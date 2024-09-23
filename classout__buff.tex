@@ -1,0 +1,103 @@
+\doxysection{out\+\_\+buff Class Reference}
+\hypertarget{classout__buff}{}\label{classout__buff}\index{out\_buff@{out\_buff}}
+
+
+Inheritance diagram for out\+\_\+buff\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=153pt]{classout__buff__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for out\+\_\+buff\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=153pt]{classout__buff__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classout__buff_aefeab815349376976ffe840b3809c223}{out\+\_\+buff}} (std\+::\+FILE \texorpdfstring{$\ast$}{*}stream)
+\item 
+\mbox{\hyperlink{classout__buff_a16f03a34ef34601514934bc18a94bd66}{\texorpdfstring{$\sim$}{\string~}out\+\_\+buff}} ()
+\item 
+int \mbox{\hyperlink{classout__buff_abf2cece897a8ecd750e9e04f7c3e817a}{sync}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{231-_cfg-_output_streams_8cpp_source_l00013}{13}} of file \mbox{\hyperlink{231-_cfg-_output_streams_8cpp_source}{231-\/\+Cfg-\/\+Output\+Streams.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classout__buff_aefeab815349376976ffe840b3809c223}\index{out\_buff@{out\_buff}!out\_buff@{out\_buff}}
+\index{out\_buff@{out\_buff}!out\_buff@{out\_buff}}
+\doxysubsubsection{\texorpdfstring{out\_buff()}{out\_buff()}}
+{\footnotesize\ttfamily \label{classout__buff_aefeab815349376976ffe840b3809c223} 
+out\+\_\+buff\+::out\+\_\+buff (\begin{DoxyParamCaption}\item[{std\+::\+FILE \texorpdfstring{$\ast$}{*}}]{stream}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{231-_cfg-_output_streams_8cpp_source_l00016}{16}} of file \mbox{\hyperlink{231-_cfg-_output_streams_8cpp_source}{231-\/\+Cfg-\/\+Output\+Streams.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00016\ :m\_stream(stream)\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classout__buff_a16f03a34ef34601514934bc18a94bd66}\index{out\_buff@{out\_buff}!````~out\_buff@{\texorpdfstring{$\sim$}{\string~}out\_buff}}
+\index{````~out\_buff@{\texorpdfstring{$\sim$}{\string~}out\_buff}!out\_buff@{out\_buff}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}out\_buff()}{\string~out\_buff()}}
+{\footnotesize\ttfamily \label{classout__buff_a16f03a34ef34601514934bc18a94bd66} 
+out\+\_\+buff\+::\texorpdfstring{$\sim$}{\string~}out\+\_\+buff (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{231-_cfg-_output_streams_8cpp_source_l00017}{17}} of file \mbox{\hyperlink{231-_cfg-_output_streams_8cpp_source}{231-\/\+Cfg-\/\+Output\+Streams.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00017\ \{\ pubsync();\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classout__buff_abf2cece897a8ecd750e9e04f7c3e817a}\index{out\_buff@{out\_buff}!sync@{sync}}
+\index{sync@{sync}!out\_buff@{out\_buff}}
+\doxysubsubsection{\texorpdfstring{sync()}{sync()}}
+{\footnotesize\ttfamily \label{classout__buff_abf2cece897a8ecd750e9e04f7c3e817a} 
+int out\+\_\+buff\+::sync (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{231-_cfg-_output_streams_8cpp_source_l00018}{18}} of file \mbox{\hyperlink{231-_cfg-_output_streams_8cpp_source}{231-\/\+Cfg-\/\+Output\+Streams.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ 0;}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ c\ :\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}())\ \{}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (putc(c,\ m\_stream)\ ==\ EOF)\ \{}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ -\/1;}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Reset\ the\ buffer\ to\ avoid\ printing\ it\ multiple\ times}}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}(\textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00029\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/examples/\mbox{\hyperlink{231-_cfg-_output_streams_8cpp}{231-\/\+Cfg-\/\+Output\+Streams.\+cpp}}\end{DoxyCompactItemize}

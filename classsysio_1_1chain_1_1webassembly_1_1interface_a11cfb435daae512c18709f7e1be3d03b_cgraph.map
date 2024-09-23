@@ -1,0 +1,9 @@
+<map id="sysio::chain::webassembly::interface::get_blockchain_parameters_packed" name="sysio::chain::webassembly::interface::get_blockchain_parameters_packed">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,14,185,70"/>
+<area shape="rect" id="Node000002" href="$namespacefc_1_1raw.html#a3a18d8161aa5b4f4f02b6fcfdff5e5d1" title=" " alt="" coords="409,29,506,55"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="185,40,394,40,394,45,185,45"/>
+<area shape="rect" id="Node000003" href="$namespacefc_1_1raw.html#a64937a5adc8041247f7007882224e225" title=" " alt="" coords="233,55,361,80"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="185,51,217,55,217,60,185,56"/>
+<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="430,30,425,21,428,11,439,5,458,3,477,5,488,12,485,16,475,10,458,8,441,10,432,15,430,20,435,28"/>
+<area shape="poly" id="edge4_Node000003_Node000002" title=" " alt="" coords="361,55,393,50,394,55,362,60"/>
+</map>

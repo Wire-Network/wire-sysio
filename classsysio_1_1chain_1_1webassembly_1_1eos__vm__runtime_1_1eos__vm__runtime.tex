@@ -1,0 +1,157 @@
+\doxysection{sysio\+::chain\+::webassembly\+::eos\+\_\+vm\+\_\+runtime\+::eos\+\_\+vm\+\_\+runtime\texorpdfstring{$<$}{<} Backend \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1eos__vm__runtime}{}\label{classsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1eos__vm__runtime}\index{sysio::chain::webassembly::eos\_vm\_runtime::eos\_vm\_runtime$<$ Backend $>$@{sysio::chain::webassembly::eos\_vm\_runtime::eos\_vm\_runtime$<$ Backend $>$}}
+
+
+{\ttfamily \#include $<$sys-\/vm.\+hpp$>$}
+
+
+
+Inheritance diagram for sysio\+::chain\+::webassembly\+::eos\+\_\+vm\+\_\+runtime\+::eos\+\_\+vm\+\_\+runtime\texorpdfstring{$<$}{<} Backend \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=215pt]{classsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1eos__vm__runtime__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for sysio\+::chain\+::webassembly\+::eos\+\_\+vm\+\_\+runtime\+::eos\+\_\+vm\+\_\+runtime\texorpdfstring{$<$}{<} Backend \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=215pt]{classsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1eos__vm__runtime__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1eos__vm__runtime_a33702ec74f0cbbb20eb59458318d441a}{eos\+\_\+vm\+\_\+runtime}} ()
+\item 
+std\+::unique\+\_\+ptr$<$ \mbox{\hyperlink{classsysio_1_1chain_1_1wasm__instantiated__module__interface}{wasm\+\_\+instantiated\+\_\+module\+\_\+interface}} $>$ \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1eos__vm__runtime_abd9f9c14ce5a8ffc2dc66457bd3f2d39}{instantiate\+\_\+module}} (const char \texorpdfstring{$\ast$}{*}code\+\_\+bytes, size\+\_\+t code\+\_\+size, std\+::vector$<$ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} $>$, const \mbox{\hyperlink{namespacesysio_1_1chain_a357fd9478475457e5bb386a3143079b6}{digest\+\_\+type}} \&code\+\_\+hash, const \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \&\mbox{\hyperlink{classsysio_1_1chain_1_1wasm__interface_a9053d9e65167e5f241f1f3f27b175f9c}{vm\+\_\+type}}, const \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \&vm\+\_\+version) override
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1eos__vm__runtime_afdcfba1cdfc2fced68f0ecd2b9355546}{immediately\+\_\+exit\+\_\+currently\+\_\+running\+\_\+module}} () override
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classsysio_1_1chain_1_1wasm__runtime__interface}{sysio\+::chain\+::wasm\+\_\+runtime\+\_\+interface}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{classsysio_1_1chain_1_1wasm__runtime__interface_ab9681628db17cab5fd9c9f878f17bf52}{\texorpdfstring{$\sim$}{\string~}wasm\+\_\+runtime\+\_\+interface}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename Impl $>$ }\\\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1eos__vm__runtime_aeffa1f8c7b8a4109a3711d0d5777ce58}{eos\+\_\+vm\+\_\+instantiated\+\_\+module}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Backend$>$\newline
+class sysio\+::chain\+::webassembly\+::eos\+\_\+vm\+\_\+runtime\+::eos\+\_\+vm\+\_\+runtime$<$ Backend $>$}
+
+
+Definition at line \mbox{\hyperlink{sys-vm_8hpp_source_l00043}{43}} of file \mbox{\hyperlink{sys-vm_8hpp_source}{sys-\/vm.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1eos__vm__runtime_a33702ec74f0cbbb20eb59458318d441a}\index{sysio::chain::webassembly::eos\_vm\_runtime::eos\_vm\_runtime$<$ Backend $>$@{sysio::chain::webassembly::eos\_vm\_runtime::eos\_vm\_runtime$<$ Backend $>$}!eos\_vm\_runtime@{eos\_vm\_runtime}}
+\index{eos\_vm\_runtime@{eos\_vm\_runtime}!sysio::chain::webassembly::eos\_vm\_runtime::eos\_vm\_runtime$<$ Backend $>$@{sysio::chain::webassembly::eos\_vm\_runtime::eos\_vm\_runtime$<$ Backend $>$}}
+\doxysubsubsection{\texorpdfstring{eos\_vm\_runtime()}{eos\_vm\_runtime()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1eos__vm__runtime_a33702ec74f0cbbb20eb59458318d441a} 
+template$<$typename Impl $>$ \\
+\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1eos__vm__runtime}{sysio\+::chain\+::webassembly\+::eos\+\_\+vm\+\_\+runtime\+::eos\+\_\+vm\+\_\+runtime}}$<$ Impl $>$\+::eos\+\_\+vm\+\_\+runtime (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_8cpp_source_l00234}{234}} of file \mbox{\hyperlink{sys-vm_8cpp_source}{sys-\/vm.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00234\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1eos__vm__runtime_afdcfba1cdfc2fced68f0ecd2b9355546}\index{sysio::chain::webassembly::eos\_vm\_runtime::eos\_vm\_runtime$<$ Backend $>$@{sysio::chain::webassembly::eos\_vm\_runtime::eos\_vm\_runtime$<$ Backend $>$}!immediately\_exit\_currently\_running\_module@{immediately\_exit\_currently\_running\_module}}
+\index{immediately\_exit\_currently\_running\_module@{immediately\_exit\_currently\_running\_module}!sysio::chain::webassembly::eos\_vm\_runtime::eos\_vm\_runtime$<$ Backend $>$@{sysio::chain::webassembly::eos\_vm\_runtime::eos\_vm\_runtime$<$ Backend $>$}}
+\doxysubsubsection{\texorpdfstring{immediately\_exit\_currently\_running\_module()}{immediately\_exit\_currently\_running\_module()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1eos__vm__runtime_afdcfba1cdfc2fced68f0ecd2b9355546} 
+template$<$typename Impl $>$ \\
+void \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1eos__vm__runtime}{sysio\+::chain\+::webassembly\+::eos\+\_\+vm\+\_\+runtime\+::eos\+\_\+vm\+\_\+runtime}}$<$ Impl $>$\+::immediately\+\_\+exit\+\_\+currently\+\_\+running\+\_\+module (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classsysio_1_1chain_1_1wasm__runtime__interface_aea114b41a2997e44fef7adb0a1877740}{sysio\+::chain\+::wasm\+\_\+runtime\+\_\+interface}}.
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_8cpp_source_l00237}{237}} of file \mbox{\hyperlink{sys-vm_8cpp_source}{sys-\/vm.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00237\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00238\ \ \ \ \textcolor{keywordflow}{throw}\ wasm\_exit\{\};}
+\DoxyCodeLine{00239\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1eos__vm__runtime_abd9f9c14ce5a8ffc2dc66457bd3f2d39}\index{sysio::chain::webassembly::eos\_vm\_runtime::eos\_vm\_runtime$<$ Backend $>$@{sysio::chain::webassembly::eos\_vm\_runtime::eos\_vm\_runtime$<$ Backend $>$}!instantiate\_module@{instantiate\_module}}
+\index{instantiate\_module@{instantiate\_module}!sysio::chain::webassembly::eos\_vm\_runtime::eos\_vm\_runtime$<$ Backend $>$@{sysio::chain::webassembly::eos\_vm\_runtime::eos\_vm\_runtime$<$ Backend $>$}}
+\doxysubsubsection{\texorpdfstring{instantiate\_module()}{instantiate\_module()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1eos__vm__runtime_abd9f9c14ce5a8ffc2dc66457bd3f2d39} 
+template$<$typename Impl $>$ \\
+std\+::unique\+\_\+ptr$<$ \mbox{\hyperlink{classsysio_1_1chain_1_1wasm__instantiated__module__interface}{wasm\+\_\+instantiated\+\_\+module\+\_\+interface}} $>$ \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1eos__vm__runtime}{sysio\+::chain\+::webassembly\+::eos\+\_\+vm\+\_\+runtime\+::eos\+\_\+vm\+\_\+runtime}}$<$ Impl $>$\+::instantiate\+\_\+module (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{code\+\_\+bytes}{, }\item[{size\+\_\+t}]{code\+\_\+size}{, }\item[{std\+::vector$<$ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} $>$}]{}{, }\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_a357fd9478475457e5bb386a3143079b6}{digest\+\_\+type}} \&}]{code\+\_\+hash}{, }\item[{const \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \&}]{vm\+\_\+type}{, }\item[{const \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \&}]{vm\+\_\+version}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classsysio_1_1chain_1_1wasm__runtime__interface_a79e2ff303be06eb3029125857756e441}{sysio\+::chain\+::wasm\+\_\+runtime\+\_\+interface}}.
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_8cpp_source_l00242}{242}} of file \mbox{\hyperlink{sys-vm_8cpp_source}{sys-\/vm.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00243\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00244\ }
+\DoxyCodeLine{00245\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{namespacesysio_1_1chain_a48442460d3a1314dec60433ab2f5ab15}{eos\_vm\_backend\_t<Impl>}};}
+\DoxyCodeLine{00246\ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00247\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1vm_a9ec5735264f754f4960b35edb8693bfa}{wasm\_code\_ptr}}\ code((\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}*)code\_bytes,\ code\_size);}
+\DoxyCodeLine{00248\ \ \ \ \ \ \ apply\_options\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}\ =\ \{\ .max\_pages\ =\ 65536,}
+\DoxyCodeLine{00249\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .max\_call\_depth\ =\ 0\ \};}
+\DoxyCodeLine{00250\ \ \ \ \ \ \ std::unique\_ptr<backend\_t>\ \mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}\ =\ std::make\_unique<backend\_t>(code,\ code\_size,\ \textcolor{keyword}{nullptr},\ options);}
+\DoxyCodeLine{00251\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1registered__host__functions_abb74daf946a6b4a1756a0ba3f08c1c04}{eos\_vm\_host\_functions\_t::resolve}}(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}-\/>\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af2bdf6918391f431538eb92100389eab}{get\_module}}());}
+\DoxyCodeLine{00252\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::make\_unique<eos\_vm\_instantiated\_module<Impl>>(\textcolor{keyword}{this},\ std::move(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}));}
+\DoxyCodeLine{00253\ \ \ \ \}\ \textcolor{keywordflow}{catch}(\mbox{\hyperlink{structsysio_1_1vm_1_1exception}{sysio::vm::exception}}\&\ e)\ \{}
+\DoxyCodeLine{00254\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(wasm\_execution\_error,\ \textcolor{stringliteral}{"{}Error\ building\ sys-\/vm\ interp:\ \$\{e\}"{}},\ (\textcolor{stringliteral}{"{}e"{}},\ e.\mbox{\hyperlink{structsysio_1_1vm_1_1exception_ae888671119bac3f7c635b6bc8244dc33}{what}}()));}
+\DoxyCodeLine{00255\ \ \ \ \}}
+\DoxyCodeLine{00256\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1eos__vm__runtime_abd9f9c14ce5a8ffc2dc66457bd3f2d39_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{classsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1eos__vm__runtime_aeffa1f8c7b8a4109a3711d0d5777ce58}\index{sysio::chain::webassembly::eos\_vm\_runtime::eos\_vm\_runtime$<$ Backend $>$@{sysio::chain::webassembly::eos\_vm\_runtime::eos\_vm\_runtime$<$ Backend $>$}!eos\_vm\_instantiated\_module@{eos\_vm\_instantiated\_module}}
+\index{eos\_vm\_instantiated\_module@{eos\_vm\_instantiated\_module}!sysio::chain::webassembly::eos\_vm\_runtime::eos\_vm\_runtime$<$ Backend $>$@{sysio::chain::webassembly::eos\_vm\_runtime::eos\_vm\_runtime$<$ Backend $>$}}
+\doxysubsubsection{\texorpdfstring{eos\_vm\_instantiated\_module}{eos\_vm\_instantiated\_module}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1eos__vm__runtime_aeffa1f8c7b8a4109a3711d0d5777ce58} 
+template$<$typename Backend $>$ \\
+template$<$typename Impl $>$ \\
+friend \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1eos__vm__instantiated__module}{eos\+\_\+vm\+\_\+instantiated\+\_\+module}}\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_8hpp_source_l00058}{58}} of file \mbox{\hyperlink{sys-vm_8hpp_source}{sys-\/vm.\+hpp}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/webassembly/\mbox{\hyperlink{sys-vm_8hpp}{sys-\/vm.\+hpp}}\item 
+libraries/chain/webassembly/runtimes/\mbox{\hyperlink{sys-vm_8cpp}{sys-\/vm.\+cpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,68 @@
+\doxysection{libraries/sys-\/vm/tests/null\+\_\+tests.cpp File Reference}
+\hypertarget{null__tests_8cpp}{}\label{null__tests_8cpp}\index{libraries/sys-\/vm/tests/null\_tests.cpp@{libraries/sys-\/vm/tests/null\_tests.cpp}}
+{\ttfamily \#include $<$sysio/vm/backend.\+hpp$>$}\newline
+{\ttfamily \#include $<$catch2/catch.\+hpp$>$}\newline
+{\ttfamily \#include "{}utils.\+hpp"{}}\newline
+Include dependency graph for null\+\_\+tests.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{null__tests_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{null__tests_8cpp_af06b994226466680cf246c63a32b76e1}{TEST\+\_\+\+CASE}} ("{}Tests \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}} null backend"{}, "{}\mbox{[}null\+\_\+backend\mbox{]}"{})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+wasm\+\_\+allocator \mbox{\hyperlink{null__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{null__tests_8cpp_af06b994226466680cf246c63a32b76e1}\index{null\_tests.cpp@{null\_tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!null\_tests.cpp@{null\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}}
+{\footnotesize\ttfamily \label{null__tests_8cpp_af06b994226466680cf246c63a32b76e1} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Tests \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}} null backend"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}null\+\_\+backend\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{null__tests_8cpp_source_l00009}{9}} of file \mbox{\hyperlink{null__tests_8cpp_source}{null\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00009\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00010\ \ \ \ \textcolor{comment}{/*}}
+\DoxyCodeLine{00011\ \textcolor{comment}{\ \ \ \ *\ (module)}}
+\DoxyCodeLine{00012\ \textcolor{comment}{\ \ \ \ */}}
+\DoxyCodeLine{00013\ \ \ \ std::vector<uint8\_t>\ code\ =\ \{\ 0x00,\ 0x61,\ 0x73,\ 0x6d,\ 0x01,\ 0x00,\ 0x00,\ 0x00\ \};}
+\DoxyCodeLine{00014\ }
+\DoxyCodeLine{00015\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ null\_backend>}};}
+\DoxyCodeLine{00016\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ \mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}(code,\ \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{00017\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=233pt]{null__tests_8cpp_af06b994226466680cf246c63a32b76e1_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{null__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}\index{null\_tests.cpp@{null\_tests.cpp}!wa@{wa}}
+\index{wa@{wa}!null\_tests.cpp@{null\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{wa}{wa}}
+{\footnotesize\ttfamily \label{null__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89} 
+wasm\+\_\+allocator wa\hspace{0.3cm}{\ttfamily [extern]}}
+
+
+
+Definition at line \mbox{\hyperlink{libraries_2sys-vm_2tests_2main_8cpp_source_l00010}{10}} of file \mbox{\hyperlink{libraries_2sys-vm_2tests_2main_8cpp_source}{main.\+cpp}}.
+

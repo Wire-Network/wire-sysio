@@ -1,0 +1,7 @@
+<map id="local_identity" name="local_identity">
+<area shape="rect" id="Node000001" title=" " alt="" coords="120,94,218,120"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,170,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="111,41,160,92,156,95,107,44"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="194,5,307,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="230,44,182,95,178,92,227,41"/>
+</map>

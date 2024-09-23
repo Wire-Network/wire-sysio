@@ -1,0 +1,17 @@
+\chapter{Broadcast Tutorial}
+\hypertarget{md_libraries_2fc_2vendor_2websocketpp_2tutorials_2broadcast__tutorial_2broadcast__tutorial}{}\label{md_libraries_2fc_2vendor_2websocketpp_2tutorials_2broadcast__tutorial_2broadcast__tutorial}\index{Broadcast Tutorial@{Broadcast Tutorial}}
+This tutorial will dig into some more nitty gritty details on how to build high scalability, high performance websocket servers for broadcast like workflows.
+
+Will go into features like\+:
+\begin{DoxyItemize}
+\item minimizing work done in handlers
+\item using asio thread pool mode
+\item teaming multiple endpoints
+\item setting accept queue depth
+\item tuning compile time buffer sizes
+\item prepared messages
+\item flow control
+\item basic operating system level tuning, particularly increasing file descriptor limits.
+\item measuring performance with wsperf / autobahn
+\item tuning permessage-\/deflate compression settings 
+\end{DoxyItemize}

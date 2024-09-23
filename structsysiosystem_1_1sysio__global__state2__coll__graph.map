@@ -1,0 +1,7 @@
+<map id="sysiosystem::sysio_global_state2" name="sysiosystem::sysio_global_state2">
+<area shape="rect" id="Node000001" title=" " alt="" coords="89,139,224,180"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1chain_1_1block__timestamp.html" title=" " alt="" coords="5,5,172,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="85,76,87,96,93,114,102,126,115,136,112,141,99,130,88,116,81,97,80,77"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="196,20,256,46"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="222,62,212,89,199,116,180,140,176,137,194,114,207,87,217,60"/>
+</map>

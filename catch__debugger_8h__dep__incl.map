@@ -1,0 +1,15 @@
+<map id="libraries/sys&#45;vm/external/Catch2/include/internal/catch_debugger.h" name="libraries/sys&#45;vm/external/Catch2/include/internal/catch_debugger.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="315,5,479,61"/>
+<area shape="rect" id="Node000002" href="$catch__assertionhandler_8cpp.html" title=" " alt="" coords="5,109,189,165"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="303,69,178,111,177,106,301,64"/>
+<area shape="rect" id="Node000004" href="$include_2internal_2catch__console__colour_8cpp.html" title=" " alt="" coords="213,109,389,165"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="363,74,329,110,325,107,359,71"/>
+<area shape="rect" id="Node000005" href="$include_2internal_2catch__debugger_8cpp.html" title=" " alt="" coords="413,109,576,165"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="436,71,470,107,466,110,432,74"/>
+<area shape="rect" id="Node000006" href="$projects_2_self_test_2_surrogate_cpps_2catch__debugger_8cpp.html" title=" " alt="" coords="600,109,832,165"/>
+<area shape="poly" id="edge7_Node000001_Node000006" title=" " alt="" coords="494,63,631,106,629,111,493,68"/>
+<area shape="rect" id="Node000003" href="$catch__objc__impl_8mm.html" title=" " alt="" coords="204,213,398,268"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="166,169,247,210,245,214,164,174"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="304,180,304,212,298,212,298,180"/>
+<area shape="poly" id="edge6_Node000005_Node000003" title=" " alt="" coords="430,175,354,214,352,210,428,170"/>
+</map>

@@ -1,0 +1,89 @@
+\doxysection{libraries/yubihsm/common/rand.h File Reference}
+\hypertarget{rand_8h}{}\label{rand_8h}\index{libraries/yubihsm/common/rand.h@{libraries/yubihsm/common/rand.h}}
+{\ttfamily \#include $<$stdbool.\+h$>$}\newline
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include $<$stddef.\+h$>$}\newline
+Include dependency graph for rand.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=272pt]{rand_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=330pt]{rand_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{rand_8h_aa1c48ca7b894657e01905d3074b38b8c}{YH\+\_\+\+INTERNAL}}~\+\_\+\+\_\+attribute\+\_\+\+\_\+((visibility("{}hidden"{})))
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{aes_8h_a3f74f478154eb204fc614b5e9fcde0d1}{YH\+\_\+\+INTERNAL}} \mbox{\hyperlink{rand_8h_a77a2c5608345e4024f55fbe9d86b0998}{rand\+\_\+generate}} (\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}, size\+\_\+t cb\+\_\+buf)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{rand_8h_aa1c48ca7b894657e01905d3074b38b8c}\index{rand.h@{rand.h}!YH\_INTERNAL@{YH\_INTERNAL}}
+\index{YH\_INTERNAL@{YH\_INTERNAL}!rand.h@{rand.h}}
+\doxysubsubsection{\texorpdfstring{YH\_INTERNAL}{YH\_INTERNAL}}
+{\footnotesize\ttfamily \label{rand_8h_aa1c48ca7b894657e01905d3074b38b8c} 
+\#define YH\+\_\+\+INTERNAL~\+\_\+\+\_\+attribute\+\_\+\+\_\+((visibility("{}hidden"{})))}
+
+
+
+Definition at line \mbox{\hyperlink{rand_8h_source_l00034}{34}} of file \mbox{\hyperlink{rand_8h_source}{rand.\+h}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{rand_8h_a77a2c5608345e4024f55fbe9d86b0998}\index{rand.h@{rand.h}!rand\_generate@{rand\_generate}}
+\index{rand\_generate@{rand\_generate}!rand.h@{rand.h}}
+\doxysubsubsection{\texorpdfstring{rand\_generate()}{rand\_generate()}}
+{\footnotesize\ttfamily \label{rand_8h_a77a2c5608345e4024f55fbe9d86b0998} 
+bool \mbox{\hyperlink{aes_8h_a3f74f478154eb204fc614b5e9fcde0d1}{YH\+\_\+\+INTERNAL}} rand\+\_\+generate (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{buf}{, }\item[{size\+\_\+t}]{cb\+\_\+buf}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{rand_8c_source_l00027}{27}} of file \mbox{\hyperlink{rand_8c_source}{rand.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00028\ }
+\DoxyCodeLine{00029\ \textcolor{preprocessor}{\#ifdef\ \_WIN32\_BCRYPT}}
+\DoxyCodeLine{00030\ \ \ NTSTATUS\ status\ =\ STATUS\_SUCCESS;}
+\DoxyCodeLine{00031\ }
+\DoxyCodeLine{00032\ \ \ BCRYPT\_ALG\_HANDLE\ hAlg\ =\ 0;}
+\DoxyCodeLine{00033\ }
+\DoxyCodeLine{00034\ \ \ \textcolor{keywordflow}{if}\ (!BCRYPT\_SUCCESS(}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ status\ =}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ \ BCryptOpenAlgorithmProvider(\&hAlg,\ BCRYPT\_RNG\_ALGORITHM,\ NULL,\ 0)))\ \{}
+\DoxyCodeLine{00037\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00038\ \ \ \}}
+\DoxyCodeLine{00039\ }
+\DoxyCodeLine{00040\ \ \ status\ =\ BCryptGenRandom(hAlg,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ (ULONG)\ cb\_buf,\ 0);}
+\DoxyCodeLine{00041\ \ \ BCryptCloseAlgorithmProvider(hAlg,\ 0);}
+\DoxyCodeLine{00042\ }
+\DoxyCodeLine{00043\ \ \ \textcolor{keywordflow}{return}\ BCRYPT\_SUCCESS(status);}
+\DoxyCodeLine{00044\ }
+\DoxyCodeLine{00045\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00046\ \ \ \textcolor{keywordflow}{return}\ (1\ ==\ RAND\_bytes(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ cb\_buf));}
+\DoxyCodeLine{00047\ }
+\DoxyCodeLine{00048\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00049\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{rand_8h_a77a2c5608345e4024f55fbe9d86b0998_icgraph}
+\end{center}
+\end{figure}

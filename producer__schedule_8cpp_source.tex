@@ -1,0 +1,29 @@
+\doxysection{producer\+\_\+schedule.\+cpp}
+\hypertarget{producer__schedule_8cpp_source}{}\label{producer__schedule_8cpp_source}\index{libraries/chain/producer\_schedule.cpp@{libraries/chain/producer\_schedule.cpp}}
+\mbox{\hyperlink{producer__schedule_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{producer__schedule_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{producer__schedule_8hpp}{sysio/chain/producer\_schedule.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{producer__schedule_8cpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{producer__schedule_8cpp_source_l00003}00003\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{\ \textcolor{keyword}{namespace\ }chain\ \{}
+\DoxyCodeLine{\Hypertarget{producer__schedule_8cpp_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{producer__schedule_8cpp_source_l00005}\mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority_ad3b20bf5d86566c173e867ce2a531e36}{00005}}\ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}\ \mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority_ad3b20bf5d86566c173e867ce2a531e36}{producer\_authority::get\_abi\_variant}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{producer__schedule_8cpp_source_l00006}00006\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ authority\_variant\ =\ std::visit([](\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})\{}
+\DoxyCodeLine{\Hypertarget{producer__schedule_8cpp_source_l00007}00007\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}};}
+\DoxyCodeLine{\Hypertarget{producer__schedule_8cpp_source_l00008}00008\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_adea61f2343de94d0fbcb920a32332ad9}{fc::to\_variant}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}});}
+\DoxyCodeLine{\Hypertarget{producer__schedule_8cpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{producer__schedule_8cpp_source_l00010}00010\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}\ type\ =\ std::string(std::decay\_t<\textcolor{keyword}{decltype}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})>::abi\_type\_name());}
+\DoxyCodeLine{\Hypertarget{producer__schedule_8cpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{producer__schedule_8cpp_source_l00012}00012\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{fc::variants}}\ \{}
+\DoxyCodeLine{\Hypertarget{producer__schedule_8cpp_source_l00013}00013\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::move(type),}
+\DoxyCodeLine{\Hypertarget{producer__schedule_8cpp_source_l00014}00014\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::move(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})}
+\DoxyCodeLine{\Hypertarget{producer__schedule_8cpp_source_l00015}00015\ \ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{producer__schedule_8cpp_source_l00016}00016\ \ \ \ \ \ \ \},\ \mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority_a2eb7b3851731ca960fc23c2a646cd828}{authority}});}
+\DoxyCodeLine{\Hypertarget{producer__schedule_8cpp_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{producer__schedule_8cpp_source_l00018}00018\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}()}
+\DoxyCodeLine{\Hypertarget{producer__schedule_8cpp_source_l00019}00019\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}producer\_name"{}},\ \mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority_a8910e67801c1f21448f5cc6e358b99c5}{producer\_name}})}
+\DoxyCodeLine{\Hypertarget{producer__schedule_8cpp_source_l00020}00020\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}authority"{}},\ std::move(authority\_variant));}
+\DoxyCodeLine{\Hypertarget{producer__schedule_8cpp_source_l00021}00021\ \}}
+\DoxyCodeLine{\Hypertarget{producer__schedule_8cpp_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{producer__schedule_8cpp_source_l00023}00023\ \}\ \}\ }
+
+\end{DoxyCode}

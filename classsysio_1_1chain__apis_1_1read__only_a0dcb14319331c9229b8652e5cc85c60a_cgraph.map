@@ -1,0 +1,9 @@
+<map id="sysio::chain_apis::read_only::copy_inline_row" name="sysio::chain_apis::read_only::copy_inline_row">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,63,184,103"/>
+<area shape="rect" id="Node000002" href="$classchainbase_1_1shared__cow__string.html#aa7b1bac206e0abc7e9ea9d642eb0b5b3" title=" " alt="" coords="232,5,390,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="173,60,216,48,217,53,174,65"/>
+<area shape="rect" id="Node000003" href="$yubihsm__pkcs11_8c.html#ae785d5badbf1f08b491af31f32a135a1" title=" " alt="" coords="275,70,346,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="184,80,260,80,260,86,184,86"/>
+<area shape="rect" id="Node000004" href="$classchainbase_1_1shared__cow__string.html#a3b3c57c0d2ee027bb70beb283be2a0f2" title=" " alt="" coords="232,120,390,161"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="174,101,217,113,216,118,173,106"/>
+</map>

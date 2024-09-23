@@ -1,0 +1,98 @@
+\doxysection{websocketpp\+::sha1 Namespace Reference}
+\hypertarget{namespacewebsocketpp_1_1sha1}{}\label{namespacewebsocketpp_1_1sha1}\index{websocketpp::sha1@{websocketpp::sha1}}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{namespacewebsocketpp_1_1sha1_ad75335df7a69d69b3fb8fef3f4594812}{calc}} (void const \texorpdfstring{$\ast$}{*}src, size\+\_\+t bytelength, unsigned char \texorpdfstring{$\ast$}{*}hash)
+\begin{DoxyCompactList}\small\item\em Calculate a SHA1 hash. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacewebsocketpp_1_1sha1_ad75335df7a69d69b3fb8fef3f4594812}\index{websocketpp::sha1@{websocketpp::sha1}!calc@{calc}}
+\index{calc@{calc}!websocketpp::sha1@{websocketpp::sha1}}
+\doxysubsubsection{\texorpdfstring{calc()}{calc()}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1sha1_ad75335df7a69d69b3fb8fef3f4594812} 
+void websocketpp\+::sha1\+::calc (\begin{DoxyParamCaption}\item[{void const \texorpdfstring{$\ast$}{*}}]{src}{, }\item[{size\+\_\+t}]{bytelength}{, }\item[{unsigned char \texorpdfstring{$\ast$}{*}}]{hash}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+\begin{DoxyParams}{Parameters}
+{\em src} & points to any kind of data to be hashed. \\
+\hline
+{\em bytelength} & the number of bytes to hash from the src pointer. \\
+\hline
+{\em hash} & should point to a buffer of at least 20 bytes of size for storing the \doxylink{namespacewebsocketpp_1_1sha1}{sha1} result in. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{vendor_2websocketpp_2websocketpp_2sha1_2sha1_8hpp_source_l00127}{127}} of file \mbox{\hyperlink{vendor_2websocketpp_2websocketpp_2sha1_2sha1_8hpp_source}{sha1.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00128\ \ \ \ \ \textcolor{comment}{//\ Init\ the\ result\ array.}}
+\DoxyCodeLine{00129\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ result[5]\ =\ \{\ 0x67452301,\ 0xefcdab89,\ 0x98badcfe,}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x10325476,\ 0xc3d2e1f0\ \};}
+\DoxyCodeLine{00131\ }
+\DoxyCodeLine{00132\ \ \ \ \ \textcolor{comment}{//\ Cast\ the\ void\ src\ pointer\ to\ be\ the\ byte\ array\ we\ can\ work\ with.}}
+\DoxyCodeLine{00133\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ \textcolor{keyword}{const}\ *\ sarray\ =\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ \textcolor{keyword}{const}\ *)\ src;}
+\DoxyCodeLine{00134\ }
+\DoxyCodeLine{00135\ \ \ \ \ \textcolor{comment}{//\ The\ reusable\ round\ buffer}}
+\DoxyCodeLine{00136\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ w[80];}
+\DoxyCodeLine{00137\ }
+\DoxyCodeLine{00138\ \ \ \ \ \textcolor{comment}{//\ Loop\ through\ all\ complete\ 64byte\ blocks.}}
+\DoxyCodeLine{00139\ }
+\DoxyCodeLine{00140\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ endCurrentBlock;}
+\DoxyCodeLine{00141\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ currentBlock\ =\ 0;}
+\DoxyCodeLine{00142\ }
+\DoxyCodeLine{00143\ \ \ \ \ \textcolor{keywordflow}{if}\ (bytelength\ >=\ 64)\ \{}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \textcolor{keyword}{const}\ endOfFullBlocks\ =\ bytelength\ -\/\ 64;}
+\DoxyCodeLine{00145\ }
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (currentBlock\ <=\ endOfFullBlocks)\ \{}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \ \ \ \ endCurrentBlock\ =\ currentBlock\ +\ 64;}
+\DoxyCodeLine{00148\ }
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Init\ the\ round\ buffer\ with\ the\ 64\ byte\ block\ data.}}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ roundPos\ =\ 0;\ currentBlock\ <\ endCurrentBlock;\ currentBlock\ +=\ 4)}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ This\ line\ will\ swap\ endian\ on\ big\ endian\ and\ keep\ endian\ on}}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ little\ endian.}}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ w[roundPos++]\ =\ (\textcolor{keywordtype}{unsigned}\ int)\ sarray[currentBlock\ +\ 3]}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ (((\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int})\ sarray[currentBlock\ +\ 2])\ <<\ 8)}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ (((\textcolor{keywordtype}{unsigned}\ int)\ sarray[currentBlock\ +\ 1])\ <<\ 16)}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ (((\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int})\ sarray[currentBlock])\ <<\ 24);}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \ \ \ \ innerHash(result,\ w);}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00161\ \ \ \ \ \}}
+\DoxyCodeLine{00162\ }
+\DoxyCodeLine{00163\ \ \ \ \ \textcolor{comment}{//\ Handle\ the\ last\ and\ not\ full\ 64\ byte\ block\ if\ existing.}}
+\DoxyCodeLine{00164\ \ \ \ \ endCurrentBlock\ =\ bytelength\ -\/\ currentBlock;}
+\DoxyCodeLine{00165\ \ \ \ \ clearWBuffert(w);}
+\DoxyCodeLine{00166\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ lastBlockBytes\ =\ 0;}
+\DoxyCodeLine{00167\ \ \ \ \ \textcolor{keywordflow}{for}\ (;lastBlockBytes\ <\ endCurrentBlock;\ ++lastBlockBytes)\ \{}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ w[lastBlockBytes\ >>\ 2]\ |=\ (\textcolor{keywordtype}{unsigned}\ int)\ sarray[lastBlockBytes\ +\ currentBlock]\ <<\ ((3\ -\/\ (lastBlockBytes\ \&\ 3))\ <<\ 3);}
+\DoxyCodeLine{00169\ \ \ \ \ \}}
+\DoxyCodeLine{00170\ }
+\DoxyCodeLine{00171\ \ \ \ \ w[lastBlockBytes\ >>\ 2]\ |=\ 0x80\ <<\ ((3\ -\/\ (lastBlockBytes\ \&\ 3))\ <<\ 3);}
+\DoxyCodeLine{00172\ \ \ \ \ \textcolor{keywordflow}{if}\ (endCurrentBlock\ >=\ 56)\ \{}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ innerHash(result,\ w);}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ clearWBuffert(w);}
+\DoxyCodeLine{00175\ \ \ \ \ \}}
+\DoxyCodeLine{00176\ \ \ \ \ w[15]\ =\ bytelength\ <<\ 3;}
+\DoxyCodeLine{00177\ \ \ \ \ innerHash(result,\ w);}
+\DoxyCodeLine{00178\ }
+\DoxyCodeLine{00179\ \ \ \ \ \textcolor{comment}{//\ Store\ hash\ in\ result\ pointer,\ and\ make\ sure\ we\ get\ in\ in\ the\ correct}}
+\DoxyCodeLine{00180\ \ \ \ \ \textcolor{comment}{//\ order\ on\ both\ endian\ models.}}
+\DoxyCodeLine{00181\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ hashByte\ =\ 20;\ -\/-\/hashByte\ >=\ 0;)\ \{}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ hash[hashByte]\ =\ (result[hashByte\ >>\ 2]\ >>\ (((3\ -\/\ hashByte)\ \&\ 0x3)\ <<\ 3))\ \&\ 0xff;}
+\DoxyCodeLine{00183\ \ \ \ \ \}}
+\DoxyCodeLine{00184\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacewebsocketpp_1_1sha1_ad75335df7a69d69b3fb8fef3f4594812_icgraph}
+\end{center}
+\end{figure}

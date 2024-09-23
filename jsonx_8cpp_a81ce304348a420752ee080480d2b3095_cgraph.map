@@ -1,0 +1,19 @@
+<map id="main" name="main">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,80,55,106"/>
+<area shape="rect" id="Node000002" href="$class_generic_reader.html#ae9008523ccd06d839a57335835cb4091" title="Get the position of last parsing error in input, 0 otherwise." alt="" coords="117,5,318,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="44,77,70,58,102,40,118,34,120,39,104,45,73,62,48,82"/>
+<area shape="rect" id="Node000004" href="$group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga28835eb93d2c3c07bbea13515eb31415" title="Maps error code of parsing into error message." alt="" coords="154,55,282,80"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="55,87,138,75,139,81,56,92"/>
+<area shape="rect" id="Node000005" href="$class_generic_reader.html#a937bf90919f50e1c370b312cee5833e8" title="Get the ParseErrorCode of last parsing." alt="" coords="103,104,333,130"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="56,93,98,99,97,104,55,99"/>
+<area shape="rect" id="Node000007" href="$class_generic_reader.html#a0c450620d14ff1824e58bb7bd9b42099" title="Parse JSON text." alt="" coords="143,153,293,179"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="48,104,73,123,104,140,129,149,127,154,102,145,70,127,45,108"/>
+<area shape="rect" id="Node000003" href="$struct_parse_result.html#afbe762766ac21b2aae266105f1dfa643" title="Get the error offset, if IsError(), 0 otherwise." alt="" coords="381,5,518,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="319,16,365,16,365,21,319,21"/>
+<area shape="rect" id="Node000006" href="$struct_parse_result.html#a2aae3c2f42b31cc2409ee1e03bc4852e" title="Get the error code." alt="" coords="384,104,516,130"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="333,114,368,114,368,120,333,120"/>
+<area shape="rect" id="Node000008" href="$struct_parse_result.html#a88b6d44f052a19e6436ae6aadc2c40b4" title="Reset error code." alt="" coords="384,153,516,179"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="294,164,368,164,368,169,294,169"/>
+<area shape="rect" id="Node000009" href="$struct_parse_result.html#aa81b4a7b776b77216cb752385203a8c1" title="Update error code and offset." alt="" coords="566,153,688,179"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="516,164,551,164,551,169,516,169"/>
+</map>

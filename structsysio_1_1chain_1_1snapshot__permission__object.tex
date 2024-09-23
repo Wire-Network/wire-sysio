@@ -1,0 +1,105 @@
+\doxysection{sysio\+::chain\+::snapshot\+\_\+permission\+\_\+object Struct Reference}
+\hypertarget{structsysio_1_1chain_1_1snapshot__permission__object}{}\label{structsysio_1_1chain_1_1snapshot__permission__object}\index{sysio::chain::snapshot\_permission\_object@{sysio::chain::snapshot\_permission\_object}}
+
+
+{\ttfamily \#include $<$permission\+\_\+object.\+hpp$>$}
+
+
+
+Collaboration diagram for sysio\+::chain\+::snapshot\+\_\+permission\+\_\+object\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1snapshot__permission__object__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_aacc541763fed17ee490b6ac42b7bb77a}{permission\+\_\+name}} \mbox{\hyperlink{structsysio_1_1chain_1_1snapshot__permission__object_a369423725eb667c68b10d2653e07872e}{parent}}
+\begin{DoxyCompactList}\small\item\em parent permission \end{DoxyCompactList}\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} \mbox{\hyperlink{structsysio_1_1chain_1_1snapshot__permission__object_aabb140f7580c588302dc3038e7ed83b8}{owner}}
+\begin{DoxyCompactList}\small\item\em the account this permission belongs to \end{DoxyCompactList}\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_aacc541763fed17ee490b6ac42b7bb77a}{permission\+\_\+name}} \mbox{\hyperlink{structsysio_1_1chain_1_1snapshot__permission__object_ab717b57132e2b8c47442468be92bd167}{name}}
+\begin{DoxyCompactList}\small\item\em human-\/readable name for the permission \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} \mbox{\hyperlink{structsysio_1_1chain_1_1snapshot__permission__object_a6252fb98de04b0a812b044bf78552386}{last\+\_\+updated}}
+\begin{DoxyCompactList}\small\item\em the last time this authority was updated \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} \mbox{\hyperlink{structsysio_1_1chain_1_1snapshot__permission__object_ae88d394c8874eed2f4366c6aaa4b9803}{last\+\_\+used}}
+\begin{DoxyCompactList}\small\item\em when this permission was last used \end{DoxyCompactList}\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1authority}{authority}} \mbox{\hyperlink{structsysio_1_1chain_1_1snapshot__permission__object_a08632f1e4dd62a964d83f81cdbf7b522}{auth}}
+\begin{DoxyCompactList}\small\item\em authority required to execute this permission \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+special cased to abstract the foreign keys for usage and the optimization of using OID for the parent 
+
+Definition at line \mbox{\hyperlink{permission__object_8hpp_source_l00073}{73}} of file \mbox{\hyperlink{permission__object_8hpp_source}{permission\+\_\+object.\+hpp}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1chain_1_1snapshot__permission__object_a08632f1e4dd62a964d83f81cdbf7b522}\index{sysio::chain::snapshot\_permission\_object@{sysio::chain::snapshot\_permission\_object}!auth@{auth}}
+\index{auth@{auth}!sysio::chain::snapshot\_permission\_object@{sysio::chain::snapshot\_permission\_object}}
+\doxysubsubsection{\texorpdfstring{auth}{auth}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1snapshot__permission__object_a08632f1e4dd62a964d83f81cdbf7b522} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1authority}{authority}} sysio\+::chain\+::snapshot\+\_\+permission\+\_\+object\+::auth}
+
+
+
+Definition at line \mbox{\hyperlink{permission__object_8hpp_source_l00079}{79}} of file \mbox{\hyperlink{permission__object_8hpp_source}{permission\+\_\+object.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1snapshot__permission__object_a6252fb98de04b0a812b044bf78552386}\index{sysio::chain::snapshot\_permission\_object@{sysio::chain::snapshot\_permission\_object}!last\_updated@{last\_updated}}
+\index{last\_updated@{last\_updated}!sysio::chain::snapshot\_permission\_object@{sysio::chain::snapshot\_permission\_object}}
+\doxysubsubsection{\texorpdfstring{last\_updated}{last\_updated}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1snapshot__permission__object_a6252fb98de04b0a812b044bf78552386} 
+\mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} sysio\+::chain\+::snapshot\+\_\+permission\+\_\+object\+::last\+\_\+updated}
+
+
+
+Definition at line \mbox{\hyperlink{permission__object_8hpp_source_l00077}{77}} of file \mbox{\hyperlink{permission__object_8hpp_source}{permission\+\_\+object.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1snapshot__permission__object_ae88d394c8874eed2f4366c6aaa4b9803}\index{sysio::chain::snapshot\_permission\_object@{sysio::chain::snapshot\_permission\_object}!last\_used@{last\_used}}
+\index{last\_used@{last\_used}!sysio::chain::snapshot\_permission\_object@{sysio::chain::snapshot\_permission\_object}}
+\doxysubsubsection{\texorpdfstring{last\_used}{last\_used}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1snapshot__permission__object_ae88d394c8874eed2f4366c6aaa4b9803} 
+\mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} sysio\+::chain\+::snapshot\+\_\+permission\+\_\+object\+::last\+\_\+used}
+
+
+
+Definition at line \mbox{\hyperlink{permission__object_8hpp_source_l00078}{78}} of file \mbox{\hyperlink{permission__object_8hpp_source}{permission\+\_\+object.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1snapshot__permission__object_ab717b57132e2b8c47442468be92bd167}\index{sysio::chain::snapshot\_permission\_object@{sysio::chain::snapshot\_permission\_object}!name@{name}}
+\index{name@{name}!sysio::chain::snapshot\_permission\_object@{sysio::chain::snapshot\_permission\_object}}
+\doxysubsubsection{\texorpdfstring{name}{name}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1snapshot__permission__object_ab717b57132e2b8c47442468be92bd167} 
+\mbox{\hyperlink{namespacesysio_1_1chain_aacc541763fed17ee490b6ac42b7bb77a}{permission\+\_\+name}} sysio\+::chain\+::snapshot\+\_\+permission\+\_\+object\+::name}
+
+
+
+Definition at line \mbox{\hyperlink{permission__object_8hpp_source_l00076}{76}} of file \mbox{\hyperlink{permission__object_8hpp_source}{permission\+\_\+object.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1snapshot__permission__object_aabb140f7580c588302dc3038e7ed83b8}\index{sysio::chain::snapshot\_permission\_object@{sysio::chain::snapshot\_permission\_object}!owner@{owner}}
+\index{owner@{owner}!sysio::chain::snapshot\_permission\_object@{sysio::chain::snapshot\_permission\_object}}
+\doxysubsubsection{\texorpdfstring{owner}{owner}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1snapshot__permission__object_aabb140f7580c588302dc3038e7ed83b8} 
+\mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} sysio\+::chain\+::snapshot\+\_\+permission\+\_\+object\+::owner}
+
+
+
+Definition at line \mbox{\hyperlink{permission__object_8hpp_source_l00075}{75}} of file \mbox{\hyperlink{permission__object_8hpp_source}{permission\+\_\+object.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1snapshot__permission__object_a369423725eb667c68b10d2653e07872e}\index{sysio::chain::snapshot\_permission\_object@{sysio::chain::snapshot\_permission\_object}!parent@{parent}}
+\index{parent@{parent}!sysio::chain::snapshot\_permission\_object@{sysio::chain::snapshot\_permission\_object}}
+\doxysubsubsection{\texorpdfstring{parent}{parent}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1snapshot__permission__object_a369423725eb667c68b10d2653e07872e} 
+\mbox{\hyperlink{namespacesysio_1_1chain_aacc541763fed17ee490b6ac42b7bb77a}{permission\+\_\+name}} sysio\+::chain\+::snapshot\+\_\+permission\+\_\+object\+::parent}
+
+
+
+Definition at line \mbox{\hyperlink{permission__object_8hpp_source_l00074}{74}} of file \mbox{\hyperlink{permission__object_8hpp_source}{permission\+\_\+object.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{permission__object_8hpp}{permission\+\_\+object.\+hpp}}\end{DoxyCompactItemize}

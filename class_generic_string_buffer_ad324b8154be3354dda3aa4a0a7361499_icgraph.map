@@ -1,0 +1,17 @@
+<map id="GenericStringBuffer::GetLength" name="GenericStringBuffer::GetLength">
+<area shape="rect" id="Node000001" title="Get the length of string in Ch in the string buffer." alt="" coords="109,146,244,186"/>
+<area shape="rect" id="Node000002" href="$stringbuffertest_8cpp.html#a58e114f4cdf292eb2d79fd07d8075624" title=" " alt="" coords="5,5,61,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="145,136,59,44,48,34,51,30,63,40,149,132"/>
+<area shape="rect" id="Node000003" href="$stringbuffertest_8cpp.html#aff5a30dd9e07bc4095de5ff9304c0323" title=" " alt="" coords="5,55,61,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="131,139,52,83,55,79,134,134"/>
+<area shape="rect" id="Node000004" href="$stringbuffertest_8cpp.html#a6f92b34ed62474587cb34b64162d5878" title=" " alt="" coords="5,104,61,130"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="100,143,60,129,62,124,102,138"/>
+<area shape="rect" id="Node000005" href="$stringbuffertest_8cpp.html#a01d80f83d15918d8b15eb382abe0ba29" title=" " alt="" coords="5,153,61,179"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="93,169,61,169,61,164,93,164"/>
+<area shape="rect" id="Node000006" href="$stringbuffertest_8cpp.html#a2a076022dd05a90d4537ba48032212c4" title=" " alt="" coords="5,203,61,228"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="102,195,62,209,60,204,100,190"/>
+<area shape="rect" id="Node000007" href="$stringbuffertest_8cpp.html#a35396fd51e755e78dcd41d821fec4818" title=" " alt="" coords="5,252,61,278"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="134,198,55,254,52,249,131,194"/>
+<area shape="rect" id="Node000008" href="$stringbuffertest_8cpp.html#a7655c9b98a62e2c2baf27f414edea796" title=" " alt="" coords="5,301,61,327"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="149,200,63,292,51,303,48,299,59,288,145,196"/>
+</map>

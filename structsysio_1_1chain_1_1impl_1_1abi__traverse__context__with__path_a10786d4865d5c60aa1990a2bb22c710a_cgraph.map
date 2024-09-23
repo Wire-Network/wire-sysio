@@ -1,0 +1,9 @@
+<map id="sysio::chain::impl::abi_traverse_context_with_path::abi_traverse_context_with_path" name="sysio::chain::impl::abi_traverse_context_with_path::abi_traverse_context_with_path">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,24,169,94"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1impl_1_1abi__traverse__context__with__path.html#a628be1cef65fa845dc10592575a9b48c" title=" " alt="" coords="217,31,388,87"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="169,56,201,56,201,62,169,62"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1chain_1_1abi__serializer.html#affad48dcb1580be1b97bbd6afe52b785" title=" " alt="" coords="436,5,611,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="388,43,420,39,421,44,389,49"/>
+<area shape="rect" id="Node000004" href="$structsysio_1_1chain_1_1abi__serializer.html#aed24871e09e1b98e0603d16bf68dcfea" title=" " alt="" coords="436,71,611,111"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="389,69,421,73,420,79,388,74"/>
+</map>

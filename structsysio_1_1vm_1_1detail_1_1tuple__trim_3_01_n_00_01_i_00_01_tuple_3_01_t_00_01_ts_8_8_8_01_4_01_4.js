@@ -1,0 +1,4 @@
+var structsysio_1_1vm_1_1detail_1_1tuple__trim_3_01_n_00_01_i_00_01_tuple_3_01_t_00_01_ts_8_8_8_01_4_01_4 =
+[
+    [ "type", "structsysio_1_1vm_1_1detail_1_1tuple__trim_3_01_n_00_01_i_00_01_tuple_3_01_t_00_01_ts_8_8_8_01_4_01_4.html#a617fa33a47578a9e876efbfe6a507ac9", null ]
+];

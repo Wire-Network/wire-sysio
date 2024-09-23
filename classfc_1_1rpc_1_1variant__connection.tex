@@ -1,0 +1,391 @@
+\doxysection{fc\+::rpc\+::variant\+\_\+connection Class Reference}
+\hypertarget{classfc_1_1rpc_1_1variant__connection}{}\label{classfc_1_1rpc_1_1variant__connection}\index{fc::rpc::variant\_connection@{fc::rpc::variant\_connection}}
+
+
+Implements JSON-\/\+RPC 2.\+0 over a set of io streams.  
+
+
+
+
+{\ttfamily \#include $<$variant\+\_\+connection.\+hpp$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef std\+::function$<$ \mbox{\hyperlink{classfc_1_1variant}{variant}}(const \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}} \&)$>$ \mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_a767c7cd410f6d9d4dc22c297407b54cf}{method}}
+\item 
+typedef std\+::function$<$ \mbox{\hyperlink{classfc_1_1variant}{variant}}(const \mbox{\hyperlink{classfc_1_1variant__object}{variant\+\_\+object}} \&)$>$ \mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_ad9cfc503f4f6c963f307ba93c2e0890c}{named\+\_\+param\+\_\+method}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_a7dcf56819720969b6282fbfeee251d12}{variant\+\_\+connection}} (fc\+::variant\+\_\+stream\+::ptr in, fc\+::variant\+\_\+stream\+::ptr out)
+\item 
+\mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_a8c12945bcd34f58b0ddb11dab390a73a}{\texorpdfstring{$\sim$}{\string~}variant\+\_\+connection}} ()
+\item 
+future$<$ void $>$ \mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_a5b33fb00285b96ad1102dcf82df2766a}{exec}} ()
+\item 
+\mbox{\hyperlink{classfc_1_1logger}{logger}} \mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_afe170e532e723b85cf1ce04aea6c2f07}{get\+\_\+logger}} () const
+\item 
+void \mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_a735c4767c8dac8c031e4357cb58b1415}{set\+\_\+logger}} (const \mbox{\hyperlink{classfc_1_1logger}{logger}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}})
+\end{DoxyCompactItemize}
+\begin{Indent}\textbf{ server interface}\par
+{\em Adding methods to the interface allows the remote side to call them. }\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_a71c8d29d5cf05a15ebadb738872ca5d3}{add\+\_\+method}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} \&\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}, \mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_a767c7cd410f6d9d4dc22c297407b54cf}{method}})
+\item 
+void \mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_a11760f540bae1070466340e390e5f659}{add\+\_\+named\+\_\+param\+\_\+method}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} \&\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}, \mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_ad9cfc503f4f6c963f307ba93c2e0890c}{named\+\_\+param\+\_\+method}})
+\item 
+void \mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_ad963e6712a340ab11b4df5411c3b9f61}{remove\+\_\+method}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} \&\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})
+\end{DoxyCompactItemize}
+\end{Indent}
+\begin{Indent}\textbf{ client interface}\par
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_ae7146268ac724f471ce429662bf3f2ee}{notice}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} \&\mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_a767c7cd410f6d9d4dc22c297407b54cf}{method}})
+\item 
+void \mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_ad11f8bd52b6e03532c30f92ecf956845}{notice}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} \&\mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_a767c7cd410f6d9d4dc22c297407b54cf}{method}}, const \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}} \&args)
+\item 
+void \mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_aea16759934ce56112538c84fa56e005e}{notice}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} \&\mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_a767c7cd410f6d9d4dc22c297407b54cf}{method}}, const \mbox{\hyperlink{classfc_1_1variant__object}{variant\+\_\+object}} \&named\+\_\+args)
+\item 
+future$<$ \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} $>$ \mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_a5f40cacdc3d2c17f5fcea0deb89cef7c}{async\+\_\+call}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} \&\mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_a767c7cd410f6d9d4dc22c297407b54cf}{method}}, const \mbox{\hyperlink{classfc_1_1variant__object}{variant\+\_\+object}} \&args)
+\begin{DoxyCompactList}\small\item\em args will be handled as named params \end{DoxyCompactList}\item 
+future$<$ \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} $>$ \mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_ae7c0fe9a9613d2688bbb363de7da5d04}{async\+\_\+call}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} \&\mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_a767c7cd410f6d9d4dc22c297407b54cf}{method}}, \mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\+\_\+variant\+\_\+object}} args)
+\item 
+future$<$ \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} $>$ \mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_a62faa70f24a19f054480d94da3b9d720}{async\+\_\+call}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} \&\mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_a767c7cd410f6d9d4dc22c297407b54cf}{method}}, const \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}} \&args)
+\begin{DoxyCompactList}\small\item\em Sending in an array of variants will be handled as positional arguments. \end{DoxyCompactList}\item 
+future$<$ \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} $>$ \mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_a658d9643ee3dc9b8680e6246f5a3a74f}{async\+\_\+call}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} \&\mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_a767c7cd410f6d9d4dc22c297407b54cf}{method}})
+\item 
+future$<$ \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} $>$ \mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_a47b7631c1f4da8f2739912c82bcb22d0}{async\+\_\+call}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} \&\mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_a767c7cd410f6d9d4dc22c297407b54cf}{method}}, const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&a1)
+\item 
+future$<$ \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} $>$ \mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_ac08bf3a2822d7d1f6328cc467d9d7f8e}{async\+\_\+call}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} \&\mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_a767c7cd410f6d9d4dc22c297407b54cf}{method}}, const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&a1, const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&a2)
+\item 
+future$<$ \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} $>$ \mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_a27edef84c4dc22391d99e56a7efc26e1}{async\+\_\+call}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} \&\mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_a767c7cd410f6d9d4dc22c297407b54cf}{method}}, const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&a1, const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&a2, const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&a3)
+\item 
+{\footnotesize template$<$typename Result $>$ }\\Result \mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_add0e2648c3a6609bf8854bf3cc9d8db5}{call}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} \&\mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_a767c7cd410f6d9d4dc22c297407b54cf}{method}}, const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&a1, const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&a2, const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&a3, \mbox{\hyperlink{classfc_1_1microseconds}{microseconds}} timeout=\mbox{\hyperlink{classfc_1_1microseconds_afc3eb0bfd792c7b1cda062e559e30c2e}{microseconds\+::maximum}}())
+\item 
+{\footnotesize template$<$typename Result $>$ }\\Result \mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_a1319e9309831427287ddc6abfd2d1f0f}{call}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} \&\mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_a767c7cd410f6d9d4dc22c297407b54cf}{method}}, const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&a1, const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&a2, \mbox{\hyperlink{classfc_1_1microseconds}{microseconds}} timeout=\mbox{\hyperlink{classfc_1_1microseconds_afc3eb0bfd792c7b1cda062e559e30c2e}{microseconds\+::maximum}}())
+\item 
+{\footnotesize template$<$typename Result $>$ }\\Result \mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_a607fc93c3bd6d3116fd9634f22b190cf}{call}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} \&\mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_a767c7cd410f6d9d4dc22c297407b54cf}{method}}, const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&a1, \mbox{\hyperlink{classfc_1_1microseconds}{microseconds}} timeout=\mbox{\hyperlink{classfc_1_1microseconds_afc3eb0bfd792c7b1cda062e559e30c2e}{microseconds\+::maximum}}())
+\item 
+{\footnotesize template$<$typename Result $>$ }\\Result \mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_ad496850b2c60a89f38b9f0b6f48a5a36}{call}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} \&\mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_a767c7cd410f6d9d4dc22c297407b54cf}{method}}, \mbox{\hyperlink{classfc_1_1variant__object}{variant\+\_\+object}} a1, \mbox{\hyperlink{classfc_1_1microseconds}{microseconds}} timeout=\mbox{\hyperlink{classfc_1_1microseconds_afc3eb0bfd792c7b1cda062e559e30c2e}{microseconds\+::maximum}}())
+\item 
+{\footnotesize template$<$typename Result $>$ }\\Result \mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_aeef96ccf72608a67329a6b22c0fa4ad9}{call}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} \&\mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_a767c7cd410f6d9d4dc22c297407b54cf}{method}}, \mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\+\_\+variant\+\_\+object}} a1, \mbox{\hyperlink{classfc_1_1microseconds}{microseconds}} timeout=\mbox{\hyperlink{classfc_1_1microseconds_afc3eb0bfd792c7b1cda062e559e30c2e}{microseconds\+::maximum}}())
+\item 
+{\footnotesize template$<$typename Result $>$ }\\Result \mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_a897e300caeff80f6953cb4cc90944603}{call}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} \&\mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_a767c7cd410f6d9d4dc22c297407b54cf}{method}}, \mbox{\hyperlink{classfc_1_1microseconds}{microseconds}} timeout=\mbox{\hyperlink{classfc_1_1microseconds_afc3eb0bfd792c7b1cda062e559e30c2e}{microseconds\+::maximum}}())
+\item 
+\mbox{\hyperlink{classfc_1_1variant}{variant}} \mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_a551535350ba594af326806a447a6e735}{call}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} \&\mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_a767c7cd410f6d9d4dc22c297407b54cf}{method}}, const \mbox{\hyperlink{classfc_1_1variant__object}{variant\+\_\+object}} \&named\+\_\+args)
+\begin{DoxyCompactList}\small\item\em Sending in a \doxylink{classfc_1_1variant__object}{variant\+\_\+object} will be issued as named parameters. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\end{Indent}
+
+
+\doxysubsection{Detailed Description}
+Each JSON RPC message is expected to be on its own line, violators will be prosecuted to the fullest extent of the law. 
+
+Definition at line \mbox{\hyperlink{variant__connection_8hpp_source_l00018}{18}} of file \mbox{\hyperlink{variant__connection_8hpp_source}{variant\+\_\+connection.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classfc_1_1rpc_1_1variant__connection_a767c7cd410f6d9d4dc22c297407b54cf}\index{fc::rpc::variant\_connection@{fc::rpc::variant\_connection}!method@{method}}
+\index{method@{method}!fc::rpc::variant\_connection@{fc::rpc::variant\_connection}}
+\doxysubsubsection{\texorpdfstring{method}{method}}
+{\footnotesize\ttfamily \label{classfc_1_1rpc_1_1variant__connection_a767c7cd410f6d9d4dc22c297407b54cf} 
+std\+::function$<$\mbox{\hyperlink{classfc_1_1variant}{variant}}(const \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}\&)$>$ \mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_a767c7cd410f6d9d4dc22c297407b54cf}{fc\+::rpc\+::variant\+\_\+connection\+::method}}}
+
+
+
+Definition at line \mbox{\hyperlink{variant__connection_8hpp_source_l00021}{21}} of file \mbox{\hyperlink{variant__connection_8hpp_source}{variant\+\_\+connection.\+hpp}}.
+
+\Hypertarget{classfc_1_1rpc_1_1variant__connection_ad9cfc503f4f6c963f307ba93c2e0890c}\index{fc::rpc::variant\_connection@{fc::rpc::variant\_connection}!named\_param\_method@{named\_param\_method}}
+\index{named\_param\_method@{named\_param\_method}!fc::rpc::variant\_connection@{fc::rpc::variant\_connection}}
+\doxysubsubsection{\texorpdfstring{named\_param\_method}{named\_param\_method}}
+{\footnotesize\ttfamily \label{classfc_1_1rpc_1_1variant__connection_ad9cfc503f4f6c963f307ba93c2e0890c} 
+std\+::function$<$\mbox{\hyperlink{classfc_1_1variant}{variant}}(const \mbox{\hyperlink{classfc_1_1variant__object}{variant\+\_\+object}}\&)$>$ \mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_ad9cfc503f4f6c963f307ba93c2e0890c}{fc\+::rpc\+::variant\+\_\+connection\+::named\+\_\+param\+\_\+method}}}
+
+
+
+Definition at line \mbox{\hyperlink{variant__connection_8hpp_source_l00022}{22}} of file \mbox{\hyperlink{variant__connection_8hpp_source}{variant\+\_\+connection.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1rpc_1_1variant__connection_a7dcf56819720969b6282fbfeee251d12}\index{fc::rpc::variant\_connection@{fc::rpc::variant\_connection}!variant\_connection@{variant\_connection}}
+\index{variant\_connection@{variant\_connection}!fc::rpc::variant\_connection@{fc::rpc::variant\_connection}}
+\doxysubsubsection{\texorpdfstring{variant\_connection()}{variant\_connection()}}
+{\footnotesize\ttfamily \label{classfc_1_1rpc_1_1variant__connection_a7dcf56819720969b6282fbfeee251d12} 
+fc\+::rpc\+::variant\+\_\+connection\+::variant\+\_\+connection (\begin{DoxyParamCaption}\item[{fc\+::variant\+\_\+stream\+::ptr}]{in}{, }\item[{fc\+::variant\+\_\+stream\+::ptr}]{out}{}\end{DoxyParamCaption})}
+
+\Hypertarget{classfc_1_1rpc_1_1variant__connection_a8c12945bcd34f58b0ddb11dab390a73a}\index{fc::rpc::variant\_connection@{fc::rpc::variant\_connection}!````~variant\_connection@{\texorpdfstring{$\sim$}{\string~}variant\_connection}}
+\index{````~variant\_connection@{\texorpdfstring{$\sim$}{\string~}variant\_connection}!fc::rpc::variant\_connection@{fc::rpc::variant\_connection}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}variant\_connection()}{\string~variant\_connection()}}
+{\footnotesize\ttfamily \label{classfc_1_1rpc_1_1variant__connection_a8c12945bcd34f58b0ddb11dab390a73a} 
+fc\+::rpc\+::variant\+\_\+connection\+::\texorpdfstring{$\sim$}{\string~}variant\+\_\+connection (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1rpc_1_1variant__connection_a71c8d29d5cf05a15ebadb738872ca5d3}\index{fc::rpc::variant\_connection@{fc::rpc::variant\_connection}!add\_method@{add\_method}}
+\index{add\_method@{add\_method}!fc::rpc::variant\_connection@{fc::rpc::variant\_connection}}
+\doxysubsubsection{\texorpdfstring{add\_method()}{add\_method()}}
+{\footnotesize\ttfamily \label{classfc_1_1rpc_1_1variant__connection_a71c8d29d5cf05a15ebadb738872ca5d3} 
+void fc\+::rpc\+::variant\+\_\+connection\+::add\+\_\+method (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} \&}]{name}{, }\item[{\mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_a767c7cd410f6d9d4dc22c297407b54cf}{method}}}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{classfc_1_1rpc_1_1variant__connection_a11760f540bae1070466340e390e5f659}\index{fc::rpc::variant\_connection@{fc::rpc::variant\_connection}!add\_named\_param\_method@{add\_named\_param\_method}}
+\index{add\_named\_param\_method@{add\_named\_param\_method}!fc::rpc::variant\_connection@{fc::rpc::variant\_connection}}
+\doxysubsubsection{\texorpdfstring{add\_named\_param\_method()}{add\_named\_param\_method()}}
+{\footnotesize\ttfamily \label{classfc_1_1rpc_1_1variant__connection_a11760f540bae1070466340e390e5f659} 
+void fc\+::rpc\+::variant\+\_\+connection\+::add\+\_\+named\+\_\+param\+\_\+method (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} \&}]{name}{, }\item[{\mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_ad9cfc503f4f6c963f307ba93c2e0890c}{named\+\_\+param\+\_\+method}}}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{classfc_1_1rpc_1_1variant__connection_a658d9643ee3dc9b8680e6246f5a3a74f}\index{fc::rpc::variant\_connection@{fc::rpc::variant\_connection}!async\_call@{async\_call}}
+\index{async\_call@{async\_call}!fc::rpc::variant\_connection@{fc::rpc::variant\_connection}}
+\doxysubsubsection{\texorpdfstring{async\_call()}{async\_call()}\hspace{0.1cm}{\footnotesize\ttfamily [1/7]}}
+{\footnotesize\ttfamily \label{classfc_1_1rpc_1_1variant__connection_a658d9643ee3dc9b8680e6246f5a3a74f} 
+future$<$ \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} $>$ fc\+::rpc\+::variant\+\_\+connection\+::async\+\_\+call (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} \&}]{method}{}\end{DoxyParamCaption})}
+
+\Hypertarget{classfc_1_1rpc_1_1variant__connection_a47b7631c1f4da8f2739912c82bcb22d0}\index{fc::rpc::variant\_connection@{fc::rpc::variant\_connection}!async\_call@{async\_call}}
+\index{async\_call@{async\_call}!fc::rpc::variant\_connection@{fc::rpc::variant\_connection}}
+\doxysubsubsection{\texorpdfstring{async\_call()}{async\_call()}\hspace{0.1cm}{\footnotesize\ttfamily [2/7]}}
+{\footnotesize\ttfamily \label{classfc_1_1rpc_1_1variant__connection_a47b7631c1f4da8f2739912c82bcb22d0} 
+future$<$ \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} $>$ fc\+::rpc\+::variant\+\_\+connection\+::async\+\_\+call (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} \&}]{method}{, }\item[{const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&}]{a1}{}\end{DoxyParamCaption})}
+
+\Hypertarget{classfc_1_1rpc_1_1variant__connection_ac08bf3a2822d7d1f6328cc467d9d7f8e}\index{fc::rpc::variant\_connection@{fc::rpc::variant\_connection}!async\_call@{async\_call}}
+\index{async\_call@{async\_call}!fc::rpc::variant\_connection@{fc::rpc::variant\_connection}}
+\doxysubsubsection{\texorpdfstring{async\_call()}{async\_call()}\hspace{0.1cm}{\footnotesize\ttfamily [3/7]}}
+{\footnotesize\ttfamily \label{classfc_1_1rpc_1_1variant__connection_ac08bf3a2822d7d1f6328cc467d9d7f8e} 
+future$<$ \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} $>$ fc\+::rpc\+::variant\+\_\+connection\+::async\+\_\+call (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} \&}]{method}{, }\item[{const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&}]{a1}{, }\item[{const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&}]{a2}{}\end{DoxyParamCaption})}
+
+\Hypertarget{classfc_1_1rpc_1_1variant__connection_a27edef84c4dc22391d99e56a7efc26e1}\index{fc::rpc::variant\_connection@{fc::rpc::variant\_connection}!async\_call@{async\_call}}
+\index{async\_call@{async\_call}!fc::rpc::variant\_connection@{fc::rpc::variant\_connection}}
+\doxysubsubsection{\texorpdfstring{async\_call()}{async\_call()}\hspace{0.1cm}{\footnotesize\ttfamily [4/7]}}
+{\footnotesize\ttfamily \label{classfc_1_1rpc_1_1variant__connection_a27edef84c4dc22391d99e56a7efc26e1} 
+future$<$ \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} $>$ fc\+::rpc\+::variant\+\_\+connection\+::async\+\_\+call (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} \&}]{method}{, }\item[{const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&}]{a1}{, }\item[{const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&}]{a2}{, }\item[{const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&}]{a3}{}\end{DoxyParamCaption})}
+
+\Hypertarget{classfc_1_1rpc_1_1variant__connection_a5f40cacdc3d2c17f5fcea0deb89cef7c}\index{fc::rpc::variant\_connection@{fc::rpc::variant\_connection}!async\_call@{async\_call}}
+\index{async\_call@{async\_call}!fc::rpc::variant\_connection@{fc::rpc::variant\_connection}}
+\doxysubsubsection{\texorpdfstring{async\_call()}{async\_call()}\hspace{0.1cm}{\footnotesize\ttfamily [5/7]}}
+{\footnotesize\ttfamily \label{classfc_1_1rpc_1_1variant__connection_a5f40cacdc3d2c17f5fcea0deb89cef7c} 
+future$<$ \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} $>$ fc\+::rpc\+::variant\+\_\+connection\+::async\+\_\+call (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} \&}]{method}{, }\item[{const \mbox{\hyperlink{classfc_1_1variant__object}{variant\+\_\+object}} \&}]{args}{}\end{DoxyParamCaption})}
+
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1rpc_1_1variant__connection_a5f40cacdc3d2c17f5fcea0deb89cef7c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1rpc_1_1variant__connection_a62faa70f24a19f054480d94da3b9d720}\index{fc::rpc::variant\_connection@{fc::rpc::variant\_connection}!async\_call@{async\_call}}
+\index{async\_call@{async\_call}!fc::rpc::variant\_connection@{fc::rpc::variant\_connection}}
+\doxysubsubsection{\texorpdfstring{async\_call()}{async\_call()}\hspace{0.1cm}{\footnotesize\ttfamily [6/7]}}
+{\footnotesize\ttfamily \label{classfc_1_1rpc_1_1variant__connection_a62faa70f24a19f054480d94da3b9d720} 
+future$<$ \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} $>$ fc\+::rpc\+::variant\+\_\+connection\+::async\+\_\+call (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} \&}]{method}{, }\item[{const \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}} \&}]{args}{}\end{DoxyParamCaption})}
+
+\Hypertarget{classfc_1_1rpc_1_1variant__connection_ae7c0fe9a9613d2688bbb363de7da5d04}\index{fc::rpc::variant\_connection@{fc::rpc::variant\_connection}!async\_call@{async\_call}}
+\index{async\_call@{async\_call}!fc::rpc::variant\_connection@{fc::rpc::variant\_connection}}
+\doxysubsubsection{\texorpdfstring{async\_call()}{async\_call()}\hspace{0.1cm}{\footnotesize\ttfamily [7/7]}}
+{\footnotesize\ttfamily \label{classfc_1_1rpc_1_1variant__connection_ae7c0fe9a9613d2688bbb363de7da5d04} 
+future$<$ \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} $>$ fc\+::rpc\+::variant\+\_\+connection\+::async\+\_\+call (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} \&}]{method}{, }\item[{\mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\+\_\+variant\+\_\+object}}}]{args}{}\end{DoxyParamCaption})}
+
+\Hypertarget{classfc_1_1rpc_1_1variant__connection_add0e2648c3a6609bf8854bf3cc9d8db5}\index{fc::rpc::variant\_connection@{fc::rpc::variant\_connection}!call@{call}}
+\index{call@{call}!fc::rpc::variant\_connection@{fc::rpc::variant\_connection}}
+\doxysubsubsection{\texorpdfstring{call()}{call()}\hspace{0.1cm}{\footnotesize\ttfamily [1/7]}}
+{\footnotesize\ttfamily \label{classfc_1_1rpc_1_1variant__connection_add0e2648c3a6609bf8854bf3cc9d8db5} 
+template$<$typename Result $>$ \\
+Result fc\+::rpc\+::variant\+\_\+connection\+::call (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} \&}]{method}{, }\item[{const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&}]{a1}{, }\item[{const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&}]{a2}{, }\item[{const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&}]{a3}{, }\item[{\mbox{\hyperlink{classfc_1_1microseconds}{microseconds}}}]{timeout}{ = {\ttfamily \mbox{\hyperlink{classfc_1_1microseconds_afc3eb0bfd792c7b1cda062e559e30c2e}{microseconds\+::maximum}}()}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{variant__connection_8hpp_source_l00080}{80}} of file \mbox{\hyperlink{variant__connection_8hpp_source}{variant\+\_\+connection.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_a5f40cacdc3d2c17f5fcea0deb89cef7c}{async\_call}}(\ \mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_a767c7cd410f6d9d4dc22c297407b54cf}{method}},\ a1,\ a2,\ a3\ ).wait(timeout).as<Result>();}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1rpc_1_1variant__connection_add0e2648c3a6609bf8854bf3cc9d8db5_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1rpc_1_1variant__connection_a1319e9309831427287ddc6abfd2d1f0f}\index{fc::rpc::variant\_connection@{fc::rpc::variant\_connection}!call@{call}}
+\index{call@{call}!fc::rpc::variant\_connection@{fc::rpc::variant\_connection}}
+\doxysubsubsection{\texorpdfstring{call()}{call()}\hspace{0.1cm}{\footnotesize\ttfamily [2/7]}}
+{\footnotesize\ttfamily \label{classfc_1_1rpc_1_1variant__connection_a1319e9309831427287ddc6abfd2d1f0f} 
+template$<$typename Result $>$ \\
+Result fc\+::rpc\+::variant\+\_\+connection\+::call (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} \&}]{method}{, }\item[{const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&}]{a1}{, }\item[{const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&}]{a2}{, }\item[{\mbox{\hyperlink{classfc_1_1microseconds}{microseconds}}}]{timeout}{ = {\ttfamily \mbox{\hyperlink{classfc_1_1microseconds_afc3eb0bfd792c7b1cda062e559e30c2e}{microseconds\+::maximum}}()}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{variant__connection_8hpp_source_l00090}{90}} of file \mbox{\hyperlink{variant__connection_8hpp_source}{variant\+\_\+connection.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_a5f40cacdc3d2c17f5fcea0deb89cef7c}{async\_call}}(\ \mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_a767c7cd410f6d9d4dc22c297407b54cf}{method}},\ a1,\ a2\ ).wait(timeout).as<Result>();}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1rpc_1_1variant__connection_a1319e9309831427287ddc6abfd2d1f0f_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1rpc_1_1variant__connection_a607fc93c3bd6d3116fd9634f22b190cf}\index{fc::rpc::variant\_connection@{fc::rpc::variant\_connection}!call@{call}}
+\index{call@{call}!fc::rpc::variant\_connection@{fc::rpc::variant\_connection}}
+\doxysubsubsection{\texorpdfstring{call()}{call()}\hspace{0.1cm}{\footnotesize\ttfamily [3/7]}}
+{\footnotesize\ttfamily \label{classfc_1_1rpc_1_1variant__connection_a607fc93c3bd6d3116fd9634f22b190cf} 
+template$<$typename Result $>$ \\
+Result fc\+::rpc\+::variant\+\_\+connection\+::call (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} \&}]{method}{, }\item[{const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&}]{a1}{, }\item[{\mbox{\hyperlink{classfc_1_1microseconds}{microseconds}}}]{timeout}{ = {\ttfamily \mbox{\hyperlink{classfc_1_1microseconds_afc3eb0bfd792c7b1cda062e559e30c2e}{microseconds\+::maximum}}()}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{variant__connection_8hpp_source_l00099}{99}} of file \mbox{\hyperlink{variant__connection_8hpp_source}{variant\+\_\+connection.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_a5f40cacdc3d2c17f5fcea0deb89cef7c}{async\_call}}(\ \mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_a767c7cd410f6d9d4dc22c297407b54cf}{method}},\ a1\ ).wait(timeout).as<Result>();}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1rpc_1_1variant__connection_a607fc93c3bd6d3116fd9634f22b190cf_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1rpc_1_1variant__connection_a551535350ba594af326806a447a6e735}\index{fc::rpc::variant\_connection@{fc::rpc::variant\_connection}!call@{call}}
+\index{call@{call}!fc::rpc::variant\_connection@{fc::rpc::variant\_connection}}
+\doxysubsubsection{\texorpdfstring{call()}{call()}\hspace{0.1cm}{\footnotesize\ttfamily [4/7]}}
+{\footnotesize\ttfamily \label{classfc_1_1rpc_1_1variant__connection_a551535350ba594af326806a447a6e735} 
+\mbox{\hyperlink{classfc_1_1variant}{variant}} fc\+::rpc\+::variant\+\_\+connection\+::call (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} \&}]{method}{, }\item[{const \mbox{\hyperlink{classfc_1_1variant__object}{variant\+\_\+object}} \&}]{named\+\_\+args}{}\end{DoxyParamCaption})}
+
+\Hypertarget{classfc_1_1rpc_1_1variant__connection_a897e300caeff80f6953cb4cc90944603}\index{fc::rpc::variant\_connection@{fc::rpc::variant\_connection}!call@{call}}
+\index{call@{call}!fc::rpc::variant\_connection@{fc::rpc::variant\_connection}}
+\doxysubsubsection{\texorpdfstring{call()}{call()}\hspace{0.1cm}{\footnotesize\ttfamily [5/7]}}
+{\footnotesize\ttfamily \label{classfc_1_1rpc_1_1variant__connection_a897e300caeff80f6953cb4cc90944603} 
+template$<$typename Result $>$ \\
+Result fc\+::rpc\+::variant\+\_\+connection\+::call (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} \&}]{method}{, }\item[{\mbox{\hyperlink{classfc_1_1microseconds}{microseconds}}}]{timeout}{ = {\ttfamily \mbox{\hyperlink{classfc_1_1microseconds_afc3eb0bfd792c7b1cda062e559e30c2e}{microseconds\+::maximum}}()}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{variant__connection_8hpp_source_l00123}{123}} of file \mbox{\hyperlink{variant__connection_8hpp_source}{variant\+\_\+connection.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_a5f40cacdc3d2c17f5fcea0deb89cef7c}{async\_call}}(\ \mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_a767c7cd410f6d9d4dc22c297407b54cf}{method}}\ ).wait(timeout).as<Result>();}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1rpc_1_1variant__connection_a897e300caeff80f6953cb4cc90944603_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1rpc_1_1variant__connection_aeef96ccf72608a67329a6b22c0fa4ad9}\index{fc::rpc::variant\_connection@{fc::rpc::variant\_connection}!call@{call}}
+\index{call@{call}!fc::rpc::variant\_connection@{fc::rpc::variant\_connection}}
+\doxysubsubsection{\texorpdfstring{call()}{call()}\hspace{0.1cm}{\footnotesize\ttfamily [6/7]}}
+{\footnotesize\ttfamily \label{classfc_1_1rpc_1_1variant__connection_aeef96ccf72608a67329a6b22c0fa4ad9} 
+template$<$typename Result $>$ \\
+Result fc\+::rpc\+::variant\+\_\+connection\+::call (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} \&}]{method}{, }\item[{\mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\+\_\+variant\+\_\+object}}}]{a1}{, }\item[{\mbox{\hyperlink{classfc_1_1microseconds}{microseconds}}}]{timeout}{ = {\ttfamily \mbox{\hyperlink{classfc_1_1microseconds_afc3eb0bfd792c7b1cda062e559e30c2e}{microseconds\+::maximum}}()}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{variant__connection_8hpp_source_l00114}{114}} of file \mbox{\hyperlink{variant__connection_8hpp_source}{variant\+\_\+connection.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_a5f40cacdc3d2c17f5fcea0deb89cef7c}{async\_call}}(\ \mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_a767c7cd410f6d9d4dc22c297407b54cf}{method}},\ variant\_object(\ fc::move(a1)\ )\ ).wait(timeout).as<Result>();}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1rpc_1_1variant__connection_aeef96ccf72608a67329a6b22c0fa4ad9_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1rpc_1_1variant__connection_ad496850b2c60a89f38b9f0b6f48a5a36}\index{fc::rpc::variant\_connection@{fc::rpc::variant\_connection}!call@{call}}
+\index{call@{call}!fc::rpc::variant\_connection@{fc::rpc::variant\_connection}}
+\doxysubsubsection{\texorpdfstring{call()}{call()}\hspace{0.1cm}{\footnotesize\ttfamily [7/7]}}
+{\footnotesize\ttfamily \label{classfc_1_1rpc_1_1variant__connection_ad496850b2c60a89f38b9f0b6f48a5a36} 
+template$<$typename Result $>$ \\
+Result fc\+::rpc\+::variant\+\_\+connection\+::call (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} \&}]{method}{, }\item[{\mbox{\hyperlink{classfc_1_1variant__object}{variant\+\_\+object}}}]{a1}{, }\item[{\mbox{\hyperlink{classfc_1_1microseconds}{microseconds}}}]{timeout}{ = {\ttfamily \mbox{\hyperlink{classfc_1_1microseconds_afc3eb0bfd792c7b1cda062e559e30c2e}{microseconds\+::maximum}}()}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{variant__connection_8hpp_source_l00107}{107}} of file \mbox{\hyperlink{variant__connection_8hpp_source}{variant\+\_\+connection.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_a5f40cacdc3d2c17f5fcea0deb89cef7c}{async\_call}}(\ \mbox{\hyperlink{classfc_1_1rpc_1_1variant__connection_a767c7cd410f6d9d4dc22c297407b54cf}{method}},\ fc::move(a1)\ ).wait(timeout).as<Result>();}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1rpc_1_1variant__connection_ad496850b2c60a89f38b9f0b6f48a5a36_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1rpc_1_1variant__connection_a5b33fb00285b96ad1102dcf82df2766a}\index{fc::rpc::variant\_connection@{fc::rpc::variant\_connection}!exec@{exec}}
+\index{exec@{exec}!fc::rpc::variant\_connection@{fc::rpc::variant\_connection}}
+\doxysubsubsection{\texorpdfstring{exec()}{exec()}}
+{\footnotesize\ttfamily \label{classfc_1_1rpc_1_1variant__connection_a5b33fb00285b96ad1102dcf82df2766a} 
+future$<$ void $>$ fc\+::rpc\+::variant\+\_\+connection\+::exec (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+Starts processing messages from input \Hypertarget{classfc_1_1rpc_1_1variant__connection_afe170e532e723b85cf1ce04aea6c2f07}\index{fc::rpc::variant\_connection@{fc::rpc::variant\_connection}!get\_logger@{get\_logger}}
+\index{get\_logger@{get\_logger}!fc::rpc::variant\_connection@{fc::rpc::variant\_connection}}
+\doxysubsubsection{\texorpdfstring{get\_logger()}{get\_logger()}}
+{\footnotesize\ttfamily \label{classfc_1_1rpc_1_1variant__connection_afe170e532e723b85cf1ce04aea6c2f07} 
+\mbox{\hyperlink{classfc_1_1logger}{logger}} fc\+::rpc\+::variant\+\_\+connection\+::get\+\_\+logger (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+\Hypertarget{classfc_1_1rpc_1_1variant__connection_ae7146268ac724f471ce429662bf3f2ee}\index{fc::rpc::variant\_connection@{fc::rpc::variant\_connection}!notice@{notice}}
+\index{notice@{notice}!fc::rpc::variant\_connection@{fc::rpc::variant\_connection}}
+\doxysubsubsection{\texorpdfstring{notice()}{notice()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{classfc_1_1rpc_1_1variant__connection_ae7146268ac724f471ce429662bf3f2ee} 
+void fc\+::rpc\+::variant\+\_\+connection\+::notice (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} \&}]{method}{}\end{DoxyParamCaption})}
+
+\Hypertarget{classfc_1_1rpc_1_1variant__connection_aea16759934ce56112538c84fa56e005e}\index{fc::rpc::variant\_connection@{fc::rpc::variant\_connection}!notice@{notice}}
+\index{notice@{notice}!fc::rpc::variant\_connection@{fc::rpc::variant\_connection}}
+\doxysubsubsection{\texorpdfstring{notice()}{notice()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{classfc_1_1rpc_1_1variant__connection_aea16759934ce56112538c84fa56e005e} 
+void fc\+::rpc\+::variant\+\_\+connection\+::notice (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} \&}]{method}{, }\item[{const \mbox{\hyperlink{classfc_1_1variant__object}{variant\+\_\+object}} \&}]{named\+\_\+args}{}\end{DoxyParamCaption})}
+
+\Hypertarget{classfc_1_1rpc_1_1variant__connection_ad11f8bd52b6e03532c30f92ecf956845}\index{fc::rpc::variant\_connection@{fc::rpc::variant\_connection}!notice@{notice}}
+\index{notice@{notice}!fc::rpc::variant\_connection@{fc::rpc::variant\_connection}}
+\doxysubsubsection{\texorpdfstring{notice()}{notice()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{classfc_1_1rpc_1_1variant__connection_ad11f8bd52b6e03532c30f92ecf956845} 
+void fc\+::rpc\+::variant\+\_\+connection\+::notice (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} \&}]{method}{, }\item[{const \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}} \&}]{args}{}\end{DoxyParamCaption})}
+
+\Hypertarget{classfc_1_1rpc_1_1variant__connection_ad963e6712a340ab11b4df5411c3b9f61}\index{fc::rpc::variant\_connection@{fc::rpc::variant\_connection}!remove\_method@{remove\_method}}
+\index{remove\_method@{remove\_method}!fc::rpc::variant\_connection@{fc::rpc::variant\_connection}}
+\doxysubsubsection{\texorpdfstring{remove\_method()}{remove\_method()}}
+{\footnotesize\ttfamily \label{classfc_1_1rpc_1_1variant__connection_ad963e6712a340ab11b4df5411c3b9f61} 
+void fc\+::rpc\+::variant\+\_\+connection\+::remove\+\_\+method (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} \&}]{name}{}\end{DoxyParamCaption})}
+
+\Hypertarget{classfc_1_1rpc_1_1variant__connection_a735c4767c8dac8c031e4357cb58b1415}\index{fc::rpc::variant\_connection@{fc::rpc::variant\_connection}!set\_logger@{set\_logger}}
+\index{set\_logger@{set\_logger}!fc::rpc::variant\_connection@{fc::rpc::variant\_connection}}
+\doxysubsubsection{\texorpdfstring{set\_logger()}{set\_logger()}}
+{\footnotesize\ttfamily \label{classfc_1_1rpc_1_1variant__connection_a735c4767c8dac8c031e4357cb58b1415} 
+void fc\+::rpc\+::variant\+\_\+connection\+::set\+\_\+logger (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1logger}{logger}} \&}]{l}{}\end{DoxyParamCaption})}
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/rpc/\mbox{\hyperlink{variant__connection_8hpp}{variant\+\_\+connection.\+hpp}}\end{DoxyCompactItemize}

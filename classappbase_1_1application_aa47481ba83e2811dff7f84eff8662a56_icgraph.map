@@ -1,0 +1,11 @@
+<map id="appbase::application::is_quiting" name="appbase::application::is_quiting">
+<area shape="rect" id="Node000001" title=" " alt="" coords="438,39,578,79"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1chain__plugin.html#affe5ea83d9db4d721af39fd7568c5875" title=" " alt="" coords="254,5,386,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="422,47,386,40,387,35,423,41"/>
+<area shape="rect" id="Node000003" href="$classappbase_1_1application.html#a3b77bd811744da79c9d8ba0d078e7668" title=" " alt="" coords="250,71,390,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="423,76,391,82,390,76,422,71"/>
+<area shape="rect" id="Node000004" href="$test__trx__full_8cpp.html#afdace07785a80c02d7fbb1d13154c2c4" title=" " alt="" coords="5,53,202,78"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="234,84,202,80,203,75,234,78"/>
+<area shape="rect" id="Node000005" href="$libraries_2appbase_2examples_2main_8cpp.html#a3c04138a5bfe5d72780bb7e82a18e627" title=" " alt="" coords="79,102,128,128"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="235,103,129,115,128,110,234,98"/>
+</map>

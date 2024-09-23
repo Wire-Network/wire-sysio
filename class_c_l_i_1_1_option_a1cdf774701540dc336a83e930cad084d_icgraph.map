@@ -1,0 +1,7 @@
+<map id="CLI::Option::excludes" name="CLI::Option::excludes">
+<area shape="rect" id="Node000001" title="Sets excluded options." alt="" coords="202,31,350,56"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_option.html#afbb2f4c5cdad55a70f4503938804234a" title="Any number supported, any mix of string and Opt." alt="" coords="5,5,154,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="186,35,154,30,154,25,187,29"/>
+<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_option.html#aa1110e431ac1c6d5fbdc985ed29b0e0b" title="Can find a string if needed." alt="" coords="5,55,154,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="187,57,154,61,154,56,186,52"/>
+</map>

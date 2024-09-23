@@ -1,0 +1,287 @@
+\doxysection{fc\+::crypto\+::signature Class Reference}
+\hypertarget{classfc_1_1crypto_1_1signature}{}\label{classfc_1_1crypto_1_1signature}\index{fc::crypto::signature@{fc::crypto::signature}}
+
+
+{\ttfamily \#include $<$signature.\+hpp$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{classfc_1_1crypto_1_1signature_a609409752d8ff1e36851a31cb60ea94d}{storage\+\_\+type}} = std\+::variant$<$\mbox{\hyperlink{structfc_1_1ecc_1_1signature__shim}{ecc\+::signature\+\_\+shim}}, \mbox{\hyperlink{structfc_1_1crypto_1_1r1_1_1signature__shim}{r1\+::signature\+\_\+shim}}, \mbox{\hyperlink{classfc_1_1crypto_1_1webauthn_1_1signature}{webauthn\+::signature}}, \mbox{\hyperlink{structfc_1_1em_1_1signature__shim}{em\+::signature\+\_\+shim}}$>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1crypto_1_1signature_a951819aaeebfa3ee2a1fb7d44d7427ef}{signature}} ()=default
+\item 
+\mbox{\hyperlink{classfc_1_1crypto_1_1signature_a090abf4aadb475423381a20a127c8f74}{signature}} (\mbox{\hyperlink{classfc_1_1crypto_1_1signature}{signature}} \&\&)=default
+\item 
+\mbox{\hyperlink{classfc_1_1crypto_1_1signature_af8e291ae6b3aa77b38c838a7a793f6cf}{signature}} (const \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{signature}} \&)=default
+\item 
+\mbox{\hyperlink{classfc_1_1crypto_1_1signature}{signature}} \& \mbox{\hyperlink{classfc_1_1crypto_1_1signature_a221c17717f5a63906846063869e213d4}{operator=}} (const \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{signature}} \&)=default
+\item 
+\mbox{\hyperlink{classfc_1_1crypto_1_1signature_ad579711d443f87a992609cee5826c34f}{signature}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&base58str)
+\item 
+std\+::string \mbox{\hyperlink{classfc_1_1crypto_1_1signature_a9e02c6ea0f56ba55ffd9fb799ae0a940}{to\+\_\+string}} (const \mbox{\hyperlink{namespacefc_a978f9e97f64eb2ce6cbe892d3cc93397}{fc\+::yield\+\_\+function\+\_\+t}} \&yield=\mbox{\hyperlink{namespacefc_a978f9e97f64eb2ce6cbe892d3cc93397}{fc\+::yield\+\_\+function\+\_\+t}}()) const
+\item 
+size\+\_\+t \mbox{\hyperlink{classfc_1_1crypto_1_1signature_a5836b8b6af3714fdbdc77cf8743fdd0b}{which}} () const
+\item 
+size\+\_\+t \mbox{\hyperlink{classfc_1_1crypto_1_1signature_a74eac58b2b683ad8a4d048e13603ada5}{variable\+\_\+size}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{classfc_1_1crypto_1_1signature_af455309b47ab8c41e1dd36b91498fb47}{reflector$<$ signature $>$}}
+\item 
+\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classfc_1_1crypto_1_1signature_ae1389c6c19ec8630ce31970de2294915}{private\+\_\+key}}
+\item 
+\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classfc_1_1crypto_1_1signature_a02ee1fa9fb75a71bb167b80862443a52}{public\+\_\+key}}
+\item 
+bool \mbox{\hyperlink{classfc_1_1crypto_1_1signature_ac2e519e4ae4118c9d1801c20f94c893b}{operator==}} (const \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{signature}} \&p1, const \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{signature}} \&p2)
+\item 
+bool \mbox{\hyperlink{classfc_1_1crypto_1_1signature_a44b742772ed7aa3e516dd4625abfe1d8}{operator!=}} (const \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{signature}} \&p1, const \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{signature}} \&p2)
+\item 
+bool \mbox{\hyperlink{classfc_1_1crypto_1_1signature_afb044052136e9b7515e3da14772089d1}{operator$<$}} (const \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{signature}} \&p1, const \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{signature}} \&p2)
+\item 
+std\+::size\+\_\+t \mbox{\hyperlink{classfc_1_1crypto_1_1signature_a84a730a17bfc74f917830e31af1fc1a9}{hash\+\_\+value}} (const \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{signature}} \&b)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{signature_8hpp_source_l00021}{21}} of file \mbox{\hyperlink{signature_8hpp_source}{signature.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classfc_1_1crypto_1_1signature_a609409752d8ff1e36851a31cb60ea94d}\index{fc::crypto::signature@{fc::crypto::signature}!storage\_type@{storage\_type}}
+\index{storage\_type@{storage\_type}!fc::crypto::signature@{fc::crypto::signature}}
+\doxysubsubsection{\texorpdfstring{storage\_type}{storage\_type}}
+{\footnotesize\ttfamily \label{classfc_1_1crypto_1_1signature_a609409752d8ff1e36851a31cb60ea94d} 
+using fc\+::crypto\+::signature\+::storage\+\_\+type = std\+::variant$<$\mbox{\hyperlink{structfc_1_1ecc_1_1signature__shim}{ecc\+::signature\+\_\+shim}}, \mbox{\hyperlink{structfc_1_1crypto_1_1r1_1_1signature__shim}{r1\+::signature\+\_\+shim}}, \mbox{\hyperlink{classfc_1_1crypto_1_1webauthn_1_1signature}{webauthn\+::signature}}, \mbox{\hyperlink{structfc_1_1em_1_1signature__shim}{em\+::signature\+\_\+shim}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{signature_8hpp_source_l00024}{24}} of file \mbox{\hyperlink{signature_8hpp_source}{signature.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1crypto_1_1signature_a951819aaeebfa3ee2a1fb7d44d7427ef}\index{fc::crypto::signature@{fc::crypto::signature}!signature@{signature}}
+\index{signature@{signature}!fc::crypto::signature@{fc::crypto::signature}}
+\doxysubsubsection{\texorpdfstring{signature()}{signature()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{classfc_1_1crypto_1_1signature_a951819aaeebfa3ee2a1fb7d44d7427ef} 
+fc\+::crypto\+::signature\+::signature (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [default]}}
+
+\Hypertarget{classfc_1_1crypto_1_1signature_a090abf4aadb475423381a20a127c8f74}\index{fc::crypto::signature@{fc::crypto::signature}!signature@{signature}}
+\index{signature@{signature}!fc::crypto::signature@{fc::crypto::signature}}
+\doxysubsubsection{\texorpdfstring{signature()}{signature()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{classfc_1_1crypto_1_1signature_a090abf4aadb475423381a20a127c8f74} 
+fc\+::crypto\+::signature\+::signature (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1crypto_1_1signature}{signature}} \&\&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [default]}}
+
+\Hypertarget{classfc_1_1crypto_1_1signature_af8e291ae6b3aa77b38c838a7a793f6cf}\index{fc::crypto::signature@{fc::crypto::signature}!signature@{signature}}
+\index{signature@{signature}!fc::crypto::signature@{fc::crypto::signature}}
+\doxysubsubsection{\texorpdfstring{signature()}{signature()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{classfc_1_1crypto_1_1signature_af8e291ae6b3aa77b38c838a7a793f6cf} 
+fc\+::crypto\+::signature\+::signature (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{signature}} \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [default]}}
+
+\Hypertarget{classfc_1_1crypto_1_1signature_ad579711d443f87a992609cee5826c34f}\index{fc::crypto::signature@{fc::crypto::signature}!signature@{signature}}
+\index{signature@{signature}!fc::crypto::signature@{fc::crypto::signature}}
+\doxysubsubsection{\texorpdfstring{signature()}{signature()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{classfc_1_1crypto_1_1signature_ad579711d443f87a992609cee5826c34f} 
+fc\+::crypto\+::signature\+::signature (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&}]{base58str}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{signature_8cpp_source_l00034}{34}} of file \mbox{\hyperlink{signature_8cpp_source}{signature.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ :\_storage(sig\_parse\_base58(base58str))}
+\DoxyCodeLine{00036\ \ \ \ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1crypto_1_1signature_a221c17717f5a63906846063869e213d4}\index{fc::crypto::signature@{fc::crypto::signature}!operator=@{operator=}}
+\index{operator=@{operator=}!fc::crypto::signature@{fc::crypto::signature}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}}
+{\footnotesize\ttfamily \label{classfc_1_1crypto_1_1signature_a221c17717f5a63906846063869e213d4} 
+\mbox{\hyperlink{classfc_1_1crypto_1_1signature}{signature}} \& fc\+::crypto\+::signature\+::operator= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{signature}} \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [default]}}
+
+\Hypertarget{classfc_1_1crypto_1_1signature_a9e02c6ea0f56ba55ffd9fb799ae0a940}\index{fc::crypto::signature@{fc::crypto::signature}!to\_string@{to\_string}}
+\index{to\_string@{to\_string}!fc::crypto::signature@{fc::crypto::signature}}
+\doxysubsubsection{\texorpdfstring{to\_string()}{to\_string()}}
+{\footnotesize\ttfamily \label{classfc_1_1crypto_1_1signature_a9e02c6ea0f56ba55ffd9fb799ae0a940} 
+std\+::string fc\+::crypto\+::signature\+::to\+\_\+string (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a978f9e97f64eb2ce6cbe892d3cc93397}{fc\+::yield\+\_\+function\+\_\+t}} \&}]{yield}{ = {\ttfamily \mbox{\hyperlink{namespacefc_a978f9e97f64eb2ce6cbe892d3cc93397}{fc\+::yield\+\_\+function\+\_\+t}}()}}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{signature_8cpp_source_l00056}{56}} of file \mbox{\hyperlink{signature_8cpp_source}{signature.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00057\ \ \ \ \{}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ data\_str\ =\ std::visit(base58str\_visitor<storage\_type,\ config::signature\_prefix>(yield),\ \_storage);}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \mbox{\hyperlink{namespaceboost_1_1fibers_1_1asio_a65142b77539b20ba6d2abb35a0d4f5d2}{yield}}();}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::string(config::signature\_base\_prefix)\ +\ \textcolor{stringliteral}{"{}\_"{}}\ +\ data\_str;}
+\DoxyCodeLine{00061\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=330pt]{classfc_1_1crypto_1_1signature_a9e02c6ea0f56ba55ffd9fb799ae0a940_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1crypto_1_1signature_a74eac58b2b683ad8a4d048e13603ada5}\index{fc::crypto::signature@{fc::crypto::signature}!variable\_size@{variable\_size}}
+\index{variable\_size@{variable\_size}!fc::crypto::signature@{fc::crypto::signature}}
+\doxysubsubsection{\texorpdfstring{variable\_size()}{variable\_size()}}
+{\footnotesize\ttfamily \label{classfc_1_1crypto_1_1signature_a74eac58b2b683ad8a4d048e13603ada5} 
+size\+\_\+t fc\+::crypto\+::signature\+::variable\+\_\+size (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{signature_8cpp_source_l00045}{45}} of file \mbox{\hyperlink{signature_8cpp_source}{signature.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::visit(\mbox{\hyperlink{namespacefc_1_1crypto_a31718e1baf7ba5d37f8a233db473eedf}{overloaded}}\ \{}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ [\&](\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ k1r1)\ \{}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(0);}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ [\&](\textcolor{keyword}{const}\ webauthn::signature\&\ \mbox{\hyperlink{allow__code__after__function__end__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}})\ \{}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(\mbox{\hyperlink{allow__code__after__function__end__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}.variable\_size());}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \},\ \_storage);}
+\DoxyCodeLine{00054\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1crypto_1_1signature_a5836b8b6af3714fdbdc77cf8743fdd0b}\index{fc::crypto::signature@{fc::crypto::signature}!which@{which}}
+\index{which@{which}!fc::crypto::signature@{fc::crypto::signature}}
+\doxysubsubsection{\texorpdfstring{which()}{which()}}
+{\footnotesize\ttfamily \label{classfc_1_1crypto_1_1signature_a5836b8b6af3714fdbdc77cf8743fdd0b} 
+size\+\_\+t fc\+::crypto\+::signature\+::which (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{signature_8cpp_source_l00038}{38}} of file \mbox{\hyperlink{signature_8cpp_source}{signature.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \_storage.index();}
+\DoxyCodeLine{00040\ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{classfc_1_1crypto_1_1signature_a84a730a17bfc74f917830e31af1fc1a9}\index{fc::crypto::signature@{fc::crypto::signature}!hash\_value@{hash\_value}}
+\index{hash\_value@{hash\_value}!fc::crypto::signature@{fc::crypto::signature}}
+\doxysubsubsection{\texorpdfstring{hash\_value}{hash\_value}}
+{\footnotesize\ttfamily \label{classfc_1_1crypto_1_1signature_a84a730a17bfc74f917830e31af1fc1a9} 
+std\+::size\+\_\+t hash\+\_\+value (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{signature}} \&}]{b}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{signature_8cpp_source_l00081}{81}} of file \mbox{\hyperlink{signature_8cpp_source}{signature.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::visit(hash\_visitor(),\ b.\_storage);}
+\DoxyCodeLine{00083\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1crypto_1_1signature_a44b742772ed7aa3e516dd4625abfe1d8}\index{fc::crypto::signature@{fc::crypto::signature}!operator"!=@{operator"!=}}
+\index{operator"!=@{operator"!=}!fc::crypto::signature@{fc::crypto::signature}}
+\doxysubsubsection{\texorpdfstring{operator"!=}{operator!=}}
+{\footnotesize\ttfamily \label{classfc_1_1crypto_1_1signature_a44b742772ed7aa3e516dd4625abfe1d8} 
+bool \mbox{\hyperlink{namespacefc_a40c368ac88294ae47b064cad937fdbf6}{operator!}}= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{signature}} \&}]{p1}{, }\item[{const \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{signature}} \&}]{p2}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{signature_8cpp_source_l00072}{72}} of file \mbox{\hyperlink{signature_8cpp_source}{signature.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !\mbox{\hyperlink{structfc_1_1crypto_1_1eq__comparator_a4a970a346ebd907e27c65f298b571b75}{eq\_comparator<signature::storage\_type>::apply}}(p1.\_storage,\ p2.\_storage);}
+\DoxyCodeLine{00074\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1crypto_1_1signature_afb044052136e9b7515e3da14772089d1}\index{fc::crypto::signature@{fc::crypto::signature}!operator$<$@{operator$<$}}
+\index{operator$<$@{operator$<$}!fc::crypto::signature@{fc::crypto::signature}}
+\doxysubsubsection{\texorpdfstring{operator$<$}{operator<}}
+{\footnotesize\ttfamily \label{classfc_1_1crypto_1_1signature_afb044052136e9b7515e3da14772089d1} 
+bool operator$<$ (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{signature}} \&}]{p1}{, }\item[{const \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{signature}} \&}]{p2}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{signature_8cpp_source_l00076}{76}} of file \mbox{\hyperlink{signature_8cpp_source}{signature.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00077\ \ \ \ \{}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structfc_1_1crypto_1_1less__comparator_aa8a9e7b3cc483fc68e4d623063606fc9}{less\_comparator<signature::storage\_type>::apply}}(p1.\_storage,\ p2.\_storage);}
+\DoxyCodeLine{00079\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1crypto_1_1signature_ac2e519e4ae4118c9d1801c20f94c893b}\index{fc::crypto::signature@{fc::crypto::signature}!operator==@{operator==}}
+\index{operator==@{operator==}!fc::crypto::signature@{fc::crypto::signature}}
+\doxysubsubsection{\texorpdfstring{operator==}{operator==}}
+{\footnotesize\ttfamily \label{classfc_1_1crypto_1_1signature_ac2e519e4ae4118c9d1801c20f94c893b} 
+bool operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{signature}} \&}]{p1}{, }\item[{const \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{signature}} \&}]{p2}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{signature_8cpp_source_l00068}{68}} of file \mbox{\hyperlink{signature_8cpp_source}{signature.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structfc_1_1crypto_1_1eq__comparator_a4a970a346ebd907e27c65f298b571b75}{eq\_comparator<signature::storage\_type>::apply}}(p1.\_storage,\ p2.\_storage);}
+\DoxyCodeLine{00070\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1crypto_1_1signature_ae1389c6c19ec8630ce31970de2294915}\index{fc::crypto::signature@{fc::crypto::signature}!private\_key@{private\_key}}
+\index{private\_key@{private\_key}!fc::crypto::signature@{fc::crypto::signature}}
+\doxysubsubsection{\texorpdfstring{private\_key}{private\_key}}
+{\footnotesize\ttfamily \label{classfc_1_1crypto_1_1signature_ae1389c6c19ec8630ce31970de2294915} 
+friend \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classfc_1_1crypto_1_1private__key}{private\+\_\+key}}\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{signature_8hpp_source_l00051}{51}} of file \mbox{\hyperlink{signature_8hpp_source}{signature.\+hpp}}.
+
+\Hypertarget{classfc_1_1crypto_1_1signature_a02ee1fa9fb75a71bb167b80862443a52}\index{fc::crypto::signature@{fc::crypto::signature}!public\_key@{public\_key}}
+\index{public\_key@{public\_key}!fc::crypto::signature@{fc::crypto::signature}}
+\doxysubsubsection{\texorpdfstring{public\_key}{public\_key}}
+{\footnotesize\ttfamily \label{classfc_1_1crypto_1_1signature_a02ee1fa9fb75a71bb167b80862443a52} 
+friend \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classfc_1_1crypto_1_1public__key}{public\+\_\+key}}\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{signature_8hpp_source_l00052}{52}} of file \mbox{\hyperlink{signature_8hpp_source}{signature.\+hpp}}.
+
+\Hypertarget{classfc_1_1crypto_1_1signature_af455309b47ab8c41e1dd36b91498fb47}\index{fc::crypto::signature@{fc::crypto::signature}!reflector$<$ signature $>$@{reflector$<$ signature $>$}}
+\index{reflector$<$ signature $>$@{reflector$<$ signature $>$}!fc::crypto::signature@{fc::crypto::signature}}
+\doxysubsubsection{\texorpdfstring{reflector$<$ signature $>$}{reflector< signature >}}
+{\footnotesize\ttfamily \label{classfc_1_1crypto_1_1signature_af455309b47ab8c41e1dd36b91498fb47} 
+friend struct \mbox{\hyperlink{structfc_1_1reflector}{reflector}}$<$ \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{signature}} $>$\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{signature_8hpp_source_l00049}{49}} of file \mbox{\hyperlink{signature_8hpp_source}{signature.\+hpp}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/\mbox{\hyperlink{signature_8hpp}{signature.\+hpp}}\item 
+libraries/fc/src/crypto/\mbox{\hyperlink{signature_8cpp}{signature.\+cpp}}\end{DoxyCompactItemize}

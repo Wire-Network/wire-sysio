@@ -1,0 +1,7 @@
+<map id="CLI::App::disabled" name="CLI::App::disabled">
+<area shape="rect" id="Node000001" title="Disable the subcommand or option group." alt="" coords="162,31,291,56"/>
+<area shape="rect" id="Node000002" href="$namespace_c_l_i.html#ae611995dabf1e7d4a2480f1952ef6ba7" title="Helper function to disable one option group/subcommand when another is used." alt="" coords="5,5,114,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="146,34,114,29,115,24,146,29"/>
+<area shape="rect" id="Node000003" href="$namespace_c_l_i.html#a495f418aefacfdfbe91642a18f60d77c" title="Helper function to enable one option group/subcommand when another is used." alt="" coords="6,55,113,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="147,58,114,62,113,57,146,52"/>
+</map>

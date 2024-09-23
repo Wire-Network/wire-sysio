@@ -1,0 +1,175 @@
+\doxysection{websocketpp\+::log\+::elevel Struct Reference}
+\hypertarget{structwebsocketpp_1_1log_1_1elevel}{}\label{structwebsocketpp_1_1log_1_1elevel}\index{websocketpp::log::elevel@{websocketpp::log::elevel}}
+
+
+Package of log levels for logging errors.  
+
+
+
+
+{\ttfamily \#include $<$levels.\+hpp$>$}
+
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static char const \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structwebsocketpp_1_1log_1_1elevel_a124ea5b3e6055ec1b4d95fca52ac0fa9}{channel\+\_\+name}} (\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}} channel)
+\begin{DoxyCompactList}\small\item\em Get the textual name of a channel given a channel id. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static \mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}} const \mbox{\hyperlink{structwebsocketpp_1_1log_1_1elevel_ae86395aa26ec2089e07fd63b62a549fa}{none}} = 0x0
+\begin{DoxyCompactList}\small\item\em Special aggregate value representing "{}no levels"{}. \end{DoxyCompactList}\item 
+static \mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}} const \mbox{\hyperlink{structwebsocketpp_1_1log_1_1elevel_a0b1dbc650c6f2711522c096496423726}{devel}} = 0x1
+\begin{DoxyCompactList}\small\item\em Low level debugging information (warning\+: very chatty) \end{DoxyCompactList}\item 
+static \mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}} const \mbox{\hyperlink{structwebsocketpp_1_1log_1_1elevel_a2b862d4f143d9b77619ddbacd1763674}{library}} = 0x2
+\item 
+static \mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}} const \mbox{\hyperlink{structwebsocketpp_1_1log_1_1elevel_a3ab47987a682f0de7b1d0df8c9c3b9d2}{info}} = 0x4
+\item 
+static \mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}} const \mbox{\hyperlink{structwebsocketpp_1_1log_1_1elevel_aef51fd791400121297f38f4381edaebe}{warn}} = 0x8
+\item 
+static \mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}} const \mbox{\hyperlink{structwebsocketpp_1_1log_1_1elevel_ae8a9a9f8b1fa45a731acd340e10aa342}{rerror}} = 0x10
+\item 
+static \mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}} const \mbox{\hyperlink{structwebsocketpp_1_1log_1_1elevel_aa909808e0fb142742a0ebd2dca54f517}{fatal}} = 0x20
+\item 
+static \mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}} const \mbox{\hyperlink{structwebsocketpp_1_1log_1_1elevel_a9b31ff708c221d314f9f4eb3ff2b1ad7}{all}} = 0xffffffff
+\begin{DoxyCompactList}\small\item\em Special aggregate value representing "{}all levels"{}. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{levels_8hpp_source_l00059}{59}} of file \mbox{\hyperlink{levels_8hpp_source}{levels.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structwebsocketpp_1_1log_1_1elevel_a124ea5b3e6055ec1b4d95fca52ac0fa9}\index{websocketpp::log::elevel@{websocketpp::log::elevel}!channel\_name@{channel\_name}}
+\index{channel\_name@{channel\_name}!websocketpp::log::elevel@{websocketpp::log::elevel}}
+\doxysubsubsection{\texorpdfstring{channel\_name()}{channel\_name()}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1log_1_1elevel_a124ea5b3e6055ec1b4d95fca52ac0fa9} 
+static char const  \texorpdfstring{$\ast$}{*} websocketpp\+::log\+::elevel\+::channel\+\_\+name (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}}}]{channel}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+The id must be that of a single channel. Passing an aggregate channel package results in undefined behavior.
+
+
+\begin{DoxyParams}{Parameters}
+{\em channel} & The channel id to look up.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The name of the specified channel. 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{levels_8hpp_source_l00091}{91}} of file \mbox{\hyperlink{levels_8hpp_source}{levels.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(channel)\ \{}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structwebsocketpp_1_1log_1_1elevel_a0b1dbc650c6f2711522c096496423726}{devel}}:}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}devel"{}};}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structwebsocketpp_1_1log_1_1elevel_a2b862d4f143d9b77619ddbacd1763674}{library}}:}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}library"{}};}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structwebsocketpp_1_1log_1_1elevel_a3ab47987a682f0de7b1d0df8c9c3b9d2}{info}}:}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}info"{}};}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structwebsocketpp_1_1log_1_1elevel_aef51fd791400121297f38f4381edaebe}{warn}}:}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}warning"{}};}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structwebsocketpp_1_1log_1_1elevel_ae8a9a9f8b1fa45a731acd340e10aa342}{rerror}}:}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}error"{}};}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structwebsocketpp_1_1log_1_1elevel_aa909808e0fb142742a0ebd2dca54f517}{fatal}}:}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}fatal"{}};}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}unknown"{}};}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00108\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structwebsocketpp_1_1log_1_1elevel_a9b31ff708c221d314f9f4eb3ff2b1ad7}\index{websocketpp::log::elevel@{websocketpp::log::elevel}!all@{all}}
+\index{all@{all}!websocketpp::log::elevel@{websocketpp::log::elevel}}
+\doxysubsubsection{\texorpdfstring{all}{all}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1log_1_1elevel_a9b31ff708c221d314f9f4eb3ff2b1ad7} 
+\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}} const websocketpp\+::log\+::elevel\+::all = 0xffffffff\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{levels_8hpp_source_l00080}{80}} of file \mbox{\hyperlink{levels_8hpp_source}{levels.\+hpp}}.
+
+\Hypertarget{structwebsocketpp_1_1log_1_1elevel_a0b1dbc650c6f2711522c096496423726}\index{websocketpp::log::elevel@{websocketpp::log::elevel}!devel@{devel}}
+\index{devel@{devel}!websocketpp::log::elevel@{websocketpp::log::elevel}}
+\doxysubsubsection{\texorpdfstring{devel}{devel}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1log_1_1elevel_a0b1dbc650c6f2711522c096496423726} 
+\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}} const websocketpp\+::log\+::elevel\+::devel = 0x1\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{levels_8hpp_source_l00063}{63}} of file \mbox{\hyperlink{levels_8hpp_source}{levels.\+hpp}}.
+
+\Hypertarget{structwebsocketpp_1_1log_1_1elevel_aa909808e0fb142742a0ebd2dca54f517}\index{websocketpp::log::elevel@{websocketpp::log::elevel}!fatal@{fatal}}
+\index{fatal@{fatal}!websocketpp::log::elevel@{websocketpp::log::elevel}}
+\doxysubsubsection{\texorpdfstring{fatal}{fatal}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1log_1_1elevel_aa909808e0fb142742a0ebd2dca54f517} 
+\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}} const websocketpp\+::log\+::elevel\+::fatal = 0x20\hspace{0.3cm}{\ttfamily [static]}}
+
+Unrecoverable error. This error will trigger immediate unclean termination of the connection or endpoint. 
+
+Definition at line \mbox{\hyperlink{levels_8hpp_source_l00078}{78}} of file \mbox{\hyperlink{levels_8hpp_source}{levels.\+hpp}}.
+
+\Hypertarget{structwebsocketpp_1_1log_1_1elevel_a3ab47987a682f0de7b1d0df8c9c3b9d2}\index{websocketpp::log::elevel@{websocketpp::log::elevel}!info@{info}}
+\index{info@{info}!websocketpp::log::elevel@{websocketpp::log::elevel}}
+\doxysubsubsection{\texorpdfstring{info}{info}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1log_1_1elevel_a3ab47987a682f0de7b1d0df8c9c3b9d2} 
+\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}} const websocketpp\+::log\+::elevel\+::info = 0x4\hspace{0.3cm}{\ttfamily [static]}}
+
+Information about minor configuration problems or additional information about other warnings. 
+
+Definition at line \mbox{\hyperlink{levels_8hpp_source_l00069}{69}} of file \mbox{\hyperlink{levels_8hpp_source}{levels.\+hpp}}.
+
+\Hypertarget{structwebsocketpp_1_1log_1_1elevel_a2b862d4f143d9b77619ddbacd1763674}\index{websocketpp::log::elevel@{websocketpp::log::elevel}!library@{library}}
+\index{library@{library}!websocketpp::log::elevel@{websocketpp::log::elevel}}
+\doxysubsubsection{\texorpdfstring{library}{library}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1log_1_1elevel_a2b862d4f143d9b77619ddbacd1763674} 
+\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}} const websocketpp\+::log\+::elevel\+::library = 0x2\hspace{0.3cm}{\ttfamily [static]}}
+
+Information about unusual system states or other minor internal library problems, less chatty than devel. 
+
+Definition at line \mbox{\hyperlink{levels_8hpp_source_l00066}{66}} of file \mbox{\hyperlink{levels_8hpp_source}{levels.\+hpp}}.
+
+\Hypertarget{structwebsocketpp_1_1log_1_1elevel_ae86395aa26ec2089e07fd63b62a549fa}\index{websocketpp::log::elevel@{websocketpp::log::elevel}!none@{none}}
+\index{none@{none}!websocketpp::log::elevel@{websocketpp::log::elevel}}
+\doxysubsubsection{\texorpdfstring{none}{none}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1log_1_1elevel_ae86395aa26ec2089e07fd63b62a549fa} 
+\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}} const websocketpp\+::log\+::elevel\+::none = 0x0\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{levels_8hpp_source_l00061}{61}} of file \mbox{\hyperlink{levels_8hpp_source}{levels.\+hpp}}.
+
+\Hypertarget{structwebsocketpp_1_1log_1_1elevel_ae8a9a9f8b1fa45a731acd340e10aa342}\index{websocketpp::log::elevel@{websocketpp::log::elevel}!rerror@{rerror}}
+\index{rerror@{rerror}!websocketpp::log::elevel@{websocketpp::log::elevel}}
+\doxysubsubsection{\texorpdfstring{rerror}{rerror}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1log_1_1elevel_ae8a9a9f8b1fa45a731acd340e10aa342} 
+\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}} const websocketpp\+::log\+::elevel\+::rerror = 0x10\hspace{0.3cm}{\ttfamily [static]}}
+
+Recoverable error. Recovery may mean cleanly closing the connection with an appropriate error code to the remote endpoint. 
+
+Definition at line \mbox{\hyperlink{levels_8hpp_source_l00075}{75}} of file \mbox{\hyperlink{levels_8hpp_source}{levels.\+hpp}}.
+
+\Hypertarget{structwebsocketpp_1_1log_1_1elevel_aef51fd791400121297f38f4381edaebe}\index{websocketpp::log::elevel@{websocketpp::log::elevel}!warn@{warn}}
+\index{warn@{warn}!websocketpp::log::elevel@{websocketpp::log::elevel}}
+\doxysubsubsection{\texorpdfstring{warn}{warn}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1log_1_1elevel_aef51fd791400121297f38f4381edaebe} 
+\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}} const websocketpp\+::log\+::elevel\+::warn = 0x8\hspace{0.3cm}{\ttfamily [static]}}
+
+Information about important problems not severe enough to terminate connections. 
+
+Definition at line \mbox{\hyperlink{levels_8hpp_source_l00072}{72}} of file \mbox{\hyperlink{levels_8hpp_source}{levels.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/vendor/websocketpp/websocketpp/logger/\mbox{\hyperlink{levels_8hpp}{levels.\+hpp}}\end{DoxyCompactItemize}

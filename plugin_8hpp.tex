@@ -1,0 +1,94 @@
+\doxysection{libraries/appbase/include/appbase/plugin.hpp File Reference}
+\hypertarget{plugin_8hpp}{}\label{plugin_8hpp}\index{libraries/appbase/include/appbase/plugin.hpp@{libraries/appbase/include/appbase/plugin.hpp}}
+{\ttfamily \#include $<$boost/program\+\_\+options.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/preprocessor/seq/for\+\_\+each.\+hpp$>$}\newline
+{\ttfamily \#include $<$string$>$}\newline
+{\ttfamily \#include $<$vector$>$}\newline
+{\ttfamily \#include $<$map$>$}\newline
+Include dependency graph for plugin.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{plugin_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{plugin_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classappbase_1_1abstract__plugin}{appbase\+::abstract\+\_\+plugin}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespaceappbase}{appbase}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{plugin_8hpp_ace3d7bcfdd264baecbaf8f60bcb22c9f}{APPBASE\+\_\+\+PLUGIN\+\_\+\+REQUIRES\+\_\+\+VISIT}}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},  visitor,  elem)
+\item 
+\#define \mbox{\hyperlink{plugin_8hpp_ae81793dd38463b82491d75a9ccd209e1}{APPBASE\+\_\+\+PLUGIN\+\_\+\+REQUIRES}}(PLUGINS)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classappbase_1_1application}{application}} \& \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{appbase\+::app}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{plugin_8hpp_ae81793dd38463b82491d75a9ccd209e1}\index{plugin.hpp@{plugin.hpp}!APPBASE\_PLUGIN\_REQUIRES@{APPBASE\_PLUGIN\_REQUIRES}}
+\index{APPBASE\_PLUGIN\_REQUIRES@{APPBASE\_PLUGIN\_REQUIRES}!plugin.hpp@{plugin.hpp}}
+\doxysubsubsection{\texorpdfstring{APPBASE\_PLUGIN\_REQUIRES}{APPBASE\_PLUGIN\_REQUIRES}}
+{\footnotesize\ttfamily \label{plugin_8hpp_ae81793dd38463b82491d75a9ccd209e1} 
+\#define APPBASE\+\_\+\+PLUGIN\+\_\+\+REQUIRES(\begin{DoxyParamCaption}\item[{}]{PLUGINS}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ Lambda>\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \textcolor{keywordtype}{void}\ plugin\_requires(\ Lambda\&\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}\ )\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ BOOST\_PP\_SEQ\_FOR\_EACH(\ \mbox{\hyperlink{plugin_8hpp_ace3d7bcfdd264baecbaf8f60bcb22c9f}{APPBASE\_PLUGIN\_REQUIRES\_VISIT}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}},\ PLUGINS\ )\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{plugin_8hpp_source_l00011}{11}} of file \mbox{\hyperlink{plugin_8hpp_source}{plugin.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00011\ \textcolor{preprocessor}{\#define\ APPBASE\_PLUGIN\_REQUIRES(\ PLUGINS\ )\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00012\ \textcolor{preprocessor}{\ \ \ template<typename\ Lambda>\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00013\ \textcolor{preprocessor}{\ \ \ void\ plugin\_requires(\ Lambda\&\&\ l\ )\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00014\ \textcolor{preprocessor}{\ \ \ \ \ \ BOOST\_PP\_SEQ\_FOR\_EACH(\ APPBASE\_PLUGIN\_REQUIRES\_VISIT,\ l,\ PLUGINS\ )\ \(\backslash\)}}
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\ \ \ \}}}
+
+\end{DoxyCode}
+\Hypertarget{plugin_8hpp_ace3d7bcfdd264baecbaf8f60bcb22c9f}\index{plugin.hpp@{plugin.hpp}!APPBASE\_PLUGIN\_REQUIRES\_VISIT@{APPBASE\_PLUGIN\_REQUIRES\_VISIT}}
+\index{APPBASE\_PLUGIN\_REQUIRES\_VISIT@{APPBASE\_PLUGIN\_REQUIRES\_VISIT}!plugin.hpp@{plugin.hpp}}
+\doxysubsubsection{\texorpdfstring{APPBASE\_PLUGIN\_REQUIRES\_VISIT}{APPBASE\_PLUGIN\_REQUIRES\_VISIT}}
+{\footnotesize\ttfamily \label{plugin_8hpp_ace3d7bcfdd264baecbaf8f60bcb22c9f} 
+\#define APPBASE\+\_\+\+PLUGIN\+\_\+\+REQUIRES\+\_\+\+VISIT(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}}{, }\item[{}]{visitor}{, }\item[{}]{elem}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ visitor(\ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{appbase::app}}().register\_plugin<elem>()\ );}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{plugin_8hpp_source_l00008}{8}} of file \mbox{\hyperlink{plugin_8hpp_source}{plugin.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00008\ \textcolor{preprocessor}{\#define\ APPBASE\_PLUGIN\_REQUIRES\_VISIT(\ r,\ visitor,\ elem\ )\ \(\backslash\)}}
+\DoxyCodeLine{00009\ \textcolor{preprocessor}{\ \ visitor(\ appbase::app().register\_plugin<elem>()\ );\ }}
+
+\end{DoxyCode}

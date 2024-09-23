@@ -1,0 +1,7 @@
+<map id="TEST" name="TEST">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,46,61,72"/>
+<area shape="rect" id="Node000002" href="$class_memory_pool_allocator.html#a5672e0833fda2e71ce987911397489ed" title="Computes the total capacity of allocated memory chunks." alt="" coords="109,5,254,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="60,50,93,43,94,48,62,55"/>
+<area shape="rect" id="Node000003" href="$class_memory_pool_allocator.html#ae7fcf0341c13e899cf488bc7c8949956" title="Computes the memory blocks allocated." alt="" coords="109,71,254,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="62,62,94,69,93,75,60,67"/>
+</map>

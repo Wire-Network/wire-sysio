@@ -1,0 +1,258 @@
+\doxysection{fixed\+\_\+bytes.\+hpp}
+\hypertarget{fixed__bytes_8hpp_source}{}\label{fixed__bytes_8hpp_source}\index{libraries/chain/include/sysio/chain/fixed\_bytes.hpp@{libraries/chain/include/sysio/chain/fixed\_bytes.hpp}}
+\mbox{\hyperlink{fixed__bytes_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00001}00001\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00005}00005\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{chain_2include_2sysio_2chain_2types_8hpp}{sysio/chain/types.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ <array>}}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <algorithm>}}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00011}00011\ \textcolor{preprocessor}{\#include\ <functional>}}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00012}00012\ \textcolor{preprocessor}{\#include\ <type\_traits>}}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00014}00014\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00018}00018\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacesysio_1_1chain_a896515137d9a7844105786ee3a6b1d47}{chain::uint128\_t}};}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00020}00020\ \ \ \ \textcolor{keyword}{template}<\textcolor{keywordtype}{size\_t}\ Size>}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00021}00021\ \ \ \ \textcolor{keyword}{class\ }fixed\_bytes;}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00023}00023\ \ \ \ \textcolor{keyword}{template}<\textcolor{keywordtype}{size\_t}\ Size>}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00024}00024\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacesysio_1_1chain_a0fc6c75576d3bf4645b51dfd6855890c}{operator\ ==}}(\textcolor{keyword}{const}\ fixed\_bytes<Size>\ \&c1,\ \textcolor{keyword}{const}\ fixed\_bytes<Size>\ \&c2);}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00026}00026\ \ \ \ \textcolor{keyword}{template}<\textcolor{keywordtype}{size\_t}\ Size>}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00027}00027\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacesysio_1_1chain_a5a450a5c1c452d22fea6e156bf083739}{operator\ !=}}(\textcolor{keyword}{const}\ fixed\_bytes<Size>\ \&c1,\ \textcolor{keyword}{const}\ fixed\_bytes<Size>\ \&c2);}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00029}00029\ \ \ \ \textcolor{keyword}{template}<\textcolor{keywordtype}{size\_t}\ Size>}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00030}00030\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacesysio_1_1chain_a74533239b4115d619e0296978872c4be}{operator\ >}}(\textcolor{keyword}{const}\ fixed\_bytes<Size>\ \&c1,\ \textcolor{keyword}{const}\ fixed\_bytes<Size>\ \&c2);}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00032}00032\ \ \ \ \textcolor{keyword}{template}<\textcolor{keywordtype}{size\_t}\ Size>}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00033}00033\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacesysio_1_1chain_a0551da3711d5d1b1dd0f2ca27e1f8e6c}{operator\ <}}(\textcolor{keyword}{const}\ fixed\_bytes<Size>\ \&c1,\ \textcolor{keyword}{const}\ fixed\_bytes<Size>\ \&c2);}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00035}00035\ \ \ \ \textcolor{keyword}{template}<\textcolor{keywordtype}{size\_t}\ Size>}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00036}00036\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacesysio_1_1chain_a8e1e210a5011c30501e6759d373ff881}{operator\ >=}}(\textcolor{keyword}{const}\ fixed\_bytes<Size>\ \&c1,\ \textcolor{keyword}{const}\ fixed\_bytes<Size>\ \&c2);}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00038}00038\ \ \ \ \textcolor{keyword}{template}<\textcolor{keywordtype}{size\_t}\ Size>}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00039}00039\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacesysio_1_1chain_a0d799fe17b0b60464938e6c9b795e2ca}{operator\ <=}}(\textcolor{keyword}{const}\ fixed\_bytes<Size>\ \&c1,\ \textcolor{keyword}{const}\ fixed\_bytes<Size>\ \&c2);}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00056}00056\ \ \ \ \textcolor{keyword}{template}<\textcolor{keywordtype}{size\_t}\ Size>}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00057}\mbox{\hyperlink{classsysio_1_1fixed__bytes}{00057}}\ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1fixed__bytes}{fixed\_bytes}}\ \{}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00058}00058\ \ \ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keywordtype}{bool}...>\ \textcolor{keyword}{struct\ }bool\_pack;}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00061}00061\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keywordtype}{bool}...\ bs>}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00062}00062\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ }all\_true\ =\ std::is\_same<\ bool\_pack<bs...,\ \textcolor{keyword}{true}>,\ bool\_pack<\textcolor{keyword}{true},\ bs...>\ >;}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00064}00064\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ Word,\ \textcolor{keywordtype}{size\_t}\ NumWords>}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00065}00065\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ set\_from\_word\_sequence(\textcolor{keyword}{const}\ Word*\ arr\_begin,\ \textcolor{keyword}{const}\ Word*\ arr\_end,\ \mbox{\hyperlink{classsysio_1_1fixed__bytes}{fixed\_bytes<Size>}}\&\ key)}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00066}00066\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00067}00067\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ key.\_data.begin();}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1fixed__bytes_a7ca85de1657ab41f1406d684da982c87}{word\_t}}\ temp\_word\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ sub\_word\_shift\ =\ 8\ *\ \textcolor{keyword}{sizeof}(Word);}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ num\_sub\_words\ =\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{classsysio_1_1fixed__bytes_a7ca85de1657ab41f1406d684da982c87}{word\_t}})\ /\ \textcolor{keyword}{sizeof}(Word);}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00071}00071\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ sub\_words\_left\ =\ num\_sub\_words;}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\ w\_itr\ =\ arr\_begin;\ w\_itr\ !=\ arr\_end;\ ++w\_itr\ )\ \{}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00073}00073\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ sub\_words\_left\ >\ 1\ )\ \{}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00074}00074\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ temp\_word\ |=\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{classsysio_1_1fixed__bytes_a7ca85de1657ab41f1406d684da982c87}{word\_t}}\textcolor{keyword}{>}(*w\_itr);}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00075}00075\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ temp\_word\ <<=\ sub\_word\_shift;}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/-\/sub\_words\_left;}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00078}00078\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00080}00080\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ sub\_words\_left\ ==\ 1,\ \textcolor{stringliteral}{"{}unexpected\ error\ in\ fixed\_bytes\ constructor"{}}\ );}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00081}00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ temp\_word\ |=\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{classsysio_1_1fixed__bytes_a7ca85de1657ab41f1406d684da982c87}{word\_t}}\textcolor{keyword}{>}(*w\_itr);}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00082}00082\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sub\_words\_left\ =\ num\_sub\_words;}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00083}00083\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00084}00084\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *itr\ =\ temp\_word;}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00085}00085\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ temp\_word\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00086}00086\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++itr;}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00087}00087\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00088}00088\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ sub\_words\_left\ !=\ num\_sub\_words\ )\ \{}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00089}00089\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ sub\_words\_left\ >\ 1\ )}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00090}00090\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ temp\_word\ <<=\ 8\ *\ (sub\_words\_left-\/1);}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00091}00091\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *itr\ =\ temp\_word;}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00092}00092\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00093}00093\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00094}00094\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00095}00095\ \ \ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00096}\mbox{\hyperlink{classsysio_1_1fixed__bytes_a7ca85de1657ab41f1406d684da982c87}{00096}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a376f631fcb770bd4b2e8349a33e52f8a}{uint128\_t}}\ \mbox{\hyperlink{classsysio_1_1fixed__bytes_a7ca85de1657ab41f1406d684da982c87}{word\_t}};}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00097}00097\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00102}\mbox{\hyperlink{classsysio_1_1fixed__bytes_ac0e00da6877e9eb06189feb7d58f2465}{00102}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classsysio_1_1fixed__bytes_ac0e00da6877e9eb06189feb7d58f2465}{num\_words}}()\ \{\ \textcolor{keywordflow}{return}\ (Size\ +\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{classsysio_1_1fixed__bytes_a7ca85de1657ab41f1406d684da982c87}{word\_t}})\ -\/\ 1)\ /\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{classsysio_1_1fixed__bytes_a7ca85de1657ab41f1406d684da982c87}{word\_t}});\ \}}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00103}00103\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00108}\mbox{\hyperlink{classsysio_1_1fixed__bytes_a40de8b9caf7258f0327df706d80ffe4e}{00108}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classsysio_1_1fixed__bytes_a40de8b9caf7258f0327df706d80ffe4e}{padded\_bytes}}()\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1fixed__bytes_ac0e00da6877e9eb06189feb7d58f2465}{num\_words}}()\ *\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{classsysio_1_1fixed__bytes_a7ca85de1657ab41f1406d684da982c87}{word\_t}})\ -\/\ Size;\ \}}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00109}00109\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00113}\mbox{\hyperlink{classsysio_1_1fixed__bytes_a8c5d1c71b3b0557a911e7cd373dfb3ac}{00113}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{classsysio_1_1fixed__bytes_a8c5d1c71b3b0557a911e7cd373dfb3ac}{fixed\_bytes}}()\ :\ \_data()\ \{\}}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00114}00114\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00120}\mbox{\hyperlink{classsysio_1_1fixed__bytes_aebe0d2ada8807e0e2035dd04fdb988a8}{00120}}\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1fixed__bytes_aebe0d2ada8807e0e2035dd04fdb988a8}{fixed\_bytes}}(\textcolor{keyword}{const}\ std::array<\mbox{\hyperlink{classsysio_1_1fixed__bytes_a7ca85de1657ab41f1406d684da982c87}{word\_t}},\ \mbox{\hyperlink{classsysio_1_1fixed__bytes_ac0e00da6877e9eb06189feb7d58f2465}{num\_words}}()>\&\ arr)}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00121}00121\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00122}00122\ \ \ \ \ \ \ \ \ \ \ \ std::copy(arr.begin(),\ arr.end(),\ \_data.begin());}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00123}00123\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00124}00124\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00130}00130\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ Word,\ \textcolor{keywordtype}{size\_t}\ NumWords,}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00131}00131\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typename}\ Enable\ =\ \textcolor{keyword}{typename}\ std::enable\_if<std::is\_integral<Word>::value\ \&\&}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00132}00132\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::is\_unsigned<Word>::value\ \&\&}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00133}00133\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ !std::is\_same<Word,\ bool>::value\ \&\&}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00134}00134\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::less<size\_t>\{\}(\textcolor{keyword}{sizeof}(Word),\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{classsysio_1_1fixed__bytes_a7ca85de1657ab41f1406d684da982c87}{word\_t}}))>::type\ >}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00135}\mbox{\hyperlink{classsysio_1_1fixed__bytes_a37791ddd82a554f237c2454299f306a7}{00135}}\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1fixed__bytes_a37791ddd82a554f237c2454299f306a7}{fixed\_bytes}}(\textcolor{keyword}{const}\ std::array<Word,\ NumWords>\&\ arr)}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00136}00136\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00137}00137\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_assert}(\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{classsysio_1_1fixed__bytes_a7ca85de1657ab41f1406d684da982c87}{word\_t}})\ ==\ (\textcolor{keyword}{sizeof}(\mbox{\hyperlink{classsysio_1_1fixed__bytes_a7ca85de1657ab41f1406d684da982c87}{word\_t}})/\textcolor{keyword}{sizeof}(Word))\ *\ \textcolor{keyword}{sizeof}(Word),}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00138}00138\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}size\ of\ the\ backing\ word\ size\ is\ not\ divisible\ by\ the\ size\ of\ the\ array\ element"{}}\ );}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00139}00139\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_assert}(\ \textcolor{keyword}{sizeof}(Word)\ *\ NumWords\ <=\ Size,\ \textcolor{stringliteral}{"{}too\ many\ words\ supplied\ to\ fixed\_bytes\ constructor"{}}\ );}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00140}00140\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00141}00141\ \ \ \ \ \ \ \ \ \ \ \ \ set\_from\_word\_sequence<Word,\ NumWords>(arr.data(),\ arr.data()\ +\ arr.size(),\ *\textcolor{keyword}{this});}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00142}00142\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00143}00143\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00149}00149\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ Word,\ \textcolor{keywordtype}{size\_t}\ NumWords,}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00150}00150\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typename}\ Enable\ =\ \textcolor{keyword}{typename}\ std::enable\_if<std::is\_integral<Word>::value\ \&\&}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00151}00151\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::is\_unsigned<Word>::value\ \&\&}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00152}00152\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ !std::is\_same<Word,\ bool>::value\ \&\&}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00153}00153\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::less<size\_t>\{\}(\textcolor{keyword}{sizeof}(Word),\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{classsysio_1_1fixed__bytes_a7ca85de1657ab41f1406d684da982c87}{word\_t}}))>::type\ >}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00154}\mbox{\hyperlink{classsysio_1_1fixed__bytes_a2addaa5da0fe9ccbfbaece359b2a2928}{00154}}\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1fixed__bytes_a2addaa5da0fe9ccbfbaece359b2a2928}{fixed\_bytes}}(\textcolor{keyword}{const}\ Word(\&arr)[NumWords])}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00155}00155\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00156}00156\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_assert}(\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{classsysio_1_1fixed__bytes_a7ca85de1657ab41f1406d684da982c87}{word\_t}})\ ==\ (\textcolor{keyword}{sizeof}(\mbox{\hyperlink{classsysio_1_1fixed__bytes_a7ca85de1657ab41f1406d684da982c87}{word\_t}})/\textcolor{keyword}{sizeof}(Word))\ *\ \textcolor{keyword}{sizeof}(Word),}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00157}00157\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}size\ of\ the\ backing\ word\ size\ is\ not\ divisible\ by\ the\ size\ of\ the\ array\ element"{}}\ );}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00158}00158\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_assert}(\ \textcolor{keyword}{sizeof}(Word)\ *\ NumWords\ <=\ Size,\ \textcolor{stringliteral}{"{}too\ many\ words\ supplied\ to\ fixed\_bytes\ constructor"{}}\ );}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00159}00159\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00160}00160\ \ \ \ \ \ \ \ \ \ \ \ \ set\_from\_word\_sequence<Word,\ NumWords>(arr,\ arr\ +\ NumWords,\ *\textcolor{keyword}{this});}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00161}00161\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00162}00162\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00171}00171\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ FirstWord,\ \textcolor{keyword}{typename}...\ Rest>}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00172}00172\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00173}00173\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1fixed__bytes}{fixed\_bytes<Size>}}}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00174}\mbox{\hyperlink{classsysio_1_1fixed__bytes_add81e8e61cc4870e192a3f174dd0f9b9}{00174}}\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1fixed__bytes_add81e8e61cc4870e192a3f174dd0f9b9}{make\_from\_word\_sequence}}(\textcolor{keyword}{typename}\ std::enable\_if<std::is\_integral<FirstWord>::value\ \&\&}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00175}00175\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::is\_unsigned<FirstWord>::value\ \&\&}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00176}00176\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ !std::is\_same<FirstWord,\ bool>::value\ \&\&}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00177}00177\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{sizeof}(FirstWord)\ <=\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{classsysio_1_1fixed__bytes_a7ca85de1657ab41f1406d684da982c87}{word\_t}})\ \&\&}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00178}00178\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ all\_true<(std::is\_same<FirstWord,\ Rest>::value)...>\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{::value}},}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00179}00179\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ FirstWord>::type\ first\_word,}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00180}00180\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Rest...\ rest)}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00181}00181\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00182}00182\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_assert}(\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{classsysio_1_1fixed__bytes_a7ca85de1657ab41f1406d684da982c87}{word\_t}})\ ==\ (\textcolor{keyword}{sizeof}(\mbox{\hyperlink{classsysio_1_1fixed__bytes_a7ca85de1657ab41f1406d684da982c87}{word\_t}})/\textcolor{keyword}{sizeof}(FirstWord))\ *\ \textcolor{keyword}{sizeof}(FirstWord),}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00183}00183\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}size\ of\ the\ backing\ word\ size\ is\ not\ divisible\ by\ the\ size\ of\ the\ words\ supplied\ as\ arguments"{}}\ );}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00184}00184\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_assert}(\ \textcolor{keyword}{sizeof}(FirstWord)\ *\ (1\ +\ \textcolor{keyword}{sizeof}...(Rest))\ <=\ Size,\ \textcolor{stringliteral}{"{}too\ many\ words\ supplied\ to\ make\_from\_word\_sequence"{}}\ );}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00185}00185\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00186}00186\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1fixed__bytes}{fixed\_bytes<Size>}}\ \mbox{\hyperlink{yubico__otp_8c_a9246c20bb98ad2b4c60313c053c70f08}{key}};}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00187}00187\ \ \ \ \ \ \ \ \ \ \ \ \ std::array<FirstWord,\ 1+\textcolor{keyword}{sizeof}...(Rest)>\ arr\{\{\ first\_word,\ rest...\ \}\};}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00188}00188\ \ \ \ \ \ \ \ \ \ \ \ \ set\_from\_word\_sequence<FirstWord,\ 1+\textcolor{keyword}{sizeof}...(Rest)>(arr.data(),\ arr.data()\ +\ arr.size(),\ key);}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00189}00189\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubico__otp_8c_a9246c20bb98ad2b4c60313c053c70f08}{key}};}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00190}00190\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00191}00191\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00195}\mbox{\hyperlink{classsysio_1_1fixed__bytes_af2dac263ee619fb6fc7f6fb627441229}{00195}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{classsysio_1_1fixed__bytes_af2dac263ee619fb6fc7f6fb627441229}{get\_array}}()\textcolor{keyword}{const\ }\{\ \textcolor{keywordflow}{return}\ \_data;\ \}}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00196}00196\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00200}\mbox{\hyperlink{classsysio_1_1fixed__bytes_ac80cc6b881c32d57aed1ab56e2932592}{00200}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{classsysio_1_1fixed__bytes_ac80cc6b881c32d57aed1ab56e2932592}{data}}()\ \{\ \textcolor{keywordflow}{return}\ \_data.data();\ \}}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00201}00201\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00203}00203\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00207}00207\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{classsysio_1_1fixed__bytes_ac80cc6b881c32d57aed1ab56e2932592}{data}}()\textcolor{keyword}{const\ }\{\ \textcolor{keywordflow}{return}\ \_data.data();\ \}}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00208}00208\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00210}00210\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00214}\mbox{\hyperlink{classsysio_1_1fixed__bytes_ae782872d63020d8f56b4d3b154ba43c4}{00214}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{classsysio_1_1fixed__bytes_ae782872d63020d8f56b4d3b154ba43c4}{size}}()\textcolor{keyword}{const\ }\{\ \textcolor{keywordflow}{return}\ \_data.size();\ \}}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00215}00215\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00216}00216\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00222}\mbox{\hyperlink{classsysio_1_1fixed__bytes_acace65d24dd5689f49ba2dcb3198493a}{00222}}\ \ \ \ \ \ \ \ \ \ std::array<uint8\_t,\ Size>\ \mbox{\hyperlink{classsysio_1_1fixed__bytes_acace65d24dd5689f49ba2dcb3198493a}{extract\_as\_byte\_array}}()\textcolor{keyword}{const\ }\{}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00223}00223\ \ \ \ \ \ \ \ \ \ \ \ \ std::array<uint8\_t,\ Size>\ arr;}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00224}00224\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00225}00225\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ num\_sub\_words\ =\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{classsysio_1_1fixed__bytes_a7ca85de1657ab41f1406d684da982c87}{word\_t}});}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00226}00226\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00227}00227\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ arr\_itr\ \ =\ arr.begin();}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00228}00228\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ data\_itr\ =\ \_data.begin();}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00229}00229\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00230}00230\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keywordtype}{size\_t}\ counter\ =\ \_data.size();\ counter\ >\ 0;\ -\/-\/counter,\ ++data\_itr\ )\ \{}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00231}00231\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ sub\_words\_left\ =\ num\_sub\_words;}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00232}00232\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00233}00233\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ temp\_word\ =\ *data\_itr;}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00234}00234\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ counter\ ==\ 1\ )\ \{\ \textcolor{comment}{//\ If\ last\ word\ in\ \_data\ array...}}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00235}00235\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sub\_words\_left\ -\/=\ \mbox{\hyperlink{classsysio_1_1fixed__bytes_a40de8b9caf7258f0327df706d80ffe4e}{padded\_bytes}}();}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00236}00236\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ temp\_word\ >>=\ 8*\mbox{\hyperlink{classsysio_1_1fixed__bytes_a40de8b9caf7258f0327df706d80ffe4e}{padded\_bytes}}();}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00237}00237\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00238}00238\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ ;\ sub\_words\_left\ >\ 0;\ -\/-\/sub\_words\_left\ )\ \{}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00239}00239\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *(arr\_itr\ +\ sub\_words\_left\ -\/\ 1)\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\textcolor{keyword}{>}(temp\_word\ \&\ 0xFF);}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00240}00240\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ temp\_word\ >>=\ 8;}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00241}00241\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00242}00242\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ arr\_itr\ +=\ num\_sub\_words;}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00243}00243\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00244}00244\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00245}00245\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ arr;}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00246}00246\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00247}00247\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00253}\mbox{\hyperlink{classsysio_1_1fixed__bytes_adc9f1e733fb2c60190ee9ba83667e3ec}{00253}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1fixed__bytes_adc9f1e733fb2c60190ee9ba83667e3ec}{print}}()\textcolor{keyword}{const\ }\{}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00254}00254\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ arr\ =\ \mbox{\hyperlink{classsysio_1_1fixed__bytes_acace65d24dd5689f49ba2dcb3198493a}{extract\_as\_byte\_array}}();}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00255}00255\ \ \ \ \ \ \ \ \ \ \ \ \ printhex(\textcolor{keyword}{static\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{void}*\textcolor{keyword}{>}(arr.data()),\ arr.size());}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00256}00256\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00257}00257\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00259}00259\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00260}00260\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{friend}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacesysio_1_1chain_a0fc6c75576d3bf4645b51dfd6855890c}{operator\ ==\ <>}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1fixed__bytes}{fixed\_bytes<Size>}}\ \&c1,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1fixed__bytes}{fixed\_bytes<Size>}}\ \&c2);}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00261}00261\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00262}00262\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{friend}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacesysio_1_1chain_a5a450a5c1c452d22fea6e156bf083739}{operator\ !=\ <>}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1fixed__bytes}{fixed\_bytes<Size>}}\ \&c1,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1fixed__bytes}{fixed\_bytes<Size>}}\ \&c2);}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00263}00263\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00264}00264\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{friend}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacesysio_1_1chain_a74533239b4115d619e0296978872c4be}{operator\ >\ <>}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1fixed__bytes}{fixed\_bytes<Size>}}\ \&c1,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1fixed__bytes}{fixed\_bytes<Size>}}\ \&c2);}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00265}00265\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00266}00266\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{friend}\ \textcolor{keywordtype}{bool}\ operator\ <\ <>(\textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1fixed__bytes}{fixed\_bytes<Size>}}\ \&c1,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1fixed__bytes}{fixed\_bytes<Size>}}\ \&c2);}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00267}00267\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00268}00268\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{friend}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacesysio_1_1chain_a8e1e210a5011c30501e6759d373ff881}{operator\ >=\ <>}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1fixed__bytes}{fixed\_bytes<Size>}}\ \&c1,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1fixed__bytes}{fixed\_bytes<Size>}}\ \&c2);}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00269}00269\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00270}00270\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{friend}\ \textcolor{keywordtype}{bool}\ operator\ <=\ <>(\textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1fixed__bytes}{fixed\_bytes<Size>}}\ \&c1,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1fixed__bytes}{fixed\_bytes<Size>}}\ \&c2);}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00271}00271\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00273}00273\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00274}00274\ \ \ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00275}00275\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00276}00276\ \ \ \ \ \ \ \ \ \ std::array<\mbox{\hyperlink{classsysio_1_1fixed__bytes_a7ca85de1657ab41f1406d684da982c87}{word\_t}},\ \mbox{\hyperlink{classsysio_1_1fixed__bytes_ac0e00da6877e9eb06189feb7d58f2465}{num\_words}}()>\ \_data;}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00277}00277\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00278}00278\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00280}00280\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00288}00288\ \ \ \ \textcolor{keyword}{template}<\textcolor{keywordtype}{size\_t}\ Size>}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00289}00289\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacesysio_1_1chain_a0fc6c75576d3bf4645b51dfd6855890c}{operator\ ==}}(\textcolor{keyword}{const}\ fixed\_bytes<Size>\ \&c1,\ \textcolor{keyword}{const}\ fixed\_bytes<Size>\ \&c2)\ \{}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00290}00290\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ c1.\_data\ ==\ c2.\_data;}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00291}00291\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00292}00292\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00300}00300\ \ \ \ \textcolor{keyword}{template}<\textcolor{keywordtype}{size\_t}\ Size>}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00301}00301\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacesysio_1_1chain_a5a450a5c1c452d22fea6e156bf083739}{operator\ !=}}(\textcolor{keyword}{const}\ fixed\_bytes<Size>\ \&c1,\ \textcolor{keyword}{const}\ fixed\_bytes<Size>\ \&c2)\ \{}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00302}00302\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ c1.\_data\ !=\ c2.\_data;}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00303}00303\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00304}00304\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00312}00312\ \ \ \ \textcolor{keyword}{template}<\textcolor{keywordtype}{size\_t}\ Size>}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00313}00313\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacesysio_1_1chain_a74533239b4115d619e0296978872c4be}{operator\ >}}(\textcolor{keyword}{const}\ fixed\_bytes<Size>\&\ c1,\ \textcolor{keyword}{const}\ fixed\_bytes<Size>\&\ c2)\ \{}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00314}00314\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ c1.\_data\ >\ c2.\_data;}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00315}00315\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00316}00316\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00324}00324\ \ \ \ \textcolor{keyword}{template}<\textcolor{keywordtype}{size\_t}\ Size>}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00325}00325\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacesysio_1_1chain_a0551da3711d5d1b1dd0f2ca27e1f8e6c}{operator\ <}}(\textcolor{keyword}{const}\ fixed\_bytes<Size>\ \&c1,\ \textcolor{keyword}{const}\ fixed\_bytes<Size>\ \&c2)\ \{}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00326}00326\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ c1.\_data\ <\ c2.\_data;}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00327}00327\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00328}00328\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00336}00336\ \ \ \ \textcolor{keyword}{template}<\textcolor{keywordtype}{size\_t}\ Size>}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00337}00337\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacesysio_1_1chain_a8e1e210a5011c30501e6759d373ff881}{operator\ >=}}(\textcolor{keyword}{const}\ fixed\_bytes<Size>\&\ c1,\ \textcolor{keyword}{const}\ fixed\_bytes<Size>\&\ c2)\ \{}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00338}00338\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ c1.\_data\ >=\ c2.\_data;}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00339}00339\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00340}00340\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00348}00348\ \ \ \ \textcolor{keyword}{template}<\textcolor{keywordtype}{size\_t}\ Size>}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00349}00349\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacesysio_1_1chain_a0d799fe17b0b60464938e6c9b795e2ca}{operator\ <=}}(\textcolor{keyword}{const}\ fixed\_bytes<Size>\ \&c1,\ \textcolor{keyword}{const}\ fixed\_bytes<Size>\ \&c2)\ \{}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00350}00350\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ c1.\_data\ <=\ c2.\_data;}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00351}00351\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00352}00352\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00353}00353\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00354}00354\ \ \ \ \textcolor{keyword}{using\ }checksum160\ =\ fixed\_bytes<20>;}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00355}00355\ \ \ \ \textcolor{keyword}{using\ }checksum256\ =\ fixed\_bytes<32>;}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00356}00356\ \ \ \ \textcolor{keyword}{using\ }checksum512\ =\ fixed\_bytes<64>;}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00357}00357\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00367}00367\ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ DataStream,\ \textcolor{keywordtype}{size\_t}\ Size>}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00368}00368\ \ \ \ \textcolor{keyword}{inline}\ DataStream\&\ \mbox{\hyperlink{namespacefc_ac4aed50b6ace3ac8741494501f0d03a5}{operator<<}}(DataStream\&\ ds,\ \textcolor{keyword}{const}\ fixed\_bytes<Size>\&\ d)\ \{}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00369}00369\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ arr\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.extract\_as\_byte\_array();}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00370}00370\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_a4b2aef26182d21706896022467868f7c}{ds}}.write(\ (\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*)arr.data(),\ arr.size()\ );}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00371}00371\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_xbyak_1_1util_a4b2aef26182d21706896022467868f7c}{ds}};}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00372}00372\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00373}00373\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00383}00383\ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ DataStream,\ \textcolor{keywordtype}{size\_t}\ Size>}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00384}00384\ \ \ \ \textcolor{keyword}{inline}\ DataStream\&\ \mbox{\hyperlink{namespacefc_adf88e2d042e971232a527f98764ffbfb}{operator>>}}(DataStream\&\ ds,\ fixed\_bytes<Size>\&\ d)\ \{}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00385}00385\ \ \ \ \ \ \ std::array<uint8\_t,\ Size>\ arr;}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00386}00386\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_a4b2aef26182d21706896022467868f7c}{ds}}.read(\ (\textcolor{keywordtype}{char}*)arr.data(),\ arr.size()\ );}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00387}00387\ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ =\ fixed\_bytes<Size>(\ arr\ );}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00388}00388\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_xbyak_1_1util_a4b2aef26182d21706896022467868f7c}{ds}};}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00389}00389\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00390}00390\ }
+\DoxyCodeLine{\Hypertarget{fixed__bytes_8hpp_source_l00392}00392\ \}}
+
+\end{DoxyCode}

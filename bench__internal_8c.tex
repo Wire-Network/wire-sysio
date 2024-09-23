@@ -1,0 +1,1064 @@
+\doxysection{libraries/fc/secp256k1/secp256k1/src/bench\+\_\+internal.c File Reference}
+\hypertarget{bench__internal_8c}{}\label{bench__internal_8c}\index{libraries/fc/secp256k1/secp256k1/src/bench\_internal.c@{libraries/fc/secp256k1/secp256k1/src/bench\_internal.c}}
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include "{}secp256k1.\+c"{}}\newline
+{\ttfamily \#include "{}../include/secp256k1.\+h"{}}\newline
+{\ttfamily \#include "{}assumptions.\+h"{}}\newline
+{\ttfamily \#include "{}util.\+h"{}}\newline
+{\ttfamily \#include "{}hash\+\_\+impl.\+h"{}}\newline
+{\ttfamily \#include "{}field\+\_\+impl.\+h"{}}\newline
+{\ttfamily \#include "{}group\+\_\+impl.\+h"{}}\newline
+{\ttfamily \#include "{}scalar\+\_\+impl.\+h"{}}\newline
+{\ttfamily \#include "{}ecmult\+\_\+const\+\_\+impl.\+h"{}}\newline
+{\ttfamily \#include "{}ecmult\+\_\+impl.\+h"{}}\newline
+{\ttfamily \#include "{}bench.\+h"{}}\newline
+Include dependency graph for bench\+\_\+internal.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{bench__internal_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structbench__inv}{bench\+\_\+inv}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{bench__internal_8c_af48be8297385d0d32de62ae12a07d55c}{bench\+\_\+setup}} (void \texorpdfstring{$\ast$}{*}arg)
+\item 
+void \mbox{\hyperlink{bench__internal_8c_ac7c021ebf94333196586195f5fc1982d}{bench\+\_\+scalar\+\_\+add}} (void \texorpdfstring{$\ast$}{*}arg, int iters)
+\item 
+void \mbox{\hyperlink{bench__internal_8c_a03e1fb46bd43f7d2b7acb919a81b76bd}{bench\+\_\+scalar\+\_\+negate}} (void \texorpdfstring{$\ast$}{*}arg, int iters)
+\item 
+void \mbox{\hyperlink{bench__internal_8c_ac8debd21905f093d1011902dac39f25b}{bench\+\_\+scalar\+\_\+mul}} (void \texorpdfstring{$\ast$}{*}arg, int iters)
+\item 
+void \mbox{\hyperlink{bench__internal_8c_a420ff0a9d3a09cc2f726afb0c9836ab8}{bench\+\_\+scalar\+\_\+split}} (void \texorpdfstring{$\ast$}{*}arg, int iters)
+\item 
+void \mbox{\hyperlink{bench__internal_8c_a85b7b814047b7c80345c68e006b75ada}{bench\+\_\+scalar\+\_\+inverse}} (void \texorpdfstring{$\ast$}{*}arg, int iters)
+\item 
+void \mbox{\hyperlink{bench__internal_8c_a177bb68ef9503ddc52bd071195bceec6}{bench\+\_\+scalar\+\_\+inverse\+\_\+var}} (void \texorpdfstring{$\ast$}{*}arg, int iters)
+\item 
+void \mbox{\hyperlink{bench__internal_8c_a36c7115e4eeb4dde0a3b46f99690f4d2}{bench\+\_\+field\+\_\+half}} (void \texorpdfstring{$\ast$}{*}arg, int iters)
+\item 
+void \mbox{\hyperlink{bench__internal_8c_a2adf7245cf7180ffb8b33ff0c5f6cab2}{bench\+\_\+field\+\_\+normalize}} (void \texorpdfstring{$\ast$}{*}arg, int iters)
+\item 
+void \mbox{\hyperlink{bench__internal_8c_a4e15d8f7733b64f5c17e725d25c9135e}{bench\+\_\+field\+\_\+normalize\+\_\+weak}} (void \texorpdfstring{$\ast$}{*}arg, int iters)
+\item 
+void \mbox{\hyperlink{bench__internal_8c_acbf7bdaaab521bfda8267af79e7fb7cc}{bench\+\_\+field\+\_\+mul}} (void \texorpdfstring{$\ast$}{*}arg, int iters)
+\item 
+void \mbox{\hyperlink{bench__internal_8c_af2e066f4baa195a1d61dd1e08ca46b72}{bench\+\_\+field\+\_\+sqr}} (void \texorpdfstring{$\ast$}{*}arg, int iters)
+\item 
+void \mbox{\hyperlink{bench__internal_8c_a03341412299c24469d8990c66faada7d}{bench\+\_\+field\+\_\+inverse}} (void \texorpdfstring{$\ast$}{*}arg, int iters)
+\item 
+void \mbox{\hyperlink{bench__internal_8c_ac45e86bb57d07be85032abb690709094}{bench\+\_\+field\+\_\+inverse\+\_\+var}} (void \texorpdfstring{$\ast$}{*}arg, int iters)
+\item 
+void \mbox{\hyperlink{bench__internal_8c_a5efa51c0544e48a43feab4043a7d4f5c}{bench\+\_\+field\+\_\+sqrt}} (void \texorpdfstring{$\ast$}{*}arg, int iters)
+\item 
+void \mbox{\hyperlink{bench__internal_8c_a887476872a0b727d1671084490f89578}{bench\+\_\+group\+\_\+double\+\_\+var}} (void \texorpdfstring{$\ast$}{*}arg, int iters)
+\item 
+void \mbox{\hyperlink{bench__internal_8c_af1a40af02b96e164c23eeea7b634f1d1}{bench\+\_\+group\+\_\+add\+\_\+var}} (void \texorpdfstring{$\ast$}{*}arg, int iters)
+\item 
+void \mbox{\hyperlink{bench__internal_8c_affa999cc5f63702c1f53765ab46cc117}{bench\+\_\+group\+\_\+add\+\_\+affine}} (void \texorpdfstring{$\ast$}{*}arg, int iters)
+\item 
+void \mbox{\hyperlink{bench__internal_8c_acb0b5fd9926c372d22409e7e1b7e71b3}{bench\+\_\+group\+\_\+add\+\_\+affine\+\_\+var}} (void \texorpdfstring{$\ast$}{*}arg, int iters)
+\item 
+void \mbox{\hyperlink{bench__internal_8c_a5253abd06655003b844b6d2e77d4de00}{bench\+\_\+group\+\_\+add\+\_\+zinv\+\_\+var}} (void \texorpdfstring{$\ast$}{*}arg, int iters)
+\item 
+void \mbox{\hyperlink{bench__internal_8c_ad463b42f2aae4241bc0ae94ce68dc360}{bench\+\_\+group\+\_\+to\+\_\+affine\+\_\+var}} (void \texorpdfstring{$\ast$}{*}arg, int iters)
+\item 
+void \mbox{\hyperlink{bench__internal_8c_a7e5c6fef6192183026ea27acd2d13c1e}{bench\+\_\+ecmult\+\_\+wnaf}} (void \texorpdfstring{$\ast$}{*}arg, int iters)
+\item 
+void \mbox{\hyperlink{bench__internal_8c_a6ac3f05487330d9264d9b1e3546510a5}{bench\+\_\+wnaf\+\_\+const}} (void \texorpdfstring{$\ast$}{*}arg, int iters)
+\item 
+void \mbox{\hyperlink{bench__internal_8c_a2dc044b23a1f1ea062e64f7dc6beb4dc}{bench\+\_\+sha256}} (void \texorpdfstring{$\ast$}{*}arg, int iters)
+\item 
+void \mbox{\hyperlink{bench__internal_8c_a3e9eb770c7cc8c97c387ea2a6b42e878}{bench\+\_\+hmac\+\_\+sha256}} (void \texorpdfstring{$\ast$}{*}arg, int iters)
+\item 
+void \mbox{\hyperlink{bench__internal_8c_ae45bdeae3f283fe0104bcf7c8556d3c4}{bench\+\_\+rfc6979\+\_\+hmac\+\_\+sha256}} (void \texorpdfstring{$\ast$}{*}arg, int iters)
+\item 
+void \mbox{\hyperlink{bench__internal_8c_a5fd532e76da99665c019c411f2f28358}{bench\+\_\+context\+\_\+verify}} (void \texorpdfstring{$\ast$}{*}arg, int iters)
+\item 
+void \mbox{\hyperlink{bench__internal_8c_aaf1bdd31c8df55e1b97c10968c5a511f}{bench\+\_\+context\+\_\+sign}} (void \texorpdfstring{$\ast$}{*}arg, int iters)
+\item 
+int \mbox{\hyperlink{bench__internal_8c_a3c04138a5bfe5d72780bb7e82a18e627}{main}} (int argc, char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{bench__internal_8c_aaf1bdd31c8df55e1b97c10968c5a511f}\index{bench\_internal.c@{bench\_internal.c}!bench\_context\_sign@{bench\_context\_sign}}
+\index{bench\_context\_sign@{bench\_context\_sign}!bench\_internal.c@{bench\_internal.c}}
+\doxysubsubsection{\texorpdfstring{bench\_context\_sign()}{bench\_context\_sign()}}
+{\footnotesize\ttfamily \label{bench__internal_8c_aaf1bdd31c8df55e1b97c10968c5a511f} 
+void bench\+\_\+context\+\_\+sign (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{arg}{, }\item[{int}]{iters}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bench__internal_8c_source_l00354}{354}} of file \mbox{\hyperlink{bench__internal_8c_source}{bench\+\_\+internal.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00354\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00355\ \ \ \ \ \textcolor{keywordtype}{int}\ i;}
+\DoxyCodeLine{00356\ \ \ \ \ (void)arg;}
+\DoxyCodeLine{00357\ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ iters;\ i++)\ \{}
+\DoxyCodeLine{00358\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{secp256k1_8h_a026db914e3723531825ecf25a0cbd699}{secp256k1\_context\_destroy}}(\mbox{\hyperlink{secp256k1_8h_a3aaa9fcc3ab67bc8f841779a049069c5}{secp256k1\_context\_create}}(\mbox{\hyperlink{secp256k1_8h_a0d34fe6baa73d3145f2e376e43de0b15}{SECP256K1\_CONTEXT\_SIGN}}));}
+\DoxyCodeLine{00359\ \ \ \ \ \}}
+\DoxyCodeLine{00360\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{bench__internal_8c_aaf1bdd31c8df55e1b97c10968c5a511f_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=256pt]{bench__internal_8c_aaf1bdd31c8df55e1b97c10968c5a511f_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{bench__internal_8c_a5fd532e76da99665c019c411f2f28358}\index{bench\_internal.c@{bench\_internal.c}!bench\_context\_verify@{bench\_context\_verify}}
+\index{bench\_context\_verify@{bench\_context\_verify}!bench\_internal.c@{bench\_internal.c}}
+\doxysubsubsection{\texorpdfstring{bench\_context\_verify()}{bench\_context\_verify()}}
+{\footnotesize\ttfamily \label{bench__internal_8c_a5fd532e76da99665c019c411f2f28358} 
+void bench\+\_\+context\+\_\+verify (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{arg}{, }\item[{int}]{iters}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bench__internal_8c_source_l00346}{346}} of file \mbox{\hyperlink{bench__internal_8c_source}{bench\+\_\+internal.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00346\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00347\ \ \ \ \ \textcolor{keywordtype}{int}\ i;}
+\DoxyCodeLine{00348\ \ \ \ \ (void)arg;}
+\DoxyCodeLine{00349\ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ iters;\ i++)\ \{}
+\DoxyCodeLine{00350\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{secp256k1_8h_a026db914e3723531825ecf25a0cbd699}{secp256k1\_context\_destroy}}(\mbox{\hyperlink{secp256k1_8h_a3aaa9fcc3ab67bc8f841779a049069c5}{secp256k1\_context\_create}}(\mbox{\hyperlink{secp256k1_8h_add20a6c320e247ca7bd524cbc4259d64}{SECP256K1\_CONTEXT\_VERIFY}}));}
+\DoxyCodeLine{00351\ \ \ \ \ \}}
+\DoxyCodeLine{00352\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{bench__internal_8c_a5fd532e76da99665c019c411f2f28358_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=262pt]{bench__internal_8c_a5fd532e76da99665c019c411f2f28358_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{bench__internal_8c_a7e5c6fef6192183026ea27acd2d13c1e}\index{bench\_internal.c@{bench\_internal.c}!bench\_ecmult\_wnaf@{bench\_ecmult\_wnaf}}
+\index{bench\_ecmult\_wnaf@{bench\_ecmult\_wnaf}!bench\_internal.c@{bench\_internal.c}}
+\doxysubsubsection{\texorpdfstring{bench\_ecmult\_wnaf()}{bench\_ecmult\_wnaf()}}
+{\footnotesize\ttfamily \label{bench__internal_8c_a7e5c6fef6192183026ea27acd2d13c1e} 
+void bench\+\_\+ecmult\+\_\+wnaf (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{arg}{, }\item[{int}]{iters}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bench__internal_8c_source_l00286}{286}} of file \mbox{\hyperlink{bench__internal_8c_source}{bench\+\_\+internal.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00286\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00287\ \ \ \ \ \textcolor{keywordtype}{int}\ i,\ bits\ =\ 0,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a49aa97067a36875627e1380c3fb3833d}{overflow}}\ =\ 0;}
+\DoxyCodeLine{00288\ \ \ \ \ \mbox{\hyperlink{structbench__inv}{bench\_inv}}\ *data\ =\ (\mbox{\hyperlink{structbench__inv}{bench\_inv}}*)arg;}
+\DoxyCodeLine{00289\ }
+\DoxyCodeLine{00290\ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ iters;\ i++)\ \{}
+\DoxyCodeLine{00291\ \ \ \ \ \ \ \ \ bits\ +=\ secp256k1\_ecmult\_wnaf(data-\/>wnaf,\ 256,\ \&data-\/>scalar[0],\ \mbox{\hyperlink{ecmult__impl_8h_a6216c81c6adbb8796c55fe0c8d3b6718}{WINDOW\_A}});}
+\DoxyCodeLine{00292\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a49aa97067a36875627e1380c3fb3833d}{overflow}}\ +=\ secp256k1\_scalar\_add(\&data-\/>scalar[0],\ \&data-\/>scalar[0],\ \&data-\/>scalar[1]);}
+\DoxyCodeLine{00293\ \ \ \ \ \}}
+\DoxyCodeLine{00294\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a49aa97067a36875627e1380c3fb3833d}{overflow}}\ >=\ 0);}
+\DoxyCodeLine{00295\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(bits\ <=\ 256*iters);}
+\DoxyCodeLine{00296\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=256pt]{bench__internal_8c_a7e5c6fef6192183026ea27acd2d13c1e_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{bench__internal_8c_a36c7115e4eeb4dde0a3b46f99690f4d2}\index{bench\_internal.c@{bench\_internal.c}!bench\_field\_half@{bench\_field\_half}}
+\index{bench\_field\_half@{bench\_field\_half}!bench\_internal.c@{bench\_internal.c}}
+\doxysubsubsection{\texorpdfstring{bench\_field\_half()}{bench\_field\_half()}}
+{\footnotesize\ttfamily \label{bench__internal_8c_a36c7115e4eeb4dde0a3b46f99690f4d2} 
+void bench\+\_\+field\+\_\+half (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{arg}{, }\item[{int}]{iters}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bench__internal_8c_source_l00143}{143}} of file \mbox{\hyperlink{bench__internal_8c_source}{bench\+\_\+internal.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00144\ \ \ \ \ \textcolor{keywordtype}{int}\ i;}
+\DoxyCodeLine{00145\ \ \ \ \ \mbox{\hyperlink{structbench__inv}{bench\_inv}}\ *data\ =\ (\mbox{\hyperlink{structbench__inv}{bench\_inv}}*)arg;}
+\DoxyCodeLine{00146\ }
+\DoxyCodeLine{00147\ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ iters;\ i++)\ \{}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ secp256k1\_fe\_half(\&data-\/>fe[0]);}
+\DoxyCodeLine{00149\ \ \ \ \ \}}
+\DoxyCodeLine{00150\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=240pt]{bench__internal_8c_a36c7115e4eeb4dde0a3b46f99690f4d2_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{bench__internal_8c_a03341412299c24469d8990c66faada7d}\index{bench\_internal.c@{bench\_internal.c}!bench\_field\_inverse@{bench\_field\_inverse}}
+\index{bench\_field\_inverse@{bench\_field\_inverse}!bench\_internal.c@{bench\_internal.c}}
+\doxysubsubsection{\texorpdfstring{bench\_field\_inverse()}{bench\_field\_inverse()}}
+{\footnotesize\ttfamily \label{bench__internal_8c_a03341412299c24469d8990c66faada7d} 
+void bench\+\_\+field\+\_\+inverse (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{arg}{, }\item[{int}]{iters}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bench__internal_8c_source_l00188}{188}} of file \mbox{\hyperlink{bench__internal_8c_source}{bench\+\_\+internal.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00189\ \ \ \ \ \textcolor{keywordtype}{int}\ i;}
+\DoxyCodeLine{00190\ \ \ \ \ \mbox{\hyperlink{structbench__inv}{bench\_inv}}\ *data\ =\ (\mbox{\hyperlink{structbench__inv}{bench\_inv}}*)arg;}
+\DoxyCodeLine{00191\ }
+\DoxyCodeLine{00192\ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ iters;\ i++)\ \{}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \ \ secp256k1\_fe\_inv(\&data-\/>fe[0],\ \&data-\/>fe[0]);}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ secp256k1\_fe\_add(\&data-\/>fe[0],\ \&data-\/>fe[1]);}
+\DoxyCodeLine{00195\ \ \ \ \ \}}
+\DoxyCodeLine{00196\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=255pt]{bench__internal_8c_a03341412299c24469d8990c66faada7d_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{bench__internal_8c_ac45e86bb57d07be85032abb690709094}\index{bench\_internal.c@{bench\_internal.c}!bench\_field\_inverse\_var@{bench\_field\_inverse\_var}}
+\index{bench\_field\_inverse\_var@{bench\_field\_inverse\_var}!bench\_internal.c@{bench\_internal.c}}
+\doxysubsubsection{\texorpdfstring{bench\_field\_inverse\_var()}{bench\_field\_inverse\_var()}}
+{\footnotesize\ttfamily \label{bench__internal_8c_ac45e86bb57d07be85032abb690709094} 
+void bench\+\_\+field\+\_\+inverse\+\_\+var (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{arg}{, }\item[{int}]{iters}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bench__internal_8c_source_l00198}{198}} of file \mbox{\hyperlink{bench__internal_8c_source}{bench\+\_\+internal.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00199\ \ \ \ \ \textcolor{keywordtype}{int}\ i;}
+\DoxyCodeLine{00200\ \ \ \ \ \mbox{\hyperlink{structbench__inv}{bench\_inv}}\ *data\ =\ (\mbox{\hyperlink{structbench__inv}{bench\_inv}}*)arg;}
+\DoxyCodeLine{00201\ }
+\DoxyCodeLine{00202\ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ iters;\ i++)\ \{}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ \ \ secp256k1\_fe\_inv\_var(\&data-\/>fe[0],\ \&data-\/>fe[0]);}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ secp256k1\_fe\_add(\&data-\/>fe[0],\ \&data-\/>fe[1]);}
+\DoxyCodeLine{00205\ \ \ \ \ \}}
+\DoxyCodeLine{00206\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=274pt]{bench__internal_8c_ac45e86bb57d07be85032abb690709094_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{bench__internal_8c_acbf7bdaaab521bfda8267af79e7fb7cc}\index{bench\_internal.c@{bench\_internal.c}!bench\_field\_mul@{bench\_field\_mul}}
+\index{bench\_field\_mul@{bench\_field\_mul}!bench\_internal.c@{bench\_internal.c}}
+\doxysubsubsection{\texorpdfstring{bench\_field\_mul()}{bench\_field\_mul()}}
+{\footnotesize\ttfamily \label{bench__internal_8c_acbf7bdaaab521bfda8267af79e7fb7cc} 
+void bench\+\_\+field\+\_\+mul (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{arg}{, }\item[{int}]{iters}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bench__internal_8c_source_l00170}{170}} of file \mbox{\hyperlink{bench__internal_8c_source}{bench\+\_\+internal.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00171\ \ \ \ \ \textcolor{keywordtype}{int}\ i;}
+\DoxyCodeLine{00172\ \ \ \ \ \mbox{\hyperlink{structbench__inv}{bench\_inv}}\ *data\ =\ (\mbox{\hyperlink{structbench__inv}{bench\_inv}}*)arg;}
+\DoxyCodeLine{00173\ }
+\DoxyCodeLine{00174\ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ iters;\ i++)\ \{}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ secp256k1\_fe\_mul(\&data-\/>fe[0],\ \&data-\/>fe[0],\ \&data-\/>fe[1]);}
+\DoxyCodeLine{00176\ \ \ \ \ \}}
+\DoxyCodeLine{00177\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=240pt]{bench__internal_8c_acbf7bdaaab521bfda8267af79e7fb7cc_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{bench__internal_8c_a2adf7245cf7180ffb8b33ff0c5f6cab2}\index{bench\_internal.c@{bench\_internal.c}!bench\_field\_normalize@{bench\_field\_normalize}}
+\index{bench\_field\_normalize@{bench\_field\_normalize}!bench\_internal.c@{bench\_internal.c}}
+\doxysubsubsection{\texorpdfstring{bench\_field\_normalize()}{bench\_field\_normalize()}}
+{\footnotesize\ttfamily \label{bench__internal_8c_a2adf7245cf7180ffb8b33ff0c5f6cab2} 
+void bench\+\_\+field\+\_\+normalize (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{arg}{, }\item[{int}]{iters}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bench__internal_8c_source_l00152}{152}} of file \mbox{\hyperlink{bench__internal_8c_source}{bench\+\_\+internal.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00153\ \ \ \ \ \textcolor{keywordtype}{int}\ i;}
+\DoxyCodeLine{00154\ \ \ \ \ \mbox{\hyperlink{structbench__inv}{bench\_inv}}\ *data\ =\ (\mbox{\hyperlink{structbench__inv}{bench\_inv}}*)arg;}
+\DoxyCodeLine{00155\ }
+\DoxyCodeLine{00156\ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ iters;\ i++)\ \{}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ secp256k1\_fe\_normalize(\&data-\/>fe[0]);}
+\DoxyCodeLine{00158\ \ \ \ \ \}}
+\DoxyCodeLine{00159\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=266pt]{bench__internal_8c_a2adf7245cf7180ffb8b33ff0c5f6cab2_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{bench__internal_8c_a4e15d8f7733b64f5c17e725d25c9135e}\index{bench\_internal.c@{bench\_internal.c}!bench\_field\_normalize\_weak@{bench\_field\_normalize\_weak}}
+\index{bench\_field\_normalize\_weak@{bench\_field\_normalize\_weak}!bench\_internal.c@{bench\_internal.c}}
+\doxysubsubsection{\texorpdfstring{bench\_field\_normalize\_weak()}{bench\_field\_normalize\_weak()}}
+{\footnotesize\ttfamily \label{bench__internal_8c_a4e15d8f7733b64f5c17e725d25c9135e} 
+void bench\+\_\+field\+\_\+normalize\+\_\+weak (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{arg}{, }\item[{int}]{iters}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bench__internal_8c_source_l00161}{161}} of file \mbox{\hyperlink{bench__internal_8c_source}{bench\+\_\+internal.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00162\ \ \ \ \ \textcolor{keywordtype}{int}\ i;}
+\DoxyCodeLine{00163\ \ \ \ \ \mbox{\hyperlink{structbench__inv}{bench\_inv}}\ *data\ =\ (\mbox{\hyperlink{structbench__inv}{bench\_inv}}*)arg;}
+\DoxyCodeLine{00164\ }
+\DoxyCodeLine{00165\ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ iters;\ i++)\ \{}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ secp256k1\_fe\_normalize\_weak(\&data-\/>fe[0]);}
+\DoxyCodeLine{00167\ \ \ \ \ \}}
+\DoxyCodeLine{00168\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=294pt]{bench__internal_8c_a4e15d8f7733b64f5c17e725d25c9135e_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{bench__internal_8c_af2e066f4baa195a1d61dd1e08ca46b72}\index{bench\_internal.c@{bench\_internal.c}!bench\_field\_sqr@{bench\_field\_sqr}}
+\index{bench\_field\_sqr@{bench\_field\_sqr}!bench\_internal.c@{bench\_internal.c}}
+\doxysubsubsection{\texorpdfstring{bench\_field\_sqr()}{bench\_field\_sqr()}}
+{\footnotesize\ttfamily \label{bench__internal_8c_af2e066f4baa195a1d61dd1e08ca46b72} 
+void bench\+\_\+field\+\_\+sqr (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{arg}{, }\item[{int}]{iters}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bench__internal_8c_source_l00179}{179}} of file \mbox{\hyperlink{bench__internal_8c_source}{bench\+\_\+internal.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00180\ \ \ \ \ \textcolor{keywordtype}{int}\ i;}
+\DoxyCodeLine{00181\ \ \ \ \ \mbox{\hyperlink{structbench__inv}{bench\_inv}}\ *data\ =\ (\mbox{\hyperlink{structbench__inv}{bench\_inv}}*)arg;}
+\DoxyCodeLine{00182\ }
+\DoxyCodeLine{00183\ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ iters;\ i++)\ \{}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ secp256k1\_fe\_sqr(\&data-\/>fe[0],\ \&data-\/>fe[0]);}
+\DoxyCodeLine{00185\ \ \ \ \ \}}
+\DoxyCodeLine{00186\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=237pt]{bench__internal_8c_af2e066f4baa195a1d61dd1e08ca46b72_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{bench__internal_8c_a5efa51c0544e48a43feab4043a7d4f5c}\index{bench\_internal.c@{bench\_internal.c}!bench\_field\_sqrt@{bench\_field\_sqrt}}
+\index{bench\_field\_sqrt@{bench\_field\_sqrt}!bench\_internal.c@{bench\_internal.c}}
+\doxysubsubsection{\texorpdfstring{bench\_field\_sqrt()}{bench\_field\_sqrt()}}
+{\footnotesize\ttfamily \label{bench__internal_8c_a5efa51c0544e48a43feab4043a7d4f5c} 
+void bench\+\_\+field\+\_\+sqrt (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{arg}{, }\item[{int}]{iters}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bench__internal_8c_source_l00208}{208}} of file \mbox{\hyperlink{bench__internal_8c_source}{bench\+\_\+internal.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00209\ \ \ \ \ \textcolor{keywordtype}{int}\ i,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ =\ 0;}
+\DoxyCodeLine{00210\ \ \ \ \ \mbox{\hyperlink{structbench__inv}{bench\_inv}}\ *data\ =\ (\mbox{\hyperlink{structbench__inv}{bench\_inv}}*)arg;}
+\DoxyCodeLine{00211\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__fe}{secp256k1\_fe}}\ t;}
+\DoxyCodeLine{00212\ }
+\DoxyCodeLine{00213\ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ iters;\ i++)\ \{}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ t\ =\ data-\/>fe[0];}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ +=\ secp256k1\_fe\_sqrt(\&data-\/>fe[0],\ \&t);}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ secp256k1\_fe\_add(\&data-\/>fe[0],\ \&data-\/>fe[1]);}
+\DoxyCodeLine{00217\ \ \ \ \ \}}
+\DoxyCodeLine{00218\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ <=\ iters);}
+\DoxyCodeLine{00219\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=240pt]{bench__internal_8c_a5efa51c0544e48a43feab4043a7d4f5c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{bench__internal_8c_affa999cc5f63702c1f53765ab46cc117}\index{bench\_internal.c@{bench\_internal.c}!bench\_group\_add\_affine@{bench\_group\_add\_affine}}
+\index{bench\_group\_add\_affine@{bench\_group\_add\_affine}!bench\_internal.c@{bench\_internal.c}}
+\doxysubsubsection{\texorpdfstring{bench\_group\_add\_affine()}{bench\_group\_add\_affine()}}
+{\footnotesize\ttfamily \label{bench__internal_8c_affa999cc5f63702c1f53765ab46cc117} 
+void bench\+\_\+group\+\_\+add\+\_\+affine (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{arg}{, }\item[{int}]{iters}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bench__internal_8c_source_l00239}{239}} of file \mbox{\hyperlink{bench__internal_8c_source}{bench\+\_\+internal.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00240\ \ \ \ \ \textcolor{keywordtype}{int}\ i;}
+\DoxyCodeLine{00241\ \ \ \ \ \mbox{\hyperlink{structbench__inv}{bench\_inv}}\ *data\ =\ (\mbox{\hyperlink{structbench__inv}{bench\_inv}}*)arg;}
+\DoxyCodeLine{00242\ }
+\DoxyCodeLine{00243\ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ iters;\ i++)\ \{}
+\DoxyCodeLine{00244\ \ \ \ \ \ \ \ \ secp256k1\_gej\_add\_ge(\&data-\/>gej[0],\ \&data-\/>gej[0],\ \&data-\/>ge[1]);}
+\DoxyCodeLine{00245\ \ \ \ \ \}}
+\DoxyCodeLine{00246\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=275pt]{bench__internal_8c_affa999cc5f63702c1f53765ab46cc117_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{bench__internal_8c_acb0b5fd9926c372d22409e7e1b7e71b3}\index{bench\_internal.c@{bench\_internal.c}!bench\_group\_add\_affine\_var@{bench\_group\_add\_affine\_var}}
+\index{bench\_group\_add\_affine\_var@{bench\_group\_add\_affine\_var}!bench\_internal.c@{bench\_internal.c}}
+\doxysubsubsection{\texorpdfstring{bench\_group\_add\_affine\_var()}{bench\_group\_add\_affine\_var()}}
+{\footnotesize\ttfamily \label{bench__internal_8c_acb0b5fd9926c372d22409e7e1b7e71b3} 
+void bench\+\_\+group\+\_\+add\+\_\+affine\+\_\+var (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{arg}{, }\item[{int}]{iters}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bench__internal_8c_source_l00248}{248}} of file \mbox{\hyperlink{bench__internal_8c_source}{bench\+\_\+internal.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00248\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00249\ \ \ \ \ \textcolor{keywordtype}{int}\ i;}
+\DoxyCodeLine{00250\ \ \ \ \ \mbox{\hyperlink{structbench__inv}{bench\_inv}}\ *data\ =\ (\mbox{\hyperlink{structbench__inv}{bench\_inv}}*)arg;}
+\DoxyCodeLine{00251\ }
+\DoxyCodeLine{00252\ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ iters;\ i++)\ \{}
+\DoxyCodeLine{00253\ \ \ \ \ \ \ \ \ secp256k1\_gej\_add\_ge\_var(\&data-\/>gej[0],\ \&data-\/>gej[0],\ \&data-\/>ge[1],\ NULL);}
+\DoxyCodeLine{00254\ \ \ \ \ \}}
+\DoxyCodeLine{00255\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=294pt]{bench__internal_8c_acb0b5fd9926c372d22409e7e1b7e71b3_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{bench__internal_8c_af1a40af02b96e164c23eeea7b634f1d1}\index{bench\_internal.c@{bench\_internal.c}!bench\_group\_add\_var@{bench\_group\_add\_var}}
+\index{bench\_group\_add\_var@{bench\_group\_add\_var}!bench\_internal.c@{bench\_internal.c}}
+\doxysubsubsection{\texorpdfstring{bench\_group\_add\_var()}{bench\_group\_add\_var()}}
+{\footnotesize\ttfamily \label{bench__internal_8c_af1a40af02b96e164c23eeea7b634f1d1} 
+void bench\+\_\+group\+\_\+add\+\_\+var (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{arg}{, }\item[{int}]{iters}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bench__internal_8c_source_l00230}{230}} of file \mbox{\hyperlink{bench__internal_8c_source}{bench\+\_\+internal.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00230\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00231\ \ \ \ \ \textcolor{keywordtype}{int}\ i;}
+\DoxyCodeLine{00232\ \ \ \ \ \mbox{\hyperlink{structbench__inv}{bench\_inv}}\ *data\ =\ (\mbox{\hyperlink{structbench__inv}{bench\_inv}}*)arg;}
+\DoxyCodeLine{00233\ }
+\DoxyCodeLine{00234\ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ iters;\ i++)\ \{}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \ \ secp256k1\_gej\_add\_var(\&data-\/>gej[0],\ \&data-\/>gej[0],\ \&data-\/>gej[1],\ NULL);}
+\DoxyCodeLine{00236\ \ \ \ \ \}}
+\DoxyCodeLine{00237\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=264pt]{bench__internal_8c_af1a40af02b96e164c23eeea7b634f1d1_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{bench__internal_8c_a5253abd06655003b844b6d2e77d4de00}\index{bench\_internal.c@{bench\_internal.c}!bench\_group\_add\_zinv\_var@{bench\_group\_add\_zinv\_var}}
+\index{bench\_group\_add\_zinv\_var@{bench\_group\_add\_zinv\_var}!bench\_internal.c@{bench\_internal.c}}
+\doxysubsubsection{\texorpdfstring{bench\_group\_add\_zinv\_var()}{bench\_group\_add\_zinv\_var()}}
+{\footnotesize\ttfamily \label{bench__internal_8c_a5253abd06655003b844b6d2e77d4de00} 
+void bench\+\_\+group\+\_\+add\+\_\+zinv\+\_\+var (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{arg}{, }\item[{int}]{iters}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bench__internal_8c_source_l00257}{257}} of file \mbox{\hyperlink{bench__internal_8c_source}{bench\+\_\+internal.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00257\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00258\ \ \ \ \ \textcolor{keywordtype}{int}\ i;}
+\DoxyCodeLine{00259\ \ \ \ \ \mbox{\hyperlink{structbench__inv}{bench\_inv}}\ *data\ =\ (\mbox{\hyperlink{structbench__inv}{bench\_inv}}*)arg;}
+\DoxyCodeLine{00260\ }
+\DoxyCodeLine{00261\ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ iters;\ i++)\ \{}
+\DoxyCodeLine{00262\ \ \ \ \ \ \ \ \ secp256k1\_gej\_add\_zinv\_var(\&data-\/>gej[0],\ \&data-\/>gej[0],\ \&data-\/>ge[1],\ \&data-\/>gej[0].y);}
+\DoxyCodeLine{00263\ \ \ \ \ \}}
+\DoxyCodeLine{00264\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=288pt]{bench__internal_8c_a5253abd06655003b844b6d2e77d4de00_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{bench__internal_8c_a887476872a0b727d1671084490f89578}\index{bench\_internal.c@{bench\_internal.c}!bench\_group\_double\_var@{bench\_group\_double\_var}}
+\index{bench\_group\_double\_var@{bench\_group\_double\_var}!bench\_internal.c@{bench\_internal.c}}
+\doxysubsubsection{\texorpdfstring{bench\_group\_double\_var()}{bench\_group\_double\_var()}}
+{\footnotesize\ttfamily \label{bench__internal_8c_a887476872a0b727d1671084490f89578} 
+void bench\+\_\+group\+\_\+double\+\_\+var (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{arg}{, }\item[{int}]{iters}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bench__internal_8c_source_l00221}{221}} of file \mbox{\hyperlink{bench__internal_8c_source}{bench\+\_\+internal.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00222\ \ \ \ \ \textcolor{keywordtype}{int}\ i;}
+\DoxyCodeLine{00223\ \ \ \ \ \mbox{\hyperlink{structbench__inv}{bench\_inv}}\ *data\ =\ (\mbox{\hyperlink{structbench__inv}{bench\_inv}}*)arg;}
+\DoxyCodeLine{00224\ }
+\DoxyCodeLine{00225\ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ iters;\ i++)\ \{}
+\DoxyCodeLine{00226\ \ \ \ \ \ \ \ \ secp256k1\_gej\_double\_var(\&data-\/>gej[0],\ \&data-\/>gej[0],\ NULL);}
+\DoxyCodeLine{00227\ \ \ \ \ \}}
+\DoxyCodeLine{00228\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=277pt]{bench__internal_8c_a887476872a0b727d1671084490f89578_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{bench__internal_8c_ad463b42f2aae4241bc0ae94ce68dc360}\index{bench\_internal.c@{bench\_internal.c}!bench\_group\_to\_affine\_var@{bench\_group\_to\_affine\_var}}
+\index{bench\_group\_to\_affine\_var@{bench\_group\_to\_affine\_var}!bench\_internal.c@{bench\_internal.c}}
+\doxysubsubsection{\texorpdfstring{bench\_group\_to\_affine\_var()}{bench\_group\_to\_affine\_var()}}
+{\footnotesize\ttfamily \label{bench__internal_8c_ad463b42f2aae4241bc0ae94ce68dc360} 
+void bench\+\_\+group\+\_\+to\+\_\+affine\+\_\+var (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{arg}{, }\item[{int}]{iters}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bench__internal_8c_source_l00266}{266}} of file \mbox{\hyperlink{bench__internal_8c_source}{bench\+\_\+internal.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00266\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00267\ \ \ \ \ \textcolor{keywordtype}{int}\ i;}
+\DoxyCodeLine{00268\ \ \ \ \ \mbox{\hyperlink{structbench__inv}{bench\_inv}}\ *data\ =\ (\mbox{\hyperlink{structbench__inv}{bench\_inv}}*)arg;}
+\DoxyCodeLine{00269\ }
+\DoxyCodeLine{00270\ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ iters;\ ++i)\ \{}
+\DoxyCodeLine{00271\ \ \ \ \ \ \ \ \ secp256k1\_ge\_set\_gej\_var(\&data-\/>ge[1],\ \&data-\/>gej[0]);}
+\DoxyCodeLine{00272\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ Use\ the\ output\ affine\ X/Y\ coordinates\ to\ vary\ the\ input\ X/Y/Z\ coordinates.}}
+\DoxyCodeLine{00273\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ Note\ that\ the\ resulting\ coordinates\ will\ generally\ not\ correspond\ to\ a\ point}}
+\DoxyCodeLine{00274\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ on\ the\ curve,\ but\ this\ is\ not\ a\ problem\ for\ the\ code\ being\ benchmarked\ here.}}
+\DoxyCodeLine{00275\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ Adding\ and\ normalizing\ have\ less\ overhead\ than\ EC\ operations\ (which\ could}}
+\DoxyCodeLine{00276\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ guarantee\ the\ point\ remains\ on\ the\ curve).\ */}}
+\DoxyCodeLine{00277\ \ \ \ \ \ \ \ \ secp256k1\_fe\_add(\&data-\/>gej[0].x,\ \&data-\/>ge[1].y);}
+\DoxyCodeLine{00278\ \ \ \ \ \ \ \ \ secp256k1\_fe\_add(\&data-\/>gej[0].y,\ \&data-\/>fe[2]);}
+\DoxyCodeLine{00279\ \ \ \ \ \ \ \ \ secp256k1\_fe\_add(\&data-\/>gej[0].z,\ \&data-\/>ge[1].x);}
+\DoxyCodeLine{00280\ \ \ \ \ \ \ \ \ secp256k1\_fe\_normalize\_var(\&data-\/>gej[0].x);}
+\DoxyCodeLine{00281\ \ \ \ \ \ \ \ \ secp256k1\_fe\_normalize\_var(\&data-\/>gej[0].y);}
+\DoxyCodeLine{00282\ \ \ \ \ \ \ \ \ secp256k1\_fe\_normalize\_var(\&data-\/>gej[0].z);}
+\DoxyCodeLine{00283\ \ \ \ \ \}}
+\DoxyCodeLine{00284\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=286pt]{bench__internal_8c_ad463b42f2aae4241bc0ae94ce68dc360_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{bench__internal_8c_a3e9eb770c7cc8c97c387ea2a6b42e878}\index{bench\_internal.c@{bench\_internal.c}!bench\_hmac\_sha256@{bench\_hmac\_sha256}}
+\index{bench\_hmac\_sha256@{bench\_hmac\_sha256}!bench\_internal.c@{bench\_internal.c}}
+\doxysubsubsection{\texorpdfstring{bench\_hmac\_sha256()}{bench\_hmac\_sha256()}}
+{\footnotesize\ttfamily \label{bench__internal_8c_a3e9eb770c7cc8c97c387ea2a6b42e878} 
+void bench\+\_\+hmac\+\_\+sha256 (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{arg}{, }\item[{int}]{iters}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bench__internal_8c_source_l00323}{323}} of file \mbox{\hyperlink{bench__internal_8c_source}{bench\+\_\+internal.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00323\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00324\ \ \ \ \ \textcolor{keywordtype}{int}\ i;}
+\DoxyCodeLine{00325\ \ \ \ \ \mbox{\hyperlink{structbench__inv}{bench\_inv}}\ *data\ =\ (\mbox{\hyperlink{structbench__inv}{bench\_inv}}*)arg;}
+\DoxyCodeLine{00326\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__hmac__sha256}{secp256k1\_hmac\_sha256}}\ hmac;}
+\DoxyCodeLine{00327\ }
+\DoxyCodeLine{00328\ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ iters;\ i++)\ \{}
+\DoxyCodeLine{00329\ \ \ \ \ \ \ \ \ secp256k1\_hmac\_sha256\_initialize(\&hmac,\ data-\/>data,\ 32);}
+\DoxyCodeLine{00330\ \ \ \ \ \ \ \ \ secp256k1\_hmac\_sha256\_write(\&hmac,\ data-\/>data,\ 32);}
+\DoxyCodeLine{00331\ \ \ \ \ \ \ \ \ secp256k1\_hmac\_sha256\_finalize(\&hmac,\ data-\/>data);}
+\DoxyCodeLine{00332\ \ \ \ \ \}}
+\DoxyCodeLine{00333\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=261pt]{bench__internal_8c_a3e9eb770c7cc8c97c387ea2a6b42e878_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{bench__internal_8c_ae45bdeae3f283fe0104bcf7c8556d3c4}\index{bench\_internal.c@{bench\_internal.c}!bench\_rfc6979\_hmac\_sha256@{bench\_rfc6979\_hmac\_sha256}}
+\index{bench\_rfc6979\_hmac\_sha256@{bench\_rfc6979\_hmac\_sha256}!bench\_internal.c@{bench\_internal.c}}
+\doxysubsubsection{\texorpdfstring{bench\_rfc6979\_hmac\_sha256()}{bench\_rfc6979\_hmac\_sha256()}}
+{\footnotesize\ttfamily \label{bench__internal_8c_ae45bdeae3f283fe0104bcf7c8556d3c4} 
+void bench\+\_\+rfc6979\+\_\+hmac\+\_\+sha256 (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{arg}{, }\item[{int}]{iters}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bench__internal_8c_source_l00335}{335}} of file \mbox{\hyperlink{bench__internal_8c_source}{bench\+\_\+internal.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00335\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00336\ \ \ \ \ \textcolor{keywordtype}{int}\ i;}
+\DoxyCodeLine{00337\ \ \ \ \ \mbox{\hyperlink{structbench__inv}{bench\_inv}}\ *data\ =\ (\mbox{\hyperlink{structbench__inv}{bench\_inv}}*)arg;}
+\DoxyCodeLine{00338\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__rfc6979__hmac__sha256}{secp256k1\_rfc6979\_hmac\_sha256}}\ \mbox{\hyperlink{namespace_catch_adf13e77187ae9bc5d7cd1bb29c1ba7e9}{rng}};}
+\DoxyCodeLine{00339\ }
+\DoxyCodeLine{00340\ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ iters;\ i++)\ \{}
+\DoxyCodeLine{00341\ \ \ \ \ \ \ \ \ secp256k1\_rfc6979\_hmac\_sha256\_initialize(\&rng,\ data-\/>data,\ 64);}
+\DoxyCodeLine{00342\ \ \ \ \ \ \ \ \ secp256k1\_rfc6979\_hmac\_sha256\_generate(\&rng,\ data-\/>data,\ 32);}
+\DoxyCodeLine{00343\ \ \ \ \ \}}
+\DoxyCodeLine{00344\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=262pt]{bench__internal_8c_ae45bdeae3f283fe0104bcf7c8556d3c4_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{bench__internal_8c_ac7c021ebf94333196586195f5fc1982d}\index{bench\_internal.c@{bench\_internal.c}!bench\_scalar\_add@{bench\_scalar\_add}}
+\index{bench\_scalar\_add@{bench\_scalar\_add}!bench\_internal.c@{bench\_internal.c}}
+\doxysubsubsection{\texorpdfstring{bench\_scalar\_add()}{bench\_scalar\_add()}}
+{\footnotesize\ttfamily \label{bench__internal_8c_ac7c021ebf94333196586195f5fc1982d} 
+void bench\+\_\+scalar\+\_\+add (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{arg}{, }\item[{int}]{iters}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bench__internal_8c_source_l00082}{82}} of file \mbox{\hyperlink{bench__internal_8c_source}{bench\+\_\+internal.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00083\ \ \ \ \ \textcolor{keywordtype}{int}\ i,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ =\ 0;}
+\DoxyCodeLine{00084\ \ \ \ \ \mbox{\hyperlink{structbench__inv}{bench\_inv}}\ *data\ =\ (\mbox{\hyperlink{structbench__inv}{bench\_inv}}*)arg;}
+\DoxyCodeLine{00085\ }
+\DoxyCodeLine{00086\ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ iters;\ i++)\ \{}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ +=\ secp256k1\_scalar\_add(\&data-\/>scalar[0],\ \&data-\/>scalar[0],\ \&data-\/>scalar[1]);}
+\DoxyCodeLine{00088\ \ \ \ \ \}}
+\DoxyCodeLine{00089\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ <=\ iters);}
+\DoxyCodeLine{00090\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=248pt]{bench__internal_8c_ac7c021ebf94333196586195f5fc1982d_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{bench__internal_8c_a85b7b814047b7c80345c68e006b75ada}\index{bench\_internal.c@{bench\_internal.c}!bench\_scalar\_inverse@{bench\_scalar\_inverse}}
+\index{bench\_scalar\_inverse@{bench\_scalar\_inverse}!bench\_internal.c@{bench\_internal.c}}
+\doxysubsubsection{\texorpdfstring{bench\_scalar\_inverse()}{bench\_scalar\_inverse()}}
+{\footnotesize\ttfamily \label{bench__internal_8c_a85b7b814047b7c80345c68e006b75ada} 
+void bench\+\_\+scalar\+\_\+inverse (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{arg}{, }\item[{int}]{iters}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bench__internal_8c_source_l00121}{121}} of file \mbox{\hyperlink{bench__internal_8c_source}{bench\+\_\+internal.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00122\ \ \ \ \ \textcolor{keywordtype}{int}\ i,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ =\ 0;}
+\DoxyCodeLine{00123\ \ \ \ \ \mbox{\hyperlink{structbench__inv}{bench\_inv}}\ *data\ =\ (\mbox{\hyperlink{structbench__inv}{bench\_inv}}*)arg;}
+\DoxyCodeLine{00124\ }
+\DoxyCodeLine{00125\ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ iters;\ i++)\ \{}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ secp256k1\_scalar\_inverse(\&data-\/>scalar[0],\ \&data-\/>scalar[0]);}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ +=\ secp256k1\_scalar\_add(\&data-\/>scalar[0],\ \&data-\/>scalar[0],\ \&data-\/>scalar[1]);}
+\DoxyCodeLine{00128\ \ \ \ \ \}}
+\DoxyCodeLine{00129\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ <=\ iters);}
+\DoxyCodeLine{00130\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=264pt]{bench__internal_8c_a85b7b814047b7c80345c68e006b75ada_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{bench__internal_8c_a177bb68ef9503ddc52bd071195bceec6}\index{bench\_internal.c@{bench\_internal.c}!bench\_scalar\_inverse\_var@{bench\_scalar\_inverse\_var}}
+\index{bench\_scalar\_inverse\_var@{bench\_scalar\_inverse\_var}!bench\_internal.c@{bench\_internal.c}}
+\doxysubsubsection{\texorpdfstring{bench\_scalar\_inverse\_var()}{bench\_scalar\_inverse\_var()}}
+{\footnotesize\ttfamily \label{bench__internal_8c_a177bb68ef9503ddc52bd071195bceec6} 
+void bench\+\_\+scalar\+\_\+inverse\+\_\+var (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{arg}{, }\item[{int}]{iters}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bench__internal_8c_source_l00132}{132}} of file \mbox{\hyperlink{bench__internal_8c_source}{bench\+\_\+internal.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00133\ \ \ \ \ \textcolor{keywordtype}{int}\ i,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ =\ 0;}
+\DoxyCodeLine{00134\ \ \ \ \ \mbox{\hyperlink{structbench__inv}{bench\_inv}}\ *data\ =\ (\mbox{\hyperlink{structbench__inv}{bench\_inv}}*)arg;}
+\DoxyCodeLine{00135\ }
+\DoxyCodeLine{00136\ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ iters;\ i++)\ \{}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ secp256k1\_scalar\_inverse\_var(\&data-\/>scalar[0],\ \&data-\/>scalar[0]);}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ +=\ secp256k1\_scalar\_add(\&data-\/>scalar[0],\ \&data-\/>scalar[0],\ \&data-\/>scalar[1]);}
+\DoxyCodeLine{00139\ \ \ \ \ \}}
+\DoxyCodeLine{00140\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ <=\ iters);}
+\DoxyCodeLine{00141\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=282pt]{bench__internal_8c_a177bb68ef9503ddc52bd071195bceec6_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{bench__internal_8c_ac8debd21905f093d1011902dac39f25b}\index{bench\_internal.c@{bench\_internal.c}!bench\_scalar\_mul@{bench\_scalar\_mul}}
+\index{bench\_scalar\_mul@{bench\_scalar\_mul}!bench\_internal.c@{bench\_internal.c}}
+\doxysubsubsection{\texorpdfstring{bench\_scalar\_mul()}{bench\_scalar\_mul()}}
+{\footnotesize\ttfamily \label{bench__internal_8c_ac8debd21905f093d1011902dac39f25b} 
+void bench\+\_\+scalar\+\_\+mul (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{arg}{, }\item[{int}]{iters}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bench__internal_8c_source_l00101}{101}} of file \mbox{\hyperlink{bench__internal_8c_source}{bench\+\_\+internal.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00102\ \ \ \ \ \textcolor{keywordtype}{int}\ i;}
+\DoxyCodeLine{00103\ \ \ \ \ \mbox{\hyperlink{structbench__inv}{bench\_inv}}\ *data\ =\ (\mbox{\hyperlink{structbench__inv}{bench\_inv}}*)arg;}
+\DoxyCodeLine{00104\ }
+\DoxyCodeLine{00105\ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ iters;\ i++)\ \{}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ secp256k1\_scalar\_mul(\&data-\/>scalar[0],\ \&data-\/>scalar[0],\ \&data-\/>scalar[1]);}
+\DoxyCodeLine{00107\ \ \ \ \ \}}
+\DoxyCodeLine{00108\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=248pt]{bench__internal_8c_ac8debd21905f093d1011902dac39f25b_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{bench__internal_8c_a03e1fb46bd43f7d2b7acb919a81b76bd}\index{bench\_internal.c@{bench\_internal.c}!bench\_scalar\_negate@{bench\_scalar\_negate}}
+\index{bench\_scalar\_negate@{bench\_scalar\_negate}!bench\_internal.c@{bench\_internal.c}}
+\doxysubsubsection{\texorpdfstring{bench\_scalar\_negate()}{bench\_scalar\_negate()}}
+{\footnotesize\ttfamily \label{bench__internal_8c_a03e1fb46bd43f7d2b7acb919a81b76bd} 
+void bench\+\_\+scalar\+\_\+negate (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{arg}{, }\item[{int}]{iters}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bench__internal_8c_source_l00092}{92}} of file \mbox{\hyperlink{bench__internal_8c_source}{bench\+\_\+internal.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00093\ \ \ \ \ \textcolor{keywordtype}{int}\ i;}
+\DoxyCodeLine{00094\ \ \ \ \ \mbox{\hyperlink{structbench__inv}{bench\_inv}}\ *data\ =\ (\mbox{\hyperlink{structbench__inv}{bench\_inv}}*)arg;}
+\DoxyCodeLine{00095\ }
+\DoxyCodeLine{00096\ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ iters;\ i++)\ \{}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ secp256k1\_scalar\_negate(\&data-\/>scalar[0],\ \&data-\/>scalar[0]);}
+\DoxyCodeLine{00098\ \ \ \ \ \}}
+\DoxyCodeLine{00099\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=261pt]{bench__internal_8c_a03e1fb46bd43f7d2b7acb919a81b76bd_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{bench__internal_8c_a420ff0a9d3a09cc2f726afb0c9836ab8}\index{bench\_internal.c@{bench\_internal.c}!bench\_scalar\_split@{bench\_scalar\_split}}
+\index{bench\_scalar\_split@{bench\_scalar\_split}!bench\_internal.c@{bench\_internal.c}}
+\doxysubsubsection{\texorpdfstring{bench\_scalar\_split()}{bench\_scalar\_split()}}
+{\footnotesize\ttfamily \label{bench__internal_8c_a420ff0a9d3a09cc2f726afb0c9836ab8} 
+void bench\+\_\+scalar\+\_\+split (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{arg}{, }\item[{int}]{iters}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bench__internal_8c_source_l00110}{110}} of file \mbox{\hyperlink{bench__internal_8c_source}{bench\+\_\+internal.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00111\ \ \ \ \ \textcolor{keywordtype}{int}\ i,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ =\ 0;}
+\DoxyCodeLine{00112\ \ \ \ \ \mbox{\hyperlink{structbench__inv}{bench\_inv}}\ *data\ =\ (\mbox{\hyperlink{structbench__inv}{bench\_inv}}*)arg;}
+\DoxyCodeLine{00113\ }
+\DoxyCodeLine{00114\ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ iters;\ i++)\ \{}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ secp256k1\_scalar\_split\_lambda(\&data-\/>scalar[0],\ \&data-\/>scalar[1],\ \&data-\/>scalar[0]);}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ +=\ secp256k1\_scalar\_add(\&data-\/>scalar[0],\ \&data-\/>scalar[0],\ \&data-\/>scalar[1]);}
+\DoxyCodeLine{00117\ \ \ \ \ \}}
+\DoxyCodeLine{00118\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ <=\ iters);}
+\DoxyCodeLine{00119\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=250pt]{bench__internal_8c_a420ff0a9d3a09cc2f726afb0c9836ab8_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{bench__internal_8c_af48be8297385d0d32de62ae12a07d55c}\index{bench\_internal.c@{bench\_internal.c}!bench\_setup@{bench\_setup}}
+\index{bench\_setup@{bench\_setup}!bench\_internal.c@{bench\_internal.c}}
+\doxysubsubsection{\texorpdfstring{bench\_setup()}{bench\_setup()}}
+{\footnotesize\ttfamily \label{bench__internal_8c_af48be8297385d0d32de62ae12a07d55c} 
+void bench\+\_\+setup (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{arg}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bench__internal_8c_source_l00030}{30}} of file \mbox{\hyperlink{bench__internal_8c_source}{bench\+\_\+internal.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00031\ \ \ \ \ \mbox{\hyperlink{structbench__inv}{bench\_inv}}\ *data\ =\ (\mbox{\hyperlink{structbench__inv}{bench\_inv}}*)arg;}
+\DoxyCodeLine{00032\ }
+\DoxyCodeLine{00033\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{lib_8h_a02fd73d861ef2e4aabb38c0c9ff82947}{init}}[4][32]\ =\ \{}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ Initializer\ for\ scalar[0],\ fe[0],\ first\ half\ of\ data,\ the\ X\ coordinate\ of\ ge[0],}}
+\DoxyCodeLine{00035\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ and\ the\ (implied\ affine)\ X\ coordinate\ of\ gej[0].\ */}}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ 0x02,\ 0x03,\ 0x05,\ 0x07,\ 0x0b,\ 0x0d,\ 0x11,\ 0x13,}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ 0x17,\ 0x1d,\ 0x1f,\ 0x25,\ 0x29,\ 0x2b,\ 0x2f,\ 0x35,}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ 0x3b,\ 0x3d,\ 0x43,\ 0x47,\ 0x49,\ 0x4f,\ 0x53,\ 0x59,}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ 0x61,\ 0x65,\ 0x67,\ 0x6b,\ 0x6d,\ 0x71,\ 0x7f,\ 0x83}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ Initializer\ for\ scalar[1],\ fe[1],\ first\ half\ of\ data,\ the\ X\ coordinate\ of\ ge[1],}}
+\DoxyCodeLine{00043\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ and\ the\ (implied\ affine)\ X\ coordinate\ of\ gej[1].\ */}}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \ \ \ 0x82,\ 0x83,\ 0x85,\ 0x87,\ 0x8b,\ 0x8d,\ 0x81,\ 0x83,}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \ \ \ 0x97,\ 0xad,\ 0xaf,\ 0xb5,\ 0xb9,\ 0xbb,\ 0xbf,\ 0xc5,}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \ \ \ 0xdb,\ 0xdd,\ 0xe3,\ 0xe7,\ 0xe9,\ 0xef,\ 0xf3,\ 0xf9,}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \ \ \ 0x11,\ 0x15,\ 0x17,\ 0x1b,\ 0x1d,\ 0xb1,\ 0xbf,\ 0xd3}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ Initializer\ for\ fe[2]\ and\ the\ Z\ coordinate\ of\ gej[0].\ */}}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \ \ 0x3d,\ 0x2d,\ 0xef,\ 0xf4,\ 0x25,\ 0x98,\ 0x4f,\ 0x5d,}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \ 0xe2,\ 0xca,\ 0x5f,\ 0x41,\ 0x3f,\ 0x3f,\ 0xce,\ 0x44,}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \ \ \ 0xaa,\ 0x2c,\ 0x53,\ 0x8a,\ 0xc6,\ 0x59,\ 0x1f,\ 0x38,}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \ \ \ 0x38,\ 0x23,\ 0xe4,\ 0x11,\ 0x27,\ 0xc6,\ 0xa0,\ 0xe7}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ Initializer\ for\ fe[3]\ and\ the\ Z\ coordinate\ of\ gej[1].\ */}}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ \ \ \ 0xbd,\ 0x21,\ 0xa5,\ 0xe1,\ 0x13,\ 0x50,\ 0x73,\ 0x2e,}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \ \ \ \ 0x52,\ 0x98,\ 0xc8,\ 0x9e,\ 0xab,\ 0x00,\ 0xa2,\ 0x68,}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \ \ \ \ 0x43,\ 0xf5,\ 0xd7,\ 0x49,\ 0x80,\ 0x72,\ 0xa7,\ 0xf3,}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \ \ \ 0xd7,\ 0x60,\ 0xe6,\ 0xab,\ 0x90,\ 0x92,\ 0xdf,\ 0xc5}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00064\ \ \ \ \ \};}
+\DoxyCodeLine{00065\ }
+\DoxyCodeLine{00066\ \ \ \ \ secp256k1\_scalar\_set\_b32(\&data-\/>scalar[0],\ \mbox{\hyperlink{lib_8h_a02fd73d861ef2e4aabb38c0c9ff82947}{init}}[0],\ NULL);}
+\DoxyCodeLine{00067\ \ \ \ \ secp256k1\_scalar\_set\_b32(\&data-\/>scalar[1],\ \mbox{\hyperlink{lib_8h_a02fd73d861ef2e4aabb38c0c9ff82947}{init}}[1],\ NULL);}
+\DoxyCodeLine{00068\ \ \ \ \ secp256k1\_fe\_set\_b32(\&data-\/>fe[0],\ \mbox{\hyperlink{lib_8h_a02fd73d861ef2e4aabb38c0c9ff82947}{init}}[0]);}
+\DoxyCodeLine{00069\ \ \ \ \ secp256k1\_fe\_set\_b32(\&data-\/>fe[1],\ \mbox{\hyperlink{lib_8h_a02fd73d861ef2e4aabb38c0c9ff82947}{init}}[1]);}
+\DoxyCodeLine{00070\ \ \ \ \ secp256k1\_fe\_set\_b32(\&data-\/>fe[2],\ \mbox{\hyperlink{lib_8h_a02fd73d861ef2e4aabb38c0c9ff82947}{init}}[2]);}
+\DoxyCodeLine{00071\ \ \ \ \ secp256k1\_fe\_set\_b32(\&data-\/>fe[3],\ \mbox{\hyperlink{lib_8h_a02fd73d861ef2e4aabb38c0c9ff82947}{init}}[3]);}
+\DoxyCodeLine{00072\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(secp256k1\_ge\_set\_xo\_var(\&data-\/>ge[0],\ \&data-\/>fe[0],\ 0));}
+\DoxyCodeLine{00073\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(secp256k1\_ge\_set\_xo\_var(\&data-\/>ge[1],\ \&data-\/>fe[1],\ 1));}
+\DoxyCodeLine{00074\ \ \ \ \ secp256k1\_gej\_set\_ge(\&data-\/>gej[0],\ \&data-\/>ge[0]);}
+\DoxyCodeLine{00075\ \ \ \ \ secp256k1\_gej\_rescale(\&data-\/>gej[0],\ \&data-\/>fe[2]);}
+\DoxyCodeLine{00076\ \ \ \ \ secp256k1\_gej\_set\_ge(\&data-\/>gej[1],\ \&data-\/>ge[1]);}
+\DoxyCodeLine{00077\ \ \ \ \ secp256k1\_gej\_rescale(\&data-\/>gej[1],\ \&data-\/>fe[3]);}
+\DoxyCodeLine{00078\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(data-\/>data,\ \mbox{\hyperlink{lib_8h_a02fd73d861ef2e4aabb38c0c9ff82947}{init}}[0],\ 32);}
+\DoxyCodeLine{00079\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(data-\/>data\ +\ 32,\ \mbox{\hyperlink{lib_8h_a02fd73d861ef2e4aabb38c0c9ff82947}{init}}[1],\ 32);}
+\DoxyCodeLine{00080\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=325pt]{bench__internal_8c_af48be8297385d0d32de62ae12a07d55c_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=225pt]{bench__internal_8c_af48be8297385d0d32de62ae12a07d55c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{bench__internal_8c_a2dc044b23a1f1ea062e64f7dc6beb4dc}\index{bench\_internal.c@{bench\_internal.c}!bench\_sha256@{bench\_sha256}}
+\index{bench\_sha256@{bench\_sha256}!bench\_internal.c@{bench\_internal.c}}
+\doxysubsubsection{\texorpdfstring{bench\_sha256()}{bench\_sha256()}}
+{\footnotesize\ttfamily \label{bench__internal_8c_a2dc044b23a1f1ea062e64f7dc6beb4dc} 
+void bench\+\_\+sha256 (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{arg}{, }\item[{int}]{iters}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bench__internal_8c_source_l00311}{311}} of file \mbox{\hyperlink{bench__internal_8c_source}{bench\+\_\+internal.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00311\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00312\ \ \ \ \ \textcolor{keywordtype}{int}\ i;}
+\DoxyCodeLine{00313\ \ \ \ \ \mbox{\hyperlink{structbench__inv}{bench\_inv}}\ *data\ =\ (\mbox{\hyperlink{structbench__inv}{bench\_inv}}*)arg;}
+\DoxyCodeLine{00314\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__sha256}{secp256k1\_sha256}}\ sha;}
+\DoxyCodeLine{00315\ }
+\DoxyCodeLine{00316\ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ iters;\ i++)\ \{}
+\DoxyCodeLine{00317\ \ \ \ \ \ \ \ \ secp256k1\_sha256\_initialize(\&sha);}
+\DoxyCodeLine{00318\ \ \ \ \ \ \ \ \ secp256k1\_sha256\_write(\&sha,\ data-\/>data,\ 32);}
+\DoxyCodeLine{00319\ \ \ \ \ \ \ \ \ secp256k1\_sha256\_finalize(\&sha,\ data-\/>data);}
+\DoxyCodeLine{00320\ \ \ \ \ \}}
+\DoxyCodeLine{00321\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=232pt]{bench__internal_8c_a2dc044b23a1f1ea062e64f7dc6beb4dc_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{bench__internal_8c_a6ac3f05487330d9264d9b1e3546510a5}\index{bench\_internal.c@{bench\_internal.c}!bench\_wnaf\_const@{bench\_wnaf\_const}}
+\index{bench\_wnaf\_const@{bench\_wnaf\_const}!bench\_internal.c@{bench\_internal.c}}
+\doxysubsubsection{\texorpdfstring{bench\_wnaf\_const()}{bench\_wnaf\_const()}}
+{\footnotesize\ttfamily \label{bench__internal_8c_a6ac3f05487330d9264d9b1e3546510a5} 
+void bench\+\_\+wnaf\+\_\+const (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{arg}{, }\item[{int}]{iters}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bench__internal_8c_source_l00298}{298}} of file \mbox{\hyperlink{bench__internal_8c_source}{bench\+\_\+internal.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00298\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00299\ \ \ \ \ \textcolor{keywordtype}{int}\ i,\ bits\ =\ 0,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a49aa97067a36875627e1380c3fb3833d}{overflow}}\ =\ 0;}
+\DoxyCodeLine{00300\ \ \ \ \ \mbox{\hyperlink{structbench__inv}{bench\_inv}}\ *data\ =\ (\mbox{\hyperlink{structbench__inv}{bench\_inv}}*)arg;}
+\DoxyCodeLine{00301\ }
+\DoxyCodeLine{00302\ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ iters;\ i++)\ \{}
+\DoxyCodeLine{00303\ \ \ \ \ \ \ \ \ bits\ +=\ secp256k1\_wnaf\_const(data-\/>wnaf,\ \&data-\/>scalar[0],\ \mbox{\hyperlink{ecmult__impl_8h_a6216c81c6adbb8796c55fe0c8d3b6718}{WINDOW\_A}},\ 256);}
+\DoxyCodeLine{00304\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a49aa97067a36875627e1380c3fb3833d}{overflow}}\ +=\ secp256k1\_scalar\_add(\&data-\/>scalar[0],\ \&data-\/>scalar[0],\ \&data-\/>scalar[1]);}
+\DoxyCodeLine{00305\ \ \ \ \ \}}
+\DoxyCodeLine{00306\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a49aa97067a36875627e1380c3fb3833d}{overflow}}\ >=\ 0);}
+\DoxyCodeLine{00307\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(bits\ <=\ 256*iters);}
+\DoxyCodeLine{00308\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=251pt]{bench__internal_8c_a6ac3f05487330d9264d9b1e3546510a5_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{bench__internal_8c_a3c04138a5bfe5d72780bb7e82a18e627}\index{bench\_internal.c@{bench\_internal.c}!main@{main}}
+\index{main@{main}!bench\_internal.c@{bench\_internal.c}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{bench__internal_8c_a3c04138a5bfe5d72780bb7e82a18e627} 
+int main (\begin{DoxyParamCaption}\item[{int}]{argc}{, }\item[{char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{argv}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bench__internal_8c_source_l00362}{362}} of file \mbox{\hyperlink{bench__internal_8c_source}{bench\+\_\+internal.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00362\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00363\ \ \ \ \ \mbox{\hyperlink{structbench__inv}{bench\_inv}}\ data;}
+\DoxyCodeLine{00364\ \ \ \ \ \textcolor{keywordtype}{int}\ iters\ =\ \mbox{\hyperlink{bench_8h_a451eb25db60dd3d4abedc8a41aecd204}{get\_iters}}(20000);}
+\DoxyCodeLine{00365\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ =\ argc\ ==\ 1;\ \textcolor{comment}{/*\ default\ */}}
+\DoxyCodeLine{00366\ \ \ \ \ \mbox{\hyperlink{bench_8h_a02fea1a81d22421b858db710e6850482}{print\_output\_table\_header\_row}}();}
+\DoxyCodeLine{00367\ }
+\DoxyCodeLine{00368\ \ \ \ \ \textcolor{keywordflow}{if}\ (d\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}scalar"{}})\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}add"{}}))\ \mbox{\hyperlink{bench_8h_aabcd2ce2b43c96bd396b30f8ecb79a17}{run\_benchmark}}(\textcolor{stringliteral}{"{}scalar\_add"{}},\ \mbox{\hyperlink{bench__internal_8c_ac7c021ebf94333196586195f5fc1982d}{bench\_scalar\_add}},\ \mbox{\hyperlink{bench__internal_8c_af48be8297385d0d32de62ae12a07d55c}{bench\_setup}},\ NULL,\ \&data,\ 10,\ iters*100);}
+\DoxyCodeLine{00369\ \ \ \ \ \textcolor{keywordflow}{if}\ (d\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}scalar"{}})\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}negate"{}}))\ \mbox{\hyperlink{bench_8h_aabcd2ce2b43c96bd396b30f8ecb79a17}{run\_benchmark}}(\textcolor{stringliteral}{"{}scalar\_negate"{}},\ \mbox{\hyperlink{bench__internal_8c_a03e1fb46bd43f7d2b7acb919a81b76bd}{bench\_scalar\_negate}},\ \mbox{\hyperlink{bench__internal_8c_af48be8297385d0d32de62ae12a07d55c}{bench\_setup}},\ NULL,\ \&data,\ 10,\ iters*100);}
+\DoxyCodeLine{00370\ \ \ \ \ \textcolor{keywordflow}{if}\ (d\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}scalar"{}})\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}mul"{}}))\ \mbox{\hyperlink{bench_8h_aabcd2ce2b43c96bd396b30f8ecb79a17}{run\_benchmark}}(\textcolor{stringliteral}{"{}scalar\_mul"{}},\ \mbox{\hyperlink{bench__internal_8c_ac8debd21905f093d1011902dac39f25b}{bench\_scalar\_mul}},\ \mbox{\hyperlink{bench__internal_8c_af48be8297385d0d32de62ae12a07d55c}{bench\_setup}},\ NULL,\ \&data,\ 10,\ iters*10);}
+\DoxyCodeLine{00371\ \ \ \ \ \textcolor{keywordflow}{if}\ (d\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}scalar"{}})\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}split"{}}))\ \mbox{\hyperlink{bench_8h_aabcd2ce2b43c96bd396b30f8ecb79a17}{run\_benchmark}}(\textcolor{stringliteral}{"{}scalar\_split"{}},\ \mbox{\hyperlink{bench__internal_8c_a420ff0a9d3a09cc2f726afb0c9836ab8}{bench\_scalar\_split}},\ \mbox{\hyperlink{bench__internal_8c_af48be8297385d0d32de62ae12a07d55c}{bench\_setup}},\ NULL,\ \&data,\ 10,\ iters);}
+\DoxyCodeLine{00372\ \ \ \ \ \textcolor{keywordflow}{if}\ (d\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}scalar"{}})\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}inverse"{}}))\ \mbox{\hyperlink{bench_8h_aabcd2ce2b43c96bd396b30f8ecb79a17}{run\_benchmark}}(\textcolor{stringliteral}{"{}scalar\_inverse"{}},\ \mbox{\hyperlink{bench__internal_8c_a85b7b814047b7c80345c68e006b75ada}{bench\_scalar\_inverse}},\ \mbox{\hyperlink{bench__internal_8c_af48be8297385d0d32de62ae12a07d55c}{bench\_setup}},\ NULL,\ \&data,\ 10,\ iters);}
+\DoxyCodeLine{00373\ \ \ \ \ \textcolor{keywordflow}{if}\ (d\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}scalar"{}})\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}inverse"{}}))\ \mbox{\hyperlink{bench_8h_aabcd2ce2b43c96bd396b30f8ecb79a17}{run\_benchmark}}(\textcolor{stringliteral}{"{}scalar\_inverse\_var"{}},\ \mbox{\hyperlink{bench__internal_8c_a177bb68ef9503ddc52bd071195bceec6}{bench\_scalar\_inverse\_var}},\ \mbox{\hyperlink{bench__internal_8c_af48be8297385d0d32de62ae12a07d55c}{bench\_setup}},\ NULL,\ \&data,\ 10,\ iters);}
+\DoxyCodeLine{00374\ }
+\DoxyCodeLine{00375\ \ \ \ \ \textcolor{keywordflow}{if}\ (d\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}field"{}})\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}half"{}}))\ \mbox{\hyperlink{bench_8h_aabcd2ce2b43c96bd396b30f8ecb79a17}{run\_benchmark}}(\textcolor{stringliteral}{"{}field\_half"{}},\ \mbox{\hyperlink{bench__internal_8c_a36c7115e4eeb4dde0a3b46f99690f4d2}{bench\_field\_half}},\ \mbox{\hyperlink{bench__internal_8c_af48be8297385d0d32de62ae12a07d55c}{bench\_setup}},\ NULL,\ \&data,\ 10,\ iters*100);}
+\DoxyCodeLine{00376\ \ \ \ \ \textcolor{keywordflow}{if}\ (d\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}field"{}})\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}normalize"{}}))\ \mbox{\hyperlink{bench_8h_aabcd2ce2b43c96bd396b30f8ecb79a17}{run\_benchmark}}(\textcolor{stringliteral}{"{}field\_normalize"{}},\ \mbox{\hyperlink{bench__internal_8c_a2adf7245cf7180ffb8b33ff0c5f6cab2}{bench\_field\_normalize}},\ \mbox{\hyperlink{bench__internal_8c_af48be8297385d0d32de62ae12a07d55c}{bench\_setup}},\ NULL,\ \&data,\ 10,\ iters*100);}
+\DoxyCodeLine{00377\ \ \ \ \ \textcolor{keywordflow}{if}\ (d\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}field"{}})\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}normalize"{}}))\ \mbox{\hyperlink{bench_8h_aabcd2ce2b43c96bd396b30f8ecb79a17}{run\_benchmark}}(\textcolor{stringliteral}{"{}field\_normalize\_weak"{}},\ \mbox{\hyperlink{bench__internal_8c_a4e15d8f7733b64f5c17e725d25c9135e}{bench\_field\_normalize\_weak}},\ \mbox{\hyperlink{bench__internal_8c_af48be8297385d0d32de62ae12a07d55c}{bench\_setup}},\ NULL,\ \&data,\ 10,\ iters*100);}
+\DoxyCodeLine{00378\ \ \ \ \ \textcolor{keywordflow}{if}\ (d\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}field"{}})\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}sqr"{}}))\ \mbox{\hyperlink{bench_8h_aabcd2ce2b43c96bd396b30f8ecb79a17}{run\_benchmark}}(\textcolor{stringliteral}{"{}field\_sqr"{}},\ \mbox{\hyperlink{bench__internal_8c_af2e066f4baa195a1d61dd1e08ca46b72}{bench\_field\_sqr}},\ \mbox{\hyperlink{bench__internal_8c_af48be8297385d0d32de62ae12a07d55c}{bench\_setup}},\ NULL,\ \&data,\ 10,\ iters*10);}
+\DoxyCodeLine{00379\ \ \ \ \ \textcolor{keywordflow}{if}\ (d\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}field"{}})\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}mul"{}}))\ \mbox{\hyperlink{bench_8h_aabcd2ce2b43c96bd396b30f8ecb79a17}{run\_benchmark}}(\textcolor{stringliteral}{"{}field\_mul"{}},\ \mbox{\hyperlink{bench__internal_8c_acbf7bdaaab521bfda8267af79e7fb7cc}{bench\_field\_mul}},\ \mbox{\hyperlink{bench__internal_8c_af48be8297385d0d32de62ae12a07d55c}{bench\_setup}},\ NULL,\ \&data,\ 10,\ iters*10);}
+\DoxyCodeLine{00380\ \ \ \ \ \textcolor{keywordflow}{if}\ (d\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}field"{}})\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}inverse"{}}))\ \mbox{\hyperlink{bench_8h_aabcd2ce2b43c96bd396b30f8ecb79a17}{run\_benchmark}}(\textcolor{stringliteral}{"{}field\_inverse"{}},\ \mbox{\hyperlink{bench__internal_8c_a03341412299c24469d8990c66faada7d}{bench\_field\_inverse}},\ \mbox{\hyperlink{bench__internal_8c_af48be8297385d0d32de62ae12a07d55c}{bench\_setup}},\ NULL,\ \&data,\ 10,\ iters);}
+\DoxyCodeLine{00381\ \ \ \ \ \textcolor{keywordflow}{if}\ (d\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}field"{}})\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}inverse"{}}))\ \mbox{\hyperlink{bench_8h_aabcd2ce2b43c96bd396b30f8ecb79a17}{run\_benchmark}}(\textcolor{stringliteral}{"{}field\_inverse\_var"{}},\ \mbox{\hyperlink{bench__internal_8c_ac45e86bb57d07be85032abb690709094}{bench\_field\_inverse\_var}},\ \mbox{\hyperlink{bench__internal_8c_af48be8297385d0d32de62ae12a07d55c}{bench\_setup}},\ NULL,\ \&data,\ 10,\ iters);}
+\DoxyCodeLine{00382\ \ \ \ \ \textcolor{keywordflow}{if}\ (d\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}field"{}})\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}sqrt"{}}))\ \mbox{\hyperlink{bench_8h_aabcd2ce2b43c96bd396b30f8ecb79a17}{run\_benchmark}}(\textcolor{stringliteral}{"{}field\_sqrt"{}},\ \mbox{\hyperlink{bench__internal_8c_a5efa51c0544e48a43feab4043a7d4f5c}{bench\_field\_sqrt}},\ \mbox{\hyperlink{bench__internal_8c_af48be8297385d0d32de62ae12a07d55c}{bench\_setup}},\ NULL,\ \&data,\ 10,\ iters);}
+\DoxyCodeLine{00383\ }
+\DoxyCodeLine{00384\ \ \ \ \ \textcolor{keywordflow}{if}\ (d\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}group"{}})\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}double"{}}))\ \mbox{\hyperlink{bench_8h_aabcd2ce2b43c96bd396b30f8ecb79a17}{run\_benchmark}}(\textcolor{stringliteral}{"{}group\_double\_var"{}},\ \mbox{\hyperlink{bench__internal_8c_a887476872a0b727d1671084490f89578}{bench\_group\_double\_var}},\ \mbox{\hyperlink{bench__internal_8c_af48be8297385d0d32de62ae12a07d55c}{bench\_setup}},\ NULL,\ \&data,\ 10,\ iters*10);}
+\DoxyCodeLine{00385\ \ \ \ \ \textcolor{keywordflow}{if}\ (d\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}group"{}})\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}add"{}}))\ \mbox{\hyperlink{bench_8h_aabcd2ce2b43c96bd396b30f8ecb79a17}{run\_benchmark}}(\textcolor{stringliteral}{"{}group\_add\_var"{}},\ \mbox{\hyperlink{bench__internal_8c_af1a40af02b96e164c23eeea7b634f1d1}{bench\_group\_add\_var}},\ \mbox{\hyperlink{bench__internal_8c_af48be8297385d0d32de62ae12a07d55c}{bench\_setup}},\ NULL,\ \&data,\ 10,\ iters*10);}
+\DoxyCodeLine{00386\ \ \ \ \ \textcolor{keywordflow}{if}\ (d\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}group"{}})\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}add"{}}))\ \mbox{\hyperlink{bench_8h_aabcd2ce2b43c96bd396b30f8ecb79a17}{run\_benchmark}}(\textcolor{stringliteral}{"{}group\_add\_affine"{}},\ \mbox{\hyperlink{bench__internal_8c_affa999cc5f63702c1f53765ab46cc117}{bench\_group\_add\_affine}},\ \mbox{\hyperlink{bench__internal_8c_af48be8297385d0d32de62ae12a07d55c}{bench\_setup}},\ NULL,\ \&data,\ 10,\ iters*10);}
+\DoxyCodeLine{00387\ \ \ \ \ \textcolor{keywordflow}{if}\ (d\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}group"{}})\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}add"{}}))\ \mbox{\hyperlink{bench_8h_aabcd2ce2b43c96bd396b30f8ecb79a17}{run\_benchmark}}(\textcolor{stringliteral}{"{}group\_add\_affine\_var"{}},\ \mbox{\hyperlink{bench__internal_8c_acb0b5fd9926c372d22409e7e1b7e71b3}{bench\_group\_add\_affine\_var}},\ \mbox{\hyperlink{bench__internal_8c_af48be8297385d0d32de62ae12a07d55c}{bench\_setup}},\ NULL,\ \&data,\ 10,\ iters*10);}
+\DoxyCodeLine{00388\ \ \ \ \ \textcolor{keywordflow}{if}\ (d\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}group"{}})\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}add"{}}))\ \mbox{\hyperlink{bench_8h_aabcd2ce2b43c96bd396b30f8ecb79a17}{run\_benchmark}}(\textcolor{stringliteral}{"{}group\_add\_zinv\_var"{}},\ \mbox{\hyperlink{bench__internal_8c_a5253abd06655003b844b6d2e77d4de00}{bench\_group\_add\_zinv\_var}},\ \mbox{\hyperlink{bench__internal_8c_af48be8297385d0d32de62ae12a07d55c}{bench\_setup}},\ NULL,\ \&data,\ 10,\ iters*10);}
+\DoxyCodeLine{00389\ \ \ \ \ \textcolor{keywordflow}{if}\ (d\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}group"{}})\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}to\_affine"{}}))\ \mbox{\hyperlink{bench_8h_aabcd2ce2b43c96bd396b30f8ecb79a17}{run\_benchmark}}(\textcolor{stringliteral}{"{}group\_to\_affine\_var"{}},\ \mbox{\hyperlink{bench__internal_8c_ad463b42f2aae4241bc0ae94ce68dc360}{bench\_group\_to\_affine\_var}},\ \mbox{\hyperlink{bench__internal_8c_af48be8297385d0d32de62ae12a07d55c}{bench\_setup}},\ NULL,\ \&data,\ 10,\ iters);}
+\DoxyCodeLine{00390\ }
+\DoxyCodeLine{00391\ \ \ \ \ \textcolor{keywordflow}{if}\ (d\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}ecmult"{}})\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}wnaf"{}}))\ \mbox{\hyperlink{bench_8h_aabcd2ce2b43c96bd396b30f8ecb79a17}{run\_benchmark}}(\textcolor{stringliteral}{"{}wnaf\_const"{}},\ \mbox{\hyperlink{bench__internal_8c_a6ac3f05487330d9264d9b1e3546510a5}{bench\_wnaf\_const}},\ \mbox{\hyperlink{bench__internal_8c_af48be8297385d0d32de62ae12a07d55c}{bench\_setup}},\ NULL,\ \&data,\ 10,\ iters);}
+\DoxyCodeLine{00392\ \ \ \ \ \textcolor{keywordflow}{if}\ (d\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}ecmult"{}})\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}wnaf"{}}))\ \mbox{\hyperlink{bench_8h_aabcd2ce2b43c96bd396b30f8ecb79a17}{run\_benchmark}}(\textcolor{stringliteral}{"{}ecmult\_wnaf"{}},\ \mbox{\hyperlink{bench__internal_8c_a7e5c6fef6192183026ea27acd2d13c1e}{bench\_ecmult\_wnaf}},\ \mbox{\hyperlink{bench__internal_8c_af48be8297385d0d32de62ae12a07d55c}{bench\_setup}},\ NULL,\ \&data,\ 10,\ iters);}
+\DoxyCodeLine{00393\ }
+\DoxyCodeLine{00394\ \ \ \ \ \textcolor{keywordflow}{if}\ (d\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}hash"{}})\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}sha256"{}}))\ \mbox{\hyperlink{bench_8h_aabcd2ce2b43c96bd396b30f8ecb79a17}{run\_benchmark}}(\textcolor{stringliteral}{"{}hash\_sha256"{}},\ \mbox{\hyperlink{bench__internal_8c_a2dc044b23a1f1ea062e64f7dc6beb4dc}{bench\_sha256}},\ \mbox{\hyperlink{bench__internal_8c_af48be8297385d0d32de62ae12a07d55c}{bench\_setup}},\ NULL,\ \&data,\ 10,\ iters);}
+\DoxyCodeLine{00395\ \ \ \ \ \textcolor{keywordflow}{if}\ (d\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}hash"{}})\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}hmac"{}}))\ \mbox{\hyperlink{bench_8h_aabcd2ce2b43c96bd396b30f8ecb79a17}{run\_benchmark}}(\textcolor{stringliteral}{"{}hash\_hmac\_sha256"{}},\ \mbox{\hyperlink{bench__internal_8c_a3e9eb770c7cc8c97c387ea2a6b42e878}{bench\_hmac\_sha256}},\ \mbox{\hyperlink{bench__internal_8c_af48be8297385d0d32de62ae12a07d55c}{bench\_setup}},\ NULL,\ \&data,\ 10,\ iters);}
+\DoxyCodeLine{00396\ \ \ \ \ \textcolor{keywordflow}{if}\ (d\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}hash"{}})\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}rng6979"{}}))\ \mbox{\hyperlink{bench_8h_aabcd2ce2b43c96bd396b30f8ecb79a17}{run\_benchmark}}(\textcolor{stringliteral}{"{}hash\_rfc6979\_hmac\_sha256"{}},\ \mbox{\hyperlink{bench__internal_8c_ae45bdeae3f283fe0104bcf7c8556d3c4}{bench\_rfc6979\_hmac\_sha256}},\ \mbox{\hyperlink{bench__internal_8c_af48be8297385d0d32de62ae12a07d55c}{bench\_setup}},\ NULL,\ \&data,\ 10,\ iters);}
+\DoxyCodeLine{00397\ }
+\DoxyCodeLine{00398\ \ \ \ \ \textcolor{keywordflow}{if}\ (d\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}context"{}})\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}verify"{}}))\ \mbox{\hyperlink{bench_8h_aabcd2ce2b43c96bd396b30f8ecb79a17}{run\_benchmark}}(\textcolor{stringliteral}{"{}context\_verify"{}},\ \mbox{\hyperlink{bench__internal_8c_a5fd532e76da99665c019c411f2f28358}{bench\_context\_verify}},\ \mbox{\hyperlink{bench__internal_8c_af48be8297385d0d32de62ae12a07d55c}{bench\_setup}},\ NULL,\ \&data,\ 10,\ 1\ +\ iters/1000);}
+\DoxyCodeLine{00399\ \ \ \ \ \textcolor{keywordflow}{if}\ (d\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}context"{}})\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}sign"{}}))\ \mbox{\hyperlink{bench_8h_aabcd2ce2b43c96bd396b30f8ecb79a17}{run\_benchmark}}(\textcolor{stringliteral}{"{}context\_sign"{}},\ \mbox{\hyperlink{bench__internal_8c_aaf1bdd31c8df55e1b97c10968c5a511f}{bench\_context\_sign}},\ \mbox{\hyperlink{bench__internal_8c_af48be8297385d0d32de62ae12a07d55c}{bench\_setup}},\ NULL,\ \&data,\ 10,\ 1\ +\ iters/100);}
+\DoxyCodeLine{00400\ }
+\DoxyCodeLine{00401\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00402\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{bench__internal_8c_a3c04138a5bfe5d72780bb7e82a18e627_cgraph}
+\end{center}
+\end{figure}

@@ -1,0 +1,268 @@
+\doxysection{add\+\_\+file\+\_\+system\+\_\+fixture Struct Reference}
+\hypertarget{structadd__file__system__fixture}{}\label{structadd__file__system__fixture}\index{add\_file\_system\_fixture@{add\_file\_system\_fixture}}
+
+
+Collaboration diagram for add\+\_\+file\+\_\+system\+\_\+fixture\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=208pt]{structadd__file__system__fixture__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structadd__file__system__fixture_1_1mock__space__provider}{mock\+\_\+space\+\_\+provider}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{structadd__file__system__fixture_ab75f739ca053d929e33d8a8e81aba01f}{file\+\_\+space\+\_\+handler\+\_\+t}} = \mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler}{file\+\_\+space\+\_\+handler}}$<$\mbox{\hyperlink{structadd__file__system__fixture_1_1mock__space__provider}{mock\+\_\+space\+\_\+provider}}$>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structadd__file__system__fixture_a4b575163560e563f57355e2b80af525d}{add\+\_\+file\+\_\+system\+\_\+fixture}} ()
+\item 
+void \mbox{\hyperlink{structadd__file__system__fixture_a410690d2dfbe7f640f3902326882af60}{add\+\_\+file\+\_\+system}} (const bfs\+::path \&path\+\_\+name)
+\item 
+void \mbox{\hyperlink{structadd__file__system__fixture_ae19ded7eca79c67b4e73e41ebf9db06c}{set\+\_\+threshold}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} threshold, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} warning\+\_\+threshold)
+\item 
+bool \mbox{\hyperlink{structadd__file__system__fixture_a4ed12f206a71e60bf983a91ebe159496}{is\+\_\+threshold\+\_\+exceeded}} ()
+\item 
+void \mbox{\hyperlink{structadd__file__system__fixture_a4ba2fd51e1f8dbf032aef91f987a1dfd}{test\+\_\+add\+\_\+file\+\_\+systems\+\_\+common}} (std\+::vector$<$ int $>$ \&capacity, std\+::vector$<$ int $>$ \&available, std\+::vector$<$ int $>$ \&devs)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+boost\+::asio\+::io\+\_\+context \mbox{\hyperlink{structadd__file__system__fixture_aaae84593e2fc4d0c96709e0c1651a873}{ctx}}
+\item 
+std\+::function$<$ bfs\+::space\+\_\+info(const bfs\+::path \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}, boost\+::system\+::error\+\_\+code \&ec)$>$ \mbox{\hyperlink{structadd__file__system__fixture_af0f7966e4f194202fd1f1dacb7f79079}{mock\+\_\+get\+\_\+space}}
+\item 
+std\+::function$<$ int(const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{classfc_1_1path}{path}}, struct stat \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}})$>$ \mbox{\hyperlink{structadd__file__system__fixture_a90132ac8f5e384fe92aad5e1471804c5}{mock\+\_\+get\+\_\+stat}}
+\item 
+\mbox{\hyperlink{structadd__file__system__fixture_ab75f739ca053d929e33d8a8e81aba01f}{file\+\_\+space\+\_\+handler\+\_\+t}} \mbox{\hyperlink{structadd__file__system__fixture_a0750fe3c766f6be00166c6875727e31f}{space\+\_\+handler}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{test__add__file__system_8cpp_source_l00012}{12}} of file \mbox{\hyperlink{test__add__file__system_8cpp_source}{test\+\_\+add\+\_\+file\+\_\+system.\+cpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{structadd__file__system__fixture_ab75f739ca053d929e33d8a8e81aba01f}\index{add\_file\_system\_fixture@{add\_file\_system\_fixture}!file\_space\_handler\_t@{file\_space\_handler\_t}}
+\index{file\_space\_handler\_t@{file\_space\_handler\_t}!add\_file\_system\_fixture@{add\_file\_system\_fixture}}
+\doxysubsubsection{\texorpdfstring{file\_space\_handler\_t}{file\_space\_handler\_t}}
+{\footnotesize\ttfamily \label{structadd__file__system__fixture_ab75f739ca053d929e33d8a8e81aba01f} 
+using \mbox{\hyperlink{structadd__file__system__fixture_ab75f739ca053d929e33d8a8e81aba01f}{add\+\_\+file\+\_\+system\+\_\+fixture\+::file\+\_\+space\+\_\+handler\+\_\+t}} = \mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler}{file\+\_\+space\+\_\+handler}}$<$\mbox{\hyperlink{structadd__file__system__fixture_1_1mock__space__provider}{mock\+\_\+space\+\_\+provider}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{test__add__file__system_8cpp_source_l00031}{31}} of file \mbox{\hyperlink{test__add__file__system_8cpp_source}{test\+\_\+add\+\_\+file\+\_\+system.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structadd__file__system__fixture_a4b575163560e563f57355e2b80af525d}\index{add\_file\_system\_fixture@{add\_file\_system\_fixture}!add\_file\_system\_fixture@{add\_file\_system\_fixture}}
+\index{add\_file\_system\_fixture@{add\_file\_system\_fixture}!add\_file\_system\_fixture@{add\_file\_system\_fixture}}
+\doxysubsubsection{\texorpdfstring{add\_file\_system\_fixture()}{add\_file\_system\_fixture()}}
+{\footnotesize\ttfamily \label{structadd__file__system__fixture_a4b575163560e563f57355e2b80af525d} 
+add\+\_\+file\+\_\+system\+\_\+fixture\+::add\+\_\+file\+\_\+system\+\_\+fixture (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{test__add__file__system_8cpp_source_l00032}{32}} of file \mbox{\hyperlink{test__add__file__system_8cpp_source}{test\+\_\+add\+\_\+file\+\_\+system.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00033\ \ \ \ :\ \mbox{\hyperlink{structadd__file__system__fixture_a0750fe3c766f6be00166c6875727e31f}{space\_handler}}(mock\_space\_provider(*\textcolor{keyword}{this}),\ \mbox{\hyperlink{structadd__file__system__fixture_aaae84593e2fc4d0c96709e0c1651a873}{ctx}})}
+\DoxyCodeLine{00034\ \ \ \ \{}
+\DoxyCodeLine{00035\ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structadd__file__system__fixture_a410690d2dfbe7f640f3902326882af60}\index{add\_file\_system\_fixture@{add\_file\_system\_fixture}!add\_file\_system@{add\_file\_system}}
+\index{add\_file\_system@{add\_file\_system}!add\_file\_system\_fixture@{add\_file\_system\_fixture}}
+\doxysubsubsection{\texorpdfstring{add\_file\_system()}{add\_file\_system()}}
+{\footnotesize\ttfamily \label{structadd__file__system__fixture_a410690d2dfbe7f640f3902326882af60} 
+void add\+\_\+file\+\_\+system\+\_\+fixture\+::add\+\_\+file\+\_\+system (\begin{DoxyParamCaption}\item[{const bfs\+::path \&}]{path\+\_\+name}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{test__add__file__system_8cpp_source_l00037}{37}} of file \mbox{\hyperlink{test__add__file__system_8cpp_source}{test\+\_\+add\+\_\+file\+\_\+system.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \mbox{\hyperlink{structadd__file__system__fixture_a0750fe3c766f6be00166c6875727e31f}{space\_handler}}.\mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler_a6a5e01f3f35cab4c846640e060b91b63}{add\_file\_system}}(path\_name);}
+\DoxyCodeLine{00039\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structadd__file__system__fixture_a410690d2dfbe7f640f3902326882af60_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structadd__file__system__fixture_a410690d2dfbe7f640f3902326882af60_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structadd__file__system__fixture_a4ed12f206a71e60bf983a91ebe159496}\index{add\_file\_system\_fixture@{add\_file\_system\_fixture}!is\_threshold\_exceeded@{is\_threshold\_exceeded}}
+\index{is\_threshold\_exceeded@{is\_threshold\_exceeded}!add\_file\_system\_fixture@{add\_file\_system\_fixture}}
+\doxysubsubsection{\texorpdfstring{is\_threshold\_exceeded()}{is\_threshold\_exceeded()}}
+{\footnotesize\ttfamily \label{structadd__file__system__fixture_a4ed12f206a71e60bf983a91ebe159496} 
+bool add\+\_\+file\+\_\+system\+\_\+fixture\+::is\+\_\+threshold\+\_\+exceeded (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{test__add__file__system_8cpp_source_l00045}{45}} of file \mbox{\hyperlink{test__add__file__system_8cpp_source}{test\+\_\+add\+\_\+file\+\_\+system.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structadd__file__system__fixture_a0750fe3c766f6be00166c6875727e31f}{space\_handler}}.\mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler_a3571fc8484a45f62857dcbe29d73aa28}{is\_threshold\_exceeded}}();}
+\DoxyCodeLine{00047\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structadd__file__system__fixture_a4ed12f206a71e60bf983a91ebe159496_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structadd__file__system__fixture_ae19ded7eca79c67b4e73e41ebf9db06c}\index{add\_file\_system\_fixture@{add\_file\_system\_fixture}!set\_threshold@{set\_threshold}}
+\index{set\_threshold@{set\_threshold}!add\_file\_system\_fixture@{add\_file\_system\_fixture}}
+\doxysubsubsection{\texorpdfstring{set\_threshold()}{set\_threshold()}}
+{\footnotesize\ttfamily \label{structadd__file__system__fixture_ae19ded7eca79c67b4e73e41ebf9db06c} 
+void add\+\_\+file\+\_\+system\+\_\+fixture\+::set\+\_\+threshold (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{threshold}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{warning\+\_\+threshold}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{test__add__file__system_8cpp_source_l00041}{41}} of file \mbox{\hyperlink{test__add__file__system_8cpp_source}{test\+\_\+add\+\_\+file\+\_\+system.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \mbox{\hyperlink{structadd__file__system__fixture_a0750fe3c766f6be00166c6875727e31f}{space\_handler}}.\mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler_a51eaff9443b1a88e06cbbd1344a78071}{set\_threshold}}(\ threshold,\ warning\_threshold\ );}
+\DoxyCodeLine{00043\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structadd__file__system__fixture_ae19ded7eca79c67b4e73e41ebf9db06c_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structadd__file__system__fixture_ae19ded7eca79c67b4e73e41ebf9db06c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structadd__file__system__fixture_a4ba2fd51e1f8dbf032aef91f987a1dfd}\index{add\_file\_system\_fixture@{add\_file\_system\_fixture}!test\_add\_file\_systems\_common@{test\_add\_file\_systems\_common}}
+\index{test\_add\_file\_systems\_common@{test\_add\_file\_systems\_common}!add\_file\_system\_fixture@{add\_file\_system\_fixture}}
+\doxysubsubsection{\texorpdfstring{test\_add\_file\_systems\_common()}{test\_add\_file\_systems\_common()}}
+{\footnotesize\ttfamily \label{structadd__file__system__fixture_a4ba2fd51e1f8dbf032aef91f987a1dfd} 
+void add\+\_\+file\+\_\+system\+\_\+fixture\+::test\+\_\+add\+\_\+file\+\_\+systems\+\_\+common (\begin{DoxyParamCaption}\item[{std\+::vector$<$ int $>$ \&}]{capacity}{, }\item[{std\+::vector$<$ int $>$ \&}]{available}{, }\item[{std\+::vector$<$ int $>$ \&}]{devs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{test__add__file__system_8cpp_source_l00049}{49}} of file \mbox{\hyperlink{test__add__file__system_8cpp_source}{test\+\_\+add\+\_\+file\+\_\+system.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \mbox{\hyperlink{structadd__file__system__fixture_af0f7966e4f194202fd1f1dacb7f79079}{mock\_get\_space}}\ =\ [\ i\ =\ 0,\ capacity,\ available\ ](\ \textcolor{keyword}{const}\ bfs::path\&\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\ boost::system::error\_code\&\ ec)\ \textcolor{keyword}{mutable}\ -\/>\ bfs::space\_info\ \{}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ ec\ =\ boost::system::errc::make\_error\_code(errc::success);}
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ bfs::space\_info\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}};}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}}.capacity\ \ =\ capacity[i];}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}}.available\ =\ available[i];}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ i++;}
+\DoxyCodeLine{00057\ }
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}};}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00060\ }
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \mbox{\hyperlink{structadd__file__system__fixture_a90132ac8f5e384fe92aad5e1471804c5}{mock\_get\_stat}}\ =\ [\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ =\ 0,\ devs\ ](\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{classfc_1_1path}{path}},\ \textcolor{keyword}{struct\ }stat\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}\ )\ \textcolor{keyword}{mutable}\ -\/>\ \textcolor{keywordtype}{int}\ \{}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}-\/>st\_dev\ =\ devs[\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}];}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}++;}
+\DoxyCodeLine{00064\ }
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00067\ }
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \mbox{\hyperlink{structadd__file__system__fixture_ae19ded7eca79c67b4e73e41ebf9db06c}{set\_threshold}}(80,\ 75);}
+\DoxyCodeLine{00069\ }
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ k\ =\ 0;\ k\ <\ capacity.size();\ k++)\ \{}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structadd__file__system__fixture_a410690d2dfbe7f640f3902326882af60}{add\_file\_system}}(\textcolor{stringliteral}{"{}/test"{}}\ +\ std::to\_string(k));}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00073\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structadd__file__system__fixture_a4ba2fd51e1f8dbf032aef91f987a1dfd_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structadd__file__system__fixture_aaae84593e2fc4d0c96709e0c1651a873}\index{add\_file\_system\_fixture@{add\_file\_system\_fixture}!ctx@{ctx}}
+\index{ctx@{ctx}!add\_file\_system\_fixture@{add\_file\_system\_fixture}}
+\doxysubsubsection{\texorpdfstring{ctx}{ctx}}
+{\footnotesize\ttfamily \label{structadd__file__system__fixture_aaae84593e2fc4d0c96709e0c1651a873} 
+boost\+::asio\+::io\+\_\+context add\+\_\+file\+\_\+system\+\_\+fixture\+::ctx}
+
+
+
+Definition at line \mbox{\hyperlink{test__add__file__system_8cpp_source_l00029}{29}} of file \mbox{\hyperlink{test__add__file__system_8cpp_source}{test\+\_\+add\+\_\+file\+\_\+system.\+cpp}}.
+
+\Hypertarget{structadd__file__system__fixture_af0f7966e4f194202fd1f1dacb7f79079}\index{add\_file\_system\_fixture@{add\_file\_system\_fixture}!mock\_get\_space@{mock\_get\_space}}
+\index{mock\_get\_space@{mock\_get\_space}!add\_file\_system\_fixture@{add\_file\_system\_fixture}}
+\doxysubsubsection{\texorpdfstring{mock\_get\_space}{mock\_get\_space}}
+{\footnotesize\ttfamily \label{structadd__file__system__fixture_af0f7966e4f194202fd1f1dacb7f79079} 
+std\+::function$<$bfs\+::space\+\_\+info(const bfs\+::path\& \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}, boost\+::system\+::error\+\_\+code\& ec)$>$ add\+\_\+file\+\_\+system\+\_\+fixture\+::mock\+\_\+get\+\_\+space}
+
+
+
+Definition at line \mbox{\hyperlink{test__add__file__system_8cpp_source_l00076}{76}} of file \mbox{\hyperlink{test__add__file__system_8cpp_source}{test\+\_\+add\+\_\+file\+\_\+system.\+cpp}}.
+
+\Hypertarget{structadd__file__system__fixture_a90132ac8f5e384fe92aad5e1471804c5}\index{add\_file\_system\_fixture@{add\_file\_system\_fixture}!mock\_get\_stat@{mock\_get\_stat}}
+\index{mock\_get\_stat@{mock\_get\_stat}!add\_file\_system\_fixture@{add\_file\_system\_fixture}}
+\doxysubsubsection{\texorpdfstring{mock\_get\_stat}{mock\_get\_stat}}
+{\footnotesize\ttfamily \label{structadd__file__system__fixture_a90132ac8f5e384fe92aad5e1471804c5} 
+std\+::function$<$int(const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{classfc_1_1path}{path}}, struct stat \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}})$>$ add\+\_\+file\+\_\+system\+\_\+fixture\+::mock\+\_\+get\+\_\+stat}
+
+
+
+Definition at line \mbox{\hyperlink{test__add__file__system_8cpp_source_l00077}{77}} of file \mbox{\hyperlink{test__add__file__system_8cpp_source}{test\+\_\+add\+\_\+file\+\_\+system.\+cpp}}.
+
+\Hypertarget{structadd__file__system__fixture_a0750fe3c766f6be00166c6875727e31f}\index{add\_file\_system\_fixture@{add\_file\_system\_fixture}!space\_handler@{space\_handler}}
+\index{space\_handler@{space\_handler}!add\_file\_system\_fixture@{add\_file\_system\_fixture}}
+\doxysubsubsection{\texorpdfstring{space\_handler}{space\_handler}}
+{\footnotesize\ttfamily \label{structadd__file__system__fixture_a0750fe3c766f6be00166c6875727e31f} 
+\mbox{\hyperlink{structadd__file__system__fixture_ab75f739ca053d929e33d8a8e81aba01f}{file\+\_\+space\+\_\+handler\+\_\+t}} add\+\_\+file\+\_\+system\+\_\+fixture\+::space\+\_\+handler}
+
+
+
+Definition at line \mbox{\hyperlink{test__add__file__system_8cpp_source_l00079}{79}} of file \mbox{\hyperlink{test__add__file__system_8cpp_source}{test\+\_\+add\+\_\+file\+\_\+system.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+plugins/resource\+\_\+monitor\+\_\+plugin/test/\mbox{\hyperlink{test__add__file__system_8cpp}{test\+\_\+add\+\_\+file\+\_\+system.\+cpp}}\end{DoxyCompactItemize}

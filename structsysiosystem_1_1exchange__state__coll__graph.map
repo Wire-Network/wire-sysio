@@ -1,0 +1,12 @@
+<map id="sysiosystem::exchange_state" name="sysiosystem::exchange_state">
+<area shape="rect" id="Node000001" title=" " alt="" coords="69,288,229,328"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1asset.html" title=" " alt="" coords="135,80,267,106"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="201,122,197,146,177,225,158,288,153,287,172,224,192,144,195,121"/>
+<area shape="rect" id="Node000004" href="$structsysiosystem_1_1exchange__state_1_1connector.html" title=" " alt="" coords="5,169,165,210"/>
+<area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="169,117,147,132,105,171,101,167,144,128,166,112"/>
+<area shape="rect" id="Node000003" href="$structfc_1_1reflect__init.html" title=" " alt="" coords="151,5,251,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="204,46,204,80,198,80,198,46"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="105,222,141,286,136,288,101,224"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="41,80,100,106"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="73,121,75,145,81,168,76,169,70,145,68,122"/>
+</map>

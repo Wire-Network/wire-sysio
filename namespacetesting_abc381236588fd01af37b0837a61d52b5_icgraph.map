@@ -1,0 +1,9 @@
+<map id="testing::ByRef" name="testing::ByRef">
+<area shape="rect" id="Node000001" title=" " alt="" coords="225,78,330,104"/>
+<area shape="rect" id="Node000002" href="$namespacetesting_1_1gmock__generated__actions__test.html#accb544431629bfb38a618343daaa54c2" title=" " alt="" coords="5,5,177,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="223,75,150,49,152,44,225,70"/>
+<area shape="rect" id="Node000003" href="$namespacetesting_1_1gmock__matchers__test.html#aab82f120c70dc7d8bc2fd74ac6897486" title=" " alt="" coords="7,71,175,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="209,94,176,94,176,88,209,88"/>
+<area shape="rect" id="Node000004" href="$namespacetesting_1_1gmock__matchers__test.html#a5ed7b822889a34f018c2ba8f21941fd4" title=" " alt="" coords="7,136,175,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="225,112,152,138,150,133,223,107"/>
+</map>

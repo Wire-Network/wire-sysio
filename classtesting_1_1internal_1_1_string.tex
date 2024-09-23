@@ -1,0 +1,330 @@
+\doxysection{testing\+::internal\+::String Class Reference}
+\hypertarget{classtesting_1_1internal_1_1_string}{}\label{classtesting_1_1internal_1_1_string}\index{testing::internal::String@{testing::internal::String}}
+
+
+{\ttfamily \#include $<$gtest-\/string.\+h$>$}
+
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classtesting_1_1internal_1_1_string_aea55761bd8e9ff8e3cbad262ac983d9b}{Clone\+CString}} (const char \texorpdfstring{$\ast$}{*}c\+\_\+str)
+\item 
+static bool \mbox{\hyperlink{classtesting_1_1internal_1_1_string_a8bea7b33e7effbd299a0b4a5522ea96e}{CString\+Equals}} (const char \texorpdfstring{$\ast$}{*}lhs, const char \texorpdfstring{$\ast$}{*}rhs)
+\item 
+static std\+::string \mbox{\hyperlink{classtesting_1_1internal_1_1_string_aaf7e376ff580677ea4954d5913d5b917}{Show\+Wide\+CString}} (const wchar\+\_\+t \texorpdfstring{$\ast$}{*}wide\+\_\+c\+\_\+str)
+\item 
+static bool \mbox{\hyperlink{classtesting_1_1internal_1_1_string_ab0373bf6e96453d6ca0de2e68df13d3a}{Wide\+CString\+Equals}} (const wchar\+\_\+t \texorpdfstring{$\ast$}{*}lhs, const wchar\+\_\+t \texorpdfstring{$\ast$}{*}rhs)
+\item 
+static bool \mbox{\hyperlink{classtesting_1_1internal_1_1_string_a116ca435d63306927ba19f90a3596787}{Case\+Insensitive\+CString\+Equals}} (const char \texorpdfstring{$\ast$}{*}lhs, const char \texorpdfstring{$\ast$}{*}rhs)
+\item 
+static bool \mbox{\hyperlink{classtesting_1_1internal_1_1_string_a1f12d1780ca7afbf8975f5d425b9f362}{Case\+Insensitive\+Wide\+CString\+Equals}} (const wchar\+\_\+t \texorpdfstring{$\ast$}{*}lhs, const wchar\+\_\+t \texorpdfstring{$\ast$}{*}rhs)
+\item 
+static bool \mbox{\hyperlink{classtesting_1_1internal_1_1_string_a968f242b709f8c7c0ed5ecf246553321}{Ends\+With\+Case\+Insensitive}} (const std\+::string \&str, const std\+::string \&suffix)
+\item 
+static std\+::string \mbox{\hyperlink{classtesting_1_1internal_1_1_string_af50b18d588355871e1982c4043523e0f}{Format\+Int\+Width2}} (int \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+static std\+::string \mbox{\hyperlink{classtesting_1_1internal_1_1_string_affe59102e49092fc0684388e9b0c5c1e}{Format\+Hex\+Int}} (int \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+static std\+::string \mbox{\hyperlink{classtesting_1_1internal_1_1_string_af702dc7cbd569589d8e3ff215a7cafa9}{Format\+Byte}} (unsigned char \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{gtest-string_8h_source_l00058}{58}} of file \mbox{\hyperlink{gtest-string_8h_source}{gtest-\/string.\+h}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_string_a116ca435d63306927ba19f90a3596787}\index{testing::internal::String@{testing::internal::String}!CaseInsensitiveCStringEquals@{CaseInsensitiveCStringEquals}}
+\index{CaseInsensitiveCStringEquals@{CaseInsensitiveCStringEquals}!testing::internal::String@{testing::internal::String}}
+\doxysubsubsection{\texorpdfstring{CaseInsensitiveCStringEquals()}{CaseInsensitiveCStringEquals()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_string_a116ca435d63306927ba19f90a3596787} 
+bool testing\+::internal\+::\+String\+::\+Case\+Insensitive\+CString\+Equals (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{lhs}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{rhs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8cc_source_l01920}{1920}} of file \mbox{\hyperlink{gtest_8cc_source}{gtest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01920\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01921\ \ \ \textcolor{keywordflow}{if}\ (lhs\ ==\ NULL)}
+\DoxyCodeLine{01922\ \ \ \ \ \textcolor{keywordflow}{return}\ rhs\ ==\ NULL;}
+\DoxyCodeLine{01923\ \ \ \textcolor{keywordflow}{if}\ (rhs\ ==\ NULL)}
+\DoxyCodeLine{01924\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{01925\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetesting_1_1internal_1_1posix_a1ef2385a7f8e4c706054da35967e76bd}{posix::StrCaseCmp}}(lhs,\ rhs)\ ==\ 0;}
+\DoxyCodeLine{01926\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_string_a116ca435d63306927ba19f90a3596787_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_string_a116ca435d63306927ba19f90a3596787_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_string_a1f12d1780ca7afbf8975f5d425b9f362}\index{testing::internal::String@{testing::internal::String}!CaseInsensitiveWideCStringEquals@{CaseInsensitiveWideCStringEquals}}
+\index{CaseInsensitiveWideCStringEquals@{CaseInsensitiveWideCStringEquals}!testing::internal::String@{testing::internal::String}}
+\doxysubsubsection{\texorpdfstring{CaseInsensitiveWideCStringEquals()}{CaseInsensitiveWideCStringEquals()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_string_a1f12d1780ca7afbf8975f5d425b9f362} 
+bool testing\+::internal\+::\+String\+::\+Case\+Insensitive\+Wide\+CString\+Equals (\begin{DoxyParamCaption}\item[{const wchar\+\_\+t \texorpdfstring{$\ast$}{*}}]{lhs}{, }\item[{const wchar\+\_\+t \texorpdfstring{$\ast$}{*}}]{rhs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8cc_source_l01940}{1940}} of file \mbox{\hyperlink{gtest_8cc_source}{gtest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01941\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01942\ \ \ \textcolor{keywordflow}{if}\ (lhs\ ==\ NULL)\ \textcolor{keywordflow}{return}\ rhs\ ==\ NULL;}
+\DoxyCodeLine{01943\ }
+\DoxyCodeLine{01944\ \ \ \textcolor{keywordflow}{if}\ (rhs\ ==\ NULL)\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{01945\ }
+\DoxyCodeLine{01946\ \textcolor{preprocessor}{\#if\ GTEST\_OS\_WINDOWS}}
+\DoxyCodeLine{01947\ \ \ \textcolor{keywordflow}{return}\ \_wcsicmp(lhs,\ rhs)\ ==\ 0;}
+\DoxyCodeLine{01948\ \textcolor{preprocessor}{\#elif\ GTEST\_OS\_LINUX\ \&\&\ !GTEST\_OS\_LINUX\_ANDROID}}
+\DoxyCodeLine{01949\ \ \ \textcolor{keywordflow}{return}\ wcscasecmp(lhs,\ rhs)\ ==\ 0;}
+\DoxyCodeLine{01950\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{01951\ \ \ \textcolor{comment}{//\ Android,\ Mac\ OS\ X\ and\ Cygwin\ don't\ define\ wcscasecmp.}}
+\DoxyCodeLine{01952\ \ \ \textcolor{comment}{//\ Other\ unknown\ OSes\ may\ not\ define\ it\ either.}}
+\DoxyCodeLine{01953\ \ \ wint\_t\ left,\ right;}
+\DoxyCodeLine{01954\ \ \ \textcolor{keywordflow}{do}\ \{}
+\DoxyCodeLine{01955\ \ \ \ \ left\ =\ towlower(*lhs++);}
+\DoxyCodeLine{01956\ \ \ \ \ right\ =\ towlower(*rhs++);}
+\DoxyCodeLine{01957\ \ \ \}\ \textcolor{keywordflow}{while}\ (left\ \&\&\ left\ ==\ right);}
+\DoxyCodeLine{01958\ \ \ \textcolor{keywordflow}{return}\ left\ ==\ right;}
+\DoxyCodeLine{01959\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ OS\ selector}}
+\DoxyCodeLine{01960\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_string_a1f12d1780ca7afbf8975f5d425b9f362_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_string_aea55761bd8e9ff8e3cbad262ac983d9b}\index{testing::internal::String@{testing::internal::String}!CloneCString@{CloneCString}}
+\index{CloneCString@{CloneCString}!testing::internal::String@{testing::internal::String}}
+\doxysubsubsection{\texorpdfstring{CloneCString()}{CloneCString()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_string_aea55761bd8e9ff8e3cbad262ac983d9b} 
+static const char \texorpdfstring{$\ast$}{*} testing\+::internal\+::\+String\+::\+Clone\+CString (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{c\+\_\+str}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_string_aea55761bd8e9ff8e3cbad262ac983d9b_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_string_a8bea7b33e7effbd299a0b4a5522ea96e}\index{testing::internal::String@{testing::internal::String}!CStringEquals@{CStringEquals}}
+\index{CStringEquals@{CStringEquals}!testing::internal::String@{testing::internal::String}}
+\doxysubsubsection{\texorpdfstring{CStringEquals()}{CStringEquals()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_string_a8bea7b33e7effbd299a0b4a5522ea96e} 
+bool testing\+::internal\+::\+String\+::\+CString\+Equals (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{lhs}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{rhs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8cc_source_l00908}{908}} of file \mbox{\hyperlink{gtest_8cc_source}{gtest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00908\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00909\ \ \ \textcolor{keywordflow}{if}\ (\ lhs\ ==\ NULL\ )\ \textcolor{keywordflow}{return}\ rhs\ ==\ NULL;}
+\DoxyCodeLine{00910\ }
+\DoxyCodeLine{00911\ \ \ \textcolor{keywordflow}{if}\ (\ rhs\ ==\ NULL\ )\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00912\ }
+\DoxyCodeLine{00913\ \ \ \textcolor{keywordflow}{return}\ strcmp(lhs,\ rhs)\ ==\ 0;}
+\DoxyCodeLine{00914\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_string_a8bea7b33e7effbd299a0b4a5522ea96e_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_string_a968f242b709f8c7c0ed5ecf246553321}\index{testing::internal::String@{testing::internal::String}!EndsWithCaseInsensitive@{EndsWithCaseInsensitive}}
+\index{EndsWithCaseInsensitive@{EndsWithCaseInsensitive}!testing::internal::String@{testing::internal::String}}
+\doxysubsubsection{\texorpdfstring{EndsWithCaseInsensitive()}{EndsWithCaseInsensitive()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_string_a968f242b709f8c7c0ed5ecf246553321} 
+bool testing\+::internal\+::\+String\+::\+Ends\+With\+Case\+Insensitive (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{str}{, }\item[{const std\+::string \&}]{suffix}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8cc_source_l01964}{1964}} of file \mbox{\hyperlink{gtest_8cc_source}{gtest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01965\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01966\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ str\_len\ =\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}.length();}
+\DoxyCodeLine{01967\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ suffix\_len\ =\ suffix.length();}
+\DoxyCodeLine{01968\ \ \ \textcolor{keywordflow}{return}\ (str\_len\ >=\ suffix\_len)\ \&\&}
+\DoxyCodeLine{01969\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_string_a116ca435d63306927ba19f90a3596787}{CaseInsensitiveCStringEquals}}(\mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}.c\_str()\ +\ str\_len\ -\/\ suffix\_len,}
+\DoxyCodeLine{01970\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ suffix.c\_str());}
+\DoxyCodeLine{01971\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_string_a968f242b709f8c7c0ed5ecf246553321_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_string_a968f242b709f8c7c0ed5ecf246553321_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_string_af702dc7cbd569589d8e3ff215a7cafa9}\index{testing::internal::String@{testing::internal::String}!FormatByte@{FormatByte}}
+\index{FormatByte@{FormatByte}!testing::internal::String@{testing::internal::String}}
+\doxysubsubsection{\texorpdfstring{FormatByte()}{FormatByte()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_string_af702dc7cbd569589d8e3ff215a7cafa9} 
+std\+::string testing\+::internal\+::\+String\+::\+Format\+Byte (\begin{DoxyParamCaption}\item[{unsigned char}]{value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8cc_source_l01988}{1988}} of file \mbox{\hyperlink{gtest_8cc_source}{gtest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01988\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01989\ \ \ std::stringstream\ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}};}
+\DoxyCodeLine{01990\ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}\ <<\ std::setfill(\textcolor{charliteral}{'0'})\ <<\ std::setw(2)\ <<\ std::hex\ <<\ std::uppercase}
+\DoxyCodeLine{01991\ \ \ \ \ \ <<\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\textcolor{keyword}{>}(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}});}
+\DoxyCodeLine{01992\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}.str();}
+\DoxyCodeLine{01993\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1internal_1_1_string_affe59102e49092fc0684388e9b0c5c1e}\index{testing::internal::String@{testing::internal::String}!FormatHexInt@{FormatHexInt}}
+\index{FormatHexInt@{FormatHexInt}!testing::internal::String@{testing::internal::String}}
+\doxysubsubsection{\texorpdfstring{FormatHexInt()}{FormatHexInt()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_string_affe59102e49092fc0684388e9b0c5c1e} 
+std\+::string testing\+::internal\+::\+String\+::\+Format\+Hex\+Int (\begin{DoxyParamCaption}\item[{int}]{value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8cc_source_l01981}{1981}} of file \mbox{\hyperlink{gtest_8cc_source}{gtest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01981\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01982\ \ \ std::stringstream\ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}};}
+\DoxyCodeLine{01983\ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}\ <<\ std::hex\ <<\ std::uppercase\ <<\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}};}
+\DoxyCodeLine{01984\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}.str();}
+\DoxyCodeLine{01985\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_string_affe59102e49092fc0684388e9b0c5c1e_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_string_af50b18d588355871e1982c4043523e0f}\index{testing::internal::String@{testing::internal::String}!FormatIntWidth2@{FormatIntWidth2}}
+\index{FormatIntWidth2@{FormatIntWidth2}!testing::internal::String@{testing::internal::String}}
+\doxysubsubsection{\texorpdfstring{FormatIntWidth2()}{FormatIntWidth2()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_string_af50b18d588355871e1982c4043523e0f} 
+std\+::string testing\+::internal\+::\+String\+::\+Format\+Int\+Width2 (\begin{DoxyParamCaption}\item[{int}]{value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8cc_source_l01974}{1974}} of file \mbox{\hyperlink{gtest_8cc_source}{gtest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01974\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01975\ \ \ std::stringstream\ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}};}
+\DoxyCodeLine{01976\ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}\ <<\ std::setfill(\textcolor{charliteral}{'0'})\ <<\ std::setw(2)\ <<\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}};}
+\DoxyCodeLine{01977\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}.str();}
+\DoxyCodeLine{01978\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_string_af50b18d588355871e1982c4043523e0f_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_string_aaf7e376ff580677ea4954d5913d5b917}\index{testing::internal::String@{testing::internal::String}!ShowWideCString@{ShowWideCString}}
+\index{ShowWideCString@{ShowWideCString}!testing::internal::String@{testing::internal::String}}
+\doxysubsubsection{\texorpdfstring{ShowWideCString()}{ShowWideCString()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_string_aaf7e376ff580677ea4954d5913d5b917} 
+std\+::string testing\+::internal\+::\+String\+::\+Show\+Wide\+CString (\begin{DoxyParamCaption}\item[{const wchar\+\_\+t \texorpdfstring{$\ast$}{*}}]{wide\+\_\+c\+\_\+str}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8cc_source_l01863}{1863}} of file \mbox{\hyperlink{gtest_8cc_source}{gtest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01863\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01864\ \ \ \textcolor{keywordflow}{if}\ (wide\_c\_str\ ==\ NULL)\ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}(null)"{}};}
+\DoxyCodeLine{01865\ }
+\DoxyCodeLine{01866\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetesting_1_1internal_a05b8c86ff38243f34d8f839a0eadefb1}{internal::WideStringToUtf8}}(wide\_c\_str,\ -\/1);}
+\DoxyCodeLine{01867\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_string_aaf7e376ff580677ea4954d5913d5b917_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_string_aaf7e376ff580677ea4954d5913d5b917_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_string_ab0373bf6e96453d6ca0de2e68df13d3a}\index{testing::internal::String@{testing::internal::String}!WideCStringEquals@{WideCStringEquals}}
+\index{WideCStringEquals@{WideCStringEquals}!testing::internal::String@{testing::internal::String}}
+\doxysubsubsection{\texorpdfstring{WideCStringEquals()}{WideCStringEquals()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_string_ab0373bf6e96453d6ca0de2e68df13d3a} 
+bool testing\+::internal\+::\+String\+::\+Wide\+CString\+Equals (\begin{DoxyParamCaption}\item[{const wchar\+\_\+t \texorpdfstring{$\ast$}{*}}]{lhs}{, }\item[{const wchar\+\_\+t \texorpdfstring{$\ast$}{*}}]{rhs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8cc_source_l01875}{1875}} of file \mbox{\hyperlink{gtest_8cc_source}{gtest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01875\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01876\ \ \ \textcolor{keywordflow}{if}\ (lhs\ ==\ NULL)\ \textcolor{keywordflow}{return}\ rhs\ ==\ NULL;}
+\DoxyCodeLine{01877\ }
+\DoxyCodeLine{01878\ \ \ \textcolor{keywordflow}{if}\ (rhs\ ==\ NULL)\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{01879\ }
+\DoxyCodeLine{01880\ \ \ \textcolor{keywordflow}{return}\ wcscmp(lhs,\ rhs)\ ==\ 0;}
+\DoxyCodeLine{01881\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=349pt]{classtesting_1_1internal_1_1_string_ab0373bf6e96453d6ca0de2e68df13d3a_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/include/gtest/internal/\mbox{\hyperlink{gtest-string_8h}{gtest-\/string.\+h}}\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/src/\mbox{\hyperlink{gtest_8cc}{gtest.\+cc}}\end{DoxyCompactItemize}

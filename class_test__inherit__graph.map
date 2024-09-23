@@ -1,0 +1,15 @@
+<map id="Test" name="Test">
+<area shape="rect" id="Node000001" title=" " alt="" coords="207,79,253,105"/>
+<area shape="rect" id="Node000003" href="$struct_a.html" title=" " alt="" coords="5,153,44,178"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="192,108,56,155,45,159,43,154,54,150,191,103"/>
+<area shape="rect" id="Node000004" href="$class_disabled_test.html" title=" " alt="" coords="68,153,165,178"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="199,116,137,154,134,150,196,111"/>
+<area shape="rect" id="Node000005" href="$class_failed_test.html" title=" " alt="" coords="189,153,271,178"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="233,120,233,152,227,152,227,120"/>
+<area shape="rect" id="Node000006" href="$class_property_recording_test.html" title=" " alt="" coords="294,153,448,178"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="268,109,349,150,346,155,266,114"/>
+<area shape="rect" id="Node000007" href="$class_successful_test.html" title=" " alt="" coords="473,153,584,178"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="269,100,478,150,477,155,267,105"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="144,5,316,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="233,46,233,79,227,79,227,46"/>
+</map>

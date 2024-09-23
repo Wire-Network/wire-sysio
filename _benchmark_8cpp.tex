@@ -1,0 +1,71 @@
+\doxysection{libraries/wasm-\/jit/\+Test/\+Benchmark/\+Benchmark.cpp File Reference}
+\hypertarget{_benchmark_8cpp}{}\label{_benchmark_8cpp}\index{libraries/wasm-\/jit/Test/Benchmark/Benchmark.cpp@{libraries/wasm-\/jit/Test/Benchmark/Benchmark.cpp}}
+{\ttfamily \#include $<$vector$>$}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+Include dependency graph for Benchmark.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=242pt]{_benchmark_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structpoint}{point}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{_benchmark_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{_benchmark_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}\index{Benchmark.cpp@{Benchmark.cpp}!main@{main}}
+\index{main@{main}!Benchmark.cpp@{Benchmark.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{_benchmark_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4} 
+int main (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_benchmark_8cpp_source_l00010}{10}} of file \mbox{\hyperlink{_benchmark_8cpp_source}{Benchmark.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00011\ \{}
+\DoxyCodeLine{00012\ \ \ \ \ \textcolor{comment}{//\ Generate\ a\ lot\ of\ uniformly\ distributed\ 2d\ points\ in\ the\ range\ -\/1,-\/1\ to\ +1,+1.}}
+\DoxyCodeLine{00013\ \ \ \ \ \textcolor{keyword}{enum}\ \{\ numXSamples\ =\ 10000\ \};}
+\DoxyCodeLine{00014\ \ \ \ \ \textcolor{keyword}{enum}\ \{\ numYSamples\ =\ 10000\ \};}
+\DoxyCodeLine{00015\ \ \ \ \ std::vector<point>\ points;}
+\DoxyCodeLine{00016\ \ \ \ \ points.reserve(numXSamples\ *\ numYSamples);}
+\DoxyCodeLine{00017\ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int}\ x\ =\ 0;x\ <\ numXSamples;++x)}
+\DoxyCodeLine{00018\ \ \ \ \ \{}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int}\ y\ =\ 0;\mbox{\hyperlink{namespacefc_ab199a7c94624123911206db59ebe45da}{y}}\ <\ numXSamples;++\mbox{\hyperlink{namespacefc_ab199a7c94624123911206db59ebe45da}{y}})}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structpoint}{point}}\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ \{-\/1.0\ +\ 2.0\ *\ x\ /\ (numXSamples-\/1),-\/1.0\ +\ 2.0\ *\ y\ /\ (numYSamples-\/1)\};}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \ \ \ \ points.push\_back(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}});}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00024\ \ \ \ \ \}}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \ \ \ \ \textcolor{comment}{//\ Count\ the\ ratio\ of\ points\ inside\ the\ unit\ circle.}}
+\DoxyCodeLine{00027\ \ \ \ \ \textcolor{keywordtype}{int}\ numerator\ =\ 0;}
+\DoxyCodeLine{00028\ \ \ \ \ \textcolor{keywordtype}{int}\ denominator\ =\ 0;}
+\DoxyCodeLine{00029\ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\ pointIt\ =\ points.begin();pointIt\ !=\ points.end();++pointIt)}
+\DoxyCodeLine{00030\ \ \ \ \ \{}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(pointIt-\/>x\ *\ pointIt-\/>x\ +\ pointIt-\/>y\ *\ pointIt-\/>y\ <\ 1.0)}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \ \ \ ++numerator;}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ ++denominator;}
+\DoxyCodeLine{00036\ \ \ \ \ \}}
+\DoxyCodeLine{00037\ }
+\DoxyCodeLine{00038\ \ \ \ \ \textcolor{comment}{//\ Derive\ the\ area\ of\ the\ unit\ circle.}}
+\DoxyCodeLine{00039\ \ \ \ \ \textcolor{keyword}{auto}\ circleArea\ =\ 4.0\ *\ (double)numerator\ /\ denominator;}
+\DoxyCodeLine{00040\ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}result:\ "{}}\ <<\ circleArea\ <<\ std::endl;}
+\DoxyCodeLine{00041\ }
+\DoxyCodeLine{00042\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00043\ \}}
+
+\end{DoxyCode}

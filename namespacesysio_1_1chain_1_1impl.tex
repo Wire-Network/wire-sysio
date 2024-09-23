@@ -1,0 +1,299 @@
+\doxysection{sysio\+::chain\+::impl Namespace Reference}
+\hypertarget{namespacesysio_1_1chain_1_1impl}{}\label{namespacesysio_1_1chain_1_1impl}\index{sysio::chain::impl@{sysio::chain::impl}}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1abi__from__variant}{abi\+\_\+from\+\_\+variant}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1chain_1_1impl_1_1abi__from__variant__visitor}{abi\+\_\+from\+\_\+variant\+\_\+visitor}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1abi__to__variant}{abi\+\_\+to\+\_\+variant}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1chain_1_1impl_1_1abi__to__variant__visitor}{abi\+\_\+to\+\_\+variant\+\_\+visitor}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1abi__traverse__context}{abi\+\_\+traverse\+\_\+context}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1abi__traverse__context__with__path}{abi\+\_\+traverse\+\_\+context\+\_\+with\+\_\+path}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1array__index__path__item}{array\+\_\+index\+\_\+path\+\_\+item}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1array__type__path__root}{array\+\_\+type\+\_\+path\+\_\+root}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1binary__to__variant__context}{binary\+\_\+to\+\_\+variant\+\_\+context}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1empty__path__item}{empty\+\_\+path\+\_\+item}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1empty__path__root}{empty\+\_\+path\+\_\+root}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1field__path__item}{field\+\_\+path\+\_\+item}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor}{generate\+\_\+path\+\_\+string\+\_\+visitor}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1path__item__type__visitor}{path\+\_\+item\+\_\+type\+\_\+visitor}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1struct__type__path__root}{struct\+\_\+type\+\_\+path\+\_\+root}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1type__requires__abi}{type\+\_\+requires\+\_\+abi}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1type__requires__abi_3_01_container_3_01_t_00_01_args_8_8_8_01_4_01_4}{type\+\_\+requires\+\_\+abi$<$ Container$<$ T, Args... $>$ $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1variant__path__item}{variant\+\_\+path\+\_\+item}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1variant__to__binary__context}{variant\+\_\+to\+\_\+binary\+\_\+context}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1variant__type__path__root}{variant\+\_\+type\+\_\+path\+\_\+root}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1impl_a485695f171d9c23df498a49bf5000ba5}{path\+\_\+root}} = std\+::variant$<$\mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1empty__path__root}{empty\+\_\+path\+\_\+root}}, \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1array__type__path__root}{array\+\_\+type\+\_\+path\+\_\+root}}, \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1struct__type__path__root}{struct\+\_\+type\+\_\+path\+\_\+root}}, \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1variant__type__path__root}{variant\+\_\+type\+\_\+path\+\_\+root}}$>$
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1impl_a99395f0f04c810e6c8d3b51e3d1aacd0}{path\+\_\+item}} = std\+::variant$<$\mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1empty__path__item}{empty\+\_\+path\+\_\+item}}, \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1array__index__path__item}{array\+\_\+index\+\_\+path\+\_\+item}}, \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1field__path__item}{field\+\_\+path\+\_\+item}}, \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1variant__path__item}{variant\+\_\+path\+\_\+item}}$>$
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\using \mbox{\hyperlink{namespacesysio_1_1chain_1_1impl_a7573b97a32a70ecbba5cab59b8914397}{not\+\_\+require\+\_\+abi\+\_\+t}} = std\+::enable\+\_\+if\+\_\+t$<$!\mbox{\hyperlink{namespacesysio_1_1chain_1_1impl_a6175739e114d4fd4b9414fd98c4139cb}{type\+\_\+requires\+\_\+abi\+\_\+v}}$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$(), int$>$
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\using \mbox{\hyperlink{namespacesysio_1_1chain_1_1impl_a79368639d533d7445d10816c3a89476d}{require\+\_\+abi\+\_\+t}} = std\+::enable\+\_\+if\+\_\+t$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1impl_a6175739e114d4fd4b9414fd98c4139cb}{type\+\_\+requires\+\_\+abi\+\_\+v}}$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$(), int$>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+constexpr size\+\_\+t \mbox{\hyperlink{namespacesysio_1_1chain_1_1impl_a808811094deb4a3461bcc19cc611ebb4}{const\+\_\+strlen}} (const char \texorpdfstring{$\ast$}{*}str)
+\item 
+void \mbox{\hyperlink{namespacesysio_1_1chain_1_1impl_a0ff60b42e045adb210fcfb9e00f7a3af}{output\+\_\+name}} (std\+::ostream \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, const string\+\_\+view \&str, bool shorten, size\+\_\+t max\+\_\+length=64)
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1chain_1_1impl_a895fb1ce3fc84c602deed5d3192c1368}{limit\+\_\+size}} (const std\+::string\+\_\+view \&str)
+\begin{DoxyCompactList}\small\item\em limits the string size to default max\+\_\+length of output\+\_\+name \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\constexpr bool \mbox{\hyperlink{namespacesysio_1_1chain_1_1impl_ae2a8afdb5f6805ad9d0bebc0bc44dd0f}{single\+\_\+type\+\_\+requires\+\_\+abi\+\_\+v}} ()
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\constexpr bool \mbox{\hyperlink{namespacesysio_1_1chain_1_1impl_a6175739e114d4fd4b9414fd98c4139cb}{type\+\_\+requires\+\_\+abi\+\_\+v}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{namespacesysio_1_1chain_1_1impl_a7573b97a32a70ecbba5cab59b8914397}\index{sysio::chain::impl@{sysio::chain::impl}!not\_require\_abi\_t@{not\_require\_abi\_t}}
+\index{not\_require\_abi\_t@{not\_require\_abi\_t}!sysio::chain::impl@{sysio::chain::impl}}
+\doxysubsubsection{\texorpdfstring{not\_require\_abi\_t}{not\_require\_abi\_t}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1impl_a7573b97a32a70ecbba5cab59b8914397} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1impl_a7573b97a32a70ecbba5cab59b8914397}{sysio\+::chain\+::impl\+::not\+\_\+require\+\_\+abi\+\_\+t}} = std\+::enable\+\_\+if\+\_\+t$<$!\mbox{\hyperlink{namespacesysio_1_1chain_1_1impl_a6175739e114d4fd4b9414fd98c4139cb}{type\+\_\+requires\+\_\+abi\+\_\+v}}$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$(), int$>$}
+
+convenience aliases for creating overload-\/guards based on whether the type contains ABI related info 
+
+Definition at line \mbox{\hyperlink{abi__serializer_8hpp_source_l00326}{326}} of file \mbox{\hyperlink{abi__serializer_8hpp_source}{abi\+\_\+serializer.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1chain_1_1impl_a99395f0f04c810e6c8d3b51e3d1aacd0}\index{sysio::chain::impl@{sysio::chain::impl}!path\_item@{path\_item}}
+\index{path\_item@{path\_item}!sysio::chain::impl@{sysio::chain::impl}}
+\doxysubsubsection{\texorpdfstring{path\_item}{path\_item}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1impl_a99395f0f04c810e6c8d3b51e3d1aacd0} 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1impl_a99395f0f04c810e6c8d3b51e3d1aacd0}{sysio\+::chain\+::impl\+::path\+\_\+item}} = std\+::variant$<$\mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1empty__path__item}{empty\+\_\+path\+\_\+item}}, \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1array__index__path__item}{array\+\_\+index\+\_\+path\+\_\+item}}, \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1field__path__item}{field\+\_\+path\+\_\+item}}, \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1variant__path__item}{variant\+\_\+path\+\_\+item}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{abi__serializer_8hpp_source_l00225}{225}} of file \mbox{\hyperlink{abi__serializer_8hpp_source}{abi\+\_\+serializer.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1chain_1_1impl_a485695f171d9c23df498a49bf5000ba5}\index{sysio::chain::impl@{sysio::chain::impl}!path\_root@{path\_root}}
+\index{path\_root@{path\_root}!sysio::chain::impl@{sysio::chain::impl}}
+\doxysubsubsection{\texorpdfstring{path\_root}{path\_root}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1impl_a485695f171d9c23df498a49bf5000ba5} 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1impl_a485695f171d9c23df498a49bf5000ba5}{sysio\+::chain\+::impl\+::path\+\_\+root}} = std\+::variant$<$\mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1empty__path__root}{empty\+\_\+path\+\_\+root}}, \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1array__type__path__root}{array\+\_\+type\+\_\+path\+\_\+root}}, \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1struct__type__path__root}{struct\+\_\+type\+\_\+path\+\_\+root}}, \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1variant__type__path__root}{variant\+\_\+type\+\_\+path\+\_\+root}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{abi__serializer_8hpp_source_l00206}{206}} of file \mbox{\hyperlink{abi__serializer_8hpp_source}{abi\+\_\+serializer.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1chain_1_1impl_a79368639d533d7445d10816c3a89476d}\index{sysio::chain::impl@{sysio::chain::impl}!require\_abi\_t@{require\_abi\_t}}
+\index{require\_abi\_t@{require\_abi\_t}!sysio::chain::impl@{sysio::chain::impl}}
+\doxysubsubsection{\texorpdfstring{require\_abi\_t}{require\_abi\_t}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1impl_a79368639d533d7445d10816c3a89476d} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1impl_a79368639d533d7445d10816c3a89476d}{sysio\+::chain\+::impl\+::require\+\_\+abi\+\_\+t}} = std\+::enable\+\_\+if\+\_\+t$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1impl_a6175739e114d4fd4b9414fd98c4139cb}{type\+\_\+requires\+\_\+abi\+\_\+v}}$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$(), int$>$}
+
+
+
+Definition at line \mbox{\hyperlink{abi__serializer_8hpp_source_l00329}{329}} of file \mbox{\hyperlink{abi__serializer_8hpp_source}{abi\+\_\+serializer.\+hpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacesysio_1_1chain_1_1impl_a808811094deb4a3461bcc19cc611ebb4}\index{sysio::chain::impl@{sysio::chain::impl}!const\_strlen@{const\_strlen}}
+\index{const\_strlen@{const\_strlen}!sysio::chain::impl@{sysio::chain::impl}}
+\doxysubsubsection{\texorpdfstring{const\_strlen()}{const\_strlen()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1impl_a808811094deb4a3461bcc19cc611ebb4} 
+size\+\_\+t sysio\+::chain\+::impl\+::const\+\_\+strlen (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{str}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{abi__serializer_8cpp_source_l00703}{703}} of file \mbox{\hyperlink{abi__serializer_8cpp_source}{abi\+\_\+serializer.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00704\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00705\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (*str\ ==\ 0)\ ?\ 0\ :\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1impl_a808811094deb4a3461bcc19cc611ebb4}{const\_strlen}}(str\ +\ 1)\ +\ 1;}
+\DoxyCodeLine{00706\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=173pt]{namespacesysio_1_1chain_1_1impl_a808811094deb4a3461bcc19cc611ebb4_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1chain_1_1impl_a808811094deb4a3461bcc19cc611ebb4_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacesysio_1_1chain_1_1impl_a895fb1ce3fc84c602deed5d3192c1368}\index{sysio::chain::impl@{sysio::chain::impl}!limit\_size@{limit\_size}}
+\index{limit\_size@{limit\_size}!sysio::chain::impl@{sysio::chain::impl}}
+\doxysubsubsection{\texorpdfstring{limit\_size()}{limit\_size()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1impl_a895fb1ce3fc84c602deed5d3192c1368} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::chain\+::impl\+::limit\+\_\+size (\begin{DoxyParamCaption}\item[{const std\+::string\+\_\+view \&}]{str}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{abi__serializer_8cpp_source_l00880}{880}} of file \mbox{\hyperlink{abi__serializer_8cpp_source}{abi\+\_\+serializer.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00880\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00881\ \ \ \ \ \ \ \ \ \ std::stringstream\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{00882\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1impl_a0ff60b42e045adb210fcfb9e00f7a3af}{output\_name}}(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ str,\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{00883\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.str();}
+\DoxyCodeLine{00884\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1chain_1_1impl_a895fb1ce3fc84c602deed5d3192c1368_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1chain_1_1impl_a895fb1ce3fc84c602deed5d3192c1368_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacesysio_1_1chain_1_1impl_a0ff60b42e045adb210fcfb9e00f7a3af}\index{sysio::chain::impl@{sysio::chain::impl}!output\_name@{output\_name}}
+\index{output\_name@{output\_name}!sysio::chain::impl@{sysio::chain::impl}}
+\doxysubsubsection{\texorpdfstring{output\_name()}{output\_name()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1impl_a0ff60b42e045adb210fcfb9e00f7a3af} 
+void sysio\+::chain\+::impl\+::output\+\_\+name (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{s}{, }\item[{const string\+\_\+view \&}]{str}{, }\item[{bool}]{shorten}{, }\item[{size\+\_\+t}]{max\+\_\+length}{ = {\ttfamily 64}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{abi__serializer_8cpp_source_l00708}{708}} of file \mbox{\hyperlink{abi__serializer_8cpp_source}{abi\+\_\+serializer.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00708\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00709\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{size\_t}\ min\_num\_characters\_at\_ends\ =\ 4;}
+\DoxyCodeLine{00710\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{size\_t}\ preferred\_num\_tail\_end\_characters\ =\ 6;}
+\DoxyCodeLine{00711\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{constexpr}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ fill\_in\ =\ \textcolor{stringliteral}{"{}..."{}};}
+\DoxyCodeLine{00712\ }
+\DoxyCodeLine{00713\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_assert}(\ min\_num\_characters\_at\_ends\ <=\ preferred\_num\_tail\_end\_characters,}
+\DoxyCodeLine{00714\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}preferred\ number\ of\ tail\ end\ characters\ cannot\ be\ less\ than\ the\ imposed\ absolute\ minimum"{}}\ );}
+\DoxyCodeLine{00715\ }
+\DoxyCodeLine{00716\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{size\_t}\ fill\_in\_length\ =\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1impl_a808811094deb4a3461bcc19cc611ebb4}{const\_strlen}}(\ fill\_in\ );}
+\DoxyCodeLine{00717\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{size\_t}\ min\_length\ =\ fill\_in\_length\ +\ 2*min\_num\_characters\_at\_ends;}
+\DoxyCodeLine{00718\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{size\_t}\ preferred\_min\_length\ =\ fill\_in\_length\ +\ 2*preferred\_num\_tail\_end\_characters;}
+\DoxyCodeLine{00719\ }
+\DoxyCodeLine{00720\ \ \ \ \ \ \ \ \ \ max\_length\ =\ std::max(\ max\_length,\ min\_length\ );}
+\DoxyCodeLine{00721\ }
+\DoxyCodeLine{00722\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !shorten\ ||\ str.size()\ <=\ max\_length\ )\ \{}
+\DoxyCodeLine{00723\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ <<\ str;}
+\DoxyCodeLine{00724\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00725\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00726\ }
+\DoxyCodeLine{00727\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ actual\_num\_tail\_end\_characters\ =\ preferred\_num\_tail\_end\_characters;}
+\DoxyCodeLine{00728\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ max\_length\ <\ preferred\_min\_length\ )\ \{}
+\DoxyCodeLine{00729\ \ \ \ \ \ \ \ \ \ \ \ \ actual\_num\_tail\_end\_characters\ =\ min\_num\_characters\_at\_ends\ +\ (max\_length\ -\/\ min\_length)/2;}
+\DoxyCodeLine{00730\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00731\ }
+\DoxyCodeLine{00732\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.write(\ str.data(),\ max\_length\ -\/\ fill\_in\_length\ -\/\ actual\_num\_tail\_end\_characters\ );}
+\DoxyCodeLine{00733\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.write(\ fill\_in,\ fill\_in\_length\ );}
+\DoxyCodeLine{00734\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.write(\ str.data()\ +\ (str.size()\ -\/\ actual\_num\_tail\_end\_characters),\ actual\_num\_tail\_end\_characters\ );}
+\DoxyCodeLine{00735\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=301pt]{namespacesysio_1_1chain_1_1impl_a0ff60b42e045adb210fcfb9e00f7a3af_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1chain_1_1impl_a0ff60b42e045adb210fcfb9e00f7a3af_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacesysio_1_1chain_1_1impl_ae2a8afdb5f6805ad9d0bebc0bc44dd0f}\index{sysio::chain::impl@{sysio::chain::impl}!single\_type\_requires\_abi\_v@{single\_type\_requires\_abi\_v}}
+\index{single\_type\_requires\_abi\_v@{single\_type\_requires\_abi\_v}!sysio::chain::impl@{sysio::chain::impl}}
+\doxysubsubsection{\texorpdfstring{single\_type\_requires\_abi\_v()}{single\_type\_requires\_abi\_v()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1impl_ae2a8afdb5f6805ad9d0bebc0bc44dd0f} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+bool sysio\+::chain\+::impl\+::single\+\_\+type\+\_\+requires\+\_\+abi\+\_\+v (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [constexpr]}}
+
+Determine if a type contains ABI related info, perhaps deeply nested 
+\begin{DoxyTemplParams}{Template Parameters}
+{\em T} & -\/ the type to check \\
+\hline
+\end{DoxyTemplParams}
+
+
+Definition at line \mbox{\hyperlink{abi__serializer_8hpp_source_l00284}{284}} of file \mbox{\hyperlink{abi__serializer_8hpp_source}{abi\+\_\+serializer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00284\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00285\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::is\_base\_of<transaction,\ T>::value\ ||}
+\DoxyCodeLine{00286\ \ \ \ \ \ \ \ \ \ \ \ \ \ std::is\_same<T,\ packed\_transaction>::value\ ||}
+\DoxyCodeLine{00287\ \ \ \ \ \ \ \ \ \ \ \ \ \ std::is\_same<T,\ transaction\_trace>::value\ ||}
+\DoxyCodeLine{00288\ \ \ \ \ \ \ \ \ \ \ \ \ \ std::is\_same<T,\ transaction\_receipt>::value\ ||}
+\DoxyCodeLine{00289\ \ \ \ \ \ \ \ \ \ \ \ \ \ std::is\_same<T,\ action\_trace>::value\ ||}
+\DoxyCodeLine{00290\ \ \ \ \ \ \ \ \ \ \ \ \ \ std::is\_same<T,\ signed\_transaction>::value\ ||}
+\DoxyCodeLine{00291\ \ \ \ \ \ \ \ \ \ \ \ \ \ std::is\_same<T,\ signed\_block>::value\ ||}
+\DoxyCodeLine{00292\ \ \ \ \ \ \ \ \ \ \ \ \ \ std::is\_same<T,\ action>::value;}
+\DoxyCodeLine{00293\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1chain_1_1impl_ae2a8afdb5f6805ad9d0bebc0bc44dd0f_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacesysio_1_1chain_1_1impl_a6175739e114d4fd4b9414fd98c4139cb}\index{sysio::chain::impl@{sysio::chain::impl}!type\_requires\_abi\_v@{type\_requires\_abi\_v}}
+\index{type\_requires\_abi\_v@{type\_requires\_abi\_v}!sysio::chain::impl@{sysio::chain::impl}}
+\doxysubsubsection{\texorpdfstring{type\_requires\_abi\_v()}{type\_requires\_abi\_v()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1impl_a6175739e114d4fd4b9414fd98c4139cb} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+bool sysio\+::chain\+::impl\+::type\+\_\+requires\+\_\+abi\+\_\+v (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{abi__serializer_8hpp_source_l00318}{318}} of file \mbox{\hyperlink{abi__serializer_8hpp_source}{abi\+\_\+serializer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00318\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00319\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1type__requires__abi}{type\_requires\_abi<T>::value}}();}
+\DoxyCodeLine{00320\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1chain_1_1impl_a6175739e114d4fd4b9414fd98c4139cb_cgraph}
+\end{center}
+\end{figure}

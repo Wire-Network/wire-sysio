@@ -1,0 +1,645 @@
+\doxysection{regextest.\+cpp}
+\hypertarget{regextest_8cpp_source}{}\label{regextest_8cpp_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/test/unittest/regextest.cpp@{libraries/fc/include/fc/crypto/webauthn\_json/test/unittest/regextest.cpp}}
+\mbox{\hyperlink{regextest_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00001}00001\ \textcolor{comment}{//\ Tencent\ is\ pleased\ to\ support\ the\ open\ source\ community\ by\ making\ RapidJSON\ available.}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00002}00002\ \textcolor{comment}{//\ }}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00003}00003\ \textcolor{comment}{//\ Copyright\ (C)\ 2015\ THL\ A29\ Limited,\ a\ Tencent\ company,\ and\ Milo\ Yip.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00004}00004\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00005}00005\ \textcolor{comment}{//\ Licensed\ under\ the\ MIT\ License\ (the\ "{}License"{});\ you\ may\ not\ use\ this\ file\ except}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00006}00006\ \textcolor{comment}{//\ in\ compliance\ with\ the\ License.\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00007}00007\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00008}00008\ \textcolor{comment}{//\ http://opensource.org/licenses/MIT}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00009}00009\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00010}00010\ \textcolor{comment}{//\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software\ distributed\ }}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00011}00011\ \textcolor{comment}{//\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,\ WITHOUT\ WARRANTIES\ OR\ }}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00012}00012\ \textcolor{comment}{//\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.\ See\ the\ License\ for\ the\ }}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00013}00013\ \textcolor{comment}{//\ specific\ language\ governing\ permissions\ and\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00015}00015\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{unittest_8h}{unittest.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00016}00016\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{regex_8h}{rapidjson/internal/regex.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00018}00018\ \textcolor{keyword}{using\ namespace\ }rapidjson::internal;}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00020}\mbox{\hyperlink{regextest_8cpp_a6926fa190879f4c751bbf0aae4be823c}{00020}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(Regex,\ Single)\ \{}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00021}00021\ \ \ \ \ Regex\ re(\textcolor{stringliteral}{"{}a"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00022}00022\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00023}00023\ \ \ \ \ RegexSearch\ rs(re);}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00024}00024\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}a"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00025}00025\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00026}00026\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}b"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00027}00027\ \}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00029}\mbox{\hyperlink{regextest_8cpp_a9f5f104eb29b493ba0cf3d88e7ccf2f4}{00029}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(Regex,\ Concatenation)\ \{}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00030}00030\ \ \ \ \ Regex\ re(\textcolor{stringliteral}{"{}abc"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00031}00031\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00032}00032\ \ \ \ \ RegexSearch\ rs(re);}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00033}00033\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abc"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00034}00034\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00035}00035\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}a"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00036}00036\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}b"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00037}00037\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}ab"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00038}00038\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}abcd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00039}00039\ \}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00041}\mbox{\hyperlink{regextest_8cpp_ab2c1dab85277a95c0d8f63a0d7932280}{00041}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(Regex,\ Alternation1)\ \{}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00042}00042\ \ \ \ \ Regex\ re(\textcolor{stringliteral}{"{}abab|abbb"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00043}00043\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00044}00044\ \ \ \ \ RegexSearch\ rs(re);}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00045}00045\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abab"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00046}00046\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abbb"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00047}00047\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00048}00048\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}ab"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00049}00049\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}ababa"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00050}00050\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}abb"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00051}00051\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}abbbb"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00052}00052\ \}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00054}\mbox{\hyperlink{regextest_8cpp_a8958e10f913d41a4f130d7a90bc36109}{00054}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(Regex,\ Alternation2)\ \{}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00055}00055\ \ \ \ \ Regex\ re(\textcolor{stringliteral}{"{}a|b|c"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00056}00056\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00057}00057\ \ \ \ \ RegexSearch\ rs(re);}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00058}00058\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}a"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00059}00059\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}b"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00060}00060\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}c"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00061}00061\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00062}00062\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}aa"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00063}00063\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}ab"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00064}00064\ \}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00066}\mbox{\hyperlink{regextest_8cpp_a4935dc01746cdf09ddc5c40f855fdc34}{00066}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(Regex,\ Parenthesis1)\ \{}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00067}00067\ \ \ \ \ Regex\ re(\textcolor{stringliteral}{"{}(ab)c"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00068}00068\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00069}00069\ \ \ \ \ RegexSearch\ rs(re);}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00070}00070\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abc"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00071}00071\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00072}00072\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}a"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00073}00073\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}b"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00074}00074\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}ab"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00075}00075\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}abcd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00076}00076\ \}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00077}00077\ }
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00078}\mbox{\hyperlink{regextest_8cpp_adad68bb47b6019c9789d548c2e16f4bb}{00078}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(Regex,\ Parenthesis2)\ \{}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00079}00079\ \ \ \ \ Regex\ re(\textcolor{stringliteral}{"{}a(bc)"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00080}00080\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00081}00081\ \ \ \ \ RegexSearch\ rs(re);}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00082}00082\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abc"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00083}00083\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00084}00084\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}a"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00085}00085\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}b"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00086}00086\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}ab"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00087}00087\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}abcd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00088}00088\ \}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00089}00089\ }
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00090}\mbox{\hyperlink{regextest_8cpp_a51706383c0b0745bf5deaec6a356fa20}{00090}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(Regex,\ Parenthesis3)\ \{}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00091}00091\ \ \ \ \ Regex\ re(\textcolor{stringliteral}{"{}(a|b)(c|d)"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00092}00092\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00093}00093\ \ \ \ \ RegexSearch\ rs(re);}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00094}00094\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}ac"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00095}00095\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}ad"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00096}00096\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}bc"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00097}00097\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}bd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00098}00098\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00099}00099\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}ab"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00100}00100\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}cd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00101}00101\ \}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00102}00102\ }
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00103}\mbox{\hyperlink{regextest_8cpp_ab3660284a866e1b38128832952301a1c}{00103}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(Regex,\ ZeroOrOne1)\ \{}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00104}00104\ \ \ \ \ Regex\ re(\textcolor{stringliteral}{"{}a?"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00105}00105\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00106}00106\ \ \ \ \ RegexSearch\ rs(re);}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00107}00107\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00108}00108\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}a"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00109}00109\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}aa"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00110}00110\ \}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00111}00111\ }
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00112}\mbox{\hyperlink{regextest_8cpp_a69d5aa19c98edd1c583084a57b52c423}{00112}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(Regex,\ ZeroOrOne2)\ \{}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00113}00113\ \ \ \ \ Regex\ re(\textcolor{stringliteral}{"{}a?b"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00114}00114\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00115}00115\ \ \ \ \ RegexSearch\ rs(re);}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00116}00116\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}b"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00117}00117\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}ab"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00118}00118\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}a"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00119}00119\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}aa"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00120}00120\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}bb"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00121}00121\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}ba"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00122}00122\ \}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00123}00123\ }
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00124}\mbox{\hyperlink{regextest_8cpp_a86d5177b7bfa3ad21bdedee7858fb246}{00124}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(Regex,\ ZeroOrOne3)\ \{}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00125}00125\ \ \ \ \ Regex\ re(\textcolor{stringliteral}{"{}ab?"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00126}00126\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00127}00127\ \ \ \ \ RegexSearch\ rs(re);}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00128}00128\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}a"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00129}00129\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}ab"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00130}00130\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}b"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00131}00131\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}aa"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00132}00132\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}bb"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00133}00133\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}ba"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00134}00134\ \}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00135}00135\ }
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00136}\mbox{\hyperlink{regextest_8cpp_a5bfb68eb7300039e328dfd5229a01d55}{00136}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(Regex,\ ZeroOrOne4)\ \{}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00137}00137\ \ \ \ \ Regex\ re(\textcolor{stringliteral}{"{}a?b?"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00138}00138\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00139}00139\ \ \ \ \ RegexSearch\ rs(re);}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00140}00140\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00141}00141\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}a"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00142}00142\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}b"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00143}00143\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}ab"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00144}00144\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}aa"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00145}00145\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}bb"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00146}00146\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}ba"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00147}00147\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}abc"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00148}00148\ \}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00149}00149\ }
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00150}\mbox{\hyperlink{regextest_8cpp_a3686c9aa735631ce12ddeaeff182c1dd}{00150}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(Regex,\ ZeroOrOne5)\ \{}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00151}00151\ \ \ \ \ Regex\ re(\textcolor{stringliteral}{"{}a(ab)?b"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00152}00152\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00153}00153\ \ \ \ \ RegexSearch\ rs(re);}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00154}00154\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}ab"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00155}00155\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}aabb"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00156}00156\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}aab"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00157}00157\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}abb"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00158}00158\ \}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00159}00159\ }
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00160}\mbox{\hyperlink{regextest_8cpp_ae26efb0cf2a86adcc118d3cec67459a0}{00160}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(Regex,\ ZeroOrMore1)\ \{}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00161}00161\ \ \ \ \ Regex\ re(\textcolor{stringliteral}{"{}a*"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00162}00162\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00163}00163\ \ \ \ \ RegexSearch\ rs(re);}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00164}00164\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00165}00165\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}a"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00166}00166\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}aa"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00167}00167\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}b"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00168}00168\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}ab"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00169}00169\ \}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00170}00170\ }
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00171}\mbox{\hyperlink{regextest_8cpp_a461556287c755c1523ae785f2cdfebd5}{00171}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(Regex,\ ZeroOrMore2)\ \{}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00172}00172\ \ \ \ \ Regex\ re(\textcolor{stringliteral}{"{}a*b"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00173}00173\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00174}00174\ \ \ \ \ RegexSearch\ rs(re);}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00175}00175\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}b"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00176}00176\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}ab"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00177}00177\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}aab"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00178}00178\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00179}00179\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}bb"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00180}00180\ \}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00181}00181\ }
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00182}\mbox{\hyperlink{regextest_8cpp_aa9d44367baa9feaa13f56bd3db85f723}{00182}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(Regex,\ ZeroOrMore3)\ \{}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00183}00183\ \ \ \ \ Regex\ re(\textcolor{stringliteral}{"{}a*b*"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00184}00184\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00185}00185\ \ \ \ \ RegexSearch\ rs(re);}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00186}00186\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00187}00187\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}a"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00188}00188\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}aa"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00189}00189\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}b"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00190}00190\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}bb"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00191}00191\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}ab"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00192}00192\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}aabb"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00193}00193\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}ba"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00194}00194\ \}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00195}00195\ }
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00196}\mbox{\hyperlink{regextest_8cpp_ae64f25bb4a800aa8cb56e29506a92755}{00196}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(Regex,\ ZeroOrMore4)\ \{}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00197}00197\ \ \ \ \ Regex\ re(\textcolor{stringliteral}{"{}a(ab)*b"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00198}00198\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00199}00199\ \ \ \ \ RegexSearch\ rs(re);}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00200}00200\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}ab"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00201}00201\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}aabb"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00202}00202\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}aababb"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00203}00203\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00204}00204\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}aa"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00205}00205\ \}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00206}00206\ }
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00207}\mbox{\hyperlink{regextest_8cpp_acf303a61ed3dc3e78162e043bd722ab4}{00207}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(Regex,\ OneOrMore1)\ \{}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00208}00208\ \ \ \ \ Regex\ re(\textcolor{stringliteral}{"{}a+"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00209}00209\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00210}00210\ \ \ \ \ RegexSearch\ rs(re);}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00211}00211\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}a"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00212}00212\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}aa"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00213}00213\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00214}00214\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}b"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00215}00215\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}ab"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00216}00216\ \}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00217}00217\ }
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00218}\mbox{\hyperlink{regextest_8cpp_ab5eaedc150f27cbff58b89409f81441f}{00218}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(Regex,\ OneOrMore2)\ \{}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00219}00219\ \ \ \ \ Regex\ re(\textcolor{stringliteral}{"{}a+b"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00220}00220\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00221}00221\ \ \ \ \ RegexSearch\ rs(re);}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00222}00222\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}ab"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00223}00223\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}aab"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00224}00224\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00225}00225\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}b"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00226}00226\ \}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00227}00227\ }
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00228}\mbox{\hyperlink{regextest_8cpp_a56170b119ba1cb63cb6f56c17b895b90}{00228}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(Regex,\ OneOrMore3)\ \{}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00229}00229\ \ \ \ \ Regex\ re(\textcolor{stringliteral}{"{}a+b+"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00230}00230\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00231}00231\ \ \ \ \ RegexSearch\ rs(re);}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00232}00232\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}ab"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00233}00233\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}aab"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00234}00234\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abb"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00235}00235\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}aabb"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00236}00236\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00237}00237\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}b"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00238}00238\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}ba"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00239}00239\ \}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00240}00240\ }
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00241}\mbox{\hyperlink{regextest_8cpp_ad9856cc9219629528b1163c39a49b6ef}{00241}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(Regex,\ OneOrMore4)\ \{}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00242}00242\ \ \ \ \ Regex\ re(\textcolor{stringliteral}{"{}a(ab)+b"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00243}00243\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00244}00244\ \ \ \ \ RegexSearch\ rs(re);}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00245}00245\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}aabb"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00246}00246\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}aababb"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00247}00247\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00248}00248\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}ab"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00249}00249\ \}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00250}00250\ }
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00251}\mbox{\hyperlink{regextest_8cpp_a6dff68def4615f25c278610e2ba0b51a}{00251}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(Regex,\ QuantifierExact1)\ \{}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00252}00252\ \ \ \ \ Regex\ re(\textcolor{stringliteral}{"{}ab\{3\}c"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00253}00253\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00254}00254\ \ \ \ \ RegexSearch\ rs(re);}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00255}00255\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abbbc"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00256}00256\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}ac"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00257}00257\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}abc"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00258}00258\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}abbc"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00259}00259\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}abbbbc"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00260}00260\ \}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00261}00261\ }
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00262}\mbox{\hyperlink{regextest_8cpp_a201a2f3aa40f995245e1cf61f50173c0}{00262}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(Regex,\ QuantifierExact2)\ \{}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00263}00263\ \ \ \ \ Regex\ re(\textcolor{stringliteral}{"{}a(bc)\{3\}d"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00264}00264\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00265}00265\ \ \ \ \ RegexSearch\ rs(re);}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00266}00266\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abcbcbcd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00267}00267\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}ad"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00268}00268\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}abcd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00269}00269\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}abcbcd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00270}00270\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}abcbcbcbcd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00271}00271\ \}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00272}00272\ }
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00273}\mbox{\hyperlink{regextest_8cpp_a3cfb69a95cf9faa9e107fac21570bfd2}{00273}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(Regex,\ QuantifierExact3)\ \{}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00274}00274\ \ \ \ \ Regex\ re(\textcolor{stringliteral}{"{}a(b|c)\{3\}d"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00275}00275\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00276}00276\ \ \ \ \ RegexSearch\ rs(re);}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00277}00277\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abbbd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00278}00278\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}acccd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00279}00279\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abcbd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00280}00280\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}ad"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00281}00281\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}abbd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00282}00282\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}accccd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00283}00283\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}abbbbd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00284}00284\ \}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00285}00285\ }
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00286}\mbox{\hyperlink{regextest_8cpp_a7d0565b30cef53039b81555c20aa4788}{00286}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(Regex,\ QuantifierMin1)\ \{}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00287}00287\ \ \ \ \ Regex\ re(\textcolor{stringliteral}{"{}ab\{3,\}c"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00288}00288\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00289}00289\ \ \ \ \ RegexSearch\ rs(re);}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00290}00290\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abbbc"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00291}00291\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abbbbc"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00292}00292\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abbbbbc"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00293}00293\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}ac"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00294}00294\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}abc"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00295}00295\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}abbc"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00296}00296\ \}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00297}00297\ }
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00298}\mbox{\hyperlink{regextest_8cpp_aceeb4372d8f8bffa5afe5f5b181bbfec}{00298}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(Regex,\ QuantifierMin2)\ \{}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00299}00299\ \ \ \ \ Regex\ re(\textcolor{stringliteral}{"{}a(bc)\{3,\}d"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00300}00300\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00301}00301\ \ \ \ \ RegexSearch\ rs(re);}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00302}00302\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abcbcbcd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00303}00303\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abcbcbcbcd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00304}00304\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}ad"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00305}00305\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}abcd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00306}00306\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}abcbcd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00307}00307\ \}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00308}00308\ }
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00309}\mbox{\hyperlink{regextest_8cpp_a8fcf728559bdbb4c18cab8ae8dd01844}{00309}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(Regex,\ QuantifierMin3)\ \{}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00310}00310\ \ \ \ \ Regex\ re(\textcolor{stringliteral}{"{}a(b|c)\{3,\}d"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00311}00311\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00312}00312\ \ \ \ \ RegexSearch\ rs(re);}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00313}00313\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abbbd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00314}00314\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}acccd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00315}00315\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abcbd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00316}00316\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}accccd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00317}00317\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abbbbd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00318}00318\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}ad"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00319}00319\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}abbd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00320}00320\ \}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00321}00321\ }
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00322}\mbox{\hyperlink{regextest_8cpp_aa1d34ea422c754e17f1af018917ffab2}{00322}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(Regex,\ QuantifierMinMax1)\ \{}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00323}00323\ \ \ \ \ Regex\ re(\textcolor{stringliteral}{"{}ab\{3,5\}c"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00324}00324\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00325}00325\ \ \ \ \ RegexSearch\ rs(re);}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00326}00326\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abbbc"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00327}00327\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abbbbc"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00328}00328\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abbbbbc"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00329}00329\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}ac"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00330}00330\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}abc"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00331}00331\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}abbc"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00332}00332\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}abbbbbbc"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00333}00333\ \}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00334}00334\ }
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00335}\mbox{\hyperlink{regextest_8cpp_a1d0baf9ad759c6cbb8cae7dcff7df081}{00335}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(Regex,\ QuantifierMinMax2)\ \{}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00336}00336\ \ \ \ \ Regex\ re(\textcolor{stringliteral}{"{}a(bc)\{3,5\}d"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00337}00337\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00338}00338\ \ \ \ \ RegexSearch\ rs(re);}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00339}00339\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abcbcbcd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00340}00340\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abcbcbcbcd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00341}00341\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abcbcbcbcbcd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00342}00342\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}ad"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00343}00343\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}abcd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00344}00344\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}abcbcd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00345}00345\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}abcbcbcbcbcbcd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00346}00346\ \}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00347}00347\ }
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00348}\mbox{\hyperlink{regextest_8cpp_aa53c89d72e27ca7d5030e034ae88b3ff}{00348}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(Regex,\ QuantifierMinMax3)\ \{}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00349}00349\ \ \ \ \ Regex\ re(\textcolor{stringliteral}{"{}a(b|c)\{3,5\}d"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00350}00350\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00351}00351\ \ \ \ \ RegexSearch\ rs(re);}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00352}00352\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abbbd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00353}00353\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}acccd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00354}00354\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abcbd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00355}00355\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}accccd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00356}00356\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abbbbd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00357}00357\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}acccccd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00358}00358\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abbbbbd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00359}00359\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}ad"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00360}00360\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}abbd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00361}00361\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}accccccd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00362}00362\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}abbbbbbd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00363}00363\ \}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00364}00364\ }
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00365}00365\ \textcolor{comment}{//\ Issue538}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00366}\mbox{\hyperlink{regextest_8cpp_afddf32b93ac293a87ebbf708f2c9d19a}{00366}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(Regex,\ QuantifierMinMax4)\ \{}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00367}00367\ \ \ \ \ Regex\ re(\textcolor{stringliteral}{"{}a(b|c)\{0,3\}d"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00368}00368\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00369}00369\ \ \ \ \ RegexSearch\ rs(re);}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00370}00370\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}ad"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00371}00371\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00372}00372\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}acd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00373}00373\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abbd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00374}00374\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}accd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00375}00375\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abcd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00376}00376\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abbbd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00377}00377\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}acccd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00378}00378\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}abbbbd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00379}00379\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}add"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00380}00380\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}accccd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00381}00381\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}abcbcd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00382}00382\ \}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00383}00383\ }
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00384}00384\ \textcolor{comment}{//\ Issue538}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00385}\mbox{\hyperlink{regextest_8cpp_a88fc24c0b52bc49b9b82e513397a0a23}{00385}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(Regex,\ QuantifierMinMax5)\ \{}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00386}00386\ \ \ \ \ Regex\ re(\textcolor{stringliteral}{"{}a(b|c)\{0,\}d"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00387}00387\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00388}00388\ \ \ \ \ RegexSearch\ rs(re);}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00389}00389\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}ad"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00390}00390\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00391}00391\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}acd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00392}00392\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abbd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00393}00393\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}accd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00394}00394\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abcd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00395}00395\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abbbd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00396}00396\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}acccd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00397}00397\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abbbbd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00398}00398\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}accccd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00399}00399\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abcbcd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00400}00400\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}add"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00401}00401\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}aad"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00402}00402\ \}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00403}00403\ }
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00404}\mbox{\hyperlink{regextest_8cpp_a5434fc5857bd1456b47ab1f89ad35098}{00404}}\ \textcolor{preprocessor}{\#define\ EURO\ "{}\(\backslash\)xE2\(\backslash\)x82\(\backslash\)xAC"{}\ }\textcolor{comment}{//\ "{}\(\backslash\)xE2\(\backslash\)x82\(\backslash\)xAC"{}\ is\ UTF-\/8\ rsquence\ of\ Euro\ sign\ U+20AC}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00405}00405\ }
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00406}\mbox{\hyperlink{regextest_8cpp_a381af5b77c706a40e6bc9a8ef561213a}{00406}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(Regex,\ Unicode)\ \{}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00407}00407\ \ \ \ \ Regex\ re(\textcolor{stringliteral}{"{}a"{}}\ \mbox{\hyperlink{regextest_8cpp_a5434fc5857bd1456b47ab1f89ad35098}{EURO}}\ \textcolor{stringliteral}{"{}+b"{}});\ }
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00408}00408\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00409}00409\ \ \ \ \ RegexSearch\ rs(re);}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00410}00410\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}a"{}}\ \mbox{\hyperlink{regextest_8cpp_a5434fc5857bd1456b47ab1f89ad35098}{EURO}}\ \textcolor{stringliteral}{"{}b"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00411}00411\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}a"{}}\ \mbox{\hyperlink{regextest_8cpp_a5434fc5857bd1456b47ab1f89ad35098}{EURO}}\ \mbox{\hyperlink{regextest_8cpp_a5434fc5857bd1456b47ab1f89ad35098}{EURO}}\ \textcolor{stringliteral}{"{}b"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00412}00412\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}a?b"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00413}00413\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}a"{}}\ \mbox{\hyperlink{regextest_8cpp_a5434fc5857bd1456b47ab1f89ad35098}{EURO}}\ \textcolor{stringliteral}{"{}\(\backslash\)xAC"{}}\ \textcolor{stringliteral}{"{}b"{}}));\ \textcolor{comment}{//\ unaware\ of\ UTF-\/8\ will\ match}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00414}00414\ \}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00415}00415\ }
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00416}\mbox{\hyperlink{regextest_8cpp_a26baa15b641c8c8200ebedd68f72b3bd}{00416}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(Regex,\ AnyCharacter)\ \{}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00417}00417\ \ \ \ \ Regex\ re(\textcolor{stringliteral}{"{}."{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00418}00418\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00419}00419\ \ \ \ \ RegexSearch\ rs(re);}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00420}00420\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}a"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00421}00421\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}b"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00422}00422\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\mbox{\hyperlink{regextest_8cpp_a5434fc5857bd1456b47ab1f89ad35098}{EURO}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00423}00423\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00424}00424\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}aa"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00425}00425\ \}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00426}00426\ }
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00427}\mbox{\hyperlink{regextest_8cpp_a5eee49c855b7e6aa70ea9afa54551da0}{00427}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(Regex,\ CharacterRange1)\ \{}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00428}00428\ \ \ \ \ Regex\ re(\textcolor{stringliteral}{"{}[abc]"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00429}00429\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00430}00430\ \ \ \ \ RegexSearch\ rs(re);}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00431}00431\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}a"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00432}00432\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}b"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00433}00433\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}c"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00434}00434\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00435}00435\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}\`{}"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00436}00436\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}d"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00437}00437\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}aa"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00438}00438\ \}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00439}00439\ }
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00440}\mbox{\hyperlink{regextest_8cpp_a03bdf5b8c7c85f58f3d94cf3c88021d2}{00440}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(Regex,\ CharacterRange2)\ \{}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00441}00441\ \ \ \ \ Regex\ re(\textcolor{stringliteral}{"{}[\string^abc]"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00442}00442\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00443}00443\ \ \ \ \ RegexSearch\ rs(re);}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00444}00444\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}\`{}"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00445}00445\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}d"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00446}00446\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}a"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00447}00447\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}b"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00448}00448\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}c"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00449}00449\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00450}00450\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}aa"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00451}00451\ \}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00452}00452\ }
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00453}\mbox{\hyperlink{regextest_8cpp_ad8766e194579bc7b258e0351b59f0ac5}{00453}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(Regex,\ CharacterRange3)\ \{}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00454}00454\ \ \ \ \ Regex\ re(\textcolor{stringliteral}{"{}[a-\/c]"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00455}00455\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00456}00456\ \ \ \ \ RegexSearch\ rs(re);}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00457}00457\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}a"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00458}00458\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}b"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00459}00459\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}c"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00460}00460\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00461}00461\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}\`{}"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00462}00462\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}d"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00463}00463\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}aa"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00464}00464\ \}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00465}00465\ }
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00466}\mbox{\hyperlink{regextest_8cpp_a6fce7647b571b45ef18cbe1096a31b3f}{00466}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(Regex,\ CharacterRange4)\ \{}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00467}00467\ \ \ \ \ Regex\ re(\textcolor{stringliteral}{"{}[\string^a-\/c]"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00468}00468\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00469}00469\ \ \ \ \ RegexSearch\ rs(re);}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00470}00470\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}\`{}"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00471}00471\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}d"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00472}00472\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}a"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00473}00473\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}b"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00474}00474\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}c"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00475}00475\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00476}00476\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}aa"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00477}00477\ \}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00478}00478\ }
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00479}\mbox{\hyperlink{regextest_8cpp_aced64e292ed888b561abe6152cf25dc7}{00479}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(Regex,\ CharacterRange5)\ \{}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00480}00480\ \ \ \ \ Regex\ re(\textcolor{stringliteral}{"{}[-\/]"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00481}00481\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00482}00482\ \ \ \ \ RegexSearch\ rs(re);}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00483}00483\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}-\/"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00484}00484\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00485}00485\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}a"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00486}00486\ \}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00487}00487\ }
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00488}\mbox{\hyperlink{regextest_8cpp_a7c4605405d9ad43a0da07e169cb69d2b}{00488}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(Regex,\ CharacterRange6)\ \{}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00489}00489\ \ \ \ \ Regex\ re(\textcolor{stringliteral}{"{}[a-\/]"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00490}00490\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00491}00491\ \ \ \ \ RegexSearch\ rs(re);}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00492}00492\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}a"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00493}00493\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}-\/"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00494}00494\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00495}00495\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}\`{}"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00496}00496\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}b"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00497}00497\ \}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00498}00498\ }
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00499}\mbox{\hyperlink{regextest_8cpp_a3ada903d344b111ae36967dbd30bcba3}{00499}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(Regex,\ CharacterRange7)\ \{}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00500}00500\ \ \ \ \ Regex\ re(\textcolor{stringliteral}{"{}[-\/a]"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00501}00501\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00502}00502\ \ \ \ \ RegexSearch\ rs(re);}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00503}00503\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}a"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00504}00504\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}-\/"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00505}00505\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00506}00506\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}\`{}"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00507}00507\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}b"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00508}00508\ \}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00509}00509\ }
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00510}\mbox{\hyperlink{regextest_8cpp_a4081650a6aa86d371eee0cdb1b457a28}{00510}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(Regex,\ CharacterRange8)\ \{}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00511}00511\ \ \ \ \ Regex\ re(\textcolor{stringliteral}{"{}[a-\/zA-\/Z0-\/9]*"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00512}00512\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00513}00513\ \ \ \ \ RegexSearch\ rs(re);}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00514}00514\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}Milo"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00515}00515\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}MT19937"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00516}00516\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}43"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00517}00517\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}a\_b"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00518}00518\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}!"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00519}00519\ \}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00520}00520\ }
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00521}\mbox{\hyperlink{regextest_8cpp_a64325e2a1d76fb7a8f92d7bccd1a8da2}{00521}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(Regex,\ Search)\ \{}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00522}00522\ \ \ \ \ Regex\ re(\textcolor{stringliteral}{"{}abc"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00523}00523\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00524}00524\ \ \ \ \ RegexSearch\ rs(re);}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00525}00525\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Search(\textcolor{stringliteral}{"{}abc"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00526}00526\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Search(\textcolor{stringliteral}{"{}\_abc"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00527}00527\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Search(\textcolor{stringliteral}{"{}abc\_"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00528}00528\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Search(\textcolor{stringliteral}{"{}\_abc\_"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00529}00529\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Search(\textcolor{stringliteral}{"{}\_\_abc\_\_"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00530}00530\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Search(\textcolor{stringliteral}{"{}abcabc"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00531}00531\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Search(\textcolor{stringliteral}{"{}a"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00532}00532\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Search(\textcolor{stringliteral}{"{}ab"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00533}00533\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Search(\textcolor{stringliteral}{"{}bc"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00534}00534\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Search(\textcolor{stringliteral}{"{}cba"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00535}00535\ \}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00536}00536\ }
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00537}\mbox{\hyperlink{regextest_8cpp_a1eda53a0cbf84cccc01a36819bc6751e}{00537}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(Regex,\ Search\_BeginAnchor)\ \{}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00538}00538\ \ \ \ \ Regex\ re(\textcolor{stringliteral}{"{}\string^abc"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00539}00539\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00540}00540\ \ \ \ \ RegexSearch\ rs(re);}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00541}00541\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Search(\textcolor{stringliteral}{"{}abc"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00542}00542\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Search(\textcolor{stringliteral}{"{}abc\_"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00543}00543\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Search(\textcolor{stringliteral}{"{}abcabc"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00544}00544\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Search(\textcolor{stringliteral}{"{}\_abc"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00545}00545\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Search(\textcolor{stringliteral}{"{}\_abc\_"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00546}00546\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Search(\textcolor{stringliteral}{"{}a"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00547}00547\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Search(\textcolor{stringliteral}{"{}ab"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00548}00548\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Search(\textcolor{stringliteral}{"{}bc"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00549}00549\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Search(\textcolor{stringliteral}{"{}cba"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00550}00550\ \}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00551}00551\ }
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00552}\mbox{\hyperlink{regextest_8cpp_a887e8f018eb36b77ad013086f1449544}{00552}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(Regex,\ Search\_EndAnchor)\ \{}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00553}00553\ \ \ \ \ Regex\ re(\textcolor{stringliteral}{"{}abc\$"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00554}00554\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00555}00555\ \ \ \ \ RegexSearch\ rs(re);}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00556}00556\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Search(\textcolor{stringliteral}{"{}abc"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00557}00557\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Search(\textcolor{stringliteral}{"{}\_abc"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00558}00558\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Search(\textcolor{stringliteral}{"{}abcabc"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00559}00559\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Search(\textcolor{stringliteral}{"{}abc\_"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00560}00560\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Search(\textcolor{stringliteral}{"{}\_abc\_"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00561}00561\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Search(\textcolor{stringliteral}{"{}a"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00562}00562\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Search(\textcolor{stringliteral}{"{}ab"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00563}00563\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Search(\textcolor{stringliteral}{"{}bc"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00564}00564\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Search(\textcolor{stringliteral}{"{}cba"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00565}00565\ \}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00566}00566\ }
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00567}\mbox{\hyperlink{regextest_8cpp_a187f2920cd48f579f856c82442441ba0}{00567}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(Regex,\ Search\_BothAnchor)\ \{}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00568}00568\ \ \ \ \ Regex\ re(\textcolor{stringliteral}{"{}\string^abc\$"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00569}00569\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00570}00570\ \ \ \ \ RegexSearch\ rs(re);}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00571}00571\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Search(\textcolor{stringliteral}{"{}abc"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00572}00572\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Search(\textcolor{stringliteral}{"{}"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00573}00573\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Search(\textcolor{stringliteral}{"{}a"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00574}00574\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Search(\textcolor{stringliteral}{"{}b"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00575}00575\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Search(\textcolor{stringliteral}{"{}ab"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00576}00576\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Search(\textcolor{stringliteral}{"{}abcd"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00577}00577\ \}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00578}00578\ }
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00579}\mbox{\hyperlink{regextest_8cpp_a00d40453c1add72f9d4bd76397ccaf73}{00579}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(Regex,\ Escape)\ \{}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00580}00580\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ =\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)\string^\(\backslash\)\(\backslash\)\$\(\backslash\)\(\backslash\)|\(\backslash\)\(\backslash\)(\(\backslash\)\(\backslash\))\(\backslash\)\(\backslash\)?\(\backslash\)\(\backslash\)*\(\backslash\)\(\backslash\)+\(\backslash\)\(\backslash\).\(\backslash\)\(\backslash\)[\(\backslash\)\(\backslash\)]\(\backslash\)\(\backslash\)\{\(\backslash\)\(\backslash\)\}\(\backslash\)\(\backslash\)\(\backslash\)\(\backslash\)\(\backslash\)\(\backslash\)f\(\backslash\)\(\backslash\)n\(\backslash\)\(\backslash\)r\(\backslash\)\(\backslash\)t\(\backslash\)\(\backslash\)v[\(\backslash\)\(\backslash\)b][\(\backslash\)\(\backslash\)[][\(\backslash\)\(\backslash\)]]"{}};}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00581}00581\ \ \ \ \ Regex\ re(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00582}00582\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00583}00583\ \ \ \ \ RegexSearch\ rs(re);}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00584}00584\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}\string^\$|()?*+.[]\{\}\(\backslash\)\(\backslash\)\(\backslash\)x0C\(\backslash\)n\(\backslash\)r\(\backslash\)t\(\backslash\)x0B\(\backslash\)b[]"{}}));}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00585}00585\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}));\ \textcolor{comment}{//\ Not\ escaping}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00586}00586\ \}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00587}00587\ }
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00588}\mbox{\hyperlink{regextest_8cpp_a33959d5936db2191b7849ce2f395b4ff}{00588}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(Regex,\ Invalid)\ \{}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00589}00589\ \textcolor{preprocessor}{\#define\ TEST\_INVALID(s)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00590}00590\ \textcolor{preprocessor}{\ \ \ \ \{\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00591}00591\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ Regex\ re(s);\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00592}00592\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ EXPECT\_FALSE(re.IsValid());\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00593}00593\ \textcolor{preprocessor}{\ \ \ \ \}}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00594}00594\ }
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00595}00595\ \ \ \ \ \mbox{\hyperlink{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960}{TEST\_INVALID}}(\textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00596}00596\ \ \ \ \ \mbox{\hyperlink{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960}{TEST\_INVALID}}(\textcolor{stringliteral}{"{}a|"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00597}00597\ \ \ \ \ \mbox{\hyperlink{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960}{TEST\_INVALID}}(\textcolor{stringliteral}{"{}()"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00598}00598\ \ \ \ \ \mbox{\hyperlink{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960}{TEST\_INVALID}}(\textcolor{stringliteral}{"{}("{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00599}00599\ \ \ \ \ \mbox{\hyperlink{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960}{TEST\_INVALID}}(\textcolor{stringliteral}{"{})"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00600}00600\ \ \ \ \ \mbox{\hyperlink{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960}{TEST\_INVALID}}(\textcolor{stringliteral}{"{}(a))"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00601}00601\ \ \ \ \ \mbox{\hyperlink{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960}{TEST\_INVALID}}(\textcolor{stringliteral}{"{}(a|)"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00602}00602\ \ \ \ \ \mbox{\hyperlink{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960}{TEST\_INVALID}}(\textcolor{stringliteral}{"{}(a||b)"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00603}00603\ \ \ \ \ \mbox{\hyperlink{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960}{TEST\_INVALID}}(\textcolor{stringliteral}{"{}(|b)"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00604}00604\ \ \ \ \ \mbox{\hyperlink{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960}{TEST\_INVALID}}(\textcolor{stringliteral}{"{}?"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00605}00605\ \ \ \ \ \mbox{\hyperlink{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960}{TEST\_INVALID}}(\textcolor{stringliteral}{"{}*"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00606}00606\ \ \ \ \ \mbox{\hyperlink{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960}{TEST\_INVALID}}(\textcolor{stringliteral}{"{}+"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00607}00607\ \ \ \ \ \mbox{\hyperlink{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960}{TEST\_INVALID}}(\textcolor{stringliteral}{"{}\{"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00608}00608\ \ \ \ \ \mbox{\hyperlink{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960}{TEST\_INVALID}}(\textcolor{stringliteral}{"{}\{\}"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00609}00609\ \ \ \ \ \mbox{\hyperlink{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960}{TEST\_INVALID}}(\textcolor{stringliteral}{"{}a\{a\}"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00610}00610\ \ \ \ \ \mbox{\hyperlink{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960}{TEST\_INVALID}}(\textcolor{stringliteral}{"{}a\{0\}"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00611}00611\ \ \ \ \ \mbox{\hyperlink{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960}{TEST\_INVALID}}(\textcolor{stringliteral}{"{}a\{-\/1\}"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00612}00612\ \ \ \ \ \mbox{\hyperlink{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960}{TEST\_INVALID}}(\textcolor{stringliteral}{"{}a\{\}"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00613}00613\ \ \ \ \ \textcolor{comment}{//\ TEST\_INVALID("{}a\{0,\}"{});\ \ \ //\ Support\ now}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00614}00614\ \ \ \ \ \mbox{\hyperlink{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960}{TEST\_INVALID}}(\textcolor{stringliteral}{"{}a\{,0\}"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00615}00615\ \ \ \ \ \mbox{\hyperlink{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960}{TEST\_INVALID}}(\textcolor{stringliteral}{"{}a\{1,0\}"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00616}00616\ \ \ \ \ \mbox{\hyperlink{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960}{TEST\_INVALID}}(\textcolor{stringliteral}{"{}a\{-\/1,0\}"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00617}00617\ \ \ \ \ \mbox{\hyperlink{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960}{TEST\_INVALID}}(\textcolor{stringliteral}{"{}a\{-\/1,1\}"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00618}00618\ \ \ \ \ \mbox{\hyperlink{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960}{TEST\_INVALID}}(\textcolor{stringliteral}{"{}a\{4294967296\}"{}});\ \textcolor{comment}{//\ overflow\ of\ unsigned}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00619}00619\ \ \ \ \ \mbox{\hyperlink{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960}{TEST\_INVALID}}(\textcolor{stringliteral}{"{}a\{1a\}"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00620}00620\ \ \ \ \ \mbox{\hyperlink{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960}{TEST\_INVALID}}(\textcolor{stringliteral}{"{}["{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00621}00621\ \ \ \ \ \mbox{\hyperlink{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960}{TEST\_INVALID}}(\textcolor{stringliteral}{"{}[]"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00622}00622\ \ \ \ \ \mbox{\hyperlink{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960}{TEST\_INVALID}}(\textcolor{stringliteral}{"{}[\string^]"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00623}00623\ \ \ \ \ \mbox{\hyperlink{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960}{TEST\_INVALID}}(\textcolor{stringliteral}{"{}[\(\backslash\)\(\backslash\)a]"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00624}00624\ \ \ \ \ \mbox{\hyperlink{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960}{TEST\_INVALID}}(\textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)a"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00625}00625\ }
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00626}00626\ \textcolor{preprocessor}{\#undef\ TEST\_INVALID}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00627}00627\ \}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00628}00628\ }
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00629}\mbox{\hyperlink{regextest_8cpp_accdc2f6fbc70061692589a4d7fdd0d07}{00629}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(Regex,\ Issue538)\ \{}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00630}00630\ \ \ \ \ Regex\ re(\textcolor{stringliteral}{"{}\string^[0-\/9]+(\(\backslash\)\(\backslash\)\(\backslash\)\(\backslash\).[0-\/9]+)\{0,2\}"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00631}00631\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00632}00632\ \}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00633}00633\ }
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00634}\mbox{\hyperlink{regextest_8cpp_a86b74f2568edad0f59ccf1746046f910}{00634}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(Regex,\ Issue583)\ \{}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00635}00635\ \ \ \ \ Regex\ re(\textcolor{stringliteral}{"{}[0-\/9]\{99999\}"{}});}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00636}00636\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00637}00637\ \}}
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00638}00638\ }
+\DoxyCodeLine{\Hypertarget{regextest_8cpp_source_l00639}00639\ \textcolor{preprocessor}{\#undef\ EURO}}
+
+\end{DoxyCode}

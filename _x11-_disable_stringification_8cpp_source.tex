@@ -1,0 +1,22 @@
+\doxysection{X11-\/\+Disable\+Stringification.cpp}
+\hypertarget{_x11-_disable_stringification_8cpp_source}{}\label{_x11-_disable_stringification_8cpp_source}\index{libraries/sys-\/vm/external/Catch2/projects/ExtraTests/X11-\/DisableStringification.cpp@{libraries/sys-\/vm/external/Catch2/projects/ExtraTests/X11-\/DisableStringification.cpp}}
+\mbox{\hyperlink{_x11-_disable_stringification_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_x11-_disable_stringification_8cpp_source_l00001}00001\ \textcolor{comment}{//\ X11-\/DisableStringification.cpp}}
+\DoxyCodeLine{\Hypertarget{_x11-_disable_stringification_8cpp_source_l00002}00002\ \textcolor{comment}{//\ Test\ that\ stringification\ of\ original\ expression\ can\ be\ disabled}}
+\DoxyCodeLine{\Hypertarget{_x11-_disable_stringification_8cpp_source_l00003}00003\ \textcolor{comment}{//\ this\ is\ a\ workaround\ for\ VS\ 2017\ issue\ with\ Raw\ String\ literal}}
+\DoxyCodeLine{\Hypertarget{_x11-_disable_stringification_8cpp_source_l00004}00004\ \textcolor{comment}{//\ and\ preprocessor\ token\ pasting.\ In\ other\ words,\ hopefully\ this\ test}}
+\DoxyCodeLine{\Hypertarget{_x11-_disable_stringification_8cpp_source_l00005}00005\ \textcolor{comment}{//\ will\ be\ deleted\ soon\ :-\/)}}
+\DoxyCodeLine{\Hypertarget{_x11-_disable_stringification_8cpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{_x11-_disable_stringification_8cpp_source_l00007}\mbox{\hyperlink{_x11-_disable_stringification_8cpp_a656eb5868e824d59f489f910db438420}{00007}}\ \textcolor{preprocessor}{\#define\ CATCH\_CONFIG\_MAIN}}
+\DoxyCodeLine{\Hypertarget{_x11-_disable_stringification_8cpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{single__include_2catch2_2catch_8hpp}{catch2/catch.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{_x11-_disable_stringification_8cpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{_x11-_disable_stringification_8cpp_source_l00010}\mbox{\hyperlink{struct_hidden}{00010}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_hidden}{Hidden}}\ \{\};}
+\DoxyCodeLine{\Hypertarget{_x11-_disable_stringification_8cpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{_x11-_disable_stringification_8cpp_source_l00012}\mbox{\hyperlink{_x11-_disable_stringification_8cpp_af1826f98c88f0273d70efb00a7860497}{00012}}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{_x11-_disable_stringification_8cpp_af1826f98c88f0273d70efb00a7860497}{operator==}}(\mbox{\hyperlink{struct_hidden}{Hidden}},\ \mbox{\hyperlink{struct_hidden}{Hidden}})\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \}}
+\DoxyCodeLine{\Hypertarget{_x11-_disable_stringification_8cpp_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{_x11-_disable_stringification_8cpp_source_l00014}\mbox{\hyperlink{_x11-_disable_stringification_8cpp_a0ee4380626e141bd3c408391afd35cca}{00014}}\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\textcolor{stringliteral}{"{}DisableStringification"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{_x11-_disable_stringification_8cpp_source_l00015}00015\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{struct_hidden}{Hidden}}\{\}\ ==\ \mbox{\hyperlink{struct_hidden}{Hidden}}\{\}\ );}
+\DoxyCodeLine{\Hypertarget{_x11-_disable_stringification_8cpp_source_l00016}00016\ \}}
+
+\end{DoxyCode}

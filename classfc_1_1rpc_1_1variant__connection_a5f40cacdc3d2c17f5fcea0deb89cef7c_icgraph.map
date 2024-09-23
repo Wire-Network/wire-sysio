@@ -1,0 +1,15 @@
+<map id="fc::rpc::variant_connection::async_call" name="fc::rpc::variant_connection::async_call">
+<area shape="rect" id="Node000001" title="args will be handled as named params" alt="" coords="229,169,404,210"/>
+<area shape="rect" id="Node000002" href="$classfc_1_1rpc_1_1variant__connection.html#add0e2648c3a6609bf8854bf3cc9d8db5" title=" " alt="" coords="5,5,181,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="287,159,239,109,210,84,179,61,156,49,159,44,182,57,214,80,243,106,290,155"/>
+<area shape="rect" id="Node000003" href="$classfc_1_1rpc_1_1variant__connection.html#a1319e9309831427287ddc6abfd2d1f0f" title=" " alt="" coords="5,71,181,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="259,164,180,127,149,114,151,109,182,122,262,160"/>
+<area shape="rect" id="Node000004" href="$classfc_1_1rpc_1_1variant__connection.html#a607fc93c3bd6d3116fd9634f22b190cf" title=" " alt="" coords="5,136,181,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="213,177,181,172,181,167,214,172"/>
+<area shape="rect" id="Node000005" href="$classfc_1_1rpc_1_1variant__connection.html#a897e300caeff80f6953cb4cc90944603" title=" " alt="" coords="5,201,181,242"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="214,207,181,212,181,206,213,202"/>
+<area shape="rect" id="Node000006" href="$classfc_1_1rpc_1_1variant__connection.html#aeef96ccf72608a67329a6b22c0fa4ad9" title=" " alt="" coords="5,267,181,307"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="261,219,182,256,151,269,149,264,180,251,259,215"/>
+<area shape="rect" id="Node000007" href="$classfc_1_1rpc_1_1variant__connection.html#ad496850b2c60a89f38b9f0b6f48a5a36" title=" " alt="" coords="5,332,181,373"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="290,224,243,273,182,321,158,334,156,329,179,317,239,269,287,220"/>
+</map>

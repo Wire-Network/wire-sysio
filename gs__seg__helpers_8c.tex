@@ -1,0 +1,190 @@
+\doxysection{libraries/chain/webassembly/runtimes/sys-\/vm-\/oc/gs\+\_\+seg\+\_\+helpers.c File Reference}
+\hypertarget{gs__seg__helpers_8c}{}\label{gs__seg__helpers_8c}\index{libraries/chain/webassembly/runtimes/sys-\/vm-\/oc/gs\_seg\_helpers.c@{libraries/chain/webassembly/runtimes/sys-\/vm-\/oc/gs\_seg\_helpers.c}}
+{\ttfamily \#include $<$sysio/chain/webassembly/sys-\/vm-\/oc/gs\+\_\+seg\+\_\+helpers.\+h$>$}\newline
+{\ttfamily \#include $<$asm/prctl.\+h$>$}\newline
+{\ttfamily \#include $<$sys/prctl.\+h$>$}\newline
+{\ttfamily \#include $<$sys/mman.\+h$>$}\newline
+Include dependency graph for gs\+\_\+seg\+\_\+helpers.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{gs__seg__helpers_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{gs__seg__helpers_8c_af033ad50e2409e6c9c8e2bf0c113446a}{SYSVMOC\+\_\+\+MEMORY\+\_\+\+PTR\+\_\+cb\+\_\+ptr}}~\mbox{\hyperlink{gs__seg__helpers_8h_a3fefb33397868842aacd0a7bbb0e26c5}{GS\+\_\+\+PTR}} struct \mbox{\hyperlink{structeos__vm__oc__control__block}{eos\+\_\+vm\+\_\+oc\+\_\+control\+\_\+block}}\texorpdfstring{$\ast$}{*} const cb\+\_\+ptr = ((\mbox{\hyperlink{gs__seg__helpers_8h_a3fefb33397868842aacd0a7bbb0e26c5}{GS\+\_\+\+PTR}} struct \mbox{\hyperlink{structeos__vm__oc__control__block}{eos\+\_\+vm\+\_\+oc\+\_\+control\+\_\+block}}\texorpdfstring{$\ast$}{*} const)(\mbox{\hyperlink{gs__seg__helpers_8h_a1edd53bdee214a76b92b8f408b614fc8}{EOS\+\_\+\+VM\+\_\+\+OC\+\_\+\+CONTROL\+\_\+\+BLOCK\+\_\+\+OFFSET}}));
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{gs__seg__helpers_8c_ac1ca206f7fd4a694348df869fd793c9c}{arch\+\_\+prctl}} (int code, unsigned long \texorpdfstring{$\ast$}{*}addr)
+\item 
+\mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\+\_\+t}} \mbox{\hyperlink{gs__seg__helpers_8c_ae68a4f81029eccfca26fd55002e5caa9}{eos\+\_\+vm\+\_\+oc\+\_\+grow\+\_\+memory}} (\mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\+\_\+t}} grow, \mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\+\_\+t}} max)
+\item 
+sigjmp\+\_\+buf \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{gs__seg__helpers_8c_a5b567c03bc74b2639ba506dc3700930d}{eos\+\_\+vm\+\_\+oc\+\_\+get\+\_\+jmp\+\_\+buf}} ()
+\item 
+void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{gs__seg__helpers_8c_a78b2433e9a5fa3e8e6d3312b251a0152}{eos\+\_\+vm\+\_\+oc\+\_\+get\+\_\+exception\+\_\+ptr}} ()
+\item 
+void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{gs__seg__helpers_8c_afbc04a665423590aed4936410345e7f8}{eos\+\_\+vm\+\_\+oc\+\_\+get\+\_\+bounce\+\_\+buffer\+\_\+list}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{gs__seg__helpers_8c_af033ad50e2409e6c9c8e2bf0c113446a}\index{gs\_seg\_helpers.c@{gs\_seg\_helpers.c}!SYSVMOC\_MEMORY\_PTR\_cb\_ptr@{SYSVMOC\_MEMORY\_PTR\_cb\_ptr}}
+\index{SYSVMOC\_MEMORY\_PTR\_cb\_ptr@{SYSVMOC\_MEMORY\_PTR\_cb\_ptr}!gs\_seg\_helpers.c@{gs\_seg\_helpers.c}}
+\doxysubsubsection{\texorpdfstring{SYSVMOC\_MEMORY\_PTR\_cb\_ptr}{SYSVMOC\_MEMORY\_PTR\_cb\_ptr}}
+{\footnotesize\ttfamily \label{gs__seg__helpers_8c_af033ad50e2409e6c9c8e2bf0c113446a} 
+\#define SYSVMOC\+\_\+\+MEMORY\+\_\+\+PTR\+\_\+cb\+\_\+ptr~\mbox{\hyperlink{gs__seg__helpers_8h_a3fefb33397868842aacd0a7bbb0e26c5}{GS\+\_\+\+PTR}} struct \mbox{\hyperlink{structeos__vm__oc__control__block}{eos\+\_\+vm\+\_\+oc\+\_\+control\+\_\+block}}\texorpdfstring{$\ast$}{*} const cb\+\_\+ptr = ((\mbox{\hyperlink{gs__seg__helpers_8h_a3fefb33397868842aacd0a7bbb0e26c5}{GS\+\_\+\+PTR}} struct \mbox{\hyperlink{structeos__vm__oc__control__block}{eos\+\_\+vm\+\_\+oc\+\_\+control\+\_\+block}}\texorpdfstring{$\ast$}{*} const)(\mbox{\hyperlink{gs__seg__helpers_8h_a1edd53bdee214a76b92b8f408b614fc8}{EOS\+\_\+\+VM\+\_\+\+OC\+\_\+\+CONTROL\+\_\+\+BLOCK\+\_\+\+OFFSET}}));}
+
+
+
+Definition at line \mbox{\hyperlink{gs__seg__helpers_8c_source_l00009}{9}} of file \mbox{\hyperlink{gs__seg__helpers_8c_source}{gs\+\_\+seg\+\_\+helpers.\+c}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{gs__seg__helpers_8c_ac1ca206f7fd4a694348df869fd793c9c}\index{gs\_seg\_helpers.c@{gs\_seg\_helpers.c}!arch\_prctl@{arch\_prctl}}
+\index{arch\_prctl@{arch\_prctl}!gs\_seg\_helpers.c@{gs\_seg\_helpers.c}}
+\doxysubsubsection{\texorpdfstring{arch\_prctl()}{arch\_prctl()}}
+{\footnotesize\ttfamily \label{gs__seg__helpers_8c_ac1ca206f7fd4a694348df869fd793c9c} 
+int arch\+\_\+prctl (\begin{DoxyParamCaption}\item[{int}]{code}{, }\item[{unsigned long \texorpdfstring{$\ast$}{*}}]{addr}{}\end{DoxyParamCaption})}
+
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=308pt]{gs__seg__helpers_8c_ac1ca206f7fd4a694348df869fd793c9c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{gs__seg__helpers_8c_afbc04a665423590aed4936410345e7f8}\index{gs\_seg\_helpers.c@{gs\_seg\_helpers.c}!eos\_vm\_oc\_get\_bounce\_buffer\_list@{eos\_vm\_oc\_get\_bounce\_buffer\_list}}
+\index{eos\_vm\_oc\_get\_bounce\_buffer\_list@{eos\_vm\_oc\_get\_bounce\_buffer\_list}!gs\_seg\_helpers.c@{gs\_seg\_helpers.c}}
+\doxysubsubsection{\texorpdfstring{eos\_vm\_oc\_get\_bounce\_buffer\_list()}{eos\_vm\_oc\_get\_bounce\_buffer\_list()}}
+{\footnotesize\ttfamily \label{gs__seg__helpers_8c_afbc04a665423590aed4936410345e7f8} 
+void \texorpdfstring{$\ast$}{*} eos\+\_\+vm\+\_\+oc\+\_\+get\+\_\+bounce\+\_\+buffer\+\_\+list (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gs__seg__helpers_8c_source_l00063}{63}} of file \mbox{\hyperlink{gs__seg__helpers_8c_source}{gs\+\_\+seg\+\_\+helpers.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00064\ \ \ \ \mbox{\hyperlink{gs__seg__helpers_8c_af033ad50e2409e6c9c8e2bf0c113446a}{SYSVMOC\_MEMORY\_PTR\_cb\_ptr}};}
+\DoxyCodeLine{00065\ \ \ \ \textcolor{keywordflow}{return}\ cb\_ptr-\/>bounce\_buffers;}
+\DoxyCodeLine{00066\ \}}
+
+\end{DoxyCode}
+\Hypertarget{gs__seg__helpers_8c_a78b2433e9a5fa3e8e6d3312b251a0152}\index{gs\_seg\_helpers.c@{gs\_seg\_helpers.c}!eos\_vm\_oc\_get\_exception\_ptr@{eos\_vm\_oc\_get\_exception\_ptr}}
+\index{eos\_vm\_oc\_get\_exception\_ptr@{eos\_vm\_oc\_get\_exception\_ptr}!gs\_seg\_helpers.c@{gs\_seg\_helpers.c}}
+\doxysubsubsection{\texorpdfstring{eos\_vm\_oc\_get\_exception\_ptr()}{eos\_vm\_oc\_get\_exception\_ptr()}}
+{\footnotesize\ttfamily \label{gs__seg__helpers_8c_a78b2433e9a5fa3e8e6d3312b251a0152} 
+void \texorpdfstring{$\ast$}{*} eos\+\_\+vm\+\_\+oc\+\_\+get\+\_\+exception\+\_\+ptr (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gs__seg__helpers_8c_source_l00058}{58}} of file \mbox{\hyperlink{gs__seg__helpers_8c_source}{gs\+\_\+seg\+\_\+helpers.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00059\ \ \ \ \mbox{\hyperlink{gs__seg__helpers_8c_af033ad50e2409e6c9c8e2bf0c113446a}{SYSVMOC\_MEMORY\_PTR\_cb\_ptr}};}
+\DoxyCodeLine{00060\ \ \ \ \textcolor{keywordflow}{return}\ cb\_ptr-\/>eptr;}
+\DoxyCodeLine{00061\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{gs__seg__helpers_8c_a78b2433e9a5fa3e8e6d3312b251a0152_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{gs__seg__helpers_8c_a5b567c03bc74b2639ba506dc3700930d}\index{gs\_seg\_helpers.c@{gs\_seg\_helpers.c}!eos\_vm\_oc\_get\_jmp\_buf@{eos\_vm\_oc\_get\_jmp\_buf}}
+\index{eos\_vm\_oc\_get\_jmp\_buf@{eos\_vm\_oc\_get\_jmp\_buf}!gs\_seg\_helpers.c@{gs\_seg\_helpers.c}}
+\doxysubsubsection{\texorpdfstring{eos\_vm\_oc\_get\_jmp\_buf()}{eos\_vm\_oc\_get\_jmp\_buf()}}
+{\footnotesize\ttfamily \label{gs__seg__helpers_8c_a5b567c03bc74b2639ba506dc3700930d} 
+sigjmp\+\_\+buf \texorpdfstring{$\ast$}{*} eos\+\_\+vm\+\_\+oc\+\_\+get\+\_\+jmp\+\_\+buf (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gs__seg__helpers_8c_source_l00053}{53}} of file \mbox{\hyperlink{gs__seg__helpers_8c_source}{gs\+\_\+seg\+\_\+helpers.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00054\ \ \ \ \mbox{\hyperlink{gs__seg__helpers_8c_af033ad50e2409e6c9c8e2bf0c113446a}{SYSVMOC\_MEMORY\_PTR\_cb\_ptr}};}
+\DoxyCodeLine{00055\ \ \ \ \textcolor{keywordflow}{return}\ cb\_ptr-\/>jmp;}
+\DoxyCodeLine{00056\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{gs__seg__helpers_8c_a5b567c03bc74b2639ba506dc3700930d_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{gs__seg__helpers_8c_ae68a4f81029eccfca26fd55002e5caa9}\index{gs\_seg\_helpers.c@{gs\_seg\_helpers.c}!eos\_vm\_oc\_grow\_memory@{eos\_vm\_oc\_grow\_memory}}
+\index{eos\_vm\_oc\_grow\_memory@{eos\_vm\_oc\_grow\_memory}!gs\_seg\_helpers.c@{gs\_seg\_helpers.c}}
+\doxysubsubsection{\texorpdfstring{eos\_vm\_oc\_grow\_memory()}{eos\_vm\_oc\_grow\_memory()}}
+{\footnotesize\ttfamily \label{gs__seg__helpers_8c_ae68a4f81029eccfca26fd55002e5caa9} 
+\mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\+\_\+t}} eos\+\_\+vm\+\_\+oc\+\_\+grow\+\_\+memory (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\+\_\+t}}}]{grow}{, }\item[{\mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\+\_\+t}}}]{max}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gs__seg__helpers_8c_source_l00011}{11}} of file \mbox{\hyperlink{gs__seg__helpers_8c_source}{gs\+\_\+seg\+\_\+helpers.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00011\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00012\ \ \ \ \mbox{\hyperlink{gs__seg__helpers_8c_af033ad50e2409e6c9c8e2bf0c113446a}{SYSVMOC\_MEMORY\_PTR\_cb\_ptr}};}
+\DoxyCodeLine{00013\ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ previous\_page\_count\ =\ cb\_ptr-\/>current\_linear\_memory\_pages;}
+\DoxyCodeLine{00014\ \ \ \ \mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}}\ grow\_amount\ =\ grow;}
+\DoxyCodeLine{00015\ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{namespacesysio_1_1vm_a0ae6751a77293216df4656dee5081eb2a95b0fd1e8f1e450ae134af180be894f3}{max\_pages}}\ =\ max;}
+\DoxyCodeLine{00016\ \ \ \ \textcolor{keywordflow}{if}(max\_pages\ >\ cb\_ptr-\/>max\_linear\_memory\_pages)}
+\DoxyCodeLine{00017\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1vm_a0ae6751a77293216df4656dee5081eb2a95b0fd1e8f1e450ae134af180be894f3}{max\_pages}}\ =\ cb\_ptr-\/>max\_linear\_memory\_pages;}
+\DoxyCodeLine{00018\ \ \ \ \textcolor{keywordflow}{if}(grow\ ==\ 0)}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (\mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}})cb\_ptr-\/>current\_linear\_memory\_pages;}
+\DoxyCodeLine{00020\ \ \ \ \textcolor{keywordflow}{if}(previous\_page\_count\ +\ grow\_amount\ >\ max\_pages)}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (\mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}})-\/1;}
+\DoxyCodeLine{00022\ }
+\DoxyCodeLine{00023\ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ max\_segments\ =\ cb\_ptr-\/>execution\_thread\_memory\_length\ /\ \mbox{\hyperlink{gs__seg__helpers_8h_aebe81eb85a49691a28997eaa4d6dce8f}{EOS\_VM\_OC\_MEMORY\_STRIDE}}\ -\/\ 1;}
+\DoxyCodeLine{00024\ \ \ \ \textcolor{keywordtype}{int}\ was\_extended\ =\ previous\_page\_count\ >\ max\_segments;}
+\DoxyCodeLine{00025\ \ \ \ \textcolor{keywordtype}{int}\ will\_be\_extended\ =\ previous\_page\_count\ +\ grow\_amount\ >\ max\_segments;}
+\DoxyCodeLine{00026\ \ \ \ \textcolor{keywordtype}{char}*\ extended\_memory\_start\ =\ cb\_ptr-\/>full\_linear\_memory\_start\ +\ max\_segments\ *\ 64*1024;}
+\DoxyCodeLine{00027\ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ gs\_diff;}
+\DoxyCodeLine{00028\ \ \ \ \textcolor{keywordflow}{if}(will\_be\_extended\ \&\&\ grow\_amount\ >\ 0)\ \{}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ skip\ =\ was\_extended\ ?\ previous\_page\_count\ -\/\ max\_segments\ :\ 0;}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ gs\_diff\ =\ was\_extended\ ?\ 0\ :\ max\_segments\ -\/\ previous\_page\_count;}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ mprotect(extended\_memory\_start\ +\ skip\ *\ 64*1024,\ (grow\_amount\ -\/\ gs\_diff)\ *\ 64*1024,\ PROT\_READ\ |\ PROT\_WRITE);}
+\DoxyCodeLine{00032\ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (was\_extended\ \&\&\ grow\_amount\ <\ 0)\ \{}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ skip\ =\ will\_be\_extended\ ?\ previous\_page\_count\ +\ grow\_amount\ -\/\ max\_segments\ :\ 0;}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ gs\_diff\ =\ will\_be\_extended\ ?\ 0\ :\ previous\_page\_count\ +\ grow\_amount\ -\/\ max\_segments;}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ mprotect(extended\_memory\_start\ +\ skip\ *\ 64*1024,\ (-\/grow\_amount\ +\ gs\_diff)\ *\ 64*1024,\ PROT\_NONE);}
+\DoxyCodeLine{00036\ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ gs\_diff\ =\ grow\_amount;}
+\DoxyCodeLine{00038\ \ \ \ \}}
+\DoxyCodeLine{00039\ }
+\DoxyCodeLine{00040\ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ current\_gs;}
+\DoxyCodeLine{00041\ \ \ \ \mbox{\hyperlink{gs__seg__helpers_8c_ac1ca206f7fd4a694348df869fd793c9c}{arch\_prctl}}(ARCH\_GET\_GS,\ \&current\_gs);}
+\DoxyCodeLine{00042\ \ \ \ current\_gs\ +=\ gs\_diff\ *\ \mbox{\hyperlink{gs__seg__helpers_8h_aebe81eb85a49691a28997eaa4d6dce8f}{EOS\_VM\_OC\_MEMORY\_STRIDE}};}
+\DoxyCodeLine{00043\ \ \ \ \mbox{\hyperlink{gs__seg__helpers_8c_ac1ca206f7fd4a694348df869fd793c9c}{arch\_prctl}}(ARCH\_SET\_GS,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}*)current\_gs);}
+\DoxyCodeLine{00044\ \ \ \ cb\_ptr-\/>current\_linear\_memory\_pages\ +=\ grow\_amount;}
+\DoxyCodeLine{00045\ \ \ \ cb\_ptr-\/>first\_invalid\_memory\_address\ +=\ grow\_amount*64*1024;}
+\DoxyCodeLine{00046\ }
+\DoxyCodeLine{00047\ \ \ \ \textcolor{keywordflow}{if}(grow\_amount\ >\ 0)}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(cb\_ptr-\/>full\_linear\_memory\_start\ +\ previous\_page\_count*64u*1024u,\ 0,\ grow\_amount*64u*1024u);}
+\DoxyCodeLine{00049\ }
+\DoxyCodeLine{00050\ \ \ \ \textcolor{keywordflow}{return}\ (\mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}})previous\_page\_count;}
+\DoxyCodeLine{00051\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=308pt]{gs__seg__helpers_8c_ae68a4f81029eccfca26fd55002e5caa9_cgraph}
+\end{center}
+\end{figure}

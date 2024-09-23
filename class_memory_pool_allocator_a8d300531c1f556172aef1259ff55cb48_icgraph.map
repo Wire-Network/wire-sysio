@@ -1,0 +1,5 @@
+<map id="MemoryPoolAllocator::Malloc" name="MemoryPoolAllocator::Malloc">
+<area shape="rect" id="Node000001" title="Allocates a memory block. (concept Allocator)" alt="" coords="199,5,344,46"/>
+<area shape="rect" id="Node000002" href="$class_memory_pool_allocator.html#a7c273279d361b207ff622d4bdfc63074" title="Resizes a memory block (concept Allocator)" alt="" coords="5,5,151,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="183,28,151,28,151,23,183,23"/>
+</map>

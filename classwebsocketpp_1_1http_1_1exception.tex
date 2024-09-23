@@ -1,0 +1,155 @@
+\doxysection{websocketpp\+::http\+::exception Class Reference}
+\hypertarget{classwebsocketpp_1_1http_1_1exception}{}\label{classwebsocketpp_1_1http_1_1exception}\index{websocketpp::http::exception@{websocketpp::http::exception}}
+
+
+{\ttfamily \#include $<$constants.\+hpp$>$}
+
+
+
+Inheritance diagram for websocketpp\+::http\+::exception\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=182pt]{classwebsocketpp_1_1http_1_1exception__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for websocketpp\+::http\+::exception\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=241pt]{classwebsocketpp_1_1http_1_1exception__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classwebsocketpp_1_1http_1_1exception_a693f5feba657716d2bd20673951b5d28}{exception}} (const std\+::string \&log\+\_\+msg, \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1status__code_ae0d61c309e053ee5673517b54e2886c6}{status\+\_\+code\+::value}} error\+\_\+code, const std\+::string \&error\+\_\+msg=std\+::string(), const std\+::string \&body=std\+::string())
+\item 
+\mbox{\hyperlink{classwebsocketpp_1_1http_1_1exception_a477ee3e56c8b0a54d599d735b834663a}{\texorpdfstring{$\sim$}{\string~}exception}} ()  throw ()
+\item 
+virtual const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classwebsocketpp_1_1http_1_1exception_ae761caeaf8c7ad6f6452be1a931007d0}{what}} () const  throw ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::string \mbox{\hyperlink{classwebsocketpp_1_1http_1_1exception_a2be9d8a05bad1b10432fdf4e25159dfe}{m\+\_\+msg}}
+\item 
+std\+::string \mbox{\hyperlink{classwebsocketpp_1_1http_1_1exception_ab723cf4d6e80075e9a73da3b7577cdc3}{m\+\_\+error\+\_\+msg}}
+\item 
+std\+::string \mbox{\hyperlink{classwebsocketpp_1_1http_1_1exception_ac8a456ed1db5ead45831fdc61b216958}{m\+\_\+body}}
+\item 
+\mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1status__code_ae0d61c309e053ee5673517b54e2886c6}{status\+\_\+code\+::value}} \mbox{\hyperlink{classwebsocketpp_1_1http_1_1exception_a169eaa70f405f073091194113fe75d0c}{m\+\_\+error\+\_\+code}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2constants_8hpp_source_l00283}{283}} of file \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2constants_8hpp_source}{constants.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classwebsocketpp_1_1http_1_1exception_a693f5feba657716d2bd20673951b5d28}\index{websocketpp::http::exception@{websocketpp::http::exception}!exception@{exception}}
+\index{exception@{exception}!websocketpp::http::exception@{websocketpp::http::exception}}
+\doxysubsubsection{\texorpdfstring{exception()}{exception()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1http_1_1exception_a693f5feba657716d2bd20673951b5d28} 
+websocketpp\+::http\+::exception\+::exception (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{log\+\_\+msg}{, }\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1status__code_ae0d61c309e053ee5673517b54e2886c6}{status\+\_\+code\+::value}}}]{error\+\_\+code}{, }\item[{const std\+::string \&}]{error\+\_\+msg}{ = {\ttfamily std\+:\+:string()}, }\item[{const std\+::string \&}]{body}{ = {\ttfamily std\+:\+:string()}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2constants_8hpp_source_l00285}{285}} of file \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2constants_8hpp_source}{constants.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00289\ \ \ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1exception_a2be9d8a05bad1b10432fdf4e25159dfe}{m\_msg}}(log\_msg)}
+\DoxyCodeLine{00290\ \ \ \ \ \ \ \ \ \ \ ,\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1exception_ab723cf4d6e80075e9a73da3b7577cdc3}{m\_error\_msg}}(error\_msg)}
+\DoxyCodeLine{00291\ \ \ \ \ \ \ \ \ \ \ ,\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1exception_ac8a456ed1db5ead45831fdc61b216958}{m\_body}}(body)}
+\DoxyCodeLine{00292\ \ \ \ \ \ \ \ \ \ \ ,\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1exception_a169eaa70f405f073091194113fe75d0c}{m\_error\_code}}(error\_code)\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1http_1_1exception_a477ee3e56c8b0a54d599d735b834663a}\index{websocketpp::http::exception@{websocketpp::http::exception}!````~exception@{\texorpdfstring{$\sim$}{\string~}exception}}
+\index{````~exception@{\texorpdfstring{$\sim$}{\string~}exception}!websocketpp::http::exception@{websocketpp::http::exception}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}exception()}{\string~exception()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1http_1_1exception_a477ee3e56c8b0a54d599d735b834663a} 
+websocketpp\+::http\+::exception\+::\texorpdfstring{$\sim$}{\string~}exception (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) throw ( ) \hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2constants_8hpp_source_l00294}{294}} of file \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2constants_8hpp_source}{constants.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00294\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classwebsocketpp_1_1http_1_1exception_ae761caeaf8c7ad6f6452be1a931007d0}\index{websocketpp::http::exception@{websocketpp::http::exception}!what@{what}}
+\index{what@{what}!websocketpp::http::exception@{websocketpp::http::exception}}
+\doxysubsubsection{\texorpdfstring{what()}{what()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1http_1_1exception_ae761caeaf8c7ad6f6452be1a931007d0} 
+virtual const char \texorpdfstring{$\ast$}{*} websocketpp\+::http\+::exception\+::what (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const throw ( ) \hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2constants_8hpp_source_l00296}{296}} of file \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2constants_8hpp_source}{constants.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00296\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00297\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1exception_a2be9d8a05bad1b10432fdf4e25159dfe}{m\_msg}}.c\_str();}
+\DoxyCodeLine{00298\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classwebsocketpp_1_1http_1_1exception_ac8a456ed1db5ead45831fdc61b216958}\index{websocketpp::http::exception@{websocketpp::http::exception}!m\_body@{m\_body}}
+\index{m\_body@{m\_body}!websocketpp::http::exception@{websocketpp::http::exception}}
+\doxysubsubsection{\texorpdfstring{m\_body}{m\_body}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1http_1_1exception_ac8a456ed1db5ead45831fdc61b216958} 
+std\+::string websocketpp\+::http\+::exception\+::m\+\_\+body}
+
+
+
+Definition at line \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2constants_8hpp_source_l00302}{302}} of file \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2constants_8hpp_source}{constants.\+hpp}}.
+
+\Hypertarget{classwebsocketpp_1_1http_1_1exception_a169eaa70f405f073091194113fe75d0c}\index{websocketpp::http::exception@{websocketpp::http::exception}!m\_error\_code@{m\_error\_code}}
+\index{m\_error\_code@{m\_error\_code}!websocketpp::http::exception@{websocketpp::http::exception}}
+\doxysubsubsection{\texorpdfstring{m\_error\_code}{m\_error\_code}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1http_1_1exception_a169eaa70f405f073091194113fe75d0c} 
+\mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1status__code_ae0d61c309e053ee5673517b54e2886c6}{status\+\_\+code\+::value}} websocketpp\+::http\+::exception\+::m\+\_\+error\+\_\+code}
+
+
+
+Definition at line \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2constants_8hpp_source_l00303}{303}} of file \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2constants_8hpp_source}{constants.\+hpp}}.
+
+\Hypertarget{classwebsocketpp_1_1http_1_1exception_ab723cf4d6e80075e9a73da3b7577cdc3}\index{websocketpp::http::exception@{websocketpp::http::exception}!m\_error\_msg@{m\_error\_msg}}
+\index{m\_error\_msg@{m\_error\_msg}!websocketpp::http::exception@{websocketpp::http::exception}}
+\doxysubsubsection{\texorpdfstring{m\_error\_msg}{m\_error\_msg}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1http_1_1exception_ab723cf4d6e80075e9a73da3b7577cdc3} 
+std\+::string websocketpp\+::http\+::exception\+::m\+\_\+error\+\_\+msg}
+
+
+
+Definition at line \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2constants_8hpp_source_l00301}{301}} of file \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2constants_8hpp_source}{constants.\+hpp}}.
+
+\Hypertarget{classwebsocketpp_1_1http_1_1exception_a2be9d8a05bad1b10432fdf4e25159dfe}\index{websocketpp::http::exception@{websocketpp::http::exception}!m\_msg@{m\_msg}}
+\index{m\_msg@{m\_msg}!websocketpp::http::exception@{websocketpp::http::exception}}
+\doxysubsubsection{\texorpdfstring{m\_msg}{m\_msg}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1http_1_1exception_a2be9d8a05bad1b10432fdf4e25159dfe} 
+std\+::string websocketpp\+::http\+::exception\+::m\+\_\+msg}
+
+
+
+Definition at line \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2constants_8hpp_source_l00300}{300}} of file \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2constants_8hpp_source}{constants.\+hpp}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/vendor/websocketpp/websocketpp/http/\mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2constants_8hpp}{constants.\+hpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,961 @@
+\doxysection{libraries/sys-\/vm/tests/spec/globals\+\_\+tests.cpp File Reference}
+\hypertarget{globals__tests_8cpp}{}\label{globals__tests_8cpp}\index{libraries/sys-\/vm/tests/spec/globals\_tests.cpp@{libraries/sys-\/vm/tests/spec/globals\_tests.cpp}}
+{\ttfamily \#include $<$algorithm$>$}\newline
+{\ttfamily \#include $<$vector$>$}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$iterator$>$}\newline
+{\ttfamily \#include $<$cmath$>$}\newline
+{\ttfamily \#include $<$cstdlib$>$}\newline
+{\ttfamily \#include $<$catch2/catch.\+hpp$>$}\newline
+{\ttfamily \#include $<$utils.\+hpp$>$}\newline
+{\ttfamily \#include $<$wasm\+\_\+config.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/vm/backend.\+hpp$>$}\newline
+Include dependency graph for globals\+\_\+tests.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{globals__tests_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{globals__tests_8cpp_aa7d81a8c1cd2e0fbb38c1dddc8558859}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Testing wasm $<$globals\+\_\+0\+\_\+wasm$>$"{}, "{}\mbox{[}globals\+\_\+0\+\_\+wasm\+\_\+tests\mbox{]}"{})
+\item 
+\mbox{\hyperlink{globals__tests_8cpp_aa6bc3925bf1beefa0e0fb9b211a53b4f}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Testing wasm $<$globals\+\_\+1\+\_\+wasm$>$"{}, "{}\mbox{[}globals\+\_\+1\+\_\+wasm\+\_\+tests\mbox{]}"{})
+\item 
+\mbox{\hyperlink{globals__tests_8cpp_a4c50d3de2053ac9b432e8b9ed6511115}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Testing wasm $<$globals\+\_\+10\+\_\+wasm$>$"{}, "{}\mbox{[}globals\+\_\+10\+\_\+wasm\+\_\+tests\mbox{]}"{})
+\item 
+\mbox{\hyperlink{globals__tests_8cpp_a4a5708230895e40aab256e57889b4446}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Testing wasm $<$globals\+\_\+11\+\_\+wasm$>$"{}, "{}\mbox{[}globals\+\_\+11\+\_\+wasm\+\_\+tests\mbox{]}"{})
+\item 
+\mbox{\hyperlink{globals__tests_8cpp_aafffa3087ecdc812ba5297a79879e764}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Testing wasm $<$globals\+\_\+12\+\_\+wasm$>$"{}, "{}\mbox{[}globals\+\_\+12\+\_\+wasm\+\_\+tests\mbox{]}"{})
+\item 
+\mbox{\hyperlink{globals__tests_8cpp_a34874c80d982e6181a2cb2c96dc05b84}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Testing wasm $<$globals\+\_\+13\+\_\+wasm$>$"{}, "{}\mbox{[}globals\+\_\+13\+\_\+wasm\+\_\+tests\mbox{]}"{})
+\item 
+\mbox{\hyperlink{globals__tests_8cpp_a8b89f698a2035cb77ba10ebe49886f48}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Testing wasm $<$globals\+\_\+15\+\_\+wasm$>$"{}, "{}\mbox{[}globals\+\_\+15\+\_\+wasm\+\_\+tests\mbox{]}"{})
+\item 
+\mbox{\hyperlink{globals__tests_8cpp_a255840f3d8133455aa81a15a0d7e2fec}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Testing wasm $<$globals\+\_\+16\+\_\+wasm$>$"{}, "{}\mbox{[}globals\+\_\+16\+\_\+wasm\+\_\+tests\mbox{]}"{})
+\item 
+\mbox{\hyperlink{globals__tests_8cpp_affcca7d018840b5c89483097f7d1c4fe}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Testing wasm $<$globals\+\_\+17\+\_\+wasm$>$"{}, "{}\mbox{[}globals\+\_\+17\+\_\+wasm\+\_\+tests\mbox{]}"{})
+\item 
+\mbox{\hyperlink{globals__tests_8cpp_abf7f1217d1912e0bed86ae0769cdf5bf}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Testing wasm $<$globals\+\_\+18\+\_\+wasm$>$"{}, "{}\mbox{[}globals\+\_\+18\+\_\+wasm\+\_\+tests\mbox{]}"{})
+\item 
+\mbox{\hyperlink{globals__tests_8cpp_a9426db128b9653335fd5d715cf66ef4b}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Testing wasm $<$globals\+\_\+19\+\_\+wasm$>$"{}, "{}\mbox{[}globals\+\_\+19\+\_\+wasm\+\_\+tests\mbox{]}"{})
+\item 
+\mbox{\hyperlink{globals__tests_8cpp_a1fddee34e3676392d82bc5bbe1bf2cf2}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Testing wasm $<$globals\+\_\+2\+\_\+wasm$>$"{}, "{}\mbox{[}globals\+\_\+2\+\_\+wasm\+\_\+tests\mbox{]}"{})
+\item 
+\mbox{\hyperlink{globals__tests_8cpp_a6532ece2290fd71f89f99eaf4eda0eca}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Testing wasm $<$globals\+\_\+20\+\_\+wasm$>$"{}, "{}\mbox{[}globals\+\_\+20\+\_\+wasm\+\_\+tests\mbox{]}"{})
+\item 
+\mbox{\hyperlink{globals__tests_8cpp_ad53d15a5f02ff831b62447603578e10c}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Testing wasm $<$globals\+\_\+21\+\_\+wasm$>$"{}, "{}\mbox{[}globals\+\_\+21\+\_\+wasm\+\_\+tests\mbox{]}"{})
+\item 
+\mbox{\hyperlink{globals__tests_8cpp_a5644a152c0fa2f2d5f64f1c332e35726}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Testing wasm $<$globals\+\_\+22\+\_\+wasm$>$"{}, "{}\mbox{[}globals\+\_\+22\+\_\+wasm\+\_\+tests\mbox{]}"{})
+\item 
+\mbox{\hyperlink{globals__tests_8cpp_ad707c29f8dd111696e06b34dbe40879d}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Testing wasm $<$globals\+\_\+23\+\_\+wasm$>$"{}, "{}\mbox{[}globals\+\_\+23\+\_\+wasm\+\_\+tests\mbox{]}"{})
+\item 
+\mbox{\hyperlink{globals__tests_8cpp_a9a37ae958dbd8a5f580e773d389c1863}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Testing wasm $<$globals\+\_\+24\+\_\+wasm$>$"{}, "{}\mbox{[}globals\+\_\+24\+\_\+wasm\+\_\+tests\mbox{]}"{})
+\item 
+\mbox{\hyperlink{globals__tests_8cpp_aec95578f6ecadd029da9a14be2913dce}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Testing wasm $<$globals\+\_\+25\+\_\+wasm$>$"{}, "{}\mbox{[}globals\+\_\+25\+\_\+wasm\+\_\+tests\mbox{]}"{})
+\item 
+\mbox{\hyperlink{globals__tests_8cpp_ae23b20976e65aeddd19efd7e4b863df2}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Testing wasm $<$globals\+\_\+26\+\_\+wasm$>$"{}, "{}\mbox{[}globals\+\_\+26\+\_\+wasm\+\_\+tests\mbox{]}"{})
+\item 
+\mbox{\hyperlink{globals__tests_8cpp_a7cbe79ef4f6e81ff054e9286bf27de99}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Testing wasm $<$globals\+\_\+27\+\_\+wasm$>$"{}, "{}\mbox{[}globals\+\_\+27\+\_\+wasm\+\_\+tests\mbox{]}"{})
+\item 
+\mbox{\hyperlink{globals__tests_8cpp_a639f8ade6ff320f06bcc8bd691b8af83}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Testing wasm $<$globals\+\_\+28\+\_\+wasm$>$"{}, "{}\mbox{[}globals\+\_\+28\+\_\+wasm\+\_\+tests\mbox{]}"{})
+\item 
+\mbox{\hyperlink{globals__tests_8cpp_a9658d99eddde4d51e87213f0236bd1f1}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Testing wasm $<$globals\+\_\+29\+\_\+wasm$>$"{}, "{}\mbox{[}globals\+\_\+29\+\_\+wasm\+\_\+tests\mbox{]}"{})
+\item 
+\mbox{\hyperlink{globals__tests_8cpp_a3948aba87ef1334f9602e6b30d615d23}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Testing wasm $<$globals\+\_\+3\+\_\+wasm$>$"{}, "{}\mbox{[}globals\+\_\+3\+\_\+wasm\+\_\+tests\mbox{]}"{})
+\item 
+\mbox{\hyperlink{globals__tests_8cpp_a487e5bdf60a3f2a1742af09a0ec39311}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Testing wasm $<$globals\+\_\+30\+\_\+wasm$>$"{}, "{}\mbox{[}globals\+\_\+30\+\_\+wasm\+\_\+tests\mbox{]}"{})
+\item 
+\mbox{\hyperlink{globals__tests_8cpp_a36ed58889e9eab41e4369cb5b1b54a67}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Testing wasm $<$globals\+\_\+31\+\_\+wasm$>$"{}, "{}\mbox{[}globals\+\_\+31\+\_\+wasm\+\_\+tests\mbox{]}"{})
+\item 
+\mbox{\hyperlink{globals__tests_8cpp_ac3a979be281cfe069c719ee5a1c140d4}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Testing wasm $<$globals\+\_\+4\+\_\+wasm$>$"{}, "{}\mbox{[}globals\+\_\+4\+\_\+wasm\+\_\+tests\mbox{]}"{})
+\item 
+\mbox{\hyperlink{globals__tests_8cpp_af30d5ad811c7bf537789a5dad6d42cf2}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Testing wasm $<$globals\+\_\+5\+\_\+wasm$>$"{}, "{}\mbox{[}globals\+\_\+5\+\_\+wasm\+\_\+tests\mbox{]}"{})
+\item 
+\mbox{\hyperlink{globals__tests_8cpp_a1500aad8853fa4dfc3e6294be3354d52}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Testing wasm $<$globals\+\_\+6\+\_\+wasm$>$"{}, "{}\mbox{[}globals\+\_\+6\+\_\+wasm\+\_\+tests\mbox{]}"{})
+\item 
+\mbox{\hyperlink{globals__tests_8cpp_a397c2440f85f6474262dc599d040278f}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Testing wasm $<$globals\+\_\+7\+\_\+wasm$>$"{}, "{}\mbox{[}globals\+\_\+7\+\_\+wasm\+\_\+tests\mbox{]}"{})
+\item 
+\mbox{\hyperlink{globals__tests_8cpp_abb555d670f0c03a3be7ca6678d99da6d}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Testing wasm $<$globals\+\_\+8\+\_\+wasm$>$"{}, "{}\mbox{[}globals\+\_\+8\+\_\+wasm\+\_\+tests\mbox{]}"{})
+\item 
+\mbox{\hyperlink{globals__tests_8cpp_af9f71b9a3c899b75f15814a804d6b7f2}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Testing wasm $<$globals\+\_\+9\+\_\+wasm$>$"{}, "{}\mbox{[}globals\+\_\+9\+\_\+wasm\+\_\+tests\mbox{]}"{})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+wasm\+\_\+allocator \mbox{\hyperlink{globals__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{globals__tests_8cpp_aa7d81a8c1cd2e0fbb38c1dddc8558859}\index{globals\_tests.cpp@{globals\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!globals\_tests.cpp@{globals\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/31]}}
+{\footnotesize\ttfamily \label{globals__tests_8cpp_aa7d81a8c1cd2e0fbb38c1dddc8558859} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Testing wasm $<$globals\+\_\+0\+\_\+wasm$>$"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}globals\+\_\+0\+\_\+wasm\+\_\+tests\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{globals__tests_8cpp_source_l00018}{18}} of file \mbox{\hyperlink{globals__tests_8cpp_source}{globals\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00019\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<standalone\_function\_t,\ TestType>}};}
+\DoxyCodeLine{00020\ \ \ \ \textcolor{keyword}{auto}\ code\ =\ \mbox{\hyperlink{namespacesysio_1_1vm_a962c97bda1b30dbf62f4f9a50abe6f99}{read\_wasm}}(\ std::string(wasm\_directory)\ +\ \textcolor{stringliteral}{"{}globals.0.wasm"{}});}
+\DoxyCodeLine{00021\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ \mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}(\ code,\ \&\mbox{\hyperlink{globals__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}\ );}
+\DoxyCodeLine{00022\ }
+\DoxyCodeLine{00023\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}get-\/a"{}})-\/>to\_ui32()\ ==\ \mbox{\hyperlink{stdint_8h_a189f825ef34a1be844d384db2618ce12}{UINT32\_C}}(4294967294));}
+\DoxyCodeLine{00024\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}get-\/b"{}})-\/>to\_ui64()\ ==\ \mbox{\hyperlink{stdint_8h_a189f825ef34a1be844d384db2618ce12}{UINT32\_C}}(18446744073709551611));}
+\DoxyCodeLine{00025\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}get-\/x"{}})-\/>to\_ui32()\ ==\ \mbox{\hyperlink{stdint_8h_a189f825ef34a1be844d384db2618ce12}{UINT32\_C}}(4294967284));}
+\DoxyCodeLine{00026\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}get-\/y"{}})-\/>to\_ui64()\ ==\ \mbox{\hyperlink{stdint_8h_a189f825ef34a1be844d384db2618ce12}{UINT32\_C}}(18446744073709551601));}
+\DoxyCodeLine{00027\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_a5e92cc8f53d748fa129bb1525cea7806}{bit\_cast<uint32\_t>}}(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}get-\/1"{}})-\/>to\_f32())\ ==\ \mbox{\hyperlink{stdint_8h_a189f825ef34a1be844d384db2618ce12}{UINT32\_C}}(3225419776));}
+\DoxyCodeLine{00028\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_a5e92cc8f53d748fa129bb1525cea7806}{bit\_cast<uint64\_t>}}(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}get-\/2"{}})-\/>to\_f64())\ ==\ \mbox{\hyperlink{stdint_8h_a8da5373e041921aa34c2b6172ac3babc}{UINT64\_C}}(13839561654909534208));}
+\DoxyCodeLine{00029\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_a5e92cc8f53d748fa129bb1525cea7806}{bit\_cast<uint32\_t>}}(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}get-\/5"{}})-\/>to\_f32())\ ==\ \mbox{\hyperlink{stdint_8h_a189f825ef34a1be844d384db2618ce12}{UINT32\_C}}(3243245568));}
+\DoxyCodeLine{00030\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_a5e92cc8f53d748fa129bb1525cea7806}{bit\_cast<uint64\_t>}}(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}get-\/6"{}})-\/>to\_f64())\ ==\ \mbox{\hyperlink{stdint_8h_a8da5373e041921aa34c2b6172ac3babc}{UINT64\_C}}(13847442954257432576));}
+\DoxyCodeLine{00031\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(!\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}set-\/x"{}},\ \mbox{\hyperlink{stdint_8h_a189f825ef34a1be844d384db2618ce12}{UINT32\_C}}(6)));}
+\DoxyCodeLine{00032\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(!\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}set-\/y"{}},\ \mbox{\hyperlink{stdint_8h_a8da5373e041921aa34c2b6172ac3babc}{UINT64\_C}}(7)));}
+\DoxyCodeLine{00033\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(!\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}set-\/5"{}},\ \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_a5e92cc8f53d748fa129bb1525cea7806}{bit\_cast<float>}}(\mbox{\hyperlink{stdint_8h_a189f825ef34a1be844d384db2618ce12}{UINT32\_C}}(1090519040))));}
+\DoxyCodeLine{00034\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(!\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}set-\/6"{}},\ \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_a5e92cc8f53d748fa129bb1525cea7806}{bit\_cast<double>}}(\mbox{\hyperlink{stdint_8h_a8da5373e041921aa34c2b6172ac3babc}{UINT64\_C}}(4621256167635550208))));}
+\DoxyCodeLine{00035\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}get-\/x"{}})-\/>to\_ui32()\ ==\ \mbox{\hyperlink{stdint_8h_a189f825ef34a1be844d384db2618ce12}{UINT32\_C}}(6));}
+\DoxyCodeLine{00036\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}get-\/y"{}})-\/>to\_ui64()\ ==\ \mbox{\hyperlink{stdint_8h_a189f825ef34a1be844d384db2618ce12}{UINT32\_C}}(7));}
+\DoxyCodeLine{00037\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_a5e92cc8f53d748fa129bb1525cea7806}{bit\_cast<uint32\_t>}}(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}get-\/5"{}})-\/>to\_f32())\ ==\ \mbox{\hyperlink{stdint_8h_a189f825ef34a1be844d384db2618ce12}{UINT32\_C}}(1090519040));}
+\DoxyCodeLine{00038\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_a5e92cc8f53d748fa129bb1525cea7806}{bit\_cast<uint64\_t>}}(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}get-\/6"{}})-\/>to\_f64())\ ==\ \mbox{\hyperlink{stdint_8h_a8da5373e041921aa34c2b6172ac3babc}{UINT64\_C}}(4621256167635550208));}
+\DoxyCodeLine{00039\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}as-\/select-\/first"{}})-\/>to\_ui32()\ ==\ \mbox{\hyperlink{stdint_8h_a189f825ef34a1be844d384db2618ce12}{UINT32\_C}}(6));}
+\DoxyCodeLine{00040\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}as-\/select-\/mid"{}})-\/>to\_ui32()\ ==\ \mbox{\hyperlink{stdint_8h_a189f825ef34a1be844d384db2618ce12}{UINT32\_C}}(2));}
+\DoxyCodeLine{00041\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}as-\/select-\/last"{}})-\/>to\_ui32()\ ==\ \mbox{\hyperlink{stdint_8h_a189f825ef34a1be844d384db2618ce12}{UINT32\_C}}(2));}
+\DoxyCodeLine{00042\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}as-\/loop-\/first"{}})-\/>to\_ui32()\ ==\ \mbox{\hyperlink{stdint_8h_a189f825ef34a1be844d384db2618ce12}{UINT32\_C}}(6));}
+\DoxyCodeLine{00043\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}as-\/loop-\/mid"{}})-\/>to\_ui32()\ ==\ \mbox{\hyperlink{stdint_8h_a189f825ef34a1be844d384db2618ce12}{UINT32\_C}}(6));}
+\DoxyCodeLine{00044\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}as-\/loop-\/last"{}})-\/>to\_ui32()\ ==\ \mbox{\hyperlink{stdint_8h_a189f825ef34a1be844d384db2618ce12}{UINT32\_C}}(6));}
+\DoxyCodeLine{00045\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}as-\/if-\/condition"{}})-\/>to\_ui32()\ ==\ \mbox{\hyperlink{stdint_8h_a189f825ef34a1be844d384db2618ce12}{UINT32\_C}}(2));}
+\DoxyCodeLine{00046\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}as-\/if-\/then"{}})-\/>to\_ui32()\ ==\ \mbox{\hyperlink{stdint_8h_a189f825ef34a1be844d384db2618ce12}{UINT32\_C}}(6));}
+\DoxyCodeLine{00047\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}as-\/if-\/else"{}})-\/>to\_ui32()\ ==\ \mbox{\hyperlink{stdint_8h_a189f825ef34a1be844d384db2618ce12}{UINT32\_C}}(6));}
+\DoxyCodeLine{00048\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}as-\/br\_if-\/first"{}})-\/>to\_ui32()\ ==\ \mbox{\hyperlink{stdint_8h_a189f825ef34a1be844d384db2618ce12}{UINT32\_C}}(6));}
+\DoxyCodeLine{00049\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}as-\/br\_if-\/last"{}})-\/>to\_ui32()\ ==\ \mbox{\hyperlink{stdint_8h_a189f825ef34a1be844d384db2618ce12}{UINT32\_C}}(2));}
+\DoxyCodeLine{00050\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}as-\/br\_table-\/first"{}})-\/>to\_ui32()\ ==\ \mbox{\hyperlink{stdint_8h_a189f825ef34a1be844d384db2618ce12}{UINT32\_C}}(6));}
+\DoxyCodeLine{00051\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}as-\/br\_table-\/last"{}})-\/>to\_ui32()\ ==\ \mbox{\hyperlink{stdint_8h_a189f825ef34a1be844d384db2618ce12}{UINT32\_C}}(2));}
+\DoxyCodeLine{00052\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}as-\/call\_indirect-\/first"{}})-\/>to\_ui32()\ ==\ \mbox{\hyperlink{stdint_8h_a189f825ef34a1be844d384db2618ce12}{UINT32\_C}}(6));}
+\DoxyCodeLine{00053\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}as-\/call\_indirect-\/mid"{}})-\/>to\_ui32()\ ==\ \mbox{\hyperlink{stdint_8h_a189f825ef34a1be844d384db2618ce12}{UINT32\_C}}(2));}
+\DoxyCodeLine{00054\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}as-\/call\_indirect-\/last"{}}),\ std::exception);}
+\DoxyCodeLine{00055\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(!\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}as-\/store-\/first"{}}));}
+\DoxyCodeLine{00056\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(!\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}as-\/store-\/last"{}}));}
+\DoxyCodeLine{00057\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}as-\/load-\/operand"{}})-\/>to\_ui32()\ ==\ \mbox{\hyperlink{stdint_8h_a189f825ef34a1be844d384db2618ce12}{UINT32\_C}}(1));}
+\DoxyCodeLine{00058\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}as-\/memory.grow-\/value"{}})-\/>to\_ui32()\ ==\ \mbox{\hyperlink{stdint_8h_a189f825ef34a1be844d384db2618ce12}{UINT32\_C}}(1));}
+\DoxyCodeLine{00059\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}as-\/call-\/value"{}})-\/>to\_ui32()\ ==\ \mbox{\hyperlink{stdint_8h_a189f825ef34a1be844d384db2618ce12}{UINT32\_C}}(6));}
+\DoxyCodeLine{00060\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}as-\/return-\/value"{}})-\/>to\_ui32()\ ==\ \mbox{\hyperlink{stdint_8h_a189f825ef34a1be844d384db2618ce12}{UINT32\_C}}(6));}
+\DoxyCodeLine{00061\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(!\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}as-\/drop-\/operand"{}}));}
+\DoxyCodeLine{00062\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}as-\/br-\/value"{}})-\/>to\_ui32()\ ==\ \mbox{\hyperlink{stdint_8h_a189f825ef34a1be844d384db2618ce12}{UINT32\_C}}(6));}
+\DoxyCodeLine{00063\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}as-\/local.set-\/value"{}},\ \mbox{\hyperlink{stdint_8h_a189f825ef34a1be844d384db2618ce12}{UINT32\_C}}(1))-\/>to\_ui32()\ ==\ \mbox{\hyperlink{stdint_8h_a189f825ef34a1be844d384db2618ce12}{UINT32\_C}}(6));}
+\DoxyCodeLine{00064\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}as-\/local.tee-\/value"{}},\ \mbox{\hyperlink{stdint_8h_a189f825ef34a1be844d384db2618ce12}{UINT32\_C}}(1))-\/>to\_ui32()\ ==\ \mbox{\hyperlink{stdint_8h_a189f825ef34a1be844d384db2618ce12}{UINT32\_C}}(6));}
+\DoxyCodeLine{00065\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}as-\/global.set-\/value"{}})-\/>to\_ui32()\ ==\ \mbox{\hyperlink{stdint_8h_a189f825ef34a1be844d384db2618ce12}{UINT32\_C}}(6));}
+\DoxyCodeLine{00066\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}as-\/unary-\/operand"{}})-\/>to\_ui32()\ ==\ \mbox{\hyperlink{stdint_8h_a189f825ef34a1be844d384db2618ce12}{UINT32\_C}}(0));}
+\DoxyCodeLine{00067\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}as-\/binary-\/operand"{}})-\/>to\_ui32()\ ==\ \mbox{\hyperlink{stdint_8h_a189f825ef34a1be844d384db2618ce12}{UINT32\_C}}(36));}
+\DoxyCodeLine{00068\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}as-\/compare-\/operand"{}})-\/>to\_ui32()\ ==\ \mbox{\hyperlink{stdint_8h_a189f825ef34a1be844d384db2618ce12}{UINT32\_C}}(1));}
+\DoxyCodeLine{00069\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{globals__tests_8cpp_aa7d81a8c1cd2e0fbb38c1dddc8558859_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{globals__tests_8cpp_a4c50d3de2053ac9b432e8b9ed6511115}\index{globals\_tests.cpp@{globals\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!globals\_tests.cpp@{globals\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/31]}}
+{\footnotesize\ttfamily \label{globals__tests_8cpp_a4c50d3de2053ac9b432e8b9ed6511115} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Testing wasm $<$globals\+\_\+10\+\_\+wasm$>$"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}globals\+\_\+10\+\_\+wasm\+\_\+tests\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{globals__tests_8cpp_source_l00077}{77}} of file \mbox{\hyperlink{globals__tests_8cpp_source}{globals\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00078\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<standalone\_function\_t,\ TestType>}};}
+\DoxyCodeLine{00079\ \ \ \ \textcolor{keyword}{auto}\ code\ =\ \mbox{\hyperlink{namespacesysio_1_1vm_a962c97bda1b30dbf62f4f9a50abe6f99}{read\_wasm}}(\ std::string(wasm\_directory)\ +\ \textcolor{stringliteral}{"{}globals.10.wasm"{}});}
+\DoxyCodeLine{00080\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(code,\ \textcolor{keyword}{nullptr}),\ std::exception);}
+\DoxyCodeLine{00081\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{globals__tests_8cpp_a4c50d3de2053ac9b432e8b9ed6511115_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{globals__tests_8cpp_a4a5708230895e40aab256e57889b4446}\index{globals\_tests.cpp@{globals\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!globals\_tests.cpp@{globals\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [3/31]}}
+{\footnotesize\ttfamily \label{globals__tests_8cpp_a4a5708230895e40aab256e57889b4446} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Testing wasm $<$globals\+\_\+11\+\_\+wasm$>$"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}globals\+\_\+11\+\_\+wasm\+\_\+tests\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{globals__tests_8cpp_source_l00083}{83}} of file \mbox{\hyperlink{globals__tests_8cpp_source}{globals\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00084\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<standalone\_function\_t,\ TestType>}};}
+\DoxyCodeLine{00085\ \ \ \ \textcolor{keyword}{auto}\ code\ =\ \mbox{\hyperlink{namespacesysio_1_1vm_a962c97bda1b30dbf62f4f9a50abe6f99}{read\_wasm}}(\ std::string(wasm\_directory)\ +\ \textcolor{stringliteral}{"{}globals.11.wasm"{}});}
+\DoxyCodeLine{00086\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(code,\ \textcolor{keyword}{nullptr}),\ std::exception);}
+\DoxyCodeLine{00087\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{globals__tests_8cpp_a4a5708230895e40aab256e57889b4446_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{globals__tests_8cpp_aafffa3087ecdc812ba5297a79879e764}\index{globals\_tests.cpp@{globals\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!globals\_tests.cpp@{globals\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [4/31]}}
+{\footnotesize\ttfamily \label{globals__tests_8cpp_aafffa3087ecdc812ba5297a79879e764} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Testing wasm $<$globals\+\_\+12\+\_\+wasm$>$"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}globals\+\_\+12\+\_\+wasm\+\_\+tests\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{globals__tests_8cpp_source_l00089}{89}} of file \mbox{\hyperlink{globals__tests_8cpp_source}{globals\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00090\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<standalone\_function\_t,\ TestType>}};}
+\DoxyCodeLine{00091\ \ \ \ \textcolor{keyword}{auto}\ code\ =\ \mbox{\hyperlink{namespacesysio_1_1vm_a962c97bda1b30dbf62f4f9a50abe6f99}{read\_wasm}}(\ std::string(wasm\_directory)\ +\ \textcolor{stringliteral}{"{}globals.12.wasm"{}});}
+\DoxyCodeLine{00092\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(code,\ \textcolor{keyword}{nullptr}),\ std::exception);}
+\DoxyCodeLine{00093\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{globals__tests_8cpp_aafffa3087ecdc812ba5297a79879e764_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{globals__tests_8cpp_a34874c80d982e6181a2cb2c96dc05b84}\index{globals\_tests.cpp@{globals\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!globals\_tests.cpp@{globals\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [5/31]}}
+{\footnotesize\ttfamily \label{globals__tests_8cpp_a34874c80d982e6181a2cb2c96dc05b84} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Testing wasm $<$globals\+\_\+13\+\_\+wasm$>$"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}globals\+\_\+13\+\_\+wasm\+\_\+tests\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{globals__tests_8cpp_source_l00095}{95}} of file \mbox{\hyperlink{globals__tests_8cpp_source}{globals\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00096\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<standalone\_function\_t,\ TestType>}};}
+\DoxyCodeLine{00097\ \ \ \ \textcolor{keyword}{auto}\ code\ =\ \mbox{\hyperlink{namespacesysio_1_1vm_a962c97bda1b30dbf62f4f9a50abe6f99}{read\_wasm}}(\ std::string(wasm\_directory)\ +\ \textcolor{stringliteral}{"{}globals.13.wasm"{}});}
+\DoxyCodeLine{00098\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(code,\ \textcolor{keyword}{nullptr}),\ std::exception);}
+\DoxyCodeLine{00099\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{globals__tests_8cpp_a34874c80d982e6181a2cb2c96dc05b84_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{globals__tests_8cpp_a8b89f698a2035cb77ba10ebe49886f48}\index{globals\_tests.cpp@{globals\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!globals\_tests.cpp@{globals\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [6/31]}}
+{\footnotesize\ttfamily \label{globals__tests_8cpp_a8b89f698a2035cb77ba10ebe49886f48} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Testing wasm $<$globals\+\_\+15\+\_\+wasm$>$"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}globals\+\_\+15\+\_\+wasm\+\_\+tests\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{globals__tests_8cpp_source_l00101}{101}} of file \mbox{\hyperlink{globals__tests_8cpp_source}{globals\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00102\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<standalone\_function\_t,\ TestType>}};}
+\DoxyCodeLine{00103\ \ \ \ \textcolor{keyword}{auto}\ code\ =\ \mbox{\hyperlink{namespacesysio_1_1vm_a962c97bda1b30dbf62f4f9a50abe6f99}{read\_wasm}}(\ std::string(wasm\_directory)\ +\ \textcolor{stringliteral}{"{}globals.15.wasm"{}});}
+\DoxyCodeLine{00104\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(code,\ \textcolor{keyword}{nullptr}),\ std::exception);}
+\DoxyCodeLine{00105\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{globals__tests_8cpp_a8b89f698a2035cb77ba10ebe49886f48_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{globals__tests_8cpp_a255840f3d8133455aa81a15a0d7e2fec}\index{globals\_tests.cpp@{globals\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!globals\_tests.cpp@{globals\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [7/31]}}
+{\footnotesize\ttfamily \label{globals__tests_8cpp_a255840f3d8133455aa81a15a0d7e2fec} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Testing wasm $<$globals\+\_\+16\+\_\+wasm$>$"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}globals\+\_\+16\+\_\+wasm\+\_\+tests\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{globals__tests_8cpp_source_l00107}{107}} of file \mbox{\hyperlink{globals__tests_8cpp_source}{globals\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00108\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<standalone\_function\_t,\ TestType>}};}
+\DoxyCodeLine{00109\ \ \ \ \textcolor{keyword}{auto}\ code\ =\ \mbox{\hyperlink{namespacesysio_1_1vm_a962c97bda1b30dbf62f4f9a50abe6f99}{read\_wasm}}(\ std::string(wasm\_directory)\ +\ \textcolor{stringliteral}{"{}globals.16.wasm"{}});}
+\DoxyCodeLine{00110\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(code,\ \textcolor{keyword}{nullptr}),\ std::exception);}
+\DoxyCodeLine{00111\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{globals__tests_8cpp_a255840f3d8133455aa81a15a0d7e2fec_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{globals__tests_8cpp_affcca7d018840b5c89483097f7d1c4fe}\index{globals\_tests.cpp@{globals\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!globals\_tests.cpp@{globals\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [8/31]}}
+{\footnotesize\ttfamily \label{globals__tests_8cpp_affcca7d018840b5c89483097f7d1c4fe} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Testing wasm $<$globals\+\_\+17\+\_\+wasm$>$"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}globals\+\_\+17\+\_\+wasm\+\_\+tests\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{globals__tests_8cpp_source_l00113}{113}} of file \mbox{\hyperlink{globals__tests_8cpp_source}{globals\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00114\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<standalone\_function\_t,\ TestType>}};}
+\DoxyCodeLine{00115\ \ \ \ \textcolor{keyword}{auto}\ code\ =\ \mbox{\hyperlink{namespacesysio_1_1vm_a962c97bda1b30dbf62f4f9a50abe6f99}{read\_wasm}}(\ std::string(wasm\_directory)\ +\ \textcolor{stringliteral}{"{}globals.17.wasm"{}});}
+\DoxyCodeLine{00116\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ \mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}(\ code,\ \&\mbox{\hyperlink{globals__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}\ );}
+\DoxyCodeLine{00117\ }
+\DoxyCodeLine{00118\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{globals__tests_8cpp_affcca7d018840b5c89483097f7d1c4fe_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{globals__tests_8cpp_abf7f1217d1912e0bed86ae0769cdf5bf}\index{globals\_tests.cpp@{globals\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!globals\_tests.cpp@{globals\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [9/31]}}
+{\footnotesize\ttfamily \label{globals__tests_8cpp_abf7f1217d1912e0bed86ae0769cdf5bf} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Testing wasm $<$globals\+\_\+18\+\_\+wasm$>$"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}globals\+\_\+18\+\_\+wasm\+\_\+tests\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{globals__tests_8cpp_source_l00120}{120}} of file \mbox{\hyperlink{globals__tests_8cpp_source}{globals\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00121\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<standalone\_function\_t,\ TestType>}};}
+\DoxyCodeLine{00122\ \ \ \ \textcolor{keyword}{auto}\ code\ =\ \mbox{\hyperlink{namespacesysio_1_1vm_a962c97bda1b30dbf62f4f9a50abe6f99}{read\_wasm}}(\ std::string(wasm\_directory)\ +\ \textcolor{stringliteral}{"{}globals.18.wasm"{}});}
+\DoxyCodeLine{00123\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(code,\ \textcolor{keyword}{nullptr}),\ std::exception);}
+\DoxyCodeLine{00124\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{globals__tests_8cpp_abf7f1217d1912e0bed86ae0769cdf5bf_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{globals__tests_8cpp_a9426db128b9653335fd5d715cf66ef4b}\index{globals\_tests.cpp@{globals\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!globals\_tests.cpp@{globals\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [10/31]}}
+{\footnotesize\ttfamily \label{globals__tests_8cpp_a9426db128b9653335fd5d715cf66ef4b} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Testing wasm $<$globals\+\_\+19\+\_\+wasm$>$"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}globals\+\_\+19\+\_\+wasm\+\_\+tests\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{globals__tests_8cpp_source_l00126}{126}} of file \mbox{\hyperlink{globals__tests_8cpp_source}{globals\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00127\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<standalone\_function\_t,\ TestType>}};}
+\DoxyCodeLine{00128\ \ \ \ \textcolor{keyword}{auto}\ code\ =\ \mbox{\hyperlink{namespacesysio_1_1vm_a962c97bda1b30dbf62f4f9a50abe6f99}{read\_wasm}}(\ std::string(wasm\_directory)\ +\ \textcolor{stringliteral}{"{}globals.19.wasm"{}});}
+\DoxyCodeLine{00129\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(code,\ \textcolor{keyword}{nullptr}),\ std::exception);}
+\DoxyCodeLine{00130\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{globals__tests_8cpp_a9426db128b9653335fd5d715cf66ef4b_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{globals__tests_8cpp_aa6bc3925bf1beefa0e0fb9b211a53b4f}\index{globals\_tests.cpp@{globals\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!globals\_tests.cpp@{globals\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [11/31]}}
+{\footnotesize\ttfamily \label{globals__tests_8cpp_aa6bc3925bf1beefa0e0fb9b211a53b4f} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Testing wasm $<$globals\+\_\+1\+\_\+wasm$>$"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}globals\+\_\+1\+\_\+wasm\+\_\+tests\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{globals__tests_8cpp_source_l00071}{71}} of file \mbox{\hyperlink{globals__tests_8cpp_source}{globals\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00072\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<standalone\_function\_t,\ TestType>}};}
+\DoxyCodeLine{00073\ \ \ \ \textcolor{keyword}{auto}\ code\ =\ \mbox{\hyperlink{namespacesysio_1_1vm_a962c97bda1b30dbf62f4f9a50abe6f99}{read\_wasm}}(\ std::string(wasm\_directory)\ +\ \textcolor{stringliteral}{"{}globals.1.wasm"{}});}
+\DoxyCodeLine{00074\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(code,\ \textcolor{keyword}{nullptr}),\ std::exception);}
+\DoxyCodeLine{00075\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{globals__tests_8cpp_aa6bc3925bf1beefa0e0fb9b211a53b4f_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{globals__tests_8cpp_a6532ece2290fd71f89f99eaf4eda0eca}\index{globals\_tests.cpp@{globals\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!globals\_tests.cpp@{globals\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [12/31]}}
+{\footnotesize\ttfamily \label{globals__tests_8cpp_a6532ece2290fd71f89f99eaf4eda0eca} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Testing wasm $<$globals\+\_\+20\+\_\+wasm$>$"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}globals\+\_\+20\+\_\+wasm\+\_\+tests\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{globals__tests_8cpp_source_l00139}{139}} of file \mbox{\hyperlink{globals__tests_8cpp_source}{globals\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00140\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<standalone\_function\_t,\ TestType>}};}
+\DoxyCodeLine{00141\ \ \ \ \textcolor{keyword}{auto}\ code\ =\ \mbox{\hyperlink{namespacesysio_1_1vm_a962c97bda1b30dbf62f4f9a50abe6f99}{read\_wasm}}(\ std::string(wasm\_directory)\ +\ \textcolor{stringliteral}{"{}globals.20.wasm"{}});}
+\DoxyCodeLine{00142\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(code,\ \textcolor{keyword}{nullptr}),\ std::exception);}
+\DoxyCodeLine{00143\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{globals__tests_8cpp_a6532ece2290fd71f89f99eaf4eda0eca_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{globals__tests_8cpp_ad53d15a5f02ff831b62447603578e10c}\index{globals\_tests.cpp@{globals\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!globals\_tests.cpp@{globals\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [13/31]}}
+{\footnotesize\ttfamily \label{globals__tests_8cpp_ad53d15a5f02ff831b62447603578e10c} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Testing wasm $<$globals\+\_\+21\+\_\+wasm$>$"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}globals\+\_\+21\+\_\+wasm\+\_\+tests\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{globals__tests_8cpp_source_l00145}{145}} of file \mbox{\hyperlink{globals__tests_8cpp_source}{globals\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00146\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<standalone\_function\_t,\ TestType>}};}
+\DoxyCodeLine{00147\ \ \ \ \textcolor{keyword}{auto}\ code\ =\ \mbox{\hyperlink{namespacesysio_1_1vm_a962c97bda1b30dbf62f4f9a50abe6f99}{read\_wasm}}(\ std::string(wasm\_directory)\ +\ \textcolor{stringliteral}{"{}globals.21.wasm"{}});}
+\DoxyCodeLine{00148\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(code,\ \textcolor{keyword}{nullptr}),\ std::exception);}
+\DoxyCodeLine{00149\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{globals__tests_8cpp_ad53d15a5f02ff831b62447603578e10c_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{globals__tests_8cpp_a5644a152c0fa2f2d5f64f1c332e35726}\index{globals\_tests.cpp@{globals\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!globals\_tests.cpp@{globals\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [14/31]}}
+{\footnotesize\ttfamily \label{globals__tests_8cpp_a5644a152c0fa2f2d5f64f1c332e35726} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Testing wasm $<$globals\+\_\+22\+\_\+wasm$>$"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}globals\+\_\+22\+\_\+wasm\+\_\+tests\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{globals__tests_8cpp_source_l00151}{151}} of file \mbox{\hyperlink{globals__tests_8cpp_source}{globals\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00152\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<standalone\_function\_t,\ TestType>}};}
+\DoxyCodeLine{00153\ \ \ \ \textcolor{keyword}{auto}\ code\ =\ \mbox{\hyperlink{namespacesysio_1_1vm_a962c97bda1b30dbf62f4f9a50abe6f99}{read\_wasm}}(\ std::string(wasm\_directory)\ +\ \textcolor{stringliteral}{"{}globals.22.wasm"{}});}
+\DoxyCodeLine{00154\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(code,\ \textcolor{keyword}{nullptr}),\ std::exception);}
+\DoxyCodeLine{00155\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{globals__tests_8cpp_a5644a152c0fa2f2d5f64f1c332e35726_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{globals__tests_8cpp_ad707c29f8dd111696e06b34dbe40879d}\index{globals\_tests.cpp@{globals\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!globals\_tests.cpp@{globals\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [15/31]}}
+{\footnotesize\ttfamily \label{globals__tests_8cpp_ad707c29f8dd111696e06b34dbe40879d} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Testing wasm $<$globals\+\_\+23\+\_\+wasm$>$"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}globals\+\_\+23\+\_\+wasm\+\_\+tests\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{globals__tests_8cpp_source_l00157}{157}} of file \mbox{\hyperlink{globals__tests_8cpp_source}{globals\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00158\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<standalone\_function\_t,\ TestType>}};}
+\DoxyCodeLine{00159\ \ \ \ \textcolor{keyword}{auto}\ code\ =\ \mbox{\hyperlink{namespacesysio_1_1vm_a962c97bda1b30dbf62f4f9a50abe6f99}{read\_wasm}}(\ std::string(wasm\_directory)\ +\ \textcolor{stringliteral}{"{}globals.23.wasm"{}});}
+\DoxyCodeLine{00160\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(code,\ \textcolor{keyword}{nullptr}),\ std::exception);}
+\DoxyCodeLine{00161\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{globals__tests_8cpp_ad707c29f8dd111696e06b34dbe40879d_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{globals__tests_8cpp_a9a37ae958dbd8a5f580e773d389c1863}\index{globals\_tests.cpp@{globals\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!globals\_tests.cpp@{globals\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [16/31]}}
+{\footnotesize\ttfamily \label{globals__tests_8cpp_a9a37ae958dbd8a5f580e773d389c1863} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Testing wasm $<$globals\+\_\+24\+\_\+wasm$>$"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}globals\+\_\+24\+\_\+wasm\+\_\+tests\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{globals__tests_8cpp_source_l00163}{163}} of file \mbox{\hyperlink{globals__tests_8cpp_source}{globals\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00164\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<standalone\_function\_t,\ TestType>}};}
+\DoxyCodeLine{00165\ \ \ \ \textcolor{keyword}{auto}\ code\ =\ \mbox{\hyperlink{namespacesysio_1_1vm_a962c97bda1b30dbf62f4f9a50abe6f99}{read\_wasm}}(\ std::string(wasm\_directory)\ +\ \textcolor{stringliteral}{"{}globals.24.wasm"{}});}
+\DoxyCodeLine{00166\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(code,\ \textcolor{keyword}{nullptr}),\ std::exception);}
+\DoxyCodeLine{00167\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{globals__tests_8cpp_a9a37ae958dbd8a5f580e773d389c1863_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{globals__tests_8cpp_aec95578f6ecadd029da9a14be2913dce}\index{globals\_tests.cpp@{globals\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!globals\_tests.cpp@{globals\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [17/31]}}
+{\footnotesize\ttfamily \label{globals__tests_8cpp_aec95578f6ecadd029da9a14be2913dce} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Testing wasm $<$globals\+\_\+25\+\_\+wasm$>$"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}globals\+\_\+25\+\_\+wasm\+\_\+tests\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{globals__tests_8cpp_source_l00169}{169}} of file \mbox{\hyperlink{globals__tests_8cpp_source}{globals\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00170\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<standalone\_function\_t,\ TestType>}};}
+\DoxyCodeLine{00171\ \ \ \ \textcolor{keyword}{auto}\ code\ =\ \mbox{\hyperlink{namespacesysio_1_1vm_a962c97bda1b30dbf62f4f9a50abe6f99}{read\_wasm}}(\ std::string(wasm\_directory)\ +\ \textcolor{stringliteral}{"{}globals.25.wasm"{}});}
+\DoxyCodeLine{00172\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(code,\ \textcolor{keyword}{nullptr}),\ std::exception);}
+\DoxyCodeLine{00173\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{globals__tests_8cpp_aec95578f6ecadd029da9a14be2913dce_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{globals__tests_8cpp_ae23b20976e65aeddd19efd7e4b863df2}\index{globals\_tests.cpp@{globals\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!globals\_tests.cpp@{globals\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [18/31]}}
+{\footnotesize\ttfamily \label{globals__tests_8cpp_ae23b20976e65aeddd19efd7e4b863df2} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Testing wasm $<$globals\+\_\+26\+\_\+wasm$>$"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}globals\+\_\+26\+\_\+wasm\+\_\+tests\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{globals__tests_8cpp_source_l00175}{175}} of file \mbox{\hyperlink{globals__tests_8cpp_source}{globals\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00176\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<standalone\_function\_t,\ TestType>}};}
+\DoxyCodeLine{00177\ \ \ \ \textcolor{keyword}{auto}\ code\ =\ \mbox{\hyperlink{namespacesysio_1_1vm_a962c97bda1b30dbf62f4f9a50abe6f99}{read\_wasm}}(\ std::string(wasm\_directory)\ +\ \textcolor{stringliteral}{"{}globals.26.wasm"{}});}
+\DoxyCodeLine{00178\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(code,\ \textcolor{keyword}{nullptr}),\ std::exception);}
+\DoxyCodeLine{00179\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{globals__tests_8cpp_ae23b20976e65aeddd19efd7e4b863df2_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{globals__tests_8cpp_a7cbe79ef4f6e81ff054e9286bf27de99}\index{globals\_tests.cpp@{globals\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!globals\_tests.cpp@{globals\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [19/31]}}
+{\footnotesize\ttfamily \label{globals__tests_8cpp_a7cbe79ef4f6e81ff054e9286bf27de99} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Testing wasm $<$globals\+\_\+27\+\_\+wasm$>$"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}globals\+\_\+27\+\_\+wasm\+\_\+tests\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{globals__tests_8cpp_source_l00181}{181}} of file \mbox{\hyperlink{globals__tests_8cpp_source}{globals\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00182\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<standalone\_function\_t,\ TestType>}};}
+\DoxyCodeLine{00183\ \ \ \ \textcolor{keyword}{auto}\ code\ =\ \mbox{\hyperlink{namespacesysio_1_1vm_a962c97bda1b30dbf62f4f9a50abe6f99}{read\_wasm}}(\ std::string(wasm\_directory)\ +\ \textcolor{stringliteral}{"{}globals.27.wasm"{}});}
+\DoxyCodeLine{00184\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(code,\ \textcolor{keyword}{nullptr}),\ std::exception);}
+\DoxyCodeLine{00185\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{globals__tests_8cpp_a7cbe79ef4f6e81ff054e9286bf27de99_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{globals__tests_8cpp_a639f8ade6ff320f06bcc8bd691b8af83}\index{globals\_tests.cpp@{globals\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!globals\_tests.cpp@{globals\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [20/31]}}
+{\footnotesize\ttfamily \label{globals__tests_8cpp_a639f8ade6ff320f06bcc8bd691b8af83} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Testing wasm $<$globals\+\_\+28\+\_\+wasm$>$"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}globals\+\_\+28\+\_\+wasm\+\_\+tests\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{globals__tests_8cpp_source_l00187}{187}} of file \mbox{\hyperlink{globals__tests_8cpp_source}{globals\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00188\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<standalone\_function\_t,\ TestType>}};}
+\DoxyCodeLine{00189\ \ \ \ \textcolor{keyword}{auto}\ code\ =\ \mbox{\hyperlink{namespacesysio_1_1vm_a962c97bda1b30dbf62f4f9a50abe6f99}{read\_wasm}}(\ std::string(wasm\_directory)\ +\ \textcolor{stringliteral}{"{}globals.28.wasm"{}});}
+\DoxyCodeLine{00190\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(code,\ \textcolor{keyword}{nullptr}),\ std::exception);}
+\DoxyCodeLine{00191\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{globals__tests_8cpp_a639f8ade6ff320f06bcc8bd691b8af83_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{globals__tests_8cpp_a9658d99eddde4d51e87213f0236bd1f1}\index{globals\_tests.cpp@{globals\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!globals\_tests.cpp@{globals\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [21/31]}}
+{\footnotesize\ttfamily \label{globals__tests_8cpp_a9658d99eddde4d51e87213f0236bd1f1} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Testing wasm $<$globals\+\_\+29\+\_\+wasm$>$"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}globals\+\_\+29\+\_\+wasm\+\_\+tests\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{globals__tests_8cpp_source_l00193}{193}} of file \mbox{\hyperlink{globals__tests_8cpp_source}{globals\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00194\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<standalone\_function\_t,\ TestType>}};}
+\DoxyCodeLine{00195\ \ \ \ \textcolor{keyword}{auto}\ code\ =\ \mbox{\hyperlink{namespacesysio_1_1vm_a962c97bda1b30dbf62f4f9a50abe6f99}{read\_wasm}}(\ std::string(wasm\_directory)\ +\ \textcolor{stringliteral}{"{}globals.29.wasm"{}});}
+\DoxyCodeLine{00196\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(code,\ \textcolor{keyword}{nullptr}),\ std::exception);}
+\DoxyCodeLine{00197\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{globals__tests_8cpp_a9658d99eddde4d51e87213f0236bd1f1_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{globals__tests_8cpp_a1fddee34e3676392d82bc5bbe1bf2cf2}\index{globals\_tests.cpp@{globals\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!globals\_tests.cpp@{globals\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [22/31]}}
+{\footnotesize\ttfamily \label{globals__tests_8cpp_a1fddee34e3676392d82bc5bbe1bf2cf2} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Testing wasm $<$globals\+\_\+2\+\_\+wasm$>$"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}globals\+\_\+2\+\_\+wasm\+\_\+tests\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{globals__tests_8cpp_source_l00132}{132}} of file \mbox{\hyperlink{globals__tests_8cpp_source}{globals\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00133\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<standalone\_function\_t,\ TestType>}};}
+\DoxyCodeLine{00134\ \ \ \ \textcolor{keyword}{auto}\ code\ =\ \mbox{\hyperlink{namespacesysio_1_1vm_a962c97bda1b30dbf62f4f9a50abe6f99}{read\_wasm}}(\ std::string(wasm\_directory)\ +\ \textcolor{stringliteral}{"{}globals.2.wasm"{}});}
+\DoxyCodeLine{00135\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ \mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}(\ code,\ \&\mbox{\hyperlink{globals__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}\ );}
+\DoxyCodeLine{00136\ }
+\DoxyCodeLine{00137\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{globals__tests_8cpp_a1fddee34e3676392d82bc5bbe1bf2cf2_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{globals__tests_8cpp_a487e5bdf60a3f2a1742af09a0ec39311}\index{globals\_tests.cpp@{globals\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!globals\_tests.cpp@{globals\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [23/31]}}
+{\footnotesize\ttfamily \label{globals__tests_8cpp_a487e5bdf60a3f2a1742af09a0ec39311} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Testing wasm $<$globals\+\_\+30\+\_\+wasm$>$"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}globals\+\_\+30\+\_\+wasm\+\_\+tests\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{globals__tests_8cpp_source_l00206}{206}} of file \mbox{\hyperlink{globals__tests_8cpp_source}{globals\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00207\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<standalone\_function\_t,\ TestType>}};}
+\DoxyCodeLine{00208\ \ \ \ \textcolor{keyword}{auto}\ code\ =\ \mbox{\hyperlink{namespacesysio_1_1vm_a962c97bda1b30dbf62f4f9a50abe6f99}{read\_wasm}}(\ std::string(wasm\_directory)\ +\ \textcolor{stringliteral}{"{}globals.30.wasm"{}});}
+\DoxyCodeLine{00209\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(code,\ \textcolor{keyword}{nullptr}),\ std::exception);}
+\DoxyCodeLine{00210\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{globals__tests_8cpp_a487e5bdf60a3f2a1742af09a0ec39311_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{globals__tests_8cpp_a36ed58889e9eab41e4369cb5b1b54a67}\index{globals\_tests.cpp@{globals\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!globals\_tests.cpp@{globals\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [24/31]}}
+{\footnotesize\ttfamily \label{globals__tests_8cpp_a36ed58889e9eab41e4369cb5b1b54a67} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Testing wasm $<$globals\+\_\+31\+\_\+wasm$>$"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}globals\+\_\+31\+\_\+wasm\+\_\+tests\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{globals__tests_8cpp_source_l00212}{212}} of file \mbox{\hyperlink{globals__tests_8cpp_source}{globals\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00213\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<standalone\_function\_t,\ TestType>}};}
+\DoxyCodeLine{00214\ \ \ \ \textcolor{keyword}{auto}\ code\ =\ \mbox{\hyperlink{namespacesysio_1_1vm_a962c97bda1b30dbf62f4f9a50abe6f99}{read\_wasm}}(\ std::string(wasm\_directory)\ +\ \textcolor{stringliteral}{"{}globals.31.wasm"{}});}
+\DoxyCodeLine{00215\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(code,\ \textcolor{keyword}{nullptr}),\ std::exception);}
+\DoxyCodeLine{00216\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{globals__tests_8cpp_a36ed58889e9eab41e4369cb5b1b54a67_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{globals__tests_8cpp_a3948aba87ef1334f9602e6b30d615d23}\index{globals\_tests.cpp@{globals\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!globals\_tests.cpp@{globals\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [25/31]}}
+{\footnotesize\ttfamily \label{globals__tests_8cpp_a3948aba87ef1334f9602e6b30d615d23} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Testing wasm $<$globals\+\_\+3\+\_\+wasm$>$"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}globals\+\_\+3\+\_\+wasm\+\_\+tests\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{globals__tests_8cpp_source_l00199}{199}} of file \mbox{\hyperlink{globals__tests_8cpp_source}{globals\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00200\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<standalone\_function\_t,\ TestType>}};}
+\DoxyCodeLine{00201\ \ \ \ \textcolor{keyword}{auto}\ code\ =\ \mbox{\hyperlink{namespacesysio_1_1vm_a962c97bda1b30dbf62f4f9a50abe6f99}{read\_wasm}}(\ std::string(wasm\_directory)\ +\ \textcolor{stringliteral}{"{}globals.3.wasm"{}});}
+\DoxyCodeLine{00202\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ \mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}(\ code,\ \&\mbox{\hyperlink{globals__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}\ );}
+\DoxyCodeLine{00203\ }
+\DoxyCodeLine{00204\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{globals__tests_8cpp_a3948aba87ef1334f9602e6b30d615d23_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{globals__tests_8cpp_ac3a979be281cfe069c719ee5a1c140d4}\index{globals\_tests.cpp@{globals\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!globals\_tests.cpp@{globals\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [26/31]}}
+{\footnotesize\ttfamily \label{globals__tests_8cpp_ac3a979be281cfe069c719ee5a1c140d4} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Testing wasm $<$globals\+\_\+4\+\_\+wasm$>$"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}globals\+\_\+4\+\_\+wasm\+\_\+tests\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{globals__tests_8cpp_source_l00218}{218}} of file \mbox{\hyperlink{globals__tests_8cpp_source}{globals\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00218\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00219\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<standalone\_function\_t,\ TestType>}};}
+\DoxyCodeLine{00220\ \ \ \ \textcolor{keyword}{auto}\ code\ =\ \mbox{\hyperlink{namespacesysio_1_1vm_a962c97bda1b30dbf62f4f9a50abe6f99}{read\_wasm}}(\ std::string(wasm\_directory)\ +\ \textcolor{stringliteral}{"{}globals.4.wasm"{}});}
+\DoxyCodeLine{00221\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(code,\ \textcolor{keyword}{nullptr}),\ std::exception);}
+\DoxyCodeLine{00222\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{globals__tests_8cpp_ac3a979be281cfe069c719ee5a1c140d4_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{globals__tests_8cpp_af30d5ad811c7bf537789a5dad6d42cf2}\index{globals\_tests.cpp@{globals\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!globals\_tests.cpp@{globals\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [27/31]}}
+{\footnotesize\ttfamily \label{globals__tests_8cpp_af30d5ad811c7bf537789a5dad6d42cf2} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Testing wasm $<$globals\+\_\+5\+\_\+wasm$>$"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}globals\+\_\+5\+\_\+wasm\+\_\+tests\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{globals__tests_8cpp_source_l00224}{224}} of file \mbox{\hyperlink{globals__tests_8cpp_source}{globals\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00225\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<standalone\_function\_t,\ TestType>}};}
+\DoxyCodeLine{00226\ \ \ \ \textcolor{keyword}{auto}\ code\ =\ \mbox{\hyperlink{namespacesysio_1_1vm_a962c97bda1b30dbf62f4f9a50abe6f99}{read\_wasm}}(\ std::string(wasm\_directory)\ +\ \textcolor{stringliteral}{"{}globals.5.wasm"{}});}
+\DoxyCodeLine{00227\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(code,\ \textcolor{keyword}{nullptr}),\ std::exception);}
+\DoxyCodeLine{00228\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{globals__tests_8cpp_af30d5ad811c7bf537789a5dad6d42cf2_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{globals__tests_8cpp_a1500aad8853fa4dfc3e6294be3354d52}\index{globals\_tests.cpp@{globals\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!globals\_tests.cpp@{globals\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [28/31]}}
+{\footnotesize\ttfamily \label{globals__tests_8cpp_a1500aad8853fa4dfc3e6294be3354d52} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Testing wasm $<$globals\+\_\+6\+\_\+wasm$>$"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}globals\+\_\+6\+\_\+wasm\+\_\+tests\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{globals__tests_8cpp_source_l00230}{230}} of file \mbox{\hyperlink{globals__tests_8cpp_source}{globals\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00230\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00231\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<standalone\_function\_t,\ TestType>}};}
+\DoxyCodeLine{00232\ \ \ \ \textcolor{keyword}{auto}\ code\ =\ \mbox{\hyperlink{namespacesysio_1_1vm_a962c97bda1b30dbf62f4f9a50abe6f99}{read\_wasm}}(\ std::string(wasm\_directory)\ +\ \textcolor{stringliteral}{"{}globals.6.wasm"{}});}
+\DoxyCodeLine{00233\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(code,\ \textcolor{keyword}{nullptr}),\ std::exception);}
+\DoxyCodeLine{00234\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{globals__tests_8cpp_a1500aad8853fa4dfc3e6294be3354d52_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{globals__tests_8cpp_a397c2440f85f6474262dc599d040278f}\index{globals\_tests.cpp@{globals\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!globals\_tests.cpp@{globals\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [29/31]}}
+{\footnotesize\ttfamily \label{globals__tests_8cpp_a397c2440f85f6474262dc599d040278f} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Testing wasm $<$globals\+\_\+7\+\_\+wasm$>$"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}globals\+\_\+7\+\_\+wasm\+\_\+tests\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{globals__tests_8cpp_source_l00236}{236}} of file \mbox{\hyperlink{globals__tests_8cpp_source}{globals\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00237\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<standalone\_function\_t,\ TestType>}};}
+\DoxyCodeLine{00238\ \ \ \ \textcolor{keyword}{auto}\ code\ =\ \mbox{\hyperlink{namespacesysio_1_1vm_a962c97bda1b30dbf62f4f9a50abe6f99}{read\_wasm}}(\ std::string(wasm\_directory)\ +\ \textcolor{stringliteral}{"{}globals.7.wasm"{}});}
+\DoxyCodeLine{00239\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(code,\ \textcolor{keyword}{nullptr}),\ std::exception);}
+\DoxyCodeLine{00240\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{globals__tests_8cpp_a397c2440f85f6474262dc599d040278f_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{globals__tests_8cpp_abb555d670f0c03a3be7ca6678d99da6d}\index{globals\_tests.cpp@{globals\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!globals\_tests.cpp@{globals\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [30/31]}}
+{\footnotesize\ttfamily \label{globals__tests_8cpp_abb555d670f0c03a3be7ca6678d99da6d} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Testing wasm $<$globals\+\_\+8\+\_\+wasm$>$"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}globals\+\_\+8\+\_\+wasm\+\_\+tests\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{globals__tests_8cpp_source_l00242}{242}} of file \mbox{\hyperlink{globals__tests_8cpp_source}{globals\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00242\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00243\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<standalone\_function\_t,\ TestType>}};}
+\DoxyCodeLine{00244\ \ \ \ \textcolor{keyword}{auto}\ code\ =\ \mbox{\hyperlink{namespacesysio_1_1vm_a962c97bda1b30dbf62f4f9a50abe6f99}{read\_wasm}}(\ std::string(wasm\_directory)\ +\ \textcolor{stringliteral}{"{}globals.8.wasm"{}});}
+\DoxyCodeLine{00245\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(code,\ \textcolor{keyword}{nullptr}),\ std::exception);}
+\DoxyCodeLine{00246\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{globals__tests_8cpp_abb555d670f0c03a3be7ca6678d99da6d_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{globals__tests_8cpp_af9f71b9a3c899b75f15814a804d6b7f2}\index{globals\_tests.cpp@{globals\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!globals\_tests.cpp@{globals\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [31/31]}}
+{\footnotesize\ttfamily \label{globals__tests_8cpp_af9f71b9a3c899b75f15814a804d6b7f2} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Testing wasm $<$globals\+\_\+9\+\_\+wasm$>$"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}globals\+\_\+9\+\_\+wasm\+\_\+tests\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{globals__tests_8cpp_source_l00248}{248}} of file \mbox{\hyperlink{globals__tests_8cpp_source}{globals\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00248\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00249\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<standalone\_function\_t,\ TestType>}};}
+\DoxyCodeLine{00250\ \ \ \ \textcolor{keyword}{auto}\ code\ =\ \mbox{\hyperlink{namespacesysio_1_1vm_a962c97bda1b30dbf62f4f9a50abe6f99}{read\_wasm}}(\ std::string(wasm\_directory)\ +\ \textcolor{stringliteral}{"{}globals.9.wasm"{}});}
+\DoxyCodeLine{00251\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(code,\ \textcolor{keyword}{nullptr}),\ std::exception);}
+\DoxyCodeLine{00252\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{globals__tests_8cpp_af9f71b9a3c899b75f15814a804d6b7f2_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{globals__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}\index{globals\_tests.cpp@{globals\_tests.cpp}!wa@{wa}}
+\index{wa@{wa}!globals\_tests.cpp@{globals\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{wa}{wa}}
+{\footnotesize\ttfamily \label{globals__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89} 
+wasm\+\_\+allocator wa\hspace{0.3cm}{\ttfamily [extern]}}
+
+
+
+Definition at line \mbox{\hyperlink{libraries_2sys-vm_2tests_2main_8cpp_source_l00010}{10}} of file \mbox{\hyperlink{libraries_2sys-vm_2tests_2main_8cpp_source}{main.\+cpp}}.
+

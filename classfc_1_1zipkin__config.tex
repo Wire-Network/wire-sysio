@@ -1,0 +1,166 @@
+\doxysection{fc\+::zipkin\+\_\+config Class Reference}
+\hypertarget{classfc_1_1zipkin__config}{}\label{classfc_1_1zipkin__config}\index{fc::zipkin\_config@{fc::zipkin\_config}}
+
+
+{\ttfamily \#include $<$zipkin.\+hpp$>$}
+
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static bool \mbox{\hyperlink{classfc_1_1zipkin__config_a9556dacb1a00643aecbf33b1f1e889d0}{is\+\_\+enabled}} ()
+\begin{DoxyCompactList}\small\item\em Thread safe only if \doxylink{lib_8h_a02fd73d861ef2e4aabb38c0c9ff82947}{init()} called from main thread before spawning of any threads. \end{DoxyCompactList}\item 
+static void \mbox{\hyperlink{classfc_1_1zipkin__config_affc268b7ec02e9c1a59f62bc627287f7}{init}} (const std\+::string \&\mbox{\hyperlink{classfc_1_1url}{url}}, const std\+::string \&service\+\_\+name, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} timeout\+\_\+us)
+\item 
+static \mbox{\hyperlink{classfc_1_1zipkin}{zipkin}} \& \mbox{\hyperlink{classfc_1_1zipkin__config_ae0348c29d052b3060150e3b379e8e9ce}{get\+\_\+zipkin}} ()
+\item 
+static void \mbox{\hyperlink{classfc_1_1zipkin__config_a0e20fd8eda4ad99190e5330645ab4890}{shutdown}} ()
+\item 
+static \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{classfc_1_1zipkin__config_a7fafc95d1ae8f71f714e1b444d6cbc87}{get\+\_\+next\+\_\+unique\+\_\+id}} ()
+\begin{DoxyCompactList}\small\item\em Starts with a random id and increments on each call, will not return 0. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{zipkin_8hpp_source_l00026}{26}} of file \mbox{\hyperlink{zipkin_8hpp_source}{zipkin.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1zipkin__config_a7fafc95d1ae8f71f714e1b444d6cbc87}\index{fc::zipkin\_config@{fc::zipkin\_config}!get\_next\_unique\_id@{get\_next\_unique\_id}}
+\index{get\_next\_unique\_id@{get\_next\_unique\_id}!fc::zipkin\_config@{fc::zipkin\_config}}
+\doxysubsubsection{\texorpdfstring{get\_next\_unique\_id()}{get\_next\_unique\_id()}}
+{\footnotesize\ttfamily \label{classfc_1_1zipkin__config_a7fafc95d1ae8f71f714e1b444d6cbc87} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} fc\+::zipkin\+\_\+config\+::get\+\_\+next\+\_\+unique\+\_\+id (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{zipkin_8cpp_source_l00039}{39}} of file \mbox{\hyperlink{zipkin_8cpp_source}{zipkin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00040\ \ \ \ \textcolor{keywordflow}{if}(\ !get().zip\ )\ \{}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ fc::assert\_exception,\ \textcolor{stringliteral}{"{}uninitialized\ zipkin"{}}\ );}
+\DoxyCodeLine{00042\ \ \ \ \}}
+\DoxyCodeLine{00043\ \ \ \ \textcolor{keywordflow}{return}\ get().zip-\/>get\_next\_unique\_id();}
+\DoxyCodeLine{00044\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=315pt]{classfc_1_1zipkin__config_a7fafc95d1ae8f71f714e1b444d6cbc87_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1zipkin__config_ae0348c29d052b3060150e3b379e8e9ce}\index{fc::zipkin\_config@{fc::zipkin\_config}!get\_zipkin@{get\_zipkin}}
+\index{get\_zipkin@{get\_zipkin}!fc::zipkin\_config@{fc::zipkin\_config}}
+\doxysubsubsection{\texorpdfstring{get\_zipkin()}{get\_zipkin()}}
+{\footnotesize\ttfamily \label{classfc_1_1zipkin__config_ae0348c29d052b3060150e3b379e8e9ce} 
+\mbox{\hyperlink{classfc_1_1zipkin}{zipkin}} \& fc\+::zipkin\+\_\+config\+::get\+\_\+zipkin (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+Thread safe only if \doxylink{lib_8h_a02fd73d861ef2e4aabb38c0c9ff82947}{init()} called from main thread before spawning of any threads 
+\begin{DoxyExceptions}{Exceptions}
+{\em assert\+\_\+exception} & if called before \doxylink{lib_8h_a02fd73d861ef2e4aabb38c0c9ff82947}{init()} \\
+\hline
+\end{DoxyExceptions}
+
+
+Definition at line \mbox{\hyperlink{zipkin_8cpp_source_l00026}{26}} of file \mbox{\hyperlink{zipkin_8cpp_source}{zipkin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00027\ \ \ \ \textcolor{keywordflow}{if}(\ !get().zip\ )\ \{}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ fc::assert\_exception,\ \textcolor{stringliteral}{"{}uninitialized\ zipkin"{}}\ );}
+\DoxyCodeLine{00029\ \ \ \ \}}
+\DoxyCodeLine{00030\ \ \ \ \textcolor{keywordflow}{return}\ *get().zip;}
+\DoxyCodeLine{00031\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1zipkin__config_ae0348c29d052b3060150e3b379e8e9ce_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1zipkin__config_affc268b7ec02e9c1a59f62bc627287f7}\index{fc::zipkin\_config@{fc::zipkin\_config}!init@{init}}
+\index{init@{init}!fc::zipkin\_config@{fc::zipkin\_config}}
+\doxysubsubsection{\texorpdfstring{init()}{init()}}
+{\footnotesize\ttfamily \label{classfc_1_1zipkin__config_affc268b7ec02e9c1a59f62bc627287f7} 
+void fc\+::zipkin\+\_\+config\+::init (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{url}{, }\item[{const std\+::string \&}]{service\+\_\+name}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{timeout\+\_\+us}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+Not thread safe, call from main thread before spawning any threads that might use zipkin. 
+\begin{DoxyParams}{Parameters}
+{\em url} & the url endpoint of zipkin server. e.\+g. \href{http://127.0.0.1:9411/api/v2/spans}{\texttt{ http\+://127.\+0.\+0.\+1\+:9411/api/v2/spans}} \\
+\hline
+{\em service\+\_\+name} & the service name to include in each zipkin span \\
+\hline
+{\em timeout\+\_\+us} & the timeout in microseconds for each http call (9 consecutive failures and zipkin is disabled) \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{zipkin_8cpp_source_l00022}{22}} of file \mbox{\hyperlink{zipkin_8cpp_source}{zipkin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00023\ \ \ \ get().zip\ =\ std::make\_unique<zipkin>(\ \mbox{\hyperlink{programs_2clio_2main_8cpp_aa03c1ef4c41f36b048cf58d5aade7653}{url}},\ service\_name,\ timeout\_us\ );}
+\DoxyCodeLine{00024\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1zipkin__config_a9556dacb1a00643aecbf33b1f1e889d0}\index{fc::zipkin\_config@{fc::zipkin\_config}!is\_enabled@{is\_enabled}}
+\index{is\_enabled@{is\_enabled}!fc::zipkin\_config@{fc::zipkin\_config}}
+\doxysubsubsection{\texorpdfstring{is\_enabled()}{is\_enabled()}}
+{\footnotesize\ttfamily \label{classfc_1_1zipkin__config_a9556dacb1a00643aecbf33b1f1e889d0} 
+static bool fc\+::zipkin\+\_\+config\+::is\+\_\+enabled (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{zipkin_8hpp_source_l00029}{29}} of file \mbox{\hyperlink{zipkin_8hpp_source}{zipkin.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00029\ \{\ \textcolor{keywordflow}{return}\ get\_zipkin\_()\ !=\ \textcolor{keyword}{nullptr};\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1zipkin__config_a9556dacb1a00643aecbf33b1f1e889d0_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1zipkin__config_a0e20fd8eda4ad99190e5330645ab4890}\index{fc::zipkin\_config@{fc::zipkin\_config}!shutdown@{shutdown}}
+\index{shutdown@{shutdown}!fc::zipkin\_config@{fc::zipkin\_config}}
+\doxysubsubsection{\texorpdfstring{shutdown()}{shutdown()}}
+{\footnotesize\ttfamily \label{classfc_1_1zipkin__config_a0e20fd8eda4ad99190e5330645ab4890} 
+void fc\+::zipkin\+\_\+config\+::shutdown (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+Thread safe only if \doxylink{lib_8h_a02fd73d861ef2e4aabb38c0c9ff82947}{init()} called from main thread before spawning of any threads 
+\begin{DoxyExceptions}{Exceptions}
+{\em assert\+\_\+exception} & if called before \doxylink{lib_8h_a02fd73d861ef2e4aabb38c0c9ff82947}{init()} \\
+\hline
+\end{DoxyExceptions}
+
+
+Definition at line \mbox{\hyperlink{zipkin_8cpp_source_l00033}{33}} of file \mbox{\hyperlink{zipkin_8cpp_source}{zipkin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00034\ \ \ \ \textcolor{keywordflow}{if}(\ zipkin*\ z\ =\ get\_zipkin\_()\ )\ \{}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ z-\/>shutdown();}
+\DoxyCodeLine{00036\ \ \ \ \}}
+\DoxyCodeLine{00037\ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/log/\mbox{\hyperlink{zipkin_8hpp}{zipkin.\+hpp}}\item 
+libraries/fc/src/log/\mbox{\hyperlink{zipkin_8cpp}{zipkin.\+cpp}}\end{DoxyCompactItemize}

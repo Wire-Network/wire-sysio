@@ -1,0 +1,54 @@
+\doxysection{Stream\+Traits\texorpdfstring{$<$}{<} Stream \texorpdfstring{$>$}{>} Struct Template Reference}
+\hypertarget{struct_stream_traits}{}\label{struct_stream_traits}\index{StreamTraits$<$ Stream $>$@{StreamTraits$<$ Stream $>$}}
+
+
+Provides additional information for stream.  
+
+
+
+
+{\ttfamily \#include $<$stream.\+h$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \{ \mbox{\hyperlink{struct_stream_traits_a83649a04cf5f37e29ab304c9fe2a67aca0300ac4c098b0d59f43a0c4e1ec86eac}{copy\+Optimization}} = 0
+ \}
+\begin{DoxyCompactList}\small\item\em Whether to make local copy of stream for optimization during parsing. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}}$>$\newline
+struct Stream\+Traits$<$ Stream $>$}
+By using traits pattern, this type provides a default configuration for stream. For custom stream, this type can be specialized for other configuration. See \doxylink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST(\+Reader, Custom\+String\+Stream)} in \doxylink{readertest_8cpp}{readertest.\+cpp} for example. 
+
+Definition at line \mbox{\hyperlink{stream_8h_source_l00073}{73}} of file \mbox{\hyperlink{stream_8h_source}{stream.\+h}}.
+
+
+
+\doxysubsection{Member Enumeration Documentation}
+\Hypertarget{struct_stream_traits_a83649a04cf5f37e29ab304c9fe2a67ac}\doxysubsubsection{\texorpdfstring{anonymous enum}{anonymous enum}}
+{\footnotesize\ttfamily \label{struct_stream_traits_a83649a04cf5f37e29ab304c9fe2a67ac} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ \\
+anonymous enum}
+
+By default, for safety, streams do not use local copy optimization. Stream that can be copied fast should specialize this, like Stream\+Traits$<$\+String\+Stream$>$. \begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{copyOptimization@{copyOptimization}!StreamTraits$<$ Stream $>$@{StreamTraits$<$ Stream $>$}}\index{StreamTraits$<$ Stream $>$@{StreamTraits$<$ Stream $>$}!copyOptimization@{copyOptimization}}}\Hypertarget{struct_stream_traits_a83649a04cf5f37e29ab304c9fe2a67aca0300ac4c098b0d59f43a0c4e1ec86eac}\label{struct_stream_traits_a83649a04cf5f37e29ab304c9fe2a67ac} 
+copy\+Optimization&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{stream_8h_source_l00079}{79}} of file \mbox{\hyperlink{stream_8h_source}{stream.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00079\ \{\ \mbox{\hyperlink{struct_stream_traits_a83649a04cf5f37e29ab304c9fe2a67aca0300ac4c098b0d59f43a0c4e1ec86eac}{copyOptimization}}\ =\ 0\ \};}
+
+\end{DoxyCode}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/\mbox{\hyperlink{stream_8h}{stream.\+h}}\end{DoxyCompactItemize}

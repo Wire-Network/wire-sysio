@@ -1,0 +1,24 @@
+<map id="test_schnorrsig_bip_vectors" name="test_schnorrsig_bip_vectors">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,177,140,218"/>
+<area shape="rect" id="Node000002" href="$extrakeys_2main__impl_8h.html#ad13aa30c6a14103321a6467918965b16" title=" " alt="" coords="411,235,582,275"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="141,216,188,227,295,241,396,249,395,254,294,247,187,232,140,221"/>
+<area shape="rect" id="Node000004" href="$schnorrsig_2tests__impl_8h.html#a3da78c8240bed7f834cde952569d440a" title=" " alt="" coords="188,112,349,153"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="135,174,190,156,192,161,136,179"/>
+<area shape="rect" id="Node000009" href="$schnorrsig_2tests__impl_8h.html#a40bf8f20fa4a04a544e177feef693980" title=" " alt="" coords="192,177,344,218"/>
+<area shape="poly" id="edge11_Node000001_Node000009" title=" " alt="" coords="140,195,176,195,176,200,140,200"/>
+<area shape="rect" id="Node000003" href="$yubihsm__pkcs11_8c.html#adc4bd59a60361844aa0e852efa210105" title=" " alt="" coords="644,120,713,145"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="572,232,595,219,630,189,657,157,661,160,634,193,598,224,574,237"/>
+<area shape="poly" id="edge10_Node000004_Node000002" title=" " alt="" coords="330,151,351,164,366,178,375,193,384,206,399,220,408,225,405,230,395,224,380,210,371,195,362,182,347,168,327,155"/>
+<area shape="rect" id="Node000005" href="$extrakeys_2main__impl_8h.html#a0b67a64a755a308e1777e6c2bde4f57b" title=" " alt="" coords="408,120,585,145"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="349,130,393,130,393,135,349,135"/>
+<area shape="rect" id="Node000006" href="$extrakeys_2main__impl_8h.html#a5ef5543ae89fd59edea43c13cad73cfb" title=" " alt="" coords="397,70,596,96"/>
+<area shape="poly" id="edge6_Node000004_Node000006" title=" " alt="" coords="349,112,419,97,420,102,350,118"/>
+<area shape="rect" id="Node000007" href="$schnorrsig_2main__impl_8h.html#a5bc69eb5f207ec82d3331594b2b9151e" title=" " alt="" coords="421,5,572,46"/>
+<area shape="poly" id="edge8_Node000004_Node000007" title=" " alt="" coords="299,109,344,82,396,55,410,49,412,54,398,60,347,87,302,114"/>
+<area shape="rect" id="Node000008" href="$schnorrsig_2main__impl_8h.html#ab4b9ea2608b3c6e0dadad4c42a48d85f" title=" " alt="" coords="421,169,572,210"/>
+<area shape="poly" id="edge9_Node000004_Node000008" title=" " alt="" coords="350,150,407,164,405,170,349,155"/>
+<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="585,130,629,130,629,135,585,135"/>
+<area shape="poly" id="edge7_Node000006_Node000003" title=" " alt="" coords="557,94,597,104,630,114,629,119,596,110,555,99"/>
+<area shape="poly" id="edge13_Node000009_Node000002" title=" " alt="" coords="345,214,399,228,397,233,344,219"/>
+<area shape="poly" id="edge12_Node000009_Node000008" title=" " alt="" coords="345,192,405,190,405,196,345,198"/>
+</map>

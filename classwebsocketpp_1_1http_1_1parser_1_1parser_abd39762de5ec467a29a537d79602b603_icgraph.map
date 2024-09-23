@@ -1,0 +1,11 @@
+<map id="websocketpp::http::parser::parser::append_header" name="websocketpp::http::parser::parser::append_header">
+<area shape="rect" id="Node000001" title="Append a value to an existing HTTP header." alt="" coords="663,31,815,87"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1http_1_1parser_1_1parser.html#a4dbb443fd916f8b4306e7afdb2e8ff45" title="Process a header line." alt="" coords="460,31,615,87"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="648,62,616,62,616,56,648,56"/>
+<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1http_1_1parser_1_1request.html#abd9cae6f44634d62253d806d982ab1d6" title="Process bytes in the input buffer." alt="" coords="238,5,407,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="444,47,407,41,408,36,445,42"/>
+<area shape="rect" id="Node000004" href="$classwebsocketpp_1_1http_1_1parser_1_1response.html#ae99b8f1287898b74d1963b95347ab838" title="Process bytes in the input buffer." alt="" coords="233,71,412,111"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="445,75,413,80,412,75,444,70"/>
+<area shape="rect" id="Node000005" href="$classwebsocketpp_1_1http_1_1parser_1_1response.html#a5b274a9e5766e679f0939a7e1ecbad56" title="Process bytes in the input buffer (istream version)" alt="" coords="5,71,185,111"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="217,94,185,94,185,88,217,88"/>
+</map>

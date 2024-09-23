@@ -1,0 +1,97 @@
+\doxysection{testing\+::internal\+::Assert\+Helper Class Reference}
+\hypertarget{classtesting_1_1internal_1_1_assert_helper}{}\label{classtesting_1_1internal_1_1_assert_helper}\index{testing::internal::AssertHelper@{testing::internal::AssertHelper}}
+
+
+{\ttfamily \#include $<$gtest.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_assert_helper_ac2c9334518fd4087189b4505567a3c90}{Assert\+Helper}} (\mbox{\hyperlink{classtesting_1_1_test_part_result_a65ae656b33fdfdfffaf34858778a52d5}{Test\+Part\+Result\+::\+Type}} type, const char \texorpdfstring{$\ast$}{*}file, int line, const char \texorpdfstring{$\ast$}{*}message)
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_assert_helper_a51c640785d4ed4a0155cc9aa857d8931}{\texorpdfstring{$\sim$}{\string~}\+Assert\+Helper}} ()
+\item 
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_assert_helper_a97bf22d786131ab7baa86b97a27aeb4d}{operator=}} (const \mbox{\hyperlink{classtesting_1_1_message}{Message}} \&message) const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{gtest_8h_source_l01707}{1707}} of file \mbox{\hyperlink{gtest_8h_source}{gtest.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_assert_helper_ac2c9334518fd4087189b4505567a3c90}\index{testing::internal::AssertHelper@{testing::internal::AssertHelper}!AssertHelper@{AssertHelper}}
+\index{AssertHelper@{AssertHelper}!testing::internal::AssertHelper@{testing::internal::AssertHelper}}
+\doxysubsubsection{\texorpdfstring{AssertHelper()}{AssertHelper()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_assert_helper_ac2c9334518fd4087189b4505567a3c90} 
+testing\+::internal\+::\+Assert\+Helper\+::\+Assert\+Helper (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classtesting_1_1_test_part_result_a65ae656b33fdfdfffaf34858778a52d5}{Test\+Part\+Result\+::\+Type}}}]{type}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{file}{, }\item[{int}]{line}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{message}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8cc_source_l00370}{370}} of file \mbox{\hyperlink{gtest_8cc_source}{gtest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00374\ \ \ \ \ :\ data\_(\textcolor{keyword}{new}\ AssertHelperData(type,\ file,\ line,\ message))\ \{}
+\DoxyCodeLine{00375\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1internal_1_1_assert_helper_a51c640785d4ed4a0155cc9aa857d8931}\index{testing::internal::AssertHelper@{testing::internal::AssertHelper}!````~AssertHelper@{\texorpdfstring{$\sim$}{\string~}AssertHelper}}
+\index{````~AssertHelper@{\texorpdfstring{$\sim$}{\string~}AssertHelper}!testing::internal::AssertHelper@{testing::internal::AssertHelper}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}AssertHelper()}{\string~AssertHelper()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_assert_helper_a51c640785d4ed4a0155cc9aa857d8931} 
+testing\+::internal\+::\+Assert\+Helper\+::\texorpdfstring{$\sim$}{\string~}\+Assert\+Helper (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8cc_source_l00377}{377}} of file \mbox{\hyperlink{gtest_8cc_source}{gtest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00377\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00378\ \ \ \textcolor{keyword}{delete}\ data\_;}
+\DoxyCodeLine{00379\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_assert_helper_a97bf22d786131ab7baa86b97a27aeb4d}\index{testing::internal::AssertHelper@{testing::internal::AssertHelper}!operator=@{operator=}}
+\index{operator=@{operator=}!testing::internal::AssertHelper@{testing::internal::AssertHelper}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_assert_helper_a97bf22d786131ab7baa86b97a27aeb4d} 
+void testing\+::internal\+::\+Assert\+Helper\+::operator= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classtesting_1_1_message}{Message}} \&}]{message}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8cc_source_l00382}{382}} of file \mbox{\hyperlink{gtest_8cc_source}{gtest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00382\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00383\ \ \ \mbox{\hyperlink{classtesting_1_1_unit_test_a24192400b70b3b946746954e9574fb8e}{UnitTest::GetInstance}}()-\/>}
+\DoxyCodeLine{00384\ \ \ \ \ AddTestPartResult(data\_-\/>type,\ data\_-\/>file,\ data\_-\/>line,}
+\DoxyCodeLine{00385\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ AppendUserMessage(data\_-\/>message,\ message),}
+\DoxyCodeLine{00386\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1_unit_test_a24192400b70b3b946746954e9574fb8e}{UnitTest::GetInstance}}()-\/>impl()}
+\DoxyCodeLine{00387\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>\mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl_a61c0a51ac4e57d9f884f646ca6dd2210}{CurrentOsStackTraceExceptTop}}(1)}
+\DoxyCodeLine{00388\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Skips\ the\ stack\ frame\ for\ this\ function\ itself.}}
+\DoxyCodeLine{00389\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );\ \ \textcolor{comment}{//\ NOLINT}}
+\DoxyCodeLine{00390\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_assert_helper_a97bf22d786131ab7baa86b97a27aeb4d_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/include/gtest/\mbox{\hyperlink{gtest_8h}{gtest.\+h}}\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/src/\mbox{\hyperlink{gtest_8cc}{gtest.\+cc}}\end{DoxyCompactItemize}

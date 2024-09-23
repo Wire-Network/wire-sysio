@@ -1,0 +1,20 @@
+<map id="libraries/yubihsm/pkcs11/pkcs11.h" name="libraries/yubihsm/pkcs11/pkcs11.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="208,5,374,46"/>
+<area shape="rect" id="Node000002" href="$p11__generate__rsa_8c.html" title=" " alt="" coords="5,94,185,135"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="234,55,141,96,139,91,232,50"/>
+<area shape="rect" id="Node000003" href="$pkcs11y_8h.html" title=" " alt="" coords="208,94,374,135"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="294,62,294,94,288,94,288,62"/>
+<area shape="rect" id="Node000008" href="$ecdh__derive__test_8c.html" title=" " alt="" coords="398,94,566,135"/>
+<area shape="poly" id="edge10_Node000001_Node000008" title=" " alt="" coords="349,50,440,91,437,96,347,55"/>
+<area shape="rect" id="Node000004" href="$util__pkcs11_8c.html" title=" " alt="" coords="148,360,314,401"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="277,150,253,206,234,272,230,319,232,359,226,359,224,319,228,271,248,204,272,148"/>
+<area shape="rect" id="Node000005" href="$util__pkcs11_8h.html" title=" " alt="" coords="243,271,408,312"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="300,149,324,270,319,271,295,150"/>
+<area shape="rect" id="Node000007" href="$yubihsm__pkcs11_8h.html" title=" " alt="" coords="328,183,494,223"/>
+<area shape="poly" id="edge7_Node000003_Node000007" title=" " alt="" coords="332,142,385,180,382,184,329,146"/>
+<area shape="poly" id="edge5_Node000005_Node000004" title=" " alt="" coords="295,325,254,362,251,358,291,321"/>
+<area shape="rect" id="Node000006" href="$yubihsm__pkcs11_8c.html" title=" " alt="" coords="350,360,515,401"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="363,320,410,357,407,362,360,324"/>
+<area shape="poly" id="edge8_Node000007_Node000005" title=" " alt="" coords="383,236,347,273,343,269,379,233"/>
+<area shape="poly" id="edge9_Node000007_Node000006" title=" " alt="" coords="419,238,423,271,433,359,428,360,418,272,413,239"/>
+</map>

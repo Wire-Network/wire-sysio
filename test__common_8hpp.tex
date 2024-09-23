@@ -1,0 +1,102 @@
+\doxysection{plugins/trace\+\_\+api\+\_\+plugin/test/include/sysio/trace\+\_\+api/test\+\_\+common.hpp File Reference}
+\hypertarget{test__common_8hpp}{}\label{test__common_8hpp}\index{plugins/trace\_api\_plugin/test/include/sysio/trace\_api/test\_common.hpp@{plugins/trace\_api\_plugin/test/include/sysio/trace\_api/test\_common.hpp}}
+{\ttfamily \#include $<$fc/bitutil.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/io/json.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/io/raw.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/abi\+\_\+def.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/asset.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/block.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/block\+\_\+state.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/name.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/trace\+\_\+api/data\+\_\+log.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/trace\+\_\+api/metadata\+\_\+log.\+hpp$>$}\newline
+Include dependency graph for test\+\_\+common.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__common_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__common_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1trace__api}{sysio\+::trace\+\_\+api}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common}{sysio\+::trace\+\_\+api\+::test\+\_\+common}}
+\item 
+namespace \mbox{\hyperlink{namespacefc}{fc}}
+\begin{DoxyCompactList}\small\item\em namespace \doxylink{namespacesysio_1_1chain}{sysio\+::chain} \end{DoxyCompactList}\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain}{sysio\+::chain}}
+\item 
+namespace \mbox{\hyperlink{namespacestd}{std}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1sha256}{fc\+::sha256}} \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_aa8cefa9541d16047b24ce70e8228c9cf}{sysio\+::trace\+\_\+api\+::test\+\_\+common\+::operator"{}"{}\+\_\+h}} (const char \texorpdfstring{$\ast$}{*}input, std\+::size\+\_\+t)
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1name}{chain\+::name}} \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a46ce1598ffa6f9bf7a20c1804caf5b57}{sysio\+::trace\+\_\+api\+::test\+\_\+common\+::operator"{}"{}\+\_\+n}} (const char \texorpdfstring{$\ast$}{*}input, std\+::size\+\_\+t)
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1asset}{chain\+::asset}} \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a344fa8330c585a912b7b6b0c45947f99}{sysio\+::trace\+\_\+api\+::test\+\_\+common\+::operator"{}"{}\+\_\+t}} (const char \texorpdfstring{$\ast$}{*}input, std\+::size\+\_\+t)
+\item 
+auto \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a16234350cb54ef5623702dfb3a0d9624}{sysio\+::trace\+\_\+api\+::test\+\_\+common\+::get\+\_\+private\+\_\+key}} (\mbox{\hyperlink{structsysio_1_1chain_1_1name}{chain\+::name}} keyname, std\+::string role="{}owner"{})
+\item 
+auto \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a9d8a6aa4b690e8cdddca915054a148a8}{sysio\+::trace\+\_\+api\+::test\+\_\+common\+::get\+\_\+public\+\_\+key}} (\mbox{\hyperlink{structsysio_1_1chain_1_1name}{chain\+::name}} keyname, std\+::string role="{}owner"{})
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_ac6f5a1f1e061f000983f5d5f3ac25dfa}{chain\+::bytes}} \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_aab47dbcf73e5456e7109c9f0d25dd035}{sysio\+::trace\+\_\+api\+::test\+\_\+common\+::make\+\_\+transfer\+\_\+data}} (\mbox{\hyperlink{structsysio_1_1chain_1_1name}{chain\+::name}} from, \mbox{\hyperlink{structsysio_1_1chain_1_1name}{chain\+::name}} to, \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{chain\+::asset}} quantity, std\+::string \&\&memo)
+\item 
+auto \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a7ad028261e9ab9a38fd557c8f7628615}{sysio\+::trace\+\_\+api\+::test\+\_\+common\+::make\+\_\+block\+\_\+state}} (\mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{chain\+::block\+\_\+id\+\_\+type}} previous, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} height, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{yubihsm__pkcs11_8c_a0209f1d92740f251d8686fd2d2a989e1}{slot}}, \mbox{\hyperlink{structsysio_1_1chain_1_1name}{chain\+::name}} producer, std\+::vector$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1packed__transaction}{chain\+::packed\+\_\+transaction}} $>$ trxs)
+\item 
+void \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a485e23904f45344e9340a77a4289fefd}{sysio\+::trace\+\_\+api\+::test\+\_\+common\+::to\+\_\+kv\+\_\+helper}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&v, std\+::function$<$ void(const std\+::string \&, const std\+::string \&)$>$ \&\&append)
+\item 
+auto \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a4684ce5b6bc8f5dd33e6a850719bfd4e}{sysio\+::trace\+\_\+api\+::test\+\_\+common\+::to\+\_\+kv}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&v)
+\item 
+bool \mbox{\hyperlink{namespacesysio_1_1trace__api_a41a2b23311b90c4c816a14846ecb16ad}{sysio\+::trace\+\_\+api\+::operator==}} (const \mbox{\hyperlink{structsysio_1_1trace__api_1_1authorization__trace__v0}{authorization\+\_\+trace\+\_\+v0}} \&lhs, const \mbox{\hyperlink{structsysio_1_1trace__api_1_1authorization__trace__v0}{authorization\+\_\+trace\+\_\+v0}} \&rhs)
+\item 
+bool \mbox{\hyperlink{namespacesysio_1_1trace__api_a34c0f4534a4fc2adc2ddc31448e8f56d}{sysio\+::trace\+\_\+api\+::operator==}} (const \mbox{\hyperlink{structsysio_1_1trace__api_1_1action__trace__v0}{action\+\_\+trace\+\_\+v0}} \&lhs, const \mbox{\hyperlink{structsysio_1_1trace__api_1_1action__trace__v0}{action\+\_\+trace\+\_\+v0}} \&rhs)
+\item 
+bool \mbox{\hyperlink{namespacesysio_1_1trace__api_a3b74e8986abb03c73600fbf5144e2bd6}{sysio\+::trace\+\_\+api\+::operator==}} (const \mbox{\hyperlink{structsysio_1_1trace__api_1_1transaction__trace__v0}{transaction\+\_\+trace\+\_\+v0}} \&lhs, const \mbox{\hyperlink{structsysio_1_1trace__api_1_1transaction__trace__v0}{transaction\+\_\+trace\+\_\+v0}} \&rhs)
+\item 
+bool \mbox{\hyperlink{namespacesysio_1_1trace__api_a021a6e1bbdf21f66b43314c65cee274a}{sysio\+::trace\+\_\+api\+::operator==}} (const \mbox{\hyperlink{structsysio_1_1trace__api_1_1transaction__trace__v2}{transaction\+\_\+trace\+\_\+v2}} \&lhs, const \mbox{\hyperlink{structsysio_1_1trace__api_1_1transaction__trace__v2}{transaction\+\_\+trace\+\_\+v2}} \&rhs)
+\item 
+bool \mbox{\hyperlink{namespacesysio_1_1trace__api_a4f19c3c336fe462488f3ea933ce424b1}{sysio\+::trace\+\_\+api\+::operator==}} (const \mbox{\hyperlink{structsysio_1_1trace__api_1_1block__trace__v0}{block\+\_\+trace\+\_\+v0}} \&lhs, const \mbox{\hyperlink{structsysio_1_1trace__api_1_1block__trace__v0}{block\+\_\+trace\+\_\+v0}} \&rhs)
+\item 
+bool \mbox{\hyperlink{namespacesysio_1_1trace__api_a93bc5783c2f167f60e3426ab0a6542a0}{sysio\+::trace\+\_\+api\+::operator==}} (const \mbox{\hyperlink{structsysio_1_1trace__api_1_1block__trace__v2}{block\+\_\+trace\+\_\+v2}} \&lhs, const \mbox{\hyperlink{structsysio_1_1trace__api_1_1block__trace__v2}{block\+\_\+trace\+\_\+v2}} \&rhs)
+\item 
+std\+::ostream \& \mbox{\hyperlink{namespacesysio_1_1trace__api_a23357afd33f30f9f6095faa502ad8371}{sysio\+::trace\+\_\+api\+::operator$<$$<$}} (std\+::ostream \&os, const \mbox{\hyperlink{structsysio_1_1trace__api_1_1block__trace__v0}{block\+\_\+trace\+\_\+v0}} \&\mbox{\hyperlink{xbyak__mnemonic_8h_a9be923ac9afe48bc98bd22e398415272}{bt}})
+\item 
+std\+::ostream \& \mbox{\hyperlink{namespacesysio_1_1trace__api_aa1d12728fe1fd05adbe74ff28f4d18cf}{sysio\+::trace\+\_\+api\+::operator$<$$<$}} (std\+::ostream \&os, const \mbox{\hyperlink{structsysio_1_1trace__api_1_1block__trace__v2}{block\+\_\+trace\+\_\+v2}} \&\mbox{\hyperlink{xbyak__mnemonic_8h_a9be923ac9afe48bc98bd22e398415272}{bt}})
+\item 
+bool \mbox{\hyperlink{namespacesysio_1_1trace__api_a24fca9598292e7c24eec3aacf15f4947}{sysio\+::trace\+\_\+api\+::operator==}} (const \mbox{\hyperlink{structsysio_1_1trace__api_1_1block__entry__v0}{block\+\_\+entry\+\_\+v0}} \&lhs, const \mbox{\hyperlink{structsysio_1_1trace__api_1_1block__entry__v0}{block\+\_\+entry\+\_\+v0}} \&rhs)
+\item 
+bool \mbox{\hyperlink{namespacesysio_1_1trace__api_a1a12b8b71f6f419062ba7cf6d3deb42b}{sysio\+::trace\+\_\+api\+::operator!=}} (const \mbox{\hyperlink{structsysio_1_1trace__api_1_1block__entry__v0}{block\+\_\+entry\+\_\+v0}} \&lhs, const \mbox{\hyperlink{structsysio_1_1trace__api_1_1block__entry__v0}{block\+\_\+entry\+\_\+v0}} \&rhs)
+\item 
+bool \mbox{\hyperlink{namespacesysio_1_1trace__api_ac081c198d190dab889e960c41e979c42}{sysio\+::trace\+\_\+api\+::operator==}} (const \mbox{\hyperlink{structsysio_1_1trace__api_1_1lib__entry__v0}{lib\+\_\+entry\+\_\+v0}} \&lhs, const \mbox{\hyperlink{structsysio_1_1trace__api_1_1lib__entry__v0}{lib\+\_\+entry\+\_\+v0}} \&rhs)
+\item 
+bool \mbox{\hyperlink{namespacesysio_1_1trace__api_abdc8a5cb5e34c90e257ab6cf10137de4}{sysio\+::trace\+\_\+api\+::operator!=}} (const \mbox{\hyperlink{structsysio_1_1trace__api_1_1lib__entry__v0}{lib\+\_\+entry\+\_\+v0}} \&lhs, const \mbox{\hyperlink{structsysio_1_1trace__api_1_1lib__entry__v0}{lib\+\_\+entry\+\_\+v0}} \&rhs)
+\item 
+std\+::ostream \& \mbox{\hyperlink{namespacesysio_1_1trace__api_a9a1a60194ac5aa7b88659609bccb90b8}{sysio\+::trace\+\_\+api\+::operator$<$$<$}} (std\+::ostream \&os, const \mbox{\hyperlink{structsysio_1_1trace__api_1_1block__entry__v0}{block\+\_\+entry\+\_\+v0}} \&be)
+\item 
+std\+::ostream \& \mbox{\hyperlink{namespacesysio_1_1trace__api_aaed7f2467b3bb0832c319fc6de35c32f}{sysio\+::trace\+\_\+api\+::operator$<$$<$}} (std\+::ostream \&os, const \mbox{\hyperlink{structsysio_1_1trace__api_1_1lib__entry__v0}{lib\+\_\+entry\+\_\+v0}} \&le)
+\item 
+{\footnotesize template$<$typename ... Ts$>$ }\\std\+::ostream \& \mbox{\hyperlink{namespacefc_a14003df784c972eee16de756abccead3}{fc\+::operator$<$$<$}} (std\+::ostream \&os, const std\+::variant$<$ Ts... $>$ \&v)
+\item 
+std\+::ostream \& \mbox{\hyperlink{namespacefc_ae8d22c871a83a091162fd84fc7ead6d8}{fc\+::operator$<$$<$}} (std\+::ostream \&os, const \mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}} \&t)
+\item 
+bool \mbox{\hyperlink{namespacesysio_1_1chain_a20875d480364a6477be615bb7d4482de}{sysio\+::chain\+::operator==}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1abi__def}{abi\+\_\+def}} \&lhs, const \mbox{\hyperlink{structsysio_1_1chain_1_1abi__def}{abi\+\_\+def}} \&rhs)
+\item 
+bool \mbox{\hyperlink{namespacesysio_1_1chain_a92d17ae24c96a4202744eb15a47b0154}{sysio\+::chain\+::operator!=}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1abi__def}{abi\+\_\+def}} \&lhs, const \mbox{\hyperlink{structsysio_1_1chain_1_1abi__def}{abi\+\_\+def}} \&rhs)
+\item 
+std\+::ostream \& \mbox{\hyperlink{namespacesysio_1_1chain_a7e68fc39f2de4ef1263f01028aa86790}{sysio\+::chain\+::operator$<$$<$}} (std\+::ostream \&os, const \mbox{\hyperlink{structsysio_1_1chain_1_1abi__def}{abi\+\_\+def}} \&abi)
+\item 
+ostream \& \mbox{\hyperlink{namespacestd_a063aefacc028fad5b24cc605b807d978}{std\+::operator$<$$<$}} (ostream \&os, const pair$<$ string, string $>$ \&entry)
+\end{DoxyCompactItemize}

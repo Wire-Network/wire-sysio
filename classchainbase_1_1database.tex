@@ -1,0 +1,976 @@
+\doxysection{chainbase\+::database Class Reference}
+\hypertarget{classchainbase_1_1database}{}\label{classchainbase_1_1database}\index{chainbase::database@{chainbase::database}}
+
+
+{\ttfamily \#include $<$chainbase.\+hpp$>$}
+
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structchainbase_1_1database_1_1session}{session}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{classchainbase_1_1database_a3d0148ef1d3bf633f3d0bfab420250ee}{open\+\_\+flags}} \{ \mbox{\hyperlink{classchainbase_1_1database_a3d0148ef1d3bf633f3d0bfab420250eea51c3754046d280c74c384e0e74a45b47}{read\+\_\+only}} = 0
+, \mbox{\hyperlink{classchainbase_1_1database_a3d0148ef1d3bf633f3d0bfab420250eea3ed40e30ae731cdc45c9dc5b782d88f4}{read\+\_\+write}} = 1
+ \}
+\item 
+using \mbox{\hyperlink{classchainbase_1_1database_a7780c270726e90372b252a354095ea3a}{database\+\_\+index\+\_\+row\+\_\+count\+\_\+multiset}} = std\+::multiset$<$std\+::pair$<$unsigned, std\+::string$>$$>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classchainbase_1_1database_a461fee5fe782650c4642bf1e5817e646}{database}} (const bfs\+::path \&dir, \mbox{\hyperlink{classchainbase_1_1database_a3d0148ef1d3bf633f3d0bfab420250ee}{open\+\_\+flags}} write=\mbox{\hyperlink{classchainbase_1_1database_a3d0148ef1d3bf633f3d0bfab420250eea51c3754046d280c74c384e0e74a45b47}{read\+\_\+only}}, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} shared\+\_\+file\+\_\+size=0, bool allow\+\_\+dirty=false, \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a7fe6684b11f441d2e971fe65166d7d5f}{pinnable\+\_\+mapped\+\_\+file\+::map\+\_\+mode}}=\mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a7fe6684b11f441d2e971fe65166d7d5fa65d636fa5a7029aaa40f1d93a52748b7}{pinnable\+\_\+mapped\+\_\+file\+::map\+\_\+mode\+::mapped}})
+\item 
+\mbox{\hyperlink{classchainbase_1_1database_a31008de680565a626cd975c25d4351db}{\texorpdfstring{$\sim$}{\string~}database}} ()
+\item 
+\mbox{\hyperlink{classchainbase_1_1database_ac1f047331d68fca270e8323a23e86922}{database}} (\mbox{\hyperlink{classchainbase_1_1database}{database}} \&\&)=default
+\item 
+\mbox{\hyperlink{classchainbase_1_1database}{database}} \& \mbox{\hyperlink{classchainbase_1_1database_a2c97ee00b7904ba08050f32e8ac52160}{operator=}} (\mbox{\hyperlink{classchainbase_1_1database}{database}} \&\&)=default
+\item 
+bool \mbox{\hyperlink{classchainbase_1_1database_ac34261887e651719813a8cffb4f31d87}{is\+\_\+read\+\_\+only}} () const
+\item 
+void \mbox{\hyperlink{classchainbase_1_1database_a7afc3526294cf634f71cc25376deaa21}{flush}} ()
+\item 
+void \mbox{\hyperlink{classchainbase_1_1database_ad544b6a999bff16775ebd96dfb6b8e27}{set\+\_\+require\+\_\+locking}} (bool enable\+\_\+require\+\_\+locking)
+\item 
+\mbox{\hyperlink{structchainbase_1_1database_1_1session}{session}} \mbox{\hyperlink{classchainbase_1_1database_abb570c03bda1ee6ae1b428d41481b476}{start\+\_\+undo\+\_\+session}} (bool enabled)
+\item 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{classchainbase_1_1database_a224fc0c346a93fd027bfa2515f54bf98}{revision}} () const
+\item 
+void \mbox{\hyperlink{classchainbase_1_1database_a167bce30384de1f373ebe0c25d4d0de6}{undo}} ()
+\item 
+void \mbox{\hyperlink{classchainbase_1_1database_ace133a4e1820ea8663fb4eaa19145e57}{squash}} ()
+\item 
+void \mbox{\hyperlink{classchainbase_1_1database_aca6d7bcd700644f077b89203b2e8b7ef}{commit}} (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{classchainbase_1_1database_a224fc0c346a93fd027bfa2515f54bf98}{revision}})
+\item 
+void \mbox{\hyperlink{classchainbase_1_1database_a832c383b7d8573d399e6149d4c715bd6}{undo\+\_\+all}} ()
+\item 
+void \mbox{\hyperlink{classchainbase_1_1database_a24e7f6336cad0bd2fc280dab381665ed}{set\+\_\+revision}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{classchainbase_1_1database_a224fc0c346a93fd027bfa2515f54bf98}{revision}})
+\item 
+{\footnotesize template$<$typename Multi\+Index\+Type $>$ }\\void \mbox{\hyperlink{classchainbase_1_1database_a43a85f8b7d728b69dbf7a9d69c9ebc1c}{add\+\_\+index}} ()
+\item 
+\mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a550aa643b3bd7335e48afd94f1089d2b}{pinnable\+\_\+mapped\+\_\+file\+::segment\+\_\+manager}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classchainbase_1_1database_a64133afb9e0ae374eeab86bd1d4db08b}{get\+\_\+segment\+\_\+manager}} ()
+\item 
+const \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a550aa643b3bd7335e48afd94f1089d2b}{pinnable\+\_\+mapped\+\_\+file\+::segment\+\_\+manager}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classchainbase_1_1database_a50525f9d37dd23fb33307990aa839e06}{get\+\_\+segment\+\_\+manager}} () const
+\item 
+size\+\_\+t \mbox{\hyperlink{classchainbase_1_1database_a63a87fe56634ee1e93511a894b98e40d}{get\+\_\+free\+\_\+memory}} () const
+\item 
+{\footnotesize template$<$typename Multi\+Index\+Type $>$ }\\const \mbox{\hyperlink{namespacechainbase_a3ba122cfc1e47fa4ddf024212ec17431}{generic\+\_\+index}}$<$ Multi\+Index\+Type $>$ \& \mbox{\hyperlink{classchainbase_1_1database_a4d5297635dcf70be481d9b600da9bc13}{get\+\_\+index}} () const
+\item 
+{\footnotesize template$<$typename Multi\+Index\+Type , typename By\+Index $>$ }\\auto \mbox{\hyperlink{classchainbase_1_1database_af35a648524fb0240a78a0450c0266046}{get\+\_\+index}} () const -\/$>$ decltype(((\mbox{\hyperlink{namespacechainbase_a3ba122cfc1e47fa4ddf024212ec17431}{generic\+\_\+index}}$<$ Multi\+Index\+Type $>$ \texorpdfstring{$\ast$}{*})(nullptr)) -\/$>$indices().\mbox{\hyperlink{yubihsm__pkcs11_8c_a53ef06e29c840024a683512c1acd791a}{template}} \mbox{\hyperlink{classchainbase_1_1database_afcfe00f81a526c1376d4f51197dd3a9a}{get}}$<$ By\+Index $>$())
+\item 
+{\footnotesize template$<$typename Multi\+Index\+Type $>$ }\\\mbox{\hyperlink{namespacechainbase_a3ba122cfc1e47fa4ddf024212ec17431}{generic\+\_\+index}}$<$ Multi\+Index\+Type $>$ \& \mbox{\hyperlink{classchainbase_1_1database_afaea057692a8bbbf3f506b64c60308b6}{get\+\_\+mutable\+\_\+index}} ()
+\item 
+{\footnotesize template$<$typename Object\+Type , typename Indexed\+By\+Type , typename Compatible\+Key $>$ }\\const Object\+Type \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classchainbase_1_1database_aa5a2ca0da0092693ac49b36b7ec6817a}{find}} (Compatible\+Key \&\&key) const
+\item 
+{\footnotesize template$<$typename Object\+Type $>$ }\\const Object\+Type \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classchainbase_1_1database_a248bf27038d616496ed18db76c69a8e1}{find}} (\mbox{\hyperlink{classchainbase_1_1oid}{oid}}$<$ Object\+Type $>$ key=\mbox{\hyperlink{classchainbase_1_1oid}{oid}}$<$ Object\+Type $>$()) const
+\item 
+{\footnotesize template$<$typename Object\+Type , typename Indexed\+By\+Type , typename Compatible\+Key $>$ }\\const Object\+Type \& \mbox{\hyperlink{classchainbase_1_1database_afcfe00f81a526c1376d4f51197dd3a9a}{get}} (Compatible\+Key \&\&key) const
+\item 
+{\footnotesize template$<$typename Object\+Type $>$ }\\const Object\+Type \& \mbox{\hyperlink{classchainbase_1_1database_a41bee39b4bab8d338193d1032b451a1e}{get}} (const \mbox{\hyperlink{classchainbase_1_1oid}{oid}}$<$ Object\+Type $>$ \&key=\mbox{\hyperlink{classchainbase_1_1oid}{oid}}$<$ Object\+Type $>$()) const
+\item 
+{\footnotesize template$<$typename Object\+Type , typename Modifier $>$ }\\void \mbox{\hyperlink{classchainbase_1_1database_a9ebc006075e8fc2e84357a0e068b58d4}{modify}} (const Object\+Type \&obj, Modifier \&\&m)
+\item 
+{\footnotesize template$<$typename Object\+Type $>$ }\\void \mbox{\hyperlink{classchainbase_1_1database_ac6bb29708e4fdfb6899028e3c351fe0b}{remove}} (const Object\+Type \&obj)
+\item 
+{\footnotesize template$<$typename Object\+Type , typename Constructor $>$ }\\const Object\+Type \& \mbox{\hyperlink{classchainbase_1_1database_adc8f336b33d7013d1b0400399b16c5a7}{create}} (Constructor \&\&con)
+\item 
+\mbox{\hyperlink{classchainbase_1_1database_a7780c270726e90372b252a354095ea3a}{database\+\_\+index\+\_\+row\+\_\+count\+\_\+multiset}} \mbox{\hyperlink{classchainbase_1_1database_ae1a365762e37490551a8de3adda5665e}{row\+\_\+count\+\_\+per\+\_\+index}} () const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+This class 
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00252}{252}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classchainbase_1_1database_a7780c270726e90372b252a354095ea3a}\index{chainbase::database@{chainbase::database}!database\_index\_row\_count\_multiset@{database\_index\_row\_count\_multiset}}
+\index{database\_index\_row\_count\_multiset@{database\_index\_row\_count\_multiset}!chainbase::database@{chainbase::database}}
+\doxysubsubsection{\texorpdfstring{database\_index\_row\_count\_multiset}{database\_index\_row\_count\_multiset}}
+{\footnotesize\ttfamily \label{classchainbase_1_1database_a7780c270726e90372b252a354095ea3a} 
+using \mbox{\hyperlink{classchainbase_1_1database_a7780c270726e90372b252a354095ea3a}{chainbase\+::database\+::database\+\_\+index\+\_\+row\+\_\+count\+\_\+multiset}} = std\+::multiset$<$std\+::pair$<$unsigned, std\+::string$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00260}{260}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+
+\doxysubsection{Member Enumeration Documentation}
+\Hypertarget{classchainbase_1_1database_a3d0148ef1d3bf633f3d0bfab420250ee}\index{chainbase::database@{chainbase::database}!open\_flags@{open\_flags}}
+\index{open\_flags@{open\_flags}!chainbase::database@{chainbase::database}}
+\doxysubsubsection{\texorpdfstring{open\_flags}{open\_flags}}
+{\footnotesize\ttfamily \label{classchainbase_1_1database_a3d0148ef1d3bf633f3d0bfab420250ee} 
+enum \mbox{\hyperlink{classchainbase_1_1database_a3d0148ef1d3bf633f3d0bfab420250ee}{chainbase\+::database\+::open\+\_\+flags}}}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{read\_only@{read\_only}!chainbase::database@{chainbase::database}}\index{chainbase::database@{chainbase::database}!read\_only@{read\_only}}}\Hypertarget{classchainbase_1_1database_a3d0148ef1d3bf633f3d0bfab420250eea51c3754046d280c74c384e0e74a45b47}\label{classchainbase_1_1database_a3d0148ef1d3bf633f3d0bfab420250ee} 
+read\+\_\+only&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{read\_write@{read\_write}!chainbase::database@{chainbase::database}}\index{chainbase::database@{chainbase::database}!read\_write@{read\_write}}}\Hypertarget{classchainbase_1_1database_a3d0148ef1d3bf633f3d0bfab420250eea3ed40e30ae731cdc45c9dc5b782d88f4}\label{classchainbase_1_1database_a3d0148ef1d3bf633f3d0bfab420250ee} 
+read\+\_\+write&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00255}{255}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00255\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00256\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classchainbase_1_1database_a3d0148ef1d3bf633f3d0bfab420250eea51c3754046d280c74c384e0e74a45b47}{read\_only}}\ \ \ \ \ =\ 0,}
+\DoxyCodeLine{00257\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classchainbase_1_1database_a3d0148ef1d3bf633f3d0bfab420250eea3ed40e30ae731cdc45c9dc5b782d88f4}{read\_write}}\ \ \ \ =\ 1}
+\DoxyCodeLine{00258\ \ \ \ \ \ \ \ \ \ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classchainbase_1_1database_a461fee5fe782650c4642bf1e5817e646}\index{chainbase::database@{chainbase::database}!database@{database}}
+\index{database@{database}!chainbase::database@{chainbase::database}}
+\doxysubsubsection{\texorpdfstring{database()}{database()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classchainbase_1_1database_a461fee5fe782650c4642bf1e5817e646} 
+database\+::database (\begin{DoxyParamCaption}\item[{const bfs\+::path \&}]{dir}{, }\item[{\mbox{\hyperlink{classchainbase_1_1database_a3d0148ef1d3bf633f3d0bfab420250ee}{open\+\_\+flags}}}]{write}{ = {\ttfamily \mbox{\hyperlink{classchainbase_1_1database_a3d0148ef1d3bf633f3d0bfab420250eea51c3754046d280c74c384e0e74a45b47}{read\+\_\+only}}}, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{shared\+\_\+file\+\_\+size}{ = {\ttfamily 0}, }\item[{bool}]{allow\+\_\+dirty}{ = {\ttfamily false}, }\item[{\mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a7fe6684b11f441d2e971fe65166d7d5f}{pinnable\+\_\+mapped\+\_\+file\+::map\+\_\+mode}}}]{db\+\_\+map\+\_\+mode}{ = {\ttfamily \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a7fe6684b11f441d2e971fe65166d7d5fa65d636fa5a7029aaa40f1d93a52748b7}{pinnable\+\_\+mapped\+\_\+file\+::map\+\_\+mode\+::mapped}}}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8cpp_source_l00012}{12}} of file \mbox{\hyperlink{chainbase_8cpp_source}{chainbase.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00013\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :}
+\DoxyCodeLine{00014\ \ \ \ \ \ \ \_db\_file(dir,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae0ed371842ace71a7886a6134ecbcb62}{flags}}\ \&\ \mbox{\hyperlink{classchainbase_1_1database_a3d0148ef1d3bf633f3d0bfab420250eea3ed40e30ae731cdc45c9dc5b782d88f4}{database::read\_write}},\ shared\_file\_size,\ allow\_dirty,\ db\_map\_mode),}
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \_read\_only(\mbox{\hyperlink{yubihsm__pkcs11_8c_ae0ed371842ace71a7886a6134ecbcb62}{flags}}\ ==\ \mbox{\hyperlink{classchainbase_1_1database_a3d0148ef1d3bf633f3d0bfab420250eea51c3754046d280c74c384e0e74a45b47}{database::read\_only}})}
+\DoxyCodeLine{00016\ \ \ \ \{}
+\DoxyCodeLine{00017\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classchainbase_1_1database_a31008de680565a626cd975c25d4351db}\index{chainbase::database@{chainbase::database}!````~database@{\texorpdfstring{$\sim$}{\string~}database}}
+\index{````~database@{\texorpdfstring{$\sim$}{\string~}database}!chainbase::database@{chainbase::database}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}database()}{\string~database()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1database_a31008de680565a626cd975c25d4351db} 
+database\+::\texorpdfstring{$\sim$}{\string~}database (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8cpp_source_l00019}{19}} of file \mbox{\hyperlink{chainbase_8cpp_source}{chainbase.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00020\ \ \ \ \{}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \_index\_list.clear();}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \_index\_map.clear();}
+\DoxyCodeLine{00023\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classchainbase_1_1database_ac1f047331d68fca270e8323a23e86922}\index{chainbase::database@{chainbase::database}!database@{database}}
+\index{database@{database}!chainbase::database@{chainbase::database}}
+\doxysubsubsection{\texorpdfstring{database()}{database()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classchainbase_1_1database_ac1f047331d68fca270e8323a23e86922} 
+chainbase\+::database\+::database (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classchainbase_1_1database}{database}} \&\&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [default]}}
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classchainbase_1_1database_a43a85f8b7d728b69dbf7a9d69c9ebc1c}\index{chainbase::database@{chainbase::database}!add\_index@{add\_index}}
+\index{add\_index@{add\_index}!chainbase::database@{chainbase::database}}
+\doxysubsubsection{\texorpdfstring{add\_index()}{add\_index()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1database_a43a85f8b7d728b69dbf7a9d69c9ebc1c} 
+template$<$typename Multi\+Index\+Type $>$ \\
+void chainbase\+::database\+::add\+\_\+index (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00344}{344}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00344\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00345\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ type\_id\ =\ generic\_index<MultiIndexType>::value\_type::type\_id;}
+\DoxyCodeLine{00346\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{namespacechainbase_a3ba122cfc1e47fa4ddf024212ec17431}{generic\_index<MultiIndexType>}}\ \ \ \ \ \ \ \ \ \ index\_type;}
+\DoxyCodeLine{00347\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{typename}\ index\_type::allocator\_type\ \ \ \ index\_alloc;}
+\DoxyCodeLine{00348\ }
+\DoxyCodeLine{00349\ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ \mbox{\hyperlink{namespacesysio_1_1chain_a007674e7dd512662e202e2a3268da2c4}{type\_name}}\ =\ boost::core::demangle(\ \textcolor{keyword}{typeid}(\ \textcolor{keyword}{typename}\ index\_type::value\_type\ ).\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}()\ );}
+\DoxyCodeLine{00350\ }
+\DoxyCodeLine{00351\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !(\ \_index\_map.size()\ <=\ type\_id\ ||\ \_index\_map[\ type\_id\ ]\ ==\ \textcolor{keyword}{nullptr}\ )\ )\ \{}
+\DoxyCodeLine{00352\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_THROW\_EXCEPTION(\ std::logic\_error(\ type\_name\ +\ \textcolor{stringliteral}{"{}::type\_id\ is\ already\ in\ use"{}}\ )\ );}
+\DoxyCodeLine{00353\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00354\ }
+\DoxyCodeLine{00355\ \ \ \ \ \ \ \ \ \ \ \ \ index\_type*\ idx\_ptr\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00356\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \_read\_only\ )}
+\DoxyCodeLine{00357\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ idx\_ptr\ =\ \_db\_file.\mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a29dccb9bf52ef5c409fc1316fc99325a}{get\_segment\_manager}}()-\/>find\_no\_lock<\ index\_type\ >(\ \mbox{\hyperlink{namespacesysio_1_1chain_a007674e7dd512662e202e2a3268da2c4}{type\_name}}.c\_str()\ ).first;}
+\DoxyCodeLine{00358\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00359\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ idx\_ptr\ =\ \_db\_file.\mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a29dccb9bf52ef5c409fc1316fc99325a}{get\_segment\_manager}}()-\/>find<\ index\_type\ >(\ \mbox{\hyperlink{namespacesysio_1_1chain_a007674e7dd512662e202e2a3268da2c4}{type\_name}}.c\_str()\ ).first;}
+\DoxyCodeLine{00360\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ first\_time\_adding\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00361\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !idx\_ptr\ )\ \{}
+\DoxyCodeLine{00362\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \_read\_only\ )\ \{}
+\DoxyCodeLine{00363\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_THROW\_EXCEPTION(\ std::runtime\_error(\ \textcolor{stringliteral}{"{}unable\ to\ find\ index\ for\ "{}}\ +\ type\_name\ +\ \textcolor{stringliteral}{"{}\ in\ read\ only\ database"{}}\ )\ );}
+\DoxyCodeLine{00364\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00365\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ first\_time\_adding\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00366\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ idx\_ptr\ =\ \_db\_file.\mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a29dccb9bf52ef5c409fc1316fc99325a}{get\_segment\_manager}}()-\/>construct<\ index\_type\ >(\ \mbox{\hyperlink{namespacesysio_1_1chain_a007674e7dd512662e202e2a3268da2c4}{type\_name}}.c\_str()\ )(\ index\_alloc(\ \_db\_file.\mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a29dccb9bf52ef5c409fc1316fc99325a}{get\_segment\_manager}}()\ )\ );}
+\DoxyCodeLine{00367\ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00368\ }
+\DoxyCodeLine{00369\ \ \ \ \ \ \ \ \ \ \ \ \ idx\_ptr-\/>validate();}
+\DoxyCodeLine{00370\ }
+\DoxyCodeLine{00371\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Ensure\ the\ undo\ stack\ of\ added\ index\ is\ consistent\ with\ the\ other\ indices\ in\ the\ database}}
+\DoxyCodeLine{00372\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \_index\_list.size()\ >\ 0\ )\ \{}
+\DoxyCodeLine{00373\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ expected\_revision\_range\ =\ \_index\_list.front()-\/>undo\_stack\_revision\_range();}
+\DoxyCodeLine{00374\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ added\_index\_revision\_range\ =\ idx\_ptr-\/>undo\_stack\_revision\_range();}
+\DoxyCodeLine{00375\ }
+\DoxyCodeLine{00376\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ added\_index\_revision\_range.first\ !=\ expected\_revision\_range.first\ ||}
+\DoxyCodeLine{00377\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ added\_index\_revision\_range.second\ !=\ expected\_revision\_range.second\ )\ \{}
+\DoxyCodeLine{00378\ }
+\DoxyCodeLine{00379\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !first\_time\_adding\ )\ \{}
+\DoxyCodeLine{00380\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_THROW\_EXCEPTION(\ std::logic\_error(}
+\DoxyCodeLine{00381\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}existing\ index\ for\ "{}}\ +\ type\_name\ +\ \textcolor{stringliteral}{"{}\ has\ an\ undo\ stack\ (revision\ range\ ["{}}\ +}
+\DoxyCodeLine{00382\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::to\_string(added\_index\_revision\_range.first)\ +\ \textcolor{stringliteral}{"{},\ "{}}\ +\ std::to\_string(added\_index\_revision\_range.second)\ +}
+\DoxyCodeLine{00383\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}])\ that\ is\ inconsistent\ with\ other\ indices\ in\ the\ database\ (revision\ range\ ["{}}\ +}
+\DoxyCodeLine{00384\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::to\_string(expected\_revision\_range.first)\ +\ \textcolor{stringliteral}{"{},\ "{}}\ +\ std::to\_string(expected\_revision\_range.second)\ +}
+\DoxyCodeLine{00385\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}]);\ corrupted\ database?"{}}}
+\DoxyCodeLine{00386\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ )\ );}
+\DoxyCodeLine{00387\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00388\ }
+\DoxyCodeLine{00389\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \_read\_only\ )\ \{}
+\DoxyCodeLine{00390\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_THROW\_EXCEPTION(\ std::logic\_error(}
+\DoxyCodeLine{00391\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}new\ index\ for\ "{}}\ +\ type\_name\ +}
+\DoxyCodeLine{00392\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ requires\ an\ undo\ stack\ that\ is\ consistent\ with\ other\ indices\ in\ the\ database;\ cannot\ fix\ in\ read-\/only\ mode"{}}}
+\DoxyCodeLine{00393\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ )\ );}
+\DoxyCodeLine{00394\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00395\ }
+\DoxyCodeLine{00396\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ idx\_ptr-\/>set\_revision(\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\textcolor{keyword}{>}(expected\_revision\_range.first)\ );}
+\DoxyCodeLine{00397\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\ idx\_ptr-\/>revision()\ <\ expected\_revision\_range.second\ )\ \{}
+\DoxyCodeLine{00398\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ idx\_ptr-\/>start\_undo\_session(\textcolor{keyword}{true}).push();}
+\DoxyCodeLine{00399\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00400\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00401\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00402\ }
+\DoxyCodeLine{00403\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ type\_id\ >=\ \_index\_map.size()\ )}
+\DoxyCodeLine{00404\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_index\_map.resize(\ type\_id\ +\ 1\ );}
+\DoxyCodeLine{00405\ }
+\DoxyCodeLine{00406\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ new\_index\ =\ \textcolor{keyword}{new}\ index<index\_type>(\ *idx\_ptr\ );}
+\DoxyCodeLine{00407\ \ \ \ \ \ \ \ \ \ \ \ \ \_index\_map[\ type\_id\ ].reset(\ new\_index\ );}
+\DoxyCodeLine{00408\ \ \ \ \ \ \ \ \ \ \ \ \ \_index\_list.push\_back(\ new\_index\ );}
+\DoxyCodeLine{00409\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classchainbase_1_1database_a43a85f8b7d728b69dbf7a9d69c9ebc1c_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classchainbase_1_1database_a43a85f8b7d728b69dbf7a9d69c9ebc1c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classchainbase_1_1database_aca6d7bcd700644f077b89203b2e8b7ef}\index{chainbase::database@{chainbase::database}!commit@{commit}}
+\index{commit@{commit}!chainbase::database@{chainbase::database}}
+\doxysubsubsection{\texorpdfstring{commit()}{commit()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1database_aca6d7bcd700644f077b89203b2e8b7ef} 
+void database\+::commit (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}}]{revision}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8cpp_source_l00057}{57}} of file \mbox{\hyperlink{chainbase_8cpp_source}{chainbase.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00058\ \ \ \ \{}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\&\ item\ :\ \_index\_list\ )}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \ item-\/>commit(\ \mbox{\hyperlink{classchainbase_1_1database_a224fc0c346a93fd027bfa2515f54bf98}{revision}}\ );}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00063\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=328pt]{classchainbase_1_1database_aca6d7bcd700644f077b89203b2e8b7ef_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classchainbase_1_1database_aca6d7bcd700644f077b89203b2e8b7ef_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classchainbase_1_1database_adc8f336b33d7013d1b0400399b16c5a7}\index{chainbase::database@{chainbase::database}!create@{create}}
+\index{create@{create}!chainbase::database@{chainbase::database}}
+\doxysubsubsection{\texorpdfstring{create()}{create()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1database_adc8f336b33d7013d1b0400399b16c5a7} 
+template$<$typename Object\+Type , typename Constructor $>$ \\
+const Object\+Type \& chainbase\+::database\+::create (\begin{DoxyParamCaption}\item[{Constructor \&\&}]{con}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00519}{519}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00520\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00521\ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chainbase_8hpp_a43b0c8cc6f841c06b58acec3d0fc10e5}{CHAINBASE\_REQUIRE\_WRITE\_LOCK}}(\textcolor{stringliteral}{"{}create"{}},\ ObjectType);}
+\DoxyCodeLine{00522\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{typename}\ get\_index\_type<ObjectType>::type\ index\_type;}
+\DoxyCodeLine{00523\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classchainbase_1_1database_afaea057692a8bbbf3f506b64c60308b6}{get\_mutable\_index<index\_type>}}().emplace(\ std::forward<Constructor>(con)\ );}
+\DoxyCodeLine{00524\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classchainbase_1_1database_adc8f336b33d7013d1b0400399b16c5a7_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classchainbase_1_1database_adc8f336b33d7013d1b0400399b16c5a7_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classchainbase_1_1database_aa5a2ca0da0092693ac49b36b7ec6817a}\index{chainbase::database@{chainbase::database}!find@{find}}
+\index{find@{find}!chainbase::database@{chainbase::database}}
+\doxysubsubsection{\texorpdfstring{find()}{find()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classchainbase_1_1database_aa5a2ca0da0092693ac49b36b7ec6817a} 
+template$<$typename Object\+Type , typename Indexed\+By\+Type , typename Compatible\+Key $>$ \\
+const Object\+Type \texorpdfstring{$\ast$}{*} chainbase\+::database\+::find (\begin{DoxyParamCaption}\item[{Compatible\+Key \&\&}]{key}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00458}{458}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00459\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00460\ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chainbase_8hpp_a92cd7cf8dd03d26bd5ef6a1a15d6d755}{CHAINBASE\_REQUIRE\_READ\_LOCK}}(\textcolor{stringliteral}{"{}find"{}},\ ObjectType);}
+\DoxyCodeLine{00461\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{typename}\ get\_index\_type<\ ObjectType\ >::type\ index\_type;}
+\DoxyCodeLine{00462\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ =\ \mbox{\hyperlink{classchainbase_1_1database_a4d5297635dcf70be481d9b600da9bc13}{get\_index<\ index\_type\ >}}().indices().template\ \mbox{\hyperlink{classchainbase_1_1database_afcfe00f81a526c1376d4f51197dd3a9a}{get<\ IndexedByType\ >}}();}
+\DoxyCodeLine{00463\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.find(\ std::forward<\ CompatibleKey\ >(\ key\ )\ );}
+\DoxyCodeLine{00464\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr\ ==\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.end()\ )\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00465\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \&*itr;}
+\DoxyCodeLine{00466\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classchainbase_1_1database_aa5a2ca0da0092693ac49b36b7ec6817a_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{classchainbase_1_1database_aa5a2ca0da0092693ac49b36b7ec6817a_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classchainbase_1_1database_a248bf27038d616496ed18db76c69a8e1}\index{chainbase::database@{chainbase::database}!find@{find}}
+\index{find@{find}!chainbase::database@{chainbase::database}}
+\doxysubsubsection{\texorpdfstring{find()}{find()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classchainbase_1_1database_a248bf27038d616496ed18db76c69a8e1} 
+template$<$typename Object\+Type $>$ \\
+const Object\+Type \texorpdfstring{$\ast$}{*} chainbase\+::database\+::find (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classchainbase_1_1oid}{oid}}$<$ Object\+Type $>$}]{key}{ = {\ttfamily \mbox{\hyperlink{classchainbase_1_1oid}{oid}}$<$~ObjectType~$>$()}}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00469}{469}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00470\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00471\ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chainbase_8hpp_a92cd7cf8dd03d26bd5ef6a1a15d6d755}{CHAINBASE\_REQUIRE\_READ\_LOCK}}(\textcolor{stringliteral}{"{}find"{}},\ ObjectType);}
+\DoxyCodeLine{00472\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{typename}\ get\_index\_type<\ ObjectType\ >::type\ index\_type;}
+\DoxyCodeLine{00473\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classchainbase_1_1database_a4d5297635dcf70be481d9b600da9bc13}{get\_index<\ index\_type\ >}}().find(\ key\ );}
+\DoxyCodeLine{00474\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classchainbase_1_1database_a248bf27038d616496ed18db76c69a8e1_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classchainbase_1_1database_a7afc3526294cf634f71cc25376deaa21}\index{chainbase::database@{chainbase::database}!flush@{flush}}
+\index{flush@{flush}!chainbase::database@{chainbase::database}}
+\doxysubsubsection{\texorpdfstring{flush()}{flush()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1database_a7afc3526294cf634f71cc25376deaa21} 
+void chainbase\+::database\+::flush (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{classchainbase_1_1database_afcfe00f81a526c1376d4f51197dd3a9a}\index{chainbase::database@{chainbase::database}!get@{get}}
+\index{get@{get}!chainbase::database@{chainbase::database}}
+\doxysubsubsection{\texorpdfstring{get()}{get()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classchainbase_1_1database_afcfe00f81a526c1376d4f51197dd3a9a} 
+template$<$typename Object\+Type , typename Indexed\+By\+Type , typename Compatible\+Key $>$ \\
+const Object\+Type \& chainbase\+::database\+::get (\begin{DoxyParamCaption}\item[{Compatible\+Key \&\&}]{key}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00477}{477}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00478\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00479\ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chainbase_8hpp_a92cd7cf8dd03d26bd5ef6a1a15d6d755}{CHAINBASE\_REQUIRE\_READ\_LOCK}}(\textcolor{stringliteral}{"{}get"{}},\ ObjectType);}
+\DoxyCodeLine{00480\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ obj\ =\ \mbox{\hyperlink{classchainbase_1_1database_aa5a2ca0da0092693ac49b36b7ec6817a}{find<\ ObjectType,\ IndexedByType\ >}}(\ std::forward<\ CompatibleKey\ >(\ key\ )\ );}
+\DoxyCodeLine{00481\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !obj\ )\ \{}
+\DoxyCodeLine{00482\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::stringstream\ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}};}
+\DoxyCodeLine{00483\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}\ <<\ \textcolor{stringliteral}{"{}unknown\ key\ ("{}}\ <<\ boost::core::demangle(\ \textcolor{keyword}{typeid}(\ key\ ).\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}()\ )\ <<\ \textcolor{stringliteral}{"{}):\ "{}}\ <<\ \mbox{\hyperlink{yubico__otp_8c_a9246c20bb98ad2b4c60313c053c70f08}{key}};}
+\DoxyCodeLine{00484\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_THROW\_EXCEPTION(\ std::out\_of\_range(\ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}.str().c\_str()\ )\ );}
+\DoxyCodeLine{00485\ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00486\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *obj;}
+\DoxyCodeLine{00487\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classchainbase_1_1database_afcfe00f81a526c1376d4f51197dd3a9a_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classchainbase_1_1database_a41bee39b4bab8d338193d1032b451a1e}\index{chainbase::database@{chainbase::database}!get@{get}}
+\index{get@{get}!chainbase::database@{chainbase::database}}
+\doxysubsubsection{\texorpdfstring{get()}{get()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classchainbase_1_1database_a41bee39b4bab8d338193d1032b451a1e} 
+template$<$typename Object\+Type $>$ \\
+const Object\+Type \& chainbase\+::database\+::get (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classchainbase_1_1oid}{oid}}$<$ Object\+Type $>$ \&}]{key}{ = {\ttfamily \mbox{\hyperlink{classchainbase_1_1oid}{oid}}$<$~ObjectType~$>$()}}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00490}{490}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00491\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00492\ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chainbase_8hpp_a92cd7cf8dd03d26bd5ef6a1a15d6d755}{CHAINBASE\_REQUIRE\_READ\_LOCK}}(\textcolor{stringliteral}{"{}get"{}},\ ObjectType);}
+\DoxyCodeLine{00493\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ obj\ =\ \mbox{\hyperlink{classchainbase_1_1database_aa5a2ca0da0092693ac49b36b7ec6817a}{find<\ ObjectType\ >}}(\ key\ );}
+\DoxyCodeLine{00494\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !obj\ )\ \{}
+\DoxyCodeLine{00495\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::stringstream\ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}};}
+\DoxyCodeLine{00496\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}\ <<\ \textcolor{stringliteral}{"{}unknown\ key\ ("{}}\ <<\ boost::core::demangle(\ \textcolor{keyword}{typeid}(\ key\ ).\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}()\ )\ <<\ \textcolor{stringliteral}{"{}):\ "{}}\ <<\ key.\_id;}
+\DoxyCodeLine{00497\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_THROW\_EXCEPTION(\ std::out\_of\_range(\ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}.str().c\_str()\ )\ );}
+\DoxyCodeLine{00498\ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00499\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *obj;}
+\DoxyCodeLine{00500\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classchainbase_1_1database_a41bee39b4bab8d338193d1032b451a1e_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classchainbase_1_1database_a63a87fe56634ee1e93511a894b98e40d}\index{chainbase::database@{chainbase::database}!get\_free\_memory@{get\_free\_memory}}
+\index{get\_free\_memory@{get\_free\_memory}!chainbase::database@{chainbase::database}}
+\doxysubsubsection{\texorpdfstring{get\_free\_memory()}{get\_free\_memory()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1database_a63a87fe56634ee1e93511a894b98e40d} 
+size\+\_\+t chainbase\+::database\+::get\+\_\+free\+\_\+memory (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00419}{419}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00420\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00421\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \_db\_file.\mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a29dccb9bf52ef5c409fc1316fc99325a}{get\_segment\_manager}}()-\/>get\_free\_memory();}
+\DoxyCodeLine{00422\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classchainbase_1_1database_a63a87fe56634ee1e93511a894b98e40d_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classchainbase_1_1database_a63a87fe56634ee1e93511a894b98e40d_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classchainbase_1_1database_a4d5297635dcf70be481d9b600da9bc13}\index{chainbase::database@{chainbase::database}!get\_index@{get\_index}}
+\index{get\_index@{get\_index}!chainbase::database@{chainbase::database}}
+\doxysubsubsection{\texorpdfstring{get\_index()}{get\_index()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classchainbase_1_1database_a4d5297635dcf70be481d9b600da9bc13} 
+template$<$typename Multi\+Index\+Type $>$ \\
+const \mbox{\hyperlink{namespacechainbase_a3ba122cfc1e47fa4ddf024212ec17431}{generic\+\_\+index}}$<$ Multi\+Index\+Type $>$ \& chainbase\+::database\+::get\+\_\+index (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00425}{425}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00426\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00427\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chainbase_8hpp_a92cd7cf8dd03d26bd5ef6a1a15d6d755}{CHAINBASE\_REQUIRE\_READ\_LOCK}}(\textcolor{stringliteral}{"{}get\_index"{}},\ \textcolor{keyword}{typename}\ MultiIndexType::value\_type);}
+\DoxyCodeLine{00428\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{namespacechainbase_a3ba122cfc1e47fa4ddf024212ec17431}{generic\_index<MultiIndexType>}}\ index\_type;}
+\DoxyCodeLine{00429\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ index\_type*\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ index\_type\_ptr;}
+\DoxyCodeLine{00430\ \ \ \ \ \ \ \ \ \ \ \ \ assert(\ \_index\_map.size()\ >\ index\_type::value\_type::type\_id\ );}
+\DoxyCodeLine{00431\ \ \ \ \ \ \ \ \ \ \ \ \ assert(\ \_index\_map[index\_type::value\_type::type\_id]\ );}
+\DoxyCodeLine{00432\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *index\_type\_ptr(\ \_index\_map[index\_type::value\_type::type\_id]-\/>\mbox{\hyperlink{classchainbase_1_1database_afcfe00f81a526c1376d4f51197dd3a9a}{get}}()\ );}
+\DoxyCodeLine{00433\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classchainbase_1_1database_a4d5297635dcf70be481d9b600da9bc13_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classchainbase_1_1database_a4d5297635dcf70be481d9b600da9bc13_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classchainbase_1_1database_af35a648524fb0240a78a0450c0266046}\index{chainbase::database@{chainbase::database}!get\_index@{get\_index}}
+\index{get\_index@{get\_index}!chainbase::database@{chainbase::database}}
+\doxysubsubsection{\texorpdfstring{get\_index()}{get\_index()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classchainbase_1_1database_af35a648524fb0240a78a0450c0266046} 
+template$<$typename Multi\+Index\+Type , typename By\+Index $>$ \\
+auto chainbase\+::database\+::get\+\_\+index (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const -\/$>$ decltype( ((\mbox{\hyperlink{namespacechainbase_a3ba122cfc1e47fa4ddf024212ec17431}{generic\+\_\+index}}$<$Multi\+Index\+Type$>$\texorpdfstring{$\ast$}{*})( nullptr ))-\/$>$indices().\mbox{\hyperlink{yubihsm__pkcs11_8c_a53ef06e29c840024a683512c1acd791a}{template}} \mbox{\hyperlink{classchainbase_1_1database_afcfe00f81a526c1376d4f51197dd3a9a}{get}}$<$By\+Index$>$() )          \hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00436}{436}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00437\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00438\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chainbase_8hpp_a92cd7cf8dd03d26bd5ef6a1a15d6d755}{CHAINBASE\_REQUIRE\_READ\_LOCK}}(\textcolor{stringliteral}{"{}get\_index"{}},\ \textcolor{keyword}{typename}\ MultiIndexType::value\_type);}
+\DoxyCodeLine{00439\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{namespacechainbase_a3ba122cfc1e47fa4ddf024212ec17431}{generic\_index<MultiIndexType>}}\ index\_type;}
+\DoxyCodeLine{00440\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ index\_type*\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ index\_type\_ptr;}
+\DoxyCodeLine{00441\ \ \ \ \ \ \ \ \ \ \ \ \ assert(\ \_index\_map.size()\ >\ index\_type::value\_type::type\_id\ );}
+\DoxyCodeLine{00442\ \ \ \ \ \ \ \ \ \ \ \ \ assert(\ \_index\_map[index\_type::value\_type::type\_id]\ );}
+\DoxyCodeLine{00443\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ index\_type\_ptr(\ \_index\_map[index\_type::value\_type::type\_id]-\/>\mbox{\hyperlink{classchainbase_1_1database_afcfe00f81a526c1376d4f51197dd3a9a}{get}}()\ )-\/>indices().template\ \mbox{\hyperlink{classchainbase_1_1database_afcfe00f81a526c1376d4f51197dd3a9a}{get<ByIndex>}}();}
+\DoxyCodeLine{00444\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classchainbase_1_1database_af35a648524fb0240a78a0450c0266046_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classchainbase_1_1database_afaea057692a8bbbf3f506b64c60308b6}\index{chainbase::database@{chainbase::database}!get\_mutable\_index@{get\_mutable\_index}}
+\index{get\_mutable\_index@{get\_mutable\_index}!chainbase::database@{chainbase::database}}
+\doxysubsubsection{\texorpdfstring{get\_mutable\_index()}{get\_mutable\_index()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1database_afaea057692a8bbbf3f506b64c60308b6} 
+template$<$typename Multi\+Index\+Type $>$ \\
+\mbox{\hyperlink{namespacechainbase_a3ba122cfc1e47fa4ddf024212ec17431}{generic\+\_\+index}}$<$ Multi\+Index\+Type $>$ \& chainbase\+::database\+::get\+\_\+mutable\+\_\+index (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00447}{447}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00448\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00449\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chainbase_8hpp_a43b0c8cc6f841c06b58acec3d0fc10e5}{CHAINBASE\_REQUIRE\_WRITE\_LOCK}}(\textcolor{stringliteral}{"{}get\_mutable\_index"{}},\ \textcolor{keyword}{typename}\ MultiIndexType::value\_type);}
+\DoxyCodeLine{00450\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{namespacechainbase_a3ba122cfc1e47fa4ddf024212ec17431}{generic\_index<MultiIndexType>}}\ index\_type;}
+\DoxyCodeLine{00451\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ index\_type*\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ index\_type\_ptr;}
+\DoxyCodeLine{00452\ \ \ \ \ \ \ \ \ \ \ \ \ assert(\ \_index\_map.size()\ >\ index\_type::value\_type::type\_id\ );}
+\DoxyCodeLine{00453\ \ \ \ \ \ \ \ \ \ \ \ \ assert(\ \_index\_map[index\_type::value\_type::type\_id]\ );}
+\DoxyCodeLine{00454\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *index\_type\_ptr(\ \_index\_map[index\_type::value\_type::type\_id]-\/>\mbox{\hyperlink{classchainbase_1_1database_afcfe00f81a526c1376d4f51197dd3a9a}{get}}()\ );}
+\DoxyCodeLine{00455\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classchainbase_1_1database_afaea057692a8bbbf3f506b64c60308b6_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{classchainbase_1_1database_afaea057692a8bbbf3f506b64c60308b6_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classchainbase_1_1database_a64133afb9e0ae374eeab86bd1d4db08b}\index{chainbase::database@{chainbase::database}!get\_segment\_manager@{get\_segment\_manager}}
+\index{get\_segment\_manager@{get\_segment\_manager}!chainbase::database@{chainbase::database}}
+\doxysubsubsection{\texorpdfstring{get\_segment\_manager()}{get\_segment\_manager()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classchainbase_1_1database_a64133afb9e0ae374eeab86bd1d4db08b} 
+\mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a550aa643b3bd7335e48afd94f1089d2b}{pinnable\+\_\+mapped\+\_\+file\+::segment\+\_\+manager}} \texorpdfstring{$\ast$}{*} chainbase\+::database\+::get\+\_\+segment\+\_\+manager (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00411}{411}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00411\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00412\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \_db\_file.\mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a29dccb9bf52ef5c409fc1316fc99325a}{get\_segment\_manager}}();}
+\DoxyCodeLine{00413\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classchainbase_1_1database_a64133afb9e0ae374eeab86bd1d4db08b_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classchainbase_1_1database_a64133afb9e0ae374eeab86bd1d4db08b_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classchainbase_1_1database_a50525f9d37dd23fb33307990aa839e06}\index{chainbase::database@{chainbase::database}!get\_segment\_manager@{get\_segment\_manager}}
+\index{get\_segment\_manager@{get\_segment\_manager}!chainbase::database@{chainbase::database}}
+\doxysubsubsection{\texorpdfstring{get\_segment\_manager()}{get\_segment\_manager()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classchainbase_1_1database_a50525f9d37dd23fb33307990aa839e06} 
+const \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a550aa643b3bd7335e48afd94f1089d2b}{pinnable\+\_\+mapped\+\_\+file\+::segment\+\_\+manager}} \texorpdfstring{$\ast$}{*} chainbase\+::database\+::get\+\_\+segment\+\_\+manager (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00415}{415}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00415\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00416\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \_db\_file.\mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a29dccb9bf52ef5c409fc1316fc99325a}{get\_segment\_manager}}();}
+\DoxyCodeLine{00417\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classchainbase_1_1database_a50525f9d37dd23fb33307990aa839e06_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classchainbase_1_1database_ac34261887e651719813a8cffb4f31d87}\index{chainbase::database@{chainbase::database}!is\_read\_only@{is\_read\_only}}
+\index{is\_read\_only@{is\_read\_only}!chainbase::database@{chainbase::database}}
+\doxysubsubsection{\texorpdfstring{is\_read\_only()}{is\_read\_only()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1database_ac34261887e651719813a8cffb4f31d87} 
+bool chainbase\+::database\+::is\+\_\+read\+\_\+only (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00267}{267}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00267\ \{\ \textcolor{keywordflow}{return}\ \_read\_only;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classchainbase_1_1database_a9ebc006075e8fc2e84357a0e068b58d4}\index{chainbase::database@{chainbase::database}!modify@{modify}}
+\index{modify@{modify}!chainbase::database@{chainbase::database}}
+\doxysubsubsection{\texorpdfstring{modify()}{modify()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1database_a9ebc006075e8fc2e84357a0e068b58d4} 
+template$<$typename Object\+Type , typename Modifier $>$ \\
+void chainbase\+::database\+::modify (\begin{DoxyParamCaption}\item[{const Object\+Type \&}]{obj}{, }\item[{Modifier \&\&}]{m}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00503}{503}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00504\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00505\ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chainbase_8hpp_a43b0c8cc6f841c06b58acec3d0fc10e5}{CHAINBASE\_REQUIRE\_WRITE\_LOCK}}(\textcolor{stringliteral}{"{}modify"{}},\ ObjectType);}
+\DoxyCodeLine{00506\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{typename}\ get\_index\_type<ObjectType>::type\ index\_type;}
+\DoxyCodeLine{00507\ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classchainbase_1_1database_afaea057692a8bbbf3f506b64c60308b6}{get\_mutable\_index<index\_type>}}().modify(\ obj,\ m\ );}
+\DoxyCodeLine{00508\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classchainbase_1_1database_a9ebc006075e8fc2e84357a0e068b58d4_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classchainbase_1_1database_a9ebc006075e8fc2e84357a0e068b58d4_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classchainbase_1_1database_a2c97ee00b7904ba08050f32e8ac52160}\index{chainbase::database@{chainbase::database}!operator=@{operator=}}
+\index{operator=@{operator=}!chainbase::database@{chainbase::database}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1database_a2c97ee00b7904ba08050f32e8ac52160} 
+\mbox{\hyperlink{classchainbase_1_1database}{database}} \& chainbase\+::database\+::operator= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classchainbase_1_1database}{database}} \&\&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [default]}}
+
+\Hypertarget{classchainbase_1_1database_ac6bb29708e4fdfb6899028e3c351fe0b}\index{chainbase::database@{chainbase::database}!remove@{remove}}
+\index{remove@{remove}!chainbase::database@{chainbase::database}}
+\doxysubsubsection{\texorpdfstring{remove()}{remove()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1database_ac6bb29708e4fdfb6899028e3c351fe0b} 
+template$<$typename Object\+Type $>$ \\
+void chainbase\+::database\+::remove (\begin{DoxyParamCaption}\item[{const Object\+Type \&}]{obj}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00511}{511}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00512\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00513\ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chainbase_8hpp_a43b0c8cc6f841c06b58acec3d0fc10e5}{CHAINBASE\_REQUIRE\_WRITE\_LOCK}}(\textcolor{stringliteral}{"{}remove"{}},\ ObjectType);}
+\DoxyCodeLine{00514\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{typename}\ get\_index\_type<ObjectType>::type\ index\_type;}
+\DoxyCodeLine{00515\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classchainbase_1_1database_afaea057692a8bbbf3f506b64c60308b6}{get\_mutable\_index<index\_type>}}().remove(\ obj\ );}
+\DoxyCodeLine{00516\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classchainbase_1_1database_ac6bb29708e4fdfb6899028e3c351fe0b_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classchainbase_1_1database_ac6bb29708e4fdfb6899028e3c351fe0b_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classchainbase_1_1database_a224fc0c346a93fd027bfa2515f54bf98}\index{chainbase::database@{chainbase::database}!revision@{revision}}
+\index{revision@{revision}!chainbase::database@{chainbase::database}}
+\doxysubsubsection{\texorpdfstring{revision()}{revision()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1database_a224fc0c346a93fd027bfa2515f54bf98} 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} chainbase\+::database\+::revision (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00325}{325}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00325\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00326\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \_index\_list.size()\ ==\ 0\ )\ \textcolor{keywordflow}{return}\ -\/1;}
+\DoxyCodeLine{00327\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \_index\_list[0]-\/>revision();}
+\DoxyCodeLine{00328\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classchainbase_1_1database_a224fc0c346a93fd027bfa2515f54bf98_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classchainbase_1_1database_ae1a365762e37490551a8de3adda5665e}\index{chainbase::database@{chainbase::database}!row\_count\_per\_index@{row\_count\_per\_index}}
+\index{row\_count\_per\_index@{row\_count\_per\_index}!chainbase::database@{chainbase::database}}
+\doxysubsubsection{\texorpdfstring{row\_count\_per\_index()}{row\_count\_per\_index()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1database_ae1a365762e37490551a8de3adda5665e} 
+\mbox{\hyperlink{classchainbase_1_1database_a7780c270726e90372b252a354095ea3a}{database\+\_\+index\+\_\+row\+\_\+count\+\_\+multiset}} chainbase\+::database\+::row\+\_\+count\+\_\+per\+\_\+index (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00526}{526}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00526\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00527\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classchainbase_1_1database_a7780c270726e90372b252a354095ea3a}{database\_index\_row\_count\_multiset}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00528\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ ai\_ptr\ :\ \_index\_map)\ \{}
+\DoxyCodeLine{00529\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!ai\_ptr)}
+\DoxyCodeLine{00530\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{00531\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.emplace(make\_pair(ai\_ptr-\/>row\_count(),\ ai\_ptr-\/>type\_name()));}
+\DoxyCodeLine{00532\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00533\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00534\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=327pt]{classchainbase_1_1database_ae1a365762e37490551a8de3adda5665e_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classchainbase_1_1database_ad544b6a999bff16775ebd96dfb6b8e27}\index{chainbase::database@{chainbase::database}!set\_require\_locking@{set\_require\_locking}}
+\index{set\_require\_locking@{set\_require\_locking}!chainbase::database@{chainbase::database}}
+\doxysubsubsection{\texorpdfstring{set\_require\_locking()}{set\_require\_locking()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1database_ad544b6a999bff16775ebd96dfb6b8e27} 
+void database\+::set\+\_\+require\+\_\+locking (\begin{DoxyParamCaption}\item[{bool}]{enable\+\_\+require\+\_\+locking}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8cpp_source_l00025}{25}} of file \mbox{\hyperlink{chainbase_8cpp_source}{chainbase.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00026\ \ \ \ \{}
+\DoxyCodeLine{00027\ \textcolor{preprocessor}{\#ifdef\ CHAINBASE\_CHECK\_LOCKING}}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \_enable\_require\_locking\ =\ enable\_require\_locking;}
+\DoxyCodeLine{00029\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00030\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classchainbase_1_1database_a24e7f6336cad0bd2fc280dab381665ed}\index{chainbase::database@{chainbase::database}!set\_revision@{set\_revision}}
+\index{set\_revision@{set\_revision}!chainbase::database@{chainbase::database}}
+\doxysubsubsection{\texorpdfstring{set\_revision()}{set\_revision()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1database_a24e7f6336cad0bd2fc280dab381665ed} 
+void chainbase\+::database\+::set\+\_\+revision (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{revision}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00336}{336}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00337\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00338\ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chainbase_8hpp_a43b0c8cc6f841c06b58acec3d0fc10e5}{CHAINBASE\_REQUIRE\_WRITE\_LOCK}}(\ \textcolor{stringliteral}{"{}set\_revision"{}},\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ );}
+\DoxyCodeLine{00339\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\ i\ :\ \_index\_list\ )\ i-\/>set\_revision(\ \mbox{\hyperlink{classchainbase_1_1database_a224fc0c346a93fd027bfa2515f54bf98}{revision}}\ );}
+\DoxyCodeLine{00340\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=328pt]{classchainbase_1_1database_a24e7f6336cad0bd2fc280dab381665ed_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classchainbase_1_1database_a24e7f6336cad0bd2fc280dab381665ed_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classchainbase_1_1database_ace133a4e1820ea8663fb4eaa19145e57}\index{chainbase::database@{chainbase::database}!squash@{squash}}
+\index{squash@{squash}!chainbase::database@{chainbase::database}}
+\doxysubsubsection{\texorpdfstring{squash()}{squash()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1database_ace133a4e1820ea8663fb4eaa19145e57} 
+void database\+::squash (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8cpp_source_l00049}{49}} of file \mbox{\hyperlink{chainbase_8cpp_source}{chainbase.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00050\ \ \ \ \{}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\&\ item\ :\ \_index\_list\ )}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ item-\/>squash();}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00055\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classchainbase_1_1database_abb570c03bda1ee6ae1b428d41481b476}\index{chainbase::database@{chainbase::database}!start\_undo\_session@{start\_undo\_session}}
+\index{start\_undo\_session@{start\_undo\_session}!chainbase::database@{chainbase::database}}
+\doxysubsubsection{\texorpdfstring{start\_undo\_session()}{start\_undo\_session()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1database_abb570c03bda1ee6ae1b428d41481b476} 
+\mbox{\hyperlink{structchainbase_1_1database_1_1session}{database\+::session}} database\+::start\+\_\+undo\+\_\+session (\begin{DoxyParamCaption}\item[{bool}]{enabled}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8cpp_source_l00073}{73}} of file \mbox{\hyperlink{chainbase_8cpp_source}{chainbase.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00074\ \ \ \ \{}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ enabled\ )\ \{}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ vector<\ std::unique\_ptr<abstract\_session>\ >\ \_sub\_sessions;}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ \_sub\_sessions.reserve(\ \_index\_list.size()\ );}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\&\ item\ :\ \_index\_list\ )\ \{}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ \ \ \ \_sub\_sessions.push\_back(\ item-\/>start\_undo\_session(\ enabled\ )\ );}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}}(\ std::move(\ \_sub\_sessions\ )\ );}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}}();}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00085\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classchainbase_1_1database_abb570c03bda1ee6ae1b428d41481b476_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classchainbase_1_1database_a167bce30384de1f373ebe0c25d4d0de6}\index{chainbase::database@{chainbase::database}!undo@{undo}}
+\index{undo@{undo}!chainbase::database@{chainbase::database}}
+\doxysubsubsection{\texorpdfstring{undo()}{undo()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1database_a167bce30384de1f373ebe0c25d4d0de6} 
+void database\+::undo (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8cpp_source_l00041}{41}} of file \mbox{\hyperlink{chainbase_8cpp_source}{chainbase.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00042\ \ \ \ \{}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\&\ item\ :\ \_index\_list\ )}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ item-\/>undo();}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00047\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classchainbase_1_1database_a167bce30384de1f373ebe0c25d4d0de6_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classchainbase_1_1database_a832c383b7d8573d399e6149d4c715bd6}\index{chainbase::database@{chainbase::database}!undo\_all@{undo\_all}}
+\index{undo\_all@{undo\_all}!chainbase::database@{chainbase::database}}
+\doxysubsubsection{\texorpdfstring{undo\_all()}{undo\_all()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1database_a832c383b7d8573d399e6149d4c715bd6} 
+void database\+::undo\+\_\+all (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8cpp_source_l00065}{65}} of file \mbox{\hyperlink{chainbase_8cpp_source}{chainbase.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00066\ \ \ \ \{}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\&\ item\ :\ \_index\_list\ )}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ item-\/>undo\_all();}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00071\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=336pt]{classchainbase_1_1database_a832c383b7d8573d399e6149d4c715bd6_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chainbase/include/chainbase/\mbox{\hyperlink{chainbase_8hpp}{chainbase.\+hpp}}\item 
+libraries/chainbase/src/\mbox{\hyperlink{chainbase_8cpp}{chainbase.\+cpp}}\end{DoxyCompactItemize}

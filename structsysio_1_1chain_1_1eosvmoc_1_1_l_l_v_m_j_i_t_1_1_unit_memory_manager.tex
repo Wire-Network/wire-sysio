@@ -1,0 +1,330 @@
+\doxysection{sysio\+::chain\+::eosvmoc\+::LLVMJIT\+::Unit\+Memory\+Manager Struct Reference}
+\hypertarget{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager}{}\label{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager}\index{sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager@{sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager}}
+
+
+Inheritance diagram for sysio\+::chain\+::eosvmoc\+::LLVMJIT\+::Unit\+Memory\+Manager\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=236pt]{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for sysio\+::chain\+::eosvmoc\+::LLVMJIT\+::Unit\+Memory\+Manager\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=236pt]{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager_a6eac125f2645bc0ad2d04378de421053}{Unit\+Memory\+Manager}} ()
+\item 
+virtual \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager_a891c8c03841cd0f4216e0be4acbdf44d}{\texorpdfstring{$\sim$}{\string~}\+Unit\+Memory\+Manager}} () override
+\item 
+void \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager_adff81bd00cdd1e72118f7c787a32c14b}{register\+EHFrames}} (\mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} \texorpdfstring{$\ast$}{*}addr, \mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}} load\+Addr, \mbox{\hyperlink{stdint_8h_a31b85deecb45924320becd11d3ee16ce}{uintptr\+\_\+t}} num\+Bytes) override
+\item 
+void \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager_a57a55e0792209f4a2d3a80017e7f3bff}{deregister\+EHFrames}} () override
+\item 
+virtual bool \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager_ad2c6b5fd3ea9a3686db69d90b1e85c4d}{needs\+To\+Reserve\+Allocation\+Space}} () override
+\item 
+virtual void \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager_a724ecfa076aa21352fc2e4ccd19f8b55}{reserve\+Allocation\+Space}} (\mbox{\hyperlink{stdint_8h_a31b85deecb45924320becd11d3ee16ce}{uintptr\+\_\+t}} num\+Code\+Bytes, \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}} code\+Alignment, \mbox{\hyperlink{stdint_8h_a31b85deecb45924320becd11d3ee16ce}{uintptr\+\_\+t}} num\+Read\+Only\+Bytes, \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}} read\+Only\+Alignment, \mbox{\hyperlink{stdint_8h_a31b85deecb45924320becd11d3ee16ce}{uintptr\+\_\+t}} num\+Read\+Write\+Bytes, \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}} read\+Write\+Alignment) override
+\item 
+virtual \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager_a43ccf480d8eb772858d59e098bc3ec0e}{allocate\+Code\+Section}} (\mbox{\hyperlink{stdint_8h_a31b85deecb45924320becd11d3ee16ce}{uintptr\+\_\+t}} num\+Bytes, \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}} alignment, \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}} section\+ID, llvm\+::\+String\+Ref section\+Name) override
+\item 
+virtual \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager_a4b89abefce475ea35baa5ee8a6a7d540}{allocate\+Data\+Section}} (\mbox{\hyperlink{stdint_8h_a31b85deecb45924320becd11d3ee16ce}{uintptr\+\_\+t}} num\+Bytes, \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}} alignment, \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}} section\+ID, llvm\+::\+String\+Ref Section\+Name, bool is\+Read\+Only) override
+\item 
+virtual bool \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager_a44ef1aa87060e55632ecb309b8f9b3e5}{finalize\+Memory}} (std\+::string \texorpdfstring{$\ast$}{*}Err\+Msg=nullptr) override
+\item 
+\mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager_a146ca7e5c73c73e6034aa4ca3a88192e}{get\+\_\+next\+\_\+code\+\_\+ptr}} (\mbox{\hyperlink{stdint_8h_a31b85deecb45924320becd11d3ee16ce}{uintptr\+\_\+t}} num\+Bytes, \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}} alignment)
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager_ac1906bbe37006648426c76c6d1ed2718}{Unit\+Memory\+Manager}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager}{Unit\+Memory\+Manager}} \&)=delete
+\item 
+void \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager_ab8399f87dce5beeba2b4b8757e800d0f}{operator=}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager}{Unit\+Memory\+Manager}} \&)=delete
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::unique\+\_\+ptr$<$ std\+::vector$<$ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} $>$ $>$ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager_a276b169f9fe69897d8f66689c9ae3491}{code}}
+\item 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager_a07c6e5a6ef21274ca9fbb83bd852a202}{ptr}}
+\item 
+std\+::vector$<$ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} $>$ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager_adf615a5a7fd7b1cba4e47570c3f4ec31}{dumpster}}
+\item 
+std\+::list$<$ std\+::vector$<$ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} $>$ $>$ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager_a6b8e73a94e41a72ffcb94bd398d5a150}{stack\+\_\+sizes}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_j_i_t_8cpp_source_l00110}{110}} of file \mbox{\hyperlink{_l_l_v_m_j_i_t_8cpp_source}{LLVMJIT.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager_a6eac125f2645bc0ad2d04378de421053}\index{sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager@{sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager}!UnitMemoryManager@{UnitMemoryManager}}
+\index{UnitMemoryManager@{UnitMemoryManager}!sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager@{sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager}}
+\doxysubsubsection{\texorpdfstring{UnitMemoryManager()}{UnitMemoryManager()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager_a6eac125f2645bc0ad2d04378de421053} 
+sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::\+Unit\+Memory\+Manager\+::\+Unit\+Memory\+Manager (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_j_i_t_8cpp_source_l00112}{112}} of file \mbox{\hyperlink{_l_l_v_m_j_i_t_8cpp_source}{LLVMJIT.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00112\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager_a891c8c03841cd0f4216e0be4acbdf44d}\index{sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager@{sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager}!````~UnitMemoryManager@{\texorpdfstring{$\sim$}{\string~}UnitMemoryManager}}
+\index{````~UnitMemoryManager@{\texorpdfstring{$\sim$}{\string~}UnitMemoryManager}!sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager@{sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}UnitMemoryManager()}{\string~UnitMemoryManager()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager_a891c8c03841cd0f4216e0be4acbdf44d} 
+virtual sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::\+Unit\+Memory\+Manager\+::\texorpdfstring{$\sim$}{\string~}\+Unit\+Memory\+Manager (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_j_i_t_8cpp_source_l00113}{113}} of file \mbox{\hyperlink{_l_l_v_m_j_i_t_8cpp_source}{LLVMJIT.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager_ac1906bbe37006648426c76c6d1ed2718}\index{sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager@{sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager}!UnitMemoryManager@{UnitMemoryManager}}
+\index{UnitMemoryManager@{UnitMemoryManager}!sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager@{sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager}}
+\doxysubsubsection{\texorpdfstring{UnitMemoryManager()}{UnitMemoryManager()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager_ac1906bbe37006648426c76c6d1ed2718} 
+sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::\+Unit\+Memory\+Manager\+::\+Unit\+Memory\+Manager (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager}{Unit\+Memory\+Manager}} \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [delete]}}
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager_a43ccf480d8eb772858d59e098bc3ec0e}\index{sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager@{sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager}!allocateCodeSection@{allocateCodeSection}}
+\index{allocateCodeSection@{allocateCodeSection}!sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager@{sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager}}
+\doxysubsubsection{\texorpdfstring{allocateCodeSection()}{allocateCodeSection()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager_a43ccf480d8eb772858d59e098bc3ec0e} 
+virtual \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} \texorpdfstring{$\ast$}{*} sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::\+Unit\+Memory\+Manager\+::allocate\+Code\+Section (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a31b85deecb45924320becd11d3ee16ce}{uintptr\+\_\+t}}}]{num\+Bytes}{, }\item[{\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}}]{alignment}{, }\item[{\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}}]{section\+ID}{, }\item[{llvm\+::\+String\+Ref}]{section\+Name}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_j_i_t_8cpp_source_l00124}{124}} of file \mbox{\hyperlink{_l_l_v_m_j_i_t_8cpp_source}{LLVMJIT.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager_a146ca7e5c73c73e6034aa4ca3a88192e}{get\_next\_code\_ptr}}(numBytes,\ alignment);}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager_a43ccf480d8eb772858d59e098bc3ec0e_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager_a4b89abefce475ea35baa5ee8a6a7d540}\index{sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager@{sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager}!allocateDataSection@{allocateDataSection}}
+\index{allocateDataSection@{allocateDataSection}!sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager@{sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager}}
+\doxysubsubsection{\texorpdfstring{allocateDataSection()}{allocateDataSection()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager_a4b89abefce475ea35baa5ee8a6a7d540} 
+virtual \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} \texorpdfstring{$\ast$}{*} sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::\+Unit\+Memory\+Manager\+::allocate\+Data\+Section (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a31b85deecb45924320becd11d3ee16ce}{uintptr\+\_\+t}}}]{num\+Bytes}{, }\item[{\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}}]{alignment}{, }\item[{\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}}]{section\+ID}{, }\item[{llvm\+::\+String\+Ref}]{Section\+Name}{, }\item[{bool}]{is\+Read\+Only}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_j_i_t_8cpp_source_l00128}{128}} of file \mbox{\hyperlink{_l_l_v_m_j_i_t_8cpp_source}{LLVMJIT.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(SectionName\ ==\ \textcolor{stringliteral}{"{}.eh\_frame"{}})\ \{}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager_adf615a5a7fd7b1cba4e47570c3f4ec31}{dumpster}}.resize(numBytes);}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager_adf615a5a7fd7b1cba4e47570c3f4ec31}{dumpster}}.data();}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(SectionName\ ==\ \textcolor{stringliteral}{"{}.stack\_sizes"{}})\ \{}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager_a6b8e73a94e41a72ffcb94bd398d5a150}{stack\_sizes}}.emplace\_back(numBytes).data();}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_errors_8h_a03bec6af3af0dd492e348b40cbe40a46}{WAVM\_ASSERT\_THROW}}(isReadOnly);}
+\DoxyCodeLine{00138\ }
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager_a146ca7e5c73c73e6034aa4ca3a88192e}{get\_next\_code\_ptr}}(numBytes,\ alignment);}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager_a4b89abefce475ea35baa5ee8a6a7d540_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager_a57a55e0792209f4a2d3a80017e7f3bff}\index{sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager@{sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager}!deregisterEHFrames@{deregisterEHFrames}}
+\index{deregisterEHFrames@{deregisterEHFrames}!sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager@{sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager}}
+\doxysubsubsection{\texorpdfstring{deregisterEHFrames()}{deregisterEHFrames()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager_a57a55e0792209f4a2d3a80017e7f3bff} 
+void sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::\+Unit\+Memory\+Manager\+::deregister\+EHFrames (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}}
+
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_j_i_t_8cpp_source_l00117}{117}} of file \mbox{\hyperlink{_l_l_v_m_j_i_t_8cpp_source}{LLVMJIT.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00117\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager_a44ef1aa87060e55632ecb309b8f9b3e5}\index{sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager@{sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager}!finalizeMemory@{finalizeMemory}}
+\index{finalizeMemory@{finalizeMemory}!sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager@{sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager}}
+\doxysubsubsection{\texorpdfstring{finalizeMemory()}{finalizeMemory()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager_a44ef1aa87060e55632ecb309b8f9b3e5} 
+virtual bool sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::\+Unit\+Memory\+Manager\+::finalize\+Memory (\begin{DoxyParamCaption}\item[{std\+::string \texorpdfstring{$\ast$}{*}}]{Err\+Msg}{ = {\ttfamily nullptr}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_j_i_t_8cpp_source_l00142}{142}} of file \mbox{\hyperlink{_l_l_v_m_j_i_t_8cpp_source}{LLVMJIT.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \ \ \ \ code-\/>resize(\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager_a07c6e5a6ef21274ca9fbb83bd852a202}{ptr}}\ -\/\ code-\/>data());}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager_a146ca7e5c73c73e6034aa4ca3a88192e}\index{sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager@{sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager}!get\_next\_code\_ptr@{get\_next\_code\_ptr}}
+\index{get\_next\_code\_ptr@{get\_next\_code\_ptr}!sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager@{sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager}}
+\doxysubsubsection{\texorpdfstring{get\_next\_code\_ptr()}{get\_next\_code\_ptr()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager_a146ca7e5c73c73e6034aa4ca3a88192e} 
+\mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} \texorpdfstring{$\ast$}{*} sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::\+Unit\+Memory\+Manager\+::get\+\_\+next\+\_\+code\+\_\+ptr (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a31b85deecb45924320becd11d3ee16ce}{uintptr\+\_\+t}}}]{num\+Bytes}{, }\item[{\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}}]{alignment}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_j_i_t_8cpp_source_l00153}{153}} of file \mbox{\hyperlink{_l_l_v_m_j_i_t_8cpp_source}{LLVMJIT.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(alignment\ <=\ \textcolor{keyword}{alignof}(std::max\_align\_t),\ \textcolor{stringliteral}{"{}alignment\ of\ section\ exceeds\ max\_align\_t"{}});}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a31b85deecb45924320becd11d3ee16ce}{uintptr\_t}}\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ (\mbox{\hyperlink{stdint_8h_a31b85deecb45924320becd11d3ee16ce}{uintptr\_t}})\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager_a07c6e5a6ef21274ca9fbb83bd852a202}{ptr}};}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ +=\ alignment\ -\/\ 1LL;}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ \&=\ \string~(alignment\ -\/\ 1LL);}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}*\ this\_section\ =\ (\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}*)\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}};}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager_a07c6e5a6ef21274ca9fbb83bd852a202}{ptr}}\ =\ this\_section\ +\ numBytes;}
+\DoxyCodeLine{00160\ }
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ this\_section;}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager_a146ca7e5c73c73e6034aa4ca3a88192e_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager_ad2c6b5fd3ea9a3686db69d90b1e85c4d}\index{sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager@{sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager}!needsToReserveAllocationSpace@{needsToReserveAllocationSpace}}
+\index{needsToReserveAllocationSpace@{needsToReserveAllocationSpace}!sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager@{sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager}}
+\doxysubsubsection{\texorpdfstring{needsToReserveAllocationSpace()}{needsToReserveAllocationSpace()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager_ad2c6b5fd3ea9a3686db69d90b1e85c4d} 
+virtual bool sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::\+Unit\+Memory\+Manager\+::needs\+To\+Reserve\+Allocation\+Space (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_j_i_t_8cpp_source_l00119}{119}} of file \mbox{\hyperlink{_l_l_v_m_j_i_t_8cpp_source}{LLVMJIT.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00119\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager_ab8399f87dce5beeba2b4b8757e800d0f}\index{sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager@{sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager}!operator=@{operator=}}
+\index{operator=@{operator=}!sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager@{sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager_ab8399f87dce5beeba2b4b8757e800d0f} 
+void sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::\+Unit\+Memory\+Manager\+::operator= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager}{Unit\+Memory\+Manager}} \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [delete]}}
+
+\Hypertarget{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager_adff81bd00cdd1e72118f7c787a32c14b}\index{sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager@{sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager}!registerEHFrames@{registerEHFrames}}
+\index{registerEHFrames@{registerEHFrames}!sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager@{sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager}}
+\doxysubsubsection{\texorpdfstring{registerEHFrames()}{registerEHFrames()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager_adff81bd00cdd1e72118f7c787a32c14b} 
+void sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::\+Unit\+Memory\+Manager\+::register\+EHFrames (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} \texorpdfstring{$\ast$}{*}}]{addr}{, }\item[{\mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}}}]{load\+Addr}{, }\item[{\mbox{\hyperlink{stdint_8h_a31b85deecb45924320becd11d3ee16ce}{uintptr\+\_\+t}}}]{num\+Bytes}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}}
+
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_j_i_t_8cpp_source_l00116}{116}} of file \mbox{\hyperlink{_l_l_v_m_j_i_t_8cpp_source}{LLVMJIT.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00116\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager_a724ecfa076aa21352fc2e4ccd19f8b55}\index{sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager@{sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager}!reserveAllocationSpace@{reserveAllocationSpace}}
+\index{reserveAllocationSpace@{reserveAllocationSpace}!sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager@{sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager}}
+\doxysubsubsection{\texorpdfstring{reserveAllocationSpace()}{reserveAllocationSpace()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager_a724ecfa076aa21352fc2e4ccd19f8b55} 
+virtual void sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::\+Unit\+Memory\+Manager\+::reserve\+Allocation\+Space (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a31b85deecb45924320becd11d3ee16ce}{uintptr\+\_\+t}}}]{num\+Code\+Bytes}{, }\item[{\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}}]{code\+Alignment}{, }\item[{\mbox{\hyperlink{stdint_8h_a31b85deecb45924320becd11d3ee16ce}{uintptr\+\_\+t}}}]{num\+Read\+Only\+Bytes}{, }\item[{\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}}]{read\+Only\+Alignment}{, }\item[{\mbox{\hyperlink{stdint_8h_a31b85deecb45924320becd11d3ee16ce}{uintptr\+\_\+t}}}]{num\+Read\+Write\+Bytes}{, }\item[{\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}}]{read\+Write\+Alignment}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_j_i_t_8cpp_source_l00120}{120}} of file \mbox{\hyperlink{_l_l_v_m_j_i_t_8cpp_source}{LLVMJIT.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \ \ \ \ code\ =\ std::make\_unique<std::vector<uint8\_t>>(numCodeBytes\ +\ numReadOnlyBytes\ +\ numReadWriteBytes);}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager_a07c6e5a6ef21274ca9fbb83bd852a202}{ptr}}\ =\ code-\/>data();}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager_a276b169f9fe69897d8f66689c9ae3491}\index{sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager@{sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager}!code@{code}}
+\index{code@{code}!sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager@{sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager}}
+\doxysubsubsection{\texorpdfstring{code}{code}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager_a276b169f9fe69897d8f66689c9ae3491} 
+std\+::unique\+\_\+ptr$<$std\+::vector$<$\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}}$>$ $>$ sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::\+Unit\+Memory\+Manager\+::code}
+
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_j_i_t_8cpp_source_l00147}{147}} of file \mbox{\hyperlink{_l_l_v_m_j_i_t_8cpp_source}{LLVMJIT.\+cpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager_adf615a5a7fd7b1cba4e47570c3f4ec31}\index{sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager@{sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager}!dumpster@{dumpster}}
+\index{dumpster@{dumpster}!sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager@{sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager}}
+\doxysubsubsection{\texorpdfstring{dumpster}{dumpster}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager_adf615a5a7fd7b1cba4e47570c3f4ec31} 
+std\+::vector$<$\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}}$>$ sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::\+Unit\+Memory\+Manager\+::dumpster}
+
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_j_i_t_8cpp_source_l00150}{150}} of file \mbox{\hyperlink{_l_l_v_m_j_i_t_8cpp_source}{LLVMJIT.\+cpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager_a07c6e5a6ef21274ca9fbb83bd852a202}\index{sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager@{sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager}!ptr@{ptr}}
+\index{ptr@{ptr}!sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager@{sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager}}
+\doxysubsubsection{\texorpdfstring{ptr}{ptr}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager_a07c6e5a6ef21274ca9fbb83bd852a202} 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}}\texorpdfstring{$\ast$}{*} sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::\+Unit\+Memory\+Manager\+::ptr}
+
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_j_i_t_8cpp_source_l00148}{148}} of file \mbox{\hyperlink{_l_l_v_m_j_i_t_8cpp_source}{LLVMJIT.\+cpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager_a6b8e73a94e41a72ffcb94bd398d5a150}\index{sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager@{sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager}!stack\_sizes@{stack\_sizes}}
+\index{stack\_sizes@{stack\_sizes}!sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager@{sysio::chain::eosvmoc::LLVMJIT::UnitMemoryManager}}
+\doxysubsubsection{\texorpdfstring{stack\_sizes}{stack\_sizes}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager_a6b8e73a94e41a72ffcb94bd398d5a150} 
+std\+::list$<$std\+::vector$<$\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}}$>$ $>$ sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::\+Unit\+Memory\+Manager\+::stack\+\_\+sizes}
+
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_j_i_t_8cpp_source_l00151}{151}} of file \mbox{\hyperlink{_l_l_v_m_j_i_t_8cpp_source}{LLVMJIT.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/webassembly/runtimes/sys-\/vm-\/oc/\mbox{\hyperlink{_l_l_v_m_j_i_t_8cpp}{LLVMJIT.\+cpp}}\end{DoxyCompactItemize}

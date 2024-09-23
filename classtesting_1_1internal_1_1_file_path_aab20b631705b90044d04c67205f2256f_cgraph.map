@@ -1,0 +1,11 @@
+<map id="testing::internal::FilePath::RemoveExtension" name="testing::internal::FilePath::RemoveExtension">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,46,190,87"/>
+<area shape="rect" id="Node000002" href="$classtesting_1_1internal_1_1_string.html#a968f242b709f8c7c0ed5ecf246553321" title=" " alt="" coords="238,13,452,54"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="190,51,222,47,223,52,191,57"/>
+<area shape="rect" id="Node000005" href="$classtesting_1_1internal_1_1_file_path.html#a3504a51accbca78a52fe586133ea5499" title=" " alt="" coords="282,78,408,119"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="191,76,267,86,266,91,190,81"/>
+<area shape="rect" id="Node000003" href="$classtesting_1_1internal_1_1_string.html#a116ca435d63306927ba19f90a3596787" title=" " alt="" coords="500,5,701,61"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="452,30,484,30,484,36,452,36"/>
+<area shape="rect" id="Node000004" href="$namespacetesting_1_1internal_1_1posix.html#a1ef2385a7f8e4c706054da35967e76bd" title=" " alt="" coords="749,13,886,54"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="702,30,734,30,734,36,702,36"/>
+</map>

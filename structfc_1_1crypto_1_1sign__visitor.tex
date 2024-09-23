@@ -1,0 +1,110 @@
+\doxysection{fc\+::crypto\+::sign\+\_\+visitor Struct Reference}
+\hypertarget{structfc_1_1crypto_1_1sign__visitor}{}\label{structfc_1_1crypto_1_1sign__visitor}\index{fc::crypto::sign\_visitor@{fc::crypto::sign\_visitor}}
+
+
+Inheritance diagram for fc\+::crypto\+::sign\+\_\+visitor\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=193pt]{structfc_1_1crypto_1_1sign__visitor__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for fc\+::crypto\+::sign\+\_\+visitor\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=266pt]{structfc_1_1crypto_1_1sign__visitor__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structfc_1_1crypto_1_1sign__visitor_adc9b9baa50b4d0d0b5c623ed421204da}{sign\+\_\+visitor}} (const \mbox{\hyperlink{classfc_1_1sha256}{sha256}} \&\mbox{\hyperlink{namespacefc_a150ca4cd9c0318ca45dc0dc7df5d58b9}{digest}}, bool require\+\_\+canonical)
+\item 
+{\footnotesize template$<$typename Key\+Type $>$ }\\signature\+::storage\+\_\+type \mbox{\hyperlink{structfc_1_1crypto_1_1sign__visitor_a989423f20ea00fcf5a4be99f52618765}{operator()}} (const Key\+Type \&key) const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+const \mbox{\hyperlink{classfc_1_1sha256}{sha256}} \& \mbox{\hyperlink{structfc_1_1crypto_1_1sign__visitor_a8a9aaf9816d368680b20fa099bac4825}{\+\_\+digest}}
+\item 
+bool \mbox{\hyperlink{structfc_1_1crypto_1_1sign__visitor_a8636832abe6a4cf023c173617d50157d}{\+\_\+require\+\_\+canonical}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{private__key_8cpp_source_l00021}{21}} of file \mbox{\hyperlink{private__key_8cpp_source}{private\+\_\+key.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structfc_1_1crypto_1_1sign__visitor_adc9b9baa50b4d0d0b5c623ed421204da}\index{fc::crypto::sign\_visitor@{fc::crypto::sign\_visitor}!sign\_visitor@{sign\_visitor}}
+\index{sign\_visitor@{sign\_visitor}!fc::crypto::sign\_visitor@{fc::crypto::sign\_visitor}}
+\doxysubsubsection{\texorpdfstring{sign\_visitor()}{sign\_visitor()}}
+{\footnotesize\ttfamily \label{structfc_1_1crypto_1_1sign__visitor_adc9b9baa50b4d0d0b5c623ed421204da} 
+fc\+::crypto\+::sign\+\_\+visitor\+::sign\+\_\+visitor (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1sha256}{sha256}} \&}]{digest}{, }\item[{bool}]{require\+\_\+canonical}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{private__key_8cpp_source_l00022}{22}} of file \mbox{\hyperlink{private__key_8cpp_source}{private\+\_\+key.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ :\mbox{\hyperlink{structfc_1_1crypto_1_1sign__visitor_a8a9aaf9816d368680b20fa099bac4825}{\_digest}}(\mbox{\hyperlink{namespacefc_a150ca4cd9c0318ca45dc0dc7df5d58b9}{digest}})}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ ,\mbox{\hyperlink{structfc_1_1crypto_1_1sign__visitor_a8636832abe6a4cf023c173617d50157d}{\_require\_canonical}}(require\_canonical)}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structfc_1_1crypto_1_1sign__visitor_a989423f20ea00fcf5a4be99f52618765}\index{fc::crypto::sign\_visitor@{fc::crypto::sign\_visitor}!operator()@{operator()}}
+\index{operator()@{operator()}!fc::crypto::sign\_visitor@{fc::crypto::sign\_visitor}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}}
+{\footnotesize\ttfamily \label{structfc_1_1crypto_1_1sign__visitor_a989423f20ea00fcf5a4be99f52618765} 
+template$<$typename Key\+Type $>$ \\
+signature\+::storage\+\_\+type fc\+::crypto\+::sign\+\_\+visitor\+::operator() (\begin{DoxyParamCaption}\item[{const Key\+Type \&}]{key}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{private__key_8cpp_source_l00028}{28}} of file \mbox{\hyperlink{private__key_8cpp_source}{private\+\_\+key.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ signature::storage\_type(key.sign(\mbox{\hyperlink{structfc_1_1crypto_1_1sign__visitor_a8a9aaf9816d368680b20fa099bac4825}{\_digest}},\ \mbox{\hyperlink{structfc_1_1crypto_1_1sign__visitor_a8636832abe6a4cf023c173617d50157d}{\_require\_canonical}}));}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structfc_1_1crypto_1_1sign__visitor_a8a9aaf9816d368680b20fa099bac4825}\index{fc::crypto::sign\_visitor@{fc::crypto::sign\_visitor}!\_digest@{\_digest}}
+\index{\_digest@{\_digest}!fc::crypto::sign\_visitor@{fc::crypto::sign\_visitor}}
+\doxysubsubsection{\texorpdfstring{\_digest}{\_digest}}
+{\footnotesize\ttfamily \label{structfc_1_1crypto_1_1sign__visitor_a8a9aaf9816d368680b20fa099bac4825} 
+const \mbox{\hyperlink{classfc_1_1sha256}{sha256}}\& fc\+::crypto\+::sign\+\_\+visitor\+::\+\_\+digest}
+
+
+
+Definition at line \mbox{\hyperlink{private__key_8cpp_source_l00033}{33}} of file \mbox{\hyperlink{private__key_8cpp_source}{private\+\_\+key.\+cpp}}.
+
+\Hypertarget{structfc_1_1crypto_1_1sign__visitor_a8636832abe6a4cf023c173617d50157d}\index{fc::crypto::sign\_visitor@{fc::crypto::sign\_visitor}!\_require\_canonical@{\_require\_canonical}}
+\index{\_require\_canonical@{\_require\_canonical}!fc::crypto::sign\_visitor@{fc::crypto::sign\_visitor}}
+\doxysubsubsection{\texorpdfstring{\_require\_canonical}{\_require\_canonical}}
+{\footnotesize\ttfamily \label{structfc_1_1crypto_1_1sign__visitor_a8636832abe6a4cf023c173617d50157d} 
+bool fc\+::crypto\+::sign\+\_\+visitor\+::\+\_\+require\+\_\+canonical}
+
+
+
+Definition at line \mbox{\hyperlink{private__key_8cpp_source_l00034}{34}} of file \mbox{\hyperlink{private__key_8cpp_source}{private\+\_\+key.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/src/crypto/\mbox{\hyperlink{private__key_8cpp}{private\+\_\+key.\+cpp}}\end{DoxyCompactItemize}

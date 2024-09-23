@@ -1,0 +1,113 @@
+\doxysection{s\+\_\+propagate\+Na\+NExt\+F80\+M.\+c}
+\hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source}{}\label{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source}\index{libraries/softfloat/source/8086/s\_propagateNaNExtF80M.c@{libraries/softfloat/source/8086/s\_propagateNaNExtF80M.c}}
+\mbox{\hyperlink{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00001}00001\ }
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00002}00002\ \textcolor{comment}{/*============================================================================}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00003}00003\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00004}00004\ \textcolor{comment}{This\ C\ source\ file\ is\ part\ of\ the\ SoftFloat\ IEEE\ Floating-\/Point\ Arithmetic}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00005}00005\ \textcolor{comment}{Package,\ Release\ 3e,\ by\ John\ R.\ Hauser.}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00006}00006\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00007}00007\ \textcolor{comment}{Copyright\ 2011,\ 2012,\ 2013,\ 2014\ The\ Regents\ of\ the\ University\ of\ California.}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00008}00008\ \textcolor{comment}{All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00009}00009\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00010}00010\ \textcolor{comment}{Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00011}00011\ \textcolor{comment}{modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are\ met:}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00012}00012\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00013}00013\ \textcolor{comment}{\ 1.\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright\ notice,}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00014}00014\ \textcolor{comment}{\ \ \ \ this\ list\ of\ conditions,\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00015}00015\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00016}00016\ \textcolor{comment}{\ 2.\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above\ copyright\ notice,}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00017}00017\ \textcolor{comment}{\ \ \ \ this\ list\ of\ conditions,\ and\ the\ following\ disclaimer\ in\ the\ documentation}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00018}00018\ \textcolor{comment}{\ \ \ \ and/or\ other\ materials\ provided\ with\ the\ distribution.}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00019}00019\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00020}00020\ \textcolor{comment}{\ 3.\ Neither\ the\ name\ of\ the\ University\ nor\ the\ names\ of\ its\ contributors\ may}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00021}00021\ \textcolor{comment}{\ \ \ \ be\ used\ to\ endorse\ or\ promote\ products\ derived\ from\ this\ software\ without}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00022}00022\ \textcolor{comment}{\ \ \ \ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00023}00023\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00024}00024\ \textcolor{comment}{THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ REGENTS\ AND\ CONTRIBUTORS\ "{}AS\ IS"{},\ AND\ ANY}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00025}00025\ \textcolor{comment}{EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ THE\ IMPLIED}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00026}00026\ \textcolor{comment}{WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR\ A\ PARTICULAR\ PURPOSE,\ ARE}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00027}00027\ \textcolor{comment}{DISCLAIMED.\ \ IN\ NO\ EVENT\ SHALL\ THE\ REGENTS\ OR\ CONTRIBUTORS\ BE\ LIABLE\ FOR\ ANY}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00028}00028\ \textcolor{comment}{DIRECT,\ INDIRECT,\ INCIDENTAL,\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00029}00029\ \textcolor{comment}{(INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00030}00030\ \textcolor{comment}{LOSS\ OF\ USE,\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00031}00031\ \textcolor{comment}{ON\ ANY\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00032}00032\ \textcolor{comment}{(INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE\ OF\ THIS}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00033}00033\ \textcolor{comment}{SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00034}00034\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00035}00035\ \textcolor{comment}{=============================================================================*/}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00037}00037\ \textcolor{preprocessor}{\#include\ <stdbool.h>}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00038}00038\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{stdint_8h}{stdint.h}}>}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00039}00039\ \textcolor{preprocessor}{\#include\ "{}platform.h"{}}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00040}00040\ \textcolor{preprocessor}{\#include\ "{}internals.h"{}}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00041}00041\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{softfloat_2source_28086_2specialize_8h}{specialize.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00042}00042\ \textcolor{preprocessor}{\#include\ "{}softfloat.h"{}}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00044}00044\ \textcolor{comment}{/*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00045}00045\ \textcolor{comment}{|\ Assuming\ at\ least\ one\ of\ the\ two\ 80-\/bit\ extended\ floating-\/point\ values}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00046}00046\ \textcolor{comment}{|\ pointed\ to\ by\ \`{}aSPtr'\ and\ \`{}bSPtr'\ is\ a\ NaN,\ stores\ the\ combined\ NaN\ result}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00047}00047\ \textcolor{comment}{|\ at\ the\ location\ pointed\ to\ by\ \`{}zSPtr'.\ \ If\ either\ original\ floating-\/point}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00048}00048\ \textcolor{comment}{|\ value\ is\ a\ signaling\ NaN,\ the\ invalid\ exception\ is\ raised.}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00049}00049\ \textcolor{comment}{*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*/}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00050}00050\ \textcolor{keywordtype}{void}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00051}\mbox{\hyperlink{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_a6d1fff7785c3407c872c7c2147223b5a}{00051}}\ \ \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2s__propagate_na_n_ext_f80_m_8c_a6d1fff7785c3407c872c7c2147223b5a}{softfloat\_propagateNaNExtF80M}}(}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00052}00052\ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{struct}\ \mbox{\hyperlink{structext_float80_m}{extFloat80M}}\ *aSPtr,}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00053}00053\ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{struct}\ \mbox{\hyperlink{structext_float80_m}{extFloat80M}}\ *bSPtr,}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00054}00054\ \ \ \ \ \ \textcolor{keyword}{struct}\ \mbox{\hyperlink{structext_float80_m}{extFloat80M}}\ *zSPtr}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00055}00055\ \ )}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00056}00056\ \{}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00057}00057\ \ \ \ \ \textcolor{keywordtype}{bool}\ isSigNaNA;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00058}00058\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structext_float80_m}{extFloat80M}}\ *sPtr;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00059}00059\ \ \ \ \ \textcolor{keywordtype}{bool}\ isSigNaNB;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00060}00060\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a6ed085329b153773ff76afa0702cf897}{uint\_fast16\_t}}\ uiB64;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00061}00061\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ uiB0;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00062}00062\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a6ed085329b153773ff76afa0702cf897}{uint\_fast16\_t}}\ uiA64;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00063}00063\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ uiA0;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00064}00064\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a6ed085329b153773ff76afa0702cf897}{uint\_fast16\_t}}\ uiMagA64,\ uiMagB64;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00066}00066\ \ \ \ \ isSigNaNA\ =\ \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2ext_f80_m__is_signaling_na_n_8c_ace8e5230b332cd22bdf612d80da1a3de}{extF80M\_isSignalingNaN}}(\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{structext_float80_m}{extFloat80\_t}}\ *)\ aSPtr\ );}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00067}00067\ \ \ \ \ sPtr\ =\ aSPtr;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00068}00068\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ !\ bSPtr\ )\ \{}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00069}00069\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ isSigNaNA\ )\ \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2softfloat__raise_flags_8c_ac16bbf09eca0fe8ff91301d82c5a667f}{softfloat\_raiseFlags}}(\ \mbox{\hyperlink{softfloat_2source_2include_2softfloat_8h_a56a0f36da7f9eaaf54bd05cc2bf49173a191f069090c3d33752fb728272d9a4a9}{softfloat\_flag\_invalid}}\ );}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00070}00070\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ copy;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00071}00071\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00072}00072\ \ \ \ \ isSigNaNB\ =\ \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2ext_f80_m__is_signaling_na_n_8c_ace8e5230b332cd22bdf612d80da1a3de}{extF80M\_isSignalingNaN}}(\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{structext_float80_m}{extFloat80\_t}}\ *)\ bSPtr\ );}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00073}00073\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ isSigNaNA\ |\ isSigNaNB\ )\ \{}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00074}00074\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2softfloat__raise_flags_8c_ac16bbf09eca0fe8ff91301d82c5a667f}{softfloat\_raiseFlags}}(\ \mbox{\hyperlink{softfloat_2source_2include_2softfloat_8h_a56a0f36da7f9eaaf54bd05cc2bf49173a191f069090c3d33752fb728272d9a4a9}{softfloat\_flag\_invalid}}\ );}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00075}00075\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ isSigNaNA\ )\ \{}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \ \ \ uiB64\ =\ bSPtr-\/>\mbox{\hyperlink{structext_float80_m_afcc87c4645279344c5365a291766afe2}{signExp}};}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ isSigNaNB\ )\ \textcolor{keywordflow}{goto}\ returnLargerUIMag;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00078}00078\ \ \ \ \ \ \ \ \ \ \ \ \ uiB0\ =\ bSPtr-\/>\mbox{\hyperlink{structext_float80_m_ac0c736880d01d0abd0a818e658755b3b}{signif}};}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a252e90dd494604f3457bebaae12320b9}{isNaNExtF80UI}}(\ uiB64,\ uiB0\ )\ )\ \textcolor{keywordflow}{goto}\ copyB;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00080}00080\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ copy;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00081}00081\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00082}00082\ \ \ \ \ \ \ \ \ \ \ \ \ uiA64\ =\ aSPtr-\/>\mbox{\hyperlink{structext_float80_m_afcc87c4645279344c5365a291766afe2}{signExp}};}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00083}00083\ \ \ \ \ \ \ \ \ \ \ \ \ uiA0\ =\ aSPtr-\/>\mbox{\hyperlink{structext_float80_m_ac0c736880d01d0abd0a818e658755b3b}{signif}};}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00084}00084\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a252e90dd494604f3457bebaae12320b9}{isNaNExtF80UI}}(\ uiA64,\ uiA0\ )\ )\ \textcolor{keywordflow}{goto}\ copy;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00085}00085\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ copyB;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00086}00086\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00087}00087\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00088}00088\ \ \ \ \ uiB64\ =\ bSPtr-\/>\mbox{\hyperlink{structext_float80_m_afcc87c4645279344c5365a291766afe2}{signExp}};}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00089}00089\ \ returnLargerUIMag:}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00090}00090\ \ \ \ \ uiA64\ =\ aSPtr-\/>\mbox{\hyperlink{structext_float80_m_afcc87c4645279344c5365a291766afe2}{signExp}};}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00091}00091\ \ \ \ \ uiMagA64\ =\ uiA64\ \&\ 0x7FFF;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00092}00092\ \ \ \ \ uiMagB64\ =\ uiB64\ \&\ 0x7FFF;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00093}00093\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ uiMagA64\ <\ uiMagB64\ )\ \textcolor{keywordflow}{goto}\ copyB;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00094}00094\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ uiMagB64\ <\ uiMagA64\ )\ \textcolor{keywordflow}{goto}\ copy;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00095}00095\ \ \ \ \ uiA0\ =\ aSPtr-\/>\mbox{\hyperlink{structext_float80_m_ac0c736880d01d0abd0a818e658755b3b}{signif}};}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00096}00096\ \ \ \ \ uiB0\ =\ bSPtr-\/>\mbox{\hyperlink{structext_float80_m_ac0c736880d01d0abd0a818e658755b3b}{signif}};}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00097}00097\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ uiA0\ <\ uiB0\ )\ \textcolor{keywordflow}{goto}\ copyB;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00098}00098\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ uiB0\ <\ uiA0\ )\ \textcolor{keywordflow}{goto}\ copy;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00099}00099\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ uiA64\ <\ uiB64\ )\ \textcolor{keywordflow}{goto}\ copy;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00100}00100\ \ copyB:}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00101}00101\ \ \ \ \ sPtr\ =\ bSPtr;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00102}00102\ \ copy:}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00103}00103\ \ \ \ \ zSPtr-\/>\mbox{\hyperlink{structext_float80_m_afcc87c4645279344c5365a291766afe2}{signExp}}\ =\ sPtr-\/>\mbox{\hyperlink{structext_float80_m_afcc87c4645279344c5365a291766afe2}{signExp}};}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00104}00104\ \ \ \ \ zSPtr-\/>\mbox{\hyperlink{structext_float80_m_ac0c736880d01d0abd0a818e658755b3b}{signif}}\ =\ sPtr-\/>\mbox{\hyperlink{structext_float80_m_ac0c736880d01d0abd0a818e658755b3b}{signif}}\ |\ \mbox{\hyperlink{stdint_8h_a8da5373e041921aa34c2b6172ac3babc}{UINT64\_C}}(\ 0xC000000000000000\ );}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00105}00105\ }
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00106}00106\ \}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_ext_f80_m_8c_source_l00107}00107\ }
+
+\end{DoxyCode}

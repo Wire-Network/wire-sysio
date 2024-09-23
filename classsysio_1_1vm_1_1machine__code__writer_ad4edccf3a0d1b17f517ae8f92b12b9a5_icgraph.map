@@ -1,0 +1,7 @@
+<map id="sysio::vm::machine_code_writer::register_call" name="sysio::vm::machine_code_writer::register_call">
+<area shape="rect" id="Node000001" title=" " alt="" coords="209,41,382,82"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1vm_1_1machine__code__writer.html#a0d0ee8c5aa6045aaf8cf612167b47411" title=" " alt="" coords="5,5,161,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="193,47,161,41,161,36,193,42"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1vm_1_1machine__code__writer.html#a36b757d118b1f741d46d9e79c1ae8aff" title=" " alt="" coords="7,70,159,126"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="194,82,160,87,159,82,193,76"/>
+</map>

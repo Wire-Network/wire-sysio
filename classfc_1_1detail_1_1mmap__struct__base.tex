@@ -1,0 +1,154 @@
+\doxysection{fc\+::detail\+::mmap\+\_\+struct\+\_\+base Class Reference}
+\hypertarget{classfc_1_1detail_1_1mmap__struct__base}{}\label{classfc_1_1detail_1_1mmap__struct__base}\index{fc::detail::mmap\_struct\_base@{fc::detail::mmap\_struct\_base}}
+
+
+{\ttfamily \#include $<$mmap\+\_\+struct.\+hpp$>$}
+
+
+
+Inheritance diagram for fc\+::detail\+::mmap\+\_\+struct\+\_\+base\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=223pt]{classfc_1_1detail_1_1mmap__struct__base__inherit__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+size\+\_\+t \mbox{\hyperlink{classfc_1_1detail_1_1mmap__struct__base_a21fe0dadcd678e4ed9fc839265cab733}{size}} () const
+\item 
+void \mbox{\hyperlink{classfc_1_1detail_1_1mmap__struct__base_a3711d51c2211d55864a8c8b83e2bf811}{flush}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{classfc_1_1detail_1_1mmap__struct__base_a0328d6168aaa14fa81db688b623def57}{open}} (const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&file, size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, bool create)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::unique\+\_\+ptr$<$ \mbox{\hyperlink{classfc_1_1file__mapping}{fc\+::file\+\_\+mapping}} $>$ \mbox{\hyperlink{classfc_1_1detail_1_1mmap__struct__base_ae2fbc74484eb156d0ce6ec7c6c2aa90d}{\+\_\+file\+\_\+mapping}}
+\item 
+std\+::unique\+\_\+ptr$<$ \mbox{\hyperlink{classfc_1_1mapped__region}{fc\+::mapped\+\_\+region}} $>$ \mbox{\hyperlink{classfc_1_1detail_1_1mmap__struct__base_abbe030f02ae317c8044b14dbd3e9a001}{\+\_\+mapped\+\_\+region}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\doxylink{class_base}{Base} class used to hide common implementation details. 
+
+Definition at line \mbox{\hyperlink{mmap__struct_8hpp_source_l00013}{13}} of file \mbox{\hyperlink{mmap__struct_8hpp_source}{mmap\+\_\+struct.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1detail_1_1mmap__struct__base_a3711d51c2211d55864a8c8b83e2bf811}\index{fc::detail::mmap\_struct\_base@{fc::detail::mmap\_struct\_base}!flush@{flush}}
+\index{flush@{flush}!fc::detail::mmap\_struct\_base@{fc::detail::mmap\_struct\_base}}
+\doxysubsubsection{\texorpdfstring{flush()}{flush()}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1mmap__struct__base_a3711d51c2211d55864a8c8b83e2bf811} 
+void fc\+::detail\+::mmap\+\_\+struct\+\_\+base\+::flush (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{mmap__struct_8cpp_source_l00014}{14}} of file \mbox{\hyperlink{mmap__struct_8cpp_source}{mmap\+\_\+struct.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \{\ }
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1mmap__struct__base_abbe030f02ae317c8044b14dbd3e9a001}{\_mapped\_region}}-\/>flush();\ \ }
+\DoxyCodeLine{00017\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1detail_1_1mmap__struct__base_a0328d6168aaa14fa81db688b623def57}\index{fc::detail::mmap\_struct\_base@{fc::detail::mmap\_struct\_base}!open@{open}}
+\index{open@{open}!fc::detail::mmap\_struct\_base@{fc::detail::mmap\_struct\_base}}
+\doxysubsubsection{\texorpdfstring{open()}{open()}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1mmap__struct__base_a0328d6168aaa14fa81db688b623def57} 
+void fc\+::detail\+::mmap\+\_\+struct\+\_\+base\+::open (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&}]{file}{, }\item[{size\+\_\+t}]{s}{, }\item[{bool}]{create}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{mmap__struct_8cpp_source_l00019}{19}} of file \mbox{\hyperlink{mmap__struct_8cpp_source}{mmap\+\_\+struct.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !\mbox{\hyperlink{namespacefc_a3fcf0d920aea28014aacae50a51d8485}{fc::exists}}(\ file\ )\ ||\ \mbox{\hyperlink{namespacefc_aae3e907b120751591ca6919ac66c384b}{fc::file\_size}}(file)\ !=\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ )}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \ \ \ \ std::ofstream\ out(\ file.generic\_string().c\_str()\ );}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ buffer[1024];}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(\ buffer,\ 0,\ \textcolor{keyword}{sizeof}(buffer)\ );}
+\DoxyCodeLine{00026\ }
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ bytes\_left\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\ bytes\_left\ >\ 0\ )}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ to\_write\ =\ std::min<size\_t>(bytes\_left,\ \textcolor{keyword}{sizeof}(buffer)\ );}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ out.write(\ buffer,\ to\_write\ );}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ bytes\_left\ -\/=\ to\_write;}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00035\ }
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ std::string\ filePath\ =\ file.to\_native\_ansi\_path();\ }
+\DoxyCodeLine{00037\ }
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1mmap__struct__base_ae2fbc74484eb156d0ce6ec7c6c2aa90d}{\_file\_mapping}}.reset(\ \textcolor{keyword}{new}\ \mbox{\hyperlink{classfc_1_1file__mapping}{fc::file\_mapping}}(\ filePath.c\_str(),\ \mbox{\hyperlink{namespacefc_a3d8a2be677709cc41f09aa7925f2d55fa4eaf6936474fac52a87743f3de041c42}{fc::read\_write}}\ )\ );}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1mmap__struct__base_abbe030f02ae317c8044b14dbd3e9a001}{\_mapped\_region}}.reset(\ \textcolor{keyword}{new}\ \mbox{\hyperlink{classfc_1_1mapped__region}{fc::mapped\_region}}(\ *\mbox{\hyperlink{classfc_1_1detail_1_1mmap__struct__base_ae2fbc74484eb156d0ce6ec7c6c2aa90d}{\_file\_mapping}},\ \mbox{\hyperlink{namespacefc_a3d8a2be677709cc41f09aa7925f2d55fa4eaf6936474fac52a87743f3de041c42}{fc::read\_write}},\ 0,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ )\ );}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=299pt]{classfc_1_1detail_1_1mmap__struct__base_a0328d6168aaa14fa81db688b623def57_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=347pt]{classfc_1_1detail_1_1mmap__struct__base_a0328d6168aaa14fa81db688b623def57_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1detail_1_1mmap__struct__base_a21fe0dadcd678e4ed9fc839265cab733}\index{fc::detail::mmap\_struct\_base@{fc::detail::mmap\_struct\_base}!size@{size}}
+\index{size@{size}!fc::detail::mmap\_struct\_base@{fc::detail::mmap\_struct\_base}}
+\doxysubsubsection{\texorpdfstring{size()}{size()}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1mmap__struct__base_a21fe0dadcd678e4ed9fc839265cab733} 
+size\+\_\+t fc\+::detail\+::mmap\+\_\+struct\+\_\+base\+::size (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{mmap__struct_8cpp_source_l00013}{13}} of file \mbox{\hyperlink{mmap__struct_8cpp_source}{mmap\+\_\+struct.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00013\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1detail_1_1mmap__struct__base_abbe030f02ae317c8044b14dbd3e9a001}{\_mapped\_region}}-\/>get\_size();\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classfc_1_1detail_1_1mmap__struct__base_ae2fbc74484eb156d0ce6ec7c6c2aa90d}\index{fc::detail::mmap\_struct\_base@{fc::detail::mmap\_struct\_base}!\_file\_mapping@{\_file\_mapping}}
+\index{\_file\_mapping@{\_file\_mapping}!fc::detail::mmap\_struct\_base@{fc::detail::mmap\_struct\_base}}
+\doxysubsubsection{\texorpdfstring{\_file\_mapping}{\_file\_mapping}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1mmap__struct__base_ae2fbc74484eb156d0ce6ec7c6c2aa90d} 
+std\+::unique\+\_\+ptr$<$\mbox{\hyperlink{classfc_1_1file__mapping}{fc\+::file\+\_\+mapping}}$>$ fc\+::detail\+::mmap\+\_\+struct\+\_\+base\+::\+\_\+file\+\_\+mapping\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{mmap__struct_8hpp_source_l00021}{21}} of file \mbox{\hyperlink{mmap__struct_8hpp_source}{mmap\+\_\+struct.\+hpp}}.
+
+\Hypertarget{classfc_1_1detail_1_1mmap__struct__base_abbe030f02ae317c8044b14dbd3e9a001}\index{fc::detail::mmap\_struct\_base@{fc::detail::mmap\_struct\_base}!\_mapped\_region@{\_mapped\_region}}
+\index{\_mapped\_region@{\_mapped\_region}!fc::detail::mmap\_struct\_base@{fc::detail::mmap\_struct\_base}}
+\doxysubsubsection{\texorpdfstring{\_mapped\_region}{\_mapped\_region}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1mmap__struct__base_abbe030f02ae317c8044b14dbd3e9a001} 
+std\+::unique\+\_\+ptr$<$\mbox{\hyperlink{classfc_1_1mapped__region}{fc\+::mapped\+\_\+region}}$>$ fc\+::detail\+::mmap\+\_\+struct\+\_\+base\+::\+\_\+mapped\+\_\+region\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{mmap__struct_8hpp_source_l00022}{22}} of file \mbox{\hyperlink{mmap__struct_8hpp_source}{mmap\+\_\+struct.\+hpp}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/interprocess/\mbox{\hyperlink{mmap__struct_8hpp}{mmap\+\_\+struct.\+hpp}}\item 
+libraries/fc/src/interprocess/\mbox{\hyperlink{mmap__struct_8cpp}{mmap\+\_\+struct.\+cpp}}\end{DoxyCompactItemize}

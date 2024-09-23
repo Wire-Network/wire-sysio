@@ -1,0 +1,146 @@
+\doxysection{unittest.\+h}
+\hypertarget{unittest_8h_source}{}\label{unittest_8h_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/test/unittest/unittest.h@{libraries/fc/include/fc/crypto/webauthn\_json/test/unittest/unittest.h}}
+\mbox{\hyperlink{unittest_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00001}00001\ \textcolor{comment}{//\ Tencent\ is\ pleased\ to\ support\ the\ open\ source\ community\ by\ making\ RapidJSON\ available.}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00002}00002\ \textcolor{comment}{//\ }}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00003}00003\ \textcolor{comment}{//\ Copyright\ (C)\ 2015\ THL\ A29\ Limited,\ a\ Tencent\ company,\ and\ Milo\ Yip.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00004}00004\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00005}00005\ \textcolor{comment}{//\ Licensed\ under\ the\ MIT\ License\ (the\ "{}License"{});\ you\ may\ not\ use\ this\ file\ except}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00006}00006\ \textcolor{comment}{//\ in\ compliance\ with\ the\ License.\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00007}00007\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00008}00008\ \textcolor{comment}{//\ http://opensource.org/licenses/MIT}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00009}00009\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00010}00010\ \textcolor{comment}{//\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software\ distributed\ }}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00011}00011\ \textcolor{comment}{//\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,\ WITHOUT\ WARRANTIES\ OR\ }}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00012}00012\ \textcolor{comment}{//\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.\ See\ the\ License\ for\ the\ }}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00013}00013\ \textcolor{comment}{//\ specific\ language\ governing\ permissions\ and\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00015}00015\ \textcolor{preprocessor}{\#ifndef\ UNITTEST\_H\_}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00016}00016\ \textcolor{preprocessor}{\#define\ UNITTEST\_H\_}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00018}00018\ \textcolor{comment}{//\ gtest\ indirectly\ included\ inttypes.h,\ without\ \_\_STDC\_CONSTANT\_MACROS.}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00019}00019\ \textcolor{preprocessor}{\#ifndef\ \_\_STDC\_CONSTANT\_MACROS}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00020}00020\ \textcolor{preprocessor}{\#ifdef\ \_\_clang\_\_}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00021}00021\ \textcolor{preprocessor}{\#pragma\ GCC\ diagnostic\ push}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00022}00022\ \textcolor{preprocessor}{\#if\ \_\_has\_warning("{}-\/Wreserved-\/id-\/macro"{})}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00023}00023\ \textcolor{preprocessor}{\#pragma\ GCC\ diagnostic\ ignored\ "{}-\/Wreserved-\/id-\/macro"{}}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00024}00024\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00025}00025\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00027}\mbox{\hyperlink{unittest_8h_a786132414c30f947907be33a4c28125a}{00027}}\ \textcolor{preprocessor}{\#\ \ define\ \_\_STDC\_CONSTANT\_MACROS\ 1\ }\textcolor{comment}{//\ required\ by\ C++\ standard}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00029}00029\ \textcolor{preprocessor}{\#ifdef\ \_\_clang\_\_}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00030}00030\ \textcolor{preprocessor}{\#pragma\ GCC\ diagnostic\ pop}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00031}00031\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00032}00032\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00034}00034\ \textcolor{preprocessor}{\#ifdef\ \_MSC\_VER}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00035}00035\ \textcolor{preprocessor}{\#define\ \_CRTDBG\_MAP\_ALLOC}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00036}00036\ \textcolor{preprocessor}{\#include\ <crtdbg.h>}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00037}00037\ \textcolor{preprocessor}{\#pragma\ warning(disable\ :\ 4996)\ }\textcolor{comment}{//\ 'function':\ was\ declared\ deprecated}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00038}00038\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00040}00040\ \textcolor{preprocessor}{\#if\ defined(\_\_clang\_\_)\ ||\ defined(\_\_GNUC\_\_)\ \&\&\ (\_\_GNUC\_\_\ >\ 4\ ||\ (\_\_GNUC\_\_\ ==\ 4\ \&\&\ \_\_GNUC\_MINOR\_\_\ >=\ 2))}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00041}00041\ \textcolor{preprocessor}{\#if\ defined(\_\_clang\_\_)\ ||\ (\_\_GNUC\_\_\ >\ 4\ ||\ (\_\_GNUC\_\_\ ==\ 4\ \&\&\ \_\_GNUC\_MINOR\_\_\ >=\ 6))}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00042}00042\ \textcolor{preprocessor}{\#pragma\ GCC\ diagnostic\ push}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00043}00043\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00044}00044\ \textcolor{preprocessor}{\#pragma\ GCC\ diagnostic\ ignored\ "{}-\/Weffc++"{}}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00045}00045\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00047}00047\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{gtest_8h}{gtest/gtest.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00048}00048\ \textcolor{preprocessor}{\#include\ <stdexcept>}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00050}00050\ \textcolor{preprocessor}{\#if\ defined(\_\_clang\_\_)\ ||\ defined(\_\_GNUC\_\_)\ \&\&\ (\_\_GNUC\_\_\ >\ 4\ ||\ (\_\_GNUC\_\_\ ==\ 4\ \&\&\ \_\_GNUC\_MINOR\_\_\ >=\ 6))}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00051}00051\ \textcolor{preprocessor}{\#pragma\ GCC\ diagnostic\ pop}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00052}00052\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00054}00054\ \textcolor{preprocessor}{\#ifdef\ \_\_clang\_\_}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00055}00055\ \textcolor{comment}{//\ All\ TEST()\ macro\ generated\ this\ warning,\ disable\ globally}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00056}00056\ \textcolor{preprocessor}{\#pragma\ GCC\ diagnostic\ ignored\ "{}-\/Wglobal-\/constructors"{}}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00057}00057\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00059}00059\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ Ch>}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00060}\mbox{\hyperlink{unittest_8h_a158bf1a4953297866644112d81a7a3e7}{00060}}\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{unsigned}\ \mbox{\hyperlink{unittest_8h_a158bf1a4953297866644112d81a7a3e7}{StrLen}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}*\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})\ \{}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00061}00061\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}*\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00062}00062\ \ \ \ \ \textcolor{keywordflow}{while}\ (*\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}++;}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00063}00063\ \ \ \ \ \textcolor{keywordflow}{return}\ unsigned(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ -\/\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00064}00064\ \}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00066}00066\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ Ch>}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00067}\mbox{\hyperlink{unittest_8h_a8d8e3cf93e9b811c207711d0b353de02}{00067}}\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{unittest_8h_a8d8e3cf93e9b811c207711d0b353de02}{StrCmp}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}*\ s1,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}*\ s2)\ \{}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00068}00068\ \ \ \ \ \textcolor{keywordflow}{while}(*s1\ \&\&\ (*s1\ ==\ *s2))\ \{\ s1++;\ s2++;\ \}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00069}00069\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\textcolor{keyword}{>}(*s1)\ <\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\textcolor{keyword}{>}(*s2)\ ?\ -\/1\ :\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\textcolor{keyword}{>}(*s1)\ >\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\textcolor{keyword}{>}(*s2);}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00070}00070\ \}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00072}00072\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ Ch>}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00073}\mbox{\hyperlink{unittest_8h_a0b8e1bafb97ad4a272c5cc4469a13687}{00073}}\ \textcolor{keyword}{inline}\ \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}*\ \mbox{\hyperlink{unittest_8h_a0b8e1bafb97ad4a272c5cc4469a13687}{StrDup}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}*\ str)\ \{}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00074}00074\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ bufferSize\ =\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}})\ *\ (\mbox{\hyperlink{unittest_8h_a158bf1a4953297866644112d81a7a3e7}{StrLen}}(str)\ +\ 1);}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00075}00075\ \ \ \ \ \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}*\ buffer\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}*\textcolor{keyword}{>}(malloc(bufferSize));}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00076}00076\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(buffer,\ str,\ bufferSize);}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00077}00077\ \ \ \ \ \textcolor{keywordflow}{return}\ buffer;}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00078}00078\ \}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00080}\mbox{\hyperlink{unittest_8h_acb6251ae9b44050f1fcabf8d3c2e792b}{00080}}\ \textcolor{keyword}{inline}\ FILE*\ \mbox{\hyperlink{unittest_8h_acb6251ae9b44050f1fcabf8d3c2e792b}{TempFile}}(\textcolor{keywordtype}{char}\ *filename)\ \{}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00081}00081\ \textcolor{preprocessor}{\#if\ defined(\_\_WIN32\_\_)\ ||\ defined(\_MSC\_VER)}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00082}00082\ \ \ \ \ filename\ =\ tmpnam(filename);}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00083}00083\ }
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00084}00084\ \ \ \ \ \textcolor{comment}{//\ For\ Visual\ Studio,\ tmpnam()\ adds\ a\ backslash\ in\ front.\ Remove\ it.}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00085}00085\ \ \ \ \ \textcolor{keywordflow}{if}\ (filename[0]\ ==\ \textcolor{charliteral}{'\(\backslash\)\(\backslash\)'})}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00086}00086\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ filename[i]\ !=\ \textcolor{charliteral}{'\(\backslash\)0'};\ i++)}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00087}00087\ \ \ \ \ \ \ \ \ \ \ \ \ filename[i]\ =\ filename[i\ +\ 1];}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00088}00088\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00089}00089\ \ \ \ \ \textcolor{keywordflow}{return}\ fopen(filename,\ \textcolor{stringliteral}{"{}wb"{}});}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00090}00090\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00091}00091\ \ \ \ \ strcpy(filename,\ \textcolor{stringliteral}{"{}/tmp/fileXXXXXX"{}});}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00092}00092\ \ \ \ \ \textcolor{keywordtype}{int}\ fd\ =\ mkstemp(filename);}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00093}00093\ \ \ \ \ \textcolor{keywordflow}{return}\ fdopen(fd,\ \textcolor{stringliteral}{"{}w"{}});}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00094}00094\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00095}00095\ \}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00096}00096\ }
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00097}00097\ \textcolor{comment}{//\ Use\ exception\ for\ catching\ assert}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00098}00098\ \textcolor{preprocessor}{\#ifdef\ \_MSC\_VER}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00099}00099\ \textcolor{preprocessor}{\#pragma\ warning(disable\ :\ 4127)}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00100}00100\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00101}00101\ }
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00102}00102\ \textcolor{preprocessor}{\#ifdef\ \_\_clang\_\_}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00103}00103\ \textcolor{preprocessor}{\#pragma\ GCC\ diagnostic\ push}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00104}00104\ \textcolor{preprocessor}{\#if\ \_\_has\_warning("{}-\/Wdeprecated"{})}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00105}00105\ \textcolor{preprocessor}{\#pragma\ GCC\ diagnostic\ ignored\ "{}-\/Wdeprecated"{}}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00106}00106\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00107}00107\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00108}00108\ }
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00109}\mbox{\hyperlink{class_assert_exception}{00109}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_assert_exception}{AssertException}}\ :\ \textcolor{keyword}{public}\ std::logic\_error\ \{}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00110}00110\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00111}\mbox{\hyperlink{class_assert_exception_ac95b6779576904bf5932c1f7e72300c6}{00111}}\ \ \ \ \ \mbox{\hyperlink{class_assert_exception_ac95b6779576904bf5932c1f7e72300c6}{AssertException}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ w)\ :\ \mbox{\hyperlink{namespacestd}{std}}::logic\_error(w)\ \{\}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00112}\mbox{\hyperlink{class_assert_exception_a1a5812bbbb81bd04d4352e3413a5946f}{00112}}\ \ \ \ \ \mbox{\hyperlink{class_assert_exception_a1a5812bbbb81bd04d4352e3413a5946f}{AssertException}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{class_assert_exception}{AssertException}}\&\ rhs)\ :\ \mbox{\hyperlink{namespacestd}{std}}::logic\_error(rhs)\ \{\}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00113}00113\ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{class_assert_exception_aba869a44de1c69d593d16d39039bd35c}{\string~AssertException}}()\ throw();}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00114}00114\ \};}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00115}00115\ }
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00116}00116\ \textcolor{preprocessor}{\#ifdef\ \_\_clang\_\_}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00117}00117\ \textcolor{preprocessor}{\#pragma\ GCC\ diagnostic\ pop}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00118}00118\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00119}00119\ }
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00120}00120\ \textcolor{comment}{//\ Not\ using\ noexcept\ for\ testing\ RAPIDJSON\_ASSERT()}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00121}\mbox{\hyperlink{unittest_8h_a7aca4eff4695749d674154ddd2fd1d2e}{00121}}\ \textcolor{preprocessor}{\#define\ RAPIDJSON\_HAS\_CXX11\_NOEXCEPT\ 0}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00122}00122\ }
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00123}00123\ \textcolor{preprocessor}{\#ifndef\ RAPIDJSON\_ASSERT}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00124}\mbox{\hyperlink{unittest_8h_abeba18d612187bad2ac62aed9276d47c}{00124}}\ \textcolor{preprocessor}{\#define\ RAPIDJSON\_ASSERT(x)\ (!(x)\ ?\ throw\ AssertException(RAPIDJSON\_STRINGIFY(x))\ :\ (void)0u)}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00125}00125\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00126}00126\ }
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00127}\mbox{\hyperlink{class_random}{00127}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_random}{Random}}\ \{}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00128}00128\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00129}\mbox{\hyperlink{class_random_a17f563fcd03a81b31057b71b0bdcbcdb}{00129}}\ \ \ \ \ \mbox{\hyperlink{class_random_a17f563fcd03a81b31057b71b0bdcbcdb}{Random}}(\textcolor{keywordtype}{unsigned}\ seed\ =\ 0)\ :\ mSeed(seed)\ \{\}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00130}00130\ }
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00131}\mbox{\hyperlink{class_random_a881e9afda6dd041defbf4473a28bcb56}{00131}}\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \mbox{\hyperlink{class_random_a881e9afda6dd041defbf4473a28bcb56}{operator()}}()\ \{}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00132}00132\ \ \ \ \ \ \ \ \ mSeed\ =\ 214013\ *\ mSeed\ +\ 2531011;}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00133}00133\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ mSeed;}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00134}00134\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00135}00135\ }
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00136}00136\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00137}00137\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ mSeed;}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00138}00138\ \};}
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00139}00139\ }
+\DoxyCodeLine{\Hypertarget{unittest_8h_source_l00140}00140\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ UNITTEST\_H\_}}
+
+\end{DoxyCode}

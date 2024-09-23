@@ -1,0 +1,13 @@
+<map id="fc::detail::call_generic" name="fc::detail::call_generic">
+<area shape="rect" id="Node000001" title=" " alt="" coords="419,55,567,80"/>
+<area shape="rect" id="Node000002" href="$namespacefc_1_1detail.html#ab872ea0d1cfd2b3f8b6b8fcb685bc157" title=" " alt="" coords="223,5,371,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="424,53,350,34,352,29,425,48"/>
+<area shape="rect" id="Node000003" href="$namespacefc_1_1detail.html#a10759577faf256c5da4dd80fb55125db" title=" " alt="" coords="227,55,366,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="403,70,367,70,367,65,403,65"/>
+<area shape="rect" id="Node000006" href="$namespacefc_1_1detail.html#ae162080f61330b93315b6fa09a8250dd" title=" " alt="" coords="227,104,366,130"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="425,87,352,106,350,101,424,82"/>
+<area shape="rect" id="Node000004" href="$classfc_1_1api__connection.html#a9c8aa3ef4091a3b634cb8413ac6979c7" title=" " alt="" coords="26,15,154,56"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="212,57,154,48,155,43,213,52"/>
+<area shape="rect" id="Node000005" href="$classfc_1_1binary__api__connection.html#a8918ff5fdb0058166b54fef916331afa" title=" " alt="" coords="5,80,175,121"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="212,84,176,90,175,84,211,79"/>
+</map>

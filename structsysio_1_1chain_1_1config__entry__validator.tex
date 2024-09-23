@@ -1,0 +1,90 @@
+\doxysection{sysio\+::chain\+::config\+\_\+entry\+\_\+validator Struct Reference}
+\hypertarget{structsysio_1_1chain_1_1config__entry__validator}{}\label{structsysio_1_1chain_1_1config__entry__validator}\index{sysio::chain::config\_entry\_validator@{sysio::chain::config\_entry\_validator}}
+
+
+{\ttfamily \#include $<$chain\+\_\+config.\+hpp$>$}
+
+
+
+Collaboration diagram for sysio\+::chain\+::config\+\_\+entry\+\_\+validator\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1config__entry__validator__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{structsysio_1_1chain_1_1config__entry__validator_a382e03f499feaf341582fbafe5a1d5f1}{operator()}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{code__cache_8cpp_aa0efefe21f4700d78692edc823e763be}{id}}) const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+const \mbox{\hyperlink{classsysio_1_1chain_1_1controller}{controller}} \& \mbox{\hyperlink{structsysio_1_1chain_1_1config__entry__validator_ac7e69c0841af15acfa6a2c98af4e5d17}{control}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{chain__config_8hpp_source_l00189}{189}} of file \mbox{\hyperlink{chain__config_8hpp_source}{chain\+\_\+config.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1chain_1_1config__entry__validator_a382e03f499feaf341582fbafe5a1d5f1}\index{sysio::chain::config\_entry\_validator@{sysio::chain::config\_entry\_validator}!operator()@{operator()}}
+\index{operator()@{operator()}!sysio::chain::config\_entry\_validator@{sysio::chain::config\_entry\_validator}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1config__entry__validator_a382e03f499feaf341582fbafe5a1d5f1} 
+bool sysio\+::chain\+::config\+\_\+entry\+\_\+validator\+::operator() (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{id}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{chain__config_8cpp_source_l00048}{48}} of file \mbox{\hyperlink{chain__config_8cpp_source}{chain\+\_\+config.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00049\ \ \ \ \textcolor{keywordtype}{bool}\ allowed\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00050\ \ \ \ \textcolor{keywordflow}{switch}(\textcolor{keywordtype}{id})\{}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v1_a5000ca17abb32e72f6a6fe4d36bab91fade99bcd127eb42daf0316c8115e28f91}{chain\_config\_v1::max\_action\_return\_value\_size\_id}}:}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ allowed\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1config__entry__validator_ac7e69c0841af15acfa6a2c98af4e5d17}{control}}.\mbox{\hyperlink{classsysio_1_1chain_1_1controller_aa808acf858e93c567ff983ccbf8fb6d3}{is\_builtin\_activated}}(\mbox{\hyperlink{namespacesysio_1_1chain_a406d45a184cdba0af316b5bf34bf56cfa7d76bd2f931e7c1f1c2b7413c93a25b0}{builtin\_protocol\_feature\_t::action\_return\_value}});}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!allowed)\{}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a1759e5c9691d8ad754bdf5eff8bb23ac}{wlog}}(\textcolor{stringliteral}{"{}action\_return\_value\ protocol\ feature\ is\ not\ active,\ max\_action\_return\_value\_size\ config\ is\ not\ allowed"{}});}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00059\ \ \ \ \}}
+\DoxyCodeLine{00060\ }
+\DoxyCodeLine{00061\ \ \ \ \textcolor{keywordflow}{return}\ allowed;}
+\DoxyCodeLine{00062\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1config__entry__validator_a382e03f499feaf341582fbafe5a1d5f1_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1chain_1_1config__entry__validator_ac7e69c0841af15acfa6a2c98af4e5d17}\index{sysio::chain::config\_entry\_validator@{sysio::chain::config\_entry\_validator}!control@{control}}
+\index{control@{control}!sysio::chain::config\_entry\_validator@{sysio::chain::config\_entry\_validator}}
+\doxysubsubsection{\texorpdfstring{control}{control}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1config__entry__validator_ac7e69c0841af15acfa6a2c98af4e5d17} 
+const \mbox{\hyperlink{classsysio_1_1chain_1_1controller}{controller}}\& sysio\+::chain\+::config\+\_\+entry\+\_\+validator\+::control}
+
+
+
+Definition at line \mbox{\hyperlink{chain__config_8hpp_source_l00190}{190}} of file \mbox{\hyperlink{chain__config_8hpp_source}{chain\+\_\+config.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{chain__config_8hpp}{chain\+\_\+config.\+hpp}}\item 
+libraries/chain/\mbox{\hyperlink{chain__config_8cpp}{chain\+\_\+config.\+cpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,31 @@
+\doxysection{chain\+\_\+snapshot.\+hpp}
+\hypertarget{chain__snapshot_8hpp_source}{}\label{chain__snapshot_8hpp_source}\index{libraries/chain/include/sysio/chain/chain\_snapshot.hpp@{libraries/chain/include/sysio/chain/chain\_snapshot.hpp}}
+\mbox{\hyperlink{chain__snapshot_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{chain__snapshot_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{chain__snapshot_8hpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{chain__snapshot_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp}{sysio/chain/exceptions.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{chain__snapshot_8hpp_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{chain__snapshot_8hpp_source_l00005}00005\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{\ \textcolor{keyword}{namespace\ }chain\ \{}
+\DoxyCodeLine{\Hypertarget{chain__snapshot_8hpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{chain__snapshot_8hpp_source_l00007}\mbox{\hyperlink{structsysio_1_1chain_1_1chain__snapshot__header}{00007}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structsysio_1_1chain_1_1chain__snapshot__header}{chain\_snapshot\_header}}\ \{}
+\DoxyCodeLine{\Hypertarget{chain__snapshot_8hpp_source_l00028}\mbox{\hyperlink{structsysio_1_1chain_1_1chain__snapshot__header_a1332d618e749d49b9281dc4ff605e469}{00028}}\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__snapshot__header_a1332d618e749d49b9281dc4ff605e469}{minimum\_compatible\_version}}\ =\ 2;}
+\DoxyCodeLine{\Hypertarget{chain__snapshot_8hpp_source_l00029}\mbox{\hyperlink{structsysio_1_1chain_1_1chain__snapshot__header_ad7357c9cee48e084e060efb76dce03e4}{00029}}\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__snapshot__header_ad7357c9cee48e084e060efb76dce03e4}{current\_version}}\ =\ 6;}
+\DoxyCodeLine{\Hypertarget{chain__snapshot_8hpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{chain__snapshot_8hpp_source_l00031}\mbox{\hyperlink{structsysio_1_1chain_1_1chain__snapshot__header_a57ba8d21e5d5c9e1325e9ef03f96d54e}{00031}}\ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__snapshot__header_a57ba8d21e5d5c9e1325e9ef03f96d54e}{version}}\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__snapshot__header_ad7357c9cee48e084e060efb76dce03e4}{current\_version}};}
+\DoxyCodeLine{\Hypertarget{chain__snapshot_8hpp_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{chain__snapshot_8hpp_source_l00033}\mbox{\hyperlink{structsysio_1_1chain_1_1chain__snapshot__header_a6f183a866ea3a474243c55484f0c700e}{00033}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__snapshot__header_a6f183a866ea3a474243c55484f0c700e}{validate}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{chain__snapshot_8hpp_source_l00034}00034\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacefc_aa3ea11c18de71ec23b19c3cc571fb8ff}{min}}\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__snapshot__header_a1332d618e749d49b9281dc4ff605e469}{minimum\_compatible\_version}};}
+\DoxyCodeLine{\Hypertarget{chain__snapshot_8hpp_source_l00035}00035\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ max\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__snapshot__header_ad7357c9cee48e084e060efb76dce03e4}{current\_version}};}
+\DoxyCodeLine{\Hypertarget{chain__snapshot_8hpp_source_l00036}00036\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\mbox{\hyperlink{structsysio_1_1chain_1_1chain__snapshot__header_a57ba8d21e5d5c9e1325e9ef03f96d54e}{version}}\ >=\ \mbox{\hyperlink{namespacefc_aa3ea11c18de71ec23b19c3cc571fb8ff}{min}}\ \&\&\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__snapshot__header_a57ba8d21e5d5c9e1325e9ef03f96d54e}{version}}\ <=\ max,}
+\DoxyCodeLine{\Hypertarget{chain__snapshot_8hpp_source_l00037}00037\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ snapshot\_validation\_exception,}
+\DoxyCodeLine{\Hypertarget{chain__snapshot_8hpp_source_l00038}00038\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Unsupported\ version\ of\ chain\ snapshot:\ \$\{version\}.\ Supported\ version\ must\ be\ between\ \$\{min\}\ and\ \$\{max\}\ inclusive."{}},}
+\DoxyCodeLine{\Hypertarget{chain__snapshot_8hpp_source_l00039}00039\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}version"{}},\mbox{\hyperlink{structsysio_1_1chain_1_1chain__snapshot__header_a57ba8d21e5d5c9e1325e9ef03f96d54e}{version}})(\textcolor{stringliteral}{"{}min"{}},\mbox{\hyperlink{namespacefc_aa3ea11c18de71ec23b19c3cc571fb8ff}{min}})(\textcolor{stringliteral}{"{}max"{}},max));}
+\DoxyCodeLine{\Hypertarget{chain__snapshot_8hpp_source_l00040}00040\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{chain__snapshot_8hpp_source_l00041}00041\ \};}
+\DoxyCodeLine{\Hypertarget{chain__snapshot_8hpp_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{chain__snapshot_8hpp_source_l00043}00043\ \}\ \}}
+\DoxyCodeLine{\Hypertarget{chain__snapshot_8hpp_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{chain__snapshot_8hpp_source_l00045}00045\ \mbox{\hyperlink{reflect_8hpp_a2ace850e636b1ca0b18fe3177e413d99}{FC\_REFLECT}}(\mbox{\hyperlink{structsysio_1_1chain_1_1chain__snapshot__header}{sysio::chain::chain\_snapshot\_header}},(version))}
+
+\end{DoxyCode}

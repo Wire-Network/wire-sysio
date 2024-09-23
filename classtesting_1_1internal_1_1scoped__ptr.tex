@@ -1,0 +1,240 @@
+\doxysection{testing\+::internal\+::scoped\+\_\+ptr\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classtesting_1_1internal_1_1scoped__ptr}{}\label{classtesting_1_1internal_1_1scoped__ptr}\index{testing::internal::scoped\_ptr$<$ T $>$@{testing::internal::scoped\_ptr$<$ T $>$}}
+
+
+{\ttfamily \#include $<$gtest-\/port.\+h$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{classtesting_1_1internal_1_1scoped__ptr_aaeed7371c5ae74ec9f32983ec225bb87}{element\+\_\+type}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1scoped__ptr_adb972432999a0c63720df148964ac2a5}{scoped\+\_\+ptr}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}=NULL)
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1scoped__ptr_ab721de9bf4369f002fb563e82352ee36}{\texorpdfstring{$\sim$}{\string~}scoped\+\_\+ptr}} ()
+\item 
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classtesting_1_1internal_1_1scoped__ptr_a171c86552b18317d318c90521a027176}{operator\texorpdfstring{$\ast$}{*}}} () const
+\item 
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classtesting_1_1internal_1_1scoped__ptr_a17b417a85a9a48e2d99e114cbacc1c20}{operator-\/$>$}} () const
+\item 
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classtesting_1_1internal_1_1scoped__ptr_a5a78280b6a59ff4b63aae444efc61e3f}{get}} () const
+\item 
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classtesting_1_1internal_1_1scoped__ptr_a600cb25935fa8a3a54238684fb9d5085}{release}} ()
+\item 
+void \mbox{\hyperlink{classtesting_1_1internal_1_1scoped__ptr_acac03266a43359801aff0de5c990bec0}{reset}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}=NULL)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{classtesting_1_1internal_1_1scoped__ptr_a01bc0441e6a3ebf26807ac523392ca86}{swap}} (\mbox{\hyperlink{classtesting_1_1internal_1_1scoped__ptr}{scoped\+\_\+ptr}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, \mbox{\hyperlink{classtesting_1_1internal_1_1scoped__ptr}{scoped\+\_\+ptr}} \&b)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$\newline
+class testing\+::internal\+::scoped\+\_\+ptr$<$ T $>$}
+
+
+Definition at line \mbox{\hyperlink{gtest-port_8h_source_l01181}{1181}} of file \mbox{\hyperlink{gtest-port_8h_source}{gtest-\/port.\+h}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classtesting_1_1internal_1_1scoped__ptr_aaeed7371c5ae74ec9f32983ec225bb87}\index{testing::internal::scoped\_ptr$<$ T $>$@{testing::internal::scoped\_ptr$<$ T $>$}!element\_type@{element\_type}}
+\index{element\_type@{element\_type}!testing::internal::scoped\_ptr$<$ T $>$@{testing::internal::scoped\_ptr$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{element\_type}{element\_type}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1scoped__ptr_aaeed7371c5ae74ec9f32983ec225bb87} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{classtesting_1_1internal_1_1scoped__ptr}{testing\+::internal\+::scoped\+\_\+ptr}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::element\+\_\+type}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-port_8h_source_l01183}{1183}} of file \mbox{\hyperlink{gtest-port_8h_source}{gtest-\/port.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1internal_1_1scoped__ptr_adb972432999a0c63720df148964ac2a5}\index{testing::internal::scoped\_ptr$<$ T $>$@{testing::internal::scoped\_ptr$<$ T $>$}!scoped\_ptr@{scoped\_ptr}}
+\index{scoped\_ptr@{scoped\_ptr}!testing::internal::scoped\_ptr$<$ T $>$@{testing::internal::scoped\_ptr$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{scoped\_ptr()}{scoped\_ptr()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1scoped__ptr_adb972432999a0c63720df148964ac2a5} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1scoped__ptr}{testing\+::internal\+::scoped\+\_\+ptr}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::scoped\+\_\+ptr (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*}}]{p}{ = {\ttfamily NULL}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-port_8h_source_l01185}{1185}} of file \mbox{\hyperlink{gtest-port_8h_source}{gtest-\/port.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01185\ :\ ptr\_(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1internal_1_1scoped__ptr_ab721de9bf4369f002fb563e82352ee36}\index{testing::internal::scoped\_ptr$<$ T $>$@{testing::internal::scoped\_ptr$<$ T $>$}!````~scoped\_ptr@{\texorpdfstring{$\sim$}{\string~}scoped\_ptr}}
+\index{````~scoped\_ptr@{\texorpdfstring{$\sim$}{\string~}scoped\_ptr}!testing::internal::scoped\_ptr$<$ T $>$@{testing::internal::scoped\_ptr$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}scoped\_ptr()}{\string~scoped\_ptr()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1scoped__ptr_ab721de9bf4369f002fb563e82352ee36} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1scoped__ptr}{testing\+::internal\+::scoped\+\_\+ptr}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::\texorpdfstring{$\sim$}{\string~}\mbox{\hyperlink{classtesting_1_1internal_1_1scoped__ptr}{scoped\+\_\+ptr}} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-port_8h_source_l01186}{1186}} of file \mbox{\hyperlink{gtest-port_8h_source}{gtest-\/port.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01186\ \{\ \mbox{\hyperlink{classtesting_1_1internal_1_1scoped__ptr_acac03266a43359801aff0de5c990bec0}{reset}}();\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1scoped__ptr_ab721de9bf4369f002fb563e82352ee36_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1scoped__ptr_a5a78280b6a59ff4b63aae444efc61e3f}\index{testing::internal::scoped\_ptr$<$ T $>$@{testing::internal::scoped\_ptr$<$ T $>$}!get@{get}}
+\index{get@{get}!testing::internal::scoped\_ptr$<$ T $>$@{testing::internal::scoped\_ptr$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{get()}{get()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1scoped__ptr_a5a78280b6a59ff4b63aae444efc61e3f} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classtesting_1_1internal_1_1scoped__ptr}{testing\+::internal\+::scoped\+\_\+ptr}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::get (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-port_8h_source_l01190}{1190}} of file \mbox{\hyperlink{gtest-port_8h_source}{gtest-\/port.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01190\ \{\ \textcolor{keywordflow}{return}\ ptr\_;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1scoped__ptr_a5a78280b6a59ff4b63aae444efc61e3f_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1scoped__ptr_a171c86552b18317d318c90521a027176}\index{testing::internal::scoped\_ptr$<$ T $>$@{testing::internal::scoped\_ptr$<$ T $>$}!operator\texorpdfstring{$\ast$}{*}@{operator\texorpdfstring{$\ast$}{*}}}
+\index{operator\texorpdfstring{$\ast$}{*}@{operator\texorpdfstring{$\ast$}{*}}!testing::internal::scoped\_ptr$<$ T $>$@{testing::internal::scoped\_ptr$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{operator\texorpdfstring{$\ast$}{*}()}{operator*()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1scoped__ptr_a171c86552b18317d318c90521a027176} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classtesting_1_1internal_1_1scoped__ptr}{testing\+::internal\+::scoped\+\_\+ptr}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::operator\texorpdfstring{$\ast$}{*} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-port_8h_source_l01188}{1188}} of file \mbox{\hyperlink{gtest-port_8h_source}{gtest-\/port.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01188\ \{\ \textcolor{keywordflow}{return}\ *ptr\_;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1internal_1_1scoped__ptr_a17b417a85a9a48e2d99e114cbacc1c20}\index{testing::internal::scoped\_ptr$<$ T $>$@{testing::internal::scoped\_ptr$<$ T $>$}!operator-\/$>$@{operator-\/$>$}}
+\index{operator-\/$>$@{operator-\/$>$}!testing::internal::scoped\_ptr$<$ T $>$@{testing::internal::scoped\_ptr$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{operator-\/$>$()}{operator->()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1scoped__ptr_a17b417a85a9a48e2d99e114cbacc1c20} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classtesting_1_1internal_1_1scoped__ptr}{testing\+::internal\+::scoped\+\_\+ptr}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::operator-\/$>$ (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-port_8h_source_l01189}{1189}} of file \mbox{\hyperlink{gtest-port_8h_source}{gtest-\/port.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01189\ \{\ \textcolor{keywordflow}{return}\ ptr\_;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1internal_1_1scoped__ptr_a600cb25935fa8a3a54238684fb9d5085}\index{testing::internal::scoped\_ptr$<$ T $>$@{testing::internal::scoped\_ptr$<$ T $>$}!release@{release}}
+\index{release@{release}!testing::internal::scoped\_ptr$<$ T $>$@{testing::internal::scoped\_ptr$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{release()}{release()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1scoped__ptr_a600cb25935fa8a3a54238684fb9d5085} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classtesting_1_1internal_1_1scoped__ptr}{testing\+::internal\+::scoped\+\_\+ptr}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::release (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-port_8h_source_l01192}{1192}} of file \mbox{\hyperlink{gtest-port_8h_source}{gtest-\/port.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01192\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01193\ \ \ \ \ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ \textcolor{keyword}{const}\ ptr\ =\ ptr\_;}
+\DoxyCodeLine{01194\ \ \ \ \ ptr\_\ =\ NULL;}
+\DoxyCodeLine{01195\ \ \ \ \ \textcolor{keywordflow}{return}\ ptr;}
+\DoxyCodeLine{01196\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1internal_1_1scoped__ptr_acac03266a43359801aff0de5c990bec0}\index{testing::internal::scoped\_ptr$<$ T $>$@{testing::internal::scoped\_ptr$<$ T $>$}!reset@{reset}}
+\index{reset@{reset}!testing::internal::scoped\_ptr$<$ T $>$@{testing::internal::scoped\_ptr$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{reset()}{reset()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1scoped__ptr_acac03266a43359801aff0de5c990bec0} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+void \mbox{\hyperlink{classtesting_1_1internal_1_1scoped__ptr}{testing\+::internal\+::scoped\+\_\+ptr}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::reset (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*}}]{p}{ = {\ttfamily NULL}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-port_8h_source_l01198}{1198}} of file \mbox{\hyperlink{gtest-port_8h_source}{gtest-\/port.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01198\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01199\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ !=\ ptr\_)\ \{}
+\DoxyCodeLine{01200\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacetesting_1_1internal_a527b9bcc13669b9a16400c8514266254}{IsTrue}}(\textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}})\ >\ 0))\ \{\ \ \textcolor{comment}{//\ Makes\ sure\ T\ is\ a\ complete\ type.}}
+\DoxyCodeLine{01201\ \ \ \ \ \ \ \ \ \textcolor{keyword}{delete}\ ptr\_;}
+\DoxyCodeLine{01202\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01203\ \ \ \ \ \ \ ptr\_\ =\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}};}
+\DoxyCodeLine{01204\ \ \ \ \ \}}
+\DoxyCodeLine{01205\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=297pt]{classtesting_1_1internal_1_1scoped__ptr_acac03266a43359801aff0de5c990bec0_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=332pt]{classtesting_1_1internal_1_1scoped__ptr_acac03266a43359801aff0de5c990bec0_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{classtesting_1_1internal_1_1scoped__ptr_a01bc0441e6a3ebf26807ac523392ca86}\index{testing::internal::scoped\_ptr$<$ T $>$@{testing::internal::scoped\_ptr$<$ T $>$}!swap@{swap}}
+\index{swap@{swap}!testing::internal::scoped\_ptr$<$ T $>$@{testing::internal::scoped\_ptr$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{swap}{swap}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1scoped__ptr_a01bc0441e6a3ebf26807ac523392ca86} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+void swap (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classtesting_1_1internal_1_1scoped__ptr}{scoped\+\_\+ptr}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&}]{a}{, }\item[{\mbox{\hyperlink{classtesting_1_1internal_1_1scoped__ptr}{scoped\+\_\+ptr}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&}]{b}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-port_8h_source_l01207}{1207}} of file \mbox{\hyperlink{gtest-port_8h_source}{gtest-\/port.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01207\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01208\ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacestd_abb7e41c7063536ff6eeee4bb5f66de6c}{std::swap}};}
+\DoxyCodeLine{01209\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1scoped__ptr_a01bc0441e6a3ebf26807ac523392ca86}{swap}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.ptr\_,\ b.ptr\_);}
+\DoxyCodeLine{01210\ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/include/gtest/internal/\mbox{\hyperlink{gtest-port_8h}{gtest-\/port.\+h}}\end{DoxyCompactItemize}

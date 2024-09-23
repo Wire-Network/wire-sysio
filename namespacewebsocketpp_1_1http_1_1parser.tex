@@ -1,0 +1,564 @@
+\doxysection{websocketpp\+::http\+::parser Namespace Reference}
+\hypertarget{namespacewebsocketpp_1_1http_1_1parser}{}\label{namespacewebsocketpp_1_1http_1_1parser}\index{websocketpp::http::parser@{websocketpp::http::parser}}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1body__encoding}{body\+\_\+encoding}}
+\item 
+namespace \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1state}{state}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser}{parser}}
+\begin{DoxyCompactList}\small\item\em \doxylink{class_base}{Base} HTTP parser. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1request}{request}}
+\begin{DoxyCompactList}\small\item\em Stores, parses, and manipulates HTTP requests. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1response}{response}}
+\begin{DoxyCompactList}\small\item\em Stores, parses, and manipulates HTTP responses. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef std\+::map$<$ std\+::string, std\+::string, \mbox{\hyperlink{structwebsocketpp_1_1utility_1_1ci__less}{utility\+::ci\+\_\+less}} $>$ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_a4bb5b2821dab6a182bfe4c5415229e6e}{header\+\_\+list}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename Input\+Iterator $>$ }\\std\+::pair$<$ std\+::string, Input\+Iterator $>$ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_a6c56e2f70369551a1dcd9816f3d4d2eb}{extract\+\_\+token}} (Input\+Iterator begin, Input\+Iterator end)
+\begin{DoxyCompactList}\small\item\em Read and return the next token in the stream. \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename Input\+Iterator $>$ }\\std\+::pair$<$ std\+::string, Input\+Iterator $>$ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_a2a35158d976b84679dda4fd4a4b237bc}{extract\+\_\+quoted\+\_\+string}} (Input\+Iterator begin, Input\+Iterator end)
+\begin{DoxyCompactList}\small\item\em Read and return the next quoted string in the stream. \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename Input\+Iterator $>$ }\\Input\+Iterator \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_a1dacef9abccd8e5b6c572447d9f5a3ab}{extract\+\_\+lws}} (Input\+Iterator begin, Input\+Iterator end)
+\begin{DoxyCompactList}\small\item\em Read and discard one unit of linear whitespace. \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename Input\+Iterator $>$ }\\Input\+Iterator \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_a263c7c466bbed56948d5877b9c33c354}{extract\+\_\+all\+\_\+lws}} (Input\+Iterator begin, Input\+Iterator end)
+\begin{DoxyCompactList}\small\item\em Read and discard linear whitespace. \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename Input\+Iterator $>$ }\\Input\+Iterator \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_ac13fb3aca2101c9e6d2ee14039f1a758}{extract\+\_\+attributes}} (Input\+Iterator begin, Input\+Iterator end, \mbox{\hyperlink{namespacewebsocketpp_1_1http_a9744f4104772b987aa9e86c35ce1357b}{attribute\+\_\+list}} \&attributes)
+\begin{DoxyCompactList}\small\item\em Extract HTTP attributes. \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename Input\+Iterator $>$ }\\Input\+Iterator \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_adabfd491d364be43bee4c7cad63e7e08}{extract\+\_\+parameters}} (Input\+Iterator begin, Input\+Iterator end, \mbox{\hyperlink{namespacewebsocketpp_1_1http_a2c285bc959df5a63bf962bed842fccfb}{parameter\+\_\+list}} \&parameters)
+\begin{DoxyCompactList}\small\item\em Extract HTTP parameters. \end{DoxyCompactList}\item 
+std\+::string \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_ae656f7130716b25fb2a34cee77a0444e}{strip\+\_\+lws}} (std\+::string const \&input)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{namespacewebsocketpp_1_1http_1_1parser_a4bb5b2821dab6a182bfe4c5415229e6e}\index{websocketpp::http::parser@{websocketpp::http::parser}!header\_list@{header\_list}}
+\index{header\_list@{header\_list}!websocketpp::http::parser@{websocketpp::http::parser}}
+\doxysubsubsection{\texorpdfstring{header\_list}{header\_list}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1http_1_1parser_a4bb5b2821dab6a182bfe4c5415229e6e} 
+typedef std\+::map$<$std\+::string, std\+::string, \mbox{\hyperlink{structwebsocketpp_1_1utility_1_1ci__less}{utility\+::ci\+\_\+less}} $>$ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_a4bb5b2821dab6a182bfe4c5415229e6e}{websocketpp\+::http\+::parser\+::header\+\_\+list}}}
+
+
+
+Definition at line \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00060}{60}} of file \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacewebsocketpp_1_1http_1_1parser_a263c7c466bbed56948d5877b9c33c354}\index{websocketpp::http::parser@{websocketpp::http::parser}!extract\_all\_lws@{extract\_all\_lws}}
+\index{extract\_all\_lws@{extract\_all\_lws}!websocketpp::http::parser@{websocketpp::http::parser}}
+\doxysubsubsection{\texorpdfstring{extract\_all\_lws()}{extract\_all\_lws()}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1http_1_1parser_a263c7c466bbed56948d5877b9c33c354} 
+template$<$typename Input\+Iterator $>$ \\
+Input\+Iterator websocketpp\+::http\+::parser\+::extract\+\_\+all\+\_\+lws (\begin{DoxyParamCaption}\item[{Input\+Iterator}]{begin}{, }\item[{Input\+Iterator}]{end}{}\end{DoxyParamCaption})}
+
+Read linear white space until a non-\/lws character is read and return an iterator to that character. If {\ttfamily begin} is returned, no whitespace was extracted.
+
+
+\begin{DoxyParams}{Parameters}
+{\em begin} & An iterator to the beginning of the sequence \\
+\hline
+{\em end} & An iterator to the end of the sequence \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+An iterator to the character after the linear whitespace read 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00164}{164}} of file \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00165\ \ \ \ \ InputIterator\ old\_it;}
+\DoxyCodeLine{00166\ \ \ \ \ InputIterator\ new\_it\ =\ begin;}
+\DoxyCodeLine{00167\ }
+\DoxyCodeLine{00168\ \ \ \ \ \textcolor{keywordflow}{do}\ \{}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Pull\ value\ from\ previous\ iteration}}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ old\_it\ =\ new\_it;}
+\DoxyCodeLine{00171\ }
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ look\ ahead\ another\ pass}}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ new\_it\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_a1dacef9abccd8e5b6c572447d9f5a3ab}{extract\_lws}}(old\_it,end);}
+\DoxyCodeLine{00174\ \ \ \ \ \}\ \textcolor{keywordflow}{while}\ (new\_it\ !=\ end\ \&\&\ old\_it\ !=\ new\_it);}
+\DoxyCodeLine{00175\ }
+\DoxyCodeLine{00176\ \ \ \ \ \textcolor{keywordflow}{return}\ new\_it;}
+\DoxyCodeLine{00177\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacewebsocketpp_1_1http_1_1parser_a263c7c466bbed56948d5877b9c33c354_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacewebsocketpp_1_1http_1_1parser_a263c7c466bbed56948d5877b9c33c354_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacewebsocketpp_1_1http_1_1parser_ac13fb3aca2101c9e6d2ee14039f1a758}\index{websocketpp::http::parser@{websocketpp::http::parser}!extract\_attributes@{extract\_attributes}}
+\index{extract\_attributes@{extract\_attributes}!websocketpp::http::parser@{websocketpp::http::parser}}
+\doxysubsubsection{\texorpdfstring{extract\_attributes()}{extract\_attributes()}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1http_1_1parser_ac13fb3aca2101c9e6d2ee14039f1a758} 
+template$<$typename Input\+Iterator $>$ \\
+Input\+Iterator websocketpp\+::http\+::parser\+::extract\+\_\+attributes (\begin{DoxyParamCaption}\item[{Input\+Iterator}]{begin}{, }\item[{Input\+Iterator}]{end}{, }\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1http_a9744f4104772b987aa9e86c35ce1357b}{attribute\+\_\+list}} \&}]{attributes}{}\end{DoxyParamCaption})}
+
+An http attributes list is a semicolon delimited list of key value pairs in the format\+: \texorpdfstring{$\ast$}{*}( "{};"{} attribute "{}="{} value ) where attribute is a token and value is a token or quoted string.
+
+Attributes extracted are appended to the supplied attributes list {\ttfamily attributes}.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em begin} & An iterator to the beginning of the sequence \\
+\hline
+\mbox{\texttt{ in}}  & {\em end} & An iterator to the end of the sequence \\
+\hline
+\mbox{\texttt{ out}}  & {\em attributes} & \doxylink{struct_a}{A} reference to the attributes list to append attribute/value pairs extracted to \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+An iterator to the character after the last atribute read 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00195}{195}} of file \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00197\ \{}
+\DoxyCodeLine{00198\ \ \ \ \ InputIterator\ cursor;}
+\DoxyCodeLine{00199\ \ \ \ \ \textcolor{keywordtype}{bool}\ first\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00200\ }
+\DoxyCodeLine{00201\ \ \ \ \ \textcolor{keywordflow}{if}\ (begin\ ==\ end)\ \{}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ begin;}
+\DoxyCodeLine{00203\ \ \ \ \ \}}
+\DoxyCodeLine{00204\ }
+\DoxyCodeLine{00205\ \ \ \ \ cursor\ =\ begin;}
+\DoxyCodeLine{00206\ \ \ \ \ std::pair<std::string,InputIterator>\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00207\ }
+\DoxyCodeLine{00208\ \ \ \ \ \textcolor{keywordflow}{while}\ (cursor\ !=\ end)\ \{}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \ \ std::string\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}};}
+\DoxyCodeLine{00210\ }
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \ \ cursor\ =\ http::parser::extract\_all\_lws(cursor,end);}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (cursor\ ==\ end)\ \{}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00215\ }
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (first)\ \{}
+\DoxyCodeLine{00217\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ ignore\ this\ check\ for\ the\ very\ first\ pass}}
+\DoxyCodeLine{00218\ \ \ \ \ \ \ \ \ \ \ \ \ first\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (*cursor\ ==\ \textcolor{charliteral}{';'})\ \{}
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ advance\ past\ the\ ';'}}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++cursor;}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ non-\/semicolon\ in\ this\ position\ indicates\ end\ end\ of\ the}}
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ attribute\ list,\ break\ and\ return.}}
+\DoxyCodeLine{00226\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00227\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00228\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00229\ }
+\DoxyCodeLine{00230\ \ \ \ \ \ \ \ \ cursor\ =\ http::parser::extract\_all\_lws(cursor,end);}
+\DoxyCodeLine{00231\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ http::parser::extract\_token(cursor,end);}
+\DoxyCodeLine{00232\ }
+\DoxyCodeLine{00233\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.first.empty())\ \{}
+\DoxyCodeLine{00234\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ error:\ expected\ a\ token}}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ begin;}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00237\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.first;}
+\DoxyCodeLine{00238\ \ \ \ \ \ \ \ \ \ \ \ \ cursor\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.second;}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00240\ }
+\DoxyCodeLine{00241\ \ \ \ \ \ \ \ \ cursor\ =\ http::parser::extract\_all\_lws(cursor,end);}
+\DoxyCodeLine{00242\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (cursor\ ==\ end\ ||\ *cursor\ !=\ \textcolor{charliteral}{'='})\ \{}
+\DoxyCodeLine{00243\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ if\ there\ is\ an\ equals\ sign,\ read\ the\ attribute\ value.\ Otherwise}}
+\DoxyCodeLine{00244\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ record\ a\ blank\ value\ and\ continue}}
+\DoxyCodeLine{00245\ \ \ \ \ \ \ \ \ \ \ \ \ attributes[\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}].clear();}
+\DoxyCodeLine{00246\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{00247\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00248\ }
+\DoxyCodeLine{00249\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ advance\ past\ the\ '='}}
+\DoxyCodeLine{00250\ \ \ \ \ \ \ \ \ ++cursor;}
+\DoxyCodeLine{00251\ }
+\DoxyCodeLine{00252\ \ \ \ \ \ \ \ \ cursor\ =\ http::parser::extract\_all\_lws(cursor,end);}
+\DoxyCodeLine{00253\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (cursor\ ==\ end)\ \{}
+\DoxyCodeLine{00254\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ error:\ expected\ a\ token\ or\ quoted\ string}}
+\DoxyCodeLine{00255\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ begin;}
+\DoxyCodeLine{00256\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00257\ }
+\DoxyCodeLine{00258\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ http::parser::extract\_quoted\_string(cursor,end);}
+\DoxyCodeLine{00259\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.second\ !=\ cursor)\ \{}
+\DoxyCodeLine{00260\ \ \ \ \ \ \ \ \ \ \ \ \ attributes[\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}]\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.first;}
+\DoxyCodeLine{00261\ \ \ \ \ \ \ \ \ \ \ \ \ cursor\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.second;}
+\DoxyCodeLine{00262\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{00263\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00264\ }
+\DoxyCodeLine{00265\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ http::parser::extract\_token(cursor,end);}
+\DoxyCodeLine{00266\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.first.empty())\ \{}
+\DoxyCodeLine{00267\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ error\ :\ expected\ token\ or\ quoted\ string}}
+\DoxyCodeLine{00268\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ begin;}
+\DoxyCodeLine{00269\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00270\ \ \ \ \ \ \ \ \ \ \ \ \ attributes[\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}]\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.first;}
+\DoxyCodeLine{00271\ \ \ \ \ \ \ \ \ \ \ \ \ cursor\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.second;}
+\DoxyCodeLine{00272\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00273\ \ \ \ \ \}}
+\DoxyCodeLine{00274\ }
+\DoxyCodeLine{00275\ \ \ \ \ \textcolor{keywordflow}{return}\ cursor;}
+\DoxyCodeLine{00276\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacewebsocketpp_1_1http_1_1parser_ac13fb3aca2101c9e6d2ee14039f1a758_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacewebsocketpp_1_1http_1_1parser_ac13fb3aca2101c9e6d2ee14039f1a758_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacewebsocketpp_1_1http_1_1parser_a1dacef9abccd8e5b6c572447d9f5a3ab}\index{websocketpp::http::parser@{websocketpp::http::parser}!extract\_lws@{extract\_lws}}
+\index{extract\_lws@{extract\_lws}!websocketpp::http::parser@{websocketpp::http::parser}}
+\doxysubsubsection{\texorpdfstring{extract\_lws()}{extract\_lws()}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1http_1_1parser_a1dacef9abccd8e5b6c572447d9f5a3ab} 
+template$<$typename Input\+Iterator $>$ \\
+Input\+Iterator websocketpp\+::http\+::parser\+::extract\+\_\+lws (\begin{DoxyParamCaption}\item[{Input\+Iterator}]{begin}{, }\item[{Input\+Iterator}]{end}{}\end{DoxyParamCaption})}
+
+Read one unit of linear white space and return the iterator to the character afterwards. If {\ttfamily begin} is returned, no whitespace was extracted.
+
+
+\begin{DoxyParams}{Parameters}
+{\em begin} & An iterator to the beginning of the sequence \\
+\hline
+{\em end} & An iterator to the end of the sequence \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+An iterator to the character after the linear whitespace read 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00139}{139}} of file \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00140\ \ \ \ \ InputIterator\ it\ =\ begin;}
+\DoxyCodeLine{00141\ }
+\DoxyCodeLine{00142\ \ \ \ \ \textcolor{comment}{//\ strip\ leading\ CRLF}}
+\DoxyCodeLine{00143\ \ \ \ \ \textcolor{keywordflow}{if}\ (end-\/begin\ >\ 2\ \&\&\ *begin\ ==\ \textcolor{charliteral}{'\(\backslash\)r'}\ \&\&\ *(begin+1)\ ==\ \textcolor{charliteral}{'\(\backslash\)n'}\ \&\&}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1http_a8ff7039dd19159bdbce3b98159c66ae2}{is\_whitespace\_char}}(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\textcolor{keyword}{>}(*(begin+2))))}
+\DoxyCodeLine{00145\ \ \ \ \ \{}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ it+=3;}
+\DoxyCodeLine{00147\ \ \ \ \ \}}
+\DoxyCodeLine{00148\ }
+\DoxyCodeLine{00149\ \ \ \ \ it\ =\ std::find\_if(it,end,\&is\_not\_whitespace\_char);}
+\DoxyCodeLine{00150\ \ \ \ \ \textcolor{keywordflow}{return}\ it;}
+\DoxyCodeLine{00151\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=339pt]{namespacewebsocketpp_1_1http_1_1parser_a1dacef9abccd8e5b6c572447d9f5a3ab_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacewebsocketpp_1_1http_1_1parser_a1dacef9abccd8e5b6c572447d9f5a3ab_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacewebsocketpp_1_1http_1_1parser_adabfd491d364be43bee4c7cad63e7e08}\index{websocketpp::http::parser@{websocketpp::http::parser}!extract\_parameters@{extract\_parameters}}
+\index{extract\_parameters@{extract\_parameters}!websocketpp::http::parser@{websocketpp::http::parser}}
+\doxysubsubsection{\texorpdfstring{extract\_parameters()}{extract\_parameters()}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1http_1_1parser_adabfd491d364be43bee4c7cad63e7e08} 
+template$<$typename Input\+Iterator $>$ \\
+Input\+Iterator websocketpp\+::http\+::parser\+::extract\+\_\+parameters (\begin{DoxyParamCaption}\item[{Input\+Iterator}]{begin}{, }\item[{Input\+Iterator}]{end}{, }\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1http_a2c285bc959df5a63bf962bed842fccfb}{parameter\+\_\+list}} \&}]{parameters}{}\end{DoxyParamCaption})}
+
+An http parameters list is a comma delimited list of tokens followed by optional semicolon delimited attributes lists.
+
+Parameters extracted are appended to the supplied parameters list {\ttfamily parameters}.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em begin} & An iterator to the beginning of the sequence \\
+\hline
+\mbox{\texttt{ in}}  & {\em end} & An iterator to the end of the sequence \\
+\hline
+\mbox{\texttt{ out}}  & {\em parameters} & \doxylink{struct_a}{A} reference to the parameters list to append paramter values extracted to \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+An iterator to the character after the last parameter read 
+\end{DoxyReturn}
+LWS token LWS \texorpdfstring{$\ast$}{*}("{};"{} method-\/param) LWS ,=loop again
+
+Definition at line \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00293}{293}} of file \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00295\ \{}
+\DoxyCodeLine{00296\ \ \ \ \ InputIterator\ cursor;}
+\DoxyCodeLine{00297\ }
+\DoxyCodeLine{00298\ \ \ \ \ \textcolor{keywordflow}{if}\ (begin\ ==\ end)\ \{}
+\DoxyCodeLine{00299\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ error:\ expected\ non-\/zero\ length\ range}}
+\DoxyCodeLine{00300\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ begin;}
+\DoxyCodeLine{00301\ \ \ \ \ \}}
+\DoxyCodeLine{00302\ }
+\DoxyCodeLine{00303\ \ \ \ \ cursor\ =\ begin;}
+\DoxyCodeLine{00304\ \ \ \ \ std::pair<std::string,InputIterator>\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00305\ }
+\DoxyCodeLine{00314\ \ \ \ \ \textcolor{keywordflow}{while}\ (cursor\ !=\ end)\ \{}
+\DoxyCodeLine{00315\ \ \ \ \ \ \ \ \ std::string\ parameter\_name;}
+\DoxyCodeLine{00316\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1http_a9744f4104772b987aa9e86c35ce1357b}{attribute\_list}}\ attributes;}
+\DoxyCodeLine{00317\ }
+\DoxyCodeLine{00318\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ extract\ any\ stray\ whitespace}}
+\DoxyCodeLine{00319\ \ \ \ \ \ \ \ \ cursor\ =\ http::parser::extract\_all\_lws(cursor,end);}
+\DoxyCodeLine{00320\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (cursor\ ==\ end)\ \{\textcolor{keywordflow}{break};\}}
+\DoxyCodeLine{00321\ }
+\DoxyCodeLine{00322\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ http::parser::extract\_token(cursor,end);}
+\DoxyCodeLine{00323\ }
+\DoxyCodeLine{00324\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.first.empty())\ \{}
+\DoxyCodeLine{00325\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ error:\ expected\ a\ token}}
+\DoxyCodeLine{00326\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ begin;}
+\DoxyCodeLine{00327\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00328\ \ \ \ \ \ \ \ \ \ \ \ \ parameter\_name\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.first;}
+\DoxyCodeLine{00329\ \ \ \ \ \ \ \ \ \ \ \ \ cursor\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.second;}
+\DoxyCodeLine{00330\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00331\ }
+\DoxyCodeLine{00332\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Safe\ break\ point,\ insert\ parameter\ with\ blank\ attributes\ and\ exit}}
+\DoxyCodeLine{00333\ \ \ \ \ \ \ \ \ cursor\ =\ http::parser::extract\_all\_lws(cursor,end);}
+\DoxyCodeLine{00334\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (cursor\ ==\ end)\ \{}
+\DoxyCodeLine{00335\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//parameters[parameter\_name]\ =\ attributes;}}
+\DoxyCodeLine{00336\ \ \ \ \ \ \ \ \ \ \ \ \ parameters.push\_back(std::make\_pair(parameter\_name,attributes));}
+\DoxyCodeLine{00337\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00338\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00339\ }
+\DoxyCodeLine{00340\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ there\ is\ an\ attribute\ list,\ read\ it\ in}}
+\DoxyCodeLine{00341\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (*cursor\ ==\ \textcolor{charliteral}{';'})\ \{}
+\DoxyCodeLine{00342\ \ \ \ \ \ \ \ \ \ \ \ \ InputIterator\ acursor;}
+\DoxyCodeLine{00343\ }
+\DoxyCodeLine{00344\ \ \ \ \ \ \ \ \ \ \ \ \ ++cursor;}
+\DoxyCodeLine{00345\ \ \ \ \ \ \ \ \ \ \ \ \ acursor\ =\ http::parser::extract\_attributes(cursor,end,attributes);}
+\DoxyCodeLine{00346\ }
+\DoxyCodeLine{00347\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (acursor\ ==\ cursor)\ \{}
+\DoxyCodeLine{00348\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ attribute\ extraction\ ended\ in\ syntax\ error}}
+\DoxyCodeLine{00349\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ begin;}
+\DoxyCodeLine{00350\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00351\ }
+\DoxyCodeLine{00352\ \ \ \ \ \ \ \ \ \ \ \ \ cursor\ =\ acursor;}
+\DoxyCodeLine{00353\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00354\ }
+\DoxyCodeLine{00355\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ insert\ parameter\ into\ output\ list}}
+\DoxyCodeLine{00356\ \ \ \ \ \ \ \ \ \textcolor{comment}{//parameters[parameter\_name]\ =\ attributes;}}
+\DoxyCodeLine{00357\ \ \ \ \ \ \ \ \ parameters.push\_back(std::make\_pair(parameter\_name,attributes));}
+\DoxyCodeLine{00358\ }
+\DoxyCodeLine{00359\ \ \ \ \ \ \ \ \ cursor\ =\ http::parser::extract\_all\_lws(cursor,end);}
+\DoxyCodeLine{00360\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (cursor\ ==\ end)\ \{\textcolor{keywordflow}{break};\}}
+\DoxyCodeLine{00361\ }
+\DoxyCodeLine{00362\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ if\ next\ char\ is\ ','\ then\ read\ another\ parameter,\ else\ stop}}
+\DoxyCodeLine{00363\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (*cursor\ !=\ \textcolor{charliteral}{','})\ \{}
+\DoxyCodeLine{00364\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00365\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00366\ }
+\DoxyCodeLine{00367\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ advance\ past\ comma}}
+\DoxyCodeLine{00368\ \ \ \ \ \ \ \ \ ++cursor;}
+\DoxyCodeLine{00369\ }
+\DoxyCodeLine{00370\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (cursor\ ==\ end)\ \{}
+\DoxyCodeLine{00371\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ expected\ more\ bytes\ after\ a\ comma}}
+\DoxyCodeLine{00372\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ begin;}
+\DoxyCodeLine{00373\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00374\ \ \ \ \ \}}
+\DoxyCodeLine{00375\ }
+\DoxyCodeLine{00376\ \ \ \ \ \textcolor{keywordflow}{return}\ cursor;}
+\DoxyCodeLine{00377\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacewebsocketpp_1_1http_1_1parser_adabfd491d364be43bee4c7cad63e7e08_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacewebsocketpp_1_1http_1_1parser_adabfd491d364be43bee4c7cad63e7e08_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacewebsocketpp_1_1http_1_1parser_a2a35158d976b84679dda4fd4a4b237bc}\index{websocketpp::http::parser@{websocketpp::http::parser}!extract\_quoted\_string@{extract\_quoted\_string}}
+\index{extract\_quoted\_string@{extract\_quoted\_string}!websocketpp::http::parser@{websocketpp::http::parser}}
+\doxysubsubsection{\texorpdfstring{extract\_quoted\_string()}{extract\_quoted\_string()}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1http_1_1parser_a2a35158d976b84679dda4fd4a4b237bc} 
+template$<$typename Input\+Iterator $>$ \\
+std\+::pair$<$ std\+::string, Input\+Iterator $>$ websocketpp\+::http\+::parser\+::extract\+\_\+quoted\+\_\+string (\begin{DoxyParamCaption}\item[{Input\+Iterator}]{begin}{, }\item[{Input\+Iterator}]{end}{}\end{DoxyParamCaption})}
+
+Read a double quoted string starting at {\ttfamily begin}. The quotes themselves are stripped. The quoted value is returned along with an iterator to the next character to read
+
+
+\begin{DoxyParams}{Parameters}
+{\em begin} & An iterator to the beginning of the sequence \\
+\hline
+{\em end} & An iterator to the end of the sequence \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\doxylink{struct_a}{A} pair containing the string read and an iterator to the next character in the stream 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00092}{92}} of file \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00094\ \{}
+\DoxyCodeLine{00095\ \ \ \ \ std::string\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{00096\ }
+\DoxyCodeLine{00097\ \ \ \ \ \textcolor{keywordflow}{if}\ (end\ ==\ begin)\ \{}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::make\_pair(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},begin);}
+\DoxyCodeLine{00099\ \ \ \ \ \}}
+\DoxyCodeLine{00100\ }
+\DoxyCodeLine{00101\ \ \ \ \ \textcolor{keywordflow}{if}\ (*begin\ !=\ \textcolor{charliteral}{'"{}'})\ \{}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::make\_pair(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},begin);}
+\DoxyCodeLine{00103\ \ \ \ \ \}}
+\DoxyCodeLine{00104\ }
+\DoxyCodeLine{00105\ \ \ \ \ InputIterator\ cursor\ =\ begin+1;}
+\DoxyCodeLine{00106\ \ \ \ \ InputIterator\ marker\ =\ cursor;}
+\DoxyCodeLine{00107\ }
+\DoxyCodeLine{00108\ \ \ \ \ cursor\ =\ std::find(cursor,end,\textcolor{charliteral}{'"{}'});}
+\DoxyCodeLine{00109\ }
+\DoxyCodeLine{00110\ \ \ \ \ \textcolor{keywordflow}{while}\ (cursor\ !=\ end)\ \{}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ either\ this\ is\ the\ end\ or\ a\ quoted\ string}}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (*(cursor-\/1)\ ==\ \textcolor{charliteral}{'\(\backslash\)\(\backslash\)'})\ \{}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.append(marker,cursor-\/1);}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.append(1,\textcolor{charliteral}{'"{}'});}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \ \ \ ++cursor;}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \ \ \ marker\ =\ cursor;}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.append(marker,cursor);}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ \ \ \ ++cursor;}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::make\_pair(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},cursor);}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00122\ }
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ cursor\ =\ std::find(cursor,end,\textcolor{charliteral}{'"{}'});}
+\DoxyCodeLine{00124\ \ \ \ \ \}}
+\DoxyCodeLine{00125\ }
+\DoxyCodeLine{00126\ \ \ \ \ \textcolor{keywordflow}{return}\ std::make\_pair(\textcolor{stringliteral}{"{}"{}},begin);}
+\DoxyCodeLine{00127\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacewebsocketpp_1_1http_1_1parser_a2a35158d976b84679dda4fd4a4b237bc_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacewebsocketpp_1_1http_1_1parser_a6c56e2f70369551a1dcd9816f3d4d2eb}\index{websocketpp::http::parser@{websocketpp::http::parser}!extract\_token@{extract\_token}}
+\index{extract\_token@{extract\_token}!websocketpp::http::parser@{websocketpp::http::parser}}
+\doxysubsubsection{\texorpdfstring{extract\_token()}{extract\_token()}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1http_1_1parser_a6c56e2f70369551a1dcd9816f3d4d2eb} 
+template$<$typename Input\+Iterator $>$ \\
+std\+::pair$<$ std\+::string, Input\+Iterator $>$ websocketpp\+::http\+::parser\+::extract\+\_\+token (\begin{DoxyParamCaption}\item[{Input\+Iterator}]{begin}{, }\item[{Input\+Iterator}]{end}{}\end{DoxyParamCaption})}
+
+Read until a non-\/token character is found and then return the token and iterator to the next character to read
+
+
+\begin{DoxyParams}{Parameters}
+{\em begin} & An iterator to the beginning of the sequence \\
+\hline
+{\em end} & An iterator to the end of the sequence \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\doxylink{struct_a}{A} pair containing the token and an iterator to the next character in the stream 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00073}{73}} of file \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00075\ \{}
+\DoxyCodeLine{00076\ \ \ \ \ InputIterator\ it\ =\ std::find\_if(begin,end,\&is\_not\_token\_char);}
+\DoxyCodeLine{00077\ \ \ \ \ \textcolor{keywordflow}{return}\ std::make\_pair(std::string(begin,it),it);}
+\DoxyCodeLine{00078\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=327pt]{namespacewebsocketpp_1_1http_1_1parser_a6c56e2f70369551a1dcd9816f3d4d2eb_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacewebsocketpp_1_1http_1_1parser_a6c56e2f70369551a1dcd9816f3d4d2eb_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacewebsocketpp_1_1http_1_1parser_ae656f7130716b25fb2a34cee77a0444e}\index{websocketpp::http::parser@{websocketpp::http::parser}!strip\_lws@{strip\_lws}}
+\index{strip\_lws@{strip\_lws}!websocketpp::http::parser@{websocketpp::http::parser}}
+\doxysubsubsection{\texorpdfstring{strip\_lws()}{strip\_lws()}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1http_1_1parser_ae656f7130716b25fb2a34cee77a0444e} 
+std\+::string websocketpp\+::http\+::parser\+::strip\+\_\+lws (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{input}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00379}{379}} of file \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00379\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00380\ \ \ \ \ std::string::const\_iterator\ begin\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_a263c7c466bbed56948d5877b9c33c354}{extract\_all\_lws}}(input.begin(),input.end());}
+\DoxyCodeLine{00381\ \ \ \ \ \textcolor{keywordflow}{if}\ (begin\ ==\ input.end())\ \{}
+\DoxyCodeLine{00382\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::string();}
+\DoxyCodeLine{00383\ \ \ \ \ \}}
+\DoxyCodeLine{00384\ }
+\DoxyCodeLine{00385\ \ \ \ \ std::string::const\_reverse\_iterator\ rbegin\ =\ extract\_all\_lws(input.rbegin(),input.rend());}
+\DoxyCodeLine{00386\ \ \ \ \ \textcolor{keywordflow}{if}\ (rbegin\ ==\ input.rend())\ \{}
+\DoxyCodeLine{00387\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::string();}
+\DoxyCodeLine{00388\ \ \ \ \ \}}
+\DoxyCodeLine{00389\ }
+\DoxyCodeLine{00390\ \ \ \ \ \textcolor{keywordflow}{return}\ std::string(begin,rbegin.base());}
+\DoxyCodeLine{00391\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacewebsocketpp_1_1http_1_1parser_ae656f7130716b25fb2a34cee77a0444e_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacewebsocketpp_1_1http_1_1parser_ae656f7130716b25fb2a34cee77a0444e_icgraph}
+\end{center}
+\end{figure}

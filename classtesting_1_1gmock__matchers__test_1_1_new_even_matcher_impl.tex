@@ -1,0 +1,105 @@
+\doxysection{testing\+::gmock\+\_\+matchers\+\_\+test\+::New\+Even\+Matcher\+Impl Class Reference}
+\hypertarget{classtesting_1_1gmock__matchers__test_1_1_new_even_matcher_impl}{}\label{classtesting_1_1gmock__matchers__test_1_1_new_even_matcher_impl}\index{testing::gmock\_matchers\_test::NewEvenMatcherImpl@{testing::gmock\_matchers\_test::NewEvenMatcherImpl}}
+
+
+Inheritance diagram for testing\+::gmock\+\_\+matchers\+\_\+test\+::New\+Even\+Matcher\+Impl\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=229pt]{classtesting_1_1gmock__matchers__test_1_1_new_even_matcher_impl__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for testing\+::gmock\+\_\+matchers\+\_\+test\+::New\+Even\+Matcher\+Impl\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=229pt]{classtesting_1_1gmock__matchers__test_1_1_new_even_matcher_impl__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual bool \mbox{\hyperlink{classtesting_1_1gmock__matchers__test_1_1_new_even_matcher_impl_a56819af55d88569fdfaa51b937f76337}{Match\+And\+Explain}} (int x, \mbox{\hyperlink{classtesting_1_1_match_result_listener}{Match\+Result\+Listener}} \texorpdfstring{$\ast$}{*}listener) const
+\item 
+virtual void \mbox{\hyperlink{classtesting_1_1gmock__matchers__test_1_1_new_even_matcher_impl_aece368c865501da4b30620d06a2690cd}{Describe\+To}} (ostream \texorpdfstring{$\ast$}{*}os) const
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classtesting_1_1_matcher_interface}{testing\+::\+Matcher\+Interface$<$ T $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual bool \mbox{\hyperlink{classtesting_1_1_matcher_interface_a296b43607cd99d60365f0e6a762777cf}{Match\+And\+Explain}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} x, \mbox{\hyperlink{classtesting_1_1_match_result_listener}{Match\+Result\+Listener}} \texorpdfstring{$\ast$}{*}listener) const =0
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classtesting_1_1_matcher_describer_interface}{testing\+::\+Matcher\+Describer\+Interface}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{classtesting_1_1_matcher_describer_interface_ae2236a56ad2cc35cad10efc1208854f4}{\texorpdfstring{$\sim$}{\string~}\+Matcher\+Describer\+Interface}} ()
+\item 
+virtual void \mbox{\hyperlink{classtesting_1_1_matcher_describer_interface_ad9f861588bd969b6e3e717f13bb94e7b}{Describe\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}os) const =0
+\item 
+virtual void \mbox{\hyperlink{classtesting_1_1_matcher_describer_interface_a2071afbc47097c4d1c0064275af34db0}{Describe\+Negation\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}os) const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers__test_8cc_source_l00281}{281}} of file \mbox{\hyperlink{gmock-matchers__test_8cc_source}{gmock-\/matchers\+\_\+test.\+cc}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1gmock__matchers__test_1_1_new_even_matcher_impl_aece368c865501da4b30620d06a2690cd}\index{testing::gmock\_matchers\_test::NewEvenMatcherImpl@{testing::gmock\_matchers\_test::NewEvenMatcherImpl}!DescribeTo@{DescribeTo}}
+\index{DescribeTo@{DescribeTo}!testing::gmock\_matchers\_test::NewEvenMatcherImpl@{testing::gmock\_matchers\_test::NewEvenMatcherImpl}}
+\doxysubsubsection{\texorpdfstring{DescribeTo()}{DescribeTo()}}
+{\footnotesize\ttfamily \label{classtesting_1_1gmock__matchers__test_1_1_new_even_matcher_impl_aece368c865501da4b30620d06a2690cd} 
+virtual void testing\+::gmock\+\_\+matchers\+\_\+test\+::\+New\+Even\+Matcher\+Impl\+::\+Describe\+To (\begin{DoxyParamCaption}\item[{ostream \texorpdfstring{$\ast$}{*}}]{os}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers__test_8cc_source_l00295}{295}} of file \mbox{\hyperlink{gmock-matchers__test_8cc_source}{gmock-\/matchers\+\_\+test.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00295\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00296\ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}is\ an\ even\ number"{}};}
+\DoxyCodeLine{00297\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1gmock__matchers__test_1_1_new_even_matcher_impl_a56819af55d88569fdfaa51b937f76337}\index{testing::gmock\_matchers\_test::NewEvenMatcherImpl@{testing::gmock\_matchers\_test::NewEvenMatcherImpl}!MatchAndExplain@{MatchAndExplain}}
+\index{MatchAndExplain@{MatchAndExplain}!testing::gmock\_matchers\_test::NewEvenMatcherImpl@{testing::gmock\_matchers\_test::NewEvenMatcherImpl}}
+\doxysubsubsection{\texorpdfstring{MatchAndExplain()}{MatchAndExplain()}}
+{\footnotesize\ttfamily \label{classtesting_1_1gmock__matchers__test_1_1_new_even_matcher_impl_a56819af55d88569fdfaa51b937f76337} 
+virtual bool testing\+::gmock\+\_\+matchers\+\_\+test\+::\+New\+Even\+Matcher\+Impl\+::\+Match\+And\+Explain (\begin{DoxyParamCaption}\item[{int}]{x}{, }\item[{\mbox{\hyperlink{classtesting_1_1_match_result_listener}{Match\+Result\+Listener}} \texorpdfstring{$\ast$}{*}}]{listener}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers__test_8cc_source_l00283}{283}} of file \mbox{\hyperlink{gmock-matchers__test_8cc_source}{gmock-\/matchers\+\_\+test.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00283\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00284\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ match\ =\ x\ \%\ 2\ ==\ 0;}
+\DoxyCodeLine{00285\ \ \ \ \ \textcolor{comment}{//\ Verifies\ that\ we\ can\ stream\ to\ a\ listener\ directly.}}
+\DoxyCodeLine{00286\ \ \ \ \ *listener\ <<\ \textcolor{stringliteral}{"{}value\ \%\ "{}}\ <<\ 2;}
+\DoxyCodeLine{00287\ \ \ \ \ \textcolor{keywordflow}{if}\ (listener-\/>stream()\ !=\ NULL)\ \{}
+\DoxyCodeLine{00288\ \ \ \ \ \ \ \textcolor{comment}{//\ Verifies\ that\ we\ can\ stream\ to\ a\ listener's\ underlying\ stream}}
+\DoxyCodeLine{00289\ \ \ \ \ \ \ \textcolor{comment}{//\ too.}}
+\DoxyCodeLine{00290\ \ \ \ \ \ \ *listener-\/>stream()\ <<\ \textcolor{stringliteral}{"{}\ ==\ "{}}\ <<\ (x\ \%\ 2);}
+\DoxyCodeLine{00291\ \ \ \ \ \}}
+\DoxyCodeLine{00292\ \ \ \ \ \textcolor{keywordflow}{return}\ match;}
+\DoxyCodeLine{00293\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1gmock__matchers__test_1_1_new_even_matcher_impl_a56819af55d88569fdfaa51b937f76337_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/test/\mbox{\hyperlink{gmock-matchers__test_8cc}{gmock-\/matchers\+\_\+test.\+cc}}\end{DoxyCompactItemize}

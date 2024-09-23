@@ -1,0 +1,5 @@
+<map id="websocket_endpoint::send" name="websocket_endpoint::send">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,146,46"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1endpoint.html#a5341f59de7ef1a565a2fd93daba212d5" title="Create a message and add it to the outgoing send queue (exception free)" alt="" coords="194,5,349,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="146,23,178,23,178,28,146,28"/>
+</map>

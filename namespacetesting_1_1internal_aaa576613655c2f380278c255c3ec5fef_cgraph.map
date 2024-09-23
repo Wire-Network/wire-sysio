@@ -1,0 +1,13 @@
+<map id="testing::internal::Int32FromEnvOrDie" name="testing::internal::Int32FromEnvOrDie">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,39,143,79"/>
+<area shape="rect" id="Node000002" href="$namespacetesting_1_1internal_1_1posix.html#aa78973d3f7aa4efd24742b0537c8cd50" title=" " alt="" coords="191,5,309,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="143,43,175,37,176,42,144,49"/>
+<area shape="rect" id="Node000003" href="$namespacetesting_1_1internal.html#ac06fc81336a3d80755f4020d34321766" title=" " alt="" coords="191,71,309,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="144,69,176,75,175,80,143,74"/>
+<area shape="rect" id="Node000004" href="$classtesting_1_1_message.html#a2cdc4df62bdcc9df37651a1cf527704e" title=" " alt="" coords="357,78,541,104"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="310,88,341,88,341,94,310,94"/>
+<area shape="rect" id="Node000005" href="$classtesting_1_1internal_1_1scoped__ptr.html#a5a78280b6a59ff4b63aae444efc61e3f" title=" " alt="" coords="603,37,721,78"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="535,75,587,67,588,72,536,80"/>
+<area shape="rect" id="Node000006" href="$namespacetesting_1_1internal.html#ac0a2b7f69fc829d80a39e925b6417e39" title=" " alt="" coords="589,103,735,143"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="539,102,574,107,573,112,539,107"/>
+</map>

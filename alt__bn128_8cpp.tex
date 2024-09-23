@@ -1,0 +1,49 @@
+\doxysection{libraries/fc/src/crypto/alt\+\_\+bn128.cpp File Reference}
+\hypertarget{alt__bn128_8cpp}{}\label{alt__bn128_8cpp}\index{libraries/fc/src/crypto/alt\_bn128.cpp@{libraries/fc/src/crypto/alt\_bn128.cpp}}
+{\ttfamily \#include $<$gmp.\+h$>$}\newline
+{\ttfamily \#include $<$fc/crypto/alt\+\_\+bn128.\+hpp$>$}\newline
+{\ttfamily \#include $<$libff/algebra/curves/alt\+\_\+bn128/alt\+\_\+bn128\+\_\+g1.\+hpp$>$}\newline
+{\ttfamily \#include $<$libff/algebra/curves/alt\+\_\+bn128/alt\+\_\+bn128\+\_\+g2.\+hpp$>$}\newline
+{\ttfamily \#include $<$libff/algebra/curves/alt\+\_\+bn128/alt\+\_\+bn128\+\_\+pairing.\+hpp$>$}\newline
+{\ttfamily \#include $<$libff/algebra/curves/alt\+\_\+bn128/alt\+\_\+bn128\+\_\+pp.\+hpp$>$}\newline
+{\ttfamily \#include $<$libff/common/profiling.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/throw\+\_\+exception.\+hpp$>$}\newline
+{\ttfamily \#include $<$algorithm$>$}\newline
+Include dependency graph for alt\+\_\+bn128.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{alt__bn128_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacefc}{fc}}
+\begin{DoxyCompactList}\small\item\em namespace \doxylink{namespacesysio_1_1chain}{sysio\+::chain} \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{namespacefc_af62d5a8b33c43786d94a749da86c5547}{fc\+::\+Scalar}} = \mbox{\hyperlink{classlibff_1_1bigint}{libff\+::bigint}}$<$\mbox{\hyperlink{namespacelibff_a8a389f4508b428cb426fd953e1d2fea1}{libff\+::alt\+\_\+bn128\+\_\+q\+\_\+limbs}}$>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{namespacefc_a3cf24032668b7b97941dcfe0afa82ebe}{fc\+::init\+Lib\+Snark}} () noexcept
+\item 
+\mbox{\hyperlink{namespacefc_af62d5a8b33c43786d94a749da86c5547}{Scalar}} \mbox{\hyperlink{namespacefc_a134fdeea1521ebed88b32666cf86a229}{fc\+::to\+\_\+scalar}} (const \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}} \&be) noexcept
+\item 
+std\+::variant$<$ \mbox{\hyperlink{namespacefc_acf2fac70bed3c7c7668279d9de619f72}{alt\+\_\+bn128\+\_\+error}}, \mbox{\hyperlink{classlibff_1_1alt__bn128___g1}{libff\+::alt\+\_\+bn128\+\_\+\+G1}} $>$ \mbox{\hyperlink{namespacefc_af6846e0b9097e4db1b1565f802eb92be}{fc\+::decode\+\_\+g1\+\_\+element}} (const \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}} \&bytes64\+\_\+be) noexcept
+\item 
+std\+::variant$<$ \mbox{\hyperlink{namespacefc_acf2fac70bed3c7c7668279d9de619f72}{alt\+\_\+bn128\+\_\+error}}, \mbox{\hyperlink{namespacelibff_a436a611ec8e4c5028e8cd4de22311397}{libff\+::alt\+\_\+bn128\+\_\+\+Fq2}} $>$ \mbox{\hyperlink{namespacefc_a954a6488501165f2e6bd7120268a7d7a}{fc\+::decode\+\_\+fp2\+\_\+element}} (const \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}} \&bytes64\+\_\+be) noexcept
+\item 
+std\+::variant$<$ \mbox{\hyperlink{namespacefc_acf2fac70bed3c7c7668279d9de619f72}{alt\+\_\+bn128\+\_\+error}}, \mbox{\hyperlink{classlibff_1_1alt__bn128___g2}{libff\+::alt\+\_\+bn128\+\_\+\+G2}} $>$ \mbox{\hyperlink{namespacefc_a175be88d40f9c9d83cb97bfdf3d74a5c}{fc\+::decode\+\_\+g2\+\_\+element}} (const \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}} \&bytes128\+\_\+be) noexcept
+\item 
+\mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}} \mbox{\hyperlink{namespacefc_a1964c6568c85b1b797dde1b2dfe0b3c0}{fc\+::encode\+\_\+g1\+\_\+element}} (\mbox{\hyperlink{classlibff_1_1alt__bn128___g1}{libff\+::alt\+\_\+bn128\+\_\+\+G1}} \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}) noexcept
+\item 
+std\+::variant$<$ \mbox{\hyperlink{namespacefc_acf2fac70bed3c7c7668279d9de619f72}{alt\+\_\+bn128\+\_\+error}}, \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}} $>$ \mbox{\hyperlink{namespacefc_aaccc65ddd035c56d5e92bedde7de3bde}{fc\+::alt\+\_\+bn128\+\_\+add}} (const \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}} \&op1, const \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}} \&op2)
+\item 
+std\+::variant$<$ \mbox{\hyperlink{namespacefc_acf2fac70bed3c7c7668279d9de619f72}{alt\+\_\+bn128\+\_\+error}}, \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}} $>$ \mbox{\hyperlink{namespacefc_adabebd5c846d83006ef00e1e63c5ec09}{fc\+::alt\+\_\+bn128\+\_\+mul}} (const \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}} \&g1\+\_\+point, const \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}} \&scalar)
+\item 
+std\+::variant$<$ \mbox{\hyperlink{namespacefc_acf2fac70bed3c7c7668279d9de619f72}{alt\+\_\+bn128\+\_\+error}}, bool $>$ \mbox{\hyperlink{namespacefc_afff05d8da5063eecb517149a272d20ed}{fc\+::alt\+\_\+bn128\+\_\+pair}} (const \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}} \&g1\+\_\+g2\+\_\+pairs, const \mbox{\hyperlink{namespacefc_a978f9e97f64eb2ce6cbe892d3cc93397}{yield\+\_\+function\+\_\+t}} \&yield)
+\end{DoxyCompactItemize}

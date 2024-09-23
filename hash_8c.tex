@@ -1,0 +1,572 @@
+\doxysection{libraries/yubihsm/common/hash.c File Reference}
+\hypertarget{hash_8c}{}\label{hash_8c}\index{libraries/yubihsm/common/hash.c@{libraries/yubihsm/common/hash.c}}
+{\ttfamily \#include $<$openssl/evp.\+h$>$}\newline
+{\ttfamily \#include "{}hash.\+h"{}}\newline
+{\ttfamily \#include "{}insecure\+\_\+memzero.\+h"{}}\newline
+Include dependency graph for hash.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{hash_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct__hash__ctx}{\+\_\+hash\+\_\+ctx}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef struct \+\_\+hash\+\_\+ctx \mbox{\hyperlink{hash_8c_a339f63d19890564111f109497dd4f9c5}{\+\_\+hash\+\_\+ctx}}
+\item 
+typedef struct \mbox{\hyperlink{struct__hash__ctx}{\+\_\+hash\+\_\+ctx}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{hash_8c_a468d019cb1592cf294bd39fafd3bda1f}{hash\+\_\+ctx}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+const \mbox{\hyperlink{aes_8h_a3f74f478154eb204fc614b5e9fcde0d1}{YH\+\_\+\+INTERNAL}} EVP\+\_\+\+MD \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{hash_8c_a2de35447908a9afccca42825a87854fb}{get\+\_\+hash}} (\mbox{\hyperlink{yubihsm_2common_2hash_8h_a488906826f8aaf7e850c35889d560089}{hash\+\_\+t}} hash)
+\item 
+bool \mbox{\hyperlink{hash_8c_a062ee0f36e0c16725c22a5d9d964a8cd}{hash\+\_\+bytes}} (const \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}in, size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}, \mbox{\hyperlink{yubihsm_2common_2hash_8h_a488906826f8aaf7e850c35889d560089}{hash\+\_\+t}} hash, \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}out, size\+\_\+t \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a565e4b6f63fecad4c290b50ee6684ee3}{out\+\_\+len}})
+\item 
+bool \mbox{\hyperlink{hash_8c_a3cc1419f3a2f6401e22e8b339b73c609}{hash\+\_\+create}} (\mbox{\hyperlink{struct__hash__ctx}{\+\_\+hash\+\_\+ctx}} \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}ctx, \mbox{\hyperlink{yubihsm_2common_2hash_8h_a488906826f8aaf7e850c35889d560089}{hash\+\_\+t}} hash)
+\item 
+bool \mbox{\hyperlink{hash_8c_a6146398e6f54347faf3e9c4e6c7cde7b}{hash\+\_\+init}} (\mbox{\hyperlink{struct__hash__ctx}{\+\_\+hash\+\_\+ctx}} \texorpdfstring{$\ast$}{*}ctx)
+\item 
+bool \mbox{\hyperlink{hash_8c_a00c3b2f60d87f408d16804b22c4fd2c2}{hash\+\_\+update}} (\mbox{\hyperlink{struct__hash__ctx}{\+\_\+hash\+\_\+ctx}} \texorpdfstring{$\ast$}{*}ctx, const \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}in, size\+\_\+t cb\+\_\+in)
+\item 
+bool \mbox{\hyperlink{hash_8c_aa23c36aa0b4bb19de4bbeaa64720e494}{hash\+\_\+final}} (\mbox{\hyperlink{struct__hash__ctx}{\+\_\+hash\+\_\+ctx}} \texorpdfstring{$\ast$}{*}ctx, \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}out, size\+\_\+t \texorpdfstring{$\ast$}{*}pcb\+\_\+out)
+\item 
+bool \mbox{\hyperlink{hash_8c_a9d8dba1d151d3db0137137a845bccc8b}{hash\+\_\+destroy}} (\mbox{\hyperlink{struct__hash__ctx}{\+\_\+hash\+\_\+ctx}} \texorpdfstring{$\ast$}{*}ctx)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{hash_8c_a339f63d19890564111f109497dd4f9c5}\index{hash.c@{hash.c}!\_hash\_ctx@{\_hash\_ctx}}
+\index{\_hash\_ctx@{\_hash\_ctx}!hash.c@{hash.c}}
+\doxysubsubsection{\texorpdfstring{\_hash\_ctx}{\_hash\_ctx}}
+{\footnotesize\ttfamily \label{hash_8c_a339f63d19890564111f109497dd4f9c5} 
+typedef struct \+\_\+hash\+\_\+ctx \+\_\+hash\+\_\+ctx}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm_2common_2hash_8h_source_l00050}{50}} of file \mbox{\hyperlink{yubihsm_2common_2hash_8h_source}{hash.\+h}}.
+
+\Hypertarget{hash_8c_a468d019cb1592cf294bd39fafd3bda1f}\index{hash.c@{hash.c}!hash\_ctx@{hash\_ctx}}
+\index{hash\_ctx@{hash\_ctx}!hash.c@{hash.c}}
+\doxysubsubsection{\texorpdfstring{hash\_ctx}{hash\_ctx}}
+{\footnotesize\ttfamily \label{hash_8c_a468d019cb1592cf294bd39fafd3bda1f} 
+typedef struct \mbox{\hyperlink{struct__hash__ctx}{\+\_\+hash\+\_\+ctx}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{hash_8c_a468d019cb1592cf294bd39fafd3bda1f}{hash\+\_\+ctx}}}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm_2common_2hash_8h_source_l00050}{50}} of file \mbox{\hyperlink{yubihsm_2common_2hash_8h_source}{hash.\+h}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{hash_8c_a2de35447908a9afccca42825a87854fb}\index{hash.c@{hash.c}!get\_hash@{get\_hash}}
+\index{get\_hash@{get\_hash}!hash.c@{hash.c}}
+\doxysubsubsection{\texorpdfstring{get\_hash()}{get\_hash()}}
+{\footnotesize\ttfamily \label{hash_8c_a2de35447908a9afccca42825a87854fb} 
+const \mbox{\hyperlink{aes_8h_a3f74f478154eb204fc614b5e9fcde0d1}{YH\+\_\+\+INTERNAL}} EVP\+\_\+\+MD \texorpdfstring{$\ast$}{*} get\+\_\+hash (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{yubihsm_2common_2hash_8h_a488906826f8aaf7e850c35889d560089}{hash\+\_\+t}}}]{hash}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{hash_8c_source_l00042}{42}} of file \mbox{\hyperlink{hash_8c_source}{hash.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00043\ \ \ \textcolor{keywordflow}{switch}\ (hash)\ \{}
+\DoxyCodeLine{00044\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{yubihsm_2common_2hash_8h_a488906826f8aaf7e850c35889d560089aad146b360b9e19d5e96401bdf594cf44}{\_NONE}}:}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ NULL;}
+\DoxyCodeLine{00046\ }
+\DoxyCodeLine{00047\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{yubihsm_2common_2hash_8h_a488906826f8aaf7e850c35889d560089a970f17bf10faf2a31f535116e97f6b4a}{\_SHA1}}:}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ EVP\_sha1();}
+\DoxyCodeLine{00049\ }
+\DoxyCodeLine{00050\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{yubihsm_2common_2hash_8h_a488906826f8aaf7e850c35889d560089af0ab1a9d65ceafa4ba1f6f177e379258}{\_SHA256}}:}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ EVP\_sha256();}
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{yubihsm_2common_2hash_8h_a488906826f8aaf7e850c35889d560089a46254673795a1d78b2d84adbf88d8bb2}{\_SHA384}}:}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ EVP\_sha384();}
+\DoxyCodeLine{00055\ }
+\DoxyCodeLine{00056\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{yubihsm_2common_2hash_8h_a488906826f8aaf7e850c35889d560089a0dbf438178c608dea7392e75c9b7ae2d}{\_SHA512}}:}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ EVP\_sha512();}
+\DoxyCodeLine{00058\ }
+\DoxyCodeLine{00059\ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ NULL;}
+\DoxyCodeLine{00061\ \ \ \}}
+\DoxyCodeLine{00062\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{hash_8c_a2de35447908a9afccca42825a87854fb_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{hash_8c_a062ee0f36e0c16725c22a5d9d964a8cd}\index{hash.c@{hash.c}!hash\_bytes@{hash\_bytes}}
+\index{hash\_bytes@{hash\_bytes}!hash.c@{hash.c}}
+\doxysubsubsection{\texorpdfstring{hash\_bytes()}{hash\_bytes()}}
+{\footnotesize\ttfamily \label{hash_8c_a062ee0f36e0c16725c22a5d9d964a8cd} 
+bool hash\+\_\+bytes (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{in}{, }\item[{size\+\_\+t}]{len}{, }\item[{\mbox{\hyperlink{yubihsm_2common_2hash_8h_a488906826f8aaf7e850c35889d560089}{hash\+\_\+t}}}]{hash}{, }\item[{\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{out}{, }\item[{size\+\_\+t \texorpdfstring{$\ast$}{*}}]{out\+\_\+len}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{hash_8c_source_l00090}{90}} of file \mbox{\hyperlink{hash_8c_source}{hash.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00092\ \textcolor{preprocessor}{\#ifndef\ \_WIN32\_BCRYPT}}
+\DoxyCodeLine{00093\ }
+\DoxyCodeLine{00094\ \ \ \textcolor{keyword}{const}\ EVP\_MD\ *md;}
+\DoxyCodeLine{00095\ }
+\DoxyCodeLine{00096\ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ d\_len;}
+\DoxyCodeLine{00097\ }
+\DoxyCodeLine{00098\ \ \ md\ =\ \mbox{\hyperlink{hash_8c_a2de35447908a9afccca42825a87854fb}{get\_hash}}(hash);}
+\DoxyCodeLine{00099\ \ \ \textcolor{keywordflow}{if}\ (md\ ==\ NULL)\ \{}
+\DoxyCodeLine{00100\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00101\ \ \ \}}
+\DoxyCodeLine{00102\ }
+\DoxyCodeLine{00103\ \ \ EVP\_MD\_CTX\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a43a691c1ec814f023faf4d9cc176ec04}{mdctx}}\ =\ EVP\_MD\_CTX\_create();}
+\DoxyCodeLine{00104\ \ \ EVP\_DigestInit\_ex(\mbox{\hyperlink{yubihsm__pkcs11_8c_a43a691c1ec814f023faf4d9cc176ec04}{mdctx}},\ md,\ NULL);}
+\DoxyCodeLine{00105\ \ \ EVP\_DigestUpdate(\mbox{\hyperlink{yubihsm__pkcs11_8c_a43a691c1ec814f023faf4d9cc176ec04}{mdctx}},\ in,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}});}
+\DoxyCodeLine{00106\ \ \ EVP\_DigestFinal\_ex(\mbox{\hyperlink{yubihsm__pkcs11_8c_a43a691c1ec814f023faf4d9cc176ec04}{mdctx}},\ out,\ \&d\_len);}
+\DoxyCodeLine{00107\ }
+\DoxyCodeLine{00108\ \ \ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a565e4b6f63fecad4c290b50ee6684ee3}{out\_len}}\ =\ (\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}})\ d\_len;}
+\DoxyCodeLine{00109\ }
+\DoxyCodeLine{00110\ \ \ EVP\_MD\_CTX\_destroy(\mbox{\hyperlink{yubihsm__pkcs11_8c_a43a691c1ec814f023faf4d9cc176ec04}{mdctx}});}
+\DoxyCodeLine{00111\ }
+\DoxyCodeLine{00112\ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00113\ }
+\DoxyCodeLine{00114\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00115\ }
+\DoxyCodeLine{00116\ \ \ \textcolor{keywordtype}{bool}\ res\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00117\ \ \ NTSTATUS\ status\ =\ 0;}
+\DoxyCodeLine{00118\ \ \ LPCWSTR\ alg\ =\ NULL;}
+\DoxyCodeLine{00119\ \ \ BCRYPT\_ALG\_HANDLE\ hAlg\ =\ 0;}
+\DoxyCodeLine{00120\ \ \ BCRYPT\_HASH\_HANDLE\ hHash\ =\ 0;}
+\DoxyCodeLine{00121\ \ \ DWORD\ cbHashObj\ =\ 0;}
+\DoxyCodeLine{00122\ \ \ DWORD\ cbHash\ =\ 0;}
+\DoxyCodeLine{00123\ \ \ DWORD\ cbData\ =\ 0;}
+\DoxyCodeLine{00124\ \ \ PBYTE\ pbHashObj\ =\ NULL;}
+\DoxyCodeLine{00125\ }
+\DoxyCodeLine{00126\ \ \ alg\ =\ \mbox{\hyperlink{hash_8c_a2de35447908a9afccca42825a87854fb}{get\_hash}}(hash);}
+\DoxyCodeLine{00127\ \ \ \textcolor{keywordflow}{if}\ (alg\ ==\ NULL)\ \{}
+\DoxyCodeLine{00128\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00129\ \ \ \}}
+\DoxyCodeLine{00130\ }
+\DoxyCodeLine{00131\ \ \ \textcolor{keywordflow}{if}\ (!BCRYPT\_SUCCESS(status\ =}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BCryptOpenAlgorithmProvider(\&hAlg,\ alg,\ NULL,\ 0)))\ \{}
+\DoxyCodeLine{00133\ \ \ \ \ \textcolor{keywordflow}{goto}\ cleanup;}
+\DoxyCodeLine{00134\ \ \ \}}
+\DoxyCodeLine{00135\ }
+\DoxyCodeLine{00136\ \ \ \textcolor{keywordflow}{if}\ (!BCRYPT\_SUCCESS(status\ =\ BCryptGetProperty(hAlg,\ BCRYPT\_OBJECT\_LENGTH,}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (PBYTE)\ \&cbHashObj,}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{sizeof}(DWORD),\ \&cbData,\ 0)))\ \{}
+\DoxyCodeLine{00139\ \ \ \ \ \textcolor{keywordflow}{goto}\ cleanup;}
+\DoxyCodeLine{00140\ \ \ \}}
+\DoxyCodeLine{00141\ }
+\DoxyCodeLine{00142\ \ \ \textcolor{keywordflow}{if}\ (!(pbHashObj\ =\ (PBYTE)\ malloc(cbHashObj)))\ \{}
+\DoxyCodeLine{00143\ \ \ \ \ \textcolor{keywordflow}{goto}\ cleanup;}
+\DoxyCodeLine{00144\ \ \ \}}
+\DoxyCodeLine{00145\ }
+\DoxyCodeLine{00146\ \ \ \textcolor{keywordflow}{if}\ (!BCRYPT\_SUCCESS(status\ =\ BCryptGetProperty(hAlg,\ BCRYPT\_HASH\_LENGTH,}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (PBYTE)\ \&cbHash,\ \textcolor{keyword}{sizeof}(DWORD),}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&cbData,\ 0)))\ \{}
+\DoxyCodeLine{00149\ \ \ \ \ \textcolor{keywordflow}{goto}\ cleanup;}
+\DoxyCodeLine{00150\ \ \ \}}
+\DoxyCodeLine{00151\ }
+\DoxyCodeLine{00152\ \ \ \textcolor{keywordflow}{if}\ (*\mbox{\hyperlink{yubihsm__pkcs11_8c_a565e4b6f63fecad4c290b50ee6684ee3}{out\_len}}\ <\ cbHash)\ \{}
+\DoxyCodeLine{00153\ \ \ \ \ \textcolor{keywordflow}{goto}\ cleanup;}
+\DoxyCodeLine{00154\ \ \ \}}
+\DoxyCodeLine{00155\ }
+\DoxyCodeLine{00156\ \ \ \textcolor{keywordflow}{if}\ (!BCRYPT\_SUCCESS(status\ =\ BCryptCreateHash(hAlg,\ \&hHash,\ pbHashObj,}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ cbHashObj,\ NULL,\ 0,\ 0)))\ \{}
+\DoxyCodeLine{00158\ \ \ \ \ \textcolor{keywordflow}{goto}\ cleanup;}
+\DoxyCodeLine{00159\ \ \ \}}
+\DoxyCodeLine{00160\ }
+\DoxyCodeLine{00161\ \ \ \textcolor{keywordflow}{if}\ (!BCRYPT\_SUCCESS(status\ =\ BCryptHashData(hHash,\ (PBYTE)\ in,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ 0)))\ \{}
+\DoxyCodeLine{00162\ \ \ \ \ \textcolor{keywordflow}{goto}\ cleanup;}
+\DoxyCodeLine{00163\ \ \ \}}
+\DoxyCodeLine{00164\ }
+\DoxyCodeLine{00165\ \ \ \textcolor{keywordflow}{if}\ (!BCRYPT\_SUCCESS(status\ =\ BCryptFinishHash(hHash,\ out,\ cbHash,\ 0)))\ \{}
+\DoxyCodeLine{00166\ \ \ \ \ \textcolor{keywordflow}{goto}\ cleanup;}
+\DoxyCodeLine{00167\ \ \ \}}
+\DoxyCodeLine{00168\ }
+\DoxyCodeLine{00169\ \ \ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a565e4b6f63fecad4c290b50ee6684ee3}{out\_len}}\ =\ cbHash;}
+\DoxyCodeLine{00170\ \ \ res\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00171\ }
+\DoxyCodeLine{00172\ cleanup:}
+\DoxyCodeLine{00173\ }
+\DoxyCodeLine{00174\ \ \ \textcolor{keywordflow}{if}\ (pbHashObj)\ \{}
+\DoxyCodeLine{00175\ \ \ \ \ free(pbHashObj);}
+\DoxyCodeLine{00176\ \ \ \}}
+\DoxyCodeLine{00177\ \ \ \textcolor{keywordflow}{if}\ (hHash)\ \{}
+\DoxyCodeLine{00178\ \ \ \ \ BCryptDestroyHash(hHash);}
+\DoxyCodeLine{00179\ \ \ \}}
+\DoxyCodeLine{00180\ \ \ \textcolor{keywordflow}{if}\ (hAlg)\ \{}
+\DoxyCodeLine{00181\ \ \ \ \ BCryptCloseAlgorithmProvider(hAlg,\ 0);}
+\DoxyCodeLine{00182\ \ \ \}}
+\DoxyCodeLine{00183\ }
+\DoxyCodeLine{00184\ \ \ \textcolor{keywordflow}{return}\ res;}
+\DoxyCodeLine{00185\ }
+\DoxyCodeLine{00186\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00187\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=238pt]{hash_8c_a062ee0f36e0c16725c22a5d9d964a8cd_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{hash_8c_a062ee0f36e0c16725c22a5d9d964a8cd_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{hash_8c_a3cc1419f3a2f6401e22e8b339b73c609}\index{hash.c@{hash.c}!hash\_create@{hash\_create}}
+\index{hash\_create@{hash\_create}!hash.c@{hash.c}}
+\doxysubsubsection{\texorpdfstring{hash\_create()}{hash\_create()}}
+{\footnotesize\ttfamily \label{hash_8c_a3cc1419f3a2f6401e22e8b339b73c609} 
+bool hash\+\_\+create (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct__hash__ctx}{\+\_\+hash\+\_\+ctx}} \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{ctx}{, }\item[{\mbox{\hyperlink{yubihsm_2common_2hash_8h_a488906826f8aaf7e850c35889d560089}{hash\+\_\+t}}}]{hash}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{hash_8c_source_l00189}{189}} of file \mbox{\hyperlink{hash_8c_source}{hash.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00190\ \ \ \textcolor{keywordtype}{bool}\ res\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00191\ \ \ \mbox{\hyperlink{struct__hash__ctx}{\_hash\_ctx}}\ *ctx\_temp\ =\ NULL;}
+\DoxyCodeLine{00192\ }
+\DoxyCodeLine{00193\ \textcolor{preprocessor}{\#ifdef\ \_WIN32\_BCRYPT}}
+\DoxyCodeLine{00194\ \ \ NTSTATUS\ status\ =\ 0;}
+\DoxyCodeLine{00195\ \ \ LPCWSTR\ alg\ =\ NULL;}
+\DoxyCodeLine{00196\ \ \ DWORD\ cbHashObj\ =\ 0;}
+\DoxyCodeLine{00197\ \ \ DWORD\ cbHash\ =\ 0;}
+\DoxyCodeLine{00198\ \ \ DWORD\ cbData\ =\ 0;}
+\DoxyCodeLine{00199\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00200\ \ \ \textcolor{keyword}{const}\ EVP\_MD\ *md\ =\ NULL;}
+\DoxyCodeLine{00201\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00202\ }
+\DoxyCodeLine{00203\ \ \ \textcolor{keywordflow}{if}\ (!ctx)\ \{}
+\DoxyCodeLine{00204\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00205\ \ \ \}}
+\DoxyCodeLine{00206\ }
+\DoxyCodeLine{00207\ \ \ \textcolor{keywordflow}{if}\ (*ctx)\ \{}
+\DoxyCodeLine{00208\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00209\ \ \ \}}
+\DoxyCodeLine{00210\ }
+\DoxyCodeLine{00211\ \ \ \textcolor{keywordflow}{if}\ (!(ctx\_temp\ =\ (\mbox{\hyperlink{struct__hash__ctx}{\_hash\_ctx}}\ *)\ malloc(\textcolor{keyword}{sizeof}(\mbox{\hyperlink{struct__hash__ctx}{\_hash\_ctx}}))))\ \{}
+\DoxyCodeLine{00212\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00213\ \ \ \}}
+\DoxyCodeLine{00214\ }
+\DoxyCodeLine{00215\ \ \ \mbox{\hyperlink{insecure__memzero_8h_a0794f9275fd1036ecba6ff0a901a320b}{insecure\_memzero}}(ctx\_temp,\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{struct__hash__ctx}{\_hash\_ctx}}));}
+\DoxyCodeLine{00216\ }
+\DoxyCodeLine{00217\ \textcolor{preprocessor}{\#ifdef\ \_WIN32\_BCRYPT}}
+\DoxyCodeLine{00218\ \ \ \textcolor{keywordflow}{if}\ (!(alg\ =\ \mbox{\hyperlink{hash_8c_a2de35447908a9afccca42825a87854fb}{get\_hash}}(hash)))\ \{}
+\DoxyCodeLine{00219\ \ \ \ \ \textcolor{keywordflow}{goto}\ cleanup;}
+\DoxyCodeLine{00220\ \ \ \}}
+\DoxyCodeLine{00221\ }
+\DoxyCodeLine{00222\ \ \ \textcolor{keywordflow}{if}\ (!BCRYPT\_SUCCESS(status\ =\ BCryptOpenAlgorithmProvider(\&(ctx\_temp-\/>hAlg),}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ alg,\ NULL,\ 0)))\ \{}
+\DoxyCodeLine{00224\ \ \ \ \ \textcolor{keywordflow}{goto}\ cleanup;}
+\DoxyCodeLine{00225\ \ \ \}}
+\DoxyCodeLine{00226\ }
+\DoxyCodeLine{00227\ \ \ \textcolor{keywordflow}{if}\ (!BCRYPT\_SUCCESS(status\ =}
+\DoxyCodeLine{00228\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BCryptGetProperty(ctx\_temp-\/>hAlg,\ BCRYPT\_OBJECT\_LENGTH,}
+\DoxyCodeLine{00229\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (PBYTE)\ \&cbHashObj,\ \textcolor{keyword}{sizeof}(DWORD),}
+\DoxyCodeLine{00230\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&cbData,\ 0)))\ \{}
+\DoxyCodeLine{00231\ \ \ \ \ \textcolor{keywordflow}{goto}\ cleanup;}
+\DoxyCodeLine{00232\ \ \ \}}
+\DoxyCodeLine{00233\ }
+\DoxyCodeLine{00234\ \ \ \textcolor{keywordflow}{if}\ (!(ctx\_temp-\/>pbHashObj\ =\ (PBYTE)\ malloc(cbHashObj)))\ \{}
+\DoxyCodeLine{00235\ \ \ \ \ \textcolor{keywordflow}{goto}\ cleanup;}
+\DoxyCodeLine{00236\ \ \ \}}
+\DoxyCodeLine{00237\ }
+\DoxyCodeLine{00238\ \ \ \textcolor{keywordflow}{if}\ (!BCRYPT\_SUCCESS(status\ =}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BCryptGetProperty(ctx\_temp-\/>hAlg,\ BCRYPT\_HASH\_LENGTH,}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (PBYTE)\ \&cbHash,\ \textcolor{keyword}{sizeof}(DWORD),}
+\DoxyCodeLine{00241\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&cbData,\ 0)))\ \{}
+\DoxyCodeLine{00242\ \ \ \ \ \textcolor{keywordflow}{goto}\ cleanup;}
+\DoxyCodeLine{00243\ \ \ \}}
+\DoxyCodeLine{00244\ }
+\DoxyCodeLine{00245\ \ \ ctx\_temp-\/>cbHash\ =\ (size\_t)\ cbHash;}
+\DoxyCodeLine{00246\ }
+\DoxyCodeLine{00247\ \ \ \textcolor{keywordflow}{if}\ (!BCRYPT\_SUCCESS(status\ =}
+\DoxyCodeLine{00248\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BCryptCreateHash(ctx\_temp-\/>hAlg,\ \&(ctx\_temp-\/>hHash),}
+\DoxyCodeLine{00249\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ctx\_temp-\/>pbHashObj,\ cbHashObj,\ NULL,}
+\DoxyCodeLine{00250\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0,\ BCRYPT\_HASH\_REUSABLE\_FLAG)))\ \{}
+\DoxyCodeLine{00251\ \ \ \ \ \textcolor{keywordflow}{goto}\ cleanup;}
+\DoxyCodeLine{00252\ \ \ \}}
+\DoxyCodeLine{00253\ }
+\DoxyCodeLine{00254\ \ \ ctx\_temp-\/>fFinal\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00255\ }
+\DoxyCodeLine{00256\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00257\ \ \ \textcolor{keywordflow}{if}\ (!(md\ =\ \mbox{\hyperlink{hash_8c_a2de35447908a9afccca42825a87854fb}{get\_hash}}(hash)))\ \{}
+\DoxyCodeLine{00258\ \ \ \ \ \textcolor{keywordflow}{goto}\ cleanup;}
+\DoxyCodeLine{00259\ \ \ \}}
+\DoxyCodeLine{00260\ }
+\DoxyCodeLine{00261\ \ \ \textcolor{keywordflow}{if}\ (!(ctx\_temp-\/>\mbox{\hyperlink{struct__hash__ctx_af94df5aa57dd054c437849bdbc812af5}{mdctx}}\ =\ EVP\_MD\_CTX\_create()))\ \{}
+\DoxyCodeLine{00262\ \ \ \ \ \textcolor{keywordflow}{goto}\ cleanup;}
+\DoxyCodeLine{00263\ \ \ \}}
+\DoxyCodeLine{00264\ }
+\DoxyCodeLine{00265\ \ \ ctx\_temp-\/>\mbox{\hyperlink{struct__hash__ctx_a1fdea94de31bd16af4a523527eb0d623}{md}}\ =\ md;}
+\DoxyCodeLine{00266\ }
+\DoxyCodeLine{00267\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00268\ }
+\DoxyCodeLine{00269\ \ \ \textcolor{comment}{/*\ set\ output\ parameters\ */}}
+\DoxyCodeLine{00270\ \ \ *ctx\ =\ ctx\_temp;}
+\DoxyCodeLine{00271\ \ \ ctx\_temp\ =\ NULL;}
+\DoxyCodeLine{00272\ \ \ res\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00273\ }
+\DoxyCodeLine{00274\ cleanup:}
+\DoxyCodeLine{00275\ }
+\DoxyCodeLine{00276\ \ \ \textcolor{keywordflow}{if}\ (ctx\_temp)\ \{}
+\DoxyCodeLine{00277\ \textcolor{preprocessor}{\#ifdef\ \_WIN32\_BCRYPT}}
+\DoxyCodeLine{00278\ \ \ \ \ \textcolor{keywordflow}{if}\ (ctx\_temp-\/>hHash)\ \{}
+\DoxyCodeLine{00279\ \ \ \ \ \ \ BCryptDestroyHash(ctx\_temp-\/>hHash);}
+\DoxyCodeLine{00280\ \ \ \ \ \}}
+\DoxyCodeLine{00281\ \ \ \ \ \textcolor{keywordflow}{if}\ (ctx\_temp-\/>pbHashObj)\ \{}
+\DoxyCodeLine{00282\ \ \ \ \ \ \ free(ctx\_temp-\/>pbHashObj);}
+\DoxyCodeLine{00283\ \ \ \ \ \}}
+\DoxyCodeLine{00284\ \ \ \ \ \textcolor{keywordflow}{if}\ (ctx\_temp-\/>hAlg)\ \{}
+\DoxyCodeLine{00285\ \ \ \ \ \ \ BCryptCloseAlgorithmProvider(ctx\_temp-\/>hAlg,\ 0);}
+\DoxyCodeLine{00286\ \ \ \ \ \}}
+\DoxyCodeLine{00287\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00288\ \ \ \ \ free(ctx\_temp);}
+\DoxyCodeLine{00289\ \ \ \}}
+\DoxyCodeLine{00290\ }
+\DoxyCodeLine{00291\ \ \ \textcolor{keywordflow}{return}\ res;}
+\DoxyCodeLine{00292\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=241pt]{hash_8c_a3cc1419f3a2f6401e22e8b339b73c609_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=337pt]{hash_8c_a3cc1419f3a2f6401e22e8b339b73c609_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{hash_8c_a9d8dba1d151d3db0137137a845bccc8b}\index{hash.c@{hash.c}!hash\_destroy@{hash\_destroy}}
+\index{hash\_destroy@{hash\_destroy}!hash.c@{hash.c}}
+\doxysubsubsection{\texorpdfstring{hash\_destroy()}{hash\_destroy()}}
+{\footnotesize\ttfamily \label{hash_8c_a9d8dba1d151d3db0137137a845bccc8b} 
+bool hash\+\_\+destroy (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct__hash__ctx}{\+\_\+hash\+\_\+ctx}} \texorpdfstring{$\ast$}{*}}]{ctx}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{hash_8c_source_l00387}{387}} of file \mbox{\hyperlink{hash_8c_source}{hash.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00387\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00388\ \ \ \textcolor{keywordflow}{if}\ (!ctx)\ \{}
+\DoxyCodeLine{00389\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00390\ \ \ \}}
+\DoxyCodeLine{00391\ }
+\DoxyCodeLine{00392\ \textcolor{preprocessor}{\#ifdef\ \_WIN32\_BCRYPT}}
+\DoxyCodeLine{00393\ \ \ \textcolor{keywordflow}{if}\ (ctx-\/>hHash)\ \{}
+\DoxyCodeLine{00394\ \ \ \ \ BCryptDestroyHash(ctx-\/>hHash);}
+\DoxyCodeLine{00395\ \ \ \}}
+\DoxyCodeLine{00396\ \ \ \textcolor{keywordflow}{if}\ (ctx-\/>pbHashObj)\ \{}
+\DoxyCodeLine{00397\ \ \ \ \ free(ctx-\/>pbHashObj);}
+\DoxyCodeLine{00398\ \ \ \}}
+\DoxyCodeLine{00399\ \ \ \textcolor{keywordflow}{if}\ (ctx-\/>hAlg)\ \{}
+\DoxyCodeLine{00400\ \ \ \ \ BCryptCloseAlgorithmProvider(ctx-\/>hAlg,\ 0);}
+\DoxyCodeLine{00401\ \ \ \}}
+\DoxyCodeLine{00402\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00403\ \ \ \textcolor{keywordflow}{if}\ (ctx-\/>\mbox{\hyperlink{struct__hash__ctx_af94df5aa57dd054c437849bdbc812af5}{mdctx}})\ \{}
+\DoxyCodeLine{00404\ \ \ \ \ EVP\_MD\_CTX\_destroy(ctx-\/>\mbox{\hyperlink{struct__hash__ctx_af94df5aa57dd054c437849bdbc812af5}{mdctx}});}
+\DoxyCodeLine{00405\ \ \ \}}
+\DoxyCodeLine{00406\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00407\ }
+\DoxyCodeLine{00408\ \ \ free(ctx);}
+\DoxyCodeLine{00409\ }
+\DoxyCodeLine{00410\ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00411\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=343pt]{hash_8c_a9d8dba1d151d3db0137137a845bccc8b_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{hash_8c_aa23c36aa0b4bb19de4bbeaa64720e494}\index{hash.c@{hash.c}!hash\_final@{hash\_final}}
+\index{hash\_final@{hash\_final}!hash.c@{hash.c}}
+\doxysubsubsection{\texorpdfstring{hash\_final()}{hash\_final()}}
+{\footnotesize\ttfamily \label{hash_8c_aa23c36aa0b4bb19de4bbeaa64720e494} 
+bool hash\+\_\+final (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct__hash__ctx}{\+\_\+hash\+\_\+ctx}} \texorpdfstring{$\ast$}{*}}]{ctx}{, }\item[{\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{out}{, }\item[{size\+\_\+t \texorpdfstring{$\ast$}{*}}]{pcb\+\_\+out}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{hash_8c_source_l00351}{351}} of file \mbox{\hyperlink{hash_8c_source}{hash.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00351\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00352\ \textcolor{preprocessor}{\#ifdef\ \_WIN32\_BCRYPT}}
+\DoxyCodeLine{00353\ \ \ NTSTATUS\ status\ =\ 0;}
+\DoxyCodeLine{00354\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00355\ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ d\_len\ =\ 0;}
+\DoxyCodeLine{00356\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00357\ }
+\DoxyCodeLine{00358\ \ \ \textcolor{keywordflow}{if}\ (!ctx)\ \{}
+\DoxyCodeLine{00359\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00360\ \ \ \}}
+\DoxyCodeLine{00361\ }
+\DoxyCodeLine{00362\ \textcolor{preprocessor}{\#ifdef\ \_WIN32\_BCRYPT}}
+\DoxyCodeLine{00363\ \ \ \textcolor{keywordflow}{if}\ (!(ctx-\/>hHash))\ \{}
+\DoxyCodeLine{00364\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00365\ \ \ \}}
+\DoxyCodeLine{00366\ }
+\DoxyCodeLine{00367\ \ \ \textcolor{keywordflow}{if}\ (*pcb\_out\ <\ ctx-\/>cbHash)\ \{}
+\DoxyCodeLine{00368\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00369\ \ \ \}}
+\DoxyCodeLine{00370\ }
+\DoxyCodeLine{00371\ \ \ \textcolor{keywordflow}{if}\ (!BCRYPT\_SUCCESS(status\ =}
+\DoxyCodeLine{00372\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BCryptFinishHash(ctx-\/>hHash,\ out,\ ctx-\/>cbHash,\ 0)))\ \{}
+\DoxyCodeLine{00373\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00374\ \ \ \}}
+\DoxyCodeLine{00375\ }
+\DoxyCodeLine{00376\ \ \ *pcb\_out\ =\ ctx-\/>cbHash;}
+\DoxyCodeLine{00377\ }
+\DoxyCodeLine{00378\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00379\ \ \ EVP\_DigestFinal\_ex(ctx-\/>\mbox{\hyperlink{struct__hash__ctx_af94df5aa57dd054c437849bdbc812af5}{mdctx}},\ out,\ \&d\_len);}
+\DoxyCodeLine{00380\ \ \ *pcb\_out\ =\ d\_len;}
+\DoxyCodeLine{00381\ }
+\DoxyCodeLine{00382\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00383\ }
+\DoxyCodeLine{00384\ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00385\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{hash_8c_aa23c36aa0b4bb19de4bbeaa64720e494_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{hash_8c_a6146398e6f54347faf3e9c4e6c7cde7b}\index{hash.c@{hash.c}!hash\_init@{hash\_init}}
+\index{hash\_init@{hash\_init}!hash.c@{hash.c}}
+\doxysubsubsection{\texorpdfstring{hash\_init()}{hash\_init()}}
+{\footnotesize\ttfamily \label{hash_8c_a6146398e6f54347faf3e9c4e6c7cde7b} 
+bool hash\+\_\+init (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct__hash__ctx}{\+\_\+hash\+\_\+ctx}} \texorpdfstring{$\ast$}{*}}]{ctx}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{hash_8c_source_l00294}{294}} of file \mbox{\hyperlink{hash_8c_source}{hash.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00294\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00295\ \ \ \textcolor{keywordflow}{if}\ (!ctx)\ \{}
+\DoxyCodeLine{00296\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00297\ \ \ \}}
+\DoxyCodeLine{00298\ }
+\DoxyCodeLine{00299\ \textcolor{preprocessor}{\#ifdef\ \_WIN32\_BCRYPT}}
+\DoxyCodeLine{00300\ \ \ \textcolor{comment}{/*\ finalize\ the\ hash,\ it\ should\ be\ marked\ as\ reusable\ */}}
+\DoxyCodeLine{00301\ \ \ \textcolor{keywordflow}{if}\ (!ctx-\/>fFinal)\ \{}
+\DoxyCodeLine{00302\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ cbHash\ =\ ctx-\/>cbHash;}
+\DoxyCodeLine{00303\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *temp\ =\ (\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *)\ malloc(cbHash);}
+\DoxyCodeLine{00304\ }
+\DoxyCodeLine{00305\ \ \ \ \ \textcolor{keywordflow}{if}\ (temp)\ \{}
+\DoxyCodeLine{00306\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ res\ =\ \mbox{\hyperlink{hash_8c_aa23c36aa0b4bb19de4bbeaa64720e494}{hash\_final}}(ctx,\ temp,\ \&cbHash);}
+\DoxyCodeLine{00307\ \ \ \ \ \ \ free(temp);}
+\DoxyCodeLine{00308\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ res;}
+\DoxyCodeLine{00309\ \ \ \ \ \}}
+\DoxyCodeLine{00310\ \ \ \}}
+\DoxyCodeLine{00311\ }
+\DoxyCodeLine{00312\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00313\ \ \ EVP\_DigestInit\_ex(ctx-\/>\mbox{\hyperlink{struct__hash__ctx_af94df5aa57dd054c437849bdbc812af5}{mdctx}},\ ctx-\/>\mbox{\hyperlink{struct__hash__ctx_a1fdea94de31bd16af4a523527eb0d623}{md}},\ NULL);}
+\DoxyCodeLine{00314\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00315\ }
+\DoxyCodeLine{00316\ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00317\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=231pt]{hash_8c_a6146398e6f54347faf3e9c4e6c7cde7b_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=323pt]{hash_8c_a6146398e6f54347faf3e9c4e6c7cde7b_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{hash_8c_a00c3b2f60d87f408d16804b22c4fd2c2}\index{hash.c@{hash.c}!hash\_update@{hash\_update}}
+\index{hash\_update@{hash\_update}!hash.c@{hash.c}}
+\doxysubsubsection{\texorpdfstring{hash\_update()}{hash\_update()}}
+{\footnotesize\ttfamily \label{hash_8c_a00c3b2f60d87f408d16804b22c4fd2c2} 
+bool hash\+\_\+update (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct__hash__ctx}{\+\_\+hash\+\_\+ctx}} \texorpdfstring{$\ast$}{*}}]{ctx}{, }\item[{const \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{in}{, }\item[{size\+\_\+t}]{cb\+\_\+in}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{hash_8c_source_l00319}{319}} of file \mbox{\hyperlink{hash_8c_source}{hash.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00319\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00320\ \textcolor{preprocessor}{\#ifdef\ \_WIN32\_BCRYPT}}
+\DoxyCodeLine{00321\ \ \ NTSTATUS\ status\ =\ 0;}
+\DoxyCodeLine{00322\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00323\ }
+\DoxyCodeLine{00324\ \ \ \textcolor{keywordflow}{if}\ (!ctx)\ \{}
+\DoxyCodeLine{00325\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00326\ \ \ \}}
+\DoxyCodeLine{00327\ }
+\DoxyCodeLine{00328\ \textcolor{preprocessor}{\#ifdef\ \_WIN32\_BCRYPT}}
+\DoxyCodeLine{00329\ \ \ \textcolor{keywordflow}{if}\ (!ctx-\/>hHash)\ \{}
+\DoxyCodeLine{00330\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00331\ \ \ \}}
+\DoxyCodeLine{00332\ }
+\DoxyCodeLine{00333\ \ \ ctx-\/>fFinal\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00334\ }
+\DoxyCodeLine{00335\ \ \ \textcolor{keywordflow}{if}\ (!BCRYPT\_SUCCESS(status\ =}
+\DoxyCodeLine{00336\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BCryptHashData(ctx-\/>hHash,\ (PBYTE)\ in,\ cb\_in,\ 0)))\ \{}
+\DoxyCodeLine{00337\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00338\ \ \ \}}
+\DoxyCodeLine{00339\ }
+\DoxyCodeLine{00340\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00341\ \ \ \textcolor{keywordflow}{if}\ (!(ctx-\/>\mbox{\hyperlink{struct__hash__ctx_af94df5aa57dd054c437849bdbc812af5}{mdctx}}))\ \{}
+\DoxyCodeLine{00342\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00343\ \ \ \}}
+\DoxyCodeLine{00344\ }
+\DoxyCodeLine{00345\ \ \ EVP\_DigestUpdate(ctx-\/>\mbox{\hyperlink{struct__hash__ctx_af94df5aa57dd054c437849bdbc812af5}{mdctx}},\ in,\ cb\_in);}
+\DoxyCodeLine{00346\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00347\ }
+\DoxyCodeLine{00348\ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00349\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=340pt]{hash_8c_a00c3b2f60d87f408d16804b22c4fd2c2_icgraph}
+\end{center}
+\end{figure}

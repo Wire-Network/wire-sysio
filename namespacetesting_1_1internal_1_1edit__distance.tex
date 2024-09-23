@@ -1,0 +1,263 @@
+\doxysection{testing\+::internal\+::edit\+\_\+distance Namespace Reference}
+\hypertarget{namespacetesting_1_1internal_1_1edit__distance}{}\label{namespacetesting_1_1internal_1_1edit__distance}\index{testing::internal::edit\_distance@{testing::internal::edit\_distance}}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{namespacetesting_1_1internal_1_1edit__distance_ad46aa6da12aec1a3f166310478b53a08}{Edit\+Type}} \{ \mbox{\hyperlink{namespacetesting_1_1internal_1_1edit__distance_ad46aa6da12aec1a3f166310478b53a08a7bdb9c74613a94f21b7489e0b5640a63}{k\+Match}}
+, \mbox{\hyperlink{namespacetesting_1_1internal_1_1edit__distance_ad46aa6da12aec1a3f166310478b53a08a63400b073f5b311a87d568b5ae27ffe8}{k\+Add}}
+, \mbox{\hyperlink{namespacetesting_1_1internal_1_1edit__distance_ad46aa6da12aec1a3f166310478b53a08a814768ef6cd0264a0a10b1e701a63e78}{k\+Remove}}
+, \mbox{\hyperlink{namespacetesting_1_1internal_1_1edit__distance_ad46aa6da12aec1a3f166310478b53a08afdbf30ecf9f32f60c646a34a358615f2}{k\+Replace}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{gtest-port_8h_aa73be6f0ba4a7456180a94904ce17790}{GTEST\+\_\+\+API\+\_\+}} std\+::vector$<$ \mbox{\hyperlink{namespacetesting_1_1internal_1_1edit__distance_ad46aa6da12aec1a3f166310478b53a08}{Edit\+Type}} $>$ \mbox{\hyperlink{namespacetesting_1_1internal_1_1edit__distance_a26323b4c2a29ea8e187aafbd4d2275db}{Calculate\+Optimal\+Edits}} (const std\+::vector$<$ size\+\_\+t $>$ \&left, const std\+::vector$<$ size\+\_\+t $>$ \&right)
+\item 
+\mbox{\hyperlink{gtest-port_8h_aa73be6f0ba4a7456180a94904ce17790}{GTEST\+\_\+\+API\+\_\+}} std\+::vector$<$ \mbox{\hyperlink{namespacetesting_1_1internal_1_1edit__distance_ad46aa6da12aec1a3f166310478b53a08}{Edit\+Type}} $>$ \mbox{\hyperlink{namespacetesting_1_1internal_1_1edit__distance_a32267b2ae24de1de175ac8217406877d}{Calculate\+Optimal\+Edits}} (const std\+::vector$<$ std\+::string $>$ \&left, const std\+::vector$<$ std\+::string $>$ \&right)
+\item 
+\mbox{\hyperlink{gtest-port_8h_aa73be6f0ba4a7456180a94904ce17790}{GTEST\+\_\+\+API\+\_\+}} std\+::string \mbox{\hyperlink{namespacetesting_1_1internal_1_1edit__distance_ac4c24a581ff433d7aca7ed12c9133fb1}{Create\+Unified\+Diff}} (const std\+::vector$<$ std\+::string $>$ \&left, const std\+::vector$<$ std\+::string $>$ \&right, size\+\_\+t \mbox{\hyperlink{structcontext}{context}}=2)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{namespacetesting_1_1internal_1_1edit__distance_ad46aa6da12aec1a3f166310478b53a08}\index{testing::internal::edit\_distance@{testing::internal::edit\_distance}!EditType@{EditType}}
+\index{EditType@{EditType}!testing::internal::edit\_distance@{testing::internal::edit\_distance}}
+\doxysubsubsection{\texorpdfstring{EditType}{EditType}}
+{\footnotesize\ttfamily \label{namespacetesting_1_1internal_1_1edit__distance_ad46aa6da12aec1a3f166310478b53a08} 
+enum \mbox{\hyperlink{namespacetesting_1_1internal_1_1edit__distance_ad46aa6da12aec1a3f166310478b53a08}{testing\+::internal\+::edit\+\_\+distance\+::\+Edit\+Type}}}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kMatch@{kMatch}!testing::internal::edit\_distance@{testing::internal::edit\_distance}}\index{testing::internal::edit\_distance@{testing::internal::edit\_distance}!kMatch@{kMatch}}}\Hypertarget{namespacetesting_1_1internal_1_1edit__distance_ad46aa6da12aec1a3f166310478b53a08a7bdb9c74613a94f21b7489e0b5640a63}\label{namespacetesting_1_1internal_1_1edit__distance_ad46aa6da12aec1a3f166310478b53a08} 
+k\+Match&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kAdd@{kAdd}!testing::internal::edit\_distance@{testing::internal::edit\_distance}}\index{testing::internal::edit\_distance@{testing::internal::edit\_distance}!kAdd@{kAdd}}}\Hypertarget{namespacetesting_1_1internal_1_1edit__distance_ad46aa6da12aec1a3f166310478b53a08a63400b073f5b311a87d568b5ae27ffe8}\label{namespacetesting_1_1internal_1_1edit__distance_ad46aa6da12aec1a3f166310478b53a08} 
+k\+Add&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kRemove@{kRemove}!testing::internal::edit\_distance@{testing::internal::edit\_distance}}\index{testing::internal::edit\_distance@{testing::internal::edit\_distance}!kRemove@{kRemove}}}\Hypertarget{namespacetesting_1_1internal_1_1edit__distance_ad46aa6da12aec1a3f166310478b53a08a814768ef6cd0264a0a10b1e701a63e78}\label{namespacetesting_1_1internal_1_1edit__distance_ad46aa6da12aec1a3f166310478b53a08} 
+k\+Remove&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kReplace@{kReplace}!testing::internal::edit\_distance@{testing::internal::edit\_distance}}\index{testing::internal::edit\_distance@{testing::internal::edit\_distance}!kReplace@{kReplace}}}\Hypertarget{namespacetesting_1_1internal_1_1edit__distance_ad46aa6da12aec1a3f166310478b53a08afdbf30ecf9f32f60c646a34a358615f2}\label{namespacetesting_1_1internal_1_1edit__distance_ad46aa6da12aec1a3f166310478b53a08} 
+k\+Replace&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{gtest-internal_8h_source_l00162}{162}} of file \mbox{\hyperlink{gtest-internal_8h_source}{gtest-\/internal.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00162\ \{\ \mbox{\hyperlink{namespacetesting_1_1internal_1_1edit__distance_ad46aa6da12aec1a3f166310478b53a08a7bdb9c74613a94f21b7489e0b5640a63}{kMatch}},\ \mbox{\hyperlink{namespacetesting_1_1internal_1_1edit__distance_ad46aa6da12aec1a3f166310478b53a08a63400b073f5b311a87d568b5ae27ffe8}{kAdd}},\ \mbox{\hyperlink{namespacetesting_1_1internal_1_1edit__distance_ad46aa6da12aec1a3f166310478b53a08a814768ef6cd0264a0a10b1e701a63e78}{kRemove}},\ \mbox{\hyperlink{namespacetesting_1_1internal_1_1edit__distance_ad46aa6da12aec1a3f166310478b53a08afdbf30ecf9f32f60c646a34a358615f2}{kReplace}}\ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacetesting_1_1internal_1_1edit__distance_a26323b4c2a29ea8e187aafbd4d2275db}\index{testing::internal::edit\_distance@{testing::internal::edit\_distance}!CalculateOptimalEdits@{CalculateOptimalEdits}}
+\index{CalculateOptimalEdits@{CalculateOptimalEdits}!testing::internal::edit\_distance@{testing::internal::edit\_distance}}
+\doxysubsubsection{\texorpdfstring{CalculateOptimalEdits()}{CalculateOptimalEdits()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{namespacetesting_1_1internal_1_1edit__distance_a26323b4c2a29ea8e187aafbd4d2275db} 
+std\+::vector$<$ \mbox{\hyperlink{namespacetesting_1_1internal_1_1edit__distance_ad46aa6da12aec1a3f166310478b53a08}{Edit\+Type}} $>$ testing\+::internal\+::edit\+\_\+distance\+::\+Calculate\+Optimal\+Edits (\begin{DoxyParamCaption}\item[{const std\+::vector$<$ size\+\_\+t $>$ \&}]{left}{, }\item[{const std\+::vector$<$ size\+\_\+t $>$ \&}]{right}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8cc_source_l01042}{1042}} of file \mbox{\hyperlink{gtest_8cc_source}{gtest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01043\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01044\ \ \ std::vector<std::vector<double>\ >\ costs(}
+\DoxyCodeLine{01045\ \ \ \ \ \ \ left.size()\ +\ 1,\ std::vector<double>(right.size()\ +\ 1));}
+\DoxyCodeLine{01046\ \ \ std::vector<std::vector<EditType>\ >\ best\_move(}
+\DoxyCodeLine{01047\ \ \ \ \ \ \ left.size()\ +\ 1,\ std::vector<EditType>(right.size()\ +\ 1));}
+\DoxyCodeLine{01048\ }
+\DoxyCodeLine{01049\ \ \ \textcolor{comment}{//\ Populate\ for\ empty\ right.}}
+\DoxyCodeLine{01050\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ l\_i\ =\ 0;\ l\_i\ <\ costs.size();\ ++l\_i)\ \{}
+\DoxyCodeLine{01051\ \ \ \ \ costs[l\_i][0]\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{double}\textcolor{keyword}{>}(l\_i);}
+\DoxyCodeLine{01052\ \ \ \ \ best\_move[l\_i][0]\ =\ \mbox{\hyperlink{namespacetesting_1_1internal_1_1edit__distance_ad46aa6da12aec1a3f166310478b53a08a814768ef6cd0264a0a10b1e701a63e78}{kRemove}};}
+\DoxyCodeLine{01053\ \ \ \}}
+\DoxyCodeLine{01054\ \ \ \textcolor{comment}{//\ Populate\ for\ empty\ left.}}
+\DoxyCodeLine{01055\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ r\_i\ =\ 1;\ r\_i\ <\ costs[0].size();\ ++r\_i)\ \{}
+\DoxyCodeLine{01056\ \ \ \ \ costs[0][r\_i]\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{double}\textcolor{keyword}{>}(r\_i);}
+\DoxyCodeLine{01057\ \ \ \ \ best\_move[0][r\_i]\ =\ kAdd;}
+\DoxyCodeLine{01058\ \ \ \}}
+\DoxyCodeLine{01059\ }
+\DoxyCodeLine{01060\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ l\_i\ =\ 0;\ l\_i\ <\ left.size();\ ++l\_i)\ \{}
+\DoxyCodeLine{01061\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ r\_i\ =\ 0;\ r\_i\ <\ right.size();\ ++r\_i)\ \{}
+\DoxyCodeLine{01062\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (left[l\_i]\ ==\ right[r\_i])\ \{}
+\DoxyCodeLine{01063\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Found\ a\ match.\ Consume\ it.}}
+\DoxyCodeLine{01064\ \ \ \ \ \ \ \ \ costs[l\_i\ +\ 1][r\_i\ +\ 1]\ =\ costs[l\_i][r\_i];}
+\DoxyCodeLine{01065\ \ \ \ \ \ \ \ \ best\_move[l\_i\ +\ 1][r\_i\ +\ 1]\ =\ kMatch;}
+\DoxyCodeLine{01066\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{01067\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01068\ }
+\DoxyCodeLine{01069\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{double}\ \mbox{\hyperlink{static__buf_8cpp_aa99823a0fc8313c9c32541ce768fb801}{add}}\ =\ costs[l\_i\ +\ 1][r\_i];}
+\DoxyCodeLine{01070\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{double}\ remove\ =\ costs[l\_i][r\_i\ +\ 1];}
+\DoxyCodeLine{01071\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{double}\ replace\ =\ costs[l\_i][r\_i];}
+\DoxyCodeLine{01072\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{static__buf_8cpp_aa99823a0fc8313c9c32541ce768fb801}{add}}\ <\ remove\ \&\&\ \mbox{\hyperlink{static__buf_8cpp_aa99823a0fc8313c9c32541ce768fb801}{add}}\ <\ replace)\ \{}
+\DoxyCodeLine{01073\ \ \ \ \ \ \ \ \ costs[l\_i\ +\ 1][r\_i\ +\ 1]\ =\ \mbox{\hyperlink{static__buf_8cpp_aa99823a0fc8313c9c32541ce768fb801}{add}}\ +\ 1;}
+\DoxyCodeLine{01074\ \ \ \ \ \ \ \ \ best\_move[l\_i\ +\ 1][r\_i\ +\ 1]\ =\ kAdd;}
+\DoxyCodeLine{01075\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (remove\ <\ \mbox{\hyperlink{static__buf_8cpp_aa99823a0fc8313c9c32541ce768fb801}{add}}\ \&\&\ remove\ <\ replace)\ \{}
+\DoxyCodeLine{01076\ \ \ \ \ \ \ \ \ costs[l\_i\ +\ 1][r\_i\ +\ 1]\ =\ \mbox{\hyperlink{namespacefc_a0db76f35dc060918029b16de918b1e84}{remove}}\ +\ 1;}
+\DoxyCodeLine{01077\ \ \ \ \ \ \ \ \ best\_move[l\_i\ +\ 1][r\_i\ +\ 1]\ =\ \mbox{\hyperlink{namespacetesting_1_1internal_1_1edit__distance_ad46aa6da12aec1a3f166310478b53a08a814768ef6cd0264a0a10b1e701a63e78}{kRemove}};}
+\DoxyCodeLine{01078\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{01079\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ We\ make\ replace\ a\ little\ more\ expensive\ than\ add/remove\ to\ lower}}
+\DoxyCodeLine{01080\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ their\ priority.}}
+\DoxyCodeLine{01081\ \ \ \ \ \ \ \ \ costs[l\_i\ +\ 1][r\_i\ +\ 1]\ =\ replace\ +\ 1.00001;}
+\DoxyCodeLine{01082\ \ \ \ \ \ \ \ \ best\_move[l\_i\ +\ 1][r\_i\ +\ 1]\ =\ \mbox{\hyperlink{namespacetesting_1_1internal_1_1edit__distance_ad46aa6da12aec1a3f166310478b53a08afdbf30ecf9f32f60c646a34a358615f2}{kReplace}};}
+\DoxyCodeLine{01083\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01084\ \ \ \ \ \}}
+\DoxyCodeLine{01085\ \ \ \}}
+\DoxyCodeLine{01086\ }
+\DoxyCodeLine{01087\ \ \ \textcolor{comment}{//\ Reconstruct\ the\ best\ path.\ We\ do\ it\ in\ reverse\ order.}}
+\DoxyCodeLine{01088\ \ \ std::vector<EditType>\ best\_path;}
+\DoxyCodeLine{01089\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ l\_i\ =\ left.size(),\ r\_i\ =\ right.size();\ l\_i\ >\ 0\ ||\ r\_i\ >\ 0;)\ \{}
+\DoxyCodeLine{01090\ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_1_1edit__distance_ad46aa6da12aec1a3f166310478b53a08}{EditType}}\ move\ =\ best\_move[l\_i][r\_i];}
+\DoxyCodeLine{01091\ \ \ \ \ best\_path.push\_back(move);}
+\DoxyCodeLine{01092\ \ \ \ \ l\_i\ -\/=\ move\ !=\ \mbox{\hyperlink{namespacetesting_1_1internal_1_1edit__distance_ad46aa6da12aec1a3f166310478b53a08a63400b073f5b311a87d568b5ae27ffe8}{kAdd}};}
+\DoxyCodeLine{01093\ \ \ \ \ r\_i\ -\/=\ move\ !=\ \mbox{\hyperlink{namespacetesting_1_1internal_1_1edit__distance_ad46aa6da12aec1a3f166310478b53a08a814768ef6cd0264a0a10b1e701a63e78}{kRemove}};}
+\DoxyCodeLine{01094\ \ \ \}}
+\DoxyCodeLine{01095\ \ \ std::reverse(best\_path.begin(),\ best\_path.end());}
+\DoxyCodeLine{01096\ \ \ \textcolor{keywordflow}{return}\ best\_path;}
+\DoxyCodeLine{01097\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacetesting_1_1internal_1_1edit__distance_a26323b4c2a29ea8e187aafbd4d2275db_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacetesting_1_1internal_1_1edit__distance_a26323b4c2a29ea8e187aafbd4d2275db_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacetesting_1_1internal_1_1edit__distance_a32267b2ae24de1de175ac8217406877d}\index{testing::internal::edit\_distance@{testing::internal::edit\_distance}!CalculateOptimalEdits@{CalculateOptimalEdits}}
+\index{CalculateOptimalEdits@{CalculateOptimalEdits}!testing::internal::edit\_distance@{testing::internal::edit\_distance}}
+\doxysubsubsection{\texorpdfstring{CalculateOptimalEdits()}{CalculateOptimalEdits()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{namespacetesting_1_1internal_1_1edit__distance_a32267b2ae24de1de175ac8217406877d} 
+std\+::vector$<$ \mbox{\hyperlink{namespacetesting_1_1internal_1_1edit__distance_ad46aa6da12aec1a3f166310478b53a08}{Edit\+Type}} $>$ testing\+::internal\+::edit\+\_\+distance\+::\+Calculate\+Optimal\+Edits (\begin{DoxyParamCaption}\item[{const std\+::vector$<$ std\+::string $>$ \&}]{left}{, }\item[{const std\+::vector$<$ std\+::string $>$ \&}]{right}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8cc_source_l01118}{1118}} of file \mbox{\hyperlink{gtest_8cc_source}{gtest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01120\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01121\ \ \ std::vector<size\_t>\ left\_ids,\ right\_ids;}
+\DoxyCodeLine{01122\ \ \ \{}
+\DoxyCodeLine{01123\ \ \ \ \ InternalStrings\ intern\_table;}
+\DoxyCodeLine{01124\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ left.size();\ ++i)\ \{}
+\DoxyCodeLine{01125\ \ \ \ \ \ \ left\_ids.push\_back(intern\_table.GetId(left[i]));}
+\DoxyCodeLine{01126\ \ \ \ \ \}}
+\DoxyCodeLine{01127\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ right.size();\ ++i)\ \{}
+\DoxyCodeLine{01128\ \ \ \ \ \ \ right\_ids.push\_back(intern\_table.GetId(right[i]));}
+\DoxyCodeLine{01129\ \ \ \ \ \}}
+\DoxyCodeLine{01130\ \ \ \}}
+\DoxyCodeLine{01131\ \ \ \textcolor{keywordflow}{return}\ CalculateOptimalEdits(left\_ids,\ right\_ids);}
+\DoxyCodeLine{01132\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacetesting_1_1internal_1_1edit__distance_a32267b2ae24de1de175ac8217406877d_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacetesting_1_1internal_1_1edit__distance_ac4c24a581ff433d7aca7ed12c9133fb1}\index{testing::internal::edit\_distance@{testing::internal::edit\_distance}!CreateUnifiedDiff@{CreateUnifiedDiff}}
+\index{CreateUnifiedDiff@{CreateUnifiedDiff}!testing::internal::edit\_distance@{testing::internal::edit\_distance}}
+\doxysubsubsection{\texorpdfstring{CreateUnifiedDiff()}{CreateUnifiedDiff()}}
+{\footnotesize\ttfamily \label{namespacetesting_1_1internal_1_1edit__distance_ac4c24a581ff433d7aca7ed12c9133fb1} 
+std\+::string testing\+::internal\+::edit\+\_\+distance\+::\+Create\+Unified\+Diff (\begin{DoxyParamCaption}\item[{const std\+::vector$<$ std\+::string $>$ \&}]{left}{, }\item[{const std\+::vector$<$ std\+::string $>$ \&}]{right}{, }\item[{size\+\_\+t}]{context}{ = {\ttfamily 2}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8cc_source_l01217}{1217}} of file \mbox{\hyperlink{gtest_8cc_source}{gtest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01219\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01220\ \ \ \textcolor{keyword}{const}\ std::vector<EditType>\ edits\ =\ CalculateOptimalEdits(left,\ right);}
+\DoxyCodeLine{01221\ }
+\DoxyCodeLine{01222\ \ \ \textcolor{keywordtype}{size\_t}\ l\_i\ =\ 0,\ r\_i\ =\ 0,\ edit\_i\ =\ 0;}
+\DoxyCodeLine{01223\ \ \ std::stringstream\ ss;}
+\DoxyCodeLine{01224\ \ \ \textcolor{keywordflow}{while}\ (edit\_i\ <\ edits.size())\ \{}
+\DoxyCodeLine{01225\ \ \ \ \ \textcolor{comment}{//\ Find\ first\ edit.}}
+\DoxyCodeLine{01226\ \ \ \ \ \textcolor{keywordflow}{while}\ (edit\_i\ <\ edits.size()\ \&\&\ edits[edit\_i]\ ==\ kMatch)\ \{}
+\DoxyCodeLine{01227\ \ \ \ \ \ \ ++l\_i;}
+\DoxyCodeLine{01228\ \ \ \ \ \ \ ++r\_i;}
+\DoxyCodeLine{01229\ \ \ \ \ \ \ ++edit\_i;}
+\DoxyCodeLine{01230\ \ \ \ \ \}}
+\DoxyCodeLine{01231\ }
+\DoxyCodeLine{01232\ \ \ \ \ \textcolor{comment}{//\ Find\ the\ first\ line\ to\ include\ in\ the\ hunk.}}
+\DoxyCodeLine{01233\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ prefix\_context\ =\ std::min(l\_i,\ \mbox{\hyperlink{structcontext}{context}});}
+\DoxyCodeLine{01234\ \ \ \ \ Hunk\ hunk(l\_i\ -\/\ prefix\_context\ +\ 1,\ r\_i\ -\/\ prefix\_context\ +\ 1);}
+\DoxyCodeLine{01235\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ prefix\_context;\ i\ >\ 0;\ -\/-\/i)\ \{}
+\DoxyCodeLine{01236\ \ \ \ \ \ \ hunk.PushLine(\textcolor{charliteral}{'\ '},\ left[l\_i\ -\/\ i].c\_str());}
+\DoxyCodeLine{01237\ \ \ \ \ \}}
+\DoxyCodeLine{01238\ }
+\DoxyCodeLine{01239\ \ \ \ \ \textcolor{comment}{//\ Iterate\ the\ edits\ until\ we\ found\ enough\ suffix\ for\ the\ hunk\ or\ the\ input}}
+\DoxyCodeLine{01240\ \ \ \ \ \textcolor{comment}{//\ is\ over.}}
+\DoxyCodeLine{01241\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ n\_suffix\ =\ 0;}
+\DoxyCodeLine{01242\ \ \ \ \ \textcolor{keywordflow}{for}\ (;\ edit\_i\ <\ edits.size();\ ++edit\_i)\ \{}
+\DoxyCodeLine{01243\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (n\_suffix\ >=\ \mbox{\hyperlink{structcontext}{context}})\ \{}
+\DoxyCodeLine{01244\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Continue\ only\ if\ the\ next\ hunk\ is\ very\ close.}}
+\DoxyCodeLine{01245\ \ \ \ \ \ \ \ \ std::vector<EditType>::const\_iterator\ it\ =\ edits.begin()\ +\ edit\_i;}
+\DoxyCodeLine{01246\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (it\ !=\ edits.end()\ \&\&\ *it\ ==\ kMatch)\ ++it;}
+\DoxyCodeLine{01247\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (it\ ==\ edits.end()\ ||\ (it\ -\/\ edits.begin())\ -\/\ edit\_i\ >=\ \mbox{\hyperlink{structcontext}{context}})\ \{}
+\DoxyCodeLine{01248\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ There\ is\ no\ next\ edit\ or\ it\ is\ too\ far\ away.}}
+\DoxyCodeLine{01249\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{01250\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01251\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01252\ }
+\DoxyCodeLine{01253\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_1_1edit__distance_ad46aa6da12aec1a3f166310478b53a08}{EditType}}\ edit\ =\ edits[edit\_i];}
+\DoxyCodeLine{01254\ \ \ \ \ \ \ \textcolor{comment}{//\ Reset\ count\ when\ a\ non\ match\ is\ found.}}
+\DoxyCodeLine{01255\ \ \ \ \ \ \ n\_suffix\ =\ edit\ ==\ \mbox{\hyperlink{namespacetesting_1_1internal_1_1edit__distance_ad46aa6da12aec1a3f166310478b53a08a7bdb9c74613a94f21b7489e0b5640a63}{kMatch}}\ ?\ n\_suffix\ +\ 1\ :\ 0;}
+\DoxyCodeLine{01256\ }
+\DoxyCodeLine{01257\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (edit\ ==\ kMatch\ ||\ edit\ ==\ kRemove\ ||\ edit\ ==\ kReplace)\ \{}
+\DoxyCodeLine{01258\ \ \ \ \ \ \ \ \ hunk.PushLine(edit\ ==\ kMatch\ ?\ \textcolor{charliteral}{'\ '}\ :\ \textcolor{charliteral}{'-\/'},\ left[l\_i].c\_str());}
+\DoxyCodeLine{01259\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01260\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (edit\ ==\ kAdd\ ||\ edit\ ==\ kReplace)\ \{}
+\DoxyCodeLine{01261\ \ \ \ \ \ \ \ \ hunk.PushLine(\textcolor{charliteral}{'+'},\ right[r\_i].c\_str());}
+\DoxyCodeLine{01262\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01263\ }
+\DoxyCodeLine{01264\ \ \ \ \ \ \ \textcolor{comment}{//\ Advance\ indices,\ depending\ on\ edit\ type.}}
+\DoxyCodeLine{01265\ \ \ \ \ \ \ l\_i\ +=\ edit\ !=\ \mbox{\hyperlink{namespacetesting_1_1internal_1_1edit__distance_ad46aa6da12aec1a3f166310478b53a08a63400b073f5b311a87d568b5ae27ffe8}{kAdd}};}
+\DoxyCodeLine{01266\ \ \ \ \ \ \ r\_i\ +=\ edit\ !=\ \mbox{\hyperlink{namespacetesting_1_1internal_1_1edit__distance_ad46aa6da12aec1a3f166310478b53a08a814768ef6cd0264a0a10b1e701a63e78}{kRemove}};}
+\DoxyCodeLine{01267\ \ \ \ \ \}}
+\DoxyCodeLine{01268\ }
+\DoxyCodeLine{01269\ \ \ \ \ \textcolor{keywordflow}{if}\ (!hunk.has\_edits())\ \{}
+\DoxyCodeLine{01270\ \ \ \ \ \ \ \textcolor{comment}{//\ We\ are\ done.\ We\ don't\ want\ this\ hunk.}}
+\DoxyCodeLine{01271\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{01272\ \ \ \ \ \}}
+\DoxyCodeLine{01273\ }
+\DoxyCodeLine{01274\ \ \ \ \ hunk.PrintTo(\&ss);}
+\DoxyCodeLine{01275\ \ \ \}}
+\DoxyCodeLine{01276\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}.str();}
+\DoxyCodeLine{01277\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacetesting_1_1internal_1_1edit__distance_ac4c24a581ff433d7aca7ed12c9133fb1_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacetesting_1_1internal_1_1edit__distance_ac4c24a581ff433d7aca7ed12c9133fb1_icgraph}
+\end{center}
+\end{figure}

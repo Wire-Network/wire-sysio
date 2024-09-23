@@ -1,0 +1,8 @@
+<map id="sysio::chain::webassembly::eosvmoc::create_function" name="sysio::chain::webassembly::eosvmoc::create_function">
+<area shape="rect" id="Node000001" title=" " alt="" coords="481,29,660,70"/>
+<area shape="poly" id="edge1_Node000001_Node000001" title=" " alt="" coords="610,16,595,10,571,8,548,10,534,15,529,21,531,28,526,29,524,19,531,10,547,5,571,3,596,5,612,11"/>
+<area shape="rect" id="Node000002" href="$namespacesysio_1_1chain_1_1webassembly_1_1eosvmoc.html#a6efa174d4d38f5f348b1a3dc0c9d9c0b" title=" " alt="" coords="233,29,433,70"/>
+<area shape="poly" id="edge2_Node000001_Node000002" title=" " alt="" coords="465,52,433,52,433,47,465,47"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1chain_1_1webassembly_1_1host__function__registrator.html#a8373c77aa3ef9e367a25f8f52c55ea7d" title=" " alt="" coords="5,22,185,78"/>
+<area shape="poly" id="edge3_Node000002_Node000003" title=" " alt="" coords="217,52,185,52,185,47,217,47"/>
+</map>

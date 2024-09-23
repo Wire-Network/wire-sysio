@@ -1,0 +1,12 @@
+<map id="Catch::TestCase" name="Catch::TestCase">
+<area shape="rect" id="Node000001" title=" " alt="" coords="22,288,143,313"/>
+<area shape="rect" id="Node000002" href="$struct_catch_1_1_test_case_info.html" title=" " alt="" coords="12,213,154,238"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="77,254,78,287,73,288,71,254"/>
+<area shape="poly" id="edge5_Node000001_Node000002" title=" " alt="" coords="94,254,92,288,87,287,89,254"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,94,59,120"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="35,134,39,161,48,187,68,210,64,214,44,190,34,162,30,135"/>
+<area shape="rect" id="Node000004" href="$struct_catch_1_1_source_line_info.html" title=" " alt="" coords="83,94,234,120"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="149,135,118,190,97,214,93,211,114,187,145,133"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="130,5,187,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="161,47,161,94,156,94,156,47"/>
+</map>

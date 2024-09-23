@@ -1,0 +1,7 @@
+<map id="sysio::vm::invoke_with_signal_handler" name="sysio::vm::invoke_with_signal_handler">
+<area shape="rect" id="Node000001" title=" " alt="" coords="153,23,308,64"/>
+<area shape="rect" id="Node000002" href="$signals__tests_8cpp.html#afb124f92e80a9c351bea946baefd52be" title=" " alt="" coords="5,5,105,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="137,33,105,28,105,23,138,27"/>
+<area shape="rect" id="Node000003" href="$signals__tests_8cpp.html#a3ec6449b1dadd607bc2bd1c15c4a43da" title=" " alt="" coords="5,55,105,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="138,59,105,63,105,58,137,54"/>
+</map>

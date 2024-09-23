@@ -1,0 +1,60 @@
+\doxysection{libraries/fc/secp256k1/secp256k1/src/ecmult.h File Reference}
+\hypertarget{ecmult_8h}{}\label{ecmult_8h}\index{libraries/fc/secp256k1/secp256k1/src/ecmult.h@{libraries/fc/secp256k1/secp256k1/src/ecmult.h}}
+{\ttfamily \#include "{}group.\+h"{}}\newline
+{\ttfamily \#include "{}scalar.\+h"{}}\newline
+{\ttfamily \#include "{}scratch.\+h"{}}\newline
+Include dependency graph for ecmult.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{ecmult_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{ecmult_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{ecmult_8h_a97c6c6e5aa98f202eec77c4c931e02f1}{ECMULT\+\_\+\+TABLE\+\_\+\+SIZE}}(w)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef int \mbox{\hyperlink{ecmult_8h_a0f127c89ba0f17e7992666f3d789e58e}{secp256k1\+\_\+ecmult\+\_\+multi\+\_\+callback}}(\mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\+\_\+scalar}} \texorpdfstring{$\ast$}{*}sc, \mbox{\hyperlink{structsecp256k1__ge}{secp256k1\+\_\+ge}} \texorpdfstring{$\ast$}{*}pt, size\+\_\+t idx, void \texorpdfstring{$\ast$}{*}data)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{ecmult_8h_a97c6c6e5aa98f202eec77c4c931e02f1}\index{ecmult.h@{ecmult.h}!ECMULT\_TABLE\_SIZE@{ECMULT\_TABLE\_SIZE}}
+\index{ECMULT\_TABLE\_SIZE@{ECMULT\_TABLE\_SIZE}!ecmult.h@{ecmult.h}}
+\doxysubsubsection{\texorpdfstring{ECMULT\_TABLE\_SIZE}{ECMULT\_TABLE\_SIZE}}
+{\footnotesize\ttfamily \label{ecmult_8h_a97c6c6e5aa98f202eec77c4c931e02f1} 
+\#define ECMULT\+\_\+\+TABLE\+\_\+\+SIZE(\begin{DoxyParamCaption}\item[{}]{w}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(1L\ <<\ ((w)-\/2))}
+
+\end{DoxyCode}
+The number of entries a table with precomputed multiples needs to have. 
+
+Definition at line \mbox{\hyperlink{ecmult_8h_source_l00030}{30}} of file \mbox{\hyperlink{ecmult_8h_source}{ecmult.\+h}}.
+
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{ecmult_8h_a0f127c89ba0f17e7992666f3d789e58e}\index{ecmult.h@{ecmult.h}!secp256k1\_ecmult\_multi\_callback@{secp256k1\_ecmult\_multi\_callback}}
+\index{secp256k1\_ecmult\_multi\_callback@{secp256k1\_ecmult\_multi\_callback}!ecmult.h@{ecmult.h}}
+\doxysubsubsection{\texorpdfstring{secp256k1\_ecmult\_multi\_callback}{secp256k1\_ecmult\_multi\_callback}}
+{\footnotesize\ttfamily \label{ecmult_8h_a0f127c89ba0f17e7992666f3d789e58e} 
+typedef int secp256k1\+\_\+ecmult\+\_\+multi\+\_\+callback(\mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\+\_\+scalar}} \texorpdfstring{$\ast$}{*}sc, \mbox{\hyperlink{structsecp256k1__ge}{secp256k1\+\_\+ge}} \texorpdfstring{$\ast$}{*}pt, size\+\_\+t idx, void \texorpdfstring{$\ast$}{*}data)}
+
+
+
+Definition at line \mbox{\hyperlink{ecmult_8h_source_l00035}{35}} of file \mbox{\hyperlink{ecmult_8h_source}{ecmult.\+h}}.
+

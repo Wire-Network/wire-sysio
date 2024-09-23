@@ -1,0 +1,21 @@
+<map id="resmon_fixture::plugin_startup" name="resmon_fixture::plugin_startup">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,104,155,145"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1resource__monitor__plugin.html#a756d8d52fe7acf391a9e11e27a1a482b" title=" " alt="" coords="203,5,373,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="116,101,202,57,216,50,218,55,204,61,119,106"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1resource__monitor__plugin.html#aec66e2d4bf2493717a81701b2504e138" title=" " alt="" coords="204,71,371,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="154,110,188,104,189,110,155,115"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1resource__monitor__plugin.html#a9450b8a934658e7baa38d0b581c98812" title=" " alt="" coords="208,136,368,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="155,133,193,139,192,144,154,138"/>
+<area shape="rect" id="Node000005" href="$structresmon__fixture.html#a7138a1a6fe46f645488210b544163f05" title=" " alt="" coords="221,201,354,242"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="120,143,204,186,219,193,217,198,202,191,117,148"/>
+<area shape="rect" id="Node000006" href="$structresmon__fixture.html#a68bd6bd03fb7e49249e6d7fcfc3dd16d" title=" " alt="" coords="421,178,583,204"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="355,209,405,202,406,207,355,215"/>
+<area shape="rect" id="Node000008" href="$structresmon__fixture.html#af5d15c1bb948ca8150b97a3e46247686" title=" " alt="" coords="435,229,569,270"/>
+<area shape="poly" id="edge7_Node000005_Node000008" title=" " alt="" coords="355,228,421,236,420,242,355,233"/>
+<area shape="rect" id="Node000007" href="$classsysio_1_1resource__monitor__plugin.html#a8aa338848d9b4ea7f0af24674fb9afe3" title=" " alt="" coords="647,168,807,209"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="584,187,631,187,631,192,584,193"/>
+<area shape="rect" id="Node000009" href="$classsysio_1_1resource__monitor__plugin.html#a6d82af2b00041a1f160d7268c1b454b7" title=" " alt="" coords="631,233,823,274"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="569,248,616,249,616,254,569,254"/>
+<area shape="rect" id="Node000010" href="$xbyak__mnemonic_8h.html#a4229a9b84f8b8673326f12bd41acd27c" title=" " alt="" coords="871,241,909,266"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="823,251,855,251,855,256,823,256"/>
+</map>

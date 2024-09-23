@@ -1,0 +1,204 @@
+\doxysection{Compilation.\+tests.\+cpp}
+\hypertarget{_compilation_8tests_8cpp_source}{}\label{_compilation_8tests_8cpp_source}\index{libraries/sys-\/vm/external/Catch2/projects/SelfTest/UsageTests/Compilation.tests.cpp@{libraries/sys-\/vm/external/Catch2/projects/SelfTest/UsageTests/Compilation.tests.cpp}}
+\mbox{\hyperlink{_compilation_8tests_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00002}00002\ \textcolor{comment}{\ *\ \ Created\ by\ Martin\ on\ 17/02/2017.}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00004}00004\ \textcolor{comment}{\ *\ \ Distributed\ under\ the\ Boost\ Software\ License,\ Version\ 1.0.\ (See\ accompanying}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00005}00005\ \textcolor{comment}{\ *\ \ file\ LICENSE\_1\_0.txt\ or\ copy\ at\ http://www.boost.org/LICENSE\_1\_0.txt)}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00006}00006\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <type\_traits>}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00010}00010\ \textcolor{comment}{//\ Setup\ for\ \#1403\ -\/-\/\ look\ for\ global\ overloads\ of\ operator\ <<\ for\ classes}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00011}00011\ \textcolor{comment}{//\ in\ a\ different\ namespace.}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00012}00012\ \textcolor{preprocessor}{\#include\ <ostream>}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00014}00014\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefoo}{foo}}\ \{}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00015}\mbox{\hyperlink{structfoo_1_1helper__1403}{00015}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structfoo_1_1helper__1403}{helper\_1403}}\ \{}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00016}\mbox{\hyperlink{structfoo_1_1helper__1403_a81d1251bc8ed08b6cecc7d00bfa40fac}{00016}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{structfoo_1_1helper__1403_a81d1251bc8ed08b6cecc7d00bfa40fac}{operator==}}(\mbox{\hyperlink{structfoo_1_1helper__1403}{helper\_1403}})\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00017}00017\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00018}00018\ \}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00020}00020\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacebar}{bar}}\ \{}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00021}00021\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}...\ Ts>}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00022}\mbox{\hyperlink{structbar_1_1_type_list}{00022}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structbar_1_1_type_list}{TypeList}}\ \{\};}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00023}00023\ \}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00025}00025\ \textcolor{preprocessor}{\#ifdef\ \_\_GNUC\_\_}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00026}00026\ \textcolor{preprocessor}{\#pragma\ GCC\ diagnostic\ ignored\ "{}-\/Wmissing-\/declarations"{}}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00027}00027\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00028}\mbox{\hyperlink{_compilation_8tests_8cpp_ade684309c8cea5930810e500e642a47e}{00028}}\ std::ostream\&\ \mbox{\hyperlink{_compilation_8tests_8cpp_ade684309c8cea5930810e500e642a47e}{operator<<}}(std::ostream\&\ out,\ \mbox{\hyperlink{structfoo_1_1helper__1403}{foo::helper\_1403}}\ \textcolor{keyword}{const}\&)\ \{}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00029}00029\ \ \ \ \ \textcolor{keywordflow}{return}\ out\ <<\ \textcolor{stringliteral}{"{}[1403\ helper]"{}};}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00030}00030\ \}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00033}00033\ \textcolor{preprocessor}{\#include\ "{}catch.hpp"{}}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00035}00035\ \textcolor{preprocessor}{\#include\ <cstring>}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00037}\mbox{\hyperlink{namespace_compilation_tests}{00037}}\ \textcolor{keyword}{namespace\ }\{\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_compilation_tests}{CompilationTests}}\ \{}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00039}00039\ \textcolor{preprocessor}{\#ifndef\ COMPILATION\_TEST\_HELPERS\_INCLUDED\ }\textcolor{comment}{//\ Don't\ compile\ this\ more\ than\ once\ per\ TU}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00040}\mbox{\hyperlink{_compilation_8tests_8cpp_ab9b6d7ea8e03695ead5c20b136bc6e22}{00040}}\ \textcolor{preprocessor}{\#define\ COMPILATION\_TEST\_HELPERS\_INCLUDED}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00042}00042\ \ \ \ \ \textcolor{comment}{//\ Comparison\ operators\ can\ return\ non-\/booleans.}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00043}00043\ \ \ \ \ \textcolor{comment}{//\ This\ is\ unusual,\ but\ should\ be\ supported.}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00044}00044\ \ \ \ \ \textcolor{keyword}{struct\ }logic\_t\ \{}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00045}00045\ \ \ \ \ \ \ \ \ logic\_t\ \mbox{\hyperlink{base58_8cpp_a6db3085f36d565f1dd8589c8386d3a2f}{operator<\ }}(logic\_t)\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \{\};\ \}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00046}00046\ \ \ \ \ \ \ \ \ logic\_t\ \mbox{\hyperlink{base58_8cpp_a9ecd8e4eda0fd40c50bf1dc79278b8da}{operator<=}}(logic\_t)\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \{\};\ \}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00047}00047\ \ \ \ \ \ \ \ \ logic\_t\ \mbox{\hyperlink{base58_8cpp_ae09a7d6e173c46e14f62c1d0790bce20}{operator>\ }}(logic\_t)\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \{\};\ \}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00048}00048\ \ \ \ \ \ \ \ \ logic\_t\ \mbox{\hyperlink{base58_8cpp_ad413d94390cfa29840c6887cdc07959e}{operator>=}}(logic\_t)\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \{\};\ \}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00049}00049\ \ \ \ \ \ \ \ \ logic\_t\ \mbox{\hyperlink{environment_8hpp_ac70f6c217754a8581540f9d3f5b1c1ed}{operator==}}(logic\_t)\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \{\};\ \}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00050}00050\ \ \ \ \ \ \ \ \ logic\_t\ \mbox{\hyperlink{environment_8hpp_a1f4c4c464184ccd8c78b240bcb2017c8}{operator!=}}(logic\_t)\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \{\};\ \}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00051}00051\ \ \ \ \ \ \ \ \ \textcolor{keyword}{explicit}\ \textcolor{keyword}{operator}\ bool()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00052}00052\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00054}00054\ }
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00055}00055\ \textcolor{comment}{//\ This\ is\ a\ minimal\ example\ for\ an\ issue\ we\ have\ found\ in\ 1.7.0}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00056}00056\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{namespacefoo}{foo}}\ \{}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00057}00057\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ i;}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00058}00058\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00060}00060\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00061}00061\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{environment_8hpp_ac70f6c217754a8581540f9d3f5b1c1ed}{operator==}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \&val,\ \mbox{\hyperlink{namespacefoo}{foo}}\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})\ \{}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00062}00062\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ val\ ==\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}.i;}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00063}00063\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00065}00065\ \ \ \ \ \textcolor{keyword}{struct\ }Y\ \{}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00066}00066\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ :\ 1;}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00067}00067\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00069}00069\ \ \ \ \ \textcolor{keywordtype}{void}\ throws\_int(\textcolor{keywordtype}{bool}\ b)\ \{}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00070}00070\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (b)\ \{}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00071}00071\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ 1;}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00072}00072\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00073}00073\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00074}00074\ }
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00075}00075\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00076}00076\ \ \ \ \ \textcolor{keywordtype}{bool}\ templated\_tests(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ t)\ \{}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00077}00077\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ =\ 3;}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00078}00078\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ ==\ t);}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00079}00079\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ ==\ t);}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00080}00080\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ae3c33faa1d31a2bb0811dac74b994e3e}{REQUIRE\_THROWS}}(throws\_int(\textcolor{keyword}{true}));}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00081}00081\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(throws\_int(\textcolor{keyword}{true}),\ \textcolor{keywordtype}{int});}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00082}00082\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ab0148f0dfca438f7aa01974e9c33216a}{REQUIRE\_NOTHROW}}(throws\_int(\textcolor{keyword}{false}));}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00083}00083\ \textcolor{preprocessor}{\#ifndef\ CATCH\_CONFIG\_DISABLE\_MATCHERS}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00084}00084\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ac1354db6f3e9c1e0a8eda0eea7ff1f0a}{REQUIRE\_THAT}}(\textcolor{stringliteral}{"{}aaa"{}},\ \mbox{\hyperlink{namespace_catch_1_1_matchers_a816ee41f265edf5fd94f55d2860c58bd}{Catch::EndsWith}}(\textcolor{stringliteral}{"{}aaa"{}}));}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00085}00085\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00086}00086\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00087}00087\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00088}00088\ }
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00089}00089\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{namespace_a}{A}}\ \{}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00090}00090\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00091}00091\ }
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00092}00092\ \ \ \ \ std::ostream\ \&\mbox{\hyperlink{database__utils_8hpp_a9c651062fd345156256e69573165086c}{operator<<}}(std::ostream\ \&o,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespace_a}{A}}\ \&)\ \{\ \textcolor{keywordflow}{return}\ o\ <<\ 0;\ \}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00093}00093\ }
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00094}00094\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{namespace_b}{B}}\ :\ \textcolor{keyword}{private}\ \mbox{\hyperlink{namespace_a}{A}}\ \{}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00095}00095\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{environment_8hpp_ac70f6c217754a8581540f9d3f5b1c1ed}{operator==}}(\textcolor{keywordtype}{int})\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00096}00096\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00097}00097\ }
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00098}00098\ \textcolor{preprocessor}{\#ifdef\ \_\_clang\_\_}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00099}00099\ \textcolor{preprocessor}{\#pragma\ clang\ diagnostic\ push}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00100}00100\ \textcolor{preprocessor}{\#pragma\ clang\ diagnostic\ ignored\ "{}-\/Wunused-\/function"{}}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00101}00101\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00102}00102\ \textcolor{preprocessor}{\#ifdef\ \_\_GNUC\_\_}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00103}00103\ \textcolor{comment}{//\ Note\ that\ because\ -\/\string~GCC\string~-\/,\ this\ warning\ cannot\ be\ silenced\ temporarily,\ by\ pushing\ diagnostic\ stack...}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00104}00104\ \textcolor{comment}{//\ Luckily\ it\ is\ firing\ in\ test\ files\ and\ thus\ can\ be\ silenced\ for\ the\ whole\ file,\ without\ losing\ much.}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00105}00105\ \textcolor{preprocessor}{\#pragma\ GCC\ diagnostic\ ignored\ "{}-\/Wunused-\/function"{}}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00106}00106\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00107}00107\ }
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00108}00108\ \ \ \ \ \mbox{\hyperlink{namespace_b}{B}}\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}();}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00109}00109\ }
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00110}00110\ \ \ \ \ std::ostream\ g();}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00111}00111\ }
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00112}00112\ \textcolor{preprocessor}{\#ifdef\ \_\_clang\_\_}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00113}00113\ \textcolor{preprocessor}{\#pragma\ clang\ diagnostic\ pop}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00114}00114\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00115}00115\ }
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00116}00116\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename},\ \textcolor{keyword}{typename}>}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00117}00117\ \ \ \ \ \textcolor{keyword}{struct\ }Fixture\_1245\ \{\};}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00118}00118\ }
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00119}00119\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00120}00120\ }
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00121}00121\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\textcolor{stringliteral}{"{}\#809"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00122}00122\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefoo}{foo}}\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}};}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00123}00123\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}.i\ =\ 42;}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00124}00124\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(42\ ==\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}});}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00125}00125\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00126}00126\ }
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00127}00127\ }
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00128}00128\ \textcolor{comment}{//\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00129}00129\ \textcolor{comment}{//\ Changes\ to\ REQUIRE\_THROWS\_AS\ made\ it\ stop\ working\ in\ a\ template\ in}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00130}00130\ \textcolor{comment}{//\ an\ unfixable\ way\ (as\ long\ as\ C++03\ compatibility\ is\ being\ kept).}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00131}00131\ \textcolor{comment}{//\ To\ prevent\ these\ from\ happening\ in\ the\ future,\ this\ needs\ to\ compile}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00132}00132\ }
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00133}00133\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\textcolor{stringliteral}{"{}\#833"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00134}00134\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(templated\_tests<int>(3));}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00135}00135\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00136}00136\ }
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00137}00137\ }
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00138}00138\ \textcolor{comment}{//\ Test\ containing\ example\ where\ original\ stream\ insertable\ check\ breaks\ compilation}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00139}00139\ }
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00140}00140\ }
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00141}00141\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\textcolor{stringliteral}{"{}\#872"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00142}00142\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_a}{A}}\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_a01c35a876e2917ffdc1ee618e0c06619}{dummy}};}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00143}00143\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_aaf9fe43c53965ff8d94bbd522fd1fd7a}{CAPTURE}}(dummy);}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00144}00144\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_b}{B}}\ x;}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00145}00145\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}\ (x\ ==\ 4);}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00146}00146\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00147}00147\ }
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00148}00148\ }
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00149}00149\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\textcolor{stringliteral}{"{}\#1027"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00150}00150\ \ \ \ \ \ \ \ \ Y\ \mbox{\hyperlink{namespacefc_ab199a7c94624123911206db59ebe45da}{y}}\{0\};}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00151}00151\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\mbox{\hyperlink{namespacefc_ab199a7c94624123911206db59ebe45da}{y}}.v\ ==\ 0);}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00152}00152\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(0\ ==\ \mbox{\hyperlink{namespacefc_ab199a7c94624123911206db59ebe45da}{y}}.v);}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00153}00153\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00154}00154\ }
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00155}00155\ \ \ \ \ \textcolor{comment}{//\ Comparison\ operators\ can\ return\ non-\/booleans.}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00156}00156\ \ \ \ \ \textcolor{comment}{//\ This\ is\ unusual,\ but\ should\ be\ supported.}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00157}00157\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\textcolor{stringliteral}{"{}\#1147"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00158}00158\ \ \ \ \ \ \ \ \ logic\_t\ t1,\ t2;}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00159}00159\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(t1\ ==\ t2);}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00160}00160\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(t1\ !=\ t2);}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00161}00161\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(t1\ <\ \ t2);}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00162}00162\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(t1\ >\ \ t2);}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00163}00163\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(t1\ <=\ t2);}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00164}00164\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(t1\ >=\ t2);}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00165}00165\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00166}00166\ }
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00167}00167\ \ \ \ \ \textcolor{comment}{//\ unsigned\ array}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00168}00168\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\textcolor{stringliteral}{"{}\#1238"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00169}00169\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ uarr[]\ =\ \textcolor{stringliteral}{"{}123"{}};}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00170}00170\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_aaf9fe43c53965ff8d94bbd522fd1fd7a}{CAPTURE}}(uarr);}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00171}00171\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{signed}\ \textcolor{keywordtype}{char}\ sarr[]\ =\ \textcolor{stringliteral}{"{}456"{}};}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00172}00172\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_aaf9fe43c53965ff8d94bbd522fd1fd7a}{CAPTURE}}(sarr);}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00173}00173\ }
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00174}00174\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(std::memcmp(uarr,\ \textcolor{stringliteral}{"{}123"{}},\ \textcolor{keyword}{sizeof}(uarr))\ ==\ 0);}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00175}00175\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(std::memcmp(sarr,\ \textcolor{stringliteral}{"{}456"{}},\ \textcolor{keyword}{sizeof}(sarr))\ ==\ 0);}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00176}00176\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00177}00177\ }
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00178}00178\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_adf06142f54a9e271590fa0e270bc41d2}{TEST\_CASE\_METHOD}}((Fixture\_1245<int,\ int>),\ \textcolor{stringliteral}{"{}\#1245"{}},\ \textcolor{stringliteral}{"{}[compilation]"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00179}00179\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a75adcdf89f69b0b615e395daafc315af}{SUCCEED}}();}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00180}00180\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00181}00181\ }
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00182}00182\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\textcolor{stringliteral}{"{}\#1403"{}},\ \textcolor{stringliteral}{"{}[compilation]"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00183}00183\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structfoo_1_1helper__1403}{::foo::helper\_1403}}\ h1,\ h2;}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00184}00184\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(h1\ ==\ h2);}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00185}00185\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00186}00186\ }
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00187}00187\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\textcolor{stringliteral}{"{}Optionally\ static\ assertions"{}},\ \textcolor{stringliteral}{"{}[compilation]"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00188}00188\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_abad9ff23b730469f209b010e0ac4687c}{STATIC\_REQUIRE}}(\ std::is\_void<void>::value\ );}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00189}00189\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ae7506af68f12e7efdb22e951b911b5a0}{STATIC\_REQUIRE\_FALSE}}(\ std::is\_void<int>::value\ );}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00190}00190\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00191}00191\ }
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00192}00192\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\textcolor{stringliteral}{"{}\#1548"{}},\ \textcolor{stringliteral}{"{}[compilation]"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00193}00193\ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacebar}{bar}};}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00194}00194\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(std::is\_same<\mbox{\hyperlink{structbar_1_1_type_list}{TypeList<int>}},\ \mbox{\hyperlink{structbar_1_1_type_list}{TypeList<int>}}>\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{::value}});}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00195}00195\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00196}00196\ }
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00197}00197\ \}\}\ \textcolor{comment}{//\ namespace\ CompilationTests}}
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00198}00198\ }
+\DoxyCodeLine{\Hypertarget{_compilation_8tests_8cpp_source_l00199}00199\ }
+
+\end{DoxyCode}

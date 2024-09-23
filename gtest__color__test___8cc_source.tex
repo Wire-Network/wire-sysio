@@ -1,0 +1,69 @@
+\doxysection{gtest\+\_\+color\+\_\+test\+\_\+.\+cc}
+\hypertarget{gtest__color__test___8cc_source}{}\label{gtest__color__test___8cc_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/test/gtest\_color\_test\_.cc@{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/test/gtest\_color\_test\_.cc}}
+\mbox{\hyperlink{gtest__color__test___8cc}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00001}00001\ \textcolor{comment}{//\ Copyright\ 2008,\ Google\ Inc.}}
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00002}00002\ \textcolor{comment}{//\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00003}00003\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00004}00004\ \textcolor{comment}{//\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00005}00005\ \textcolor{comment}{//\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are}}
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00006}00006\ \textcolor{comment}{//\ met:}}
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00007}00007\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00008}00008\ \textcolor{comment}{//\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00009}00009\ \textcolor{comment}{//\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00010}00010\ \textcolor{comment}{//\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above}}
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00011}00011\ \textcolor{comment}{//\ copyright\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer}}
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00012}00012\ \textcolor{comment}{//\ in\ the\ documentation\ and/or\ other\ materials\ provided\ with\ the}}
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00013}00013\ \textcolor{comment}{//\ distribution.}}
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00014}00014\ \textcolor{comment}{//\ \ \ \ \ *\ Neither\ the\ name\ of\ Google\ Inc.\ nor\ the\ names\ of\ its}}
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00015}00015\ \textcolor{comment}{//\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products\ derived\ from}}
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00016}00016\ \textcolor{comment}{//\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00017}00017\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00018}00018\ \textcolor{comment}{//\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS}}
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00019}00019\ \textcolor{comment}{//\ "{}AS\ IS"{}\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00020}00020\ \textcolor{comment}{//\ LIMITED\ TO,\ THE\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR}}
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00021}00021\ \textcolor{comment}{//\ A\ PARTICULAR\ PURPOSE\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ THE\ COPYRIGHT}}
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00022}00022\ \textcolor{comment}{//\ OWNER\ OR\ CONTRIBUTORS\ BE\ LIABLE\ FOR\ ANY\ DIRECT,\ INDIRECT,\ INCIDENTAL,}}
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00023}00023\ \textcolor{comment}{//\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES\ (INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00024}00024\ \textcolor{comment}{//\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;\ LOSS\ OF\ USE,}}
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00025}00025\ \textcolor{comment}{//\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND\ ON\ ANY}}
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00026}00026\ \textcolor{comment}{//\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00027}00027\ \textcolor{comment}{//\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE}}
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00028}00028\ \textcolor{comment}{//\ OF\ THIS\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00029}00029\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00030}00030\ \textcolor{comment}{//\ Author:\ wan@google.com\ (Zhanyong\ Wan)}}
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00032}00032\ \textcolor{comment}{//\ A\ helper\ program\ for\ testing\ how\ Google\ Test\ determines\ whether\ to\ use}}
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00033}00033\ \textcolor{comment}{//\ colors\ in\ the\ output.\ \ It\ prints\ "{}YES"{}\ and\ returns\ 1\ if\ Google\ Test}}
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00034}00034\ \textcolor{comment}{//\ decides\ to\ use\ colors,\ and\ prints\ "{}NO"{}\ and\ returns\ 0\ otherwise.}}
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00036}00036\ \textcolor{preprocessor}{\#include\ <stdio.h>}}
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00038}00038\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{gtest_8h}{gtest/gtest.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00039}00039\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{gtest-internal-inl_8h}{src/gtest-\/internal-\/inl.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00041}00041\ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacetesting_1_1internal_ac1db1b4603967a6c4404f31cbbac31a6}{testing::internal::ShouldUseColor}};}
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00043}00043\ \textcolor{comment}{//\ The\ purpose\ of\ this\ is\ to\ ensure\ that\ the\ UnitTest\ singleton\ is}}
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00044}00044\ \textcolor{comment}{//\ created\ before\ main()\ is\ entered,\ and\ thus\ that\ ShouldUseColor()}}
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00045}00045\ \textcolor{comment}{//\ works\ the\ same\ way\ as\ in\ a\ real\ Google-\/Test-\/based\ test.\ \ We\ don't\ actual}}
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00046}00046\ \textcolor{comment}{//\ run\ the\ TEST\ itself.}}
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00047}\mbox{\hyperlink{gtest__color__test___8cc_a78903f80b07f944e7aa466ebdff1d644}{00047}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(GTestColorTest,\ Dummy)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00048}00048\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00050}\mbox{\hyperlink{gtest__color__test___8cc_a3c04138a5bfe5d72780bb7e82a18e627}{00050}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}(\textcolor{keywordtype}{int}\ argc,\ \textcolor{keywordtype}{char}**\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}})\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00051}00051\ \ \ \mbox{\hyperlink{namespacetesting_afd726ae08c9bd16dc52f78c822d9946b}{testing::InitGoogleTest}}(\&argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}});}
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00052}00052\ }
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00053}00053\ \ \ \textcolor{keywordflow}{if}\ (ShouldUseColor(\textcolor{keyword}{true}))\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00054}00054\ \ \ \ \ \textcolor{comment}{//\ Google\ Test\ decides\ to\ use\ colors\ in\ the\ output\ (assuming\ it}}
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00055}00055\ \ \ \ \ \textcolor{comment}{//\ goes\ to\ a\ TTY).}}
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00056}00056\ \ \ \ \ printf(\textcolor{stringliteral}{"{}YES\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00057}00057\ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00058}00058\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00059}00059\ \ \ \ \ \textcolor{comment}{//\ Google\ Test\ decides\ not\ to\ use\ colors\ in\ the\ output.}}
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00060}00060\ \ \ \ \ printf(\textcolor{stringliteral}{"{}NO\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00061}00061\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00062}00062\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__color__test___8cc_source_l00063}00063\ \}}
+
+\end{DoxyCode}

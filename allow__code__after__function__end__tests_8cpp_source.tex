@@ -1,0 +1,142 @@
+\doxysection{allow\+\_\+code\+\_\+after\+\_\+function\+\_\+end\+\_\+tests.\+cpp}
+\hypertarget{allow__code__after__function__end__tests_8cpp_source}{}\label{allow__code__after__function__end__tests_8cpp_source}\index{libraries/sys-\/vm/tests/allow\_code\_after\_function\_end\_tests.cpp@{libraries/sys-\/vm/tests/allow\_code\_after\_function\_end\_tests.cpp}}
+\mbox{\hyperlink{allow__code__after__function__end__tests_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <sysio/vm/backend.hpp>}}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{sys-vm_2tests_2utils_8hpp}{utils.hpp}}"{}}}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{single__include_2catch2_2catch_8hpp}{catch2/catch.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00006}00006\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacesysio_1_1vm}{sysio::vm}};}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00008}00008\ \textcolor{keyword}{extern}\ \mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator}{wasm\_allocator}}\ \mbox{\hyperlink{allow__code__after__function__end__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}};}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00010}00010\ \textcolor{keyword}{namespace\ }\{}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00012}00012\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00013}00013\ \textcolor{comment}{\ *\ (module}}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00014}00014\ \textcolor{comment}{\ *\ \ (memory\ 0)}}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00015}00015\ \textcolor{comment}{\ *\ \ (global\ i32\ (i32.const\ 0))}}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00016}00016\ \textcolor{comment}{\ *\ \ (func\ (export\ "{}apply"{})\ (param\ i64\ i64\ i64))}}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00017}00017\ \textcolor{comment}{\ *\ \ (block\ unreachable)}}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00018}00018\ \textcolor{comment}{\ *\ \ (loop\ unreachable)}}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00019}00019\ \textcolor{comment}{\ *\ \ (i32.const\ 0)}}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00020}00020\ \textcolor{comment}{\ *\ \ (nop)}}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00021}00021\ \textcolor{comment}{\ *\ \ (local.get\ 0)}}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00022}00022\ \textcolor{comment}{\ *\ \ (global.get\ 0)}}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00023}00023\ \textcolor{comment}{\ *\ \ (memory.size)}}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00024}00024\ \textcolor{comment}{\ *\ )}}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00025}00025\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00026}00026\ std::vector<uint8\_t>\ code\_after\_end\_wasm\ =\ \{}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00027}00027\ \ \ \ 0x00,\ 0x61,\ 0x73,\ 0x6d,\ 0x01,\ 0x00,\ 0x00,\ 0x00,\ 0x01,\ 0x07,\ 0x01,\ 0x60,}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00028}00028\ \ \ \ 0x03,\ 0x7e,\ 0x7e,\ 0x7e,\ 0x00,\ 0x03,\ 0x02,\ 0x01,\ 0x00,\ 0x05,\ 0x03,\ 0x01,}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00029}00029\ \ \ \ 0x00,\ 0x00,\ 0x06,\ 0x06,\ 0x01,\ 0x7f,\ 0x00,\ 0x41,\ 0x00,\ 0x0b,\ 0x07,\ 0x09,}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00030}00030\ \ \ \ 0x01,\ 0x05,\ 0x61,\ 0x70,\ 0x70,\ 0x6c,\ 0x79,\ 0x00,\ 0x00,\ 0x0a,\ 0x15,\ 0x01,}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00031}00031\ \ \ \ 0x13,\ 0x00,\ 0x0b,\ 0x02,\ 0x40,\ 0x00,\ 0x0b,\ 0x03,\ 0x40,\ 0x00,\ 0x0b,\ 0x41,}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00032}00032\ \ \ \ 0x00,\ 0x01,\ 0x20,\ 0x00,\ 0x23,\ 0x00,\ 0x3f,\ 0x00}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00033}00033\ \};}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00035}00035\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00036}00036\ \textcolor{comment}{\ *\ (module}}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00037}00037\ \textcolor{comment}{\ *\ \ (memory\ 0)}}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00038}00038\ \textcolor{comment}{\ *\ \ (table\ 1\ funcref)}}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00039}00039\ \textcolor{comment}{\ *\ \ (elem\ (i32.const\ 0)\ 0)}}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00040}00040\ \textcolor{comment}{\ *\ \ (global\ (mut\ i32)\ (i32.const\ 0))}}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00041}00041\ \textcolor{comment}{\ *\ \ (func\ (export\ "{}apply"{})\ (param\ i64\ i64\ i64))}}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00042}00042\ \textcolor{comment}{\ *\ \ ...}}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00043}00043\ \textcolor{comment}{\ *\ )}}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00044}00044\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00045}00045\ std::vector<uint8\_t>\ make\_wasm(std::initializer\_list<uint8\_t>\ il)\ \{}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00046}00046\ \ \ \ std::vector<uint8\_t>\ result\ =\ \{}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00047}00047\ \ \ \ \ \ \ 0x00,\ 0x61,\ 0x73,\ 0x6d,\ 0x01,\ 0x00,\ 0x00,\ 0x00,\ 0x01,\ 0x07,\ 0x01,\ 0x60,}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00048}00048\ \ \ \ \ \ \ 0x03,\ 0x7e,\ 0x7e,\ 0x7e,\ 0x00,\ 0x03,\ 0x02,\ 0x01,\ 0x00,\ 0x04,\ 0x04,\ 0x01,}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00049}00049\ \ \ \ \ \ \ 0x70,\ 0x00,\ 0x01,\ 0x05,\ 0x03,\ 0x01,\ 0x00,\ 0x00,\ 0x06,\ 0x06,\ 0x01,\ 0x7f,}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00050}00050\ \ \ \ \ \ \ 0x01,\ 0x41,\ 0x00,\ 0x0b,\ 0x07,\ 0x09,\ 0x01,\ 0x05,\ 0x61,\ 0x70,\ 0x70,\ 0x6c,}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00051}00051\ \ \ \ \ \ \ 0x79,\ 0x00,\ 0x00,\ 0x09,\ 0x07,\ 0x01,\ 0x00,\ 0x41,\ 0x00,\ 0x0b,\ 0x01,\ 0x00,}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00052}00052\ \ \ \ \ \ \ 0x0a}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00053}00053\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00054}00054\ \ \ \ result.push\_back(il.size()\ +\ 4);}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00055}00055\ \ \ \ result.push\_back(1);}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00056}00056\ \ \ \ result.push\_back(il.size()\ +\ 2);}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00057}00057\ \ \ \ result.push\_back(0);}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00058}00058\ \ \ \ result.push\_back(0x0b);}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00059}00059\ \ \ \ result.insert(result.end(),\ il);}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00060}00060\ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00061}00061\ \}}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00062}00062\ }
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00063}00063\ std::vector<std::vector<uint8\_t>>\ fail\_wasms\ =\ \{}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00064}00064\ \ \ \ make\_wasm(\{0x00\}),\ \textcolor{comment}{//\ unreachable}}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00065}00065\ \ \ \ make\_wasm(\{0x0b\}),\ \textcolor{comment}{//\ end}}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00066}00066\ \ \ \ make\_wasm(\{0x0f\}),\ \textcolor{comment}{//\ return}}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00067}00067\ \ \ \ make\_wasm(\{0x41,\ 0x00,\ 0x04,\ 0x40,\ 0x0b\}),\ \textcolor{comment}{//\ if}}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00068}00068\ \ \ \ make\_wasm(\{0x05\}),\ \textcolor{comment}{//\ else}}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00069}00069\ \ \ \ make\_wasm(\{0x0C,\ 0x00\}),\ \textcolor{comment}{//\ br}}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00070}00070\ \ \ \ make\_wasm(\{0x41,\ 0x00,\ 0x0D,\ 0x00\}),\ \textcolor{comment}{//\ br\_if}}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00071}00071\ \ \ \ make\_wasm(\{0x41,\ 0x00,\ 0x0E,\ 0x00,\ 0x00\}),\ \textcolor{comment}{//\ br\_table}}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00072}00072\ \ \ \ make\_wasm(\{0x42,\ 0x00,\ 0x42,\ 0x00,\ 0x42,\ 0x00,\ 0x10,\ 0x00\}),\ \textcolor{comment}{//\ call}}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00073}00073\ \ \ \ make\_wasm(\{0x42,\ 0x00,\ 0x42,\ 0x00,\ 0x42,\ 0x00,\ 0x41,\ 0x00,\ 0x11,\ 0x00,\ 0x00\}),\ \textcolor{comment}{//\ call\_indirect}}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00074}00074\ \ \ \ make\_wasm(\{0x41,\ 0x00,\ 0x1A\}),\ \textcolor{comment}{//\ drop}}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00075}00075\ \ \ \ make\_wasm(\{0x41,\ 0x00,\ 0x41,\ 0x00,\ 0x41,\ 0x00,\ 0x1B\}),\ \textcolor{comment}{//\ select}}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00076}00076\ \ \ \ make\_wasm(\{0x42,\ 0x00,\ 0x21,\ 0x00\}),\ \textcolor{comment}{//\ local.set}}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00077}00077\ \ \ \ make\_wasm(\{0x42,\ 0x00,\ 0x22,\ 0x00\}),\ \textcolor{comment}{//\ local.tee}}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00078}00078\ \ \ \ make\_wasm(\{0x41,\ 0x00,\ 0x24,\ 0x00\}),\ \textcolor{comment}{//\ global.set}}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00079}00079\ \ \ \ make\_wasm(\{0x41,\ 0x00,\ 0x28,\ 0x00,\ 0x00\}),\ \textcolor{comment}{//\ i32.load}}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00080}00080\ \ \ \ make\_wasm(\{0x41,\ 0x00,\ 0x41,\ 0x41,\ 0x36,\ 0x00,\ 0x00\}),\ \textcolor{comment}{//\ i32.store}}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00081}00081\ \ \ \ make\_wasm(\{0x41,\ 0x00,\ 0x40,\ 0x00\}),\ \textcolor{comment}{//\ memory.grow}}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00082}00082\ \ \ \ make\_wasm(\{0x41,\ 0x00,\ 0x67\}),\ \textcolor{comment}{//\ i32.clz}}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00083}00083\ \ \ \ make\_wasm(\{0x41,\ 0x00,\ 0x41,\ 0x00,\ 0x6a\}),\ \textcolor{comment}{//\ i32.add}}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00084}00084\ \ \ \ make\_wasm(\{0x41,\ 0x00,\ 0xac\}),\ \textcolor{comment}{//\ i64.extend\_i32}}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00085}00085\ \ \ \ make\_wasm(\{0x25\}),\ \textcolor{comment}{//\ illegal\ instruction}}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00086}00086\ \ \ \ make\_wasm(\{0xff\})\ \textcolor{comment}{//\ illegal\ instruction}}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00087}00087\ \};}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00088}00088\ }
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00089}00089\ \textcolor{keyword}{struct\ }empty\_options\ \{\};}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00090}00090\ \textcolor{keyword}{struct\ }static\_options\_false\ \{}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00091}00091\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{bool}\ allow\_code\_after\_function\_end\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00092}00092\ \};}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00093}00093\ \textcolor{keyword}{struct\ }static\_options\_true\ \{}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00094}00094\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{bool}\ allow\_code\_after\_function\_end\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00095}00095\ \};}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00096}00096\ \textcolor{keyword}{struct\ }dynamic\_options\ \{}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00097}00097\ \ \ \ \textcolor{keywordtype}{bool}\ allow\_code\_after\_function\_end;}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00098}00098\ \};}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00099}00099\ }
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00100}00100\ \}}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00101}00101\ }
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00102}\mbox{\hyperlink{allow__code__after__function__end__tests_8cpp_a2ee7a6883988a834c460fd8421837e11}{00102}}\ \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_a3e5f265967cb6d730cad8ca15e807ac2}{BACKEND\_TEST\_CASE}}(\textcolor{stringliteral}{"{}Test\ allow\_code\_after\_function\_end\ default"{}},\ \textcolor{stringliteral}{"{}[allow\_code\_after\_function\_end\_test]"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00103}00103\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType>}};}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00104}00104\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(code\_after\_end\_wasm,\ \&\mbox{\hyperlink{allow__code__after__function__end__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00105}00105\ \}}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00106}00106\ }
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00107}\mbox{\hyperlink{allow__code__after__function__end__tests_8cpp_a97ecba945738044898b94343c890242a}{00107}}\ \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_a3e5f265967cb6d730cad8ca15e807ac2}{BACKEND\_TEST\_CASE}}(\textcolor{stringliteral}{"{}Test\ allow\_code\_after\_function\_end\ unlimited"{}},\ \textcolor{stringliteral}{"{}[allow\_code\_after\_function\_end\_test]"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00108}00108\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ empty\_options>}};}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00109}00109\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(code\_after\_end\_wasm,\ \&\mbox{\hyperlink{allow__code__after__function__end__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00110}00110\ \}}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00111}00111\ }
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00112}\mbox{\hyperlink{allow__code__after__function__end__tests_8cpp_a26370e4999b477e7dcd99f6873acb7d6}{00112}}\ \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_a3e5f265967cb6d730cad8ca15e807ac2}{BACKEND\_TEST\_CASE}}(\textcolor{stringliteral}{"{}Test\ allow\_code\_after\_function\_end\ static\ fail"{}},\ \textcolor{stringliteral}{"{}[allow\_code\_after\_function\_end\_test]"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00113}00113\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ static\_options\_false>}};}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00114}00114\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(code\_after\_end\_wasm,\ \&\mbox{\hyperlink{allow__code__after__function__end__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00115}00115\ \}}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00116}00116\ }
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00117}\mbox{\hyperlink{allow__code__after__function__end__tests_8cpp_ac8fc92c123e3cd2061046ab1ac531e30}{00117}}\ \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_a3e5f265967cb6d730cad8ca15e807ac2}{BACKEND\_TEST\_CASE}}(\textcolor{stringliteral}{"{}Test\ allow\_code\_after\_function\_end\ static\ pass"{}},\ \textcolor{stringliteral}{"{}[allow\_code\_after\_function\_end\_test]"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00118}00118\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ static\_options\_true>}};}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00119}00119\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend}}(code\_after\_end\_wasm,\ \&\mbox{\hyperlink{allow__code__after__function__end__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00120}00120\ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\ wasm\ :\ fail\_wasms)\ \{}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00121}00121\ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(wasm,\ \&\mbox{\hyperlink{allow__code__after__function__end__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00122}00122\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00123}00123\ \}}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00124}00124\ }
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00125}\mbox{\hyperlink{allow__code__after__function__end__tests_8cpp_a05b61226ab8f97f5b696f4cde7564a44}{00125}}\ \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_a3e5f265967cb6d730cad8ca15e807ac2}{BACKEND\_TEST\_CASE}}(\textcolor{stringliteral}{"{}Test\ allow\_code\_after\_function\_end\ dynamic\ fail"{}},\ \textcolor{stringliteral}{"{}[allow\_code\_after\_function\_end\_test]"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00126}00126\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ dynamic\_options>}};}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00127}00127\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(code\_after\_end\_wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\{\textcolor{keyword}{false}\}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00128}00128\ \}}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00129}00129\ }
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00130}\mbox{\hyperlink{allow__code__after__function__end__tests_8cpp_ad4e2fc38bed264a9f60a12d0e16c4454}{00130}}\ \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_a3e5f265967cb6d730cad8ca15e807ac2}{BACKEND\_TEST\_CASE}}(\textcolor{stringliteral}{"{}Test\ allow\_code\_after\_function\_end\ dynamic\ pass"{}},\ \textcolor{stringliteral}{"{}[allow\_code\_after\_function\_end\_test]"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00131}00131\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ dynamic\_options>}};}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00132}00132\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend}}(code\_after\_end\_wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\{\textcolor{keyword}{true}\});}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00133}00133\ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\ wasm\ :\ fail\_wasms)\ \{}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00134}00134\ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\{\textcolor{keyword}{true}\}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00135}00135\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{allow__code__after__function__end__tests_8cpp_source_l00136}00136\ \}}
+
+\end{DoxyCode}

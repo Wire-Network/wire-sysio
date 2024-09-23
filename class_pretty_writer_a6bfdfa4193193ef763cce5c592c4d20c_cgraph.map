@@ -1,0 +1,18 @@
+<map id="PrettyWriter::EndObject" name="PrettyWriter::EndObject">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,81,165,107"/>
+<area shape="rect" id="Node000002" href="$class_writer.html#adc1cadbabc309d31f19cf7463251d879" title=" " alt="" coords="236,5,354,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="122,78,242,34,244,39,124,83"/>
+<area shape="rect" id="Node000004" href="$class_writer.html#a8ca4e364c546b2eb526caa68dde011d2" title="Flush the output stream." alt="" coords="458,56,553,82"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="165,87,442,70,443,75,165,92"/>
+<area shape="rect" id="Node000005" href="$class_writer.html#a7e3f6760a50a72f4217a9b2d625c43ee" title=" " alt="" coords="218,107,372,132"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="166,101,203,106,202,111,165,106"/>
+<area shape="rect" id="Node000006" href="$class_pretty_writer.html#a6f244ecc94fd5b134d424033b1574b7e" title=" " alt="" coords="213,156,377,182"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="118,105,214,142,232,148,230,153,212,147,116,110"/>
+<area shape="rect" id="Node000003" href="$classinternal_1_1_stack.html#a2b8bda380e33838a99e3c73ff9785f03" title=" " alt="" coords="430,5,581,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="355,16,414,16,414,21,355,21"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="352,29,443,51,442,56,351,34"/>
+<area shape="rect" id="Node000007" href="$classinternal_1_1_stack.html#ac484468a2791bd3e9ba609bd1600ab48" title=" " alt="" coords="425,131,585,156"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="377,156,409,152,410,158,378,162"/>
+<area shape="rect" id="Node000008" href="$filewritestream_8h.html#a5c9b0f0e6249be2acf7f3505c295c132" title="Implement specialized version of PutN() with memset() for better performance." alt="" coords="480,180,531,206"/>
+<area shape="poly" id="edge8_Node000006_Node000008" title=" " alt="" coords="378,176,464,186,464,191,377,181"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="websocketpp::frame::circshift_prepared_key" name="websocketpp::frame::circshift_prepared_key">
+<area shape="rect" id="Node000001" title="circularly shifts the supplied prepared masking key by offset bytes" alt="" coords="5,5,166,46"/>
+<area shape="rect" id="Node000002" href="$namespacewebsocketpp_1_1lib_1_1net.html#a321373761665b77eaf5d78ff5e535941" title=" " alt="" coords="214,5,359,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="166,23,198,23,198,28,166,28"/>
+</map>

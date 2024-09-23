@@ -1,0 +1,67 @@
+\doxysection{fc\+::if\+\_\+enum\texorpdfstring{$<$}{<} fc\+::true\+\_\+type \texorpdfstring{$>$}{>} Struct Reference}
+\hypertarget{structfc_1_1if__enum_3_01fc_1_1true__type_01_4}{}\label{structfc_1_1if__enum_3_01fc_1_1true__type_01_4}\index{fc::if\_enum$<$ fc::true\_type $>$@{fc::if\_enum$<$ fc::true\_type $>$}}
+
+
+{\ttfamily \#include $<$variant.\+hpp$>$}
+
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\static void \mbox{\hyperlink{structfc_1_1if__enum_3_01fc_1_1true__type_01_4_a11eac43004dde4068db8314f3dc2650d}{to\+\_\+variant}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&o, \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&v)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\static void \mbox{\hyperlink{structfc_1_1if__enum_3_01fc_1_1true__type_01_4_a4d28193c3ee53bef7021897448489ba2}{from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&v, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&o)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{fc_2include_2fc_2reflect_2variant_8hpp_source_l00079}{79}} of file \mbox{\hyperlink{fc_2include_2fc_2reflect_2variant_8hpp_source}{variant.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structfc_1_1if__enum_3_01fc_1_1true__type_01_4_a4d28193c3ee53bef7021897448489ba2}\index{fc::if\_enum$<$ fc::true\_type $>$@{fc::if\_enum$<$ fc::true\_type $>$}!from\_variant@{from\_variant}}
+\index{from\_variant@{from\_variant}!fc::if\_enum$<$ fc::true\_type $>$@{fc::if\_enum$<$ fc::true\_type $>$}}
+\doxysubsubsection{\texorpdfstring{from\_variant()}{from\_variant()}}
+{\footnotesize\ttfamily \label{structfc_1_1if__enum_3_01fc_1_1true__type_01_4_a4d28193c3ee53bef7021897448489ba2} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+static void \mbox{\hyperlink{structfc_1_1if__enum}{fc\+::if\+\_\+enum}}$<$ \mbox{\hyperlink{structfc_1_1true__type}{fc\+::true\+\_\+type}} $>$\+::from\+\_\+variant (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&}]{v}{, }\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{o}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{fc_2include_2fc_2reflect_2variant_8hpp_source_l00087}{87}} of file \mbox{\hyperlink{fc_2include_2fc_2reflect_2variant_8hpp_source}{variant.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \{\ }
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.is\_string()\ )}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ o\ =\ \mbox{\hyperlink{structfc_1_1reflector}{fc::reflector<T>::from\_string}}(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.get\_string().c\_str()\ );}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ o\ =\ \mbox{\hyperlink{structfc_1_1reflector}{fc::reflector<T>::from\_int}}(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.as\_int64()\ );}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structfc_1_1if__enum_3_01fc_1_1true__type_01_4_a11eac43004dde4068db8314f3dc2650d}\index{fc::if\_enum$<$ fc::true\_type $>$@{fc::if\_enum$<$ fc::true\_type $>$}!to\_variant@{to\_variant}}
+\index{to\_variant@{to\_variant}!fc::if\_enum$<$ fc::true\_type $>$@{fc::if\_enum$<$ fc::true\_type $>$}}
+\doxysubsubsection{\texorpdfstring{to\_variant()}{to\_variant()}}
+{\footnotesize\ttfamily \label{structfc_1_1if__enum_3_01fc_1_1true__type_01_4_a11eac43004dde4068db8314f3dc2650d} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+static void \mbox{\hyperlink{structfc_1_1if__enum}{fc\+::if\+\_\+enum}}$<$ \mbox{\hyperlink{structfc_1_1true__type}{fc\+::true\+\_\+type}} $>$\+::to\+\_\+variant (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{o}{, }\item[{\mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&}]{v}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{fc_2include_2fc_2reflect_2variant_8hpp_source_l00082}{82}} of file \mbox{\hyperlink{fc_2include_2fc_2reflect_2variant_8hpp_source}{variant.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \{\ }
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ =\ \mbox{\hyperlink{structfc_1_1reflector}{fc::reflector<T>::to\_fc\_string}}(o);}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/reflect/\mbox{\hyperlink{fc_2include_2fc_2reflect_2variant_8hpp}{variant.\+hpp}}\end{DoxyCompactItemize}

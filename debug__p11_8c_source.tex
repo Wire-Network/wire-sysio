@@ -1,0 +1,61 @@
+\doxysection{debug\+\_\+p11.\+c}
+\hypertarget{debug__p11_8c_source}{}\label{debug__p11_8c_source}\index{libraries/yubihsm/pkcs11/debug\_p11.c@{libraries/yubihsm/pkcs11/debug\_p11.c}}
+\mbox{\hyperlink{debug__p11_8c}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{debug__p11_8c_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{debug__p11_8c_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ 2015-\/2018\ Yubico\ AB}}
+\DoxyCodeLine{\Hypertarget{debug__p11_8c_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{debug__p11_8c_source_l00004}00004\ \textcolor{comment}{\ *\ Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{\Hypertarget{debug__p11_8c_source_l00005}00005\ \textcolor{comment}{\ *\ you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{debug__p11_8c_source_l00006}00006\ \textcolor{comment}{\ *\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{\Hypertarget{debug__p11_8c_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{debug__p11_8c_source_l00008}00008\ \textcolor{comment}{\ *\ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{\Hypertarget{debug__p11_8c_source_l00009}00009\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{debug__p11_8c_source_l00010}00010\ \textcolor{comment}{\ *\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{\Hypertarget{debug__p11_8c_source_l00011}00011\ \textcolor{comment}{\ *\ distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{\Hypertarget{debug__p11_8c_source_l00012}00012\ \textcolor{comment}{\ *\ WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{\Hypertarget{debug__p11_8c_source_l00013}00013\ \textcolor{comment}{\ *\ See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{\Hypertarget{debug__p11_8c_source_l00014}00014\ \textcolor{comment}{\ *\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{debug__p11_8c_source_l00015}00015\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{debug__p11_8c_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{debug__p11_8c_source_l00017}00017\ \textcolor{preprocessor}{\#include\ <stdlib.h>}}
+\DoxyCodeLine{\Hypertarget{debug__p11_8c_source_l00018}00018\ \textcolor{preprocessor}{\#include\ <string.h>}}
+\DoxyCodeLine{\Hypertarget{debug__p11_8c_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{debug__p11_8c_source_l00020}00020\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{debug__p11_8h}{debug\_p11.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{debug__p11_8c_source_l00021}00021\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{yubihsm_8h}{yubihsm.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{debug__p11_8c_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{debug__p11_8c_source_l00023}\mbox{\hyperlink{debug__p11_8c_a4f2b00e9d2103c45be137b3396c200bc}{00023}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{debug__p11_8c_a4f2b00e9d2103c45be137b3396c200bc}{\_YHP11\_DBG}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{debug__p11_8c_source_l00024}\mbox{\hyperlink{debug__p11_8c_aa7859d8d2b3c49143732bfd6c2702669}{00024}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{debug__p11_8c_aa7859d8d2b3c49143732bfd6c2702669}{\_YHP11\_DINOUT}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{debug__p11_8c_source_l00025}\mbox{\hyperlink{debug__p11_8c_a18be458b4a8773f2e02c8547ec0ca584}{00025}}\ FILE\ *\mbox{\hyperlink{debug__p11_8c_a18be458b4a8773f2e02c8547ec0ca584}{\_YHP11\_OUTPUT}}\ =\ NULL;}
+\DoxyCodeLine{\Hypertarget{debug__p11_8c_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{debug__p11_8c_source_l00027}\mbox{\hyperlink{debug__p11_8c_a561f643ac8a24b9d62f61117cd0a1bb4}{00027}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{debug__p11_8c_a561f643ac8a24b9d62f61117cd0a1bb4}{yh\_dbg\_init}}(\textcolor{keywordtype}{int}\ dbg,\ \textcolor{keywordtype}{int}\ dinout,\ \textcolor{keywordtype}{int}\ libdbg,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *debug\_file)\ \{}
+\DoxyCodeLine{\Hypertarget{debug__p11_8c_source_l00028}00028\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{debug__p11_8c_a18be458b4a8773f2e02c8547ec0ca584}{\_YHP11\_OUTPUT}}\ !=\ stderr\ \&\&\ \mbox{\hyperlink{debug__p11_8c_a18be458b4a8773f2e02c8547ec0ca584}{\_YHP11\_OUTPUT}}\ !=\ stdout\ \&\&}
+\DoxyCodeLine{\Hypertarget{debug__p11_8c_source_l00029}00029\ \ \ \ \ \ \ \mbox{\hyperlink{debug__p11_8c_a18be458b4a8773f2e02c8547ec0ca584}{\_YHP11\_OUTPUT}}\ !=\ NULL)\ \{}
+\DoxyCodeLine{\Hypertarget{debug__p11_8c_source_l00030}00030\ \ \ \ \ fclose(\mbox{\hyperlink{debug__p11_8c_a18be458b4a8773f2e02c8547ec0ca584}{\_YHP11\_OUTPUT}});}
+\DoxyCodeLine{\Hypertarget{debug__p11_8c_source_l00031}00031\ \ \ \ \ \mbox{\hyperlink{debug__p11_8c_a18be458b4a8773f2e02c8547ec0ca584}{\_YHP11\_OUTPUT}}\ =\ stderr;}
+\DoxyCodeLine{\Hypertarget{debug__p11_8c_source_l00032}00032\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{debug__p11_8c_source_l00033}00033\ \ \ \textcolor{keywordflow}{if}\ (strcmp(debug\_file,\ \textcolor{stringliteral}{"{}stderr"{}})\ ==\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{debug__p11_8c_source_l00034}00034\ \ \ \ \ \mbox{\hyperlink{debug__p11_8c_a18be458b4a8773f2e02c8547ec0ca584}{\_YHP11\_OUTPUT}}\ =\ stderr;}
+\DoxyCodeLine{\Hypertarget{debug__p11_8c_source_l00035}00035\ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (strcmp(debug\_file,\ \textcolor{stringliteral}{"{}stdout"{}})\ ==\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{debug__p11_8c_source_l00036}00036\ \ \ \ \ \mbox{\hyperlink{debug__p11_8c_a18be458b4a8773f2e02c8547ec0ca584}{\_YHP11\_OUTPUT}}\ =\ stdout;}
+\DoxyCodeLine{\Hypertarget{debug__p11_8c_source_l00037}00037\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{debug__p11_8c_source_l00038}00038\ \ \ \ \ FILE\ *file\ =\ fopen(debug\_file,\ \textcolor{stringliteral}{"{}ab"{}});}
+\DoxyCodeLine{\Hypertarget{debug__p11_8c_source_l00039}00039\ \ \ \ \ \textcolor{keywordflow}{if}\ (file)\ \{}
+\DoxyCodeLine{\Hypertarget{debug__p11_8c_source_l00040}00040\ \ \ \ \ \ \ \mbox{\hyperlink{debug__p11_8c_a18be458b4a8773f2e02c8547ec0ca584}{\_YHP11\_OUTPUT}}\ =\ file;}
+\DoxyCodeLine{\Hypertarget{debug__p11_8c_source_l00041}00041\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{debug__p11_8c_source_l00042}00042\ \ \ \ \ \ \ \mbox{\hyperlink{debug__p11_8c_a18be458b4a8773f2e02c8547ec0ca584}{\_YHP11\_OUTPUT}}\ =\ stderr;}
+\DoxyCodeLine{\Hypertarget{debug__p11_8c_source_l00043}00043\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{debug__p11_8c_source_l00044}00044\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{debug__p11_8c_source_l00045}00045\ \ \ \mbox{\hyperlink{yubihsm_8c_a7d223fd4ee6ae3f578307d72aba37a19}{yh\_set\_debug\_output}}(NULL,\ \mbox{\hyperlink{debug__p11_8c_a18be458b4a8773f2e02c8547ec0ca584}{\_YHP11\_OUTPUT}});}
+\DoxyCodeLine{\Hypertarget{debug__p11_8c_source_l00046}00046\ \ \ \textcolor{keywordflow}{if}\ (dbg\ ||\ getenv(\textcolor{stringliteral}{"{}YUBIHSM\_PKCS11\_DBG"{}}))\ \{}
+\DoxyCodeLine{\Hypertarget{debug__p11_8c_source_l00047}00047\ \ \ \ \ \mbox{\hyperlink{debug__p11_8c_a4f2b00e9d2103c45be137b3396c200bc}{\_YHP11\_DBG}}\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{debug__p11_8c_source_l00048}00048\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{debug__p11_8c_source_l00049}00049\ \ \ \textcolor{keywordflow}{if}\ (dinout\ ||\ getenv(\textcolor{stringliteral}{"{}YUBIHSM\_PKCS11\_DINOUT"{}}))\ \{}
+\DoxyCodeLine{\Hypertarget{debug__p11_8c_source_l00050}00050\ \ \ \ \ \mbox{\hyperlink{debug__p11_8c_aa7859d8d2b3c49143732bfd6c2702669}{\_YHP11\_DINOUT}}\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{debug__p11_8c_source_l00051}00051\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{debug__p11_8c_source_l00052}00052\ \ \ \textcolor{keywordflow}{if}\ (libdbg\ ||\ getenv(\textcolor{stringliteral}{"{}YUBIHSM\_LIB\_DBG"{}}))\ \{}
+\DoxyCodeLine{\Hypertarget{debug__p11_8c_source_l00053}00053\ \ \ \ \ \mbox{\hyperlink{yubihsm_8c_a24c3146e51242256af505961e763f417}{yh\_set\_verbosity}}(NULL,\ \mbox{\hyperlink{yubihsm_8h_a15dbe0ac973691939ca6e9148b181ccd}{YH\_VERB\_ALL}});}
+\DoxyCodeLine{\Hypertarget{debug__p11_8c_source_l00054}00054\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{debug__p11_8c_source_l00055}00055\ \}}
+
+\end{DoxyCode}

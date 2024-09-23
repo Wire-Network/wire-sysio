@@ -1,0 +1,62 @@
+\doxysection{test\+\_\+scoped\+\_\+exit.\+cpp}
+\hypertarget{test__scoped__exit_8cpp_source}{}\label{test__scoped__exit_8cpp_source}\index{libraries/fc/test/scoped\_exit/test\_scoped\_exit.cpp@{libraries/fc/test/scoped\_exit/test\_scoped\_exit.cpp}}
+\mbox{\hyperlink{test__scoped__exit_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{test__scoped__exit_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{scoped__exit_8hpp}{fc/scoped\_exit.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{test__scoped__exit_8cpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{test__scoped__exit_8cpp_source_l00003}\mbox{\hyperlink{test__scoped__exit_8cpp_a6b2a3852db8bb19ab6909bac01859985}{00003}}\ \textcolor{preprocessor}{\#define\ BOOST\_TEST\_MODULE\ scoped\_exit}}
+\DoxyCodeLine{\Hypertarget{test__scoped__exit_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <boost/test/included/unit\_test.hpp>}}
+\DoxyCodeLine{\Hypertarget{test__scoped__exit_8cpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{test__scoped__exit_8cpp_source_l00006}00006\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacefc}{fc}};}
+\DoxyCodeLine{\Hypertarget{test__scoped__exit_8cpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{test__scoped__exit_8cpp_source_l00008}00008\ BOOST\_AUTO\_TEST\_SUITE(scoped\_exit\_test\_suite)}
+\DoxyCodeLine{\Hypertarget{test__scoped__exit_8cpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{test__scoped__exit_8cpp_source_l00010}\mbox{\hyperlink{test__scoped__exit_8cpp_a6de8e8ef1e1e0ff1f0839b0ad1c784d7}{00010}}\ \mbox{\hyperlink{test__scoped__exit_8cpp_a6de8e8ef1e1e0ff1f0839b0ad1c784d7}{BOOST\_AUTO\_TEST\_CASE}}(scoped\_exit\_test)}
+\DoxyCodeLine{\Hypertarget{test__scoped__exit_8cpp_source_l00011}00011\ \{}
+\DoxyCodeLine{\Hypertarget{test__scoped__exit_8cpp_source_l00012}00012\ \ \ \ \textcolor{keywordtype}{bool}\ result\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{test__scoped__exit_8cpp_source_l00013}00013\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__scoped__exit_8cpp_source_l00014}00014\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ g1\ =\ \mbox{\hyperlink{namespacefc_a23d89b54a8ffd84f7e7efeb21747d846}{make\_scoped\_exit}}([\&]\{\ result\ =\ \textcolor{keyword}{true};\ \});}
+\DoxyCodeLine{\Hypertarget{test__scoped__exit_8cpp_source_l00015}00015\ \ \ \ \ \ \ BOOST\_TEST(result\ ==\ \textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{test__scoped__exit_8cpp_source_l00016}00016\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__scoped__exit_8cpp_source_l00017}00017\ \ \ \ BOOST\_TEST(result\ ==\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{test__scoped__exit_8cpp_source_l00018}00018\ \}}
+\DoxyCodeLine{\Hypertarget{test__scoped__exit_8cpp_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{test__scoped__exit_8cpp_source_l00020}\mbox{\hyperlink{test__scoped__exit_8cpp_ac7e94a35187102607447de2e9a33194d}{00020}}\ \mbox{\hyperlink{test__scoped__exit_8cpp_a6de8e8ef1e1e0ff1f0839b0ad1c784d7}{BOOST\_AUTO\_TEST\_CASE}}(cancel)\ \{}
+\DoxyCodeLine{\Hypertarget{test__scoped__exit_8cpp_source_l00021}00021\ \ \ \ \textcolor{keywordtype}{bool}\ result\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{test__scoped__exit_8cpp_source_l00022}00022\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__scoped__exit_8cpp_source_l00023}00023\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ g1\ =\ \mbox{\hyperlink{namespacefc_a23d89b54a8ffd84f7e7efeb21747d846}{make\_scoped\_exit}}([\&]\{\ result\ =\ \textcolor{keyword}{true};\ \});}
+\DoxyCodeLine{\Hypertarget{test__scoped__exit_8cpp_source_l00024}00024\ \ \ \ \ \ \ BOOST\_TEST(result\ ==\ \textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{test__scoped__exit_8cpp_source_l00025}00025\ \ \ \ \ \ \ g1.cancel();}
+\DoxyCodeLine{\Hypertarget{test__scoped__exit_8cpp_source_l00026}00026\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__scoped__exit_8cpp_source_l00027}00027\ \ \ \ BOOST\_TEST(result\ ==\ \textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{test__scoped__exit_8cpp_source_l00028}00028\ \}}
+\DoxyCodeLine{\Hypertarget{test__scoped__exit_8cpp_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{test__scoped__exit_8cpp_source_l00030}\mbox{\hyperlink{test__scoped__exit_8cpp_ac288d01eb57ee11cc67124cf53f6f823}{00030}}\ \mbox{\hyperlink{test__scoped__exit_8cpp_a6de8e8ef1e1e0ff1f0839b0ad1c784d7}{BOOST\_AUTO\_TEST\_CASE}}(test\_move)\ \{}
+\DoxyCodeLine{\Hypertarget{test__scoped__exit_8cpp_source_l00031}00031\ \ \ \ \textcolor{keywordtype}{bool}\ result\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{test__scoped__exit_8cpp_source_l00032}00032\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__scoped__exit_8cpp_source_l00033}00033\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ g1\ =\ \mbox{\hyperlink{namespacefc_a23d89b54a8ffd84f7e7efeb21747d846}{make\_scoped\_exit}}([\&]\{\ result\ =\ \textcolor{keyword}{true};\ \});}
+\DoxyCodeLine{\Hypertarget{test__scoped__exit_8cpp_source_l00034}00034\ \ \ \ \ \ \ BOOST\_TEST(result\ ==\ \textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{test__scoped__exit_8cpp_source_l00035}00035\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__scoped__exit_8cpp_source_l00036}00036\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ g2\ =\ std::move(g1);}
+\DoxyCodeLine{\Hypertarget{test__scoped__exit_8cpp_source_l00037}00037\ \ \ \ \ \ \ \ \ \ BOOST\_TEST(result\ ==\ \textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{test__scoped__exit_8cpp_source_l00038}00038\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__scoped__exit_8cpp_source_l00039}00039\ \ \ \ \ \ \ BOOST\_TEST(result\ ==\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{test__scoped__exit_8cpp_source_l00040}00040\ \ \ \ \ \ \ result\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{test__scoped__exit_8cpp_source_l00041}00041\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__scoped__exit_8cpp_source_l00042}00042\ \ \ \ BOOST\_TEST(result\ ==\ \textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{test__scoped__exit_8cpp_source_l00043}00043\ \}}
+\DoxyCodeLine{\Hypertarget{test__scoped__exit_8cpp_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{test__scoped__exit_8cpp_source_l00045}\mbox{\hyperlink{structmove__only}{00045}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structmove__only}{move\_only}}\ \{}
+\DoxyCodeLine{\Hypertarget{test__scoped__exit_8cpp_source_l00046}\mbox{\hyperlink{structmove__only_ab81178eaccf99ff1f4edf402200efef8}{00046}}\ \ \ \ \mbox{\hyperlink{structmove__only_ab81178eaccf99ff1f4edf402200efef8}{move\_only}}()\ =\ \textcolor{keywordflow}{default};}
+\DoxyCodeLine{\Hypertarget{test__scoped__exit_8cpp_source_l00047}\mbox{\hyperlink{structmove__only_ade7aebf9cdff6474cb2b0b989c599319}{00047}}\ \ \ \ \mbox{\hyperlink{structmove__only_ade7aebf9cdff6474cb2b0b989c599319}{move\_only}}(\mbox{\hyperlink{structmove__only}{move\_only}}\&\&)\ =\ \textcolor{keywordflow}{default};}
+\DoxyCodeLine{\Hypertarget{test__scoped__exit_8cpp_source_l00048}\mbox{\hyperlink{structmove__only_a1c66c5ae4a2249b1a2b8de17def9eeb1}{00048}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structmove__only_a1c66c5ae4a2249b1a2b8de17def9eeb1}{operator()}}()\ \{\}}
+\DoxyCodeLine{\Hypertarget{test__scoped__exit_8cpp_source_l00049}00049\ \};}
+\DoxyCodeLine{\Hypertarget{test__scoped__exit_8cpp_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{test__scoped__exit_8cpp_source_l00051}\mbox{\hyperlink{test__scoped__exit_8cpp_a545db944b0fa657ffd099c46028909d0}{00051}}\ \mbox{\hyperlink{test__scoped__exit_8cpp_a6de8e8ef1e1e0ff1f0839b0ad1c784d7}{BOOST\_AUTO\_TEST\_CASE}}(test\_forward)\ \{}
+\DoxyCodeLine{\Hypertarget{test__scoped__exit_8cpp_source_l00052}00052\ \ \ \ \textcolor{keyword}{auto}\ g\ =\ \mbox{\hyperlink{namespacefc_a23d89b54a8ffd84f7e7efeb21747d846}{make\_scoped\_exit}}(\mbox{\hyperlink{structmove__only}{move\_only}}\{\});}
+\DoxyCodeLine{\Hypertarget{test__scoped__exit_8cpp_source_l00053}00053\ \ \ \ \textcolor{keyword}{auto}\ g2\ =\ std::move(g);}
+\DoxyCodeLine{\Hypertarget{test__scoped__exit_8cpp_source_l00054}00054\ \}}
+\DoxyCodeLine{\Hypertarget{test__scoped__exit_8cpp_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{test__scoped__exit_8cpp_source_l00056}00056\ BOOST\_AUTO\_TEST\_SUITE\_END()}
+
+\end{DoxyCode}

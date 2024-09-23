@@ -1,0 +1,41 @@
+\doxysection{plugins/trace\+\_\+api\+\_\+plugin/include/sysio/trace\+\_\+api/request\+\_\+handler.hpp File Reference}
+\hypertarget{request__handler_8hpp}{}\label{request__handler_8hpp}\index{plugins/trace\_api\_plugin/include/sysio/trace\_api/request\_handler.hpp@{plugins/trace\_api\_plugin/include/sysio/trace\_api/request\_handler.hpp}}
+{\ttfamily \#include $<$fc/variant.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/trace\+\_\+api/metadata\+\_\+log.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/trace\+\_\+api/data\+\_\+log.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/trace\+\_\+api/common.\+hpp$>$}\newline
+Include dependency graph for request\+\_\+handler.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{request__handler_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{request__handler_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classsysio_1_1trace__api_1_1detail_1_1response__formatter}{sysio\+::trace\+\_\+api\+::detail\+::response\+\_\+formatter}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1trace__api_1_1request__handler}{sysio\+::trace\+\_\+api\+::request\+\_\+handler$<$ Logfile\+Provider, Data\+Handler\+Provider $>$}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1trace__api}{sysio\+::trace\+\_\+api}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1detail}{sysio\+::trace\+\_\+api\+::detail}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1trace__api_ae306675da343477bc1ebdf6512c76066}{sysio\+::trace\+\_\+api\+::data\+\_\+handler\+\_\+function}} = std\+::function$<$std\+::tuple$<$\mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}}, std\+::optional$<$\mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}}$>$$>$( const std\+::variant$<$\mbox{\hyperlink{structsysio_1_1trace__api_1_1action__trace__v0}{action\+\_\+trace\+\_\+v0}}, \mbox{\hyperlink{structsysio_1_1trace__api_1_1action__trace__v1}{action\+\_\+trace\+\_\+v1}}$>$ \& action\+\_\+trace\+\_\+t, const \mbox{\hyperlink{namespacesysio_1_1trace__api_a24d1d2b642518b3d627011e7ef39ae9a}{yield\+\_\+function}}\&)$>$
+\end{DoxyCompactItemize}

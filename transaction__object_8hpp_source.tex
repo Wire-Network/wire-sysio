@@ -1,0 +1,51 @@
+\doxysection{transaction\+\_\+object.\+hpp}
+\hypertarget{transaction__object_8hpp_source}{}\label{transaction__object_8hpp_source}\index{libraries/chain/include/sysio/chain/transaction\_object.hpp@{libraries/chain/include/sysio/chain/transaction\_object.hpp}}
+\mbox{\hyperlink{transaction__object_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{transaction__object_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{transaction__object_8hpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{raw_8hpp}{fc/io/raw.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{transaction__object_8hpp_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{transaction__object_8hpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{transaction_8hpp}{sysio/chain/transaction.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{transaction__object_8hpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{uint128_8hpp}{fc/uint128.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{transaction__object_8hpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{transaction__object_8hpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <boost/multi\_index/hashed\_index.hpp>}}
+\DoxyCodeLine{\Hypertarget{transaction__object_8hpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <boost/multi\_index/mem\_fun.hpp>}}
+\DoxyCodeLine{\Hypertarget{transaction__object_8hpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{transaction__object_8hpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{multi__index__includes_8hpp}{multi\_index\_includes.hpp}}"{}}}
+\DoxyCodeLine{\Hypertarget{transaction__object_8hpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{transaction__object_8hpp_source_l00012}00012\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{\ \textcolor{keyword}{namespace\ }chain\ \{}
+\DoxyCodeLine{\Hypertarget{transaction__object_8hpp_source_l00013}00013\ \ \ \ \textcolor{keyword}{using\ }boost::multi\_index\_container;}
+\DoxyCodeLine{\Hypertarget{transaction__object_8hpp_source_l00014}00014\ \ \ \ \textcolor{keyword}{using\ namespace\ }boost::multi\_index;}
+\DoxyCodeLine{\Hypertarget{transaction__object_8hpp_source_l00020}\mbox{\hyperlink{classsysio_1_1chain_1_1transaction__object}{00020}}\ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1chain_1_1transaction__object}{transaction\_object}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{structchainbase_1_1object}{chainbase::object}}<transaction\_object\_type,\ transaction\_object>}
+\DoxyCodeLine{\Hypertarget{transaction__object_8hpp_source_l00021}00021\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{transaction__object_8hpp_source_l00022}00022\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2types_8hpp_a4f726ee00eb9bbf2574c06492926cf73}{OBJECT\_CTOR}}(\mbox{\hyperlink{classsysio_1_1chain_1_1transaction__object}{transaction\_object}})}
+\DoxyCodeLine{\Hypertarget{transaction__object_8hpp_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{transaction__object_8hpp_source_l00024}00024\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classchainbase_1_1oid}{id\_type}}\ \ \ \ \ \ \ \ \ \ \ \ \ id;}
+\DoxyCodeLine{\Hypertarget{transaction__object_8hpp_source_l00025}00025\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1time__point__sec}{time\_point\_sec}}\ \ \ \ \ \ expiration;}
+\DoxyCodeLine{\Hypertarget{transaction__object_8hpp_source_l00026}00026\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1sha256}{transaction\_id\_type}}\ trx\_id;\ \textcolor{comment}{//<\ trx\_id\ should\ not\ be\ changed\ within\ a\ chainbase\ modifier\ lambda}}
+\DoxyCodeLine{\Hypertarget{transaction__object_8hpp_source_l00027}00027\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{transaction__object_8hpp_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{transaction__object_8hpp_source_l00029}00029\ \ \ \ \textcolor{keyword}{struct\ }by\_expiration;}
+\DoxyCodeLine{\Hypertarget{transaction__object_8hpp_source_l00030}00030\ \ \ \ \textcolor{keyword}{struct\ }by\_trx\_id;}
+\DoxyCodeLine{\Hypertarget{transaction__object_8hpp_source_l00031}\mbox{\hyperlink{namespacesysio_1_1chain_a7ae1398893dd587589ee5593a952a2ef}{00031}}\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacesysio_1_1chain_a7ae1398893dd587589ee5593a952a2ef}{transaction\_multi\_index}}\ =\ \mbox{\hyperlink{namespacechainbase_aba1e047495dcaa4e0d32ff25b8705f1f}{chainbase::shared\_multi\_index\_container}}<}
+\DoxyCodeLine{\Hypertarget{transaction__object_8hpp_source_l00032}00032\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__object}{transaction\_object}},}
+\DoxyCodeLine{\Hypertarget{transaction__object_8hpp_source_l00033}00033\ \ \ \ \ \ \ indexed\_by<}
+\DoxyCodeLine{\Hypertarget{transaction__object_8hpp_source_l00034}00034\ \ \ \ \ \ \ \ \ \ ordered\_unique<\ tag<by\_id>,\ BOOST\_MULTI\_INDEX\_MEMBER(\mbox{\hyperlink{classsysio_1_1chain_1_1transaction__object}{transaction\_object}},\ \mbox{\hyperlink{classchainbase_1_1oid}{transaction\_object::id\_type}},\ \textcolor{keywordtype}{id})>,}
+\DoxyCodeLine{\Hypertarget{transaction__object_8hpp_source_l00035}00035\ \ \ \ \ \ \ \ \ \ ordered\_unique<\ tag<by\_trx\_id>,\ BOOST\_MULTI\_INDEX\_MEMBER(\mbox{\hyperlink{classsysio_1_1chain_1_1transaction__object}{transaction\_object}},\ \mbox{\hyperlink{classfc_1_1sha256}{transaction\_id\_type}},\ trx\_id)>,}
+\DoxyCodeLine{\Hypertarget{transaction__object_8hpp_source_l00036}00036\ \ \ \ \ \ \ \ \ \ ordered\_unique<\ tag<by\_expiration>,}
+\DoxyCodeLine{\Hypertarget{transaction__object_8hpp_source_l00037}00037\ \ \ \ \ \ \ \ \ \ \ \ \ composite\_key<\ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__object}{transaction\_object}},}
+\DoxyCodeLine{\Hypertarget{transaction__object_8hpp_source_l00038}00038\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_MULTI\_INDEX\_MEMBER(\ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__object}{transaction\_object}},\ \mbox{\hyperlink{classfc_1_1time__point__sec}{time\_point\_sec}},\ expiration\ ),}
+\DoxyCodeLine{\Hypertarget{transaction__object_8hpp_source_l00039}00039\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_MULTI\_INDEX\_MEMBER(\ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__object}{transaction\_object}},\ \mbox{\hyperlink{classchainbase_1_1oid}{transaction\_object::id\_type}},\ \textcolor{keywordtype}{id})}
+\DoxyCodeLine{\Hypertarget{transaction__object_8hpp_source_l00040}00040\ \ \ \ \ \ \ \ \ \ \ \ \ >}
+\DoxyCodeLine{\Hypertarget{transaction__object_8hpp_source_l00041}00041\ \ \ \ \ \ \ \ \ \ >}
+\DoxyCodeLine{\Hypertarget{transaction__object_8hpp_source_l00042}00042\ \ \ \ \ \ \ >}
+\DoxyCodeLine{\Hypertarget{transaction__object_8hpp_source_l00043}00043\ \ \ \ >;}
+\DoxyCodeLine{\Hypertarget{transaction__object_8hpp_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{transaction__object_8hpp_source_l00045}\mbox{\hyperlink{namespacesysio_1_1chain_a2d5eaf4500f30a5386c9da75c1e5836b}{00045}}\ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{namespacechainbase_a3ba122cfc1e47fa4ddf024212ec17431}{chainbase::generic\_index<transaction\_multi\_index>}}\ \mbox{\hyperlink{namespacesysio_1_1chain_a2d5eaf4500f30a5386c9da75c1e5836b}{transaction\_index}};}
+\DoxyCodeLine{\Hypertarget{transaction__object_8hpp_source_l00046}00046\ \}\ \}}
+\DoxyCodeLine{\Hypertarget{transaction__object_8hpp_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{transaction__object_8hpp_source_l00048}00048\ \mbox{\hyperlink{chainbase_8hpp_a789572f90cbf8d6a0c1909c170298a1a}{CHAINBASE\_SET\_INDEX\_TYPE}}(\mbox{\hyperlink{classsysio_1_1chain_1_1transaction__object}{sysio::chain::transaction\_object}},\ \mbox{\hyperlink{namespacesysio_1_1chain_a7ae1398893dd587589ee5593a952a2ef}{sysio::chain::transaction\_multi\_index}})}
+\DoxyCodeLine{\Hypertarget{transaction__object_8hpp_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{transaction__object_8hpp_source_l00050}00050\ \mbox{\hyperlink{reflect_8hpp_a2ace850e636b1ca0b18fe3177e413d99}{FC\_REFLECT}}(\mbox{\hyperlink{classsysio_1_1chain_1_1transaction__object}{sysio::chain::transaction\_object}},\ (expiration)(trx\_id))}
+
+\end{DoxyCode}

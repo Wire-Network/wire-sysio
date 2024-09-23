@@ -1,0 +1,208 @@
+\doxysection{Cursor\+Stream\+Wrapper\texorpdfstring{$<$}{<} Input\+Stream, Encoding \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{class_cursor_stream_wrapper}{}\label{class_cursor_stream_wrapper}\index{CursorStreamWrapper$<$ InputStream, Encoding $>$@{CursorStreamWrapper$<$ InputStream, Encoding $>$}}
+
+
+Cursor stream wrapper for counting line and column number if error exists.  
+
+
+
+
+{\ttfamily \#include $<$cursorstreamwrapper.\+h$>$}
+
+
+
+Inheritance diagram for Cursor\+Stream\+Wrapper\texorpdfstring{$<$}{<} Input\+Stream, Encoding \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=214pt]{class_cursor_stream_wrapper__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Cursor\+Stream\+Wrapper\texorpdfstring{$<$}{<} Input\+Stream, Encoding \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=214pt]{class_cursor_stream_wrapper__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef Encoding\+::\+Ch \mbox{\hyperlink{class_cursor_stream_wrapper_a2d55eefb9c0f1a118020c57f6580a1a4}{Ch}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Types inherited from \mbox{\hyperlink{class_generic_stream_wrapper}{Generic\+Stream\+Wrapper$<$ Input\+Stream, UTF8$<$$>$ $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{struct_u_t_f8}{UTF8}}$<$$>$\+::\+Ch \mbox{\hyperlink{class_generic_stream_wrapper_a7c6a3fd0f2c0579b2ade05fd3b0bf1d2}{Ch}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_cursor_stream_wrapper_a8d9a0109e19ab4fb7a79091cefe608a7}{Cursor\+Stream\+Wrapper}} (Input\+Stream \&is)
+\item 
+\mbox{\hyperlink{class_cursor_stream_wrapper_a2d55eefb9c0f1a118020c57f6580a1a4}{Ch}} \mbox{\hyperlink{class_cursor_stream_wrapper_af0bbad24ff7ad101cdf9842760deb0f6}{Take}} ()
+\item 
+size\+\_\+t \mbox{\hyperlink{class_cursor_stream_wrapper_ad5cc5b06be7fb5afb7c3d4a82b5ef8ce}{Get\+Line}} () const
+\begin{DoxyCompactList}\small\item\em Get the error line number, if error exists. \end{DoxyCompactList}\item 
+size\+\_\+t \mbox{\hyperlink{class_cursor_stream_wrapper_afdd243889599c9c9edfacea82674a8f4}{Get\+Column}} () const
+\begin{DoxyCompactList}\small\item\em Get the error column number, if error exists. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{class_generic_stream_wrapper}{Generic\+Stream\+Wrapper$<$ Input\+Stream, UTF8$<$$>$ $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_generic_stream_wrapper_a7b12b1de6337d3f8e635b650e372c803}{Generic\+Stream\+Wrapper}} (Input\+Stream \&is)
+\item 
+\mbox{\hyperlink{class_generic_stream_wrapper_a7c6a3fd0f2c0579b2ade05fd3b0bf1d2}{Ch}} \mbox{\hyperlink{class_generic_stream_wrapper_a98d22642dfdd2626ee25ad1db9fe287e}{Peek}} () const
+\item 
+\mbox{\hyperlink{class_generic_stream_wrapper_a7c6a3fd0f2c0579b2ade05fd3b0bf1d2}{Ch}} \mbox{\hyperlink{class_generic_stream_wrapper_a1c0bc67a233e08ed89b4ff37455e7754}{Take}} ()
+\item 
+size\+\_\+t \mbox{\hyperlink{class_generic_stream_wrapper_a5068a627e0a2deffa985db39f89c5378}{Tell}} ()
+\item 
+\mbox{\hyperlink{class_generic_stream_wrapper_a7c6a3fd0f2c0579b2ade05fd3b0bf1d2}{Ch}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_generic_stream_wrapper_a15044e9a6874ca4caa92ed27a191345c}{Put\+Begin}} ()
+\item 
+void \mbox{\hyperlink{class_generic_stream_wrapper_a458b9f3e00ad41dadb069839ab53f0ba}{Put}} (\mbox{\hyperlink{class_generic_stream_wrapper_a7c6a3fd0f2c0579b2ade05fd3b0bf1d2}{Ch}} ch)
+\item 
+void \mbox{\hyperlink{class_generic_stream_wrapper_a210c0864fbff3cc72f2f62ed461105fb}{Flush}} ()
+\item 
+size\+\_\+t \mbox{\hyperlink{class_generic_stream_wrapper_a84f8d6e1f95d53c4e8e22892d5113fd3}{Put\+End}} (\mbox{\hyperlink{class_generic_stream_wrapper_a7c6a3fd0f2c0579b2ade05fd3b0bf1d2}{Ch}} \texorpdfstring{$\ast$}{*}ch)
+\item 
+const \mbox{\hyperlink{class_generic_stream_wrapper_a7c6a3fd0f2c0579b2ade05fd3b0bf1d2}{Ch}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_generic_stream_wrapper_afdfd046b769d1c2e38d9a91656e6b592}{Peek4}} () const
+\item 
+\mbox{\hyperlink{encodings_8h_ac9448aedf514a5bb509bae73a9ce4e58}{UTFType}} \mbox{\hyperlink{class_generic_stream_wrapper_a5978422ff38fbacee201d4123da37e4f}{Get\+Type}} () const
+\item 
+bool \mbox{\hyperlink{class_generic_stream_wrapper_a50f13a9be06f9b29032ca6c655b099ef}{Has\+BOM}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Protected Attributes inherited from \mbox{\hyperlink{class_generic_stream_wrapper}{Generic\+Stream\+Wrapper$<$ Input\+Stream, UTF8$<$$>$ $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+Input\+Stream \& \mbox{\hyperlink{class_generic_stream_wrapper_a2b44ae2c9460c2e18aca6ba25c537cc5}{is\+\_\+}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Input\+Stream, typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} = UTF8$<$$>$$>$\newline
+class Cursor\+Stream\+Wrapper$<$ Input\+Stream, Encoding $>$}
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em Input\+Stream} & Any stream that implements Stream Concept \\
+\hline
+\end{DoxyTemplParams}
+
+
+Definition at line \mbox{\hyperlink{cursorstreamwrapper_8h_source_l00039}{39}} of file \mbox{\hyperlink{cursorstreamwrapper_8h_source}{cursorstreamwrapper.\+h}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{class_cursor_stream_wrapper_a2d55eefb9c0f1a118020c57f6580a1a4}\index{CursorStreamWrapper$<$ InputStream, Encoding $>$@{CursorStreamWrapper$<$ InputStream, Encoding $>$}!Ch@{Ch}}
+\index{Ch@{Ch}!CursorStreamWrapper$<$ InputStream, Encoding $>$@{CursorStreamWrapper$<$ InputStream, Encoding $>$}}
+\doxysubsubsection{\texorpdfstring{Ch}{Ch}}
+{\footnotesize\ttfamily \label{class_cursor_stream_wrapper_a2d55eefb9c0f1a118020c57f6580a1a4} 
+template$<$typename Input\+Stream , typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}  = UTF8$<$$>$$>$ \\
+Encoding\+::\+Ch \mbox{\hyperlink{class_cursor_stream_wrapper}{Cursor\+Stream\+Wrapper}}$<$ Input\+Stream, \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$\+::\+Ch}
+
+
+
+Definition at line \mbox{\hyperlink{cursorstreamwrapper_8h_source_l00041}{41}} of file \mbox{\hyperlink{cursorstreamwrapper_8h_source}{cursorstreamwrapper.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_cursor_stream_wrapper_a8d9a0109e19ab4fb7a79091cefe608a7}\index{CursorStreamWrapper$<$ InputStream, Encoding $>$@{CursorStreamWrapper$<$ InputStream, Encoding $>$}!CursorStreamWrapper@{CursorStreamWrapper}}
+\index{CursorStreamWrapper@{CursorStreamWrapper}!CursorStreamWrapper$<$ InputStream, Encoding $>$@{CursorStreamWrapper$<$ InputStream, Encoding $>$}}
+\doxysubsubsection{\texorpdfstring{CursorStreamWrapper()}{CursorStreamWrapper()}}
+{\footnotesize\ttfamily \label{class_cursor_stream_wrapper_a8d9a0109e19ab4fb7a79091cefe608a7} 
+template$<$typename Input\+Stream , typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}  = UTF8$<$$>$$>$ \\
+\mbox{\hyperlink{class_cursor_stream_wrapper}{Cursor\+Stream\+Wrapper}}$<$ Input\+Stream, \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$\mbox{\hyperlink{class_cursor_stream_wrapper}{\+::\+Cursor\+Stream\+Wrapper}} (\begin{DoxyParamCaption}\item[{Input\+Stream \&}]{is}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{cursorstreamwrapper_8h_source_l00043}{43}} of file \mbox{\hyperlink{cursorstreamwrapper_8h_source}{cursorstreamwrapper.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_stream_wrapper_a7b12b1de6337d3f8e635b650e372c803}{GenericStreamWrapper<InputStream,\ Encoding>}}(is),\ line\_(1),\ col\_(0)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_cursor_stream_wrapper_afdd243889599c9c9edfacea82674a8f4}\index{CursorStreamWrapper$<$ InputStream, Encoding $>$@{CursorStreamWrapper$<$ InputStream, Encoding $>$}!GetColumn@{GetColumn}}
+\index{GetColumn@{GetColumn}!CursorStreamWrapper$<$ InputStream, Encoding $>$@{CursorStreamWrapper$<$ InputStream, Encoding $>$}}
+\doxysubsubsection{\texorpdfstring{GetColumn()}{GetColumn()}}
+{\footnotesize\ttfamily \label{class_cursor_stream_wrapper_afdd243889599c9c9edfacea82674a8f4} 
+template$<$typename Input\+Stream , typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}  = UTF8$<$$>$$>$ \\
+size\+\_\+t \mbox{\hyperlink{class_cursor_stream_wrapper}{Cursor\+Stream\+Wrapper}}$<$ Input\+Stream, \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$\+::\+Get\+Column (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{cursorstreamwrapper_8h_source_l00061}{61}} of file \mbox{\hyperlink{cursorstreamwrapper_8h_source}{cursorstreamwrapper.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00061\ \{\ \textcolor{keywordflow}{return}\ col\_;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_cursor_stream_wrapper_afdd243889599c9c9edfacea82674a8f4_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_cursor_stream_wrapper_ad5cc5b06be7fb5afb7c3d4a82b5ef8ce}\index{CursorStreamWrapper$<$ InputStream, Encoding $>$@{CursorStreamWrapper$<$ InputStream, Encoding $>$}!GetLine@{GetLine}}
+\index{GetLine@{GetLine}!CursorStreamWrapper$<$ InputStream, Encoding $>$@{CursorStreamWrapper$<$ InputStream, Encoding $>$}}
+\doxysubsubsection{\texorpdfstring{GetLine()}{GetLine()}}
+{\footnotesize\ttfamily \label{class_cursor_stream_wrapper_ad5cc5b06be7fb5afb7c3d4a82b5ef8ce} 
+template$<$typename Input\+Stream , typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}  = UTF8$<$$>$$>$ \\
+size\+\_\+t \mbox{\hyperlink{class_cursor_stream_wrapper}{Cursor\+Stream\+Wrapper}}$<$ Input\+Stream, \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$\+::\+Get\+Line (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{cursorstreamwrapper_8h_source_l00059}{59}} of file \mbox{\hyperlink{cursorstreamwrapper_8h_source}{cursorstreamwrapper.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00059\ \{\ \textcolor{keywordflow}{return}\ line\_;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_cursor_stream_wrapper_ad5cc5b06be7fb5afb7c3d4a82b5ef8ce_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_cursor_stream_wrapper_af0bbad24ff7ad101cdf9842760deb0f6}\index{CursorStreamWrapper$<$ InputStream, Encoding $>$@{CursorStreamWrapper$<$ InputStream, Encoding $>$}!Take@{Take}}
+\index{Take@{Take}!CursorStreamWrapper$<$ InputStream, Encoding $>$@{CursorStreamWrapper$<$ InputStream, Encoding $>$}}
+\doxysubsubsection{\texorpdfstring{Take()}{Take()}}
+{\footnotesize\ttfamily \label{class_cursor_stream_wrapper_af0bbad24ff7ad101cdf9842760deb0f6} 
+template$<$typename Input\+Stream , typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}  = UTF8$<$$>$$>$ \\
+\mbox{\hyperlink{class_cursor_stream_wrapper_a2d55eefb9c0f1a118020c57f6580a1a4}{Ch}} \mbox{\hyperlink{class_cursor_stream_wrapper}{Cursor\+Stream\+Wrapper}}$<$ Input\+Stream, \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$\+::\+Take (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{cursorstreamwrapper_8h_source_l00047}{47}} of file \mbox{\hyperlink{cursorstreamwrapper_8h_source}{cursorstreamwrapper.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_cursor_stream_wrapper_a2d55eefb9c0f1a118020c57f6580a1a4}{Ch}}\ \mbox{\hyperlink{namespace_xbyak_1_1util_a36c093c7b6cc66981a18fcbfebc2a225}{ch}}\ =\ this-\/>\mbox{\hyperlink{class_generic_stream_wrapper_a2b44ae2c9460c2e18aca6ba25c537cc5}{is\_}}.Take();}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(ch\ ==\ \textcolor{charliteral}{'\(\backslash\)n'})\ \{}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \ \ \ line\_\ ++;}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ col\_\ =\ 0;}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \ col\_\ ++;}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_xbyak_1_1util_a36c093c7b6cc66981a18fcbfebc2a225}{ch}};}
+\DoxyCodeLine{00056\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/\mbox{\hyperlink{cursorstreamwrapper_8h}{cursorstreamwrapper.\+h}}\end{DoxyCompactItemize}

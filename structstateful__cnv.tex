@@ -1,0 +1,199 @@
+\doxysection{stateful\+\_\+cnv Struct Reference}
+\hypertarget{structstateful__cnv}{}\label{structstateful__cnv}\index{stateful\_cnv@{stateful\_cnv}}
+
+
+Inheritance diagram for stateful\+\_\+cnv\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=209pt]{structstateful__cnv__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for stateful\+\_\+cnv\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=212pt]{structstateful__cnv__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\auto \mbox{\hyperlink{structstateful__cnv_abfad0a6859fb929a78c3db1035864b52}{from\+\_\+wasm}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} val) const -\/$>$ std\+::enable\+\_\+if\+\_\+t$<$ std\+::is\+\_\+same\+\_\+v$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{structhas__stateful__conversion}{has\+\_\+stateful\+\_\+conversion}} $>$, \mbox{\hyperlink{structstateful__conversion}{stateful\+\_\+conversion}} $>$
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\auto \mbox{\hyperlink{structstateful__cnv_ada8a3fa344cd68a38fba11e2cbe3c867}{from\+\_\+wasm}} (\mbox{\hyperlink{namespacesysio_1_1vm_a82e706727e849ccc38e1c8e7888c1609}{wasm\+\_\+ptr\+\_\+t}} ptr, \mbox{\hyperlink{namespacesysio_1_1chain_af05f45cfd38b39e1a4b19cf40c526dab}{wasm\+\_\+size\+\_\+t}} \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}, \mbox{\hyperlink{structsysio_1_1vm_1_1tag}{tag}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$=\{\}) const -\/$>$ std\+::enable\+\_\+if\+\_\+t$<$ is\+\_\+span\+\_\+type\+\_\+v$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\auto \mbox{\hyperlink{structstateful__cnv_aea72cb382c3aa336177c0651499857da}{from\+\_\+wasm}} (\mbox{\hyperlink{namespacesysio_1_1vm_a82e706727e849ccc38e1c8e7888c1609}{wasm\+\_\+ptr\+\_\+t}} ptr, \mbox{\hyperlink{structsysio_1_1vm_1_1tag}{tag}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$=\{\}) const -\/$>$ std\+::enable\+\_\+if\+\_\+t$<$ is\+\_\+argument\+\_\+proxy\+\_\+type\+\_\+v$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&\&std\+::is\+\_\+pointer\+\_\+v$<$ typename T\+::proxy\+\_\+type $>$, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{structsysio_1_1vm_1_1type__converter}{sysio\+::vm\+::type\+\_\+converter$<$ standalone\+\_\+function\+\_\+t $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1vm_1_1type__converter_aabdc9e5ad2d99135fdf897eb87f10224}{SYS\+\_\+\+VM\+\_\+\+FROM\+\_\+\+WASM}} (bool,(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}))
+\item 
+\mbox{\hyperlink{structsysio_1_1vm_1_1type__converter_aabdc9e5ad2d99135fdf897eb87f10224}{SYS\+\_\+\+VM\+\_\+\+FROM\+\_\+\+WASM}} (bool,(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}))
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1vm_1_1type__converter_a5018cdf68f67346a2771a2f4d47aa34a}{to\+\_\+wasm}} (bool \&\&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+\mbox{\hyperlink{structsysio_1_1vm_1_1no__match__t}{no\+\_\+match\+\_\+t}} \mbox{\hyperlink{structsysio_1_1vm_1_1type__converter_af168fe768fee3076ccd7018068d34199}{to\+\_\+wasm}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\&)
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1vm_1_1type__converter_a5018cdf68f67346a2771a2f4d47aa34a}{to\+\_\+wasm}} (bool \&\&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+\mbox{\hyperlink{structsysio_1_1vm_1_1no__match__t}{no\+\_\+match\+\_\+t}} \mbox{\hyperlink{structsysio_1_1vm_1_1type__converter_af168fe768fee3076ccd7018068d34199}{to\+\_\+wasm}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\&)
+\item 
+auto \mbox{\hyperlink{structsysio_1_1vm_1_1type__converter_ada8a3fa344cd68a38fba11e2cbe3c867}{from\+\_\+wasm}} (\mbox{\hyperlink{namespacesysio_1_1vm_a82e706727e849ccc38e1c8e7888c1609}{wasm\+\_\+ptr\+\_\+t}} ptr, \mbox{\hyperlink{namespacesysio_1_1vm_ab7d81f47e123ef4970d3e643196660ea}{wasm\+\_\+size\+\_\+t}} \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}, \mbox{\hyperlink{structsysio_1_1vm_1_1tag}{tag}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$=\{\}) const -\/$>$ std\+::enable\+\_\+if\+\_\+t$<$ is\+\_\+span\+\_\+type\+\_\+v$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$
+\item 
+auto \mbox{\hyperlink{structsysio_1_1vm_1_1type__converter_a2ad23cf6c5efbe394b9eafb7ba13ffbf}{from\+\_\+wasm}} (\mbox{\hyperlink{namespacesysio_1_1vm_a82e706727e849ccc38e1c8e7888c1609}{wasm\+\_\+ptr\+\_\+t}} ptr, \mbox{\hyperlink{namespacesysio_1_1vm_ab7d81f47e123ef4970d3e643196660ea}{wasm\+\_\+size\+\_\+t}} \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}, \mbox{\hyperlink{structsysio_1_1vm_1_1tag}{tag}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$=\{\}) const -\/$>$ std\+::enable\+\_\+if\+\_\+t$<$ is\+\_\+argument\+\_\+proxy\+\_\+type\+\_\+v$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&\&is\+\_\+span\+\_\+type\+\_\+v$<$ typename T\+::proxy\+\_\+type $>$, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$
+\item 
+auto \mbox{\hyperlink{structsysio_1_1vm_1_1type__converter_aea72cb382c3aa336177c0651499857da}{from\+\_\+wasm}} (\mbox{\hyperlink{namespacesysio_1_1vm_a82e706727e849ccc38e1c8e7888c1609}{wasm\+\_\+ptr\+\_\+t}} ptr, \mbox{\hyperlink{structsysio_1_1vm_1_1tag}{tag}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$=\{\}) const -\/$>$ std\+::enable\+\_\+if\+\_\+t$<$ is\+\_\+argument\+\_\+proxy\+\_\+type\+\_\+v$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&\&std\+::is\+\_\+pointer\+\_\+v$<$ typename T\+::proxy\+\_\+type $>$, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$
+\item 
+auto \mbox{\hyperlink{structsysio_1_1vm_1_1type__converter_ada8a3fa344cd68a38fba11e2cbe3c867}{from\+\_\+wasm}} (\mbox{\hyperlink{namespacesysio_1_1vm_a82e706727e849ccc38e1c8e7888c1609}{wasm\+\_\+ptr\+\_\+t}} ptr, \mbox{\hyperlink{namespacesysio_1_1vm_ab7d81f47e123ef4970d3e643196660ea}{wasm\+\_\+size\+\_\+t}} \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}, \mbox{\hyperlink{structsysio_1_1vm_1_1tag}{tag}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$=\{\}) const -\/$>$ std\+::enable\+\_\+if\+\_\+t$<$ is\+\_\+span\+\_\+type\+\_\+v$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$
+\item 
+auto \mbox{\hyperlink{structsysio_1_1vm_1_1type__converter_a2ad23cf6c5efbe394b9eafb7ba13ffbf}{from\+\_\+wasm}} (\mbox{\hyperlink{namespacesysio_1_1vm_a82e706727e849ccc38e1c8e7888c1609}{wasm\+\_\+ptr\+\_\+t}} ptr, \mbox{\hyperlink{namespacesysio_1_1vm_ab7d81f47e123ef4970d3e643196660ea}{wasm\+\_\+size\+\_\+t}} \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}, \mbox{\hyperlink{structsysio_1_1vm_1_1tag}{tag}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$=\{\}) const -\/$>$ std\+::enable\+\_\+if\+\_\+t$<$ is\+\_\+argument\+\_\+proxy\+\_\+type\+\_\+v$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&\&is\+\_\+span\+\_\+type\+\_\+v$<$ typename T\+::proxy\+\_\+type $>$, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$
+\item 
+auto \mbox{\hyperlink{structsysio_1_1vm_1_1type__converter_aea72cb382c3aa336177c0651499857da}{from\+\_\+wasm}} (\mbox{\hyperlink{namespacesysio_1_1vm_a82e706727e849ccc38e1c8e7888c1609}{wasm\+\_\+ptr\+\_\+t}} ptr, \mbox{\hyperlink{structsysio_1_1vm_1_1tag}{tag}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$=\{\}) const -\/$>$ std\+::enable\+\_\+if\+\_\+t$<$ is\+\_\+argument\+\_\+proxy\+\_\+type\+\_\+v$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&\&std\+::is\+\_\+pointer\+\_\+v$<$ typename T\+::proxy\+\_\+type $>$, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$
+\item 
+decltype(auto) \mbox{\hyperlink{structsysio_1_1vm_1_1type__converter_ac08fe85cc1024bdf81a7305d951b9f93}{as\+\_\+value}} (const \mbox{\hyperlink{structsysio_1_1vm_1_1type__converter_ad26375f01e5397fc5d6a4c56605f907d}{elem\+\_\+type}} \&val) const
+\item 
+decltype(auto) \mbox{\hyperlink{structsysio_1_1vm_1_1type__converter_ac08fe85cc1024bdf81a7305d951b9f93}{as\+\_\+value}} (const \mbox{\hyperlink{structsysio_1_1vm_1_1type__converter_ad26375f01e5397fc5d6a4c56605f907d}{elem\+\_\+type}} \&val) const
+\item 
+constexpr auto \mbox{\hyperlink{structsysio_1_1vm_1_1type__converter_a040445c2ef3f86a985420ea858f9ba45}{as\+\_\+result}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\&val) const
+\item 
+constexpr auto \mbox{\hyperlink{structsysio_1_1vm_1_1type__converter_a040445c2ef3f86a985420ea858f9ba45}{as\+\_\+result}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\&val) const
+\item 
+\mbox{\hyperlink{structsysio_1_1vm_1_1type__converter_a7afa36ffbfccf6704e19ad6f374e6821}{running\+\_\+context}} (Host\+\_\+\+Type \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a5a5638571b2406db1f899a039f3eff9d}{host}}, const \mbox{\hyperlink{structsysio_1_1vm_1_1execution__interface}{execution\+\_\+interface}} \&ei)
+\item 
+\mbox{\hyperlink{structsysio_1_1vm_1_1type__converter_a4313b6793cb38b4564eb60b1937f4486}{running\+\_\+context}} (Host\+\_\+\+Type \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a5a5638571b2406db1f899a039f3eff9d}{host}}, \mbox{\hyperlink{structsysio_1_1vm_1_1execution__interface}{execution\+\_\+interface}} \&\&ei)
+\item 
+decltype(auto) \mbox{\hyperlink{structsysio_1_1vm_1_1type__converter_a4e977f78d30ba3952099aae66b486541}{get\+\_\+host}} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{structsysio_1_1vm_1_1running__context}{sysio\+::vm\+::running\+\_\+context$<$ standalone\+\_\+function\+\_\+t, execution\+\_\+interface $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a7afa36ffbfccf6704e19ad6f374e6821}{running\+\_\+context}} (\mbox{\hyperlink{namespacesysio_1_1vm_a7dd645e455b4223b85222e54f0fc3c14}{standalone\+\_\+function\+\_\+t}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a5a5638571b2406db1f899a039f3eff9d}{host}}, const \mbox{\hyperlink{structsysio_1_1vm_1_1execution__interface}{execution\+\_\+interface}} \&ei)
+\item 
+\mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a4313b6793cb38b4564eb60b1937f4486}{running\+\_\+context}} (\mbox{\hyperlink{namespacesysio_1_1vm_a7dd645e455b4223b85222e54f0fc3c14}{standalone\+\_\+function\+\_\+t}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a5a5638571b2406db1f899a039f3eff9d}{host}}, \mbox{\hyperlink{structsysio_1_1vm_1_1execution__interface}{execution\+\_\+interface}} \&\&ei)
+\item 
+\mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a7afa36ffbfccf6704e19ad6f374e6821}{running\+\_\+context}} (\mbox{\hyperlink{namespacesysio_1_1vm_a7dd645e455b4223b85222e54f0fc3c14}{standalone\+\_\+function\+\_\+t}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a5a5638571b2406db1f899a039f3eff9d}{host}}, const \mbox{\hyperlink{structsysio_1_1vm_1_1execution__interface}{execution\+\_\+interface}} \&ei)
+\item 
+\mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a4313b6793cb38b4564eb60b1937f4486}{running\+\_\+context}} (\mbox{\hyperlink{namespacesysio_1_1vm_a7dd645e455b4223b85222e54f0fc3c14}{standalone\+\_\+function\+\_\+t}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a5a5638571b2406db1f899a039f3eff9d}{host}}, \mbox{\hyperlink{structsysio_1_1vm_1_1execution__interface}{execution\+\_\+interface}} \&\&ei)
+\item 
+void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_adcf11dcf0561f87d00d970dedd3cc7f1}{access}} (\mbox{\hyperlink{namespacesysio_1_1vm_a82e706727e849ccc38e1c8e7888c1609}{wasm\+\_\+ptr\+\_\+t}} addr=0) const
+\item 
+void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_adcf11dcf0561f87d00d970dedd3cc7f1}{access}} (\mbox{\hyperlink{namespacesysio_1_1vm_a82e706727e849ccc38e1c8e7888c1609}{wasm\+\_\+ptr\+\_\+t}} addr=0) const
+\item 
+\mbox{\hyperlink{structsysio_1_1vm_1_1execution__interface}{execution\+\_\+interface}} \& \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a102b607430e70aab298a77980fe775b1}{get\+\_\+interface}} ()
+\item 
+const \mbox{\hyperlink{structsysio_1_1vm_1_1execution__interface}{execution\+\_\+interface}} \& \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a499abb110132b4d1d866394eb22f89fb}{get\+\_\+interface}} () const
+\item 
+\mbox{\hyperlink{structsysio_1_1vm_1_1execution__interface}{execution\+\_\+interface}} \& \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a102b607430e70aab298a77980fe775b1}{get\+\_\+interface}} ()
+\item 
+const \mbox{\hyperlink{structsysio_1_1vm_1_1execution__interface}{execution\+\_\+interface}} \& \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a499abb110132b4d1d866394eb22f89fb}{get\+\_\+interface}} () const
+\item 
+decltype(auto) \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a4e977f78d30ba3952099aae66b486541}{get\+\_\+host}} ()
+\item 
+decltype(auto) \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a4e977f78d30ba3952099aae66b486541}{get\+\_\+host}} ()
+\item 
+auto \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a478b0dc62286dd10788d1a035656b0ed}{validate\+\_\+pointer}} (\mbox{\hyperlink{union_u}{U}} ptr, \mbox{\hyperlink{namespacesysio_1_1vm_ab7d81f47e123ef4970d3e643196660ea}{wasm\+\_\+size\+\_\+t}} \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}) const
+\item 
+auto \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a478b0dc62286dd10788d1a035656b0ed}{validate\+\_\+pointer}} (\mbox{\hyperlink{union_u}{U}} ptr, \mbox{\hyperlink{namespacesysio_1_1vm_ab7d81f47e123ef4970d3e643196660ea}{wasm\+\_\+size\+\_\+t}} \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}) const
+\item 
+auto \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a17c78537d5c2f671c0fec3513e0e4eb3}{validate\+\_\+null\+\_\+terminated\+\_\+pointer}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} ptr) const
+\item 
+auto \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a17c78537d5c2f671c0fec3513e0e4eb3}{validate\+\_\+null\+\_\+terminated\+\_\+pointer}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} ptr) const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Public Types inherited from \mbox{\hyperlink{structsysio_1_1vm_1_1type__converter}{sysio\+::vm\+::type\+\_\+converter$<$ standalone\+\_\+function\+\_\+t $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{structsysio_1_1vm_1_1type__converter_a8f13ea6cd34d95c3c68a6e7cb59b8332}{base\+\_\+type}}
+\item 
+using \mbox{\hyperlink{structsysio_1_1vm_1_1type__converter_ad26375f01e5397fc5d6a4c56605f907d}{elem\+\_\+type}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Types inherited from \mbox{\hyperlink{structsysio_1_1vm_1_1running__context}{sysio\+::vm\+::running\+\_\+context$<$ standalone\+\_\+function\+\_\+t, execution\+\_\+interface $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a69040f9a8b13c6a7de2df8a9b07fce71}{running\+\_\+context\+\_\+t}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes inherited from \mbox{\hyperlink{structsysio_1_1vm_1_1running__context}{sysio\+::vm\+::running\+\_\+context$<$ standalone\+\_\+function\+\_\+t, execution\+\_\+interface $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacesysio_1_1vm_a7dd645e455b4223b85222e54f0fc3c14}{standalone\+\_\+function\+\_\+t}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a5a5638571b2406db1f899a039f3eff9d}{host}}
+\item 
+\mbox{\hyperlink{structsysio_1_1vm_1_1execution__interface}{execution\+\_\+interface}} \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_acb4ee00df8e5719608f1fba32d6d0bed}{interface}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{host__functions__tests_8cpp_source_l00419}{419}} of file \mbox{\hyperlink{host__functions__tests_8cpp_source}{host\+\_\+functions\+\_\+tests.\+cpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structstateful__cnv_abfad0a6859fb929a78c3db1035864b52}\index{stateful\_cnv@{stateful\_cnv}!from\_wasm@{from\_wasm}}
+\index{from\_wasm@{from\_wasm}!stateful\_cnv@{stateful\_cnv}}
+\doxysubsubsection{\texorpdfstring{from\_wasm()}{from\_wasm()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{structstateful__cnv_abfad0a6859fb929a78c3db1035864b52} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+auto stateful\+\_\+cnv\+::from\+\_\+wasm (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{val}{}\end{DoxyParamCaption}) const -\/$>$ std\+::enable\+\_\+if\+\_\+t$<$std\+::is\+\_\+same\+\_\+v$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{structhas__stateful__conversion}{has\+\_\+stateful\+\_\+conversion}}$>$,                           \mbox{\hyperlink{structstateful__conversion}{stateful\+\_\+conversion}}$>$ \hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{host__functions__tests_8cpp_source_l00423}{423}} of file \mbox{\hyperlink{host__functions__tests_8cpp_source}{host\+\_\+functions\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00425\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00426\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{\ val\ \};}
+\DoxyCodeLine{00427\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structstateful__cnv_aea72cb382c3aa336177c0651499857da}\index{stateful\_cnv@{stateful\_cnv}!from\_wasm@{from\_wasm}}
+\index{from\_wasm@{from\_wasm}!stateful\_cnv@{stateful\_cnv}}
+\doxysubsubsection{\texorpdfstring{from\_wasm()}{from\_wasm()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{structstateful__cnv_aea72cb382c3aa336177c0651499857da} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+auto \mbox{\hyperlink{structsysio_1_1vm_1_1type__converter}{sysio\+::vm\+::type\+\_\+converter}}$<$ Host, Execution\+\_\+\+Interface $>$\+::from\+\_\+wasm (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacesysio_1_1vm_a82e706727e849ccc38e1c8e7888c1609}{wasm\+\_\+ptr\+\_\+t}}}]{ptr}{, }\item[{\mbox{\hyperlink{structsysio_1_1vm_1_1tag}{tag}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$}]{}{ = {\ttfamily \{\}}}\end{DoxyParamCaption}) const -\/$>$ std\+::enable\+\_\+if\+\_\+t$<$ is\+\_\+argument\+\_\+proxy\+\_\+type\+\_\+v$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$ \&\&                               std\+::is\+\_\+pointer\+\_\+v$<$typename T\+::proxy\+\_\+type$>$, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$ \hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_source_l00097}{97}} of file \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_source}{host\+\_\+function.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\})\ \textcolor{keyword}{const}}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ -\/>\ std::enable\_if\_t<\ is\_argument\_proxy\_type\_v<T>\ \&\&}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::is\_pointer\_v<typename\ T::proxy\_type>,\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}>\ \{}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ this-\/>\textcolor{keyword}{template}\ \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a478b0dc62286dd10788d1a035656b0ed}{validate\_pointer<typename\ T::pointee\_type>}}(ptr,\ 1);}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\};}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structstateful__cnv_ada8a3fa344cd68a38fba11e2cbe3c867}\index{stateful\_cnv@{stateful\_cnv}!from\_wasm@{from\_wasm}}
+\index{from\_wasm@{from\_wasm}!stateful\_cnv@{stateful\_cnv}}
+\doxysubsubsection{\texorpdfstring{from\_wasm()}{from\_wasm()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{structstateful__cnv_ada8a3fa344cd68a38fba11e2cbe3c867} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+auto \mbox{\hyperlink{structsysio_1_1vm_1_1type__converter}{sysio\+::vm\+::type\+\_\+converter}}$<$ Host, Execution\+\_\+\+Interface $>$\+::from\+\_\+wasm (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacesysio_1_1vm_a82e706727e849ccc38e1c8e7888c1609}{wasm\+\_\+ptr\+\_\+t}}}]{ptr}{, }\item[{\mbox{\hyperlink{namespacesysio_1_1chain_af05f45cfd38b39e1a4b19cf40c526dab}{wasm\+\_\+size\+\_\+t}}}]{len}{, }\item[{\mbox{\hyperlink{structsysio_1_1vm_1_1tag}{tag}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$}]{}{ = {\ttfamily \{\}}}\end{DoxyParamCaption}) const -\/$>$ std\+::enable\+\_\+if\+\_\+t$<$is\+\_\+span\+\_\+type\+\_\+v$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$ \hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_source_l00082}{82}} of file \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_source}{host\+\_\+function.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\})\ \textcolor{keyword}{const}}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ -\/>\ std::enable\_if\_t<is\_span\_type\_v<T>,\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}>\ \{}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ this-\/>\textcolor{keyword}{template}\ \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a478b0dc62286dd10788d1a035656b0ed}{validate\_pointer<typename\ T::value\_type>}}(ptr,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}});}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{\textcolor{keyword}{static\_cast<}typename\ T::pointer\textcolor{keyword}{>}(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}),\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\};}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/tests/\mbox{\hyperlink{host__functions__tests_8cpp}{host\+\_\+functions\+\_\+tests.\+cpp}}\end{DoxyCompactItemize}

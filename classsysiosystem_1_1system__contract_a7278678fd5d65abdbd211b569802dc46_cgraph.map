@@ -1,0 +1,15 @@
+<map id="sysiosystem::system_contract::powerup" name="sysiosystem::system_contract::powerup">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,47,152,88"/>
+<area shape="rect" id="Node000002" href="$namespacesysiosystem.html#aef52abde82b1b047f831dec402a48690" title=" " alt="" coords="200,5,408,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="152,49,226,32,228,37,153,54"/>
+<area shape="rect" id="Node000003" href="$namespacefc.html#adcb1bf49c2b6b33eacb5a84333b12a5c" title=" " alt="" coords="270,55,338,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="152,65,254,65,254,70,152,70"/>
+<area shape="rect" id="Node000007" href="$classsysiosystem_1_1system__contract.html#a7489c7a72a5cd39876940701c66d5d19" title=" " alt="" coords="231,105,377,161"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="152,86,216,105,215,110,150,91"/>
+<area shape="rect" id="Node000004" href="$namespacefc.html#a6e85a2de1275728bcc4a3d01f14d9172" title=" " alt="" coords="456,55,528,80"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="338,65,440,65,440,70,338,70"/>
+<area shape="rect" id="Node000005" href="$namespacefc.html#a9c3f2826ca2b6652fcef4da96f33503a" title=" " alt="" coords="576,55,663,80"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="529,65,561,65,561,70,529,70"/>
+<area shape="rect" id="Node000006" href="$namespacefc.html#a9623b8cae3f48bbed6aa1fc2afe9b174" title=" " alt="" coords="711,55,800,80"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="663,65,695,65,695,70,663,70"/>
+</map>

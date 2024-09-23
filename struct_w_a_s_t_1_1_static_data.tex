@@ -1,0 +1,150 @@
+\doxysection{WAST\+::Static\+Data Struct Reference}
+\hypertarget{struct_w_a_s_t_1_1_static_data}{}\label{struct_w_a_s_t_1_1_static_data}\index{WAST::StaticData@{WAST::StaticData}}
+
+
+Collaboration diagram for WAST\+::Static\+Data\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=181pt]{struct_w_a_s_t_1_1_static_data__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_w_a_s_t_1_1_static_data_a4a527078696e7eed08c7e75e9fb58b64}{Static\+Data}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_n_f_a_1_1_machine}{NFA\+::\+Machine}} \mbox{\hyperlink{struct_w_a_s_t_1_1_static_data_a37c4d27bb956914c06b3198191995f35}{nfa\+Machine}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{_lexer_8cpp_source_l00027}{27}} of file \mbox{\hyperlink{_lexer_8cpp_source}{Lexer.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{struct_w_a_s_t_1_1_static_data_a4a527078696e7eed08c7e75e9fb58b64}\index{WAST::StaticData@{WAST::StaticData}!StaticData@{StaticData}}
+\index{StaticData@{StaticData}!WAST::StaticData@{WAST::StaticData}}
+\doxysubsubsection{\texorpdfstring{StaticData()}{StaticData()}}
+{\footnotesize\ttfamily \label{struct_w_a_s_t_1_1_static_data_a4a527078696e7eed08c7e75e9fb58b64} 
+WAST\+::\+Static\+Data\+::\+Static\+Data (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_lexer_8cpp_source_l00065}{65}} of file \mbox{\hyperlink{_lexer_8cpp_source}{Lexer.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00066\ \ \ \ \ \{}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ std::pair<TokenType,const\ char*>\ regexpTokenPairs[]\ =}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ \{t\_decimalInt,\textcolor{stringliteral}{"{}[+\(\backslash\)\(\backslash\)-\/]?\(\backslash\)\(\backslash\)d+(\_\(\backslash\)\(\backslash\)d+)*"{}}\},}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \ \ \ \{t\_decimalFloat,\textcolor{stringliteral}{"{}[+\(\backslash\)\(\backslash\)-\/]?\(\backslash\)\(\backslash\)d+(\_\(\backslash\)\(\backslash\)d+)*\(\backslash\)\(\backslash\).(\(\backslash\)\(\backslash\)d+(\_\(\backslash\)\(\backslash\)d+)*)*([eE][+\(\backslash\)\(\backslash\)-\/]?\(\backslash\)\(\backslash\)d+(\_\(\backslash\)\(\backslash\)d+)*)?"{}}\},}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \ \ \ \{t\_decimalFloat,\textcolor{stringliteral}{"{}[+\(\backslash\)\(\backslash\)-\/]?\(\backslash\)\(\backslash\)d+(\_\(\backslash\)\(\backslash\)d+)*[eE][+\(\backslash\)\(\backslash\)-\/]?\(\backslash\)\(\backslash\)d+(\_\(\backslash\)\(\backslash\)d+)*"{}}\},}
+\DoxyCodeLine{00072\ }
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \ \ \ \{t\_hexInt,\textcolor{stringliteral}{"{}[+\(\backslash\)\(\backslash\)-\/]?0[xX][\(\backslash\)\(\backslash\)da-\/fA-\/F]+(\_[\(\backslash\)\(\backslash\)da-\/fA-\/F]+)*"{}}\},}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \ \ \ \{t\_hexFloat,\textcolor{stringliteral}{"{}[+\(\backslash\)\(\backslash\)-\/]?0[xX][\(\backslash\)\(\backslash\)da-\/fA-\/F]+(\_[\(\backslash\)\(\backslash\)da-\/fA-\/F]+)*\(\backslash\)\(\backslash\).([\(\backslash\)\(\backslash\)da-\/fA-\/F]+(\_[\(\backslash\)\(\backslash\)da-\/fA-\/F]+)*)*([pP][+\(\backslash\)\(\backslash\)-\/]?\(\backslash\)\(\backslash\)d+(\_\(\backslash\)\(\backslash\)d+)*)?"{}}\},}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \ \ \ \{t\_hexFloat,\textcolor{stringliteral}{"{}[+\(\backslash\)\(\backslash\)-\/]?0[xX][\(\backslash\)\(\backslash\)da-\/fA-\/F]+(\_[\(\backslash\)\(\backslash\)da-\/fA-\/F]+)*[pP][+\(\backslash\)\(\backslash\)-\/]?\(\backslash\)\(\backslash\)d+(\_\(\backslash\)\(\backslash\)d+)*"{}}\},}
+\DoxyCodeLine{00076\ }
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ \ \ \ \{t\_floatNaN,\textcolor{stringliteral}{"{}[+\(\backslash\)\(\backslash\)-\/]?nan(:0[xX][\(\backslash\)\(\backslash\)da-\/fA-\/F]+(\_[\(\backslash\)\(\backslash\)da-\/fA-\/F]+)*)?"{}}\},}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \ \ \ \{t\_floatInf,\textcolor{stringliteral}{"{}[+\(\backslash\)\(\backslash\)-\/]?inf"{}}\},}
+\DoxyCodeLine{00079\ }
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \ \ \ \ \{t\_string,\textcolor{stringliteral}{"{}\(\backslash\)"{}([\string^\(\backslash\)"{}\(\backslash\)n\(\backslash\)\(\backslash\)\(\backslash\)\(\backslash\)]*(\(\backslash\)\(\backslash\)\(\backslash\)\(\backslash\)([\string^0-\/9a-\/fA-\/Fu]|[0-\/9a-\/fA-\/F][0-\/9a-\/fA-\/F]|u\(\backslash\)\(\backslash\)\{[0-\/9a-\/fA-\/F]+\})))*\(\backslash\)"{}"{}}\},}
+\DoxyCodeLine{00081\ }
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \ \ \ \{t\_name,\textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)\$[a-\/zA-\/Z0-\/9\(\backslash\)'\_+*/\string~=<>!?@\#\$\%\&|:`.\(\backslash\)\(\backslash\)-\/\(\backslash\)\(\backslash\)\string^\(\backslash\)\(\backslash\)\(\backslash\)\(\backslash\)]+"{}}\},}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00084\ }
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ std::tuple<TokenType,const\ char*,bool>\ literalTokenTuples[]\ =}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \ \ \ \ std::make\_tuple(t\_leftParenthesis,\textcolor{stringliteral}{"{}("{}},\textcolor{keyword}{true}),}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \ \ \ std::make\_tuple(t\_rightParenthesis,\textcolor{stringliteral}{"{})"{}},\textcolor{keyword}{true}),}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \ std::make\_tuple(t\_equals,\textcolor{stringliteral}{"{}="{}},\textcolor{keyword}{true}),}
+\DoxyCodeLine{00090\ }
+\DoxyCodeLine{00091\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \#define\ VISIT\_TOKEN(name,description)\ std::make\_tuple(t\_\#\#name,\#name,false),}}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_lexer_8h_a935799414b43c9ea38224a78360fadc8}{ENUM\_LITERAL\_TOKENS}}()}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{preprocessor}{\#undef\ VISIT\_TOKEN}}
+\DoxyCodeLine{00094\ }
+\DoxyCodeLine{00095\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \#undef\ VISIT\_OPERATOR\_TOKEN}}
+\DoxyCodeLine{00096\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \#define\ VISIT\_OPERATOR\_TOKEN(\_,name,nameString,...)\ std::make\_tuple(t\_\#\#name,nameString,false),}}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_operators_8h_a8b6ca1413466de9d4478329c481520a4}{ENUM\_OPERATORS}}(\mbox{\hyperlink{_lexer_8cpp_adbca12765407bd0d57af8966b48ffc02}{VISIT\_OPERATOR\_TOKEN}})}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{preprocessor}{\#undef\ VISIT\_OPERATOR\_TOKEN}}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00100\ \ \ \ \ }
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_timing_1_1_timer}{Timing::Timer}}\ timer;}
+\DoxyCodeLine{00102\ }
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_n_f_a_1_1_builder}{NFA::Builder}}*\ nfaBuilder\ =\ \mbox{\hyperlink{namespace_n_f_a_adf36678137843faef3c32d8f0a9dcb25}{NFA::createBuilder}}();}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\ regexpTokenPair\ :\ regexpTokenPairs)}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{NFA::StateIndex}}\ finalState\ =\ \mbox{\hyperlink{namespace_n_f_a_ad9fb95d6afb96fea8750c3543ee293a1a6df9f5bfcb1889079b46027cf7bdac15}{NFA::maximumTerminalStateIndex}}\ -\/\ (\mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{NFA::StateIndex}})regexpTokenPair.first;}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \ \ \ \ finalState\ =\ createTokenSeparatorPeekState(nfaBuilder,finalState);}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_regexp_aadd46f06c56abd08dd3844b0eac3d28e}{Regexp::addToNFA}}(regexpTokenPair.second,nfaBuilder,0,finalState);}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\ literalTokenTuple\ :\ literalTokenTuples)}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespace_w_a_s_t_a57c99a932a2a7d69084cbeca01031f32}{TokenType}}\ tokenType\ =\ std::get<0>(literalTokenTuple);}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ literalString\ =\ std::get<1>(literalTokenTuple);}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ isTokenSeparator\ =\ std::get<2>(literalTokenTuple);}
+\DoxyCodeLine{00117\ }
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{NFA::StateIndex}}\ finalState\ =\ \mbox{\hyperlink{namespace_n_f_a_ad9fb95d6afb96fea8750c3543ee293a1a6df9f5bfcb1889079b46027cf7bdac15}{NFA::maximumTerminalStateIndex}}\ -\/\ (\mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{NFA::StateIndex}})tokenType;}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!isTokenSeparator)\ \{\ finalState\ =\ createTokenSeparatorPeekState(nfaBuilder,finalState);\ \}}
+\DoxyCodeLine{00120\ }
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \ \ \ \ addLiteralToNFA(literalString,nfaBuilder,0,finalState);}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00123\ }
+\DoxyCodeLine{00124\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#ifndef\ \_DEBUG}}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\textcolor{keyword}{false})}
+\DoxyCodeLine{00126\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#endif}}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \ \ \ \ std::ofstream\ debugGraphStream(\textcolor{stringliteral}{"{}nfaGraph.dot"{}});}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \ \ \ debugGraphStream\ <<\ \mbox{\hyperlink{namespace_n_f_a_ad2bae1dc95f748e75ed2ef3d06b38868}{NFA::dumpNFAGraphViz}}(nfaBuilder).c\_str();}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \ \ \ debugGraphStream.close();}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00132\ }
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_w_a_s_t_1_1_static_data_a37c4d27bb956914c06b3198191995f35}{nfaMachine}}\ =\ \mbox{\hyperlink{struct_n_f_a_1_1_machine}{NFA::Machine}}(nfaBuilder);}
+\DoxyCodeLine{00134\ }
+\DoxyCodeLine{00135\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#ifndef\ \_DEBUG}}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\textcolor{keyword}{false})}
+\DoxyCodeLine{00137\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#endif}}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \ \ \ \ std::ofstream\ debugGraphStream(\textcolor{stringliteral}{"{}dfaGraph.dot"{}});}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \ \ \ \ debugGraphStream\ <<\ \mbox{\hyperlink{struct_w_a_s_t_1_1_static_data_a37c4d27bb956914c06b3198191995f35}{nfaMachine}}.\mbox{\hyperlink{struct_n_f_a_1_1_machine_a97de1223997c8844b4b56e9e24884e87}{dumpDFAGraphViz}}().c\_str();}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \ \ \ \ debugGraphStream.close();}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00143\ }
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_timing_a13894b5d7cecb827bcef919187a66d94}{Timing::logTimer}}(\textcolor{stringliteral}{"{}built\ lexer\ tables"{}},timer);}
+\DoxyCodeLine{00145\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_w_a_s_t_1_1_static_data_a4a527078696e7eed08c7e75e9fb58b64_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_w_a_s_t_1_1_static_data_a37c4d27bb956914c06b3198191995f35}\index{WAST::StaticData@{WAST::StaticData}!nfaMachine@{nfaMachine}}
+\index{nfaMachine@{nfaMachine}!WAST::StaticData@{WAST::StaticData}}
+\doxysubsubsection{\texorpdfstring{nfaMachine}{nfaMachine}}
+{\footnotesize\ttfamily \label{struct_w_a_s_t_1_1_static_data_a37c4d27bb956914c06b3198191995f35} 
+\mbox{\hyperlink{struct_n_f_a_1_1_machine}{NFA\+::\+Machine}} WAST\+::\+Static\+Data\+::nfa\+Machine}
+
+
+
+Definition at line \mbox{\hyperlink{_lexer_8cpp_source_l00029}{29}} of file \mbox{\hyperlink{_lexer_8cpp_source}{Lexer.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/wasm-\/jit/\+Source/\+WAST/\mbox{\hyperlink{_lexer_8cpp}{Lexer.\+cpp}}\end{DoxyCompactItemize}

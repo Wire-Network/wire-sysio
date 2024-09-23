@@ -1,0 +1,222 @@
+\doxysection{boost\+::fibers\+::asio\+::round\+\_\+robin Class Reference}
+\hypertarget{classboost_1_1fibers_1_1asio_1_1round__robin}{}\label{classboost_1_1fibers_1_1asio_1_1round__robin}\index{boost::fibers::asio::round\_robin@{boost::fibers::asio::round\_robin}}
+
+
+{\ttfamily \#include $<$round\+\_\+robin.\+hpp$>$}
+
+
+
+Inheritance diagram for boost\+::fibers\+::asio\+::round\+\_\+robin\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=174pt]{classboost_1_1fibers_1_1asio_1_1round__robin__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for boost\+::fibers\+::asio\+::round\+\_\+robin\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=174pt]{classboost_1_1fibers_1_1asio_1_1round__robin__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structboost_1_1fibers_1_1asio_1_1round__robin_1_1service}{service}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1round__robin_aee1131d9ade630b117f0e208d24487f0}{round\+\_\+robin}} (boost\+::asio\+::io\+\_\+service \&io\+\_\+svc)
+\item 
+void \mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1round__robin_af0b5f5de86abf157f4f92d499b1ffaee}{awakened}} (\mbox{\hyperlink{structcontext}{context}} \texorpdfstring{$\ast$}{*}ctx) noexcept
+\item 
+\mbox{\hyperlink{structcontext}{context}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1round__robin_a42dc0e10a8b389d079e7d48b59c3daf0}{pick\+\_\+next}} () noexcept
+\item 
+bool \mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1round__robin_a7a2c74f6bda80e69c87bf52a0ae79c62}{has\+\_\+ready\+\_\+fibers}} () const noexcept
+\item 
+void \mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1round__robin_ac45de1f9a2b54df5b615a6e9d5b5a411}{suspend\+\_\+until}} (std\+::chrono\+::steady\+\_\+clock\+::time\+\_\+point const \&abs\+\_\+time) noexcept
+\item 
+void \mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1round__robin_aac505bb623204b864769bfc80f26a408}{notify}} () noexcept
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{round__robin_8hpp_source_l00035}{35}} of file \mbox{\hyperlink{round__robin_8hpp_source}{round\+\_\+robin.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classboost_1_1fibers_1_1asio_1_1round__robin_aee1131d9ade630b117f0e208d24487f0}\index{boost::fibers::asio::round\_robin@{boost::fibers::asio::round\_robin}!round\_robin@{round\_robin}}
+\index{round\_robin@{round\_robin}!boost::fibers::asio::round\_robin@{boost::fibers::asio::round\_robin}}
+\doxysubsubsection{\texorpdfstring{round\_robin()}{round\_robin()}}
+{\footnotesize\ttfamily \label{classboost_1_1fibers_1_1asio_1_1round__robin_aee1131d9ade630b117f0e208d24487f0} 
+boost\+::fibers\+::asio\+::round\+\_\+robin\+::round\+\_\+robin (\begin{DoxyParamCaption}\item[{boost\+::asio\+::io\+\_\+service \&}]{io\+\_\+svc}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{round__robin_8hpp_source_l00089}{89}} of file \mbox{\hyperlink{round__robin_8hpp_source}{round\+\_\+robin.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ io\_svc\_(\ io\_svc),}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ suspend\_timer\_(\ io\_svc\_)\ \{}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ We\ use\ add\_service()\ very\ deliberately.\ This\ will\ throw}}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ service\_already\_exists\ if\ you\ pass\ the\ same\ io\_service\ instance\ to}}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ more\ than\ one\ round\_robin\ instance.}}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ boost::asio::add\_service(\ io\_svc\_,\ \textcolor{keyword}{new}\ service(\ io\_svc\_));}
+\DoxyCodeLine{00096\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classboost_1_1fibers_1_1asio_1_1round__robin_af0b5f5de86abf157f4f92d499b1ffaee}\index{boost::fibers::asio::round\_robin@{boost::fibers::asio::round\_robin}!awakened@{awakened}}
+\index{awakened@{awakened}!boost::fibers::asio::round\_robin@{boost::fibers::asio::round\_robin}}
+\doxysubsubsection{\texorpdfstring{awakened()}{awakened()}}
+{\footnotesize\ttfamily \label{classboost_1_1fibers_1_1asio_1_1round__robin_af0b5f5de86abf157f4f92d499b1ffaee} 
+void boost\+::fibers\+::asio\+::round\+\_\+robin\+::awakened (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structcontext}{context}} \texorpdfstring{$\ast$}{*}}]{ctx}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{round__robin_8hpp_source_l00099}{99}} of file \mbox{\hyperlink{round__robin_8hpp_source}{round\+\_\+robin.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ BOOST\_ASSERT(\ \textcolor{keyword}{nullptr}\ !=\ ctx);}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ ctx-\/>ready\_link(\ rqueue\_);\ \textcolor{comment}{/*<\ fiber,\ enqueue\ on\ ready\ queue\ >*/}}
+\DoxyCodeLine{00102\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classboost_1_1fibers_1_1asio_1_1round__robin_a7a2c74f6bda80e69c87bf52a0ae79c62}\index{boost::fibers::asio::round\_robin@{boost::fibers::asio::round\_robin}!has\_ready\_fibers@{has\_ready\_fibers}}
+\index{has\_ready\_fibers@{has\_ready\_fibers}!boost::fibers::asio::round\_robin@{boost::fibers::asio::round\_robin}}
+\doxysubsubsection{\texorpdfstring{has\_ready\_fibers()}{has\_ready\_fibers()}}
+{\footnotesize\ttfamily \label{classboost_1_1fibers_1_1asio_1_1round__robin_a7a2c74f6bda80e69c87bf52a0ae79c62} 
+bool boost\+::fibers\+::asio\+::round\+\_\+robin\+::has\+\_\+ready\+\_\+fibers (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{round__robin_8hpp_source_l00117}{117}} of file \mbox{\hyperlink{round__robin_8hpp_source}{round\+\_\+robin.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !\ rqueue\_.empty();}
+\DoxyCodeLine{00119\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classboost_1_1fibers_1_1asio_1_1round__robin_aac505bb623204b864769bfc80f26a408}\index{boost::fibers::asio::round\_robin@{boost::fibers::asio::round\_robin}!notify@{notify}}
+\index{notify@{notify}!boost::fibers::asio::round\_robin@{boost::fibers::asio::round\_robin}}
+\doxysubsubsection{\texorpdfstring{notify()}{notify()}}
+{\footnotesize\ttfamily \label{classboost_1_1fibers_1_1asio_1_1round__robin_aac505bb623204b864769bfc80f26a408} 
+void boost\+::fibers\+::asio\+::round\+\_\+robin\+::notify (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{round__robin_8hpp_source_l00156}{156}} of file \mbox{\hyperlink{round__robin_8hpp_source}{round\+\_\+robin.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Something\ has\ happened\ that\ should\ wake\ one\ or\ more\ fibers\ BEFORE}}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ suspend\_timer\_\ expires.\ Reset\ the\ timer\ to\ cause\ it\ to\ fire}}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ immediately,\ causing\ the\ run\_one()\ call\ to\ return.\ In\ theory\ we}}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ could\ use\ cancel()\ because\ we\ don't\ care\ whether\ suspend\_timer\_'s}}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ handler\ is\ called\ with\ operation\_aborted\ or\ success.\ However\ -\/-\/}}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ cancel()\ doesn't\ change\ the\ expiration\ time,\ and\ we\ use}}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ suspend\_timer\_'s\ expiration\ time\ to\ decide\ whether\ it's\ already}}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ set.\ If\ suspend\_until()\ set\ some\ specific\ wake\ time,\ then\ notify()}}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ canceled\ it,\ then\ suspend\_until()\ was\ called\ again\ with\ the\ same}}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ wake\ time,\ it\ would\ match\ suspend\_timer\_'s\ expiration\ time\ and\ we'd}}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ refrain\ from\ setting\ the\ timer.\ So\ instead\ of\ simply\ calling}}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ cancel(),\ reset\ the\ timer,\ which\ cancels\ the\ pending\ sleep\ AND\ sets}}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ a\ new\ expiration\ time.\ This\ will\ cause\ us\ to\ spin\ the\ loop\ twice\ -\/-\/}}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ once\ for\ the\ operation\_aborted\ handler,\ once\ for\ timer\ expiration}}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ -\/-\/\ but\ that\ shouldn't\ be\ a\ big\ problem.}}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ suspend\_timer\_.expires\_at(\ std::chrono::steady\_clock::now()\ );}
+\DoxyCodeLine{00173\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classboost_1_1fibers_1_1asio_1_1round__robin_a42dc0e10a8b389d079e7d48b59c3daf0}\index{boost::fibers::asio::round\_robin@{boost::fibers::asio::round\_robin}!pick\_next@{pick\_next}}
+\index{pick\_next@{pick\_next}!boost::fibers::asio::round\_robin@{boost::fibers::asio::round\_robin}}
+\doxysubsubsection{\texorpdfstring{pick\_next()}{pick\_next()}}
+{\footnotesize\ttfamily \label{classboost_1_1fibers_1_1asio_1_1round__robin_a42dc0e10a8b389d079e7d48b59c3daf0} 
+\mbox{\hyperlink{structcontext}{context}} \texorpdfstring{$\ast$}{*} boost\+::fibers\+::asio\+::round\+\_\+robin\+::pick\+\_\+next (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{round__robin_8hpp_source_l00104}{104}} of file \mbox{\hyperlink{round__robin_8hpp_source}{round\+\_\+robin.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structcontext}{context}}\ *\ ctx(\ \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ !\ rqueue\_.empty()\ )\ \{\ \textcolor{comment}{/*<}}
+\DoxyCodeLine{00107\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ pop\ an\ item\ from\ the\ ready\ queue}}
+\DoxyCodeLine{00108\ \textcolor{comment}{\ \ \ \ \ \ \ \ >*/}}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \ \ \ \ ctx\ =\ \&\ rqueue\_.front();}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \ \ \ \ rqueue\_.pop\_front();}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_ASSERT(\ \textcolor{keyword}{nullptr}\ !=\ ctx);}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_ASSERT(\ context::active()\ !=\ ctx);}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ctx;}
+\DoxyCodeLine{00115\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classboost_1_1fibers_1_1asio_1_1round__robin_ac45de1f9a2b54df5b615a6e9d5b5a411}\index{boost::fibers::asio::round\_robin@{boost::fibers::asio::round\_robin}!suspend\_until@{suspend\_until}}
+\index{suspend\_until@{suspend\_until}!boost::fibers::asio::round\_robin@{boost::fibers::asio::round\_robin}}
+\doxysubsubsection{\texorpdfstring{suspend\_until()}{suspend\_until()}}
+{\footnotesize\ttfamily \label{classboost_1_1fibers_1_1asio_1_1round__robin_ac45de1f9a2b54df5b615a6e9d5b5a411} 
+void boost\+::fibers\+::asio\+::round\+\_\+robin\+::suspend\+\_\+until (\begin{DoxyParamCaption}\item[{std\+::chrono\+::steady\+\_\+clock\+::time\+\_\+point const \&}]{abs\+\_\+time}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{round__robin_8hpp_source_l00122}{122}} of file \mbox{\hyperlink{round__robin_8hpp_source}{round\+\_\+robin.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Set\ a\ timer\ so\ at\ least\ one\ handler\ will\ eventually\ fire,\ causing}}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ run\_one()\ to\ eventually\ return.\ Set\ a\ timer\ even\ if\ abs\_time\ ==}}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ time\_point::max()\ so\ the\ timer\ can\ be\ canceled\ by\ our\ notify()}}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ method\ -\/-\/\ which\ calls\ the\ handler.}}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ suspend\_timer\_.expires\_at()\ !=\ abs\_time)\ \{}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Each\ expires\_at(time\_point)\ call\ cancels\ any\ previous\ pending}}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ call.\ We\ could\ inadvertently\ spin\ like\ this:}}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ dispatcher\ calls\ suspend\_until()\ with\ earliest\ wake\ time}}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ suspend\_until()\ sets\ suspend\_timer\_}}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ lambda\ loop\ calls\ run\_one()}}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ some\ other\ asio\ handler\ runs\ before\ timer\ expires}}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ run\_one()\ returns\ to\ lambda\ loop}}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ lambda\ loop\ yields\ to\ dispatcher}}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ dispatcher\ finds\ no\ ready\ fibers}}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ dispatcher\ calls\ suspend\_until()\ with\ SAME\ wake\ time}}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ suspend\_until()\ sets\ suspend\_timer\_\ to\ same\ time,\ canceling}}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ previous\ async\_wait()}}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ lambda\ loop\ calls\ run\_one()}}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ asio\ calls\ suspend\_timer\_\ handler\ with\ operation\_aborted}}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ run\_one()\ returns\ to\ lambda\ loop...\ etc.\ etc.}}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ So\ only\ actually\ set\ the\ timer\ when\ we're\ passed\ a\ DIFFERENT}}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ abs\_time\ value.}}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \ \ \ \ suspend\_timer\_.expires\_at(\ abs\_time);}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ It\ really\ doesn't\ matter\ what\ the\ suspend\_timer\_\ handler\ does,}}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ or\ even\ whether\ it's\ called\ because\ the\ timer\ ran\ out\ or\ was}}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ canceled.\ The\ whole\ point\ is\ to\ cause\ the\ run\_one()\ call\ to}}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ return.\ So\ just\ pass\ a\ no-\/op\ lambda\ with\ proper\ signature.}}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \ \ \ \ suspend\_timer\_.async\_wait([](boost::system::error\_code\ \textcolor{keyword}{const}\&)\{\});}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00152\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/src/thread/asio/\mbox{\hyperlink{round__robin_8hpp}{round\+\_\+robin.\+hpp}}\end{DoxyCompactItemize}

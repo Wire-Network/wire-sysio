@@ -1,0 +1,184 @@
+\chapter{readme.\+zh-\/cn}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2readme_8zh-cn}{}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2readme_8zh-cn}\index{readme.zh-\/cn@{readme.zh-\/cn}}
+
+
+
+
+\doxysubsection*{高效的 C++ JSON 解析／生成器，提供 SAX 及 DOM 风格 API}
+
+Tencent is pleased to support the open source community by making Rapid\+JSON available.
+
+Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.
+
+
+\begin{DoxyItemize}
+\item \href{https://github.com/Tencent/rapidjson/}{\texttt{ Rapid\+JSON Git\+Hub}}
+\item Rapid\+JSON 文档
+\begin{DoxyItemize}
+\item \href{http://rapidjson.org/}{\texttt{ English}}
+\item \href{http://rapidjson.org/zh-cn/}{\texttt{ 简体中文}}
+\item \href{https://www.gitbook.com/book/miloyip/rapidjson/details/zh-cn}{\texttt{ Git\+Book}} 可下载 PDF/\+EPUB/\+MOBI，但不含 API 参考手册。
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+\doxysubsection*{Build 状态}
+
+\tabulinesep=1mm
+\begin{longtabu}spread 0pt [c]{*{3}{|X[-1]}|}
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ \href{https://travis-ci.org/Tencent/rapidjson}{\texttt{ Linux}}   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ \href{https://ci.appveyor.com/project/miloyip/rapidjson-0fdqj/branch/master}{\texttt{ Windows}}   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ \href{https://coveralls.io/r/Tencent/rapidjson?branch=master}{\texttt{ Coveralls}}    }\\\cline{1-3}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ \href{https://travis-ci.org/Tencent/rapidjson}{\texttt{ Linux}}   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ \href{https://ci.appveyor.com/project/miloyip/rapidjson-0fdqj/branch/master}{\texttt{ Windows}}   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ \href{https://coveralls.io/r/Tencent/rapidjson?branch=master}{\texttt{ Coveralls}}    }\\\cline{1-3}
+\endhead
+\PBS\centering    &\PBS\centering    &\PBS\centering    \\\cline{1-3}
+\end{longtabu}
+
+
+\doxysubsection*{简介}
+
+Rapid\+JSON 是一个 C++ 的 JSON 解析器及生成器。它的灵感来自 \href{http://rapidxml.sourceforge.net/}{\texttt{ Rapid\+Xml}}。
+
+
+\begin{DoxyItemize}
+\item Rapid\+JSON 小而全。它同时支持 SAX 和 DOM 风格的 API。\+SAX 解析器只有约 500 行代码。
+\item Rapid\+JSON 快。它的性能可与 {\ttfamily strlen()} 相比。可支持 SSE2/\+SSE4.\+2 加速。
+\item Rapid\+JSON 独立。它不依赖于 BOOST 等外部库。它甚至不依赖于 STL。
+\item Rapid\+JSON 对内存友好。在大部分 32/64 位机器上，每个 JSON 值只占 16 字节（除字符串外）。它预设使用一个快速的内存分配器，令分析器可以紧凑地分配内存。
+\item Rapid\+JSON 对 Unicode 友好。它支持 UTF-\/8、\+UTF-\/16、\+UTF-\/32 (大端序／小端序)，并内部支持这些编码的检测、校验及转码。例如，\+Rapid\+JSON 可以在分析一个 UTF-\/8 文件至 DOM 时，把当中的 JSON 字符串转码至 UTF-\/16。它也支持代理对（surrogate pair）及 {\ttfamily "{}\textbackslash{}u0000"{}}（空字符）。
+\end{DoxyItemize}
+
+在 \doxysectlink{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2features_8zh-cn}{这里}{0} 可读取更多特点。
+
+JSON（\+Java\+Script Object Notation）是一个轻量的数据交换格式。\+Rapid\+JSON 应该完全遵从 RFC7159/\+ECMA-\/404，并支持可选的放宽语法。 关于 JSON 的更多信息可参考：
+\begin{DoxyItemize}
+\item \href{http://json.org/}{\texttt{ Introducing JSON}}
+\item \href{https://tools.ietf.org/html/rfc7159}{\texttt{ RFC7159\+: The Java\+Script Object Notation (JSON) Data Interchange Format}}
+\item \href{https://www.ecma-international.org/publications/standards/Ecma-404.htm}{\texttt{ Standard ECMA-\/404\+: The JSON Data Interchange Format}}
+\end{DoxyItemize}
+
+\doxysubsection*{v1.\+1 中的亮点 (2016-\/8-\/25)}
+
+
+\begin{DoxyItemize}
+\item 加入 \doxysectlink{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2pointer_8zh-cn}{JSON Pointer}{0} 功能，可更简单地访问及更改 DOM。
+\item 加入 \doxysectlink{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_8zh-cn}{JSON Schema}{0} 功能，可在解析或生成 JSON 时进行校验。
+\item 加入 \doxysectlink{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2dom_8zh-cn}{放宽的 JSON 语法}{0} （注释、尾随逗号、\+Na\+N/\+Infinity）
+\item 使用 \doxysectlink{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn}{C++11 范围 for 循环}{0} 去遍历 array 和 object。
+\item 在 x86-\/64 架构下，缩减每个 {\ttfamily Value} 的内存开销从 24 字节至 16 字节。
+\end{DoxyItemize}
+
+其他改动请参考 \doxysectlink{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2_c_h_a_n_g_e_l_o_g}{change log}{0}.
+
+\doxysubsection*{兼容性}
+
+Rapid\+JSON 是跨平台的。以下是一些曾测试的平台／编译器组合：
+\begin{DoxyItemize}
+\item Visual C++ 2008/2010/2013 在 Windows (32/64-\/bit)
+\item GNU C++ 3.\+8.\+x 在 Cygwin
+\item Clang 3.\+4 在 Mac OS X (32/64-\/bit) 及 i\+OS
+\item Clang 3.\+4 在 Android NDK
+\end{DoxyItemize}
+
+用户也可以在他们的平台上生成及执行单元测试。
+
+\doxysubsection*{安装}
+
+Rapid\+JSON 是只有头文件的 C++ 库。只需把 {\ttfamily include/rapidjson} 目录复制至系统或项目的 include 目录中。
+
+Rapid\+JSON 依赖于以下软件：
+\begin{DoxyItemize}
+\item \href{https://cmake.org/}{\texttt{ CMake}} 作为通用生成工具
+\item (optional) \href{http://www.doxygen.org}{\texttt{ Doxygen}} 用于生成文档
+\item (optional) \href{https://github.com/google/googletest}{\texttt{ googletest}} 用于单元及性能测试
+\end{DoxyItemize}
+
+生成测试及例子的步骤：
+
+
+\begin{DoxyEnumerate}
+\item 执行 {\ttfamily git submodule update -\/-\/init} 去获取 thirdparty submodules (google test)。
+\item 在 rapidjson 目录下，建立一个 {\ttfamily build} 目录。
+\item 在 {\ttfamily build} 目录下执行 {\ttfamily cmake ..} 命令以设置生成。\+Windows 用户可使用 cmake-\/gui 应用程序。
+\item 在 Windows 下，编译生成在 build 目录中的 solution。在 Linux 下，于 build 目录运行 {\ttfamily make}。
+\end{DoxyEnumerate}
+
+成功生成后，你会在 {\ttfamily bin} 的目录下找到编译后的测试及例子可执行文件。而生成的文档将位于 build 下的 {\ttfamily doc/html} 目录。要执行测试，请在 build 下执行 {\ttfamily make test} 或 {\ttfamily ctest}。使用 {\ttfamily ctest -\/\doxylink{struct_v}{V}} 命令可获取详细的输出。
+
+我们也可以把程序库安装至全系统中，只要在具管理权限下从 build 目录执行 {\ttfamily make install} 命令。这样会按系统的偏好设置安装所有文件。当安装 Rapid\+JSON 后，其他的 CMake 项目需要使用它时，可以通过在 {\ttfamily CMake\+Lists.\+txt} 加入一句 {\ttfamily find\+\_\+package(\+Rapid\+JSON)}。
+
+\doxysubsection*{用法一览}
+
+此简单例子解析一个 JSON 字符串至一个 document (DOM)，对 DOM 作出简单修改，最终把 DOM 转换（stringify）至 JSON 字符串。
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{comment}{//\ rapidjson/example/simpledom/simpledom.cpp`}}
+\DoxyCodeLine{\textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{document_8h}{rapidjson/document.h}}"{}}}
+\DoxyCodeLine{\textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{writer_8h}{rapidjson/writer.h}}"{}}}
+\DoxyCodeLine{\textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{stringbuffer_8h}{rapidjson/stringbuffer.h}}"{}}}
+\DoxyCodeLine{\textcolor{preprocessor}{\#include\ <iostream>}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacerapidjson}{rapidjson}};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keywordtype}{int}\ \mbox{\hyperlink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}()\ \{}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ 1.\ 把\ JSON\ 解析至\ DOM。}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ json\ =\ \textcolor{stringliteral}{"{}\{\(\backslash\)"{}project\(\backslash\)"{}:\(\backslash\)"{}rapidjson\(\backslash\)"{},\(\backslash\)"{}stars\(\backslash\)"{}:10\}"{}};}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{class_generic_document}{Document}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}};}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.Parse(json);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ 2.\ 利用\ DOM\ 作出修改。}}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{class_generic_value}{Value}}\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}[\textcolor{stringliteral}{"{}stars"{}}];}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.SetInt(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.GetInt()\ +\ 1);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ 3.\ 把\ DOM\ 转换（stringify）成\ JSON。}}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{class_generic_string_buffer}{StringBuffer}}\ buffer;}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{class_writer}{Writer<StringBuffer>}}\ writer(buffer);}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.Accept(writer);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ Output\ \{"{}project"{}:"{}rapidjson"{},"{}stars"{}:11\}}}
+\DoxyCodeLine{\ \ \ \ std::cout\ <<\ buffer.\mbox{\hyperlink{class_generic_string_buffer_a42079865bab1deb930c6cff7d491c719}{GetString}}()\ <<\ std::endl;}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+注意此例子并没有处理潜在错误。
+
+下图展示执行过程。
+
+
+
+还有许多 \href{https://github.com/Tencent/rapidjson/tree/master/example}{\texttt{ 例子}} 可供参考：
+
+
+\begin{DoxyItemize}
+\item DOM API
+\begin{DoxyItemize}
+\item \href{https://github.com/Tencent/rapidjson/blob/master/example/tutorial/tutorial.cpp}{\texttt{ tutorial}}\+: DOM API 的基本使用方法。
+\end{DoxyItemize}
+\item SAX API
+\begin{DoxyItemize}
+\item \href{https://github.com/Tencent/rapidjson/blob/master/example/simplereader/simplereader.cpp}{\texttt{ simplereader}}\+: 使用 {\ttfamily Reader} 解析 JSON 时，打印所有 SAX 事件。
+\item \href{https://github.com/Tencent/rapidjson/blob/master/example/condense/condense.cpp}{\texttt{ condense}}\+: 移除 JSON 中所有空白符的命令行工具。
+\item \href{https://github.com/Tencent/rapidjson/blob/master/example/pretty/pretty.cpp}{\texttt{ pretty}}\+: 为 JSON 加入缩进与换行的命令行工具，当中使用了 {\ttfamily \doxylink{class_pretty_writer}{Pretty\+Writer}}。
+\item \href{https://github.com/Tencent/rapidjson/blob/master/example/capitalize/capitalize.cpp}{\texttt{ capitalize}}\+: 把 JSON 中所有字符串改为大写的命令行工具。
+\item \href{https://github.com/Tencent/rapidjson/blob/master/example/messagereader/messagereader.cpp}{\texttt{ messagereader}}\+: 使用 SAX API 去解析一个 JSON 报文。
+\item \href{https://github.com/Tencent/rapidjson/blob/master/example/serialize/serialize.cpp}{\texttt{ serialize}}\+: 使用 SAX API 去序列化 C++ 对象，生成 JSON。
+\item \href{https://github.com/Tencent/rapidjson/blob/master/example/jsonx/jsonx.cpp}{\texttt{ jsonx}}\+: 实现了一个 {\ttfamily \doxylink{class_jsonx_writer}{Jsonx\+Writer}}，它能把 SAX 事件写成 \href{https://www-01.ibm.com/support/knowledgecenter/SS9H2Y_7.1.0/com.ibm.dp.doc/json_jsonx.html}{\texttt{ JSONx}}（一种 XML）格式。这个例子是把 JSON 输入转换成 JSONx 格式的命令行工具。
+\end{DoxyItemize}
+\item \doxylink{class_schema}{Schema} API
+\begin{DoxyItemize}
+\item \href{https://github.com/Tencent/rapidjson/blob/master/example/schemavalidator/schemavalidator.cpp}{\texttt{ schemavalidator}}\+: 使用 JSON \doxylink{class_schema}{Schema} 去校验 JSON 的命令行工具。
+\end{DoxyItemize}
+\item 进阶
+\begin{DoxyItemize}
+\item \href{https://github.com/Tencent/rapidjson/blob/master/example/prettyauto/prettyauto.cpp}{\texttt{ prettyauto}}\+: \href{https://github.com/Tencent/rapidjson/blob/master/example/pretty/pretty.cpp}{\texttt{ pretty}} 的修改版本，可自动处理任何 UTF 编码的 JSON。
+\item \href{https://github.com/Tencent/rapidjson/blob/master/example/parsebyparts/parsebyparts.cpp}{\texttt{ parsebyparts}}\+: 这例子中的 {\ttfamily Async\+Document\+Parser} 类使用 C++ 线程来逐段解析 JSON。
+\item \href{https://github.com/Tencent/rapidjson/blob/master/example/filterkey/filterkey.cpp}{\texttt{ filterkey}}\+: 移取使用者指定的键值的命令行工具。
+\item \href{https://github.com/Tencent/rapidjson/blob/master/example/filterkey/filterkey.cpp}{\texttt{ filterkeydom}}\+: 如上的工具，但展示如何使用生成器（generator）去填充一个 {\ttfamily Document}。 
+\end{DoxyItemize}
+\end{DoxyItemize}

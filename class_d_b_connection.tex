@@ -1,0 +1,64 @@
+\doxysection{DBConnection Class Reference}
+\hypertarget{class_d_b_connection}{}\label{class_d_b_connection}\index{DBConnection@{DBConnection}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{class_d_b_connection_a59666c3e7dcb888c2460e5ecde1e8bcb}{execute\+SQL}} (std\+::string const \&, int const, std\+::string const \&arg)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static \mbox{\hyperlink{class_d_b_connection}{DBConnection}} \mbox{\hyperlink{class_d_b_connection_a39977c08d5ef2abb24d6f3d9e6d3d12d}{create\+Connection}} (std\+::string const \&)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{110-_fix-_class_fixture_8cpp_source_l00011}{11}} of file \mbox{\hyperlink{110-_fix-_class_fixture_8cpp_source}{110-\/\+Fix-\/\+Class\+Fixture.\+cpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_d_b_connection_a39977c08d5ef2abb24d6f3d9e6d3d12d}\index{DBConnection@{DBConnection}!createConnection@{createConnection}}
+\index{createConnection@{createConnection}!DBConnection@{DBConnection}}
+\doxysubsubsection{\texorpdfstring{createConnection()}{createConnection()}}
+{\footnotesize\ttfamily \label{class_d_b_connection_a39977c08d5ef2abb24d6f3d9e6d3d12d} 
+static \mbox{\hyperlink{class_d_b_connection}{DBConnection}} DBConnection\+::create\+Connection (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{110-_fix-_class_fixture_8cpp_source_l00014}{14}} of file \mbox{\hyperlink{110-_fix-_class_fixture_8cpp_source}{110-\/\+Fix-\/\+Class\+Fixture.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00014\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_d_b_connection}{DBConnection}}();}
+\DoxyCodeLine{00016\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_d_b_connection_a59666c3e7dcb888c2460e5ecde1e8bcb}\index{DBConnection@{DBConnection}!executeSQL@{executeSQL}}
+\index{executeSQL@{executeSQL}!DBConnection@{DBConnection}}
+\doxysubsubsection{\texorpdfstring{executeSQL()}{executeSQL()}}
+{\footnotesize\ttfamily \label{class_d_b_connection_a59666c3e7dcb888c2460e5ecde1e8bcb} 
+bool DBConnection\+::execute\+SQL (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{}{, }\item[{int const}]{}{, }\item[{std\+::string const \&}]{arg}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{110-_fix-_class_fixture_8cpp_source_l00018}{18}} of file \mbox{\hyperlink{110-_fix-_class_fixture_8cpp_source}{110-\/\+Fix-\/\+Class\+Fixture.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ arg.length()\ ==\ 0\ )\ \{}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::logic\_error(\textcolor{stringliteral}{"{}empty\ SQL\ query\ argument"{}});}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \textcolor{comment}{//\ ok}}
+\DoxyCodeLine{00023\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/examples/\mbox{\hyperlink{110-_fix-_class_fixture_8cpp}{110-\/\+Fix-\/\+Class\+Fixture.\+cpp}}\end{DoxyCompactItemize}

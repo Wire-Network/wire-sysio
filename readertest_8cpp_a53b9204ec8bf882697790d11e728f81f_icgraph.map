@@ -1,0 +1,7 @@
+<map id="TestTrailingCommas" name="TestTrailingCommas">
+<area shape="rect" id="Node000001" title=" " alt="" coords="109,31,250,56"/>
+<area shape="rect" id="Node000002" href="$readertest_8cpp.html#a6915cfb99ca350fe96d8d3bcfdd8cd88" title=" " alt="" coords="5,5,61,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="93,31,61,26,62,20,94,26"/>
+<area shape="rect" id="Node000003" href="$readertest_8cpp.html#a682347bb2b9e7237a432cc36c07c81a0" title=" " alt="" coords="5,55,61,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="94,60,62,66,61,60,93,55"/>
+</map>

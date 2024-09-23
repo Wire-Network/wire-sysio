@@ -1,0 +1,26 @@
+var classsysio_1_1wallet_1_1wallet__manager =
+[
+    [ "wallet_manager", "classsysio_1_1wallet_1_1wallet__manager.html#a21033bf369566df07a2305d23bdd26d2", null ],
+    [ "wallet_manager", "classsysio_1_1wallet_1_1wallet__manager.html#a4da134f518c4d1c9f440fbfda6bde907", null ],
+    [ "wallet_manager", "classsysio_1_1wallet_1_1wallet__manager.html#a75b660b3a994d3a6052a00851798085f", null ],
+    [ "~wallet_manager", "classsysio_1_1wallet_1_1wallet__manager.html#a91f87ee286b1ad524277ad1b9a89d362", null ],
+    [ "create", "classsysio_1_1wallet_1_1wallet__manager.html#a9c1673ae072e569c07ab5af68fc3ae34", null ],
+    [ "create_key", "classsysio_1_1wallet_1_1wallet__manager.html#abcbda806e839ef15affb1f090d44cac3", null ],
+    [ "get_public_keys", "classsysio_1_1wallet_1_1wallet__manager.html#a761fbbaa05ca80aa08d9de80a1d2f224", null ],
+    [ "import_key", "classsysio_1_1wallet_1_1wallet__manager.html#a7af27f75346e69c7037dc648129e878b", null ],
+    [ "list_keys", "classsysio_1_1wallet_1_1wallet__manager.html#a319251983b7f931e0a5b3dbc78cceac9", null ],
+    [ "list_wallets", "classsysio_1_1wallet_1_1wallet__manager.html#afad689d414b3d3e08a90e6e631111838", null ],
+    [ "lock", "classsysio_1_1wallet_1_1wallet__manager.html#afb4ea349b3e8337ba01b61417bba505d", null ],
+    [ "lock_all", "classsysio_1_1wallet_1_1wallet__manager.html#a386ae05dc788545f920226be4c4e8f24", null ],
+    [ "open", "classsysio_1_1wallet_1_1wallet__manager.html#aa2afccf9173458e34f4ce2aba878efb4", null ],
+    [ "operator=", "classsysio_1_1wallet_1_1wallet__manager.html#ace255539e23f9b452790404bd8f82dfd", null ],
+    [ "operator=", "classsysio_1_1wallet_1_1wallet__manager.html#ab51693ac8b433e803108a8c84ac580a7", null ],
+    [ "own_and_use_wallet", "classsysio_1_1wallet_1_1wallet__manager.html#a313c62b87f7dc75063341bdbed750eef", null ],
+    [ "remove_key", "classsysio_1_1wallet_1_1wallet__manager.html#ab6aafecc1ed2761dc39d963d45321acf", null ],
+    [ "set_dir", "classsysio_1_1wallet_1_1wallet__manager.html#ac330332e56fe16ba2d2b855acc551a44", null ],
+    [ "set_timeout", "classsysio_1_1wallet_1_1wallet__manager.html#a31ff8d23227bdca61ae4d53d228e7988", null ],
+    [ "set_timeout", "classsysio_1_1wallet_1_1wallet__manager.html#aa0b19fba064d2db5a813e6e934638a3a", null ],
+    [ "sign_digest", "classsysio_1_1wallet_1_1wallet__manager.html#abdd2a00c00061934ba7899e41f6b5a09", null ],
+    [ "sign_transaction", "classsysio_1_1wallet_1_1wallet__manager.html#a5603a17a529a1e55788a1cb42d73af89", null ],
+    [ "unlock", "classsysio_1_1wallet_1_1wallet__manager.html#a108a129e4176fb7a1b782344e9cecc8f", null ]
+];

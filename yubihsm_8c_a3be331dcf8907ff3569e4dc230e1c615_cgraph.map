@@ -1,0 +1,12 @@
+<map id="yh_create_session_derived" name="yh_create_session_derived">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,79,185,104"/>
+<area shape="rect" id="Node000002" href="$yubihsm_8c.html#a0e96ea59c5f32def80843fec5a3c2142" title=" " alt="" coords="233,53,363,79"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="185,78,217,74,218,79,186,83"/>
+<area shape="rect" id="Node000005" href="$lib_2error_8c.html#a238eedb1e27dbff2a0ab9a3932eb3f8b" title=" " alt="" coords="421,104,504,130"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="185,95,405,110,405,116,185,100"/>
+<area shape="rect" id="Node000003" href="$yubihsm__pkcs11_8c.html#ae785d5badbf1f08b491af31f32a135a1" title=" " alt="" coords="427,5,498,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="344,50,411,30,413,35,346,55"/>
+<area shape="rect" id="Node000004" href="$rand_8c.html#a2d3d1e86f4093fbe0a1b2a7eede4cd75" title=" " alt="" coords="411,55,514,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="363,64,395,64,395,70,363,69"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="343,77,407,97,405,102,341,82"/>
+</map>

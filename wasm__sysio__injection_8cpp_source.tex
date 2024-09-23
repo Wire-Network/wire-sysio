@@ -1,0 +1,36 @@
+\doxysection{wasm\+\_\+sysio\+\_\+injection.\+cpp}
+\hypertarget{wasm__sysio__injection_8cpp_source}{}\label{wasm__sysio__injection_8cpp_source}\index{libraries/chain/wasm\_sysio\_injection.cpp@{libraries/chain/wasm\_sysio\_injection.cpp}}
+\mbox{\hyperlink{wasm__sysio__injection_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{wasm__sysio__injection_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{wasm__sysio__constraints_8hpp}{sysio/chain/wasm\_sysio\_constraints.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{wasm__sysio__injection_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{wasm__sysio__injection_8hpp}{sysio/chain/wasm\_sysio\_injection.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{wasm__sysio__injection_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{exception_8hpp}{fc/exception/exception.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{wasm__sysio__injection_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_module_8h}{IR/Module.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{wasm__sysio__injection_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_w_a_s_m_8h}{WASM/WASM.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{wasm__sysio__injection_8cpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{wasm__sysio__injection_8cpp_source_l00007}00007\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{\ \textcolor{keyword}{namespace\ }chain\ \{\ \textcolor{keyword}{namespace\ }wasm\_injections\ \{}
+\DoxyCodeLine{\Hypertarget{wasm__sysio__injection_8cpp_source_l00008}00008\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespace_i_r}{IR}};}
+\DoxyCodeLine{\Hypertarget{wasm__sysio__injection_8cpp_source_l00009}00009\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__constraints}{sysio::chain::wasm\_constraints}};}
+\DoxyCodeLine{\Hypertarget{wasm__sysio__injection_8cpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{wasm__sysio__injection_8cpp_source_l00011}00011\ std::map<std::vector<uint16\_t>,\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}>\ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils_a3ccb7a28f38a9bc62d464af51cf5cc03}{injector\_utils::type\_slots}};}
+\DoxyCodeLine{\Hypertarget{wasm__sysio__injection_8cpp_source_l00012}00012\ std::map<std::string,\ uint32\_t>\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils_ab51a2714c385bed8dee37b943617c8ef}{injector\_utils::registered\_injected}};}
+\DoxyCodeLine{\Hypertarget{wasm__sysio__injection_8cpp_source_l00013}00013\ std::map<uint32\_t,\ uint32\_t>\ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils_a888f19e36551e2c70561101dc4f62fa7}{injector\_utils::injected\_index\_mapping}};}
+\DoxyCodeLine{\Hypertarget{wasm__sysio__injection_8cpp_source_l00014}00014\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils_ac81989991223785170f6c53e762041c6}{injector\_utils::next\_injected\_index}};}
+\DoxyCodeLine{\Hypertarget{wasm__sysio__injection_8cpp_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{wasm__sysio__injection_8cpp_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{wasm__sysio__injection_8cpp_source_l00017}\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1noop__injection__visitor_a86c1dc61576242c576a403f65e73a12f}{00017}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1noop__injection__visitor_a86c1dc61576242c576a403f65e73a12f}{noop\_injection\_visitor::inject}}(\ \mbox{\hyperlink{struct_i_r_1_1_module}{Module}}\&\ m\ )\ \{\ \textcolor{comment}{/*\ just\ pass\ */}\ \}}
+\DoxyCodeLine{\Hypertarget{wasm__sysio__injection_8cpp_source_l00018}\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1noop__injection__visitor_af028950d2541c9b09d25331c942ab054}{00018}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1noop__injection__visitor_af028950d2541c9b09d25331c942ab054}{noop\_injection\_visitor::initializer}}()\ \{\ \textcolor{comment}{/*\ just\ pass\ */}\ \}}
+\DoxyCodeLine{\Hypertarget{wasm__sysio__injection_8cpp_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{wasm__sysio__injection_8cpp_source_l00020}\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1memories__injection__visitor_a06969a92a1e5c052f8bf46f9f675a621}{00020}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1memories__injection__visitor_a06969a92a1e5c052f8bf46f9f675a621}{memories\_injection\_visitor::inject}}(\ \mbox{\hyperlink{struct_i_r_1_1_module}{Module}}\&\ m\ )\ \{}
+\DoxyCodeLine{\Hypertarget{wasm__sysio__injection_8cpp_source_l00021}00021\ \}}
+\DoxyCodeLine{\Hypertarget{wasm__sysio__injection_8cpp_source_l00022}\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1memories__injection__visitor_a9101b1a6267eb94fd64f22a992d2bbf1}{00022}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1memories__injection__visitor_a9101b1a6267eb94fd64f22a992d2bbf1}{memories\_injection\_visitor::initializer}}()\ \{}
+\DoxyCodeLine{\Hypertarget{wasm__sysio__injection_8cpp_source_l00023}00023\ \}}
+\DoxyCodeLine{\Hypertarget{wasm__sysio__injection_8cpp_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{wasm__sysio__injection_8cpp_source_l00025}\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1data__segments__injection__visitor_a070a234abd291530ce667b164b0362af}{00025}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1data__segments__injection__visitor_a070a234abd291530ce667b164b0362af}{data\_segments\_injection\_visitor::inject}}(\ \mbox{\hyperlink{struct_i_r_1_1_module}{Module}}\&\ m\ )\ \{}
+\DoxyCodeLine{\Hypertarget{wasm__sysio__injection_8cpp_source_l00026}00026\ \}}
+\DoxyCodeLine{\Hypertarget{wasm__sysio__injection_8cpp_source_l00027}\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1data__segments__injection__visitor_acfffefe01a0b57fb15a3bbcc851072e3}{00027}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1data__segments__injection__visitor_acfffefe01a0b57fb15a3bbcc851072e3}{data\_segments\_injection\_visitor::initializer}}()\ \{}
+\DoxyCodeLine{\Hypertarget{wasm__sysio__injection_8cpp_source_l00028}00028\ \}}
+\DoxyCodeLine{\Hypertarget{wasm__sysio__injection_8cpp_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{wasm__sysio__injection_8cpp_source_l00030}00030\ \}\}\}\ \textcolor{comment}{//\ namespace\ sysio,\ chain,\ injectors}}
+
+\end{DoxyCode}

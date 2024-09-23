@@ -1,0 +1,8 @@
+<map id="sysio::vm::profile_data::write" name="sysio::vm::profile_data::write">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,127,46"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1vm_1_1profile__data.html#a81d2e2c1ad082a8a0e7624b97cd78cac" title=" " alt="" coords="175,5,296,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="127,23,159,23,159,28,127,28"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1vm_1_1profile__data.html#a2fbb3c09344e2c8f613757ff5cc53efb" title=" " alt="" coords="344,5,465,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="296,32,329,32,328,37,296,37"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="343,20,311,19,311,14,344,14"/>
+</map>

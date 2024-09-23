@@ -1,0 +1,476 @@
+\doxysection{libraries/chain/webassembly/runtimes/sys-\/vm-\/oc/\+LLVMEmit\+IR.cpp File Reference}
+\hypertarget{_l_l_v_m_emit_i_r_8cpp}{}\label{_l_l_v_m_emit_i_r_8cpp}\index{libraries/chain/webassembly/runtimes/sys-\/vm-\/oc/LLVMEmitIR.cpp@{libraries/chain/webassembly/runtimes/sys-\/vm-\/oc/LLVMEmitIR.cpp}}
+{\ttfamily \#include "{}LLVMJIT.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+ADT/\+Small\+Vector.\+h"{}}\newline
+{\ttfamily \#include "{}IR/\+Operators.\+h"{}}\newline
+{\ttfamily \#include "{}IR/\+Operator\+Printer.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+Support/raw\+\_\+ostream.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+Analysis/\+Passes.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+IR/\+Data\+Layout.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+IR/\+Derived\+Types.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+IR/\+IRBuilder.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+IR/\+LLVMContext.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+IR/\+Legacy\+Pass\+Manager.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+IR/\+Module.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+IR/\+Intrinsics.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+IR/\+Verifier.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+IR/\+Value\+Handle.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+IR/\+Debug\+Loc.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+Object/\+Object\+File.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+Object/\+Symbol\+Size.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+Support/\+Debug.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+Support/\+Data\+Types.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+Support/\+Target\+Select.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+Support/\+Host.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+Support/\+Dynamic\+Library.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+Transforms/\+Scalar.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+IR/\+DIBuilder.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+Transforms/\+Inst\+Combine/\+Inst\+Combine.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+Transforms/\+Utils.\+h"{}}\newline
+{\ttfamily \#include $<$sysio/chain/webassembly/sys-\/vm-\/oc/intrinsic.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/webassembly/sys-\/vm-\/oc/memory.\+hpp$>$}\newline
+Include dependency graph for LLVMEmit\+IR.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{_l_l_v_m_emit_i_r_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_emit_module_context}{sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::\+Emit\+Module\+Context}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_emit_function_context}{sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::\+Emit\+Function\+Context}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_emit_function_context_1_1_control_context}{sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::\+Emit\+Function\+Context\+::\+Control\+Context}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_emit_function_context_1_1_branch_target}{sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::\+Emit\+Function\+Context\+::\+Branch\+Target}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unreachable_op_visitor}{sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::\+Unreachable\+Op\+Visitor}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain}{sysio\+::chain}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc}{sysio\+::chain\+::eosvmoc}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t}{sysio\+::chain\+::eosvmoc\+::\+LLVMJIT}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_a042e13d7e40b6a804e22e1089a8074ec}{ENABLE\+\_\+\+LOGGING}}~0
+\item 
+\#define \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_a4d769052aed9e0603ddc9497865dfe1b}{ENABLE\+\_\+\+FUNCTION\+\_\+\+ENTER\+\_\+\+EXIT\+\_\+\+HOOKS}}~0
+\item 
+\#define \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_ad8c837674e4356a7d35a158156f9d647}{EMIT\+\_\+\+CONST}}(type\+Id,  native\+Type)
+\item 
+\#define \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_a3dd458e5a61c51fcf43cfe7aed3be2df}{EMIT\+\_\+\+LOAD\+\_\+\+OP}}(value\+Type\+Id,  \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  llvm\+Memory\+Type,  natural\+Alignment\+Log2,  conversion\+Op,  alignment\+Param)
+\item 
+\#define \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_ad0bbd109c48508e4ecad0f875b0439b2}{EMIT\+\_\+\+STORE\+\_\+\+OP}}(value\+Type\+Id,  \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  llvm\+Memory\+Type,  natural\+Alignment\+Log2,  conversion\+Op,  alignment\+Param)
+\item 
+\#define \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_a18fbbf5213855e5d8cea448a9c9749d0}{LOAD\+\_\+\+STORE\+\_\+\+ALIGNMENT\+\_\+\+PARAM}}~1
+\item 
+\#define \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_afed409eed57195f876a415c2034620dd}{EMIT\+\_\+\+BINARY\+\_\+\+OP}}(type\+Id,  \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  emit\+Code)
+\item 
+\#define \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_a0c4922105a5d94a12974d0b7008326b3}{EMIT\+\_\+\+INT\+\_\+\+BINARY\+\_\+\+OP}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  emit\+Code)
+\item 
+\#define \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_af053e31bfc81aacbec078a0a42ad1819}{EMIT\+\_\+\+FP\+\_\+\+BINARY\+\_\+\+OP}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  emit\+Code)
+\item 
+\#define \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_a6d3e24267811c311d6d4b6d626fcbf62}{EMIT\+\_\+\+UNARY\+\_\+\+OP}}(type\+Id,  \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  emit\+Code)
+\item 
+\#define \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_aed9f6f217da29a0dc1a419168627320c}{EMIT\+\_\+\+INT\+\_\+\+UNARY\+\_\+\+OP}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  emit\+Code)
+\item 
+\#define \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_a3a42e529283647d7ff760958b46a6cb0}{EMIT\+\_\+\+FP\+\_\+\+UNARY\+\_\+\+OP}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  emit\+Code)
+\item 
+\#define \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_a7c6f1d481394698bd36b68719d3ea239}{EMIT\+\_\+\+INT\+\_\+\+COMPARE\+\_\+\+OP}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  llvm\+Source\+Type,  llvm\+Dest\+Type,  value\+Type,  emit\+Code)
+\item 
+\#define \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_a351ccdf82885362ad5108b02909b007b}{EMIT\+\_\+\+INT\+\_\+\+COMPARE}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  emit\+Code)
+\item 
+\#define \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_a5c975c850de8a1221bcc1a77cc2f7013}{VISIT\+\_\+\+OP}}(opcode,  \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  name\+String,  Imm, ...)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_ad225d9ff7b3c8d52e2e7128b937ca42e}{sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::get\+Table\+Symbol\+Name}} ()
+\item 
+bool \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a6a845a4c43fc6bf05d5f301aef56ff77}{sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::get\+Function\+Index\+From\+External\+Name}} (const char \texorpdfstring{$\ast$}{*}external\+Name, \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} \&out\+Function\+Def\+Index)
+\item 
+llvm\+::\+Value \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_af795eedea4eeeb05c14888495c44958d}{sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::\+Create\+In\+Bounds\+GEPWAR}} (llvm\+::\+IRBuilder$<$$>$ \&ir\+Builder, llvm\+::\+Value \texorpdfstring{$\ast$}{*}Ptr, llvm\+::\+Value \texorpdfstring{$\ast$}{*}v1, llvm\+::\+Value \texorpdfstring{$\ast$}{*}v2=nullptr)
+\item 
+llvm\+::\+Type \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a9d72c71de74b687a86250a32946a7288}{sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::as\+LLVMType}} (\mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{Value\+Type}} type)
+\item 
+llvm\+::\+Type \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a8e055d3c9465a2a1bf60ee5e03e7026a}{sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::as\+LLVMType}} (\mbox{\hyperlink{namespace_i_r_ac56fb5355b338ad4a167c48ec539b90b}{Result\+Type}} type)
+\item 
+llvm\+::\+Function\+Type \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a3d16b9414b79f5141b40237a570d8ae4}{sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::as\+LLVMType}} (const \mbox{\hyperlink{struct_i_r_1_1_function_type}{Function\+Type}} \texorpdfstring{$\ast$}{*}function\+Type)
+\item 
+llvm\+::\+Constant\+Int \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a3516e0069b55fd689270d7d866543bd4}{sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::emit\+Literal}} (\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+llvm\+::\+Constant\+Int \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a4df86bb4684a9eb6c786c39ec576b490}{sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::emit\+Literal}} (\mbox{\hyperlink{_basic_types_8h_a2f1a62071dd7dc3f6ef85c1b7612dc35}{I32}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+llvm\+::\+Constant\+Int \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_ac3111b8fad7fca0a556ff28ea9380c24}{sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::emit\+Literal}} (\mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+llvm\+::\+Constant\+Int \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_ada409f18b1f66574aa1e2024c97a4ef3}{sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::emit\+Literal}} (\mbox{\hyperlink{_basic_types_8h_a416b74ff5b1dc365af5713a3f48fb8b9}{I64}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+llvm\+::\+Constant \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a3500b23a4cd214df7625dd6c6da4acb2}{sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::emit\+Literal}} (\mbox{\hyperlink{_basic_types_8h_a841d3674577a1e86afdc2f4845f46c4b}{F32}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+llvm\+::\+Constant \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a488113f7fdea1c5cfadc96760e9e3861}{sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::emit\+Literal}} (\mbox{\hyperlink{_basic_types_8h_adc9896ee12db3bb116fc63b3464c72c7}{F64}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+llvm\+::\+Constant \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_af66446a9bc4909d857cde13ec075b61b}{sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::emit\+Literal}} (bool \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+llvm\+::\+Constant \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a0ae0854b815533d14d628d2d5192656f}{sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::emit\+Literal\+Pointer}} (const void \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}}, llvm\+::\+Type \texorpdfstring{$\ast$}{*}type)
+\item 
+llvm\+::\+Module \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a988f69eb1e3c3722b9b899034d86d146}{sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::emit\+Module}} (const \mbox{\hyperlink{struct_i_r_1_1_module}{Module}} \&module)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+llvm\+::\+LLVMContext \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a810104386ace5517d32da5601399238e}{sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::context}}
+\item 
+llvm\+::\+Type \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a90fbf10072748df57aab1e6965dcb8b9}{sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::llvm\+Result\+Types}} \mbox{[}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}) Result\+Type\+::num\mbox{]}
+\item 
+llvm\+::\+Type \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a61a8da55e599cd9365ff6487168a353c}{sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::llvm\+I8\+Type}}
+\item 
+llvm\+::\+Type \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a529f20ea894c2ddc96505dacdab63780}{sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::llvm\+I16\+Type}}
+\item 
+llvm\+::\+Type \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a32ff63778fba31b0d80fc8dbaac5dde2}{sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::llvm\+I32\+Type}}
+\item 
+llvm\+::\+Type \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a79cec67ff4611f28c9ae3ab71add43a9}{sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::llvm\+I64\+Type}}
+\item 
+llvm\+::\+Type \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_abc25b2e91dcd2c77156736f553fe39be}{sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::llvm\+F32\+Type}}
+\item 
+llvm\+::\+Type \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a71de18ed122b1f59c36a3b0a9b8c26b0}{sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::llvm\+F64\+Type}}
+\item 
+llvm\+::\+Type \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a139269b8e6cecac4e7195a810b27b5b9}{sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::llvm\+Void\+Type}}
+\item 
+llvm\+::\+Type \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_ad6d4c1013f4d88832c3d090e96cef612}{sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::llvm\+Bool\+Type}}
+\item 
+llvm\+::\+Type \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_af08c6a6042f0b71abc3f71556d864b1a}{sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::llvm\+I8\+Ptr\+Type}}
+\item 
+llvm\+::\+Constant \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_adcc1122ae23ba2a66125f0972bc52310}{sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::typed\+Zero\+Constants}} \mbox{[}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}) Value\+Type\+::num\mbox{]}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{_l_l_v_m_emit_i_r_8cpp_afed409eed57195f876a415c2034620dd}\index{LLVMEmitIR.cpp@{LLVMEmitIR.cpp}!EMIT\_BINARY\_OP@{EMIT\_BINARY\_OP}}
+\index{EMIT\_BINARY\_OP@{EMIT\_BINARY\_OP}!LLVMEmitIR.cpp@{LLVMEmitIR.cpp}}
+\doxysubsubsection{\texorpdfstring{EMIT\_BINARY\_OP}{EMIT\_BINARY\_OP}}
+{\footnotesize\ttfamily \label{_l_l_v_m_emit_i_r_8cpp_afed409eed57195f876a415c2034620dd} 
+\#define EMIT\+\_\+\+BINARY\+\_\+\+OP(\begin{DoxyParamCaption}\item[{}]{type\+Id}{, }\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{emit\+Code}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ typeId\#\#\_\#\#\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(\mbox{\hyperlink{struct_i_r_1_1_no_imm}{NoImm}})\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}\ type\ =\ ValueType::typeId;\ \mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_af754e908a4e63c2527b91fe55260059b}{SUPPRESS\_UNUSED}}(type);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ right\ =\ pop();\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ left\ =\ pop();\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ push(emitCode);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source_l00950}{950}} of file \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source}{LLVMEmit\+IR.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00950\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#define\ EMIT\_BINARY\_OP(typeId,name,emitCode)\ void\ typeId\#\#\_\#\#name(NoImm)\ \(\backslash\)}}
+\DoxyCodeLine{00951\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \{\ \(\backslash\)}}
+\DoxyCodeLine{00952\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ const\ ValueType\ type\ =\ ValueType::typeId;\ SUPPRESS\_UNUSED(type);\ \(\backslash\)}}
+\DoxyCodeLine{00953\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ auto\ right\ =\ pop();\ \(\backslash\)}}
+\DoxyCodeLine{00954\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ auto\ left\ =\ pop();\ \(\backslash\)}}
+\DoxyCodeLine{00955\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ push(emitCode);\ \(\backslash\)}}
+\DoxyCodeLine{00956\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \}}}
+
+\end{DoxyCode}
+\Hypertarget{_l_l_v_m_emit_i_r_8cpp_ad8c837674e4356a7d35a158156f9d647}\index{LLVMEmitIR.cpp@{LLVMEmitIR.cpp}!EMIT\_CONST@{EMIT\_CONST}}
+\index{EMIT\_CONST@{EMIT\_CONST}!LLVMEmitIR.cpp@{LLVMEmitIR.cpp}}
+\doxysubsubsection{\texorpdfstring{EMIT\_CONST}{EMIT\_CONST}}
+{\footnotesize\ttfamily \label{_l_l_v_m_emit_i_r_8cpp_ad8c837674e4356a7d35a158156f9d647} 
+\#define EMIT\+\_\+\+CONST(\begin{DoxyParamCaption}\item[{}]{type\+Id}{, }\item[{}]{native\+Type}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordtype}{void}\ typeId\#\#\_const(\mbox{\hyperlink{struct_i_r_1_1_literal_imm}{LiteralImm<nativeType>}}\ imm)\ \{\ push(emitLiteral(imm.\mbox{\hyperlink{struct_i_r_1_1_literal_imm_a9b796ec65d16af24f33ed01887df92ca}{value}}));\ \}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source_l00892}{892}} of file \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source}{LLVMEmit\+IR.\+cpp}}.
+
+\Hypertarget{_l_l_v_m_emit_i_r_8cpp_af053e31bfc81aacbec078a0a42ad1819}\index{LLVMEmitIR.cpp@{LLVMEmitIR.cpp}!EMIT\_FP\_BINARY\_OP@{EMIT\_FP\_BINARY\_OP}}
+\index{EMIT\_FP\_BINARY\_OP@{EMIT\_FP\_BINARY\_OP}!LLVMEmitIR.cpp@{LLVMEmitIR.cpp}}
+\doxysubsubsection{\texorpdfstring{EMIT\_FP\_BINARY\_OP}{EMIT\_FP\_BINARY\_OP}}
+{\footnotesize\ttfamily \label{_l_l_v_m_emit_i_r_8cpp_af053e31bfc81aacbec078a0a42ad1819} 
+\#define EMIT\+\_\+\+FP\+\_\+\+BINARY\+\_\+\+OP(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{emit\+Code}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_afed409eed57195f876a415c2034620dd}{EMIT\_BINARY\_OP}}(\mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6a512dc597be7ae761876315165dc8bd2e}{f32}},\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},emitCode)\ \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_afed409eed57195f876a415c2034620dd}{EMIT\_BINARY\_OP}}(\mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6a714b98e0a797e8f119f257a4ab802f86}{f64}},\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},emitCode)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source_l00958}{958}} of file \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source}{LLVMEmit\+IR.\+cpp}}.
+
+\Hypertarget{_l_l_v_m_emit_i_r_8cpp_a3a42e529283647d7ff760958b46a6cb0}\index{LLVMEmitIR.cpp@{LLVMEmitIR.cpp}!EMIT\_FP\_UNARY\_OP@{EMIT\_FP\_UNARY\_OP}}
+\index{EMIT\_FP\_UNARY\_OP@{EMIT\_FP\_UNARY\_OP}!LLVMEmitIR.cpp@{LLVMEmitIR.cpp}}
+\doxysubsubsection{\texorpdfstring{EMIT\_FP\_UNARY\_OP}{EMIT\_FP\_UNARY\_OP}}
+{\footnotesize\ttfamily \label{_l_l_v_m_emit_i_r_8cpp_a3a42e529283647d7ff760958b46a6cb0} 
+\#define EMIT\+\_\+\+FP\+\_\+\+UNARY\+\_\+\+OP(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{emit\+Code}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_a6d3e24267811c311d6d4b6d626fcbf62}{EMIT\_UNARY\_OP}}(\mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6a512dc597be7ae761876315165dc8bd2e}{f32}},\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},emitCode)\ \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_a6d3e24267811c311d6d4b6d626fcbf62}{EMIT\_UNARY\_OP}}(\mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6a714b98e0a797e8f119f257a4ab802f86}{f64}},\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},emitCode)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source_l00967}{967}} of file \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source}{LLVMEmit\+IR.\+cpp}}.
+
+\Hypertarget{_l_l_v_m_emit_i_r_8cpp_a0c4922105a5d94a12974d0b7008326b3}\index{LLVMEmitIR.cpp@{LLVMEmitIR.cpp}!EMIT\_INT\_BINARY\_OP@{EMIT\_INT\_BINARY\_OP}}
+\index{EMIT\_INT\_BINARY\_OP@{EMIT\_INT\_BINARY\_OP}!LLVMEmitIR.cpp@{LLVMEmitIR.cpp}}
+\doxysubsubsection{\texorpdfstring{EMIT\_INT\_BINARY\_OP}{EMIT\_INT\_BINARY\_OP}}
+{\footnotesize\ttfamily \label{_l_l_v_m_emit_i_r_8cpp_a0c4922105a5d94a12974d0b7008326b3} 
+\#define EMIT\+\_\+\+INT\+\_\+\+BINARY\+\_\+\+OP(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{emit\+Code}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_afed409eed57195f876a415c2034620dd}{EMIT\_BINARY\_OP}}(\mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6af89edb52b075b8bd95989bd3d0a04c0a}{i32}},\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},emitCode)\ \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_afed409eed57195f876a415c2034620dd}{EMIT\_BINARY\_OP}}(\mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6add1d26230d15c93e8fbdba07b0299a44}{i64}},\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},emitCode)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source_l00957}{957}} of file \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source}{LLVMEmit\+IR.\+cpp}}.
+
+\Hypertarget{_l_l_v_m_emit_i_r_8cpp_a351ccdf82885362ad5108b02909b007b}\index{LLVMEmitIR.cpp@{LLVMEmitIR.cpp}!EMIT\_INT\_COMPARE@{EMIT\_INT\_COMPARE}}
+\index{EMIT\_INT\_COMPARE@{EMIT\_INT\_COMPARE}!LLVMEmitIR.cpp@{LLVMEmitIR.cpp}}
+\doxysubsubsection{\texorpdfstring{EMIT\_INT\_COMPARE}{EMIT\_INT\_COMPARE}}
+{\footnotesize\ttfamily \label{_l_l_v_m_emit_i_r_8cpp_a351ccdf82885362ad5108b02909b007b} 
+\#define EMIT\+\_\+\+INT\+\_\+\+COMPARE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{emit\+Code}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_a7c6f1d481394698bd36b68719d3ea239}{EMIT\_INT\_COMPARE\_OP}}(i32\_\#\#\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ llvmI32Type,\ llvmI32Type,\ ValueType::i32,\ emitCode)\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ EMIT\_INT\_COMPARE\_OP(i64\_\#\#\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ llvmI64Type,\ llvmI32Type,\ ValueType::i64,\ emitCode)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source_l01071}{1071}} of file \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source}{LLVMEmit\+IR.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01071\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#define\ EMIT\_INT\_COMPARE(name,\ emitCode)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{01072\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ EMIT\_INT\_COMPARE\_OP(i32\_\#\#name,\ llvmI32Type,\ llvmI32Type,\ ValueType::i32,\ emitCode)\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{01073\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ EMIT\_INT\_COMPARE\_OP(i64\_\#\#name,\ llvmI64Type,\ llvmI32Type,\ ValueType::i64,\ emitCode)}}
+
+\end{DoxyCode}
+\Hypertarget{_l_l_v_m_emit_i_r_8cpp_a7c6f1d481394698bd36b68719d3ea239}\index{LLVMEmitIR.cpp@{LLVMEmitIR.cpp}!EMIT\_INT\_COMPARE\_OP@{EMIT\_INT\_COMPARE\_OP}}
+\index{EMIT\_INT\_COMPARE\_OP@{EMIT\_INT\_COMPARE\_OP}!LLVMEmitIR.cpp@{LLVMEmitIR.cpp}}
+\doxysubsubsection{\texorpdfstring{EMIT\_INT\_COMPARE\_OP}{EMIT\_INT\_COMPARE\_OP}}
+{\footnotesize\ttfamily \label{_l_l_v_m_emit_i_r_8cpp_a7c6f1d481394698bd36b68719d3ea239} 
+\#define EMIT\+\_\+\+INT\+\_\+\+COMPARE\+\_\+\+OP(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{llvm\+Source\+Type}{, }\item[{}]{llvm\+Dest\+Type}{, }\item[{}]{value\+Type}{, }\item[{}]{emit\+Code}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(\mbox{\hyperlink{struct_i_r_1_1_no_imm}{NoImm}})\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ right\ =\ irBuilder.CreateOr(\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ irBuilder.CreateBitCast(pop(),\ llvmSourceType),\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ irBuilder.CreateBitCast(\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ getNonConstantZero(irBuilder,\ typedZeroConstants[\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}(valueType)]),\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ llvmSourceType));\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ left\ =\ irBuilder.CreateBitCast(pop(),\ llvmSourceType);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ push(coerceBoolToI32(emitCode));\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source_l01060}{1060}} of file \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source}{LLVMEmit\+IR.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01060\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#define\ EMIT\_INT\_COMPARE\_OP(name,\ llvmSourceType,\ llvmDestType,\ valueType,\ emitCode)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{01061\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ void\ name(NoImm)\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{01062\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ auto\ right\ =\ irBuilder.CreateOr(\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{01063\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ irBuilder.CreateBitCast(pop(),\ llvmSourceType),\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{01064\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ irBuilder.CreateBitCast(\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{01065\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ getNonConstantZero(irBuilder,\ typedZeroConstants[Uptr(valueType)]),\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{01066\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ llvmSourceType));\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{01067\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ auto\ left\ =\ irBuilder.CreateBitCast(pop(),\ llvmSourceType);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{01068\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ push(coerceBoolToI32(emitCode));\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{01069\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \}}}
+
+\end{DoxyCode}
+\Hypertarget{_l_l_v_m_emit_i_r_8cpp_aed9f6f217da29a0dc1a419168627320c}\index{LLVMEmitIR.cpp@{LLVMEmitIR.cpp}!EMIT\_INT\_UNARY\_OP@{EMIT\_INT\_UNARY\_OP}}
+\index{EMIT\_INT\_UNARY\_OP@{EMIT\_INT\_UNARY\_OP}!LLVMEmitIR.cpp@{LLVMEmitIR.cpp}}
+\doxysubsubsection{\texorpdfstring{EMIT\_INT\_UNARY\_OP}{EMIT\_INT\_UNARY\_OP}}
+{\footnotesize\ttfamily \label{_l_l_v_m_emit_i_r_8cpp_aed9f6f217da29a0dc1a419168627320c} 
+\#define EMIT\+\_\+\+INT\+\_\+\+UNARY\+\_\+\+OP(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{emit\+Code}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_a6d3e24267811c311d6d4b6d626fcbf62}{EMIT\_UNARY\_OP}}(\mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6af89edb52b075b8bd95989bd3d0a04c0a}{i32}},\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},emitCode)\ \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_a6d3e24267811c311d6d4b6d626fcbf62}{EMIT\_UNARY\_OP}}(\mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6add1d26230d15c93e8fbdba07b0299a44}{i64}},\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},emitCode)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source_l00966}{966}} of file \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source}{LLVMEmit\+IR.\+cpp}}.
+
+\Hypertarget{_l_l_v_m_emit_i_r_8cpp_a3dd458e5a61c51fcf43cfe7aed3be2df}\index{LLVMEmitIR.cpp@{LLVMEmitIR.cpp}!EMIT\_LOAD\_OP@{EMIT\_LOAD\_OP}}
+\index{EMIT\_LOAD\_OP@{EMIT\_LOAD\_OP}!LLVMEmitIR.cpp@{LLVMEmitIR.cpp}}
+\doxysubsubsection{\texorpdfstring{EMIT\_LOAD\_OP}{EMIT\_LOAD\_OP}}
+{\footnotesize\ttfamily \label{_l_l_v_m_emit_i_r_8cpp_a3dd458e5a61c51fcf43cfe7aed3be2df} 
+\#define EMIT\+\_\+\+LOAD\+\_\+\+OP(\begin{DoxyParamCaption}\item[{}]{value\+Type\+Id}{, }\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{llvm\+Memory\+Type}{, }\item[{}]{natural\+Alignment\+Log2}{, }\item[{}]{conversion\+Op}{, }\item[{}]{alignment\+Param}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ valueTypeId\#\#\_\#\#\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(\mbox{\hyperlink{struct_i_r_1_1_load_or_store_imm}{LoadOrStoreImm<naturalAlignmentLog2>}}\ imm)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ byteIndex\ =\ pop();\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}}\ =\ coerceByteIndexToPointer(byteIndex,imm.offset,llvmMemoryType);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ load\ =\ irBuilder.CreateLoad(\mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}});\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ load-\/>setAlignment(alignmentParam);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ load-\/>setVolatile(\textcolor{keyword}{true});\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ push(conversionOp(load,asLLVMType(ValueType::valueTypeId)));\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source_l00899}{899}} of file \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source}{LLVMEmit\+IR.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00899\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#define\ EMIT\_LOAD\_OP(valueTypeId,name,llvmMemoryType,naturalAlignmentLog2,conversionOp,alignmentParam)\ \(\backslash\)}}
+\DoxyCodeLine{00900\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ void\ valueTypeId\#\#\_\#\#name(LoadOrStoreImm<naturalAlignmentLog2>\ imm)\ \(\backslash\)}}
+\DoxyCodeLine{00901\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \{\ \(\backslash\)}}
+\DoxyCodeLine{00902\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ auto\ byteIndex\ =\ pop();\ \(\backslash\)}}
+\DoxyCodeLine{00903\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ auto\ pointer\ =\ coerceByteIndexToPointer(byteIndex,imm.offset,llvmMemoryType);\ \(\backslash\)}}
+\DoxyCodeLine{00904\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ auto\ load\ =\ irBuilder.CreateLoad(pointer);\ \(\backslash\)}}
+\DoxyCodeLine{00905\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ load-\/>setAlignment(alignmentParam);\ \(\backslash\)}}
+\DoxyCodeLine{00906\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ load-\/>setVolatile(true);\ \(\backslash\)}}
+\DoxyCodeLine{00907\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ push(conversionOp(load,asLLVMType(ValueType::valueTypeId)));\ \(\backslash\)}}
+\DoxyCodeLine{00908\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \}}}
+
+\end{DoxyCode}
+\Hypertarget{_l_l_v_m_emit_i_r_8cpp_ad0bbd109c48508e4ecad0f875b0439b2}\index{LLVMEmitIR.cpp@{LLVMEmitIR.cpp}!EMIT\_STORE\_OP@{EMIT\_STORE\_OP}}
+\index{EMIT\_STORE\_OP@{EMIT\_STORE\_OP}!LLVMEmitIR.cpp@{LLVMEmitIR.cpp}}
+\doxysubsubsection{\texorpdfstring{EMIT\_STORE\_OP}{EMIT\_STORE\_OP}}
+{\footnotesize\ttfamily \label{_l_l_v_m_emit_i_r_8cpp_ad0bbd109c48508e4ecad0f875b0439b2} 
+\#define EMIT\+\_\+\+STORE\+\_\+\+OP(\begin{DoxyParamCaption}\item[{}]{value\+Type\+Id}{, }\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{llvm\+Memory\+Type}{, }\item[{}]{natural\+Alignment\+Log2}{, }\item[{}]{conversion\+Op}{, }\item[{}]{alignment\+Param}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ valueTypeId\#\#\_\#\#\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(\mbox{\hyperlink{struct_i_r_1_1_load_or_store_imm}{LoadOrStoreImm<naturalAlignmentLog2>}}\ imm)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ =\ pop();\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ byteIndex\ =\ pop();\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}}\ =\ coerceByteIndexToPointer(byteIndex,imm.offset,llvmMemoryType);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ memoryValue\ =\ conversionOp(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},llvmMemoryType);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ store\ =\ irBuilder.CreateStore(memoryValue,\mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}});\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ store-\/>setVolatile(\textcolor{keyword}{true});\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ store-\/>setAlignment(alignmentParam);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source_l00909}{909}} of file \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source}{LLVMEmit\+IR.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00909\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#define\ EMIT\_STORE\_OP(valueTypeId,name,llvmMemoryType,naturalAlignmentLog2,conversionOp,alignmentParam)\ \(\backslash\)}}
+\DoxyCodeLine{00910\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ void\ valueTypeId\#\#\_\#\#name(LoadOrStoreImm<naturalAlignmentLog2>\ imm)\ \(\backslash\)}}
+\DoxyCodeLine{00911\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \{\ \(\backslash\)}}
+\DoxyCodeLine{00912\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ auto\ value\ =\ pop();\ \(\backslash\)}}
+\DoxyCodeLine{00913\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ auto\ byteIndex\ =\ pop();\ \(\backslash\)}}
+\DoxyCodeLine{00914\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ auto\ pointer\ =\ coerceByteIndexToPointer(byteIndex,imm.offset,llvmMemoryType);\ \(\backslash\)}}
+\DoxyCodeLine{00915\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ auto\ memoryValue\ =\ conversionOp(value,llvmMemoryType);\ \(\backslash\)}}
+\DoxyCodeLine{00916\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ auto\ store\ =\ irBuilder.CreateStore(memoryValue,pointer);\ \(\backslash\)}}
+\DoxyCodeLine{00917\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ store-\/>setVolatile(true);\ \(\backslash\)}}
+\DoxyCodeLine{00918\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ store-\/>setAlignment(alignmentParam);\ \(\backslash\)}}
+\DoxyCodeLine{00919\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \}}}
+
+\end{DoxyCode}
+\Hypertarget{_l_l_v_m_emit_i_r_8cpp_a6d3e24267811c311d6d4b6d626fcbf62}\index{LLVMEmitIR.cpp@{LLVMEmitIR.cpp}!EMIT\_UNARY\_OP@{EMIT\_UNARY\_OP}}
+\index{EMIT\_UNARY\_OP@{EMIT\_UNARY\_OP}!LLVMEmitIR.cpp@{LLVMEmitIR.cpp}}
+\doxysubsubsection{\texorpdfstring{EMIT\_UNARY\_OP}{EMIT\_UNARY\_OP}}
+{\footnotesize\ttfamily \label{_l_l_v_m_emit_i_r_8cpp_a6d3e24267811c311d6d4b6d626fcbf62} 
+\#define EMIT\+\_\+\+UNARY\+\_\+\+OP(\begin{DoxyParamCaption}\item[{}]{type\+Id}{, }\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{emit\+Code}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ typeId\#\#\_\#\#\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(\mbox{\hyperlink{struct_i_r_1_1_no_imm}{NoImm}})\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}\ type\ =\ ValueType::typeId;\ \mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_af754e908a4e63c2527b91fe55260059b}{SUPPRESS\_UNUSED}}(type);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ operand\ =\ pop();\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ push(emitCode);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source_l00960}{960}} of file \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source}{LLVMEmit\+IR.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00960\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#define\ EMIT\_UNARY\_OP(typeId,name,emitCode)\ void\ typeId\#\#\_\#\#name(NoImm)\ \(\backslash\)}}
+\DoxyCodeLine{00961\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \{\ \(\backslash\)}}
+\DoxyCodeLine{00962\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ const\ ValueType\ type\ =\ ValueType::typeId;\ SUPPRESS\_UNUSED(type);\ \(\backslash\)}}
+\DoxyCodeLine{00963\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ auto\ operand\ =\ pop();\ \(\backslash\)}}
+\DoxyCodeLine{00964\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ push(emitCode);\ \(\backslash\)}}
+\DoxyCodeLine{00965\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \}}}
+
+\end{DoxyCode}
+\Hypertarget{_l_l_v_m_emit_i_r_8cpp_a4d769052aed9e0603ddc9497865dfe1b}\index{LLVMEmitIR.cpp@{LLVMEmitIR.cpp}!ENABLE\_FUNCTION\_ENTER\_EXIT\_HOOKS@{ENABLE\_FUNCTION\_ENTER\_EXIT\_HOOKS}}
+\index{ENABLE\_FUNCTION\_ENTER\_EXIT\_HOOKS@{ENABLE\_FUNCTION\_ENTER\_EXIT\_HOOKS}!LLVMEmitIR.cpp@{LLVMEmitIR.cpp}}
+\doxysubsubsection{\texorpdfstring{ENABLE\_FUNCTION\_ENTER\_EXIT\_HOOKS}{ENABLE\_FUNCTION\_ENTER\_EXIT\_HOOKS}}
+{\footnotesize\ttfamily \label{_l_l_v_m_emit_i_r_8cpp_a4d769052aed9e0603ddc9497865dfe1b} 
+\#define ENABLE\+\_\+\+FUNCTION\+\_\+\+ENTER\+\_\+\+EXIT\+\_\+\+HOOKS~0}
+
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source_l00050}{50}} of file \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source}{LLVMEmit\+IR.\+cpp}}.
+
+\Hypertarget{_l_l_v_m_emit_i_r_8cpp_a042e13d7e40b6a804e22e1089a8074ec}\index{LLVMEmitIR.cpp@{LLVMEmitIR.cpp}!ENABLE\_LOGGING@{ENABLE\_LOGGING}}
+\index{ENABLE\_LOGGING@{ENABLE\_LOGGING}!LLVMEmitIR.cpp@{LLVMEmitIR.cpp}}
+\doxysubsubsection{\texorpdfstring{ENABLE\_LOGGING}{ENABLE\_LOGGING}}
+{\footnotesize\ttfamily \label{_l_l_v_m_emit_i_r_8cpp_a042e13d7e40b6a804e22e1089a8074ec} 
+\#define ENABLE\+\_\+\+LOGGING~0}
+
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source_l00049}{49}} of file \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source}{LLVMEmit\+IR.\+cpp}}.
+
+\Hypertarget{_l_l_v_m_emit_i_r_8cpp_a18fbbf5213855e5d8cea448a9c9749d0}\index{LLVMEmitIR.cpp@{LLVMEmitIR.cpp}!LOAD\_STORE\_ALIGNMENT\_PARAM@{LOAD\_STORE\_ALIGNMENT\_PARAM}}
+\index{LOAD\_STORE\_ALIGNMENT\_PARAM@{LOAD\_STORE\_ALIGNMENT\_PARAM}!LLVMEmitIR.cpp@{LLVMEmitIR.cpp}}
+\doxysubsubsection{\texorpdfstring{LOAD\_STORE\_ALIGNMENT\_PARAM}{LOAD\_STORE\_ALIGNMENT\_PARAM}}
+{\footnotesize\ttfamily \label{_l_l_v_m_emit_i_r_8cpp_a18fbbf5213855e5d8cea448a9c9749d0} 
+\#define LOAD\+\_\+\+STORE\+\_\+\+ALIGNMENT\+\_\+\+PARAM~1}
+
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source_l00924}{924}} of file \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source}{LLVMEmit\+IR.\+cpp}}.
+
+\Hypertarget{_l_l_v_m_emit_i_r_8cpp_a5c975c850de8a1221bcc1a77cc2f7013}\index{LLVMEmitIR.cpp@{LLVMEmitIR.cpp}!VISIT\_OP@{VISIT\_OP}}
+\index{VISIT\_OP@{VISIT\_OP}!LLVMEmitIR.cpp@{LLVMEmitIR.cpp}}
+\doxysubsubsection{\texorpdfstring{VISIT\_OP}{VISIT\_OP}}
+{\footnotesize\ttfamily \label{_l_l_v_m_emit_i_r_8cpp_a5c975c850de8a1221bcc1a77cc2f7013} 
+\#define VISIT\+\_\+\+OP(\begin{DoxyParamCaption}\item[{}]{opcode}{, }\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{name\+String}{, }\item[{}]{Imm}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordtype}{void}\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(Imm\ imm)\ \{\}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source_l01160}{1160}} of file \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source}{LLVMEmit\+IR.\+cpp}}.
+

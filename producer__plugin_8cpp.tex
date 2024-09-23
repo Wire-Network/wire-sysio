@@ -1,0 +1,357 @@
+\doxysection{plugins/producer\+\_\+plugin/producer\+\_\+plugin.cpp File Reference}
+\hypertarget{producer__plugin_8cpp}{}\label{producer__plugin_8cpp}\index{plugins/producer\_plugin/producer\_plugin.cpp@{plugins/producer\_plugin/producer\_plugin.cpp}}
+{\ttfamily \#include $<$sysio/producer\+\_\+plugin/producer\+\_\+plugin.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/producer\+\_\+plugin/subjective\+\_\+billing.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/plugin\+\_\+interface.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/global\+\_\+property\+\_\+object.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/generated\+\_\+transaction\+\_\+object.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/snapshot.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/transaction\+\_\+object.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/thread\+\_\+utils.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/unapplied\+\_\+transaction\+\_\+queue.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/resource\+\_\+monitor\+\_\+plugin/resource\+\_\+monitor\+\_\+plugin.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/sub\+\_\+chain\+\_\+plugin/sub\+\_\+chain\+\_\+plugin.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/s\+\_\+root\+\_\+extension.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/io/json.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/log/logger\+\_\+config.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/scoped\+\_\+exit.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/asio.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/date\+\_\+time/posix\+\_\+time/posix\+\_\+time.\+hpp$>$}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$algorithm$>$}\newline
+{\ttfamily \#include $<$boost/algorithm/string.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/range/adaptor/map.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/function\+\_\+output\+\_\+iterator.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/multi\+\_\+index\+\_\+container.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/multi\+\_\+index/member.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/multi\+\_\+index/hashed\+\_\+index.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/multi\+\_\+index/ordered\+\_\+index.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/signals2/connection.\+hpp$>$}\newline
+Include dependency graph for producer\+\_\+plugin.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{producer__plugin_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1transaction__id__with__expiry}{sysio\+::transaction\+\_\+id\+\_\+with\+\_\+expiry}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1pending__snapshot}{sysio\+::pending\+\_\+snapshot}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1producer__plugin__impl}{sysio\+::producer\+\_\+plugin\+\_\+impl}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{producer__plugin_8cpp_a01d09f9c9fe1cbc1b70a0c41f0682e07}{LOG\+\_\+\+AND\+\_\+\+DROP}}()
+\item 
+\#define \mbox{\hyperlink{producer__plugin_8cpp_ac96900c0c3efb424647faf59995487d6}{LOAD\+\_\+\+VALUE\+\_\+\+SET}}(options,  op\+\_\+name,  container)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{namespacesysio_a3da8a6a29b9db34a4eb5170317d0b5a5}{sysio\+::transaction\+\_\+id\+\_\+with\+\_\+expiry\+\_\+index}}
+\item 
+using \mbox{\hyperlink{namespacesysio_a141379c7defda83a80367f716ab4f78b}{sysio\+::pending\+\_\+snapshot\+\_\+index}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum class \mbox{\hyperlink{namespacesysio_acd1c637e1a22040dbf666b0301cbc475}{sysio\+::pending\+\_\+block\+\_\+mode}} \{ \mbox{\hyperlink{namespacesysio_acd1c637e1a22040dbf666b0301cbc475afd75fc8d5de6f56947b1afc9e44ddb5f}{sysio\+::producing}}
+, \mbox{\hyperlink{namespacesysio_acd1c637e1a22040dbf666b0301cbc475aa25b9b4361a3bd215c739cf4f9cf2e4a}{sysio\+::speculating}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+const std\+::string \mbox{\hyperlink{producer__plugin_8cpp_ae8244453c4634dc005f0e0c4cb58dd09}{logger\+\_\+name}} ("{}producer\+\_\+plugin"{})
+\item 
+const std\+::string \mbox{\hyperlink{producer__plugin_8cpp_ada404895f53490702144cecc3a82b6d4}{trx\+\_\+successful\+\_\+trace\+\_\+logger\+\_\+name}} ("{}transaction\+\_\+success\+\_\+tracing"{})
+\item 
+const std\+::string \mbox{\hyperlink{producer__plugin_8cpp_a621f886a258aed68a24a53ffb3b0c36d}{trx\+\_\+failed\+\_\+trace\+\_\+logger\+\_\+name}} ("{}transaction\+\_\+failure\+\_\+tracing"{})
+\item 
+const std\+::string \mbox{\hyperlink{producer__plugin_8cpp_ae546cf0f5f4ee210f917a432e3c1bc42}{trx\+\_\+trace\+\_\+success\+\_\+logger\+\_\+name}} ("{}transaction\+\_\+trace\+\_\+success"{})
+\item 
+const std\+::string \mbox{\hyperlink{producer__plugin_8cpp_a54d7146c8088d64735b0cfbbea3ecae8}{trx\+\_\+trace\+\_\+failure\+\_\+logger\+\_\+name}} ("{}transaction\+\_\+trace\+\_\+failure"{})
+\item 
+const std\+::string \mbox{\hyperlink{producer__plugin_8cpp_af25e4084ac685ca1a7777524a948d81f}{trx\+\_\+logger\+\_\+name}} ("{}transaction"{})
+\item 
+void \mbox{\hyperlink{namespacesysio_ae6b502dce0e50dbe3d9ee47f1ba720d1}{sysio\+::new\+\_\+chain\+\_\+banner}} (const \mbox{\hyperlink{classsysio_1_1chain_1_1controller}{sysio\+::chain\+::controller}} \&db)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{namespacesysio_a57a25df07ccdce01a63d0b026d80ea5f}{sysio\+::dejsonify}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1logger}{fc\+::logger}} \mbox{\hyperlink{producer__plugin_8cpp_adff615e9fbe43b3e6443687be568cffd}{\+\_\+log}}
+\item 
+\mbox{\hyperlink{classfc_1_1logger}{fc\+::logger}} \mbox{\hyperlink{producer__plugin_8cpp_aea18f7b7425ddc0191447aca7c3e27f6}{\+\_\+trx\+\_\+successful\+\_\+trace\+\_\+log}}
+\item 
+\mbox{\hyperlink{classfc_1_1logger}{fc\+::logger}} \mbox{\hyperlink{producer__plugin_8cpp_ae93a86d470c7e16b50ab7102170c5d4e}{\+\_\+trx\+\_\+failed\+\_\+trace\+\_\+log}}
+\item 
+\mbox{\hyperlink{classfc_1_1logger}{fc\+::logger}} \mbox{\hyperlink{producer__plugin_8cpp_a79c03faf256096a8e1ad0d59c8760d2e}{\+\_\+trx\+\_\+trace\+\_\+success\+\_\+log}}
+\item 
+\mbox{\hyperlink{classfc_1_1logger}{fc\+::logger}} \mbox{\hyperlink{producer__plugin_8cpp_a979f47bc56a17944271d72bccb834c33}{\+\_\+trx\+\_\+trace\+\_\+failure\+\_\+log}}
+\item 
+\mbox{\hyperlink{classfc_1_1logger}{fc\+::logger}} \mbox{\hyperlink{producer__plugin_8cpp_a78396757cc70405744561b647c892edf}{\+\_\+trx\+\_\+log}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{producer__plugin_8cpp_ac96900c0c3efb424647faf59995487d6}\index{producer\_plugin.cpp@{producer\_plugin.cpp}!LOAD\_VALUE\_SET@{LOAD\_VALUE\_SET}}
+\index{LOAD\_VALUE\_SET@{LOAD\_VALUE\_SET}!producer\_plugin.cpp@{producer\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{LOAD\_VALUE\_SET}{LOAD\_VALUE\_SET}}
+{\footnotesize\ttfamily \label{producer__plugin_8cpp_ac96900c0c3efb424647faf59995487d6} 
+\#define LOAD\+\_\+\+VALUE\+\_\+\+SET(\begin{DoxyParamCaption}\item[{}]{options}{, }\item[{}]{op\+\_\+name}{, }\item[{}]{container}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordflow}{if}(\ options.count(op\_name)\ )\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \textcolor{keyword}{const}\ std::vector<std::string>\&\ ops\ =\ options[op\_name].as<std::vector<std::string>>();\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ for(\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ v\ :\ ops\ )\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ container.emplace(\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{sysio::chain::name}}(\ v\ )\ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{producer__plugin_8cpp_source_l00940}{940}} of file \mbox{\hyperlink{producer__plugin_8cpp_source}{producer\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00940\ \textcolor{preprocessor}{\#define\ LOAD\_VALUE\_SET(options,\ op\_name,\ container)\ \(\backslash\)}}
+\DoxyCodeLine{00941\ \textcolor{preprocessor}{if(\ options.count(op\_name)\ )\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00942\ \textcolor{preprocessor}{\ \ \ const\ std::vector<std::string>\&\ ops\ =\ options[op\_name].as<std::vector<std::string>>();\ \(\backslash\)}}
+\DoxyCodeLine{00943\ \textcolor{preprocessor}{\ \ \ for(\ const\ auto\&\ v\ :\ ops\ )\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00944\ \textcolor{preprocessor}{\ \ \ \ \ \ container.emplace(\ sysio::chain::name(\ v\ )\ );\ \(\backslash\)}}
+\DoxyCodeLine{00945\ \textcolor{preprocessor}{\ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00946\ \textcolor{preprocessor}{\}}}
+
+\end{DoxyCode}
+\Hypertarget{producer__plugin_8cpp_a01d09f9c9fe1cbc1b70a0c41f0682e07}\index{producer\_plugin.cpp@{producer\_plugin.cpp}!LOG\_AND\_DROP@{LOG\_AND\_DROP}}
+\index{LOG\_AND\_DROP@{LOG\_AND\_DROP}!producer\_plugin.cpp@{producer\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{LOG\_AND\_DROP}{LOG\_AND\_DROP}}
+{\footnotesize\ttfamily \label{producer__plugin_8cpp_a01d09f9c9fe1cbc1b70a0c41f0682e07} 
+\#define LOG\+\_\+\+AND\+\_\+\+DROP(\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \textcolor{keywordflow}{catch}\ (\ \textcolor{keyword}{const}\ guard\_exception\&\ e\ )\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ chain\_plugin::handle\_guard\_exception(e);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \}\ \textcolor{keywordflow}{catch}\ (\ \textcolor{keyword}{const}\ std::bad\_alloc\&\ )\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ chain\_plugin::handle\_bad\_alloc();\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \}\ \textcolor{keywordflow}{catch}\ (\ boost::interprocess::bad\_alloc\&\ )\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ chain\_plugin::handle\_db\_exhaustion();\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \}\ \textcolor{keywordflow}{catch}(\ \mbox{\hyperlink{classfc_1_1exception}{fc::exception}}\&\ er\ )\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ wlog(\ \textcolor{stringliteral}{"{}\$\{details\}"{}},\ (\textcolor{stringliteral}{"{}details"{}},er.\mbox{\hyperlink{classfc_1_1exception_a7611ea8fbe25dde56649b685c2298a37}{to\_detail\_string}}())\ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \}\ \textcolor{keywordflow}{catch}(\ \textcolor{keyword}{const}\ std::exception\&\ e\ )\ \{\ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1exception}{fc::exception}}\ fce(\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{log__message_8hpp_a4a4df4bb5cffbe07aadf7d29fd44c75e}{FC\_LOG\_MESSAGE}}(\ warn,\ \textcolor{stringliteral}{"{}std::exception:\ \$\{what\}:\ "{}},(\textcolor{stringliteral}{"{}what"{}},e.what())\ ),\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca969f910e4a1ec90bac8bf8eca1a8cec0}{fc::std\_exception\_code}},\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_CORE\_TYPEID(e).\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(),\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ e.what()\ )\ ;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ wlog(\ \textcolor{stringliteral}{"{}\$\{details\}"{}},\ (\textcolor{stringliteral}{"{}details"{}},fce.to\_detail\_string())\ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \}\ \textcolor{keywordflow}{catch}(\ ...\ )\ \{\ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1unhandled__exception}{fc::unhandled\_exception}}\ e(\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{log__message_8hpp_a4a4df4bb5cffbe07aadf7d29fd44c75e}{FC\_LOG\_MESSAGE}}(\ warn,\ \textcolor{stringliteral}{"{}unknown:\ "{}},\ \ ),\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::current\_exception()\ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ wlog(\ \textcolor{stringliteral}{"{}\$\{details\}"{}},\ (\textcolor{stringliteral}{"{}details"{}},e.to\_detail\_string())\ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{producer__plugin_8cpp_source_l00047}{47}} of file \mbox{\hyperlink{producer__plugin_8cpp_source}{producer\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00047\ \textcolor{preprocessor}{\#define\ LOG\_AND\_DROP()\ \ \(\backslash\)}}
+\DoxyCodeLine{00048\ \textcolor{preprocessor}{\ \ \ catch\ (\ const\ guard\_exception\&\ e\ )\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00049\ \textcolor{preprocessor}{\ \ \ \ \ \ chain\_plugin::handle\_guard\_exception(e);\ \(\backslash\)}}
+\DoxyCodeLine{00050\ \textcolor{preprocessor}{\ \ \ \}\ catch\ (\ const\ std::bad\_alloc\&\ )\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00051\ \textcolor{preprocessor}{\ \ \ \ \ \ chain\_plugin::handle\_bad\_alloc();\ \(\backslash\)}}
+\DoxyCodeLine{00052\ \textcolor{preprocessor}{\ \ \ \}\ catch\ (\ boost::interprocess::bad\_alloc\&\ )\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00053\ \textcolor{preprocessor}{\ \ \ \ \ \ chain\_plugin::handle\_db\_exhaustion();\ \(\backslash\)}}
+\DoxyCodeLine{00054\ \textcolor{preprocessor}{\ \ \ \}\ catch(\ fc::exception\&\ er\ )\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00055\ \textcolor{preprocessor}{\ \ \ \ \ \ wlog(\ "{}\$\{details\}"{},\ ("{}details"{},er.to\_detail\_string())\ );\ \(\backslash\)}}
+\DoxyCodeLine{00056\ \textcolor{preprocessor}{\ \ \ \}\ catch(\ const\ std::exception\&\ e\ )\ \{\ \ \(\backslash\)}}
+\DoxyCodeLine{00057\ \textcolor{preprocessor}{\ \ \ \ \ \ fc::exception\ fce(\ \(\backslash\)}}
+\DoxyCodeLine{00058\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ FC\_LOG\_MESSAGE(\ warn,\ "{}std::exception:\ \$\{what\}:\ "{},("{}what"{},e.what())\ ),\ \(\backslash\)}}
+\DoxyCodeLine{00059\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fc::std\_exception\_code,\(\backslash\)}}
+\DoxyCodeLine{00060\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_CORE\_TYPEID(e).name(),\ \(\backslash\)}}
+\DoxyCodeLine{00061\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ e.what()\ )\ ;\ \(\backslash\)}}
+\DoxyCodeLine{00062\ \textcolor{preprocessor}{\ \ \ \ \ \ wlog(\ "{}\$\{details\}"{},\ ("{}details"{},fce.to\_detail\_string())\ );\ \(\backslash\)}}
+\DoxyCodeLine{00063\ \textcolor{preprocessor}{\ \ \ \}\ catch(\ ...\ )\ \{\ \ \(\backslash\)}}
+\DoxyCodeLine{00064\ \textcolor{preprocessor}{\ \ \ \ \ \ fc::unhandled\_exception\ e(\ \(\backslash\)}}
+\DoxyCodeLine{00065\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ FC\_LOG\_MESSAGE(\ warn,\ "{}unknown:\ "{},\ \ ),\ \(\backslash\)}}
+\DoxyCodeLine{00066\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::current\_exception()\ );\ \(\backslash\)}}
+\DoxyCodeLine{00067\ \textcolor{preprocessor}{\ \ \ \ \ \ wlog(\ "{}\$\{details\}"{},\ ("{}details"{},e.to\_detail\_string())\ );\ \(\backslash\)}}
+\DoxyCodeLine{00068\ \textcolor{preprocessor}{\ \ \ \}}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{producer__plugin_8cpp_ae8244453c4634dc005f0e0c4cb58dd09}\index{producer\_plugin.cpp@{producer\_plugin.cpp}!logger\_name@{logger\_name}}
+\index{logger\_name@{logger\_name}!producer\_plugin.cpp@{producer\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{logger\_name()}{logger\_name()}}
+{\footnotesize\ttfamily \label{producer__plugin_8cpp_ae8244453c4634dc005f0e0c4cb58dd09} 
+const std\+::string logger\+\_\+name (\begin{DoxyParamCaption}\item[{"{}producer\+\_\+plugin"{}}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{producer__plugin_8cpp_a621f886a258aed68a24a53ffb3b0c36d}\index{producer\_plugin.cpp@{producer\_plugin.cpp}!trx\_failed\_trace\_logger\_name@{trx\_failed\_trace\_logger\_name}}
+\index{trx\_failed\_trace\_logger\_name@{trx\_failed\_trace\_logger\_name}!producer\_plugin.cpp@{producer\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{trx\_failed\_trace\_logger\_name()}{trx\_failed\_trace\_logger\_name()}}
+{\footnotesize\ttfamily \label{producer__plugin_8cpp_a621f886a258aed68a24a53ffb3b0c36d} 
+const std\+::string trx\+\_\+failed\+\_\+trace\+\_\+logger\+\_\+name (\begin{DoxyParamCaption}\item[{"{}transaction\+\_\+failure\+\_\+tracing"{}}]{}{}\end{DoxyParamCaption})}
+
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{producer__plugin_8cpp_a621f886a258aed68a24a53ffb3b0c36d_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{producer__plugin_8cpp_af25e4084ac685ca1a7777524a948d81f}\index{producer\_plugin.cpp@{producer\_plugin.cpp}!trx\_logger\_name@{trx\_logger\_name}}
+\index{trx\_logger\_name@{trx\_logger\_name}!producer\_plugin.cpp@{producer\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{trx\_logger\_name()}{trx\_logger\_name()}}
+{\footnotesize\ttfamily \label{producer__plugin_8cpp_af25e4084ac685ca1a7777524a948d81f} 
+const std\+::string trx\+\_\+logger\+\_\+name (\begin{DoxyParamCaption}\item[{"{}transaction"{}}]{}{}\end{DoxyParamCaption})}
+
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{producer__plugin_8cpp_af25e4084ac685ca1a7777524a948d81f_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{producer__plugin_8cpp_ada404895f53490702144cecc3a82b6d4}\index{producer\_plugin.cpp@{producer\_plugin.cpp}!trx\_successful\_trace\_logger\_name@{trx\_successful\_trace\_logger\_name}}
+\index{trx\_successful\_trace\_logger\_name@{trx\_successful\_trace\_logger\_name}!producer\_plugin.cpp@{producer\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{trx\_successful\_trace\_logger\_name()}{trx\_successful\_trace\_logger\_name()}}
+{\footnotesize\ttfamily \label{producer__plugin_8cpp_ada404895f53490702144cecc3a82b6d4} 
+const std\+::string trx\+\_\+successful\+\_\+trace\+\_\+logger\+\_\+name (\begin{DoxyParamCaption}\item[{"{}transaction\+\_\+success\+\_\+tracing"{}}]{}{}\end{DoxyParamCaption})}
+
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{producer__plugin_8cpp_ada404895f53490702144cecc3a82b6d4_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{producer__plugin_8cpp_a54d7146c8088d64735b0cfbbea3ecae8}\index{producer\_plugin.cpp@{producer\_plugin.cpp}!trx\_trace\_failure\_logger\_name@{trx\_trace\_failure\_logger\_name}}
+\index{trx\_trace\_failure\_logger\_name@{trx\_trace\_failure\_logger\_name}!producer\_plugin.cpp@{producer\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{trx\_trace\_failure\_logger\_name()}{trx\_trace\_failure\_logger\_name()}}
+{\footnotesize\ttfamily \label{producer__plugin_8cpp_a54d7146c8088d64735b0cfbbea3ecae8} 
+const std\+::string trx\+\_\+trace\+\_\+failure\+\_\+logger\+\_\+name (\begin{DoxyParamCaption}\item[{"{}transaction\+\_\+trace\+\_\+failure"{}}]{}{}\end{DoxyParamCaption})}
+
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{producer__plugin_8cpp_a54d7146c8088d64735b0cfbbea3ecae8_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{producer__plugin_8cpp_ae546cf0f5f4ee210f917a432e3c1bc42}\index{producer\_plugin.cpp@{producer\_plugin.cpp}!trx\_trace\_success\_logger\_name@{trx\_trace\_success\_logger\_name}}
+\index{trx\_trace\_success\_logger\_name@{trx\_trace\_success\_logger\_name}!producer\_plugin.cpp@{producer\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{trx\_trace\_success\_logger\_name()}{trx\_trace\_success\_logger\_name()}}
+{\footnotesize\ttfamily \label{producer__plugin_8cpp_ae546cf0f5f4ee210f917a432e3c1bc42} 
+const std\+::string trx\+\_\+trace\+\_\+success\+\_\+logger\+\_\+name (\begin{DoxyParamCaption}\item[{"{}transaction\+\_\+trace\+\_\+success"{}}]{}{}\end{DoxyParamCaption})}
+
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{producer__plugin_8cpp_ae546cf0f5f4ee210f917a432e3c1bc42_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{producer__plugin_8cpp_adff615e9fbe43b3e6443687be568cffd}\index{producer\_plugin.cpp@{producer\_plugin.cpp}!\_log@{\_log}}
+\index{\_log@{\_log}!producer\_plugin.cpp@{producer\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{\_log}{\_log}}
+{\footnotesize\ttfamily \label{producer__plugin_8cpp_adff615e9fbe43b3e6443687be568cffd} 
+\mbox{\hyperlink{classfc_1_1logger}{fc\+::logger}} \+\_\+log}
+
+
+
+Definition at line \mbox{\hyperlink{producer__plugin_8cpp_source_l00071}{71}} of file \mbox{\hyperlink{producer__plugin_8cpp_source}{producer\+\_\+plugin.\+cpp}}.
+
+\Hypertarget{producer__plugin_8cpp_ae93a86d470c7e16b50ab7102170c5d4e}\index{producer\_plugin.cpp@{producer\_plugin.cpp}!\_trx\_failed\_trace\_log@{\_trx\_failed\_trace\_log}}
+\index{\_trx\_failed\_trace\_log@{\_trx\_failed\_trace\_log}!producer\_plugin.cpp@{producer\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{\_trx\_failed\_trace\_log}{\_trx\_failed\_trace\_log}}
+{\footnotesize\ttfamily \label{producer__plugin_8cpp_ae93a86d470c7e16b50ab7102170c5d4e} 
+\mbox{\hyperlink{classfc_1_1logger}{fc\+::logger}} \+\_\+trx\+\_\+failed\+\_\+trace\+\_\+log}
+
+
+
+Definition at line \mbox{\hyperlink{producer__plugin_8cpp_source_l00077}{77}} of file \mbox{\hyperlink{producer__plugin_8cpp_source}{producer\+\_\+plugin.\+cpp}}.
+
+\Hypertarget{producer__plugin_8cpp_a78396757cc70405744561b647c892edf}\index{producer\_plugin.cpp@{producer\_plugin.cpp}!\_trx\_log@{\_trx\_log}}
+\index{\_trx\_log@{\_trx\_log}!producer\_plugin.cpp@{producer\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{\_trx\_log}{\_trx\_log}}
+{\footnotesize\ttfamily \label{producer__plugin_8cpp_a78396757cc70405744561b647c892edf} 
+\mbox{\hyperlink{classfc_1_1logger}{fc\+::logger}} \+\_\+trx\+\_\+log}
+
+
+
+Definition at line \mbox{\hyperlink{producer__plugin_8cpp_source_l00086}{86}} of file \mbox{\hyperlink{producer__plugin_8cpp_source}{producer\+\_\+plugin.\+cpp}}.
+
+\Hypertarget{producer__plugin_8cpp_aea18f7b7425ddc0191447aca7c3e27f6}\index{producer\_plugin.cpp@{producer\_plugin.cpp}!\_trx\_successful\_trace\_log@{\_trx\_successful\_trace\_log}}
+\index{\_trx\_successful\_trace\_log@{\_trx\_successful\_trace\_log}!producer\_plugin.cpp@{producer\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{\_trx\_successful\_trace\_log}{\_trx\_successful\_trace\_log}}
+{\footnotesize\ttfamily \label{producer__plugin_8cpp_aea18f7b7425ddc0191447aca7c3e27f6} 
+\mbox{\hyperlink{classfc_1_1logger}{fc\+::logger}} \+\_\+trx\+\_\+successful\+\_\+trace\+\_\+log}
+
+
+
+Definition at line \mbox{\hyperlink{producer__plugin_8cpp_source_l00074}{74}} of file \mbox{\hyperlink{producer__plugin_8cpp_source}{producer\+\_\+plugin.\+cpp}}.
+
+\Hypertarget{producer__plugin_8cpp_a979f47bc56a17944271d72bccb834c33}\index{producer\_plugin.cpp@{producer\_plugin.cpp}!\_trx\_trace\_failure\_log@{\_trx\_trace\_failure\_log}}
+\index{\_trx\_trace\_failure\_log@{\_trx\_trace\_failure\_log}!producer\_plugin.cpp@{producer\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{\_trx\_trace\_failure\_log}{\_trx\_trace\_failure\_log}}
+{\footnotesize\ttfamily \label{producer__plugin_8cpp_a979f47bc56a17944271d72bccb834c33} 
+\mbox{\hyperlink{classfc_1_1logger}{fc\+::logger}} \+\_\+trx\+\_\+trace\+\_\+failure\+\_\+log}
+
+
+
+Definition at line \mbox{\hyperlink{producer__plugin_8cpp_source_l00083}{83}} of file \mbox{\hyperlink{producer__plugin_8cpp_source}{producer\+\_\+plugin.\+cpp}}.
+
+\Hypertarget{producer__plugin_8cpp_a79c03faf256096a8e1ad0d59c8760d2e}\index{producer\_plugin.cpp@{producer\_plugin.cpp}!\_trx\_trace\_success\_log@{\_trx\_trace\_success\_log}}
+\index{\_trx\_trace\_success\_log@{\_trx\_trace\_success\_log}!producer\_plugin.cpp@{producer\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{\_trx\_trace\_success\_log}{\_trx\_trace\_success\_log}}
+{\footnotesize\ttfamily \label{producer__plugin_8cpp_a79c03faf256096a8e1ad0d59c8760d2e} 
+\mbox{\hyperlink{classfc_1_1logger}{fc\+::logger}} \+\_\+trx\+\_\+trace\+\_\+success\+\_\+log}
+
+
+
+Definition at line \mbox{\hyperlink{producer__plugin_8cpp_source_l00080}{80}} of file \mbox{\hyperlink{producer__plugin_8cpp_source}{producer\+\_\+plugin.\+cpp}}.
+
+\Hypertarget{producer__plugin_8cpp_afaa31b8b3376c7a4a9bde7ff4222a1af}\index{producer\_plugin.cpp@{producer\_plugin.cpp}!ex\_flags@{ex\_flags}}
+\index{ex\_flags@{ex\_flags}!producer\_plugin.cpp@{producer\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{ex\_flags}{ex\_flags}}
+{\footnotesize\ttfamily \label{producer__plugin_8cpp_afaa31b8b3376c7a4a9bde7ff4222a1af} 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} ex\+\_\+flags = 0}
+
+
+
+Definition at line \mbox{\hyperlink{producer__plugin_8cpp_source_l00282}{282}} of file \mbox{\hyperlink{producer__plugin_8cpp_source}{producer\+\_\+plugin.\+cpp}}.
+
+\Hypertarget{producer__plugin_8cpp_abcd3f04fd24761496de6ea2aa0e3934d}\index{producer\_plugin.cpp@{producer\_plugin.cpp}!num\_failures@{num\_failures}}
+\index{num\_failures@{num\_failures}!producer\_plugin.cpp@{producer\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{num\_failures}{num\_failures}}
+{\footnotesize\ttfamily \label{producer__plugin_8cpp_abcd3f04fd24761496de6ea2aa0e3934d} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} num\+\_\+failures = 0}
+
+
+
+Definition at line \mbox{\hyperlink{producer__plugin_8cpp_source_l00281}{281}} of file \mbox{\hyperlink{producer__plugin_8cpp_source}{producer\+\_\+plugin.\+cpp}}.
+

@@ -1,0 +1,225 @@
+\doxysection{CLI\+::Option\+Defaults Class Reference}
+\hypertarget{class_c_l_i_1_1_option_defaults}{}\label{class_c_l_i_1_1_option_defaults}\index{CLI::OptionDefaults@{CLI::OptionDefaults}}
+
+
+{\ttfamily \#include $<$CLI11.\+hpp$>$}
+
+
+
+Inheritance diagram for CLI\+::Option\+Defaults\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=252pt]{class_c_l_i_1_1_option_defaults__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for CLI\+::Option\+Defaults\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=252pt]{class_c_l_i_1_1_option_defaults__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_c_l_i_1_1_option_defaults_ab3b11a73b6f5ce805514b3f44cb9b079}{Option\+Defaults}} ()=default
+\item 
+\mbox{\hyperlink{class_c_l_i_1_1_option_defaults}{Option\+Defaults}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_c_l_i_1_1_option_defaults_a3ec8717c6463814c85855db771b1823c}{multi\+\_\+option\+\_\+policy}} (\mbox{\hyperlink{namespace_c_l_i_a991a3264d3459575fc7e83eb54d73d2b}{Multi\+Option\+Policy}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}=\mbox{\hyperlink{namespace_c_l_i_a991a3264d3459575fc7e83eb54d73d2ba8ce61dd2505effd96f937fa743b6491f}{Multi\+Option\+Policy\+::\+Throw}})
+\begin{DoxyCompactList}\small\item\em Take the last argument if given multiple times. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_c_l_i_1_1_option_defaults}{Option\+Defaults}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_c_l_i_1_1_option_defaults_a94a07d97297fafce6ff13e64fd004c56}{ignore\+\_\+case}} (bool \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}=true)
+\begin{DoxyCompactList}\small\item\em Ignore the case of the option name. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_c_l_i_1_1_option_defaults}{Option\+Defaults}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_c_l_i_1_1_option_defaults_aa154cb32423373082db3e3887aa55991}{ignore\+\_\+underscore}} (bool \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}=true)
+\begin{DoxyCompactList}\small\item\em Ignore underscores in the option name. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_c_l_i_1_1_option_defaults}{Option\+Defaults}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_c_l_i_1_1_option_defaults_ae1542af262dc35adcb782c9fda96e0c6}{disable\+\_\+flag\+\_\+override}} (bool \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}=true)
+\begin{DoxyCompactList}\small\item\em Disable overriding flag values with an \textquotesingle{}=
+
+\textquotesingle{} segment. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_c_l_i_1_1_option_defaults}{Option\+Defaults}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_c_l_i_1_1_option_defaults_ac9362d44844c8e69a51710dad88644fe}{delimiter}} (char \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}=\textquotesingle{}\textbackslash{}0\textquotesingle{})
+\begin{DoxyCompactList}\small\item\em set a delimiter character to split up single arguments to treat as multiple inputs \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{class_c_l_i_1_1_option_base}{CLI\+::\+Option\+Base$<$ Option\+Defaults $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_c_l_i_1_1_option_defaults}{Option\+Defaults}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_c_l_i_1_1_option_base_a17077e6cf3e228a4978fb4be525bc80d}{group}} (const std\+::string \&\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})
+\begin{DoxyCompactList}\small\item\em Changes the group membership. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_c_l_i_1_1_option_defaults}{Option\+Defaults}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a}{required}} (bool \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}=true)
+\begin{DoxyCompactList}\small\item\em Set the option as required. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_c_l_i_1_1_option_defaults}{Option\+Defaults}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_c_l_i_1_1_option_base_a083eb9ce01d6f8a59f6cfea0cece2e05}{mandatory}} (bool \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}=true)
+\begin{DoxyCompactList}\small\item\em Support Plumbum term. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_c_l_i_1_1_option_defaults}{Option\+Defaults}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_c_l_i_1_1_option_base_ac5ee05409ef6e5369e78ecf127bb0e7f}{always\+\_\+capture\+\_\+default}} (bool \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}=true)
+\item 
+const std\+::string \& \mbox{\hyperlink{class_c_l_i_1_1_option_base_ad824d0f4f973675beece17d6b5ad9d00}{get\+\_\+group}} () const
+\begin{DoxyCompactList}\small\item\em Get the group of this option. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_c_l_i_1_1_option_base_aa902dee6da6d7f5b083b1c7d5f9c1308}{get\+\_\+required}} () const
+\begin{DoxyCompactList}\small\item\em True if this is a required option. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_c_l_i_1_1_option_base_a12d180bda82c466cfbcd5fbeac27e956}{get\+\_\+ignore\+\_\+case}} () const
+\begin{DoxyCompactList}\small\item\em The status of ignore case. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_c_l_i_1_1_option_base_a321ce55e69252d0b01426480a8c6c894}{get\+\_\+ignore\+\_\+underscore}} () const
+\begin{DoxyCompactList}\small\item\em The status of ignore\+\_\+underscore. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_c_l_i_1_1_option_base_a148499af929ff2498d1ef3567fc18dfc}{get\+\_\+configurable}} () const
+\begin{DoxyCompactList}\small\item\em The status of configurable. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_c_l_i_1_1_option_base_a07c4e6b7c4a7c3af4e147613d5e39aa0}{get\+\_\+disable\+\_\+flag\+\_\+override}} () const
+\begin{DoxyCompactList}\small\item\em The status of configurable. \end{DoxyCompactList}\item 
+char \mbox{\hyperlink{class_c_l_i_1_1_option_base_ad3057f1f7bdd0473d86aad54a0e36064}{get\+\_\+delimiter}} () const
+\begin{DoxyCompactList}\small\item\em Get the current delimiter char. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_c_l_i_1_1_option_base_acf913635549804e222cd309294cdba7a}{get\+\_\+always\+\_\+capture\+\_\+default}} () const
+\begin{DoxyCompactList}\small\item\em Return true if this will automatically capture the default value for help printing. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{namespace_c_l_i_a991a3264d3459575fc7e83eb54d73d2b}{Multi\+Option\+Policy}} \mbox{\hyperlink{class_c_l_i_1_1_option_base_a67ade2fd6f98b5a77c45b18c3d8ae639}{get\+\_\+multi\+\_\+option\+\_\+policy}} () const
+\begin{DoxyCompactList}\small\item\em The status of the multi option policy. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_c_l_i_1_1_option_defaults}{Option\+Defaults}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_c_l_i_1_1_option_base_abf721b86beb0f957a4d85ad4f6e72c20}{take\+\_\+last}} ()
+\begin{DoxyCompactList}\small\item\em Set the multi option policy to take last. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_c_l_i_1_1_option_defaults}{Option\+Defaults}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_c_l_i_1_1_option_base_a5727e47f4541f99986503b086f1da735}{take\+\_\+first}} ()
+\begin{DoxyCompactList}\small\item\em Set the multi option policy to take last. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_c_l_i_1_1_option_defaults}{Option\+Defaults}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_c_l_i_1_1_option_base_a0edb237c89d77253e079e4d6c7f86e8c}{take\+\_\+all}} ()
+\begin{DoxyCompactList}\small\item\em Set the multi option policy to take all arguments. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_c_l_i_1_1_option_defaults}{Option\+Defaults}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_c_l_i_1_1_option_base_a1c353d2455f0fc251fa8d0e98b66ea93}{join}} ()
+\begin{DoxyCompactList}\small\item\em Set the multi option policy to join. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_c_l_i_1_1_option_defaults}{Option\+Defaults}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_c_l_i_1_1_option_base_a2f9160afa4b72e8425bffd043be92ea6}{join}} (char delim)
+\begin{DoxyCompactList}\small\item\em Set the multi option policy to join with a specific delimiter. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_c_l_i_1_1_option_defaults}{Option\+Defaults}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_c_l_i_1_1_option_base_a618d6a4f8137bec3272a04d848106046}{configurable}} (bool \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}=true)
+\begin{DoxyCompactList}\small\item\em Allow in a configuration file. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_c_l_i_1_1_option_defaults}{Option\+Defaults}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_c_l_i_1_1_option_base_a620c2f57aca00ad2ad1fe8870143fcc1}{delimiter}} (char \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}=\textquotesingle{}\textbackslash{}0\textquotesingle{})
+\begin{DoxyCompactList}\small\item\em Allow in a configuration file. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Protected Member Functions inherited from \mbox{\hyperlink{class_c_l_i_1_1_option_base}{CLI\+::\+Option\+Base$<$ Option\+Defaults $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{class_c_l_i_1_1_option_base_aeccfd835475420d963f2fff446c32003}{copy\+\_\+to}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*}other) const
+\begin{DoxyCompactList}\small\item\em Copy the contents to another similar class (one based on \doxylink{class_c_l_i_1_1_option_base}{Option\+Base}) \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Protected Attributes inherited from \mbox{\hyperlink{class_c_l_i_1_1_option_base}{CLI\+::\+Option\+Base$<$ Option\+Defaults $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+std\+::string \mbox{\hyperlink{class_c_l_i_1_1_option_base_ad0d8bd0637023f7d87a8e95315e8fb21}{group\+\_\+}}
+\begin{DoxyCompactList}\small\item\em The group membership. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_c_l_i_1_1_option_base_abad838fd3da11f840a40536a279912ac}{required\+\_\+}}
+\begin{DoxyCompactList}\small\item\em True if this is a required option. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_c_l_i_1_1_option_base_a616d0aa1bd4e540733e24f88bc17cd3a}{ignore\+\_\+case\+\_\+}}
+\begin{DoxyCompactList}\small\item\em Ignore the case when matching (option, not value) \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_c_l_i_1_1_option_base_adafc24528125977c500b9b0c7b5068bf}{ignore\+\_\+underscore\+\_\+}}
+\begin{DoxyCompactList}\small\item\em Ignore underscores when matching (option, not value) \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_c_l_i_1_1_option_base_a86801bb8560b37e40ea60815871a22ee}{configurable\+\_\+}}
+\begin{DoxyCompactList}\small\item\em Allow this option to be given in a configuration file. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_c_l_i_1_1_option_base_ab62f608c0957e32ccf56f2834aa574c1}{disable\+\_\+flag\+\_\+override\+\_\+}}
+\begin{DoxyCompactList}\small\item\em Disable overriding flag values with \textquotesingle{}=value\textquotesingle{}. \end{DoxyCompactList}\item 
+char \mbox{\hyperlink{class_c_l_i_1_1_option_base_ac4164d93e2b8e59b2de24dad04a9f34b}{delimiter\+\_\+}}
+\begin{DoxyCompactList}\small\item\em Specify a delimiter character for vector arguments. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_c_l_i_1_1_option_base_a23aca05ffa9c2d3fbba10b5434cdba64}{always\+\_\+capture\+\_\+default\+\_\+}}
+\begin{DoxyCompactList}\small\item\em Automatically capture default value. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{namespace_c_l_i_a991a3264d3459575fc7e83eb54d73d2b}{Multi\+Option\+Policy}} \mbox{\hyperlink{class_c_l_i_1_1_option_base_a2c5483d3c992baad97beed3de2b82b05}{multi\+\_\+option\+\_\+policy\+\_\+}}
+\begin{DoxyCompactList}\small\item\em Policy for handling multiple arguments beyond the expected Max. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+This is a version of \doxylink{class_c_l_i_1_1_option_base}{Option\+Base} that only supports setting values, for defaults. It is stored as the default option in an \doxylink{class_c_l_i_1_1_app}{App}. 
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l03495}{3495}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_c_l_i_1_1_option_defaults_ab3b11a73b6f5ce805514b3f44cb9b079}\index{CLI::OptionDefaults@{CLI::OptionDefaults}!OptionDefaults@{OptionDefaults}}
+\index{OptionDefaults@{OptionDefaults}!CLI::OptionDefaults@{CLI::OptionDefaults}}
+\doxysubsubsection{\texorpdfstring{OptionDefaults()}{OptionDefaults()}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_option_defaults_ab3b11a73b6f5ce805514b3f44cb9b079} 
+CLI\+::\+Option\+Defaults\+::\+Option\+Defaults (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [default]}}
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_c_l_i_1_1_option_defaults_ac9362d44844c8e69a51710dad88644fe}\index{CLI::OptionDefaults@{CLI::OptionDefaults}!delimiter@{delimiter}}
+\index{delimiter@{delimiter}!CLI::OptionDefaults@{CLI::OptionDefaults}}
+\doxysubsubsection{\texorpdfstring{delimiter()}{delimiter()}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_option_defaults_ac9362d44844c8e69a51710dad88644fe} 
+\mbox{\hyperlink{class_c_l_i_1_1_option_defaults}{Option\+Defaults}} \texorpdfstring{$\ast$}{*} CLI\+::\+Option\+Defaults\+::delimiter (\begin{DoxyParamCaption}\item[{char}]{value}{ = {\ttfamily \textquotesingle{}\textbackslash{}0\textquotesingle{}}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l03526}{3526}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03526\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{03527\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_c_l_i_1_1_option_base_ac4164d93e2b8e59b2de24dad04a9f34b}{delimiter\_}}\ =\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}};}
+\DoxyCodeLine{03528\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{this};}
+\DoxyCodeLine{03529\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_c_l_i_1_1_option_defaults_ae1542af262dc35adcb782c9fda96e0c6}\index{CLI::OptionDefaults@{CLI::OptionDefaults}!disable\_flag\_override@{disable\_flag\_override}}
+\index{disable\_flag\_override@{disable\_flag\_override}!CLI::OptionDefaults@{CLI::OptionDefaults}}
+\doxysubsubsection{\texorpdfstring{disable\_flag\_override()}{disable\_flag\_override()}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_option_defaults_ae1542af262dc35adcb782c9fda96e0c6} 
+\mbox{\hyperlink{class_c_l_i_1_1_option_defaults}{Option\+Defaults}} \texorpdfstring{$\ast$}{*} CLI\+::\+Option\+Defaults\+::disable\+\_\+flag\+\_\+override (\begin{DoxyParamCaption}\item[{bool}]{value}{ = {\ttfamily true}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l03520}{3520}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03520\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{03521\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_c_l_i_1_1_option_base_ab62f608c0957e32ccf56f2834aa574c1}{disable\_flag\_override\_}}\ =\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}};}
+\DoxyCodeLine{03522\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{this};}
+\DoxyCodeLine{03523\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_c_l_i_1_1_option_defaults_a94a07d97297fafce6ff13e64fd004c56}\index{CLI::OptionDefaults@{CLI::OptionDefaults}!ignore\_case@{ignore\_case}}
+\index{ignore\_case@{ignore\_case}!CLI::OptionDefaults@{CLI::OptionDefaults}}
+\doxysubsubsection{\texorpdfstring{ignore\_case()}{ignore\_case()}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_option_defaults_a94a07d97297fafce6ff13e64fd004c56} 
+\mbox{\hyperlink{class_c_l_i_1_1_option_defaults}{Option\+Defaults}} \texorpdfstring{$\ast$}{*} CLI\+::\+Option\+Defaults\+::ignore\+\_\+case (\begin{DoxyParamCaption}\item[{bool}]{value}{ = {\ttfamily true}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l03508}{3508}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03508\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{03509\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_c_l_i_1_1_option_base_a616d0aa1bd4e540733e24f88bc17cd3a}{ignore\_case\_}}\ =\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}};}
+\DoxyCodeLine{03510\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{this};}
+\DoxyCodeLine{03511\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_c_l_i_1_1_option_defaults_aa154cb32423373082db3e3887aa55991}\index{CLI::OptionDefaults@{CLI::OptionDefaults}!ignore\_underscore@{ignore\_underscore}}
+\index{ignore\_underscore@{ignore\_underscore}!CLI::OptionDefaults@{CLI::OptionDefaults}}
+\doxysubsubsection{\texorpdfstring{ignore\_underscore()}{ignore\_underscore()}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_option_defaults_aa154cb32423373082db3e3887aa55991} 
+\mbox{\hyperlink{class_c_l_i_1_1_option_defaults}{Option\+Defaults}} \texorpdfstring{$\ast$}{*} CLI\+::\+Option\+Defaults\+::ignore\+\_\+underscore (\begin{DoxyParamCaption}\item[{bool}]{value}{ = {\ttfamily true}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l03514}{3514}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03514\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{03515\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_c_l_i_1_1_option_base_adafc24528125977c500b9b0c7b5068bf}{ignore\_underscore\_}}\ =\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}};}
+\DoxyCodeLine{03516\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{this};}
+\DoxyCodeLine{03517\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_c_l_i_1_1_option_defaults_a3ec8717c6463814c85855db771b1823c}\index{CLI::OptionDefaults@{CLI::OptionDefaults}!multi\_option\_policy@{multi\_option\_policy}}
+\index{multi\_option\_policy@{multi\_option\_policy}!CLI::OptionDefaults@{CLI::OptionDefaults}}
+\doxysubsubsection{\texorpdfstring{multi\_option\_policy()}{multi\_option\_policy()}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_option_defaults_a3ec8717c6463814c85855db771b1823c} 
+\mbox{\hyperlink{class_c_l_i_1_1_option_defaults}{Option\+Defaults}} \texorpdfstring{$\ast$}{*} CLI\+::\+Option\+Defaults\+::multi\+\_\+option\+\_\+policy (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespace_c_l_i_a991a3264d3459575fc7e83eb54d73d2b}{Multi\+Option\+Policy}}}]{value}{ = {\ttfamily \mbox{\hyperlink{namespace_c_l_i_a991a3264d3459575fc7e83eb54d73d2ba8ce61dd2505effd96f937fa743b6491f}{Multi\+Option\+Policy\+::\+Throw}}}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l03502}{3502}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03502\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{03503\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_c_l_i_1_1_option_base_a2c5483d3c992baad97beed3de2b82b05}{multi\_option\_policy\_}}\ =\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}};}
+\DoxyCodeLine{03504\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{this};}
+\DoxyCodeLine{03505\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+programs/clio/\mbox{\hyperlink{_c_l_i11_8hpp}{CLI11.\+hpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,208 @@
+\doxysection{resmon\+\_\+fixture Struct Reference}
+\hypertarget{structresmon__fixture}{}\label{structresmon__fixture}\index{resmon\_fixture@{resmon\_fixture}}
+
+
+Collaboration diagram for resmon\+\_\+fixture\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=323pt]{structresmon__fixture__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{structresmon__fixture_af5d15c1bb948ca8150b97a3e46247686}{set\+\_\+program\+\_\+options}} ()
+\item 
+void \mbox{\hyperlink{structresmon__fixture_a68bd6bd03fb7e49249e6d7fcfc3dd16d}{initialize}} (const std\+::vector$<$ std\+::string $>$ \&args)
+\item 
+void \mbox{\hyperlink{structresmon__fixture_a7138a1a6fe46f645488210b544163f05}{set\+\_\+options}} (const std\+::vector$<$ std\+::string $>$ \&arg)
+\item 
+void \mbox{\hyperlink{structresmon__fixture_aef5a903ad369335d6a5a79061be32b03}{plugin\+\_\+startup}} (const std\+::vector$<$ bfs\+::path $>$ \&dirs, int run\+Time\+Secs=3)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classsysio_1_1resource__monitor__plugin}{resource\+\_\+monitor\+\_\+plugin}} \mbox{\hyperlink{structresmon__fixture_a4136c5f10d574c6cbd1d15ef1af31837}{\+\_\+my}}
+\item 
+options\+\_\+description \mbox{\hyperlink{structresmon__fixture_a4c75064976b2e8857322afb6000f32f7}{\+\_\+cfg}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{test__resmon__plugin_8cpp_source_l00020}{20}} of file \mbox{\hyperlink{test__resmon__plugin_8cpp_source}{test\+\_\+resmon\+\_\+plugin.\+cpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structresmon__fixture_a68bd6bd03fb7e49249e6d7fcfc3dd16d}\index{resmon\_fixture@{resmon\_fixture}!initialize@{initialize}}
+\index{initialize@{initialize}!resmon\_fixture@{resmon\_fixture}}
+\doxysubsubsection{\texorpdfstring{initialize()}{initialize()}}
+{\footnotesize\ttfamily \label{structresmon__fixture_a68bd6bd03fb7e49249e6d7fcfc3dd16d} 
+void resmon\+\_\+fixture\+::initialize (\begin{DoxyParamCaption}\item[{const std\+::vector$<$ std\+::string $>$ \&}]{args}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{test__resmon__plugin_8cpp_source_l00026}{26}} of file \mbox{\hyperlink{test__resmon__plugin_8cpp_source}{test\+\_\+resmon\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \textcolor{comment}{//\ We\ only\ have\ at\ most\ 3\ arguments.\ OK\ to\ hardcodied\ in\ test}}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \textcolor{comment}{//\ programs.}}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[10];}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.size()\ <\ 10,\ chain::plugin\_exception,\ \textcolor{stringliteral}{"{}number\ of\ arguments\ \ (\$\{size\})\ must\ be\ less\ than\ 10"{}},\ (\textcolor{stringliteral}{"{}size"{}},\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.size()));}
+\DoxyCodeLine{00031\ }
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \textcolor{comment}{//\ argv[0]\ is\ program\ name,\ no\ need\ to\ fill\ in}}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i=0;\ i<\mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.size();\ ++i)\ \{}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[i+1]\ =\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}[i].c\_str();}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00036\ }
+\DoxyCodeLine{00037\ \ \ \ \ \ \ bpo::variables\_map\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}};}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ bpo::store(bpo::parse\_command\_line(\mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.size()+1,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \mbox{\hyperlink{structresmon__fixture_a4c75064976b2e8857322afb6000f32f7}{\_cfg}}),\ options);}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ bpo::notify(options);}
+\DoxyCodeLine{00040\ }
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \mbox{\hyperlink{structresmon__fixture_a4136c5f10d574c6cbd1d15ef1af31837}{\_my}}.\mbox{\hyperlink{classsysio_1_1resource__monitor__plugin_a8aa338848d9b4ea7f0af24674fb9afe3}{plugin\_initialize}}(options);}
+\DoxyCodeLine{00042\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structresmon__fixture_a68bd6bd03fb7e49249e6d7fcfc3dd16d_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structresmon__fixture_a68bd6bd03fb7e49249e6d7fcfc3dd16d_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structresmon__fixture_aef5a903ad369335d6a5a79061be32b03}\index{resmon\_fixture@{resmon\_fixture}!plugin\_startup@{plugin\_startup}}
+\index{plugin\_startup@{plugin\_startup}!resmon\_fixture@{resmon\_fixture}}
+\doxysubsubsection{\texorpdfstring{plugin\_startup()}{plugin\_startup()}}
+{\footnotesize\ttfamily \label{structresmon__fixture_aef5a903ad369335d6a5a79061be32b03} 
+void resmon\+\_\+fixture\+::plugin\+\_\+startup (\begin{DoxyParamCaption}\item[{const std\+::vector$<$ bfs\+::path $>$ \&}]{dirs}{, }\item[{int}]{run\+Time\+Secs}{ = {\ttfamily 3}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{test__resmon__plugin_8cpp_source_l00049}{49}} of file \mbox{\hyperlink{test__resmon__plugin_8cpp_source}{test\+\_\+resmon\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \mbox{\hyperlink{structresmon__fixture_a7138a1a6fe46f645488210b544163f05}{set\_options}}(\{\textcolor{stringliteral}{"{}-\/-\/resource-\/monitor-\/interval-\/seconds=1"{}}\});}
+\DoxyCodeLine{00051\ }
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\&\ dir:\ dirs)\ \{}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structresmon__fixture_a4136c5f10d574c6cbd1d15ef1af31837}{\_my}}.\mbox{\hyperlink{classsysio_1_1resource__monitor__plugin_a756d8d52fe7acf391a9e11e27a1a482b}{monitor\_directory}}(dir);}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00055\ }
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \mbox{\hyperlink{structresmon__fixture_a4136c5f10d574c6cbd1d15ef1af31837}{\_my}}.\mbox{\hyperlink{classsysio_1_1resource__monitor__plugin_a9450b8a934658e7baa38d0b581c98812}{plugin\_startup}}();}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ std::this\_thread::sleep\_for(\ std::chrono::milliseconds(runTimeSecs*1000)\ );}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \mbox{\hyperlink{structresmon__fixture_a4136c5f10d574c6cbd1d15ef1af31837}{\_my}}.\mbox{\hyperlink{classsysio_1_1resource__monitor__plugin_aec66e2d4bf2493717a81701b2504e138}{plugin\_shutdown}}();}
+\DoxyCodeLine{00059\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structresmon__fixture_aef5a903ad369335d6a5a79061be32b03_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structresmon__fixture_a7138a1a6fe46f645488210b544163f05}\index{resmon\_fixture@{resmon\_fixture}!set\_options@{set\_options}}
+\index{set\_options@{set\_options}!resmon\_fixture@{resmon\_fixture}}
+\doxysubsubsection{\texorpdfstring{set\_options()}{set\_options()}}
+{\footnotesize\ttfamily \label{structresmon__fixture_a7138a1a6fe46f645488210b544163f05} 
+void resmon\+\_\+fixture\+::set\+\_\+options (\begin{DoxyParamCaption}\item[{const std\+::vector$<$ std\+::string $>$ \&}]{arg}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{test__resmon__plugin_8cpp_source_l00044}{44}} of file \mbox{\hyperlink{test__resmon__plugin_8cpp_source}{test\+\_\+resmon\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \mbox{\hyperlink{structresmon__fixture_af5d15c1bb948ca8150b97a3e46247686}{set\_program\_options}}();}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \mbox{\hyperlink{structresmon__fixture_a68bd6bd03fb7e49249e6d7fcfc3dd16d}{initialize}}(arg);}
+\DoxyCodeLine{00047\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structresmon__fixture_a7138a1a6fe46f645488210b544163f05_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=328pt]{structresmon__fixture_a7138a1a6fe46f645488210b544163f05_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structresmon__fixture_af5d15c1bb948ca8150b97a3e46247686}\index{resmon\_fixture@{resmon\_fixture}!set\_program\_options@{set\_program\_options}}
+\index{set\_program\_options@{set\_program\_options}!resmon\_fixture@{resmon\_fixture}}
+\doxysubsubsection{\texorpdfstring{set\_program\_options()}{set\_program\_options()}}
+{\footnotesize\ttfamily \label{structresmon__fixture_af5d15c1bb948ca8150b97a3e46247686} 
+void resmon\+\_\+fixture\+::set\+\_\+program\+\_\+options (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{test__resmon__plugin_8cpp_source_l00021}{21}} of file \mbox{\hyperlink{test__resmon__plugin_8cpp_source}{test\+\_\+resmon\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ options\_description\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_a01c35a876e2917ffdc1ee618e0c06619}{dummy}};}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \mbox{\hyperlink{structresmon__fixture_a4136c5f10d574c6cbd1d15ef1af31837}{\_my}}.\mbox{\hyperlink{classsysio_1_1resource__monitor__plugin_a6d82af2b00041a1f160d7268c1b454b7}{set\_program\_options}}(dummy,\ \mbox{\hyperlink{structresmon__fixture_a4c75064976b2e8857322afb6000f32f7}{\_cfg}});}
+\DoxyCodeLine{00024\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structresmon__fixture_af5d15c1bb948ca8150b97a3e46247686_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structresmon__fixture_af5d15c1bb948ca8150b97a3e46247686_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structresmon__fixture_a4c75064976b2e8857322afb6000f32f7}\index{resmon\_fixture@{resmon\_fixture}!\_cfg@{\_cfg}}
+\index{\_cfg@{\_cfg}!resmon\_fixture@{resmon\_fixture}}
+\doxysubsubsection{\texorpdfstring{\_cfg}{\_cfg}}
+{\footnotesize\ttfamily \label{structresmon__fixture_a4c75064976b2e8857322afb6000f32f7} 
+options\+\_\+description resmon\+\_\+fixture\+::\+\_\+cfg}
+
+
+
+Definition at line \mbox{\hyperlink{test__resmon__plugin_8cpp_source_l00062}{62}} of file \mbox{\hyperlink{test__resmon__plugin_8cpp_source}{test\+\_\+resmon\+\_\+plugin.\+cpp}}.
+
+\Hypertarget{structresmon__fixture_a4136c5f10d574c6cbd1d15ef1af31837}\index{resmon\_fixture@{resmon\_fixture}!\_my@{\_my}}
+\index{\_my@{\_my}!resmon\_fixture@{resmon\_fixture}}
+\doxysubsubsection{\texorpdfstring{\_my}{\_my}}
+{\footnotesize\ttfamily \label{structresmon__fixture_a4136c5f10d574c6cbd1d15ef1af31837} 
+\mbox{\hyperlink{classsysio_1_1resource__monitor__plugin}{resource\+\_\+monitor\+\_\+plugin}} resmon\+\_\+fixture\+::\+\_\+my}
+
+
+
+Definition at line \mbox{\hyperlink{test__resmon__plugin_8cpp_source_l00061}{61}} of file \mbox{\hyperlink{test__resmon__plugin_8cpp_source}{test\+\_\+resmon\+\_\+plugin.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+plugins/resource\+\_\+monitor\+\_\+plugin/test/\mbox{\hyperlink{test__resmon__plugin_8cpp}{test\+\_\+resmon\+\_\+plugin.\+cpp}}\end{DoxyCompactItemize}

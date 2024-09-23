@@ -1,0 +1,281 @@
+\doxysection{Catch\+::IStreaming\+Reporter Struct Reference}
+\hypertarget{struct_catch_1_1_i_streaming_reporter}{}\label{struct_catch_1_1_i_streaming_reporter}\index{Catch::IStreamingReporter@{Catch::IStreamingReporter}}
+
+
+{\ttfamily \#include $<$catch\+\_\+interfaces\+\_\+reporter.\+h$>$}
+
+
+
+Inheritance diagram for Catch\+::IStreaming\+Reporter\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_catch_1_1_i_streaming_reporter__inherit__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_a7edcaeb7bb35258b4faa4b79a20320e1}{\texorpdfstring{$\sim$}{\string~}\+IStreaming\+Reporter}} ()=default
+\item 
+virtual \mbox{\hyperlink{struct_catch_1_1_reporter_preferences}{Reporter\+Preferences}} \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_a122d9136175aefb16ccc5d3b61f23711}{get\+Preferences}} () const =0
+\item 
+virtual void \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_aaa0ea1d8250b48fafc8d36f86e6d1d80}{no\+Matching\+Test\+Cases}} (std\+::string const \&spec)=0
+\item 
+virtual void \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_a8c7b304d9563992a611dc7d68dc0c1ce}{test\+Run\+Starting}} (\mbox{\hyperlink{struct_catch_1_1_test_run_info}{Test\+Run\+Info}} const \&test\+Run\+Info)=0
+\item 
+virtual void \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_aef40d16994fe8a7ab140c885d8c2d7d0}{test\+Group\+Starting}} (\mbox{\hyperlink{struct_catch_1_1_group_info}{Group\+Info}} const \&group\+Info)=0
+\item 
+virtual void \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_a8f7270dc83853494a1c3a912ddf95a11}{test\+Case\+Starting}} (\mbox{\hyperlink{struct_catch_1_1_test_case_info}{Test\+Case\+Info}} const \&test\+Info)=0
+\item 
+virtual void \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_aa6236178937a43c2d7665729fcb79521}{section\+Starting}} (\mbox{\hyperlink{struct_catch_1_1_section_info}{Section\+Info}} const \&section\+Info)=0
+\item 
+virtual void \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_ac0b61a3ef04ee287937751c043a7013a}{benchmark\+Starting}} (\mbox{\hyperlink{struct_catch_1_1_benchmark_info}{Benchmark\+Info}} const \&)
+\item 
+virtual void \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_ae1c3becff20f4a940c9f01d2c4114a17}{assertion\+Starting}} (\mbox{\hyperlink{struct_catch_1_1_assertion_info}{Assertion\+Info}} const \&assertion\+Info)=0
+\item 
+virtual bool \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_a5248ab87149e0f1abe2de96c387ff5e3}{assertion\+Ended}} (\mbox{\hyperlink{struct_catch_1_1_assertion_stats}{Assertion\+Stats}} const \&assertion\+Stats)=0
+\item 
+virtual void \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_aed607b9cde8193cc470c2749f106b4fa}{benchmark\+Ended}} (\mbox{\hyperlink{struct_catch_1_1_benchmark_stats}{Benchmark\+Stats}} const \&)
+\item 
+virtual void \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_aba7a6ce1f315da47b8017b5ca6d1d008}{section\+Ended}} (\mbox{\hyperlink{struct_catch_1_1_section_stats}{Section\+Stats}} const \&section\+Stats)=0
+\item 
+virtual void \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_ae295b98b77bab527be53ea9d35dfe66f}{test\+Case\+Ended}} (\mbox{\hyperlink{struct_catch_1_1_test_case_stats}{Test\+Case\+Stats}} const \&test\+Case\+Stats)=0
+\item 
+virtual void \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_abf668bf347eda4ba94fa2b3483ca4dd3}{test\+Group\+Ended}} (\mbox{\hyperlink{struct_catch_1_1_test_group_stats}{Test\+Group\+Stats}} const \&test\+Group\+Stats)=0
+\item 
+virtual void \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_a1ac383df84242bc55578e32ebca13e88}{test\+Run\+Ended}} (\mbox{\hyperlink{struct_catch_1_1_test_run_stats}{Test\+Run\+Stats}} const \&test\+Run\+Stats)=0
+\item 
+virtual void \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_a04ef7725043808bbbf258633043f06b2}{skip\+Test}} (\mbox{\hyperlink{struct_catch_1_1_test_case_info}{Test\+Case\+Info}} const \&test\+Info)=0
+\item 
+virtual void \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_ad5001d7247cc94e5fec26b0e702f134f}{fatal\+Error\+Encountered}} (\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})
+\item 
+virtual bool \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_a6ca0329f20ad8b8ec7b3d1958f1fa73f}{is\+Multi}} () const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{catch__interfaces__reporter_8h_source_l00171}{171}} of file \mbox{\hyperlink{catch__interfaces__reporter_8h_source}{catch\+\_\+interfaces\+\_\+reporter.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{struct_catch_1_1_i_streaming_reporter_a7edcaeb7bb35258b4faa4b79a20320e1}\index{Catch::IStreamingReporter@{Catch::IStreamingReporter}!````~IStreamingReporter@{\texorpdfstring{$\sim$}{\string~}IStreamingReporter}}
+\index{````~IStreamingReporter@{\texorpdfstring{$\sim$}{\string~}IStreamingReporter}!Catch::IStreamingReporter@{Catch::IStreamingReporter}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}IStreamingReporter()}{\string~IStreamingReporter()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_i_streaming_reporter_a7edcaeb7bb35258b4faa4b79a20320e1} 
+virtual Catch\+::\+IStreaming\+Reporter\+::\texorpdfstring{$\sim$}{\string~}\+IStreaming\+Reporter (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}, {\ttfamily [default]}}
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_catch_1_1_i_streaming_reporter_a5248ab87149e0f1abe2de96c387ff5e3}\index{Catch::IStreamingReporter@{Catch::IStreamingReporter}!assertionEnded@{assertionEnded}}
+\index{assertionEnded@{assertionEnded}!Catch::IStreamingReporter@{Catch::IStreamingReporter}}
+\doxysubsubsection{\texorpdfstring{assertionEnded()}{assertionEnded()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_i_streaming_reporter_a5248ab87149e0f1abe2de96c387ff5e3} 
+virtual bool Catch\+::\+IStreaming\+Reporter\+::assertion\+Ended (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_assertion_stats}{Assertion\+Stats}} const \&}]{assertion\+Stats}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{struct_catch_1_1_automake_reporter_aebc364695919d782bc1d5aaa504b4712}{Catch\+::\+Automake\+Reporter}}, \mbox{\hyperlink{struct_catch_1_1_automake_reporter_aebc364695919d782bc1d5aaa504b4712}{Catch\+::\+Automake\+Reporter}}, \mbox{\hyperlink{struct_catch_1_1_compact_reporter_af47435648ace91a6482b18b0fda87f01}{Catch\+::\+Compact\+Reporter}}, \mbox{\hyperlink{struct_catch_1_1_console_reporter_a8b122bcaadf50ad6dca012d1b2916aef}{Catch\+::\+Console\+Reporter}}, \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_ad64bc50fc91ce50f3ecbfc0de5de6e2c}{Catch\+::\+Cumulative\+Reporter\+Base$<$ Derived\+T $>$}}, \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_ad64bc50fc91ce50f3ecbfc0de5de6e2c}{Catch\+::\+Cumulative\+Reporter\+Base$<$ Junit\+Reporter $>$}}, \mbox{\hyperlink{class_catch_1_1_junit_reporter_afcd8fb806f6ba5295ecd86985b3ac1df}{Catch\+::\+Junit\+Reporter}}, \mbox{\hyperlink{class_catch_1_1_listening_reporter_a2c47aa9e99eba2ba5fe60c76d81b3660}{Catch\+::\+Listening\+Reporter}}, \mbox{\hyperlink{struct_catch_1_1_t_a_p_reporter_ad3b5eadd22706edb1c3d8a3312b7acd7}{Catch\+::\+TAPReporter}}, \mbox{\hyperlink{struct_catch_1_1_t_a_p_reporter_ad3b5eadd22706edb1c3d8a3312b7acd7}{Catch\+::\+TAPReporter}}, \mbox{\hyperlink{struct_catch_1_1_team_city_reporter_a5eb1132fce7e59ae0b28bd93b86833ae}{Catch\+::\+Team\+City\+Reporter}}, \mbox{\hyperlink{struct_catch_1_1_team_city_reporter_a5eb1132fce7e59ae0b28bd93b86833ae}{Catch\+::\+Team\+City\+Reporter}}, \mbox{\hyperlink{struct_catch_1_1_test_event_listener_base_a19802a657ba95e3d3c213281988d4431}{Catch\+::\+Test\+Event\+Listener\+Base}}, \mbox{\hyperlink{class_catch_1_1_xml_reporter_a133d3b5deb923998634d96ff8f234cde}{Catch\+::\+Xml\+Reporter}}, and \mbox{\hyperlink{struct_my_listener_ad04e3bd8552d46cd015a1272060ea8df}{My\+Listener}}.
+
+\Hypertarget{struct_catch_1_1_i_streaming_reporter_ae1c3becff20f4a940c9f01d2c4114a17}\index{Catch::IStreamingReporter@{Catch::IStreamingReporter}!assertionStarting@{assertionStarting}}
+\index{assertionStarting@{assertionStarting}!Catch::IStreamingReporter@{Catch::IStreamingReporter}}
+\doxysubsubsection{\texorpdfstring{assertionStarting()}{assertionStarting()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_i_streaming_reporter_ae1c3becff20f4a940c9f01d2c4114a17} 
+virtual void Catch\+::\+IStreaming\+Reporter\+::assertion\+Starting (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_assertion_info}{Assertion\+Info}} const \&}]{assertion\+Info}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{struct_catch_1_1_automake_reporter_a69449e2a737e684fbf33a69a073e10f3}{Catch\+::\+Automake\+Reporter}}, \mbox{\hyperlink{struct_catch_1_1_automake_reporter_a69449e2a737e684fbf33a69a073e10f3}{Catch\+::\+Automake\+Reporter}}, \mbox{\hyperlink{struct_catch_1_1_compact_reporter_a21024f34ea5465118a6432cf75f618ee}{Catch\+::\+Compact\+Reporter}}, \mbox{\hyperlink{struct_catch_1_1_console_reporter_a91b1289a9bc2ff2f8128fd6cbc258665}{Catch\+::\+Console\+Reporter}}, \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a1e5ae547b7bef0be697f6e77add75d9c}{Catch\+::\+Cumulative\+Reporter\+Base$<$ Derived\+T $>$}}, \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a1e5ae547b7bef0be697f6e77add75d9c}{Catch\+::\+Cumulative\+Reporter\+Base$<$ Junit\+Reporter $>$}}, \mbox{\hyperlink{class_catch_1_1_listening_reporter_ac54f461297eca221a06425ed5edc2129}{Catch\+::\+Listening\+Reporter}}, \mbox{\hyperlink{struct_catch_1_1_t_a_p_reporter_adf67d3a1a1b785604ce3a4c35946c6ff}{Catch\+::\+TAPReporter}}, \mbox{\hyperlink{struct_catch_1_1_t_a_p_reporter_adf67d3a1a1b785604ce3a4c35946c6ff}{Catch\+::\+TAPReporter}}, \mbox{\hyperlink{struct_catch_1_1_team_city_reporter_a216436274c05f5528438c6c622f60f0b}{Catch\+::\+Team\+City\+Reporter}}, \mbox{\hyperlink{struct_catch_1_1_team_city_reporter_a216436274c05f5528438c6c622f60f0b}{Catch\+::\+Team\+City\+Reporter}}, \mbox{\hyperlink{struct_catch_1_1_test_event_listener_base_a7c7a96690d7e2f3594daf9576353178a}{Catch\+::\+Test\+Event\+Listener\+Base}}, \mbox{\hyperlink{class_catch_1_1_xml_reporter_a4f2661042672c0930086700fcd348f04}{Catch\+::\+Xml\+Reporter}}, and \mbox{\hyperlink{struct_my_listener_a245c546dbffd4d9f75d436e9bc4184c4}{My\+Listener}}.
+
+\Hypertarget{struct_catch_1_1_i_streaming_reporter_aed607b9cde8193cc470c2749f106b4fa}\index{Catch::IStreamingReporter@{Catch::IStreamingReporter}!benchmarkEnded@{benchmarkEnded}}
+\index{benchmarkEnded@{benchmarkEnded}!Catch::IStreamingReporter@{Catch::IStreamingReporter}}
+\doxysubsubsection{\texorpdfstring{benchmarkEnded()}{benchmarkEnded()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_i_streaming_reporter_aed607b9cde8193cc470c2749f106b4fa} 
+virtual void Catch\+::\+IStreaming\+Reporter\+::benchmark\+Ended (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_benchmark_stats}{Benchmark\+Stats}} const \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{struct_catch_1_1_console_reporter_af97510a0cfbd0ac07161c9642b996315}{Catch\+::\+Console\+Reporter}}, and \mbox{\hyperlink{class_catch_1_1_listening_reporter_af344f128ba1d336b35036eacba3bf516}{Catch\+::\+Listening\+Reporter}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__interfaces__reporter_8h_source_l00197}{197}} of file \mbox{\hyperlink{catch__interfaces__reporter_8h_source}{catch\+\_\+interfaces\+\_\+reporter.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00197\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{struct_catch_1_1_i_streaming_reporter_ac0b61a3ef04ee287937751c043a7013a}\index{Catch::IStreamingReporter@{Catch::IStreamingReporter}!benchmarkStarting@{benchmarkStarting}}
+\index{benchmarkStarting@{benchmarkStarting}!Catch::IStreamingReporter@{Catch::IStreamingReporter}}
+\doxysubsubsection{\texorpdfstring{benchmarkStarting()}{benchmarkStarting()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_i_streaming_reporter_ac0b61a3ef04ee287937751c043a7013a} 
+virtual void Catch\+::\+IStreaming\+Reporter\+::benchmark\+Starting (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_benchmark_info}{Benchmark\+Info}} const \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{struct_catch_1_1_console_reporter_a6caa775343962a467d9ebbc3403fc3d3}{Catch\+::\+Console\+Reporter}}, and \mbox{\hyperlink{class_catch_1_1_listening_reporter_a5f0115018b42c6424fcd887c04545920}{Catch\+::\+Listening\+Reporter}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__interfaces__reporter_8h_source_l00189}{189}} of file \mbox{\hyperlink{catch__interfaces__reporter_8h_source}{catch\+\_\+interfaces\+\_\+reporter.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00189\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{struct_catch_1_1_i_streaming_reporter_ad5001d7247cc94e5fec26b0e702f134f}\index{Catch::IStreamingReporter@{Catch::IStreamingReporter}!fatalErrorEncountered@{fatalErrorEncountered}}
+\index{fatalErrorEncountered@{fatalErrorEncountered}!Catch::IStreamingReporter@{Catch::IStreamingReporter}}
+\doxysubsubsection{\texorpdfstring{fatalErrorEncountered()}{fatalErrorEncountered()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_i_streaming_reporter_ad5001d7247cc94e5fec26b0e702f134f} 
+void Catch\+::\+IStreaming\+Reporter\+::fatal\+Error\+Encountered (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}}}]{name}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{include_2internal_2catch__interfaces__reporter_8cpp_source_l00108}{108}} of file \mbox{\hyperlink{include_2internal_2catch__interfaces__reporter_8cpp_source}{catch\+\_\+interfaces\+\_\+reporter.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00108\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{struct_catch_1_1_i_streaming_reporter_a122d9136175aefb16ccc5d3b61f23711}\index{Catch::IStreamingReporter@{Catch::IStreamingReporter}!getPreferences@{getPreferences}}
+\index{getPreferences@{getPreferences}!Catch::IStreamingReporter@{Catch::IStreamingReporter}}
+\doxysubsubsection{\texorpdfstring{getPreferences()}{getPreferences()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_i_streaming_reporter_a122d9136175aefb16ccc5d3b61f23711} 
+virtual \mbox{\hyperlink{struct_catch_1_1_reporter_preferences}{Reporter\+Preferences}} Catch\+::\+IStreaming\+Reporter\+::get\+Preferences (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{struct_catch_1_1_compact_reporter_a8b07aa14b5f505993379808f42b0f25a}{Catch\+::\+Compact\+Reporter}}, \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a45960ead3e300a607d6b2e7237a712ab}{Catch\+::\+Cumulative\+Reporter\+Base$<$ Derived\+T $>$}}, \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a45960ead3e300a607d6b2e7237a712ab}{Catch\+::\+Cumulative\+Reporter\+Base$<$ Junit\+Reporter $>$}}, \mbox{\hyperlink{class_catch_1_1_listening_reporter_aba18a06b704eca4aec42eb8869f8a92c}{Catch\+::\+Listening\+Reporter}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a83390b98f9a6ac5dab1165d6eb1a7f62}{Catch\+::\+Streaming\+Reporter\+Base$<$ Derived\+T $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a83390b98f9a6ac5dab1165d6eb1a7f62}{Catch\+::\+Streaming\+Reporter\+Base$<$ Automake\+Reporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a83390b98f9a6ac5dab1165d6eb1a7f62}{Catch\+::\+Streaming\+Reporter\+Base$<$ Compact\+Reporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a83390b98f9a6ac5dab1165d6eb1a7f62}{Catch\+::\+Streaming\+Reporter\+Base$<$ Console\+Reporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a83390b98f9a6ac5dab1165d6eb1a7f62}{Catch\+::\+Streaming\+Reporter\+Base$<$ TAPReporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a83390b98f9a6ac5dab1165d6eb1a7f62}{Catch\+::\+Streaming\+Reporter\+Base$<$ Team\+City\+Reporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a83390b98f9a6ac5dab1165d6eb1a7f62}{Catch\+::\+Streaming\+Reporter\+Base$<$ Test\+Event\+Listener\+Base $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a83390b98f9a6ac5dab1165d6eb1a7f62}{Catch\+::\+Streaming\+Reporter\+Base$<$ Xml\+Reporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_t_a_p_reporter_a52f056dc4cd354d5020a9ed3358877cb}{Catch\+::\+TAPReporter}}, and \mbox{\hyperlink{struct_catch_1_1_t_a_p_reporter_a52f056dc4cd354d5020a9ed3358877cb}{Catch\+::\+TAPReporter}}.
+
+\Hypertarget{struct_catch_1_1_i_streaming_reporter_a6ca0329f20ad8b8ec7b3d1958f1fa73f}\index{Catch::IStreamingReporter@{Catch::IStreamingReporter}!isMulti@{isMulti}}
+\index{isMulti@{isMulti}!Catch::IStreamingReporter@{Catch::IStreamingReporter}}
+\doxysubsubsection{\texorpdfstring{isMulti()}{isMulti()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_i_streaming_reporter_a6ca0329f20ad8b8ec7b3d1958f1fa73f} 
+bool Catch\+::\+IStreaming\+Reporter\+::is\+Multi (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{class_catch_1_1_listening_reporter_a7e162ceca38f3fa2416b323cc4eb03ab}{Catch\+::\+Listening\+Reporter}}.
+
+
+
+Definition at line \mbox{\hyperlink{include_2internal_2catch__interfaces__reporter_8cpp_source_l00109}{109}} of file \mbox{\hyperlink{include_2internal_2catch__interfaces__reporter_8cpp_source}{catch\+\_\+interfaces\+\_\+reporter.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00109\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_catch_1_1_i_streaming_reporter_aaa0ea1d8250b48fafc8d36f86e6d1d80}\index{Catch::IStreamingReporter@{Catch::IStreamingReporter}!noMatchingTestCases@{noMatchingTestCases}}
+\index{noMatchingTestCases@{noMatchingTestCases}!Catch::IStreamingReporter@{Catch::IStreamingReporter}}
+\doxysubsubsection{\texorpdfstring{noMatchingTestCases()}{noMatchingTestCases()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_i_streaming_reporter_aaa0ea1d8250b48fafc8d36f86e6d1d80} 
+virtual void Catch\+::\+IStreaming\+Reporter\+::no\+Matching\+Test\+Cases (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{spec}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{struct_catch_1_1_compact_reporter_a09320273bd7540b02443887306db30b8}{Catch\+::\+Compact\+Reporter}}, \mbox{\hyperlink{struct_catch_1_1_console_reporter_a73955f7470015a6164966a6626e21343}{Catch\+::\+Console\+Reporter}}, \mbox{\hyperlink{class_catch_1_1_junit_reporter_adc452888bb18f416fd7c1b74bca6ee14}{Catch\+::\+Junit\+Reporter}}, \mbox{\hyperlink{class_catch_1_1_listening_reporter_a9f2dd7fd9ad465474d0991de5e8a8022}{Catch\+::\+Listening\+Reporter}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a3576d7fca326a345fd3aff03efa4fbc8}{Catch\+::\+Streaming\+Reporter\+Base$<$ Derived\+T $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a3576d7fca326a345fd3aff03efa4fbc8}{Catch\+::\+Streaming\+Reporter\+Base$<$ Automake\+Reporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a3576d7fca326a345fd3aff03efa4fbc8}{Catch\+::\+Streaming\+Reporter\+Base$<$ Compact\+Reporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a3576d7fca326a345fd3aff03efa4fbc8}{Catch\+::\+Streaming\+Reporter\+Base$<$ Console\+Reporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a3576d7fca326a345fd3aff03efa4fbc8}{Catch\+::\+Streaming\+Reporter\+Base$<$ TAPReporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a3576d7fca326a345fd3aff03efa4fbc8}{Catch\+::\+Streaming\+Reporter\+Base$<$ Team\+City\+Reporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a3576d7fca326a345fd3aff03efa4fbc8}{Catch\+::\+Streaming\+Reporter\+Base$<$ Test\+Event\+Listener\+Base $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a3576d7fca326a345fd3aff03efa4fbc8}{Catch\+::\+Streaming\+Reporter\+Base$<$ Xml\+Reporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_t_a_p_reporter_aa0ebdd59272d35036d6500972466d906}{Catch\+::\+TAPReporter}}, \mbox{\hyperlink{struct_catch_1_1_t_a_p_reporter_aa0ebdd59272d35036d6500972466d906}{Catch\+::\+TAPReporter}}, \mbox{\hyperlink{struct_catch_1_1_team_city_reporter_a0467f50b1349b71ac72b4302d146c988}{Catch\+::\+Team\+City\+Reporter}}, \mbox{\hyperlink{struct_catch_1_1_team_city_reporter_a0467f50b1349b71ac72b4302d146c988}{Catch\+::\+Team\+City\+Reporter}}, and \mbox{\hyperlink{class_catch_1_1_xml_reporter_a5e80921e60f776401d6e2e111e48398f}{Catch\+::\+Xml\+Reporter}}.
+
+\Hypertarget{struct_catch_1_1_i_streaming_reporter_aba7a6ce1f315da47b8017b5ca6d1d008}\index{Catch::IStreamingReporter@{Catch::IStreamingReporter}!sectionEnded@{sectionEnded}}
+\index{sectionEnded@{sectionEnded}!Catch::IStreamingReporter@{Catch::IStreamingReporter}}
+\doxysubsubsection{\texorpdfstring{sectionEnded()}{sectionEnded()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_i_streaming_reporter_aba7a6ce1f315da47b8017b5ca6d1d008} 
+virtual void Catch\+::\+IStreaming\+Reporter\+::section\+Ended (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_section_stats}{Section\+Stats}} const \&}]{section\+Stats}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{struct_catch_1_1_compact_reporter_a7e19f270f40f428470eb89a826fb07a1}{Catch\+::\+Compact\+Reporter}}, \mbox{\hyperlink{struct_catch_1_1_console_reporter_a7ba7b75fa4a7e88d71782a1800523d78}{Catch\+::\+Console\+Reporter}}, \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a105f802576dcac9ddab9c10b10d6cd86}{Catch\+::\+Cumulative\+Reporter\+Base$<$ Derived\+T $>$}}, \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a105f802576dcac9ddab9c10b10d6cd86}{Catch\+::\+Cumulative\+Reporter\+Base$<$ Junit\+Reporter $>$}}, \mbox{\hyperlink{class_catch_1_1_listening_reporter_a6e85b5d61a9e5c894288086e52449c2e}{Catch\+::\+Listening\+Reporter}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ab889c47d829ddb5a2b96b46e1e09d207}{Catch\+::\+Streaming\+Reporter\+Base$<$ Derived\+T $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ab889c47d829ddb5a2b96b46e1e09d207}{Catch\+::\+Streaming\+Reporter\+Base$<$ Automake\+Reporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ab889c47d829ddb5a2b96b46e1e09d207}{Catch\+::\+Streaming\+Reporter\+Base$<$ Compact\+Reporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ab889c47d829ddb5a2b96b46e1e09d207}{Catch\+::\+Streaming\+Reporter\+Base$<$ Console\+Reporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ab889c47d829ddb5a2b96b46e1e09d207}{Catch\+::\+Streaming\+Reporter\+Base$<$ TAPReporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ab889c47d829ddb5a2b96b46e1e09d207}{Catch\+::\+Streaming\+Reporter\+Base$<$ Team\+City\+Reporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ab889c47d829ddb5a2b96b46e1e09d207}{Catch\+::\+Streaming\+Reporter\+Base$<$ Test\+Event\+Listener\+Base $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ab889c47d829ddb5a2b96b46e1e09d207}{Catch\+::\+Streaming\+Reporter\+Base$<$ Xml\+Reporter $>$}}, \mbox{\hyperlink{class_catch_1_1_xml_reporter_a73c809f067d58a7a6748cb13643448e5}{Catch\+::\+Xml\+Reporter}}, and \mbox{\hyperlink{struct_my_listener_ada23a11c27164a622cd01d35cb2d2432}{My\+Listener}}.
+
+\Hypertarget{struct_catch_1_1_i_streaming_reporter_aa6236178937a43c2d7665729fcb79521}\index{Catch::IStreamingReporter@{Catch::IStreamingReporter}!sectionStarting@{sectionStarting}}
+\index{sectionStarting@{sectionStarting}!Catch::IStreamingReporter@{Catch::IStreamingReporter}}
+\doxysubsubsection{\texorpdfstring{sectionStarting()}{sectionStarting()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_i_streaming_reporter_aa6236178937a43c2d7665729fcb79521} 
+virtual void Catch\+::\+IStreaming\+Reporter\+::section\+Starting (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_section_info}{Section\+Info}} const \&}]{section\+Info}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{struct_catch_1_1_console_reporter_a4827fca3e5921e571fc03e38d3cf59c9}{Catch\+::\+Console\+Reporter}}, \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a179ba3a2d5c94ab93b53be42fa0bdb0a}{Catch\+::\+Cumulative\+Reporter\+Base$<$ Derived\+T $>$}}, \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a179ba3a2d5c94ab93b53be42fa0bdb0a}{Catch\+::\+Cumulative\+Reporter\+Base$<$ Junit\+Reporter $>$}}, \mbox{\hyperlink{class_catch_1_1_listening_reporter_af1df5628b89d61db63b4d9d4d5bd3bf2}{Catch\+::\+Listening\+Reporter}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a249cfe647a373a77d118e4c564422e49}{Catch\+::\+Streaming\+Reporter\+Base$<$ Derived\+T $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a249cfe647a373a77d118e4c564422e49}{Catch\+::\+Streaming\+Reporter\+Base$<$ Automake\+Reporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a249cfe647a373a77d118e4c564422e49}{Catch\+::\+Streaming\+Reporter\+Base$<$ Compact\+Reporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a249cfe647a373a77d118e4c564422e49}{Catch\+::\+Streaming\+Reporter\+Base$<$ Console\+Reporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a249cfe647a373a77d118e4c564422e49}{Catch\+::\+Streaming\+Reporter\+Base$<$ TAPReporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a249cfe647a373a77d118e4c564422e49}{Catch\+::\+Streaming\+Reporter\+Base$<$ Team\+City\+Reporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a249cfe647a373a77d118e4c564422e49}{Catch\+::\+Streaming\+Reporter\+Base$<$ Test\+Event\+Listener\+Base $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a249cfe647a373a77d118e4c564422e49}{Catch\+::\+Streaming\+Reporter\+Base$<$ Xml\+Reporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_team_city_reporter_a659dbf515acee57b7e957edf2b10e2d9}{Catch\+::\+Team\+City\+Reporter}}, \mbox{\hyperlink{struct_catch_1_1_team_city_reporter_a659dbf515acee57b7e957edf2b10e2d9}{Catch\+::\+Team\+City\+Reporter}}, \mbox{\hyperlink{class_catch_1_1_xml_reporter_a06befa9cf2b661c5226317bff0f05c64}{Catch\+::\+Xml\+Reporter}}, and \mbox{\hyperlink{struct_my_listener_af5ded27f59b0a73bb87c6b761babc50c}{My\+Listener}}.
+
+\Hypertarget{struct_catch_1_1_i_streaming_reporter_a04ef7725043808bbbf258633043f06b2}\index{Catch::IStreamingReporter@{Catch::IStreamingReporter}!skipTest@{skipTest}}
+\index{skipTest@{skipTest}!Catch::IStreamingReporter@{Catch::IStreamingReporter}}
+\doxysubsubsection{\texorpdfstring{skipTest()}{skipTest()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_i_streaming_reporter_a04ef7725043808bbbf258633043f06b2} 
+virtual void Catch\+::\+IStreaming\+Reporter\+::skip\+Test (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_test_case_info}{Test\+Case\+Info}} const \&}]{test\+Info}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{struct_catch_1_1_automake_reporter_a209ebf2ee192bcadb3fa9952f7d5bdb5}{Catch\+::\+Automake\+Reporter}}, \mbox{\hyperlink{struct_catch_1_1_automake_reporter_a209ebf2ee192bcadb3fa9952f7d5bdb5}{Catch\+::\+Automake\+Reporter}}, \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_ad3fd3b17f7385ae4efcae8958987fdef}{Catch\+::\+Cumulative\+Reporter\+Base$<$ Derived\+T $>$}}, \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_ad3fd3b17f7385ae4efcae8958987fdef}{Catch\+::\+Cumulative\+Reporter\+Base$<$ Junit\+Reporter $>$}}, \mbox{\hyperlink{class_catch_1_1_listening_reporter_a61c6d70973c7bc21414007c9c7497241}{Catch\+::\+Listening\+Reporter}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ae9debeac49a31342ffa6844de5346cbf}{Catch\+::\+Streaming\+Reporter\+Base$<$ Derived\+T $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ae9debeac49a31342ffa6844de5346cbf}{Catch\+::\+Streaming\+Reporter\+Base$<$ Automake\+Reporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ae9debeac49a31342ffa6844de5346cbf}{Catch\+::\+Streaming\+Reporter\+Base$<$ Compact\+Reporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ae9debeac49a31342ffa6844de5346cbf}{Catch\+::\+Streaming\+Reporter\+Base$<$ Console\+Reporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ae9debeac49a31342ffa6844de5346cbf}{Catch\+::\+Streaming\+Reporter\+Base$<$ TAPReporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ae9debeac49a31342ffa6844de5346cbf}{Catch\+::\+Streaming\+Reporter\+Base$<$ Team\+City\+Reporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ae9debeac49a31342ffa6844de5346cbf}{Catch\+::\+Streaming\+Reporter\+Base$<$ Test\+Event\+Listener\+Base $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ae9debeac49a31342ffa6844de5346cbf}{Catch\+::\+Streaming\+Reporter\+Base$<$ Xml\+Reporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_team_city_reporter_a41a25116e22dee735f8fca7a29490e1b}{Catch\+::\+Team\+City\+Reporter}}, \mbox{\hyperlink{struct_catch_1_1_team_city_reporter_a41a25116e22dee735f8fca7a29490e1b}{Catch\+::\+Team\+City\+Reporter}}, and \mbox{\hyperlink{struct_my_listener_aacaccef0a332a73348768caaf440bede}{My\+Listener}}.
+
+\Hypertarget{struct_catch_1_1_i_streaming_reporter_ae295b98b77bab527be53ea9d35dfe66f}\index{Catch::IStreamingReporter@{Catch::IStreamingReporter}!testCaseEnded@{testCaseEnded}}
+\index{testCaseEnded@{testCaseEnded}!Catch::IStreamingReporter@{Catch::IStreamingReporter}}
+\doxysubsubsection{\texorpdfstring{testCaseEnded()}{testCaseEnded()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_i_streaming_reporter_ae295b98b77bab527be53ea9d35dfe66f} 
+virtual void Catch\+::\+IStreaming\+Reporter\+::test\+Case\+Ended (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_test_case_stats}{Test\+Case\+Stats}} const \&}]{test\+Case\+Stats}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{struct_catch_1_1_automake_reporter_a88e67aaa39d97ea283795c2fbc2598f0}{Catch\+::\+Automake\+Reporter}}, \mbox{\hyperlink{struct_catch_1_1_automake_reporter_a88e67aaa39d97ea283795c2fbc2598f0}{Catch\+::\+Automake\+Reporter}}, \mbox{\hyperlink{struct_catch_1_1_console_reporter_a20bdc16be273420c9649138272546132}{Catch\+::\+Console\+Reporter}}, \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a74282d5b47c5994e0337b1bebce21ee4}{Catch\+::\+Cumulative\+Reporter\+Base$<$ Derived\+T $>$}}, \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a74282d5b47c5994e0337b1bebce21ee4}{Catch\+::\+Cumulative\+Reporter\+Base$<$ Junit\+Reporter $>$}}, \mbox{\hyperlink{class_catch_1_1_junit_reporter_ad04704cfa67f64ca6bf540e9cbe108f4}{Catch\+::\+Junit\+Reporter}}, \mbox{\hyperlink{class_catch_1_1_listening_reporter_a81969997dee722a6eed64a81dda6a9d1}{Catch\+::\+Listening\+Reporter}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ae9e916b4aeb5e9080f3b77a10d69c5f6}{Catch\+::\+Streaming\+Reporter\+Base$<$ Derived\+T $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ae9e916b4aeb5e9080f3b77a10d69c5f6}{Catch\+::\+Streaming\+Reporter\+Base$<$ Automake\+Reporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ae9e916b4aeb5e9080f3b77a10d69c5f6}{Catch\+::\+Streaming\+Reporter\+Base$<$ Compact\+Reporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ae9e916b4aeb5e9080f3b77a10d69c5f6}{Catch\+::\+Streaming\+Reporter\+Base$<$ Console\+Reporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ae9e916b4aeb5e9080f3b77a10d69c5f6}{Catch\+::\+Streaming\+Reporter\+Base$<$ TAPReporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ae9e916b4aeb5e9080f3b77a10d69c5f6}{Catch\+::\+Streaming\+Reporter\+Base$<$ Team\+City\+Reporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ae9e916b4aeb5e9080f3b77a10d69c5f6}{Catch\+::\+Streaming\+Reporter\+Base$<$ Test\+Event\+Listener\+Base $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ae9e916b4aeb5e9080f3b77a10d69c5f6}{Catch\+::\+Streaming\+Reporter\+Base$<$ Xml\+Reporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_team_city_reporter_ab2a5007071e489a4e4c8ee8e84585ef8}{Catch\+::\+Team\+City\+Reporter}}, \mbox{\hyperlink{struct_catch_1_1_team_city_reporter_ab2a5007071e489a4e4c8ee8e84585ef8}{Catch\+::\+Team\+City\+Reporter}}, \mbox{\hyperlink{class_catch_1_1_xml_reporter_ab641ec7e115cb94efa02f85e9d91de0f}{Catch\+::\+Xml\+Reporter}}, and \mbox{\hyperlink{struct_my_listener_ad621d3e39e42d103f10e1f5f44b2cd9e}{My\+Listener}}.
+
+\Hypertarget{struct_catch_1_1_i_streaming_reporter_a8f7270dc83853494a1c3a912ddf95a11}\index{Catch::IStreamingReporter@{Catch::IStreamingReporter}!testCaseStarting@{testCaseStarting}}
+\index{testCaseStarting@{testCaseStarting}!Catch::IStreamingReporter@{Catch::IStreamingReporter}}
+\doxysubsubsection{\texorpdfstring{testCaseStarting()}{testCaseStarting()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_i_streaming_reporter_a8f7270dc83853494a1c3a912ddf95a11} 
+virtual void Catch\+::\+IStreaming\+Reporter\+::test\+Case\+Starting (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_test_case_info}{Test\+Case\+Info}} const \&}]{test\+Info}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a5ac5bcd607982d0a33829893ea6963c9}{Catch\+::\+Cumulative\+Reporter\+Base$<$ Derived\+T $>$}}, \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a5ac5bcd607982d0a33829893ea6963c9}{Catch\+::\+Cumulative\+Reporter\+Base$<$ Junit\+Reporter $>$}}, \mbox{\hyperlink{class_catch_1_1_junit_reporter_a1e099029f5c138d5bcda0fdd184ef3ee}{Catch\+::\+Junit\+Reporter}}, \mbox{\hyperlink{class_catch_1_1_listening_reporter_a41a88ece54222d8a5fd629e58ed2b676}{Catch\+::\+Listening\+Reporter}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ad8a773ceb481c17f3cedee3bf65b9820}{Catch\+::\+Streaming\+Reporter\+Base$<$ Derived\+T $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ad8a773ceb481c17f3cedee3bf65b9820}{Catch\+::\+Streaming\+Reporter\+Base$<$ Automake\+Reporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ad8a773ceb481c17f3cedee3bf65b9820}{Catch\+::\+Streaming\+Reporter\+Base$<$ Compact\+Reporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ad8a773ceb481c17f3cedee3bf65b9820}{Catch\+::\+Streaming\+Reporter\+Base$<$ Console\+Reporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ad8a773ceb481c17f3cedee3bf65b9820}{Catch\+::\+Streaming\+Reporter\+Base$<$ TAPReporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ad8a773ceb481c17f3cedee3bf65b9820}{Catch\+::\+Streaming\+Reporter\+Base$<$ Team\+City\+Reporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ad8a773ceb481c17f3cedee3bf65b9820}{Catch\+::\+Streaming\+Reporter\+Base$<$ Test\+Event\+Listener\+Base $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ad8a773ceb481c17f3cedee3bf65b9820}{Catch\+::\+Streaming\+Reporter\+Base$<$ Xml\+Reporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_team_city_reporter_a512e183512859522d4605fee3ad8e52b}{Catch\+::\+Team\+City\+Reporter}}, \mbox{\hyperlink{struct_catch_1_1_team_city_reporter_a512e183512859522d4605fee3ad8e52b}{Catch\+::\+Team\+City\+Reporter}}, \mbox{\hyperlink{class_catch_1_1_xml_reporter_a1395b2efb62faaa947a42638a03be32c}{Catch\+::\+Xml\+Reporter}}, and \mbox{\hyperlink{struct_my_listener_aa7ebbe560e34112beb30598196e5d728}{My\+Listener}}.
+
+\Hypertarget{struct_catch_1_1_i_streaming_reporter_abf668bf347eda4ba94fa2b3483ca4dd3}\index{Catch::IStreamingReporter@{Catch::IStreamingReporter}!testGroupEnded@{testGroupEnded}}
+\index{testGroupEnded@{testGroupEnded}!Catch::IStreamingReporter@{Catch::IStreamingReporter}}
+\doxysubsubsection{\texorpdfstring{testGroupEnded()}{testGroupEnded()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_i_streaming_reporter_abf668bf347eda4ba94fa2b3483ca4dd3} 
+virtual void Catch\+::\+IStreaming\+Reporter\+::test\+Group\+Ended (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_test_group_stats}{Test\+Group\+Stats}} const \&}]{test\+Group\+Stats}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{struct_catch_1_1_console_reporter_ad27c37a218bb32d8aa968ed08f5f1177}{Catch\+::\+Console\+Reporter}}, \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a7e33466bcd3a32923d8808bcc0fe9fe7}{Catch\+::\+Cumulative\+Reporter\+Base$<$ Derived\+T $>$}}, \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a7e33466bcd3a32923d8808bcc0fe9fe7}{Catch\+::\+Cumulative\+Reporter\+Base$<$ Junit\+Reporter $>$}}, \mbox{\hyperlink{class_catch_1_1_junit_reporter_aa91e71b824c3a7733993821668fe7e6e}{Catch\+::\+Junit\+Reporter}}, \mbox{\hyperlink{class_catch_1_1_listening_reporter_a8bb6e2d75f76be7c4b2012e9b8659d57}{Catch\+::\+Listening\+Reporter}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_aebb3f5242058ff945527079b85964bbe}{Catch\+::\+Streaming\+Reporter\+Base$<$ Derived\+T $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_aebb3f5242058ff945527079b85964bbe}{Catch\+::\+Streaming\+Reporter\+Base$<$ Automake\+Reporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_aebb3f5242058ff945527079b85964bbe}{Catch\+::\+Streaming\+Reporter\+Base$<$ Compact\+Reporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_aebb3f5242058ff945527079b85964bbe}{Catch\+::\+Streaming\+Reporter\+Base$<$ Console\+Reporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_aebb3f5242058ff945527079b85964bbe}{Catch\+::\+Streaming\+Reporter\+Base$<$ TAPReporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_aebb3f5242058ff945527079b85964bbe}{Catch\+::\+Streaming\+Reporter\+Base$<$ Team\+City\+Reporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_aebb3f5242058ff945527079b85964bbe}{Catch\+::\+Streaming\+Reporter\+Base$<$ Test\+Event\+Listener\+Base $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_aebb3f5242058ff945527079b85964bbe}{Catch\+::\+Streaming\+Reporter\+Base$<$ Xml\+Reporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_team_city_reporter_a1f84a6b49e1b13a3fc5a14b1e351909d}{Catch\+::\+Team\+City\+Reporter}}, \mbox{\hyperlink{struct_catch_1_1_team_city_reporter_a1f84a6b49e1b13a3fc5a14b1e351909d}{Catch\+::\+Team\+City\+Reporter}}, and \mbox{\hyperlink{class_catch_1_1_xml_reporter_ab9ba05f0311cb976fb6f7e5bd2df477c}{Catch\+::\+Xml\+Reporter}}.
+
+\Hypertarget{struct_catch_1_1_i_streaming_reporter_aef40d16994fe8a7ab140c885d8c2d7d0}\index{Catch::IStreamingReporter@{Catch::IStreamingReporter}!testGroupStarting@{testGroupStarting}}
+\index{testGroupStarting@{testGroupStarting}!Catch::IStreamingReporter@{Catch::IStreamingReporter}}
+\doxysubsubsection{\texorpdfstring{testGroupStarting()}{testGroupStarting()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_i_streaming_reporter_aef40d16994fe8a7ab140c885d8c2d7d0} 
+virtual void Catch\+::\+IStreaming\+Reporter\+::test\+Group\+Starting (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_group_info}{Group\+Info}} const \&}]{group\+Info}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a2422d4701dd7796d1c60dfb90a99b9d0}{Catch\+::\+Cumulative\+Reporter\+Base$<$ Derived\+T $>$}}, \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a2422d4701dd7796d1c60dfb90a99b9d0}{Catch\+::\+Cumulative\+Reporter\+Base$<$ Junit\+Reporter $>$}}, \mbox{\hyperlink{class_catch_1_1_junit_reporter_a40421d8e1a8a6498cc302595c35cfed5}{Catch\+::\+Junit\+Reporter}}, \mbox{\hyperlink{class_catch_1_1_listening_reporter_a3d2ffe4c24a7877657bc3e5e0e9ae7d2}{Catch\+::\+Listening\+Reporter}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a6961a1cbf0d4bffed14cb04f80aaf318}{Catch\+::\+Streaming\+Reporter\+Base$<$ Derived\+T $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a6961a1cbf0d4bffed14cb04f80aaf318}{Catch\+::\+Streaming\+Reporter\+Base$<$ Automake\+Reporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a6961a1cbf0d4bffed14cb04f80aaf318}{Catch\+::\+Streaming\+Reporter\+Base$<$ Compact\+Reporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a6961a1cbf0d4bffed14cb04f80aaf318}{Catch\+::\+Streaming\+Reporter\+Base$<$ Console\+Reporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a6961a1cbf0d4bffed14cb04f80aaf318}{Catch\+::\+Streaming\+Reporter\+Base$<$ TAPReporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a6961a1cbf0d4bffed14cb04f80aaf318}{Catch\+::\+Streaming\+Reporter\+Base$<$ Team\+City\+Reporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a6961a1cbf0d4bffed14cb04f80aaf318}{Catch\+::\+Streaming\+Reporter\+Base$<$ Test\+Event\+Listener\+Base $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a6961a1cbf0d4bffed14cb04f80aaf318}{Catch\+::\+Streaming\+Reporter\+Base$<$ Xml\+Reporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_team_city_reporter_a6b9db7ad0ac2c39c8b222bffa8eace6c}{Catch\+::\+Team\+City\+Reporter}}, \mbox{\hyperlink{struct_catch_1_1_team_city_reporter_a6b9db7ad0ac2c39c8b222bffa8eace6c}{Catch\+::\+Team\+City\+Reporter}}, and \mbox{\hyperlink{class_catch_1_1_xml_reporter_a873beb2333056238c4fd476ef90412fb}{Catch\+::\+Xml\+Reporter}}.
+
+\Hypertarget{struct_catch_1_1_i_streaming_reporter_a1ac383df84242bc55578e32ebca13e88}\index{Catch::IStreamingReporter@{Catch::IStreamingReporter}!testRunEnded@{testRunEnded}}
+\index{testRunEnded@{testRunEnded}!Catch::IStreamingReporter@{Catch::IStreamingReporter}}
+\doxysubsubsection{\texorpdfstring{testRunEnded()}{testRunEnded()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_i_streaming_reporter_a1ac383df84242bc55578e32ebca13e88} 
+virtual void Catch\+::\+IStreaming\+Reporter\+::test\+Run\+Ended (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_test_run_stats}{Test\+Run\+Stats}} const \&}]{test\+Run\+Stats}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{struct_catch_1_1_compact_reporter_abf31540bf74013cb7736f28291712d53}{Catch\+::\+Compact\+Reporter}}, \mbox{\hyperlink{struct_catch_1_1_console_reporter_a665c8005050d0f1745935e0dde76e280}{Catch\+::\+Console\+Reporter}}, \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a86b6b628c217ed77c16de39b844c9eb8}{Catch\+::\+Cumulative\+Reporter\+Base$<$ Derived\+T $>$}}, \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a86b6b628c217ed77c16de39b844c9eb8}{Catch\+::\+Cumulative\+Reporter\+Base$<$ Junit\+Reporter $>$}}, \mbox{\hyperlink{class_catch_1_1_listening_reporter_ae07e52e85111d49886059403c02b9347}{Catch\+::\+Listening\+Reporter}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a8cfd2e27ce7746966cf145b818254fd1}{Catch\+::\+Streaming\+Reporter\+Base$<$ Derived\+T $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a8cfd2e27ce7746966cf145b818254fd1}{Catch\+::\+Streaming\+Reporter\+Base$<$ Automake\+Reporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a8cfd2e27ce7746966cf145b818254fd1}{Catch\+::\+Streaming\+Reporter\+Base$<$ Compact\+Reporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a8cfd2e27ce7746966cf145b818254fd1}{Catch\+::\+Streaming\+Reporter\+Base$<$ Console\+Reporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a8cfd2e27ce7746966cf145b818254fd1}{Catch\+::\+Streaming\+Reporter\+Base$<$ TAPReporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a8cfd2e27ce7746966cf145b818254fd1}{Catch\+::\+Streaming\+Reporter\+Base$<$ Team\+City\+Reporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a8cfd2e27ce7746966cf145b818254fd1}{Catch\+::\+Streaming\+Reporter\+Base$<$ Test\+Event\+Listener\+Base $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a8cfd2e27ce7746966cf145b818254fd1}{Catch\+::\+Streaming\+Reporter\+Base$<$ Xml\+Reporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_t_a_p_reporter_a991c5fc83855f65e11e840044335198a}{Catch\+::\+TAPReporter}}, \mbox{\hyperlink{struct_catch_1_1_t_a_p_reporter_a991c5fc83855f65e11e840044335198a}{Catch\+::\+TAPReporter}}, \mbox{\hyperlink{class_catch_1_1_xml_reporter_a2458c9f342a446f0b3a7480b53c93705}{Catch\+::\+Xml\+Reporter}}, and \mbox{\hyperlink{struct_my_listener_a2f04586d353bafd39cb0e6346643bfb0}{My\+Listener}}.
+
+\Hypertarget{struct_catch_1_1_i_streaming_reporter_a8c7b304d9563992a611dc7d68dc0c1ce}\index{Catch::IStreamingReporter@{Catch::IStreamingReporter}!testRunStarting@{testRunStarting}}
+\index{testRunStarting@{testRunStarting}!Catch::IStreamingReporter@{Catch::IStreamingReporter}}
+\doxysubsubsection{\texorpdfstring{testRunStarting()}{testRunStarting()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_i_streaming_reporter_a8c7b304d9563992a611dc7d68dc0c1ce} 
+virtual void Catch\+::\+IStreaming\+Reporter\+::test\+Run\+Starting (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_test_run_info}{Test\+Run\+Info}} const \&}]{test\+Run\+Info}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{struct_catch_1_1_console_reporter_a89d08018bf29583341bdfe7422007011}{Catch\+::\+Console\+Reporter}}, \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a99061d05f2f9e162989f616c68670dbb}{Catch\+::\+Cumulative\+Reporter\+Base$<$ Derived\+T $>$}}, \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a99061d05f2f9e162989f616c68670dbb}{Catch\+::\+Cumulative\+Reporter\+Base$<$ Junit\+Reporter $>$}}, \mbox{\hyperlink{class_catch_1_1_junit_reporter_a416da4586bd135749eea5adc8aa41280}{Catch\+::\+Junit\+Reporter}}, \mbox{\hyperlink{class_catch_1_1_listening_reporter_a5681779111a3f8c0827000d04f7de199}{Catch\+::\+Listening\+Reporter}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a510b201b48fb7d0ebd11d0c8c65a43ba}{Catch\+::\+Streaming\+Reporter\+Base$<$ Derived\+T $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a510b201b48fb7d0ebd11d0c8c65a43ba}{Catch\+::\+Streaming\+Reporter\+Base$<$ Automake\+Reporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a510b201b48fb7d0ebd11d0c8c65a43ba}{Catch\+::\+Streaming\+Reporter\+Base$<$ Compact\+Reporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a510b201b48fb7d0ebd11d0c8c65a43ba}{Catch\+::\+Streaming\+Reporter\+Base$<$ Console\+Reporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a510b201b48fb7d0ebd11d0c8c65a43ba}{Catch\+::\+Streaming\+Reporter\+Base$<$ TAPReporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a510b201b48fb7d0ebd11d0c8c65a43ba}{Catch\+::\+Streaming\+Reporter\+Base$<$ Team\+City\+Reporter $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a510b201b48fb7d0ebd11d0c8c65a43ba}{Catch\+::\+Streaming\+Reporter\+Base$<$ Test\+Event\+Listener\+Base $>$}}, \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a510b201b48fb7d0ebd11d0c8c65a43ba}{Catch\+::\+Streaming\+Reporter\+Base$<$ Xml\+Reporter $>$}}, \mbox{\hyperlink{class_catch_1_1_xml_reporter_ab5de0b02d5a30612ae5449360d867672}{Catch\+::\+Xml\+Reporter}}, and \mbox{\hyperlink{struct_my_listener_a8f1891cc05349bd5fc2951dd0a3b8c22}{My\+Listener}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__interfaces__reporter_8h}{catch\+\_\+interfaces\+\_\+reporter.\+h}}\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{include_2internal_2catch__interfaces__reporter_8cpp}{catch\+\_\+interfaces\+\_\+reporter.\+cpp}}\end{DoxyCompactItemize}

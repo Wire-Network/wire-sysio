@@ -1,0 +1,179 @@
+\doxysection{serialize.\+cpp}
+\hypertarget{serialize_8cpp_source}{}\label{serialize_8cpp_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/example/serialize/serialize.cpp@{libraries/fc/include/fc/crypto/webauthn\_json/example/serialize/serialize.cpp}}
+\mbox{\hyperlink{serialize_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00001}00001\ \textcolor{comment}{//\ Serialize\ example}}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00002}00002\ \textcolor{comment}{//\ This\ example\ shows\ writing\ JSON\ string\ with\ writer\ directly.}}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{prettywriter_8h}{rapidjson/prettywriter.h}}"{}}\ \textcolor{comment}{//\ for\ stringify\ JSON}}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <cstdio>}}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00009}00009\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacerapidjson}{rapidjson}};}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00011}\mbox{\hyperlink{class_person}{00011}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_person}{Person}}\ \{}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00012}00012\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00013}\mbox{\hyperlink{class_person_a5e10221f201605ad323d5518e5436bd3}{00013}}\ \ \ \ \ \mbox{\hyperlink{class_person_a5e10221f201605ad323d5518e5436bd3}{Person}}(\textcolor{keyword}{const}\ std::string\&\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ \textcolor{keywordtype}{unsigned}\ age)\ :\ name\_(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}),\ age\_(age)\ \{\}}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00014}\mbox{\hyperlink{class_person_a3379ad4403098272609da06570c6df1a}{00014}}\ \ \ \ \ \mbox{\hyperlink{class_person_a3379ad4403098272609da06570c6df1a}{Person}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{class_person}{Person}}\&\ rhs)\ :\ name\_(rhs.name\_),\ age\_(rhs.age\_)\ \{\}}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00015}00015\ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{class_person_a700ffd693321c5fe6880262acf43d4da}{\string~Person}}();}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00017}\mbox{\hyperlink{class_person_a045de2557ddbba75164088f90cb701d5}{00017}}\ \ \ \ \ \mbox{\hyperlink{class_person}{Person}}\&\ \mbox{\hyperlink{class_person_a045de2557ddbba75164088f90cb701d5}{operator=}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{class_person}{Person}}\&\ rhs)\ \{}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00018}00018\ \ \ \ \ \ \ \ \ name\_\ =\ rhs.name\_;}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00019}00019\ \ \ \ \ \ \ \ \ age\_\ =\ rhs.age\_;}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00020}00020\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00021}00021\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00023}00023\ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00024}00024\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ Writer>}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00025}\mbox{\hyperlink{class_person_a2365a4a101fa1f89b6e74f7c40a21b69}{00025}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_person_a2365a4a101fa1f89b6e74f7c40a21b69}{Serialize}}(\mbox{\hyperlink{class_writer}{Writer}}\&\ writer)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00026}00026\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ This\ base\ class\ just\ write\ out\ name-\/value\ pairs,\ without\ wrapping\ within\ an\ object.}}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00027}00027\ \ \ \ \ \ \ \ \ writer.\mbox{\hyperlink{class_writer_a8b4dc44f471403a83c9959575796ceab}{String}}(\textcolor{stringliteral}{"{}name"{}});}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00028}00028\ \textcolor{preprocessor}{\#if\ RAPIDJSON\_HAS\_STDSTRING}}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00029}00029\ \ \ \ \ \ \ \ \ writer.\mbox{\hyperlink{class_writer_a8b4dc44f471403a83c9959575796ceab}{String}}(name\_);}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00030}00030\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00031}00031\ \ \ \ \ \ \ \ \ writer.\mbox{\hyperlink{class_writer_a8b4dc44f471403a83c9959575796ceab}{String}}(name\_.c\_str(),\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\textcolor{keyword}{>}(name\_.length()));\ \textcolor{comment}{//\ Supplying\ length\ of\ string\ is\ faster.}}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00032}00032\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00033}00033\ \ \ \ \ \ \ \ \ writer.\mbox{\hyperlink{class_writer_a8b4dc44f471403a83c9959575796ceab}{String}}(\textcolor{stringliteral}{"{}age"{}});}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00034}00034\ \ \ \ \ \ \ \ \ writer.\mbox{\hyperlink{class_writer_a5fb0c3228f89f6f9bef15f3e6e6f1739}{Uint}}(age\_);}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00035}00035\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00037}00037\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00038}00038\ \ \ \ \ std::string\ name\_;}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00039}00039\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ age\_;}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00040}00040\ \};}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00042}\mbox{\hyperlink{class_person_a700ffd693321c5fe6880262acf43d4da}{00042}}\ \mbox{\hyperlink{class_person_a700ffd693321c5fe6880262acf43d4da}{Person::\string~Person}}()\ \{}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00043}00043\ \}}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00045}\mbox{\hyperlink{class_education}{00045}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_education}{Education}}\ \{}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00046}00046\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00047}\mbox{\hyperlink{class_education_abf86a8d07c552c8b50cd4abc1610023e}{00047}}\ \ \ \ \ \mbox{\hyperlink{class_education_abf86a8d07c552c8b50cd4abc1610023e}{Education}}(\textcolor{keyword}{const}\ std::string\&\ school,\ \textcolor{keywordtype}{double}\ GPA)\ :\ school\_(school),\ GPA\_(GPA)\ \{\}}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00048}\mbox{\hyperlink{class_education_a46232aa9676c4f52fb8e81f79b8f93c8}{00048}}\ \ \ \ \ \mbox{\hyperlink{class_education_a46232aa9676c4f52fb8e81f79b8f93c8}{Education}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{class_education}{Education}}\&\ rhs)\ :\ school\_(rhs.school\_),\ GPA\_(rhs.GPA\_)\ \{\}}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00050}00050\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ Writer>}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00051}\mbox{\hyperlink{class_education_aa7dbbb0273bdaeca29d8bab01b365bbb}{00051}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_education_aa7dbbb0273bdaeca29d8bab01b365bbb}{Serialize}}(\mbox{\hyperlink{class_writer}{Writer}}\&\ writer)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00052}00052\ \ \ \ \ \ \ \ \ writer.\mbox{\hyperlink{class_writer_aec3200b2fc80ec87d1c37f775256b2e1}{StartObject}}();}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00053}00053\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00054}00054\ \ \ \ \ \ \ \ \ writer.\mbox{\hyperlink{class_writer_a8b4dc44f471403a83c9959575796ceab}{String}}(\textcolor{stringliteral}{"{}school"{}});}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00055}00055\ \textcolor{preprocessor}{\#if\ RAPIDJSON\_HAS\_STDSTRING}}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00056}00056\ \ \ \ \ \ \ \ \ writer.\mbox{\hyperlink{class_writer_a8b4dc44f471403a83c9959575796ceab}{String}}(school\_);}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00057}00057\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00058}00058\ \ \ \ \ \ \ \ \ writer.\mbox{\hyperlink{class_writer_a8b4dc44f471403a83c9959575796ceab}{String}}(school\_.c\_str(),\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\textcolor{keyword}{>}(school\_.length()));}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00059}00059\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00061}00061\ \ \ \ \ \ \ \ \ writer.\mbox{\hyperlink{class_writer_a8b4dc44f471403a83c9959575796ceab}{String}}(\textcolor{stringliteral}{"{}GPA"{}});}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00062}00062\ \ \ \ \ \ \ \ \ writer.\mbox{\hyperlink{class_writer_a22a43e8a7193105deec6b808736f7a1a}{Double}}(GPA\_);}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00064}00064\ \ \ \ \ \ \ \ \ writer.\mbox{\hyperlink{class_writer_a0771a565261564c27676b7300b11f2b5}{EndObject}}();}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00065}00065\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00067}00067\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00068}00068\ \ \ \ \ std::string\ school\_;}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00069}00069\ \ \ \ \ \textcolor{keywordtype}{double}\ GPA\_;}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00070}00070\ \};}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00072}\mbox{\hyperlink{class_dependent}{00072}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_dependent}{Dependent}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{class_person}{Person}}\ \{}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00073}00073\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00074}\mbox{\hyperlink{class_dependent_ad797443ec52d4567f8caeabe38cccf6d}{00074}}\ \ \ \ \ \mbox{\hyperlink{class_dependent_ad797443ec52d4567f8caeabe38cccf6d}{Dependent}}(\textcolor{keyword}{const}\ std::string\&\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ \textcolor{keywordtype}{unsigned}\ age,\ \mbox{\hyperlink{class_education}{Education}}*\ education\ =\ 0)\ :\ \mbox{\hyperlink{class_person}{Person}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ age),\ education\_(education)\ \{\}}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00075}\mbox{\hyperlink{class_dependent_a3613a9eba5f88e43ea41159956c655a9}{00075}}\ \ \ \ \ \mbox{\hyperlink{class_dependent_a3613a9eba5f88e43ea41159956c655a9}{Dependent}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{class_dependent}{Dependent}}\&\ rhs)\ :\ \mbox{\hyperlink{class_person}{Person}}(rhs),\ education\_(0)\ \{\ education\_\ =\ (rhs.education\_\ ==\ 0)\ ?\ 0\ :\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_education}{Education}}(*rhs.education\_);\ \}}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00076}00076\ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{class_dependent_a9be9cfbc1219e12d796ae16fad545174}{\string~Dependent}}();}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00077}00077\ }
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00078}\mbox{\hyperlink{class_dependent_aa97f793c9fc0ac46a8b355f9a0ab4b8b}{00078}}\ \ \ \ \ \mbox{\hyperlink{class_dependent}{Dependent}}\&\ \mbox{\hyperlink{class_dependent_aa97f793c9fc0ac46a8b355f9a0ab4b8b}{operator=}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{class_dependent}{Dependent}}\&\ rhs)\ \{}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00079}00079\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{this}\ ==\ \&rhs)}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00080}00080\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00081}00081\ \ \ \ \ \ \ \ \ \textcolor{keyword}{delete}\ education\_;}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00082}00082\ \ \ \ \ \ \ \ \ education\_\ =\ (rhs.education\_\ ==\ 0)\ ?\ 0\ :\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_education}{Education}}(*rhs.education\_);}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00083}00083\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00084}00084\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00085}00085\ }
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00086}00086\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ Writer>}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00087}\mbox{\hyperlink{class_dependent_a37eb0e3477bdb26a66a2a2f3e03c85be}{00087}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_dependent_a37eb0e3477bdb26a66a2a2f3e03c85be}{Serialize}}(\mbox{\hyperlink{class_writer}{Writer}}\&\ writer)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00088}00088\ \ \ \ \ \ \ \ \ writer.\mbox{\hyperlink{class_writer_aec3200b2fc80ec87d1c37f775256b2e1}{StartObject}}();}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00089}00089\ }
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00090}00090\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_person_a2365a4a101fa1f89b6e74f7c40a21b69}{Person::Serialize}}(writer);}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00091}00091\ }
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00092}00092\ \ \ \ \ \ \ \ \ writer.\mbox{\hyperlink{class_writer_a8b4dc44f471403a83c9959575796ceab}{String}}(\textcolor{stringliteral}{"{}education"{}});}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00093}00093\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (education\_)}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00094}00094\ \ \ \ \ \ \ \ \ \ \ \ \ education\_-\/>\mbox{\hyperlink{class_education_aa7dbbb0273bdaeca29d8bab01b365bbb}{Serialize}}(writer);}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00095}00095\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00096}00096\ \ \ \ \ \ \ \ \ \ \ \ \ writer.\mbox{\hyperlink{class_writer_af700ed03c8810d48a4aaa3c5baeaf26c}{Null}}();}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00097}00097\ }
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00098}00098\ \ \ \ \ \ \ \ \ writer.\mbox{\hyperlink{class_writer_a0771a565261564c27676b7300b11f2b5}{EndObject}}();}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00099}00099\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00100}00100\ }
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00101}00101\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00102}00102\ }
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00103}00103\ \ \ \ \ \mbox{\hyperlink{class_education}{Education}}\ *education\_;}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00104}00104\ \};}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00105}00105\ }
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00106}\mbox{\hyperlink{class_dependent_a9be9cfbc1219e12d796ae16fad545174}{00106}}\ \mbox{\hyperlink{class_dependent_a9be9cfbc1219e12d796ae16fad545174}{Dependent::\string~Dependent}}()\ \{}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00107}00107\ \ \ \ \ \textcolor{keyword}{delete}\ education\_;\ }
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00108}00108\ \}}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00109}00109\ }
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00110}\mbox{\hyperlink{class_employee}{00110}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_employee}{Employee}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{class_person}{Person}}\ \{}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00111}00111\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00112}\mbox{\hyperlink{class_employee_a524a0a5d4f27c51b76a64dda44c6e328}{00112}}\ \ \ \ \ \mbox{\hyperlink{class_employee_a524a0a5d4f27c51b76a64dda44c6e328}{Employee}}(\textcolor{keyword}{const}\ std::string\&\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ \textcolor{keywordtype}{unsigned}\ age,\ \textcolor{keywordtype}{bool}\ married)\ :\ \mbox{\hyperlink{class_person}{Person}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ age),\ dependents\_(),\ married\_(married)\ \{\}}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00113}\mbox{\hyperlink{class_employee_a85388b3b212aa92334c787811348cc8a}{00113}}\ \ \ \ \ \mbox{\hyperlink{class_employee_a85388b3b212aa92334c787811348cc8a}{Employee}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{class_employee}{Employee}}\&\ rhs)\ :\ \mbox{\hyperlink{class_person}{Person}}(rhs),\ dependents\_(rhs.dependents\_),\ married\_(rhs.married\_)\ \{\}}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00114}00114\ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{class_employee_abed56e9c007fff2bfe27ca87251baaf2}{\string~Employee}}();}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00115}00115\ }
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00116}\mbox{\hyperlink{class_employee_a5f34edd226568fe72b64b64274102ff5}{00116}}\ \ \ \ \ \mbox{\hyperlink{class_employee}{Employee}}\&\ \mbox{\hyperlink{class_employee_a5f34edd226568fe72b64b64274102ff5}{operator=}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{class_employee}{Employee}}\&\ rhs)\ \{}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00117}00117\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{class_person}{Person}}\&\textcolor{keyword}{>}(*this)\ =\ rhs;}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00118}00118\ \ \ \ \ \ \ \ \ dependents\_\ =\ rhs.dependents\_;}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00119}00119\ \ \ \ \ \ \ \ \ married\_\ =\ rhs.married\_;}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00120}00120\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00121}00121\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00122}00122\ }
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00123}\mbox{\hyperlink{class_employee_ad83c2ff92351c61994a3f597afa1f60f}{00123}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_employee_ad83c2ff92351c61994a3f597afa1f60f}{AddDependent}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{class_dependent}{Dependent}}\&\ dependent)\ \{}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00124}00124\ \ \ \ \ \ \ \ \ dependents\_.push\_back(dependent);}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00125}00125\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00126}00126\ }
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00127}00127\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ Writer>}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00128}\mbox{\hyperlink{class_employee_a9679fb699a96d2a4d570568ab472d696}{00128}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_employee_a9679fb699a96d2a4d570568ab472d696}{Serialize}}(\mbox{\hyperlink{class_writer}{Writer}}\&\ writer)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00129}00129\ \ \ \ \ \ \ \ \ writer.\mbox{\hyperlink{class_writer_aec3200b2fc80ec87d1c37f775256b2e1}{StartObject}}();}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00130}00130\ }
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00131}00131\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_person_a2365a4a101fa1f89b6e74f7c40a21b69}{Person::Serialize}}(writer);}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00132}00132\ }
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00133}00133\ \ \ \ \ \ \ \ \ writer.\mbox{\hyperlink{class_writer_a8b4dc44f471403a83c9959575796ceab}{String}}(\textcolor{stringliteral}{"{}married"{}});}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00134}00134\ \ \ \ \ \ \ \ \ writer.\mbox{\hyperlink{class_writer_ad7491f4dedb02e7456b240b23ef8c1ad}{Bool}}(married\_);}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00135}00135\ }
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00136}00136\ \ \ \ \ \ \ \ \ writer.\mbox{\hyperlink{class_writer_a8b4dc44f471403a83c9959575796ceab}{String}}((\textcolor{stringliteral}{"{}dependents"{}}));}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00137}00137\ \ \ \ \ \ \ \ \ writer.\mbox{\hyperlink{class_writer_a38715785194b42cd67ba5dd52bf7967e}{StartArray}}();}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00138}00138\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (std::vector<Dependent>::const\_iterator\ dependentItr\ =\ dependents\_.begin();\ dependentItr\ !=\ dependents\_.end();\ ++dependentItr)}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00139}00139\ \ \ \ \ \ \ \ \ \ \ \ \ dependentItr-\/>Serialize(writer);}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00140}00140\ \ \ \ \ \ \ \ \ writer.\mbox{\hyperlink{class_writer_ac88d533095591a878500b63b351d4013}{EndArray}}();}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00141}00141\ }
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00142}00142\ \ \ \ \ \ \ \ \ writer.\mbox{\hyperlink{class_writer_a0771a565261564c27676b7300b11f2b5}{EndObject}}();}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00143}00143\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00144}00144\ }
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00145}00145\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00146}00146\ \ \ \ \ std::vector<Dependent>\ dependents\_;}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00147}00147\ \ \ \ \ \textcolor{keywordtype}{bool}\ married\_;}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00148}00148\ \};}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00149}00149\ }
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00150}\mbox{\hyperlink{class_employee_abed56e9c007fff2bfe27ca87251baaf2}{00150}}\ \mbox{\hyperlink{class_employee_abed56e9c007fff2bfe27ca87251baaf2}{Employee::\string~Employee}}()\ \{}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00151}00151\ \}}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00152}00152\ }
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00153}\mbox{\hyperlink{serialize_8cpp_a81ce304348a420752ee080480d2b3095}{00153}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}(\textcolor{keywordtype}{int},\ \textcolor{keywordtype}{char}*[])\ \{}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00154}00154\ \ \ \ \ std::vector<Employee>\ employees;}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00155}00155\ }
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00156}00156\ \ \ \ \ employees.push\_back(\mbox{\hyperlink{class_employee}{Employee}}(\textcolor{stringliteral}{"{}Milo\ YIP"{}},\ 34,\ \textcolor{keyword}{true}));}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00157}00157\ \ \ \ \ employees.back().AddDependent(\mbox{\hyperlink{class_dependent}{Dependent}}(\textcolor{stringliteral}{"{}Lua\ YIP"{}},\ 3,\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_education}{Education}}(\textcolor{stringliteral}{"{}Happy\ Kindergarten"{}},\ 3.5)));}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00158}00158\ \ \ \ \ employees.back().AddDependent(\mbox{\hyperlink{class_dependent}{Dependent}}(\textcolor{stringliteral}{"{}Mio\ YIP"{}},\ 1));}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00159}00159\ }
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00160}00160\ \ \ \ \ employees.push\_back(\mbox{\hyperlink{class_employee}{Employee}}(\textcolor{stringliteral}{"{}Percy\ TSE"{}},\ 30,\ \textcolor{keyword}{false}));}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00161}00161\ }
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00162}00162\ \ \ \ \ \mbox{\hyperlink{class_generic_string_buffer}{StringBuffer}}\ sb;}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00163}00163\ \ \ \ \ \mbox{\hyperlink{class_pretty_writer}{PrettyWriter<StringBuffer>}}\ writer(sb);}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00164}00164\ }
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00165}00165\ \ \ \ \ writer.\mbox{\hyperlink{class_pretty_writer_aec7fdf4798a3af5e31c147633f4798ed}{StartArray}}();}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00166}00166\ \ \ \ \ \textcolor{keywordflow}{for}\ (std::vector<Employee>::const\_iterator\ employeeItr\ =\ employees.begin();\ employeeItr\ !=\ employees.end();\ ++employeeItr)}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00167}00167\ \ \ \ \ \ \ \ \ employeeItr-\/>Serialize(writer);}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00168}00168\ \ \ \ \ writer.\mbox{\hyperlink{class_pretty_writer_a1e9d97fc950d349f55abd864c787ff37}{EndArray}}();}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00169}00169\ }
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00170}00170\ \ \ \ \ puts(sb.\mbox{\hyperlink{class_generic_string_buffer_a42079865bab1deb930c6cff7d491c719}{GetString}}());}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00171}00171\ }
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00172}00172\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{serialize_8cpp_source_l00173}00173\ \}}
+
+\end{DoxyCode}

@@ -1,0 +1,16 @@
+<map id="sysio::chain::webassembly::interface::get_parameters_packed" name="sysio::chain::webassembly::interface::get_parameters_packed">
+<area shape="rect" id="Node000001" title="Retrieve the blockchain config parameters." alt="" coords="5,99,232,140"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1vm_1_1span.html#a65d9e2641d763c860ae175a9a936a309" title=" " alt="" coords="280,5,427,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="167,96,306,35,309,40,169,101"/>
+<area shape="rect" id="Node000003" href="$namespacefc_1_1raw.html#a3a18d8161aa5b4f4f02b6fcfdff5e5d1" title=" " alt="" coords="475,81,572,107"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="232,97,279,92,374,88,459,89,459,94,374,93,280,97,233,102"/>
+<area shape="rect" id="Node000004" href="$namespacefc_1_1raw.html#a64937a5adc8041247f7007882224e225" title=" " alt="" coords="289,107,418,132"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="232,117,274,117,274,122,232,122"/>
+<area shape="rect" id="Node000005" href="$classsysio_1_1vm_1_1span.html#a584ee0404e01edf225142e86d23d6d7d" title=" " alt="" coords="280,156,426,182"/>
+<area shape="poly" id="edge6_Node000001_Node000005" title=" " alt="" coords="219,138,275,150,273,155,218,143"/>
+<area shape="rect" id="Node000006" href="$namespacefc_1_1raw.html#a0b442d98ceb22dd5a6ae84745e43ffab" title=" " alt="" coords="298,229,409,255"/>
+<area shape="poly" id="edge7_Node000001_Node000006" title=" " alt="" coords="160,138,315,219,312,224,158,143"/>
+<area shape="poly" id="edge3_Node000003_Node000003" title=" " alt="" coords="495,82,489,73,493,63,504,57,524,55,544,57,555,64,553,68,543,62,524,60,506,62,497,67,494,72,499,80"/>
+<area shape="poly" id="edge5_Node000004_Node000003" title=" " alt="" coords="418,107,459,101,460,106,418,113"/>
+<area shape="poly" id="edge8_Node000006_Node000006" title=" " alt="" coords="324,230,319,221,322,211,334,205,353,203,374,205,385,212,382,216,372,210,353,208,336,210,326,215,324,220,329,228"/>
+</map>

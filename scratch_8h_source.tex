@@ -1,0 +1,37 @@
+\doxysection{scratch.\+h}
+\hypertarget{scratch_8h_source}{}\label{scratch_8h_source}\index{libraries/fc/secp256k1/secp256k1/src/scratch.h@{libraries/fc/secp256k1/secp256k1/src/scratch.h}}
+\mbox{\hyperlink{scratch_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{scratch_8h_source_l00001}00001\ \textcolor{comment}{/***********************************************************************}}
+\DoxyCodeLine{\Hypertarget{scratch_8h_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2017\ Andrew\ Poelstra\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{scratch_8h_source_l00003}00003\ \textcolor{comment}{\ *\ Distributed\ under\ the\ MIT\ software\ license,\ see\ the\ accompanying\ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{scratch_8h_source_l00004}00004\ \textcolor{comment}{\ *\ file\ COPYING\ or\ https://www.opensource.org/licenses/mit-\/license.php.*}}
+\DoxyCodeLine{\Hypertarget{scratch_8h_source_l00005}00005\ \textcolor{comment}{\ ***********************************************************************/}}
+\DoxyCodeLine{\Hypertarget{scratch_8h_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{scratch_8h_source_l00007}00007\ \textcolor{preprocessor}{\#ifndef\ SECP256K1\_SCRATCH\_H}}
+\DoxyCodeLine{\Hypertarget{scratch_8h_source_l00008}00008\ \textcolor{preprocessor}{\#define\ SECP256K1\_SCRATCH\_H}}
+\DoxyCodeLine{\Hypertarget{scratch_8h_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{scratch_8h_source_l00010}00010\ \textcolor{comment}{/*\ The\ typedef\ is\ used\ internally;\ the\ struct\ name\ is\ used\ in\ the\ public\ API}}
+\DoxyCodeLine{\Hypertarget{scratch_8h_source_l00011}00011\ \textcolor{comment}{\ *\ (where\ it\ is\ exposed\ as\ a\ different\ typedef)\ */}}
+\DoxyCodeLine{\Hypertarget{scratch_8h_source_l00012}\mbox{\hyperlink{structsecp256k1__scratch__space__struct}{00012}}\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structsecp256k1__scratch__space__struct}{secp256k1\_scratch\_space\_struct}}\ \{}
+\DoxyCodeLine{\Hypertarget{scratch_8h_source_l00014}\mbox{\hyperlink{structsecp256k1__scratch__space__struct_a794b94d27e06cc8ece235e3baaa68240}{00014}}\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{structsecp256k1__scratch__space__struct_a794b94d27e06cc8ece235e3baaa68240}{magic}}[8];}
+\DoxyCodeLine{\Hypertarget{scratch_8h_source_l00016}\mbox{\hyperlink{structsecp256k1__scratch__space__struct_a411d4fd1980301bb2e3a7d0f83eeba47}{00016}}\ \ \ \ \ \textcolor{keywordtype}{void}\ *\mbox{\hyperlink{structsecp256k1__scratch__space__struct_a411d4fd1980301bb2e3a7d0f83eeba47}{data}};}
+\DoxyCodeLine{\Hypertarget{scratch_8h_source_l00019}\mbox{\hyperlink{structsecp256k1__scratch__space__struct_a1a7fd762172b1d5455223d4c33a596f9}{00019}}\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{structsecp256k1__scratch__space__struct_a1a7fd762172b1d5455223d4c33a596f9}{alloc\_size}};}
+\DoxyCodeLine{\Hypertarget{scratch_8h_source_l00021}\mbox{\hyperlink{structsecp256k1__scratch__space__struct_a1f2a8df08845fcbfea507f9b65142401}{00021}}\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{structsecp256k1__scratch__space__struct_a1f2a8df08845fcbfea507f9b65142401}{max\_size}};}
+\DoxyCodeLine{\Hypertarget{scratch_8h_source_l00022}\mbox{\hyperlink{scratch_8h_a84bdf30f4ca993587d89471cf1ae8be7}{00022}}\ \}\ \mbox{\hyperlink{scratch_8h_a84bdf30f4ca993587d89471cf1ae8be7}{secp256k1\_scratch}};}
+\DoxyCodeLine{\Hypertarget{scratch_8h_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{scratch_8h_source_l00024}00024\ \textcolor{keyword}{static}\ \mbox{\hyperlink{structsecp256k1__scratch__space__struct}{secp256k1\_scratch}}*\ secp256k1\_scratch\_create(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__callback}{secp256k1\_callback}}*\ error\_callback,\ \textcolor{keywordtype}{size\_t}\ max\_size);}
+\DoxyCodeLine{\Hypertarget{scratch_8h_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{scratch_8h_source_l00026}00026\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_scratch\_destroy(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__callback}{secp256k1\_callback}}*\ error\_callback,\ \mbox{\hyperlink{structsecp256k1__scratch__space__struct}{secp256k1\_scratch}}*\ scratch);}
+\DoxyCodeLine{\Hypertarget{scratch_8h_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{scratch_8h_source_l00030}00030\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{size\_t}\ secp256k1\_scratch\_checkpoint(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__callback}{secp256k1\_callback}}*\ error\_callback,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scratch__space__struct}{secp256k1\_scratch}}*\ scratch);}
+\DoxyCodeLine{\Hypertarget{scratch_8h_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{scratch_8h_source_l00034}00034\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_scratch\_apply\_checkpoint(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__callback}{secp256k1\_callback}}*\ error\_callback,\ \mbox{\hyperlink{structsecp256k1__scratch__space__struct}{secp256k1\_scratch}}*\ scratch,\ \textcolor{keywordtype}{size\_t}\ checkpoint);}
+\DoxyCodeLine{\Hypertarget{scratch_8h_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{scratch_8h_source_l00037}00037\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{size\_t}\ secp256k1\_scratch\_max\_allocation(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__callback}{secp256k1\_callback}}*\ error\_callback,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scratch__space__struct}{secp256k1\_scratch}}*\ scratch,\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a351300ca15aa70c149f1301f89bcbe9b}{n\_objects}});}
+\DoxyCodeLine{\Hypertarget{scratch_8h_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{scratch_8h_source_l00040}00040\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ *secp256k1\_scratch\_alloc(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__callback}{secp256k1\_callback}}*\ error\_callback,\ \mbox{\hyperlink{structsecp256k1__scratch__space__struct}{secp256k1\_scratch}}*\ scratch,\ \textcolor{keywordtype}{size\_t}\ n);}
+\DoxyCodeLine{\Hypertarget{scratch_8h_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{scratch_8h_source_l00042}00042\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

@@ -1,0 +1,51 @@
+\doxysection{libraries/sys-\/vm/external/softfloat/source/s\+\_\+norm\+Ext\+F80\+SigM.c File Reference}
+\hypertarget{sys-vm_2external_2softfloat_2source_2s__norm_ext_f80_sig_m_8c}{}\label{sys-vm_2external_2softfloat_2source_2s__norm_ext_f80_sig_m_8c}\index{libraries/sys-\/vm/external/softfloat/source/s\_normExtF80SigM.c@{libraries/sys-\/vm/external/softfloat/source/s\_normExtF80SigM.c}}
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include "{}platform.\+h"{}}\newline
+{\ttfamily \#include "{}internals.\+h"{}}\newline
+Include dependency graph for s\+\_\+norm\+Ext\+F80\+Sig\+M.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=317pt]{sys-vm_2external_2softfloat_2source_2s__norm_ext_f80_sig_m_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2s__norm_ext_f80_sig_m_8c_ab73bb43a318bc3d5545a502f56021396}{softfloat\+\_\+norm\+Ext\+F80\+SigM}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \texorpdfstring{$\ast$}{*}sig\+Ptr)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{sys-vm_2external_2softfloat_2source_2s__norm_ext_f80_sig_m_8c_ab73bb43a318bc3d5545a502f56021396}\index{s\_normExtF80SigM.c@{s\_normExtF80SigM.c}!softfloat\_normExtF80SigM@{softfloat\_normExtF80SigM}}
+\index{softfloat\_normExtF80SigM@{softfloat\_normExtF80SigM}!s\_normExtF80SigM.c@{s\_normExtF80SigM.c}}
+\doxysubsubsection{\texorpdfstring{softfloat\_normExtF80SigM()}{softfloat\_normExtF80SigM()}}
+{\footnotesize\ttfamily \label{sys-vm_2external_2softfloat_2source_2s__norm_ext_f80_sig_m_8c_ab73bb43a318bc3d5545a502f56021396} 
+int softfloat\+\_\+norm\+Ext\+F80\+SigM (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{sig\+Ptr}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2s__norm_ext_f80_sig_m_8c_source_l00041}{41}} of file \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2s__norm_ext_f80_sig_m_8c_source}{s\+\_\+norm\+Ext\+F80\+Sig\+M.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00042\ \{}
+\DoxyCodeLine{00043\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ sig;}
+\DoxyCodeLine{00044\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a880ed9ceb8621521452c81d03bd08cfb}{int\_fast8\_t}}\ shiftDist;}
+\DoxyCodeLine{00045\ }
+\DoxyCodeLine{00046\ \ \ \ \ sig\ =\ *sigPtr;}
+\DoxyCodeLine{00047\ \ \ \ \ shiftDist\ =\ \mbox{\hyperlink{softfloat_2source_2s__count_leading_zeros64_8c_aa7f029cdc05ad078461581da52b91bef}{softfloat\_countLeadingZeros64}}(\ sig\ );}
+\DoxyCodeLine{00048\ \ \ \ \ *sigPtr\ =\ sig<<shiftDist;}
+\DoxyCodeLine{00049\ \ \ \ \ \textcolor{keywordflow}{return}\ -\/shiftDist;}
+\DoxyCodeLine{00050\ }
+\DoxyCodeLine{00051\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sys-vm_2external_2softfloat_2source_2s__norm_ext_f80_sig_m_8c_ab73bb43a318bc3d5545a502f56021396_icgraph}
+\end{center}
+\end{figure}

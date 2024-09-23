@@ -1,0 +1,216 @@
+\doxysection{libraries/fc/secp256k1/secp256k1/src/bench.c File Reference}
+\hypertarget{bench_8c}{}\label{bench_8c}\index{libraries/fc/secp256k1/secp256k1/src/bench.c@{libraries/fc/secp256k1/secp256k1/src/bench.c}}
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include "{}../include/secp256k1.\+h"{}}\newline
+{\ttfamily \#include "{}util.\+h"{}}\newline
+{\ttfamily \#include "{}bench.\+h"{}}\newline
+Include dependency graph for bench.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{bench_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structbench__verify__data}{bench\+\_\+verify\+\_\+data}}
+\item 
+struct \mbox{\hyperlink{structbench__sign__data}{bench\+\_\+sign\+\_\+data}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{bench_8c_afbf64c5800dd79a07f48d4efc37c4262}{help}} (int default\+\_\+iters)
+\item 
+int \mbox{\hyperlink{bench_8c_a3c04138a5bfe5d72780bb7e82a18e627}{main}} (int argc, char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{bench_8c_afbf64c5800dd79a07f48d4efc37c4262}\index{bench.c@{bench.c}!help@{help}}
+\index{help@{help}!bench.c@{bench.c}}
+\doxysubsubsection{\texorpdfstring{help()}{help()}}
+{\footnotesize\ttfamily \label{bench_8c_afbf64c5800dd79a07f48d4efc37c4262} 
+void help (\begin{DoxyParamCaption}\item[{int}]{default\+\_\+iters}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bench_8c_source_l00014}{14}} of file \mbox{\hyperlink{bench_8c_source}{bench.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00014\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00015\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Benchmarks\ the\ following\ algorithms:\(\backslash\)n"{}});}
+\DoxyCodeLine{00016\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\ \ \ \ -\/\ ECDSA\ signing/verification\(\backslash\)n"{}});}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#ifdef\ ENABLE\_MODULE\_ECDH}}
+\DoxyCodeLine{00019\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\ \ \ \ -\/\ ECDH\ key\ exchange\ (optional\ module)\(\backslash\)n"{}});}
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00021\ }
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#ifdef\ ENABLE\_MODULE\_RECOVERY}}
+\DoxyCodeLine{00023\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\ \ \ \ -\/\ Public\ key\ recovery\ (optional\ module)\(\backslash\)n"{}});}
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \textcolor{preprocessor}{\#ifdef\ ENABLE\_MODULE\_SCHNORRSIG}}
+\DoxyCodeLine{00027\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\ \ \ \ -\/\ Schnorr\ signatures\ (optional\ module)\(\backslash\)n"{}});}
+\DoxyCodeLine{00028\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00029\ }
+\DoxyCodeLine{00030\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{00031\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}The\ default\ number\ of\ iterations\ for\ each\ benchmark\ is\ \%d.\ This\ can\ be\(\backslash\)n"{}},\ default\_iters);}
+\DoxyCodeLine{00032\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}customized\ using\ the\ SECP256K1\_BENCH\_ITERS\ environment\ variable.\(\backslash\)n"{}});}
+\DoxyCodeLine{00033\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{00034\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Usage:\ ./bench\ [args]\(\backslash\)n"{}});}
+\DoxyCodeLine{00035\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}By\ default,\ all\ benchmarks\ will\ be\ run.\(\backslash\)n"{}});}
+\DoxyCodeLine{00036\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}args:\(\backslash\)n"{}});}
+\DoxyCodeLine{00037\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\ \ \ \ help\ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ display\ this\ help\ and\ exit\(\backslash\)n"{}});}
+\DoxyCodeLine{00038\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\ \ \ \ ecdsa\ \ \ \ \ \ \ \ \ \ \ \ \ :\ all\ ECDSA\ algorithms-\/-\/sign,\ verify,\ recovery\ (if\ enabled)\(\backslash\)n"{}});}
+\DoxyCodeLine{00039\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\ \ \ \ ecdsa\_sign\ \ \ \ \ \ \ \ :\ ECDSA\ siging\ algorithm\(\backslash\)n"{}});}
+\DoxyCodeLine{00040\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\ \ \ \ ecdsa\_verify\ \ \ \ \ \ :\ ECDSA\ verification\ algorithm\(\backslash\)n"{}});}
+\DoxyCodeLine{00041\ }
+\DoxyCodeLine{00042\ \textcolor{preprocessor}{\#ifdef\ ENABLE\_MODULE\_RECOVERY}}
+\DoxyCodeLine{00043\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\ \ \ \ ecdsa\_recover\ \ \ \ \ :\ ECDSA\ public\ key\ recovery\ algorithm\(\backslash\)n"{}});}
+\DoxyCodeLine{00044\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00045\ }
+\DoxyCodeLine{00046\ \textcolor{preprocessor}{\#ifdef\ ENABLE\_MODULE\_ECDH}}
+\DoxyCodeLine{00047\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\ \ \ \ ecdh\ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ ECDH\ key\ exchange\ algorithm\(\backslash\)n"{}});}
+\DoxyCodeLine{00048\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00049\ }
+\DoxyCodeLine{00050\ \textcolor{preprocessor}{\#ifdef\ ENABLE\_MODULE\_SCHNORRSIG}}
+\DoxyCodeLine{00051\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\ \ \ \ schnorrsig\ \ \ \ \ \ \ \ :\ all\ Schnorr\ signature\ algorithms\ (sign,\ verify)\(\backslash\)n"{}});}
+\DoxyCodeLine{00052\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\ \ \ \ schnorrsig\_sign\ \ \ :\ Schnorr\ sigining\ algorithm\(\backslash\)n"{}});}
+\DoxyCodeLine{00053\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\ \ \ \ schnorrsig\_verify\ :\ Schnorr\ verification\ algorithm\(\backslash\)n"{}});}
+\DoxyCodeLine{00054\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00055\ }
+\DoxyCodeLine{00056\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{00057\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=187pt]{bench_8c_afbf64c5800dd79a07f48d4efc37c4262_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{bench_8c_a3c04138a5bfe5d72780bb7e82a18e627}\index{bench.c@{bench.c}!main@{main}}
+\index{main@{main}!bench.c@{bench.c}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{bench_8c_a3c04138a5bfe5d72780bb7e82a18e627} 
+int main (\begin{DoxyParamCaption}\item[{int}]{argc}{, }\item[{char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{argv}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bench_8c_source_l00136}{136}} of file \mbox{\hyperlink{bench_8c_source}{bench.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00137\ \ \ \ \ \textcolor{keywordtype}{int}\ i;}
+\DoxyCodeLine{00138\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__pubkey}{secp256k1\_pubkey}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}};}
+\DoxyCodeLine{00139\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__ecdsa__signature}{secp256k1\_ecdsa\_signature}}\ sig;}
+\DoxyCodeLine{00140\ \ \ \ \ \mbox{\hyperlink{structbench__verify__data}{bench\_verify\_data}}\ data;}
+\DoxyCodeLine{00141\ }
+\DoxyCodeLine{00142\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ =\ argc\ ==\ 1;}
+\DoxyCodeLine{00143\ \ \ \ \ \textcolor{keywordtype}{int}\ default\_iters\ =\ 20000;}
+\DoxyCodeLine{00144\ \ \ \ \ \textcolor{keywordtype}{int}\ iters\ =\ \mbox{\hyperlink{bench_8h_a451eb25db60dd3d4abedc8a41aecd204}{get\_iters}}(default\_iters);}
+\DoxyCodeLine{00145\ }
+\DoxyCodeLine{00146\ \ \ \ \ \textcolor{comment}{/*\ Check\ for\ invalid\ user\ arguments\ */}}
+\DoxyCodeLine{00147\ \ \ \ \ \textcolor{keywordtype}{char}*\ valid\_args[]\ =\ \{\textcolor{stringliteral}{"{}ecdsa"{}},\ \textcolor{stringliteral}{"{}verify"{}},\ \textcolor{stringliteral}{"{}ecdsa\_verify"{}},\ \textcolor{stringliteral}{"{}sign"{}},\ \textcolor{stringliteral}{"{}ecdsa\_sign"{}},\ \textcolor{stringliteral}{"{}ecdh"{}},\ \textcolor{stringliteral}{"{}recover"{}},}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}ecdsa\_recover"{}},\ \textcolor{stringliteral}{"{}schnorrsig"{}},\ \textcolor{stringliteral}{"{}schnorrsig\_verify"{}},\ \textcolor{stringliteral}{"{}schnorrsig\_sign"{}}\};}
+\DoxyCodeLine{00149\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ valid\_args\_size\ =\ \textcolor{keyword}{sizeof}(valid\_args)/\textcolor{keyword}{sizeof}(valid\_args[0]);}
+\DoxyCodeLine{00150\ \ \ \ \ \textcolor{keywordtype}{int}\ invalid\_args\ =\ \mbox{\hyperlink{bench_8h_a8e26ecdf7f0d912f5b7b017794b603bc}{have\_invalid\_args}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ valid\_args,\ valid\_args\_size);}
+\DoxyCodeLine{00151\ }
+\DoxyCodeLine{00152\ \ \ \ \ \textcolor{keywordflow}{if}\ (argc\ >\ 1)\ \{}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}-\/h"{}})}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \ \ \ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}-\/-\/help"{}})}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \ \ \ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}help"{}}))\ \{}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bench_8c_afbf64c5800dd79a07f48d4efc37c4262}{help}}(default\_iters);}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (invalid\_args)\ \{}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}./bench:\ unrecognized\ argument.\(\backslash\)n\(\backslash\)n"{}});}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bench_8c_afbf64c5800dd79a07f48d4efc37c4262}{help}}(default\_iters);}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00163\ \ \ \ \ \}}
+\DoxyCodeLine{00164\ }
+\DoxyCodeLine{00165\ \textcolor{comment}{/*\ Check\ if\ the\ user\ tries\ to\ benchmark\ optional\ module\ without\ building\ it\ */}}
+\DoxyCodeLine{00166\ \textcolor{preprocessor}{\#ifndef\ ENABLE\_MODULE\_ECDH}}
+\DoxyCodeLine{00167\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}ecdh"{}}))\ \{\ }
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}./bench:\ ECDH\ module\ not\ enabled.\(\backslash\)n"{}});}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Use\ ./configure\ -\/-\/enable-\/module-\/ecdh.\(\backslash\)n\(\backslash\)n"{}});}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{00171\ \ \ \ \ \}}
+\DoxyCodeLine{00172\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00173\ }
+\DoxyCodeLine{00174\ \textcolor{preprocessor}{\#ifndef\ ENABLE\_MODULE\_RECOVERY}}
+\DoxyCodeLine{00175\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}recover"{}})\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}ecdsa\_recover"{}}))\ \{\ }
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}./bench:\ Public\ key\ recovery\ module\ not\ enabled.\(\backslash\)n"{}});}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Use\ ./configure\ -\/-\/enable-\/module-\/recovery.\(\backslash\)n\(\backslash\)n"{}});}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{00179\ \ \ \ \ \}}
+\DoxyCodeLine{00180\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00181\ }
+\DoxyCodeLine{00182\ \textcolor{preprocessor}{\#ifndef\ ENABLE\_MODULE\_SCHNORRSIG}}
+\DoxyCodeLine{00183\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}schnorrsig"{}})\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}schnorrsig\_sign"{}})\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}schnorrsig\_verify"{}}))\ \{\ }
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}./bench:\ Schnorr\ signatures\ module\ not\ enabled.\(\backslash\)n"{}});}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Use\ ./configure\ -\/-\/enable-\/module-\/schnorrsig.\(\backslash\)n\(\backslash\)n"{}});}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{00187\ \ \ \ \ \}}
+\DoxyCodeLine{00188\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00189\ }
+\DoxyCodeLine{00190\ \ \ \ \ \textcolor{comment}{/*\ ECDSA\ verification\ benchmark\ */}}
+\DoxyCodeLine{00191\ \ \ \ \ data.ctx\ =\ \mbox{\hyperlink{secp256k1_8h_a3aaa9fcc3ab67bc8f841779a049069c5}{secp256k1\_context\_create}}(\mbox{\hyperlink{secp256k1_8h_a0d34fe6baa73d3145f2e376e43de0b15}{SECP256K1\_CONTEXT\_SIGN}}\ |\ \mbox{\hyperlink{secp256k1_8h_add20a6c320e247ca7bd524cbc4259d64}{SECP256K1\_CONTEXT\_VERIFY}});}
+\DoxyCodeLine{00192\ }
+\DoxyCodeLine{00193\ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ 32;\ i++)\ \{}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ data.msg[i]\ =\ 1\ +\ i;}
+\DoxyCodeLine{00195\ \ \ \ \ \}}
+\DoxyCodeLine{00196\ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ 32;\ i++)\ \{}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ data.key[i]\ =\ 33\ +\ i;}
+\DoxyCodeLine{00198\ \ \ \ \ \}}
+\DoxyCodeLine{00199\ \ \ \ \ data.siglen\ =\ 72;}
+\DoxyCodeLine{00200\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{secp256k1_8h_a4185cc9a9de502e52cfe5350f7dc8438}{secp256k1\_ecdsa\_sign}}(data.ctx,\ \&sig,\ data.msg,\ data.key,\ NULL,\ NULL));}
+\DoxyCodeLine{00201\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{secp256k1_8h_ac07809ca872ec967ab4d3b1a95eafe0b}{secp256k1\_ecdsa\_signature\_serialize\_der}}(data.ctx,\ data.sig,\ \&data.siglen,\ \&sig));}
+\DoxyCodeLine{00202\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{secp256k1_8h_a7438071aa8a6dc4697abe4f4659f2161}{secp256k1\_ec\_pubkey\_create}}(data.ctx,\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}},\ data.key));}
+\DoxyCodeLine{00203\ \ \ \ \ data.pubkeylen\ =\ 33;}
+\DoxyCodeLine{00204\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{secp256k1_8h_a34977bf00322e510e881160c421836d7}{secp256k1\_ec\_pubkey\_serialize}}(data.ctx,\ data.pubkey,\ \&data.pubkeylen,\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}},\ \mbox{\hyperlink{secp256k1_8h_a7b8f642c65e8b5c81fa4421b7c42ab57}{SECP256K1\_EC\_COMPRESSED}})\ ==\ 1);}
+\DoxyCodeLine{00205\ }
+\DoxyCodeLine{00206\ \ \ \ \ \mbox{\hyperlink{bench_8h_a02fea1a81d22421b858db710e6850482}{print\_output\_table\_header\_row}}();}
+\DoxyCodeLine{00207\ \ \ \ \ \textcolor{keywordflow}{if}\ (d\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}ecdsa"{}})\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}verify"{}})\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}ecdsa\_verify"{}}))\ \mbox{\hyperlink{bench_8h_aabcd2ce2b43c96bd396b30f8ecb79a17}{run\_benchmark}}(\textcolor{stringliteral}{"{}ecdsa\_verify"{}},\ bench\_verify,\ NULL,\ NULL,\ \&data,\ 10,\ iters);}
+\DoxyCodeLine{00208\ }
+\DoxyCodeLine{00209\ \ \ \ \ \mbox{\hyperlink{secp256k1_8h_a026db914e3723531825ecf25a0cbd699}{secp256k1\_context\_destroy}}(data.ctx);}
+\DoxyCodeLine{00210\ }
+\DoxyCodeLine{00211\ \ \ \ \ \textcolor{comment}{/*\ ECDSA\ signing\ benchmark\ */}}
+\DoxyCodeLine{00212\ \ \ \ \ data.ctx\ =\ \mbox{\hyperlink{secp256k1_8h_a3aaa9fcc3ab67bc8f841779a049069c5}{secp256k1\_context\_create}}(\mbox{\hyperlink{secp256k1_8h_a0d34fe6baa73d3145f2e376e43de0b15}{SECP256K1\_CONTEXT\_SIGN}});}
+\DoxyCodeLine{00213\ }
+\DoxyCodeLine{00214\ \ \ \ \ \textcolor{keywordflow}{if}\ (d\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}ecdsa"{}})\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}sign"{}})\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}ecdsa\_sign"{}}))\ \mbox{\hyperlink{bench_8h_aabcd2ce2b43c96bd396b30f8ecb79a17}{run\_benchmark}}(\textcolor{stringliteral}{"{}ecdsa\_sign"{}},\ bench\_sign\_run,\ bench\_sign\_setup,\ NULL,\ \&data,\ 10,\ iters);}
+\DoxyCodeLine{00215\ }
+\DoxyCodeLine{00216\ \ \ \ \ \mbox{\hyperlink{secp256k1_8h_a026db914e3723531825ecf25a0cbd699}{secp256k1\_context\_destroy}}(data.ctx);}
+\DoxyCodeLine{00217\ }
+\DoxyCodeLine{00218\ \textcolor{preprocessor}{\#ifdef\ ENABLE\_MODULE\_ECDH}}
+\DoxyCodeLine{00219\ \ \ \ \ \textcolor{comment}{/*\ ECDH\ benchmarks\ */}}
+\DoxyCodeLine{00220\ \ \ \ \ \mbox{\hyperlink{ecdh_2bench__impl_8h_a1eef60b8d94696b31bdaea3e0469e687}{run\_ecdh\_bench}}(iters,\ argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}});}
+\DoxyCodeLine{00221\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00222\ }
+\DoxyCodeLine{00223\ \textcolor{preprocessor}{\#ifdef\ ENABLE\_MODULE\_RECOVERY}}
+\DoxyCodeLine{00224\ \ \ \ \ \textcolor{comment}{/*\ ECDSA\ recovery\ benchmarks\ */}}
+\DoxyCodeLine{00225\ \ \ \ \ \mbox{\hyperlink{recovery_2bench__impl_8h_afdec90f8eb6e571e672bdbca7a4b4e89}{run\_recovery\_bench}}(iters,\ argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}});}
+\DoxyCodeLine{00226\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00227\ }
+\DoxyCodeLine{00228\ \textcolor{preprocessor}{\#ifdef\ ENABLE\_MODULE\_SCHNORRSIG}}
+\DoxyCodeLine{00229\ \ \ \ \ \textcolor{comment}{/*\ Schnorr\ signature\ benchmarks\ */}}
+\DoxyCodeLine{00230\ \ \ \ \ \mbox{\hyperlink{schnorrsig_2bench__impl_8h_af4b484aa697df8bb3e5dff5c5b12f06b}{run\_schnorrsig\_bench}}(iters,\ argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}});}
+\DoxyCodeLine{00231\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00232\ }
+\DoxyCodeLine{00233\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00234\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{bench_8c_a3c04138a5bfe5d72780bb7e82a18e627_cgraph}
+\end{center}
+\end{figure}

@@ -1,0 +1,240 @@
+\doxysection{libraries/fc/include/fc/tuple.hpp File Reference}
+\hypertarget{tuple_8hpp}{}\label{tuple_8hpp}\index{libraries/fc/include/fc/tuple.hpp@{libraries/fc/include/fc/tuple.hpp}}
+{\ttfamily \#include $<$fc/utility.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/preprocessor/repeat.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/preprocessor/repeat\+\_\+from\+\_\+to.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/preprocessor/repetition/enum\+\_\+binary\+\_\+params.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/preprocessor/repetition/enum\+\_\+params.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/preprocessor/repetition/enum.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/preprocessor/facilities/empty.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/preprocessor/repetition/enum\+\_\+params\+\_\+with\+\_\+a\+\_\+default.\+hpp$>$}\newline
+Include dependency graph for tuple.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{tuple_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=182pt]{tuple_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structfc_1_1tuple}{fc\+::tuple$<$$>$}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1tuple_3_4}{fc\+::tuple$<$$>$}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1is__tuple}{fc\+::is\+\_\+tuple$<$ T $>$}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacefc}{fc}}
+\begin{DoxyCompactList}\small\item\em namespace \doxylink{namespacesysio_1_1chain}{sysio\+::chain} \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{tuple_8hpp_a7e2ebda41c8466b8d61388ef4c140a3a}{RREF\+\_\+\+PARAMS}}(z,  n,  data)
+\item 
+\#define \mbox{\hyperlink{tuple_8hpp_a6f6c7a31d46de735a56450903a8bf8f9}{ILIST\+\_\+\+PARAMS}}(z,  n,  data)
+\item 
+\#define \mbox{\hyperlink{tuple_8hpp_ab578612c88e71b56628555504f3eba00}{ILIST\+\_\+\+PARAMS\+\_\+\+COPY}}(z,  n,  data)
+\item 
+\#define \mbox{\hyperlink{tuple_8hpp_aab299d755d5bfaa1f5b0421d3bca3db1}{VISIT\+\_\+\+PARAMS}}(z,  n,  data)
+\item 
+\#define \mbox{\hyperlink{tuple_8hpp_ab372230d60e407f3f12ffd9e66e2fc4e}{LIST\+\_\+\+MEMBERS\+\_\+\+ON}}(z,  n,  data)
+\item 
+\#define \mbox{\hyperlink{tuple_8hpp_accb1f2a16fccf01661573a51382eae28}{DEDUCE\+\_\+\+MEMBERS}}(z,  n,  data)
+\item 
+\#define \mbox{\hyperlink{tuple_8hpp_ac2128810268b6113798455a29e97f6ff}{FORWARD\+\_\+\+PARAMS}}(z,  n,  data)
+\item 
+\#define \mbox{\hyperlink{tuple_8hpp_a09413328dd3de551635fe37002c4a235}{MEM\+\_\+\+PARAMS}}(z,  n,  data)
+\item 
+\#define \mbox{\hyperlink{tuple_8hpp_afbaaa5289c806e9d0eb888d856549d5c}{TUPLE}}(z,  n,  unused)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename Functor $>$ }\\auto \mbox{\hyperlink{namespacefc_a2a978e7f69726042161a7971d3c6048f}{fc\+::call\+\_\+fused}} (Functor \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}, const \mbox{\hyperlink{structfc_1_1tuple}{tuple}}$<$$>$ \&t) -\/$>$ decltype(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}())
+\item 
+\mbox{\hyperlink{structfc_1_1tuple}{tuple}} \mbox{\hyperlink{namespacefc_afaa68c524abb39e1c66c9ed044806fb7}{fc\+::make\+\_\+tuple}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{tuple_8hpp_accb1f2a16fccf01661573a51382eae28}\index{tuple.hpp@{tuple.hpp}!DEDUCE\_MEMBERS@{DEDUCE\_MEMBERS}}
+\index{DEDUCE\_MEMBERS@{DEDUCE\_MEMBERS}!tuple.hpp@{tuple.hpp}}
+\doxysubsubsection{\texorpdfstring{DEDUCE\_MEMBERS}{DEDUCE\_MEMBERS}}
+{\footnotesize\ttfamily \label{tuple_8hpp_accb1f2a16fccf01661573a51382eae28} 
+\#define DEDUCE\+\_\+\+MEMBERS(\begin{DoxyParamCaption}\item[{}]{z}{, }\item[{}]{n}{, }\item[{}]{data}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{typename}\ \mbox{\hyperlink{structfc_1_1deduce}{fc::deduce}}<BOOST\_PP\_CAT(AA,n)>::type}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{tuple_8hpp_source_l00080}{80}} of file \mbox{\hyperlink{tuple_8hpp_source}{tuple.\+hpp}}.
+
+\Hypertarget{tuple_8hpp_ac2128810268b6113798455a29e97f6ff}\index{tuple.hpp@{tuple.hpp}!FORWARD\_PARAMS@{FORWARD\_PARAMS}}
+\index{FORWARD\_PARAMS@{FORWARD\_PARAMS}!tuple.hpp@{tuple.hpp}}
+\doxysubsubsection{\texorpdfstring{FORWARD\_PARAMS}{FORWARD\_PARAMS}}
+{\footnotesize\ttfamily \label{tuple_8hpp_ac2128810268b6113798455a29e97f6ff} 
+\#define FORWARD\+\_\+\+PARAMS(\begin{DoxyParamCaption}\item[{}]{z}{, }\item[{}]{n}{, }\item[{}]{data}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{fc::forward<BOOST\_PP\_CAT(AA,n)>(BOOST\_PP\_CAT(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},n))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{tuple_8hpp_source_l00081}{81}} of file \mbox{\hyperlink{tuple_8hpp_source}{tuple.\+hpp}}.
+
+\Hypertarget{tuple_8hpp_a6f6c7a31d46de735a56450903a8bf8f9}\index{tuple.hpp@{tuple.hpp}!ILIST\_PARAMS@{ILIST\_PARAMS}}
+\index{ILIST\_PARAMS@{ILIST\_PARAMS}!tuple.hpp@{tuple.hpp}}
+\doxysubsubsection{\texorpdfstring{ILIST\_PARAMS}{ILIST\_PARAMS}}
+{\footnotesize\ttfamily \label{tuple_8hpp_a6f6c7a31d46de735a56450903a8bf8f9} 
+\#define ILIST\+\_\+\+PARAMS(\begin{DoxyParamCaption}\item[{}]{z}{, }\item[{}]{n}{, }\item[{}]{data}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{BOOST\_PP\_CAT(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},n)(\ fc::forward<BOOST\_PP\_CAT(AA,n)>(\ BOOST\_PP\_CAT(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},n)\ )\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{tuple_8hpp_source_l00076}{76}} of file \mbox{\hyperlink{tuple_8hpp_source}{tuple.\+hpp}}.
+
+\Hypertarget{tuple_8hpp_ab578612c88e71b56628555504f3eba00}\index{tuple.hpp@{tuple.hpp}!ILIST\_PARAMS\_COPY@{ILIST\_PARAMS\_COPY}}
+\index{ILIST\_PARAMS\_COPY@{ILIST\_PARAMS\_COPY}!tuple.hpp@{tuple.hpp}}
+\doxysubsubsection{\texorpdfstring{ILIST\_PARAMS\_COPY}{ILIST\_PARAMS\_COPY}}
+{\footnotesize\ttfamily \label{tuple_8hpp_ab578612c88e71b56628555504f3eba00} 
+\#define ILIST\+\_\+\+PARAMS\+\_\+\+COPY(\begin{DoxyParamCaption}\item[{}]{z}{, }\item[{}]{n}{, }\item[{}]{data}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{BOOST\_PP\_CAT(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},n)(\ t.BOOST\_PP\_CAT(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},n)\ \ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{tuple_8hpp_source_l00077}{77}} of file \mbox{\hyperlink{tuple_8hpp_source}{tuple.\+hpp}}.
+
+\Hypertarget{tuple_8hpp_ab372230d60e407f3f12ffd9e66e2fc4e}\index{tuple.hpp@{tuple.hpp}!LIST\_MEMBERS\_ON@{LIST\_MEMBERS\_ON}}
+\index{LIST\_MEMBERS\_ON@{LIST\_MEMBERS\_ON}!tuple.hpp@{tuple.hpp}}
+\doxysubsubsection{\texorpdfstring{LIST\_MEMBERS\_ON}{LIST\_MEMBERS\_ON}}
+{\footnotesize\ttfamily \label{tuple_8hpp_ab372230d60e407f3f12ffd9e66e2fc4e} 
+\#define LIST\+\_\+\+MEMBERS\+\_\+\+ON(\begin{DoxyParamCaption}\item[{}]{z}{, }\item[{}]{n}{, }\item[{}]{data}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{data.BOOST\_PP\_CAT(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},n)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{tuple_8hpp_source_l00079}{79}} of file \mbox{\hyperlink{tuple_8hpp_source}{tuple.\+hpp}}.
+
+\Hypertarget{tuple_8hpp_a09413328dd3de551635fe37002c4a235}\index{tuple.hpp@{tuple.hpp}!MEM\_PARAMS@{MEM\_PARAMS}}
+\index{MEM\_PARAMS@{MEM\_PARAMS}!tuple.hpp@{tuple.hpp}}
+\doxysubsubsection{\texorpdfstring{MEM\_PARAMS}{MEM\_PARAMS}}
+{\footnotesize\ttfamily \label{tuple_8hpp_a09413328dd3de551635fe37002c4a235} 
+\#define MEM\+\_\+\+PARAMS(\begin{DoxyParamCaption}\item[{}]{z}{, }\item[{}]{n}{, }\item[{}]{data}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{BOOST\_PP\_CAT(\mbox{\hyperlink{namespace_a}{A}},n)\ BOOST\_PP\_CAT(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},n);}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{tuple_8hpp_source_l00082}{82}} of file \mbox{\hyperlink{tuple_8hpp_source}{tuple.\+hpp}}.
+
+\Hypertarget{tuple_8hpp_a7e2ebda41c8466b8d61388ef4c140a3a}\index{tuple.hpp@{tuple.hpp}!RREF\_PARAMS@{RREF\_PARAMS}}
+\index{RREF\_PARAMS@{RREF\_PARAMS}!tuple.hpp@{tuple.hpp}}
+\doxysubsubsection{\texorpdfstring{RREF\_PARAMS}{RREF\_PARAMS}}
+{\footnotesize\ttfamily \label{tuple_8hpp_a7e2ebda41c8466b8d61388ef4c140a3a} 
+\#define RREF\+\_\+\+PARAMS(\begin{DoxyParamCaption}\item[{}]{z}{, }\item[{}]{n}{, }\item[{}]{data}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{BOOST\_PP\_CAT(AA,n)\&\&\ BOOST\_PP\_CAT(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},n)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{tuple_8hpp_source_l00075}{75}} of file \mbox{\hyperlink{tuple_8hpp_source}{tuple.\+hpp}}.
+
+\Hypertarget{tuple_8hpp_afbaaa5289c806e9d0eb888d856549d5c}\index{tuple.hpp@{tuple.hpp}!TUPLE@{TUPLE}}
+\index{TUPLE@{TUPLE}!tuple.hpp@{tuple.hpp}}
+\doxysubsubsection{\texorpdfstring{TUPLE}{TUPLE}}
+{\footnotesize\ttfamily \label{tuple_8hpp_afbaaa5289c806e9d0eb888d856549d5c} 
+\#define TUPLE(\begin{DoxyParamCaption}\item[{}]{z}{, }\item[{}]{n}{, }\item[{}]{unused}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{tuple_8hpp_source_l00083}{83}} of file \mbox{\hyperlink{tuple_8hpp_source}{tuple.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00083\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#define\ TUPLE(z,n,unused)\ \(\backslash\)}}
+\DoxyCodeLine{00084\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ template<BOOST\_PP\_ENUM\_PARAMS(\ n,\ typename\ A)>\ \(\backslash\)}}
+\DoxyCodeLine{00085\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ struct\ tuple<BOOST\_PP\_ENUM\_PARAMS(n,A)>\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00086\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ enum\ size\_enum\ \{\ size\ =\ n\ \};\ \(\backslash\)}}
+\DoxyCodeLine{00087\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ template<BOOST\_PP\_ENUM\_PARAMS(\ n,\ typename\ AA)>\ \(\backslash\)}}
+\DoxyCodeLine{00088\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ explicit\ tuple(\ BOOST\_PP\_ENUM(n,\ RREF\_PARAMS,\ unused\ )\ )BOOST\_PP\_IF(n,:,BOOST\_PP\_EMPTY())BOOST\_PP\_ENUM(\ n,\ ILIST\_PARAMS,unused)\{\}\ \(\backslash\)}}
+\DoxyCodeLine{00089\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ tuple(\ const\ tuple\&\ t\ )BOOST\_PP\_IF(n,:,BOOST\_PP\_EMPTY())BOOST\_PP\_ENUM(\ n,\ ILIST\_PARAMS\_COPY,unused)\{\}\ \(\backslash\)}}
+\DoxyCodeLine{00090\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ tuple(\ tuple\&\&\ t\ )BOOST\_PP\_IF(n,:,BOOST\_PP\_EMPTY())BOOST\_PP\_ENUM(\ n,\ ILIST\_PARAMS\_COPY,unused)\{\}\ \(\backslash\)}}
+\DoxyCodeLine{00091\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ tuple()\{\}\(\backslash\)}}
+\DoxyCodeLine{00092\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ template<typename\ V>\(\backslash\)}}
+\DoxyCodeLine{00093\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ void\ visit(\ V\&\&\ v\ )\ \{\ BOOST\_PP\_REPEAT(n,VISIT\_PARAMS,a)\ \}\(\backslash\)}}
+\DoxyCodeLine{00094\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ template<typename\ V>\(\backslash\)}}
+\DoxyCodeLine{00095\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ void\ visit(\ V\&\&\ v\ )const\ \{\ BOOST\_PP\_REPEAT(n,VISIT\_PARAMS,a)\ \}\(\backslash\)}}
+\DoxyCodeLine{00096\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ BOOST\_PP\_REPEAT(n,MEM\_PARAMS,a)\ \(\backslash\)}}
+\DoxyCodeLine{00097\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \};\ \ \(\backslash\)}}
+\DoxyCodeLine{00098\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ template<BOOST\_PP\_ENUM\_PARAMS(\ n,\ typename\ AA)>\ \(\backslash\)}}
+\DoxyCodeLine{00099\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ tuple<BOOST\_PP\_ENUM\_PARAMS(n,AA)>\ make\_tuple(\ BOOST\_PP\_ENUM(\ n,\ RREF\_PARAMS,\ unused)\ )\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00100\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ return\ tuple<BOOST\_PP\_ENUM\_PARAMS(n,AA)>(\ BOOST\_PP\_ENUM(\ n,\ FORWARD\_PARAMS,unused\ )\ );\ \ \(\backslash\)}}
+\DoxyCodeLine{00101\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00102\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ template<typename\ Functor,\ BOOST\_PP\_ENUM\_PARAMS(n,typename\ AA)>\ \(\backslash\)}}
+\DoxyCodeLine{00103\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ auto\ call\_fused(\ Functor\ f,\ tuple<BOOST\_PP\_ENUM\_PARAMS(n,AA)>\&\ t\ )\ \ \(\backslash\)}}
+\DoxyCodeLine{00104\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ -\/>\ decltype(\ f(\ BOOST\_PP\_ENUM(\ n,\ LIST\_MEMBERS\_ON,\ t)\ )\ )\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00105\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ return\ f(\ BOOST\_PP\_ENUM(\ n,\ LIST\_MEMBERS\_ON,\ t)\ );\ \(\backslash\)}}
+\DoxyCodeLine{00106\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00107\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ template<typename\ Functor,\ BOOST\_PP\_ENUM\_PARAMS(n,typename\ AA)>\ \(\backslash\)}}
+\DoxyCodeLine{00108\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ auto\ call\_fused(\ Functor\ f,\ const\ tuple<BOOST\_PP\_ENUM\_PARAMS(n,AA)>\&\ t\ )\ \ \(\backslash\)}}
+\DoxyCodeLine{00109\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ -\/>\ decltype(\ f(\ BOOST\_PP\_ENUM(\ n,\ LIST\_MEMBERS\_ON,\ t)\ )\ )\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00110\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ return\ f(\ BOOST\_PP\_ENUM(\ n,\ LIST\_MEMBERS\_ON,\ t)\ );\ \(\backslash\)}}
+\DoxyCodeLine{00111\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00112\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ template<BOOST\_PP\_ENUM\_PARAMS(\ n,\ typename\ AA)>\ \(\backslash\)}}
+\DoxyCodeLine{00113\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ struct\ is\_tuple<fc::tuple<BOOST\_PP\_ENUM\_PARAMS(n,AA)>\ >\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00114\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ typedef\ fc::true\_type\ type;\ \(\backslash\)}}
+\DoxyCodeLine{00115\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \};\ \(\backslash\)}}
+\DoxyCodeLine{00116\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ template<BOOST\_PP\_ENUM\_PARAMS(\ n,\ typename\ AA)>\ \(\backslash\)}}
+\DoxyCodeLine{00117\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ struct\ deduce<fc::tuple<BOOST\_PP\_ENUM\_PARAMS(n,AA)>\ >\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00118\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ typedef\ fc::tuple<BOOST\_PP\_ENUM(\ n,\ DEDUCE\_MEMBERS,unused)>\ \ type;\ \(\backslash\)}}
+\DoxyCodeLine{00119\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \};\ }}
+
+\end{DoxyCode}
+\Hypertarget{tuple_8hpp_aab299d755d5bfaa1f5b0421d3bca3db1}\index{tuple.hpp@{tuple.hpp}!VISIT\_PARAMS@{VISIT\_PARAMS}}
+\index{VISIT\_PARAMS@{VISIT\_PARAMS}!tuple.hpp@{tuple.hpp}}
+\doxysubsubsection{\texorpdfstring{VISIT\_PARAMS}{VISIT\_PARAMS}}
+{\footnotesize\ttfamily \label{tuple_8hpp_aab299d755d5bfaa1f5b0421d3bca3db1} 
+\#define VISIT\+\_\+\+PARAMS(\begin{DoxyParamCaption}\item[{}]{z}{, }\item[{}]{n}{, }\item[{}]{data}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{v(BOOST\_PP\_CAT(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},n));}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{tuple_8hpp_source_l00078}{78}} of file \mbox{\hyperlink{tuple_8hpp_source}{tuple.\+hpp}}.
+

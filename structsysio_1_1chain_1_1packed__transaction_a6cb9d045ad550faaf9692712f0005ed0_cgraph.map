@@ -1,0 +1,8 @@
+<map id="sysio::chain::packed_transaction::get_prunable_size" name="sysio::chain::packed_transaction::get_prunable_size">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,22,211,62"/>
+<area shape="rect" id="Node000002" href="$namespacefc_1_1raw.html#a64937a5adc8041247f7007882224e225" title=" " alt="" coords="259,29,387,55"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="211,40,243,40,243,45,211,45"/>
+<area shape="rect" id="Node000003" href="$namespacefc_1_1raw.html#a3a18d8161aa5b4f4f02b6fcfdff5e5d1" title=" " alt="" coords="435,29,532,55"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="388,40,419,40,419,45,388,45"/>
+<area shape="poly" id="edge3_Node000003_Node000003" title=" " alt="" coords="456,30,451,21,454,11,465,5,484,3,503,5,514,12,511,16,501,10,484,8,467,10,458,15,456,20,461,28"/>
+</map>

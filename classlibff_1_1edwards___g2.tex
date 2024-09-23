@@ -1,0 +1,1199 @@
+\doxysection{libff\+::edwards\+\_\+\+G2 Class Reference}
+\hypertarget{classlibff_1_1edwards___g2}{}\label{classlibff_1_1edwards___g2}\index{libff::edwards\_G2@{libff::edwards\_G2}}
+
+
+{\ttfamily \#include $<$edwards\+\_\+g2.\+hpp$>$}
+
+
+
+Collaboration diagram for libff\+::edwards\+\_\+\+G2\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classlibff_1_1edwards___g2__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{namespacelibff_a2653629483aeb0df51eec08cb6635343}{edwards\+\_\+\+Fq}} \mbox{\hyperlink{classlibff_1_1edwards___g2_a0e3b859851eae923f04a656de6def101}{base\+\_\+field}}
+\item 
+typedef \mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\+\_\+\+Fq3}} \mbox{\hyperlink{classlibff_1_1edwards___g2_ad267d433335ebed33c7d2014890740b1}{twist\+\_\+field}}
+\item 
+typedef \mbox{\hyperlink{namespacelibff_ab8734750fbf545572c63fa96171f7caf}{edwards\+\_\+\+Fr}} \mbox{\hyperlink{classlibff_1_1edwards___g2_a5cb092cc7be26019e292d0a66ecf700c}{scalar\+\_\+field}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classlibff_1_1edwards___g2_a9a1543d44a8cc4c13466982853492a81}{edwards\+\_\+\+G2}} ()
+\item 
+\mbox{\hyperlink{classlibff_1_1edwards___g2_a48db981cd43a807e29186196ec3b5c5a}{edwards\+\_\+\+G2}} (const \mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\+\_\+\+Fq3}} \&\mbox{\hyperlink{lib_8h_a3f9003cfa8b6fa038820ae2e2e077ffa}{X}}, const \mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\+\_\+\+Fq3}} \&\mbox{\hyperlink{classlibff_1_1edwards___g2_ab5e61fc3b52c5edfcbff48644dfbd52d}{Y}})
+\item 
+void \mbox{\hyperlink{classlibff_1_1edwards___g2_a918594a8c818343b81e655364d78433e}{print}} () const
+\item 
+void \mbox{\hyperlink{classlibff_1_1edwards___g2_ab95e2dc0afd6b5f94da33981d59e7135}{print\+\_\+coordinates}} () const
+\item 
+void \mbox{\hyperlink{classlibff_1_1edwards___g2_aaa060f954066d8f17360bd4240625699}{to\+\_\+affine\+\_\+coordinates}} ()
+\item 
+void \mbox{\hyperlink{classlibff_1_1edwards___g2_ab19394b08c865bbed1742a9ab42f7d6c}{to\+\_\+special}} ()
+\item 
+bool \mbox{\hyperlink{classlibff_1_1edwards___g2_af9990d40084f2e37f0ee5e66867be5a3}{is\+\_\+special}} () const
+\item 
+bool \mbox{\hyperlink{classlibff_1_1edwards___g2_af4c09f5488ce09b7cc0d6f7bed0ce8d5}{is\+\_\+zero}} () const
+\item 
+bool \mbox{\hyperlink{classlibff_1_1edwards___g2_a373d2e84e67e95ccb557f04156675fb0}{operator==}} (const \mbox{\hyperlink{classlibff_1_1edwards___g2}{edwards\+\_\+\+G2}} \&other) const
+\item 
+bool \mbox{\hyperlink{classlibff_1_1edwards___g2_a28352a1723a3e81214a9a166342c7c91}{operator!=}} (const \mbox{\hyperlink{classlibff_1_1edwards___g2}{edwards\+\_\+\+G2}} \&other) const
+\item 
+\mbox{\hyperlink{classlibff_1_1edwards___g2}{edwards\+\_\+\+G2}} \mbox{\hyperlink{classlibff_1_1edwards___g2_abaabf21b1e89488fd1a8384c1e6b8ba0}{operator+}} (const \mbox{\hyperlink{classlibff_1_1edwards___g2}{edwards\+\_\+\+G2}} \&other) const
+\item 
+\mbox{\hyperlink{classlibff_1_1edwards___g2}{edwards\+\_\+\+G2}} \mbox{\hyperlink{classlibff_1_1edwards___g2_a526a9e1d60dfd8c2fc4cb3f6b0875ed3}{operator-\/}} () const
+\item 
+\mbox{\hyperlink{classlibff_1_1edwards___g2}{edwards\+\_\+\+G2}} \mbox{\hyperlink{classlibff_1_1edwards___g2_af4571d7a8921a8138cdebbc70ad7ea7f}{operator-\/}} (const \mbox{\hyperlink{classlibff_1_1edwards___g2}{edwards\+\_\+\+G2}} \&other) const
+\item 
+\mbox{\hyperlink{classlibff_1_1edwards___g2}{edwards\+\_\+\+G2}} \mbox{\hyperlink{classlibff_1_1edwards___g2_a3c25bc071fed41abba3d78eb0ab5517a}{add}} (const \mbox{\hyperlink{classlibff_1_1edwards___g2}{edwards\+\_\+\+G2}} \&other) const
+\item 
+\mbox{\hyperlink{classlibff_1_1edwards___g2}{edwards\+\_\+\+G2}} \mbox{\hyperlink{classlibff_1_1edwards___g2_aa200e9023af1e09e337163b89ea1a927}{mixed\+\_\+add}} (const \mbox{\hyperlink{classlibff_1_1edwards___g2}{edwards\+\_\+\+G2}} \&other) const
+\item 
+\mbox{\hyperlink{classlibff_1_1edwards___g2}{edwards\+\_\+\+G2}} \mbox{\hyperlink{classlibff_1_1edwards___g2_a0a95a0c7b0fe95d1d58fe1531f8436a8}{dbl}} () const
+\item 
+\mbox{\hyperlink{classlibff_1_1edwards___g2}{edwards\+\_\+\+G2}} \mbox{\hyperlink{classlibff_1_1edwards___g2_aee4d8db67e923cbbd7c49048b9d570e6}{mul\+\_\+by\+\_\+q}} () const
+\item 
+bool \mbox{\hyperlink{classlibff_1_1edwards___g2_a1f0fbfce0cc0029563b412255a28b98e}{is\+\_\+well\+\_\+formed}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static \mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\+\_\+\+Fq3}} \mbox{\hyperlink{classlibff_1_1edwards___g2_aa623283cb479983656793b7c4bf999b6}{mul\+\_\+by\+\_\+a}} (const \mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\+\_\+\+Fq3}} \&elt)
+\item 
+static \mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\+\_\+\+Fq3}} \mbox{\hyperlink{classlibff_1_1edwards___g2_aba8cba4a8dedeb3c5f0c1055abd10432}{mul\+\_\+by\+\_\+d}} (const \mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\+\_\+\+Fq3}} \&elt)
+\item 
+static \mbox{\hyperlink{classlibff_1_1edwards___g2}{edwards\+\_\+\+G2}} \mbox{\hyperlink{classlibff_1_1edwards___g2_a26000143fff61d7d6e40ec879720bc42}{zero}} ()
+\item 
+static \mbox{\hyperlink{classlibff_1_1edwards___g2}{edwards\+\_\+\+G2}} \mbox{\hyperlink{classlibff_1_1edwards___g2_aa3321eec79dc4281133c6d323f3bde82}{one}} ()
+\item 
+static \mbox{\hyperlink{classlibff_1_1edwards___g2}{edwards\+\_\+\+G2}} \mbox{\hyperlink{classlibff_1_1edwards___g2_a0e2c6edc3b3c03987e7b3a58aa949fd2}{random\+\_\+element}} ()
+\item 
+static size\+\_\+t \mbox{\hyperlink{classlibff_1_1edwards___g2_a4bd65268bfbae96f16f01bf5cf933a09}{size\+\_\+in\+\_\+bits}} ()
+\item 
+static \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ \mbox{\hyperlink{classlibff_1_1_fp__model_a537cb6d7a4bdf842cf9dd9194c67fb93}{base\+\_\+field\+::num\+\_\+limbs}} $>$ \mbox{\hyperlink{classlibff_1_1edwards___g2_ac759b256c5a428a378ba5e9e81dda243}{base\+\_\+field\+\_\+char}} ()
+\item 
+static \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ \mbox{\hyperlink{classlibff_1_1_fp__model_a537cb6d7a4bdf842cf9dd9194c67fb93}{scalar\+\_\+field\+::num\+\_\+limbs}} $>$ \mbox{\hyperlink{classlibff_1_1edwards___g2_a9cce9653590d5bd93d04c27977eb359f}{order}} ()
+\item 
+static void \mbox{\hyperlink{classlibff_1_1edwards___g2_a3b20beccdcab25ef4a595a5a17fe6c7f}{batch\+\_\+to\+\_\+special\+\_\+all\+\_\+non\+\_\+zeros}} (std\+::vector$<$ \mbox{\hyperlink{classlibff_1_1edwards___g2}{edwards\+\_\+\+G2}} $>$ \&vec)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\+\_\+\+Fq3}} \mbox{\hyperlink{classlibff_1_1edwards___g2_ae0620259ec606ee2761bef5b60164a87}{X}}
+\item 
+\mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\+\_\+\+Fq3}} \mbox{\hyperlink{classlibff_1_1edwards___g2_ab5e61fc3b52c5edfcbff48644dfbd52d}{Y}}
+\item 
+\mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\+\_\+\+Fq3}} \mbox{\hyperlink{classlibff_1_1edwards___g2_a99140a2a935d501fc1c6825fcd2ee9d2}{Z}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static std\+::vector$<$ size\+\_\+t $>$ \mbox{\hyperlink{classlibff_1_1edwards___g2_ac137e30fc787fa6c978bfabdaed5825b}{wnaf\+\_\+window\+\_\+table}}
+\item 
+static std\+::vector$<$ size\+\_\+t $>$ \mbox{\hyperlink{classlibff_1_1edwards___g2_a924a5490983e9fabae01dfd7a97288e1}{fixed\+\_\+base\+\_\+exp\+\_\+window\+\_\+table}}
+\item 
+static \mbox{\hyperlink{classlibff_1_1edwards___g2}{edwards\+\_\+\+G2}} \mbox{\hyperlink{classlibff_1_1edwards___g2_ac78fb5ea61a1e9ee1a2b67543b2cd6fe}{G2\+\_\+zero}} = \{\}
+\item 
+static \mbox{\hyperlink{classlibff_1_1edwards___g2}{edwards\+\_\+\+G2}} \mbox{\hyperlink{classlibff_1_1edwards___g2_abd355ad5b41ae4e9491dd54ef17cc413}{G2\+\_\+one}} = \{\}
+\item 
+static bool \mbox{\hyperlink{classlibff_1_1edwards___g2_a99f0e7b0a4e9ba15a4cdae764398054d}{initialized}} = false
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+std\+::ostream \& \mbox{\hyperlink{classlibff_1_1edwards___g2_a4b0dd06852ee538b2489a38a3636a2bd}{operator$<$$<$}} (std\+::ostream \&out, const \mbox{\hyperlink{classlibff_1_1edwards___g2}{edwards\+\_\+\+G2}} \&g)
+\item 
+std\+::istream \& \mbox{\hyperlink{classlibff_1_1edwards___g2_a77c57b8fe495dd63f32dfbf45af0421e}{operator$>$$>$}} (std\+::istream \&in, \mbox{\hyperlink{classlibff_1_1edwards___g2}{edwards\+\_\+\+G2}} \&g)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{edwards__g2_8hpp_source_l00022}{22}} of file \mbox{\hyperlink{edwards__g2_8hpp_source}{edwards\+\_\+g2.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classlibff_1_1edwards___g2_a0e3b859851eae923f04a656de6def101}\index{libff::edwards\_G2@{libff::edwards\_G2}!base\_field@{base\_field}}
+\index{base\_field@{base\_field}!libff::edwards\_G2@{libff::edwards\_G2}}
+\doxysubsubsection{\texorpdfstring{base\_field}{base\_field}}
+{\footnotesize\ttfamily \label{classlibff_1_1edwards___g2_a0e3b859851eae923f04a656de6def101} 
+\mbox{\hyperlink{namespacelibff_a2653629483aeb0df51eec08cb6635343}{edwards\+\_\+\+Fq}} \mbox{\hyperlink{classlibff_1_1edwards___g2_a0e3b859851eae923f04a656de6def101}{libff\+::edwards\+\_\+\+G2\+::base\+\_\+field}}}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__g2_8hpp_source_l00042}{42}} of file \mbox{\hyperlink{edwards__g2_8hpp_source}{edwards\+\_\+g2.\+hpp}}.
+
+\Hypertarget{classlibff_1_1edwards___g2_a5cb092cc7be26019e292d0a66ecf700c}\index{libff::edwards\_G2@{libff::edwards\_G2}!scalar\_field@{scalar\_field}}
+\index{scalar\_field@{scalar\_field}!libff::edwards\_G2@{libff::edwards\_G2}}
+\doxysubsubsection{\texorpdfstring{scalar\_field}{scalar\_field}}
+{\footnotesize\ttfamily \label{classlibff_1_1edwards___g2_a5cb092cc7be26019e292d0a66ecf700c} 
+\mbox{\hyperlink{namespacelibff_ab8734750fbf545572c63fa96171f7caf}{edwards\+\_\+\+Fr}} \mbox{\hyperlink{classlibff_1_1edwards___g2_a5cb092cc7be26019e292d0a66ecf700c}{libff\+::edwards\+\_\+\+G2\+::scalar\+\_\+field}}}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__g2_8hpp_source_l00044}{44}} of file \mbox{\hyperlink{edwards__g2_8hpp_source}{edwards\+\_\+g2.\+hpp}}.
+
+\Hypertarget{classlibff_1_1edwards___g2_ad267d433335ebed33c7d2014890740b1}\index{libff::edwards\_G2@{libff::edwards\_G2}!twist\_field@{twist\_field}}
+\index{twist\_field@{twist\_field}!libff::edwards\_G2@{libff::edwards\_G2}}
+\doxysubsubsection{\texorpdfstring{twist\_field}{twist\_field}}
+{\footnotesize\ttfamily \label{classlibff_1_1edwards___g2_ad267d433335ebed33c7d2014890740b1} 
+\mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\+\_\+\+Fq3}} \mbox{\hyperlink{classlibff_1_1edwards___g2_ad267d433335ebed33c7d2014890740b1}{libff\+::edwards\+\_\+\+G2\+::twist\+\_\+field}}}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__g2_8hpp_source_l00043}{43}} of file \mbox{\hyperlink{edwards__g2_8hpp_source}{edwards\+\_\+g2.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classlibff_1_1edwards___g2_a9a1543d44a8cc4c13466982853492a81}\index{libff::edwards\_G2@{libff::edwards\_G2}!edwards\_G2@{edwards\_G2}}
+\index{edwards\_G2@{edwards\_G2}!libff::edwards\_G2@{libff::edwards\_G2}}
+\doxysubsubsection{\texorpdfstring{edwards\_G2()}{edwards\_G2()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classlibff_1_1edwards___g2_a9a1543d44a8cc4c13466982853492a81} 
+libff\+::edwards\+\_\+\+G2\+::edwards\+\_\+\+G2 (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__g2_8cpp_source_l00024}{24}} of file \mbox{\hyperlink{edwards__g2_8cpp_source}{edwards\+\_\+g2.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00025\ \{}
+\DoxyCodeLine{00026\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classlibff_1_1edwards___g2_a99f0e7b0a4e9ba15a4cdae764398054d}{initialized}})}
+\DoxyCodeLine{00027\ \ \ \ \ \{}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ this-\/>\mbox{\hyperlink{struct_x_t}{X}}\ =\ \mbox{\hyperlink{classlibff_1_1edwards___g2_ac78fb5ea61a1e9ee1a2b67543b2cd6fe}{G2\_zero}}.\mbox{\hyperlink{classlibff_1_1edwards___g2_ae0620259ec606ee2761bef5b60164a87}{X}};}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ this-\/>\mbox{\hyperlink{classlibff_1_1edwards___g2_ab5e61fc3b52c5edfcbff48644dfbd52d}{Y}}\ =\ \mbox{\hyperlink{classlibff_1_1edwards___g2_ac78fb5ea61a1e9ee1a2b67543b2cd6fe}{G2\_zero}}.\mbox{\hyperlink{classlibff_1_1edwards___g2_ab5e61fc3b52c5edfcbff48644dfbd52d}{Y}};}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ this-\/>\mbox{\hyperlink{classlibff_1_1edwards___g2_a99140a2a935d501fc1c6825fcd2ee9d2}{Z}}\ =\ \mbox{\hyperlink{classlibff_1_1edwards___g2_ac78fb5ea61a1e9ee1a2b67543b2cd6fe}{G2\_zero}}.\mbox{\hyperlink{classlibff_1_1edwards___g2_a99140a2a935d501fc1c6825fcd2ee9d2}{Z}};}
+\DoxyCodeLine{00031\ \ \ \ \ \}}
+\DoxyCodeLine{00032\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classlibff_1_1edwards___g2_a9a1543d44a8cc4c13466982853492a81_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classlibff_1_1edwards___g2_a48db981cd43a807e29186196ec3b5c5a}\index{libff::edwards\_G2@{libff::edwards\_G2}!edwards\_G2@{edwards\_G2}}
+\index{edwards\_G2@{edwards\_G2}!libff::edwards\_G2@{libff::edwards\_G2}}
+\doxysubsubsection{\texorpdfstring{edwards\_G2()}{edwards\_G2()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classlibff_1_1edwards___g2_a48db981cd43a807e29186196ec3b5c5a} 
+libff\+::edwards\+\_\+\+G2\+::edwards\+\_\+\+G2 (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\+\_\+\+Fq3}} \&}]{X}{, }\item[{const \mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\+\_\+\+Fq3}} \&}]{Y}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__g2_8hpp_source_l00047}{47}} of file \mbox{\hyperlink{edwards__g2_8hpp_source}{edwards\+\_\+g2.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00047\ :\ \mbox{\hyperlink{classlibff_1_1edwards___g2_ae0620259ec606ee2761bef5b60164a87}{X}}(\mbox{\hyperlink{classlibff_1_1edwards___g2_ab5e61fc3b52c5edfcbff48644dfbd52d}{Y}}),\ \mbox{\hyperlink{classlibff_1_1edwards___g2_ab5e61fc3b52c5edfcbff48644dfbd52d}{Y}}(\mbox{\hyperlink{struct_x_t}{X}}),\ \mbox{\hyperlink{classlibff_1_1edwards___g2_a99140a2a935d501fc1c6825fcd2ee9d2}{Z}}(\mbox{\hyperlink{struct_x_t}{X}}*\mbox{\hyperlink{classlibff_1_1edwards___g2_ab5e61fc3b52c5edfcbff48644dfbd52d}{Y}})\ \{\};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classlibff_1_1edwards___g2_a3c25bc071fed41abba3d78eb0ab5517a}\index{libff::edwards\_G2@{libff::edwards\_G2}!add@{add}}
+\index{add@{add}!libff::edwards\_G2@{libff::edwards\_G2}}
+\doxysubsubsection{\texorpdfstring{add()}{add()}}
+{\footnotesize\ttfamily \label{classlibff_1_1edwards___g2_a3c25bc071fed41abba3d78eb0ab5517a} 
+\mbox{\hyperlink{classlibff_1_1edwards___g2}{edwards\+\_\+\+G2}} libff\+::edwards\+\_\+\+G2\+::add (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classlibff_1_1edwards___g2}{edwards\+\_\+\+G2}} \&}]{other}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__g2_8cpp_source_l00202}{202}} of file \mbox{\hyperlink{edwards__g2_8cpp_source}{edwards\+\_\+g2.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00203\ \{}
+\DoxyCodeLine{00204\ \textcolor{preprocessor}{\#ifdef\ PROFILE\_OP\_COUNTS}}
+\DoxyCodeLine{00205\ \ \ \ \ this-\/>add\_cnt++;}
+\DoxyCodeLine{00206\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00207\ \ \ \ \ \textcolor{comment}{//\ NOTE:\ does\ not\ handle\ O\ and\ pts\ of\ order\ 2,4}}
+\DoxyCodeLine{00208\ \ \ \ \ \textcolor{comment}{//\ http://www.hyperelliptic.org/EFD/g1p/auto-\/twisted-\/inverted.html\#addition-\/add-\/2008-\/bbjlp}}
+\DoxyCodeLine{00209\ }
+\DoxyCodeLine{00210\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\_Fq3}}\ \mbox{\hyperlink{namespace_a}{A}}\ =\ (this-\/>\mbox{\hyperlink{classlibff_1_1edwards___g2_a99140a2a935d501fc1c6825fcd2ee9d2}{Z}})\ *\ (\mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.Z);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ A\ =\ Z1*Z2}}
+\DoxyCodeLine{00211\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\_Fq3}}\ \mbox{\hyperlink{namespace_b}{B}}\ =\ \mbox{\hyperlink{classlibff_1_1edwards___g2_aba8cba4a8dedeb3c5f0c1055abd10432}{edwards\_G2::mul\_by\_d}}(\mbox{\hyperlink{namespace_a}{A}}.squared());\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ B\ =\ d*A\string^2}}
+\DoxyCodeLine{00212\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\_Fq3}}\ C\ =\ (this-\/>\mbox{\hyperlink{classlibff_1_1edwards___g2_ae0620259ec606ee2761bef5b60164a87}{X}})\ *\ (\mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.X);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ C\ =\ X1*X2}}
+\DoxyCodeLine{00213\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\_Fq3}}\ \mbox{\hyperlink{debug_8h_a6a96826afbc53984fc8331e32328fb3b}{D}}\ =\ (this-\/>\mbox{\hyperlink{classlibff_1_1edwards___g2_ab5e61fc3b52c5edfcbff48644dfbd52d}{Y}})\ *\ (\mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.Y);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ D\ =\ Y1*Y2}}
+\DoxyCodeLine{00214\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\_Fq3}}\ E\ =\ C*\mbox{\hyperlink{debug_8h_a6a96826afbc53984fc8331e32328fb3b}{D}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ E\ =\ C*D}}
+\DoxyCodeLine{00215\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\_Fq3}}\ H\ =\ C\ -\/\ \mbox{\hyperlink{classlibff_1_1edwards___g2_aa623283cb479983656793b7c4bf999b6}{edwards\_G2::mul\_by\_a}}(\mbox{\hyperlink{debug_8h_a6a96826afbc53984fc8331e32328fb3b}{D}});\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ H\ =\ C-\/a*D}}
+\DoxyCodeLine{00216\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\_Fq3}}\ I\ =\ (this-\/>\mbox{\hyperlink{struct_x_t}{X}}+this-\/>\mbox{\hyperlink{classlibff_1_1edwards___g2_ab5e61fc3b52c5edfcbff48644dfbd52d}{Y}})*(\mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.X+\mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.Y)-\/C-\/\mbox{\hyperlink{debug_8h_a6a96826afbc53984fc8331e32328fb3b}{D}};\ \ \ \ \ \textcolor{comment}{//\ I\ =\ (X1+Y1)*(X2+Y2)-\/C-\/D}}
+\DoxyCodeLine{00217\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\_Fq3}}\ X3\ =\ (E+\mbox{\hyperlink{namespace_b}{B}})*H;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ X3\ =\ (E+B)*H}}
+\DoxyCodeLine{00218\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\_Fq3}}\ Y3\ =\ (E-\/\mbox{\hyperlink{namespace_b}{B}})*I;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Y3\ =\ (E-\/B)*I}}
+\DoxyCodeLine{00219\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\_Fq3}}\ Z3\ =\ \mbox{\hyperlink{namespace_a}{A}}*H*I;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Z3\ =\ A*H*I}}
+\DoxyCodeLine{00220\ }
+\DoxyCodeLine{00221\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classlibff_1_1edwards___g2_a9a1543d44a8cc4c13466982853492a81}{edwards\_G2}}(X3,\ Y3,\ Z3);}
+\DoxyCodeLine{00222\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=329pt]{classlibff_1_1edwards___g2_a3c25bc071fed41abba3d78eb0ab5517a_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classlibff_1_1edwards___g2_a3c25bc071fed41abba3d78eb0ab5517a_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classlibff_1_1edwards___g2_ac759b256c5a428a378ba5e9e81dda243}\index{libff::edwards\_G2@{libff::edwards\_G2}!base\_field\_char@{base\_field\_char}}
+\index{base\_field\_char@{base\_field\_char}!libff::edwards\_G2@{libff::edwards\_G2}}
+\doxysubsubsection{\texorpdfstring{base\_field\_char()}{base\_field\_char()}}
+{\footnotesize\ttfamily \label{classlibff_1_1edwards___g2_ac759b256c5a428a378ba5e9e81dda243} 
+static \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ \mbox{\hyperlink{classlibff_1_1_fp__model_a537cb6d7a4bdf842cf9dd9194c67fb93}{base\+\_\+field\+::num\+\_\+limbs}} $>$ libff\+::edwards\+\_\+\+G2\+::base\+\_\+field\+\_\+char (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__g2_8hpp_source_l00077}{77}} of file \mbox{\hyperlink{edwards__g2_8hpp_source}{edwards\+\_\+g2.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00077\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classlibff_1_1_fp__model_a17007913e835c044394a3bd0208d09d6}{base\_field::field\_char}}();\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classlibff_1_1edwards___g2_ac759b256c5a428a378ba5e9e81dda243_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classlibff_1_1edwards___g2_a3b20beccdcab25ef4a595a5a17fe6c7f}\index{libff::edwards\_G2@{libff::edwards\_G2}!batch\_to\_special\_all\_non\_zeros@{batch\_to\_special\_all\_non\_zeros}}
+\index{batch\_to\_special\_all\_non\_zeros@{batch\_to\_special\_all\_non\_zeros}!libff::edwards\_G2@{libff::edwards\_G2}}
+\doxysubsubsection{\texorpdfstring{batch\_to\_special\_all\_non\_zeros()}{batch\_to\_special\_all\_non\_zeros()}}
+{\footnotesize\ttfamily \label{classlibff_1_1edwards___g2_a3b20beccdcab25ef4a595a5a17fe6c7f} 
+void libff\+::edwards\+\_\+\+G2\+::batch\+\_\+to\+\_\+special\+\_\+all\+\_\+non\+\_\+zeros (\begin{DoxyParamCaption}\item[{std\+::vector$<$ \mbox{\hyperlink{classlibff_1_1edwards___g2}{edwards\+\_\+\+G2}} $>$ \&}]{vec}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__g2_8cpp_source_l00396}{396}} of file \mbox{\hyperlink{edwards__g2_8cpp_source}{edwards\+\_\+g2.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00397\ \{}
+\DoxyCodeLine{00398\ \ \ \ \ std::vector<edwards\_Fq3>\ Z\_vec;}
+\DoxyCodeLine{00399\ \ \ \ \ Z\_vec.reserve(vec.size());}
+\DoxyCodeLine{00400\ }
+\DoxyCodeLine{00401\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\ \&el:\ vec)}
+\DoxyCodeLine{00402\ \ \ \ \ \{}
+\DoxyCodeLine{00403\ \ \ \ \ \ \ \ \ Z\_vec.emplace\_back(el.Z);}
+\DoxyCodeLine{00404\ \ \ \ \ \}}
+\DoxyCodeLine{00405\ \ \ \ \ \mbox{\hyperlink{namespacelibff_aecf9947f6cf142476f71f413e69eec59}{batch\_invert<edwards\_Fq3>}}(Z\_vec);}
+\DoxyCodeLine{00406\ }
+\DoxyCodeLine{00407\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\_Fq3}}\ \mbox{\hyperlink{classlibff_1_1edwards___g2_aa3321eec79dc4281133c6d323f3bde82}{one}}\ =\ \mbox{\hyperlink{classlibff_1_1_fp3__model_a7694c73c1ac55c3f9b00c8b51c7ffeff}{edwards\_Fq3::one}}();}
+\DoxyCodeLine{00408\ }
+\DoxyCodeLine{00409\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ vec.size();\ ++i)}
+\DoxyCodeLine{00410\ \ \ \ \ \{}
+\DoxyCodeLine{00411\ \ \ \ \ \ \ \ \ vec[i].X\ =\ vec[i].X\ *\ Z\_vec[i];}
+\DoxyCodeLine{00412\ \ \ \ \ \ \ \ \ vec[i].Y\ =\ vec[i].Y\ *\ Z\_vec[i];}
+\DoxyCodeLine{00413\ \ \ \ \ \ \ \ \ vec[i].Z\ =\ \mbox{\hyperlink{classlibff_1_1edwards___g2_aa3321eec79dc4281133c6d323f3bde82}{one}};}
+\DoxyCodeLine{00414\ \ \ \ \ \}}
+\DoxyCodeLine{00415\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classlibff_1_1edwards___g2_a3b20beccdcab25ef4a595a5a17fe6c7f_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classlibff_1_1edwards___g2_a0a95a0c7b0fe95d1d58fe1531f8436a8}\index{libff::edwards\_G2@{libff::edwards\_G2}!dbl@{dbl}}
+\index{dbl@{dbl}!libff::edwards\_G2@{libff::edwards\_G2}}
+\doxysubsubsection{\texorpdfstring{dbl()}{dbl()}}
+{\footnotesize\ttfamily \label{classlibff_1_1edwards___g2_a0a95a0c7b0fe95d1d58fe1531f8436a8} 
+\mbox{\hyperlink{classlibff_1_1edwards___g2}{edwards\+\_\+\+G2}} libff\+::edwards\+\_\+\+G2\+::dbl (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__g2_8cpp_source_l00261}{261}} of file \mbox{\hyperlink{edwards__g2_8cpp_source}{edwards\+\_\+g2.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00262\ \{}
+\DoxyCodeLine{00263\ \textcolor{preprocessor}{\#ifdef\ PROFILE\_OP\_COUNTS}}
+\DoxyCodeLine{00264\ \ \ \ \ this-\/>dbl\_cnt++;}
+\DoxyCodeLine{00265\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00266\ \ \ \ \ \textcolor{keywordflow}{if}\ (this-\/>\mbox{\hyperlink{classlibff_1_1edwards___g2_af4c09f5488ce09b7cc0d6f7bed0ce8d5}{is\_zero}}())}
+\DoxyCodeLine{00267\ \ \ \ \ \{}
+\DoxyCodeLine{00268\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (*\textcolor{keyword}{this});}
+\DoxyCodeLine{00269\ \ \ \ \ \}}
+\DoxyCodeLine{00270\ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00271\ \ \ \ \ \{}
+\DoxyCodeLine{00272\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ NOTE:\ does\ not\ handle\ O\ and\ pts\ of\ order\ 2,4}}
+\DoxyCodeLine{00273\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ http://www.hyperelliptic.org/EFD/g1p/auto-\/twisted-\/inverted.html\#doubling-\/dbl-\/2008-\/bbjlp}}
+\DoxyCodeLine{00274\ }
+\DoxyCodeLine{00275\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\_Fq3}}\ \mbox{\hyperlink{namespace_a}{A}}\ =\ (this-\/>\mbox{\hyperlink{classlibff_1_1edwards___g2_ae0620259ec606ee2761bef5b60164a87}{X}}).squared();\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ A\ =\ X1\string^2}}
+\DoxyCodeLine{00276\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\_Fq3}}\ \mbox{\hyperlink{namespace_b}{B}}\ =\ (this-\/>\mbox{\hyperlink{classlibff_1_1edwards___g2_ab5e61fc3b52c5edfcbff48644dfbd52d}{Y}}).squared();\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ B\ =\ Y1\string^2}}
+\DoxyCodeLine{00277\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\_Fq3}}\ \mbox{\hyperlink{union_u}{U}}\ =\ \mbox{\hyperlink{classlibff_1_1edwards___g2_aa623283cb479983656793b7c4bf999b6}{edwards\_G2::mul\_by\_a}}(\mbox{\hyperlink{namespace_b}{B}});\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ U\ =\ a*B}}
+\DoxyCodeLine{00278\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\_Fq3}}\ C\ =\ \mbox{\hyperlink{namespace_a}{A}}+\mbox{\hyperlink{union_u}{U}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ C\ =\ A+U}}
+\DoxyCodeLine{00279\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\_Fq3}}\ \mbox{\hyperlink{debug_8h_a6a96826afbc53984fc8331e32328fb3b}{D}}\ =\ \mbox{\hyperlink{namespace_a}{A}}-\/\mbox{\hyperlink{union_u}{U}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ D\ =\ A-\/U}}
+\DoxyCodeLine{00280\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\_Fq3}}\ E\ =\ (this-\/>\mbox{\hyperlink{struct_x_t}{X}}+this-\/>\mbox{\hyperlink{classlibff_1_1edwards___g2_ab5e61fc3b52c5edfcbff48644dfbd52d}{Y}}).squared()-\/\mbox{\hyperlink{namespace_a}{A}}-\/\mbox{\hyperlink{namespace_b}{B}};\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ E\ =\ (X1+Y1)\string^2-\/A-\/B}}
+\DoxyCodeLine{00281\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\_Fq3}}\ X3\ =\ C*\mbox{\hyperlink{debug_8h_a6a96826afbc53984fc8331e32328fb3b}{D}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ X3\ =\ C*D}}
+\DoxyCodeLine{00282\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\_Fq3}}\ dZZ\ =\ \mbox{\hyperlink{classlibff_1_1edwards___g2_aba8cba4a8dedeb3c5f0c1055abd10432}{edwards\_G2::mul\_by\_d}}(this-\/>\mbox{\hyperlink{classlibff_1_1edwards___g2_a99140a2a935d501fc1c6825fcd2ee9d2}{Z}}.\mbox{\hyperlink{classlibff_1_1_fp3__model_a531291be856a835c47d632a88ba4cfaa}{squared}}());}
+\DoxyCodeLine{00283\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\_Fq3}}\ Y3\ =\ E*(C-\/dZZ-\/dZZ);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Y3\ =\ E*(C-\/2*d*Z1\string^2)}}
+\DoxyCodeLine{00284\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\_Fq3}}\ Z3\ =\ \mbox{\hyperlink{debug_8h_a6a96826afbc53984fc8331e32328fb3b}{D}}*E;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Z3\ =\ D*E}}
+\DoxyCodeLine{00285\ }
+\DoxyCodeLine{00286\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classlibff_1_1edwards___g2_a9a1543d44a8cc4c13466982853492a81}{edwards\_G2}}(X3,\ Y3,\ Z3);}
+\DoxyCodeLine{00287\ \ \ \ \ \}}
+\DoxyCodeLine{00288\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classlibff_1_1edwards___g2_a0a95a0c7b0fe95d1d58fe1531f8436a8_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classlibff_1_1edwards___g2_af9990d40084f2e37f0ee5e66867be5a3}\index{libff::edwards\_G2@{libff::edwards\_G2}!is\_special@{is\_special}}
+\index{is\_special@{is\_special}!libff::edwards\_G2@{libff::edwards\_G2}}
+\doxysubsubsection{\texorpdfstring{is\_special()}{is\_special()}}
+{\footnotesize\ttfamily \label{classlibff_1_1edwards___g2_af9990d40084f2e37f0ee5e66867be5a3} 
+bool libff\+::edwards\+\_\+\+G2\+::is\+\_\+special (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__g2_8cpp_source_l00131}{131}} of file \mbox{\hyperlink{edwards__g2_8cpp_source}{edwards\+\_\+g2.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00132\ \{}
+\DoxyCodeLine{00133\ \ \ \ \ \textcolor{keywordflow}{return}\ (this-\/>\mbox{\hyperlink{classlibff_1_1edwards___g2_af4c09f5488ce09b7cc0d6f7bed0ce8d5}{is\_zero}}()\ ||\ this-\/>\mbox{\hyperlink{classlibff_1_1edwards___g2_a99140a2a935d501fc1c6825fcd2ee9d2}{Z}}\ ==\ \mbox{\hyperlink{classlibff_1_1_fp3__model_a7694c73c1ac55c3f9b00c8b51c7ffeff}{edwards\_Fq3::one}}());}
+\DoxyCodeLine{00134\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classlibff_1_1edwards___g2_af9990d40084f2e37f0ee5e66867be5a3_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classlibff_1_1edwards___g2_a1f0fbfce0cc0029563b412255a28b98e}\index{libff::edwards\_G2@{libff::edwards\_G2}!is\_well\_formed@{is\_well\_formed}}
+\index{is\_well\_formed@{is\_well\_formed}!libff::edwards\_G2@{libff::edwards\_G2}}
+\doxysubsubsection{\texorpdfstring{is\_well\_formed()}{is\_well\_formed()}}
+{\footnotesize\ttfamily \label{classlibff_1_1edwards___g2_a1f0fbfce0cc0029563b412255a28b98e} 
+bool libff\+::edwards\+\_\+\+G2\+::is\+\_\+well\+\_\+formed (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__g2_8cpp_source_l00297}{297}} of file \mbox{\hyperlink{edwards__g2_8cpp_source}{edwards\+\_\+g2.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00298\ \{}
+\DoxyCodeLine{00299\ \ \ \ \ \textcolor{comment}{/*\ Note\ that\ point\ at\ infinity\ is\ the\ only\ special\ case\ we\ must\ check\ as}}
+\DoxyCodeLine{00300\ \textcolor{comment}{\ \ \ \ \ \ \ inverted\ representation\ does\ no\ cover\ points\ (0,\ +-\/c)\ and\ (+-\/c,\ 0).\ */}}
+\DoxyCodeLine{00301\ \ \ \ \ \textcolor{keywordflow}{if}\ (this-\/>\mbox{\hyperlink{classlibff_1_1edwards___g2_af4c09f5488ce09b7cc0d6f7bed0ce8d5}{is\_zero}}())}
+\DoxyCodeLine{00302\ \ \ \ \ \{}
+\DoxyCodeLine{00303\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00304\ \ \ \ \ \}}
+\DoxyCodeLine{00305\ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00306\ \ \ \ \ \{}
+\DoxyCodeLine{00307\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*}}
+\DoxyCodeLine{00308\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ a\ x\string^2\ +\ y\string^2\ =\ 1\ +\ d\ x\string^2\ y\string^2}}
+\DoxyCodeLine{00309\ \textcolor{comment}{}}
+\DoxyCodeLine{00310\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ We\ are\ using\ inverted,\ so\ equation\ we\ need\ to\ check\ is\ actually}}
+\DoxyCodeLine{00311\ \textcolor{comment}{}}
+\DoxyCodeLine{00312\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ a\ (z/x)\string^2\ +\ (z/y)\string^2\ =\ 1\ +\ d\ z\string^4\ /\ (x\string^2\ *\ y\string^2)}}
+\DoxyCodeLine{00313\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ z\string^2\ (a\ y\string^2\ +\ x\string^2\ -\/\ dz\string^2)\ =\ x\string^2\ y\string^2}}
+\DoxyCodeLine{00314\ \textcolor{comment}{\ \ \ \ \ \ \ \ */}}
+\DoxyCodeLine{00315\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\_Fq3}}\ X2\ =\ this-\/>\mbox{\hyperlink{struct_x_t}{X}}.squared();}
+\DoxyCodeLine{00316\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\_Fq3}}\ Y2\ =\ this-\/>\mbox{\hyperlink{classlibff_1_1edwards___g2_ab5e61fc3b52c5edfcbff48644dfbd52d}{Y}}.\mbox{\hyperlink{classlibff_1_1_fp3__model_a531291be856a835c47d632a88ba4cfaa}{squared}}();}
+\DoxyCodeLine{00317\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\_Fq3}}\ Z2\ =\ this-\/>\mbox{\hyperlink{classlibff_1_1edwards___g2_a99140a2a935d501fc1c6825fcd2ee9d2}{Z}}.\mbox{\hyperlink{classlibff_1_1_fp3__model_a531291be856a835c47d632a88ba4cfaa}{squared}}();}
+\DoxyCodeLine{00318\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\_Fq3}}\ aY2\ =\ \mbox{\hyperlink{classlibff_1_1edwards___g2_aa623283cb479983656793b7c4bf999b6}{edwards\_G2::mul\_by\_a}}(Y2);}
+\DoxyCodeLine{00319\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\_Fq3}}\ dZ2\ =\ \mbox{\hyperlink{classlibff_1_1edwards___g2_aba8cba4a8dedeb3c5f0c1055abd10432}{edwards\_G2::mul\_by\_d}}(Z2);}
+\DoxyCodeLine{00320\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (Z2\ *\ (aY2\ +\ X2\ -\/\ dZ2)\ ==\ X2\ *\ Y2);}
+\DoxyCodeLine{00321\ \ \ \ \ \}}
+\DoxyCodeLine{00322\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classlibff_1_1edwards___g2_a1f0fbfce0cc0029563b412255a28b98e_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classlibff_1_1edwards___g2_af4c09f5488ce09b7cc0d6f7bed0ce8d5}\index{libff::edwards\_G2@{libff::edwards\_G2}!is\_zero@{is\_zero}}
+\index{is\_zero@{is\_zero}!libff::edwards\_G2@{libff::edwards\_G2}}
+\doxysubsubsection{\texorpdfstring{is\_zero()}{is\_zero()}}
+{\footnotesize\ttfamily \label{classlibff_1_1edwards___g2_af4c09f5488ce09b7cc0d6f7bed0ce8d5} 
+bool libff\+::edwards\+\_\+\+G2\+::is\+\_\+zero (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__g2_8cpp_source_l00136}{136}} of file \mbox{\hyperlink{edwards__g2_8cpp_source}{edwards\+\_\+g2.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00137\ \{}
+\DoxyCodeLine{00138\ \ \ \ \ \textcolor{keywordflow}{return}\ (this-\/>\mbox{\hyperlink{classlibff_1_1edwards___g2_ab5e61fc3b52c5edfcbff48644dfbd52d}{Y}}.\mbox{\hyperlink{classlibff_1_1_fp3__model_ab518027d2286b3ef3324c15667bb4b10}{is\_zero}}()\ \&\&\ this-\/>Z.is\_zero());}
+\DoxyCodeLine{00139\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classlibff_1_1edwards___g2_af4c09f5488ce09b7cc0d6f7bed0ce8d5_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classlibff_1_1edwards___g2_af4c09f5488ce09b7cc0d6f7bed0ce8d5_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classlibff_1_1edwards___g2_aa200e9023af1e09e337163b89ea1a927}\index{libff::edwards\_G2@{libff::edwards\_G2}!mixed\_add@{mixed\_add}}
+\index{mixed\_add@{mixed\_add}!libff::edwards\_G2@{libff::edwards\_G2}}
+\doxysubsubsection{\texorpdfstring{mixed\_add()}{mixed\_add()}}
+{\footnotesize\ttfamily \label{classlibff_1_1edwards___g2_aa200e9023af1e09e337163b89ea1a927} 
+\mbox{\hyperlink{classlibff_1_1edwards___g2}{edwards\+\_\+\+G2}} libff\+::edwards\+\_\+\+G2\+::mixed\+\_\+add (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classlibff_1_1edwards___g2}{edwards\+\_\+\+G2}} \&}]{other}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__g2_8cpp_source_l00224}{224}} of file \mbox{\hyperlink{edwards__g2_8cpp_source}{edwards\+\_\+g2.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00225\ \{}
+\DoxyCodeLine{00226\ \textcolor{preprocessor}{\#ifdef\ PROFILE\_OP\_COUNTS}}
+\DoxyCodeLine{00227\ \ \ \ \ this-\/>add\_cnt++;}
+\DoxyCodeLine{00228\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00229\ \ \ \ \ \textcolor{comment}{//\ handle\ special\ cases\ having\ to\ do\ with\ O}}
+\DoxyCodeLine{00230\ \ \ \ \ \textcolor{keywordflow}{if}\ (this-\/>\mbox{\hyperlink{classlibff_1_1edwards___g2_af4c09f5488ce09b7cc0d6f7bed0ce8d5}{is\_zero}}())}
+\DoxyCodeLine{00231\ \ \ \ \ \{}
+\DoxyCodeLine{00232\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}};}
+\DoxyCodeLine{00233\ \ \ \ \ \}}
+\DoxyCodeLine{00234\ }
+\DoxyCodeLine{00235\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.is\_zero())}
+\DoxyCodeLine{00236\ \ \ \ \ \{}
+\DoxyCodeLine{00237\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00238\ \ \ \ \ \}}
+\DoxyCodeLine{00239\ }
+\DoxyCodeLine{00240\ \textcolor{preprocessor}{\#ifdef\ DEBUG}}
+\DoxyCodeLine{00241\ \ \ \ \ assert(\mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.is\_special());}
+\DoxyCodeLine{00242\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00243\ }
+\DoxyCodeLine{00244\ \ \ \ \ \textcolor{comment}{//\ NOTE:\ does\ not\ handle\ O\ and\ pts\ of\ order\ 2,4}}
+\DoxyCodeLine{00245\ \ \ \ \ \textcolor{comment}{//\ http://www.hyperelliptic.org/EFD/g1p/auto-\/edwards-\/inverted.html\#addition-\/madd-\/2007-\/lb}}
+\DoxyCodeLine{00246\ }
+\DoxyCodeLine{00247\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\_Fq3}}\ \mbox{\hyperlink{namespace_a}{A}}\ =\ this-\/>\mbox{\hyperlink{classlibff_1_1edwards___g2_a99140a2a935d501fc1c6825fcd2ee9d2}{Z}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ A\ =\ Z1*Z2}}
+\DoxyCodeLine{00248\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\_Fq3}}\ \mbox{\hyperlink{namespace_b}{B}}\ =\ \mbox{\hyperlink{classlibff_1_1edwards___g2_aba8cba4a8dedeb3c5f0c1055abd10432}{edwards\_G2::mul\_by\_d}}(A.squared());\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ B\ =\ d*A\string^2}}
+\DoxyCodeLine{00249\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\_Fq3}}\ C\ =\ (this-\/>\mbox{\hyperlink{classlibff_1_1edwards___g2_ae0620259ec606ee2761bef5b60164a87}{X}})\ *\ (\mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.X);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ C\ =\ X1*X2}}
+\DoxyCodeLine{00250\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\_Fq3}}\ \mbox{\hyperlink{debug_8h_a6a96826afbc53984fc8331e32328fb3b}{D}}\ =\ (this-\/>\mbox{\hyperlink{classlibff_1_1edwards___g2_ab5e61fc3b52c5edfcbff48644dfbd52d}{Y}})\ *\ (\mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.Y);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ D\ =\ Y1*Y2}}
+\DoxyCodeLine{00251\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\_Fq3}}\ E\ =\ C*\mbox{\hyperlink{debug_8h_a6a96826afbc53984fc8331e32328fb3b}{D}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ E\ =\ C*D}}
+\DoxyCodeLine{00252\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\_Fq3}}\ H\ =\ C\ -\/\ \mbox{\hyperlink{classlibff_1_1edwards___g2_aa623283cb479983656793b7c4bf999b6}{edwards\_G2::mul\_by\_a}}(\mbox{\hyperlink{debug_8h_a6a96826afbc53984fc8331e32328fb3b}{D}});\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ H\ =\ C-\/a*D}}
+\DoxyCodeLine{00253\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\_Fq3}}\ I\ =\ (this-\/>\mbox{\hyperlink{struct_x_t}{X}}+this-\/>\mbox{\hyperlink{classlibff_1_1edwards___g2_ab5e61fc3b52c5edfcbff48644dfbd52d}{Y}})*(\mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.X+\mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.Y)-\/C-\/\mbox{\hyperlink{debug_8h_a6a96826afbc53984fc8331e32328fb3b}{D}};\ \ \ \ \ \textcolor{comment}{//\ I\ =\ (X1+Y1)*(X2+Y2)-\/C-\/D}}
+\DoxyCodeLine{00254\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\_Fq3}}\ X3\ =\ (E+\mbox{\hyperlink{namespace_b}{B}})*H;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ X3\ =\ (E+B)*H}}
+\DoxyCodeLine{00255\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\_Fq3}}\ Y3\ =\ (E-\/\mbox{\hyperlink{namespace_b}{B}})*I;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Y3\ =\ (E-\/B)*I}}
+\DoxyCodeLine{00256\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\_Fq3}}\ Z3\ =\ \mbox{\hyperlink{namespace_a}{A}}*H*I;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Z3\ =\ A*H*I}}
+\DoxyCodeLine{00257\ }
+\DoxyCodeLine{00258\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classlibff_1_1edwards___g2_a9a1543d44a8cc4c13466982853492a81}{edwards\_G2}}(X3,\ Y3,\ Z3);}
+\DoxyCodeLine{00259\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classlibff_1_1edwards___g2_aa200e9023af1e09e337163b89ea1a927_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classlibff_1_1edwards___g2_aa623283cb479983656793b7c4bf999b6}\index{libff::edwards\_G2@{libff::edwards\_G2}!mul\_by\_a@{mul\_by\_a}}
+\index{mul\_by\_a@{mul\_by\_a}!libff::edwards\_G2@{libff::edwards\_G2}}
+\doxysubsubsection{\texorpdfstring{mul\_by\_a()}{mul\_by\_a()}}
+{\footnotesize\ttfamily \label{classlibff_1_1edwards___g2_aa623283cb479983656793b7c4bf999b6} 
+\mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\+\_\+\+Fq3}} libff\+::edwards\+\_\+\+G2\+::mul\+\_\+by\+\_\+a (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\+\_\+\+Fq3}} \&}]{elt}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__g2_8cpp_source_l00034}{34}} of file \mbox{\hyperlink{edwards__g2_8cpp_source}{edwards\+\_\+g2.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00035\ \{}
+\DoxyCodeLine{00036\ \ \ \ \ \textcolor{comment}{//\ should\ be}}
+\DoxyCodeLine{00037\ \ \ \ \ \textcolor{comment}{//\ \ edwards\_Fq3(edwards\_twist\_mul\_by\_a\_c0\ *\ elt.c2,\ edwards\_twist\_mul\_by\_a\_c1\ *\ elt.c0,\ edwards\_twist\_mul\_by\_a\_c2\ *\ elt.c1)}}
+\DoxyCodeLine{00038\ \ \ \ \ \textcolor{comment}{//\ but\ optimizing\ the\ fact\ that\ edwards\_twist\_mul\_by\_a\_c1\ =\ edwards\_twist\_mul\_by\_a\_c2\ =\ 1}}
+\DoxyCodeLine{00039\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\_Fq3}}(\mbox{\hyperlink{namespacelibff_a75c8b605b0ae0c978eaefaa9463bcb1e}{edwards\_twist\_mul\_by\_a\_c0}}\ *\ elt.c2,\ elt.c0,\ elt.c1);}
+\DoxyCodeLine{00040\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classlibff_1_1edwards___g2_aa623283cb479983656793b7c4bf999b6_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classlibff_1_1edwards___g2_aba8cba4a8dedeb3c5f0c1055abd10432}\index{libff::edwards\_G2@{libff::edwards\_G2}!mul\_by\_d@{mul\_by\_d}}
+\index{mul\_by\_d@{mul\_by\_d}!libff::edwards\_G2@{libff::edwards\_G2}}
+\doxysubsubsection{\texorpdfstring{mul\_by\_d()}{mul\_by\_d()}}
+{\footnotesize\ttfamily \label{classlibff_1_1edwards___g2_aba8cba4a8dedeb3c5f0c1055abd10432} 
+\mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\+\_\+\+Fq3}} libff\+::edwards\+\_\+\+G2\+::mul\+\_\+by\+\_\+d (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\+\_\+\+Fq3}} \&}]{elt}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__g2_8cpp_source_l00042}{42}} of file \mbox{\hyperlink{edwards__g2_8cpp_source}{edwards\+\_\+g2.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00043\ \{}
+\DoxyCodeLine{00044\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\_Fq3}}(\mbox{\hyperlink{namespacelibff_aef3cfd31cd5ac3fe7dd357b2cfdf9f80}{edwards\_twist\_mul\_by\_d\_c0}}\ *\ elt.c2,\ \mbox{\hyperlink{namespacelibff_a4412942c013c55ccabf3668aa0aa141a}{edwards\_twist\_mul\_by\_d\_c1}}\ *\ elt.c0,\ \mbox{\hyperlink{namespacelibff_a9b966d637e715465f03160ee1a04c47a}{edwards\_twist\_mul\_by\_d\_c2}}\ *\ elt.c1);}
+\DoxyCodeLine{00045\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classlibff_1_1edwards___g2_aba8cba4a8dedeb3c5f0c1055abd10432_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classlibff_1_1edwards___g2_aee4d8db67e923cbbd7c49048b9d570e6}\index{libff::edwards\_G2@{libff::edwards\_G2}!mul\_by\_q@{mul\_by\_q}}
+\index{mul\_by\_q@{mul\_by\_q}!libff::edwards\_G2@{libff::edwards\_G2}}
+\doxysubsubsection{\texorpdfstring{mul\_by\_q()}{mul\_by\_q()}}
+{\footnotesize\ttfamily \label{classlibff_1_1edwards___g2_aee4d8db67e923cbbd7c49048b9d570e6} 
+\mbox{\hyperlink{classlibff_1_1edwards___g2}{edwards\+\_\+\+G2}} libff\+::edwards\+\_\+\+G2\+::mul\+\_\+by\+\_\+q (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__g2_8cpp_source_l00290}{290}} of file \mbox{\hyperlink{edwards__g2_8cpp_source}{edwards\+\_\+g2.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00291\ \{}
+\DoxyCodeLine{00292\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classlibff_1_1edwards___g2_a9a1543d44a8cc4c13466982853492a81}{edwards\_G2}}((this-\/>\mbox{\hyperlink{struct_x_t}{X}}).Frobenius\_map(1),}
+\DoxyCodeLine{00293\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacelibff_a380758d5f0d54ff22e997a0ae00221f5}{edwards\_twist\_mul\_by\_q\_Y}}\ *\ (this-\/>\mbox{\hyperlink{classlibff_1_1edwards___g2_ab5e61fc3b52c5edfcbff48644dfbd52d}{Y}}).Frobenius\_map(1),}
+\DoxyCodeLine{00294\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacelibff_a479e426f737a68c38b46d3f0af736c9b}{edwards\_twist\_mul\_by\_q\_Z}}\ *\ (this-\/>\mbox{\hyperlink{classlibff_1_1edwards___g2_a99140a2a935d501fc1c6825fcd2ee9d2}{Z}}).Frobenius\_map(1));}
+\DoxyCodeLine{00295\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=313pt]{classlibff_1_1edwards___g2_aee4d8db67e923cbbd7c49048b9d570e6_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classlibff_1_1edwards___g2_aa3321eec79dc4281133c6d323f3bde82}\index{libff::edwards\_G2@{libff::edwards\_G2}!one@{one}}
+\index{one@{one}!libff::edwards\_G2@{libff::edwards\_G2}}
+\doxysubsubsection{\texorpdfstring{one()}{one()}}
+{\footnotesize\ttfamily \label{classlibff_1_1edwards___g2_aa3321eec79dc4281133c6d323f3bde82} 
+\mbox{\hyperlink{classlibff_1_1edwards___g2}{edwards\+\_\+\+G2}} libff\+::edwards\+\_\+\+G2\+::one (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__g2_8cpp_source_l00329}{329}} of file \mbox{\hyperlink{edwards__g2_8cpp_source}{edwards\+\_\+g2.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00330\ \{}
+\DoxyCodeLine{00331\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classlibff_1_1edwards___g2_abd355ad5b41ae4e9491dd54ef17cc413}{G2\_one}};}
+\DoxyCodeLine{00332\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=335pt]{classlibff_1_1edwards___g2_aa3321eec79dc4281133c6d323f3bde82_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classlibff_1_1edwards___g2_a28352a1723a3e81214a9a166342c7c91}\index{libff::edwards\_G2@{libff::edwards\_G2}!operator"!=@{operator"!=}}
+\index{operator"!=@{operator"!=}!libff::edwards\_G2@{libff::edwards\_G2}}
+\doxysubsubsection{\texorpdfstring{operator"!=()}{operator!=()}}
+{\footnotesize\ttfamily \label{classlibff_1_1edwards___g2_a28352a1723a3e81214a9a166342c7c91} 
+bool libff\+::edwards\+\_\+\+G2\+::operator!= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classlibff_1_1edwards___g2}{edwards\+\_\+\+G2}} \&}]{other}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__g2_8cpp_source_l00170}{170}} of file \mbox{\hyperlink{edwards__g2_8cpp_source}{edwards\+\_\+g2.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00171\ \{}
+\DoxyCodeLine{00172\ \ \ \ \ \textcolor{keywordflow}{return}\ !(\mbox{\hyperlink{classlibff_1_1edwards___g2_a373d2e84e67e95ccb557f04156675fb0}{operator==}}(other));}
+\DoxyCodeLine{00173\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classlibff_1_1edwards___g2_a28352a1723a3e81214a9a166342c7c91_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classlibff_1_1edwards___g2_abaabf21b1e89488fd1a8384c1e6b8ba0}\index{libff::edwards\_G2@{libff::edwards\_G2}!operator+@{operator+}}
+\index{operator+@{operator+}!libff::edwards\_G2@{libff::edwards\_G2}}
+\doxysubsubsection{\texorpdfstring{operator+()}{operator+()}}
+{\footnotesize\ttfamily \label{classlibff_1_1edwards___g2_abaabf21b1e89488fd1a8384c1e6b8ba0} 
+\mbox{\hyperlink{classlibff_1_1edwards___g2}{edwards\+\_\+\+G2}} libff\+::edwards\+\_\+\+G2\+::operator+ (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classlibff_1_1edwards___g2}{edwards\+\_\+\+G2}} \&}]{other}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__g2_8cpp_source_l00175}{175}} of file \mbox{\hyperlink{edwards__g2_8cpp_source}{edwards\+\_\+g2.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00176\ \{}
+\DoxyCodeLine{00177\ \ \ \ \ \textcolor{comment}{//\ handle\ special\ cases\ having\ to\ do\ with\ O}}
+\DoxyCodeLine{00178\ \ \ \ \ \textcolor{keywordflow}{if}\ (this-\/>\mbox{\hyperlink{classlibff_1_1edwards___g2_af4c09f5488ce09b7cc0d6f7bed0ce8d5}{is\_zero}}())}
+\DoxyCodeLine{00179\ \ \ \ \ \{}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}};}
+\DoxyCodeLine{00181\ \ \ \ \ \}}
+\DoxyCodeLine{00182\ }
+\DoxyCodeLine{00183\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.is\_zero())}
+\DoxyCodeLine{00184\ \ \ \ \ \{}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (*\textcolor{keyword}{this});}
+\DoxyCodeLine{00186\ \ \ \ \ \}}
+\DoxyCodeLine{00187\ }
+\DoxyCodeLine{00188\ \ \ \ \ \textcolor{keywordflow}{return}\ this-\/>\mbox{\hyperlink{classlibff_1_1edwards___g2_a3c25bc071fed41abba3d78eb0ab5517a}{add}}(other);}
+\DoxyCodeLine{00189\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classlibff_1_1edwards___g2_abaabf21b1e89488fd1a8384c1e6b8ba0_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classlibff_1_1edwards___g2_a526a9e1d60dfd8c2fc4cb3f6b0875ed3}\index{libff::edwards\_G2@{libff::edwards\_G2}!operator-\/@{operator-\/}}
+\index{operator-\/@{operator-\/}!libff::edwards\_G2@{libff::edwards\_G2}}
+\doxysubsubsection{\texorpdfstring{operator-\/()}{operator-()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classlibff_1_1edwards___g2_a526a9e1d60dfd8c2fc4cb3f6b0875ed3} 
+\mbox{\hyperlink{classlibff_1_1edwards___g2}{edwards\+\_\+\+G2}} libff\+::edwards\+\_\+\+G2\+::operator-\/ (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__g2_8cpp_source_l00191}{191}} of file \mbox{\hyperlink{edwards__g2_8cpp_source}{edwards\+\_\+g2.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00192\ \{}
+\DoxyCodeLine{00193\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classlibff_1_1edwards___g2_a9a1543d44a8cc4c13466982853492a81}{edwards\_G2}}(-\/(this-\/>\mbox{\hyperlink{struct_x_t}{X}}),\ this-\/>\mbox{\hyperlink{classlibff_1_1edwards___g2_ab5e61fc3b52c5edfcbff48644dfbd52d}{Y}},\ this-\/>\mbox{\hyperlink{classlibff_1_1edwards___g2_a99140a2a935d501fc1c6825fcd2ee9d2}{Z}});}
+\DoxyCodeLine{00194\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=313pt]{classlibff_1_1edwards___g2_a526a9e1d60dfd8c2fc4cb3f6b0875ed3_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classlibff_1_1edwards___g2_af4571d7a8921a8138cdebbc70ad7ea7f}\index{libff::edwards\_G2@{libff::edwards\_G2}!operator-\/@{operator-\/}}
+\index{operator-\/@{operator-\/}!libff::edwards\_G2@{libff::edwards\_G2}}
+\doxysubsubsection{\texorpdfstring{operator-\/()}{operator-()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classlibff_1_1edwards___g2_af4571d7a8921a8138cdebbc70ad7ea7f} 
+\mbox{\hyperlink{classlibff_1_1edwards___g2}{edwards\+\_\+\+G2}} libff\+::edwards\+\_\+\+G2\+::operator-\/ (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classlibff_1_1edwards___g2}{edwards\+\_\+\+G2}} \&}]{other}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__g2_8cpp_source_l00197}{197}} of file \mbox{\hyperlink{edwards__g2_8cpp_source}{edwards\+\_\+g2.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00198\ \{}
+\DoxyCodeLine{00199\ \ \ \ \ \textcolor{keywordflow}{return}\ (*\textcolor{keyword}{this})\ +\ (-\/\mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}});}
+\DoxyCodeLine{00200\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classlibff_1_1edwards___g2_a373d2e84e67e95ccb557f04156675fb0}\index{libff::edwards\_G2@{libff::edwards\_G2}!operator==@{operator==}}
+\index{operator==@{operator==}!libff::edwards\_G2@{libff::edwards\_G2}}
+\doxysubsubsection{\texorpdfstring{operator==()}{operator==()}}
+{\footnotesize\ttfamily \label{classlibff_1_1edwards___g2_a373d2e84e67e95ccb557f04156675fb0} 
+bool libff\+::edwards\+\_\+\+G2\+::operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classlibff_1_1edwards___g2}{edwards\+\_\+\+G2}} \&}]{other}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__g2_8cpp_source_l00141}{141}} of file \mbox{\hyperlink{edwards__g2_8cpp_source}{edwards\+\_\+g2.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00142\ \{}
+\DoxyCodeLine{00143\ \ \ \ \ \textcolor{keywordflow}{if}\ (this-\/>\mbox{\hyperlink{classlibff_1_1edwards___g2_af4c09f5488ce09b7cc0d6f7bed0ce8d5}{is\_zero}}())}
+\DoxyCodeLine{00144\ \ \ \ \ \{}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.is\_zero();}
+\DoxyCodeLine{00146\ \ \ \ \ \}}
+\DoxyCodeLine{00147\ }
+\DoxyCodeLine{00148\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.is\_zero())}
+\DoxyCodeLine{00149\ \ \ \ \ \{}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00151\ \ \ \ \ \}}
+\DoxyCodeLine{00152\ }
+\DoxyCodeLine{00153\ \ \ \ \ \textcolor{comment}{/*\ now\ neither\ is\ O\ */}}
+\DoxyCodeLine{00154\ }
+\DoxyCodeLine{00155\ \ \ \ \ \textcolor{comment}{//\ X1/Z1\ =\ X2/Z2\ <=>\ X1*Z2\ =\ X2*Z1}}
+\DoxyCodeLine{00156\ \ \ \ \ \textcolor{keywordflow}{if}\ ((this-\/>\mbox{\hyperlink{struct_x_t}{X}}\ *\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.Z)\ !=\ (\mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.X\ *\ this-\/>Z))}
+\DoxyCodeLine{00157\ \ \ \ \ \{}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00159\ \ \ \ \ \}}
+\DoxyCodeLine{00160\ }
+\DoxyCodeLine{00161\ \ \ \ \ \textcolor{comment}{//\ Y1/Z1\ =\ Y2/Z2\ <=>\ Y1*Z2\ =\ Y2*Z1}}
+\DoxyCodeLine{00162\ \ \ \ \ \textcolor{keywordflow}{if}\ ((this-\/>\mbox{\hyperlink{classlibff_1_1edwards___g2_ab5e61fc3b52c5edfcbff48644dfbd52d}{Y}}\ *\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.Z)\ !=\ (\mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.Y\ *\ this-\/>Z))}
+\DoxyCodeLine{00163\ \ \ \ \ \{}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00165\ \ \ \ \ \}}
+\DoxyCodeLine{00166\ }
+\DoxyCodeLine{00167\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00168\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classlibff_1_1edwards___g2_a373d2e84e67e95ccb557f04156675fb0_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=313pt]{classlibff_1_1edwards___g2_a373d2e84e67e95ccb557f04156675fb0_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classlibff_1_1edwards___g2_a9cce9653590d5bd93d04c27977eb359f}\index{libff::edwards\_G2@{libff::edwards\_G2}!order@{order}}
+\index{order@{order}!libff::edwards\_G2@{libff::edwards\_G2}}
+\doxysubsubsection{\texorpdfstring{order()}{order()}}
+{\footnotesize\ttfamily \label{classlibff_1_1edwards___g2_a9cce9653590d5bd93d04c27977eb359f} 
+static \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ \mbox{\hyperlink{classlibff_1_1_fp__model_a537cb6d7a4bdf842cf9dd9194c67fb93}{scalar\+\_\+field\+::num\+\_\+limbs}} $>$ libff\+::edwards\+\_\+\+G2\+::order (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__g2_8hpp_source_l00078}{78}} of file \mbox{\hyperlink{edwards__g2_8hpp_source}{edwards\+\_\+g2.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00078\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classlibff_1_1_fp__model_a17007913e835c044394a3bd0208d09d6}{scalar\_field::field\_char}}();\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=343pt]{classlibff_1_1edwards___g2_a9cce9653590d5bd93d04c27977eb359f_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classlibff_1_1edwards___g2_a918594a8c818343b81e655364d78433e}\index{libff::edwards\_G2@{libff::edwards\_G2}!print@{print}}
+\index{print@{print}!libff::edwards\_G2@{libff::edwards\_G2}}
+\doxysubsubsection{\texorpdfstring{print()}{print()}}
+{\footnotesize\ttfamily \label{classlibff_1_1edwards___g2_a918594a8c818343b81e655364d78433e} 
+void libff\+::edwards\+\_\+\+G2\+::print (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__g2_8cpp_source_l00047}{47}} of file \mbox{\hyperlink{edwards__g2_8cpp_source}{edwards\+\_\+g2.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00048\ \{}
+\DoxyCodeLine{00049\ \ \ \ \ \textcolor{keywordflow}{if}\ (this-\/>\mbox{\hyperlink{classlibff_1_1edwards___g2_af4c09f5488ce09b7cc0d6f7bed0ce8d5}{is\_zero}}())}
+\DoxyCodeLine{00050\ \ \ \ \ \{}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}O\(\backslash\)n"{}});}
+\DoxyCodeLine{00052\ \ \ \ \ \}}
+\DoxyCodeLine{00053\ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00054\ \ \ \ \ \{}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classlibff_1_1edwards___g2_a9a1543d44a8cc4c13466982853492a81}{edwards\_G2}}\ \mbox{\hyperlink{namespacefc_a79771837fffd80fcc4bc658ee2fc4b2b}{copy}}(*\textcolor{keyword}{this});}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a79771837fffd80fcc4bc658ee2fc4b2b}{copy}}.to\_affine\_coordinates();}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ gmp\_printf(\textcolor{stringliteral}{"{}(\%Nd*z\string^2\ +\ \%Nd*z\ +\ \%Nd\ ,\ \%Nd*z\string^2\ +\ \%Nd*z\ +\ \%Nd)\(\backslash\)n"{}},}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a79771837fffd80fcc4bc658ee2fc4b2b}{copy}}.X.c2.as\_bigint().data,\ \mbox{\hyperlink{classlibff_1_1_fp__model_a537cb6d7a4bdf842cf9dd9194c67fb93}{edwards\_Fq::num\_limbs}},}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a79771837fffd80fcc4bc658ee2fc4b2b}{copy}}.X.c1.as\_bigint().data,\ \mbox{\hyperlink{classlibff_1_1_fp__model_a537cb6d7a4bdf842cf9dd9194c67fb93}{edwards\_Fq::num\_limbs}},}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a79771837fffd80fcc4bc658ee2fc4b2b}{copy}}.X.c0.as\_bigint().data,\ \mbox{\hyperlink{classlibff_1_1_fp__model_a537cb6d7a4bdf842cf9dd9194c67fb93}{edwards\_Fq::num\_limbs}},}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a79771837fffd80fcc4bc658ee2fc4b2b}{copy}}.Y.c2.as\_bigint().data,\ \mbox{\hyperlink{classlibff_1_1_fp__model_a537cb6d7a4bdf842cf9dd9194c67fb93}{edwards\_Fq::num\_limbs}},}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a79771837fffd80fcc4bc658ee2fc4b2b}{copy}}.Y.c1.as\_bigint().data,\ \mbox{\hyperlink{classlibff_1_1_fp__model_a537cb6d7a4bdf842cf9dd9194c67fb93}{edwards\_Fq::num\_limbs}},}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a79771837fffd80fcc4bc658ee2fc4b2b}{copy}}.Y.c0.as\_bigint().data,\ \mbox{\hyperlink{classlibff_1_1_fp__model_a537cb6d7a4bdf842cf9dd9194c67fb93}{edwards\_Fq::num\_limbs}});}
+\DoxyCodeLine{00064\ \ \ \ \ \}}
+\DoxyCodeLine{00065\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classlibff_1_1edwards___g2_a918594a8c818343b81e655364d78433e_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classlibff_1_1edwards___g2_ab95e2dc0afd6b5f94da33981d59e7135}\index{libff::edwards\_G2@{libff::edwards\_G2}!print\_coordinates@{print\_coordinates}}
+\index{print\_coordinates@{print\_coordinates}!libff::edwards\_G2@{libff::edwards\_G2}}
+\doxysubsubsection{\texorpdfstring{print\_coordinates()}{print\_coordinates()}}
+{\footnotesize\ttfamily \label{classlibff_1_1edwards___g2_ab95e2dc0afd6b5f94da33981d59e7135} 
+void libff\+::edwards\+\_\+\+G2\+::print\+\_\+coordinates (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__g2_8cpp_source_l00067}{67}} of file \mbox{\hyperlink{edwards__g2_8cpp_source}{edwards\+\_\+g2.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00068\ \{}
+\DoxyCodeLine{00069\ \ \ \ \ \textcolor{keywordflow}{if}\ (this-\/>\mbox{\hyperlink{classlibff_1_1edwards___g2_af4c09f5488ce09b7cc0d6f7bed0ce8d5}{is\_zero}}())}
+\DoxyCodeLine{00070\ \ \ \ \ \{}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}O\(\backslash\)n"{}});}
+\DoxyCodeLine{00072\ \ \ \ \ \}}
+\DoxyCodeLine{00073\ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00074\ \ \ \ \ \{}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ gmp\_printf(\textcolor{stringliteral}{"{}(\%Nd*z\string^2\ +\ \%Nd*z\ +\ \%Nd\ :\ \%Nd*z\string^2\ +\ \%Nd*z\ +\ \%Nd\ :\ \%Nd*z\string^2\ +\ \%Nd*z\ +\ \%Nd)\(\backslash\)n"{}},}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ this-\/>\mbox{\hyperlink{struct_x_t}{X}}.c2.as\_bigint().data,\ \mbox{\hyperlink{classlibff_1_1_fp__model_a537cb6d7a4bdf842cf9dd9194c67fb93}{edwards\_Fq::num\_limbs}},}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ this-\/>X.c1.as\_bigint().data,\ \mbox{\hyperlink{classlibff_1_1_fp__model_a537cb6d7a4bdf842cf9dd9194c67fb93}{edwards\_Fq::num\_limbs}},}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ this-\/>X.c0.as\_bigint().data,\ \mbox{\hyperlink{classlibff_1_1_fp__model_a537cb6d7a4bdf842cf9dd9194c67fb93}{edwards\_Fq::num\_limbs}},}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ this-\/>Y.c2.as\_bigint().data,\ \mbox{\hyperlink{classlibff_1_1_fp__model_a537cb6d7a4bdf842cf9dd9194c67fb93}{edwards\_Fq::num\_limbs}},}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ this-\/>Y.c1.as\_bigint().data,\ \mbox{\hyperlink{classlibff_1_1_fp__model_a537cb6d7a4bdf842cf9dd9194c67fb93}{edwards\_Fq::num\_limbs}},}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ this-\/>Y.c0.as\_bigint().data,\ \mbox{\hyperlink{classlibff_1_1_fp__model_a537cb6d7a4bdf842cf9dd9194c67fb93}{edwards\_Fq::num\_limbs}},}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ this-\/>Z.c2.as\_bigint().data,\ \mbox{\hyperlink{classlibff_1_1_fp__model_a537cb6d7a4bdf842cf9dd9194c67fb93}{edwards\_Fq::num\_limbs}},}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ this-\/>Z.c1.as\_bigint().data,\ \mbox{\hyperlink{classlibff_1_1_fp__model_a537cb6d7a4bdf842cf9dd9194c67fb93}{edwards\_Fq::num\_limbs}},}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ this-\/>Z.c0.as\_bigint().data,\ \mbox{\hyperlink{classlibff_1_1_fp__model_a537cb6d7a4bdf842cf9dd9194c67fb93}{edwards\_Fq::num\_limbs}});}
+\DoxyCodeLine{00085\ \ \ \ \ \}}
+\DoxyCodeLine{00086\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classlibff_1_1edwards___g2_ab95e2dc0afd6b5f94da33981d59e7135_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classlibff_1_1edwards___g2_a0e2c6edc3b3c03987e7b3a58aa949fd2}\index{libff::edwards\_G2@{libff::edwards\_G2}!random\_element@{random\_element}}
+\index{random\_element@{random\_element}!libff::edwards\_G2@{libff::edwards\_G2}}
+\doxysubsubsection{\texorpdfstring{random\_element()}{random\_element()}}
+{\footnotesize\ttfamily \label{classlibff_1_1edwards___g2_a0e2c6edc3b3c03987e7b3a58aa949fd2} 
+\mbox{\hyperlink{classlibff_1_1edwards___g2}{edwards\+\_\+\+G2}} libff\+::edwards\+\_\+\+G2\+::random\+\_\+element (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__g2_8cpp_source_l00334}{334}} of file \mbox{\hyperlink{edwards__g2_8cpp_source}{edwards\+\_\+g2.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00335\ \{}
+\DoxyCodeLine{00336\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classlibff_1_1_fp__model_afc32db599e3a27d9ed19016d14d465a3}{edwards\_Fr::random\_element}}().as\_bigint()\ *\ \mbox{\hyperlink{classlibff_1_1edwards___g2_abd355ad5b41ae4e9491dd54ef17cc413}{G2\_one}};}
+\DoxyCodeLine{00337\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=333pt]{classlibff_1_1edwards___g2_a0e2c6edc3b3c03987e7b3a58aa949fd2_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classlibff_1_1edwards___g2_a4bd65268bfbae96f16f01bf5cf933a09}\index{libff::edwards\_G2@{libff::edwards\_G2}!size\_in\_bits@{size\_in\_bits}}
+\index{size\_in\_bits@{size\_in\_bits}!libff::edwards\_G2@{libff::edwards\_G2}}
+\doxysubsubsection{\texorpdfstring{size\_in\_bits()}{size\_in\_bits()}}
+{\footnotesize\ttfamily \label{classlibff_1_1edwards___g2_a4bd65268bfbae96f16f01bf5cf933a09} 
+static size\+\_\+t libff\+::edwards\+\_\+\+G2\+::size\+\_\+in\+\_\+bits (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__g2_8hpp_source_l00076}{76}} of file \mbox{\hyperlink{edwards__g2_8hpp_source}{edwards\+\_\+g2.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00076\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classlibff_1_1_fp3__model_a42632944bde8f169a8fdebf4df8ceb7a}{twist\_field::size\_in\_bits}}()\ +\ 1;\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classlibff_1_1edwards___g2_a4bd65268bfbae96f16f01bf5cf933a09_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classlibff_1_1edwards___g2_aaa060f954066d8f17360bd4240625699}\index{libff::edwards\_G2@{libff::edwards\_G2}!to\_affine\_coordinates@{to\_affine\_coordinates}}
+\index{to\_affine\_coordinates@{to\_affine\_coordinates}!libff::edwards\_G2@{libff::edwards\_G2}}
+\doxysubsubsection{\texorpdfstring{to\_affine\_coordinates()}{to\_affine\_coordinates()}}
+{\footnotesize\ttfamily \label{classlibff_1_1edwards___g2_aaa060f954066d8f17360bd4240625699} 
+void libff\+::edwards\+\_\+\+G2\+::to\+\_\+affine\+\_\+coordinates (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__g2_8cpp_source_l00088}{88}} of file \mbox{\hyperlink{edwards__g2_8cpp_source}{edwards\+\_\+g2.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00089\ \{}
+\DoxyCodeLine{00090\ \ \ \ \ \textcolor{keywordflow}{if}\ (this-\/>\mbox{\hyperlink{classlibff_1_1edwards___g2_af4c09f5488ce09b7cc0d6f7bed0ce8d5}{is\_zero}}())}
+\DoxyCodeLine{00091\ \ \ \ \ \{}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ this-\/>\mbox{\hyperlink{struct_x_t}{X}}\ =\ \mbox{\hyperlink{classlibff_1_1_fp3__model_ac40e5078fc001bf10caeab9e0d793c49}{edwards\_Fq3::zero}}();}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ this-\/>\mbox{\hyperlink{classlibff_1_1edwards___g2_ab5e61fc3b52c5edfcbff48644dfbd52d}{Y}}\ =\ \mbox{\hyperlink{classlibff_1_1_fp3__model_a7694c73c1ac55c3f9b00c8b51c7ffeff}{edwards\_Fq3::one}}();}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ this-\/>\mbox{\hyperlink{classlibff_1_1edwards___g2_a99140a2a935d501fc1c6825fcd2ee9d2}{Z}}\ =\ \mbox{\hyperlink{classlibff_1_1_fp3__model_a7694c73c1ac55c3f9b00c8b51c7ffeff}{edwards\_Fq3::one}}();}
+\DoxyCodeLine{00095\ \ \ \ \ \}}
+\DoxyCodeLine{00096\ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00097\ \ \ \ \ \{}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ go\ from\ inverted\ coordinates\ to\ projective\ coordinates}}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\_Fq3}}\ tX\ =\ this-\/>\mbox{\hyperlink{classlibff_1_1edwards___g2_ab5e61fc3b52c5edfcbff48644dfbd52d}{Y}}\ *\ this-\/>\mbox{\hyperlink{classlibff_1_1edwards___g2_a99140a2a935d501fc1c6825fcd2ee9d2}{Z}};}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\_Fq3}}\ tY\ =\ this-\/>\mbox{\hyperlink{struct_x_t}{X}}\ *\ this-\/>\mbox{\hyperlink{classlibff_1_1edwards___g2_a99140a2a935d501fc1c6825fcd2ee9d2}{Z}};}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\_Fq3}}\ tZ\ =\ this-\/>\mbox{\hyperlink{struct_x_t}{X}}\ *\ this-\/>\mbox{\hyperlink{classlibff_1_1edwards___g2_ab5e61fc3b52c5edfcbff48644dfbd52d}{Y}};}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ go\ from\ projective\ coordinates\ to\ affine\ coordinates}}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\_Fq3}}\ tZ\_inv\ =\ tZ.\mbox{\hyperlink{classlibff_1_1_fp3__model_a4eed1fe6afa08c5919bf272ae4ef7aae}{inverse}}();}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ this-\/>\mbox{\hyperlink{struct_x_t}{X}}\ =\ tX\ *\ tZ\_inv;}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ this-\/>Y\ =\ tY\ *\ tZ\_inv;}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ this-\/>Z\ =\ \mbox{\hyperlink{classlibff_1_1_fp3__model_a7694c73c1ac55c3f9b00c8b51c7ffeff}{edwards\_Fq3::one}}();}
+\DoxyCodeLine{00107\ \ \ \ \ \}}
+\DoxyCodeLine{00108\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classlibff_1_1edwards___g2_aaa060f954066d8f17360bd4240625699_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classlibff_1_1edwards___g2_aaa060f954066d8f17360bd4240625699_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classlibff_1_1edwards___g2_ab19394b08c865bbed1742a9ab42f7d6c}\index{libff::edwards\_G2@{libff::edwards\_G2}!to\_special@{to\_special}}
+\index{to\_special@{to\_special}!libff::edwards\_G2@{libff::edwards\_G2}}
+\doxysubsubsection{\texorpdfstring{to\_special()}{to\_special()}}
+{\footnotesize\ttfamily \label{classlibff_1_1edwards___g2_ab19394b08c865bbed1742a9ab42f7d6c} 
+void libff\+::edwards\+\_\+\+G2\+::to\+\_\+special (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__g2_8cpp_source_l00110}{110}} of file \mbox{\hyperlink{edwards__g2_8cpp_source}{edwards\+\_\+g2.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00111\ \{}
+\DoxyCodeLine{00112\ \ \ \ \ \textcolor{keywordflow}{if}\ (this-\/>\mbox{\hyperlink{classlibff_1_1edwards___g2_a99140a2a935d501fc1c6825fcd2ee9d2}{Z}}.\mbox{\hyperlink{classlibff_1_1_fp3__model_ab518027d2286b3ef3324c15667bb4b10}{is\_zero}}())}
+\DoxyCodeLine{00113\ \ \ \ \ \{}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00115\ \ \ \ \ \}}
+\DoxyCodeLine{00116\ }
+\DoxyCodeLine{00117\ \textcolor{preprocessor}{\#ifdef\ DEBUG}}
+\DoxyCodeLine{00118\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classlibff_1_1edwards___g2_a9a1543d44a8cc4c13466982853492a81}{edwards\_G2}}\ \mbox{\hyperlink{namespacefc_a79771837fffd80fcc4bc658ee2fc4b2b}{copy}}(*\textcolor{keyword}{this});}
+\DoxyCodeLine{00119\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00120\ }
+\DoxyCodeLine{00121\ \ \ \ \ \mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\_Fq3}}\ Z\_inv\ =\ this-\/>\mbox{\hyperlink{classlibff_1_1edwards___g2_a99140a2a935d501fc1c6825fcd2ee9d2}{Z}}.\mbox{\hyperlink{classlibff_1_1_fp3__model_a4eed1fe6afa08c5919bf272ae4ef7aae}{inverse}}();}
+\DoxyCodeLine{00122\ \ \ \ \ this-\/>\mbox{\hyperlink{struct_x_t}{X}}\ =\ this-\/>\mbox{\hyperlink{struct_x_t}{X}}\ *\ Z\_inv;}
+\DoxyCodeLine{00123\ \ \ \ \ this-\/>\mbox{\hyperlink{classlibff_1_1edwards___g2_ab5e61fc3b52c5edfcbff48644dfbd52d}{Y}}\ =\ this-\/>\mbox{\hyperlink{classlibff_1_1edwards___g2_ab5e61fc3b52c5edfcbff48644dfbd52d}{Y}}\ *\ Z\_inv;}
+\DoxyCodeLine{00124\ \ \ \ \ this-\/>\mbox{\hyperlink{classlibff_1_1edwards___g2_a99140a2a935d501fc1c6825fcd2ee9d2}{Z}}\ =\ \mbox{\hyperlink{classlibff_1_1_fp3__model_a7694c73c1ac55c3f9b00c8b51c7ffeff}{edwards\_Fq3::one}}();}
+\DoxyCodeLine{00125\ }
+\DoxyCodeLine{00126\ \textcolor{preprocessor}{\#ifdef\ DEBUG}}
+\DoxyCodeLine{00127\ \ \ \ \ assert((*\textcolor{keyword}{this})\ ==\ copy);}
+\DoxyCodeLine{00128\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00129\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classlibff_1_1edwards___g2_ab19394b08c865bbed1742a9ab42f7d6c_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classlibff_1_1edwards___g2_a26000143fff61d7d6e40ec879720bc42}\index{libff::edwards\_G2@{libff::edwards\_G2}!zero@{zero}}
+\index{zero@{zero}!libff::edwards\_G2@{libff::edwards\_G2}}
+\doxysubsubsection{\texorpdfstring{zero()}{zero()}}
+{\footnotesize\ttfamily \label{classlibff_1_1edwards___g2_a26000143fff61d7d6e40ec879720bc42} 
+\mbox{\hyperlink{classlibff_1_1edwards___g2}{edwards\+\_\+\+G2}} libff\+::edwards\+\_\+\+G2\+::zero (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__g2_8cpp_source_l00324}{324}} of file \mbox{\hyperlink{edwards__g2_8cpp_source}{edwards\+\_\+g2.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00325\ \{}
+\DoxyCodeLine{00326\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classlibff_1_1edwards___g2_ac78fb5ea61a1e9ee1a2b67543b2cd6fe}{G2\_zero}};}
+\DoxyCodeLine{00327\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{classlibff_1_1edwards___g2_a4b0dd06852ee538b2489a38a3636a2bd}\index{libff::edwards\_G2@{libff::edwards\_G2}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!libff::edwards\_G2@{libff::edwards\_G2}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$}{operator<<}}
+{\footnotesize\ttfamily \label{classlibff_1_1edwards___g2_a4b0dd06852ee538b2489a38a3636a2bd} 
+std\+::ostream \& operator$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{out}{, }\item[{const \mbox{\hyperlink{classlibff_1_1edwards___g2}{edwards\+\_\+\+G2}} \&}]{g}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__g2_8cpp_source_l00339}{339}} of file \mbox{\hyperlink{edwards__g2_8cpp_source}{edwards\+\_\+g2.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00340\ \{}
+\DoxyCodeLine{00341\ \ \ \ \ \mbox{\hyperlink{classlibff_1_1edwards___g2_a9a1543d44a8cc4c13466982853492a81}{edwards\_G2}}\ \mbox{\hyperlink{namespacefc_a79771837fffd80fcc4bc658ee2fc4b2b}{copy}}(g);}
+\DoxyCodeLine{00342\ \ \ \ \ \mbox{\hyperlink{namespacefc_a79771837fffd80fcc4bc658ee2fc4b2b}{copy}}.to\_affine\_coordinates();}
+\DoxyCodeLine{00343\ \textcolor{preprocessor}{\#ifdef\ NO\_PT\_COMPRESSION}}
+\DoxyCodeLine{00344\ \ \ \ \ out\ <<\ \mbox{\hyperlink{namespacefc_a79771837fffd80fcc4bc658ee2fc4b2b}{copy}}.X\ <<\ \mbox{\hyperlink{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_ad80cfbe7456c7d029544e8bc2cec16c8}{OUTPUT\_SEPARATOR}}\ <<\ \mbox{\hyperlink{namespacefc_a79771837fffd80fcc4bc658ee2fc4b2b}{copy}}.Y;}
+\DoxyCodeLine{00345\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00346\ \ \ \ \ \textcolor{comment}{/*\ storing\ LSB\ of\ Y\ */}}
+\DoxyCodeLine{00347\ \ \ \ \ out\ <<\ \mbox{\hyperlink{namespacefc_a79771837fffd80fcc4bc658ee2fc4b2b}{copy}}.X\ <<\ \mbox{\hyperlink{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_ad80cfbe7456c7d029544e8bc2cec16c8}{OUTPUT\_SEPARATOR}}\ <<\ (\mbox{\hyperlink{namespacefc_a79771837fffd80fcc4bc658ee2fc4b2b}{copy}}.Y.c0.as\_bigint().data[0]\ \&\ 1);}
+\DoxyCodeLine{00348\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00349\ \ \ \ \ \textcolor{keywordflow}{return}\ out;}
+\DoxyCodeLine{00350\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classlibff_1_1edwards___g2_a77c57b8fe495dd63f32dfbf45af0421e}\index{libff::edwards\_G2@{libff::edwards\_G2}!operator$>$$>$@{operator$>$$>$}}
+\index{operator$>$$>$@{operator$>$$>$}!libff::edwards\_G2@{libff::edwards\_G2}}
+\doxysubsubsection{\texorpdfstring{operator$>$$>$}{operator>>}}
+{\footnotesize\ttfamily \label{classlibff_1_1edwards___g2_a77c57b8fe495dd63f32dfbf45af0421e} 
+std\+::istream \& operator$>$$>$ (\begin{DoxyParamCaption}\item[{std\+::istream \&}]{in}{, }\item[{\mbox{\hyperlink{classlibff_1_1edwards___g2}{edwards\+\_\+\+G2}} \&}]{g}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__g2_8cpp_source_l00352}{352}} of file \mbox{\hyperlink{edwards__g2_8cpp_source}{edwards\+\_\+g2.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00353\ \{}
+\DoxyCodeLine{00354\ \ \ \ \ \mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\_Fq3}}\ tX,\ tY;}
+\DoxyCodeLine{00355\ }
+\DoxyCodeLine{00356\ \textcolor{preprocessor}{\#ifdef\ NO\_PT\_COMPRESSION}}
+\DoxyCodeLine{00357\ \ \ \ \ in\ >>\ tX;}
+\DoxyCodeLine{00358\ \ \ \ \ \mbox{\hyperlink{namespacelibff_a3b7a446329c9be967e16ab1c04f260e6}{consume\_OUTPUT\_SEPARATOR}}(in);}
+\DoxyCodeLine{00359\ \ \ \ \ in\ >>\ tY;}
+\DoxyCodeLine{00360\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00361\ \ \ \ \ \textcolor{comment}{/*}}
+\DoxyCodeLine{00362\ \textcolor{comment}{\ \ \ \ \ \ a\ x\string^2\ +\ y\string^2\ =\ 1\ +\ d\ x\string^2\ y\string^2}}
+\DoxyCodeLine{00363\ \textcolor{comment}{\ \ \ \ \ \ y\ =\ sqrt((1-\/ax\string^2)/(1-\/dx\string^2))}}
+\DoxyCodeLine{00364\ \textcolor{comment}{\ \ \ \ */}}
+\DoxyCodeLine{00365\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ Y\_lsb;}
+\DoxyCodeLine{00366\ \ \ \ \ in\ >>\ tX;}
+\DoxyCodeLine{00367\ \ \ \ \ \mbox{\hyperlink{namespacelibff_a3b7a446329c9be967e16ab1c04f260e6}{consume\_OUTPUT\_SEPARATOR}}(in);}
+\DoxyCodeLine{00368\ }
+\DoxyCodeLine{00369\ \ \ \ \ in.read((\textcolor{keywordtype}{char}*)\&Y\_lsb,\ 1);}
+\DoxyCodeLine{00370\ \ \ \ \ Y\_lsb\ -\/=\ \textcolor{charliteral}{'0'};}
+\DoxyCodeLine{00371\ }
+\DoxyCodeLine{00372\ \ \ \ \ \mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\_Fq3}}\ tX2\ =\ tX.\mbox{\hyperlink{classlibff_1_1_fp3__model_a531291be856a835c47d632a88ba4cfaa}{squared}}();}
+\DoxyCodeLine{00373\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\_Fq3}}\ tY2\ =}
+\DoxyCodeLine{00374\ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{classlibff_1_1_fp3__model_a7694c73c1ac55c3f9b00c8b51c7ffeff}{edwards\_Fq3::one}}()\ -\/\ \mbox{\hyperlink{classlibff_1_1edwards___g2_aa623283cb479983656793b7c4bf999b6}{edwards\_G2::mul\_by\_a}}(tX2))\ *}
+\DoxyCodeLine{00375\ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{classlibff_1_1_fp3__model_a7694c73c1ac55c3f9b00c8b51c7ffeff}{edwards\_Fq3::one}}()\ -\/\ \mbox{\hyperlink{classlibff_1_1edwards___g2_aba8cba4a8dedeb3c5f0c1055abd10432}{edwards\_G2::mul\_by\_d}}(tX2)).\mbox{\hyperlink{classlibff_1_1_fp3__model_a4eed1fe6afa08c5919bf272ae4ef7aae}{inverse}}();}
+\DoxyCodeLine{00376\ \ \ \ \ tY\ =\ tY2.\mbox{\hyperlink{classlibff_1_1_fp3__model_a9e9807e10cba30ab69b6c24041a09da9}{sqrt}}();}
+\DoxyCodeLine{00377\ }
+\DoxyCodeLine{00378\ \ \ \ \ \textcolor{keywordflow}{if}\ ((tY.c0.as\_bigint().data[0]\ \&\ 1)\ !=\ Y\_lsb)}
+\DoxyCodeLine{00379\ \ \ \ \ \{}
+\DoxyCodeLine{00380\ \ \ \ \ \ \ \ \ tY\ =\ -\/tY;}
+\DoxyCodeLine{00381\ \ \ \ \ \}}
+\DoxyCodeLine{00382\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00383\ }
+\DoxyCodeLine{00384\ \ \ \ \ \textcolor{comment}{//\ using\ inverted\ coordinates}}
+\DoxyCodeLine{00385\ \ \ \ \ g.X\ =\ tY;}
+\DoxyCodeLine{00386\ \ \ \ \ g.Y\ =\ tX;}
+\DoxyCodeLine{00387\ \ \ \ \ g.Z\ =\ tX\ *\ tY;}
+\DoxyCodeLine{00388\ }
+\DoxyCodeLine{00389\ \textcolor{preprocessor}{\#ifdef\ USE\_MIXED\_ADDITION}}
+\DoxyCodeLine{00390\ \ \ \ \ g.to\_special();}
+\DoxyCodeLine{00391\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00392\ }
+\DoxyCodeLine{00393\ \ \ \ \ \textcolor{keywordflow}{return}\ in;}
+\DoxyCodeLine{00394\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classlibff_1_1edwards___g2_a924a5490983e9fabae01dfd7a97288e1}\index{libff::edwards\_G2@{libff::edwards\_G2}!fixed\_base\_exp\_window\_table@{fixed\_base\_exp\_window\_table}}
+\index{fixed\_base\_exp\_window\_table@{fixed\_base\_exp\_window\_table}!libff::edwards\_G2@{libff::edwards\_G2}}
+\doxysubsubsection{\texorpdfstring{fixed\_base\_exp\_window\_table}{fixed\_base\_exp\_window\_table}}
+{\footnotesize\ttfamily \label{classlibff_1_1edwards___g2_a924a5490983e9fabae01dfd7a97288e1} 
+std\+::vector$<$ size\+\_\+t $>$ libff\+::edwards\+\_\+\+G2\+::fixed\+\_\+base\+\_\+exp\+\_\+window\+\_\+table\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__g2_8hpp_source_l00029}{29}} of file \mbox{\hyperlink{edwards__g2_8hpp_source}{edwards\+\_\+g2.\+hpp}}.
+
+\Hypertarget{classlibff_1_1edwards___g2_abd355ad5b41ae4e9491dd54ef17cc413}\index{libff::edwards\_G2@{libff::edwards\_G2}!G2\_one@{G2\_one}}
+\index{G2\_one@{G2\_one}!libff::edwards\_G2@{libff::edwards\_G2}}
+\doxysubsubsection{\texorpdfstring{G2\_one}{G2\_one}}
+{\footnotesize\ttfamily \label{classlibff_1_1edwards___g2_abd355ad5b41ae4e9491dd54ef17cc413} 
+\mbox{\hyperlink{classlibff_1_1edwards___g2}{edwards\+\_\+\+G2}} libff\+::edwards\+\_\+\+G2\+::\+G2\+\_\+one = \{\}\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__g2_8hpp_source_l00032}{32}} of file \mbox{\hyperlink{edwards__g2_8hpp_source}{edwards\+\_\+g2.\+hpp}}.
+
+\Hypertarget{classlibff_1_1edwards___g2_ac78fb5ea61a1e9ee1a2b67543b2cd6fe}\index{libff::edwards\_G2@{libff::edwards\_G2}!G2\_zero@{G2\_zero}}
+\index{G2\_zero@{G2\_zero}!libff::edwards\_G2@{libff::edwards\_G2}}
+\doxysubsubsection{\texorpdfstring{G2\_zero}{G2\_zero}}
+{\footnotesize\ttfamily \label{classlibff_1_1edwards___g2_ac78fb5ea61a1e9ee1a2b67543b2cd6fe} 
+\mbox{\hyperlink{classlibff_1_1edwards___g2}{edwards\+\_\+\+G2}} libff\+::edwards\+\_\+\+G2\+::\+G2\+\_\+zero = \{\}\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__g2_8hpp_source_l00031}{31}} of file \mbox{\hyperlink{edwards__g2_8hpp_source}{edwards\+\_\+g2.\+hpp}}.
+
+\Hypertarget{classlibff_1_1edwards___g2_a99f0e7b0a4e9ba15a4cdae764398054d}\index{libff::edwards\_G2@{libff::edwards\_G2}!initialized@{initialized}}
+\index{initialized@{initialized}!libff::edwards\_G2@{libff::edwards\_G2}}
+\doxysubsubsection{\texorpdfstring{initialized}{initialized}}
+{\footnotesize\ttfamily \label{classlibff_1_1edwards___g2_a99f0e7b0a4e9ba15a4cdae764398054d} 
+bool libff\+::edwards\+\_\+\+G2\+::initialized = false\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__g2_8hpp_source_l00033}{33}} of file \mbox{\hyperlink{edwards__g2_8hpp_source}{edwards\+\_\+g2.\+hpp}}.
+
+\Hypertarget{classlibff_1_1edwards___g2_ac137e30fc787fa6c978bfabdaed5825b}\index{libff::edwards\_G2@{libff::edwards\_G2}!wnaf\_window\_table@{wnaf\_window\_table}}
+\index{wnaf\_window\_table@{wnaf\_window\_table}!libff::edwards\_G2@{libff::edwards\_G2}}
+\doxysubsubsection{\texorpdfstring{wnaf\_window\_table}{wnaf\_window\_table}}
+{\footnotesize\ttfamily \label{classlibff_1_1edwards___g2_ac137e30fc787fa6c978bfabdaed5825b} 
+std\+::vector$<$ size\+\_\+t $>$ libff\+::edwards\+\_\+\+G2\+::wnaf\+\_\+window\+\_\+table\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__g2_8hpp_source_l00028}{28}} of file \mbox{\hyperlink{edwards__g2_8hpp_source}{edwards\+\_\+g2.\+hpp}}.
+
+\Hypertarget{classlibff_1_1edwards___g2_ae0620259ec606ee2761bef5b60164a87}\index{libff::edwards\_G2@{libff::edwards\_G2}!X@{X}}
+\index{X@{X}!libff::edwards\_G2@{libff::edwards\_G2}}
+\doxysubsubsection{\texorpdfstring{X}{X}}
+{\footnotesize\ttfamily \label{classlibff_1_1edwards___g2_ae0620259ec606ee2761bef5b60164a87} 
+\mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\+\_\+\+Fq3}} libff\+::edwards\+\_\+\+G2\+::X}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__g2_8hpp_source_l00035}{35}} of file \mbox{\hyperlink{edwards__g2_8hpp_source}{edwards\+\_\+g2.\+hpp}}.
+
+\Hypertarget{classlibff_1_1edwards___g2_ab5e61fc3b52c5edfcbff48644dfbd52d}\index{libff::edwards\_G2@{libff::edwards\_G2}!Y@{Y}}
+\index{Y@{Y}!libff::edwards\_G2@{libff::edwards\_G2}}
+\doxysubsubsection{\texorpdfstring{Y}{Y}}
+{\footnotesize\ttfamily \label{classlibff_1_1edwards___g2_ab5e61fc3b52c5edfcbff48644dfbd52d} 
+\mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\+\_\+\+Fq3}} libff\+::edwards\+\_\+\+G2\+::Y}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__g2_8hpp_source_l00035}{35}} of file \mbox{\hyperlink{edwards__g2_8hpp_source}{edwards\+\_\+g2.\+hpp}}.
+
+\Hypertarget{classlibff_1_1edwards___g2_a99140a2a935d501fc1c6825fcd2ee9d2}\index{libff::edwards\_G2@{libff::edwards\_G2}!Z@{Z}}
+\index{Z@{Z}!libff::edwards\_G2@{libff::edwards\_G2}}
+\doxysubsubsection{\texorpdfstring{Z}{Z}}
+{\footnotesize\ttfamily \label{classlibff_1_1edwards___g2_a99140a2a935d501fc1c6825fcd2ee9d2} 
+\mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\+\_\+\+Fq3}} libff\+::edwards\+\_\+\+G2\+::Z}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__g2_8hpp_source_l00035}{35}} of file \mbox{\hyperlink{edwards__g2_8hpp_source}{edwards\+\_\+g2.\+hpp}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/libraries/ff/libff/algebra/curves/edwards/\mbox{\hyperlink{edwards__g2_8hpp}{edwards\+\_\+g2.\+hpp}}\item 
+libraries/fc/libraries/ff/libff/algebra/curves/edwards/\mbox{\hyperlink{edwards__g2_8cpp}{edwards\+\_\+g2.\+cpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,39 @@
+<map id="Catch::getRegistryHub" name="Catch::getRegistryHub">
+<area shape="rect" id="Node000001" title=" " alt="" coords="701,277,857,303"/>
+<area shape="rect" id="Node000002" href="$struct_catch_1_1_i_tag_alias_registry.html#a7c4bf6e2fc52de95fb2596ba19b3bf76" title=" " alt="" coords="448,55,641,80"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="752,268,651,167,559,83,563,79,655,163,756,264"/>
+<area shape="rect" id="Node000006" href="$namespace_catch.html#a97039bab95e97f059410f67425f1f2da" title=" " alt="" coords="445,177,643,203"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="731,273,576,206,578,201,733,268"/>
+<area shape="rect" id="Node000011" href="$namespace_catch.html#a372777bee6b529124e0cae35748bb79c" title=" " alt="" coords="475,252,613,278"/>
+<area shape="poly" id="edge12_Node000001_Node000011" title=" " alt="" coords="686,283,614,275,614,270,686,278"/>
+<area shape="rect" id="Node000012" href="$namespace_catch.html#add4f86f38bf30c7b49daacfac665aaff" title=" " alt="" coords="435,353,653,379"/>
+<area shape="poly" id="edge14_Node000001_Node000012" title=" " alt="" coords="728,311,654,337,594,355,592,350,653,332,726,306"/>
+<area shape="rect" id="Node000013" href="$class_catch_1_1_session.html#a4564992e2b028770e38a1dcc6fff8b34" title=" " alt="" coords="187,304,353,330"/>
+<area shape="poly" id="edge17_Node000001_Node000013" title=" " alt="" coords="686,298,354,315,353,310,686,292"/>
+<area shape="rect" id="Node000015" href="$namespace_catch.html#adafff91485eeeeb9e9333f317cc0e3b1" title=" " alt="" coords="440,403,649,428"/>
+<area shape="poly" id="edge18_Node000001_Node000015" title=" " alt="" coords="757,316,713,356,684,377,654,394,627,405,625,400,652,389,682,372,709,352,754,312"/>
+<area shape="rect" id="Node000003" href="$class_catch_1_1_config.html#a25ad0360a8386e7bc068c9c1ac5320bf" title=" " alt="" coords="196,5,344,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="453,54,344,34,345,29,454,49"/>
+<area shape="rect" id="Node000004" href="$namespace_catch.html#a30373cc449e9c2fb629ef8a0df323cdd" title=" " alt="" coords="194,55,346,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="432,70,346,70,346,65,432,65"/>
+<area shape="rect" id="Node000005" href="$_cmd_line_8tests_8cpp.html#a0fd69e25bdfb62c4f72014ad241bb8c3" title=" " alt="" coords="5,55,105,80"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="179,70,105,70,105,65,179,65"/>
+<area shape="rect" id="Node000007" href="$namespace_catch.html#a2226866b4114853fb3ff63dbecc8b0c9" title=" " alt="" coords="215,104,324,130"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="489,174,386,143,324,129,326,124,388,138,490,169"/>
+<area shape="rect" id="Node000009" href="$namespace_catch.html#ac2542a1569e5b9dc72206347368a921e" title=" " alt="" coords="213,153,326,179"/>
+<area shape="poly" id="edge8_Node000006_Node000009" title=" " alt="" coords="429,183,327,174,327,168,430,177"/>
+<area shape="rect" id="Node000010" href="$namespace_catch.html#a7f2d0f82056a4b9adc4204b9a1fbd117" title=" " alt="" coords="179,203,361,228"/>
+<area shape="poly" id="edge10_Node000006_Node000010" title=" " alt="" coords="430,203,362,210,361,204,429,198"/>
+<area shape="rect" id="Node000008" href="$namespace_catch.html#a8267f077fd7ddf88bb182e8b9ead85d3" title=" " alt="" coords="14,177,96,203"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="201,130,154,143,114,161,79,179,77,174,111,156,152,138,199,125"/>
+<area shape="poly" id="edge9_Node000009_Node000008" title=" " alt="" coords="198,177,97,188,96,183,197,172"/>
+<area shape="poly" id="edge11_Node000010_Node000008" title=" " alt="" coords="163,206,96,198,97,192,164,200"/>
+<area shape="poly" id="edge13_Node000011_Node000008" title=" " alt="" coords="460,272,392,273,314,270,232,260,152,243,109,226,74,206,77,201,112,221,153,238,233,255,315,264,392,268,459,267"/>
+<area shape="poly" id="edge15_Node000012_Node000013" title=" " alt="" coords="453,353,345,333,346,328,454,347"/>
+<area shape="rect" id="Node000014" href="$_cmd_line_8tests_8cpp.html#a44d5ced817b0c1ec9baafeab51cbe1fd" title=" " alt="" coords="220,353,320,379"/>
+<area shape="poly" id="edge16_Node000012_Node000014" title=" " alt="" coords="420,369,320,369,320,364,420,364"/>
+<area shape="rect" id="Node000016" href="$namespace_catch.html#a3a96a82307107087642e22fc4be5844d" title=" " alt="" coords="158,403,382,428"/>
+<area shape="poly" id="edge19_Node000015_Node000016" title=" " alt="" coords="424,418,382,418,382,413,424,413"/>
+<area shape="rect" id="Node000017" href="$class_catch_1_1_assertion_handler.html#aa2504dad6a91f3645e5f52c932c11270" title=" " alt="" coords="153,452,387,493"/>
+<area shape="poly" id="edge20_Node000015_Node000017" title=" " alt="" coords="465,435,371,454,370,449,464,429"/>
+</map>

@@ -1,0 +1,644 @@
+\doxysection{libraries/fc/libraries/ff/depends/xbyak/test/cybozu/test.hpp File Reference}
+\hypertarget{xbyak_2test_2cybozu_2test_8hpp}{}\label{xbyak_2test_2cybozu_2test_8hpp}\index{libraries/fc/libraries/ff/depends/xbyak/test/cybozu/test.hpp@{libraries/fc/libraries/ff/depends/xbyak/test/cybozu/test.hpp}}
+
+
+unit test class  
+
+
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include $<$string$>$}\newline
+{\ttfamily \#include $<$list$>$}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$utility$>$}\newline
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+Include dependency graph for test.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{xbyak_2test_2cybozu_2test_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=326pt]{xbyak_2test_2cybozu_2test_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classcybozu_1_1test_1_1_auto_run}{cybozu\+::test\+::\+Auto\+Run}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacecybozu}{cybozu}}
+\item 
+namespace \mbox{\hyperlink{namespacecybozu_1_1test}{cybozu\+::test}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{xbyak_2test_2cybozu_2test_8hpp_a275b40cea38ee703709b5b981e4df6ac}{CYBOZU\+\_\+\+TEST\+\_\+\+ASSERT}}(x)
+\item 
+\#define \mbox{\hyperlink{xbyak_2test_2cybozu_2test_8hpp_adf4139512121fff5a626af6d06b528ad}{CYBOZU\+\_\+\+TEST\+\_\+\+EQUAL}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{xbyak_2test_2cybozu_2test_8hpp_a3991e3f3e5ee2da1dd32aca74509fb49}{CYBOZU\+\_\+\+TEST\+\_\+\+NEAR}}(x,  y,  eps)
+\item 
+\#define \mbox{\hyperlink{xbyak_2test_2cybozu_2test_8hpp_a7dab074dddf6faa52749d6ecdf19d753}{CYBOZU\+\_\+\+TEST\+\_\+\+EQUAL\+\_\+\+POINTER}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{xbyak_2test_2cybozu_2test_8hpp_a92f39fde95bc92a21c55ec4017c6b026}{CYBOZU\+\_\+\+TEST\+\_\+\+EQUAL\+\_\+\+ARRAY}}(x,  y,  n)
+\item 
+\#define \mbox{\hyperlink{xbyak_2test_2cybozu_2test_8hpp_aff1dee14ebf6d4ac83a4f25c07133301}{CYBOZU\+\_\+\+TEST\+\_\+\+FAIL}}(msg)
+\item 
+\#define \mbox{\hyperlink{xbyak_2test_2cybozu_2test_8hpp_a2812e559523c1b784c4334ba06fbe63a}{CYBOZU\+\_\+\+TEST\+\_\+\+EXCEPTION\+\_\+\+MESSAGE}}(statement,  Exception,  msg)
+\item 
+\#define \mbox{\hyperlink{xbyak_2test_2cybozu_2test_8hpp_a55d417cd6a01e7709f468f27f1de0309}{CYBOZU\+\_\+\+TEST\+\_\+\+EXCEPTION}}(statement,  Exception)
+\item 
+\#define \mbox{\hyperlink{xbyak_2test_2cybozu_2test_8hpp_aa2797929b9474d118ec22c945aa8b244}{CYBOZU\+\_\+\+TEST\+\_\+\+NO\+\_\+\+EXCEPTION}}(statement)
+\item 
+\#define \mbox{\hyperlink{xbyak_2test_2cybozu_2test_8hpp_ae6af8da76a2ce1a6132c96b49c20923c}{CYBOZU\+\_\+\+TEST\+\_\+\+AUTO}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})
+\item 
+\#define \mbox{\hyperlink{xbyak_2test_2cybozu_2test_8hpp_abe70b825e63f61c0396efda329895603}{CYBOZU\+\_\+\+TEST\+\_\+\+AUTO\+\_\+\+WITH\+\_\+\+FIXTURE}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  \mbox{\hyperlink{struct_fixture}{Fixture}})
+\item 
+\#define \mbox{\hyperlink{xbyak_2test_2cybozu_2test_8hpp_ae5e258e17a55fafb5cfe20dfc47960b0}{CYBOZU\+\_\+\+TEST\+\_\+\+SETUP\+\_\+\+FIXTURE}}(\mbox{\hyperlink{struct_fixture}{Fixture}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{namespacecybozu_1_1test_aea14f09ded7f8a0f840c5cb6e3a0a417}{cybozu\+::test\+::test}} (bool \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}, const std\+::string \&msg, const std\+::string \&param, const char \texorpdfstring{$\ast$}{*}file, int line)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{union_u}{U}} $>$ }\\bool \mbox{\hyperlink{namespacecybozu_1_1test_a282fede0a619c22d30a4bee3e33d90bc}{cybozu\+::test\+::is\+Equal}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&lhs, const \mbox{\hyperlink{union_u}{U}} \&rhs)
+\item 
+bool \mbox{\hyperlink{namespacecybozu_1_1test_a6d357202b26c157c0a1c119fb456ea66}{cybozu\+::test\+::is\+Equal}} (size\+\_\+t lhs, int rhs)
+\item 
+bool \mbox{\hyperlink{namespacecybozu_1_1test_a6ed827ec3427d5a352b77d88f1740b4f}{cybozu\+::test\+::is\+Equal}} (int lhs, size\+\_\+t rhs)
+\item 
+bool \mbox{\hyperlink{namespacecybozu_1_1test_aa03830a68d851357ad0c0c51bac5ce25}{cybozu\+::test\+::is\+Equal}} (const char \texorpdfstring{$\ast$}{*}lhs, const char \texorpdfstring{$\ast$}{*}rhs)
+\item 
+bool \mbox{\hyperlink{namespacecybozu_1_1test_a42818c084db26c2526589e9e7b050287}{cybozu\+::test\+::is\+Equal}} (char \texorpdfstring{$\ast$}{*}lhs, const char \texorpdfstring{$\ast$}{*}rhs)
+\item 
+bool \mbox{\hyperlink{namespacecybozu_1_1test_a6fb548da7d681e154f40c71ff7b5ab2e}{cybozu\+::test\+::is\+Equal}} (const char \texorpdfstring{$\ast$}{*}lhs, char \texorpdfstring{$\ast$}{*}rhs)
+\item 
+bool \mbox{\hyperlink{namespacecybozu_1_1test_a71c9f6a4187eae924c86b95f9092086e}{cybozu\+::test\+::is\+Equal}} (char \texorpdfstring{$\ast$}{*}lhs, char \texorpdfstring{$\ast$}{*}rhs)
+\item 
+bool \mbox{\hyperlink{namespacecybozu_1_1test_ab05c765e80de3e5e521733bce4350e15}{cybozu\+::test\+::is\+Equal}} (float lhs, float rhs)
+\item 
+bool \mbox{\hyperlink{namespacecybozu_1_1test_a43bfb4921f5ee7c1186438e7924f1f50}{cybozu\+::test\+::is\+Equal}} (double lhs, double rhs)
+\item 
+int \mbox{\hyperlink{xbyak_2test_2cybozu_2test_8hpp_a0ddf1224851353fc92bfbff6f499fa97}{main}} (int argc, char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}\mbox{[}$\,$\mbox{]})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Copyright (C) 2008 Cybozu Labs, Inc., all rights reserved. 
+
+Definition in file \mbox{\hyperlink{xbyak_2test_2cybozu_2test_8hpp_source}{test.\+hpp}}.
+
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{xbyak_2test_2cybozu_2test_8hpp_a275b40cea38ee703709b5b981e4df6ac}\index{test.hpp@{test.hpp}!CYBOZU\_TEST\_ASSERT@{CYBOZU\_TEST\_ASSERT}}
+\index{CYBOZU\_TEST\_ASSERT@{CYBOZU\_TEST\_ASSERT}!test.hpp@{test.hpp}}
+\doxysubsubsection{\texorpdfstring{CYBOZU\_TEST\_ASSERT}{CYBOZU\_TEST\_ASSERT}}
+{\footnotesize\ttfamily \label{xbyak_2test_2cybozu_2test_8hpp_a275b40cea38ee703709b5b981e4df6ac} 
+\#define CYBOZU\+\_\+\+TEST\+\_\+\+ASSERT(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{namespacecybozu_1_1test_aea14f09ded7f8a0f840c5cb6e3a0a417}{cybozu::test::test}}(!!(x),\ \textcolor{stringliteral}{"{}CYBOZU\_TEST\_ASSERT"{}},\ \#x,\ \_\_FILE\_\_,\ \_\_LINE\_\_)}
+
+\end{DoxyCode}
+alert if !x 
+\begin{DoxyParams}{Parameters}
+{\em x} & \mbox{[}in\mbox{]} \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{xbyak_2test_2cybozu_2test_8hpp_source_l00194}{194}} of file \mbox{\hyperlink{xbyak_2test_2cybozu_2test_8hpp_source}{test.\+hpp}}.
+
+\Hypertarget{xbyak_2test_2cybozu_2test_8hpp_ae6af8da76a2ce1a6132c96b49c20923c}\index{test.hpp@{test.hpp}!CYBOZU\_TEST\_AUTO@{CYBOZU\_TEST\_AUTO}}
+\index{CYBOZU\_TEST\_AUTO@{CYBOZU\_TEST\_AUTO}!test.hpp@{test.hpp}}
+\doxysubsubsection{\texorpdfstring{CYBOZU\_TEST\_AUTO}{CYBOZU\_TEST\_AUTO}}
+{\footnotesize\ttfamily \label{xbyak_2test_2cybozu_2test_8hpp_ae6af8da76a2ce1a6132c96b49c20923c} 
+\#define CYBOZU\+\_\+\+TEST\+\_\+\+AUTO(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordtype}{void}\ cybozu\_test\_\ \#\#\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}();\ \(\backslash\)}
+\DoxyCodeLine{\textcolor{keyword}{struct\ }cybozu\_test\_local\_\ \#\#\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ cybozu\_test\_local\_\ \#\#\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}()\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ cybozu::test::autoRun.\mbox{\hyperlink{classcybozu_1_1test_1_1_auto_run_a4d9c1c2226d3313f5c3a6288e73836b8}{append}}(\#\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ cybozu\_test\_\ \#\#\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}});\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\}\ cybozu\_test\_local\_instance\_\ \#\#\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}};\ \(\backslash\)}
+\DoxyCodeLine{\textcolor{keywordtype}{void}\ cybozu\_test\_\ \#\#\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}()}
+
+\end{DoxyCode}
+append auto unit test 
+\begin{DoxyParams}{Parameters}
+{\em name} & \mbox{[}in\mbox{]} module name \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{xbyak_2test_2cybozu_2test_8hpp_source_l00324}{324}} of file \mbox{\hyperlink{xbyak_2test_2cybozu_2test_8hpp_source}{test.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00324\ \textcolor{preprocessor}{\#define\ CYBOZU\_TEST\_AUTO(name)\ \(\backslash\)}}
+\DoxyCodeLine{00325\ \textcolor{preprocessor}{void\ cybozu\_test\_\ \#\#\ name();\ \(\backslash\)}}
+\DoxyCodeLine{00326\ \textcolor{preprocessor}{struct\ cybozu\_test\_local\_\ \#\#\ name\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00327\ \textcolor{preprocessor}{\ \ \ \ cybozu\_test\_local\_\ \#\#\ name()\ \(\backslash\)}}
+\DoxyCodeLine{00328\ \textcolor{preprocessor}{\ \ \ \ \{\ \(\backslash\)}}
+\DoxyCodeLine{00329\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ cybozu::test::autoRun.append(\#name,\ cybozu\_test\_\ \#\#\ name);\ \(\backslash\)}}
+\DoxyCodeLine{00330\ \textcolor{preprocessor}{\ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00331\ \textcolor{preprocessor}{\}\ cybozu\_test\_local\_instance\_\ \#\#\ name;\ \(\backslash\)}}
+\DoxyCodeLine{00332\ \textcolor{preprocessor}{void\ cybozu\_test\_\ \#\#\ name()}}
+
+\end{DoxyCode}
+\Hypertarget{xbyak_2test_2cybozu_2test_8hpp_abe70b825e63f61c0396efda329895603}\index{test.hpp@{test.hpp}!CYBOZU\_TEST\_AUTO\_WITH\_FIXTURE@{CYBOZU\_TEST\_AUTO\_WITH\_FIXTURE}}
+\index{CYBOZU\_TEST\_AUTO\_WITH\_FIXTURE@{CYBOZU\_TEST\_AUTO\_WITH\_FIXTURE}!test.hpp@{test.hpp}}
+\doxysubsubsection{\texorpdfstring{CYBOZU\_TEST\_AUTO\_WITH\_FIXTURE}{CYBOZU\_TEST\_AUTO\_WITH\_FIXTURE}}
+{\footnotesize\ttfamily \label{xbyak_2test_2cybozu_2test_8hpp_abe70b825e63f61c0396efda329895603} 
+\#define CYBOZU\+\_\+\+TEST\+\_\+\+AUTO\+\_\+\+WITH\+\_\+\+FIXTURE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{\mbox{\hyperlink{struct_fixture}{Fixture}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordtype}{void}\ cybozu\_test\_\ \#\#\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}();\ \(\backslash\)}
+\DoxyCodeLine{\textcolor{keywordtype}{void}\ cybozu\_test\_real\_\ \#\#\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}()\ \(\backslash\)}
+\DoxyCodeLine{\{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{struct_fixture}{Fixture}}\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}};\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ cybozu\_test\_\ \#\#\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}();\ \(\backslash\)}
+\DoxyCodeLine{\}\ \(\backslash\)}
+\DoxyCodeLine{\textcolor{keyword}{struct\ }cybozu\_test\_local\_\ \#\#\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ cybozu\_test\_local\_\ \#\#\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}()\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ cybozu::test::autoRun.\mbox{\hyperlink{classcybozu_1_1test_1_1_auto_run_a4d9c1c2226d3313f5c3a6288e73836b8}{append}}(\#\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ cybozu\_test\_real\_\ \#\#\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}});\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\}\ cybozu\_test\_local\_instance\_\ \#\#\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}};\ \(\backslash\)}
+\DoxyCodeLine{\textcolor{keywordtype}{void}\ cybozu\_test\_\ \#\#\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}()}
+
+\end{DoxyCode}
+append auto unit test with fixture 
+\begin{DoxyParams}{Parameters}
+{\em name} & \mbox{[}in\mbox{]} module name \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{xbyak_2test_2cybozu_2test_8hpp_source_l00338}{338}} of file \mbox{\hyperlink{xbyak_2test_2cybozu_2test_8hpp_source}{test.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00338\ \textcolor{preprocessor}{\#define\ CYBOZU\_TEST\_AUTO\_WITH\_FIXTURE(name,\ Fixture)\ \(\backslash\)}}
+\DoxyCodeLine{00339\ \textcolor{preprocessor}{void\ cybozu\_test\_\ \#\#\ name();\ \(\backslash\)}}
+\DoxyCodeLine{00340\ \textcolor{preprocessor}{void\ cybozu\_test\_real\_\ \#\#\ name()\ \(\backslash\)}}
+\DoxyCodeLine{00341\ \textcolor{preprocessor}{\{\ \(\backslash\)}}
+\DoxyCodeLine{00342\ \textcolor{preprocessor}{\ \ \ \ Fixture\ f;\ \(\backslash\)}}
+\DoxyCodeLine{00343\ \textcolor{preprocessor}{\ \ \ \ cybozu\_test\_\ \#\#\ name();\ \(\backslash\)}}
+\DoxyCodeLine{00344\ \textcolor{preprocessor}{\}\ \(\backslash\)}}
+\DoxyCodeLine{00345\ \textcolor{preprocessor}{struct\ cybozu\_test\_local\_\ \#\#\ name\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00346\ \textcolor{preprocessor}{\ \ \ \ cybozu\_test\_local\_\ \#\#\ name()\ \(\backslash\)}}
+\DoxyCodeLine{00347\ \textcolor{preprocessor}{\ \ \ \ \{\ \(\backslash\)}}
+\DoxyCodeLine{00348\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ cybozu::test::autoRun.append(\#name,\ cybozu\_test\_real\_\ \#\#\ name);\ \(\backslash\)}}
+\DoxyCodeLine{00349\ \textcolor{preprocessor}{\ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00350\ \textcolor{preprocessor}{\}\ cybozu\_test\_local\_instance\_\ \#\#\ name;\ \(\backslash\)}}
+\DoxyCodeLine{00351\ \textcolor{preprocessor}{void\ cybozu\_test\_\ \#\#\ name()}}
+
+\end{DoxyCode}
+\Hypertarget{xbyak_2test_2cybozu_2test_8hpp_adf4139512121fff5a626af6d06b528ad}\index{test.hpp@{test.hpp}!CYBOZU\_TEST\_EQUAL@{CYBOZU\_TEST\_EQUAL}}
+\index{CYBOZU\_TEST\_EQUAL@{CYBOZU\_TEST\_EQUAL}!test.hpp@{test.hpp}}
+\doxysubsubsection{\texorpdfstring{CYBOZU\_TEST\_EQUAL}{CYBOZU\_TEST\_EQUAL}}
+{\footnotesize\ttfamily \label{xbyak_2test_2cybozu_2test_8hpp_adf4139512121fff5a626af6d06b528ad} 
+\#define CYBOZU\+\_\+\+TEST\+\_\+\+EQUAL(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{bool}\ \_cybozu\_eq\ =\ \mbox{\hyperlink{namespacecybozu_1_1test_a282fede0a619c22d30a4bee3e33d90bc}{cybozu::test::isEqual}}(x,\ y);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ cybozu::test::test(\_cybozu\_eq,\ \textcolor{stringliteral}{"{}CYBOZU\_TEST\_EQUAL"{}},\ \#x\ \textcolor{stringliteral}{"{},\ "{}}\ \#y,\ \_\_FILE\_\_,\ \_\_LINE\_\_);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ if\ (!\_cybozu\_eq)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}ctest:\ \ lhs="{}}\ <<\ (x)\ <<\ std::endl;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}ctest:\ \ rhs="{}}\ <<\ (y)\ <<\ std::endl;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+alert if x != y 
+\begin{DoxyParams}{Parameters}
+{\em x} & \mbox{[}in\mbox{]} \\
+\hline
+{\em y} & \mbox{[}in\mbox{]} \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{xbyak_2test_2cybozu_2test_8hpp_source_l00201}{201}} of file \mbox{\hyperlink{xbyak_2test_2cybozu_2test_8hpp_source}{test.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00201\ \textcolor{preprocessor}{\#define\ CYBOZU\_TEST\_EQUAL(x,\ y)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00202\ \textcolor{preprocessor}{\ \ \ \ bool\ \_cybozu\_eq\ =\ cybozu::test::isEqual(x,\ y);\ \(\backslash\)}}
+\DoxyCodeLine{00203\ \textcolor{preprocessor}{\ \ \ \ cybozu::test::test(\_cybozu\_eq,\ "{}CYBOZU\_TEST\_EQUAL"{},\ \#x\ "{},\ "{}\ \#y,\ \_\_FILE\_\_,\ \_\_LINE\_\_);\ \(\backslash\)}}
+\DoxyCodeLine{00204\ \textcolor{preprocessor}{\ \ \ \ if\ (!\_cybozu\_eq)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00205\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ std::cout\ <<\ "{}ctest:\ \ lhs="{}\ <<\ (x)\ <<\ std::endl;\ \(\backslash\)}}
+\DoxyCodeLine{00206\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ std::cout\ <<\ "{}ctest:\ \ rhs="{}\ <<\ (y)\ <<\ std::endl;\ \(\backslash\)}}
+\DoxyCodeLine{00207\ \textcolor{preprocessor}{\ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00208\ \textcolor{preprocessor}{\}}}
+
+\end{DoxyCode}
+\Hypertarget{xbyak_2test_2cybozu_2test_8hpp_a92f39fde95bc92a21c55ec4017c6b026}\index{test.hpp@{test.hpp}!CYBOZU\_TEST\_EQUAL\_ARRAY@{CYBOZU\_TEST\_EQUAL\_ARRAY}}
+\index{CYBOZU\_TEST\_EQUAL\_ARRAY@{CYBOZU\_TEST\_EQUAL\_ARRAY}!test.hpp@{test.hpp}}
+\doxysubsubsection{\texorpdfstring{CYBOZU\_TEST\_EQUAL\_ARRAY}{CYBOZU\_TEST\_EQUAL\_ARRAY}}
+{\footnotesize\ttfamily \label{xbyak_2test_2cybozu_2test_8hpp_a92f39fde95bc92a21c55ec4017c6b026} 
+\#define CYBOZU\+\_\+\+TEST\+\_\+\+EQUAL\+\_\+\+ARRAY(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{, }\item[{}]{n}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ for\ (\textcolor{keywordtype}{size\_t}\ \_cybozu\_test\_i\ =\ 0,\ \_cybozu\_ie\ =\ (\textcolor{keywordtype}{size\_t})(n);\ \_cybozu\_test\_i\ <\ \_cybozu\_ie;\ \_cybozu\_test\_i++)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \_cybozu\_eq\ =\ \mbox{\hyperlink{namespacecybozu_1_1test_a282fede0a619c22d30a4bee3e33d90bc}{cybozu::test::isEqual}}((x)[\_cybozu\_test\_i],\ (y)[\_cybozu\_test\_i]);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ cybozu::test::test(\_cybozu\_eq,\ \textcolor{stringliteral}{"{}CYBOZU\_TEST\_EQUAL\_ARRAY"{}},\ \#x\ \textcolor{stringliteral}{"{},\ "{}}\ \#y\ \textcolor{stringliteral}{"{},\ "{}}\ \#n,\ \_\_FILE\_\_,\ \_\_LINE\_\_);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ if\ (!\_cybozu\_eq)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}ctest:\ \ i="{}}\ <<\ \_cybozu\_test\_i\ <<\ std::endl;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}ctest:\ \ lhs="{}}\ <<\ (x)[\_cybozu\_test\_i]\ <<\ std::endl;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}ctest:\ \ rhs="{}}\ <<\ (y)[\_cybozu\_test\_i]\ <<\ std::endl;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+alert if x\mbox{[}\mbox{]} != y\mbox{[}\mbox{]} 
+\begin{DoxyParams}{Parameters}
+{\em x} & \mbox{[}in\mbox{]} \\
+\hline
+{\em y} & \mbox{[}in\mbox{]} \\
+\hline
+{\em n} & \mbox{[}in\mbox{]} \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{xbyak_2test_2cybozu_2test_8hpp_source_l00237}{237}} of file \mbox{\hyperlink{xbyak_2test_2cybozu_2test_8hpp_source}{test.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00237\ \textcolor{preprocessor}{\#define\ CYBOZU\_TEST\_EQUAL\_ARRAY(x,\ y,\ n)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00238\ \textcolor{preprocessor}{\ \ \ \ for\ (size\_t\ \_cybozu\_test\_i\ =\ 0,\ \_cybozu\_ie\ =\ (size\_t)(n);\ \_cybozu\_test\_i\ <\ \_cybozu\_ie;\ \_cybozu\_test\_i++)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00239\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ bool\ \_cybozu\_eq\ =\ cybozu::test::isEqual((x)[\_cybozu\_test\_i],\ (y)[\_cybozu\_test\_i]);\ \(\backslash\)}}
+\DoxyCodeLine{00240\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ cybozu::test::test(\_cybozu\_eq,\ "{}CYBOZU\_TEST\_EQUAL\_ARRAY"{},\ \#x\ "{},\ "{}\ \#y\ "{},\ "{}\ \#n,\ \_\_FILE\_\_,\ \_\_LINE\_\_);\ \(\backslash\)}}
+\DoxyCodeLine{00241\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ if\ (!\_cybozu\_eq)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00242\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ "{}ctest:\ \ i="{}\ <<\ \_cybozu\_test\_i\ <<\ std::endl;\ \(\backslash\)}}
+\DoxyCodeLine{00243\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ "{}ctest:\ \ lhs="{}\ <<\ (x)[\_cybozu\_test\_i]\ <<\ std::endl;\ \(\backslash\)}}
+\DoxyCodeLine{00244\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ "{}ctest:\ \ rhs="{}\ <<\ (y)[\_cybozu\_test\_i]\ <<\ std::endl;\ \(\backslash\)}}
+\DoxyCodeLine{00245\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00246\ \textcolor{preprocessor}{\ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00247\ \textcolor{preprocessor}{\}}}
+
+\end{DoxyCode}
+\Hypertarget{xbyak_2test_2cybozu_2test_8hpp_a7dab074dddf6faa52749d6ecdf19d753}\index{test.hpp@{test.hpp}!CYBOZU\_TEST\_EQUAL\_POINTER@{CYBOZU\_TEST\_EQUAL\_POINTER}}
+\index{CYBOZU\_TEST\_EQUAL\_POINTER@{CYBOZU\_TEST\_EQUAL\_POINTER}!test.hpp@{test.hpp}}
+\doxysubsubsection{\texorpdfstring{CYBOZU\_TEST\_EQUAL\_POINTER}{CYBOZU\_TEST\_EQUAL\_POINTER}}
+{\footnotesize\ttfamily \label{xbyak_2test_2cybozu_2test_8hpp_a7dab074dddf6faa52749d6ecdf19d753} 
+\#define CYBOZU\+\_\+\+TEST\+\_\+\+EQUAL\+\_\+\+POINTER(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{bool}\ \_cybozu\_eq\ =\ x\ ==\ y;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ cybozu::test::test(\_cybozu\_eq,\ \textcolor{stringliteral}{"{}CYBOZU\_TEST\_EQUAL\_POINTER"{}},\ \#x\ \textcolor{stringliteral}{"{},\ "{}}\ \#y,\ \_\_FILE\_\_,\ \_\_LINE\_\_);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ if\ (!\_cybozu\_eq)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}ctest:\ \ lhs="{}}\ <<\ \textcolor{keyword}{static\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{void}*\textcolor{keyword}{>}(x)\ <<\ std::endl;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}ctest:\ \ rhs="{}}\ <<\ \textcolor{keyword}{static\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{void}*\textcolor{keyword}{>}(y)\ <<\ std::endl;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{xbyak_2test_2cybozu_2test_8hpp_source_l00223}{223}} of file \mbox{\hyperlink{xbyak_2test_2cybozu_2test_8hpp_source}{test.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00223\ \textcolor{preprocessor}{\#define\ CYBOZU\_TEST\_EQUAL\_POINTER(x,\ y)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00224\ \textcolor{preprocessor}{\ \ \ \ bool\ \_cybozu\_eq\ =\ x\ ==\ y;\ \(\backslash\)}}
+\DoxyCodeLine{00225\ \textcolor{preprocessor}{\ \ \ \ cybozu::test::test(\_cybozu\_eq,\ "{}CYBOZU\_TEST\_EQUAL\_POINTER"{},\ \#x\ "{},\ "{}\ \#y,\ \_\_FILE\_\_,\ \_\_LINE\_\_);\ \(\backslash\)}}
+\DoxyCodeLine{00226\ \textcolor{preprocessor}{\ \ \ \ if\ (!\_cybozu\_eq)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00227\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ std::cout\ <<\ "{}ctest:\ \ lhs="{}\ <<\ static\_cast<const\ void*>(x)\ <<\ std::endl;\ \(\backslash\)}}
+\DoxyCodeLine{00228\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ std::cout\ <<\ "{}ctest:\ \ rhs="{}\ <<\ static\_cast<const\ void*>(y)\ <<\ std::endl;\ \(\backslash\)}}
+\DoxyCodeLine{00229\ \textcolor{preprocessor}{\ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00230\ \textcolor{preprocessor}{\}}}
+
+\end{DoxyCode}
+\Hypertarget{xbyak_2test_2cybozu_2test_8hpp_a55d417cd6a01e7709f468f27f1de0309}\index{test.hpp@{test.hpp}!CYBOZU\_TEST\_EXCEPTION@{CYBOZU\_TEST\_EXCEPTION}}
+\index{CYBOZU\_TEST\_EXCEPTION@{CYBOZU\_TEST\_EXCEPTION}!test.hpp@{test.hpp}}
+\doxysubsubsection{\texorpdfstring{CYBOZU\_TEST\_EXCEPTION}{CYBOZU\_TEST\_EXCEPTION}}
+{\footnotesize\ttfamily \label{xbyak_2test_2cybozu_2test_8hpp_a55d417cd6a01e7709f468f27f1de0309} 
+\#define CYBOZU\+\_\+\+TEST\+\_\+\+EXCEPTION(\begin{DoxyParamCaption}\item[{}]{statement}{, }\item[{}]{Exception}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{int}\ \_cybozu\_ret\ =\ 0;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{try}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ statement;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \_cybozu\_ret\ =\ 1;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\textcolor{keyword}{const}\ Exception\&)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \_cybozu\_ret\ =\ 2;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ if\ (\_cybozu\_ret)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ cybozu::test::test(\textcolor{keyword}{false},\ \textcolor{stringliteral}{"{}CYBOZU\_TEST\_EXCEPTION"{}},\ \#statement\ \textcolor{stringliteral}{"{},\ "{}}\ \#Exception,\ \_\_FILE\_\_,\ \_\_LINE\_\_);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ if\ (\_cybozu\_ret\ ==\ 1)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}ctest:\ \ no\ exception"{}}\ <<\ std::endl;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}ctest:\ \ unexpected\ exception"{}}\ <<\ std::endl;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ cybozu::test::autoRun.\mbox{\hyperlink{classcybozu_1_1test_1_1_auto_run_ace4237a002b2a2849a4bce661cfc0e56}{set}}(\textcolor{keyword}{true});\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{xbyak_2test_2cybozu_2test_8hpp_source_l00287}{287}} of file \mbox{\hyperlink{xbyak_2test_2cybozu_2test_8hpp_source}{test.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00287\ \textcolor{preprocessor}{\#define\ CYBOZU\_TEST\_EXCEPTION(statement,\ Exception)\ \(\backslash\)}}
+\DoxyCodeLine{00288\ \textcolor{preprocessor}{\{\ \(\backslash\)}}
+\DoxyCodeLine{00289\ \textcolor{preprocessor}{\ \ \ \ int\ \_cybozu\_ret\ =\ 0;\ \(\backslash\)}}
+\DoxyCodeLine{00290\ \textcolor{preprocessor}{\ \ \ \ try\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00291\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ statement;\ \(\backslash\)}}
+\DoxyCodeLine{00292\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \_cybozu\_ret\ =\ 1;\ \(\backslash\)}}
+\DoxyCodeLine{00293\ \textcolor{preprocessor}{\ \ \ \ \}\ catch\ (const\ Exception\&)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00294\ \textcolor{preprocessor}{\ \ \ \ \}\ catch\ (...)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00295\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \_cybozu\_ret\ =\ 2;\ \(\backslash\)}}
+\DoxyCodeLine{00296\ \textcolor{preprocessor}{\ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00297\ \textcolor{preprocessor}{\ \ \ \ if\ (\_cybozu\_ret)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00298\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ cybozu::test::test(false,\ "{}CYBOZU\_TEST\_EXCEPTION"{},\ \#statement\ "{},\ "{}\ \#Exception,\ \_\_FILE\_\_,\ \_\_LINE\_\_);\ \(\backslash\)}}
+\DoxyCodeLine{00299\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ if\ (\_cybozu\_ret\ ==\ 1)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00300\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ "{}ctest:\ \ no\ exception"{}\ <<\ std::endl;\ \(\backslash\)}}
+\DoxyCodeLine{00301\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \}\ else\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00302\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ "{}ctest:\ \ unexpected\ exception"{}\ <<\ std::endl;\ \(\backslash\)}}
+\DoxyCodeLine{00303\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00304\ \textcolor{preprocessor}{\ \ \ \ \}\ else\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00305\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ cybozu::test::autoRun.set(true);\ \(\backslash\)}}
+\DoxyCodeLine{00306\ \textcolor{preprocessor}{\ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00307\ \textcolor{preprocessor}{\}}}
+
+\end{DoxyCode}
+\Hypertarget{xbyak_2test_2cybozu_2test_8hpp_a2812e559523c1b784c4334ba06fbe63a}\index{test.hpp@{test.hpp}!CYBOZU\_TEST\_EXCEPTION\_MESSAGE@{CYBOZU\_TEST\_EXCEPTION\_MESSAGE}}
+\index{CYBOZU\_TEST\_EXCEPTION\_MESSAGE@{CYBOZU\_TEST\_EXCEPTION\_MESSAGE}!test.hpp@{test.hpp}}
+\doxysubsubsection{\texorpdfstring{CYBOZU\_TEST\_EXCEPTION\_MESSAGE}{CYBOZU\_TEST\_EXCEPTION\_MESSAGE}}
+{\footnotesize\ttfamily \label{xbyak_2test_2cybozu_2test_8hpp_a2812e559523c1b784c4334ba06fbe63a} 
+\#define CYBOZU\+\_\+\+TEST\+\_\+\+EXCEPTION\+\_\+\+MESSAGE(\begin{DoxyParamCaption}\item[{}]{statement}{, }\item[{}]{Exception}{, }\item[{}]{msg}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{int}\ \_cybozu\_ret\ =\ 0;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ std::string\ \_cybozu\_errMsg;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{try}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ statement;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \_cybozu\_ret\ =\ 1;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\textcolor{keyword}{const}\ Exception\&\ \_cybozu\_e)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \_cybozu\_errMsg\ =\ \_cybozu\_e.what();\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ if\ (\_cybozu\_errMsg.find(msg)\ ==\ std::string::npos)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \_cybozu\_ret\ =\ 2;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \_cybozu\_ret\ =\ 3;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ if\ (\_cybozu\_ret)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ cybozu::test::test(\textcolor{keyword}{false},\ \textcolor{stringliteral}{"{}CYBOZU\_TEST\_EXCEPTION\_MESSAGE"{}},\ \#statement\ \textcolor{stringliteral}{"{},\ "{}}\ \#Exception\ \textcolor{stringliteral}{"{},\ "{}}\ \#msg,\ \_\_FILE\_\_,\ \_\_LINE\_\_);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ if\ (\_cybozu\_ret\ ==\ 1)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}ctest:\ \ no\ exception"{}}\ <<\ std::endl;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\_cybozu\_ret\ ==\ 2)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}ctest:\ \ bad\ exception\ msg:"{}}\ <<\ \_cybozu\_errMsg\ <<\ std::endl;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}ctest:\ \ unexpected\ exception"{}}\ <<\ std::endl;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ cybozu::test::autoRun.\mbox{\hyperlink{classcybozu_1_1test_1_1_auto_run_ace4237a002b2a2849a4bce661cfc0e56}{set}}(\textcolor{keyword}{true});\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+verify message in exception 
+
+Definition at line \mbox{\hyperlink{xbyak_2test_2cybozu_2test_8hpp_source_l00258}{258}} of file \mbox{\hyperlink{xbyak_2test_2cybozu_2test_8hpp_source}{test.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00258\ \textcolor{preprocessor}{\#define\ CYBOZU\_TEST\_EXCEPTION\_MESSAGE(statement,\ Exception,\ msg)\ \(\backslash\)}}
+\DoxyCodeLine{00259\ \textcolor{preprocessor}{\{\ \(\backslash\)}}
+\DoxyCodeLine{00260\ \textcolor{preprocessor}{\ \ \ \ int\ \_cybozu\_ret\ =\ 0;\ \(\backslash\)}}
+\DoxyCodeLine{00261\ \textcolor{preprocessor}{\ \ \ \ std::string\ \_cybozu\_errMsg;\ \(\backslash\)}}
+\DoxyCodeLine{00262\ \textcolor{preprocessor}{\ \ \ \ try\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00263\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ statement;\ \(\backslash\)}}
+\DoxyCodeLine{00264\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \_cybozu\_ret\ =\ 1;\ \(\backslash\)}}
+\DoxyCodeLine{00265\ \textcolor{preprocessor}{\ \ \ \ \}\ catch\ (const\ Exception\&\ \_cybozu\_e)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00266\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \_cybozu\_errMsg\ =\ \_cybozu\_e.what();\ \(\backslash\)}}
+\DoxyCodeLine{00267\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ if\ (\_cybozu\_errMsg.find(msg)\ ==\ std::string::npos)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00268\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \_cybozu\_ret\ =\ 2;\ \(\backslash\)}}
+\DoxyCodeLine{00269\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00270\ \textcolor{preprocessor}{\ \ \ \ \}\ catch\ (...)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00271\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \_cybozu\_ret\ =\ 3;\ \(\backslash\)}}
+\DoxyCodeLine{00272\ \textcolor{preprocessor}{\ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00273\ \textcolor{preprocessor}{\ \ \ \ if\ (\_cybozu\_ret)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00274\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ cybozu::test::test(false,\ "{}CYBOZU\_TEST\_EXCEPTION\_MESSAGE"{},\ \#statement\ "{},\ "{}\ \#Exception\ "{},\ "{}\ \#msg,\ \_\_FILE\_\_,\ \_\_LINE\_\_);\ \(\backslash\)}}
+\DoxyCodeLine{00275\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ if\ (\_cybozu\_ret\ ==\ 1)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00276\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ "{}ctest:\ \ no\ exception"{}\ <<\ std::endl;\ \(\backslash\)}}
+\DoxyCodeLine{00277\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \}\ else\ if\ (\_cybozu\_ret\ ==\ 2)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00278\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ "{}ctest:\ \ bad\ exception\ msg:"{}\ <<\ \_cybozu\_errMsg\ <<\ std::endl;\ \(\backslash\)}}
+\DoxyCodeLine{00279\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \}\ else\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00280\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ "{}ctest:\ \ unexpected\ exception"{}\ <<\ std::endl;\ \(\backslash\)}}
+\DoxyCodeLine{00281\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00282\ \textcolor{preprocessor}{\ \ \ \ \}\ else\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00283\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ cybozu::test::autoRun.set(true);\ \(\backslash\)}}
+\DoxyCodeLine{00284\ \textcolor{preprocessor}{\ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00285\ \textcolor{preprocessor}{\}}}
+
+\end{DoxyCode}
+\Hypertarget{xbyak_2test_2cybozu_2test_8hpp_aff1dee14ebf6d4ac83a4f25c07133301}\index{test.hpp@{test.hpp}!CYBOZU\_TEST\_FAIL@{CYBOZU\_TEST\_FAIL}}
+\index{CYBOZU\_TEST\_FAIL@{CYBOZU\_TEST\_FAIL}!test.hpp@{test.hpp}}
+\doxysubsubsection{\texorpdfstring{CYBOZU\_TEST\_FAIL}{CYBOZU\_TEST\_FAIL}}
+{\footnotesize\ttfamily \label{xbyak_2test_2cybozu_2test_8hpp_aff1dee14ebf6d4ac83a4f25c07133301} 
+\#define CYBOZU\+\_\+\+TEST\+\_\+\+FAIL(\begin{DoxyParamCaption}\item[{}]{msg}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{namespacecybozu_1_1test_aea14f09ded7f8a0f840c5cb6e3a0a417}{cybozu::test::test}}(\textcolor{keyword}{false},\ \textcolor{stringliteral}{"{}CYBOZU\_TEST\_FAIL"{}},\ msg,\ \_\_FILE\_\_,\ \_\_LINE\_\_)}
+
+\end{DoxyCode}
+always alert 
+\begin{DoxyParams}{Parameters}
+{\em msg} & \mbox{[}in\mbox{]} \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{xbyak_2test_2cybozu_2test_8hpp_source_l00253}{253}} of file \mbox{\hyperlink{xbyak_2test_2cybozu_2test_8hpp_source}{test.\+hpp}}.
+
+\Hypertarget{xbyak_2test_2cybozu_2test_8hpp_a3991e3f3e5ee2da1dd32aca74509fb49}\index{test.hpp@{test.hpp}!CYBOZU\_TEST\_NEAR@{CYBOZU\_TEST\_NEAR}}
+\index{CYBOZU\_TEST\_NEAR@{CYBOZU\_TEST\_NEAR}!test.hpp@{test.hpp}}
+\doxysubsubsection{\texorpdfstring{CYBOZU\_TEST\_NEAR}{CYBOZU\_TEST\_NEAR}}
+{\footnotesize\ttfamily \label{xbyak_2test_2cybozu_2test_8hpp_a3991e3f3e5ee2da1dd32aca74509fb49} 
+\#define CYBOZU\+\_\+\+TEST\+\_\+\+NEAR(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{, }\item[{}]{eps}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{bool}\ \_cybozu\_isNear\ =\ \mbox{\hyperlink{xbyak__mnemonic_8h_a3357ad22233ec022b85f32d969935f51}{fabs}}((x)\ -\/\ (y))\ <\ eps;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ cybozu::test::test(\_cybozu\_isNear,\ \textcolor{stringliteral}{"{}CYBOZU\_TEST\_NEAR"{}},\ \#x\ \textcolor{stringliteral}{"{},\ "{}}\ \#y,\ \_\_FILE\_\_,\ \_\_LINE\_\_);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ if\ (!\_cybozu\_isNear)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}ctest:\ \ lhs="{}}\ <<\ (x)\ <<\ std::endl;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}ctest:\ \ rhs="{}}\ <<\ (y)\ <<\ std::endl;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+alert if fabs(x, y) \texorpdfstring{$>$}{>}= eps 
+\begin{DoxyParams}{Parameters}
+{\em x} & \mbox{[}in\mbox{]} \\
+\hline
+{\em y} & \mbox{[}in\mbox{]} \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{xbyak_2test_2cybozu_2test_8hpp_source_l00214}{214}} of file \mbox{\hyperlink{xbyak_2test_2cybozu_2test_8hpp_source}{test.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00214\ \textcolor{preprocessor}{\#define\ CYBOZU\_TEST\_NEAR(x,\ y,\ eps)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00215\ \textcolor{preprocessor}{\ \ \ \ bool\ \_cybozu\_isNear\ =\ fabs((x)\ -\/\ (y))\ <\ eps;\ \(\backslash\)}}
+\DoxyCodeLine{00216\ \textcolor{preprocessor}{\ \ \ \ cybozu::test::test(\_cybozu\_isNear,\ "{}CYBOZU\_TEST\_NEAR"{},\ \#x\ "{},\ "{}\ \#y,\ \_\_FILE\_\_,\ \_\_LINE\_\_);\ \(\backslash\)}}
+\DoxyCodeLine{00217\ \textcolor{preprocessor}{\ \ \ \ if\ (!\_cybozu\_isNear)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00218\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ std::cout\ <<\ "{}ctest:\ \ lhs="{}\ <<\ (x)\ <<\ std::endl;\ \(\backslash\)}}
+\DoxyCodeLine{00219\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ std::cout\ <<\ "{}ctest:\ \ rhs="{}\ <<\ (y)\ <<\ std::endl;\ \(\backslash\)}}
+\DoxyCodeLine{00220\ \textcolor{preprocessor}{\ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00221\ \textcolor{preprocessor}{\}}}
+
+\end{DoxyCode}
+\Hypertarget{xbyak_2test_2cybozu_2test_8hpp_aa2797929b9474d118ec22c945aa8b244}\index{test.hpp@{test.hpp}!CYBOZU\_TEST\_NO\_EXCEPTION@{CYBOZU\_TEST\_NO\_EXCEPTION}}
+\index{CYBOZU\_TEST\_NO\_EXCEPTION@{CYBOZU\_TEST\_NO\_EXCEPTION}!test.hpp@{test.hpp}}
+\doxysubsubsection{\texorpdfstring{CYBOZU\_TEST\_NO\_EXCEPTION}{CYBOZU\_TEST\_NO\_EXCEPTION}}
+{\footnotesize\ttfamily \label{xbyak_2test_2cybozu_2test_8hpp_aa2797929b9474d118ec22c945aa8b244} 
+\#define CYBOZU\+\_\+\+TEST\+\_\+\+NO\+\_\+\+EXCEPTION(\begin{DoxyParamCaption}\item[{}]{statement}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordflow}{try}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ statement;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ cybozu::test::autoRun.\mbox{\hyperlink{classcybozu_1_1test_1_1_auto_run_ace4237a002b2a2849a4bce661cfc0e56}{set}}(\textcolor{keyword}{true});\ \(\backslash\)}
+\DoxyCodeLine{\}\ \textcolor{keywordflow}{catch}\ (...)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ cybozu::test::test(\textcolor{keyword}{false},\ \textcolor{stringliteral}{"{}CYBOZU\_TEST\_NO\_EXCEPTION"{}},\ \#statement,\ \_\_FILE\_\_,\ \_\_LINE\_\_);\ \(\backslash\)}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+verify statement does not throw 
+
+Definition at line \mbox{\hyperlink{xbyak_2test_2cybozu_2test_8hpp_source_l00312}{312}} of file \mbox{\hyperlink{xbyak_2test_2cybozu_2test_8hpp_source}{test.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00312\ \textcolor{preprocessor}{\#define\ CYBOZU\_TEST\_NO\_EXCEPTION(statement)\ \(\backslash\)}}
+\DoxyCodeLine{00313\ \textcolor{preprocessor}{try\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00314\ \textcolor{preprocessor}{\ \ \ \ statement;\ \(\backslash\)}}
+\DoxyCodeLine{00315\ \textcolor{preprocessor}{\ \ \ \ cybozu::test::autoRun.set(true);\ \(\backslash\)}}
+\DoxyCodeLine{00316\ \textcolor{preprocessor}{\}\ catch\ (...)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00317\ \textcolor{preprocessor}{\ \ \ \ cybozu::test::test(false,\ "{}CYBOZU\_TEST\_NO\_EXCEPTION"{},\ \#statement,\ \_\_FILE\_\_,\ \_\_LINE\_\_);\ \(\backslash\)}}
+\DoxyCodeLine{00318\ \textcolor{preprocessor}{\}}}
+
+\end{DoxyCode}
+\Hypertarget{xbyak_2test_2cybozu_2test_8hpp_ae5e258e17a55fafb5cfe20dfc47960b0}\index{test.hpp@{test.hpp}!CYBOZU\_TEST\_SETUP\_FIXTURE@{CYBOZU\_TEST\_SETUP\_FIXTURE}}
+\index{CYBOZU\_TEST\_SETUP\_FIXTURE@{CYBOZU\_TEST\_SETUP\_FIXTURE}!test.hpp@{test.hpp}}
+\doxysubsubsection{\texorpdfstring{CYBOZU\_TEST\_SETUP\_FIXTURE}{CYBOZU\_TEST\_SETUP\_FIXTURE}}
+{\footnotesize\ttfamily \label{xbyak_2test_2cybozu_2test_8hpp_ae5e258e17a55fafb5cfe20dfc47960b0} 
+\#define CYBOZU\+\_\+\+TEST\+\_\+\+SETUP\+\_\+\+FIXTURE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{struct_fixture}{Fixture}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{struct_fixture}{Fixture}}\ *cybozu\_test\_local\_fixture;\ \(\backslash\)}
+\DoxyCodeLine{\textcolor{keywordtype}{void}\ cybozu\_test\_local\_init()\ \(\backslash\)}
+\DoxyCodeLine{\{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ cybozu\_test\_local\_fixture\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{struct_fixture}{Fixture}}();\ \(\backslash\)}
+\DoxyCodeLine{\}\ \(\backslash\)}
+\DoxyCodeLine{\textcolor{keywordtype}{void}\ cybozu\_test\_local\_term()\ \(\backslash\)}
+\DoxyCodeLine{\{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{delete}\ cybozu\_test\_local\_fixture;\ \(\backslash\)}
+\DoxyCodeLine{\}\ \(\backslash\)}
+\DoxyCodeLine{\textcolor{keyword}{struct\ }cybozu\_test\_local\_fixture\_setup\_\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ cybozu\_test\_local\_fixture\_setup\_()\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ cybozu::test::autoRun.\mbox{\hyperlink{classcybozu_1_1test_1_1_auto_run_ab1f326148f5ca9d113acbe80a53d1366}{setup}}(cybozu\_test\_local\_init,\ cybozu\_test\_local\_term);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\}\ cybozu\_test\_local\_fixture\_setup\_instance\_;}
+
+\end{DoxyCode}
+setup fixture 
+\begin{DoxyParams}{Parameters}
+{\em \doxylink{struct_fixture}{Fixture}} & \mbox{[}in\mbox{]} class name of fixture \\
+\hline
+\end{DoxyParams}
+\begin{DoxyNote}{Note}
+cstr of \doxylink{struct_fixture}{Fixture} is called before test and dstr of \doxylink{struct_fixture}{Fixture} is called after test 
+\end{DoxyNote}
+
+
+Definition at line \mbox{\hyperlink{xbyak_2test_2cybozu_2test_8hpp_source_l00358}{358}} of file \mbox{\hyperlink{xbyak_2test_2cybozu_2test_8hpp_source}{test.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00358\ \textcolor{preprocessor}{\#define\ CYBOZU\_TEST\_SETUP\_FIXTURE(Fixture)\ \(\backslash\)}}
+\DoxyCodeLine{00359\ \textcolor{preprocessor}{Fixture\ *cybozu\_test\_local\_fixture;\ \(\backslash\)}}
+\DoxyCodeLine{00360\ \textcolor{preprocessor}{void\ cybozu\_test\_local\_init()\ \(\backslash\)}}
+\DoxyCodeLine{00361\ \textcolor{preprocessor}{\{\ \(\backslash\)}}
+\DoxyCodeLine{00362\ \textcolor{preprocessor}{\ \ \ \ cybozu\_test\_local\_fixture\ =\ new\ Fixture();\ \(\backslash\)}}
+\DoxyCodeLine{00363\ \textcolor{preprocessor}{\}\ \(\backslash\)}}
+\DoxyCodeLine{00364\ \textcolor{preprocessor}{void\ cybozu\_test\_local\_term()\ \(\backslash\)}}
+\DoxyCodeLine{00365\ \textcolor{preprocessor}{\{\ \(\backslash\)}}
+\DoxyCodeLine{00366\ \textcolor{preprocessor}{\ \ \ \ delete\ cybozu\_test\_local\_fixture;\ \(\backslash\)}}
+\DoxyCodeLine{00367\ \textcolor{preprocessor}{\}\ \(\backslash\)}}
+\DoxyCodeLine{00368\ \textcolor{preprocessor}{struct\ cybozu\_test\_local\_fixture\_setup\_\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00369\ \textcolor{preprocessor}{\ \ \ \ cybozu\_test\_local\_fixture\_setup\_()\ \(\backslash\)}}
+\DoxyCodeLine{00370\ \textcolor{preprocessor}{\ \ \ \ \{\ \(\backslash\)}}
+\DoxyCodeLine{00371\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ cybozu::test::autoRun.setup(cybozu\_test\_local\_init,\ cybozu\_test\_local\_term);\ \(\backslash\)}}
+\DoxyCodeLine{00372\ \textcolor{preprocessor}{\ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00373\ \textcolor{preprocessor}{\}\ cybozu\_test\_local\_fixture\_setup\_instance\_;}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{xbyak_2test_2cybozu_2test_8hpp_a0ddf1224851353fc92bfbff6f499fa97}\index{test.hpp@{test.hpp}!main@{main}}
+\index{main@{main}!test.hpp@{test.hpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{xbyak_2test_2cybozu_2test_8hpp_a0ddf1224851353fc92bfbff6f499fa97} 
+int main (\begin{DoxyParamCaption}\item[{int}]{argc}{, }\item[{char \texorpdfstring{$\ast$}{*}}]{argv}{\mbox{[}$\,$\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_2test_2cybozu_2test_8hpp_source_l00184}{184}} of file \mbox{\hyperlink{xbyak_2test_2cybozu_2test_8hpp_source}{test.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00185\ \{}
+\DoxyCodeLine{00186\ \ \ \ \ \textcolor{keywordflow}{return}\ cybozu::test::autoRun.\mbox{\hyperlink{classcybozu_1_1test_1_1_auto_run_aba95d366f0f81f5ee59d32b710da397a}{run}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}});}
+\DoxyCodeLine{00187\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{xbyak_2test_2cybozu_2test_8hpp_a0ddf1224851353fc92bfbff6f499fa97_cgraph}
+\end{center}
+\end{figure}

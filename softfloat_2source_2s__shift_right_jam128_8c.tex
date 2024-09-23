@@ -1,0 +1,63 @@
+\doxysection{libraries/softfloat/source/s\+\_\+shift\+Right\+Jam128.c File Reference}
+\hypertarget{softfloat_2source_2s__shift_right_jam128_8c}{}\label{softfloat_2source_2s__shift_right_jam128_8c}\index{libraries/softfloat/source/s\_shiftRightJam128.c@{libraries/softfloat/source/s\_shiftRightJam128.c}}
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include "{}platform.\+h"{}}\newline
+{\ttfamily \#include "{}primitive\+Types.\+h"{}}\newline
+Include dependency graph for s\+\_\+shift\+Right\+Jam128.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=343pt]{softfloat_2source_2s__shift_right_jam128_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+struct uint128 \mbox{\hyperlink{softfloat_2source_2s__shift_right_jam128_8c_af0fe4ea75279fad49e547b77192eb43e}{softfloat\+\_\+shift\+Right\+Jam128}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} a64, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} a0, \mbox{\hyperlink{stdint_8h_a8f075c759c74e109e8184306c663809d}{uint\+\_\+fast32\+\_\+t}} dist)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{softfloat_2source_2s__shift_right_jam128_8c_af0fe4ea75279fad49e547b77192eb43e}\index{s\_shiftRightJam128.c@{s\_shiftRightJam128.c}!softfloat\_shiftRightJam128@{softfloat\_shiftRightJam128}}
+\index{softfloat\_shiftRightJam128@{softfloat\_shiftRightJam128}!s\_shiftRightJam128.c@{s\_shiftRightJam128.c}}
+\doxysubsubsection{\texorpdfstring{softfloat\_shiftRightJam128()}{softfloat\_shiftRightJam128()}}
+{\footnotesize\ttfamily \label{softfloat_2source_2s__shift_right_jam128_8c_af0fe4ea75279fad49e547b77192eb43e} 
+struct uint128 softfloat\+\_\+shift\+Right\+Jam128 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{a64}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{a0}{, }\item[{\mbox{\hyperlink{stdint_8h_a8f075c759c74e109e8184306c663809d}{uint\+\_\+fast32\+\_\+t}}}]{dist}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2s__shift_right_jam128_8c_source_l00044}{44}} of file \mbox{\hyperlink{softfloat_2source_2s__shift_right_jam128_8c_source}{s\+\_\+shift\+Right\+Jam128.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00045\ \{}
+\DoxyCodeLine{00046\ \ \ \ \ \mbox{\hyperlink{stdint_8h_ad0fca8b15c218d2c687f8c373a71d228}{uint\_fast8\_t}}\ u8NegDist;}
+\DoxyCodeLine{00047\ \ \ \ \ \textcolor{keyword}{struct\ }uint128\ z;}
+\DoxyCodeLine{00048\ }
+\DoxyCodeLine{00049\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ dist\ <\ 64\ )\ \{}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ u8NegDist\ =\ -\/dist;}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ z.v64\ =\ a64>>dist;}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ z.v0\ =}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \ a64<<(u8NegDist\ \&\ 63)\ |\ a0>>dist}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ ((\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})\ (a0<<(u8NegDist\ \&\ 63))\ !=\ 0);}
+\DoxyCodeLine{00055\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ z.v64\ =\ 0;}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ z.v0\ =}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \ \ \ (dist\ <\ 127)}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ?\ a64>>(dist\ \&\ 63)}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ (((a64\ \&\ (((\mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\_fast64\_t}})\ 1<<(dist\ \&\ 63))\ -\/\ 1))\ |\ a0)}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ !=\ 0)}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ ((a64\ |\ a0)\ !=\ 0);}
+\DoxyCodeLine{00063\ \ \ \ \ \}}
+\DoxyCodeLine{00064\ \ \ \ \ \textcolor{keywordflow}{return}\ z;}
+\DoxyCodeLine{00065\ }
+\DoxyCodeLine{00066\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{softfloat_2source_2s__shift_right_jam128_8c_af0fe4ea75279fad49e547b77192eb43e_icgraph}
+\end{center}
+\end{figure}

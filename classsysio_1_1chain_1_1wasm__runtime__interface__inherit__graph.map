@@ -1,0 +1,11 @@
+<map id="sysio::chain::wasm_runtime_interface" name="sysio::chain::wasm_runtime_interface">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,133,140,174"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1eos__vm__runtime.html" title=" " alt="" coords="195,5,374,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="110,121,186,71,210,59,212,64,189,75,113,126"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1eos__vm__profile__runtime.html" title=" " alt="" coords="195,85,374,141"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="154,135,194,128,195,133,155,140"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1eos__vm__runtime.html" title=" " alt="" coords="195,165,374,221"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="155,166,195,174,194,179,154,171"/>
+<area shape="rect" id="Node000005" href="$classsysio_1_1chain_1_1webassembly_1_1eosvmoc_1_1eosvmoc__runtime.html" title=" " alt="" coords="188,245,381,286"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="112,181,148,207,189,231,214,242,212,247,186,236,145,211,109,185"/>
+</map>

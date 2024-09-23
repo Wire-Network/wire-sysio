@@ -1,0 +1,66 @@
+\doxysection{libraries/sys-\/vm/external/\+Catch2/include/internal/catch\+\_\+stringref.h File Reference}
+\hypertarget{catch__stringref_8h}{}\label{catch__stringref_8h}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_stringref.h@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_stringref.h}}
+{\ttfamily \#include $<$cstddef$>$}\newline
+{\ttfamily \#include $<$string$>$}\newline
+{\ttfamily \#include $<$iosfwd$>$}\newline
+Include dependency graph for catch\+\_\+stringref.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=248pt]{catch__stringref_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{catch__stringref_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{class_catch_1_1_string_ref}{Catch\+::\+String\+Ref}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespace_catch}{Catch}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+auto \mbox{\hyperlink{namespace_catch_a3a766cb0b8c792c9151baaaf1e8003eb}{Catch\+::operator+}} (\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} const \&lhs, \mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} const \&rhs) -\/$>$ std\+::string
+\item 
+auto \mbox{\hyperlink{namespace_catch_abfc25bbeac5c57693fee9fa3ef262a3a}{Catch\+::operator+}} (\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} const \&lhs, const char \texorpdfstring{$\ast$}{*}rhs) -\/$>$ std\+::string
+\item 
+auto \mbox{\hyperlink{namespace_catch_a764a678121fa11c590a53618baa47680}{Catch\+::operator+}} (char const \texorpdfstring{$\ast$}{*}lhs, \mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} const \&rhs) -\/$>$ std\+::string
+\item 
+auto \mbox{\hyperlink{namespace_catch_a7209c96e886c406e1fcaff562c20311b}{Catch\+::operator+=}} (std\+::string \&lhs, \mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} const \&rhs) -\/$>$ std\+::string \&
+\item 
+auto \mbox{\hyperlink{namespace_catch_a821e202f593832c3196d204842e8174a}{Catch\+::operator$<$$<$}} (std\+::ostream \&os, \mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} const \&str) -\/$>$ std\+::ostream \&
+\item 
+auto \mbox{\hyperlink{namespace_catch_a56dcfbb436fa40d778e784bf862e78a6}{Catch\+::operator"{}"{}\+\_\+sr}} (char const \texorpdfstring{$\ast$}{*}raw\+Chars, std\+::size\+\_\+t size) noexcept -\/$>$ \mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}}
+\item 
+auto \mbox{\hyperlink{catch__stringref_8h_a741882c3457a7d151a0e81fd3f011b31}{operator"{}"{}\+\_\+catch\+\_\+sr}} (char const \texorpdfstring{$\ast$}{*}raw\+Chars, std\+::size\+\_\+t size) noexcept -\/$>$ \mbox{\hyperlink{class_catch_1_1_string_ref}{Catch\+::\+String\+Ref}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{catch__stringref_8h_a741882c3457a7d151a0e81fd3f011b31}\index{catch\_stringref.h@{catch\_stringref.h}!operator"{}"{}\_catch\_sr@{operator""""\_catch\_sr}}
+\index{operator"{}"{}\_catch\_sr@{operator""""\_catch\_sr}!catch\_stringref.h@{catch\_stringref.h}}
+\doxysubsubsection{\texorpdfstring{operator""""\_catch\_sr()}{operator""\_catch\_sr()}}
+{\footnotesize\ttfamily \label{catch__stringref_8h_a741882c3457a7d151a0e81fd3f011b31} 
+auto operator"{}"{}\+\_\+catch\+\_\+sr (\begin{DoxyParamCaption}\item[{char const \texorpdfstring{$\ast$}{*}}]{raw\+Chars}{, }\item[{std\+::size\+\_\+t}]{size}{}\end{DoxyParamCaption}) -\/$>$ \mbox{\hyperlink{class_catch_1_1_string_ref}{Catch\+::\+String\+Ref}} \hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__stringref_8h_source_l00128}{128}} of file \mbox{\hyperlink{catch__stringref_8h_source}{catch\+\_\+stringref.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00129\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_catch_1_1_string_ref}{Catch::StringRef}}(\ rawChars,\ size\ );}
+\DoxyCodeLine{00130\ \}}
+
+\end{DoxyCode}

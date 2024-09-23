@@ -1,0 +1,25 @@
+<map id="websocketpp::http::parser::parser::get_header_as_plist" name="websocketpp::http::parser::parser::get_header_as_plist">
+<area shape="rect" id="Node000001" title="Extract an HTTP parameter list from a parser header." alt="" coords="5,102,142,158"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1http_1_1parser_1_1parser.html#af903e5538e362d9ac0aeaea3064aed0c" title="Extract an HTTP parameter list from a string." alt="" coords="190,102,331,158"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="142,127,174,127,174,132,142,132"/>
+<area shape="rect" id="Node000003" href="$namespacewebsocketpp_1_1http_1_1parser.html#adabfd491d364be43bee4c7cad63e7e08" title="Extract HTTP parameters." alt="" coords="379,109,556,150"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="332,127,363,127,363,132,332,132"/>
+<area shape="rect" id="Node000004" href="$namespacewebsocketpp_1_1http_1_1parser.html#a263c7c466bbed56948d5877b9c33c354" title="Read and discard linear whitespace." alt="" coords="819,37,971,78"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="552,106,604,95,803,65,804,71,605,100,553,111"/>
+<area shape="rect" id="Node000008" href="$namespacewebsocketpp_1_1http_1_1parser.html#ac13fb3aca2101c9e6d2ee14039f1a758" title="Extract HTTP attributes." alt="" coords="604,109,771,150"/>
+<area shape="poly" id="edge7_Node000003_Node000008" title=" " alt="" coords="557,127,588,127,588,132,557,132"/>
+<area shape="rect" id="Node000010" href="$namespacewebsocketpp_1_1http_1_1parser.html#a6c56e2f70369551a1dcd9816f3d4d2eb" title="Read and return the next token in the stream." alt="" coords="823,181,967,222"/>
+<area shape="poly" id="edge12_Node000003_Node000010" title=" " alt="" coords="553,148,605,159,808,189,807,195,604,164,552,153"/>
+<area shape="rect" id="Node000005" href="$namespacewebsocketpp_1_1http_1_1parser.html#a1dacef9abccd8e5b6c572447d9f5a3ab" title="Read and discard one unit of linear whitespace." alt="" coords="1019,37,1155,78"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="971,55,1004,55,1004,60,971,60"/>
+<area shape="rect" id="Node000006" href="$namespacewebsocketpp_1_1http.html#a95df9e609616688298d34fee9ec34945" title="Is the character non&#45;whitespace." alt="" coords="1203,5,1365,46"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="1155,44,1187,39,1188,44,1156,49"/>
+<area shape="rect" id="Node000007" href="$namespacewebsocketpp_1_1http.html#a8ff7039dd19159bdbce3b98159c66ae2" title="Is the character whitespace." alt="" coords="1216,71,1352,111"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="1156,67,1201,74,1200,80,1155,72"/>
+<area shape="poly" id="edge8_Node000008_Node000004" title=" " alt="" coords="747,106,819,81,821,86,749,111"/>
+<area shape="rect" id="Node000009" href="$namespacewebsocketpp_1_1http_1_1parser.html#a2a35158d976b84679dda4fd4a4b237bc" title="Read and return the next quoted string in the stream." alt="" coords="819,102,970,158"/>
+<area shape="poly" id="edge9_Node000008_Node000009" title=" " alt="" coords="771,127,804,127,804,132,771,132"/>
+<area shape="poly" id="edge10_Node000008_Node000010" title=" " alt="" coords="749,148,821,173,819,178,747,153"/>
+<area shape="rect" id="Node000011" href="$namespacewebsocketpp_1_1http.html#a45a9b60b72b68de7b32fb75d89ad4c04" title="Is the character a non&#45;token." alt="" coords="1019,181,1155,222"/>
+<area shape="poly" id="edge11_Node000010_Node000011" title=" " alt="" coords="967,199,1004,199,1004,204,967,204"/>
+</map>

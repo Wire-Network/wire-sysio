@@ -1,0 +1,18 @@
+\chapter{Release Process}
+\hypertarget{md_libraries_2fc_2secp256k1_2secp256k1_2doc_2release-process}{}\label{md_libraries_2fc_2secp256k1_2secp256k1_2doc_2release-process}\index{Release Process@{Release Process}}
+
+\begin{DoxyEnumerate}
+\item Open PR to master that
+\begin{DoxyEnumerate}
+\item adds release notes to {\ttfamily \doxylink{secp256k1_2secp256k1_2doc_2_c_h_a_n_g_e_l_o_g_8md}{doc/\+CHANGELOG.\+md}} and
+\item if this is {\bfseries{not}} a patch release, updates {\ttfamily \+\_\+\+PKG\+\_\+\+VERSION\+\_\+\{MAJOR,MINOR\}} and {\ttfamily \+\_\+\+LIB\+\_\+\+VERSIONS\+\_\+\texorpdfstring{$\ast$}{*}} in {\ttfamily configure.\+ac}
+\end{DoxyEnumerate}
+\item After the PR is merged,
+\begin{DoxyItemize}
+\item if this is {\bfseries{not}} a patch release, create a release branch with name {\ttfamily MAJOR.\+MINOR}. Make sure that the branch contains the right commits. Create commit on the release branch that sets {\ttfamily \+\_\+\+PKG\+\_\+\+VERSION\+\_\+\+IS\+\_\+\+RELEASE} in {\ttfamily configure.\+ac} to {\ttfamily true}.
+\item if this {\bfseries{is}} a patch release, open a pull request with the bugfixes to the {\ttfamily MAJOR.\+MINOR} branch. Also include the release note commit bump {\ttfamily \+\_\+\+PKG\+\_\+\+VERSION\+\_\+\+BUILD} and {\ttfamily \+\_\+\+LIB\+\_\+\+VERSIONS\+\_\+\texorpdfstring{$\ast$}{*}} in {\ttfamily configure.\+ac}.
+\end{DoxyItemize}
+\item Tag the commit with {\ttfamily git tag -\/s v\+MAJOR.\+MINOR.\+PATCH}.
+\item Push branch and tag with {\ttfamily git push origin -\/-\/tags}.
+\item Create a new Git\+Hub release with a link to the corresponding entry in {\ttfamily \doxylink{secp256k1_2secp256k1_2doc_2_c_h_a_n_g_e_l_o_g_8md}{doc/\+CHANGELOG.\+md}}. 
+\end{DoxyEnumerate}

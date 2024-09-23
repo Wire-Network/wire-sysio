@@ -1,0 +1,322 @@
+\doxysection{libraries/sys-\/vm/tests/allocator\+\_\+tests.cpp File Reference}
+\hypertarget{allocator__tests_8cpp}{}\label{allocator__tests_8cpp}\index{libraries/sys-\/vm/tests/allocator\_tests.cpp@{libraries/sys-\/vm/tests/allocator\_tests.cpp}}
+{\ttfamily \#include $<$sysio/vm/allocator.\+hpp$>$}\newline
+{\ttfamily \#include $<$catch2/catch.\+hpp$>$}\newline
+Include dependency graph for allocator\+\_\+tests.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{allocator__tests_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\bool \mbox{\hyperlink{allocator__tests_8cpp_ad000166816dcdbe1584c13f67d61efce}{check\+\_\+alignment}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*}ptr)
+\item 
+\mbox{\hyperlink{allocator__tests_8cpp_af448fd7e15b27276c4d415a15b210b88}{TEST\+\_\+\+CASE}} ("{}Testing \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator}{growable\+\_\+allocator}} alignment"{}, "{}\mbox{[}growable\+\_\+allocator\mbox{]}"{})
+\item 
+\mbox{\hyperlink{allocator__tests_8cpp_adeaf8b7961e5e3e337d8590933a7546e}{TEST\+\_\+\+CASE}} ("{}Testing maximum single allocation"{}, "{}\mbox{[}growable\+\_\+allocator\mbox{]}"{})
+\item 
+\mbox{\hyperlink{allocator__tests_8cpp_ae868e8147872aefb475be47d02411b9d}{TEST\+\_\+\+CASE}} ("{}Testing maximum multiple allocation"{}, "{}\mbox{[}growable\+\_\+allocator\mbox{]}"{})
+\item 
+\mbox{\hyperlink{allocator__tests_8cpp_a10bdc93f0e96fc3d9cf7bf11e8b85b74}{TEST\+\_\+\+CASE}} ("{}Testing too large single allocation"{}, "{}\mbox{[}growable\+\_\+allocator\mbox{]}"{})
+\item 
+\mbox{\hyperlink{allocator__tests_8cpp_a4aba5371945059b443cf2fdac97d129d}{TEST\+\_\+\+CASE}} ("{}Testing too large multiple allocation"{}, "{}\mbox{[}growable\+\_\+allocator\mbox{]}"{})
+\item 
+\mbox{\hyperlink{allocator__tests_8cpp_a1debbace00cf0facf9c28e278737becf}{TEST\+\_\+\+CASE}} ("{}Testing maximum initial size"{}, "{}\mbox{[}growable\+\_\+allocator\mbox{]}"{})
+\item 
+\mbox{\hyperlink{allocator__tests_8cpp_af3c20b901f81ccd120b3992d59cd80d1}{TEST\+\_\+\+CASE}} ("{}Testing too large initial size"{}, "{}\mbox{[}growable\+\_\+allocator\mbox{]}"{})
+\item 
+\mbox{\hyperlink{allocator__tests_8cpp_a0295eeb94d43e5fefb0e7d72c7c5d418}{TEST\+\_\+\+CASE}} ("{}Testing maximum \mbox{\hyperlink{structfc_1_1aligned}{aligned}} allocation"{}, "{}\mbox{[}growable\+\_\+allocator\mbox{]}"{})
+\item 
+\mbox{\hyperlink{allocator__tests_8cpp_a88e72dd2da5ca8c94f8cf0dc9bf5e233}{TEST\+\_\+\+CASE}} ("{}Testing reclaim"{}, "{}\mbox{[}growable\+\_\+allocator\mbox{]}"{})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{allocator__tests_8cpp_ad000166816dcdbe1584c13f67d61efce}\index{allocator\_tests.cpp@{allocator\_tests.cpp}!check\_alignment@{check\_alignment}}
+\index{check\_alignment@{check\_alignment}!allocator\_tests.cpp@{allocator\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{check\_alignment()}{check\_alignment()}}
+{\footnotesize\ttfamily \label{allocator__tests_8cpp_ad000166816dcdbe1584c13f67d61efce} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+bool check\+\_\+alignment (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*}}]{ptr}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{allocator__tests_8cpp_source_l00009}{9}} of file \mbox{\hyperlink{allocator__tests_8cpp_source}{allocator\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00009\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00010\ \ \ \ \textcolor{keywordtype}{void}\ *\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ ptr;}
+\DoxyCodeLine{00011\ \ \ \ std::size\_t\ sz\ =\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}});}
+\DoxyCodeLine{00012\ \ \ \ \textcolor{keywordflow}{return}\ std::align(\textcolor{keyword}{alignof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}),\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}),\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\ sz)\ !=\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00013\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=280pt]{allocator__tests_8cpp_ad000166816dcdbe1584c13f67d61efce_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{allocator__tests_8cpp_af448fd7e15b27276c4d415a15b210b88}\index{allocator\_tests.cpp@{allocator\_tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!allocator\_tests.cpp@{allocator\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/9]}}
+{\footnotesize\ttfamily \label{allocator__tests_8cpp_af448fd7e15b27276c4d415a15b210b88} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Testing \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator}{growable\+\_\+allocator}} alignment"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}growable\+\_\+allocator\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{allocator__tests_8cpp_source_l00015}{15}} of file \mbox{\hyperlink{allocator__tests_8cpp_source}{allocator\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00016\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator}{growable\_allocator}}\ alloc(1024);}
+\DoxyCodeLine{00017\ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *\ cptr\ =\ alloc.alloc<\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}>(1);}
+\DoxyCodeLine{00018\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{allocator__tests_8cpp_ad000166816dcdbe1584c13f67d61efce}{check\_alignment}}(cptr));}
+\DoxyCodeLine{00019\ \ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ *\ sptr\ =\ alloc.alloc<\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}>(1);}
+\DoxyCodeLine{00020\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{allocator__tests_8cpp_ad000166816dcdbe1584c13f67d61efce}{check\_alignment}}(sptr));}
+\DoxyCodeLine{00021\ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ *\ iptr\ =\ alloc.alloc<\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}>(1);}
+\DoxyCodeLine{00022\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{allocator__tests_8cpp_ad000166816dcdbe1584c13f67d61efce}{check\_alignment}}(iptr));}
+\DoxyCodeLine{00023\ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ *\ lptr\ =\ alloc.alloc<\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}>(1);}
+\DoxyCodeLine{00024\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{allocator__tests_8cpp_ad000166816dcdbe1584c13f67d61efce}{check\_alignment}}(lptr));}
+\DoxyCodeLine{00025\ \ \ \ *cptr\ =\ 0x11u;}
+\DoxyCodeLine{00026\ \ \ \ *sptr\ =\ 0x2233u;}
+\DoxyCodeLine{00027\ \ \ \ *iptr\ =\ 0x44556677u;}
+\DoxyCodeLine{00028\ \ \ \ *lptr\ =\ 0x8899102030405060u;}
+\DoxyCodeLine{00029\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(*cptr\ ==\ 0x11u);}
+\DoxyCodeLine{00030\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(*sptr\ ==\ 0x2233u);}
+\DoxyCodeLine{00031\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(*iptr\ ==\ 0x44556677u);}
+\DoxyCodeLine{00032\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(*lptr\ ==\ 0x8899102030405060u);}
+\DoxyCodeLine{00033\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{allocator__tests_8cpp_af448fd7e15b27276c4d415a15b210b88_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{allocator__tests_8cpp_a0295eeb94d43e5fefb0e7d72c7c5d418}\index{allocator\_tests.cpp@{allocator\_tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!allocator\_tests.cpp@{allocator\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/9]}}
+{\footnotesize\ttfamily \label{allocator__tests_8cpp_a0295eeb94d43e5fefb0e7d72c7c5d418} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Testing maximum \mbox{\hyperlink{structfc_1_1aligned}{aligned}} allocation"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}growable\+\_\+allocator\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{allocator__tests_8cpp_source_l00082}{82}} of file \mbox{\hyperlink{allocator__tests_8cpp_source}{allocator\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00083\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator}{growable\_allocator}}\ alloc(1024);}
+\DoxyCodeLine{00084\ \ \ \ \textcolor{keyword}{struct\ }\textcolor{keyword}{alignas}(8)\ aligned\_t\ \{\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}[8];\ \};}
+\DoxyCodeLine{00085\ \ \ \ alloc.alloc<\textcolor{keywordtype}{char}>(0x3FFFFFF4);}
+\DoxyCodeLine{00086\ \ \ \ aligned\_t\ *\ ptr\ =\ alloc.alloc<aligned\_t>(1);}
+\DoxyCodeLine{00087\ \ \ \ ptr-\/>a[0]\ =\ \textcolor{charliteral}{'a'};}
+\DoxyCodeLine{00088\ \ \ \ ptr-\/>a[7]\ =\ \textcolor{charliteral}{'z'};}
+\DoxyCodeLine{00089\ \ \ \ alloc.alloc<aligned\_t>(0);}
+\DoxyCodeLine{00090\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(alloc.alloc<\textcolor{keywordtype}{char}>(1),\ wasm\_bad\_alloc);}
+\DoxyCodeLine{00091\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{allocator__tests_8cpp_a0295eeb94d43e5fefb0e7d72c7c5d418_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{allocator__tests_8cpp_a1debbace00cf0facf9c28e278737becf}\index{allocator\_tests.cpp@{allocator\_tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!allocator\_tests.cpp@{allocator\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [3/9]}}
+{\footnotesize\ttfamily \label{allocator__tests_8cpp_a1debbace00cf0facf9c28e278737becf} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Testing maximum initial size"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}growable\+\_\+allocator\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{allocator__tests_8cpp_source_l00067}{67}} of file \mbox{\hyperlink{allocator__tests_8cpp_source}{allocator\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00068\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator}{growable\_allocator}}\ alloc(0x40000000);}
+\DoxyCodeLine{00069\ \ \ \ \textcolor{keywordtype}{char}\ *\ ptr\ =\ alloc.alloc<\textcolor{keywordtype}{char}>(0x40000000);}
+\DoxyCodeLine{00070\ \ \ \ ptr[0]\ =\ \textcolor{charliteral}{'a'};}
+\DoxyCodeLine{00071\ \ \ \ ptr[0x3FFFFFFF]\ =\ \textcolor{charliteral}{'z'};}
+\DoxyCodeLine{00072\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{allocator__tests_8cpp_a1debbace00cf0facf9c28e278737becf_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{allocator__tests_8cpp_ae868e8147872aefb475be47d02411b9d}\index{allocator\_tests.cpp@{allocator\_tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!allocator\_tests.cpp@{allocator\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [4/9]}}
+{\footnotesize\ttfamily \label{allocator__tests_8cpp_ae868e8147872aefb475be47d02411b9d} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Testing maximum multiple allocation"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}growable\+\_\+allocator\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{allocator__tests_8cpp_source_l00044}{44}} of file \mbox{\hyperlink{allocator__tests_8cpp_source}{allocator\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00045\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator}{growable\_allocator}}\ alloc(1024);}
+\DoxyCodeLine{00046\ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ 4;\ ++i)\ \{}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ *\ ptr\ =\ alloc.alloc<\textcolor{keywordtype}{char}>(0x10000000);}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ ptr[0]\ =\ \textcolor{charliteral}{'a'};}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ ptr[0x0FFFFFFF]\ =\ \textcolor{charliteral}{'z'};}
+\DoxyCodeLine{00050\ \ \ \ \}}
+\DoxyCodeLine{00051\ \ \ \ alloc.alloc<\textcolor{keywordtype}{char}>(0);}
+\DoxyCodeLine{00052\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{allocator__tests_8cpp_ae868e8147872aefb475be47d02411b9d_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{allocator__tests_8cpp_adeaf8b7961e5e3e337d8590933a7546e}\index{allocator\_tests.cpp@{allocator\_tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!allocator\_tests.cpp@{allocator\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [5/9]}}
+{\footnotesize\ttfamily \label{allocator__tests_8cpp_adeaf8b7961e5e3e337d8590933a7546e} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Testing maximum single allocation"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}growable\+\_\+allocator\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{allocator__tests_8cpp_source_l00035}{35}} of file \mbox{\hyperlink{allocator__tests_8cpp_source}{allocator\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00036\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator}{growable\_allocator}}\ alloc(0);}
+\DoxyCodeLine{00037\ \ \ \ \textcolor{keywordtype}{char}\ *\ ptr\ =\ alloc.alloc<\textcolor{keywordtype}{char}>(0x40000000);}
+\DoxyCodeLine{00038\ \ \ \ ptr[0]\ =\ \textcolor{charliteral}{'a'};}
+\DoxyCodeLine{00039\ \ \ \ ptr[0x3FFFFFFF]\ =\ \textcolor{charliteral}{'z'};}
+\DoxyCodeLine{00040\ \ \ \ alloc.alloc<\textcolor{keywordtype}{char}>(0);}
+\DoxyCodeLine{00041\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{allocator__tests_8cpp_adeaf8b7961e5e3e337d8590933a7546e_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{allocator__tests_8cpp_a88e72dd2da5ca8c94f8cf0dc9bf5e233}\index{allocator\_tests.cpp@{allocator\_tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!allocator\_tests.cpp@{allocator\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [6/9]}}
+{\footnotesize\ttfamily \label{allocator__tests_8cpp_a88e72dd2da5ca8c94f8cf0dc9bf5e233} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Testing reclaim"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}growable\+\_\+allocator\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{allocator__tests_8cpp_source_l00093}{93}} of file \mbox{\hyperlink{allocator__tests_8cpp_source}{allocator\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00094\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator}{growable\_allocator}}\ alloc(1024);}
+\DoxyCodeLine{00095\ \ \ \ \textcolor{keywordtype}{int}\ *\ ptr1\ =\ alloc.alloc<\textcolor{keywordtype}{int}>(10);}
+\DoxyCodeLine{00096\ \ \ \ alloc.reclaim(ptr1\ +\ 2,\ 8);}
+\DoxyCodeLine{00097\ \ \ \ \textcolor{keywordtype}{int}\ *\ ptr2\ =\ alloc.alloc<\textcolor{keywordtype}{int}>(10);}
+\DoxyCodeLine{00098\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(ptr2\ ==\ ptr1\ +\ 2);}
+\DoxyCodeLine{00099\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{allocator__tests_8cpp_a88e72dd2da5ca8c94f8cf0dc9bf5e233_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{allocator__tests_8cpp_af3c20b901f81ccd120b3992d59cd80d1}\index{allocator\_tests.cpp@{allocator\_tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!allocator\_tests.cpp@{allocator\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [7/9]}}
+{\footnotesize\ttfamily \label{allocator__tests_8cpp_af3c20b901f81ccd120b3992d59cd80d1} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Testing too large initial size"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}growable\+\_\+allocator\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{allocator__tests_8cpp_source_l00074}{74}} of file \mbox{\hyperlink{allocator__tests_8cpp_source}{allocator\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00075\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator}{growable\_allocator}}\{0x40000001\},\ wasm\_bad\_alloc);}
+\DoxyCodeLine{00076\ \ \ \ \textcolor{comment}{//\ Check\ that\ integer\ overflow\ in\ rounding\ functions\ won't\ cause\ issues}}
+\DoxyCodeLine{00077\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator}{growable\_allocator}}\{0x8000000000000000ull\},\ wasm\_bad\_alloc);}
+\DoxyCodeLine{00078\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator}{growable\_allocator}}\{0xFFFFFFFFFFFE0001ull\},\ wasm\_bad\_alloc);}
+\DoxyCodeLine{00079\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator}{growable\_allocator}}\{0xFFFFFFFFFFFFFFFFull\},\ wasm\_bad\_alloc);}
+\DoxyCodeLine{00080\ \}}
+
+\end{DoxyCode}
+\Hypertarget{allocator__tests_8cpp_a4aba5371945059b443cf2fdac97d129d}\index{allocator\_tests.cpp@{allocator\_tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!allocator\_tests.cpp@{allocator\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [8/9]}}
+{\footnotesize\ttfamily \label{allocator__tests_8cpp_a4aba5371945059b443cf2fdac97d129d} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Testing too large multiple allocation"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}growable\+\_\+allocator\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{allocator__tests_8cpp_source_l00059}{59}} of file \mbox{\hyperlink{allocator__tests_8cpp_source}{allocator\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00060\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator}{growable\_allocator}}\ alloc(1024);}
+\DoxyCodeLine{00061\ \ \ \ alloc.alloc<\textcolor{keywordtype}{char}>(0x10000000);}
+\DoxyCodeLine{00062\ \ \ \ alloc.alloc<\textcolor{keywordtype}{char}>(0x10000000);}
+\DoxyCodeLine{00063\ \ \ \ alloc.alloc<\textcolor{keywordtype}{char}>(0x10000000);}
+\DoxyCodeLine{00064\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(alloc.alloc<\textcolor{keywordtype}{char}>(0x10000001),\ wasm\_bad\_alloc);}
+\DoxyCodeLine{00065\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{allocator__tests_8cpp_a4aba5371945059b443cf2fdac97d129d_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{allocator__tests_8cpp_a10bdc93f0e96fc3d9cf7bf11e8b85b74}\index{allocator\_tests.cpp@{allocator\_tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!allocator\_tests.cpp@{allocator\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [9/9]}}
+{\footnotesize\ttfamily \label{allocator__tests_8cpp_a10bdc93f0e96fc3d9cf7bf11e8b85b74} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Testing too large single allocation"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}growable\+\_\+allocator\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{allocator__tests_8cpp_source_l00054}{54}} of file \mbox{\hyperlink{allocator__tests_8cpp_source}{allocator\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00055\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator}{growable\_allocator}}\ alloc(1024);}
+\DoxyCodeLine{00056\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(alloc.alloc<\textcolor{keywordtype}{char}>(0x40000001),\ wasm\_bad\_alloc);}
+\DoxyCodeLine{00057\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{allocator__tests_8cpp_a10bdc93f0e96fc3d9cf7bf11e8b85b74_cgraph}
+\end{center}
+\end{figure}

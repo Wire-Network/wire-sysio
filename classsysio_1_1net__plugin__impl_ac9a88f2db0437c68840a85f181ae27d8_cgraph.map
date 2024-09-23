@@ -1,0 +1,9 @@
+<map id="sysio::net_plugin_impl::start_monitors" name="sysio::net_plugin_impl::start_monitors">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,55,156,96"/>
+<area shape="rect" id="Node000002" href="$classfc_1_1unique__ptr.html#afabaa48e02b058c61df6089f56b17cf6" title=" " alt="" coords="210,5,348,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="152,52,217,33,218,38,154,57"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1net__plugin__impl.html#a61888d730f07a5396e5a2932991f2653" title=" " alt="" coords="204,55,354,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="156,73,188,73,188,78,156,78"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1net__plugin__impl.html#a4a79395ba59f524103b8a2e44aaa1c22" title=" " alt="" coords="204,120,354,161"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="145,94,201,113,200,118,143,99"/>
+</map>

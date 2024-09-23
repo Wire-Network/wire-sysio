@@ -1,0 +1,170 @@
+\doxysection{Widget Class Reference}
+\hypertarget{class_widget}{}\label{class_widget}\index{Widget@{Widget}}
+
+
+{\ttfamily \#include $<$widget.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_widget_ab573b75a8a69d29c298af2485fb9cda9}{Widget}} (int number, const std\+::string \&\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})
+\item 
+\mbox{\hyperlink{class_widget_aa24f66bcbaaec6d458b0980e8c8eae65}{\texorpdfstring{$\sim$}{\string~}\+Widget}} ()
+\item 
+float \mbox{\hyperlink{class_widget_abf639d975e02cabda8132873aca1a333}{Get\+Float\+Value}} () const
+\item 
+int \mbox{\hyperlink{class_widget_a15e7d0423020a7a98063a749fb97bdd3}{Get\+Int\+Value}} () const
+\item 
+std\+::string \mbox{\hyperlink{class_widget_a7a6e3a7fca3a9373f631c94dc1494d22}{Get\+String\+Value}} () const
+\item 
+void \mbox{\hyperlink{class_widget_a50791a556979f22f5593383143c7f815}{Get\+Char\+Ptr\+Value}} (char \texorpdfstring{$\ast$}{*}buffer, size\+\_\+t max\+\_\+size) const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{widget_8h_source_l00042}{42}} of file \mbox{\hyperlink{widget_8h_source}{widget.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_widget_ab573b75a8a69d29c298af2485fb9cda9}\index{Widget@{Widget}!Widget@{Widget}}
+\index{Widget@{Widget}!Widget@{Widget}}
+\doxysubsubsection{\texorpdfstring{Widget()}{Widget()}}
+{\footnotesize\ttfamily \label{class_widget_ab573b75a8a69d29c298af2485fb9cda9} 
+Widget\+::\+Widget (\begin{DoxyParamCaption}\item[{int}]{number}{, }\item[{const std\+::string \&}]{name}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{widget_8cc_source_l00040}{40}} of file \mbox{\hyperlink{widget_8cc_source}{widget.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00041\ \ \ \ \ :\ number\_(number),}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ name\_(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{class_widget_aa24f66bcbaaec6d458b0980e8c8eae65}\index{Widget@{Widget}!````~Widget@{\texorpdfstring{$\sim$}{\string~}Widget}}
+\index{````~Widget@{\texorpdfstring{$\sim$}{\string~}Widget}!Widget@{Widget}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}Widget()}{\string~Widget()}}
+{\footnotesize\ttfamily \label{class_widget_aa24f66bcbaaec6d458b0980e8c8eae65} 
+Widget\+::\texorpdfstring{$\sim$}{\string~}\+Widget (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{widget_8cc_source_l00044}{44}} of file \mbox{\hyperlink{widget_8cc_source}{widget.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00044\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_widget_a50791a556979f22f5593383143c7f815}\index{Widget@{Widget}!GetCharPtrValue@{GetCharPtrValue}}
+\index{GetCharPtrValue@{GetCharPtrValue}!Widget@{Widget}}
+\doxysubsubsection{\texorpdfstring{GetCharPtrValue()}{GetCharPtrValue()}}
+{\footnotesize\ttfamily \label{class_widget_a50791a556979f22f5593383143c7f815} 
+void Widget\+::\+Get\+Char\+Ptr\+Value (\begin{DoxyParamCaption}\item[{char \texorpdfstring{$\ast$}{*}}]{buffer}{, }\item[{size\+\_\+t}]{max\+\_\+size}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{widget_8cc_source_l00058}{58}} of file \mbox{\hyperlink{widget_8cc_source}{widget.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00059\ \ \ \textcolor{comment}{//\ Copy\ the\ char*\ representation\ of\ name\_\ into\ buffer,\ up\ to\ max\_size.}}
+\DoxyCodeLine{00060\ \ \ strncpy(buffer,\ name\_.c\_str(),\ max\_size-\/1);}
+\DoxyCodeLine{00061\ \ \ buffer[max\_size-\/1]\ =\ \textcolor{charliteral}{'\(\backslash\)0'};}
+\DoxyCodeLine{00062\ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00063\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=284pt]{class_widget_a50791a556979f22f5593383143c7f815_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_widget_abf639d975e02cabda8132873aca1a333}\index{Widget@{Widget}!GetFloatValue@{GetFloatValue}}
+\index{GetFloatValue@{GetFloatValue}!Widget@{Widget}}
+\doxysubsubsection{\texorpdfstring{GetFloatValue()}{GetFloatValue()}}
+{\footnotesize\ttfamily \label{class_widget_abf639d975e02cabda8132873aca1a333} 
+float Widget\+::\+Get\+Float\+Value (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{widget_8cc_source_l00046}{46}} of file \mbox{\hyperlink{widget_8cc_source}{widget.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00047\ \ \ \textcolor{keywordflow}{return}\ number\_;}
+\DoxyCodeLine{00048\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=272pt]{class_widget_abf639d975e02cabda8132873aca1a333_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_widget_a15e7d0423020a7a98063a749fb97bdd3}\index{Widget@{Widget}!GetIntValue@{GetIntValue}}
+\index{GetIntValue@{GetIntValue}!Widget@{Widget}}
+\doxysubsubsection{\texorpdfstring{GetIntValue()}{GetIntValue()}}
+{\footnotesize\ttfamily \label{class_widget_a15e7d0423020a7a98063a749fb97bdd3} 
+int Widget\+::\+Get\+Int\+Value (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{widget_8cc_source_l00050}{50}} of file \mbox{\hyperlink{widget_8cc_source}{widget.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00051\ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(number\_);}
+\DoxyCodeLine{00052\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=261pt]{class_widget_a15e7d0423020a7a98063a749fb97bdd3_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_widget_a7a6e3a7fca3a9373f631c94dc1494d22}\index{Widget@{Widget}!GetStringValue@{GetStringValue}}
+\index{GetStringValue@{GetStringValue}!Widget@{Widget}}
+\doxysubsubsection{\texorpdfstring{GetStringValue()}{GetStringValue()}}
+{\footnotesize\ttfamily \label{class_widget_a7a6e3a7fca3a9373f631c94dc1494d22} 
+std\+::string Widget\+::\+Get\+String\+Value (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{widget_8cc_source_l00054}{54}} of file \mbox{\hyperlink{widget_8cc_source}{widget.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00055\ \ \ \textcolor{keywordflow}{return}\ name\_;}
+\DoxyCodeLine{00056\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=276pt]{class_widget_a7a6e3a7fca3a9373f631c94dc1494d22_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/xcode/\+Samples/\+Framework\+Sample/\mbox{\hyperlink{widget_8h}{widget.\+h}}\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/xcode/\+Samples/\+Framework\+Sample/\mbox{\hyperlink{widget_8cc}{widget.\+cc}}\end{DoxyCompactItemize}

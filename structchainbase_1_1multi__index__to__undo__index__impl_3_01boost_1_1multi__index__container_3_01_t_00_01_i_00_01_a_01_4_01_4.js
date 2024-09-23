@@ -1,0 +1,5 @@
+var structchainbase_1_1multi__index__to__undo__index__impl_3_01boost_1_1multi__index__container_3_01_t_00_01_i_00_01_a_01_4_01_4 =
+[
+    [ "as_mp11", "structchainbase_1_1multi__index__to__undo__index__impl_3_01boost_1_1multi__index__container_3_01_t_00_01_i_00_01_a_01_4_01_4.html#ad3e39d6648a553796b5174aa66756331", null ],
+    [ "type", "structchainbase_1_1multi__index__to__undo__index__impl_3_01boost_1_1multi__index__container_3_01_t_00_01_i_00_01_a_01_4_01_4.html#a4c4137d89e0039a0be3bdd9ea9244ead", null ]
+];

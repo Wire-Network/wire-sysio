@@ -1,0 +1,14 @@
+<map id="libraries/yubihsm/ykyh/error.c" name="libraries/yubihsm/ykyh/error.c">
+<area shape="rect" id="Node000001" title=" " alt="" coords="61,5,213,46"/>
+<area shape="rect" id="Node000002" href="$ykyh_8h.html" title=" " alt="" coords="74,94,134,120"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="131,47,117,81,112,78,126,45"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="138,168,206,193"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="144,46,168,152,163,153,139,47"/>
+<area shape="rect" id="Node000003" href="$stdint_8h.html" title=" " alt="" coords="49,168,113,193"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="102,121,92,153,87,152,97,119"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="117,118,152,155,148,158,113,122"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="5,241,69,267"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="76,195,55,229,50,226,71,192"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="93,241,160,267"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="91,192,113,227,108,230,86,195"/>
+</map>

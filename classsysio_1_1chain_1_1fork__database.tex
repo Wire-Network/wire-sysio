@@ -1,0 +1,561 @@
+\doxysection{sysio\+::chain\+::fork\+\_\+database Class Reference}
+\hypertarget{classsysio_1_1chain_1_1fork__database}{}\label{classsysio_1_1chain_1_1fork__database}\index{sysio::chain::fork\_database@{sysio::chain::fork\_database}}
+
+
+manages light-\/weight state for all potential unconfirmed forks  
+
+
+
+
+{\ttfamily \#include $<$fork\+\_\+database.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_acdd97cb223a90aac537ce1cd5684d388}{fork\+\_\+database}} (const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&data\+\_\+dir)
+\item 
+\mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a5eb28c8778610f360516341594997fc7}{\texorpdfstring{$\sim$}{\string~}fork\+\_\+database}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a378b089fe1ff7ac016ee51058ff52cb2}{open}} (const std\+::function$<$ void(\mbox{\hyperlink{namespacesysio_1_1chain_a11965fc424809ea1802175f8b36ae4e5}{block\+\_\+timestamp\+\_\+type}}, const flat\+\_\+set$<$ \mbox{\hyperlink{namespacesysio_1_1chain_a357fd9478475457e5bb386a3143079b6}{digest\+\_\+type}} $>$ \&, const \mbox{\hyperlink{classfc_1_1vector}{vector}}$<$ \mbox{\hyperlink{namespacesysio_1_1chain_a357fd9478475457e5bb386a3143079b6}{digest\+\_\+type}} $>$ \&)$>$ \&validator)
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a8d84a8db51ed89315f80a7b251a38b8e}{close}} ()
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_a918963c39fa6317556dca73276274e64}{block\+\_\+header\+\_\+state\+\_\+ptr}} \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a681f9146e0afd70a0e8c0421efb0a41f}{get\+\_\+block\+\_\+header}} (const \mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{block\+\_\+id\+\_\+type}} \&\mbox{\hyperlink{code__cache_8cpp_aa0efefe21f4700d78692edc823e763be}{id}}) const
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\+\_\+state\+\_\+ptr}} \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_aee9daa00e2698a868ad36853e58d3908}{get\+\_\+block}} (const \mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{block\+\_\+id\+\_\+type}} \&\mbox{\hyperlink{code__cache_8cpp_aa0efefe21f4700d78692edc823e763be}{id}}) const
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a7dd3012e6d7e68e24b2f223d5be09c02}{reset}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1block__header__state}{block\+\_\+header\+\_\+state}} \&root\+\_\+bhs)
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a611cc70b13dee823c43ffe99df5522d4}{rollback\+\_\+head\+\_\+to\+\_\+root}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_ae911acbc996994cb6dfd21fddfb89a45}{advance\+\_\+root}} (const \mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{block\+\_\+id\+\_\+type}} \&\mbox{\hyperlink{code__cache_8cpp_aa0efefe21f4700d78692edc823e763be}{id}})
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a97cf1402b71020048ae0054e4d7c8079}{add}} (const \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\+\_\+state\+\_\+ptr}} \&next\+\_\+block, bool ignore\+\_\+duplicate=false)
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a193f10ce12656c580b023d36193a5cdc}{remove}} (const \mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{block\+\_\+id\+\_\+type}} \&\mbox{\hyperlink{code__cache_8cpp_aa0efefe21f4700d78692edc823e763be}{id}})
+\begin{DoxyCompactList}\small\item\em fetch\+\_\+branch\+\_\+from\+\_\+impl \end{DoxyCompactList}\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\+\_\+state\+\_\+ptr}} \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a31db3526cc966f5db1046cebcfc45219}{root}} () const
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\+\_\+state\+\_\+ptr}} \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a3b128a7d57c262ef6351d83c16cffae3}{head}} () const
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\+\_\+state\+\_\+ptr}} \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a16e619525d86741f3e5344b39ab91868}{pending\+\_\+head}} () const
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_a3b287e6c2d3717609273c999ef660dea}{branch\+\_\+type}} \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a18e51b748469f97473d120ef69e1da22}{fetch\+\_\+branch}} (const \mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{block\+\_\+id\+\_\+type}} \&h, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} trim\+\_\+after\+\_\+block\+\_\+num=std\+::numeric\+\_\+limits$<$ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} $>$\+::max()) const
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\+\_\+state\+\_\+ptr}} \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a17185d8543965b7cd40066019bbf5740}{search\+\_\+on\+\_\+branch}} (const \mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{block\+\_\+id\+\_\+type}} \&h, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} block\+\_\+num) const
+\item 
+pair$<$ \mbox{\hyperlink{namespacesysio_1_1chain_a3b287e6c2d3717609273c999ef660dea}{branch\+\_\+type}}, \mbox{\hyperlink{namespacesysio_1_1chain_a3b287e6c2d3717609273c999ef660dea}{branch\+\_\+type}} $>$ \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a77f152572f2703a40e9c198456fad748}{fetch\+\_\+branch\+\_\+from}} (const \mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{block\+\_\+id\+\_\+type}} \&first, const \mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{block\+\_\+id\+\_\+type}} \&second) const
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a764fc46000bb93901ba6440fec07b5f9}{mark\+\_\+valid}} (const \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\+\_\+state\+\_\+ptr}} \&h)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a6649b0d3a5a88f5cea9d2f467601fe24}{magic\+\_\+number}} = 0x30510\+FDB
+\item 
+static const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a849a1eb423d310b17ec5d899b48b80d7}{min\+\_\+supported\+\_\+version}} = 1
+\item 
+static const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a04a97bab59df6c56c06101d431f06e84}{max\+\_\+supported\+\_\+version}} = 1
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+As new blocks are received, they are pushed into the fork database. The fork database tracks the longest chain and the last irreversible block number. All blocks older than the last irreversible block are freed after emitting the irreversible signal.
+
+An internal mutex is used to provide thread-\/safety. 
+
+Definition at line \mbox{\hyperlink{fork__database_8hpp_source_l00022}{22}} of file \mbox{\hyperlink{fork__database_8hpp_source}{fork\+\_\+database.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classsysio_1_1chain_1_1fork__database_acdd97cb223a90aac537ce1cd5684d388}\index{sysio::chain::fork\_database@{sysio::chain::fork\_database}!fork\_database@{fork\_database}}
+\index{fork\_database@{fork\_database}!sysio::chain::fork\_database@{sysio::chain::fork\_database}}
+\doxysubsubsection{\texorpdfstring{fork\_database()}{fork\_database()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1fork__database_acdd97cb223a90aac537ce1cd5684d388} 
+sysio\+::chain\+::fork\+\_\+database\+::fork\+\_\+database (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&}]{data\+\_\+dir}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{fork__database_8cpp_source_l00100}{100}} of file \mbox{\hyperlink{fork__database_8cpp_source}{fork\+\_\+database.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00101\ \ \ \ :my(\ \textcolor{keyword}{new}\ fork\_database\_impl(\ data\_dir\ )\ )}
+\DoxyCodeLine{00102\ \ \ \ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1fork__database_a5eb28c8778610f360516341594997fc7}\index{sysio::chain::fork\_database@{sysio::chain::fork\_database}!````~fork\_database@{\texorpdfstring{$\sim$}{\string~}fork\_database}}
+\index{````~fork\_database@{\texorpdfstring{$\sim$}{\string~}fork\_database}!sysio::chain::fork\_database@{sysio::chain::fork\_database}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}fork\_database()}{\string~fork\_database()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1fork__database_a5eb28c8778610f360516341594997fc7} 
+sysio\+::chain\+::fork\+\_\+database\+::\texorpdfstring{$\sim$}{\string~}fork\+\_\+database (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{fork__database_8cpp_source_l00259}{259}} of file \mbox{\hyperlink{fork__database_8cpp_source}{fork\+\_\+database.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00259\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00260\ \ \ \ \ \ \ my-\/>close\_impl();}
+\DoxyCodeLine{00261\ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1chain_1_1fork__database_a97cf1402b71020048ae0054e4d7c8079}\index{sysio::chain::fork\_database@{sysio::chain::fork\_database}!add@{add}}
+\index{add@{add}!sysio::chain::fork\_database@{sysio::chain::fork\_database}}
+\doxysubsubsection{\texorpdfstring{add()}{add()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1fork__database_a97cf1402b71020048ae0054e4d7c8079} 
+void sysio\+::chain\+::fork\+\_\+database\+::add (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\+\_\+state\+\_\+ptr}} \&}]{next\+\_\+block}{, }\item[{bool}]{ignore\+\_\+duplicate}{ = {\ttfamily false}}\end{DoxyParamCaption})}
+
+Add block state to fork database. Must link to existing block in fork database or the root. 
+
+Definition at line \mbox{\hyperlink{fork__database_8cpp_source_l00385}{385}} of file \mbox{\hyperlink{fork__database_8cpp_source}{fork\+\_\+database.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00385\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00386\ \ \ \ \ \ \ std::lock\_guard\ g(\ my-\/>mtx\ );}
+\DoxyCodeLine{00387\ \ \ \ \ \ \ my-\/>add\_impl(\ n,\ ignore\_duplicate,\ \textcolor{keyword}{false},}
+\DoxyCodeLine{00388\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [](\ \mbox{\hyperlink{namespacesysio_1_1chain_a11965fc424809ea1802175f8b36ae4e5}{block\_timestamp\_type}}\ timestamp,}
+\DoxyCodeLine{00389\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ flat\_set<digest\_type>\&\ cur\_features,}
+\DoxyCodeLine{00390\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ vector<digest\_type>\&\ new\_features\ )}
+\DoxyCodeLine{00391\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\}}
+\DoxyCodeLine{00392\ \ \ \ \ \ \ );}
+\DoxyCodeLine{00393\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1fork__database_a97cf1402b71020048ae0054e4d7c8079_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1fork__database_ae911acbc996994cb6dfd21fddfb89a45}\index{sysio::chain::fork\_database@{sysio::chain::fork\_database}!advance\_root@{advance\_root}}
+\index{advance\_root@{advance\_root}!sysio::chain::fork\_database@{sysio::chain::fork\_database}}
+\doxysubsubsection{\texorpdfstring{advance\_root()}{advance\_root()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1fork__database_ae911acbc996994cb6dfd21fddfb89a45} 
+void sysio\+::chain\+::fork\+\_\+database\+::advance\+\_\+root (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{block\+\_\+id\+\_\+type}} \&}]{id}{}\end{DoxyParamCaption})}
+
+Advance root block forward to some other block in the tree. 
+
+Definition at line \mbox{\hyperlink{fork__database_8cpp_source_l00293}{293}} of file \mbox{\hyperlink{fork__database_8cpp_source}{fork\+\_\+database.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00293\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00294\ \ \ \ \ \ \ std::lock\_guard\ g(\ my-\/>mtx\ );}
+\DoxyCodeLine{00295\ \ \ \ \ \ \ my-\/>advance\_root\_impl(\ \textcolor{keywordtype}{id}\ );}
+\DoxyCodeLine{00296\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1fork__database_ae911acbc996994cb6dfd21fddfb89a45_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1fork__database_a8d84a8db51ed89315f80a7b251a38b8e}\index{sysio::chain::fork\_database@{sysio::chain::fork\_database}!close@{close}}
+\index{close@{close}!sysio::chain::fork\_database@{sysio::chain::fork\_database}}
+\doxysubsubsection{\texorpdfstring{close()}{close()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1fork__database_a8d84a8db51ed89315f80a7b251a38b8e} 
+void sysio\+::chain\+::fork\+\_\+database\+::close (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{fork__database_8cpp_source_l00191}{191}} of file \mbox{\hyperlink{fork__database_8cpp_source}{fork\+\_\+database.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ std::lock\_guard\ g(\ my-\/>mtx\ );}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ my-\/>close\_impl();}
+\DoxyCodeLine{00194\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1fork__database_a18e51b748469f97473d120ef69e1da22}\index{sysio::chain::fork\_database@{sysio::chain::fork\_database}!fetch\_branch@{fetch\_branch}}
+\index{fetch\_branch@{fetch\_branch}!sysio::chain::fork\_database@{sysio::chain::fork\_database}}
+\doxysubsubsection{\texorpdfstring{fetch\_branch()}{fetch\_branch()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1fork__database_a18e51b748469f97473d120ef69e1da22} 
+\mbox{\hyperlink{namespacesysio_1_1chain_a3b287e6c2d3717609273c999ef660dea}{branch\+\_\+type}} sysio\+::chain\+::fork\+\_\+database\+::fetch\+\_\+branch (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{block\+\_\+id\+\_\+type}} \&}]{h}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{trim\+\_\+after\+\_\+block\+\_\+num}{ = {\ttfamily std\+:\+:numeric\+\_\+limits$<$\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}$>$\+:\+:max()}}\end{DoxyParamCaption}) const}
+
+Returns the sequence of block states resulting from trimming the branch from the root block (exclusive) to the block with an id of {\ttfamily h} (inclusive) by removing any block states corresponding to block numbers greater than {\ttfamily trim\+\_\+after\+\_\+block\+\_\+num}.
+
+The order of the sequence is in descending block number order. \doxylink{struct_a}{A} block with an id of {\ttfamily h} must exist in the fork database otherwise this method will throw an exception. 
+
+Definition at line \mbox{\hyperlink{fork__database_8cpp_source_l00418}{418}} of file \mbox{\hyperlink{fork__database_8cpp_source}{fork\+\_\+database.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00418\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00419\ \ \ \ \ \ \ std::shared\_lock\ g(\ my-\/>mtx\ );}
+\DoxyCodeLine{00420\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ my-\/>fetch\_branch\_impl(\ h,\ trim\_after\_block\_num\ );}
+\DoxyCodeLine{00421\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1fork__database_a18e51b748469f97473d120ef69e1da22_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1fork__database_a77f152572f2703a40e9c198456fad748}\index{sysio::chain::fork\_database@{sysio::chain::fork\_database}!fetch\_branch\_from@{fetch\_branch\_from}}
+\index{fetch\_branch\_from@{fetch\_branch\_from}!sysio::chain::fork\_database@{sysio::chain::fork\_database}}
+\doxysubsubsection{\texorpdfstring{fetch\_branch\_from()}{fetch\_branch\_from()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1fork__database_a77f152572f2703a40e9c198456fad748} 
+pair$<$ \mbox{\hyperlink{namespacesysio_1_1chain_a3b287e6c2d3717609273c999ef660dea}{branch\+\_\+type}}, \mbox{\hyperlink{namespacesysio_1_1chain_a3b287e6c2d3717609273c999ef660dea}{branch\+\_\+type}} $>$ sysio\+::chain\+::fork\+\_\+database\+::fetch\+\_\+branch\+\_\+from (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{block\+\_\+id\+\_\+type}} \&}]{first}{, }\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{block\+\_\+id\+\_\+type}} \&}]{second}{}\end{DoxyParamCaption}) const}
+
+Given two head blocks, return two branches of the fork graph that end with a common ancestor (same prior block) 
+
+Definition at line \mbox{\hyperlink{fork__database_8cpp_source_l00451}{451}} of file \mbox{\hyperlink{fork__database_8cpp_source}{fork\+\_\+database.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00452\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00453\ \ \ \ \ \ \ std::shared\_lock\ g(\ my-\/>mtx\ );}
+\DoxyCodeLine{00454\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ my-\/>fetch\_branch\_from\_impl(\ first,\ second\ );}
+\DoxyCodeLine{00455\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1fork__database_a77f152572f2703a40e9c198456fad748_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1fork__database_aee9daa00e2698a868ad36853e58d3908}\index{sysio::chain::fork\_database@{sysio::chain::fork\_database}!get\_block@{get\_block}}
+\index{get\_block@{get\_block}!sysio::chain::fork\_database@{sysio::chain::fork\_database}}
+\doxysubsubsection{\texorpdfstring{get\_block()}{get\_block()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1fork__database_aee9daa00e2698a868ad36853e58d3908} 
+\mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\+\_\+state\+\_\+ptr}} sysio\+::chain\+::fork\+\_\+database\+::get\+\_\+block (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{block\+\_\+id\+\_\+type}} \&}]{id}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{fork__database_8cpp_source_l00568}{568}} of file \mbox{\hyperlink{fork__database_8cpp_source}{fork\+\_\+database.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00568\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00569\ \ \ \ \ \ \ std::shared\_lock\ g(\ my-\/>mtx\ );}
+\DoxyCodeLine{00570\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ my-\/>get\_block\_impl(\textcolor{keywordtype}{id});}
+\DoxyCodeLine{00571\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1fork__database_aee9daa00e2698a868ad36853e58d3908_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1fork__database_a681f9146e0afd70a0e8c0421efb0a41f}\index{sysio::chain::fork\_database@{sysio::chain::fork\_database}!get\_block\_header@{get\_block\_header}}
+\index{get\_block\_header@{get\_block\_header}!sysio::chain::fork\_database@{sysio::chain::fork\_database}}
+\doxysubsubsection{\texorpdfstring{get\_block\_header()}{get\_block\_header()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1fork__database_a681f9146e0afd70a0e8c0421efb0a41f} 
+\mbox{\hyperlink{namespacesysio_1_1chain_a918963c39fa6317556dca73276274e64}{block\+\_\+header\+\_\+state\+\_\+ptr}} sysio\+::chain\+::fork\+\_\+database\+::get\+\_\+block\+\_\+header (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{block\+\_\+id\+\_\+type}} \&}]{id}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{fork__database_8cpp_source_l00331}{331}} of file \mbox{\hyperlink{fork__database_8cpp_source}{fork\+\_\+database.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00331\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00332\ \ \ \ \ \ \ std::shared\_lock\ g(\ my-\/>mtx\ );}
+\DoxyCodeLine{00333\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ my-\/>get\_block\_header\_impl(\ \textcolor{keywordtype}{id}\ );}
+\DoxyCodeLine{00334\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1fork__database_a681f9146e0afd70a0e8c0421efb0a41f_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1fork__database_a3b128a7d57c262ef6351d83c16cffae3}\index{sysio::chain::fork\_database@{sysio::chain::fork\_database}!head@{head}}
+\index{head@{head}!sysio::chain::fork\_database@{sysio::chain::fork\_database}}
+\doxysubsubsection{\texorpdfstring{head()}{head()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1fork__database_a3b128a7d57c262ef6351d83c16cffae3} 
+\mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\+\_\+state\+\_\+ptr}} sysio\+::chain\+::fork\+\_\+database\+::head (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{fork__database_8cpp_source_l00400}{400}} of file \mbox{\hyperlink{fork__database_8cpp_source}{fork\+\_\+database.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00400\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00401\ \ \ \ \ \ \ std::shared\_lock\ g(\ my-\/>mtx\ );}
+\DoxyCodeLine{00402\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ my-\/>head;}
+\DoxyCodeLine{00403\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1fork__database_a3b128a7d57c262ef6351d83c16cffae3_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1fork__database_a764fc46000bb93901ba6440fec07b5f9}\index{sysio::chain::fork\_database@{sysio::chain::fork\_database}!mark\_valid@{mark\_valid}}
+\index{mark\_valid@{mark\_valid}!sysio::chain::fork\_database@{sysio::chain::fork\_database}}
+\doxysubsubsection{\texorpdfstring{mark\_valid()}{mark\_valid()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1fork__database_a764fc46000bb93901ba6440fec07b5f9} 
+void sysio\+::chain\+::fork\+\_\+database\+::mark\+\_\+valid (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\+\_\+state\+\_\+ptr}} \&}]{h}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{fork__database_8cpp_source_l00543}{543}} of file \mbox{\hyperlink{fork__database_8cpp_source}{fork\+\_\+database.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00543\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00544\ \ \ \ \ \ \ std::lock\_guard\ g(\ my-\/>mtx\ );}
+\DoxyCodeLine{00545\ \ \ \ \ \ \ my-\/>mark\_valid\_impl(\ h\ );}
+\DoxyCodeLine{00546\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1fork__database_a764fc46000bb93901ba6440fec07b5f9_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1fork__database_a378b089fe1ff7ac016ee51058ff52cb2}\index{sysio::chain::fork\_database@{sysio::chain::fork\_database}!open@{open}}
+\index{open@{open}!sysio::chain::fork\_database@{sysio::chain::fork\_database}}
+\doxysubsubsection{\texorpdfstring{open()}{open()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1fork__database_a378b089fe1ff7ac016ee51058ff52cb2} 
+void sysio\+::chain\+::fork\+\_\+database\+::open (\begin{DoxyParamCaption}\item[{const std\+::function$<$ void(\mbox{\hyperlink{namespacesysio_1_1chain_a11965fc424809ea1802175f8b36ae4e5}{block\+\_\+timestamp\+\_\+type}}, const flat\+\_\+set$<$ \mbox{\hyperlink{namespacesysio_1_1chain_a357fd9478475457e5bb386a3143079b6}{digest\+\_\+type}} $>$ \&, const \mbox{\hyperlink{classfc_1_1vector}{vector}}$<$ \mbox{\hyperlink{namespacesysio_1_1chain_a357fd9478475457e5bb386a3143079b6}{digest\+\_\+type}} $>$ \&)$>$ \&}]{validator}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{fork__database_8cpp_source_l00105}{105}} of file \mbox{\hyperlink{fork__database_8cpp_source}{fork\+\_\+database.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00108\ \ \ \ \{}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ std::lock\_guard\ g(\ my-\/>mtx\ );}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ my-\/>open\_impl(\ validator\ );}
+\DoxyCodeLine{00111\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1fork__database_a378b089fe1ff7ac016ee51058ff52cb2_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1fork__database_a16e619525d86741f3e5344b39ab91868}\index{sysio::chain::fork\_database@{sysio::chain::fork\_database}!pending\_head@{pending\_head}}
+\index{pending\_head@{pending\_head}!sysio::chain::fork\_database@{sysio::chain::fork\_database}}
+\doxysubsubsection{\texorpdfstring{pending\_head()}{pending\_head()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1fork__database_a16e619525d86741f3e5344b39ab91868} 
+\mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\+\_\+state\+\_\+ptr}} sysio\+::chain\+::fork\+\_\+database\+::pending\+\_\+head (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{fork__database_8cpp_source_l00405}{405}} of file \mbox{\hyperlink{fork__database_8cpp_source}{fork\+\_\+database.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00405\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00406\ \ \ \ \ \ \ std::shared\_lock\ g(\ my-\/>mtx\ );}
+\DoxyCodeLine{00407\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ indx\ =\ my-\/>index.get<by\_lib\_block\_num>();}
+\DoxyCodeLine{00408\ }
+\DoxyCodeLine{00409\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ indx.lower\_bound(\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{00410\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr\ !=\ indx.end()\ \&\&\ !(*itr)-\/>is\_valid()\ )\ \{}
+\DoxyCodeLine{00411\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{namespacesysio_1_1chain_a4d023005b3b47d76c62beeaebc291fa3}{first\_preferred}}(\ **itr,\ *my-\/>head\ )\ )}
+\DoxyCodeLine{00412\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *itr;}
+\DoxyCodeLine{00413\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00414\ }
+\DoxyCodeLine{00415\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ my-\/>head;}
+\DoxyCodeLine{00416\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=334pt]{classsysio_1_1chain_1_1fork__database_a16e619525d86741f3e5344b39ab91868_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1fork__database_a16e619525d86741f3e5344b39ab91868_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1fork__database_a193f10ce12656c580b023d36193a5cdc}\index{sysio::chain::fork\_database@{sysio::chain::fork\_database}!remove@{remove}}
+\index{remove@{remove}!sysio::chain::fork\_database@{sysio::chain::fork\_database}}
+\doxysubsubsection{\texorpdfstring{remove()}{remove()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1fork__database_a193f10ce12656c580b023d36193a5cdc} 
+void sysio\+::chain\+::fork\+\_\+database\+::remove (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{block\+\_\+id\+\_\+type}} \&}]{id}{}\end{DoxyParamCaption})}
+
+remove all of the invalid forks built off of this id including this id 
+
+Definition at line \mbox{\hyperlink{fork__database_8cpp_source_l00517}{517}} of file \mbox{\hyperlink{fork__database_8cpp_source}{fork\+\_\+database.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00517\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00518\ \ \ \ \ \ \ std::lock\_guard\ g(\ my-\/>mtx\ );}
+\DoxyCodeLine{00519\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ my-\/>remove\_impl(\ \textcolor{keywordtype}{id}\ );}
+\DoxyCodeLine{00520\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1fork__database_a193f10ce12656c580b023d36193a5cdc_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1fork__database_a7dd3012e6d7e68e24b2f223d5be09c02}\index{sysio::chain::fork\_database@{sysio::chain::fork\_database}!reset@{reset}}
+\index{reset@{reset}!sysio::chain::fork\_database@{sysio::chain::fork\_database}}
+\doxysubsubsection{\texorpdfstring{reset()}{reset()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1fork__database_a7dd3012e6d7e68e24b2f223d5be09c02} 
+void sysio\+::chain\+::fork\+\_\+database\+::reset (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1block__header__state}{block\+\_\+header\+\_\+state}} \&}]{root\+\_\+bhs}{}\end{DoxyParamCaption})}
+
+Purges any existing blocks from the fork database and resets the root \doxylink{structsysio_1_1chain_1_1block__header__state}{block\+\_\+header\+\_\+state} to the provided value. The head will also be reset to point to the root. 
+
+Definition at line \mbox{\hyperlink{fork__database_8cpp_source_l00263}{263}} of file \mbox{\hyperlink{fork__database_8cpp_source}{fork\+\_\+database.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00263\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00264\ \ \ \ \ \ \ std::lock\_guard\ g(\ my-\/>mtx\ );}
+\DoxyCodeLine{00265\ \ \ \ \ \ \ my-\/>reset\_impl(root\_bhs);}
+\DoxyCodeLine{00266\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1fork__database_a7dd3012e6d7e68e24b2f223d5be09c02_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1fork__database_a611cc70b13dee823c43ffe99df5522d4}\index{sysio::chain::fork\_database@{sysio::chain::fork\_database}!rollback\_head\_to\_root@{rollback\_head\_to\_root}}
+\index{rollback\_head\_to\_root@{rollback\_head\_to\_root}!sysio::chain::fork\_database@{sysio::chain::fork\_database}}
+\doxysubsubsection{\texorpdfstring{rollback\_head\_to\_root()}{rollback\_head\_to\_root()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1fork__database_a611cc70b13dee823c43ffe99df5522d4} 
+void sysio\+::chain\+::fork\+\_\+database\+::rollback\+\_\+head\+\_\+to\+\_\+root (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+Removes validated flag from all blocks in fork database and resets head to point to the root. 
+
+Definition at line \mbox{\hyperlink{fork__database_8cpp_source_l00276}{276}} of file \mbox{\hyperlink{fork__database_8cpp_source}{fork\+\_\+database.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00276\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00277\ \ \ \ \ \ \ std::lock\_guard\ g(\ my-\/>mtx\ );}
+\DoxyCodeLine{00278\ \ \ \ \ \ \ my-\/>rollback\_head\_to\_root\_impl();}
+\DoxyCodeLine{00279\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=331pt]{classsysio_1_1chain_1_1fork__database_a611cc70b13dee823c43ffe99df5522d4_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1fork__database_a31db3526cc966f5db1046cebcfc45219}\index{sysio::chain::fork\_database@{sysio::chain::fork\_database}!root@{root}}
+\index{root@{root}!sysio::chain::fork\_database@{sysio::chain::fork\_database}}
+\doxysubsubsection{\texorpdfstring{root()}{root()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1fork__database_a31db3526cc966f5db1046cebcfc45219} 
+\mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\+\_\+state\+\_\+ptr}} sysio\+::chain\+::fork\+\_\+database\+::root (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{fork__database_8cpp_source_l00395}{395}} of file \mbox{\hyperlink{fork__database_8cpp_source}{fork\+\_\+database.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00395\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00396\ \ \ \ \ \ \ std::shared\_lock\ g(\ my-\/>mtx\ );}
+\DoxyCodeLine{00397\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ my-\/>root;}
+\DoxyCodeLine{00398\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1fork__database_a31db3526cc966f5db1046cebcfc45219_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1fork__database_a17185d8543965b7cd40066019bbf5740}\index{sysio::chain::fork\_database@{sysio::chain::fork\_database}!search\_on\_branch@{search\_on\_branch}}
+\index{search\_on\_branch@{search\_on\_branch}!sysio::chain::fork\_database@{sysio::chain::fork\_database}}
+\doxysubsubsection{\texorpdfstring{search\_on\_branch()}{search\_on\_branch()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1fork__database_a17185d8543965b7cd40066019bbf5740} 
+\mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\+\_\+state\+\_\+ptr}} sysio\+::chain\+::fork\+\_\+database\+::search\+\_\+on\+\_\+branch (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{block\+\_\+id\+\_\+type}} \&}]{h}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{block\+\_\+num}{}\end{DoxyParamCaption}) const}
+
+Returns the block state with a block number of {\ttfamily block\+\_\+num} that is on the branch that contains a block with an id of{\ttfamily h}, or the empty shared pointer if no such block can be found. 
+
+Definition at line \mbox{\hyperlink{fork__database_8cpp_source_l00433}{433}} of file \mbox{\hyperlink{fork__database_8cpp_source}{fork\+\_\+database.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00433\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00434\ \ \ \ \ \ \ std::shared\_lock\ g(\ my-\/>mtx\ );}
+\DoxyCodeLine{00435\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ my-\/>search\_on\_branch\_impl(\ h,\ block\_num\ );}
+\DoxyCodeLine{00436\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1fork__database_a17185d8543965b7cd40066019bbf5740_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classsysio_1_1chain_1_1fork__database_a6649b0d3a5a88f5cea9d2f467601fe24}\index{sysio::chain::fork\_database@{sysio::chain::fork\_database}!magic\_number@{magic\_number}}
+\index{magic\_number@{magic\_number}!sysio::chain::fork\_database@{sysio::chain::fork\_database}}
+\doxysubsubsection{\texorpdfstring{magic\_number}{magic\_number}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1fork__database_a6649b0d3a5a88f5cea9d2f467601fe24} 
+const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::chain\+::fork\+\_\+database\+::magic\+\_\+number = 0x30510\+FDB\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{fork__database_8hpp_source_l00091}{91}} of file \mbox{\hyperlink{fork__database_8hpp_source}{fork\+\_\+database.\+hpp}}.
+
+\Hypertarget{classsysio_1_1chain_1_1fork__database_a04a97bab59df6c56c06101d431f06e84}\index{sysio::chain::fork\_database@{sysio::chain::fork\_database}!max\_supported\_version@{max\_supported\_version}}
+\index{max\_supported\_version@{max\_supported\_version}!sysio::chain::fork\_database@{sysio::chain::fork\_database}}
+\doxysubsubsection{\texorpdfstring{max\_supported\_version}{max\_supported\_version}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1fork__database_a04a97bab59df6c56c06101d431f06e84} 
+const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::chain\+::fork\+\_\+database\+::max\+\_\+supported\+\_\+version = 1\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{fork__database_8hpp_source_l00094}{94}} of file \mbox{\hyperlink{fork__database_8hpp_source}{fork\+\_\+database.\+hpp}}.
+
+\Hypertarget{classsysio_1_1chain_1_1fork__database_a849a1eb423d310b17ec5d899b48b80d7}\index{sysio::chain::fork\_database@{sysio::chain::fork\_database}!min\_supported\_version@{min\_supported\_version}}
+\index{min\_supported\_version@{min\_supported\_version}!sysio::chain::fork\_database@{sysio::chain::fork\_database}}
+\doxysubsubsection{\texorpdfstring{min\_supported\_version}{min\_supported\_version}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1fork__database_a849a1eb423d310b17ec5d899b48b80d7} 
+const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::chain\+::fork\+\_\+database\+::min\+\_\+supported\+\_\+version = 1\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{fork__database_8hpp_source_l00093}{93}} of file \mbox{\hyperlink{fork__database_8hpp_source}{fork\+\_\+database.\+hpp}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{fork__database_8hpp}{fork\+\_\+database.\+hpp}}\item 
+libraries/chain/\mbox{\hyperlink{fork__database_8cpp}{fork\+\_\+database.\+cpp}}\end{DoxyCompactItemize}

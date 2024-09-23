@@ -1,0 +1,43 @@
+\doxysection{parsing.\+h}
+\hypertarget{parsing_8h_source}{}\label{parsing_8h_source}\index{libraries/yubihsm/common/parsing.h@{libraries/yubihsm/common/parsing.h}}
+\mbox{\hyperlink{parsing_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{parsing_8h_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{parsing_8h_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ 2015-\/2018\ Yubico\ AB}}
+\DoxyCodeLine{\Hypertarget{parsing_8h_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{parsing_8h_source_l00004}00004\ \textcolor{comment}{\ *\ Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{\Hypertarget{parsing_8h_source_l00005}00005\ \textcolor{comment}{\ *\ you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{parsing_8h_source_l00006}00006\ \textcolor{comment}{\ *\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{\Hypertarget{parsing_8h_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{parsing_8h_source_l00008}00008\ \textcolor{comment}{\ *\ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{\Hypertarget{parsing_8h_source_l00009}00009\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{parsing_8h_source_l00010}00010\ \textcolor{comment}{\ *\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{\Hypertarget{parsing_8h_source_l00011}00011\ \textcolor{comment}{\ *\ distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{\Hypertarget{parsing_8h_source_l00012}00012\ \textcolor{comment}{\ *\ WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{\Hypertarget{parsing_8h_source_l00013}00013\ \textcolor{comment}{\ *\ See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{\Hypertarget{parsing_8h_source_l00014}00014\ \textcolor{comment}{\ *\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{parsing_8h_source_l00015}00015\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{parsing_8h_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{parsing_8h_source_l00017}00017\ \textcolor{preprocessor}{\#ifndef\ YUBICOM\_PARSING\_H}}
+\DoxyCodeLine{\Hypertarget{parsing_8h_source_l00018}00018\ \textcolor{preprocessor}{\#define\ YUBICOM\_PARSING\_H}}
+\DoxyCodeLine{\Hypertarget{parsing_8h_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{parsing_8h_source_l00020}00020\ \textcolor{preprocessor}{\#include\ <stdbool.h>}}
+\DoxyCodeLine{\Hypertarget{parsing_8h_source_l00021}00021\ \textcolor{preprocessor}{\#include\ <stdlib.h>}}
+\DoxyCodeLine{\Hypertarget{parsing_8h_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{parsing_8h_source_l00023}00023\ \textcolor{comment}{//\ NOTE(adma):\ those\ utility\ functions\ do\ not\ link\ against\ libyubihsm}}
+\DoxyCodeLine{\Hypertarget{parsing_8h_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{parsing_8h_source_l00025}\mbox{\hyperlink{parsing_8h_ab06b84c4848a12847ba134dd739fe5f0}{00025}}\ \textcolor{preprocessor}{\#define\ READ\_STR\_PROMPT\_BASE\ "{}Enter\ \%s:\ "{}}}
+\DoxyCodeLine{\Hypertarget{parsing_8h_source_l00026}00026\ \textcolor{preprocessor}{\#ifndef\ \_\_WIN32}}
+\DoxyCodeLine{\Hypertarget{parsing_8h_source_l00027}\mbox{\hyperlink{parsing_8h_aa1c48ca7b894657e01905d3074b38b8c}{00027}}\ \textcolor{preprocessor}{\#define\ YH\_INTERNAL\ \_\_attribute\_\_((visibility("{}hidden"{})))}}
+\DoxyCodeLine{\Hypertarget{parsing_8h_source_l00028}00028\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{parsing_8h_source_l00029}00029\ \textcolor{preprocessor}{\#define\ YH\_INTERNAL}}
+\DoxyCodeLine{\Hypertarget{parsing_8h_source_l00030}00030\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{parsing_8h_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{parsing_8h_source_l00032}00032\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{parsing_8h_aa1c48ca7b894657e01905d3074b38b8c}{YH\_INTERNAL}}\ \mbox{\hyperlink{parsing_8h_a4e281d72bb866bf05237e615adb744b4}{parse\_pw}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *prompt,\ \textcolor{keywordtype}{char}\ *pw,\ \textcolor{keywordtype}{char}\ *parsed,}
+\DoxyCodeLine{\Hypertarget{parsing_8h_source_l00033}00033\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ *parsed\_len);}
+\DoxyCodeLine{\Hypertarget{parsing_8h_source_l00034}00034\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{parsing_8h_aa1c48ca7b894657e01905d3074b38b8c}{YH\_INTERNAL}}\ \mbox{\hyperlink{parsing_8h_acc4860ff7d56dbfdd32a9a4d92aa420b}{read\_string}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ \textcolor{keywordtype}{char}\ *str\_buf,}
+\DoxyCodeLine{\Hypertarget{parsing_8h_source_l00035}00035\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ str\_buf\_len,\ \textcolor{keywordtype}{bool}\ hidden);}
+\DoxyCodeLine{\Hypertarget{parsing_8h_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{parsing_8h_source_l00037}00037\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

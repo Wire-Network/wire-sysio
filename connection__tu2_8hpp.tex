@@ -1,0 +1,170 @@
+\doxysection{libraries/fc/vendor/websocketpp/test/connection/connection\+\_\+tu2.hpp File Reference}
+\hypertarget{connection__tu2_8hpp}{}\label{connection__tu2_8hpp}\index{libraries/fc/vendor/websocketpp/test/connection/connection\_tu2.hpp@{libraries/fc/vendor/websocketpp/test/connection/connection\_tu2.hpp}}
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$sstream$>$}\newline
+{\ttfamily \#include $<$websocketpp/config/debug.\+hpp$>$}\newline
+{\ttfamily \#include $<$websocketpp/config/core.\+hpp$>$}\newline
+{\ttfamily \#include $<$websocketpp/server.\+hpp$>$}\newline
+{\ttfamily \#include $<$websocketpp/client.\+hpp$>$}\newline
+Include dependency graph for connection\+\_\+tu2.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{connection__tu2_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{connection__tu2_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1server}{websocketpp\+::server}}$<$ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1core}{websocketpp\+::config\+::core}} $>$ \mbox{\hyperlink{connection__tu2_8hpp_a49fb43a0abcf860429edd72caab81b74}{server}}
+\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1client}{websocketpp\+::client}}$<$ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1core}{websocketpp\+::config\+::core}} $>$ \mbox{\hyperlink{connection__tu2_8hpp_ab0d33aacfc7b89b25a12dff130758ffc}{client}}
+\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message_a665ccc8a3883dbea049aef85c46efe7f}{websocketpp\+::config\+::core\+::message\+\_\+type\+::ptr}} \mbox{\hyperlink{connection__tu2_8hpp_a08398c4d31a4dc3e42d1b9a9ef64c6ad}{message\+\_\+ptr}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{connection__tu2_8hpp_a8b14e82050a791e4af2a7c86aecc7caf}{echo\+\_\+func}} (\mbox{\hyperlink{docs_2simple__broadcast__server_8cpp_afc38239e3eef2a4200e324bff14d91d1}{server}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, \mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{websocketpp\+::connection\+\_\+hdl}} hdl, \mbox{\hyperlink{debug__client_8cpp_a08398c4d31a4dc3e42d1b9a9ef64c6ad}{message\+\_\+ptr}} msg)
+\item 
+std\+::string \mbox{\hyperlink{connection__tu2_8hpp_a9006d5799a4c1af40c2bb00c014334cc}{run\+\_\+server\+\_\+test}} (std\+::string input, bool log=false)
+\item 
+std\+::string \mbox{\hyperlink{connection__tu2_8hpp_a3e7a9400bc459c852c2f2401916f5323}{run\+\_\+server\+\_\+test}} (\mbox{\hyperlink{docs_2simple__broadcast__server_8cpp_afc38239e3eef2a4200e324bff14d91d1}{server}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, std\+::string input, bool log=false)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{connection__tu2_8hpp_ab0d33aacfc7b89b25a12dff130758ffc}\index{connection\_tu2.hpp@{connection\_tu2.hpp}!client@{client}}
+\index{client@{client}!connection\_tu2.hpp@{connection\_tu2.hpp}}
+\doxysubsubsection{\texorpdfstring{client}{client}}
+{\footnotesize\ttfamily \label{connection__tu2_8hpp_ab0d33aacfc7b89b25a12dff130758ffc} 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1client}{websocketpp\+::client}}$<$\mbox{\hyperlink{structwebsocketpp_1_1config_1_1core}{websocketpp\+::config\+::core}}$>$ \mbox{\hyperlink{debug__client_8cpp_aff8c62b83a9c8aefc476f96166656b76}{client}}}
+
+NOTE\+: the "{}server"{} config is being used for the client here because we don\textquotesingle{}t want to pull in the real RNG. \doxylink{struct_a}{A} better way to do this might be a custom client config with the RNG explicitly stubbed out. 
+
+Definition at line \mbox{\hyperlink{connection__tu2_8hpp_source_l00042}{42}} of file \mbox{\hyperlink{connection__tu2_8hpp_source}{connection\+\_\+tu2.\+hpp}}.
+
+\Hypertarget{connection__tu2_8hpp_a08398c4d31a4dc3e42d1b9a9ef64c6ad}\index{connection\_tu2.hpp@{connection\_tu2.hpp}!message\_ptr@{message\_ptr}}
+\index{message\_ptr@{message\_ptr}!connection\_tu2.hpp@{connection\_tu2.hpp}}
+\doxysubsubsection{\texorpdfstring{message\_ptr}{message\_ptr}}
+{\footnotesize\ttfamily \label{connection__tu2_8hpp_a08398c4d31a4dc3e42d1b9a9ef64c6ad} 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message_a665ccc8a3883dbea049aef85c46efe7f}{websocketpp\+::config\+::core\+::message\+\_\+type\+::ptr}} \mbox{\hyperlink{debug__client_8cpp_a08398c4d31a4dc3e42d1b9a9ef64c6ad}{message\+\_\+ptr}}}
+
+
+
+Definition at line \mbox{\hyperlink{connection__tu2_8hpp_source_l00043}{43}} of file \mbox{\hyperlink{connection__tu2_8hpp_source}{connection\+\_\+tu2.\+hpp}}.
+
+\Hypertarget{connection__tu2_8hpp_a49fb43a0abcf860429edd72caab81b74}\index{connection\_tu2.hpp@{connection\_tu2.hpp}!server@{server}}
+\index{server@{server}!connection\_tu2.hpp@{connection\_tu2.hpp}}
+\doxysubsubsection{\texorpdfstring{server}{server}}
+{\footnotesize\ttfamily \label{connection__tu2_8hpp_a49fb43a0abcf860429edd72caab81b74} 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1server}{websocketpp\+::server}}$<$\mbox{\hyperlink{structwebsocketpp_1_1config_1_1core}{websocketpp\+::config\+::core}}$>$ \mbox{\hyperlink{docs_2simple__broadcast__server_8cpp_afc38239e3eef2a4200e324bff14d91d1}{server}}}
+
+
+
+Definition at line \mbox{\hyperlink{connection__tu2_8hpp_source_l00038}{38}} of file \mbox{\hyperlink{connection__tu2_8hpp_source}{connection\+\_\+tu2.\+hpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{connection__tu2_8hpp_a8b14e82050a791e4af2a7c86aecc7caf}\index{connection\_tu2.hpp@{connection\_tu2.hpp}!echo\_func@{echo\_func}}
+\index{echo\_func@{echo\_func}!connection\_tu2.hpp@{connection\_tu2.hpp}}
+\doxysubsubsection{\texorpdfstring{echo\_func()}{echo\_func()}}
+{\footnotesize\ttfamily \label{connection__tu2_8hpp_a8b14e82050a791e4af2a7c86aecc7caf} 
+void echo\+\_\+func (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{docs_2simple__broadcast__server_8cpp_afc38239e3eef2a4200e324bff14d91d1}{server}} \texorpdfstring{$\ast$}{*}}]{s}{, }\item[{\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{websocketpp\+::connection\+\_\+hdl}}}]{hdl}{, }\item[{\mbox{\hyperlink{debug__client_8cpp_a08398c4d31a4dc3e42d1b9a9ef64c6ad}{message\+\_\+ptr}}}]{msg}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{connection__tu2_8cpp_source_l00030}{30}} of file \mbox{\hyperlink{connection__tu2_8cpp_source}{connection\+\_\+tu2.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00031\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}-\/>send(hdl,\ msg-\/>get\_payload(),\ msg-\/>get\_opcode());}
+\DoxyCodeLine{00032\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=324pt]{connection__tu2_8hpp_a8b14e82050a791e4af2a7c86aecc7caf_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{connection__tu2_8hpp_a3e7a9400bc459c852c2f2401916f5323}\index{connection\_tu2.hpp@{connection\_tu2.hpp}!run\_server\_test@{run\_server\_test}}
+\index{run\_server\_test@{run\_server\_test}!connection\_tu2.hpp@{connection\_tu2.hpp}}
+\doxysubsubsection{\texorpdfstring{run\_server\_test()}{run\_server\_test()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{connection__tu2_8hpp_a3e7a9400bc459c852c2f2401916f5323} 
+std\+::string run\+\_\+server\+\_\+test (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{docs_2simple__broadcast__server_8cpp_afc38239e3eef2a4200e324bff14d91d1}{server}} \&}]{s}{, }\item[{std\+::string}]{input}{, }\item[{bool}]{log}{ = {\ttfamily false}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{connection__tu2_8cpp_source_l00039}{39}} of file \mbox{\hyperlink{connection__tu2_8cpp_source}{connection\+\_\+tu2.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00040\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1server_abb895563dddafdc1426997d245cbd7cb}{server::connection\_ptr}}\ con;}
+\DoxyCodeLine{00041\ \ \ \ \ std::stringstream\ output;}
+\DoxyCodeLine{00042\ }
+\DoxyCodeLine{00043\ \ \ \ \ \textcolor{keywordflow}{if}\ (log)\ \{}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.set\_access\_channels(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a853aa0b8976e53f3181af3bc398d493e}{websocketpp::log::alevel::all}});}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.set\_error\_channels(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1elevel_a9b31ff708c221d314f9f4eb3ff2b1ad7}{websocketpp::log::elevel::all}});}
+\DoxyCodeLine{00046\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.clear\_access\_channels(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a853aa0b8976e53f3181af3bc398d493e}{websocketpp::log::alevel::all}});}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.clear\_error\_channels(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1elevel_a9b31ff708c221d314f9f4eb3ff2b1ad7}{websocketpp::log::elevel::all}});}
+\DoxyCodeLine{00049\ \ \ \ \ \}}
+\DoxyCodeLine{00050\ }
+\DoxyCodeLine{00051\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.register\_ostream(\&output);}
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ \ \ \ \ con\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.get\_connection();}
+\DoxyCodeLine{00054\ \ \ \ \ con-\/>start();}
+\DoxyCodeLine{00055\ }
+\DoxyCodeLine{00056\ \ \ \ \ std::stringstream\ channel;}
+\DoxyCodeLine{00057\ }
+\DoxyCodeLine{00058\ \ \ \ \ channel\ <<\ input;}
+\DoxyCodeLine{00059\ \ \ \ \ channel\ >>\ *con;}
+\DoxyCodeLine{00060\ }
+\DoxyCodeLine{00061\ \ \ \ \ \textcolor{keywordflow}{return}\ output.str();}
+\DoxyCodeLine{00062\ \}}
+
+\end{DoxyCode}
+\Hypertarget{connection__tu2_8hpp_a9006d5799a4c1af40c2bb00c014334cc}\index{connection\_tu2.hpp@{connection\_tu2.hpp}!run\_server\_test@{run\_server\_test}}
+\index{run\_server\_test@{run\_server\_test}!connection\_tu2.hpp@{connection\_tu2.hpp}}
+\doxysubsubsection{\texorpdfstring{run\_server\_test()}{run\_server\_test()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{connection__tu2_8hpp_a9006d5799a4c1af40c2bb00c014334cc} 
+std\+::string run\+\_\+server\+\_\+test (\begin{DoxyParamCaption}\item[{std\+::string}]{input}{, }\item[{bool}]{log}{ = {\ttfamily false}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{connection__tu2_8cpp_source_l00034}{34}} of file \mbox{\hyperlink{connection__tu2_8cpp_source}{connection\+\_\+tu2.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00035\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1server}{server}}\ test\_server;}
+\DoxyCodeLine{00036\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{connection__tu2_8cpp_a70900b0f15b8692b4586ed96d710a279}{run\_server\_test}}(test\_server,input,log);}
+\DoxyCodeLine{00037\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=164pt]{connection__tu2_8hpp_a9006d5799a4c1af40c2bb00c014334cc_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=347pt]{connection__tu2_8hpp_a9006d5799a4c1af40c2bb00c014334cc_icgraph}
+\end{center}
+\end{figure}

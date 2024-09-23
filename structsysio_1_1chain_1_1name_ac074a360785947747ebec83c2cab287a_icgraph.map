@@ -1,0 +1,21 @@
+<map id="sysio::chain::name::empty" name="sysio::chain::name::empty">
+<area shape="rect" id="Node000001" title=" " alt="" coords="822,71,953,111"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1name.html#a00b8bba321fb9b589a995d2924b6754d" title=" " alt="" coords="642,37,774,78"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="806,79,774,73,775,67,807,73"/>
+<area shape="rect" id="Node000007" href="$namespacesysio_1_1wallet.html#aec99b3a63cebacb7d46a30201e7e806b" title=" " alt="" coords="643,103,773,143"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="807,108,773,114,772,109,806,103"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1chain_1_1controller.html#ab1f5f957aa0b2f95d3872ba6624a4629" title=" " alt="" coords="442,37,594,78"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="626,60,595,60,595,55,626,55"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1chain_1_1controller.html#afca478b72d646f19c87d7e1c4f08453e" title=" " alt="" coords="242,37,394,78"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="426,60,394,60,394,55,426,55"/>
+<area shape="rect" id="Node000005" href="$classsysio_1_1chain__apis_1_1read__write.html#af607f8f57b7e15ce557179795303a4e9" title=" " alt="" coords="5,5,194,46"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="226,47,194,42,194,37,227,42"/>
+<area shape="rect" id="Node000006" href="$classsysio_1_1chain__apis_1_1read__write.html#a1da8a36ada58712781b2aef93801c161" title=" " alt="" coords="5,71,194,111"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="227,74,194,79,194,74,226,69"/>
+<area shape="rect" id="Node000008" href="$classsysio_1_1wallet_1_1wallet__manager.html#a9c1673ae072e569c07ab5af68fc3ae34" title=" " alt="" coords="450,103,586,143"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="628,126,587,126,587,120,628,120"/>
+<area shape="rect" id="Node000009" href="$classsysio_1_1wallet_1_1wallet__manager.html#aa2afccf9173458e34f4ce2aba878efb4" title=" " alt="" coords="450,168,586,209"/>
+<area shape="poly" id="edge8_Node000007_Node000009" title=" " alt="" coords="634,151,580,170,578,165,632,146"/>
+<area shape="rect" id="Node000010" href="$classsysio_1_1wallet_1_1wallet__manager.html#a108a129e4176fb7a1b782344e9cecc8f" title=" " alt="" coords="250,168,386,209"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="434,191,386,191,386,186,434,186"/>
+</map>

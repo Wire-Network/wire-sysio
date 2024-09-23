@@ -1,0 +1,375 @@
+\doxysection{Lexer.\+cpp}
+\hypertarget{_lexer_8cpp_source}{}\label{_lexer_8cpp_source}\index{libraries/wasm-\/jit/Source/WAST/Lexer.cpp@{libraries/wasm-\/jit/Source/WAST/Lexer.cpp}}
+\mbox{\hyperlink{_lexer_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_basic_types_8h}{Inline/BasicTypes.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_timing_8h}{Inline/Timing.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_errors_8h}{Inline/Errors.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_n_f_a_8h}{NFA.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_regexp_8h}{Regexp.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_w_a_s_t_8h}{WAST.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_lexer_8h}{Lexer.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_operators_8h}{IR/Operators.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <fstream>}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00012}00012\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_w_a_s_t}{WAST}}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00013}00013\ \{}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00014}\mbox{\hyperlink{namespace_w_a_s_t_a23505430f91325d50b390d1318fd20b5}{00014}}\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{namespace_w_a_s_t_a23505430f91325d50b390d1318fd20b5}{describeToken}}(\mbox{\hyperlink{namespace_w_a_s_t_a57c99a932a2a7d69084cbeca01031f32}{TokenType}}\ tokenType)}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00015}00015\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00016}00016\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_errors_8h_a03bec6af3af0dd492e348b40cbe40a46}{WAVM\_ASSERT\_THROW}}(tokenType\ <\ \mbox{\hyperlink{namespace_w_a_s_t_a57c99a932a2a7d69084cbeca01031f32a39fb9d16c0964296c4a8b6b567b1c17d}{numTokenTypes}});}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00017}00017\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ tokenDescriptions[]\ =}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00018}00018\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00019}00019\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ This\ ENUM\_TOKENS\ must\ come\ before\ the\ literalTokenPairs\ definition\ that\ redefines\ VISIT\_OPERATOR\_TOKEN.}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00020}00020\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \#define\ VISIT\_TOKEN(name,description)\ description,}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00021}00021\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_lexer_8h_a44201a8ebbcc0d7ade75480d088f57b2}{ENUM\_TOKENS}}()}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00022}00022\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{preprocessor}{\#undef\ VISIT\_TOKEN}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00023}00023\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00024}00024\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ tokenDescriptions[tokenType];}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00025}00025\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00026}00026\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00027}\mbox{\hyperlink{struct_w_a_s_t_1_1_static_data}{00027}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_w_a_s_t_1_1_static_data}{StaticData}}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00028}00028\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00029}\mbox{\hyperlink{struct_w_a_s_t_1_1_static_data_a37c4d27bb956914c06b3198191995f35}{00029}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_n_f_a_1_1_machine}{NFA::Machine}}\ \mbox{\hyperlink{struct_w_a_s_t_1_1_static_data_a37c4d27bb956914c06b3198191995f35}{nfaMachine}};}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00030}00030\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_w_a_s_t_1_1_static_data_a4a527078696e7eed08c7e75e9fb58b64}{StaticData}}();}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00031}00031\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00033}00033\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{NFA::StateIndex}}\ createTokenSeparatorPeekState(\mbox{\hyperlink{struct_n_f_a_1_1_builder}{NFA::Builder}}*\ builder,\mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{NFA::StateIndex}}\ finalState)}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00034}00034\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00035}00035\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_dense_static_int_set}{NFA::CharSet}}\ tokenSeparatorCharSet;}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00036}00036\ \ \ \ \ \ \ \ \ tokenSeparatorCharSet.\mbox{\hyperlink{struct_dense_static_int_set_abd86ddd57ca2a9bca54d35959dc4d674}{add}}(\mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}(\textcolor{charliteral}{'\ '}));}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00037}00037\ \ \ \ \ \ \ \ \ tokenSeparatorCharSet.\mbox{\hyperlink{struct_dense_static_int_set_abd86ddd57ca2a9bca54d35959dc4d674}{add}}(\mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}(\textcolor{charliteral}{'\(\backslash\)t'}));}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00038}00038\ \ \ \ \ \ \ \ \ tokenSeparatorCharSet.\mbox{\hyperlink{struct_dense_static_int_set_abd86ddd57ca2a9bca54d35959dc4d674}{add}}(\mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}(\textcolor{charliteral}{'\(\backslash\)r'}));}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00039}00039\ \ \ \ \ \ \ \ \ tokenSeparatorCharSet.\mbox{\hyperlink{struct_dense_static_int_set_abd86ddd57ca2a9bca54d35959dc4d674}{add}}(\mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}(\textcolor{charliteral}{'\(\backslash\)n'}));}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00040}00040\ \ \ \ \ \ \ \ \ tokenSeparatorCharSet.\mbox{\hyperlink{struct_dense_static_int_set_abd86ddd57ca2a9bca54d35959dc4d674}{add}}(\mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}(\textcolor{charliteral}{'='}));}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00041}00041\ \ \ \ \ \ \ \ \ tokenSeparatorCharSet.\mbox{\hyperlink{struct_dense_static_int_set_abd86ddd57ca2a9bca54d35959dc4d674}{add}}(\mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}(\textcolor{charliteral}{'('}));}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00042}00042\ \ \ \ \ \ \ \ \ tokenSeparatorCharSet.\mbox{\hyperlink{struct_dense_static_int_set_abd86ddd57ca2a9bca54d35959dc4d674}{add}}(\mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}(\textcolor{charliteral}{')'}));}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00043}00043\ \ \ \ \ \ \ \ \ tokenSeparatorCharSet.\mbox{\hyperlink{struct_dense_static_int_set_abd86ddd57ca2a9bca54d35959dc4d674}{add}}(\mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}(\textcolor{charliteral}{';'}));}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00044}00044\ \ \ \ \ \ \ \ \ tokenSeparatorCharSet.\mbox{\hyperlink{struct_dense_static_int_set_abd86ddd57ca2a9bca54d35959dc4d674}{add}}(0);}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00045}00045\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ separatorState\ =\ addState(builder);}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00046}00046\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_n_f_a_a7fcfabbb0aaf904f594a4c6d72e9e54c}{NFA::addEdge}}(builder,separatorState,tokenSeparatorCharSet,finalState\ |\ \mbox{\hyperlink{namespace_n_f_a_ad9fb95d6afb96fea8750c3543ee293a1ab7afa25e880146b8ce78efc4cb221274}{NFA::edgeDoesntConsumeInputFlag}});}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00047}00047\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ separatorState;}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00048}00048\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00049}00049\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00050}00050\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ addLiteralToNFA(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \textcolor{keywordtype}{string},\mbox{\hyperlink{struct_n_f_a_1_1_builder}{NFA::Builder}}*\ builder,\mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{NFA::StateIndex}}\ initialState,\mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{NFA::StateIndex}}\ finalState)}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00051}00051\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00052}00052\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Add\ the\ literal\ to\ the\ NFA,\ one\ character\ at\ a\ time,\ reusing\ existing\ states\ that\ are\ reachable\ by\ the\ same\ string.}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ nextChar\ =\ \textcolor{keywordtype}{string};*nextChar;++nextChar)}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00054}00054\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{NFA::StateIndex}}\ nextState\ =\ \mbox{\hyperlink{namespace_n_f_a_ad1e9e5dd3c2cdbefdf6ba97f12d26eae}{NFA::getNonTerminalEdge}}(builder,initialState,*nextChar);}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(nextState\ <\ 0\ ||\ nextChar[1]\ ==\ 0)}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ nextState\ =\ nextChar[1]\ ==\ 0\ ?\ finalState\ :\ addState(builder);}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00059}00059\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_n_f_a_a7fcfabbb0aaf904f594a4c6d72e9e54c}{NFA::addEdge}}(builder,initialState,\mbox{\hyperlink{struct_dense_static_int_set}{NFA::CharSet}}(*nextChar),nextState);}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00061}00061\ \ \ \ \ \ \ \ \ \ \ \ \ initialState\ =\ nextState;}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00062}00062\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00063}00063\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00065}\mbox{\hyperlink{struct_w_a_s_t_1_1_static_data_a4a527078696e7eed08c7e75e9fb58b64}{00065}}\ \ \ \ \ \mbox{\hyperlink{struct_w_a_s_t_1_1_static_data_a4a527078696e7eed08c7e75e9fb58b64}{StaticData::StaticData}}()}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00066}00066\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00067}00067\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ std::pair<TokenType,const\ char*>\ regexpTokenPairs[]\ =}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00068}00068\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \ \ \ \{t\_decimalInt,\textcolor{stringliteral}{"{}[+\(\backslash\)\(\backslash\)-\/]?\(\backslash\)\(\backslash\)d+(\_\(\backslash\)\(\backslash\)d+)*"{}}\},}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \ \ \ \{t\_decimalFloat,\textcolor{stringliteral}{"{}[+\(\backslash\)\(\backslash\)-\/]?\(\backslash\)\(\backslash\)d+(\_\(\backslash\)\(\backslash\)d+)*\(\backslash\)\(\backslash\).(\(\backslash\)\(\backslash\)d+(\_\(\backslash\)\(\backslash\)d+)*)*([eE][+\(\backslash\)\(\backslash\)-\/]?\(\backslash\)\(\backslash\)d+(\_\(\backslash\)\(\backslash\)d+)*)?"{}}\},}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00071}00071\ \ \ \ \ \ \ \ \ \ \ \ \ \{t\_decimalFloat,\textcolor{stringliteral}{"{}[+\(\backslash\)\(\backslash\)-\/]?\(\backslash\)\(\backslash\)d+(\_\(\backslash\)\(\backslash\)d+)*[eE][+\(\backslash\)\(\backslash\)-\/]?\(\backslash\)\(\backslash\)d+(\_\(\backslash\)\(\backslash\)d+)*"{}}\},}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00073}00073\ \ \ \ \ \ \ \ \ \ \ \ \ \{t\_hexInt,\textcolor{stringliteral}{"{}[+\(\backslash\)\(\backslash\)-\/]?0[xX][\(\backslash\)\(\backslash\)da-\/fA-\/F]+(\_[\(\backslash\)\(\backslash\)da-\/fA-\/F]+)*"{}}\},}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00074}00074\ \ \ \ \ \ \ \ \ \ \ \ \ \{t\_hexFloat,\textcolor{stringliteral}{"{}[+\(\backslash\)\(\backslash\)-\/]?0[xX][\(\backslash\)\(\backslash\)da-\/fA-\/F]+(\_[\(\backslash\)\(\backslash\)da-\/fA-\/F]+)*\(\backslash\)\(\backslash\).([\(\backslash\)\(\backslash\)da-\/fA-\/F]+(\_[\(\backslash\)\(\backslash\)da-\/fA-\/F]+)*)*([pP][+\(\backslash\)\(\backslash\)-\/]?\(\backslash\)\(\backslash\)d+(\_\(\backslash\)\(\backslash\)d+)*)?"{}}\},}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00075}00075\ \ \ \ \ \ \ \ \ \ \ \ \ \{t\_hexFloat,\textcolor{stringliteral}{"{}[+\(\backslash\)\(\backslash\)-\/]?0[xX][\(\backslash\)\(\backslash\)da-\/fA-\/F]+(\_[\(\backslash\)\(\backslash\)da-\/fA-\/F]+)*[pP][+\(\backslash\)\(\backslash\)-\/]?\(\backslash\)\(\backslash\)d+(\_\(\backslash\)\(\backslash\)d+)*"{}}\},}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00076}00076\ }
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ \{t\_floatNaN,\textcolor{stringliteral}{"{}[+\(\backslash\)\(\backslash\)-\/]?nan(:0[xX][\(\backslash\)\(\backslash\)da-\/fA-\/F]+(\_[\(\backslash\)\(\backslash\)da-\/fA-\/F]+)*)?"{}}\},}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00078}00078\ \ \ \ \ \ \ \ \ \ \ \ \ \{t\_floatInf,\textcolor{stringliteral}{"{}[+\(\backslash\)\(\backslash\)-\/]?inf"{}}\},}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00080}00080\ \ \ \ \ \ \ \ \ \ \ \ \ \{t\_string,\textcolor{stringliteral}{"{}\(\backslash\)"{}([\string^\(\backslash\)"{}\(\backslash\)n\(\backslash\)\(\backslash\)\(\backslash\)\(\backslash\)]*(\(\backslash\)\(\backslash\)\(\backslash\)\(\backslash\)([\string^0-\/9a-\/fA-\/Fu]|[0-\/9a-\/fA-\/F][0-\/9a-\/fA-\/F]|u\(\backslash\)\(\backslash\)\{[0-\/9a-\/fA-\/F]+\})))*\(\backslash\)"{}"{}}\},}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00081}00081\ }
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00082}00082\ \ \ \ \ \ \ \ \ \ \ \ \ \{t\_name,\textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)\$[a-\/zA-\/Z0-\/9\(\backslash\)'\_+*/\string~=<>!?@\#\$\%\&|:`.\(\backslash\)\(\backslash\)-\/\(\backslash\)\(\backslash\)\string^\(\backslash\)\(\backslash\)\(\backslash\)\(\backslash\)]+"{}}\},}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00083}00083\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00084}00084\ }
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00085}00085\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ std::tuple<TokenType,const\ char*,bool>\ literalTokenTuples[]\ =}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00086}00086\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00087}00087\ \ \ \ \ \ \ \ \ \ \ \ \ std::make\_tuple(t\_leftParenthesis,\textcolor{stringliteral}{"{}("{}},\textcolor{keyword}{true}),}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00088}00088\ \ \ \ \ \ \ \ \ \ \ \ \ std::make\_tuple(t\_rightParenthesis,\textcolor{stringliteral}{"{})"{}},\textcolor{keyword}{true}),}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00089}00089\ \ \ \ \ \ \ \ \ \ \ \ \ std::make\_tuple(t\_equals,\textcolor{stringliteral}{"{}="{}},\textcolor{keyword}{true}),}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00090}00090\ }
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00091}00091\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \#define\ VISIT\_TOKEN(name,description)\ std::make\_tuple(t\_\#\#name,\#name,false),}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00092}00092\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_lexer_8h_a935799414b43c9ea38224a78360fadc8}{ENUM\_LITERAL\_TOKENS}}()}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00093}00093\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{preprocessor}{\#undef\ VISIT\_TOKEN}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00094}00094\ }
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00095}00095\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \#undef\ VISIT\_OPERATOR\_TOKEN}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00096}00096\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \#define\ VISIT\_OPERATOR\_TOKEN(\_,name,nameString,...)\ std::make\_tuple(t\_\#\#name,nameString,false),}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00097}00097\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_operators_8h_a8b6ca1413466de9d4478329c481520a4}{ENUM\_OPERATORS}}(\mbox{\hyperlink{_lexer_8cpp_adbca12765407bd0d57af8966b48ffc02}{VISIT\_OPERATOR\_TOKEN}})}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00098}00098\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{preprocessor}{\#undef\ VISIT\_OPERATOR\_TOKEN}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00099}00099\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00100}00100\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00101}00101\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_timing_1_1_timer}{Timing::Timer}}\ timer;}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00102}00102\ }
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00103}00103\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_n_f_a_1_1_builder}{NFA::Builder}}*\ nfaBuilder\ =\ \mbox{\hyperlink{namespace_n_f_a_adf36678137843faef3c32d8f0a9dcb25}{NFA::createBuilder}}();}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00104}00104\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00105}00105\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\ regexpTokenPair\ :\ regexpTokenPairs)}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00106}00106\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00107}00107\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{NFA::StateIndex}}\ finalState\ =\ \mbox{\hyperlink{namespace_n_f_a_ad9fb95d6afb96fea8750c3543ee293a1a6df9f5bfcb1889079b46027cf7bdac15}{NFA::maximumTerminalStateIndex}}\ -\/\ (\mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{NFA::StateIndex}})regexpTokenPair.first;}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00108}00108\ \ \ \ \ \ \ \ \ \ \ \ \ finalState\ =\ createTokenSeparatorPeekState(nfaBuilder,finalState);}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00109}00109\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_regexp_aadd46f06c56abd08dd3844b0eac3d28e}{Regexp::addToNFA}}(regexpTokenPair.second,nfaBuilder,0,finalState);}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00110}00110\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00111}00111\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00112}00112\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\ literalTokenTuple\ :\ literalTokenTuples)}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00113}00113\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00114}00114\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespace_w_a_s_t_a57c99a932a2a7d69084cbeca01031f32}{TokenType}}\ tokenType\ =\ std::get<0>(literalTokenTuple);}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00115}00115\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ literalString\ =\ std::get<1>(literalTokenTuple);}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00116}00116\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ isTokenSeparator\ =\ std::get<2>(literalTokenTuple);}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00117}00117\ }
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00118}00118\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{NFA::StateIndex}}\ finalState\ =\ \mbox{\hyperlink{namespace_n_f_a_ad9fb95d6afb96fea8750c3543ee293a1a6df9f5bfcb1889079b46027cf7bdac15}{NFA::maximumTerminalStateIndex}}\ -\/\ (\mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{NFA::StateIndex}})tokenType;}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00119}00119\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!isTokenSeparator)\ \{\ finalState\ =\ createTokenSeparatorPeekState(nfaBuilder,finalState);\ \}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00120}00120\ }
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00121}00121\ \ \ \ \ \ \ \ \ \ \ \ \ addLiteralToNFA(literalString,nfaBuilder,0,finalState);}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00122}00122\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00123}00123\ }
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00124}00124\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#ifndef\ \_DEBUG}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00125}00125\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\textcolor{keyword}{false})}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00126}00126\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#endif}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00127}00127\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00128}00128\ \ \ \ \ \ \ \ \ \ \ \ \ std::ofstream\ debugGraphStream(\textcolor{stringliteral}{"{}nfaGraph.dot"{}});}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00129}00129\ \ \ \ \ \ \ \ \ \ \ \ \ debugGraphStream\ <<\ \mbox{\hyperlink{namespace_n_f_a_ad2bae1dc95f748e75ed2ef3d06b38868}{NFA::dumpNFAGraphViz}}(nfaBuilder).c\_str();}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00130}00130\ \ \ \ \ \ \ \ \ \ \ \ \ debugGraphStream.close();}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00131}00131\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00132}00132\ }
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00133}00133\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_w_a_s_t_1_1_static_data_a37c4d27bb956914c06b3198191995f35}{nfaMachine}}\ =\ \mbox{\hyperlink{struct_n_f_a_1_1_machine}{NFA::Machine}}(nfaBuilder);}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00134}00134\ }
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00135}00135\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#ifndef\ \_DEBUG}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00136}00136\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\textcolor{keyword}{false})}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00137}00137\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#endif}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00138}00138\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00139}00139\ \ \ \ \ \ \ \ \ \ \ \ \ std::ofstream\ debugGraphStream(\textcolor{stringliteral}{"{}dfaGraph.dot"{}});}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00140}00140\ \ \ \ \ \ \ \ \ \ \ \ \ debugGraphStream\ <<\ \mbox{\hyperlink{struct_w_a_s_t_1_1_static_data_a37c4d27bb956914c06b3198191995f35}{nfaMachine}}.\mbox{\hyperlink{struct_n_f_a_1_1_machine_a97de1223997c8844b4b56e9e24884e87}{dumpDFAGraphViz}}().c\_str();}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00141}00141\ \ \ \ \ \ \ \ \ \ \ \ \ debugGraphStream.close();}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00142}00142\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00143}00143\ }
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00144}00144\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_timing_a13894b5d7cecb827bcef919187a66d94}{Timing::logTimer}}(\textcolor{stringliteral}{"{}built\ lexer\ tables"{}},timer);}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00145}00145\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00146}00146\ }
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00147}\mbox{\hyperlink{struct_w_a_s_t_1_1_line_info}{00147}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_w_a_s_t_1_1_line_info}{LineInfo}}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00148}00148\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00149}\mbox{\hyperlink{struct_w_a_s_t_1_1_line_info_a9126d0f1e7b90b40a84a99c713b6debd}{00149}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}*\ \mbox{\hyperlink{struct_w_a_s_t_1_1_line_info_a9126d0f1e7b90b40a84a99c713b6debd}{lineStarts}};}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00150}\mbox{\hyperlink{struct_w_a_s_t_1_1_line_info_a414b827a7ed94595b5e77b85f0df31a0}{00150}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}\ \mbox{\hyperlink{struct_w_a_s_t_1_1_line_info_a414b827a7ed94595b5e77b85f0df31a0}{numLineStarts}};}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00151}00151\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00152}00152\ }
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00153}\mbox{\hyperlink{namespace_w_a_s_t_ae250d021fe4842a3a03f4ded3a982c20}{00153}}\ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespace_w_a_s_t_ae250d021fe4842a3a03f4ded3a982c20}{isRecoveryPointChar}}(\textcolor{keywordtype}{char}\ c)}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00154}00154\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00155}00155\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(c)}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00156}00156\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00157}00157\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Recover\ lexing\ at\ the\ next\ whitespace\ or\ parenthesis.}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00158}00158\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\ '}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)t'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)r'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)n'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)f'}:}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00159}00159\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'('}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{')'}:}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00160}00160\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00161}00161\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00162}00162\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00163}00163\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00164}00164\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00165}00165\ }
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00166}\mbox{\hyperlink{namespace_w_a_s_t_a9ffdd3dd8d6db105464488183a5f13da}{00166}}\ \ \ \ \ Token*\ \mbox{\hyperlink{namespace_w_a_s_t_a9ffdd3dd8d6db105464488183a5f13da}{lex}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \textcolor{keywordtype}{string},\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ stringLength,\mbox{\hyperlink{struct_w_a_s_t_1_1_line_info}{LineInfo}}*\&\ outLineInfo)}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00167}00167\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00168}00168\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{struct_w_a_s_t_1_1_static_data}{StaticData}}\ staticData;}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00169}00169\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00170}00170\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_timing_1_1_timer}{Timing::Timer}}\ timer;}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00171}00171\ }
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00172}00172\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(stringLength\ >\ \mbox{\hyperlink{stdint_8h_ab5eb23180f7cc12b7d6c04a8ec067fdd}{UINT32\_MAX}})}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00173}00173\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00174}00174\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_errors_a719a329951edb01e45afe1443dfa2a92}{Errors::fatalf}}(\textcolor{stringliteral}{"{}cannot\ lex\ strings\ with\ more\ than\ \%u\ characters"{}},\mbox{\hyperlink{stdint_8h_ab5eb23180f7cc12b7d6c04a8ec067fdd}{UINT32\_MAX}});}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00175}00175\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00176}00176\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00177}00177\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Allocate\ enough\ memory\ up\ front\ for\ a\ token\ and\ newline\ for\ each\ character\ in\ the\ input\ string.}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00178}00178\ \ \ \ \ \ \ \ \ Token*\ tokens\ =\ (Token*)malloc(\textcolor{keyword}{sizeof}(Token)\ *\ (stringLength\ +\ 1));}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00179}00179\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}*\ lineStarts\ =\ (\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}*)malloc(\textcolor{keyword}{sizeof}(\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}})\ *\ (stringLength\ +\ 2));}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00180}00180\ }
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00181}00181\ \ \ \ \ \ \ \ \ Token*\ nextToken\ =\ tokens;}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00182}00182\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}*\ nextLineStart\ =\ lineStarts;}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00183}00183\ \ \ \ \ \ \ \ \ *nextLineStart++\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00184}00184\ }
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00185}00185\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ nextChar\ =\ string;}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00186}00186\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\textcolor{keyword}{true})}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00187}00187\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00188}00188\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Skip\ whitespace\ and\ comments\ (keeping\ track\ of\ newlines).}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00189}00189\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\textcolor{keyword}{true})}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00190}00190\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00191}00191\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(*nextChar)}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00192}00192\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00193}00193\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Single\ line\ comments.}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00194}00194\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{';'}:}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00195}00195\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(nextChar[1]\ !=\ \textcolor{charliteral}{';'})\ \{\ \textcolor{keywordflow}{goto}\ doneSkippingWhitespace;\ \}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00196}00196\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00197}00197\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00198}00198\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ nextChar\ +=\ 2;}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00199}00199\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(*nextChar)}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00200}00200\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00201}00201\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(*nextChar\ ==\ \textcolor{charliteral}{'\(\backslash\)n'})}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00202}00202\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00203}00203\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Emit\ a\ line\ start\ for\ the\ newline.}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00204}00204\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *nextLineStart++\ =\ \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}(nextChar\ -\/\ \textcolor{keywordtype}{string}\ +\ 1);}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00205}00205\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++nextChar;}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00206}00206\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00207}00207\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00208}00208\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++nextChar;}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00209}00209\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00210}00210\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00211}00211\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00212}00212\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Delimited\ (possibly\ multi-\/line)\ comments.}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00213}00213\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'('}:}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00214}00214\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(nextChar[1]\ !=\ \textcolor{charliteral}{';'})\ \{\ \textcolor{keywordflow}{goto}\ doneSkippingWhitespace;\ \}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00215}00215\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00216}00216\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00217}00217\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ firstCommentChar\ =\ nextChar;}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00218}00218\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ nextChar\ +=\ 2;}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00219}00219\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}\ commentDepth\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00220}00220\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(commentDepth)}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00221}00221\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00222}00222\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(nextChar[0]\ ==\ \textcolor{charliteral}{';'}\ \&\&\ nextChar[1]\ ==\ \textcolor{charliteral}{')'})}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00223}00223\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00224}00224\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/-\/commentDepth;}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00225}00225\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ nextChar\ +=\ 2;}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00226}00226\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00227}00227\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(nextChar[0]\ ==\ \textcolor{charliteral}{'('}\ \&\&\ nextChar[1]\ ==\ \textcolor{charliteral}{';'})}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00228}00228\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00229}00229\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++commentDepth;}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00230}00230\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ nextChar\ +=\ 2;}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00231}00231\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00232}00232\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(nextChar\ ==\ \textcolor{keywordtype}{string}\ +\ stringLength)}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00233}00233\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00234}00234\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Emit\ an\ unterminated\ comment\ token.}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00235}00235\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ nextToken-\/>type\ =\ t\_unterminatedComment;}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00236}00236\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ nextToken-\/>begin\ =\ \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}(firstCommentChar\ -\/\ \textcolor{keywordtype}{string});}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00237}00237\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++nextToken;}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00238}00238\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ doneSkippingWhitespace;}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00239}00239\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00240}00240\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00241}00241\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00242}00242\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(*nextChar\ ==\ \textcolor{charliteral}{'\(\backslash\)n'})}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00243}00243\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00244}00244\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Emit\ a\ line\ start\ for\ the\ newline.}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00245}00245\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *nextLineStart++\ =\ \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}(nextChar\ -\/\ \textcolor{keywordtype}{string});}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00246}00246\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00247}00247\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++nextChar;}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00248}00248\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00249}00249\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00250}00250\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00251}00251\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00252}00252\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Whitespace.}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00253}00253\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)n'}:}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00254}00254\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *nextLineStart++\ =\ \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}(nextChar\ -\/\ \textcolor{keywordtype}{string}\ +\ 1);}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00255}00255\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++nextChar;}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00256}00256\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00257}00257\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\ '}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)t'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)r'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)f'}:}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00258}00258\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++nextChar;}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00259}00259\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00260}00260\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00261}00261\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ doneSkippingWhitespace;}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00262}00262\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00263}00263\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00264}00264\ \ \ \ \ \ \ \ \ \ \ \ \ doneSkippingWhitespace:}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00265}00265\ }
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00266}00266\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Once\ we\ reach\ a\ non-\/whitespace,\ non-\/comment\ character,\ feed\ characters\ into\ the\ NFA\ until\ it\ reaches\ a\ terminal\ state.}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00267}00267\ \ \ \ \ \ \ \ \ \ \ \ \ nextToken-\/>begin\ =\ \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}(nextChar\ -\/\ \textcolor{keywordtype}{string});}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00268}00268\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{NFA::StateIndex}}\ terminalState\ =\ staticData.\mbox{\hyperlink{struct_w_a_s_t_1_1_static_data_a37c4d27bb956914c06b3198191995f35}{nfaMachine}}.\mbox{\hyperlink{struct_n_f_a_1_1_machine_ac25347ea5e9d318f6ac499af40e7b77b}{feed}}(nextChar);}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00269}00269\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(terminalState\ !=\ \mbox{\hyperlink{namespace_n_f_a_ad9fb95d6afb96fea8750c3543ee293a1ac83c0f7e053c5efc232f432bba1ab6c6}{NFA::unmatchedCharacterTerminal}})}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00270}00270\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00271}00271\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ nextToken-\/>type\ =\ \mbox{\hyperlink{namespace_w_a_s_t_a57c99a932a2a7d69084cbeca01031f32}{TokenType}}(\mbox{\hyperlink{namespace_n_f_a_ad9fb95d6afb96fea8750c3543ee293a1a6df9f5bfcb1889079b46027cf7bdac15}{NFA::maximumTerminalStateIndex}}\ -\/\ (\mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{NFA::StateIndex}})terminalState);}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00272}00272\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++nextToken;}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00273}00273\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00274}00274\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00275}00275\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00276}00276\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(nextToken-\/>begin\ <\ stringLength)}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00277}00277\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00278}00278\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Emit\ an\ unrecognized\ token.}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00279}00279\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ nextToken-\/>type\ =\ t\_unrecognized;}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00280}00280\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++nextToken;}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00281}00281\ }
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00282}00282\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Advance\ until\ a\ recovery\ point.}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00283}00283\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(!\mbox{\hyperlink{namespace_w_a_s_t_ae250d021fe4842a3a03f4ded3a982c20}{isRecoveryPointChar}}(*nextChar))\ \{\ ++nextChar;\ \}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00284}00284\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00285}00285\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00286}00286\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00287}00287\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00288}00288\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00289}00289\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00290}00290\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00291}00291\ }
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00292}00292\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Emit\ an\ end\ token\ to\ mark\ the\ end\ of\ the\ token\ stream.}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00293}00293\ \ \ \ \ \ \ \ \ nextToken-\/>type\ =\ t\_eof;}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00294}00294\ \ \ \ \ \ \ \ \ ++nextToken;}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00295}00295\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00296}00296\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Emit\ an\ extra\ line\ start\ for\ the\ end\ of\ the\ file,\ so\ you\ can\ find\ the\ end\ of\ a\ line\ with\ lineStarts[line\ +\ 1].}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00297}00297\ \ \ \ \ \ \ \ \ *nextLineStart++\ =\ \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}(nextChar\ -\/\ \textcolor{keywordtype}{string})\ +\ 1;}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00298}00298\ }
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00299}00299\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Shrink\ the\ line\ start\ and\ token\ arrays\ to\ the\ final\ number\ of\ tokens/lines.}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00300}00300\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ numLineStarts\ =\ nextLineStart\ -\/\ lineStarts;}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00301}00301\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ numTokens\ =\ nextToken\ -\/\ tokens;}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00302}00302\ \ \ \ \ \ \ \ \ lineStarts\ =\ (\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}*)realloc(lineStarts,\textcolor{keyword}{sizeof}(\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}})\ *\ numLineStarts);}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00303}00303\ \ \ \ \ \ \ \ \ tokens\ =\ (Token*)realloc(tokens,\textcolor{keyword}{sizeof}(Token)\ *\ numTokens);}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00304}00304\ }
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00305}00305\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Create\ the\ LineInfo\ object\ that\ encapsulates\ the\ line\ start\ information.}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00306}00306\ \ \ \ \ \ \ \ \ outLineInfo\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{struct_w_a_s_t_1_1_line_info}{LineInfo}}\ \{lineStarts,\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}(numLineStarts)\};}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00307}00307\ }
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00308}00308\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_timing_a4f7cf4a3faa27612ba0ad6e4653651f8}{Timing::logRatePerSecond}}(\textcolor{stringliteral}{"{}lexed\ WAST\ file"{}},timer,stringLength/1024.0/1024.0,\textcolor{stringliteral}{"{}MB"{}});}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00309}00309\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{Log::printf}}(\mbox{\hyperlink{namespace_log_a1f055cc08a2ed074aa74f9d99c8a0901aaa59d67c2123f094d0d6798ffe651c4d}{Log::Category::metrics}},\textcolor{stringliteral}{"{}lexer\ produced\ \%u\ tokens\ (\%.1fMB)\(\backslash\)n"{}},numTokens,numTokens*\textcolor{keyword}{sizeof}(Token)/1024.0/1024.0);}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00310}00310\ }
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00311}00311\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ tokens;}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00312}00312\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00313}00313\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00314}\mbox{\hyperlink{namespace_w_a_s_t_ac4e53dc178c5ceaf93b846c81f9adfc2}{00314}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespace_w_a_s_t_ac4e53dc178c5ceaf93b846c81f9adfc2}{freeTokens}}(Token*\ tokens)}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00315}00315\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00316}00316\ \ \ \ \ \ \ \ \ free(tokens);}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00317}00317\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00318}00318\ }
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00319}\mbox{\hyperlink{namespace_w_a_s_t_ae0e7852160946f05f04d4cab549275d9}{00319}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespace_w_a_s_t_ae0e7852160946f05f04d4cab549275d9}{freeLineInfo}}(\mbox{\hyperlink{struct_w_a_s_t_1_1_line_info}{LineInfo}}*\ lineInfo)}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00320}00320\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00321}00321\ \ \ \ \ \ \ \ \ free(lineInfo-\/>\mbox{\hyperlink{struct_w_a_s_t_1_1_line_info_a9126d0f1e7b90b40a84a99c713b6debd}{lineStarts}});}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00322}00322\ \ \ \ \ \ \ \ \ \textcolor{keyword}{delete}\ lineInfo;}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00323}00323\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00324}00324\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00325}00325\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ getLineOffset(\textcolor{keyword}{const}\ LineInfo*\ lineInfo,\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ lineIndex)}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00326}00326\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00327}00327\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_errors_8h_a36d7655d01d72167969992b17b772507}{errorUnless}}(lineIndex\ <\ lineInfo-\/>numLineStarts);}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00328}00328\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ lineInfo-\/>lineStarts[lineIndex];}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00329}00329\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00330}00330\ }
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00331}\mbox{\hyperlink{namespace_w_a_s_t_a29cdb29885fdca5fa42fd1e7bf3c62b1}{00331}}\ \ \ \ \ \mbox{\hyperlink{struct_w_a_s_t_1_1_text_file_locus}{TextFileLocus}}\ \mbox{\hyperlink{namespace_w_a_s_t_a29cdb29885fdca5fa42fd1e7bf3c62b1}{calcLocusFromOffset}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \textcolor{keywordtype}{string},\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_w_a_s_t_1_1_line_info}{LineInfo}}*\ lineInfo,\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ charOffset)}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00332}00332\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00333}00333\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Binary\ search\ the\ line\ starts\ for\ the\ last\ one\ before\ charIndex.}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00334}00334\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ minLineIndex\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00335}00335\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ maxLineIndex\ =\ lineInfo-\/>\mbox{\hyperlink{struct_w_a_s_t_1_1_line_info_a414b827a7ed94595b5e77b85f0df31a0}{numLineStarts}}\ -\/\ 1;}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00336}00336\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(maxLineIndex\ >\ minLineIndex)}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00337}00337\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00338}00338\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ medianLineIndex\ =\ (minLineIndex\ +\ maxLineIndex\ +\ 1)\ /\ 2;}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00339}00339\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(charOffset\ <\ lineInfo-\/>lineStarts[medianLineIndex])}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00340}00340\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00341}00341\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ maxLineIndex\ =\ medianLineIndex\ -\/\ 1;}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00342}00342\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00343}00343\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(charOffset\ >\ lineInfo-\/>\mbox{\hyperlink{struct_w_a_s_t_1_1_line_info_a9126d0f1e7b90b40a84a99c713b6debd}{lineStarts}}[medianLineIndex])}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00344}00344\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00345}00345\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ minLineIndex\ =\ medianLineIndex;}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00346}00346\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00347}00347\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00348}00348\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00349}00349\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ minLineIndex\ =\ maxLineIndex\ =\ medianLineIndex;}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00350}00350\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00351}00351\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00352}00352\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_w_a_s_t_1_1_text_file_locus}{TextFileLocus}}\ result;}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00353}00353\ \ \ \ \ \ \ \ \ result.newlines\ =\ (\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}})minLineIndex;}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00354}00354\ }
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00355}00355\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Count\ tabs\ and\ and\ spaces\ from\ the\ beginning\ of\ the\ line\ to\ charIndex.}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00356}00356\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}\ index\ =\ lineInfo-\/>\mbox{\hyperlink{struct_w_a_s_t_1_1_line_info_a9126d0f1e7b90b40a84a99c713b6debd}{lineStarts}}[result.newlines];index\ <\ charOffset;++index)}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00357}00357\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00358}00358\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\textcolor{keywordtype}{string}[index]\ ==\ \textcolor{charliteral}{'\(\backslash\)t'})\ \{\ ++result.tabs;\ \}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00359}00359\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{\ ++result.characters;\ \}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00360}00360\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00361}00361\ }
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00362}00362\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Copy\ the\ full\ source\ line\ into\ the\ TextFileLocus\ for\ context.}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00363}00363\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ lineStartOffset\ =\ getLineOffset(lineInfo,result.newlines);}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00364}00364\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ lineEndOffset\ =\ getLineOffset(lineInfo,result.newlines+1)\ -\/\ 1;}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00365}00365\ \ \ \ \ \ \ \ \ result.sourceLine\ =\ std::string(\textcolor{keywordtype}{string}\ +\ lineStartOffset,lineEndOffset\ -\/\ lineStartOffset);}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00366}00366\ }
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00367}00367\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00368}00368\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_lexer_8cpp_source_l00369}00369\ \}}
+
+\end{DoxyCode}

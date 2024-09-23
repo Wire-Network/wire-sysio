@@ -1,0 +1,75 @@
+\doxysection{testing\+::internal\+::Key\+Matcher\texorpdfstring{$<$}{<} M \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classtesting_1_1internal_1_1_key_matcher}{}\label{classtesting_1_1internal_1_1_key_matcher}\index{testing::internal::KeyMatcher$<$ M $>$@{testing::internal::KeyMatcher$<$ M $>$}}
+
+
+{\ttfamily \#include $<$gmock-\/matchers.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_key_matcher_a08429692150bf9304b493192abcf16d4}{Key\+Matcher}} (M m)
+\item 
+{\footnotesize template$<$typename Pair\+Type $>$ }\\\mbox{\hyperlink{classtesting_1_1internal_1_1_key_matcher_aa3861b06dd9e3255a7c1c013ddf88fb5}{operator Matcher$<$ Pair\+Type $>$}} () const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename M$>$\newline
+class testing\+::internal\+::\+Key\+Matcher$<$ M $>$}
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l03335}{3335}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_key_matcher_a08429692150bf9304b493192abcf16d4}\index{testing::internal::KeyMatcher$<$ M $>$@{testing::internal::KeyMatcher$<$ M $>$}!KeyMatcher@{KeyMatcher}}
+\index{KeyMatcher@{KeyMatcher}!testing::internal::KeyMatcher$<$ M $>$@{testing::internal::KeyMatcher$<$ M $>$}}
+\doxysubsubsection{\texorpdfstring{KeyMatcher()}{KeyMatcher()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_key_matcher_a08429692150bf9304b493192abcf16d4} 
+template$<$typename M $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_key_matcher}{testing\+::internal\+::\+Key\+Matcher}}$<$ M $>$\+::\+Key\+Matcher (\begin{DoxyParamCaption}\item[{M}]{m}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l03337}{3337}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03337\ :\ matcher\_for\_key\_(m)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_key_matcher_aa3861b06dd9e3255a7c1c013ddf88fb5}\index{testing::internal::KeyMatcher$<$ M $>$@{testing::internal::KeyMatcher$<$ M $>$}!operator Matcher$<$ PairType $>$@{operator Matcher$<$ PairType $>$}}
+\index{operator Matcher$<$ PairType $>$@{operator Matcher$<$ PairType $>$}!testing::internal::KeyMatcher$<$ M $>$@{testing::internal::KeyMatcher$<$ M $>$}}
+\doxysubsubsection{\texorpdfstring{operator Matcher$<$ PairType $>$()}{operator Matcher< PairType >()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_key_matcher_aa3861b06dd9e3255a7c1c013ddf88fb5} 
+template$<$typename M $>$ \\
+template$<$typename Pair\+Type $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_key_matcher}{testing\+::internal\+::\+Key\+Matcher}}$<$ M $>$\+::operator \mbox{\hyperlink{classtesting_1_1_matcher}{Matcher}}$<$ Pair\+Type $>$ (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l03340}{3340}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03340\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{03341\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetesting_aca6c4c4fdf7fb7257ea4fc76971cb82c}{MakeMatcher}}(\textcolor{keyword}{new}\ KeyMatcherImpl<PairType>(matcher\_for\_key\_));}
+\DoxyCodeLine{03342\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=337pt]{classtesting_1_1internal_1_1_key_matcher_aa3861b06dd9e3255a7c1c013ddf88fb5_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/include/gmock/\mbox{\hyperlink{gmock-matchers_8h}{gmock-\/matchers.\+h}}\end{DoxyCompactItemize}

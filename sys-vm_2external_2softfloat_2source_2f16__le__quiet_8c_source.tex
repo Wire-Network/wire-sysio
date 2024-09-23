@@ -1,0 +1,77 @@
+\doxysection{f16\+\_\+le\+\_\+quiet.\+c}
+\hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source}{}\label{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source}\index{libraries/sys-\/vm/external/softfloat/source/f16\_le\_quiet.c@{libraries/sys-\/vm/external/softfloat/source/f16\_le\_quiet.c}}
+\mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00001}00001\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00002}00002\ \textcolor{comment}{/*============================================================================}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00003}00003\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00004}00004\ \textcolor{comment}{This\ C\ source\ file\ is\ part\ of\ the\ SoftFloat\ IEEE\ Floating-\/Point\ Arithmetic}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00005}00005\ \textcolor{comment}{Package,\ Release\ 3e,\ by\ John\ R.\ Hauser.}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00006}00006\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00007}00007\ \textcolor{comment}{Copyright\ 2011,\ 2012,\ 2013,\ 2014,\ 2015\ The\ Regents\ of\ the\ University\ of}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00008}00008\ \textcolor{comment}{California.\ \ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00009}00009\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00010}00010\ \textcolor{comment}{Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00011}00011\ \textcolor{comment}{modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are\ met:}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00012}00012\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00013}00013\ \textcolor{comment}{\ 1.\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright\ notice,}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00014}00014\ \textcolor{comment}{\ \ \ \ this\ list\ of\ conditions,\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00015}00015\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00016}00016\ \textcolor{comment}{\ 2.\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above\ copyright\ notice,}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00017}00017\ \textcolor{comment}{\ \ \ \ this\ list\ of\ conditions,\ and\ the\ following\ disclaimer\ in\ the\ documentation}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00018}00018\ \textcolor{comment}{\ \ \ \ and/or\ other\ materials\ provided\ with\ the\ distribution.}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00019}00019\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00020}00020\ \textcolor{comment}{\ 3.\ Neither\ the\ name\ of\ the\ University\ nor\ the\ names\ of\ its\ contributors\ may}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00021}00021\ \textcolor{comment}{\ \ \ \ be\ used\ to\ endorse\ or\ promote\ products\ derived\ from\ this\ software\ without}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00022}00022\ \textcolor{comment}{\ \ \ \ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00023}00023\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00024}00024\ \textcolor{comment}{THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ REGENTS\ AND\ CONTRIBUTORS\ "{}AS\ IS"{},\ AND\ ANY}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00025}00025\ \textcolor{comment}{EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ THE\ IMPLIED}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00026}00026\ \textcolor{comment}{WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR\ A\ PARTICULAR\ PURPOSE,\ ARE}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00027}00027\ \textcolor{comment}{DISCLAIMED.\ \ IN\ NO\ EVENT\ SHALL\ THE\ REGENTS\ OR\ CONTRIBUTORS\ BE\ LIABLE\ FOR\ ANY}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00028}00028\ \textcolor{comment}{DIRECT,\ INDIRECT,\ INCIDENTAL,\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00029}00029\ \textcolor{comment}{(INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00030}00030\ \textcolor{comment}{LOSS\ OF\ USE,\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00031}00031\ \textcolor{comment}{ON\ ANY\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00032}00032\ \textcolor{comment}{(INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE\ OF\ THIS}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00033}00033\ \textcolor{comment}{SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00034}00034\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00035}00035\ \textcolor{comment}{=============================================================================*/}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00037}00037\ \textcolor{preprocessor}{\#include\ <stdbool.h>}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00038}00038\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{stdint_8h}{stdint.h}}>}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00039}00039\ \textcolor{preprocessor}{\#include\ "{}platform.h"{}}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00040}00040\ \textcolor{preprocessor}{\#include\ "{}internals.h"{}}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00041}00041\ \textcolor{preprocessor}{\#include\ "{}specialize.h"{}}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00042}00042\ \textcolor{preprocessor}{\#include\ "{}softfloat.h"{}}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00044}\mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_aa586cba5136645fcec42656db3aed425}{00044}}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{softfloat_2source_2f16__le__quiet_8c_aa586cba5136645fcec42656db3aed425}{f16\_le\_quiet}}(\ \mbox{\hyperlink{structfloat16__t}{float16\_t}}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \mbox{\hyperlink{structfloat16__t}{float16\_t}}\ b\ )}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00045}00045\ \{}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00046}00046\ \ \ \ \ \textcolor{keyword}{union\ }\mbox{\hyperlink{unionui16__f16}{ui16\_f16}}\ uA;}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00047}00047\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a6ed085329b153773ff76afa0702cf897}{uint\_fast16\_t}}\ uiA;}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00048}00048\ \ \ \ \ \textcolor{keyword}{union\ }\mbox{\hyperlink{unionui16__f16}{ui16\_f16}}\ uB;}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00049}00049\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a6ed085329b153773ff76afa0702cf897}{uint\_fast16\_t}}\ uiB;}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00050}00050\ \ \ \ \ \textcolor{keywordtype}{bool}\ signA,\ signB;}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00052}00052\ \ \ \ \ uA.\mbox{\hyperlink{unionui16__f16_ab323bc7bebcf8d648c2e9135482fde81}{f}}\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}};}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00053}00053\ \ \ \ \ uiA\ =\ uA.\mbox{\hyperlink{unionui16__f16_aac6c7d977adfc50a60af439130126fc4}{ui}};}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00054}00054\ \ \ \ \ uB.\mbox{\hyperlink{unionui16__f16_ab323bc7bebcf8d648c2e9135482fde81}{f}}\ =\ b;}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00055}00055\ \ \ \ \ uiB\ =\ uB.\mbox{\hyperlink{unionui16__f16_aac6c7d977adfc50a60af439130126fc4}{ui}};}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00056}00056\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a04fd9cc6c846c09355329b8f7a5af495}{isNaNF16UI}}(\ uiA\ )\ ||\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a04fd9cc6c846c09355329b8f7a5af495}{isNaNF16UI}}(\ uiB\ )\ )\ \{}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00057}00057\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2specialize_8h_abc0281087bce323de3425406f4b56516}{softfloat\_isSigNaNF16UI}}(\ uiA\ )\ ||\ \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2specialize_8h_abc0281087bce323de3425406f4b56516}{softfloat\_isSigNaNF16UI}}(\ uiB\ )}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00059}00059\ \ \ \ \ \ \ \ \ )\ \{}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2softfloat__raise_flags_8c_ac16bbf09eca0fe8ff91301d82c5a667f}{softfloat\_raiseFlags}}(\ \mbox{\hyperlink{softfloat_2source_2include_2softfloat_8h_a56a0f36da7f9eaaf54bd05cc2bf49173a191f069090c3d33752fb728272d9a4a9}{softfloat\_flag\_invalid}}\ );}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00061}00061\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00062}00062\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00063}00063\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00064}00064\ \ \ \ \ signA\ =\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a436bcbe96380e4dab48591350a95c45b}{signF16UI}}(\ uiA\ );}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00065}00065\ \ \ \ \ signB\ =\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a436bcbe96380e4dab48591350a95c45b}{signF16UI}}(\ uiB\ );}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00066}00066\ \ \ \ \ \textcolor{keywordflow}{return}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00067}00067\ \ \ \ \ \ \ \ \ (signA\ !=\ signB)\ ?\ signA\ ||\ !\ (\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}})\ ((uiA\ |\ uiB)<<1)}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \ \ \ :\ (uiA\ ==\ uiB)\ ||\ (signA\ \string^\ (uiA\ <\ uiB));}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00069}00069\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00070}00070\ \}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2f16__le__quiet_8c_source_l00071}00071\ }
+
+\end{DoxyCode}

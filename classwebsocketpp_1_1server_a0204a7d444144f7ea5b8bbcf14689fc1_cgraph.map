@@ -1,0 +1,16 @@
+<map id="websocketpp::server::start_accept" name="websocketpp::server::start_accept">
+<area shape="rect" id="Node000001" title="Starts the server&#39;s async connection acceptance loop (exception free)" alt="" coords="5,95,148,135"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1server.html#a9146c63ed1afb5bdec29eca52c487226" title="Create and initialize a new connection." alt="" coords="196,17,338,58"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="128,92,200,62,202,67,130,97"/>
+<area shape="rect" id="Node000004" href="$classwebsocketpp_1_1server.html#aa24feb1c5d2bde47de8b11f5369c54d4" title="Handler callback for start_accept." alt="" coords="196,95,338,135"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="148,112,180,112,180,118,148,118"/>
+<area shape="rect" id="Node000006" href="$namespacewebsocketpp_1_1error.html#a3344622df8c36e8ae03c59164e7b5e89" title=" " alt="" coords="201,160,333,201"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="139,133,192,152,191,157,137,138"/>
+<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1endpoint.html#abfbee4cb244700560ef80594a913cd95" title=" " alt="" coords="386,5,541,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="338,31,370,29,371,34,338,36"/>
+<area shape="rect" id="Node000005" href="$classwebsocketpp_1_1server.html#ab61bcdf9fd532fe7ebd934f8d84fdfea" title="Starts the server&#39;s async connection acceptance loop." alt="" coords="392,95,535,135"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="338,112,377,112,377,118,338,118"/>
+<area shape="poly" id="edge5_Node000005_Node000005" title=" " alt="" coords="426,95,424,85,430,76,444,70,464,68,485,70,498,77,495,81,484,76,464,73,445,75,434,80,430,86,431,93"/>
+<area shape="rect" id="Node000007" href="$namespacewebsocketpp_1_1error.html#ac1acac2bfb24bbd2b1791db80993b0c2" title=" " alt="" coords="398,160,530,201"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="333,178,382,178,382,183,333,183"/>
+</map>

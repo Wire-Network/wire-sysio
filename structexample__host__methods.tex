@@ -1,0 +1,139 @@
+\doxysection{example\+\_\+host\+\_\+methods Struct Reference}
+\hypertarget{structexample__host__methods}{}\label{structexample__host__methods}\index{example\_host\_methods@{example\_host\_methods}}
+
+
+Collaboration diagram for example\+\_\+host\+\_\+methods\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=200pt]{structexample__host__methods__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{structexample__host__methods_aafe26636e9ac62100c1bf20a45fabf89}{print\+\_\+num}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} n)
+\item 
+void \mbox{\hyperlink{structexample__host__methods_a7410c320366b22a9359913b4b9ec98f9}{print\+\_\+name}} (const char \texorpdfstring{$\ast$}{*}nm)
+\item 
+void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structexample__host__methods_af69f9804f8f8a31ddd1831eff5da931a}{memset}} (char \texorpdfstring{$\ast$}{*}ptr, int x, size\+\_\+t n)
+\item 
+void \mbox{\hyperlink{structexample__host__methods_aaeab9f9f56aa8c95e137eea0fdc5bdae}{sysio\+\_\+assert}} (bool test, const char \texorpdfstring{$\ast$}{*}msg)
+\item 
+void \mbox{\hyperlink{structexample__host__methods_a935fb22c9cdbd90d5b11b5610396169e}{print\+\_\+span}} (\mbox{\hyperlink{classsysio_1_1vm_1_1span}{span}}$<$ const char $>$ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::string \mbox{\hyperlink{structexample__host__methods_a5bea5fc1bf19ab72166d9366f32d87e4}{field}} = "{}"{}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{hello__driver_8cpp_source_l00014}{14}} of file \mbox{\hyperlink{hello__driver_8cpp_source}{hello\+\_\+driver.\+cpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structexample__host__methods_af69f9804f8f8a31ddd1831eff5da931a}\index{example\_host\_methods@{example\_host\_methods}!memset@{memset}}
+\index{memset@{memset}!example\_host\_methods@{example\_host\_methods}}
+\doxysubsubsection{\texorpdfstring{memset()}{memset()}}
+{\footnotesize\ttfamily \label{structexample__host__methods_af69f9804f8f8a31ddd1831eff5da931a} 
+void \texorpdfstring{$\ast$}{*} example\+\_\+host\+\_\+methods\+::memset (\begin{DoxyParamCaption}\item[{char \texorpdfstring{$\ast$}{*}}]{ptr}{, }\item[{int}]{x}{, }\item[{size\+\_\+t}]{n}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{hello__driver_8cpp_source_l00019}{19}} of file \mbox{\hyperlink{hello__driver_8cpp_source}{hello\+\_\+driver.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00019\ \{\ return\ ::memset(ptr,\ x,\ n);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structexample__host__methods_a7410c320366b22a9359913b4b9ec98f9}\index{example\_host\_methods@{example\_host\_methods}!print\_name@{print\_name}}
+\index{print\_name@{print\_name}!example\_host\_methods@{example\_host\_methods}}
+\doxysubsubsection{\texorpdfstring{print\_name()}{print\_name()}}
+{\footnotesize\ttfamily \label{structexample__host__methods_a7410c320366b22a9359913b4b9ec98f9} 
+void example\+\_\+host\+\_\+methods\+::print\+\_\+name (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{nm}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{hello__driver_8cpp_source_l00017}{17}} of file \mbox{\hyperlink{hello__driver_8cpp_source}{hello\+\_\+driver.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00017\ \{\ std::cout\ <<\ \textcolor{stringliteral}{"{}Name\ :\ "{}}\ <<\ nm\ <<\ \textcolor{stringliteral}{"{}\ "{}}\ <<\ \mbox{\hyperlink{structexample__host__methods_a5bea5fc1bf19ab72166d9366f32d87e4}{field}}\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structexample__host__methods_aafe26636e9ac62100c1bf20a45fabf89}\index{example\_host\_methods@{example\_host\_methods}!print\_num@{print\_num}}
+\index{print\_num@{print\_num}!example\_host\_methods@{example\_host\_methods}}
+\doxysubsubsection{\texorpdfstring{print\_num()}{print\_num()}}
+{\footnotesize\ttfamily \label{structexample__host__methods_aafe26636e9ac62100c1bf20a45fabf89} 
+void example\+\_\+host\+\_\+methods\+::print\+\_\+num (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{n}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{hello__driver_8cpp_source_l00015}{15}} of file \mbox{\hyperlink{hello__driver_8cpp_source}{hello\+\_\+driver.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00015\ \{\ std::cout\ <<\ \textcolor{stringliteral}{"{}Number\ :\ "{}}\ <<\ n\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structexample__host__methods_a935fb22c9cdbd90d5b11b5610396169e}\index{example\_host\_methods@{example\_host\_methods}!print\_span@{print\_span}}
+\index{print\_span@{print\_span}!example\_host\_methods@{example\_host\_methods}}
+\doxysubsubsection{\texorpdfstring{print\_span()}{print\_span()}}
+{\footnotesize\ttfamily \label{structexample__host__methods_a935fb22c9cdbd90d5b11b5610396169e} 
+void example\+\_\+host\+\_\+methods\+::print\+\_\+span (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classsysio_1_1vm_1_1span}{span}}$<$ const char $>$}]{s}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{hello__driver_8cpp_source_l00029}{29}} of file \mbox{\hyperlink{hello__driver_8cpp_source}{hello\+\_\+driver.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}Span\ :\ "{}}\ <<\ std::string\{\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.data(),\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.size()\}\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{00031\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structexample__host__methods_aaeab9f9f56aa8c95e137eea0fdc5bdae}\index{example\_host\_methods@{example\_host\_methods}!sysio\_assert@{sysio\_assert}}
+\index{sysio\_assert@{sysio\_assert}!example\_host\_methods@{example\_host\_methods}}
+\doxysubsubsection{\texorpdfstring{sysio\_assert()}{sysio\_assert()}}
+{\footnotesize\ttfamily \label{structexample__host__methods_aaeab9f9f56aa8c95e137eea0fdc5bdae} 
+void example\+\_\+host\+\_\+methods\+::sysio\+\_\+assert (\begin{DoxyParamCaption}\item[{bool}]{test}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{msg}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{hello__driver_8cpp_source_l00022}{22}} of file \mbox{\hyperlink{hello__driver_8cpp_source}{hello\+\_\+driver.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!test)\ \{}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \ std::cout\ <<\ msg\ <<\ std::endl;}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ 0;}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00027\ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structexample__host__methods_a5bea5fc1bf19ab72166d9366f32d87e4}\index{example\_host\_methods@{example\_host\_methods}!field@{field}}
+\index{field@{field}!example\_host\_methods@{example\_host\_methods}}
+\doxysubsubsection{\texorpdfstring{field}{field}}
+{\footnotesize\ttfamily \label{structexample__host__methods_a5bea5fc1bf19ab72166d9366f32d87e4} 
+std\+::string example\+\_\+host\+\_\+methods\+::field = "{}"{}}
+
+
+
+Definition at line \mbox{\hyperlink{hello__driver_8cpp_source_l00020}{20}} of file \mbox{\hyperlink{hello__driver_8cpp_source}{hello\+\_\+driver.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/tools/\mbox{\hyperlink{hello__driver_8cpp}{hello\+\_\+driver.\+cpp}}\end{DoxyCompactItemize}

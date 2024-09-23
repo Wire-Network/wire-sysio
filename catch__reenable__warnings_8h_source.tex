@@ -1,0 +1,27 @@
+\doxysection{catch\+\_\+reenable\+\_\+warnings.\+h}
+\hypertarget{catch__reenable__warnings_8h_source}{}\label{catch__reenable__warnings_8h_source}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_reenable\_warnings.h@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_reenable\_warnings.h}}
+\mbox{\hyperlink{catch__reenable__warnings_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{catch__reenable__warnings_8h_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{catch__reenable__warnings_8h_source_l00002}00002\ \textcolor{comment}{\ *\ \ Copyright\ 2014\ Two\ Blue\ Cubes\ Ltd}}
+\DoxyCodeLine{\Hypertarget{catch__reenable__warnings_8h_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{catch__reenable__warnings_8h_source_l00004}00004\ \textcolor{comment}{\ *\ \ Distributed\ under\ the\ Boost\ Software\ License,\ Version\ 1.0.\ (See\ accompanying}}
+\DoxyCodeLine{\Hypertarget{catch__reenable__warnings_8h_source_l00005}00005\ \textcolor{comment}{\ *\ \ file\ LICENSE\_1\_0.txt\ or\ copy\ at\ http://www.boost.org/LICENSE\_1\_0.txt)}}
+\DoxyCodeLine{\Hypertarget{catch__reenable__warnings_8h_source_l00006}00006\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{catch__reenable__warnings_8h_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{catch__reenable__warnings_8h_source_l00008}00008\ \textcolor{preprocessor}{\#ifndef\ TWOBLUECUBES\_CATCH\_REENABLE\_WARNINGS\_H\_INCLUDED}}
+\DoxyCodeLine{\Hypertarget{catch__reenable__warnings_8h_source_l00009}00009\ \textcolor{preprocessor}{\#define\ TWOBLUECUBES\_CATCH\_REENABLE\_WARNINGS\_H\_INCLUDED}}
+\DoxyCodeLine{\Hypertarget{catch__reenable__warnings_8h_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{catch__reenable__warnings_8h_source_l00011}00011\ \textcolor{preprocessor}{\#ifdef\ \_\_clang\_\_}}
+\DoxyCodeLine{\Hypertarget{catch__reenable__warnings_8h_source_l00012}00012\ \textcolor{preprocessor}{\#\ \ \ \ ifdef\ \_\_ICC\ }\textcolor{comment}{//\ icpc\ defines\ the\ \_\_clang\_\_\ macro}}
+\DoxyCodeLine{\Hypertarget{catch__reenable__warnings_8h_source_l00013}00013\ \textcolor{preprocessor}{\#\ \ \ \ \ \ \ \ pragma\ warning(pop)}}
+\DoxyCodeLine{\Hypertarget{catch__reenable__warnings_8h_source_l00014}00014\ \textcolor{preprocessor}{\#\ \ \ \ else}}
+\DoxyCodeLine{\Hypertarget{catch__reenable__warnings_8h_source_l00015}00015\ \textcolor{preprocessor}{\#\ \ \ \ \ \ \ \ pragma\ clang\ diagnostic\ pop}}
+\DoxyCodeLine{\Hypertarget{catch__reenable__warnings_8h_source_l00016}00016\ \textcolor{preprocessor}{\#\ \ \ \ endif}}
+\DoxyCodeLine{\Hypertarget{catch__reenable__warnings_8h_source_l00017}00017\ \textcolor{preprocessor}{\#elif\ defined\ \_\_GNUC\_\_}}
+\DoxyCodeLine{\Hypertarget{catch__reenable__warnings_8h_source_l00018}00018\ \textcolor{preprocessor}{\#\ \ \ \ pragma\ GCC\ diagnostic\ pop}}
+\DoxyCodeLine{\Hypertarget{catch__reenable__warnings_8h_source_l00019}00019\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{catch__reenable__warnings_8h_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{catch__reenable__warnings_8h_source_l00021}00021\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ TWOBLUECUBES\_CATCH\_REENABLE\_WARNINGS\_H\_INCLUDED}}
+
+\end{DoxyCode}

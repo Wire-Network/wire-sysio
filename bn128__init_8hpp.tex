@@ -1,0 +1,62 @@
+\doxysection{libraries/fc/libraries/ff/libff/algebra/curves/bn128/bn128\+\_\+init.hpp File Reference}
+\hypertarget{bn128__init_8hpp}{}\label{bn128__init_8hpp}\index{libraries/fc/libraries/ff/libff/algebra/curves/bn128/bn128\_init.hpp@{libraries/fc/libraries/ff/libff/algebra/curves/bn128/bn128\_init.hpp}}
+{\ttfamily \#include "{}depends/ate-\/pairing/include/bn.\+h"{}}\newline
+{\ttfamily \#include $<$libff/algebra/curves/public\+\_\+params.\+hpp$>$}\newline
+{\ttfamily \#include $<$libff/algebra/fields/fp.\+hpp$>$}\newline
+Include dependency graph for bn128\+\_\+init.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{bn128__init_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{bn128__init_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacelibff}{libff}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}}$<$ \mbox{\hyperlink{namespacelibff_af2516ebed1903f9142500e347920f368}{bn128\+\_\+r\+\_\+limbs}}, \mbox{\hyperlink{namespacelibff_ad4a6c1db75d904ebacff99070e47c7f0}{bn128\+\_\+modulus\+\_\+r}} $>$ \mbox{\hyperlink{namespacelibff_a9712ea71a738f22dd2028ed5a8469b86}{libff\+::bn128\+\_\+\+Fr}}
+\item 
+typedef \mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}}$<$ \mbox{\hyperlink{namespacelibff_ae81bcf0f1b1aeec7333ffbbf960634cf}{bn128\+\_\+q\+\_\+limbs}}, \mbox{\hyperlink{namespacelibff_abffaeec0bb4c7fd2bc3accfdcbc1ec7e}{bn128\+\_\+modulus\+\_\+q}} $>$ \mbox{\hyperlink{namespacelibff_ab9a6509cce94368d4a31527a04ee4c16}{libff\+::bn128\+\_\+\+Fq}}
+\item 
+typedef \mbox{\hyperlink{classlibff_1_1bn128___g_t}{bn128\+\_\+\+GT}} \mbox{\hyperlink{namespacelibff_ac0733749594209226e40427fe723aed3}{libff\+::bn128\+\_\+\+Fq12}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{namespacelibff_ac6fb1d4d50b5298ed361253e9a777c10}{libff\+::init\+\_\+bn128\+\_\+params}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+const mp\+\_\+size\+\_\+t \mbox{\hyperlink{namespacelibff_a5fc43329eecf2c791d8da3cacfdfc45e}{libff\+::bn128\+\_\+r\+\_\+bitcount}} = 254
+\item 
+const mp\+\_\+size\+\_\+t \mbox{\hyperlink{namespacelibff_aab01b396365c9129521a25b0c6a5812e}{libff\+::bn128\+\_\+q\+\_\+bitcount}} = 254
+\item 
+const mp\+\_\+size\+\_\+t \mbox{\hyperlink{namespacelibff_af2516ebed1903f9142500e347920f368}{libff\+::bn128\+\_\+r\+\_\+limbs}} = (\mbox{\hyperlink{namespacelibff_a5fc43329eecf2c791d8da3cacfdfc45e}{bn128\+\_\+r\+\_\+bitcount}}+GMP\+\_\+\+NUMB\+\_\+\+BITS-\/1)/GMP\+\_\+\+NUMB\+\_\+\+BITS
+\item 
+const mp\+\_\+size\+\_\+t \mbox{\hyperlink{namespacelibff_ae81bcf0f1b1aeec7333ffbbf960634cf}{libff\+::bn128\+\_\+q\+\_\+limbs}} = (\mbox{\hyperlink{namespacelibff_aab01b396365c9129521a25b0c6a5812e}{bn128\+\_\+q\+\_\+bitcount}}+GMP\+\_\+\+NUMB\+\_\+\+BITS-\/1)/GMP\+\_\+\+NUMB\+\_\+\+BITS
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\begin{DoxyAuthor}{Author}
+This file is part of libff, developed by SCIPR Lab and contributors (see AUTHORS). 
+\end{DoxyAuthor}
+\begin{DoxyCopyright}{Copyright}
+MIT license (see LICENSE file) 
+\end{DoxyCopyright}
+
+
+Definition in file \mbox{\hyperlink{bn128__init_8hpp_source}{bn128\+\_\+init.\+hpp}}.
+

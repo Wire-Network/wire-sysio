@@ -1,0 +1,120 @@
+\doxysection{Filter\+Key\+Reader\texorpdfstring{$<$}{<} Input\+Stream \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{class_filter_key_reader}{}\label{class_filter_key_reader}\index{FilterKeyReader$<$ InputStream $>$@{FilterKeyReader$<$ InputStream $>$}}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef char \mbox{\hyperlink{class_filter_key_reader_a597ab74ee51c054bc9d213b70cc06cf6}{Ch}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_filter_key_reader_a73560153a815e680b3a611168496802a}{Filter\+Key\+Reader}} (Input\+Stream \&is, const \mbox{\hyperlink{class_filter_key_reader_a597ab74ee51c054bc9d213b70cc06cf6}{Ch}} \texorpdfstring{$\ast$}{*}key\+String, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} key\+Length)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_handler}{Handler}} $>$ }\\bool \mbox{\hyperlink{class_filter_key_reader_a9687b8fa261576ef894b25575766eb81}{operator()}} (\mbox{\hyperlink{classrapidjson_1_1_handler}{Handler}} \&handler)
+\item 
+const \mbox{\hyperlink{struct_parse_result}{Parse\+Result}} \& \mbox{\hyperlink{class_filter_key_reader_a3758ff0e4ecbc870564ca30ad01ddae3}{Get\+Parse\+Result}} () const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Input\+Stream$>$\newline
+class Filter\+Key\+Reader$<$ Input\+Stream $>$}
+
+
+Definition at line \mbox{\hyperlink{filterkeydom_8cpp_source_l00111}{111}} of file \mbox{\hyperlink{filterkeydom_8cpp_source}{filterkeydom.\+cpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{class_filter_key_reader_a597ab74ee51c054bc9d213b70cc06cf6}\index{FilterKeyReader$<$ InputStream $>$@{FilterKeyReader$<$ InputStream $>$}!Ch@{Ch}}
+\index{Ch@{Ch}!FilterKeyReader$<$ InputStream $>$@{FilterKeyReader$<$ InputStream $>$}}
+\doxysubsubsection{\texorpdfstring{Ch}{Ch}}
+{\footnotesize\ttfamily \label{class_filter_key_reader_a597ab74ee51c054bc9d213b70cc06cf6} 
+template$<$typename Input\+Stream $>$ \\
+char \mbox{\hyperlink{class_filter_key_reader}{Filter\+Key\+Reader}}$<$ Input\+Stream $>$\+::\+Ch}
+
+
+
+Definition at line \mbox{\hyperlink{filterkeydom_8cpp_source_l00113}{113}} of file \mbox{\hyperlink{filterkeydom_8cpp_source}{filterkeydom.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_filter_key_reader_a73560153a815e680b3a611168496802a}\index{FilterKeyReader$<$ InputStream $>$@{FilterKeyReader$<$ InputStream $>$}!FilterKeyReader@{FilterKeyReader}}
+\index{FilterKeyReader@{FilterKeyReader}!FilterKeyReader$<$ InputStream $>$@{FilterKeyReader$<$ InputStream $>$}}
+\doxysubsubsection{\texorpdfstring{FilterKeyReader()}{FilterKeyReader()}}
+{\footnotesize\ttfamily \label{class_filter_key_reader_a73560153a815e680b3a611168496802a} 
+template$<$typename Input\+Stream $>$ \\
+\mbox{\hyperlink{class_filter_key_reader}{Filter\+Key\+Reader}}$<$ Input\+Stream $>$\mbox{\hyperlink{class_filter_key_reader}{\+::\+Filter\+Key\+Reader}} (\begin{DoxyParamCaption}\item[{Input\+Stream \&}]{is}{, }\item[{const \mbox{\hyperlink{class_filter_key_reader_a597ab74ee51c054bc9d213b70cc06cf6}{Ch}} \texorpdfstring{$\ast$}{*}}]{key\+String}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{key\+Length}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{filterkeydom_8cpp_source_l00115}{115}} of file \mbox{\hyperlink{filterkeydom_8cpp_source}{filterkeydom.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ }
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ is\_(is),\ keyString\_(keyString),\ keyLength\_(keyLength),\ parseResult\_()}
+\DoxyCodeLine{00117\ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_filter_key_reader_a3758ff0e4ecbc870564ca30ad01ddae3}\index{FilterKeyReader$<$ InputStream $>$@{FilterKeyReader$<$ InputStream $>$}!GetParseResult@{GetParseResult}}
+\index{GetParseResult@{GetParseResult}!FilterKeyReader$<$ InputStream $>$@{FilterKeyReader$<$ InputStream $>$}}
+\doxysubsubsection{\texorpdfstring{GetParseResult()}{GetParseResult()}}
+{\footnotesize\ttfamily \label{class_filter_key_reader_a3758ff0e4ecbc870564ca30ad01ddae3} 
+template$<$typename Input\+Stream $>$ \\
+const \mbox{\hyperlink{struct_parse_result}{Parse\+Result}} \& \mbox{\hyperlink{class_filter_key_reader}{Filter\+Key\+Reader}}$<$ Input\+Stream $>$\+::\+Get\+Parse\+Result (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{filterkeydom_8cpp_source_l00128}{128}} of file \mbox{\hyperlink{filterkeydom_8cpp_source}{filterkeydom.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00128\ \{\ \textcolor{keywordflow}{return}\ parseResult\_;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=287pt]{class_filter_key_reader_a3758ff0e4ecbc870564ca30ad01ddae3_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_filter_key_reader_a9687b8fa261576ef894b25575766eb81}\index{FilterKeyReader$<$ InputStream $>$@{FilterKeyReader$<$ InputStream $>$}!operator()@{operator()}}
+\index{operator()@{operator()}!FilterKeyReader$<$ InputStream $>$@{FilterKeyReader$<$ InputStream $>$}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}}
+{\footnotesize\ttfamily \label{class_filter_key_reader_a9687b8fa261576ef894b25575766eb81} 
+template$<$typename Input\+Stream $>$ \\
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_handler}{Handler}} $>$ \\
+bool \mbox{\hyperlink{class_filter_key_reader}{Filter\+Key\+Reader}}$<$ Input\+Stream $>$\+::operator() (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classrapidjson_1_1_handler}{Handler}} \&}]{handler}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{filterkeydom_8cpp_source_l00121}{121}} of file \mbox{\hyperlink{filterkeydom_8cpp_source}{filterkeydom.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_filter_key_handler}{FilterKeyHandler<Handler>}}\ filter(handler,\ keyString\_,\ keyLength\_);}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_reader}{Reader}}\ reader;}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ parseResult\_\ =\ reader.\mbox{\hyperlink{class_generic_reader_a0c450620d14ff1824e58bb7bd9b42099}{Parse}}(is\_,\ filter);}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ parseResult\_;}
+\DoxyCodeLine{00126\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_filter_key_reader_a9687b8fa261576ef894b25575766eb81_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/example/filterkeydom/\mbox{\hyperlink{filterkeydom_8cpp}{filterkeydom.\+cpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,7 @@
+<map id="sysio::detail::asio_with_stub_log&lt; T &gt;" name="sysio::detail::asio_with_stub_log&lt; T &gt;">
+<area shape="rect" id="Node000001" title=" " alt="" coords="6,183,146,223"/>
+<area shape="rect" id="Node000002" href="$structwebsocketpp_1_1config_1_1asio.html" title="Server config with asio transport and TLS disabled." alt="" coords="5,94,147,135"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="79,150,79,182,73,182,73,150"/>
+<area shape="rect" id="Node000003" href="$structwebsocketpp_1_1config_1_1core.html" title="Server config with iostream transport." alt="" coords="5,5,147,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="79,62,79,94,73,94,73,62"/>
+</map>

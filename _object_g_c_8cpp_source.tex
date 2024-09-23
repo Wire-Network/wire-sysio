@@ -1,0 +1,133 @@
+\doxysection{Object\+GC.\+cpp}
+\hypertarget{_object_g_c_8cpp_source}{}\label{_object_g_c_8cpp_source}\index{libraries/wasm-\/jit/Source/Runtime/ObjectGC.cpp@{libraries/wasm-\/jit/Source/Runtime/ObjectGC.cpp}}
+\mbox{\hyperlink{_object_g_c_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_basic_types_8h}{Inline/BasicTypes.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_runtime_8h}{Runtime.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_runtime_private_8h}{RuntimePrivate.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_intrinsics_8h}{Intrinsics.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <set>}}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00009}00009\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_runtime}{Runtime}}}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00010}00010\ \{}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00011}00011\ \ \ \ \ \textcolor{comment}{//\ Keep\ a\ global\ list\ of\ all\ objects.}}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00012}\mbox{\hyperlink{struct_runtime_1_1_g_c_globals}{00012}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_runtime_1_1_g_c_globals}{GCGlobals}}}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00013}00013\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00014}\mbox{\hyperlink{struct_runtime_1_1_g_c_globals_a233f9a8b878fa2cbc9dfda96d5ce8f46}{00014}}\ \ \ \ \ \ \ \ \ std::set<GCObject*>\ \mbox{\hyperlink{struct_runtime_1_1_g_c_globals_a233f9a8b878fa2cbc9dfda96d5ce8f46}{allObjects}};}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00016}\mbox{\hyperlink{struct_runtime_1_1_g_c_globals_a1c033c698e1d21a0f4996b189ff891fe}{00016}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{struct_runtime_1_1_g_c_globals}{GCGlobals}}\&\ \mbox{\hyperlink{struct_runtime_1_1_g_c_globals_a1c033c698e1d21a0f4996b189ff891fe}{get}}()}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00017}00017\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00018}00018\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{struct_runtime_1_1_g_c_globals}{GCGlobals}}\ globals;}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00019}00019\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ globals;}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00020}00020\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00021}00021\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00022}00022\ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00023}00023\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_runtime_1_1_g_c_globals}{GCGlobals}}()\ \{\}}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00024}00024\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00026}\mbox{\hyperlink{struct_runtime_1_1_g_c_object_ad61fa15a80d09b18aa1e8f80b1338467}{00026}}\ \ \ \ \ \mbox{\hyperlink{struct_runtime_1_1_g_c_object_ad61fa15a80d09b18aa1e8f80b1338467}{GCObject::GCObject}}(\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908}{ObjectKind}}\ inKind):\ \mbox{\hyperlink{struct_runtime_1_1_object_instance}{ObjectInstance}}(inKind)}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00027}00027\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00028}00028\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Add\ the\ object\ to\ the\ global\ array.}}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00029}00029\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_runtime_1_1_g_c_globals_a1c033c698e1d21a0f4996b189ff891fe}{GCGlobals::get}}().\mbox{\hyperlink{struct_runtime_1_1_g_c_globals_a233f9a8b878fa2cbc9dfda96d5ce8f46}{allObjects}}.insert(\textcolor{keyword}{this});}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00030}00030\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00032}\mbox{\hyperlink{struct_runtime_1_1_g_c_object_a87fe6580879c9e158d151219dfe6999e}{00032}}\ \ \ \ \ \mbox{\hyperlink{struct_runtime_1_1_g_c_object_a87fe6580879c9e158d151219dfe6999e}{GCObject::\string~GCObject}}()}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00033}00033\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00034}00034\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Remove\ the\ object\ from\ the\ global\ array.}}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00035}00035\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_runtime_1_1_g_c_globals_a1c033c698e1d21a0f4996b189ff891fe}{GCGlobals::get}}().\mbox{\hyperlink{struct_runtime_1_1_g_c_globals_a233f9a8b878fa2cbc9dfda96d5ce8f46}{allObjects}}.erase(\textcolor{keyword}{this});}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00036}00036\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00038}\mbox{\hyperlink{namespace_runtime_a99e85ba1e74372d2f08a062072d4db26}{00038}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespace_runtime_a99e85ba1e74372d2f08a062072d4db26}{freeUnreferencedObjects}}(std::vector<ObjectInstance*>\&\&\ rootObjectReferences)}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00039}00039\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00040}00040\ \ \ \ \ \ \ \ \ std::set<ObjectInstance*>\ referencedObjects;}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00041}00041\ \ \ \ \ \ \ \ \ std::vector<ObjectInstance*>\ pendingScanObjects;}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00043}00043\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Initialize\ the\ referencedObjects\ set\ from\ the\ rootObjectReferences\ and\ intrinsic\ objects.}}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00044}00044\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\ \textcolor{keywordtype}{object}\ :\ rootObjectReferences)}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00045}00045\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00046}00046\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\textcolor{keywordtype}{object}\ \&\&\ !referencedObjects.count(\textcolor{keywordtype}{object}))}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00047}00047\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ referencedObjects.insert(\textcolor{keywordtype}{object});}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ pendingScanObjects.push\_back(\textcolor{keywordtype}{object});}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00050}00050\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00051}00051\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00052}00052\ }
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::vector<ObjectInstance*>\ intrinsicObjects\ =\ \mbox{\hyperlink{namespace_intrinsics_a0234c55bf4d16a610b8e079f71f4dbde}{Intrinsics::getAllIntrinsicObjects}}();}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00054}00054\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\ \textcolor{keywordtype}{object}\ :\ intrinsicObjects)}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00055}00055\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\textcolor{keywordtype}{object}\ \&\&\ !referencedObjects.count(\textcolor{keywordtype}{object}))}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ referencedObjects.insert(\textcolor{keywordtype}{object});}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00059}00059\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ pendingScanObjects.push\_back(\textcolor{keywordtype}{object});}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00061}00061\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00062}00062\ }
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00063}00063\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Scan\ the\ objects\ added\ to\ the\ referenced\ set\ so\ far:\ gather\ their\ child\ references\ and\ recurse.}}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00064}00064\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(pendingScanObjects.size())}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00065}00065\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00066}00066\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_runtime_1_1_object_instance}{ObjectInstance}}*\ scanObject\ =\ pendingScanObjects.back();}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00067}00067\ \ \ \ \ \ \ \ \ \ \ \ \ pendingScanObjects.pop\_back();}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Gather\ the\ child\ references\ for\ this\ object\ based\ on\ its\ kind.}}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \ \ \ std::vector<ObjectInstance*>\ childReferences;}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00071}00071\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(scanObject-\/>\mbox{\hyperlink{struct_runtime_1_1_object_instance_a0d77f442a8f7418381f356c31795d8db}{kind}})}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00073}00073\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ ObjectKind::function:}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00074}00074\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00075}00075\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_runtime_1_1_function_instance}{FunctionInstance}}*\ function\ =\ \mbox{\hyperlink{namespace_runtime_a11201ffdc21c10931405eccf4318cd08}{asFunction}}(scanObject);}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ childReferences.push\_back(function-\/>moduleInstance);}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00078}00078\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ ObjectKind::module:}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00080}00080\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00081}00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_runtime_1_1_module_instance}{ModuleInstance}}*\ moduleInstance\ =\ \mbox{\hyperlink{namespace_runtime_a8ea2f0a1be4f5cd3ecf15be8beac2d88}{asModule}}(scanObject);}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00082}00082\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ childReferences.insert(childReferences.begin(),moduleInstance-\/>\mbox{\hyperlink{struct_runtime_1_1_module_instance_a72a475ad0c17e2c9db9fa7f77beb45c0}{functionDefs}}.begin(),moduleInstance-\/>\mbox{\hyperlink{struct_runtime_1_1_module_instance_a72a475ad0c17e2c9db9fa7f77beb45c0}{functionDefs}}.end());}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00083}00083\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ childReferences.insert(childReferences.begin(),moduleInstance-\/>\mbox{\hyperlink{struct_runtime_1_1_module_instance_ad512509190e4e88f6d57fbdd72ab61d0}{functions}}.begin(),moduleInstance-\/>\mbox{\hyperlink{struct_runtime_1_1_module_instance_ad512509190e4e88f6d57fbdd72ab61d0}{functions}}.end());}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00084}00084\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ childReferences.insert(childReferences.begin(),moduleInstance-\/>\mbox{\hyperlink{struct_runtime_1_1_module_instance_ad145f5d94690827d27cf4a650f70391c}{tables}}.begin(),moduleInstance-\/>\mbox{\hyperlink{struct_runtime_1_1_module_instance_ad145f5d94690827d27cf4a650f70391c}{tables}}.end());}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00085}00085\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ childReferences.insert(childReferences.begin(),moduleInstance-\/>\mbox{\hyperlink{struct_runtime_1_1_module_instance_af3a1eaa936f73428d469498b96fd3181}{memories}}.begin(),moduleInstance-\/>\mbox{\hyperlink{struct_runtime_1_1_module_instance_af3a1eaa936f73428d469498b96fd3181}{memories}}.end());}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00086}00086\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ childReferences.insert(childReferences.begin(),moduleInstance-\/>\mbox{\hyperlink{struct_runtime_1_1_module_instance_ac750c8329d19563f2852733369cefc4c}{globals}}.begin(),moduleInstance-\/>\mbox{\hyperlink{struct_runtime_1_1_module_instance_ac750c8329d19563f2852733369cefc4c}{globals}}.end());}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00087}00087\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ childReferences.push\_back(moduleInstance-\/>\mbox{\hyperlink{struct_runtime_1_1_module_instance_a388111c993baac2ec030e41db773a8aa}{defaultMemory}});}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00088}00088\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ childReferences.push\_back(moduleInstance-\/>\mbox{\hyperlink{struct_runtime_1_1_module_instance_a4b9cbe3016774341330e36d099934dd1}{defaultTable}});}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00089}00089\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00090}00090\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00091}00091\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ ObjectKind::table:}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00092}00092\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00093}00093\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_runtime_1_1_table_instance}{TableInstance}}*\ table\ =\ \mbox{\hyperlink{namespace_runtime_aa13468c3f88bf92243a8c6666df4b83f}{asTable}}(scanObject);}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00094}00094\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ childReferences.insert(childReferences.end(),table-\/>elements.begin(),table-\/>elements.end());}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00095}00095\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00096}00096\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00097}00097\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ ObjectKind::memory:}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00098}00098\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ ObjectKind::global:\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00099}00099\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:\ \mbox{\hyperlink{namespace_errors_a6959930ad6159fe3eb2e04ebf87c1b84}{Errors::unreachable}}();}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00100}00100\ \ \ \ \ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00101}00101\ }
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00102}00102\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Add\ the\ object's\ child\ references\ to\ the\ referenced\ set,\ and\ enqueue\ them\ for\ scanning.}}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00103}00103\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\ reference\ :\ childReferences)}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00104}00104\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00105}00105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(reference\ \&\&\ !referencedObjects.count(reference))}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00106}00106\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00107}00107\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ referencedObjects.insert(reference);}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00108}00108\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ pendingScanObjects.push\_back(reference);}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00109}00109\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00110}00110\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00111}00111\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00112}00112\ }
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00113}00113\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Iterate\ over\ all\ objects,\ and\ delete\ objects\ that\ weren't\ referenced\ directly\ or\ indirectly\ by\ the\ root\ set.}}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00114}00114\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_runtime_1_1_g_c_globals}{GCGlobals}}\&\ gcGlobals\ =\ \mbox{\hyperlink{struct_runtime_1_1_g_c_globals_a1c033c698e1d21a0f4996b189ff891fe}{GCGlobals::get}}();}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00115}00115\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ objectIt\ =\ gcGlobals.\mbox{\hyperlink{struct_runtime_1_1_g_c_globals_a233f9a8b878fa2cbc9dfda96d5ce8f46}{allObjects}}.begin();}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00116}00116\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(objectIt\ !=\ gcGlobals.\mbox{\hyperlink{struct_runtime_1_1_g_c_globals_a233f9a8b878fa2cbc9dfda96d5ce8f46}{allObjects}}.end())}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00117}00117\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00118}00118\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(referencedObjects.count(*objectIt))\ \{\ ++objectIt;\ \}}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00119}00119\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00120}00120\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00121}00121\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_runtime_1_1_object_instance}{ObjectInstance}}*\ \textcolor{keywordtype}{object}\ =\ *objectIt;}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00122}00122\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ objectIt\ =\ gcGlobals.\mbox{\hyperlink{struct_runtime_1_1_g_c_globals_a233f9a8b878fa2cbc9dfda96d5ce8f46}{allObjects}}.erase(objectIt);}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00123}00123\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{delete}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}};}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00124}00124\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00125}00125\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00126}00126\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_object_g_c_8cpp_source_l00127}00127\ \}}
+
+\end{DoxyCode}

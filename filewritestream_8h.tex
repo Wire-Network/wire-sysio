@@ -1,0 +1,56 @@
+\doxysection{libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/filewritestream.h File Reference}
+\hypertarget{filewritestream_8h}{}\label{filewritestream_8h}\index{libraries/fc/include/fc/crypto/webauthn\_json/include/rapidjson/filewritestream.h@{libraries/fc/include/fc/crypto/webauthn\_json/include/rapidjson/filewritestream.h}}
+{\ttfamily \#include "{}stream.\+h"{}}\newline
+{\ttfamily \#include $<$cstdio$>$}\newline
+Include dependency graph for filewritestream.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=282pt]{filewritestream_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{filewritestream_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{class_file_write_stream}{File\+Write\+Stream}}
+\begin{DoxyCompactList}\small\item\em Wrapper of C file stream for output using fwrite(). \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+template$<$$>$ void \mbox{\hyperlink{filewritestream_8h_a5c9b0f0e6249be2acf7f3505c295c132}{PutN}} (\mbox{\hyperlink{class_file_write_stream}{File\+Write\+Stream}} \&stream, char c, size\+\_\+t n)
+\begin{DoxyCompactList}\small\item\em Implement specialized version of \doxylink{filewritestream_8h_a5c9b0f0e6249be2acf7f3505c295c132}{Put\+N()} with \doxylink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset()} for better performance. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{filewritestream_8h_a5c9b0f0e6249be2acf7f3505c295c132}\index{filewritestream.h@{filewritestream.h}!PutN@{PutN}}
+\index{PutN@{PutN}!filewritestream.h@{filewritestream.h}}
+\doxysubsubsection{\texorpdfstring{PutN()}{PutN()}}
+{\footnotesize\ttfamily \label{filewritestream_8h_a5c9b0f0e6249be2acf7f3505c295c132} 
+template$<$$>$ \\
+void PutN (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_file_write_stream}{File\+Write\+Stream}} \&}]{stream}{, }\item[{char}]{c}{, }\item[{size\+\_\+t}]{n}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{filewritestream_8h_source_l00094}{94}} of file \mbox{\hyperlink{filewritestream_8h_source}{filewritestream.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00095\ \ \ \ \ stream.PutN(c,\ n);}
+\DoxyCodeLine{00096\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{filewritestream_8h_a5c9b0f0e6249be2acf7f3505c295c132_icgraph}
+\end{center}
+\end{figure}

@@ -1,0 +1,86 @@
+\doxysection{name\+\_\+bidding.\+cpp}
+\hypertarget{name__bidding_8cpp_source}{}\label{name__bidding_8cpp_source}\index{/Users/svetlasyrimis/Desktop/wire-\/network/WN-\/org/wire-\/system-\/contracts/contracts/sysio.system/src/name\_bidding.cpp@{/Users/svetlasyrimis/Desktop/wire-\/network/WN-\/org/wire-\/system-\/contracts/contracts/sysio.system/src/name\_bidding.cpp}}
+\mbox{\hyperlink{name__bidding_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{sysio_8system_8hpp}{sysio.system/sysio.system.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{sysio_8token_8hpp}{sysio.token/sysio.token.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <sysio/transaction.hpp>}}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00006}00006\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysiosystem}{sysiosystem}}\ \{}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00008}00008\ \ \ \ \textcolor{keyword}{using\ }sysio::current\_time\_point;}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00009}00009\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1token}{sysio::token}};}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00011}\mbox{\hyperlink{classsysiosystem_1_1system__contract_aba0e3afc59fa11936d95f47be61a41df}{00011}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_aba0e3afc59fa11936d95f47be61a41df}{system\_contract::bidname}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\&\ bidder,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\&\ newname,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\&\ bid\ )\ \{}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00012}00012\ \ \ \ \ \ \ require\_auth(\ bidder\ );}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00013}00013\ \ \ \ \ \ \ check(\ newname.suffix()\ ==\ newname,\ \textcolor{stringliteral}{"{}you\ can\ only\ bid\ on\ top-\/level\ suffix"{}}\ );}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00015}00015\ \ \ \ \ \ \ check(\ (\textcolor{keywordtype}{bool})newname,\ \textcolor{stringliteral}{"{}the\ empty\ name\ is\ not\ a\ valid\ account\ name\ to\ bid\ on"{}}\ );}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00016}00016\ \ \ \ \ \ \ check(\ (newname.value\ \&\ 0xFull)\ ==\ 0,\ \textcolor{stringliteral}{"{}13\ character\ names\ are\ not\ valid\ account\ names\ to\ bid\ on"{}}\ );}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00017}00017\ \ \ \ \ \ \ check(\ (newname.value\ \&\ 0x1F0ull)\ ==\ 0,\ \textcolor{stringliteral}{"{}accounts\ with\ 12\ character\ names\ and\ no\ dots\ can\ be\ created\ without\ bidding\ required"{}}\ );}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00018}00018\ \ \ \ \ \ \ check(\ !is\_account(\ newname\ ),\ \textcolor{stringliteral}{"{}account\ already\ exists"{}}\ );}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00019}00019\ \ \ \ \ \ \ check(\ bid.symbol\ ==\ core\_symbol(),\ \textcolor{stringliteral}{"{}asset\ must\ be\ system\ token"{}}\ );}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00020}00020\ \ \ \ \ \ \ check(\ bid.amount\ >\ 0,\ \textcolor{stringliteral}{"{}insufficient\ bid"{}}\ );}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00021}00021\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1token_a104313ae127b80733cf26925f5246379}{token::transfer\_action}}\ transfer\_act\{\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_a52f7532857765f2a19f0b55e9b8c29ea}{token\_account}},\ \{\ \{bidder,\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_a73d78c07b50de02a172c31966637041e}{active\_permission}}\}\ \}\ \};}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00022}00022\ \ \ \ \ \ \ transfer\_act.send(\ bidder,\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_a7bf7d3a36a51da1cb3d26935d11306ba}{names\_account}},\ bid,\ std::string(\textcolor{stringliteral}{"{}bid\ name\ "{}})+\ newname.\mbox{\hyperlink{structsysio_1_1chain_1_1name_ad1e96c77890d21207fc5cda532244019}{to\_string}}()\ );}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00023}00023\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysiosystem_a3e1fecc8ab83c8e8f634cbdc1073e484}{name\_bid\_table}}\ bids(get\_self(),\ get\_self().\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}});}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00024}00024\ \ \ \ \ \ \ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\{bidder\},\ \textcolor{stringliteral}{"{}\ bid\ "{}},\ bid,\ \textcolor{stringliteral}{"{}\ on\ "{}},\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\{newname\},\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}\ );}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00025}00025\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ current\ =\ bids.find(\ newname.value\ );}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00026}00026\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ current\ ==\ bids.end()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00027}00027\ \ \ \ \ \ \ \ \ \ bids.emplace(\ bidder,\ [\&](\ \textcolor{keyword}{auto}\&\ b\ )\ \{}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00028}00028\ \ \ \ \ \ \ \ \ \ \ \ \ b.newname\ =\ newname;}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00029}00029\ \ \ \ \ \ \ \ \ \ \ \ \ b.high\_bidder\ =\ bidder;}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00030}00030\ \ \ \ \ \ \ \ \ \ \ \ \ b.high\_bid\ =\ bid.amount;}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00031}00031\ \ \ \ \ \ \ \ \ \ \ \ \ b.last\_bid\_time\ =\ current\_time\_point();}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00032}00032\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00033}00033\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00034}00034\ \ \ \ \ \ \ \ \ \ check(\ current-\/>high\_bid\ >\ 0,\ \textcolor{stringliteral}{"{}this\ auction\ has\ already\ closed"{}}\ );}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00035}00035\ \ \ \ \ \ \ \ \ \ check(\ bid.amount\ -\/\ current-\/>high\_bid\ >\ (current-\/>high\_bid\ /\ 10),\ \textcolor{stringliteral}{"{}must\ increase\ bid\ by\ 10\%"{}}\ );}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00036}00036\ \ \ \ \ \ \ \ \ \ check(\ current-\/>high\_bidder\ !=\ bidder,\ \textcolor{stringliteral}{"{}account\ is\ already\ highest\ bidder"{}}\ );}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00038}00038\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysiosystem_ade3fba06d389843fb55ca3c42f86e327}{bid\_refund\_table}}\ \mbox{\hyperlink{namespacesysiosystem_a26c6e658ca5a182ea69d27bab1cc74a4}{refunds\_table}}(get\_self(),\ newname.value);}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00040}00040\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ it\ =\ \mbox{\hyperlink{namespacesysiosystem_a26c6e658ca5a182ea69d27bab1cc74a4}{refunds\_table}}.find(\ current-\/>high\_bidder.value\ );}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00041}00041\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ it\ !=\ \mbox{\hyperlink{namespacesysiosystem_a26c6e658ca5a182ea69d27bab1cc74a4}{refunds\_table}}.end()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00042}00042\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysiosystem_a26c6e658ca5a182ea69d27bab1cc74a4}{refunds\_table}}.modify(\ it,\ same\_payer,\ [\&](\textcolor{keyword}{auto}\&\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}})\ \{}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00043}00043\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.amount\ +=\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}(\ current-\/>high\_bid,\ core\_symbol()\ );}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00044}00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00045}00045\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00046}00046\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysiosystem_a26c6e658ca5a182ea69d27bab1cc74a4}{refunds\_table}}.emplace(\ bidder,\ [\&](\textcolor{keyword}{auto}\&\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}})\ \{}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00047}00047\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.bidder\ =\ current-\/>high\_bidder;}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.amount\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}(\ current-\/>high\_bid,\ core\_symbol()\ );}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00050}00050\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1transaction}{sysio::transaction}}\ t;}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \ t.\mbox{\hyperlink{structsysio_1_1chain_1_1transaction_a407fcf1868b81bb30b85f80d388bbac2}{actions}}.emplace\_back(\ \mbox{\hyperlink{structsysio_1_1chain_1_1permission__level}{permission\_level}}\{current-\/>high\_bidder,\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_a73d78c07b50de02a172c31966637041e}{active\_permission}}\},}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ get\_self(),\ \textcolor{stringliteral}{"{}bidrefund"{}}\_n,}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::make\_tuple(\ current-\/>high\_bidder,\ newname\ )}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00056}00056\ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00057}00057\ \ \ \ \ \ \ \ \ \ t.\mbox{\hyperlink{structsysio_1_1chain_1_1transaction__header_a349b11695387e3dbe91f918ee759d4b4}{delay\_sec}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00058}00058\ \ \ \ \ \ \ \ \ \ uint128\_t\ deferred\_id\ =\ (uint128\_t(newname.value)\ <<\ 64)\ |\ current-\/>high\_bidder.value;}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00059}00059\ \ \ \ \ \ \ \ \ \ sysio::cancel\_deferred(\ deferred\_id\ );}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00060}00060\ \ \ \ \ \ \ \ \ \ t.send(\ deferred\_id,\ bidder\ );}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00062}00062\ \ \ \ \ \ \ \ \ \ bids.modify(\ current,\ bidder,\ [\&](\ \textcolor{keyword}{auto}\&\ b\ )\ \{}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \ \ \ b.high\_bidder\ =\ bidder;}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00064}00064\ \ \ \ \ \ \ \ \ \ \ \ \ b.high\_bid\ =\ bid.amount;}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00065}00065\ \ \ \ \ \ \ \ \ \ \ \ \ b.last\_bid\_time\ =\ current\_time\_point();}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00066}00066\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00067}00067\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00068}00068\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00069}00069\ }
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00070}\mbox{\hyperlink{classsysiosystem_1_1system__contract_a42c8939e14ec6a782b3c000d64c8e1e1}{00070}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_a42c8939e14ec6a782b3c000d64c8e1e1}{system\_contract::bidrefund}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\&\ bidder,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\&\ newname\ )\ \{}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00071}00071\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysiosystem_ade3fba06d389843fb55ca3c42f86e327}{bid\_refund\_table}}\ \mbox{\hyperlink{namespacesysiosystem_a26c6e658ca5a182ea69d27bab1cc74a4}{refunds\_table}}(get\_self(),\ newname.value);}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00072}00072\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ it\ =\ \mbox{\hyperlink{namespacesysiosystem_a26c6e658ca5a182ea69d27bab1cc74a4}{refunds\_table}}.find(\ bidder.value\ );}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00073}00073\ \ \ \ \ \ \ check(\ it\ !=\ \mbox{\hyperlink{namespacesysiosystem_a26c6e658ca5a182ea69d27bab1cc74a4}{refunds\_table}}.end(),\ \textcolor{stringliteral}{"{}refund\ not\ found"{}}\ );}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00074}00074\ }
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00075}00075\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1token_a104313ae127b80733cf26925f5246379}{token::transfer\_action}}\ transfer\_act\{\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_a52f7532857765f2a19f0b55e9b8c29ea}{token\_account}},\ \{\ \{\mbox{\hyperlink{classsysiosystem_1_1system__contract_a7bf7d3a36a51da1cb3d26935d11306ba}{names\_account}},\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_a73d78c07b50de02a172c31966637041e}{active\_permission}}\},\ \{bidder,\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_a73d78c07b50de02a172c31966637041e}{active\_permission}}\}\ \}\ \};}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00076}00076\ \ \ \ \ \ \ transfer\_act.send(\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_a7bf7d3a36a51da1cb3d26935d11306ba}{names\_account}},\ bidder,\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}(it-\/>amount),\ std::string(\textcolor{stringliteral}{"{}refund\ bid\ on\ name\ "{}})+(\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\{newname\}).\mbox{\hyperlink{structsysio_1_1chain_1_1asset_a48c40a7e8e433a43b7af638d10a8debb}{to\_string}}()\ );}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00077}00077\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysiosystem_a26c6e658ca5a182ea69d27bab1cc74a4}{refunds\_table}}.erase(\ it\ );}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00078}00078\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{name__bidding_8cpp_source_l00080}00080\ \}}
+
+\end{DoxyCode}

@@ -1,0 +1,51 @@
+\doxysection{sysio\+::chain\+::wasm\+\_\+validations\+::data\+\_\+segments\+\_\+validation\+\_\+visitor Struct Reference}
+\hypertarget{structsysio_1_1chain_1_1wasm__validations_1_1data__segments__validation__visitor}{}\label{structsysio_1_1chain_1_1wasm__validations_1_1data__segments__validation__visitor}\index{sysio::chain::wasm\_validations::data\_segments\_validation\_visitor@{sysio::chain::wasm\_validations::data\_segments\_validation\_visitor}}
+
+
+{\ttfamily \#include $<$wasm\+\_\+sysio\+\_\+validation.\+hpp$>$}
+
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static void \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__validations_1_1data__segments__validation__visitor_a77335c61bea1ba5f6362a9af4b98efcc}{validate}} (const \mbox{\hyperlink{struct_i_r_1_1_module}{IR\+::\+Module}} \&m)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__validation_8hpp_source_l00026}{26}} of file \mbox{\hyperlink{wasm__sysio__validation_8hpp_source}{wasm\+\_\+sysio\+\_\+validation.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1chain_1_1wasm__validations_1_1data__segments__validation__visitor_a77335c61bea1ba5f6362a9af4b98efcc}\index{sysio::chain::wasm\_validations::data\_segments\_validation\_visitor@{sysio::chain::wasm\_validations::data\_segments\_validation\_visitor}!validate@{validate}}
+\index{validate@{validate}!sysio::chain::wasm\_validations::data\_segments\_validation\_visitor@{sysio::chain::wasm\_validations::data\_segments\_validation\_visitor}}
+\doxysubsubsection{\texorpdfstring{validate()}{validate()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__validations_1_1data__segments__validation__visitor_a77335c61bea1ba5f6362a9af4b98efcc} 
+void sysio\+::chain\+::wasm\+\_\+validations\+::data\+\_\+segments\+\_\+validation\+\_\+visitor\+::validate (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct_i_r_1_1_module}{IR\+::\+Module}} \&}]{m}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__validation_8cpp_source_l00023}{23}} of file \mbox{\hyperlink{wasm__sysio__validation_8cpp_source}{wasm\+\_\+sysio\+\_\+validation.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00024\ \ \ \ \textcolor{keywordflow}{for}\ (\ \textcolor{keyword}{const}\ DataSegment\&\ ds\ :\ m.\mbox{\hyperlink{struct_i_r_1_1_module_af7d4ea2e86159b15bbe1a3c5ea57c69e}{dataSegments}}\ )\ \{}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ \mbox{\hyperlink{namespace_xbyak_1_1util_a4b2aef26182d21706896022467868f7c}{ds}}.baseOffset.type\ !=\ InitializerExpression::Type::i32\_const\ )}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ wasm\_execution\_error,\ \textcolor{stringliteral}{"{}Smart\ contract\ has\ unexpected\ memory\ base\ offset\ type"{}}\ );}
+\DoxyCodeLine{00027\ }
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\textcolor{keyword}{>}(\ \mbox{\hyperlink{namespace_xbyak_1_1util_a4b2aef26182d21706896022467868f7c}{ds}}.baseOffset.i32\ )\ +\ \mbox{\hyperlink{namespace_xbyak_1_1util_a4b2aef26182d21706896022467868f7c}{ds}}.data.size()\ >\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__constraints_ad2f8a06fd9d6bbb29340f7b72d4190d7}{wasm\_constraints::maximum\_linear\_memory\_init}}\ )}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(wasm\_execution\_error,\ \textcolor{stringliteral}{"{}Smart\ contract\ data\ segments\ must\ lie\ in\ first\ \$\{k\}KiB"{}},\ }
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}k"{}},\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__constraints_ad2f8a06fd9d6bbb29340f7b72d4190d7}{wasm\_constraints::maximum\_linear\_memory\_init}}/1024));}
+\DoxyCodeLine{00031\ \ \ \ \}}
+\DoxyCodeLine{00032\ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{wasm__sysio__validation_8hpp}{wasm\+\_\+sysio\+\_\+validation.\+hpp}}\item 
+libraries/chain/\mbox{\hyperlink{wasm__sysio__validation_8cpp}{wasm\+\_\+sysio\+\_\+validation.\+cpp}}\end{DoxyCompactItemize}

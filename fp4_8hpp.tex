@@ -1,0 +1,63 @@
+\doxysection{libraries/fc/libraries/ff/libff/algebra/fields/fp4.hpp File Reference}
+\hypertarget{fp4_8hpp}{}\label{fp4_8hpp}\index{libraries/fc/libraries/ff/libff/algebra/fields/fp4.hpp@{libraries/fc/libraries/ff/libff/algebra/fields/fp4.hpp}}
+{\ttfamily \#include $<$libff/algebra/fields/fp.\+hpp$>$}\newline
+{\ttfamily \#include $<$libff/algebra/fields/fp2.\+hpp$>$}\newline
+{\ttfamily \#include $<$libff/algebra/fields/fp4.\+tcc$>$}\newline
+Include dependency graph for fp4.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{fp4_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{fp4_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classlibff_1_1_fp4__model}{libff\+::\+Fp4\+\_\+model$<$ n, modulus $>$}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacelibff}{libff}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ }\\std\+::ostream \& \mbox{\hyperlink{namespacelibff_ae177f3241c0c23f8b0a570ea9fdb460d}{libff\+::operator$<$$<$}} (std\+::ostream \&, const \mbox{\hyperlink{classlibff_1_1_fp4__model}{Fp4\+\_\+model}}$<$ n, modulus $>$ \&)
+\item 
+{\footnotesize template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ }\\std\+::istream \& \mbox{\hyperlink{namespacelibff_ab4e6305f2fda90b39e8f3528da36ad9c}{libff\+::operator$>$$>$}} (std\+::istream \&in, \mbox{\hyperlink{classlibff_1_1_fp4__model}{Fp4\+\_\+model}}$<$ n, modulus $>$ \&el)
+\item 
+{\footnotesize template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ }\\\mbox{\hyperlink{classlibff_1_1_fp4__model}{Fp4\+\_\+model}}$<$ n, modulus $>$ \mbox{\hyperlink{namespacelibff_a3850bc9835e205e00ebb8425daa8fdb1}{libff\+::operator\texorpdfstring{$\ast$}{*}}} (const \mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}}$<$ n, modulus $>$ \&lhs, const \mbox{\hyperlink{classlibff_1_1_fp4__model}{Fp4\+\_\+model}}$<$ n, modulus $>$ \&rhs)
+\item 
+{\footnotesize template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ }\\\mbox{\hyperlink{classlibff_1_1_fp4__model}{Fp4\+\_\+model}}$<$ n, modulus $>$ \mbox{\hyperlink{namespacelibff_a8083d7cb8a0b92e96eddc3aeef5a831f}{libff\+::operator\texorpdfstring{$\ast$}{*}}} (const \mbox{\hyperlink{classlibff_1_1_fp2__model}{Fp2\+\_\+model}}$<$ n, modulus $>$ \&lhs, const \mbox{\hyperlink{classlibff_1_1_fp4__model}{Fp4\+\_\+model}}$<$ n, modulus $>$ \&rhs)
+\item 
+{\footnotesize template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus, mp\+\_\+size\+\_\+t m$>$ }\\\mbox{\hyperlink{classlibff_1_1_fp4__model}{Fp4\+\_\+model}}$<$ n, modulus $>$ \mbox{\hyperlink{namespacelibff_a52369ea35cb6e7f47ed5bdc56d05dbf4}{libff\+::operator\texorpdfstring{$^\wedge$}{\string^}}} (const \mbox{\hyperlink{classlibff_1_1_fp4__model}{Fp4\+\_\+model}}$<$ n, modulus $>$ \&self, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ m $>$ \&exponent)
+\item 
+{\footnotesize template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus, mp\+\_\+size\+\_\+t m, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ m $>$ \& modulus\+\_\+p$>$ }\\\mbox{\hyperlink{classlibff_1_1_fp4__model}{Fp4\+\_\+model}}$<$ n, modulus $>$ \mbox{\hyperlink{namespacelibff_ab79d15bf6a39f1a81060cfe2268bc4a6}{libff\+::operator\texorpdfstring{$^\wedge$}{\string^}}} (const \mbox{\hyperlink{classlibff_1_1_fp4__model}{Fp4\+\_\+model}}$<$ n, modulus $>$ \&self, const \mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}}$<$ m, modulus\+\_\+p $>$ \&exponent)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Declaration of interfaces for the (extension) field Fp4.
+
+The field Fp4 equals \doxylink{class_fp2}{Fp2}\mbox{[}\doxylink{struct_v}{V}\mbox{]}/(V\texorpdfstring{$^\wedge$}{\string^}2-\/U) where \doxylink{class_fp2}{Fp2} = \doxylink{class_fp}{Fp}\mbox{[}\doxylink{union_u}{U}\mbox{]}/(U\texorpdfstring{$^\wedge$}{\string^}2-\/non\+\_\+residue) and non\+\_\+residue is in \doxylink{class_fp}{Fp}.
+
+ASSUMPTION\+: the modulus p is 1 mod 6.
+
+\begin{DoxyAuthor}{Author}
+This file is part of libff, developed by SCIPR Lab and contributors (see AUTHORS). 
+\end{DoxyAuthor}
+\begin{DoxyCopyright}{Copyright}
+MIT license (see LICENSE file) 
+\end{DoxyCopyright}
+
+
+Definition in file \mbox{\hyperlink{fp4_8hpp_source}{fp4.\+hpp}}.
+

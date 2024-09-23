@@ -1,0 +1,115 @@
+\doxysection{main.\+cpp}
+\hypertarget{programs_2kiod_2main_8cpp_source}{}\label{programs_2kiod_2main_8cpp_source}\index{programs/kiod/main.cpp@{programs/kiod/main.cpp}}
+\mbox{\hyperlink{programs_2kiod_2main_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{application_8hpp}{appbase/application.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{http__plugin_8hpp}{sysio/http\_plugin/http\_plugin.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{wallet__plugin_8hpp}{sysio/wallet\_plugin/wallet\_plugin.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{wallet__api__plugin_8hpp}{sysio/wallet\_api\_plugin/wallet\_api\_plugin.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{version_2include_2sysio_2version_2version_8hpp}{sysio/version/version.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{logger__config_8hpp}{fc/log/logger\_config.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{exception_8hpp}{fc/exception/exception.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00011}00011\ \textcolor{preprocessor}{\#include\ <boost/exception/diagnostic\_information.hpp>}}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00013}00013\ \textcolor{preprocessor}{\#include\ <pwd.h>}}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00014}00014\ \textcolor{preprocessor}{\#include\ "{}config.hpp"{}}}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00016}00016\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespaceappbase}{appbase}};}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00017}00017\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}};}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00019}\mbox{\hyperlink{programs_2kiod_2main_8cpp_a266ad541c0def0058f9607100f6da74a}{00019}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefc_ad64fa786e47f4f646fb607f1a039c680}{configure\_logging}}(\textcolor{keyword}{const}\ bfs::path\&\ config\_path)\ \{}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00020}00020\ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00021}00021\ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00022}00022\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_ad64fa786e47f4f646fb607f1a039c680}{fc::configure\_logging}}(config\_path);}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00023}00023\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00024}00024\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}}(\textcolor{stringliteral}{"{}Error\ reloading\ logging.json"{}});}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00025}00025\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw};}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00026}00026\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00027}00027\ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1exception}{fc::exception}}\&\ e)\ \{\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00028}00028\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}}(\textcolor{stringliteral}{"{}\$\{e\}"{}},\ (\textcolor{stringliteral}{"{}e"{}},\ e.\mbox{\hyperlink{classfc_1_1exception_a7611ea8fbe25dde56649b685c2298a37}{to\_detail\_string}}()));}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00029}00029\ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\textcolor{keyword}{const}\ boost::exception\&\ e)\ \{}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00030}00030\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}}(\textcolor{stringliteral}{"{}\$\{e\}"{}},\ (\textcolor{stringliteral}{"{}e"{}},\ boost::diagnostic\_information(e)));}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00031}00031\ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\textcolor{keyword}{const}\ std::exception\&\ e)\ \{\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00032}00032\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}}(\textcolor{stringliteral}{"{}\$\{e\}"{}},\ (\textcolor{stringliteral}{"{}e"{}},\ e.\mbox{\hyperlink{classfc_1_1exception_ab1104818bf0d9b6a29f0dfe036cf97f6}{what}}()));}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00033}00033\ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00034}00034\ \ \ \ \ \ \ \textcolor{comment}{//\ empty}}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00035}00035\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00036}00036\ \}}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00038}\mbox{\hyperlink{programs_2kiod_2main_8cpp_abaf0af9c61c10d5ecdc00eb4fdb87917}{00038}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{programs_2kiod_2main_8cpp_abaf0af9c61c10d5ecdc00eb4fdb87917}{logging\_conf\_handler}}()\ \{}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00039}00039\ \ \ \ \textcolor{keyword}{auto}\ config\_path\ =\ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_a9abb5f5858e4dc6ba3ba45071ffdaed5}{get\_logging\_conf}}();}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00040}00040\ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacefc_a3fcf0d920aea28014aacae50a51d8485}{fc::exists}}(config\_path))\ \{}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00041}00041\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\textcolor{stringliteral}{"{}Received\ HUP.\ \ Reloading\ logging\ configuration\ from\ \$\{p\}."{}},\ (\textcolor{stringliteral}{"{}p"{}},\ config\_path.string()));}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00042}00042\ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00043}00043\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\textcolor{stringliteral}{"{}Received\ HUP.\ \ No\ log\ config\ found\ at\ \$\{p\},\ setting\ to\ default."{}},\ (\textcolor{stringliteral}{"{}p"{}},\ config\_path.string()));}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00044}00044\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00045}00045\ \ \ \ \mbox{\hyperlink{namespacefc_ad64fa786e47f4f646fb607f1a039c680}{configure\_logging}}(config\_path);}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00046}00046\ \ \ \ \mbox{\hyperlink{structfc_1_1log__config_a471dafd77fe6c2f69b04d51aba09f1b3}{fc::log\_config::initialize\_appenders}}(\mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().get\_io\_service());}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00047}00047\ \}}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00049}\mbox{\hyperlink{programs_2kiod_2main_8cpp_a73166cb9cb44aa126b3a0db898360fb1}{00049}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{programs_2kiod_2main_8cpp_a73166cb9cb44aa126b3a0db898360fb1}{initialize\_logging}}()\ \{}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00050}00050\ \ \ \ \textcolor{keyword}{auto}\ config\_path\ =\ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_a9abb5f5858e4dc6ba3ba45071ffdaed5}{get\_logging\_conf}}();}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00051}00051\ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacefc_a3fcf0d920aea28014aacae50a51d8485}{fc::exists}}(config\_path))}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00052}00052\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_ad64fa786e47f4f646fb607f1a039c680}{fc::configure\_logging}}(config\_path);\ \textcolor{comment}{//\ intentionally\ allowing\ exceptions\ to\ escape}}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00053}00053\ \ \ \ \mbox{\hyperlink{structfc_1_1log__config_a471dafd77fe6c2f69b04d51aba09f1b3}{fc::log\_config::initialize\_appenders}}(\mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().get\_io\_service());}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00054}00054\ }
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00055}00055\ \ \ \ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_a741b1b2adb2974b9cf72f1fa129b1adf}{set\_sighup\_callback}}(\mbox{\hyperlink{programs_2kiod_2main_8cpp_abaf0af9c61c10d5ecdc00eb4fdb87917}{logging\_conf\_handler}});}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00056}00056\ \}}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00059}\mbox{\hyperlink{programs_2kiod_2main_8cpp_aedfd5e3e8ebc409a4747ab6ff83eef2c}{00059}}\ bfs::path\ \mbox{\hyperlink{programs_2kiod_2main_8cpp_aedfd5e3e8ebc409a4747ab6ff83eef2c}{determine\_home\_directory}}()}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00060}00060\ \{}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00061}00061\ \ \ \ bfs::path\ home;}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00062}00062\ \ \ \ \textcolor{keyword}{struct\ }passwd*\ pwd\ =\ getpwuid(getuid());}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00063}00063\ \ \ \ \textcolor{keywordflow}{if}(pwd)\ \{}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00064}00064\ \ \ \ \ \ \ home\ =\ pwd-\/>pw\_dir;}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00065}00065\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00066}00066\ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00067}00067\ \ \ \ \ \ \ home\ =\ getenv(\textcolor{stringliteral}{"{}HOME"{}});}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00068}00068\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00069}00069\ \ \ \ \textcolor{keywordflow}{if}(home.empty())}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00070}00070\ \ \ \ \ \ \ home\ =\ \textcolor{stringliteral}{"{}./"{}};}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00071}00071\ \ \ \ \textcolor{keywordflow}{return}\ home;}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00072}00072\ \}}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00073}00073\ }
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00074}\mbox{\hyperlink{programs_2kiod_2main_8cpp_a3c04138a5bfe5d72780bb7e82a18e627}{00074}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}(\textcolor{keywordtype}{int}\ argc,\ \textcolor{keywordtype}{char}**\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}})}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00075}00075\ \{}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00076}00076\ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00077}00077\ \ \ \ \ \ \ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_a1d2a9932724a536b94eb3d5cff815ffc}{set\_version\_string}}(\mbox{\hyperlink{namespacesysio_1_1version_a0eb84a32a53aa306749bc5b7db097f62}{sysio::version::version\_client}}());}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00078}00078\ \ \ \ \ \ \ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_ae894f512cb24cba9b754cf984dceaa84}{set\_full\_version\_string}}(\mbox{\hyperlink{namespacesysio_1_1version_a34aecb5a2d640b3dac7236df81787ce8}{sysio::version::version\_full}}());}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00079}00079\ \ \ \ \ \ \ bfs::path\ home\ =\ \mbox{\hyperlink{programs_2kiod_2main_8cpp_aedfd5e3e8ebc409a4747ab6ff83eef2c}{determine\_home\_directory}}();}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00080}00080\ \ \ \ \ \ \ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_af81fa07af200b5b24049ed5d197a864f}{set\_default\_data\_dir}}(home\ /\ \textcolor{stringliteral}{"{}sysio-\/wallet"{}});}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00081}00081\ \ \ \ \ \ \ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_a49901c76b365337c933e6485649a50b6}{set\_default\_config\_dir}}(home\ /\ \textcolor{stringliteral}{"{}sysio-\/wallet"{}});}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00082}00082\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1http__plugin_aaf46561ac841485d6bf25266b4aa9b5a}{http\_plugin::set\_defaults}}(\{}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00083}00083\ \ \ \ \ \ \ \ \ \ .default\_unix\_socket\_path\ =\ kiod::config::key\_store\_executable\_name\ +\ \textcolor{stringliteral}{"{}.sock"{}},}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00084}00084\ \ \ \ \ \ \ \ \ \ .default\_http\_port\ =\ 0}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00085}00085\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00086}00086\ \ \ \ \ \ \ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_a87e84549150056c56c0327cc4976cc2a}{register\_plugin}}<\mbox{\hyperlink{classsysio_1_1wallet__api__plugin}{wallet\_api\_plugin}}>();}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00087}00087\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!\mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().initialize<wallet\_plugin,\ wallet\_api\_plugin,\ http\_plugin>(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}))\ \{}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00088}00088\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ \&opts\ =\ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_a1cd05ae43f6400f07f9c60a09cc610cb}{get\_options}}();}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00089}00089\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (opts.count(\textcolor{stringliteral}{"{}help"{}})\ ||\ opts.count(\textcolor{stringliteral}{"{}version"{}})\ ||\ opts.count(\textcolor{stringliteral}{"{}full-\/version"{}})\ ||}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00090}00090\ \ \ \ \ \ \ \ \ \ \ \ \ \ opts.count(\textcolor{stringliteral}{"{}print-\/default-\/config"{}}))\ \{}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00091}00091\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00092}00092\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00093}00093\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00094}00094\ \ \ \ \ \ \ \mbox{\hyperlink{programs_2kiod_2main_8cpp_a73166cb9cb44aa126b3a0db898360fb1}{initialize\_logging}}();}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00095}00095\ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ http\ =\ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_a3c4b68a0667942b58f1369f454ce0ce3}{get\_plugin}}<\mbox{\hyperlink{classsysio_1_1http__plugin}{http\_plugin}}>();}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00096}00096\ \ \ \ \ \ \ http.\mbox{\hyperlink{classsysio_1_1http__plugin_a0bb9bb7e3217b57524b8a556ec946a6e}{add\_handler}}(\textcolor{stringliteral}{"{}/v1/"{}}\ +\ kiod::config::key\_store\_executable\_name\ +\ \textcolor{stringliteral}{"{}/stop"{}},\ [\&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}=\mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}()](\textcolor{keywordtype}{string},\ \textcolor{keywordtype}{string},\ \mbox{\hyperlink{namespacesysio_ababf376b47a253805b530a023df4768c}{url\_response\_callback}}\ cb)\ \{\ cb(200,\ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}(\mbox{\hyperlink{classfc_1_1variant__object}{fc::variant\_object}}()));\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.quit();\ \}\ );}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00097}00097\ \ \ \ \ \ \ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_a3b77bd811744da79c9d8ba0d078e7668}{startup}}();}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00098}00098\ \ \ \ \ \ \ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_a39286b0b034b97f6940568a00f44edaf}{exec}}();}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00099}00099\ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1exception}{fc::exception}}\&\ e)\ \{}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00100}00100\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}}(\textcolor{stringliteral}{"{}\$\{e\}"{}},\ (\textcolor{stringliteral}{"{}e"{}},e.\mbox{\hyperlink{classfc_1_1exception_a7611ea8fbe25dde56649b685c2298a37}{to\_detail\_string}}()));}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00101}00101\ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\textcolor{keyword}{const}\ boost::exception\&\ e)\ \{}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00102}00102\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}}(\textcolor{stringliteral}{"{}\$\{e\}"{}},\ (\textcolor{stringliteral}{"{}e"{}},boost::diagnostic\_information(e)));}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00103}00103\ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\textcolor{keyword}{const}\ std::exception\&\ e)\ \{}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00104}00104\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}}(\textcolor{stringliteral}{"{}\$\{e\}"{}},\ (\textcolor{stringliteral}{"{}e"{}},e.\mbox{\hyperlink{classfc_1_1exception_ab1104818bf0d9b6a29f0dfe036cf97f6}{what}}()));}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00105}00105\ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00106}00106\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}}(\textcolor{stringliteral}{"{}unknown\ exception"{}});}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00107}00107\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00108}00108\ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{programs_2kiod_2main_8cpp_source_l00109}00109\ \}}
+
+\end{DoxyCode}

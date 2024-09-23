@@ -1,0 +1,495 @@
+\doxysection{fc\+::time\+\_\+point Class Reference}
+\hypertarget{classfc_1_1time__point}{}\label{classfc_1_1time__point}\index{fc::time\_point@{fc::time\_point}}
+
+
+{\ttfamily \#include $<$time.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+constexpr \mbox{\hyperlink{classfc_1_1time__point_ab46781dcaab4880902bc136f36e39e5e}{time\+\_\+point}} (\mbox{\hyperlink{classfc_1_1microseconds}{microseconds}} e=\mbox{\hyperlink{classfc_1_1microseconds}{microseconds}}())
+\item 
+\mbox{\hyperlink{classfc_1_1time__point_acf01edf36668a361a460192dd1765904}{operator fc\+::string}} () const
+\item 
+constexpr const \mbox{\hyperlink{classfc_1_1microseconds}{microseconds}} \& \mbox{\hyperlink{classfc_1_1time__point_abfea5efbe9ef58024cda814395ee9945}{time\+\_\+since\+\_\+epoch}} () const
+\item 
+constexpr \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classfc_1_1time__point_a77fd4cd8de69bb62c15ddcc2eb51e78a}{sec\+\_\+since\+\_\+epoch}} () const
+\item 
+constexpr bool \mbox{\hyperlink{classfc_1_1time__point_ad6fc6fd16d19a8b966479ad4c2333c34}{operator$>$}} (const \mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} \&t) const
+\item 
+constexpr bool \mbox{\hyperlink{classfc_1_1time__point_acc6ef1bcff60e518cb41f7dde37df1ed}{operator$>$=}} (const \mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} \&t) const
+\item 
+constexpr bool \mbox{\hyperlink{classfc_1_1time__point_a09168c7dc62a6dcd9942d46043a9e770}{operator$<$}} (const \mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} \&t) const
+\item 
+constexpr bool \mbox{\hyperlink{classfc_1_1time__point_a41c7a993528c43bc6ee3decc4c138992}{operator$<$=}} (const \mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} \&t) const
+\item 
+constexpr bool \mbox{\hyperlink{classfc_1_1time__point_af8472816aff4d07e04cfba425cd5d930}{operator==}} (const \mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} \&t) const
+\item 
+constexpr bool \mbox{\hyperlink{classfc_1_1time__point_ac0b1844fa3dcaa44ba5415a31efa885f}{operator!=}} (const \mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} \&t) const
+\item 
+constexpr \mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} \& \mbox{\hyperlink{classfc_1_1time__point_a9712f71705869b4c89e184ccdaeb33c3}{operator+=}} (const \mbox{\hyperlink{classfc_1_1microseconds}{microseconds}} \&m)
+\item 
+constexpr \mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} \& \mbox{\hyperlink{classfc_1_1time__point_a666f078343f705cb834b4dfe94d946f6}{operator-\/=}} (const \mbox{\hyperlink{classfc_1_1microseconds}{microseconds}} \&m)
+\item 
+constexpr \mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} \mbox{\hyperlink{classfc_1_1time__point_ad41b12811756e6cebd3fb238309cb174}{operator+}} (const \mbox{\hyperlink{classfc_1_1microseconds}{microseconds}} \&m) const
+\item 
+constexpr \mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} \mbox{\hyperlink{classfc_1_1time__point_ab3fa12788fc95378d01c0e28e3fce999}{operator-\/}} (const \mbox{\hyperlink{classfc_1_1microseconds}{microseconds}} \&m) const
+\item 
+constexpr \mbox{\hyperlink{classfc_1_1microseconds}{microseconds}} \mbox{\hyperlink{classfc_1_1time__point_a74fa4d6d0afb15cf58150a4c9b90c80c}{operator-\/}} (const \mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} \&m) const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static \mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} \mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{now}} ()
+\item 
+static constexpr \mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} \mbox{\hyperlink{classfc_1_1time__point_aeccf1b70aa34b132c5269313b8a50573}{maximum}} ()
+\item 
+static constexpr \mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} \mbox{\hyperlink{classfc_1_1time__point_a841ec8241bcfda97fd0a648d631ff16c}{min}} ()
+\item 
+static \mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} \mbox{\hyperlink{classfc_1_1time__point_acf917831e171906dbbbd46b17bc6e0a5}{from\+\_\+iso\+\_\+string}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{include_2fc_2time_8hpp_source_l00042}{42}} of file \mbox{\hyperlink{include_2fc_2time_8hpp_source}{time.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1time__point_ab46781dcaab4880902bc136f36e39e5e}\index{fc::time\_point@{fc::time\_point}!time\_point@{time\_point}}
+\index{time\_point@{time\_point}!fc::time\_point@{fc::time\_point}}
+\doxysubsubsection{\texorpdfstring{time\_point()}{time\_point()}}
+{\footnotesize\ttfamily \label{classfc_1_1time__point_ab46781dcaab4880902bc136f36e39e5e} 
+fc\+::time\+\_\+point\+::time\+\_\+point (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1microseconds}{microseconds}}}]{e}{ = {\ttfamily \mbox{\hyperlink{classfc_1_1microseconds}{microseconds}}()}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{include_2fc_2time_8hpp_source_l00044}{44}} of file \mbox{\hyperlink{include_2fc_2time_8hpp_source}{time.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00044\ :elapsed(e)\{\}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{classfc_1_1time__point_ab46781dcaab4880902bc136f36e39e5e_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1time__point_acf917831e171906dbbbd46b17bc6e0a5}\index{fc::time\_point@{fc::time\_point}!from\_iso\_string@{from\_iso\_string}}
+\index{from\_iso\_string@{from\_iso\_string}!fc::time\_point@{fc::time\_point}}
+\doxysubsubsection{\texorpdfstring{from\_iso\_string()}{from\_iso\_string()}}
+{\footnotesize\ttfamily \label{classfc_1_1time__point_acf917831e171906dbbbd46b17bc6e0a5} 
+\mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} fc\+::time\+\_\+point\+::from\+\_\+iso\+\_\+string (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} \&}]{s}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{time_8cpp_source_l00067}{67}} of file \mbox{\hyperlink{time_8cpp_source}{time.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00068\ \ \ \{\ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ dot\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.find(\ \textcolor{charliteral}{'.'}\ );}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ dot\ ==\ std::string::npos\ )}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1time__point_ab46781dcaab4880902bc136f36e39e5e}{time\_point}}(\ \mbox{\hyperlink{classfc_1_1time__point__sec_ac2a18f665e7718f6992d17e4d80fc15f}{time\_point\_sec::from\_iso\_string}}(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ )\ );}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ ms\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.substr(\ dot\ );}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ ms[0]\ =\ \textcolor{charliteral}{'1'};}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\ ms.size()\ <\ 4\ )\ ms.push\_back(\textcolor{charliteral}{'0'});}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1time__point_ab46781dcaab4880902bc136f36e39e5e}{time\_point}}(\ \mbox{\hyperlink{classfc_1_1time__point__sec_ac2a18f665e7718f6992d17e4d80fc15f}{time\_point\_sec::from\_iso\_string}}(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ )\ )\ +\ \mbox{\hyperlink{namespacefc_a76ae235ec7e9b8862e70740058d7eb1b}{milliseconds}}(\ \mbox{\hyperlink{namespacefc_afe327b84123fcbda675ea00418471c9a}{to\_int64}}(ms)\ -\/\ 1000\ );}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00078\ \ \ \}\ \mbox{\hyperlink{exception_8hpp_af3731d6e3beb140d9e652adf7a18113b}{FC\_RETHROW\_EXCEPTIONS}}(\ warn,\ \textcolor{stringliteral}{"{}unable\ to\ convert\ ISO-\/formatted\ string\ to\ fc::time\_point"{}}\ )\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=317pt]{classfc_1_1time__point_acf917831e171906dbbbd46b17bc6e0a5_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1time__point_acf917831e171906dbbbd46b17bc6e0a5_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1time__point_aeccf1b70aa34b132c5269313b8a50573}\index{fc::time\_point@{fc::time\_point}!maximum@{maximum}}
+\index{maximum@{maximum}!fc::time\_point@{fc::time\_point}}
+\doxysubsubsection{\texorpdfstring{maximum()}{maximum()}}
+{\footnotesize\ttfamily \label{classfc_1_1time__point_aeccf1b70aa34b132c5269313b8a50573} 
+static constexpr \mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} fc\+::time\+\_\+point\+::maximum (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{include_2fc_2time_8hpp_source_l00046}{46}} of file \mbox{\hyperlink{include_2fc_2time_8hpp_source}{time.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00046\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1time__point_ab46781dcaab4880902bc136f36e39e5e}{time\_point}}(\ \mbox{\hyperlink{classfc_1_1microseconds_afc3eb0bfd792c7b1cda062e559e30c2e}{microseconds::maximum}}()\ );\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1time__point_aeccf1b70aa34b132c5269313b8a50573_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1time__point_aeccf1b70aa34b132c5269313b8a50573_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1time__point_a841ec8241bcfda97fd0a648d631ff16c}\index{fc::time\_point@{fc::time\_point}!min@{min}}
+\index{min@{min}!fc::time\_point@{fc::time\_point}}
+\doxysubsubsection{\texorpdfstring{min()}{min()}}
+{\footnotesize\ttfamily \label{classfc_1_1time__point_a841ec8241bcfda97fd0a648d631ff16c} 
+static constexpr \mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} fc\+::time\+\_\+point\+::min (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{include_2fc_2time_8hpp_source_l00047}{47}} of file \mbox{\hyperlink{include_2fc_2time_8hpp_source}{time.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00047\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1time__point_ab46781dcaab4880902bc136f36e39e5e}{time\_point}}();\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=313pt]{classfc_1_1time__point_a841ec8241bcfda97fd0a648d631ff16c_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1time__point_a841ec8241bcfda97fd0a648d631ff16c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}\index{fc::time\_point@{fc::time\_point}!now@{now}}
+\index{now@{now}!fc::time\_point@{fc::time\_point}}
+\doxysubsubsection{\texorpdfstring{now()}{now()}}
+{\footnotesize\ttfamily \label{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e} 
+\mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} fc\+::time\+\_\+point\+::now (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{time_8cpp_source_l00014}{14}} of file \mbox{\hyperlink{time_8cpp_source}{time.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00015\ \ \ \{}
+\DoxyCodeLine{00016\ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{exception_8hpp_ab10d0a221f4d7a706701b806c8135fd7}{UNLIKELY}}(\mbox{\hyperlink{classfc_1_1mock__time__traits_adddeebdf472c33f927827c111ddbf0b1}{mock\_time\_traits::is\_set}}())\ )\ \{}
+\DoxyCodeLine{00017\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1mock__time__traits_a0bed781012a73b8c15882648397b56be}{mock\_time\_traits::fc\_now}}();}
+\DoxyCodeLine{00018\ \ \ \ \ \ \}}
+\DoxyCodeLine{00019\ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1time__point_ab46781dcaab4880902bc136f36e39e5e}{time\_point}}(\ microseconds(\ bch::duration\_cast<bch::microseconds>(\ bch::system\_clock::now().\mbox{\hyperlink{classfc_1_1time__point_abfea5efbe9ef58024cda814395ee9945}{time\_since\_epoch}}()\ ).\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}()\ )\ );}
+\DoxyCodeLine{00020\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1time__point_acf01edf36668a361a460192dd1765904}\index{fc::time\_point@{fc::time\_point}!operator fc::string@{operator fc::string}}
+\index{operator fc::string@{operator fc::string}!fc::time\_point@{fc::time\_point}}
+\doxysubsubsection{\texorpdfstring{operator fc::string()}{operator fc::string()}}
+{\footnotesize\ttfamily \label{classfc_1_1time__point_acf01edf36668a361a460192dd1765904} 
+fc\+::time\+\_\+point\+::operator \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{time_8cpp_source_l00050}{50}} of file \mbox{\hyperlink{time_8cpp_source}{time.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00051\ \ \ \ \{}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ =\ elapsed.\mbox{\hyperlink{classfc_1_1microseconds_a20fba59ec7e1f50c6b8f2c9443cc9b92}{count}}();}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ >=\ 0)\ \{}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ secs\ =\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ /\ 1000000ULL;}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ msec\ =\ ((\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ \%\ 1000000ULL)\ /\ 1000ULL;}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ padded\_ms\ =\ \mbox{\hyperlink{namespacefc_a4e07b3870aa72f8c38bdd5f78044dad1}{to\_string}}((\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})(msec\ +\ 1000ULL)).substr(1);}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ ptime\ =\ boost::posix\_time::from\_time\_t(time\_t(secs));}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ boost::posix\_time::to\_iso\_extended\_string(ptime)\ +\ \textcolor{stringliteral}{"{}."{}}\ +\ padded\_ms;}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ negative\ time\_points\ serialized\ as\ "{}durations"{}\ in\ the\ ISO\ form\ with\ boost}}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ this\ is\ not\ very\ human\ readable\ but\ fits\ the\ precedent\ set\ by\ the\ above}}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ as\_duration\ =\ boost::posix\_time::microseconds(\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}});}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ boost::posix\_time::to\_iso\_string(as\_duration);}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00065\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=289pt]{classfc_1_1time__point_acf01edf36668a361a460192dd1765904_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=349pt]{classfc_1_1time__point_acf01edf36668a361a460192dd1765904_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1time__point_ac0b1844fa3dcaa44ba5415a31efa885f}\index{fc::time\_point@{fc::time\_point}!operator"!=@{operator"!=}}
+\index{operator"!=@{operator"!=}!fc::time\_point@{fc::time\_point}}
+\doxysubsubsection{\texorpdfstring{operator"!=()}{operator!=()}}
+{\footnotesize\ttfamily \label{classfc_1_1time__point_ac0b1844fa3dcaa44ba5415a31efa885f} 
+bool fc\+::time\+\_\+point\+::operator!= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} \&}]{t}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{include_2fc_2time_8hpp_source_l00059}{59}} of file \mbox{\hyperlink{include_2fc_2time_8hpp_source}{time.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00059\ \{\ \textcolor{keywordflow}{return}\ elapsed.\_count\ !=t.elapsed.\_count;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1time__point_ad41b12811756e6cebd3fb238309cb174}\index{fc::time\_point@{fc::time\_point}!operator+@{operator+}}
+\index{operator+@{operator+}!fc::time\_point@{fc::time\_point}}
+\doxysubsubsection{\texorpdfstring{operator+()}{operator+()}}
+{\footnotesize\ttfamily \label{classfc_1_1time__point_ad41b12811756e6cebd3fb238309cb174} 
+\mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} fc\+::time\+\_\+point\+::operator+ (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1microseconds}{microseconds}} \&}]{m}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{include_2fc_2time_8hpp_source_l00062}{62}} of file \mbox{\hyperlink{include_2fc_2time_8hpp_source}{time.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00062\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1time__point_ab46781dcaab4880902bc136f36e39e5e}{time\_point}}(elapsed+m);\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=339pt]{classfc_1_1time__point_ad41b12811756e6cebd3fb238309cb174_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1time__point_a9712f71705869b4c89e184ccdaeb33c3}\index{fc::time\_point@{fc::time\_point}!operator+=@{operator+=}}
+\index{operator+=@{operator+=}!fc::time\_point@{fc::time\_point}}
+\doxysubsubsection{\texorpdfstring{operator+=()}{operator+=()}}
+{\footnotesize\ttfamily \label{classfc_1_1time__point_a9712f71705869b4c89e184ccdaeb33c3} 
+\mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} \& fc\+::time\+\_\+point\+::operator+= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1microseconds}{microseconds}} \&}]{m}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{include_2fc_2time_8hpp_source_l00060}{60}} of file \mbox{\hyperlink{include_2fc_2time_8hpp_source}{time.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00060\ \{\ elapsed+=m;\ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1time__point_ab3fa12788fc95378d01c0e28e3fce999}\index{fc::time\_point@{fc::time\_point}!operator-\/@{operator-\/}}
+\index{operator-\/@{operator-\/}!fc::time\_point@{fc::time\_point}}
+\doxysubsubsection{\texorpdfstring{operator-\/()}{operator-()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1time__point_ab3fa12788fc95378d01c0e28e3fce999} 
+\mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} fc\+::time\+\_\+point\+::operator-\/ (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1microseconds}{microseconds}} \&}]{m}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{include_2fc_2time_8hpp_source_l00063}{63}} of file \mbox{\hyperlink{include_2fc_2time_8hpp_source}{time.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00063\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1time__point_ab46781dcaab4880902bc136f36e39e5e}{time\_point}}(elapsed-\/m);\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=336pt]{classfc_1_1time__point_ab3fa12788fc95378d01c0e28e3fce999_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1time__point_a74fa4d6d0afb15cf58150a4c9b90c80c}\index{fc::time\_point@{fc::time\_point}!operator-\/@{operator-\/}}
+\index{operator-\/@{operator-\/}!fc::time\_point@{fc::time\_point}}
+\doxysubsubsection{\texorpdfstring{operator-\/()}{operator-()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1time__point_a74fa4d6d0afb15cf58150a4c9b90c80c} 
+\mbox{\hyperlink{classfc_1_1microseconds}{microseconds}} fc\+::time\+\_\+point\+::operator-\/ (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} \&}]{m}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{include_2fc_2time_8hpp_source_l00064}{64}} of file \mbox{\hyperlink{include_2fc_2time_8hpp_source}{time.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00064\ \{\ \textcolor{keywordflow}{return}\ microseconds(elapsed.\mbox{\hyperlink{classfc_1_1microseconds_a20fba59ec7e1f50c6b8f2c9443cc9b92}{count}}()\ -\/\ m.elapsed.count());\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1time__point_a74fa4d6d0afb15cf58150a4c9b90c80c_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1time__point_a666f078343f705cb834b4dfe94d946f6}\index{fc::time\_point@{fc::time\_point}!operator-\/=@{operator-\/=}}
+\index{operator-\/=@{operator-\/=}!fc::time\_point@{fc::time\_point}}
+\doxysubsubsection{\texorpdfstring{operator-\/=()}{operator-=()}}
+{\footnotesize\ttfamily \label{classfc_1_1time__point_a666f078343f705cb834b4dfe94d946f6} 
+\mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} \& fc\+::time\+\_\+point\+::operator-\/= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1microseconds}{microseconds}} \&}]{m}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{include_2fc_2time_8hpp_source_l00061}{61}} of file \mbox{\hyperlink{include_2fc_2time_8hpp_source}{time.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00061\ \{\ elapsed-\/=m;\ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1time__point_a09168c7dc62a6dcd9942d46043a9e770}\index{fc::time\_point@{fc::time\_point}!operator$<$@{operator$<$}}
+\index{operator$<$@{operator$<$}!fc::time\_point@{fc::time\_point}}
+\doxysubsubsection{\texorpdfstring{operator$<$()}{operator<()}}
+{\footnotesize\ttfamily \label{classfc_1_1time__point_a09168c7dc62a6dcd9942d46043a9e770} 
+bool fc\+::time\+\_\+point\+::operator$<$ (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} \&}]{t}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{include_2fc_2time_8hpp_source_l00056}{56}} of file \mbox{\hyperlink{include_2fc_2time_8hpp_source}{time.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00056\ \{\ \textcolor{keywordflow}{return}\ elapsed.\_count\ <\ t.elapsed.\_count;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1time__point_a41c7a993528c43bc6ee3decc4c138992}\index{fc::time\_point@{fc::time\_point}!operator$<$=@{operator$<$=}}
+\index{operator$<$=@{operator$<$=}!fc::time\_point@{fc::time\_point}}
+\doxysubsubsection{\texorpdfstring{operator$<$=()}{operator<=()}}
+{\footnotesize\ttfamily \label{classfc_1_1time__point_a41c7a993528c43bc6ee3decc4c138992} 
+bool fc\+::time\+\_\+point\+::operator$<$= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} \&}]{t}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{include_2fc_2time_8hpp_source_l00057}{57}} of file \mbox{\hyperlink{include_2fc_2time_8hpp_source}{time.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00057\ \{\ \textcolor{keywordflow}{return}\ elapsed.\_count\ <=t.elapsed.\_count;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1time__point_af8472816aff4d07e04cfba425cd5d930}\index{fc::time\_point@{fc::time\_point}!operator==@{operator==}}
+\index{operator==@{operator==}!fc::time\_point@{fc::time\_point}}
+\doxysubsubsection{\texorpdfstring{operator==()}{operator==()}}
+{\footnotesize\ttfamily \label{classfc_1_1time__point_af8472816aff4d07e04cfba425cd5d930} 
+bool fc\+::time\+\_\+point\+::operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} \&}]{t}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{include_2fc_2time_8hpp_source_l00058}{58}} of file \mbox{\hyperlink{include_2fc_2time_8hpp_source}{time.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00058\ \{\ \textcolor{keywordflow}{return}\ elapsed.\_count\ ==t.elapsed.\_count;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1time__point_ad6fc6fd16d19a8b966479ad4c2333c34}\index{fc::time\_point@{fc::time\_point}!operator$>$@{operator$>$}}
+\index{operator$>$@{operator$>$}!fc::time\_point@{fc::time\_point}}
+\doxysubsubsection{\texorpdfstring{operator$>$()}{operator>()}}
+{\footnotesize\ttfamily \label{classfc_1_1time__point_ad6fc6fd16d19a8b966479ad4c2333c34} 
+bool fc\+::time\+\_\+point\+::operator$>$ (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} \&}]{t}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{include_2fc_2time_8hpp_source_l00054}{54}} of file \mbox{\hyperlink{include_2fc_2time_8hpp_source}{time.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00054\ \{\ \textcolor{keywordflow}{return}\ elapsed.\_count\ >\ t.elapsed.\_count;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1time__point_acc6ef1bcff60e518cb41f7dde37df1ed}\index{fc::time\_point@{fc::time\_point}!operator$>$=@{operator$>$=}}
+\index{operator$>$=@{operator$>$=}!fc::time\_point@{fc::time\_point}}
+\doxysubsubsection{\texorpdfstring{operator$>$=()}{operator>=()}}
+{\footnotesize\ttfamily \label{classfc_1_1time__point_acc6ef1bcff60e518cb41f7dde37df1ed} 
+bool fc\+::time\+\_\+point\+::operator$>$= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} \&}]{t}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{include_2fc_2time_8hpp_source_l00055}{55}} of file \mbox{\hyperlink{include_2fc_2time_8hpp_source}{time.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00055\ \{\ \textcolor{keywordflow}{return}\ elapsed.\_count\ >=t.elapsed.\_count;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1time__point_a77fd4cd8de69bb62c15ddcc2eb51e78a}\index{fc::time\_point@{fc::time\_point}!sec\_since\_epoch@{sec\_since\_epoch}}
+\index{sec\_since\_epoch@{sec\_since\_epoch}!fc::time\_point@{fc::time\_point}}
+\doxysubsubsection{\texorpdfstring{sec\_since\_epoch()}{sec\_since\_epoch()}}
+{\footnotesize\ttfamily \label{classfc_1_1time__point_a77fd4cd8de69bb62c15ddcc2eb51e78a} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} fc\+::time\+\_\+point\+::sec\+\_\+since\+\_\+epoch (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{include_2fc_2time_8hpp_source_l00053}{53}} of file \mbox{\hyperlink{include_2fc_2time_8hpp_source}{time.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00053\ \{\ \textcolor{keywordflow}{return}\ elapsed.\mbox{\hyperlink{classfc_1_1microseconds_a20fba59ec7e1f50c6b8f2c9443cc9b92}{count}}()\ /\ 1000000;\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=334pt]{classfc_1_1time__point_a77fd4cd8de69bb62c15ddcc2eb51e78a_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1time__point_a77fd4cd8de69bb62c15ddcc2eb51e78a_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1time__point_abfea5efbe9ef58024cda814395ee9945}\index{fc::time\_point@{fc::time\_point}!time\_since\_epoch@{time\_since\_epoch}}
+\index{time\_since\_epoch@{time\_since\_epoch}!fc::time\_point@{fc::time\_point}}
+\doxysubsubsection{\texorpdfstring{time\_since\_epoch()}{time\_since\_epoch()}}
+{\footnotesize\ttfamily \label{classfc_1_1time__point_abfea5efbe9ef58024cda814395ee9945} 
+const \mbox{\hyperlink{classfc_1_1microseconds}{microseconds}} \& fc\+::time\+\_\+point\+::time\+\_\+since\+\_\+epoch (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{include_2fc_2time_8hpp_source_l00052}{52}} of file \mbox{\hyperlink{include_2fc_2time_8hpp_source}{time.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00052\ \{\ \textcolor{keywordflow}{return}\ elapsed;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{classfc_1_1time__point_abfea5efbe9ef58024cda814395ee9945_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/\mbox{\hyperlink{include_2fc_2time_8hpp}{time.\+hpp}}\item 
+libraries/fc/src/\mbox{\hyperlink{time_8cpp}{time.\+cpp}}\end{DoxyCompactItemize}

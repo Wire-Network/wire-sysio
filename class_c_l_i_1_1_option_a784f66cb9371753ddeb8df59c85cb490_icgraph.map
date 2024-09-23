@@ -1,0 +1,27 @@
+<map id="CLI::Option::get_allow_extra_args" name="CLI::Option::get_allow_extra_args">
+<area shape="rect" id="Node000001" title="Get the current value of allow extra args." alt="" coords="1028,98,1179,138"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_app.html#a3b564aa8c90f25152f5379c661ab82b1" title=" " alt="" coords="798,56,980,82"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1012,100,947,85,949,80,1013,95"/>
+<area shape="rect" id="Node000009" href="$namespace_c_l_i.html#a36cfe4a6a80bf143735c0b80960bc252" title="Helper function to mark an option as retired." alt="" coords="828,129,950,155"/>
+<area shape="poly" id="edge10_Node000001_Node000009" title=" " alt="" coords="1013,131,950,138,950,133,1012,126"/>
+<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="926,44,914,37,889,35,866,37,854,41,851,47,857,54,853,57,846,47,850,38,865,31,889,29,915,32,929,39"/>
+<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_app.html#a02368e2fe89470ab9b4131c7e3288349" title=" " alt="" coords="335,31,496,56"/>
+<area shape="poly" id="edge3_Node000002_Node000003" title=" " alt="" coords="813,55,749,46,616,40,497,42,497,37,616,35,750,41,813,50"/>
+<area shape="rect" id="Node000008" href="$class_c_l_i_1_1_app.html#af20c05b97b9de2a4543a2de9bcc0993d" title=" " alt="" coords="544,56,750,82"/>
+<area shape="poly" id="edge8_Node000002_Node000008" title=" " alt="" coords="782,72,750,72,750,66,782,66"/>
+<area shape="rect" id="Node000004" href="$class_c_l_i_1_1_app.html#a26a92886a7d7f10a9afbd39b6535f42b" title="Internal parse function." alt="" coords="167,5,287,31"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="319,33,287,29,287,24,320,28"/>
+<area shape="rect" id="Node000005" href="$class_c_l_i_1_1_app.html#a241ba75a6c98b36349ae2f71a9137291" title="Internal parse function." alt="" coords="167,55,287,80"/>
+<area shape="poly" id="edge5_Node000003_Node000005" title=" " alt="" coords="320,58,287,63,287,57,319,53"/>
+<area shape="rect" id="Node000006" href="$class_c_l_i_1_1_app.html#a8ffb155a1153ee23d442c5bfed21225c" title="The real work is done here. Expects a reversed vector." alt="" coords="5,29,119,55"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="151,58,119,54,119,48,151,53"/>
+<area shape="rect" id="Node000007" href="$class_c_l_i_1_1_app.html#a878c1067ade7145aa11478d64f5173ed" title=" " alt="" coords="5,79,119,104"/>
+<area shape="poly" id="edge7_Node000005_Node000007" title=" " alt="" coords="151,81,119,86,119,81,151,76"/>
+<area shape="poly" id="edge9_Node000008_Node000003" title=" " alt="" coords="529,59,496,55,497,50,529,53"/>
+<area shape="rect" id="Node000010" href="$namespace_c_l_i.html#a77cd1a3639a91dea33a7d144ea476df6" title="Helper function to mark an option as retired." alt="" coords="586,105,708,131"/>
+<area shape="poly" id="edge11_Node000009_Node000010" title=" " alt="" coords="812,137,708,127,708,122,813,132"/>
+<area shape="rect" id="Node000011" href="$namespace_c_l_i.html#a52390f850f663cf38a27e134c1a39b61" title="Helper function to mark an option as retired." alt="" coords="586,155,708,180"/>
+<area shape="poly" id="edge12_Node000009_Node000011" title=" " alt="" coords="813,153,708,164,708,159,812,147"/>
+<area shape="rect" id="Node000012" href="$namespace_c_l_i.html#ad9ac23b01e2ef840ec123f5a115302ab" title="Helper function to mark an option as retired." alt="" coords="586,204,708,230"/>
+<area shape="poly" id="edge13_Node000009_Node000012" title=" " alt="" coords="841,164,750,195,709,207,707,201,749,190,839,159"/>
+</map>

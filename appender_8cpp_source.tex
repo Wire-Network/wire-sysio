@@ -1,0 +1,21 @@
+\doxysection{appender.\+cpp}
+\hypertarget{appender_8cpp_source}{}\label{appender_8cpp_source}\index{libraries/fc/src/log/appender.cpp@{libraries/fc/src/log/appender.cpp}}
+\mbox{\hyperlink{appender_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{appender_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{appender_8hpp}{fc/log/appender.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{appender_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{console__appender_8hpp}{fc/log/console\_appender.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{appender_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{gelf__appender_8hpp}{fc/log/gelf\_appender.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{appender_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{dmlog__appender_8hpp}{fc/log/dmlog\_appender.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{appender_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{logger__config_8hpp}{fc/log/logger\_config.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{appender_8cpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{appender_8cpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{appender_8cpp_source_l00008}00008\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}\ \{}
+\DoxyCodeLine{\Hypertarget{appender_8cpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{appender_8cpp_source_l00010}00010\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{bool}\ reg\_console\_appender\ =\ \mbox{\hyperlink{structfc_1_1log__config_af2fae8b8e423c8461625436befefd399}{log\_config::register\_appender<console\_appender>}}(\ \textcolor{stringliteral}{"{}console"{}}\ );}
+\DoxyCodeLine{\Hypertarget{appender_8cpp_source_l00011}00011\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{bool}\ reg\_gelf\_appender\ =\ \mbox{\hyperlink{structfc_1_1log__config_af2fae8b8e423c8461625436befefd399}{log\_config::register\_appender<gelf\_appender>}}(\ \textcolor{stringliteral}{"{}gelf"{}}\ );}
+\DoxyCodeLine{\Hypertarget{appender_8cpp_source_l00012}00012\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{bool}\ reg\_dmlog\_appender\ =\ \mbox{\hyperlink{structfc_1_1log__config_af2fae8b8e423c8461625436befefd399}{log\_config::register\_appender<dmlog\_appender>}}(\ \textcolor{stringliteral}{"{}dmlog"{}}\ );}
+\DoxyCodeLine{\Hypertarget{appender_8cpp_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{appender_8cpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{appender_8cpp_source_l00015}00015\ \}\ \textcolor{comment}{//\ namespace\ fc}}
+
+\end{DoxyCode}

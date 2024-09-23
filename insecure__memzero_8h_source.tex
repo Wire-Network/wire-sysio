@@ -1,0 +1,40 @@
+\doxysection{insecure\+\_\+memzero.\+h}
+\hypertarget{insecure__memzero_8h_source}{}\label{insecure__memzero_8h_source}\index{libraries/yubihsm/common/insecure\_memzero.h@{libraries/yubihsm/common/insecure\_memzero.h}}
+\mbox{\hyperlink{insecure__memzero_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{insecure__memzero_8h_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{insecure__memzero_8h_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ 2015-\/2018\ Yubico\ AB}}
+\DoxyCodeLine{\Hypertarget{insecure__memzero_8h_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{insecure__memzero_8h_source_l00004}00004\ \textcolor{comment}{\ *\ Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{\Hypertarget{insecure__memzero_8h_source_l00005}00005\ \textcolor{comment}{\ *\ you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{insecure__memzero_8h_source_l00006}00006\ \textcolor{comment}{\ *\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{\Hypertarget{insecure__memzero_8h_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{insecure__memzero_8h_source_l00008}00008\ \textcolor{comment}{\ *\ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{\Hypertarget{insecure__memzero_8h_source_l00009}00009\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{insecure__memzero_8h_source_l00010}00010\ \textcolor{comment}{\ *\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{\Hypertarget{insecure__memzero_8h_source_l00011}00011\ \textcolor{comment}{\ *\ distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{\Hypertarget{insecure__memzero_8h_source_l00012}00012\ \textcolor{comment}{\ *\ WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{\Hypertarget{insecure__memzero_8h_source_l00013}00013\ \textcolor{comment}{\ *\ See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{\Hypertarget{insecure__memzero_8h_source_l00014}00014\ \textcolor{comment}{\ *\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{insecure__memzero_8h_source_l00015}00015\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{insecure__memzero_8h_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{insecure__memzero_8h_source_l00017}00017\ \textcolor{preprocessor}{\#ifndef\ YUBICOM\_MEMZERO\_H}}
+\DoxyCodeLine{\Hypertarget{insecure__memzero_8h_source_l00018}00018\ \textcolor{preprocessor}{\#define\ YUBICOM\_MEMZERO\_H}}
+\DoxyCodeLine{\Hypertarget{insecure__memzero_8h_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{insecure__memzero_8h_source_l00020}00020\ \textcolor{preprocessor}{\#ifdef\ \_WIN32}}
+\DoxyCodeLine{\Hypertarget{insecure__memzero_8h_source_l00021}00021\ \textcolor{preprocessor}{\#include\ <windows.h>}}
+\DoxyCodeLine{\Hypertarget{insecure__memzero_8h_source_l00022}00022\ \textcolor{preprocessor}{\#define\ insecure\_memzero(buf,\ len)\ SecureZeroMemory(buf,\ len)}}
+\DoxyCodeLine{\Hypertarget{insecure__memzero_8h_source_l00023}00023\ \textcolor{preprocessor}{\#elif\ HAVE\_MEMSET\_S}}
+\DoxyCodeLine{\Hypertarget{insecure__memzero_8h_source_l00024}00024\ \textcolor{preprocessor}{\#include\ <string.h>}}
+\DoxyCodeLine{\Hypertarget{insecure__memzero_8h_source_l00025}00025\ \textcolor{preprocessor}{\#define\ insecure\_memzero(buf,\ len)\ memset\_s(buf,\ len,\ 0,\ len)}}
+\DoxyCodeLine{\Hypertarget{insecure__memzero_8h_source_l00026}00026\ \textcolor{preprocessor}{\#elif\ HAVE\_EXPLICIT\_BZERO}}
+\DoxyCodeLine{\Hypertarget{insecure__memzero_8h_source_l00027}00027\ \textcolor{preprocessor}{\#include\ <string.h>}}
+\DoxyCodeLine{\Hypertarget{insecure__memzero_8h_source_l00028}00028\ \textcolor{preprocessor}{\#define\ insecure\_memzero(buf,\ len)\ explicit\_bzero(buf,\ len)}}
+\DoxyCodeLine{\Hypertarget{insecure__memzero_8h_source_l00029}00029\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{insecure__memzero_8h_source_l00030}00030\ \textcolor{preprocessor}{\#include\ <openssl/crypto.h>}}
+\DoxyCodeLine{\Hypertarget{insecure__memzero_8h_source_l00031}\mbox{\hyperlink{insecure__memzero_8h_a0794f9275fd1036ecba6ff0a901a320b}{00031}}\ \textcolor{preprocessor}{\#define\ insecure\_memzero(buf,\ len)\ OPENSSL\_cleanse(buf,\ len)}}
+\DoxyCodeLine{\Hypertarget{insecure__memzero_8h_source_l00032}00032\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{insecure__memzero_8h_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{insecure__memzero_8h_source_l00034}00034\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

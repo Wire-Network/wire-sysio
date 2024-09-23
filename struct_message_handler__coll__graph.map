@@ -1,0 +1,9 @@
+<map id="MessageHandler" name="MessageHandler">
+<area shape="rect" id="Node000001" title=" " alt="" coords="234,109,353,135"/>
+<area shape="rect" id="Node000002" href="$struct_base_reader_handler.html" title=" " alt="" coords="5,5,198,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="157,51,270,106,267,111,154,56"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="222,13,365,38"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="296,54,296,108,291,108,291,54"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="388,13,442,38"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="402,53,371,87,329,111,327,106,368,83,398,50"/>
+</map>

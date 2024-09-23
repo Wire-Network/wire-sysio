@@ -1,0 +1,15 @@
+<map id="sysio::chain::impl::abi_from_variant_visitor::operator()" name="sysio::chain::impl::abi_from_variant_visitor::operator()">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,56,173,111"/>
+<area shape="rect" id="Node000002" href="$classfc_1_1variant__object.html#a804706455398e249f6272b3ff19cef5d" title=" " alt="" coords="221,5,371,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="172,55,238,34,239,39,174,60"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1chain_1_1impl_1_1abi__from__variant.html#a733b2b85ed5f3e9826f93bb5d1af0d8c" title=" " alt="" coords="229,56,362,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="173,81,214,81,214,86,173,86"/>
+<area shape="rect" id="Node000006" href="$classfc_1_1variant__object.html#acfef67913fd3c24ea8017b3a5ad49144" title=" " alt="" coords="235,159,356,200"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="152,109,238,150,236,155,149,114"/>
+<area shape="rect" id="Node000004" href="$structsysio_1_1chain_1_1impl_1_1abi__traverse__context.html#aa59879bd83e287e7174d4d0ba248d3ea" title=" " alt="" coords="419,12,569,67"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="362,66,403,57,404,62,363,71"/>
+<area shape="rect" id="Node000005" href="$namespacefc.html#accef08adf4ee05c36ccc550d8101b08f" title=" " alt="" coords="438,116,550,142"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="363,96,423,110,422,115,362,101"/>
+<area shape="poly" id="edge5_Node000005_Node000005" title=" " alt="" coords="461,117,454,107,458,98,472,91,494,89,519,92,531,99,528,104,517,97,494,95,473,97,462,101,460,107,465,114"/>
+<area shape="poly" id="edge7_Node000006_Node000006" title=" " alt="" coords="258,159,256,149,262,140,276,135,296,133,317,135,330,141,328,146,316,140,296,138,277,140,266,144,261,150,263,158"/>
+</map>

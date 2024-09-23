@@ -1,0 +1,7 @@
+<map id="GenericValue::ShortString::SetLength" name="GenericValue::ShortString::SetLength">
+<area shape="rect" id="Node000001" title=" " alt="" coords="241,23,412,64"/>
+<area shape="rect" id="Node000002" href="$class_generic_value.html#a83c8f84b8e61f2f40414b703b75aea61" title="Constructor with JSON value type." alt="" coords="7,5,191,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="225,35,191,31,191,26,225,30"/>
+<area shape="rect" id="Node000003" href="$class_generic_value.html#ad3d91db36dfdbfc1af40a79aae07723c" title="Initialize this value as copy string with initial data, without calling destructor." alt="" coords="5,55,193,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="225,57,194,60,193,55,225,52"/>
+</map>

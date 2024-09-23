@@ -1,0 +1,80 @@
+\doxysection{fc\+::detail\+::gntp\+\_\+icon\+\_\+impl Class Reference}
+\hypertarget{classfc_1_1detail_1_1gntp__icon__impl}{}\label{classfc_1_1detail_1_1gntp__icon__impl}\index{fc::detail::gntp\_icon\_impl@{fc::detail::gntp\_icon\_impl}}
+
+
+Collaboration diagram for fc\+::detail\+::gntp\+\_\+icon\+\_\+impl\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=205pt]{classfc_1_1detail_1_1gntp__icon__impl__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1detail_1_1gntp__icon__impl_a5f2d193019668ec353c8dd40f0e8da49}{gntp\+\_\+icon\+\_\+impl}} (const char \texorpdfstring{$\ast$}{*}buffer, size\+\_\+t length)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::string \mbox{\hyperlink{classfc_1_1detail_1_1gntp__icon__impl_ac3ce9406a76835189b2f193b17567bcc}{\+\_\+icon\+\_\+bytes}}
+\item 
+std\+::string \mbox{\hyperlink{classfc_1_1detail_1_1gntp__icon__impl_a007649f37bce851e9c122a999b6ecf62}{\+\_\+sha1\+\_\+hash}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{gntp_8cpp_source_l00032}{32}} of file \mbox{\hyperlink{gntp_8cpp_source}{gntp.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1detail_1_1gntp__icon__impl_a5f2d193019668ec353c8dd40f0e8da49}\index{fc::detail::gntp\_icon\_impl@{fc::detail::gntp\_icon\_impl}!gntp\_icon\_impl@{gntp\_icon\_impl}}
+\index{gntp\_icon\_impl@{gntp\_icon\_impl}!fc::detail::gntp\_icon\_impl@{fc::detail::gntp\_icon\_impl}}
+\doxysubsubsection{\texorpdfstring{gntp\_icon\_impl()}{gntp\_icon\_impl()}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1gntp__icon__impl_a5f2d193019668ec353c8dd40f0e8da49} 
+fc\+::detail\+::gntp\+\_\+icon\+\_\+impl\+::gntp\+\_\+icon\+\_\+impl (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{buffer}{, }\item[{size\+\_\+t}]{length}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gntp_8cpp_source_l00038}{38}} of file \mbox{\hyperlink{gntp_8cpp_source}{gntp.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1gntp__icon__impl_ac3ce9406a76835189b2f193b17567bcc}{\_icon\_bytes}}(buffer,\ length),}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1gntp__icon__impl_a007649f37bce851e9c122a999b6ecf62}{\_sha1\_hash}}(calc\_sha1\_base32\_of\_buffer(\mbox{\hyperlink{classfc_1_1detail_1_1gntp__icon__impl_ac3ce9406a76835189b2f193b17567bcc}{\_icon\_bytes}}))}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classfc_1_1detail_1_1gntp__icon__impl_ac3ce9406a76835189b2f193b17567bcc}\index{fc::detail::gntp\_icon\_impl@{fc::detail::gntp\_icon\_impl}!\_icon\_bytes@{\_icon\_bytes}}
+\index{\_icon\_bytes@{\_icon\_bytes}!fc::detail::gntp\_icon\_impl@{fc::detail::gntp\_icon\_impl}}
+\doxysubsubsection{\texorpdfstring{\_icon\_bytes}{\_icon\_bytes}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1gntp__icon__impl_ac3ce9406a76835189b2f193b17567bcc} 
+std\+::string fc\+::detail\+::gntp\+\_\+icon\+\_\+impl\+::\+\_\+icon\+\_\+bytes}
+
+
+
+Definition at line \mbox{\hyperlink{gntp_8cpp_source_l00035}{35}} of file \mbox{\hyperlink{gntp_8cpp_source}{gntp.\+cpp}}.
+
+\Hypertarget{classfc_1_1detail_1_1gntp__icon__impl_a007649f37bce851e9c122a999b6ecf62}\index{fc::detail::gntp\_icon\_impl@{fc::detail::gntp\_icon\_impl}!\_sha1\_hash@{\_sha1\_hash}}
+\index{\_sha1\_hash@{\_sha1\_hash}!fc::detail::gntp\_icon\_impl@{fc::detail::gntp\_icon\_impl}}
+\doxysubsubsection{\texorpdfstring{\_sha1\_hash}{\_sha1\_hash}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1gntp__icon__impl_a007649f37bce851e9c122a999b6ecf62} 
+std\+::string fc\+::detail\+::gntp\+\_\+icon\+\_\+impl\+::\+\_\+sha1\+\_\+hash}
+
+
+
+Definition at line \mbox{\hyperlink{gntp_8cpp_source_l00036}{36}} of file \mbox{\hyperlink{gntp_8cpp_source}{gntp.\+cpp}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/src/network/\mbox{\hyperlink{gntp_8cpp}{gntp.\+cpp}}\end{DoxyCompactItemize}

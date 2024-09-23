@@ -1,0 +1,15 @@
+<map id="sysio::wallet::detail::se_wallet_impl::string_for_cferror" name="sysio::wallet::detail::se_wallet_impl::string_for_cferror">
+<area shape="rect" id="Node000001" title=" " alt="" coords="604,67,760,123"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1wallet_1_1detail_1_1se__wallet__impl.html#a910dfcc255f4f77f893ca8e2c13a22ae" title=" " alt="" coords="12,5,171,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="589,65,556,58,453,42,348,33,171,27,172,22,349,28,453,37,557,52,590,60"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1wallet_1_1detail_1_1se__wallet__impl.html#a06cd1a5418bb1d4d6fd34a06d98479d7" title=" " alt="" coords="415,67,556,123"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="589,98,557,98,557,92,589,92"/>
+<area shape="rect" id="Node000006" href="$structsysio_1_1wallet_1_1detail_1_1se__wallet__impl.html#af55d7af9639ae410b25d61286e03912a" title=" " alt="" coords="227,143,366,199"/>
+<area shape="poly" id="edge7_Node000001_Node000006" title=" " alt="" coords="590,129,557,138,457,156,366,167,365,162,456,151,556,132,589,124"/>
+<area shape="rect" id="Node000004" href="$structsysio_1_1wallet_1_1detail_1_1se__wallet__impl.html#a4143e58c3ef85d340f73fd65e5805f3f" title=" " alt="" coords="226,63,367,119"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="400,96,367,95,367,90,400,91"/>
+<area shape="poly" id="edge6_Node000003_Node000006" title=" " alt="" coords="402,131,367,146,365,141,400,127"/>
+<area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="210,66,157,49,159,44,212,61"/>
+<area shape="rect" id="Node000005" href="$structsysio_1_1wallet_1_1detail_1_1se__wallet__impl.html#a3cfe51bbc6f89087296a06d2a8dbf65c" title=" " alt="" coords="5,70,178,126"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="210,96,178,98,178,92,210,91"/>
+</map>

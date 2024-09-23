@@ -1,0 +1,47 @@
+\doxysection{sysio\+::chain\+::transaction\+\_\+object Class Reference}
+\hypertarget{classsysio_1_1chain_1_1transaction__object}{}\label{classsysio_1_1chain_1_1transaction__object}\index{sysio::chain::transaction\_object@{sysio::chain::transaction\_object}}
+
+
+{\ttfamily \#include $<$transaction\+\_\+object.\+hpp$>$}
+
+
+
+Inheritance diagram for sysio\+::chain\+::transaction\+\_\+object\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=215pt]{classsysio_1_1chain_1_1transaction__object__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for sysio\+::chain\+::transaction\+\_\+object\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=215pt]{classsysio_1_1chain_1_1transaction__object__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Public Types inherited from \mbox{\hyperlink{structchainbase_1_1object}{chainbase\+::object$<$ transaction\+\_\+object\+\_\+type, transaction\+\_\+object $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{classchainbase_1_1oid}{oid}}$<$ transaction\+\_\+object $>$ \mbox{\hyperlink{structchainbase_1_1object_a7c6a0efb95ee67d538a976cfa5be9df9}{id\+\_\+type}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Static Public Attributes inherited from \mbox{\hyperlink{structchainbase_1_1object}{chainbase\+::object$<$ transaction\+\_\+object\+\_\+type, transaction\+\_\+object $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+static const \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{structchainbase_1_1object_a30d3a5340e6fc59b4a2e044fcd42f0a2}{type\+\_\+id}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+The purpose of this object is to enable the detection of duplicate transactions. When a transaction is included in a block a \doxylink{classsysio_1_1chain_1_1transaction__object}{transaction\+\_\+object} is added. At the end of block processing all transaction\+\_\+objects that have expired can be removed from the index. 
+
+Definition at line \mbox{\hyperlink{transaction__object_8hpp_source_l00020}{20}} of file \mbox{\hyperlink{transaction__object_8hpp_source}{transaction\+\_\+object.\+hpp}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{transaction__object_8hpp}{transaction\+\_\+object.\+hpp}}\end{DoxyCompactItemize}

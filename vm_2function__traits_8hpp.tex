@@ -1,0 +1,267 @@
+\doxysection{libraries/sys-\/vm/include/sysio/vm/function\+\_\+traits.hpp File Reference}
+\hypertarget{vm_2function__traits_8hpp}{}\label{vm_2function__traits_8hpp}\index{libraries/sys-\/vm/include/sysio/vm/function\_traits.hpp@{libraries/sys-\/vm/include/sysio/vm/function\_traits.hpp}}
+{\ttfamily \#include $<$type\+\_\+traits$>$}\newline
+{\ttfamily \#include $<$tuple$>$}\newline
+Include dependency graph for function\+\_\+traits.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=222pt]{vm_2function__traits_8hpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1freestanding}{sysio\+::vm\+::freestanding}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1overloaded}{sysio\+::vm\+::detail\+::overloaded$<$ Ts $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1wrapper__t}{sysio\+::vm\+::detail\+::wrapper\+\_\+t$<$ T $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1pack__from_3_01_sz_00_01_n_00_01_i_00_01_arg_00_01_args_8_8_8_01_4}{sysio\+::vm\+::detail\+::pack\+\_\+from$<$ Sz, N, I, Arg, Args... $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1pack__from_3_01_sz_00_01_n_00_01_n_00_01_arg_00_01_args_8_8_8_01_4}{sysio\+::vm\+::detail\+::pack\+\_\+from$<$ Sz, N, N, Arg, Args... $>$}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1vm}{sysio\+::vm}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail}{sysio\+::vm\+::detail}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{vm_2function__traits_8hpp_a7a41c13580dd3b382376f5ce312b2ed2}{SYS\+\_\+\+VM\+\_\+\+HAS\+\_\+\+MEMBER}}(ARG,  \mbox{\hyperlink{pointertest_8cpp_a59c7737920212dcb3bb9df58d7062de4}{NAME}})
+\item 
+\#define \mbox{\hyperlink{vm_2function__traits_8hpp_a0302efe794d137a942d8048fb906328e}{SYS\+\_\+\+VM\+\_\+\+HAS\+\_\+\+MEMBER\+\_\+\+TY}}(TY,  \mbox{\hyperlink{pointertest_8cpp_a59c7737920212dcb3bb9df58d7062de4}{NAME}})
+\item 
+\#define \mbox{\hyperlink{vm_2function__traits_8hpp_aa796dd2a42095f33cc57d0550886b838}{SYS\+\_\+\+VM\+\_\+\+HAS\+\_\+\+TEMPLATE\+\_\+\+MEMBER}}(ARG,  \mbox{\hyperlink{pointertest_8cpp_a59c7737920212dcb3bb9df58d7062de4}{NAME}})
+\item 
+\#define \mbox{\hyperlink{vm_2function__traits_8hpp_ab111a40b9d97cc55f3d587096953539e}{SYS\+\_\+\+VM\+\_\+\+HAS\+\_\+\+TEMPLATE\+\_\+\+MEMBER\+\_\+\+TY}}(TY,  \mbox{\hyperlink{pointertest_8cpp_a59c7737920212dcb3bb9df58d7062de4}{NAME}})
+\item 
+\#define \mbox{\hyperlink{vm_2function__traits_8hpp_ae0e7ec10d6ffcb99b68833b2156699f4}{AUTO\+\_\+\+PARAM\+\_\+\+WORKAROUND}}(\mbox{\hyperlink{lib_8h_a3f9003cfa8b6fa038820ae2e2e077ffa}{X}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\constexpr bool \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a98a80f3ec6e21f4e847d12bea16ce60f}{sysio\+::vm\+::detail\+::pass\+\_\+type}} ()
+\item 
+{\footnotesize template$<$typename $>$ }\\constexpr bool \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_ace7cf6ccbf9b7840b22a56f626ca35bd}{sysio\+::vm\+::detail\+::is\+\_\+callable\+\_\+impl}} (...)
+\item 
+{\footnotesize template$<$class... Ts$>$ }\\\mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a10a5213e8071677754e063def2767ace}{sysio\+::vm\+::detail\+::overloaded}} (Ts...) -\/$>$ overloaded$<$ Ts... $>$
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{union_u}{U}} $>$ }\\constexpr \mbox{\hyperlink{union_u}{U}} \&\& \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a4807799cf4dcabe075abde117be1e0c1}{sysio\+::vm\+::detail\+::make\+\_\+dependent}} (\mbox{\hyperlink{union_u}{U}} \&\&u)
+\item 
+{\footnotesize template$<$typename F $>$ }\\constexpr bool \mbox{\hyperlink{namespacesysio_1_1vm_aa0f8d54b67a1295d1cde34261cb32eb7}{sysio\+::vm\+::is\+\_\+callable}} (F \&\&fn)
+\item 
+{\footnotesize template$<$bool Decay, typename \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}} , typename... Args$>$ }\\constexpr auto \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_ab141ec340c80b2b0f076f740a31065a6}{sysio\+::vm\+::detail\+::get\+\_\+types}} (\mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}(Args...)) -\/$>$ std\+::tuple$<$ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}, \mbox{\hyperlink{structsysio_1_1vm_1_1freestanding}{freestanding}}, std\+::tuple$<$ std\+::conditional\+\_\+t$<$ Decay, std\+::decay\+\_\+t$<$ Args $>$, Args $>$... $>$ $>$
+\item 
+{\footnotesize template$<$bool Decay, typename \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}} , typename Cls , typename... Args$>$ }\\constexpr auto \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a78ac38765ba4037c28153972ab044e05}{sysio\+::vm\+::detail\+::get\+\_\+types}} (\mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}(Cls\+::\texorpdfstring{$\ast$}{*})(Args...)) -\/$>$ std\+::tuple$<$ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}, Cls, std\+::tuple$<$ std\+::conditional\+\_\+t$<$ Decay, std\+::decay\+\_\+t$<$ Args $>$, Args $>$... $>$ $>$
+\item 
+{\footnotesize template$<$bool Decay, typename \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}} , typename Cls , typename... Args$>$ }\\constexpr auto \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_ad5d9a7890bccfc6803ad840c6faa3ad4}{sysio\+::vm\+::detail\+::get\+\_\+types}} (\mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}(Cls\+::\texorpdfstring{$\ast$}{*})(Args...)\&) -\/$>$ std\+::tuple$<$ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}, Cls, std\+::tuple$<$ std\+::conditional\+\_\+t$<$ Decay, std\+::decay\+\_\+t$<$ Args $>$, Args $>$... $>$ $>$
+\item 
+{\footnotesize template$<$bool Decay, typename \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}} , typename Cls , typename... Args$>$ }\\constexpr auto \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_aa35ca18433e0d9abd4b834d589dff02a}{sysio\+::vm\+::detail\+::get\+\_\+types}} (\mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}(Cls\+::\texorpdfstring{$\ast$}{*})(Args...)\&\&) -\/$>$ std\+::tuple$<$ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}, Cls, std\+::tuple$<$ std\+::conditional\+\_\+t$<$ Decay, std\+::decay\+\_\+t$<$ Args $>$, Args $>$... $>$ $>$
+\item 
+{\footnotesize template$<$bool Decay, typename \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}} , typename Cls , typename... Args$>$ }\\constexpr auto \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_acb024e97414e87fd48bebf88c05a685d}{sysio\+::vm\+::detail\+::get\+\_\+types}} (\mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}(Cls\+::\texorpdfstring{$\ast$}{*})(Args...) const \&) -\/$>$ std\+::tuple$<$ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}, Cls, std\+::tuple$<$ std\+::conditional\+\_\+t$<$ Decay, std\+::decay\+\_\+t$<$ Args $>$, Args $>$... $>$ $>$
+\item 
+{\footnotesize template$<$bool Decay, typename \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}} , typename Cls , typename... Args$>$ }\\constexpr auto \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a48e47d8bf6e48dff354338b3e8eafea4}{sysio\+::vm\+::detail\+::get\+\_\+types}} (\mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}(Cls\+::\texorpdfstring{$\ast$}{*})(Args...) const \&\&) -\/$>$ std\+::tuple$<$ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}, Cls, std\+::tuple$<$ std\+::conditional\+\_\+t$<$ Decay, std\+::decay\+\_\+t$<$ Args $>$, Args $>$... $>$ $>$
+\item 
+{\footnotesize template$<$bool Decay, typename F $>$ }\\constexpr auto \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_acf88385800b2126aae5e20ed1893708b}{sysio\+::vm\+::detail\+::get\+\_\+types}} (F \&\&fn)
+\item 
+{\footnotesize template$<$std\+::size\+\_\+t N, typename \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}} , typename... Args$>$ }\\constexpr auto \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a6caebc597dfc2d2580ac99cc5ea92029}{sysio\+::vm\+::detail\+::parameters\+\_\+from\+\_\+impl}} (\mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}(Args...)) -\/$>$ \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a765b1076b6399d01bb6fc83b3c9fce34}{pack\+\_\+from\+\_\+t}}$<$ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}, Args... $>$
+\item 
+{\footnotesize template$<$std\+::size\+\_\+t N, typename \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}} , typename Cls , typename... Args$>$ }\\constexpr auto \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_ab43b5512cbda4dd3336404caff4f0863}{sysio\+::vm\+::detail\+::parameters\+\_\+from\+\_\+impl}} (\mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}(Cls\+::\texorpdfstring{$\ast$}{*})(Args...)) -\/$>$ \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a765b1076b6399d01bb6fc83b3c9fce34}{pack\+\_\+from\+\_\+t}}$<$ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}, Args... $>$
+\item 
+{\footnotesize template$<$std\+::size\+\_\+t N, typename \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}} , typename Cls , typename... Args$>$ }\\constexpr auto \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a6ea42609c2c0dd2db1e8f837eaf5b023}{sysio\+::vm\+::detail\+::parameters\+\_\+from\+\_\+impl}} (\mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}(Cls\+::\texorpdfstring{$\ast$}{*})(Args...)\&) -\/$>$ \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a765b1076b6399d01bb6fc83b3c9fce34}{pack\+\_\+from\+\_\+t}}$<$ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}, Args... $>$
+\item 
+{\footnotesize template$<$std\+::size\+\_\+t N, typename \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}} , typename Cls , typename... Args$>$ }\\constexpr auto \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a3a4349d35cb2b5d5dd63d95182932136}{sysio\+::vm\+::detail\+::parameters\+\_\+from\+\_\+impl}} (\mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}(Cls\+::\texorpdfstring{$\ast$}{*})(Args...)\&\&) -\/$>$ \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a765b1076b6399d01bb6fc83b3c9fce34}{pack\+\_\+from\+\_\+t}}$<$ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}, Args... $>$
+\item 
+{\footnotesize template$<$std\+::size\+\_\+t N, typename \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}} , typename Cls , typename... Args$>$ }\\constexpr auto \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_aabcfc830729e952feb820772f1fb68a6}{sysio\+::vm\+::detail\+::parameters\+\_\+from\+\_\+impl}} (\mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}(Cls\+::\texorpdfstring{$\ast$}{*})(Args...) const \&) -\/$>$ \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a765b1076b6399d01bb6fc83b3c9fce34}{pack\+\_\+from\+\_\+t}}$<$ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}, Args... $>$
+\item 
+{\footnotesize template$<$std\+::size\+\_\+t N, typename \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}} , typename Cls , typename... Args$>$ }\\constexpr auto \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_aa4f1712eec117c8a03710a8e80812dd0}{sysio\+::vm\+::detail\+::parameters\+\_\+from\+\_\+impl}} (\mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}(Cls\+::\texorpdfstring{$\ast$}{*})(Args...) const \&\&) -\/$>$ \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a765b1076b6399d01bb6fc83b3c9fce34}{pack\+\_\+from\+\_\+t}}$<$ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}, Args... $>$
+\item 
+{\footnotesize template$<$std\+::size\+\_\+t N, typename F $>$ }\\constexpr auto \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_ad60e4f25d177682fb1155ec0e68eb838}{sysio\+::vm\+::detail\+::parameters\+\_\+from\+\_\+impl}} (F \&\&fn)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}} , typename... Args$>$ }\\constexpr bool \mbox{\hyperlink{namespacesysio_1_1vm_a7e80ce56c648ce9d9e076b438b1e297f}{sysio\+::vm\+::is\+\_\+function}} (\mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}(\texorpdfstring{$\ast$}{*})(Args...))
+\item 
+{\footnotesize template$<$typename F $>$ }\\constexpr bool \mbox{\hyperlink{namespacesysio_1_1vm_a05e1f1f751a243adf3497282117576f1}{sysio\+::vm\+::is\+\_\+function}} (F \&\&)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}} , typename Cls , typename... Args$>$ }\\constexpr bool \mbox{\hyperlink{namespacesysio_1_1vm_afce6a5259baffc00a0687bf35e247f8c}{sysio\+::vm\+::is\+\_\+member\+\_\+function}} (\mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}(Cls\+::\texorpdfstring{$\ast$}{*})(Args...))
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}} , typename Cls , typename... Args$>$ }\\constexpr bool \mbox{\hyperlink{namespacesysio_1_1vm_a13f9b1b185b9cf605549f98ae13d1cf4}{sysio\+::vm\+::is\+\_\+member\+\_\+function}} (\mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}(Cls\+::\texorpdfstring{$\ast$}{*})(Args...)\&)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}} , typename Cls , typename... Args$>$ }\\constexpr bool \mbox{\hyperlink{namespacesysio_1_1vm_a35364345d05970700bcd9905b9dc272a}{sysio\+::vm\+::is\+\_\+member\+\_\+function}} (\mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}(Cls\+::\texorpdfstring{$\ast$}{*})(Args...)\&\&)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}} , typename Cls , typename... Args$>$ }\\constexpr bool \mbox{\hyperlink{namespacesysio_1_1vm_a95a93a2327b24395003ce62966734c8f}{sysio\+::vm\+::is\+\_\+member\+\_\+function}} (\mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}(Cls\+::\texorpdfstring{$\ast$}{*})(Args...) const \&)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}} , typename Cls , typename... Args$>$ }\\constexpr bool \mbox{\hyperlink{namespacesysio_1_1vm_ae0caf78eb0bd47c12b133d79122d7308}{sysio\+::vm\+::is\+\_\+member\+\_\+function}} (\mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}(Cls\+::\texorpdfstring{$\ast$}{*})(Args...) const \&\&)
+\item 
+{\footnotesize template$<$typename F $>$ }\\constexpr bool \mbox{\hyperlink{namespacesysio_1_1vm_ae53f70709b902418c86ad53cdac775ef}{sysio\+::vm\+::is\+\_\+member\+\_\+function}} (F \&\&)
+\item 
+{\footnotesize template$<$typename F $>$ }\\constexpr bool \mbox{\hyperlink{namespacesysio_1_1vm_a218a50b7a5ec6574178b99f9286c774b}{sysio\+::vm\+::is\+\_\+class}} (F \&\&)
+\item 
+{\footnotesize template$<$typename F $>$ }\\constexpr auto \mbox{\hyperlink{namespacesysio_1_1vm_a823bec625180c394e2b63efb3ecf1966}{sysio\+::vm\+::return\+\_\+type}} (F \&\&fn) -\/$>$ std\+::tuple\+\_\+element\+\_\+t$<$ 0, \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_aec7e5558f028ac96c58282abc02cdb86}{detail\+::get\+\_\+types\+\_\+t}}$<$ false, F $>$ $>$
+\item 
+{\footnotesize template$<$typename F $>$ }\\constexpr auto \mbox{\hyperlink{namespacesysio_1_1vm_ada72b2703c9022ceb424683b3f7e4a77}{sysio\+::vm\+::class\+\_\+from\+\_\+member}} (F \&\&fn) -\/$>$ std\+::tuple\+\_\+element\+\_\+t$<$ 1, \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_aec7e5558f028ac96c58282abc02cdb86}{detail\+::get\+\_\+types\+\_\+t}}$<$ false, F $>$ $>$
+\item 
+{\footnotesize template$<$typename F $>$ }\\constexpr auto \mbox{\hyperlink{namespacesysio_1_1vm_aa85279489a75582350b0d072d26a20fe}{sysio\+::vm\+::flatten\+\_\+parameters}} (F \&\&fn) -\/$>$ std\+::tuple\+\_\+element\+\_\+t$<$ 2, \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_aec7e5558f028ac96c58282abc02cdb86}{detail\+::get\+\_\+types\+\_\+t}}$<$ false, F $>$ $>$
+\item 
+{\footnotesize template$<$typename F $>$ }\\constexpr auto \mbox{\hyperlink{namespacesysio_1_1vm_a9ab0ae59d50ce856a213b51ecf8ebc4c}{sysio\+::vm\+::decayed\+\_\+flatten\+\_\+parameters}} (F \&\&fn) -\/$>$ std\+::tuple\+\_\+element\+\_\+t$<$ 2, \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_aec7e5558f028ac96c58282abc02cdb86}{detail\+::get\+\_\+types\+\_\+t}}$<$ true, F $>$ $>$
+\item 
+{\footnotesize template$<$std\+::size\+\_\+t N, typename F $>$ }\\constexpr auto \mbox{\hyperlink{namespacesysio_1_1vm_a9d4fd68654d24e82f2441751e341464a}{sysio\+::vm\+::parameter\+\_\+at}} (F \&\&fn) -\/$>$ std\+::tuple\+\_\+element\+\_\+t$<$ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}, decltype(\mbox{\hyperlink{namespacesysio_1_1vm_aa85279489a75582350b0d072d26a20fe}{flatten\+\_\+parameters}}(std\+::declval$<$ F $>$()))$>$
+\item 
+{\footnotesize template$<$std\+::size\+\_\+t N, typename F $>$ }\\constexpr auto \mbox{\hyperlink{namespacesysio_1_1vm_a08a7ad0243a623a35c8cabe6e68e6337}{sysio\+::vm\+::parameters\+\_\+from}} (F \&\&fn) -\/$>$ \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a44aea6d55c2460e05f4cf371b07655bf}{detail\+::parameters\+\_\+from\+\_\+impl\+\_\+t}}$<$ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}, F $>$
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{vm_2function__traits_8hpp_ae0e7ec10d6ffcb99b68833b2156699f4}\index{function\_traits.hpp@{function\_traits.hpp}!AUTO\_PARAM\_WORKAROUND@{AUTO\_PARAM\_WORKAROUND}}
+\index{AUTO\_PARAM\_WORKAROUND@{AUTO\_PARAM\_WORKAROUND}!function\_traits.hpp@{function\_traits.hpp}}
+\doxysubsubsection{\texorpdfstring{AUTO\_PARAM\_WORKAROUND}{AUTO\_PARAM\_WORKAROUND}}
+{\footnotesize\ttfamily \label{vm_2function__traits_8hpp_ae0e7ec10d6ffcb99b68833b2156699f4} 
+\#define AUTO\+\_\+\+PARAM\+\_\+\+WORKAROUND(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{lib_8h_a3f9003cfa8b6fa038820ae2e2e077ffa}{X}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a4807799cf4dcabe075abde117be1e0c1}{sysio::vm::detail::make\_dependent<decltype(X)>}}(\mbox{\hyperlink{struct_x_t}{X}})}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{vm_2function__traits_8hpp_source_l00046}{46}} of file \mbox{\hyperlink{vm_2function__traits_8hpp_source}{function\+\_\+traits.\+hpp}}.
+
+\Hypertarget{vm_2function__traits_8hpp_a7a41c13580dd3b382376f5ce312b2ed2}\index{function\_traits.hpp@{function\_traits.hpp}!SYS\_VM\_HAS\_MEMBER@{SYS\_VM\_HAS\_MEMBER}}
+\index{SYS\_VM\_HAS\_MEMBER@{SYS\_VM\_HAS\_MEMBER}!function\_traits.hpp@{function\_traits.hpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_HAS\_MEMBER}{SYS\_VM\_HAS\_MEMBER}}
+{\footnotesize\ttfamily \label{vm_2function__traits_8hpp_a7a41c13580dd3b382376f5ce312b2ed2} 
+\#define SYS\+\_\+\+VM\+\_\+\+HAS\+\_\+\+MEMBER(\begin{DoxyParamCaption}\item[{}]{ARG}{, }\item[{}]{\mbox{\hyperlink{pointertest_8cpp_a59c7737920212dcb3bb9df58d7062de4}{NAME}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1overloaded}{sysio::vm::detail::overloaded}}\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ [](\textcolor{keyword}{auto}\&\&\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}},\ std::enable\_if\_t<std::is\_class\_v<std::decay\_t<\textcolor{keyword}{decltype}(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})>>\ \&\&\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a98a80f3ec6e21f4e847d12bea16ce60f}{sysio::vm::detail::pass\_type}}<\ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ decltype(\&std::decay\_t<\textcolor{keyword}{decltype}(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})>::type::NAME)>(),\ \textcolor{keywordtype}{int}>\ =\ 0)\ \textcolor{keyword}{constexpr}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \},\ [](...)\ \textcolor{keyword}{constexpr}\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};\ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}(\mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1wrapper__t}{sysio::vm::detail::wrapper\_t}}<\textcolor{keyword}{decltype}(ARG)>\{\})}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{vm_2function__traits_8hpp_source_l00005}{5}} of file \mbox{\hyperlink{vm_2function__traits_8hpp_source}{function\+\_\+traits.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#define\ SYS\_VM\_HAS\_MEMBER(ARG,\ NAME)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00006\ \textcolor{preprocessor}{\ \ \ sysio::vm::detail::overloaded\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ [](auto\&\&\ f,\ std::enable\_if\_t<std::is\_class\_v<std::decay\_t<decltype(f)>>\ \&\&\ \(\backslash\)}}
+\DoxyCodeLine{00008\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sysio::vm::detail::pass\_type<\ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00009\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ decltype(\&std::decay\_t<decltype(f)>::type::NAME)>(),\ int>\ =\ 0)\ constexpr\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00010\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ return\ true;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00011\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \},\ [](...)\ constexpr\ \{\ return\ false;\ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00012\ \textcolor{preprocessor}{\ \ \ \ \}(sysio::vm::detail::wrapper\_t<decltype(ARG)>\{\})}}
+
+\end{DoxyCode}
+\Hypertarget{vm_2function__traits_8hpp_a0302efe794d137a942d8048fb906328e}\index{function\_traits.hpp@{function\_traits.hpp}!SYS\_VM\_HAS\_MEMBER\_TY@{SYS\_VM\_HAS\_MEMBER\_TY}}
+\index{SYS\_VM\_HAS\_MEMBER\_TY@{SYS\_VM\_HAS\_MEMBER\_TY}!function\_traits.hpp@{function\_traits.hpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_HAS\_MEMBER\_TY}{SYS\_VM\_HAS\_MEMBER\_TY}}
+{\footnotesize\ttfamily \label{vm_2function__traits_8hpp_a0302efe794d137a942d8048fb906328e} 
+\#define SYS\+\_\+\+VM\+\_\+\+HAS\+\_\+\+MEMBER\+\_\+\+TY(\begin{DoxyParamCaption}\item[{}]{TY}{, }\item[{}]{\mbox{\hyperlink{pointertest_8cpp_a59c7737920212dcb3bb9df58d7062de4}{NAME}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1overloaded}{sysio::vm::detail::overloaded}}\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ [](\textcolor{keyword}{auto}\&\&\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}},\ std::enable\_if\_t<std::is\_class\_v<TY>\ \&\&\ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a98a80f3ec6e21f4e847d12bea16ce60f}{sysio::vm::detail::pass\_type}}<\ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ decltype(\&std::decay\_t<\textcolor{keyword}{decltype}(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})>::type::NAME)>(),\ \textcolor{keywordtype}{int}>\ =\ 0)\ \textcolor{keyword}{constexpr}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \},\ [](...)\ \textcolor{keyword}{constexpr}\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};\ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}(\mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1wrapper__t}{sysio::vm::detail::wrapper\_t<TY>}}\{\})}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{vm_2function__traits_8hpp_source_l00014}{14}} of file \mbox{\hyperlink{vm_2function__traits_8hpp_source}{function\+\_\+traits.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00014\ \textcolor{preprocessor}{\#define\ SYS\_VM\_HAS\_MEMBER\_TY(TY,\ NAME)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\ \ \ sysio::vm::detail::overloaded\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ [](auto\&\&\ f,\ std::enable\_if\_t<std::is\_class\_v<TY>\ \&\&\ \ \ \(\backslash\)}}
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sysio::vm::detail::pass\_type<\ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ decltype(\&std::decay\_t<decltype(f)>::type::NAME)>(),\ int>\ =\ 0)\ constexpr\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ return\ true;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \},\ [](...)\ constexpr\ \{\ return\ false;\ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\ \ \ \ \}(sysio::vm::detail::wrapper\_t<TY>\{\})}}
+
+\end{DoxyCode}
+\Hypertarget{vm_2function__traits_8hpp_aa796dd2a42095f33cc57d0550886b838}\index{function\_traits.hpp@{function\_traits.hpp}!SYS\_VM\_HAS\_TEMPLATE\_MEMBER@{SYS\_VM\_HAS\_TEMPLATE\_MEMBER}}
+\index{SYS\_VM\_HAS\_TEMPLATE\_MEMBER@{SYS\_VM\_HAS\_TEMPLATE\_MEMBER}!function\_traits.hpp@{function\_traits.hpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_HAS\_TEMPLATE\_MEMBER}{SYS\_VM\_HAS\_TEMPLATE\_MEMBER}}
+{\footnotesize\ttfamily \label{vm_2function__traits_8hpp_aa796dd2a42095f33cc57d0550886b838} 
+\#define SYS\+\_\+\+VM\+\_\+\+HAS\+\_\+\+TEMPLATE\+\_\+\+MEMBER(\begin{DoxyParamCaption}\item[{}]{ARG}{, }\item[{}]{\mbox{\hyperlink{pointertest_8cpp_a59c7737920212dcb3bb9df58d7062de4}{NAME}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1overloaded}{sysio::vm::detail::overloaded}}\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ [\&](\textcolor{keyword}{auto}\&\&\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}},\ std::enable\_if\_t<std::is\_class\_v<std::decay\_t<\textcolor{keyword}{decltype}(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})>>\ \&\&\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a98a80f3ec6e21f4e847d12bea16ce60f}{sysio::vm::detail::pass\_type}}<\ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ decltype(\&std::decay\_t<\textcolor{keyword}{decltype}(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})>::type::template\ \mbox{\hyperlink{pointertest_8cpp_a59c7737920212dcb3bb9df58d7062de4}{NAME}})>(),\ \textcolor{keywordtype}{int}>\ =\ 0)\ \textcolor{keyword}{constexpr}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \},\ [](...)\ \textcolor{keyword}{constexpr}\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};\ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}(\mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1wrapper__t}{sysio::vm::detail::wrapper\_t}}<\textcolor{keyword}{decltype}(ARG)>\{\})}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{vm_2function__traits_8hpp_source_l00023}{23}} of file \mbox{\hyperlink{vm_2function__traits_8hpp_source}{function\+\_\+traits.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#define\ SYS\_VM\_HAS\_TEMPLATE\_MEMBER(ARG,\ NAME)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\ \ \ sysio::vm::detail::overloaded\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00025\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ [\&](auto\&\&\ f,\ std::enable\_if\_t<std::is\_class\_v<std::decay\_t<decltype(f)>>\ \&\&\ \(\backslash\)}}
+\DoxyCodeLine{00026\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sysio::vm::detail::pass\_type<\ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00027\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ decltype(\&std::decay\_t<decltype(f)>::type::template\ NAME)>(),\ int>\ =\ 0)\ constexpr\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00028\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ return\ true;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00029\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \},\ [](...)\ constexpr\ \{\ return\ false;\ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00030\ \textcolor{preprocessor}{\ \ \ \ \}(sysio::vm::detail::wrapper\_t<decltype(ARG)>\{\})}}
+
+\end{DoxyCode}
+\Hypertarget{vm_2function__traits_8hpp_ab111a40b9d97cc55f3d587096953539e}\index{function\_traits.hpp@{function\_traits.hpp}!SYS\_VM\_HAS\_TEMPLATE\_MEMBER\_TY@{SYS\_VM\_HAS\_TEMPLATE\_MEMBER\_TY}}
+\index{SYS\_VM\_HAS\_TEMPLATE\_MEMBER\_TY@{SYS\_VM\_HAS\_TEMPLATE\_MEMBER\_TY}!function\_traits.hpp@{function\_traits.hpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_HAS\_TEMPLATE\_MEMBER\_TY}{SYS\_VM\_HAS\_TEMPLATE\_MEMBER\_TY}}
+{\footnotesize\ttfamily \label{vm_2function__traits_8hpp_ab111a40b9d97cc55f3d587096953539e} 
+\#define SYS\+\_\+\+VM\+\_\+\+HAS\+\_\+\+TEMPLATE\+\_\+\+MEMBER\+\_\+\+TY(\begin{DoxyParamCaption}\item[{}]{TY}{, }\item[{}]{\mbox{\hyperlink{pointertest_8cpp_a59c7737920212dcb3bb9df58d7062de4}{NAME}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1overloaded}{sysio::vm::detail::overloaded}}\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ [](\textcolor{keyword}{auto}\&\&\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}},\ std::enable\_if\_t<std::is\_class\_v<TY>\ \&\&\ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a98a80f3ec6e21f4e847d12bea16ce60f}{sysio::vm::detail::pass\_type}}<\ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ decltype(\&std::decay\_t<\textcolor{keyword}{decltype}(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})>::type::template\ \mbox{\hyperlink{pointertest_8cpp_a59c7737920212dcb3bb9df58d7062de4}{NAME}})>(),\ \textcolor{keywordtype}{int}>\ =\ 0)\ \textcolor{keyword}{constexpr}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \},\ [](...)\ \textcolor{keyword}{constexpr}\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};\ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}(\mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1wrapper__t}{sysio::vm::detail::wrapper\_t<TY>}}\{\})}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{vm_2function__traits_8hpp_source_l00032}{32}} of file \mbox{\hyperlink{vm_2function__traits_8hpp_source}{function\+\_\+traits.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00032\ \textcolor{preprocessor}{\#define\ SYS\_VM\_HAS\_TEMPLATE\_MEMBER\_TY(TY,\ NAME)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00033\ \textcolor{preprocessor}{\ \ \ sysio::vm::detail::overloaded\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00034\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ [](auto\&\&\ f,\ std::enable\_if\_t<std::is\_class\_v<TY>\ \&\&\ \ \ \(\backslash\)}}
+\DoxyCodeLine{00035\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sysio::vm::detail::pass\_type<\ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00036\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ decltype(\&std::decay\_t<decltype(f)>::type::template\ NAME)>(),\ int>\ =\ 0)\ constexpr\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00037\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ return\ true;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00038\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \},\ [](...)\ constexpr\ \{\ return\ false;\ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00039\ \textcolor{preprocessor}{\ \ \ \ \}(sysio::vm::detail::wrapper\_t<TY>\{\})}}
+
+\end{DoxyCode}

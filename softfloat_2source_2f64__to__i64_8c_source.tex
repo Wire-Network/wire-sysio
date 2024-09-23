@@ -1,0 +1,109 @@
+\doxysection{f64\+\_\+to\+\_\+i64.\+c}
+\hypertarget{softfloat_2source_2f64__to__i64_8c_source}{}\label{softfloat_2source_2f64__to__i64_8c_source}\index{libraries/softfloat/source/f64\_to\_i64.c@{libraries/softfloat/source/f64\_to\_i64.c}}
+\mbox{\hyperlink{softfloat_2source_2f64__to__i64_8c}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00001}00001\ }
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00002}00002\ \textcolor{comment}{/*============================================================================}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00003}00003\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00004}00004\ \textcolor{comment}{This\ C\ source\ file\ is\ part\ of\ the\ SoftFloat\ IEEE\ Floating-\/Point\ Arithmetic}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00005}00005\ \textcolor{comment}{Package,\ Release\ 3e,\ by\ John\ R.\ Hauser.}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00006}00006\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00007}00007\ \textcolor{comment}{Copyright\ 2011,\ 2012,\ 2013,\ 2014,\ 2015,\ 2016,\ 2017\ The\ Regents\ of\ the}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00008}00008\ \textcolor{comment}{University\ of\ California.\ \ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00009}00009\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00010}00010\ \textcolor{comment}{Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00011}00011\ \textcolor{comment}{modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are\ met:}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00012}00012\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00013}00013\ \textcolor{comment}{\ 1.\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright\ notice,}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00014}00014\ \textcolor{comment}{\ \ \ \ this\ list\ of\ conditions,\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00015}00015\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00016}00016\ \textcolor{comment}{\ 2.\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above\ copyright\ notice,}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00017}00017\ \textcolor{comment}{\ \ \ \ this\ list\ of\ conditions,\ and\ the\ following\ disclaimer\ in\ the\ documentation}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00018}00018\ \textcolor{comment}{\ \ \ \ and/or\ other\ materials\ provided\ with\ the\ distribution.}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00019}00019\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00020}00020\ \textcolor{comment}{\ 3.\ Neither\ the\ name\ of\ the\ University\ nor\ the\ names\ of\ its\ contributors\ may}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00021}00021\ \textcolor{comment}{\ \ \ \ be\ used\ to\ endorse\ or\ promote\ products\ derived\ from\ this\ software\ without}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00022}00022\ \textcolor{comment}{\ \ \ \ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00023}00023\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00024}00024\ \textcolor{comment}{THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ REGENTS\ AND\ CONTRIBUTORS\ "{}AS\ IS"{},\ AND\ ANY}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00025}00025\ \textcolor{comment}{EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ THE\ IMPLIED}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00026}00026\ \textcolor{comment}{WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR\ A\ PARTICULAR\ PURPOSE,\ ARE}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00027}00027\ \textcolor{comment}{DISCLAIMED.\ \ IN\ NO\ EVENT\ SHALL\ THE\ REGENTS\ OR\ CONTRIBUTORS\ BE\ LIABLE\ FOR\ ANY}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00028}00028\ \textcolor{comment}{DIRECT,\ INDIRECT,\ INCIDENTAL,\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00029}00029\ \textcolor{comment}{(INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00030}00030\ \textcolor{comment}{LOSS\ OF\ USE,\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00031}00031\ \textcolor{comment}{ON\ ANY\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00032}00032\ \textcolor{comment}{(INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE\ OF\ THIS}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00033}00033\ \textcolor{comment}{SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00034}00034\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00035}00035\ \textcolor{comment}{=============================================================================*/}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00037}00037\ \textcolor{preprocessor}{\#include\ <stdbool.h>}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00038}00038\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{stdint_8h}{stdint.h}}>}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00039}00039\ \textcolor{preprocessor}{\#include\ "{}platform.h"{}}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00040}00040\ \textcolor{preprocessor}{\#include\ "{}internals.h"{}}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00041}00041\ \textcolor{preprocessor}{\#include\ "{}specialize.h"{}}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00042}00042\ \textcolor{preprocessor}{\#include\ "{}softfloat.h"{}}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00044}\mbox{\hyperlink{softfloat_2source_2f64__to__i64_8c_a375448433a8b049ba605b725e5c1accd}{00044}}\ \mbox{\hyperlink{stdint_8h_afd072b9a94c14417246175f6442422ae}{int\_fast64\_t}}\ \mbox{\hyperlink{softfloat_2source_2f64__to__i64_8c_a375448433a8b049ba605b725e5c1accd}{f64\_to\_i64}}(\ \mbox{\hyperlink{structfloat64__t}{float64\_t}}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \mbox{\hyperlink{stdint_8h_ad0fca8b15c218d2c687f8c373a71d228}{uint\_fast8\_t}}\ roundingMode,\ \textcolor{keywordtype}{bool}\ exact\ )}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00045}00045\ \{}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00046}00046\ \ \ \ \ \textcolor{keyword}{union\ }\mbox{\hyperlink{unionui64__f64}{ui64\_f64}}\ uA;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00047}00047\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\_fast64\_t}}\ uiA;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00048}00048\ \ \ \ \ \textcolor{keywordtype}{bool}\ sign;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00049}00049\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a9b7386d4af0e20ee32296d9a158c9f3a}{int\_fast16\_t}}\ exp;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00050}00050\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\_fast64\_t}}\ sig;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00051}00051\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a9b7386d4af0e20ee32296d9a158c9f3a}{int\_fast16\_t}}\ shiftDist;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00052}00052\ \textcolor{preprocessor}{\#ifdef\ SOFTFLOAT\_FAST\_INT64}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00053}00053\ \ \ \ \ \textcolor{keyword}{struct\ }uint64\_extra\ sigExtra;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00054}00054\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00055}00055\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ extSig[3];}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00056}00056\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00058}00058\ \ \ \ \ \textcolor{comment}{/*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00059}00059\ \textcolor{comment}{\ \ \ \ *-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*/}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00060}00060\ \ \ \ \ uA.\mbox{\hyperlink{unionui64__f64_a6c3253c08850759ca3c64dd956c6b4dd}{f}}\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}};}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00061}00061\ \ \ \ \ uiA\ =\ uA.\mbox{\hyperlink{unionui64__f64_a8f2bd2e3e69133354de3a30ec71c0634}{ui}};}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00062}00062\ \ \ \ \ sign\ =\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a6984fd1f3a0a8d7862b252a3853ba41d}{signF64UI}}(\ uiA\ );}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00063}00063\ \ \ \ \ exp\ \ =\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_acb8508e72960a694ee0de7eea1cf88b4}{expF64UI}}(\ uiA\ );}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00064}00064\ \ \ \ \ sig\ \ =\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_adec1d38df3339c530d0457bad29b6006}{fracF64UI}}(\ uiA\ );}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00065}00065\ \ \ \ \ \textcolor{comment}{/*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00066}00066\ \textcolor{comment}{\ \ \ \ *-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*/}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00067}00067\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ exp\ )\ sig\ |=\ \mbox{\hyperlink{stdint_8h_a8da5373e041921aa34c2b6172ac3babc}{UINT64\_C}}(\ 0x0010000000000000\ );}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00068}00068\ \ \ \ \ shiftDist\ =\ 0x433\ -\/\ exp;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00069}00069\ \textcolor{preprocessor}{\#ifdef\ SOFTFLOAT\_FAST\_INT64}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00070}00070\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ shiftDist\ <=\ 0\ )\ \{}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00071}00071\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ shiftDist\ <\ -\/11\ )\ \textcolor{keywordflow}{goto}\ invalid;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00072}00072\ \ \ \ \ \ \ \ \ sigExtra.v\ =\ sig<<-\/shiftDist;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00073}00073\ \ \ \ \ \ \ \ \ sigExtra.extra\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00074}00074\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00075}00075\ \ \ \ \ \ \ \ \ sigExtra\ =\ \mbox{\hyperlink{softfloat_2source_2s__shift_right_jam64_extra_8c_ad77b47aa5e02c75d01e4e0beeac87043}{softfloat\_shiftRightJam64Extra}}(\ sig,\ 0,\ shiftDist\ );}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00076}00076\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00077}00077\ \ \ \ \ \textcolor{keywordflow}{return}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00078}00078\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{softfloat_2source_2s__round_to_i64_8c_ade71787d45a8f73efde3ddb76a00701c}{softfloat\_roundToI64}}(}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \ \ \ sign,\ sigExtra.v,\ sigExtra.extra,\ roundingMode,\ exact\ );}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00080}00080\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00081}00081\ \ \ \ \ extSig[\mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a49446dd1193996f92b1e5bb62eaa4689}{indexWord}}(\ 3,\ 0\ )]\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00082}00082\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ shiftDist\ <=\ 0\ )\ \{}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00083}00083\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ shiftDist\ <\ -\/11\ )\ \textcolor{keywordflow}{goto}\ invalid;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00084}00084\ \ \ \ \ \ \ \ \ sig\ <<=\ -\/shiftDist;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00085}00085\ \ \ \ \ \ \ \ \ extSig[\mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a49446dd1193996f92b1e5bb62eaa4689}{indexWord}}(\ 3,\ 2\ )]\ =\ sig>>32;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00086}00086\ \ \ \ \ \ \ \ \ extSig[\mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a49446dd1193996f92b1e5bb62eaa4689}{indexWord}}(\ 3,\ 1\ )]\ =\ sig;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00087}00087\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00088}00088\ \ \ \ \ \ \ \ \ extSig[\mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a49446dd1193996f92b1e5bb62eaa4689}{indexWord}}(\ 3,\ 2\ )]\ =\ sig>>32;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00089}00089\ \ \ \ \ \ \ \ \ extSig[\mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a49446dd1193996f92b1e5bb62eaa4689}{indexWord}}(\ 3,\ 1\ )]\ =\ sig;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00090}00090\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{softfloat_2source_2include_2primitives_8h_a1d892f767d9e62cef1f0c996c19c1f82}{softfloat\_shiftRightJam96M}}(\ extSig,\ shiftDist,\ extSig\ );}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00091}00091\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00092}00092\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_ac02cdd84d087543a8774df0c4474c4d2}{softfloat\_roundMToI64}}(\ sign,\ extSig,\ roundingMode,\ exact\ );}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00093}00093\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00094}00094\ \ \ \ \ \textcolor{comment}{/*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00095}00095\ \textcolor{comment}{\ \ \ \ *-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*/}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00096}00096\ \ invalid:}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00097}00097\ \ \ \ \ \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2softfloat__raise_flags_8c_ac16bbf09eca0fe8ff91301d82c5a667f}{softfloat\_raiseFlags}}(\ \mbox{\hyperlink{softfloat_2source_2include_2softfloat_8h_a56a0f36da7f9eaaf54bd05cc2bf49173a191f069090c3d33752fb728272d9a4a9}{softfloat\_flag\_invalid}}\ );}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00098}00098\ \ \ \ \ \textcolor{keywordflow}{return}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00099}00099\ \ \ \ \ \ \ \ \ (exp\ ==\ 0x7FF)\ \&\&\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_adec1d38df3339c530d0457bad29b6006}{fracF64UI}}(\ uiA\ )\ ?\ \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2specialize_8h_aa7a325f8cc6020c3ca36643f3746c853}{i64\_fromNaN}}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00100}00100\ \ \ \ \ \ \ \ \ \ \ \ \ :\ sign\ ?\ \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2specialize_8h_acc823dc6690eaa4abfc7f49ef1fdc4fa}{i64\_fromNegOverflow}}\ :\ \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2specialize_8h_af38f53a03504c6cc4f84b0f3df1c5bf6}{i64\_fromPosOverflow}};}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00101}00101\ }
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00102}00102\ \}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f64__to__i64_8c_source_l00103}00103\ }
+
+\end{DoxyCode}

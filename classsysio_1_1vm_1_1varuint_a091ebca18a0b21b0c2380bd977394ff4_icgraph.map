@@ -1,0 +1,13 @@
+<map id="sysio::vm::varuint::to" name="sysio::vm::varuint::to">
+<area shape="rect" id="Node000001" title=" " alt="" coords="430,112,574,137"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1vm_1_1binary__parser.html#aa94aeec8745658f5a0a3dd4186f15252" title=" " alt="" coords="218,5,382,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="464,106,381,61,353,49,355,44,383,57,467,101"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1vm_1_1binary__parser.html#a5f124bb19f2a7bae49b6a10b70de5904" title=" " alt="" coords="218,71,382,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="414,113,382,107,383,102,415,107"/>
+<area shape="rect" id="Node000005" href="$classsysio_1_1vm_1_1binary__parser.html#a2791ae4581f7898f87406e771ed8dccb" title=" " alt="" coords="218,136,382,177"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="415,141,383,146,382,141,414,135"/>
+<area shape="rect" id="Node000006" href="$varint__tests_8cpp.html#aadf48e513d13aa68e0ea56d6105ecbda" title=" " alt="" coords="250,201,350,226"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="468,147,383,191,350,203,348,198,381,186,465,143"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1vm_1_1binary__parser.html#ad8435e2e340702448e59154380263880" title=" " alt="" coords="5,71,170,111"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="202,94,170,94,170,88,202,88"/>
+</map>

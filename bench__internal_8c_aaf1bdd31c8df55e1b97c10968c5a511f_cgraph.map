@@ -1,0 +1,14 @@
+<map id="bench_context_sign" name="bench_context_sign">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,100,143,125"/>
+<area shape="rect" id="Node000002" href="$secp256k1_8c.html#a861ce6fc7ee5e9fc346a5fee7093adb1" title=" " alt="" coords="194,70,372,96"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="142,100,178,95,179,100,143,105"/>
+<area shape="rect" id="Node000005" href="$secp256k1_8c.html#ac80c186f8ff22d87441240267a2c8100" title=" " alt="" coords="191,124,375,149"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="143,118,176,121,175,127,143,123"/>
+<area shape="rect" id="Node000003" href="$secp256k1_8c.html#af4866e9619f06679358fe6338ed42cd0" title=" " alt="" coords="423,5,634,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="341,67,423,48,424,53,342,72"/>
+<area shape="rect" id="Node000004" href="$secp256k1_8c.html#a9f5faeec85b85bdaccd7ddda899dbfa2" title=" " alt="" coords="682,42,925,68"/>
+<area shape="poly" id="edge4_Node000002_Node000004" title=" " alt="" coords="372,76,666,60,667,65,372,81"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="635,34,667,38,667,43,635,40"/>
+<area shape="rect" id="Node000006" href="$secp256k1_8c.html#a62b32b6a46f53b6aef01d3888496a79f" title=" " alt="" coords="423,120,634,161"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="375,135,407,136,407,141,375,141"/>
+</map>

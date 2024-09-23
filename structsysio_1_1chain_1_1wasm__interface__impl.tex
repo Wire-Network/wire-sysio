@@ -1,0 +1,364 @@
+\doxysection{sysio\+::chain\+::wasm\+\_\+interface\+\_\+impl Struct Reference}
+\hypertarget{structsysio_1_1chain_1_1wasm__interface__impl}{}\label{structsysio_1_1chain_1_1wasm__interface__impl}\index{sysio::chain::wasm\_interface\_impl@{sysio::chain::wasm\_interface\_impl}}
+
+
+{\ttfamily \#include $<$wasm\+\_\+interface\+\_\+private.\+hpp$>$}
+
+
+
+Collaboration diagram for sysio\+::chain\+::wasm\+\_\+interface\+\_\+impl\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=186pt]{structsysio_1_1chain_1_1wasm__interface__impl__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_1_1wasm__cache__entry}{wasm\+\_\+cache\+\_\+entry}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef boost\+::multi\+\_\+index\+\_\+container$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_1_1wasm__cache__entry}{wasm\+\_\+cache\+\_\+entry}}, indexed\+\_\+by$<$ ordered\+\_\+unique$<$ tag$<$ by\+\_\+hash $>$, composite\+\_\+key$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_1_1wasm__cache__entry}{wasm\+\_\+cache\+\_\+entry}}, member$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_1_1wasm__cache__entry}{wasm\+\_\+cache\+\_\+entry}}, \mbox{\hyperlink{namespacesysio_1_1chain_a357fd9478475457e5bb386a3143079b6}{digest\+\_\+type}}, \&\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_1_1wasm__cache__entry_a2186212ec09b24e80e7b0d9ed08dd1d1}{wasm\+\_\+cache\+\_\+entry\+::code\+\_\+hash}} $>$, member$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_1_1wasm__cache__entry}{wasm\+\_\+cache\+\_\+entry}}, \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}}, \&\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_1_1wasm__cache__entry_a743c987a1325f0b7771b545465f80169}{wasm\+\_\+cache\+\_\+entry\+::vm\+\_\+type}} $>$, member$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_1_1wasm__cache__entry}{wasm\+\_\+cache\+\_\+entry}}, \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}}, \&\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_1_1wasm__cache__entry_a27d4e0b8c3e923efed41d39c63564e58}{wasm\+\_\+cache\+\_\+entry\+::vm\+\_\+version}} $>$ $>$ $>$, ordered\+\_\+non\+\_\+unique$<$ tag$<$ by\+\_\+first\+\_\+block\+\_\+num $>$, member$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_1_1wasm__cache__entry}{wasm\+\_\+cache\+\_\+entry}}, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}, \&\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_1_1wasm__cache__entry_ab6295f4400e2633cebad94850d53ad43}{wasm\+\_\+cache\+\_\+entry\+::first\+\_\+block\+\_\+num\+\_\+used}} $>$ $>$, ordered\+\_\+non\+\_\+unique$<$ tag$<$ by\+\_\+last\+\_\+block\+\_\+num $>$, member$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_1_1wasm__cache__entry}{wasm\+\_\+cache\+\_\+entry}}, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}, \&\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_1_1wasm__cache__entry_a9d845e0e7a7740feb7d1ed68903c9b91}{wasm\+\_\+cache\+\_\+entry\+::last\+\_\+block\+\_\+num\+\_\+used}} $>$ $>$ $>$ $>$ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_a9980f338dd2ae523f6e5d419a867161d}{wasm\+\_\+cache\+\_\+index}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_a4a9123f895d0c469d94e516033fbdeb3}{wasm\+\_\+interface\+\_\+impl}} (\mbox{\hyperlink{classsysio_1_1chain_1_1wasm__interface_a9053d9e65167e5f241f1f3f27b175f9c}{wasm\+\_\+interface\+::vm\+\_\+type}} vm, bool eosvmoc\+\_\+tierup, const \mbox{\hyperlink{classchainbase_1_1database}{chainbase\+::database}} \&d, const boost\+::filesystem\+::path data\+\_\+dir, const \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1config}{eosvmoc\+::config}} \&eosvmoc\+\_\+config, bool profile)
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_aca43cd5121056cba404d048a35cd45c3}{\texorpdfstring{$\sim$}{\string~}wasm\+\_\+interface\+\_\+impl}} ()
+\item 
+std\+::vector$<$ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} $>$ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_acaf8b5f51ca4697993edf5c74bc612d6}{parse\+\_\+initial\+\_\+memory}} (const \mbox{\hyperlink{struct_i_r_1_1_module}{Module}} \&module)
+\item 
+void \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_a7d5fe6dd5951729a3a64bbad0657771d}{code\+\_\+block\+\_\+num\+\_\+last\+\_\+used}} (const \mbox{\hyperlink{namespacesysio_1_1chain_a357fd9478475457e5bb386a3143079b6}{digest\+\_\+type}} \&code\+\_\+hash, const \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \&\mbox{\hyperlink{classsysio_1_1chain_1_1wasm__interface_a9053d9e65167e5f241f1f3f27b175f9c}{vm\+\_\+type}}, const \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \&vm\+\_\+version, const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \&block\+\_\+num)
+\item 
+void \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_a07bc61b782d0a2463a05554909e8a72d}{current\+\_\+lib}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} lib)
+\item 
+const std\+::unique\+\_\+ptr$<$ \mbox{\hyperlink{classsysio_1_1chain_1_1wasm__instantiated__module__interface}{wasm\+\_\+instantiated\+\_\+module\+\_\+interface}} $>$ \& \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_a0db209c4515fe5d680783f7c49ffeecf}{get\+\_\+instantiated\+\_\+module}} (const \mbox{\hyperlink{namespacesysio_1_1chain_a357fd9478475457e5bb386a3143079b6}{digest\+\_\+type}} \&code\+\_\+hash, const \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \&\mbox{\hyperlink{classsysio_1_1chain_1_1wasm__interface_a9053d9e65167e5f241f1f3f27b175f9c}{vm\+\_\+type}}, const \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \&vm\+\_\+version, \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context}{transaction\+\_\+context}} \&trx\+\_\+context)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_a4782146a2bda629fc16b5772230ccb54}{is\+\_\+shutting\+\_\+down}} = false
+\item 
+std\+::unique\+\_\+ptr$<$ \mbox{\hyperlink{classsysio_1_1chain_1_1wasm__runtime__interface}{wasm\+\_\+runtime\+\_\+interface}} $>$ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_ad6943b8ec03fdbc69554b814d64f10d1}{runtime\+\_\+interface}}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_a9980f338dd2ae523f6e5d419a867161d}{wasm\+\_\+cache\+\_\+index}} \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_a653b949873ce49be456fb494b4f2e161}{wasm\+\_\+instantiation\+\_\+cache}}
+\item 
+const \mbox{\hyperlink{classchainbase_1_1database}{chainbase\+::database}} \& \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_a75f322279d22bb957853e69cd55e1269}{db}}
+\item 
+const \mbox{\hyperlink{classsysio_1_1chain_1_1wasm__interface_a9053d9e65167e5f241f1f3f27b175f9c}{wasm\+\_\+interface\+::vm\+\_\+type}} \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_a22ac534da54800a99b98db93c2d2ce07}{wasm\+\_\+runtime\+\_\+time}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{wasm__interface__private_8hpp_source_l00037}{37}} of file \mbox{\hyperlink{wasm__interface__private_8hpp_source}{wasm\+\_\+interface\+\_\+private.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{structsysio_1_1chain_1_1wasm__interface__impl_a9980f338dd2ae523f6e5d419a867161d}\index{sysio::chain::wasm\_interface\_impl@{sysio::chain::wasm\_interface\_impl}!wasm\_cache\_index@{wasm\_cache\_index}}
+\index{wasm\_cache\_index@{wasm\_cache\_index}!sysio::chain::wasm\_interface\_impl@{sysio::chain::wasm\_interface\_impl}}
+\doxysubsubsection{\texorpdfstring{wasm\_cache\_index}{wasm\_cache\_index}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__interface__impl_a9980f338dd2ae523f6e5d419a867161d} 
+boost\+::multi\+\_\+index\+\_\+container$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_1_1wasm__cache__entry}{wasm\+\_\+cache\+\_\+entry}}, indexed\+\_\+by$<$ ordered\+\_\+unique$<$tag$<$by\+\_\+hash$>$, composite\+\_\+key$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_1_1wasm__cache__entry}{wasm\+\_\+cache\+\_\+entry}}, member$<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_1_1wasm__cache__entry}{wasm\+\_\+cache\+\_\+entry}}, \mbox{\hyperlink{namespacesysio_1_1chain_a357fd9478475457e5bb386a3143079b6}{digest\+\_\+type}}, \&\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_1_1wasm__cache__entry_a2186212ec09b24e80e7b0d9ed08dd1d1}{wasm\+\_\+cache\+\_\+entry\+::code\+\_\+hash}}$>$, member$<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_1_1wasm__cache__entry}{wasm\+\_\+cache\+\_\+entry}}, \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}}, \&\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_1_1wasm__cache__entry_a743c987a1325f0b7771b545465f80169}{wasm\+\_\+cache\+\_\+entry\+::vm\+\_\+type}}$>$, member$<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_1_1wasm__cache__entry}{wasm\+\_\+cache\+\_\+entry}}, \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}}, \&\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_1_1wasm__cache__entry_a27d4e0b8c3e923efed41d39c63564e58}{wasm\+\_\+cache\+\_\+entry\+::vm\+\_\+version}}$>$ $>$ $>$, ordered\+\_\+non\+\_\+unique$<$tag$<$by\+\_\+first\+\_\+block\+\_\+num$>$, member$<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_1_1wasm__cache__entry}{wasm\+\_\+cache\+\_\+entry}}, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}, \&\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_1_1wasm__cache__entry_ab6295f4400e2633cebad94850d53ad43}{wasm\+\_\+cache\+\_\+entry\+::first\+\_\+block\+\_\+num\+\_\+used}}$>$ $>$, ordered\+\_\+non\+\_\+unique$<$tag$<$by\+\_\+last\+\_\+block\+\_\+num$>$, member$<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_1_1wasm__cache__entry}{wasm\+\_\+cache\+\_\+entry}}, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}, \&\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_1_1wasm__cache__entry_a9d845e0e7a7740feb7d1ed68903c9b91}{wasm\+\_\+cache\+\_\+entry\+::last\+\_\+block\+\_\+num\+\_\+used}}$>$ $>$ $>$ $>$ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_a9980f338dd2ae523f6e5d419a867161d}{sysio\+::chain\+::wasm\+\_\+interface\+\_\+impl\+::wasm\+\_\+cache\+\_\+index}}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__interface__private_8hpp_source_l00200}{200}} of file \mbox{\hyperlink{wasm__interface__private_8hpp_source}{wasm\+\_\+interface\+\_\+private.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structsysio_1_1chain_1_1wasm__interface__impl_a4a9123f895d0c469d94e516033fbdeb3}\index{sysio::chain::wasm\_interface\_impl@{sysio::chain::wasm\_interface\_impl}!wasm\_interface\_impl@{wasm\_interface\_impl}}
+\index{wasm\_interface\_impl@{wasm\_interface\_impl}!sysio::chain::wasm\_interface\_impl@{sysio::chain::wasm\_interface\_impl}}
+\doxysubsubsection{\texorpdfstring{wasm\_interface\_impl()}{wasm\_interface\_impl()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__interface__impl_a4a9123f895d0c469d94e516033fbdeb3} 
+sysio\+::chain\+::wasm\+\_\+interface\+\_\+impl\+::wasm\+\_\+interface\+\_\+impl (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classsysio_1_1chain_1_1wasm__interface_a9053d9e65167e5f241f1f3f27b175f9c}{wasm\+\_\+interface\+::vm\+\_\+type}}}]{vm}{, }\item[{bool}]{eosvmoc\+\_\+tierup}{, }\item[{const \mbox{\hyperlink{classchainbase_1_1database}{chainbase\+::database}} \&}]{d}{, }\item[{const boost\+::filesystem\+::path}]{data\+\_\+dir}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1config}{eosvmoc\+::config}} \&}]{eosvmoc\+\_\+config}{, }\item[{bool}]{profile}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__interface__private_8hpp_source_l00061}{61}} of file \mbox{\hyperlink{wasm__interface__private_8hpp_source}{wasm\+\_\+interface\+\_\+private.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_a75f322279d22bb957853e69cd55e1269}{db}}(d),\ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_a22ac534da54800a99b98db93c2d2ce07}{wasm\_runtime\_time}}(vm)\ \{}
+\DoxyCodeLine{00062\ \textcolor{preprocessor}{\#ifdef\ SYSIO\_SYS\_VM\_RUNTIME\_ENABLED}}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(vm\ ==\ wasm\_interface::vm\_type::eos\_vm)}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_ad6943b8ec03fdbc69554b814d64f10d1}{runtime\_interface}}\ =\ std::make\_unique<webassembly::eos\_vm\_runtime::eos\_vm\_runtime<sysio::vm::interpreter>>();}
+\DoxyCodeLine{00065\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00066\ \textcolor{preprocessor}{\#ifdef\ SYSIO\_SYS\_VM\_JIT\_RUNTIME\_ENABLED}}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(vm\ ==\ wasm\_interface::vm\_type::eos\_vm\_jit\ \&\&\ profile)\ \{}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1vm_adaaff21cfdbe1f41d62269f7117a69b0}{sysio::vm::set\_profile\_interval\_us}}(200);}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_ad6943b8ec03fdbc69554b814d64f10d1}{runtime\_interface}}\ =\ std::make\_unique<webassembly::eos\_vm\_runtime::eos\_vm\_profile\_runtime>();}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(vm\ ==\ wasm\_interface::vm\_type::eos\_vm\_jit\ \&\&\ !profile)}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_ad6943b8ec03fdbc69554b814d64f10d1}{runtime\_interface}}\ =\ std::make\_unique<webassembly::eos\_vm\_runtime::eos\_vm\_runtime<sysio::vm::jit>>();}
+\DoxyCodeLine{00073\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00074\ \textcolor{preprocessor}{\#ifdef\ SYSIO\_SYS\_VM\_OC\_RUNTIME\_ENABLED}}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(vm\ ==\ wasm\_interface::vm\_type::eos\_vm\_oc)}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_ad6943b8ec03fdbc69554b814d64f10d1}{runtime\_interface}}\ =\ std::make\_unique<webassembly::eosvmoc::eosvmoc\_runtime>(data\_dir,\ eosvmoc\_config,\ d);}
+\DoxyCodeLine{00077\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_ad6943b8ec03fdbc69554b814d64f10d1}{runtime\_interface}})}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a1bfa656552ea0534b2c91ee0fe33f850}{SYS\_THROW}}(\mbox{\hyperlink{namespacesysio_1_1chain_a489ddfe76234ed9479deafde7d26c2b9}{wasm\_exception}},\ \textcolor{stringliteral}{"{}\$\{r\}\ wasm\ runtime\ not\ supported\ on\ this\ platform\ and/or\ configuration"{}},\ (\textcolor{stringliteral}{"{}r"{}},\ vm));}
+\DoxyCodeLine{00080\ }
+\DoxyCodeLine{00081\ \textcolor{preprocessor}{\#ifdef\ SYSIO\_SYS\_VM\_OC\_RUNTIME\_ENABLED}}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(eosvmoc\_tierup)\ \{}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(vm\ !=\ wasm\_interface::vm\_type::eos\_vm\_oc,\ \mbox{\hyperlink{namespacesysio_1_1chain_a489ddfe76234ed9479deafde7d26c2b9}{wasm\_exception}},\ \textcolor{stringliteral}{"{}You\ can't\ use\ SYS\ VM\ OC\ as\ the\ base\ runtime\ when\ tier\ up\ is\ activated"{}});}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \ \ \ eosvmoc.emplace(data\_dir,\ eosvmoc\_config,\ d);}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00086\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=340pt]{structsysio_1_1chain_1_1wasm__interface__impl_a4a9123f895d0c469d94e516033fbdeb3_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1wasm__interface__impl_aca43cd5121056cba404d048a35cd45c3}\index{sysio::chain::wasm\_interface\_impl@{sysio::chain::wasm\_interface\_impl}!````~wasm\_interface\_impl@{\texorpdfstring{$\sim$}{\string~}wasm\_interface\_impl}}
+\index{````~wasm\_interface\_impl@{\texorpdfstring{$\sim$}{\string~}wasm\_interface\_impl}!sysio::chain::wasm\_interface\_impl@{sysio::chain::wasm\_interface\_impl}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}wasm\_interface\_impl()}{\string~wasm\_interface\_impl()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__interface__impl_aca43cd5121056cba404d048a35cd45c3} 
+sysio\+::chain\+::wasm\+\_\+interface\+\_\+impl\+::\texorpdfstring{$\sim$}{\string~}wasm\+\_\+interface\+\_\+impl (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__interface__private_8hpp_source_l00089}{89}} of file \mbox{\hyperlink{wasm__interface__private_8hpp_source}{wasm\+\_\+interface\+\_\+private.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_a4782146a2bda629fc16b5772230ccb54}{is\_shutting\_down}})}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(wasm\_cache\_index::iterator\ it\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_a653b949873ce49be456fb494b4f2e161}{wasm\_instantiation\_cache}}.begin();\ it\ !=\ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_a653b949873ce49be456fb494b4f2e161}{wasm\_instantiation\_cache}}.end();\ ++it)}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_a653b949873ce49be456fb494b4f2e161}{wasm\_instantiation\_cache}}.modify(it,\ [](wasm\_cache\_entry\&\ e)\ \{}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ e.module.release()-\/>fast\_shutdown();}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1chain_1_1wasm__interface__impl_a7d5fe6dd5951729a3a64bbad0657771d}\index{sysio::chain::wasm\_interface\_impl@{sysio::chain::wasm\_interface\_impl}!code\_block\_num\_last\_used@{code\_block\_num\_last\_used}}
+\index{code\_block\_num\_last\_used@{code\_block\_num\_last\_used}!sysio::chain::wasm\_interface\_impl@{sysio::chain::wasm\_interface\_impl}}
+\doxysubsubsection{\texorpdfstring{code\_block\_num\_last\_used()}{code\_block\_num\_last\_used()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__interface__impl_a7d5fe6dd5951729a3a64bbad0657771d} 
+void sysio\+::chain\+::wasm\+\_\+interface\+\_\+impl\+::code\+\_\+block\+\_\+num\+\_\+last\+\_\+used (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_a357fd9478475457e5bb386a3143079b6}{digest\+\_\+type}} \&}]{code\+\_\+hash}{, }\item[{const \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \&}]{vm\+\_\+type}{, }\item[{const \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \&}]{vm\+\_\+version}{, }\item[{const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \&}]{block\+\_\+num}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__interface__private_8hpp_source_l00115}{115}} of file \mbox{\hyperlink{wasm__interface__private_8hpp_source}{wasm\+\_\+interface\+\_\+private.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ wasm\_cache\_index::iterator\ it\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_a653b949873ce49be456fb494b4f2e161}{wasm\_instantiation\_cache}}.find(boost::make\_tuple(code\_hash,\ \mbox{\hyperlink{namespacesysio_af322f17f4ee9adb9dc402c8608dac30e}{vm\_type}},\ vm\_version));}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(it\ !=\ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_a653b949873ce49be456fb494b4f2e161}{wasm\_instantiation\_cache}}.end())}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_a653b949873ce49be456fb494b4f2e161}{wasm\_instantiation\_cache}}.modify(it,\ [block\_num](wasm\_cache\_entry\&\ e)\ \{}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ e.last\_block\_num\_used\ =\ block\_num;}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1wasm__interface__impl_a07bc61b782d0a2463a05554909e8a72d}\index{sysio::chain::wasm\_interface\_impl@{sysio::chain::wasm\_interface\_impl}!current\_lib@{current\_lib}}
+\index{current\_lib@{current\_lib}!sysio::chain::wasm\_interface\_impl@{sysio::chain::wasm\_interface\_impl}}
+\doxysubsubsection{\texorpdfstring{current\_lib()}{current\_lib()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__interface__impl_a07bc61b782d0a2463a05554909e8a72d} 
+void sysio\+::chain\+::wasm\+\_\+interface\+\_\+impl\+::current\+\_\+lib (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{lib}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__interface__private_8hpp_source_l00123}{123}} of file \mbox{\hyperlink{wasm__interface__private_8hpp_source}{wasm\+\_\+interface\+\_\+private.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//anything\ last\ used\ before\ or\ on\ the\ LIB\ can\ be\ evicted}}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ first\_it\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_a653b949873ce49be456fb494b4f2e161}{wasm\_instantiation\_cache}}.get<by\_last\_block\_num>().begin();}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ last\_it\ \ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_a653b949873ce49be456fb494b4f2e161}{wasm\_instantiation\_cache}}.get<by\_last\_block\_num>().upper\_bound(lib);}
+\DoxyCodeLine{00127\ \textcolor{preprocessor}{\#ifdef\ SYSIO\_SYS\_VM\_OC\_RUNTIME\_ENABLED}}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(eosvmoc)\ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\ it\ =\ first\_it;\ it\ !=\ last\_it;\ it++)}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \ \ \ eosvmoc-\/>cc.free\_code(it-\/>code\_hash,\ it-\/>vm\_version);}
+\DoxyCodeLine{00130\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_a653b949873ce49be456fb494b4f2e161}{wasm\_instantiation\_cache}}.get<by\_last\_block\_num>().erase(first\_it,\ last\_it);}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1wasm__interface__impl_a0db209c4515fe5d680783f7c49ffeecf}\index{sysio::chain::wasm\_interface\_impl@{sysio::chain::wasm\_interface\_impl}!get\_instantiated\_module@{get\_instantiated\_module}}
+\index{get\_instantiated\_module@{get\_instantiated\_module}!sysio::chain::wasm\_interface\_impl@{sysio::chain::wasm\_interface\_impl}}
+\doxysubsubsection{\texorpdfstring{get\_instantiated\_module()}{get\_instantiated\_module()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__interface__impl_a0db209c4515fe5d680783f7c49ffeecf} 
+const std\+::unique\+\_\+ptr$<$ \mbox{\hyperlink{classsysio_1_1chain_1_1wasm__instantiated__module__interface}{wasm\+\_\+instantiated\+\_\+module\+\_\+interface}} $>$ \& sysio\+::chain\+::wasm\+\_\+interface\+\_\+impl\+::get\+\_\+instantiated\+\_\+module (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_a357fd9478475457e5bb386a3143079b6}{digest\+\_\+type}} \&}]{code\+\_\+hash}{, }\item[{const \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \&}]{vm\+\_\+type}{, }\item[{const \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \&}]{vm\+\_\+version}{, }\item[{\mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context}{transaction\+\_\+context}} \&}]{trx\+\_\+context}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__interface__private_8hpp_source_l00134}{134}} of file \mbox{\hyperlink{wasm__interface__private_8hpp_source}{wasm\+\_\+interface\+\_\+private.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ wasm\_cache\_index::iterator\ it\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_a653b949873ce49be456fb494b4f2e161}{wasm\_instantiation\_cache}}.find(}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::make\_tuple(code\_hash,\ \mbox{\hyperlink{namespacesysio_af322f17f4ee9adb9dc402c8608dac30e}{vm\_type}},\ vm\_version)\ );}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ code\_object*\ codeobject\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(it\ ==\ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_a653b949873ce49be456fb494b4f2e161}{wasm\_instantiation\_cache}}.end())\ \{}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \ \ \ \ codeobject\ =\ \&\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_a75f322279d22bb957853e69cd55e1269}{db}}.\mbox{\hyperlink{classchainbase_1_1database_afcfe00f81a526c1376d4f51197dd3a9a}{get}}<code\_object,by\_code\_hash>(boost::make\_tuple(code\_hash,\ \mbox{\hyperlink{namespacesysio_af322f17f4ee9adb9dc402c8608dac30e}{vm\_type}},\ vm\_version));}
+\DoxyCodeLine{00142\ }
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \ \ \ \ it\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_a653b949873ce49be456fb494b4f2e161}{wasm\_instantiation\_cache}}.emplace(\ wasm\_interface\_impl::wasm\_cache\_entry\{}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .code\_hash\ =\ code\_hash,}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .first\_block\_num\_used\ =\ codeobject-\/>first\_block\_used,}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .last\_block\_num\_used\ =\ \mbox{\hyperlink{stdint_8h_ab5eb23180f7cc12b7d6c04a8ec067fdd}{UINT32\_MAX}},}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .module\ =\ \textcolor{keyword}{nullptr},}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .vm\_type\ =\ \mbox{\hyperlink{namespacesysio_af322f17f4ee9adb9dc402c8608dac30e}{vm\_type}},}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .vm\_version\ =\ vm\_version}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ ).first;}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00152\ }
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!it-\/>module)\ \{}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!codeobject)}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ codeobject\ =\ \&\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_a75f322279d22bb957853e69cd55e1269}{db}}.\mbox{\hyperlink{classchainbase_1_1database_afcfe00f81a526c1376d4f51197dd3a9a}{get}}<code\_object,by\_code\_hash>(boost::make\_tuple(code\_hash,\ \mbox{\hyperlink{namespacesysio_af322f17f4ee9adb9dc402c8608dac30e}{vm\_type}},\ vm\_version));}
+\DoxyCodeLine{00156\ }
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ timer\_pause\ =\ \mbox{\hyperlink{namespacefc_a23d89b54a8ffd84f7e7efeb21747d846}{fc::make\_scoped\_exit}}([\&]()\{}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ trx\_context.resume\_billing\_timer();}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \ \ \ \ trx\_context.pause\_billing\_timer();}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_i_r_1_1_module}{IR::Module}}\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}};}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \ \ \ \ \ \ std::vector<U8>\ \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}}\ =\ \{}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{keyword}{const}\ \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}*)codeobject-\/>code.data(),}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{keyword}{const}\ \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}*)codeobject-\/>code.data()\ +\ codeobject-\/>code.size()\};}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_serialization_1_1_memory_input_stream}{Serialization::MemoryInputStream}}\ stream((\textcolor{keyword}{const}\ \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}*)\mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}}.data(),}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}}.size());}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_w_a_s_m_1_1scoped__skip__checks}{WASM::scoped\_skip\_checks}}\ no\_check;}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_serialization_a2a05c5aff4847073ca0fb887d20ac485}{WASM::serialize}}(stream,\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}});}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{module}.userSections.clear();}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_serialization_1_1_fatal_serialization_exception}{Serialization::FatalSerializationException}}\&\ e)\ \{}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\textcolor{keyword}{false},\ wasm\_serialization\_error,\ e.\mbox{\hyperlink{struct_serialization_1_1_fatal_serialization_exception_ae65cd23b2cf7b4f0c9a062d3584bbdde}{message}}.c\_str());}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_i_r_1_1_validation_exception}{IR::ValidationException}}\&\ e)\ \{}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\textcolor{keyword}{false},\ wasm\_serialization\_error,\ e.\mbox{\hyperlink{struct_i_r_1_1_validation_exception_a9308689c3efeb272361bf9a07bf8f8ae}{message}}.c\_str());}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00176\ }
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_a653b949873ce49be456fb494b4f2e161}{wasm\_instantiation\_cache}}.modify(it,\ [\&](\textcolor{keyword}{auto}\&\ c)\ \{}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ c.module\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_ad6943b8ec03fdbc69554b814d64f10d1}{runtime\_interface}}-\/>instantiate\_module((\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*)\mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}}.data(),\ \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}}.size(),\ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_acaf8b5f51ca4697993edf5c74bc612d6}{parse\_initial\_memory}}(\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}),\ code\_hash,\ \mbox{\hyperlink{namespacesysio_af322f17f4ee9adb9dc402c8608dac30e}{vm\_type}},\ vm\_version);}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ it-\/>module;}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1wasm__interface__impl_a0db209c4515fe5d680783f7c49ffeecf_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1wasm__interface__impl_acaf8b5f51ca4697993edf5c74bc612d6}\index{sysio::chain::wasm\_interface\_impl@{sysio::chain::wasm\_interface\_impl}!parse\_initial\_memory@{parse\_initial\_memory}}
+\index{parse\_initial\_memory@{parse\_initial\_memory}!sysio::chain::wasm\_interface\_impl@{sysio::chain::wasm\_interface\_impl}}
+\doxysubsubsection{\texorpdfstring{parse\_initial\_memory()}{parse\_initial\_memory()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__interface__impl_acaf8b5f51ca4697993edf5c74bc612d6} 
+std\+::vector$<$ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} $>$ sysio\+::chain\+::wasm\+\_\+interface\+\_\+impl\+::parse\+\_\+initial\+\_\+memory (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct_i_r_1_1_module}{Module}} \&}]{module}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__interface__private_8hpp_source_l00097}{97}} of file \mbox{\hyperlink{wasm__interface__private_8hpp_source}{wasm\+\_\+interface\+\_\+private.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ std::vector<uint8\_t>\ mem\_image;}
+\DoxyCodeLine{00099\ }
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_i_r_1_1_data_segment}{DataSegment}}\&\ data\_segment\ :\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.dataSegments)\ \{}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(data\_segment.\mbox{\hyperlink{struct_i_r_1_1_data_segment_a4426062ee993d970dfa7b9e33dd7da6b}{baseOffset}}.\mbox{\hyperlink{struct_i_r_1_1_initializer_expression_a66f8d262d27a9bd6536f0268974c7dd5}{type}}\ ==\ InitializerExpression::Type::i32\_const,\ \mbox{\hyperlink{namespacesysio_1_1chain_a489ddfe76234ed9479deafde7d26c2b9}{wasm\_exception}},\ \textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.memories.defs.size(),\ \mbox{\hyperlink{namespacesysio_1_1chain_a489ddfe76234ed9479deafde7d26c2b9}{wasm\_exception}},\ \textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}\ base\_offset\ =\ data\_segment.\mbox{\hyperlink{struct_i_r_1_1_data_segment_a4426062ee993d970dfa7b9e33dd7da6b}{baseOffset}}.\mbox{\hyperlink{struct_i_r_1_1_initializer_expression_ae39054471f85529a9a641962618bab7e}{i32}};}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ \mbox{\hyperlink{namespacefc_1_1tracked_a7a874ea77f5afa2de8f3d5fb6d19a241}{memory\_size}}\ =\ (\textcolor{keyword}{module}.memories.defs[0].type.size.min\ <<\ IR::numBytesPerPageLog2);}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(base\_offset\ >=\ memory\_size\ ||\ base\_offset\ +\ data\_segment.\mbox{\hyperlink{struct_i_r_1_1_data_segment_a32f58a06f3c2dfff7094c92f63ed1d23}{data}}.size()\ >\ memory\_size)}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(wasm\_execution\_error,\ \textcolor{stringliteral}{"{}WASM\ data\ segment\ outside\ of\ valid\ memory\ range"{}});}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(base\_offset\ +\ data\_segment.\mbox{\hyperlink{struct_i_r_1_1_data_segment_a32f58a06f3c2dfff7094c92f63ed1d23}{data}}.size()\ >\ mem\_image.size())}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ mem\_image.resize(base\_offset\ +\ data\_segment.\mbox{\hyperlink{struct_i_r_1_1_data_segment_a32f58a06f3c2dfff7094c92f63ed1d23}{data}}.size(),\ 0x00);}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(mem\_image.data()\ +\ base\_offset,\ data\_segment.\mbox{\hyperlink{struct_i_r_1_1_data_segment_a32f58a06f3c2dfff7094c92f63ed1d23}{data}}.data(),\ data\_segment.\mbox{\hyperlink{struct_i_r_1_1_data_segment_a32f58a06f3c2dfff7094c92f63ed1d23}{data}}.size());}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00111\ }
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ mem\_image;}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=282pt]{structsysio_1_1chain_1_1wasm__interface__impl_acaf8b5f51ca4697993edf5c74bc612d6_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=336pt]{structsysio_1_1chain_1_1wasm__interface__impl_acaf8b5f51ca4697993edf5c74bc612d6_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1chain_1_1wasm__interface__impl_a75f322279d22bb957853e69cd55e1269}\index{sysio::chain::wasm\_interface\_impl@{sysio::chain::wasm\_interface\_impl}!db@{db}}
+\index{db@{db}!sysio::chain::wasm\_interface\_impl@{sysio::chain::wasm\_interface\_impl}}
+\doxysubsubsection{\texorpdfstring{db}{db}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__interface__impl_a75f322279d22bb957853e69cd55e1269} 
+const \mbox{\hyperlink{classchainbase_1_1database}{chainbase\+::database}}\& sysio\+::chain\+::wasm\+\_\+interface\+\_\+impl\+::db}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__interface__private_8hpp_source_l00203}{203}} of file \mbox{\hyperlink{wasm__interface__private_8hpp_source}{wasm\+\_\+interface\+\_\+private.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__interface__impl_a4782146a2bda629fc16b5772230ccb54}\index{sysio::chain::wasm\_interface\_impl@{sysio::chain::wasm\_interface\_impl}!is\_shutting\_down@{is\_shutting\_down}}
+\index{is\_shutting\_down@{is\_shutting\_down}!sysio::chain::wasm\_interface\_impl@{sysio::chain::wasm\_interface\_impl}}
+\doxysubsubsection{\texorpdfstring{is\_shutting\_down}{is\_shutting\_down}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__interface__impl_a4782146a2bda629fc16b5772230ccb54} 
+bool sysio\+::chain\+::wasm\+\_\+interface\+\_\+impl\+::is\+\_\+shutting\+\_\+down = false}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__interface__private_8hpp_source_l00184}{184}} of file \mbox{\hyperlink{wasm__interface__private_8hpp_source}{wasm\+\_\+interface\+\_\+private.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__interface__impl_ad6943b8ec03fdbc69554b814d64f10d1}\index{sysio::chain::wasm\_interface\_impl@{sysio::chain::wasm\_interface\_impl}!runtime\_interface@{runtime\_interface}}
+\index{runtime\_interface@{runtime\_interface}!sysio::chain::wasm\_interface\_impl@{sysio::chain::wasm\_interface\_impl}}
+\doxysubsubsection{\texorpdfstring{runtime\_interface}{runtime\_interface}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__interface__impl_ad6943b8ec03fdbc69554b814d64f10d1} 
+std\+::unique\+\_\+ptr$<$\mbox{\hyperlink{classsysio_1_1chain_1_1wasm__runtime__interface}{wasm\+\_\+runtime\+\_\+interface}}$>$ sysio\+::chain\+::wasm\+\_\+interface\+\_\+impl\+::runtime\+\_\+interface}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__interface__private_8hpp_source_l00185}{185}} of file \mbox{\hyperlink{wasm__interface__private_8hpp_source}{wasm\+\_\+interface\+\_\+private.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__interface__impl_a653b949873ce49be456fb494b4f2e161}\index{sysio::chain::wasm\_interface\_impl@{sysio::chain::wasm\_interface\_impl}!wasm\_instantiation\_cache@{wasm\_instantiation\_cache}}
+\index{wasm\_instantiation\_cache@{wasm\_instantiation\_cache}!sysio::chain::wasm\_interface\_impl@{sysio::chain::wasm\_interface\_impl}}
+\doxysubsubsection{\texorpdfstring{wasm\_instantiation\_cache}{wasm\_instantiation\_cache}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__interface__impl_a653b949873ce49be456fb494b4f2e161} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_a9980f338dd2ae523f6e5d419a867161d}{wasm\+\_\+cache\+\_\+index}} sysio\+::chain\+::wasm\+\_\+interface\+\_\+impl\+::wasm\+\_\+instantiation\+\_\+cache}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__interface__private_8hpp_source_l00201}{201}} of file \mbox{\hyperlink{wasm__interface__private_8hpp_source}{wasm\+\_\+interface\+\_\+private.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__interface__impl_a22ac534da54800a99b98db93c2d2ce07}\index{sysio::chain::wasm\_interface\_impl@{sysio::chain::wasm\_interface\_impl}!wasm\_runtime\_time@{wasm\_runtime\_time}}
+\index{wasm\_runtime\_time@{wasm\_runtime\_time}!sysio::chain::wasm\_interface\_impl@{sysio::chain::wasm\_interface\_impl}}
+\doxysubsubsection{\texorpdfstring{wasm\_runtime\_time}{wasm\_runtime\_time}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__interface__impl_a22ac534da54800a99b98db93c2d2ce07} 
+const \mbox{\hyperlink{classsysio_1_1chain_1_1wasm__interface_a9053d9e65167e5f241f1f3f27b175f9c}{wasm\+\_\+interface\+::vm\+\_\+type}} sysio\+::chain\+::wasm\+\_\+interface\+\_\+impl\+::wasm\+\_\+runtime\+\_\+time}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__interface__private_8hpp_source_l00204}{204}} of file \mbox{\hyperlink{wasm__interface__private_8hpp_source}{wasm\+\_\+interface\+\_\+private.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{wasm__interface__private_8hpp}{wasm\+\_\+interface\+\_\+private.\+hpp}}\end{DoxyCompactItemize}

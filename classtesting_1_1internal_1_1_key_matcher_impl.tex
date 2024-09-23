@@ -1,0 +1,204 @@
+\doxysection{testing\+::internal\+::Key\+Matcher\+Impl\texorpdfstring{$<$}{<} Pair\+Type \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classtesting_1_1internal_1_1_key_matcher_impl}{}\label{classtesting_1_1internal_1_1_key_matcher_impl}\index{testing::internal::KeyMatcherImpl$<$ PairType $>$@{testing::internal::KeyMatcherImpl$<$ PairType $>$}}
+
+
+{\ttfamily \#include $<$gmock-\/matchers.\+h$>$}
+
+
+
+Inheritance diagram for testing\+::internal\+::Key\+Matcher\+Impl\texorpdfstring{$<$}{<} Pair\+Type \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=224pt]{classtesting_1_1internal_1_1_key_matcher_impl__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for testing\+::internal\+::Key\+Matcher\+Impl\texorpdfstring{$<$}{<} Pair\+Type \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=224pt]{classtesting_1_1internal_1_1_key_matcher_impl__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef Raw\+Pair\+Type\+::first\+\_\+type \mbox{\hyperlink{classtesting_1_1internal_1_1_key_matcher_impl_aee891464193ef9913c1170b7ccb3f78c}{Key\+Type}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{classtesting_1_1internal_1_1_key_matcher_impl_a006551fc32e5aef0d319a304ddc5f383}{GTEST\+\_\+\+REMOVE\+\_\+\+REFERENCE\+\_\+\+AND\+\_\+\+CONST\+\_\+}} (Pair\+Type) Raw\+Pair\+Type
+\item 
+{\footnotesize template$<$typename Inner\+Matcher $>$ }\\\mbox{\hyperlink{classtesting_1_1internal_1_1_key_matcher_impl_a9ad2a218b0366cae9fb09e82347bd8e7}{Key\+Matcher\+Impl}} (Inner\+Matcher inner\+\_\+matcher)
+\item 
+virtual bool \mbox{\hyperlink{classtesting_1_1internal_1_1_key_matcher_impl_ae821c96473c6400defbb21eb9eca8d4c}{Match\+And\+Explain}} (Pair\+Type key\+\_\+value, \mbox{\hyperlink{classtesting_1_1_match_result_listener}{Match\+Result\+Listener}} \texorpdfstring{$\ast$}{*}listener) const
+\item 
+virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_key_matcher_impl_af024a1774c1aedae7b1dc532df7e27af}{Describe\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}os) const
+\item 
+virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_key_matcher_impl_a4be87d136547063a16777151b691046d}{Describe\+Negation\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}os) const
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classtesting_1_1_matcher_interface}{testing\+::\+Matcher\+Interface$<$ Pair\+Type $>$}}}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classtesting_1_1_matcher_describer_interface}{testing\+::\+Matcher\+Describer\+Interface}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{classtesting_1_1_matcher_describer_interface_ae2236a56ad2cc35cad10efc1208854f4}{\texorpdfstring{$\sim$}{\string~}\+Matcher\+Describer\+Interface}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Pair\+Type$>$\newline
+class testing\+::internal\+::\+Key\+Matcher\+Impl$<$ Pair\+Type $>$}
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l03291}{3291}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_key_matcher_impl_aee891464193ef9913c1170b7ccb3f78c}\index{testing::internal::KeyMatcherImpl$<$ PairType $>$@{testing::internal::KeyMatcherImpl$<$ PairType $>$}!KeyType@{KeyType}}
+\index{KeyType@{KeyType}!testing::internal::KeyMatcherImpl$<$ PairType $>$@{testing::internal::KeyMatcherImpl$<$ PairType $>$}}
+\doxysubsubsection{\texorpdfstring{KeyType}{KeyType}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_key_matcher_impl_aee891464193ef9913c1170b7ccb3f78c} 
+template$<$typename Pair\+Type $>$ \\
+Raw\+Pair\+Type\+::first\+\_\+type \mbox{\hyperlink{classtesting_1_1internal_1_1_key_matcher_impl}{testing\+::internal\+::\+Key\+Matcher\+Impl}}$<$ Pair\+Type $>$\+::\+Key\+Type}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l03294}{3294}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_key_matcher_impl_a9ad2a218b0366cae9fb09e82347bd8e7}\index{testing::internal::KeyMatcherImpl$<$ PairType $>$@{testing::internal::KeyMatcherImpl$<$ PairType $>$}!KeyMatcherImpl@{KeyMatcherImpl}}
+\index{KeyMatcherImpl@{KeyMatcherImpl}!testing::internal::KeyMatcherImpl$<$ PairType $>$@{testing::internal::KeyMatcherImpl$<$ PairType $>$}}
+\doxysubsubsection{\texorpdfstring{KeyMatcherImpl()}{KeyMatcherImpl()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_key_matcher_impl_a9ad2a218b0366cae9fb09e82347bd8e7} 
+template$<$typename Pair\+Type $>$ \\
+template$<$typename Inner\+Matcher $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_key_matcher_impl}{testing\+::internal\+::\+Key\+Matcher\+Impl}}$<$ Pair\+Type $>$\+::\+Key\+Matcher\+Impl (\begin{DoxyParamCaption}\item[{Inner\+Matcher}]{inner\+\_\+matcher}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l03297}{3297}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03298\ \ \ \ \ \ \ :\ inner\_matcher\_(}
+\DoxyCodeLine{03299\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_ad49d22f0e87778e2b97a88ee851dcea3}{testing::SafeMatcherCast<const\ KeyType\&>}}(inner\_matcher))\ \{}
+\DoxyCodeLine{03300\ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_key_matcher_impl_a4be87d136547063a16777151b691046d}\index{testing::internal::KeyMatcherImpl$<$ PairType $>$@{testing::internal::KeyMatcherImpl$<$ PairType $>$}!DescribeNegationTo@{DescribeNegationTo}}
+\index{DescribeNegationTo@{DescribeNegationTo}!testing::internal::KeyMatcherImpl$<$ PairType $>$@{testing::internal::KeyMatcherImpl$<$ PairType $>$}}
+\doxysubsubsection{\texorpdfstring{DescribeNegationTo()}{DescribeNegationTo()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_key_matcher_impl_a4be87d136547063a16777151b691046d} 
+template$<$typename Pair\+Type $>$ \\
+virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_key_matcher_impl}{testing\+::internal\+::\+Key\+Matcher\+Impl}}$<$ Pair\+Type $>$\+::\+Describe\+Negation\+To (\begin{DoxyParamCaption}\item[{\+::std\+::ostream \texorpdfstring{$\ast$}{*}}]{os}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classtesting_1_1_matcher_describer_interface_a2071afbc47097c4d1c0064275af34db0}{testing\+::\+Matcher\+Describer\+Interface}}.
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l03322}{3322}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03322\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{03323\ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}doesn't\ have\ a\ key\ that\ "{}};}
+\DoxyCodeLine{03324\ \ \ \ \ inner\_matcher\_.\mbox{\hyperlink{classtesting_1_1internal_1_1_matcher_base_a7e0c883c7745e0d646463077ef1c1267}{DescribeTo}}(os);}
+\DoxyCodeLine{03325\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_key_matcher_impl_a4be87d136547063a16777151b691046d_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_key_matcher_impl_af024a1774c1aedae7b1dc532df7e27af}\index{testing::internal::KeyMatcherImpl$<$ PairType $>$@{testing::internal::KeyMatcherImpl$<$ PairType $>$}!DescribeTo@{DescribeTo}}
+\index{DescribeTo@{DescribeTo}!testing::internal::KeyMatcherImpl$<$ PairType $>$@{testing::internal::KeyMatcherImpl$<$ PairType $>$}}
+\doxysubsubsection{\texorpdfstring{DescribeTo()}{DescribeTo()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_key_matcher_impl_af024a1774c1aedae7b1dc532df7e27af} 
+template$<$typename Pair\+Type $>$ \\
+virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_key_matcher_impl}{testing\+::internal\+::\+Key\+Matcher\+Impl}}$<$ Pair\+Type $>$\+::\+Describe\+To (\begin{DoxyParamCaption}\item[{\+::std\+::ostream \texorpdfstring{$\ast$}{*}}]{os}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classtesting_1_1_matcher_describer_interface_ad9f861588bd969b6e3e717f13bb94e7b}{testing\+::\+Matcher\+Describer\+Interface}}.
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l03316}{3316}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03316\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{03317\ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}has\ a\ key\ that\ "{}};}
+\DoxyCodeLine{03318\ \ \ \ \ inner\_matcher\_.\mbox{\hyperlink{classtesting_1_1internal_1_1_matcher_base_a7e0c883c7745e0d646463077ef1c1267}{DescribeTo}}(os);}
+\DoxyCodeLine{03319\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_key_matcher_impl_af024a1774c1aedae7b1dc532df7e27af_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_key_matcher_impl_a006551fc32e5aef0d319a304ddc5f383}\index{testing::internal::KeyMatcherImpl$<$ PairType $>$@{testing::internal::KeyMatcherImpl$<$ PairType $>$}!GTEST\_REMOVE\_REFERENCE\_AND\_CONST\_@{GTEST\_REMOVE\_REFERENCE\_AND\_CONST\_}}
+\index{GTEST\_REMOVE\_REFERENCE\_AND\_CONST\_@{GTEST\_REMOVE\_REFERENCE\_AND\_CONST\_}!testing::internal::KeyMatcherImpl$<$ PairType $>$@{testing::internal::KeyMatcherImpl$<$ PairType $>$}}
+\doxysubsubsection{\texorpdfstring{GTEST\_REMOVE\_REFERENCE\_AND\_CONST\_()}{GTEST\_REMOVE\_REFERENCE\_AND\_CONST\_()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_key_matcher_impl_a006551fc32e5aef0d319a304ddc5f383} 
+template$<$typename Pair\+Type $>$ \\
+typedef \mbox{\hyperlink{classtesting_1_1internal_1_1_key_matcher_impl}{testing\+::internal\+::\+Key\+Matcher\+Impl}}$<$ Pair\+Type $>$\+::\+GTEST\+\_\+\+REMOVE\+\_\+\+REFERENCE\+\_\+\+AND\+\_\+\+CONST\+\_\+ (\begin{DoxyParamCaption}\item[{Pair\+Type}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{classtesting_1_1internal_1_1_key_matcher_impl_ae821c96473c6400defbb21eb9eca8d4c}\index{testing::internal::KeyMatcherImpl$<$ PairType $>$@{testing::internal::KeyMatcherImpl$<$ PairType $>$}!MatchAndExplain@{MatchAndExplain}}
+\index{MatchAndExplain@{MatchAndExplain}!testing::internal::KeyMatcherImpl$<$ PairType $>$@{testing::internal::KeyMatcherImpl$<$ PairType $>$}}
+\doxysubsubsection{\texorpdfstring{MatchAndExplain()}{MatchAndExplain()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_key_matcher_impl_ae821c96473c6400defbb21eb9eca8d4c} 
+template$<$typename Pair\+Type $>$ \\
+virtual bool \mbox{\hyperlink{classtesting_1_1internal_1_1_key_matcher_impl}{testing\+::internal\+::\+Key\+Matcher\+Impl}}$<$ Pair\+Type $>$\+::\+Match\+And\+Explain (\begin{DoxyParamCaption}\item[{Pair\+Type}]{key\+\_\+value}{, }\item[{\mbox{\hyperlink{classtesting_1_1_match_result_listener}{Match\+Result\+Listener}} \texorpdfstring{$\ast$}{*}}]{listener}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classtesting_1_1_matcher_interface_a296b43607cd99d60365f0e6a762777cf}{testing\+::\+Matcher\+Interface$<$ Pair\+Type $>$}}.
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l03303}{3303}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03304\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{03305\ \ \ \ \ StringMatchResultListener\ inner\_listener;}
+\DoxyCodeLine{03306\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ match\ =\ inner\_matcher\_.\mbox{\hyperlink{classtesting_1_1internal_1_1_matcher_base_aab88b1d23b6b94a8495ce6a0e0c576ce}{MatchAndExplain}}(}
+\DoxyCodeLine{03307\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_1_1pair__getters_ad3ec636d0a3b753528952714a2af63b7}{pair\_getters::First}}(key\_value,\ Rank0()),\ \&inner\_listener);}
+\DoxyCodeLine{03308\ \ \ \ \ \textcolor{keyword}{const}\ std::string\ explanation\ =\ inner\_listener.str();}
+\DoxyCodeLine{03309\ \ \ \ \ \textcolor{keywordflow}{if}\ (explanation\ !=\ \textcolor{stringliteral}{"{}"{}})\ \{}
+\DoxyCodeLine{03310\ \ \ \ \ \ \ *listener\ <<\ \textcolor{stringliteral}{"{}whose\ first\ field\ is\ a\ value\ "{}}\ <<\ explanation;}
+\DoxyCodeLine{03311\ \ \ \ \ \}}
+\DoxyCodeLine{03312\ \ \ \ \ \textcolor{keywordflow}{return}\ match;}
+\DoxyCodeLine{03313\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_key_matcher_impl_ae821c96473c6400defbb21eb9eca8d4c_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/include/gmock/\mbox{\hyperlink{gmock-matchers_8h}{gmock-\/matchers.\+h}}\end{DoxyCompactItemize}

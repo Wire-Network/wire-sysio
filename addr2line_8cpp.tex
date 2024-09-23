@@ -1,0 +1,195 @@
+\doxysection{libraries/sys-\/vm/tools/addr2line.cpp File Reference}
+\hypertarget{addr2line_8cpp}{}\label{addr2line_8cpp}\index{libraries/sys-\/vm/tools/addr2line.cpp@{libraries/sys-\/vm/tools/addr2line.cpp}}
+{\ttfamily \#include $<$sysio/vm/backend.\+hpp$>$}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$iomanip$>$}\newline
+{\ttfamily \#include $<$cctype$>$}\newline
+Include dependency graph for addr2line.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{addr2line_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structnm__debug__info}{nm\+\_\+debug\+\_\+info}}
+\item 
+struct \mbox{\hyperlink{structnm__options}{nm\+\_\+options}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacesysio_1_1vm_a4e7c9f9a80391b4f980c64238a1feaaf}{sysio\+::vm\+::guarded\+\_\+vector}}$<$ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} $>$ \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{addr2line_8cpp_a0c79579de6b0e6b2ab9145d9ae03da59}{find\+\_\+export\+\_\+name}} (\mbox{\hyperlink{structsysio_1_1vm_1_1module}{sysio\+::vm\+::module}} \&mod, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} idx)
+\item 
+bool \mbox{\hyperlink{addr2line_8cpp_af098af211275a41a03419345d18a8a59}{starts\+\_\+with}} (std\+::string\+\_\+view arg, std\+::string\+\_\+view prefix)
+\item 
+int \mbox{\hyperlink{addr2line_8cpp_a217dbf8b442f20279ea00b898af96f52}{main}} (int argc, const char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{addr2line_8cpp_a0c79579de6b0e6b2ab9145d9ae03da59}\index{addr2line.cpp@{addr2line.cpp}!find\_export\_name@{find\_export\_name}}
+\index{find\_export\_name@{find\_export\_name}!addr2line.cpp@{addr2line.cpp}}
+\doxysubsubsection{\texorpdfstring{find\_export\_name()}{find\_export\_name()}}
+{\footnotesize\ttfamily \label{addr2line_8cpp_a0c79579de6b0e6b2ab9145d9ae03da59} 
+\mbox{\hyperlink{namespacesysio_1_1vm_a4e7c9f9a80391b4f980c64238a1feaaf}{sysio\+::vm\+::guarded\+\_\+vector}}$<$ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} $>$ \texorpdfstring{$\ast$}{*} find\+\_\+export\+\_\+name (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1vm_1_1module}{sysio\+::vm\+::module}} \&}]{mod}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{idx}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{addr2line_8cpp_source_l00029}{29}} of file \mbox{\hyperlink{addr2line_8cpp_source}{addr2line.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00030\ \ \ \ \textcolor{keywordflow}{if}(mod.\mbox{\hyperlink{structsysio_1_1vm_1_1module_a9edd9e4e91d2946ce07ebb62c22bc08c}{names}}\ \&\&\ mod.\mbox{\hyperlink{structsysio_1_1vm_1_1module_a9edd9e4e91d2946ce07ebb62c22bc08c}{names}}-\/>\mbox{\hyperlink{structsysio_1_1vm_1_1name__section_aa3e4a23f304034a548fa222484515cf6}{function\_names}})\ \{}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ i\ =\ 0;\ i\ <\ mod.\mbox{\hyperlink{structsysio_1_1vm_1_1module_a9edd9e4e91d2946ce07ebb62c22bc08c}{names}}-\/>\mbox{\hyperlink{structsysio_1_1vm_1_1name__section_aa3e4a23f304034a548fa222484515cf6}{function\_names}}-\/>size();\ ++i)\ \{}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}((*mod.\mbox{\hyperlink{structsysio_1_1vm_1_1module_a9edd9e4e91d2946ce07ebb62c22bc08c}{names}}-\/>\mbox{\hyperlink{structsysio_1_1vm_1_1name__section_aa3e4a23f304034a548fa222484515cf6}{function\_names}})[i].idx\ ==\ idx)\ \{}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \&(*mod.\mbox{\hyperlink{structsysio_1_1vm_1_1module_a9edd9e4e91d2946ce07ebb62c22bc08c}{names}}-\/>\mbox{\hyperlink{structsysio_1_1vm_1_1name__section_aa3e4a23f304034a548fa222484515cf6}{function\_names}})[i].\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}};}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00036\ \ \ \ \}}
+\DoxyCodeLine{00037\ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ i\ =\ 0;\ i\ <\ mod.\mbox{\hyperlink{structsysio_1_1vm_1_1module_a7354012cc5c944bd5fe569ee7167e5bf}{exports}}.size();\ ++i)\ \{}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(mod.\mbox{\hyperlink{structsysio_1_1vm_1_1module_a7354012cc5c944bd5fe569ee7167e5bf}{exports}}[i].index\ ==\ idx\ \&\&\ mod.\mbox{\hyperlink{structsysio_1_1vm_1_1module_a7354012cc5c944bd5fe569ee7167e5bf}{exports}}[i].kind\ ==\ \mbox{\hyperlink{namespacesysio_1_1vm_a6906e0db8d0142b181d3b8f0b77b5124ad5e2a019709e6fe68af6b3c4fd0f17d8}{sysio::vm::Function}})\ \{}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \&mod.\mbox{\hyperlink{structsysio_1_1vm_1_1module_a7354012cc5c944bd5fe569ee7167e5bf}{exports}}[i].field\_str;}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00041\ \ \ \ \}}
+\DoxyCodeLine{00042\ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00043\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=246pt]{addr2line_8cpp_a0c79579de6b0e6b2ab9145d9ae03da59_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{addr2line_8cpp_a217dbf8b442f20279ea00b898af96f52}\index{addr2line.cpp@{addr2line.cpp}!main@{main}}
+\index{main@{main}!addr2line.cpp@{addr2line.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{addr2line_8cpp_a217dbf8b442f20279ea00b898af96f52} 
+int main (\begin{DoxyParamCaption}\item[{int}]{argc}{, }\item[{const char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{argv}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{addr2line_8cpp_source_l00053}{53}} of file \mbox{\hyperlink{addr2line_8cpp_source}{addr2line.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00054\ \ \ \ \textcolor{keywordtype}{bool}\ print\_addresses\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00055\ \ \ \ \textcolor{keywordtype}{bool}\ print\_functions\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00056\ \ \ \ \textcolor{keywordtype}{bool}\ pretty\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00057\ \ \ \ std::vector<std::string>\ addresses;}
+\DoxyCodeLine{00058\ \ \ \ std::string\ \mbox{\hyperlink{namespaceembed_clara_a1e1bd594f85f58f5dca6c41c0ac720fb}{filename}}\ =\ \textcolor{stringliteral}{"{}a.out"{}};}
+\DoxyCodeLine{00059\ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int}\ i\ =\ 1;\ i\ <\ argc;\ ++i)\ \{}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ std::string\ arg\ =\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[i];}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(arg\ ==\ \textcolor{stringliteral}{"{}-\/h"{}}\ ||\ arg\ ==\ \textcolor{stringliteral}{"{}-\/-\/help"{}})\ \{}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}Usage:\ "{}}\ <<\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[0]\ <<\ \textcolor{stringliteral}{"{}\ [-\/h]\ [-\/a]\ [-\/C]\ [-\/e\ wasm]\ [-\/f]\ [-\/s]\ [-\/i]\ [-\/p]\ address..."{}}\ <<\ std::endl;}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(arg\ ==\ \textcolor{stringliteral}{"{}-\/a"{}}\ ||\ arg\ ==\ \textcolor{stringliteral}{"{}-\/-\/addresses"{}})\ \{}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ print\_addresses\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(arg\ ==\ \textcolor{stringliteral}{"{}-\/C"{}}\ ||\ \mbox{\hyperlink{addr2line_8cpp_af098af211275a41a03419345d18a8a59}{starts\_with}}(arg,\ \textcolor{stringliteral}{"{}-\/-\/demangle="{}}))\ \{}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Ignore\ requests\ to\ demangle}}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(arg\ ==\ \textcolor{stringliteral}{"{}-\/e"{}})\ \{}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(++i\ <\ argc)\ \{}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceembed_clara_a1e1bd594f85f58f5dca6c41c0ac720fb}{filename}}\ =\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[i];}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}Missing\ argument\ to\ -\/e"{}}\ <<\ std::endl;}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 2;}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(\mbox{\hyperlink{addr2line_8cpp_af098af211275a41a03419345d18a8a59}{starts\_with}}(arg,\ \textcolor{stringliteral}{"{}-\/-\/exe="{}}))\ \{}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceembed_clara_a1e1bd594f85f58f5dca6c41c0ac720fb}{filename}}\ =\ arg.substr(6);}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(arg\ ==\ \textcolor{stringliteral}{"{}-\/f"{}}\ ||\ arg\ ==\ \textcolor{stringliteral}{"{}-\/-\/functions"{}})\ \{}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ print\_functions\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(arg\ ==\ \textcolor{stringliteral}{"{}-\/s"{}}\ ||\ arg\ ==\ \textcolor{stringliteral}{"{}-\/-\/basenames"{}})\ \{}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ No\ effect\ without\ filenames}}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(arg\ ==\ \textcolor{stringliteral}{"{}-\/i"{}}\ ||\ arg\ ==\ \textcolor{stringliteral}{"{}-\/-\/inlines"{}})\ \{}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ No\ effect\ without\ source\ information}}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(arg\ ==\ \textcolor{stringliteral}{"{}-\/p"{}}\ ||\ arg\ ==\ \textcolor{stringliteral}{"{}-\/-\/pretty-\/print"{}})\ \{}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ pretty\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(arg[0]\ !=\ \textcolor{charliteral}{'-\/'})\ \{}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \ addresses.push\_back(arg);}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}unexpected\ argument:\ "{}}\ <<\ arg\ <<\ std::endl;}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 2;}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00091\ \ \ \ \}}
+\DoxyCodeLine{00092\ }
+\DoxyCodeLine{00093\ \ \ \ std::vector<std::string>\ function\_names;}
+\DoxyCodeLine{00094\ }
+\DoxyCodeLine{00095\ \ \ \ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacesysio_1_1vm}{sysio::vm}};}
+\DoxyCodeLine{00096\ \ \ \ \textcolor{keyword}{auto}\ code\ =\ \mbox{\hyperlink{fuzz__parser_8cpp_ab6d9537f94c320b20d681495d7f93099}{read\_wasm}}(filename);}
+\DoxyCodeLine{00097\ \ \ \ \mbox{\hyperlink{structnm__debug__info}{nm\_debug\_info}}\ info;}
+\DoxyCodeLine{00098\ \ \ \ \textcolor{keyword}{module}\ mod;}
+\DoxyCodeLine{00099\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1binary__parser}{binary\_parser<null\_writer,\ nm\_options,\ nm\_debug\_info>}}\ \mbox{\hyperlink{namespaceupload_af9e508d19dc2dd9cdb7c642dde0bdd21}{parser}}(mod.allocator);}
+\DoxyCodeLine{00100\ \ \ \ \mbox{\hyperlink{namespaceupload_af9e508d19dc2dd9cdb7c642dde0bdd21}{parser}}.parse\_module(code,\ mod,\ info);}
+\DoxyCodeLine{00101\ \ \ \ \{}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(std::size\_t\ i\ =\ 0;\ i\ <\ info.function\_offsets.size();\ ++i)\ \{}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{classsysio_1_1vm_1_1managed__vector}{guarded\_vector<uint8\_t>}}*\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\ =\ \mbox{\hyperlink{addr2line_8cpp_a0c79579de6b0e6b2ab9145d9ae03da59}{find\_export\_name}}(mod,\ i\ +\ mod.get\_imported\_functions\_size()))\ \{}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ \ \ \ function\_names.push\_back(std::string(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}-\/>raw()),\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}-\/>size()));}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \ \ \ \ function\_names.push\_back(\textcolor{stringliteral}{"{}fn"{}}\ +\ std::to\_string(\ i\ +\ mod.get\_imported\_functions\_size()));}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00109\ \ \ \ \}}
+\DoxyCodeLine{00110\ }
+\DoxyCodeLine{00111\ \ \ \ std::string\_view\ sep\ =\ pretty\ ?\ \textcolor{stringliteral}{"{}\ "{}}\ :\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{00112\ }
+\DoxyCodeLine{00113\ \ \ \ \textcolor{keyword}{auto}\ print\_one\_address\ =\ [\&](\textcolor{keyword}{const}\ std::string\&\ addr)\ \{}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ x\ =\ std::stoul(addr,\ \textcolor{keyword}{nullptr},\ 16);}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(print\_addresses)\ \{}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ std::cout\ <<\ std::showbase\ <<\ std::hex\ <<\ x\ <<\ sep;}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(print\_functions)\ \{}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ std::cout\ <<\ std::hex\ <<\ function\_names[info.get\_function(x)]\ <<\ sep;}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}??:0\(\backslash\)n"{}};}
+\DoxyCodeLine{00122\ \ \ \ \};}
+\DoxyCodeLine{00123\ }
+\DoxyCodeLine{00124\ \ \ \ \textcolor{keywordflow}{if}(!addresses.empty())\ \{}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ addr\ :\ addresses)\ \{}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ print\_one\_address(addr);}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00128\ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ std::string\ addr;}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \textcolor{keywordflow}{while}(std::cin\ >>\ addr)\ \{}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ print\_one\_address(addr);}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00133\ \ \ \ \}}
+\DoxyCodeLine{00134\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=246pt]{addr2line_8cpp_a217dbf8b442f20279ea00b898af96f52_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{addr2line_8cpp_af098af211275a41a03419345d18a8a59}\index{addr2line.cpp@{addr2line.cpp}!starts\_with@{starts\_with}}
+\index{starts\_with@{starts\_with}!addr2line.cpp@{addr2line.cpp}}
+\doxysubsubsection{\texorpdfstring{starts\_with()}{starts\_with()}}
+{\footnotesize\ttfamily \label{addr2line_8cpp_af098af211275a41a03419345d18a8a59} 
+bool starts\+\_\+with (\begin{DoxyParamCaption}\item[{std\+::string\+\_\+view}]{arg}{, }\item[{std\+::string\+\_\+view}]{prefix}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{addr2line_8cpp_source_l00049}{49}} of file \mbox{\hyperlink{addr2line_8cpp_source}{addr2line.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00050\ \ \ \ \textcolor{keywordflow}{return}\ arg.substr(0,\ prefix.size())\ ==\ prefix;}
+\DoxyCodeLine{00051\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=217pt]{addr2line_8cpp_af098af211275a41a03419345d18a8a59_icgraph}
+\end{center}
+\end{figure}

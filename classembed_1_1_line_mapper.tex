@@ -1,0 +1,156 @@
+\doxysection{embed.\+Line\+Mapper Class Reference}
+\hypertarget{classembed_1_1_line_mapper}{}\label{classembed_1_1_line_mapper}\index{embed.LineMapper@{embed.LineMapper}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classembed_1_1_line_mapper_a3fba8e81ff9595adb47b65d5e0fc9f9b}{\+\_\+\+\_\+init\+\_\+\+\_\+}} (self, \mbox{\hyperlink{classembed_1_1_line_mapper_ae46b69ab0d09db7a5f01eb3cafef7d91}{id\+Map}}, \mbox{\hyperlink{classembed_1_1_line_mapper_a35067db26fdbee959d637f350830f43b}{outer\+Namespace}})
+\item 
+\mbox{\hyperlink{classembed_1_1_line_mapper_a98d45d187f555e8a42ffdf703f8e0dd2}{map\+Line}} (self, line\+No, line)
+\item 
+\mbox{\hyperlink{classembed_1_1_line_mapper_aeae9d4f7f233aad47a354235a96bcbfb}{map\+File}} (self, filename\+In, filename\+Out)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classembed_1_1_line_mapper_ae46b69ab0d09db7a5f01eb3cafef7d91}{id\+Map}} = id\+Map
+\item 
+\mbox{\hyperlink{classembed_1_1_line_mapper_a35067db26fdbee959d637f350830f43b}{outer\+Namespace}} = outer\+Namespace
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{embed_8py_source_l00020}{20}} of file \mbox{\hyperlink{embed_8py_source}{embed.\+py}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classembed_1_1_line_mapper_a3fba8e81ff9595adb47b65d5e0fc9f9b}\index{embed.LineMapper@{embed.LineMapper}!\_\_init\_\_@{\_\_init\_\_}}
+\index{\_\_init\_\_@{\_\_init\_\_}!embed.LineMapper@{embed.LineMapper}}
+\doxysubsubsection{\texorpdfstring{\_\_init\_\_()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily \label{classembed_1_1_line_mapper_a3fba8e81ff9595adb47b65d5e0fc9f9b} 
+embed.\+Line\+Mapper.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self}{, }\item[{}]{id\+Map}{, }\item[{}]{outer\+Namespace}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{embed_8py_source_l00021}{21}} of file \mbox{\hyperlink{embed_8py_source}{embed.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00021\ \ \ \ \ \textcolor{keyword}{def\ }\_\_init\_\_(\ self,\ idMap,\ outerNamespace\ ):}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ self.idMap\ =\ idMap}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ self.outerNamespace\ =\ outerNamespace}
+\DoxyCodeLine{00024\ }
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classembed_1_1_line_mapper_aeae9d4f7f233aad47a354235a96bcbfb}\index{embed.LineMapper@{embed.LineMapper}!mapFile@{mapFile}}
+\index{mapFile@{mapFile}!embed.LineMapper@{embed.LineMapper}}
+\doxysubsubsection{\texorpdfstring{mapFile()}{mapFile()}}
+{\footnotesize\ttfamily \label{classembed_1_1_line_mapper_aeae9d4f7f233aad47a354235a96bcbfb} 
+embed.\+Line\+Mapper.\+map\+File (\begin{DoxyParamCaption}\item[{}]{self}{, }\item[{}]{filename\+In}{, }\item[{}]{filename\+Out}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{embed_8py_source_l00056}{56}} of file \mbox{\hyperlink{embed_8py_source}{embed.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00056\ \ \ \ \ \textcolor{keyword}{def\ }mapFile(self,\ filenameIn,\ filenameOut\ ):}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\ \textcolor{stringliteral}{"{}Embedding:\(\backslash\)n\ \ \{0\}\(\backslash\)nas:\(\backslash\)n\ \ \{1\}"{}}.\mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}(\ filenameIn,\ filenameOut\ )\ )}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \textcolor{keyword}{with}\ open(\ filenameIn,\ \textcolor{stringliteral}{'r'}\ )\ \textcolor{keyword}{as}\ f,\ open(\ filenameOut,\ \textcolor{stringliteral}{'w'}\ )\ \textcolor{keyword}{as}\ outf:}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ \ \ \ lineNo\ =\ 1}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ line\ \textcolor{keywordflow}{in}\ f:}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ outf.write(\ self.mapLine(\ lineNo,\ line\ )\ )}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lineNo\ =\ lineNo\ +\ 1}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\ \textcolor{stringliteral}{"{}Written\ \{0\}}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classembed_1_1_line_mapper_aeae9d4f7f233aad47a354235a96bcbfb_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classembed_1_1_line_mapper_a98d45d187f555e8a42ffdf703f8e0dd2}\index{embed.LineMapper@{embed.LineMapper}!mapLine@{mapLine}}
+\index{mapLine@{mapLine}!embed.LineMapper@{embed.LineMapper}}
+\doxysubsubsection{\texorpdfstring{mapLine()}{mapLine()}}
+{\footnotesize\ttfamily \label{classembed_1_1_line_mapper_a98d45d187f555e8a42ffdf703f8e0dd2} 
+embed.\+Line\+Mapper.\+map\+Line (\begin{DoxyParamCaption}\item[{}]{self}{, }\item[{}]{line\+No}{, }\item[{}]{line}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{embed_8py_source_l00027}{27}} of file \mbox{\hyperlink{embed_8py_source}{embed.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00027\ \ \ \ \ \textcolor{keyword}{def\ }mapLine(\ self,\ lineNo,\ line\ ):}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ idFrom,\ idTo\ \textcolor{keywordflow}{in}\ self.idMap.items():}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ \ \ \ r\ =\ re.compile(\textcolor{stringliteral}{"{}(.*)"{}}\ +\ idFrom\ +\ \textcolor{stringliteral}{"{}(.*)"{}})}
+\DoxyCodeLine{00030\ }
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \ \ \ m\ =\ r.match(\ line\ )}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ m:}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ line\ =\ m.group(1)\ +\ idTo\ +\ m.group(2)\ +\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}}
+\DoxyCodeLine{00034\ }
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ m\ =\ nsCloseRe.match(\ line\ )}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ m:}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ originalNs\ =\ m.group(3)}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ print("{}[\{0\}]\ originalNs:\ '\{1\}'\ -\/\ closing"{}.format(lineNo,\ originalNs))}}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ print(\ "{}\ \ "{}\ +\ line\ )}}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ print(\ "{}\ \ 1:[\{0\}]\(\backslash\)n\ \ 2:[\{1\}]\(\backslash\)n\ \ 3:[\{2\}]\(\backslash\)n\ \ 4:[\{3\}]\(\backslash\)n\ \ 5:[\{4\}]"{}.format(\ m.group(1),\ m.group(2),\ m.group(3),\ m.group(4),\ m.group(5)\ )\ )}}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ originalNs\ \textcolor{keywordflow}{in}\ self.outerNamespace:}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ outerNs,\ innerNs\ =\ self.outerNamespace[originalNs]}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}\{0\}\}\}\{1\}\{2\}::\{3\}\{4\}\{5\}\(\backslash\)n"{}}.\mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}(\ m.group(1),\ m.group(2),\ outerNs,\ innerNs,\ m.group(4),\ m.group(5))}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ m\ =\ nsRe.match(\ line\ )}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ m:}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \ \ \ originalNs\ =\ m.group(2)}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ print("{}[\{0\}]\ originalNs:\ '\{1\}'"{}.format(lineNo,\ originalNs))}}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ print(\ "{}\ \ "{}\ +\ line\ )}}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ print(\ "{}\ \ 1:[\{0\}]\(\backslash\)n\ \ 2:[\{1\}]\(\backslash\)n\ \ 3:[\{2\}]\(\backslash\)n\ \ 4:[\{3\}]"{}.format(\ m.group(1),\ m.group(2),\ m.group(3),\ m.group(4)\ )\ )}}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ originalNs\ \textcolor{keywordflow}{in}\ self.outerNamespace:}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ outerNs,\ innerNs\ =\ self.outerNamespace[originalNs]}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}\{0\}\{1\}\ \{\{\ namespace\ \{2\}\{3\}\{4\}\(\backslash\)n"{}}.\mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}(\ m.group(1),\ outerNs,\ innerNs,\ m.group(3),\ m.group(4)\ )}
+\DoxyCodeLine{00053\ }
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ line}
+\DoxyCodeLine{00055\ }
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classembed_1_1_line_mapper_a98d45d187f555e8a42ffdf703f8e0dd2_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classembed_1_1_line_mapper_ae46b69ab0d09db7a5f01eb3cafef7d91}\index{embed.LineMapper@{embed.LineMapper}!idMap@{idMap}}
+\index{idMap@{idMap}!embed.LineMapper@{embed.LineMapper}}
+\doxysubsubsection{\texorpdfstring{idMap}{idMap}}
+{\footnotesize\ttfamily \label{classembed_1_1_line_mapper_ae46b69ab0d09db7a5f01eb3cafef7d91} 
+embed.\+Line\+Mapper.\+id\+Map = id\+Map}
+
+
+
+Definition at line \mbox{\hyperlink{embed_8py_source_l00022}{22}} of file \mbox{\hyperlink{embed_8py_source}{embed.\+py}}.
+
+\Hypertarget{classembed_1_1_line_mapper_a35067db26fdbee959d637f350830f43b}\index{embed.LineMapper@{embed.LineMapper}!outerNamespace@{outerNamespace}}
+\index{outerNamespace@{outerNamespace}!embed.LineMapper@{embed.LineMapper}}
+\doxysubsubsection{\texorpdfstring{outerNamespace}{outerNamespace}}
+{\footnotesize\ttfamily \label{classembed_1_1_line_mapper_a35067db26fdbee959d637f350830f43b} 
+embed.\+Line\+Mapper.\+outer\+Namespace = outer\+Namespace}
+
+
+
+Definition at line \mbox{\hyperlink{embed_8py_source_l00023}{23}} of file \mbox{\hyperlink{embed_8py_source}{embed.\+py}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/scripts/\mbox{\hyperlink{embed_8py}{embed.\+py}}\end{DoxyCompactItemize}

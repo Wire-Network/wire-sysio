@@ -1,0 +1,13 @@
+<map id="sysio::chain::controller::push_transaction" name="sysio::chain::controller::push_transaction">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,39,158,79"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1chain_1_1controller.html#a28d33629f3badcb8155c08be3e05b99e" title=" " alt="" coords="222,5,374,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="158,45,206,37,206,42,159,50"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1chain_1_1controller.html#a7b2f18a21e18a1bdc6837a567bb259eb" title=" " alt="" coords="206,71,390,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="159,68,191,72,190,78,158,73"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1chain_1_1controller.html#a0c79d00dae8c0d90efc18f4d091b2391" title=" " alt="" coords="438,49,612,74"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="390,76,422,72,423,78,391,82"/>
+<area shape="rect" id="Node000005" href="$classchainbase_1_1database.html#a64133afb9e0ae374eeab86bd1d4db08b" title=" " alt="" coords="444,99,606,139"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="391,100,430,105,429,110,390,105"/>
+<area shape="rect" id="Node000006" href="$classchainbase_1_1pinnable__mapped__file.html#a29dccb9bf52ef5c409fc1316fc99325a" title=" " alt="" coords="660,91,842,147"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="606,116,645,116,645,122,606,122"/>
+</map>

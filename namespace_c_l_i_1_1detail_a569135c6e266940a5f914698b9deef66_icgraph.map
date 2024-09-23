@@ -1,0 +1,9 @@
+<map id="CLI::detail::overflowCheck" name="CLI::detail::overflowCheck">
+<area shape="rect" id="Node000001" title="Do a check for overflow on signed numbers." alt="" coords="403,46,579,72"/>
+<area shape="rect" id="Node000002" href="$namespace_c_l_i_1_1detail.html#a58ce723daebf6cd298565eb365d1b157" title="Performs a *= b; if it doesn&#39;t cause integer overflow. Returns false otherwise." alt="" coords="217,39,355,79"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="387,62,355,62,355,56,387,56"/>
+<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_as_number_with_unit.html#af5d2fc29cd92c1821e653a97f91b00cb" title=" " alt="" coords="5,5,169,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="201,48,169,42,170,37,202,42"/>
+<area shape="rect" id="Node000004" href="$class_c_l_i_1_1_option.html#a996b69fbb68a6d62829855816c30ed38" title="Get the maximum number of items expected to be returned and used for the callback." alt="" coords="10,71,164,111"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="202,75,165,81,164,76,201,70"/>
+</map>

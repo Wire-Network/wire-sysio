@@ -1,0 +1,9 @@
+<map id="websocketpp::transport::asio::make_custom_alloc_handler" name="websocketpp::transport::asio::make_custom_alloc_handler">
+<area shape="rect" id="Node000001" title=" " alt="" coords="256,77,433,133"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1transport_1_1asio_1_1connection.html#a1ed9a4a93e753c4b84118760195f484c" title="read at least num_bytes bytes into buf and then call handler." alt="" coords="23,5,190,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="240,76,190,61,191,56,241,71"/>
+<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1transport_1_1asio_1_1connection.html#a9c17ab9142868c2dd2ff74c478173bb3" title="Initiate a potentially asyncronous write of the given buffer." alt="" coords="5,85,208,126"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="240,108,208,108,208,102,240,102"/>
+<area shape="rect" id="Node000004" href="$classwebsocketpp_1_1transport_1_1asio_1_1connection.html#a9f62627d2a0fd05278a0fb1d8761911b" title="Initiate a potentially asyncronous write of the given buffers." alt="" coords="5,150,208,191"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="241,136,184,152,183,147,240,131"/>
+</map>

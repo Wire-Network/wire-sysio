@@ -1,0 +1,160 @@
+\doxysection{libraries/fc/test/variant/test\+\_\+variant.cpp File Reference}
+\hypertarget{test__variant_8cpp}{}\label{test__variant_8cpp}\index{libraries/fc/test/variant/test\_variant.cpp@{libraries/fc/test/variant/test\_variant.cpp}}
+{\ttfamily \#include $<$boost/test/included/unit\+\_\+test.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/variant\+\_\+object.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/exception/exception.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/crypto/base64.\+hpp$>$}\newline
+{\ttfamily \#include $<$string$>$}\newline
+Include dependency graph for test\+\_\+variant.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__variant_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{test__variant_8cpp_a6b2a3852db8bb19ab6909bac01859985}{BOOST\+\_\+\+TEST\+\_\+\+MODULE}}~\mbox{\hyperlink{classfc_1_1variant}{variant}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{test__variant_8cpp_a3a3abf28605c73141236f452c9e9a714}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (mutable\+\_\+variant\+\_\+object\+\_\+test)
+\item 
+\mbox{\hyperlink{test__variant_8cpp_ae84169d0f97a558f76419cef7827733d}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (variant\+\_\+format\+\_\+string\+\_\+limited)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{test__variant_8cpp_a6b2a3852db8bb19ab6909bac01859985}\index{test\_variant.cpp@{test\_variant.cpp}!BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}}
+\index{BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}!test\_variant.cpp@{test\_variant.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_TEST\_MODULE}{BOOST\_TEST\_MODULE}}
+{\footnotesize\ttfamily \label{test__variant_8cpp_a6b2a3852db8bb19ab6909bac01859985} 
+\#define BOOST\+\_\+\+TEST\+\_\+\+MODULE~\mbox{\hyperlink{classfc_1_1variant}{variant}}}
+
+
+
+Definition at line \mbox{\hyperlink{test__variant_8cpp_source_l00001}{1}} of file \mbox{\hyperlink{test__variant_8cpp_source}{test\+\_\+variant.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{test__variant_8cpp_a3a3abf28605c73141236f452c9e9a714}\index{test\_variant.cpp@{test\_variant.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!test\_variant.cpp@{test\_variant.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{test__variant_8cpp_a3a3abf28605c73141236f452c9e9a714} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{mutable\+\_\+variant\+\_\+object\+\_\+test}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__variant_8cpp_source_l00012}{12}} of file \mbox{\hyperlink{test__variant_8cpp_source}{test\+\_\+variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00013\ \{}
+\DoxyCodeLine{00014\ \ \ \textcolor{comment}{//\ no\ BOOST\_CHECK\ /\ BOOST\_REQUIRE,\ just\ see\ that\ this\ compiles\ on\ all\ supported\ platforms}}
+\DoxyCodeLine{00015\ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00016\ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{variant}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}(42);}
+\DoxyCodeLine{00017\ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant__object}{variant\_object}}\ vo;}
+\DoxyCodeLine{00018\ \ \ \ \ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\_variant\_object}}\ mvo;}
+\DoxyCodeLine{00019\ \ \ \ \ \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}\ vs;}
+\DoxyCodeLine{00020\ \ \ \ \ vs.push\_back(\mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\_variant\_object}}(\textcolor{stringliteral}{"{}level"{}},\ \textcolor{stringliteral}{"{}debug"{}})(\textcolor{stringliteral}{"{}color"{}},\ v));}
+\DoxyCodeLine{00021\ \ \ \ \ vs.push\_back(\mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\_variant\_object}}()(\textcolor{stringliteral}{"{}level"{}},\ \textcolor{stringliteral}{"{}debug"{}})(\textcolor{stringliteral}{"{}color"{}},\ v));}
+\DoxyCodeLine{00022\ \ \ \ \ vs.push\_back(\mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\_variant\_object}}(\textcolor{stringliteral}{"{}level"{}},\ \textcolor{stringliteral}{"{}debug"{}})(\textcolor{stringliteral}{"{}color"{}},\ \textcolor{stringliteral}{"{}green"{}}));}
+\DoxyCodeLine{00023\ \ \ \ \ vs.push\_back(\mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\_variant\_object}}()(\textcolor{stringliteral}{"{}level"{}},\ \textcolor{stringliteral}{"{}debug"{}})(\textcolor{stringliteral}{"{}color"{}},\ \textcolor{stringliteral}{"{}green"{}}));}
+\DoxyCodeLine{00024\ \ \ \ \ vs.push\_back(\mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\_variant\_object}}(\textcolor{stringliteral}{"{}level"{}},\ \textcolor{stringliteral}{"{}debug"{}})(vo));}
+\DoxyCodeLine{00025\ \ \ \ \ vs.push\_back(\mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\_variant\_object}}()(\textcolor{stringliteral}{"{}level"{}},\ \textcolor{stringliteral}{"{}debug"{}})(mvo));}
+\DoxyCodeLine{00026\ \ \ \ \ vs.push\_back(\mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\_variant\_object}}(\textcolor{stringliteral}{"{}level"{}},\ \textcolor{stringliteral}{"{}debug"{}}).\mbox{\hyperlink{yubihsm__pkcs11_8c_a893468abdce45d586a5b659094a25e6c}{set}}(\textcolor{stringliteral}{"{}color"{}},\ v));}
+\DoxyCodeLine{00027\ \ \ \ \ vs.push\_back(\mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\_variant\_object}}()(\textcolor{stringliteral}{"{}level"{}},\ \textcolor{stringliteral}{"{}debug"{}}).\mbox{\hyperlink{yubihsm__pkcs11_8c_a893468abdce45d586a5b659094a25e6c}{set}}(\textcolor{stringliteral}{"{}color"{}},\ v));}
+\DoxyCodeLine{00028\ \ \ \ \ vs.push\_back(\mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\_variant\_object}}(\textcolor{stringliteral}{"{}level"{}},\ \textcolor{stringliteral}{"{}debug"{}}).\mbox{\hyperlink{yubihsm__pkcs11_8c_a893468abdce45d586a5b659094a25e6c}{set}}(\textcolor{stringliteral}{"{}color"{}},\ \textcolor{stringliteral}{"{}green"{}}));}
+\DoxyCodeLine{00029\ \ \ \ \ vs.push\_back(\mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\_variant\_object}}()(\textcolor{stringliteral}{"{}level"{}},\ \textcolor{stringliteral}{"{}debug"{}}).\mbox{\hyperlink{yubihsm__pkcs11_8c_a893468abdce45d586a5b659094a25e6c}{set}}(\textcolor{stringliteral}{"{}color"{}},\ \textcolor{stringliteral}{"{}green"{}}));}
+\DoxyCodeLine{00030\ \ \ \}}
+\DoxyCodeLine{00031\ \ \ \mbox{\hyperlink{exception_8hpp_ae70bfa24f5a3bc0917382b3c17fc033c}{FC\_LOG\_AND\_RETHROW}}();}
+\DoxyCodeLine{00032\ \}}
+
+\end{DoxyCode}
+\Hypertarget{test__variant_8cpp_ae84169d0f97a558f76419cef7827733d}\index{test\_variant.cpp@{test\_variant.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!test\_variant.cpp@{test\_variant.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{test__variant_8cpp_ae84169d0f97a558f76419cef7827733d} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{variant\+\_\+format\+\_\+string\+\_\+limited}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__variant_8cpp_source_l00034}{34}} of file \mbox{\hyperlink{test__variant_8cpp_source}{test\+\_\+variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00035\ \{}
+\DoxyCodeLine{00036\ \ \ \ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{size\_t}\ long\_rep\_char\_num\ =\ 1024;}
+\DoxyCodeLine{00037\ \ \ \ \textcolor{keyword}{const}\ std::string\ a\_long\_list\ =\ std::string(long\_rep\_char\_num,\ \textcolor{charliteral}{'a'});}
+\DoxyCodeLine{00038\ \ \ \ \textcolor{keyword}{const}\ std::string\ b\_long\_list\ =\ std::string(long\_rep\_char\_num,\ \textcolor{charliteral}{'b'});}
+\DoxyCodeLine{00039\ \ \ \ \{}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\ \mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}\ =\ \textcolor{stringliteral}{"{}\$\{a\}\ \$\{b\}\ \$\{c\}"{}};}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}\ mu;}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ mu(\ \textcolor{stringliteral}{"{}a"{}},\ \textcolor{keywordtype}{string}(\ long\_rep\_char\_num,\ \textcolor{charliteral}{'a'}\ )\ );}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ mu(\ \textcolor{stringliteral}{"{}b"{}},\ \textcolor{keywordtype}{string}(\ long\_rep\_char\_num,\ \textcolor{charliteral}{'b'}\ )\ );}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ mu(\ \textcolor{stringliteral}{"{}c"{}},\ \textcolor{keywordtype}{string}(\ long\_rep\_char\_num,\ \textcolor{charliteral}{'c'}\ )\ );}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\ result\ =\ \mbox{\hyperlink{namespacefc_acd5129981ae93fce3154d3fed6f6acbc}{fc::format\_string}}(\ \mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}},\ mu,\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ BOOST\_CHECK\_LT(0,\ mu.\mbox{\hyperlink{classfc_1_1mutable__variant__object_a0612732e6fcc4b2017dd7f15590d16bd}{size}}());}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ arg\_limit\_size\ =\ (1024\ -\/\ \mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}.size())\ /\ mu.\mbox{\hyperlink{classfc_1_1mutable__variant__object_a0612732e6fcc4b2017dd7f15590d16bd}{size}}();}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ result,\ \textcolor{keywordtype}{string}(arg\_limit\_size,\ \textcolor{charliteral}{'a'}\ )\ +\ \textcolor{stringliteral}{"{}...\ "{}}\ +\ \textcolor{keywordtype}{string}(arg\_limit\_size,\ \textcolor{charliteral}{'b'}\ )\ +\ \textcolor{stringliteral}{"{}...\ "{}}\ +\ \textcolor{keywordtype}{string}(arg\_limit\_size,\ \textcolor{charliteral}{'c'}\ )\ +\ \textcolor{stringliteral}{"{}..."{}}\ );}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ BOOST\_CHECK\_LT(result.size(),\ 1024\ +\ 3\ *\ mu.\mbox{\hyperlink{classfc_1_1mutable__variant__object_a0612732e6fcc4b2017dd7f15590d16bd}{size}}());}
+\DoxyCodeLine{00050\ \ \ \ \}}
+\DoxyCodeLine{00051\ \ \ \ \{\ \ \textcolor{comment}{//\ verify\ object,\ array,\ blob,\ and\ string,\ all\ exceeds\ limits,\ fold\ display\ for\ each}}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}\ mu;}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ mu(\ \textcolor{stringliteral}{"{}str"{}},\ a\_long\_list\ );}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ mu(\ \textcolor{stringliteral}{"{}obj"{}},\ \mbox{\hyperlink{classfc_1_1variant__object}{variant\_object}}(\mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\_variant\_object}}()(\textcolor{stringliteral}{"{}a"{}},\ a\_long\_list)(\textcolor{stringliteral}{"{}b"{}},\ b\_long\_list))\ );}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ mu(\ \textcolor{stringliteral}{"{}arr"{}},\ \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}\{\mbox{\hyperlink{classfc_1_1variant}{variant}}(a\_long\_list),\ \mbox{\hyperlink{classfc_1_1variant}{variant}}(b\_long\_list)\}\ );}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ mu(\ \textcolor{stringliteral}{"{}blob"{}},\ \mbox{\hyperlink{structfc_1_1blob}{blob}}(\{std::vector<char>(a\_long\_list.begin(),\ a\_long\_list.end())\})\ );}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\ format\_prefix\ =\ \textcolor{stringliteral}{"{}Format\ string\ test:\ "{}};}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\ format\_str\ =\ format\_prefix\ +\ \textcolor{stringliteral}{"{}\$\{str\}\ \$\{obj\}\ \$\{arr\}\ \{blob\}"{}};}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\ result\ =\ \mbox{\hyperlink{namespacefc_acd5129981ae93fce3154d3fed6f6acbc}{fc::format\_string}}(\ format\_str,\ mu,\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ BOOST\_CHECK\_LT(0,\ mu.\mbox{\hyperlink{classfc_1_1mutable__variant__object_a0612732e6fcc4b2017dd7f15590d16bd}{size}}());}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ arg\_limit\_size\ =\ (1024\ -\/\ format\_str.size())\ /\ mu.\mbox{\hyperlink{classfc_1_1mutable__variant__object_a0612732e6fcc4b2017dd7f15590d16bd}{size}}();}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ result,\ format\_prefix\ +\ a\_long\_list.substr(0,\ arg\_limit\_size)\ +\ \textcolor{stringliteral}{"{}..."{}}\ +\ \textcolor{stringliteral}{"{}\ \$\{obj\}\ \$\{arr\}\ \{blob\}"{}});}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ BOOST\_CHECK\_LT(result.size(),\ 1024\ +\ 3\ *\ mu.\mbox{\hyperlink{classfc_1_1mutable__variant__object_a0612732e6fcc4b2017dd7f15590d16bd}{size}}());}
+\DoxyCodeLine{00064\ \ \ \ \}}
+\DoxyCodeLine{00065\ \ \ \ \{\ \ \textcolor{comment}{//\ verify\ object,\ array\ can\ be\ displayed\ properly}}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\ format\_prefix\ =\ \textcolor{stringliteral}{"{}Format\ string\ test:\ "{}};}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\ format\_str\ =\ format\_prefix\ +\ \textcolor{stringliteral}{"{}\$\{str\}\ \$\{obj\}\ \$\{arr\}\ \$\{blob\}\ \$\{var\}"{}};}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ BOOST\_CHECK\_LT(format\_str.size(),\ 1024);}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ short\_rep\_char\_num\ =\ (1024\ -\/\ format\_str.size())\ /\ 5\ -\/\ 1;}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::string\ a\_short\_list\ =\ std::string(short\_rep\_char\_num,\ \textcolor{charliteral}{'a'});}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::string\ b\_short\_list\ =\ std::string(short\_rep\_char\_num\ /\ 3,\ \textcolor{charliteral}{'b'});}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::string\ c\_short\_list\ =\ std::string(short\_rep\_char\_num\ /\ 3,\ \textcolor{charliteral}{'c'});}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::string\ d\_short\_list\ =\ std::string(short\_rep\_char\_num\ /\ 3,\ \textcolor{charliteral}{'d'});}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::string\ e\_short\_list\ =\ std::string(short\_rep\_char\_num\ /\ 3,\ \textcolor{charliteral}{'e'});}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::string\ f\_short\_list\ =\ std::string(short\_rep\_char\_num,\ \textcolor{charliteral}{'f'});}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::string\ g\_short\_list\ =\ std::string(short\_rep\_char\_num,\ \textcolor{charliteral}{'g'});}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}\ mu;}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1variant__object}{variant\_object}}\ vo(\mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\_variant\_object}}()(\textcolor{stringliteral}{"{}b"{}},\ b\_short\_list)(\textcolor{stringliteral}{"{}c"{}},\ c\_short\_list));}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}\ variant\_list\{\mbox{\hyperlink{classfc_1_1variant}{variant}}(d\_short\_list),\ \mbox{\hyperlink{classfc_1_1variant}{variant}}(e\_short\_list)\};}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structfc_1_1blob}{blob}}\ a\_blob(\{std::vector<char>(f\_short\_list.begin(),\ f\_short\_list.end())\});}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1variant}{variant}}\ a\_variant(g\_short\_list);}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ mu(\ \textcolor{stringliteral}{"{}str"{}},\ \ a\_short\_list\ );}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ mu(\ \textcolor{stringliteral}{"{}obj"{}},\ \ vo);}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ mu(\ \textcolor{stringliteral}{"{}arr"{}},\ \ variant\_list);}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ mu(\ \textcolor{stringliteral}{"{}blob"{}},\ a\_blob);}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ mu(\ \textcolor{stringliteral}{"{}var"{}},\ \ a\_variant);}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\ result\ =\ \mbox{\hyperlink{namespacefc_acd5129981ae93fce3154d3fed6f6acbc}{fc::format\_string}}(\ format\_str,\ mu,\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\ target\_result\ =\ format\_prefix\ +\ a\_short\_list\ +\ \textcolor{stringliteral}{"{}\ "{}}\ +}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\{"{}}\ +\ \textcolor{stringliteral}{"{}\(\backslash\)"{}b\(\backslash\)"{}:\(\backslash\)"{}"{}}\ +\ b\_short\_list\ +\ \textcolor{stringliteral}{"{}\(\backslash\)"{},\(\backslash\)"{}c\(\backslash\)"{}:\(\backslash\)"{}"{}}\ +\ c\_short\_list\ +\ \textcolor{stringliteral}{"{}\(\backslash\)"{}\}"{}}\ +\ \textcolor{stringliteral}{"{}\ "{}}\ +}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}[\(\backslash\)"{}"{}}\ +\ d\_short\_list\ +\ \textcolor{stringliteral}{"{}\(\backslash\)"{},\(\backslash\)"{}"{}}\ +\ e\_short\_list\ +\ \textcolor{stringliteral}{"{}\(\backslash\)"{}]"{}}\ +\ \textcolor{stringliteral}{"{}\ "{}}\ +}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a3668095306e6c6c4c53de5d7701e4dde}{base64\_encode}}(\ a\_blob.data.data(),\ a\_blob.data.size()\ )\ +\ \textcolor{stringliteral}{"{}="{}}\ +\ \textcolor{stringliteral}{"{}\ "{}}\ +}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ g\_short\_list;}
+\DoxyCodeLine{00093\ }
+\DoxyCodeLine{00094\ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ result,\ target\_result);}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ BOOST\_CHECK\_LT(result.size(),\ 1024\ +\ 3\ *\ mu.\mbox{\hyperlink{classfc_1_1mutable__variant__object_a0612732e6fcc4b2017dd7f15590d16bd}{size}}());}
+\DoxyCodeLine{00096\ \ \ \ \}}
+\DoxyCodeLine{00097\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__variant_8cpp_ae84169d0f97a558f76419cef7827733d_cgraph}
+\end{center}
+\end{figure}

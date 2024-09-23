@@ -1,0 +1,13 @@
+<map id="websocketpp::endpoint::set_fail_handler" name="websocketpp::endpoint::set_fail_handler">
+<area shape="rect" id="Node000001" title=" " alt="" coords="250,96,405,137"/>
+<area shape="rect" id="Node000002" href="$integration_8cpp.html#a8a2652ffc56288790b7840234f4367c1" title=" " alt="" coords="5,5,202,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="284,90,244,66,201,45,169,34,171,29,203,40,247,61,286,86"/>
+<area shape="rect" id="Node000003" href="$integration_8cpp.html#a5909d376af453e2fb6f63bb3ce804b69" title=" " alt="" coords="5,55,202,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="234,99,164,84,166,78,235,94"/>
+<area shape="rect" id="Node000004" href="$debug__server_8cpp.html#ae66f6b31b5ad750f1fe042a706a4e3d4" title=" " alt="" coords="79,104,128,130"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="234,120,128,120,128,114,234,114"/>
+<area shape="rect" id="Node000005" href="$classperftest.html#a4e118ad1d9d81fddf82b5db930b26924" title=" " alt="" coords="45,153,162,179"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="235,140,163,156,162,151,234,135"/>
+<area shape="rect" id="Node000006" href="$classtelemetry__client.html#a402130e09282e6416bcacb806f217cce" title=" " alt="" coords="16,203,191,244"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="285,148,203,194,175,205,173,200,201,189,282,143"/>
+</map>

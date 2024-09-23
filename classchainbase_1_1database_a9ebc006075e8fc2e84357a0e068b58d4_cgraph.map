@@ -1,0 +1,13 @@
+<map id="chainbase::database::modify" name="chainbase::database::modify">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,147,46"/>
+<area shape="rect" id="Node000002" href="$classchainbase_1_1database.html#afaea057692a8bbbf3f506b64c60308b6" title=" " alt="" coords="195,5,336,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="147,23,179,23,179,28,147,28"/>
+<area shape="rect" id="Node000003" href="$classchainbase_1_1database.html#afcfe00f81a526c1376d4f51197dd3a9a" title=" " alt="" coords="384,13,551,38"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="337,23,368,23,368,28,337,28"/>
+<area shape="rect" id="Node000004" href="$classchainbase_1_1database.html#aa5a2ca0da0092693ac49b36b7ec6817a" title=" " alt="" coords="599,5,741,46"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="552,32,584,32,584,37,552,37"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="599,20,567,19,567,14,599,14"/>
+<area shape="rect" id="Node000005" href="$classchainbase_1_1database.html#a4d5297635dcf70be481d9b600da9bc13" title=" " alt="" coords="789,35,930,75"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="741,34,774,39,773,44,740,39"/>
+<area shape="poly" id="edge6_Node000005_Node000003" title=" " alt="" coords="789,60,741,60,670,63,599,60,527,46,528,41,600,55,670,58,741,55,788,54"/>
+</map>

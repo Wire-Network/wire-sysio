@@ -1,0 +1,183 @@
+\doxysection{parse\+\_\+tests.\+cpp}
+\hypertarget{parse__tests_8cpp_source}{}\label{parse__tests_8cpp_source}\index{libraries/sys-\/vm/tests/parse\_tests.cpp@{libraries/sys-\/vm/tests/parse\_tests.cpp}}
+\mbox{\hyperlink{parse__tests_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <algorithm>}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <iterator>}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <cstdlib>}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <fstream>}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{sys-vm_2tests_2utils_8hpp}{utils.hpp}}"{}}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <sysio/vm/backend.hpp>}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00012}00012\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}};}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00013}00013\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacesysio_1_1vm}{sysio::vm}};}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00015}\mbox{\hyperlink{parse__tests_8cpp_a49df642b1ed73b527cab5ec35cd328c2}{00015}}\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\textcolor{stringliteral}{"{}small\ parse\ test"{}},\ \textcolor{stringliteral}{"{}[small\_parse\_test]"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00016}00016\ \ \ \ \textcolor{keyword}{module}\ mod;}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00017}00017\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1binary__parser}{binary\_parser}}\ bp\{mod.allocator\};}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00018}00018\ \ \ \ \mbox{\hyperlink{namespacesysio_1_1vm_a6ffa5796148f0f779a3d44799c3f0cce}{wasm\_code}}\ error\ =\ \{\ 0x01,\ 0x61,\ 0x73,\ 0x6D,\ 0x01,\ 0x00,\ 0x00,\ 0x00\ \};}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00019}00019\ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1guarded__ptr}{wasm\_code\_ptr}}\ error\_ptr(\ error.data(),\ 4\ );}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00020}00020\ \ \ \ \textcolor{keyword}{auto}\ n\ =\ bp.parse\_magic(\ error\_ptr\ );}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00021}00021\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(n\ !=\ constants::magic);}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00022}00022\ \ \ \ \mbox{\hyperlink{namespacesysio_1_1vm_a6ffa5796148f0f779a3d44799c3f0cce}{wasm\_code}}\ correct\ =\ \{\ 0x00,\ 0x61,\ 0x73,\ 0x6D,\ 0x01,\ 0x00,\ 0x00,\ 0x00\ \};}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00023}00023\ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1guarded__ptr}{wasm\_code\_ptr}}\ correct\_ptr(\ correct.data(),\ 4\ );}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00024}00024\ \ \ \ n\ =\ bp.parse\_magic(\ correct\_ptr\ );}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00025}00025\ \ \ \ CHECKL(n\ ==\ constants::magic);}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00026}00026\ \}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00027}00027\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00028}00028\ \textcolor{comment}{BOOST\_AUTO\_TEST\_CASE(actual\_wasm\_test)\ \{}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00029}00029\ \textcolor{comment}{\ \ \ try\ \{}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00030}00030\ \textcolor{comment}{\ \ \ \ \ \ static\ const\ std::vector<std::pair\ <std::vector<uint8\_t>,\ std::vector<uint8\_t>>>\ system\_contract\_types\ =\ \{}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00031}00031\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \{\{types::i32,types::i32\},\ \{\}\},}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00032}00032\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \{\{types::i32,types::i32,types::i64\},\{\}\},}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00033}00033\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \{\{types::i32\},\{\}\},}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00034}00034\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \{\{types::i32,types::i64,types::i64\},\{\}\},}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00035}00035\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \{\{types::i32,types::i64,types::i64,types::i32\},\{\}\},}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00036}00036\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \{\{types::i32,types::i64,types::i32,types::i32,types::i32\},\{\}\},}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00037}00037\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \{\{types::i32,types::i64\},\{\}\},}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00038}00038\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \{\{types::i32,types::i64,types::i64,types::i32,types::i32\},\{\}\},}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00039}00039\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \{\{types::i32,types::i64,types::i32\},\{\}\},}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00040}00040\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \{\{types::i32,types::i64,types::i64,types::i32,types::i32,types::i32\},\{\}\},}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00041}00041\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \{\{\},\{\}\},}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00042}00042\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \{\{types::i64,types::i64\},\{\}\},}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00043}00043\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \{\{types::i64\},\{\}\},}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00044}00044\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \{\{\},\{types::i64\}\},}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00045}00045\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \{\{types::i64,types::i64,types::i64,types::i64\},\{types::i32\}\},}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00046}00046\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \{\{types::i32,types::i64,types::i32,types::i32\},\{\}\},}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00047}00047\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \{\{types::i64,types::i64,types::i64,types::i32,types::i64\},\{types::i32\}\},}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00048}00048\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \{\{types::i32,types::i32,types::i32\},\{types::i32\}\},}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00049}00049\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \{\{types::i32,types::i32\},\{types::i64\}\},}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00050}00050\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \{\{types::i64,types::i64,types::i64,types::i64,types::i32,types::i32\},\{types::i32\}\},}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00051}00051\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \{\{types::i64,types::i64,types::i64,types::i64\},\{\}\},}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00052}00052\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \{\{types::i32,types::i32\},\{types::i32\}\},}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00053}00053\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \{\{types::i32\},\{types::i32\}\},}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00054}00054\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \{\{types::i64,types::i32\},\{\}\},}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00055}00055\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \{\{types::i64\},\{types::i32\}\},}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00056}00056\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \{\{types::i64,types::i64,types::i64,types::i64,types::i32\},\{types::i32\}\},}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00057}00057\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \{\{\},\{types::i32\}\},}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00058}00058\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \{\{types::i64,types::i64,types::i64,types::i32,types::i32\},\{types::i32\}\},}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00059}00059\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \{\{types::i32,types::i64,types::i64,types::i64,types::i64\},\{\}\},}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00060}00060\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \{\{types::i64,types::i64\},\{types::i32\}\},}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00061}00061\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \{\{types::i32,types::f64\},\{\}\},}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00062}00062\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \{\{types::i32,types::f32\},\{\}\},}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00063}00063\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \{\{types::i64,types::i64\},\{types::f64\}\},}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00064}00064\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \{\{types::i64,types::i64\},\{types::f32\}\},}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00065}00065\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \{\{types::i32,types::i32,types::i32\},\{\}\},}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00066}00066\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \{\{types::i32,types::i64,types::i32\},\{types::i32\}\},}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00067}00067\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \{\{types::i64,types::i64,types::i32,types::i32\},\{\}\},}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00068}00068\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \{\{types::i32,types::i32,types::i32,types::i64\},\{\}\},}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00069}00069\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \{\{types::i32,types::i32,types::i32,types::i32\},\{\}\},}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00070}00070\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \{\{types::i32,types::i32,types::i32,types::i32,types::i32\},\{\}\},}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00071}00071\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \{\{types::i32,types::i32,types::i64,types::i32\},\{\}\},}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00072}00072\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \{\{types::i32,types::i64\},\{types::i32\}\},}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00073}00073\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \{\{types::i64\},\{types::i64\}\},}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00074}00074\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \{\{types::i64,types::i64,types::i64\},\{\}\},}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00075}00075\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \{\{types::i32,types::i32,types::i32,types::i32,types::i32,types::i32\},\{types::i32\}\},}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00076}00076\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \{\{types::i32,types::i32,types::i32,types::i32\},\{types::i32\}\},}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00077}00077\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \{\{types::i32,types::i32,types::i32,types::i32,types::i32\},\{types::i32\}\},}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00078}00078\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \{\{types::i32,types::i32,types::i32,types::i32,types::i32,types::i32,types::i32,types::i32\},\{\}\},}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00079}00079\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \{\{types::f64\},\{types::f64\}\},}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00080}00080\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \{\{types::f64,types::f64\},\{types::f64\}\},}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00081}00081\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \{\{types::f64,types::i32\},\{types::f64\}\}}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00082}00082\ \textcolor{comment}{\ \ \ \ \ \ \};}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00083}00083\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00084}00084\ \textcolor{comment}{\ \ \ \ \ \ \{}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00085}00085\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ memory\_manager::set\_memory\_limits(\ 32*1024*1024\ );}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00086}00086\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ binary\_parser\ bp;}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00087}00087\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ module\ mod;}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00088}00088\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ wasm\_code\ code\ =\ read\_wasm(\ "{}wasms/system.wasm"{}\ );}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00089}00089\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ wasm\_code\_ptr\ code\_ptr(code.data(),\ 0);}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00090}00090\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ bp.parse\_module(\ code,\ mod\ );}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00091}00091\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00092}00092\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ for\ (\ int\ i=0;\ i\ <\ mod.types.size();\ i++\ )\ \{}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00093}00093\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ auto\&\ ft\ =\ mod.types.at(i);}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00094}00094\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ ft.form,\ types::func\ );}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00095}00095\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ ft.param\_count,\ std::get<0>(system\_contract\_types[i]).size()\ );}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00096}00096\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ for\ (\ int\ j=0;\ j\ <\ ft.param\_types.size();\ j++\ )\ \{}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00097}00097\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ auto\ type\ =\ ft.param\_types.at(j);}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00098}00098\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ std::get<0>(system\_contract\_types[i])[j++],\ type\ );}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00099}00099\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \}}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00100}00100\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ if\ (\ ft.return\_count\ )}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00101}00101\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL\ (\ std::get<1>(system\_contract\_types[i])[0],\ ft.return\_type\ );}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00102}00102\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \}}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00103}00103\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00104}00104\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ for\ (\ int\ i=0;\ i\ <\ mod.imports.size();\ i++\ )\ \{}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00105}00105\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ mod.imports.at(i).kind,\ external\_kind::Function\ );}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00106}00106\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \}}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00107}00107\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00108}00108\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ for\ (\ int\ i=0;\ i\ <\ mod.functions.size();\ i++\ )\ \{}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00109}00109\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ //std::cout\ <<\ "{}FUNC\ "{}\ <<\ mod.imports.size()+i\ <<\ "{}\ :\ "{}\ <<\ mod.functions.at(i)\ <<\ "{}\(\backslash\)n"{};}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00110}00110\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \}}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00111}00111\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00112}00112\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ mod.tables.at(0).element\_type,\ 0x70\ );}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00113}00113\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ mod.tables.at(0).limits.flags,\ true\ );}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00114}00114\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ mod.tables.at(0).limits.initial,\ 0x1A\ );}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00115}00115\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ mod.tables.at(0).limits.maximum,\ 0x1A\ );}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00116}00116\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00117}00117\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ mod.memories.at(0).limits.flags,\ false\ );}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00118}00118\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ mod.memories.at(0).limits.initial,\ 0x01\ );}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00119}00119\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00120}00120\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ mod.globals.at(0).type.content\_type,\ types::i32\ );}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00121}00121\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ mod.globals.at(1).type.content\_type,\ types::i32\ );}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00122}00122\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ mod.globals.at(2).type.content\_type,\ types::i32\ );}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00123}00123\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00124}00124\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ mod.globals.at(0).type.mutability,\ true\ );}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00125}00125\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ mod.globals.at(1).type.mutability,\ false\ );}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00126}00126\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ mod.globals.at(2).type.mutability,\ false\ );}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00127}00127\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00128}00128\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ mod.globals.at(0).init.opcode,\ opcodes::i32\_const\ );}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00129}00129\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ mod.globals.at(1).init.opcode,\ opcodes::i32\_const\ );}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00130}00130\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ mod.globals.at(2).init.opcode,\ opcodes::i32\_const\ );}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00131}00131\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00132}00132\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ mod.globals.at(0).init.value.i32,\ 8192\ );}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00133}00133\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ mod.globals.at(1).init.value.i32,\ 12244\ );}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00134}00134\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ mod.globals.at(2).init.value.i32,\ 12244\ );}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00135}00135\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00136}00136\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ BOOST\_CHECK(\ memcmp((char*)mod.exports.at(0).field\_str.raw(),\ "{}memory"{},\ mod.exports.at(0).field\_len)\ ==\ 0\ \&\&}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00137}00137\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ mod.exports.at(0).kind\ ==\ external\_kind::Memory\ );}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00138}00138\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ BOOST\_CHECK(\ memcmp((char*)mod.exports.at(1).field\_str.raw(),\ "{}\_\_heap\_base"{},\ mod.exports.at(1).field\_len)\ ==\ 0\ \&\&}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00139}00139\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ mod.exports.at(1).kind\ ==\ external\_kind::Global\ );}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00140}00140\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ BOOST\_CHECK(\ memcmp((char*)mod.exports.at(2).field\_str.raw(),\ "{}\_\_data\_end"{},\ mod.exports.at(2).field\_len)\ ==\ 0\ \&\&}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00141}00141\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ mod.exports.at(2).kind\ ==\ external\_kind::Global\ );}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00142}00142\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ BOOST\_CHECK(\ memcmp((char*)mod.exports.at(3).field\_str.raw(),\ "{}apply"{},\ mod.exports.at(3).field\_len)\ ==\ 0\ \&\&}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00143}00143\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ mod.exports.at(3).kind\ ==\ external\_kind::Function\ );}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00144}00144\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ BOOST\_CHECK(\ memcmp((char*)mod.exports.at(4).field\_str.raw(),\ "{}\_ZdlPv"{},\ mod.exports.at(4).field\_len)\ ==\ 0\ \&\&}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00145}00145\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ mod.exports.at(4).kind\ ==\ external\_kind::Function\ );}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00146}00146\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ BOOST\_CHECK(\ memcmp((char*)mod.exports.at(5).field\_str.raw(),\ "{}\_Znwj"{},\ mod.exports.at(5).field\_len)\ ==\ 0\ \&\&}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00147}00147\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ mod.exports.at(5).kind\ ==\ external\_kind::Function\ );}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00148}00148\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ BOOST\_CHECK(\ memcmp((char*)mod.exports.at(6).field\_str.raw(),\ "{}\_Znaj"{},\ mod.exports.at(6).field\_len)\ ==\ 0\ \&\&}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00149}00149\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ mod.exports.at(6).kind\ ==\ external\_kind::Function\ );}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00150}00150\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ BOOST\_CHECK(\ memcmp((char*)mod.exports.at(7).field\_str.raw(),\ "{}\_ZdaPv"{},\ mod.exports.at(7).field\_len)\ ==\ 0\ \&\&}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00151}00151\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ mod.exports.at(7).kind\ ==\ external\_kind::Function\ );}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00152}00152\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00153}00153\ \textcolor{comment}{\#if\ 0}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00154}00154\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ code\_ptr.add\_bounds(\ constants::id\_size);}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00155}00155\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ id\ =\ bp.parse\_section\_id(\ code\_ptr\ );}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00156}00156\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ id,\ section\_id::start\_section\ );}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00157}00157\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00158}00158\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ code\_ptr.add\_bounds(\ constants::varuint32\_size\ );}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00159}00159\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ len\ =\ bp.parse\_section\_payload\_len(\ code\_ptr\ );}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00160}00160\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ code\_ptr.fit\_bounds();}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00161}00161\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00162}00162\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ code\_ptr.add\_bounds(\ len\ );}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00163}00163\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ bp.parse\_start\_section(\ code\_ptr,\ mod.start\ );}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00164}00164\ \textcolor{comment}{\#endif}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00165}00165\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00166}00166\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ uint32\_t\ indices[]\ =\ \{73,\ 60,\ 169,\ 92,\ 80,\ 124,\ 131,\ 152,\ 176,\ 177,\ 178,\ 164,\ 153,\ 122,\ 136,\ 156,\ 158,\ 83,\ 184,\ 123,\ 129,\ 185,\ 154,\ 155,\ 121\};}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00167}00167\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00168}00168\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ for\ (int\ i=0;\ i\ <\ mod.elements.size();\ i++)\ \{}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00169}00169\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ for\ (int\ j=0;\ j\ <\ mod.elements[i].elems.size();\ j++)}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00170}00170\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(mod.elements[i].elems[j],\ indices[j]);}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00171}00171\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \}}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00172}00172\ \textcolor{comment}{\ \ \ \ \ \ \}}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00173}00173\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00174}00174\ \textcolor{comment}{\ \ \ \}\ FC\_LOG\_AND\_RETHROW()}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00175}00175\ \textcolor{comment}{\}}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00176}00176\ \textcolor{comment}{BOOST\_AUTO\_TEST\_SUITE\_END()}}
+\DoxyCodeLine{\Hypertarget{parse__tests_8cpp_source_l00177}00177\ \textcolor{comment}{}}
+
+\end{DoxyCode}

@@ -1,0 +1,8 @@
+<map id="sysio::chain_apis::account_query_db_impl::remove_from_bimaps" name="sysio::chain_apis::account_query_db_impl::remove_from_bimaps">
+<area shape="rect" id="Node000001" title=" " alt="" coords="418,5,576,61"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain__apis_1_1account__query__db__impl.html#aa184af1bc686f0c89bb5837f05ef30fb" title=" " alt="" coords="5,5,164,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="402,29,370,28,212,28,164,30,164,25,212,23,370,23,402,24"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1chain__apis_1_1account__query__db__impl.html#a55b5594b7d59cd2c7c38207cb988a44c" title=" " alt="" coords="212,37,370,93"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="403,50,371,56,370,50,402,45"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="196,53,164,48,165,43,197,48"/>
+</map>

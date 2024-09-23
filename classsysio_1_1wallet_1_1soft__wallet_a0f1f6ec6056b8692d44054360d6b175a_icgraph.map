@@ -1,0 +1,18 @@
+<map id="sysio::wallet::soft_wallet::is_locked" name="sysio::wallet::soft_wallet::is_locked">
+<area shape="rect" id="Node000001" title=" " alt="" coords="416,201,541,242"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1wallet_1_1soft__wallet.html#a41306d0f8872a6688a35f37f1e7b6210" title=" " alt="" coords="219,5,354,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="459,188,422,124,396,91,366,61,348,49,351,44,370,57,400,87,426,121,464,186"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1wallet_1_1soft__wallet.html#a9eabfe672a49da445a4873a0233920a7" title=" " alt="" coords="219,71,354,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="446,192,409,158,367,127,343,114,346,109,369,122,413,154,449,188"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1wallet_1_1soft__wallet.html#a1dae33892bc1f21ea028a5fdf008d71d" title=" " alt="" coords="224,136,348,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="402,198,347,180,349,175,403,193"/>
+<area shape="rect" id="Node000005" href="$classsysio_1_1wallet_1_1soft__wallet.html#a9bc82129f2f36979c9e8a56c3409dc49" title=" " alt="" coords="205,201,368,242"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="401,224,369,224,369,219,401,219"/>
+<area shape="rect" id="Node000006" href="$classsysio_1_1wallet_1_1soft__wallet.html#a785790f5903fe246b806c56378cab721" title=" " alt="" coords="224,267,348,307"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="403,250,349,269,347,264,402,245"/>
+<area shape="rect" id="Node000007" href="$classsysio_1_1wallet_1_1soft__wallet.html#a7e4e271bd0a7ffd9693f0e3105455647" title=" " alt="" coords="5,296,157,337"/>
+<area shape="poly" id="edge8_Node000001_Node000007" title=" " alt="" coords="454,256,417,292,394,309,369,321,315,336,259,341,205,340,157,334,157,329,206,334,259,336,314,330,367,317,391,304,414,288,451,252"/>
+<area shape="rect" id="Node000008" href="$classsysio_1_1wallet_1_1soft__wallet.html#ae13b6057e9b411dd857cd958ae9c04bb" title=" " alt="" coords="216,381,357,422"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="460,257,422,311,397,339,370,365,342,383,339,378,366,361,393,336,418,308,456,254"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="209,301,157,308,157,303,208,295"/>
+</map>

@@ -1,0 +1,162 @@
+\doxysection{Runtime\+::Exception Struct Reference}
+\hypertarget{struct_runtime_1_1_exception}{}\label{struct_runtime_1_1_exception}\index{Runtime::Exception@{Runtime::Exception}}
+
+
+{\ttfamily \#include $<$Runtime.\+h$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum class \mbox{\hyperlink{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59c}{Cause}} \+: U8 \{ \newline
+\mbox{\hyperlink{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59caad921d60486366258809553a3db49a4a}{unknown}}
+, \mbox{\hyperlink{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59ca46822c13fed47fba52de95888facd90e}{access\+Violation}}
+, \mbox{\hyperlink{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59caefab200f4775c7a6f73743d4dcd6681a}{stack\+Overflow}}
+, \mbox{\hyperlink{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59cabf0f9090e2e6a4420035e710855efc57}{integer\+Divide\+By\+Zero\+Or\+Integer\+Overflow}}
+, \newline
+\mbox{\hyperlink{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59ca4dd747df8663790545cac5ad05f53ac3}{invalid\+Float\+Operation}}
+, \mbox{\hyperlink{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59ca70107fc0cbfce89c96f7cb9f670f0452}{invoke\+Signature\+Mismatch}}
+, \mbox{\hyperlink{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59ca7de4868d33e7535f2001f871cc433085}{reached\+Unreachable}}
+, \mbox{\hyperlink{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59ca7670e3abe0b2f1a791d7c22427322023}{indirect\+Call\+Signature\+Mismatch}}
+, \newline
+\mbox{\hyperlink{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59ca46dc91ec878f1eca4833f51ad847d61c}{undefined\+Table\+Element}}
+, \mbox{\hyperlink{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59caa583b11e3b4851bd7b8afb6b933b8596}{called\+Abort}}
+, \mbox{\hyperlink{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59ca96646c895f4ca23dc236eb466758a83e}{called\+Unimplemented\+Intrinsic}}
+, \mbox{\hyperlink{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59cadaf4b07dac87d5172e105e03cecf6d89}{out\+Of\+Memory}}
+, \newline
+\mbox{\hyperlink{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59ca3b77aefffacbb52fb6a5b92af8ec1392}{invalid\+Segment\+Offset}}
+, \mbox{\hyperlink{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59cab1224544cc341f407bb95fb8a0f19d02}{misaligned\+Atomic\+Memory\+Access}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59c}{Cause}} \mbox{\hyperlink{struct_runtime_1_1_exception_a6d61df6a78e253a562af1fdbd19e1659}{cause}}
+\item 
+std\+::vector$<$ std\+::string $>$ \mbox{\hyperlink{struct_runtime_1_1_exception_a4d5476f70e524b4ee1aae1ea85c738c2}{call\+Stack}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{_runtime_8h_source_l00020}{20}} of file \mbox{\hyperlink{_runtime_8h_source}{Runtime.\+h}}.
+
+
+
+\doxysubsection{Member Enumeration Documentation}
+\Hypertarget{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59c}\index{Runtime::Exception@{Runtime::Exception}!Cause@{Cause}}
+\index{Cause@{Cause}!Runtime::Exception@{Runtime::Exception}}
+\doxysubsubsection{\texorpdfstring{Cause}{Cause}}
+{\footnotesize\ttfamily \label{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59c} 
+enum \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59c}{Runtime\+::\+Exception\+::\+Cause}} \+: \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}\hspace{0.3cm}{\ttfamily [strong]}}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{unknown@{unknown}!Runtime::Exception@{Runtime::Exception}}\index{Runtime::Exception@{Runtime::Exception}!unknown@{unknown}}}\Hypertarget{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59caad921d60486366258809553a3db49a4a}\label{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59c} 
+unknown&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{accessViolation@{accessViolation}!Runtime::Exception@{Runtime::Exception}}\index{Runtime::Exception@{Runtime::Exception}!accessViolation@{accessViolation}}}\Hypertarget{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59ca46822c13fed47fba52de95888facd90e}\label{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59c} 
+access\+Violation&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{stackOverflow@{stackOverflow}!Runtime::Exception@{Runtime::Exception}}\index{Runtime::Exception@{Runtime::Exception}!stackOverflow@{stackOverflow}}}\Hypertarget{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59caefab200f4775c7a6f73743d4dcd6681a}\label{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59c} 
+stack\+Overflow&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{integerDivideByZeroOrIntegerOverflow@{integerDivideByZeroOrIntegerOverflow}!Runtime::Exception@{Runtime::Exception}}\index{Runtime::Exception@{Runtime::Exception}!integerDivideByZeroOrIntegerOverflow@{integerDivideByZeroOrIntegerOverflow}}}\Hypertarget{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59cabf0f9090e2e6a4420035e710855efc57}\label{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59c} 
+integer\+Divide\+By\+Zero\+Or\+Integer\+Overflow&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{invalidFloatOperation@{invalidFloatOperation}!Runtime::Exception@{Runtime::Exception}}\index{Runtime::Exception@{Runtime::Exception}!invalidFloatOperation@{invalidFloatOperation}}}\Hypertarget{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59ca4dd747df8663790545cac5ad05f53ac3}\label{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59c} 
+invalid\+Float\+Operation&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{invokeSignatureMismatch@{invokeSignatureMismatch}!Runtime::Exception@{Runtime::Exception}}\index{Runtime::Exception@{Runtime::Exception}!invokeSignatureMismatch@{invokeSignatureMismatch}}}\Hypertarget{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59ca70107fc0cbfce89c96f7cb9f670f0452}\label{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59c} 
+invoke\+Signature\+Mismatch&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{reachedUnreachable@{reachedUnreachable}!Runtime::Exception@{Runtime::Exception}}\index{Runtime::Exception@{Runtime::Exception}!reachedUnreachable@{reachedUnreachable}}}\Hypertarget{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59ca7de4868d33e7535f2001f871cc433085}\label{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59c} 
+reached\+Unreachable&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{indirectCallSignatureMismatch@{indirectCallSignatureMismatch}!Runtime::Exception@{Runtime::Exception}}\index{Runtime::Exception@{Runtime::Exception}!indirectCallSignatureMismatch@{indirectCallSignatureMismatch}}}\Hypertarget{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59ca7670e3abe0b2f1a791d7c22427322023}\label{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59c} 
+indirect\+Call\+Signature\+Mismatch&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{undefinedTableElement@{undefinedTableElement}!Runtime::Exception@{Runtime::Exception}}\index{Runtime::Exception@{Runtime::Exception}!undefinedTableElement@{undefinedTableElement}}}\Hypertarget{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59ca46dc91ec878f1eca4833f51ad847d61c}\label{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59c} 
+undefined\+Table\+Element&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{calledAbort@{calledAbort}!Runtime::Exception@{Runtime::Exception}}\index{Runtime::Exception@{Runtime::Exception}!calledAbort@{calledAbort}}}\Hypertarget{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59caa583b11e3b4851bd7b8afb6b933b8596}\label{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59c} 
+called\+Abort&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{calledUnimplementedIntrinsic@{calledUnimplementedIntrinsic}!Runtime::Exception@{Runtime::Exception}}\index{Runtime::Exception@{Runtime::Exception}!calledUnimplementedIntrinsic@{calledUnimplementedIntrinsic}}}\Hypertarget{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59ca96646c895f4ca23dc236eb466758a83e}\label{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59c} 
+called\+Unimplemented\+Intrinsic&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{outOfMemory@{outOfMemory}!Runtime::Exception@{Runtime::Exception}}\index{Runtime::Exception@{Runtime::Exception}!outOfMemory@{outOfMemory}}}\Hypertarget{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59cadaf4b07dac87d5172e105e03cecf6d89}\label{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59c} 
+out\+Of\+Memory&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{invalidSegmentOffset@{invalidSegmentOffset}!Runtime::Exception@{Runtime::Exception}}\index{Runtime::Exception@{Runtime::Exception}!invalidSegmentOffset@{invalidSegmentOffset}}}\Hypertarget{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59ca3b77aefffacbb52fb6a5b92af8ec1392}\label{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59c} 
+invalid\+Segment\+Offset&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{misalignedAtomicMemoryAccess@{misalignedAtomicMemoryAccess}!Runtime::Exception@{Runtime::Exception}}\index{Runtime::Exception@{Runtime::Exception}!misalignedAtomicMemoryAccess@{misalignedAtomicMemoryAccess}}}\Hypertarget{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59cab1224544cc341f407bb95fb8a0f19d02}\label{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59c} 
+misaligned\+Atomic\+Memory\+Access&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{_runtime_8h_source_l00022}{22}} of file \mbox{\hyperlink{_runtime_8h_source}{Runtime.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59caad921d60486366258809553a3db49a4a}{unknown}},}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59ca46822c13fed47fba52de95888facd90e}{accessViolation}},}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59caefab200f4775c7a6f73743d4dcd6681a}{stackOverflow}},}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59cabf0f9090e2e6a4420035e710855efc57}{integerDivideByZeroOrIntegerOverflow}},}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59ca4dd747df8663790545cac5ad05f53ac3}{invalidFloatOperation}},}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59ca70107fc0cbfce89c96f7cb9f670f0452}{invokeSignatureMismatch}},}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59ca7de4868d33e7535f2001f871cc433085}{reachedUnreachable}},}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59ca7670e3abe0b2f1a791d7c22427322023}{indirectCallSignatureMismatch}},}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59ca46dc91ec878f1eca4833f51ad847d61c}{undefinedTableElement}},}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59caa583b11e3b4851bd7b8afb6b933b8596}{calledAbort}},}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59ca96646c895f4ca23dc236eb466758a83e}{calledUnimplementedIntrinsic}},}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59cadaf4b07dac87d5172e105e03cecf6d89}{outOfMemory}},}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59ca3b77aefffacbb52fb6a5b92af8ec1392}{invalidSegmentOffset}},}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59cab1224544cc341f407bb95fb8a0f19d02}{misalignedAtomicMemoryAccess}}}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_runtime_1_1_exception_a4d5476f70e524b4ee1aae1ea85c738c2}\index{Runtime::Exception@{Runtime::Exception}!callStack@{callStack}}
+\index{callStack@{callStack}!Runtime::Exception@{Runtime::Exception}}
+\doxysubsubsection{\texorpdfstring{callStack}{callStack}}
+{\footnotesize\ttfamily \label{struct_runtime_1_1_exception_a4d5476f70e524b4ee1aae1ea85c738c2} 
+std\+::vector$<$std\+::string$>$ Runtime\+::\+Exception\+::call\+Stack}
+
+
+
+Definition at line \mbox{\hyperlink{_runtime_8h_source_l00041}{41}} of file \mbox{\hyperlink{_runtime_8h_source}{Runtime.\+h}}.
+
+\Hypertarget{struct_runtime_1_1_exception_a6d61df6a78e253a562af1fdbd19e1659}\index{Runtime::Exception@{Runtime::Exception}!cause@{cause}}
+\index{cause@{cause}!Runtime::Exception@{Runtime::Exception}}
+\doxysubsubsection{\texorpdfstring{cause}{cause}}
+{\footnotesize\ttfamily \label{struct_runtime_1_1_exception_a6d61df6a78e253a562af1fdbd19e1659} 
+\mbox{\hyperlink{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59c}{Cause}} Runtime\+::\+Exception\+::cause}
+
+
+
+Definition at line \mbox{\hyperlink{_runtime_8h_source_l00040}{40}} of file \mbox{\hyperlink{_runtime_8h_source}{Runtime.\+h}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/wasm-\/jit/\+Include/\+Runtime/\mbox{\hyperlink{_runtime_8h}{Runtime.\+h}}\end{DoxyCompactItemize}

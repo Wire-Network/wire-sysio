@@ -1,0 +1,99 @@
+\doxysection{Catch\+::Test\+Spec Class Reference}
+\hypertarget{class_catch_1_1_test_spec}{}\label{class_catch_1_1_test_spec}\index{Catch::TestSpec@{Catch::TestSpec}}
+
+
+{\ttfamily \#include $<$catch\+\_\+test\+\_\+spec.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{class_catch_1_1_test_spec_ac6d69b4a19677d95e46af0467fc72ecd}{has\+Filters}} () const
+\item 
+bool \mbox{\hyperlink{class_catch_1_1_test_spec_a2342df9eff2c7db0d26432c1ddef796f}{matches}} (\mbox{\hyperlink{struct_catch_1_1_test_case_info}{Test\+Case\+Info}} const \&test\+Case) const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{class_catch_1_1_test_spec_a8b4fea0f5a37c5ef447eddceacf113a7}{Test\+Spec\+Parser}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{catch__test__spec_8h_source_l00025}{25}} of file \mbox{\hyperlink{catch__test__spec_8h_source}{catch\+\_\+test\+\_\+spec.\+h}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_catch_1_1_test_spec_ac6d69b4a19677d95e46af0467fc72ecd}\index{Catch::TestSpec@{Catch::TestSpec}!hasFilters@{hasFilters}}
+\index{hasFilters@{hasFilters}!Catch::TestSpec@{Catch::TestSpec}}
+\doxysubsubsection{\texorpdfstring{hasFilters()}{hasFilters()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_test_spec_ac6d69b4a19677d95e46af0467fc72ecd} 
+bool Catch\+::\+Test\+Spec\+::has\+Filters (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{include_2internal_2catch__test__spec_8cpp_source_l00049}{49}} of file \mbox{\hyperlink{include_2internal_2catch__test__spec_8cpp_source}{catch\+\_\+test\+\_\+spec.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !m\_filters.empty();}
+\DoxyCodeLine{00051\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_test_spec_ac6d69b4a19677d95e46af0467fc72ecd_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_test_spec_a2342df9eff2c7db0d26432c1ddef796f}\index{Catch::TestSpec@{Catch::TestSpec}!matches@{matches}}
+\index{matches@{matches}!Catch::TestSpec@{Catch::TestSpec}}
+\doxysubsubsection{\texorpdfstring{matches()}{matches()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_test_spec_a2342df9eff2c7db0d26432c1ddef796f} 
+bool Catch\+::\+Test\+Spec\+::matches (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_test_case_info}{Test\+Case\+Info}} const \&}]{test\+Case}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{include_2internal_2catch__test__spec_8cpp_source_l00052}{52}} of file \mbox{\hyperlink{include_2internal_2catch__test__spec_8cpp_source}{catch\+\_\+test\+\_\+spec.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ A\ TestSpec\ matches\ if\ any\ filter\ matches}}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\ \textcolor{keyword}{const}\&\ filter\ :\ m\_filters\ )}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ filter.matches(\ testCase\ )\ )}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00058\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_test_spec_a2342df9eff2c7db0d26432c1ddef796f_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{class_catch_1_1_test_spec_a8b4fea0f5a37c5ef447eddceacf113a7}\index{Catch::TestSpec@{Catch::TestSpec}!TestSpecParser@{TestSpecParser}}
+\index{TestSpecParser@{TestSpecParser}!Catch::TestSpec@{Catch::TestSpec}}
+\doxysubsubsection{\texorpdfstring{TestSpecParser}{TestSpecParser}}
+{\footnotesize\ttfamily \label{class_catch_1_1_test_spec_a8b4fea0f5a37c5ef447eddceacf113a7} 
+friend \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{class_catch_1_1_test_spec_parser}{Test\+Spec\+Parser}}\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__test__spec_8h_source_l00072}{72}} of file \mbox{\hyperlink{catch__test__spec_8h_source}{catch\+\_\+test\+\_\+spec.\+h}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__test__spec_8h}{catch\+\_\+test\+\_\+spec.\+h}}\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{include_2internal_2catch__test__spec_8cpp}{catch\+\_\+test\+\_\+spec.\+cpp}}\end{DoxyCompactItemize}

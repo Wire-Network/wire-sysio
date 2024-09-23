@@ -1,0 +1,85 @@
+\doxysection{libraries/fc/include/fc/io/datastream.hpp File Reference}
+\hypertarget{datastream_8hpp}{}\label{datastream_8hpp}\index{libraries/fc/include/fc/io/datastream.hpp@{libraries/fc/include/fc/io/datastream.hpp}}
+{\ttfamily \#include $<$fc/utility.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/exception/exception.\+hpp$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include $<$type\+\_\+traits$>$}\newline
+{\ttfamily \#include $<$boost/multiprecision/cpp\+\_\+int.\+hpp$>$}\newline
+Include dependency graph for datastream.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{datastream_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{datastream_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classfc_1_1datastream_3_01_t_00_01std_1_1enable__if__t_3_01std_1_1is__same__v_3_01_t_00_01char_04eadb0f8bdce27e5631f0871386070b4}{fc\+::datastream$<$ T, std\+::enable\+\_\+if\+\_\+t$<$ std\+::is\+\_\+same\+\_\+v$<$ T, char \texorpdfstring{$\ast$}{*} $>$\texorpdfstring{$\vert$}{|}\texorpdfstring{$\vert$}{|}std\+::is\+\_\+same\+\_\+v$<$ T, const char \texorpdfstring{$\ast$}{*} $>$\texorpdfstring{$\vert$}{|}\texorpdfstring{$\vert$}{|}std\+::is\+\_\+same\+\_\+v$<$ T, const unsigned char \texorpdfstring{$\ast$}{*} $>$ $>$ $>$}}
+\item 
+class \mbox{\hyperlink{classfc_1_1datastream_3_01size__t_00_01void_01_4}{fc\+::datastream$<$ size\+\_\+t, void $>$}}
+\item 
+class \mbox{\hyperlink{classfc_1_1datastream_3_01_streambuf_00_01typename_01std_1_1enable__if__t_3_01std_1_1is__base__o76614512708450c186f49e481e4fdabd}{fc\+::datastream$<$ Streambuf, typename std\+::enable\+\_\+if\+\_\+t$<$ std\+::is\+\_\+base\+\_\+of\+\_\+v$<$ std\+::streambuf, Streambuf $>$ $>$ $>$}}
+\item 
+class \mbox{\hyperlink{classfc_1_1datastream_3_01_container_00_01typename_01std_1_1enable__if__t_3_07std_1_1is__same__vfd96e234dc1149e01c9f4c631faf0080}{fc\+::datastream$<$ Container, typename std\+::enable\+\_\+if\+\_\+t$<$(std\+::is\+\_\+same\+\_\+v$<$ std\+::vector$<$ char $>$, Container $>$\texorpdfstring{$\vert$}{|}\texorpdfstring{$\vert$}{|}std\+::is\+\_\+same\+\_\+v$<$ std\+::deque$<$ char $>$, Container $>$)$>$ $>$}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacefc}{fc}}
+\begin{DoxyCompactList}\small\item\em namespace \doxylink{namespacesysio_1_1chain}{sysio\+::chain} \end{DoxyCompactList}\item 
+namespace \mbox{\hyperlink{namespacefc_1_1detail}{fc\+::detail}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{utility_8hpp_a9bc43e3ee0ae83643b65e07fe1fd0132}{NO\+\_\+\+RETURN}} void \mbox{\hyperlink{namespacefc_1_1detail_a20e12fc3683b005cd6430a4a3c066bc0}{fc\+::detail\+::throw\+\_\+datastream\+\_\+range\+\_\+error}} (const char \texorpdfstring{$\ast$}{*}file, size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}, \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} over)
+\item 
+{\footnotesize template$<$typename ST $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_a41c2c53a5b52eb48b47afa7d38261f73}{fc\+::operator$<$$<$}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, const \+\_\+\+\_\+int128 \&d)
+\item 
+{\footnotesize template$<$typename ST , typename DATA $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_ab3ebdab797051b684fd5c6f2bf9e600e}{fc\+::operator$>$$>$}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, \+\_\+\+\_\+int128 \&d)
+\item 
+{\footnotesize template$<$typename ST $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_aecd968891b4a94518caccc0755ff6208}{fc\+::operator$<$$<$}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, const unsigned \+\_\+\+\_\+int128 \&d)
+\item 
+{\footnotesize template$<$typename ST , typename DATA $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_ac35bad4cbd53e5ee7a7d8a038f03334e}{fc\+::operator$>$$>$}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, unsigned \+\_\+\+\_\+int128 \&d)
+\item 
+{\footnotesize template$<$typename ST $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_a28f93eed9274b053f3479b939bc0fb5c}{fc\+::operator$<$$<$}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, const \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \&d)
+\item 
+{\footnotesize template$<$typename ST , typename DATA $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_a3dc344225431623f1714cf82a682487a}{fc\+::operator$>$$>$}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \&d)
+\item 
+{\footnotesize template$<$typename ST $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_a9196a4a08f4845ef048112cb0c5ad38e}{fc\+::operator$<$$<$}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, const \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \&d)
+\item 
+{\footnotesize template$<$typename ST , typename DATA $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_a05c1a0d6c2fd94c7ab09573af69a1fff}{fc\+::operator$>$$>$}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \&d)
+\item 
+{\footnotesize template$<$typename ST $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_a0c8885e70e438435a32fbf826f35fb6e}{fc\+::operator$<$$<$}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, const \mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\+\_\+t}} \&d)
+\item 
+{\footnotesize template$<$typename ST , typename DATA $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_a51137b43c25e20fc53ab46d0619e8c90}{fc\+::operator$>$$>$}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, \mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\+\_\+t}} \&d)
+\item 
+{\footnotesize template$<$typename ST $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_ad59ee302f3b0de6fa68fa36dab5fb0d3}{fc\+::operator$<$$<$}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \&d)
+\item 
+{\footnotesize template$<$typename ST , typename DATA $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_a44e08d884820dab558f8b935a697761a}{fc\+::operator$>$$>$}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \&d)
+\item 
+{\footnotesize template$<$typename ST $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_a60dbd98bf029ab3113f5134171a2a404}{fc\+::operator$<$$<$}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, const \mbox{\hyperlink{stdint_8h_a269259c924dce846340ddbb810db2e3c}{int16\+\_\+t}} \&d)
+\item 
+{\footnotesize template$<$typename ST , typename DATA $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_a006850cfe64e6bbb4484b7cd47e6882b}{fc\+::operator$>$$>$}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, \mbox{\hyperlink{stdint_8h_a269259c924dce846340ddbb810db2e3c}{int16\+\_\+t}} \&d)
+\item 
+{\footnotesize template$<$typename ST $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_a4dc481c62007b58ec81b22c046b76140}{fc\+::operator$<$$<$}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, const \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \&d)
+\item 
+{\footnotesize template$<$typename ST , typename DATA $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_a85d445a2f0f9e2e5dc6e52f09c4b498b}{fc\+::operator$>$$>$}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \&d)
+\item 
+{\footnotesize template$<$typename ST $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_a523f4b71775b04eb20ff29f77b384a7e}{fc\+::operator$<$$<$}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, const \mbox{\hyperlink{stdint_8h_aef44329758059c91c76d334e8fc09700}{int8\+\_\+t}} \&d)
+\item 
+{\footnotesize template$<$typename ST , typename DATA $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_a71b778ebfe0451a2dfa35a1fc9f6da50}{fc\+::operator$>$$>$}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, \mbox{\hyperlink{stdint_8h_aef44329758059c91c76d334e8fc09700}{int8\+\_\+t}} \&d)
+\item 
+{\footnotesize template$<$typename ST $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_a048f536e5e210414568d5993f5100743}{fc\+::operator$<$$<$}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, const \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \&d)
+\item 
+{\footnotesize template$<$typename ST , typename DATA $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_a0719bd6e6e8ec1a10c4d56162bb3d76e}{fc\+::operator$>$$>$}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \&d)
+\end{DoxyCompactItemize}

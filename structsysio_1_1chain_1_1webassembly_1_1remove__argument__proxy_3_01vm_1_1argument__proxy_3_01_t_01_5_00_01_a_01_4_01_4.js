@@ -1,0 +1,4 @@
+var structsysio_1_1chain_1_1webassembly_1_1remove__argument__proxy_3_01vm_1_1argument__proxy_3_01_t_01_5_00_01_a_01_4_01_4 =
+[
+    [ "type", "structsysio_1_1chain_1_1webassembly_1_1remove__argument__proxy_3_01vm_1_1argument__proxy_3_01_t_01_5_00_01_a_01_4_01_4.html#a760050c1b8e2734fcd7358791c6d7fbd", null ]
+];

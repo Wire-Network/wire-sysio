@@ -1,0 +1,31 @@
+\doxysection{Catch\+::Matchers\+::Generic\+::Detail Namespace Reference}
+\hypertarget{namespace_catch_1_1_matchers_1_1_generic_1_1_detail}{}\label{namespace_catch_1_1_matchers_1_1_generic_1_1_detail}\index{Catch::Matchers::Generic::Detail@{Catch::Matchers::Generic::Detail}}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+std\+::string \mbox{\hyperlink{namespace_catch_1_1_matchers_1_1_generic_1_1_detail_a79ef1103073f7a8d31735436d2012835}{finalize\+Description}} (const std\+::string \&desc)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespace_catch_1_1_matchers_1_1_generic_1_1_detail_a79ef1103073f7a8d31735436d2012835}\index{Catch::Matchers::Generic::Detail@{Catch::Matchers::Generic::Detail}!finalizeDescription@{finalizeDescription}}
+\index{finalizeDescription@{finalizeDescription}!Catch::Matchers::Generic::Detail@{Catch::Matchers::Generic::Detail}}
+\doxysubsubsection{\texorpdfstring{finalizeDescription()}{finalizeDescription()}}
+{\footnotesize\ttfamily \label{namespace_catch_1_1_matchers_1_1_generic_1_1_detail_a79ef1103073f7a8d31735436d2012835} 
+std\+::string Catch\+::\+Matchers\+::\+Generic\+::\+Detail\+::finalize\+Description (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{desc}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__matchers__generic_8cpp_source_l00003}{3}} of file \mbox{\hyperlink{catch__matchers__generic_8cpp_source}{catch\+\_\+matchers\+\_\+generic.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00003\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00004\ \ \ \ \ \textcolor{keywordflow}{if}\ (desc.empty())\ \{}
+\DoxyCodeLine{00005\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}matches\ undescribed\ predicate"{}};}
+\DoxyCodeLine{00006\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00007\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}matches\ predicate:\ \(\backslash\)"{}"{}}\ +\ desc\ +\ \textcolor{charliteral}{'"{}'};}
+\DoxyCodeLine{00008\ \ \ \ \ \}}
+\DoxyCodeLine{00009\ \}}
+
+\end{DoxyCode}

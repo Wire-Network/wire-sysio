@@ -1,0 +1,97 @@
+\doxysection{cancelrexorder\+\_\+subcommand Struct Reference}
+\hypertarget{structcancelrexorder__subcommand}{}\label{structcancelrexorder__subcommand}\index{cancelrexorder\_subcommand@{cancelrexorder\_subcommand}}
+
+
+Collaboration diagram for cancelrexorder\+\_\+subcommand\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=224pt]{structcancelrexorder__subcommand__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structcancelrexorder__subcommand_ac3c562f0fa605397d2b24607511e05fc}{cancelrexorder\+\_\+subcommand}} (\mbox{\hyperlink{class_c_l_i_1_1_app}{CLI\+::\+App}} \texorpdfstring{$\ast$}{*}action\+Root)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structcancelrexorder__subcommand_ae5710908e31e57e64103165386f178a3}{owner\+\_\+str}}
+\item 
+const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \mbox{\hyperlink{structcancelrexorder__subcommand_ac29d283016a3f2a9e35cafad3ff156b9}{act\+\_\+name}} \{ "{}cnclrexorder"{}\+\_\+n \}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01943}{1943}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structcancelrexorder__subcommand_ac3c562f0fa605397d2b24607511e05fc}\index{cancelrexorder\_subcommand@{cancelrexorder\_subcommand}!cancelrexorder\_subcommand@{cancelrexorder\_subcommand}}
+\index{cancelrexorder\_subcommand@{cancelrexorder\_subcommand}!cancelrexorder\_subcommand@{cancelrexorder\_subcommand}}
+\doxysubsubsection{\texorpdfstring{cancelrexorder\_subcommand()}{cancelrexorder\_subcommand()}}
+{\footnotesize\ttfamily \label{structcancelrexorder__subcommand_ac3c562f0fa605397d2b24607511e05fc} 
+cancelrexorder\+\_\+subcommand\+::cancelrexorder\+\_\+subcommand (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_c_l_i_1_1_app}{CLI\+::\+App}} \texorpdfstring{$\ast$}{*}}]{action\+Root}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01947}{1947}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01947\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01948\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ cancelrexorder\ =\ actionRoot-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_a8b461d2233ec4121259011b5ed24b336}{add\_subcommand}}(\textcolor{stringliteral}{"{}cancelrexorder"{}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}Cancel\ queued\ REX\ sell\ order\ if\ one\ exists"{}}));}
+\DoxyCodeLine{01949\ \ \ \ \ \ \ cancelrexorder-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_a8c812d42c7720ecb5cd0aec41b5aa941}{add\_option}}(\textcolor{stringliteral}{"{}owner"{}},\ \mbox{\hyperlink{structcancelrexorder__subcommand_ae5710908e31e57e64103165386f178a3}{owner\_str}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}Owner\ account\ of\ sell\ order"{}}))-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a}{required}}();}
+\DoxyCodeLine{01950\ \ \ \ \ \ \ \mbox{\hyperlink{programs_2clio_2main_8cpp_aa5d53f41b83b5323c73622fbbb15e9cd}{add\_standard\_transaction\_options}}(cancelrexorder,\ \textcolor{stringliteral}{"{}owner@active"{}});}
+\DoxyCodeLine{01951\ \ \ \ \ \ \ cancelrexorder-\/>callback([\textcolor{keyword}{this}]\ \{}
+\DoxyCodeLine{01952\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}\ act\_payload\ =\ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}()(\textcolor{stringliteral}{"{}owner"{}},\ \mbox{\hyperlink{structcancelrexorder__subcommand_ae5710908e31e57e64103165386f178a3}{owner\_str}});}
+\DoxyCodeLine{01953\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ accountPermissions\ =\ \mbox{\hyperlink{programs_2clio_2main_8cpp_a2b91ca5dbe7cc4ab287d0e44c3037552}{get\_account\_permissions}}(\mbox{\hyperlink{programs_2clio_2main_8cpp_ad552924cb151dcd5b60c73856d1ff706}{tx\_permission}},\ \{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(\mbox{\hyperlink{structcancelrexorder__subcommand_ae5710908e31e57e64103165386f178a3}{owner\_str}}),\ config::active\_name\});}
+\DoxyCodeLine{01954\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{programs_2clio_2main_8cpp_aaf784434864a29e4835be7465173d1ab}{send\_actions}}(\{\mbox{\hyperlink{programs_2clio_2main_8cpp_a067e20df5f65333b0c3cf5840bc37dea}{create\_action}}(accountPermissions,\ config::system\_account\_name,\ \mbox{\hyperlink{structcancelrexorder__subcommand_ac29d283016a3f2a9e35cafad3ff156b9}{act\_name}},\ act\_payload)\});}
+\DoxyCodeLine{01955\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{01956\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structcancelrexorder__subcommand_ac3c562f0fa605397d2b24607511e05fc_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structcancelrexorder__subcommand_ac29d283016a3f2a9e35cafad3ff156b9}\index{cancelrexorder\_subcommand@{cancelrexorder\_subcommand}!act\_name@{act\_name}}
+\index{act\_name@{act\_name}!cancelrexorder\_subcommand@{cancelrexorder\_subcommand}}
+\doxysubsubsection{\texorpdfstring{act\_name}{act\_name}}
+{\footnotesize\ttfamily \label{structcancelrexorder__subcommand_ac29d283016a3f2a9e35cafad3ff156b9} 
+const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} cancelrexorder\+\_\+subcommand\+::act\+\_\+name \{ "{}cnclrexorder"{}\+\_\+n \}}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01945}{1945}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01945\ \{\ \textcolor{stringliteral}{"{}cnclrexorder"{}}\_n\ \};}
+
+\end{DoxyCode}
+\Hypertarget{structcancelrexorder__subcommand_ae5710908e31e57e64103165386f178a3}\index{cancelrexorder\_subcommand@{cancelrexorder\_subcommand}!owner\_str@{owner\_str}}
+\index{owner\_str@{owner\_str}!cancelrexorder\_subcommand@{cancelrexorder\_subcommand}}
+\doxysubsubsection{\texorpdfstring{owner\_str}{owner\_str}}
+{\footnotesize\ttfamily \label{structcancelrexorder__subcommand_ae5710908e31e57e64103165386f178a3} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} cancelrexorder\+\_\+subcommand\+::owner\+\_\+str}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01944}{1944}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+programs/clio/\mbox{\hyperlink{programs_2clio_2main_8cpp}{main.\+cpp}}\end{DoxyCompactItemize}

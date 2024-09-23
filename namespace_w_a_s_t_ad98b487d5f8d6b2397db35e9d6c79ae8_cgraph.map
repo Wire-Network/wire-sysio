@@ -1,0 +1,10 @@
+<map id="WAST::resolveRef" name="WAST::resolveRef">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,134,56"/>
+<area shape="rect" id="Node000002" href="$namespace_w_a_s_t.html#af36d14f42c697d5272a592bf7349d06d" title=" " alt="" coords="182,5,311,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="134,32,166,27,167,32,135,37"/>
+<area shape="rect" id="Node000003" href="$namespace_errors.html#a6959930ad6159fe3eb2e04ebf87c1b84" title=" " alt="" coords="359,31,493,56"/>
+<area shape="poly" id="edge4_Node000001_Node000003" title=" " alt="" coords="134,41,343,41,343,46,134,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="312,25,344,29,343,35,311,30"/>
+<area shape="rect" id="Node000004" href="$namespace_errors.html#a719a329951edb01e45afe1443dfa2a92" title=" " alt="" coords="541,31,635,56"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="494,41,526,41,526,46,494,46"/>
+</map>

@@ -1,0 +1,15 @@
+<map id="BOOST_AUTO_TEST_CASE" name="BOOST_AUTO_TEST_CASE">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,104,202,130"/>
+<area shape="rect" id="Node000002" href="$namespacefc.html#a4d30681e99b9cacc0c9b3b8985a5daa4" title=" " alt="" coords="250,5,396,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="127,101,182,72,249,40,263,34,265,39,251,45,184,76,129,106"/>
+<area shape="rect" id="Node000004" href="$classfc_1_1sha256.html#ab897537f6c524085b28049be51ed370d" title=" " alt="" coords="265,55,380,80"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="163,101,249,81,251,86,165,106"/>
+<area shape="rect" id="Node000005" href="$classfc_1_1sha256.html#ac7722b7428b1db345f1b7fab7f4d5774" title=" " alt="" coords="250,104,396,130"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="202,114,234,114,234,120,202,120"/>
+<area shape="rect" id="Node000006" href="$classfc_1_1crypto_1_1r1_1_1private__key.html#ad71aa7d73e57ef9fd7648fb7461177fb" title=" " alt="" coords="252,154,394,194"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="156,128,237,149,236,154,155,133"/>
+<area shape="rect" id="Node000007" href="$yubihsm__pkcs11_8c.html#ae785d5badbf1f08b491af31f32a135a1" title=" " alt="" coords="287,219,358,244"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="125,128,180,164,251,204,273,213,271,218,248,209,177,169,122,132"/>
+<area shape="rect" id="Node000003" href="$namespacefc.html#a7c8b089501fd00e09e068aa02eacf3de" title=" " alt="" coords="444,5,606,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="396,16,429,16,429,21,396,21"/>
+</map>

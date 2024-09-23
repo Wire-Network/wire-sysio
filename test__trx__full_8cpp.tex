@@ -1,0 +1,182 @@
+\doxysection{plugins/producer\+\_\+plugin/test/test\+\_\+trx\+\_\+full.cpp File Reference}
+\hypertarget{test__trx__full_8cpp}{}\label{test__trx__full_8cpp}\index{plugins/producer\_plugin/test/test\_trx\_full.cpp@{plugins/producer\_plugin/test/test\_trx\_full.cpp}}
+{\ttfamily \#include $<$boost/test/included/unit\+\_\+test.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/producer\+\_\+plugin/producer\+\_\+plugin.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/testing/tester.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/genesis\+\_\+state.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/thread\+\_\+utils.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/transaction\+\_\+metadata.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/trace.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/name.\+hpp$>$}\newline
+{\ttfamily \#include $<$appbase/application.\+hpp$>$}\newline
+Include dependency graph for test\+\_\+trx\+\_\+full.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__trx__full_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1test_1_1detail_1_1testit}{sysio\+::test\+::detail\+::testit}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1test}{sysio\+::test}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1test_1_1detail}{sysio\+::test\+::detail}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{test__trx__full_8cpp_a6b2a3852db8bb19ab6909bac01859985}{BOOST\+\_\+\+TEST\+\_\+\+MODULE}}~full\+\_\+producer\+\_\+trxs
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{test__trx__full_8cpp_afdace07785a80c02d7fbb1d13154c2c4}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (producer)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{test__trx__full_8cpp_a6b2a3852db8bb19ab6909bac01859985}\index{test\_trx\_full.cpp@{test\_trx\_full.cpp}!BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}}
+\index{BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}!test\_trx\_full.cpp@{test\_trx\_full.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_TEST\_MODULE}{BOOST\_TEST\_MODULE}}
+{\footnotesize\ttfamily \label{test__trx__full_8cpp_a6b2a3852db8bb19ab6909bac01859985} 
+\#define BOOST\+\_\+\+TEST\+\_\+\+MODULE~full\+\_\+producer\+\_\+trxs}
+
+
+
+Definition at line \mbox{\hyperlink{test__trx__full_8cpp_source_l00001}{1}} of file \mbox{\hyperlink{test__trx__full_8cpp_source}{test\+\_\+trx\+\_\+full.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{test__trx__full_8cpp_afdace07785a80c02d7fbb1d13154c2c4}\index{test\_trx\_full.cpp@{test\_trx\_full.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!test\_trx\_full.cpp@{test\_trx\_full.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}}
+{\footnotesize\ttfamily \label{test__trx__full_8cpp_afdace07785a80c02d7fbb1d13154c2c4} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{producer}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__trx__full_8cpp_source_l00102}{102}} of file \mbox{\hyperlink{test__trx__full_8cpp_source}{test\+\_\+trx\+\_\+full.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00103\ \ \ \ boost::filesystem::path\ temp\ =\ boost::filesystem::temp\_directory\_path()\ /\ boost::filesystem::unique\_path();}
+\DoxyCodeLine{00104\ }
+\DoxyCodeLine{00105\ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ std::promise<std::tuple<producer\_plugin*,\ chain\_plugin*>>\ plugin\_promise;}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ std::future<std::tuple<producer\_plugin*,\ chain\_plugin*>>\ plugin\_fut\ =\ plugin\_promise.get\_future();}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ std::thread\ app\_thread(\ [\&]()\ \{}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1logger_a4e12ef2e794551d593e497b4b90601ab}{fc::logger::get}}(\mbox{\hyperlink{logger_8hpp_a8c7a288fea519c7e895518f8dff4888f}{DEFAULT\_LOGGER}}).\mbox{\hyperlink{classfc_1_1logger_a4c22e498cec41efb806fda9733662650}{set\_log\_level}}(\mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4a30d2de77e71beb8d09d530cac04efa25}{fc::log\_level::debug}});}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \ std::vector<const\ char*>\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}\ =}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\textcolor{stringliteral}{"{}test"{}},\ \textcolor{stringliteral}{"{}-\/-\/data-\/dir"{}},\ temp.c\_str(),\ \textcolor{stringliteral}{"{}-\/-\/config-\/dir"{}},\ temp.c\_str(),}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}-\/p"{}},\ \textcolor{stringliteral}{"{}sysio"{}},\ \textcolor{stringliteral}{"{}-\/e"{}},\ \textcolor{stringliteral}{"{}-\/-\/max-\/transaction-\/time"{}},\ \textcolor{stringliteral}{"{}475"{}},\ \textcolor{stringliteral}{"{}-\/-\/disable-\/subjective-\/billing=true"{}}\ \};}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{appbase::app}}().\mbox{\hyperlink{classappbase_1_1application_a29ed51314f78ebe6795930a4ca910fd6}{initialize}}<\mbox{\hyperlink{classchain__plugin}{chain\_plugin}},\ \mbox{\hyperlink{classsysio_1_1producer__plugin}{producer\_plugin}}>(\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}.size(),\ (\textcolor{keywordtype}{char}**)\ \&\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[0]\ );}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{appbase::app}}().\mbox{\hyperlink{classappbase_1_1application_a3b77bd811744da79c9d8ba0d078e7668}{startup}}();}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ plugin\_promise.set\_value(}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{appbase::app}}().\mbox{\hyperlink{classappbase_1_1application_a1d2c585f90007be342c9c64ee9cc0f7c}{find\_plugin}}<\mbox{\hyperlink{classsysio_1_1producer__plugin}{producer\_plugin}}>(),\ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{appbase::app}}().\mbox{\hyperlink{classappbase_1_1application_a1d2c585f90007be342c9c64ee9cc0f7c}{find\_plugin}}<\mbox{\hyperlink{classchain__plugin}{chain\_plugin}}>()\}\ );}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{appbase::app}}().\mbox{\hyperlink{classappbase_1_1application_a39286b0b034b97f6940568a00f44edaf}{exec}}();}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \}\ );}
+\DoxyCodeLine{00119\ }
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \textcolor{keyword}{auto}[prod\_plug,\ chain\_plug]\ =\ plugin\_fut.get();}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ chain\_id\ =\ chain\_plug-\/>get\_chain\_id();}
+\DoxyCodeLine{00122\ }
+\DoxyCodeLine{00123\ \ \ \ \ \ \ std::deque<block\_state\_ptr>\ all\_blocks;}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ std::promise<void>\ empty\_blocks\_promise;}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ std::future<void>\ empty\_blocks\_fut\ =\ empty\_blocks\_promise.get\_future();}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ ab\ =\ chain\_plug-\/>chain().accepted\_block.connect(\ [\&](\textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\_state\_ptr}}\&\ bsp)\ \{}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ num\_empty\ =\ std::numeric\_limits<int>::max();}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \ all\_blocks.push\_back(\ bsp\ );}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ bsp-\/>block-\/>transactions.empty()\ )\ \{}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \ \ \ -\/-\/num\_empty;}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ num\_empty\ ==\ 0\ )\ empty\_blocks\_promise.set\_value();}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{\ \textcolor{comment}{//\ we\ want\ a\ few\ empty\ blocks\ after\ we\ have\ some\ non-\/empty\ blocks}}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \ \ \ \ num\_empty\ =\ 10;}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \}\ );}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ bs\ =\ chain\_plug-\/>chain().block\_start.connect(\ [\&](\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{namespacebn}{bn}}\ )\ \{}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \}\ );}
+\DoxyCodeLine{00138\ }
+\DoxyCodeLine{00139\ \ \ \ \ \ \ std::deque<packed\_transaction\_ptr>\ trxs;}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ std::atomic<size\_t>\ next\_calls\ =\ 0;}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ std::atomic<size\_t>\ num\_posts\ =\ 0;}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ std::atomic<size\_t>\ trace\_with\_except\ =\ 0;}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ std::atomic<bool>\ trx\_match\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ num\_pushes\ =\ 4242;}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keywordtype}{size\_t}\ i\ =\ 1;\ i\ <=\ num\_pushes;\ ++i\ )\ \{}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ ptrx\ =\ make\_unique\_trx(\ chain\_id\ );}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a3da1571bad6ca6c94df9a3660b2115ee}{dlog}}(\ \textcolor{stringliteral}{"{}posting\ \$\{id\}"{}},\ (\textcolor{stringliteral}{"{}id"{}},\ ptrx-\/>id())\ );}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_a77aff91b861010fd61a616c59b310dcc}{post}}(\ \mbox{\hyperlink{structappbase_1_1priority_ae0c72abae2c2ba770667fcf90e40d654}{priority::low}},\ [ptrx,\ \&next\_calls,\ \&num\_posts,\ \&trace\_with\_except,\ \&trx\_match,\ \&trxs]()\ \{}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \ \ \ \ ++num\_posts;}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ return\_failure\_traces\ =\ \textcolor{keyword}{false};\ \textcolor{comment}{//\ 2.2.x+\ =\ num\_posts\ \%\ 2\ ==\ 0;}}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_a87887b19b1f639ca551645813bb380de}{get\_method}}<\mbox{\hyperlink{structappbase_1_1method__decl}{plugin\_interface::incoming::methods::transaction\_async}}>()(ptrx,}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{false},\ \textcolor{comment}{//\ persist\_until\_expiried}}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{false},\ \textcolor{comment}{//\ read\_only}}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{false},\ \textcolor{comment}{//\ return\_failure\_traces}}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [ptrx,\ \&next\_calls,\ \&trace\_with\_except,\ \&trx\_match,\ \&trxs,\ return\_failure\_traces]}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{keyword}{const}\ std::variant<fc::exception\_ptr,\ transaction\_trace\_ptr>\&\ result)\ \{}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !std::holds\_alternative<fc::exception\_ptr>(\ result\ )\ \&\&\ !std::get<chain::transaction\_trace\_ptr>(\ result\ )-\/>except\ )\ \{}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ std::get<chain::transaction\_trace\_ptr>(\ result\ )-\/>\textcolor{keywordtype}{id}\ ==\ ptrx-\/>id()\ )\ \{}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ trxs.push\_back(\ ptrx\ );}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}}(\ \textcolor{stringliteral}{"{}trace\ not\ for\ trx\ \$\{id\}:\ \$\{t\}"{}},}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}id"{}},\ ptrx-\/>id())(\textcolor{stringliteral}{"{}t"{}},\ \mbox{\hyperlink{classfc_1_1json_ae6c022ab581a9552ae2c97ff5d73aaf8}{fc::json::to\_pretty\_string}}(*std::get<chain::transaction\_trace\_ptr>(result)))\ );}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ trx\_match\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(\ !return\_failure\_traces\ \&\&\ !std::holds\_alternative<fc::exception\_ptr>(\ result\ )\ \&\&\ std::get<chain::transaction\_trace\_ptr>(\ result\ )-\/>except\ )\ \{}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}}(\ \textcolor{stringliteral}{"{}trace\ with\ except\ \$\{e\}"{}},}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}e"{}},\ \mbox{\hyperlink{classfc_1_1json_ae6c022ab581a9552ae2c97ff5d73aaf8}{fc::json::to\_pretty\_string}}(\ *std::get<chain::transaction\_trace\_ptr>(\ result\ )\ ))\ );}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++trace\_with\_except;}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++next\_calls;}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ i\ \%\ (num\_pushes/3)\ ==\ 0\ )\ \{}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ need\ to\ sleep\ or\ a\ fast\ machine\ might\ put\ all\ trxs\ in\ one\ block}}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \ \ \ \ usleep(\ config::block\_interval\_us\ /\ 2\ );}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ i\ \%\ 200\ ==\ 0\ )\ \{}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ get\_integrity\_hash\ aborts\ block\ and\ places\ aborted\ trxs\ into\ unapplied\_transaction\_queue}}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ verifying\ that\ aborting\ block\ does\ not\ lose\ transactions}}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_a77aff91b861010fd61a616c59b310dcc}{post}}(\mbox{\hyperlink{structappbase_1_1priority_adab9a6659f361fc6ca6c855788b05df0}{priority::high}},\ []()\{}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_a1d2c585f90007be342c9c64ee9cc0f7c}{find\_plugin}}<\mbox{\hyperlink{classsysio_1_1producer__plugin}{producer\_plugin}}>()-\/>get\_integrity\_hash();}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00185\ }
+\DoxyCodeLine{00186\ \ \ \ \ \ \ empty\_blocks\_fut.wait\_for(std::chrono::seconds(15));}
+\DoxyCodeLine{00187\ }
+\DoxyCodeLine{00188\ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ trace\_with\_except,\ 0\ );\ \textcolor{comment}{//\ should\ not\ have\ any\ traces\ with\ except\ in\ it}}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ BOOST\_CHECK(\ all\_blocks.size()\ >\ 3\ );\ \textcolor{comment}{//\ should\ have\ a\ few\ blocks\ otherwise\ test\ is\ running\ too\ fast}}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ num\_pushes,\ num\_posts\ );}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ num\_pushes,\ next\_calls\ );}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ BOOST\_CHECK(\ trx\_match.load()\ );}
+\DoxyCodeLine{00193\ }
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{appbase::app}}().\mbox{\hyperlink{classappbase_1_1application_a81aa58d3f94570b7976145039155fc46}{quit}}();}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ app\_thread.join();}
+\DoxyCodeLine{00196\ }
+\DoxyCodeLine{00197\ \ \ \ \ \ \ BOOST\_REQUIRE(\ verify\_equal(trxs,\ all\_blocks\ )\ );}
+\DoxyCodeLine{00198\ }
+\DoxyCodeLine{00199\ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\ ...\ )\ \{}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ bfs::remove\_all(\ temp\ );}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \textcolor{keywordflow}{throw};}
+\DoxyCodeLine{00202\ \ \ \ \}}
+\DoxyCodeLine{00203\ \ \ \ bfs::remove\_all(\ temp\ );}
+\DoxyCodeLine{00204\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__trx__full_8cpp_afdace07785a80c02d7fbb1d13154c2c4_cgraph}
+\end{center}
+\end{figure}

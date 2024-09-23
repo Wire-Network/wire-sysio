@@ -1,0 +1,161 @@
+\doxysection{libraries/fc/secp256k1/secp256k1/src/hash\+\_\+impl.h File Reference}
+\hypertarget{hash__impl_8h}{}\label{hash__impl_8h}\index{libraries/fc/secp256k1/secp256k1/src/hash\_impl.h@{libraries/fc/secp256k1/secp256k1/src/hash\_impl.h}}
+{\ttfamily \#include "{}hash.\+h"{}}\newline
+{\ttfamily \#include "{}util.\+h"{}}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+Include dependency graph for hash\+\_\+impl.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=305pt]{hash__impl_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{hash__impl_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}(x,  y,  z)
+\item 
+\#define \mbox{\hyperlink{hash__impl_8h_a447cd1d7fb703b62666400976be24bf3}{Maj}}(x,  y,  z)
+\item 
+\#define \mbox{\hyperlink{hash__impl_8h_a613f88ad88919b6ed21ff223070f9a21}{Sigma0}}(x)
+\item 
+\#define \mbox{\hyperlink{hash__impl_8h_a6d34508d6d962274083fcd992fb4e340}{Sigma1}}(x)
+\item 
+\#define \mbox{\hyperlink{hash__impl_8h_a672bd39bdf2f6dc295a23ddd109175ff}{sigma0}}(x)
+\item 
+\#define \mbox{\hyperlink{hash__impl_8h_a0347251dc63b7abe5d4c500544c24a97}{sigma1}}(x)
+\item 
+\#define \mbox{\hyperlink{hash__impl_8h_a4a6398f77b0cf603722649d4fd67260f}{Round}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},  b,  c,  d,  e,  \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}},  g,  h,  k,  w)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}\index{hash\_impl.h@{hash\_impl.h}!Ch@{Ch}}
+\index{Ch@{Ch}!hash\_impl.h@{hash\_impl.h}}
+\doxysubsubsection{\texorpdfstring{Ch}{Ch}}
+{\footnotesize\ttfamily \label{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a} 
+\#define Ch(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{, }\item[{}]{z}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((z)\ \string^\ ((x)\ \&\ ((y)\ \string^\ (z))))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{hash__impl_8h_source_l00017}{17}} of file \mbox{\hyperlink{hash__impl_8h_source}{hash\+\_\+impl.\+h}}.
+
+\Hypertarget{hash__impl_8h_a447cd1d7fb703b62666400976be24bf3}\index{hash\_impl.h@{hash\_impl.h}!Maj@{Maj}}
+\index{Maj@{Maj}!hash\_impl.h@{hash\_impl.h}}
+\doxysubsubsection{\texorpdfstring{Maj}{Maj}}
+{\footnotesize\ttfamily \label{hash__impl_8h_a447cd1d7fb703b62666400976be24bf3} 
+\#define Maj(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{, }\item[{}]{z}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(((x)\ \&\ (y))\ |\ ((z)\ \&\ ((x)\ |\ (y))))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{hash__impl_8h_source_l00018}{18}} of file \mbox{\hyperlink{hash__impl_8h_source}{hash\+\_\+impl.\+h}}.
+
+\Hypertarget{hash__impl_8h_a4a6398f77b0cf603722649d4fd67260f}\index{hash\_impl.h@{hash\_impl.h}!Round@{Round}}
+\index{Round@{Round}!hash\_impl.h@{hash\_impl.h}}
+\doxysubsubsection{\texorpdfstring{Round}{Round}}
+{\footnotesize\ttfamily \label{hash__impl_8h_a4a6398f77b0cf603722649d4fd67260f} 
+\#define Round(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}}{, }\item[{}]{b}{, }\item[{}]{c}{, }\item[{}]{d}{, }\item[{}]{e}{, }\item[{}]{\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}}{, }\item[{}]{g}{, }\item[{}]{h}{, }\item[{}]{k}{, }\item[{}]{w}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ t1\ =\ (h)\ +\ \mbox{\hyperlink{hash__impl_8h_a6d34508d6d962274083fcd992fb4e340}{Sigma1}}(e)\ +\ \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}((e),\ (\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}),\ (g))\ +\ (k)\ +\ (w);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ t2\ =\ \mbox{\hyperlink{hash__impl_8h_a613f88ad88919b6ed21ff223070f9a21}{Sigma0}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})\ +\ \mbox{\hyperlink{hash__impl_8h_a447cd1d7fb703b62666400976be24bf3}{Maj}}((\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}),\ (b),\ (c));\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}})\ +=\ t1;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ (h)\ =\ t1\ +\ t2;\ \(\backslash\)}
+\DoxyCodeLine{\}\ \textcolor{keywordflow}{while}(0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{hash__impl_8h_source_l00024}{24}} of file \mbox{\hyperlink{hash__impl_8h_source}{hash\+\_\+impl.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#define\ Round(a,b,c,d,e,f,g,h,k,w)\ do\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00025\ \textcolor{preprocessor}{\ \ \ \ uint32\_t\ t1\ =\ (h)\ +\ Sigma1(e)\ +\ Ch((e),\ (f),\ (g))\ +\ (k)\ +\ (w);\ \(\backslash\)}}
+\DoxyCodeLine{00026\ \textcolor{preprocessor}{\ \ \ \ uint32\_t\ t2\ =\ Sigma0(a)\ +\ Maj((a),\ (b),\ (c));\ \(\backslash\)}}
+\DoxyCodeLine{00027\ \textcolor{preprocessor}{\ \ \ \ (d)\ +=\ t1;\ \(\backslash\)}}
+\DoxyCodeLine{00028\ \textcolor{preprocessor}{\ \ \ \ (h)\ =\ t1\ +\ t2;\ \(\backslash\)}}
+\DoxyCodeLine{00029\ \textcolor{preprocessor}{\}\ while(0)}}
+
+\end{DoxyCode}
+\Hypertarget{hash__impl_8h_a613f88ad88919b6ed21ff223070f9a21}\index{hash\_impl.h@{hash\_impl.h}!Sigma0@{Sigma0}}
+\index{Sigma0@{Sigma0}!hash\_impl.h@{hash\_impl.h}}
+\doxysubsubsection{\texorpdfstring{Sigma0}{Sigma0}}
+{\footnotesize\ttfamily \label{hash__impl_8h_a613f88ad88919b6ed21ff223070f9a21} 
+\#define Sigma0(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(((x)\ >>\ 2\ |\ (x)\ <<\ 30)\ \string^\ ((x)\ >>\ 13\ |\ (x)\ <<\ 19)\ \string^\ ((x)\ >>\ 22\ |\ (x)\ <<\ 10))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{hash__impl_8h_source_l00019}{19}} of file \mbox{\hyperlink{hash__impl_8h_source}{hash\+\_\+impl.\+h}}.
+
+\Hypertarget{hash__impl_8h_a672bd39bdf2f6dc295a23ddd109175ff}\index{hash\_impl.h@{hash\_impl.h}!sigma0@{sigma0}}
+\index{sigma0@{sigma0}!hash\_impl.h@{hash\_impl.h}}
+\doxysubsubsection{\texorpdfstring{sigma0}{sigma0}}
+{\footnotesize\ttfamily \label{hash__impl_8h_a672bd39bdf2f6dc295a23ddd109175ff} 
+\#define sigma0(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(((x)\ >>\ 7\ |\ (x)\ <<\ 25)\ \string^\ ((x)\ >>\ 18\ |\ (x)\ <<\ 14)\ \string^\ ((x)\ >>\ 3))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{hash__impl_8h_source_l00021}{21}} of file \mbox{\hyperlink{hash__impl_8h_source}{hash\+\_\+impl.\+h}}.
+
+\Hypertarget{hash__impl_8h_a6d34508d6d962274083fcd992fb4e340}\index{hash\_impl.h@{hash\_impl.h}!Sigma1@{Sigma1}}
+\index{Sigma1@{Sigma1}!hash\_impl.h@{hash\_impl.h}}
+\doxysubsubsection{\texorpdfstring{Sigma1}{Sigma1}}
+{\footnotesize\ttfamily \label{hash__impl_8h_a6d34508d6d962274083fcd992fb4e340} 
+\#define Sigma1(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(((x)\ >>\ 6\ |\ (x)\ <<\ 26)\ \string^\ ((x)\ >>\ 11\ |\ (x)\ <<\ 21)\ \string^\ ((x)\ >>\ 25\ |\ (x)\ <<\ 7))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{hash__impl_8h_source_l00020}{20}} of file \mbox{\hyperlink{hash__impl_8h_source}{hash\+\_\+impl.\+h}}.
+
+\Hypertarget{hash__impl_8h_a0347251dc63b7abe5d4c500544c24a97}\index{hash\_impl.h@{hash\_impl.h}!sigma1@{sigma1}}
+\index{sigma1@{sigma1}!hash\_impl.h@{hash\_impl.h}}
+\doxysubsubsection{\texorpdfstring{sigma1}{sigma1}}
+{\footnotesize\ttfamily \label{hash__impl_8h_a0347251dc63b7abe5d4c500544c24a97} 
+\#define sigma1(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(((x)\ >>\ 17\ |\ (x)\ <<\ 15)\ \string^\ ((x)\ >>\ 19\ |\ (x)\ <<\ 13)\ \string^\ ((x)\ >>\ 10))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{hash__impl_8h_source_l00022}{22}} of file \mbox{\hyperlink{hash__impl_8h_source}{hash\+\_\+impl.\+h}}.
+

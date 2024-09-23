@@ -1,0 +1,30 @@
+\doxysection{perftest.\+cpp}
+\hypertarget{perftest_8cpp_source}{}\label{perftest_8cpp_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/test/perftest/perftest.cpp@{libraries/fc/include/fc/crypto/webauthn\_json/test/perftest/perftest.cpp}}
+\mbox{\hyperlink{perftest_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{perftest_8cpp_source_l00001}00001\ \textcolor{comment}{//\ Tencent\ is\ pleased\ to\ support\ the\ open\ source\ community\ by\ making\ RapidJSON\ available.}}
+\DoxyCodeLine{\Hypertarget{perftest_8cpp_source_l00002}00002\ \textcolor{comment}{//\ }}
+\DoxyCodeLine{\Hypertarget{perftest_8cpp_source_l00003}00003\ \textcolor{comment}{//\ Copyright\ (C)\ 2015\ THL\ A29\ Limited,\ a\ Tencent\ company,\ and\ Milo\ Yip.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{perftest_8cpp_source_l00004}00004\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{perftest_8cpp_source_l00005}00005\ \textcolor{comment}{//\ Licensed\ under\ the\ MIT\ License\ (the\ "{}License"{});\ you\ may\ not\ use\ this\ file\ except}}
+\DoxyCodeLine{\Hypertarget{perftest_8cpp_source_l00006}00006\ \textcolor{comment}{//\ in\ compliance\ with\ the\ License.\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{\Hypertarget{perftest_8cpp_source_l00007}00007\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{perftest_8cpp_source_l00008}00008\ \textcolor{comment}{//\ http://opensource.org/licenses/MIT}}
+\DoxyCodeLine{\Hypertarget{perftest_8cpp_source_l00009}00009\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{perftest_8cpp_source_l00010}00010\ \textcolor{comment}{//\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software\ distributed\ }}
+\DoxyCodeLine{\Hypertarget{perftest_8cpp_source_l00011}00011\ \textcolor{comment}{//\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,\ WITHOUT\ WARRANTIES\ OR\ }}
+\DoxyCodeLine{\Hypertarget{perftest_8cpp_source_l00012}00012\ \textcolor{comment}{//\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.\ See\ the\ License\ for\ the\ }}
+\DoxyCodeLine{\Hypertarget{perftest_8cpp_source_l00013}00013\ \textcolor{comment}{//\ specific\ language\ governing\ permissions\ and\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{perftest_8cpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{perftest_8cpp_source_l00015}00015\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{perftest_8h}{perftest.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{perftest_8cpp_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{perftest_8cpp_source_l00017}\mbox{\hyperlink{perftest_8cpp_a3c04138a5bfe5d72780bb7e82a18e627}{00017}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}(\textcolor{keywordtype}{int}\ argc,\ \textcolor{keywordtype}{char}\ **\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}})\ \{}
+\DoxyCodeLine{\Hypertarget{perftest_8cpp_source_l00018}00018\ \textcolor{preprocessor}{\#if\ \_MSC\_VER}}
+\DoxyCodeLine{\Hypertarget{perftest_8cpp_source_l00019}00019\ \ \ \ \ \_CrtSetDbgFlag\ (\ \_CRTDBG\_ALLOC\_MEM\_DF\ |\ \_CRTDBG\_LEAK\_CHECK\_DF\ );}
+\DoxyCodeLine{\Hypertarget{perftest_8cpp_source_l00020}00020\ \ \ \ \ \textcolor{comment}{//void\ *testWhetherMemoryLeakDetectionWorks\ =\ malloc(1);}}
+\DoxyCodeLine{\Hypertarget{perftest_8cpp_source_l00021}00021\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{perftest_8cpp_source_l00022}00022\ \ \ \ \ \mbox{\hyperlink{namespacetesting_afd726ae08c9bd16dc52f78c822d9946b}{::testing::InitGoogleTest}}(\&argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}});}
+\DoxyCodeLine{\Hypertarget{perftest_8cpp_source_l00023}00023\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{gtest_8h_a853a3792807489591d3d4a2f2ff9359f}{RUN\_ALL\_TESTS}}();}
+\DoxyCodeLine{\Hypertarget{perftest_8cpp_source_l00024}00024\ \}}
+
+\end{DoxyCode}

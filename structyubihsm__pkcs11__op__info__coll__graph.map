@@ -1,0 +1,32 @@
+<map id="yubihsm_pkcs11_op_info" name="yubihsm_pkcs11_op_info">
+<area shape="rect" id="Node000001" title=" " alt="" coords="181,405,350,431"/>
+<area shape="rect" id="Node000002" href="$structmechanism.html" title=" " alt="" coords="146,316,235,342"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="213,352,257,403,253,406,209,356"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="72,213,126,238"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="120,248,157,291,180,314,176,318,153,294,116,252"/>
+<area shape="rect" id="Node000004" href="$unionop.html" title=" " alt="" coords="365,316,403,342"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="357,354,284,407,281,402,354,349"/>
+<area shape="rect" id="Node000005" href="$structfind__info.html" title=" " alt="" coords="150,213,220,238"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="215,245,288,290,329,307,365,319,363,325,327,312,286,295,213,250"/>
+<area shape="rect" id="Node000006" href="$structyh__object__descriptor.html" title=" " alt="" coords="5,109,147,135"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="99,145,141,187,170,210,167,214,138,191,95,148"/>
+<area shape="rect" id="Node000007" href="$structyh__capabilities.html" title="Capabilities representation." alt="" coords="22,5,130,31"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="79,47,79,109,73,109,73,47"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="170,109,227,135"/>
+<area shape="poly" id="edge7_Node000005_Node000008" title=" " alt="" coords="198,151,190,213,184,212,192,150"/>
+<area shape="rect" id="Node000009" href="$structsign__info.html" title=" " alt="" coords="245,213,318,238"/>
+<area shape="poly" id="edge8_Node000004_Node000009" title=" " alt="" coords="306,247,374,314,370,318,302,251"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="413,109,459,135"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="399,133,365,143,333,161,307,187,290,214,285,211,303,184,329,157,363,139,398,128"/>
+<area shape="rect" id="Node000011" href="$structdigest__info.html" title=" " alt="" coords="342,213,426,238"/>
+<area shape="poly" id="edge11_Node000011_Node000010" title=" " alt="" coords="407,147,397,160,388,187,386,212,381,212,383,186,392,157,403,143"/>
+<area shape="rect" id="Node000012" href="$structverify__info.html" title=" " alt="" coords="450,213,531,238"/>
+<area shape="poly" id="edge13_Node000012_Node000010" title=" " alt="" coords="453,147,460,157,487,211,483,214,455,160,449,149"/>
+<area shape="rect" id="Node000013" href="$structdecrypt__info.html" title=" " alt="" coords="555,213,648,238"/>
+<area shape="poly" id="edge15_Node000013_Node000010" title=" " alt="" coords="475,132,528,156,564,184,592,210,588,214,561,188,525,161,472,137"/>
+<area shape="poly" id="edge10_Node000004_Node000011" title=" " alt="" coords="387,254,387,316,381,316,381,254"/>
+<area shape="poly" id="edge12_Node000004_Node000012" title=" " alt="" coords="472,252,430,294,402,318,398,314,426,290,468,248"/>
+<area shape="poly" id="edge14_Node000004_Node000013" title=" " alt="" coords="575,250,540,273,500,295,449,314,404,326,403,321,447,309,498,290,537,268,572,245"/>
+<area shape="rect" id="Node000014" href="$structencrypt__info.html" title=" " alt="" coords="671,213,764,238"/>
+<area shape="poly" id="edge16_Node000004_Node000014" title=" " alt="" coords="690,250,650,274,604,295,548,311,491,321,404,330,403,324,491,316,547,305,602,290,647,269,687,245"/>
+</map>

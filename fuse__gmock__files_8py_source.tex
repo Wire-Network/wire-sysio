@@ -1,0 +1,246 @@
+\doxysection{fuse\+\_\+gmock\+\_\+files.\+py}
+\hypertarget{fuse__gmock__files_8py_source}{}\label{fuse__gmock__files_8py_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googlemock/scripts/fuse\_gmock\_files.py@{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googlemock/scripts/fuse\_gmock\_files.py}}
+\mbox{\hyperlink{fuse__gmock__files_8py}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00001}\mbox{\hyperlink{namespacefuse__gmock__files}{00001}}\ \textcolor{comment}{\#!/usr/bin/env\ python}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00002}00002\ \textcolor{comment}{\#}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00003}00003\ \textcolor{comment}{\#\ Copyright\ 2009,\ Google\ Inc.}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00004}00004\ \textcolor{comment}{\#\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00005}00005\ \textcolor{comment}{\#}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00006}00006\ \textcolor{comment}{\#\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00007}00007\ \textcolor{comment}{\#\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00008}00008\ \textcolor{comment}{\#\ met:}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00009}00009\ \textcolor{comment}{\#}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00010}00010\ \textcolor{comment}{\#\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00011}00011\ \textcolor{comment}{\#\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00012}00012\ \textcolor{comment}{\#\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00013}00013\ \textcolor{comment}{\#\ copyright\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00014}00014\ \textcolor{comment}{\#\ in\ the\ documentation\ and/or\ other\ materials\ provided\ with\ the}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00015}00015\ \textcolor{comment}{\#\ distribution.}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00016}00016\ \textcolor{comment}{\#\ \ \ \ \ *\ Neither\ the\ name\ of\ Google\ Inc.\ nor\ the\ names\ of\ its}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00017}00017\ \textcolor{comment}{\#\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products\ derived\ from}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00018}00018\ \textcolor{comment}{\#\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00019}00019\ \textcolor{comment}{\#}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00020}00020\ \textcolor{comment}{\#\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00021}00021\ \textcolor{comment}{\#\ "{}AS\ IS"{}\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00022}00022\ \textcolor{comment}{\#\ LIMITED\ TO,\ THE\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00023}00023\ \textcolor{comment}{\#\ A\ PARTICULAR\ PURPOSE\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ THE\ COPYRIGHT}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00024}00024\ \textcolor{comment}{\#\ OWNER\ OR\ CONTRIBUTORS\ BE\ LIABLE\ FOR\ ANY\ DIRECT,\ INDIRECT,\ INCIDENTAL,}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00025}00025\ \textcolor{comment}{\#\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES\ (INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00026}00026\ \textcolor{comment}{\#\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;\ LOSS\ OF\ USE,}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00027}00027\ \textcolor{comment}{\#\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND\ ON\ ANY}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00028}00028\ \textcolor{comment}{\#\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00029}00029\ \textcolor{comment}{\#\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00030}00030\ \textcolor{comment}{\#\ OF\ THIS\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00032}00032\ \textcolor{stringliteral}{"{}"{}"{}fuse\_gmock\_files.py\ v0.1.0}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00033}00033\ \textcolor{stringliteral}{Fuses\ Google\ Mock\ and\ Google\ Test\ source\ code\ into\ two\ .h\ files\ and\ a\ .cc\ file.}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00034}00034\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00035}00035\ \textcolor{stringliteral}{SYNOPSIS}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00036}00036\ \textcolor{stringliteral}{\ \ \ \ \ \ \ fuse\_gmock\_files.py\ [GMOCK\_ROOT\_DIR]\ OUTPUT\_DIR}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00037}00037\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00038}00038\ \textcolor{stringliteral}{\ \ \ \ \ \ \ Scans\ GMOCK\_ROOT\_DIR\ for\ Google\ Mock\ and\ Google\ Test\ source}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00039}00039\ \textcolor{stringliteral}{\ \ \ \ \ \ \ code,\ assuming\ Google\ Test\ is\ in\ the\ GMOCK\_ROOT\_DIR/../googletest}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00040}00040\ \textcolor{stringliteral}{\ \ \ \ \ \ \ directory,\ and\ generates\ three\ files:}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00041}00041\ \textcolor{stringliteral}{\ \ \ \ \ \ \ OUTPUT\_DIR/gtest/gtest.h,\ OUTPUT\_DIR/gmock/gmock.h,\ and}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00042}00042\ \textcolor{stringliteral}{\ \ \ \ \ \ \ OUTPUT\_DIR/gmock-\/gtest-\/all.cc.\ \ Then\ you\ can\ build\ your\ tests}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00043}00043\ \textcolor{stringliteral}{\ \ \ \ \ \ \ by\ adding\ OUTPUT\_DIR\ to\ the\ include\ search\ path\ and\ linking}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00044}00044\ \textcolor{stringliteral}{\ \ \ \ \ \ \ with\ OUTPUT\_DIR/gmock-\/gtest-\/all.cc.\ \ These\ three\ files\ contain}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00045}00045\ \textcolor{stringliteral}{\ \ \ \ \ \ \ everything\ you\ need\ to\ use\ Google\ Mock.\ \ Hence\ you\ can}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00046}00046\ \textcolor{stringliteral}{\ \ \ \ \ \ \ "{}install"{}\ Google\ Mock\ by\ copying\ them\ to\ wherever\ you\ want.}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00047}00047\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00048}00048\ \textcolor{stringliteral}{\ \ \ \ \ \ \ GMOCK\_ROOT\_DIR\ can\ be\ omitted\ and\ defaults\ to\ the\ parent}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00049}00049\ \textcolor{stringliteral}{\ \ \ \ \ \ \ directory\ of\ the\ directory\ holding\ this\ script.}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00050}00050\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00051}00051\ \textcolor{stringliteral}{EXAMPLES}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00052}00052\ \textcolor{stringliteral}{\ \ \ \ \ \ \ ./fuse\_gmock\_files.py\ fused\_gmock}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00053}00053\ \textcolor{stringliteral}{\ \ \ \ \ \ \ ./fuse\_gmock\_files.py\ path/to/unpacked/gmock\ fused\_gmock}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00054}00054\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00055}00055\ \textcolor{stringliteral}{This\ tool\ is\ experimental.\ \ In\ particular,\ it\ assumes\ that\ there\ is\ no}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00056}00056\ \textcolor{stringliteral}{conditional\ inclusion\ of\ Google\ Mock\ or\ Google\ Test\ headers.\ \ Please}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00057}00057\ \textcolor{stringliteral}{report\ any\ problems\ to\ googlemock@googlegroups.com.\ \ You\ can\ read}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00058}00058\ \textcolor{stringliteral}{https://github.com/google/googletest/blob/master/googlemock/docs/CookBook.md\ for\ more}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00059}00059\ \textcolor{stringliteral}{information.}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00060}00060\ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00062}00062\ \_\_author\_\_\ =\ \textcolor{stringliteral}{'wan@google.com\ (Zhanyong\ Wan)'}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00064}00064\ \textcolor{keyword}{import}\ os}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00065}00065\ \textcolor{keyword}{import}\ re}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00066}00066\ \textcolor{keyword}{import}\ sets}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00067}00067\ \textcolor{keyword}{import}\ sys}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00069}00069\ \textcolor{comment}{\#\ We\ assume\ that\ this\ file\ is\ in\ the\ scripts/\ directory\ in\ the\ Google}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00070}00070\ \textcolor{comment}{\#\ Mock\ root\ directory.}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00071}\mbox{\hyperlink{namespacefuse__gmock__files_a900b64b34e20c7430b72252192a3c7ed}{00071}}\ DEFAULT\_GMOCK\_ROOT\_DIR\ =\ os.path.join(os.path.dirname(\_\_file\_\_),\ \textcolor{stringliteral}{'..'})}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00073}00073\ \textcolor{comment}{\#\ We\ need\ to\ call\ into\ googletest/scripts/fuse\_gtest\_files.py.}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00074}00074\ sys.path.append(os.path.join(DEFAULT\_GMOCK\_ROOT\_DIR,\ \textcolor{stringliteral}{'../googletest/scripts'}))}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00075}00075\ \textcolor{keyword}{import}\ fuse\_gtest\_files}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00076}\mbox{\hyperlink{namespacefuse__gmock__files_a3fb36dbe8d361f9ecc54e1aa4b94b068}{00076}}\ gtest\ =\ fuse\_gtest\_files}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00077}00077\ }
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00078}00078\ \textcolor{comment}{\#\ Regex\ for\ matching\ '\#include\ "{}gmock/..."{}'.}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00079}\mbox{\hyperlink{namespacefuse__gmock__files_aeb4457451f878d6bc8a42f7ff3e5f6cf}{00079}}\ INCLUDE\_GMOCK\_FILE\_REGEX\ =\ re.compile(\textcolor{stringliteral}{r'\string^\(\backslash\)s*\#\(\backslash\)s*include\(\backslash\)s*"{}(gmock/.+)"{}'})}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00080}00080\ }
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00081}00081\ \textcolor{comment}{\#\ Where\ to\ find\ the\ source\ seed\ files.}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00082}\mbox{\hyperlink{namespacefuse__gmock__files_a97ee2dfa0e0df8426b1dcadcba74060b}{00082}}\ GMOCK\_H\_SEED\ =\ \textcolor{stringliteral}{'include/gmock/gmock.h'}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00083}\mbox{\hyperlink{namespacefuse__gmock__files_afe8e67a915b4f19d7f9b69b4c109403f}{00083}}\ GMOCK\_ALL\_CC\_SEED\ =\ \textcolor{stringliteral}{'src/gmock-\/all.cc'}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00084}00084\ }
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00085}00085\ \textcolor{comment}{\#\ Where\ to\ put\ the\ generated\ files.}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00086}\mbox{\hyperlink{namespacefuse__gmock__files_a47742af71dda33b3da2f1fc6da90ac48}{00086}}\ GTEST\_H\_OUTPUT\ =\ \textcolor{stringliteral}{'gtest/gtest.h'}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00087}\mbox{\hyperlink{namespacefuse__gmock__files_a94c0785996934b48537f271a3e9031a3}{00087}}\ GMOCK\_H\_OUTPUT\ =\ \textcolor{stringliteral}{'gmock/gmock.h'}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00088}\mbox{\hyperlink{namespacefuse__gmock__files_a26c573e973fe80ab03a7dc3ff5093f78}{00088}}\ GMOCK\_GTEST\_ALL\_CC\_OUTPUT\ =\ \textcolor{stringliteral}{'gmock-\/gtest-\/all.cc'}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00089}00089\ }
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00090}00090\ }
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00091}\mbox{\hyperlink{namespacefuse__gmock__files_a5dbe055d6af58d0d95d8f12312c7091f}{00091}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacefuse__gmock__files_a5dbe055d6af58d0d95d8f12312c7091f}{GetGTestRootDir}}(gmock\_root):}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00092}00092\ \ \ \textcolor{stringliteral}{"{}"{}"{}Returns\ the\ root\ directory\ of\ Google\ Test."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00093}00093\ }
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00094}00094\ \ \ \textcolor{keywordflow}{return}\ os.path.join(gmock\_root,\ \textcolor{stringliteral}{'../googletest'})}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00095}00095\ }
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00096}00096\ }
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00097}\mbox{\hyperlink{namespacefuse__gmock__files_ab911d1f96b031f57e7d28c4025fb0505}{00097}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacefuse__gmock__files_ab911d1f96b031f57e7d28c4025fb0505}{ValidateGMockRootDir}}(gmock\_root):}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00098}00098\ \ \ \textcolor{stringliteral}{"{}"{}"{}Makes\ sure\ gmock\_root\ points\ to\ a\ valid\ gmock\ root\ directory.}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00099}00099\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00100}00100\ \textcolor{stringliteral}{\ \ The\ function\ aborts\ the\ program\ on\ failure.}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00101}00101\ \textcolor{stringliteral}{\ \ "{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00102}00102\ }
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00103}00103\ \ \ gtest.ValidateGTestRootDir(\mbox{\hyperlink{namespacefuse__gmock__files_a5dbe055d6af58d0d95d8f12312c7091f}{GetGTestRootDir}}(gmock\_root))}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00104}00104\ \ \ gtest.VerifyFileExists(gmock\_root,\ GMOCK\_H\_SEED)}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00105}00105\ \ \ gtest.VerifyFileExists(gmock\_root,\ GMOCK\_ALL\_CC\_SEED)}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00106}00106\ }
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00107}00107\ }
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00108}\mbox{\hyperlink{namespacefuse__gmock__files_a97ab00d3faec16c6574a8f548001294e}{00108}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacefuse__gmock__files_a97ab00d3faec16c6574a8f548001294e}{ValidateOutputDir}}(output\_dir):}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00109}00109\ \ \ \textcolor{stringliteral}{"{}"{}"{}Makes\ sure\ output\_dir\ points\ to\ a\ valid\ output\ directory.}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00110}00110\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00111}00111\ \textcolor{stringliteral}{\ \ The\ function\ aborts\ the\ program\ on\ failure.}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00112}00112\ \textcolor{stringliteral}{\ \ "{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00113}00113\ }
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00114}00114\ \ \ gtest.VerifyOutputFile(output\_dir,\ gtest.GTEST\_H\_OUTPUT)}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00115}00115\ \ \ gtest.VerifyOutputFile(output\_dir,\ GMOCK\_H\_OUTPUT)}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00116}00116\ \ \ gtest.VerifyOutputFile(output\_dir,\ GMOCK\_GTEST\_ALL\_CC\_OUTPUT)}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00117}00117\ }
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00118}00118\ }
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00119}\mbox{\hyperlink{namespacefuse__gmock__files_a8ecbbf6248e41609d85b32776508f419}{00119}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacefuse__gmock__files_a8ecbbf6248e41609d85b32776508f419}{FuseGMockH}}(gmock\_root,\ output\_dir):}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00120}00120\ \ \ \textcolor{stringliteral}{"{}"{}"{}Scans\ folder\ gmock\_root\ to\ generate\ gmock/gmock.h\ in\ output\_dir."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00121}00121\ }
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00122}00122\ \ \ output\_file\ =\ file(os.path.join(output\_dir,\ GMOCK\_H\_OUTPUT),\ \textcolor{stringliteral}{'w'})}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00123}00123\ \ \ processed\_files\ =\ sets.Set()\ \ \textcolor{comment}{\#\ Holds\ all\ gmock\ headers\ we've\ processed.}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00124}00124\ }
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00125}00125\ \ \ \textcolor{keyword}{def\ }ProcessFile(gmock\_header\_path):}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00126}00126\ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Processes\ the\ given\ gmock\ header\ file."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00127}00127\ }
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00128}00128\ \ \ \ \ \textcolor{comment}{\#\ We\ don't\ process\ the\ same\ header\ twice.}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00129}00129\ \ \ \ \ \textcolor{keywordflow}{if}\ gmock\_header\_path\ \textcolor{keywordflow}{in}\ processed\_files:}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00130}00130\ \ \ \ \ \ \ \textcolor{keywordflow}{return}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00131}00131\ }
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00132}00132\ \ \ \ \ processed\_files.add(gmock\_header\_path)}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00133}00133\ }
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00134}00134\ \ \ \ \ \textcolor{comment}{\#\ Reads\ each\ line\ in\ the\ given\ gmock\ header.}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00135}00135\ \ \ \ \ \textcolor{keywordflow}{for}\ line\ \textcolor{keywordflow}{in}\ file(os.path.join(gmock\_root,\ gmock\_header\_path),\ \textcolor{stringliteral}{'r'}):}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00136}00136\ \ \ \ \ \ \ m\ =\ INCLUDE\_GMOCK\_FILE\_REGEX.match(line)}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00137}00137\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ m:}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00138}00138\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ It's\ '\#include\ "{}gmock/..."{}'\ -\/\ let's\ process\ it\ recursively.}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00139}00139\ \ \ \ \ \ \ \ \ ProcessFile(\textcolor{stringliteral}{'include/'}\ +\ m.group(1))}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00140}00140\ \ \ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00141}00141\ \ \ \ \ \ \ \ \ m\ =\ gtest.INCLUDE\_GTEST\_FILE\_REGEX.match(line)}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00142}00142\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ m:}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00143}00143\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ It's\ '\#include\ "{}gtest/foo.h"{}'.\ \ We\ translate\ it\ to}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00144}00144\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ "{}gtest/gtest.h"{},\ regardless\ of\ what\ foo\ is,\ since\ all}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00145}00145\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ gtest\ headers\ are\ fused\ into\ gtest/gtest.h.}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00146}00146\ }
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00147}00147\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ There\ is\ no\ need\ to\ \#include\ gtest.h\ twice.}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00148}00148\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keywordflow}{not}\ gtest.GTEST\_H\_SEED\ \textcolor{keywordflow}{in}\ processed\_files:}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00149}00149\ \ \ \ \ \ \ \ \ \ \ \ \ processed\_files.add(gtest.GTEST\_H\_SEED)}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00150}00150\ \ \ \ \ \ \ \ \ \ \ \ \ output\_file.write(\textcolor{stringliteral}{'\#include\ "{}\%s"{}\(\backslash\)n'}\ \%\ (gtest.GTEST\_H\_OUTPUT,))}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00151}00151\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00152}00152\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Otherwise\ we\ copy\ the\ line\ unchanged\ to\ the\ output\ file.}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00153}00153\ \ \ \ \ \ \ \ \ \ \ output\_file.write(line)}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00154}00154\ }
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00155}00155\ \ \ ProcessFile(GMOCK\_H\_SEED)}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00156}00156\ \ \ output\_file.close()}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00157}00157\ }
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00158}00158\ }
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00159}\mbox{\hyperlink{namespacefuse__gmock__files_a17d95bfd0ac56b67262de63d085ab503}{00159}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacefuse__gmock__files_a17d95bfd0ac56b67262de63d085ab503}{FuseGMockAllCcToFile}}(gmock\_root,\ output\_file):}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00160}00160\ \ \ \textcolor{stringliteral}{"{}"{}"{}Scans\ folder\ gmock\_root\ to\ fuse\ gmock-\/all.cc\ into\ output\_file."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00161}00161\ }
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00162}00162\ \ \ processed\_files\ =\ sets.Set()}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00163}00163\ }
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00164}00164\ \ \ \textcolor{keyword}{def\ }ProcessFile(gmock\_source\_file):}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00165}00165\ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Processes\ the\ given\ gmock\ source\ file."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00166}00166\ }
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00167}00167\ \ \ \ \ \textcolor{comment}{\#\ We\ don't\ process\ the\ same\ \#included\ file\ twice.}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00168}00168\ \ \ \ \ \textcolor{keywordflow}{if}\ gmock\_source\_file\ \textcolor{keywordflow}{in}\ processed\_files:}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00169}00169\ \ \ \ \ \ \ \textcolor{keywordflow}{return}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00170}00170\ }
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00171}00171\ \ \ \ \ processed\_files.add(gmock\_source\_file)}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00172}00172\ }
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00173}00173\ \ \ \ \ \textcolor{comment}{\#\ Reads\ each\ line\ in\ the\ given\ gmock\ source\ file.}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00174}00174\ \ \ \ \ \textcolor{keywordflow}{for}\ line\ \textcolor{keywordflow}{in}\ file(os.path.join(gmock\_root,\ gmock\_source\_file),\ \textcolor{stringliteral}{'r'}):}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00175}00175\ \ \ \ \ \ \ m\ =\ INCLUDE\_GMOCK\_FILE\_REGEX.match(line)}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00176}00176\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ m:}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00177}00177\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ It's\ '\#include\ "{}gmock/foo.h"{}'.\ \ We\ treat\ it\ as\ '\#include}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00178}00178\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ "{}gmock/gmock.h"{}',\ as\ all\ other\ gmock\ headers\ are\ being\ fused}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00179}00179\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ into\ gmock.h\ and\ cannot\ be\ \#included\ directly.}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00180}00180\ }
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00181}00181\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ There\ is\ no\ need\ to\ \#include\ "{}gmock/gmock.h"{}\ more\ than\ once.}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00182}00182\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keywordflow}{not}\ GMOCK\_H\_SEED\ \textcolor{keywordflow}{in}\ processed\_files:}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00183}00183\ \ \ \ \ \ \ \ \ \ \ processed\_files.add(GMOCK\_H\_SEED)}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00184}00184\ \ \ \ \ \ \ \ \ \ \ output\_file.write(\textcolor{stringliteral}{'\#include\ "{}\%s"{}\(\backslash\)n'}\ \%\ (GMOCK\_H\_OUTPUT,))}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00185}00185\ \ \ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00186}00186\ \ \ \ \ \ \ \ \ m\ =\ gtest.INCLUDE\_GTEST\_FILE\_REGEX.match(line)}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00187}00187\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ m:}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00188}00188\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ It's\ '\#include\ "{}gtest/..."{}'.}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00189}00189\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ There\ is\ no\ need\ to\ \#include\ gtest.h\ as\ it\ has\ been}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00190}00190\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ \#included\ by\ gtest-\/all.cc.}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00191}00191\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{pass}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00192}00192\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00193}00193\ \ \ \ \ \ \ \ \ \ \ m\ =\ gtest.INCLUDE\_SRC\_FILE\_REGEX.match(line)}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00194}00194\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ m:}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00195}00195\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ It's\ '\#include\ "{}src/foo"{}'\ -\/\ let's\ process\ it\ recursively.}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00196}00196\ \ \ \ \ \ \ \ \ \ \ \ \ ProcessFile(m.group(1))}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00197}00197\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00198}00198\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Otherwise\ we\ copy\ the\ line\ unchanged\ to\ the\ output\ file.}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00199}00199\ \ \ \ \ \ \ \ \ \ \ \ \ output\_file.write(line)}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00200}00200\ }
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00201}00201\ \ \ ProcessFile(GMOCK\_ALL\_CC\_SEED)}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00202}00202\ }
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00203}00203\ }
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00204}\mbox{\hyperlink{namespacefuse__gmock__files_aca6794aa64f1e2a30e5f2fbb05e37083}{00204}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacefuse__gmock__files_aca6794aa64f1e2a30e5f2fbb05e37083}{FuseGMockGTestAllCc}}(gmock\_root,\ output\_dir):}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00205}00205\ \ \ \textcolor{stringliteral}{"{}"{}"{}Scans\ folder\ gmock\_root\ to\ generate\ gmock-\/gtest-\/all.cc\ in\ output\_dir."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00206}00206\ }
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00207}00207\ \ \ output\_file\ =\ file(os.path.join(output\_dir,\ GMOCK\_GTEST\_ALL\_CC\_OUTPUT),\ \textcolor{stringliteral}{'w'})}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00208}00208\ \ \ \textcolor{comment}{\#\ First,\ fuse\ gtest-\/all.cc\ into\ gmock-\/gtest-\/all.cc.}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00209}00209\ \ \ gtest.FuseGTestAllCcToFile(\mbox{\hyperlink{namespacefuse__gmock__files_a5dbe055d6af58d0d95d8f12312c7091f}{GetGTestRootDir}}(gmock\_root),\ output\_file)}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00210}00210\ \ \ \textcolor{comment}{\#\ Next,\ append\ fused\ gmock-\/all.cc\ to\ gmock-\/gtest-\/all.cc.}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00211}00211\ \ \ \mbox{\hyperlink{namespacefuse__gmock__files_a17d95bfd0ac56b67262de63d085ab503}{FuseGMockAllCcToFile}}(gmock\_root,\ output\_file)}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00212}00212\ \ \ output\_file.close()}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00213}00213\ }
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00214}00214\ }
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00215}\mbox{\hyperlink{namespacefuse__gmock__files_aeab42ce30edaf4f4bdffec3a6ae74c33}{00215}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacefuse__gmock__files_aeab42ce30edaf4f4bdffec3a6ae74c33}{FuseGMock}}(gmock\_root,\ output\_dir):}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00216}00216\ \ \ \textcolor{stringliteral}{"{}"{}"{}Fuses\ gtest.h,\ gmock.h,\ and\ gmock-\/gtest-\/all.h."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00217}00217\ }
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00218}00218\ \ \ \mbox{\hyperlink{namespacefuse__gmock__files_ab911d1f96b031f57e7d28c4025fb0505}{ValidateGMockRootDir}}(gmock\_root)}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00219}00219\ \ \ \mbox{\hyperlink{namespacefuse__gmock__files_a97ab00d3faec16c6574a8f548001294e}{ValidateOutputDir}}(output\_dir)}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00220}00220\ }
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00221}00221\ \ \ gtest.FuseGTestH(\mbox{\hyperlink{namespacefuse__gmock__files_a5dbe055d6af58d0d95d8f12312c7091f}{GetGTestRootDir}}(gmock\_root),\ output\_dir)}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00222}00222\ \ \ \mbox{\hyperlink{namespacefuse__gmock__files_a8ecbbf6248e41609d85b32776508f419}{FuseGMockH}}(gmock\_root,\ output\_dir)}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00223}00223\ \ \ \mbox{\hyperlink{namespacefuse__gmock__files_aca6794aa64f1e2a30e5f2fbb05e37083}{FuseGMockGTestAllCc}}(gmock\_root,\ output\_dir)}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00224}00224\ }
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00225}00225\ }
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00226}\mbox{\hyperlink{namespacefuse__gmock__files_a040a956c1856db183cc64326a5391e5d}{00226}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacefuse__gmock__files_a040a956c1856db183cc64326a5391e5d}{main}}():}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00227}00227\ \ \ argc\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}(sys.argv)}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00228}00228\ \ \ \textcolor{keywordflow}{if}\ argc\ ==\ 2:}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00229}00229\ \ \ \ \ \textcolor{comment}{\#\ fuse\_gmock\_files.py\ OUTPUT\_DIR}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00230}00230\ \ \ \ \ \mbox{\hyperlink{namespacefuse__gmock__files_aeab42ce30edaf4f4bdffec3a6ae74c33}{FuseGMock}}(DEFAULT\_GMOCK\_ROOT\_DIR,\ sys.argv[1])}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00231}00231\ \ \ \textcolor{keywordflow}{elif}\ argc\ ==\ 3:}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00232}00232\ \ \ \ \ \textcolor{comment}{\#\ fuse\_gmock\_files.py\ GMOCK\_ROOT\_DIR\ OUTPUT\_DIR}}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00233}00233\ \ \ \ \ \mbox{\hyperlink{namespacefuse__gmock__files_aeab42ce30edaf4f4bdffec3a6ae74c33}{FuseGMock}}(sys.argv[1],\ sys.argv[2])}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00234}00234\ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00235}00235\ \ \ \ \ \textcolor{keywordflow}{print}\ \_\_doc\_\_}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00236}00236\ \ \ \ \ sys.exit(1)}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00237}00237\ }
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00238}00238\ }
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00239}00239\ \textcolor{keywordflow}{if}\ \_\_name\_\_\ ==\ \textcolor{stringliteral}{'\_\_main\_\_'}:}
+\DoxyCodeLine{\Hypertarget{fuse__gmock__files_8py_source_l00240}00240\ \ \ \mbox{\hyperlink{namespacefuse__gmock__files_a040a956c1856db183cc64326a5391e5d}{main}}()}
+
+\end{DoxyCode}

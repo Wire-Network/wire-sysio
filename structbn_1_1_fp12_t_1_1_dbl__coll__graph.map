@@ -1,0 +1,23 @@
+<map id="bn::Fp12T&lt; T &gt;::Dbl" name="bn::Fp12T&lt; T &gt;::Dbl">
+<area shape="rect" id="Node000001" title=" " alt="" coords="1518,5,1658,31"/>
+<area shape="rect" id="Node000002" href="$structmie_1_1local_1_1addsubmul.html" title=" " alt="" coords="855,13,1053,69"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1069,22,1077,21,1189,13,1276,10,1476,9,1494,9,1518,10,1517,15,1494,14,1476,14,1276,15,1189,18,1078,26,1069,27"/>
+<area shape="rect" id="Node000005" href="$structbn_1_1_fp6_t_1_1_dbl.html" title=" " alt="" coords="1319,31,1452,56"/>
+<area shape="poly" id="edge5_Node000005_Node000002" title=" " alt="" coords="1069,39,1318,40,1318,46,1069,44"/>
+<area shape="rect" id="Node000006" href="$structbn_1_1_fp2_t_1_1_dbl.html" title=" " alt="" coords="1119,96,1253,122"/>
+<area shape="poly" id="edge7_Node000006_Node000002" title=" " alt="" coords="1067,71,1141,93,1139,98,1065,76"/>
+<area shape="rect" id="Node000003" href="$structmie_1_1local_1_1has_negative.html" title=" " alt="" coords="210,59,368,100"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="383,71,855,44,855,49,384,77"/>
+<area shape="rect" id="Node000009" href="$structmie_1_1local_1_1comparable.html" title=" " alt="" coords="418,86,587,142"/>
+<area shape="poly" id="edge11_Node000009_Node000003" title=" " alt="" coords="384,92,418,98,417,103,383,98"/>
+<area shape="rect" id="Node000004" href="$structmie_1_1local_1_1_empty.html" title=" " alt="" coords="5,67,161,92"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="177,77,209,77,209,82,177,82"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="1467,41,1494,39,1541,29,1542,34,1494,44,1467,47"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="1268,110,1294,105,1316,95,1337,82,1369,55,1373,59,1340,86,1319,100,1295,110,1269,115"/>
+<area shape="rect" id="Node000007" href="$structmie_1_1_fp_1_1_dbl.html" title=" " alt="" coords="908,132,1001,158"/>
+<area shape="poly" id="edge8_Node000006_Node000007" title=" " alt="" coords="1016,136,1095,126,1126,120,1127,125,1096,131,1017,142"/>
+<area shape="poly" id="edge12_Node000007_Node000007" title=" " alt="" coords="930,115,939,108,954,105,969,108,978,114,980,123,976,133,971,131,975,123,973,117,967,113,954,111,941,113,934,119"/>
+<area shape="rect" id="Node000008" href="$structmie_1_1local_1_1addsubmul.html" title=" " alt="" coords="636,87,806,158"/>
+<area shape="poly" id="edge9_Node000007_Node000008" title=" " alt="" coords="821,129,907,138,907,143,821,135"/>
+<area shape="poly" id="edge10_Node000008_Node000009" title=" " alt="" coords="602,115,636,116,636,122,602,120"/>
+</map>

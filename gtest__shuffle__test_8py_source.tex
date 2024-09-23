@@ -1,0 +1,331 @@
+\doxysection{gtest\+\_\+shuffle\+\_\+test.\+py}
+\hypertarget{gtest__shuffle__test_8py_source}{}\label{gtest__shuffle__test_8py_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/test/gtest\_shuffle\_test.py@{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/test/gtest\_shuffle\_test.py}}
+\mbox{\hyperlink{gtest__shuffle__test_8py}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00001}\mbox{\hyperlink{namespacegtest__shuffle__test}{00001}}\ \textcolor{comment}{\#!/usr/bin/env\ python}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00002}00002\ \textcolor{comment}{\#}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00003}00003\ \textcolor{comment}{\#\ Copyright\ 2009\ Google\ Inc.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00004}00004\ \textcolor{comment}{\#}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00005}00005\ \textcolor{comment}{\#\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00006}00006\ \textcolor{comment}{\#\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00007}00007\ \textcolor{comment}{\#\ met:}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00008}00008\ \textcolor{comment}{\#}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00009}00009\ \textcolor{comment}{\#\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00010}00010\ \textcolor{comment}{\#\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00011}00011\ \textcolor{comment}{\#\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00012}00012\ \textcolor{comment}{\#\ copyright\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00013}00013\ \textcolor{comment}{\#\ in\ the\ documentation\ and/or\ other\ materials\ provided\ with\ the}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00014}00014\ \textcolor{comment}{\#\ distribution.}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00015}00015\ \textcolor{comment}{\#\ \ \ \ \ *\ Neither\ the\ name\ of\ Google\ Inc.\ nor\ the\ names\ of\ its}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00016}00016\ \textcolor{comment}{\#\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products\ derived\ from}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00017}00017\ \textcolor{comment}{\#\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00018}00018\ \textcolor{comment}{\#}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00019}00019\ \textcolor{comment}{\#\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00020}00020\ \textcolor{comment}{\#\ "{}AS\ IS"{}\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00021}00021\ \textcolor{comment}{\#\ LIMITED\ TO,\ THE\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00022}00022\ \textcolor{comment}{\#\ A\ PARTICULAR\ PURPOSE\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ THE\ COPYRIGHT}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00023}00023\ \textcolor{comment}{\#\ OWNER\ OR\ CONTRIBUTORS\ BE\ LIABLE\ FOR\ ANY\ DIRECT,\ INDIRECT,\ INCIDENTAL,}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00024}00024\ \textcolor{comment}{\#\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES\ (INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00025}00025\ \textcolor{comment}{\#\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;\ LOSS\ OF\ USE,}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00026}00026\ \textcolor{comment}{\#\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND\ ON\ ANY}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00027}00027\ \textcolor{comment}{\#\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00028}00028\ \textcolor{comment}{\#\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00029}00029\ \textcolor{comment}{\#\ OF\ THIS\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00031}00031\ \textcolor{stringliteral}{"{}"{}"{}Verifies\ that\ test\ shuffling\ works."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00033}00033\ \_\_author\_\_\ =\ \textcolor{stringliteral}{'wan@google.com\ (Zhanyong\ Wan)'}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00035}00035\ \textcolor{keyword}{import}\ os}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00036}00036\ \textcolor{keyword}{import}\ gtest\_test\_utils}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00038}00038\ \textcolor{comment}{\#\ Command\ to\ run\ the\ gtest\_shuffle\_test\_\ program.}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00039}\mbox{\hyperlink{namespacegtest__shuffle__test_a33b8a2fc24ccd6476d1e27b084142a25}{00039}}\ COMMAND\ =\ \mbox{\hyperlink{namespacegtest__test__utils_a239f43ff0e44144cb5a1e14f3453c273}{gtest\_test\_utils.GetTestExecutablePath}}(\textcolor{stringliteral}{'gtest\_shuffle\_test\_'})}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00041}00041\ \textcolor{comment}{\#\ The\ environment\ variables\ for\ test\ sharding.}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00042}\mbox{\hyperlink{namespacegtest__shuffle__test_ae308b0367efac6f7c40999590593ffa0}{00042}}\ TOTAL\_SHARDS\_ENV\_VAR\ =\ \textcolor{stringliteral}{'GTEST\_TOTAL\_SHARDS'}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00043}\mbox{\hyperlink{namespacegtest__shuffle__test_a0418bc61c30e3c4f5611c949b61cef03}{00043}}\ SHARD\_INDEX\_ENV\_VAR\ =\ \textcolor{stringliteral}{'GTEST\_SHARD\_INDEX'}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00045}\mbox{\hyperlink{namespacegtest__shuffle__test_afb3e0bed1bced169e5d882b79cfb3a32}{00045}}\ TEST\_FILTER\ =\ \textcolor{stringliteral}{'A*.A:A*.B:C*'}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00047}\mbox{\hyperlink{namespacegtest__shuffle__test_aede96442ff7a7c9ac9a8baaaeb48e86c}{00047}}\ ALL\_TESTS\ =\ []}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00048}\mbox{\hyperlink{namespacegtest__shuffle__test_acd6d827819dcc06b9bf061cd4849b082}{00048}}\ ACTIVE\_TESTS\ =\ []}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00049}\mbox{\hyperlink{namespacegtest__shuffle__test_a35011532d6bd14ac29c891111ce1a911}{00049}}\ FILTERED\_TESTS\ =\ []}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00050}\mbox{\hyperlink{namespacegtest__shuffle__test_ad9bd126c3dc9894a3977a907e97e71e8}{00050}}\ SHARDED\_TESTS\ =\ []}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00052}\mbox{\hyperlink{namespacegtest__shuffle__test_a6128f9c522f40c64ffb3917ff17080b8}{00052}}\ SHUFFLED\_ALL\_TESTS\ =\ []}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00053}\mbox{\hyperlink{namespacegtest__shuffle__test_ac3bfd4eae8e6f35a83e73cfd9d9611d5}{00053}}\ SHUFFLED\_ACTIVE\_TESTS\ =\ []}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00054}\mbox{\hyperlink{namespacegtest__shuffle__test_aa9502dcb42a1d690d17558cc71388e45}{00054}}\ SHUFFLED\_FILTERED\_TESTS\ =\ []}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00055}\mbox{\hyperlink{namespacegtest__shuffle__test_a3603885677e36438fd2d7521db51bcb4}{00055}}\ SHUFFLED\_SHARDED\_TESTS\ =\ []}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00058}\mbox{\hyperlink{namespacegtest__shuffle__test_a20069bf6743b827007e91a708a622d51}{00058}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacegtest__shuffle__test_a20069bf6743b827007e91a708a622d51}{AlsoRunDisabledTestsFlag}}():}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00059}00059\ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{'-\/-\/gtest\_also\_run\_disabled\_tests'}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00062}\mbox{\hyperlink{namespacegtest__shuffle__test_a448133259d44395f06e00e914d382112}{00062}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacegtest__shuffle__test_a448133259d44395f06e00e914d382112}{FilterFlag}}(test\_filter):}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00063}00063\ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{'-\/-\/gtest\_filter=\%s'}\ \%\ (test\_filter,)}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00066}\mbox{\hyperlink{namespacegtest__shuffle__test_adffb7cacf9023023749a15ec2a66ef68}{00066}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacegtest__shuffle__test_adffb7cacf9023023749a15ec2a66ef68}{RepeatFlag}}(n):}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00067}00067\ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{'-\/-\/gtest\_repeat=\%s'}\ \%\ (n,)}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00069}00069\ }
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00070}\mbox{\hyperlink{namespacegtest__shuffle__test_a489bbd025a7ddba5c8607349265c0c52}{00070}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacegtest__shuffle__test_a489bbd025a7ddba5c8607349265c0c52}{ShuffleFlag}}():}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00071}00071\ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{'-\/-\/gtest\_shuffle'}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00073}00073\ }
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00074}\mbox{\hyperlink{namespacegtest__shuffle__test_a7bb61f49e37b831c7f4ee20a30736e74}{00074}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacegtest__shuffle__test_a7bb61f49e37b831c7f4ee20a30736e74}{RandomSeedFlag}}(n):}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00075}00075\ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{'-\/-\/gtest\_random\_seed=\%s'}\ \%\ (n,)}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00076}00076\ }
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00077}00077\ }
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00078}\mbox{\hyperlink{namespacegtest__shuffle__test_a8e6a3ad4102d91a2d90487a7ed64c07f}{00078}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacegtest__shuffle__test_a8e6a3ad4102d91a2d90487a7ed64c07f}{RunAndReturnOutput}}(extra\_env,\ args):}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00079}00079\ \ \ \textcolor{stringliteral}{"{}"{}"{}Runs\ the\ test\ program\ and\ returns\ its\ output."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00080}00080\ }
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00081}00081\ \ \ environ\_copy\ =\ os.environ.copy()}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00082}00082\ \ \ environ\_copy.update(extra\_env)}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00083}00083\ }
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00084}00084\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classgtest__test__utils_1_1_subprocess}{gtest\_test\_utils.Subprocess}}([COMMAND]\ +\ args,\ env=environ\_copy).output}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00085}00085\ }
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00086}00086\ }
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00087}\mbox{\hyperlink{namespacegtest__shuffle__test_a729a90dc6fa4a90dbcd6490f51593708}{00087}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacegtest__shuffle__test_a729a90dc6fa4a90dbcd6490f51593708}{GetTestsForAllIterations}}(extra\_env,\ args):}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00088}00088\ \ \ \textcolor{stringliteral}{"{}"{}"{}Runs\ the\ test\ program\ and\ returns\ a\ list\ of\ test\ lists.}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00089}00089\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00090}00090\ \textcolor{stringliteral}{\ \ Args:}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00091}00091\ \textcolor{stringliteral}{\ \ \ \ extra\_env:\ a\ map\ from\ environment\ variables\ to\ their\ values}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00092}00092\ \textcolor{stringliteral}{\ \ \ \ args:\ command\ line\ flags\ to\ pass\ to\ gtest\_shuffle\_test\_}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00093}00093\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00094}00094\ \textcolor{stringliteral}{\ \ Returns:}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00095}00095\ \textcolor{stringliteral}{\ \ \ \ A\ list\ where\ the\ i-\/th\ element\ is\ the\ list\ of\ tests\ run\ in\ the\ i-\/th}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00096}00096\ \textcolor{stringliteral}{\ \ \ \ test\ iteration.}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00097}00097\ \textcolor{stringliteral}{\ \ "{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00098}00098\ }
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00099}00099\ \ \ test\_iterations\ =\ []}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00100}00100\ \ \ \textcolor{keywordflow}{for}\ line\ \textcolor{keywordflow}{in}\ \mbox{\hyperlink{namespacegtest__shuffle__test_a8e6a3ad4102d91a2d90487a7ed64c07f}{RunAndReturnOutput}}(extra\_env,\ args).split(\textcolor{stringliteral}{'\(\backslash\)n'}):}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00101}00101\ \ \ \ \ \textcolor{keywordflow}{if}\ line.startswith(\textcolor{stringliteral}{'-\/-\/-\/-\/'}):}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00102}00102\ \ \ \ \ \ \ tests\ =\ []}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00103}00103\ \ \ \ \ \ \ test\_iterations.append(tests)}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00104}00104\ \ \ \ \ \textcolor{keywordflow}{elif}\ line.strip():}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00105}00105\ \ \ \ \ \ \ tests.append(line.strip())\ \ \textcolor{comment}{\#\ 'TestCaseName.TestName'}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00106}00106\ }
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00107}00107\ \ \ \textcolor{keywordflow}{return}\ test\_iterations}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00108}00108\ }
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00109}00109\ }
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00110}\mbox{\hyperlink{namespacegtest__shuffle__test_ae0ef601e243e38eb2e6df09e17ab61b4}{00110}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacegtest__shuffle__test_ae0ef601e243e38eb2e6df09e17ab61b4}{GetTestCases}}(tests):}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00111}00111\ \ \ \textcolor{stringliteral}{"{}"{}"{}Returns\ a\ list\ of\ test\ cases\ in\ the\ given\ full\ test\ names.}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00112}00112\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00113}00113\ \textcolor{stringliteral}{\ \ Args:}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00114}00114\ \textcolor{stringliteral}{\ \ \ \ tests:\ a\ list\ of\ full\ test\ names}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00115}00115\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00116}00116\ \textcolor{stringliteral}{\ \ Returns:}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00117}00117\ \textcolor{stringliteral}{\ \ \ \ A\ list\ of\ test\ cases\ from\ 'tests',\ in\ their\ original\ order.}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00118}00118\ \textcolor{stringliteral}{\ \ \ \ Consecutive\ duplicates\ are\ removed.}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00119}00119\ \textcolor{stringliteral}{\ \ "{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00120}00120\ }
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00121}00121\ \ \ test\_cases\ =\ []}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00122}00122\ \ \ \textcolor{keywordflow}{for}\ test\ \textcolor{keywordflow}{in}\ tests:}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00123}00123\ \ \ \ \ test\_case\ =\ test.split(\textcolor{stringliteral}{'.'})[0]}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00124}00124\ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keywordflow}{not}\ test\_case\ \textcolor{keywordflow}{in}\ test\_cases:}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00125}00125\ \ \ \ \ \ \ test\_cases.append(test\_case)}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00126}00126\ }
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00127}00127\ \ \ \textcolor{keywordflow}{return}\ test\_cases}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00128}00128\ }
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00129}00129\ }
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00130}\mbox{\hyperlink{namespacegtest__shuffle__test_a4b3549c585569a12d0fcad283eb0ea7e}{00130}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacegtest__shuffle__test_a4b3549c585569a12d0fcad283eb0ea7e}{CalculateTestLists}}():}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00131}00131\ \ \ \textcolor{stringliteral}{"{}"{}"{}Calculates\ the\ list\ of\ tests\ run\ under\ different\ flags."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00132}00132\ }
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00133}00133\ \ \ \textcolor{keywordflow}{if}\ \textcolor{keywordflow}{not}\ ALL\_TESTS:}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00134}00134\ \ \ \ \ ALL\_TESTS.extend(}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00135}00135\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacegtest__shuffle__test_a729a90dc6fa4a90dbcd6490f51593708}{GetTestsForAllIterations}}(\{\},\ [\mbox{\hyperlink{namespacegtest__shuffle__test_a20069bf6743b827007e91a708a622d51}{AlsoRunDisabledTestsFlag}}()])[0])}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00136}00136\ }
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00137}00137\ \ \ \textcolor{keywordflow}{if}\ \textcolor{keywordflow}{not}\ ACTIVE\_TESTS:}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00138}00138\ \ \ \ \ ACTIVE\_TESTS.extend(\mbox{\hyperlink{namespacegtest__shuffle__test_a729a90dc6fa4a90dbcd6490f51593708}{GetTestsForAllIterations}}(\{\},\ [])[0])}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00139}00139\ }
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00140}00140\ \ \ \textcolor{keywordflow}{if}\ \textcolor{keywordflow}{not}\ FILTERED\_TESTS:}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00141}00141\ \ \ \ \ FILTERED\_TESTS.extend(}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00142}00142\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacegtest__shuffle__test_a729a90dc6fa4a90dbcd6490f51593708}{GetTestsForAllIterations}}(\{\},\ [\mbox{\hyperlink{namespacegtest__shuffle__test_a448133259d44395f06e00e914d382112}{FilterFlag}}(TEST\_FILTER)])[0])}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00143}00143\ }
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00144}00144\ \ \ \textcolor{keywordflow}{if}\ \textcolor{keywordflow}{not}\ SHARDED\_TESTS:}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00145}00145\ \ \ \ \ SHARDED\_TESTS.extend(}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00146}00146\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacegtest__shuffle__test_a729a90dc6fa4a90dbcd6490f51593708}{GetTestsForAllIterations}}(\{TOTAL\_SHARDS\_ENV\_VAR:\ \textcolor{stringliteral}{'3'},}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00147}00147\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ SHARD\_INDEX\_ENV\_VAR:\ \textcolor{stringliteral}{'1'}\},}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00148}00148\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [])[0])}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00149}00149\ }
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00150}00150\ \ \ \textcolor{keywordflow}{if}\ \textcolor{keywordflow}{not}\ SHUFFLED\_ALL\_TESTS:}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00151}00151\ \ \ \ \ SHUFFLED\_ALL\_TESTS.extend(\mbox{\hyperlink{namespacegtest__shuffle__test_a729a90dc6fa4a90dbcd6490f51593708}{GetTestsForAllIterations}}(}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00152}00152\ \ \ \ \ \ \ \ \ \{\},\ [\mbox{\hyperlink{namespacegtest__shuffle__test_a20069bf6743b827007e91a708a622d51}{AlsoRunDisabledTestsFlag}}(),\ \mbox{\hyperlink{namespacegtest__shuffle__test_a489bbd025a7ddba5c8607349265c0c52}{ShuffleFlag}}(),\ \mbox{\hyperlink{namespacegtest__shuffle__test_a7bb61f49e37b831c7f4ee20a30736e74}{RandomSeedFlag}}(1)])[0])}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00153}00153\ }
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00154}00154\ \ \ \textcolor{keywordflow}{if}\ \textcolor{keywordflow}{not}\ SHUFFLED\_ACTIVE\_TESTS:}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00155}00155\ \ \ \ \ SHUFFLED\_ACTIVE\_TESTS.extend(\mbox{\hyperlink{namespacegtest__shuffle__test_a729a90dc6fa4a90dbcd6490f51593708}{GetTestsForAllIterations}}(}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00156}00156\ \ \ \ \ \ \ \ \ \{\},\ [\mbox{\hyperlink{namespacegtest__shuffle__test_a489bbd025a7ddba5c8607349265c0c52}{ShuffleFlag}}(),\ \mbox{\hyperlink{namespacegtest__shuffle__test_a7bb61f49e37b831c7f4ee20a30736e74}{RandomSeedFlag}}(1)])[0])}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00157}00157\ }
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00158}00158\ \ \ \textcolor{keywordflow}{if}\ \textcolor{keywordflow}{not}\ SHUFFLED\_FILTERED\_TESTS:}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00159}00159\ \ \ \ \ SHUFFLED\_FILTERED\_TESTS.extend(\mbox{\hyperlink{namespacegtest__shuffle__test_a729a90dc6fa4a90dbcd6490f51593708}{GetTestsForAllIterations}}(}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00160}00160\ \ \ \ \ \ \ \ \ \{\},\ [\mbox{\hyperlink{namespacegtest__shuffle__test_a489bbd025a7ddba5c8607349265c0c52}{ShuffleFlag}}(),\ \mbox{\hyperlink{namespacegtest__shuffle__test_a7bb61f49e37b831c7f4ee20a30736e74}{RandomSeedFlag}}(1),\ \mbox{\hyperlink{namespacegtest__shuffle__test_a448133259d44395f06e00e914d382112}{FilterFlag}}(TEST\_FILTER)])[0])}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00161}00161\ }
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00162}00162\ \ \ \textcolor{keywordflow}{if}\ \textcolor{keywordflow}{not}\ SHUFFLED\_SHARDED\_TESTS:}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00163}00163\ \ \ \ \ SHUFFLED\_SHARDED\_TESTS.extend(}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00164}00164\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacegtest__shuffle__test_a729a90dc6fa4a90dbcd6490f51593708}{GetTestsForAllIterations}}(\{TOTAL\_SHARDS\_ENV\_VAR:\ \textcolor{stringliteral}{'3'},}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00165}00165\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ SHARD\_INDEX\_ENV\_VAR:\ \textcolor{stringliteral}{'1'}\},}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00166}00166\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [\mbox{\hyperlink{namespacegtest__shuffle__test_a489bbd025a7ddba5c8607349265c0c52}{ShuffleFlag}}(),\ \mbox{\hyperlink{namespacegtest__shuffle__test_a7bb61f49e37b831c7f4ee20a30736e74}{RandomSeedFlag}}(1)])[0])}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00167}00167\ }
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00168}00168\ }
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00169}\mbox{\hyperlink{classgtest__shuffle__test_1_1_g_test_shuffle_unit_test}{00169}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classgtest__shuffle__test_1_1_g_test_shuffle_unit_test}{GTestShuffleUnitTest}}(\mbox{\hyperlink{namespacegtest__test__utils_acb97a85206c09d233db6c7f2362e5428}{gtest\_test\_utils.TestCase}}):}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00170}00170\ \ \ \textcolor{stringliteral}{"{}"{}"{}Tests\ test\ shuffling."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00171}00171\ }
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00172}\mbox{\hyperlink{classgtest__shuffle__test_1_1_g_test_shuffle_unit_test_a81b1ef370115a1e6bc38e793a8cb4a70}{00172}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classgtest__shuffle__test_1_1_g_test_shuffle_unit_test_a81b1ef370115a1e6bc38e793a8cb4a70}{setUp}}(self):}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00173}00173\ \ \ \ \ \mbox{\hyperlink{namespacegtest__shuffle__test_a4b3549c585569a12d0fcad283eb0ea7e}{CalculateTestLists}}()}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00174}00174\ }
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00175}\mbox{\hyperlink{classgtest__shuffle__test_1_1_g_test_shuffle_unit_test_a631b9d2ad3e2941bf8a20b8853a14505}{00175}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classgtest__shuffle__test_1_1_g_test_shuffle_unit_test_a631b9d2ad3e2941bf8a20b8853a14505}{testShufflePreservesNumberOfTests}}(self):}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00176}00176\ \ \ \ \ self.assertEqual(\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}(ALL\_TESTS),\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}(SHUFFLED\_ALL\_TESTS))}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00177}00177\ \ \ \ \ self.assertEqual(\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}(ACTIVE\_TESTS),\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}(SHUFFLED\_ACTIVE\_TESTS))}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00178}00178\ \ \ \ \ self.assertEqual(\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}(FILTERED\_TESTS),\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}(SHUFFLED\_FILTERED\_TESTS))}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00179}00179\ \ \ \ \ self.assertEqual(\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}(SHARDED\_TESTS),\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}(SHUFFLED\_SHARDED\_TESTS))}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00180}00180\ }
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00181}\mbox{\hyperlink{classgtest__shuffle__test_1_1_g_test_shuffle_unit_test_a89fd96db48c44fd3fc363cf291183769}{00181}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classgtest__shuffle__test_1_1_g_test_shuffle_unit_test_a89fd96db48c44fd3fc363cf291183769}{testShuffleChangesTestOrder}}(self):}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00182}00182\ \ \ \ \ self.assert\_(SHUFFLED\_ALL\_TESTS\ !=\ ALL\_TESTS,\ SHUFFLED\_ALL\_TESTS)}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00183}00183\ \ \ \ \ self.assert\_(SHUFFLED\_ACTIVE\_TESTS\ !=\ ACTIVE\_TESTS,\ SHUFFLED\_ACTIVE\_TESTS)}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00184}00184\ \ \ \ \ self.assert\_(SHUFFLED\_FILTERED\_TESTS\ !=\ FILTERED\_TESTS,}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00185}00185\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ SHUFFLED\_FILTERED\_TESTS)}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00186}00186\ \ \ \ \ self.assert\_(SHUFFLED\_SHARDED\_TESTS\ !=\ SHARDED\_TESTS,}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00187}00187\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ SHUFFLED\_SHARDED\_TESTS)}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00188}00188\ }
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00189}\mbox{\hyperlink{classgtest__shuffle__test_1_1_g_test_shuffle_unit_test_ae00b442adfebb8c7f27e51f1fe41f426}{00189}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classgtest__shuffle__test_1_1_g_test_shuffle_unit_test_ae00b442adfebb8c7f27e51f1fe41f426}{testShuffleChangesTestCaseOrder}}(self):}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00190}00190\ \ \ \ \ self.assert\_(\mbox{\hyperlink{namespacegtest__shuffle__test_ae0ef601e243e38eb2e6df09e17ab61b4}{GetTestCases}}(SHUFFLED\_ALL\_TESTS)\ !=\ \mbox{\hyperlink{namespacegtest__shuffle__test_ae0ef601e243e38eb2e6df09e17ab61b4}{GetTestCases}}(ALL\_TESTS),}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00191}00191\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacegtest__shuffle__test_ae0ef601e243e38eb2e6df09e17ab61b4}{GetTestCases}}(SHUFFLED\_ALL\_TESTS))}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00192}00192\ \ \ \ \ self.assert\_(}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00193}00193\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacegtest__shuffle__test_ae0ef601e243e38eb2e6df09e17ab61b4}{GetTestCases}}(SHUFFLED\_ACTIVE\_TESTS)\ !=\ \mbox{\hyperlink{namespacegtest__shuffle__test_ae0ef601e243e38eb2e6df09e17ab61b4}{GetTestCases}}(ACTIVE\_TESTS),}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00194}00194\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacegtest__shuffle__test_ae0ef601e243e38eb2e6df09e17ab61b4}{GetTestCases}}(SHUFFLED\_ACTIVE\_TESTS))}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00195}00195\ \ \ \ \ self.assert\_(}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00196}00196\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacegtest__shuffle__test_ae0ef601e243e38eb2e6df09e17ab61b4}{GetTestCases}}(SHUFFLED\_FILTERED\_TESTS)\ !=\ \mbox{\hyperlink{namespacegtest__shuffle__test_ae0ef601e243e38eb2e6df09e17ab61b4}{GetTestCases}}(FILTERED\_TESTS),}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00197}00197\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacegtest__shuffle__test_ae0ef601e243e38eb2e6df09e17ab61b4}{GetTestCases}}(SHUFFLED\_FILTERED\_TESTS))}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00198}00198\ \ \ \ \ self.assert\_(}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00199}00199\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacegtest__shuffle__test_ae0ef601e243e38eb2e6df09e17ab61b4}{GetTestCases}}(SHUFFLED\_SHARDED\_TESTS)\ !=\ \mbox{\hyperlink{namespacegtest__shuffle__test_ae0ef601e243e38eb2e6df09e17ab61b4}{GetTestCases}}(SHARDED\_TESTS),}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00200}00200\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacegtest__shuffle__test_ae0ef601e243e38eb2e6df09e17ab61b4}{GetTestCases}}(SHUFFLED\_SHARDED\_TESTS))}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00201}00201\ }
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00202}\mbox{\hyperlink{classgtest__shuffle__test_1_1_g_test_shuffle_unit_test_a03149bc33668c164e11b5d5ad79b4a92}{00202}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classgtest__shuffle__test_1_1_g_test_shuffle_unit_test_a03149bc33668c164e11b5d5ad79b4a92}{testShuffleDoesNotRepeatTest}}(self):}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00203}00203\ \ \ \ \ \textcolor{keywordflow}{for}\ test\ \textcolor{keywordflow}{in}\ SHUFFLED\_ALL\_TESTS:}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00204}00204\ \ \ \ \ \ \ self.assertEqual(1,\ SHUFFLED\_ALL\_TESTS.count(test),}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00205}00205\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'\%s\ appears\ more\ than\ once'}\ \%\ (test,))}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00206}00206\ \ \ \ \ \textcolor{keywordflow}{for}\ test\ \textcolor{keywordflow}{in}\ SHUFFLED\_ACTIVE\_TESTS:}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00207}00207\ \ \ \ \ \ \ self.assertEqual(1,\ SHUFFLED\_ACTIVE\_TESTS.count(test),}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00208}00208\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'\%s\ appears\ more\ than\ once'}\ \%\ (test,))}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00209}00209\ \ \ \ \ \textcolor{keywordflow}{for}\ test\ \textcolor{keywordflow}{in}\ SHUFFLED\_FILTERED\_TESTS:}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00210}00210\ \ \ \ \ \ \ self.assertEqual(1,\ SHUFFLED\_FILTERED\_TESTS.count(test),}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00211}00211\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'\%s\ appears\ more\ than\ once'}\ \%\ (test,))}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00212}00212\ \ \ \ \ \textcolor{keywordflow}{for}\ test\ \textcolor{keywordflow}{in}\ SHUFFLED\_SHARDED\_TESTS:}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00213}00213\ \ \ \ \ \ \ self.assertEqual(1,\ SHUFFLED\_SHARDED\_TESTS.count(test),}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00214}00214\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'\%s\ appears\ more\ than\ once'}\ \%\ (test,))}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00215}00215\ }
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00216}\mbox{\hyperlink{classgtest__shuffle__test_1_1_g_test_shuffle_unit_test_a48b45ce4e597752ae78d5eb770772746}{00216}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classgtest__shuffle__test_1_1_g_test_shuffle_unit_test_a48b45ce4e597752ae78d5eb770772746}{testShuffleDoesNotCreateNewTest}}(self):}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00217}00217\ \ \ \ \ \textcolor{keywordflow}{for}\ test\ \textcolor{keywordflow}{in}\ SHUFFLED\_ALL\_TESTS:}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00218}00218\ \ \ \ \ \ \ self.assert\_(test\ \textcolor{keywordflow}{in}\ ALL\_TESTS,\ \textcolor{stringliteral}{'\%s\ is\ an\ invalid\ test'}\ \%\ (test,))}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00219}00219\ \ \ \ \ \textcolor{keywordflow}{for}\ test\ \textcolor{keywordflow}{in}\ SHUFFLED\_ACTIVE\_TESTS:}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00220}00220\ \ \ \ \ \ \ self.assert\_(test\ \textcolor{keywordflow}{in}\ ACTIVE\_TESTS,\ \textcolor{stringliteral}{'\%s\ is\ an\ invalid\ test'}\ \%\ (test,))}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00221}00221\ \ \ \ \ \textcolor{keywordflow}{for}\ test\ \textcolor{keywordflow}{in}\ SHUFFLED\_FILTERED\_TESTS:}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00222}00222\ \ \ \ \ \ \ self.assert\_(test\ \textcolor{keywordflow}{in}\ FILTERED\_TESTS,\ \textcolor{stringliteral}{'\%s\ is\ an\ invalid\ test'}\ \%\ (test,))}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00223}00223\ \ \ \ \ \textcolor{keywordflow}{for}\ test\ \textcolor{keywordflow}{in}\ SHUFFLED\_SHARDED\_TESTS:}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00224}00224\ \ \ \ \ \ \ self.assert\_(test\ \textcolor{keywordflow}{in}\ SHARDED\_TESTS,\ \textcolor{stringliteral}{'\%s\ is\ an\ invalid\ test'}\ \%\ (test,))}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00225}00225\ }
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00226}\mbox{\hyperlink{classgtest__shuffle__test_1_1_g_test_shuffle_unit_test_a0512937acbffdb2ffc5ce1a1004563fc}{00226}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classgtest__shuffle__test_1_1_g_test_shuffle_unit_test_a0512937acbffdb2ffc5ce1a1004563fc}{testShuffleIncludesAllTests}}(self):}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00227}00227\ \ \ \ \ \textcolor{keywordflow}{for}\ test\ \textcolor{keywordflow}{in}\ ALL\_TESTS:}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00228}00228\ \ \ \ \ \ \ self.assert\_(test\ \textcolor{keywordflow}{in}\ SHUFFLED\_ALL\_TESTS,\ \textcolor{stringliteral}{'\%s\ is\ missing'}\ \%\ (test,))}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00229}00229\ \ \ \ \ \textcolor{keywordflow}{for}\ test\ \textcolor{keywordflow}{in}\ ACTIVE\_TESTS:}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00230}00230\ \ \ \ \ \ \ self.assert\_(test\ \textcolor{keywordflow}{in}\ SHUFFLED\_ACTIVE\_TESTS,\ \textcolor{stringliteral}{'\%s\ is\ missing'}\ \%\ (test,))}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00231}00231\ \ \ \ \ \textcolor{keywordflow}{for}\ test\ \textcolor{keywordflow}{in}\ FILTERED\_TESTS:}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00232}00232\ \ \ \ \ \ \ self.assert\_(test\ \textcolor{keywordflow}{in}\ SHUFFLED\_FILTERED\_TESTS,\ \textcolor{stringliteral}{'\%s\ is\ missing'}\ \%\ (test,))}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00233}00233\ \ \ \ \ \textcolor{keywordflow}{for}\ test\ \textcolor{keywordflow}{in}\ SHARDED\_TESTS:}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00234}00234\ \ \ \ \ \ \ self.assert\_(test\ \textcolor{keywordflow}{in}\ SHUFFLED\_SHARDED\_TESTS,\ \textcolor{stringliteral}{'\%s\ is\ missing'}\ \%\ (test,))}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00235}00235\ }
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00236}\mbox{\hyperlink{classgtest__shuffle__test_1_1_g_test_shuffle_unit_test_a77d85925d603068bd9c7dcd3f65aafea}{00236}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classgtest__shuffle__test_1_1_g_test_shuffle_unit_test_a77d85925d603068bd9c7dcd3f65aafea}{testShuffleLeavesDeathTestsAtFront}}(self):}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00237}00237\ \ \ \ \ non\_death\_test\_found\ =\ \textcolor{keyword}{False}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00238}00238\ \ \ \ \ \textcolor{keywordflow}{for}\ test\ \textcolor{keywordflow}{in}\ SHUFFLED\_ACTIVE\_TESTS:}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00239}00239\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{stringliteral}{'DeathTest.'}\ \textcolor{keywordflow}{in}\ test:}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00240}00240\ \ \ \ \ \ \ \ \ self.assert\_(\textcolor{keywordflow}{not}\ non\_death\_test\_found,}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00241}00241\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'\%s\ appears\ after\ a\ non-\/death\ test'}\ \%\ (test,))}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00242}00242\ \ \ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00243}00243\ \ \ \ \ \ \ \ \ non\_death\_test\_found\ =\ \textcolor{keyword}{True}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00244}00244\ }
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00245}\mbox{\hyperlink{classgtest__shuffle__test_1_1_g_test_shuffle_unit_test_afd2c42674688324f5f2e9658c4d0075f}{00245}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classgtest__shuffle__test_1_1_g_test_shuffle_unit_test_afd2c42674688324f5f2e9658c4d0075f}{\_VerifyTestCasesDoNotInterleave}}(self,\ tests):}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00246}00246\ \ \ \ \ test\_cases\ =\ []}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00247}00247\ \ \ \ \ \textcolor{keywordflow}{for}\ test\ \textcolor{keywordflow}{in}\ tests:}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00248}00248\ \ \ \ \ \ \ [test\_case,\ \_]\ =\ test.split(\textcolor{stringliteral}{'.'})}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00249}00249\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ test\_cases\ \textcolor{keywordflow}{and}\ test\_cases[-\/1]\ !=\ test\_case:}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00250}00250\ \ \ \ \ \ \ \ \ test\_cases.append(test\_case)}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00251}00251\ \ \ \ \ \ \ \ \ self.assertEqual(1,\ test\_cases.count(test\_case),}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00252}00252\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'Test\ case\ \%s\ is\ not\ grouped\ together\ in\ \%s'}\ \%}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00253}00253\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (test\_case,\ tests))}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00254}00254\ }
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00255}\mbox{\hyperlink{classgtest__shuffle__test_1_1_g_test_shuffle_unit_test_a035d85a9786562f1d086a5eeee5f1c37}{00255}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classgtest__shuffle__test_1_1_g_test_shuffle_unit_test_a035d85a9786562f1d086a5eeee5f1c37}{testShuffleDoesNotInterleaveTestCases}}(self):}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00256}00256\ \ \ \ \ self.\mbox{\hyperlink{classgtest__shuffle__test_1_1_g_test_shuffle_unit_test_afd2c42674688324f5f2e9658c4d0075f}{\_VerifyTestCasesDoNotInterleave}}(SHUFFLED\_ALL\_TESTS)}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00257}00257\ \ \ \ \ self.\mbox{\hyperlink{classgtest__shuffle__test_1_1_g_test_shuffle_unit_test_afd2c42674688324f5f2e9658c4d0075f}{\_VerifyTestCasesDoNotInterleave}}(SHUFFLED\_ACTIVE\_TESTS)}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00258}00258\ \ \ \ \ self.\mbox{\hyperlink{classgtest__shuffle__test_1_1_g_test_shuffle_unit_test_afd2c42674688324f5f2e9658c4d0075f}{\_VerifyTestCasesDoNotInterleave}}(SHUFFLED\_FILTERED\_TESTS)}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00259}00259\ \ \ \ \ self.\mbox{\hyperlink{classgtest__shuffle__test_1_1_g_test_shuffle_unit_test_afd2c42674688324f5f2e9658c4d0075f}{\_VerifyTestCasesDoNotInterleave}}(SHUFFLED\_SHARDED\_TESTS)}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00260}00260\ }
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00261}\mbox{\hyperlink{classgtest__shuffle__test_1_1_g_test_shuffle_unit_test_a00b5ccdadf74330fd7e972813bdde152}{00261}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classgtest__shuffle__test_1_1_g_test_shuffle_unit_test_a00b5ccdadf74330fd7e972813bdde152}{testShuffleRestoresOrderAfterEachIteration}}(self):}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00262}00262\ \ \ \ \ \textcolor{comment}{\#\ Get\ the\ test\ lists\ in\ all\ 3\ iterations,\ using\ random\ seed\ 1,\ 2,}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00263}00263\ \ \ \ \ \textcolor{comment}{\#\ and\ 3\ respectively.\ \ Google\ Test\ picks\ a\ different\ seed\ in\ each}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00264}00264\ \ \ \ \ \textcolor{comment}{\#\ iteration,\ and\ this\ test\ depends\ on\ the\ current\ implementation}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00265}00265\ \ \ \ \ \textcolor{comment}{\#\ picking\ successive\ numbers.\ \ This\ dependency\ is\ not\ ideal,\ but}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00266}00266\ \ \ \ \ \textcolor{comment}{\#\ makes\ the\ test\ much\ easier\ to\ write.}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00267}00267\ \ \ \ \ [tests\_in\_iteration1,\ tests\_in\_iteration2,\ tests\_in\_iteration3]\ =\ (}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00268}00268\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacegtest__shuffle__test_a729a90dc6fa4a90dbcd6490f51593708}{GetTestsForAllIterations}}(}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00269}00269\ \ \ \ \ \ \ \ \ \ \ \ \ \{\},\ [\mbox{\hyperlink{namespacegtest__shuffle__test_a489bbd025a7ddba5c8607349265c0c52}{ShuffleFlag}}(),\ \mbox{\hyperlink{namespacegtest__shuffle__test_a7bb61f49e37b831c7f4ee20a30736e74}{RandomSeedFlag}}(1),\ \mbox{\hyperlink{namespacegtest__shuffle__test_adffb7cacf9023023749a15ec2a66ef68}{RepeatFlag}}(3)]))}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00270}00270\ }
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00271}00271\ \ \ \ \ \textcolor{comment}{\#\ Make\ sure\ running\ the\ tests\ with\ random\ seed\ 1\ gets\ the\ same}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00272}00272\ \ \ \ \ \textcolor{comment}{\#\ order\ as\ in\ iteration\ 1\ above.}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00273}00273\ \ \ \ \ [tests\_with\_seed1]\ =\ \mbox{\hyperlink{namespacegtest__shuffle__test_a729a90dc6fa4a90dbcd6490f51593708}{GetTestsForAllIterations}}(}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00274}00274\ \ \ \ \ \ \ \ \ \{\},\ [\mbox{\hyperlink{namespacegtest__shuffle__test_a489bbd025a7ddba5c8607349265c0c52}{ShuffleFlag}}(),\ \mbox{\hyperlink{namespacegtest__shuffle__test_a7bb61f49e37b831c7f4ee20a30736e74}{RandomSeedFlag}}(1)])}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00275}00275\ \ \ \ \ self.assertEqual(tests\_in\_iteration1,\ tests\_with\_seed1)}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00276}00276\ }
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00277}00277\ \ \ \ \ \textcolor{comment}{\#\ Make\ sure\ running\ the\ tests\ with\ random\ seed\ 2\ gets\ the\ same}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00278}00278\ \ \ \ \ \textcolor{comment}{\#\ order\ as\ in\ iteration\ 2\ above.\ \ Success\ means\ that\ Google\ Test}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00279}00279\ \ \ \ \ \textcolor{comment}{\#\ correctly\ restores\ the\ test\ order\ before\ re-\/shuffling\ at\ the}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00280}00280\ \ \ \ \ \textcolor{comment}{\#\ beginning\ of\ iteration\ 2.}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00281}00281\ \ \ \ \ [tests\_with\_seed2]\ =\ \mbox{\hyperlink{namespacegtest__shuffle__test_a729a90dc6fa4a90dbcd6490f51593708}{GetTestsForAllIterations}}(}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00282}00282\ \ \ \ \ \ \ \ \ \{\},\ [\mbox{\hyperlink{namespacegtest__shuffle__test_a489bbd025a7ddba5c8607349265c0c52}{ShuffleFlag}}(),\ \mbox{\hyperlink{namespacegtest__shuffle__test_a7bb61f49e37b831c7f4ee20a30736e74}{RandomSeedFlag}}(2)])}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00283}00283\ \ \ \ \ self.assertEqual(tests\_in\_iteration2,\ tests\_with\_seed2)}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00284}00284\ }
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00285}00285\ \ \ \ \ \textcolor{comment}{\#\ Make\ sure\ running\ the\ tests\ with\ random\ seed\ 3\ gets\ the\ same}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00286}00286\ \ \ \ \ \textcolor{comment}{\#\ order\ as\ in\ iteration\ 3\ above.\ \ Success\ means\ that\ Google\ Test}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00287}00287\ \ \ \ \ \textcolor{comment}{\#\ correctly\ restores\ the\ test\ order\ before\ re-\/shuffling\ at\ the}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00288}00288\ \ \ \ \ \textcolor{comment}{\#\ beginning\ of\ iteration\ 3.}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00289}00289\ \ \ \ \ [tests\_with\_seed3]\ =\ \mbox{\hyperlink{namespacegtest__shuffle__test_a729a90dc6fa4a90dbcd6490f51593708}{GetTestsForAllIterations}}(}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00290}00290\ \ \ \ \ \ \ \ \ \{\},\ [\mbox{\hyperlink{namespacegtest__shuffle__test_a489bbd025a7ddba5c8607349265c0c52}{ShuffleFlag}}(),\ \mbox{\hyperlink{namespacegtest__shuffle__test_a7bb61f49e37b831c7f4ee20a30736e74}{RandomSeedFlag}}(3)])}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00291}00291\ \ \ \ \ self.assertEqual(tests\_in\_iteration3,\ tests\_with\_seed3)}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00292}00292\ }
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00293}\mbox{\hyperlink{classgtest__shuffle__test_1_1_g_test_shuffle_unit_test_af7260f9cb098dc03f9d47bb8b0fca6f8}{00293}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classgtest__shuffle__test_1_1_g_test_shuffle_unit_test_af7260f9cb098dc03f9d47bb8b0fca6f8}{testShuffleGeneratesNewOrderInEachIteration}}(self):}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00294}00294\ \ \ \ \ [tests\_in\_iteration1,\ tests\_in\_iteration2,\ tests\_in\_iteration3]\ =\ (}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00295}00295\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacegtest__shuffle__test_a729a90dc6fa4a90dbcd6490f51593708}{GetTestsForAllIterations}}(}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00296}00296\ \ \ \ \ \ \ \ \ \ \ \ \ \{\},\ [\mbox{\hyperlink{namespacegtest__shuffle__test_a489bbd025a7ddba5c8607349265c0c52}{ShuffleFlag}}(),\ \mbox{\hyperlink{namespacegtest__shuffle__test_a7bb61f49e37b831c7f4ee20a30736e74}{RandomSeedFlag}}(1),\ \mbox{\hyperlink{namespacegtest__shuffle__test_adffb7cacf9023023749a15ec2a66ef68}{RepeatFlag}}(3)]))}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00297}00297\ }
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00298}00298\ \ \ \ \ self.assert\_(tests\_in\_iteration1\ !=\ tests\_in\_iteration2,}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00299}00299\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ tests\_in\_iteration1)}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00300}00300\ \ \ \ \ self.assert\_(tests\_in\_iteration1\ !=\ tests\_in\_iteration3,}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00301}00301\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ tests\_in\_iteration1)}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00302}00302\ \ \ \ \ self.assert\_(tests\_in\_iteration2\ !=\ tests\_in\_iteration3,}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00303}00303\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ tests\_in\_iteration2)}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00304}00304\ }
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00305}\mbox{\hyperlink{classgtest__shuffle__test_1_1_g_test_shuffle_unit_test_a19d265dfe79944f6ef861f96255d624b}{00305}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classgtest__shuffle__test_1_1_g_test_shuffle_unit_test_a19d265dfe79944f6ef861f96255d624b}{testShuffleShardedTestsPreservesPartition}}(self):}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00306}00306\ \ \ \ \ \textcolor{comment}{\#\ If\ we\ run\ M\ tests\ on\ N\ shards,\ the\ same\ M\ tests\ should\ be\ run\ in}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00307}00307\ \ \ \ \ \textcolor{comment}{\#\ total,\ regardless\ of\ the\ random\ seeds\ used\ by\ the\ shards.}}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00308}00308\ \ \ \ \ [tests1]\ =\ \mbox{\hyperlink{namespacegtest__shuffle__test_a729a90dc6fa4a90dbcd6490f51593708}{GetTestsForAllIterations}}(\{TOTAL\_SHARDS\_ENV\_VAR:\ \textcolor{stringliteral}{'3'},}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00309}00309\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ SHARD\_INDEX\_ENV\_VAR:\ \textcolor{stringliteral}{'0'}\},}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00310}00310\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [\mbox{\hyperlink{namespacegtest__shuffle__test_a489bbd025a7ddba5c8607349265c0c52}{ShuffleFlag}}(),\ \mbox{\hyperlink{namespacegtest__shuffle__test_a7bb61f49e37b831c7f4ee20a30736e74}{RandomSeedFlag}}(1)])}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00311}00311\ \ \ \ \ [tests2]\ =\ \mbox{\hyperlink{namespacegtest__shuffle__test_a729a90dc6fa4a90dbcd6490f51593708}{GetTestsForAllIterations}}(\{TOTAL\_SHARDS\_ENV\_VAR:\ \textcolor{stringliteral}{'3'},}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00312}00312\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ SHARD\_INDEX\_ENV\_VAR:\ \textcolor{stringliteral}{'1'}\},}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00313}00313\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [\mbox{\hyperlink{namespacegtest__shuffle__test_a489bbd025a7ddba5c8607349265c0c52}{ShuffleFlag}}(),\ \mbox{\hyperlink{namespacegtest__shuffle__test_a7bb61f49e37b831c7f4ee20a30736e74}{RandomSeedFlag}}(20)])}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00314}00314\ \ \ \ \ [tests3]\ =\ \mbox{\hyperlink{namespacegtest__shuffle__test_a729a90dc6fa4a90dbcd6490f51593708}{GetTestsForAllIterations}}(\{TOTAL\_SHARDS\_ENV\_VAR:\ \textcolor{stringliteral}{'3'},}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00315}00315\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ SHARD\_INDEX\_ENV\_VAR:\ \textcolor{stringliteral}{'2'}\},}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00316}00316\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [\mbox{\hyperlink{namespacegtest__shuffle__test_a489bbd025a7ddba5c8607349265c0c52}{ShuffleFlag}}(),\ \mbox{\hyperlink{namespacegtest__shuffle__test_a7bb61f49e37b831c7f4ee20a30736e74}{RandomSeedFlag}}(25)])}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00317}00317\ \ \ \ \ sorted\_sharded\_tests\ =\ tests1\ +\ tests2\ +\ tests3}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00318}00318\ \ \ \ \ sorted\_sharded\_tests.sort()}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00319}00319\ \ \ \ \ sorted\_active\_tests\ =\ []}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00320}00320\ \ \ \ \ sorted\_active\_tests.extend(ACTIVE\_TESTS)}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00321}00321\ \ \ \ \ sorted\_active\_tests.sort()}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00322}00322\ \ \ \ \ self.assertEqual(sorted\_active\_tests,\ sorted\_sharded\_tests)}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00323}00323\ }
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00324}00324\ \textcolor{keywordflow}{if}\ \_\_name\_\_\ ==\ \textcolor{stringliteral}{'\_\_main\_\_'}:}
+\DoxyCodeLine{\Hypertarget{gtest__shuffle__test_8py_source_l00325}00325\ \ \ \mbox{\hyperlink{namespacegtest__test__utils_affb42cd189bf8fb9618e5b7178fd34fd}{gtest\_test\_utils.Main}}()}
+
+\end{DoxyCode}

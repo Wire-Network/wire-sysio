@@ -1,0 +1,17 @@
+<map id="websocketpp::lib::net::_htonll" name="websocketpp::lib::net::_htonll">
+<area shape="rect" id="Node000001" title="Convert 64 bit value to network byte order." alt="" coords="1063,70,1208,111"/>
+<area shape="rect" id="Node000002" href="$namespacewebsocketpp_1_1lib_1_1net.html#ae2011914840da1dcbcac7266213a8709" title="Convert 64 bit value to host byte order." alt="" coords="844,13,990,54"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1047,70,989,55,991,50,1049,65"/>
+<area shape="rect" id="Node000007" href="$frame_8cpp.html#ad85249cf07a2ae7b5923e990ff22afa0" title=" " alt="" coords="819,78,1015,103"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="1047,93,1016,93,1016,88,1047,88"/>
+<area shape="rect" id="Node000008" href="$frame_8cpp.html#a645b482dedfe131f3684c173f940fae5" title=" " alt="" coords="819,127,1015,153"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="1048,113,978,129,977,124,1047,108"/>
+<area shape="rect" id="Node000003" href="$namespacewebsocketpp_1_1frame.html#ac55b672bcd3baf4c5a074816f6eb035b" title="Extract the jumbo size field from an extended header." alt="" coords="631,13,771,54"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="829,36,771,36,771,30,829,30"/>
+<area shape="rect" id="Node000004" href="$namespacewebsocketpp_1_1frame.html#a2ca0b9ba6077f201997da543d45b067f" title="Extract the full payload size field from a WebSocket header." alt="" coords="444,13,583,54"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="616,36,584,36,584,30,616,30"/>
+<area shape="rect" id="Node000005" href="$classwebsocketpp_1_1processor_1_1hybi13.html#aee8565136bb0820e9a8914dfc5fdb753" title="Validate an incoming extended header." alt="" coords="217,5,396,61"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="428,36,397,36,397,30,428,30"/>
+<area shape="rect" id="Node000006" href="$classwebsocketpp_1_1processor_1_1hybi13.html#a5c5e3234a0067c7f14fe0ceb4e647659" title="Process new websocket connection bytes." alt="" coords="5,13,169,54"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="201,36,169,36,169,30,201,30"/>
+</map>

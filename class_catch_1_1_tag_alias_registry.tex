@@ -1,0 +1,179 @@
+\doxysection{Catch\+::Tag\+Alias\+Registry Class Reference}
+\hypertarget{class_catch_1_1_tag_alias_registry}{}\label{class_catch_1_1_tag_alias_registry}\index{Catch::TagAliasRegistry@{Catch::TagAliasRegistry}}
+
+
+{\ttfamily \#include $<$catch\+\_\+tag\+\_\+alias\+\_\+registry.\+h$>$}
+
+
+
+Inheritance diagram for Catch\+::Tag\+Alias\+Registry\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=206pt]{class_catch_1_1_tag_alias_registry__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Catch\+::Tag\+Alias\+Registry\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=206pt]{class_catch_1_1_tag_alias_registry__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_catch_1_1_tag_alias_registry_ac3a595bfb73ffa66908f3f8bf7c92eed}{\texorpdfstring{$\sim$}{\string~}\+Tag\+Alias\+Registry}} () override
+\item 
+\mbox{\hyperlink{struct_catch_1_1_tag_alias}{Tag\+Alias}} const \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_catch_1_1_tag_alias_registry_a3ac6e1870e096e6010072da60c23f89f}{find}} (std\+::string const \&alias) const override
+\item 
+std\+::string \mbox{\hyperlink{class_catch_1_1_tag_alias_registry_a721693fa58ec30ec94079368eb388802}{expand\+Aliases}} (std\+::string const \&unexpanded\+Test\+Spec) const override
+\item 
+void \mbox{\hyperlink{class_catch_1_1_tag_alias_registry_a37ae1fda30de783f563492c3c60ab414}{add}} (std\+::string const \&alias, std\+::string const \&tag, \mbox{\hyperlink{struct_catch_1_1_source_line_info}{Source\+Line\+Info}} const \&line\+Info)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{struct_catch_1_1_i_tag_alias_registry}{Catch\+::\+ITag\+Alias\+Registry}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{struct_catch_1_1_i_tag_alias_registry_a016aab63b05a91530ec1d20b918ae2ee}{\texorpdfstring{$\sim$}{\string~}\+ITag\+Alias\+Registry}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Static Public Member Functions inherited from \mbox{\hyperlink{struct_catch_1_1_i_tag_alias_registry}{Catch\+::\+ITag\+Alias\+Registry}}}
+\begin{DoxyCompactItemize}
+\item 
+static \mbox{\hyperlink{struct_catch_1_1_i_tag_alias_registry}{ITag\+Alias\+Registry}} const \& \mbox{\hyperlink{struct_catch_1_1_i_tag_alias_registry_a7c4bf6e2fc52de95fb2596ba19b3bf76}{get}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{catch__tag__alias__registry_8h_source_l00018}{18}} of file \mbox{\hyperlink{catch__tag__alias__registry_8h_source}{catch\+\_\+tag\+\_\+alias\+\_\+registry.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_catch_1_1_tag_alias_registry_ac3a595bfb73ffa66908f3f8bf7c92eed}\index{Catch::TagAliasRegistry@{Catch::TagAliasRegistry}!````~TagAliasRegistry@{\texorpdfstring{$\sim$}{\string~}TagAliasRegistry}}
+\index{````~TagAliasRegistry@{\texorpdfstring{$\sim$}{\string~}TagAliasRegistry}!Catch::TagAliasRegistry@{Catch::TagAliasRegistry}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}TagAliasRegistry()}{\string~TagAliasRegistry()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_tag_alias_registry_ac3a595bfb73ffa66908f3f8bf7c92eed} 
+Catch\+::\+Tag\+Alias\+Registry\+::\texorpdfstring{$\sim$}{\string~}\+Tag\+Alias\+Registry (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__tag__alias__registry_8cpp_source_l00019}{19}} of file \mbox{\hyperlink{catch__tag__alias__registry_8cpp_source}{catch\+\_\+tag\+\_\+alias\+\_\+registry.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00019\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_catch_1_1_tag_alias_registry_a37ae1fda30de783f563492c3c60ab414}\index{Catch::TagAliasRegistry@{Catch::TagAliasRegistry}!add@{add}}
+\index{add@{add}!Catch::TagAliasRegistry@{Catch::TagAliasRegistry}}
+\doxysubsubsection{\texorpdfstring{add()}{add()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_tag_alias_registry_a37ae1fda30de783f563492c3c60ab414} 
+void Catch\+::\+Tag\+Alias\+Registry\+::add (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{alias}{, }\item[{std\+::string const \&}]{tag}{, }\item[{\mbox{\hyperlink{struct_catch_1_1_source_line_info}{Source\+Line\+Info}} const \&}]{line\+Info}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__tag__alias__registry_8cpp_source_l00042}{42}} of file \mbox{\hyperlink{catch__tag__alias__registry_8cpp_source}{catch\+\_\+tag\+\_\+alias\+\_\+registry.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{catch__enforce_8h_aa4c5f453d4352f75712de56e5892849f}{CATCH\_ENFORCE}}(\ \mbox{\hyperlink{namespace_catch_a695f62327be0676e046291eeaae15110}{startsWith}}(alias,\ \textcolor{stringliteral}{"{}[@"{}})\ \&\&\ \mbox{\hyperlink{namespace_catch_ada025504f627feaf9ac68ca391515dff}{endsWith}}(alias,\ \textcolor{charliteral}{']'}),}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}error:\ tag\ alias,\ '"{}}\ <<\ alias\ <<\ \textcolor{stringliteral}{"{}'\ is\ not\ of\ the\ form\ [@alias\ name].\(\backslash\)n"{}}\ <<\ lineInfo\ );}
+\DoxyCodeLine{00045\ }
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{catch__enforce_8h_aa4c5f453d4352f75712de56e5892849f}{CATCH\_ENFORCE}}(\ m\_registry.insert(std::make\_pair(alias,\ TagAlias(tag,\ lineInfo))).second,}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}error:\ tag\ alias,\ '"{}}\ <<\ alias\ <<\ \textcolor{stringliteral}{"{}'\ already\ registered.\(\backslash\)n"{}}}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\(\backslash\)tFirst\ seen\ at:\ "{}}\ <<\ \mbox{\hyperlink{class_catch_1_1_tag_alias_registry_a3ac6e1870e096e6010072da60c23f89f}{find}}(alias)-\/>lineInfo\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\(\backslash\)tRedefined\ at:\ "{}}\ <<\ lineInfo\ );}
+\DoxyCodeLine{00050\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_tag_alias_registry_a37ae1fda30de783f563492c3c60ab414_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_tag_alias_registry_a37ae1fda30de783f563492c3c60ab414_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_tag_alias_registry_a721693fa58ec30ec94079368eb388802}\index{Catch::TagAliasRegistry@{Catch::TagAliasRegistry}!expandAliases@{expandAliases}}
+\index{expandAliases@{expandAliases}!Catch::TagAliasRegistry@{Catch::TagAliasRegistry}}
+\doxysubsubsection{\texorpdfstring{expandAliases()}{expandAliases()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_tag_alias_registry_a721693fa58ec30ec94079368eb388802} 
+std\+::string Catch\+::\+Tag\+Alias\+Registry\+::expand\+Aliases (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{unexpanded\+Test\+Spec}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_i_tag_alias_registry_ae729a7532faf7466db1a157ce0395170}{Catch\+::\+ITag\+Alias\+Registry}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__tag__alias__registry_8cpp_source_l00029}{29}} of file \mbox{\hyperlink{catch__tag__alias__registry_8cpp_source}{catch\+\_\+tag\+\_\+alias\+\_\+registry.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ std::string\ expandedTestSpec\ =\ unexpandedTestSpec;}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\ \textcolor{keyword}{const}\&\ registryKvp\ :\ m\_registry\ )\ \{}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \ \ \ std::size\_t\ pos\ =\ expandedTestSpec.find(\ registryKvp.first\ );}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ pos\ !=\ std::string::npos\ )\ \{}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ expandedTestSpec\ =\ \ expandedTestSpec.substr(\ 0,\ pos\ )\ +}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ registryKvp.second.tag\ +}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ expandedTestSpec.substr(\ pos\ +\ registryKvp.first.size()\ );}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ expandedTestSpec;}
+\DoxyCodeLine{00040\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_tag_alias_registry_a3ac6e1870e096e6010072da60c23f89f}\index{Catch::TagAliasRegistry@{Catch::TagAliasRegistry}!find@{find}}
+\index{find@{find}!Catch::TagAliasRegistry@{Catch::TagAliasRegistry}}
+\doxysubsubsection{\texorpdfstring{find()}{find()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_tag_alias_registry_a3ac6e1870e096e6010072da60c23f89f} 
+\mbox{\hyperlink{struct_catch_1_1_tag_alias}{Tag\+Alias}} const  \texorpdfstring{$\ast$}{*} Catch\+::\+Tag\+Alias\+Registry\+::find (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{alias}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_i_tag_alias_registry_ab926b57c257d04f584bf7e4fa35a1884}{Catch\+::\+ITag\+Alias\+Registry}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__tag__alias__registry_8cpp_source_l00021}{21}} of file \mbox{\hyperlink{catch__tag__alias__registry_8cpp_source}{catch\+\_\+tag\+\_\+alias\+\_\+registry.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ it\ =\ m\_registry.find(\ alias\ );}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ it\ !=\ m\_registry.end()\ )}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \&(it-\/>second);}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00027\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_tag_alias_registry_a3ac6e1870e096e6010072da60c23f89f_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__tag__alias__registry_8h}{catch\+\_\+tag\+\_\+alias\+\_\+registry.\+h}}\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__tag__alias__registry_8cpp}{catch\+\_\+tag\+\_\+alias\+\_\+registry.\+cpp}}\end{DoxyCompactItemize}

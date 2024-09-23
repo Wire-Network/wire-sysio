@@ -1,0 +1,133 @@
+\doxysection{extraction\+\_\+test\+\_\+fixture\+::mock\+\_\+logfile\+\_\+provider\+\_\+type Struct Reference}
+\hypertarget{structextraction__test__fixture_1_1mock__logfile__provider__type}{}\label{structextraction__test__fixture_1_1mock__logfile__provider__type}\index{extraction\_test\_fixture::mock\_logfile\_provider\_type@{extraction\_test\_fixture::mock\_logfile\_provider\_type}}
+
+
+Collaboration diagram for extraction\+\_\+test\+\_\+fixture\+::mock\+\_\+logfile\+\_\+provider\+\_\+type\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structextraction__test__fixture_1_1mock__logfile__provider__type__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structextraction__test__fixture_1_1mock__logfile__provider__type_a69f899c3be4745de4613d0e7728178f4}{mock\+\_\+logfile\+\_\+provider\+\_\+type}} (\mbox{\hyperlink{structextraction__test__fixture}{extraction\+\_\+test\+\_\+fixture}} \&\mbox{\hyperlink{structextraction__test__fixture_1_1mock__logfile__provider__type_a8ee295c2bdb758374f97c9d1204a4f77}{fixture}})
+\item 
+{\footnotesize template$<$typename Block\+Trace $>$ }\\void \mbox{\hyperlink{structextraction__test__fixture_1_1mock__logfile__provider__type_a8303d36ce93a3eb9436036b7a422b405}{append}} (const Block\+Trace \&entry)
+\item 
+void \mbox{\hyperlink{structextraction__test__fixture_1_1mock__logfile__provider__type_a2e5924a0659304412732993f121f3e20}{append\+\_\+lib}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} lib)
+\item 
+void \mbox{\hyperlink{structextraction__test__fixture_1_1mock__logfile__provider__type_aef33481955f8aa58380f0b1609180b34}{append\+\_\+trx\+\_\+ids}} (const \mbox{\hyperlink{structsysio_1_1trace__api_1_1block__trxs__entry}{block\+\_\+trxs\+\_\+entry}} \&tt)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structextraction__test__fixture}{extraction\+\_\+test\+\_\+fixture}} \& \mbox{\hyperlink{structextraction__test__fixture_1_1mock__logfile__provider__type_a8ee295c2bdb758374f97c9d1204a4f77}{fixture}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+MOCK implementation of the logfile input API 
+
+Definition at line \mbox{\hyperlink{test__extraction_8cpp_source_l00105}{105}} of file \mbox{\hyperlink{test__extraction_8cpp_source}{test\+\_\+extraction.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structextraction__test__fixture_1_1mock__logfile__provider__type_a69f899c3be4745de4613d0e7728178f4}\index{extraction\_test\_fixture::mock\_logfile\_provider\_type@{extraction\_test\_fixture::mock\_logfile\_provider\_type}!mock\_logfile\_provider\_type@{mock\_logfile\_provider\_type}}
+\index{mock\_logfile\_provider\_type@{mock\_logfile\_provider\_type}!extraction\_test\_fixture::mock\_logfile\_provider\_type@{extraction\_test\_fixture::mock\_logfile\_provider\_type}}
+\doxysubsubsection{\texorpdfstring{mock\_logfile\_provider\_type()}{mock\_logfile\_provider\_type()}}
+{\footnotesize\ttfamily \label{structextraction__test__fixture_1_1mock__logfile__provider__type_a69f899c3be4745de4613d0e7728178f4} 
+extraction\+\_\+test\+\_\+fixture\+::mock\+\_\+logfile\+\_\+provider\+\_\+type\+::mock\+\_\+logfile\+\_\+provider\+\_\+type (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structextraction__test__fixture}{extraction\+\_\+test\+\_\+fixture}} \&}]{fixture}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{test__extraction_8cpp_source_l00106}{106}} of file \mbox{\hyperlink{test__extraction_8cpp_source}{test\+\_\+extraction.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ :\mbox{\hyperlink{structextraction__test__fixture_1_1mock__logfile__provider__type_a8ee295c2bdb758374f97c9d1204a4f77}{fixture}}(\mbox{\hyperlink{structextraction__test__fixture_1_1mock__logfile__provider__type_a8ee295c2bdb758374f97c9d1204a4f77}{fixture}})}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structextraction__test__fixture_1_1mock__logfile__provider__type_a8303d36ce93a3eb9436036b7a422b405}\index{extraction\_test\_fixture::mock\_logfile\_provider\_type@{extraction\_test\_fixture::mock\_logfile\_provider\_type}!append@{append}}
+\index{append@{append}!extraction\_test\_fixture::mock\_logfile\_provider\_type@{extraction\_test\_fixture::mock\_logfile\_provider\_type}}
+\doxysubsubsection{\texorpdfstring{append()}{append()}}
+{\footnotesize\ttfamily \label{structextraction__test__fixture_1_1mock__logfile__provider__type_a8303d36ce93a3eb9436036b7a422b405} 
+template$<$typename Block\+Trace $>$ \\
+void extraction\+\_\+test\+\_\+fixture\+::mock\+\_\+logfile\+\_\+provider\+\_\+type\+::append (\begin{DoxyParamCaption}\item[{const Block\+Trace \&}]{entry}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+append an entry to the data store
+
+
+\begin{DoxyParams}{Parameters}
+{\em entry} & \+: the entry to append \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{test__extraction_8cpp_source_l00116}{116}} of file \mbox{\hyperlink{test__extraction_8cpp_source}{test\+\_\+extraction.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structextraction__test__fixture_1_1mock__logfile__provider__type_a8ee295c2bdb758374f97c9d1204a4f77}{fixture}}.\mbox{\hyperlink{structextraction__test__fixture_af0c46668c7422e7b5c11add0a20ed58c}{data\_log}}.emplace\_back(entry);}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structextraction__test__fixture_1_1mock__logfile__provider__type_a2e5924a0659304412732993f121f3e20}\index{extraction\_test\_fixture::mock\_logfile\_provider\_type@{extraction\_test\_fixture::mock\_logfile\_provider\_type}!append\_lib@{append\_lib}}
+\index{append\_lib@{append\_lib}!extraction\_test\_fixture::mock\_logfile\_provider\_type@{extraction\_test\_fixture::mock\_logfile\_provider\_type}}
+\doxysubsubsection{\texorpdfstring{append\_lib()}{append\_lib()}}
+{\footnotesize\ttfamily \label{structextraction__test__fixture_1_1mock__logfile__provider__type_a2e5924a0659304412732993f121f3e20} 
+void extraction\+\_\+test\+\_\+fixture\+::mock\+\_\+logfile\+\_\+provider\+\_\+type\+::append\+\_\+lib (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{lib}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{test__extraction_8cpp_source_l00120}{120}} of file \mbox{\hyperlink{test__extraction_8cpp_source}{test\+\_\+extraction.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structextraction__test__fixture_1_1mock__logfile__provider__type_a8ee295c2bdb758374f97c9d1204a4f77}{fixture}}.\mbox{\hyperlink{structextraction__test__fixture_a4b7080c11fcd3434743ec348db714aa2}{max\_lib}}\ =\ std::max(\mbox{\hyperlink{structextraction__test__fixture_1_1mock__logfile__provider__type_a8ee295c2bdb758374f97c9d1204a4f77}{fixture}}.\mbox{\hyperlink{structextraction__test__fixture_a4b7080c11fcd3434743ec348db714aa2}{max\_lib}},\ lib);}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structextraction__test__fixture_1_1mock__logfile__provider__type_aef33481955f8aa58380f0b1609180b34}\index{extraction\_test\_fixture::mock\_logfile\_provider\_type@{extraction\_test\_fixture::mock\_logfile\_provider\_type}!append\_trx\_ids@{append\_trx\_ids}}
+\index{append\_trx\_ids@{append\_trx\_ids}!extraction\_test\_fixture::mock\_logfile\_provider\_type@{extraction\_test\_fixture::mock\_logfile\_provider\_type}}
+\doxysubsubsection{\texorpdfstring{append\_trx\_ids()}{append\_trx\_ids()}}
+{\footnotesize\ttfamily \label{structextraction__test__fixture_1_1mock__logfile__provider__type_aef33481955f8aa58380f0b1609180b34} 
+void extraction\+\_\+test\+\_\+fixture\+::mock\+\_\+logfile\+\_\+provider\+\_\+type\+::append\+\_\+trx\+\_\+ids (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1trace__api_1_1block__trxs__entry}{block\+\_\+trxs\+\_\+entry}} \&}]{tt}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{test__extraction_8cpp_source_l00124}{124}} of file \mbox{\hyperlink{test__extraction_8cpp_source}{test\+\_\+extraction.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structextraction__test__fixture_1_1mock__logfile__provider__type_a8ee295c2bdb758374f97c9d1204a4f77}{fixture}}.\mbox{\hyperlink{structextraction__test__fixture_ac303bb01366a9e905eab3ed4710902c4}{id\_log}}[tt.\mbox{\hyperlink{structsysio_1_1trace__api_1_1block__trxs__entry_a10c9e5753dc6cc8fe55b8d0ebf3e650f}{block\_num}}]\ =\ tt.\mbox{\hyperlink{structsysio_1_1trace__api_1_1block__trxs__entry_a5f90e0fd049c32db0a074b7cf10cb3b5}{ids}};}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structextraction__test__fixture_1_1mock__logfile__provider__type_a8ee295c2bdb758374f97c9d1204a4f77}\index{extraction\_test\_fixture::mock\_logfile\_provider\_type@{extraction\_test\_fixture::mock\_logfile\_provider\_type}!fixture@{fixture}}
+\index{fixture@{fixture}!extraction\_test\_fixture::mock\_logfile\_provider\_type@{extraction\_test\_fixture::mock\_logfile\_provider\_type}}
+\doxysubsubsection{\texorpdfstring{fixture}{fixture}}
+{\footnotesize\ttfamily \label{structextraction__test__fixture_1_1mock__logfile__provider__type_a8ee295c2bdb758374f97c9d1204a4f77} 
+\mbox{\hyperlink{structextraction__test__fixture}{extraction\+\_\+test\+\_\+fixture}}\& extraction\+\_\+test\+\_\+fixture\+::mock\+\_\+logfile\+\_\+provider\+\_\+type\+::fixture}
+
+
+
+Definition at line \mbox{\hyperlink{test__extraction_8cpp_source_l00128}{128}} of file \mbox{\hyperlink{test__extraction_8cpp_source}{test\+\_\+extraction.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+plugins/trace\+\_\+api\+\_\+plugin/test/\mbox{\hyperlink{test__extraction_8cpp}{test\+\_\+extraction.\+cpp}}\end{DoxyCompactItemize}

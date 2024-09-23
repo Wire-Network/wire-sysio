@@ -1,0 +1,679 @@
+\doxysection{Filter\+Key\+Handler\texorpdfstring{$<$}{<} Output\+Handler \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{class_filter_key_handler}{}\label{class_filter_key_handler}\index{FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef char \mbox{\hyperlink{class_filter_key_handler_a9c4de4bf706794410bc8bdc40a7cf95d}{Ch}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_filter_key_handler_ab7e37d9d0aad1573e4388af6c6d0250a}{Filter\+Key\+Handler}} (Output\+Handler \&output\+Handler, const \mbox{\hyperlink{class_filter_key_handler_a9c4de4bf706794410bc8bdc40a7cf95d}{Ch}} \texorpdfstring{$\ast$}{*}key\+String, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} key\+Length)
+\item 
+bool \mbox{\hyperlink{class_filter_key_handler_a0961f7f4188d46fd1cff814e2c6ad45b}{Null}} ()
+\item 
+bool \mbox{\hyperlink{class_filter_key_handler_a534c3b357be44f8a7bdeefe79e9d5dd7}{Bool}} (bool b)
+\item 
+bool \mbox{\hyperlink{class_filter_key_handler_a916721741643c42f460d1a62044bcd10}{Int}} (int i)
+\item 
+bool \mbox{\hyperlink{class_filter_key_handler_afc365d8748bd77fa1d1a98d56bdcd12c}{Uint}} (unsigned u)
+\item 
+bool \mbox{\hyperlink{class_filter_key_handler_a6e7338a8a49ebfb60d116e717d9cee1d}{Int64}} (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} i)
+\item 
+bool \mbox{\hyperlink{class_filter_key_handler_a93eed6c20bd41eb6bd597861e43bfe12}{Uint64}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} u)
+\item 
+bool \mbox{\hyperlink{class_filter_key_handler_a9d718ce635cedaafa03cd65788d9dd91}{Double}} (double d)
+\item 
+bool \mbox{\hyperlink{class_filter_key_handler_ac240886ec2015817189a28f8f66938f9}{Raw\+Number}} (const \mbox{\hyperlink{class_filter_key_handler_a9c4de4bf706794410bc8bdc40a7cf95d}{Ch}} \texorpdfstring{$\ast$}{*}str, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}, bool copy)
+\item 
+bool \mbox{\hyperlink{class_filter_key_handler_a2e5ee8ad7545dafcb0c8a60d82e7c579}{String}} (const \mbox{\hyperlink{class_filter_key_handler_a9c4de4bf706794410bc8bdc40a7cf95d}{Ch}} \texorpdfstring{$\ast$}{*}str, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}, bool copy)
+\item 
+bool \mbox{\hyperlink{class_filter_key_handler_ab595e71b6dc9ece313f2ab9a255667f7}{Start\+Object}} ()
+\item 
+bool \mbox{\hyperlink{class_filter_key_handler_a9dbf14eeda9713e58fc8fc9ce6de0f33}{Key}} (const \mbox{\hyperlink{class_filter_key_handler_a9c4de4bf706794410bc8bdc40a7cf95d}{Ch}} \texorpdfstring{$\ast$}{*}str, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}, bool copy)
+\item 
+bool \mbox{\hyperlink{class_filter_key_handler_a49612ff389f37602aa9ad78350f392aa}{End\+Object}} (\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}})
+\item 
+bool \mbox{\hyperlink{class_filter_key_handler_a3f75f5092a076657f7ab016271a7d559}{Start\+Array}} ()
+\item 
+bool \mbox{\hyperlink{class_filter_key_handler_ab95bdeaedf7ef33a40074b59489c3a8c}{End\+Array}} (\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} element\+Count)
+\item 
+\mbox{\hyperlink{class_filter_key_handler_ab7e37d9d0aad1573e4388af6c6d0250a}{Filter\+Key\+Handler}} (Output\+Handler \&output\+Handler, const \mbox{\hyperlink{class_filter_key_handler_a9c4de4bf706794410bc8bdc40a7cf95d}{Ch}} \texorpdfstring{$\ast$}{*}key\+String, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} key\+Length)
+\item 
+bool \mbox{\hyperlink{class_filter_key_handler_a0961f7f4188d46fd1cff814e2c6ad45b}{Null}} ()
+\item 
+bool \mbox{\hyperlink{class_filter_key_handler_a534c3b357be44f8a7bdeefe79e9d5dd7}{Bool}} (bool b)
+\item 
+bool \mbox{\hyperlink{class_filter_key_handler_a916721741643c42f460d1a62044bcd10}{Int}} (int i)
+\item 
+bool \mbox{\hyperlink{class_filter_key_handler_afc365d8748bd77fa1d1a98d56bdcd12c}{Uint}} (unsigned u)
+\item 
+bool \mbox{\hyperlink{class_filter_key_handler_a6e7338a8a49ebfb60d116e717d9cee1d}{Int64}} (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} i)
+\item 
+bool \mbox{\hyperlink{class_filter_key_handler_a93eed6c20bd41eb6bd597861e43bfe12}{Uint64}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} u)
+\item 
+bool \mbox{\hyperlink{class_filter_key_handler_a9d718ce635cedaafa03cd65788d9dd91}{Double}} (double d)
+\item 
+bool \mbox{\hyperlink{class_filter_key_handler_ac240886ec2015817189a28f8f66938f9}{Raw\+Number}} (const \mbox{\hyperlink{class_filter_key_handler_a9c4de4bf706794410bc8bdc40a7cf95d}{Ch}} \texorpdfstring{$\ast$}{*}str, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}, bool copy)
+\item 
+bool \mbox{\hyperlink{class_filter_key_handler_a2e5ee8ad7545dafcb0c8a60d82e7c579}{String}} (const \mbox{\hyperlink{class_filter_key_handler_a9c4de4bf706794410bc8bdc40a7cf95d}{Ch}} \texorpdfstring{$\ast$}{*}str, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}, bool copy)
+\item 
+bool \mbox{\hyperlink{class_filter_key_handler_ab595e71b6dc9ece313f2ab9a255667f7}{Start\+Object}} ()
+\item 
+bool \mbox{\hyperlink{class_filter_key_handler_a9dbf14eeda9713e58fc8fc9ce6de0f33}{Key}} (const \mbox{\hyperlink{class_filter_key_handler_a9c4de4bf706794410bc8bdc40a7cf95d}{Ch}} \texorpdfstring{$\ast$}{*}str, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}, bool copy)
+\item 
+bool \mbox{\hyperlink{class_filter_key_handler_a49612ff389f37602aa9ad78350f392aa}{End\+Object}} (\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}})
+\item 
+bool \mbox{\hyperlink{class_filter_key_handler_a3f75f5092a076657f7ab016271a7d559}{Start\+Array}} ()
+\item 
+bool \mbox{\hyperlink{class_filter_key_handler_ab95bdeaedf7ef33a40074b59489c3a8c}{End\+Array}} (\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} element\+Count)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Output\+Handler$>$\newline
+class Filter\+Key\+Handler$<$ Output\+Handler $>$}
+
+
+Definition at line \mbox{\hyperlink{filterkey_8cpp_source_l00018}{18}} of file \mbox{\hyperlink{filterkey_8cpp_source}{filterkey.\+cpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{class_filter_key_handler_a9c4de4bf706794410bc8bdc40a7cf95d}\index{FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}!Ch@{Ch}}
+\index{Ch@{Ch}!FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}}
+\doxysubsubsection{\texorpdfstring{Ch}{Ch}}
+{\footnotesize\ttfamily \label{class_filter_key_handler_a9c4de4bf706794410bc8bdc40a7cf95d} 
+template$<$typename Output\+Handler $>$ \\
+typedef char \mbox{\hyperlink{class_filter_key_handler}{Filter\+Key\+Handler}}$<$ Output\+Handler $>$\+::\+Ch}
+
+
+
+Definition at line \mbox{\hyperlink{filterkey_8cpp_source_l00020}{20}} of file \mbox{\hyperlink{filterkey_8cpp_source}{filterkey.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_filter_key_handler_ab7e37d9d0aad1573e4388af6c6d0250a}\index{FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}!FilterKeyHandler@{FilterKeyHandler}}
+\index{FilterKeyHandler@{FilterKeyHandler}!FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}}
+\doxysubsubsection{\texorpdfstring{FilterKeyHandler()}{FilterKeyHandler()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_filter_key_handler_ab7e37d9d0aad1573e4388af6c6d0250a} 
+template$<$typename Output\+Handler $>$ \\
+\mbox{\hyperlink{class_filter_key_handler}{Filter\+Key\+Handler}}$<$ Output\+Handler $>$\mbox{\hyperlink{class_filter_key_handler}{\+::\+Filter\+Key\+Handler}} (\begin{DoxyParamCaption}\item[{Output\+Handler \&}]{output\+Handler}{, }\item[{const \mbox{\hyperlink{class_filter_key_handler_a9c4de4bf706794410bc8bdc40a7cf95d}{Ch}} \texorpdfstring{$\ast$}{*}}]{key\+String}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{key\+Length}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{filterkey_8cpp_source_l00022}{22}} of file \mbox{\hyperlink{filterkey_8cpp_source}{filterkey.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ }
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ outputHandler\_(outputHandler),\ keyString\_(keyString),\ keyLength\_(keyLength),\ filterValueDepth\_(),\ filteredKeyCount\_()}
+\DoxyCodeLine{00024\ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{class_filter_key_handler_ab7e37d9d0aad1573e4388af6c6d0250a}\index{FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}!FilterKeyHandler@{FilterKeyHandler}}
+\index{FilterKeyHandler@{FilterKeyHandler}!FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}}
+\doxysubsubsection{\texorpdfstring{FilterKeyHandler()}{FilterKeyHandler()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_filter_key_handler_ab7e37d9d0aad1573e4388af6c6d0250a} 
+template$<$typename Output\+Handler $>$ \\
+\mbox{\hyperlink{class_filter_key_handler}{Filter\+Key\+Handler}}$<$ Output\+Handler $>$\mbox{\hyperlink{class_filter_key_handler}{\+::\+Filter\+Key\+Handler}} (\begin{DoxyParamCaption}\item[{Output\+Handler \&}]{output\+Handler}{, }\item[{const \mbox{\hyperlink{class_filter_key_handler_a9c4de4bf706794410bc8bdc40a7cf95d}{Ch}} \texorpdfstring{$\ast$}{*}}]{key\+String}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{key\+Length}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{filterkeydom_8cpp_source_l00023}{23}} of file \mbox{\hyperlink{filterkeydom_8cpp_source}{filterkeydom.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ }
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ outputHandler\_(outputHandler),\ keyString\_(keyString),\ keyLength\_(keyLength),\ filterValueDepth\_(),\ filteredKeyCount\_()}
+\DoxyCodeLine{00025\ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_filter_key_handler_a534c3b357be44f8a7bdeefe79e9d5dd7}\index{FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}!Bool@{Bool}}
+\index{Bool@{Bool}!FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}}
+\doxysubsubsection{\texorpdfstring{Bool()}{Bool()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_filter_key_handler_a534c3b357be44f8a7bdeefe79e9d5dd7} 
+template$<$typename Output\+Handler $>$ \\
+bool \mbox{\hyperlink{class_filter_key_handler}{Filter\+Key\+Handler}}$<$ Output\+Handler $>$\mbox{\hyperlink{struct_bool}{\+::\+Bool}} (\begin{DoxyParamCaption}\item[{bool}]{b}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{filterkey_8cpp_source_l00027}{27}} of file \mbox{\hyperlink{filterkey_8cpp_source}{filterkey.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00027\ \{\ \textcolor{keywordflow}{return}\ filterValueDepth\_\ >\ 0\ ?\ EndValue()\ :\ outputHandler\_.\mbox{\hyperlink{struct_bool}{Bool}}(b)\ \ \ \&\&\ EndValue();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_filter_key_handler_a534c3b357be44f8a7bdeefe79e9d5dd7}\index{FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}!Bool@{Bool}}
+\index{Bool@{Bool}!FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}}
+\doxysubsubsection{\texorpdfstring{Bool()}{Bool()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_filter_key_handler_a534c3b357be44f8a7bdeefe79e9d5dd7} 
+template$<$typename Output\+Handler $>$ \\
+bool \mbox{\hyperlink{class_filter_key_handler}{Filter\+Key\+Handler}}$<$ Output\+Handler $>$\mbox{\hyperlink{struct_bool}{\+::\+Bool}} (\begin{DoxyParamCaption}\item[{bool}]{b}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{filterkeydom_8cpp_source_l00028}{28}} of file \mbox{\hyperlink{filterkeydom_8cpp_source}{filterkeydom.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00028\ \{\ \textcolor{keywordflow}{return}\ filterValueDepth\_\ >\ 0\ ?\ EndValue()\ :\ outputHandler\_.\mbox{\hyperlink{struct_bool}{Bool}}(b)\ \ \ \&\&\ EndValue();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_filter_key_handler_a9d718ce635cedaafa03cd65788d9dd91}\index{FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}!Double@{Double}}
+\index{Double@{Double}!FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}}
+\doxysubsubsection{\texorpdfstring{Double()}{Double()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_filter_key_handler_a9d718ce635cedaafa03cd65788d9dd91} 
+template$<$typename Output\+Handler $>$ \\
+bool \mbox{\hyperlink{class_filter_key_handler}{Filter\+Key\+Handler}}$<$ Output\+Handler $>$\+::\+Double (\begin{DoxyParamCaption}\item[{double}]{d}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{filterkey_8cpp_source_l00032}{32}} of file \mbox{\hyperlink{filterkey_8cpp_source}{filterkey.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00032\ \{\ \textcolor{keywordflow}{return}\ filterValueDepth\_\ >\ 0\ ?\ EndValue()\ :\ outputHandler\_.\mbox{\hyperlink{class_filter_key_handler_a9d718ce635cedaafa03cd65788d9dd91}{Double}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}})\ \&\&\ EndValue();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_filter_key_handler_a9d718ce635cedaafa03cd65788d9dd91}\index{FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}!Double@{Double}}
+\index{Double@{Double}!FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}}
+\doxysubsubsection{\texorpdfstring{Double()}{Double()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_filter_key_handler_a9d718ce635cedaafa03cd65788d9dd91} 
+template$<$typename Output\+Handler $>$ \\
+bool \mbox{\hyperlink{class_filter_key_handler}{Filter\+Key\+Handler}}$<$ Output\+Handler $>$\+::\+Double (\begin{DoxyParamCaption}\item[{double}]{d}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{filterkeydom_8cpp_source_l00033}{33}} of file \mbox{\hyperlink{filterkeydom_8cpp_source}{filterkeydom.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00033\ \{\ \textcolor{keywordflow}{return}\ filterValueDepth\_\ >\ 0\ ?\ EndValue()\ :\ outputHandler\_.\mbox{\hyperlink{class_filter_key_handler_a9d718ce635cedaafa03cd65788d9dd91}{Double}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}})\ \&\&\ EndValue();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_filter_key_handler_ab95bdeaedf7ef33a40074b59489c3a8c}\index{FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}!EndArray@{EndArray}}
+\index{EndArray@{EndArray}!FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}}
+\doxysubsubsection{\texorpdfstring{EndArray()}{EndArray()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_filter_key_handler_ab95bdeaedf7ef33a40074b59489c3a8c} 
+template$<$typename Output\+Handler $>$ \\
+bool \mbox{\hyperlink{class_filter_key_handler}{Filter\+Key\+Handler}}$<$ Output\+Handler $>$\+::\+End\+Array (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{element\+Count}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{filterkey_8cpp_source_l00082}{82}} of file \mbox{\hyperlink{filterkey_8cpp_source}{filterkey.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (filterValueDepth\_\ >\ 0)\ \{}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \ \ \ filterValueDepth\_-\/-\/;}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ EndValue();}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ outputHandler\_.EndArray(elementCount)\ \&\&\ EndValue();}
+\DoxyCodeLine{00089\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_filter_key_handler_ab95bdeaedf7ef33a40074b59489c3a8c}\index{FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}!EndArray@{EndArray}}
+\index{EndArray@{EndArray}!FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}}
+\doxysubsubsection{\texorpdfstring{EndArray()}{EndArray()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_filter_key_handler_ab95bdeaedf7ef33a40074b59489c3a8c} 
+template$<$typename Output\+Handler $>$ \\
+bool \mbox{\hyperlink{class_filter_key_handler}{Filter\+Key\+Handler}}$<$ Output\+Handler $>$\+::\+End\+Array (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{element\+Count}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{filterkeydom_8cpp_source_l00083}{83}} of file \mbox{\hyperlink{filterkeydom_8cpp_source}{filterkeydom.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (filterValueDepth\_\ >\ 0)\ \{}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \ \ \ \ filterValueDepth\_-\/-\/;}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ EndValue();}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ outputHandler\_.EndArray(elementCount)\ \&\&\ EndValue();}
+\DoxyCodeLine{00090\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_filter_key_handler_a49612ff389f37602aa9ad78350f392aa}\index{FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}!EndObject@{EndObject}}
+\index{EndObject@{EndObject}!FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}}
+\doxysubsubsection{\texorpdfstring{EndObject()}{EndObject()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_filter_key_handler_a49612ff389f37602aa9ad78350f392aa} 
+template$<$typename Output\+Handler $>$ \\
+bool \mbox{\hyperlink{class_filter_key_handler}{Filter\+Key\+Handler}}$<$ Output\+Handler $>$\+::\+End\+Object (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{filterkey_8cpp_source_l00060}{60}} of file \mbox{\hyperlink{filterkey_8cpp_source}{filterkey.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (filterValueDepth\_\ >\ 0)\ \{}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \ \ \ filterValueDepth\_-\/-\/;}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ EndValue();}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Use\ our\ own\ filtered\ memberCount}}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\ memberCount\ =\ filteredKeyCount\_.top();}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \ \ \ filteredKeyCount\_.pop();}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ outputHandler\_.EndObject(memberCount)\ \&\&\ EndValue();}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00071\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_filter_key_handler_a49612ff389f37602aa9ad78350f392aa}\index{FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}!EndObject@{EndObject}}
+\index{EndObject@{EndObject}!FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}}
+\doxysubsubsection{\texorpdfstring{EndObject()}{EndObject()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_filter_key_handler_a49612ff389f37602aa9ad78350f392aa} 
+template$<$typename Output\+Handler $>$ \\
+bool \mbox{\hyperlink{class_filter_key_handler}{Filter\+Key\+Handler}}$<$ Output\+Handler $>$\+::\+End\+Object (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{filterkeydom_8cpp_source_l00061}{61}} of file \mbox{\hyperlink{filterkeydom_8cpp_source}{filterkeydom.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (filterValueDepth\_\ >\ 0)\ \{}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ filterValueDepth\_-\/-\/;}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ EndValue();}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Use\ our\ own\ filtered\ memberCount}}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\ memberCount\ =\ filteredKeyCount\_.top();}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ filteredKeyCount\_.pop();}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ outputHandler\_.EndObject(memberCount)\ \&\&\ EndValue();}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00072\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_filter_key_handler_a916721741643c42f460d1a62044bcd10}\index{FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}!Int@{Int}}
+\index{Int@{Int}!FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}}
+\doxysubsubsection{\texorpdfstring{Int()}{Int()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_filter_key_handler_a916721741643c42f460d1a62044bcd10} 
+template$<$typename Output\+Handler $>$ \\
+bool \mbox{\hyperlink{class_filter_key_handler}{Filter\+Key\+Handler}}$<$ Output\+Handler $>$\+::\+Int (\begin{DoxyParamCaption}\item[{int}]{i}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{filterkey_8cpp_source_l00028}{28}} of file \mbox{\hyperlink{filterkey_8cpp_source}{filterkey.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00028\ \{\ \textcolor{keywordflow}{return}\ filterValueDepth\_\ >\ 0\ ?\ EndValue()\ :\ outputHandler\_.\mbox{\hyperlink{class_filter_key_handler_a916721741643c42f460d1a62044bcd10}{Int}}(i)\ \ \ \ \&\&\ EndValue();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_filter_key_handler_a916721741643c42f460d1a62044bcd10}\index{FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}!Int@{Int}}
+\index{Int@{Int}!FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}}
+\doxysubsubsection{\texorpdfstring{Int()}{Int()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_filter_key_handler_a916721741643c42f460d1a62044bcd10} 
+template$<$typename Output\+Handler $>$ \\
+bool \mbox{\hyperlink{class_filter_key_handler}{Filter\+Key\+Handler}}$<$ Output\+Handler $>$\+::\+Int (\begin{DoxyParamCaption}\item[{int}]{i}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{filterkeydom_8cpp_source_l00029}{29}} of file \mbox{\hyperlink{filterkeydom_8cpp_source}{filterkeydom.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00029\ \{\ \textcolor{keywordflow}{return}\ filterValueDepth\_\ >\ 0\ ?\ EndValue()\ :\ outputHandler\_.\mbox{\hyperlink{class_filter_key_handler_a916721741643c42f460d1a62044bcd10}{Int}}(i)\ \ \ \ \&\&\ EndValue();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_filter_key_handler_a6e7338a8a49ebfb60d116e717d9cee1d}\index{FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}!Int64@{Int64}}
+\index{Int64@{Int64}!FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}}
+\doxysubsubsection{\texorpdfstring{Int64()}{Int64()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_filter_key_handler_a6e7338a8a49ebfb60d116e717d9cee1d} 
+template$<$typename Output\+Handler $>$ \\
+bool \mbox{\hyperlink{class_filter_key_handler}{Filter\+Key\+Handler}}$<$ Output\+Handler $>$\+::\+Int64 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}}]{i}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{filterkey_8cpp_source_l00030}{30}} of file \mbox{\hyperlink{filterkey_8cpp_source}{filterkey.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00030\ \{\ \textcolor{keywordflow}{return}\ filterValueDepth\_\ >\ 0\ ?\ EndValue()\ :\ outputHandler\_.\mbox{\hyperlink{class_filter_key_handler_a6e7338a8a49ebfb60d116e717d9cee1d}{Int64}}(i)\ \ \&\&\ EndValue();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_filter_key_handler_a6e7338a8a49ebfb60d116e717d9cee1d}\index{FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}!Int64@{Int64}}
+\index{Int64@{Int64}!FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}}
+\doxysubsubsection{\texorpdfstring{Int64()}{Int64()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_filter_key_handler_a6e7338a8a49ebfb60d116e717d9cee1d} 
+template$<$typename Output\+Handler $>$ \\
+bool \mbox{\hyperlink{class_filter_key_handler}{Filter\+Key\+Handler}}$<$ Output\+Handler $>$\+::\+Int64 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}}]{i}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{filterkeydom_8cpp_source_l00031}{31}} of file \mbox{\hyperlink{filterkeydom_8cpp_source}{filterkeydom.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00031\ \{\ \textcolor{keywordflow}{return}\ filterValueDepth\_\ >\ 0\ ?\ EndValue()\ :\ outputHandler\_.\mbox{\hyperlink{class_filter_key_handler_a6e7338a8a49ebfb60d116e717d9cee1d}{Int64}}(i)\ \ \&\&\ EndValue();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_filter_key_handler_a9dbf14eeda9713e58fc8fc9ce6de0f33}\index{FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}!Key@{Key}}
+\index{Key@{Key}!FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}}
+\doxysubsubsection{\texorpdfstring{Key()}{Key()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_filter_key_handler_a9dbf14eeda9713e58fc8fc9ce6de0f33} 
+template$<$typename Output\+Handler $>$ \\
+bool \mbox{\hyperlink{class_filter_key_handler}{Filter\+Key\+Handler}}$<$ Output\+Handler $>$\+::\+Key (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_filter_key_handler_a9c4de4bf706794410bc8bdc40a7cf95d}{Ch}} \texorpdfstring{$\ast$}{*}}]{str}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{len}{, }\item[{bool}]{copy}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{filterkey_8cpp_source_l00047}{47}} of file \mbox{\hyperlink{filterkey_8cpp_source}{filterkey.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ }
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (filterValueDepth\_\ >\ 0)\ }
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ ==\ keyLength\_\ \&\&\ std::memcmp(str,\ keyString\_,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})\ ==\ 0)\ \{}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ filterValueDepth\_\ =\ 1;}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \ \ \ ++filteredKeyCount\_.top();}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ outputHandler\_.Key(str,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ copy);}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00058\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_filter_key_handler_a9dbf14eeda9713e58fc8fc9ce6de0f33}\index{FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}!Key@{Key}}
+\index{Key@{Key}!FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}}
+\doxysubsubsection{\texorpdfstring{Key()}{Key()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_filter_key_handler_a9dbf14eeda9713e58fc8fc9ce6de0f33} 
+template$<$typename Output\+Handler $>$ \\
+bool \mbox{\hyperlink{class_filter_key_handler}{Filter\+Key\+Handler}}$<$ Output\+Handler $>$\+::\+Key (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_filter_key_handler_a9c4de4bf706794410bc8bdc40a7cf95d}{Ch}} \texorpdfstring{$\ast$}{*}}]{str}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{len}{, }\item[{bool}]{copy}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{filterkeydom_8cpp_source_l00048}{48}} of file \mbox{\hyperlink{filterkeydom_8cpp_source}{filterkeydom.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ }
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (filterValueDepth\_\ >\ 0)\ }
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ ==\ keyLength\_\ \&\&\ std::memcmp(str,\ keyString\_,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})\ ==\ 0)\ \{}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \ \ filterValueDepth\_\ =\ 1;}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ \ \ \ ++filteredKeyCount\_.top();}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ outputHandler\_.Key(str,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ copy);}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00059\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_filter_key_handler_a0961f7f4188d46fd1cff814e2c6ad45b}\index{FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}!Null@{Null}}
+\index{Null@{Null}!FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}}
+\doxysubsubsection{\texorpdfstring{Null()}{Null()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_filter_key_handler_a0961f7f4188d46fd1cff814e2c6ad45b} 
+template$<$typename Output\+Handler $>$ \\
+bool \mbox{\hyperlink{class_filter_key_handler}{Filter\+Key\+Handler}}$<$ Output\+Handler $>$\+::\+Null (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{filterkey_8cpp_source_l00026}{26}} of file \mbox{\hyperlink{filterkey_8cpp_source}{filterkey.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00026\ \{\ \textcolor{keywordflow}{return}\ filterValueDepth\_\ >\ 0\ ?\ EndValue()\ :\ outputHandler\_.\mbox{\hyperlink{class_filter_key_handler_a0961f7f4188d46fd1cff814e2c6ad45b}{Null}}()\ \ \ \ \&\&\ EndValue();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_filter_key_handler_a0961f7f4188d46fd1cff814e2c6ad45b}\index{FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}!Null@{Null}}
+\index{Null@{Null}!FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}}
+\doxysubsubsection{\texorpdfstring{Null()}{Null()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_filter_key_handler_a0961f7f4188d46fd1cff814e2c6ad45b} 
+template$<$typename Output\+Handler $>$ \\
+bool \mbox{\hyperlink{class_filter_key_handler}{Filter\+Key\+Handler}}$<$ Output\+Handler $>$\+::\+Null (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{filterkeydom_8cpp_source_l00027}{27}} of file \mbox{\hyperlink{filterkeydom_8cpp_source}{filterkeydom.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00027\ \{\ \textcolor{keywordflow}{return}\ filterValueDepth\_\ >\ 0\ ?\ EndValue()\ :\ outputHandler\_.\mbox{\hyperlink{class_filter_key_handler_a0961f7f4188d46fd1cff814e2c6ad45b}{Null}}()\ \ \ \ \&\&\ EndValue();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_filter_key_handler_ac240886ec2015817189a28f8f66938f9}\index{FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}!RawNumber@{RawNumber}}
+\index{RawNumber@{RawNumber}!FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}}
+\doxysubsubsection{\texorpdfstring{RawNumber()}{RawNumber()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_filter_key_handler_ac240886ec2015817189a28f8f66938f9} 
+template$<$typename Output\+Handler $>$ \\
+bool \mbox{\hyperlink{class_filter_key_handler}{Filter\+Key\+Handler}}$<$ Output\+Handler $>$\+::\+Raw\+Number (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_filter_key_handler_a9c4de4bf706794410bc8bdc40a7cf95d}{Ch}} \texorpdfstring{$\ast$}{*}}]{str}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{len}{, }\item[{bool}]{copy}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{filterkey_8cpp_source_l00033}{33}} of file \mbox{\hyperlink{filterkey_8cpp_source}{filterkey.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00033\ \{\ \textcolor{keywordflow}{return}\ filterValueDepth\_\ >\ 0\ ?\ EndValue()\ :\ outputHandler\_.\mbox{\hyperlink{class_filter_key_handler_ac240886ec2015817189a28f8f66938f9}{RawNumber}}(\mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ \mbox{\hyperlink{namespacefc_a79771837fffd80fcc4bc658ee2fc4b2b}{copy}})\ \&\&\ EndValue();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_filter_key_handler_ac240886ec2015817189a28f8f66938f9}\index{FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}!RawNumber@{RawNumber}}
+\index{RawNumber@{RawNumber}!FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}}
+\doxysubsubsection{\texorpdfstring{RawNumber()}{RawNumber()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_filter_key_handler_ac240886ec2015817189a28f8f66938f9} 
+template$<$typename Output\+Handler $>$ \\
+bool \mbox{\hyperlink{class_filter_key_handler}{Filter\+Key\+Handler}}$<$ Output\+Handler $>$\+::\+Raw\+Number (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_filter_key_handler_a9c4de4bf706794410bc8bdc40a7cf95d}{Ch}} \texorpdfstring{$\ast$}{*}}]{str}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{len}{, }\item[{bool}]{copy}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{filterkeydom_8cpp_source_l00034}{34}} of file \mbox{\hyperlink{filterkeydom_8cpp_source}{filterkeydom.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00034\ \{\ \textcolor{keywordflow}{return}\ filterValueDepth\_\ >\ 0\ ?\ EndValue()\ :\ outputHandler\_.\mbox{\hyperlink{class_filter_key_handler_ac240886ec2015817189a28f8f66938f9}{RawNumber}}(\mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ \mbox{\hyperlink{namespacefc_a79771837fffd80fcc4bc658ee2fc4b2b}{copy}})\ \&\&\ EndValue();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_filter_key_handler_a3f75f5092a076657f7ab016271a7d559}\index{FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}!StartArray@{StartArray}}
+\index{StartArray@{StartArray}!FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}}
+\doxysubsubsection{\texorpdfstring{StartArray()}{StartArray()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_filter_key_handler_a3f75f5092a076657f7ab016271a7d559} 
+template$<$typename Output\+Handler $>$ \\
+bool \mbox{\hyperlink{class_filter_key_handler}{Filter\+Key\+Handler}}$<$ Output\+Handler $>$\+::\+Start\+Array (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{filterkey_8cpp_source_l00073}{73}} of file \mbox{\hyperlink{filterkey_8cpp_source}{filterkey.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (filterValueDepth\_\ >\ 0)\ \{}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \ \ \ filterValueDepth\_++;}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ outputHandler\_.StartArray();}
+\DoxyCodeLine{00080\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_filter_key_handler_a3f75f5092a076657f7ab016271a7d559}\index{FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}!StartArray@{StartArray}}
+\index{StartArray@{StartArray}!FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}}
+\doxysubsubsection{\texorpdfstring{StartArray()}{StartArray()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_filter_key_handler_a3f75f5092a076657f7ab016271a7d559} 
+template$<$typename Output\+Handler $>$ \\
+bool \mbox{\hyperlink{class_filter_key_handler}{Filter\+Key\+Handler}}$<$ Output\+Handler $>$\+::\+Start\+Array (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{filterkeydom_8cpp_source_l00074}{74}} of file \mbox{\hyperlink{filterkeydom_8cpp_source}{filterkeydom.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (filterValueDepth\_\ >\ 0)\ \{}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ filterValueDepth\_++;}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ outputHandler\_.StartArray();}
+\DoxyCodeLine{00081\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_filter_key_handler_ab595e71b6dc9ece313f2ab9a255667f7}\index{FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}!StartObject@{StartObject}}
+\index{StartObject@{StartObject}!FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}}
+\doxysubsubsection{\texorpdfstring{StartObject()}{StartObject()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_filter_key_handler_ab595e71b6dc9ece313f2ab9a255667f7} 
+template$<$typename Output\+Handler $>$ \\
+bool \mbox{\hyperlink{class_filter_key_handler}{Filter\+Key\+Handler}}$<$ Output\+Handler $>$\+::\+Start\+Object (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{filterkey_8cpp_source_l00036}{36}} of file \mbox{\hyperlink{filterkey_8cpp_source}{filterkey.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ }
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (filterValueDepth\_\ >\ 0)\ \{}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ filterValueDepth\_++;}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \ \ \ filteredKeyCount\_.push(0);}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ outputHandler\_.StartObject();}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00045\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_filter_key_handler_ab595e71b6dc9ece313f2ab9a255667f7}\index{FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}!StartObject@{StartObject}}
+\index{StartObject@{StartObject}!FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}}
+\doxysubsubsection{\texorpdfstring{StartObject()}{StartObject()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_filter_key_handler_ab595e71b6dc9ece313f2ab9a255667f7} 
+template$<$typename Output\+Handler $>$ \\
+bool \mbox{\hyperlink{class_filter_key_handler}{Filter\+Key\+Handler}}$<$ Output\+Handler $>$\+::\+Start\+Object (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{filterkeydom_8cpp_source_l00037}{37}} of file \mbox{\hyperlink{filterkeydom_8cpp_source}{filterkeydom.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ }
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (filterValueDepth\_\ >\ 0)\ \{}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ filterValueDepth\_++;}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \ \ \ filteredKeyCount\_.push(0);}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ outputHandler\_.StartObject();}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00046\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_filter_key_handler_a2e5ee8ad7545dafcb0c8a60d82e7c579}\index{FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}!String@{String}}
+\index{String@{String}!FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}}
+\doxysubsubsection{\texorpdfstring{String()}{String()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_filter_key_handler_a2e5ee8ad7545dafcb0c8a60d82e7c579} 
+template$<$typename Output\+Handler $>$ \\
+bool \mbox{\hyperlink{class_filter_key_handler}{Filter\+Key\+Handler}}$<$ Output\+Handler $>$\+::\+String (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_filter_key_handler_a9c4de4bf706794410bc8bdc40a7cf95d}{Ch}} \texorpdfstring{$\ast$}{*}}]{str}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{len}{, }\item[{bool}]{copy}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{filterkey_8cpp_source_l00034}{34}} of file \mbox{\hyperlink{filterkey_8cpp_source}{filterkey.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00034\ \{\ \textcolor{keywordflow}{return}\ filterValueDepth\_\ >\ 0\ ?\ EndValue()\ :\ outputHandler\_.\mbox{\hyperlink{class_filter_key_handler_a2e5ee8ad7545dafcb0c8a60d82e7c579}{String}}\ \ \ (\mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ \mbox{\hyperlink{namespacefc_a79771837fffd80fcc4bc658ee2fc4b2b}{copy}})\ \&\&\ EndValue();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_filter_key_handler_a2e5ee8ad7545dafcb0c8a60d82e7c579}\index{FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}!String@{String}}
+\index{String@{String}!FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}}
+\doxysubsubsection{\texorpdfstring{String()}{String()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_filter_key_handler_a2e5ee8ad7545dafcb0c8a60d82e7c579} 
+template$<$typename Output\+Handler $>$ \\
+bool \mbox{\hyperlink{class_filter_key_handler}{Filter\+Key\+Handler}}$<$ Output\+Handler $>$\+::\+String (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_filter_key_handler_a9c4de4bf706794410bc8bdc40a7cf95d}{Ch}} \texorpdfstring{$\ast$}{*}}]{str}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{len}{, }\item[{bool}]{copy}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{filterkeydom_8cpp_source_l00035}{35}} of file \mbox{\hyperlink{filterkeydom_8cpp_source}{filterkeydom.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00035\ \{\ \textcolor{keywordflow}{return}\ filterValueDepth\_\ >\ 0\ ?\ EndValue()\ :\ outputHandler\_.\mbox{\hyperlink{class_filter_key_handler_a2e5ee8ad7545dafcb0c8a60d82e7c579}{String}}\ \ \ (\mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ \mbox{\hyperlink{namespacefc_a79771837fffd80fcc4bc658ee2fc4b2b}{copy}})\ \&\&\ EndValue();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_filter_key_handler_afc365d8748bd77fa1d1a98d56bdcd12c}\index{FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}!Uint@{Uint}}
+\index{Uint@{Uint}!FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}}
+\doxysubsubsection{\texorpdfstring{Uint()}{Uint()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_filter_key_handler_afc365d8748bd77fa1d1a98d56bdcd12c} 
+template$<$typename Output\+Handler $>$ \\
+bool \mbox{\hyperlink{class_filter_key_handler}{Filter\+Key\+Handler}}$<$ Output\+Handler $>$\+::\+Uint (\begin{DoxyParamCaption}\item[{unsigned}]{u}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{filterkey_8cpp_source_l00029}{29}} of file \mbox{\hyperlink{filterkey_8cpp_source}{filterkey.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00029\ \{\ \textcolor{keywordflow}{return}\ filterValueDepth\_\ >\ 0\ ?\ EndValue()\ :\ outputHandler\_.\mbox{\hyperlink{class_filter_key_handler_afc365d8748bd77fa1d1a98d56bdcd12c}{Uint}}(u)\ \ \ \&\&\ EndValue();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_filter_key_handler_afc365d8748bd77fa1d1a98d56bdcd12c}\index{FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}!Uint@{Uint}}
+\index{Uint@{Uint}!FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}}
+\doxysubsubsection{\texorpdfstring{Uint()}{Uint()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_filter_key_handler_afc365d8748bd77fa1d1a98d56bdcd12c} 
+template$<$typename Output\+Handler $>$ \\
+bool \mbox{\hyperlink{class_filter_key_handler}{Filter\+Key\+Handler}}$<$ Output\+Handler $>$\+::\+Uint (\begin{DoxyParamCaption}\item[{unsigned}]{u}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{filterkeydom_8cpp_source_l00030}{30}} of file \mbox{\hyperlink{filterkeydom_8cpp_source}{filterkeydom.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00030\ \{\ \textcolor{keywordflow}{return}\ filterValueDepth\_\ >\ 0\ ?\ EndValue()\ :\ outputHandler\_.\mbox{\hyperlink{class_filter_key_handler_afc365d8748bd77fa1d1a98d56bdcd12c}{Uint}}(u)\ \ \ \&\&\ EndValue();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_filter_key_handler_a93eed6c20bd41eb6bd597861e43bfe12}\index{FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}!Uint64@{Uint64}}
+\index{Uint64@{Uint64}!FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}}
+\doxysubsubsection{\texorpdfstring{Uint64()}{Uint64()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_filter_key_handler_a93eed6c20bd41eb6bd597861e43bfe12} 
+template$<$typename Output\+Handler $>$ \\
+bool \mbox{\hyperlink{class_filter_key_handler}{Filter\+Key\+Handler}}$<$ Output\+Handler $>$\+::\+Uint64 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{u}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{filterkey_8cpp_source_l00031}{31}} of file \mbox{\hyperlink{filterkey_8cpp_source}{filterkey.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00031\ \{\ \textcolor{keywordflow}{return}\ filterValueDepth\_\ >\ 0\ ?\ EndValue()\ :\ outputHandler\_.\mbox{\hyperlink{class_filter_key_handler_a93eed6c20bd41eb6bd597861e43bfe12}{Uint64}}(u)\ \&\&\ EndValue();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_filter_key_handler_a93eed6c20bd41eb6bd597861e43bfe12}\index{FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}!Uint64@{Uint64}}
+\index{Uint64@{Uint64}!FilterKeyHandler$<$ OutputHandler $>$@{FilterKeyHandler$<$ OutputHandler $>$}}
+\doxysubsubsection{\texorpdfstring{Uint64()}{Uint64()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_filter_key_handler_a93eed6c20bd41eb6bd597861e43bfe12} 
+template$<$typename Output\+Handler $>$ \\
+bool \mbox{\hyperlink{class_filter_key_handler}{Filter\+Key\+Handler}}$<$ Output\+Handler $>$\+::\+Uint64 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{u}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{filterkeydom_8cpp_source_l00032}{32}} of file \mbox{\hyperlink{filterkeydom_8cpp_source}{filterkeydom.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00032\ \{\ \textcolor{keywordflow}{return}\ filterValueDepth\_\ >\ 0\ ?\ EndValue()\ :\ outputHandler\_.\mbox{\hyperlink{class_filter_key_handler_a93eed6c20bd41eb6bd597861e43bfe12}{Uint64}}(u)\ \&\&\ EndValue();\ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/example/filterkey/\mbox{\hyperlink{filterkey_8cpp}{filterkey.\+cpp}}\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/example/filterkeydom/\mbox{\hyperlink{filterkeydom_8cpp}{filterkeydom.\+cpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,16 @@
+<map id="sysio::chain::webassembly::interface::recover_key" name="sysio::chain::webassembly::interface::recover_key">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,72,185,113"/>
+<area shape="rect" id="Node000002" href="$namespacefc.html#a150ca4cd9c0318ca45dc0dc7df5d58b9" title=" " alt="" coords="251,80,326,106"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="185,90,235,90,235,96,185,96"/>
+<area shape="rect" id="Node000003" href="$namespacefc_1_1raw.html#a3a18d8161aa5b4f4f02b6fcfdff5e5d1" title=" " alt="" coords="412,29,509,55"/>
+<area shape="poly" id="edge6_Node000001_Node000003" title=" " alt="" coords="185,73,232,65,396,45,397,51,233,70,186,78"/>
+<area shape="rect" id="Node000006" href="$namespacefc_1_1raw.html#a0b442d98ceb22dd5a6ae84745e43ffab" title=" " alt="" coords="233,153,344,179"/>
+<area shape="poly" id="edge7_Node000001_Node000006" title=" " alt="" coords="151,111,239,145,237,150,150,116"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="326,79,398,57,400,63,327,84"/>
+<area shape="rect" id="Node000004" href="$classfc_1_1sha256_1_1encoder.html#a4d8b8181e912194cf98a56164671adf8" title=" " alt="" coords="392,79,528,120"/>
+<area shape="poly" id="edge4_Node000002_Node000004" title=" " alt="" coords="326,92,376,94,376,99,326,97"/>
+<area shape="poly" id="edge3_Node000003_Node000003" title=" " alt="" coords="431,30,425,21,429,11,441,5,460,3,481,5,492,12,489,16,479,10,460,8,442,10,433,15,431,20,436,28"/>
+<area shape="rect" id="Node000005" href="$classfc_1_1sha256.html#ab897537f6c524085b28049be51ed370d" title=" " alt="" coords="576,87,692,112"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="529,97,560,97,560,102,529,102"/>
+<area shape="poly" id="edge8_Node000006_Node000006" title=" " alt="" coords="259,154,254,145,257,135,269,129,288,127,309,129,320,136,317,140,307,134,288,132,270,134,261,139,259,144,264,152"/>
+</map>

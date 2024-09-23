@@ -1,0 +1,21 @@
+<map id="softfloat_normSubnormalF128Sig" name="softfloat_normSubnormalF128Sig">
+<area shape="rect" id="Node000001" title=" " alt="" coords="429,149,643,174"/>
+<area shape="rect" id="Node000002" href="$softfloat_2source_2f128__div_8c.html#a34e3cf1a832e7bd8d45dae1578d79b95" title=" " alt="" coords="272,17,342,42"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="503,142,446,104,380,64,341,45,343,41,382,59,449,99,506,137"/>
+<area shape="rect" id="Node000004" href="$softfloat_2source_2f128__mul_8c.html#acff69fe493c4e1c8387aa9f94393e0bd" title=" " alt="" coords="270,74,344,100"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="479,146,344,102,345,96,481,141"/>
+<area shape="rect" id="Node000006" href="$softfloat_2source_2f128__rem_8c.html#a4ab1480151227545db6f932a0859234f" title=" " alt="" coords="269,124,344,149"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="413,151,344,143,345,138,414,145"/>
+<area shape="rect" id="Node000007" href="$softfloat_2source_2f128__sqrt_8c.html#ae2d66508e90a450d258c67046d4c7d43" title=" " alt="" coords="269,173,344,198"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="414,177,345,184,344,179,413,172"/>
+<area shape="rect" id="Node000008" href="$softfloat_2source_2f128__to__ext_f80_8c.html#ae38e1abfc5b22ee65ccf8e9aff680c59" title=" " alt="" coords="251,222,362,248"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="479,182,351,224,349,219,478,177"/>
+<area shape="rect" id="Node000009" href="$softfloat_2source_2s__mul_add_f128_8c.html#aafd8aa968a9a82bc14a311c6f0e6fecd" title=" " alt="" coords="233,272,381,297"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="507,186,450,224,382,263,356,273,354,268,380,258,448,220,504,182"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1chain_1_1webassembly_1_1interface.html#a40f929e9a17c255f673744aaba49dfac" title=" " alt="" coords="5,5,185,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="256,31,185,30,185,25,256,26"/>
+<area shape="rect" id="Node000005" href="$classsysio_1_1chain_1_1webassembly_1_1interface.html#abd6a0d70c0b018f3d40496bf959359b6" title=" " alt="" coords="5,71,185,111"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="254,91,185,92,185,87,254,85"/>
+<area shape="rect" id="Node000010" href="$softfloat_2source_2f128__mul_add_8c.html#a57cd6be2f1f912fec08ddd22fb3dd3fa" title=" " alt="" coords="46,272,144,297"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="217,287,144,287,144,282,217,282"/>
+</map>

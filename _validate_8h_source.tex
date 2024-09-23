@@ -1,0 +1,68 @@
+\doxysection{Validate.\+h}
+\hypertarget{_validate_8h_source}{}\label{_validate_8h_source}\index{libraries/wasm-\/jit/Include/IR/Validate.h@{libraries/wasm-\/jit/Include/IR/Validate.h}}
+\mbox{\hyperlink{_validate_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00003}00003\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_i_r_8h}{IR.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00004}00004\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_operators_8h}{IR/Operators.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00008}00008\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_i_r}{IR}}}
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00009}00009\ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00010}00010\ \ \ \ \ \textcolor{keyword}{struct\ }Module;}
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00011}00011\ \ \ \ \ \textcolor{keyword}{struct\ }FunctionDef;}
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00013}\mbox{\hyperlink{struct_i_r_1_1_validation_exception}{00013}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_i_r_1_1_validation_exception}{ValidationException}}}
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00014}00014\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00015}\mbox{\hyperlink{struct_i_r_1_1_validation_exception_a9308689c3efeb272361bf9a07bf8f8ae}{00015}}\ \ \ \ \ \ \ \ \ std::string\ \mbox{\hyperlink{struct_i_r_1_1_validation_exception_a9308689c3efeb272361bf9a07bf8f8ae}{message}};}
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00016}\mbox{\hyperlink{struct_i_r_1_1_validation_exception_afd217fe01d97a27f638e7753027bb7c0}{00016}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_i_r_1_1_validation_exception_afd217fe01d97a27f638e7753027bb7c0}{ValidationException}}(std::string\&\&\ inMessage):\ message(inMessage)\ \{\}}
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00017}00017\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00019}00019\ \ \ \ \ \textcolor{keyword}{struct\ }CodeValidationStreamImpl;}
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00021}\mbox{\hyperlink{struct_i_r_1_1_code_validation_stream}{00021}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_i_r_1_1_code_validation_stream}{CodeValidationStream}}}
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00022}00022\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00023}00023\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_i_r_8h_a0ee024894bb6f700da724f2f1a120abb}{IR\_API}}\ \mbox{\hyperlink{struct_i_r_1_1_code_validation_stream_a6ccf3c90dcc91490e552b3db8e31601b}{CodeValidationStream}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_i_r_1_1_module}{Module}}\&\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}},\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_i_r_1_1_function_def}{FunctionDef}}\&\ function);}
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00024}00024\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_i_r_8h_a0ee024894bb6f700da724f2f1a120abb}{IR\_API}}\ \mbox{\hyperlink{struct_i_r_1_1_code_validation_stream_a8e53fdcd7efdddd5d459f8bebb5e954f}{\string~CodeValidationStream}}();}
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00025}00025\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00026}00026\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_i_r_8h_a0ee024894bb6f700da724f2f1a120abb}{IR\_API}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_i_r_1_1_code_validation_stream_a7b3f5a99b18e33290b74a36a79004370}{finish}}();}
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00028}\mbox{\hyperlink{_validate_8h_a0d04d0b7b632d732f24972574f4bde51}{00028}}\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#define\ VISIT\_OPCODE(\_,name,nameString,Imm,...)\ IR\_API\ void\ name(Imm\ imm\ =\ \{\});}}
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00029}00029\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_operators_8h_a8b6ca1413466de9d4478329c481520a4}{ENUM\_OPERATORS}}(\mbox{\hyperlink{namespace_i_r_a59653fd60bb296de971e5f945c66933aa275346406ff338dd8adf063f9a066141}{VISIT\_OPCODE}})}
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00030}00030\ \ \ \ \ \ \ \ \ \textcolor{preprocessor}{\#undef\ VISIT\_OPCODE}}
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00032}00032\ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00033}00033\ \ \ \ \ \ \ \ \ CodeValidationStreamImpl*\ impl;}
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00034}00034\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00036}00036\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ InnerStream>}
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00037}\mbox{\hyperlink{struct_i_r_1_1_code_validation_proxy_stream}{00037}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_i_r_1_1_code_validation_proxy_stream}{CodeValidationProxyStream}}}
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00038}00038\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00039}\mbox{\hyperlink{struct_i_r_1_1_code_validation_proxy_stream_ac7481aea51d9dd38c69881c38bf82db0}{00039}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_i_r_1_1_code_validation_proxy_stream_ac7481aea51d9dd38c69881c38bf82db0}{CodeValidationProxyStream}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_i_r_1_1_module}{Module}}\&\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}},\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_i_r_1_1_function_def}{FunctionDef}}\&\ function,InnerStream\&\ inInnerStream)}
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00040}00040\ \ \ \ \ \ \ \ \ :\ codeValidationStream(\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}},function)}
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00041}00041\ \ \ \ \ \ \ \ \ ,\ innerStream(inInnerStream)}
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00042}00042\ \ \ \ \ \ \ \ \ \{\}}
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00043}00043\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00044}\mbox{\hyperlink{struct_i_r_1_1_code_validation_proxy_stream_af5faff2a07a2acdb1a678bddc244c2ac}{00044}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_i_r_1_1_code_validation_proxy_stream_af5faff2a07a2acdb1a678bddc244c2ac}{finishValidation}}()\ \{\ codeValidationStream.\mbox{\hyperlink{struct_i_r_1_1_code_validation_stream_a7b3f5a99b18e33290b74a36a79004370}{finish}}();\ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00046}00046\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#define\ VISIT\_OPCODE(\_,name,nameString,Imm,...)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00047}00047\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ void\ name(Imm\ imm\ =\ \{\})\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00048}00048\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00049}00049\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ codeValidationStream.name(imm);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00050}00050\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ innerStream.name(imm);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00051}00051\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \}}}
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00052}00052\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_operators_8h_a8b6ca1413466de9d4478329c481520a4}{ENUM\_OPERATORS}}(\mbox{\hyperlink{namespace_i_r_a59653fd60bb296de971e5f945c66933aa275346406ff338dd8adf063f9a066141}{VISIT\_OPCODE}})}
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00053}00053\ \ \ \ \ \ \ \ \ \textcolor{preprocessor}{\#undef\ VISIT\_OPCODE}}
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00054}00054\ }
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00055}00055\ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00057}00057\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_i_r_1_1_code_validation_stream}{CodeValidationStream}}\ codeValidationStream;}
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00058}00058\ \ \ \ \ \ \ \ \ InnerStream\&\ innerStream;}
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00059}00059\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00061}00061\ \ \ \ \ \mbox{\hyperlink{_i_r_8h_a0ee024894bb6f700da724f2f1a120abb}{IR\_API}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespace_i_r_a623d4533e80c60c6d4a5217635b7602f}{validateDefinitions}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_i_r_1_1_module}{IR::Module}}\&\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}});}
+\DoxyCodeLine{\Hypertarget{_validate_8h_source_l00062}00062\ \}}
+
+\end{DoxyCode}

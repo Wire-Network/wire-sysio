@@ -1,0 +1,133 @@
+\doxysection{lendrex\+\_\+subcommand Struct Reference}
+\hypertarget{structlendrex__subcommand}{}\label{structlendrex__subcommand}\index{lendrex\_subcommand@{lendrex\_subcommand}}
+
+
+Collaboration diagram for lendrex\+\_\+subcommand\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=191pt]{structlendrex__subcommand__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structlendrex__subcommand_af1c0243c6ef5baf1e93ec9b39cd39518}{lendrex\+\_\+subcommand}} (\mbox{\hyperlink{class_c_l_i_1_1_app}{CLI\+::\+App}} \texorpdfstring{$\ast$}{*}action\+Root)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structlendrex__subcommand_a91c046668fb698f4fecbf1b6f6426c77}{from\+\_\+str}}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structlendrex__subcommand_ac64f7ff28a4132a76e1d9943f0111e65}{amount\+\_\+str}}
+\item 
+const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \mbox{\hyperlink{structlendrex__subcommand_a382484d93c49288cd9ee3c387bf06ca6}{act\+\_\+name1}} \{ "{}deposit"{}\+\_\+n \}
+\item 
+const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \mbox{\hyperlink{structlendrex__subcommand_adb060ab70ba3ef111fa018cae64af2b3}{act\+\_\+name2}} \{ "{}buyrex"{}\+\_\+n \}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01872}{1872}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structlendrex__subcommand_af1c0243c6ef5baf1e93ec9b39cd39518}\index{lendrex\_subcommand@{lendrex\_subcommand}!lendrex\_subcommand@{lendrex\_subcommand}}
+\index{lendrex\_subcommand@{lendrex\_subcommand}!lendrex\_subcommand@{lendrex\_subcommand}}
+\doxysubsubsection{\texorpdfstring{lendrex\_subcommand()}{lendrex\_subcommand()}}
+{\footnotesize\ttfamily \label{structlendrex__subcommand_af1c0243c6ef5baf1e93ec9b39cd39518} 
+lendrex\+\_\+subcommand\+::lendrex\+\_\+subcommand (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_c_l_i_1_1_app}{CLI\+::\+App}} \texorpdfstring{$\ast$}{*}}]{action\+Root}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01878}{1878}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01878\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01879\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ lendrex\ =\ actionRoot-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_a8b461d2233ec4121259011b5ed24b336}{add\_subcommand}}(\textcolor{stringliteral}{"{}lendrex"{}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}Deposit\ tokens\ to\ REX\ fund\ and\ use\ the\ tokens\ to\ buy\ REX"{}}));}
+\DoxyCodeLine{01880\ \ \ \ \ \ \ lendrex-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_a8c812d42c7720ecb5cd0aec41b5aa941}{add\_option}}(\textcolor{stringliteral}{"{}from"{}},\ \ \ \mbox{\hyperlink{structlendrex__subcommand_a91c046668fb698f4fecbf1b6f6426c77}{from\_str}},\ \ \ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}Account\ buying\ REX\ tokens"{}}))-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a}{required}}();}
+\DoxyCodeLine{01881\ \ \ \ \ \ \ lendrex-\/>add\_option(\textcolor{stringliteral}{"{}amount"{}},\ \mbox{\hyperlink{structlendrex__subcommand_ac64f7ff28a4132a76e1d9943f0111e65}{amount\_str}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}Amount\ of\ liquid\ tokens\ to\ be\ used\ in\ buying\ REX"{}}))-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a}{required}}();}
+\DoxyCodeLine{01882\ \ \ \ \ \ \ \mbox{\hyperlink{programs_2clio_2main_8cpp_aa5d53f41b83b5323c73622fbbb15e9cd}{add\_standard\_transaction\_options}}(lendrex,\ \textcolor{stringliteral}{"{}from@active"{}});}
+\DoxyCodeLine{01883\ \ \ \ \ \ \ lendrex-\/>callback([\textcolor{keyword}{this}]\ \{}
+\DoxyCodeLine{01884\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}\ act\_payload1\ =\ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}()}
+\DoxyCodeLine{01885\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}owner"{}},\ \ \mbox{\hyperlink{structlendrex__subcommand_a91c046668fb698f4fecbf1b6f6426c77}{from\_str}})}
+\DoxyCodeLine{01886\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}amount"{}},\ \mbox{\hyperlink{structlendrex__subcommand_ac64f7ff28a4132a76e1d9943f0111e65}{amount\_str}});}
+\DoxyCodeLine{01887\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}\ act\_payload2\ =\ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}()}
+\DoxyCodeLine{01888\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}from"{}},\ \ \ \mbox{\hyperlink{structlendrex__subcommand_a91c046668fb698f4fecbf1b6f6426c77}{from\_str}})}
+\DoxyCodeLine{01889\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}amount"{}},\ \mbox{\hyperlink{structlendrex__subcommand_ac64f7ff28a4132a76e1d9943f0111e65}{amount\_str}});}
+\DoxyCodeLine{01890\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ accountPermissions\ =\ \mbox{\hyperlink{programs_2clio_2main_8cpp_a2b91ca5dbe7cc4ab287d0e44c3037552}{get\_account\_permissions}}(\mbox{\hyperlink{programs_2clio_2main_8cpp_ad552924cb151dcd5b60c73856d1ff706}{tx\_permission}},\ \{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(\mbox{\hyperlink{structlendrex__subcommand_a91c046668fb698f4fecbf1b6f6426c77}{from\_str}}),\ config::active\_name\});}
+\DoxyCodeLine{01891\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{programs_2clio_2main_8cpp_aaf784434864a29e4835be7465173d1ab}{send\_actions}}(\{\mbox{\hyperlink{programs_2clio_2main_8cpp_a067e20df5f65333b0c3cf5840bc37dea}{create\_action}}(accountPermissions,\ config::system\_account\_name,\ \mbox{\hyperlink{structlendrex__subcommand_a382484d93c49288cd9ee3c387bf06ca6}{act\_name1}},\ act\_payload1),}
+\DoxyCodeLine{01892\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{programs_2clio_2main_8cpp_a067e20df5f65333b0c3cf5840bc37dea}{create\_action}}(accountPermissions,\ config::system\_account\_name,\ \mbox{\hyperlink{structlendrex__subcommand_adb060ab70ba3ef111fa018cae64af2b3}{act\_name2}},\ act\_payload2)\});}
+\DoxyCodeLine{01893\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{01894\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structlendrex__subcommand_af1c0243c6ef5baf1e93ec9b39cd39518_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structlendrex__subcommand_a382484d93c49288cd9ee3c387bf06ca6}\index{lendrex\_subcommand@{lendrex\_subcommand}!act\_name1@{act\_name1}}
+\index{act\_name1@{act\_name1}!lendrex\_subcommand@{lendrex\_subcommand}}
+\doxysubsubsection{\texorpdfstring{act\_name1}{act\_name1}}
+{\footnotesize\ttfamily \label{structlendrex__subcommand_a382484d93c49288cd9ee3c387bf06ca6} 
+const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} lendrex\+\_\+subcommand\+::act\+\_\+name1 \{ "{}deposit"{}\+\_\+n \}}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01875}{1875}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01875\ \{\ \textcolor{stringliteral}{"{}deposit"{}}\_n\ \};}
+
+\end{DoxyCode}
+\Hypertarget{structlendrex__subcommand_adb060ab70ba3ef111fa018cae64af2b3}\index{lendrex\_subcommand@{lendrex\_subcommand}!act\_name2@{act\_name2}}
+\index{act\_name2@{act\_name2}!lendrex\_subcommand@{lendrex\_subcommand}}
+\doxysubsubsection{\texorpdfstring{act\_name2}{act\_name2}}
+{\footnotesize\ttfamily \label{structlendrex__subcommand_adb060ab70ba3ef111fa018cae64af2b3} 
+const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} lendrex\+\_\+subcommand\+::act\+\_\+name2 \{ "{}buyrex"{}\+\_\+n \}}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01876}{1876}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01876\ \{\ \textcolor{stringliteral}{"{}buyrex"{}}\_n\ \};}
+
+\end{DoxyCode}
+\Hypertarget{structlendrex__subcommand_ac64f7ff28a4132a76e1d9943f0111e65}\index{lendrex\_subcommand@{lendrex\_subcommand}!amount\_str@{amount\_str}}
+\index{amount\_str@{amount\_str}!lendrex\_subcommand@{lendrex\_subcommand}}
+\doxysubsubsection{\texorpdfstring{amount\_str}{amount\_str}}
+{\footnotesize\ttfamily \label{structlendrex__subcommand_ac64f7ff28a4132a76e1d9943f0111e65} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} lendrex\+\_\+subcommand\+::amount\+\_\+str}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01874}{1874}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{structlendrex__subcommand_a91c046668fb698f4fecbf1b6f6426c77}\index{lendrex\_subcommand@{lendrex\_subcommand}!from\_str@{from\_str}}
+\index{from\_str@{from\_str}!lendrex\_subcommand@{lendrex\_subcommand}}
+\doxysubsubsection{\texorpdfstring{from\_str}{from\_str}}
+{\footnotesize\ttfamily \label{structlendrex__subcommand_a91c046668fb698f4fecbf1b6f6426c77} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} lendrex\+\_\+subcommand\+::from\+\_\+str}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01873}{1873}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+programs/clio/\mbox{\hyperlink{programs_2clio_2main_8cpp}{main.\+cpp}}\end{DoxyCompactItemize}

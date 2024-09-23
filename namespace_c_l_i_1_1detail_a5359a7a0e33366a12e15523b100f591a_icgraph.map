@@ -1,0 +1,112 @@
+<map id="CLI::detail::remove_underscore" name="CLI::detail::remove_underscore">
+<area shape="rect" id="Node000001" title="remove underscores from a string" alt="" coords="1742,896,1874,937"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_app.html#a3ba6eb33f3ee9cd1a126385fa44f2c16" title="Check the name, case insensitive and underscore insensitive if set." alt="" coords="1538,756,1694,782"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1766,889,1633,784,1636,780,1770,884"/>
+<area shape="rect" id="Node000023" href="$class_c_l_i_1_1_option.html#af457a9a493f06f212cad9f854b281200" title="Check a name. Requires &quot;&#45;&quot; or &quot;&#45;&#45;&quot; for short / long, supports positional name." alt="" coords="862,1027,1032,1052"/>
+<area shape="poly" id="edge24_Node000001_Node000023" title=" " alt="" coords="1729,945,1526,1001,1403,1029,1278,1049,1225,1053,1184,1053,1090,1049,1032,1047,1033,1041,1090,1043,1184,1048,1225,1048,1277,1044,1402,1023,1525,996,1728,940"/>
+<area shape="rect" id="Node000042" href="$namespace_c_l_i_1_1detail.html#a356b9c9cc904af2b0a918fd55e86cd9c" title="Check if a string is a member of a list of strings and optionally ignore case or ignore underscores." alt="" coords="1325,904,1490,930"/>
+<area shape="poly" id="edge39_Node000001_Node000042" title=" " alt="" coords="1726,919,1490,919,1490,914,1726,914"/>
+<area shape="rect" id="Node000120" href="$namespace_c_l_i.html#a111b6f05d21b9b84e7ba933ade79884c" title="Helper function to allow ignore_underscore to be passed to IsMember or Transform." alt="" coords="1538,879,1694,904"/>
+<area shape="poly" id="edge59_Node000001_Node000120" title=" " alt="" coords="1726,909,1694,904,1695,899,1727,903"/>
+<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_app.html#aade2ac30d86141da0d55d9181ac8b710" title="Helper function to run through all possible comparisons of subcommand names to check there is no over..." alt="" coords="1331,667,1484,708"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="1565,752,1461,711,1463,706,1567,747"/>
+<area shape="poly" id="edge3_Node000003_Node000003" title=" " alt="" coords="1441,654,1429,648,1407,646,1388,648,1376,652,1371,658,1373,666,1368,667,1366,657,1373,648,1386,643,1408,640,1430,643,1444,649"/>
+<area shape="rect" id="Node000004" href="$class_c_l_i_1_1_app.html#a99e2ddf1ae27593e19162eba3aec5fcd" title="Add a previously created app as a subcommand." alt="" coords="1090,348,1277,374"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="1399,652,1386,594,1364,522,1347,485,1328,449,1304,416,1276,387,1260,376,1262,372,1279,383,1308,412,1332,446,1352,482,1369,520,1392,592,1404,651"/>
+<area shape="rect" id="Node000005" href="$class_c_l_i_1_1_app.html#ad5d02ee857879c6abd007c8293a1151a" title="Set an alias for the app." alt="" coords="1130,649,1238,675"/>
+<area shape="poly" id="edge5_Node000003_Node000005" title=" " alt="" coords="1315,680,1238,671,1239,666,1316,674"/>
+<area shape="rect" id="Node000008" href="$class_c_l_i_1_1_app.html#a1e0b05ed58f80301b945ffc344b61aa3" title="Ignore case. Subcommands inherit value." alt="" coords="1108,699,1259,724"/>
+<area shape="poly" id="edge8_Node000003_Node000008" title=" " alt="" coords="1316,700,1260,706,1259,701,1316,695"/>
+<area shape="rect" id="Node000009" href="$class_c_l_i_1_1_app.html#aca4afbde81a59b25fc514b960d472c08" title="Ignore underscore. Subcommands inherit value." alt="" coords="1090,748,1277,774"/>
+<area shape="poly" id="edge9_Node000003_Node000009" title=" " alt="" coords="1343,716,1278,739,1242,750,1240,745,1277,734,1341,711"/>
+<area shape="rect" id="Node000010" href="$class_c_l_i_1_1_app.html#a76d7d45b60647632df392dd5e696877a" title="Set a name for the app (empty will use parser to set the name)" alt="" coords="1127,397,1240,423"/>
+<area shape="poly" id="edge10_Node000003_Node000010" title=" " alt="" coords="1378,656,1194,425,1198,422,1382,653"/>
+<area shape="rect" id="Node000006" href="$classcpp_1_1ast_1_1_typedef.html#ac461b1e6209716f39cc06baa5d726f56" title=" " alt="" coords="866,679,1028,704"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="1115,673,1028,684,1027,679,1114,668"/>
+<area shape="rect" id="Node000007" href="$classcpp_1_1ast_1_1_typedef.html#ad94253075cea5a5110bf5e9b8fe0ee61" title=" " alt="" coords="862,728,1032,754"/>
+<area shape="poly" id="edge7_Node000005_Node000007" title=" " alt="" coords="1116,680,1091,689,1067,704,1043,719,1013,730,1011,725,1041,714,1065,699,1089,684,1114,675"/>
+<area shape="poly" id="edge16_Node000010_Node000006" title=" " alt="" coords="1178,438,1161,488,1134,550,1095,614,1071,643,1044,668,1023,680,1020,676,1040,664,1067,639,1091,611,1129,548,1156,486,1173,437"/>
+<area shape="rect" id="Node000011" href="$classcpp_1_1ast_1_1___nested_type.html#a944c5478ca7586a71d1d10bfcc7be1bb" title=" " alt="" coords="872,254,1022,294"/>
+<area shape="poly" id="edge11_Node000010_Node000011" title=" " alt="" coords="1111,401,1088,388,1071,368,1063,348,1056,327,1040,308,1021,296,1023,291,1044,304,1061,325,1068,346,1075,365,1092,384,1113,396"/>
+<area shape="rect" id="Node000012" href="$classcpp_1_1ast_1_1_class.html#a572953e3438a048cdc5f103fbf6ab7b0" title=" " alt="" coords="872,319,1022,344"/>
+<area shape="poly" id="edge12_Node000010_Node000012" title=" " alt="" coords="1111,397,1089,389,1065,373,1041,358,1011,347,1013,342,1043,353,1067,369,1091,384,1113,392"/>
+<area shape="rect" id="Node000013" href="$classcpp_1_1ast_1_1_define.html#a8e51e0611e1a76c5874f6b39e27a6d6a" title=" " alt="" coords="870,368,1024,394"/>
+<area shape="poly" id="edge13_Node000010_Node000013" title=" " alt="" coords="1112,404,1024,393,1024,388,1112,399"/>
+<area shape="rect" id="Node000014" href="$classcpp_1_1ast_1_1_function.html#a61e8eadca35b3848183554f62acf0ffb" title=" " alt="" coords="882,418,1012,458"/>
+<area shape="poly" id="edge14_Node000010_Node000014" title=" " alt="" coords="1112,421,1012,433,1012,428,1111,416"/>
+<area shape="rect" id="Node000015" href="$classcpp_1_1ast_1_1_parameter.html#aebd069a2a057dc791df21c56e22912bb" title=" " alt="" coords="881,483,1012,524"/>
+<area shape="poly" id="edge15_Node000010_Node000015" title=" " alt="" coords="1140,432,1043,473,1010,485,1008,480,1041,468,1137,427"/>
+<area shape="rect" id="Node000016" href="$classcpp_1_1tokenize_1_1_token.html#ad93a4059e9932fa2dea149510f0ef002" title=" " alt="" coords="878,548,1016,589"/>
+<area shape="poly" id="edge17_Node000010_Node000016" title=" " alt="" coords="1163,436,1111,487,1078,514,1043,538,1017,551,1015,546,1041,533,1075,510,1108,483,1159,433"/>
+<area shape="rect" id="Node000017" href="$classvalidate__reflection_1_1_empty_scope.html#a423076007160dd8dd8e9b314aa1429b1" title=" " alt="" coords="863,614,1031,654"/>
+<area shape="poly" id="edge18_Node000010_Node000017" title=" " alt="" coords="1172,438,1151,475,1123,519,1086,564,1044,603,1022,616,1020,611,1040,599,1083,560,1118,516,1147,472,1167,435"/>
+<area shape="rect" id="Node000018" href="$classvalidate__reflection_1_1_empty_scope.html#a5c2e058527ec1f3b72266c29c77ad0b2" title=" " alt="" coords="863,58,1031,98"/>
+<area shape="poly" id="edge19_Node000010_Node000018" title=" " alt="" coords="1111,403,1088,388,1065,353,1056,318,1056,284,1062,250,1068,216,1069,182,1061,148,1040,113,1026,101,1029,97,1044,110,1066,146,1074,181,1073,216,1067,251,1062,284,1061,318,1070,351,1092,384,1114,399"/>
+<area shape="rect" id="Node000019" href="$classvalidate__reflection_1_1_empty_scope.html#a1fb4f76506790294268dc078986d7430" title=" " alt="" coords="635,30,803,70"/>
+<area shape="poly" id="edge22_Node000010_Node000019" title=" " alt="" coords="1111,404,1088,388,1072,366,1061,344,1055,322,1053,299,1058,254,1069,210,1078,167,1081,126,1078,106,1071,86,1058,67,1040,48,1011,29,979,16,944,10,909,8,838,16,778,32,776,27,837,11,909,3,945,4,981,11,1014,24,1044,44,1063,64,1075,84,1083,104,1086,125,1084,168,1074,212,1063,255,1059,299,1060,321,1066,342,1076,363,1092,384,1114,400"/>
+<area shape="rect" id="Node000020" href="$classcpp_1_1ast_1_1___generic_declaration.html#a4851c5ea09b0a312d762342b71211bb1" title=" " alt="" coords="852,123,1042,164"/>
+<area shape="poly" id="edge21_Node000010_Node000020" title=" " alt="" coords="1111,403,1088,388,1069,362,1061,335,1060,309,1062,282,1065,256,1064,230,1057,205,1040,179,1026,166,1029,162,1044,175,1062,202,1070,230,1070,256,1068,283,1065,309,1066,334,1074,359,1092,384,1114,399"/>
+<area shape="rect" id="Node000021" href="$classcpp_1_1ast_1_1_variable_declaration.html#ad8821ceb26b91d7c3604486a424c3f8f" title=" " alt="" coords="855,188,1039,229"/>
+<area shape="poly" id="edge23_Node000010_Node000021" title=" " alt="" coords="1111,402,1088,388,1073,370,1066,352,1063,315,1060,279,1053,262,1040,244,1024,232,1028,228,1044,240,1058,259,1065,278,1068,315,1071,350,1078,367,1092,384,1114,398"/>
+<area shape="poly" id="edge20_Node000018_Node000019" title=" " alt="" coords="847,69,803,63,804,58,848,63"/>
+<area shape="rect" id="Node000024" href="$class_c_l_i_1_1_app.html#aa429cf3265602a5a1d60b87504ec33c5" title="Get an option by name (noexcept const version)" alt="" coords="648,1084,790,1125"/>
+<area shape="poly" id="edge25_Node000023_Node000024" title=" " alt="" coords="885,1060,791,1087,789,1082,884,1055"/>
+<area shape="rect" id="Node000025" href="$class_c_l_i_1_1_app.html#a5125f786c409fe0bbba684fe99f2c5fe" title="Get an option by name (noexcept non&#45;const version)" alt="" coords="648,1019,790,1060"/>
+<area shape="poly" id="edge26_Node000023_Node000025" title=" " alt="" coords="846,1042,790,1042,790,1037,846,1037"/>
+<area shape="rect" id="Node000026" href="$class_c_l_i_1_1_app.html#a1f7a70f4bc4c375a7de10073a5de709d" title="Fill in a single config option." alt="" coords="425,954,586,994"/>
+<area shape="poly" id="edge27_Node000025_Node000026" title=" " alt="" coords="635,1017,574,998,575,993,637,1012"/>
+<area shape="rect" id="Node000034" href="$class_c_l_i_1_1_app.html#addab9d99dce6a2f96b5c8748d20ebea8" title="Selects a Classifier enum based on the type of the current argument." alt="" coords="434,1164,578,1190"/>
+<area shape="poly" id="edge29_Node000025_Node000034" title=" " alt="" coords="646,1069,636,1075,582,1116,524,1166,520,1162,578,1112,633,1071,644,1065"/>
+<area shape="rect" id="Node000037" href="$class_c_l_i_1_1_app.html#a3424bdc3973b2c7a6e3e13ba50de748a" title="Get an option by name (non&#45;const version)" alt="" coords="435,1019,576,1044"/>
+<area shape="poly" id="edge34_Node000025_Node000037" title=" " alt="" coords="633,1039,577,1037,577,1031,633,1034"/>
+<area shape="rect" id="Node000038" href="$class_c_l_i_1_1_app.html#ad098a287e9a398ec6b24630335d068c8" title="Get an option by name." alt="" coords="435,1068,576,1094"/>
+<area shape="poly" id="edge35_Node000025_Node000038" title=" " alt="" coords="634,1059,576,1070,575,1065,633,1053"/>
+<area shape="rect" id="Node000027" href="$class_c_l_i_1_1_app.html#aee09795046c3b47948e6c2fa45349eca" title=" " alt="" coords="215,961,377,987"/>
+<area shape="poly" id="edge28_Node000026_Node000027" title=" " alt="" coords="410,977,377,977,377,971,410,971"/>
+<area shape="rect" id="Node000035" href="$class_c_l_i_1_1_app.html#a73c9decd5eb2b0c7eeda63cc4bd5048e" title=" " alt="" coords="223,1239,368,1264"/>
+<area shape="poly" id="edge30_Node000034_Node000035" title=" " alt="" coords="454,1198,335,1241,334,1236,452,1193"/>
+<area shape="rect" id="Node000036" href="$class_c_l_i_1_1_app.html#a02368e2fe89470ab9b4131c7e3288349" title=" " alt="" coords="5,1201,167,1227"/>
+<area shape="poly" id="edge33_Node000034_Node000036" title=" " alt="" coords="418,1187,215,1205,167,1209,167,1204,214,1200,418,1182"/>
+<area shape="poly" id="edge31_Node000035_Node000035" title=" " alt="" coords="332,1226,320,1220,296,1217,274,1219,262,1224,259,1229,265,1237,261,1240,254,1230,258,1220,272,1214,296,1212,322,1215,335,1222"/>
+<area shape="poly" id="edge32_Node000035_Node000036" title=" " alt="" coords="207,1238,161,1230,162,1225,208,1233"/>
+<area shape="rect" id="Node000039" href="$class_c_l_i_1_1_app.html#a89776486006cb61d112ae1cdd73848e1" title="Counts the number of times the given option was passed." alt="" coords="239,1113,352,1139"/>
+<area shape="poly" id="edge36_Node000038_Node000039" title=" " alt="" coords="429,1100,353,1117,352,1111,427,1095"/>
+<area shape="rect" id="Node000040" href="$class_c_l_i_1_1_app.html#a443c945fd3d3f03d33ad24be91b0ccbb" title="Shortcut bracket operator for getting a pointer to an option." alt="" coords="228,1015,364,1040"/>
+<area shape="poly" id="edge37_Node000038_Node000040" title=" " alt="" coords="437,1066,349,1044,350,1038,438,1061"/>
+<area shape="rect" id="Node000041" href="$class_c_l_i_1_1_app.html#a05c1dbeb654a91b792889551656c0ab8" title="Shortcut bracket operator for getting a pointer to an option." alt="" coords="228,1064,364,1090"/>
+<area shape="poly" id="edge38_Node000038_Node000041" title=" " alt="" coords="420,1082,364,1081,364,1075,420,1077"/>
+<area shape="rect" id="Node000043" href="$class_c_l_i_1_1_option.html#a4d2329268bae134aa58e704fa61f4b57" title="Requires &quot;&#45;&#45;&quot; to be removed from string." alt="" coords="1118,863,1249,904"/>
+<area shape="poly" id="edge40_Node000042_Node000043" title=" " alt="" coords="1310,905,1249,896,1250,891,1311,900"/>
+<area shape="rect" id="Node000115" href="$class_c_l_i_1_1_option.html#a481001137137be0d6a4e5998866d604a" title="Requires &quot;&#45;&#45;&quot; to be removed from string." alt="" coords="1118,928,1249,969"/>
+<area shape="poly" id="edge51_Node000042_Node000115" title=" " alt="" coords="1311,933,1250,942,1249,937,1310,928"/>
+<area shape="rect" id="Node000118" href="$class_c_l_i_1_1_option.html#acfa639ba77f034615c7e66028da1fc3b" title="Requires &quot;&#45;&quot; to be removed from string." alt="" coords="1118,994,1249,1034"/>
+<area shape="poly" id="edge54_Node000042_Node000118" title=" " alt="" coords="1369,940,1278,983,1247,996,1245,991,1276,978,1367,935"/>
+<area shape="rect" id="Node000119" href="$class_c_l_i_1_1_option.html#a4eb6212ac30a0b139da52d258a3a1790" title=" " alt="" coords="1112,798,1255,838"/>
+<area shape="poly" id="edge57_Node000042_Node000119" title=" " alt="" coords="1367,899,1276,854,1245,841,1247,837,1278,849,1370,894"/>
+<area shape="rect" id="Node000044" href="$class_c_l_i_1_1_option.html#ab84751fbf9037efaed5b64fed17fe57f" title="Gets a comma separated list of names. Will include / prefer the positional name if positional is true..." alt="" coords="870,805,1024,831"/>
+<area shape="poly" id="edge41_Node000043_Node000044" title=" " alt="" coords="1103,864,996,834,997,829,1104,859"/>
+<area shape="rect" id="Node000045" href="$class_c_l_i_1_1_app.html#aaabfb31d7fb10ee7465716b948b376dc" title="function that could be used by subclasses of App to shift options around into subcommands" alt="" coords="638,592,800,618"/>
+<area shape="poly" id="edge42_Node000044_Node000045" title=" " alt="" coords="893,800,870,786,850,768,837,749,831,731,827,696,823,663,815,647,802,631,787,620,790,616,805,627,820,644,828,661,832,695,836,730,842,747,854,764,873,782,895,796"/>
+<area shape="rect" id="Node000049" href="$class_c_l_i_1_1_app.html#a4e0c00ce18bbfca1ae890a653bbd2b93" title="Verify required options and cross requirements. Subcommands too (only if selected)." alt="" coords="652,954,786,994"/>
+<area shape="poly" id="edge43_Node000044_Node000049" title=" " alt="" coords="925,844,873,894,840,921,805,944,783,956,781,951,802,940,837,916,869,890,921,840"/>
+<area shape="rect" id="Node000050" href="$class_c_l_i_1_1_app.html#aaa53fda3b6aa477158ea8b1768342cc0" title="Special private constructor for subcommand." alt="" coords="667,641,771,667"/>
+<area shape="poly" id="edge45_Node000044_Node000050" title=" " alt="" coords="896,801,872,786,850,768,833,744,826,722,819,701,802,680,770,664,773,660,805,676,824,698,831,720,838,742,854,764,875,782,899,796"/>
+<area shape="rect" id="Node000095" href="$namespace_c_l_i.html#a6cb6f8bfff8c49385fb24f6f23a23c21" title="Helper function to mark an option as deprecated." alt="" coords="644,691,794,716"/>
+<area shape="poly" id="edge46_Node000044_Node000095" title=" " alt="" coords="904,800,850,768,827,749,802,731,774,719,776,714,805,727,830,744,853,764,907,795"/>
+<area shape="rect" id="Node000098" href="$class_c_l_i_1_1_formatter.html#ad29eb726bf961560f0c6419fd74332d0" title="This is the name part of an option, Default: left column." alt="" coords="646,740,792,781"/>
+<area shape="poly" id="edge47_Node000044_Node000098" title=" " alt="" coords="877,804,792,782,793,777,879,798"/>
+<area shape="rect" id="Node000107" href="$class_c_l_i_1_1_option.html#a251a3c10c556855c236fddbd419709b1" title="Get the results as a specified type." alt="" coords="651,805,787,831"/>
+<area shape="poly" id="edge48_Node000044_Node000107" title=" " alt="" coords="855,821,787,821,787,815,855,815"/>
+<area shape="rect" id="Node000108" href="$namespace_c_l_i.html#a36cfe4a6a80bf143735c0b80960bc252" title="Helper function to mark an option as retired." alt="" coords="658,855,780,880"/>
+<area shape="poly" id="edge49_Node000044_Node000108" title=" " alt="" coords="870,837,781,857,780,852,869,832"/>
+<area shape="rect" id="Node000112" href="$class_c_l_i_1_1_option.html#ab06eb6c31666a4a003aeb2cf3e5cdcd9" title="Process the callback." alt="" coords="634,904,804,930"/>
+<area shape="poly" id="edge50_Node000044_Node000112" title=" " alt="" coords="912,842,862,869,805,895,774,906,772,901,803,890,859,864,909,837"/>
+<area shape="poly" id="edge44_Node000049_Node000026" title=" " alt="" coords="636,977,587,977,587,971,636,971"/>
+<area shape="poly" id="edge52_Node000115_Node000023" title=" " alt="" coords="1110,977,1091,985,981,1029,979,1024,1089,980,1108,972"/>
+<area shape="rect" id="Node000116" href="$class_c_l_i_1_1_option.html#ad95e4bba59db33e4bfe4caf91ca7be21" title="If options share any of the same names, find it." alt="" coords="853,957,1041,983"/>
+<area shape="poly" id="edge53_Node000115_Node000116" title=" " alt="" coords="1103,959,1042,964,1041,959,1103,953"/>
+<area shape="poly" id="edge55_Node000118_Node000023" title=" " alt="" coords="1103,1025,1033,1033,1032,1028,1103,1020"/>
+<area shape="poly" id="edge56_Node000118_Node000116" title=" " alt="" coords="1102,1002,1019,986,1020,981,1103,997"/>
+<area shape="poly" id="edge58_Node000119_Node000044" title=" " alt="" coords="1097,821,1024,821,1024,815,1097,815"/>
+<area shape="poly" id="edge60_Node000120_Node000042" title=" " alt="" coords="1523,905,1491,909,1490,904,1522,900"/>
+</map>

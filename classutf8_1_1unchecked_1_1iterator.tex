@@ -1,0 +1,350 @@
+\doxysection{utf8\+::unchecked\+::iterator\texorpdfstring{$<$}{<} octet\+\_\+iterator \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classutf8_1_1unchecked_1_1iterator}{}\label{classutf8_1_1unchecked_1_1iterator}\index{utf8::unchecked::iterator$<$ octet\_iterator $>$@{utf8::unchecked::iterator$<$ octet\_iterator $>$}}
+
+
+{\ttfamily \#include $<$unchecked.\+h$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator_a224be2233b03592c9129d2f2e7a2b9ba}{iterator\+\_\+category}} = std\+::bidirectional\+\_\+iterator\+\_\+tag
+\item 
+using \mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator_a98412635ce8a3f01e3886a089a75d5e1}{value\+\_\+type}} = \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}
+\item 
+using \mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator_aed4a56cd661b373aeffe452549c5999d}{difference\+\_\+type}} = std\+::ptrdiff\+\_\+t
+\item 
+using \mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator_a718a6e16b252278924edfabad21bbcf5}{pointer}} = \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}\texorpdfstring{$\ast$}{*}
+\item 
+using \mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator_a8c918c564efdb3ca2d50254736e3ec52}{reference}} = \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}\&
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator_a6564ecea96a82b87daca60a153ee1a6f}{iterator}} ()
+\item 
+\mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator_a0f93d81989f2eb1038c0550431b9653b}{iterator}} (const octet\+\_\+iterator \&octet\+\_\+it)
+\item 
+octet\+\_\+iterator \mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator_a475cd482cf1ff3aeb8d858d580a2e27a}{base}} () const
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator_a150ab57c3546d067d49214af4d317e97}{operator\texorpdfstring{$\ast$}{*}}} () const
+\item 
+bool \mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator_aa2bb05a12c371c1cb105a66607159059}{operator==}} (const \mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator}{iterator}} \&rhs) const
+\item 
+bool \mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator_a28c371e85ff2ef99fe33eb3ce9182f05}{operator!=}} (const \mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator}{iterator}} \&rhs) const
+\item 
+\mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator}{iterator}} \& \mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator_a7743751d8f5c14aedf22aaaa6d3e6198}{operator++}} ()
+\item 
+\mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator}{iterator}} \mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator_ae1cadaddd5c1db5518def5af491a1ff1}{operator++}} (int)
+\item 
+\mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator}{iterator}} \& \mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator_a4de90515d79c3c55fe172e6e1d5c07cd}{operator-\/-\/}} ()
+\item 
+\mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator}{iterator}} \mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator_a85597f5ae4bd175edb6dc2fc9ceb2f34}{operator-\/-\/}} (int)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename octet\+\_\+iterator$>$\newline
+class utf8\+::unchecked\+::iterator$<$ octet\+\_\+iterator $>$}
+
+
+Definition at line \mbox{\hyperlink{unchecked_8h_source_l00179}{179}} of file \mbox{\hyperlink{unchecked_8h_source}{unchecked.\+h}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classutf8_1_1unchecked_1_1iterator_aed4a56cd661b373aeffe452549c5999d}\index{utf8::unchecked::iterator$<$ octet\_iterator $>$@{utf8::unchecked::iterator$<$ octet\_iterator $>$}!difference\_type@{difference\_type}}
+\index{difference\_type@{difference\_type}!utf8::unchecked::iterator$<$ octet\_iterator $>$@{utf8::unchecked::iterator$<$ octet\_iterator $>$}}
+\doxysubsubsection{\texorpdfstring{difference\_type}{difference\_type}}
+{\footnotesize\ttfamily \label{classutf8_1_1unchecked_1_1iterator_aed4a56cd661b373aeffe452549c5999d} 
+template$<$typename octet\+\_\+iterator $>$ \\
+using \mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator}{utf8\+::unchecked\+::iterator}}$<$ octet\+\_\+iterator $>$\+::difference\+\_\+type = std\+::ptrdiff\+\_\+t}
+
+
+
+Definition at line \mbox{\hyperlink{unchecked_8h_source_l00184}{184}} of file \mbox{\hyperlink{unchecked_8h_source}{unchecked.\+h}}.
+
+\Hypertarget{classutf8_1_1unchecked_1_1iterator_a224be2233b03592c9129d2f2e7a2b9ba}\index{utf8::unchecked::iterator$<$ octet\_iterator $>$@{utf8::unchecked::iterator$<$ octet\_iterator $>$}!iterator\_category@{iterator\_category}}
+\index{iterator\_category@{iterator\_category}!utf8::unchecked::iterator$<$ octet\_iterator $>$@{utf8::unchecked::iterator$<$ octet\_iterator $>$}}
+\doxysubsubsection{\texorpdfstring{iterator\_category}{iterator\_category}}
+{\footnotesize\ttfamily \label{classutf8_1_1unchecked_1_1iterator_a224be2233b03592c9129d2f2e7a2b9ba} 
+template$<$typename octet\+\_\+iterator $>$ \\
+using \mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator}{utf8\+::unchecked\+::iterator}}$<$ octet\+\_\+iterator $>$\+::iterator\+\_\+category = std\+::bidirectional\+\_\+iterator\+\_\+tag}
+
+
+
+Definition at line \mbox{\hyperlink{unchecked_8h_source_l00182}{182}} of file \mbox{\hyperlink{unchecked_8h_source}{unchecked.\+h}}.
+
+\Hypertarget{classutf8_1_1unchecked_1_1iterator_a718a6e16b252278924edfabad21bbcf5}\index{utf8::unchecked::iterator$<$ octet\_iterator $>$@{utf8::unchecked::iterator$<$ octet\_iterator $>$}!pointer@{pointer}}
+\index{pointer@{pointer}!utf8::unchecked::iterator$<$ octet\_iterator $>$@{utf8::unchecked::iterator$<$ octet\_iterator $>$}}
+\doxysubsubsection{\texorpdfstring{pointer}{pointer}}
+{\footnotesize\ttfamily \label{classutf8_1_1unchecked_1_1iterator_a718a6e16b252278924edfabad21bbcf5} 
+template$<$typename octet\+\_\+iterator $>$ \\
+using \mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator}{utf8\+::unchecked\+::iterator}}$<$ octet\+\_\+iterator $>$\+::pointer = \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}\texorpdfstring{$\ast$}{*}}
+
+
+
+Definition at line \mbox{\hyperlink{unchecked_8h_source_l00185}{185}} of file \mbox{\hyperlink{unchecked_8h_source}{unchecked.\+h}}.
+
+\Hypertarget{classutf8_1_1unchecked_1_1iterator_a8c918c564efdb3ca2d50254736e3ec52}\index{utf8::unchecked::iterator$<$ octet\_iterator $>$@{utf8::unchecked::iterator$<$ octet\_iterator $>$}!reference@{reference}}
+\index{reference@{reference}!utf8::unchecked::iterator$<$ octet\_iterator $>$@{utf8::unchecked::iterator$<$ octet\_iterator $>$}}
+\doxysubsubsection{\texorpdfstring{reference}{reference}}
+{\footnotesize\ttfamily \label{classutf8_1_1unchecked_1_1iterator_a8c918c564efdb3ca2d50254736e3ec52} 
+template$<$typename octet\+\_\+iterator $>$ \\
+using \mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator}{utf8\+::unchecked\+::iterator}}$<$ octet\+\_\+iterator $>$\+::reference = \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}\&}
+
+
+
+Definition at line \mbox{\hyperlink{unchecked_8h_source_l00186}{186}} of file \mbox{\hyperlink{unchecked_8h_source}{unchecked.\+h}}.
+
+\Hypertarget{classutf8_1_1unchecked_1_1iterator_a98412635ce8a3f01e3886a089a75d5e1}\index{utf8::unchecked::iterator$<$ octet\_iterator $>$@{utf8::unchecked::iterator$<$ octet\_iterator $>$}!value\_type@{value\_type}}
+\index{value\_type@{value\_type}!utf8::unchecked::iterator$<$ octet\_iterator $>$@{utf8::unchecked::iterator$<$ octet\_iterator $>$}}
+\doxysubsubsection{\texorpdfstring{value\_type}{value\_type}}
+{\footnotesize\ttfamily \label{classutf8_1_1unchecked_1_1iterator_a98412635ce8a3f01e3886a089a75d5e1} 
+template$<$typename octet\+\_\+iterator $>$ \\
+using \mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator}{utf8\+::unchecked\+::iterator}}$<$ octet\+\_\+iterator $>$\+::value\+\_\+type = \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}
+
+
+
+Definition at line \mbox{\hyperlink{unchecked_8h_source_l00183}{183}} of file \mbox{\hyperlink{unchecked_8h_source}{unchecked.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classutf8_1_1unchecked_1_1iterator_a6564ecea96a82b87daca60a153ee1a6f}\index{utf8::unchecked::iterator$<$ octet\_iterator $>$@{utf8::unchecked::iterator$<$ octet\_iterator $>$}!iterator@{iterator}}
+\index{iterator@{iterator}!utf8::unchecked::iterator$<$ octet\_iterator $>$@{utf8::unchecked::iterator$<$ octet\_iterator $>$}}
+\doxysubsubsection{\texorpdfstring{iterator()}{iterator()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classutf8_1_1unchecked_1_1iterator_a6564ecea96a82b87daca60a153ee1a6f} 
+template$<$typename octet\+\_\+iterator $>$ \\
+\mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator}{utf8\+::unchecked\+::iterator}}$<$ octet\+\_\+iterator $>$\+::iterator (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{unchecked_8h_source_l00188}{188}} of file \mbox{\hyperlink{unchecked_8h_source}{unchecked.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00188\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classutf8_1_1unchecked_1_1iterator_a0f93d81989f2eb1038c0550431b9653b}\index{utf8::unchecked::iterator$<$ octet\_iterator $>$@{utf8::unchecked::iterator$<$ octet\_iterator $>$}!iterator@{iterator}}
+\index{iterator@{iterator}!utf8::unchecked::iterator$<$ octet\_iterator $>$@{utf8::unchecked::iterator$<$ octet\_iterator $>$}}
+\doxysubsubsection{\texorpdfstring{iterator()}{iterator()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classutf8_1_1unchecked_1_1iterator_a0f93d81989f2eb1038c0550431b9653b} 
+template$<$typename octet\+\_\+iterator $>$ \\
+\mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator}{utf8\+::unchecked\+::iterator}}$<$ octet\+\_\+iterator $>$\+::iterator (\begin{DoxyParamCaption}\item[{const octet\+\_\+iterator$<$ octet\+\_\+iterator $>$ \&}]{octet\+\_\+it}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{unchecked_8h_source_l00189}{189}} of file \mbox{\hyperlink{unchecked_8h_source}{unchecked.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00189\ :\ it(octet\_it)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classutf8_1_1unchecked_1_1iterator_a475cd482cf1ff3aeb8d858d580a2e27a}\index{utf8::unchecked::iterator$<$ octet\_iterator $>$@{utf8::unchecked::iterator$<$ octet\_iterator $>$}!base@{base}}
+\index{base@{base}!utf8::unchecked::iterator$<$ octet\_iterator $>$@{utf8::unchecked::iterator$<$ octet\_iterator $>$}}
+\doxysubsubsection{\texorpdfstring{base()}{base()}}
+{\footnotesize\ttfamily \label{classutf8_1_1unchecked_1_1iterator_a475cd482cf1ff3aeb8d858d580a2e27a} 
+template$<$typename octet\+\_\+iterator $>$ \\
+octet\+\_\+iterator \mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator}{utf8\+::unchecked\+::iterator}}$<$ octet\+\_\+iterator $>$\+::base (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{unchecked_8h_source_l00191}{191}} of file \mbox{\hyperlink{unchecked_8h_source}{unchecked.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00191\ \{\ \textcolor{keywordflow}{return}\ it;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classutf8_1_1unchecked_1_1iterator_a28c371e85ff2ef99fe33eb3ce9182f05}\index{utf8::unchecked::iterator$<$ octet\_iterator $>$@{utf8::unchecked::iterator$<$ octet\_iterator $>$}!operator"!=@{operator"!=}}
+\index{operator"!=@{operator"!=}!utf8::unchecked::iterator$<$ octet\_iterator $>$@{utf8::unchecked::iterator$<$ octet\_iterator $>$}}
+\doxysubsubsection{\texorpdfstring{operator"!=()}{operator!=()}}
+{\footnotesize\ttfamily \label{classutf8_1_1unchecked_1_1iterator_a28c371e85ff2ef99fe33eb3ce9182f05} 
+template$<$typename octet\+\_\+iterator $>$ \\
+bool \mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator}{utf8\+::unchecked\+::iterator}}$<$ octet\+\_\+iterator $>$\+::operator!= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator}{iterator}}$<$ octet\+\_\+iterator $>$ \&}]{rhs}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{unchecked_8h_source_l00201}{201}} of file \mbox{\hyperlink{unchecked_8h_source}{unchecked.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !(\mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator_aa2bb05a12c371c1cb105a66607159059}{operator\ ==\ }}(rhs));}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classutf8_1_1unchecked_1_1iterator_a28c371e85ff2ef99fe33eb3ce9182f05_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classutf8_1_1unchecked_1_1iterator_a150ab57c3546d067d49214af4d317e97}\index{utf8::unchecked::iterator$<$ octet\_iterator $>$@{utf8::unchecked::iterator$<$ octet\_iterator $>$}!operator\texorpdfstring{$\ast$}{*}@{operator\texorpdfstring{$\ast$}{*}}}
+\index{operator\texorpdfstring{$\ast$}{*}@{operator\texorpdfstring{$\ast$}{*}}!utf8::unchecked::iterator$<$ octet\_iterator $>$@{utf8::unchecked::iterator$<$ octet\_iterator $>$}}
+\doxysubsubsection{\texorpdfstring{operator\texorpdfstring{$\ast$}{*}()}{operator*()}}
+{\footnotesize\ttfamily \label{classutf8_1_1unchecked_1_1iterator_a150ab57c3546d067d49214af4d317e97} 
+template$<$typename octet\+\_\+iterator $>$ \\
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator}{utf8\+::unchecked\+::iterator}}$<$ octet\+\_\+iterator $>$\+::operator\texorpdfstring{$\ast$}{*} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{unchecked_8h_source_l00192}{192}} of file \mbox{\hyperlink{unchecked_8h_source}{unchecked.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ octet\_iterator\ temp\ =\ it;}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespaceutf8_1_1unchecked_ac5932c0cbb2498a111d53d26fd82f260}{utf8::unchecked::next}}(temp);}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classutf8_1_1unchecked_1_1iterator_a150ab57c3546d067d49214af4d317e97_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classutf8_1_1unchecked_1_1iterator_a7743751d8f5c14aedf22aaaa6d3e6198}\index{utf8::unchecked::iterator$<$ octet\_iterator $>$@{utf8::unchecked::iterator$<$ octet\_iterator $>$}!operator++@{operator++}}
+\index{operator++@{operator++}!utf8::unchecked::iterator$<$ octet\_iterator $>$@{utf8::unchecked::iterator$<$ octet\_iterator $>$}}
+\doxysubsubsection{\texorpdfstring{operator++()}{operator++()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classutf8_1_1unchecked_1_1iterator_a7743751d8f5c14aedf22aaaa6d3e6198} 
+template$<$typename octet\+\_\+iterator $>$ \\
+\mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator}{iterator}} \& \mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator}{utf8\+::unchecked\+::iterator}}$<$ octet\+\_\+iterator $>$\+::operator++ (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{unchecked_8h_source_l00205}{205}} of file \mbox{\hyperlink{unchecked_8h_source}{unchecked.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ::std::advance(it,\ \mbox{\hyperlink{namespaceutf8_1_1internal_adb347cc81d32ebb0fd22d849f7bff5ea}{utf8::internal::sequence\_length}}(it));}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classutf8_1_1unchecked_1_1iterator_a7743751d8f5c14aedf22aaaa6d3e6198_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classutf8_1_1unchecked_1_1iterator_ae1cadaddd5c1db5518def5af491a1ff1}\index{utf8::unchecked::iterator$<$ octet\_iterator $>$@{utf8::unchecked::iterator$<$ octet\_iterator $>$}!operator++@{operator++}}
+\index{operator++@{operator++}!utf8::unchecked::iterator$<$ octet\_iterator $>$@{utf8::unchecked::iterator$<$ octet\_iterator $>$}}
+\doxysubsubsection{\texorpdfstring{operator++()}{operator++()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classutf8_1_1unchecked_1_1iterator_ae1cadaddd5c1db5518def5af491a1ff1} 
+template$<$typename octet\+\_\+iterator $>$ \\
+\mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator}{iterator}} \mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator}{utf8\+::unchecked\+::iterator}}$<$ octet\+\_\+iterator $>$\+::operator++ (\begin{DoxyParamCaption}\item[{int}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{unchecked_8h_source_l00210}{210}} of file \mbox{\hyperlink{unchecked_8h_source}{unchecked.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ iterator\ temp\ =\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ::std::advance(it,\ \mbox{\hyperlink{namespaceutf8_1_1internal_adb347cc81d32ebb0fd22d849f7bff5ea}{utf8::internal::sequence\_length}}(it));}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ temp;}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classutf8_1_1unchecked_1_1iterator_ae1cadaddd5c1db5518def5af491a1ff1_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classutf8_1_1unchecked_1_1iterator_a4de90515d79c3c55fe172e6e1d5c07cd}\index{utf8::unchecked::iterator$<$ octet\_iterator $>$@{utf8::unchecked::iterator$<$ octet\_iterator $>$}!operator-\/-\/@{operator-\/-\/}}
+\index{operator-\/-\/@{operator-\/-\/}!utf8::unchecked::iterator$<$ octet\_iterator $>$@{utf8::unchecked::iterator$<$ octet\_iterator $>$}}
+\doxysubsubsection{\texorpdfstring{operator-\/-\/()}{operator--()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classutf8_1_1unchecked_1_1iterator_a4de90515d79c3c55fe172e6e1d5c07cd} 
+template$<$typename octet\+\_\+iterator $>$ \\
+\mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator}{iterator}} \& \mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator}{utf8\+::unchecked\+::iterator}}$<$ octet\+\_\+iterator $>$\+::operator-\/-\/ (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{unchecked_8h_source_l00216}{216}} of file \mbox{\hyperlink{unchecked_8h_source}{unchecked.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00217\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00218\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceutf8_1_1unchecked_ad2c0e4b9693713ac18ee543e214b3ef9}{utf8::unchecked::prior}}(it);}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classutf8_1_1unchecked_1_1iterator_a4de90515d79c3c55fe172e6e1d5c07cd_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classutf8_1_1unchecked_1_1iterator_a85597f5ae4bd175edb6dc2fc9ceb2f34}\index{utf8::unchecked::iterator$<$ octet\_iterator $>$@{utf8::unchecked::iterator$<$ octet\_iterator $>$}!operator-\/-\/@{operator-\/-\/}}
+\index{operator-\/-\/@{operator-\/-\/}!utf8::unchecked::iterator$<$ octet\_iterator $>$@{utf8::unchecked::iterator$<$ octet\_iterator $>$}}
+\doxysubsubsection{\texorpdfstring{operator-\/-\/()}{operator--()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classutf8_1_1unchecked_1_1iterator_a85597f5ae4bd175edb6dc2fc9ceb2f34} 
+template$<$typename octet\+\_\+iterator $>$ \\
+\mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator}{iterator}} \mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator}{utf8\+::unchecked\+::iterator}}$<$ octet\+\_\+iterator $>$\+::operator-\/-\/ (\begin{DoxyParamCaption}\item[{int}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{unchecked_8h_source_l00221}{221}} of file \mbox{\hyperlink{unchecked_8h_source}{unchecked.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ iterator\ temp\ =\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceutf8_1_1unchecked_ad2c0e4b9693713ac18ee543e214b3ef9}{utf8::unchecked::prior}}(it);}
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ temp;}
+\DoxyCodeLine{00226\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classutf8_1_1unchecked_1_1iterator_a85597f5ae4bd175edb6dc2fc9ceb2f34_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classutf8_1_1unchecked_1_1iterator_aa2bb05a12c371c1cb105a66607159059}\index{utf8::unchecked::iterator$<$ octet\_iterator $>$@{utf8::unchecked::iterator$<$ octet\_iterator $>$}!operator==@{operator==}}
+\index{operator==@{operator==}!utf8::unchecked::iterator$<$ octet\_iterator $>$@{utf8::unchecked::iterator$<$ octet\_iterator $>$}}
+\doxysubsubsection{\texorpdfstring{operator==()}{operator==()}}
+{\footnotesize\ttfamily \label{classutf8_1_1unchecked_1_1iterator_aa2bb05a12c371c1cb105a66607159059} 
+template$<$typename octet\+\_\+iterator $>$ \\
+bool \mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator}{utf8\+::unchecked\+::iterator}}$<$ octet\+\_\+iterator $>$\+::operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator}{iterator}}$<$ octet\+\_\+iterator $>$ \&}]{rhs}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{unchecked_8h_source_l00197}{197}} of file \mbox{\hyperlink{unchecked_8h_source}{unchecked.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \ \ \ \ \{\ }
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (it\ ==\ rhs.it);}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classutf8_1_1unchecked_1_1iterator_aa2bb05a12c371c1cb105a66607159059_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/src/utf8/\mbox{\hyperlink{unchecked_8h}{unchecked.\+h}}\end{DoxyCompactItemize}

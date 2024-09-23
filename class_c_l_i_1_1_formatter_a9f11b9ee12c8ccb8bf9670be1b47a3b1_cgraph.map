@@ -1,0 +1,27 @@
+<map id="CLI::Formatter::make_option_opts" name="CLI::Formatter::make_option_opts">
+<area shape="rect" id="Node000001" title="This is the options part of the name, Default: combined into left column." alt="" coords="5,244,152,285"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_option.html#a3b8410c5366dbbb6781b37d963677101" title="The default value (for help printing)" alt="" coords="212,5,394,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="82,243,96,200,118,145,152,88,173,62,198,40,203,37,206,41,201,44,177,66,156,91,123,147,101,202,87,245"/>
+<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_option.html#a9657b97545e51cdcda8efd61d13b5ab3" title="The environment variable associated to this value." alt="" coords="216,55,390,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="86,243,102,209,126,167,158,125,198,89,205,85,208,90,201,94,162,128,131,170,107,211,91,245"/>
+<area shape="rect" id="Node000004" href="$class_c_l_i_1_1_option.html#a833eaaba4c8823298e7740a3e43a82b6" title="The set of options excluded." alt="" coords="216,104,390,130"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="92,242,135,190,165,162,198,139,208,134,211,138,201,143,168,166,139,194,96,246"/>
+<area shape="rect" id="Node000005" href="$class_c_l_i_1_1_option.html#a307543e6e4ddeb6e4ea00438b5b10be3" title="The number of times the option expects to be included." alt="" coords="216,153,390,179"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="106,242,148,214,199,188,216,181,217,186,201,193,151,218,109,246"/>
+<area shape="rect" id="Node000006" href="$class_c_l_i_1_1_option.html#a21133f27201fa12203567cf0ee40c9c5" title="The max number of times the option expects to be included." alt="" coords="200,203,406,228"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="151,246,225,230,227,235,152,251"/>
+<area shape="rect" id="Node000007" href="$class_c_l_i_1_1_option.html#a19c64a02c22d968e834c2aaf13f98f62" title="The number of times the option expects to be included." alt="" coords="202,252,404,278"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="152,262,186,262,186,268,152,268"/>
+<area shape="rect" id="Node000008" href="$class_c_l_i_1_1_formatter_base.html#a7e8f9d7896c599f7befd84a9947d4cab" title="Get the current value of a name (REQUIRED, etc.)" alt="" coords="235,302,371,342"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="152,281,220,298,219,304,151,286"/>
+<area shape="rect" id="Node000009" href="$class_c_l_i_1_1_option.html#acf898e5c04f5fb3f42ec1ea711e97743" title="The set of options needed." alt="" coords="225,367,381,392"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="104,284,147,319,201,352,218,359,216,364,198,357,144,323,100,288"/>
+<area shape="rect" id="Node000010" href="$class_c_l_i_1_1_option_base.html#aa902dee6da6d7f5b083b1c7d5f9c1308" title="True if this is a required option." alt="" coords="231,416,375,457"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="94,284,137,343,167,375,201,403,218,412,215,416,198,407,163,379,133,346,90,287"/>
+<area shape="rect" id="Node000011" href="$class_c_l_i_1_1_option.html#a8b8425827ceb852c3cc3f44b9b1c26a4" title="Get the full typename for this option." alt="" coords="210,481,396,507"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="88,284,103,324,126,373,159,424,179,447,201,467,209,472,206,476,198,471,175,451,154,427,121,376,98,326,83,286"/>
+<area shape="rect" id="Node000013" href="$class_c_l_i_1_1_option.html#a88f36e42c1afcf1d4887230cc133f1fa" title="The number of arguments the option expects." alt="" coords="214,531,392,556"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="86,285,97,333,119,397,153,462,175,492,201,517,205,520,202,525,198,522,171,495,148,465,114,399,92,335,81,286"/>
+<area shape="rect" id="Node000012" href="$class_c_l_i_1_1_validator.html#a77c9d0a1f496ccaa4a8ef293a41bca78" title="Generate type description information for the Validator." alt="" coords="454,474,580,514"/>
+<area shape="poly" id="edge11_Node000011_Node000012" title=" " alt="" coords="396,492,438,492,438,497,396,497"/>
+</map>

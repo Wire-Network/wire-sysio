@@ -1,0 +1,10 @@
+<map id="SetJacobi" name="SetJacobi">
+<area shape="rect" id="Node000001" title=" " alt="" coords="254,31,333,56"/>
+<area shape="rect" id="Node000002" href="$bn_8cpp.html#a7d49267f82535f353da5b92350d646c6" title=" " alt="" coords="112,5,197,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="238,36,197,29,198,23,239,31"/>
+<area shape="rect" id="Node000004" href="$bn_8cpp.html#a3dd4f8104e17c1e3aa314fe20afb3ea2" title=" " alt="" coords="103,55,206,80"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="239,56,207,61,206,56,238,50"/>
+<area shape="rect" id="Node000003" href="$bn_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97" title=" " alt="" coords="5,31,55,56"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="97,33,56,41,55,36,96,27"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="87,57,54,51,55,46,88,52"/>
+</map>

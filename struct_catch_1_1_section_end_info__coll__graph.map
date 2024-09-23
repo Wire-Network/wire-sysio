@@ -1,0 +1,16 @@
+<map id="Catch::SectionEndInfo" name="Catch::SectionEndInfo">
+<area shape="rect" id="Node000001" title=" " alt="" coords="195,316,349,342"/>
+<area shape="rect" id="Node000002" href="$struct_catch_1_1_section_info.html" title=" " alt="" coords="94,228,224,253"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="170,266,187,290,206,304,227,313,225,318,203,308,183,294,166,269"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,124,59,150"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="50,161,67,182,88,202,128,225,126,229,85,206,63,185,46,164"/>
+<area shape="rect" id="Node000004" href="$struct_catch_1_1_source_line_info.html" title=" " alt="" coords="83,124,234,150"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="161,165,161,227,156,227,156,165"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="186,5,243,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="205,46,167,125,162,122,200,44"/>
+<area shape="rect" id="Node000006" href="$struct_catch_1_1_counts.html" title=" " alt="" coords="219,176,325,202"/>
+<area shape="poly" id="edge6_Node000006_Node000005" title=" " alt="" coords="226,45,270,175,265,176,221,47"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="275,217,275,316,269,316,269,217"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="388,228,447,253"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="385,264,294,318,291,313,383,259"/>
+</map>

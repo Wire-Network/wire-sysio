@@ -1,0 +1,165 @@
+\doxysection{Catch\+::clara\+::detail\+::Token\+Stream Class Reference}
+\hypertarget{class_catch_1_1clara_1_1detail_1_1_token_stream}{}\label{class_catch_1_1clara_1_1detail_1_1_token_stream}\index{Catch::clara::detail::TokenStream@{Catch::clara::detail::TokenStream}}
+
+
+{\ttfamily \#include $<$clara.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_token_stream_aef19c75916e0192b6b726646d0968739}{Token\+Stream}} (\mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_args}{Args}} const \&args)
+\item 
+\mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_token_stream_a782469150c90c5827dc45e8e51a647e6}{Token\+Stream}} (Iterator it, Iterator it\+End)
+\item 
+\mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_token_stream_a1b2daf6f16a84197e2a0f9cfebe344cc}{operator bool}} () const
+\item 
+auto \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_token_stream_ac273831ac6186d9c19fee9bd9c7dfca8}{count}} () const -\/$>$ size\+\_\+t
+\item 
+auto \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_token_stream_afda35a81fe2c16354eaf59f92faef7ac}{operator\texorpdfstring{$\ast$}{*}}} () const -\/$>$ \mbox{\hyperlink{struct_catch_1_1clara_1_1detail_1_1_token}{Token}}
+\item 
+auto \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_token_stream_a6c99df344d245194d92cada8981609a9}{operator-\/$>$}} () const -\/$>$ \mbox{\hyperlink{struct_catch_1_1clara_1_1detail_1_1_token}{Token}} const \texorpdfstring{$\ast$}{*}
+\item 
+auto \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_token_stream_ade357e772ec8cfa76f2614bf6fd99265}{operator++}} () -\/$>$ \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_token_stream}{Token\+Stream}} \&
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{include_2external_2clara_8hpp_source_l00447}{447}} of file \mbox{\hyperlink{include_2external_2clara_8hpp_source}{clara.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_catch_1_1clara_1_1detail_1_1_token_stream_aef19c75916e0192b6b726646d0968739}\index{Catch::clara::detail::TokenStream@{Catch::clara::detail::TokenStream}!TokenStream@{TokenStream}}
+\index{TokenStream@{TokenStream}!Catch::clara::detail::TokenStream@{Catch::clara::detail::TokenStream}}
+\doxysubsubsection{\texorpdfstring{TokenStream()}{TokenStream()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1clara_1_1detail_1_1_token_stream_aef19c75916e0192b6b726646d0968739} 
+Catch\+::clara\+::detail\+::\+Token\+Stream\+::\+Token\+Stream (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_args}{Args}} const \&}]{args}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{include_2external_2clara_8hpp_source_l00485}{485}} of file \mbox{\hyperlink{include_2external_2clara_8hpp_source}{clara.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00485\ :\ \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_token_stream_aef19c75916e0192b6b726646d0968739}{TokenStream}}(\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.m\_args.begin(),\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.m\_args.end()\ )\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1clara_1_1detail_1_1_token_stream_a782469150c90c5827dc45e8e51a647e6}\index{Catch::clara::detail::TokenStream@{Catch::clara::detail::TokenStream}!TokenStream@{TokenStream}}
+\index{TokenStream@{TokenStream}!Catch::clara::detail::TokenStream@{Catch::clara::detail::TokenStream}}
+\doxysubsubsection{\texorpdfstring{TokenStream()}{TokenStream()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1clara_1_1detail_1_1_token_stream_a782469150c90c5827dc45e8e51a647e6} 
+Catch\+::clara\+::detail\+::\+Token\+Stream\+::\+Token\+Stream (\begin{DoxyParamCaption}\item[{Iterator}]{it}{, }\item[{Iterator}]{it\+End}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{include_2external_2clara_8hpp_source_l00487}{487}} of file \mbox{\hyperlink{include_2external_2clara_8hpp_source}{clara.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00487\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ it(\ it\ ),\ itEnd(\ itEnd\ )\ \{}
+\DoxyCodeLine{00488\ \ \ \ \ \ \ \ \ \ \ \ \ loadBuffer();}
+\DoxyCodeLine{00489\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_catch_1_1clara_1_1detail_1_1_token_stream_ac273831ac6186d9c19fee9bd9c7dfca8}\index{Catch::clara::detail::TokenStream@{Catch::clara::detail::TokenStream}!count@{count}}
+\index{count@{count}!Catch::clara::detail::TokenStream@{Catch::clara::detail::TokenStream}}
+\doxysubsubsection{\texorpdfstring{count()}{count()}}
+{\footnotesize\ttfamily \label{class_catch_1_1clara_1_1detail_1_1_token_stream_ac273831ac6186d9c19fee9bd9c7dfca8} 
+auto Catch\+::clara\+::detail\+::\+Token\+Stream\+::count (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const -\/$>$ size\+\_\+t \hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{include_2external_2clara_8hpp_source_l00495}{495}} of file \mbox{\hyperlink{include_2external_2clara_8hpp_source}{clara.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00495\ \{\ \textcolor{keywordflow}{return}\ m\_tokenBuffer.size()\ +\ (itEnd\ -\/\ it);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1clara_1_1detail_1_1_token_stream_a1b2daf6f16a84197e2a0f9cfebe344cc}\index{Catch::clara::detail::TokenStream@{Catch::clara::detail::TokenStream}!operator bool@{operator bool}}
+\index{operator bool@{operator bool}!Catch::clara::detail::TokenStream@{Catch::clara::detail::TokenStream}}
+\doxysubsubsection{\texorpdfstring{operator bool()}{operator bool()}}
+{\footnotesize\ttfamily \label{class_catch_1_1clara_1_1detail_1_1_token_stream_a1b2daf6f16a84197e2a0f9cfebe344cc} 
+Catch\+::clara\+::detail\+::\+Token\+Stream\+::operator bool (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{include_2external_2clara_8hpp_source_l00491}{491}} of file \mbox{\hyperlink{include_2external_2clara_8hpp_source}{clara.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00491\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00492\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !m\_tokenBuffer.empty()\ ||\ it\ !=\ itEnd;}
+\DoxyCodeLine{00493\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1clara_1_1detail_1_1_token_stream_afda35a81fe2c16354eaf59f92faef7ac}\index{Catch::clara::detail::TokenStream@{Catch::clara::detail::TokenStream}!operator\texorpdfstring{$\ast$}{*}@{operator\texorpdfstring{$\ast$}{*}}}
+\index{operator\texorpdfstring{$\ast$}{*}@{operator\texorpdfstring{$\ast$}{*}}!Catch::clara::detail::TokenStream@{Catch::clara::detail::TokenStream}}
+\doxysubsubsection{\texorpdfstring{operator\texorpdfstring{$\ast$}{*}()}{operator*()}}
+{\footnotesize\ttfamily \label{class_catch_1_1clara_1_1detail_1_1_token_stream_afda35a81fe2c16354eaf59f92faef7ac} 
+auto Catch\+::clara\+::detail\+::\+Token\+Stream\+::operator\texorpdfstring{$\ast$}{*} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const -\/$>$ \mbox{\hyperlink{struct_catch_1_1clara_1_1detail_1_1_token}{Token}} \hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{include_2external_2clara_8hpp_source_l00497}{497}} of file \mbox{\hyperlink{include_2external_2clara_8hpp_source}{clara.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00497\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00498\ \ \ \ \ \ \ \ \ \ \ \ \ assert(\ !m\_tokenBuffer.empty()\ );}
+\DoxyCodeLine{00499\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_tokenBuffer.front();}
+\DoxyCodeLine{00500\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1clara_1_1detail_1_1_token_stream_ade357e772ec8cfa76f2614bf6fd99265}\index{Catch::clara::detail::TokenStream@{Catch::clara::detail::TokenStream}!operator++@{operator++}}
+\index{operator++@{operator++}!Catch::clara::detail::TokenStream@{Catch::clara::detail::TokenStream}}
+\doxysubsubsection{\texorpdfstring{operator++()}{operator++()}}
+{\footnotesize\ttfamily \label{class_catch_1_1clara_1_1detail_1_1_token_stream_ade357e772ec8cfa76f2614bf6fd99265} 
+auto Catch\+::clara\+::detail\+::\+Token\+Stream\+::operator++ (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) -\/$>$ \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_token_stream}{Token\+Stream}} \& \hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{include_2external_2clara_8hpp_source_l00507}{507}} of file \mbox{\hyperlink{include_2external_2clara_8hpp_source}{clara.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00507\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00508\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ m\_tokenBuffer.size()\ >=\ 2\ )\ \{}
+\DoxyCodeLine{00509\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_tokenBuffer.erase(\ m\_tokenBuffer.begin()\ );}
+\DoxyCodeLine{00510\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00511\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ it\ !=\ itEnd\ )}
+\DoxyCodeLine{00512\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++it;}
+\DoxyCodeLine{00513\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ loadBuffer();}
+\DoxyCodeLine{00514\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00515\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00516\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1clara_1_1detail_1_1_token_stream_a6c99df344d245194d92cada8981609a9}\index{Catch::clara::detail::TokenStream@{Catch::clara::detail::TokenStream}!operator-\/$>$@{operator-\/$>$}}
+\index{operator-\/$>$@{operator-\/$>$}!Catch::clara::detail::TokenStream@{Catch::clara::detail::TokenStream}}
+\doxysubsubsection{\texorpdfstring{operator-\/$>$()}{operator->()}}
+{\footnotesize\ttfamily \label{class_catch_1_1clara_1_1detail_1_1_token_stream_a6c99df344d245194d92cada8981609a9} 
+auto Catch\+::clara\+::detail\+::\+Token\+Stream\+::operator-\/$>$ (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const -\/$>$ \mbox{\hyperlink{struct_catch_1_1clara_1_1detail_1_1_token}{Token}} const \texorpdfstring{$\ast$}{*} \hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{include_2external_2clara_8hpp_source_l00502}{502}} of file \mbox{\hyperlink{include_2external_2clara_8hpp_source}{clara.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00502\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00503\ \ \ \ \ \ \ \ \ \ \ \ \ assert(\ !m\_tokenBuffer.empty()\ );}
+\DoxyCodeLine{00504\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \&m\_tokenBuffer.front();}
+\DoxyCodeLine{00505\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/include/external/\mbox{\hyperlink{include_2external_2clara_8hpp}{clara.\+hpp}}\end{DoxyCompactItemize}

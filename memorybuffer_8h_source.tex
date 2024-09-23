@@ -1,0 +1,63 @@
+\doxysection{memorybuffer.\+h}
+\hypertarget{memorybuffer_8h_source}{}\label{memorybuffer_8h_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/include/rapidjson/memorybuffer.h@{libraries/fc/include/fc/crypto/webauthn\_json/include/rapidjson/memorybuffer.h}}
+\mbox{\hyperlink{memorybuffer_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{memorybuffer_8h_source_l00001}00001\ \textcolor{comment}{//\ Tencent\ is\ pleased\ to\ support\ the\ open\ source\ community\ by\ making\ RapidJSON\ available.}}
+\DoxyCodeLine{\Hypertarget{memorybuffer_8h_source_l00002}00002\ \textcolor{comment}{//\ }}
+\DoxyCodeLine{\Hypertarget{memorybuffer_8h_source_l00003}00003\ \textcolor{comment}{//\ Copyright\ (C)\ 2015\ THL\ A29\ Limited,\ a\ Tencent\ company,\ and\ Milo\ Yip.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{memorybuffer_8h_source_l00004}00004\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{memorybuffer_8h_source_l00005}00005\ \textcolor{comment}{//\ Licensed\ under\ the\ MIT\ License\ (the\ "{}License"{});\ you\ may\ not\ use\ this\ file\ except}}
+\DoxyCodeLine{\Hypertarget{memorybuffer_8h_source_l00006}00006\ \textcolor{comment}{//\ in\ compliance\ with\ the\ License.\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{\Hypertarget{memorybuffer_8h_source_l00007}00007\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{memorybuffer_8h_source_l00008}00008\ \textcolor{comment}{//\ http://opensource.org/licenses/MIT}}
+\DoxyCodeLine{\Hypertarget{memorybuffer_8h_source_l00009}00009\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{memorybuffer_8h_source_l00010}00010\ \textcolor{comment}{//\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software\ distributed\ }}
+\DoxyCodeLine{\Hypertarget{memorybuffer_8h_source_l00011}00011\ \textcolor{comment}{//\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,\ WITHOUT\ WARRANTIES\ OR\ }}
+\DoxyCodeLine{\Hypertarget{memorybuffer_8h_source_l00012}00012\ \textcolor{comment}{//\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.\ See\ the\ License\ for\ the\ }}
+\DoxyCodeLine{\Hypertarget{memorybuffer_8h_source_l00013}00013\ \textcolor{comment}{//\ specific\ language\ governing\ permissions\ and\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{memorybuffer_8h_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{memorybuffer_8h_source_l00015}00015\ \textcolor{preprocessor}{\#ifndef\ RAPIDJSON\_MEMORYBUFFER\_H\_}}
+\DoxyCodeLine{\Hypertarget{memorybuffer_8h_source_l00016}00016\ \textcolor{preprocessor}{\#define\ RAPIDJSON\_MEMORYBUFFER\_H\_}}
+\DoxyCodeLine{\Hypertarget{memorybuffer_8h_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{memorybuffer_8h_source_l00018}00018\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{stream_8h}{stream.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{memorybuffer_8h_source_l00019}00019\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{stack_8h}{internal/stack.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{memorybuffer_8h_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{memorybuffer_8h_source_l00021}00021\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gad3806c8251fdc7da9618b7e922674ffc}{RAPIDJSON\_NAMESPACE\_BEGIN}}}
+\DoxyCodeLine{\Hypertarget{memorybuffer_8h_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{memorybuffer_8h_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{memorybuffer_8h_source_l00036}00036\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ Allocator\ =\ CrtAllocator>}
+\DoxyCodeLine{\Hypertarget{memorybuffer_8h_source_l00037}\mbox{\hyperlink{struct_generic_memory_buffer}{00037}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_generic_memory_buffer}{GenericMemoryBuffer}}\ \{}
+\DoxyCodeLine{\Hypertarget{memorybuffer_8h_source_l00038}\mbox{\hyperlink{struct_generic_memory_buffer_a83cd3a166572414fb8d73356f17d78f2}{00038}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{struct_generic_memory_buffer_a83cd3a166572414fb8d73356f17d78f2}{Ch}};\ \textcolor{comment}{//\ byte}}
+\DoxyCodeLine{\Hypertarget{memorybuffer_8h_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{memorybuffer_8h_source_l00040}\mbox{\hyperlink{struct_generic_memory_buffer_ad08f7da47bca43fcdb0c3b10e22dfa1d}{00040}}\ \ \ \ \ \mbox{\hyperlink{struct_generic_memory_buffer_ad08f7da47bca43fcdb0c3b10e22dfa1d}{GenericMemoryBuffer}}(\mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}*\ allocator\ =\ 0,\ \textcolor{keywordtype}{size\_t}\ capacity\ =\ \mbox{\hyperlink{struct_generic_memory_buffer_af6ecdbdbb8d3aa53cdef6e788e4980be}{kDefaultCapacity}})\ :\ \mbox{\hyperlink{struct_generic_memory_buffer_a977b479180bebe8ae14ca1c11d52a486}{stack\_}}(allocator,\ capacity)\ \{\}}
+\DoxyCodeLine{\Hypertarget{memorybuffer_8h_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{memorybuffer_8h_source_l00042}\mbox{\hyperlink{struct_generic_memory_buffer_a9dfb477983e211893601f8ab637b42d8}{00042}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_generic_memory_buffer_a9dfb477983e211893601f8ab637b42d8}{Put}}(\mbox{\hyperlink{struct_generic_memory_buffer_a83cd3a166572414fb8d73356f17d78f2}{Ch}}\ c)\ \{\ *\mbox{\hyperlink{struct_generic_memory_buffer_a977b479180bebe8ae14ca1c11d52a486}{stack\_}}.template\ \mbox{\hyperlink{struct_generic_memory_buffer_a1455475eba731dc0ce2816c70c775359}{Push<Ch>}}()\ =\ c;\ \}}
+\DoxyCodeLine{\Hypertarget{memorybuffer_8h_source_l00043}\mbox{\hyperlink{struct_generic_memory_buffer_a9861181cab6f5bec2ec08b601aa53575}{00043}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_generic_memory_buffer_a9861181cab6f5bec2ec08b601aa53575}{Flush}}()\ \{\}}
+\DoxyCodeLine{\Hypertarget{memorybuffer_8h_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{memorybuffer_8h_source_l00045}\mbox{\hyperlink{struct_generic_memory_buffer_a036cbe2556778e1edc525602a9821df2}{00045}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_generic_memory_buffer_a036cbe2556778e1edc525602a9821df2}{Clear}}()\ \{\ \mbox{\hyperlink{struct_generic_memory_buffer_a977b479180bebe8ae14ca1c11d52a486}{stack\_}}.Clear();\ \}}
+\DoxyCodeLine{\Hypertarget{memorybuffer_8h_source_l00046}\mbox{\hyperlink{struct_generic_memory_buffer_a3b87deb9bf34c394c8fb262ab53c0c4b}{00046}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_generic_memory_buffer_a3b87deb9bf34c394c8fb262ab53c0c4b}{ShrinkToFit}}()\ \{\ \mbox{\hyperlink{struct_generic_memory_buffer_a977b479180bebe8ae14ca1c11d52a486}{stack\_}}.ShrinkToFit();\ \}}
+\DoxyCodeLine{\Hypertarget{memorybuffer_8h_source_l00047}\mbox{\hyperlink{struct_generic_memory_buffer_a1455475eba731dc0ce2816c70c775359}{00047}}\ \ \ \ \ \mbox{\hyperlink{struct_generic_memory_buffer_a83cd3a166572414fb8d73356f17d78f2}{Ch}}*\ \mbox{\hyperlink{struct_generic_memory_buffer_a1455475eba731dc0ce2816c70c775359}{Push}}(\textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}})\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_generic_memory_buffer_a977b479180bebe8ae14ca1c11d52a486}{stack\_}}.template\ \mbox{\hyperlink{struct_generic_memory_buffer_a1455475eba731dc0ce2816c70c775359}{Push<Ch>}}(\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}});\ \}}
+\DoxyCodeLine{\Hypertarget{memorybuffer_8h_source_l00048}\mbox{\hyperlink{struct_generic_memory_buffer_a82a6706286f1356e1769282f5d496005}{00048}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_generic_memory_buffer_a82a6706286f1356e1769282f5d496005}{Pop}}(\textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}})\ \{\ \mbox{\hyperlink{struct_generic_memory_buffer_a977b479180bebe8ae14ca1c11d52a486}{stack\_}}.template\ \mbox{\hyperlink{struct_generic_memory_buffer_a82a6706286f1356e1769282f5d496005}{Pop<Ch>}}(\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}});\ \}}
+\DoxyCodeLine{\Hypertarget{memorybuffer_8h_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{memorybuffer_8h_source_l00050}\mbox{\hyperlink{struct_generic_memory_buffer_a65217e77ae6d4c249c16360c24854411}{00050}}\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_generic_memory_buffer_a83cd3a166572414fb8d73356f17d78f2}{Ch}}*\ \mbox{\hyperlink{struct_generic_memory_buffer_a65217e77ae6d4c249c16360c24854411}{GetBuffer}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{memorybuffer_8h_source_l00051}00051\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_generic_memory_buffer_a977b479180bebe8ae14ca1c11d52a486}{stack\_}}.template\ Bottom<Ch>();}
+\DoxyCodeLine{\Hypertarget{memorybuffer_8h_source_l00052}00052\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{memorybuffer_8h_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{memorybuffer_8h_source_l00054}\mbox{\hyperlink{struct_generic_memory_buffer_aaab1f18d03109ab01213d3e3d8368ff9}{00054}}\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{struct_generic_memory_buffer_aaab1f18d03109ab01213d3e3d8368ff9}{GetSize}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_generic_memory_buffer_a977b479180bebe8ae14ca1c11d52a486}{stack\_}}.GetSize();\ \}}
+\DoxyCodeLine{\Hypertarget{memorybuffer_8h_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{memorybuffer_8h_source_l00056}\mbox{\hyperlink{struct_generic_memory_buffer_af6ecdbdbb8d3aa53cdef6e788e4980be}{00056}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{struct_generic_memory_buffer_af6ecdbdbb8d3aa53cdef6e788e4980be}{kDefaultCapacity}}\ =\ 256;}
+\DoxyCodeLine{\Hypertarget{memorybuffer_8h_source_l00057}\mbox{\hyperlink{struct_generic_memory_buffer_a977b479180bebe8ae14ca1c11d52a486}{00057}}\ \ \ \ \ \textcolor{keyword}{mutable}\ \mbox{\hyperlink{classinternal_1_1_stack}{internal::Stack<Allocator>}}\ \mbox{\hyperlink{struct_generic_memory_buffer_a977b479180bebe8ae14ca1c11d52a486}{stack\_}};}
+\DoxyCodeLine{\Hypertarget{memorybuffer_8h_source_l00058}00058\ \};}
+\DoxyCodeLine{\Hypertarget{memorybuffer_8h_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{memorybuffer_8h_source_l00060}\mbox{\hyperlink{memorybuffer_8h_aad74f4c6994a951097a63ee117039085}{00060}}\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{struct_generic_memory_buffer}{GenericMemoryBuffer<>}}\ \mbox{\hyperlink{memorybuffer_8h_aad74f4c6994a951097a63ee117039085}{MemoryBuffer}};}
+\DoxyCodeLine{\Hypertarget{memorybuffer_8h_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{memorybuffer_8h_source_l00063}00063\ \textcolor{keyword}{template}<>}
+\DoxyCodeLine{\Hypertarget{memorybuffer_8h_source_l00064}\mbox{\hyperlink{memorybuffer_8h_a635d8eaaf48777150dc08f7d5a8be054}{00064}}\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{memorybuffer_8h_a635d8eaaf48777150dc08f7d5a8be054}{PutN}}(\mbox{\hyperlink{struct_generic_memory_buffer}{MemoryBuffer}}\&\ memoryBuffer,\ \textcolor{keywordtype}{char}\ c,\ \textcolor{keywordtype}{size\_t}\ n)\ \{}
+\DoxyCodeLine{\Hypertarget{memorybuffer_8h_source_l00065}00065\ \ \ \ \ std::memset(memoryBuffer.\mbox{\hyperlink{struct_generic_memory_buffer_a977b479180bebe8ae14ca1c11d52a486}{stack\_}}.Push<\textcolor{keywordtype}{char}>(n),\ c,\ n\ *\ \textcolor{keyword}{sizeof}(c));}
+\DoxyCodeLine{\Hypertarget{memorybuffer_8h_source_l00066}00066\ \}}
+\DoxyCodeLine{\Hypertarget{memorybuffer_8h_source_l00067}00067\ }
+\DoxyCodeLine{\Hypertarget{memorybuffer_8h_source_l00068}00068\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gaf18f052a98b9f5df5448d39484b743c1}{RAPIDJSON\_NAMESPACE\_END}}}
+\DoxyCodeLine{\Hypertarget{memorybuffer_8h_source_l00069}00069\ }
+\DoxyCodeLine{\Hypertarget{memorybuffer_8h_source_l00070}00070\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ RAPIDJSON\_MEMORYBUFFER\_H\_}}
+
+\end{DoxyCode}

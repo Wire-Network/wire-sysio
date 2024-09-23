@@ -1,0 +1,96 @@
+\doxysection{Runtime\+::Intrinsic\+Resolver Struct Reference}
+\hypertarget{struct_runtime_1_1_intrinsic_resolver}{}\label{struct_runtime_1_1_intrinsic_resolver}\index{Runtime::IntrinsicResolver@{Runtime::IntrinsicResolver}}
+
+
+{\ttfamily \#include $<$Linker.\+h$>$}
+
+
+
+Inheritance diagram for Runtime\+::Intrinsic\+Resolver\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=212pt]{struct_runtime_1_1_intrinsic_resolver__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Runtime\+::Intrinsic\+Resolver\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=272pt]{struct_runtime_1_1_intrinsic_resolver__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{_runtime_8h_aae02bf1df7927dd0f69c6412fce40fc4}{RUNTIME\+\_\+\+API}} bool \mbox{\hyperlink{struct_runtime_1_1_intrinsic_resolver_a2a56dfa6a88e030be17a066d2907c763}{resolve}} (const std\+::string \&module\+Name, const std\+::string \&export\+Name, \mbox{\hyperlink{struct_i_r_1_1_object_type}{IR\+::\+Object\+Type}} type, \mbox{\hyperlink{struct_runtime_1_1_object_instance}{Object\+Instance}} \texorpdfstring{$\ast$}{*}\&out\+Object) override
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{struct_runtime_1_1_resolver}{Runtime\+::\+Resolver}}}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static \mbox{\hyperlink{_runtime_8h_aae02bf1df7927dd0f69c6412fce40fc4}{RUNTIME\+\_\+\+API}} \mbox{\hyperlink{struct_runtime_1_1_intrinsic_resolver}{Intrinsic\+Resolver}} \mbox{\hyperlink{struct_runtime_1_1_intrinsic_resolver_aedd78257585aeb8697fae5bc08254f47}{singleton}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{_linker_8h_source_l00017}{17}} of file \mbox{\hyperlink{_linker_8h_source}{Linker.\+h}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_runtime_1_1_intrinsic_resolver_a2a56dfa6a88e030be17a066d2907c763}\index{Runtime::IntrinsicResolver@{Runtime::IntrinsicResolver}!resolve@{resolve}}
+\index{resolve@{resolve}!Runtime::IntrinsicResolver@{Runtime::IntrinsicResolver}}
+\doxysubsubsection{\texorpdfstring{resolve()}{resolve()}}
+{\footnotesize\ttfamily \label{struct_runtime_1_1_intrinsic_resolver_a2a56dfa6a88e030be17a066d2907c763} 
+bool Runtime\+::\+Intrinsic\+Resolver\+::resolve (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{module\+Name}{, }\item[{const std\+::string \&}]{export\+Name}{, }\item[{\mbox{\hyperlink{struct_i_r_1_1_object_type}{IR\+::\+Object\+Type}}}]{type}{, }\item[{\mbox{\hyperlink{struct_runtime_1_1_object_instance}{Object\+Instance}} \texorpdfstring{$\ast$}{*}\&}]{out\+Object}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_runtime_1_1_resolver_a8387253cf2addc917647cba230a00334}{Runtime\+::\+Resolver}}.
+
+
+
+Definition at line \mbox{\hyperlink{_linker_8cpp_source_l00029}{29}} of file \mbox{\hyperlink{_linker_8cpp_source}{Linker.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00030\ \ \ \ \ \{}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Make\ sure\ the\ wavmIntrinsics\ module\ can't\ be\ directly\ imported.}}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(moduleName\ ==\ \textcolor{stringliteral}{"{}wavmIntrinsics"{}})\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};\ \}}
+\DoxyCodeLine{00033\ }
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ outObject\ =\ \mbox{\hyperlink{namespace_intrinsics_a7b30616029cc015f330ebf338c3fb454}{Intrinsics::find}}(moduleName\ +\ \textcolor{stringliteral}{"{}."{}}\ +\ exportName,type);}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ outObject\ !=\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00036\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_runtime_1_1_intrinsic_resolver_a2a56dfa6a88e030be17a066d2907c763_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_runtime_1_1_intrinsic_resolver_aedd78257585aeb8697fae5bc08254f47}\index{Runtime::IntrinsicResolver@{Runtime::IntrinsicResolver}!singleton@{singleton}}
+\index{singleton@{singleton}!Runtime::IntrinsicResolver@{Runtime::IntrinsicResolver}}
+\doxysubsubsection{\texorpdfstring{singleton}{singleton}}
+{\footnotesize\ttfamily \label{struct_runtime_1_1_intrinsic_resolver_aedd78257585aeb8697fae5bc08254f47} 
+\mbox{\hyperlink{_runtime_8h_aae02bf1df7927dd0f69c6412fce40fc4}{RUNTIME\+\_\+\+API}} \mbox{\hyperlink{struct_runtime_1_1_intrinsic_resolver}{Intrinsic\+Resolver}} Runtime\+::\+Intrinsic\+Resolver\+::singleton\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{_linker_8h_source_l00019}{19}} of file \mbox{\hyperlink{_linker_8h_source}{Linker.\+h}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/wasm-\/jit/\+Include/\+Runtime/\mbox{\hyperlink{_linker_8h}{Linker.\+h}}\item 
+libraries/wasm-\/jit/\+Source/\+Runtime/\mbox{\hyperlink{_linker_8cpp}{Linker.\+cpp}}\end{DoxyCompactItemize}

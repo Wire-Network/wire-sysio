@@ -1,0 +1,118 @@
+\doxysection{Catch\+::IReporter\+Registry Struct Reference}
+\hypertarget{struct_catch_1_1_i_reporter_registry}{}\label{struct_catch_1_1_i_reporter_registry}\index{Catch::IReporterRegistry@{Catch::IReporterRegistry}}
+
+
+{\ttfamily \#include $<$catch\+\_\+interfaces\+\_\+reporter.\+h$>$}
+
+
+
+Inheritance diagram for Catch\+::IReporter\+Registry\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=206pt]{struct_catch_1_1_i_reporter_registry__inherit__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{struct_catch_1_1_i_reporter_registry_a29a909d3b5285692826124d992717f2c}{Factory\+Map}} = std\+::map$<$std\+::string, \mbox{\hyperlink{namespace_catch_a67fa7f4bc02f3bbcd6f6669b921d5cf3}{IReporter\+Factory\+Ptr}}$>$
+\item 
+using \mbox{\hyperlink{struct_catch_1_1_i_reporter_registry_a7ca2e70d2b1e76cdcb1dd9017e84a17f}{Listeners}} = std\+::vector$<$\mbox{\hyperlink{namespace_catch_a67fa7f4bc02f3bbcd6f6669b921d5cf3}{IReporter\+Factory\+Ptr}}$>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{struct_catch_1_1_i_reporter_registry_a8f27416c356dad6b7b083213ae296459}{\texorpdfstring{$\sim$}{\string~}\+IReporter\+Registry}} ()
+\item 
+virtual \mbox{\hyperlink{namespace_catch_a1f5555abfc248b3dca63e0c46e55002d}{IStreaming\+Reporter\+Ptr}} \mbox{\hyperlink{struct_catch_1_1_i_reporter_registry_a6a1b86a882828ae2f7e6f9f21431ed72}{create}} (std\+::string const \&\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}, \mbox{\hyperlink{namespace_catch_a961f6f5f07e265684c220a8ae014d7d6}{IConfig\+Ptr}} const \&\mbox{\hyperlink{classconfig}{config}}) const =0
+\item 
+virtual \mbox{\hyperlink{struct_catch_1_1_i_reporter_registry_a29a909d3b5285692826124d992717f2c}{Factory\+Map}} const \& \mbox{\hyperlink{struct_catch_1_1_i_reporter_registry_add3a4d2a843bd8061c0ff8778257e160}{get\+Factories}} () const =0
+\item 
+virtual \mbox{\hyperlink{struct_catch_1_1_i_reporter_registry_a7ca2e70d2b1e76cdcb1dd9017e84a17f}{Listeners}} const \& \mbox{\hyperlink{struct_catch_1_1_i_reporter_registry_a56de1f74de3084d5bb0ff0c9b8d55fba}{get\+Listeners}} () const =0
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{catch__interfaces__reporter_8h_source_l00220}{220}} of file \mbox{\hyperlink{catch__interfaces__reporter_8h_source}{catch\+\_\+interfaces\+\_\+reporter.\+h}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{struct_catch_1_1_i_reporter_registry_a29a909d3b5285692826124d992717f2c}\index{Catch::IReporterRegistry@{Catch::IReporterRegistry}!FactoryMap@{FactoryMap}}
+\index{FactoryMap@{FactoryMap}!Catch::IReporterRegistry@{Catch::IReporterRegistry}}
+\doxysubsubsection{\texorpdfstring{FactoryMap}{FactoryMap}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_i_reporter_registry_a29a909d3b5285692826124d992717f2c} 
+using \mbox{\hyperlink{struct_catch_1_1_i_reporter_registry_a29a909d3b5285692826124d992717f2c}{Catch\+::\+IReporter\+Registry\+::\+Factory\+Map}} = std\+::map$<$std\+::string, \mbox{\hyperlink{namespace_catch_a67fa7f4bc02f3bbcd6f6669b921d5cf3}{IReporter\+Factory\+Ptr}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{catch__interfaces__reporter_8h_source_l00221}{221}} of file \mbox{\hyperlink{catch__interfaces__reporter_8h_source}{catch\+\_\+interfaces\+\_\+reporter.\+h}}.
+
+\Hypertarget{struct_catch_1_1_i_reporter_registry_a7ca2e70d2b1e76cdcb1dd9017e84a17f}\index{Catch::IReporterRegistry@{Catch::IReporterRegistry}!Listeners@{Listeners}}
+\index{Listeners@{Listeners}!Catch::IReporterRegistry@{Catch::IReporterRegistry}}
+\doxysubsubsection{\texorpdfstring{Listeners}{Listeners}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_i_reporter_registry_a7ca2e70d2b1e76cdcb1dd9017e84a17f} 
+using \mbox{\hyperlink{struct_catch_1_1_i_reporter_registry_a7ca2e70d2b1e76cdcb1dd9017e84a17f}{Catch\+::\+IReporter\+Registry\+::\+Listeners}} = std\+::vector$<$\mbox{\hyperlink{namespace_catch_a67fa7f4bc02f3bbcd6f6669b921d5cf3}{IReporter\+Factory\+Ptr}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{catch__interfaces__reporter_8h_source_l00222}{222}} of file \mbox{\hyperlink{catch__interfaces__reporter_8h_source}{catch\+\_\+interfaces\+\_\+reporter.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{struct_catch_1_1_i_reporter_registry_a8f27416c356dad6b7b083213ae296459}\index{Catch::IReporterRegistry@{Catch::IReporterRegistry}!````~IReporterRegistry@{\texorpdfstring{$\sim$}{\string~}IReporterRegistry}}
+\index{````~IReporterRegistry@{\texorpdfstring{$\sim$}{\string~}IReporterRegistry}!Catch::IReporterRegistry@{Catch::IReporterRegistry}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}IReporterRegistry()}{\string~IReporterRegistry()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_i_reporter_registry_a8f27416c356dad6b7b083213ae296459} 
+Catch\+::\+IReporter\+Registry\+::\texorpdfstring{$\sim$}{\string~}\+IReporter\+Registry (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}, {\ttfamily [default]}}
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_catch_1_1_i_reporter_registry_a6a1b86a882828ae2f7e6f9f21431ed72}\index{Catch::IReporterRegistry@{Catch::IReporterRegistry}!create@{create}}
+\index{create@{create}!Catch::IReporterRegistry@{Catch::IReporterRegistry}}
+\doxysubsubsection{\texorpdfstring{create()}{create()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_i_reporter_registry_a6a1b86a882828ae2f7e6f9f21431ed72} 
+virtual \mbox{\hyperlink{namespace_catch_a1f5555abfc248b3dca63e0c46e55002d}{IStreaming\+Reporter\+Ptr}} Catch\+::\+IReporter\+Registry\+::create (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{name}{, }\item[{\mbox{\hyperlink{namespace_catch_a961f6f5f07e265684c220a8ae014d7d6}{IConfig\+Ptr}} const \&}]{config}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{class_catch_1_1_reporter_registry_a821af9a4750d1e63afd26cd1f5e3c302}{Catch\+::\+Reporter\+Registry}}.
+
+\Hypertarget{struct_catch_1_1_i_reporter_registry_add3a4d2a843bd8061c0ff8778257e160}\index{Catch::IReporterRegistry@{Catch::IReporterRegistry}!getFactories@{getFactories}}
+\index{getFactories@{getFactories}!Catch::IReporterRegistry@{Catch::IReporterRegistry}}
+\doxysubsubsection{\texorpdfstring{getFactories()}{getFactories()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_i_reporter_registry_add3a4d2a843bd8061c0ff8778257e160} 
+virtual \mbox{\hyperlink{struct_catch_1_1_i_reporter_registry_a29a909d3b5285692826124d992717f2c}{Factory\+Map}} const  \& Catch\+::\+IReporter\+Registry\+::get\+Factories (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{class_catch_1_1_reporter_registry_a97a4cc859d73ea07fbcdb47cfef611d8}{Catch\+::\+Reporter\+Registry}}.
+
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_catch_1_1_i_reporter_registry_add3a4d2a843bd8061c0ff8778257e160_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_catch_1_1_i_reporter_registry_a56de1f74de3084d5bb0ff0c9b8d55fba}\index{Catch::IReporterRegistry@{Catch::IReporterRegistry}!getListeners@{getListeners}}
+\index{getListeners@{getListeners}!Catch::IReporterRegistry@{Catch::IReporterRegistry}}
+\doxysubsubsection{\texorpdfstring{getListeners()}{getListeners()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_i_reporter_registry_a56de1f74de3084d5bb0ff0c9b8d55fba} 
+virtual \mbox{\hyperlink{struct_catch_1_1_i_reporter_registry_a7ca2e70d2b1e76cdcb1dd9017e84a17f}{Listeners}} const  \& Catch\+::\+IReporter\+Registry\+::get\+Listeners (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{class_catch_1_1_reporter_registry_a28607d81c9bd99e81ae9ac108aa68718}{Catch\+::\+Reporter\+Registry}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__interfaces__reporter_8h}{catch\+\_\+interfaces\+\_\+reporter.\+h}}\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{include_2internal_2catch__interfaces__reporter_8cpp}{catch\+\_\+interfaces\+\_\+reporter.\+cpp}}\end{DoxyCompactItemize}

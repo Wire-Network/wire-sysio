@@ -1,0 +1,5 @@
+<map id="websocketpp::processor::hybi00::prepare_data_frame" name="websocketpp::processor::hybi00::prepare_data_frame">
+<area shape="rect" id="Node000001" title="Prepare a message for writing." alt="" coords="5,5,196,46"/>
+<area shape="rect" id="Node000002" href="$namespacewebsocketpp_1_1utf8__validator.html#ad088137c6f18e6844e20496d8782c835" title="Validate a UTF8 string." alt="" coords="244,5,428,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="196,23,228,23,228,28,196,28"/>
+</map>

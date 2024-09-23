@@ -1,0 +1,455 @@
+\doxysection{sysio\+::testing Namespace Reference}
+\hypertarget{namespacesysio_1_1testing}{}\label{namespacesysio_1_1testing}\index{sysio::testing@{sysio::testing}}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1testing_1_1mock}{mock}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classsysio_1_1testing_1_1base__tester}{base\+\_\+tester}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1testing_1_1chainbase__fixture}{chainbase\+\_\+fixture}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1testing_1_1fc__assert__exception__message__is}{fc\+\_\+assert\+\_\+exception\+\_\+message\+\_\+is}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1testing_1_1fc__assert__exception__message__starts__with}{fc\+\_\+assert\+\_\+exception\+\_\+message\+\_\+starts\+\_\+with}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1testing_1_1fc__exception__message__is}{fc\+\_\+exception\+\_\+message\+\_\+is}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1testing_1_1fc__exception__message__starts__with}{fc\+\_\+exception\+\_\+message\+\_\+starts\+\_\+with}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1testing_1_1sysio__assert__code__is}{sysio\+\_\+assert\+\_\+code\+\_\+is}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1testing_1_1sysio__assert__message__is}{sysio\+\_\+assert\+\_\+message\+\_\+is}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1testing_1_1sysio__assert__message__starts__with}{sysio\+\_\+assert\+\_\+message\+\_\+starts\+\_\+with}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1testing_1_1tester}{tester}}
+\begin{DoxyCompactList}\small\item\em provides utility function to simplify the creation of unit tests \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{classsysio_1_1testing_1_1tester__network}{tester\+\_\+network}}
+\begin{DoxyCompactList}\small\item\em The \doxylink{classsysio_1_1testing_1_1tester__network}{tester\+\_\+network} class provides a simplistic virtual P2P network connecting testing\+\_\+blockchains together. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{classsysio_1_1testing_1_1validating__tester}{validating\+\_\+tester}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1testing_acae96fe90b772011e89845ed8d97bf29}{subjective\+\_\+restriction\+\_\+map}} = std\+::map$<$\mbox{\hyperlink{namespacesysio_1_1chain_a406d45a184cdba0af316b5bf34bf56cf}{builtin\+\_\+protocol\+\_\+feature\+\_\+t}}, \mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature__subjective__restrictions}{protocol\+\_\+feature\+\_\+subjective\+\_\+restrictions}}$>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum class \mbox{\hyperlink{namespacesysio_1_1testing_abbcb96725af015f540fdd36473336baf}{setup\+\_\+policy}} \{ \newline
+\mbox{\hyperlink{namespacesysio_1_1testing_abbcb96725af015f540fdd36473336bafa334c4a4c42fdb79d7ebc3e73b517e6f8}{none}}
+, \mbox{\hyperlink{namespacesysio_1_1testing_abbcb96725af015f540fdd36473336bafa0683f49f54a666d50a178dcbb1bb3aab}{old\+\_\+bios\+\_\+only}}
+, \mbox{\hyperlink{namespacesysio_1_1testing_abbcb96725af015f540fdd36473336bafa037d51f77b132305d732d6e196c33e37}{preactivate\+\_\+feature\+\_\+only}}
+, \mbox{\hyperlink{namespacesysio_1_1testing_abbcb96725af015f540fdd36473336bafaa0aae2fff4ea32f362e16bec17dfe53e}{preactivate\+\_\+feature\+\_\+and\+\_\+new\+\_\+bios}}
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1testing_abbcb96725af015f540fdd36473336bafa03596874c3502399ae3e2755b9852953}{old\+\_\+wasm\+\_\+parser}}
+, \mbox{\hyperlink{namespacesysio_1_1testing_abbcb96725af015f540fdd36473336bafae9dc924f238fa6cc29465942875fe8f0}{full}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+std\+::vector$<$ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} $>$ \mbox{\hyperlink{namespacesysio_1_1testing_ad245f01ccab429ec3c5407ff0266b17e}{read\+\_\+wasm}} (const char \texorpdfstring{$\ast$}{*}fn)
+\item 
+std\+::vector$<$ char $>$ \mbox{\hyperlink{namespacesysio_1_1testing_ada90805bcbce429144d11f16b057999c}{read\+\_\+abi}} (const char \texorpdfstring{$\ast$}{*}fn)
+\item 
+std\+::string \mbox{\hyperlink{namespacesysio_1_1testing_a5c80e405e617f9c628fc6c0381fe35d7}{read\+\_\+wast}} (const char \texorpdfstring{$\ast$}{*}fn)
+\item 
+std\+::string \mbox{\hyperlink{namespacesysio_1_1testing_a966343fcad2e104d6fdeb2c748ac073b}{read\+\_\+binary\+\_\+snapshot}} (const char \texorpdfstring{$\ast$}{*}fn)
+\item 
+\mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \mbox{\hyperlink{namespacesysio_1_1testing_a6de7af83b0ca849f8dc2d189d0a78488}{read\+\_\+json\+\_\+snapshot}} (const char \texorpdfstring{$\ast$}{*}fn)
+\item 
+\mbox{\hyperlink{classfc_1_1variant__object}{fc\+::variant\+\_\+object}} \mbox{\hyperlink{namespacesysio_1_1testing_acbc32a23f9b171377a23b0b1d10f18b3}{filter\+\_\+fields}} (const \mbox{\hyperlink{classfc_1_1variant__object}{fc\+::variant\+\_\+object}} \&filter, const \mbox{\hyperlink{classfc_1_1variant__object}{fc\+::variant\+\_\+object}} \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+void \mbox{\hyperlink{namespacesysio_1_1testing_a320161d2a9dbf7248cef595b30dc742b}{copy\+\_\+row}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1key__value__object}{chain\+::key\+\_\+value\+\_\+object}} \&obj, \mbox{\hyperlink{classfc_1_1vector}{vector}}$<$ char $>$ \&data)
+\item 
+bool \mbox{\hyperlink{namespacesysio_1_1testing_ab79cbc2e7941e60c4be70914ebbe56c9}{expect\+\_\+assert\+\_\+message}} (const \mbox{\hyperlink{classfc_1_1exception}{fc\+::exception}} \&ex, \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} expected)
+\item 
+\mbox{\hyperlink{classsysio_1_1chain_1_1protocol__feature__set}{protocol\+\_\+feature\+\_\+set}} \mbox{\hyperlink{namespacesysio_1_1testing_aa1bac177b89467d958f2093f30295960}{make\+\_\+protocol\+\_\+feature\+\_\+set}} (const \mbox{\hyperlink{namespacesysio_1_1testing_acae96fe90b772011e89845ed8d97bf29}{subjective\+\_\+restriction\+\_\+map}} \&custom\+\_\+subjective\+\_\+restrictions=\{\})
+\item 
+\mbox{\hyperlink{namespacesysio_1_1testing_adc732225a4a8044543b14e8e81e77ddb}{FC\+\_\+\+CAPTURE\+\_\+\+AND\+\_\+\+RETHROW}} ((account)) void \mbox{\hyperlink{classsysio_1_1testing_1_1base__tester}{base\+\_\+tester}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{namespacesysio_1_1testing_acae96fe90b772011e89845ed8d97bf29}\index{sysio::testing@{sysio::testing}!subjective\_restriction\_map@{subjective\_restriction\_map}}
+\index{subjective\_restriction\_map@{subjective\_restriction\_map}!sysio::testing@{sysio::testing}}
+\doxysubsubsection{\texorpdfstring{subjective\_restriction\_map}{subjective\_restriction\_map}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1testing_acae96fe90b772011e89845ed8d97bf29} 
+using \mbox{\hyperlink{namespacesysio_1_1testing_acae96fe90b772011e89845ed8d97bf29}{sysio\+::testing\+::subjective\+\_\+restriction\+\_\+map}} = std\+::map$<$\mbox{\hyperlink{namespacesysio_1_1chain_a406d45a184cdba0af316b5bf34bf56cf}{builtin\+\_\+protocol\+\_\+feature\+\_\+t}}, \mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature__subjective__restrictions}{protocol\+\_\+feature\+\_\+subjective\+\_\+restrictions}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{tester_8hpp_source_l00085}{85}} of file \mbox{\hyperlink{tester_8hpp_source}{tester.\+hpp}}.
+
+
+
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{namespacesysio_1_1testing_abbcb96725af015f540fdd36473336baf}\index{sysio::testing@{sysio::testing}!setup\_policy@{setup\_policy}}
+\index{setup\_policy@{setup\_policy}!sysio::testing@{sysio::testing}}
+\doxysubsubsection{\texorpdfstring{setup\_policy}{setup\_policy}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1testing_abbcb96725af015f540fdd36473336baf} 
+enum \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{namespacesysio_1_1testing_abbcb96725af015f540fdd36473336baf}{sysio\+::testing\+::setup\+\_\+policy}}\hspace{0.3cm}{\ttfamily [strong]}}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{none@{none}!sysio::testing@{sysio::testing}}\index{sysio::testing@{sysio::testing}!none@{none}}}\Hypertarget{namespacesysio_1_1testing_abbcb96725af015f540fdd36473336bafa334c4a4c42fdb79d7ebc3e73b517e6f8}\label{namespacesysio_1_1testing_abbcb96725af015f540fdd36473336baf} 
+none&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{old\_bios\_only@{old\_bios\_only}!sysio::testing@{sysio::testing}}\index{sysio::testing@{sysio::testing}!old\_bios\_only@{old\_bios\_only}}}\Hypertarget{namespacesysio_1_1testing_abbcb96725af015f540fdd36473336bafa0683f49f54a666d50a178dcbb1bb3aab}\label{namespacesysio_1_1testing_abbcb96725af015f540fdd36473336baf} 
+old\+\_\+bios\+\_\+only&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{preactivate\_feature\_only@{preactivate\_feature\_only}!sysio::testing@{sysio::testing}}\index{sysio::testing@{sysio::testing}!preactivate\_feature\_only@{preactivate\_feature\_only}}}\Hypertarget{namespacesysio_1_1testing_abbcb96725af015f540fdd36473336bafa037d51f77b132305d732d6e196c33e37}\label{namespacesysio_1_1testing_abbcb96725af015f540fdd36473336baf} 
+preactivate\+\_\+feature\+\_\+only&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{preactivate\_feature\_and\_new\_bios@{preactivate\_feature\_and\_new\_bios}!sysio::testing@{sysio::testing}}\index{sysio::testing@{sysio::testing}!preactivate\_feature\_and\_new\_bios@{preactivate\_feature\_and\_new\_bios}}}\Hypertarget{namespacesysio_1_1testing_abbcb96725af015f540fdd36473336bafaa0aae2fff4ea32f362e16bec17dfe53e}\label{namespacesysio_1_1testing_abbcb96725af015f540fdd36473336baf} 
+preactivate\+\_\+feature\+\_\+and\+\_\+new\+\_\+bios&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{old\_wasm\_parser@{old\_wasm\_parser}!sysio::testing@{sysio::testing}}\index{sysio::testing@{sysio::testing}!old\_wasm\_parser@{old\_wasm\_parser}}}\Hypertarget{namespacesysio_1_1testing_abbcb96725af015f540fdd36473336bafa03596874c3502399ae3e2755b9852953}\label{namespacesysio_1_1testing_abbcb96725af015f540fdd36473336baf} 
+old\+\_\+wasm\+\_\+parser&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{full@{full}!sysio::testing@{sysio::testing}}\index{sysio::testing@{sysio::testing}!full@{full}}}\Hypertarget{namespacesysio_1_1testing_abbcb96725af015f540fdd36473336bafae9dc924f238fa6cc29465942875fe8f0}\label{namespacesysio_1_1testing_abbcb96725af015f540fdd36473336baf} 
+full&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{tester_8hpp_source_l00061}{61}} of file \mbox{\hyperlink{tester_8hpp_source}{tester.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ none,}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1testing_abbcb96725af015f540fdd36473336bafa0683f49f54a666d50a178dcbb1bb3aab}{old\_bios\_only}},}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1testing_abbcb96725af015f540fdd36473336bafa037d51f77b132305d732d6e196c33e37}{preactivate\_feature\_only}},}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1testing_abbcb96725af015f540fdd36473336bafaa0aae2fff4ea32f362e16bec17dfe53e}{preactivate\_feature\_and\_new\_bios}},}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1testing_abbcb96725af015f540fdd36473336bafa03596874c3502399ae3e2755b9852953}{old\_wasm\_parser}},}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a19f31d9744c12503a9cbdaa1fd3a9848}{full}}}
+\DoxyCodeLine{00068\ \ \ \ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacesysio_1_1testing_a320161d2a9dbf7248cef595b30dc742b}\index{sysio::testing@{sysio::testing}!copy\_row@{copy\_row}}
+\index{copy\_row@{copy\_row}!sysio::testing@{sysio::testing}}
+\doxysubsubsection{\texorpdfstring{copy\_row()}{copy\_row()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1testing_a320161d2a9dbf7248cef595b30dc742b} 
+void sysio\+::testing\+::copy\+\_\+row (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1key__value__object}{chain\+::key\+\_\+value\+\_\+object}} \&}]{obj}{, }\item[{\mbox{\hyperlink{classfc_1_1vector}{vector}}$<$ char $>$ \&}]{data}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{tester_8cpp_source_l00105}{105}} of file \mbox{\hyperlink{tester_8cpp_source}{tester.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ data.resize(\ obj.\mbox{\hyperlink{structsysio_1_1chain_1_1key__value__object_ab78a91101969265c3e5345d6db5941e3}{value}}.\mbox{\hyperlink{classchainbase_1_1shared__cow__string_a3b3c57c0d2ee027bb70beb283be2a0f2}{size}}()\ );}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(\ data.data(),\ obj.\mbox{\hyperlink{structsysio_1_1chain_1_1key__value__object_ab78a91101969265c3e5345d6db5941e3}{value}}.\mbox{\hyperlink{classchainbase_1_1shared__cow__string_aa7b1bac206e0abc7e9ea9d642eb0b5b3}{data}}(),\ obj.\mbox{\hyperlink{structsysio_1_1chain_1_1key__value__object_ab78a91101969265c3e5345d6db5941e3}{value}}.\mbox{\hyperlink{classchainbase_1_1shared__cow__string_a3b3c57c0d2ee027bb70beb283be2a0f2}{size}}()\ );}
+\DoxyCodeLine{00108\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1testing_a320161d2a9dbf7248cef595b30dc742b_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacesysio_1_1testing_ab79cbc2e7941e60c4be70914ebbe56c9}\index{sysio::testing@{sysio::testing}!expect\_assert\_message@{expect\_assert\_message}}
+\index{expect\_assert\_message@{expect\_assert\_message}!sysio::testing@{sysio::testing}}
+\doxysubsubsection{\texorpdfstring{expect\_assert\_message()}{expect\_assert\_message()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1testing_ab79cbc2e7941e60c4be70914ebbe56c9} 
+bool sysio\+::testing\+::expect\+\_\+assert\+\_\+message (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1exception}{fc\+::exception}} \&}]{ex}{, }\item[{\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}}}]{expected}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{tester_8cpp_source_l00091}{91}} of file \mbox{\hyperlink{tester_8cpp_source}{tester.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ BOOST\_TEST\_MESSAGE(\textcolor{stringliteral}{"{}LOG\ :\ "{}}\ <<\ \textcolor{stringliteral}{"{}expected:\ "{}}\ <<\ expected\ <<\ \textcolor{stringliteral}{"{},\ actual:\ "{}}\ <<\ ex.\mbox{\hyperlink{classfc_1_1exception_a70b72c1e4fe0d17485a8b7a0a6f397de}{get\_log}}().at(0).get\_message());}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (ex.\mbox{\hyperlink{classfc_1_1exception_a70b72c1e4fe0d17485a8b7a0a6f397de}{get\_log}}().at(0).get\_message().find(expected)\ !=\ std::string::npos);}
+\DoxyCodeLine{00094\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=336pt]{namespacesysio_1_1testing_ab79cbc2e7941e60c4be70914ebbe56c9_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacesysio_1_1testing_adc732225a4a8044543b14e8e81e77ddb}\index{sysio::testing@{sysio::testing}!FC\_CAPTURE\_AND\_RETHROW@{FC\_CAPTURE\_AND\_RETHROW}}
+\index{FC\_CAPTURE\_AND\_RETHROW@{FC\_CAPTURE\_AND\_RETHROW}!sysio::testing@{sysio::testing}}
+\doxysubsubsection{\texorpdfstring{FC\_CAPTURE\_AND\_RETHROW()}{FC\_CAPTURE\_AND\_RETHROW()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1testing_adc732225a4a8044543b14e8e81e77ddb} 
+sysio\+::testing\+::\+FC\+\_\+\+CAPTURE\+\_\+\+AND\+\_\+\+RETHROW (\begin{DoxyParamCaption}\item[{(account)}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{tester_8cpp_source_l00911}{911}} of file \mbox{\hyperlink{tester_8cpp_source}{tester.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00914\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00915\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1signed__transaction}{signed\_transaction}}\ trx;}
+\DoxyCodeLine{00916\ \ \ \ \ \ \ trx.\mbox{\hyperlink{structsysio_1_1chain_1_1transaction_a407fcf1868b81bb30b85f80d388bbac2}{actions}}.emplace\_back(\ \mbox{\hyperlink{classfc_1_1vector}{vector<permission\_level>}}\{\{account,config::active\_name\}\},}
+\DoxyCodeLine{00917\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ setcode\{}
+\DoxyCodeLine{00918\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .account\ \ \ \ =\ account,}
+\DoxyCodeLine{00919\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .vmtype\ \ \ \ \ =\ 0,}
+\DoxyCodeLine{00920\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .vmversion\ \ =\ 0,}
+\DoxyCodeLine{00921\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .code\ \ \ \ \ \ \ =\ bytes(wasm.begin(),\ wasm.end())}
+\DoxyCodeLine{00922\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00923\ }
+\DoxyCodeLine{00924\ \ \ \ \ \ \ set\_transaction\_headers(trx);}
+\DoxyCodeLine{00925\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ signer\ )\ \{}
+\DoxyCodeLine{00926\ \ \ \ \ \ \ \ \ \ trx.\mbox{\hyperlink{structsysio_1_1chain_1_1signed__transaction_a9cf1962f11e84392dbf74aae5d7550a6}{sign}}(\ *signer,\ control-\/>get\_chain\_id()\ \ );}
+\DoxyCodeLine{00927\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00928\ \ \ \ \ \ \ \ \ \ trx.\mbox{\hyperlink{structsysio_1_1chain_1_1signed__transaction_a9cf1962f11e84392dbf74aae5d7550a6}{sign}}(\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a16234350cb54ef5623702dfb3a0d9624}{get\_private\_key}}(\ account,\ \textcolor{stringliteral}{"{}active"{}}\ ),\ control-\/>get\_chain\_id()\ \ );}
+\DoxyCodeLine{00929\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00930\ \ \ \ \ \ \ \mbox{\hyperlink{programs_2clio_2main_8cpp_afe8fe332483247c5c5e9a46ca80bf569}{push\_transaction}}(\ trx\ );}
+\DoxyCodeLine{00931\ \ \ \ \}\ \mbox{\hyperlink{exception_8hpp_a094902280cad82ad6529ebbd12a697eb}{FC\_CAPTURE\_AND\_RETHROW}}(\ (account)\ )}
+\DoxyCodeLine{00932\ }
+\DoxyCodeLine{00933\ }
+\DoxyCodeLine{00934\ \ \ \ \textcolor{keywordtype}{void}\ base\_tester::set\_abi(\ account\_name\ account,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ abi\_json,\ \textcolor{keyword}{const}\ private\_key\_type*\ signer\ )\ \{}
+\DoxyCodeLine{00935\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ abi\ =\ \mbox{\hyperlink{classfc_1_1json_afad69f9f9c2a9f0105aae99f532f90cb}{fc::json::from\_string}}(abi\_json).template\ as<abi\_def>();}
+\DoxyCodeLine{00936\ \ \ \ \ \ \ signed\_transaction\ trx;}
+\DoxyCodeLine{00937\ \ \ \ \ \ \ trx.\mbox{\hyperlink{structsysio_1_1chain_1_1transaction_a407fcf1868b81bb30b85f80d388bbac2}{actions}}.emplace\_back(\ vector<permission\_level>\{\{account,config::active\_name\}\},}
+\DoxyCodeLine{00938\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ setabi\{}
+\DoxyCodeLine{00939\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .account\ \ \ \ =\ account,}
+\DoxyCodeLine{00940\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .abi\ \ \ \ \ \ \ \ =\ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(abi)}
+\DoxyCodeLine{00941\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00942\ }
+\DoxyCodeLine{00943\ \ \ \ \ \ \ set\_transaction\_headers(trx);}
+\DoxyCodeLine{00944\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ signer\ )\ \{}
+\DoxyCodeLine{00945\ \ \ \ \ \ \ \ \ \ trx.sign(\ *signer,\ control-\/>get\_chain\_id()\ \ );}
+\DoxyCodeLine{00946\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00947\ \ \ \ \ \ \ \ \ \ trx.sign(\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a16234350cb54ef5623702dfb3a0d9624}{get\_private\_key}}(\ account,\ \textcolor{stringliteral}{"{}active"{}}\ ),\ control-\/>get\_chain\_id()\ \ );}
+\DoxyCodeLine{00948\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00949\ \ \ \ \ \ \ \mbox{\hyperlink{programs_2clio_2main_8cpp_afe8fe332483247c5c5e9a46ca80bf569}{push\_transaction}}(\ trx\ );}
+\DoxyCodeLine{00950\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacesysio_1_1testing_acbc32a23f9b171377a23b0b1d10f18b3}\index{sysio::testing@{sysio::testing}!filter\_fields@{filter\_fields}}
+\index{filter\_fields@{filter\_fields}!sysio::testing@{sysio::testing}}
+\doxysubsubsection{\texorpdfstring{filter\_fields()}{filter\_fields()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1testing_acbc32a23f9b171377a23b0b1d10f18b3} 
+\mbox{\hyperlink{classfc_1_1variant__object}{fc\+::variant\+\_\+object}} sysio\+::testing\+::filter\+\_\+fields (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1variant__object}{fc\+::variant\+\_\+object}} \&}]{filter}{, }\item[{const \mbox{\hyperlink{classfc_1_1variant__object}{fc\+::variant\+\_\+object}} \&}]{value}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{tester_8cpp_source_l00096}{96}} of file \mbox{\hyperlink{tester_8cpp_source}{tester.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}\ res;}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\&\ entry\ :\ filter\ )\ \{}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ it\ =\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}.find(entry.key());}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ res(\ it-\/>key(),\ it-\/>value()\ );}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ res;}
+\DoxyCodeLine{00103\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacesysio_1_1testing_aa1bac177b89467d958f2093f30295960}\index{sysio::testing@{sysio::testing}!make\_protocol\_feature\_set@{make\_protocol\_feature\_set}}
+\index{make\_protocol\_feature\_set@{make\_protocol\_feature\_set}!sysio::testing@{sysio::testing}}
+\doxysubsubsection{\texorpdfstring{make\_protocol\_feature\_set()}{make\_protocol\_feature\_set()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1testing_aa1bac177b89467d958f2093f30295960} 
+\mbox{\hyperlink{classsysio_1_1chain_1_1protocol__feature__set}{protocol\+\_\+feature\+\_\+set}} sysio\+::testing\+::make\+\_\+protocol\+\_\+feature\+\_\+set (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1testing_acae96fe90b772011e89845ed8d97bf29}{subjective\+\_\+restriction\+\_\+map}} \&}]{custom\+\_\+subjective\+\_\+restrictions}{ = {\ttfamily \{\}}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{tester_8cpp_source_l00110}{110}} of file \mbox{\hyperlink{tester_8cpp_source}{tester.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1protocol__feature__set}{protocol\_feature\_set}}\ pfs;}
+\DoxyCodeLine{00112\ }
+\DoxyCodeLine{00113\ \ \ \ \ \ \ map<\ builtin\_protocol\_feature\_t,\ std::optional<digest\_type>\ >\ visited\_builtins;}
+\DoxyCodeLine{00114\ }
+\DoxyCodeLine{00115\ \ \ \ \ \ \ std::function<\mbox{\hyperlink{classfc_1_1sha256}{digest\_type}}(\mbox{\hyperlink{namespacesysio_1_1chain_a406d45a184cdba0af316b5bf34bf56cf}{builtin\_protocol\_feature\_t}})>\ add\_builtins\ =}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ [\&pfs,\ \&visited\_builtins,\ \&add\_builtins,\ \&custom\_subjective\_restrictions]}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ (\ \mbox{\hyperlink{namespacesysio_1_1chain_a406d45a184cdba0af316b5bf34bf56cf}{builtin\_protocol\_feature\_t}}\ codename\ )\ -\/>\ \mbox{\hyperlink{classfc_1_1sha256}{digest\_type}}\ \{}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ res\ =\ visited\_builtins.emplace(\ codename,\ std::optional<digest\_type>()\ );}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !res.second\ )\ \{}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ res.first-\/>second,\ protocol\_feature\_exception,}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}invariant\ failure:\ cycle\ found\ in\ builtin\ protocol\ feature\ dependencies"{}}}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *res.first-\/>second;}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00125\ }
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}\ =\ protocol\_feature\_set::make\_default\_builtin\_protocol\_feature(\ codename,}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \ [\&add\_builtins](\ \mbox{\hyperlink{namespacesysio_1_1chain_a406d45a184cdba0af316b5bf34bf56cf}{builtin\_protocol\_feature\_t}}\ d\ )\ \{}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ add\_builtins(\ d\ );}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \}\ );}
+\DoxyCodeLine{00130\ }
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ itr\ =\ custom\_subjective\_restrictions.find(codename);}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr\ !=\ custom\_subjective\_restrictions.end()\ )\ \{}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}.subjective\_restrictions\ =\ itr-\/>second;}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00135\ }
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ pf\ =\ pfs.\mbox{\hyperlink{classsysio_1_1chain_1_1protocol__feature__set_ad1172cf546f8fb4439de8f99f7edb6de}{add\_feature}}(\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}\ );}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ res.first-\/>second\ =\ pf.\mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature_a4743db595022a0f1782a03d306458d2b}{feature\_digest}};}
+\DoxyCodeLine{00138\ }
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ pf.feature\_digest;}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00141\ }
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ :\ builtin\_protocol\_feature\_codenames\ )\ \{}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \ add\_builtins(\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.first\ );}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00145\ }
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ pfs;}
+\DoxyCodeLine{00147\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1testing_aa1bac177b89467d958f2093f30295960_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1testing_aa1bac177b89467d958f2093f30295960_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacesysio_1_1testing_ada90805bcbce429144d11f16b057999c}\index{sysio::testing@{sysio::testing}!read\_abi@{read\_abi}}
+\index{read\_abi@{read\_abi}!sysio::testing@{sysio::testing}}
+\doxysubsubsection{\texorpdfstring{read\_abi()}{read\_abi()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1testing_ada90805bcbce429144d11f16b057999c} 
+std\+::vector$<$ char $>$ sysio\+::testing\+::read\+\_\+abi (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{fn}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{tester_8cpp_source_l00052}{52}} of file \mbox{\hyperlink{tester_8cpp_source}{tester.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ std::ifstream\ abi\_file(fn);}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ abi\_file.is\_open(),\ \textcolor{stringliteral}{"{}abi\ file\ cannot\ be\ found"{}}\ );}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ abi\_file.seekg(0,\ std::ios::end);}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ std::vector<char>\ abi;}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ =\ abi\_file.tellg();}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ >=\ 0,\ \textcolor{stringliteral}{"{}abi\ file\ length\ is\ -\/1"{}}\ );}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ abi.resize(\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}+1);}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ abi\_file.seekg(0,\ std::ios::beg);}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ abi\_file.read(abi.data(),\ abi.size());}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ abi[abi.size()-\/1]\ =\ \textcolor{charliteral}{'\(\backslash\)0'};}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ abi\_file.close();}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ abi;}
+\DoxyCodeLine{00065\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacesysio_1_1testing_a966343fcad2e104d6fdeb2c748ac073b}\index{sysio::testing@{sysio::testing}!read\_binary\_snapshot@{read\_binary\_snapshot}}
+\index{read\_binary\_snapshot@{read\_binary\_snapshot}!sysio::testing@{sysio::testing}}
+\doxysubsubsection{\texorpdfstring{read\_binary\_snapshot()}{read\_binary\_snapshot()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1testing_a966343fcad2e104d6fdeb2c748ac073b} 
+std\+::string sysio\+::testing\+::read\+\_\+binary\+\_\+snapshot (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{fn}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{tester_8cpp_source_l00081}{81}} of file \mbox{\hyperlink{tester_8cpp_source}{tester.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ read\_gzipped\_snapshot(fn);}
+\DoxyCodeLine{00083\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacesysio_1_1testing_a6de7af83b0ca849f8dc2d189d0a78488}\index{sysio::testing@{sysio::testing}!read\_json\_snapshot@{read\_json\_snapshot}}
+\index{read\_json\_snapshot@{read\_json\_snapshot}!sysio::testing@{sysio::testing}}
+\doxysubsubsection{\texorpdfstring{read\_json\_snapshot()}{read\_json\_snapshot()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1testing_a6de7af83b0ca849f8dc2d189d0a78488} 
+\mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} sysio\+::testing\+::read\+\_\+json\+\_\+snapshot (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{fn}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{tester_8cpp_source_l00085}{85}} of file \mbox{\hyperlink{tester_8cpp_source}{tester.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1json_afad69f9f9c2a9f0105aae99f532f90cb}{fc::json::from\_string}}(\ read\_gzipped\_snapshot(fn)\ );}
+\DoxyCodeLine{00087\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1testing_a6de7af83b0ca849f8dc2d189d0a78488_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacesysio_1_1testing_ad245f01ccab429ec3c5407ff0266b17e}\index{sysio::testing@{sysio::testing}!read\_wasm@{read\_wasm}}
+\index{read\_wasm@{read\_wasm}!sysio::testing@{sysio::testing}}
+\doxysubsubsection{\texorpdfstring{read\_wasm()}{read\_wasm()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1testing_ad245f01ccab429ec3c5407ff0266b17e} 
+std\+::vector$<$ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} $>$ sysio\+::testing\+::read\+\_\+wasm (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{fn}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{tester_8cpp_source_l00038}{38}} of file \mbox{\hyperlink{tester_8cpp_source}{tester.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ std::ifstream\ wasm\_file(fn,\ std::ios::binary);}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ wasm\_file.is\_open(),\ \textcolor{stringliteral}{"{}wasm\ file\ cannot\ be\ found"{}}\ );}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ wasm\_file.seekg(0,\ std::ios::end);}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ std::vector<uint8\_t>\ wasm;}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ =\ wasm\_file.tellg();}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ >=\ 0,\ \textcolor{stringliteral}{"{}wasm\ file\ length\ is\ -\/1"{}}\ );}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ wasm.resize(\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}});}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ wasm\_file.seekg(0,\ std::ios::beg);}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ wasm\_file.read((\textcolor{keywordtype}{char}*)wasm.data(),\ wasm.size());}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ wasm\_file.close();}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ wasm;}
+\DoxyCodeLine{00050\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacesysio_1_1testing_a5c80e405e617f9c628fc6c0381fe35d7}\index{sysio::testing@{sysio::testing}!read\_wast@{read\_wast}}
+\index{read\_wast@{read\_wast}!sysio::testing@{sysio::testing}}
+\doxysubsubsection{\texorpdfstring{read\_wast()}{read\_wast()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1testing_a5c80e405e617f9c628fc6c0381fe35d7} 
+std\+::string sysio\+::testing\+::read\+\_\+wast (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{fn}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{tester_8cpp_source_l00023}{23}} of file \mbox{\hyperlink{tester_8cpp_source}{tester.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ std::ifstream\ wast\_file(fn);}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ wast\_file.is\_open(),\ \textcolor{stringliteral}{"{}wast\ file\ cannot\ be\ found"{}}\ );}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ wast\_file.seekg(0,\ std::ios::end);}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ std::vector<char>\ wast;}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ =\ wast\_file.tellg();}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ >=\ 0,\ \textcolor{stringliteral}{"{}wast\ file\ length\ is\ -\/1"{}}\ );}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ wast.resize(\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}+1);}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ wast\_file.seekg(0,\ std::ios::beg);}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ wast\_file.read(wast.data(),\ wast.size());}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ wast[wast.size()-\/1]\ =\ \textcolor{charliteral}{'\(\backslash\)0'};}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ wast\_file.close();}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{wast.data()\};}
+\DoxyCodeLine{00036\ \ \ \ \}}
+
+\end{DoxyCode}

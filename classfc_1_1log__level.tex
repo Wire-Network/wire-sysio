@@ -1,0 +1,196 @@
+\doxysection{fc\+::log\+\_\+level Class Reference}
+\hypertarget{classfc_1_1log__level}{}\label{classfc_1_1log__level}\index{fc::log\_level@{fc::log\_level}}
+
+
+{\ttfamily \#include $<$log\+\_\+message.\+hpp$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4}{values}} \{ \newline
+\mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4a890e233ab2c5d4db2a1c26a10bd2de7d}{all}}
+, \mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4a30d2de77e71beb8d09d530cac04efa25}{debug}}
+, \mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4afe6da1f3a75c3911b0b59bffaea070e1}{info}}
+, \mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4a890c8f6993efee47d617cf72e6b19583}{warn}}
+, \newline
+\mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4a836fc8bbd6f9c9445879679eb512df49}{error}}
+, \mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4a93f96542fabbe1792786b3ab17ad1dda}{off}}
+ \}
+\begin{DoxyCompactList}\small\item\em Define\textquotesingle{}s the various log levels for reporting. ~\newline
+ \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1log__level_ae561572fae60950899c484f3909ddbbd}{log\+\_\+level}} (\mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4}{values}} v=\mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4a93f96542fabbe1792786b3ab17ad1dda}{off}})
+\item 
+\mbox{\hyperlink{classfc_1_1log__level_a10bca9796c4c5513369c113344a49de1}{log\+\_\+level}} (int v)
+\item 
+\mbox{\hyperlink{classfc_1_1log__level_a34e31d7311a699c957aa7ee5e3ed292e}{operator int}} () const
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{classfc_1_1log__level_aa5fa4ff6d6215163f98652d122486266}{to\+\_\+string}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4}{values}} \mbox{\hyperlink{classfc_1_1log__level_af8a08a5fdd2be399f80fc81707638194}{value}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Named scope for \doxylink{classfc_1_1log__level}{log\+\_\+level} enumeration. 
+
+Definition at line \mbox{\hyperlink{log__message_8hpp_source_l00021}{21}} of file \mbox{\hyperlink{log__message_8hpp_source}{log\+\_\+message.\+hpp}}.
+
+
+
+\doxysubsection{Member Enumeration Documentation}
+\Hypertarget{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4}\index{fc::log\_level@{fc::log\_level}!values@{values}}
+\index{values@{values}!fc::log\_level@{fc::log\_level}}
+\doxysubsubsection{\texorpdfstring{values}{values}}
+{\footnotesize\ttfamily \label{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4} 
+enum \mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4}{fc\+::log\+\_\+level\+::values}}}
+
+Each log level includes all higher levels such that Debug includes Error, but Error does not include Debug. \begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{all@{all}!fc::log\_level@{fc::log\_level}}\index{fc::log\_level@{fc::log\_level}!all@{all}}}\Hypertarget{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4a890e233ab2c5d4db2a1c26a10bd2de7d}\label{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4} 
+all&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{debug@{debug}!fc::log\_level@{fc::log\_level}}\index{fc::log\_level@{fc::log\_level}!debug@{debug}}}\Hypertarget{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4a30d2de77e71beb8d09d530cac04efa25}\label{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4} 
+debug&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{info@{info}!fc::log\_level@{fc::log\_level}}\index{fc::log\_level@{fc::log\_level}!info@{info}}}\Hypertarget{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4afe6da1f3a75c3911b0b59bffaea070e1}\label{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4} 
+info&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{warn@{warn}!fc::log\_level@{fc::log\_level}}\index{fc::log\_level@{fc::log\_level}!warn@{warn}}}\Hypertarget{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4a890c8f6993efee47d617cf72e6b19583}\label{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4} 
+warn&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{error@{error}!fc::log\_level@{fc::log\_level}}\index{fc::log\_level@{fc::log\_level}!error@{error}}}\Hypertarget{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4a836fc8bbd6f9c9445879679eb512df49}\label{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4} 
+error&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{off@{off}!fc::log\_level@{fc::log\_level}}\index{fc::log\_level@{fc::log\_level}!off@{off}}}\Hypertarget{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4a93f96542fabbe1792786b3ab17ad1dda}\label{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4} 
+off&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{log__message_8hpp_source_l00030}{30}} of file \mbox{\hyperlink{log__message_8hpp_source}{log\+\_\+message.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4a890e233ab2c5d4db2a1c26a10bd2de7d}{all}},\ }
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4a30d2de77e71beb8d09d530cac04efa25}{debug}},\ }
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4afe6da1f3a75c3911b0b59bffaea070e1}{info}},\ }
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4a890c8f6993efee47d617cf72e6b19583}{warn}},\ }
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4a836fc8bbd6f9c9445879679eb512df49}{error}},\ }
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4a93f96542fabbe1792786b3ab17ad1dda}{off}}\ \ }
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1log__level_ae561572fae60950899c484f3909ddbbd}\index{fc::log\_level@{fc::log\_level}!log\_level@{log\_level}}
+\index{log\_level@{log\_level}!fc::log\_level@{fc::log\_level}}
+\doxysubsubsection{\texorpdfstring{log\_level()}{log\_level()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1log__level_ae561572fae60950899c484f3909ddbbd} 
+fc\+::log\+\_\+level\+::log\+\_\+level (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4}{values}}}]{v}{ = {\ttfamily \mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4a93f96542fabbe1792786b3ab17ad1dda}{off}}}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{log__message_8hpp_source_l00039}{39}} of file \mbox{\hyperlink{log__message_8hpp_source}{log\+\_\+message.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00039\ :\mbox{\hyperlink{classfc_1_1log__level_af8a08a5fdd2be399f80fc81707638194}{value}}(v)\{\}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1log__level_a10bca9796c4c5513369c113344a49de1}\index{fc::log\_level@{fc::log\_level}!log\_level@{log\_level}}
+\index{log\_level@{log\_level}!fc::log\_level@{fc::log\_level}}
+\doxysubsubsection{\texorpdfstring{log\_level()}{log\_level()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1log__level_a10bca9796c4c5513369c113344a49de1} 
+fc\+::log\+\_\+level\+::log\+\_\+level (\begin{DoxyParamCaption}\item[{int}]{v}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{log__message_8hpp_source_l00040}{40}} of file \mbox{\hyperlink{log__message_8hpp_source}{log\+\_\+message.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00040\ :\mbox{\hyperlink{classfc_1_1log__level_af8a08a5fdd2be399f80fc81707638194}{value}}(\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4}{values}}\textcolor{keyword}{>}(v))\{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1log__level_a34e31d7311a699c957aa7ee5e3ed292e}\index{fc::log\_level@{fc::log\_level}!operator int@{operator int}}
+\index{operator int@{operator int}!fc::log\_level@{fc::log\_level}}
+\doxysubsubsection{\texorpdfstring{operator int()}{operator int()}}
+{\footnotesize\ttfamily \label{classfc_1_1log__level_a34e31d7311a699c957aa7ee5e3ed292e} 
+fc\+::log\+\_\+level\+::operator int (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{log__message_8hpp_source_l00041}{41}} of file \mbox{\hyperlink{log__message_8hpp_source}{log\+\_\+message.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00041\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1log__level_af8a08a5fdd2be399f80fc81707638194}{value}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1log__level_aa5fa4ff6d6215163f98652d122486266}\index{fc::log\_level@{fc::log\_level}!to\_string@{to\_string}}
+\index{to\_string@{to\_string}!fc::log\_level@{fc::log\_level}}
+\doxysubsubsection{\texorpdfstring{to\_string()}{to\_string()}}
+{\footnotesize\ttfamily \label{classfc_1_1log__level_aa5fa4ff6d6215163f98652d122486266} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} fc\+::log\+\_\+level\+::to\+\_\+string (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{log__message_8cpp_source_l00149}{149}} of file \mbox{\hyperlink{log__message_8cpp_source}{log\+\_\+message.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(\ \mbox{\hyperlink{classfc_1_1log__level_af8a08a5fdd2be399f80fc81707638194}{value}}\ )}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4a890e233ab2c5d4db2a1c26a10bd2de7d}{log\_level::all}}:}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}all"{}};}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4a30d2de77e71beb8d09d530cac04efa25}{log\_level::debug}}:}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}debug"{}};}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4afe6da1f3a75c3911b0b59bffaea070e1}{log\_level::info}}:}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}info"{}};}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4a890c8f6993efee47d617cf72e6b19583}{log\_level::warn}}:}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}warn"{}};}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4a836fc8bbd6f9c9445879679eb512df49}{log\_level::error}}:}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}error"{}};}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4a93f96542fabbe1792786b3ab17ad1dda}{log\_level::off}}:}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}off"{}};}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}unknown"{}};}
+\DoxyCodeLine{00166\ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classfc_1_1log__level_af8a08a5fdd2be399f80fc81707638194}\index{fc::log\_level@{fc::log\_level}!value@{value}}
+\index{value@{value}!fc::log\_level@{fc::log\_level}}
+\doxysubsubsection{\texorpdfstring{value}{value}}
+{\footnotesize\ttfamily \label{classfc_1_1log__level_af8a08a5fdd2be399f80fc81707638194} 
+\mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4}{values}} fc\+::log\+\_\+level\+::value}
+
+
+
+Definition at line \mbox{\hyperlink{log__message_8hpp_source_l00043}{43}} of file \mbox{\hyperlink{log__message_8hpp_source}{log\+\_\+message.\+hpp}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/log/\mbox{\hyperlink{log__message_8hpp}{log\+\_\+message.\+hpp}}\item 
+libraries/fc/src/log/\mbox{\hyperlink{log__message_8cpp}{log\+\_\+message.\+cpp}}\end{DoxyCompactItemize}

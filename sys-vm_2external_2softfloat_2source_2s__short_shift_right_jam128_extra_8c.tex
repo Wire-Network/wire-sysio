@@ -1,0 +1,45 @@
+\doxysection{libraries/sys-\/vm/external/softfloat/source/s\+\_\+short\+Shift\+Right\+Jam128\+Extra.c File Reference}
+\hypertarget{sys-vm_2external_2softfloat_2source_2s__short_shift_right_jam128_extra_8c}{}\label{sys-vm_2external_2softfloat_2source_2s__short_shift_right_jam128_extra_8c}\index{libraries/sys-\/vm/external/softfloat/source/s\_shortShiftRightJam128Extra.c@{libraries/sys-\/vm/external/softfloat/source/s\_shortShiftRightJam128Extra.c}}
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include "{}platform.\+h"{}}\newline
+{\ttfamily \#include "{}primitive\+Types.\+h"{}}\newline
+Include dependency graph for s\+\_\+short\+Shift\+Right\+Jam128\+Extra.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=343pt]{sys-vm_2external_2softfloat_2source_2s__short_shift_right_jam128_extra_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+struct uint128\+\_\+extra \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2s__short_shift_right_jam128_extra_8c_af69f5bf780e718a3bbb10ee428e41397}{softfloat\+\_\+short\+Shift\+Right\+Jam128\+Extra}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} a64, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} a0, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} extra, \mbox{\hyperlink{stdint_8h_ad0fca8b15c218d2c687f8c373a71d228}{uint\+\_\+fast8\+\_\+t}} dist)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{sys-vm_2external_2softfloat_2source_2s__short_shift_right_jam128_extra_8c_af69f5bf780e718a3bbb10ee428e41397}\index{s\_shortShiftRightJam128Extra.c@{s\_shortShiftRightJam128Extra.c}!softfloat\_shortShiftRightJam128Extra@{softfloat\_shortShiftRightJam128Extra}}
+\index{softfloat\_shortShiftRightJam128Extra@{softfloat\_shortShiftRightJam128Extra}!s\_shortShiftRightJam128Extra.c@{s\_shortShiftRightJam128Extra.c}}
+\doxysubsubsection{\texorpdfstring{softfloat\_shortShiftRightJam128Extra()}{softfloat\_shortShiftRightJam128Extra()}}
+{\footnotesize\ttfamily \label{sys-vm_2external_2softfloat_2source_2s__short_shift_right_jam128_extra_8c_af69f5bf780e718a3bbb10ee428e41397} 
+struct uint128\+\_\+extra softfloat\+\_\+short\+Shift\+Right\+Jam128\+Extra (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{a64}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{a0}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{extra}{, }\item[{\mbox{\hyperlink{stdint_8h_ad0fca8b15c218d2c687f8c373a71d228}{uint\+\_\+fast8\+\_\+t}}}]{dist}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2s__short_shift_right_jam128_extra_8c_source_l00044}{44}} of file \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2s__short_shift_right_jam128_extra_8c_source}{s\+\_\+short\+Shift\+Right\+Jam128\+Extra.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00046\ \{}
+\DoxyCodeLine{00047\ \ \ \ \ \mbox{\hyperlink{stdint_8h_ad0fca8b15c218d2c687f8c373a71d228}{uint\_fast8\_t}}\ uNegDist;}
+\DoxyCodeLine{00048\ \ \ \ \ \textcolor{keyword}{struct\ }uint128\_extra\ z;}
+\DoxyCodeLine{00049\ }
+\DoxyCodeLine{00050\ \ \ \ \ uNegDist\ =\ -\/dist;}
+\DoxyCodeLine{00051\ \ \ \ \ z.v.v64\ =\ a64>>dist;}
+\DoxyCodeLine{00052\ \ \ \ \ z.v.v0\ =\ a64<<(uNegDist\ \&\ 63)\ |\ a0>>dist;}
+\DoxyCodeLine{00053\ \ \ \ \ z.extra\ =\ a0<<(uNegDist\ \&\ 63)\ |\ (extra\ !=\ 0);}
+\DoxyCodeLine{00054\ \ \ \ \ \textcolor{keywordflow}{return}\ z;}
+\DoxyCodeLine{00055\ }
+\DoxyCodeLine{00056\ \}}
+
+\end{DoxyCode}

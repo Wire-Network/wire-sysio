@@ -1,0 +1,5 @@
+<map id="websocketpp::connection::handle_write_frame" name="websocketpp::connection::handle_write_frame">
+<area shape="rect" id="Node000001" title="Process the results of a frame write operation and start the next write." alt="" coords="5,5,175,46"/>
+<area shape="rect" id="Node000002" href="$xbyak__mnemonic_8h.html#aa81aed607133209dade63a226818224d" title=" " alt="" coords="223,13,268,38"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="175,23,207,23,207,28,175,28"/>
+</map>

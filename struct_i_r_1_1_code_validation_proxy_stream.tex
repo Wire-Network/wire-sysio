@@ -1,0 +1,74 @@
+\doxysection{IR\+::Code\+Validation\+Proxy\+Stream\texorpdfstring{$<$}{<} Inner\+Stream \texorpdfstring{$>$}{>} Struct Template Reference}
+\hypertarget{struct_i_r_1_1_code_validation_proxy_stream}{}\label{struct_i_r_1_1_code_validation_proxy_stream}\index{IR::CodeValidationProxyStream$<$ InnerStream $>$@{IR::CodeValidationProxyStream$<$ InnerStream $>$}}
+
+
+{\ttfamily \#include $<$Validate.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_i_r_1_1_code_validation_proxy_stream_ac7481aea51d9dd38c69881c38bf82db0}{Code\+Validation\+Proxy\+Stream}} (const \mbox{\hyperlink{struct_i_r_1_1_module}{Module}} \&\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}, const \mbox{\hyperlink{struct_i_r_1_1_function_def}{Function\+Def}} \&\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908ac1c425268e68385d1ab5074c17a94f14}{function}}, Inner\+Stream \&in\+Inner\+Stream)
+\item 
+void \mbox{\hyperlink{struct_i_r_1_1_code_validation_proxy_stream_af5faff2a07a2acdb1a678bddc244c2ac}{finish\+Validation}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Inner\+Stream$>$\newline
+struct IR\+::\+Code\+Validation\+Proxy\+Stream$<$ Inner\+Stream $>$}
+
+
+Definition at line \mbox{\hyperlink{_validate_8h_source_l00037}{37}} of file \mbox{\hyperlink{_validate_8h_source}{Validate.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{struct_i_r_1_1_code_validation_proxy_stream_ac7481aea51d9dd38c69881c38bf82db0}\index{IR::CodeValidationProxyStream$<$ InnerStream $>$@{IR::CodeValidationProxyStream$<$ InnerStream $>$}!CodeValidationProxyStream@{CodeValidationProxyStream}}
+\index{CodeValidationProxyStream@{CodeValidationProxyStream}!IR::CodeValidationProxyStream$<$ InnerStream $>$@{IR::CodeValidationProxyStream$<$ InnerStream $>$}}
+\doxysubsubsection{\texorpdfstring{CodeValidationProxyStream()}{CodeValidationProxyStream()}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_code_validation_proxy_stream_ac7481aea51d9dd38c69881c38bf82db0} 
+template$<$typename Inner\+Stream $>$ \\
+\mbox{\hyperlink{struct_i_r_1_1_code_validation_proxy_stream}{IR\+::\+Code\+Validation\+Proxy\+Stream}}$<$ Inner\+Stream $>$\+::\+Code\+Validation\+Proxy\+Stream (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct_i_r_1_1_module}{Module}} \&}]{module}{, }\item[{const \mbox{\hyperlink{struct_i_r_1_1_function_def}{Function\+Def}} \&}]{function}{, }\item[{Inner\+Stream \&}]{in\+Inner\+Stream}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_validate_8h_source_l00039}{39}} of file \mbox{\hyperlink{_validate_8h_source}{Validate.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ :\ codeValidationStream(\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}},function)}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ ,\ innerStream(inInnerStream)}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_i_r_1_1_code_validation_proxy_stream_af5faff2a07a2acdb1a678bddc244c2ac}\index{IR::CodeValidationProxyStream$<$ InnerStream $>$@{IR::CodeValidationProxyStream$<$ InnerStream $>$}!finishValidation@{finishValidation}}
+\index{finishValidation@{finishValidation}!IR::CodeValidationProxyStream$<$ InnerStream $>$@{IR::CodeValidationProxyStream$<$ InnerStream $>$}}
+\doxysubsubsection{\texorpdfstring{finishValidation()}{finishValidation()}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_code_validation_proxy_stream_af5faff2a07a2acdb1a678bddc244c2ac} 
+template$<$typename Inner\+Stream $>$ \\
+void \mbox{\hyperlink{struct_i_r_1_1_code_validation_proxy_stream}{IR\+::\+Code\+Validation\+Proxy\+Stream}}$<$ Inner\+Stream $>$\+::finish\+Validation (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_validate_8h_source_l00044}{44}} of file \mbox{\hyperlink{_validate_8h_source}{Validate.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00044\ \{\ codeValidationStream.\mbox{\hyperlink{struct_i_r_1_1_code_validation_stream_a7b3f5a99b18e33290b74a36a79004370}{finish}}();\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_i_r_1_1_code_validation_proxy_stream_af5faff2a07a2acdb1a678bddc244c2ac_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/wasm-\/jit/\+Include/\+IR/\mbox{\hyperlink{_validate_8h}{Validate.\+h}}\end{DoxyCompactItemize}

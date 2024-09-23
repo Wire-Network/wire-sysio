@@ -1,0 +1,185 @@
+\doxysection{gtest\+\_\+xml\+\_\+output\+\_\+unittest\+\_\+.\+cc}
+\hypertarget{gtest__xml__output__unittest___8cc_source}{}\label{gtest__xml__output__unittest___8cc_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/test/gtest\_xml\_output\_unittest\_.cc@{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/test/gtest\_xml\_output\_unittest\_.cc}}
+\mbox{\hyperlink{gtest__xml__output__unittest___8cc}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00001}00001\ \textcolor{comment}{//\ Copyright\ 2006,\ Google\ Inc.}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00002}00002\ \textcolor{comment}{//\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00003}00003\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00004}00004\ \textcolor{comment}{//\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00005}00005\ \textcolor{comment}{//\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00006}00006\ \textcolor{comment}{//\ met:}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00007}00007\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00008}00008\ \textcolor{comment}{//\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00009}00009\ \textcolor{comment}{//\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00010}00010\ \textcolor{comment}{//\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00011}00011\ \textcolor{comment}{//\ copyright\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00012}00012\ \textcolor{comment}{//\ in\ the\ documentation\ and/or\ other\ materials\ provided\ with\ the}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00013}00013\ \textcolor{comment}{//\ distribution.}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00014}00014\ \textcolor{comment}{//\ \ \ \ \ *\ Neither\ the\ name\ of\ Google\ Inc.\ nor\ the\ names\ of\ its}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00015}00015\ \textcolor{comment}{//\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products\ derived\ from}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00016}00016\ \textcolor{comment}{//\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00017}00017\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00018}00018\ \textcolor{comment}{//\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00019}00019\ \textcolor{comment}{//\ "{}AS\ IS"{}\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00020}00020\ \textcolor{comment}{//\ LIMITED\ TO,\ THE\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00021}00021\ \textcolor{comment}{//\ A\ PARTICULAR\ PURPOSE\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ THE\ COPYRIGHT}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00022}00022\ \textcolor{comment}{//\ OWNER\ OR\ CONTRIBUTORS\ BE\ LIABLE\ FOR\ ANY\ DIRECT,\ INDIRECT,\ INCIDENTAL,}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00023}00023\ \textcolor{comment}{//\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES\ (INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00024}00024\ \textcolor{comment}{//\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;\ LOSS\ OF\ USE,}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00025}00025\ \textcolor{comment}{//\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND\ ON\ ANY}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00026}00026\ \textcolor{comment}{//\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00027}00027\ \textcolor{comment}{//\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00028}00028\ \textcolor{comment}{//\ OF\ THIS\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00030}00030\ \textcolor{comment}{//\ Unit\ test\ for\ Google\ Test\ XML\ output.}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00031}00031\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00032}00032\ \textcolor{comment}{//\ A\ user\ can\ specify\ XML\ output\ in\ a\ Google\ Test\ program\ to\ run\ via}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00033}00033\ \textcolor{comment}{//\ either\ the\ GTEST\_OUTPUT\ environment\ variable\ or\ the\ -\/-\/gtest\_output}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00034}00034\ \textcolor{comment}{//\ flag.\ \ This\ is\ used\ for\ testing\ such\ functionality.}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00035}00035\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00036}00036\ \textcolor{comment}{//\ This\ program\ will\ be\ invoked\ from\ a\ Python\ unit\ test.\ \ Don't\ run\ it}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00037}00037\ \textcolor{comment}{//\ directly.}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00039}00039\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{gtest_8h}{gtest/gtest.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00041}00041\ using\ ::testing::InitGoogleTest;}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00042}00042\ using\ ::testing::TestEventListeners;}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00043}00043\ using\ ::testing::TestWithParam;}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00044}00044\ using\ ::testing::UnitTest;}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00045}00045\ using\ ::testing::Test;}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00046}00046\ using\ ::testing::Values;}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00048}\mbox{\hyperlink{class_successful_test}{00048}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_successful_test}{SuccessfulTest}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{class_test}{Test}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00049}00049\ \};}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00051}\mbox{\hyperlink{gtest__xml__output__unittest___8cc_aa6dc865a2584304f44da9f4b085f8e08}{00051}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{class_successful_test}{SuccessfulTest}},\ Succeeds)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00052}00052\ \ \ \mbox{\hyperlink{gtest_8h_a75adcdf89f69b0b615e395daafc315af}{SUCCEED}}()\ <<\ \textcolor{stringliteral}{"{}This\ is\ a\ success."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00053}00053\ \ \ \mbox{\hyperlink{gtest_8h_a1a6db8b1338ee7040329322b77779086}{ASSERT\_EQ}}(1,\ 1);}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00054}00054\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00056}\mbox{\hyperlink{class_failed_test}{00056}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_failed_test}{FailedTest}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{class_test}{Test}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00057}00057\ \};}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00059}\mbox{\hyperlink{gtest__xml__output__unittest___8cc_a0789e983f69fddd50cd6a2ad73a167c2}{00059}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{class_failed_test}{FailedTest}},\ Fails)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00060}00060\ \ \ \mbox{\hyperlink{gtest_8h_a1a6db8b1338ee7040329322b77779086}{ASSERT\_EQ}}(1,\ 2);}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00061}00061\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00062}00062\ }
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00063}\mbox{\hyperlink{class_disabled_test}{00063}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_disabled_test}{DisabledTest}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{class_test}{Test}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00064}00064\ \};}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00066}\mbox{\hyperlink{gtest__xml__output__unittest___8cc_a743749af716f6da79472d5a662e31723}{00066}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{class_disabled_test}{DisabledTest}},\ DISABLED\_test\_not\_run)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00067}00067\ \ \ \mbox{\hyperlink{gtest_8h_a3e26a8d27caa386ed0ea7ce9d5b7c4ed}{FAIL}}()\ <<\ \textcolor{stringliteral}{"{}Unexpected\ failure:\ Disabled\ test\ should\ not\ be\ run"{}};}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00068}00068\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00069}00069\ }
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00070}\mbox{\hyperlink{gtest__xml__output__unittest___8cc_a32b81caf894a39956292191e0ac9efe8}{00070}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(MixedResultTest,\ Succeeds)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00071}00071\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(1,\ 1);}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00072}00072\ \ \ \mbox{\hyperlink{gtest_8h_a1a6db8b1338ee7040329322b77779086}{ASSERT\_EQ}}(1,\ 1);}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00073}00073\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00074}00074\ }
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00075}\mbox{\hyperlink{gtest__xml__output__unittest___8cc_adb093d371e5672f26e82d2df1e66e311}{00075}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(MixedResultTest,\ Fails)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00076}00076\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(1,\ 2);}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00077}00077\ \ \ \mbox{\hyperlink{gtest_8h_a1a6db8b1338ee7040329322b77779086}{ASSERT\_EQ}}(2,\ 3);}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00078}00078\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00080}\mbox{\hyperlink{gtest__xml__output__unittest___8cc_a34e71da1ce98b2984594c8db97018c75}{00080}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(MixedResultTest,\ DISABLED\_test)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00081}00081\ \ \ \mbox{\hyperlink{gtest_8h_a3e26a8d27caa386ed0ea7ce9d5b7c4ed}{FAIL}}()\ <<\ \textcolor{stringliteral}{"{}Unexpected\ failure:\ Disabled\ test\ should\ not\ be\ run"{}};}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00082}00082\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00083}00083\ }
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00084}\mbox{\hyperlink{gtest__xml__output__unittest___8cc_a6ac53dbcf6b02f01cc4f2486db8dd9dc}{00084}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(XmlQuotingTest,\ OutputsCData)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00085}00085\ \ \ \mbox{\hyperlink{gtest_8h_a3e26a8d27caa386ed0ea7ce9d5b7c4ed}{FAIL}}()\ <<\ \textcolor{stringliteral}{"{}XML\ output:\ "{}}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00086}00086\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}<?xml\ encoding=\(\backslash\)"{}utf-\/8\(\backslash\)"{}><top><![CDATA[cdata\ text]]></top>"{}};}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00087}00087\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00088}00088\ }
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00089}00089\ \textcolor{comment}{//\ Helps\ to\ test\ that\ invalid\ characters\ produced\ by\ test\ code\ do\ not\ make}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00090}00090\ \textcolor{comment}{//\ it\ into\ the\ XML\ file.}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00091}\mbox{\hyperlink{gtest__xml__output__unittest___8cc_aa07f760144874b77158b9336bdc95c93}{00091}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(InvalidCharactersTest,\ InvalidCharactersInMessage)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00092}00092\ \ \ \mbox{\hyperlink{gtest_8h_a3e26a8d27caa386ed0ea7ce9d5b7c4ed}{FAIL}}()\ <<\ \textcolor{stringliteral}{"{}Invalid\ characters\ in\ brackets\ [\(\backslash\)x1\(\backslash\)x2]"{}};}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00093}00093\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00094}00094\ }
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00095}\mbox{\hyperlink{class_property_recording_test}{00095}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_property_recording_test}{PropertyRecordingTest}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{class_test}{Test}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00096}00096\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00097}\mbox{\hyperlink{class_property_recording_test_a673c9dfcd9f0c8d10d0df765852c1669}{00097}}\ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_property_recording_test_a673c9dfcd9f0c8d10d0df765852c1669}{SetUpTestCase}}()\ \{\ RecordProperty(\textcolor{stringliteral}{"{}SetUpTestCase"{}},\ \textcolor{stringliteral}{"{}yes"{}});\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00098}\mbox{\hyperlink{class_property_recording_test_ac0d2d47efbdc4399777dffca6071d15d}{00098}}\ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_property_recording_test_ac0d2d47efbdc4399777dffca6071d15d}{TearDownTestCase}}()\ \{\ RecordProperty(\textcolor{stringliteral}{"{}TearDownTestCase"{}},\ \textcolor{stringliteral}{"{}aye"{}});\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00099}00099\ \};}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00100}00100\ }
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00101}\mbox{\hyperlink{gtest__xml__output__unittest___8cc_af81998ca9ca595e3107c142ebd25e0d5}{00101}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{class_property_recording_test}{PropertyRecordingTest}},\ OneProperty)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00102}00102\ \ \ RecordProperty(\textcolor{stringliteral}{"{}key\_1"{}},\ \textcolor{stringliteral}{"{}1"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00103}00103\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00104}00104\ }
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00105}\mbox{\hyperlink{gtest__xml__output__unittest___8cc_adb1f852fc00cf0ee498bdfeda3063904}{00105}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{class_property_recording_test}{PropertyRecordingTest}},\ IntValuedProperty)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00106}00106\ \ \ RecordProperty(\textcolor{stringliteral}{"{}key\_int"{}},\ 1);}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00107}00107\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00108}00108\ }
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00109}\mbox{\hyperlink{gtest__xml__output__unittest___8cc_ae2e5aa08a79eb9b086a145cc06accfc5}{00109}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{class_property_recording_test}{PropertyRecordingTest}},\ ThreeProperties)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00110}00110\ \ \ RecordProperty(\textcolor{stringliteral}{"{}key\_1"{}},\ \textcolor{stringliteral}{"{}1"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00111}00111\ \ \ RecordProperty(\textcolor{stringliteral}{"{}key\_2"{}},\ \textcolor{stringliteral}{"{}2"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00112}00112\ \ \ RecordProperty(\textcolor{stringliteral}{"{}key\_3"{}},\ \textcolor{stringliteral}{"{}3"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00113}00113\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00114}00114\ }
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00115}\mbox{\hyperlink{gtest__xml__output__unittest___8cc_a261de6777fb791a7556366e938ddb98a}{00115}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{class_property_recording_test}{PropertyRecordingTest}},\ TwoValuesForOneKeyUsesLastValue)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00116}00116\ \ \ RecordProperty(\textcolor{stringliteral}{"{}key\_1"{}},\ \textcolor{stringliteral}{"{}1"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00117}00117\ \ \ RecordProperty(\textcolor{stringliteral}{"{}key\_1"{}},\ \textcolor{stringliteral}{"{}2"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00118}00118\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00119}00119\ }
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00120}\mbox{\hyperlink{gtest__xml__output__unittest___8cc_ab78e993a01acfc3e6b0b879351a1e679}{00120}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(NoFixtureTest,\ RecordProperty)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00121}00121\ \ \ RecordProperty(\textcolor{stringliteral}{"{}key"{}},\ \textcolor{stringliteral}{"{}1"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00122}00122\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00123}00123\ }
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00124}\mbox{\hyperlink{gtest__xml__output__unittest___8cc_a8a5eb3769c1d7482bf69f3a03862c6a6}{00124}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{gtest__xml__output__unittest___8cc_a8a5eb3769c1d7482bf69f3a03862c6a6}{ExternalUtilityThatCallsRecordProperty}}(\textcolor{keyword}{const}\ std::string\&\ key,\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00125}00125\ \ \ \mbox{\hyperlink{classtesting_1_1_test_a1559ce1c83f56993b582650c091535a7}{testing::Test::RecordProperty}}(key,\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}});}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00126}00126\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00127}00127\ }
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00128}\mbox{\hyperlink{gtest__xml__output__unittest___8cc_a88d769551f5ca79a6668f6ef64a1abdd}{00128}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{gtest__xml__output__unittest___8cc_a8a5eb3769c1d7482bf69f3a03862c6a6}{ExternalUtilityThatCallsRecordProperty}}(\textcolor{keyword}{const}\ std::string\&\ key,}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00129}00129\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::string\&\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00130}00130\ \ \ \mbox{\hyperlink{classtesting_1_1_test_a1559ce1c83f56993b582650c091535a7}{testing::Test::RecordProperty}}(key,\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}});}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00131}00131\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00132}00132\ }
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00133}\mbox{\hyperlink{gtest__xml__output__unittest___8cc_abe7f5c93beecd6501a7b6ccf838f5b10}{00133}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(NoFixtureTest,\ ExternalUtilityThatCallsRecordIntValuedProperty)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00134}00134\ \ \ \mbox{\hyperlink{gtest__xml__output__unittest___8cc_a8a5eb3769c1d7482bf69f3a03862c6a6}{ExternalUtilityThatCallsRecordProperty}}(\textcolor{stringliteral}{"{}key\_for\_utility\_int"{}},\ 1);}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00135}00135\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00136}00136\ }
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00137}\mbox{\hyperlink{gtest__xml__output__unittest___8cc_aabb1993df586239008c66c29009a8b72}{00137}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(NoFixtureTest,\ ExternalUtilityThatCallsRecordStringValuedProperty)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00138}00138\ \ \ \mbox{\hyperlink{gtest__xml__output__unittest___8cc_a8a5eb3769c1d7482bf69f3a03862c6a6}{ExternalUtilityThatCallsRecordProperty}}(\textcolor{stringliteral}{"{}key\_for\_utility\_string"{}},\ \textcolor{stringliteral}{"{}1"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00139}00139\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00140}00140\ }
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00141}00141\ \textcolor{comment}{//\ Verifies\ that\ the\ test\ parameter\ value\ is\ output\ in\ the\ 'value\_param'}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00142}00142\ \textcolor{comment}{//\ XML\ attribute\ for\ value-\/parameterized\ tests.}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00143}00143\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_value_param_test}{ValueParamTest}}\ :\ \textcolor{keyword}{public}\ TestWithParam<int>\ \{\};}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00144}\mbox{\hyperlink{gtest__xml__output__unittest___8cc_a615039c123426f44437f6119fce3333f}{00144}}\ \mbox{\hyperlink{gtest-param-test_8h_abd3bb216dafbffa36044a6030216ecda}{TEST\_P}}(\mbox{\hyperlink{class_value_param_test}{ValueParamTest}},\ HasValueParamAttribute)\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00145}\mbox{\hyperlink{gtest__xml__output__unittest___8cc_a45f95818a41865db8e0209f3f536fab0}{00145}}\ \mbox{\hyperlink{gtest-param-test_8h_abd3bb216dafbffa36044a6030216ecda}{TEST\_P}}(\mbox{\hyperlink{class_value_param_test}{ValueParamTest}},\ AnotherTestThatHasValueParamAttribute)\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00146}\mbox{\hyperlink{gtest__xml__output__unittest___8cc_a6f0556593693ceebb2d31ff96025cebb}{00146}}\ \mbox{\hyperlink{gtest-param-test_8h_a9e411d086a08ba0cd14b73fb2f8d028f}{INSTANTIATE\_TEST\_CASE\_P}}(Single,\ \mbox{\hyperlink{class_value_param_test}{ValueParamTest}},\ Values(33,\ 42));}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00147}00147\ }
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00148}00148\ \textcolor{preprocessor}{\#if\ GTEST\_HAS\_TYPED\_TEST}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00149}00149\ \textcolor{comment}{//\ Verifies\ that\ the\ type\ parameter\ name\ is\ output\ in\ the\ 'type\_param'}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00150}00150\ \textcolor{comment}{//\ XML\ attribute\ for\ typed\ tests.}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00151}00151\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_typed_test}{TypedTest}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{class_test}{Test}}\ \{\};}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00152}00152\ \textcolor{keyword}{typedef}\ testing::Types<int,\ long>\ TypedTestTypes;}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00153}00153\ \mbox{\hyperlink{gtest__list__tests__unittest___8cc_a862ed8944c2b3e4827e95002d20c45d3}{TYPED\_TEST\_CASE}}(\mbox{\hyperlink{class_typed_test}{TypedTest}},\ TypedTestTypes);}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00154}00154\ \mbox{\hyperlink{gtest__list__tests__unittest___8cc_a83ec84c5fac9fdffa59a16e5d043bd66}{TYPED\_TEST}}(\mbox{\hyperlink{class_typed_test}{TypedTest}},\ HasTypeParamAttribute)\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00155}00155\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00156}00156\ }
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00157}00157\ \textcolor{preprocessor}{\#if\ GTEST\_HAS\_TYPED\_TEST\_P}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00158}00158\ \textcolor{comment}{//\ Verifies\ that\ the\ type\ parameter\ name\ is\ output\ in\ the\ 'type\_param'}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00159}00159\ \textcolor{comment}{//\ XML\ attribute\ for\ type-\/parameterized\ tests.}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00160}00160\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>\ \textcolor{keyword}{class\ }TypeParameterizedTestCase\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{class_test}{Test}}\ \{\};}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00161}00161\ \mbox{\hyperlink{gtest__list__tests__unittest___8cc_a8f36af28829ba875ca3675b4054f48b6}{TYPED\_TEST\_CASE\_P}}(TypeParameterizedTestCase);}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00162}00162\ \mbox{\hyperlink{gtest__list__tests__unittest___8cc_aadd51dfff9d63b5e0faa0130697684c1}{TYPED\_TEST\_P}}(TypeParameterizedTestCase,\ HasTypeParamAttribute)\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00163}00163\ \mbox{\hyperlink{gtest__list__tests__unittest___8cc_a3316a9dc1c581f96a50ec10e0c116e5c}{REGISTER\_TYPED\_TEST\_CASE\_P}}(TypeParameterizedTestCase,\ HasTypeParamAttribute);}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00164}00164\ \textcolor{keyword}{typedef}\ testing::Types<int,\ long>\ TypeParameterizedTestCaseTypes;}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00165}00165\ \mbox{\hyperlink{gtest__list__tests__unittest___8cc_abace4e22d147fb69e2be527b355a2316}{INSTANTIATE\_TYPED\_TEST\_CASE\_P}}(Single,}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00166}00166\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ TypeParameterizedTestCase,}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00167}00167\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ TypeParameterizedTestCaseTypes);}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00168}00168\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00169}00169\ }
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00170}\mbox{\hyperlink{gtest__xml__output__unittest___8cc_a3c04138a5bfe5d72780bb7e82a18e627}{00170}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}(\textcolor{keywordtype}{int}\ argc,\ \textcolor{keywordtype}{char}**\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}})\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00171}00171\ \ \ InitGoogleTest(\&argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}});}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00172}00172\ }
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00173}00173\ \ \ \textcolor{keywordflow}{if}\ (argc\ >\ 1\ \&\&\ strcmp(\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[1],\ \textcolor{stringliteral}{"{}-\/-\/shut\_down\_xml"{}})\ ==\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00174}00174\ \ \ \ \ TestEventListeners\&\ listeners\ =\ UnitTest::GetInstance()-\/>listeners();}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00175}00175\ \ \ \ \ \textcolor{keyword}{delete}\ listeners.Release(listeners.default\_xml\_generator());}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00176}00176\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00177}00177\ \ \ \mbox{\hyperlink{classtesting_1_1_test_a1559ce1c83f56993b582650c091535a7}{testing::Test::RecordProperty}}(\textcolor{stringliteral}{"{}ad\_hoc\_property"{}},\ \textcolor{stringliteral}{"{}42"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00178}00178\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{gtest_8h_a853a3792807489591d3d4a2f2ff9359f}{RUN\_ALL\_TESTS}}();}
+\DoxyCodeLine{\Hypertarget{gtest__xml__output__unittest___8cc_source_l00179}00179\ \}}
+
+\end{DoxyCode}

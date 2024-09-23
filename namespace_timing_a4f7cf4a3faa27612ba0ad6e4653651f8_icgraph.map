@@ -1,0 +1,12 @@
+<map id="Timing::logRatePerSecond" name="Timing::logRatePerSecond">
+<area shape="rect" id="Node000001" title=" " alt="" coords="682,31,859,56"/>
+<area shape="rect" id="Node000002" href="$namespace_w_a_s_t.html#a9ffdd3dd8d6db105464488183a5f13da" title=" " alt="" coords="551,5,634,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="666,31,634,27,634,21,667,26"/>
+<area shape="rect" id="Node000003" href="$namespace_w_a_s_t.html#a6d93426db9bd262249b9ce93ddba7c87" title=" " alt="" coords="364,31,503,56"/>
+<area shape="poly" id="edge5_Node000001_Node000003" title=" " alt="" coords="666,46,504,46,504,41,666,41"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="537,30,504,35,503,30,536,24"/>
+<area shape="rect" id="Node000004" href="$namespacesysio_1_1chain.html#ae6ea4fd60bb72cc213f5311600ca63e8" title=" " alt="" coords="189,23,316,64"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="349,46,316,46,316,41,349,41"/>
+<area shape="rect" id="Node000005" href="$classsysio_1_1testing_1_1base__tester.html#a768d08e70915faf981cdfe6da50f24d1" title=" " alt="" coords="5,23,141,64"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="173,46,141,46,141,41,173,41"/>
+</map>

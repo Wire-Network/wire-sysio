@@ -1,0 +1,155 @@
+\doxysection{catch\+\_\+matchers\+\_\+floating.\+cpp}
+\hypertarget{catch__matchers__floating_8cpp_source}{}\label{catch__matchers__floating_8cpp_source}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_matchers\_floating.cpp@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_matchers\_floating.cpp}}
+\mbox{\hyperlink{catch__matchers__floating_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00002}00002\ \textcolor{comment}{\ *\ \ Created\ by\ Martin\ on\ 07/11/2017.}}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00004}00004\ \textcolor{comment}{\ *\ Distributed\ under\ the\ Boost\ Software\ License,\ Version\ 1.0.\ (See\ accompanying}}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00005}00005\ \textcolor{comment}{\ *\ file\ LICENSE\_1\_0.txt\ or\ copy\ at\ http://www.boost.org/LICENSE\_1\_0.txt)}}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00006}00006\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__matchers__floating_8h}{catch\_matchers\_floating.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__enforce_8h}{catch\_enforce.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__polyfills_8hpp}{catch\_polyfills.hpp}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00011}00011\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__to__string_8hpp}{catch\_to\_string.hpp}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00012}00012\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__tostring_8h}{catch\_tostring.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00014}00014\ \textcolor{preprocessor}{\#include\ <cstdlib>}}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00015}00015\ \textcolor{preprocessor}{\#include\ <cstdint>}}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00016}00016\ \textcolor{preprocessor}{\#include\ <cstring>}}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00018}00018\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00019}00019\ \textcolor{keyword}{namespace\ }Matchers\ \{}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00020}\mbox{\hyperlink{namespace_catch_1_1_matchers_1_1_floating}{00020}}\ \textcolor{keyword}{namespace\ }Floating\ \{}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00021}\mbox{\hyperlink{namespace_catch_1_1_matchers_1_1_floating_acc92722dc04d13912dac9c603866804c}{00021}}\ \textcolor{keyword}{enum\ class}\ \mbox{\hyperlink{namespace_catch_1_1_matchers_1_1_floating_acc92722dc04d13912dac9c603866804c}{FloatingPointKind}}\ :\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00022}00022\ \ \ \ \ \mbox{\hyperlink{namespace_catch_1_1_matchers_1_1_floating_acc92722dc04d13912dac9c603866804ca22ae0e2b89e5e3d477f988cc36d3272b}{Float}},}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00023}00023\ \ \ \ \ \mbox{\hyperlink{namespace_catch_1_1_matchers_1_1_floating_acc92722dc04d13912dac9c603866804cad909d38d705ce75386dd86e611a82f5b}{Double}}}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00024}00024\ \};}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00025}00025\ \}}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00026}00026\ \}}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00027}00027\ \}}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00029}00029\ \textcolor{keyword}{namespace\ }\{}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00031}00031\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00032}00032\ \textcolor{keyword}{struct\ }Converter;}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00034}00034\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00035}00035\ \textcolor{keyword}{struct\ }Converter<float>\ \{}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00036}00036\ \ \ \ \ \textcolor{keyword}{static\_assert}(\textcolor{keyword}{sizeof}(float)\ ==\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}}),\ \textcolor{stringliteral}{"{}Important\ ULP\ matcher\ assumption\ violated"{}});}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00037}00037\ \ \ \ \ Converter(\textcolor{keywordtype}{float}\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})\ \{}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00038}00038\ \ \ \ \ \ \ \ \ std::memcpy(\&i,\ \&\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}},\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}));}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00039}00039\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00040}00040\ \ \ \ \ \mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}}\ i;}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00041}00041\ \};}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00043}00043\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00044}00044\ \textcolor{keyword}{struct\ }Converter<double>\ \{}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00045}00045\ \ \ \ \ \textcolor{keyword}{static\_assert}(\textcolor{keyword}{sizeof}(double)\ ==\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}),\ \textcolor{stringliteral}{"{}Important\ ULP\ matcher\ assumption\ violated"{}});}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00046}00046\ \ \ \ \ Converter(\textcolor{keywordtype}{double}\ d)\ \{}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00047}00047\ \ \ \ \ \ \ \ \ std::memcpy(\&i,\ \&d,\ \textcolor{keyword}{sizeof}(d));}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00048}00048\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00049}00049\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ i;}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00050}00050\ \};}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00052}00052\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00053}00053\ \textcolor{keyword}{auto}\ convert(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ t)\ -\/>\ Converter<T>\ \{}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00054}00054\ \ \ \ \ \textcolor{keywordflow}{return}\ Converter<T>(t);}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00055}00055\ \}}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00057}00057\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ FP>}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00058}00058\ \textcolor{keywordtype}{bool}\ almostEqualUlps(FP\ lhs,\ FP\ rhs,\ \textcolor{keywordtype}{int}\ maxUlpDiff)\ \{}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00059}00059\ \ \ \ \ \textcolor{comment}{//\ Comparison\ with\ NaN\ should\ always\ be\ false.}}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00060}00060\ \ \ \ \ \textcolor{comment}{//\ This\ way\ we\ can\ rule\ it\ out\ before\ getting\ into\ the\ ugly\ details}}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00061}00061\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespace_catch_aff37796f0f578c2816f74267e641c5f7}{Catch::isnan}}(lhs)\ ||\ \mbox{\hyperlink{namespace_catch_aff37796f0f578c2816f74267e641c5f7}{Catch::isnan}}(rhs))\ \{}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00062}00062\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00063}00063\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00065}00065\ \ \ \ \ \textcolor{keyword}{auto}\ lc\ =\ convert(lhs);}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00066}00066\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}}\ =\ convert(rhs);}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00067}00067\ }
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00068}00068\ \ \ \ \ \textcolor{keywordflow}{if}\ ((lc.i\ <\ 0)\ !=\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}}.i\ <\ 0))\ \{}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00069}00069\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Potentially\ we\ can\ have\ +0\ and\ -\/0}}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00070}00070\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ lhs\ ==\ rhs;}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00071}00071\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00073}00073\ \ \ \ \ \textcolor{keyword}{auto}\ ulpDiff\ =\ std::abs(lc.i\ -\/\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}}.i);}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00074}00074\ \ \ \ \ \textcolor{keywordflow}{return}\ ulpDiff\ <=\ maxUlpDiff;}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00075}00075\ \}}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00076}00076\ }
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00077}00077\ \}}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00080}00080\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00081}00081\ \textcolor{keyword}{namespace\ }Matchers\ \{}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00082}00082\ \textcolor{keyword}{namespace\ }Floating\ \{}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00083}\mbox{\hyperlink{struct_catch_1_1_matchers_1_1_floating_1_1_within_abs_matcher_ac45340b98c41230a7def5bd86c2d870f}{00083}}\ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_floating_1_1_within_abs_matcher_ac45340b98c41230a7def5bd86c2d870f}{WithinAbsMatcher::WithinAbsMatcher}}(\textcolor{keywordtype}{double}\ target,\ \textcolor{keywordtype}{double}\ margin)}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00084}00084\ \ \ \ \ \ \ \ \ :m\_target\{\ target\ \},\ m\_margin\{\ margin\ \}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00085}00085\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{catch__enforce_8h_aa4c5f453d4352f75712de56e5892849f}{CATCH\_ENFORCE}}(margin\ >=\ 0,\ \textcolor{stringliteral}{"{}Invalid\ margin:\ "{}}\ <<\ margin\ <<\ \textcolor{charliteral}{'.'}}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00086}00086\ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\ Margin\ has\ to\ be\ non-\/negative."{}});}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00087}00087\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00088}00088\ }
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00089}00089\ \ \ \ \ \textcolor{comment}{//\ Performs\ equivalent\ check\ of\ std::fabs(lhs\ -\/\ rhs)\ <=\ margin}}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00090}00090\ \ \ \ \ \textcolor{comment}{//\ But\ without\ the\ subtraction\ to\ allow\ for\ INFINITY\ in\ comparison}}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00091}\mbox{\hyperlink{struct_catch_1_1_matchers_1_1_floating_1_1_within_abs_matcher_afa5d8eed57f12c1e5d006471eb0bfe72}{00091}}\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_floating_1_1_within_abs_matcher_afa5d8eed57f12c1e5d006471eb0bfe72}{WithinAbsMatcher::match}}(\textcolor{keywordtype}{double}\ \textcolor{keyword}{const}\&\ matchee)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00092}00092\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (matchee\ +\ m\_margin\ >=\ m\_target)\ \&\&\ (m\_target\ +\ m\_margin\ >=\ matchee);}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00093}00093\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00094}00094\ }
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00095}\mbox{\hyperlink{struct_catch_1_1_matchers_1_1_floating_1_1_within_abs_matcher_a206a738680f8767af31d3f1835afff3f}{00095}}\ \ \ \ \ std::string\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_floating_1_1_within_abs_matcher_a206a738680f8767af31d3f1835afff3f}{WithinAbsMatcher::describe}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00096}00096\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}is\ within\ "{}}\ +\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(m\_margin)\ +\ \textcolor{stringliteral}{"{}\ of\ "{}}\ +\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(m\_target);}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00097}00097\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00098}00098\ }
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00099}00099\ }
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00100}\mbox{\hyperlink{struct_catch_1_1_matchers_1_1_floating_1_1_within_ulps_matcher_a836074ae4010275284ab66b2485c6575}{00100}}\ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_floating_1_1_within_ulps_matcher_a836074ae4010275284ab66b2485c6575}{WithinUlpsMatcher::WithinUlpsMatcher}}(\textcolor{keywordtype}{double}\ target,\ \textcolor{keywordtype}{int}\ ulps,\ \mbox{\hyperlink{namespace_catch_1_1_matchers_1_1_floating_acc92722dc04d13912dac9c603866804c}{FloatingPointKind}}\ baseType)}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00101}00101\ \ \ \ \ \ \ \ \ :m\_target\{\ target\ \},\ m\_ulps\{\ ulps\ \},\ m\_type\{\ baseType\ \}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00102}00102\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{catch__enforce_8h_aa4c5f453d4352f75712de56e5892849f}{CATCH\_ENFORCE}}(ulps\ >=\ 0,\ \textcolor{stringliteral}{"{}Invalid\ ULP\ setting:\ "{}}\ <<\ ulps\ <<\ \textcolor{charliteral}{'.'}}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00103}00103\ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\ ULPs\ have\ to\ be\ non-\/negative."{}});}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00104}00104\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00105}00105\ }
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00106}00106\ \textcolor{preprocessor}{\#if\ defined(\_\_clang\_\_)}}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00107}00107\ \textcolor{preprocessor}{\#pragma\ clang\ diagnostic\ push}}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00108}00108\ \textcolor{comment}{//\ Clang\ <3.5\ reports\ on\ the\ default\ branch\ in\ the\ switch\ below}}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00109}00109\ \textcolor{preprocessor}{\#pragma\ clang\ diagnostic\ ignored\ "{}-\/Wunreachable-\/code"{}}}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00110}00110\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00111}00111\ }
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00112}\mbox{\hyperlink{struct_catch_1_1_matchers_1_1_floating_1_1_within_ulps_matcher_aabda42a0dc5d00f3c5916feb75006b32}{00112}}\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_floating_1_1_within_ulps_matcher_aabda42a0dc5d00f3c5916feb75006b32}{WithinUlpsMatcher::match}}(\textcolor{keywordtype}{double}\ \textcolor{keyword}{const}\&\ matchee)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00113}00113\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (m\_type)\ \{}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00114}00114\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespace_catch_1_1_matchers_1_1_floating_acc92722dc04d13912dac9c603866804ca22ae0e2b89e5e3d477f988cc36d3272b}{FloatingPointKind::Float}}:}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00115}00115\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ almostEqualUlps<float>(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{float}\textcolor{keyword}{>}(matchee),\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{float}\textcolor{keyword}{>}(m\_target),\ m\_ulps);}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00116}00116\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespace_catch_1_1_matchers_1_1_floating_acc92722dc04d13912dac9c603866804cad909d38d705ce75386dd86e611a82f5b}{FloatingPointKind::Double}}:}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00117}00117\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ almostEqualUlps<double>(matchee,\ m\_target,\ m\_ulps);}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00118}00118\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00119}00119\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{catch__enforce_8h_a05b6c8a530fa2e5b397add8966522777}{CATCH\_INTERNAL\_ERROR}}(\ \textcolor{stringliteral}{"{}Unknown\ FloatingPointKind\ value"{}}\ );}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00120}00120\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00121}00121\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00122}00122\ }
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00123}00123\ \textcolor{preprocessor}{\#if\ defined(\_\_clang\_\_)}}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00124}00124\ \textcolor{preprocessor}{\#pragma\ clang\ diagnostic\ pop}}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00125}00125\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00126}00126\ }
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00127}\mbox{\hyperlink{struct_catch_1_1_matchers_1_1_floating_1_1_within_ulps_matcher_ad9bc8bb7f3abd326580a4bf6cf369b1b}{00127}}\ \ \ \ \ std::string\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_floating_1_1_within_ulps_matcher_ad9bc8bb7f3abd326580a4bf6cf369b1b}{WithinUlpsMatcher::describe}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00128}00128\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}is\ within\ "{}}\ +\ \mbox{\hyperlink{namespace_catch_a800dd11d86d4ee3e86f9b83336b94b08}{Catch::to\_string}}(m\_ulps)\ +\ \textcolor{stringliteral}{"{}\ ULPs\ of\ "{}}\ +\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(m\_target)\ +\ ((m\_type\ ==\ \mbox{\hyperlink{namespace_catch_1_1_matchers_1_1_floating_acc92722dc04d13912dac9c603866804ca22ae0e2b89e5e3d477f988cc36d3272b}{FloatingPointKind::Float}})?\ \textcolor{stringliteral}{"{}f"{}}\ :\ \textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00129}00129\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00130}00130\ }
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00131}00131\ \}\textcolor{comment}{//\ namespace\ Floating}}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00132}00132\ }
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00133}00133\ }
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00134}00134\ }
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00135}\mbox{\hyperlink{namespace_catch_1_1_matchers_ae895591bd78a7d0ce4cdf3cf40d89ab5}{00135}}\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_floating_1_1_within_ulps_matcher}{Floating::WithinUlpsMatcher}}\ \mbox{\hyperlink{namespace_catch_1_1_matchers_ae895591bd78a7d0ce4cdf3cf40d89ab5}{WithinULP}}(\textcolor{keywordtype}{double}\ target,\ \textcolor{keywordtype}{int}\ maxUlpDiff)\ \{}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00136}00136\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_floating_1_1_within_ulps_matcher}{Floating::WithinUlpsMatcher}}(target,\ maxUlpDiff,\ \mbox{\hyperlink{namespace_catch_1_1_matchers_1_1_floating_acc92722dc04d13912dac9c603866804cad909d38d705ce75386dd86e611a82f5b}{Floating::FloatingPointKind::Double}});}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00137}00137\ \}}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00138}00138\ }
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00139}\mbox{\hyperlink{namespace_catch_1_1_matchers_ab87ee77e5349fac450d1e631dee86496}{00139}}\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_floating_1_1_within_ulps_matcher}{Floating::WithinUlpsMatcher}}\ \mbox{\hyperlink{namespace_catch_1_1_matchers_ae895591bd78a7d0ce4cdf3cf40d89ab5}{WithinULP}}(\textcolor{keywordtype}{float}\ target,\ \textcolor{keywordtype}{int}\ maxUlpDiff)\ \{}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00140}00140\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_floating_1_1_within_ulps_matcher}{Floating::WithinUlpsMatcher}}(target,\ maxUlpDiff,\ \mbox{\hyperlink{namespace_catch_1_1_matchers_1_1_floating_acc92722dc04d13912dac9c603866804ca22ae0e2b89e5e3d477f988cc36d3272b}{Floating::FloatingPointKind::Float}});}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00141}00141\ \}}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00142}00142\ }
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00143}\mbox{\hyperlink{namespace_catch_1_1_matchers_a4c9ea76d47d02de0cf2d354c87c26e95}{00143}}\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_floating_1_1_within_abs_matcher}{Floating::WithinAbsMatcher}}\ \mbox{\hyperlink{namespace_catch_1_1_matchers_a4c9ea76d47d02de0cf2d354c87c26e95}{WithinAbs}}(\textcolor{keywordtype}{double}\ target,\ \textcolor{keywordtype}{double}\ margin)\ \{}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00144}00144\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_floating_1_1_within_abs_matcher}{Floating::WithinAbsMatcher}}(target,\ margin);}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00145}00145\ \}}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00146}00146\ }
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00147}00147\ \}\ \textcolor{comment}{//\ namespace\ Matchers}}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00148}00148\ \}\ \textcolor{comment}{//\ namespace\ Catch}}
+\DoxyCodeLine{\Hypertarget{catch__matchers__floating_8cpp_source_l00149}00149\ }
+
+\end{DoxyCode}

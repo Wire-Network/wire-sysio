@@ -1,0 +1,408 @@
+\doxysection{sysio\+::subjective\+\_\+billing Class Reference}
+\hypertarget{classsysio_1_1subjective__billing}{}\label{classsysio_1_1subjective__billing}\index{sysio::subjective\_billing@{sysio::subjective\_billing}}
+
+
+{\ttfamily \#include $<$subjective\+\_\+billing.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{classsysio_1_1subjective__billing_ae9609ccca5fb1be5d7421ea6acf002b4}{remove\+\_\+subjective\+\_\+billing}} (const \mbox{\hyperlink{namespacesysio_1_1chain_aa85a3b49b3b219d1e3840567579e7e63}{transaction\+\_\+id\+\_\+type}} \&trx\+\_\+id, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} time\+\_\+ordinal)
+\item 
+void \mbox{\hyperlink{classsysio_1_1subjective__billing_a6f9f1b4e1f20dbe98360c6a9f4f7219f}{disable}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1subjective__billing_a6ce772a2163326920255c1faea2309f5}{disable\+\_\+account}} (\mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{chain\+::account\+\_\+name}} \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})
+\item 
+bool \mbox{\hyperlink{classsysio_1_1subjective__billing_a7da6a0636378886a46193d41089149bc}{is\+\_\+account\+\_\+disabled}} (const \mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}) const
+\item 
+void \mbox{\hyperlink{classsysio_1_1subjective__billing_a443a458832b5c475272149ccb31db567}{subjective\+\_\+bill}} (const \mbox{\hyperlink{namespacesysio_1_1chain_aa85a3b49b3b219d1e3840567579e7e63}{transaction\+\_\+id\+\_\+type}} \&\mbox{\hyperlink{code__cache_8cpp_aa0efefe21f4700d78692edc823e763be}{id}}, const \mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}} \&expire, const \mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} \&first\+\_\+auth, const \mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}} \&elapsed, bool in\+\_\+pending\+\_\+block)
+\item 
+void \mbox{\hyperlink{classsysio_1_1subjective__billing_a50d2b20b8dc816f33f480062a24e074a}{subjective\+\_\+bill\+\_\+failure}} (const \mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} \&first\+\_\+auth, const \mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}} \&elapsed, const \mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}} \&now)
+\item 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{classsysio_1_1subjective__billing_a24c7829695461e95f71a1e209b3bda1f}{get\+\_\+subjective\+\_\+bill}} (const \mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} \&first\+\_\+auth, const \mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}} \&now) const
+\item 
+void \mbox{\hyperlink{classsysio_1_1subjective__billing_a23d4fafb3e774be584b5e23b3510bb0d}{abort\+\_\+block}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1subjective__billing_aec76b593918a0e487d607afd7a7fbe4a}{on\+\_\+block}} (\mbox{\hyperlink{classfc_1_1logger}{fc\+::logger}} \&log, const \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\+\_\+state\+\_\+ptr}} \&bsp, const \mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}} \&now)
+\item 
+{\footnotesize template$<$typename Yield $>$ }\\bool \mbox{\hyperlink{classsysio_1_1subjective__billing_a793fb0f1fa545a9de1d117cc95f6fbdc}{remove\+\_\+expired}} (\mbox{\hyperlink{classfc_1_1logger}{fc\+::logger}} \&log, const \mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}} \&pending\+\_\+block\+\_\+time, const \mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}} \&now, Yield \&\&yield)
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classsysio_1_1subjective__billing_a8e2a7a102f565993fb2382c1028e91c3}{get\+\_\+expired\+\_\+accumulator\+\_\+average\+\_\+window}} () const
+\item 
+void \mbox{\hyperlink{classsysio_1_1subjective__billing_a01a2a48693b5cf3609d08b8732276e1c}{set\+\_\+expired\+\_\+accumulator\+\_\+average\+\_\+window}} (\mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}} subjective\+\_\+account\+\_\+decay\+\_\+time)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static constexpr \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classsysio_1_1subjective__billing_a9ef86edd58fb355478cf07852266a27c}{subjective\+\_\+time\+\_\+interval\+\_\+ms}} = 5\textquotesingle{}000
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{subjective__billing_8hpp_source_l00025}{25}} of file \mbox{\hyperlink{subjective__billing_8hpp_source}{subjective\+\_\+billing.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1subjective__billing_a23d4fafb3e774be584b5e23b3510bb0d}\index{sysio::subjective\_billing@{sysio::subjective\_billing}!abort\_block@{abort\_block}}
+\index{abort\_block@{abort\_block}!sysio::subjective\_billing@{sysio::subjective\_billing}}
+\doxysubsubsection{\texorpdfstring{abort\_block()}{abort\_block()}}
+{\footnotesize\ttfamily \label{classsysio_1_1subjective__billing_a23d4fafb3e774be584b5e23b3510bb0d} 
+void sysio\+::subjective\+\_\+billing\+::abort\+\_\+block (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{subjective__billing_8hpp_source_l00171}{171}} of file \mbox{\hyperlink{subjective__billing_8hpp_source}{subjective\+\_\+billing.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \_block\_subjective\_bill\_cache.clear();}
+\DoxyCodeLine{00173\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1subjective__billing_a23d4fafb3e774be584b5e23b3510bb0d_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1subjective__billing_a6f9f1b4e1f20dbe98360c6a9f4f7219f}\index{sysio::subjective\_billing@{sysio::subjective\_billing}!disable@{disable}}
+\index{disable@{disable}!sysio::subjective\_billing@{sysio::subjective\_billing}}
+\doxysubsubsection{\texorpdfstring{disable()}{disable()}}
+{\footnotesize\ttfamily \label{classsysio_1_1subjective__billing_a6f9f1b4e1f20dbe98360c6a9f4f7219f} 
+void sysio\+::subjective\+\_\+billing\+::disable (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{subjective__billing_8hpp_source_l00115}{115}} of file \mbox{\hyperlink{subjective__billing_8hpp_source}{subjective\+\_\+billing.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00115\ \{\ \_disabled\ =\ \textcolor{keyword}{true};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1subjective__billing_a6ce772a2163326920255c1faea2309f5}\index{sysio::subjective\_billing@{sysio::subjective\_billing}!disable\_account@{disable\_account}}
+\index{disable\_account@{disable\_account}!sysio::subjective\_billing@{sysio::subjective\_billing}}
+\doxysubsubsection{\texorpdfstring{disable\_account()}{disable\_account()}}
+{\footnotesize\ttfamily \label{classsysio_1_1subjective__billing_a6ce772a2163326920255c1faea2309f5} 
+void sysio\+::subjective\+\_\+billing\+::disable\+\_\+account (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{chain\+::account\+\_\+name}}}]{a}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{subjective__billing_8hpp_source_l00116}{116}} of file \mbox{\hyperlink{subjective__billing_8hpp_source}{subjective\+\_\+billing.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00116\ \{\ \_disabled\_accounts.emplace(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ );\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1subjective__billing_a8e2a7a102f565993fb2382c1028e91c3}\index{sysio::subjective\_billing@{sysio::subjective\_billing}!get\_expired\_accumulator\_average\_window@{get\_expired\_accumulator\_average\_window}}
+\index{get\_expired\_accumulator\_average\_window@{get\_expired\_accumulator\_average\_window}!sysio::subjective\_billing@{sysio::subjective\_billing}}
+\doxysubsubsection{\texorpdfstring{get\_expired\_accumulator\_average\_window()}{get\_expired\_accumulator\_average\_window()}}
+{\footnotesize\ttfamily \label{classsysio_1_1subjective__billing_a8e2a7a102f565993fb2382c1028e91c3} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::subjective\+\_\+billing\+::get\+\_\+expired\+\_\+accumulator\+\_\+average\+\_\+window (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{subjective__billing_8hpp_source_l00210}{210}} of file \mbox{\hyperlink{subjective__billing_8hpp_source}{subjective\+\_\+billing.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \_expired\_accumulator\_average\_window;}
+\DoxyCodeLine{00212\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1subjective__billing_a24c7829695461e95f71a1e209b3bda1f}\index{sysio::subjective\_billing@{sysio::subjective\_billing}!get\_subjective\_bill@{get\_subjective\_bill}}
+\index{get\_subjective\_bill@{get\_subjective\_bill}!sysio::subjective\_billing@{sysio::subjective\_billing}}
+\doxysubsubsection{\texorpdfstring{get\_subjective\_bill()}{get\_subjective\_bill()}}
+{\footnotesize\ttfamily \label{classsysio_1_1subjective__billing_a24c7829695461e95f71a1e209b3bda1f} 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} sysio\+::subjective\+\_\+billing\+::get\+\_\+subjective\+\_\+bill (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} \&}]{first\+\_\+auth}{, }\item[{const \mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}} \&}]{now}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{subjective__billing_8hpp_source_l00148}{148}} of file \mbox{\hyperlink{subjective__billing_8hpp_source}{subjective\+\_\+billing.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \_disabled\ ||\ \_disabled\_accounts.count(\ first\_auth\ )\ )\ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ time\_ordinal\ =\ time\_ordinal\_for(now);}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \textcolor{keyword}{const}\ subjective\_billing\_info*\ sub\_bill\_info\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ aitr\ =\ \_account\_subjective\_bill\_cache.find(\ first\_auth\ );}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ aitr\ !=\ \_account\_subjective\_bill\_cache.end()\ )\ \{}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \ sub\_bill\_info\ =\ \&aitr-\/>second;}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ in\_block\_pending\_cpu\_us\ =\ 0;}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ bitr\ =\ \_block\_subjective\_bill\_cache.find(\ first\_auth\ );}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ bitr\ !=\ \_block\_subjective\_bill\_cache.end()\ )\ \{}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \ in\_block\_pending\_cpu\_us\ =\ bitr-\/>second;}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00161\ }
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (sub\_bill\_info)\ \{}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(sub\_bill\_info-\/>pending\_cpu\_us\ >=\ in\_block\_pending\_cpu\_us,\ chain::tx\_resource\_exhaustion,\ \textcolor{stringliteral}{"{}Logic\ error\ subjective\ billing\ \$\{a\}"{}},\ (\textcolor{stringliteral}{"{}a"{}},\ first\_auth)\ );}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ sub\_bill\ =\ sub\_bill\_info-\/>pending\_cpu\_us\ -\/\ in\_block\_pending\_cpu\_us\ +\ sub\_bill\_info-\/>expired\_accumulator.value\_at(time\_ordinal,\ \_expired\_accumulator\_average\_window\ );}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ sub\_bill;}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00169\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1subjective__billing_a24c7829695461e95f71a1e209b3bda1f_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1subjective__billing_a7da6a0636378886a46193d41089149bc}\index{sysio::subjective\_billing@{sysio::subjective\_billing}!is\_account\_disabled@{is\_account\_disabled}}
+\index{is\_account\_disabled@{is\_account\_disabled}!sysio::subjective\_billing@{sysio::subjective\_billing}}
+\doxysubsubsection{\texorpdfstring{is\_account\_disabled()}{is\_account\_disabled()}}
+{\footnotesize\ttfamily \label{classsysio_1_1subjective__billing_a7da6a0636378886a46193d41089149bc} 
+bool sysio\+::subjective\+\_\+billing\+::is\+\_\+account\+\_\+disabled (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} \&}]{a}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{subjective__billing_8hpp_source_l00117}{117}} of file \mbox{\hyperlink{subjective__billing_8hpp_source}{subjective\+\_\+billing.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00117\ \{\ \textcolor{keywordflow}{return}\ \_disabled\ ||\ \_disabled\_accounts.count(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ );\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1subjective__billing_a7da6a0636378886a46193d41089149bc_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1subjective__billing_aec76b593918a0e487d607afd7a7fbe4a}\index{sysio::subjective\_billing@{sysio::subjective\_billing}!on\_block@{on\_block}}
+\index{on\_block@{on\_block}!sysio::subjective\_billing@{sysio::subjective\_billing}}
+\doxysubsubsection{\texorpdfstring{on\_block()}{on\_block()}}
+{\footnotesize\ttfamily \label{classsysio_1_1subjective__billing_aec76b593918a0e487d607afd7a7fbe4a} 
+void sysio\+::subjective\+\_\+billing\+::on\+\_\+block (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1logger}{fc\+::logger}} \&}]{log}{, }\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\+\_\+state\+\_\+ptr}} \&}]{bsp}{, }\item[{const \mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}} \&}]{now}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{subjective__billing_8hpp_source_l00175}{175}} of file \mbox{\hyperlink{subjective__billing_8hpp_source}{subjective\+\_\+billing.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ bsp\ ==\ \textcolor{keyword}{nullptr}\ ||\ \_disabled\ )\ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ time\_ordinal\ =\ time\_ordinal\_for(now);}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ orig\_count\ =\ \_account\_subjective\_bill\_cache.size();}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ remove\_subjective\_billing(\ bsp,\ time\_ordinal\ );}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\ log,\ \textcolor{stringliteral}{"{}Subjective\ billed\ accounts\ \$\{n\}\ removed\ \$\{r\}"{}},\ (\textcolor{stringliteral}{"{}n"{}},\ orig\_count)(\textcolor{stringliteral}{"{}r"{}},\ orig\_count\ -\/\ \_account\_subjective\_bill\_cache.size())\ );}
+\DoxyCodeLine{00181\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=349pt]{classsysio_1_1subjective__billing_aec76b593918a0e487d607afd7a7fbe4a_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1subjective__billing_a793fb0f1fa545a9de1d117cc95f6fbdc}\index{sysio::subjective\_billing@{sysio::subjective\_billing}!remove\_expired@{remove\_expired}}
+\index{remove\_expired@{remove\_expired}!sysio::subjective\_billing@{sysio::subjective\_billing}}
+\doxysubsubsection{\texorpdfstring{remove\_expired()}{remove\_expired()}}
+{\footnotesize\ttfamily \label{classsysio_1_1subjective__billing_a793fb0f1fa545a9de1d117cc95f6fbdc} 
+template$<$typename Yield $>$ \\
+bool sysio\+::subjective\+\_\+billing\+::remove\+\_\+expired (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1logger}{fc\+::logger}} \&}]{log}{, }\item[{const \mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}} \&}]{pending\+\_\+block\+\_\+time}{, }\item[{const \mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}} \&}]{now}{, }\item[{Yield \&\&}]{yield}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{subjective__billing_8hpp_source_l00184}{184}} of file \mbox{\hyperlink{subjective__billing_8hpp_source}{subjective\+\_\+billing.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ exhausted\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ =\ \_trx\_cache\_index.get<by\_expiry>();}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !\mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.empty()\ )\ \{}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ time\_ordinal\ =\ time\_ordinal\_for(now);}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ orig\_count\ =\ \_trx\_cache\_index.size();}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ num\_expired\ =\ 0;}
+\DoxyCodeLine{00191\ }
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\ !\mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.empty()\ )\ \{}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{namespaceboost_1_1fibers_1_1asio_a65142b77539b20ba6d2abb35a0d4f5d2}{yield}}()\ )\ \{}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ exhausted\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ b\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.begin();}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ b-\/>expiry\ >\ pending\_block\_time\ )\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ \ \ \ \ transition\_to\_expired(\ *b,\ time\_ordinal\ );}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.erase(\ b\ );}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \ \ \ \ \ \ num\_expired++;}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00203\ }
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\ log,\ \textcolor{stringliteral}{"{}Processed\ \$\{n\}\ subjective\ billed\ transactions,\ Expired\ \$\{expired\}"{}},}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}n"{}},\ orig\_count)(\ \textcolor{stringliteral}{"{}expired"{}},\ num\_expired\ )\ );}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !exhausted;}
+\DoxyCodeLine{00208\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1subjective__billing_a793fb0f1fa545a9de1d117cc95f6fbdc_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1subjective__billing_ae9609ccca5fb1be5d7421ea6acf002b4}\index{sysio::subjective\_billing@{sysio::subjective\_billing}!remove\_subjective\_billing@{remove\_subjective\_billing}}
+\index{remove\_subjective\_billing@{remove\_subjective\_billing}!sysio::subjective\_billing@{sysio::subjective\_billing}}
+\doxysubsubsection{\texorpdfstring{remove\_subjective\_billing()}{remove\_subjective\_billing()}}
+{\footnotesize\ttfamily \label{classsysio_1_1subjective__billing_ae9609ccca5fb1be5d7421ea6acf002b4} 
+void sysio\+::subjective\+\_\+billing\+::remove\+\_\+subjective\+\_\+billing (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_aa85a3b49b3b219d1e3840567579e7e63}{transaction\+\_\+id\+\_\+type}} \&}]{trx\+\_\+id}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{time\+\_\+ordinal}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{subjective__billing_8hpp_source_l00105}{105}} of file \mbox{\hyperlink{subjective__billing_8hpp_source}{subjective\+\_\+billing.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ =\ \_trx\_cache\_index.get<by\_id>();}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.find(\ trx\_id\ );}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr\ !=\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.end()\ )\ \{}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \ remove\_subjective\_billing(\ *itr,\ time\_ordinal\ );}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.erase(\ itr\ );}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00112\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1subjective__billing_a01a2a48693b5cf3609d08b8732276e1c}\index{sysio::subjective\_billing@{sysio::subjective\_billing}!set\_expired\_accumulator\_average\_window@{set\_expired\_accumulator\_average\_window}}
+\index{set\_expired\_accumulator\_average\_window@{set\_expired\_accumulator\_average\_window}!sysio::subjective\_billing@{sysio::subjective\_billing}}
+\doxysubsubsection{\texorpdfstring{set\_expired\_accumulator\_average\_window()}{set\_expired\_accumulator\_average\_window()}}
+{\footnotesize\ttfamily \label{classsysio_1_1subjective__billing_a01a2a48693b5cf3609d08b8732276e1c} 
+void sysio\+::subjective\+\_\+billing\+::set\+\_\+expired\+\_\+accumulator\+\_\+average\+\_\+window (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}}}]{subjective\+\_\+account\+\_\+decay\+\_\+time}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{subjective__billing_8hpp_source_l00214}{214}} of file \mbox{\hyperlink{subjective__billing_8hpp_source}{subjective\+\_\+billing.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \_expired\_accumulator\_average\_window\ =}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ subjective\_account\_decay\_time.\mbox{\hyperlink{classfc_1_1microseconds_a20fba59ec7e1f50c6b8f2c9443cc9b92}{count}}()\ /\ 1000\ /\ \mbox{\hyperlink{classsysio_1_1subjective__billing_a9ef86edd58fb355478cf07852266a27c}{subjective\_time\_interval\_ms}};}
+\DoxyCodeLine{00217\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1subjective__billing_a01a2a48693b5cf3609d08b8732276e1c_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1subjective__billing_a443a458832b5c475272149ccb31db567}\index{sysio::subjective\_billing@{sysio::subjective\_billing}!subjective\_bill@{subjective\_bill}}
+\index{subjective\_bill@{subjective\_bill}!sysio::subjective\_billing@{sysio::subjective\_billing}}
+\doxysubsubsection{\texorpdfstring{subjective\_bill()}{subjective\_bill()}}
+{\footnotesize\ttfamily \label{classsysio_1_1subjective__billing_a443a458832b5c475272149ccb31db567} 
+void sysio\+::subjective\+\_\+billing\+::subjective\+\_\+bill (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_aa85a3b49b3b219d1e3840567579e7e63}{transaction\+\_\+id\+\_\+type}} \&}]{id}{, }\item[{const \mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}} \&}]{expire}{, }\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} \&}]{first\+\_\+auth}{, }\item[{const \mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}} \&}]{elapsed}{, }\item[{bool}]{in\+\_\+pending\+\_\+block}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+\begin{DoxyParams}{Parameters}
+{\em in\+\_\+pending\+\_\+block} & pass true if pt\textquotesingle{}s bill time is accounted for in the pending block \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{subjective__billing_8hpp_source_l00120}{120}} of file \mbox{\hyperlink{subjective__billing_8hpp_source}{subjective\+\_\+billing.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00122\ \ \ \ \{}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !\_disabled\ \&\&\ !\_disabled\_accounts.count(\ first\_auth\ )\ )\ \{}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ bill\ =\ std::max<int64\_t>(\ 0,\ elapsed.\mbox{\hyperlink{classfc_1_1microseconds_a20fba59ec7e1f50c6b8f2c9443cc9b92}{count}}()\ );}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ \_trx\_cache\_index.emplace(}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ trx\_cache\_entry\{\mbox{\hyperlink{code__cache_8cpp_aa0efefe21f4700d78692edc823e763be}{id}},}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ first\_auth,}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ bill,}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ expire\}\ );}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.second\ )\ \{}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \ \ \ \_account\_subjective\_bill\_cache[first\_auth].pending\_cpu\_us\ +=\ bill;}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ in\_pending\_block\ )\ \{}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_block\_subjective\_bill\_cache[first\_auth]\ +=\ bill;}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00137\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1subjective__billing_a443a458832b5c475272149ccb31db567_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1subjective__billing_a443a458832b5c475272149ccb31db567_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1subjective__billing_a50d2b20b8dc816f33f480062a24e074a}\index{sysio::subjective\_billing@{sysio::subjective\_billing}!subjective\_bill\_failure@{subjective\_bill\_failure}}
+\index{subjective\_bill\_failure@{subjective\_bill\_failure}!sysio::subjective\_billing@{sysio::subjective\_billing}}
+\doxysubsubsection{\texorpdfstring{subjective\_bill\_failure()}{subjective\_bill\_failure()}}
+{\footnotesize\ttfamily \label{classsysio_1_1subjective__billing_a50d2b20b8dc816f33f480062a24e074a} 
+void sysio\+::subjective\+\_\+billing\+::subjective\+\_\+bill\+\_\+failure (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} \&}]{first\+\_\+auth}{, }\item[{const \mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}} \&}]{elapsed}{, }\item[{const \mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}} \&}]{now}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{subjective__billing_8hpp_source_l00139}{139}} of file \mbox{\hyperlink{subjective__billing_8hpp_source}{subjective\+\_\+billing.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00140\ \ \ \ \{}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !\_disabled\ \&\&\ !\_disabled\_accounts.count(\ first\_auth\ )\ )\ \{}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ bill\ =\ std::max<int64\_t>(\ 0,\ elapsed.\mbox{\hyperlink{classfc_1_1microseconds_a20fba59ec7e1f50c6b8f2c9443cc9b92}{count}}()\ );}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ time\_ordinal\ =\ time\_ordinal\_for(now);}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ \ \_account\_subjective\_bill\_cache[first\_auth].expired\_accumulator.add(bill,\ time\_ordinal,\ \_expired\_accumulator\_average\_window);}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00146\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1subjective__billing_a50d2b20b8dc816f33f480062a24e074a_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1subjective__billing_a50d2b20b8dc816f33f480062a24e074a_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classsysio_1_1subjective__billing_a9ef86edd58fb355478cf07852266a27c}\index{sysio::subjective\_billing@{sysio::subjective\_billing}!subjective\_time\_interval\_ms@{subjective\_time\_interval\_ms}}
+\index{subjective\_time\_interval\_ms@{subjective\_time\_interval\_ms}!sysio::subjective\_billing@{sysio::subjective\_billing}}
+\doxysubsubsection{\texorpdfstring{subjective\_time\_interval\_ms}{subjective\_time\_interval\_ms}}
+{\footnotesize\ttfamily \label{classsysio_1_1subjective__billing_a9ef86edd58fb355478cf07852266a27c} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::subjective\+\_\+billing\+::subjective\+\_\+time\+\_\+interval\+\_\+ms = 5\textquotesingle{}000\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{subjective__billing_8hpp_source_l00103}{103}} of file \mbox{\hyperlink{subjective__billing_8hpp_source}{subjective\+\_\+billing.\+hpp}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+plugins/producer\+\_\+plugin/include/sysio/producer\+\_\+plugin/\mbox{\hyperlink{subjective__billing_8hpp}{subjective\+\_\+billing.\+hpp}}\end{DoxyCompactItemize}

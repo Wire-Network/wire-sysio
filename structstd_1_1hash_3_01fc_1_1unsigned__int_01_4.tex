@@ -1,0 +1,43 @@
+\doxysection{std\+::hash\texorpdfstring{$<$}{<} fc\+::unsigned\+\_\+int \texorpdfstring{$>$}{>} Struct Reference}
+\hypertarget{structstd_1_1hash_3_01fc_1_1unsigned__int_01_4}{}\label{structstd_1_1hash_3_01fc_1_1unsigned__int_01_4}\index{std::hash$<$ fc::unsigned\_int $>$@{std::hash$<$ fc::unsigned\_int $>$}}
+
+
+{\ttfamily \#include $<$varint.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+size\+\_\+t \mbox{\hyperlink{structstd_1_1hash_3_01fc_1_1unsigned__int_01_4_a7ef1bff9e387b3d3fc97f1c11803b483}{operator()}} (const \mbox{\hyperlink{structfc_1_1signed__int}{fc\+::signed\+\_\+int}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}) const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{varint_8hpp_source_l00090}{90}} of file \mbox{\hyperlink{varint_8hpp_source}{varint.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structstd_1_1hash_3_01fc_1_1unsigned__int_01_4_a7ef1bff9e387b3d3fc97f1c11803b483}\index{std::hash$<$ fc::unsigned\_int $>$@{std::hash$<$ fc::unsigned\_int $>$}!operator()@{operator()}}
+\index{operator()@{operator()}!std::hash$<$ fc::unsigned\_int $>$@{std::hash$<$ fc::unsigned\_int $>$}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}}
+{\footnotesize\ttfamily \label{structstd_1_1hash_3_01fc_1_1unsigned__int_01_4_a7ef1bff9e387b3d3fc97f1c11803b483} 
+size\+\_\+t std\+::hash$<$ \mbox{\hyperlink{structfc_1_1unsigned__int}{fc\+::unsigned\+\_\+int}} $>$\+::operator() (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structfc_1_1signed__int}{fc\+::signed\+\_\+int}} \&}]{a}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{varint_8hpp_source_l00093}{93}} of file \mbox{\hyperlink{varint_8hpp_source}{varint.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::hash<uint32\_t>()(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.value);}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/io/\mbox{\hyperlink{varint_8hpp}{varint.\+hpp}}\end{DoxyCompactItemize}

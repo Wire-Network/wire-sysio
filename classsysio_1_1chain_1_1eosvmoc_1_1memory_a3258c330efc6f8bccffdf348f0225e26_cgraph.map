@@ -1,0 +1,9 @@
+<map id="sysio::chain::eosvmoc::memory::memory" name="sysio::chain::eosvmoc::memory::memory">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,55,158,96"/>
+<area shape="rect" id="Node000002" href="$integration_8cpp.html#af5b66d867a040d002fb57d645cae3fb4" title=" " alt="" coords="256,5,308,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="154,52,240,27,241,32,155,57"/>
+<area shape="rect" id="Node000003" href="$namespacesysio_1_1chain_1_1eosvmoc.html#abe43c1d3ddfb344db0cd7dd5ab25f48c" title=" " alt="" coords="206,55,358,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="158,73,190,73,190,78,158,78"/>
+<area shape="rect" id="Node000004" href="$namespacefc.html#a23d89b54a8ffd84f7e7efeb21747d846" title=" " alt="" coords="207,120,356,146"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="155,94,220,113,219,118,154,99"/>
+</map>

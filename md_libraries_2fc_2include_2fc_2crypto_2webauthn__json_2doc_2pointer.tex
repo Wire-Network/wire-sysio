@@ -1,0 +1,253 @@
+\chapter{Pointer}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2pointer}{}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2pointer}\index{Pointer@{Pointer}}
+(This feature was released in v1.\+1.\+0)
+
+JSON Pointer is a standardized (\href{https://tools.ietf.org/html/rfc6901}{\texttt{ RFC6901}}) way to select a value inside a JSON Document (DOM). This can be analogous to XPath for XML document. However, JSON Pointer is much simpler, and a single JSON Pointer only pointed to a single value.
+
+Using Rapid\+JSON\textquotesingle{}s implementation of JSON Pointer can simplify some manipulations of the DOM.\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2pointer_8zh-cn_JsonPointer}{}\doxysection{\texorpdfstring{JSON Pointer}{JSON Pointer}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2pointer_8zh-cn_JsonPointer}
+\doxylink{struct_a}{A} JSON Pointer is a list of zero-\/to-\/many tokens, each prefixed by {\ttfamily /}. Each token can be a string or a number. For example, given a JSON\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\{}
+\DoxyCodeLine{\ \ \ \ "{}foo"{}\ :\ ["{}bar"{},\ "{}baz"{}],}
+\DoxyCodeLine{\ \ \ \ "{}pi"{}\ :\ 3.1416}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+The following JSON Pointers resolve this JSON as\+:
+
+
+\begin{DoxyEnumerate}
+\item {\ttfamily "{}/foo"{}} → {\ttfamily \mbox{[} "{}bar"{}, "{}baz"{} \mbox{]}}
+\item {\ttfamily "{}/foo/0"{}} → {\ttfamily "{}bar"{}}
+\item {\ttfamily "{}/foo/1"{}} → {\ttfamily "{}baz"{}}
+\item {\ttfamily "{}/pi"{}} → {\ttfamily 3.\+1416}
+\end{DoxyEnumerate}
+
+Note that, an empty JSON Pointer {\ttfamily "{}"{}} (zero token) resolves to the whole JSON.\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_8zh-cn_BasicUsage}{}\doxysection{\texorpdfstring{Basic Usage}{Basic Usage}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_8zh-cn_BasicUsage}
+The following example code is self-\/explanatory.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{pointer_8h}{rapidjson/pointer.h}}"{}}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ ...}}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_document}{Document}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ Create\ DOM\ by\ Set()}}
+\DoxyCodeLine{\mbox{\hyperlink{fwd_8h_a0e5c49dba7ec654cdda5735347c00397}{Pointer}}(\textcolor{stringliteral}{"{}/project"{}}).Set(d,\ \textcolor{stringliteral}{"{}RapidJSON"{}});}
+\DoxyCodeLine{\mbox{\hyperlink{fwd_8h_a0e5c49dba7ec654cdda5735347c00397}{Pointer}}(\textcolor{stringliteral}{"{}/stars"{}}).Set(d,\ 10);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ \{\ "{}project"{}\ :\ "{}RapidJSON"{},\ "{}stars"{}\ :\ 10\ \}}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ Access\ DOM\ by\ Get().\ It\ return\ nullptr\ if\ the\ value\ does\ not\ exist.}}
+\DoxyCodeLine{\textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_generic_value}{Value}}*\ stars\ =\ \mbox{\hyperlink{fwd_8h_a0e5c49dba7ec654cdda5735347c00397}{Pointer}}(\textcolor{stringliteral}{"{}/stars"{}}).Get(d))}
+\DoxyCodeLine{\ \ \ \ stars-\/>SetInt(stars-\/>GetInt()\ +\ 1);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ \{\ "{}project"{}\ :\ "{}RapidJSON"{},\ "{}stars"{}\ :\ 11\ \}}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ Set()\ and\ Create()\ automatically\ generate\ parents\ if\ not\ exist.}}
+\DoxyCodeLine{\mbox{\hyperlink{fwd_8h_a0e5c49dba7ec654cdda5735347c00397}{Pointer}}(\textcolor{stringliteral}{"{}/a/b/0"{}}).Create(d);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ \{\ "{}project"{}\ :\ "{}RapidJSON"{},\ "{}stars"{}\ :\ 11,\ "{}a"{}\ :\ \{\ "{}b"{}\ :\ [\ null\ ]\ \}\ \}}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ GetWithDefault()\ returns\ reference.\ And\ it\ deep\ clones\ the\ default\ value.}}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_value}{Value}}\&\ hello\ =\ \mbox{\hyperlink{fwd_8h_a0e5c49dba7ec654cdda5735347c00397}{Pointer}}(\textcolor{stringliteral}{"{}/hello"{}}).GetWithDefault(d,\ \textcolor{stringliteral}{"{}world"{}});}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ \{\ "{}project"{}\ :\ "{}RapidJSON"{},\ "{}stars"{}\ :\ 11,\ "{}a"{}\ :\ \{\ "{}b"{}\ :\ [\ null\ ]\ \},\ "{}hello"{}\ :\ "{}world"{}\ \}}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ Swap()\ is\ similar\ to\ Set()}}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_value}{Value}}\ x(\textcolor{stringliteral}{"{}C++"{}});}
+\DoxyCodeLine{\mbox{\hyperlink{fwd_8h_a0e5c49dba7ec654cdda5735347c00397}{Pointer}}(\textcolor{stringliteral}{"{}/hello"{}}).Swap(d,\ x);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ \{\ "{}project"{}\ :\ "{}RapidJSON"{},\ "{}stars"{}\ :\ 11,\ "{}a"{}\ :\ \{\ "{}b"{}\ :\ [\ null\ ]\ \},\ "{}hello"{}\ :\ "{}C++"{}\ \}}}
+\DoxyCodeLine{\textcolor{comment}{//\ x\ becomes\ "{}world"{}}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ Erase\ a\ member\ or\ element,\ return\ true\ if\ the\ value\ exists}}
+\DoxyCodeLine{\textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a72ffd6653260a2dedcc4b55e39e10973a4e09c20e9a85794807a130e8283e8769}{success}}\ =\ \mbox{\hyperlink{fwd_8h_a0e5c49dba7ec654cdda5735347c00397}{Pointer}}(\textcolor{stringliteral}{"{}/a"{}}).Erase(d);}
+\DoxyCodeLine{assert(success);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ \{\ "{}project"{}\ :\ "{}RapidJSON"{},\ "{}stars"{}\ :\ 10\ \}}}
+
+\end{DoxyCode}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2pointer_8zh-cn_HelperFunctions}{}\doxysection{\texorpdfstring{Helper Functions}{Helper Functions}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2pointer_8zh-cn_HelperFunctions}
+Since object-\/oriented calling convention may be non-\/intuitive, Rapid\+JSON also provides helper functions, which just wrap the member functions with free-\/functions.
+
+The following example does exactly the same as the above one.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_document}{Document}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\mbox{\hyperlink{pointer_8h_a58128fa07ac8e9159440c83d0a78f2be}{SetValueByPointer}}(d,\ \textcolor{stringliteral}{"{}/project"{}},\ \textcolor{stringliteral}{"{}RapidJSON"{}});}
+\DoxyCodeLine{\mbox{\hyperlink{pointer_8h_a58128fa07ac8e9159440c83d0a78f2be}{SetValueByPointer}}(d,\ \textcolor{stringliteral}{"{}/stars"{}},\ 10);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_generic_value}{Value}}*\ stars\ =\ \mbox{\hyperlink{pointer_8h_a581633984b11d0587c2ad06649efefc4}{GetValueByPointer}}(d,\ \textcolor{stringliteral}{"{}/stars"{}}))}
+\DoxyCodeLine{\ \ \ \ stars-\/>SetInt(stars-\/>GetInt()\ +\ 1);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\mbox{\hyperlink{pointer_8h_a7ce0d37e372f630e46e221e45714e84b}{CreateValueByPointer}}(d,\ \textcolor{stringliteral}{"{}/a/b/0"{}});}
+\DoxyCodeLine{}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_value}{Value}}\&\ hello\ =\ \mbox{\hyperlink{pointer_8h_accdac20f6fea3ab631da1a0df5208a61}{GetValueByPointerWithDefault}}(d,\ \textcolor{stringliteral}{"{}/hello"{}},\ \textcolor{stringliteral}{"{}world"{}});}
+\DoxyCodeLine{}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_value}{Value}}\ x(\textcolor{stringliteral}{"{}C++"{}});}
+\DoxyCodeLine{\mbox{\hyperlink{pointer_8h_a542981a8bdcf3bc3c701c7eff39648ac}{SwapValueByPointer}}(d,\ \textcolor{stringliteral}{"{}/hello"{}},\ x);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a72ffd6653260a2dedcc4b55e39e10973a4e09c20e9a85794807a130e8283e8769}{success}}\ =\ \mbox{\hyperlink{pointer_8h_a7342710933f35ad7267c871f4a8cc55f}{EraseValueByPointer}}(d,\ \textcolor{stringliteral}{"{}/a"{}});}
+\DoxyCodeLine{assert(success);}
+
+\end{DoxyCode}
+
+
+The conventions are shown here for comparison\+:
+
+
+\begin{DoxyEnumerate}
+\item {\ttfamily \doxylink{fwd_8h_a0e5c49dba7ec654cdda5735347c00397}{Pointer(source)}.\texorpdfstring{$<$}{<}Method\texorpdfstring{$>$}{>}(root, ...)}
+\item {\ttfamily \texorpdfstring{$<$}{<}Method\texorpdfstring{$>$}{>}Value\+By\+Pointer(root, Pointer(source), ...)}
+\item {\ttfamily \texorpdfstring{$<$}{<}Method\texorpdfstring{$>$}{>}Value\+By\+Pointer(root, source, ...)}
+\end{DoxyEnumerate}\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2pointer_8zh-cn_ResolvingPointer}{}\doxysection{\texorpdfstring{Resolving Pointer}{Resolving Pointer}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2pointer_8zh-cn_ResolvingPointer}
+{\ttfamily Pointer\+::\+Get()} or {\ttfamily \doxylink{pointer_8h_a581633984b11d0587c2ad06649efefc4}{Get\+Value\+By\+Pointer()}} function does not modify the DOM. If the tokens cannot match a value in the DOM, it returns {\ttfamily nullptr}. User can use this to check whether a value exists.
+
+Note that, numerical tokens can represent an array index or member name. The resolving process will match the values according to the types of value.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\{}
+\DoxyCodeLine{\ \ \ \ "{}0"{}\ :\ 123,}
+\DoxyCodeLine{\ \ \ \ "{}1"{}\ :\ [456]}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+
+\begin{DoxyEnumerate}
+\item {\ttfamily "{}/0"{}} → {\ttfamily 123}
+\item {\ttfamily "{}/1/0"{}} → {\ttfamily 456}
+\end{DoxyEnumerate}
+
+The token {\ttfamily "{}0"{}} is treated as member name in the first pointer. It is treated as an array index in the second pointer.
+
+The other functions, including {\ttfamily Create()}, {\ttfamily Get\+With\+Default()}, {\ttfamily Set()} and {\ttfamily Swap()}, will change the DOM. These functions will always succeed. They will create the parent values if they do not exist. If the parent values do not match the tokens, they will also be forced to change their type. Changing the type also mean fully removal of that DOM subtree.
+
+Parsing the above JSON into {\ttfamily d},
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{pointer_8h_a58128fa07ac8e9159440c83d0a78f2be}{SetValueByPointer}}(d,\ \textcolor{stringliteral}{"{}1/a"{}},\ 789);\ \textcolor{comment}{//\ \{\ "{}0"{}\ :\ 123,\ "{}1"{}\ :\ \{\ "{}a"{}\ :\ 789\ \}\ \}}}
+
+\end{DoxyCode}
+
+
+\doxysubsection*{Resolving Minus Sign Token}
+
+Besides, \href{https://tools.ietf.org/html/rfc6901}{\texttt{ RFC6901}} defines a special token {\ttfamily -\/} (single minus sign), which represents the pass-\/the-\/end element of an array. {\ttfamily Get()} only treats this token as a member name \textquotesingle{}"{}-\/"{}\textquotesingle{}. Yet the other functions can resolve this for array, equivalent to calling {\ttfamily Value\+::\+Push\+Back()} to the array.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_document}{Document}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}};}
+\DoxyCodeLine{\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.Parse(\textcolor{stringliteral}{"{}\{\(\backslash\)"{}foo\(\backslash\)"{}:[123]\}"{}});}
+\DoxyCodeLine{\mbox{\hyperlink{pointer_8h_a58128fa07ac8e9159440c83d0a78f2be}{SetValueByPointer}}(d,\ \textcolor{stringliteral}{"{}/foo/-\/"{}},\ 456);\ \textcolor{comment}{//\ \{\ "{}foo"{}\ :\ [123,\ 456]\ \}}}
+\DoxyCodeLine{\mbox{\hyperlink{pointer_8h_a58128fa07ac8e9159440c83d0a78f2be}{SetValueByPointer}}(d,\ \textcolor{stringliteral}{"{}/-\/"{}},\ 789);\ \ \ \ \textcolor{comment}{//\ \{\ "{}foo"{}\ :\ [123,\ 456],\ "{}-\/"{}\ :\ 789\ \}}}
+
+\end{DoxyCode}
+
+
+\doxysubsection*{Resolving Document and Value}
+
+When using {\ttfamily p.\+Get(root)} or {\ttfamily Get\+Value\+By\+Pointer(root, p)}, {\ttfamily root} is a (const) {\ttfamily Value\&}. That means, it can be a subtree of the DOM.
+
+The other functions have two groups of signature. One group uses {\ttfamily Document\& document} as parameter, another one uses {\ttfamily Value\& root}. The first group uses {\ttfamily document.\+Get\+Allocator()} for creating values. And the second group needs user to supply an allocator, like the functions in DOM.
+
+All examples above do not require an allocator parameter, because the first parameter is a {\ttfamily Document\&}. But if you want to resolve a pointer to a subtree, you need to supply the allocator as in the following example\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{class\ }\mbox{\hyperlink{class_person}{Person}}\ \{}
+\DoxyCodeLine{\textcolor{keyword}{public}:}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{class_person_a5e10221f201605ad323d5518e5436bd3}{Person}}()\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ document\_\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{document_8h_ac6ea5b168e3fe8c7fa532450fc9391f7}{Document}}();}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{comment}{//\ CreateValueByPointer()\ here\ no\ need\ allocator}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ SetLocation(\mbox{\hyperlink{pointer_8h_a7ce0d37e372f630e46e221e45714e84b}{CreateValueByPointer}}(*document\_,\ \textcolor{stringliteral}{"{}/residence"{}}),\ ...);}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ SetLocation(\mbox{\hyperlink{pointer_8h_a7ce0d37e372f630e46e221e45714e84b}{CreateValueByPointer}}(*document\_,\ \textcolor{stringliteral}{"{}/office"{}}),\ ...);}
+\DoxyCodeLine{\ \ \ \ \};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{private}:}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{void}\ SetLocation(\mbox{\hyperlink{class_generic_value}{Value}}\&\ location,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ country,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ addresses[2])\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ Value::Allocator\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ =\ document\_-\/>GetAllocator();}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{comment}{//\ SetValueByPointer()\ here\ need\ allocator}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_a58128fa07ac8e9159440c83d0a78f2be}{SetValueByPointer}}(location,\ \textcolor{stringliteral}{"{}/country"{}},\ country,\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_a58128fa07ac8e9159440c83d0a78f2be}{SetValueByPointer}}(location,\ \textcolor{stringliteral}{"{}/address/0"{}},\ address[0],\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_a58128fa07ac8e9159440c83d0a78f2be}{SetValueByPointer}}(location,\ \textcolor{stringliteral}{"{}/address/1"{}},\ address[1],\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ ...}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{class_generic_document}{Document}}*\ document\_;}
+\DoxyCodeLine{\};}
+
+\end{DoxyCode}
+
+
+{\ttfamily Erase()} or {\ttfamily \doxylink{pointer_8h_a7342710933f35ad7267c871f4a8cc55f}{Erase\+Value\+By\+Pointer()}} does not need allocator. And they return {\ttfamily true} if the value is erased successfully.\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2pointer_8zh-cn_ErrorHandling}{}\doxysection{\texorpdfstring{Error Handling}{Error Handling}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2pointer_8zh-cn_ErrorHandling}
+\doxylink{struct_a}{A} {\ttfamily Pointer} parses a source string in its constructor. If there is parsing error, {\ttfamily Pointer\+::\+Is\+Valid()} returns {\ttfamily false}. And you can use {\ttfamily Pointer\+::\+Get\+Parse\+Error\+Code()} and {\ttfamily Get\+Parse\+Error\+Offset()} to retrieve the error information.
+
+Note that, all resolving functions assumes valid pointer. Resolving with an invalid pointer causes assertion failure.\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2pointer_8zh-cn_URIFragment}{}\doxysection{\texorpdfstring{URI Fragment Representation}{URI Fragment Representation}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2pointer_8zh-cn_URIFragment}
+In addition to the string representation of JSON pointer that we are using till now, \href{https://tools.ietf.org/html/rfc6901}{\texttt{ RFC6901}} also defines the URI fragment representation of JSON pointer. URI fragment is specified in \href{https://tools.ietf.org/html/rfc3986}{\texttt{ RFC3986}} "{}\+Uniform Resource Identifier (\+URI)\+: Generic Syntax"{}.
+
+The main differences are that a the URI fragment always has a {\ttfamily \#} (pound sign) in the beginning, and some characters are encoded by percent-\/encoding in UTF-\/8 sequence. For example, the following table shows different C/\+C++ string literals of different representations.
+
+\tabulinesep=1mm
+\begin{longtabu}spread 0pt [c]{*{3}{|X[-1]}|}
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ String Representation   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ URI Fragment Representation   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Pointer Tokens (UTF-\/8)    }\\\cline{1-3}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ String Representation   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ URI Fragment Representation   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Pointer Tokens (UTF-\/8)    }\\\cline{1-3}
+\endhead
+{\ttfamily "{}/foo/0"{}}   &{\ttfamily "{}\#/foo/0"{}}   &{\ttfamily \{"{}foo"{}, 0\}}    \\\cline{1-3}
+{\ttfamily "{}/a\texorpdfstring{$\sim$}{\string~}1b"{}}   &{\ttfamily "{}\#/a\texorpdfstring{$\sim$}{\string~}1b"{}}   &{\ttfamily \{"{}a/b"{}\}}    \\\cline{1-3}
+{\ttfamily "{}/m\texorpdfstring{$\sim$}{\string~}0n"{}}   &{\ttfamily "{}\#/m\texorpdfstring{$\sim$}{\string~}0n"{}}   &{\ttfamily \{"{}m\texorpdfstring{$\sim$}{\string~}n"{}\}}    \\\cline{1-3}
+{\ttfamily "{}/ "{}}   &{\ttfamily "{}\#/\%20"{}}   &{\ttfamily \{"{} "{}\}}    \\\cline{1-3}
+{\ttfamily "{}/\textbackslash{}0"{}}   &{\ttfamily "{}\#/\%00"{}}   &{\ttfamily \{"{}\textbackslash{}0"{}\}}    \\\cline{1-3}
+{\ttfamily "{}/€"{}}   &{\ttfamily "{}\#/\%\+E2\%82\%\+AC"{}}   &{\ttfamily \{"{}€"{}\}}   \\\cline{1-3}
+\end{longtabu}
+
+
+Rapid\+JSON fully support URI fragment representation. It automatically detects the pound sign during parsing.
+
+\doxysection*{Stringify}
+
+You may also stringify a {\ttfamily Pointer} to a string or other output streams. This can be done by\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{Pointer\ p(...);}
+\DoxyCodeLine{StringBuffer\ sb;}
+\DoxyCodeLine{p.Stringify(sb);}
+\DoxyCodeLine{std::cout\ <<\ sb.GetString()\ <<\ std::endl;}
+
+\end{DoxyCode}
+
+
+It can also stringify to URI fragment representation by {\ttfamily Stringify\+Uri\+Fragment()}.\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2pointer_8zh-cn_UserSuppliedTokens}{}\doxysection{\texorpdfstring{User-\/\+Supplied Tokens}{User-\/\+Supplied Tokens}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2pointer_8zh-cn_UserSuppliedTokens}
+If a pointer will be resolved multiple times, it should be constructed once, and then apply it to different DOMs or in different times. This reduce time and memory allocation for constructing {\ttfamily Pointer} multiple times.
+
+We can go one step further, to completely eliminate the parsing process and dynamic memory allocation, we can establish the token array directly\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{preprocessor}{\#define\ NAME(s)\ \{\ s,\ sizeof(s)\ /\ sizeof(s[0])\ -\/\ 1,\ kPointerInvalidIndex\ \}}}
+\DoxyCodeLine{\textcolor{preprocessor}{\#define\ INDEX(i)\ \{\ \#i,\ sizeof(\#i)\ -\/\ 1,\ i\ \}}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_generic_pointer_1_1_token}{Pointer::Token}}\ kTokens[]\ =\ \{\ \mbox{\hyperlink{pointertest_8cpp_a59c7737920212dcb3bb9df58d7062de4}{NAME}}(\textcolor{stringliteral}{"{}foo"{}}),\ \mbox{\hyperlink{pointertest_8cpp_aa5fad23b2a5eed790e6661e896a506b7}{INDEX}}(123)\ \};}
+\DoxyCodeLine{\textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_generic_pointer}{Pointer}}\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}(kTokens,\ \textcolor{keyword}{sizeof}(kTokens)\ /\ \textcolor{keyword}{sizeof}(kTokens[0]));}
+\DoxyCodeLine{\textcolor{comment}{//\ Equivalent\ to\ static\ const\ Pointer\ p("{}/foo/123"{});}}
+
+\end{DoxyCode}
+
+
+This may be useful for memory constrained systems. 

@@ -1,0 +1,11 @@
+<map id="sysio::http_plugin::plugin_shutdown" name="sysio::http_plugin::plugin_shutdown">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,39,132,79"/>
+<area shape="rect" id="Node000002" href="$namespaceappbase.html#a99374dc23934f008a09f2f79be9eae40" title=" " alt="" coords="200,16,300,41"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="132,46,185,37,186,42,133,51"/>
+<area shape="rect" id="Node000004" href="$classappbase_1_1application.html#a77aff91b861010fd61a616c59b310dcc" title=" " alt="" coords="180,67,320,107"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="133,66,164,71,164,76,132,71"/>
+<area shape="rect" id="Node000003" href="$classappbase_1_1application.html#ac874b2659b400fe254f1ae4260d06ecf" title=" " alt="" coords="370,5,511,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="300,25,355,24,355,30,300,30"/>
+<area shape="rect" id="Node000005" href="$classappbase_1_1execution__priority__queue.html#acfa0c68e913a02f179e52ed758451a69" title=" " alt="" coords="368,71,513,111"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="320,86,353,86,353,92,320,91"/>
+</map>

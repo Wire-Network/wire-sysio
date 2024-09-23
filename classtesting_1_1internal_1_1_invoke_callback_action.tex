@@ -1,0 +1,78 @@
+\doxysection{testing\+::internal\+::Invoke\+Callback\+Action\texorpdfstring{$<$}{<} Callback\+Type \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classtesting_1_1internal_1_1_invoke_callback_action}{}\label{classtesting_1_1internal_1_1_invoke_callback_action}\index{testing::internal::InvokeCallbackAction$<$ CallbackType $>$@{testing::internal::InvokeCallbackAction$<$ CallbackType $>$}}
+
+
+{\ttfamily \#include $<$gmock-\/generated-\/actions.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_invoke_callback_action_a21b051db0b2e1d33fd8d5cdfe7e6824b}{Invoke\+Callback\+Action}} (Callback\+Type \texorpdfstring{$\ast$}{*}callback)
+\item 
+{\footnotesize template$<$typename Result , typename Argument\+Tuple $>$ }\\Result \mbox{\hyperlink{classtesting_1_1internal_1_1_invoke_callback_action_a74278acbfc51fe7407fdabc9d6a42c70}{Perform}} (const Argument\+Tuple \&args) const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Callback\+Type$>$\newline
+class testing\+::internal\+::\+Invoke\+Callback\+Action$<$ Callback\+Type $>$}
+
+
+Definition at line \mbox{\hyperlink{gmock-generated-actions_8h_source_l00327}{327}} of file \mbox{\hyperlink{gmock-generated-actions_8h_source}{gmock-\/generated-\/actions.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_invoke_callback_action_a21b051db0b2e1d33fd8d5cdfe7e6824b}\index{testing::internal::InvokeCallbackAction$<$ CallbackType $>$@{testing::internal::InvokeCallbackAction$<$ CallbackType $>$}!InvokeCallbackAction@{InvokeCallbackAction}}
+\index{InvokeCallbackAction@{InvokeCallbackAction}!testing::internal::InvokeCallbackAction$<$ CallbackType $>$@{testing::internal::InvokeCallbackAction$<$ CallbackType $>$}}
+\doxysubsubsection{\texorpdfstring{InvokeCallbackAction()}{InvokeCallbackAction()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_invoke_callback_action_a21b051db0b2e1d33fd8d5cdfe7e6824b} 
+template$<$typename Callback\+Type $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_invoke_callback_action}{testing\+::internal\+::\+Invoke\+Callback\+Action}}$<$ Callback\+Type $>$\+::\+Invoke\+Callback\+Action (\begin{DoxyParamCaption}\item[{Callback\+Type \texorpdfstring{$\ast$}{*}}]{callback}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-generated-actions_8h_source_l00330}{330}} of file \mbox{\hyperlink{gmock-generated-actions_8h_source}{gmock-\/generated-\/actions.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00331\ \ \ \ \ \ \ :\ callback\_(callback)\ \{}
+\DoxyCodeLine{00332\ \ \ \ \ callback-\/>CheckIsRepeatable();\ \ \textcolor{comment}{//\ Makes\ sure\ the\ callback\ is\ permanent.}}
+\DoxyCodeLine{00333\ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_invoke_callback_action_a74278acbfc51fe7407fdabc9d6a42c70}\index{testing::internal::InvokeCallbackAction$<$ CallbackType $>$@{testing::internal::InvokeCallbackAction$<$ CallbackType $>$}!Perform@{Perform}}
+\index{Perform@{Perform}!testing::internal::InvokeCallbackAction$<$ CallbackType $>$@{testing::internal::InvokeCallbackAction$<$ CallbackType $>$}}
+\doxysubsubsection{\texorpdfstring{Perform()}{Perform()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_invoke_callback_action_a74278acbfc51fe7407fdabc9d6a42c70} 
+template$<$typename Callback\+Type $>$ \\
+template$<$typename Result , typename Argument\+Tuple $>$ \\
+Result \mbox{\hyperlink{classtesting_1_1internal_1_1_invoke_callback_action}{testing\+::internal\+::\+Invoke\+Callback\+Action}}$<$ Callback\+Type $>$\+::\+Perform (\begin{DoxyParamCaption}\item[{const Argument\+Tuple \&}]{args}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-generated-actions_8h_source_l00342}{342}} of file \mbox{\hyperlink{gmock-generated-actions_8h_source}{gmock-\/generated-\/actions.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00342\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00343\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_invoke_helper}{InvokeHelper<Result,\ ArgumentTuple>::InvokeCallback}}(}
+\DoxyCodeLine{00344\ \ \ \ \ \ \ \ \ callback\_.\mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr_aca6bc39c9d73278fb495804fa508ad73}{get}}(),\ args);}
+\DoxyCodeLine{00345\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=316pt]{classtesting_1_1internal_1_1_invoke_callback_action_a74278acbfc51fe7407fdabc9d6a42c70_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/include/gmock/\mbox{\hyperlink{gmock-generated-actions_8h}{gmock-\/generated-\/actions.\+h}}\end{DoxyCompactItemize}

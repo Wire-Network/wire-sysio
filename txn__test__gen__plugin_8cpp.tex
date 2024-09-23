@@ -1,0 +1,276 @@
+\doxysection{plugins/txn\+\_\+test\+\_\+gen\+\_\+plugin/txn\+\_\+test\+\_\+gen\+\_\+plugin.cpp File Reference}
+\hypertarget{txn__test__gen__plugin_8cpp}{}\label{txn__test__gen__plugin_8cpp}\index{plugins/txn\_test\_gen\_plugin/txn\_test\_gen\_plugin.cpp@{plugins/txn\_test\_gen\_plugin/txn\_test\_gen\_plugin.cpp}}
+{\ttfamily \#include $<$sysio/txn\+\_\+test\+\_\+gen\+\_\+plugin/txn\+\_\+test\+\_\+gen\+\_\+plugin.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain\+\_\+plugin/chain\+\_\+plugin.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/wast\+\_\+to\+\_\+wasm.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/thread\+\_\+utils.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/variant.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/io/json.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/exception/exception.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/reflect/variant.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/asio/high\+\_\+resolution\+\_\+timer.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/algorithm/clamp.\+hpp$>$}\newline
+{\ttfamily \#include $<$Inline/\+Basic\+Types.\+h$>$}\newline
+{\ttfamily \#include $<$IR/\+Module.\+h$>$}\newline
+{\ttfamily \#include $<$IR/\+Validate.\+h$>$}\newline
+{\ttfamily \#include $<$WAST/\+WAST.\+h$>$}\newline
+{\ttfamily \#include $<$WASM/\+WASM.\+h$>$}\newline
+{\ttfamily \#include $<$Runtime/\+Runtime.\+h$>$}\newline
+{\ttfamily \#include $<$contracts.\+hpp$>$}\newline
+Include dependency graph for txn\+\_\+test\+\_\+gen\+\_\+plugin.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{txn__test__gen__plugin_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1detail_1_1txn__test__gen__empty}{sysio\+::detail\+::txn\+\_\+test\+\_\+gen\+\_\+empty}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1detail_1_1txn__test__gen__status}{sysio\+::detail\+::txn\+\_\+test\+\_\+gen\+\_\+status}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1txn__test__gen__plugin__impl}{sysio\+::txn\+\_\+test\+\_\+gen\+\_\+plugin\+\_\+impl}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1detail}{sysio\+::detail}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{txn__test__gen__plugin_8cpp_a7f59ca44c6b0f45ca526a8c86a477d4a}{CALL}}(api\+\_\+name,  api\+\_\+handle,  call\+\_\+name,  INVOKE,  http\+\_\+response\+\_\+code)
+\item 
+\#define \mbox{\hyperlink{txn__test__gen__plugin_8cpp_a0e00cd8085030cd38c1fd93a92ea8e7a}{INVOKE\+\_\+\+V\+\_\+\+R\+\_\+\+R\+\_\+R}}(api\+\_\+handle,  call\+\_\+name,  in\+\_\+param0,  in\+\_\+param1,  in\+\_\+param2)
+\item 
+\#define \mbox{\hyperlink{txn__test__gen__plugin_8cpp_a653b6a13b0cc13bed8565f0d19aa8e03}{INVOKE\+\_\+\+V\+\_\+\+R\+\_\+R}}(api\+\_\+handle,  call\+\_\+name,  in\+\_\+param0,  in\+\_\+param1)
+\item 
+\#define \mbox{\hyperlink{txn__test__gen__plugin_8cpp_a54f8b56aff9e470dbebbddd544256b8f}{INVOKE\+\_\+\+V\+\_\+V}}(api\+\_\+handle,  call\+\_\+name)
+\item 
+\#define \mbox{\hyperlink{txn__test__gen__plugin_8cpp_a33196ca3be5d427668ef31afcaf50d07}{CALL\+\_\+\+ASYNC}}(api\+\_\+name,  api\+\_\+handle,  call\+\_\+name,  INVOKE,  http\+\_\+response\+\_\+code)
+\item 
+\#define \mbox{\hyperlink{txn__test__gen__plugin_8cpp_a657352e4059a68d27c289bfdc380e08c}{INVOKE\+\_\+\+ASYNC\+\_\+\+R\+\_\+R}}(api\+\_\+handle,  call\+\_\+name,  in\+\_\+param0,  in\+\_\+param1)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{txn__test__gen__plugin_8cpp_a7265c0ccd5e24c8644400b22c614e26e}{FC\+\_\+\+REFLECT}} (\mbox{\hyperlink{structsysio_1_1detail_1_1txn__test__gen__empty}{sysio\+::detail\+::txn\+\_\+test\+\_\+gen\+\_\+empty}},)
+\item 
+\mbox{\hyperlink{txn__test__gen__plugin_8cpp_a9692639627df96e0578f23c7c559743d}{FC\+\_\+\+REFLECT}} (\mbox{\hyperlink{structsysio_1_1detail_1_1txn__test__gen__status}{sysio\+::detail\+::txn\+\_\+test\+\_\+gen\+\_\+status}},(status))
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{txn__test__gen__plugin_8cpp_a7f59ca44c6b0f45ca526a8c86a477d4a}\index{txn\_test\_gen\_plugin.cpp@{txn\_test\_gen\_plugin.cpp}!CALL@{CALL}}
+\index{CALL@{CALL}!txn\_test\_gen\_plugin.cpp@{txn\_test\_gen\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{CALL}{CALL}}
+{\footnotesize\ttfamily \label{txn__test__gen__plugin_8cpp_a7f59ca44c6b0f45ca526a8c86a477d4a} 
+\#define CALL(\begin{DoxyParamCaption}\item[{}]{api\+\_\+name}{, }\item[{}]{api\+\_\+handle}{, }\item[{}]{call\+\_\+name}{, }\item[{}]{INVOKE}{, }\item[{}]{http\+\_\+response\+\_\+code}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\{std::string(\textcolor{stringliteral}{"{}/v1/"{}}\ \#api\_name\ \textcolor{stringliteral}{"{}/"{}}\ \#call\_name),\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ [\textcolor{keyword}{this}](\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}},\ \textcolor{keywordtype}{string}\ body,\ url\_response\_callback\ cb)\ \textcolor{keyword}{mutable}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ if\ (body.empty())\ body\ =\ "{}\{\}\textcolor{stringliteral}{"{};\ \(\backslash\)}}
+\DoxyCodeLine{\textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \ INVOKE\ \(\backslash\)}}
+\DoxyCodeLine{\textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \ cb(http\_response\_code,\ fc::variant(result));\ \(\backslash\)}}
+\DoxyCodeLine{\textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \}\ catch\ (...)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \ http\_plugin::handle\_exception(\#api\_name,\ \#call\_name,\ body,\ cb);\ \(\backslash\)}}
+\DoxyCodeLine{\textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{\textcolor{stringliteral}{\ \ \ \ \ \ \ \}\}}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{txn__test__gen__plugin_8cpp_source_l00042}{42}} of file \mbox{\hyperlink{txn__test__gen__plugin_8cpp_source}{txn\+\_\+test\+\_\+gen\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00042\ \textcolor{preprocessor}{\#define\ CALL(api\_name,\ api\_handle,\ call\_name,\ INVOKE,\ http\_response\_code)\ \(\backslash\)}}
+\DoxyCodeLine{00043\ \textcolor{preprocessor}{\{std::string("{}/v1/"{}\ \#api\_name\ "{}/"{}\ \#call\_name),\ \(\backslash\)}}
+\DoxyCodeLine{00044\ \textcolor{preprocessor}{\ \ \ [this](string,\ string\ body,\ url\_response\_callback\ cb)\ mutable\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00045\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ try\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00046\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ if\ (body.empty())\ body\ =\ "{}\{\}"{};\ \(\backslash\)}}
+\DoxyCodeLine{00047\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ INVOKE\ \(\backslash\)}}
+\DoxyCodeLine{00048\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ cb(http\_response\_code,\ fc::variant(result));\ \(\backslash\)}}
+\DoxyCodeLine{00049\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \}\ catch\ (...)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00050\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ http\_plugin::handle\_exception(\#api\_name,\ \#call\_name,\ body,\ cb);\ \(\backslash\)}}
+\DoxyCodeLine{00051\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00052\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \}\}}}
+
+\end{DoxyCode}
+\Hypertarget{txn__test__gen__plugin_8cpp_a33196ca3be5d427668ef31afcaf50d07}\index{txn\_test\_gen\_plugin.cpp@{txn\_test\_gen\_plugin.cpp}!CALL\_ASYNC@{CALL\_ASYNC}}
+\index{CALL\_ASYNC@{CALL\_ASYNC}!txn\_test\_gen\_plugin.cpp@{txn\_test\_gen\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{CALL\_ASYNC}{CALL\_ASYNC}}
+{\footnotesize\ttfamily \label{txn__test__gen__plugin_8cpp_a33196ca3be5d427668ef31afcaf50d07} 
+\#define CALL\+\_\+\+ASYNC(\begin{DoxyParamCaption}\item[{}]{api\+\_\+name}{, }\item[{}]{api\+\_\+handle}{, }\item[{}]{call\+\_\+name}{, }\item[{}]{INVOKE}{, }\item[{}]{http\+\_\+response\+\_\+code}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\{std::string(\textcolor{stringliteral}{"{}/v1/"{}}\ \#api\_name\ \textcolor{stringliteral}{"{}/"{}}\ \#call\_name),\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ [\textcolor{keyword}{this}](\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}},\ \textcolor{keywordtype}{string}\ body,\ url\_response\_callback\ cb)\ \textcolor{keyword}{mutable}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ if\ (body.empty())\ body\ =\ "{}\{\}\textcolor{stringliteral}{"{};\ \(\backslash\)}}
+\DoxyCodeLine{\textcolor{stringliteral}{\ \ \ \ \ \ \ /*plugin\ processes\ many\ transactions,\ report\ only\ first\ to\ avoid\ http\_plugin\ having\ to\ deal\ with\ multiple\ responses*/\ \(\backslash\)}}
+\DoxyCodeLine{\textcolor{stringliteral}{\ \ \ \ \ \ auto\ times\_called\ =\ std::make\_shared<std::atomic<size\_t>>(0);\(\backslash\)}}
+\DoxyCodeLine{\textcolor{stringliteral}{\ \ \ \ \ \ auto\ result\_handler\ =\ [times\_called\{std::move(times\_called)\},\ cb,\ body](const\ fc::exception\_ptr\&\ e)\ mutable\ \{\(\backslash\)}}
+\DoxyCodeLine{\textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ if(\ ++(*times\_called)\ >\ 1\ )\ return;\(\backslash\)}}
+\DoxyCodeLine{\textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ if\ (e)\ \{\(\backslash\)}}
+\DoxyCodeLine{\textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ try\ \{\(\backslash\)}}
+\DoxyCodeLine{\textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ e-\/>dynamic\_rethrow\_exception();\(\backslash\)}}
+\DoxyCodeLine{\textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \}\ catch\ (...)\ \{\(\backslash\)}}
+\DoxyCodeLine{\textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ http\_plugin::handle\_exception(\#api\_name,\ \#call\_name,\ body,\ cb);\(\backslash\)}}
+\DoxyCodeLine{\textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \}\(\backslash\)}}
+\DoxyCodeLine{\textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \}\ else\ \{\(\backslash\)}}
+\DoxyCodeLine{\textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ cb(http\_response\_code,\ fc::variant(sysio::detail::txn\_test\_gen\_empty()));\ \(\backslash\)}}
+\DoxyCodeLine{\textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \}\(\backslash\)}}
+\DoxyCodeLine{\textcolor{stringliteral}{\ \ \ \ \ \ \};\(\backslash\)}}
+\DoxyCodeLine{\textcolor{stringliteral}{\ \ \ \ \ \ INVOKE\ \(\backslash\)}}
+\DoxyCodeLine{\textcolor{stringliteral}{\ \ \ \}\(\backslash\)}}
+\DoxyCodeLine{\textcolor{stringliteral}{\}}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{txn__test__gen__plugin_8cpp_source_l00068}{68}} of file \mbox{\hyperlink{txn__test__gen__plugin_8cpp_source}{txn\+\_\+test\+\_\+gen\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00068\ \textcolor{preprocessor}{\#define\ CALL\_ASYNC(api\_name,\ api\_handle,\ call\_name,\ INVOKE,\ http\_response\_code)\ \(\backslash\)}}
+\DoxyCodeLine{00069\ \textcolor{preprocessor}{\{std::string("{}/v1/"{}\ \#api\_name\ "{}/"{}\ \#call\_name),\ \(\backslash\)}}
+\DoxyCodeLine{00070\ \textcolor{preprocessor}{\ \ \ [this](string,\ string\ body,\ url\_response\_callback\ cb)\ mutable\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00071\ \textcolor{preprocessor}{\ \ \ \ \ \ if\ (body.empty())\ body\ =\ "{}\{\}"{};\ \(\backslash\)}}
+\DoxyCodeLine{00072\ \textcolor{preprocessor}{\ \ \ \ \ \ \ }\textcolor{comment}{/*plugin\ processes\ many\ transactions,\ report\ only\ first\ to\ avoid\ http\_plugin\ having\ to\ deal\ with\ multiple\ responses*/}\textcolor{preprocessor}{\ \(\backslash\)}}
+\DoxyCodeLine{00073\ \textcolor{preprocessor}{\ \ \ \ \ \ auto\ times\_called\ =\ std::make\_shared<std::atomic<size\_t>>(0);\(\backslash\)}}
+\DoxyCodeLine{00074\ \textcolor{preprocessor}{\ \ \ \ \ \ auto\ result\_handler\ =\ [times\_called\{std::move(times\_called)\},\ cb,\ body](const\ fc::exception\_ptr\&\ e)\ mutable\ \{\(\backslash\)}}
+\DoxyCodeLine{00075\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ if(\ ++(*times\_called)\ >\ 1\ )\ return;\(\backslash\)}}
+\DoxyCodeLine{00076\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ if\ (e)\ \{\(\backslash\)}}
+\DoxyCodeLine{00077\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ try\ \{\(\backslash\)}}
+\DoxyCodeLine{00078\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ e-\/>dynamic\_rethrow\_exception();\(\backslash\)}}
+\DoxyCodeLine{00079\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \}\ catch\ (...)\ \{\(\backslash\)}}
+\DoxyCodeLine{00080\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ http\_plugin::handle\_exception(\#api\_name,\ \#call\_name,\ body,\ cb);\(\backslash\)}}
+\DoxyCodeLine{00081\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \}\(\backslash\)}}
+\DoxyCodeLine{00082\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \}\ else\ \{\(\backslash\)}}
+\DoxyCodeLine{00083\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ cb(http\_response\_code,\ fc::variant(sysio::detail::txn\_test\_gen\_empty()));\ \(\backslash\)}}
+\DoxyCodeLine{00084\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \}\(\backslash\)}}
+\DoxyCodeLine{00085\ \textcolor{preprocessor}{\ \ \ \ \ \ \};\(\backslash\)}}
+\DoxyCodeLine{00086\ \textcolor{preprocessor}{\ \ \ \ \ \ INVOKE\ \(\backslash\)}}
+\DoxyCodeLine{00087\ \textcolor{preprocessor}{\ \ \ \}\(\backslash\)}}
+\DoxyCodeLine{00088\ \textcolor{preprocessor}{\}}}
+
+\end{DoxyCode}
+\Hypertarget{txn__test__gen__plugin_8cpp_a657352e4059a68d27c289bfdc380e08c}\index{txn\_test\_gen\_plugin.cpp@{txn\_test\_gen\_plugin.cpp}!INVOKE\_ASYNC\_R\_R@{INVOKE\_ASYNC\_R\_R}}
+\index{INVOKE\_ASYNC\_R\_R@{INVOKE\_ASYNC\_R\_R}!txn\_test\_gen\_plugin.cpp@{txn\_test\_gen\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{INVOKE\_ASYNC\_R\_R}{INVOKE\_ASYNC\_R\_R}}
+{\footnotesize\ttfamily \label{txn__test__gen__plugin_8cpp_a657352e4059a68d27c289bfdc380e08c} 
+\#define INVOKE\+\_\+\+ASYNC\+\_\+\+R\+\_\+R(\begin{DoxyParamCaption}\item[{}]{api\+\_\+handle}{, }\item[{}]{call\+\_\+name}{, }\item[{}]{in\+\_\+param0}{, }\item[{}]{in\+\_\+param1}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ vs\ =\ fc::json::json::from\_string(body).as<\mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{fc::variants}}>();\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ api\_handle-\/>call\_name(vs.at(0).as<in\_param0>(),\ vs.at(1).as<in\_param1>(),\ result\_handler);}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{txn__test__gen__plugin_8cpp_source_l00090}{90}} of file \mbox{\hyperlink{txn__test__gen__plugin_8cpp_source}{txn\+\_\+test\+\_\+gen\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00090\ \textcolor{preprocessor}{\#define\ INVOKE\_ASYNC\_R\_R(api\_handle,\ call\_name,\ in\_param0,\ in\_param1)\ \(\backslash\)}}
+\DoxyCodeLine{00091\ \textcolor{preprocessor}{\ \ \ const\ auto\&\ vs\ =\ fc::json::json::from\_string(body).as<fc::variants>();\ \(\backslash\)}}
+\DoxyCodeLine{00092\ \textcolor{preprocessor}{\ \ \ api\_handle-\/>call\_name(vs.at(0).as<in\_param0>(),\ vs.at(1).as<in\_param1>(),\ result\_handler);}}
+
+\end{DoxyCode}
+\Hypertarget{txn__test__gen__plugin_8cpp_a653b6a13b0cc13bed8565f0d19aa8e03}\index{txn\_test\_gen\_plugin.cpp@{txn\_test\_gen\_plugin.cpp}!INVOKE\_V\_R\_R@{INVOKE\_V\_R\_R}}
+\index{INVOKE\_V\_R\_R@{INVOKE\_V\_R\_R}!txn\_test\_gen\_plugin.cpp@{txn\_test\_gen\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{INVOKE\_V\_R\_R}{INVOKE\_V\_R\_R}}
+{\footnotesize\ttfamily \label{txn__test__gen__plugin_8cpp_a653b6a13b0cc13bed8565f0d19aa8e03} 
+\#define INVOKE\+\_\+\+V\+\_\+\+R\+\_\+R(\begin{DoxyParamCaption}\item[{}]{api\+\_\+handle}{, }\item[{}]{call\+\_\+name}{, }\item[{}]{in\+\_\+param0}{, }\item[{}]{in\+\_\+param1}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ vs\ =\ fc::json::json::from\_string(body).as<\mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{fc::variants}}>();\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ api\_handle-\/>call\_name(vs.at(0).as<in\_param0>(),\ vs.at(1).as<in\_param1>());\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \mbox{\hyperlink{structsysio_1_1detail_1_1txn__test__gen__empty}{sysio::detail::txn\_test\_gen\_empty}}\ result;}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{txn__test__gen__plugin_8cpp_source_l00059}{59}} of file \mbox{\hyperlink{txn__test__gen__plugin_8cpp_source}{txn\+\_\+test\+\_\+gen\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00059\ \textcolor{preprocessor}{\#define\ INVOKE\_V\_R\_R(api\_handle,\ call\_name,\ in\_param0,\ in\_param1)\ \(\backslash\)}}
+\DoxyCodeLine{00060\ \textcolor{preprocessor}{\ \ \ \ \ const\ auto\&\ vs\ =\ fc::json::json::from\_string(body).as<fc::variants>();\ \(\backslash\)}}
+\DoxyCodeLine{00061\ \textcolor{preprocessor}{\ \ \ \ \ api\_handle-\/>call\_name(vs.at(0).as<in\_param0>(),\ vs.at(1).as<in\_param1>());\ \(\backslash\)}}
+\DoxyCodeLine{00062\ \textcolor{preprocessor}{\ \ \ \ \ sysio::detail::txn\_test\_gen\_empty\ result;}}
+
+\end{DoxyCode}
+\Hypertarget{txn__test__gen__plugin_8cpp_a0e00cd8085030cd38c1fd93a92ea8e7a}\index{txn\_test\_gen\_plugin.cpp@{txn\_test\_gen\_plugin.cpp}!INVOKE\_V\_R\_R\_R@{INVOKE\_V\_R\_R\_R}}
+\index{INVOKE\_V\_R\_R\_R@{INVOKE\_V\_R\_R\_R}!txn\_test\_gen\_plugin.cpp@{txn\_test\_gen\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{INVOKE\_V\_R\_R\_R}{INVOKE\_V\_R\_R\_R}}
+{\footnotesize\ttfamily \label{txn__test__gen__plugin_8cpp_a0e00cd8085030cd38c1fd93a92ea8e7a} 
+\#define INVOKE\+\_\+\+V\+\_\+\+R\+\_\+\+R\+\_\+R(\begin{DoxyParamCaption}\item[{}]{api\+\_\+handle}{, }\item[{}]{call\+\_\+name}{, }\item[{}]{in\+\_\+param0}{, }\item[{}]{in\+\_\+param1}{, }\item[{}]{in\+\_\+param2}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ vs\ =\ fc::json::json::from\_string(body).as<\mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{fc::variants}}>();\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \textcolor{keyword}{auto}\ status\ =\ api\_handle-\/>call\_name(vs.at(0).as<in\_param0>(),\ vs.at(1).as<in\_param1>(),\ vs.at(2).as<in\_param2>());\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \mbox{\hyperlink{structsysio_1_1detail_1_1txn__test__gen__status}{sysio::detail::txn\_test\_gen\_status}}\ result\ =\ \{\ status\ \};}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{txn__test__gen__plugin_8cpp_source_l00054}{54}} of file \mbox{\hyperlink{txn__test__gen__plugin_8cpp_source}{txn\+\_\+test\+\_\+gen\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00054\ \textcolor{preprocessor}{\#define\ INVOKE\_V\_R\_R\_R(api\_handle,\ call\_name,\ in\_param0,\ in\_param1,\ in\_param2)\ \(\backslash\)}}
+\DoxyCodeLine{00055\ \textcolor{preprocessor}{\ \ \ \ \ const\ auto\&\ vs\ =\ fc::json::json::from\_string(body).as<fc::variants>();\ \(\backslash\)}}
+\DoxyCodeLine{00056\ \textcolor{preprocessor}{\ \ \ \ \ auto\ status\ =\ api\_handle-\/>call\_name(vs.at(0).as<in\_param0>(),\ vs.at(1).as<in\_param1>(),\ vs.at(2).as<in\_param2>());\ \(\backslash\)}}
+\DoxyCodeLine{00057\ \textcolor{preprocessor}{\ \ \ \ \ sysio::detail::txn\_test\_gen\_status\ result\ =\ \{\ status\ \};}}
+
+\end{DoxyCode}
+\Hypertarget{txn__test__gen__plugin_8cpp_a54f8b56aff9e470dbebbddd544256b8f}\index{txn\_test\_gen\_plugin.cpp@{txn\_test\_gen\_plugin.cpp}!INVOKE\_V\_V@{INVOKE\_V\_V}}
+\index{INVOKE\_V\_V@{INVOKE\_V\_V}!txn\_test\_gen\_plugin.cpp@{txn\_test\_gen\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{INVOKE\_V\_V}{INVOKE\_V\_V}}
+{\footnotesize\ttfamily \label{txn__test__gen__plugin_8cpp_a54f8b56aff9e470dbebbddd544256b8f} 
+\#define INVOKE\+\_\+\+V\+\_\+V(\begin{DoxyParamCaption}\item[{}]{api\+\_\+handle}{, }\item[{}]{call\+\_\+name}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ api\_handle-\/>call\_name();\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \mbox{\hyperlink{structsysio_1_1detail_1_1txn__test__gen__empty}{sysio::detail::txn\_test\_gen\_empty}}\ result;}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{txn__test__gen__plugin_8cpp_source_l00064}{64}} of file \mbox{\hyperlink{txn__test__gen__plugin_8cpp_source}{txn\+\_\+test\+\_\+gen\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00064\ \textcolor{preprocessor}{\#define\ INVOKE\_V\_V(api\_handle,\ call\_name)\ \(\backslash\)}}
+\DoxyCodeLine{00065\ \textcolor{preprocessor}{\ \ \ \ \ api\_handle-\/>call\_name();\ \(\backslash\)}}
+\DoxyCodeLine{00066\ \textcolor{preprocessor}{\ \ \ \ \ sysio::detail::txn\_test\_gen\_empty\ result;}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{txn__test__gen__plugin_8cpp_a7265c0ccd5e24c8644400b22c614e26e}\index{txn\_test\_gen\_plugin.cpp@{txn\_test\_gen\_plugin.cpp}!FC\_REFLECT@{FC\_REFLECT}}
+\index{FC\_REFLECT@{FC\_REFLECT}!txn\_test\_gen\_plugin.cpp@{txn\_test\_gen\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{FC\_REFLECT()}{FC\_REFLECT()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{txn__test__gen__plugin_8cpp_a7265c0ccd5e24c8644400b22c614e26e} 
+FC\+\_\+\+REFLECT (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1detail_1_1txn__test__gen__empty}{sysio\+::detail\+::txn\+\_\+test\+\_\+gen\+\_\+empty}}}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{txn__test__gen__plugin_8cpp_a9692639627df96e0578f23c7c559743d}\index{txn\_test\_gen\_plugin.cpp@{txn\_test\_gen\_plugin.cpp}!FC\_REFLECT@{FC\_REFLECT}}
+\index{FC\_REFLECT@{FC\_REFLECT}!txn\_test\_gen\_plugin.cpp@{txn\_test\_gen\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{FC\_REFLECT()}{FC\_REFLECT()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{txn__test__gen__plugin_8cpp_a9692639627df96e0578f23c7c559743d} 
+FC\+\_\+\+REFLECT (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1detail_1_1txn__test__gen__status}{sysio\+::detail\+::txn\+\_\+test\+\_\+gen\+\_\+status}}}]{}{, }\item[{(status)}]{}{}\end{DoxyParamCaption})}
+

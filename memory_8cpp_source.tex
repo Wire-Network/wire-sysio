@@ -1,0 +1,33 @@
+\doxysection{memory.\+cpp}
+\hypertarget{memory_8cpp_source}{}\label{memory_8cpp_source}\index{libraries/chain/webassembly/memory.cpp@{libraries/chain/webassembly/memory.cpp}}
+\mbox{\hyperlink{memory_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{memory_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{interface_8hpp}{sysio/chain/webassembly/interface.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{memory_8cpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{memory_8cpp_source_l00003}00003\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{\ \textcolor{keyword}{namespace\ }chain\ \{\ \textcolor{keyword}{namespace\ }webassembly\ \{}
+\DoxyCodeLine{\Hypertarget{memory_8cpp_source_l00004}\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_adde74da0336a3706956e02f4f8f929ed}{00004}}\ \ \ \ \textcolor{keywordtype}{void}*\ \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_adde74da0336a3706956e02f4f8f929ed}{interface::memcpy}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1memcpy__params}{memcpy\_params}}\ args\ )\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{memory_8cpp_source_l00005}00005\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ [dest,\ src,\ length]\ =\ args;}
+\DoxyCodeLine{\Hypertarget{memory_8cpp_source_l00006}00006\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}((\textcolor{keywordtype}{size\_t})(std::abs((ptrdiff\_t)(\textcolor{keywordtype}{char}*)dest\ -\/\ (ptrdiff\_t)(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*)src))\ >=\ length,}
+\DoxyCodeLine{\Hypertarget{memory_8cpp_source_l00007}00007\ \ \ \ \ \ \ \ \ \ \ \ \ overlapping\_memory\_error,\ \textcolor{stringliteral}{"{}memcpy\ can\ only\ accept\ non-\/aliasing\ pointers"{}});}
+\DoxyCodeLine{\Hypertarget{memory_8cpp_source_l00008}00008\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (\textcolor{keywordtype}{char}\ *)std::memcpy((\textcolor{keywordtype}{char}*)dest,\ (\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*)src,\ length);}
+\DoxyCodeLine{\Hypertarget{memory_8cpp_source_l00009}00009\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{memory_8cpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{memory_8cpp_source_l00011}\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_aa67f6318747a81d03b154844e3f123c5}{00011}}\ \ \ \ \textcolor{keywordtype}{void}*\ \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_aa67f6318747a81d03b154844e3f123c5}{interface::memmove}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1memcpy__params}{memcpy\_params}}\ args\ )\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{memory_8cpp_source_l00012}00012\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ [dest,\ src,\ length]\ =\ args;}
+\DoxyCodeLine{\Hypertarget{memory_8cpp_source_l00013}00013\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (\textcolor{keywordtype}{char}\ *)std::memmove((\textcolor{keywordtype}{char}*)dest,\ (\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*)src,\ length);}
+\DoxyCodeLine{\Hypertarget{memory_8cpp_source_l00014}00014\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{memory_8cpp_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{memory_8cpp_source_l00016}\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_abdbb0ec7313e26df6952759d4c4faf64}{00016}}\ \ \ \ \mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}}\ \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_abdbb0ec7313e26df6952759d4c4faf64}{interface::memcmp}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1memcmp__params}{memcmp\_params}}\ args\ )\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{memory_8cpp_source_l00017}00017\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ [dest,\ src,\ length]\ =\ args;}
+\DoxyCodeLine{\Hypertarget{memory_8cpp_source_l00018}00018\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ std::memcmp((\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*)dest,\ (\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*)src,\ length);}
+\DoxyCodeLine{\Hypertarget{memory_8cpp_source_l00019}00019\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ <\ 0\ ?\ -\/1\ :\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ >\ 0\ ?\ 1\ :\ 0;}
+\DoxyCodeLine{\Hypertarget{memory_8cpp_source_l00020}00020\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{memory_8cpp_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{memory_8cpp_source_l00022}\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_a88264d2f414701e8066f1f7591fd7107}{00022}}\ \ \ \ \textcolor{keywordtype}{void}*\ \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_a88264d2f414701e8066f1f7591fd7107}{interface::memset}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1memset__params}{memset\_params}}\ args\ )\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{memory_8cpp_source_l00023}00023\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ [dest,\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\ length]\ =\ args;}
+\DoxyCodeLine{\Hypertarget{memory_8cpp_source_l00024}00024\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (\textcolor{keywordtype}{char}\ *)std::memset(\ (\textcolor{keywordtype}{char}*)dest,\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\ length\ );}
+\DoxyCodeLine{\Hypertarget{memory_8cpp_source_l00025}00025\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{memory_8cpp_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{memory_8cpp_source_l00027}00027\ \}\}\}\ \textcolor{comment}{//\ ns\ sysio::chain::webassembly}}
+
+\end{DoxyCode}

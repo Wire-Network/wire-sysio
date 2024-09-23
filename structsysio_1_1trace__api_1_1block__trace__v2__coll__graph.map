@@ -1,0 +1,9 @@
+<map id="sysio::trace_api::block_trace_v2" name="sysio::trace_api::block_trace_v2">
+<area shape="rect" id="Node000001" title=" " alt="" coords="340,90,492,130"/>
+<area shape="rect" id="Node000002" href="$classfc_1_1sha256.html" title=" " alt="" coords="55,25,138,51"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="153,48,340,90,338,95,152,53"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1chain_1_1block__timestamp.html" title=" " alt="" coords="5,75,188,145"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="203,107,339,107,339,113,203,113"/>
+<area shape="rect" id="Node000004" href="$structsysio_1_1chain_1_1name.html" title="Immutable except for fc::from_variant." alt="" coords="31,169,162,195"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="171,163,339,124,340,130,172,168"/>
+</map>

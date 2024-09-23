@@ -1,0 +1,174 @@
+\doxysection{websocketpp\+::error\+::category Class Reference}
+\hypertarget{classwebsocketpp_1_1error_1_1category}{}\label{classwebsocketpp_1_1error_1_1category}\index{websocketpp::error::category@{websocketpp::error::category}}
+
+
+{\ttfamily \#include $<$error.\+hpp$>$}
+
+
+
+Inheritance diagram for websocketpp\+::error\+::category\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=179pt]{classwebsocketpp_1_1error_1_1category__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for websocketpp\+::error\+::category\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=179pt]{classwebsocketpp_1_1error_1_1category__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classwebsocketpp_1_1error_1_1category_a1bb85c82e564bfc962d1dbaf3e85d1eb}{category}} ()
+\item 
+char const \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classwebsocketpp_1_1error_1_1category_a7aaeb9b875f0ff14f8abc01267221050}{name}} () const \mbox{\hyperlink{cpp11_8hpp_aa19747404a5f2fe9c9eb9e9d2e48f26c}{\+\_\+\+WEBSOCKETPP\+\_\+\+NOEXCEPT\+\_\+\+TOKEN\+\_\+}}
+\item 
+std\+::string \mbox{\hyperlink{classwebsocketpp_1_1error_1_1category_a92dff0e7645808ef0607f9f4fa07acbb}{message}} (int \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68d}{value}}) const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{error_8hpp_source_l00150}{150}} of file \mbox{\hyperlink{error_8hpp_source}{error.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classwebsocketpp_1_1error_1_1category_a1bb85c82e564bfc962d1dbaf3e85d1eb}\index{websocketpp::error::category@{websocketpp::error::category}!category@{category}}
+\index{category@{category}!websocketpp::error::category@{websocketpp::error::category}}
+\doxysubsubsection{\texorpdfstring{category()}{category()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1error_1_1category_a1bb85c82e564bfc962d1dbaf3e85d1eb} 
+websocketpp\+::error\+::category\+::category (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{error_8hpp_source_l00152}{152}} of file \mbox{\hyperlink{error_8hpp_source}{error.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00152\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classwebsocketpp_1_1error_1_1category_a92dff0e7645808ef0607f9f4fa07acbb}\index{websocketpp::error::category@{websocketpp::error::category}!message@{message}}
+\index{message@{message}!websocketpp::error::category@{websocketpp::error::category}}
+\doxysubsubsection{\texorpdfstring{message()}{message()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1error_1_1category_a92dff0e7645808ef0607f9f4fa07acbb} 
+std\+::string websocketpp\+::error\+::category\+::message (\begin{DoxyParamCaption}\item[{int}]{value}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{error_8hpp_source_l00158}{158}} of file \mbox{\hyperlink{error_8hpp_source}{error.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(\mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68d}{value}})\ \{}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da0cd3808919f43e5fbeee42fbcb808d66}{error::general}}:}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Generic\ error"{}};}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68daebde17ef225c3b7e9638fbd40b13ce91}{error::send\_queue\_full}}:}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}send\ queue\ full"{}};}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68daa2abe6fda013270792213b0f0ff8eaaf}{error::payload\_violation}}:}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}payload\ violation"{}};}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68dab60d2206b38a89602d316dd029c33c1b}{error::endpoint\_not\_secure}}:}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}endpoint\ not\ secure"{}};}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da472f65367504b2e11e63682cca469be4}{error::endpoint\_unavailable}}:}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}endpoint\ not\ available"{}};}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68daf80643edf3b27c30fc83be7b489a418c}{error::invalid\_uri}}:}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}invalid\ uri"{}};}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da55cc9da6c40e8dc3f8df1e9e3f7b989f}{error::no\_outgoing\_buffers}}:}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}no\ outgoing\ message\ buffers"{}};}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da6081f5914dabed34d55d3e12325f329d}{error::no\_incoming\_buffers}}:}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}no\ incoming\ message\ buffers"{}};}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da7566c083efb2833cbe99e6f4bda75882}{error::invalid\_state}}:}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}invalid\ state"{}};}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68dad002d8a5b5667c6b117805b368cd7853}{error::bad\_close\_code}}:}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Unable\ to\ extract\ close\ code"{}};}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68daa864a4ce65c5f0fe910567fe33a984c0}{error::invalid\_close\_code}}:}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Extracted\ close\ code\ is\ in\ an\ invalid\ range"{}};}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da58cb6e9202b34339bf0602c997de4f4c}{error::reserved\_close\_code}}:}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Extracted\ close\ code\ is\ in\ a\ reserved\ range"{}};}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da942738932384d65a5156ca03863587e1}{error::invalid\_utf8}}:}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Invalid\ UTF-\/8"{}};}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68dabdba1165334e583188795c7fda926dc3}{error::invalid\_subprotocol}}:}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Invalid\ subprotocol"{}};}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da9d05e6c7355920beb025ef1034941841}{error::bad\_connection}}:}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Bad\ Connection"{}};}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68daee5b74d2be31ca48e104578d6c2b7425}{error::test}}:}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Test\ Error"{}};}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da5e907c1c8fb01b9122f590513916c1e8}{error::con\_creation\_failed}}:}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Connection\ creation\ attempt\ failed"{}};}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da1c2d766aa9dc1b43d4af8dac9d7de2e0}{error::unrequested\_subprotocol}}:}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Selected\ subprotocol\ was\ not\ requested\ by\ the\ client"{}};}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da34e082b99518716e9755d3ac0436ccf3}{error::client\_only}}:}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Feature\ not\ available\ on\ server\ endpoints"{}};}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68daab6790e91c53a767498f7939e8fc734e}{error::server\_only}}:}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Feature\ not\ available\ on\ client\ endpoints"{}};}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da378e4b84397008e32d03d0fea4f15326}{error::http\_connection\_ended}}:}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}HTTP\ connection\ ended"{}};}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68dad2d508dc214d70b4bd6249a85987bfd6}{error::open\_handshake\_timeout}}:}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}The\ opening\ handshake\ timed\ out"{}};}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68dabd195839148da73c7dbef46688635f77}{error::close\_handshake\_timeout}}:}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}The\ closing\ handshake\ timed\ out"{}};}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da1eec17fbd4329fad248a4688ce736c40}{error::invalid\_port}}:}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Invalid\ URI\ port"{}};}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da3a15d734910438b77e8f1919e6dac9e6}{error::async\_accept\_not\_listening}}:}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Async\ Accept\ not\ listening"{}};}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da3b58b6bfba3dcc3dbdf828c07bb040f4}{error::operation\_canceled}}:}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Operation\ canceled"{}};}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da84dc4660cd164a5e27d8c2f816f3593b}{error::rejected}}:}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Connection\ rejected"{}};}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68dad50a56da7a0355b9075f98c7567523a5}{error::upgrade\_required}}:}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Upgrade\ required"{}};}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68daddbb433d0d194d25e7bc72a7611a9e47}{error::invalid\_version}}:}
+\DoxyCodeLine{00217\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Invalid\ version"{}};}
+\DoxyCodeLine{00218\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da93459fd7c7609d8ebf110bb0f6754073}{error::unsupported\_version}}:}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Unsupported\ version"{}};}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da589164fe7382c7355310fc92ff0d53d7}{error::http\_parse\_error}}:}
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}HTTP\ parse\ error"{}};}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da7ab039563d30f7760c3cd34f1fd680b1}{error::extension\_neg\_failed}}:}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Extension\ negotiation\ failed"{}};}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Unknown"{}};}
+\DoxyCodeLine{00226\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00227\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1error_1_1category_a7aaeb9b875f0ff14f8abc01267221050}\index{websocketpp::error::category@{websocketpp::error::category}!name@{name}}
+\index{name@{name}!websocketpp::error::category@{websocketpp::error::category}}
+\doxysubsubsection{\texorpdfstring{name()}{name()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1error_1_1category_a7aaeb9b875f0ff14f8abc01267221050} 
+char const  \texorpdfstring{$\ast$}{*} websocketpp\+::error\+::category\+::name (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{error_8hpp_source_l00154}{154}} of file \mbox{\hyperlink{error_8hpp_source}{error.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}websocketpp"{}};}
+\DoxyCodeLine{00156\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1error_1_1category_a7aaeb9b875f0ff14f8abc01267221050_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/vendor/websocketpp/websocketpp/\mbox{\hyperlink{error_8hpp}{error.\+hpp}}\end{DoxyCompactItemize}

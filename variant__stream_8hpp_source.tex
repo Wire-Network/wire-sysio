@@ -1,0 +1,36 @@
+\doxysection{variant\+\_\+stream.\+hpp}
+\hypertarget{variant__stream_8hpp_source}{}\label{variant__stream_8hpp_source}\index{libraries/fc/include/fc/rpc/variant\_stream.hpp@{libraries/fc/include/fc/rpc/variant\_stream.hpp}}
+\mbox{\hyperlink{variant__stream_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{variant__stream_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{variant__stream_8hpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{variant__stream_8hpp_source_l00003}00003\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}\ }
+\DoxyCodeLine{\Hypertarget{variant__stream_8hpp_source_l00004}00004\ \{}
+\DoxyCodeLine{\Hypertarget{variant__stream_8hpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{variant__stream_8hpp_source_l00010}\mbox{\hyperlink{classfc_1_1variant__stream}{00010}}\ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classfc_1_1variant__stream}{variant\_stream}}}
+\DoxyCodeLine{\Hypertarget{variant__stream_8hpp_source_l00011}00011\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{variant__stream_8hpp_source_l00012}00012\ \ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{variant__stream_8hpp_source_l00013}\mbox{\hyperlink{classfc_1_1variant__stream_addb34b5a7761e521b06adcc909d1e07c}{00013}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant__stream_addb34b5a7761e521b06adcc909d1e07c}{variant\_stream}}(\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ );}
+\DoxyCodeLine{\Hypertarget{variant__stream_8hpp_source_l00014}\mbox{\hyperlink{classfc_1_1variant__stream_aaa8ed0e91af5e2858e5b99df882ac973}{00014}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant__stream_aaa8ed0e91af5e2858e5b99df882ac973}{\string~variant\_stream}}();}
+\DoxyCodeLine{\Hypertarget{variant__stream_8hpp_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{variant__stream_8hpp_source_l00017}\mbox{\hyperlink{classfc_1_1variant__stream_a27edce830ba6ed70ed293096be85495b}{00017}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ \mbox{\hyperlink{classfc_1_1variant__stream_a27edce830ba6ed70ed293096be85495b}{free}}();\ \textcolor{comment}{//\ number\ of\ spaces\ available}}
+\DoxyCodeLine{\Hypertarget{variant__stream_8hpp_source_l00018}\mbox{\hyperlink{classfc_1_1variant__stream_a51044a413bcf7e74cdb287947a6871cb}{00018}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ \mbox{\hyperlink{classfc_1_1variant__stream_a51044a413bcf7e74cdb287947a6871cb}{claim}}(\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ num\ );}
+\DoxyCodeLine{\Hypertarget{variant__stream_8hpp_source_l00019}\mbox{\hyperlink{classfc_1_1variant__stream_a8e590de1bbe36cd4899e1be2a2919244}{00019}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ \mbox{\hyperlink{classfc_1_1variant__stream_a8e590de1bbe36cd4899e1be2a2919244}{publish}}(\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ pos\ );}
+\DoxyCodeLine{\Hypertarget{variant__stream_8hpp_source_l00020}\mbox{\hyperlink{classfc_1_1variant__stream_a0b3239fe3a02325ed1a656242185d957}{00020}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ \mbox{\hyperlink{classfc_1_1variant__stream_a0b3239fe3a02325ed1a656242185d957}{wait\_free}}();\ \textcolor{comment}{//\ wait\ for\ free\ space}}
+\DoxyCodeLine{\Hypertarget{variant__stream_8hpp_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{variant__stream_8hpp_source_l00022}00022\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ producer/consumer\ api}}
+\DoxyCodeLine{\Hypertarget{variant__stream_8hpp_source_l00023}\mbox{\hyperlink{classfc_1_1variant__stream_a954d8b99fb4febe46cac7f60b95bd1b4}{00023}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{variant}}\&\ \ \mbox{\hyperlink{classfc_1_1variant__stream_a954d8b99fb4febe46cac7f60b95bd1b4}{get}}(\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ pos\ );}
+\DoxyCodeLine{\Hypertarget{variant__stream_8hpp_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{variant__stream_8hpp_source_l00026}\mbox{\hyperlink{classfc_1_1variant__stream_a8a0ba29c9ff02e5eacbbf7cdc838031a}{00026}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ \ \ \mbox{\hyperlink{classfc_1_1variant__stream_a8a0ba29c9ff02e5eacbbf7cdc838031a}{begin}}();\ \textcolor{comment}{//\ returns\ the\ first\ index\ ready\ to\ be\ read}}
+\DoxyCodeLine{\Hypertarget{variant__stream_8hpp_source_l00027}\mbox{\hyperlink{classfc_1_1variant__stream_a8ef5eb832531813e0ef7860da128d458}{00027}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ \ \ \mbox{\hyperlink{classfc_1_1variant__stream_a8ef5eb832531813e0ef7860da128d458}{end}}();\ \ \ \textcolor{comment}{//\ returns\ the\ first\ index\ that\ cannot\ be\ read}}
+\DoxyCodeLine{\Hypertarget{variant__stream_8hpp_source_l00028}\mbox{\hyperlink{classfc_1_1variant__stream_ab540ce964d2a642c0d193b04d7862e16}{00028}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ \ \ \mbox{\hyperlink{classfc_1_1variant__stream_ab540ce964d2a642c0d193b04d7862e16}{wait}}();\ \textcolor{comment}{//\ wait\ for\ variants\ to\ be\ posted}}
+\DoxyCodeLine{\Hypertarget{variant__stream_8hpp_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{variant__stream_8hpp_source_l00030}00030\ \ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{variant__stream_8hpp_source_l00031}00031\ \ \ \ \ \ \ \ \ std::vector<fc::variant>\ \ \_variants;}
+\DoxyCodeLine{\Hypertarget{variant__stream_8hpp_source_l00032}00032\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \_read\_pos;}
+\DoxyCodeLine{\Hypertarget{variant__stream_8hpp_source_l00033}00033\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \_write\_pos;}
+\DoxyCodeLine{\Hypertarget{variant__stream_8hpp_source_l00034}00034\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{variant__stream_8hpp_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{variant__stream_8hpp_source_l00036}00036\ \}}
+
+\end{DoxyCode}

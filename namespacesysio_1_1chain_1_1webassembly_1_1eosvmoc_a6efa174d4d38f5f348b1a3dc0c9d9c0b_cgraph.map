@@ -1,0 +1,46 @@
+<map id="sysio::chain::webassembly::eosvmoc::register_eosvm_oc" name="sysio::chain::webassembly::eosvmoc::register_eosvm_oc">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,91,206,131"/>
+<area shape="rect" id="Node000002" href="$namespacesysio_1_1chain_1_1webassembly_1_1eosvmoc.html#a3dd1211a90dc7ff1746b5459a3e03b2c" title=" " alt="" coords="254,29,433,70"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="186,87,247,72,248,77,188,93"/>
+<area shape="rect" id="Node000006" href="$namespacesysio_1_1chain_1_1eosvmoc.html#a45477b2def754b987f33a693e9b9102b" title=" " alt="" coords="504,91,656,131"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="206,108,488,108,488,114,206,114"/>
+<area shape="rect" id="Node000009" href="$namespacesysio_1_1chain_1_1webassembly_1_1eosvmoc.html#ac6593044ffde3f1589b705c6e21f342d" title=" " alt="" coords="254,172,433,213"/>
+<area shape="poly" id="edge9_Node000001_Node000009" title=" " alt="" coords="168,129,268,164,266,169,167,134"/>
+<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="299,29,297,19,304,10,320,5,343,3,369,5,384,11,382,16,368,10,343,8,321,10,307,15,302,21,304,28"/>
+<area shape="rect" id="Node000003" href="$namespacesysio_1_1chain_1_1webassembly_1_1eosvmoc.html#a4eac6dba434ae4fbd77147eaefe0277d" title=" " alt="" coords="490,25,670,66"/>
+<area shape="poly" id="edge3_Node000002_Node000003" title=" " alt="" coords="433,45,475,45,475,50,434,51"/>
+<area shape="rect" id="Node000004" href="$namespacesysio_1_1chain_1_1webassembly_1_1eosvmoc.html#a7a50104e9dfcb83cb52d823a079b4bee" title=" " alt="" coords="727,25,907,66"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="670,43,712,43,712,48,670,48"/>
+<area shape="rect" id="Node000005" href="$namespacesysio_1_1chain_1_1webassembly_1_1eosvmoc.html#ae347ac30020feebc0cb0452d6ecf5164" title=" " alt="" coords="955,25,1141,66"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="907,43,939,43,939,48,907,48"/>
+<area shape="rect" id="Node000007" href="$namespacesysio_1_1chain_1_1eosvmoc.html#ad649cd6b28056e1ed27e70d4a42e8530" title=" " alt="" coords="741,91,893,131"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="657,108,725,108,725,114,657,114"/>
+<area shape="rect" id="Node000008" href="$namespacesysio_1_1chain_1_1eosvmoc_1_1detail.html#ac025d056b200fb2a6da4210e7ba6edb5" title=" " alt="" coords="971,91,1124,131"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="894,108,956,108,956,114,894,114"/>
+<area shape="poly" id="edge12_Node000009_Node000006" title=" " alt="" coords="400,169,480,140,499,134,501,139,482,146,402,174"/>
+<area shape="rect" id="Node000010" href="$gs__seg__helpers_8c.html#a78b2433e9a5fa3e8e6d3312b251a0152" title=" " alt="" coords="481,156,679,181"/>
+<area shape="poly" id="edge10_Node000009_Node000010" title=" " alt="" coords="433,181,465,177,466,183,434,186"/>
+<area shape="rect" id="Node000011" href="$gs__seg__helpers_8c.html#a5b567c03bc74b2639ba506dc3700930d" title=" " alt="" coords="497,205,663,230"/>
+<area shape="poly" id="edge11_Node000009_Node000011" title=" " alt="" coords="434,199,482,204,481,210,433,205"/>
+<area shape="rect" id="Node000012" href="$programs_2sysio-launcher_2main_8cpp.html#a8d747b8417c90b78c386111de7934753" title=" " alt="" coords="557,254,603,280"/>
+<area shape="poly" id="edge13_Node000009_Node000012" title=" " alt="" coords="398,211,482,240,542,256,541,261,480,246,396,216"/>
+<area shape="rect" id="Node000013" href="$namespacesysio_1_1vm.html#a7807fbd22c5d50e7045619100189fda0" title=" " alt="" coords="486,304,674,329"/>
+<area shape="poly" id="edge14_Node000009_Node000013" title=" " alt="" coords="369,211,419,251,482,290,496,296,494,301,480,295,416,256,365,215"/>
+<area shape="rect" id="Node000014" href="$namespacesysio_1_1vm_1_1detail.html#ad1706c38b98bb19b51cc48842b3180fe" title=" " alt="" coords="754,263,880,303"/>
+<area shape="poly" id="edge15_Node000013_Node000014" title=" " alt="" coords="674,300,739,291,740,297,675,306"/>
+<area shape="rect" id="Node000019" href="$namespacesysio_1_1vm.html#aa4e6b3dd94060b8acb13335f2c444b53" title=" " alt="" coords="739,328,895,369"/>
+<area shape="poly" id="edge23_Node000013_Node000019" title=" " alt="" coords="675,326,724,333,724,338,674,332"/>
+<area shape="poly" id="edge20_Node000014_Node000014" title=" " alt="" coords="774,263,771,253,779,244,794,238,817,236,842,238,857,245,855,250,841,244,817,241,795,243,782,248,777,254,779,261"/>
+<area shape="rect" id="Node000015" href="$namespacesysio_1_1vm_1_1detail.html#acd8507bfbf3a57c8c4901927622f3607" title=" " alt="" coords="985,267,1110,307"/>
+<area shape="poly" id="edge16_Node000014_Node000015" title=" " alt="" coords="880,281,969,283,969,288,880,287"/>
+<area shape="rect" id="Node000018" href="$namespacesysio_1_1vm_1_1detail.html#acadae1683ef8a9847acd3186e475acf3" title=" " alt="" coords="985,201,1110,242"/>
+<area shape="poly" id="edge21_Node000014_Node000018" title=" " alt="" coords="879,264,970,240,971,245,881,269"/>
+<area shape="rect" id="Node000016" href="$namespacesysio_1_1vm_1_1detail.html#a326c9db9f5cc716ab644389d65b965aa" title=" " alt="" coords="1189,209,1314,250"/>
+<area shape="poly" id="edge17_Node000015_Node000016" title=" " alt="" coords="1110,267,1173,249,1175,254,1112,272"/>
+<area shape="rect" id="Node000017" href="$namespacesysio_1_1vm_1_1detail.html#a3ed27747cf7b328d4536b9ca709e71c0" title=" " alt="" coords="1362,239,1488,279"/>
+<area shape="poly" id="edge19_Node000015_Node000017" title=" " alt="" coords="1111,280,1346,262,1347,267,1111,285"/>
+<area shape="poly" id="edge18_Node000016_Node000017" title=" " alt="" coords="1315,238,1348,243,1347,249,1314,243"/>
+<area shape="poly" id="edge22_Node000018_Node000016" title=" " alt="" coords="1111,221,1174,224,1174,229,1111,227"/>
+<area shape="rect" id="Node000020" href="$namespacesysio_1_1vm.html#a91bb5237ac25e0ae89bf8c988dba56e0" title=" " alt="" coords="970,336,1126,361"/>
+<area shape="poly" id="edge24_Node000019_Node000020" title=" " alt="" coords="895,346,955,346,955,351,895,351"/>
+</map>

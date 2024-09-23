@@ -1,0 +1,18 @@
+<map id="testing::internal::Log" name="testing::internal::Log">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,215,145,241"/>
+<area shape="rect" id="Node000002" href="$namespacetesting_1_1internal.html#aeb475922b8cd1e6c60ac052bbc396e62" title=" " alt="" coords="193,150,424,191"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="130,212,207,193,209,198,131,217"/>
+<area shape="rect" id="Node000007" href="$classtesting_1_1_unit_test.html#a24192400b70b3b946746954e9574fb8e" title=" " alt="" coords="751,180,876,220"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="145,223,735,200,735,205,145,228"/>
+<area shape="rect" id="Node000008" href="$namespacetesting_1_1internal.html#a69ffdba5ee36743e88d8f89b79e566ff" title=" " alt="" coords="249,265,368,306"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="131,239,235,265,234,270,130,244"/>
+<area shape="rect" id="Node000003" href="$classtesting_1_1internal_1_1_unit_test_impl.html#a61c0a51ac4e57d9f884f646ca6dd2210" title=" " alt="" coords="472,71,669,126"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="384,147,456,127,458,132,386,152"/>
+<area shape="rect" id="Node000006" href="$namespacetesting_1_1internal.html#a9bd0caf5d16512de38b39599c13ee634" title=" " alt="" coords="512,150,630,191"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="424,168,496,168,496,173,424,173"/>
+<area shape="rect" id="Node000004" href="$classtesting_1_1internal_1_1_os_stack_trace_getter_interface.html#a0c41724e4e47647a7fe2ace8e70c0ec7" title=" " alt="" coords="717,5,910,61"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="669,69,702,61,703,66,670,74"/>
+<area shape="rect" id="Node000005" href="$classtesting_1_1internal_1_1_unit_test_impl.html#a71753679854f7fbba6c1568eb422fecb" title=" " alt="" coords="735,85,892,141"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="670,102,720,105,720,110,670,107"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="630,175,735,188,735,193,630,180"/>
+</map>

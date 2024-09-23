@@ -1,0 +1,9 @@
+<map id="CLI::Option::description" name="CLI::Option::description">
+<area shape="rect" id="Node000001" title="Set the description." alt="" coords="400,31,559,56"/>
+<area shape="rect" id="Node000002" href="$namespace_c_l_i.html#a6cb6f8bfff8c49385fb24f6f23a23c21" title="Helper function to mark an option as deprecated." alt="" coords="203,31,352,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="384,46,352,46,352,41,384,41"/>
+<area shape="rect" id="Node000003" href="$namespace_c_l_i.html#a5e83d92a6ec271c2439141feaede1136" title="Helper function to mark an option as deprecated." alt="" coords="5,5,155,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="187,35,155,30,155,25,188,29"/>
+<area shape="rect" id="Node000004" href="$namespace_c_l_i.html#ad6d89b5d1aba2ebdca5f94534d658cab" title="Helper function to mark an option as deprecated." alt="" coords="5,55,155,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="188,57,155,61,155,56,187,52"/>
+</map>

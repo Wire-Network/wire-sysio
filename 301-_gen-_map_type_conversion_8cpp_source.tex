@@ -1,0 +1,60 @@
+\doxysection{301-\/Gen-\/\+Map\+Type\+Conversion.cpp}
+\hypertarget{301-_gen-_map_type_conversion_8cpp_source}{}\label{301-_gen-_map_type_conversion_8cpp_source}\index{libraries/sys-\/vm/external/Catch2/examples/301-\/Gen-\/MapTypeConversion.cpp@{libraries/sys-\/vm/external/Catch2/examples/301-\/Gen-\/MapTypeConversion.cpp}}
+\mbox{\hyperlink{301-_gen-_map_type_conversion_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{301-_gen-_map_type_conversion_8cpp_source_l00001}00001\ \textcolor{comment}{//\ 301-\/Gen-\/MapTypeConversion.cpp}}
+\DoxyCodeLine{\Hypertarget{301-_gen-_map_type_conversion_8cpp_source_l00002}00002\ \textcolor{comment}{//\ Shows\ how\ to\ use\ map\ to\ modify\ generator's\ return\ type.}}
+\DoxyCodeLine{\Hypertarget{301-_gen-_map_type_conversion_8cpp_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{301-_gen-_map_type_conversion_8cpp_source_l00004}00004\ \textcolor{comment}{//\ TODO}}
+\DoxyCodeLine{\Hypertarget{301-_gen-_map_type_conversion_8cpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{301-_gen-_map_type_conversion_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{single__include_2catch2_2catch_8hpp}{catch2/catch.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{301-_gen-_map_type_conversion_8cpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{301-_gen-_map_type_conversion_8cpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{\Hypertarget{301-_gen-_map_type_conversion_8cpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ <sstream>}}
+\DoxyCodeLine{\Hypertarget{301-_gen-_map_type_conversion_8cpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{301-_gen-_map_type_conversion_8cpp_source_l00011}00011\ \textcolor{comment}{//\ Returns\ a\ line\ from\ a\ stream.\ You\ could\ have\ it\ e.g.\ read\ lines\ from}}
+\DoxyCodeLine{\Hypertarget{301-_gen-_map_type_conversion_8cpp_source_l00012}00012\ \textcolor{comment}{//\ a\ file,\ but\ to\ avoid\ problems\ with\ paths\ in\ examples,\ we\ will\ use}}
+\DoxyCodeLine{\Hypertarget{301-_gen-_map_type_conversion_8cpp_source_l00013}00013\ \textcolor{comment}{//\ a\ fixed\ stringstream.}}
+\DoxyCodeLine{\Hypertarget{301-_gen-_map_type_conversion_8cpp_source_l00014}\mbox{\hyperlink{class_line_generator}{00014}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_line_generator}{LineGenerator}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{struct_catch_1_1_generators_1_1_i_generator}{Catch::Generators::IGenerator}}<std::string>\ \{}
+\DoxyCodeLine{\Hypertarget{301-_gen-_map_type_conversion_8cpp_source_l00015}00015\ \ \ \ \ std::string\ m\_line;}
+\DoxyCodeLine{\Hypertarget{301-_gen-_map_type_conversion_8cpp_source_l00016}00016\ \ \ \ \ std::stringstream\ m\_stream;}
+\DoxyCodeLine{\Hypertarget{301-_gen-_map_type_conversion_8cpp_source_l00017}00017\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{301-_gen-_map_type_conversion_8cpp_source_l00018}\mbox{\hyperlink{class_line_generator_a1a1a6dc1f84aea5c441a5b4bd9bd3bd6}{00018}}\ \ \ \ \ \mbox{\hyperlink{class_line_generator_a1a1a6dc1f84aea5c441a5b4bd9bd3bd6}{LineGenerator}}()\ \{}
+\DoxyCodeLine{\Hypertarget{301-_gen-_map_type_conversion_8cpp_source_l00019}00019\ \ \ \ \ \ \ \ \ m\_stream.str(\textcolor{stringliteral}{"{}1\(\backslash\)n2\(\backslash\)n3\(\backslash\)n4\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{301-_gen-_map_type_conversion_8cpp_source_l00020}00020\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{class_line_generator_a6de004837a1c1965f9e8d8164b47332a}{next}}())\ \{}
+\DoxyCodeLine{\Hypertarget{301-_gen-_map_type_conversion_8cpp_source_l00021}00021\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{class_catch_1_1_generator_exception}{Catch::GeneratorException}}(\textcolor{stringliteral}{"{}Couldn't\ read\ a\ single\ line"{}});}
+\DoxyCodeLine{\Hypertarget{301-_gen-_map_type_conversion_8cpp_source_l00022}00022\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{301-_gen-_map_type_conversion_8cpp_source_l00023}00023\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{301-_gen-_map_type_conversion_8cpp_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{301-_gen-_map_type_conversion_8cpp_source_l00025}\mbox{\hyperlink{class_line_generator_a98ac9b2242abe590e6014287957465f3}{00025}}\ \ \ \ \ std::string\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{class_line_generator_a98ac9b2242abe590e6014287957465f3}{get}}()\textcolor{keyword}{\ const\ override\ }\{}
+\DoxyCodeLine{\Hypertarget{301-_gen-_map_type_conversion_8cpp_source_l00026}00026\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_line;}
+\DoxyCodeLine{\Hypertarget{301-_gen-_map_type_conversion_8cpp_source_l00027}00027\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{301-_gen-_map_type_conversion_8cpp_source_l00028}00028\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{301-_gen-_map_type_conversion_8cpp_source_l00029}\mbox{\hyperlink{class_line_generator_a6de004837a1c1965f9e8d8164b47332a}{00029}}\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_line_generator_a6de004837a1c1965f9e8d8164b47332a}{next}}()\textcolor{keyword}{\ override\ }\{}
+\DoxyCodeLine{\Hypertarget{301-_gen-_map_type_conversion_8cpp_source_l00030}00030\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !!std::getline(m\_stream,\ m\_line);}
+\DoxyCodeLine{\Hypertarget{301-_gen-_map_type_conversion_8cpp_source_l00031}00031\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{301-_gen-_map_type_conversion_8cpp_source_l00032}00032\ \};}
+\DoxyCodeLine{\Hypertarget{301-_gen-_map_type_conversion_8cpp_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{301-_gen-_map_type_conversion_8cpp_source_l00034}00034\ \textcolor{comment}{//\ This\ helper\ function\ provides\ a\ nicer\ UX\ when\ instantiating\ the\ generator}}
+\DoxyCodeLine{\Hypertarget{301-_gen-_map_type_conversion_8cpp_source_l00035}00035\ \textcolor{comment}{//\ Notice\ that\ it\ returns\ an\ instance\ of\ GeneratorWrapper<std::string>,\ which}}
+\DoxyCodeLine{\Hypertarget{301-_gen-_map_type_conversion_8cpp_source_l00036}00036\ \textcolor{comment}{//\ is\ a\ value-\/wrapper\ around\ std::unique\_ptr<IGenerator<std::string>>.}}
+\DoxyCodeLine{\Hypertarget{301-_gen-_map_type_conversion_8cpp_source_l00037}\mbox{\hyperlink{301-_gen-_map_type_conversion_8cpp_a1c6a4102d247bdd583751f5a9e2e72f6}{00037}}\ \mbox{\hyperlink{class_catch_1_1_generators_1_1_generator_wrapper}{Catch::Generators::GeneratorWrapper<std::string>}}\ \mbox{\hyperlink{301-_gen-_map_type_conversion_8cpp_a1c6a4102d247bdd583751f5a9e2e72f6}{lines}}(std::string\ \textcolor{comment}{/*\ ignored\ for\ example\ */})\ \{}
+\DoxyCodeLine{\Hypertarget{301-_gen-_map_type_conversion_8cpp_source_l00038}00038\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_catch_1_1_generators_1_1_generator_wrapper}{Catch::Generators::GeneratorWrapper<std::string>}}(}
+\DoxyCodeLine{\Hypertarget{301-_gen-_map_type_conversion_8cpp_source_l00039}00039\ \ \ \ \ \ \ \ \ std::unique\_ptr<\mbox{\hyperlink{struct_catch_1_1_generators_1_1_i_generator}{Catch::Generators::IGenerator<std::string>}}>(}
+\DoxyCodeLine{\Hypertarget{301-_gen-_map_type_conversion_8cpp_source_l00040}00040\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_line_generator}{LineGenerator}}()}
+\DoxyCodeLine{\Hypertarget{301-_gen-_map_type_conversion_8cpp_source_l00041}00041\ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{\Hypertarget{301-_gen-_map_type_conversion_8cpp_source_l00042}00042\ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{301-_gen-_map_type_conversion_8cpp_source_l00043}00043\ \}}
+\DoxyCodeLine{\Hypertarget{301-_gen-_map_type_conversion_8cpp_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{301-_gen-_map_type_conversion_8cpp_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{301-_gen-_map_type_conversion_8cpp_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{301-_gen-_map_type_conversion_8cpp_source_l00047}\mbox{\hyperlink{301-_gen-_map_type_conversion_8cpp_aa0f289d21b66b167097bcd7fcfba1812}{00047}}\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\textcolor{stringliteral}{"{}filter\ can\ convert\ types\ inside\ the\ generator\ expression"{}},\ \textcolor{stringliteral}{"{}[example][generator]"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{301-_gen-_map_type_conversion_8cpp_source_l00048}00048\ \ \ \ \ \textcolor{keyword}{auto}\ num\ =\ \mbox{\hyperlink{catch__generators_8hpp_a4941c6427cfa36ee7c52d734e460f9df}{GENERATE}}(map<int>([](std::string\ \textcolor{keyword}{const}\&\ line)\ \{\ \textcolor{keywordflow}{return}\ std::stoi(line);\ \},}
+\DoxyCodeLine{\Hypertarget{301-_gen-_map_type_conversion_8cpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{301-_gen-_map_type_conversion_8cpp_a1c6a4102d247bdd583751f5a9e2e72f6}{lines}}(\textcolor{stringliteral}{"{}fake-\/file"{}})));}
+\DoxyCodeLine{\Hypertarget{301-_gen-_map_type_conversion_8cpp_source_l00050}00050\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{301-_gen-_map_type_conversion_8cpp_source_l00051}00051\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(num\ >\ 0);}
+\DoxyCodeLine{\Hypertarget{301-_gen-_map_type_conversion_8cpp_source_l00052}00052\ \}}
+\DoxyCodeLine{\Hypertarget{301-_gen-_map_type_conversion_8cpp_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{301-_gen-_map_type_conversion_8cpp_source_l00054}00054\ \textcolor{comment}{//\ Compiling\ and\ running\ this\ file\ will\ result\ in\ 4\ successful\ assertions}}
+
+\end{DoxyCode}

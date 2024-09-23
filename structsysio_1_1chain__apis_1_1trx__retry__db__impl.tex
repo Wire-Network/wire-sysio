@@ -1,0 +1,245 @@
+\doxysection{sysio\+::chain\+\_\+apis\+::trx\+\_\+retry\+\_\+db\+\_\+impl Struct Reference}
+\hypertarget{structsysio_1_1chain__apis_1_1trx__retry__db__impl}{}\label{structsysio_1_1chain__apis_1_1trx__retry__db__impl}\index{sysio::chain\_apis::trx\_retry\_db\_impl@{sysio::chain\_apis::trx\_retry\_db\_impl}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain__apis_1_1trx__retry__db__impl_af7d7ff0aaeb0aa01a7f6cfb312f7479f}{trx\+\_\+retry\+\_\+db\+\_\+impl}} (const \mbox{\hyperlink{classsysio_1_1chain_1_1controller}{chain\+::controller}} \&\mbox{\hyperlink{classsysio_1_1chain_1_1controller}{controller}}, size\+\_\+t max\+\_\+mem\+\_\+usage\+\_\+size, \mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}} retry\+\_\+interval, \mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}} max\+\_\+expiration\+\_\+time, \mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}} \mbox{\hyperlink{programs_2clio_2main_8cpp_a074511b7997537efa9b642dcddcced71}{abi\+\_\+serializer\+\_\+max\+\_\+time}})
+\item 
+const \mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}} \& \mbox{\hyperlink{structsysio_1_1chain__apis_1_1trx__retry__db__impl_a55737444ce4d85c4dd484dfc5060d0f9}{get\+\_\+max\+\_\+expiration}} () const
+\item 
+size\+\_\+t \mbox{\hyperlink{structsysio_1_1chain__apis_1_1trx__retry__db__impl_aa5c399d19146af11a74731749b4b6304}{size}} () const
+\item 
+void \mbox{\hyperlink{structsysio_1_1chain__apis_1_1trx__retry__db__impl_a6dd90ac668940381e2e43d68901b697b}{track\+\_\+transaction}} (\mbox{\hyperlink{namespacesysio_1_1chain_a7041c0316bd294d0866609ab3e0cc7a7}{packed\+\_\+transaction\+\_\+ptr}} ptrx, std\+::optional$<$ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} $>$ num\+\_\+blocks, \mbox{\hyperlink{namespacesysio_1_1chain__apis_a7c0a9b3be43e3ab139d31d0d3bb98f5b}{next\+\_\+function}}$<$ std\+::unique\+\_\+ptr$<$ \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} $>$ $>$ next)
+\item 
+void \mbox{\hyperlink{structsysio_1_1chain__apis_1_1trx__retry__db__impl_a3a80c92f409e90cf684cb94e0d35338e}{on\+\_\+applied\+\_\+transaction}} (const \mbox{\hyperlink{namespacesysio_1_1chain_a4ee2867a6bec961c7a78b203cfd76be9}{chain\+::transaction\+\_\+trace\+\_\+ptr}} \&trace, const \mbox{\hyperlink{namespacesysio_1_1chain_a7041c0316bd294d0866609ab3e0cc7a7}{chain\+::packed\+\_\+transaction\+\_\+ptr}} \&ptrx)
+\item 
+void \mbox{\hyperlink{structsysio_1_1chain__apis_1_1trx__retry__db__impl_a54008a84f46f45ddf7f8a57aba9e7c8f}{on\+\_\+block\+\_\+start}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} block\+\_\+num)
+\item 
+void \mbox{\hyperlink{structsysio_1_1chain__apis_1_1trx__retry__db__impl_a2540514c64a504f962802abecc314565}{on\+\_\+accepted\+\_\+block}} (const \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{chain\+::block\+\_\+state\+\_\+ptr}} \&bsp)
+\item 
+void \mbox{\hyperlink{structsysio_1_1chain__apis_1_1trx__retry__db__impl_a198588874aabe1ad26f4f2c1f65ec843}{on\+\_\+irreversible\+\_\+block}} (const \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{chain\+::block\+\_\+state\+\_\+ptr}} \&bsp)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{trx__retry__db_8cpp_source_l00092}{92}} of file \mbox{\hyperlink{trx__retry__db_8cpp_source}{trx\+\_\+retry\+\_\+db.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structsysio_1_1chain__apis_1_1trx__retry__db__impl_af7d7ff0aaeb0aa01a7f6cfb312f7479f}\index{sysio::chain\_apis::trx\_retry\_db\_impl@{sysio::chain\_apis::trx\_retry\_db\_impl}!trx\_retry\_db\_impl@{trx\_retry\_db\_impl}}
+\index{trx\_retry\_db\_impl@{trx\_retry\_db\_impl}!sysio::chain\_apis::trx\_retry\_db\_impl@{sysio::chain\_apis::trx\_retry\_db\_impl}}
+\doxysubsubsection{\texorpdfstring{trx\_retry\_db\_impl()}{trx\_retry\_db\_impl()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain__apis_1_1trx__retry__db__impl_af7d7ff0aaeb0aa01a7f6cfb312f7479f} 
+sysio\+::chain\+\_\+apis\+::trx\+\_\+retry\+\_\+db\+\_\+impl\+::trx\+\_\+retry\+\_\+db\+\_\+impl (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classsysio_1_1chain_1_1controller}{chain\+::controller}} \&}]{controller}{, }\item[{size\+\_\+t}]{max\+\_\+mem\+\_\+usage\+\_\+size}{, }\item[{\mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}}}]{retry\+\_\+interval}{, }\item[{\mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}}}]{max\+\_\+expiration\+\_\+time}{, }\item[{\mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}}}]{abi\+\_\+serializer\+\_\+max\+\_\+time}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{trx__retry__db_8cpp_source_l00093}{93}} of file \mbox{\hyperlink{trx__retry__db_8cpp_source}{trx\+\_\+retry\+\_\+db.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00096\ \ \ \ :\ \_controller(\mbox{\hyperlink{classsysio_1_1chain_1_1controller}{controller}})}
+\DoxyCodeLine{00097\ \ \ \ ,\ \_transaction\_ack\_channel(\mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{appbase::app}}().get\_channel<chain::plugin\_interface::compat::channels::transaction\_ack>())}
+\DoxyCodeLine{00098\ \ \ \ ,\ \_abi\_serializer\_max\_time(\mbox{\hyperlink{programs_2clio_2main_8cpp_a074511b7997537efa9b642dcddcced71}{abi\_serializer\_max\_time}})}
+\DoxyCodeLine{00099\ \ \ \ ,\ \_max\_mem\_usage\_size(max\_mem\_usage\_size)}
+\DoxyCodeLine{00100\ \ \ \ ,\ \_retry\_interval(retry\_interval)}
+\DoxyCodeLine{00101\ \ \ \ ,\ \_max\_expiration\_time(max\_expiration\_time)}
+\DoxyCodeLine{00102\ \ \ \ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1chain__apis_1_1trx__retry__db__impl_a55737444ce4d85c4dd484dfc5060d0f9}\index{sysio::chain\_apis::trx\_retry\_db\_impl@{sysio::chain\_apis::trx\_retry\_db\_impl}!get\_max\_expiration@{get\_max\_expiration}}
+\index{get\_max\_expiration@{get\_max\_expiration}!sysio::chain\_apis::trx\_retry\_db\_impl@{sysio::chain\_apis::trx\_retry\_db\_impl}}
+\doxysubsubsection{\texorpdfstring{get\_max\_expiration()}{get\_max\_expiration()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain__apis_1_1trx__retry__db__impl_a55737444ce4d85c4dd484dfc5060d0f9} 
+const \mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}} \& sysio\+::chain\+\_\+apis\+::trx\+\_\+retry\+\_\+db\+\_\+impl\+::get\+\_\+max\+\_\+expiration (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{trx__retry__db_8cpp_source_l00104}{104}} of file \mbox{\hyperlink{trx__retry__db_8cpp_source}{trx\+\_\+retry\+\_\+db.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \_max\_expiration\_time;}
+\DoxyCodeLine{00106\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain__apis_1_1trx__retry__db__impl_a2540514c64a504f962802abecc314565}\index{sysio::chain\_apis::trx\_retry\_db\_impl@{sysio::chain\_apis::trx\_retry\_db\_impl}!on\_accepted\_block@{on\_accepted\_block}}
+\index{on\_accepted\_block@{on\_accepted\_block}!sysio::chain\_apis::trx\_retry\_db\_impl@{sysio::chain\_apis::trx\_retry\_db\_impl}}
+\doxysubsubsection{\texorpdfstring{on\_accepted\_block()}{on\_accepted\_block()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain__apis_1_1trx__retry__db__impl_a2540514c64a504f962802abecc314565} 
+void sysio\+::chain\+\_\+apis\+::trx\+\_\+retry\+\_\+db\+\_\+impl\+::on\+\_\+accepted\+\_\+block (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{chain\+::block\+\_\+state\+\_\+ptr}} \&}]{bsp}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{trx__retry__db_8cpp_source_l00166}{166}} of file \mbox{\hyperlink{trx__retry__db_8cpp_source}{trx\+\_\+retry\+\_\+db.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \textcolor{comment}{//\ good\ time\ to\ perform\ processing}}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ ack\_ready\_trxs\_by\_block\_num(\ bsp-\/>block\_num\ );}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ retry\_trxs();}
+\DoxyCodeLine{00170\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain__apis_1_1trx__retry__db__impl_a3a80c92f409e90cf684cb94e0d35338e}\index{sysio::chain\_apis::trx\_retry\_db\_impl@{sysio::chain\_apis::trx\_retry\_db\_impl}!on\_applied\_transaction@{on\_applied\_transaction}}
+\index{on\_applied\_transaction@{on\_applied\_transaction}!sysio::chain\_apis::trx\_retry\_db\_impl@{sysio::chain\_apis::trx\_retry\_db\_impl}}
+\doxysubsubsection{\texorpdfstring{on\_applied\_transaction()}{on\_applied\_transaction()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain__apis_1_1trx__retry__db__impl_a3a80c92f409e90cf684cb94e0d35338e} 
+void sysio\+::chain\+\_\+apis\+::trx\+\_\+retry\+\_\+db\+\_\+impl\+::on\+\_\+applied\+\_\+transaction (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_a4ee2867a6bec961c7a78b203cfd76be9}{chain\+::transaction\+\_\+trace\+\_\+ptr}} \&}]{trace}{, }\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_a7041c0316bd294d0866609ab3e0cc7a7}{chain\+::packed\+\_\+transaction\+\_\+ptr}} \&}]{ptrx}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{trx__retry__db_8cpp_source_l00128}{128}} of file \mbox{\hyperlink{trx__retry__db_8cpp_source}{trx\+\_\+retry\+\_\+db.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !trace-\/>receipt\ )\ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \textcolor{comment}{//\ include\ only\ executed\ incoming\ transactions.}}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \textcolor{comment}{//\ soft\_fail\ not\ included\ as\ only\ interested\ in\ incoming}}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(trace-\/>receipt-\/>status\ !=\ \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__receipt__header_a2bb00bac16048e6f624c2ded867ebf55a7a6de58f1f84063a5f85bbfb59b43608}{chain::transaction\_receipt\_header::executed}})\ \{}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \textcolor{comment}{//\ only\ incoming}}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ trace-\/>scheduled\ )\ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \textcolor{comment}{//\ Only\ want\ transactions\ in\ a\ block,\ if\ no\ producer\ id\ then\ not\ in\ a\ block}}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !trace-\/>producer\_block\_id\ )\ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \textcolor{comment}{//\ Don't\ care\ about\ implicit}}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{namespacesysio_1_1chain_a9a9946a27c3832394b9b2b3911e0733c}{chain::is\_onblock}}(\ *trace\ )\ )\ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00141\ }
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \textcolor{comment}{//\ Is\ this\ a\ transaction\ we\ are\ tracking}}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ =\ \_tracked\_trxs.\mbox{\hyperlink{classfc_1_1tracked__storage_ab578f3765c80c8cee1d758d440c99e90}{index}}().get<by\_trx\_id>();}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.find(trace-\/>id);}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr\ !=\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.end()\ )\ \{}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \ \_tracked\_trxs.\mbox{\hyperlink{classfc_1_1tracked__storage_a857cf0f6d4ca31111b633b9d4c923ffe}{modify}}(\ itr,\ [\&trace,\ \&control=\_controller,\ \&abi\_max\_time=\_abi\_serializer\_max\_time](\ tracked\_transaction\&\ tt\ )\ \{}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \ \ \ \ tt.block\_num\ =\ trace-\/>block\_num;}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ send\_transaction\ trace\ output\ format.}}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Convert\ to\ variant\ with\ abi\ here\ and\ now\ because\ abi\ could\ change\ in\ very\ next\ transaction.}}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Alternatively,\ we\ could\ store\ off\ all\ the\ abis\ needed\ and\ do\ the\ conversion\ later,\ but\ as\ this\ is\ designed}}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ to\ run\ on\ an\ API\ node,\ probably\ the\ best\ trade\ off\ to\ perform\ the\ abi\ serialization\ during\ block\ processing.}}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ tt.trx\_trace\_v\ =\ control.to\_variant\_with\_abi(\ *trace,\ \mbox{\hyperlink{structsysio_1_1chain_1_1abi__serializer_a2dc34bf706557f0c83d61b3791299c98}{abi\_serializer::create\_yield\_function}}(\ abi\_max\_time\ )\ );}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}(\ chain::abi\_exception\&\ )\ \{}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ tt.trx\_trace\_v\ =\ *trace;}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \ \}\ );}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00159\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain__apis_1_1trx__retry__db__impl_a3a80c92f409e90cf684cb94e0d35338e_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain__apis_1_1trx__retry__db__impl_a54008a84f46f45ddf7f8a57aba9e7c8f}\index{sysio::chain\_apis::trx\_retry\_db\_impl@{sysio::chain\_apis::trx\_retry\_db\_impl}!on\_block\_start@{on\_block\_start}}
+\index{on\_block\_start@{on\_block\_start}!sysio::chain\_apis::trx\_retry\_db\_impl@{sysio::chain\_apis::trx\_retry\_db\_impl}}
+\doxysubsubsection{\texorpdfstring{on\_block\_start()}{on\_block\_start()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain__apis_1_1trx__retry__db__impl_a54008a84f46f45ddf7f8a57aba9e7c8f} 
+void sysio\+::chain\+\_\+apis\+::trx\+\_\+retry\+\_\+db\+\_\+impl\+::on\+\_\+block\+\_\+start (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{block\+\_\+num}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{trx__retry__db_8cpp_source_l00161}{161}} of file \mbox{\hyperlink{trx__retry__db_8cpp_source}{trx\+\_\+retry\+\_\+db.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \textcolor{comment}{//\ on\ forks\ rollback\ any\ accepted\ block\ transactions}}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ rollback\_to(\ block\_num\ );}
+\DoxyCodeLine{00164\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain__apis_1_1trx__retry__db__impl_a198588874aabe1ad26f4f2c1f65ec843}\index{sysio::chain\_apis::trx\_retry\_db\_impl@{sysio::chain\_apis::trx\_retry\_db\_impl}!on\_irreversible\_block@{on\_irreversible\_block}}
+\index{on\_irreversible\_block@{on\_irreversible\_block}!sysio::chain\_apis::trx\_retry\_db\_impl@{sysio::chain\_apis::trx\_retry\_db\_impl}}
+\doxysubsubsection{\texorpdfstring{on\_irreversible\_block()}{on\_irreversible\_block()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain__apis_1_1trx__retry__db__impl_a198588874aabe1ad26f4f2c1f65ec843} 
+void sysio\+::chain\+\_\+apis\+::trx\+\_\+retry\+\_\+db\+\_\+impl\+::on\+\_\+irreversible\+\_\+block (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{chain\+::block\+\_\+state\+\_\+ptr}} \&}]{bsp}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{trx__retry__db_8cpp_source_l00172}{172}} of file \mbox{\hyperlink{trx__retry__db_8cpp_source}{trx\+\_\+retry\+\_\+db.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ ack\_ready\_trxs\_by\_lib(\ bsp-\/>block\_num\ );}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ clear\_expired(\ bsp-\/>block-\/>timestamp\ );}
+\DoxyCodeLine{00175\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain__apis_1_1trx__retry__db__impl_aa5c399d19146af11a74731749b4b6304}\index{sysio::chain\_apis::trx\_retry\_db\_impl@{sysio::chain\_apis::trx\_retry\_db\_impl}!size@{size}}
+\index{size@{size}!sysio::chain\_apis::trx\_retry\_db\_impl@{sysio::chain\_apis::trx\_retry\_db\_impl}}
+\doxysubsubsection{\texorpdfstring{size()}{size()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain__apis_1_1trx__retry__db__impl_aa5c399d19146af11a74731749b4b6304} 
+size\+\_\+t sysio\+::chain\+\_\+apis\+::trx\+\_\+retry\+\_\+db\+\_\+impl\+::size (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{trx__retry__db_8cpp_source_l00108}{108}} of file \mbox{\hyperlink{trx__retry__db_8cpp_source}{trx\+\_\+retry\+\_\+db.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \_tracked\_trxs.\mbox{\hyperlink{classfc_1_1tracked__storage_ab578f3765c80c8cee1d758d440c99e90}{index}}().size();}
+\DoxyCodeLine{00110\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=331pt]{structsysio_1_1chain__apis_1_1trx__retry__db__impl_aa5c399d19146af11a74731749b4b6304_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain__apis_1_1trx__retry__db__impl_a6dd90ac668940381e2e43d68901b697b}\index{sysio::chain\_apis::trx\_retry\_db\_impl@{sysio::chain\_apis::trx\_retry\_db\_impl}!track\_transaction@{track\_transaction}}
+\index{track\_transaction@{track\_transaction}!sysio::chain\_apis::trx\_retry\_db\_impl@{sysio::chain\_apis::trx\_retry\_db\_impl}}
+\doxysubsubsection{\texorpdfstring{track\_transaction()}{track\_transaction()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain__apis_1_1trx__retry__db__impl_a6dd90ac668940381e2e43d68901b697b} 
+void sysio\+::chain\+\_\+apis\+::trx\+\_\+retry\+\_\+db\+\_\+impl\+::track\+\_\+transaction (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacesysio_1_1chain_a7041c0316bd294d0866609ab3e0cc7a7}{packed\+\_\+transaction\+\_\+ptr}}}]{ptrx}{, }\item[{std\+::optional$<$ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} $>$}]{num\+\_\+blocks}{, }\item[{\mbox{\hyperlink{namespacesysio_1_1chain__apis_a7c0a9b3be43e3ab139d31d0d3bb98f5b}{next\+\_\+function}}$<$ std\+::unique\+\_\+ptr$<$ \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} $>$ $>$}]{next}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{trx__retry__db_8cpp_source_l00112}{112}} of file \mbox{\hyperlink{trx__retry__db_8cpp_source}{trx\+\_\+retry\+\_\+db.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ \_tracked\_trxs.\mbox{\hyperlink{classfc_1_1tracked__storage_a5bd678ec2e09568df574c8ecaa184962}{memory\_size}}()\ <\ \_max\_mem\_usage\_size,\ tx\_resource\_exhaustion,}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Transaction\ exceeded\ \ transaction-\/retry-\/max-\/storage-\/size-\/gb\ limit:\ \$\{m\}\ bytes"{}},\ (\textcolor{stringliteral}{"{}m"{}},\ \_tracked\_trxs.\mbox{\hyperlink{classfc_1_1tracked__storage_a5bd678ec2e09568df574c8ecaa184962}{memory\_size}}())\ );}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ i\ =\ \_tracked\_trxs.\mbox{\hyperlink{classfc_1_1tracked__storage_ab578f3765c80c8cee1d758d440c99e90}{index}}().get<by\_trx\_id>().\mbox{\hyperlink{namespace_intrinsics_a7b30616029cc015f330ebf338c3fb454}{find}}(\ ptrx-\/>id()\ );}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ i\ ==\ \_tracked\_trxs.\mbox{\hyperlink{classfc_1_1tracked__storage_ab578f3765c80c8cee1d758d440c99e90}{index}}().end()\ )\ \{}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ \_tracked\_trxs.\mbox{\hyperlink{classfc_1_1tracked__storage_a6d24a6bf4512b48a846d88a1bf44b5b8}{insert}}(\ \{std::move(ptrx),}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ !num\_blocks.has\_value()\ ?\ lib\_totem\ :\ *num\_blocks,}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0,}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\},}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{fc::time\_point::now}}(),}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::move(next)\}\ );}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ already\ tracking\ transaction}}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00126\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain__apis_1_1trx__retry__db__impl_a6dd90ac668940381e2e43d68901b697b_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+plugins/chain\+\_\+plugin/\mbox{\hyperlink{trx__retry__db_8cpp}{trx\+\_\+retry\+\_\+db.\+cpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,89 @@
+<map id="CLI::App::_parse_single" name="CLI::App::_parse_single">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,474,167,500"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_app.html#af15231547d53a51458059588a1c34a0b" title="Count the required remaining positional arguments." alt="" coords="712,52,885,92"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="97,472,150,415,236,332,345,242,405,200,467,163,524,137,583,116,696,86,698,92,585,121,526,142,469,168,408,204,348,246,239,336,154,419,101,475"/>
+<area shape="rect" id="Node000006" href="$class_c_l_i_1_1_app.html#afe454e935514c0acd6bd81e68d908206" title="Helper function to place extra values in the most appropriate position." alt="" coords="729,498,868,539"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="167,488,714,512,713,518,167,493"/>
+<area shape="rect" id="Node000007" href="$class_c_l_i_1_1_app.html#a73c9decd5eb2b0c7eeda63cc4bd5048e" title=" " alt="" coords="245,626,390,652"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="109,498,285,615,282,620,106,502"/>
+<area shape="rect" id="Node000011" href="$class_c_l_i_1_1_app.html#addab9d99dce6a2f96b5c8748d20ebea8" title="Selects a Classifier enum based on the type of the current argument." alt="" coords="487,753,631,778"/>
+<area shape="poly" id="edge57_Node000001_Node000011" title=" " alt="" coords="96,499,112,532,138,576,173,622,216,662,278,698,345,724,412,742,472,754,471,759,410,748,343,729,275,703,213,666,169,626,134,579,107,534,91,501"/>
+<area shape="rect" id="Node000027" href="$class_c_l_i_1_1_app.html#a3b564aa8c90f25152f5379c661ab82b1" title=" " alt="" coords="468,347,650,373"/>
+<area shape="poly" id="edge42_Node000001_Node000027" title=" " alt="" coords="108,471,156,446,214,422,337,389,452,369,453,375,338,395,216,427,158,451,111,476"/>
+<area shape="rect" id="Node000030" href="$class_c_l_i_1_1_app.html#af20c05b97b9de2a4543a2de9bcc0993d" title=" " alt="" coords="215,437,420,462"/>
+<area shape="poly" id="edge53_Node000001_Node000030" title=" " alt="" coords="167,471,218,463,219,468,168,476"/>
+<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_option.html#a154543609c45d9c59c69991a08ca272b" title="Count the total number of times an option was passed." alt="" coords="980,89,1108,114"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="885,80,965,89,964,95,885,85"/>
+<area shape="rect" id="Node000004" href="$class_c_l_i_1_1_option.html#af87dffed2cb245673312c993e563710e" title="The total min number of expected string values to be used." alt="" coords="967,138,1120,179"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="865,90,900,103,948,124,964,130,962,135,946,129,898,108,864,95"/>
+<area shape="rect" id="Node000005" href="$class_c_l_i_1_1_option.html#acab7033604b49e314d290b01adea690d" title="True if the argument can be given directly." alt="" coords="956,39,1132,65"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="885,62,940,58,940,63,885,68"/>
+<area shape="poly" id="edge13_Node000007_Node000006" title=" " alt="" coords="358,623,467,590,597,558,713,533,715,538,598,563,469,595,359,628"/>
+<area shape="poly" id="edge14_Node000007_Node000007" title=" " alt="" coords="279,627,271,617,276,607,292,601,317,599,346,602,360,609,358,614,344,607,317,605,293,607,280,611,277,617,283,624"/>
+<area shape="rect" id="Node000008" href="$class_c_l_i_1_1_app.html#a6e3eedf148351dabd1868bd7e63d24bc" title="Count the required remaining positional arguments." alt="" coords="707,117,890,158"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="326,624,370,561,395,518,418,474,431,428,435,388,442,350,451,330,466,309,488,287,509,272,552,255,597,242,622,232,649,217,672,195,697,174,719,162,721,167,700,178,676,199,652,221,625,237,599,247,554,260,512,276,491,291,470,312,456,333,447,352,440,389,436,429,422,476,400,521,374,564,331,627"/>
+<area shape="rect" id="Node000010" href="$class_c_l_i_1_1_app.html#a0e00bdc00c5bca05d52d98833f77a3b5" title="Get the appropriate parent to fallthrough to which is the first one that has a name or the main app." alt="" coords="712,564,885,604"/>
+<area shape="poly" id="edge12_Node000007_Node000010" title=" " alt="" coords="390,628,696,593,697,598,391,633"/>
+<area shape="poly" id="edge15_Node000007_Node000011" title=" " alt="" coords="338,650,395,689,469,731,501,744,499,749,467,736,392,693,335,654"/>
+<area shape="rect" id="Node000023" href="$namespace_c_l_i_1_1detail.html#a0de15b0ba0d12c9170d15693477808ed" title=" " alt="" coords="726,767,871,793"/>
+<area shape="poly" id="edge39_Node000007_Node000023" title=" " alt="" coords="351,650,469,694,559,717,651,738,699,752,729,760,727,765,698,757,650,743,558,722,467,699,349,655"/>
+<area shape="rect" id="Node000025" href="$namespace_c_l_i_1_1detail.html#a1e6f215bcb727ff49f126ac3e1a13e40" title=" " alt="" coords="742,817,855,858"/>
+<area shape="poly" id="edge40_Node000007_Node000025" title=" " alt="" coords="329,651,351,680,382,719,423,757,469,788,534,813,602,828,668,836,727,838,726,843,668,841,601,834,532,818,467,793,419,761,378,722,346,684,325,654"/>
+<area shape="rect" id="Node000026" href="$namespace_c_l_i_1_1detail.html#aadbd2b5b93afe2f10427dd6e32639b0c" title=" " alt="" coords="741,702,856,743"/>
+<area shape="poly" id="edge41_Node000007_Node000026" title=" " alt="" coords="391,648,651,693,726,707,725,712,650,699,390,654"/>
+<area shape="poly" id="edge8_Node000008_Node000003" title=" " alt="" coords="890,121,964,110,964,116,891,127"/>
+<area shape="poly" id="edge9_Node000008_Node000004" title=" " alt="" coords="891,143,952,148,951,153,890,148"/>
+<area shape="poly" id="edge10_Node000008_Node000005" title=" " alt="" coords="867,114,897,102,921,87,946,74,963,67,965,72,948,79,924,92,900,106,869,119"/>
+<area shape="rect" id="Node000009" href="$class_c_l_i_1_1_option_base.html#aa902dee6da6d7f5b083b1c7d5f9c1308" title="True if this is a required option." alt="" coords="972,204,1116,244"/>
+<area shape="poly" id="edge11_Node000008_Node000009" title=" " alt="" coords="858,156,948,188,969,196,967,201,946,193,856,161"/>
+<area shape="rect" id="Node000012" href="$class_c_l_i_1_1_app.html#a2c9093efb2ffc55224f2acf2239fd5ce" title="Check to see if a subcommand is valid. Give up immediately if subcommand max has been reached." alt="" coords="698,653,899,678"/>
+<area shape="poly" id="edge16_Node000011_Node000012" title=" " alt="" coords="580,750,632,719,697,688,720,681,722,686,699,693,635,724,583,754"/>
+<area shape="rect" id="Node000014" href="$class_c_l_i_1_1_app.html#a5125f786c409fe0bbba684fe99f2c5fe" title="Get an option by name (noexcept non&#45;const version)" alt="" coords="728,882,869,923"/>
+<area shape="poly" id="edge19_Node000011_Node000014" title=" " alt="" coords="576,777,629,820,663,845,700,867,715,874,712,879,697,872,660,850,625,824,573,781"/>
+<area shape="poly" id="edge33_Node000011_Node000023" title=" " alt="" coords="632,767,711,772,711,777,631,772"/>
+<area shape="poly" id="edge35_Node000011_Node000025" title=" " alt="" coords="605,776,728,814,726,819,604,781"/>
+<area shape="poly" id="edge37_Node000011_Node000026" title=" " alt="" coords="631,750,726,733,727,738,632,755"/>
+<area shape="poly" id="edge18_Node000012_Node000012" title=" " alt="" coords="759,654,751,644,756,634,772,628,799,626,828,629,843,636,841,641,827,634,798,631,773,633,759,638,756,643,763,650"/>
+<area shape="rect" id="Node000013" href="$class_c_l_i_1_1_app.html#a70bf7b1ed5b4f823746dba84ec3d9927" title=" " alt="" coords="947,449,1141,474"/>
+<area shape="poly" id="edge17_Node000012_Node000013" title=" " alt="" coords="833,650,865,634,897,614,934,582,969,547,1022,485,1026,488,973,551,938,586,900,618,868,639,835,654"/>
+<area shape="rect" id="Node000015" href="$class_c_l_i_1_1_option.html#af457a9a493f06f212cad9f854b281200" title="Check a name. Requires &quot;&#45;&quot; or &quot;&#45;&#45;&quot; for short / long, supports positional name." alt="" coords="959,890,1129,916"/>
+<area shape="poly" id="edge20_Node000014_Node000015" title=" " alt="" coords="869,900,943,900,943,905,869,905"/>
+<area shape="rect" id="Node000016" href="$class_c_l_i_1_1_option.html#a481001137137be0d6a4e5998866d604a" title="Requires &quot;&#45;&#45;&quot; to be removed from string." alt="" coords="1189,849,1320,890"/>
+<area shape="poly" id="edge21_Node000015_Node000016" title=" " alt="" coords="1129,887,1173,880,1174,885,1130,892"/>
+<area shape="rect" id="Node000019" href="$namespace_c_l_i_1_1detail.html#ae83709ec148057ec53df4383645727e9" title="Return a lower case version of a string." alt="" coords="1785,798,1923,824"/>
+<area shape="poly" id="edge32_Node000015_Node000019" title=" " alt="" coords="1067,887,1121,859,1188,835,1267,818,1347,806,1507,794,1653,794,1769,800,1769,806,1653,800,1508,800,1348,811,1268,823,1190,840,1123,864,1069,892"/>
+<area shape="rect" id="Node000021" href="$namespace_c_l_i_1_1detail.html#a5359a7a0e33366a12e15523b100f591a" title="remove underscores from a string" alt="" coords="1788,942,1920,983"/>
+<area shape="poly" id="edge31_Node000015_Node000021" title=" " alt="" coords="1069,914,1123,941,1190,964,1341,995,1403,1003,1461,1006,1582,1001,1737,985,1772,980,1773,985,1737,991,1583,1006,1461,1011,1402,1008,1340,1000,1188,969,1121,946,1067,919"/>
+<area shape="rect" id="Node000022" href="$class_c_l_i_1_1_option.html#acfa639ba77f034615c7e66028da1fc3b" title="Requires &quot;&#45;&quot; to be removed from string." alt="" coords="1189,914,1320,955"/>
+<area shape="poly" id="edge29_Node000015_Node000022" title=" " alt="" coords="1130,913,1174,920,1173,925,1129,918"/>
+<area shape="rect" id="Node000017" href="$namespace_c_l_i_1_1detail.html#a356b9c9cc904af2b0a918fd55e86cd9c" title="Check if a string is a member of a list of strings and optionally ignore case or ignore underscores." alt="" coords="1368,878,1533,904"/>
+<area shape="poly" id="edge22_Node000016_Node000017" title=" " alt="" coords="1321,874,1353,877,1352,883,1321,879"/>
+<area shape="rect" id="Node000018" href="$namespace_c_l_i.html#a0c52326d2681814c22aa1a93ce43375e" title="Helper function to allow ignore_case to be passed to IsMember or Transform." alt="" coords="1599,849,1719,874"/>
+<area shape="poly" id="edge23_Node000017_Node000018" title=" " alt="" coords="1533,877,1583,869,1584,875,1533,882"/>
+<area shape="poly" id="edge28_Node000017_Node000019" title=" " alt="" coords="1476,875,1523,853,1580,834,1678,816,1769,809,1770,815,1678,822,1581,839,1525,858,1478,880"/>
+<area shape="rect" id="Node000020" href="$namespace_c_l_i.html#a111b6f05d21b9b84e7ba933ade79884c" title="Helper function to allow ignore_underscore to be passed to IsMember or Transform." alt="" coords="1581,950,1737,976"/>
+<area shape="poly" id="edge25_Node000017_Node000020" title=" " alt="" coords="1491,902,1606,942,1604,947,1489,907"/>
+<area shape="poly" id="edge27_Node000017_Node000021" title=" " alt="" coords="1534,900,1737,935,1773,942,1772,947,1737,940,1533,906"/>
+<area shape="poly" id="edge24_Node000018_Node000019" title=" " alt="" coords="1711,845,1787,825,1788,831,1712,851"/>
+<area shape="poly" id="edge26_Node000020_Node000021" title=" " alt="" coords="1737,960,1773,960,1773,965,1737,965"/>
+<area shape="poly" id="edge30_Node000022_Node000017" title=" " alt="" coords="1320,917,1375,905,1376,910,1321,923"/>
+<area shape="rect" id="Node000024" href="$namespace_c_l_i_1_1detail.html#a3a05d1129df69e88135e178137b1fd89" title="Verify the first character of an option." alt="" coords="986,760,1102,800"/>
+<area shape="poly" id="edge34_Node000023_Node000024" title=" " alt="" coords="871,777,970,777,970,783,871,783"/>
+<area shape="poly" id="edge36_Node000025_Node000024" title=" " alt="" coords="855,822,970,794,971,800,856,827"/>
+<area shape="poly" id="edge38_Node000026_Node000024" title=" " alt="" coords="857,733,971,761,970,766,856,739"/>
+<area shape="poly" id="edge49_Node000027_Node000003" title=" " alt="" coords="570,345,632,276,668,241,697,218,726,204,751,196,798,191,844,186,869,180,897,167,911,157,921,146,930,135,945,124,964,116,966,121,948,129,934,139,925,150,915,161,900,172,871,185,845,192,798,196,752,202,727,209,700,222,672,245,636,280,574,349"/>
+<area shape="poly" id="edge51_Node000027_Node000004" title=" " alt="" coords="619,371,682,379,756,380,794,375,830,367,865,353,897,333,912,317,919,301,922,266,924,228,931,209,945,190,953,183,956,187,949,194,936,211,929,229,927,266,924,303,916,320,900,337,868,357,832,372,795,381,756,385,682,385,618,376"/>
+<area shape="poly" id="edge52_Node000027_Node000005" title=" " alt="" coords="559,347,566,287,587,201,605,155,628,110,659,70,697,38,733,19,772,8,812,3,853,4,930,14,994,31,993,37,929,20,853,9,813,9,773,14,735,24,700,42,663,74,633,113,610,157,592,203,571,288,564,347"/>
+<area shape="poly" id="edge46_Node000027_Node000006" title=" " alt="" coords="582,371,755,487,752,492,579,376"/>
+<area shape="poly" id="edge43_Node000027_Node000008" title=" " alt="" coords="572,345,607,305,648,255,661,232,669,212,679,194,697,174,712,163,715,168,700,178,683,197,674,215,666,234,653,258,611,309,575,348"/>
+<area shape="poly" id="edge45_Node000027_Node000010" title=" " alt="" coords="569,372,587,407,615,455,653,505,700,549,707,554,704,558,697,553,649,509,611,458,582,410,564,375"/>
+<area shape="poly" id="edge44_Node000027_Node000013" title=" " alt="" coords="625,371,965,442,963,448,624,376"/>
+<area shape="poly" id="edge47_Node000027_Node000027" title=" " alt="" coords="520,349,512,339,516,329,533,323,559,321,589,323,604,331,601,335,588,329,559,326,534,328,520,333,517,338,524,345"/>
+<area shape="rect" id="Node000028" href="$class_c_l_i_1_1_option.html#a49ba3750688c16a2c001dd2c91ecba3e" title="Puts a result at the end." alt="" coords="720,233,877,258"/>
+<area shape="poly" id="edge48_Node000027_Node000028" title=" " alt="" coords="576,344,628,307,697,268,717,261,719,266,699,273,631,311,579,349"/>
+<area shape="rect" id="Node000029" href="$class_c_l_i_1_1_option.html#a784f66cb9371753ddeb8df59c85cb490" title="Get the current value of allow extra args." alt="" coords="723,282,874,323"/>
+<area shape="poly" id="edge50_Node000027_Node000029" title=" " alt="" coords="615,344,707,322,708,327,617,349"/>
+<area shape="poly" id="edge54_Node000030_Node000008" title=" " alt="" coords="321,435,338,392,368,333,411,270,437,241,466,217,520,186,577,164,636,150,691,141,692,146,637,155,579,169,522,191,470,221,441,245,415,273,373,336,343,394,326,437"/>
+<area shape="poly" id="edge55_Node000030_Node000013" title=" " alt="" coords="421,448,931,457,931,462,420,454"/>
+<area shape="poly" id="edge56_Node000030_Node000027" title=" " alt="" coords="354,434,507,376,509,381,355,439"/>
+</map>

@@ -1,0 +1,244 @@
+\doxysection{sysio\+::chain\+\_\+api\+\_\+plugin Class Reference}
+\hypertarget{classsysio_1_1chain__api__plugin}{}\label{classsysio_1_1chain__api__plugin}\index{sysio::chain\_api\_plugin@{sysio::chain\_api\_plugin}}
+
+
+{\ttfamily \#include $<$chain\+\_\+api\+\_\+plugin.\+hpp$>$}
+
+
+
+Inheritance diagram for sysio\+::chain\+\_\+api\+\_\+plugin\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=205pt]{classsysio_1_1chain__api__plugin__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for sysio\+::chain\+\_\+api\+\_\+plugin\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=205pt]{classsysio_1_1chain__api__plugin__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classsysio_1_1chain__api__plugin_a8889e9fef3ea1854756acc7b47ab4bc7}{APPBASE\+\_\+\+PLUGIN\+\_\+\+REQUIRES}} ((\mbox{\hyperlink{classsysio_1_1chain__plugin}{chain\+\_\+plugin}})(\mbox{\hyperlink{classsysio_1_1http__plugin}{http\+\_\+plugin}})) \mbox{\hyperlink{classsysio_1_1chain__api__plugin}{chain\+\_\+api\+\_\+plugin}}()
+\item 
+virtual \mbox{\hyperlink{classsysio_1_1chain__api__plugin_a174712689f42184a100dd63e9ca70c62}{\texorpdfstring{$\sim$}{\string~}chain\+\_\+api\+\_\+plugin}} ()
+\item 
+virtual void \mbox{\hyperlink{classsysio_1_1chain__api__plugin_a8679612f56738a75a17560008ab90e5c}{set\+\_\+program\+\_\+options}} (options\+\_\+description \&, options\+\_\+description \&) override
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain__api__plugin_ae3016de53e73c3dcf5e4c27bad0b8f34}{plugin\+\_\+initialize}} (const variables\+\_\+map \&)
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain__api__plugin_a91f0262ad889564cfbe6abfe70dce6a9}{plugin\+\_\+startup}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain__api__plugin_a78bb6d6c89868254e73baf21a4fa6deb}{plugin\+\_\+shutdown}} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classappbase_1_1plugin}{appbase\+::plugin$<$ chain\+\_\+api\+\_\+plugin $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classappbase_1_1plugin_a3cf5509f2854ffb274018dca8606c50a}{plugin}} ()
+\item 
+virtual \mbox{\hyperlink{classappbase_1_1plugin_a6c83bcf2c8ee3de87593824da807e4ba}{\texorpdfstring{$\sim$}{\string~}plugin}} ()
+\item 
+virtual \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408}{state}} \mbox{\hyperlink{classappbase_1_1plugin_a857288c2424b57a898c0579d25dacbb0}{get\+\_\+state}} () const override
+\item 
+virtual const std\+::string \& \mbox{\hyperlink{classappbase_1_1plugin_a274f072d2f7f37d43ae74e01edd0ba62}{name}} () const override
+\item 
+virtual void \mbox{\hyperlink{classappbase_1_1plugin_a6a0cd7ccc873527ebb5e6716b249ea17}{register\+\_\+dependencies}} ()
+\item 
+virtual void \mbox{\hyperlink{classappbase_1_1plugin_ac28755a82831d41e5d0ef0ce56b10fa9}{initialize}} (const variables\+\_\+map \&options) override
+\item 
+virtual void \mbox{\hyperlink{classappbase_1_1plugin_ab314bd778e71a91de584cd9b8a999867}{handle\+\_\+sighup}} () override
+\item 
+virtual void \mbox{\hyperlink{classappbase_1_1plugin_a10e4e1c582bfadf67f510df76d87abfd}{startup}} () override
+\item 
+virtual void \mbox{\hyperlink{classappbase_1_1plugin_a21e5be5587fca41fbc91367d449b8f27}{shutdown}} () override
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classappbase_1_1abstract__plugin}{appbase\+::abstract\+\_\+plugin}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4643a2618ac94aa2ef56e59fe363f828}{\texorpdfstring{$\sim$}{\string~}abstract\+\_\+plugin}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Public Types inherited from \mbox{\hyperlink{classappbase_1_1abstract__plugin}{appbase\+::abstract\+\_\+plugin}}}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408}{state}} \{ \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408ac712ce3482a78b8bf87080aefd77cf7d}{registered}}
+, \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408a9ae208bba76e9c0eab1cac52953f947b}{initialized}}
+, \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408a808ebbf475942017567644697eca3224}{started}}
+, \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408a320c2eebb5306f385aebfca07336d29e}{stopped}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Member Functions inherited from \mbox{\hyperlink{classappbase_1_1plugin}{appbase\+::plugin$<$ chain\+\_\+api\+\_\+plugin $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classappbase_1_1plugin_a51f43c3c64ab8524928698a72a186822}{plugin}} (const string \&\mbox{\hyperlink{classappbase_1_1plugin_a274f072d2f7f37d43ae74e01edd0ba62}{name}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{chain__api__plugin_8hpp_source_l00013}{13}} of file \mbox{\hyperlink{chain__api__plugin_8hpp_source}{chain\+\_\+api\+\_\+plugin.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classsysio_1_1chain__api__plugin_a174712689f42184a100dd63e9ca70c62}\index{sysio::chain\_api\_plugin@{sysio::chain\_api\_plugin}!````~chain\_api\_plugin@{\texorpdfstring{$\sim$}{\string~}chain\_api\_plugin}}
+\index{````~chain\_api\_plugin@{\texorpdfstring{$\sim$}{\string~}chain\_api\_plugin}!sysio::chain\_api\_plugin@{sysio::chain\_api\_plugin}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}chain\_api\_plugin()}{\string~chain\_api\_plugin()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain__api__plugin_a174712689f42184a100dd63e9ca70c62} 
+sysio\+::chain\+\_\+api\+\_\+plugin\+::\texorpdfstring{$\sim$}{\string~}chain\+\_\+api\+\_\+plugin (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{chain__api__plugin_8cpp_source_l00022}{22}} of file \mbox{\hyperlink{chain__api__plugin_8cpp_source}{chain\+\_\+api\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00022\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1chain__api__plugin_a8889e9fef3ea1854756acc7b47ab4bc7}\index{sysio::chain\_api\_plugin@{sysio::chain\_api\_plugin}!APPBASE\_PLUGIN\_REQUIRES@{APPBASE\_PLUGIN\_REQUIRES}}
+\index{APPBASE\_PLUGIN\_REQUIRES@{APPBASE\_PLUGIN\_REQUIRES}!sysio::chain\_api\_plugin@{sysio::chain\_api\_plugin}}
+\doxysubsubsection{\texorpdfstring{APPBASE\_PLUGIN\_REQUIRES()}{APPBASE\_PLUGIN\_REQUIRES()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain__api__plugin_a8889e9fef3ea1854756acc7b47ab4bc7} 
+sysio\+::chain\+\_\+api\+\_\+plugin\+::\+APPBASE\+\_\+\+PLUGIN\+\_\+\+REQUIRES (\begin{DoxyParamCaption}\item[{(\mbox{\hyperlink{classsysio_1_1chain__plugin}{chain\+\_\+plugin}})(\mbox{\hyperlink{classsysio_1_1http__plugin}{http\+\_\+plugin}})}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{classsysio_1_1chain__api__plugin_ae3016de53e73c3dcf5e4c27bad0b8f34}\index{sysio::chain\_api\_plugin@{sysio::chain\_api\_plugin}!plugin\_initialize@{plugin\_initialize}}
+\index{plugin\_initialize@{plugin\_initialize}!sysio::chain\_api\_plugin@{sysio::chain\_api\_plugin}}
+\doxysubsubsection{\texorpdfstring{plugin\_initialize()}{plugin\_initialize()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain__api__plugin_ae3016de53e73c3dcf5e4c27bad0b8f34} 
+void sysio\+::chain\+\_\+api\+\_\+plugin\+::plugin\+\_\+initialize (\begin{DoxyParamCaption}\item[{const variables\+\_\+map \&}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{chain__api__plugin_8cpp_source_l00025}{25}} of file \mbox{\hyperlink{chain__api__plugin_8cpp_source}{chain\+\_\+api\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00025\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain__api__plugin_a78bb6d6c89868254e73baf21a4fa6deb}\index{sysio::chain\_api\_plugin@{sysio::chain\_api\_plugin}!plugin\_shutdown@{plugin\_shutdown}}
+\index{plugin\_shutdown@{plugin\_shutdown}!sysio::chain\_api\_plugin@{sysio::chain\_api\_plugin}}
+\doxysubsubsection{\texorpdfstring{plugin\_shutdown()}{plugin\_shutdown()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain__api__plugin_a78bb6d6c89868254e73baf21a4fa6deb} 
+void sysio\+::chain\+\_\+api\+\_\+plugin\+::plugin\+\_\+shutdown (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{chain__api__plugin_8cpp_source_l00150}{150}} of file \mbox{\hyperlink{chain__api__plugin_8cpp_source}{chain\+\_\+api\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00150\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain__api__plugin_a91f0262ad889564cfbe6abfe70dce6a9}\index{sysio::chain\_api\_plugin@{sysio::chain\_api\_plugin}!plugin\_startup@{plugin\_startup}}
+\index{plugin\_startup@{plugin\_startup}!sysio::chain\_api\_plugin@{sysio::chain\_api\_plugin}}
+\doxysubsubsection{\texorpdfstring{plugin\_startup()}{plugin\_startup()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain__api__plugin_a91f0262ad889564cfbe6abfe70dce6a9} 
+void sysio\+::chain\+\_\+api\+\_\+plugin\+::plugin\+\_\+startup (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{chain__api__plugin_8cpp_source_l00095}{95}} of file \mbox{\hyperlink{chain__api__plugin_8cpp_source}{chain\+\_\+api\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00096\ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\ \textcolor{stringliteral}{"{}starting\ chain\_api\_plugin"{}}\ );}
+\DoxyCodeLine{00097\ \ \ \ my.reset(\textcolor{keyword}{new}\ chain\_api\_plugin\_impl(\mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().get\_plugin<chain\_plugin>().chain()));}
+\DoxyCodeLine{00098\ \ \ \ \textcolor{keyword}{auto}\&\ chain\ =\ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_a3c4b68a0667942b58f1369f454ce0ce3}{get\_plugin}}<\mbox{\hyperlink{classchain__plugin}{chain\_plugin}}>();}
+\DoxyCodeLine{00099\ \ \ \ \textcolor{keyword}{auto}\ ro\_api\ =\ chain.get\_read\_only\_api();}
+\DoxyCodeLine{00100\ \ \ \ \textcolor{keyword}{auto}\ rw\_api\ =\ chain.get\_read\_write\_api();}
+\DoxyCodeLine{00101\ }
+\DoxyCodeLine{00102\ \ \ \ \textcolor{keyword}{auto}\&\ \_http\_plugin\ =\ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_a3c4b68a0667942b58f1369f454ce0ce3}{get\_plugin}}<http\_plugin>();}
+\DoxyCodeLine{00103\ \ \ \ ro\_api.set\_shorten\_abi\_errors(\ !\_http\_plugin.verbose\_errors()\ );}
+\DoxyCodeLine{00104\ }
+\DoxyCodeLine{00105\ \ \ \ \_http\_plugin.add\_api(\ \{}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \mbox{\hyperlink{chain__api__plugin_8cpp_af30579c85185bcda813619205a246c24}{CHAIN\_RO\_CALL}}(\mbox{\hyperlink{programs_2clio_2main_8cpp_a687676b9096cc5ff8ae265740a1faf4f}{get\_info}},\ 200,\ \mbox{\hyperlink{namespacesysio_abf4a5fc3ea13f713d0a43bdbc8788cd7a0e9a5336c90eefed9d98a345a024f19b}{http\_params\_types::no\_params}})\},\ \mbox{\hyperlink{structappbase_1_1priority_a5cbe06c2c3aa611d5f2966789572c9d7}{appbase::priority::medium\_high}});}
+\DoxyCodeLine{00107\ \ \ \ \_http\_plugin.add\_api(\{}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \mbox{\hyperlink{chain__api__plugin_8cpp_af30579c85185bcda813619205a246c24}{CHAIN\_RO\_CALL}}(get\_activated\_protocol\_features,\ 200,\ \mbox{\hyperlink{namespacesysio_abf4a5fc3ea13f713d0a43bdbc8788cd7a2b0c52326dd77c6307b66c4e53a36f53}{http\_params\_types::possible\_no\_params}}),}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \mbox{\hyperlink{chain__api__plugin_8cpp_af30579c85185bcda813619205a246c24}{CHAIN\_RO\_CALL}}(get\_block,\ 200,\ \mbox{\hyperlink{namespacesysio_abf4a5fc3ea13f713d0a43bdbc8788cd7af4df8f1e5079096ea1bf20ed4616ebdf}{http\_params\_types::params\_required}}),}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \mbox{\hyperlink{chain__api__plugin_8cpp_af30579c85185bcda813619205a246c24}{CHAIN\_RO\_CALL}}(get\_block\_info,\ 200,\ \mbox{\hyperlink{namespacesysio_abf4a5fc3ea13f713d0a43bdbc8788cd7af4df8f1e5079096ea1bf20ed4616ebdf}{http\_params\_types::params\_required}}),}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \mbox{\hyperlink{chain__api__plugin_8cpp_af30579c85185bcda813619205a246c24}{CHAIN\_RO\_CALL}}(get\_block\_header\_state,\ 200,\ \mbox{\hyperlink{namespacesysio_abf4a5fc3ea13f713d0a43bdbc8788cd7af4df8f1e5079096ea1bf20ed4616ebdf}{http\_params\_types::params\_required}}),}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \mbox{\hyperlink{chain__api__plugin_8cpp_af30579c85185bcda813619205a246c24}{CHAIN\_RO\_CALL}}(\mbox{\hyperlink{programs_2clio_2main_8cpp_a0b4fb9a3e114ce27a049e4a8268b8300}{get\_account}},\ 200,\ \mbox{\hyperlink{namespacesysio_abf4a5fc3ea13f713d0a43bdbc8788cd7af4df8f1e5079096ea1bf20ed4616ebdf}{http\_params\_types::params\_required}}),}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \mbox{\hyperlink{chain__api__plugin_8cpp_af30579c85185bcda813619205a246c24}{CHAIN\_RO\_CALL}}(get\_code,\ 200,\ \mbox{\hyperlink{namespacesysio_abf4a5fc3ea13f713d0a43bdbc8788cd7af4df8f1e5079096ea1bf20ed4616ebdf}{http\_params\_types::params\_required}}),}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \mbox{\hyperlink{chain__api__plugin_8cpp_af30579c85185bcda813619205a246c24}{CHAIN\_RO\_CALL}}(\mbox{\hyperlink{namespacesysio_1_1chain_a406d45a184cdba0af316b5bf34bf56cfa47b372aeb97f49fd5861d48bd3f94a38}{get\_code\_hash}},\ 200,\ \mbox{\hyperlink{namespacesysio_abf4a5fc3ea13f713d0a43bdbc8788cd7af4df8f1e5079096ea1bf20ed4616ebdf}{http\_params\_types::params\_required}}),}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \mbox{\hyperlink{chain__api__plugin_8cpp_af30579c85185bcda813619205a246c24}{CHAIN\_RO\_CALL}}(get\_abi,\ 200,\ \mbox{\hyperlink{namespacesysio_abf4a5fc3ea13f713d0a43bdbc8788cd7af4df8f1e5079096ea1bf20ed4616ebdf}{http\_params\_types::params\_required}}),}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \mbox{\hyperlink{chain__api__plugin_8cpp_af30579c85185bcda813619205a246c24}{CHAIN\_RO\_CALL}}(get\_raw\_code\_and\_abi,\ 200,\ \mbox{\hyperlink{namespacesysio_abf4a5fc3ea13f713d0a43bdbc8788cd7af4df8f1e5079096ea1bf20ed4616ebdf}{http\_params\_types::params\_required}}),}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \mbox{\hyperlink{chain__api__plugin_8cpp_af30579c85185bcda813619205a246c24}{CHAIN\_RO\_CALL}}(get\_raw\_abi,\ 200,\ \mbox{\hyperlink{namespacesysio_abf4a5fc3ea13f713d0a43bdbc8788cd7af4df8f1e5079096ea1bf20ed4616ebdf}{http\_params\_types::params\_required}}),}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \mbox{\hyperlink{chain__api__plugin_8cpp_af30579c85185bcda813619205a246c24}{CHAIN\_RO\_CALL}}(get\_table\_rows,\ 200,\ \mbox{\hyperlink{namespacesysio_abf4a5fc3ea13f713d0a43bdbc8788cd7af4df8f1e5079096ea1bf20ed4616ebdf}{http\_params\_types::params\_required}}),}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \mbox{\hyperlink{chain__api__plugin_8cpp_af30579c85185bcda813619205a246c24}{CHAIN\_RO\_CALL}}(get\_table\_by\_scope,\ 200,\ \mbox{\hyperlink{namespacesysio_abf4a5fc3ea13f713d0a43bdbc8788cd7af4df8f1e5079096ea1bf20ed4616ebdf}{http\_params\_types::params\_required}}),}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \mbox{\hyperlink{chain__api__plugin_8cpp_af30579c85185bcda813619205a246c24}{CHAIN\_RO\_CALL}}(get\_currency\_balance,\ 200,\ \mbox{\hyperlink{namespacesysio_abf4a5fc3ea13f713d0a43bdbc8788cd7af4df8f1e5079096ea1bf20ed4616ebdf}{http\_params\_types::params\_required}}),}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \mbox{\hyperlink{chain__api__plugin_8cpp_af30579c85185bcda813619205a246c24}{CHAIN\_RO\_CALL}}(get\_currency\_stats,\ 200,\ \mbox{\hyperlink{namespacesysio_abf4a5fc3ea13f713d0a43bdbc8788cd7af4df8f1e5079096ea1bf20ed4616ebdf}{http\_params\_types::params\_required}}),}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \mbox{\hyperlink{chain__api__plugin_8cpp_af30579c85185bcda813619205a246c24}{CHAIN\_RO\_CALL}}(get\_producers,\ 200,\ \mbox{\hyperlink{namespacesysio_abf4a5fc3ea13f713d0a43bdbc8788cd7af4df8f1e5079096ea1bf20ed4616ebdf}{http\_params\_types::params\_required}}),}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \mbox{\hyperlink{chain__api__plugin_8cpp_af30579c85185bcda813619205a246c24}{CHAIN\_RO\_CALL}}(get\_producer\_schedule,\ 200,\ \mbox{\hyperlink{namespacesysio_abf4a5fc3ea13f713d0a43bdbc8788cd7a0e9a5336c90eefed9d98a345a024f19b}{http\_params\_types::no\_params}}),}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \mbox{\hyperlink{chain__api__plugin_8cpp_af30579c85185bcda813619205a246c24}{CHAIN\_RO\_CALL}}(get\_scheduled\_transactions,\ 200,\ \mbox{\hyperlink{namespacesysio_abf4a5fc3ea13f713d0a43bdbc8788cd7af4df8f1e5079096ea1bf20ed4616ebdf}{http\_params\_types::params\_required}}),}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \mbox{\hyperlink{chain__api__plugin_8cpp_af30579c85185bcda813619205a246c24}{CHAIN\_RO\_CALL}}(abi\_json\_to\_bin,\ 200,\ \mbox{\hyperlink{namespacesysio_abf4a5fc3ea13f713d0a43bdbc8788cd7af4df8f1e5079096ea1bf20ed4616ebdf}{http\_params\_types::params\_required}}),}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \mbox{\hyperlink{chain__api__plugin_8cpp_af30579c85185bcda813619205a246c24}{CHAIN\_RO\_CALL}}(abi\_bin\_to\_json,\ 200,\ \mbox{\hyperlink{namespacesysio_abf4a5fc3ea13f713d0a43bdbc8788cd7af4df8f1e5079096ea1bf20ed4616ebdf}{http\_params\_types::params\_required}}),}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \mbox{\hyperlink{chain__api__plugin_8cpp_af30579c85185bcda813619205a246c24}{CHAIN\_RO\_CALL}}(get\_required\_keys,\ 200,\ \mbox{\hyperlink{namespacesysio_abf4a5fc3ea13f713d0a43bdbc8788cd7af4df8f1e5079096ea1bf20ed4616ebdf}{http\_params\_types::params\_required}}),}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \mbox{\hyperlink{chain__api__plugin_8cpp_af30579c85185bcda813619205a246c24}{CHAIN\_RO\_CALL}}(get\_transaction\_id,\ 200,\ \mbox{\hyperlink{namespacesysio_abf4a5fc3ea13f713d0a43bdbc8788cd7af4df8f1e5079096ea1bf20ed4616ebdf}{http\_params\_types::params\_required}}),}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \mbox{\hyperlink{chain__api__plugin_8cpp_a1ecc20ecac83cc8b5e94e862dc4b0b6c}{CHAIN\_RO\_CALL\_ASYNC}}(compute\_transaction,\ chain\_apis::read\_only::compute\_transaction\_results,\ 200,\ \mbox{\hyperlink{namespacesysio_abf4a5fc3ea13f713d0a43bdbc8788cd7af4df8f1e5079096ea1bf20ed4616ebdf}{http\_params\_types::params\_required}}),}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \mbox{\hyperlink{chain__api__plugin_8cpp_a262656e4d130aa3ad5e182cd87b2198f}{CHAIN\_RW\_CALL\_ASYNC}}(push\_block,\ \mbox{\hyperlink{classsysio_1_1chain__apis_1_1read__write_a318dec963451d97a5f88f5db1ee3158a}{chain\_apis::read\_write::push\_block\_results}},\ 202,\ \mbox{\hyperlink{namespacesysio_abf4a5fc3ea13f713d0a43bdbc8788cd7af4df8f1e5079096ea1bf20ed4616ebdf}{http\_params\_types::params\_required}}),}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \mbox{\hyperlink{chain__api__plugin_8cpp_a262656e4d130aa3ad5e182cd87b2198f}{CHAIN\_RW\_CALL\_ASYNC}}(\mbox{\hyperlink{programs_2clio_2main_8cpp_afe8fe332483247c5c5e9a46ca80bf569}{push\_transaction}},\ chain\_apis::read\_write::push\_transaction\_results,\ 202,\ \mbox{\hyperlink{namespacesysio_abf4a5fc3ea13f713d0a43bdbc8788cd7af4df8f1e5079096ea1bf20ed4616ebdf}{http\_params\_types::params\_required}}),}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \mbox{\hyperlink{chain__api__plugin_8cpp_a262656e4d130aa3ad5e182cd87b2198f}{CHAIN\_RW\_CALL\_ASYNC}}(push\_transactions,\ \mbox{\hyperlink{classsysio_1_1chain__apis_1_1read__write_a8231c2c0719da179493f9312ff711a38}{chain\_apis::read\_write::push\_transactions\_results}},\ 202,\ \mbox{\hyperlink{namespacesysio_abf4a5fc3ea13f713d0a43bdbc8788cd7af4df8f1e5079096ea1bf20ed4616ebdf}{http\_params\_types::params\_required}}),}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \mbox{\hyperlink{chain__api__plugin_8cpp_a262656e4d130aa3ad5e182cd87b2198f}{CHAIN\_RW\_CALL\_ASYNC}}(\mbox{\hyperlink{programs_2clio_2main_8cpp_a87e0dcfdae4fe7c0dae35459b568b1a6}{send\_transaction}},\ \mbox{\hyperlink{classsysio_1_1chain__apis_1_1read__write_a551f0b368e28de08359629795b8c29c8}{chain\_apis::read\_write::send\_transaction\_results}},\ 202,\ \mbox{\hyperlink{namespacesysio_abf4a5fc3ea13f713d0a43bdbc8788cd7af4df8f1e5079096ea1bf20ed4616ebdf}{http\_params\_types::params\_required}}),}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \mbox{\hyperlink{chain__api__plugin_8cpp_a262656e4d130aa3ad5e182cd87b2198f}{CHAIN\_RW\_CALL\_ASYNC}}(send\_transaction2,\ \mbox{\hyperlink{classsysio_1_1chain__apis_1_1read__write_a551f0b368e28de08359629795b8c29c8}{chain\_apis::read\_write::send\_transaction\_results}},\ 202,\ \mbox{\hyperlink{namespacesysio_abf4a5fc3ea13f713d0a43bdbc8788cd7af4df8f1e5079096ea1bf20ed4616ebdf}{http\_params\_types::params\_required}})}
+\DoxyCodeLine{00135\ \ \ \ \});}
+\DoxyCodeLine{00136\ }
+\DoxyCodeLine{00137\ \ \ \ \textcolor{keywordflow}{if}\ (chain.account\_queries\_enabled())\ \{}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \_http\_plugin.add\_async\_api(\{}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain__api__plugin_8cpp_ab36a65d18616c2e76bc38ab47c242df0}{CHAIN\_RO\_CALL\_WITH\_400}}(get\_accounts\_by\_authorizers,\ 200,\ \mbox{\hyperlink{namespacesysio_abf4a5fc3ea13f713d0a43bdbc8788cd7af4df8f1e5079096ea1bf20ed4616ebdf}{http\_params\_types::params\_required}}),}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00141\ \ \ \ \}}
+\DoxyCodeLine{00142\ }
+\DoxyCodeLine{00143\ \ \ \ \textcolor{keywordflow}{if}\ (chain.transaction\_finality\_status\_enabled())\ \{}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \_http\_plugin.add\_async\_api(\{}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain__api__plugin_8cpp_ab36a65d18616c2e76bc38ab47c242df0}{CHAIN\_RO\_CALL\_WITH\_400}}(get\_transaction\_status,\ 200,\ \mbox{\hyperlink{namespacesysio_abf4a5fc3ea13f713d0a43bdbc8788cd7af4df8f1e5079096ea1bf20ed4616ebdf}{http\_params\_types::params\_required}}),}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00147\ \ \ \ \}}
+\DoxyCodeLine{00148\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain__api__plugin_a91f0262ad889564cfbe6abfe70dce6a9_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain__api__plugin_a8679612f56738a75a17560008ab90e5c}\index{sysio::chain\_api\_plugin@{sysio::chain\_api\_plugin}!set\_program\_options@{set\_program\_options}}
+\index{set\_program\_options@{set\_program\_options}!sysio::chain\_api\_plugin@{sysio::chain\_api\_plugin}}
+\doxysubsubsection{\texorpdfstring{set\_program\_options()}{set\_program\_options()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain__api__plugin_a8679612f56738a75a17560008ab90e5c} 
+void sysio\+::chain\+\_\+api\+\_\+plugin\+::set\+\_\+program\+\_\+options (\begin{DoxyParamCaption}\item[{options\+\_\+description \&}]{}{, }\item[{options\+\_\+description \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classappbase_1_1abstract__plugin_a274a3c7462de3c699a8eb23741ed7655}{appbase\+::abstract\+\_\+plugin}}.
+
+
+
+Definition at line \mbox{\hyperlink{chain__api__plugin_8cpp_source_l00024}{24}} of file \mbox{\hyperlink{chain__api__plugin_8cpp_source}{chain\+\_\+api\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00024\ \{\}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+plugins/chain\+\_\+api\+\_\+plugin/include/sysio/chain\+\_\+api\+\_\+plugin/\mbox{\hyperlink{chain__api__plugin_8hpp}{chain\+\_\+api\+\_\+plugin.\+hpp}}\item 
+plugins/chain\+\_\+api\+\_\+plugin/\mbox{\hyperlink{chain__api__plugin_8cpp}{chain\+\_\+api\+\_\+plugin.\+cpp}}\end{DoxyCompactItemize}

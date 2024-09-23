@@ -1,0 +1,11 @@
+<map id="Ec2::add" name="Ec2::add">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,79,56"/>
+<area shape="rect" id="Node000002" href="$classbn_1_1_ec_t.html#ad4217e38c5c16c1a97d2036a1f21e751" title=" " alt="" coords="127,31,221,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="79,41,111,41,111,46,79,46"/>
+<area shape="rect" id="Node000003" href="$namespacebn_1_1ecop.html#abcaa67b67f6c2af1201769cd15cbbed9" title=" " alt="" coords="269,31,390,56"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="222,41,253,41,253,46,222,46"/>
+<area shape="rect" id="Node000004" href="$namespacebn_1_1ecop.html#a4a6928bb915f1eef461635202d2e4c30" title=" " alt="" coords="454,5,562,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="391,32,439,25,440,31,391,37"/>
+<area shape="rect" id="Node000005" href="$namespacebn_1_1ecop.html#a0e64ca6d01c24fb266f1986ebce3a07d" title=" " alt="" coords="438,55,578,80"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="391,49,423,53,422,59,391,54"/>
+</map>

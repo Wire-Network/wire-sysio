@@ -1,0 +1,61 @@
+\doxysection{sysio\+::chain\+::wasm\+\_\+validations\+::maximum\+\_\+function\+\_\+stack\+\_\+visitor Struct Reference}
+\hypertarget{structsysio_1_1chain_1_1wasm__validations_1_1maximum__function__stack__visitor}{}\label{structsysio_1_1chain_1_1wasm__validations_1_1maximum__function__stack__visitor}\index{sysio::chain::wasm\_validations::maximum\_function\_stack\_visitor@{sysio::chain::wasm\_validations::maximum\_function\_stack\_visitor}}
+
+
+{\ttfamily \#include $<$wasm\+\_\+sysio\+\_\+validation.\+hpp$>$}
+
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static void \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__validations_1_1maximum__function__stack__visitor_a3e0beda20b86e3cb397089d1cf5d0b70}{validate}} (const \mbox{\hyperlink{struct_i_r_1_1_module}{IR\+::\+Module}} \&m)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__validation_8hpp_source_l00038}{38}} of file \mbox{\hyperlink{wasm__sysio__validation_8hpp_source}{wasm\+\_\+sysio\+\_\+validation.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1chain_1_1wasm__validations_1_1maximum__function__stack__visitor_a3e0beda20b86e3cb397089d1cf5d0b70}\index{sysio::chain::wasm\_validations::maximum\_function\_stack\_visitor@{sysio::chain::wasm\_validations::maximum\_function\_stack\_visitor}!validate@{validate}}
+\index{validate@{validate}!sysio::chain::wasm\_validations::maximum\_function\_stack\_visitor@{sysio::chain::wasm\_validations::maximum\_function\_stack\_visitor}}
+\doxysubsubsection{\texorpdfstring{validate()}{validate()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__validations_1_1maximum__function__stack__visitor_a3e0beda20b86e3cb397089d1cf5d0b70} 
+void sysio\+::chain\+::wasm\+\_\+validations\+::maximum\+\_\+function\+\_\+stack\+\_\+visitor\+::validate (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct_i_r_1_1_module}{IR\+::\+Module}} \&}]{m}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__validation_8cpp_source_l00062}{62}} of file \mbox{\hyperlink{wasm__sysio__validation_8cpp_source}{wasm\+\_\+sysio\+\_\+validation.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00063\ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ FunctionDef\&\ func\ :\ m.\mbox{\hyperlink{struct_i_r_1_1_module_a439e1f32fa3fa9bf47f58ac309bfc50a}{functions}}.defs)\ \{}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ function\_stack\_usage\ =\ 0;}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}\&\ local\ :\ \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2}{func}}.nonParameterLocalTypes)}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ function\_stack\_usage\ +=\ \mbox{\hyperlink{namespace_i_r_ad46dd77836957c118907d69d239826bb}{getTypeBitWidth}}(local)/8;}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}\&\ \mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}}\ :\ m.\mbox{\hyperlink{struct_i_r_1_1_module_a682c9e762448410a20c98ea062a50308}{types}}[\mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2}{func}}.type.index]-\/>parameters)}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ function\_stack\_usage\ +=\ \mbox{\hyperlink{namespace_i_r_ad46dd77836957c118907d69d239826bb}{getTypeBitWidth}}(\mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}})/8;}
+\DoxyCodeLine{00069\ }
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(function\_stack\_usage\ >\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__constraints_acd9b29a2807d996ee0e61249e1f5fde3}{wasm\_constraints::maximum\_func\_local\_bytes}})}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(wasm\_execution\_error,\ \textcolor{stringliteral}{"{}Smart\ contract\ function\ has\ more\ than\ \$\{k\}\ bytes\ of\ stack\ usage"{}},}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}k"{}},\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__constraints_acd9b29a2807d996ee0e61249e1f5fde3}{wasm\_constraints::maximum\_func\_local\_bytes}}));}
+\DoxyCodeLine{00073\ \ \ \ \}}
+\DoxyCodeLine{00074\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1wasm__validations_1_1maximum__function__stack__visitor_a3e0beda20b86e3cb397089d1cf5d0b70_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{wasm__sysio__validation_8hpp}{wasm\+\_\+sysio\+\_\+validation.\+hpp}}\item 
+libraries/chain/\mbox{\hyperlink{wasm__sysio__validation_8cpp}{wasm\+\_\+sysio\+\_\+validation.\+cpp}}\end{DoxyCompactItemize}

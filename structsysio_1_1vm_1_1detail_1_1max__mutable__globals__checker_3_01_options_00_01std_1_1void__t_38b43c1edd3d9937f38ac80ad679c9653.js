@@ -1,0 +1,6 @@
+var structsysio_1_1vm_1_1detail_1_1max__mutable__globals__checker_3_01_options_00_01std_1_1void__t_38b43c1edd3d9937f38ac80ad679c9653 =
+[
+    [ "on_mutable_global", "structsysio_1_1vm_1_1detail_1_1max__mutable__globals__checker_3_01_options_00_01std_1_1void__t_38b43c1edd3d9937f38ac80ad679c9653.html#a5deb5181118440dd9c67f08e0fa345cd", null ],
+    [ "on_mutable_global", "structsysio_1_1vm_1_1detail_1_1max__mutable__globals__checker_3_01_options_00_01std_1_1void__t_38b43c1edd3d9937f38ac80ad679c9653.html#a5deb5181118440dd9c67f08e0fa345cd", null ],
+    [ "_counter", "structsysio_1_1vm_1_1detail_1_1max__mutable__globals__checker_3_01_options_00_01std_1_1void__t_38b43c1edd3d9937f38ac80ad679c9653.html#a751ef851c46c4fad5c50e1fe230e17f0", null ]
+];

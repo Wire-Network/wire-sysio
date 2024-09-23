@@ -1,0 +1,116 @@
+\doxysection{platform\+\_\+timer\+\_\+macos.\+cpp}
+\hypertarget{platform__timer__macos_8cpp_source}{}\label{platform__timer__macos_8cpp_source}\index{libraries/chain/platform\_timer\_macos.cpp@{libraries/chain/platform\_timer\_macos.cpp}}
+\mbox{\hyperlink{platform__timer__macos_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{platform__timer_8hpp}{sysio/chain/platform\_timer.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{platform__timer__accuracy_8hpp}{sysio/chain/platform\_timer\_accuracy.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{include_2fc_2time_8hpp}{fc/time.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{fwd__impl_8hpp}{fc/fwd\_impl.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{exception_8hpp}{fc/exception/exception.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{logger__config_8hpp}{fc/log/logger\_config.hpp}}>}\ \textcolor{comment}{//set\_os\_thread\_name()}}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ <mutex>}}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <thread>}}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00012}00012\ \textcolor{preprocessor}{\#include\ <sys/event.h>}}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00014}00014\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{\ \textcolor{keyword}{namespace\ }chain\ \{}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00016}00016\ \textcolor{comment}{//a\ kqueue\ \&\ thread\ is\ shared\ for\ all\ platform\_timer\_macos\ instances}}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00017}00017\ \textcolor{keyword}{static}\ std::mutex\ timer\_ref\_mutex;}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00018}00018\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{unsigned}\ next\_timerid;}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00019}00019\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{unsigned}\ refcount;}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00020}00020\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ kqueue\_fd;}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00021}00021\ \textcolor{keyword}{static}\ std::thread\ kevent\_thread;}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00023}00023\ \textcolor{keyword}{struct\ }platform\_timer::impl\ \{}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00024}\mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_1_1impl_ab5d270960f7b1dc8b529c6bfb836b144}{00024}}\ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_1_1impl_ab5d270960f7b1dc8b529c6bfb836b144}{timerid}};}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00026}\mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_1_1impl_a420aaf55b414f2d93ead85f38b113bb9}{00026}}\ \ \ \ \textcolor{keyword}{constexpr}\ \textcolor{keyword}{static}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_1_1impl_a420aaf55b414f2d93ead85f38b113bb9}{quit\_event\_id}}\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00027}00027\ \};}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00029}00029\ \mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_a73955c69921017b77b595476e8de4eea}{platform\_timer::platform\_timer}}()\ \{}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00030}00030\ \ \ \ \textcolor{keyword}{static\_assert}(\textcolor{keyword}{sizeof}(\mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_1_1impl}{impl}})\ <=\ fwd\_size);}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00032}00032\ \ \ \ std::lock\_guard\ guard(timer\_ref\_mutex);}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00034}00034\ \ \ \ \textcolor{keywordflow}{if}(refcount++\ ==\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00035}00035\ \ \ \ \ \ \ kqueue\_fd\ =\ kqueue();}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00037}00037\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(kqueue\_fd\ !=\ -\/1,\ \textcolor{stringliteral}{"{}failed\ to\ create\ kqueue"{}});}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00039}00039\ \ \ \ \ \ \ \textcolor{comment}{//set\ up\ a\ EVFILT\_USER\ which\ will\ be\ signaled\ to\ shut\ down\ the\ thread}}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00040}00040\ \ \ \ \ \ \ \textcolor{keyword}{struct\ }kevent64\_s\ quit\_event;}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00041}00041\ \ \ \ \ \ \ EV\_SET64(\&quit\_event,\ \mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_1_1impl_a420aaf55b414f2d93ead85f38b113bb9}{impl::quit\_event\_id}},\ EVFILT\_USER,\ EV\_ADD|EV\_ENABLE,\ NOTE\_FFNOP,\ 0,\ 0,\ 0,\ 0);}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00042}00042\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(kevent64(kqueue\_fd,\ \&quit\_event,\ 1,\ NULL,\ 0,\ KEVENT\_FLAG\_IMMEDIATE,\ NULL)\ ==\ 0,\ \textcolor{stringliteral}{"{}failed\ to\ create\ quit\ event"{}});}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00044}00044\ \ \ \ \ \ \ kevent\_thread\ =\ std::thread([]()\ \{}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00045}00045\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_ab58a7f71e88d7d4d5761bbd24837c595}{fc::set\_os\_thread\_name}}(\textcolor{stringliteral}{"{}checktime"{}});}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00046}00046\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\textcolor{keyword}{true})\ \{}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00047}00047\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{struct\ }kevent64\_s\ anEvent;}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ c\ =\ kevent64(kqueue\_fd,\ NULL,\ 0,\ \&anEvent,\ 1,\ 0,\ NULL);}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00050}00050\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(c\ ==\ 1\ \&\&\ anEvent.filter\ ==\ EVFILT\_TIMER)\ \{}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00051}00051\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer}{platform\_timer}}*\ \mbox{\hyperlink{namespacesysio_a5c18cd9d34b8c5d3af8e2de75577673fa1f42b089b0bc1105b38f19140a65cc2a}{self}}\ =\ (\mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer}{platform\_timer}}*)anEvent.udata;}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_a5c18cd9d34b8c5d3af8e2de75577673fa1f42b089b0bc1105b38f19140a65cc2a}{self}}-\/>expired\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_a5c18cd9d34b8c5d3af8e2de75577673fa1f42b089b0bc1105b38f19140a65cc2a}{self}}-\/>call\_expiration\_callback();}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(c\ ==\ 1\ \&\&\ anEvent.filter\ ==\ EVFILT\_USER)}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(c\ ==\ -\/1\ \&\&\ errno\ ==\ EINTR)}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00059}00059\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(c\ ==\ -\/1)}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};\ \textcolor{comment}{//??\ not\ much\ we\ can\ do\ now}}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00061}00061\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00062}00062\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00063}00063\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00065}00065\ \ \ \ my-\/>timerid\ =\ next\_timerid++;}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00067}00067\ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_ae7932098515897c80ae49b0d569441ba}{compute\_and\_print\_timer\_accuracy}}(*\textcolor{keyword}{this});}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00068}00068\ \}}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00069}00069\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00070}00070\ \mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_ab241e03e3055f290f13d6b367d8447b7}{platform\_timer::\string~platform\_timer}}()\ \{}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00071}00071\ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_a5cb70a095755d00bf02d37d31b6e46af}{stop}}();}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00072}00072\ \ \ \ \textcolor{keywordflow}{if}(std::lock\_guard\ guard(timer\_ref\_mutex);\ -\/-\/refcount\ ==\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00073}00073\ \ \ \ \ \ \ \textcolor{keyword}{struct\ }kevent64\_s\ signal\_quit\_event;}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00074}00074\ \ \ \ \ \ \ EV\_SET64(\&signal\_quit\_event,\ \mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_1_1impl_a420aaf55b414f2d93ead85f38b113bb9}{impl::quit\_event\_id}},\ EVFILT\_USER,\ 0,\ NOTE\_TRIGGER,\ 0,\ 0,\ 0,\ 0);}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00075}00075\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00076}00076\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(kevent64(kqueue\_fd,\ \&signal\_quit\_event,\ 1,\ NULL,\ 0,\ KEVENT\_FLAG\_IMMEDIATE,\ NULL)\ !=\ -\/1)}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00077}00077\ \ \ \ \ \ \ \ \ \ kevent\_thread.join();}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00078}00078\ \ \ \ \ \ \ \mbox{\hyperlink{integration_8cpp_af5b66d867a040d002fb57d645cae3fb4}{close}}(kqueue\_fd);}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00079}00079\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00080}00080\ \}}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00081}00081\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00082}00082\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_a8396e86c6a626dd2632cb075bd254ad4}{platform\_timer::start}}(\mbox{\hyperlink{classfc_1_1time__point}{fc::time\_point}}\ tp)\ \{}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00083}00083\ \ \ \ \textcolor{keywordflow}{if}(tp\ ==\ \mbox{\hyperlink{classfc_1_1time__point_aeccf1b70aa34b132c5269313b8a50573}{fc::time\_point::maximum}}())\ \{}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00084}00084\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_a801fb6084f296f86fdc1dedd980ac643}{expired}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00085}00085\ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00086}00086\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00087}00087\ \ \ \ \mbox{\hyperlink{classfc_1_1microseconds}{fc::microseconds}}\ x\ =\ tp.\mbox{\hyperlink{classfc_1_1time__point_abfea5efbe9ef58024cda814395ee9945}{time\_since\_epoch}}()\ -\/\ \mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{fc::time\_point::now}}().\mbox{\hyperlink{classfc_1_1time__point_abfea5efbe9ef58024cda814395ee9945}{time\_since\_epoch}}();}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00088}00088\ \ \ \ \textcolor{keywordflow}{if}(x.\mbox{\hyperlink{classfc_1_1microseconds_a20fba59ec7e1f50c6b8f2c9443cc9b92}{count}}()\ <=\ 0)}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00089}00089\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_a801fb6084f296f86fdc1dedd980ac643}{expired}}\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00090}00090\ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00091}00091\ \ \ \ \ \ \ \textcolor{keyword}{struct\ }kevent64\_s\ aTimerEvent;}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00092}00092\ \ \ \ \ \ \ EV\_SET64(\&aTimerEvent,\ my-\/>timerid,\ EVFILT\_TIMER,\ EV\_ADD|EV\_ENABLE|EV\_ONESHOT,\ NOTE\_USECONDS|NOTE\_CRITICAL,\ x.\mbox{\hyperlink{classfc_1_1microseconds_a20fba59ec7e1f50c6b8f2c9443cc9b92}{count}}(),\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})\textcolor{keyword}{this},\ 0,\ 0);}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00093}00093\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00094}00094\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_a801fb6084f296f86fdc1dedd980ac643}{expired}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00095}00095\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(kevent64(kqueue\_fd,\ \&aTimerEvent,\ 1,\ NULL,\ 0,\ KEVENT\_FLAG\_IMMEDIATE,\ NULL)\ !=\ 0)}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00096}00096\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_a801fb6084f296f86fdc1dedd980ac643}{expired}}\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00097}00097\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00098}00098\ \}}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00099}00099\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00100}00100\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_a5cb70a095755d00bf02d37d31b6e46af}{platform\_timer::stop}}()\ \{}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00101}00101\ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_a801fb6084f296f86fdc1dedd980ac643}{expired}})}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00102}00102\ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00103}00103\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00104}00104\ \ \ \ \textcolor{keyword}{struct\ }kevent64\_s\ stop\_timer\_event;}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00105}00105\ \ \ \ EV\_SET64(\&stop\_timer\_event,\ my-\/>timerid,\ EVFILT\_TIMER,\ EV\_DELETE,\ 0,\ 0,\ 0,\ 0,\ 0);}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00106}00106\ \ \ \ kevent64(kqueue\_fd,\ \&stop\_timer\_event,\ 1,\ NULL,\ 0,\ KEVENT\_FLAG\_IMMEDIATE,\ NULL);}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00107}00107\ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_a801fb6084f296f86fdc1dedd980ac643}{expired}}\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00108}00108\ \}}
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00109}00109\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__macos_8cpp_source_l00110}00110\ \}\}}
+
+\end{DoxyCode}

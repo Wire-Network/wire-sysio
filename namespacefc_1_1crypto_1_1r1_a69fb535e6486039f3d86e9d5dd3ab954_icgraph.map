@@ -1,0 +1,7 @@
+<map id="fc::crypto::r1::signature_from_ecdsa" name="fc::crypto::r1::signature_from_ecdsa">
+<area shape="rect" id="Node000001" title=" " alt="" coords="204,53,360,94"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1wallet_1_1detail_1_1se__wallet__impl.html#af55d7af9639ae410b25d61286e03912a" title=" " alt="" coords="11,5,150,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="188,57,150,50,151,44,189,52"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl.html#a8987016445813c0391f04894e9bdb002" title=" " alt="" coords="5,85,156,141"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="189,94,157,101,156,96,188,89"/>
+</map>

@@ -1,0 +1,287 @@
+\doxysection{libraries/yubihsm/common/openssl-\/compat.c File Reference}
+\hypertarget{openssl-compat_8c}{}\label{openssl-compat_8c}\index{libraries/yubihsm/common/openssl-\/compat.c@{libraries/yubihsm/common/openssl-\/compat.c}}
+{\ttfamily \#include "{}openssl-\/compat.\+h"{}}\newline
+Include dependency graph for openssl-\/compat.c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{openssl-compat_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{openssl-compat_8c_ada007b0a8f3f9089fed98a22cb2b1554}{RSA\+\_\+set0\+\_\+key}} (RSA \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}, \mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_a62125ea4e1d748a4a9c1aed9766f451a}{BIGNUM}} \texorpdfstring{$\ast$}{*}n, \mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_a62125ea4e1d748a4a9c1aed9766f451a}{BIGNUM}} \texorpdfstring{$\ast$}{*}e, \mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_a62125ea4e1d748a4a9c1aed9766f451a}{BIGNUM}} \texorpdfstring{$\ast$}{*}d)
+\item 
+void \mbox{\hyperlink{openssl-compat_8c_a96e6deebb87bafb81f7bde3df63e59f3}{RSA\+\_\+get0\+\_\+key}} (const RSA \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}, const \mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_a62125ea4e1d748a4a9c1aed9766f451a}{BIGNUM}} \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}n, const \mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_a62125ea4e1d748a4a9c1aed9766f451a}{BIGNUM}} \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}e, const \mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_a62125ea4e1d748a4a9c1aed9766f451a}{BIGNUM}} \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}d)
+\item 
+void \mbox{\hyperlink{openssl-compat_8c_ad0eaa8f2e87045d4abd7b3fc94ab4694}{RSA\+\_\+get0\+\_\+factors}} (const RSA \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}, const \mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_a62125ea4e1d748a4a9c1aed9766f451a}{BIGNUM}} \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}, const \mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_a62125ea4e1d748a4a9c1aed9766f451a}{BIGNUM}} \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}q)
+\item 
+void \mbox{\hyperlink{openssl-compat_8c_a4f4b9ece6db658890011cfcf730d18f1}{RSA\+\_\+get0\+\_\+crt\+\_\+params}} (const RSA \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}, const \mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_a62125ea4e1d748a4a9c1aed9766f451a}{BIGNUM}} \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}dmp1, const \mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_a62125ea4e1d748a4a9c1aed9766f451a}{BIGNUM}} \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}dmq1, const \mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_a62125ea4e1d748a4a9c1aed9766f451a}{BIGNUM}} \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}iqmp)
+\item 
+int \mbox{\hyperlink{openssl-compat_8c_ae2f28de42b8345422b7ac3b28f330b9b}{ECDSA\+\_\+\+SIG\+\_\+set0}} (ECDSA\+\_\+\+SIG \texorpdfstring{$\ast$}{*}sig, \mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_a62125ea4e1d748a4a9c1aed9766f451a}{BIGNUM}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}, \mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_a62125ea4e1d748a4a9c1aed9766f451a}{BIGNUM}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\item 
+void \mbox{\hyperlink{openssl-compat_8c_aa0ad424eeb5c9c34c12d77cd3dc9dbf1}{ECDSA\+\_\+\+SIG\+\_\+get0}} (const ECDSA\+\_\+\+SIG \texorpdfstring{$\ast$}{*}sig, const \mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_a62125ea4e1d748a4a9c1aed9766f451a}{BIGNUM}} \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}pr, const \mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_a62125ea4e1d748a4a9c1aed9766f451a}{BIGNUM}} \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}ps)
+\item 
+const \mbox{\hyperlink{openssl-compat_8c_a93acf209ee3e7156a5533958e7e50bb0}{STACK\+\_\+\+OF}} (X509\+\_\+\+EXTENSION)
+\item 
+ASN1\+\_\+\+OBJECT \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{openssl-compat_8c_a6bdaf92149340326578e982fc4b81f6a}{X509\+\_\+\+EXTENSION\+\_\+get\+\_\+object}} (X509\+\_\+\+EXTENSION \texorpdfstring{$\ast$}{*}ex)
+\item 
+ASN1\+\_\+\+OCTET\+\_\+\+STRING \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{openssl-compat_8c_a4dbc44b3ea7e769ad8704b1aec815eee}{X509\+\_\+\+EXTENSION\+\_\+get\+\_\+data}} (X509\+\_\+\+EXTENSION \texorpdfstring{$\ast$}{*}ex)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{openssl-compat_8c_aa0ad424eeb5c9c34c12d77cd3dc9dbf1}\index{openssl-\/compat.c@{openssl-\/compat.c}!ECDSA\_SIG\_get0@{ECDSA\_SIG\_get0}}
+\index{ECDSA\_SIG\_get0@{ECDSA\_SIG\_get0}!openssl-\/compat.c@{openssl-\/compat.c}}
+\doxysubsubsection{\texorpdfstring{ECDSA\_SIG\_get0()}{ECDSA\_SIG\_get0()}}
+{\footnotesize\ttfamily \label{openssl-compat_8c_aa0ad424eeb5c9c34c12d77cd3dc9dbf1} 
+void ECDSA\+\_\+\+SIG\+\_\+get0 (\begin{DoxyParamCaption}\item[{const ECDSA\+\_\+\+SIG \texorpdfstring{$\ast$}{*}}]{sig}{, }\item[{const \mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_a62125ea4e1d748a4a9c1aed9766f451a}{BIGNUM}} \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{pr}{, }\item[{const \mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_a62125ea4e1d748a4a9c1aed9766f451a}{BIGNUM}} \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{ps}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{openssl-compat_8c_source_l00080}{80}} of file \mbox{\hyperlink{openssl-compat_8c_source}{openssl-\/compat.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00082\ \ \ \textcolor{keywordflow}{if}\ (pr\ !=\ NULL)\ \{}
+\DoxyCodeLine{00083\ \ \ \ \ *pr\ =\ sig-\/>r;}
+\DoxyCodeLine{00084\ \ \ \}}
+\DoxyCodeLine{00085\ \ \ \textcolor{keywordflow}{if}\ (ps\ !=\ NULL)\ \{}
+\DoxyCodeLine{00086\ \ \ \ \ *ps\ =\ sig-\/>s;}
+\DoxyCodeLine{00087\ \ \ \}}
+\DoxyCodeLine{00088\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{openssl-compat_8c_aa0ad424eeb5c9c34c12d77cd3dc9dbf1_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{openssl-compat_8c_ae2f28de42b8345422b7ac3b28f330b9b}\index{openssl-\/compat.c@{openssl-\/compat.c}!ECDSA\_SIG\_set0@{ECDSA\_SIG\_set0}}
+\index{ECDSA\_SIG\_set0@{ECDSA\_SIG\_set0}!openssl-\/compat.c@{openssl-\/compat.c}}
+\doxysubsubsection{\texorpdfstring{ECDSA\_SIG\_set0()}{ECDSA\_SIG\_set0()}}
+{\footnotesize\ttfamily \label{openssl-compat_8c_ae2f28de42b8345422b7ac3b28f330b9b} 
+int ECDSA\+\_\+\+SIG\+\_\+set0 (\begin{DoxyParamCaption}\item[{ECDSA\+\_\+\+SIG \texorpdfstring{$\ast$}{*}}]{sig}{, }\item[{\mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_a62125ea4e1d748a4a9c1aed9766f451a}{BIGNUM}} \texorpdfstring{$\ast$}{*}}]{r}{, }\item[{\mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_a62125ea4e1d748a4a9c1aed9766f451a}{BIGNUM}} \texorpdfstring{$\ast$}{*}}]{s}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{openssl-compat_8c_source_l00064}{64}} of file \mbox{\hyperlink{openssl-compat_8c_source}{openssl-\/compat.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00065\ \ \ \textcolor{keywordflow}{if}\ ((sig-\/>r\ ==\ NULL\ \&\&\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ ==\ NULL)\ ||\ (sig-\/>s\ ==\ NULL\ \&\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ ==\ NULL))\ \{}
+\DoxyCodeLine{00066\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00067\ \ \ \}}
+\DoxyCodeLine{00068\ }
+\DoxyCodeLine{00069\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ !=\ NULL)\ \{}
+\DoxyCodeLine{00070\ \ \ \ \ BN\_free(sig-\/>r);}
+\DoxyCodeLine{00071\ \ \ \ \ sig-\/>r\ =\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};}
+\DoxyCodeLine{00072\ \ \ \}}
+\DoxyCodeLine{00073\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ !=\ NULL)\ \{}
+\DoxyCodeLine{00074\ \ \ \ \ BN\_free(sig-\/>s);}
+\DoxyCodeLine{00075\ \ \ \ \ sig-\/>s\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{00076\ \ \ \}}
+\DoxyCodeLine{00077\ }
+\DoxyCodeLine{00078\ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{00079\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=335pt]{openssl-compat_8c_ae2f28de42b8345422b7ac3b28f330b9b_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{openssl-compat_8c_a4f4b9ece6db658890011cfcf730d18f1}\index{openssl-\/compat.c@{openssl-\/compat.c}!RSA\_get0\_crt\_params@{RSA\_get0\_crt\_params}}
+\index{RSA\_get0\_crt\_params@{RSA\_get0\_crt\_params}!openssl-\/compat.c@{openssl-\/compat.c}}
+\doxysubsubsection{\texorpdfstring{RSA\_get0\_crt\_params()}{RSA\_get0\_crt\_params()}}
+{\footnotesize\ttfamily \label{openssl-compat_8c_a4f4b9ece6db658890011cfcf730d18f1} 
+void RSA\+\_\+get0\+\_\+crt\+\_\+params (\begin{DoxyParamCaption}\item[{const RSA \texorpdfstring{$\ast$}{*}}]{r}{, }\item[{const \mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_a62125ea4e1d748a4a9c1aed9766f451a}{BIGNUM}} \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{dmp1}{, }\item[{const \mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_a62125ea4e1d748a4a9c1aed9766f451a}{BIGNUM}} \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{dmq1}{, }\item[{const \mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_a62125ea4e1d748a4a9c1aed9766f451a}{BIGNUM}} \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{iqmp}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{openssl-compat_8c_source_l00054}{54}} of file \mbox{\hyperlink{openssl-compat_8c_source}{openssl-\/compat.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00056\ \ \ \textcolor{keywordflow}{if}\ (dmp1\ !=\ NULL)}
+\DoxyCodeLine{00057\ \ \ \ \ *dmp1\ =\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>dmp1;}
+\DoxyCodeLine{00058\ \ \ \textcolor{keywordflow}{if}\ (dmq1\ !=\ NULL)}
+\DoxyCodeLine{00059\ \ \ \ \ *dmq1\ =\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>dmq1;}
+\DoxyCodeLine{00060\ \ \ \textcolor{keywordflow}{if}\ (iqmp\ !=\ NULL)}
+\DoxyCodeLine{00061\ \ \ \ \ *iqmp\ =\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>iqmp;}
+\DoxyCodeLine{00062\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{openssl-compat_8c_a4f4b9ece6db658890011cfcf730d18f1_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{openssl-compat_8c_ad0eaa8f2e87045d4abd7b3fc94ab4694}\index{openssl-\/compat.c@{openssl-\/compat.c}!RSA\_get0\_factors@{RSA\_get0\_factors}}
+\index{RSA\_get0\_factors@{RSA\_get0\_factors}!openssl-\/compat.c@{openssl-\/compat.c}}
+\doxysubsubsection{\texorpdfstring{RSA\_get0\_factors()}{RSA\_get0\_factors()}}
+{\footnotesize\ttfamily \label{openssl-compat_8c_ad0eaa8f2e87045d4abd7b3fc94ab4694} 
+void RSA\+\_\+get0\+\_\+factors (\begin{DoxyParamCaption}\item[{const RSA \texorpdfstring{$\ast$}{*}}]{r}{, }\item[{const \mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_a62125ea4e1d748a4a9c1aed9766f451a}{BIGNUM}} \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{p}{, }\item[{const \mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_a62125ea4e1d748a4a9c1aed9766f451a}{BIGNUM}} \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{q}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{openssl-compat_8c_source_l00047}{47}} of file \mbox{\hyperlink{openssl-compat_8c_source}{openssl-\/compat.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00048\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ !=\ NULL)}
+\DoxyCodeLine{00049\ \ \ \ \ *\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>p;}
+\DoxyCodeLine{00050\ \ \ \textcolor{keywordflow}{if}\ (q\ !=\ NULL)}
+\DoxyCodeLine{00051\ \ \ \ \ *q\ =\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>q;}
+\DoxyCodeLine{00052\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{openssl-compat_8c_ad0eaa8f2e87045d4abd7b3fc94ab4694_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{openssl-compat_8c_a96e6deebb87bafb81f7bde3df63e59f3}\index{openssl-\/compat.c@{openssl-\/compat.c}!RSA\_get0\_key@{RSA\_get0\_key}}
+\index{RSA\_get0\_key@{RSA\_get0\_key}!openssl-\/compat.c@{openssl-\/compat.c}}
+\doxysubsubsection{\texorpdfstring{RSA\_get0\_key()}{RSA\_get0\_key()}}
+{\footnotesize\ttfamily \label{openssl-compat_8c_a96e6deebb87bafb81f7bde3df63e59f3} 
+void RSA\+\_\+get0\+\_\+key (\begin{DoxyParamCaption}\item[{const RSA \texorpdfstring{$\ast$}{*}}]{r}{, }\item[{const \mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_a62125ea4e1d748a4a9c1aed9766f451a}{BIGNUM}} \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{n}{, }\item[{const \mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_a62125ea4e1d748a4a9c1aed9766f451a}{BIGNUM}} \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{e}{, }\item[{const \mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_a62125ea4e1d748a4a9c1aed9766f451a}{BIGNUM}} \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{d}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{openssl-compat_8c_source_l00037}{37}} of file \mbox{\hyperlink{openssl-compat_8c_source}{openssl-\/compat.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00039\ \ \ \textcolor{keywordflow}{if}\ (n\ !=\ NULL)}
+\DoxyCodeLine{00040\ \ \ \ \ *n\ =\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>n;}
+\DoxyCodeLine{00041\ \ \ \textcolor{keywordflow}{if}\ (e\ !=\ NULL)}
+\DoxyCodeLine{00042\ \ \ \ \ *e\ =\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>e;}
+\DoxyCodeLine{00043\ \ \ \textcolor{keywordflow}{if}\ (d\ !=\ NULL)}
+\DoxyCodeLine{00044\ \ \ \ \ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ =\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d;}
+\DoxyCodeLine{00045\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{openssl-compat_8c_a96e6deebb87bafb81f7bde3df63e59f3_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{openssl-compat_8c_ada007b0a8f3f9089fed98a22cb2b1554}\index{openssl-\/compat.c@{openssl-\/compat.c}!RSA\_set0\_key@{RSA\_set0\_key}}
+\index{RSA\_set0\_key@{RSA\_set0\_key}!openssl-\/compat.c@{openssl-\/compat.c}}
+\doxysubsubsection{\texorpdfstring{RSA\_set0\_key()}{RSA\_set0\_key()}}
+{\footnotesize\ttfamily \label{openssl-compat_8c_ada007b0a8f3f9089fed98a22cb2b1554} 
+int RSA\+\_\+set0\+\_\+key (\begin{DoxyParamCaption}\item[{RSA \texorpdfstring{$\ast$}{*}}]{r}{, }\item[{\mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_a62125ea4e1d748a4a9c1aed9766f451a}{BIGNUM}} \texorpdfstring{$\ast$}{*}}]{n}{, }\item[{\mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_a62125ea4e1d748a4a9c1aed9766f451a}{BIGNUM}} \texorpdfstring{$\ast$}{*}}]{e}{, }\item[{\mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_a62125ea4e1d748a4a9c1aed9766f451a}{BIGNUM}} \texorpdfstring{$\ast$}{*}}]{d}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{openssl-compat_8c_source_l00013}{13}} of file \mbox{\hyperlink{openssl-compat_8c_source}{openssl-\/compat.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00013\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00014\ \ \ \textcolor{comment}{/*\ If\ the\ fields\ n\ and\ e\ in\ r\ are\ NULL,\ the\ corresponding\ input}}
+\DoxyCodeLine{00015\ \textcolor{comment}{\ \ \ *\ parameters\ MUST\ be\ non-\/NULL\ for\ n\ and\ e.\ \ d\ may\ be}}
+\DoxyCodeLine{00016\ \textcolor{comment}{\ \ \ *\ left\ NULL\ (in\ case\ only\ the\ public\ key\ is\ used).}}
+\DoxyCodeLine{00017\ \textcolor{comment}{\ \ \ */}}
+\DoxyCodeLine{00018\ \ \ \textcolor{keywordflow}{if}\ ((\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>n\ ==\ NULL\ \&\&\ n\ ==\ NULL)\ ||\ (\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>e\ ==\ NULL\ \&\&\ e\ ==\ NULL))}
+\DoxyCodeLine{00019\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00021\ \ \ \textcolor{keywordflow}{if}\ (n\ !=\ NULL)\ \{}
+\DoxyCodeLine{00022\ \ \ \ \ BN\_free(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>n);}
+\DoxyCodeLine{00023\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>n\ =\ n;}
+\DoxyCodeLine{00024\ \ \ \}}
+\DoxyCodeLine{00025\ \ \ \textcolor{keywordflow}{if}\ (e\ !=\ NULL)\ \{}
+\DoxyCodeLine{00026\ \ \ \ \ BN\_free(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>e);}
+\DoxyCodeLine{00027\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>e\ =\ e;}
+\DoxyCodeLine{00028\ \ \ \}}
+\DoxyCodeLine{00029\ \ \ \textcolor{keywordflow}{if}\ (d\ !=\ NULL)\ \{}
+\DoxyCodeLine{00030\ \ \ \ \ BN\_free(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d);}
+\DoxyCodeLine{00031\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}};}
+\DoxyCodeLine{00032\ \ \ \}}
+\DoxyCodeLine{00033\ }
+\DoxyCodeLine{00034\ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{00035\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{openssl-compat_8c_ada007b0a8f3f9089fed98a22cb2b1554_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{openssl-compat_8c_a93acf209ee3e7156a5533958e7e50bb0}\index{openssl-\/compat.c@{openssl-\/compat.c}!STACK\_OF@{STACK\_OF}}
+\index{STACK\_OF@{STACK\_OF}!openssl-\/compat.c@{openssl-\/compat.c}}
+\doxysubsubsection{\texorpdfstring{STACK\_OF()}{STACK\_OF()}}
+{\footnotesize\ttfamily \label{openssl-compat_8c_a93acf209ee3e7156a5533958e7e50bb0} 
+const STACK\+\_\+\+OF (\begin{DoxyParamCaption}\item[{X509\+\_\+\+EXTENSION}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{openssl-compat_8c_source_l00090}{90}} of file \mbox{\hyperlink{openssl-compat_8c_source}{openssl-\/compat.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00091\ \ \ \textcolor{keywordflow}{return}\ x-\/>cert\_info-\/>extensions;}
+\DoxyCodeLine{00092\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=221pt]{openssl-compat_8c_a93acf209ee3e7156a5533958e7e50bb0_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{openssl-compat_8c_a4dbc44b3ea7e769ad8704b1aec815eee}\index{openssl-\/compat.c@{openssl-\/compat.c}!X509\_EXTENSION\_get\_data@{X509\_EXTENSION\_get\_data}}
+\index{X509\_EXTENSION\_get\_data@{X509\_EXTENSION\_get\_data}!openssl-\/compat.c@{openssl-\/compat.c}}
+\doxysubsubsection{\texorpdfstring{X509\_EXTENSION\_get\_data()}{X509\_EXTENSION\_get\_data()}}
+{\footnotesize\ttfamily \label{openssl-compat_8c_a4dbc44b3ea7e769ad8704b1aec815eee} 
+ASN1\+\_\+\+OCTET\+\_\+\+STRING \texorpdfstring{$\ast$}{*} X509\+\_\+\+EXTENSION\+\_\+get\+\_\+data (\begin{DoxyParamCaption}\item[{X509\+\_\+\+EXTENSION \texorpdfstring{$\ast$}{*}}]{ex}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{openssl-compat_8c_source_l00097}{97}} of file \mbox{\hyperlink{openssl-compat_8c_source}{openssl-\/compat.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00098\ \ \ \textcolor{keywordflow}{return}\ ex-\/>value;}
+\DoxyCodeLine{00099\ \}}
+
+\end{DoxyCode}
+\Hypertarget{openssl-compat_8c_a6bdaf92149340326578e982fc4b81f6a}\index{openssl-\/compat.c@{openssl-\/compat.c}!X509\_EXTENSION\_get\_object@{X509\_EXTENSION\_get\_object}}
+\index{X509\_EXTENSION\_get\_object@{X509\_EXTENSION\_get\_object}!openssl-\/compat.c@{openssl-\/compat.c}}
+\doxysubsubsection{\texorpdfstring{X509\_EXTENSION\_get\_object()}{X509\_EXTENSION\_get\_object()}}
+{\footnotesize\ttfamily \label{openssl-compat_8c_a6bdaf92149340326578e982fc4b81f6a} 
+ASN1\+\_\+\+OBJECT \texorpdfstring{$\ast$}{*} X509\+\_\+\+EXTENSION\+\_\+get\+\_\+object (\begin{DoxyParamCaption}\item[{X509\+\_\+\+EXTENSION \texorpdfstring{$\ast$}{*}}]{ex}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{openssl-compat_8c_source_l00094}{94}} of file \mbox{\hyperlink{openssl-compat_8c_source}{openssl-\/compat.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00095\ \ \ \textcolor{keywordflow}{return}\ ex-\/>object;}
+\DoxyCodeLine{00096\ \}}
+
+\end{DoxyCode}

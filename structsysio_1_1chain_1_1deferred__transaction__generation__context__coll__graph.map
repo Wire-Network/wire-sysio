@@ -1,0 +1,9 @@
+<map id="sysio::chain::deferred_transaction_generation_context" name="sysio::chain::deferred_transaction_generation_context">
+<area shape="rect" id="Node000001" title=" " alt="" coords="92,94,251,150"/>
+<area shape="rect" id="Node000002" href="$structfc_1_1reflect__init.html" title=" " alt="" coords="5,5,106,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="83,40,142,91,139,95,79,44"/>
+<area shape="rect" id="Node000003" href="$classfc_1_1sha256.html" title=" " alt="" coords="130,5,213,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="174,47,174,93,169,93,169,47"/>
+<area shape="rect" id="Node000004" href="$structsysio_1_1chain_1_1name.html" title="Immutable except for fc::from_variant." alt="" coords="236,5,368,31"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="287,45,261,72,227,96,224,91,258,68,283,42"/>
+</map>

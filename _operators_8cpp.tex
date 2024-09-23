@@ -1,0 +1,39 @@
+\doxysection{libraries/wasm-\/jit/\+Source/\+IR/\+Operators.cpp File Reference}
+\hypertarget{_operators_8cpp}{}\label{_operators_8cpp}\index{libraries/wasm-\/jit/Source/IR/Operators.cpp@{libraries/wasm-\/jit/Source/IR/Operators.cpp}}
+{\ttfamily \#include "{}Operators.\+h"{}}\newline
+Include dependency graph for Operators.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{_operators_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespace_i_r}{IR}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{_operators_8cpp_a0c71ee5bcdb73fd61e4b983a6120c861}{VISIT\+\_\+\+OPCODE}}(encoding,  \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  name\+String,  Imm, ...)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{_i_r_8h_a0ee024894bb6f700da724f2f1a120abb}{IR\+\_\+\+API}} const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_i_r_a257e1a2dd0295c113d4bdf87dd466f4a}{IR\+::get\+Opcode\+Name}} (\mbox{\hyperlink{namespace_i_r_a59653fd60bb296de971e5f945c66933a}{Opcode}} opcode)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{_operators_8cpp_a0c71ee5bcdb73fd61e4b983a6120c861}\index{Operators.cpp@{Operators.cpp}!VISIT\_OPCODE@{VISIT\_OPCODE}}
+\index{VISIT\_OPCODE@{VISIT\_OPCODE}!Operators.cpp@{Operators.cpp}}
+\doxysubsubsection{\texorpdfstring{VISIT\_OPCODE}{VISIT\_OPCODE}}
+{\footnotesize\ttfamily \label{_operators_8cpp_a0c71ee5bcdb73fd61e4b983a6120c861} 
+\#define VISIT\+\_\+\+OPCODE(\begin{DoxyParamCaption}\item[{}]{encoding}{, }\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{name\+String}{, }\item[{}]{Imm}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordflow}{case}\ Opcode::name:\ \textcolor{keywordflow}{return}\ nameString;}
+
+\end{DoxyCode}

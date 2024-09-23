@@ -1,0 +1,499 @@
+\doxysection{libraries/fc/include/fc/log/logger.hpp File Reference}
+\hypertarget{logger_8hpp}{}\label{logger_8hpp}\index{libraries/fc/include/fc/log/logger.hpp@{libraries/fc/include/fc/log/logger.hpp}}
+{\ttfamily \#include $<$fc/string.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/time.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/log/log\+\_\+message.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/preprocessor/seq/for\+\_\+each.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/preprocessor/seq/enum.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/preprocessor/seq/size.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/preprocessor/seq/seq.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/preprocessor/stringize.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/preprocessor/punctuation/paren.\+hpp$>$}\newline
+Include dependency graph for logger.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{logger_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{logger_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classfc_1_1logger}{fc\+::logger}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacefc}{fc}}
+\begin{DoxyCompactList}\small\item\em namespace \doxylink{namespacesysio_1_1chain}{sysio\+::chain} \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{logger_8hpp_a8c7a288fea519c7e895518f8dff4888f}{DEFAULT\+\_\+\+LOGGER}}~"{}default"{}
+\item 
+\#define \mbox{\hyperlink{logger_8hpp_aca39b0acd8f2d04c4ab97b152d87557d}{FC\+\_\+\+MULTILINE\+\_\+\+MACRO\+\_\+\+BEGIN}}~do \{
+\item 
+\#define \mbox{\hyperlink{logger_8hpp_a593df1a27f2ade3ef3418a67bae4ee9e}{FC\+\_\+\+MULTILINE\+\_\+\+MACRO\+\_\+\+END}}~\} while (0)
+\item 
+\#define \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\+\_\+dlog}}(LOGGER,  FORMAT, ...)
+\item 
+\#define \mbox{\hyperlink{logger_8hpp_a067e87b091ade3787bcdda5775354654}{fc\+\_\+ilog}}(LOGGER,  FORMAT, ...)
+\item 
+\#define \mbox{\hyperlink{logger_8hpp_af3086372b1da6bfce45ff871734f2e8d}{fc\+\_\+wlog}}(LOGGER,  FORMAT, ...)
+\item 
+\#define \mbox{\hyperlink{logger_8hpp_ae75bea0ceb7483fdf0ed20c22556a907}{fc\+\_\+elog}}(LOGGER,  FORMAT, ...)
+\item 
+\#define \mbox{\hyperlink{logger_8hpp_a3da1571bad6ca6c94df9a3660b2115ee}{dlog}}(FORMAT, ...)
+\item 
+\#define \mbox{\hyperlink{logger_8hpp_ac513cc2a5da0419b4e241277d20b37fb}{ulog}}(FORMAT, ...)
+\item 
+\#define \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(FORMAT, ...)
+\item 
+\#define \mbox{\hyperlink{logger_8hpp_a1759e5c9691d8ad754bdf5eff8bb23ac}{wlog}}(FORMAT, ...)
+\item 
+\#define \mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}}(FORMAT, ...)
+\item 
+\#define \mbox{\hyperlink{logger_8hpp_a32d0170fcd76c3c02d02a4c27a9186b8}{FC\+\_\+\+FORMAT\+\_\+\+ARG}}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},  unused,  base)
+\item 
+\#define \mbox{\hyperlink{logger_8hpp_af736c3c039132f8054d706ebb5af5039}{FC\+\_\+\+FORMAT\+\_\+\+ARGS}}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},  unused,  base)
+\item 
+\#define \mbox{\hyperlink{logger_8hpp_a3390a98a18a3f555157b7e8057d11529}{FC\+\_\+\+FORMAT}}(SEQ)
+\item 
+\#define \mbox{\hyperlink{logger_8hpp_aeb3351df93084ed835f9ff7946cde4f7}{FC\+\_\+\+FORMAT\+\_\+\+ARG\+\_\+\+PARAMS}}(...)
+\item 
+\#define \mbox{\hyperlink{logger_8hpp_ac7f967269d8cfcc4cab16d2ec7a04b91}{idump}}(SEQ)
+\item 
+\#define \mbox{\hyperlink{logger_8hpp_a4d1a1f9c3a9f914e9eb0363d72e5fff0}{wdump}}(SEQ)
+\item 
+\#define \mbox{\hyperlink{logger_8hpp_a26aaf645dd9dc96836635d6b18bd1090}{edump}}(SEQ)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{logger_8hpp_a8c7a288fea519c7e895518f8dff4888f}\index{logger.hpp@{logger.hpp}!DEFAULT\_LOGGER@{DEFAULT\_LOGGER}}
+\index{DEFAULT\_LOGGER@{DEFAULT\_LOGGER}!logger.hpp@{logger.hpp}}
+\doxysubsubsection{\texorpdfstring{DEFAULT\_LOGGER}{DEFAULT\_LOGGER}}
+{\footnotesize\ttfamily \label{logger_8hpp_a8c7a288fea519c7e895518f8dff4888f} 
+\#define DEFAULT\+\_\+\+LOGGER~"{}default"{}}
+
+
+
+Definition at line \mbox{\hyperlink{logger_8hpp_source_l00007}{7}} of file \mbox{\hyperlink{logger_8hpp_source}{logger.\+hpp}}.
+
+\Hypertarget{logger_8hpp_a3da1571bad6ca6c94df9a3660b2115ee}\index{logger.hpp@{logger.hpp}!dlog@{dlog}}
+\index{dlog@{dlog}!logger.hpp@{logger.hpp}}
+\doxysubsubsection{\texorpdfstring{dlog}{dlog}}
+{\footnotesize\ttfamily \label{logger_8hpp_a3da1571bad6ca6c94df9a3660b2115ee} 
+\#define dlog(\begin{DoxyParamCaption}\item[{}]{FORMAT}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ FC\_MULTILINE\_MACRO\_BEGIN\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ if(\ (\mbox{\hyperlink{classfc_1_1logger_a4e12ef2e794551d593e497b4b90601ab}{fc::logger::get}}(\mbox{\hyperlink{logger_8hpp_a8c7a288fea519c7e895518f8dff4888f}{DEFAULT\_LOGGER}})).is\_enabled(\ \mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4a30d2de77e71beb8d09d530cac04efa25}{fc::log\_level::debug}}\ )\ )\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ (\mbox{\hyperlink{classfc_1_1logger_a4e12ef2e794551d593e497b4b90601ab}{fc::logger::get}}(\mbox{\hyperlink{logger_8hpp_a8c7a288fea519c7e895518f8dff4888f}{DEFAULT\_LOGGER}})).log(\ \mbox{\hyperlink{log__message_8hpp_a4a4df4bb5cffbe07aadf7d29fd44c75e}{FC\_LOG\_MESSAGE}}(\ \mbox{\hyperlink{environment_8hpp_a398527b3e9e358c345c5047b16871957}{debug}},\ FORMAT,\ \_\_VA\_ARGS\_\_\ )\ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \mbox{\hyperlink{logger_8hpp_a593df1a27f2ade3ef3418a67bae4ee9e}{FC\_MULTILINE\_MACRO\_END}}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{logger_8hpp_source_l00101}{101}} of file \mbox{\hyperlink{logger_8hpp_source}{logger.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00101\ \textcolor{preprocessor}{\#define\ dlog(\ FORMAT,\ ...\ )\ \(\backslash\)}}
+\DoxyCodeLine{00102\ \textcolor{preprocessor}{\ \ FC\_MULTILINE\_MACRO\_BEGIN\ \(\backslash\)}}
+\DoxyCodeLine{00103\ \textcolor{preprocessor}{\ \ \ if(\ (fc::logger::get(DEFAULT\_LOGGER)).is\_enabled(\ fc::log\_level::debug\ )\ )\ \(\backslash\)}}
+\DoxyCodeLine{00104\ \textcolor{preprocessor}{\ \ \ \ \ \ (fc::logger::get(DEFAULT\_LOGGER)).log(\ FC\_LOG\_MESSAGE(\ debug,\ FORMAT,\ \_\_VA\_ARGS\_\_\ )\ );\ \(\backslash\)}}
+\DoxyCodeLine{00105\ \textcolor{preprocessor}{\ \ FC\_MULTILINE\_MACRO\_END}}
+
+\end{DoxyCode}
+\Hypertarget{logger_8hpp_a26aaf645dd9dc96836635d6b18bd1090}\index{logger.hpp@{logger.hpp}!edump@{edump}}
+\index{edump@{edump}!logger.hpp@{logger.hpp}}
+\doxysubsubsection{\texorpdfstring{edump}{edump}}
+{\footnotesize\ttfamily \label{logger_8hpp_a26aaf645dd9dc96836635d6b18bd1090} 
+\#define edump(\begin{DoxyParamCaption}\item[{}]{SEQ}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}}(\ \mbox{\hyperlink{logger_8hpp_a3390a98a18a3f555157b7e8057d11529}{FC\_FORMAT}}(SEQ),\ \mbox{\hyperlink{logger_8hpp_aeb3351df93084ed835f9ff7946cde4f7}{FC\_FORMAT\_ARG\_PARAMS}}(SEQ)\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{logger_8hpp_source_l00162}{162}} of file \mbox{\hyperlink{logger_8hpp_source}{logger.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00162\ \textcolor{preprocessor}{\#define\ edump(\ SEQ\ )\ \(\backslash\)}}
+\DoxyCodeLine{00163\ \textcolor{preprocessor}{\ \ \ \ elog(\ FC\_FORMAT(SEQ),\ FC\_FORMAT\_ARG\_PARAMS(SEQ)\ )\ \ }}
+
+\end{DoxyCode}
+\Hypertarget{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}\index{logger.hpp@{logger.hpp}!elog@{elog}}
+\index{elog@{elog}!logger.hpp@{logger.hpp}}
+\doxysubsubsection{\texorpdfstring{elog}{elog}}
+{\footnotesize\ttfamily \label{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad} 
+\#define elog(\begin{DoxyParamCaption}\item[{}]{FORMAT}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ FC\_MULTILINE\_MACRO\_BEGIN\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ if(\ (\mbox{\hyperlink{classfc_1_1logger_a4e12ef2e794551d593e497b4b90601ab}{fc::logger::get}}(\mbox{\hyperlink{logger_8hpp_a8c7a288fea519c7e895518f8dff4888f}{DEFAULT\_LOGGER}})).is\_enabled(\ \mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4a836fc8bbd6f9c9445879679eb512df49}{fc::log\_level::error}}\ )\ )\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ (\mbox{\hyperlink{classfc_1_1logger_a4e12ef2e794551d593e497b4b90601ab}{fc::logger::get}}(\mbox{\hyperlink{logger_8hpp_a8c7a288fea519c7e895518f8dff4888f}{DEFAULT\_LOGGER}})).log(\ \mbox{\hyperlink{log__message_8hpp_a4a4df4bb5cffbe07aadf7d29fd44c75e}{FC\_LOG\_MESSAGE}}(\ error,\ FORMAT,\ \_\_VA\_ARGS\_\_\ )\ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \mbox{\hyperlink{logger_8hpp_a593df1a27f2ade3ef3418a67bae4ee9e}{FC\_MULTILINE\_MACRO\_END}}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{logger_8hpp_source_l00130}{130}} of file \mbox{\hyperlink{logger_8hpp_source}{logger.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00130\ \textcolor{preprocessor}{\#define\ elog(\ FORMAT,\ ...\ )\ \(\backslash\)}}
+\DoxyCodeLine{00131\ \textcolor{preprocessor}{\ \ FC\_MULTILINE\_MACRO\_BEGIN\ \(\backslash\)}}
+\DoxyCodeLine{00132\ \textcolor{preprocessor}{\ \ \ if(\ (fc::logger::get(DEFAULT\_LOGGER)).is\_enabled(\ fc::log\_level::error\ )\ )\ \(\backslash\)}}
+\DoxyCodeLine{00133\ \textcolor{preprocessor}{\ \ \ \ \ \ (fc::logger::get(DEFAULT\_LOGGER)).log(\ FC\_LOG\_MESSAGE(\ error,\ FORMAT,\ \_\_VA\_ARGS\_\_\ )\ );\ \(\backslash\)}}
+\DoxyCodeLine{00134\ \textcolor{preprocessor}{\ \ FC\_MULTILINE\_MACRO\_END}}
+
+\end{DoxyCode}
+\Hypertarget{logger_8hpp_af5adfcda7e0a01306256754a6511915d}\index{logger.hpp@{logger.hpp}!fc\_dlog@{fc\_dlog}}
+\index{fc\_dlog@{fc\_dlog}!logger.hpp@{logger.hpp}}
+\doxysubsubsection{\texorpdfstring{fc\_dlog}{fc\_dlog}}
+{\footnotesize\ttfamily \label{logger_8hpp_af5adfcda7e0a01306256754a6511915d} 
+\#define fc\+\_\+dlog(\begin{DoxyParamCaption}\item[{}]{LOGGER}{, }\item[{}]{FORMAT}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ FC\_MULTILINE\_MACRO\_BEGIN\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ if(\ (LOGGER).is\_enabled(\ \mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4a30d2de77e71beb8d09d530cac04efa25}{fc::log\_level::debug}}\ )\ )\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ (LOGGER).log(\ \mbox{\hyperlink{log__message_8hpp_a4a4df4bb5cffbe07aadf7d29fd44c75e}{FC\_LOG\_MESSAGE}}(\ \mbox{\hyperlink{environment_8hpp_a398527b3e9e358c345c5047b16871957}{debug}},\ FORMAT,\ \_\_VA\_ARGS\_\_\ )\ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \mbox{\hyperlink{logger_8hpp_a593df1a27f2ade3ef3418a67bae4ee9e}{FC\_MULTILINE\_MACRO\_END}}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{logger_8hpp_source_l00077}{77}} of file \mbox{\hyperlink{logger_8hpp_source}{logger.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00077\ \textcolor{preprocessor}{\#define\ fc\_dlog(\ LOGGER,\ FORMAT,\ ...\ )\ \(\backslash\)}}
+\DoxyCodeLine{00078\ \textcolor{preprocessor}{\ \ FC\_MULTILINE\_MACRO\_BEGIN\ \(\backslash\)}}
+\DoxyCodeLine{00079\ \textcolor{preprocessor}{\ \ \ if(\ (LOGGER).is\_enabled(\ fc::log\_level::debug\ )\ )\ \(\backslash\)}}
+\DoxyCodeLine{00080\ \textcolor{preprocessor}{\ \ \ \ \ \ (LOGGER).log(\ FC\_LOG\_MESSAGE(\ debug,\ FORMAT,\ \_\_VA\_ARGS\_\_\ )\ );\ \(\backslash\)}}
+\DoxyCodeLine{00081\ \textcolor{preprocessor}{\ \ FC\_MULTILINE\_MACRO\_END}}
+
+\end{DoxyCode}
+\Hypertarget{logger_8hpp_ae75bea0ceb7483fdf0ed20c22556a907}\index{logger.hpp@{logger.hpp}!fc\_elog@{fc\_elog}}
+\index{fc\_elog@{fc\_elog}!logger.hpp@{logger.hpp}}
+\doxysubsubsection{\texorpdfstring{fc\_elog}{fc\_elog}}
+{\footnotesize\ttfamily \label{logger_8hpp_ae75bea0ceb7483fdf0ed20c22556a907} 
+\#define fc\+\_\+elog(\begin{DoxyParamCaption}\item[{}]{LOGGER}{, }\item[{}]{FORMAT}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ FC\_MULTILINE\_MACRO\_BEGIN\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ if(\ (LOGGER).is\_enabled(\ \mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4a836fc8bbd6f9c9445879679eb512df49}{fc::log\_level::error}}\ )\ )\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ (LOGGER).log(\ \mbox{\hyperlink{log__message_8hpp_a4a4df4bb5cffbe07aadf7d29fd44c75e}{FC\_LOG\_MESSAGE}}(\ error,\ FORMAT,\ \_\_VA\_ARGS\_\_\ )\ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \mbox{\hyperlink{logger_8hpp_a593df1a27f2ade3ef3418a67bae4ee9e}{FC\_MULTILINE\_MACRO\_END}}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{logger_8hpp_source_l00095}{95}} of file \mbox{\hyperlink{logger_8hpp_source}{logger.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00095\ \textcolor{preprocessor}{\#define\ fc\_elog(\ LOGGER,\ FORMAT,\ ...\ )\ \(\backslash\)}}
+\DoxyCodeLine{00096\ \textcolor{preprocessor}{\ \ FC\_MULTILINE\_MACRO\_BEGIN\ \(\backslash\)}}
+\DoxyCodeLine{00097\ \textcolor{preprocessor}{\ \ \ if(\ (LOGGER).is\_enabled(\ fc::log\_level::error\ )\ )\ \(\backslash\)}}
+\DoxyCodeLine{00098\ \textcolor{preprocessor}{\ \ \ \ \ \ (LOGGER).log(\ FC\_LOG\_MESSAGE(\ error,\ FORMAT,\ \_\_VA\_ARGS\_\_\ )\ );\ \(\backslash\)}}
+\DoxyCodeLine{00099\ \textcolor{preprocessor}{\ \ FC\_MULTILINE\_MACRO\_END}}
+
+\end{DoxyCode}
+\Hypertarget{logger_8hpp_a3390a98a18a3f555157b7e8057d11529}\index{logger.hpp@{logger.hpp}!FC\_FORMAT@{FC\_FORMAT}}
+\index{FC\_FORMAT@{FC\_FORMAT}!logger.hpp@{logger.hpp}}
+\doxysubsubsection{\texorpdfstring{FC\_FORMAT}{FC\_FORMAT}}
+{\footnotesize\ttfamily \label{logger_8hpp_a3390a98a18a3f555157b7e8057d11529} 
+\#define FC\+\_\+\+FORMAT(\begin{DoxyParamCaption}\item[{}]{SEQ}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ BOOST\_PP\_SEQ\_FOR\_EACH(\ \mbox{\hyperlink{logger_8hpp_a32d0170fcd76c3c02d02a4c27a9186b8}{FC\_FORMAT\_ARG}},\ v,\ SEQ\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{logger_8hpp_source_l00150}{150}} of file \mbox{\hyperlink{logger_8hpp_source}{logger.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00150\ \textcolor{preprocessor}{\#define\ FC\_FORMAT(\ SEQ\ )\(\backslash\)}}
+\DoxyCodeLine{00151\ \textcolor{preprocessor}{\ \ \ \ BOOST\_PP\_SEQ\_FOR\_EACH(\ FC\_FORMAT\_ARG,\ v,\ SEQ\ )\ }}
+
+\end{DoxyCode}
+\Hypertarget{logger_8hpp_a32d0170fcd76c3c02d02a4c27a9186b8}\index{logger.hpp@{logger.hpp}!FC\_FORMAT\_ARG@{FC\_FORMAT\_ARG}}
+\index{FC\_FORMAT\_ARG@{FC\_FORMAT\_ARG}!logger.hpp@{logger.hpp}}
+\doxysubsubsection{\texorpdfstring{FC\_FORMAT\_ARG}{FC\_FORMAT\_ARG}}
+{\footnotesize\ttfamily \label{logger_8hpp_a32d0170fcd76c3c02d02a4c27a9186b8} 
+\#define FC\+\_\+\+FORMAT\+\_\+\+ARG(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}}{, }\item[{}]{unused}{, }\item[{}]{base}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ BOOST\_PP\_STRINGIZE(base)\ \textcolor{stringliteral}{"{}:\ \$\{"{}}\ BOOST\_PP\_STRINGIZE(\ base\ )\ \textcolor{stringliteral}{"{}\}\ "{}}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{logger_8hpp_source_l00144}{144}} of file \mbox{\hyperlink{logger_8hpp_source}{logger.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00144\ \textcolor{preprocessor}{\#define\ FC\_FORMAT\_ARG(r,\ unused,\ base)\ \(\backslash\)}}
+\DoxyCodeLine{00145\ \textcolor{preprocessor}{\ \ BOOST\_PP\_STRINGIZE(base)\ "{}:\ \$\{"{}\ BOOST\_PP\_STRINGIZE(\ base\ )\ "{}\}\ "{}}}
+
+\end{DoxyCode}
+\Hypertarget{logger_8hpp_aeb3351df93084ed835f9ff7946cde4f7}\index{logger.hpp@{logger.hpp}!FC\_FORMAT\_ARG\_PARAMS@{FC\_FORMAT\_ARG\_PARAMS}}
+\index{FC\_FORMAT\_ARG\_PARAMS@{FC\_FORMAT\_ARG\_PARAMS}!logger.hpp@{logger.hpp}}
+\doxysubsubsection{\texorpdfstring{FC\_FORMAT\_ARG\_PARAMS}{FC\_FORMAT\_ARG\_PARAMS}}
+{\footnotesize\ttfamily \label{logger_8hpp_aeb3351df93084ed835f9ff7946cde4f7} 
+\#define FC\+\_\+\+FORMAT\+\_\+\+ARG\+\_\+\+PARAMS(\begin{DoxyParamCaption}\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ BOOST\_PP\_SEQ\_FOR\_EACH(\ \mbox{\hyperlink{logger_8hpp_af736c3c039132f8054d706ebb5af5039}{FC\_FORMAT\_ARGS}},\ v,\ \_\_VA\_ARGS\_\_\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{logger_8hpp_source_l00155}{155}} of file \mbox{\hyperlink{logger_8hpp_source}{logger.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00155\ \textcolor{preprocessor}{\#define\ FC\_FORMAT\_ARG\_PARAMS(\ ...\ )\(\backslash\)}}
+\DoxyCodeLine{00156\ \textcolor{preprocessor}{\ \ \ \ BOOST\_PP\_SEQ\_FOR\_EACH(\ FC\_FORMAT\_ARGS,\ v,\ \_\_VA\_ARGS\_\_\ )\ }}
+
+\end{DoxyCode}
+\Hypertarget{logger_8hpp_af736c3c039132f8054d706ebb5af5039}\index{logger.hpp@{logger.hpp}!FC\_FORMAT\_ARGS@{FC\_FORMAT\_ARGS}}
+\index{FC\_FORMAT\_ARGS@{FC\_FORMAT\_ARGS}!logger.hpp@{logger.hpp}}
+\doxysubsubsection{\texorpdfstring{FC\_FORMAT\_ARGS}{FC\_FORMAT\_ARGS}}
+{\footnotesize\ttfamily \label{logger_8hpp_af736c3c039132f8054d706ebb5af5039} 
+\#define FC\+\_\+\+FORMAT\+\_\+\+ARGS(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}}{, }\item[{}]{unused}{, }\item[{}]{base}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ BOOST\_PP\_LPAREN()\ BOOST\_PP\_STRINGIZE(base),\mbox{\hyperlink{namespacefc}{fc}}::variant(base)\ BOOST\_PP\_RPAREN()}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{logger_8hpp_source_l00147}{147}} of file \mbox{\hyperlink{logger_8hpp_source}{logger.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00147\ \textcolor{preprocessor}{\#define\ FC\_FORMAT\_ARGS(r,\ unused,\ base)\ \(\backslash\)}}
+\DoxyCodeLine{00148\ \textcolor{preprocessor}{\ \ BOOST\_PP\_LPAREN()\ BOOST\_PP\_STRINGIZE(base),fc::variant(base)\ BOOST\_PP\_RPAREN()}}
+
+\end{DoxyCode}
+\Hypertarget{logger_8hpp_a067e87b091ade3787bcdda5775354654}\index{logger.hpp@{logger.hpp}!fc\_ilog@{fc\_ilog}}
+\index{fc\_ilog@{fc\_ilog}!logger.hpp@{logger.hpp}}
+\doxysubsubsection{\texorpdfstring{fc\_ilog}{fc\_ilog}}
+{\footnotesize\ttfamily \label{logger_8hpp_a067e87b091ade3787bcdda5775354654} 
+\#define fc\+\_\+ilog(\begin{DoxyParamCaption}\item[{}]{LOGGER}{, }\item[{}]{FORMAT}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ FC\_MULTILINE\_MACRO\_BEGIN\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ if(\ (LOGGER).is\_enabled(\ \mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4afe6da1f3a75c3911b0b59bffaea070e1}{fc::log\_level::info}}\ )\ )\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ (LOGGER).log(\ \mbox{\hyperlink{log__message_8hpp_a4a4df4bb5cffbe07aadf7d29fd44c75e}{FC\_LOG\_MESSAGE}}(\ info,\ FORMAT,\ \_\_VA\_ARGS\_\_\ )\ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \mbox{\hyperlink{logger_8hpp_a593df1a27f2ade3ef3418a67bae4ee9e}{FC\_MULTILINE\_MACRO\_END}}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{logger_8hpp_source_l00083}{83}} of file \mbox{\hyperlink{logger_8hpp_source}{logger.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00083\ \textcolor{preprocessor}{\#define\ fc\_ilog(\ LOGGER,\ FORMAT,\ ...\ )\ \(\backslash\)}}
+\DoxyCodeLine{00084\ \textcolor{preprocessor}{\ \ FC\_MULTILINE\_MACRO\_BEGIN\ \(\backslash\)}}
+\DoxyCodeLine{00085\ \textcolor{preprocessor}{\ \ \ if(\ (LOGGER).is\_enabled(\ fc::log\_level::info\ )\ )\ \(\backslash\)}}
+\DoxyCodeLine{00086\ \textcolor{preprocessor}{\ \ \ \ \ \ (LOGGER).log(\ FC\_LOG\_MESSAGE(\ info,\ FORMAT,\ \_\_VA\_ARGS\_\_\ )\ );\ \(\backslash\)}}
+\DoxyCodeLine{00087\ \textcolor{preprocessor}{\ \ FC\_MULTILINE\_MACRO\_END}}
+
+\end{DoxyCode}
+\Hypertarget{logger_8hpp_aca39b0acd8f2d04c4ab97b152d87557d}\index{logger.hpp@{logger.hpp}!FC\_MULTILINE\_MACRO\_BEGIN@{FC\_MULTILINE\_MACRO\_BEGIN}}
+\index{FC\_MULTILINE\_MACRO\_BEGIN@{FC\_MULTILINE\_MACRO\_BEGIN}!logger.hpp@{logger.hpp}}
+\doxysubsubsection{\texorpdfstring{FC\_MULTILINE\_MACRO\_BEGIN}{FC\_MULTILINE\_MACRO\_BEGIN}}
+{\footnotesize\ttfamily \label{logger_8hpp_aca39b0acd8f2d04c4ab97b152d87557d} 
+\#define FC\+\_\+\+MULTILINE\+\_\+\+MACRO\+\_\+\+BEGIN~do \{}
+
+
+
+Definition at line \mbox{\hyperlink{logger_8hpp_source_l00066}{66}} of file \mbox{\hyperlink{logger_8hpp_source}{logger.\+hpp}}.
+
+\Hypertarget{logger_8hpp_a593df1a27f2ade3ef3418a67bae4ee9e}\index{logger.hpp@{logger.hpp}!FC\_MULTILINE\_MACRO\_END@{FC\_MULTILINE\_MACRO\_END}}
+\index{FC\_MULTILINE\_MACRO\_END@{FC\_MULTILINE\_MACRO\_END}!logger.hpp@{logger.hpp}}
+\doxysubsubsection{\texorpdfstring{FC\_MULTILINE\_MACRO\_END}{FC\_MULTILINE\_MACRO\_END}}
+{\footnotesize\ttfamily \label{logger_8hpp_a593df1a27f2ade3ef3418a67bae4ee9e} 
+\#define FC\+\_\+\+MULTILINE\+\_\+\+MACRO\+\_\+\+END~\} while (0)}
+
+
+
+Definition at line \mbox{\hyperlink{logger_8hpp_source_l00074}{74}} of file \mbox{\hyperlink{logger_8hpp_source}{logger.\+hpp}}.
+
+\Hypertarget{logger_8hpp_af3086372b1da6bfce45ff871734f2e8d}\index{logger.hpp@{logger.hpp}!fc\_wlog@{fc\_wlog}}
+\index{fc\_wlog@{fc\_wlog}!logger.hpp@{logger.hpp}}
+\doxysubsubsection{\texorpdfstring{fc\_wlog}{fc\_wlog}}
+{\footnotesize\ttfamily \label{logger_8hpp_af3086372b1da6bfce45ff871734f2e8d} 
+\#define fc\+\_\+wlog(\begin{DoxyParamCaption}\item[{}]{LOGGER}{, }\item[{}]{FORMAT}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ FC\_MULTILINE\_MACRO\_BEGIN\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ if(\ (LOGGER).is\_enabled(\ \mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4a890c8f6993efee47d617cf72e6b19583}{fc::log\_level::warn}}\ )\ )\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ (LOGGER).log(\ \mbox{\hyperlink{log__message_8hpp_a4a4df4bb5cffbe07aadf7d29fd44c75e}{FC\_LOG\_MESSAGE}}(\ warn,\ FORMAT,\ \_\_VA\_ARGS\_\_\ )\ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \mbox{\hyperlink{logger_8hpp_a593df1a27f2ade3ef3418a67bae4ee9e}{FC\_MULTILINE\_MACRO\_END}}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{logger_8hpp_source_l00089}{89}} of file \mbox{\hyperlink{logger_8hpp_source}{logger.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00089\ \textcolor{preprocessor}{\#define\ fc\_wlog(\ LOGGER,\ FORMAT,\ ...\ )\ \(\backslash\)}}
+\DoxyCodeLine{00090\ \textcolor{preprocessor}{\ \ FC\_MULTILINE\_MACRO\_BEGIN\ \(\backslash\)}}
+\DoxyCodeLine{00091\ \textcolor{preprocessor}{\ \ \ if(\ (LOGGER).is\_enabled(\ fc::log\_level::warn\ )\ )\ \(\backslash\)}}
+\DoxyCodeLine{00092\ \textcolor{preprocessor}{\ \ \ \ \ \ (LOGGER).log(\ FC\_LOG\_MESSAGE(\ warn,\ FORMAT,\ \_\_VA\_ARGS\_\_\ )\ );\ \(\backslash\)}}
+\DoxyCodeLine{00093\ \textcolor{preprocessor}{\ \ FC\_MULTILINE\_MACRO\_END}}
+
+\end{DoxyCode}
+\Hypertarget{logger_8hpp_ac7f967269d8cfcc4cab16d2ec7a04b91}\index{logger.hpp@{logger.hpp}!idump@{idump}}
+\index{idump@{idump}!logger.hpp@{logger.hpp}}
+\doxysubsubsection{\texorpdfstring{idump}{idump}}
+{\footnotesize\ttfamily \label{logger_8hpp_ac7f967269d8cfcc4cab16d2ec7a04b91} 
+\#define idump(\begin{DoxyParamCaption}\item[{}]{SEQ}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\ \mbox{\hyperlink{logger_8hpp_a3390a98a18a3f555157b7e8057d11529}{FC\_FORMAT}}(SEQ),\ \mbox{\hyperlink{logger_8hpp_aeb3351df93084ed835f9ff7946cde4f7}{FC\_FORMAT\_ARG\_PARAMS}}(SEQ)\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{logger_8hpp_source_l00158}{158}} of file \mbox{\hyperlink{logger_8hpp_source}{logger.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00158\ \textcolor{preprocessor}{\#define\ idump(\ SEQ\ )\ \(\backslash\)}}
+\DoxyCodeLine{00159\ \textcolor{preprocessor}{\ \ \ \ ilog(\ FC\_FORMAT(SEQ),\ FC\_FORMAT\_ARG\_PARAMS(SEQ)\ )\ \ }}
+
+\end{DoxyCode}
+\Hypertarget{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}\index{logger.hpp@{logger.hpp}!ilog@{ilog}}
+\index{ilog@{ilog}!logger.hpp@{logger.hpp}}
+\doxysubsubsection{\texorpdfstring{ilog}{ilog}}
+{\footnotesize\ttfamily \label{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb} 
+\#define ilog(\begin{DoxyParamCaption}\item[{}]{FORMAT}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ FC\_MULTILINE\_MACRO\_BEGIN\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ if(\ (\mbox{\hyperlink{classfc_1_1logger_a4e12ef2e794551d593e497b4b90601ab}{fc::logger::get}}(\mbox{\hyperlink{logger_8hpp_a8c7a288fea519c7e895518f8dff4888f}{DEFAULT\_LOGGER}})).is\_enabled(\ \mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4afe6da1f3a75c3911b0b59bffaea070e1}{fc::log\_level::info}}\ )\ )\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ (\mbox{\hyperlink{classfc_1_1logger_a4e12ef2e794551d593e497b4b90601ab}{fc::logger::get}}(\mbox{\hyperlink{logger_8hpp_a8c7a288fea519c7e895518f8dff4888f}{DEFAULT\_LOGGER}})).log(\ \mbox{\hyperlink{log__message_8hpp_a4a4df4bb5cffbe07aadf7d29fd44c75e}{FC\_LOG\_MESSAGE}}(\ info,\ FORMAT,\ \_\_VA\_ARGS\_\_\ )\ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \mbox{\hyperlink{logger_8hpp_a593df1a27f2ade3ef3418a67bae4ee9e}{FC\_MULTILINE\_MACRO\_END}}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{logger_8hpp_source_l00118}{118}} of file \mbox{\hyperlink{logger_8hpp_source}{logger.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00118\ \textcolor{preprocessor}{\#define\ ilog(\ FORMAT,\ ...\ )\ \(\backslash\)}}
+\DoxyCodeLine{00119\ \textcolor{preprocessor}{\ \ FC\_MULTILINE\_MACRO\_BEGIN\ \(\backslash\)}}
+\DoxyCodeLine{00120\ \textcolor{preprocessor}{\ \ \ if(\ (fc::logger::get(DEFAULT\_LOGGER)).is\_enabled(\ fc::log\_level::info\ )\ )\ \(\backslash\)}}
+\DoxyCodeLine{00121\ \textcolor{preprocessor}{\ \ \ \ \ \ (fc::logger::get(DEFAULT\_LOGGER)).log(\ FC\_LOG\_MESSAGE(\ info,\ FORMAT,\ \_\_VA\_ARGS\_\_\ )\ );\ \(\backslash\)}}
+\DoxyCodeLine{00122\ \textcolor{preprocessor}{\ \ FC\_MULTILINE\_MACRO\_END}}
+
+\end{DoxyCode}
+\Hypertarget{logger_8hpp_ac513cc2a5da0419b4e241277d20b37fb}\index{logger.hpp@{logger.hpp}!ulog@{ulog}}
+\index{ulog@{ulog}!logger.hpp@{logger.hpp}}
+\doxysubsubsection{\texorpdfstring{ulog}{ulog}}
+{\footnotesize\ttfamily \label{logger_8hpp_ac513cc2a5da0419b4e241277d20b37fb} 
+\#define ulog(\begin{DoxyParamCaption}\item[{}]{FORMAT}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ FC\_MULTILINE\_MACRO\_BEGIN\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ if(\ (\mbox{\hyperlink{classfc_1_1logger_a4e12ef2e794551d593e497b4b90601ab}{fc::logger::get}}(\textcolor{stringliteral}{"{}user"{}})).is\_enabled(\ \mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4a30d2de77e71beb8d09d530cac04efa25}{fc::log\_level::debug}}\ )\ )\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ (\mbox{\hyperlink{classfc_1_1logger_a4e12ef2e794551d593e497b4b90601ab}{fc::logger::get}}(\textcolor{stringliteral}{"{}user"{}})).log(\ \mbox{\hyperlink{log__message_8hpp_a4a4df4bb5cffbe07aadf7d29fd44c75e}{FC\_LOG\_MESSAGE}}(\ \mbox{\hyperlink{environment_8hpp_a398527b3e9e358c345c5047b16871957}{debug}},\ FORMAT,\ \_\_VA\_ARGS\_\_\ )\ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \mbox{\hyperlink{logger_8hpp_a593df1a27f2ade3ef3418a67bae4ee9e}{FC\_MULTILINE\_MACRO\_END}}}
+
+\end{DoxyCode}
+Sends the log message to a special \textquotesingle{}user\textquotesingle{} log stream designed for messages that the end user may like to see. 
+
+Definition at line \mbox{\hyperlink{logger_8hpp_source_l00111}{111}} of file \mbox{\hyperlink{logger_8hpp_source}{logger.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00111\ \textcolor{preprocessor}{\#define\ ulog(\ FORMAT,\ ...\ )\ \(\backslash\)}}
+\DoxyCodeLine{00112\ \textcolor{preprocessor}{\ \ FC\_MULTILINE\_MACRO\_BEGIN\ \(\backslash\)}}
+\DoxyCodeLine{00113\ \textcolor{preprocessor}{\ \ \ if(\ (fc::logger::get("{}user"{})).is\_enabled(\ fc::log\_level::debug\ )\ )\ \(\backslash\)}}
+\DoxyCodeLine{00114\ \textcolor{preprocessor}{\ \ \ \ \ \ (fc::logger::get("{}user"{})).log(\ FC\_LOG\_MESSAGE(\ debug,\ FORMAT,\ \_\_VA\_ARGS\_\_\ )\ );\ \(\backslash\)}}
+\DoxyCodeLine{00115\ \textcolor{preprocessor}{\ \ FC\_MULTILINE\_MACRO\_END}}
+
+\end{DoxyCode}
+\Hypertarget{logger_8hpp_a4d1a1f9c3a9f914e9eb0363d72e5fff0}\index{logger.hpp@{logger.hpp}!wdump@{wdump}}
+\index{wdump@{wdump}!logger.hpp@{logger.hpp}}
+\doxysubsubsection{\texorpdfstring{wdump}{wdump}}
+{\footnotesize\ttfamily \label{logger_8hpp_a4d1a1f9c3a9f914e9eb0363d72e5fff0} 
+\#define wdump(\begin{DoxyParamCaption}\item[{}]{SEQ}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{logger_8hpp_a1759e5c9691d8ad754bdf5eff8bb23ac}{wlog}}(\ \mbox{\hyperlink{logger_8hpp_a3390a98a18a3f555157b7e8057d11529}{FC\_FORMAT}}(SEQ),\ \mbox{\hyperlink{logger_8hpp_aeb3351df93084ed835f9ff7946cde4f7}{FC\_FORMAT\_ARG\_PARAMS}}(SEQ)\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{logger_8hpp_source_l00160}{160}} of file \mbox{\hyperlink{logger_8hpp_source}{logger.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00160\ \textcolor{preprocessor}{\#define\ wdump(\ SEQ\ )\ \(\backslash\)}}
+\DoxyCodeLine{00161\ \textcolor{preprocessor}{\ \ \ \ wlog(\ FC\_FORMAT(SEQ),\ FC\_FORMAT\_ARG\_PARAMS(SEQ)\ )\ \ }}
+
+\end{DoxyCode}
+\Hypertarget{logger_8hpp_a1759e5c9691d8ad754bdf5eff8bb23ac}\index{logger.hpp@{logger.hpp}!wlog@{wlog}}
+\index{wlog@{wlog}!logger.hpp@{logger.hpp}}
+\doxysubsubsection{\texorpdfstring{wlog}{wlog}}
+{\footnotesize\ttfamily \label{logger_8hpp_a1759e5c9691d8ad754bdf5eff8bb23ac} 
+\#define wlog(\begin{DoxyParamCaption}\item[{}]{FORMAT}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ FC\_MULTILINE\_MACRO\_BEGIN\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ if(\ (\mbox{\hyperlink{classfc_1_1logger_a4e12ef2e794551d593e497b4b90601ab}{fc::logger::get}}(\mbox{\hyperlink{logger_8hpp_a8c7a288fea519c7e895518f8dff4888f}{DEFAULT\_LOGGER}})).is\_enabled(\ \mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4a890c8f6993efee47d617cf72e6b19583}{fc::log\_level::warn}}\ )\ )\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ (\mbox{\hyperlink{classfc_1_1logger_a4e12ef2e794551d593e497b4b90601ab}{fc::logger::get}}(\mbox{\hyperlink{logger_8hpp_a8c7a288fea519c7e895518f8dff4888f}{DEFAULT\_LOGGER}})).log(\ \mbox{\hyperlink{log__message_8hpp_a4a4df4bb5cffbe07aadf7d29fd44c75e}{FC\_LOG\_MESSAGE}}(\ warn,\ FORMAT,\ \_\_VA\_ARGS\_\_\ )\ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \mbox{\hyperlink{logger_8hpp_a593df1a27f2ade3ef3418a67bae4ee9e}{FC\_MULTILINE\_MACRO\_END}}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{logger_8hpp_source_l00124}{124}} of file \mbox{\hyperlink{logger_8hpp_source}{logger.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00124\ \textcolor{preprocessor}{\#define\ wlog(\ FORMAT,\ ...\ )\ \(\backslash\)}}
+\DoxyCodeLine{00125\ \textcolor{preprocessor}{\ \ FC\_MULTILINE\_MACRO\_BEGIN\ \(\backslash\)}}
+\DoxyCodeLine{00126\ \textcolor{preprocessor}{\ \ \ if(\ (fc::logger::get(DEFAULT\_LOGGER)).is\_enabled(\ fc::log\_level::warn\ )\ )\ \(\backslash\)}}
+\DoxyCodeLine{00127\ \textcolor{preprocessor}{\ \ \ \ \ \ (fc::logger::get(DEFAULT\_LOGGER)).log(\ FC\_LOG\_MESSAGE(\ warn,\ FORMAT,\ \_\_VA\_ARGS\_\_\ )\ );\ \(\backslash\)}}
+\DoxyCodeLine{00128\ \textcolor{preprocessor}{\ \ FC\_MULTILINE\_MACRO\_END}}
+
+\end{DoxyCode}

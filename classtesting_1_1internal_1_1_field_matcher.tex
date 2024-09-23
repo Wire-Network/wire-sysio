@@ -1,0 +1,147 @@
+\doxysection{testing\+::internal\+::Field\+Matcher\texorpdfstring{$<$}{<} Class, Field\+Type \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classtesting_1_1internal_1_1_field_matcher}{}\label{classtesting_1_1internal_1_1_field_matcher}\index{testing::internal::FieldMatcher$<$ Class, FieldType $>$@{testing::internal::FieldMatcher$<$ Class, FieldType $>$}}
+
+
+{\ttfamily \#include $<$gmock-\/matchers.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_field_matcher_adf3435dcc9592b75e474cc90b1424952}{Field\+Matcher}} (Field\+Type Class\+::\texorpdfstring{$\ast$}{*}\mbox{\hyperlink{hello__driver_8cpp_a0b6f424d9a532680c6b2ca5c119c938b}{field}}, const \mbox{\hyperlink{classtesting_1_1_matcher}{Matcher}}$<$ const Field\+Type \& $>$ \&matcher)
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_field_matcher_a3247ee028b4246409e8083c582ebd200}{Field\+Matcher}} (const std\+::string \&field\+\_\+name, Field\+Type Class\+::\texorpdfstring{$\ast$}{*}\mbox{\hyperlink{hello__driver_8cpp_a0b6f424d9a532680c6b2ca5c119c938b}{field}}, const \mbox{\hyperlink{classtesting_1_1_matcher}{Matcher}}$<$ const Field\+Type \& $>$ \&matcher)
+\item 
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_field_matcher_af0726e67962870bed9f3b184b3edb22e}{Describe\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}os) const
+\item 
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_field_matcher_a3d8eb433d6a765f8d59b3b07704c3d80}{Describe\+Negation\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}os) const
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\bool \mbox{\hyperlink{classtesting_1_1internal_1_1_field_matcher_ac0cf950415d64026bc28eb84e6296f1b}{Match\+And\+Explain}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}, \mbox{\hyperlink{classtesting_1_1_match_result_listener}{Match\+Result\+Listener}} \texorpdfstring{$\ast$}{*}listener) const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Class, typename Field\+Type$>$\newline
+class testing\+::internal\+::\+Field\+Matcher$<$ Class, Field\+Type $>$}
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l02452}{2452}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_field_matcher_adf3435dcc9592b75e474cc90b1424952}\index{testing::internal::FieldMatcher$<$ Class, FieldType $>$@{testing::internal::FieldMatcher$<$ Class, FieldType $>$}!FieldMatcher@{FieldMatcher}}
+\index{FieldMatcher@{FieldMatcher}!testing::internal::FieldMatcher$<$ Class, FieldType $>$@{testing::internal::FieldMatcher$<$ Class, FieldType $>$}}
+\doxysubsubsection{\texorpdfstring{FieldMatcher()}{FieldMatcher()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_field_matcher_adf3435dcc9592b75e474cc90b1424952} 
+template$<$typename Class , typename Field\+Type $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_field_matcher}{testing\+::internal\+::\+Field\+Matcher}}$<$ Class, Field\+Type $>$\+::\+Field\+Matcher (\begin{DoxyParamCaption}\item[{Field\+Type Class\+::\texorpdfstring{$\ast$}{*}}]{field}{, }\item[{const \mbox{\hyperlink{classtesting_1_1_matcher}{Matcher}}$<$ const Field\+Type \& $>$ \&}]{matcher}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l02454}{2454}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02456\ \ \ \ \ \ \ :\ field\_(\mbox{\hyperlink{hello__driver_8cpp_a0b6f424d9a532680c6b2ca5c119c938b}{field}}),\ matcher\_(matcher),\ whose\_field\_(\textcolor{stringliteral}{"{}whose\ given\ field\ "{}})\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1internal_1_1_field_matcher_a3247ee028b4246409e8083c582ebd200}\index{testing::internal::FieldMatcher$<$ Class, FieldType $>$@{testing::internal::FieldMatcher$<$ Class, FieldType $>$}!FieldMatcher@{FieldMatcher}}
+\index{FieldMatcher@{FieldMatcher}!testing::internal::FieldMatcher$<$ Class, FieldType $>$@{testing::internal::FieldMatcher$<$ Class, FieldType $>$}}
+\doxysubsubsection{\texorpdfstring{FieldMatcher()}{FieldMatcher()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_field_matcher_a3247ee028b4246409e8083c582ebd200} 
+template$<$typename Class , typename Field\+Type $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_field_matcher}{testing\+::internal\+::\+Field\+Matcher}}$<$ Class, Field\+Type $>$\+::\+Field\+Matcher (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{field\+\_\+name}{, }\item[{Field\+Type Class\+::\texorpdfstring{$\ast$}{*}}]{field}{, }\item[{const \mbox{\hyperlink{classtesting_1_1_matcher}{Matcher}}$<$ const Field\+Type \& $>$ \&}]{matcher}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l02458}{2458}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02460\ \ \ \ \ \ \ :\ field\_(\mbox{\hyperlink{hello__driver_8cpp_a0b6f424d9a532680c6b2ca5c119c938b}{field}}),}
+\DoxyCodeLine{02461\ \ \ \ \ \ \ \ \ matcher\_(matcher),}
+\DoxyCodeLine{02462\ \ \ \ \ \ \ \ \ whose\_field\_(\textcolor{stringliteral}{"{}whose\ field\ \`{}"{}}\ +\ field\_name\ +\ \textcolor{stringliteral}{"{}\`{}\ "{}})\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_field_matcher_a3d8eb433d6a765f8d59b3b07704c3d80}\index{testing::internal::FieldMatcher$<$ Class, FieldType $>$@{testing::internal::FieldMatcher$<$ Class, FieldType $>$}!DescribeNegationTo@{DescribeNegationTo}}
+\index{DescribeNegationTo@{DescribeNegationTo}!testing::internal::FieldMatcher$<$ Class, FieldType $>$@{testing::internal::FieldMatcher$<$ Class, FieldType $>$}}
+\doxysubsubsection{\texorpdfstring{DescribeNegationTo()}{DescribeNegationTo()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_field_matcher_a3d8eb433d6a765f8d59b3b07704c3d80} 
+template$<$typename Class , typename Field\+Type $>$ \\
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_field_matcher}{testing\+::internal\+::\+Field\+Matcher}}$<$ Class, Field\+Type $>$\+::\+Describe\+Negation\+To (\begin{DoxyParamCaption}\item[{\+::std\+::ostream \texorpdfstring{$\ast$}{*}}]{os}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l02469}{2469}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02469\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02470\ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}is\ an\ object\ "{}}\ <<\ whose\_field\_;}
+\DoxyCodeLine{02471\ \ \ \ \ matcher\_.\mbox{\hyperlink{classtesting_1_1internal_1_1_matcher_base_ac1089d49b6b8a381900618985cd69b7f}{DescribeNegationTo}}(os);}
+\DoxyCodeLine{02472\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_field_matcher_a3d8eb433d6a765f8d59b3b07704c3d80_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_field_matcher_af0726e67962870bed9f3b184b3edb22e}\index{testing::internal::FieldMatcher$<$ Class, FieldType $>$@{testing::internal::FieldMatcher$<$ Class, FieldType $>$}!DescribeTo@{DescribeTo}}
+\index{DescribeTo@{DescribeTo}!testing::internal::FieldMatcher$<$ Class, FieldType $>$@{testing::internal::FieldMatcher$<$ Class, FieldType $>$}}
+\doxysubsubsection{\texorpdfstring{DescribeTo()}{DescribeTo()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_field_matcher_af0726e67962870bed9f3b184b3edb22e} 
+template$<$typename Class , typename Field\+Type $>$ \\
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_field_matcher}{testing\+::internal\+::\+Field\+Matcher}}$<$ Class, Field\+Type $>$\+::\+Describe\+To (\begin{DoxyParamCaption}\item[{\+::std\+::ostream \texorpdfstring{$\ast$}{*}}]{os}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l02464}{2464}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02464\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02465\ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}is\ an\ object\ "{}}\ <<\ whose\_field\_;}
+\DoxyCodeLine{02466\ \ \ \ \ matcher\_.\mbox{\hyperlink{classtesting_1_1internal_1_1_matcher_base_a7e0c883c7745e0d646463077ef1c1267}{DescribeTo}}(os);}
+\DoxyCodeLine{02467\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_field_matcher_af0726e67962870bed9f3b184b3edb22e_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_field_matcher_ac0cf950415d64026bc28eb84e6296f1b}\index{testing::internal::FieldMatcher$<$ Class, FieldType $>$@{testing::internal::FieldMatcher$<$ Class, FieldType $>$}!MatchAndExplain@{MatchAndExplain}}
+\index{MatchAndExplain@{MatchAndExplain}!testing::internal::FieldMatcher$<$ Class, FieldType $>$@{testing::internal::FieldMatcher$<$ Class, FieldType $>$}}
+\doxysubsubsection{\texorpdfstring{MatchAndExplain()}{MatchAndExplain()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_field_matcher_ac0cf950415d64026bc28eb84e6296f1b} 
+template$<$typename Class , typename Field\+Type $>$ \\
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+bool \mbox{\hyperlink{classtesting_1_1internal_1_1_field_matcher}{testing\+::internal\+::\+Field\+Matcher}}$<$ Class, Field\+Type $>$\+::\+Match\+And\+Explain (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{value}{, }\item[{\mbox{\hyperlink{classtesting_1_1_match_result_listener}{Match\+Result\+Listener}} \texorpdfstring{$\ast$}{*}}]{listener}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l02475}{2475}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02475\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02476\ \ \ \ \ \textcolor{keywordflow}{return}\ MatchAndExplainImpl(}
+\DoxyCodeLine{02477\ \ \ \ \ \ \ \ \ typename\ ::testing::internal::}
+\DoxyCodeLine{02478\ \ \ \ \ \ \ \ \ \ \ \ \ is\_pointer<\mbox{\hyperlink{gtest-internal_8h_a2ffec8c60510eb130af387f5ce9a756a}{GTEST\_REMOVE\_CONST\_}}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}})>::type(),}
+\DoxyCodeLine{02479\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\ listener);}
+\DoxyCodeLine{02480\ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/include/gmock/\mbox{\hyperlink{gmock-matchers_8h}{gmock-\/matchers.\+h}}\end{DoxyCompactItemize}

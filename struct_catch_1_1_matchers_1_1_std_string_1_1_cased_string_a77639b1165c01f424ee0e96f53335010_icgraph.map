@@ -1,0 +1,11 @@
+<map id="Catch::Matchers::StdString::CasedString::adjustString" name="Catch::Matchers::StdString::CasedString::adjustString">
+<area shape="rect" id="Node000001" title=" " alt="" coords="236,104,416,145"/>
+<area shape="rect" id="Node000002" href="$struct_catch_1_1_matchers_1_1_std_string_1_1_contains_matcher.html#a630628b234b037be83fe587081a80b53" title=" " alt="" coords="6,5,187,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="269,99,187,61,156,49,158,44,189,57,271,95"/>
+<area shape="rect" id="Node000003" href="$struct_catch_1_1_matchers_1_1_std_string_1_1_ends_with_matcher.html#aca2741fa57374a2a98d2a84ac3e13a6d" title=" " alt="" coords="6,71,187,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="220,112,187,107,188,102,221,106"/>
+<area shape="rect" id="Node000004" href="$struct_catch_1_1_matchers_1_1_std_string_1_1_equals_matcher.html#a0bb9d64693f7bb1ef7441062d219f21a" title=" " alt="" coords="6,136,187,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="221,142,188,146,187,141,220,136"/>
+<area shape="rect" id="Node000005" href="$struct_catch_1_1_matchers_1_1_std_string_1_1_starts_with_matcher.html#a7da4747aed0c48989d8be59a89e2b7fb" title=" " alt="" coords="5,201,188,242"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="270,154,189,191,157,203,155,198,187,186,268,149"/>
+</map>

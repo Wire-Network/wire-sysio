@@ -1,0 +1,52 @@
+<map id="TEST" name="TEST">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,209,61,234"/>
+<area shape="rect" id="Node000002" href="$class_generic_string_buffer.html#a42f15c959046d899cb74c3120a6995f9" title=" " alt="" coords="137,5,272,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="34,208,42,177,55,137,77,94,107,57,122,46,125,50,111,61,81,97,60,139,47,179,39,209"/>
+<area shape="rect" id="Node000003" href="$class_generic_string_buffer.html#a725e862b9a78375f5363b0b61ad789f3" title="Get the size of string in bytes in the string buffer." alt="" coords="137,71,272,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="39,207,65,166,84,142,107,122,122,113,124,118,110,126,88,146,69,169,43,210"/>
+<area shape="rect" id="Node000004" href="$class_generic_string_buffer.html#a42079865bab1deb930c6cff7d491c719" title=" " alt="" coords="137,201,272,242"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="61,219,122,219,122,224,61,224"/>
+<area shape="rect" id="Node000007" href="$class_generic_document.html#a510a0588db4eb372f5d81bc3646578fb" title="Whether a parse error has occurred in the last parsing." alt="" coords="109,267,301,307"/>
+<area shape="poly" id="edge8_Node000001_Node000007" title=" " alt="" coords="62,231,110,251,129,258,127,263,108,256,60,236"/>
+<area shape="rect" id="Node000009" href="$class_generic_document.html#a901db1678f99a1b550003eed75bc380a" title="Parse JSON text from a read&#45;only string (with Encoding conversion)" alt="" coords="121,332,289,357"/>
+<area shape="poly" id="edge10_Node000001_Node000009" title=" " alt="" coords="43,234,69,275,88,298,110,317,120,323,117,327,107,321,84,301,64,278,39,236"/>
+<area shape="rect" id="Node000020" href="$class_generic_reader.html#a0c450620d14ff1824e58bb7bd9b42099" title="Parse JSON text." alt="" coords="130,393,280,418"/>
+<area shape="poly" id="edge22_Node000001_Node000020" title=" " alt="" coords="40,234,63,298,83,335,110,368,135,384,132,389,107,372,79,338,58,300,35,236"/>
+<area shape="rect" id="Node000023" href="$class_generic_string_buffer.html#a0dbdb77489b95923795011a24f705be5" title=" " alt="" coords="137,136,272,177"/>
+<area shape="poly" id="edge25_Node000001_Node000023" title=" " alt="" coords="60,207,108,187,127,180,129,185,110,192,62,212"/>
+<area shape="rect" id="Node000005" href="$class_generic_string_buffer.html#a0038e53ba03c271bc4cbbac403ec4de4" title=" " alt="" coords="371,217,537,242"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="273,221,356,224,355,229,273,226"/>
+<area shape="rect" id="Node000006" href="$class_generic_string_buffer.html#a80af78c43da93126a940a40d1889278a" title=" " alt="" coords="386,128,522,169"/>
+<area shape="poly" id="edge6_Node000004_Node000006" title=" " alt="" coords="272,199,371,170,372,175,274,204"/>
+<area shape="poly" id="edge5_Node000005_Node000005" title=" " alt="" coords="413,218,405,208,410,198,427,192,454,190,485,193,500,200,498,205,484,198,454,195,428,198,414,202,411,208,417,215"/>
+<area shape="poly" id="edge7_Node000006_Node000006" title=" " alt="" coords="408,128,405,118,413,109,429,103,454,101,481,104,497,110,495,115,480,109,454,107,430,109,416,113,411,119,413,127"/>
+<area shape="rect" id="Node000008" href="$struct_parse_result.html#adfe0ef5b994e82f8aa9ebf0b30c924b1" title="Whether the result is an error." alt="" coords="384,274,524,300"/>
+<area shape="poly" id="edge9_Node000007_Node000008" title=" " alt="" coords="302,284,368,284,368,290,302,290"/>
+<area shape="rect" id="Node000010" href="$class_generic_document.html#a7bc1827a7ab04de4789fe46237f0e921" title="Parse JSON text from an input stream (with Encoding conversion)" alt="" coords="349,332,559,357"/>
+<area shape="poly" id="edge11_Node000009_Node000010" title=" " alt="" coords="289,350,334,351,334,356,289,356"/>
+<area shape="poly" id="edge21_Node000010_Node000009" title=" " alt="" coords="349,338,304,338,304,333,349,333"/>
+<area shape="rect" id="Node000011" href="$classinternal_1_1_stack.html#aa6f933acc7ecd92a2b567db5fa8cd43a" title=" " alt="" coords="609,381,794,406"/>
+<area shape="poly" id="edge12_Node000010_Node000011" title=" " alt="" coords="523,355,619,375,618,380,522,360"/>
+<area shape="rect" id="Node000012" href="$classinternal_1_1_stack.html#ac484468a2791bd3e9ba609bd1600ab48" title=" " alt="" coords="621,233,782,258"/>
+<area shape="poly" id="edge13_Node000010_Node000012" title=" " alt="" coords="513,328,558,310,572,300,581,289,591,278,606,267,617,262,620,267,609,272,594,282,585,293,576,304,561,315,515,333"/>
+<area shape="rect" id="Node000013" href="$classinternal_1_1_stack.html#a657ae4d477b25d4e0045aee0efd809c3" title=" " alt="" coords="607,282,796,308"/>
+<area shape="poly" id="edge14_Node000010_Node000013" title=" " alt="" coords="522,328,618,309,619,314,523,333"/>
+<area shape="rect" id="Node000014" href="$class_generic_value.html#ad7502bbfcd0c14f7ece07243d56e2b90" title="Assignment with move semantics." alt="" coords="621,332,782,357"/>
+<area shape="poly" id="edge15_Node000010_Node000014" title=" " alt="" coords="560,342,605,342,605,347,560,347"/>
+<area shape="rect" id="Node000015" href="$class_generic_value.html#abb8ea2dfbe74ff4ee7dac6be31317f81" title="Assignment without calling destructor." alt="" coords="853,308,1026,333"/>
+<area shape="poly" id="edge16_Node000014_Node000015" title=" " alt="" coords="782,334,837,328,837,333,783,339"/>
+<area shape="rect" id="Node000016" href="$class_generic_value.html#a213ba89ef5ef961a5e655bd8c78ac9f4" title="Destructor." alt="" coords="844,357,1035,382"/>
+<area shape="poly" id="edge17_Node000014_Node000016" title=" " alt="" coords="783,350,828,355,828,360,782,356"/>
+<area shape="rect" id="Node000017" href="$class_generic_value.html#a40f567bae6fabbb07822ebac5fe00bfc" title=" " alt="" coords="1093,284,1275,325"/>
+<area shape="poly" id="edge18_Node000016_Node000017" title=" " alt="" coords="994,354,1034,343,1094,327,1095,332,1036,348,995,359"/>
+<area shape="rect" id="Node000018" href="$class_generic_value.html#a8c39af1a639eae1b59db66e2cbb537c9" title=" " alt="" coords="1094,349,1275,390"/>
+<area shape="poly" id="edge19_Node000016_Node000018" title=" " alt="" coords="1035,367,1078,367,1078,372,1035,372"/>
+<area shape="rect" id="Node000019" href="$class_generic_value.html#af182f2ccbcd962d2a28f92407622e9a9" title=" " alt="" coords="1083,414,1285,440"/>
+<area shape="poly" id="edge20_Node000016_Node000019" title=" " alt="" coords="998,381,1112,407,1111,413,997,386"/>
+<area shape="rect" id="Node000021" href="$struct_parse_result.html#a88b6d44f052a19e6436ae6aadc2c40b4" title="Reset error code." alt="" coords="388,405,520,430"/>
+<area shape="poly" id="edge23_Node000020_Node000021" title=" " alt="" coords="281,407,372,411,372,416,280,412"/>
+<area shape="rect" id="Node000022" href="$struct_parse_result.html#aa81b4a7b776b77216cb752385203a8c1" title="Update error code and offset." alt="" coords="641,430,762,456"/>
+<area shape="poly" id="edge24_Node000021_Node000022" title=" " alt="" coords="521,422,626,433,625,438,520,427"/>
+<area shape="poly" id="edge26_Node000023_Node000005" title=" " alt="" coords="274,174,394,209,392,214,272,179"/>
+<area shape="poly" id="edge27_Node000023_Node000006" title=" " alt="" coords="273,152,371,148,371,154,273,157"/>
+</map>

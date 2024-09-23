@@ -1,0 +1,208 @@
+\doxysection{fc\+::crypto\+::r1\+::private\+\_\+key\+\_\+shim Struct Reference}
+\hypertarget{structfc_1_1crypto_1_1r1_1_1private__key__shim}{}\label{structfc_1_1crypto_1_1r1_1_1private__key__shim}\index{fc::crypto::r1::private\_key\_shim@{fc::crypto::r1::private\_key\_shim}}
+
+
+{\ttfamily \#include $<$elliptic\+\_\+r1.\+hpp$>$}
+
+
+
+Inheritance diagram for fc\+::crypto\+::r1\+::private\+\_\+key\+\_\+shim\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=203pt]{structfc_1_1crypto_1_1r1_1_1private__key__shim__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for fc\+::crypto\+::r1\+::private\+\_\+key\+\_\+shim\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=203pt]{structfc_1_1crypto_1_1r1_1_1private__key__shim__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{structfc_1_1crypto_1_1r1_1_1private__key__shim_a673810ed7aa110c64872bf4cb709fc10}{signature\+\_\+type}} = \mbox{\hyperlink{structfc_1_1crypto_1_1r1_1_1signature__shim}{signature\+\_\+shim}}
+\item 
+using \mbox{\hyperlink{structfc_1_1crypto_1_1r1_1_1private__key__shim_a62620b14e3da00e0434862258b184b9f}{public\+\_\+key\+\_\+type}} = \mbox{\hyperlink{structfc_1_1crypto_1_1r1_1_1public__key__shim}{public\+\_\+key\+\_\+shim}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Types inherited from \mbox{\hyperlink{structfc_1_1crypto_1_1shim}{fc\+::crypto\+::shim$<$ private\+\_\+key\+\_\+secret $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{structfc_1_1crypto_1_1shim_af49214f775b60b76c4826a2c988471cf}{data\+\_\+type}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structfc_1_1crypto_1_1r1_1_1private__key__shim_a673810ed7aa110c64872bf4cb709fc10}{signature\+\_\+type}} \mbox{\hyperlink{structfc_1_1crypto_1_1r1_1_1private__key__shim_abc672592c4cb60b767b08c0f683917c9}{sign}} (const \mbox{\hyperlink{classfc_1_1sha256}{sha256}} \&\mbox{\hyperlink{namespacefc_a150ca4cd9c0318ca45dc0dc7df5d58b9}{digest}}, bool require\+\_\+canonical=true) const
+\item 
+\mbox{\hyperlink{structfc_1_1crypto_1_1r1_1_1private__key__shim_a62620b14e3da00e0434862258b184b9f}{public\+\_\+key\+\_\+type}} \mbox{\hyperlink{structfc_1_1crypto_1_1r1_1_1private__key__shim_a6d673533b99deec7cc62ee5126575ebb}{get\+\_\+public\+\_\+key}} () const
+\item 
+\mbox{\hyperlink{classfc_1_1sha512}{sha512}} \mbox{\hyperlink{structfc_1_1crypto_1_1r1_1_1private__key__shim_af917161201febd5585723170e11b4a68}{generate\+\_\+shared\+\_\+secret}} (const \mbox{\hyperlink{structfc_1_1crypto_1_1r1_1_1private__key__shim_a62620b14e3da00e0434862258b184b9f}{public\+\_\+key\+\_\+type}} \&pub\+\_\+key) const
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{structfc_1_1crypto_1_1shim}{fc\+::crypto\+::shim$<$ private\+\_\+key\+\_\+secret $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structfc_1_1crypto_1_1shim_a0fff27d966c42a1759a6192ddd6f7365}{shim}} ()
+\item 
+\mbox{\hyperlink{structfc_1_1crypto_1_1shim_a7aa30b3f06fd5178b96e9a218a763b82}{shim}} (\mbox{\hyperlink{structfc_1_1crypto_1_1shim_af49214f775b60b76c4826a2c988471cf}{data\+\_\+type}} \&\&data)
+\item 
+\mbox{\hyperlink{structfc_1_1crypto_1_1shim_afcd3504a5af0edddcf383efeb89c0acd}{shim}} (const \mbox{\hyperlink{structfc_1_1crypto_1_1shim_af49214f775b60b76c4826a2c988471cf}{data\+\_\+type}} \&data)
+\item 
+const \mbox{\hyperlink{structfc_1_1crypto_1_1shim_af49214f775b60b76c4826a2c988471cf}{data\+\_\+type}} \& \mbox{\hyperlink{structfc_1_1crypto_1_1shim_a4b5c1963c31a11f2415a0dcd481ec49a}{serialize}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static \mbox{\hyperlink{structfc_1_1crypto_1_1r1_1_1private__key__shim}{private\+\_\+key\+\_\+shim}} \mbox{\hyperlink{structfc_1_1crypto_1_1r1_1_1private__key__shim_adca021da556cfe6d75a6fe63f5286f73}{generate}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Public Attributes inherited from \mbox{\hyperlink{structfc_1_1crypto_1_1shim}{fc\+::crypto\+::shim$<$ private\+\_\+key\+\_\+secret $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structfc_1_1crypto_1_1shim_af49214f775b60b76c4826a2c988471cf}{data\+\_\+type}} \mbox{\hyperlink{structfc_1_1crypto_1_1shim_ab5bbf7c7dffffb514761aa79ddbb2079}{\+\_\+data}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{elliptic__r1_8hpp_source_l00153}{153}} of file \mbox{\hyperlink{elliptic__r1_8hpp_source}{elliptic\+\_\+r1.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{structfc_1_1crypto_1_1r1_1_1private__key__shim_a62620b14e3da00e0434862258b184b9f}\index{fc::crypto::r1::private\_key\_shim@{fc::crypto::r1::private\_key\_shim}!public\_key\_type@{public\_key\_type}}
+\index{public\_key\_type@{public\_key\_type}!fc::crypto::r1::private\_key\_shim@{fc::crypto::r1::private\_key\_shim}}
+\doxysubsubsection{\texorpdfstring{public\_key\_type}{public\_key\_type}}
+{\footnotesize\ttfamily \label{structfc_1_1crypto_1_1r1_1_1private__key__shim_a62620b14e3da00e0434862258b184b9f} 
+using \mbox{\hyperlink{structfc_1_1crypto_1_1r1_1_1private__key__shim_a62620b14e3da00e0434862258b184b9f}{fc\+::crypto\+::r1\+::private\+\_\+key\+\_\+shim\+::public\+\_\+key\+\_\+type}} = \mbox{\hyperlink{structfc_1_1crypto_1_1r1_1_1public__key__shim}{public\+\_\+key\+\_\+shim}}}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic__r1_8hpp_source_l00156}{156}} of file \mbox{\hyperlink{elliptic__r1_8hpp_source}{elliptic\+\_\+r1.\+hpp}}.
+
+\Hypertarget{structfc_1_1crypto_1_1r1_1_1private__key__shim_a673810ed7aa110c64872bf4cb709fc10}\index{fc::crypto::r1::private\_key\_shim@{fc::crypto::r1::private\_key\_shim}!signature\_type@{signature\_type}}
+\index{signature\_type@{signature\_type}!fc::crypto::r1::private\_key\_shim@{fc::crypto::r1::private\_key\_shim}}
+\doxysubsubsection{\texorpdfstring{signature\_type}{signature\_type}}
+{\footnotesize\ttfamily \label{structfc_1_1crypto_1_1r1_1_1private__key__shim_a673810ed7aa110c64872bf4cb709fc10} 
+using \mbox{\hyperlink{structfc_1_1crypto_1_1r1_1_1private__key__shim_a673810ed7aa110c64872bf4cb709fc10}{fc\+::crypto\+::r1\+::private\+\_\+key\+\_\+shim\+::signature\+\_\+type}} = \mbox{\hyperlink{structfc_1_1crypto_1_1r1_1_1signature__shim}{signature\+\_\+shim}}}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic__r1_8hpp_source_l00155}{155}} of file \mbox{\hyperlink{elliptic__r1_8hpp_source}{elliptic\+\_\+r1.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structfc_1_1crypto_1_1r1_1_1private__key__shim_adca021da556cfe6d75a6fe63f5286f73}\index{fc::crypto::r1::private\_key\_shim@{fc::crypto::r1::private\_key\_shim}!generate@{generate}}
+\index{generate@{generate}!fc::crypto::r1::private\_key\_shim@{fc::crypto::r1::private\_key\_shim}}
+\doxysubsubsection{\texorpdfstring{generate()}{generate()}}
+{\footnotesize\ttfamily \label{structfc_1_1crypto_1_1r1_1_1private__key__shim_adca021da556cfe6d75a6fe63f5286f73} 
+static \mbox{\hyperlink{structfc_1_1crypto_1_1r1_1_1private__key__shim}{private\+\_\+key\+\_\+shim}} fc\+::crypto\+::r1\+::private\+\_\+key\+\_\+shim\+::generate (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic__r1_8hpp_source_l00173}{173}} of file \mbox{\hyperlink{elliptic__r1_8hpp_source}{elliptic\+\_\+r1.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ private\_key\_shim(\mbox{\hyperlink{classfc_1_1crypto_1_1r1_1_1private__key_ad71aa7d73e57ef9fd7648fb7461177fb}{private\_key::generate}}().get\_secret());}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=330pt]{structfc_1_1crypto_1_1r1_1_1private__key__shim_adca021da556cfe6d75a6fe63f5286f73_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structfc_1_1crypto_1_1r1_1_1private__key__shim_af917161201febd5585723170e11b4a68}\index{fc::crypto::r1::private\_key\_shim@{fc::crypto::r1::private\_key\_shim}!generate\_shared\_secret@{generate\_shared\_secret}}
+\index{generate\_shared\_secret@{generate\_shared\_secret}!fc::crypto::r1::private\_key\_shim@{fc::crypto::r1::private\_key\_shim}}
+\doxysubsubsection{\texorpdfstring{generate\_shared\_secret()}{generate\_shared\_secret()}}
+{\footnotesize\ttfamily \label{structfc_1_1crypto_1_1r1_1_1private__key__shim_af917161201febd5585723170e11b4a68} 
+\mbox{\hyperlink{classfc_1_1sha512}{sha512}} fc\+::crypto\+::r1\+::private\+\_\+key\+\_\+shim\+::generate\+\_\+shared\+\_\+secret (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structfc_1_1crypto_1_1r1_1_1private__key__shim_a62620b14e3da00e0434862258b184b9f}{public\+\_\+key\+\_\+type}} \&}]{pub\+\_\+key}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic__r1_8hpp_source_l00168}{168}} of file \mbox{\hyperlink{elliptic__r1_8hpp_source}{elliptic\+\_\+r1.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1crypto_1_1r1_1_1private__key_abed020ddf6cc239edccce96dbbdb4238}{private\_key::regenerate}}(\mbox{\hyperlink{structfc_1_1crypto_1_1shim_ab5bbf7c7dffffb514761aa79ddbb2079}{\_data}}).\mbox{\hyperlink{classfc_1_1crypto_1_1r1_1_1private__key_a9a312037162a8f847825f0387d9aa59e}{get\_shared\_secret}}(public\_key(pub\_key.serialize()));}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structfc_1_1crypto_1_1r1_1_1private__key__shim_af917161201febd5585723170e11b4a68_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structfc_1_1crypto_1_1r1_1_1private__key__shim_a6d673533b99deec7cc62ee5126575ebb}\index{fc::crypto::r1::private\_key\_shim@{fc::crypto::r1::private\_key\_shim}!get\_public\_key@{get\_public\_key}}
+\index{get\_public\_key@{get\_public\_key}!fc::crypto::r1::private\_key\_shim@{fc::crypto::r1::private\_key\_shim}}
+\doxysubsubsection{\texorpdfstring{get\_public\_key()}{get\_public\_key()}}
+{\footnotesize\ttfamily \label{structfc_1_1crypto_1_1r1_1_1private__key__shim_a6d673533b99deec7cc62ee5126575ebb} 
+\mbox{\hyperlink{structfc_1_1crypto_1_1r1_1_1private__key__shim_a62620b14e3da00e0434862258b184b9f}{public\+\_\+key\+\_\+type}} fc\+::crypto\+::r1\+::private\+\_\+key\+\_\+shim\+::get\+\_\+public\+\_\+key (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic__r1_8hpp_source_l00163}{163}} of file \mbox{\hyperlink{elliptic__r1_8hpp_source}{elliptic\+\_\+r1.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structfc_1_1crypto_1_1r1_1_1private__key__shim_a62620b14e3da00e0434862258b184b9f}{public\_key\_type}}(\mbox{\hyperlink{classfc_1_1crypto_1_1r1_1_1private__key_abed020ddf6cc239edccce96dbbdb4238}{private\_key::regenerate}}(\mbox{\hyperlink{structfc_1_1crypto_1_1shim_ab5bbf7c7dffffb514761aa79ddbb2079}{\_data}}).\mbox{\hyperlink{structfc_1_1crypto_1_1r1_1_1private__key__shim_a6d673533b99deec7cc62ee5126575ebb}{get\_public\_key}}().\mbox{\hyperlink{structfc_1_1crypto_1_1shim_a4b5c1963c31a11f2415a0dcd481ec49a}{serialize}}());}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structfc_1_1crypto_1_1r1_1_1private__key__shim_a6d673533b99deec7cc62ee5126575ebb_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=215pt]{structfc_1_1crypto_1_1r1_1_1private__key__shim_a6d673533b99deec7cc62ee5126575ebb_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structfc_1_1crypto_1_1r1_1_1private__key__shim_abc672592c4cb60b767b08c0f683917c9}\index{fc::crypto::r1::private\_key\_shim@{fc::crypto::r1::private\_key\_shim}!sign@{sign}}
+\index{sign@{sign}!fc::crypto::r1::private\_key\_shim@{fc::crypto::r1::private\_key\_shim}}
+\doxysubsubsection{\texorpdfstring{sign()}{sign()}}
+{\footnotesize\ttfamily \label{structfc_1_1crypto_1_1r1_1_1private__key__shim_abc672592c4cb60b767b08c0f683917c9} 
+\mbox{\hyperlink{structfc_1_1crypto_1_1r1_1_1private__key__shim_a673810ed7aa110c64872bf4cb709fc10}{signature\+\_\+type}} fc\+::crypto\+::r1\+::private\+\_\+key\+\_\+shim\+::sign (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1sha256}{sha256}} \&}]{digest}{, }\item[{bool}]{require\+\_\+canonical}{ = {\ttfamily true}}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic__r1_8hpp_source_l00158}{158}} of file \mbox{\hyperlink{elliptic__r1_8hpp_source}{elliptic\+\_\+r1.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structfc_1_1crypto_1_1r1_1_1private__key__shim_a673810ed7aa110c64872bf4cb709fc10}{signature\_type}}(\mbox{\hyperlink{classfc_1_1crypto_1_1r1_1_1private__key_abed020ddf6cc239edccce96dbbdb4238}{private\_key::regenerate}}(\mbox{\hyperlink{structfc_1_1crypto_1_1shim_ab5bbf7c7dffffb514761aa79ddbb2079}{\_data}}).sign\_compact(\mbox{\hyperlink{namespacefc_a150ca4cd9c0318ca45dc0dc7df5d58b9}{digest}}));}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structfc_1_1crypto_1_1r1_1_1private__key__shim_abc672592c4cb60b767b08c0f683917c9_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/\mbox{\hyperlink{elliptic__r1_8hpp}{elliptic\+\_\+r1.\+hpp}}\end{DoxyCompactItemize}

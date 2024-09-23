@@ -1,0 +1,9 @@
+<map id="GenericPointer&lt; ValueType, Allocator &gt;" name="GenericPointer&lt; ValueType, Allocator &gt;">
+<area shape="rect" id="Node000001" title="Represents a JSON Pointer. Use Pointer for UTF8 encoding and default allocator." alt="" coords="120,139,304,180"/>
+<area shape="rect" id="Node000002" href="$class_crt_allocator.html" title="C&#45;runtime library allocator." alt="" coords="5,13,96,38"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="69,49,94,82,126,113,164,136,162,141,123,117,90,85,64,53"/>
+<area shape="rect" id="Node000003" href="$struct_generic_pointer_1_1_token.html" title="A token is the basic units of internal representation." alt="" coords="120,5,304,46"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="214,62,214,139,209,139,209,62"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="328,13,384,38"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="337,52,270,117,240,141,237,136,266,113,333,48"/>
+</map>

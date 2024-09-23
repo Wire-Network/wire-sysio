@@ -1,0 +1,1124 @@
+\doxysection{websocketpp\+::transport\+::iostream\+::connection\texorpdfstring{$<$}{<} config \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classwebsocketpp_1_1transport_1_1iostream_1_1connection}{}\label{classwebsocketpp_1_1transport_1_1iostream_1_1connection}\index{websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}}
+
+
+{\ttfamily \#include $<$connection.\+hpp$>$}
+
+
+
+Inheritance diagram for websocketpp\+::transport\+::iostream\+::connection\texorpdfstring{$<$}{<} config \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=227pt]{classwebsocketpp_1_1transport_1_1iostream_1_1connection__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for websocketpp\+::transport\+::iostream\+::connection\texorpdfstring{$<$}{<} config \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=227pt]{classwebsocketpp_1_1transport_1_1iostream_1_1connection__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection}{connection}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_afda32ed083d4e272e378e75225e6e26e}{type}}
+\begin{DoxyCompactList}\small\item\em Type of this connection transport component. \end{DoxyCompactList}\item 
+typedef lib\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_afda32ed083d4e272e378e75225e6e26e}{type}} $>$ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a5edb16646621ff775f2529c2a6910c82}{ptr}}
+\begin{DoxyCompactList}\small\item\em Type of a shared pointer to this connection transport component. \end{DoxyCompactList}\item 
+typedef config\+::concurrency\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a24d7deb9e9bdd0f7c48d3c5ff435914d}{concurrency\+\_\+type}}
+\begin{DoxyCompactList}\small\item\em transport concurrency policy \end{DoxyCompactList}\item 
+typedef config\+::alog\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a69b22a7cce2e247dca483bb22805c1be}{alog\+\_\+type}}
+\begin{DoxyCompactList}\small\item\em Type of this transport\textquotesingle{}s access logging policy. \end{DoxyCompactList}\item 
+typedef config\+::elog\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a4d6d7400af7585fb72507c40a2575434}{elog\+\_\+type}}
+\begin{DoxyCompactList}\small\item\em Type of this transport\textquotesingle{}s error logging policy. \end{DoxyCompactList}\item 
+typedef concurrency\+\_\+type\+::scoped\+\_\+lock\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_af12d059c4beaffe3c4e4685a7f121a3e}{scoped\+\_\+lock\+\_\+type}}
+\item 
+typedef concurrency\+\_\+type\+::mutex\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a5e7456b9b53e4c7a8497fc1ee53836ca}{mutex\+\_\+type}}
+\item 
+typedef lib\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{structwebsocketpp_1_1transport_1_1iostream_1_1timer}{timer}} $>$ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_aa993f99a9b31b42fe3ef1ec471cbc2e8}{timer\+\_\+ptr}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a737fcfe26dfda316d9908b819d3580b0}{connection}} (bool is\+\_\+server, \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a69b22a7cce2e247dca483bb22805c1be}{alog\+\_\+type}} \&alog, \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a4d6d7400af7585fb72507c40a2575434}{elog\+\_\+type}} \&\mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}})
+\item 
+\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a5edb16646621ff775f2529c2a6910c82}{ptr}} \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_afab9454b5af00a8edb494fdd2e32a41e}{get\+\_\+shared}} ()
+\begin{DoxyCompactList}\small\item\em Get a shared pointer to this component. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_ad0d1f64845818bb6bebe43fe057e4da2}{register\+\_\+ostream}} (std\+::ostream \texorpdfstring{$\ast$}{*}o)
+\begin{DoxyCompactList}\small\item\em Register a std\+::ostream with the transport for writing output. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a0f5d21e86961b0f3d75c417d5f45d4ac}{set\+\_\+uri}} (\mbox{\hyperlink{namespacewebsocketpp_aae370ea5ac83a8ece7712cb39fc23f5b}{uri\+\_\+ptr}})
+\begin{DoxyCompactList}\small\item\em Set uri hook. \end{DoxyCompactList}\item 
+size\+\_\+t \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a4616555cbee050aec84da1e39a3c34a8}{read\+\_\+some}} (char const \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}, size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})
+\begin{DoxyCompactList}\small\item\em Manual input supply (read some) \end{DoxyCompactList}\item 
+size\+\_\+t \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a4a492425587bf02f557d8f03b8be8dc8}{read\+\_\+all}} (char const \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}, size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})
+\begin{DoxyCompactList}\small\item\em Manual input supply (read all) \end{DoxyCompactList}\item 
+size\+\_\+t \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a72f532fb0a8d339371b8ca112fdd3f66}{readsome}} (char const \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}, size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})
+\begin{DoxyCompactList}\small\item\em Manual input supply (DEPRECATED) \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a88529f4130f75beed493c84c861e66cf}{eof}} ()
+\begin{DoxyCompactList}\small\item\em Signal EOF. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a3fdd2b1f005daafa73bffe45063a7750}{fatal\+\_\+error}} ()
+\begin{DoxyCompactList}\small\item\em Signal transport error. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a34443f9921e85115607304397d43cc8f}{set\+\_\+secure}} (bool \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\begin{DoxyCompactList}\small\item\em Set whether or not this connection is secure. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_aae6fa1869211e9dc8a18d609292bd833}{is\+\_\+secure}} () const
+\begin{DoxyCompactList}\small\item\em Tests whether or not the underlying transport is secure. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a846340a41ebbce1a6a1cecfd9026c2e9}{set\+\_\+remote\+\_\+endpoint}} (std\+::string \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\begin{DoxyCompactList}\small\item\em Set human readable remote endpoint address. \end{DoxyCompactList}\item 
+std\+::string \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_ac1c63528e36a2a60c0efc01a1c17584e}{get\+\_\+remote\+\_\+endpoint}} () const
+\begin{DoxyCompactList}\small\item\em Get human readable remote endpoint address. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}} \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a06d23eee9c6c1bd1a48f7cf8a081bda9}{get\+\_\+handle}} () const
+\begin{DoxyCompactList}\small\item\em Get the connection handle. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_aa993f99a9b31b42fe3ef1ec471cbc2e8}{timer\+\_\+ptr}} \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a7852f9c0dc64d6e51b57b4a28302a602}{set\+\_\+timer}} (long, \mbox{\hyperlink{namespacewebsocketpp_1_1transport_a946cc56ff41139f3002149c15fd87bc9}{timer\+\_\+handler}})
+\begin{DoxyCompactList}\small\item\em \doxylink{struct_call}{Call} back a function after a period of time. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a32740c33406e5484da7f030fb106ae22}{set\+\_\+write\+\_\+handler}} (\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1iostream_abc22b834c2d0c698d6c87e51d5bfad2c}{write\+\_\+handler}} h)
+\begin{DoxyCompactList}\small\item\em Sets the write handler. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_aa035dc6275c5babb99c0cbada8521b5c}{set\+\_\+vector\+\_\+write\+\_\+handler}} (\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1iostream_a21982146513c0b5580786c3af5dd2878}{vector\+\_\+write\+\_\+handler}} h)
+\begin{DoxyCompactList}\small\item\em Sets the vectored write handler. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a37bb9ef90b3d183c238a32cf9f056d4b}{set\+\_\+shutdown\+\_\+handler}} (\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1iostream_a3563ce2cca06b1466f7d76ecb8eb4a0b}{shutdown\+\_\+handler}} h)
+\begin{DoxyCompactList}\small\item\em Sets the shutdown handler. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a771203b134cc012188a07c471907fc76}{init}} (\mbox{\hyperlink{namespacewebsocketpp_1_1transport_aeae75e675c1a334b3b33ab7120b480a5}{init\+\_\+handler}} handler)
+\begin{DoxyCompactList}\small\item\em Initialize the connection transport. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_ad66fa146a7cdc19bfca3e32da23b9c60}{async\+\_\+read\+\_\+at\+\_\+least}} (size\+\_\+t num\+\_\+bytes, char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}, size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}, \mbox{\hyperlink{namespacewebsocketpp_1_1transport_a3a9b2ed54dfcc6ebe7d7e6b4c02f53fb}{read\+\_\+handler}} handler)
+\begin{DoxyCompactList}\small\item\em Initiate an async\+\_\+read for at least num\+\_\+bytes bytes into buf. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a6bc18b4c6b20bb9bc5d0c41cad53d602}{async\+\_\+write}} (char const \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}, size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}, \mbox{\hyperlink{namespacewebsocketpp_1_1transport_addf5d728159e7aa2bce2a0df947b1560}{transport\+::write\+\_\+handler}} handler)
+\begin{DoxyCompactList}\small\item\em Asyncronous Transport Write. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_adcc51157786a27f08ffea25025b6d4f8}{async\+\_\+write}} (std\+::vector$<$ \mbox{\hyperlink{structwebsocketpp_1_1transport_1_1buffer}{buffer}} $>$ const \&bufs, \mbox{\hyperlink{namespacewebsocketpp_1_1transport_addf5d728159e7aa2bce2a0df947b1560}{transport\+::write\+\_\+handler}} handler)
+\begin{DoxyCompactList}\small\item\em Asyncronous Transport Write (scatter-\/gather) \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_ac565af9c7f9e86972fd1c20bc369f06d}{set\+\_\+handle}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}} hdl)
+\begin{DoxyCompactList}\small\item\em Set Connection Handle. \end{DoxyCompactList}\item 
+lib\+::error\+\_\+code \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a0c31a1546701021f547ae2f21126a473}{dispatch}} (\mbox{\hyperlink{namespacewebsocketpp_1_1transport_a6658447b2e10f4c712dd792aad0e0c78}{dispatch\+\_\+handler}} handler)
+\begin{DoxyCompactList}\small\item\em \doxylink{struct_call}{Call} given handler back within the transport\textquotesingle{}s event system (if present) \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a2db617fadc96d53034eae1d0f3f1a68a}{async\+\_\+shutdown}} (\mbox{\hyperlink{namespacewebsocketpp_1_1transport_af39aff6fc4cb76f7df0d5322b734d156}{transport\+::shutdown\+\_\+handler}} handler)
+\begin{DoxyCompactList}\small\item\em Perform cleanup on socket shutdown\+\_\+handler. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+std\+::istream \& \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a9fe305b0c1b1ce99ac822960c3aeb5c7}{operator$>$$>$}} (std\+::istream \&in, \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_afda32ed083d4e272e378e75225e6e26e}{type}} \&t)
+\begin{DoxyCompactList}\small\item\em Overloaded stream input operator. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{classconfig}{config}}$>$\newline
+class websocketpp\+::transport\+::iostream\+::connection$<$ config $>$}
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source_l00060}{60}} of file \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source}{connection.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a69b22a7cce2e247dca483bb22805c1be}\index{websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}!alog\_type@{alog\_type}}
+\index{alog\_type@{alog\_type}!websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{alog\_type}{alog\_type}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a69b22a7cce2e247dca483bb22805c1be} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+config\+::alog\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection}{websocketpp\+::transport\+::iostream\+::connection}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::alog\+\_\+type}
+
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source_l00070}{70}} of file \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source}{connection.\+hpp}}.
+
+\Hypertarget{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a24d7deb9e9bdd0f7c48d3c5ff435914d}\index{websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}!concurrency\_type@{concurrency\_type}}
+\index{concurrency\_type@{concurrency\_type}!websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{concurrency\_type}{concurrency\_type}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a24d7deb9e9bdd0f7c48d3c5ff435914d} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+config\+::concurrency\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection}{websocketpp\+::transport\+::iostream\+::connection}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::concurrency\+\_\+type}
+
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source_l00068}{68}} of file \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source}{connection.\+hpp}}.
+
+\Hypertarget{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a4d6d7400af7585fb72507c40a2575434}\index{websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}!elog\_type@{elog\_type}}
+\index{elog\_type@{elog\_type}!websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{elog\_type}{elog\_type}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a4d6d7400af7585fb72507c40a2575434} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+config\+::elog\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection}{websocketpp\+::transport\+::iostream\+::connection}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::elog\+\_\+type}
+
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source_l00072}{72}} of file \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source}{connection.\+hpp}}.
+
+\Hypertarget{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a5e7456b9b53e4c7a8497fc1ee53836ca}\index{websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}!mutex\_type@{mutex\_type}}
+\index{mutex\_type@{mutex\_type}!websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{mutex\_type}{mutex\_type}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a5e7456b9b53e4c7a8497fc1ee53836ca} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+concurrency\+\_\+type\+::mutex\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection}{websocketpp\+::transport\+::iostream\+::connection}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::mutex\+\_\+type}
+
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source_l00076}{76}} of file \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source}{connection.\+hpp}}.
+
+\Hypertarget{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a5edb16646621ff775f2529c2a6910c82}\index{websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}!ptr@{ptr}}
+\index{ptr@{ptr}!websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{ptr}{ptr}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a5edb16646621ff775f2529c2a6910c82} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+lib\+::shared\+\_\+ptr$<$\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_afda32ed083d4e272e378e75225e6e26e}{type}}$>$ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection}{websocketpp\+::transport\+::iostream\+::connection}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::ptr}
+
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source_l00065}{65}} of file \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source}{connection.\+hpp}}.
+
+\Hypertarget{classwebsocketpp_1_1transport_1_1iostream_1_1connection_af12d059c4beaffe3c4e4685a7f121a3e}\index{websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}!scoped\_lock\_type@{scoped\_lock\_type}}
+\index{scoped\_lock\_type@{scoped\_lock\_type}!websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{scoped\_lock\_type}{scoped\_lock\_type}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1transport_1_1iostream_1_1connection_af12d059c4beaffe3c4e4685a7f121a3e} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+concurrency\+\_\+type\+::scoped\+\_\+lock\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection}{websocketpp\+::transport\+::iostream\+::connection}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::scoped\+\_\+lock\+\_\+type}
+
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source_l00075}{75}} of file \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source}{connection.\+hpp}}.
+
+\Hypertarget{classwebsocketpp_1_1transport_1_1iostream_1_1connection_aa993f99a9b31b42fe3ef1ec471cbc2e8}\index{websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}!timer\_ptr@{timer\_ptr}}
+\index{timer\_ptr@{timer\_ptr}!websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{timer\_ptr}{timer\_ptr}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1transport_1_1iostream_1_1connection_aa993f99a9b31b42fe3ef1ec471cbc2e8} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+lib\+::shared\+\_\+ptr$<$\mbox{\hyperlink{structwebsocketpp_1_1transport_1_1iostream_1_1timer}{timer}}$>$ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection}{websocketpp\+::transport\+::iostream\+::connection}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::timer\+\_\+ptr}
+
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source_l00078}{78}} of file \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source}{connection.\+hpp}}.
+
+\Hypertarget{classwebsocketpp_1_1transport_1_1iostream_1_1connection_afda32ed083d4e272e378e75225e6e26e}\index{websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}!type@{type}}
+\index{type@{type}!websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{type}{type}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1transport_1_1iostream_1_1connection_afda32ed083d4e272e378e75225e6e26e} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection}{connection}}$<$\mbox{\hyperlink{classconfig}{config}}$>$ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection}{websocketpp\+::transport\+::iostream\+::connection}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::type}
+
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source_l00063}{63}} of file \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source}{connection.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a737fcfe26dfda316d9908b819d3580b0}\index{websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}!connection@{connection}}
+\index{connection@{connection}!websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{connection()}{connection()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a737fcfe26dfda316d9908b819d3580b0} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection}{websocketpp\+::transport\+::iostream\+::connection}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::connection (\begin{DoxyParamCaption}\item[{bool}]{is\+\_\+server}{, }\item[{\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a69b22a7cce2e247dca483bb22805c1be}{alog\+\_\+type}} \&}]{alog}{, }\item[{\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a4d6d7400af7585fb72507c40a2575434}{elog\+\_\+type}} \&}]{elog}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source_l00080}{80}} of file \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source}{connection.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ :\ m\_output\_stream(NULL)}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ ,\ m\_reading(\textcolor{keyword}{false})}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ ,\ m\_is\_server(is\_server)}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ ,\ m\_is\_secure(\textcolor{keyword}{false})}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ ,\ m\_alog(alog)}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ ,\ m\_elog(\mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}})}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ ,\ m\_remote\_endpoint(\textcolor{stringliteral}{"{}iostream\ transport"{}})}
+\DoxyCodeLine{00088\ \ \ \ \ \{}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ m\_alog.write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}{log::alevel::devel}},\textcolor{stringliteral}{"{}iostream\ con\ transport\ constructor"{}});}
+\DoxyCodeLine{00090\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classwebsocketpp_1_1transport_1_1iostream_1_1connection_ad66fa146a7cdc19bfca3e32da23b9c60}\index{websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}!async\_read\_at\_least@{async\_read\_at\_least}}
+\index{async\_read\_at\_least@{async\_read\_at\_least}!websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{async\_read\_at\_least()}{async\_read\_at\_least()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1transport_1_1iostream_1_1connection_ad66fa146a7cdc19bfca3e32da23b9c60} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection}{websocketpp\+::transport\+::iostream\+::connection}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::async\+\_\+read\+\_\+at\+\_\+least (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{num\+\_\+bytes}{, }\item[{char \texorpdfstring{$\ast$}{*}}]{buf}{, }\item[{size\+\_\+t}]{len}{, }\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1transport_a3a9b2ed54dfcc6ebe7d7e6b4c02f53fb}{read\+\_\+handler}}}]{handler}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+Initiates an async\+\_\+read request for at least num\+\_\+bytes bytes. The input will be read into buf. \doxylink{struct_a}{A} maximum of len bytes will be input. When the operation is complete, handler will be called with the status and number of bytes read.
+
+This method may or may not call handler from within the initial call. The application should be prepared to accept either.
+
+The application should never call this method a second time before it has been called back for the first read. If this is done, the second read will be called back immediately with a double\+\_\+read error.
+
+If num\+\_\+bytes or len are zero handler will be called back immediately indicating success.
+
+
+\begin{DoxyParams}{Parameters}
+{\em num\+\_\+bytes} & Don\textquotesingle{}t call handler until at least this many bytes have been read. \\
+\hline
+{\em buf} & The buffer to read bytes into \\
+\hline
+{\em len} & The size of buf. At maximum, this many bytes will be read. \\
+\hline
+{\em handler} & The callback to invoke when the operation is complete or ends in an error \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source_l00439}{439}} of file \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source}{connection.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00441\ \ \ \ \ \{}
+\DoxyCodeLine{00442\ \ \ \ \ \ \ \ \ std::stringstream\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{00443\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ <<\ \textcolor{stringliteral}{"{}iostream\_con\ async\_read\_at\_least:\ "{}}\ <<\ num\_bytes;}
+\DoxyCodeLine{00444\ \ \ \ \ \ \ \ \ m\_alog.write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}{log::alevel::devel}},\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.str());}
+\DoxyCodeLine{00445\ }
+\DoxyCodeLine{00446\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (num\_bytes\ >\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})\ \{}
+\DoxyCodeLine{00447\ \ \ \ \ \ \ \ \ \ \ \ \ handler(make\_error\_code(\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1iostream_1_1error_a647b428e260748d7606c92255e1e9737aa185b313b5353e821c3fce4bf62f50a6}{error::invalid\_num\_bytes}}),\textcolor{keywordtype}{size\_t}(0));}
+\DoxyCodeLine{00448\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00449\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00450\ }
+\DoxyCodeLine{00451\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (m\_reading\ ==\ \textcolor{keyword}{true})\ \{}
+\DoxyCodeLine{00452\ \ \ \ \ \ \ \ \ \ \ \ \ handler(make\_error\_code(\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1iostream_1_1error_a647b428e260748d7606c92255e1e9737ac1ae213118c53b4d7eceb10876d88266}{error::double\_read}}),\textcolor{keywordtype}{size\_t}(0));}
+\DoxyCodeLine{00453\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00454\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00455\ }
+\DoxyCodeLine{00456\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (num\_bytes\ ==\ 0\ ||\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ ==\ 0)\ \{}
+\DoxyCodeLine{00457\ \ \ \ \ \ \ \ \ \ \ \ \ handler(lib::error\_code(),\textcolor{keywordtype}{size\_t}(0));}
+\DoxyCodeLine{00458\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00459\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00460\ }
+\DoxyCodeLine{00461\ \ \ \ \ \ \ \ \ m\_buf\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}};}
+\DoxyCodeLine{00462\ \ \ \ \ \ \ \ \ m\_len\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}};}
+\DoxyCodeLine{00463\ \ \ \ \ \ \ \ \ m\_bytes\_needed\ =\ num\_bytes;}
+\DoxyCodeLine{00464\ \ \ \ \ \ \ \ \ m\_read\_handler\ =\ handler;}
+\DoxyCodeLine{00465\ \ \ \ \ \ \ \ \ m\_cursor\ =\ 0;}
+\DoxyCodeLine{00466\ \ \ \ \ \ \ \ \ m\_reading\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00467\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1transport_1_1iostream_1_1connection_ad66fa146a7cdc19bfca3e32da23b9c60_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a2db617fadc96d53034eae1d0f3f1a68a}\index{websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}!async\_shutdown@{async\_shutdown}}
+\index{async\_shutdown@{async\_shutdown}!websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{async\_shutdown()}{async\_shutdown()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a2db617fadc96d53034eae1d0f3f1a68a} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection}{websocketpp\+::transport\+::iostream\+::connection}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::async\+\_\+shutdown (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1transport_af39aff6fc4cb76f7df0d5322b734d156}{transport\+::shutdown\+\_\+handler}}}]{handler}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+If a shutdown handler is set, call it and pass through its return error code. Otherwise assume there is nothing to do and pass through a success code.
+
+
+\begin{DoxyParams}{Parameters}
+{\em handler} & The {\ttfamily shutdown\+\_\+handler} to call back when complete \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source_l00593}{593}} of file \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source}{connection.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00593\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00594\ \ \ \ \ \ \ \ \ lib::error\_code\ ec;}
+\DoxyCodeLine{00595\ }
+\DoxyCodeLine{00596\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (m\_shutdown\_handler)\ \{}
+\DoxyCodeLine{00597\ \ \ \ \ \ \ \ \ \ \ \ \ ec\ =\ m\_shutdown\_handler(m\_connection\_hdl);}
+\DoxyCodeLine{00598\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00599\ }
+\DoxyCodeLine{00600\ \ \ \ \ \ \ \ \ handler(ec);}
+\DoxyCodeLine{00601\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=338pt]{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a2db617fadc96d53034eae1d0f3f1a68a_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a6bc18b4c6b20bb9bc5d0c41cad53d602}\index{websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}!async\_write@{async\_write}}
+\index{async\_write@{async\_write}!websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{async\_write()}{async\_write()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a6bc18b4c6b20bb9bc5d0c41cad53d602} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection}{websocketpp\+::transport\+::iostream\+::connection}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::async\+\_\+write (\begin{DoxyParamCaption}\item[{char const \texorpdfstring{$\ast$}{*}}]{buf}{, }\item[{size\+\_\+t}]{len}{, }\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1transport_addf5d728159e7aa2bce2a0df947b1560}{transport\+::write\+\_\+handler}}}]{handler}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+Write len bytes in buf to the output method. \doxylink{struct_call}{Call} handler to report success or failure. handler may or may not be called during async\+\_\+write, but it must be safe for this to happen.
+
+Will return 0 on success. Other possible errors (not exhaustive) output\+\_\+stream\+\_\+required\+: No output stream was registered to write to bad\+\_\+stream\+: a ostream pass through error
+
+This method will attempt to write to the registered ostream first. If an ostream is not registered it will use the write handler. If neither are registered then an error is passed up to the connection.
+
+
+\begin{DoxyParams}{Parameters}
+{\em buf} & buffer to read bytes from \\
+\hline
+{\em len} & number of bytes to write \\
+\hline
+{\em handler} & Callback to invoke with operation status. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source_l00487}{487}} of file \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source}{connection.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00489\ \ \ \ \ \{}
+\DoxyCodeLine{00490\ \ \ \ \ \ \ \ \ m\_alog.write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}{log::alevel::devel}},\textcolor{stringliteral}{"{}iostream\_con\ async\_write"{}});}
+\DoxyCodeLine{00491\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ TODO:\ lock\ transport\ state?}}
+\DoxyCodeLine{00492\ }
+\DoxyCodeLine{00493\ \ \ \ \ \ \ \ \ lib::error\_code\ ec;}
+\DoxyCodeLine{00494\ }
+\DoxyCodeLine{00495\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (m\_output\_stream)\ \{}
+\DoxyCodeLine{00496\ \ \ \ \ \ \ \ \ \ \ \ \ m\_output\_stream-\/>write(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}});}
+\DoxyCodeLine{00497\ }
+\DoxyCodeLine{00498\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (m\_output\_stream-\/>bad())\ \{}
+\DoxyCodeLine{00499\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ec\ =\ make\_error\_code(\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1iostream_1_1error_a647b428e260748d7606c92255e1e9737ad46c640654d1d96c517444d95d24da45}{error::bad\_stream}});}
+\DoxyCodeLine{00500\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00501\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (m\_write\_handler)\ \{}
+\DoxyCodeLine{00502\ \ \ \ \ \ \ \ \ \ \ \ \ ec\ =\ m\_write\_handler(m\_connection\_hdl,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}});}
+\DoxyCodeLine{00503\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00504\ \ \ \ \ \ \ \ \ \ \ \ \ ec\ =\ make\_error\_code(\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1iostream_1_1error_a647b428e260748d7606c92255e1e9737a92341254bd27c7cb97fb5e1aca5310f3}{error::output\_stream\_required}});}
+\DoxyCodeLine{00505\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00506\ }
+\DoxyCodeLine{00507\ \ \ \ \ \ \ \ \ handler(ec);}
+\DoxyCodeLine{00508\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=317pt]{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a6bc18b4c6b20bb9bc5d0c41cad53d602_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1transport_1_1iostream_1_1connection_adcc51157786a27f08ffea25025b6d4f8}\index{websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}!async\_write@{async\_write}}
+\index{async\_write@{async\_write}!websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{async\_write()}{async\_write()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1transport_1_1iostream_1_1connection_adcc51157786a27f08ffea25025b6d4f8} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection}{websocketpp\+::transport\+::iostream\+::connection}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::async\+\_\+write (\begin{DoxyParamCaption}\item[{std\+::vector$<$ \mbox{\hyperlink{structwebsocketpp_1_1transport_1_1buffer}{buffer}} $>$ const \&}]{bufs}{, }\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1transport_addf5d728159e7aa2bce2a0df947b1560}{transport\+::write\+\_\+handler}}}]{handler}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+Write a sequence of buffers to the output method. \doxylink{struct_call}{Call} handler to report success or failure. handler may or may not be called during async\+\_\+write, but it must be safe for this to happen.
+
+Will return 0 on success. Other possible errors (not exhaustive) output\+\_\+stream\+\_\+required\+: No output stream was registered to write to bad\+\_\+stream\+: a ostream pass through error
+
+This method will attempt to write to the registered ostream first. If an ostream is not registered it will use the write handler. If neither are registered then an error is passed up to the connection.
+
+
+\begin{DoxyParams}{Parameters}
+{\em bufs} & vector of buffers to write \\
+\hline
+{\em handler} & Callback to invoke with operation status. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source_l00527}{527}} of file \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source}{connection.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00529\ \ \ \ \ \{}
+\DoxyCodeLine{00530\ \ \ \ \ \ \ \ \ m\_alog.write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}{log::alevel::devel}},\textcolor{stringliteral}{"{}iostream\_con\ async\_write\ buffer\ list"{}});}
+\DoxyCodeLine{00531\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ TODO:\ lock\ transport\ state?}}
+\DoxyCodeLine{00532\ }
+\DoxyCodeLine{00533\ \ \ \ \ \ \ \ \ lib::error\_code\ ec;}
+\DoxyCodeLine{00534\ }
+\DoxyCodeLine{00535\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (m\_output\_stream)\ \{}
+\DoxyCodeLine{00536\ \ \ \ \ \ \ \ \ \ \ \ \ std::vector<buffer>::const\_iterator\ it;}
+\DoxyCodeLine{00537\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (it\ =\ bufs.begin();\ it\ !=\ bufs.end();\ it++)\ \{}
+\DoxyCodeLine{00538\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_output\_stream-\/>write((*it).buf,(*it).len);}
+\DoxyCodeLine{00539\ }
+\DoxyCodeLine{00540\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (m\_output\_stream-\/>bad())\ \{}
+\DoxyCodeLine{00541\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ec\ =\ make\_error\_code(\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1iostream_1_1error_a647b428e260748d7606c92255e1e9737ad46c640654d1d96c517444d95d24da45}{error::bad\_stream}});}
+\DoxyCodeLine{00542\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00543\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00544\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00545\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (m\_vector\_write\_handler)\ \{}
+\DoxyCodeLine{00546\ \ \ \ \ \ \ \ \ \ \ \ \ ec\ =\ m\_vector\_write\_handler(m\_connection\_hdl,\ bufs);}
+\DoxyCodeLine{00547\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (m\_write\_handler)\ \{}
+\DoxyCodeLine{00548\ \ \ \ \ \ \ \ \ \ \ \ \ std::vector<buffer>::const\_iterator\ it;}
+\DoxyCodeLine{00549\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (it\ =\ bufs.begin();\ it\ !=\ bufs.end();\ it++)\ \{}
+\DoxyCodeLine{00550\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ec\ =\ m\_write\_handler(m\_connection\_hdl,\ (*it).buf,\ (*it).len);}
+\DoxyCodeLine{00551\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ec)\ \{\textcolor{keywordflow}{break};\}}
+\DoxyCodeLine{00552\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00553\ }
+\DoxyCodeLine{00554\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00555\ \ \ \ \ \ \ \ \ \ \ \ \ ec\ =\ make\_error\_code(\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1iostream_1_1error_a647b428e260748d7606c92255e1e9737a92341254bd27c7cb97fb5e1aca5310f3}{error::output\_stream\_required}});}
+\DoxyCodeLine{00556\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00557\ }
+\DoxyCodeLine{00558\ \ \ \ \ \ \ \ \ handler(ec);}
+\DoxyCodeLine{00559\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a0c31a1546701021f547ae2f21126a473}\index{websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}!dispatch@{dispatch}}
+\index{dispatch@{dispatch}!websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{dispatch()}{dispatch()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a0c31a1546701021f547ae2f21126a473} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+lib\+::error\+\_\+code \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection}{websocketpp\+::transport\+::iostream\+::connection}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::dispatch (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1transport_a6658447b2e10f4c712dd792aad0e0c78}{dispatch\+\_\+handler}}}]{handler}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+Invoke a callback within the transport\textquotesingle{}s event system if it has one. If it doesn\textquotesingle{}t, the handler will be invoked immediately before this function returns.
+
+
+\begin{DoxyParams}{Parameters}
+{\em handler} & The callback to invoke\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Whether or not the transport was able to register the handler for callback. 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source_l00580}{580}} of file \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source}{connection.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00580\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00581\ \ \ \ \ \ \ \ \ handler();}
+\DoxyCodeLine{00582\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ lib::error\_code();}
+\DoxyCodeLine{00583\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a88529f4130f75beed493c84c861e66cf}\index{websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}!eof@{eof}}
+\index{eof@{eof}!websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{eof()}{eof()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a88529f4130f75beed493c84c861e66cf} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection}{websocketpp\+::transport\+::iostream\+::connection}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::eof (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Signals to the transport that data stream being read has reached EOF and that no more bytes may be read or written to/from the transport.
+
+\begin{DoxySince}{Since}
+0.\+3.\+0-\/alpha4 
+\end{DoxySince}
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source_l00219}{219}} of file \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source}{connection.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ this\ serializes\ calls\ to\ external\ read.}}
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_af12d059c4beaffe3c4e4685a7f121a3e}{scoped\_lock\_type}}\ \mbox{\hyperlink{xbyak__mnemonic_8h_aa81aed607133209dade63a226818224d}{lock}}(m\_read\_mutex);}
+\DoxyCodeLine{00222\ }
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (m\_reading)\ \{}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \ \ \ \ \ \ complete\_read(make\_error\_code(\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0a73dd0d0f22cd67b7bcc031cd6bdef743}{transport::error::eof}}));}
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00226\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=282pt]{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a88529f4130f75beed493c84c861e66cf_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a3fdd2b1f005daafa73bffe45063a7750}\index{websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}!fatal\_error@{fatal\_error}}
+\index{fatal\_error@{fatal\_error}!websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{fatal\_error()}{fatal\_error()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a3fdd2b1f005daafa73bffe45063a7750} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection}{websocketpp\+::transport\+::iostream\+::connection}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::fatal\+\_\+error (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Signals to the transport that a fatal data stream error has occurred and that no more bytes may be read or written to/from the transport.
+
+\begin{DoxySince}{Since}
+0.\+3.\+0-\/alpha4 
+\end{DoxySince}
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source_l00235}{235}} of file \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source}{connection.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ this\ serializes\ calls\ to\ external\ read.}}
+\DoxyCodeLine{00237\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_af12d059c4beaffe3c4e4685a7f121a3e}{scoped\_lock\_type}}\ \mbox{\hyperlink{xbyak__mnemonic_8h_aa81aed607133209dade63a226818224d}{lock}}(m\_read\_mutex);}
+\DoxyCodeLine{00238\ }
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (m\_reading)\ \{}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \ \ \ \ \ \ complete\_read(make\_error\_code(\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0a6a7cb8ef776c9eabe2324a529e991732}{transport::error::pass\_through}}));}
+\DoxyCodeLine{00241\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00242\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=268pt]{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a3fdd2b1f005daafa73bffe45063a7750_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a06d23eee9c6c1bd1a48f7cf8a081bda9}\index{websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}!get\_handle@{get\_handle}}
+\index{get\_handle@{get\_handle}!websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{get\_handle()}{get\_handle()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a06d23eee9c6c1bd1a48f7cf8a081bda9} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}} \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection}{websocketpp\+::transport\+::iostream\+::connection}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::get\+\_\+handle (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+\begin{DoxyReturn}{Returns}
+The handle for this connection. 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source_l00313}{313}} of file \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source}{connection.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00313\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00314\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_connection\_hdl;}
+\DoxyCodeLine{00315\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1transport_1_1iostream_1_1connection_ac1c63528e36a2a60c0efc01a1c17584e}\index{websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}!get\_remote\_endpoint@{get\_remote\_endpoint}}
+\index{get\_remote\_endpoint@{get\_remote\_endpoint}!websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{get\_remote\_endpoint()}{get\_remote\_endpoint()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1transport_1_1iostream_1_1connection_ac1c63528e36a2a60c0efc01a1c17584e} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+std\+::string \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection}{websocketpp\+::transport\+::iostream\+::connection}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::get\+\_\+remote\+\_\+endpoint (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+The iostream transport has no information about the ultimate remote endpoint. It will return the string "{}iostream transport"{}. The {\ttfamily set\+\_\+remote\+\_\+endpoint} method may be used by external network code to set a more accurate value.
+
+This value is used in access and error logs and is available to the end application for including in user facing interfaces and messages.
+
+\begin{DoxyReturn}{Returns}
+\doxylink{struct_a}{A} string identifying the address of the remote endpoint 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source_l00305}{305}} of file \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source}{connection.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00305\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00306\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_remote\_endpoint;}
+\DoxyCodeLine{00307\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1transport_1_1iostream_1_1connection_afab9454b5af00a8edb494fdd2e32a41e}\index{websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}!get\_shared@{get\_shared}}
+\index{get\_shared@{get\_shared}!websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{get\_shared()}{get\_shared()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1transport_1_1iostream_1_1connection_afab9454b5af00a8edb494fdd2e32a41e} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a5edb16646621ff775f2529c2a6910c82}{ptr}} \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection}{websocketpp\+::transport\+::iostream\+::connection}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::get\+\_\+shared (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source_l00093}{93}} of file \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source}{connection.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ type::shared\_from\_this();}
+\DoxyCodeLine{00095\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1transport_1_1iostream_1_1connection_afab9454b5af00a8edb494fdd2e32a41e_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a771203b134cc012188a07c471907fc76}\index{websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}!init@{init}}
+\index{init@{init}!websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{init()}{init()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a771203b134cc012188a07c471907fc76} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection}{websocketpp\+::transport\+::iostream\+::connection}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::init (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1transport_aeae75e675c1a334b3b33ab7120b480a5}{init\+\_\+handler}}}]{handler}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+Initialize the connection\textquotesingle{}s transport component.
+
+
+\begin{DoxyParams}{Parameters}
+{\em handler} & The {\ttfamily init\+\_\+handler} to call when initialization is done \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source_l00410}{410}} of file \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source}{connection.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00410\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00411\ \ \ \ \ \ \ \ \ m\_alog.write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}{log::alevel::devel}},\textcolor{stringliteral}{"{}iostream\ connection\ init"{}});}
+\DoxyCodeLine{00412\ \ \ \ \ \ \ \ \ handler(lib::error\_code());}
+\DoxyCodeLine{00413\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1transport_1_1iostream_1_1connection_aae6fa1869211e9dc8a18d609292bd833}\index{websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}!is\_secure@{is\_secure}}
+\index{is\_secure@{is\_secure}!websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{is\_secure()}{is\_secure()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1transport_1_1iostream_1_1connection_aae6fa1869211e9dc8a18d609292bd833} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+bool \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection}{websocketpp\+::transport\+::iostream\+::connection}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::is\+\_\+secure (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+iostream transport will return false always because it has no information about the ultimate remote endpoint. This may or may not be accurate depending on the real source of bytes being input. The {\ttfamily set\+\_\+secure} method may be used to flag connections that are secured by an external API
+
+\begin{DoxyReturn}{Returns}
+Whether or not the underlying transport is secure 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source_l00271}{271}} of file \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source}{connection.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00271\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00272\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_is\_secure;}
+\DoxyCodeLine{00273\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a4a492425587bf02f557d8f03b8be8dc8}\index{websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}!read\_all@{read\_all}}
+\index{read\_all@{read\_all}!websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{read\_all()}{read\_all()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a4a492425587bf02f557d8f03b8be8dc8} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+size\+\_\+t \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection}{websocketpp\+::transport\+::iostream\+::connection}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::read\+\_\+all (\begin{DoxyParamCaption}\item[{char const \texorpdfstring{$\ast$}{*}}]{buf}{, }\item[{size\+\_\+t}]{len}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Similar to read\+\_\+some, but continues to read until all bytes in the supplied buffer have been read or the connection runs out of read requests.
+
+This method still may not read all of the bytes in the input buffer. if it doesn\textquotesingle{}t it indicates that the connection was most likely closed or is in an error state where it is no longer accepting new input.
+
+\begin{DoxySince}{Since}
+0.\+3.\+0
+\end{DoxySince}
+
+\begin{DoxyParams}{Parameters}
+{\em buf} & Char buffer to read into the websocket \\
+\hline
+{\em len} & Length of buf \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The number of characters from buf actually read. 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source_l00188}{188}} of file \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source}{connection.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ this\ serializes\ calls\ to\ external\ read.}}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_af12d059c4beaffe3c4e4685a7f121a3e}{scoped\_lock\_type}}\ \mbox{\hyperlink{xbyak__mnemonic_8h_aa81aed607133209dade63a226818224d}{lock}}(m\_read\_mutex);}
+\DoxyCodeLine{00191\ }
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ total\_read\ =\ 0;}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ temp\_read\ =\ 0;}
+\DoxyCodeLine{00194\ }
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{do}\ \{}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \ \ \ \ temp\_read\ =\ this-\/>read\_some\_impl(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}+total\_read,\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}-\/total\_read);}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \ \ \ \ total\_read\ +=\ temp\_read;}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{while}\ (temp\_read\ !=\ 0\ \&\&\ total\_read\ <\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}});}
+\DoxyCodeLine{00199\ }
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ total\_read;}
+\DoxyCodeLine{00201\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=268pt]{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a4a492425587bf02f557d8f03b8be8dc8_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a4616555cbee050aec84da1e39a3c34a8}\index{websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}!read\_some@{read\_some}}
+\index{read\_some@{read\_some}!websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{read\_some()}{read\_some()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a4616555cbee050aec84da1e39a3c34a8} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+size\+\_\+t \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection}{websocketpp\+::transport\+::iostream\+::connection}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::read\+\_\+some (\begin{DoxyParamCaption}\item[{char const \texorpdfstring{$\ast$}{*}}]{buf}{, }\item[{size\+\_\+t}]{len}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Copies bytes from buf into Web\+Socket++\textquotesingle{}s input buffers. Bytes will be copied from the supplied buffer to fulfill any pending library reads. It will return the number of bytes successfully processed. If there are no pending reads read\+\_\+some will return immediately. Not all of the bytes may be able to be read in one call.
+
+\begin{DoxySince}{Since}
+0.\+3.\+0-\/alpha4
+\end{DoxySince}
+
+\begin{DoxyParams}{Parameters}
+{\em buf} & Char buffer to read into the websocket \\
+\hline
+{\em len} & Length of buf \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The number of characters from buf actually read. 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source_l00165}{165}} of file \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source}{connection.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ this\ serializes\ calls\ to\ external\ read.}}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_af12d059c4beaffe3c4e4685a7f121a3e}{scoped\_lock\_type}}\ \mbox{\hyperlink{xbyak__mnemonic_8h_aa81aed607133209dade63a226818224d}{lock}}(m\_read\_mutex);}
+\DoxyCodeLine{00168\ }
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ this-\/>read\_some\_impl(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}});}
+\DoxyCodeLine{00170\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=268pt]{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a4616555cbee050aec84da1e39a3c34a8_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a4616555cbee050aec84da1e39a3c34a8_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a72f532fb0a8d339371b8ca112fdd3f66}\index{websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}!readsome@{readsome}}
+\index{readsome@{readsome}!websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{readsome()}{readsome()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a72f532fb0a8d339371b8ca112fdd3f66} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+size\+\_\+t \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection}{websocketpp\+::transport\+::iostream\+::connection}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::readsome (\begin{DoxyParamCaption}\item[{char const \texorpdfstring{$\ast$}{*}}]{buf}{, }\item[{size\+\_\+t}]{len}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\begin{DoxyRefDesc}{Deprecated}
+\item[\mbox{\hyperlink{deprecated__deprecated000006}{Deprecated}}]DEPRECATED in favor of \doxylink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a4616555cbee050aec84da1e39a3c34a8}{read\+\_\+some()} \end{DoxyRefDesc}
+\begin{DoxySeeAlso}{See also}
+\doxylink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a4616555cbee050aec84da1e39a3c34a8}{read\+\_\+some()} 
+\end{DoxySeeAlso}
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source_l00208}{208}} of file \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source}{connection.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ this-\/>\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a4616555cbee050aec84da1e39a3c34a8}{read\_some}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},len);}
+\DoxyCodeLine{00210\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a72f532fb0a8d339371b8ca112fdd3f66_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1transport_1_1iostream_1_1connection_ad0d1f64845818bb6bebe43fe057e4da2}\index{websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}!register\_ostream@{register\_ostream}}
+\index{register\_ostream@{register\_ostream}!websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{register\_ostream()}{register\_ostream()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1transport_1_1iostream_1_1connection_ad0d1f64845818bb6bebe43fe057e4da2} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection}{websocketpp\+::transport\+::iostream\+::connection}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::register\+\_\+ostream (\begin{DoxyParamCaption}\item[{std\+::ostream \texorpdfstring{$\ast$}{*}}]{o}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Register a std\+::ostream with the transport. All future writes will be done to this output stream.
+
+
+\begin{DoxyParams}{Parameters}
+{\em o} & \doxylink{struct_a}{A} pointer to the ostream to use for output. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source_l00104}{104}} of file \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source}{connection.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ TODO:\ lock\ transport\ state?}}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_af12d059c4beaffe3c4e4685a7f121a3e}{scoped\_lock\_type}}\ \mbox{\hyperlink{xbyak__mnemonic_8h_aa81aed607133209dade63a226818224d}{lock}}(m\_read\_mutex);}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ m\_output\_stream\ =\ o;}
+\DoxyCodeLine{00108\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=268pt]{classwebsocketpp_1_1transport_1_1iostream_1_1connection_ad0d1f64845818bb6bebe43fe057e4da2_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1transport_1_1iostream_1_1connection_ac565af9c7f9e86972fd1c20bc369f06d}\index{websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}!set\_handle@{set\_handle}}
+\index{set\_handle@{set\_handle}!websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{set\_handle()}{set\_handle()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1transport_1_1iostream_1_1connection_ac565af9c7f9e86972fd1c20bc369f06d} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection}{websocketpp\+::transport\+::iostream\+::connection}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::set\+\_\+handle (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}}}]{hdl}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+
+\begin{DoxyParams}{Parameters}
+{\em hdl} & The new handle \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source_l00565}{565}} of file \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source}{connection.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00565\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00566\ \ \ \ \ \ \ \ \ m\_connection\_hdl\ =\ hdl;}
+\DoxyCodeLine{00567\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a846340a41ebbce1a6a1cecfd9026c2e9}\index{websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}!set\_remote\_endpoint@{set\_remote\_endpoint}}
+\index{set\_remote\_endpoint@{set\_remote\_endpoint}!websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{set\_remote\_endpoint()}{set\_remote\_endpoint()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a846340a41ebbce1a6a1cecfd9026c2e9} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection}{websocketpp\+::transport\+::iostream\+::connection}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::set\+\_\+remote\+\_\+endpoint (\begin{DoxyParamCaption}\item[{std\+::string}]{value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Sets the remote endpoint address returned by {\ttfamily get\+\_\+remote\+\_\+endpoint}. This value should be a human readable string that describes the remote endpoint. Typically an IP address or hostname, perhaps with a port. But may be something else depending on the nature of the underlying transport.
+
+If none is set the default is "{}iostream transport"{}.
+
+\begin{DoxySince}{Since}
+0.\+3.\+0-\/alpha4
+\end{DoxySince}
+
+\begin{DoxyParams}{Parameters}
+{\em value} & The remote endpoint address to set. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source_l00289}{289}} of file \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source}{connection.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00289\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00290\ \ \ \ \ \ \ \ \ m\_remote\_endpoint\ =\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}};}
+\DoxyCodeLine{00291\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a34443f9921e85115607304397d43cc8f}\index{websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}!set\_secure@{set\_secure}}
+\index{set\_secure@{set\_secure}!websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{set\_secure()}{set\_secure()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a34443f9921e85115607304397d43cc8f} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection}{websocketpp\+::transport\+::iostream\+::connection}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::set\+\_\+secure (\begin{DoxyParamCaption}\item[{bool}]{value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+The iostream transport does not provide any security features. As such it defaults to returning false when {\ttfamily is\+\_\+secure} is called. However, the iostream transport may be used to wrap an external socket API that may provide secure transport. This method allows that external API to flag whether or not this connection is secure so that users of the Web\+Socket++ API will get more accurate information.
+
+\begin{DoxySince}{Since}
+0.\+3.\+0-\/alpha4
+\end{DoxySince}
+
+\begin{DoxyParams}{Parameters}
+{\em value} & Whether or not this connection is secure. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source_l00257}{257}} of file \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source}{connection.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00257\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00258\ \ \ \ \ \ \ \ \ m\_is\_secure\ =\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}};}
+\DoxyCodeLine{00259\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a37bb9ef90b3d183c238a32cf9f056d4b}\index{websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}!set\_shutdown\_handler@{set\_shutdown\_handler}}
+\index{set\_shutdown\_handler@{set\_shutdown\_handler}!websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{set\_shutdown\_handler()}{set\_shutdown\_handler()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a37bb9ef90b3d183c238a32cf9f056d4b} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection}{websocketpp\+::transport\+::iostream\+::connection}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::set\+\_\+shutdown\+\_\+handler (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1iostream_a3563ce2cca06b1466f7d76ecb8eb4a0b}{shutdown\+\_\+handler}}}]{h}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+The shutdown handler is called when the iostream transport receives a notification from the core library that it is finished with all read and write operations and that the underlying transport can be cleaned up.
+
+If you are using iostream transport with another socket library, this is a good time to close/shutdown the socket for this connection.
+
+The signature of the handler is {\ttfamily lib\+::error\+\_\+code (connection\+\_\+hdl)}. The code returned will be reported and logged by the core library.
+
+\begin{DoxySince}{Since}
+0.\+5.\+0
+\end{DoxySince}
+
+\begin{DoxyParams}{Parameters}
+{\em h} & The handler to call on connection shutdown. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source_l00400}{400}} of file \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source}{connection.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00400\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00401\ \ \ \ \ \ \ \ \ m\_shutdown\_handler\ =\ h;}
+\DoxyCodeLine{00402\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a7852f9c0dc64d6e51b57b4a28302a602}\index{websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}!set\_timer@{set\_timer}}
+\index{set\_timer@{set\_timer}!websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{set\_timer()}{set\_timer()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a7852f9c0dc64d6e51b57b4a28302a602} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_aa993f99a9b31b42fe3ef1ec471cbc2e8}{timer\+\_\+ptr}} \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection}{websocketpp\+::transport\+::iostream\+::connection}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::set\+\_\+timer (\begin{DoxyParamCaption}\item[{long}]{}{, }\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1transport_a946cc56ff41139f3002149c15fd87bc9}{timer\+\_\+handler}}}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Timers are not implemented in this transport. The timer pointer will always be empty. The handler will never be called.
+
+
+\begin{DoxyParams}{Parameters}
+{\em duration} & Length of time to wait in milliseconds \\
+\hline
+{\em callback} & The function to call back when the timer has expired \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\doxylink{struct_a}{A} handle that can be used to cancel the timer if it is no longer needed. 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source_l00327}{327}} of file \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source}{connection.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00327\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00328\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_aa993f99a9b31b42fe3ef1ec471cbc2e8}{timer\_ptr}}();}
+\DoxyCodeLine{00329\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a0f5d21e86961b0f3d75c417d5f45d4ac}\index{websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}!set\_uri@{set\_uri}}
+\index{set\_uri@{set\_uri}!websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{set\_uri()}{set\_uri()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a0f5d21e86961b0f3d75c417d5f45d4ac} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection}{websocketpp\+::transport\+::iostream\+::connection}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::set\+\_\+uri (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_aae370ea5ac83a8ece7712cb39fc23f5b}{uri\+\_\+ptr}}}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Called by the endpoint as a connection is being established to provide the uri being connected to to the transport layer.
+
+This transport policy doesn\textquotesingle{}t use the uri so it is ignored.
+
+\begin{DoxySince}{Since}
+0.\+6.\+0
+\end{DoxySince}
+
+\begin{DoxyParams}{Parameters}
+{\em u} & The uri to set \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source_l00121}{121}} of file \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source}{connection.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00121\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1transport_1_1iostream_1_1connection_aa035dc6275c5babb99c0cbada8521b5c}\index{websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}!set\_vector\_write\_handler@{set\_vector\_write\_handler}}
+\index{set\_vector\_write\_handler@{set\_vector\_write\_handler}!websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{set\_vector\_write\_handler()}{set\_vector\_write\_handler()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1transport_1_1iostream_1_1connection_aa035dc6275c5babb99c0cbada8521b5c} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection}{websocketpp\+::transport\+::iostream\+::connection}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::set\+\_\+vector\+\_\+write\+\_\+handler (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1iostream_a21982146513c0b5580786c3af5dd2878}{vector\+\_\+write\+\_\+handler}}}]{h}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+The vectored write handler is called when the iostream transport receives multiple chunks of data that need to be written to the appropriate output location. This handler can be used in conjunction with the write\+\_\+handler in place of registering an ostream for output.
+
+The sequence of buffers represents bytes that should be written consecutively and it is suggested to group the buffers into as few next layer packets as possible. Vector write is used to allow implementations that support it to coalesce writes into a single TCP packet or TLS segment for improved efficiency.
+
+This is an optional handler. If it is not defined then multiple calls will be made to the standard write handler.
+
+The signature of the handler is {\ttfamily lib\+::error\+\_\+code (connection\+\_\+hdl, std\+::vector\texorpdfstring{$<$}{<}\doxylink{structwebsocketpp_1_1transport_1_1buffer}{websocketpp\+::transport\+::buffer}\texorpdfstring{$>$}{>} const \& bufs)}. The code returned will be reported and logged by the core library. The {\ttfamily \doxylink{structwebsocketpp_1_1transport_1_1buffer}{websocketpp\+::transport\+::buffer}} type is a struct with two data members. buf (char const \texorpdfstring{$\ast$}{*}) and len (size\+\_\+t).
+
+\begin{DoxySince}{Since}
+0.\+6.\+0
+\end{DoxySince}
+
+\begin{DoxyParams}{Parameters}
+{\em h} & The handler to call when vectored data is to be written. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source_l00380}{380}} of file \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source}{connection.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00380\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00381\ \ \ \ \ \ \ \ \ m\_vector\_write\_handler\ =\ h;}
+\DoxyCodeLine{00382\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a32740c33406e5484da7f030fb106ae22}\index{websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}!set\_write\_handler@{set\_write\_handler}}
+\index{set\_write\_handler@{set\_write\_handler}!websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{set\_write\_handler()}{set\_write\_handler()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a32740c33406e5484da7f030fb106ae22} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection}{websocketpp\+::transport\+::iostream\+::connection}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::set\+\_\+write\+\_\+handler (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1iostream_abc22b834c2d0c698d6c87e51d5bfad2c}{write\+\_\+handler}}}]{h}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+The write handler is called when the iostream transport receives data that needs to be written to the appropriate output location. This handler can be used in place of registering an ostream for output.
+
+The signature of the handler is {\ttfamily lib\+::error\+\_\+code (connection\+\_\+hdl, char const \texorpdfstring{$\ast$}{*}, size\+\_\+t)} The code returned will be reported and logged by the core library.
+
+See also, set\+\_\+vector\+\_\+write\+\_\+handler, for an optional write handler that allows more efficient handling of multiple writes at once.
+
+\begin{DoxySeeAlso}{See also}
+\doxylink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_aa035dc6275c5babb99c0cbada8521b5c}{set\+\_\+vector\+\_\+write\+\_\+handler}
+\end{DoxySeeAlso}
+\begin{DoxySince}{Since}
+0.\+5.\+0
+\end{DoxySince}
+
+\begin{DoxyParams}{Parameters}
+{\em h} & The handler to call when data is to be written. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source_l00350}{350}} of file \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source}{connection.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00350\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00351\ \ \ \ \ \ \ \ \ m\_write\_handler\ =\ h;}
+\DoxyCodeLine{00352\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a9fe305b0c1b1ce99ac822960c3aeb5c7}\index{websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}!operator$>$$>$@{operator$>$$>$}}
+\index{operator$>$$>$@{operator$>$$>$}!websocketpp::transport::iostream::connection$<$ config $>$@{websocketpp::transport::iostream::connection$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{operator$>$$>$}{operator>>}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a9fe305b0c1b1ce99ac822960c3aeb5c7} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+std\+::istream \& operator$>$$>$ (\begin{DoxyParamCaption}\item[{std\+::istream \&}]{in}{, }\item[{\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_afda32ed083d4e272e378e75225e6e26e}{type}} \&}]{t}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+Attempts to read input from the given stream into the transport. Bytes will be extracted from the input stream to fulfill any pending reads. Input in this manner will only read until the current read buffer has been filled. Then it will signal the library to process the input. If the library\textquotesingle{}s input handler adds a new async\+\_\+read, additional bytes will be read, otherwise the input operation will end.
+
+When this function returns one of the following conditions is true\+:
+\begin{DoxyItemize}
+\item There is no outstanding read operation
+\item There are no more bytes available in the input stream
+\end{DoxyItemize}
+
+You can use tellg() on the input stream to determine if all of the input bytes were read or not.
+
+If there is no pending read operation when the input method is called, it will return immediately and tellg() will not have changed. 
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source_l00142}{142}} of file \mbox{\hyperlink{transport_2iostream_2connection_8hpp_source}{connection.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ this\ serializes\ calls\ to\ external\ read.}}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_af12d059c4beaffe3c4e4685a7f121a3e}{scoped\_lock\_type}}\ \mbox{\hyperlink{xbyak__mnemonic_8h_aa81aed607133209dade63a226818224d}{lock}}(t.m\_read\_mutex);}
+\DoxyCodeLine{00145\ }
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ t.read(in);}
+\DoxyCodeLine{00147\ }
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ in;}
+\DoxyCodeLine{00149\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/vendor/websocketpp/websocketpp/transport/iostream/\mbox{\hyperlink{transport_2iostream_2connection_8hpp}{connection.\+hpp}}\end{DoxyCompactItemize}

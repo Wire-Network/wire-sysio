@@ -1,0 +1,66 @@
+\doxysection{memorystream.\+h}
+\hypertarget{memorystream_8h_source}{}\label{memorystream_8h_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/include/rapidjson/memorystream.h@{libraries/fc/include/fc/crypto/webauthn\_json/include/rapidjson/memorystream.h}}
+\mbox{\hyperlink{memorystream_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{memorystream_8h_source_l00001}00001\ \textcolor{comment}{//\ Tencent\ is\ pleased\ to\ support\ the\ open\ source\ community\ by\ making\ RapidJSON\ available.}}
+\DoxyCodeLine{\Hypertarget{memorystream_8h_source_l00002}00002\ \textcolor{comment}{//\ }}
+\DoxyCodeLine{\Hypertarget{memorystream_8h_source_l00003}00003\ \textcolor{comment}{//\ Copyright\ (C)\ 2015\ THL\ A29\ Limited,\ a\ Tencent\ company,\ and\ Milo\ Yip.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{memorystream_8h_source_l00004}00004\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{memorystream_8h_source_l00005}00005\ \textcolor{comment}{//\ Licensed\ under\ the\ MIT\ License\ (the\ "{}License"{});\ you\ may\ not\ use\ this\ file\ except}}
+\DoxyCodeLine{\Hypertarget{memorystream_8h_source_l00006}00006\ \textcolor{comment}{//\ in\ compliance\ with\ the\ License.\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{\Hypertarget{memorystream_8h_source_l00007}00007\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{memorystream_8h_source_l00008}00008\ \textcolor{comment}{//\ http://opensource.org/licenses/MIT}}
+\DoxyCodeLine{\Hypertarget{memorystream_8h_source_l00009}00009\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{memorystream_8h_source_l00010}00010\ \textcolor{comment}{//\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software\ distributed\ }}
+\DoxyCodeLine{\Hypertarget{memorystream_8h_source_l00011}00011\ \textcolor{comment}{//\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,\ WITHOUT\ WARRANTIES\ OR\ }}
+\DoxyCodeLine{\Hypertarget{memorystream_8h_source_l00012}00012\ \textcolor{comment}{//\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.\ See\ the\ License\ for\ the\ }}
+\DoxyCodeLine{\Hypertarget{memorystream_8h_source_l00013}00013\ \textcolor{comment}{//\ specific\ language\ governing\ permissions\ and\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{memorystream_8h_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{memorystream_8h_source_l00015}00015\ \textcolor{preprocessor}{\#ifndef\ RAPIDJSON\_MEMORYSTREAM\_H\_}}
+\DoxyCodeLine{\Hypertarget{memorystream_8h_source_l00016}00016\ \textcolor{preprocessor}{\#define\ RAPIDJSON\_MEMORYSTREAM\_H\_}}
+\DoxyCodeLine{\Hypertarget{memorystream_8h_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{memorystream_8h_source_l00018}00018\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{stream_8h}{stream.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{memorystream_8h_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{memorystream_8h_source_l00020}00020\ \textcolor{preprocessor}{\#ifdef\ \_\_clang\_\_}}
+\DoxyCodeLine{\Hypertarget{memorystream_8h_source_l00021}00021\ RAPIDJSON\_DIAG\_PUSH}
+\DoxyCodeLine{\Hypertarget{memorystream_8h_source_l00022}00022\ RAPIDJSON\_DIAG\_OFF(unreachable-\/code)}
+\DoxyCodeLine{\Hypertarget{memorystream_8h_source_l00023}00023\ RAPIDJSON\_DIAG\_OFF(missing-\/noreturn)}
+\DoxyCodeLine{\Hypertarget{memorystream_8h_source_l00024}00024\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{memorystream_8h_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{memorystream_8h_source_l00026}00026\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gad3806c8251fdc7da9618b7e922674ffc}{RAPIDJSON\_NAMESPACE\_BEGIN}}}
+\DoxyCodeLine{\Hypertarget{memorystream_8h_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{memorystream_8h_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{memorystream_8h_source_l00040}\mbox{\hyperlink{struct_memory_stream}{00040}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_memory_stream}{MemoryStream}}\ \{}
+\DoxyCodeLine{\Hypertarget{memorystream_8h_source_l00041}\mbox{\hyperlink{struct_memory_stream_aa4c5ce865bbaafcbeca64e5036b7d979}{00041}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{struct_memory_stream_aa4c5ce865bbaafcbeca64e5036b7d979}{Ch}};\ \textcolor{comment}{//\ byte}}
+\DoxyCodeLine{\Hypertarget{memorystream_8h_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{memorystream_8h_source_l00043}\mbox{\hyperlink{struct_memory_stream_a2472317ef00fcd44e5cc209e04c49756}{00043}}\ \ \ \ \ \mbox{\hyperlink{struct_memory_stream_a2472317ef00fcd44e5cc209e04c49756}{MemoryStream}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_memory_stream_aa4c5ce865bbaafcbeca64e5036b7d979}{Ch}}\ *src,\ \textcolor{keywordtype}{size\_t}\ size)\ :\ \mbox{\hyperlink{struct_memory_stream_a57cf6cb5766e931a62928b9f92507443}{src\_}}(src),\ \mbox{\hyperlink{struct_memory_stream_a91f0767b4f0ed2476d835e8344848a2f}{begin\_}}(src),\ \mbox{\hyperlink{struct_memory_stream_a55fb302ba0492419757e3ba318c8c654}{end\_}}(src\ +\ size),\ \mbox{\hyperlink{struct_memory_stream_ab26a1b5c6d5e8f52c0f6982feba47f36}{size\_}}(size)\ \{\}}
+\DoxyCodeLine{\Hypertarget{memorystream_8h_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{memorystream_8h_source_l00045}\mbox{\hyperlink{struct_memory_stream_a707014bbfd303838b6a7b90be24f6adc}{00045}}\ \ \ \ \ \mbox{\hyperlink{struct_memory_stream_aa4c5ce865bbaafcbeca64e5036b7d979}{Ch}}\ \mbox{\hyperlink{struct_memory_stream_a707014bbfd303838b6a7b90be24f6adc}{Peek}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_ga6a2b1695c13e77ae425e3cbac980ccb5}{RAPIDJSON\_UNLIKELY}}(\mbox{\hyperlink{struct_memory_stream_a57cf6cb5766e931a62928b9f92507443}{src\_}}\ ==\ \mbox{\hyperlink{struct_memory_stream_a55fb302ba0492419757e3ba318c8c654}{end\_}})\ ?\ \textcolor{charliteral}{'\(\backslash\)0'}\ :\ *\mbox{\hyperlink{struct_memory_stream_a57cf6cb5766e931a62928b9f92507443}{src\_}};\ \}}
+\DoxyCodeLine{\Hypertarget{memorystream_8h_source_l00046}\mbox{\hyperlink{struct_memory_stream_a14ff92deda5d39c9b166aaa07e82a0ee}{00046}}\ \ \ \ \ \mbox{\hyperlink{struct_memory_stream_aa4c5ce865bbaafcbeca64e5036b7d979}{Ch}}\ \mbox{\hyperlink{struct_memory_stream_a14ff92deda5d39c9b166aaa07e82a0ee}{Take}}()\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_ga6a2b1695c13e77ae425e3cbac980ccb5}{RAPIDJSON\_UNLIKELY}}(\mbox{\hyperlink{struct_memory_stream_a57cf6cb5766e931a62928b9f92507443}{src\_}}\ ==\ \mbox{\hyperlink{struct_memory_stream_a55fb302ba0492419757e3ba318c8c654}{end\_}})\ ?\ \textcolor{charliteral}{'\(\backslash\)0'}\ :\ *\mbox{\hyperlink{struct_memory_stream_a57cf6cb5766e931a62928b9f92507443}{src\_}}++;\ \}}
+\DoxyCodeLine{\Hypertarget{memorystream_8h_source_l00047}\mbox{\hyperlink{struct_memory_stream_a2de1486742f0d44decda90a56bc43268}{00047}}\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{struct_memory_stream_a2de1486742f0d44decda90a56bc43268}{Tell}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(\mbox{\hyperlink{struct_memory_stream_a57cf6cb5766e931a62928b9f92507443}{src\_}}\ -\/\ \mbox{\hyperlink{struct_memory_stream_a91f0767b4f0ed2476d835e8344848a2f}{begin\_}});\ \}}
+\DoxyCodeLine{\Hypertarget{memorystream_8h_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{memorystream_8h_source_l00049}\mbox{\hyperlink{struct_memory_stream_a4fd6e7a293bd3ec76e649d8e853dd38f}{00049}}\ \ \ \ \ \mbox{\hyperlink{struct_memory_stream_aa4c5ce865bbaafcbeca64e5036b7d979}{Ch}}*\ \mbox{\hyperlink{struct_memory_stream_a4fd6e7a293bd3ec76e649d8e853dd38f}{PutBegin}}()\ \{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\textcolor{keyword}{false});\ \textcolor{keywordflow}{return}\ 0;\ \}}
+\DoxyCodeLine{\Hypertarget{memorystream_8h_source_l00050}\mbox{\hyperlink{struct_memory_stream_ac445f93c23c9e85f1f5381911c4ed870}{00050}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_memory_stream_ac445f93c23c9e85f1f5381911c4ed870}{Put}}(\mbox{\hyperlink{struct_memory_stream_aa4c5ce865bbaafcbeca64e5036b7d979}{Ch}})\ \{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\textcolor{keyword}{false});\ \}}
+\DoxyCodeLine{\Hypertarget{memorystream_8h_source_l00051}\mbox{\hyperlink{struct_memory_stream_a305e141314ae0e3afacb04aaf2d8bcc6}{00051}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_memory_stream_a305e141314ae0e3afacb04aaf2d8bcc6}{Flush}}()\ \{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\textcolor{keyword}{false});\ \}}
+\DoxyCodeLine{\Hypertarget{memorystream_8h_source_l00052}\mbox{\hyperlink{struct_memory_stream_a74fb36c1f6f95d189502cf7a6be79135}{00052}}\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{struct_memory_stream_a74fb36c1f6f95d189502cf7a6be79135}{PutEnd}}(\mbox{\hyperlink{struct_memory_stream_aa4c5ce865bbaafcbeca64e5036b7d979}{Ch}}*)\ \{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\textcolor{keyword}{false});\ \textcolor{keywordflow}{return}\ 0;\ \}}
+\DoxyCodeLine{\Hypertarget{memorystream_8h_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{memorystream_8h_source_l00054}00054\ \ \ \ \ \textcolor{comment}{//\ For\ encoding\ detection\ only.}}
+\DoxyCodeLine{\Hypertarget{memorystream_8h_source_l00055}\mbox{\hyperlink{struct_memory_stream_a81dd4a86148b0af9527083cdef3d31d8}{00055}}\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_memory_stream_aa4c5ce865bbaafcbeca64e5036b7d979}{Ch}}*\ \mbox{\hyperlink{struct_memory_stream_a81dd4a86148b0af9527083cdef3d31d8}{Peek4}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{memorystream_8h_source_l00056}00056\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_memory_stream_a2de1486742f0d44decda90a56bc43268}{Tell}}()\ +\ 4\ <=\ \mbox{\hyperlink{struct_memory_stream_ab26a1b5c6d5e8f52c0f6982feba47f36}{size\_}}\ ?\ \mbox{\hyperlink{struct_memory_stream_a57cf6cb5766e931a62928b9f92507443}{src\_}}\ :\ 0;}
+\DoxyCodeLine{\Hypertarget{memorystream_8h_source_l00057}00057\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{memorystream_8h_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{memorystream_8h_source_l00059}\mbox{\hyperlink{struct_memory_stream_a57cf6cb5766e931a62928b9f92507443}{00059}}\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_memory_stream_aa4c5ce865bbaafcbeca64e5036b7d979}{Ch}}*\ \mbox{\hyperlink{struct_memory_stream_a57cf6cb5766e931a62928b9f92507443}{src\_}};\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{memorystream_8h_source_l00060}\mbox{\hyperlink{struct_memory_stream_a91f0767b4f0ed2476d835e8344848a2f}{00060}}\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_memory_stream_aa4c5ce865bbaafcbeca64e5036b7d979}{Ch}}*\ \mbox{\hyperlink{struct_memory_stream_a91f0767b4f0ed2476d835e8344848a2f}{begin\_}};\ \ \ }
+\DoxyCodeLine{\Hypertarget{memorystream_8h_source_l00061}\mbox{\hyperlink{struct_memory_stream_a55fb302ba0492419757e3ba318c8c654}{00061}}\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_memory_stream_aa4c5ce865bbaafcbeca64e5036b7d979}{Ch}}*\ \mbox{\hyperlink{struct_memory_stream_a55fb302ba0492419757e3ba318c8c654}{end\_}};\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{memorystream_8h_source_l00062}\mbox{\hyperlink{struct_memory_stream_ab26a1b5c6d5e8f52c0f6982feba47f36}{00062}}\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{struct_memory_stream_ab26a1b5c6d5e8f52c0f6982feba47f36}{size\_}};\ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{memorystream_8h_source_l00063}00063\ \};}
+\DoxyCodeLine{\Hypertarget{memorystream_8h_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{memorystream_8h_source_l00065}00065\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gaf18f052a98b9f5df5448d39484b743c1}{RAPIDJSON\_NAMESPACE\_END}}}
+\DoxyCodeLine{\Hypertarget{memorystream_8h_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{memorystream_8h_source_l00067}00067\ \textcolor{preprocessor}{\#ifdef\ \_\_clang\_\_}}
+\DoxyCodeLine{\Hypertarget{memorystream_8h_source_l00068}00068\ RAPIDJSON\_DIAG\_POP}
+\DoxyCodeLine{\Hypertarget{memorystream_8h_source_l00069}00069\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{memorystream_8h_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{memorystream_8h_source_l00071}00071\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ RAPIDJSON\_MEMORYBUFFER\_H\_}}
+
+\end{DoxyCode}

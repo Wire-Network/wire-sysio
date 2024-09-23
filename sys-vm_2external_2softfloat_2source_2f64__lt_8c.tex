@@ -1,0 +1,73 @@
+\doxysection{libraries/sys-\/vm/external/softfloat/source/f64\+\_\+lt.c File Reference}
+\hypertarget{sys-vm_2external_2softfloat_2source_2f64__lt_8c}{}\label{sys-vm_2external_2softfloat_2source_2f64__lt_8c}\index{libraries/sys-\/vm/external/softfloat/source/f64\_lt.c@{libraries/sys-\/vm/external/softfloat/source/f64\_lt.c}}
+{\ttfamily \#include $<$stdbool.\+h$>$}\newline
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include "{}platform.\+h"{}}\newline
+{\ttfamily \#include "{}internals.\+h"{}}\newline
+{\ttfamily \#include "{}softfloat.\+h"{}}\newline
+Include dependency graph for f64\+\_\+lt.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sys-vm_2external_2softfloat_2source_2f64__lt_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2f64__lt_8c_a690fdf8dcd4115ce5f200d04bac57f05}{f64\+\_\+lt}} (\mbox{\hyperlink{structfloat64__t}{float64\+\_\+t}} \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, \mbox{\hyperlink{structfloat64__t}{float64\+\_\+t}} b)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{sys-vm_2external_2softfloat_2source_2f64__lt_8c_a690fdf8dcd4115ce5f200d04bac57f05}\index{f64\_lt.c@{f64\_lt.c}!f64\_lt@{f64\_lt}}
+\index{f64\_lt@{f64\_lt}!f64\_lt.c@{f64\_lt.c}}
+\doxysubsubsection{\texorpdfstring{f64\_lt()}{f64\_lt()}}
+{\footnotesize\ttfamily \label{sys-vm_2external_2softfloat_2source_2f64__lt_8c_a690fdf8dcd4115ce5f200d04bac57f05} 
+bool f64\+\_\+lt (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structfloat64__t}{float64\+\_\+t}}}]{a}{, }\item[{\mbox{\hyperlink{structfloat64__t}{float64\+\_\+t}}}]{b}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2f64__lt_8c_source_l00043}{43}} of file \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2f64__lt_8c_source}{f64\+\_\+lt.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00044\ \{}
+\DoxyCodeLine{00045\ \ \ \ \ \textcolor{keyword}{union\ }\mbox{\hyperlink{unionui64__f64}{ui64\_f64}}\ uA;}
+\DoxyCodeLine{00046\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\_fast64\_t}}\ uiA;}
+\DoxyCodeLine{00047\ \ \ \ \ \textcolor{keyword}{union\ }\mbox{\hyperlink{unionui64__f64}{ui64\_f64}}\ uB;}
+\DoxyCodeLine{00048\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\_fast64\_t}}\ uiB;}
+\DoxyCodeLine{00049\ \ \ \ \ \textcolor{keywordtype}{bool}\ signA,\ signB;}
+\DoxyCodeLine{00050\ }
+\DoxyCodeLine{00051\ \ \ \ \ uA.\mbox{\hyperlink{unionui64__f64_a6c3253c08850759ca3c64dd956c6b4dd}{f}}\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}};}
+\DoxyCodeLine{00052\ \ \ \ \ uiA\ =\ uA.ui;}
+\DoxyCodeLine{00053\ \ \ \ \ uB.f\ =\ b;}
+\DoxyCodeLine{00054\ \ \ \ \ uiB\ =\ uB.ui;}
+\DoxyCodeLine{00055\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a54cf847b77be110d616ac7048c1cc0cf}{isNaNF64UI}}(\ uiA\ )\ ||\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a54cf847b77be110d616ac7048c1cc0cf}{isNaNF64UI}}(\ uiB\ )\ )\ \{}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2softfloat__raise_flags_8c_ac16bbf09eca0fe8ff91301d82c5a667f}{softfloat\_raiseFlags}}(\ \mbox{\hyperlink{softfloat_2source_2include_2softfloat_8h_a56a0f36da7f9eaaf54bd05cc2bf49173a191f069090c3d33752fb728272d9a4a9}{softfloat\_flag\_invalid}}\ );}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00058\ \ \ \ \ \}}
+\DoxyCodeLine{00059\ \ \ \ \ signA\ =\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a6984fd1f3a0a8d7862b252a3853ba41d}{signF64UI}}(\ uiA\ );}
+\DoxyCodeLine{00060\ \ \ \ \ signB\ =\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a6984fd1f3a0a8d7862b252a3853ba41d}{signF64UI}}(\ uiB\ );}
+\DoxyCodeLine{00061\ \ \ \ \ \textcolor{keywordflow}{return}}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ (signA\ !=\ signB)}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ ?\ signA\ \&\&\ ((uiA\ |\ uiB)\ \&\ \mbox{\hyperlink{stdint_8h_a8da5373e041921aa34c2b6172ac3babc}{UINT64\_C}}(\ 0x7FFFFFFFFFFFFFFF\ ))}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \ \ \ :\ (uiA\ !=\ uiB)\ \&\&\ (signA\ \string^\ (uiA\ <\ uiB));}
+\DoxyCodeLine{00065\ }
+\DoxyCodeLine{00066\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=258pt]{sys-vm_2external_2softfloat_2source_2f64__lt_8c_a690fdf8dcd4115ce5f200d04bac57f05_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=213pt]{sys-vm_2external_2softfloat_2source_2f64__lt_8c_a690fdf8dcd4115ce5f200d04bac57f05_icgraph}
+\end{center}
+\end{figure}

@@ -1,0 +1,71 @@
+\doxysection{libraries/softfloat/source/i64\+\_\+to\+\_\+f128M.c File Reference}
+\hypertarget{softfloat_2source_2i64__to__f128_m_8c}{}\label{softfloat_2source_2i64__to__f128_m_8c}\index{libraries/softfloat/source/i64\_to\_f128M.c@{libraries/softfloat/source/i64\_to\_f128M.c}}
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include "{}platform.\+h"{}}\newline
+{\ttfamily \#include "{}internals.\+h"{}}\newline
+{\ttfamily \#include "{}softfloat.\+h"{}}\newline
+Include dependency graph for i64\+\_\+to\+\_\+f128\+M.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{softfloat_2source_2i64__to__f128_m_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{softfloat_2source_2i64__to__f128_m_8c_a3b6710932674892ad4c2d547960b161c}{i64\+\_\+to\+\_\+f128M}} (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, \mbox{\hyperlink{structfloat128__t}{float128\+\_\+t}} \texorpdfstring{$\ast$}{*}z\+Ptr)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{softfloat_2source_2i64__to__f128_m_8c_a3b6710932674892ad4c2d547960b161c}\index{i64\_to\_f128M.c@{i64\_to\_f128M.c}!i64\_to\_f128M@{i64\_to\_f128M}}
+\index{i64\_to\_f128M@{i64\_to\_f128M}!i64\_to\_f128M.c@{i64\_to\_f128M.c}}
+\doxysubsubsection{\texorpdfstring{i64\_to\_f128M()}{i64\_to\_f128M()}}
+{\footnotesize\ttfamily \label{softfloat_2source_2i64__to__f128_m_8c_a3b6710932674892ad4c2d547960b161c} 
+void i64\+\_\+to\+\_\+f128M (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}}]{a}{, }\item[{\mbox{\hyperlink{structfloat128__t}{float128\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{z\+Ptr}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2i64__to__f128_m_8c_source_l00053}{53}} of file \mbox{\hyperlink{softfloat_2source_2i64__to__f128_m_8c_source}{i64\+\_\+to\+\_\+f128\+M.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00054\ \{}
+\DoxyCodeLine{00055\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ *zWPtr;}
+\DoxyCodeLine{00056\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ uiZ96,\ uiZ64;}
+\DoxyCodeLine{00057\ \ \ \ \ \textcolor{keywordtype}{bool}\ sign;}
+\DoxyCodeLine{00058\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ absA;}
+\DoxyCodeLine{00059\ \ \ \ \ \mbox{\hyperlink{stdint_8h_ad0fca8b15c218d2c687f8c373a71d228}{uint\_fast8\_t}}\ shiftDist;}
+\DoxyCodeLine{00060\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ *ptr;}
+\DoxyCodeLine{00061\ }
+\DoxyCodeLine{00062\ \ \ \ \ zWPtr\ =\ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ *)\ zPtr;}
+\DoxyCodeLine{00063\ \ \ \ \ uiZ96\ =\ 0;}
+\DoxyCodeLine{00064\ \ \ \ \ uiZ64\ =\ 0;}
+\DoxyCodeLine{00065\ \ \ \ \ zWPtr[\mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a49446dd1193996f92b1e5bb62eaa4689}{indexWord}}(\ 4,\ 1\ )]\ =\ 0;}
+\DoxyCodeLine{00066\ \ \ \ \ zWPtr[\mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a49446dd1193996f92b1e5bb62eaa4689}{indexWord}}(\ 4,\ 0\ )]\ =\ 0;}
+\DoxyCodeLine{00067\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ )\ \{}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ sign\ =\ (\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ <\ 0);}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ absA\ =\ sign\ ?\ -\/(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ :\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}};}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ shiftDist\ =\ \mbox{\hyperlink{softfloat_2source_2s__count_leading_zeros64_8c_aa7f029cdc05ad078461581da52b91bef}{softfloat\_countLeadingZeros64}}(\ absA\ )\ +\ 17;}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ shiftDist\ <\ 32\ )\ \{}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ \ \ \ ptr\ =\ zWPtr\ +\ \mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a016e8ca813d61983f044bcb6a01ff4b3}{indexMultiwordHi}}(\ 4,\ 3\ );}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \ \ \ ptr[\mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a49446dd1193996f92b1e5bb62eaa4689}{indexWord}}(\ 3,\ 2\ )]\ =\ 0;}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \ \ \ ptr[\mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a49446dd1193996f92b1e5bb62eaa4689}{indexWord}}(\ 3,\ 1\ )]\ =\ absA>>32;}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \ \ \ ptr[\mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a49446dd1193996f92b1e5bb62eaa4689}{indexWord}}(\ 3,\ 0\ )]\ =\ absA;}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{softfloat_2source_2include_2primitives_8h_ac8619e18d8588214cace2d9eb662dc14}{softfloat\_shortShiftLeft96M}}(\ ptr,\ shiftDist,\ ptr\ );}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ \ \ \ ptr[\mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_aa3af452dd34ad7a607f4ad31c234fda7}{indexWordHi}}(\ 3\ )]\ =}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a31e45a00b5b281fb1e035d07b00bc049}{packToF128UI96}}(}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sign,\ 0x404E\ -\/\ shiftDist,\ ptr[\mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_aa3af452dd34ad7a607f4ad31c234fda7}{indexWordHi}}(\ 3\ )]\ );}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ absA\ <<=\ shiftDist\ -\/\ 32;}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ uiZ96\ =\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a31e45a00b5b281fb1e035d07b00bc049}{packToF128UI96}}(\ sign,\ 0x404E\ -\/\ shiftDist,\ absA>>32\ );}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ uiZ64\ =\ absA;}
+\DoxyCodeLine{00085\ \ \ \ \ \}}
+\DoxyCodeLine{00086\ \ \ \ \ zWPtr[\mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a49446dd1193996f92b1e5bb62eaa4689}{indexWord}}(\ 4,\ 3\ )]\ =\ uiZ96;}
+\DoxyCodeLine{00087\ \ \ \ \ zWPtr[\mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a49446dd1193996f92b1e5bb62eaa4689}{indexWord}}(\ 4,\ 2\ )]\ =\ uiZ64;}
+\DoxyCodeLine{00088\ }
+\DoxyCodeLine{00089\ \}}
+
+\end{DoxyCode}

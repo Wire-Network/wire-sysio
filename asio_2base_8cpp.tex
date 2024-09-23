@@ -1,0 +1,89 @@
+\doxysection{libraries/fc/vendor/websocketpp/test/transport/asio/base.cpp File Reference}
+\hypertarget{asio_2base_8cpp}{}\label{asio_2base_8cpp}\index{libraries/fc/vendor/websocketpp/test/transport/asio/base.cpp@{libraries/fc/vendor/websocketpp/test/transport/asio/base.cpp}}
+{\ttfamily \#include $<$boost/test/unit\+\_\+test.\+hpp$>$}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$websocketpp/transport/asio/base.\+hpp$>$}\newline
+Include dependency graph for base.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{asio_2base_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{asio_2base_8cpp_a6b2a3852db8bb19ab6909bac01859985}{BOOST\+\_\+\+TEST\+\_\+\+MODULE}}~transport\+\_\+asio\+\_\+base
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{asio_2base_8cpp_aa5d2be39b8c78ba592dd63c627802b8b}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (blank\+\_\+error)
+\item 
+\mbox{\hyperlink{asio_2base_8cpp_af6751874dd77e473199440e01c9ac298}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (asio\+\_\+error)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{asio_2base_8cpp_a6b2a3852db8bb19ab6909bac01859985}\index{base.cpp@{base.cpp}!BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}}
+\index{BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}!base.cpp@{base.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_TEST\_MODULE}{BOOST\_TEST\_MODULE}}
+{\footnotesize\ttfamily \label{asio_2base_8cpp_a6b2a3852db8bb19ab6909bac01859985} 
+\#define BOOST\+\_\+\+TEST\+\_\+\+MODULE~transport\+\_\+asio\+\_\+base}
+
+
+
+Definition at line \mbox{\hyperlink{asio_2base_8cpp_source_l00028}{28}} of file \mbox{\hyperlink{asio_2base_8cpp_source}{base.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{asio_2base_8cpp_af6751874dd77e473199440e01c9ac298}\index{base.cpp@{base.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!base.cpp@{base.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{asio_2base_8cpp_af6751874dd77e473199440e01c9ac298} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{asio\+\_\+error}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{asio_2base_8cpp_source_l00041}{41}} of file \mbox{\hyperlink{asio_2base_8cpp_source}{base.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00042\ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1asio_1_1error_ae47ed03449a199118bd7413c48203820}{websocketpp::transport::asio::error::make\_error\_code}};}
+\DoxyCodeLine{00043\ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1asio_1_1error_aeb44b27fc0ffac2a8991bf629cbfd045a883593fb292745d5e7dc0edb402fd23a}{websocketpp::transport::asio::error::general}};}
+\DoxyCodeLine{00044\ }
+\DoxyCodeLine{00045\ \ \ \ \ websocketpp::lib::error\_code\ ec\ =\ make\_error\_code(general);}
+\DoxyCodeLine{00046\ }
+\DoxyCodeLine{00047\ \ \ \ \ BOOST\_CHECK(\ ec\ ==\ general\ );}
+\DoxyCodeLine{00048\ \ \ \ \ BOOST\_CHECK(\ ec.value()\ ==\ 1\ );}
+\DoxyCodeLine{00049\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{asio_2base_8cpp_af6751874dd77e473199440e01c9ac298_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{asio_2base_8cpp_aa5d2be39b8c78ba592dd63c627802b8b}\index{base.cpp@{base.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!base.cpp@{base.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{asio_2base_8cpp_aa5d2be39b8c78ba592dd63c627802b8b} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{blank\+\_\+error}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{asio_2base_8cpp_source_l00035}{35}} of file \mbox{\hyperlink{asio_2base_8cpp_source}{base.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00036\ \ \ \ \ websocketpp::lib::error\_code\ ec;}
+\DoxyCodeLine{00037\ }
+\DoxyCodeLine{00038\ \ \ \ \ BOOST\_CHECK(\ !ec\ );}
+\DoxyCodeLine{00039\ \}}
+
+\end{DoxyCode}

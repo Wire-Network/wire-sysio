@@ -1,0 +1,99 @@
+\doxysection{sysio\+::chain\+::protocol\+\_\+feature\+\_\+activation\+\_\+set Struct Reference}
+\hypertarget{structsysio_1_1chain_1_1protocol__feature__activation__set}{}\label{structsysio_1_1chain_1_1protocol__feature__activation__set}\index{sysio::chain::protocol\_feature\_activation\_set@{sysio::chain::protocol\_feature\_activation\_set}}
+
+
+{\ttfamily \#include $<$protocol\+\_\+feature\+\_\+activation.\+hpp$>$}
+
+
+
+Collaboration diagram for sysio\+::chain\+::protocol\+\_\+feature\+\_\+activation\+\_\+set\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=217pt]{structsysio_1_1chain_1_1protocol__feature__activation__set__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature__activation__set_a76272ea0cd2c056a5ac64833d235df9b}{protocol\+\_\+feature\+\_\+activation\+\_\+set}} ()=default
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature__activation__set_ab01dbdab9b0adcec82ad87b33a12f3a6}{protocol\+\_\+feature\+\_\+activation\+\_\+set}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature__activation__set}{protocol\+\_\+feature\+\_\+activation\+\_\+set}} \&orig\+\_\+pfa\+\_\+set, \mbox{\hyperlink{classfc_1_1vector}{vector}}$<$ \mbox{\hyperlink{namespacesysio_1_1chain_a357fd9478475457e5bb386a3143079b6}{digest\+\_\+type}} $>$ additional\+\_\+features, bool enforce\+\_\+disjoint=true)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+flat\+\_\+set$<$ \mbox{\hyperlink{namespacesysio_1_1chain_a357fd9478475457e5bb386a3143079b6}{digest\+\_\+type}} $>$ \mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature__activation__set_a15562ea9156da8caf0dcdf91b4cc2129}{protocol\+\_\+features}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{protocol__feature__activation_8hpp_source_l00036}{36}} of file \mbox{\hyperlink{protocol__feature__activation_8hpp_source}{protocol\+\_\+feature\+\_\+activation.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structsysio_1_1chain_1_1protocol__feature__activation__set_a76272ea0cd2c056a5ac64833d235df9b}\index{sysio::chain::protocol\_feature\_activation\_set@{sysio::chain::protocol\_feature\_activation\_set}!protocol\_feature\_activation\_set@{protocol\_feature\_activation\_set}}
+\index{protocol\_feature\_activation\_set@{protocol\_feature\_activation\_set}!sysio::chain::protocol\_feature\_activation\_set@{sysio::chain::protocol\_feature\_activation\_set}}
+\doxysubsubsection{\texorpdfstring{protocol\_feature\_activation\_set()}{protocol\_feature\_activation\_set()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1protocol__feature__activation__set_a76272ea0cd2c056a5ac64833d235df9b} 
+sysio\+::chain\+::protocol\+\_\+feature\+\_\+activation\+\_\+set\+::protocol\+\_\+feature\+\_\+activation\+\_\+set (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [default]}}
+
+\Hypertarget{structsysio_1_1chain_1_1protocol__feature__activation__set_ab01dbdab9b0adcec82ad87b33a12f3a6}\index{sysio::chain::protocol\_feature\_activation\_set@{sysio::chain::protocol\_feature\_activation\_set}!protocol\_feature\_activation\_set@{protocol\_feature\_activation\_set}}
+\index{protocol\_feature\_activation\_set@{protocol\_feature\_activation\_set}!sysio::chain::protocol\_feature\_activation\_set@{sysio::chain::protocol\_feature\_activation\_set}}
+\doxysubsubsection{\texorpdfstring{protocol\_feature\_activation\_set()}{protocol\_feature\_activation\_set()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1protocol__feature__activation__set_ab01dbdab9b0adcec82ad87b33a12f3a6} 
+sysio\+::chain\+::protocol\+\_\+feature\+\_\+activation\+\_\+set\+::protocol\+\_\+feature\+\_\+activation\+\_\+set (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature__activation__set}{protocol\+\_\+feature\+\_\+activation\+\_\+set}} \&}]{orig\+\_\+pfa\+\_\+set}{, }\item[{\mbox{\hyperlink{classfc_1_1vector}{vector}}$<$ \mbox{\hyperlink{namespacesysio_1_1chain_a357fd9478475457e5bb386a3143079b6}{digest\+\_\+type}} $>$}]{additional\+\_\+features}{, }\item[{bool}]{enforce\+\_\+disjoint}{ = {\ttfamily true}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{protocol__feature__activation_8cpp_source_l00028}{28}} of file \mbox{\hyperlink{protocol__feature__activation_8cpp_source}{protocol\+\_\+feature\+\_\+activation.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00033\ \ \ \ \{}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ std::sort(\ additional\_features.begin(),\ additional\_features.end()\ );}
+\DoxyCodeLine{00035\ }
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ s1\ =\ orig\_pfa\_set.protocol\_features;}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ s2\ =\ additional\_features;}
+\DoxyCodeLine{00038\ }
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ expected\_size\ =\ s1.size()\ +\ s2.size();}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature__activation__set_a15562ea9156da8caf0dcdf91b4cc2129}{protocol\_features}}.reserve(\ expected\_size\ );}
+\DoxyCodeLine{00041\ }
+\DoxyCodeLine{00042\ \ \ \ \ \ \ std::set\_union(\ s1.cbegin(),\ s1.cend(),\ s2.cbegin(),\ s2.cend(),\ \mbox{\hyperlink{namespacesysio_1_1chain_a1491348a4182743cfdf2d0d41f5c6796}{end\_inserter}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature__activation__set_a15562ea9156da8caf0dcdf91b4cc2129}{protocol\_features}}\ )\ );}
+\DoxyCodeLine{00043\ }
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ !enforce\_disjoint\ ||\ \mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature__activation__set_a15562ea9156da8caf0dcdf91b4cc2129}{protocol\_features}}.size()\ ==\ expected\_size,}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ invalid\_block\_header\_extension,}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}duplication\ of\ protocol\ feature\ digests"{}}}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ );}
+\DoxyCodeLine{00048\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1protocol__feature__activation__set_ab01dbdab9b0adcec82ad87b33a12f3a6_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1chain_1_1protocol__feature__activation__set_a15562ea9156da8caf0dcdf91b4cc2129}\index{sysio::chain::protocol\_feature\_activation\_set@{sysio::chain::protocol\_feature\_activation\_set}!protocol\_features@{protocol\_features}}
+\index{protocol\_features@{protocol\_features}!sysio::chain::protocol\_feature\_activation\_set@{sysio::chain::protocol\_feature\_activation\_set}}
+\doxysubsubsection{\texorpdfstring{protocol\_features}{protocol\_features}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1protocol__feature__activation__set_a15562ea9156da8caf0dcdf91b4cc2129} 
+flat\+\_\+set$<$\mbox{\hyperlink{namespacesysio_1_1chain_a357fd9478475457e5bb386a3143079b6}{digest\+\_\+type}}$>$ sysio\+::chain\+::protocol\+\_\+feature\+\_\+activation\+\_\+set\+::protocol\+\_\+features}
+
+
+
+Definition at line \mbox{\hyperlink{protocol__feature__activation_8hpp_source_l00037}{37}} of file \mbox{\hyperlink{protocol__feature__activation_8hpp_source}{protocol\+\_\+feature\+\_\+activation.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{protocol__feature__activation_8hpp}{protocol\+\_\+feature\+\_\+activation.\+hpp}}\item 
+libraries/chain/\mbox{\hyperlink{protocol__feature__activation_8cpp}{protocol\+\_\+feature\+\_\+activation.\+cpp}}\end{DoxyCompactItemize}

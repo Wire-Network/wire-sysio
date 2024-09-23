@@ -1,0 +1,7 @@
+<map id="test_intialized_inf" name="test_intialized_inf">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,128,31"/>
+<area shape="rect" id="Node000002" href="$tests_8c.html#a63a7c68b6b72356c59cfdaaab131c73b" title=" " alt="" coords="176,5,361,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="128,16,160,16,160,21,128,21"/>
+<area shape="rect" id="Node000003" href="$tests_8c.html#af038dec65d22bf5050a82de7b4ad4bca" title=" " alt="" coords="409,5,586,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="361,16,393,16,393,21,361,21"/>
+</map>

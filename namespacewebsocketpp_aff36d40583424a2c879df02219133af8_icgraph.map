@@ -1,0 +1,17 @@
+<map id="websocketpp::base64_encode" name="websocketpp::base64_encode">
+<area shape="rect" id="Node000001" title="Encode a char buffer into a base64 string." alt="" coords="512,113,660,154"/>
+<area shape="rect" id="Node000002" href="$namespacewebsocketpp.html#a3a167489f63491475d0069204edf71da" title="Encode a string into a base64 string." alt="" coords="280,5,428,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="543,106,505,82,463,60,428,47,430,42,465,55,507,78,546,102"/>
+<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1processor_1_1hybi13.html#a587360571f5bb11b7d0c39b69566bf38" title="Fill in a set of request headers for a client connection request." alt="" coords="266,70,442,126"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="497,123,443,114,443,109,497,117"/>
+<area shape="rect" id="Node000004" href="$classwebsocketpp_1_1processor_1_1hybi13.html#afe3d2731a39faebab5f927a13e26fb8c" title="Convert a client handshake key into a server response key in place." alt="" coords="245,149,464,190"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="497,150,465,155,464,150,496,145"/>
+<area shape="rect" id="Node000007" href="$classwebsocketpp_1_1transport_1_1asio_1_1connection.html#a99ee9d4f4043a2e3b2225cb1f03a56d1" title="Set the basic auth credentials to use (exception free)" alt="" coords="276,218,433,274"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="539,164,465,204,430,220,428,215,463,199,536,160"/>
+<area shape="rect" id="Node000005" href="$classwebsocketpp_1_1processor_1_1hybi13.html#aa527ee3ece912ef818a207fce5261383" title="Calculate the appropriate response for this websocket request." alt="" coords="5,77,197,118"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="265,147,175,121,176,116,266,142"/>
+<area shape="rect" id="Node000006" href="$classwebsocketpp_1_1processor_1_1hybi13.html#a8b3cea2f1526b4982e0836c5705584a8" title="Validate the server&#39;s response to an outgoing handshake request." alt="" coords="19,142,183,198"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="229,172,183,172,183,167,229,167"/>
+<area shape="rect" id="Node000008" href="$classwebsocketpp_1_1transport_1_1asio_1_1connection.html#a0a42cbcc12974d71c0ea91d12da6b72e" title="Set the basic auth credentials to use (exception)" alt="" coords="22,222,180,278"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="260,250,180,251,180,246,260,244"/>
+</map>

@@ -1,0 +1,70 @@
+\doxysection{block.\+cpp}
+\hypertarget{block_8cpp_source}{}\label{block_8cpp_source}\index{libraries/chain/block.cpp@{libraries/chain/block.cpp}}
+\mbox{\hyperlink{block_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{block_8hpp}{sysio/chain/block.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00003}00003\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{\ \textcolor{keyword}{namespace\ }chain\ \{}
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00004}\mbox{\hyperlink{structsysio_1_1chain_1_1additional__block__signatures__extension_a27cc356718d561e7eb2488ff6022696e}{00004}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structsysio_1_1chain_1_1additional__block__signatures__extension_a27cc356718d561e7eb2488ff6022696e}{additional\_block\_signatures\_extension::reflector\_init}}()\ \{}
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00005}00005\ \ \ \ \ \ \ \textcolor{keyword}{static\_assert}(\ \mbox{\hyperlink{namespacefc_1_1raw_a2faa56ac1b3732aa5606b053b3f92d78}{fc::raw::has\_feature\_reflector\_init\_on\_unpacked\_reflected\_types}},}
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00006}00006\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}additional\_block\_signatures\_extension\ expects\ FC\ to\ support\ reflector\_init"{}}\ );}
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00008}00008\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ signatures.size()\ >\ 0,\ ill\_formed\_additional\_block\_signatures\_extension,}
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00009}00009\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Additional\ block\ signatures\ extension\ must\ contain\ at\ least\ one\ signature"{}},}
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00010}00010\ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00012}00012\ \ \ \ \ \ \ set<signature\_type>\ unique\_sigs;}
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00014}00014\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ :\ signatures\ )\ \{}
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00015}00015\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ res\ =\ unique\_sigs.insert(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ );}
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00016}00016\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ res.second,\ ill\_formed\_additional\_block\_signatures\_extension,}
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00017}00017\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Signature\ \$\{s\}\ was\ repeated\ in\ the\ additional\ block\ signatures\ extension"{}},}
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00018}00018\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}s"{}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})}
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00019}00019\ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00020}00020\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00021}00021\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00023}\mbox{\hyperlink{structsysio_1_1chain_1_1signed__block_ac2a52995b95d052a915bc65b3e498a3a}{00023}}\ \ \ \ flat\_multimap<uint16\_t,\ block\_extension>\ \mbox{\hyperlink{structsysio_1_1chain_1_1signed__block_ac2a52995b95d052a915bc65b3e498a3a}{signed\_block::validate\_and\_extract\_extensions}}()\textcolor{keyword}{const\ }\{}
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00024}00024\ \ \ \ \ \ \ \textcolor{keyword}{using\ }decompose\_t\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1detail_1_1block__extension__types_a3592d46defab7a5455253210addd2e27}{block\_extension\_types::decompose\_t}};}
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00026}00026\ \ \ \ \ \ \ flat\_multimap<uint16\_t,\ block\_extension>\ \mbox{\hyperlink{test__account__query__db_8cpp_a33f2983ff61d9343e424c440190d8610}{results}};}
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00028}00028\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ id\_type\_lower\_bound\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00030}00030\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{structsysio_1_1chain_1_1signed__block_a7be0f657a61b3467d9d1178a5de239a0}{block\_extensions}}.size();\ ++i\ )\ \{}
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00031}00031\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ e\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1signed__block_a7be0f657a61b3467d9d1178a5de239a0}{block\_extensions}}[i];}
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00032}00032\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \textcolor{keywordtype}{id}\ =\ e.first;}
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00034}00034\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ \textcolor{keywordtype}{id}\ >=\ id\_type\_lower\_bound,\ invalid\_block\_extension,}
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00035}00035\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Block\ extensions\ are\ not\ in\ the\ correct\ order\ (ascending\ id\ types\ required)"{}}}
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00036}00036\ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00038}00038\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ iter\ =\ \mbox{\hyperlink{test__account__query__db_8cpp_a33f2983ff61d9343e424c440190d8610}{results}}.emplace(std::piecewise\_construct,}
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00039}00039\ \ \ \ \ \ \ \ \ \ \ \ \ std::forward\_as\_tuple(\textcolor{keywordtype}{id}),}
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00040}00040\ \ \ \ \ \ \ \ \ \ \ \ \ std::forward\_as\_tuple()}
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00041}00041\ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00043}00043\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ match\ =\ decompose\_t::extract<block\_extension>(\ \textcolor{keywordtype}{id},\ e.second,\ iter-\/>second\ );}
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00044}00044\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ match,\ invalid\_block\_extension,}
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00045}00045\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Block\ extension\ with\ id\ type\ \$\{id\}\ is\ not\ supported"{}},}
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00046}00046\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}id"{}},\ \textcolor{keywordtype}{id})}
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00047}00047\ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ match-\/>enforce\_unique\ )\ \{}
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00050}00050\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ i\ ==\ 0\ ||\ \textcolor{keywordtype}{id}\ >\ id\_type\_lower\_bound,\ invalid\_block\_header\_extension,}
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00051}00051\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Block\ extension\ with\ id\ type\ \$\{id\}\ is\ not\ allowed\ to\ repeat"{}},}
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}id"{}},\ \textcolor{keywordtype}{id})}
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00057}00057\ \ \ \ \ \ \ \ \ \ id\_type\_lower\_bound\ =\ \mbox{\hyperlink{code__cache_8cpp_aa0efefe21f4700d78692edc823e763be}{id}};}
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00058}00058\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00060}00060\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{test__account__query__db_8cpp_a33f2983ff61d9343e424c440190d8610}{results}};}
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00062}00062\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{block_8cpp_source_l00064}00064\ \}\ \}\ }
+
+\end{DoxyCode}

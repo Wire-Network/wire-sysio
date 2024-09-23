@@ -1,0 +1,380 @@
+\doxysection{sysio\+::trace\+\_\+api\+\_\+rpc\+\_\+plugin\+\_\+impl Struct Reference}
+\hypertarget{structsysio_1_1trace__api__rpc__plugin__impl}{}\label{structsysio_1_1trace__api__rpc__plugin__impl}\index{sysio::trace\_api\_rpc\_plugin\_impl@{sysio::trace\_api\_rpc\_plugin\_impl}}
+
+
+Inheritance diagram for sysio\+::trace\+\_\+api\+\_\+rpc\+\_\+plugin\+\_\+impl\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=191pt]{structsysio_1_1trace__api__rpc__plugin__impl__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for sysio\+::trace\+\_\+api\+\_\+rpc\+\_\+plugin\+\_\+impl\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=191pt]{structsysio_1_1trace__api__rpc__plugin__impl__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{structsysio_1_1trace__api__rpc__plugin__impl_af96dac8555b8344de52b30b439f28a9c}{request\+\_\+handler\+\_\+t}} = \mbox{\hyperlink{classsysio_1_1trace__api_1_1request__handler}{request\+\_\+handler}}$<$shared\+\_\+store\+\_\+provider$<$\mbox{\hyperlink{classsysio_1_1trace__api_1_1store__provider}{store\+\_\+provider}}$>$, \mbox{\hyperlink{classsysio_1_1trace__api_1_1abi__data__handler_1_1shared__provider}{abi\+\_\+data\+\_\+handler\+::shared\+\_\+provider}}$>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1trace__api__rpc__plugin__impl_a4f50d4e3e5d587c067d89d65ca9e5b7f}{trace\+\_\+api\+\_\+rpc\+\_\+plugin\+\_\+impl}} (const std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{structsysio_1_1trace__api__common__impl}{trace\+\_\+api\+\_\+common\+\_\+impl}} $>$ \&\mbox{\hyperlink{structsysio_1_1trace__api__rpc__plugin__impl_aa832892cc5ce02500ef32393d81a91e1}{common}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1trace__api__rpc__plugin__impl_aefcd255adcccd0c9ddc5d2bb512eb3a8}{plugin\+\_\+initialize}} (const appbase\+::variables\+\_\+map \&options)
+\item 
+\mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}} \mbox{\hyperlink{structsysio_1_1trace__api__rpc__plugin__impl_a49c7c2a04c5676138a8b4d4e2369cb12}{calc\+\_\+deadline}} (const \mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}} \&max\+\_\+serialization\+\_\+time)
+\item 
+void \mbox{\hyperlink{structsysio_1_1trace__api__rpc__plugin__impl_a8d5216121c2ae237cf5bb675b66aef1f}{plugin\+\_\+startup}} ()
+\item 
+void \mbox{\hyperlink{structsysio_1_1trace__api__rpc__plugin__impl_a3539de78c9c3d655420cd9096e590505}{plugin\+\_\+shutdown}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static void \mbox{\hyperlink{structsysio_1_1trace__api__rpc__plugin__impl_a47813f526ec1792c77fba7bba237c231}{set\+\_\+program\+\_\+options}} (appbase\+::options\+\_\+description \&\mbox{\hyperlink{xbyak__mnemonic_8h_a4229a9b84f8b8673326f12bd41acd27c}{cli}}, appbase\+::options\+\_\+description \&cfg)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{structsysio_1_1trace__api__common__impl}{trace\+\_\+api\+\_\+common\+\_\+impl}} $>$ \mbox{\hyperlink{structsysio_1_1trace__api__rpc__plugin__impl_aa832892cc5ce02500ef32393d81a91e1}{common}}
+\item 
+std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{structsysio_1_1trace__api__rpc__plugin__impl_af96dac8555b8344de52b30b439f28a9c}{request\+\_\+handler\+\_\+t}} $>$ \mbox{\hyperlink{structsysio_1_1trace__api__rpc__plugin__impl_aebe70c7e0dcec59710eeaadaf7a6397d}{req\+\_\+handler}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\doxylink{class_interface}{Interface} with the RPC process 
+
+Definition at line \mbox{\hyperlink{trace__api__plugin_8cpp_source_l00179}{179}} of file \mbox{\hyperlink{trace__api__plugin_8cpp_source}{trace\+\_\+api\+\_\+plugin.\+cpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{structsysio_1_1trace__api__rpc__plugin__impl_af96dac8555b8344de52b30b439f28a9c}\index{sysio::trace\_api\_rpc\_plugin\_impl@{sysio::trace\_api\_rpc\_plugin\_impl}!request\_handler\_t@{request\_handler\_t}}
+\index{request\_handler\_t@{request\_handler\_t}!sysio::trace\_api\_rpc\_plugin\_impl@{sysio::trace\_api\_rpc\_plugin\_impl}}
+\doxysubsubsection{\texorpdfstring{request\_handler\_t}{request\_handler\_t}}
+{\footnotesize\ttfamily \label{structsysio_1_1trace__api__rpc__plugin__impl_af96dac8555b8344de52b30b439f28a9c} 
+using \mbox{\hyperlink{structsysio_1_1trace__api__rpc__plugin__impl_af96dac8555b8344de52b30b439f28a9c}{sysio\+::trace\+\_\+api\+\_\+rpc\+\_\+plugin\+\_\+impl\+::request\+\_\+handler\+\_\+t}} = \mbox{\hyperlink{classsysio_1_1trace__api_1_1request__handler}{request\+\_\+handler}}$<$shared\+\_\+store\+\_\+provider$<$\mbox{\hyperlink{classsysio_1_1trace__api_1_1store__provider}{store\+\_\+provider}}$>$, \mbox{\hyperlink{classsysio_1_1trace__api_1_1abi__data__handler_1_1shared__provider}{abi\+\_\+data\+\_\+handler\+::shared\+\_\+provider}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{trace__api__plugin_8cpp_source_l00354}{354}} of file \mbox{\hyperlink{trace__api__plugin_8cpp_source}{trace\+\_\+api\+\_\+plugin.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structsysio_1_1trace__api__rpc__plugin__impl_a4f50d4e3e5d587c067d89d65ca9e5b7f}\index{sysio::trace\_api\_rpc\_plugin\_impl@{sysio::trace\_api\_rpc\_plugin\_impl}!trace\_api\_rpc\_plugin\_impl@{trace\_api\_rpc\_plugin\_impl}}
+\index{trace\_api\_rpc\_plugin\_impl@{trace\_api\_rpc\_plugin\_impl}!sysio::trace\_api\_rpc\_plugin\_impl@{sysio::trace\_api\_rpc\_plugin\_impl}}
+\doxysubsubsection{\texorpdfstring{trace\_api\_rpc\_plugin\_impl()}{trace\_api\_rpc\_plugin\_impl()}}
+{\footnotesize\ttfamily \label{structsysio_1_1trace__api__rpc__plugin__impl_a4f50d4e3e5d587c067d89d65ca9e5b7f} 
+sysio\+::trace\+\_\+api\+\_\+rpc\+\_\+plugin\+\_\+impl\+::trace\+\_\+api\+\_\+rpc\+\_\+plugin\+\_\+impl (\begin{DoxyParamCaption}\item[{const std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{structsysio_1_1trace__api__common__impl}{trace\+\_\+api\+\_\+common\+\_\+impl}} $>$ \&}]{common}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{trace__api__plugin_8cpp_source_l00181}{181}} of file \mbox{\hyperlink{trace__api__plugin_8cpp_source}{trace\+\_\+api\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00182\ \ \ \ :\mbox{\hyperlink{structsysio_1_1trace__api__rpc__plugin__impl_aa832892cc5ce02500ef32393d81a91e1}{common}}(\mbox{\hyperlink{namespacecommon}{common}})\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1trace__api__rpc__plugin__impl_a49c7c2a04c5676138a8b4d4e2369cb12}\index{sysio::trace\_api\_rpc\_plugin\_impl@{sysio::trace\_api\_rpc\_plugin\_impl}!calc\_deadline@{calc\_deadline}}
+\index{calc\_deadline@{calc\_deadline}!sysio::trace\_api\_rpc\_plugin\_impl@{sysio::trace\_api\_rpc\_plugin\_impl}}
+\doxysubsubsection{\texorpdfstring{calc\_deadline()}{calc\_deadline()}}
+{\footnotesize\ttfamily \label{structsysio_1_1trace__api__rpc__plugin__impl_a49c7c2a04c5676138a8b4d4e2369cb12} 
+\mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}} sysio\+::trace\+\_\+api\+\_\+rpc\+\_\+plugin\+\_\+impl\+::calc\+\_\+deadline (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}} \&}]{max\+\_\+serialization\+\_\+time}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{trace__api__plugin_8cpp_source_l00236}{236}} of file \mbox{\hyperlink{trace__api__plugin_8cpp_source}{trace\+\_\+api\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00237\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1time__point}{fc::time\_point}}\ deadline\ =\ \mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{fc::time\_point::now}}();}
+\DoxyCodeLine{00238\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ max\_serialization\_time\ >\ \mbox{\hyperlink{classfc_1_1microseconds_afc3eb0bfd792c7b1cda062e559e30c2e}{fc::microseconds::maximum}}()\ -\/\ deadline.time\_since\_epoch()\ )\ \{}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \ deadline\ =\ \mbox{\hyperlink{classfc_1_1time__point_aeccf1b70aa34b132c5269313b8a50573}{fc::time\_point::maximum}}();}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00241\ \ \ \ \ \ \ \ \ \ deadline\ +=\ max\_serialization\_time;}
+\DoxyCodeLine{00242\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00243\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ deadline;}
+\DoxyCodeLine{00244\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1trace__api__rpc__plugin__impl_a49c7c2a04c5676138a8b4d4e2369cb12_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1trace__api__rpc__plugin__impl_aefcd255adcccd0c9ddc5d2bb512eb3a8}\index{sysio::trace\_api\_rpc\_plugin\_impl@{sysio::trace\_api\_rpc\_plugin\_impl}!plugin\_initialize@{plugin\_initialize}}
+\index{plugin\_initialize@{plugin\_initialize}!sysio::trace\_api\_rpc\_plugin\_impl@{sysio::trace\_api\_rpc\_plugin\_impl}}
+\doxysubsubsection{\texorpdfstring{plugin\_initialize()}{plugin\_initialize()}}
+{\footnotesize\ttfamily \label{structsysio_1_1trace__api__rpc__plugin__impl_aefcd255adcccd0c9ddc5d2bb512eb3a8} 
+void sysio\+::trace\+\_\+api\+\_\+rpc\+\_\+plugin\+\_\+impl\+::plugin\+\_\+initialize (\begin{DoxyParamCaption}\item[{const appbase\+::variables\+\_\+map \&}]{options}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{trace__api__plugin_8cpp_source_l00201}{201}} of file \mbox{\hyperlink{trace__api__plugin_8cpp_source}{trace\+\_\+api\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\textcolor{stringliteral}{"{}initializing\ trace\ api\ rpc\ plugin"{}});}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ std::shared\_ptr<abi\_data\_handler>\ data\_handler\ =\ std::make\_shared<abi\_data\_handler>([](\textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1trace__api_a13234b2d8223402a236dd90c01bedcfb}{exception\_with\_context}}\&\ e)\{}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ \ log\_exception(e,\ \mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4a30d2de77e71beb8d09d530cac04efa25}{fc::log\_level::debug}});}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00206\ }
+\DoxyCodeLine{00207\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.count(\textcolor{stringliteral}{"{}trace-\/rpc-\/abi"{}})\ )\ \{}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.count(\textcolor{stringliteral}{"{}trace-\/no-\/abis"{}})\ ==\ 0,\ chain::plugin\_config\_exception,}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Trace\ API\ is\ configured\ with\ ABIs\ however\ trace-\/no-\/abis\ is\ set"{}});}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::vector<std::string>\ key\_value\_pairs\ =\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}[\textcolor{stringliteral}{"{}trace-\/rpc-\/abi"{}}].as<std::vector<std::string>>();}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ entry\ :\ key\_value\_pairs)\ \{}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ kv\ =\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1configuration__utils_a1d240ad24c2e4abfb7daa4fa19ac36bf}{parse\_kv\_pairs}}(entry);}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ account\ =\ chain::name(kv.first);}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ abi\ =\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1configuration__utils_af66eb1c8879c8d045ad82f33233aed66}{abi\_def\_from\_file}}(kv.second,\ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().data\_dir());}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ data\_handler-\/>add\_abi(account,\ abi);}
+\DoxyCodeLine{00217\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{}
+\DoxyCodeLine{00218\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}}(\textcolor{stringliteral}{"{}Malformed\ trace-\/rpc-\/abi\ provider:\ \(\backslash\)"{}\$\{val\}\(\backslash\)"{}"{}},\ (\textcolor{stringliteral}{"{}val"{}},\ entry));}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw};}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.count(\textcolor{stringliteral}{"{}trace-\/no-\/abis"{}})\ !=\ 0,\ chain::plugin\_config\_exception,}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Trace\ API\ is\ not\ configured\ with\ ABIs\ and\ trace-\/no-\/abis\ is\ not\ set"{}});}
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00226\ }
+\DoxyCodeLine{00227\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1trace__api__rpc__plugin__impl_aebe70c7e0dcec59710eeaadaf7a6397d}{req\_handler}}\ =\ std::make\_shared<request\_handler\_t>(}
+\DoxyCodeLine{00228\ \ \ \ \ \ \ \ \ \ shared\_store\_provider<store\_provider>(\mbox{\hyperlink{namespacecommon}{common}}-\/>store),}
+\DoxyCodeLine{00229\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1trace__api_1_1abi__data__handler_1_1shared__provider}{abi\_data\_handler::shared\_provider}}(data\_handler),}
+\DoxyCodeLine{00230\ \ \ \ \ \ \ \ \ \ [](\textcolor{keyword}{const}\ std::string\&\ msg\ )\ \{}
+\DoxyCodeLine{00231\ \ \ \ \ \ \ \ \ \ \ \ \ fc\_dlog(\ \_log,\ msg\ );}
+\DoxyCodeLine{00232\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00233\ \ \ \ \ \ \ );}
+\DoxyCodeLine{00234\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1trace__api__rpc__plugin__impl_aefcd255adcccd0c9ddc5d2bb512eb3a8_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1trace__api__rpc__plugin__impl_a3539de78c9c3d655420cd9096e590505}\index{sysio::trace\_api\_rpc\_plugin\_impl@{sysio::trace\_api\_rpc\_plugin\_impl}!plugin\_shutdown@{plugin\_shutdown}}
+\index{plugin\_shutdown@{plugin\_shutdown}!sysio::trace\_api\_rpc\_plugin\_impl@{sysio::trace\_api\_rpc\_plugin\_impl}}
+\doxysubsubsection{\texorpdfstring{plugin\_shutdown()}{plugin\_shutdown()}}
+{\footnotesize\ttfamily \label{structsysio_1_1trace__api__rpc__plugin__impl_a3539de78c9c3d655420cd9096e590505} 
+void sysio\+::trace\+\_\+api\+\_\+rpc\+\_\+plugin\+\_\+impl\+::plugin\+\_\+shutdown (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{trace__api__plugin_8cpp_source_l00349}{349}} of file \mbox{\hyperlink{trace__api__plugin_8cpp_source}{trace\+\_\+api\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00349\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00350\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1trace__api__rpc__plugin__impl_a8d5216121c2ae237cf5bb675b66aef1f}\index{sysio::trace\_api\_rpc\_plugin\_impl@{sysio::trace\_api\_rpc\_plugin\_impl}!plugin\_startup@{plugin\_startup}}
+\index{plugin\_startup@{plugin\_startup}!sysio::trace\_api\_rpc\_plugin\_impl@{sysio::trace\_api\_rpc\_plugin\_impl}}
+\doxysubsubsection{\texorpdfstring{plugin\_startup()}{plugin\_startup()}}
+{\footnotesize\ttfamily \label{structsysio_1_1trace__api__rpc__plugin__impl_a8d5216121c2ae237cf5bb675b66aef1f} 
+void sysio\+::trace\+\_\+api\+\_\+rpc\+\_\+plugin\+\_\+impl\+::plugin\+\_\+startup (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{trace__api__plugin_8cpp_source_l00246}{246}} of file \mbox{\hyperlink{trace__api__plugin_8cpp_source}{trace\+\_\+api\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00246\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00247\ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ http\ =\ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_a3c4b68a0667942b58f1369f454ce0ce3}{get\_plugin}}<\mbox{\hyperlink{classsysio_1_1http__plugin}{http\_plugin}}>();}
+\DoxyCodeLine{00248\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1microseconds}{fc::microseconds}}\ max\_response\_time\ =\ http.get\_max\_response\_time();}
+\DoxyCodeLine{00249\ }
+\DoxyCodeLine{00250\ \ \ \ \ \ \ http.add\_async\_handler(\textcolor{stringliteral}{"{}/v1/trace\_api/get\_block"{}},}
+\DoxyCodeLine{00251\ \ \ \ \ \ \ \ \ \ \ \ \ [wthis=weak\_from\_this(),\ max\_response\_time](std::string,\ std::string\ body,\ \mbox{\hyperlink{namespacesysio_ababf376b47a253805b530a023df4768c}{url\_response\_callback}}\ cb)}
+\DoxyCodeLine{00252\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00253\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ that\ =\ wthis.lock();}
+\DoxyCodeLine{00254\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!that)\ \{}
+\DoxyCodeLine{00255\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00256\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00257\ }
+\DoxyCodeLine{00258\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ block\_number\ =\ ([\&body]()\ -\/>\ std::optional<uint32\_t>\ \{}
+\DoxyCodeLine{00259\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (body.empty())\ \{}
+\DoxyCodeLine{00260\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{\};}
+\DoxyCodeLine{00261\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00262\ }
+\DoxyCodeLine{00263\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00264\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ input\ =\ \mbox{\hyperlink{classfc_1_1json_afad69f9f9c2a9f0105aae99f532f90cb}{fc::json::from\_string}}(body);}
+\DoxyCodeLine{00265\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ block\_num\ =\ input.get\_object()[\textcolor{stringliteral}{"{}block\_num"{}}].as\_uint64();}
+\DoxyCodeLine{00266\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (block\_num\ >\ std::numeric\_limits<uint32\_t>::max())\ \{}
+\DoxyCodeLine{00267\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{\};}
+\DoxyCodeLine{00268\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00269\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ block\_num;}
+\DoxyCodeLine{00270\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{}
+\DoxyCodeLine{00271\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{\};}
+\DoxyCodeLine{00272\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00273\ \ \ \ \ \ \ \ \ \ \})();}
+\DoxyCodeLine{00274\ }
+\DoxyCodeLine{00275\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!block\_number)\ \{}
+\DoxyCodeLine{00276\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1error__results}{error\_results}}\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__result}{results}}\{400,\ \textcolor{stringliteral}{"{}Bad\ or\ missing\ block\_num"{}}\};}
+\DoxyCodeLine{00277\ \ \ \ \ \ \ \ \ \ \ \ \ cb(\ 400,\ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}(\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__result}{results}}\ ));}
+\DoxyCodeLine{00278\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00279\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00280\ }
+\DoxyCodeLine{00281\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00282\ }
+\DoxyCodeLine{00283\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ deadline\ =\ that-\/>calc\_deadline(\ max\_response\_time\ );}
+\DoxyCodeLine{00284\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ resp\ =\ that-\/>req\_handler-\/>get\_block\_trace(*block\_number,\ [deadline]()\ \{\ \mbox{\hyperlink{exception_8hpp_a03f2a3185ee8e8b39a309dfd336b64b5}{FC\_CHECK\_DEADLINE}}(deadline);\ \});}
+\DoxyCodeLine{00285\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (resp.is\_null())\ \{}
+\DoxyCodeLine{00286\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1error__results}{error\_results}}\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__result}{results}}\{404,\ \textcolor{stringliteral}{"{}Trace\ API:\ block\ trace\ missing"{}}\};}
+\DoxyCodeLine{00287\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ cb(\ 404,\ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}(\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__result}{results}}\ ));}
+\DoxyCodeLine{00288\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00289\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ cb(\ 200,\ std::move(resp)\ );}
+\DoxyCodeLine{00290\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00291\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{}
+\DoxyCodeLine{00292\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1http__plugin_acd1b5b94a136fd365c3c83a6452bc892}{http\_plugin::handle\_exception}}(\textcolor{stringliteral}{"{}trace\_api"{}},\ \textcolor{stringliteral}{"{}get\_block"{}},\ body,\ cb);}
+\DoxyCodeLine{00293\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00294\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00295\ }
+\DoxyCodeLine{00296\ }
+\DoxyCodeLine{00297\ \ \ \ \ \ \ http.add\_async\_handler(\textcolor{stringliteral}{"{}/v1/trace\_api/get\_transaction\_trace"{}},}
+\DoxyCodeLine{00298\ \ \ \ \ \ \ \ \ \ \ \ \ [wthis=weak\_from\_this(),\ max\_response\_time,\ \textcolor{keyword}{this}](std::string,\ std::string\ body,\ \mbox{\hyperlink{namespacesysio_ababf376b47a253805b530a023df4768c}{url\_response\_callback}}\ cb)}
+\DoxyCodeLine{00299\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00300\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ that\ =\ wthis.lock();}
+\DoxyCodeLine{00301\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!that)\ \{}
+\DoxyCodeLine{00302\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00303\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00304\ }
+\DoxyCodeLine{00305\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ trx\_id\ =\ ([\&body]()\ -\/>\ std::optional<transaction\_id\_type>\ \{}
+\DoxyCodeLine{00306\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (body.empty())\ \{}
+\DoxyCodeLine{00307\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{\};}
+\DoxyCodeLine{00308\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00309\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00310\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ input\ =\ \mbox{\hyperlink{classfc_1_1json_afad69f9f9c2a9f0105aae99f532f90cb}{fc::json::from\_string}}(body);}
+\DoxyCodeLine{00311\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ trxid\ =\ input.get\_object()[\textcolor{stringliteral}{"{}id"{}}].as\_string();}
+\DoxyCodeLine{00312\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (trxid.size()\ <\ 8\ ||\ trxid.size()\ >\ 64)\ \{}
+\DoxyCodeLine{00313\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{\};}
+\DoxyCodeLine{00314\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00315\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacesysio_1_1chain_aa85a3b49b3b219d1e3840567579e7e63}{transaction\_id\_type}}(trxid);}
+\DoxyCodeLine{00316\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{}
+\DoxyCodeLine{00317\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{\};}
+\DoxyCodeLine{00318\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00319\ \ \ \ \ \ \ \ \ \ \})();}
+\DoxyCodeLine{00320\ }
+\DoxyCodeLine{00321\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!trx\_id)\ \{}
+\DoxyCodeLine{00322\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1error__results}{error\_results}}\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__result}{results}}\{400,\ \textcolor{stringliteral}{"{}Bad\ or\ missing\ transaction\ ID"{}}\};}
+\DoxyCodeLine{00323\ \ \ \ \ \ \ \ \ \ \ \ \ cb(\ 400,\ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}(\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__result}{results}}\ ));}
+\DoxyCodeLine{00324\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00325\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00326\ }
+\DoxyCodeLine{00327\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00328\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ deadline\ =\ that-\/>calc\_deadline(\ max\_response\_time\ );}
+\DoxyCodeLine{00329\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ search\ for\ the\ block\ that\ contains\ the\ transaction}}
+\DoxyCodeLine{00330\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1trace__api_abd0f429b16506edddbd4a2cc5a8acea0}{get\_block\_n}}\ blk\_num\ =\ \mbox{\hyperlink{namespacecommon}{common}}-\/>store-\/>get\_trx\_block\_number(*trx\_id,\ \mbox{\hyperlink{namespacecommon}{common}}-\/>minimum\_irreversible\_history\_blocks,\ [deadline]()\ \{\ FC\_CHECK\_DEADLINE(deadline);\ \});}
+\DoxyCodeLine{00331\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!blk\_num.has\_value())\{}
+\DoxyCodeLine{00332\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1error__results}{error\_results}}\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__result}{results}}\{404,\ \textcolor{stringliteral}{"{}Trace\ API:\ transaction\ id\ missing\ in\ the\ transaction\ id\ log\ files"{}}\};}
+\DoxyCodeLine{00333\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ cb(\ 404,\ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}(\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__result}{results}}\ ));}
+\DoxyCodeLine{00334\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00335\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ resp\ =\ that-\/>req\_handler-\/>get\_transaction\_trace(*trx\_id,\ *blk\_num,\ [deadline]()\ \{\ \mbox{\hyperlink{exception_8hpp_a03f2a3185ee8e8b39a309dfd336b64b5}{FC\_CHECK\_DEADLINE}}(deadline);\ \});}
+\DoxyCodeLine{00336\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (resp.is\_null())\ \{}
+\DoxyCodeLine{00337\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1error__results}{error\_results}}\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__result}{results}}\{404,\ \textcolor{stringliteral}{"{}Trace\ API:\ transaction\ trace\ missing"{}}\};}
+\DoxyCodeLine{00338\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ cb(\ 404,\ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}(\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__result}{results}}\ ));}
+\DoxyCodeLine{00339\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00340\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ cb(\ 200,\ std::move(resp)\ );}
+\DoxyCodeLine{00341\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00342\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00343\ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{}
+\DoxyCodeLine{00344\ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1http__plugin_acd1b5b94a136fd365c3c83a6452bc892}{http\_plugin::handle\_exception}}(\textcolor{stringliteral}{"{}trace\_api"{}},\ \textcolor{stringliteral}{"{}get\_transaction"{}},\ body,\ cb);}
+\DoxyCodeLine{00345\ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00346\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00347\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1trace__api__rpc__plugin__impl_a8d5216121c2ae237cf5bb675b66aef1f_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1trace__api__rpc__plugin__impl_a47813f526ec1792c77fba7bba237c231}\index{sysio::trace\_api\_rpc\_plugin\_impl@{sysio::trace\_api\_rpc\_plugin\_impl}!set\_program\_options@{set\_program\_options}}
+\index{set\_program\_options@{set\_program\_options}!sysio::trace\_api\_rpc\_plugin\_impl@{sysio::trace\_api\_rpc\_plugin\_impl}}
+\doxysubsubsection{\texorpdfstring{set\_program\_options()}{set\_program\_options()}}
+{\footnotesize\ttfamily \label{structsysio_1_1trace__api__rpc__plugin__impl_a47813f526ec1792c77fba7bba237c231} 
+static void sysio\+::trace\+\_\+api\+\_\+rpc\+\_\+plugin\+\_\+impl\+::set\+\_\+program\+\_\+options (\begin{DoxyParamCaption}\item[{appbase\+::options\+\_\+description \&}]{cli}{, }\item[{appbase\+::options\+\_\+description \&}]{cfg}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{trace__api__plugin_8cpp_source_l00184}{184}} of file \mbox{\hyperlink{trace__api__plugin_8cpp_source}{trace\+\_\+api\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ cfg\_options\ =\ cfg.add\_options();}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ cfg\_options(\textcolor{stringliteral}{"{}trace-\/rpc-\/abi"{}},\ bpo::value<\mbox{\hyperlink{classfc_1_1vector}{vector<string>}}>()-\/>composing(),}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}ABIs\ used\ when\ decoding\ trace\ RPC\ responses.\(\backslash\)n"{}}}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}There\ must\ be\ at\ least\ one\ ABI\ specified\ OR\ the\ flag\ trace-\/no-\/abis\ must\ be\ used.\(\backslash\)n"{}}}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}ABIs\ are\ specified\ as\ \(\backslash\)"{}Key=Value\(\backslash\)"{}\ pairs\ in\ the\ form\ <account-\/name>=<abi-\/def>\(\backslash\)n"{}}}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Where\ <abi-\/def>\ can\ be:\(\backslash\)n"{}}}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ \ \ an\ absolute\ path\ to\ a\ file\ containing\ a\ valid\ JSON-\/encoded\ ABI\(\backslash\)n"{}}}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ \ \ a\ relative\ path\ from\ \`{}data-\/dir`\ to\ a\ file\ containing\ a\ valid\ JSON-\/encoded\ ABI\(\backslash\)n"{}}}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ cfg\_options(\textcolor{stringliteral}{"{}trace-\/no-\/abis"{}},}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Use\ to\ indicate\ that\ the\ RPC\ responses\ will\ not\ use\ ABIs.\(\backslash\)n"{}}}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Failure\ to\ specify\ this\ option\ when\ there\ are\ no\ trace-\/rpc-\/abi\ configuations\ will\ result\ in\ an\ Error.\(\backslash\)n"{}}}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}This\ option\ is\ mutually\ exclusive\ with\ trace-\/rpc-\/api"{}}}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ );}
+\DoxyCodeLine{00199\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1trace__api__rpc__plugin__impl_a47813f526ec1792c77fba7bba237c231_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1trace__api__rpc__plugin__impl_aa832892cc5ce02500ef32393d81a91e1}\index{sysio::trace\_api\_rpc\_plugin\_impl@{sysio::trace\_api\_rpc\_plugin\_impl}!common@{common}}
+\index{common@{common}!sysio::trace\_api\_rpc\_plugin\_impl@{sysio::trace\_api\_rpc\_plugin\_impl}}
+\doxysubsubsection{\texorpdfstring{common}{common}}
+{\footnotesize\ttfamily \label{structsysio_1_1trace__api__rpc__plugin__impl_aa832892cc5ce02500ef32393d81a91e1} 
+std\+::shared\+\_\+ptr$<$\mbox{\hyperlink{structsysio_1_1trace__api__common__impl}{trace\+\_\+api\+\_\+common\+\_\+impl}}$>$ sysio\+::trace\+\_\+api\+\_\+rpc\+\_\+plugin\+\_\+impl\+::common}
+
+
+
+Definition at line \mbox{\hyperlink{trace__api__plugin_8cpp_source_l00352}{352}} of file \mbox{\hyperlink{trace__api__plugin_8cpp_source}{trace\+\_\+api\+\_\+plugin.\+cpp}}.
+
+\Hypertarget{structsysio_1_1trace__api__rpc__plugin__impl_aebe70c7e0dcec59710eeaadaf7a6397d}\index{sysio::trace\_api\_rpc\_plugin\_impl@{sysio::trace\_api\_rpc\_plugin\_impl}!req\_handler@{req\_handler}}
+\index{req\_handler@{req\_handler}!sysio::trace\_api\_rpc\_plugin\_impl@{sysio::trace\_api\_rpc\_plugin\_impl}}
+\doxysubsubsection{\texorpdfstring{req\_handler}{req\_handler}}
+{\footnotesize\ttfamily \label{structsysio_1_1trace__api__rpc__plugin__impl_aebe70c7e0dcec59710eeaadaf7a6397d} 
+std\+::shared\+\_\+ptr$<$\mbox{\hyperlink{structsysio_1_1trace__api__rpc__plugin__impl_af96dac8555b8344de52b30b439f28a9c}{request\+\_\+handler\+\_\+t}}$>$ sysio\+::trace\+\_\+api\+\_\+rpc\+\_\+plugin\+\_\+impl\+::req\+\_\+handler}
+
+
+
+Definition at line \mbox{\hyperlink{trace__api__plugin_8cpp_source_l00355}{355}} of file \mbox{\hyperlink{trace__api__plugin_8cpp_source}{trace\+\_\+api\+\_\+plugin.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+plugins/trace\+\_\+api\+\_\+plugin/\mbox{\hyperlink{trace__api__plugin_8cpp}{trace\+\_\+api\+\_\+plugin.\+cpp}}\end{DoxyCompactItemize}

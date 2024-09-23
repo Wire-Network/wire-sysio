@@ -1,0 +1,21 @@
+<map id="libraries/fc/secp256k1/secp256k1/src/assumptions.h" name="libraries/fc/secp256k1/secp256k1/src/assumptions.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="396,5,595,46"/>
+<area shape="rect" id="Node000002" href="$bench__internal_8c.html" title=" " alt="" coords="5,198,215,238"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="381,32,293,38,205,50,130,68,103,81,84,96,77,107,74,119,76,146,86,173,99,196,94,199,81,175,71,147,69,119,72,105,80,92,100,76,128,63,204,44,293,33,380,27"/>
+<area shape="rect" id="Node000003" href="$precompute__ecmult_8c.html" title=" " alt="" coords="94,94,276,150"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="417,53,275,96,274,91,415,48"/>
+<area shape="rect" id="Node000004" href="$precompute__ecmult__gen_8c.html" title=" " alt="" coords="300,94,482,150"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="464,59,423,95,420,91,461,55"/>
+<area shape="rect" id="Node000005" href="$secp256k1_8c.html" title=" " alt="" coords="506,102,695,142"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="530,54,581,99,577,103,527,58"/>
+<area shape="rect" id="Node000008" href="$tests__exhaustive_8c.html" title=" " alt="" coords="660,198,885,238"/>
+<area shape="poly" id="edge9_Node000001_Node000008" title=" " alt="" coords="611,43,662,63,709,92,732,116,749,144,770,196,765,198,744,147,727,120,706,96,660,67,609,48"/>
+<area shape="rect" id="Node000009" href="$valgrind__ctime__test_8c.html" title=" " alt="" coords="770,94,930,150"/>
+<area shape="poly" id="edge10_Node000001_Node000009" title=" " alt="" coords="586,48,752,91,770,96,769,101,751,97,585,53"/>
+<area shape="poly" id="edge6_Node000005_Node000002" title=" " alt="" coords="510,149,495,152,349,180,216,203,215,198,348,175,493,147,509,144"/>
+<area shape="rect" id="Node000006" href="$bench__ecmult_8c.html" title=" " alt="" coords="252,198,458,238"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="536,151,408,200,406,195,534,146"/>
+<area shape="rect" id="Node000007" href="$tests_8c.html" title=" " alt="" coords="482,198,636,238"/>
+<area shape="poly" id="edge7_Node000005_Node000007" title=" " alt="" coords="588,158,570,198,565,196,583,155"/>
+<area shape="poly" id="edge8_Node000005_Node000008" title=" " alt="" coords="651,148,738,195,735,199,649,152"/>
+</map>

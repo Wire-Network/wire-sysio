@@ -1,0 +1,11 @@
+<map id="testing::internal::ReportInvalidTestCaseType" name="testing::internal::ReportInvalidTestCaseType">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,35,188,75"/>
+<area shape="rect" id="Node000002" href="$namespacetesting_1_1internal.html#a31b7c3abed4a7c395f42c61e993989f4" title=" " alt="" coords="262,5,394,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="188,41,246,33,247,39,189,46"/>
+<area shape="rect" id="Node000003" href="$classtesting_1_1_message.html#a2cdc4df62bdcc9df37651a1cf527704e" title=" " alt="" coords="236,70,420,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="189,63,221,67,220,73,188,69"/>
+<area shape="rect" id="Node000004" href="$classtesting_1_1internal_1_1scoped__ptr.html#a5a78280b6a59ff4b63aae444efc61e3f" title=" " alt="" coords="482,29,600,70"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="414,67,466,59,467,64,414,72"/>
+<area shape="rect" id="Node000005" href="$namespacetesting_1_1internal.html#ac0a2b7f69fc829d80a39e925b6417e39" title=" " alt="" coords="468,95,613,135"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="418,94,453,99,452,104,417,99"/>
+</map>

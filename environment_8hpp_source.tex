@@ -1,0 +1,85 @@
+\doxysection{environment.\+hpp}
+\hypertarget{environment_8hpp_source}{}\label{environment_8hpp_source}\index{libraries/chainbase/include/chainbase/environment.hpp@{libraries/chainbase/include/chainbase/environment.hpp}}
+\mbox{\hyperlink{environment_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00001}\mbox{\hyperlink{environment_8hpp_ad25edacba00e4d0666a9959053b7cc10}{00001}}\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00002}\mbox{\hyperlink{environment_8hpp_aba05f3389d9d85333033226e7faad614}{00002}}\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{pinnable__mapped__file_8hpp}{chainbase/pinnable\_mapped\_file.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <iomanip>}}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00004}\mbox{\hyperlink{environment_8hpp_a5e55ee7dabe1ec807ab569fc11babbb0}{00004}}\ }
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00005}\mbox{\hyperlink{environment_8hpp_a5e55ee7dabe1ec807ab569fc11babbb0ac3724e0358f391346c785d3450532797}{00005}}\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacechainbase}{chainbase}}\ \{}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00006}\mbox{\hyperlink{environment_8hpp_a5e55ee7dabe1ec807ab569fc11babbb0af1b08c91685e3bc4d30e56dfd468e735}{00006}}\ }
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00007}\mbox{\hyperlink{namespacechainbase_a3553db3334a3279bf83b5951ab9be322}{00007}}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{namespacechainbase_a3553db3334a3279bf83b5951ab9be322}{header\_size}}\ =\ 1024;}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00008}\mbox{\hyperlink{namespacechainbase_ae035193195fb0b2f1d8c652f21df45ff}{00008}}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{namespacechainbase_a390fbf5c3ed14d5389ea5ee4f92eb1b6}{header\_id}}\ =\ 0x3242444f49534f45ULL;\ \textcolor{comment}{//"{}SYSIODB2"{}\ little\ endian}}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00009}\mbox{\hyperlink{environment_8hpp_a5e55ee7dabe1ec807ab569fc11babbb0a3d3a12d1d170260bc66459e6437d06cb}{00009}}\ }
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00010}\mbox{\hyperlink{environment_8hpp_aa8554335c865509d8d68f600b3d97442}{00010}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structchainbase_1_1environment}{environment}}\ \ \{}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00011}\mbox{\hyperlink{structchainbase_1_1environment_a2cf8e86854bddead8f9d51eb0a2676e4}{00011}}\ \ \ \ \mbox{\hyperlink{structchainbase_1_1environment_a2cf8e86854bddead8f9d51eb0a2676e4}{environment}}()\ \{}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00012}\mbox{\hyperlink{environment_8hpp_aa8554335c865509d8d68f600b3d97442aa9fb1533dda1c8184bd7fa0a3f8e88f7}{00012}}\ \ \ \ \ \ \ strncpy(\mbox{\hyperlink{structchainbase_1_1environment_a5877d3a8ae187320facd1c7935ae40fc}{compiler}},\ \_\_VERSION\_\_,\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{structchainbase_1_1environment_a5877d3a8ae187320facd1c7935ae40fc}{compiler}})-\/1);}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00013}\mbox{\hyperlink{environment_8hpp_aa8554335c865509d8d68f600b3d97442af63fb533173014b205e107cdd13fce75}{00013}}\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00015}\mbox{\hyperlink{structchainbase_1_1environment_a5230c250a35c7d13c3c059e117c54395}{00015}}\ \ \ \ \textcolor{keyword}{enum}\ \mbox{\hyperlink{structchainbase_1_1environment_a5230c250a35c7d13c3c059e117c54395}{os\_t}}\ :\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ \{}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00016}\mbox{\hyperlink{structchainbase_1_1environment_a5230c250a35c7d13c3c059e117c54395a4e8ce2a96ea0b535b8fe12d92c04b0c4}{00016}}\ \ \ \ \ \ \ \mbox{\hyperlink{structchainbase_1_1environment_a5230c250a35c7d13c3c059e117c54395a4e8ce2a96ea0b535b8fe12d92c04b0c4}{OS\_LINUX}},}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00017}\mbox{\hyperlink{structchainbase_1_1environment_a5230c250a35c7d13c3c059e117c54395a022d1acb0c856766ce1cdc6814d96057}{00017}}\ \ \ \ \ \ \ \mbox{\hyperlink{structchainbase_1_1environment_a5230c250a35c7d13c3c059e117c54395a022d1acb0c856766ce1cdc6814d96057}{OS\_MACOS}},}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00018}\mbox{\hyperlink{structchainbase_1_1environment_a5230c250a35c7d13c3c059e117c54395a2bda405992008383e3c311255aabb3c9}{00018}}\ \ \ \ \ \ \ \mbox{\hyperlink{structchainbase_1_1environment_a5230c250a35c7d13c3c059e117c54395a2bda405992008383e3c311255aabb3c9}{OS\_WINDOWS}},}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00019}00019\ \ \ \ \ \ \ \mbox{\hyperlink{structchainbase_1_1environment_a5230c250a35c7d13c3c059e117c54395a49bf53029b517339b7d000b5006238a4}{OS\_OTHER}}}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00020}\mbox{\hyperlink{structchainbase_1_1environment_acae55e12d9cfaec780620dcfdbf407ce}{00020}}\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00021}\mbox{\hyperlink{structchainbase_1_1environment_ad49d26e72b1a5ad85a8d2ccdc85b7fa8}{00021}}\ \ \ \ \textcolor{keyword}{enum}\ \mbox{\hyperlink{structchainbase_1_1environment_ad49d26e72b1a5ad85a8d2ccdc85b7fa8}{arch\_t}}\ :\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ \{}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00022}\mbox{\hyperlink{structchainbase_1_1environment_ad49d26e72b1a5ad85a8d2ccdc85b7fa8ada45144844701756f5757aee0f929a7b}{00022}}\ \ \ \ \ \ \ \mbox{\hyperlink{structchainbase_1_1environment_ad49d26e72b1a5ad85a8d2ccdc85b7fa8ada45144844701756f5757aee0f929a7b}{ARCH\_X86\_64}},}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00023}\mbox{\hyperlink{structchainbase_1_1environment_ad49d26e72b1a5ad85a8d2ccdc85b7fa8af374c3b01e0ba23a75eedf0c38a43450}{00023}}\ \ \ \ \ \ \ \mbox{\hyperlink{structchainbase_1_1environment_ad49d26e72b1a5ad85a8d2ccdc85b7fa8af374c3b01e0ba23a75eedf0c38a43450}{ARCH\_ARM}},}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00024}\mbox{\hyperlink{structchainbase_1_1environment_ad49d26e72b1a5ad85a8d2ccdc85b7fa8a2f0968d6b82358cb65f4f1fe65d374c0}{00024}}\ \ \ \ \ \ \ \mbox{\hyperlink{structchainbase_1_1environment_ad49d26e72b1a5ad85a8d2ccdc85b7fa8a2f0968d6b82358cb65f4f1fe65d374c0}{ARCH\_RISCV}},}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00025}00025\ \ \ \ \ \ \ \mbox{\hyperlink{structchainbase_1_1environment_ad49d26e72b1a5ad85a8d2ccdc85b7fa8a27b93f887db652b34583ae3d61e061ab}{ARCH\_OTHER}}}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00026}\mbox{\hyperlink{structchainbase_1_1environment_ad49d26e72b1a5ad85a8d2ccdc85b7fa8a27b93f887db652b34583ae3d61e061ab}{00026}}\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00028}\mbox{\hyperlink{structchainbase_1_1environment_a328120bb740176a5215fb32d641800b8}{00028}}\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{structchainbase_1_1environment_a328120bb740176a5215fb32d641800b8}{debug}}\ =}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00029}00029\ \textcolor{preprocessor}{\#ifndef\ NDEBUG}}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00030}00030\ \ \ \ \ \ \ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00031}00031\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00032}00032\ \ \ \ \ \ \ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00033}\mbox{\hyperlink{environment_8hpp_aa0e431d4d0a75d1ecbdf0c31893c77aa}{00033}}\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00034}\mbox{\hyperlink{structchainbase_1_1environment_a29626f3d5a8c2e741807d4818800455d}{00034}}\ \ \ \ \mbox{\hyperlink{structchainbase_1_1environment_a5230c250a35c7d13c3c059e117c54395}{os\_t}}\ os\ =}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00035}00035\ \textcolor{preprocessor}{\#if\ defined(\_\_linux\_\_)}}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00036}00036\ \ \ \ \ \ \ \mbox{\hyperlink{structchainbase_1_1environment_a5230c250a35c7d13c3c059e117c54395a4e8ce2a96ea0b535b8fe12d92c04b0c4}{OS\_LINUX}};}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00037}00037\ \textcolor{preprocessor}{\#elif\ defined(\_\_APPLE\_\_)}}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00038}00038\ \ \ \ \ \ \ \mbox{\hyperlink{structchainbase_1_1environment_a5230c250a35c7d13c3c059e117c54395a022d1acb0c856766ce1cdc6814d96057}{OS\_MACOS}};}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00039}00039\ \textcolor{preprocessor}{\#elif\ defined(\_WIN32)}}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00040}00040\ \ \ \ \ \ \ \mbox{\hyperlink{structchainbase_1_1environment_a5230c250a35c7d13c3c059e117c54395a2bda405992008383e3c311255aabb3c9}{OS\_WINDOWS}};}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00041}00041\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00042}00042\ \ \ \ \ \ \ \mbox{\hyperlink{structchainbase_1_1environment_a5230c250a35c7d13c3c059e117c54395a49bf53029b517339b7d000b5006238a4}{OS\_OTHER}};}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00043}00043\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00044}\mbox{\hyperlink{structchainbase_1_1environment_ab83a258982dca21a9bbe652773295e30}{00044}}\ \ \ \ \mbox{\hyperlink{structchainbase_1_1environment_ad49d26e72b1a5ad85a8d2ccdc85b7fa8}{arch\_t}}\ \mbox{\hyperlink{structchainbase_1_1environment_ab83a258982dca21a9bbe652773295e30}{arch}}\ =}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00045}\mbox{\hyperlink{environment_8hpp_a83b194e731d2cf63d2812367744b0ed6}{00045}}\ \textcolor{preprocessor}{\#if\ defined(\_\_x86\_64\_\_)}}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00046}\mbox{\hyperlink{environment_8hpp_ada194dda0ebbfb422d370043a4bec4cf}{00046}}\ \ \ \ \ \ \ \mbox{\hyperlink{structchainbase_1_1environment_ad49d26e72b1a5ad85a8d2ccdc85b7fa8ada45144844701756f5757aee0f929a7b}{ARCH\_X86\_64}};}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00047}00047\ \textcolor{preprocessor}{\#elif\ defined(\_\_aarch64\_\_)}}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00048}\mbox{\hyperlink{environment_8hpp_ac70f6c217754a8581540f9d3f5b1c1ed}{00048}}\ \ \ \ \ \ \ \mbox{\hyperlink{structchainbase_1_1environment_ad49d26e72b1a5ad85a8d2ccdc85b7fa8af374c3b01e0ba23a75eedf0c38a43450}{ARCH\_ARM}};}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00049}00049\ \textcolor{preprocessor}{\#elif\ defined(\_\_riscv\_\_)}}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00050}00050\ \ \ \ \ \ \ \mbox{\hyperlink{structchainbase_1_1environment_ad49d26e72b1a5ad85a8d2ccdc85b7fa8a2f0968d6b82358cb65f4f1fe65d374c0}{ARCH\_RISCV}};}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00051}\mbox{\hyperlink{environment_8hpp_a1f4c4c464184ccd8c78b240bcb2017c8}{00051}}\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00052}00052\ \ \ \ \ \ \ \mbox{\hyperlink{structchainbase_1_1environment_ad49d26e72b1a5ad85a8d2ccdc85b7fa8a27b93f887db652b34583ae3d61e061ab}{ARCH\_OTHER}};}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00053}00053\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00054}00054\ }
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00055}\mbox{\hyperlink{structchainbase_1_1environment_a4244eac72c418fa7d07f97cc1e3bdfd4}{00055}}\ \ \ \ \textcolor{keywordtype}{unsigned}\ \mbox{\hyperlink{structchainbase_1_1environment_a4244eac72c418fa7d07f97cc1e3bdfd4}{boost\_version}}\ =\ BOOST\_VERSION;}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00056}\mbox{\hyperlink{structchainbase_1_1environment_a5ff472a676fe25173c2d60b3c00cb87e}{00056}}\ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \mbox{\hyperlink{structchainbase_1_1environment_a5ff472a676fe25173c2d60b3c00cb87e}{reserved}}[512]\ =\ \{\};}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00057}\mbox{\hyperlink{structchainbase_1_1environment_a5877d3a8ae187320facd1c7935ae40fc}{00057}}\ \ \ \ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{structchainbase_1_1environment_a5877d3a8ae187320facd1c7935ae40fc}{compiler}}[256]\ =\ \{\};}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00059}\mbox{\hyperlink{structchainbase_1_1environment_a9fe43972471bca5481e46577afc94080}{00059}}\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{structchainbase_1_1environment_a9fe43972471bca5481e46577afc94080}{operator==}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structchainbase_1_1environment}{environment}}\&\ other)\ \{}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00060}00060\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !memcmp(\textcolor{keyword}{this},\ \&other,\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{structchainbase_1_1environment}{environment}}));}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00061}00061\ \ \ \ \}\ }
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00062}\mbox{\hyperlink{structchainbase_1_1environment_aae31f058079578d211f327ec5a856d77}{00062}}\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{structchainbase_1_1environment_aae31f058079578d211f327ec5a856d77}{operator!=}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structchainbase_1_1environment}{environment}}\&\ other)\ \{}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00063}00063\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !(*\textcolor{keyword}{this}\ ==\ other);}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00064}00064\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00065}00065\ \}\ \mbox{\hyperlink{namespacechainbase_ae035193195fb0b2f1d8c652f21df45ff}{\_\_attribute\_\_}}\ ((packed));}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00067}\mbox{\hyperlink{structchainbase_1_1db__header}{00067}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structchainbase_1_1db__header}{db\_header}}\ \ \{}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00068}\mbox{\hyperlink{structchainbase_1_1db__header_a33a0e29c48beec81d6f09849870637e6}{00068}}\ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \textcolor{keywordtype}{id}\ =\ \mbox{\hyperlink{namespacechainbase_a390fbf5c3ed14d5389ea5ee4f92eb1b6}{header\_id}};}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00069}\mbox{\hyperlink{structchainbase_1_1db__header_a67ba3bb80fdbadc89e69fb12030ccf61}{00069}}\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{structchainbase_1_1db__header_a67ba3bb80fdbadc89e69fb12030ccf61}{dirty}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00070}\mbox{\hyperlink{structchainbase_1_1db__header_ae06cc9a3463f5923e2402f0460f7517f}{00070}}\ \ \ \ \mbox{\hyperlink{structchainbase_1_1environment}{environment}}\ \mbox{\hyperlink{structchainbase_1_1db__header_ae06cc9a3463f5923e2402f0460f7517f}{dbenviron}};}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00071}00071\ \}\ \mbox{\hyperlink{namespacechainbase_ae035193195fb0b2f1d8c652f21df45ff}{\_\_attribute\_\_}}\ ((packed));}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00073}\mbox{\hyperlink{namespacechainbase_a281dadbe1ae02170ae8922387c134875}{00073}}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{namespacechainbase_a281dadbe1ae02170ae8922387c134875}{header\_dirty\_bit\_offset}}\ =\ offsetof(\mbox{\hyperlink{structchainbase_1_1db__header}{db\_header}},\ \mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3a8251c5ee6c4498d42adb2b1a0aa286af}{dirty}});}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00074}00074\ }
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00075}00075\ \textcolor{keyword}{static\_assert}(\textcolor{keyword}{sizeof}(\mbox{\hyperlink{structchainbase_1_1db__header}{db\_header}})\ <=\ \mbox{\hyperlink{namespacechainbase_a3553db3334a3279bf83b5951ab9be322}{header\_size}},\ \textcolor{stringliteral}{"{}DB\ header\ struct\ too\ large"{}});}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00076}00076\ }
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00077}00077\ std::ostream\&\ \mbox{\hyperlink{namespacechainbase_a31de493974b1fdcfe8e90c6b0bdb3c48}{operator<<}}(std::ostream\&\ os,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structchainbase_1_1environment}{chainbase::environment}}\&\ dt);}
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{environment_8hpp_source_l00079}00079\ \}}
+
+\end{DoxyCode}

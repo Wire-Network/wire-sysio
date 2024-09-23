@@ -1,0 +1,126 @@
+\doxysection{bn\+::Curve\+Param Struct Reference}
+\hypertarget{structbn_1_1_curve_param}{}\label{structbn_1_1_curve_param}\index{bn::CurveParam@{bn::CurveParam}}
+
+
+{\ttfamily \#include $<$bn.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{structbn_1_1_curve_param_a016b0fdb6bf7161e4dc9d1f8c81a08e5}{operator==}} (const \mbox{\hyperlink{structbn_1_1_curve_param}{Curve\+Param}} \&rhs) const
+\item 
+bool \mbox{\hyperlink{structbn_1_1_curve_param_adc14a7c15187e602cd05243907bedca4}{operator!=}} (const \mbox{\hyperlink{structbn_1_1_curve_param}{Curve\+Param}} \&rhs) const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{structbn_1_1_curve_param_aac8084783590ba4b2983930c1dd4b16a}{z}}
+\item 
+int \mbox{\hyperlink{structbn_1_1_curve_param_aac649328a96cc37f3c9fc66ade0b8831}{b}}
+\item 
+int \mbox{\hyperlink{structbn_1_1_curve_param_a27fbfaf48f9664d8e56f7dd21ecda4e1}{xi\+\_\+a}}
+\item 
+int \mbox{\hyperlink{structbn_1_1_curve_param_afaa91706c0815969a0037f73691c0da9}{xi\+\_\+b}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{bn_8h_source_l00058}{58}} of file \mbox{\hyperlink{bn_8h_source}{bn.\+h}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structbn_1_1_curve_param_adc14a7c15187e602cd05243907bedca4}\index{bn::CurveParam@{bn::CurveParam}!operator"!=@{operator"!=}}
+\index{operator"!=@{operator"!=}!bn::CurveParam@{bn::CurveParam}}
+\doxysubsubsection{\texorpdfstring{operator"!=()}{operator!=()}}
+{\footnotesize\ttfamily \label{structbn_1_1_curve_param_adc14a7c15187e602cd05243907bedca4} 
+bool bn\+::\+Curve\+Param\+::operator!= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structbn_1_1_curve_param}{Curve\+Param}} \&}]{rhs}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn_8h_source_l00071}{71}} of file \mbox{\hyperlink{bn_8h_source}{bn.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00071\ \{\ \textcolor{keywordflow}{return}\ !\mbox{\hyperlink{structbn_1_1_curve_param_a016b0fdb6bf7161e4dc9d1f8c81a08e5}{operator==}}(rhs);\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structbn_1_1_curve_param_adc14a7c15187e602cd05243907bedca4_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structbn_1_1_curve_param_a016b0fdb6bf7161e4dc9d1f8c81a08e5}\index{bn::CurveParam@{bn::CurveParam}!operator==@{operator==}}
+\index{operator==@{operator==}!bn::CurveParam@{bn::CurveParam}}
+\doxysubsubsection{\texorpdfstring{operator==()}{operator==()}}
+{\footnotesize\ttfamily \label{structbn_1_1_curve_param_a016b0fdb6bf7161e4dc9d1f8c81a08e5} 
+bool bn\+::\+Curve\+Param\+::operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structbn_1_1_curve_param}{Curve\+Param}} \&}]{rhs}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn_8h_source_l00070}{70}} of file \mbox{\hyperlink{bn_8h_source}{bn.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00070\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structbn_1_1_curve_param_aac8084783590ba4b2983930c1dd4b16a}{z}}\ ==\ rhs.z\ \&\&\ \mbox{\hyperlink{structbn_1_1_curve_param_aac649328a96cc37f3c9fc66ade0b8831}{b}}\ ==\ rhs.b\ \&\&\ \mbox{\hyperlink{structbn_1_1_curve_param_a27fbfaf48f9664d8e56f7dd21ecda4e1}{xi\_a}}\ ==\ rhs.xi\_a\ \&\&\ \mbox{\hyperlink{structbn_1_1_curve_param_afaa91706c0815969a0037f73691c0da9}{xi\_b}}\ ==\ rhs.xi\_b;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structbn_1_1_curve_param_a016b0fdb6bf7161e4dc9d1f8c81a08e5_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structbn_1_1_curve_param_aac649328a96cc37f3c9fc66ade0b8831}\index{bn::CurveParam@{bn::CurveParam}!b@{b}}
+\index{b@{b}!bn::CurveParam@{bn::CurveParam}}
+\doxysubsubsection{\texorpdfstring{b}{b}}
+{\footnotesize\ttfamily \label{structbn_1_1_curve_param_aac649328a96cc37f3c9fc66ade0b8831} 
+int bn\+::\+Curve\+Param\+::b}
+
+
+
+Definition at line \mbox{\hyperlink{bn_8h_source_l00067}{67}} of file \mbox{\hyperlink{bn_8h_source}{bn.\+h}}.
+
+\Hypertarget{structbn_1_1_curve_param_a27fbfaf48f9664d8e56f7dd21ecda4e1}\index{bn::CurveParam@{bn::CurveParam}!xi\_a@{xi\_a}}
+\index{xi\_a@{xi\_a}!bn::CurveParam@{bn::CurveParam}}
+\doxysubsubsection{\texorpdfstring{xi\_a}{xi\_a}}
+{\footnotesize\ttfamily \label{structbn_1_1_curve_param_a27fbfaf48f9664d8e56f7dd21ecda4e1} 
+int bn\+::\+Curve\+Param\+::xi\+\_\+a}
+
+
+
+Definition at line \mbox{\hyperlink{bn_8h_source_l00068}{68}} of file \mbox{\hyperlink{bn_8h_source}{bn.\+h}}.
+
+\Hypertarget{structbn_1_1_curve_param_afaa91706c0815969a0037f73691c0da9}\index{bn::CurveParam@{bn::CurveParam}!xi\_b@{xi\_b}}
+\index{xi\_b@{xi\_b}!bn::CurveParam@{bn::CurveParam}}
+\doxysubsubsection{\texorpdfstring{xi\_b}{xi\_b}}
+{\footnotesize\ttfamily \label{structbn_1_1_curve_param_afaa91706c0815969a0037f73691c0da9} 
+int bn\+::\+Curve\+Param\+::xi\+\_\+b}
+
+
+
+Definition at line \mbox{\hyperlink{bn_8h_source_l00069}{69}} of file \mbox{\hyperlink{bn_8h_source}{bn.\+h}}.
+
+\Hypertarget{structbn_1_1_curve_param_aac8084783590ba4b2983930c1dd4b16a}\index{bn::CurveParam@{bn::CurveParam}!z@{z}}
+\index{z@{z}!bn::CurveParam@{bn::CurveParam}}
+\doxysubsubsection{\texorpdfstring{z}{z}}
+{\footnotesize\ttfamily \label{structbn_1_1_curve_param_aac8084783590ba4b2983930c1dd4b16a} 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} bn\+::\+Curve\+Param\+::z}
+
+
+
+Definition at line \mbox{\hyperlink{bn_8h_source_l00066}{66}} of file \mbox{\hyperlink{bn_8h_source}{bn.\+h}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/libraries/ff/depends/ate-\/pairing/include/\mbox{\hyperlink{bn_8h}{bn.\+h}}\end{DoxyCompactItemize}

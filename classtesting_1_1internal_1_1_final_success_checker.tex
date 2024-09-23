@@ -1,0 +1,167 @@
+\doxysection{testing\+::internal\+::Final\+Success\+Checker Class Reference}
+\hypertarget{classtesting_1_1internal_1_1_final_success_checker}{}\label{classtesting_1_1internal_1_1_final_success_checker}\index{testing::internal::FinalSuccessChecker@{testing::internal::FinalSuccessChecker}}
+
+
+Inheritance diagram for testing\+::internal\+::Final\+Success\+Checker\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=192pt]{classtesting_1_1internal_1_1_final_success_checker__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for testing\+::internal\+::Final\+Success\+Checker\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=192pt]{classtesting_1_1internal_1_1_final_success_checker__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_final_success_checker_a8f39d12a1f2bfe8c6c04b5c6749382c9}{Tear\+Down}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classtesting_1_1_environment}{testing\+::\+Environment}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{classtesting_1_1_environment_a0e41c320362576d752cd1f44cabd57d4}{\texorpdfstring{$\sim$}{\string~}\+Environment}} ()
+\item 
+virtual void \mbox{\hyperlink{classtesting_1_1_environment_a1bf8cafaa9d4eba9feb98655ee434eb3}{Set\+Up}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{gtest-unittest-api__test_8cc_source_l00234}{234}} of file \mbox{\hyperlink{gtest-unittest-api__test_8cc_source}{gtest-\/unittest-\/api\+\_\+test.\+cc}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_final_success_checker_a8f39d12a1f2bfe8c6c04b5c6749382c9}\index{testing::internal::FinalSuccessChecker@{testing::internal::FinalSuccessChecker}!TearDown@{TearDown}}
+\index{TearDown@{TearDown}!testing::internal::FinalSuccessChecker@{testing::internal::FinalSuccessChecker}}
+\doxysubsubsection{\texorpdfstring{TearDown()}{TearDown()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_final_success_checker_a8f39d12a1f2bfe8c6c04b5c6749382c9} 
+virtual void testing\+::internal\+::\+Final\+Success\+Checker\+::\+Tear\+Down (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classtesting_1_1_environment_a039bdaa705c46b9b88234cf4d3bb6254}{testing\+::\+Environment}}.
+
+
+
+Definition at line \mbox{\hyperlink{gtest-unittest-api__test_8cc_source_l00236}{236}} of file \mbox{\hyperlink{gtest-unittest-api__test_8cc_source}{gtest-\/unittest-\/api\+\_\+test.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00237\ \ \ \ \ UnitTest*\ unit\_test\ =\ \mbox{\hyperlink{classtesting_1_1_unit_test_a24192400b70b3b946746954e9574fb8e}{UnitTest::GetInstance}}();}
+\DoxyCodeLine{00238\ }
+\DoxyCodeLine{00239\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(1\ +\ \mbox{\hyperlink{namespacetesting_1_1internal_a685ea5332074ae63b0ded2b184ac2271}{kTypedTestCases}},\ unit\_test-\/>successful\_test\_case\_count());}
+\DoxyCodeLine{00240\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(3\ +\ \mbox{\hyperlink{namespacetesting_1_1internal_a53ee2d113744f9ba1d89469db4d7388b}{kTypedTests}},\ unit\_test-\/>successful\_test\_count());}
+\DoxyCodeLine{00241\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0,\ unit\_test-\/>failed\_test\_case\_count());}
+\DoxyCodeLine{00242\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0,\ unit\_test-\/>failed\_test\_count());}
+\DoxyCodeLine{00243\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(unit\_test-\/>Passed());}
+\DoxyCodeLine{00244\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(unit\_test-\/>Failed());}
+\DoxyCodeLine{00245\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a1a6db8b1338ee7040329322b77779086}{ASSERT\_EQ}}(2\ +\ \mbox{\hyperlink{namespacetesting_1_1internal_a685ea5332074ae63b0ded2b184ac2271}{kTypedTestCases}},\ unit\_test-\/>total\_test\_case\_count());}
+\DoxyCodeLine{00246\ }
+\DoxyCodeLine{00247\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacegmock__test__utils_a959c5af591e4d49b6d35745205b64509}{TestCase}}**\ \textcolor{keyword}{const}\ test\_cases\ =\ \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_helper_ae810e4ec1f26ebd9f8340c511e68e2a9}{UnitTestHelper::GetSortedTestCases}}();}
+\DoxyCodeLine{00248\ }
+\DoxyCodeLine{00249\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ad20f7b94ac5081e16f0005b94e95f0c6}{EXPECT\_STREQ}}(\textcolor{stringliteral}{"{}ApiTest"{}},\ test\_cases[0]-\/>\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}());}
+\DoxyCodeLine{00250\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{namespacetesting_a2ec690ee5d90f4e2970fcfd44bbd4941}{IsNull}}(test\_cases[0]-\/>type\_param()));}
+\DoxyCodeLine{00251\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(test\_cases[0]-\/>should\_run());}
+\DoxyCodeLine{00252\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(1,\ test\_cases[0]-\/>disabled\_test\_count());}
+\DoxyCodeLine{00253\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a1a6db8b1338ee7040329322b77779086}{ASSERT\_EQ}}(4,\ test\_cases[0]-\/>total\_test\_count());}
+\DoxyCodeLine{00254\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(3,\ test\_cases[0]-\/>successful\_test\_count());}
+\DoxyCodeLine{00255\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0,\ test\_cases[0]-\/>failed\_test\_count());}
+\DoxyCodeLine{00256\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(test\_cases[0]-\/>Passed());}
+\DoxyCodeLine{00257\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(test\_cases[0]-\/>Failed());}
+\DoxyCodeLine{00258\ }
+\DoxyCodeLine{00259\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ad20f7b94ac5081e16f0005b94e95f0c6}{EXPECT\_STREQ}}(\textcolor{stringliteral}{"{}DISABLED\_Test"{}},\ test\_cases[1]-\/>\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}());}
+\DoxyCodeLine{00260\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{namespacetesting_a2ec690ee5d90f4e2970fcfd44bbd4941}{IsNull}}(test\_cases[1]-\/>type\_param()));}
+\DoxyCodeLine{00261\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(test\_cases[1]-\/>should\_run());}
+\DoxyCodeLine{00262\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(1,\ test\_cases[1]-\/>disabled\_test\_count());}
+\DoxyCodeLine{00263\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a1a6db8b1338ee7040329322b77779086}{ASSERT\_EQ}}(1,\ test\_cases[1]-\/>total\_test\_count());}
+\DoxyCodeLine{00264\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0,\ test\_cases[1]-\/>successful\_test\_count());}
+\DoxyCodeLine{00265\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0,\ test\_cases[1]-\/>failed\_test\_count());}
+\DoxyCodeLine{00266\ }
+\DoxyCodeLine{00267\ \textcolor{preprocessor}{\#if\ GTEST\_HAS\_TYPED\_TEST}}
+\DoxyCodeLine{00268\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ad20f7b94ac5081e16f0005b94e95f0c6}{EXPECT\_STREQ}}(\textcolor{stringliteral}{"{}TestCaseWithCommentTest/0"{}},\ test\_cases[2]-\/>\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}());}
+\DoxyCodeLine{00269\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ad20f7b94ac5081e16f0005b94e95f0c6}{EXPECT\_STREQ}}(\mbox{\hyperlink{namespacetesting_1_1internal_a635606b4731f843c86ec8ca51cab83a1}{GetTypeName<int>}}().c\_str(),\ test\_cases[2]-\/>type\_param());}
+\DoxyCodeLine{00270\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(test\_cases[2]-\/>should\_run());}
+\DoxyCodeLine{00271\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0,\ test\_cases[2]-\/>disabled\_test\_count());}
+\DoxyCodeLine{00272\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a1a6db8b1338ee7040329322b77779086}{ASSERT\_EQ}}(1,\ test\_cases[2]-\/>total\_test\_count());}
+\DoxyCodeLine{00273\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(1,\ test\_cases[2]-\/>successful\_test\_count());}
+\DoxyCodeLine{00274\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0,\ test\_cases[2]-\/>failed\_test\_count());}
+\DoxyCodeLine{00275\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(test\_cases[2]-\/>Passed());}
+\DoxyCodeLine{00276\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(test\_cases[2]-\/>Failed());}
+\DoxyCodeLine{00277\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_HAS\_TYPED\_TEST}}
+\DoxyCodeLine{00278\ }
+\DoxyCodeLine{00279\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacegmock__test__utils_a959c5af591e4d49b6d35745205b64509}{TestCase}}*\ test\_case\ =\ \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_helper_ad7a9059a537193d7964606dc344e8669}{UnitTestHelper::FindTestCase}}(\textcolor{stringliteral}{"{}ApiTest"{}});}
+\DoxyCodeLine{00280\ \ \ \ \ \textcolor{keyword}{const}\ TestInfo**\ tests\ =\ \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_helper_aa58fa9a6b07d0409405c21d088899fa4}{UnitTestHelper::GetSortedTests}}(test\_case);}
+\DoxyCodeLine{00281\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ad20f7b94ac5081e16f0005b94e95f0c6}{EXPECT\_STREQ}}(\textcolor{stringliteral}{"{}DISABLED\_Dummy1"{}},\ tests[0]-\/>\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}());}
+\DoxyCodeLine{00282\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ad20f7b94ac5081e16f0005b94e95f0c6}{EXPECT\_STREQ}}(\textcolor{stringliteral}{"{}ApiTest"{}},\ tests[0]-\/>test\_case\_name());}
+\DoxyCodeLine{00283\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(tests[0]-\/>should\_run());}
+\DoxyCodeLine{00284\ }
+\DoxyCodeLine{00285\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ad20f7b94ac5081e16f0005b94e95f0c6}{EXPECT\_STREQ}}(\textcolor{stringliteral}{"{}TestCaseDisabledAccessorsWork"{}},\ tests[1]-\/>\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}());}
+\DoxyCodeLine{00286\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ad20f7b94ac5081e16f0005b94e95f0c6}{EXPECT\_STREQ}}(\textcolor{stringliteral}{"{}ApiTest"{}},\ tests[1]-\/>test\_case\_name());}
+\DoxyCodeLine{00287\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{namespacetesting_a2ec690ee5d90f4e2970fcfd44bbd4941}{IsNull}}(tests[1]-\/>value\_param()));}
+\DoxyCodeLine{00288\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{namespacetesting_a2ec690ee5d90f4e2970fcfd44bbd4941}{IsNull}}(tests[1]-\/>type\_param()));}
+\DoxyCodeLine{00289\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(tests[1]-\/>should\_run());}
+\DoxyCodeLine{00290\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(tests[1]-\/>result()-\/>Passed());}
+\DoxyCodeLine{00291\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0,\ tests[1]-\/>result()-\/>test\_property\_count());}
+\DoxyCodeLine{00292\ }
+\DoxyCodeLine{00293\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ad20f7b94ac5081e16f0005b94e95f0c6}{EXPECT\_STREQ}}(\textcolor{stringliteral}{"{}TestCaseImmutableAccessorsWork"{}},\ tests[2]-\/>\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}());}
+\DoxyCodeLine{00294\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ad20f7b94ac5081e16f0005b94e95f0c6}{EXPECT\_STREQ}}(\textcolor{stringliteral}{"{}ApiTest"{}},\ tests[2]-\/>test\_case\_name());}
+\DoxyCodeLine{00295\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{namespacetesting_a2ec690ee5d90f4e2970fcfd44bbd4941}{IsNull}}(tests[2]-\/>value\_param()));}
+\DoxyCodeLine{00296\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{namespacetesting_a2ec690ee5d90f4e2970fcfd44bbd4941}{IsNull}}(tests[2]-\/>type\_param()));}
+\DoxyCodeLine{00297\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(tests[2]-\/>should\_run());}
+\DoxyCodeLine{00298\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(tests[2]-\/>result()-\/>Passed());}
+\DoxyCodeLine{00299\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0,\ tests[2]-\/>result()-\/>test\_property\_count());}
+\DoxyCodeLine{00300\ }
+\DoxyCodeLine{00301\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ad20f7b94ac5081e16f0005b94e95f0c6}{EXPECT\_STREQ}}(\textcolor{stringliteral}{"{}UnitTestImmutableAccessorsWork"{}},\ tests[3]-\/>\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}());}
+\DoxyCodeLine{00302\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ad20f7b94ac5081e16f0005b94e95f0c6}{EXPECT\_STREQ}}(\textcolor{stringliteral}{"{}ApiTest"{}},\ tests[3]-\/>test\_case\_name());}
+\DoxyCodeLine{00303\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{namespacetesting_a2ec690ee5d90f4e2970fcfd44bbd4941}{IsNull}}(tests[3]-\/>value\_param()));}
+\DoxyCodeLine{00304\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{namespacetesting_a2ec690ee5d90f4e2970fcfd44bbd4941}{IsNull}}(tests[3]-\/>type\_param()));}
+\DoxyCodeLine{00305\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(tests[3]-\/>should\_run());}
+\DoxyCodeLine{00306\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(tests[3]-\/>result()-\/>Passed());}
+\DoxyCodeLine{00307\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(1,\ tests[3]-\/>result()-\/>test\_property\_count());}
+\DoxyCodeLine{00308\ \ \ \ \ \textcolor{keyword}{const}\ TestProperty\&\ \textcolor{keyword}{property}\ =\ tests[3]-\/>result()-\/>GetTestProperty(0);}
+\DoxyCodeLine{00309\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ad20f7b94ac5081e16f0005b94e95f0c6}{EXPECT\_STREQ}}(\textcolor{stringliteral}{"{}key"{}},\ property.key());}
+\DoxyCodeLine{00310\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ad20f7b94ac5081e16f0005b94e95f0c6}{EXPECT\_STREQ}}(\textcolor{stringliteral}{"{}value"{}},\ property.value());}
+\DoxyCodeLine{00311\ }
+\DoxyCodeLine{00312\ \ \ \ \ \textcolor{keyword}{delete}[]\ tests;}
+\DoxyCodeLine{00313\ }
+\DoxyCodeLine{00314\ \textcolor{preprocessor}{\#if\ GTEST\_HAS\_TYPED\_TEST}}
+\DoxyCodeLine{00315\ \ \ \ \ test\_case\ =\ \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_helper_ad7a9059a537193d7964606dc344e8669}{UnitTestHelper::FindTestCase}}(\textcolor{stringliteral}{"{}TestCaseWithCommentTest/0"{}});}
+\DoxyCodeLine{00316\ \ \ \ \ tests\ =\ \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_helper_aa58fa9a6b07d0409405c21d088899fa4}{UnitTestHelper::GetSortedTests}}(test\_case);}
+\DoxyCodeLine{00317\ }
+\DoxyCodeLine{00318\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ad20f7b94ac5081e16f0005b94e95f0c6}{EXPECT\_STREQ}}(\textcolor{stringliteral}{"{}Dummy"{}},\ tests[0]-\/>\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}());}
+\DoxyCodeLine{00319\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ad20f7b94ac5081e16f0005b94e95f0c6}{EXPECT\_STREQ}}(\textcolor{stringliteral}{"{}TestCaseWithCommentTest/0"{}},\ tests[0]-\/>test\_case\_name());}
+\DoxyCodeLine{00320\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{namespacetesting_a2ec690ee5d90f4e2970fcfd44bbd4941}{IsNull}}(tests[0]-\/>value\_param()));}
+\DoxyCodeLine{00321\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ad20f7b94ac5081e16f0005b94e95f0c6}{EXPECT\_STREQ}}(\mbox{\hyperlink{namespacetesting_1_1internal_a635606b4731f843c86ec8ca51cab83a1}{GetTypeName<int>}}().c\_str(),\ tests[0]-\/>type\_param());}
+\DoxyCodeLine{00322\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(tests[0]-\/>should\_run());}
+\DoxyCodeLine{00323\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(tests[0]-\/>result()-\/>Passed());}
+\DoxyCodeLine{00324\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0,\ tests[0]-\/>result()-\/>test\_property\_count());}
+\DoxyCodeLine{00325\ }
+\DoxyCodeLine{00326\ \ \ \ \ \textcolor{keyword}{delete}[]\ tests;}
+\DoxyCodeLine{00327\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_HAS\_TYPED\_TEST}}
+\DoxyCodeLine{00328\ \ \ \ \ \textcolor{keyword}{delete}[]\ test\_cases;}
+\DoxyCodeLine{00329\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_final_success_checker_a8f39d12a1f2bfe8c6c04b5c6749382c9_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/test/\mbox{\hyperlink{gtest-unittest-api__test_8cc}{gtest-\/unittest-\/api\+\_\+test.\+cc}}\end{DoxyCompactItemize}

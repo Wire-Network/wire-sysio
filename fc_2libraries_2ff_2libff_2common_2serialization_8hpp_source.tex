@@ -1,0 +1,102 @@
+\doxysection{serialization.\+hpp}
+\hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source}{}\label{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source}\index{libraries/fc/libraries/ff/libff/common/serialization.hpp@{libraries/fc/libraries/ff/libff/common/serialization.hpp}}
+\mbox{\hyperlink{fc_2libraries_2ff_2libff_2common_2serialization_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00001}00001\ }
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00012}00012\ \textcolor{preprocessor}{\#ifndef\ SERIALIZATION\_HPP\_}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00013}00013\ \textcolor{preprocessor}{\#define\ SERIALIZATION\_HPP\_}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00015}00015\ \textcolor{preprocessor}{\#include\ <istream>}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00016}00016\ \textcolor{preprocessor}{\#include\ <map>}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00017}00017\ \textcolor{preprocessor}{\#include\ <ostream>}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00018}00018\ \textcolor{preprocessor}{\#include\ <set>}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00019}00019\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00021}00021\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacelibff}{libff}}\ \{}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00023}00023\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00024}00024\ \textcolor{comment}{\ *\ @todo}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00025}00025\ \textcolor{comment}{\ *\ The\ serialization\ is\ fragile.\ Shoud\ be\ rewritten\ using\ a\ standard,\ portable-\/format}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00026}00026\ \textcolor{comment}{\ *\ library\ like\ boost::serialize.}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00027}00027\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00028}00028\ \textcolor{comment}{\ *\ However,\ for\ now\ the\ following\ conventions\ are\ used\ within\ the\ code.}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00029}00029\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00030}00030\ \textcolor{comment}{\ *\ All\ algebraic\ objects\ support\ either\ binary\ or\ decimal\ output\ using}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00031}00031\ \textcolor{comment}{\ *\ the\ standard\ C++\ stream\ operators\ (operator<<,\ operator>>).}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00032}00032\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00033}00033\ \textcolor{comment}{\ *\ The\ binary\ mode\ is\ activated\ by\ defining\ a\ BINARY\_OUTPUT}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00034}00034\ \textcolor{comment}{\ *\ preprocessor\ macro\ (e.g.\ g++\ -\/DBINARY\_OUTPUT\ ...).}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00035}00035\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00036}00036\ \textcolor{comment}{\ *\ Binary\ output\ assumes\ that\ the\ stream\ is\ to\ be\ binary\ read\ at\ its}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00037}00037\ \textcolor{comment}{\ *\ current\ position\ so\ any\ white\ space\ should\ be\ consumed\ beforehand.}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00038}00038\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00039}00039\ \textcolor{comment}{\ *\ Consecutive\ algebraic\ objects\ are\ separated\ by\ OUTPUT\_NEWLINE\ and}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00040}00040\ \textcolor{comment}{\ *\ within\ themselves\ (e.g.\ X\ and\ Y\ coordinates\ for\ field\ elements)\ with}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00041}00041\ \textcolor{comment}{\ *\ OUTPUT\_SEPARATOR\ (as\ defined\ below).}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00042}00042\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00043}00043\ \textcolor{comment}{\ *\ Therefore\ to\ dump\ two\ integers,\ two\ Fp\ elements\ and\ another\ integer}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00044}00044\ \textcolor{comment}{\ *\ one\ would:}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00045}00045\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00046}00046\ \textcolor{comment}{\ *\ out\ <<\ 3\ <<\ "{}\(\backslash\)n"{};}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00047}00047\ \textcolor{comment}{\ *\ out\ <<\ 4\ <<\ "{}\(\backslash\)n"{};}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00048}00048\ \textcolor{comment}{\ *\ out\ <<\ FieldT(56)\ <<\ OUTPUT\_NEWLINE;}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00049}00049\ \textcolor{comment}{\ *\ out\ <<\ FieldT(78)\ <<\ OUTPUT\_NEWLINE;}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00050}00050\ \textcolor{comment}{\ *\ out\ <<\ 9\ <<\ "{}\(\backslash\)n"{};}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00051}00051\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00052}00052\ \textcolor{comment}{\ *\ Then\ reading\ back\ it\ its\ reader's\ responsibility\ (!)\ to\ consume\ "{}\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00053}00053\ \textcolor{comment}{\ *\ after\ 4,\ but\ Fp::operator<<\ will\ correctly\ consume\ OUTPUT\_NEWLINE.}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00054}00054\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00055}00055\ \textcolor{comment}{\ *\ The\ reader\ should\ also\ consume\ "{}\(\backslash\)n"{}\ after\ 9,\ so\ that\ another\ field}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00056}00056\ \textcolor{comment}{\ *\ element\ can\ be\ properly\ chained.\ This\ is\ especially\ important\ for}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00057}00057\ \textcolor{comment}{\ *\ binary\ output.}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00058}00058\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00059}00059\ \textcolor{comment}{\ *\ The\ binary\ serialization\ of\ algebraic\ objects\ is\ currently\ *not*}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00060}00060\ \textcolor{comment}{\ *\ portable\ between\ machines\ of\ different\ word\ sizes.}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00061}00061\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00062}00062\ }
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00063}00063\ \textcolor{preprocessor}{\#ifdef\ BINARY\_OUTPUT}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00064}00064\ \textcolor{preprocessor}{\#define\ OUTPUT\_NEWLINE\ "{}"{}}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00065}00065\ \textcolor{preprocessor}{\#define\ OUTPUT\_SEPARATOR\ "{}"{}}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00066}00066\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00067}\mbox{\hyperlink{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_a770cd1596be261bee8d26c55e31589e0}{00067}}\ \textcolor{preprocessor}{\#define\ OUTPUT\_NEWLINE\ "{}\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00068}\mbox{\hyperlink{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_ad80cfbe7456c7d029544e8bc2cec16c8}{00068}}\ \textcolor{preprocessor}{\#define\ OUTPUT\_SEPARATOR\ "{}\ "{}}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00069}00069\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00071}\mbox{\hyperlink{namespacelibff_adf450a87fdc5eb1a37422fabcba95023}{00071}}\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacelibff_adf450a87fdc5eb1a37422fabcba95023}{consume\_newline}}(std::istream\ \&in);}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00072}\mbox{\hyperlink{namespacelibff_a1cde4f28fdf0349673d1361daf4298d4}{00072}}\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacelibff_a1cde4f28fdf0349673d1361daf4298d4}{consume\_OUTPUT\_NEWLINE}}(std::istream\ \&in);}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00073}\mbox{\hyperlink{namespacelibff_a3b7a446329c9be967e16ab1c04f260e6}{00073}}\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacelibff_a3b7a446329c9be967e16ab1c04f260e6}{consume\_OUTPUT\_SEPARATOR}}(std::istream\ \&in);}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00074}00074\ }
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00075}\mbox{\hyperlink{namespacelibff_a0988a8f3ba5456beaeb5ec85997a1806}{00075}}\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacelibff_a0988a8f3ba5456beaeb5ec85997a1806}{output\_bool}}(std::ostream\ \&out,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ b);}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00076}\mbox{\hyperlink{namespacelibff_a7f9b202395818e2991485cf13ac26cff}{00076}}\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacelibff_a7f9b202395818e2991485cf13ac26cff}{input\_bool}}(std::istream\ \&in,\ \textcolor{keywordtype}{bool}\ \&b);}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00077}00077\ }
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00078}\mbox{\hyperlink{namespacelibff_afd2d62a584bc219a57bfa568bfbe23f3}{00078}}\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacelibff_afd2d62a584bc219a57bfa568bfbe23f3}{output\_bool\_vector}}(std::ostream\ \&out,\ \textcolor{keyword}{const}\ std::vector<bool>\ \&v);}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00079}\mbox{\hyperlink{namespacelibff_ad0035ea66b0c095b71fc2bda79096ea4}{00079}}\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacelibff_ad0035ea66b0c095b71fc2bda79096ea4}{input\_bool\_vector}}(std::istream\ \&in,\ std::vector<bool>\ \&v);}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00080}00080\ }
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00081}00081\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00082}\mbox{\hyperlink{namespacelibff_a0a19876fdeb681006eed9c4da061a22d}{00082}}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \mbox{\hyperlink{namespacelibff_a0a19876fdeb681006eed9c4da061a22d}{reserialize}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \&obj);}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00083}00083\ }
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00084}00084\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00085}\mbox{\hyperlink{namespacelibff_a28a206a971cb5d01305b1aba19d2b8b7}{00085}}\ std::ostream\&\ \mbox{\hyperlink{namespacelibff_a5c91b3dd1186f88cf8ee40d85d88f5f5}{operator<<}}(std::ostream\&\ out,\ \textcolor{keyword}{const}\ std::vector<T>\ \&v);}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00086}00086\ }
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00087}00087\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00088}\mbox{\hyperlink{namespacelibff_a883b4dea06a45104195dfa4db3c3bb35}{00088}}\ std::istream\&\ \mbox{\hyperlink{namespacelibff_a35aab22b78ce3785c5fa6fb128c86283}{operator>>}}(std::ostream\&\ out,\ std::vector<T>\ \&v);}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00089}00089\ }
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00090}00090\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T1,\ \textcolor{keyword}{typename}\ T2>}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00091}\mbox{\hyperlink{namespacelibff_aa3cb76cab37de5de3efe59ad56799078}{00091}}\ std::ostream\&\ \mbox{\hyperlink{namespacelibff_a5c91b3dd1186f88cf8ee40d85d88f5f5}{operator<<}}(std::ostream\&\ out,\ \textcolor{keyword}{const}\ std::map<T1,\ T2>\ \&m);}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00092}00092\ }
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00093}00093\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T1,\ \textcolor{keyword}{typename}\ T2>}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00094}\mbox{\hyperlink{namespacelibff_a19a5463b7c9920d8a8e105eabaf5905a}{00094}}\ std::istream\&\ \mbox{\hyperlink{namespacelibff_a35aab22b78ce3785c5fa6fb128c86283}{operator>>}}(std::istream\&\ in,\ std::map<T1,\ T2>\ \&m);}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00095}00095\ }
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00096}00096\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00097}\mbox{\hyperlink{namespacelibff_a07751239b830657c244e1c8aadf18d09}{00097}}\ std::ostream\&\ \mbox{\hyperlink{namespacelibff_a5c91b3dd1186f88cf8ee40d85d88f5f5}{operator<<}}(std::ostream\&\ out,\ \textcolor{keyword}{const}\ std::set<T>\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00098}00098\ }
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00099}00099\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00100}\mbox{\hyperlink{namespacelibff_a9b854ce5eb2642604b311c1ddef6e729}{00100}}\ std::istream\&\ \mbox{\hyperlink{namespacelibff_a35aab22b78ce3785c5fa6fb128c86283}{operator>>}}(std::istream\&\ in,\ std::set<T>\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00101}00101\ }
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00102}00102\ \}\ \textcolor{comment}{//\ libff}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00103}00103\ }
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00104}00104\ \textcolor{preprocessor}{\#include\ <libff/common/serialization.tcc>}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00105}00105\ }
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00106}00106\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ SERIALIZATION\_HPP\_}}
+
+\end{DoxyCode}

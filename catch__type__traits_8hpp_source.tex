@@ -1,0 +1,46 @@
+\doxysection{catch\+\_\+type\+\_\+traits.\+hpp}
+\hypertarget{catch__type__traits_8hpp_source}{}\label{catch__type__traits_8hpp_source}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_type\_traits.hpp@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_type\_traits.hpp}}
+\mbox{\hyperlink{catch__type__traits_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{catch__type__traits_8hpp_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{catch__type__traits_8hpp_source_l00002}00002\ \textcolor{comment}{\ *\ \ Created\ by\ Jozef\ on\ 12/11/2018.}}
+\DoxyCodeLine{\Hypertarget{catch__type__traits_8hpp_source_l00003}00003\ \textcolor{comment}{\ *\ \ Copyright\ 2017\ Two\ Blue\ Cubes\ Ltd.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{catch__type__traits_8hpp_source_l00004}00004\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{catch__type__traits_8hpp_source_l00005}00005\ \textcolor{comment}{\ *\ \ Distributed\ under\ the\ Boost\ Software\ License,\ Version\ 1.0.\ (See\ accompanying}}
+\DoxyCodeLine{\Hypertarget{catch__type__traits_8hpp_source_l00006}00006\ \textcolor{comment}{\ *\ \ file\ LICENSE\_1\_0.txt\ or\ copy\ at\ http://www.boost.org/LICENSE\_1\_0.txt)}}
+\DoxyCodeLine{\Hypertarget{catch__type__traits_8hpp_source_l00007}00007\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{catch__type__traits_8hpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{catch__type__traits_8hpp_source_l00009}00009\ \textcolor{preprocessor}{\#ifndef\ TWOBLUECUBES\_CATCH\_TYPE\_TRAITS\_HPP\_INCLUDED}}
+\DoxyCodeLine{\Hypertarget{catch__type__traits_8hpp_source_l00010}00010\ \textcolor{preprocessor}{\#define\ TWOBLUECUBES\_CATCH\_TYPE\_TRAITS\_HPP\_INCLUDED}}
+\DoxyCodeLine{\Hypertarget{catch__type__traits_8hpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{catch__type__traits_8hpp_source_l00012}00012\ \textcolor{preprocessor}{\#include\ <type\_traits>}}
+\DoxyCodeLine{\Hypertarget{catch__type__traits_8hpp_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{catch__type__traits_8hpp_source_l00014}00014\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}}\{}
+\DoxyCodeLine{\Hypertarget{catch__type__traits_8hpp_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{catch__type__traits_8hpp_source_l00016}00016\ \textcolor{preprocessor}{\#ifdef\ CATCH\_CPP17\_OR\_GREATER}}
+\DoxyCodeLine{\Hypertarget{catch__type__traits_8hpp_source_l00017}00017\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}...>}
+\DoxyCodeLine{\Hypertarget{catch__type__traits_8hpp_source_l00018}00018\ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{constexpr}\ \textcolor{keyword}{auto}\ is\_unique\ =\ std::true\_type\{\};}
+\DoxyCodeLine{\Hypertarget{catch__type__traits_8hpp_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{catch__type__traits_8hpp_source_l00020}00020\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}},\ \textcolor{keyword}{typename}...\ Rest>}
+\DoxyCodeLine{\Hypertarget{catch__type__traits_8hpp_source_l00021}00021\ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{constexpr}\ \textcolor{keyword}{auto}\ is\_unique<\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}},\ Rest...>\ =\ std::bool\_constant<}
+\DoxyCodeLine{\Hypertarget{catch__type__traits_8hpp_source_l00022}00022\ \ \ \ \ \ \ \ \ (!std::is\_same\_v<T,\ Rest>\ \&\&\ ...)\ \&\&\ is\_unique<Rest...>}
+\DoxyCodeLine{\Hypertarget{catch__type__traits_8hpp_source_l00023}00023\ \ \ \ \ >\{\};}
+\DoxyCodeLine{\Hypertarget{catch__type__traits_8hpp_source_l00024}00024\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{catch__type__traits_8hpp_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{catch__type__traits_8hpp_source_l00026}00026\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}...>}
+\DoxyCodeLine{\Hypertarget{catch__type__traits_8hpp_source_l00027}00027\ \textcolor{keyword}{struct\ }is\_unique\ :\ std::true\_type\{\};}
+\DoxyCodeLine{\Hypertarget{catch__type__traits_8hpp_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{catch__type__traits_8hpp_source_l00029}00029\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T0,\ \textcolor{keyword}{typename}\ T1,\ \textcolor{keyword}{typename}...\ Rest>}
+\DoxyCodeLine{\Hypertarget{catch__type__traits_8hpp_source_l00030}00030\ \textcolor{keyword}{struct\ }is\_unique<T0,\ T1,\ Rest...>\ :\ std::integral\_constant}
+\DoxyCodeLine{\Hypertarget{catch__type__traits_8hpp_source_l00031}00031\ <bool,}
+\DoxyCodeLine{\Hypertarget{catch__type__traits_8hpp_source_l00032}00032\ \ \ \ \ \ !std::is\_same<T0,\ T1>::value\ }
+\DoxyCodeLine{\Hypertarget{catch__type__traits_8hpp_source_l00033}00033\ \ \ \ \ \ \&\&\ is\_unique<T0,\ Rest...>::value\ }
+\DoxyCodeLine{\Hypertarget{catch__type__traits_8hpp_source_l00034}00034\ \ \ \ \ \ \&\&\ is\_unique<T1,\ Rest...>::value}
+\DoxyCodeLine{\Hypertarget{catch__type__traits_8hpp_source_l00035}00035\ >\{\};}
+\DoxyCodeLine{\Hypertarget{catch__type__traits_8hpp_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{catch__type__traits_8hpp_source_l00037}00037\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{catch__type__traits_8hpp_source_l00038}00038\ \}}
+\DoxyCodeLine{\Hypertarget{catch__type__traits_8hpp_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{catch__type__traits_8hpp_source_l00040}00040\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ TWOBLUECUBES\_CATCH\_TYPE\_TRAITS\_HPP\_INCLUDED}}
+
+\end{DoxyCode}

@@ -1,0 +1,17 @@
+<map id="broadcast_server::broadcast_server" name="broadcast_server::broadcast_server">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,157,192,198"/>
+<area shape="rect" id="Node000002" href="$classbroadcast__server.html#aba6fc18682e45978ae64ed1667deb44e" title=" " alt="" coords="257,5,400,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="118,155,170,107,238,57,249,51,252,55,241,61,173,111,122,159"/>
+<area shape="rect" id="Node000003" href="$classbroadcast__server.html#aa56cb8528f19afc3b1a2712d07d0b499" title=" " alt="" coords="257,71,400,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="151,154,239,121,254,115,256,120,241,125,153,159"/>
+<area shape="rect" id="Node000005" href="$classbroadcast__server.html#a20d3e5b15b9e916f6772d3e1137327c0" title=" " alt="" coords="240,136,418,161"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="191,163,224,159,224,164,192,168"/>
+<area shape="rect" id="Node000006" href="$classwebsocketpp_1_1endpoint.html#a8d7d95bebc154879655211e2b0b5e069" title=" " alt="" coords="251,185,406,226"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="192,186,236,192,235,197,191,192"/>
+<area shape="rect" id="Node000007" href="$classwebsocketpp_1_1endpoint.html#a34a3a8351bff65ba878975be471cab85" title=" " alt="" coords="251,251,407,291"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="148,196,241,235,258,242,256,247,239,240,146,201"/>
+<area shape="rect" id="Node000008" href="$classwebsocketpp_1_1endpoint.html#a5753d9848aefc04ee91da401c0cc65b8" title=" " alt="" coords="251,316,406,357"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="120,197,172,248,205,276,241,301,252,307,249,311,238,305,202,280,168,252,116,200"/>
+<area shape="rect" id="Node000004" href="$classwebsocketpp_1_1endpoint.html#a5341f59de7ef1a565a2fd93daba212d5" title="Create a message and add it to the outgoing send queue (exception free)" alt="" coords="466,71,621,111"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="401,88,450,88,450,94,401,94"/>
+</map>

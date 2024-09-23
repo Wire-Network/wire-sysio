@@ -1,0 +1,307 @@
+\doxysection{chainbase\+::environment Struct Reference}
+\hypertarget{structchainbase_1_1environment}{}\label{structchainbase_1_1environment}\index{chainbase::environment@{chainbase::environment}}
+
+
+{\ttfamily \#include $<$environment.\+hpp$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{structchainbase_1_1environment_a5230c250a35c7d13c3c059e117c54395}{os\+\_\+t}} \+: unsigned char \{ \mbox{\hyperlink{structchainbase_1_1environment_a5230c250a35c7d13c3c059e117c54395a4e8ce2a96ea0b535b8fe12d92c04b0c4}{OS\+\_\+\+LINUX}}
+, \mbox{\hyperlink{structchainbase_1_1environment_a5230c250a35c7d13c3c059e117c54395a022d1acb0c856766ce1cdc6814d96057}{OS\+\_\+\+MACOS}}
+, \mbox{\hyperlink{structchainbase_1_1environment_a5230c250a35c7d13c3c059e117c54395a2bda405992008383e3c311255aabb3c9}{OS\+\_\+\+WINDOWS}}
+, \mbox{\hyperlink{structchainbase_1_1environment_a5230c250a35c7d13c3c059e117c54395a49bf53029b517339b7d000b5006238a4}{OS\+\_\+\+OTHER}}
+ \}
+\item 
+enum \mbox{\hyperlink{structchainbase_1_1environment_ad49d26e72b1a5ad85a8d2ccdc85b7fa8}{arch\+\_\+t}} \+: unsigned char \{ \mbox{\hyperlink{structchainbase_1_1environment_ad49d26e72b1a5ad85a8d2ccdc85b7fa8ada45144844701756f5757aee0f929a7b}{ARCH\+\_\+\+X86\+\_\+64}}
+, \mbox{\hyperlink{structchainbase_1_1environment_ad49d26e72b1a5ad85a8d2ccdc85b7fa8af374c3b01e0ba23a75eedf0c38a43450}{ARCH\+\_\+\+ARM}}
+, \mbox{\hyperlink{structchainbase_1_1environment_ad49d26e72b1a5ad85a8d2ccdc85b7fa8a2f0968d6b82358cb65f4f1fe65d374c0}{ARCH\+\_\+\+RISCV}}
+, \mbox{\hyperlink{structchainbase_1_1environment_ad49d26e72b1a5ad85a8d2ccdc85b7fa8a27b93f887db652b34583ae3d61e061ab}{ARCH\+\_\+\+OTHER}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structchainbase_1_1environment_a2cf8e86854bddead8f9d51eb0a2676e4}{environment}} ()
+\item 
+bool \mbox{\hyperlink{structchainbase_1_1environment_a9fe43972471bca5481e46577afc94080}{operator==}} (const \mbox{\hyperlink{structchainbase_1_1environment}{environment}} \&other)
+\item 
+bool \mbox{\hyperlink{structchainbase_1_1environment_aae31f058079578d211f327ec5a856d77}{operator!=}} (const \mbox{\hyperlink{structchainbase_1_1environment}{environment}} \&other)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{structchainbase_1_1environment_a5230c250a35c7d13c3c059e117c54395}{chainbase\+::environment\+::os\+\_\+t}} \mbox{\hyperlink{structchainbase_1_1environment_acae55e12d9cfaec780620dcfdbf407ce}{\+\_\+\+\_\+attribute\+\_\+\+\_\+}}
+\item 
+bool \mbox{\hyperlink{structchainbase_1_1environment_a328120bb740176a5215fb32d641800b8}{debug}}
+\item 
+\mbox{\hyperlink{structchainbase_1_1environment_a5230c250a35c7d13c3c059e117c54395}{os\+\_\+t}} \mbox{\hyperlink{structchainbase_1_1environment_a29626f3d5a8c2e741807d4818800455d}{os}}
+\item 
+\mbox{\hyperlink{structchainbase_1_1environment_ad49d26e72b1a5ad85a8d2ccdc85b7fa8}{arch\+\_\+t}} \mbox{\hyperlink{structchainbase_1_1environment_ab83a258982dca21a9bbe652773295e30}{arch}}
+\item 
+unsigned \mbox{\hyperlink{structchainbase_1_1environment_a4244eac72c418fa7d07f97cc1e3bdfd4}{boost\+\_\+version}} = BOOST\+\_\+\+VERSION
+\item 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{structchainbase_1_1environment_a5ff472a676fe25173c2d60b3c00cb87e}{reserved}} \mbox{[}512\mbox{]} = \{\}
+\item 
+char \mbox{\hyperlink{structchainbase_1_1environment_a5877d3a8ae187320facd1c7935ae40fc}{compiler}} \mbox{[}256\mbox{]} = \{\}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{environment_8hpp_source_l00010}{10}} of file \mbox{\hyperlink{environment_8hpp_source}{environment.\+hpp}}.
+
+
+
+\doxysubsection{Member Enumeration Documentation}
+\Hypertarget{structchainbase_1_1environment_ad49d26e72b1a5ad85a8d2ccdc85b7fa8}\index{chainbase::environment@{chainbase::environment}!arch\_t@{arch\_t}}
+\index{arch\_t@{arch\_t}!chainbase::environment@{chainbase::environment}}
+\doxysubsubsection{\texorpdfstring{arch\_t}{arch\_t}}
+{\footnotesize\ttfamily \label{structchainbase_1_1environment_ad49d26e72b1a5ad85a8d2ccdc85b7fa8} 
+enum \mbox{\hyperlink{structchainbase_1_1environment_ad49d26e72b1a5ad85a8d2ccdc85b7fa8}{chainbase\+::environment\+::arch\+\_\+t}} \+: unsigned char}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ARCH\_X86\_64@{ARCH\_X86\_64}!chainbase::environment@{chainbase::environment}}\index{chainbase::environment@{chainbase::environment}!ARCH\_X86\_64@{ARCH\_X86\_64}}}\Hypertarget{structchainbase_1_1environment_ad49d26e72b1a5ad85a8d2ccdc85b7fa8ada45144844701756f5757aee0f929a7b}\label{structchainbase_1_1environment_ad49d26e72b1a5ad85a8d2ccdc85b7fa8} 
+ARCH\+\_\+\+X86\+\_\+64&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ARCH\_ARM@{ARCH\_ARM}!chainbase::environment@{chainbase::environment}}\index{chainbase::environment@{chainbase::environment}!ARCH\_ARM@{ARCH\_ARM}}}\Hypertarget{structchainbase_1_1environment_ad49d26e72b1a5ad85a8d2ccdc85b7fa8af374c3b01e0ba23a75eedf0c38a43450}\label{structchainbase_1_1environment_ad49d26e72b1a5ad85a8d2ccdc85b7fa8} 
+ARCH\+\_\+\+ARM&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ARCH\_RISCV@{ARCH\_RISCV}!chainbase::environment@{chainbase::environment}}\index{chainbase::environment@{chainbase::environment}!ARCH\_RISCV@{ARCH\_RISCV}}}\Hypertarget{structchainbase_1_1environment_ad49d26e72b1a5ad85a8d2ccdc85b7fa8a2f0968d6b82358cb65f4f1fe65d374c0}\label{structchainbase_1_1environment_ad49d26e72b1a5ad85a8d2ccdc85b7fa8} 
+ARCH\+\_\+\+RISCV&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ARCH\_OTHER@{ARCH\_OTHER}!chainbase::environment@{chainbase::environment}}\index{chainbase::environment@{chainbase::environment}!ARCH\_OTHER@{ARCH\_OTHER}}}\Hypertarget{structchainbase_1_1environment_ad49d26e72b1a5ad85a8d2ccdc85b7fa8a27b93f887db652b34583ae3d61e061ab}\label{structchainbase_1_1environment_ad49d26e72b1a5ad85a8d2ccdc85b7fa8} 
+ARCH\+\_\+\+OTHER&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{environment_8hpp_source_l00021}{21}} of file \mbox{\hyperlink{environment_8hpp_source}{environment.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ \{}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \mbox{\hyperlink{structchainbase_1_1environment_ad49d26e72b1a5ad85a8d2ccdc85b7fa8ada45144844701756f5757aee0f929a7b}{ARCH\_X86\_64}},}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \mbox{\hyperlink{structchainbase_1_1environment_ad49d26e72b1a5ad85a8d2ccdc85b7fa8af374c3b01e0ba23a75eedf0c38a43450}{ARCH\_ARM}},}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \mbox{\hyperlink{structchainbase_1_1environment_ad49d26e72b1a5ad85a8d2ccdc85b7fa8a2f0968d6b82358cb65f4f1fe65d374c0}{ARCH\_RISCV}},}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \mbox{\hyperlink{structchainbase_1_1environment_ad49d26e72b1a5ad85a8d2ccdc85b7fa8a27b93f887db652b34583ae3d61e061ab}{ARCH\_OTHER}}}
+\DoxyCodeLine{00026\ \ \ \ \};}
+
+\end{DoxyCode}
+\Hypertarget{structchainbase_1_1environment_a5230c250a35c7d13c3c059e117c54395}\index{chainbase::environment@{chainbase::environment}!os\_t@{os\_t}}
+\index{os\_t@{os\_t}!chainbase::environment@{chainbase::environment}}
+\doxysubsubsection{\texorpdfstring{os\_t}{os\_t}}
+{\footnotesize\ttfamily \label{structchainbase_1_1environment_a5230c250a35c7d13c3c059e117c54395} 
+enum \mbox{\hyperlink{structchainbase_1_1environment_a5230c250a35c7d13c3c059e117c54395}{chainbase\+::environment\+::os\+\_\+t}} \+: unsigned char}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{OS\_LINUX@{OS\_LINUX}!chainbase::environment@{chainbase::environment}}\index{chainbase::environment@{chainbase::environment}!OS\_LINUX@{OS\_LINUX}}}\Hypertarget{structchainbase_1_1environment_a5230c250a35c7d13c3c059e117c54395a4e8ce2a96ea0b535b8fe12d92c04b0c4}\label{structchainbase_1_1environment_a5230c250a35c7d13c3c059e117c54395} 
+OS\+\_\+\+LINUX&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{OS\_MACOS@{OS\_MACOS}!chainbase::environment@{chainbase::environment}}\index{chainbase::environment@{chainbase::environment}!OS\_MACOS@{OS\_MACOS}}}\Hypertarget{structchainbase_1_1environment_a5230c250a35c7d13c3c059e117c54395a022d1acb0c856766ce1cdc6814d96057}\label{structchainbase_1_1environment_a5230c250a35c7d13c3c059e117c54395} 
+OS\+\_\+\+MACOS&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{OS\_WINDOWS@{OS\_WINDOWS}!chainbase::environment@{chainbase::environment}}\index{chainbase::environment@{chainbase::environment}!OS\_WINDOWS@{OS\_WINDOWS}}}\Hypertarget{structchainbase_1_1environment_a5230c250a35c7d13c3c059e117c54395a2bda405992008383e3c311255aabb3c9}\label{structchainbase_1_1environment_a5230c250a35c7d13c3c059e117c54395} 
+OS\+\_\+\+WINDOWS&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{OS\_OTHER@{OS\_OTHER}!chainbase::environment@{chainbase::environment}}\index{chainbase::environment@{chainbase::environment}!OS\_OTHER@{OS\_OTHER}}}\Hypertarget{structchainbase_1_1environment_a5230c250a35c7d13c3c059e117c54395a49bf53029b517339b7d000b5006238a4}\label{structchainbase_1_1environment_a5230c250a35c7d13c3c059e117c54395} 
+OS\+\_\+\+OTHER&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{environment_8hpp_source_l00015}{15}} of file \mbox{\hyperlink{environment_8hpp_source}{environment.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ \{}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \mbox{\hyperlink{structchainbase_1_1environment_a5230c250a35c7d13c3c059e117c54395a4e8ce2a96ea0b535b8fe12d92c04b0c4}{OS\_LINUX}},}
+\DoxyCodeLine{00017\ \ \ \ \ \ \ \mbox{\hyperlink{structchainbase_1_1environment_a5230c250a35c7d13c3c059e117c54395a022d1acb0c856766ce1cdc6814d96057}{OS\_MACOS}},}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \mbox{\hyperlink{structchainbase_1_1environment_a5230c250a35c7d13c3c059e117c54395a2bda405992008383e3c311255aabb3c9}{OS\_WINDOWS}},}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \mbox{\hyperlink{structchainbase_1_1environment_a5230c250a35c7d13c3c059e117c54395a49bf53029b517339b7d000b5006238a4}{OS\_OTHER}}}
+\DoxyCodeLine{00020\ \ \ \ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structchainbase_1_1environment_a2cf8e86854bddead8f9d51eb0a2676e4}\index{chainbase::environment@{chainbase::environment}!environment@{environment}}
+\index{environment@{environment}!chainbase::environment@{chainbase::environment}}
+\doxysubsubsection{\texorpdfstring{environment()}{environment()}}
+{\footnotesize\ttfamily \label{structchainbase_1_1environment_a2cf8e86854bddead8f9d51eb0a2676e4} 
+chainbase\+::environment\+::environment (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{environment_8hpp_source_l00011}{11}} of file \mbox{\hyperlink{environment_8hpp_source}{environment.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00011\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00012\ \ \ \ \ \ \ strncpy(\mbox{\hyperlink{structchainbase_1_1environment_a5877d3a8ae187320facd1c7935ae40fc}{compiler}},\ \_\_VERSION\_\_,\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{structchainbase_1_1environment_a5877d3a8ae187320facd1c7935ae40fc}{compiler}})-\/1);}
+\DoxyCodeLine{00013\ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structchainbase_1_1environment_aae31f058079578d211f327ec5a856d77}\index{chainbase::environment@{chainbase::environment}!operator"!=@{operator"!=}}
+\index{operator"!=@{operator"!=}!chainbase::environment@{chainbase::environment}}
+\doxysubsubsection{\texorpdfstring{operator"!=()}{operator!=()}}
+{\footnotesize\ttfamily \label{structchainbase_1_1environment_aae31f058079578d211f327ec5a856d77} 
+bool chainbase\+::environment\+::operator!= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structchainbase_1_1environment}{environment}} \&}]{other}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{environment_8hpp_source_l00062}{62}} of file \mbox{\hyperlink{environment_8hpp_source}{environment.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !(*\textcolor{keyword}{this}\ ==\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}});}
+\DoxyCodeLine{00064\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structchainbase_1_1environment_a9fe43972471bca5481e46577afc94080}\index{chainbase::environment@{chainbase::environment}!operator==@{operator==}}
+\index{operator==@{operator==}!chainbase::environment@{chainbase::environment}}
+\doxysubsubsection{\texorpdfstring{operator==()}{operator==()}}
+{\footnotesize\ttfamily \label{structchainbase_1_1environment_a9fe43972471bca5481e46577afc94080} 
+bool chainbase\+::environment\+::operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structchainbase_1_1environment}{environment}} \&}]{other}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{environment_8hpp_source_l00059}{59}} of file \mbox{\hyperlink{environment_8hpp_source}{environment.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !memcmp(\textcolor{keyword}{this},\ \&other,\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{structchainbase_1_1environment_a2cf8e86854bddead8f9d51eb0a2676e4}{environment}}));}
+\DoxyCodeLine{00061\ \ \ \ \}\ }
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structchainbase_1_1environment_acae55e12d9cfaec780620dcfdbf407ce}\index{chainbase::environment@{chainbase::environment}!\_\_attribute\_\_@{\_\_attribute\_\_}}
+\index{\_\_attribute\_\_@{\_\_attribute\_\_}!chainbase::environment@{chainbase::environment}}
+\doxysubsubsection{\texorpdfstring{\_\_attribute\_\_}{\_\_attribute\_\_}}
+{\footnotesize\ttfamily \label{structchainbase_1_1environment_acae55e12d9cfaec780620dcfdbf407ce} 
+enum \mbox{\hyperlink{structchainbase_1_1environment_a5230c250a35c7d13c3c059e117c54395}{chainbase\+::environment\+::os\+\_\+t}} chainbase\+::environment\+::\+\_\+\+\_\+attribute\+\_\+\+\_\+}
+
+\Hypertarget{structchainbase_1_1environment_ab83a258982dca21a9bbe652773295e30}\index{chainbase::environment@{chainbase::environment}!arch@{arch}}
+\index{arch@{arch}!chainbase::environment@{chainbase::environment}}
+\doxysubsubsection{\texorpdfstring{arch}{arch}}
+{\footnotesize\ttfamily \label{structchainbase_1_1environment_ab83a258982dca21a9bbe652773295e30} 
+\mbox{\hyperlink{structchainbase_1_1environment_ad49d26e72b1a5ad85a8d2ccdc85b7fa8}{arch\+\_\+t}} chainbase\+::environment\+::arch}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=}
+\DoxyCodeLine{}
+\DoxyCodeLine{}
+\DoxyCodeLine{}
+\DoxyCodeLine{}
+\DoxyCodeLine{}
+\DoxyCodeLine{}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \ \ \mbox{\hyperlink{structchainbase_1_1environment_ad49d26e72b1a5ad85a8d2ccdc85b7fa8a27b93f887db652b34583ae3d61e061ab}{ARCH\_OTHER}}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{environment_8hpp_source_l00044}{44}} of file \mbox{\hyperlink{environment_8hpp_source}{environment.\+hpp}}.
+
+\Hypertarget{structchainbase_1_1environment_a4244eac72c418fa7d07f97cc1e3bdfd4}\index{chainbase::environment@{chainbase::environment}!boost\_version@{boost\_version}}
+\index{boost\_version@{boost\_version}!chainbase::environment@{chainbase::environment}}
+\doxysubsubsection{\texorpdfstring{boost\_version}{boost\_version}}
+{\footnotesize\ttfamily \label{structchainbase_1_1environment_a4244eac72c418fa7d07f97cc1e3bdfd4} 
+unsigned chainbase\+::environment\+::boost\+\_\+version = BOOST\+\_\+\+VERSION}
+
+
+
+Definition at line \mbox{\hyperlink{environment_8hpp_source_l00055}{55}} of file \mbox{\hyperlink{environment_8hpp_source}{environment.\+hpp}}.
+
+\Hypertarget{structchainbase_1_1environment_a5877d3a8ae187320facd1c7935ae40fc}\index{chainbase::environment@{chainbase::environment}!compiler@{compiler}}
+\index{compiler@{compiler}!chainbase::environment@{chainbase::environment}}
+\doxysubsubsection{\texorpdfstring{compiler}{compiler}}
+{\footnotesize\ttfamily \label{structchainbase_1_1environment_a5877d3a8ae187320facd1c7935ae40fc} 
+char chainbase\+::environment\+::compiler\mbox{[}256\mbox{]} = \{\}}
+
+
+
+Definition at line \mbox{\hyperlink{environment_8hpp_source_l00057}{57}} of file \mbox{\hyperlink{environment_8hpp_source}{environment.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00057\ \{\};}
+
+\end{DoxyCode}
+\Hypertarget{structchainbase_1_1environment_a328120bb740176a5215fb32d641800b8}\index{chainbase::environment@{chainbase::environment}!debug@{debug}}
+\index{debug@{debug}!chainbase::environment@{chainbase::environment}}
+\doxysubsubsection{\texorpdfstring{debug}{debug}}
+{\footnotesize\ttfamily \label{structchainbase_1_1environment_a328120bb740176a5215fb32d641800b8} 
+bool chainbase\+::environment\+::debug}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keyword}{true}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{environment_8hpp_source_l00028}{28}} of file \mbox{\hyperlink{environment_8hpp_source}{environment.\+hpp}}.
+
+\Hypertarget{structchainbase_1_1environment_a29626f3d5a8c2e741807d4818800455d}\index{chainbase::environment@{chainbase::environment}!os@{os}}
+\index{os@{os}!chainbase::environment@{chainbase::environment}}
+\doxysubsubsection{\texorpdfstring{os}{os}}
+{\footnotesize\ttfamily \label{structchainbase_1_1environment_a29626f3d5a8c2e741807d4818800455d} 
+\mbox{\hyperlink{structchainbase_1_1environment_a5230c250a35c7d13c3c059e117c54395}{os\+\_\+t}} chainbase\+::environment\+::os}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=}
+\DoxyCodeLine{}
+\DoxyCodeLine{}
+\DoxyCodeLine{}
+\DoxyCodeLine{}
+\DoxyCodeLine{}
+\DoxyCodeLine{}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \ \ \mbox{\hyperlink{structchainbase_1_1environment_a5230c250a35c7d13c3c059e117c54395a49bf53029b517339b7d000b5006238a4}{OS\_OTHER}}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{environment_8hpp_source_l00034}{34}} of file \mbox{\hyperlink{environment_8hpp_source}{environment.\+hpp}}.
+
+\Hypertarget{structchainbase_1_1environment_a5ff472a676fe25173c2d60b3c00cb87e}\index{chainbase::environment@{chainbase::environment}!reserved@{reserved}}
+\index{reserved@{reserved}!chainbase::environment@{chainbase::environment}}
+\doxysubsubsection{\texorpdfstring{reserved}{reserved}}
+{\footnotesize\ttfamily \label{structchainbase_1_1environment_a5ff472a676fe25173c2d60b3c00cb87e} 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} chainbase\+::environment\+::reserved\mbox{[}512\mbox{]} = \{\}}
+
+
+
+Definition at line \mbox{\hyperlink{environment_8hpp_source_l00056}{56}} of file \mbox{\hyperlink{environment_8hpp_source}{environment.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00056\ \{\};}
+
+\end{DoxyCode}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chainbase/include/chainbase/\mbox{\hyperlink{environment_8hpp}{environment.\+hpp}}\end{DoxyCompactItemize}

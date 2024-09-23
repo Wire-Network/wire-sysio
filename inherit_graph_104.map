@@ -1,0 +1,13 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,43,62,68"/>
+<area shape="rect" id="Node000001" href="$structmie_1_1local_1_1shiftable.html" title=" " alt="" coords="110,35,295,76"/>
+<area shape="poly" id="edge78_Node000000_Node000001" title=" " alt="" coords="77,53,109,53,109,58,77,58"/>
+<area shape="rect" id="Node000002" href="$structmie_1_1local_1_1comparable.html" title=" " alt="" coords="343,20,518,91"/>
+<area shape="poly" id="edge79_Node000001_Node000002" title=" " alt="" coords="310,53,342,53,342,58,310,58"/>
+<area shape="rect" id="Node000003" href="$structmie_1_1local_1_1addsubmul.html" title=" " alt="" coords="566,13,760,98"/>
+<area shape="poly" id="edge80_Node000002_Node000003" title=" " alt="" coords="534,53,566,53,566,58,534,58"/>
+<area shape="rect" id="Node000004" href="$structmie_1_1local_1_1dividable.html" title=" " alt="" coords="808,5,1029,106"/>
+<area shape="poly" id="edge81_Node000003_Node000004" title=" " alt="" coords="776,53,807,53,807,58,776,58"/>
+<area shape="rect" id="Node000005" href="$structmie_1_1_vuint_t.html" title=" " alt="" coords="1077,43,1224,68"/>
+<area shape="poly" id="edge82_Node000004_Node000005" title=" " alt="" coords="1045,53,1076,53,1076,58,1045,58"/>
+</map>

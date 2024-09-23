@@ -1,0 +1,244 @@
+\doxysection{libraries/fc/include/fc/crypto/webauthn\+\_\+json/test/unittest/stringbuffertest.cpp File Reference}
+\hypertarget{stringbuffertest_8cpp}{}\label{stringbuffertest_8cpp}\index{libraries/fc/include/fc/crypto/webauthn\_json/test/unittest/stringbuffertest.cpp@{libraries/fc/include/fc/crypto/webauthn\_json/test/unittest/stringbuffertest.cpp}}
+{\ttfamily \#include "{}unittest.\+h"{}}\newline
+{\ttfamily \#include "{}rapidjson/stringbuffer.\+h"{}}\newline
+{\ttfamily \#include "{}rapidjson/writer.\+h"{}}\newline
+Include dependency graph for stringbuffertest.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{stringbuffertest_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stringbuffertest_8cpp_a6f92b34ed62474587cb34b64162d5878}{TEST}} (\mbox{\hyperlink{fwd_8h_ab956b6537825abf8aac4112e81cfad7e}{String\+Buffer}}, Initial\+Size)
+\item 
+\mbox{\hyperlink{stringbuffertest_8cpp_a35396fd51e755e78dcd41d821fec4818}{TEST}} (\mbox{\hyperlink{fwd_8h_ab956b6537825abf8aac4112e81cfad7e}{String\+Buffer}}, \mbox{\hyperlink{bench_8cpp_a8496465558c5f8a68e4583295fb89c7d}{Put}})
+\item 
+\mbox{\hyperlink{stringbuffertest_8cpp_a7655c9b98a62e2c2baf27f414edea796}{TEST}} (\mbox{\hyperlink{fwd_8h_ab956b6537825abf8aac4112e81cfad7e}{String\+Buffer}}, Put\+N\+\_\+\+Issue672)
+\item 
+\mbox{\hyperlink{stringbuffertest_8cpp_a58e114f4cdf292eb2d79fd07d8075624}{TEST}} (\mbox{\hyperlink{fwd_8h_ab956b6537825abf8aac4112e81cfad7e}{String\+Buffer}}, Clear)
+\item 
+\mbox{\hyperlink{stringbuffertest_8cpp_a2a076022dd05a90d4537ba48032212c4}{TEST}} (\mbox{\hyperlink{fwd_8h_ab956b6537825abf8aac4112e81cfad7e}{String\+Buffer}}, Push)
+\item 
+\mbox{\hyperlink{stringbuffertest_8cpp_a01d80f83d15918d8b15eb382abe0ba29}{TEST}} (\mbox{\hyperlink{fwd_8h_ab956b6537825abf8aac4112e81cfad7e}{String\+Buffer}}, Pop)
+\item 
+\mbox{\hyperlink{stringbuffertest_8cpp_aff5a30dd9e07bc4095de5ff9304c0323}{TEST}} (\mbox{\hyperlink{fwd_8h_ab956b6537825abf8aac4112e81cfad7e}{String\+Buffer}}, Get\+Length\+\_\+\+Issue744)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{stringbuffertest_8cpp_a58e114f4cdf292eb2d79fd07d8075624}\index{stringbuffertest.cpp@{stringbuffertest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!stringbuffertest.cpp@{stringbuffertest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [1/7]}}
+{\footnotesize\ttfamily \label{stringbuffertest_8cpp_a58e114f4cdf292eb2d79fd07d8075624} 
+TEST (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{fwd_8h_ab956b6537825abf8aac4112e81cfad7e}{String\+Buffer}}}]{}{, }\item[{Clear}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{stringbuffertest_8cpp_source_l00051}{51}} of file \mbox{\hyperlink{stringbuffertest_8cpp_source}{stringbuffertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00052\ \ \ \ \ \mbox{\hyperlink{class_generic_string_buffer}{StringBuffer}}\ buffer;}
+\DoxyCodeLine{00053\ \ \ \ \ buffer.\mbox{\hyperlink{class_generic_string_buffer_a8be5c8fadccacdcf40e20220f38e0afa}{Put}}(\textcolor{charliteral}{'A'});}
+\DoxyCodeLine{00054\ \ \ \ \ buffer.\mbox{\hyperlink{class_generic_string_buffer_a8be5c8fadccacdcf40e20220f38e0afa}{Put}}(\textcolor{charliteral}{'B'});}
+\DoxyCodeLine{00055\ \ \ \ \ buffer.\mbox{\hyperlink{class_generic_string_buffer_a8be5c8fadccacdcf40e20220f38e0afa}{Put}}(\textcolor{charliteral}{'C'});}
+\DoxyCodeLine{00056\ \ \ \ \ buffer.\mbox{\hyperlink{class_generic_string_buffer_a42f15c959046d899cb74c3120a6995f9}{Clear}}();}
+\DoxyCodeLine{00057\ }
+\DoxyCodeLine{00058\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0u,\ buffer.\mbox{\hyperlink{class_generic_string_buffer_a725e862b9a78375f5363b0b61ad789f3}{GetSize}}());}
+\DoxyCodeLine{00059\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0u,\ buffer.\mbox{\hyperlink{class_generic_string_buffer_ad324b8154be3354dda3aa4a0a7361499}{GetLength}}());}
+\DoxyCodeLine{00060\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ad20f7b94ac5081e16f0005b94e95f0c6}{EXPECT\_STREQ}}(\textcolor{stringliteral}{"{}"{}},\ buffer.\mbox{\hyperlink{class_generic_string_buffer_a42079865bab1deb930c6cff7d491c719}{GetString}}());}
+\DoxyCodeLine{00061\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{stringbuffertest_8cpp_a58e114f4cdf292eb2d79fd07d8075624_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{stringbuffertest_8cpp_aff5a30dd9e07bc4095de5ff9304c0323}\index{stringbuffertest.cpp@{stringbuffertest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!stringbuffertest.cpp@{stringbuffertest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [2/7]}}
+{\footnotesize\ttfamily \label{stringbuffertest_8cpp_aff5a30dd9e07bc4095de5ff9304c0323} 
+TEST (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{fwd_8h_ab956b6537825abf8aac4112e81cfad7e}{String\+Buffer}}}]{}{, }\item[{Get\+Length\+\_\+\+Issue744}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{stringbuffertest_8cpp_source_l00089}{89}} of file \mbox{\hyperlink{stringbuffertest_8cpp_source}{stringbuffertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00090\ \ \ \ \ \mbox{\hyperlink{class_generic_string_buffer}{GenericStringBuffer<UTF16<wchar\_t>}}\ >\ buffer;}
+\DoxyCodeLine{00091\ \ \ \ \ buffer.\mbox{\hyperlink{class_generic_string_buffer_a8be5c8fadccacdcf40e20220f38e0afa}{Put}}(\textcolor{charliteral}{'A'});}
+\DoxyCodeLine{00092\ \ \ \ \ buffer.\mbox{\hyperlink{class_generic_string_buffer_a8be5c8fadccacdcf40e20220f38e0afa}{Put}}(\textcolor{charliteral}{'B'});}
+\DoxyCodeLine{00093\ \ \ \ \ buffer.\mbox{\hyperlink{class_generic_string_buffer_a8be5c8fadccacdcf40e20220f38e0afa}{Put}}(\textcolor{charliteral}{'C'});}
+\DoxyCodeLine{00094\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(3u\ *\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{wchar\_t}),\ buffer.\mbox{\hyperlink{class_generic_string_buffer_a725e862b9a78375f5363b0b61ad789f3}{GetSize}}());}
+\DoxyCodeLine{00095\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(3u,\ buffer.\mbox{\hyperlink{class_generic_string_buffer_ad324b8154be3354dda3aa4a0a7361499}{GetLength}}());}
+\DoxyCodeLine{00096\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{stringbuffertest_8cpp_aff5a30dd9e07bc4095de5ff9304c0323_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{stringbuffertest_8cpp_a6f92b34ed62474587cb34b64162d5878}\index{stringbuffertest.cpp@{stringbuffertest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!stringbuffertest.cpp@{stringbuffertest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [3/7]}}
+{\footnotesize\ttfamily \label{stringbuffertest_8cpp_a6f92b34ed62474587cb34b64162d5878} 
+TEST (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{fwd_8h_ab956b6537825abf8aac4112e81cfad7e}{String\+Buffer}}}]{}{, }\item[{Initial\+Size}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{stringbuffertest_8cpp_source_l00026}{26}} of file \mbox{\hyperlink{stringbuffertest_8cpp_source}{stringbuffertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00027\ \ \ \ \ \mbox{\hyperlink{class_generic_string_buffer}{StringBuffer}}\ buffer;}
+\DoxyCodeLine{00028\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0u,\ buffer.\mbox{\hyperlink{class_generic_string_buffer_a725e862b9a78375f5363b0b61ad789f3}{GetSize}}());}
+\DoxyCodeLine{00029\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0u,\ buffer.\mbox{\hyperlink{class_generic_string_buffer_ad324b8154be3354dda3aa4a0a7361499}{GetLength}}());}
+\DoxyCodeLine{00030\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ad20f7b94ac5081e16f0005b94e95f0c6}{EXPECT\_STREQ}}(\textcolor{stringliteral}{"{}"{}},\ buffer.\mbox{\hyperlink{class_generic_string_buffer_a42079865bab1deb930c6cff7d491c719}{GetString}}());}
+\DoxyCodeLine{00031\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{stringbuffertest_8cpp_a6f92b34ed62474587cb34b64162d5878_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{stringbuffertest_8cpp_a01d80f83d15918d8b15eb382abe0ba29}\index{stringbuffertest.cpp@{stringbuffertest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!stringbuffertest.cpp@{stringbuffertest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [4/7]}}
+{\footnotesize\ttfamily \label{stringbuffertest_8cpp_a01d80f83d15918d8b15eb382abe0ba29} 
+TEST (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{fwd_8h_ab956b6537825abf8aac4112e81cfad7e}{String\+Buffer}}}]{}{, }\item[{Pop}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{stringbuffertest_8cpp_source_l00075}{75}} of file \mbox{\hyperlink{stringbuffertest_8cpp_source}{stringbuffertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00076\ \ \ \ \ \mbox{\hyperlink{class_generic_string_buffer}{StringBuffer}}\ buffer;}
+\DoxyCodeLine{00077\ \ \ \ \ buffer.\mbox{\hyperlink{class_generic_string_buffer_a8be5c8fadccacdcf40e20220f38e0afa}{Put}}(\textcolor{charliteral}{'A'});}
+\DoxyCodeLine{00078\ \ \ \ \ buffer.\mbox{\hyperlink{class_generic_string_buffer_a8be5c8fadccacdcf40e20220f38e0afa}{Put}}(\textcolor{charliteral}{'B'});}
+\DoxyCodeLine{00079\ \ \ \ \ buffer.\mbox{\hyperlink{class_generic_string_buffer_a8be5c8fadccacdcf40e20220f38e0afa}{Put}}(\textcolor{charliteral}{'C'});}
+\DoxyCodeLine{00080\ \ \ \ \ buffer.\mbox{\hyperlink{class_generic_string_buffer_a8be5c8fadccacdcf40e20220f38e0afa}{Put}}(\textcolor{charliteral}{'D'});}
+\DoxyCodeLine{00081\ \ \ \ \ buffer.\mbox{\hyperlink{class_generic_string_buffer_a8be5c8fadccacdcf40e20220f38e0afa}{Put}}(\textcolor{charliteral}{'E'});}
+\DoxyCodeLine{00082\ \ \ \ \ buffer.\mbox{\hyperlink{class_generic_string_buffer_a0038e53ba03c271bc4cbbac403ec4de4}{Pop}}(3);}
+\DoxyCodeLine{00083\ }
+\DoxyCodeLine{00084\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(2u,\ buffer.\mbox{\hyperlink{class_generic_string_buffer_a725e862b9a78375f5363b0b61ad789f3}{GetSize}}());}
+\DoxyCodeLine{00085\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(2u,\ buffer.\mbox{\hyperlink{class_generic_string_buffer_ad324b8154be3354dda3aa4a0a7361499}{GetLength}}());}
+\DoxyCodeLine{00086\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ad20f7b94ac5081e16f0005b94e95f0c6}{EXPECT\_STREQ}}(\textcolor{stringliteral}{"{}AB"{}},\ buffer.\mbox{\hyperlink{class_generic_string_buffer_a42079865bab1deb930c6cff7d491c719}{GetString}}());}
+\DoxyCodeLine{00087\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{stringbuffertest_8cpp_a01d80f83d15918d8b15eb382abe0ba29_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{stringbuffertest_8cpp_a2a076022dd05a90d4537ba48032212c4}\index{stringbuffertest.cpp@{stringbuffertest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!stringbuffertest.cpp@{stringbuffertest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [5/7]}}
+{\footnotesize\ttfamily \label{stringbuffertest_8cpp_a2a076022dd05a90d4537ba48032212c4} 
+TEST (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{fwd_8h_ab956b6537825abf8aac4112e81cfad7e}{String\+Buffer}}}]{}{, }\item[{Push}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{stringbuffertest_8cpp_source_l00063}{63}} of file \mbox{\hyperlink{stringbuffertest_8cpp_source}{stringbuffertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00064\ \ \ \ \ \mbox{\hyperlink{class_generic_string_buffer}{StringBuffer}}\ buffer;}
+\DoxyCodeLine{00065\ \ \ \ \ buffer.\mbox{\hyperlink{class_generic_string_buffer_a80af78c43da93126a940a40d1889278a}{Push}}(5);}
+\DoxyCodeLine{00066\ }
+\DoxyCodeLine{00067\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(5u,\ buffer.\mbox{\hyperlink{class_generic_string_buffer_a725e862b9a78375f5363b0b61ad789f3}{GetSize}}());}
+\DoxyCodeLine{00068\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(5u,\ buffer.\mbox{\hyperlink{class_generic_string_buffer_ad324b8154be3354dda3aa4a0a7361499}{GetLength}}());}
+\DoxyCodeLine{00069\ }
+\DoxyCodeLine{00070\ \ \ \ \ \textcolor{comment}{//\ Causes\ sudden\ expansion\ to\ make\ the\ stack's\ capacity\ equal\ to\ size}}
+\DoxyCodeLine{00071\ \ \ \ \ buffer.\mbox{\hyperlink{class_generic_string_buffer_a80af78c43da93126a940a40d1889278a}{Push}}(65536u);}
+\DoxyCodeLine{00072\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(5u\ +\ 65536u,\ buffer.\mbox{\hyperlink{class_generic_string_buffer_a725e862b9a78375f5363b0b61ad789f3}{GetSize}}());}
+\DoxyCodeLine{00073\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=259pt]{stringbuffertest_8cpp_a2a076022dd05a90d4537ba48032212c4_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{stringbuffertest_8cpp_a35396fd51e755e78dcd41d821fec4818}\index{stringbuffertest.cpp@{stringbuffertest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!stringbuffertest.cpp@{stringbuffertest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [6/7]}}
+{\footnotesize\ttfamily \label{stringbuffertest_8cpp_a35396fd51e755e78dcd41d821fec4818} 
+TEST (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{fwd_8h_ab956b6537825abf8aac4112e81cfad7e}{String\+Buffer}}}]{}{, }\item[{\mbox{\hyperlink{bench_8cpp_a8496465558c5f8a68e4583295fb89c7d}{Put}}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{stringbuffertest_8cpp_source_l00033}{33}} of file \mbox{\hyperlink{stringbuffertest_8cpp_source}{stringbuffertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00034\ \ \ \ \ \mbox{\hyperlink{class_generic_string_buffer}{StringBuffer}}\ buffer;}
+\DoxyCodeLine{00035\ \ \ \ \ buffer.\mbox{\hyperlink{class_generic_string_buffer_a8be5c8fadccacdcf40e20220f38e0afa}{Put}}(\textcolor{charliteral}{'A'});}
+\DoxyCodeLine{00036\ }
+\DoxyCodeLine{00037\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(1u,\ buffer.\mbox{\hyperlink{class_generic_string_buffer_a725e862b9a78375f5363b0b61ad789f3}{GetSize}}());}
+\DoxyCodeLine{00038\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(1u,\ buffer.\mbox{\hyperlink{class_generic_string_buffer_ad324b8154be3354dda3aa4a0a7361499}{GetLength}}());}
+\DoxyCodeLine{00039\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ad20f7b94ac5081e16f0005b94e95f0c6}{EXPECT\_STREQ}}(\textcolor{stringliteral}{"{}A"{}},\ buffer.\mbox{\hyperlink{class_generic_string_buffer_a42079865bab1deb930c6cff7d491c719}{GetString}}());}
+\DoxyCodeLine{00040\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{stringbuffertest_8cpp_a35396fd51e755e78dcd41d821fec4818_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{stringbuffertest_8cpp_a7655c9b98a62e2c2baf27f414edea796}\index{stringbuffertest.cpp@{stringbuffertest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!stringbuffertest.cpp@{stringbuffertest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [7/7]}}
+{\footnotesize\ttfamily \label{stringbuffertest_8cpp_a7655c9b98a62e2c2baf27f414edea796} 
+TEST (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{fwd_8h_ab956b6537825abf8aac4112e81cfad7e}{String\+Buffer}}}]{}{, }\item[{Put\+N\+\_\+\+Issue672}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{stringbuffertest_8cpp_source_l00042}{42}} of file \mbox{\hyperlink{stringbuffertest_8cpp_source}{stringbuffertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00043\ \ \ \ \ \mbox{\hyperlink{class_generic_string_buffer}{GenericStringBuffer<UTF8<>}},\ \mbox{\hyperlink{class_memory_pool_allocator}{MemoryPoolAllocator<>}}\ >\ buffer;}
+\DoxyCodeLine{00044\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0u,\ buffer.\mbox{\hyperlink{class_generic_string_buffer_a725e862b9a78375f5363b0b61ad789f3}{GetSize}}());}
+\DoxyCodeLine{00045\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0u,\ buffer.\mbox{\hyperlink{class_generic_string_buffer_ad324b8154be3354dda3aa4a0a7361499}{GetLength}}());}
+\DoxyCodeLine{00046\ \ \ \ \ rapidjson::PutN(buffer,\ \textcolor{charliteral}{'\ '},\ 1);}
+\DoxyCodeLine{00047\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(1u,\ buffer.\mbox{\hyperlink{class_generic_string_buffer_a725e862b9a78375f5363b0b61ad789f3}{GetSize}}());}
+\DoxyCodeLine{00048\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(1u,\ buffer.\mbox{\hyperlink{class_generic_string_buffer_ad324b8154be3354dda3aa4a0a7361499}{GetLength}}());}
+\DoxyCodeLine{00049\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=259pt]{stringbuffertest_8cpp_a7655c9b98a62e2c2baf27f414edea796_cgraph}
+\end{center}
+\end{figure}

@@ -1,0 +1,9 @@
+<map id="extF80_roundToInt" name="extF80_roundToInt">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,46,135,72"/>
+<area shape="rect" id="Node000002" href="$softfloat_2source_2s__norm_subnormal_ext_f80_sig_8c.html#afce793e78b0a7d8bd729aac084b19317" title=" " alt="" coords="183,5,369,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="135,46,167,41,168,46,135,51"/>
+<area shape="rect" id="Node000003" href="$softfloat_2source_28086-_s_s_e_2s__propagate_na_n_ext_f80_u_i_8c.html#a3c8ffdc0cccfdd0fb7f265e4221b82d0" title=" " alt="" coords="186,71,366,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="135,66,171,72,170,77,135,72"/>
+<area shape="rect" id="Node000004" href="$softfloat_2source_28086-_s_s_e_2softfloat__raise_flags_8c.html#ac16bbf09eca0fe8ff91301d82c5a667f" title=" " alt="" coords="417,78,552,104"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="366,88,401,88,401,94,366,94"/>
+</map>

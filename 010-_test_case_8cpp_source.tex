@@ -1,0 +1,42 @@
+\doxysection{010-\/Test\+Case.\+cpp}
+\hypertarget{010-_test_case_8cpp_source}{}\label{010-_test_case_8cpp_source}\index{libraries/sys-\/vm/external/Catch2/examples/010-\/TestCase.cpp@{libraries/sys-\/vm/external/Catch2/examples/010-\/TestCase.cpp}}
+\mbox{\hyperlink{010-_test_case_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{010-_test_case_8cpp_source_l00001}00001\ \textcolor{comment}{//\ 010-\/TestCase.cpp}}
+\DoxyCodeLine{\Hypertarget{010-_test_case_8cpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{010-_test_case_8cpp_source_l00003}00003\ \textcolor{comment}{//\ Let\ Catch\ provide\ main():}}
+\DoxyCodeLine{\Hypertarget{010-_test_case_8cpp_source_l00004}\mbox{\hyperlink{010-_test_case_8cpp_a656eb5868e824d59f489f910db438420}{00004}}\ \textcolor{preprocessor}{\#define\ CATCH\_CONFIG\_MAIN}}
+\DoxyCodeLine{\Hypertarget{010-_test_case_8cpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{010-_test_case_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{single__include_2catch2_2catch_8hpp}{catch2/catch.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{010-_test_case_8cpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{010-_test_case_8cpp_source_l00008}\mbox{\hyperlink{010-_test_case_8cpp_add2051c05ae0af82b9f85a7aed140679}{00008}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{010-_test_case_8cpp_add2051c05ae0af82b9f85a7aed140679}{Factorial}}(\ \textcolor{keywordtype}{int}\ number\ )\ \{}
+\DoxyCodeLine{\Hypertarget{010-_test_case_8cpp_source_l00009}00009\ \ \ \ \textcolor{keywordflow}{return}\ number\ <=\ 1\ ?\ number\ :\ \mbox{\hyperlink{010-_test_case_8cpp_add2051c05ae0af82b9f85a7aed140679}{Factorial}}(\ number\ -\/\ 1\ )\ *\ number;\ \ \textcolor{comment}{//\ fail}}
+\DoxyCodeLine{\Hypertarget{010-_test_case_8cpp_source_l00010}00010\ \textcolor{comment}{//\ return\ number\ <=\ 1\ ?\ 1\ \ \ \ \ \ :\ Factorial(\ number\ -\/\ 1\ )\ *\ number;\ \ //\ pass}}
+\DoxyCodeLine{\Hypertarget{010-_test_case_8cpp_source_l00011}00011\ \}}
+\DoxyCodeLine{\Hypertarget{010-_test_case_8cpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{010-_test_case_8cpp_source_l00013}\mbox{\hyperlink{010-_test_case_8cpp_aede3c4edb62337049cf2b7fc463b9539}{00013}}\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\ \textcolor{stringliteral}{"{}Factorial\ of\ 0\ is\ 1\ (fail)"{}},\ \textcolor{stringliteral}{"{}[single-\/file]"{}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{010-_test_case_8cpp_source_l00014}00014\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{010-_test_case_8cpp_add2051c05ae0af82b9f85a7aed140679}{Factorial}}(0)\ ==\ 1\ );}
+\DoxyCodeLine{\Hypertarget{010-_test_case_8cpp_source_l00015}00015\ \}}
+\DoxyCodeLine{\Hypertarget{010-_test_case_8cpp_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{010-_test_case_8cpp_source_l00017}\mbox{\hyperlink{010-_test_case_8cpp_ae4a225917ee96bff1145341e8084ab47}{00017}}\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\ \textcolor{stringliteral}{"{}Factorials\ of\ 1\ and\ higher\ are\ computed\ (pass)"{}},\ \textcolor{stringliteral}{"{}[single-\/file]"{}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{010-_test_case_8cpp_source_l00018}00018\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{010-_test_case_8cpp_add2051c05ae0af82b9f85a7aed140679}{Factorial}}(1)\ ==\ 1\ );}
+\DoxyCodeLine{\Hypertarget{010-_test_case_8cpp_source_l00019}00019\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{010-_test_case_8cpp_add2051c05ae0af82b9f85a7aed140679}{Factorial}}(2)\ ==\ 2\ );}
+\DoxyCodeLine{\Hypertarget{010-_test_case_8cpp_source_l00020}00020\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{010-_test_case_8cpp_add2051c05ae0af82b9f85a7aed140679}{Factorial}}(3)\ ==\ 6\ );}
+\DoxyCodeLine{\Hypertarget{010-_test_case_8cpp_source_l00021}00021\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{010-_test_case_8cpp_add2051c05ae0af82b9f85a7aed140679}{Factorial}}(10)\ ==\ 3628800\ );}
+\DoxyCodeLine{\Hypertarget{010-_test_case_8cpp_source_l00022}00022\ \}}
+\DoxyCodeLine{\Hypertarget{010-_test_case_8cpp_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{010-_test_case_8cpp_source_l00024}00024\ \textcolor{comment}{//\ Compile\ \&\ run:}}
+\DoxyCodeLine{\Hypertarget{010-_test_case_8cpp_source_l00025}00025\ \textcolor{comment}{//\ -\/\ g++\ -\/std=c++11\ -\/Wall\ -\/I\$(CATCH\_SINGLE\_INCLUDE)\ -\/o\ 010-\/TestCase\ 010-\/TestCase.cpp\ \&\&\ 010-\/TestCase\ -\/-\/success}}
+\DoxyCodeLine{\Hypertarget{010-_test_case_8cpp_source_l00026}00026\ \textcolor{comment}{//\ -\/\ cl\ -\/EHsc\ -\/I\%CATCH\_SINGLE\_INCLUDE\%\ 010-\/TestCase.cpp\ \&\&\ 010-\/TestCase\ -\/-\/success}}
+\DoxyCodeLine{\Hypertarget{010-_test_case_8cpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{010-_test_case_8cpp_source_l00028}00028\ \textcolor{comment}{//\ Expected\ compact\ output\ (all\ assertions):}}
+\DoxyCodeLine{\Hypertarget{010-_test_case_8cpp_source_l00029}00029\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{010-_test_case_8cpp_source_l00030}00030\ \textcolor{comment}{//\ prompt>\ 010-\/TestCase\ -\/-\/reporter\ compact\ -\/-\/success}}
+\DoxyCodeLine{\Hypertarget{010-_test_case_8cpp_source_l00031}00031\ \textcolor{comment}{//\ 010-\/TestCase.cpp:14:\ failed:\ Factorial(0)\ ==\ 1\ for:\ 0\ ==\ 1}}
+\DoxyCodeLine{\Hypertarget{010-_test_case_8cpp_source_l00032}00032\ \textcolor{comment}{//\ 010-\/TestCase.cpp:18:\ passed:\ Factorial(1)\ ==\ 1\ for:\ 1\ ==\ 1}}
+\DoxyCodeLine{\Hypertarget{010-_test_case_8cpp_source_l00033}00033\ \textcolor{comment}{//\ 010-\/TestCase.cpp:19:\ passed:\ Factorial(2)\ ==\ 2\ for:\ 2\ ==\ 2}}
+\DoxyCodeLine{\Hypertarget{010-_test_case_8cpp_source_l00034}00034\ \textcolor{comment}{//\ 010-\/TestCase.cpp:20:\ passed:\ Factorial(3)\ ==\ 6\ for:\ 6\ ==\ 6}}
+\DoxyCodeLine{\Hypertarget{010-_test_case_8cpp_source_l00035}00035\ \textcolor{comment}{//\ 010-\/TestCase.cpp:21:\ passed:\ Factorial(10)\ ==\ 3628800\ for:\ 3628800\ (0x375f00)\ ==\ 3628800\ (0x375f00)}}
+\DoxyCodeLine{\Hypertarget{010-_test_case_8cpp_source_l00036}00036\ \textcolor{comment}{//\ Failed\ 1\ test\ case,\ failed\ 1\ assertion.}}
+
+\end{DoxyCode}

@@ -1,0 +1,6 @@
+<map id="launcher_def::write_genesis_file" name="launcher_def::write_genesis_file">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,22,137,62"/>
+<area shape="rect" id="Node000002" href="$classfc_1_1json.html#a7d6bb8dc49fecafcf96688c5202b22e5" title=" " alt="" coords="185,29,327,55"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="137,40,169,40,169,45,137,45"/>
+<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="225,30,219,21,222,11,235,5,256,3,278,5,290,12,287,16,277,10,256,8,236,10,226,15,224,20,229,27"/>
+</map>

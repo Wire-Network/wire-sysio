@@ -1,0 +1,9 @@
+<map id="fc::crypto::shim::serialize" name="fc::crypto::shim::serialize">
+<area shape="rect" id="Node000001" title=" " alt="" coords="242,100,410,126"/>
+<area shape="rect" id="Node000002" href="$structfc_1_1crypto_1_1r1_1_1private__key__shim.html#af917161201febd5585723170e11b4a68" title=" " alt="" coords="5,5,194,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="272,97,179,64,181,59,274,92"/>
+<area shape="rect" id="Node000003" href="$structfc_1_1ecc_1_1private__key__shim.html#ab226b9bd48919066953c147e93d6101c" title=" " alt="" coords="19,85,180,141"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="226,116,180,116,180,110,226,110"/>
+<area shape="rect" id="Node000004" href="$structfc_1_1em_1_1private__key__shim.html#accecadb72e199291e0bd344910d0be9d" title=" " alt="" coords="19,165,180,221"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="274,134,181,167,179,162,272,129"/>
+</map>

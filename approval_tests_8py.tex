@@ -1,0 +1,55 @@
+\doxysection{libraries/sys-\/vm/external/\+Catch2/scripts/approval\+Tests.py File Reference}
+\hypertarget{approval_tests_8py}{}\label{approval_tests_8py}\index{libraries/sys-\/vm/external/Catch2/scripts/approvalTests.py@{libraries/sys-\/vm/external/Catch2/scripts/approvalTests.py}}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespaceapproval_tests}{approval\+Tests}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespaceapproval_tests_acc60966d163363c059b628aec3074f8e}{approval\+Tests.\+diff\+Files}} (fileA, fileB)
+\item 
+\mbox{\hyperlink{namespaceapproval_tests_a30ec2bee60ef454af995c94c6a2ddd28}{approval\+Tests.\+normalize\+Filepath}} (line)
+\item 
+\mbox{\hyperlink{namespaceapproval_tests_a68f9b1139e8fcdef8b4381eb551efd65}{approval\+Tests.\+filter\+Line}} (line, is\+Compact)
+\item 
+\mbox{\hyperlink{namespaceapproval_tests_ae3be5e4e346f8b3560207c724d1b6df4}{approval\+Tests.\+approve}} (base\+Name, args)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespaceapproval_tests_a0e4ccdeac06eaee53f9cae61c35c3564}{approval\+Tests.\+root\+Path}} = os.\+path.\+join(catch\+Path, \textquotesingle{}projects/Self\+Test/Baselines\textquotesingle{})
+\item 
+\mbox{\hyperlink{namespaceapproval_tests_a74f2e3e79cfce7827b565d680c179e4e}{approval\+Tests.\+lang\+Filename\+Parser}} = re.\+compile(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\textquotesingle{}(.+\textbackslash{}.\mbox{[}ch\mbox{]}pp)\textquotesingle{})
+\item 
+\mbox{\hyperlink{namespaceapproval_tests_a34c9ded82d65f4e19332fe86d221880e}{approval\+Tests.\+fileloc\+Parser}} = re.\+compile(, re.\+VERBOSE)
+\item 
+\mbox{\hyperlink{namespaceapproval_tests_af193d0c6f1e00facb5b74d1b10af3100}{approval\+Tests.\+line\+Number\+Parser}} = re.\+compile(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\textquotesingle{} line="{}\mbox{[}0-\/9\mbox{]}\texorpdfstring{$\ast$}{*}"{}\textquotesingle{})
+\item 
+\mbox{\hyperlink{namespaceapproval_tests_a89f275f12d7ca4ce597704ec8fdc8dc2}{approval\+Tests.\+hex\+Parser}} = re.\+compile(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\textquotesingle{}\textbackslash{}b(0\mbox{[}xX\mbox{]}\mbox{[}0-\/9\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/fA-\/F\mbox{]}+)\textbackslash{}b\textquotesingle{})
+\item 
+\mbox{\hyperlink{namespaceapproval_tests_a02022b1d0cacfb209492c417951dc210}{approval\+Tests.\+durations\+Parser}} = re.\+compile(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\textquotesingle{} time="{}\mbox{[}0-\/9\mbox{]}\texorpdfstring{$\ast$}{*}\textbackslash{}.\mbox{[}0-\/9\mbox{]}\texorpdfstring{$\ast$}{*}"{}\textquotesingle{})
+\item 
+\mbox{\hyperlink{namespaceapproval_tests_ad8663be20453812940ea9ffc3d95aa7e}{approval\+Tests.\+timestamps\+Parser}} = re.\+compile(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\textquotesingle{}\textbackslash{}d\{4\}-\/\textbackslash{}d\{2\}-\/\textbackslash{}d\{2\}T\textbackslash{}d\{2\}\textbackslash{}\+:\textbackslash{}d\{2\}\textbackslash{}\+:\textbackslash{}d\{2\}Z\textquotesingle{})
+\item 
+\mbox{\hyperlink{namespaceapproval_tests_a3f910e60a43b6ff24a4baab7beb49c57}{approval\+Tests.\+version\+Parser}} = re.\+compile(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\textquotesingle{}Catch v\mbox{[}0-\/9\mbox{]}+\textbackslash{}.\mbox{[}0-\/9\mbox{]}+\textbackslash{}.\mbox{[}0-\/9\mbox{]}+(-\/develop\textbackslash{}.\mbox{[}0-\/9\mbox{]}+)?\textquotesingle{})
+\item 
+\mbox{\hyperlink{namespaceapproval_tests_afb844cdfc62bc9d7223216345e9b9119}{approval\+Tests.\+null\+Parser}} = re.\+compile(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\textquotesingle{}\textbackslash{}b(\+\_\+\+\_\+null\texorpdfstring{$\vert$}{|}nullptr)\textbackslash{}b\textquotesingle{})
+\item 
+\mbox{\hyperlink{namespaceapproval_tests_a2885976431cb8be45550516fc5ba0d8b}{approval\+Tests.\+exe\+Name\+Parser}} = re.\+compile(, re.\+VERBOSE)
+\item 
+\mbox{\hyperlink{namespaceapproval_tests_a38adf49dc2cf888362594cfe775f0df6}{approval\+Tests.\+special\+Case\+Parser}} = re.\+compile(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\textquotesingle{}file\textbackslash{}((\textbackslash{}d+)\textbackslash{})\textquotesingle{})
+\item 
+\mbox{\hyperlink{namespaceapproval_tests_aa8bb6a8067a5e5b800c1bc147a69488c}{approval\+Tests.\+errno\+Parser}} = re.\+compile(, re.\+VERBOSE)
+\item 
+\mbox{\hyperlink{namespaceapproval_tests_aca0d379d8efe1d15d9c8a1f24cec2e58}{approval\+Tests.\+since\+Epoch\+Parser}} = re.\+compile(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\textquotesingle{}\textbackslash{}d+ .+ since epoch\textquotesingle{})
+\item 
+\mbox{\hyperlink{namespaceapproval_tests_a7e8bc6490929aea01a37d425ca342d52}{approval\+Tests.\+inf\+Parser}} = re.\+compile(, re.\+VERBOSE)
+\item 
+\mbox{\hyperlink{namespaceapproval_tests_a47bf82454591c700de587d63c0f35ab4}{approval\+Tests.\+nan\+Parser}} = re.\+compile(, re.\+VERBOSE)
+\item 
+\mbox{\hyperlink{namespaceapproval_tests_a8c86165c508c9045c702ed1641bbb83a}{approval\+Tests.\+cmd\+Path}} = sys.\+argv\mbox{[}1\mbox{]}
+\item 
+int \mbox{\hyperlink{namespaceapproval_tests_a5b988c09ad10a33b109b47667fc0f0ed}{approval\+Tests.\+overall\+Result}} = 0
+\end{DoxyCompactItemize}

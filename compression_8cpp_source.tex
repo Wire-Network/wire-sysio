@@ -1,0 +1,38 @@
+\doxysection{compression.\+cpp}
+\hypertarget{compression_8cpp_source}{}\label{compression_8cpp_source}\index{libraries/state\_history/compression.cpp@{libraries/state\_history/compression.cpp}}
+\mbox{\hyperlink{compression_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{compression_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{compression_8hpp}{sysio/state\_history/compression.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{compression_8cpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{compression_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <boost/iostreams/device/back\_inserter.hpp>}}
+\DoxyCodeLine{\Hypertarget{compression_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <boost/iostreams/filter/zlib.hpp>}}
+\DoxyCodeLine{\Hypertarget{compression_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <boost/iostreams/filtering\_stream.hpp>}}
+\DoxyCodeLine{\Hypertarget{compression_8cpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{compression_8cpp_source_l00007}00007\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{}
+\DoxyCodeLine{\Hypertarget{compression_8cpp_source_l00008}\mbox{\hyperlink{namespacesysio_1_1state__history}{00008}}\ \textcolor{keyword}{namespace\ }state\_history\ \{}
+\DoxyCodeLine{\Hypertarget{compression_8cpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{compression_8cpp_source_l00010}00010\ \textcolor{keyword}{namespace\ }bio\ =\ boost::iostreams;}
+\DoxyCodeLine{\Hypertarget{compression_8cpp_source_l00011}\mbox{\hyperlink{namespacesysio_1_1state__history_a56d6b703f34519b5d085529ebd120d29}{00011}}\ \mbox{\hyperlink{classfc_1_1vector}{bytes}}\ \mbox{\hyperlink{namespacesysio_1_1state__history_a56d6b703f34519b5d085529ebd120d29}{zlib\_compress\_bytes}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1vector}{bytes}}\&\ in)\ \{}
+\DoxyCodeLine{\Hypertarget{compression_8cpp_source_l00012}00012\ \ \ \ \mbox{\hyperlink{classfc_1_1vector}{bytes}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ out;}
+\DoxyCodeLine{\Hypertarget{compression_8cpp_source_l00013}00013\ \ \ \ bio::filtering\_ostream\ comp;}
+\DoxyCodeLine{\Hypertarget{compression_8cpp_source_l00014}00014\ \ \ \ comp.push(bio::zlib\_compressor(bio::zlib::default\_compression));}
+\DoxyCodeLine{\Hypertarget{compression_8cpp_source_l00015}00015\ \ \ \ comp.push(bio::back\_inserter(out));}
+\DoxyCodeLine{\Hypertarget{compression_8cpp_source_l00016}00016\ \ \ \ bio::write(comp,\ in.data(),\ in.size());}
+\DoxyCodeLine{\Hypertarget{compression_8cpp_source_l00017}00017\ \ \ \ bio::close(comp);}
+\DoxyCodeLine{\Hypertarget{compression_8cpp_source_l00018}00018\ \ \ \ \textcolor{keywordflow}{return}\ out;}
+\DoxyCodeLine{\Hypertarget{compression_8cpp_source_l00019}00019\ \}}
+\DoxyCodeLine{\Hypertarget{compression_8cpp_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{compression_8cpp_source_l00021}\mbox{\hyperlink{namespacesysio_1_1state__history_a81fbdf52169b3b2295f3911729f09142}{00021}}\ \mbox{\hyperlink{classfc_1_1vector}{bytes}}\ \mbox{\hyperlink{namespacesysio_1_1state__history_a81fbdf52169b3b2295f3911729f09142}{zlib\_decompress}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1vector}{bytes}}\&\ in)\ \{}
+\DoxyCodeLine{\Hypertarget{compression_8cpp_source_l00022}00022\ \ \ \ \mbox{\hyperlink{classfc_1_1vector}{bytes}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ out;}
+\DoxyCodeLine{\Hypertarget{compression_8cpp_source_l00023}00023\ \ \ \ bio::filtering\_ostream\ decomp;}
+\DoxyCodeLine{\Hypertarget{compression_8cpp_source_l00024}00024\ \ \ \ decomp.push(bio::zlib\_decompressor());}
+\DoxyCodeLine{\Hypertarget{compression_8cpp_source_l00025}00025\ \ \ \ decomp.push(bio::back\_inserter(out));}
+\DoxyCodeLine{\Hypertarget{compression_8cpp_source_l00026}00026\ \ \ \ bio::write(decomp,\ in.data(),\ in.size());}
+\DoxyCodeLine{\Hypertarget{compression_8cpp_source_l00027}00027\ \ \ \ bio::close(decomp);}
+\DoxyCodeLine{\Hypertarget{compression_8cpp_source_l00028}00028\ \ \ \ \textcolor{keywordflow}{return}\ out;}
+\DoxyCodeLine{\Hypertarget{compression_8cpp_source_l00029}00029\ \}}
+\DoxyCodeLine{\Hypertarget{compression_8cpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{compression_8cpp_source_l00031}00031\ \}\ \textcolor{comment}{//\ namespace\ state\_history}}
+\DoxyCodeLine{\Hypertarget{compression_8cpp_source_l00032}00032\ \}\ \textcolor{comment}{//\ namespace\ sysio}}
+
+\end{DoxyCode}

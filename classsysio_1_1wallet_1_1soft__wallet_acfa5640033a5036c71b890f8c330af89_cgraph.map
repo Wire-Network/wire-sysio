@@ -1,0 +1,12 @@
+<map id="sysio::wallet::soft_wallet::try_sign_digest" name="sysio::wallet::soft_wallet::try_sign_digest">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,51,164,92"/>
+<area shape="rect" id="Node000002" href="$namespacefc.html#a150ca4cd9c0318ca45dc0dc7df5d58b9" title=" " alt="" coords="212,59,287,84"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="164,69,196,69,196,74,164,74"/>
+<area shape="rect" id="Node000003" href="$namespacefc_1_1raw.html#a3a18d8161aa5b4f4f02b6fcfdff5e5d1" title=" " alt="" coords="354,29,452,55"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="287,62,339,52,340,57,288,67"/>
+<area shape="rect" id="Node000004" href="$classfc_1_1sha256_1_1encoder.html#a4d8b8181e912194cf98a56164671adf8" title=" " alt="" coords="335,79,471,120"/>
+<area shape="poly" id="edge4_Node000002_Node000004" title=" " alt="" coords="288,76,320,82,319,87,287,81"/>
+<area shape="poly" id="edge3_Node000003_Node000003" title=" " alt="" coords="377,30,372,21,375,11,386,5,403,3,422,5,432,12,429,16,420,10,403,8,387,10,379,15,377,20,381,28"/>
+<area shape="rect" id="Node000005" href="$classfc_1_1sha256.html#ab897537f6c524085b28049be51ed370d" title=" " alt="" coords="519,87,635,112"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="472,97,503,97,503,102,472,102"/>
+</map>

@@ -1,0 +1,63 @@
+\doxysection{catch\+\_\+benchmark.\+h}
+\hypertarget{catch__benchmark_8h_source}{}\label{catch__benchmark_8h_source}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_benchmark.h@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_benchmark.h}}
+\mbox{\hyperlink{catch__benchmark_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8h_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8h_source_l00002}00002\ \textcolor{comment}{\ *\ \ Created\ by\ Phil\ on\ 04/07/2017.}}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8h_source_l00003}00003\ \textcolor{comment}{\ *\ \ Copyright\ 2017\ Two\ Blue\ Cubes\ Ltd.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8h_source_l00004}00004\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8h_source_l00005}00005\ \textcolor{comment}{\ *\ \ Distributed\ under\ the\ Boost\ Software\ License,\ Version\ 1.0.\ (See\ accompanying}}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8h_source_l00006}00006\ \textcolor{comment}{\ *\ \ file\ LICENSE\_1\_0.txt\ or\ copy\ at\ http://www.boost.org/LICENSE\_1\_0.txt)}}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8h_source_l00007}00007\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8h_source_l00008}00008\ \textcolor{preprocessor}{\#ifndef\ TWOBLUECUBES\_CATCH\_BENCHMARK\_H\_INCLUDED}}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8h_source_l00009}00009\ \textcolor{preprocessor}{\#define\ TWOBLUECUBES\_CATCH\_BENCHMARK\_H\_INCLUDED}}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8h_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8h_source_l00011}00011\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__stringref_8h}{catch\_stringref.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8h_source_l00012}00012\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__timer_8h}{catch\_timer.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8h_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8h_source_l00014}00014\ \textcolor{preprocessor}{\#include\ <cstdint>}}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8h_source_l00015}00015\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8h_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8h_source_l00017}00017\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8h_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8h_source_l00019}00019\ \ \ \ \ \textcolor{keyword}{class\ }BenchmarkLooper\ \{}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8h_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8h_source_l00021}00021\ \ \ \ \ \ \ \ \ std::string\ m\_name;}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8h_source_l00022}00022\ \ \ \ \ \ \ \ \ std::size\_t\ m\_count\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8h_source_l00023}00023\ \ \ \ \ \ \ \ \ std::size\_t\ m\_iterationsToRun\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8h_source_l00024}00024\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ m\_resolution;}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8h_source_l00025}00025\ \ \ \ \ \ \ \ \ Timer\ m\_timer;}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8h_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8h_source_l00027}00027\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ getResolution()\ -\/>\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}};}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8h_source_l00028}00028\ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8h_source_l00029}00029\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Keep\ most\ of\ this\ inline\ as\ it's\ on\ the\ code\ path\ that\ is\ being\ timed}}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8h_source_l00030}\mbox{\hyperlink{class_catch_1_1_benchmark_looper_ab9ba6397306a70082f39e63a8a71bde6}{00030}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_benchmark_looper_ab9ba6397306a70082f39e63a8a71bde6}{BenchmarkLooper}}(\ \mbox{\hyperlink{class_catch_1_1_string_ref}{StringRef}}\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ )}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8h_source_l00031}00031\ \ \ \ \ \ \ \ \ :\ \ \ m\_name(\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ ),}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8h_source_l00032}00032\ \ \ \ \ \ \ \ \ \ \ \ \ m\_resolution(\ getResolution()\ )}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8h_source_l00033}00033\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8h_source_l00034}00034\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_benchmark_looper_a0697d1b266112b110edf2025b82c4e77}{reportStart}}();}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8h_source_l00035}00035\ \ \ \ \ \ \ \ \ \ \ \ \ m\_timer.start();}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8h_source_l00036}00036\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8h_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8h_source_l00038}\mbox{\hyperlink{class_catch_1_1_benchmark_looper_a54da41bada9da038dc05faf41d746765}{00038}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{explicit}\ \textcolor{keyword}{operator}\ bool()\ \{}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8h_source_l00039}00039\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ m\_count\ <\ m\_iterationsToRun\ )}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8h_source_l00040}00040\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8h_source_l00041}00041\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_catch_1_1_benchmark_looper_a97bd944521f519b1593a5d1d2f9998fa}{needsMoreIterations}}();}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8h_source_l00042}00042\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8h_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8h_source_l00044}\mbox{\hyperlink{class_catch_1_1_benchmark_looper_a210552aff5b19408637444d4bb35d59c}{00044}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_benchmark_looper_a210552aff5b19408637444d4bb35d59c}{increment}}()\ \{}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8h_source_l00045}00045\ \ \ \ \ \ \ \ \ \ \ \ \ ++m\_count;}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8h_source_l00046}00046\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8h_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8h_source_l00048}00048\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_benchmark_looper_a0697d1b266112b110edf2025b82c4e77}{reportStart}}();}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8h_source_l00049}00049\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{class_catch_1_1_benchmark_looper_a97bd944521f519b1593a5d1d2f9998fa}{needsMoreIterations}}()\ -\/>\ bool;}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8h_source_l00050}00050\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8h_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8h_source_l00052}00052\ \}\ \textcolor{comment}{//\ end\ namespace\ Catch}}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8h_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8h_source_l00054}\mbox{\hyperlink{catch__benchmark_8h_aaba0eec6ef0736ca2b022a98a7c855e4}{00054}}\ \textcolor{preprocessor}{\#define\ BENCHMARK(\ name\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8h_source_l00055}00055\ \textcolor{preprocessor}{\ \ \ \ for(\ Catch::BenchmarkLooper\ looper(\ name\ );\ looper;\ looper.increment()\ )}}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8h_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8h_source_l00057}00057\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ TWOBLUECUBES\_CATCH\_BENCHMARK\_H\_INCLUDED}}
+
+\end{DoxyCode}

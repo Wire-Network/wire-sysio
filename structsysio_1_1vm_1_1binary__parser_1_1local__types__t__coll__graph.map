@@ -1,0 +1,15 @@
+<map id="sysio::vm::binary_parser&lt; Writer, Options, DebugInfo &gt;::local_types_t" name="sysio::vm::binary_parser&lt; Writer, Options, DebugInfo &gt;::local_types_t">
+<area shape="rect" id="Node000001" title=" " alt="" coords="716,45,903,101"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1vm_1_1func__type.html" title=" " alt="" coords="479,24,623,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="639,47,716,57,715,63,638,52"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1vm_1_1managed__vector.html" title=" " alt="" coords="196,13,347,54"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="363,32,479,33,479,39,363,37"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1vm_1_1detail_1_1vector.html" title=" " alt="" coords="5,5,142,61"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="157,39,196,39,196,45,157,45"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="157,22,196,22,196,27,157,27"/>
+<area shape="rect" id="Node000005" href="$classsysio_1_1vm_1_1managed__vector.html" title=" " alt="" coords="480,77,622,133"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="637,93,691,87,715,84,716,89,692,92,637,99"/>
+<area shape="rect" id="Node000006" href="$classsysio_1_1vm_1_1detail_1_1vector.html" title=" " alt="" coords="191,77,352,133"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="368,111,480,110,480,116,368,116"/>
+<area shape="poly" id="edge7_Node000005_Node000006" title=" " alt="" coords="368,94,480,95,480,100,368,99"/>
+</map>

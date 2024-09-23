@@ -1,0 +1,7 @@
+<map id="sysio::net_plugin_impl::ticker" name="sysio::net_plugin_impl::ticker">
+<area shape="rect" id="Node000001" title="Peer heartbeat ticker." alt="" coords="5,27,156,68"/>
+<area shape="rect" id="Node000002" href="$namespacesysio.html#af36f44203d6675615cf012396bcef424" title=" " alt="" coords="204,5,384,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="156,35,188,30,188,35,156,40"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1connection.html#aa74b147947e087bc084d72a3d892a06f" title="Read system time and convert to a 64 bit integer." alt="" coords="228,55,360,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="156,55,213,62,213,68,156,60"/>
+</map>

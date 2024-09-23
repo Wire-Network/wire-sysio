@@ -1,0 +1,44 @@
+\doxysection{catch\+\_\+list.\+h}
+\hypertarget{catch__list_8h_source}{}\label{catch__list_8h_source}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_list.h@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_list.h}}
+\mbox{\hyperlink{catch__list_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{catch__list_8h_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{catch__list_8h_source_l00002}00002\ \textcolor{comment}{\ *\ \ Created\ by\ Phil\ on\ 5/11/2010.}}
+\DoxyCodeLine{\Hypertarget{catch__list_8h_source_l00003}00003\ \textcolor{comment}{\ *\ \ Copyright\ 2010\ Two\ Blue\ Cubes\ Ltd.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{catch__list_8h_source_l00004}00004\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{catch__list_8h_source_l00005}00005\ \textcolor{comment}{\ *\ \ Distributed\ under\ the\ Boost\ Software\ License,\ Version\ 1.0.\ (See\ accompanying}}
+\DoxyCodeLine{\Hypertarget{catch__list_8h_source_l00006}00006\ \textcolor{comment}{\ *\ \ file\ LICENSE\_1\_0.txt\ or\ copy\ at\ http://www.boost.org/LICENSE\_1\_0.txt)}}
+\DoxyCodeLine{\Hypertarget{catch__list_8h_source_l00007}00007\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{catch__list_8h_source_l00008}00008\ \textcolor{preprocessor}{\#ifndef\ TWOBLUECUBES\_CATCH\_LIST\_H\_INCLUDED}}
+\DoxyCodeLine{\Hypertarget{catch__list_8h_source_l00009}00009\ \textcolor{preprocessor}{\#define\ TWOBLUECUBES\_CATCH\_LIST\_H\_INCLUDED}}
+\DoxyCodeLine{\Hypertarget{catch__list_8h_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{catch__list_8h_source_l00011}00011\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__option_8hpp}{catch\_option.hpp}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__list_8h_source_l00012}00012\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__config_8hpp}{catch\_config.hpp}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__list_8h_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{catch__list_8h_source_l00014}00014\ \textcolor{preprocessor}{\#include\ <set>}}
+\DoxyCodeLine{\Hypertarget{catch__list_8h_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{catch__list_8h_source_l00016}00016\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__list_8h_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{catch__list_8h_source_l00018}00018\ \ \ \ \ std::size\_t\ \mbox{\hyperlink{namespace_catch_ac2542a1569e5b9dc72206347368a921e}{listTests}}(\ Config\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{classconfig}{config}}\ );}
+\DoxyCodeLine{\Hypertarget{catch__list_8h_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{catch__list_8h_source_l00020}00020\ \ \ \ \ std::size\_t\ \mbox{\hyperlink{namespace_catch_a7f2d0f82056a4b9adc4204b9a1fbd117}{listTestsNamesOnly}}(\ Config\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{classconfig}{config}}\ );}
+\DoxyCodeLine{\Hypertarget{catch__list_8h_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{catch__list_8h_source_l00022}\mbox{\hyperlink{struct_catch_1_1_tag_info}{00022}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_catch_1_1_tag_info}{TagInfo}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__list_8h_source_l00023}00023\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_catch_1_1_tag_info_a5ee84ccb68379088fdccbc7867b20754}{add}}(\ std::string\ \textcolor{keyword}{const}\&\ spelling\ );}
+\DoxyCodeLine{\Hypertarget{catch__list_8h_source_l00024}00024\ \ \ \ \ \ \ \ \ std::string\ \mbox{\hyperlink{struct_catch_1_1_tag_info_a383b0c3531d4822ef13991bc15a58974}{all}}()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{catch__list_8h_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{catch__list_8h_source_l00026}\mbox{\hyperlink{struct_catch_1_1_tag_info_af666de1ea615c77682fdea632d288ff6}{00026}}\ \ \ \ \ \ \ \ \ std::set<std::string>\ \mbox{\hyperlink{struct_catch_1_1_tag_info_af666de1ea615c77682fdea632d288ff6}{spellings}};}
+\DoxyCodeLine{\Hypertarget{catch__list_8h_source_l00027}\mbox{\hyperlink{struct_catch_1_1_tag_info_ae056c754ab1e2f1a8f175096ae5835c2}{00027}}\ \ \ \ \ \ \ \ \ std::size\_t\ \mbox{\hyperlink{struct_catch_1_1_tag_info_ae056c754ab1e2f1a8f175096ae5835c2}{count}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{catch__list_8h_source_l00028}00028\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{catch__list_8h_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{catch__list_8h_source_l00030}00030\ \ \ \ \ std::size\_t\ \mbox{\hyperlink{namespace_catch_a2226866b4114853fb3ff63dbecc8b0c9}{listTags}}(\ \mbox{\hyperlink{class_catch_1_1_config}{Config}}\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{classconfig}{config}}\ );}
+\DoxyCodeLine{\Hypertarget{catch__list_8h_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{catch__list_8h_source_l00032}00032\ \ \ \ \ std::size\_t\ \mbox{\hyperlink{namespace_catch_a372777bee6b529124e0cae35748bb79c}{listReporters}}();}
+\DoxyCodeLine{\Hypertarget{catch__list_8h_source_l00033}00033\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{catch__list_8h_source_l00034}00034\ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_option}{Option<std::size\_t>}}\ \mbox{\hyperlink{namespace_catch_a8267f077fd7ddf88bb182e8b9ead85d3}{list}}(\ std::shared\_ptr<Config>\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{classconfig}{config}}\ );}
+\DoxyCodeLine{\Hypertarget{catch__list_8h_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{catch__list_8h_source_l00036}00036\ \}\ \textcolor{comment}{//\ end\ namespace\ Catch}}
+\DoxyCodeLine{\Hypertarget{catch__list_8h_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{catch__list_8h_source_l00038}00038\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ TWOBLUECUBES\_CATCH\_LIST\_H\_INCLUDED}}
+
+\end{DoxyCode}

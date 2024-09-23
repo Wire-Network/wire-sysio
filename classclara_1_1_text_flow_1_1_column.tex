@@ -1,0 +1,292 @@
+\doxysection{clara\+::Text\+Flow\+::Column Class Reference}
+\hypertarget{classclara_1_1_text_flow_1_1_column}{}\label{classclara_1_1_text_flow_1_1_column}\index{clara::TextFlow::Column@{clara::TextFlow::Column}}
+
+
+{\ttfamily \#include $<$clara.\+hpp$>$}
+
+
+
+Inheritance diagram for clara\+::Text\+Flow\+::Column\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=203pt]{classclara_1_1_text_flow_1_1_column__inherit__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classclara_1_1_text_flow_1_1_column_1_1iterator}{iterator}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{classclara_1_1_text_flow_1_1_column_a2b80d2c036ccb7989aa4159d4a1b30ad}{const\+\_\+iterator}} = \mbox{\hyperlink{classclara_1_1_text_flow_1_1_column_1_1iterator}{iterator}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classclara_1_1_text_flow_1_1_column_a008056c913f1f9c0696f35e2f3bacd6e}{Column}} (std\+::string const \&text)
+\item 
+auto \mbox{\hyperlink{classclara_1_1_text_flow_1_1_column_a04614501d20ee47d4cdbbd1ecaf8d29e}{width}} (size\+\_\+t new\+Width) -\/$>$ \mbox{\hyperlink{classclara_1_1_text_flow_1_1_column}{Column}} \&
+\item 
+auto \mbox{\hyperlink{classclara_1_1_text_flow_1_1_column_a30a0c51aad3043639a850856867b202d}{indent}} (size\+\_\+t new\+Indent) -\/$>$ \mbox{\hyperlink{classclara_1_1_text_flow_1_1_column}{Column}} \&
+\item 
+auto \mbox{\hyperlink{classclara_1_1_text_flow_1_1_column_acda2001f1a379baad4e15cd65131a170}{initial\+Indent}} (size\+\_\+t new\+Indent) -\/$>$ \mbox{\hyperlink{classclara_1_1_text_flow_1_1_column}{Column}} \&
+\item 
+auto \mbox{\hyperlink{classclara_1_1_text_flow_1_1_column_af3cb145d05d0c692306d6dc210e50361}{width}} () const -\/$>$ size\+\_\+t
+\item 
+auto \mbox{\hyperlink{classclara_1_1_text_flow_1_1_column_add70d52626305265f73b6ac366880e0f}{begin}} () const -\/$>$ \mbox{\hyperlink{classclara_1_1_text_flow_1_1_column_1_1iterator}{iterator}}
+\item 
+auto \mbox{\hyperlink{classclara_1_1_text_flow_1_1_column_aed27621336c67a2e0f3849434dc1dbfd}{end}} () const -\/$>$ \mbox{\hyperlink{classclara_1_1_text_flow_1_1_column_1_1iterator}{iterator}}
+\item 
+auto \mbox{\hyperlink{classclara_1_1_text_flow_1_1_column_a1d620af208a3e88c9be8fc0a5e0e8b43}{operator+}} (\mbox{\hyperlink{classclara_1_1_text_flow_1_1_column}{Column}} const \&other) -\/$>$ \mbox{\hyperlink{classclara_1_1_text_flow_1_1_columns}{Columns}}
+\item 
+auto \mbox{\hyperlink{classclara_1_1_text_flow_1_1_column_a63e243f464d2898c81d0f6c58c133b6b}{to\+String}} () const -\/$>$ std\+::string
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+std\+::ostream \& \mbox{\hyperlink{classclara_1_1_text_flow_1_1_column_adf5f75953d889485742ede619047a00b}{operator$<$$<$}} (std\+::ostream \&os, \mbox{\hyperlink{classclara_1_1_text_flow_1_1_column}{Column}} const \&col)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{third__party_2clara_8hpp_source_l00072}{72}} of file \mbox{\hyperlink{third__party_2clara_8hpp_source}{clara.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classclara_1_1_text_flow_1_1_column_a2b80d2c036ccb7989aa4159d4a1b30ad}\index{clara::TextFlow::Column@{clara::TextFlow::Column}!const\_iterator@{const\_iterator}}
+\index{const\_iterator@{const\_iterator}!clara::TextFlow::Column@{clara::TextFlow::Column}}
+\doxysubsubsection{\texorpdfstring{const\_iterator}{const\_iterator}}
+{\footnotesize\ttfamily \label{classclara_1_1_text_flow_1_1_column_a2b80d2c036ccb7989aa4159d4a1b30ad} 
+using \mbox{\hyperlink{classclara_1_1_text_flow_1_1_column_a2b80d2c036ccb7989aa4159d4a1b30ad}{clara\+::\+Text\+Flow\+::\+Column\+::const\+\_\+iterator}} = \mbox{\hyperlink{classclara_1_1_text_flow_1_1_column_1_1iterator}{iterator}}}
+
+
+
+Definition at line \mbox{\hyperlink{third__party_2clara_8hpp_source_l00200}{200}} of file \mbox{\hyperlink{third__party_2clara_8hpp_source}{clara.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classclara_1_1_text_flow_1_1_column_a008056c913f1f9c0696f35e2f3bacd6e}\index{clara::TextFlow::Column@{clara::TextFlow::Column}!Column@{Column}}
+\index{Column@{Column}!clara::TextFlow::Column@{clara::TextFlow::Column}}
+\doxysubsubsection{\texorpdfstring{Column()}{Column()}}
+{\footnotesize\ttfamily \label{classclara_1_1_text_flow_1_1_column_a008056c913f1f9c0696f35e2f3bacd6e} 
+clara\+::\+Text\+Flow\+::\+Column\+::\+Column (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{text}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{third__party_2clara_8hpp_source_l00202}{202}} of file \mbox{\hyperlink{third__party_2clara_8hpp_source}{clara.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00202\ \{\ m\_strings.push\_back(\ text\ );\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classclara_1_1_text_flow_1_1_column_add70d52626305265f73b6ac366880e0f}\index{clara::TextFlow::Column@{clara::TextFlow::Column}!begin@{begin}}
+\index{begin@{begin}!clara::TextFlow::Column@{clara::TextFlow::Column}}
+\doxysubsubsection{\texorpdfstring{begin()}{begin()}}
+{\footnotesize\ttfamily \label{classclara_1_1_text_flow_1_1_column_add70d52626305265f73b6ac366880e0f} 
+auto clara\+::\+Text\+Flow\+::\+Column\+::begin (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const -\/$>$ \mbox{\hyperlink{classclara_1_1_text_flow_1_1_column_1_1iterator}{iterator}} \hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{third__party_2clara_8hpp_source_l00219}{219}} of file \mbox{\hyperlink{third__party_2clara_8hpp_source}{clara.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00219\ \{\ \textcolor{keywordflow}{return}\ iterator(\ *\textcolor{keyword}{this}\ );\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classclara_1_1_text_flow_1_1_column_aed27621336c67a2e0f3849434dc1dbfd}\index{clara::TextFlow::Column@{clara::TextFlow::Column}!end@{end}}
+\index{end@{end}!clara::TextFlow::Column@{clara::TextFlow::Column}}
+\doxysubsubsection{\texorpdfstring{end()}{end()}}
+{\footnotesize\ttfamily \label{classclara_1_1_text_flow_1_1_column_aed27621336c67a2e0f3849434dc1dbfd} 
+auto clara\+::\+Text\+Flow\+::\+Column\+::end (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const -\/$>$ \mbox{\hyperlink{classclara_1_1_text_flow_1_1_column_1_1iterator}{iterator}} \hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{third__party_2clara_8hpp_source_l00220}{220}} of file \mbox{\hyperlink{third__party_2clara_8hpp_source}{clara.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00220\ \{\ \textcolor{keywordflow}{return}\ \{\ *\textcolor{keyword}{this},\ m\_strings.size()\ \};\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classclara_1_1_text_flow_1_1_column_aed27621336c67a2e0f3849434dc1dbfd_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classclara_1_1_text_flow_1_1_column_a30a0c51aad3043639a850856867b202d}\index{clara::TextFlow::Column@{clara::TextFlow::Column}!indent@{indent}}
+\index{indent@{indent}!clara::TextFlow::Column@{clara::TextFlow::Column}}
+\doxysubsubsection{\texorpdfstring{indent()}{indent()}}
+{\footnotesize\ttfamily \label{classclara_1_1_text_flow_1_1_column_a30a0c51aad3043639a850856867b202d} 
+auto clara\+::\+Text\+Flow\+::\+Column\+::indent (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{new\+Indent}{}\end{DoxyParamCaption}) -\/$>$ \mbox{\hyperlink{classclara_1_1_text_flow_1_1_column}{Column}}\& \hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{third__party_2clara_8hpp_source_l00209}{209}} of file \mbox{\hyperlink{third__party_2clara_8hpp_source}{clara.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \ \ \ \ \ \ m\_indent\ =\ newIndent;}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classclara_1_1_text_flow_1_1_column_a30a0c51aad3043639a850856867b202d_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classclara_1_1_text_flow_1_1_column_acda2001f1a379baad4e15cd65131a170}\index{clara::TextFlow::Column@{clara::TextFlow::Column}!initialIndent@{initialIndent}}
+\index{initialIndent@{initialIndent}!clara::TextFlow::Column@{clara::TextFlow::Column}}
+\doxysubsubsection{\texorpdfstring{initialIndent()}{initialIndent()}}
+{\footnotesize\ttfamily \label{classclara_1_1_text_flow_1_1_column_acda2001f1a379baad4e15cd65131a170} 
+auto clara\+::\+Text\+Flow\+::\+Column\+::initial\+Indent (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{new\+Indent}{}\end{DoxyParamCaption}) -\/$>$ \mbox{\hyperlink{classclara_1_1_text_flow_1_1_column}{Column}}\& \hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{third__party_2clara_8hpp_source_l00213}{213}} of file \mbox{\hyperlink{third__party_2clara_8hpp_source}{clara.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ \ \ \ \ m\_initialIndent\ =\ newIndent;}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classclara_1_1_text_flow_1_1_column_a1d620af208a3e88c9be8fc0a5e0e8b43}\index{clara::TextFlow::Column@{clara::TextFlow::Column}!operator+@{operator+}}
+\index{operator+@{operator+}!clara::TextFlow::Column@{clara::TextFlow::Column}}
+\doxysubsubsection{\texorpdfstring{operator+()}{operator+()}}
+{\footnotesize\ttfamily \label{classclara_1_1_text_flow_1_1_column_a1d620af208a3e88c9be8fc0a5e0e8b43} 
+auto clara\+::\+Text\+Flow\+::\+Column\+::operator+ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classclara_1_1_text_flow_1_1_column}{Column}} const \&}]{other}{}\end{DoxyParamCaption}) -\/$>$ \mbox{\hyperlink{classclara_1_1_text_flow_1_1_columns}{Columns}}\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{third__party_2clara_8hpp_source_l00364}{364}} of file \mbox{\hyperlink{third__party_2clara_8hpp_source}{clara.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00364\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00365\ \ \ \ \ \ \ \ \ Columns\ cols;}
+\DoxyCodeLine{00366\ \ \ \ \ \ \ \ \ cols\ +=\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00367\ \ \ \ \ \ \ \ \ cols\ +=\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}};}
+\DoxyCodeLine{00368\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ cols;}
+\DoxyCodeLine{00369\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classclara_1_1_text_flow_1_1_column_a63e243f464d2898c81d0f6c58c133b6b}\index{clara::TextFlow::Column@{clara::TextFlow::Column}!toString@{toString}}
+\index{toString@{toString}!clara::TextFlow::Column@{clara::TextFlow::Column}}
+\doxysubsubsection{\texorpdfstring{toString()}{toString()}}
+{\footnotesize\ttfamily \label{classclara_1_1_text_flow_1_1_column_a63e243f464d2898c81d0f6c58c133b6b} 
+auto clara\+::\+Text\+Flow\+::\+Column\+::to\+String (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const -\/$>$ std\+::string \hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{third__party_2clara_8hpp_source_l00236}{236}} of file \mbox{\hyperlink{third__party_2clara_8hpp_source}{clara.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00237\ \ \ \ \ \ \ \ \ \ \ \ \ std::ostringstream\ oss;}
+\DoxyCodeLine{00238\ \ \ \ \ \ \ \ \ \ \ \ \ oss\ <<\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ oss.str();}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classclara_1_1_text_flow_1_1_column_af3cb145d05d0c692306d6dc210e50361}\index{clara::TextFlow::Column@{clara::TextFlow::Column}!width@{width}}
+\index{width@{width}!clara::TextFlow::Column@{clara::TextFlow::Column}}
+\doxysubsubsection{\texorpdfstring{width()}{width()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classclara_1_1_text_flow_1_1_column_af3cb145d05d0c692306d6dc210e50361} 
+auto clara\+::\+Text\+Flow\+::\+Column\+::width (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const -\/$>$ size\+\_\+t \hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{third__party_2clara_8hpp_source_l00218}{218}} of file \mbox{\hyperlink{third__party_2clara_8hpp_source}{clara.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00218\ \{\ \textcolor{keywordflow}{return}\ m\_width;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classclara_1_1_text_flow_1_1_column_af3cb145d05d0c692306d6dc210e50361_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classclara_1_1_text_flow_1_1_column_a04614501d20ee47d4cdbbd1ecaf8d29e}\index{clara::TextFlow::Column@{clara::TextFlow::Column}!width@{width}}
+\index{width@{width}!clara::TextFlow::Column@{clara::TextFlow::Column}}
+\doxysubsubsection{\texorpdfstring{width()}{width()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classclara_1_1_text_flow_1_1_column_a04614501d20ee47d4cdbbd1ecaf8d29e} 
+auto clara\+::\+Text\+Flow\+::\+Column\+::width (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{new\+Width}{}\end{DoxyParamCaption}) -\/$>$ \mbox{\hyperlink{classclara_1_1_text_flow_1_1_column}{Column}}\& \hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{third__party_2clara_8hpp_source_l00204}{204}} of file \mbox{\hyperlink{third__party_2clara_8hpp_source}{clara.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ \ \ \ \ assert(\ newWidth\ >\ 0\ );}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ \ \ \ \ m\_width\ =\ newWidth;}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=339pt]{classclara_1_1_text_flow_1_1_column_a04614501d20ee47d4cdbbd1ecaf8d29e_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{classclara_1_1_text_flow_1_1_column_adf5f75953d889485742ede619047a00b}\index{clara::TextFlow::Column@{clara::TextFlow::Column}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!clara::TextFlow::Column@{clara::TextFlow::Column}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$}{operator<<}}
+{\footnotesize\ttfamily \label{classclara_1_1_text_flow_1_1_column_adf5f75953d889485742ede619047a00b} 
+std\+::ostream \& operator$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{os}{, }\item[{\mbox{\hyperlink{classclara_1_1_text_flow_1_1_column}{Column}} const \&}]{col}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{third__party_2clara_8hpp_source_l00222}{222}} of file \mbox{\hyperlink{third__party_2clara_8hpp_source}{clara.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ first\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\ line\ :\ col\ )\ \{}
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ first\ )}
+\DoxyCodeLine{00226\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ first\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00227\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00228\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{00229\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}};}
+\DoxyCodeLine{00230\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00231\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}};}
+\DoxyCodeLine{00232\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/third\+\_\+party/\mbox{\hyperlink{third__party_2clara_8hpp}{clara.\+hpp}}\end{DoxyCompactItemize}

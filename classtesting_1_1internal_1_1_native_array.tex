@@ -1,0 +1,258 @@
+\doxysection{testing\+::internal\+::Native\+Array\texorpdfstring{$<$}{<} Element \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classtesting_1_1internal_1_1_native_array}{}\label{classtesting_1_1internal_1_1_native_array}\index{testing::internal::NativeArray$<$ Element $>$@{testing::internal::NativeArray$<$ Element $>$}}
+
+
+{\ttfamily \#include $<$gtest-\/internal.\+h$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef Element \mbox{\hyperlink{classtesting_1_1internal_1_1_native_array_a1f884e6c78369584f2ab3508d443cfef}{value\+\_\+type}}
+\item 
+typedef Element \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classtesting_1_1internal_1_1_native_array_ad14dd52fc7b2d235bbaa724e1b9e1582}{iterator}}
+\item 
+typedef const Element \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classtesting_1_1internal_1_1_native_array_af82048fc424c973a70e2592dd29df344}{const\+\_\+iterator}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_native_array_a52b3689c62532703d11e9d82939a7141}{Native\+Array}} (const Element \texorpdfstring{$\ast$}{*}array, size\+\_\+t \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}, \mbox{\hyperlink{structtesting_1_1internal_1_1_relation_to_source_reference}{Relation\+To\+Source\+Reference}})
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_native_array_ac184ee5741af5be3402213819c834405}{Native\+Array}} (const Element \texorpdfstring{$\ast$}{*}array, size\+\_\+t \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}, \mbox{\hyperlink{structtesting_1_1internal_1_1_relation_to_source_copy}{Relation\+To\+Source\+Copy}})
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_native_array_abb346ac3040f5da733f594cc2d5958bc}{Native\+Array}} (const \mbox{\hyperlink{classtesting_1_1internal_1_1_native_array}{Native\+Array}} \&rhs)
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_native_array_a55ab5948d473a487303dcf6e02ad1f60}{\texorpdfstring{$\sim$}{\string~}\+Native\+Array}} ()
+\item 
+size\+\_\+t \mbox{\hyperlink{classtesting_1_1internal_1_1_native_array_af96a4a5ca0cdd5d163c47a081f08bd89}{size}} () const
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_native_array_af82048fc424c973a70e2592dd29df344}{const\+\_\+iterator}} \mbox{\hyperlink{classtesting_1_1internal_1_1_native_array_a3046d93cfa23097e7b7c91f5f982dc78}{begin}} () const
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_native_array_af82048fc424c973a70e2592dd29df344}{const\+\_\+iterator}} \mbox{\hyperlink{classtesting_1_1internal_1_1_native_array_ae1cda748e49c6906421c6183c4d07c5a}{end}} () const
+\item 
+bool \mbox{\hyperlink{classtesting_1_1internal_1_1_native_array_a81b90f5739ed812610e68dc34c9e3850}{operator==}} (const \mbox{\hyperlink{classtesting_1_1internal_1_1_native_array}{Native\+Array}} \&rhs) const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Element$>$\newline
+class testing\+::internal\+::\+Native\+Array$<$ Element $>$}
+
+
+Definition at line \mbox{\hyperlink{gtest-internal_8h_source_l01074}{1074}} of file \mbox{\hyperlink{gtest-internal_8h_source}{gtest-\/internal.\+h}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_native_array_af82048fc424c973a70e2592dd29df344}\index{testing::internal::NativeArray$<$ Element $>$@{testing::internal::NativeArray$<$ Element $>$}!const\_iterator@{const\_iterator}}
+\index{const\_iterator@{const\_iterator}!testing::internal::NativeArray$<$ Element $>$@{testing::internal::NativeArray$<$ Element $>$}}
+\doxysubsubsection{\texorpdfstring{const\_iterator}{const\_iterator}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_native_array_af82048fc424c973a70e2592dd29df344} 
+template$<$typename Element $>$ \\
+const Element\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classtesting_1_1internal_1_1_native_array}{testing\+::internal\+::\+Native\+Array}}$<$ Element $>$\+::const\+\_\+iterator}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-internal_8h_source_l01079}{1079}} of file \mbox{\hyperlink{gtest-internal_8h_source}{gtest-\/internal.\+h}}.
+
+\Hypertarget{classtesting_1_1internal_1_1_native_array_ad14dd52fc7b2d235bbaa724e1b9e1582}\index{testing::internal::NativeArray$<$ Element $>$@{testing::internal::NativeArray$<$ Element $>$}!iterator@{iterator}}
+\index{iterator@{iterator}!testing::internal::NativeArray$<$ Element $>$@{testing::internal::NativeArray$<$ Element $>$}}
+\doxysubsubsection{\texorpdfstring{iterator}{iterator}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_native_array_ad14dd52fc7b2d235bbaa724e1b9e1582} 
+template$<$typename Element $>$ \\
+Element\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classtesting_1_1internal_1_1_native_array}{testing\+::internal\+::\+Native\+Array}}$<$ Element $>$\+::iterator}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-internal_8h_source_l01078}{1078}} of file \mbox{\hyperlink{gtest-internal_8h_source}{gtest-\/internal.\+h}}.
+
+\Hypertarget{classtesting_1_1internal_1_1_native_array_a1f884e6c78369584f2ab3508d443cfef}\index{testing::internal::NativeArray$<$ Element $>$@{testing::internal::NativeArray$<$ Element $>$}!value\_type@{value\_type}}
+\index{value\_type@{value\_type}!testing::internal::NativeArray$<$ Element $>$@{testing::internal::NativeArray$<$ Element $>$}}
+\doxysubsubsection{\texorpdfstring{value\_type}{value\_type}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_native_array_a1f884e6c78369584f2ab3508d443cfef} 
+template$<$typename Element $>$ \\
+Element \mbox{\hyperlink{classtesting_1_1internal_1_1_native_array}{testing\+::internal\+::\+Native\+Array}}$<$ Element $>$\+::value\+\_\+type}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-internal_8h_source_l01077}{1077}} of file \mbox{\hyperlink{gtest-internal_8h_source}{gtest-\/internal.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_native_array_a52b3689c62532703d11e9d82939a7141}\index{testing::internal::NativeArray$<$ Element $>$@{testing::internal::NativeArray$<$ Element $>$}!NativeArray@{NativeArray}}
+\index{NativeArray@{NativeArray}!testing::internal::NativeArray$<$ Element $>$@{testing::internal::NativeArray$<$ Element $>$}}
+\doxysubsubsection{\texorpdfstring{NativeArray()}{NativeArray()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_native_array_a52b3689c62532703d11e9d82939a7141} 
+template$<$typename Element $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_native_array}{testing\+::internal\+::\+Native\+Array}}$<$ Element $>$\+::\+Native\+Array (\begin{DoxyParamCaption}\item[{const Element \texorpdfstring{$\ast$}{*}}]{array}{, }\item[{size\+\_\+t}]{count}{, }\item[{\mbox{\hyperlink{structtesting_1_1internal_1_1_relation_to_source_reference}{Relation\+To\+Source\+Reference}}}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-internal_8h_source_l01082}{1082}} of file \mbox{\hyperlink{gtest-internal_8h_source}{gtest-\/internal.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01082\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01083\ \ \ \ \ InitRef(array,\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}});}
+\DoxyCodeLine{01084\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1internal_1_1_native_array_ac184ee5741af5be3402213819c834405}\index{testing::internal::NativeArray$<$ Element $>$@{testing::internal::NativeArray$<$ Element $>$}!NativeArray@{NativeArray}}
+\index{NativeArray@{NativeArray}!testing::internal::NativeArray$<$ Element $>$@{testing::internal::NativeArray$<$ Element $>$}}
+\doxysubsubsection{\texorpdfstring{NativeArray()}{NativeArray()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_native_array_ac184ee5741af5be3402213819c834405} 
+template$<$typename Element $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_native_array}{testing\+::internal\+::\+Native\+Array}}$<$ Element $>$\+::\+Native\+Array (\begin{DoxyParamCaption}\item[{const Element \texorpdfstring{$\ast$}{*}}]{array}{, }\item[{size\+\_\+t}]{count}{, }\item[{\mbox{\hyperlink{structtesting_1_1internal_1_1_relation_to_source_copy}{Relation\+To\+Source\+Copy}}}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-internal_8h_source_l01087}{1087}} of file \mbox{\hyperlink{gtest-internal_8h_source}{gtest-\/internal.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01087\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01088\ \ \ \ \ InitCopy(array,\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}});}
+\DoxyCodeLine{01089\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1internal_1_1_native_array_abb346ac3040f5da733f594cc2d5958bc}\index{testing::internal::NativeArray$<$ Element $>$@{testing::internal::NativeArray$<$ Element $>$}!NativeArray@{NativeArray}}
+\index{NativeArray@{NativeArray}!testing::internal::NativeArray$<$ Element $>$@{testing::internal::NativeArray$<$ Element $>$}}
+\doxysubsubsection{\texorpdfstring{NativeArray()}{NativeArray()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_native_array_abb346ac3040f5da733f594cc2d5958bc} 
+template$<$typename Element $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_native_array}{testing\+::internal\+::\+Native\+Array}}$<$ Element $>$\+::\+Native\+Array (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classtesting_1_1internal_1_1_native_array}{Native\+Array}}$<$ Element $>$ \&}]{rhs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-internal_8h_source_l01092}{1092}} of file \mbox{\hyperlink{gtest-internal_8h_source}{gtest-\/internal.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01092\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01093\ \ \ \ \ (this-\/>*rhs.clone\_)(rhs.array\_,\ rhs.size\_);}
+\DoxyCodeLine{01094\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1internal_1_1_native_array_a55ab5948d473a487303dcf6e02ad1f60}\index{testing::internal::NativeArray$<$ Element $>$@{testing::internal::NativeArray$<$ Element $>$}!````~NativeArray@{\texorpdfstring{$\sim$}{\string~}NativeArray}}
+\index{````~NativeArray@{\texorpdfstring{$\sim$}{\string~}NativeArray}!testing::internal::NativeArray$<$ Element $>$@{testing::internal::NativeArray$<$ Element $>$}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}NativeArray()}{\string~NativeArray()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_native_array_a55ab5948d473a487303dcf6e02ad1f60} 
+template$<$typename Element $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_native_array}{testing\+::internal\+::\+Native\+Array}}$<$ Element $>$\+::\texorpdfstring{$\sim$}{\string~}\mbox{\hyperlink{classtesting_1_1internal_1_1_native_array}{Native\+Array}} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-internal_8h_source_l01096}{1096}} of file \mbox{\hyperlink{gtest-internal_8h_source}{gtest-\/internal.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01097\ \ \ \ \ \textcolor{keywordflow}{if}\ (clone\_\ !=\ \&NativeArray::InitRef)}
+\DoxyCodeLine{01098\ \ \ \ \ \ \ \textcolor{keyword}{delete}[]\ array\_;}
+\DoxyCodeLine{01099\ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_native_array_a3046d93cfa23097e7b7c91f5f982dc78}\index{testing::internal::NativeArray$<$ Element $>$@{testing::internal::NativeArray$<$ Element $>$}!begin@{begin}}
+\index{begin@{begin}!testing::internal::NativeArray$<$ Element $>$@{testing::internal::NativeArray$<$ Element $>$}}
+\doxysubsubsection{\texorpdfstring{begin()}{begin()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_native_array_a3046d93cfa23097e7b7c91f5f982dc78} 
+template$<$typename Element $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_native_array_af82048fc424c973a70e2592dd29df344}{const\+\_\+iterator}} \mbox{\hyperlink{classtesting_1_1internal_1_1_native_array}{testing\+::internal\+::\+Native\+Array}}$<$ Element $>$\+::begin (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-internal_8h_source_l01103}{1103}} of file \mbox{\hyperlink{gtest-internal_8h_source}{gtest-\/internal.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01103\ \{\ \textcolor{keywordflow}{return}\ array\_;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=334pt]{classtesting_1_1internal_1_1_native_array_a3046d93cfa23097e7b7c91f5f982dc78_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_native_array_ae1cda748e49c6906421c6183c4d07c5a}\index{testing::internal::NativeArray$<$ Element $>$@{testing::internal::NativeArray$<$ Element $>$}!end@{end}}
+\index{end@{end}!testing::internal::NativeArray$<$ Element $>$@{testing::internal::NativeArray$<$ Element $>$}}
+\doxysubsubsection{\texorpdfstring{end()}{end()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_native_array_ae1cda748e49c6906421c6183c4d07c5a} 
+template$<$typename Element $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_native_array_af82048fc424c973a70e2592dd29df344}{const\+\_\+iterator}} \mbox{\hyperlink{classtesting_1_1internal_1_1_native_array}{testing\+::internal\+::\+Native\+Array}}$<$ Element $>$\+::end (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-internal_8h_source_l01104}{1104}} of file \mbox{\hyperlink{gtest-internal_8h_source}{gtest-\/internal.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01104\ \{\ \textcolor{keywordflow}{return}\ array\_\ +\ size\_;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_native_array_ae1cda748e49c6906421c6183c4d07c5a_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_native_array_a81b90f5739ed812610e68dc34c9e3850}\index{testing::internal::NativeArray$<$ Element $>$@{testing::internal::NativeArray$<$ Element $>$}!operator==@{operator==}}
+\index{operator==@{operator==}!testing::internal::NativeArray$<$ Element $>$@{testing::internal::NativeArray$<$ Element $>$}}
+\doxysubsubsection{\texorpdfstring{operator==()}{operator==()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_native_array_a81b90f5739ed812610e68dc34c9e3850} 
+template$<$typename Element $>$ \\
+bool \mbox{\hyperlink{classtesting_1_1internal_1_1_native_array}{testing\+::internal\+::\+Native\+Array}}$<$ Element $>$\+::operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classtesting_1_1internal_1_1_native_array}{Native\+Array}}$<$ Element $>$ \&}]{rhs}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-internal_8h_source_l01105}{1105}} of file \mbox{\hyperlink{gtest-internal_8h_source}{gtest-\/internal.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01106\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_native_array_af96a4a5ca0cdd5d163c47a081f08bd89}{size}}()\ ==\ rhs.size()\ \&\&}
+\DoxyCodeLine{01107\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_af4bebf36baf0b0a5b26d051dde55fa47}{ArrayEq}}(\mbox{\hyperlink{classtesting_1_1internal_1_1_native_array_a3046d93cfa23097e7b7c91f5f982dc78}{begin}}(),\ \mbox{\hyperlink{classtesting_1_1internal_1_1_native_array_af96a4a5ca0cdd5d163c47a081f08bd89}{size}}(),\ rhs.begin());}
+\DoxyCodeLine{01108\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=334pt]{classtesting_1_1internal_1_1_native_array_a81b90f5739ed812610e68dc34c9e3850_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_native_array_af96a4a5ca0cdd5d163c47a081f08bd89}\index{testing::internal::NativeArray$<$ Element $>$@{testing::internal::NativeArray$<$ Element $>$}!size@{size}}
+\index{size@{size}!testing::internal::NativeArray$<$ Element $>$@{testing::internal::NativeArray$<$ Element $>$}}
+\doxysubsubsection{\texorpdfstring{size()}{size()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_native_array_af96a4a5ca0cdd5d163c47a081f08bd89} 
+template$<$typename Element $>$ \\
+size\+\_\+t \mbox{\hyperlink{classtesting_1_1internal_1_1_native_array}{testing\+::internal\+::\+Native\+Array}}$<$ Element $>$\+::size (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-internal_8h_source_l01102}{1102}} of file \mbox{\hyperlink{gtest-internal_8h_source}{gtest-\/internal.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01102\ \{\ \textcolor{keywordflow}{return}\ size\_;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=329pt]{classtesting_1_1internal_1_1_native_array_af96a4a5ca0cdd5d163c47a081f08bd89_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/include/gtest/internal/\mbox{\hyperlink{gtest-internal_8h}{gtest-\/internal.\+h}}\end{DoxyCompactItemize}

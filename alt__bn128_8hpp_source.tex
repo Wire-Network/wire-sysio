@@ -1,0 +1,31 @@
+\doxysection{alt\+\_\+bn128.\+hpp}
+\hypertarget{alt__bn128_8hpp_source}{}\label{alt__bn128_8hpp_source}\index{libraries/fc/include/fc/crypto/alt\_bn128.hpp@{libraries/fc/include/fc/crypto/alt\_bn128.hpp}}
+\mbox{\hyperlink{alt__bn128_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{alt__bn128_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{alt__bn128_8hpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{alt__bn128_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <functional>}}
+\DoxyCodeLine{\Hypertarget{alt__bn128_8hpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <cstdint>}}
+\DoxyCodeLine{\Hypertarget{alt__bn128_8hpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <variant>}}
+\DoxyCodeLine{\Hypertarget{alt__bn128_8hpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{\Hypertarget{alt__bn128_8hpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{utility_8hpp}{fc/utility.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{alt__bn128_8hpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{alt__bn128_8hpp_source_l00009}00009\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}\ \{}
+\DoxyCodeLine{\Hypertarget{alt__bn128_8hpp_source_l00010}\mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{00010}}\ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}}\ =\ std::vector<char>;}
+\DoxyCodeLine{\Hypertarget{alt__bn128_8hpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{alt__bn128_8hpp_source_l00012}\mbox{\hyperlink{namespacefc_acf2fac70bed3c7c7668279d9de619f72}{00012}}\ \ \ \ \ \textcolor{keyword}{enum\ class}\ \mbox{\hyperlink{namespacefc_acf2fac70bed3c7c7668279d9de619f72}{alt\_bn128\_error}}\ :\ \mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}}\ \{}
+\DoxyCodeLine{\Hypertarget{alt__bn128_8hpp_source_l00013}00013\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_acf2fac70bed3c7c7668279d9de619f72a963c97bbe6e7d0586d653bf362ad7c8c}{operand\_component\_invalid}},}
+\DoxyCodeLine{\Hypertarget{alt__bn128_8hpp_source_l00014}00014\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_acf2fac70bed3c7c7668279d9de619f72a13f94f90a7c58cfac2aad5ff6326df0f}{operand\_not\_in\_curve}},}
+\DoxyCodeLine{\Hypertarget{alt__bn128_8hpp_source_l00015}00015\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_acf2fac70bed3c7c7668279d9de619f72a3c649dc69cf0422413733d5687c4ef76}{pairing\_list\_size\_error}},}
+\DoxyCodeLine{\Hypertarget{alt__bn128_8hpp_source_l00016}00016\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_acf2fac70bed3c7c7668279d9de619f72aad6e4c3db4d7d0976f39b24344afd5e0}{operand\_outside\_g2}},}
+\DoxyCodeLine{\Hypertarget{alt__bn128_8hpp_source_l00017}00017\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_acf2fac70bed3c7c7668279d9de619f72a432c768a921a9550970c31c8d332d59a}{input\_len\_error}},}
+\DoxyCodeLine{\Hypertarget{alt__bn128_8hpp_source_l00018}00018\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_acf2fac70bed3c7c7668279d9de619f72a846d76329a967dd8c99ad17c4af9d685}{invalid\_scalar\_size}}}
+\DoxyCodeLine{\Hypertarget{alt__bn128_8hpp_source_l00019}00019\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{alt__bn128_8hpp_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{alt__bn128_8hpp_source_l00021}00021\ \ \ \ \ std::variant<alt\_bn128\_error,\ bytes>\ \mbox{\hyperlink{namespacefc_aaccc65ddd035c56d5e92bedde7de3bde}{alt\_bn128\_add}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}}\&\ op1,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}}\&\ op2);\ }
+\DoxyCodeLine{\Hypertarget{alt__bn128_8hpp_source_l00022}00022\ \ \ \ \ std::variant<alt\_bn128\_error,\ bytes>\ \mbox{\hyperlink{namespacefc_adabebd5c846d83006ef00e1e63c5ec09}{alt\_bn128\_mul}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}}\&\ g1\_point,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}}\&\ scalar);}
+\DoxyCodeLine{\Hypertarget{alt__bn128_8hpp_source_l00023}00023\ \ \ \ \ std::variant<alt\_bn128\_error,\ bool>\ \ \mbox{\hyperlink{namespacefc_afff05d8da5063eecb517149a272d20ed}{alt\_bn128\_pair}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}}\&\ g1\_g2\_pairs,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacefc_a978f9e97f64eb2ce6cbe892d3cc93397}{yield\_function\_t}}\&\ yield);}
+\DoxyCodeLine{\Hypertarget{alt__bn128_8hpp_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{alt__bn128_8hpp_source_l00025}00025\ \}\ \textcolor{comment}{//\ fc}}
+
+\end{DoxyCode}

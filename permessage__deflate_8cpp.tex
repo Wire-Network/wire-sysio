@@ -1,0 +1,1366 @@
+\doxysection{libraries/fc/vendor/websocketpp/test/extension/permessage\+\_\+deflate.cpp File Reference}
+\hypertarget{permessage__deflate_8cpp}{}\label{permessage__deflate_8cpp}\index{libraries/fc/vendor/websocketpp/test/extension/permessage\_deflate.cpp@{libraries/fc/vendor/websocketpp/test/extension/permessage\_deflate.cpp}}
+{\ttfamily \#include $<$boost/test/unit\+\_\+test.\+hpp$>$}\newline
+{\ttfamily \#include $<$websocketpp/error.\+hpp$>$}\newline
+{\ttfamily \#include $<$websocketpp/extensions/extension.\+hpp$>$}\newline
+{\ttfamily \#include $<$websocketpp/extensions/permessage\+\_\+deflate/disabled.\+hpp$>$}\newline
+{\ttfamily \#include $<$websocketpp/extensions/permessage\+\_\+deflate/enabled.\+hpp$>$}\newline
+{\ttfamily \#include $<$string$>$}\newline
+{\ttfamily \#include $<$websocketpp/utilities.\+hpp$>$}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+Include dependency graph for permessage\+\_\+deflate.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{permessage__deflate_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{classconfig}{config}}
+\item 
+struct \mbox{\hyperlink{structext__vars}{ext\+\_\+vars}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{permessage__deflate_8cpp_a6b2a3852db8bb19ab6909bac01859985}{BOOST\+\_\+\+TEST\+\_\+\+MODULE}}~permessage\+\_\+deflate
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled}{websocketpp\+::extensions\+::permessage\+\_\+deflate\+::enabled}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$ \mbox{\hyperlink{permessage__deflate_8cpp_a7465a5f6a0df08ad3eeaaf94fc1365f1}{enabled\+\_\+type}}
+\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1disabled}{websocketpp\+::extensions\+::permessage\+\_\+deflate\+::disabled}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$ \mbox{\hyperlink{permessage__deflate_8cpp_a183ad01934e721ab9a6408a0f42567bf}{disabled\+\_\+type}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{permessage__deflate_8cpp_a93ae6c0f80748d409a66db0b3d741238}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (disabled\+\_\+is\+\_\+disabled)
+\item 
+\mbox{\hyperlink{permessage__deflate_8cpp_afcb5e1beee13d21cb630f1324c67eb1d}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (disabled\+\_\+is\+\_\+off)
+\item 
+\mbox{\hyperlink{permessage__deflate_8cpp_a83d6a1a427e2ff10dec06666760452ce}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (enabled\+\_\+is\+\_\+enabled)
+\item 
+\mbox{\hyperlink{permessage__deflate_8cpp_a3894958dd4b65726c41a8784c37796d2}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (enabled\+\_\+starts\+\_\+disabled)
+\item 
+\mbox{\hyperlink{permessage__deflate_8cpp_a1493f0457934a02767c6b0dceca31721}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (negotiation\+\_\+empty\+\_\+attr)
+\item 
+\mbox{\hyperlink{permessage__deflate_8cpp_a5d3afed908982eaefeca10bece30b1af}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (negotiation\+\_\+invalid\+\_\+attr)
+\item 
+\mbox{\hyperlink{permessage__deflate_8cpp_af81b658adce672734b4262a4065003dc}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (negotiate\+\_\+server\+\_\+no\+\_\+context\+\_\+takeover\+\_\+invalid)
+\item 
+\mbox{\hyperlink{permessage__deflate_8cpp_a8f9186eb5d4d31e6dc65db1851907991}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (negotiate\+\_\+server\+\_\+no\+\_\+context\+\_\+takeover)
+\item 
+\mbox{\hyperlink{permessage__deflate_8cpp_a83d5121172749453521988f9cc80b7b0}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (negotiate\+\_\+server\+\_\+no\+\_\+context\+\_\+takeover\+\_\+server\+\_\+initiated)
+\item 
+\mbox{\hyperlink{permessage__deflate_8cpp_afaa35febd6787f28de059e10ae72af44}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (negotiate\+\_\+client\+\_\+no\+\_\+context\+\_\+takeover\+\_\+invalid)
+\item 
+\mbox{\hyperlink{permessage__deflate_8cpp_a51fe0c73fe2cfbe2bd89f096175395fe}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (negotiate\+\_\+client\+\_\+no\+\_\+context\+\_\+takeover)
+\item 
+\mbox{\hyperlink{permessage__deflate_8cpp_a16ef13537277adfd5c71d68ebd1c972a}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (negotiate\+\_\+client\+\_\+no\+\_\+context\+\_\+takeover\+\_\+server\+\_\+initiated)
+\item 
+\mbox{\hyperlink{permessage__deflate_8cpp_a01ff9e0f1795c4e046897d30c5f74fdd}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (negotiate\+\_\+server\+\_\+max\+\_\+window\+\_\+bits\+\_\+invalid)
+\item 
+\mbox{\hyperlink{permessage__deflate_8cpp_a29d2b1927aabe31ddfa68d8f2915d77f}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (negotiate\+\_\+server\+\_\+max\+\_\+window\+\_\+bits\+\_\+valid)
+\item 
+\mbox{\hyperlink{permessage__deflate_8cpp_ad7ab55a77fb3a79268c28792be9f55de}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (invalid\+\_\+set\+\_\+server\+\_\+max\+\_\+window\+\_\+bits)
+\item 
+\mbox{\hyperlink{permessage__deflate_8cpp_af10f15d8b86a0665b16f3fd34fe208d3}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (negotiate\+\_\+server\+\_\+max\+\_\+window\+\_\+bits\+\_\+decline)
+\item 
+\mbox{\hyperlink{permessage__deflate_8cpp_ab842a768e457b589bc53b36ba43ed19f}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (negotiate\+\_\+server\+\_\+max\+\_\+window\+\_\+bits\+\_\+accept)
+\item 
+\mbox{\hyperlink{permessage__deflate_8cpp_a092d23db7da1315d1c7aac74643cd653}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (negotiate\+\_\+server\+\_\+max\+\_\+window\+\_\+bits\+\_\+largest)
+\item 
+\mbox{\hyperlink{permessage__deflate_8cpp_a2f230c5ff8f482b37010960b0c64e513}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (negotiate\+\_\+server\+\_\+max\+\_\+window\+\_\+bits\+\_\+smallest)
+\item 
+\mbox{\hyperlink{permessage__deflate_8cpp_ad223abf7aa52e86bc00c8b8ff3d57746}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (negotiate\+\_\+client\+\_\+max\+\_\+window\+\_\+bits\+\_\+invalid)
+\item 
+\mbox{\hyperlink{permessage__deflate_8cpp_adcdd0e78d39a296506c97d566ce69d30}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (negotiate\+\_\+client\+\_\+max\+\_\+window\+\_\+bits\+\_\+valid)
+\item 
+\mbox{\hyperlink{permessage__deflate_8cpp_a3e00f4fd25358a12420335d5ab2c9677}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (invalid\+\_\+set\+\_\+client\+\_\+max\+\_\+window\+\_\+bits)
+\item 
+\mbox{\hyperlink{permessage__deflate_8cpp_a58999e295854f178bd61ef4722976a7a}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (negotiate\+\_\+client\+\_\+max\+\_\+window\+\_\+bits\+\_\+decline)
+\item 
+\mbox{\hyperlink{permessage__deflate_8cpp_a939579452e7f936f83009ce2fb347207}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (negotiate\+\_\+client\+\_\+max\+\_\+window\+\_\+bits\+\_\+accept)
+\item 
+\mbox{\hyperlink{permessage__deflate_8cpp_a5cc5e123c421c8770c06a0f9832886a8}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (negotiate\+\_\+client\+\_\+max\+\_\+window\+\_\+bits\+\_\+largest)
+\item 
+\mbox{\hyperlink{permessage__deflate_8cpp_a80dd194417464d3cde1ed1f96fdfa73a}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (negotiate\+\_\+client\+\_\+max\+\_\+window\+\_\+bits\+\_\+smallest)
+\item 
+\mbox{\hyperlink{permessage__deflate_8cpp_aec7dd507660e453917b3e6c94d214f2d}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (negotiate\+\_\+two\+\_\+client\+\_\+initiated1)
+\item 
+\mbox{\hyperlink{permessage__deflate_8cpp_a23670c1d1d6924b97ca6871e383049e5}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (negotiate\+\_\+two\+\_\+client\+\_\+initiated2)
+\item 
+\mbox{\hyperlink{permessage__deflate_8cpp_a6e11503bcf98cf23f2d27d6fa19aab46}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (negotiate\+\_\+two\+\_\+client\+\_\+initiated3)
+\item 
+\mbox{\hyperlink{permessage__deflate_8cpp_a9b46c1287416797e09c76e12b9ae498c}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (negotiate\+\_\+two\+\_\+client\+\_\+initiated4)
+\item 
+\mbox{\hyperlink{permessage__deflate_8cpp_a0818aed86b780040ec9ee3b1659f78a6}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (negotiate\+\_\+two\+\_\+client\+\_\+initiated5)
+\item 
+\mbox{\hyperlink{permessage__deflate_8cpp_a9a64cd0a1848fdef32f40fdef4b0bf14}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (negotiate\+\_\+two\+\_\+client\+\_\+initiated6)
+\item 
+\mbox{\hyperlink{permessage__deflate_8cpp_ab199686285ddbc0407a01708de49e19b}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (negotiate\+\_\+three\+\_\+client\+\_\+initiated1)
+\item 
+\mbox{\hyperlink{permessage__deflate_8cpp_ad92486da6ce840f4635caf0775f14923}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (negotiate\+\_\+three\+\_\+client\+\_\+initiated2)
+\item 
+\mbox{\hyperlink{permessage__deflate_8cpp_ab8b6dddd5427eda94a3c22e449b92d67}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (negotiate\+\_\+three\+\_\+client\+\_\+initiated3)
+\item 
+\mbox{\hyperlink{permessage__deflate_8cpp_a6d04d9d8e57d3bb589430f35a590e509}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (negotiate\+\_\+three\+\_\+client\+\_\+initiated4)
+\item 
+\mbox{\hyperlink{permessage__deflate_8cpp_abae413a4e24e198c9e08a9d8175b7d25}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (negotiate\+\_\+four\+\_\+client\+\_\+initiated)
+\item 
+\mbox{\hyperlink{permessage__deflate_8cpp_a3fc62183810edc2235d679db7c3f6fe0}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (compress\+\_\+data)
+\item 
+\mbox{\hyperlink{permessage__deflate_8cpp_a526a1f8d6b4b1f670b58e25f41c3670d}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (compress\+\_\+data\+\_\+multiple)
+\item 
+\mbox{\hyperlink{permessage__deflate_8cpp_a44163bcad33e4240f4d4e84474acb2b6}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (compress\+\_\+data\+\_\+large)
+\item 
+\mbox{\hyperlink{permessage__deflate_8cpp_a7073585a8bb58a3e2781b431db43089b}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (compress\+\_\+data\+\_\+no\+\_\+context\+\_\+takeover)
+\item 
+\mbox{\hyperlink{permessage__deflate_8cpp_a7142cd972fda20e77309a6836c0f95b5}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (compress\+\_\+empty)
+\item 
+\mbox{\hyperlink{permessage__deflate_8cpp_a640c2ff3b439cceb412d897c8953216b}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (decompress\+\_\+data)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{permessage__deflate_8cpp_a6b2a3852db8bb19ab6909bac01859985}\index{permessage\_deflate.cpp@{permessage\_deflate.cpp}!BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}}
+\index{BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}!permessage\_deflate.cpp@{permessage\_deflate.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_TEST\_MODULE}{BOOST\_TEST\_MODULE}}
+{\footnotesize\ttfamily \label{permessage__deflate_8cpp_a6b2a3852db8bb19ab6909bac01859985} 
+\#define BOOST\+\_\+\+TEST\+\_\+\+MODULE~permessage\+\_\+deflate}
+
+
+
+Definition at line \mbox{\hyperlink{permessage__deflate_8cpp_source_l00028}{28}} of file \mbox{\hyperlink{permessage__deflate_8cpp_source}{permessage\+\_\+deflate.\+cpp}}.
+
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{permessage__deflate_8cpp_a183ad01934e721ab9a6408a0f42567bf}\index{permessage\_deflate.cpp@{permessage\_deflate.cpp}!disabled\_type@{disabled\_type}}
+\index{disabled\_type@{disabled\_type}!permessage\_deflate.cpp@{permessage\_deflate.cpp}}
+\doxysubsubsection{\texorpdfstring{disabled\_type}{disabled\_type}}
+{\footnotesize\ttfamily \label{permessage__deflate_8cpp_a183ad01934e721ab9a6408a0f42567bf} 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1disabled}{websocketpp\+::extensions\+::permessage\+\_\+deflate\+::disabled}}$<$\mbox{\hyperlink{classconfig}{config}}$>$ \mbox{\hyperlink{permessage__deflate_8cpp_a183ad01934e721ab9a6408a0f42567bf}{disabled\+\_\+type}}}
+
+
+
+Definition at line \mbox{\hyperlink{permessage__deflate_8cpp_source_l00045}{45}} of file \mbox{\hyperlink{permessage__deflate_8cpp_source}{permessage\+\_\+deflate.\+cpp}}.
+
+\Hypertarget{permessage__deflate_8cpp_a7465a5f6a0df08ad3eeaaf94fc1365f1}\index{permessage\_deflate.cpp@{permessage\_deflate.cpp}!enabled\_type@{enabled\_type}}
+\index{enabled\_type@{enabled\_type}!permessage\_deflate.cpp@{permessage\_deflate.cpp}}
+\doxysubsubsection{\texorpdfstring{enabled\_type}{enabled\_type}}
+{\footnotesize\ttfamily \label{permessage__deflate_8cpp_a7465a5f6a0df08ad3eeaaf94fc1365f1} 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled}{websocketpp\+::extensions\+::permessage\+\_\+deflate\+::enabled}}$<$\mbox{\hyperlink{classconfig}{config}}$>$ \mbox{\hyperlink{permessage__deflate_8cpp_a7465a5f6a0df08ad3eeaaf94fc1365f1}{enabled\+\_\+type}}}
+
+
+
+Definition at line \mbox{\hyperlink{permessage__deflate_8cpp_source_l00044}{44}} of file \mbox{\hyperlink{permessage__deflate_8cpp_source}{permessage\+\_\+deflate.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{permessage__deflate_8cpp_a3fc62183810edc2235d679db7c3f6fe0}\index{permessage\_deflate.cpp@{permessage\_deflate.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!permessage\_deflate.cpp@{permessage\_deflate.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/43]}}
+{\footnotesize\ttfamily \label{permessage__deflate_8cpp_a3fc62183810edc2235d679db7c3f6fe0} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{compress\+\_\+data}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{permessage__deflate_8cpp_source_l00503}{503}} of file \mbox{\hyperlink{permessage__deflate_8cpp_source}{permessage\+\_\+deflate.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00503\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00504\ \ \ \ \ \mbox{\hyperlink{structext__vars}{ext\_vars}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{00505\ }
+\DoxyCodeLine{00506\ \ \ \ \ std::string\ compress\_in\ =\ \textcolor{stringliteral}{"{}Hello"{}};}
+\DoxyCodeLine{00507\ \ \ \ \ std::string\ compress\_out;}
+\DoxyCodeLine{00508\ \ \ \ \ std::string\ decompress\_out;}
+\DoxyCodeLine{00509\ }
+\DoxyCodeLine{00510\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.init(\textcolor{keyword}{true});}
+\DoxyCodeLine{00511\ }
+\DoxyCodeLine{00512\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.ec\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.compress(compress\_in,compress\_out);}
+\DoxyCodeLine{00513\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.ec,\ websocketpp::lib::error\_code()\ );}
+\DoxyCodeLine{00514\ }
+\DoxyCodeLine{00515\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.ec\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.decompress(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *\textcolor{keyword}{>}(compress\_out.data()),compress\_out.size(),decompress\_out);}
+\DoxyCodeLine{00516\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.ec,\ websocketpp::lib::error\_code()\ );}
+\DoxyCodeLine{00517\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ compress\_in,\ decompress\_out\ );}
+\DoxyCodeLine{00518\ \}}
+
+\end{DoxyCode}
+\Hypertarget{permessage__deflate_8cpp_a44163bcad33e4240f4d4e84474acb2b6}\index{permessage\_deflate.cpp@{permessage\_deflate.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!permessage\_deflate.cpp@{permessage\_deflate.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/43]}}
+{\footnotesize\ttfamily \label{permessage__deflate_8cpp_a44163bcad33e4240f4d4e84474acb2b6} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{compress\+\_\+data\+\_\+large}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{permessage__deflate_8cpp_source_l00539}{539}} of file \mbox{\hyperlink{permessage__deflate_8cpp_source}{permessage\+\_\+deflate.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00539\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00540\ \ \ \ \ \mbox{\hyperlink{structext__vars}{ext\_vars}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{00541\ }
+\DoxyCodeLine{00542\ \ \ \ \ std::string\ compress\_in(600,\textcolor{charliteral}{'*'});}
+\DoxyCodeLine{00543\ \ \ \ \ std::string\ compress\_out;}
+\DoxyCodeLine{00544\ \ \ \ \ std::string\ decompress\_out;}
+\DoxyCodeLine{00545\ }
+\DoxyCodeLine{00546\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1http_a9744f4104772b987aa9e86c35ce1357b}{websocketpp::http::attribute\_list}}\ alist;}
+\DoxyCodeLine{00547\ }
+\DoxyCodeLine{00548\ \ \ \ \ alist[\textcolor{stringliteral}{"{}server\_max\_window\_bits"{}}]\ =\ \textcolor{stringliteral}{"{}8"{}};}
+\DoxyCodeLine{00549\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.set\_server\_max\_window\_bits(8,\mbox{\hyperlink{namespacewebsocketpp_1_1extensions_1_1permessage__deflate_1_1mode_ae06aef93260cb0b5f5bd729a82564120ae726aa33271e359a9256338cc23881af}{websocketpp::extensions::permessage\_deflate::mode::smallest}});}
+\DoxyCodeLine{00550\ }
+\DoxyCodeLine{00551\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.negotiate(alist);}
+\DoxyCodeLine{00552\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.init(\textcolor{keyword}{true});}
+\DoxyCodeLine{00553\ }
+\DoxyCodeLine{00554\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.ec\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.compress(compress\_in,compress\_out);}
+\DoxyCodeLine{00555\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.ec,\ websocketpp::lib::error\_code()\ );}
+\DoxyCodeLine{00556\ }
+\DoxyCodeLine{00557\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.ec\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.decompress(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *\textcolor{keyword}{>}(compress\_out.data()),compress\_out.size(),decompress\_out);}
+\DoxyCodeLine{00558\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.ec,\ websocketpp::lib::error\_code()\ );}
+\DoxyCodeLine{00559\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ compress\_in,\ decompress\_out\ );}
+\DoxyCodeLine{00560\ \}}
+
+\end{DoxyCode}
+\Hypertarget{permessage__deflate_8cpp_a526a1f8d6b4b1f670b58e25f41c3670d}\index{permessage\_deflate.cpp@{permessage\_deflate.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!permessage\_deflate.cpp@{permessage\_deflate.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [3/43]}}
+{\footnotesize\ttfamily \label{permessage__deflate_8cpp_a526a1f8d6b4b1f670b58e25f41c3670d} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{compress\+\_\+data\+\_\+multiple}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{permessage__deflate_8cpp_source_l00520}{520}} of file \mbox{\hyperlink{permessage__deflate_8cpp_source}{permessage\+\_\+deflate.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00520\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00521\ \ \ \ \ \mbox{\hyperlink{structext__vars}{ext\_vars}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{00522\ }
+\DoxyCodeLine{00523\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.init(\textcolor{keyword}{true});}
+\DoxyCodeLine{00524\ }
+\DoxyCodeLine{00525\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ 2;\ i++)\ \{}
+\DoxyCodeLine{00526\ \ \ \ \ \ \ \ \ std::string\ compress\_in\ =\ \textcolor{stringliteral}{"{}Hello"{}};}
+\DoxyCodeLine{00527\ \ \ \ \ \ \ \ \ std::string\ compress\_out;}
+\DoxyCodeLine{00528\ \ \ \ \ \ \ \ \ std::string\ decompress\_out;}
+\DoxyCodeLine{00529\ }
+\DoxyCodeLine{00530\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.ec\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.compress(compress\_in,compress\_out);}
+\DoxyCodeLine{00531\ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.ec,\ websocketpp::lib::error\_code()\ );}
+\DoxyCodeLine{00532\ }
+\DoxyCodeLine{00533\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.ec\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.decompress(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *\textcolor{keyword}{>}(compress\_out.data()),compress\_out.size(),decompress\_out);}
+\DoxyCodeLine{00534\ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.ec,\ websocketpp::lib::error\_code()\ );}
+\DoxyCodeLine{00535\ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ compress\_in,\ decompress\_out\ );}
+\DoxyCodeLine{00536\ \ \ \ \ \}}
+\DoxyCodeLine{00537\ \}}
+
+\end{DoxyCode}
+\Hypertarget{permessage__deflate_8cpp_a7073585a8bb58a3e2781b431db43089b}\index{permessage\_deflate.cpp@{permessage\_deflate.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!permessage\_deflate.cpp@{permessage\_deflate.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [4/43]}}
+{\footnotesize\ttfamily \label{permessage__deflate_8cpp_a7073585a8bb58a3e2781b431db43089b} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{compress\+\_\+data\+\_\+no\+\_\+context\+\_\+takeover}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{permessage__deflate_8cpp_source_l00562}{562}} of file \mbox{\hyperlink{permessage__deflate_8cpp_source}{permessage\+\_\+deflate.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00562\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00563\ \ \ \ \ \mbox{\hyperlink{structext__vars}{ext\_vars}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{00564\ }
+\DoxyCodeLine{00565\ \ \ \ \ std::string\ compress\_in\ =\ \textcolor{stringliteral}{"{}Hello"{}};}
+\DoxyCodeLine{00566\ \ \ \ \ std::string\ compress\_out1;}
+\DoxyCodeLine{00567\ \ \ \ \ std::string\ compress\_out2;}
+\DoxyCodeLine{00568\ \ \ \ \ std::string\ decompress\_out;}
+\DoxyCodeLine{00569\ }
+\DoxyCodeLine{00570\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1http_a9744f4104772b987aa9e86c35ce1357b}{websocketpp::http::attribute\_list}}\ alist;}
+\DoxyCodeLine{00571\ }
+\DoxyCodeLine{00572\ \ \ \ \ alist[\textcolor{stringliteral}{"{}server\_no\_context\_takeover"{}}].clear();}
+\DoxyCodeLine{00573\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.enable\_server\_no\_context\_takeover();}
+\DoxyCodeLine{00574\ }
+\DoxyCodeLine{00575\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.negotiate(alist);}
+\DoxyCodeLine{00576\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.init(\textcolor{keyword}{true});}
+\DoxyCodeLine{00577\ }
+\DoxyCodeLine{00578\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.ec\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.compress(compress\_in,compress\_out1);}
+\DoxyCodeLine{00579\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.ec,\ websocketpp::lib::error\_code()\ );}
+\DoxyCodeLine{00580\ }
+\DoxyCodeLine{00581\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.ec\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.decompress(}
+\DoxyCodeLine{00582\ \ \ \ \ \ \ \ \ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *\textcolor{keyword}{>}(compress\_out1.data()),}
+\DoxyCodeLine{00583\ \ \ \ \ \ \ \ \ compress\_out1.size(),}
+\DoxyCodeLine{00584\ \ \ \ \ \ \ \ \ decompress\_out}
+\DoxyCodeLine{00585\ \ \ \ \ );}
+\DoxyCodeLine{00586\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.ec,\ websocketpp::lib::error\_code()\ );}
+\DoxyCodeLine{00587\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ compress\_in,\ decompress\_out\ );}
+\DoxyCodeLine{00588\ }
+\DoxyCodeLine{00589\ \ \ \ \ decompress\_out.clear();}
+\DoxyCodeLine{00590\ }
+\DoxyCodeLine{00591\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.ec\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.compress(compress\_in,compress\_out2);}
+\DoxyCodeLine{00592\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.ec,\ websocketpp::lib::error\_code()\ );}
+\DoxyCodeLine{00593\ }
+\DoxyCodeLine{00594\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.ec\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.decompress(}
+\DoxyCodeLine{00595\ \ \ \ \ \ \ \ \ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *\textcolor{keyword}{>}(compress\_out2.data()),}
+\DoxyCodeLine{00596\ \ \ \ \ \ \ \ \ compress\_out2.size(),}
+\DoxyCodeLine{00597\ \ \ \ \ \ \ \ \ decompress\_out}
+\DoxyCodeLine{00598\ \ \ \ \ );}
+\DoxyCodeLine{00599\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.ec,\ websocketpp::lib::error\_code()\ );}
+\DoxyCodeLine{00600\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ compress\_in,\ decompress\_out\ );}
+\DoxyCodeLine{00601\ }
+\DoxyCodeLine{00602\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ compress\_out1,\ compress\_out2\ );}
+\DoxyCodeLine{00603\ \}}
+
+\end{DoxyCode}
+\Hypertarget{permessage__deflate_8cpp_a7142cd972fda20e77309a6836c0f95b5}\index{permessage\_deflate.cpp@{permessage\_deflate.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!permessage\_deflate.cpp@{permessage\_deflate.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [5/43]}}
+{\footnotesize\ttfamily \label{permessage__deflate_8cpp_a7142cd972fda20e77309a6836c0f95b5} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{compress\+\_\+empty}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{permessage__deflate_8cpp_source_l00605}{605}} of file \mbox{\hyperlink{permessage__deflate_8cpp_source}{permessage\+\_\+deflate.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00605\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00606\ \ \ \ \ \mbox{\hyperlink{structext__vars}{ext\_vars}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{00607\ }
+\DoxyCodeLine{00608\ \ \ \ \ std::string\ compress\_in;}
+\DoxyCodeLine{00609\ \ \ \ \ std::string\ compress\_out;}
+\DoxyCodeLine{00610\ \ \ \ \ std::string\ decompress\_out;}
+\DoxyCodeLine{00611\ }
+\DoxyCodeLine{00612\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.init(\textcolor{keyword}{true});}
+\DoxyCodeLine{00613\ }
+\DoxyCodeLine{00614\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.ec\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.compress(compress\_in,compress\_out);}
+\DoxyCodeLine{00615\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.ec,\ websocketpp::lib::error\_code()\ );}
+\DoxyCodeLine{00616\ }
+\DoxyCodeLine{00617\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.ec\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.decompress(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *\textcolor{keyword}{>}(compress\_out.data()),compress\_out.size(),decompress\_out);}
+\DoxyCodeLine{00618\ }
+\DoxyCodeLine{00619\ \ \ \ \ compress\_out.clear();}
+\DoxyCodeLine{00620\ \ \ \ \ decompress\_out.clear();}
+\DoxyCodeLine{00621\ }
+\DoxyCodeLine{00622\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.ec\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.compress(compress\_in,compress\_out);}
+\DoxyCodeLine{00623\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.ec,\ websocketpp::lib::error\_code()\ );}
+\DoxyCodeLine{00624\ }
+\DoxyCodeLine{00625\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.ec\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.decompress(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *\textcolor{keyword}{>}(compress\_out.data()),compress\_out.size(),decompress\_out);}
+\DoxyCodeLine{00626\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.ec,\ websocketpp::lib::error\_code()\ );}
+\DoxyCodeLine{00627\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ compress\_in,\ decompress\_out\ );}
+\DoxyCodeLine{00628\ \}}
+
+\end{DoxyCode}
+\Hypertarget{permessage__deflate_8cpp_a640c2ff3b439cceb412d897c8953216b}\index{permessage\_deflate.cpp@{permessage\_deflate.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!permessage\_deflate.cpp@{permessage\_deflate.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [6/43]}}
+{\footnotesize\ttfamily \label{permessage__deflate_8cpp_a640c2ff3b439cceb412d897c8953216b} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{decompress\+\_\+data}]{}{}\end{DoxyParamCaption})}
+
+\begin{DoxyRefDesc}{Todo}
+\item[\mbox{\hyperlink{todo__todo000002}{Todo}}]\+: more compression tests \end{DoxyRefDesc}
+
+\begin{DoxyItemize}
+\item compress at different compression levels 
+\end{DoxyItemize}
+
+Definition at line \mbox{\hyperlink{permessage__deflate_8cpp_source_l00636}{636}} of file \mbox{\hyperlink{permessage__deflate_8cpp_source}{permessage\+\_\+deflate.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00636\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00637\ \ \ \ \ \mbox{\hyperlink{structext__vars}{ext\_vars}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{00638\ }
+\DoxyCodeLine{00639\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ in[11]\ =\ \{0xf2,\ 0x48,\ 0xcd,\ 0xc9,\ 0xc9,\ 0x07,\ 0x00,\ 0x00,\ 0x00,\ 0xff,\ 0xff\};}
+\DoxyCodeLine{00640\ \ \ \ \ std::string\ out;}
+\DoxyCodeLine{00641\ \ \ \ \ std::string\ reference\ =\ \textcolor{stringliteral}{"{}Hello"{}};}
+\DoxyCodeLine{00642\ }
+\DoxyCodeLine{00643\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.init(\textcolor{keyword}{true});}
+\DoxyCodeLine{00644\ }
+\DoxyCodeLine{00645\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.ec\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.decompress(in,11,out);}
+\DoxyCodeLine{00646\ }
+\DoxyCodeLine{00647\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.ec,\ websocketpp::lib::error\_code()\ );}
+\DoxyCodeLine{00648\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ out,\ reference\ );}
+\DoxyCodeLine{00649\ \}}
+
+\end{DoxyCode}
+\Hypertarget{permessage__deflate_8cpp_a93ae6c0f80748d409a66db0b3d741238}\index{permessage\_deflate.cpp@{permessage\_deflate.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!permessage\_deflate.cpp@{permessage\_deflate.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [7/43]}}
+{\footnotesize\ttfamily \label{permessage__deflate_8cpp_a93ae6c0f80748d409a66db0b3d741238} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{disabled\+\_\+is\+\_\+disabled}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{permessage__deflate_8cpp_source_l00059}{59}} of file \mbox{\hyperlink{permessage__deflate_8cpp_source}{permessage\+\_\+deflate.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00060\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1disabled}{disabled\_type}}\ exts;}
+\DoxyCodeLine{00061\ \ \ \ \ BOOST\_CHECK(\ !exts.\mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1disabled_a2471ea045dfff17b36effd61319fc87a}{is\_implemented}}()\ );}
+\DoxyCodeLine{00062\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{permessage__deflate_8cpp_a93ae6c0f80748d409a66db0b3d741238_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{permessage__deflate_8cpp_afcb5e1beee13d21cb630f1324c67eb1d}\index{permessage\_deflate.cpp@{permessage\_deflate.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!permessage\_deflate.cpp@{permessage\_deflate.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [8/43]}}
+{\footnotesize\ttfamily \label{permessage__deflate_8cpp_afcb5e1beee13d21cb630f1324c67eb1d} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{disabled\+\_\+is\+\_\+off}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{permessage__deflate_8cpp_source_l00064}{64}} of file \mbox{\hyperlink{permessage__deflate_8cpp_source}{permessage\+\_\+deflate.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00065\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1disabled}{disabled\_type}}\ exts;}
+\DoxyCodeLine{00066\ \ \ \ \ BOOST\_CHECK(\ !exts.\mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1disabled_a821b1f5929e8330e24e792e0d3ac98a9}{is\_enabled}}()\ );}
+\DoxyCodeLine{00067\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{permessage__deflate_8cpp_afcb5e1beee13d21cb630f1324c67eb1d_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{permessage__deflate_8cpp_a83d6a1a427e2ff10dec06666760452ce}\index{permessage\_deflate.cpp@{permessage\_deflate.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!permessage\_deflate.cpp@{permessage\_deflate.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [9/43]}}
+{\footnotesize\ttfamily \label{permessage__deflate_8cpp_a83d6a1a427e2ff10dec06666760452ce} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{enabled\+\_\+is\+\_\+enabled}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{permessage__deflate_8cpp_source_l00071}{71}} of file \mbox{\hyperlink{permessage__deflate_8cpp_source}{permessage\+\_\+deflate.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00072\ \ \ \ \ \mbox{\hyperlink{structext__vars}{ext\_vars}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{00073\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.is\_implemented()\ );}
+\DoxyCodeLine{00074\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.extc.is\_implemented()\ );}
+\DoxyCodeLine{00075\ \}}
+
+\end{DoxyCode}
+\Hypertarget{permessage__deflate_8cpp_a3894958dd4b65726c41a8784c37796d2}\index{permessage\_deflate.cpp@{permessage\_deflate.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!permessage\_deflate.cpp@{permessage\_deflate.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [10/43]}}
+{\footnotesize\ttfamily \label{permessage__deflate_8cpp_a3894958dd4b65726c41a8784c37796d2} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{enabled\+\_\+starts\+\_\+disabled}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{permessage__deflate_8cpp_source_l00078}{78}} of file \mbox{\hyperlink{permessage__deflate_8cpp_source}{permessage\+\_\+deflate.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00079\ \ \ \ \ \mbox{\hyperlink{structext__vars}{ext\_vars}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{00080\ \ \ \ \ BOOST\_CHECK(\ !\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.is\_enabled()\ );}
+\DoxyCodeLine{00081\ \ \ \ \ BOOST\_CHECK(\ !\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.extc.is\_enabled()\ );}
+\DoxyCodeLine{00082\ \}}
+
+\end{DoxyCode}
+\Hypertarget{permessage__deflate_8cpp_a3e00f4fd25358a12420335d5ab2c9677}\index{permessage\_deflate.cpp@{permessage\_deflate.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!permessage\_deflate.cpp@{permessage\_deflate.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [11/43]}}
+{\footnotesize\ttfamily \label{permessage__deflate_8cpp_a3e00f4fd25358a12420335d5ab2c9677} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{invalid\+\_\+set\+\_\+client\+\_\+max\+\_\+window\+\_\+bits}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{permessage__deflate_8cpp_source_l00304}{304}} of file \mbox{\hyperlink{permessage__deflate_8cpp_source}{permessage\+\_\+deflate.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00304\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00305\ \ \ \ \ \mbox{\hyperlink{structext__vars}{ext\_vars}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{00306\ }
+\DoxyCodeLine{00307\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.ec\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.set\_client\_max\_window\_bits(7,\mbox{\hyperlink{namespacewebsocketpp_1_1extensions_1_1permessage__deflate_1_1mode_ae06aef93260cb0b5f5bd729a82564120af37f3279b22c67273d84c30811f4d3a4}{pmd\_mode::decline}});}
+\DoxyCodeLine{00308\ \ \ \ \ BOOST\_CHECK\_EQUAL(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.ec,\mbox{\hyperlink{namespacewebsocketpp_1_1extensions_1_1permessage__deflate_1_1error_a9e955844ce4acf0ade5425c98af861ce}{pmde::make\_error\_code}}(\mbox{\hyperlink{namespacewebsocketpp_1_1extensions_1_1permessage__deflate_1_1error_a38e53d7586dd60059cc99a5833bbe54ea23eace97896da0a8136d213fb1e4e987}{pmde::invalid\_max\_window\_bits}}));}
+\DoxyCodeLine{00309\ }
+\DoxyCodeLine{00310\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.ec\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.set\_client\_max\_window\_bits(16,\mbox{\hyperlink{namespacewebsocketpp_1_1extensions_1_1permessage__deflate_1_1mode_ae06aef93260cb0b5f5bd729a82564120af37f3279b22c67273d84c30811f4d3a4}{pmd\_mode::decline}});}
+\DoxyCodeLine{00311\ \ \ \ \ BOOST\_CHECK\_EQUAL(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.ec,\mbox{\hyperlink{namespacewebsocketpp_1_1extensions_1_1permessage__deflate_1_1error_a9e955844ce4acf0ade5425c98af861ce}{pmde::make\_error\_code}}(\mbox{\hyperlink{namespacewebsocketpp_1_1extensions_1_1permessage__deflate_1_1error_a38e53d7586dd60059cc99a5833bbe54ea23eace97896da0a8136d213fb1e4e987}{pmde::invalid\_max\_window\_bits}}));}
+\DoxyCodeLine{00312\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{permessage__deflate_8cpp_a3e00f4fd25358a12420335d5ab2c9677_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{permessage__deflate_8cpp_ad7ab55a77fb3a79268c28792be9f55de}\index{permessage\_deflate.cpp@{permessage\_deflate.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!permessage\_deflate.cpp@{permessage\_deflate.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [12/43]}}
+{\footnotesize\ttfamily \label{permessage__deflate_8cpp_ad7ab55a77fb3a79268c28792be9f55de} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{invalid\+\_\+set\+\_\+server\+\_\+max\+\_\+window\+\_\+bits}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{permessage__deflate_8cpp_source_l00204}{204}} of file \mbox{\hyperlink{permessage__deflate_8cpp_source}{permessage\+\_\+deflate.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00205\ \ \ \ \ \mbox{\hyperlink{structext__vars}{ext\_vars}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{00206\ }
+\DoxyCodeLine{00207\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.ec\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.set\_server\_max\_window\_bits(7,\mbox{\hyperlink{namespacewebsocketpp_1_1extensions_1_1permessage__deflate_1_1mode_ae06aef93260cb0b5f5bd729a82564120af37f3279b22c67273d84c30811f4d3a4}{pmd\_mode::decline}});}
+\DoxyCodeLine{00208\ \ \ \ \ BOOST\_CHECK\_EQUAL(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.ec,\mbox{\hyperlink{namespacewebsocketpp_1_1extensions_1_1permessage__deflate_1_1error_a9e955844ce4acf0ade5425c98af861ce}{pmde::make\_error\_code}}(\mbox{\hyperlink{namespacewebsocketpp_1_1extensions_1_1permessage__deflate_1_1error_a38e53d7586dd60059cc99a5833bbe54ea23eace97896da0a8136d213fb1e4e987}{pmde::invalid\_max\_window\_bits}}));}
+\DoxyCodeLine{00209\ }
+\DoxyCodeLine{00210\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.ec\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.set\_server\_max\_window\_bits(16,\mbox{\hyperlink{namespacewebsocketpp_1_1extensions_1_1permessage__deflate_1_1mode_ae06aef93260cb0b5f5bd729a82564120af37f3279b22c67273d84c30811f4d3a4}{pmd\_mode::decline}});}
+\DoxyCodeLine{00211\ \ \ \ \ BOOST\_CHECK\_EQUAL(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.ec,\mbox{\hyperlink{namespacewebsocketpp_1_1extensions_1_1permessage__deflate_1_1error_a9e955844ce4acf0ade5425c98af861ce}{pmde::make\_error\_code}}(\mbox{\hyperlink{namespacewebsocketpp_1_1extensions_1_1permessage__deflate_1_1error_a38e53d7586dd60059cc99a5833bbe54ea23eace97896da0a8136d213fb1e4e987}{pmde::invalid\_max\_window\_bits}}));}
+\DoxyCodeLine{00212\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{permessage__deflate_8cpp_ad7ab55a77fb3a79268c28792be9f55de_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{permessage__deflate_8cpp_a939579452e7f936f83009ce2fb347207}\index{permessage\_deflate.cpp@{permessage\_deflate.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!permessage\_deflate.cpp@{permessage\_deflate.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [13/43]}}
+{\footnotesize\ttfamily \label{permessage__deflate_8cpp_a939579452e7f936f83009ce2fb347207} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{negotiate\+\_\+client\+\_\+max\+\_\+window\+\_\+bits\+\_\+accept}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{permessage__deflate_8cpp_source_l00326}{326}} of file \mbox{\hyperlink{permessage__deflate_8cpp_source}{permessage\+\_\+deflate.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00326\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00327\ \ \ \ \ \mbox{\hyperlink{structext__vars}{ext\_vars}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{00328\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr[\textcolor{stringliteral}{"{}client\_max\_window\_bits"{}}]\ =\ \textcolor{stringliteral}{"{}8"{}};}
+\DoxyCodeLine{00329\ }
+\DoxyCodeLine{00330\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.ec\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.set\_client\_max\_window\_bits(15,\mbox{\hyperlink{namespacewebsocketpp_1_1extensions_1_1permessage__deflate_1_1mode_ae06aef93260cb0b5f5bd729a82564120ac001b9dafe12f8f4f812588d9c41e9da}{pmd\_mode::accept}});}
+\DoxyCodeLine{00331\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.negotiate(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr);}
+\DoxyCodeLine{00332\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.is\_enabled()\ );}
+\DoxyCodeLine{00333\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.ec,\ websocketpp::lib::error\_code()\ );}
+\DoxyCodeLine{00334\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.first,\ websocketpp::lib::error\_code()\ );}
+\DoxyCodeLine{00335\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.second,\ \textcolor{stringliteral}{"{}permessage-\/deflate;\ client\_max\_window\_bits=8"{}});}
+\DoxyCodeLine{00336\ \}}
+
+\end{DoxyCode}
+\Hypertarget{permessage__deflate_8cpp_a58999e295854f178bd61ef4722976a7a}\index{permessage\_deflate.cpp@{permessage\_deflate.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!permessage\_deflate.cpp@{permessage\_deflate.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [14/43]}}
+{\footnotesize\ttfamily \label{permessage__deflate_8cpp_a58999e295854f178bd61ef4722976a7a} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{negotiate\+\_\+client\+\_\+max\+\_\+window\+\_\+bits\+\_\+decline}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{permessage__deflate_8cpp_source_l00314}{314}} of file \mbox{\hyperlink{permessage__deflate_8cpp_source}{permessage\+\_\+deflate.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00314\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00315\ \ \ \ \ \mbox{\hyperlink{structext__vars}{ext\_vars}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{00316\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr[\textcolor{stringliteral}{"{}client\_max\_window\_bits"{}}]\ =\ \textcolor{stringliteral}{"{}8"{}};}
+\DoxyCodeLine{00317\ }
+\DoxyCodeLine{00318\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.ec\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.set\_client\_max\_window\_bits(8,\mbox{\hyperlink{namespacewebsocketpp_1_1extensions_1_1permessage__deflate_1_1mode_ae06aef93260cb0b5f5bd729a82564120af37f3279b22c67273d84c30811f4d3a4}{pmd\_mode::decline}});}
+\DoxyCodeLine{00319\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.negotiate(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr);}
+\DoxyCodeLine{00320\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.is\_enabled()\ );}
+\DoxyCodeLine{00321\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.ec,\ websocketpp::lib::error\_code()\ );}
+\DoxyCodeLine{00322\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.first,\ websocketpp::lib::error\_code()\ );}
+\DoxyCodeLine{00323\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.second,\ \textcolor{stringliteral}{"{}permessage-\/deflate"{}});}
+\DoxyCodeLine{00324\ \}}
+
+\end{DoxyCode}
+\Hypertarget{permessage__deflate_8cpp_ad223abf7aa52e86bc00c8b8ff3d57746}\index{permessage\_deflate.cpp@{permessage\_deflate.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!permessage\_deflate.cpp@{permessage\_deflate.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [15/43]}}
+{\footnotesize\ttfamily \label{permessage__deflate_8cpp_ad223abf7aa52e86bc00c8b8ff3d57746} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{negotiate\+\_\+client\+\_\+max\+\_\+window\+\_\+bits\+\_\+invalid}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{permessage__deflate_8cpp_source_l00263}{263}} of file \mbox{\hyperlink{permessage__deflate_8cpp_source}{permessage\+\_\+deflate.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00263\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00264\ \ \ \ \ \mbox{\hyperlink{structext__vars}{ext\_vars}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{00265\ }
+\DoxyCodeLine{00266\ \ \ \ \ std::vector<std::string>\ \mbox{\hyperlink{namespace_catch_1_1_generators_aff55717239311a0e8352a4de5d29967f}{values}};}
+\DoxyCodeLine{00267\ \ \ \ \ \mbox{\hyperlink{namespace_catch_1_1_generators_aff55717239311a0e8352a4de5d29967f}{values}}.push\_back(\textcolor{stringliteral}{"{}foo"{}});}
+\DoxyCodeLine{00268\ \ \ \ \ \mbox{\hyperlink{namespace_catch_1_1_generators_aff55717239311a0e8352a4de5d29967f}{values}}.push\_back(\textcolor{stringliteral}{"{}7"{}});}
+\DoxyCodeLine{00269\ \ \ \ \ \mbox{\hyperlink{namespace_catch_1_1_generators_aff55717239311a0e8352a4de5d29967f}{values}}.push\_back(\textcolor{stringliteral}{"{}16"{}});}
+\DoxyCodeLine{00270\ }
+\DoxyCodeLine{00271\ \ \ \ \ std::vector<std::string>::const\_iterator\ it;}
+\DoxyCodeLine{00272\ \ \ \ \ \textcolor{keywordflow}{for}\ (it\ =\ \mbox{\hyperlink{namespace_catch_1_1_generators_aff55717239311a0e8352a4de5d29967f}{values}}.begin();\ it\ !=\ \mbox{\hyperlink{namespace_catch_1_1_generators_aff55717239311a0e8352a4de5d29967f}{values}}.end();\ ++it)\ \{}
+\DoxyCodeLine{00273\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr[\textcolor{stringliteral}{"{}client\_max\_window\_bits"{}}]\ =\ *it;}
+\DoxyCodeLine{00274\ }
+\DoxyCodeLine{00275\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.negotiate(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr);}
+\DoxyCodeLine{00276\ \ \ \ \ \ \ \ \ BOOST\_CHECK(\ !\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.is\_enabled()\ );}
+\DoxyCodeLine{00277\ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.first,\ \mbox{\hyperlink{namespacewebsocketpp_1_1extensions_1_1permessage__deflate_1_1error_a9e955844ce4acf0ade5425c98af861ce}{pmde::make\_error\_code}}(\mbox{\hyperlink{namespacewebsocketpp_1_1extensions_1_1permessage__deflate_1_1error_a38e53d7586dd60059cc99a5833bbe54ea5554d2f18722ee4c2a4c58bf7ffae079}{pmde::invalid\_attribute\_value}})\ );}
+\DoxyCodeLine{00278\ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.second,\ \textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{00279\ \ \ \ \ \}}
+\DoxyCodeLine{00280\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{permessage__deflate_8cpp_ad223abf7aa52e86bc00c8b8ff3d57746_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{permessage__deflate_8cpp_a5cc5e123c421c8770c06a0f9832886a8}\index{permessage\_deflate.cpp@{permessage\_deflate.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!permessage\_deflate.cpp@{permessage\_deflate.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [16/43]}}
+{\footnotesize\ttfamily \label{permessage__deflate_8cpp_a5cc5e123c421c8770c06a0f9832886a8} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{negotiate\+\_\+client\+\_\+max\+\_\+window\+\_\+bits\+\_\+largest}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{permessage__deflate_8cpp_source_l00338}{338}} of file \mbox{\hyperlink{permessage__deflate_8cpp_source}{permessage\+\_\+deflate.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00338\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00339\ \ \ \ \ \mbox{\hyperlink{structext__vars}{ext\_vars}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{00340\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr[\textcolor{stringliteral}{"{}client\_max\_window\_bits"{}}]\ =\ \textcolor{stringliteral}{"{}8"{}};}
+\DoxyCodeLine{00341\ }
+\DoxyCodeLine{00342\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.ec\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.set\_client\_max\_window\_bits(15,\mbox{\hyperlink{namespacewebsocketpp_1_1extensions_1_1permessage__deflate_1_1mode_ae06aef93260cb0b5f5bd729a82564120af2f3ee153c2edcb52b23191ff6ff4374}{pmd\_mode::largest}});}
+\DoxyCodeLine{00343\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.negotiate(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr);}
+\DoxyCodeLine{00344\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.is\_enabled()\ );}
+\DoxyCodeLine{00345\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.ec,\ websocketpp::lib::error\_code()\ );}
+\DoxyCodeLine{00346\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.first,\ websocketpp::lib::error\_code()\ );}
+\DoxyCodeLine{00347\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.second,\ \textcolor{stringliteral}{"{}permessage-\/deflate;\ client\_max\_window\_bits=8"{}});}
+\DoxyCodeLine{00348\ \}}
+
+\end{DoxyCode}
+\Hypertarget{permessage__deflate_8cpp_a80dd194417464d3cde1ed1f96fdfa73a}\index{permessage\_deflate.cpp@{permessage\_deflate.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!permessage\_deflate.cpp@{permessage\_deflate.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [17/43]}}
+{\footnotesize\ttfamily \label{permessage__deflate_8cpp_a80dd194417464d3cde1ed1f96fdfa73a} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{negotiate\+\_\+client\+\_\+max\+\_\+window\+\_\+bits\+\_\+smallest}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{permessage__deflate_8cpp_source_l00350}{350}} of file \mbox{\hyperlink{permessage__deflate_8cpp_source}{permessage\+\_\+deflate.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00350\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00351\ \ \ \ \ \mbox{\hyperlink{structext__vars}{ext\_vars}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{00352\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr[\textcolor{stringliteral}{"{}client\_max\_window\_bits"{}}]\ =\ \textcolor{stringliteral}{"{}8"{}};}
+\DoxyCodeLine{00353\ }
+\DoxyCodeLine{00354\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.ec\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.set\_client\_max\_window\_bits(15,\mbox{\hyperlink{namespacewebsocketpp_1_1extensions_1_1permessage__deflate_1_1mode_ae06aef93260cb0b5f5bd729a82564120ae726aa33271e359a9256338cc23881af}{pmd\_mode::smallest}});}
+\DoxyCodeLine{00355\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.negotiate(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr);}
+\DoxyCodeLine{00356\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.is\_enabled()\ );}
+\DoxyCodeLine{00357\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.ec,\ websocketpp::lib::error\_code()\ );}
+\DoxyCodeLine{00358\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.first,\ websocketpp::lib::error\_code()\ );}
+\DoxyCodeLine{00359\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.second,\ \textcolor{stringliteral}{"{}permessage-\/deflate;\ client\_max\_window\_bits=8"{}});}
+\DoxyCodeLine{00360\ \}}
+
+\end{DoxyCode}
+\Hypertarget{permessage__deflate_8cpp_adcdd0e78d39a296506c97d566ce69d30}\index{permessage\_deflate.cpp@{permessage\_deflate.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!permessage\_deflate.cpp@{permessage\_deflate.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [18/43]}}
+{\footnotesize\ttfamily \label{permessage__deflate_8cpp_adcdd0e78d39a296506c97d566ce69d30} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{negotiate\+\_\+client\+\_\+max\+\_\+window\+\_\+bits\+\_\+valid}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{permessage__deflate_8cpp_source_l00282}{282}} of file \mbox{\hyperlink{permessage__deflate_8cpp_source}{permessage\+\_\+deflate.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00282\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00283\ \ \ \ \ \mbox{\hyperlink{structext__vars}{ext\_vars}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{00284\ }
+\DoxyCodeLine{00285\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr[\textcolor{stringliteral}{"{}client\_max\_window\_bits"{}}].clear();}
+\DoxyCodeLine{00286\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.negotiate(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr);}
+\DoxyCodeLine{00287\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.is\_enabled()\ );}
+\DoxyCodeLine{00288\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.first,\ websocketpp::lib::error\_code()\ );}
+\DoxyCodeLine{00289\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.second,\ \textcolor{stringliteral}{"{}permessage-\/deflate"{}});}
+\DoxyCodeLine{00290\ }
+\DoxyCodeLine{00291\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr[\textcolor{stringliteral}{"{}client\_max\_window\_bits"{}}]\ =\ \textcolor{stringliteral}{"{}8"{}};}
+\DoxyCodeLine{00292\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.negotiate(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr);}
+\DoxyCodeLine{00293\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.is\_enabled()\ );}
+\DoxyCodeLine{00294\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.first,\ websocketpp::lib::error\_code()\ );}
+\DoxyCodeLine{00295\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.second,\ \textcolor{stringliteral}{"{}permessage-\/deflate;\ client\_max\_window\_bits=8"{}});}
+\DoxyCodeLine{00296\ }
+\DoxyCodeLine{00297\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr[\textcolor{stringliteral}{"{}client\_max\_window\_bits"{}}]\ =\ \textcolor{stringliteral}{"{}15"{}};}
+\DoxyCodeLine{00298\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.negotiate(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr);}
+\DoxyCodeLine{00299\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.is\_enabled()\ );}
+\DoxyCodeLine{00300\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.first,\ websocketpp::lib::error\_code()\ );}
+\DoxyCodeLine{00301\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.second,\ \textcolor{stringliteral}{"{}permessage-\/deflate"{}});}
+\DoxyCodeLine{00302\ \}}
+
+\end{DoxyCode}
+\Hypertarget{permessage__deflate_8cpp_a51fe0c73fe2cfbe2bd89f096175395fe}\index{permessage\_deflate.cpp@{permessage\_deflate.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!permessage\_deflate.cpp@{permessage\_deflate.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [19/43]}}
+{\footnotesize\ttfamily \label{permessage__deflate_8cpp_a51fe0c73fe2cfbe2bd89f096175395fe} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{negotiate\+\_\+client\+\_\+no\+\_\+context\+\_\+takeover}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{permessage__deflate_8cpp_source_l00145}{145}} of file \mbox{\hyperlink{permessage__deflate_8cpp_source}{permessage\+\_\+deflate.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00146\ \ \ \ \ \mbox{\hyperlink{structext__vars}{ext\_vars}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{00147\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr[\textcolor{stringliteral}{"{}client\_no\_context\_takeover"{}}].clear();}
+\DoxyCodeLine{00148\ }
+\DoxyCodeLine{00149\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.negotiate(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr);}
+\DoxyCodeLine{00150\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.is\_enabled()\ );}
+\DoxyCodeLine{00151\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.first,\ websocketpp::lib::error\_code()\ );}
+\DoxyCodeLine{00152\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.second,\ \textcolor{stringliteral}{"{}permessage-\/deflate;\ client\_no\_context\_takeover"{}});}
+\DoxyCodeLine{00153\ \}}
+
+\end{DoxyCode}
+\Hypertarget{permessage__deflate_8cpp_afaa35febd6787f28de059e10ae72af44}\index{permessage\_deflate.cpp@{permessage\_deflate.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!permessage\_deflate.cpp@{permessage\_deflate.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [20/43]}}
+{\footnotesize\ttfamily \label{permessage__deflate_8cpp_afaa35febd6787f28de059e10ae72af44} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{negotiate\+\_\+client\+\_\+no\+\_\+context\+\_\+takeover\+\_\+invalid}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{permessage__deflate_8cpp_source_l00135}{135}} of file \mbox{\hyperlink{permessage__deflate_8cpp_source}{permessage\+\_\+deflate.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00136\ \ \ \ \ \mbox{\hyperlink{structext__vars}{ext\_vars}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{00137\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr[\textcolor{stringliteral}{"{}client\_no\_context\_takeover"{}}]\ =\ \textcolor{stringliteral}{"{}foo"{}};}
+\DoxyCodeLine{00138\ }
+\DoxyCodeLine{00139\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.negotiate(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr);}
+\DoxyCodeLine{00140\ \ \ \ \ BOOST\_CHECK(\ !\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.is\_enabled()\ );}
+\DoxyCodeLine{00141\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.first,\ \mbox{\hyperlink{namespacewebsocketpp_1_1extensions_1_1permessage__deflate_1_1error_a9e955844ce4acf0ade5425c98af861ce}{pmde::make\_error\_code}}(\mbox{\hyperlink{namespacewebsocketpp_1_1extensions_1_1permessage__deflate_1_1error_a38e53d7586dd60059cc99a5833bbe54ea5554d2f18722ee4c2a4c58bf7ffae079}{pmde::invalid\_attribute\_value}})\ );}
+\DoxyCodeLine{00142\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.second,\ \textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{00143\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{permessage__deflate_8cpp_afaa35febd6787f28de059e10ae72af44_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{permessage__deflate_8cpp_a16ef13537277adfd5c71d68ebd1c972a}\index{permessage\_deflate.cpp@{permessage\_deflate.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!permessage\_deflate.cpp@{permessage\_deflate.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [21/43]}}
+{\footnotesize\ttfamily \label{permessage__deflate_8cpp_a16ef13537277adfd5c71d68ebd1c972a} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{negotiate\+\_\+client\+\_\+no\+\_\+context\+\_\+takeover\+\_\+server\+\_\+initiated}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{permessage__deflate_8cpp_source_l00155}{155}} of file \mbox{\hyperlink{permessage__deflate_8cpp_source}{permessage\+\_\+deflate.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00156\ \ \ \ \ \mbox{\hyperlink{structext__vars}{ext\_vars}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{00157\ }
+\DoxyCodeLine{00158\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.enable\_client\_no\_context\_takeover();}
+\DoxyCodeLine{00159\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.negotiate(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr);}
+\DoxyCodeLine{00160\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.is\_enabled()\ );}
+\DoxyCodeLine{00161\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.first,\ websocketpp::lib::error\_code()\ );}
+\DoxyCodeLine{00162\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.second,\ \textcolor{stringliteral}{"{}permessage-\/deflate;\ client\_no\_context\_takeover"{}});}
+\DoxyCodeLine{00163\ \}}
+
+\end{DoxyCode}
+\Hypertarget{permessage__deflate_8cpp_abae413a4e24e198c9e08a9d8175b7d25}\index{permessage\_deflate.cpp@{permessage\_deflate.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!permessage\_deflate.cpp@{permessage\_deflate.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [22/43]}}
+{\footnotesize\ttfamily \label{permessage__deflate_8cpp_abae413a4e24e198c9e08a9d8175b7d25} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{negotiate\+\_\+four\+\_\+client\+\_\+initiated}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{permessage__deflate_8cpp_source_l00488}{488}} of file \mbox{\hyperlink{permessage__deflate_8cpp_source}{permessage\+\_\+deflate.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00488\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00489\ \ \ \ \ \mbox{\hyperlink{structext__vars}{ext\_vars}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{00490\ }
+\DoxyCodeLine{00491\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr[\textcolor{stringliteral}{"{}server\_no\_context\_takeover"{}}].clear();}
+\DoxyCodeLine{00492\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr[\textcolor{stringliteral}{"{}client\_no\_context\_takeover"{}}].clear();}
+\DoxyCodeLine{00493\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr[\textcolor{stringliteral}{"{}server\_max\_window\_bits"{}}]\ =\ \textcolor{stringliteral}{"{}10"{}};}
+\DoxyCodeLine{00494\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr[\textcolor{stringliteral}{"{}client\_max\_window\_bits"{}}]\ =\ \textcolor{stringliteral}{"{}10"{}};}
+\DoxyCodeLine{00495\ }
+\DoxyCodeLine{00496\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.negotiate(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr);}
+\DoxyCodeLine{00497\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.is\_enabled()\ );}
+\DoxyCodeLine{00498\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.first,\ websocketpp::lib::error\_code()\ );}
+\DoxyCodeLine{00499\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.second,\ \textcolor{stringliteral}{"{}permessage-\/deflate;\ server\_no\_context\_takeover;\ client\_no\_context\_takeover;\ server\_max\_window\_bits=10;\ client\_max\_window\_bits=10"{}});}
+\DoxyCodeLine{00500\ \}}
+
+\end{DoxyCode}
+\Hypertarget{permessage__deflate_8cpp_ab842a768e457b589bc53b36ba43ed19f}\index{permessage\_deflate.cpp@{permessage\_deflate.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!permessage\_deflate.cpp@{permessage\_deflate.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [23/43]}}
+{\footnotesize\ttfamily \label{permessage__deflate_8cpp_ab842a768e457b589bc53b36ba43ed19f} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{negotiate\+\_\+server\+\_\+max\+\_\+window\+\_\+bits\+\_\+accept}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{permessage__deflate_8cpp_source_l00226}{226}} of file \mbox{\hyperlink{permessage__deflate_8cpp_source}{permessage\+\_\+deflate.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00226\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00227\ \ \ \ \ \mbox{\hyperlink{structext__vars}{ext\_vars}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{00228\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr[\textcolor{stringliteral}{"{}server\_max\_window\_bits"{}}]\ =\ \textcolor{stringliteral}{"{}8"{}};}
+\DoxyCodeLine{00229\ }
+\DoxyCodeLine{00230\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.ec\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.set\_server\_max\_window\_bits(15,\mbox{\hyperlink{namespacewebsocketpp_1_1extensions_1_1permessage__deflate_1_1mode_ae06aef93260cb0b5f5bd729a82564120ac001b9dafe12f8f4f812588d9c41e9da}{pmd\_mode::accept}});}
+\DoxyCodeLine{00231\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.negotiate(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr);}
+\DoxyCodeLine{00232\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.is\_enabled()\ );}
+\DoxyCodeLine{00233\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.ec,\ websocketpp::lib::error\_code()\ );}
+\DoxyCodeLine{00234\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.first,\ websocketpp::lib::error\_code()\ );}
+\DoxyCodeLine{00235\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.second,\ \textcolor{stringliteral}{"{}permessage-\/deflate;\ server\_max\_window\_bits=8"{}});}
+\DoxyCodeLine{00236\ \}}
+
+\end{DoxyCode}
+\Hypertarget{permessage__deflate_8cpp_af10f15d8b86a0665b16f3fd34fe208d3}\index{permessage\_deflate.cpp@{permessage\_deflate.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!permessage\_deflate.cpp@{permessage\_deflate.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [24/43]}}
+{\footnotesize\ttfamily \label{permessage__deflate_8cpp_af10f15d8b86a0665b16f3fd34fe208d3} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{negotiate\+\_\+server\+\_\+max\+\_\+window\+\_\+bits\+\_\+decline}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{permessage__deflate_8cpp_source_l00214}{214}} of file \mbox{\hyperlink{permessage__deflate_8cpp_source}{permessage\+\_\+deflate.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00215\ \ \ \ \ \mbox{\hyperlink{structext__vars}{ext\_vars}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{00216\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr[\textcolor{stringliteral}{"{}server\_max\_window\_bits"{}}]\ =\ \textcolor{stringliteral}{"{}8"{}};}
+\DoxyCodeLine{00217\ }
+\DoxyCodeLine{00218\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.ec\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.set\_server\_max\_window\_bits(15,\mbox{\hyperlink{namespacewebsocketpp_1_1extensions_1_1permessage__deflate_1_1mode_ae06aef93260cb0b5f5bd729a82564120af37f3279b22c67273d84c30811f4d3a4}{pmd\_mode::decline}});}
+\DoxyCodeLine{00219\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.negotiate(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr);}
+\DoxyCodeLine{00220\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.is\_enabled()\ );}
+\DoxyCodeLine{00221\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.ec,\ websocketpp::lib::error\_code()\ );}
+\DoxyCodeLine{00222\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.first,\ websocketpp::lib::error\_code()\ );}
+\DoxyCodeLine{00223\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.second,\ \textcolor{stringliteral}{"{}permessage-\/deflate"{}});}
+\DoxyCodeLine{00224\ \}}
+
+\end{DoxyCode}
+\Hypertarget{permessage__deflate_8cpp_a01ff9e0f1795c4e046897d30c5f74fdd}\index{permessage\_deflate.cpp@{permessage\_deflate.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!permessage\_deflate.cpp@{permessage\_deflate.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [25/43]}}
+{\footnotesize\ttfamily \label{permessage__deflate_8cpp_a01ff9e0f1795c4e046897d30c5f74fdd} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{negotiate\+\_\+server\+\_\+max\+\_\+window\+\_\+bits\+\_\+invalid}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{permessage__deflate_8cpp_source_l00167}{167}} of file \mbox{\hyperlink{permessage__deflate_8cpp_source}{permessage\+\_\+deflate.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00168\ \ \ \ \ \mbox{\hyperlink{structext__vars}{ext\_vars}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{00169\ }
+\DoxyCodeLine{00170\ \ \ \ \ std::vector<std::string>\ \mbox{\hyperlink{namespace_catch_1_1_generators_aff55717239311a0e8352a4de5d29967f}{values}};}
+\DoxyCodeLine{00171\ \ \ \ \ \mbox{\hyperlink{namespace_catch_1_1_generators_aff55717239311a0e8352a4de5d29967f}{values}}.push\_back(\textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{00172\ \ \ \ \ \mbox{\hyperlink{namespace_catch_1_1_generators_aff55717239311a0e8352a4de5d29967f}{values}}.push\_back(\textcolor{stringliteral}{"{}foo"{}});}
+\DoxyCodeLine{00173\ \ \ \ \ \mbox{\hyperlink{namespace_catch_1_1_generators_aff55717239311a0e8352a4de5d29967f}{values}}.push\_back(\textcolor{stringliteral}{"{}7"{}});}
+\DoxyCodeLine{00174\ \ \ \ \ \mbox{\hyperlink{namespace_catch_1_1_generators_aff55717239311a0e8352a4de5d29967f}{values}}.push\_back(\textcolor{stringliteral}{"{}16"{}});}
+\DoxyCodeLine{00175\ }
+\DoxyCodeLine{00176\ \ \ \ \ std::vector<std::string>::const\_iterator\ it;}
+\DoxyCodeLine{00177\ \ \ \ \ \textcolor{keywordflow}{for}\ (it\ =\ \mbox{\hyperlink{namespace_catch_1_1_generators_aff55717239311a0e8352a4de5d29967f}{values}}.begin();\ it\ !=\ \mbox{\hyperlink{namespace_catch_1_1_generators_aff55717239311a0e8352a4de5d29967f}{values}}.end();\ ++it)\ \{}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr[\textcolor{stringliteral}{"{}server\_max\_window\_bits"{}}]\ =\ *it;}
+\DoxyCodeLine{00179\ }
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.negotiate(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr);}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ BOOST\_CHECK(\ !\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.is\_enabled()\ );}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.first,\ \mbox{\hyperlink{namespacewebsocketpp_1_1extensions_1_1permessage__deflate_1_1error_a9e955844ce4acf0ade5425c98af861ce}{pmde::make\_error\_code}}(\mbox{\hyperlink{namespacewebsocketpp_1_1extensions_1_1permessage__deflate_1_1error_a38e53d7586dd60059cc99a5833bbe54ea5554d2f18722ee4c2a4c58bf7ffae079}{pmde::invalid\_attribute\_value}})\ );}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.second,\ \textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{00184\ \ \ \ \ \}}
+\DoxyCodeLine{00185\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{permessage__deflate_8cpp_a01ff9e0f1795c4e046897d30c5f74fdd_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{permessage__deflate_8cpp_a092d23db7da1315d1c7aac74643cd653}\index{permessage\_deflate.cpp@{permessage\_deflate.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!permessage\_deflate.cpp@{permessage\_deflate.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [26/43]}}
+{\footnotesize\ttfamily \label{permessage__deflate_8cpp_a092d23db7da1315d1c7aac74643cd653} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{negotiate\+\_\+server\+\_\+max\+\_\+window\+\_\+bits\+\_\+largest}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{permessage__deflate_8cpp_source_l00238}{238}} of file \mbox{\hyperlink{permessage__deflate_8cpp_source}{permessage\+\_\+deflate.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00238\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00239\ \ \ \ \ \mbox{\hyperlink{structext__vars}{ext\_vars}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{00240\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr[\textcolor{stringliteral}{"{}server\_max\_window\_bits"{}}]\ =\ \textcolor{stringliteral}{"{}8"{}};}
+\DoxyCodeLine{00241\ }
+\DoxyCodeLine{00242\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.ec\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.set\_server\_max\_window\_bits(15,\mbox{\hyperlink{namespacewebsocketpp_1_1extensions_1_1permessage__deflate_1_1mode_ae06aef93260cb0b5f5bd729a82564120af2f3ee153c2edcb52b23191ff6ff4374}{pmd\_mode::largest}});}
+\DoxyCodeLine{00243\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.negotiate(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr);}
+\DoxyCodeLine{00244\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.is\_enabled()\ );}
+\DoxyCodeLine{00245\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.ec,\ websocketpp::lib::error\_code()\ );}
+\DoxyCodeLine{00246\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.first,\ websocketpp::lib::error\_code()\ );}
+\DoxyCodeLine{00247\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.second,\ \textcolor{stringliteral}{"{}permessage-\/deflate;\ server\_max\_window\_bits=8"{}});}
+\DoxyCodeLine{00248\ \}}
+
+\end{DoxyCode}
+\Hypertarget{permessage__deflate_8cpp_a2f230c5ff8f482b37010960b0c64e513}\index{permessage\_deflate.cpp@{permessage\_deflate.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!permessage\_deflate.cpp@{permessage\_deflate.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [27/43]}}
+{\footnotesize\ttfamily \label{permessage__deflate_8cpp_a2f230c5ff8f482b37010960b0c64e513} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{negotiate\+\_\+server\+\_\+max\+\_\+window\+\_\+bits\+\_\+smallest}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{permessage__deflate_8cpp_source_l00250}{250}} of file \mbox{\hyperlink{permessage__deflate_8cpp_source}{permessage\+\_\+deflate.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00250\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00251\ \ \ \ \ \mbox{\hyperlink{structext__vars}{ext\_vars}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{00252\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr[\textcolor{stringliteral}{"{}server\_max\_window\_bits"{}}]\ =\ \textcolor{stringliteral}{"{}8"{}};}
+\DoxyCodeLine{00253\ }
+\DoxyCodeLine{00254\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.ec\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.set\_server\_max\_window\_bits(15,\mbox{\hyperlink{namespacewebsocketpp_1_1extensions_1_1permessage__deflate_1_1mode_ae06aef93260cb0b5f5bd729a82564120ae726aa33271e359a9256338cc23881af}{pmd\_mode::smallest}});}
+\DoxyCodeLine{00255\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.negotiate(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr);}
+\DoxyCodeLine{00256\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.is\_enabled()\ );}
+\DoxyCodeLine{00257\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.ec,\ websocketpp::lib::error\_code()\ );}
+\DoxyCodeLine{00258\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.first,\ websocketpp::lib::error\_code()\ );}
+\DoxyCodeLine{00259\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.second,\ \textcolor{stringliteral}{"{}permessage-\/deflate;\ server\_max\_window\_bits=8"{}});}
+\DoxyCodeLine{00260\ \}}
+
+\end{DoxyCode}
+\Hypertarget{permessage__deflate_8cpp_a29d2b1927aabe31ddfa68d8f2915d77f}\index{permessage\_deflate.cpp@{permessage\_deflate.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!permessage\_deflate.cpp@{permessage\_deflate.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [28/43]}}
+{\footnotesize\ttfamily \label{permessage__deflate_8cpp_a29d2b1927aabe31ddfa68d8f2915d77f} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{negotiate\+\_\+server\+\_\+max\+\_\+window\+\_\+bits\+\_\+valid}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{permessage__deflate_8cpp_source_l00187}{187}} of file \mbox{\hyperlink{permessage__deflate_8cpp_source}{permessage\+\_\+deflate.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00188\ \ \ \ \ \mbox{\hyperlink{structext__vars}{ext\_vars}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{00189\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr[\textcolor{stringliteral}{"{}server\_max\_window\_bits"{}}]\ =\ \textcolor{stringliteral}{"{}8"{}};}
+\DoxyCodeLine{00190\ }
+\DoxyCodeLine{00191\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.negotiate(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr);}
+\DoxyCodeLine{00192\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.is\_enabled()\ );}
+\DoxyCodeLine{00193\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.first,\ websocketpp::lib::error\_code()\ );}
+\DoxyCodeLine{00194\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.second,\ \textcolor{stringliteral}{"{}permessage-\/deflate;\ server\_max\_window\_bits=8"{}});}
+\DoxyCodeLine{00195\ }
+\DoxyCodeLine{00196\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr[\textcolor{stringliteral}{"{}server\_max\_window\_bits"{}}]\ =\ \textcolor{stringliteral}{"{}15"{}};}
+\DoxyCodeLine{00197\ }
+\DoxyCodeLine{00198\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.negotiate(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr);}
+\DoxyCodeLine{00199\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.is\_enabled()\ );}
+\DoxyCodeLine{00200\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.first,\ websocketpp::lib::error\_code()\ );}
+\DoxyCodeLine{00201\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.second,\ \textcolor{stringliteral}{"{}permessage-\/deflate"{}});}
+\DoxyCodeLine{00202\ \}}
+
+\end{DoxyCode}
+\Hypertarget{permessage__deflate_8cpp_a8f9186eb5d4d31e6dc65db1851907991}\index{permessage\_deflate.cpp@{permessage\_deflate.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!permessage\_deflate.cpp@{permessage\_deflate.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [29/43]}}
+{\footnotesize\ttfamily \label{permessage__deflate_8cpp_a8f9186eb5d4d31e6dc65db1851907991} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{negotiate\+\_\+server\+\_\+no\+\_\+context\+\_\+takeover}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{permessage__deflate_8cpp_source_l00114}{114}} of file \mbox{\hyperlink{permessage__deflate_8cpp_source}{permessage\+\_\+deflate.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00115\ \ \ \ \ \mbox{\hyperlink{structext__vars}{ext\_vars}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{00116\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr[\textcolor{stringliteral}{"{}server\_no\_context\_takeover"{}}].clear();}
+\DoxyCodeLine{00117\ }
+\DoxyCodeLine{00118\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.negotiate(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr);}
+\DoxyCodeLine{00119\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.is\_enabled()\ );}
+\DoxyCodeLine{00120\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.first,\ websocketpp::lib::error\_code()\ );}
+\DoxyCodeLine{00121\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.second,\ \textcolor{stringliteral}{"{}permessage-\/deflate;\ server\_no\_context\_takeover"{}});}
+\DoxyCodeLine{00122\ \}}
+
+\end{DoxyCode}
+\Hypertarget{permessage__deflate_8cpp_af81b658adce672734b4262a4065003dc}\index{permessage\_deflate.cpp@{permessage\_deflate.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!permessage\_deflate.cpp@{permessage\_deflate.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [30/43]}}
+{\footnotesize\ttfamily \label{permessage__deflate_8cpp_af81b658adce672734b4262a4065003dc} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{negotiate\+\_\+server\+\_\+no\+\_\+context\+\_\+takeover\+\_\+invalid}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{permessage__deflate_8cpp_source_l00104}{104}} of file \mbox{\hyperlink{permessage__deflate_8cpp_source}{permessage\+\_\+deflate.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00105\ \ \ \ \ \mbox{\hyperlink{structext__vars}{ext\_vars}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{00106\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr[\textcolor{stringliteral}{"{}server\_no\_context\_takeover"{}}]\ =\ \textcolor{stringliteral}{"{}foo"{}};}
+\DoxyCodeLine{00107\ }
+\DoxyCodeLine{00108\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.negotiate(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr);}
+\DoxyCodeLine{00109\ \ \ \ \ BOOST\_CHECK(\ !\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.is\_enabled()\ );}
+\DoxyCodeLine{00110\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.first,\ \mbox{\hyperlink{namespacewebsocketpp_1_1extensions_1_1permessage__deflate_1_1error_a9e955844ce4acf0ade5425c98af861ce}{pmde::make\_error\_code}}(\mbox{\hyperlink{namespacewebsocketpp_1_1extensions_1_1permessage__deflate_1_1error_a38e53d7586dd60059cc99a5833bbe54ea5554d2f18722ee4c2a4c58bf7ffae079}{pmde::invalid\_attribute\_value}})\ );}
+\DoxyCodeLine{00111\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.second,\ \textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{00112\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{permessage__deflate_8cpp_af81b658adce672734b4262a4065003dc_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{permessage__deflate_8cpp_a83d5121172749453521988f9cc80b7b0}\index{permessage\_deflate.cpp@{permessage\_deflate.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!permessage\_deflate.cpp@{permessage\_deflate.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [31/43]}}
+{\footnotesize\ttfamily \label{permessage__deflate_8cpp_a83d5121172749453521988f9cc80b7b0} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{negotiate\+\_\+server\+\_\+no\+\_\+context\+\_\+takeover\+\_\+server\+\_\+initiated}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{permessage__deflate_8cpp_source_l00124}{124}} of file \mbox{\hyperlink{permessage__deflate_8cpp_source}{permessage\+\_\+deflate.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00125\ \ \ \ \ \mbox{\hyperlink{structext__vars}{ext\_vars}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{00126\ }
+\DoxyCodeLine{00127\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.enable\_server\_no\_context\_takeover();}
+\DoxyCodeLine{00128\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.negotiate(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr);}
+\DoxyCodeLine{00129\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.is\_enabled()\ );}
+\DoxyCodeLine{00130\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.first,\ websocketpp::lib::error\_code()\ );}
+\DoxyCodeLine{00131\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.second,\ \textcolor{stringliteral}{"{}permessage-\/deflate;\ server\_no\_context\_takeover"{}});}
+\DoxyCodeLine{00132\ \}}
+
+\end{DoxyCode}
+\Hypertarget{permessage__deflate_8cpp_ab199686285ddbc0407a01708de49e19b}\index{permessage\_deflate.cpp@{permessage\_deflate.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!permessage\_deflate.cpp@{permessage\_deflate.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [32/43]}}
+{\footnotesize\ttfamily \label{permessage__deflate_8cpp_ab199686285ddbc0407a01708de49e19b} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{negotiate\+\_\+three\+\_\+client\+\_\+initiated1}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{permessage__deflate_8cpp_source_l00436}{436}} of file \mbox{\hyperlink{permessage__deflate_8cpp_source}{permessage\+\_\+deflate.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00436\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00437\ \ \ \ \ \mbox{\hyperlink{structext__vars}{ext\_vars}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{00438\ }
+\DoxyCodeLine{00439\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr[\textcolor{stringliteral}{"{}server\_no\_context\_takeover"{}}].clear();}
+\DoxyCodeLine{00440\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr[\textcolor{stringliteral}{"{}client\_no\_context\_takeover"{}}].clear();}
+\DoxyCodeLine{00441\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr[\textcolor{stringliteral}{"{}server\_max\_window\_bits"{}}]\ =\ \textcolor{stringliteral}{"{}10"{}};}
+\DoxyCodeLine{00442\ }
+\DoxyCodeLine{00443\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.negotiate(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr);}
+\DoxyCodeLine{00444\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.is\_enabled()\ );}
+\DoxyCodeLine{00445\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.first,\ websocketpp::lib::error\_code()\ );}
+\DoxyCodeLine{00446\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.second,\ \textcolor{stringliteral}{"{}permessage-\/deflate;\ server\_no\_context\_takeover;\ client\_no\_context\_takeover;\ server\_max\_window\_bits=10"{}});}
+\DoxyCodeLine{00447\ \}}
+
+\end{DoxyCode}
+\Hypertarget{permessage__deflate_8cpp_ad92486da6ce840f4635caf0775f14923}\index{permessage\_deflate.cpp@{permessage\_deflate.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!permessage\_deflate.cpp@{permessage\_deflate.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [33/43]}}
+{\footnotesize\ttfamily \label{permessage__deflate_8cpp_ad92486da6ce840f4635caf0775f14923} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{negotiate\+\_\+three\+\_\+client\+\_\+initiated2}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{permessage__deflate_8cpp_source_l00449}{449}} of file \mbox{\hyperlink{permessage__deflate_8cpp_source}{permessage\+\_\+deflate.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00449\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00450\ \ \ \ \ \mbox{\hyperlink{structext__vars}{ext\_vars}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{00451\ }
+\DoxyCodeLine{00452\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr[\textcolor{stringliteral}{"{}server\_no\_context\_takeover"{}}].clear();}
+\DoxyCodeLine{00453\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr[\textcolor{stringliteral}{"{}client\_no\_context\_takeover"{}}].clear();}
+\DoxyCodeLine{00454\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr[\textcolor{stringliteral}{"{}client\_max\_window\_bits"{}}]\ =\ \textcolor{stringliteral}{"{}10"{}};}
+\DoxyCodeLine{00455\ }
+\DoxyCodeLine{00456\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.negotiate(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr);}
+\DoxyCodeLine{00457\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.is\_enabled()\ );}
+\DoxyCodeLine{00458\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.first,\ websocketpp::lib::error\_code()\ );}
+\DoxyCodeLine{00459\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.second,\ \textcolor{stringliteral}{"{}permessage-\/deflate;\ server\_no\_context\_takeover;\ client\_no\_context\_takeover;\ client\_max\_window\_bits=10"{}});}
+\DoxyCodeLine{00460\ \}}
+
+\end{DoxyCode}
+\Hypertarget{permessage__deflate_8cpp_ab8b6dddd5427eda94a3c22e449b92d67}\index{permessage\_deflate.cpp@{permessage\_deflate.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!permessage\_deflate.cpp@{permessage\_deflate.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [34/43]}}
+{\footnotesize\ttfamily \label{permessage__deflate_8cpp_ab8b6dddd5427eda94a3c22e449b92d67} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{negotiate\+\_\+three\+\_\+client\+\_\+initiated3}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{permessage__deflate_8cpp_source_l00462}{462}} of file \mbox{\hyperlink{permessage__deflate_8cpp_source}{permessage\+\_\+deflate.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00462\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00463\ \ \ \ \ \mbox{\hyperlink{structext__vars}{ext\_vars}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{00464\ }
+\DoxyCodeLine{00465\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr[\textcolor{stringliteral}{"{}server\_no\_context\_takeover"{}}].clear();}
+\DoxyCodeLine{00466\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr[\textcolor{stringliteral}{"{}server\_max\_window\_bits"{}}]\ =\ \textcolor{stringliteral}{"{}10"{}};}
+\DoxyCodeLine{00467\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr[\textcolor{stringliteral}{"{}client\_max\_window\_bits"{}}]\ =\ \textcolor{stringliteral}{"{}10"{}};}
+\DoxyCodeLine{00468\ }
+\DoxyCodeLine{00469\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.negotiate(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr);}
+\DoxyCodeLine{00470\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.is\_enabled()\ );}
+\DoxyCodeLine{00471\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.first,\ websocketpp::lib::error\_code()\ );}
+\DoxyCodeLine{00472\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.second,\ \textcolor{stringliteral}{"{}permessage-\/deflate;\ server\_no\_context\_takeover;\ server\_max\_window\_bits=10;\ client\_max\_window\_bits=10"{}});}
+\DoxyCodeLine{00473\ \}}
+
+\end{DoxyCode}
+\Hypertarget{permessage__deflate_8cpp_a6d04d9d8e57d3bb589430f35a590e509}\index{permessage\_deflate.cpp@{permessage\_deflate.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!permessage\_deflate.cpp@{permessage\_deflate.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [35/43]}}
+{\footnotesize\ttfamily \label{permessage__deflate_8cpp_a6d04d9d8e57d3bb589430f35a590e509} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{negotiate\+\_\+three\+\_\+client\+\_\+initiated4}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{permessage__deflate_8cpp_source_l00475}{475}} of file \mbox{\hyperlink{permessage__deflate_8cpp_source}{permessage\+\_\+deflate.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00475\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00476\ \ \ \ \ \mbox{\hyperlink{structext__vars}{ext\_vars}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{00477\ }
+\DoxyCodeLine{00478\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr[\textcolor{stringliteral}{"{}client\_no\_context\_takeover"{}}].clear();}
+\DoxyCodeLine{00479\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr[\textcolor{stringliteral}{"{}server\_max\_window\_bits"{}}]\ =\ \textcolor{stringliteral}{"{}10"{}};}
+\DoxyCodeLine{00480\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr[\textcolor{stringliteral}{"{}client\_max\_window\_bits"{}}]\ =\ \textcolor{stringliteral}{"{}10"{}};}
+\DoxyCodeLine{00481\ }
+\DoxyCodeLine{00482\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.negotiate(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr);}
+\DoxyCodeLine{00483\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.is\_enabled()\ );}
+\DoxyCodeLine{00484\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.first,\ websocketpp::lib::error\_code()\ );}
+\DoxyCodeLine{00485\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.second,\ \textcolor{stringliteral}{"{}permessage-\/deflate;\ client\_no\_context\_takeover;\ server\_max\_window\_bits=10;\ client\_max\_window\_bits=10"{}});}
+\DoxyCodeLine{00486\ \}}
+
+\end{DoxyCode}
+\Hypertarget{permessage__deflate_8cpp_aec7dd507660e453917b3e6c94d214f2d}\index{permessage\_deflate.cpp@{permessage\_deflate.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!permessage\_deflate.cpp@{permessage\_deflate.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [36/43]}}
+{\footnotesize\ttfamily \label{permessage__deflate_8cpp_aec7dd507660e453917b3e6c94d214f2d} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{negotiate\+\_\+two\+\_\+client\+\_\+initiated1}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{permessage__deflate_8cpp_source_l00364}{364}} of file \mbox{\hyperlink{permessage__deflate_8cpp_source}{permessage\+\_\+deflate.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00364\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00365\ \ \ \ \ \mbox{\hyperlink{structext__vars}{ext\_vars}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{00366\ }
+\DoxyCodeLine{00367\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr[\textcolor{stringliteral}{"{}server\_no\_context\_takeover"{}}].clear();}
+\DoxyCodeLine{00368\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr[\textcolor{stringliteral}{"{}client\_no\_context\_takeover"{}}].clear();}
+\DoxyCodeLine{00369\ }
+\DoxyCodeLine{00370\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.negotiate(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr);}
+\DoxyCodeLine{00371\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.is\_enabled()\ );}
+\DoxyCodeLine{00372\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.first,\ websocketpp::lib::error\_code()\ );}
+\DoxyCodeLine{00373\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.second,\ \textcolor{stringliteral}{"{}permessage-\/deflate;\ server\_no\_context\_takeover;\ client\_no\_context\_takeover"{}});}
+\DoxyCodeLine{00374\ \}}
+
+\end{DoxyCode}
+\Hypertarget{permessage__deflate_8cpp_a23670c1d1d6924b97ca6871e383049e5}\index{permessage\_deflate.cpp@{permessage\_deflate.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!permessage\_deflate.cpp@{permessage\_deflate.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [37/43]}}
+{\footnotesize\ttfamily \label{permessage__deflate_8cpp_a23670c1d1d6924b97ca6871e383049e5} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{negotiate\+\_\+two\+\_\+client\+\_\+initiated2}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{permessage__deflate_8cpp_source_l00376}{376}} of file \mbox{\hyperlink{permessage__deflate_8cpp_source}{permessage\+\_\+deflate.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00376\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00377\ \ \ \ \ \mbox{\hyperlink{structext__vars}{ext\_vars}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{00378\ }
+\DoxyCodeLine{00379\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr[\textcolor{stringliteral}{"{}server\_no\_context\_takeover"{}}].clear();}
+\DoxyCodeLine{00380\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr[\textcolor{stringliteral}{"{}server\_max\_window\_bits"{}}]\ =\ \textcolor{stringliteral}{"{}10"{}};}
+\DoxyCodeLine{00381\ }
+\DoxyCodeLine{00382\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.negotiate(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr);}
+\DoxyCodeLine{00383\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.is\_enabled()\ );}
+\DoxyCodeLine{00384\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.first,\ websocketpp::lib::error\_code()\ );}
+\DoxyCodeLine{00385\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.second,\ \textcolor{stringliteral}{"{}permessage-\/deflate;\ server\_no\_context\_takeover;\ server\_max\_window\_bits=10"{}});}
+\DoxyCodeLine{00386\ \}}
+
+\end{DoxyCode}
+\Hypertarget{permessage__deflate_8cpp_a6e11503bcf98cf23f2d27d6fa19aab46}\index{permessage\_deflate.cpp@{permessage\_deflate.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!permessage\_deflate.cpp@{permessage\_deflate.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [38/43]}}
+{\footnotesize\ttfamily \label{permessage__deflate_8cpp_a6e11503bcf98cf23f2d27d6fa19aab46} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{negotiate\+\_\+two\+\_\+client\+\_\+initiated3}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{permessage__deflate_8cpp_source_l00388}{388}} of file \mbox{\hyperlink{permessage__deflate_8cpp_source}{permessage\+\_\+deflate.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00388\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00389\ \ \ \ \ \mbox{\hyperlink{structext__vars}{ext\_vars}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{00390\ }
+\DoxyCodeLine{00391\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr[\textcolor{stringliteral}{"{}server\_no\_context\_takeover"{}}].clear();}
+\DoxyCodeLine{00392\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr[\textcolor{stringliteral}{"{}client\_max\_window\_bits"{}}]\ =\ \textcolor{stringliteral}{"{}10"{}};}
+\DoxyCodeLine{00393\ }
+\DoxyCodeLine{00394\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.negotiate(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr);}
+\DoxyCodeLine{00395\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.is\_enabled()\ );}
+\DoxyCodeLine{00396\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.first,\ websocketpp::lib::error\_code()\ );}
+\DoxyCodeLine{00397\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.second,\ \textcolor{stringliteral}{"{}permessage-\/deflate;\ server\_no\_context\_takeover;\ client\_max\_window\_bits=10"{}});}
+\DoxyCodeLine{00398\ \}}
+
+\end{DoxyCode}
+\Hypertarget{permessage__deflate_8cpp_a9b46c1287416797e09c76e12b9ae498c}\index{permessage\_deflate.cpp@{permessage\_deflate.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!permessage\_deflate.cpp@{permessage\_deflate.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [39/43]}}
+{\footnotesize\ttfamily \label{permessage__deflate_8cpp_a9b46c1287416797e09c76e12b9ae498c} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{negotiate\+\_\+two\+\_\+client\+\_\+initiated4}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{permessage__deflate_8cpp_source_l00400}{400}} of file \mbox{\hyperlink{permessage__deflate_8cpp_source}{permessage\+\_\+deflate.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00400\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00401\ \ \ \ \ \mbox{\hyperlink{structext__vars}{ext\_vars}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{00402\ }
+\DoxyCodeLine{00403\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr[\textcolor{stringliteral}{"{}client\_no\_context\_takeover"{}}].clear();}
+\DoxyCodeLine{00404\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr[\textcolor{stringliteral}{"{}server\_max\_window\_bits"{}}]\ =\ \textcolor{stringliteral}{"{}10"{}};}
+\DoxyCodeLine{00405\ }
+\DoxyCodeLine{00406\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.negotiate(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr);}
+\DoxyCodeLine{00407\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.is\_enabled()\ );}
+\DoxyCodeLine{00408\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.first,\ websocketpp::lib::error\_code()\ );}
+\DoxyCodeLine{00409\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.second,\ \textcolor{stringliteral}{"{}permessage-\/deflate;\ client\_no\_context\_takeover;\ server\_max\_window\_bits=10"{}});}
+\DoxyCodeLine{00410\ \}}
+
+\end{DoxyCode}
+\Hypertarget{permessage__deflate_8cpp_a0818aed86b780040ec9ee3b1659f78a6}\index{permessage\_deflate.cpp@{permessage\_deflate.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!permessage\_deflate.cpp@{permessage\_deflate.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [40/43]}}
+{\footnotesize\ttfamily \label{permessage__deflate_8cpp_a0818aed86b780040ec9ee3b1659f78a6} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{negotiate\+\_\+two\+\_\+client\+\_\+initiated5}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{permessage__deflate_8cpp_source_l00412}{412}} of file \mbox{\hyperlink{permessage__deflate_8cpp_source}{permessage\+\_\+deflate.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00412\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00413\ \ \ \ \ \mbox{\hyperlink{structext__vars}{ext\_vars}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{00414\ }
+\DoxyCodeLine{00415\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr[\textcolor{stringliteral}{"{}client\_no\_context\_takeover"{}}].clear();}
+\DoxyCodeLine{00416\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr[\textcolor{stringliteral}{"{}client\_max\_window\_bits"{}}]\ =\ \textcolor{stringliteral}{"{}10"{}};}
+\DoxyCodeLine{00417\ }
+\DoxyCodeLine{00418\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.negotiate(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr);}
+\DoxyCodeLine{00419\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.is\_enabled()\ );}
+\DoxyCodeLine{00420\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.first,\ websocketpp::lib::error\_code()\ );}
+\DoxyCodeLine{00421\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.second,\ \textcolor{stringliteral}{"{}permessage-\/deflate;\ client\_no\_context\_takeover;\ client\_max\_window\_bits=10"{}});}
+\DoxyCodeLine{00422\ \}}
+
+\end{DoxyCode}
+\Hypertarget{permessage__deflate_8cpp_a9a64cd0a1848fdef32f40fdef4b0bf14}\index{permessage\_deflate.cpp@{permessage\_deflate.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!permessage\_deflate.cpp@{permessage\_deflate.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [41/43]}}
+{\footnotesize\ttfamily \label{permessage__deflate_8cpp_a9a64cd0a1848fdef32f40fdef4b0bf14} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{negotiate\+\_\+two\+\_\+client\+\_\+initiated6}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{permessage__deflate_8cpp_source_l00424}{424}} of file \mbox{\hyperlink{permessage__deflate_8cpp_source}{permessage\+\_\+deflate.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00424\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00425\ \ \ \ \ \mbox{\hyperlink{structext__vars}{ext\_vars}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{00426\ }
+\DoxyCodeLine{00427\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr[\textcolor{stringliteral}{"{}server\_max\_window\_bits"{}}]\ =\ \textcolor{stringliteral}{"{}10"{}};}
+\DoxyCodeLine{00428\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr[\textcolor{stringliteral}{"{}client\_max\_window\_bits"{}}]\ =\ \textcolor{stringliteral}{"{}10"{}};}
+\DoxyCodeLine{00429\ }
+\DoxyCodeLine{00430\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.negotiate(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr);}
+\DoxyCodeLine{00431\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.is\_enabled()\ );}
+\DoxyCodeLine{00432\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.first,\ websocketpp::lib::error\_code()\ );}
+\DoxyCodeLine{00433\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.second,\ \textcolor{stringliteral}{"{}permessage-\/deflate;\ server\_max\_window\_bits=10;\ client\_max\_window\_bits=10"{}});}
+\DoxyCodeLine{00434\ \}}
+
+\end{DoxyCode}
+\Hypertarget{permessage__deflate_8cpp_a1493f0457934a02767c6b0dceca31721}\index{permessage\_deflate.cpp@{permessage\_deflate.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!permessage\_deflate.cpp@{permessage\_deflate.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [42/43]}}
+{\footnotesize\ttfamily \label{permessage__deflate_8cpp_a1493f0457934a02767c6b0dceca31721} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{negotiation\+\_\+empty\+\_\+attr}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{permessage__deflate_8cpp_source_l00084}{84}} of file \mbox{\hyperlink{permessage__deflate_8cpp_source}{permessage\+\_\+deflate.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00085\ \ \ \ \ \mbox{\hyperlink{structext__vars}{ext\_vars}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{00086\ }
+\DoxyCodeLine{00087\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.negotiate(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr);}
+\DoxyCodeLine{00088\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.is\_enabled()\ );}
+\DoxyCodeLine{00089\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.first,\ websocketpp::lib::error\_code()\ );}
+\DoxyCodeLine{00090\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.second,\ \textcolor{stringliteral}{"{}permessage-\/deflate"{}});}
+\DoxyCodeLine{00091\ \}}
+
+\end{DoxyCode}
+\Hypertarget{permessage__deflate_8cpp_a5d3afed908982eaefeca10bece30b1af}\index{permessage\_deflate.cpp@{permessage\_deflate.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!permessage\_deflate.cpp@{permessage\_deflate.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [43/43]}}
+{\footnotesize\ttfamily \label{permessage__deflate_8cpp_a5d3afed908982eaefeca10bece30b1af} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{negotiation\+\_\+invalid\+\_\+attr}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{permessage__deflate_8cpp_source_l00093}{93}} of file \mbox{\hyperlink{permessage__deflate_8cpp_source}{permessage\+\_\+deflate.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00094\ \ \ \ \ \mbox{\hyperlink{structext__vars}{ext\_vars}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{00095\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr[\textcolor{stringliteral}{"{}foo"{}}]\ =\ \textcolor{stringliteral}{"{}bar"{}};}
+\DoxyCodeLine{00096\ }
+\DoxyCodeLine{00097\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.negotiate(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.attr);}
+\DoxyCodeLine{00098\ \ \ \ \ BOOST\_CHECK(\ !\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.exts.is\_enabled()\ );}
+\DoxyCodeLine{00099\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.first,\ \mbox{\hyperlink{namespacewebsocketpp_1_1extensions_1_1permessage__deflate_1_1error_a9e955844ce4acf0ade5425c98af861ce}{pmde::make\_error\_code}}(\mbox{\hyperlink{namespacewebsocketpp_1_1extensions_1_1permessage__deflate_1_1error_a38e53d7586dd60059cc99a5833bbe54eae5f446fcc9f28756b471d89e879f7670}{pmde::invalid\_attributes}})\ );}
+\DoxyCodeLine{00100\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.esp.second,\ \textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{00101\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{permessage__deflate_8cpp_a5d3afed908982eaefeca10bece30b1af_cgraph}
+\end{center}
+\end{figure}

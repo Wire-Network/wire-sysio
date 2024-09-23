@@ -1,0 +1,9 @@
+<map id="websocketpp::client&lt; config &gt;" name="websocketpp::client&lt; config &gt;">
+<area shape="rect" id="Node000001" title="Client endpoint role based on the given config." alt="" coords="96,183,233,223"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1endpoint.html" title=" " alt="" coords="87,79,242,135"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="167,150,167,182,162,182,162,150"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,5,153,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="103,40,139,77,136,80,99,44"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="177,5,325,31"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="230,44,193,80,190,77,226,40"/>
+</map>

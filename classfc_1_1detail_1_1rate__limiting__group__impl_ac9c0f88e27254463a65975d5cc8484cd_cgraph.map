@@ -1,0 +1,27 @@
+<map id="fc::detail::rate_limiting_group_impl::readsome_impl" name="fc::detail::rate_limiting_group_impl::readsome_impl">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,165,193,206"/>
+<area shape="rect" id="Node000002" href="$classfc_1_1detail_1_1rate__limiting__group__impl.html#a30e2a1f703fcd1983c5e2afb2dcd1ef7" title=" " alt="" coords="241,132,477,173"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="193,171,225,167,225,172,194,176"/>
+<area shape="rect" id="Node000013" href="$classfc_1_1detail_1_1average__rate__meter.html#ada9b561ff55964f5c3dd3f56a68858dc" title=" " alt="" coords="290,197,428,238"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="194,195,275,205,275,210,193,200"/>
+<area shape="rect" id="Node000003" href="$classfc_1_1detail_1_1rate__limiting__group__impl.html#ab87ad5f4ec8adcf3702745b30cd822ad" title=" " alt="" coords="525,124,722,180"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="477,150,509,150,509,155,477,155"/>
+<area shape="rect" id="Node000004" href="$classfc_1_1microseconds.html#a20fba59ec7e1f50c6b8f2c9443cc9b92" title=" " alt="" coords="786,61,948,86"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="695,121,770,95,792,88,794,94,771,100,697,126"/>
+<area shape="rect" id="Node000005" href="$classfc_1_1time__point.html#aa164ff1268a16d4b32afcff181f6100e" title=" " alt="" coords="801,110,933,136"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="723,138,785,130,786,135,723,143"/>
+<area shape="rect" id="Node000011" href="$classfc_1_1detail_1_1rate__limited__operation.html#a7090878b9387f70e1718021b5fc596cb" title=" " alt="" coords="770,160,964,201"/>
+<area shape="poly" id="edge10_Node000003_Node000011" title=" " alt="" coords="723,161,755,165,755,170,723,166"/>
+<area shape="rect" id="Node000012" href="$namespacefc.html#a9623b8cae3f48bbed6aa1fc2afe9b174" title=" " alt="" coords="822,225,912,250"/>
+<area shape="poly" id="edge11_Node000003_Node000012" title=" " alt="" coords="690,178,771,210,808,221,807,226,769,215,688,183"/>
+<area shape="rect" id="Node000006" href="$classfc_1_1mock__time__traits.html#a0bed781012a73b8c15882648397b56be" title=" " alt="" coords="1012,5,1152,46"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="932,108,962,97,986,78,1010,57,1019,51,1022,56,1013,61,990,82,965,101,934,113"/>
+<area shape="rect" id="Node000008" href="$classfc_1_1mock__time__traits.html#adddeebdf472c33f927827c111ddbf0b1" title=" " alt="" coords="1012,71,1152,111"/>
+<area shape="poly" id="edge7_Node000005_Node000008" title=" " alt="" coords="933,111,996,101,997,106,934,116"/>
+<area shape="rect" id="Node000009" href="$classfc_1_1time__point.html#ab46781dcaab4880902bc136f36e39e5e" title=" " alt="" coords="1015,136,1148,177"/>
+<area shape="poly" id="edge8_Node000005_Node000009" title=" " alt="" coords="934,131,1000,141,999,146,933,136"/>
+<area shape="rect" id="Node000010" href="$classfc_1_1time__point.html#abfea5efbe9ef58024cda814395ee9945" title=" " alt="" coords="1015,201,1148,242"/>
+<area shape="poly" id="edge9_Node000005_Node000010" title=" " alt="" coords="934,134,965,146,990,165,1013,186,1022,191,1019,196,1010,190,986,170,962,151,932,139"/>
+<area shape="rect" id="Node000007" href="$classfc_1_1mock__time__traits.html#a0d7245b32fd62b3bc712f658250cc4db" title=" " alt="" coords="1200,13,1372,38"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="1153,23,1184,23,1184,28,1153,28"/>
+</map>

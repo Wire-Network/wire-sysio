@@ -1,0 +1,216 @@
+\doxysection{fc\+::datastream\texorpdfstring{$<$}{<} Streambuf, typename std\+::enable\+\_\+if\+\_\+t\texorpdfstring{$<$}{<} std\+::is\+\_\+base\+\_\+of\+\_\+v\texorpdfstring{$<$}{<} std\+::streambuf, Streambuf \texorpdfstring{$>$}{>} \texorpdfstring{$>$}{>} \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classfc_1_1datastream_3_01_streambuf_00_01typename_01std_1_1enable__if__t_3_01std_1_1is__base__o76614512708450c186f49e481e4fdabd}{}\label{classfc_1_1datastream_3_01_streambuf_00_01typename_01std_1_1enable__if__t_3_01std_1_1is__base__o76614512708450c186f49e481e4fdabd}\index{fc::datastream$<$ Streambuf, typename std::enable\_if\_t$<$ std::is\_base\_of\_v$<$ std::streambuf, Streambuf $>$ $>$ $>$@{fc::datastream$<$ Streambuf, typename std::enable\_if\_t$<$ std::is\_base\_of\_v$<$ std::streambuf, Streambuf $>$ $>$ $>$}}
+
+
+{\ttfamily \#include $<$datastream.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename... Args$>$ }\\\mbox{\hyperlink{classfc_1_1datastream_3_01_streambuf_00_01typename_01std_1_1enable__if__t_3_01std_1_1is__base__o76614512708450c186f49e481e4fdabd_aacdcf99193efc8953a5d1f508a56d396}{datastream}} (Args \&\&... args)
+\item 
+size\+\_\+t \mbox{\hyperlink{classfc_1_1datastream_3_01_streambuf_00_01typename_01std_1_1enable__if__t_3_01std_1_1is__base__o76614512708450c186f49e481e4fdabd_a692ca5a8bcfc69e3195c8d5b3cd7f09b}{read}} (char \texorpdfstring{$\ast$}{*}data, size\+\_\+t n)
+\item 
+size\+\_\+t \mbox{\hyperlink{classfc_1_1datastream_3_01_streambuf_00_01typename_01std_1_1enable__if__t_3_01std_1_1is__base__o76614512708450c186f49e481e4fdabd_afcc606b0927bea3af51e880050142b51}{write}} (const char \texorpdfstring{$\ast$}{*}data, size\+\_\+t n)
+\item 
+size\+\_\+t \mbox{\hyperlink{classfc_1_1datastream_3_01_streambuf_00_01typename_01std_1_1enable__if__t_3_01std_1_1is__base__o76614512708450c186f49e481e4fdabd_a298c27379f2aa11a191eec18b5fa6571}{tellp}} ()
+\item 
+bool \mbox{\hyperlink{classfc_1_1datastream_3_01_streambuf_00_01typename_01std_1_1enable__if__t_3_01std_1_1is__base__o76614512708450c186f49e481e4fdabd_a1b4013404e6916ea4a70d2e9abdb7431}{skip}} (size\+\_\+t \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})
+\item 
+bool \mbox{\hyperlink{classfc_1_1datastream_3_01_streambuf_00_01typename_01std_1_1enable__if__t_3_01std_1_1is__base__o76614512708450c186f49e481e4fdabd_a323f890ea92238c01764b97b54550c71}{get}} (char \&c)
+\item 
+bool \mbox{\hyperlink{classfc_1_1datastream_3_01_streambuf_00_01typename_01std_1_1enable__if__t_3_01std_1_1is__base__o76614512708450c186f49e481e4fdabd_abfe400ec2707f5d51e34ce5767c815b9}{seekp}} (size\+\_\+t off)
+\item 
+bool \mbox{\hyperlink{classfc_1_1datastream_3_01_streambuf_00_01typename_01std_1_1enable__if__t_3_01std_1_1is__base__o76614512708450c186f49e481e4fdabd_a157d574522f715f4368a77319565514d}{remaining}} ()
+\item 
+Streambuf \& \mbox{\hyperlink{classfc_1_1datastream_3_01_streambuf_00_01typename_01std_1_1enable__if__t_3_01std_1_1is__base__o76614512708450c186f49e481e4fdabd_a64d9c62cdfdf4a752a365b6ce72151fc}{storage}} ()
+\item 
+const Streambuf \& \mbox{\hyperlink{classfc_1_1datastream_3_01_streambuf_00_01typename_01std_1_1enable__if__t_3_01std_1_1is__base__o76614512708450c186f49e481e4fdabd_adfff96c239986646489f7e693d773cba}{storage}} () const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Streambuf$>$\newline
+class fc\+::datastream$<$ Streambuf, typename std\+::enable\+\_\+if\+\_\+t$<$ std\+::is\+\_\+base\+\_\+of\+\_\+v$<$ std\+::streambuf, Streambuf $>$ $>$ $>$}
+
+
+Definition at line \mbox{\hyperlink{datastream_8hpp_source_l00100}{100}} of file \mbox{\hyperlink{datastream_8hpp_source}{datastream.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1datastream_3_01_streambuf_00_01typename_01std_1_1enable__if__t_3_01std_1_1is__base__o76614512708450c186f49e481e4fdabd_aacdcf99193efc8953a5d1f508a56d396}\index{fc::datastream$<$ Streambuf, typename std::enable\_if\_t$<$ std::is\_base\_of\_v$<$ std::streambuf, Streambuf $>$ $>$ $>$@{fc::datastream$<$ Streambuf, typename std::enable\_if\_t$<$ std::is\_base\_of\_v$<$ std::streambuf, Streambuf $>$ $>$ $>$}!datastream@{datastream}}
+\index{datastream@{datastream}!fc::datastream$<$ Streambuf, typename std::enable\_if\_t$<$ std::is\_base\_of\_v$<$ std::streambuf, Streambuf $>$ $>$ $>$@{fc::datastream$<$ Streambuf, typename std::enable\_if\_t$<$ std::is\_base\_of\_v$<$ std::streambuf, Streambuf $>$ $>$ $>$}}
+\doxysubsubsection{\texorpdfstring{datastream()}{datastream()}}
+{\footnotesize\ttfamily \label{classfc_1_1datastream_3_01_streambuf_00_01typename_01std_1_1enable__if__t_3_01std_1_1is__base__o76614512708450c186f49e481e4fdabd_aacdcf99193efc8953a5d1f508a56d396} 
+template$<$typename Streambuf $>$ \\
+template$<$typename... Args$>$ \\
+\mbox{\hyperlink{classfc_1_1datastream}{fc\+::datastream}}$<$ Streambuf, typename std\+::enable\+\_\+if\+\_\+t$<$ std\+::is\+\_\+base\+\_\+of\+\_\+v$<$ std\+::streambuf, Streambuf $>$ $>$ $>$\+::datastream (\begin{DoxyParamCaption}\item[{Args \&\&...}]{args}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{datastream_8hpp_source_l00106}{106}} of file \mbox{\hyperlink{datastream_8hpp_source}{datastream.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ :\ buf(std::forward<Args>(args)...)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1datastream_3_01_streambuf_00_01typename_01std_1_1enable__if__t_3_01std_1_1is__base__o76614512708450c186f49e481e4fdabd_a323f890ea92238c01764b97b54550c71}\index{fc::datastream$<$ Streambuf, typename std::enable\_if\_t$<$ std::is\_base\_of\_v$<$ std::streambuf, Streambuf $>$ $>$ $>$@{fc::datastream$<$ Streambuf, typename std::enable\_if\_t$<$ std::is\_base\_of\_v$<$ std::streambuf, Streambuf $>$ $>$ $>$}!get@{get}}
+\index{get@{get}!fc::datastream$<$ Streambuf, typename std::enable\_if\_t$<$ std::is\_base\_of\_v$<$ std::streambuf, Streambuf $>$ $>$ $>$@{fc::datastream$<$ Streambuf, typename std::enable\_if\_t$<$ std::is\_base\_of\_v$<$ std::streambuf, Streambuf $>$ $>$ $>$}}
+\doxysubsubsection{\texorpdfstring{get()}{get()}}
+{\footnotesize\ttfamily \label{classfc_1_1datastream_3_01_streambuf_00_01typename_01std_1_1enable__if__t_3_01std_1_1is__base__o76614512708450c186f49e481e4fdabd_a323f890ea92238c01764b97b54550c71} 
+template$<$typename Streambuf $>$ \\
+bool \mbox{\hyperlink{classfc_1_1datastream}{fc\+::datastream}}$<$ Streambuf, typename std\+::enable\+\_\+if\+\_\+t$<$ std\+::is\+\_\+base\+\_\+of\+\_\+v$<$ std\+::streambuf, Streambuf $>$ $>$ $>$\+::get (\begin{DoxyParamCaption}\item[{char \&}]{c}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{datastream_8hpp_source_l00113}{113}} of file \mbox{\hyperlink{datastream_8hpp_source}{datastream.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ c\ =\ buf.sbumpc();}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00116\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1datastream_3_01_streambuf_00_01typename_01std_1_1enable__if__t_3_01std_1_1is__base__o76614512708450c186f49e481e4fdabd_a692ca5a8bcfc69e3195c8d5b3cd7f09b}\index{fc::datastream$<$ Streambuf, typename std::enable\_if\_t$<$ std::is\_base\_of\_v$<$ std::streambuf, Streambuf $>$ $>$ $>$@{fc::datastream$<$ Streambuf, typename std::enable\_if\_t$<$ std::is\_base\_of\_v$<$ std::streambuf, Streambuf $>$ $>$ $>$}!read@{read}}
+\index{read@{read}!fc::datastream$<$ Streambuf, typename std::enable\_if\_t$<$ std::is\_base\_of\_v$<$ std::streambuf, Streambuf $>$ $>$ $>$@{fc::datastream$<$ Streambuf, typename std::enable\_if\_t$<$ std::is\_base\_of\_v$<$ std::streambuf, Streambuf $>$ $>$ $>$}}
+\doxysubsubsection{\texorpdfstring{read()}{read()}}
+{\footnotesize\ttfamily \label{classfc_1_1datastream_3_01_streambuf_00_01typename_01std_1_1enable__if__t_3_01std_1_1is__base__o76614512708450c186f49e481e4fdabd_a692ca5a8bcfc69e3195c8d5b3cd7f09b} 
+template$<$typename Streambuf $>$ \\
+size\+\_\+t \mbox{\hyperlink{classfc_1_1datastream}{fc\+::datastream}}$<$ Streambuf, typename std\+::enable\+\_\+if\+\_\+t$<$ std\+::is\+\_\+base\+\_\+of\+\_\+v$<$ std\+::streambuf, Streambuf $>$ $>$ $>$\+::read (\begin{DoxyParamCaption}\item[{char \texorpdfstring{$\ast$}{*}}]{data}{, }\item[{size\+\_\+t}]{n}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{datastream_8hpp_source_l00109}{109}} of file \mbox{\hyperlink{datastream_8hpp_source}{datastream.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00109\ \{\ \textcolor{keywordflow}{return}\ buf.sgetn(data,\ n);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1datastream_3_01_streambuf_00_01typename_01std_1_1enable__if__t_3_01std_1_1is__base__o76614512708450c186f49e481e4fdabd_a157d574522f715f4368a77319565514d}\index{fc::datastream$<$ Streambuf, typename std::enable\_if\_t$<$ std::is\_base\_of\_v$<$ std::streambuf, Streambuf $>$ $>$ $>$@{fc::datastream$<$ Streambuf, typename std::enable\_if\_t$<$ std::is\_base\_of\_v$<$ std::streambuf, Streambuf $>$ $>$ $>$}!remaining@{remaining}}
+\index{remaining@{remaining}!fc::datastream$<$ Streambuf, typename std::enable\_if\_t$<$ std::is\_base\_of\_v$<$ std::streambuf, Streambuf $>$ $>$ $>$@{fc::datastream$<$ Streambuf, typename std::enable\_if\_t$<$ std::is\_base\_of\_v$<$ std::streambuf, Streambuf $>$ $>$ $>$}}
+\doxysubsubsection{\texorpdfstring{remaining()}{remaining()}}
+{\footnotesize\ttfamily \label{classfc_1_1datastream_3_01_streambuf_00_01typename_01std_1_1enable__if__t_3_01std_1_1is__base__o76614512708450c186f49e481e4fdabd_a157d574522f715f4368a77319565514d} 
+template$<$typename Streambuf $>$ \\
+bool \mbox{\hyperlink{classfc_1_1datastream}{fc\+::datastream}}$<$ Streambuf, typename std\+::enable\+\_\+if\+\_\+t$<$ std\+::is\+\_\+base\+\_\+of\+\_\+v$<$ std\+::streambuf, Streambuf $>$ $>$ $>$\+::remaining (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{datastream_8hpp_source_l00121}{121}} of file \mbox{\hyperlink{datastream_8hpp_source}{datastream.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00121\ \{\ \textcolor{keywordflow}{return}\ buf.in\_avail();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1datastream_3_01_streambuf_00_01typename_01std_1_1enable__if__t_3_01std_1_1is__base__o76614512708450c186f49e481e4fdabd_abfe400ec2707f5d51e34ce5767c815b9}\index{fc::datastream$<$ Streambuf, typename std::enable\_if\_t$<$ std::is\_base\_of\_v$<$ std::streambuf, Streambuf $>$ $>$ $>$@{fc::datastream$<$ Streambuf, typename std::enable\_if\_t$<$ std::is\_base\_of\_v$<$ std::streambuf, Streambuf $>$ $>$ $>$}!seekp@{seekp}}
+\index{seekp@{seekp}!fc::datastream$<$ Streambuf, typename std::enable\_if\_t$<$ std::is\_base\_of\_v$<$ std::streambuf, Streambuf $>$ $>$ $>$@{fc::datastream$<$ Streambuf, typename std::enable\_if\_t$<$ std::is\_base\_of\_v$<$ std::streambuf, Streambuf $>$ $>$ $>$}}
+\doxysubsubsection{\texorpdfstring{seekp()}{seekp()}}
+{\footnotesize\ttfamily \label{classfc_1_1datastream_3_01_streambuf_00_01typename_01std_1_1enable__if__t_3_01std_1_1is__base__o76614512708450c186f49e481e4fdabd_abfe400ec2707f5d51e34ce5767c815b9} 
+template$<$typename Streambuf $>$ \\
+bool \mbox{\hyperlink{classfc_1_1datastream}{fc\+::datastream}}$<$ Streambuf, typename std\+::enable\+\_\+if\+\_\+t$<$ std\+::is\+\_\+base\+\_\+of\+\_\+v$<$ std\+::streambuf, Streambuf $>$ $>$ $>$\+::seekp (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{off}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{datastream_8hpp_source_l00117}{117}} of file \mbox{\hyperlink{datastream_8hpp_source}{datastream.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ buf.pubseekoff(off,\ std::ios::beg);}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00120\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1datastream_3_01_streambuf_00_01typename_01std_1_1enable__if__t_3_01std_1_1is__base__o76614512708450c186f49e481e4fdabd_a1b4013404e6916ea4a70d2e9abdb7431}\index{fc::datastream$<$ Streambuf, typename std::enable\_if\_t$<$ std::is\_base\_of\_v$<$ std::streambuf, Streambuf $>$ $>$ $>$@{fc::datastream$<$ Streambuf, typename std::enable\_if\_t$<$ std::is\_base\_of\_v$<$ std::streambuf, Streambuf $>$ $>$ $>$}!skip@{skip}}
+\index{skip@{skip}!fc::datastream$<$ Streambuf, typename std::enable\_if\_t$<$ std::is\_base\_of\_v$<$ std::streambuf, Streambuf $>$ $>$ $>$@{fc::datastream$<$ Streambuf, typename std::enable\_if\_t$<$ std::is\_base\_of\_v$<$ std::streambuf, Streambuf $>$ $>$ $>$}}
+\doxysubsubsection{\texorpdfstring{skip()}{skip()}}
+{\footnotesize\ttfamily \label{classfc_1_1datastream_3_01_streambuf_00_01typename_01std_1_1enable__if__t_3_01std_1_1is__base__o76614512708450c186f49e481e4fdabd_a1b4013404e6916ea4a70d2e9abdb7431} 
+template$<$typename Streambuf $>$ \\
+bool \mbox{\hyperlink{classfc_1_1datastream}{fc\+::datastream}}$<$ Streambuf, typename std\+::enable\+\_\+if\+\_\+t$<$ std\+::is\+\_\+base\+\_\+of\+\_\+v$<$ std\+::streambuf, Streambuf $>$ $>$ $>$\+::skip (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{p}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{datastream_8hpp_source_l00112}{112}} of file \mbox{\hyperlink{datastream_8hpp_source}{datastream.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00112\ \{\ this-\/>pubseekoff(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\ std::ios::cur);\ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1datastream_3_01_streambuf_00_01typename_01std_1_1enable__if__t_3_01std_1_1is__base__o76614512708450c186f49e481e4fdabd_a64d9c62cdfdf4a752a365b6ce72151fc}\index{fc::datastream$<$ Streambuf, typename std::enable\_if\_t$<$ std::is\_base\_of\_v$<$ std::streambuf, Streambuf $>$ $>$ $>$@{fc::datastream$<$ Streambuf, typename std::enable\_if\_t$<$ std::is\_base\_of\_v$<$ std::streambuf, Streambuf $>$ $>$ $>$}!storage@{storage}}
+\index{storage@{storage}!fc::datastream$<$ Streambuf, typename std::enable\_if\_t$<$ std::is\_base\_of\_v$<$ std::streambuf, Streambuf $>$ $>$ $>$@{fc::datastream$<$ Streambuf, typename std::enable\_if\_t$<$ std::is\_base\_of\_v$<$ std::streambuf, Streambuf $>$ $>$ $>$}}
+\doxysubsubsection{\texorpdfstring{storage()}{storage()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1datastream_3_01_streambuf_00_01typename_01std_1_1enable__if__t_3_01std_1_1is__base__o76614512708450c186f49e481e4fdabd_a64d9c62cdfdf4a752a365b6ce72151fc} 
+template$<$typename Streambuf $>$ \\
+Streambuf \& \mbox{\hyperlink{classfc_1_1datastream}{fc\+::datastream}}$<$ Streambuf, typename std\+::enable\+\_\+if\+\_\+t$<$ std\+::is\+\_\+base\+\_\+of\+\_\+v$<$ std\+::streambuf, Streambuf $>$ $>$ $>$\+::storage (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{datastream_8hpp_source_l00123}{123}} of file \mbox{\hyperlink{datastream_8hpp_source}{datastream.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00123\ \{\ \textcolor{keywordflow}{return}\ buf;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1datastream_3_01_streambuf_00_01typename_01std_1_1enable__if__t_3_01std_1_1is__base__o76614512708450c186f49e481e4fdabd_adfff96c239986646489f7e693d773cba}\index{fc::datastream$<$ Streambuf, typename std::enable\_if\_t$<$ std::is\_base\_of\_v$<$ std::streambuf, Streambuf $>$ $>$ $>$@{fc::datastream$<$ Streambuf, typename std::enable\_if\_t$<$ std::is\_base\_of\_v$<$ std::streambuf, Streambuf $>$ $>$ $>$}!storage@{storage}}
+\index{storage@{storage}!fc::datastream$<$ Streambuf, typename std::enable\_if\_t$<$ std::is\_base\_of\_v$<$ std::streambuf, Streambuf $>$ $>$ $>$@{fc::datastream$<$ Streambuf, typename std::enable\_if\_t$<$ std::is\_base\_of\_v$<$ std::streambuf, Streambuf $>$ $>$ $>$}}
+\doxysubsubsection{\texorpdfstring{storage()}{storage()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1datastream_3_01_streambuf_00_01typename_01std_1_1enable__if__t_3_01std_1_1is__base__o76614512708450c186f49e481e4fdabd_adfff96c239986646489f7e693d773cba} 
+template$<$typename Streambuf $>$ \\
+const Streambuf \& \mbox{\hyperlink{classfc_1_1datastream}{fc\+::datastream}}$<$ Streambuf, typename std\+::enable\+\_\+if\+\_\+t$<$ std\+::is\+\_\+base\+\_\+of\+\_\+v$<$ std\+::streambuf, Streambuf $>$ $>$ $>$\+::storage (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{datastream_8hpp_source_l00124}{124}} of file \mbox{\hyperlink{datastream_8hpp_source}{datastream.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00124\ \{\ \textcolor{keywordflow}{return}\ buf;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1datastream_3_01_streambuf_00_01typename_01std_1_1enable__if__t_3_01std_1_1is__base__o76614512708450c186f49e481e4fdabd_a298c27379f2aa11a191eec18b5fa6571}\index{fc::datastream$<$ Streambuf, typename std::enable\_if\_t$<$ std::is\_base\_of\_v$<$ std::streambuf, Streambuf $>$ $>$ $>$@{fc::datastream$<$ Streambuf, typename std::enable\_if\_t$<$ std::is\_base\_of\_v$<$ std::streambuf, Streambuf $>$ $>$ $>$}!tellp@{tellp}}
+\index{tellp@{tellp}!fc::datastream$<$ Streambuf, typename std::enable\_if\_t$<$ std::is\_base\_of\_v$<$ std::streambuf, Streambuf $>$ $>$ $>$@{fc::datastream$<$ Streambuf, typename std::enable\_if\_t$<$ std::is\_base\_of\_v$<$ std::streambuf, Streambuf $>$ $>$ $>$}}
+\doxysubsubsection{\texorpdfstring{tellp()}{tellp()}}
+{\footnotesize\ttfamily \label{classfc_1_1datastream_3_01_streambuf_00_01typename_01std_1_1enable__if__t_3_01std_1_1is__base__o76614512708450c186f49e481e4fdabd_a298c27379f2aa11a191eec18b5fa6571} 
+template$<$typename Streambuf $>$ \\
+size\+\_\+t \mbox{\hyperlink{classfc_1_1datastream}{fc\+::datastream}}$<$ Streambuf, typename std\+::enable\+\_\+if\+\_\+t$<$ std\+::is\+\_\+base\+\_\+of\+\_\+v$<$ std\+::streambuf, Streambuf $>$ $>$ $>$\+::tellp (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{datastream_8hpp_source_l00111}{111}} of file \mbox{\hyperlink{datastream_8hpp_source}{datastream.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00111\ \{\ \textcolor{keywordflow}{return}\ this-\/>pubseekoff(0,\ std::ios::cur);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1datastream_3_01_streambuf_00_01typename_01std_1_1enable__if__t_3_01std_1_1is__base__o76614512708450c186f49e481e4fdabd_afcc606b0927bea3af51e880050142b51}\index{fc::datastream$<$ Streambuf, typename std::enable\_if\_t$<$ std::is\_base\_of\_v$<$ std::streambuf, Streambuf $>$ $>$ $>$@{fc::datastream$<$ Streambuf, typename std::enable\_if\_t$<$ std::is\_base\_of\_v$<$ std::streambuf, Streambuf $>$ $>$ $>$}!write@{write}}
+\index{write@{write}!fc::datastream$<$ Streambuf, typename std::enable\_if\_t$<$ std::is\_base\_of\_v$<$ std::streambuf, Streambuf $>$ $>$ $>$@{fc::datastream$<$ Streambuf, typename std::enable\_if\_t$<$ std::is\_base\_of\_v$<$ std::streambuf, Streambuf $>$ $>$ $>$}}
+\doxysubsubsection{\texorpdfstring{write()}{write()}}
+{\footnotesize\ttfamily \label{classfc_1_1datastream_3_01_streambuf_00_01typename_01std_1_1enable__if__t_3_01std_1_1is__base__o76614512708450c186f49e481e4fdabd_afcc606b0927bea3af51e880050142b51} 
+template$<$typename Streambuf $>$ \\
+size\+\_\+t \mbox{\hyperlink{classfc_1_1datastream}{fc\+::datastream}}$<$ Streambuf, typename std\+::enable\+\_\+if\+\_\+t$<$ std\+::is\+\_\+base\+\_\+of\+\_\+v$<$ std\+::streambuf, Streambuf $>$ $>$ $>$\+::write (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{data}{, }\item[{size\+\_\+t}]{n}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{datastream_8hpp_source_l00110}{110}} of file \mbox{\hyperlink{datastream_8hpp_source}{datastream.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00110\ \{\ \textcolor{keywordflow}{return}\ buf.sputn(data,\ n);\ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/io/\mbox{\hyperlink{datastream_8hpp}{datastream.\+hpp}}\end{DoxyCompactItemize}

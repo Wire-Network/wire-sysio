@@ -1,0 +1,103 @@
+\doxysection{public\+\_\+params.\+hpp}
+\hypertarget{public__params_8hpp_source}{}\label{public__params_8hpp_source}\index{libraries/fc/libraries/ff/libff/algebra/curves/public\_params.hpp@{libraries/fc/libraries/ff/libff/algebra/curves/public\_params.hpp}}
+\mbox{\hyperlink{public__params_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00001}00001\ }
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00008}00008\ \textcolor{preprocessor}{\#ifndef\ PUBLIC\_PARAMS\_HPP\_}}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00009}00009\ \textcolor{preprocessor}{\#define\ PUBLIC\_PARAMS\_HPP\_}}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00012}00012\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacelibff}{libff}}\ \{}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00014}00014\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00015}00015\ \textcolor{comment}{\ \ for\ every\ curve\ the\ user\ should\ define\ corresponding}}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00016}00016\ \textcolor{comment}{\ \ public\_params\ with\ the\ following\ typedefs:}}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00017}00017\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00018}00018\ \textcolor{comment}{\ \ Fp\_type}}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00019}00019\ \textcolor{comment}{\ \ G1\_type}}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00020}00020\ \textcolor{comment}{\ \ G2\_type}}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00021}00021\ \textcolor{comment}{\ \ G1\_precomp\_type}}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00022}00022\ \textcolor{comment}{\ \ G2\_precomp\_type}}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00023}00023\ \textcolor{comment}{\ \ affine\_ate\_G1\_precomp\_type}}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00024}00024\ \textcolor{comment}{\ \ affine\_ate\_G2\_precomp\_type}}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00025}00025\ \textcolor{comment}{\ \ Fq\_type}}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00026}00026\ \textcolor{comment}{\ \ Fqe\_type}}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00027}00027\ \textcolor{comment}{\ \ Fqk\_type}}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00028}00028\ \textcolor{comment}{\ \ GT\_type}}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00029}00029\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00030}00030\ \textcolor{comment}{\ \ one\ should\ also\ define\ the\ following\ static\ methods:}}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00031}00031\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00032}00032\ \textcolor{comment}{\ \ void\ init\_public\_params();}}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00033}00033\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00034}00034\ \textcolor{comment}{\ \ GT<EC\_ppT>\ final\_exponentiation(const\ Fqk<EC\_ppT>\ \&elt);}}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00035}00035\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00036}00036\ \textcolor{comment}{\ \ G1\_precomp<EC\_ppT>\ precompute\_G1(const\ G1<EC\_ppT>\ \&P);}}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00037}00037\ \textcolor{comment}{\ \ G2\_precomp<EC\_ppT>\ precompute\_G2(const\ G2<EC\_ppT>\ \&Q);}}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00038}00038\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00039}00039\ \textcolor{comment}{\ \ Fqk<EC\_ppT>\ miller\_loop(const\ G1\_precomp<EC\_ppT>\ \&prec\_P,}}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00040}00040\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ const\ G2\_precomp<EC\_ppT>\ \&prec\_Q);}}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00041}00041\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00042}00042\ \textcolor{comment}{\ \ affine\_ate\_G1\_precomp<EC\_ppT>\ affine\_ate\_precompute\_G1(const\ G1<EC\_ppT>\ \&P);}}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00043}00043\ \textcolor{comment}{\ \ affine\_ate\_G2\_precomp<EC\_ppT>\ affine\_ate\_precompute\_G2(const\ G2<EC\_ppT>\ \&Q);}}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00044}00044\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00045}00045\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00046}00046\ \textcolor{comment}{\ \ Fqk<EC\_ppT>\ affine\_ate\_miller\_loop(const\ affine\_ate\_G1\_precomp<EC\_ppT>\ \&prec\_P,}}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00047}00047\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ const\ affine\_ate\_G2\_precomp<EC\_ppT>\ \&prec\_Q);}}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00048}00048\ \textcolor{comment}{\ \ Fqk<EC\_ppT>\ affine\_ate\_e\_over\_e\_miller\_loop(const\ affine\_ate\_G1\_precomp<EC\_ppT>\ \&prec\_P1,}}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00049}00049\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ const\ affine\_ate\_G2\_precomp<EC\_ppT>\ \&prec\_Q1,}}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00050}00050\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ const\ affine\_ate\_G1\_precomp<EC\_ppT>\ \&prec\_P2,}}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00051}00051\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ const\ affine\_ate\_G2\_precomp<EC\_ppT>\ \&prec\_Q2);}}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00052}00052\ \textcolor{comment}{\ \ Fqk<EC\_ppT>\ affine\_ate\_e\_times\_e\_over\_e\_miller\_loop(const\ affine\_ate\_G1\_precomp<EC\_ppT>\ \&prec\_P1,}}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00053}00053\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ const\ affine\_ate\_G2\_precomp<EC\_ppT>\ \&prec\_Q1,}}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00054}00054\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ const\ affine\_ate\_G1\_precomp<EC\_ppT>\ \&prec\_P2,}}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00055}00055\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ const\ affine\_ate\_G2\_precomp<EC\_ppT>\ \&prec\_Q2,}}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00056}00056\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ const\ affine\_ate\_G1\_precomp<EC\_ppT>\ \&prec\_P3,}}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00057}00057\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ const\ affine\_ate\_G2\_precomp<EC\_ppT>\ \&prec\_Q3);}}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00058}00058\ \textcolor{comment}{\ \ Fqk<EC\_ppT>\ double\_miller\_loop(const\ G1\_precomp<EC\_ppT>\ \&prec\_P1,}}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00059}00059\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ const\ G2\_precomp<EC\_ppT>\ \&prec\_Q1,}}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00060}00060\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ const\ G1\_precomp<EC\_ppT>\ \&prec\_P2,}}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00061}00061\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ const\ G2\_precomp<EC\_ppT>\ \&prec\_Q2);}}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00062}00062\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00063}00063\ \textcolor{comment}{\ \ Fqk<EC\_ppT>\ pairing(const\ G1<EC\_ppT>\ \&P,}}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00064}00064\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ const\ G2<EC\_ppT>\ \&Q);}}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00065}00065\ \textcolor{comment}{\ \ GT<EC\_ppT>\ reduced\_pairing(const\ G1<EC\_ppT>\ \&P,}}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00066}00066\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ const\ G2<EC\_ppT>\ \&Q);}}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00067}00067\ \textcolor{comment}{\ \ GT<EC\_ppT>\ affine\_reduced\_pairing(const\ G1<EC\_ppT>\ \&P,}}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00068}00068\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ const\ G2<EC\_ppT>\ \&Q);}}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00069}00069\ \textcolor{comment}{*/}}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00071}00071\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ EC\_ppT>}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00072}\mbox{\hyperlink{namespacelibff_a4d9ee1177daeded24b60e6425e5370d3}{00072}}\ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacelibff_a4d9ee1177daeded24b60e6425e5370d3}{Fr}}\ =\ \textcolor{keyword}{typename}\ EC\_ppT::Fp\_type;}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00073}00073\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ EC\_ppT>}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00074}\mbox{\hyperlink{namespacelibff_a2076489a787bb029bf7fefef35b0f536}{00074}}\ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacelibff_a2076489a787bb029bf7fefef35b0f536}{G1}}\ =\ \textcolor{keyword}{typename}\ EC\_ppT::G1\_type;}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00075}00075\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ EC\_ppT>}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00076}\mbox{\hyperlink{namespacelibff_a3d00b3d04ecc57132a0458a558b9017f}{00076}}\ \textcolor{keyword}{using\ }\mbox{\hyperlink{struct_g2}{G2}}\ =\ \textcolor{keyword}{typename}\ EC\_ppT::G2\_type;}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00077}00077\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ EC\_ppT>}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00078}\mbox{\hyperlink{namespacelibff_a1f916db4f6e4e95cd54d1810b18fb236}{00078}}\ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacelibff_a1f916db4f6e4e95cd54d1810b18fb236}{G1\_precomp}}\ =\ \textcolor{keyword}{typename}\ EC\_ppT::G1\_precomp\_type;}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00079}00079\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ EC\_ppT>}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00080}\mbox{\hyperlink{namespacelibff_ad967d2fbe0566124c5b1ed3006f99a3a}{00080}}\ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacelibff_ad967d2fbe0566124c5b1ed3006f99a3a}{G2\_precomp}}\ =\ \textcolor{keyword}{typename}\ EC\_ppT::G2\_precomp\_type;}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00081}00081\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ EC\_ppT>}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00082}\mbox{\hyperlink{namespacelibff_a1993b916a0445b05b1b2c41d7c53f552}{00082}}\ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacelibff_a1993b916a0445b05b1b2c41d7c53f552}{affine\_ate\_G1\_precomp}}\ =\ \textcolor{keyword}{typename}\ EC\_ppT::affine\_ate\_G1\_precomp\_type;}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00083}00083\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ EC\_ppT>}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00084}\mbox{\hyperlink{namespacelibff_a8b10051620120721572387d0cac8c692}{00084}}\ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacelibff_a8b10051620120721572387d0cac8c692}{affine\_ate\_G2\_precomp}}\ =\ \textcolor{keyword}{typename}\ EC\_ppT::affine\_ate\_G2\_precomp\_type;}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00085}00085\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ EC\_ppT>}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00086}\mbox{\hyperlink{namespacelibff_a0a13464408b9a5d7ec5d44ae8b05b95f}{00086}}\ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacelibff_a0a13464408b9a5d7ec5d44ae8b05b95f}{Fq}}\ =\ \textcolor{keyword}{typename}\ EC\_ppT::Fq\_type;}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00087}00087\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ EC\_ppT>}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00088}\mbox{\hyperlink{namespacelibff_a04aa6a253619abda88fa9aae50074175}{00088}}\ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacelibff_a04aa6a253619abda88fa9aae50074175}{Fqe}}\ =\ \textcolor{keyword}{typename}\ EC\_ppT::Fqe\_type;}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00089}00089\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ EC\_ppT>}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00090}\mbox{\hyperlink{namespacelibff_a1cbc314a52017a7089a0e845293e3d9f}{00090}}\ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacelibff_a1cbc314a52017a7089a0e845293e3d9f}{Fqk}}\ =\ \textcolor{keyword}{typename}\ EC\_ppT::Fqk\_type;}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00091}00091\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ EC\_ppT>}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00092}\mbox{\hyperlink{namespacelibff_ab20bea69cbab18a4560648792f14c6b9}{00092}}\ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacelibff_ab20bea69cbab18a4560648792f14c6b9}{GT}}\ =\ \textcolor{keyword}{typename}\ EC\_ppT::GT\_type;}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00093}00093\ }
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00094}00094\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ EC\_ppT>}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00095}\mbox{\hyperlink{namespacelibff_af48ab7fc497856d75882a2a4dac441c6}{00095}}\ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacelibff_af48ab7fc497856d75882a2a4dac441c6}{Fr\_vector}}\ =\ std::vector<Fr<EC\_ppT>\ >;}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00096}00096\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ EC\_ppT>}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00097}\mbox{\hyperlink{namespacelibff_a3f9c54f66bf5c08c9066ddaa70732229}{00097}}\ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacelibff_a3f9c54f66bf5c08c9066ddaa70732229}{G1\_vector}}\ =\ std::vector<G1<EC\_ppT>\ >;}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00098}00098\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ EC\_ppT>}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00099}\mbox{\hyperlink{namespacelibff_afe8365f7ca79a4d98f3669eb43fa4cf0}{00099}}\ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacelibff_afe8365f7ca79a4d98f3669eb43fa4cf0}{G2\_vector}}\ =\ std::vector<G2<EC\_ppT>\ >;}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00100}00100\ }
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00101}00101\ \}\ \textcolor{comment}{//\ libff}}
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00102}00102\ }
+\DoxyCodeLine{\Hypertarget{public__params_8hpp_source_l00103}00103\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ PUBLIC\_PARAMS\_HPP\_}}
+
+\end{DoxyCode}

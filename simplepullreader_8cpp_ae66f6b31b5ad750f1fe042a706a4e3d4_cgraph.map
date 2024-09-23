@@ -1,0 +1,15 @@
+<map id="main" name="main">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,78,55,104"/>
+<area shape="rect" id="Node000002" href="$class_generic_reader.html#aa1e9e1eef614fde971550ed2f955151d" title="Check if token&#45;by&#45;token parsing JSON text is complete." alt="" coords="103,5,266,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="54,78,102,57,117,50,119,55,104,61,56,83"/>
+<area shape="rect" id="Node000003" href="$class_generic_reader.html#a7de472eda2ad9de13cfd8c1de74f1754" title="Initialize JSON text token&#45;by&#45;token parsing." alt="" coords="103,71,266,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="55,88,87,88,87,94,55,94"/>
+<area shape="rect" id="Node000006" href="$class_generic_reader.html#a257891331e0c259903e7066fb4cebf92" title="Parse one token from JSON text." alt="" coords="103,136,266,177"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="56,99,104,121,119,127,117,132,102,125,54,104"/>
+<area shape="rect" id="Node000004" href="$struct_parse_result.html#a88b6d44f052a19e6436ae6aadc2c40b4" title="Reset error code." alt="" coords="320,78,452,104"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="266,88,304,88,304,94,266,94"/>
+<area shape="rect" id="Node000005" href="$struct_parse_result.html#aa81b4a7b776b77216cb752385203a8c1" title="Update error code and offset." alt="" coords="506,78,628,104"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="453,88,491,88,491,94,453,94"/>
+<area shape="rect" id="Node000007" href="$classinternal_1_1_stack.html#a02da31665a372738e81ded2f7b7d598e" title=" " alt="" coords="314,144,458,169"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="266,154,299,154,299,159,266,159"/>
+</map>

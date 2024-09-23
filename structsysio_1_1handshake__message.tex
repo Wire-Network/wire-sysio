@@ -1,0 +1,218 @@
+\doxysection{sysio\+::handshake\+\_\+message Struct Reference}
+\hypertarget{structsysio_1_1handshake__message}{}\label{structsysio_1_1handshake__message}\index{sysio::handshake\_message@{sysio::handshake\_message}}
+
+
+{\ttfamily \#include $<$protocol.\+hpp$>$}
+
+
+
+Collaboration diagram for sysio\+::handshake\+\_\+message\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1handshake__message__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{structsysio_1_1handshake__message_a1d5b498e96d2c54874cfd26c1d8ef9ae}{network\+\_\+version}} = 0
+\begin{DoxyCompactList}\small\item\em incremental value above a computed base \end{DoxyCompactList}\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1chain__id__type}{chain\+\_\+id\+\_\+type}} \mbox{\hyperlink{structsysio_1_1handshake__message_a0f19bb5d5904f446ef442749aeaba3a0}{chain\+\_\+id}}
+\begin{DoxyCompactList}\small\item\em used to identify chain \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classfc_1_1sha256}{fc\+::sha256}} \mbox{\hyperlink{structsysio_1_1handshake__message_a7f8190c5079ab1745b344ffc43d4cad3}{node\+\_\+id}}
+\begin{DoxyCompactList}\small\item\em used to identify peers and prevent self-\/connect \end{DoxyCompactList}\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_a0628a11f388cd2e43b1ccc1260a1042f}{chain\+::public\+\_\+key\+\_\+type}} \mbox{\hyperlink{structsysio_1_1handshake__message_aae336a35f5684178d56be1a8aed48a82}{key}}
+\begin{DoxyCompactList}\small\item\em authentication key; may be a producer or peer key, or empty \end{DoxyCompactList}\item 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{structsysio_1_1handshake__message_ad620c6e5ccdc5205e285934b9b8c15f3}{time}} \{0\}
+\begin{DoxyCompactList}\small\item\em time message created in nanoseconds from epoch \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classfc_1_1sha256}{fc\+::sha256}} \mbox{\hyperlink{structsysio_1_1handshake__message_a874f3e3e6f73875dde3e49cae0086ba2}{token}}
+\begin{DoxyCompactList}\small\item\em digest of time to prove we own the private key of the key above \end{DoxyCompactList}\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_af141a69eb789b86fa0eb93c2d263f0df}{chain\+::signature\+\_\+type}} \mbox{\hyperlink{structsysio_1_1handshake__message_acd6da9c0533522d811f395059d20c96c}{sig}}
+\begin{DoxyCompactList}\small\item\em signature for the digest \end{DoxyCompactList}\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structsysio_1_1handshake__message_a39bdbe3cacc0ee82d4c1238df057a56c}{p2p\+\_\+address}}
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1handshake__message_a6a66b5762131e7f7684c0f5baf3a6705}{last\+\_\+irreversible\+\_\+block\+\_\+num}} = 0
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{block\+\_\+id\+\_\+type}} \mbox{\hyperlink{structsysio_1_1handshake__message_add797e772415837261beaef238a7faa6}{last\+\_\+irreversible\+\_\+block\+\_\+id}}
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1handshake__message_a1b2717cc284cb6f783d1a2c4602f66d3}{head\+\_\+num}} = 0
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{block\+\_\+id\+\_\+type}} \mbox{\hyperlink{structsysio_1_1handshake__message_a2ca0bcb5e2387d67ae1d05e7a9718595}{head\+\_\+id}}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structsysio_1_1handshake__message_a11d748ba9306ff51196c7ee1818bfd17}{os}}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structsysio_1_1handshake__message_ad54cbd5f2ff055f7bc9fdeaf4e426955}{agent}}
+\item 
+\mbox{\hyperlink{stdint_8h_a269259c924dce846340ddbb810db2e3c}{int16\+\_\+t}} \mbox{\hyperlink{structsysio_1_1handshake__message_a62247b1e0a1a552278fc2b156d4d663f}{generation}} = 0
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{plugins_2net__plugin_2include_2sysio_2net__plugin_2protocol_8hpp_source_l00027}{27}} of file \mbox{\hyperlink{plugins_2net__plugin_2include_2sysio_2net__plugin_2protocol_8hpp_source}{protocol.\+hpp}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1handshake__message_ad54cbd5f2ff055f7bc9fdeaf4e426955}\index{sysio::handshake\_message@{sysio::handshake\_message}!agent@{agent}}
+\index{agent@{agent}!sysio::handshake\_message@{sysio::handshake\_message}}
+\doxysubsubsection{\texorpdfstring{agent}{agent}}
+{\footnotesize\ttfamily \label{structsysio_1_1handshake__message_ad54cbd5f2ff055f7bc9fdeaf4e426955} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::handshake\+\_\+message\+::agent}
+
+
+
+Definition at line \mbox{\hyperlink{plugins_2net__plugin_2include_2sysio_2net__plugin_2protocol_8hpp_source_l00041}{41}} of file \mbox{\hyperlink{plugins_2net__plugin_2include_2sysio_2net__plugin_2protocol_8hpp_source}{protocol.\+hpp}}.
+
+\Hypertarget{structsysio_1_1handshake__message_a0f19bb5d5904f446ef442749aeaba3a0}\index{sysio::handshake\_message@{sysio::handshake\_message}!chain\_id@{chain\_id}}
+\index{chain\_id@{chain\_id}!sysio::handshake\_message@{sysio::handshake\_message}}
+\doxysubsubsection{\texorpdfstring{chain\_id}{chain\_id}}
+{\footnotesize\ttfamily \label{structsysio_1_1handshake__message_a0f19bb5d5904f446ef442749aeaba3a0} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1chain__id__type}{chain\+\_\+id\+\_\+type}} sysio\+::handshake\+\_\+message\+::chain\+\_\+id}
+
+
+
+Definition at line \mbox{\hyperlink{plugins_2net__plugin_2include_2sysio_2net__plugin_2protocol_8hpp_source_l00029}{29}} of file \mbox{\hyperlink{plugins_2net__plugin_2include_2sysio_2net__plugin_2protocol_8hpp_source}{protocol.\+hpp}}.
+
+\Hypertarget{structsysio_1_1handshake__message_a62247b1e0a1a552278fc2b156d4d663f}\index{sysio::handshake\_message@{sysio::handshake\_message}!generation@{generation}}
+\index{generation@{generation}!sysio::handshake\_message@{sysio::handshake\_message}}
+\doxysubsubsection{\texorpdfstring{generation}{generation}}
+{\footnotesize\ttfamily \label{structsysio_1_1handshake__message_a62247b1e0a1a552278fc2b156d4d663f} 
+\mbox{\hyperlink{stdint_8h_a269259c924dce846340ddbb810db2e3c}{int16\+\_\+t}} sysio\+::handshake\+\_\+message\+::generation = 0}
+
+
+
+Definition at line \mbox{\hyperlink{plugins_2net__plugin_2include_2sysio_2net__plugin_2protocol_8hpp_source_l00042}{42}} of file \mbox{\hyperlink{plugins_2net__plugin_2include_2sysio_2net__plugin_2protocol_8hpp_source}{protocol.\+hpp}}.
+
+\Hypertarget{structsysio_1_1handshake__message_a2ca0bcb5e2387d67ae1d05e7a9718595}\index{sysio::handshake\_message@{sysio::handshake\_message}!head\_id@{head\_id}}
+\index{head\_id@{head\_id}!sysio::handshake\_message@{sysio::handshake\_message}}
+\doxysubsubsection{\texorpdfstring{head\_id}{head\_id}}
+{\footnotesize\ttfamily \label{structsysio_1_1handshake__message_a2ca0bcb5e2387d67ae1d05e7a9718595} 
+\mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{block\+\_\+id\+\_\+type}} sysio\+::handshake\+\_\+message\+::head\+\_\+id}
+
+
+
+Definition at line \mbox{\hyperlink{plugins_2net__plugin_2include_2sysio_2net__plugin_2protocol_8hpp_source_l00039}{39}} of file \mbox{\hyperlink{plugins_2net__plugin_2include_2sysio_2net__plugin_2protocol_8hpp_source}{protocol.\+hpp}}.
+
+\Hypertarget{structsysio_1_1handshake__message_a1b2717cc284cb6f783d1a2c4602f66d3}\index{sysio::handshake\_message@{sysio::handshake\_message}!head\_num@{head\_num}}
+\index{head\_num@{head\_num}!sysio::handshake\_message@{sysio::handshake\_message}}
+\doxysubsubsection{\texorpdfstring{head\_num}{head\_num}}
+{\footnotesize\ttfamily \label{structsysio_1_1handshake__message_a1b2717cc284cb6f783d1a2c4602f66d3} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::handshake\+\_\+message\+::head\+\_\+num = 0}
+
+
+
+Definition at line \mbox{\hyperlink{plugins_2net__plugin_2include_2sysio_2net__plugin_2protocol_8hpp_source_l00038}{38}} of file \mbox{\hyperlink{plugins_2net__plugin_2include_2sysio_2net__plugin_2protocol_8hpp_source}{protocol.\+hpp}}.
+
+\Hypertarget{structsysio_1_1handshake__message_aae336a35f5684178d56be1a8aed48a82}\index{sysio::handshake\_message@{sysio::handshake\_message}!key@{key}}
+\index{key@{key}!sysio::handshake\_message@{sysio::handshake\_message}}
+\doxysubsubsection{\texorpdfstring{key}{key}}
+{\footnotesize\ttfamily \label{structsysio_1_1handshake__message_aae336a35f5684178d56be1a8aed48a82} 
+\mbox{\hyperlink{namespacesysio_1_1chain_a0628a11f388cd2e43b1ccc1260a1042f}{chain\+::public\+\_\+key\+\_\+type}} sysio\+::handshake\+\_\+message\+::key}
+
+
+
+Definition at line \mbox{\hyperlink{plugins_2net__plugin_2include_2sysio_2net__plugin_2protocol_8hpp_source_l00031}{31}} of file \mbox{\hyperlink{plugins_2net__plugin_2include_2sysio_2net__plugin_2protocol_8hpp_source}{protocol.\+hpp}}.
+
+\Hypertarget{structsysio_1_1handshake__message_add797e772415837261beaef238a7faa6}\index{sysio::handshake\_message@{sysio::handshake\_message}!last\_irreversible\_block\_id@{last\_irreversible\_block\_id}}
+\index{last\_irreversible\_block\_id@{last\_irreversible\_block\_id}!sysio::handshake\_message@{sysio::handshake\_message}}
+\doxysubsubsection{\texorpdfstring{last\_irreversible\_block\_id}{last\_irreversible\_block\_id}}
+{\footnotesize\ttfamily \label{structsysio_1_1handshake__message_add797e772415837261beaef238a7faa6} 
+\mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{block\+\_\+id\+\_\+type}} sysio\+::handshake\+\_\+message\+::last\+\_\+irreversible\+\_\+block\+\_\+id}
+
+
+
+Definition at line \mbox{\hyperlink{plugins_2net__plugin_2include_2sysio_2net__plugin_2protocol_8hpp_source_l00037}{37}} of file \mbox{\hyperlink{plugins_2net__plugin_2include_2sysio_2net__plugin_2protocol_8hpp_source}{protocol.\+hpp}}.
+
+\Hypertarget{structsysio_1_1handshake__message_a6a66b5762131e7f7684c0f5baf3a6705}\index{sysio::handshake\_message@{sysio::handshake\_message}!last\_irreversible\_block\_num@{last\_irreversible\_block\_num}}
+\index{last\_irreversible\_block\_num@{last\_irreversible\_block\_num}!sysio::handshake\_message@{sysio::handshake\_message}}
+\doxysubsubsection{\texorpdfstring{last\_irreversible\_block\_num}{last\_irreversible\_block\_num}}
+{\footnotesize\ttfamily \label{structsysio_1_1handshake__message_a6a66b5762131e7f7684c0f5baf3a6705} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::handshake\+\_\+message\+::last\+\_\+irreversible\+\_\+block\+\_\+num = 0}
+
+
+
+Definition at line \mbox{\hyperlink{plugins_2net__plugin_2include_2sysio_2net__plugin_2protocol_8hpp_source_l00036}{36}} of file \mbox{\hyperlink{plugins_2net__plugin_2include_2sysio_2net__plugin_2protocol_8hpp_source}{protocol.\+hpp}}.
+
+\Hypertarget{structsysio_1_1handshake__message_a1d5b498e96d2c54874cfd26c1d8ef9ae}\index{sysio::handshake\_message@{sysio::handshake\_message}!network\_version@{network\_version}}
+\index{network\_version@{network\_version}!sysio::handshake\_message@{sysio::handshake\_message}}
+\doxysubsubsection{\texorpdfstring{network\_version}{network\_version}}
+{\footnotesize\ttfamily \label{structsysio_1_1handshake__message_a1d5b498e96d2c54874cfd26c1d8ef9ae} 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} sysio\+::handshake\+\_\+message\+::network\+\_\+version = 0}
+
+
+
+Definition at line \mbox{\hyperlink{plugins_2net__plugin_2include_2sysio_2net__plugin_2protocol_8hpp_source_l00028}{28}} of file \mbox{\hyperlink{plugins_2net__plugin_2include_2sysio_2net__plugin_2protocol_8hpp_source}{protocol.\+hpp}}.
+
+\Hypertarget{structsysio_1_1handshake__message_a7f8190c5079ab1745b344ffc43d4cad3}\index{sysio::handshake\_message@{sysio::handshake\_message}!node\_id@{node\_id}}
+\index{node\_id@{node\_id}!sysio::handshake\_message@{sysio::handshake\_message}}
+\doxysubsubsection{\texorpdfstring{node\_id}{node\_id}}
+{\footnotesize\ttfamily \label{structsysio_1_1handshake__message_a7f8190c5079ab1745b344ffc43d4cad3} 
+\mbox{\hyperlink{classfc_1_1sha256}{fc\+::sha256}} sysio\+::handshake\+\_\+message\+::node\+\_\+id}
+
+
+
+Definition at line \mbox{\hyperlink{plugins_2net__plugin_2include_2sysio_2net__plugin_2protocol_8hpp_source_l00030}{30}} of file \mbox{\hyperlink{plugins_2net__plugin_2include_2sysio_2net__plugin_2protocol_8hpp_source}{protocol.\+hpp}}.
+
+\Hypertarget{structsysio_1_1handshake__message_a11d748ba9306ff51196c7ee1818bfd17}\index{sysio::handshake\_message@{sysio::handshake\_message}!os@{os}}
+\index{os@{os}!sysio::handshake\_message@{sysio::handshake\_message}}
+\doxysubsubsection{\texorpdfstring{os}{os}}
+{\footnotesize\ttfamily \label{structsysio_1_1handshake__message_a11d748ba9306ff51196c7ee1818bfd17} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::handshake\+\_\+message\+::os}
+
+
+
+Definition at line \mbox{\hyperlink{plugins_2net__plugin_2include_2sysio_2net__plugin_2protocol_8hpp_source_l00040}{40}} of file \mbox{\hyperlink{plugins_2net__plugin_2include_2sysio_2net__plugin_2protocol_8hpp_source}{protocol.\+hpp}}.
+
+\Hypertarget{structsysio_1_1handshake__message_a39bdbe3cacc0ee82d4c1238df057a56c}\index{sysio::handshake\_message@{sysio::handshake\_message}!p2p\_address@{p2p\_address}}
+\index{p2p\_address@{p2p\_address}!sysio::handshake\_message@{sysio::handshake\_message}}
+\doxysubsubsection{\texorpdfstring{p2p\_address}{p2p\_address}}
+{\footnotesize\ttfamily \label{structsysio_1_1handshake__message_a39bdbe3cacc0ee82d4c1238df057a56c} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::handshake\+\_\+message\+::p2p\+\_\+address}
+
+
+
+Definition at line \mbox{\hyperlink{plugins_2net__plugin_2include_2sysio_2net__plugin_2protocol_8hpp_source_l00035}{35}} of file \mbox{\hyperlink{plugins_2net__plugin_2include_2sysio_2net__plugin_2protocol_8hpp_source}{protocol.\+hpp}}.
+
+\Hypertarget{structsysio_1_1handshake__message_acd6da9c0533522d811f395059d20c96c}\index{sysio::handshake\_message@{sysio::handshake\_message}!sig@{sig}}
+\index{sig@{sig}!sysio::handshake\_message@{sysio::handshake\_message}}
+\doxysubsubsection{\texorpdfstring{sig}{sig}}
+{\footnotesize\ttfamily \label{structsysio_1_1handshake__message_acd6da9c0533522d811f395059d20c96c} 
+\mbox{\hyperlink{namespacesysio_1_1chain_af141a69eb789b86fa0eb93c2d263f0df}{chain\+::signature\+\_\+type}} sysio\+::handshake\+\_\+message\+::sig}
+
+
+
+Definition at line \mbox{\hyperlink{plugins_2net__plugin_2include_2sysio_2net__plugin_2protocol_8hpp_source_l00034}{34}} of file \mbox{\hyperlink{plugins_2net__plugin_2include_2sysio_2net__plugin_2protocol_8hpp_source}{protocol.\+hpp}}.
+
+\Hypertarget{structsysio_1_1handshake__message_ad620c6e5ccdc5205e285934b9b8c15f3}\index{sysio::handshake\_message@{sysio::handshake\_message}!time@{time}}
+\index{time@{time}!sysio::handshake\_message@{sysio::handshake\_message}}
+\doxysubsubsection{\texorpdfstring{time}{time}}
+{\footnotesize\ttfamily \label{structsysio_1_1handshake__message_ad620c6e5ccdc5205e285934b9b8c15f3} 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} sysio\+::handshake\+\_\+message\+::time \{0\}}
+
+
+
+Definition at line \mbox{\hyperlink{plugins_2net__plugin_2include_2sysio_2net__plugin_2protocol_8hpp_source_l00032}{32}} of file \mbox{\hyperlink{plugins_2net__plugin_2include_2sysio_2net__plugin_2protocol_8hpp_source}{protocol.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00032\ \{0\};\ }
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1handshake__message_a874f3e3e6f73875dde3e49cae0086ba2}\index{sysio::handshake\_message@{sysio::handshake\_message}!token@{token}}
+\index{token@{token}!sysio::handshake\_message@{sysio::handshake\_message}}
+\doxysubsubsection{\texorpdfstring{token}{token}}
+{\footnotesize\ttfamily \label{structsysio_1_1handshake__message_a874f3e3e6f73875dde3e49cae0086ba2} 
+\mbox{\hyperlink{classfc_1_1sha256}{fc\+::sha256}} sysio\+::handshake\+\_\+message\+::token}
+
+
+
+Definition at line \mbox{\hyperlink{plugins_2net__plugin_2include_2sysio_2net__plugin_2protocol_8hpp_source_l00033}{33}} of file \mbox{\hyperlink{plugins_2net__plugin_2include_2sysio_2net__plugin_2protocol_8hpp_source}{protocol.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+plugins/net\+\_\+plugin/include/sysio/net\+\_\+plugin/\mbox{\hyperlink{plugins_2net__plugin_2include_2sysio_2net__plugin_2protocol_8hpp}{protocol.\+hpp}}\end{DoxyCompactItemize}

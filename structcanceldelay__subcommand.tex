@@ -1,0 +1,101 @@
+\doxysection{canceldelay\+\_\+subcommand Struct Reference}
+\hypertarget{structcanceldelay__subcommand}{}\label{structcanceldelay__subcommand}\index{canceldelay\_subcommand@{canceldelay\_subcommand}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structcanceldelay__subcommand_aebb722eed1632dbbb6db7d96735699b8}{canceldelay\+\_\+subcommand}} (\mbox{\hyperlink{class_c_l_i_1_1_app}{CLI\+::\+App}} \texorpdfstring{$\ast$}{*}action\+Root)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structcanceldelay__subcommand_a12231508b35bf92bdc9a6ebd98d49f72}{canceling\+\_\+account}}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structcanceldelay__subcommand_a89d242b8527b967f1bd91f2b47c9d530}{canceling\+\_\+permission}}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structcanceldelay__subcommand_ae0d0dfb1478f2f9d5b90181466be7554}{trx\+\_\+id}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01789}{1789}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structcanceldelay__subcommand_aebb722eed1632dbbb6db7d96735699b8}\index{canceldelay\_subcommand@{canceldelay\_subcommand}!canceldelay\_subcommand@{canceldelay\_subcommand}}
+\index{canceldelay\_subcommand@{canceldelay\_subcommand}!canceldelay\_subcommand@{canceldelay\_subcommand}}
+\doxysubsubsection{\texorpdfstring{canceldelay\_subcommand()}{canceldelay\_subcommand()}}
+{\footnotesize\ttfamily \label{structcanceldelay__subcommand_aebb722eed1632dbbb6db7d96735699b8} 
+canceldelay\+\_\+subcommand\+::canceldelay\+\_\+subcommand (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_c_l_i_1_1_app}{CLI\+::\+App}} \texorpdfstring{$\ast$}{*}}]{action\+Root}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01794}{1794}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01794\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01795\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ cancel\_delay\ =\ actionRoot-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_a8b461d2233ec4121259011b5ed24b336}{add\_subcommand}}(\textcolor{stringliteral}{"{}canceldelay"{}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}Cancel\ a\ delayed\ transaction"{}}));}
+\DoxyCodeLine{01796\ \ \ \ \ \ \ cancel\_delay-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_a8c812d42c7720ecb5cd0aec41b5aa941}{add\_option}}(\textcolor{stringliteral}{"{}canceling\_account"{}},\ \mbox{\hyperlink{structcanceldelay__subcommand_a12231508b35bf92bdc9a6ebd98d49f72}{canceling\_account}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}Account\ from\ authorization\ on\ the\ original\ delayed\ transaction"{}}))-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a}{required}}();}
+\DoxyCodeLine{01797\ \ \ \ \ \ \ cancel\_delay-\/>add\_option(\textcolor{stringliteral}{"{}canceling\_permission"{}},\ \mbox{\hyperlink{structcanceldelay__subcommand_a89d242b8527b967f1bd91f2b47c9d530}{canceling\_permission}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}Permission\ from\ authorization\ on\ the\ original\ delayed\ transaction"{}}))-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a}{required}}();}
+\DoxyCodeLine{01798\ \ \ \ \ \ \ cancel\_delay-\/>add\_option(\textcolor{stringliteral}{"{}trx\_id"{}},\ \mbox{\hyperlink{structcanceldelay__subcommand_ae0d0dfb1478f2f9d5b90181466be7554}{trx\_id}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}The\ transaction\ id\ of\ the\ original\ delayed\ transaction"{}}))-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a}{required}}();}
+\DoxyCodeLine{01799\ \ \ \ \ \ \ \mbox{\hyperlink{programs_2clio_2main_8cpp_aa5d53f41b83b5323c73622fbbb15e9cd}{add\_standard\_transaction\_options}}(cancel\_delay,\ \textcolor{stringliteral}{"{}canceling\_account@canceling\_permission"{}});}
+\DoxyCodeLine{01800\ }
+\DoxyCodeLine{01801\ \ \ \ \ \ \ cancel\_delay-\/>callback([\textcolor{keyword}{this}]\ \{}
+\DoxyCodeLine{01802\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ canceling\_auth\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1permission__level}{permission\_level}}\{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(\mbox{\hyperlink{structcanceldelay__subcommand_a12231508b35bf92bdc9a6ebd98d49f72}{canceling\_account}}),\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(\mbox{\hyperlink{structcanceldelay__subcommand_a89d242b8527b967f1bd91f2b47c9d530}{canceling\_permission}})\};}
+\DoxyCodeLine{01803\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}\ act\_payload\ =\ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}()}
+\DoxyCodeLine{01804\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}canceling\_auth"{}},\ canceling\_auth)}
+\DoxyCodeLine{01805\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}trx\_id"{}},\ \mbox{\hyperlink{structcanceldelay__subcommand_ae0d0dfb1478f2f9d5b90181466be7554}{trx\_id}});}
+\DoxyCodeLine{01806\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ accountPermissions\ =\ \mbox{\hyperlink{programs_2clio_2main_8cpp_a2b91ca5dbe7cc4ab287d0e44c3037552}{get\_account\_permissions}}(\mbox{\hyperlink{programs_2clio_2main_8cpp_ad552924cb151dcd5b60c73856d1ff706}{tx\_permission}},\ canceling\_auth);}
+\DoxyCodeLine{01807\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{programs_2clio_2main_8cpp_aaf784434864a29e4835be7465173d1ab}{send\_actions}}(\{\mbox{\hyperlink{programs_2clio_2main_8cpp_a067e20df5f65333b0c3cf5840bc37dea}{create\_action}}(accountPermissions,\ config::system\_account\_name,\ \textcolor{stringliteral}{"{}canceldelay"{}}\_n,\ act\_payload)\});}
+\DoxyCodeLine{01808\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{01809\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structcanceldelay__subcommand_aebb722eed1632dbbb6db7d96735699b8_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structcanceldelay__subcommand_a12231508b35bf92bdc9a6ebd98d49f72}\index{canceldelay\_subcommand@{canceldelay\_subcommand}!canceling\_account@{canceling\_account}}
+\index{canceling\_account@{canceling\_account}!canceldelay\_subcommand@{canceldelay\_subcommand}}
+\doxysubsubsection{\texorpdfstring{canceling\_account}{canceling\_account}}
+{\footnotesize\ttfamily \label{structcanceldelay__subcommand_a12231508b35bf92bdc9a6ebd98d49f72} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} canceldelay\+\_\+subcommand\+::canceling\+\_\+account}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01790}{1790}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{structcanceldelay__subcommand_a89d242b8527b967f1bd91f2b47c9d530}\index{canceldelay\_subcommand@{canceldelay\_subcommand}!canceling\_permission@{canceling\_permission}}
+\index{canceling\_permission@{canceling\_permission}!canceldelay\_subcommand@{canceldelay\_subcommand}}
+\doxysubsubsection{\texorpdfstring{canceling\_permission}{canceling\_permission}}
+{\footnotesize\ttfamily \label{structcanceldelay__subcommand_a89d242b8527b967f1bd91f2b47c9d530} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} canceldelay\+\_\+subcommand\+::canceling\+\_\+permission}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01791}{1791}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{structcanceldelay__subcommand_ae0d0dfb1478f2f9d5b90181466be7554}\index{canceldelay\_subcommand@{canceldelay\_subcommand}!trx\_id@{trx\_id}}
+\index{trx\_id@{trx\_id}!canceldelay\_subcommand@{canceldelay\_subcommand}}
+\doxysubsubsection{\texorpdfstring{trx\_id}{trx\_id}}
+{\footnotesize\ttfamily \label{structcanceldelay__subcommand_ae0d0dfb1478f2f9d5b90181466be7554} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} canceldelay\+\_\+subcommand\+::trx\+\_\+id}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01792}{1792}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+programs/clio/\mbox{\hyperlink{programs_2clio_2main_8cpp}{main.\+cpp}}\end{DoxyCompactItemize}

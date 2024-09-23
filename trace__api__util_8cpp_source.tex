@@ -1,0 +1,88 @@
+\doxysection{trace\+\_\+api\+\_\+util.\+cpp}
+\hypertarget{trace__api__util_8cpp_source}{}\label{trace__api__util_8cpp_source}\index{plugins/trace\_api\_plugin/utils/trace\_api\_util.cpp@{plugins/trace\_api\_plugin/utils/trace\_api\_util.cpp}}
+\mbox{\hyperlink{trace__api__util_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{cmd__registration_8hpp}{sysio/trace\_api/cmd\_registration.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <iostream>}}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <boost/program\_options.hpp>}}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00007}00007\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacesysio_1_1trace__api}{sysio::trace\_api}};}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00008}00008\ \textcolor{keyword}{namespace\ }bpo\ =\ boost::program\_options;}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00010}00010\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1command__registration}{command\_registration}}*\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1command__registration_a339cfdb3bfbfeadf6d06c2bbe5526091}{command\_registration::\_list}}\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00012}00012\ \textcolor{keyword}{namespace\ }\{}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00013}00013\ \ \ \ \textcolor{keyword}{auto}\ create\_command\_map()\ \{}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00014}00014\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ result\ =\ std::map<std::string,\ command\_registration*>();}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00015}00015\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1trace__api_1_1command__registration}{command\_registration}}*\ cur\ =\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1command__registration_a339cfdb3bfbfeadf6d06c2bbe5526091}{command\_registration::\_list}};}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00016}00016\ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (cur\ !=\ \textcolor{keyword}{nullptr})\ \{}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00017}00017\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (result.count(cur-\/>\mbox{\hyperlink{structsysio_1_1trace__api_1_1command__registration_aba1c317cc4b2299a08dc2520a34d0cd6}{name}})\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00018}00018\ \ \ \ \ \ \ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}Illformed\ Program,\ duplicate\ subcommand:\ "{}}\ <<\ cur-\/>\mbox{\hyperlink{structsysio_1_1trace__api_1_1command__registration_aba1c317cc4b2299a08dc2520a34d0cd6}{name}}\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00019}00019\ \ \ \ \ \ \ \ \ \ \ \ \ exit(1);}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00020}00020\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00021}00021\ \ \ \ \ \ \ \ \ \ result[cur-\/>\mbox{\hyperlink{structsysio_1_1trace__api_1_1command__registration_aba1c317cc4b2299a08dc2520a34d0cd6}{name}}]\ =\ cur;}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00022}00022\ \ \ \ \ \ \ \ \ \ cur\ =\ cur-\/>\mbox{\hyperlink{structsysio_1_1trace__api_1_1command__registration_a612a39efc82b9fbadb057a9d9684301d}{\_next}};}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00023}00023\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00025}00025\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00026}00026\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00027}00027\ \}}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00029}\mbox{\hyperlink{trace__api__util_8cpp_a3c04138a5bfe5d72780bb7e82a18e627}{00029}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}(\textcolor{keywordtype}{int}\ argc,\ \textcolor{keywordtype}{char}**\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}})\ \{}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00030}00030\ \ \ \ \textcolor{keyword}{auto}\ command\_map\ =\ create\_command\_map();}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00032}00032\ \ \ \ bpo::options\_description\ vis\_desc(\textcolor{stringliteral}{"{}Options"{}});}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00033}00033\ \ \ \ \textcolor{keyword}{auto}\ vis\_opts\ =\ vis\_desc.add\_options();}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00034}00034\ \ \ \ vis\_opts(\textcolor{stringliteral}{"{}help,h"{}},\ \textcolor{stringliteral}{"{}show\ usage\ help\ message"{}});}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00036}00036\ \ \ \ bpo::options\_description\ hidden\_desc;}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00037}00037\ \ \ \ \textcolor{keyword}{auto}\ hidden\_opts\ =\ hidden\_desc.add\_options();}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00038}00038\ \ \ \ hidden\_opts(\textcolor{stringliteral}{"{}subargs"{}},\ bpo::value<std::vector<std::string>>(),\ \textcolor{stringliteral}{"{}args"{}});}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00040}00040\ \ \ \ bpo::positional\_options\_description\ pos\_desc;}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00041}00041\ \ \ \ pos\_desc.add(\textcolor{stringliteral}{"{}subargs"{}},\ -\/1);}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00043}00043\ \ \ \ bpo::options\_description\ cmdline\_options;}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00044}00044\ \ \ \ cmdline\_options.add(vis\_desc).add(hidden\_desc);}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00046}00046\ \ \ \ bpo::variables\_map\ vm;}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00047}00047\ \ \ \ \textcolor{keyword}{auto}\ parsed\_args\ =\ bpo::command\_line\_parser(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}).options(cmdline\_options).positional(pos\_desc).allow\_unregistered().run();}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00048}00048\ \ \ \ bpo::store(parsed\_args,\ vm);}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00050}00050\ \ \ \ std::vector<std::string>\ args\ =\ bpo::collect\_unrecognized(parsed\_args.options,\ bpo::include\_positional);}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00052}00052\ \ \ \ \textcolor{keyword}{auto}\ show\_help\ =\ [\&](std::ostream\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\ \{}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00053}00053\ \ \ \ \ \ \ os\ <<}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Usage:\ trace\_api\_util\ <options>\ command\ ...\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Commands:\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00058}00058\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ e:\ command\_map)\ \{}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00059}00059\ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}\ \ "{}}\ <<\ e.second-\/>name\ <<\ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ \ \ \ \ \ \ \ "{}}\ <<\ e.second-\/>slug\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00060}00060\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00062}00062\ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}\ <<\ vis\_desc\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00063}00063\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00065}00065\ \ \ \ \textcolor{keywordflow}{if}\ (args.size()\ <\ 1)\ \{}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00066}00066\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (vm.count(\textcolor{stringliteral}{"{}help"{}})\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00067}00067\ \ \ \ \ \ \ \ \ \ show\_help(std::cout);}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00069}00069\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00071}00071\ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}Error:\ No\ command\ provided\(\backslash\)n\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00072}00072\ \ \ \ \ \ \ show\_help(std::cerr);}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00073}00073\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00074}00074\ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (command\_map.count(args.at(0))\ ==\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00075}00075\ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}Error:\ unknown\ command\ \(\backslash\)"{}"{}}\ <<\ args.at(0)\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)"{}\(\backslash\)n\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00076}00076\ \ \ \ \ \ \ show\_help(std::cerr);}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00077}00077\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00078}00078\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00080}00080\ \ \ \ \textcolor{comment}{//\ trim\ the\ command\ name\ and\ pass\ the\ rest\ of\ the\ args\ to\ the\ defined\ command}}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00081}00081\ \ \ \ \textcolor{keywordflow}{return}\ command\_map.at(args.at(0))-\/>func(vm,\ std::vector<std::string>(args.begin()\ +\ 1,\ args.end()));}
+\DoxyCodeLine{\Hypertarget{trace__api__util_8cpp_source_l00082}00082\ \}}
+
+\end{DoxyCode}

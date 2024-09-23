@@ -1,0 +1,8 @@
+<map id="internal::StrtodFast" name="internal::StrtodFast">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,138,56"/>
+<area shape="rect" id="Node000002" href="$namespaceinternal.html#aa1bb51d788788eb5390a16462b40d98d" title=" " alt="" coords="186,5,310,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="138,31,170,27,171,32,138,37"/>
+<area shape="rect" id="Node000003" href="$namespaceinternal.html#af01c41d045d596e2f8d1888cf6fbecb6" title="Computes integer powers of 10 in double (10.0^n)." alt="" coords="358,31,469,56"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="138,41,343,41,343,46,138,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="311,25,343,30,342,35,310,30"/>
+</map>

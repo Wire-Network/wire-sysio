@@ -1,0 +1,14 @@
+<map id="libraries/softfloat/source/include/primitives.h" name="libraries/softfloat/source/include/primitives.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="27,5,207,46"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,94,80,120"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="101,48,66,84,62,81,97,45"/>
+<area shape="rect" id="Node000003" href="$stdint_8h.html" title=" " alt="" coords="133,168,197,193"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="124,46,145,119,157,152,152,154,140,120,119,47"/>
+<area shape="rect" id="Node000006" href="$softfloat_2source_2include_2primitive_types_8h.html" title=" " alt="" coords="155,94,271,120"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="143,44,188,82,185,86,139,48"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="90,241,153,267"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="160,195,139,229,134,226,156,192"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="177,241,244,267"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="175,192,197,227,193,230,170,195"/>
+<area shape="poly" id="edge6_Node000006_Node000003" title=" " alt="" coords="207,121,184,156,180,153,203,118"/>
+</map>

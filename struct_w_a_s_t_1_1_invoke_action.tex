@@ -1,0 +1,114 @@
+\doxysection{WAST\+::Invoke\+Action Struct Reference}
+\hypertarget{struct_w_a_s_t_1_1_invoke_action}{}\label{struct_w_a_s_t_1_1_invoke_action}\index{WAST::InvokeAction@{WAST::InvokeAction}}
+
+
+{\ttfamily \#include $<$Test\+Script.\+h$>$}
+
+
+
+Inheritance diagram for WAST\+::Invoke\+Action\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=186pt]{struct_w_a_s_t_1_1_invoke_action__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for WAST\+::Invoke\+Action\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=257pt]{struct_w_a_s_t_1_1_invoke_action__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_w_a_s_t_1_1_invoke_action_ac44479a509723c131e0a8168186339de}{Invoke\+Action}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_text_file_locus}{Text\+File\+Locus}} \&\&in\+Locus, std\+::string \&\&in\+Internal\+Module\+Name, std\+::string \&\&in\+Export\+Name, std\+::vector$<$ \mbox{\hyperlink{struct_runtime_1_1_value}{Runtime\+::\+Value}} $>$ \&\&in\+Arguments)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{struct_w_a_s_t_1_1_action}{WAST\+::\+Action}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_w_a_s_t_1_1_action_aac7d30058fa131ab6f8827980f079a10}{Action}} (\mbox{\hyperlink{namespace_w_a_s_t_a054762705d8542a796362ce7f711b628}{Action\+Type}} in\+Type, \mbox{\hyperlink{struct_w_a_s_t_1_1_text_file_locus}{Text\+File\+Locus}} \&\&in\+Locus)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::string \mbox{\hyperlink{struct_w_a_s_t_1_1_invoke_action_a42b2e508ff018966a86be5d4c51d69bf}{internal\+Module\+Name}}
+\item 
+std\+::string \mbox{\hyperlink{struct_w_a_s_t_1_1_invoke_action_ab4d2b92ec166e49d43c243927bd2dd9c}{export\+Name}}
+\item 
+std\+::vector$<$ \mbox{\hyperlink{struct_runtime_1_1_value}{Runtime\+::\+Value}} $>$ \mbox{\hyperlink{struct_w_a_s_t_1_1_invoke_action_ad882e9603f97e795c49942680029bea8}{arguments}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes inherited from \mbox{\hyperlink{struct_w_a_s_t_1_1_action}{WAST\+::\+Action}}}
+\begin{DoxyCompactItemize}
+\item 
+const \mbox{\hyperlink{namespace_w_a_s_t_a054762705d8542a796362ce7f711b628}{Action\+Type}} \mbox{\hyperlink{struct_w_a_s_t_1_1_action_a67e4f46e3021e93b3d38a97cc86254cc}{type}}
+\item 
+const \mbox{\hyperlink{struct_w_a_s_t_1_1_text_file_locus}{Text\+File\+Locus}} \mbox{\hyperlink{struct_w_a_s_t_1_1_action_af67c1490eebb9ee56eeba36960cfe4d7}{locus}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{_test_script_8h_source_l00064}{64}} of file \mbox{\hyperlink{_test_script_8h_source}{Test\+Script.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{struct_w_a_s_t_1_1_invoke_action_ac44479a509723c131e0a8168186339de}\index{WAST::InvokeAction@{WAST::InvokeAction}!InvokeAction@{InvokeAction}}
+\index{InvokeAction@{InvokeAction}!WAST::InvokeAction@{WAST::InvokeAction}}
+\doxysubsubsection{\texorpdfstring{InvokeAction()}{InvokeAction()}}
+{\footnotesize\ttfamily \label{struct_w_a_s_t_1_1_invoke_action_ac44479a509723c131e0a8168186339de} 
+WAST\+::\+Invoke\+Action\+::\+Invoke\+Action (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_w_a_s_t_1_1_text_file_locus}{Text\+File\+Locus}} \&\&}]{in\+Locus}{, }\item[{std\+::string \&\&}]{in\+Internal\+Module\+Name}{, }\item[{std\+::string \&\&}]{in\+Export\+Name}{, }\item[{std\+::vector$<$ \mbox{\hyperlink{struct_runtime_1_1_value}{Runtime\+::\+Value}} $>$ \&\&}]{in\+Arguments}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_test_script_8h_source_l00069}{69}} of file \mbox{\hyperlink{_test_script_8h_source}{Test\+Script.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{struct_w_a_s_t_1_1_action_aac7d30058fa131ab6f8827980f079a10}{Action}}(\mbox{\hyperlink{namespace_w_a_s_t_a054762705d8542a796362ce7f711b628a5fb833d20ef9f93596f4117a81523536}{ActionType::invoke}},std::move(inLocus)),\ \mbox{\hyperlink{struct_w_a_s_t_1_1_invoke_action_a42b2e508ff018966a86be5d4c51d69bf}{internalModuleName}}(inInternalModuleName),\ \mbox{\hyperlink{struct_w_a_s_t_1_1_invoke_action_ab4d2b92ec166e49d43c243927bd2dd9c}{exportName}}(inExportName),\ \mbox{\hyperlink{struct_w_a_s_t_1_1_invoke_action_ad882e9603f97e795c49942680029bea8}{arguments}}(inArguments)}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_w_a_s_t_1_1_invoke_action_ad882e9603f97e795c49942680029bea8}\index{WAST::InvokeAction@{WAST::InvokeAction}!arguments@{arguments}}
+\index{arguments@{arguments}!WAST::InvokeAction@{WAST::InvokeAction}}
+\doxysubsubsection{\texorpdfstring{arguments}{arguments}}
+{\footnotesize\ttfamily \label{struct_w_a_s_t_1_1_invoke_action_ad882e9603f97e795c49942680029bea8} 
+std\+::vector$<$\mbox{\hyperlink{struct_runtime_1_1_value}{Runtime\+::\+Value}}$>$ WAST\+::\+Invoke\+Action\+::arguments}
+
+
+
+Definition at line \mbox{\hyperlink{_test_script_8h_source_l00068}{68}} of file \mbox{\hyperlink{_test_script_8h_source}{Test\+Script.\+h}}.
+
+\Hypertarget{struct_w_a_s_t_1_1_invoke_action_ab4d2b92ec166e49d43c243927bd2dd9c}\index{WAST::InvokeAction@{WAST::InvokeAction}!exportName@{exportName}}
+\index{exportName@{exportName}!WAST::InvokeAction@{WAST::InvokeAction}}
+\doxysubsubsection{\texorpdfstring{exportName}{exportName}}
+{\footnotesize\ttfamily \label{struct_w_a_s_t_1_1_invoke_action_ab4d2b92ec166e49d43c243927bd2dd9c} 
+std\+::string WAST\+::\+Invoke\+Action\+::export\+Name}
+
+
+
+Definition at line \mbox{\hyperlink{_test_script_8h_source_l00067}{67}} of file \mbox{\hyperlink{_test_script_8h_source}{Test\+Script.\+h}}.
+
+\Hypertarget{struct_w_a_s_t_1_1_invoke_action_a42b2e508ff018966a86be5d4c51d69bf}\index{WAST::InvokeAction@{WAST::InvokeAction}!internalModuleName@{internalModuleName}}
+\index{internalModuleName@{internalModuleName}!WAST::InvokeAction@{WAST::InvokeAction}}
+\doxysubsubsection{\texorpdfstring{internalModuleName}{internalModuleName}}
+{\footnotesize\ttfamily \label{struct_w_a_s_t_1_1_invoke_action_a42b2e508ff018966a86be5d4c51d69bf} 
+std\+::string WAST\+::\+Invoke\+Action\+::internal\+Module\+Name}
+
+
+
+Definition at line \mbox{\hyperlink{_test_script_8h_source_l00066}{66}} of file \mbox{\hyperlink{_test_script_8h_source}{Test\+Script.\+h}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/wasm-\/jit/\+Include/\+WAST/\mbox{\hyperlink{_test_script_8h}{Test\+Script.\+h}}\end{DoxyCompactItemize}

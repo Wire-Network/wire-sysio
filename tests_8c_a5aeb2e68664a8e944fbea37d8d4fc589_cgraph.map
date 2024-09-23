@@ -1,0 +1,9 @@
+<map id="test_ecmult_multi" name="test_ecmult_multi">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,130,56"/>
+<area shape="rect" id="Node000002" href="$tests_8c.html#a63a7c68b6b72356c59cfdaaab131c73b" title=" " alt="" coords="178,5,363,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="130,33,162,29,163,34,130,38"/>
+<area shape="rect" id="Node000004" href="$tests_8c.html#a01cf4b4fc9b4ab8cb3e04fd3dc2ff57f" title=" " alt="" coords="199,55,342,80"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="130,48,184,55,183,60,130,53"/>
+<area shape="rect" id="Node000003" href="$tests_8c.html#af038dec65d22bf5050a82de7b4ad4bca" title=" " alt="" coords="411,5,588,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="363,16,395,16,395,21,363,21"/>
+</map>

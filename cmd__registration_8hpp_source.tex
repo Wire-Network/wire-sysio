@@ -1,0 +1,37 @@
+\doxysection{cmd\+\_\+registration.\+hpp}
+\hypertarget{cmd__registration_8hpp_source}{}\label{cmd__registration_8hpp_source}\index{plugins/trace\_api\_plugin/utils/include/sysio/trace\_api/cmd\_registration.hpp@{plugins/trace\_api\_plugin/utils/include/sysio/trace\_api/cmd\_registration.hpp}}
+\mbox{\hyperlink{cmd__registration_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{cmd__registration_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{cmd__registration_8hpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{cmd__registration_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{\Hypertarget{cmd__registration_8hpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <functional>}}
+\DoxyCodeLine{\Hypertarget{cmd__registration_8hpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{\Hypertarget{cmd__registration_8hpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{cmd__registration_8hpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <boost/program\_options.hpp>}}
+\DoxyCodeLine{\Hypertarget{cmd__registration_8hpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{cmd__registration_8hpp_source_l00009}00009\ \textcolor{keyword}{namespace\ }bpo\ =\ boost::program\_options;}
+\DoxyCodeLine{\Hypertarget{cmd__registration_8hpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{cmd__registration_8hpp_source_l00011}00011\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio_1_1trace__api}{sysio::trace\_api}}\ \{}
+\DoxyCodeLine{\Hypertarget{cmd__registration_8hpp_source_l00015}\mbox{\hyperlink{namespacesysio_1_1trace__api_ac8eb6442da5d5494700c3575a8641046}{00015}}\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacesysio_1_1trace__api_ac8eb6442da5d5494700c3575a8641046}{command\_fn}}\ =\ std::function<int(\ \textcolor{keyword}{const}\ bpo::variables\_map\&,\ \textcolor{keyword}{const}\ std::vector<std::string>\&)>;}
+\DoxyCodeLine{\Hypertarget{cmd__registration_8hpp_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{cmd__registration_8hpp_source_l00020}\mbox{\hyperlink{structsysio_1_1trace__api_1_1command__registration}{00020}}\ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structsysio_1_1trace__api_1_1command__registration}{command\_registration}}\ \{}
+\DoxyCodeLine{\Hypertarget{cmd__registration_8hpp_source_l00021}\mbox{\hyperlink{structsysio_1_1trace__api_1_1command__registration_a170e950c44d1602a843683358c72c926}{00021}}\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1trace__api_1_1command__registration_a170e950c44d1602a843683358c72c926}{command\_registration}}(\ std::string\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}},\ std::string\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1command__registration_a8526bb7042d00d0a1b4c89e5c1493c7b}{slug}},\ \mbox{\hyperlink{namespacesysio_1_1trace__api_ac8eb6442da5d5494700c3575a8641046}{command\_fn}}\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1command__registration_a5c8e1c1bea3edfe4b9d79bd76b9855b8}{func}}\ )}
+\DoxyCodeLine{\Hypertarget{cmd__registration_8hpp_source_l00022}00022\ \ \ \ \ \ \ :\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}(\mbox{\hyperlink{namespacestd}{std}}::move(\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}))}
+\DoxyCodeLine{\Hypertarget{cmd__registration_8hpp_source_l00023}00023\ \ \ \ \ \ \ ,\mbox{\hyperlink{structsysio_1_1trace__api_1_1command__registration_a8526bb7042d00d0a1b4c89e5c1493c7b}{slug}}(\mbox{\hyperlink{namespacestd}{std}}::move(\mbox{\hyperlink{structsysio_1_1trace__api_1_1command__registration_a8526bb7042d00d0a1b4c89e5c1493c7b}{slug}}))}
+\DoxyCodeLine{\Hypertarget{cmd__registration_8hpp_source_l00024}00024\ \ \ \ \ \ \ ,\mbox{\hyperlink{structsysio_1_1trace__api_1_1command__registration_a5c8e1c1bea3edfe4b9d79bd76b9855b8}{func}}(\mbox{\hyperlink{namespacestd}{std}}::move(\mbox{\hyperlink{structsysio_1_1trace__api_1_1command__registration_a5c8e1c1bea3edfe4b9d79bd76b9855b8}{func}}))}
+\DoxyCodeLine{\Hypertarget{cmd__registration_8hpp_source_l00025}00025\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{cmd__registration_8hpp_source_l00026}00026\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1trace__api_1_1command__registration_a612a39efc82b9fbadb057a9d9684301d}{\_next}}\ =\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1command__registration_a339cfdb3bfbfeadf6d06c2bbe5526091}{\_list}};}
+\DoxyCodeLine{\Hypertarget{cmd__registration_8hpp_source_l00027}00027\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1trace__api_1_1command__registration_a339cfdb3bfbfeadf6d06c2bbe5526091}{\_list}}\ =\ \textcolor{keyword}{this};}
+\DoxyCodeLine{\Hypertarget{cmd__registration_8hpp_source_l00028}00028\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{cmd__registration_8hpp_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{cmd__registration_8hpp_source_l00030}\mbox{\hyperlink{structsysio_1_1trace__api_1_1command__registration_aba1c317cc4b2299a08dc2520a34d0cd6}{00030}}\ \ \ \ \ \ \ std::string\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1command__registration_aba1c317cc4b2299a08dc2520a34d0cd6}{name}};}
+\DoxyCodeLine{\Hypertarget{cmd__registration_8hpp_source_l00031}\mbox{\hyperlink{structsysio_1_1trace__api_1_1command__registration_a8526bb7042d00d0a1b4c89e5c1493c7b}{00031}}\ \ \ \ \ \ \ std::string\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1command__registration_a8526bb7042d00d0a1b4c89e5c1493c7b}{slug}};}
+\DoxyCodeLine{\Hypertarget{cmd__registration_8hpp_source_l00032}\mbox{\hyperlink{structsysio_1_1trace__api_1_1command__registration_a5c8e1c1bea3edfe4b9d79bd76b9855b8}{00032}}\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1trace__api_ac8eb6442da5d5494700c3575a8641046}{command\_fn}}\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1command__registration_a5c8e1c1bea3edfe4b9d79bd76b9855b8}{func}};}
+\DoxyCodeLine{\Hypertarget{cmd__registration_8hpp_source_l00033}\mbox{\hyperlink{structsysio_1_1trace__api_1_1command__registration_a612a39efc82b9fbadb057a9d9684301d}{00033}}\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1trace__api_1_1command__registration}{command\_registration}}\ *\mbox{\hyperlink{structsysio_1_1trace__api_1_1command__registration_a612a39efc82b9fbadb057a9d9684301d}{\_next}};}
+\DoxyCodeLine{\Hypertarget{cmd__registration_8hpp_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{cmd__registration_8hpp_source_l00035}\mbox{\hyperlink{structsysio_1_1trace__api_1_1command__registration_a339cfdb3bfbfeadf6d06c2bbe5526091}{00035}}\ \ \ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1command__registration}{command\_registration}}\ *\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1command__registration_a339cfdb3bfbfeadf6d06c2bbe5526091}{\_list}};}
+\DoxyCodeLine{\Hypertarget{cmd__registration_8hpp_source_l00036}00036\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{cmd__registration_8hpp_source_l00037}00037\ \}}
+
+\end{DoxyCode}

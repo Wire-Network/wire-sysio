@@ -1,0 +1,163 @@
+\doxysection{fc\+::http\+\_\+client Class Reference}
+\hypertarget{classfc_1_1http__client}{}\label{classfc_1_1http__client}\index{fc::http\_client@{fc::http\_client}}
+
+
+{\ttfamily \#include $<$http\+\_\+client.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1http__client_ae8bd9f4a127653e1e874239354f48fee}{http\+\_\+client}} ()
+\item 
+\mbox{\hyperlink{classfc_1_1http__client_a156a26b1214829a2b973fb1f7d91eb79}{\texorpdfstring{$\sim$}{\string~}http\+\_\+client}} ()
+\item 
+\mbox{\hyperlink{classfc_1_1variant}{variant}} \mbox{\hyperlink{classfc_1_1http__client_a17c7f208e97d47e1b8e17f9f07c9821d}{post\+\_\+sync}} (const \mbox{\hyperlink{classfc_1_1url}{url}} \&dest, const \mbox{\hyperlink{classfc_1_1variant}{variant}} \&payload, const \mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} \&deadline=\mbox{\hyperlink{classfc_1_1time__point_aeccf1b70aa34b132c5269313b8a50573}{time\+\_\+point\+::maximum}}())
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{classfc_1_1variant}{variant}} \mbox{\hyperlink{classfc_1_1http__client_a93331c2706ae276fad2daee42cafac58}{post\+\_\+sync}} (const \mbox{\hyperlink{classfc_1_1url}{url}} \&dest, const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&payload, const \mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} \&deadline=\mbox{\hyperlink{classfc_1_1time__point_aeccf1b70aa34b132c5269313b8a50573}{time\+\_\+point\+::maximum}}())
+\item 
+void \mbox{\hyperlink{classfc_1_1http__client_a7be49c9a7578612da641aa1be766e8e2}{add\+\_\+cert}} (const std\+::string \&cert\+\_\+pem\+\_\+string)
+\item 
+void \mbox{\hyperlink{classfc_1_1http__client_a4f7481e8e58038bd9c362453012fa4c9}{set\+\_\+verify\+\_\+peers}} (bool enabled)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{http__client_8hpp_source_l00015}{15}} of file \mbox{\hyperlink{http__client_8hpp_source}{http\+\_\+client.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1http__client_ae8bd9f4a127653e1e874239354f48fee}\index{fc::http\_client@{fc::http\_client}!http\_client@{http\_client}}
+\index{http\_client@{http\_client}!fc::http\_client@{fc::http\_client}}
+\doxysubsubsection{\texorpdfstring{http\_client()}{http\_client()}}
+{\footnotesize\ttfamily \label{classfc_1_1http__client_ae8bd9f4a127653e1e874239354f48fee} 
+fc\+::http\+\_\+client\+::http\+\_\+client (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{http__client_8cpp_source_l00429}{429}} of file \mbox{\hyperlink{http__client_8cpp_source}{http\+\_\+client.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00430\ :\_my(\textcolor{keyword}{new}\ http\_client\_impl())}
+\DoxyCodeLine{00431\ \{}
+\DoxyCodeLine{00432\ }
+\DoxyCodeLine{00433\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1http__client_a156a26b1214829a2b973fb1f7d91eb79}\index{fc::http\_client@{fc::http\_client}!````~http\_client@{\texorpdfstring{$\sim$}{\string~}http\_client}}
+\index{````~http\_client@{\texorpdfstring{$\sim$}{\string~}http\_client}!fc::http\_client@{fc::http\_client}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}http\_client()}{\string~http\_client()}}
+{\footnotesize\ttfamily \label{classfc_1_1http__client_a156a26b1214829a2b973fb1f7d91eb79} 
+fc\+::http\+\_\+client\+::\texorpdfstring{$\sim$}{\string~}http\+\_\+client (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{http__client_8cpp_source_l00450}{450}} of file \mbox{\hyperlink{http__client_8cpp_source}{http\+\_\+client.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00450\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00451\ }
+\DoxyCodeLine{00452\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1http__client_a7be49c9a7578612da641aa1be766e8e2}\index{fc::http\_client@{fc::http\_client}!add\_cert@{add\_cert}}
+\index{add\_cert@{add\_cert}!fc::http\_client@{fc::http\_client}}
+\doxysubsubsection{\texorpdfstring{add\_cert()}{add\_cert()}}
+{\footnotesize\ttfamily \label{classfc_1_1http__client_a7be49c9a7578612da641aa1be766e8e2} 
+void fc\+::http\+\_\+client\+::add\+\_\+cert (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{cert\+\_\+pem\+\_\+string}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{http__client_8cpp_source_l00442}{442}} of file \mbox{\hyperlink{http__client_8cpp_source}{http\+\_\+client.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00442\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00443\ \ \ \ \_my-\/>add\_cert(cert\_pem\_string);}
+\DoxyCodeLine{00444\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1http__client_a93331c2706ae276fad2daee42cafac58}\index{fc::http\_client@{fc::http\_client}!post\_sync@{post\_sync}}
+\index{post\_sync@{post\_sync}!fc::http\_client@{fc::http\_client}}
+\doxysubsubsection{\texorpdfstring{post\_sync()}{post\_sync()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1http__client_a93331c2706ae276fad2daee42cafac58} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{classfc_1_1variant}{variant}} fc\+::http\+\_\+client\+::post\+\_\+sync (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1url}{url}} \&}]{dest}{, }\item[{const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{payload}{, }\item[{const \mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} \&}]{deadline}{ = {\ttfamily \mbox{\hyperlink{classfc_1_1time__point_aeccf1b70aa34b132c5269313b8a50573}{time\+\_\+point\+::maximum}}()}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{http__client_8hpp_source_l00023}{23}} of file \mbox{\hyperlink{http__client_8hpp_source}{http\+\_\+client.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \ variant\ payload\_v;}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_adea61f2343de94d0fbcb920a32332ad9}{to\_variant}}(payload,\ payload\_v);}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1http__client_a17c7f208e97d47e1b8e17f9f07c9821d}{post\_sync}}(dest,\ payload\_v,\ deadline);}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1http__client_a93331c2706ae276fad2daee42cafac58_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1http__client_a17c7f208e97d47e1b8e17f9f07c9821d}\index{fc::http\_client@{fc::http\_client}!post\_sync@{post\_sync}}
+\index{post\_sync@{post\_sync}!fc::http\_client@{fc::http\_client}}
+\doxysubsubsection{\texorpdfstring{post\_sync()}{post\_sync()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1http__client_a17c7f208e97d47e1b8e17f9f07c9821d} 
+\mbox{\hyperlink{classfc_1_1variant}{variant}} fc\+::http\+\_\+client\+::post\+\_\+sync (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1url}{url}} \&}]{dest}{, }\item[{const \mbox{\hyperlink{classfc_1_1variant}{variant}} \&}]{payload}{, }\item[{const \mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} \&}]{deadline}{ = {\ttfamily \mbox{\hyperlink{classfc_1_1time__point_aeccf1b70aa34b132c5269313b8a50573}{time\+\_\+point\+::maximum}}()}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{http__client_8cpp_source_l00435}{435}} of file \mbox{\hyperlink{http__client_8cpp_source}{http\+\_\+client.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00435\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00436\ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{namespaceupload_a770d9c7b49b1fede80de6078d5e49af7}{dest}}.proto()\ ==\ \textcolor{stringliteral}{"{}unix"{}})}
+\DoxyCodeLine{00437\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \_my-\/>post\_sync(\_my-\/>get\_unix\_url(*\mbox{\hyperlink{namespaceupload_a770d9c7b49b1fede80de6078d5e49af7}{dest}}.host()),\ payload,\ deadline);}
+\DoxyCodeLine{00438\ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00439\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \_my-\/>post\_sync(dest,\ payload,\ deadline);}
+\DoxyCodeLine{00440\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1http__client_a17c7f208e97d47e1b8e17f9f07c9821d_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1http__client_a4f7481e8e58038bd9c362453012fa4c9}\index{fc::http\_client@{fc::http\_client}!set\_verify\_peers@{set\_verify\_peers}}
+\index{set\_verify\_peers@{set\_verify\_peers}!fc::http\_client@{fc::http\_client}}
+\doxysubsubsection{\texorpdfstring{set\_verify\_peers()}{set\_verify\_peers()}}
+{\footnotesize\ttfamily \label{classfc_1_1http__client_a4f7481e8e58038bd9c362453012fa4c9} 
+void fc\+::http\+\_\+client\+::set\+\_\+verify\+\_\+peers (\begin{DoxyParamCaption}\item[{bool}]{enabled}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{http__client_8cpp_source_l00446}{446}} of file \mbox{\hyperlink{http__client_8cpp_source}{http\+\_\+client.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00446\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00447\ \ \ \ \_my-\/>set\_verify\_peers(enabled);}
+\DoxyCodeLine{00448\ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/network/http/\mbox{\hyperlink{http__client_8hpp}{http\+\_\+client.\+hpp}}\item 
+libraries/fc/src/network/http/\mbox{\hyperlink{http__client_8cpp}{http\+\_\+client.\+cpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,76 @@
+\doxysection{libraries/softfloat/source/8086/s\+\_\+propagate\+Na\+NF32\+UI.c File Reference}
+\hypertarget{softfloat_2source_28086_2s__propagate_na_n_f32_u_i_8c}{}\label{softfloat_2source_28086_2s__propagate_na_n_f32_u_i_8c}\index{libraries/softfloat/source/8086/s\_propagateNaNF32UI.c@{libraries/softfloat/source/8086/s\_propagateNaNF32UI.c}}
+{\ttfamily \#include $<$stdbool.\+h$>$}\newline
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include "{}platform.\+h"{}}\newline
+{\ttfamily \#include "{}internals.\+h"{}}\newline
+{\ttfamily \#include "{}specialize.\+h"{}}\newline
+{\ttfamily \#include "{}softfloat.\+h"{}}\newline
+Include dependency graph for s\+\_\+propagate\+Na\+NF32\+UI.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{softfloat_2source_28086_2s__propagate_na_n_f32_u_i_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_a8f075c759c74e109e8184306c663809d}{uint\+\_\+fast32\+\_\+t}} \mbox{\hyperlink{softfloat_2source_28086_2s__propagate_na_n_f32_u_i_8c_ab7ccb9ad1e4fd7bb7f009c32a03248f3}{softfloat\+\_\+propagate\+Na\+NF32\+UI}} (\mbox{\hyperlink{stdint_8h_a8f075c759c74e109e8184306c663809d}{uint\+\_\+fast32\+\_\+t}} uiA, \mbox{\hyperlink{stdint_8h_a8f075c759c74e109e8184306c663809d}{uint\+\_\+fast32\+\_\+t}} uiB)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{softfloat_2source_28086_2s__propagate_na_n_f32_u_i_8c_ab7ccb9ad1e4fd7bb7f009c32a03248f3}\index{s\_propagateNaNF32UI.c@{s\_propagateNaNF32UI.c}!softfloat\_propagateNaNF32UI@{softfloat\_propagateNaNF32UI}}
+\index{softfloat\_propagateNaNF32UI@{softfloat\_propagateNaNF32UI}!s\_propagateNaNF32UI.c@{s\_propagateNaNF32UI.c}}
+\doxysubsubsection{\texorpdfstring{softfloat\_propagateNaNF32UI()}{softfloat\_propagateNaNF32UI()}}
+{\footnotesize\ttfamily \label{softfloat_2source_28086_2s__propagate_na_n_f32_u_i_8c_ab7ccb9ad1e4fd7bb7f009c32a03248f3} 
+\mbox{\hyperlink{stdint_8h_a8f075c759c74e109e8184306c663809d}{uint\+\_\+fast32\+\_\+t}} softfloat\+\_\+propagate\+Na\+NF32\+UI (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a8f075c759c74e109e8184306c663809d}{uint\+\_\+fast32\+\_\+t}}}]{uiA}{, }\item[{\mbox{\hyperlink{stdint_8h_a8f075c759c74e109e8184306c663809d}{uint\+\_\+fast32\+\_\+t}}}]{uiB}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_28086_2s__propagate_na_n_f32_u_i_8c_source_l00051}{51}} of file \mbox{\hyperlink{softfloat_2source_28086_2s__propagate_na_n_f32_u_i_8c_source}{s\+\_\+propagate\+Na\+NF32\+UI.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00052\ \{}
+\DoxyCodeLine{00053\ \ \ \ \ \textcolor{keywordtype}{bool}\ isSigNaNA,\ isSigNaNB;}
+\DoxyCodeLine{00054\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a8f075c759c74e109e8184306c663809d}{uint\_fast32\_t}}\ uiNonsigA,\ uiNonsigB,\ uiMagA,\ uiMagB;}
+\DoxyCodeLine{00055\ }
+\DoxyCodeLine{00056\ \ \ \ \ \textcolor{comment}{/*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{00057\ \textcolor{comment}{\ \ \ \ *-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*/}}
+\DoxyCodeLine{00058\ \ \ \ \ isSigNaNA\ =\ \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2specialize_8h_a8336c91cb3231dd160bbd31812dd63e9}{softfloat\_isSigNaNF32UI}}(\ uiA\ );}
+\DoxyCodeLine{00059\ \ \ \ \ isSigNaNB\ =\ \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2specialize_8h_a8336c91cb3231dd160bbd31812dd63e9}{softfloat\_isSigNaNF32UI}}(\ uiB\ );}
+\DoxyCodeLine{00060\ \ \ \ \ \textcolor{comment}{/*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{00061\ \textcolor{comment}{\ \ \ \ |\ Make\ NaNs\ non-\/signaling.}}
+\DoxyCodeLine{00062\ \textcolor{comment}{\ \ \ \ *-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*/}}
+\DoxyCodeLine{00063\ \ \ \ \ uiNonsigA\ =\ uiA\ |\ 0x00400000;}
+\DoxyCodeLine{00064\ \ \ \ \ uiNonsigB\ =\ uiB\ |\ 0x00400000;}
+\DoxyCodeLine{00065\ \ \ \ \ \textcolor{comment}{/*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{00066\ \textcolor{comment}{\ \ \ \ *-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*/}}
+\DoxyCodeLine{00067\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ isSigNaNA\ |\ isSigNaNB\ )\ \{}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2softfloat__raise_flags_8c_ac16bbf09eca0fe8ff91301d82c5a667f}{softfloat\_raiseFlags}}(\ \mbox{\hyperlink{softfloat_2source_2include_2softfloat_8h_a56a0f36da7f9eaaf54bd05cc2bf49173a191f069090c3d33752fb728272d9a4a9}{softfloat\_flag\_invalid}}\ );}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ isSigNaNA\ )\ \{}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ isSigNaNB\ )\ \textcolor{keywordflow}{goto}\ returnLargerMag;}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_ae950eca33420281d20e46d498b70fad1}{isNaNF32UI}}(\ uiB\ )\ ?\ uiNonsigB\ :\ uiNonsigA;}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_ae950eca33420281d20e46d498b70fad1}{isNaNF32UI}}(\ uiA\ )\ ?\ uiNonsigA\ :\ uiNonsigB;}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00075\ \ \ \ \ \}}
+\DoxyCodeLine{00076\ \ returnLargerMag:}
+\DoxyCodeLine{00077\ \ \ \ \ uiMagA\ =\ uiA\ \&\ 0x7FFFFFFF;}
+\DoxyCodeLine{00078\ \ \ \ \ uiMagB\ =\ uiB\ \&\ 0x7FFFFFFF;}
+\DoxyCodeLine{00079\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ uiMagA\ <\ uiMagB\ )\ \textcolor{keywordflow}{return}\ uiNonsigB;}
+\DoxyCodeLine{00080\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ uiMagB\ <\ uiMagA\ )\ \textcolor{keywordflow}{return}\ uiNonsigA;}
+\DoxyCodeLine{00081\ \ \ \ \ \textcolor{keywordflow}{return}\ (uiNonsigA\ <\ uiNonsigB)\ ?\ uiNonsigA\ :\ uiNonsigB;}
+\DoxyCodeLine{00082\ }
+\DoxyCodeLine{00083\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{softfloat_2source_28086_2s__propagate_na_n_f32_u_i_8c_ab7ccb9ad1e4fd7bb7f009c32a03248f3_cgraph}
+\end{center}
+\end{figure}

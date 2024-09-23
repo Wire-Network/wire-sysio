@@ -1,0 +1,13 @@
+<map id="CLI::detail::find_and_replace" name="CLI::detail::find_and_replace">
+<area shape="rect" id="Node000001" title="Find and replace a substring with another substring." alt="" coords="619,55,758,96"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_formatter.html#ade54fd392e2c9f5364744dca82408e60" title="This prints out a subcommand in help&#45;all." alt="" coords="425,26,571,66"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="604,65,571,60,572,55,604,60"/>
+<area shape="rect" id="Node000005" href="$namespace_c_l_i_1_1detail.html#aa249801c72ca4b9d138ef21ba1aa06b1" title=" " alt="" coords="438,91,558,116"/>
+<area shape="poly" id="edge6_Node000001_Node000005" title=" " alt="" coords="605,91,559,97,558,92,604,85"/>
+<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_formatter.html#a838e0f47efa4fbd1b738eedb156887b9" title="This puts everything together." alt="" coords="5,5,183,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="416,24,377,17,277,11,183,13,183,8,277,5,377,12,417,19"/>
+<area shape="rect" id="Node000004" href="$class_c_l_i_1_1_formatter.html#a9e6b7c4c6eee50b11fe1ca785002db04" title="This prints out all the subcommands." alt="" coords="231,26,377,66"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="409,58,377,58,377,52,409,52"/>
+<area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="392,35,424,35,424,40,392,40"/>
+<area shape="poly" id="edge5_Node000004_Node000003" title=" " alt="" coords="214,37,183,33,183,27,215,32"/>
+</map>

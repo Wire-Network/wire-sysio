@@ -1,0 +1,10 @@
+<map id="sysio::vm::type_converter&lt; Host, Execution_Interface &gt;" name="sysio::vm::type_converter&lt; Host, Execution_Interface &gt;">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,333,203,373"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1vm_1_1running__context.html" title=" " alt="" coords="16,228,192,283"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="98,299,99,332,94,333,92,299"/>
+<area shape="poly" id="edge4_Node000001_Node000002" title=" " alt="" coords="116,299,114,333,109,332,110,299"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1vm_1_1execution__interface.html" title=" " alt="" coords="33,124,175,165"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="107,180,107,227,101,227,101,180"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1vm_1_1stack.html" title=" " alt="" coords="16,5,192,61"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="107,76,107,124,101,124,101,76"/>
+</map>

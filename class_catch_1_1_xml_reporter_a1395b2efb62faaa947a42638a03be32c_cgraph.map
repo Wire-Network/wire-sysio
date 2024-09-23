@@ -1,0 +1,23 @@
+<map id="Catch::XmlReporter::testCaseStarting" name="Catch::XmlReporter::testCaseStarting">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,186,143,227"/>
+<area shape="rect" id="Node000002" href="$class_catch_1_1_xml_writer.html#aba98703d9852416e237de82aed4a9c4f" title=" " alt="" coords="461,13,629,53"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="80,185,95,151,118,110,149,70,168,53,189,39,220,25,252,15,319,4,386,4,446,10,445,15,385,9,320,10,254,20,222,30,192,43,171,57,153,73,122,113,99,153,85,187"/>
+<area shape="rect" id="Node000003" href="$class_catch_1_1_timer.html#a0a56e879e43f36c102bf9ea8b5fc8b72" title=" " alt="" coords="227,103,358,128"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="105,183,145,160,190,138,212,131,213,136,192,143,147,165,108,188"/>
+<area shape="rect" id="Node000005" href="$class_catch_1_1_xml_writer.html#a6114b9d8038cd4f159ccd016f12d4992" title=" " alt="" coords="191,53,394,79"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="88,184,130,135,158,110,189,88,199,83,202,88,192,92,161,114,134,139,92,187"/>
+<area shape="rect" id="Node000006" href="$struct_catch_1_1_test_case_info.html#a17506de67fb18e27511c17f8a81119d8" title=" " alt="" coords="221,153,364,193"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="143,193,205,183,206,189,143,198"/>
+<area shape="rect" id="Node000007" href="$struct_catch_1_1_streaming_reporter_base.html#ad8a773ceb481c17f3cedee3bf65b9820" title=" " alt="" coords="206,218,379,259"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="143,214,191,221,190,226,143,219"/>
+<area shape="rect" id="Node000008" href="$namespace_catch.html#a084108b47f37d8bfd5db51c50c7451b3" title=" " alt="" coords="249,283,336,308"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="109,225,148,247,192,268,235,281,233,286,190,273,145,252,106,229"/>
+<area shape="rect" id="Node000009" href="$class_catch_1_1_xml_writer.html#ad433310b59d30e0fedc7130dc11c563b" title=" " alt="" coords="442,361,648,387"/>
+<area shape="poly" id="edge9_Node000001_Node000009" title=" " alt="" coords="92,225,133,274,161,299,192,318,233,332,292,344,427,362,426,367,291,350,232,338,190,323,158,303,129,278,88,229"/>
+<area shape="rect" id="Node000010" href="$class_catch_1_1_xml_reporter.html#a190d2ae83de78e06273fa476d3729771" title=" " alt="" coords="224,383,361,424"/>
+<area shape="poly" id="edge10_Node000001_Node000010" title=" " alt="" coords="88,226,128,293,158,330,192,363,211,375,209,379,189,367,154,334,124,296,83,229"/>
+<area shape="rect" id="Node000004" href="$namespace_catch.html#a98d058468488c486a9cb5c8463f3ba29" title=" " alt="" coords="442,95,648,136"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="358,113,427,113,427,118,358,118"/>
+<area shape="poly" id="edge5_Node000005_Node000002" title=" " alt="" coords="394,50,445,43,446,49,395,55"/>
+<area shape="poly" id="edge11_Node000010_Node000009" title=" " alt="" coords="361,393,427,385,427,391,362,398"/>
+</map>

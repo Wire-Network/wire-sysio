@@ -1,0 +1,118 @@
+\doxysection{type\+\_\+converter32 Struct Reference}
+\hypertarget{structtype__converter32}{}\label{structtype__converter32}\index{type\_converter32@{type\_converter32}}
+
+
+{\ttfamily \#include $<$utils.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structtype__converter32_a6c877f4cb28f778695055d6beba56297}{type\+\_\+converter32}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} n)
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structtype__converter32_aa044e01070fd01d45d818ad32565ac16}{to\+\_\+ui}} () const
+\item 
+float \mbox{\hyperlink{structtype__converter32_a4ed1eb2324c5110e2b80bbe5dc1a9b18}{to\+\_\+f}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\begin{tabbing}
+xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=\kill
+union \{\\
+\>\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}} \mbox{\hyperlink{structtype__converter32_a769663d644520e35c9eeeb2f8de46dc8}{ui}}\\
+\>float \mbox{\hyperlink{structtype__converter32_a92d90de0e50346249eec7df1adb1ab65}{f}}\\
+\} \mbox{\hyperlink{structtype__converter32_a9cd13f24b1d7f0ec68e03e6a769cf7e6}{\_data}}\\
+
+\end{tabbing}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_source_l00013}{13}} of file \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_source}{utils.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structtype__converter32_a6c877f4cb28f778695055d6beba56297}\index{type\_converter32@{type\_converter32}!type\_converter32@{type\_converter32}}
+\index{type\_converter32@{type\_converter32}!type\_converter32@{type\_converter32}}
+\doxysubsubsection{\texorpdfstring{type\_converter32()}{type\_converter32()}}
+{\footnotesize\ttfamily \label{structtype__converter32_a6c877f4cb28f778695055d6beba56297} 
+type\+\_\+converter32\+::type\+\_\+converter32 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{n}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_source_l00018}{18}} of file \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_source}{utils.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00018\ \{\ \mbox{\hyperlink{structtype__converter32_a9cd13f24b1d7f0ec68e03e6a769cf7e6}{\_data}}.ui\ =\ n;\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structtype__converter32_a4ed1eb2324c5110e2b80bbe5dc1a9b18}\index{type\_converter32@{type\_converter32}!to\_f@{to\_f}}
+\index{to\_f@{to\_f}!type\_converter32@{type\_converter32}}
+\doxysubsubsection{\texorpdfstring{to\_f()}{to\_f()}}
+{\footnotesize\ttfamily \label{structtype__converter32_a4ed1eb2324c5110e2b80bbe5dc1a9b18} 
+float type\+\_\+converter32\+::to\+\_\+f (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_source_l00020}{20}} of file \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_source}{utils.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00020\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structtype__converter32_a9cd13f24b1d7f0ec68e03e6a769cf7e6}{\_data}}.f;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structtype__converter32_aa044e01070fd01d45d818ad32565ac16}\index{type\_converter32@{type\_converter32}!to\_ui@{to\_ui}}
+\index{to\_ui@{to\_ui}!type\_converter32@{type\_converter32}}
+\doxysubsubsection{\texorpdfstring{to\_ui()}{to\_ui()}}
+{\footnotesize\ttfamily \label{structtype__converter32_aa044e01070fd01d45d818ad32565ac16} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} type\+\_\+converter32\+::to\+\_\+ui (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_source_l00019}{19}} of file \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_source}{utils.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00019\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structtype__converter32_a9cd13f24b1d7f0ec68e03e6a769cf7e6}{\_data}}.ui;\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structtype__converter32_a9cd13f24b1d7f0ec68e03e6a769cf7e6}\index{type\_converter32@{type\_converter32}!\_data@{\_data}}
+\index{\_data@{\_data}!type\_converter32@{type\_converter32}}
+\doxysubsubsection{\texorpdfstring{[union]}{[union]}}
+{\footnotesize\ttfamily \label{structtype__converter32_a9cd13f24b1d7f0ec68e03e6a769cf7e6} 
+union  \{ ... \}  type\+\_\+converter32\+::\+\_\+data}
+
+\Hypertarget{structtype__converter32_a92d90de0e50346249eec7df1adb1ab65}\index{type\_converter32@{type\_converter32}!f@{f}}
+\index{f@{f}!type\_converter32@{type\_converter32}}
+\doxysubsubsection{\texorpdfstring{f}{f}}
+{\footnotesize\ttfamily \label{structtype__converter32_a92d90de0e50346249eec7df1adb1ab65} 
+float type\+\_\+converter32\+::f}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_source_l00016}{16}} of file \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_source}{utils.\+hpp}}.
+
+\Hypertarget{structtype__converter32_a769663d644520e35c9eeeb2f8de46dc8}\index{type\_converter32@{type\_converter32}!ui@{ui}}
+\index{ui@{ui}!type\_converter32@{type\_converter32}}
+\doxysubsubsection{\texorpdfstring{ui}{ui}}
+{\footnotesize\ttfamily \label{structtype__converter32_a769663d644520e35c9eeeb2f8de46dc8} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} type\+\_\+converter32\+::ui}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_source_l00015}{15}} of file \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_source}{utils.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/tests/\mbox{\hyperlink{sys-vm_2tests_2utils_8hpp}{utils.\+hpp}}\end{DoxyCompactItemize}

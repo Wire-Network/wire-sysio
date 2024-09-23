@@ -1,0 +1,8 @@
+<map id="secp256k1_xonly_pubkey_cmp" name="secp256k1_xonly_pubkey_cmp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,209,31"/>
+<area shape="rect" id="Node000002" href="$yubihsm__pkcs11_8c.html#adc4bd59a60361844aa0e852efa210105" title=" " alt="" coords="476,5,544,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="209,12,428,12,460,13,460,18,428,17,209,18"/>
+<area shape="rect" id="Node000003" href="$extrakeys_2main__impl_8h.html#a29339d5ba3db7c60337c8e7fab89c31a" title=" " alt="" coords="257,26,428,66"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="209,28,242,32,241,37,209,33"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="428,29,460,24,461,29,429,34"/>
+</map>

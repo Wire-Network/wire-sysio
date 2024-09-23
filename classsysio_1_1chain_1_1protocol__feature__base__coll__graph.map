@@ -1,0 +1,15 @@
+<map id="sysio::chain::protocol_feature_base" name="sysio::chain::protocol_feature_base">
+<area shape="rect" id="Node000001" title=" " alt="" coords="733,96,878,137"/>
+<area shape="rect" id="Node000002" href="$structfc_1_1reflect__init.html" title=" " alt="" coords="398,5,498,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="514,19,608,31,660,42,710,57,746,74,778,94,775,98,744,79,708,62,658,47,607,36,514,24"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="422,55,475,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="491,68,591,78,709,94,733,98,732,104,709,99,590,84,490,74"/>
+<area shape="rect" id="Node000004" href="$classfc_1_1sha256.html" title=" " alt="" coords="407,104,490,130"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="505,114,732,114,732,120,505,120"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="374,153,523,179"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="538,156,709,135,732,130,733,136,709,140,539,161"/>
+<area shape="rect" id="Node000006" href="$structsysio_1_1chain_1_1protocol__feature__subjective__restrictions.html" title=" " alt="" coords="346,203,551,244"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="565,208,637,194,708,172,743,155,775,135,778,140,746,160,710,177,638,199,566,213"/>
+<area shape="rect" id="Node000007" href="$classfc_1_1time__point.html" title=" " alt="" coords="5,211,106,236"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="121,221,345,221,345,226,121,226"/>
+</map>

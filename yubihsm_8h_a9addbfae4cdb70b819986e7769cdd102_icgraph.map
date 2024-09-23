@@ -1,0 +1,12 @@
+<map id="yh_set_connector_option" name="yh_set_connector_option">
+<area shape="rect" id="Node000001" title=" " alt="" coords="518,31,685,56"/>
+<area shape="rect" id="Node000002" href="$yubihsm__pkcs11_8c.html#a553b528011491713b85dc590221ea616" title=" " alt="" coords="296,5,470,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="503,35,470,31,471,26,503,29"/>
+<area shape="rect" id="Node000003" href="$commands_8c.html#a9155cc4306ad97e58a03ead18637f33b" title=" " alt="" coords="323,55,443,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="504,57,444,64,443,58,503,52"/>
+<area shape="rect" id="Node000004" href="$src_2main_8c.html#a34a9e8c400dcf19e771e884636316060" title=" " alt="" coords="103,29,248,55"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="307,61,248,54,249,48,308,56"/>
+<area shape="rect" id="Node000005" href="$src_2main_8c.html#a0ddf1224851353fc92bfbff6f499fa97" title=" " alt="" coords="5,55,55,80"/>
+<area shape="poly" id="edge5_Node000003_Node000005" title=" " alt="" coords="307,70,55,70,55,65,307,65"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="88,60,55,66,54,61,87,55"/>
+</map>

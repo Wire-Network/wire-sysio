@@ -1,0 +1,184 @@
+\doxysection{fc\+::cfile\+\_\+datastream Class Reference}
+\hypertarget{classfc_1_1cfile__datastream}{}\label{classfc_1_1cfile__datastream}\index{fc::cfile\_datastream@{fc::cfile\_datastream}}
+
+
+{\ttfamily \#include $<$cfile.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1cfile__datastream_a2b722abd6695ec40c47efd3e638cdcc1}{cfile\+\_\+datastream}} (\mbox{\hyperlink{classfc_1_1cfile}{cfile}} \&cf)
+\item 
+void \mbox{\hyperlink{classfc_1_1cfile__datastream_ae6f1ad5473ace81a1548c8e8460e2c37}{skip}} (size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\item 
+bool \mbox{\hyperlink{classfc_1_1cfile__datastream_a6cb58e20d4c5243d719040b19a0a1161}{read}} (char \texorpdfstring{$\ast$}{*}d, size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\item 
+bool \mbox{\hyperlink{classfc_1_1cfile__datastream_a8f4661fd77c5a6b04b0422a7da33d7ba}{get}} (unsigned char \&c)
+\item 
+bool \mbox{\hyperlink{classfc_1_1cfile__datastream_a40d05820e080308df4c1b5a858d9926d}{get}} (char \&c)
+\item 
+size\+\_\+t \mbox{\hyperlink{classfc_1_1cfile__datastream_ad1d4d86497097b4cb473f4137c6e2ed3}{tellp}} () const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{cfile_8hpp_source_l00225}{225}} of file \mbox{\hyperlink{cfile_8hpp_source}{cfile.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1cfile__datastream_a2b722abd6695ec40c47efd3e638cdcc1}\index{fc::cfile\_datastream@{fc::cfile\_datastream}!cfile\_datastream@{cfile\_datastream}}
+\index{cfile\_datastream@{cfile\_datastream}!fc::cfile\_datastream@{fc::cfile\_datastream}}
+\doxysubsubsection{\texorpdfstring{cfile\_datastream()}{cfile\_datastream()}}
+{\footnotesize\ttfamily \label{classfc_1_1cfile__datastream_a2b722abd6695ec40c47efd3e638cdcc1} 
+fc\+::cfile\+\_\+datastream\+::cfile\+\_\+datastream (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1cfile}{cfile}} \&}]{cf}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{cfile_8hpp_source_l00227}{227}} of file \mbox{\hyperlink{cfile_8hpp_source}{cfile.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00227\ :\ cf(cf)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1cfile__datastream_a40d05820e080308df4c1b5a858d9926d}\index{fc::cfile\_datastream@{fc::cfile\_datastream}!get@{get}}
+\index{get@{get}!fc::cfile\_datastream@{fc::cfile\_datastream}}
+\doxysubsubsection{\texorpdfstring{get()}{get()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1cfile__datastream_a40d05820e080308df4c1b5a858d9926d} 
+bool fc\+::cfile\+\_\+datastream\+::get (\begin{DoxyParamCaption}\item[{char \&}]{c}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{cfile_8hpp_source_l00241}{241}} of file \mbox{\hyperlink{cfile_8hpp_source}{cfile.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00241\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1cfile__datastream_a6cb58e20d4c5243d719040b19a0a1161}{read}}(\&c,\ 1);\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1cfile__datastream_a40d05820e080308df4c1b5a858d9926d_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1cfile__datastream_a8f4661fd77c5a6b04b0422a7da33d7ba}\index{fc::cfile\_datastream@{fc::cfile\_datastream}!get@{get}}
+\index{get@{get}!fc::cfile\_datastream@{fc::cfile\_datastream}}
+\doxysubsubsection{\texorpdfstring{get()}{get()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1cfile__datastream_a8f4661fd77c5a6b04b0422a7da33d7ba} 
+bool fc\+::cfile\+\_\+datastream\+::get (\begin{DoxyParamCaption}\item[{unsigned char \&}]{c}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{cfile_8hpp_source_l00239}{239}} of file \mbox{\hyperlink{cfile_8hpp_source}{cfile.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00239\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1cfile__datastream_a8f4661fd77c5a6b04b0422a7da33d7ba}{get}}(\ *(\textcolor{keywordtype}{char}*)\&c\ );\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=202pt]{classfc_1_1cfile__datastream_a8f4661fd77c5a6b04b0422a7da33d7ba_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=202pt]{classfc_1_1cfile__datastream_a8f4661fd77c5a6b04b0422a7da33d7ba_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1cfile__datastream_a6cb58e20d4c5243d719040b19a0a1161}\index{fc::cfile\_datastream@{fc::cfile\_datastream}!read@{read}}
+\index{read@{read}!fc::cfile\_datastream@{fc::cfile\_datastream}}
+\doxysubsubsection{\texorpdfstring{read()}{read()}}
+{\footnotesize\ttfamily \label{classfc_1_1cfile__datastream_a6cb58e20d4c5243d719040b19a0a1161} 
+bool fc\+::cfile\+\_\+datastream\+::read (\begin{DoxyParamCaption}\item[{char \texorpdfstring{$\ast$}{*}}]{d}{, }\item[{size\+\_\+t}]{s}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{cfile_8hpp_source_l00234}{234}} of file \mbox{\hyperlink{cfile_8hpp_source}{cfile.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00234\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ cf.\mbox{\hyperlink{classfc_1_1cfile_a247250a28d17544a57dfafe07012d27b}{read}}(\ d,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ );}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00237\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1cfile__datastream_a6cb58e20d4c5243d719040b19a0a1161_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=340pt]{classfc_1_1cfile__datastream_a6cb58e20d4c5243d719040b19a0a1161_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1cfile__datastream_ae6f1ad5473ace81a1548c8e8460e2c37}\index{fc::cfile\_datastream@{fc::cfile\_datastream}!skip@{skip}}
+\index{skip@{skip}!fc::cfile\_datastream@{fc::cfile\_datastream}}
+\doxysubsubsection{\texorpdfstring{skip()}{skip()}}
+{\footnotesize\ttfamily \label{classfc_1_1cfile__datastream_ae6f1ad5473ace81a1548c8e8460e2c37} 
+void fc\+::cfile\+\_\+datastream\+::skip (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{s}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{cfile_8hpp_source_l00229}{229}} of file \mbox{\hyperlink{cfile_8hpp_source}{cfile.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00229\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00230\ \ \ \ \ \ \ std::vector<char>\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ );}
+\DoxyCodeLine{00231\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1cfile__datastream_a6cb58e20d4c5243d719040b19a0a1161}{read}}(\ \&d[0],\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ );}
+\DoxyCodeLine{00232\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1cfile__datastream_ae6f1ad5473ace81a1548c8e8460e2c37_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1cfile__datastream_ad1d4d86497097b4cb473f4137c6e2ed3}\index{fc::cfile\_datastream@{fc::cfile\_datastream}!tellp@{tellp}}
+\index{tellp@{tellp}!fc::cfile\_datastream@{fc::cfile\_datastream}}
+\doxysubsubsection{\texorpdfstring{tellp()}{tellp()}}
+{\footnotesize\ttfamily \label{classfc_1_1cfile__datastream_ad1d4d86497097b4cb473f4137c6e2ed3} 
+size\+\_\+t fc\+::cfile\+\_\+datastream\+::tellp (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{cfile_8hpp_source_l00243}{243}} of file \mbox{\hyperlink{cfile_8hpp_source}{cfile.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00243\ \{\ \textcolor{keywordflow}{return}\ cf.\mbox{\hyperlink{classfc_1_1cfile_abc92fc8d64550b772a69ca1b63f75bfb}{tellp}}();\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1cfile__datastream_ad1d4d86497097b4cb473f4137c6e2ed3_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/io/\mbox{\hyperlink{cfile_8hpp}{cfile.\+hpp}}\end{DoxyCompactItemize}

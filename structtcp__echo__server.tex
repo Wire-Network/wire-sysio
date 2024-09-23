@@ -1,0 +1,156 @@
+\doxysection{tcp\+\_\+echo\+\_\+server Struct Reference}
+\hypertarget{structtcp__echo__server}{}\label{structtcp__echo__server}\index{tcp\_echo\_server@{tcp\_echo\_server}}
+
+
+{\ttfamily \#include $<$tcp\+\_\+echo\+\_\+server.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structtcp__echo__server_a20bcbc728243d24b258bc44dce10ba43}{tcp\+\_\+echo\+\_\+server}} (asio\+::io\+\_\+service \&service, short port)
+\item 
+void \mbox{\hyperlink{structtcp__echo__server_aba350094250187e9e05031512d2db771}{start\+\_\+accept}} ()
+\item 
+void \mbox{\hyperlink{structtcp__echo__server_aada379cda78e40871a7e2d96536a8b68}{handle\+\_\+accept}} (\mbox{\hyperlink{structtcp__echo__session_a6821612c6ccc108aab6d32dbf4ae1509}{tcp\+\_\+echo\+\_\+session\+::ptr}} new\+\_\+session, const asio\+::error\+\_\+code \&ec)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+asio\+::io\+\_\+service \& \mbox{\hyperlink{structtcp__echo__server_ad58d0d47a8eca9406a0724bb07de3f7f}{m\+\_\+service}}
+\item 
+asio\+::ip\+::tcp\+::acceptor \mbox{\hyperlink{structtcp__echo__server_a0d7f86ad066b6c16bdb61999ffb8c340}{m\+\_\+acceptor}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{tcp__echo__server_8hpp_source_l00074}{74}} of file \mbox{\hyperlink{tcp__echo__server_8hpp_source}{tcp\+\_\+echo\+\_\+server.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structtcp__echo__server_a20bcbc728243d24b258bc44dce10ba43}\index{tcp\_echo\_server@{tcp\_echo\_server}!tcp\_echo\_server@{tcp\_echo\_server}}
+\index{tcp\_echo\_server@{tcp\_echo\_server}!tcp\_echo\_server@{tcp\_echo\_server}}
+\doxysubsubsection{\texorpdfstring{tcp\_echo\_server()}{tcp\_echo\_server()}}
+{\footnotesize\ttfamily \label{structtcp__echo__server_a20bcbc728243d24b258bc44dce10ba43} 
+tcp\+\_\+echo\+\_\+server\+::tcp\+\_\+echo\+\_\+server (\begin{DoxyParamCaption}\item[{asio\+::io\+\_\+service \&}]{service}{, }\item[{short}]{port}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{tcp__echo__server_8hpp_source_l00075}{75}} of file \mbox{\hyperlink{tcp__echo__server_8hpp_source}{tcp\+\_\+echo\+\_\+server.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{structtcp__echo__server_ad58d0d47a8eca9406a0724bb07de3f7f}{m\_service}}(service)}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ ,\ \mbox{\hyperlink{structtcp__echo__server_a0d7f86ad066b6c16bdb61999ffb8c340}{m\_acceptor}}(service,\ asio::ip::tcp::endpoint(asio::ip::tcp::v6(),\ port))}
+\DoxyCodeLine{00078\ \ \ \ \ \{}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ this-\/>\mbox{\hyperlink{structtcp__echo__server_aba350094250187e9e05031512d2db771}{start\_accept}}();}
+\DoxyCodeLine{00080\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structtcp__echo__server_a20bcbc728243d24b258bc44dce10ba43_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structtcp__echo__server_aada379cda78e40871a7e2d96536a8b68}\index{tcp\_echo\_server@{tcp\_echo\_server}!handle\_accept@{handle\_accept}}
+\index{handle\_accept@{handle\_accept}!tcp\_echo\_server@{tcp\_echo\_server}}
+\doxysubsubsection{\texorpdfstring{handle\_accept()}{handle\_accept()}}
+{\footnotesize\ttfamily \label{structtcp__echo__server_aada379cda78e40871a7e2d96536a8b68} 
+void tcp\+\_\+echo\+\_\+server\+::handle\+\_\+accept (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structtcp__echo__session_a6821612c6ccc108aab6d32dbf4ae1509}{tcp\+\_\+echo\+\_\+session\+::ptr}}}]{new\+\_\+session}{, }\item[{const asio\+::error\+\_\+code \&}]{ec}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{tcp__echo__server_8hpp_source_l00088}{88}} of file \mbox{\hyperlink{tcp__echo__server_8hpp_source}{tcp\+\_\+echo\+\_\+server.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!ec)\ \{}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ \ \ \ new\_session-\/>start();}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structtcp__echo__server_aba350094250187e9e05031512d2db771}{start\_accept}}();}
+\DoxyCodeLine{00093\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structtcp__echo__server_aada379cda78e40871a7e2d96536a8b68_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structtcp__echo__server_aada379cda78e40871a7e2d96536a8b68_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structtcp__echo__server_aba350094250187e9e05031512d2db771}\index{tcp\_echo\_server@{tcp\_echo\_server}!start\_accept@{start\_accept}}
+\index{start\_accept@{start\_accept}!tcp\_echo\_server@{tcp\_echo\_server}}
+\doxysubsubsection{\texorpdfstring{start\_accept()}{start\_accept()}}
+{\footnotesize\ttfamily \label{structtcp__echo__server_aba350094250187e9e05031512d2db771} 
+void tcp\+\_\+echo\+\_\+server\+::start\+\_\+accept (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{tcp__echo__server_8hpp_source_l00082}{82}} of file \mbox{\hyperlink{tcp__echo__server_8hpp_source}{tcp\+\_\+echo\+\_\+server.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structtcp__echo__session_a6821612c6ccc108aab6d32dbf4ae1509}{tcp\_echo\_session::ptr}}\ new\_session(\textcolor{keyword}{new}\ \mbox{\hyperlink{structtcp__echo__session}{tcp\_echo\_session}}(\mbox{\hyperlink{structtcp__echo__server_ad58d0d47a8eca9406a0724bb07de3f7f}{m\_service}}));}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structtcp__echo__server_a0d7f86ad066b6c16bdb61999ffb8c340}{m\_acceptor}}.async\_accept(new\_session-\/>m\_socket,}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \ \ \ \ bind(\&\mbox{\hyperlink{structtcp__echo__server_aada379cda78e40871a7e2d96536a8b68}{tcp\_echo\_server::handle\_accept}},\ \textcolor{keyword}{this},\ new\_session,\ \_1));}
+\DoxyCodeLine{00086\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structtcp__echo__server_aba350094250187e9e05031512d2db771_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structtcp__echo__server_aba350094250187e9e05031512d2db771_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structtcp__echo__server_a0d7f86ad066b6c16bdb61999ffb8c340}\index{tcp\_echo\_server@{tcp\_echo\_server}!m\_acceptor@{m\_acceptor}}
+\index{m\_acceptor@{m\_acceptor}!tcp\_echo\_server@{tcp\_echo\_server}}
+\doxysubsubsection{\texorpdfstring{m\_acceptor}{m\_acceptor}}
+{\footnotesize\ttfamily \label{structtcp__echo__server_a0d7f86ad066b6c16bdb61999ffb8c340} 
+asio\+::ip\+::tcp\+::acceptor tcp\+\_\+echo\+\_\+server\+::m\+\_\+acceptor}
+
+
+
+Definition at line \mbox{\hyperlink{tcp__echo__server_8hpp_source_l00096}{96}} of file \mbox{\hyperlink{tcp__echo__server_8hpp_source}{tcp\+\_\+echo\+\_\+server.\+hpp}}.
+
+\Hypertarget{structtcp__echo__server_ad58d0d47a8eca9406a0724bb07de3f7f}\index{tcp\_echo\_server@{tcp\_echo\_server}!m\_service@{m\_service}}
+\index{m\_service@{m\_service}!tcp\_echo\_server@{tcp\_echo\_server}}
+\doxysubsubsection{\texorpdfstring{m\_service}{m\_service}}
+{\footnotesize\ttfamily \label{structtcp__echo__server_ad58d0d47a8eca9406a0724bb07de3f7f} 
+asio\+::io\+\_\+service\& tcp\+\_\+echo\+\_\+server\+::m\+\_\+service}
+
+
+
+Definition at line \mbox{\hyperlink{tcp__echo__server_8hpp_source_l00095}{95}} of file \mbox{\hyperlink{tcp__echo__server_8hpp_source}{tcp\+\_\+echo\+\_\+server.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/vendor/websocketpp/examples/external\+\_\+io\+\_\+service/\mbox{\hyperlink{tcp__echo__server_8hpp}{tcp\+\_\+echo\+\_\+server.\+hpp}}\end{DoxyCompactItemize}

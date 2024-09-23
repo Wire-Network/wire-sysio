@@ -1,0 +1,321 @@
+\doxysection{compressed\+\_\+file.\+cpp}
+\hypertarget{compressed__file_8cpp_source}{}\label{compressed__file_8cpp_source}\index{plugins/trace\_api\_plugin/compressed\_file.cpp@{plugins/trace\_api\_plugin/compressed\_file.cpp}}
+\mbox{\hyperlink{compressed__file_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{compressed__file_8hpp}{sysio/trace\_api/compressed\_file.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <zlib.h>}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00005}00005\ \textcolor{keyword}{namespace\ }\{}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00006}00006\ \ \ \ \textcolor{keyword}{using\ }seek\_point\_entry\ =\ std::tuple<uint64\_t,\ uint64\_t>;}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00007}00007\ \ \ \ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{size\_t}\ expected\_seek\_point\_entry\_size\ =\ 16;}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00009}00009\ \ \ \ \textcolor{keyword}{using\ }seek\_point\_count\_type\ =\ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}};}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00010}00010\ \ \ \ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{size\_t}\ expected\_seek\_point\_count\_size\ =\ 2;}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00012}00012\ \ \ \ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ raw\_zlib\_window\_bits\ =\ -\/15;}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00014}00014\ \ \ \ \textcolor{comment}{//\ These\ are\ hard-\/coded\ expectations\ in\ the\ written\ file\ format}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00015}00015\ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00016}00016\ \ \ \ \textcolor{keyword}{static\_assert}(\textcolor{keyword}{sizeof}(seek\_point\_entry)\ ==\ expected\_seek\_point\_entry\_size,\ \textcolor{stringliteral}{"{}unexpected\ size\ for\ seek\ point"{}});}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00017}00017\ \ \ \ \textcolor{keyword}{static\_assert}(\textcolor{keyword}{sizeof}(seek\_point\_count\_type)\ ==\ expected\_seek\_point\_count\_size,\ \textcolor{stringliteral}{"{}Unexpected\ size\ for\ seek\ point\ count"{}});}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00018}00018\ \}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00020}00020\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio_1_1trace__api}{sysio::trace\_api}}\ \{}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00022}\mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl}{00022}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl}{compressed\_file\_impl}}\ \{}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00023}\mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_a8d236309beb23779cb11f78ecb33aa14}{00023}}\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_a8d236309beb23779cb11f78ecb33aa14}{read\_buffer\_size}}\ =\ 4*1024;}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00024}\mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_ae466972520e5a8f727c36ec5cf1f2556}{00024}}\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_ae466972520e5a8f727c36ec5cf1f2556}{compressed\_buffer\_size}}\ =\ 4*1024;}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00026}\mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_ad61ee1df25f1d2d2d969b8437638ca66}{00026}}\ \ \ \ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_ad61ee1df25f1d2d2d969b8437638ca66}{\string~compressed\_file\_impl}}()}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00027}00027\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00028}00028\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_aa9f80ef0d517d554fd1c6e8237695012}{initialized}})\ \{}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00029}00029\ \ \ \ \ \ \ \ \ \ inflateEnd(\&\mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_af2a587dc20d03dcd59467fd8d4d61d51}{strm}});}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00030}00030\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_aa9f80ef0d517d554fd1c6e8237695012}{initialized}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00031}00031\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00032}00032\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00034}\mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_a84d50de8a686907ee4eddad83d497834}{00034}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_a84d50de8a686907ee4eddad83d497834}{read}}(\ \textcolor{keywordtype}{char}*\ d,\ \textcolor{keywordtype}{size\_t}\ n,\ \mbox{\hyperlink{classfc_1_1cfile}{fc::cfile}}\&\ file\ )}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00035}00035\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00036}00036\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_aa9f80ef0d517d554fd1c6e8237695012}{initialized}})\ \{}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00037}00037\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (Z\_OK\ !=\ inflateInit2(\&\mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_af2a587dc20d03dcd59467fd8d4d61d51}{strm}},\ raw\_zlib\_window\_bits))\ \{}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00038}00038\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}failed\ to\ initialize\ decompression"{}});}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00039}00039\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00041}00041\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_a28a22f20c576b62bba8bbd85ef239d4a}{remaining\_read\_buffer}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00042}00042\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_af2a587dc20d03dcd59467fd8d4d61d51}{strm}}.avail\_in\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00043}00043\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_aa9f80ef0d517d554fd1c6e8237695012}{initialized}}\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00044}00044\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00046}00046\ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ written\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00048}00048\ \ \ \ \ \ \ \textcolor{comment}{//\ consume\ the\ left\ over\ from\ the\ last\ read\ if\ there\ is\ any}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00049}00049\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_a28a22f20c576b62bba8bbd85ef239d4a}{remaining\_read\_buffer}}\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00050}00050\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ to\_read\ =\ std::min(\mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_a28a22f20c576b62bba8bbd85ef239d4a}{remaining\_read\_buffer}},\ n);}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00051}00051\ \ \ \ \ \ \ \ \ \ std::memcpy(\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}},\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_a490e9fb6f4e48df0d98cda7939e96325}{read\_buffer}}.data(),\ to\_read\ );}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_a28a22f20c576b62bba8bbd85ef239d4a}{remaining\_read\_buffer}}\ -\/=\ to\_read;}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \ written\ +=\ to\_read;}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00054}00054\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_a28a22f20c576b62bba8bbd85ef239d4a}{remaining\_read\_buffer}}\ >\ 0\ )\ \{}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \ \ \ std::memmove(\mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_a490e9fb6f4e48df0d98cda7939e96325}{read\_buffer}}.data(),\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_a490e9fb6f4e48df0d98cda7939e96325}{read\_buffer}}.data()\ +\ to\_read,\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_a28a22f20c576b62bba8bbd85ef239d4a}{remaining\_read\_buffer}});}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00059}00059\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00062}00062\ \ \ \ \ \ \ \textcolor{comment}{//\ decompress\ more\ chunks}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00063}00063\ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (written\ <\ n)\ \{}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00064}00064\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_af2a587dc20d03dcd59467fd8d4d61d51}{strm}}.avail\_in\ ==\ 0\ )\ \{}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00065}00065\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ remaining\ =\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_ac9a0848b88856e3b55cd7b6a73c05184}{file\_size}}\ -\/\ file.tellp();}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00066}00066\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ to\_read\ =\ std::min((\textcolor{keywordtype}{size\_t})\mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_a1a5e5e7e4f40935cb25d79f88086864b}{compressed\_buffer}}.size(),\ remaining);}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00067}00067\ \ \ \ \ \ \ \ \ \ \ \ \ file.read(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(\mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_a1a5e5e7e4f40935cb25d79f88086864b}{compressed\_buffer}}.data()),\ to\_read);}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_af2a587dc20d03dcd59467fd8d4d61d51}{strm}}.avail\_in\ =\ to\_read;}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_af2a587dc20d03dcd59467fd8d4d61d51}{strm}}.next\_in\ =\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_a1a5e5e7e4f40935cb25d79f88086864b}{compressed\_buffer}}.data();}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{do}\ \{}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00073}00073\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_af2a587dc20d03dcd59467fd8d4d61d51}{strm}}.avail\_out\ =\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_a490e9fb6f4e48df0d98cda7939e96325}{read\_buffer}}.size();}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00074}00074\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_af2a587dc20d03dcd59467fd8d4d61d51}{strm}}.next\_out\ =\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_a490e9fb6f4e48df0d98cda7939e96325}{read\_buffer}}.data();}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00075}00075\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ inflate(\&\mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_af2a587dc20d03dcd59467fd8d4d61d51}{strm}},\ Z\_NO\_FLUSH);}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00076}00076\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ ==\ Z\_NEED\_DICT\ ||\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ ==\ Z\_DATA\_ERROR\ ||\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ ==\ Z\_MEM\_ERROR)\ \{}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00078}00078\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file__error}{compressed\_file\_error}}(\textcolor{stringliteral}{"{}Error\ decompressing:\ "{}}\ +\ std::string(\mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_af2a587dc20d03dcd59467fd8d4d61d51}{strm}}.msg));}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00080}00080\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00081}00081\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00083}00083\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ bytes\_decompressed\ =\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_a490e9fb6f4e48df0d98cda7939e96325}{read\_buffer}}.size()\ -\/\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_af2a587dc20d03dcd59467fd8d4d61d51}{strm}}.avail\_out;}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00084}00084\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (bytes\_decompressed\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00085}00085\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ to\_copy\ =\ std::min(bytes\_decompressed,\ n\ -\/\ written);}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00086}00086\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::memcpy(\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ +\ written,\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_a490e9fb6f4e48df0d98cda7939e96325}{read\_buffer}}.data(),\ to\_copy);}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00087}00087\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ written\ +=\ to\_copy;}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00088}00088\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00089}00089\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (bytes\_decompressed\ >\ to\_copy)\ \{}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00090}00090\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ move\ remaining\ to\ the\ front\ of\ the\ buffer}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00091}00091\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::memmove(\mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_a490e9fb6f4e48df0d98cda7939e96325}{read\_buffer}}.data(),\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_a490e9fb6f4e48df0d98cda7939e96325}{read\_buffer}}.data()\ +\ to\_copy,\ bytes\_decompressed\ -\/\ to\_copy);}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00092}00092\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_a28a22f20c576b62bba8bbd85ef239d4a}{remaining\_read\_buffer}}\ =\ bytes\_decompressed\ -\/\ to\_copy;}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00093}00093\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00094}00094\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00095}00095\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00096}00096\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (written\ <\ n\ \&\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ ==\ Z\_STREAM\_END)\ \{}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00097}00097\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::ios\_base::failure(\textcolor{stringliteral}{"{}Attempting\ to\ read\ past\ the\ end\ of\ a\ compressed\ file"{}});}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00098}00098\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00099}00099\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00100}00100\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ ==\ Z\_BUF\_ERROR)\ \{}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00101}00101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ need\ more\ input}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00102}00102\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_af2a587dc20d03dcd59467fd8d4d61d51}{strm}}.avail\_in\ !=\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00103}00103\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file__error}{compressed\_file\_error}}(\textcolor{stringliteral}{"{}Error\ decompressing\ cannot\ continue\ processing\ input"{}});}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00104}00104\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00105}00105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00106}00106\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00107}00107\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00108}00108\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{while}\ (\mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_af2a587dc20d03dcd59467fd8d4d61d51}{strm}}.avail\_out\ ==\ 0\ \&\&\ written\ <\ n);}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00109}00109\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00110}00110\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00111}00111\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00112}\mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_ad5485cb0fa283cf7ddebe48e95a48819}{00112}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_ad5485cb0fa283cf7ddebe48e95a48819}{seek}}(\ \textcolor{keywordtype}{long}\ loc,\ \mbox{\hyperlink{classfc_1_1cfile}{fc::cfile}}\&\ file\ )\ \{}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00113}00113\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_aa9f80ef0d517d554fd1c6e8237695012}{initialized}})\ \{}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00114}00114\ \ \ \ \ \ \ \ \ \ inflateEnd(\&\mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_af2a587dc20d03dcd59467fd8d4d61d51}{strm}});}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00115}00115\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_aa9f80ef0d517d554fd1c6e8237695012}{initialized}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00116}00116\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00117}00117\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00118}00118\ \ \ \ \ \ \ \textcolor{keywordtype}{long}\ remaining\ =\ loc;}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00119}00119\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00120}00120\ \ \ \ \ \ \ \textcolor{comment}{//\ read\ in\ the\ seek\ point\ map}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00121}00121\ \ \ \ \ \ \ file.seek\_end(-\/expected\_seek\_point\_count\_size);}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00122}00122\ \ \ \ \ \ \ seek\_point\_count\_type\ seek\_point\_count\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00123}00123\ \ \ \ \ \ \ file.read(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(\&seek\_point\_count),\ \textcolor{keyword}{sizeof}(seek\_point\_count));}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00124}00124\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00125}00125\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (seek\_point\_count\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00126}00126\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ seek\_map\_size\ =\ \textcolor{keyword}{sizeof}(seek\_point\_entry)\ *\ seek\_point\_count;}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00127}00127\ \ \ \ \ \ \ \ \ \ file.seek\_end(-\/expected\_seek\_point\_count\_size\ -\/\ seek\_map\_size);}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00128}00128\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00129}00129\ \ \ \ \ \ \ \ \ \ std::vector<seek\_point\_entry>\ seek\_point\_map(seek\_point\_count);}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00130}00130\ \ \ \ \ \ \ \ \ \ file.read(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(seek\_point\_map.data()),\ seek\_point\_map.size()\ *\ \textcolor{keyword}{sizeof}(seek\_point\_entry));}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00131}00131\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00132}00132\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ seek\ to\ the\ neareast\ seek\ point}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00133}00133\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ iter\ =\ std::lower\_bound(seek\_point\_map.begin(),\ seek\_point\_map.end(),\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})loc,\ [](\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ lhs,\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ rhs\ )\{}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00134}00134\ \ \ \ \ \ \ \ \ \ \ \ \ return\ std::get<0>(lhs)\ <\ rhs;}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00135}00135\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00136}00136\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00137}00137\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ special\ case\ when\ there\ is\ a\ seek\ point\ that\ is\ exact}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00138}00138\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ iter\ !=\ seek\_point\_map.end()\ \&\&\ std::get<0>(*iter)\ ==\ loc\ )\ \{}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00139}00139\ \ \ \ \ \ \ \ \ \ \ \ \ file.seek(std::get<1>(*iter));}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00140}00140\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00141}00141\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00142}00142\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00143}00143\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ special\ case\ when\ this\ is\ before\ the\ first\ seek\ point}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00144}00144\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ iter\ ==\ seek\_point\_map.begin()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00145}00145\ \ \ \ \ \ \ \ \ \ \ \ \ file.seek(0);}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00146}00146\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00147}00147\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ if\ lower\ bound\ wasn't\ exact\ iter\ will\ be\ one\ past\ the\ seek\ point\ we\ need}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00148}00148\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ seek\_pt\ =\ *(iter\ -\/\ 1);}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00149}00149\ \ \ \ \ \ \ \ \ \ \ \ \ file.seek(std::get<1>(seek\_pt));}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00150}00150\ \ \ \ \ \ \ \ \ \ \ \ \ remaining\ -\/=\ std::get<0>(seek\_pt);}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00151}00151\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00152}00152\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00153}00153\ \ \ \ \ \ \ \ \ \ file.seek(0);}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00154}00154\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00155}00155\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00156}00156\ \ \ \ \ \ \ \textcolor{comment}{//\ read\ up\ to\ the\ expected\ offset}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00157}00157\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (remaining\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00158}00158\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ pre\_read\_buffer\ =\ std::vector<char>(remaining);}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00159}00159\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_a84d50de8a686907ee4eddad83d497834}{read}}(pre\_read\_buffer.data(),\ pre\_read\_buffer.size(),\ file);}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00160}00160\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00161}00161\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00162}00162\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00163}\mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_af2a587dc20d03dcd59467fd8d4d61d51}{00163}}\ \ \ \ z\_stream\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_af2a587dc20d03dcd59467fd8d4d61d51}{strm}};}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00164}\mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_a1a5e5e7e4f40935cb25d79f88086864b}{00164}}\ \ \ \ std::vector<uint8\_t>\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_a1a5e5e7e4f40935cb25d79f88086864b}{compressed\_buffer}}\ =\ std::vector<uint8\_t>(\mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_ae466972520e5a8f727c36ec5cf1f2556}{compressed\_buffer\_size}});}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00165}\mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_a490e9fb6f4e48df0d98cda7939e96325}{00165}}\ \ \ \ std::vector<uint8\_t>\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_a490e9fb6f4e48df0d98cda7939e96325}{read\_buffer}}\ =\ std::vector<uint8\_t>(\mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_a8d236309beb23779cb11f78ecb33aa14}{read\_buffer\_size}});}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00166}\mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_a28a22f20c576b62bba8bbd85ef239d4a}{00166}}\ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_a28a22f20c576b62bba8bbd85ef239d4a}{remaining\_read\_buffer}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00167}\mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_aa9f80ef0d517d554fd1c6e8237695012}{00167}}\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_aa9f80ef0d517d554fd1c6e8237695012}{initialized}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00168}\mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_ac9a0848b88856e3b55cd7b6a73c05184}{00168}}\ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_ac9a0848b88856e3b55cd7b6a73c05184}{file\_size}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00169}00169\ \};}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00170}00170\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00171}\mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file_a5fdfe332d7e3eb5172cae470b4f3a79d}{00171}}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file_a5fdfe332d7e3eb5172cae470b4f3a79d}{compressed\_file::compressed\_file}}(\ \mbox{\hyperlink{classfc_1_1path}{fc::path}}\ file\_path\ )}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00172}00172\ :file\_path(\mbox{\hyperlink{namespacestd}{std}}::move(file\_path))}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00173}00173\ ,file\_ptr(nullptr)}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00174}00174\ ,impl(\mbox{\hyperlink{namespacestd}{std}}::make\_unique<\mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl}{compressed\_file\_impl}}>())}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00175}00175\ \{}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00176}00176\ \ \ \ impl-\/>file\_size\ =\ \mbox{\hyperlink{namespacefc_aae3e907b120751591ca6919ac66c384b}{fc::file\_size}}(file\_path);}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00177}00177\ \}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00178}00178\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00179}\mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file_a2026b9b0fe2df13b11dfaaf40aedd35a}{00179}}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file_a2026b9b0fe2df13b11dfaaf40aedd35a}{compressed\_file::\string~compressed\_file}}()}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00180}00180\ \{\}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00181}00181\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00182}\mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file_abe66c8be1c43c60b6ec0b6e6e428a519}{00182}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file_abe66c8be1c43c60b6ec0b6e6e428a519}{compressed\_file::seek}}(\ \textcolor{keywordtype}{long}\ loc\ )\ \{}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00183}00183\ \ \ \ impl-\/>seek(loc,\ *file\_ptr);}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00184}00184\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00185}00185\ \}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00186}00186\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00187}\mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file_ace042e7a3a61ed1d44a78e4b379fd961}{00187}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file_ace042e7a3a61ed1d44a78e4b379fd961}{compressed\_file::read}}(\ \textcolor{keywordtype}{char}*\ d,\ \textcolor{keywordtype}{size\_t}\ n\ )\ \{}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00188}00188\ \ \ \ impl-\/>read(\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}},\ n,\ *file\_ptr);}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00189}00189\ \}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00190}00190\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00191}00191\ \textcolor{comment}{//\ these\ are\ defaulted\ now\ that\ the\ opaque\ impl\ type\ is\ known}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00192}00192\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00193}00193\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file_a5fdfe332d7e3eb5172cae470b4f3a79d}{compressed\_file::compressed\_file}}(\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file}{compressed\_file}}\&\&\ )\ =\ \textcolor{keywordflow}{default};}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00194}00194\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file}{compressed\_file}}\&\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file_a5941ad2a4c3d0d7266066dbef9da3ac0}{compressed\_file::operator=\ }}(\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file}{compressed\_file}}\&\&\ )\ =\ \textcolor{keywordflow}{default};}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00195}00195\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00196}00196\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00197}\mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file_ab13021e139e2ee1be1e38e84499810e2}{00197}}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file_ab13021e139e2ee1be1e38e84499810e2}{compressed\_file::process}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1path}{fc::path}}\&\ input\_path,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1path}{fc::path}}\&\ output\_path,\ \textcolor{keywordtype}{size\_t}\ seek\_point\_stride\ \ )\ \{}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00198}00198\ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{namespacefc_a3fcf0d920aea28014aacae50a51d8485}{fc::exists}}(input\_path))\ \{}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00199}00199\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::ios\_base::failure(std::string(\textcolor{stringliteral}{"{}Attempting\ to\ create\ compressed\_file\ from\ file\ that\ does\ not\ exist:\ "{}})\ +\ input\_path.\mbox{\hyperlink{classfc_1_1path_ab1eae2062df4ea01435348ec52fb3784}{generic\_string}}());}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00200}00200\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00201}00201\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00202}00202\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ input\_size\ =\ \mbox{\hyperlink{namespacefc_aae3e907b120751591ca6919ac66c384b}{fc::file\_size}}(input\_path);}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00203}00203\ \ \ \ \textcolor{keywordflow}{if}\ (input\_size\ ==\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00204}00204\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::ios\_base::failure(std::string(\textcolor{stringliteral}{"{}Attempting\ to\ create\ compressed\_file\ from\ file\ that\ is\ empty:\ "{}})\ +\ input\_path.\mbox{\hyperlink{classfc_1_1path_ab1eae2062df4ea01435348ec52fb3784}{generic\_string}}());}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00205}00205\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00206}00206\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00207}00207\ \ \ \ \textcolor{comment}{//\ subtract\ 1\ to\ make\ sure\ that\ the\ truncated\ division\ will\ only\ create\ a\ seek\ point\ if\ there\ is\ at\ least\ one\ byte}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00208}00208\ \ \ \ \textcolor{comment}{//\ in\ the\ next\ stride.\ \ So,\ a\ file\ size\ of\ N\ and\ a\ stride\ >=\ N\ results\ in\ 0\ seek\ points.\ \ N\ +\ 1\ will\ have\ a\ seek}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00209}00209\ \ \ \ \textcolor{comment}{//\ point\ for\ the\ last\ byte\ as\ will\ XN\ +\ 1\ which\ will\ create\ X\ seek\ points\ (the\ last\ of\ which\ is\ for\ the\ last\ byte)}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00210}00210\ \ \ \ \textcolor{comment}{//\ of\ the\ file}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00211}00211\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ seek\_point\_count\ =\ (input\_size\ -\/\ 1)\ /\ seek\_point\_stride;}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00212}00212\ \ \ \ std::vector<seek\_point\_entry>\ seek\_point\_map(seek\_point\_count);}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00213}00213\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00214}00214\ \ \ \ \mbox{\hyperlink{classfc_1_1cfile}{fc::cfile}}\ input\_file;}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00215}00215\ \ \ \ input\_file.\mbox{\hyperlink{classfc_1_1cfile_ac4a0191d7846c07a907d3c7eb35e848d}{set\_file\_path}}(input\_path);}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00216}00216\ \ \ \ input\_file.\mbox{\hyperlink{classfc_1_1cfile_a9e01adaeee108420312ed271133a2d7d}{open}}(\textcolor{stringliteral}{"{}rb"{}});}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00217}00217\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00218}00218\ \ \ \ \mbox{\hyperlink{classfc_1_1cfile}{fc::cfile}}\ output\_file;}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00219}00219\ \ \ \ output\_file.\mbox{\hyperlink{classfc_1_1cfile_ac4a0191d7846c07a907d3c7eb35e848d}{set\_file\_path}}(output\_path);}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00220}00220\ \ \ \ output\_file.\mbox{\hyperlink{classfc_1_1cfile_a9e01adaeee108420312ed271133a2d7d}{open}}(\textcolor{stringliteral}{"{}wb"{}});}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00221}00221\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00222}00222\ \ \ \ z\_stream\ strm;}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00223}00223\ \ \ \ strm.zalloc\ =\ Z\_NULL;}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00224}00224\ \ \ \ strm.zfree\ =\ Z\_NULL;}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00225}00225\ \ \ \ strm.opaque\ =\ Z\_NULL;}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00226}00226\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00227}00227\ \ \ \ \textcolor{keywordflow}{if}\ (deflateInit2(\&strm,\ Z\_BEST\_COMPRESSION,\ Z\_DEFLATED,\ raw\_zlib\_window\_bits,\ 8,\ Z\_DEFAULT\_STRATEGY)\ !=\ Z\_OK)\ \{}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00228}00228\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00229}00229\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00230}00230\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00231}00231\ \ \ \ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{size\_t}\ buffer\_size\ =\ 64*1024;}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00232}00232\ \ \ \ \textcolor{keyword}{auto}\ input\_buffer\ =\ std::vector<uint8\_t>(buffer\_size);}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00233}00233\ \ \ \ \textcolor{keyword}{auto}\ output\_buffer\ =\ std::vector<uint8\_t>(buffer\_size);}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00234}00234\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00235}00235\ \ \ \ \textcolor{keyword}{auto}\ bytes\_remaining\_before\_sync\ =\ seek\_point\_stride;}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00236}00236\ \ \ \ \textcolor{keywordtype}{int}\ next\_sync\_point\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00237}00237\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00238}00238\ \ \ \ \textcolor{comment}{//\ process\ a\ single\ chunk\ of\ input\ completely,}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00239}00239\ \ \ \ \textcolor{comment}{//\ this\ may\ sometime\ loop\ multiple\ times\ if\ the\ compressor\ state\ combined\ with\ input\ data\ creates\ more\ than\ a}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00240}00240\ \ \ \ \textcolor{comment}{//\ single\ buffer's\ worth\ of\ data}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00241}00241\ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00242}00242\ \ \ \ \textcolor{keyword}{auto}\ process\_chunk\ =\ [\&](\ \textcolor{keywordtype}{size\_t}\ input\_size,\ \textcolor{keywordtype}{int}\ mode\ )\ \{}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00243}00243\ \ \ \ \ \ \ strm.avail\_in\ =\ input\_size;}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00244}00244\ \ \ \ \ \ \ strm.next\_in\ =\ input\_buffer.data();}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00245}00245\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00246}00246\ \ \ \ \ \ \ \textcolor{keywordflow}{do}\ \{}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00247}00247\ \ \ \ \ \ \ \ \ \ strm.avail\_out\ =\ output\_buffer.size();}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00248}00248\ \ \ \ \ \ \ \ \ \ strm.next\_out\ =\ output\_buffer.data();}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00249}00249\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ deflate(\&strm,\ mode);}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00250}00250\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00251}00251\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ success\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ ==\ Z\_OK\ ||\ (mode\ ==\ Z\_FINISH\ \&\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ ==\ Z\_STREAM\_END);}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00252}00252\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!success)\ \{}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00253}00253\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00254}00254\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00255}00255\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00256}00256\ \ \ \ \ \ \ \ \ \ output\_file.\mbox{\hyperlink{classfc_1_1cfile_af6ad44b8179f355db75a9d01de931235}{write}}(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(output\_buffer.data()),\ output\_buffer.size()\ -\/\ strm.avail\_out);}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00257}00257\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{while}\ (strm.avail\_out\ ==\ 0);}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00258}00258\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00259}00259\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Z\_OK;}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00260}00260\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00261}00261\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00262}00262\ \ \ \ \textcolor{keywordtype}{size\_t}\ read\_offset\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00263}00263\ \ \ \ \textcolor{keywordflow}{while}\ (read\_offset\ <\ input\_size)\ \{}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00264}00264\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ bytes\_remaining\ =\ input\_size\ -\/\ read\_offset;}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00265}00265\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ read\_size\ =\ std::min(\{\ buffer\_size,\ bytes\_remaining,\ bytes\_remaining\_before\_sync\ \});}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00266}00266\ \ \ \ \ \ \ input\_file.\mbox{\hyperlink{classfc_1_1cfile_a247250a28d17544a57dfafe07012d27b}{read}}(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(input\_buffer.data()),\ read\_size);}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00267}00267\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00268}00268\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ process\_chunk(read\_size,\ Z\_NO\_FLUSH);}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00269}00269\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ !=\ Z\_OK)\ \{}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00270}00270\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file__error}{compressed\_file\_error}}(std::string(\textcolor{stringliteral}{"{}deflate\ failed:\ "{}})\ +\ std::to\_string(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}));}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00271}00271\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00272}00272\ \ \ \ \ \ \ read\_offset\ +=\ read\_size;}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00273}00273\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00274}00274\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (read\_size\ ==\ bytes\_remaining\ )\ \{}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00275}00275\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ finish\ the\ file\ out\ by\ draining\ remaining\ output}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00276}00276\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ process\_chunk(0,\ Z\_FINISH);}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00277}00277\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ !=\ Z\_OK)\ \{}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00278}00278\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file__error}{compressed\_file\_error}}(std::string(\textcolor{stringliteral}{"{}failed\ to\ finalize\ file\ compression:\ "{}})\ +\ std::to\_string(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}));}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00279}00279\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00280}00280\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\ read\_size\ ==\ bytes\_remaining\_before\_sync\ )\ \{}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00281}00281\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ create\ a\ sync\ point\ by\ flushing\ the\ compressor\ so\ a\ decompressor\ can\ start\ at\ this\ offset}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00282}00282\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ process\_chunk(0,\ Z\_FULL\_FLUSH);}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00283}00283\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ !=\ Z\_OK)\ \{}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00284}00284\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file__error}{compressed\_file\_error}}(std::string(\textcolor{stringliteral}{"{}failed\ to\ create\ sync\ point:\ "{}})\ +\ std::to\_string(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}));}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00285}00285\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00286}00286\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00287}00287\ \ \ \ \ \ \ \ \ \ seek\_point\_map.at(next\_sync\_point++)\ =\ \{read\_offset,\ output\_file.\mbox{\hyperlink{classfc_1_1cfile_abc92fc8d64550b772a69ca1b63f75bfb}{tellp}}()\};}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00288}00288\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00289}00289\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (next\_sync\_point\ ==\ seek\_point\_count)\ \{}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00290}00290\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ if\ we\ are\ out\ of\ sync\ points,\ set\ this\ value\ one\ past\ the\ end\ (disabling\ it)}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00291}00291\ \ \ \ \ \ \ \ \ \ \ \ \ bytes\_remaining\_before\_sync\ =\ input\_size\ -\/\ read\_offset\ +\ 1;}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00292}00292\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00293}00293\ \ \ \ \ \ \ \ \ \ \ \ \ bytes\_remaining\_before\_sync\ =\ seek\_point\_stride;}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00294}00294\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00295}00295\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00296}00296\ \ \ \ \ \ \ \ \ \ bytes\_remaining\_before\_sync\ -\/=\ read\_size;}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00297}00297\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00298}00298\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00299}00299\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00300}00300\ \ \ \ deflateEnd(\&strm);}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00301}00301\ \ \ \ input\_file.\mbox{\hyperlink{classfc_1_1cfile_a25b3bbb8ed2f690b750a197380153985}{close}}();}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00302}00302\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00303}00303\ \ \ \ \textcolor{comment}{//\ write\ out\ the\ seek\ point\ table}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00304}00304\ \ \ \ \textcolor{keywordflow}{if}\ (seek\_point\_map.size()\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00305}00305\ \ \ \ \ \ \ output\_file.\mbox{\hyperlink{classfc_1_1cfile_af6ad44b8179f355db75a9d01de931235}{write}}(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(seek\_point\_map.data()),\ seek\_point\_map.size()\ *\ \textcolor{keyword}{sizeof}(seek\_point\_entry));}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00306}00306\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00307}00307\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00308}00308\ \ \ \ \textcolor{comment}{//\ write\ out\ the\ seek\ point\ count}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00309}00309\ \ \ \ output\_file.\mbox{\hyperlink{classfc_1_1cfile_af6ad44b8179f355db75a9d01de931235}{write}}(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(\&seek\_point\_count),\ \textcolor{keyword}{sizeof}(seek\_point\_count\_type));}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00310}00310\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00311}00311\ \ \ \ output\_file.\mbox{\hyperlink{classfc_1_1cfile_a25b3bbb8ed2f690b750a197380153985}{close}}();}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00312}00312\ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00313}00313\ \}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00314}00314\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8cpp_source_l00315}00315\ \}}
+
+\end{DoxyCode}

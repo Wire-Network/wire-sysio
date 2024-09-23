@@ -1,0 +1,24 @@
+<map id="CLI::App::_count_remaining_positionals" name="CLI::App::_count_remaining_positionals">
+<area shape="rect" id="Node000001" title="Count the required remaining positional arguments." alt="" coords="1028,90,1211,130"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_app.html#a73c9decd5eb2b0c7eeda63cc4bd5048e" title=" " alt="" coords="574,29,720,55"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1056,86,979,63,911,53,842,46,720,43,720,38,843,41,912,47,981,58,1057,81"/>
+<area shape="rect" id="Node000008" href="$class_c_l_i_1_1_app.html#a3b564aa8c90f25152f5379c661ab82b1" title=" " alt="" coords="798,97,980,123"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="1012,113,980,113,980,108,1012,108"/>
+<area shape="rect" id="Node000009" href="$class_c_l_i_1_1_app.html#af20c05b97b9de2a4543a2de9bcc0993d" title=" " alt="" coords="544,136,750,162"/>
+<area shape="poly" id="edge13_Node000001_Node000009" title=" " alt="" coords="1013,134,980,138,861,147,750,151,750,146,861,142,980,133,1012,128"/>
+<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="687,17,674,10,647,8,622,10,609,15,606,20,613,27,609,31,601,21,606,11,621,5,647,3,675,5,690,12"/>
+<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_app.html#a02368e2fe89470ab9b4131c7e3288349" title=" " alt="" coords="335,85,496,111"/>
+<area shape="poly" id="edge3_Node000002_Node000003" title=" " alt="" coords="577,62,473,87,471,82,575,57"/>
+<area shape="rect" id="Node000004" href="$class_c_l_i_1_1_app.html#a26a92886a7d7f10a9afbd39b6535f42b" title="Internal parse function." alt="" coords="167,60,287,86"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="319,88,287,83,287,78,320,83"/>
+<area shape="rect" id="Node000005" href="$class_c_l_i_1_1_app.html#a241ba75a6c98b36349ae2f71a9137291" title="Internal parse function." alt="" coords="167,109,287,135"/>
+<area shape="poly" id="edge5_Node000003_Node000005" title=" " alt="" coords="320,113,287,117,287,112,319,108"/>
+<area shape="rect" id="Node000006" href="$class_c_l_i_1_1_app.html#a8ffb155a1153ee23d442c5bfed21225c" title="The real work is done here. Expects a reversed vector." alt="" coords="5,84,119,110"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="151,113,119,108,119,103,151,108"/>
+<area shape="rect" id="Node000007" href="$class_c_l_i_1_1_app.html#a878c1067ade7145aa11478d64f5173ed" title=" " alt="" coords="5,133,119,159"/>
+<area shape="poly" id="edge7_Node000005_Node000007" title=" " alt="" coords="151,136,119,141,119,135,151,131"/>
+<area shape="poly" id="edge10_Node000008_Node000003" title=" " alt="" coords="782,110,497,103,497,98,782,105"/>
+<area shape="poly" id="edge9_Node000008_Node000008" title=" " alt="" coords="929,85,916,78,889,76,864,78,851,83,848,88,855,95,851,99,843,89,848,79,863,73,889,71,917,73,931,80"/>
+<area shape="poly" id="edge11_Node000008_Node000009" title=" " alt="" coords="790,129,732,138,731,133,789,123"/>
+<area shape="poly" id="edge12_Node000009_Node000003" title=" " alt="" coords="570,135,477,114,478,109,571,129"/>
+</map>

@@ -1,0 +1,23 @@
+<map id="libraries/sys&#45;vm/external/Catch2/projects/SelfTest/SurrogateCpps/catch_test_case_tracker.cpp" name="libraries/sys&#45;vm/external/Catch2/projects/SelfTest/SurrogateCpps/catch_test_case_tracker.cpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="294,5,472,76"/>
+<area shape="rect" id="Node000002" href="$catch__test__case__tracker_8h.html" title=" " alt="" coords="319,124,447,165"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="386,76,386,108,380,108,380,76"/>
+<area shape="rect" id="Node000003" href="$catch__compiler__capabilities_8h.html" title=" " alt="" coords="5,286,198,312"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="322,168,268,188,213,215,166,246,127,278,124,274,163,242,211,210,266,184,320,163"/>
+<area shape="rect" id="Node000005" href="$catch__common_8h.html" title=" " alt="" coords="224,213,345,238"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="360,167,313,205,310,200,357,163"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="390,286,443,312"/>
+<area shape="poly" id="edge9_Node000002_Node000007" title=" " alt="" coords="390,164,413,270,408,272,384,166"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="421,213,478,238"/>
+<area shape="poly" id="edge10_Node000002_Node000009" title=" " alt="" coords="401,163,431,199,427,202,397,167"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="502,213,570,238"/>
+<area shape="poly" id="edge11_Node000002_Node000010" title=" " alt="" coords="422,163,501,203,498,208,420,168"/>
+<area shape="rect" id="Node000004" href="$catch__platform_8h.html" title=" " alt="" coords="42,360,161,386"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="104,312,104,344,99,344,99,312"/>
+<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="254,241,148,283,146,278,252,236"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="221,286,280,312"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="281,240,265,273,261,271,276,237"/>
+<area shape="poly" id="edge7_Node000005_Node000007" title=" " alt="" coords="308,237,382,276,379,281,305,241"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="305,286,365,312"/>
+<area shape="poly" id="edge8_Node000005_Node000008" title=" " alt="" coords="295,237,320,272,315,275,290,240"/>
+</map>

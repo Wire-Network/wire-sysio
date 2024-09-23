@@ -1,0 +1,143 @@
+\doxysection{yh\+\_\+log\+\_\+entry Struct Reference}
+\hypertarget{structyh__log__entry}{}\label{structyh__log__entry}\index{yh\_log\_entry@{yh\_log\_entry}}
+
+
+{\ttfamily \#include $<$yubihsm.\+h$>$}
+
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{structyh__log__entry_adbdbdd10828646a96f67438062c909c8}{number}}
+\begin{DoxyCompactList}\small\item\em Monotonically increasing index. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{structyh__log__entry_ad1932210758f5649c94e0a7758040b48}{command}}
+\begin{DoxyCompactList}\small\item\em What command was executed. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{structyh__log__entry_abd847b85c49faf8f3bb88876fe56cf2f}{length}}
+\begin{DoxyCompactList}\small\item\em Length of in-\/data. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{structyh__log__entry_a925f85bbcea7077e632e1699d32dfbe2}{session\+\_\+key}}
+\begin{DoxyCompactList}\small\item\em ID of Authentication Key used. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{structyh__log__entry_ab866b36403547d518733745c090f69cc}{target\+\_\+key}}
+\begin{DoxyCompactList}\small\item\em ID of first Object used. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{structyh__log__entry_a248294c48b017749865e97c22fee57ce}{second\+\_\+key}}
+\begin{DoxyCompactList}\small\item\em ID of second Object used. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{structyh__log__entry_a31bb67d7241b0cdd25d36cee65d4b6da}{result}}
+\begin{DoxyCompactList}\small\item\em \doxylink{struct_command}{Command} result. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structyh__log__entry_a32bf3bd463165110201f585222616ee4}{systick}}
+\begin{DoxyCompactList}\small\item\em Systick at time of execution. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{structyh__log__entry_a0e8ca2892b29342aa721e5a9917fabed}{digest}} \mbox{[}\mbox{\hyperlink{yubihsm_8h_a289ca46f5ef481980f0fad98d727e87a}{YH\+\_\+\+LOG\+\_\+\+DIGEST\+\_\+\+SIZE}}\mbox{]}
+\begin{DoxyCompactList}\small\item\em Truncated sha256 digest of this last digest + this entry. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Logging struct as returned by device
+
+\begin{DoxySeeAlso}{See also}
+\href{https://developers.yubico.com/YubiHSM2/Concepts/Logs.html}{\texttt{ Objects}} 
+\end{DoxySeeAlso}
+
+
+Definition at line \mbox{\hyperlink{yubihsm_8h_source_l00516}{516}} of file \mbox{\hyperlink{yubihsm_8h_source}{yubihsm.\+h}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structyh__log__entry_ad1932210758f5649c94e0a7758040b48}\index{yh\_log\_entry@{yh\_log\_entry}!command@{command}}
+\index{command@{command}!yh\_log\_entry@{yh\_log\_entry}}
+\doxysubsubsection{\texorpdfstring{command}{command}}
+{\footnotesize\ttfamily \label{structyh__log__entry_ad1932210758f5649c94e0a7758040b48} 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} yh\+\_\+log\+\_\+entry\+::command}
+
+\begin{DoxySeeAlso}{See also}
+\doxylink{yubihsm_8h_aa5415bafa9c48dfef0e183d8df504b7e}{yh\+\_\+cmd} 
+\end{DoxySeeAlso}
+
+
+Definition at line \mbox{\hyperlink{yubihsm_8h_source_l00520}{520}} of file \mbox{\hyperlink{yubihsm_8h_source}{yubihsm.\+h}}.
+
+\Hypertarget{structyh__log__entry_a0e8ca2892b29342aa721e5a9917fabed}\index{yh\_log\_entry@{yh\_log\_entry}!digest@{digest}}
+\index{digest@{digest}!yh\_log\_entry@{yh\_log\_entry}}
+\doxysubsubsection{\texorpdfstring{digest}{digest}}
+{\footnotesize\ttfamily \label{structyh__log__entry_a0e8ca2892b29342aa721e5a9917fabed} 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} yh\+\_\+log\+\_\+entry\+::digest\mbox{[}\mbox{\hyperlink{yubihsm_8h_a289ca46f5ef481980f0fad98d727e87a}{YH\+\_\+\+LOG\+\_\+\+DIGEST\+\_\+\+SIZE}}\mbox{]}}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm_8h_source_l00534}{534}} of file \mbox{\hyperlink{yubihsm_8h_source}{yubihsm.\+h}}.
+
+\Hypertarget{structyh__log__entry_abd847b85c49faf8f3bb88876fe56cf2f}\index{yh\_log\_entry@{yh\_log\_entry}!length@{length}}
+\index{length@{length}!yh\_log\_entry@{yh\_log\_entry}}
+\doxysubsubsection{\texorpdfstring{length}{length}}
+{\footnotesize\ttfamily \label{structyh__log__entry_abd847b85c49faf8f3bb88876fe56cf2f} 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} yh\+\_\+log\+\_\+entry\+::length}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm_8h_source_l00522}{522}} of file \mbox{\hyperlink{yubihsm_8h_source}{yubihsm.\+h}}.
+
+\Hypertarget{structyh__log__entry_adbdbdd10828646a96f67438062c909c8}\index{yh\_log\_entry@{yh\_log\_entry}!number@{number}}
+\index{number@{number}!yh\_log\_entry@{yh\_log\_entry}}
+\doxysubsubsection{\texorpdfstring{number}{number}}
+{\footnotesize\ttfamily \label{structyh__log__entry_adbdbdd10828646a96f67438062c909c8} 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} yh\+\_\+log\+\_\+entry\+::number}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm_8h_source_l00518}{518}} of file \mbox{\hyperlink{yubihsm_8h_source}{yubihsm.\+h}}.
+
+\Hypertarget{structyh__log__entry_a31bb67d7241b0cdd25d36cee65d4b6da}\index{yh\_log\_entry@{yh\_log\_entry}!result@{result}}
+\index{result@{result}!yh\_log\_entry@{yh\_log\_entry}}
+\doxysubsubsection{\texorpdfstring{result}{result}}
+{\footnotesize\ttfamily \label{structyh__log__entry_a31bb67d7241b0cdd25d36cee65d4b6da} 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} yh\+\_\+log\+\_\+entry\+::result}
+
+\begin{DoxySeeAlso}{See also}
+\doxylink{yubihsm_8h_aa5415bafa9c48dfef0e183d8df504b7e}{yh\+\_\+cmd} 
+\end{DoxySeeAlso}
+
+
+Definition at line \mbox{\hyperlink{yubihsm_8h_source_l00530}{530}} of file \mbox{\hyperlink{yubihsm_8h_source}{yubihsm.\+h}}.
+
+\Hypertarget{structyh__log__entry_a248294c48b017749865e97c22fee57ce}\index{yh\_log\_entry@{yh\_log\_entry}!second\_key@{second\_key}}
+\index{second\_key@{second\_key}!yh\_log\_entry@{yh\_log\_entry}}
+\doxysubsubsection{\texorpdfstring{second\_key}{second\_key}}
+{\footnotesize\ttfamily \label{structyh__log__entry_a248294c48b017749865e97c22fee57ce} 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} yh\+\_\+log\+\_\+entry\+::second\+\_\+key}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm_8h_source_l00528}{528}} of file \mbox{\hyperlink{yubihsm_8h_source}{yubihsm.\+h}}.
+
+\Hypertarget{structyh__log__entry_a925f85bbcea7077e632e1699d32dfbe2}\index{yh\_log\_entry@{yh\_log\_entry}!session\_key@{session\_key}}
+\index{session\_key@{session\_key}!yh\_log\_entry@{yh\_log\_entry}}
+\doxysubsubsection{\texorpdfstring{session\_key}{session\_key}}
+{\footnotesize\ttfamily \label{structyh__log__entry_a925f85bbcea7077e632e1699d32dfbe2} 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} yh\+\_\+log\+\_\+entry\+::session\+\_\+key}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm_8h_source_l00524}{524}} of file \mbox{\hyperlink{yubihsm_8h_source}{yubihsm.\+h}}.
+
+\Hypertarget{structyh__log__entry_a32bf3bd463165110201f585222616ee4}\index{yh\_log\_entry@{yh\_log\_entry}!systick@{systick}}
+\index{systick@{systick}!yh\_log\_entry@{yh\_log\_entry}}
+\doxysubsubsection{\texorpdfstring{systick}{systick}}
+{\footnotesize\ttfamily \label{structyh__log__entry_a32bf3bd463165110201f585222616ee4} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} yh\+\_\+log\+\_\+entry\+::systick}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm_8h_source_l00532}{532}} of file \mbox{\hyperlink{yubihsm_8h_source}{yubihsm.\+h}}.
+
+\Hypertarget{structyh__log__entry_ab866b36403547d518733745c090f69cc}\index{yh\_log\_entry@{yh\_log\_entry}!target\_key@{target\_key}}
+\index{target\_key@{target\_key}!yh\_log\_entry@{yh\_log\_entry}}
+\doxysubsubsection{\texorpdfstring{target\_key}{target\_key}}
+{\footnotesize\ttfamily \label{structyh__log__entry_ab866b36403547d518733745c090f69cc} 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} yh\+\_\+log\+\_\+entry\+::target\+\_\+key}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm_8h_source_l00526}{526}} of file \mbox{\hyperlink{yubihsm_8h_source}{yubihsm.\+h}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/yubihsm/lib/\mbox{\hyperlink{yubihsm_8h}{yubihsm.\+h}}\end{DoxyCompactItemize}

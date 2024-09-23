@@ -1,0 +1,51 @@
+\doxysection{thread\+\_\+utils.\+hpp}
+\hypertarget{thread__utils_8hpp_source}{}\label{thread__utils_8hpp_source}\index{libraries/chain/include/sysio/chain/thread\_utils.hpp@{libraries/chain/include/sysio/chain/thread\_utils.hpp}}
+\mbox{\hyperlink{thread__utils_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{thread__utils_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{thread__utils_8hpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{thread__utils_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <boost/asio/io\_context.hpp>}}
+\DoxyCodeLine{\Hypertarget{thread__utils_8hpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <boost/asio/thread\_pool.hpp>}}
+\DoxyCodeLine{\Hypertarget{thread__utils_8hpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <boost/asio/post.hpp>}}
+\DoxyCodeLine{\Hypertarget{thread__utils_8hpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <future>}}
+\DoxyCodeLine{\Hypertarget{thread__utils_8hpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <memory>}}
+\DoxyCodeLine{\Hypertarget{thread__utils_8hpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <optional>}}
+\DoxyCodeLine{\Hypertarget{thread__utils_8hpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{thread__utils_8hpp_source_l00010}00010\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{\ \textcolor{keyword}{namespace\ }chain\ \{}
+\DoxyCodeLine{\Hypertarget{thread__utils_8hpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{thread__utils_8hpp_source_l00016}\mbox{\hyperlink{classsysio_1_1chain_1_1named__thread__pool}{00016}}\ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1chain_1_1named__thread__pool}{named\_thread\_pool}}\ \{}
+\DoxyCodeLine{\Hypertarget{thread__utils_8hpp_source_l00017}00017\ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{thread__utils_8hpp_source_l00018}00018\ \ \ \ \ \ \ \textcolor{comment}{//\ name\_prefix\ is\ name\ appended\ with\ -\/\#\#\ of\ thread.}}
+\DoxyCodeLine{\Hypertarget{thread__utils_8hpp_source_l00019}00019\ \ \ \ \ \ \ \textcolor{comment}{//\ short\ name\_prefix\ (6\ chars\ or\ under)\ is\ recommended\ as\ console\_appender\ uses\ 9\ chars\ for\ thread\ name}}
+\DoxyCodeLine{\Hypertarget{thread__utils_8hpp_source_l00020}00020\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1named__thread__pool_a0f1e730d72e86361eb8edfa66c9e3cfb}{named\_thread\_pool}}(\ std::string\ name\_prefix,\ \textcolor{keywordtype}{size\_t}\ num\_threads\ );}
+\DoxyCodeLine{\Hypertarget{thread__utils_8hpp_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{thread__utils_8hpp_source_l00022}00022\ \ \ \ \ \ \ \textcolor{comment}{//\ calls\ stop()}}
+\DoxyCodeLine{\Hypertarget{thread__utils_8hpp_source_l00023}00023\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1named__thread__pool_a403565b5e9112c939999a0bc2fb366e2}{\string~named\_thread\_pool}}();}
+\DoxyCodeLine{\Hypertarget{thread__utils_8hpp_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{thread__utils_8hpp_source_l00025}\mbox{\hyperlink{classsysio_1_1chain_1_1named__thread__pool_ae2f5fa4611193d13bb40e34708d897ea}{00025}}\ \ \ \ \ \ \ boost::asio::io\_context\&\ \mbox{\hyperlink{classsysio_1_1chain_1_1named__thread__pool_ae2f5fa4611193d13bb40e34708d897ea}{get\_executor}}()\ \{\ \textcolor{keywordflow}{return}\ \_ioc;\ \}}
+\DoxyCodeLine{\Hypertarget{thread__utils_8hpp_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{thread__utils_8hpp_source_l00027}00027\ \ \ \ \ \ \ \textcolor{comment}{//\ destroy\ work\ guard,\ stop\ io\_context,\ join\ thread\_pool,\ and\ stop\ thread\_pool}}
+\DoxyCodeLine{\Hypertarget{thread__utils_8hpp_source_l00028}00028\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1named__thread__pool_a2cf9d662cfa57de6d29cd900f8375208}{stop}}();}
+\DoxyCodeLine{\Hypertarget{thread__utils_8hpp_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{thread__utils_8hpp_source_l00030}00030\ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{thread__utils_8hpp_source_l00031}00031\ \ \ \ \ \ \ \textcolor{keyword}{using\ }ioc\_work\_t\ =\ boost::asio::executor\_work\_guard<boost::asio::io\_context::executor\_type>;}
+\DoxyCodeLine{\Hypertarget{thread__utils_8hpp_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{thread__utils_8hpp_source_l00033}00033\ \ \ \ \ \ \ boost::asio::thread\_pool\ \ \ \ \ \ \ \_thread\_pool;}
+\DoxyCodeLine{\Hypertarget{thread__utils_8hpp_source_l00034}00034\ \ \ \ \ \ \ boost::asio::io\_context\ \ \ \ \ \ \ \ \_ioc;}
+\DoxyCodeLine{\Hypertarget{thread__utils_8hpp_source_l00035}00035\ \ \ \ \ \ \ std::optional<ioc\_work\_t>\ \ \ \ \ \ \_ioc\_work;}
+\DoxyCodeLine{\Hypertarget{thread__utils_8hpp_source_l00036}00036\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{thread__utils_8hpp_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{thread__utils_8hpp_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{thread__utils_8hpp_source_l00039}00039\ \ \ \ \textcolor{comment}{//\ async\ on\ thread\_pool\ and\ return\ future}}
+\DoxyCodeLine{\Hypertarget{thread__utils_8hpp_source_l00040}00040\ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ F>}
+\DoxyCodeLine{\Hypertarget{thread__utils_8hpp_source_l00041}\mbox{\hyperlink{namespacesysio_1_1chain_a7c89dacf49f9737b2395006400c5a26c}{00041}}\ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacesysio_1_1chain_a7c89dacf49f9737b2395006400c5a26c}{async\_thread\_pool}}(\ boost::asio::io\_context\&\ thread\_pool,\ F\&\&\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{thread__utils_8hpp_source_l00042}00042\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ task\ =\ std::make\_shared<std::packaged\_task<\textcolor{keyword}{decltype}(\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}()\ )()>>(\ std::forward<F>(\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}\ )\ );}
+\DoxyCodeLine{\Hypertarget{thread__utils_8hpp_source_l00043}00043\ \ \ \ \ \ \ boost::asio::post(\ thread\_pool,\ [task]()\ \{\ (*task)();\ \}\ );}
+\DoxyCodeLine{\Hypertarget{thread__utils_8hpp_source_l00044}00044\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ task-\/>get\_future();}
+\DoxyCodeLine{\Hypertarget{thread__utils_8hpp_source_l00045}00045\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{thread__utils_8hpp_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{thread__utils_8hpp_source_l00047}00047\ \}\ \}\ \textcolor{comment}{//\ sysio::chain}}
+\DoxyCodeLine{\Hypertarget{thread__utils_8hpp_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{thread__utils_8hpp_source_l00049}00049\ }
+
+\end{DoxyCode}

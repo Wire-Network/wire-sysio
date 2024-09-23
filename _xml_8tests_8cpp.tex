@@ -1,0 +1,191 @@
+\doxysection{libraries/sys-\/vm/external/\+Catch2/projects/\+Self\+Test/\+Introspective\+Tests/\+Xml.tests.\+cpp File Reference}
+\hypertarget{_xml_8tests_8cpp}{}\label{_xml_8tests_8cpp}\index{libraries/sys-\/vm/external/Catch2/projects/SelfTest/IntrospectiveTests/Xml.tests.cpp@{libraries/sys-\/vm/external/Catch2/projects/SelfTest/IntrospectiveTests/Xml.tests.cpp}}
+{\ttfamily \#include "{}catch.\+hpp"{}}\newline
+{\ttfamily \#include "{}internal/catch\+\_\+xmlwriter.\+h"{}}\newline
+{\ttfamily \#include $<$sstream$>$}\newline
+Include dependency graph for Xml.\+tests.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{_xml_8tests_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+std\+::string \mbox{\hyperlink{_xml_8tests_8cpp_aecd16812a623571d4fa171136057d189}{encode}} (std\+::string const \&str, \mbox{\hyperlink{class_catch_1_1_xml_encode_a81ed50fe458d1aae3481781b4d599b7a}{Catch\+::\+Xml\+Encode\+::\+For\+What}} for\+What=\mbox{\hyperlink{class_catch_1_1_xml_encode_a81ed50fe458d1aae3481781b4d599b7aafebf4db23809cd7925a3bdaaa4249de1}{Catch\+::\+Xml\+Encode\+::\+For\+Text\+Nodes}})
+\item 
+\mbox{\hyperlink{_xml_8tests_8cpp_a8b3c2d53c441c3d3b31581fdd328f52f}{TEST\+\_\+\+CASE}} ("{}Xml\+Encode"{}, "{}\mbox{[}XML\mbox{]}"{})
+\item 
+\mbox{\hyperlink{_xml_8tests_8cpp_a60e44919118cf1e3c9257267c3bf0e7d}{TEST\+\_\+\+CASE}} ("{}Xml\+Encode\+: UTF-\/8"{}, "{}\mbox{[}XML\mbox{]}\mbox{[}UTF-\/8\mbox{]}"{})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{_xml_8tests_8cpp_aecd16812a623571d4fa171136057d189}\index{Xml.tests.cpp@{Xml.tests.cpp}!encode@{encode}}
+\index{encode@{encode}!Xml.tests.cpp@{Xml.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{encode()}{encode()}}
+{\footnotesize\ttfamily \label{_xml_8tests_8cpp_aecd16812a623571d4fa171136057d189} 
+std\+::string encode (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{str}{, }\item[{\mbox{\hyperlink{class_catch_1_1_xml_encode_a81ed50fe458d1aae3481781b4d599b7a}{Catch\+::\+Xml\+Encode\+::\+For\+What}}}]{for\+What}{ = {\ttfamily \mbox{\hyperlink{class_catch_1_1_xml_encode_a81ed50fe458d1aae3481781b4d599b7aafebf4db23809cd7925a3bdaaa4249de1}{Catch\+::\+Xml\+Encode\+::\+For\+Text\+Nodes}}}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_xml_8tests_8cpp_source_l00006}{6}} of file \mbox{\hyperlink{_xml_8tests_8cpp_source}{Xml.\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00006\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00007\ \ \ \ \ std::ostringstream\ oss;}
+\DoxyCodeLine{00008\ \ \ \ \ oss\ <<\ \mbox{\hyperlink{class_catch_1_1_xml_encode}{Catch::XmlEncode}}(\ str,\ forWhat\ );}
+\DoxyCodeLine{00009\ \ \ \ \ \textcolor{keywordflow}{return}\ oss.str();}
+\DoxyCodeLine{00010\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=238pt]{_xml_8tests_8cpp_aecd16812a623571d4fa171136057d189_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{_xml_8tests_8cpp_a8b3c2d53c441c3d3b31581fdd328f52f}\index{Xml.tests.cpp@{Xml.tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!Xml.tests.cpp@{Xml.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{_xml_8tests_8cpp_a8b3c2d53c441c3d3b31581fdd328f52f} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Xml\+Encode"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}\+XML\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_xml_8tests_8cpp_source_l00012}{12}} of file \mbox{\hyperlink{_xml_8tests_8cpp_source}{Xml.\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00012\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00013\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\ \textcolor{stringliteral}{"{}normal\ string"{}}\ )\ \{}
+\DoxyCodeLine{00014\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{_xml_8tests_8cpp_aecd16812a623571d4fa171136057d189}{encode}}(\ \textcolor{stringliteral}{"{}normal\ string"{}}\ )\ ==\ \textcolor{stringliteral}{"{}normal\ string"{}}\ );}
+\DoxyCodeLine{00015\ \ \ \ \ \}}
+\DoxyCodeLine{00016\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\ \textcolor{stringliteral}{"{}empty\ string"{}}\ )\ \{}
+\DoxyCodeLine{00017\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{_xml_8tests_8cpp_aecd16812a623571d4fa171136057d189}{encode}}(\ \textcolor{stringliteral}{"{}"{}}\ )\ ==\ \textcolor{stringliteral}{"{}"{}}\ );}
+\DoxyCodeLine{00018\ \ \ \ \ \}}
+\DoxyCodeLine{00019\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\ \textcolor{stringliteral}{"{}string\ with\ ampersand"{}}\ )\ \{}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{_xml_8tests_8cpp_aecd16812a623571d4fa171136057d189}{encode}}(\ \textcolor{stringliteral}{"{}smith\ \&\ jones"{}}\ )\ ==\ \textcolor{stringliteral}{"{}smith\ \&amp;\ jones"{}}\ );}
+\DoxyCodeLine{00021\ \ \ \ \ \}}
+\DoxyCodeLine{00022\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\ \textcolor{stringliteral}{"{}string\ with\ less-\/than"{}}\ )\ \{}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{_xml_8tests_8cpp_aecd16812a623571d4fa171136057d189}{encode}}(\ \textcolor{stringliteral}{"{}smith\ <\ jones"{}}\ )\ ==\ \textcolor{stringliteral}{"{}smith\ \&lt;\ jones"{}}\ );}
+\DoxyCodeLine{00024\ \ \ \ \ \}}
+\DoxyCodeLine{00025\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\ \textcolor{stringliteral}{"{}string\ with\ greater-\/than"{}}\ )\ \{}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{_xml_8tests_8cpp_aecd16812a623571d4fa171136057d189}{encode}}(\ \textcolor{stringliteral}{"{}smith\ >\ jones"{}}\ )\ ==\ \textcolor{stringliteral}{"{}smith\ >\ jones"{}}\ );}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{_xml_8tests_8cpp_aecd16812a623571d4fa171136057d189}{encode}}(\ \textcolor{stringliteral}{"{}smith\ ]]>\ jones"{}}\ )\ ==\ \textcolor{stringliteral}{"{}smith\ ]]\&gt;\ jones"{}}\ );}
+\DoxyCodeLine{00028\ \ \ \ \ \}}
+\DoxyCodeLine{00029\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\ \textcolor{stringliteral}{"{}string\ with\ quotes"{}}\ )\ \{}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ std::string\ stringWithQuotes\ =\ \textcolor{stringliteral}{"{}don't\ \(\backslash\)"{}quote\(\backslash\)"{}\ me\ on\ that"{}};}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{_xml_8tests_8cpp_aecd16812a623571d4fa171136057d189}{encode}}(\ stringWithQuotes\ )\ ==\ stringWithQuotes\ );}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{_xml_8tests_8cpp_aecd16812a623571d4fa171136057d189}{encode}}(\ stringWithQuotes,\ \mbox{\hyperlink{class_catch_1_1_xml_encode_a81ed50fe458d1aae3481781b4d599b7aa3cdd995cc66ae405a4793a98db186005}{Catch::XmlEncode::ForAttributes}}\ )\ ==\ \textcolor{stringliteral}{"{}don't\ \&quot;quote\&quot;\ me\ on\ that"{}}\ );}
+\DoxyCodeLine{00033\ \ \ \ \ \}}
+\DoxyCodeLine{00034\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\ \textcolor{stringliteral}{"{}string\ with\ control\ char\ (1)"{}}\ )\ \{}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{_xml_8tests_8cpp_aecd16812a623571d4fa171136057d189}{encode}}(\ \textcolor{stringliteral}{"{}[\(\backslash\)x01]"{}}\ )\ ==\ \textcolor{stringliteral}{"{}[\(\backslash\)\(\backslash\)x01]"{}}\ );}
+\DoxyCodeLine{00036\ \ \ \ \ \}}
+\DoxyCodeLine{00037\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\ \textcolor{stringliteral}{"{}string\ with\ control\ char\ (x7F)"{}}\ )\ \{}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{_xml_8tests_8cpp_aecd16812a623571d4fa171136057d189}{encode}}(\ \textcolor{stringliteral}{"{}[\(\backslash\)x7F]"{}}\ )\ ==\ \textcolor{stringliteral}{"{}[\(\backslash\)\(\backslash\)x7F]"{}}\ );}
+\DoxyCodeLine{00039\ \ \ \ \ \}}
+\DoxyCodeLine{00040\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=238pt]{_xml_8tests_8cpp_a8b3c2d53c441c3d3b31581fdd328f52f_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{_xml_8tests_8cpp_a60e44919118cf1e3c9257267c3bf0e7d}\index{Xml.tests.cpp@{Xml.tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!Xml.tests.cpp@{Xml.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{_xml_8tests_8cpp_a60e44919118cf1e3c9257267c3bf0e7d} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Xml\+Encode\+: UTF-\/8"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}\+XML\mbox{]}\mbox{[}\+UTF-\/8\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_xml_8tests_8cpp_source_l00043}{43}} of file \mbox{\hyperlink{_xml_8tests_8cpp_source}{Xml.\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ UTF-\/8\textcolor{stringliteral}{"{},\ "{}}[XML][UTF-\/8]\textcolor{stringliteral}{"{})\ \{}}
+\DoxyCodeLine{00044\ \textcolor{stringliteral}{\ \ \ \ SECTION("{}}Valid\ utf-\/8\ strings\textcolor{stringliteral}{"{})\ \{}}
+\DoxyCodeLine{00045\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ CHECK(encode(u8"{}}Here\ be\ 👾\textcolor{stringliteral}{"{})\ ==\ u8"{}}Here\ be\ 👾\textcolor{stringliteral}{"{});}}
+\DoxyCodeLine{00046\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ CHECK(encode(u8"{}}šš\textcolor{stringliteral}{"{})\ ==\ u8"{}}šš\textcolor{stringliteral}{"{});}}
+\DoxyCodeLine{00047\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00048\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ CHECK(encode("{}}\(\backslash\)xDF\(\backslash\)xBF\textcolor{stringliteral}{"{})\ \ \ \ \ \ \ \ \ ==\ "{}}\(\backslash\)xDF\(\backslash\)xBF\textcolor{stringliteral}{"{});\ //\ 0x7FF}}
+\DoxyCodeLine{00049\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ CHECK(encode("{}}\(\backslash\)xE0\(\backslash\)xA0\(\backslash\)x80\textcolor{stringliteral}{"{})\ \ \ \ \ ==\ "{}}\(\backslash\)xE0\(\backslash\)xA0\(\backslash\)x80\textcolor{stringliteral}{"{});\ //\ 0x800}}
+\DoxyCodeLine{00050\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ CHECK(encode("{}}\(\backslash\)xED\(\backslash\)x9F\(\backslash\)xBF\textcolor{stringliteral}{"{})\ \ \ \ \ ==\ "{}}\(\backslash\)xED\(\backslash\)x9F\(\backslash\)xBF\textcolor{stringliteral}{"{});\ //\ 0xD7FF}}
+\DoxyCodeLine{00051\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ CHECK(encode("{}}\(\backslash\)xEE\(\backslash\)x80\(\backslash\)x80\textcolor{stringliteral}{"{})\ \ \ \ \ ==\ "{}}\(\backslash\)xEE\(\backslash\)x80\(\backslash\)x80\textcolor{stringliteral}{"{});\ //\ 0xE000}}
+\DoxyCodeLine{00052\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ CHECK(encode("{}}\(\backslash\)xEF\(\backslash\)xBF\(\backslash\)xBF\textcolor{stringliteral}{"{})\ \ \ \ \ ==\ "{}}\(\backslash\)xEF\(\backslash\)xBF\(\backslash\)xBF\textcolor{stringliteral}{"{});\ //\ 0xFFFF}}
+\DoxyCodeLine{00053\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ CHECK(encode("{}}\(\backslash\)xF0\(\backslash\)x90\(\backslash\)x80\(\backslash\)x80\textcolor{stringliteral}{"{})\ ==\ "{}}\(\backslash\)xF0\(\backslash\)x90\(\backslash\)x80\(\backslash\)x80\textcolor{stringliteral}{"{});\ //\ 0x10000}}
+\DoxyCodeLine{00054\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ CHECK(encode("{}}\(\backslash\)xF4\(\backslash\)x8F\(\backslash\)xBF\(\backslash\)xBF\textcolor{stringliteral}{"{})\ ==\ "{}}\(\backslash\)xF4\(\backslash\)x8F\(\backslash\)xBF\(\backslash\)xBF\textcolor{stringliteral}{"{});\ //\ 0x10FFFF}}
+\DoxyCodeLine{00055\ \textcolor{stringliteral}{\ \ \ \ \}}}
+\DoxyCodeLine{00056\ \textcolor{stringliteral}{\ \ \ \ SECTION("{}}Invalid\ utf-\/8\ strings\textcolor{stringliteral}{"{})\ \{}}
+\DoxyCodeLine{00057\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ SECTION("{}}Various\ broken\ strings\textcolor{stringliteral}{"{})\ \{}}
+\DoxyCodeLine{00058\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ CHECK(encode("{}}Here\ \(\backslash\)xFF\ be\ 👾\textcolor{stringliteral}{"{})\ ==\ u8"{}}Here\ \(\backslash\)\(\backslash\)xFF\ be\ 👾\textcolor{stringliteral}{"{});}}
+\DoxyCodeLine{00059\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ CHECK(encode("{}}\(\backslash\)xFF\textcolor{stringliteral}{"{})\ ==\ "{}}\(\backslash\)\(\backslash\)xFF\textcolor{stringliteral}{"{});}}
+\DoxyCodeLine{00060\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ CHECK(encode("{}}\(\backslash\)xC5\(\backslash\)xC5\(\backslash\)xA0\textcolor{stringliteral}{"{})\ ==\ u8"{}}\(\backslash\)\(\backslash\)xC5Š\textcolor{stringliteral}{"{});}}
+\DoxyCodeLine{00061\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ CHECK(encode("{}}\(\backslash\)xF4\(\backslash\)x90\(\backslash\)x80\(\backslash\)x80\textcolor{stringliteral}{"{})\ ==\ u8"{}}\(\backslash\)\(\backslash\)xF4\(\backslash\)\(\backslash\)x90\(\backslash\)\(\backslash\)x80\(\backslash\)\(\backslash\)x80\textcolor{stringliteral}{"{});\ //\ 0x110000\ -\/-\/\ out\ of\ unicode\ range}}
+\DoxyCodeLine{00062\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \}}}
+\DoxyCodeLine{00063\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00064\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ SECTION("{}}Overlong\ encodings\textcolor{stringliteral}{"{})\ \{}}
+\DoxyCodeLine{00065\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ CHECK(encode("{}}\(\backslash\)xC0\(\backslash\)x80\textcolor{stringliteral}{"{})\ ==\ u8"{}}\(\backslash\)\(\backslash\)xC0\(\backslash\)\(\backslash\)x80\textcolor{stringliteral}{"{});\ //\ \(\backslash\)0}}
+\DoxyCodeLine{00066\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ CHECK(encode("{}}\(\backslash\)xF0\(\backslash\)x80\(\backslash\)x80\(\backslash\)x80\textcolor{stringliteral}{"{})\ ==\ u8"{}}\(\backslash\)\(\backslash\)xF0\(\backslash\)\(\backslash\)x80\(\backslash\)\(\backslash\)x80\(\backslash\)\(\backslash\)x80\textcolor{stringliteral}{"{});\ //\ Super-\/over-\/long\ \(\backslash\)0}}
+\DoxyCodeLine{00067\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ CHECK(encode("{}}\(\backslash\)xC1\(\backslash\)xBF\textcolor{stringliteral}{"{})\ ==\ u8"{}}\(\backslash\)\(\backslash\)xC1\(\backslash\)\(\backslash\)xBF\textcolor{stringliteral}{"{});\ //\ ASCII\ char\ as\ UTF-\/8\ (0x7F)}}
+\DoxyCodeLine{00068\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ CHECK(encode("{}}\(\backslash\)xE0\(\backslash\)x9F\(\backslash\)xBF\textcolor{stringliteral}{"{})\ ==\ u8"{}}\(\backslash\)\(\backslash\)xE0\(\backslash\)\(\backslash\)x9F\(\backslash\)\(\backslash\)xBF\textcolor{stringliteral}{"{});\ //\ 0x7FF}}
+\DoxyCodeLine{00069\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ CHECK(encode("{}}\(\backslash\)xF0\(\backslash\)x8F\(\backslash\)xBF\(\backslash\)xBF\textcolor{stringliteral}{"{})\ ==\ u8"{}}\(\backslash\)\(\backslash\)xF0\(\backslash\)\(\backslash\)x8F\(\backslash\)\(\backslash\)xBF\(\backslash\)\(\backslash\)xBF\textcolor{stringliteral}{"{});\ //\ 0xFFFF}}
+\DoxyCodeLine{00070\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \}}}
+\DoxyCodeLine{00071\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00072\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ //\ Note\ that\ we\ actually\ don't\ modify\ surrogate\ pairs,\ as\ we\ do\ not\ do\ strict\ checking}}
+\DoxyCodeLine{00073\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ SECTION("{}}Surrogate\ pairs\textcolor{stringliteral}{"{})\ \{}}
+\DoxyCodeLine{00074\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ CHECK(encode("{}}\(\backslash\)xED\(\backslash\)xA0\(\backslash\)x80\textcolor{stringliteral}{"{})\ ==\ "{}}\(\backslash\)xED\(\backslash\)xA0\(\backslash\)x80\textcolor{stringliteral}{"{});\ //\ Invalid\ surrogate\ half\ 0xD800}}
+\DoxyCodeLine{00075\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ CHECK(encode("{}}\(\backslash\)xED\(\backslash\)xAF\(\backslash\)xBF\textcolor{stringliteral}{"{})\ ==\ "{}}\(\backslash\)xED\(\backslash\)xAF\(\backslash\)xBF\textcolor{stringliteral}{"{});\ //\ Invalid\ surrogate\ half\ 0xDBFF}}
+\DoxyCodeLine{00076\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ CHECK(encode("{}}\(\backslash\)xED\(\backslash\)xB0\(\backslash\)x80\textcolor{stringliteral}{"{})\ ==\ "{}}\(\backslash\)xED\(\backslash\)xB0\(\backslash\)x80\textcolor{stringliteral}{"{});\ //\ Invalid\ surrogate\ half\ 0xDC00}}
+\DoxyCodeLine{00077\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ CHECK(encode("{}}\(\backslash\)xED\(\backslash\)xBF\(\backslash\)xBF\textcolor{stringliteral}{"{})\ ==\ "{}}\(\backslash\)xED\(\backslash\)xBF\(\backslash\)xBF\textcolor{stringliteral}{"{});\ //\ Invalid\ surrogate\ half\ 0xDFFF}}
+\DoxyCodeLine{00078\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \}}}
+\DoxyCodeLine{00079\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00080\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ SECTION("{}}Invalid\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103aea2b2676c28c0db26d39331a336c6b92}{start}}\ \textcolor{keywordtype}{byte}\textcolor{stringliteral}{"{})\ \{}}
+\DoxyCodeLine{00081\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ CHECK(encode("{}}\(\backslash\)x80\textcolor{stringliteral}{"{})\ ==\ u8"{}}\(\backslash\)\(\backslash\)x80\textcolor{stringliteral}{"{});}}
+\DoxyCodeLine{00082\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ CHECK(encode("{}}\(\backslash\)x81\textcolor{stringliteral}{"{})\ ==\ u8"{}}\(\backslash\)\(\backslash\)x81\textcolor{stringliteral}{"{});}}
+\DoxyCodeLine{00083\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ CHECK(encode("{}}\(\backslash\)xBC\textcolor{stringliteral}{"{})\ ==\ u8"{}}\(\backslash\)\(\backslash\)xBC\textcolor{stringliteral}{"{});}}
+\DoxyCodeLine{00084\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ CHECK(encode("{}}\(\backslash\)xBF\textcolor{stringliteral}{"{})\ ==\ u8"{}}\(\backslash\)\(\backslash\)xBF\textcolor{stringliteral}{"{});}}
+\DoxyCodeLine{00085\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ //\ Out\ of\ range}}
+\DoxyCodeLine{00086\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ CHECK(encode("{}}\(\backslash\)xF5\(\backslash\)x80\(\backslash\)x80\(\backslash\)x80\textcolor{stringliteral}{"{})\ ==\ u8"{}}\(\backslash\)\(\backslash\)xF5\(\backslash\)\(\backslash\)x80\(\backslash\)\(\backslash\)x80\(\backslash\)\(\backslash\)x80\textcolor{stringliteral}{"{});}}
+\DoxyCodeLine{00087\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ CHECK(encode("{}}\(\backslash\)xF6\(\backslash\)x80\(\backslash\)x80\(\backslash\)x80\textcolor{stringliteral}{"{})\ ==\ u8"{}}\(\backslash\)\(\backslash\)xF6\(\backslash\)\(\backslash\)x80\(\backslash\)\(\backslash\)x80\(\backslash\)\(\backslash\)x80\textcolor{stringliteral}{"{});}}
+\DoxyCodeLine{00088\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ CHECK(encode("{}}\(\backslash\)xF7\(\backslash\)x80\(\backslash\)x80\(\backslash\)x80\textcolor{stringliteral}{"{})\ ==\ u8"{}}\(\backslash\)\(\backslash\)xF7\(\backslash\)\(\backslash\)x80\(\backslash\)\(\backslash\)x80\(\backslash\)\(\backslash\)x80\textcolor{stringliteral}{"{});}}
+\DoxyCodeLine{00089\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \}}}
+\DoxyCodeLine{00090\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00091\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ SECTION("{}}Missing\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5eafa255413b3fad4339e5fb92cdda184e8}{continuation}}\ \mbox{\hyperlink{namespace_xbyak_1_1util_aa32c2b65ee9fdc28f9ef245092e96352}{byte}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})\textcolor{stringliteral}{"{})\ \{}}
+\DoxyCodeLine{00092\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ //\ Missing\ first\ continuation\ byte}}
+\DoxyCodeLine{00093\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ CHECK(encode("{}}\(\backslash\)xDE\textcolor{stringliteral}{"{})\ ==\ u8"{}}\(\backslash\)\(\backslash\)xDE\textcolor{stringliteral}{"{});}}
+\DoxyCodeLine{00094\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ CHECK(encode("{}}\(\backslash\)xDF\textcolor{stringliteral}{"{})\ ==\ u8"{}}\(\backslash\)\(\backslash\)xDF\textcolor{stringliteral}{"{});}}
+\DoxyCodeLine{00095\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ CHECK(encode("{}}\(\backslash\)xE0\textcolor{stringliteral}{"{})\ ==\ u8"{}}\(\backslash\)\(\backslash\)xE0\textcolor{stringliteral}{"{});}}
+\DoxyCodeLine{00096\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ CHECK(encode("{}}\(\backslash\)xEF\textcolor{stringliteral}{"{})\ ==\ u8"{}}\(\backslash\)\(\backslash\)xEF\textcolor{stringliteral}{"{});}}
+\DoxyCodeLine{00097\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ CHECK(encode("{}}\(\backslash\)xF0\textcolor{stringliteral}{"{})\ ==\ u8"{}}\(\backslash\)\(\backslash\)xF0\textcolor{stringliteral}{"{});}}
+\DoxyCodeLine{00098\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ CHECK(encode("{}}\(\backslash\)xF4\textcolor{stringliteral}{"{})\ ==\ u8"{}}\(\backslash\)\(\backslash\)xF4\textcolor{stringliteral}{"{});}}
+\DoxyCodeLine{00099\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00100\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ //\ Missing\ second\ continuation\ byte}}
+\DoxyCodeLine{00101\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ CHECK(encode("{}}\(\backslash\)xE0\(\backslash\)x80\textcolor{stringliteral}{"{})\ ==\ u8"{}}\(\backslash\)\(\backslash\)xE0\(\backslash\)\(\backslash\)x80\textcolor{stringliteral}{"{});}}
+\DoxyCodeLine{00102\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ CHECK(encode("{}}\(\backslash\)xE0\(\backslash\)xBF\textcolor{stringliteral}{"{})\ ==\ u8"{}}\(\backslash\)\(\backslash\)xE0\(\backslash\)\(\backslash\)xBF\textcolor{stringliteral}{"{});}}
+\DoxyCodeLine{00103\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ CHECK(encode("{}}\(\backslash\)xE1\(\backslash\)x80\textcolor{stringliteral}{"{})\ ==\ u8"{}}\(\backslash\)\(\backslash\)xE1\(\backslash\)\(\backslash\)x80\textcolor{stringliteral}{"{});}}
+\DoxyCodeLine{00104\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ CHECK(encode("{}}\(\backslash\)xF0\(\backslash\)x80\textcolor{stringliteral}{"{})\ ==\ u8"{}}\(\backslash\)\(\backslash\)xF0\(\backslash\)\(\backslash\)x80\textcolor{stringliteral}{"{});}}
+\DoxyCodeLine{00105\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ CHECK(encode("{}}\(\backslash\)xF4\(\backslash\)x80\textcolor{stringliteral}{"{})\ ==\ u8"{}}\(\backslash\)\(\backslash\)xF4\(\backslash\)\(\backslash\)x80\textcolor{stringliteral}{"{});}}
+\DoxyCodeLine{00106\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00107\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ //\ Missing\ third\ continuation\ byte}}
+\DoxyCodeLine{00108\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ CHECK(encode("{}}\(\backslash\)xF0\(\backslash\)x80\(\backslash\)x80\textcolor{stringliteral}{"{})\ ==\ u8"{}}\(\backslash\)\(\backslash\)xF0\(\backslash\)\(\backslash\)x80\(\backslash\)\(\backslash\)x80\textcolor{stringliteral}{"{});}}
+\DoxyCodeLine{00109\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ CHECK(encode("{}}\(\backslash\)xF4\(\backslash\)x80\(\backslash\)x80\textcolor{stringliteral}{"{})\ ==\ u8"{}}\(\backslash\)\(\backslash\)xF4\(\backslash\)\(\backslash\)x80\(\backslash\)\(\backslash\)x80\textcolor{stringliteral}{"{});}}
+\DoxyCodeLine{00110\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \}}}
+\DoxyCodeLine{00111\ \textcolor{stringliteral}{\ \ \ \ \}}}
+\DoxyCodeLine{00112\ \textcolor{stringliteral}{\}}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=238pt]{_xml_8tests_8cpp_a60e44919118cf1e3c9257267c3bf0e7d_cgraph}
+\end{center}
+\end{figure}

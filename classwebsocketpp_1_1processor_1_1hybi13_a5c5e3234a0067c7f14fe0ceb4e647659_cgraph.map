@@ -1,0 +1,77 @@
+<map id="websocketpp::processor::hybi13::consume" name="websocketpp::processor::hybi13::consume">
+<area shape="rect" id="Node000001" title="Process new websocket connection bytes." alt="" coords="5,372,169,413"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1processor_1_1hybi13.html#a737c86ee2ec91709052e69f22083afb9" title="Reads bytes from buf into m_basic_header." alt="" coords="217,5,443,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="87,371,96,310,117,225,134,179,155,134,182,92,215,56,218,53,221,57,219,60,186,96,160,137,138,181,122,226,101,311,93,372"/>
+<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1processor_1_1hybi13.html#a79fbd0b0670ab1c345ddbb4db76f6a0b" title="Reads bytes from buf into m_extended_header." alt="" coords="248,70,412,126"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="91,371,105,323,129,260,165,194,188,163,215,136,233,123,236,127,218,140,192,166,170,197,134,263,110,325,96,372"/>
+<area shape="rect" id="Node000004" href="$classwebsocketpp_1_1processor_1_1hybi13.html#a906398e2c23370de53d4f3572657ad05" title="Perform any finalization actions on an incoming message." alt="" coords="242,149,418,190"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="95,370,113,335,139,291,173,246,215,206,233,195,235,200,218,210,177,249,144,294,118,338,100,373"/>
+<area shape="rect" id="Node000006" href="$namespacewebsocketpp_1_1frame.html#a235192baaf86f38158dc33f178c04661" title="Extract opcode from basic header." alt="" coords="514,77,653,118"/>
+<area shape="poly" id="edge14_Node000001_Node000006" title=" " alt="" coords="99,370,145,310,178,277,215,250,248,235,277,228,331,227,384,224,411,216,441,200,457,183,465,166,473,147,489,129,498,123,501,127,493,133,478,150,470,168,462,186,445,204,413,221,385,229,331,232,278,233,249,240,218,255,181,281,149,313,103,373"/>
+<area shape="rect" id="Node000007" href="$namespacewebsocketpp_1_1frame.html#a66b39e273681d8509128e420cfaef6b0" title="Check whether the frame&#39;s FIN bit is set." alt="" coords="514,273,653,314"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="168,369,216,358,498,305,499,310,217,363,170,374"/>
+<area shape="rect" id="Node000008" href="$namespacewebsocketpp_1_1frame.html#abd4f23c906cc48fb3b34603fd4284b01" title="Calculates the full length of the header based on the first bytes." alt="" coords="260,635,400,675"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="100,412,145,493,179,542,219,586,244,607,272,625,269,629,241,611,215,590,175,545,141,496,95,414"/>
+<area shape="rect" id="Node000012" href="$namespacewebsocketpp_1_1frame.html#aed7edd146ce3aa5b87adc9fcc5fcb10f" title="Extract the masking key from a frame header." alt="" coords="260,780,400,821"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="93,413,102,477,122,567,139,615,160,664,186,710,219,750,248,772,245,777,215,754,182,713,155,666,134,617,117,568,96,478,87,414"/>
+<area shape="rect" id="Node000013" href="$namespacewebsocketpp_1_1frame.html#a90556de9dd71c1f063153b791abeb81c" title="check whether the frame&#39;s RSV1 bit is set" alt="" coords="514,339,653,379"/>
+<area shape="poly" id="edge15_Node000001_Node000013" title=" " alt="" coords="169,384,498,362,499,367,169,390"/>
+<area shape="rect" id="Node000014" href="$namespacewebsocketpp_1_1frame_1_1opcode.html#aa5e7f94a35f8fb59a925fa01636f08ad" title="Check if an opcode is for a control frame." alt="" coords="514,715,653,755"/>
+<area shape="poly" id="edge16_Node000001_Node000014" title=" " alt="" coords="105,411,152,468,184,500,218,527,250,546,279,558,333,571,386,585,414,599,445,621,461,640,469,659,477,676,493,694,507,705,504,709,489,698,473,679,465,661,457,643,441,625,412,604,384,590,331,576,277,563,247,551,215,532,180,504,148,472,101,415"/>
+<area shape="rect" id="Node000015" href="$classwebsocketpp_1_1processor_1_1hybi13.html#aa7eece3f48840535f41b625061fa7867" title="Reads bytes from buf into message payload." alt="" coords="224,264,436,305"/>
+<area shape="poly" id="edge17_Node000001_Node000015" title=" " alt="" coords="122,369,216,321,247,308,249,313,218,325,124,374"/>
+<area shape="rect" id="Node000021" href="$classwebsocketpp_1_1processor_1_1hybi13.html#a052dd867709539c0a3f70eb271da70ca" title=" " alt="" coords="248,700,412,741"/>
+<area shape="poly" id="edge24_Node000001_Node000021" title=" " alt="" coords="94,412,105,467,127,541,144,580,164,618,189,654,218,685,236,697,233,701,215,689,185,657,160,621,139,582,122,542,100,468,89,413"/>
+<area shape="rect" id="Node000022" href="$classwebsocketpp_1_1processor_1_1hybi13.html#a0c549a5e2766288fb625c03e507cc9ad" title="Validate an incoming basic header." alt="" coords="240,462,420,518"/>
+<area shape="poly" id="edge25_Node000001_Node000022" title=" " alt="" coords="141,411,245,453,243,458,139,416"/>
+<area shape="rect" id="Node000027" href="$classwebsocketpp_1_1processor_1_1hybi13.html#aee8565136bb0820e9a8914dfc5fdb753" title="Validate an incoming extended header." alt="" coords="240,895,420,951"/>
+<area shape="poly" id="edge36_Node000001_Node000027" title=" " alt="" coords="93,413,102,486,123,594,139,654,161,715,187,775,219,831,243,859,271,884,267,888,239,863,214,834,182,778,156,717,134,656,118,595,97,487,87,413"/>
+<area shape="rect" id="Node000005" href="$classwebsocketpp_1_1utf8__validator_1_1validator.html#a89deb3bdfd8b94da908b806e543491ba" title="Return whether the input sequence ended on a valid utf8 codepoint." alt="" coords="491,12,675,53"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="417,149,441,136,457,119,465,101,473,82,489,64,497,58,500,63,493,68,477,85,470,103,462,122,445,140,420,154"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="404,146,442,135,498,119,499,124,444,140,405,151"/>
+<area shape="rect" id="Node000009" href="$namespacewebsocketpp_1_1frame.html#a4e8cf8ae88a7a8fdb2b3ea86623d01d2" title="check whether the frame is masked" alt="" coords="514,780,653,821"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="401,664,424,673,445,686,462,706,470,726,477,746,493,765,501,771,498,776,489,769,472,749,465,728,457,709,441,690,421,678,399,669"/>
+<area shape="rect" id="Node000010" href="$namespacewebsocketpp_1_1frame.html#a001d6c5e538d5eb1ef5ddc21aeb61ee3" title="Calculate the offset location of the masking key within the extended header." alt="" coords="498,845,669,886"/>
+<area shape="poly" id="edge9_Node000008_Node000010" title=" " alt="" coords="401,662,424,672,445,686,459,705,467,723,470,760,473,795,480,813,493,831,496,834,493,838,489,834,475,815,468,797,465,760,462,724,455,707,441,690,422,676,399,667"/>
+<area shape="rect" id="Node000011" href="$namespacewebsocketpp_1_1frame.html#a2ceb63e6a2fe19964d13363ba2bb9e15" title="Extracts the raw payload length specified in the basic header." alt="" coords="746,857,885,898"/>
+<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="670,867,731,871,730,876,669,873"/>
+<area shape="poly" id="edge12_Node000012_Node000009" title=" " alt="" coords="400,798,498,798,498,803,400,803"/>
+<area shape="poly" id="edge13_Node000012_Node000010" title=" " alt="" coords="400,816,488,838,486,844,399,821"/>
+<area shape="poly" id="edge23_Node000015_Node000009" title=" " alt="" coords="352,303,400,365,425,406,445,449,459,496,462,540,455,617,453,653,455,689,468,726,493,765,502,774,499,778,489,769,463,728,450,690,447,653,450,616,457,540,454,497,441,451,420,408,395,368,348,307"/>
+<area shape="rect" id="Node000016" href="$namespacewebsocketpp_1_1frame.html#a3e0ba89b475df758d84dab352a76c3b3" title="Circular byte aligned mask/unmask." alt="" coords="514,208,653,249"/>
+<area shape="poly" id="edge18_Node000015_Node000016" title=" " alt="" coords="424,261,498,244,499,250,425,266"/>
+<area shape="rect" id="Node000019" href="$classwebsocketpp_1_1utf8__validator_1_1validator.html#a2cde6cad6f1a0f66674010848ec80fba" title="Advance validator state with input from an iterator pair." alt="" coords="491,143,675,183"/>
+<area shape="poly" id="edge21_Node000015_Node000019" title=" " alt="" coords="406,261,442,243,456,232,465,219,474,207,489,194,499,188,502,193,493,199,478,211,469,223,460,235,444,248,409,266"/>
+<area shape="rect" id="Node000017" href="$namespacewebsocketpp_1_1frame.html#a76bf120d54d47d760eb8bd803572b004" title="circularly shifts the supplied prepared masking key by offset bytes" alt="" coords="735,208,896,249"/>
+<area shape="poly" id="edge19_Node000016_Node000017" title=" " alt="" coords="653,226,720,226,720,231,653,231"/>
+<area shape="rect" id="Node000018" href="$namespacewebsocketpp_1_1lib_1_1net.html#a321373761665b77eaf5d78ff5e535941" title=" " alt="" coords="956,208,1101,249"/>
+<area shape="poly" id="edge20_Node000017_Node000018" title=" " alt="" coords="896,226,940,226,940,231,896,231"/>
+<area shape="rect" id="Node000020" href="$namespacewebsocketpp_1_1utf8__validator.html#ae6dab1acad72af0396e2448394a07d98" title="Decode the next byte of a UTF8 sequence." alt="" coords="723,143,908,183"/>
+<area shape="poly" id="edge22_Node000019_Node000020" title=" " alt="" coords="676,160,707,160,707,166,676,166"/>
+<area shape="poly" id="edge29_Node000022_Node000006" title=" " alt="" coords="351,460,396,396,441,315,450,288,454,263,456,218,462,175,472,153,489,129,498,121,502,125,493,133,476,155,467,176,461,218,460,264,455,289,445,317,401,398,356,463"/>
+<area shape="poly" id="edge27_Node000022_Node000007" title=" " alt="" coords="350,460,408,393,447,357,490,325,499,319,502,324,492,329,451,361,412,397,354,464"/>
+<area shape="poly" id="edge28_Node000022_Node000009" title=" " alt="" coords="362,516,405,563,445,622,455,643,460,663,464,699,471,731,479,748,493,765,502,773,499,777,489,769,475,751,466,733,459,699,455,664,450,645,441,624,401,567,358,520"/>
+<area shape="poly" id="edge26_Node000022_Node000011" title=" " alt="" coords="393,516,420,534,445,556,461,582,468,606,475,629,493,650,516,666,538,674,581,678,626,680,651,687,677,701,716,733,750,771,798,843,794,846,746,774,712,737,674,705,649,692,625,686,581,683,537,679,514,670,489,654,470,631,463,608,456,584,441,559,417,538,390,520"/>
+<area shape="poly" id="edge30_Node000022_Node000013" title=" " alt="" coords="371,459,427,424,490,390,504,383,507,388,492,395,429,429,374,464"/>
+<area shape="poly" id="edge34_Node000022_Node000014" title=" " alt="" coords="404,516,426,531,445,549,458,569,465,588,469,624,473,659,480,677,493,695,503,704,500,708,489,698,475,679,468,661,463,625,460,589,453,571,441,553,422,535,401,520"/>
+<area shape="rect" id="Node000023" href="$namespacewebsocketpp_1_1frame.html#a531509bc14ee0a6641662b17d5670460" title="check whether the frame&#39;s RSV2 bit is set" alt="" coords="514,535,653,575"/>
+<area shape="poly" id="edge31_Node000022_Node000023" title=" " alt="" coords="421,510,499,531,498,536,419,515"/>
+<area shape="rect" id="Node000024" href="$namespacewebsocketpp_1_1frame.html#a4dc0cc35b38986b9b56120ef297dd795" title="check whether the frame&#39;s RSV3 bit is set" alt="" coords="514,600,653,641"/>
+<area shape="poly" id="edge32_Node000022_Node000024" title=" " alt="" coords="388,516,445,549,468,568,492,585,505,591,503,596,490,589,465,572,441,553,385,520"/>
+<area shape="rect" id="Node000025" href="$namespacewebsocketpp_1_1frame_1_1opcode.html#a6f451ade60e2cca4caac58347643443a" title="Check if an opcode is invalid." alt="" coords="514,404,653,445"/>
+<area shape="poly" id="edge33_Node000022_Node000025" title=" " alt="" coords="419,464,498,443,499,449,421,469"/>
+<area shape="rect" id="Node000026" href="$namespacewebsocketpp_1_1frame_1_1opcode.html#a9890345367f4c8bdf565d62e00afbc61" title="Check if an opcode is reserved." alt="" coords="514,469,653,510"/>
+<area shape="poly" id="edge35_Node000022_Node000026" title=" " alt="" coords="420,487,498,487,498,492,420,492"/>
+<area shape="poly" id="edge37_Node000027_Node000011" title=" " alt="" coords="420,916,675,895,730,888,731,893,676,900,420,921"/>
+<area shape="rect" id="Node000028" href="$namespacewebsocketpp_1_1frame.html#a2ca0b9ba6077f201997da543d45b067f" title="Extract the full payload size field from a WebSocket header." alt="" coords="514,960,653,1001"/>
+<area shape="poly" id="edge38_Node000027_Node000028" title=" " alt="" coords="420,941,499,959,497,964,419,946"/>
+<area shape="poly" id="edge39_Node000028_Node000011" title=" " alt="" coords="633,957,674,939,755,902,757,907,676,944,635,962"/>
+<area shape="rect" id="Node000029" href="$namespacewebsocketpp_1_1frame.html#a5ae0cc87ac44bb78c5dc41983c43a0c4" title="Extract the extended size field from an extended header." alt="" coords="746,1012,885,1053"/>
+<area shape="poly" id="edge40_Node000028_Node000029" title=" " alt="" coords="654,993,731,1011,730,1016,653,999"/>
+<area shape="rect" id="Node000030" href="$namespacewebsocketpp_1_1frame.html#ac55b672bcd3baf4c5a074816f6eb035b" title="Extract the jumbo size field from an extended header." alt="" coords="746,947,885,987"/>
+<area shape="poly" id="edge41_Node000028_Node000030" title=" " alt="" coords="653,974,730,969,730,975,654,979"/>
+<area shape="rect" id="Node000031" href="$namespacewebsocketpp_1_1lib_1_1net.html#ae2011914840da1dcbcac7266213a8709" title="Convert 64 bit value to host byte order." alt="" coords="956,947,1101,987"/>
+<area shape="poly" id="edge42_Node000030_Node000031" title=" " alt="" coords="886,964,940,964,940,970,886,970"/>
+<area shape="rect" id="Node000032" href="$namespacewebsocketpp_1_1lib_1_1net.html#ab3e62ef8d23c6e35b1d726fa1fa1c537" title="Convert 64 bit value to network byte order." alt="" coords="1149,947,1294,987"/>
+<area shape="poly" id="edge43_Node000031_Node000032" title=" " alt="" coords="1101,964,1133,964,1133,970,1101,970"/>
+</map>

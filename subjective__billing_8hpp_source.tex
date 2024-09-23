@@ -1,0 +1,225 @@
+\doxysection{subjective\+\_\+billing.\+hpp}
+\hypertarget{subjective__billing_8hpp_source}{}\label{subjective__billing_8hpp_source}\index{plugins/producer\_plugin/include/sysio/producer\_plugin/subjective\_billing.hpp@{plugins/producer\_plugin/include/sysio/producer\_plugin/subjective\_billing.hpp}}
+\mbox{\hyperlink{subjective__billing_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{chain_2include_2sysio_2chain_2types_8hpp}{sysio/chain/types.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp}{sysio/chain/exceptions.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{block__state_8hpp}{sysio/chain/block\_state.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{transaction_8hpp}{sysio/chain/transaction.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{resource__limits_8hpp}{sysio/chain/resource\_limits.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{resource__limits__private_8hpp}{sysio/chain/resource\_limits\_private.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{chain_2include_2sysio_2chain_2config_8hpp}{sysio/chain/config.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00011}00011\ \textcolor{preprocessor}{\#include\ <boost/multi\_index\_container.hpp>}}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00012}00012\ \textcolor{preprocessor}{\#include\ <boost/multi\_index/member.hpp>}}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00013}00013\ \textcolor{preprocessor}{\#include\ <boost/multi\_index/hashed\_index.hpp>}}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00014}00014\ \textcolor{preprocessor}{\#include\ <boost/multi\_index/ordered\_index.hpp>}}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00016}00016\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00018}00018\ \textcolor{keyword}{namespace\ }bmi\ =\ boost::multi\_index;}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00019}00019\ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacesysio_1_1chain_aa85a3b49b3b219d1e3840567579e7e63}{chain::transaction\_id\_type}};}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00020}00020\ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{chain::account\_name}};}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00021}00021\ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{chain::block\_state\_ptr}};}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00022}00022\ \textcolor{keyword}{using\ }chain::packed\_transaction;}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00023}00023\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{classconfig}{config}}\ =\ chain::config;}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00025}\mbox{\hyperlink{classsysio_1_1subjective__billing}{00025}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1subjective__billing}{subjective\_billing}}\ \{}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00026}00026\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00028}00028\ \ \ \ \textcolor{keyword}{struct\ }trx\_cache\_entry\ \{}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00029}00029\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1sha256}{transaction\_id\_type}}\ \ \ \ \ trx\_id;}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00030}00030\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{account\_name}}\ \ \ \ \ \ \ \ \ \ \ \ account;}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00031}00031\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ subjective\_cpu\_bill;}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00032}00032\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1time__point}{fc::time\_point}}\ \ \ \ \ \ \ \ \ \ expiry;}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00033}00033\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00034}00034\ \ \ \ \textcolor{keyword}{struct\ }by\_id;}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00035}00035\ \ \ \ \textcolor{keyword}{struct\ }by\_expiry;}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00037}00037\ \ \ \ \textcolor{keyword}{using\ }trx\_cache\_index\ =\ bmi::multi\_index\_container<}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00038}00038\ \ \ \ \ \ \ \ \ \ trx\_cache\_entry,}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00039}00039\ \ \ \ \ \ \ \ \ \ indexed\_by<}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00040}00040\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ bmi::hashed\_unique<tag<by\_id>,\ BOOST\_MULTI\_INDEX\_MEMBER(\ trx\_cache\_entry,\ \mbox{\hyperlink{classfc_1_1sha256}{transaction\_id\_type}},\ trx\_id\ )\ >,}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00041}00041\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ordered\_non\_unique<tag<by\_expiry>,\ BOOST\_MULTI\_INDEX\_MEMBER(\ trx\_cache\_entry,\ \mbox{\hyperlink{classfc_1_1time__point}{fc::time\_point}},\ expiry\ )\ >}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00042}00042\ \ \ \ \ \ \ \ \ \ >}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00043}00043\ \ \ \ >;}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00045}00045\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__decay__accumulator}{decaying\_accumulator}}\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__decay__accumulator}{chain::resource\_limits::impl::exponential\_decay\_accumulator<>}};}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00047}00047\ \ \ \ \textcolor{keyword}{struct\ }subjective\_billing\_info\ \{}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00048}00048\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ pending\_cpu\_us;\ \ \ \ \ \ \ \ \textcolor{comment}{//\ tracked\ cpu\ us\ for\ transactions\ that\ may\ still\ succeed\ in\ a\ block}}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00049}00049\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__decay__accumulator}{decaying\_accumulator}}\ \ expired\_accumulator;\ \ \ \textcolor{comment}{//\ accumulator\ used\ to\ account\ for\ transactions\ that\ have\ expired}}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00051}00051\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ empty(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ time\_ordinal,\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ expired\_accumulator\_average\_window)\ \{}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ pending\_cpu\_us\ ==\ 0\ \&\&\ expired\_accumulator.\mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__decay__accumulator_a810496e2ab1c59b8967e8e961ab3403a}{value\_at}}(time\_ordinal,\ expired\_accumulator\_average\_window)\ ==\ 0;}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00053}00053\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00054}00054\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00056}00056\ \ \ \ \textcolor{keyword}{using\ }account\_subjective\_bill\_cache\ =\ std::map<account\_name,\ subjective\_billing\_info>;}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00057}00057\ \ \ \ \textcolor{keyword}{using\ }block\_subjective\_bill\_cache\ =\ std::map<account\_name,\ uint64\_t>;}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00059}00059\ \ \ \ \textcolor{keywordtype}{bool}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_disabled\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00060}00060\ \ \ \ trx\_cache\_index\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_trx\_cache\_index;}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00061}00061\ \ \ \ account\_subjective\_bill\_cache\ \ \ \ \ \ \ \ \ \ \ \ \ \_account\_subjective\_bill\_cache;}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00062}00062\ \ \ \ block\_subjective\_bill\_cache\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_block\_subjective\_bill\_cache;}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00063}00063\ \ \ \ std::set<chain::account\_name>\ \ \ \ \ \ \ \ \ \ \ \ \ \_disabled\_accounts;}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00064}00064\ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_expired\_accumulator\_average\_window\ =\ config::account\_cpu\_usage\_average\_window\_ms\ /\ \mbox{\hyperlink{classsysio_1_1subjective__billing_a9ef86edd58fb355478cf07852266a27c}{subjective\_time\_interval\_ms}};}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00066}00066\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00067}00067\ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ time\_ordinal\_for(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1time__point}{fc::time\_point}}\&\ t\ )\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00068}00068\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ ordinal\ =\ t.\mbox{\hyperlink{classfc_1_1time__point_abfea5efbe9ef58024cda814395ee9945}{time\_since\_epoch}}().\mbox{\hyperlink{classfc_1_1microseconds_a20fba59ec7e1f50c6b8f2c9443cc9b92}{count}}()\ /\ (1000U\ *\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})\mbox{\hyperlink{classsysio_1_1subjective__billing_a9ef86edd58fb355478cf07852266a27c}{subjective\_time\_interval\_ms}});}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00069}00069\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(ordinal\ <=\ std::numeric\_limits<uint32\_t>::max(),\ chain::tx\_resource\_exhaustion,\ \textcolor{stringliteral}{"{}overflow\ of\ quantized\ time\ in\ subjective\ billing"{}});}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00070}00070\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ordinal;}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00071}00071\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00073}00073\ \ \ \ \textcolor{keywordtype}{void}\ remove\_subjective\_billing(\ \textcolor{keyword}{const}\ trx\_cache\_entry\&\ entry,\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ time\_ordinal\ )\ \{}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00074}00074\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ aitr\ =\ \_account\_subjective\_bill\_cache.find(\ entry.account\ );}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00075}00075\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ aitr\ !=\ \_account\_subjective\_bill\_cache.end()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00076}00076\ \ \ \ \ \ \ \ \ \ aitr-\/>second.pending\_cpu\_us\ -\/=\ entry.subjective\_cpu\_bill;}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ aitr-\/>second.pending\_cpu\_us\ >=\ 0,\ chain::tx\_resource\_exhaustion,}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00078}00078\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Logic\ error\ in\ subjective\ account\ billing\ \$\{a\}"{}},\ (\textcolor{stringliteral}{"{}a"{}},\ entry.account)\ );}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ aitr-\/>second.empty(time\_ordinal,\ \_expired\_accumulator\_average\_window)\ )\ \_account\_subjective\_bill\_cache.erase(\ aitr\ );}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00080}00080\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00081}00081\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00083}00083\ \ \ \ \textcolor{keywordtype}{void}\ transition\_to\_expired(\ \textcolor{keyword}{const}\ trx\_cache\_entry\&\ entry,\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ time\_ordinal\ )\ \{}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00084}00084\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ aitr\ =\ \_account\_subjective\_bill\_cache.find(\ entry.account\ );}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00085}00085\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ aitr\ !=\ \_account\_subjective\_bill\_cache.end()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00086}00086\ \ \ \ \ \ \ \ \ \ aitr-\/>second.pending\_cpu\_us\ -\/=\ entry.subjective\_cpu\_bill;}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00087}00087\ \ \ \ \ \ \ \ \ \ aitr-\/>second.expired\_accumulator.add(entry.subjective\_cpu\_bill,\ time\_ordinal,\ \_expired\_accumulator\_average\_window);}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00088}00088\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00089}00089\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00090}00090\ }
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00091}00091\ \ \ \ \textcolor{keywordtype}{void}\ remove\_subjective\_billing(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\_state\_ptr}}\&\ bsp,\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ time\_ordinal\ )\ \{}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00092}00092\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !\_trx\_cache\_index.empty()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00093}00093\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ receipt\ :\ bsp-\/>block-\/>transactions\ )\ \{}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00094}00094\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ std::holds\_alternative<packed\_transaction>(receipt.trx)\ )\ \{}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00095}00095\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ pt\ =\ std::get<packed\_transaction>(receipt.trx);}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00096}00096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ remove\_subjective\_billing(\ pt.id(),\ time\_ordinal\ );}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00097}00097\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00098}00098\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00099}00099\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00100}00100\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00101}00101\ }
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00102}00102\ \textcolor{keyword}{public}:\ \textcolor{comment}{//\ public\ for\ tests}}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00103}\mbox{\hyperlink{classsysio_1_1subjective__billing_a9ef86edd58fb355478cf07852266a27c}{00103}}\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{classsysio_1_1subjective__billing_a9ef86edd58fb355478cf07852266a27c}{subjective\_time\_interval\_ms}}\ =\ 5'000;}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00104}00104\ }
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00105}\mbox{\hyperlink{classsysio_1_1subjective__billing_ae9609ccca5fb1be5d7421ea6acf002b4}{00105}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1subjective__billing_ae9609ccca5fb1be5d7421ea6acf002b4}{remove\_subjective\_billing}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha256}{transaction\_id\_type}}\&\ trx\_id,\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ time\_ordinal\ )\ \{}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00106}00106\ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ idx\ =\ \_trx\_cache\_index.get<by\_id>();}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00107}00107\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ idx.find(\ trx\_id\ );}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00108}00108\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr\ !=\ idx.end()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00109}00109\ \ \ \ \ \ \ \ \ \ remove\_subjective\_billing(\ *itr,\ time\_ordinal\ );}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00110}00110\ \ \ \ \ \ \ \ \ \ idx.erase(\ itr\ );}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00111}00111\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00112}00112\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00113}00113\ }
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00114}00114\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00115}\mbox{\hyperlink{classsysio_1_1subjective__billing_a6f9f1b4e1f20dbe98360c6a9f4f7219f}{00115}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1subjective__billing_a6f9f1b4e1f20dbe98360c6a9f4f7219f}{disable}}()\ \{\ \_disabled\ =\ \textcolor{keyword}{true};\ \}}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00116}\mbox{\hyperlink{classsysio_1_1subjective__billing_a6ce772a2163326920255c1faea2309f5}{00116}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1subjective__billing_a6ce772a2163326920255c1faea2309f5}{disable\_account}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{chain::account\_name}}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ )\ \{\ \_disabled\_accounts.emplace(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ );\ \}}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00117}\mbox{\hyperlink{classsysio_1_1subjective__billing_a7da6a0636378886a46193d41089149bc}{00117}}\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classsysio_1_1subjective__billing_a7da6a0636378886a46193d41089149bc}{is\_account\_disabled}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{account\_name}}\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ )\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \_disabled\ ||\ \_disabled\_accounts.count(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ );\ \}}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00118}00118\ }
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00120}\mbox{\hyperlink{classsysio_1_1subjective__billing_a443a458832b5c475272149ccb31db567}{00120}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1subjective__billing_a443a458832b5c475272149ccb31db567}{subjective\_bill}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha256}{transaction\_id\_type}}\&\ \textcolor{keywordtype}{id},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1time__point}{fc::time\_point}}\&\ expire,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{account\_name}}\&\ first\_auth,}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00121}00121\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1microseconds}{fc::microseconds}}\&\ elapsed,\ \textcolor{keywordtype}{bool}\ in\_pending\_block\ )}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00122}00122\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00123}00123\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !\_disabled\ \&\&\ !\_disabled\_accounts.count(\ first\_auth\ )\ )\ \{}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00124}00124\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ bill\ =\ std::max<int64\_t>(\ 0,\ elapsed.\mbox{\hyperlink{classfc_1_1microseconds_a20fba59ec7e1f50c6b8f2c9443cc9b92}{count}}()\ );}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00125}00125\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ \_trx\_cache\_index.emplace(}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00126}00126\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ trx\_cache\_entry\{\mbox{\hyperlink{code__cache_8cpp_aa0efefe21f4700d78692edc823e763be}{id}},}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00127}00127\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ first\_auth,}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00128}00128\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ bill,}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00129}00129\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ expire\}\ );}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00130}00130\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.second\ )\ \{}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00131}00131\ \ \ \ \ \ \ \ \ \ \ \ \ \_account\_subjective\_bill\_cache[first\_auth].pending\_cpu\_us\ +=\ bill;}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00132}00132\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ in\_pending\_block\ )\ \{}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00133}00133\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_block\_subjective\_bill\_cache[first\_auth]\ +=\ bill;}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00134}00134\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00135}00135\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00136}00136\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00137}00137\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00138}00138\ }
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00139}\mbox{\hyperlink{classsysio_1_1subjective__billing_a50d2b20b8dc816f33f480062a24e074a}{00139}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1subjective__billing_a50d2b20b8dc816f33f480062a24e074a}{subjective\_bill\_failure}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{account\_name}}\&\ first\_auth,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1microseconds}{fc::microseconds}}\&\ elapsed,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1time__point}{fc::time\_point}}\&\ now\ )}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00140}00140\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00141}00141\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !\_disabled\ \&\&\ !\_disabled\_accounts.count(\ first\_auth\ )\ )\ \{}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00142}00142\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ bill\ =\ std::max<int64\_t>(\ 0,\ elapsed.\mbox{\hyperlink{classfc_1_1microseconds_a20fba59ec7e1f50c6b8f2c9443cc9b92}{count}}()\ );}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00143}00143\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ time\_ordinal\ =\ time\_ordinal\_for(now);}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00144}00144\ \ \ \ \ \ \ \ \ \ \_account\_subjective\_bill\_cache[first\_auth].expired\_accumulator.add(bill,\ time\_ordinal,\ \_expired\_accumulator\_average\_window);}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00145}00145\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00146}00146\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00147}00147\ }
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00148}\mbox{\hyperlink{classsysio_1_1subjective__billing_a24c7829695461e95f71a1e209b3bda1f}{00148}}\ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ \mbox{\hyperlink{classsysio_1_1subjective__billing_a24c7829695461e95f71a1e209b3bda1f}{get\_subjective\_bill}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{account\_name}}\&\ first\_auth,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1time__point}{fc::time\_point}}\&\ now\ )\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00149}00149\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \_disabled\ ||\ \_disabled\_accounts.count(\ first\_auth\ )\ )\ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00150}00150\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ time\_ordinal\ =\ time\_ordinal\_for(now);}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00151}00151\ \ \ \ \ \ \ \textcolor{keyword}{const}\ subjective\_billing\_info*\ sub\_bill\_info\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00152}00152\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ aitr\ =\ \_account\_subjective\_bill\_cache.find(\ first\_auth\ );}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00153}00153\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ aitr\ !=\ \_account\_subjective\_bill\_cache.end()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00154}00154\ \ \ \ \ \ \ \ \ \ sub\_bill\_info\ =\ \&aitr-\/>second;}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00155}00155\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00156}00156\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ in\_block\_pending\_cpu\_us\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00157}00157\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ bitr\ =\ \_block\_subjective\_bill\_cache.find(\ first\_auth\ );}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00158}00158\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ bitr\ !=\ \_block\_subjective\_bill\_cache.end()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00159}00159\ \ \ \ \ \ \ \ \ \ in\_block\_pending\_cpu\_us\ =\ bitr-\/>second;}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00160}00160\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00161}00161\ }
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00162}00162\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (sub\_bill\_info)\ \{}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00163}00163\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(sub\_bill\_info-\/>pending\_cpu\_us\ >=\ in\_block\_pending\_cpu\_us,\ chain::tx\_resource\_exhaustion,\ \textcolor{stringliteral}{"{}Logic\ error\ subjective\ billing\ \$\{a\}"{}},\ (\textcolor{stringliteral}{"{}a"{}},\ first\_auth)\ );}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00164}00164\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ sub\_bill\ =\ sub\_bill\_info-\/>pending\_cpu\_us\ -\/\ in\_block\_pending\_cpu\_us\ +\ sub\_bill\_info-\/>expired\_accumulator.\mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__decay__accumulator_a810496e2ab1c59b8967e8e961ab3403a}{value\_at}}(time\_ordinal,\ \_expired\_accumulator\_average\_window\ );}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00165}00165\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ sub\_bill;}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00166}00166\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00167}00167\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00168}00168\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00169}00169\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00170}00170\ }
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00171}\mbox{\hyperlink{classsysio_1_1subjective__billing_a23d4fafb3e774be584b5e23b3510bb0d}{00171}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1subjective__billing_a23d4fafb3e774be584b5e23b3510bb0d}{abort\_block}}()\ \{}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00172}00172\ \ \ \ \ \ \ \_block\_subjective\_bill\_cache.clear();}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00173}00173\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00174}00174\ }
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00175}\mbox{\hyperlink{classsysio_1_1subjective__billing_aec76b593918a0e487d607afd7a7fbe4a}{00175}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1subjective__billing_aec76b593918a0e487d607afd7a7fbe4a}{on\_block}}(\ \mbox{\hyperlink{classfc_1_1logger}{fc::logger}}\&\ log,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\_state\_ptr}}\&\ bsp,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1time__point}{fc::time\_point}}\&\ now\ )\ \{}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00176}00176\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ bsp\ ==\ \textcolor{keyword}{nullptr}\ ||\ \_disabled\ )\ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00177}00177\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ time\_ordinal\ =\ time\_ordinal\_for(now);}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00178}00178\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ orig\_count\ =\ \_account\_subjective\_bill\_cache.size();}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00179}00179\ \ \ \ \ \ \ remove\_subjective\_billing(\ bsp,\ time\_ordinal\ );}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00180}00180\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\ log,\ \textcolor{stringliteral}{"{}Subjective\ billed\ accounts\ \$\{n\}\ removed\ \$\{r\}"{}},\ (\textcolor{stringliteral}{"{}n"{}},\ orig\_count)(\textcolor{stringliteral}{"{}r"{}},\ orig\_count\ -\/\ \_account\_subjective\_bill\_cache.size())\ );}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00181}00181\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00182}00182\ }
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00183}00183\ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ Yield>}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00184}\mbox{\hyperlink{classsysio_1_1subjective__billing_a793fb0f1fa545a9de1d117cc95f6fbdc}{00184}}\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classsysio_1_1subjective__billing_a793fb0f1fa545a9de1d117cc95f6fbdc}{remove\_expired}}(\ \mbox{\hyperlink{classfc_1_1logger}{fc::logger}}\&\ log,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1time__point}{fc::time\_point}}\&\ pending\_block\_time,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1time__point}{fc::time\_point}}\&\ now,\ Yield\&\&\ yield\ )\ \{}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00185}00185\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ exhausted\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00186}00186\ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ idx\ =\ \_trx\_cache\_index.get<by\_expiry>();}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00187}00187\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !idx.empty()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00188}00188\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ time\_ordinal\ =\ time\_ordinal\_for(now);}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00189}00189\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ orig\_count\ =\ \_trx\_cache\_index.size();}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00190}00190\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ num\_expired\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00191}00191\ }
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00192}00192\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\ !idx.empty()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00193}00193\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ yield()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00194}00194\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ exhausted\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00195}00195\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00196}00196\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00197}00197\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ b\ =\ idx.begin();}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00198}00198\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ b-\/>expiry\ >\ pending\_block\_time\ )\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00199}00199\ \ \ \ \ \ \ \ \ \ \ \ \ transition\_to\_expired(\ *b,\ time\_ordinal\ );}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00200}00200\ \ \ \ \ \ \ \ \ \ \ \ \ idx.erase(\ b\ );}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00201}00201\ \ \ \ \ \ \ \ \ \ \ \ \ num\_expired++;}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00202}00202\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00203}00203\ }
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00204}00204\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\ log,\ \textcolor{stringliteral}{"{}Processed\ \$\{n\}\ subjective\ billed\ transactions,\ Expired\ \$\{expired\}"{}},}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00205}00205\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}n"{}},\ orig\_count)(\ \textcolor{stringliteral}{"{}expired"{}},\ num\_expired\ )\ );}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00206}00206\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00207}00207\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !exhausted;}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00208}00208\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00209}00209\ }
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00210}\mbox{\hyperlink{classsysio_1_1subjective__billing_a8e2a7a102f565993fb2382c1028e91c3}{00210}}\ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{classsysio_1_1subjective__billing_a8e2a7a102f565993fb2382c1028e91c3}{get\_expired\_accumulator\_average\_window}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00211}00211\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \_expired\_accumulator\_average\_window;}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00212}00212\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00213}00213\ }
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00214}\mbox{\hyperlink{classsysio_1_1subjective__billing_a01a2a48693b5cf3609d08b8732276e1c}{00214}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1subjective__billing_a01a2a48693b5cf3609d08b8732276e1c}{set\_expired\_accumulator\_average\_window}}(\ \mbox{\hyperlink{classfc_1_1microseconds}{fc::microseconds}}\ subjective\_account\_decay\_time\ )\ \{}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00215}00215\ \ \ \ \ \ \ \_expired\_accumulator\_average\_window\ =}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00216}00216\ \ \ \ \ \ \ \ \ subjective\_account\_decay\_time.\mbox{\hyperlink{classfc_1_1microseconds_a20fba59ec7e1f50c6b8f2c9443cc9b92}{count}}()\ /\ 1000\ /\ \mbox{\hyperlink{classsysio_1_1subjective__billing_a9ef86edd58fb355478cf07852266a27c}{subjective\_time\_interval\_ms}};}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00217}00217\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00218}00218\ \};}
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00219}00219\ }
+\DoxyCodeLine{\Hypertarget{subjective__billing_8hpp_source_l00220}00220\ \}\ \textcolor{comment}{//sysio}}
+
+\end{DoxyCode}

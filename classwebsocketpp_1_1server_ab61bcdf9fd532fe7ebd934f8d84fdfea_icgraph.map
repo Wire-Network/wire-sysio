@@ -1,0 +1,30 @@
+<map id="websocketpp::server::start_accept" name="websocketpp::server::start_accept">
+<area shape="rect" id="Node000001" title="Starts the server&#39;s async connection acceptance loop." alt="" coords="679,146,821,186"/>
+<area shape="poly" id="edge14_Node000001_Node000001" title=" " alt="" coords="781,133,769,127,750,124,732,126,721,131,717,137,719,145,713,146,712,136,718,127,731,121,750,119,771,122,783,128"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1server.html#aa24feb1c5d2bde47de8b11f5369c54d4" title="Handler callback for start_accept." alt="" coords="488,146,631,186"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="663,169,631,169,631,164,663,164"/>
+<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1server.html#a0204a7d444144f7ea5b8bbcf14689fc1" title="Starts the server&#39;s async connection acceptance loop (exception free)" alt="" coords="298,146,440,186"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="473,169,441,169,441,164,473,164"/>
+<area shape="rect" id="Node000004" href="$debug__server_8cpp.html#ae66f6b31b5ad750f1fe042a706a4e3d4" title=" " alt="" coords="152,5,201,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="342,135,302,88,276,65,249,44,225,33,200,25,202,20,226,28,251,40,280,61,305,85,346,132"/>
+<area shape="rect" id="Node000005" href="$scratch__server_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97" title=" " alt="" coords="152,55,201,80"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="326,139,249,94,200,76,202,71,251,89,329,135"/>
+<area shape="rect" id="Node000006" href="$classbroadcast__server.html#af7c28eeb788bf2451364e76a02615cac" title=" " alt="" coords="103,104,250,130"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="282,147,229,133,230,128,284,142"/>
+<area shape="rect" id="Node000008" href="$classcount__server.html#a60a93e888b63c87badb9c7b9f74a8985" title=" " alt="" coords="115,153,238,179"/>
+<area shape="poly" id="edge7_Node000003_Node000008" title=" " alt="" coords="283,169,238,169,238,164,283,164"/>
+<area shape="rect" id="Node000009" href="$classprint__server.html#a724db97a6c441b5db090f6274c6112d8" title=" " alt="" coords="119,203,234,228"/>
+<area shape="poly" id="edge8_Node000003_Node000009" title=" " alt="" coords="284,191,230,205,229,200,282,186"/>
+<area shape="rect" id="Node000011" href="$classtelemetry__server.html#a8c09eba40e8993079859e9f1974254ab" title=" " alt="" coords="104,252,248,278"/>
+<area shape="poly" id="edge10_Node000003_Node000011" title=" " alt="" coords="329,198,251,243,225,254,223,249,249,238,326,193"/>
+<area shape="rect" id="Node000013" href="$classutility__server.html#a86f83e6b79b082f181c7d5edbb6b6324" title=" " alt="" coords="116,301,237,327"/>
+<area shape="poly" id="edge12_Node000003_Node000013" title=" " alt="" coords="346,200,305,248,280,272,251,292,230,303,228,298,249,288,276,267,302,244,342,197"/>
+<area shape="rect" id="Node000007" href="$broadcast__server_8cpp.html#ae66f6b31b5ad750f1fe042a706a4e3d4" title=" " alt="" coords="5,104,55,130"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="87,120,55,120,55,114,87,114"/>
+<area shape="rect" id="Node000010" href="$print__server_8cpp.html#ae66f6b31b5ad750f1fe042a706a4e3d4" title=" " alt="" coords="5,203,55,228"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="103,218,55,218,55,213,103,213"/>
+<area shape="rect" id="Node000012" href="$telemetry__server_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97" title=" " alt="" coords="5,252,55,278"/>
+<area shape="poly" id="edge11_Node000011_Node000012" title=" " alt="" coords="89,268,55,268,55,262,89,262"/>
+<area shape="rect" id="Node000014" href="$utility__server_2step1_8cpp.html#ae66f6b31b5ad750f1fe042a706a4e3d4" title=" " alt="" coords="5,301,55,327"/>
+<area shape="poly" id="edge13_Node000013_Node000014" title=" " alt="" coords="100,317,55,317,55,312,100,312"/>
+</map>

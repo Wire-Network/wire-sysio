@@ -1,0 +1,115 @@
+\doxysection{libraries/fc/libraries/ff/depends/xbyak/test/normalize\+\_\+prefix.cpp File Reference}
+\hypertarget{normalize__prefix_8cpp}{}\label{normalize__prefix_8cpp}\index{libraries/fc/libraries/ff/depends/xbyak/test/normalize\_prefix.cpp@{libraries/fc/libraries/ff/depends/xbyak/test/normalize\_prefix.cpp}}
+{\ttfamily \#include $<$string$>$}\newline
+{\ttfamily \#include $<$set$>$}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$memory.\+h$>$}\newline
+Include dependency graph for normalize\+\_\+prefix.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=316pt]{normalize__prefix_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef unsigned char \mbox{\hyperlink{normalize__prefix_8cpp_adde6aaee8457bee49c2a92621fe22b79}{uint8}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+std\+::string \mbox{\hyperlink{normalize__prefix_8cpp_a359b1f30b0a9553a0e1ce551ddb7e9a6}{normalize}} (const std\+::string \&line)
+\item 
+int \mbox{\hyperlink{normalize__prefix_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{normalize__prefix_8cpp_adde6aaee8457bee49c2a92621fe22b79}\index{normalize\_prefix.cpp@{normalize\_prefix.cpp}!uint8@{uint8}}
+\index{uint8@{uint8}!normalize\_prefix.cpp@{normalize\_prefix.cpp}}
+\doxysubsubsection{\texorpdfstring{uint8}{uint8}}
+{\footnotesize\ttfamily \label{normalize__prefix_8cpp_adde6aaee8457bee49c2a92621fe22b79} 
+typedef unsigned char \mbox{\hyperlink{normalize__prefix_8cpp_adde6aaee8457bee49c2a92621fe22b79}{uint8}}}
+
+
+
+Definition at line \mbox{\hyperlink{normalize__prefix_8cpp_source_l00009}{9}} of file \mbox{\hyperlink{normalize__prefix_8cpp_source}{normalize\+\_\+prefix.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{normalize__prefix_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}\index{normalize\_prefix.cpp@{normalize\_prefix.cpp}!main@{main}}
+\index{main@{main}!normalize\_prefix.cpp@{normalize\_prefix.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{normalize__prefix_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4} 
+int main (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{normalize__prefix_8cpp_source_l00038}{38}} of file \mbox{\hyperlink{normalize__prefix_8cpp_source}{normalize\+\_\+prefix.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00039\ \{}
+\DoxyCodeLine{00040\ \ \ \ \ std::string\ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}};}
+\DoxyCodeLine{00041\ \ \ \ \ \textcolor{keywordflow}{while}\ (std::getline(std::cin,\ line))\ \{}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ std::string\ normalizedLine\ =\ \mbox{\hyperlink{normalize__prefix_8cpp_a359b1f30b0a9553a0e1ce551ddb7e9a6}{normalize}}(line);}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ std::cout\ <<\ normalizedLine\ <<\ \textcolor{charliteral}{'\(\backslash\)n'};\textcolor{comment}{//std::endl;}}
+\DoxyCodeLine{00044\ \ \ \ \ \}}
+\DoxyCodeLine{00045\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=211pt]{normalize__prefix_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{normalize__prefix_8cpp_a359b1f30b0a9553a0e1ce551ddb7e9a6}\index{normalize\_prefix.cpp@{normalize\_prefix.cpp}!normalize@{normalize}}
+\index{normalize@{normalize}!normalize\_prefix.cpp@{normalize\_prefix.cpp}}
+\doxysubsubsection{\texorpdfstring{normalize()}{normalize()}}
+{\footnotesize\ttfamily \label{normalize__prefix_8cpp_a359b1f30b0a9553a0e1ce551ddb7e9a6} 
+std\+::string normalize (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{line}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{normalize__prefix_8cpp_source_l00011}{11}} of file \mbox{\hyperlink{normalize__prefix_8cpp_source}{normalize\+\_\+prefix.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00012\ \{}
+\DoxyCodeLine{00013\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{cvt__test_8cpp_af73a49a9258b274934a51f5b17b0d1be}{tbl}}[][3]\ =\ \{\ \textcolor{stringliteral}{"{}66"{}},\ \textcolor{stringliteral}{"{}67"{}},\ \textcolor{stringliteral}{"{}F2"{}},\ \textcolor{stringliteral}{"{}F3"{}}\ \};}
+\DoxyCodeLine{00014\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ tblNum\ =\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{cvt__test_8cpp_af73a49a9258b274934a51f5b17b0d1be}{tbl}})\ /\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{cvt__test_8cpp_af73a49a9258b274934a51f5b17b0d1be}{tbl}}[0]);}
+\DoxyCodeLine{00015\ \ \ \ \ \textcolor{keyword}{typedef}\ std::set<std::string>\ StringSet;}
+\DoxyCodeLine{00016\ \ \ \ \ StringSet\ suf;}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ pos\ =\ 0;}
+\DoxyCodeLine{00019\ \ \ \ \ \textcolor{keywordflow}{for}\ (;\ pos\ <\ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}.size();\ pos\ +=\ 2)\ \{}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ found\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ tblNum;\ i++)\ \{}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (::memcmp(\&line[pos],\ \mbox{\hyperlink{cvt__test_8cpp_af73a49a9258b274934a51f5b17b0d1be}{tbl}}[i],\ 2)\ ==\ 0)\ \{}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ found\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ suf.insert(\mbox{\hyperlink{cvt__test_8cpp_af73a49a9258b274934a51f5b17b0d1be}{tbl}}[i]);}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!found)\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00029\ \ \ \ \ \}}
+\DoxyCodeLine{00030\ \ \ \ \ std::string\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00031\ \ \ \ \ \textcolor{keywordflow}{for}\ (StringSet::const\_iterator\ i\ =\ suf.begin(),\ e\ =\ suf.end();\ i\ !=\ e;\ ++i)\ \{}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ +=\ *i;}
+\DoxyCodeLine{00033\ \ \ \ \ \}}
+\DoxyCodeLine{00034\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ +=\ \&\mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}[pos];}
+\DoxyCodeLine{00035\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00036\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=211pt]{normalize__prefix_8cpp_a359b1f30b0a9553a0e1ce551ddb7e9a6_icgraph}
+\end{center}
+\end{figure}

@@ -1,0 +1,472 @@
+\doxysection{cpp.\+tokenize Namespace Reference}
+\hypertarget{namespacecpp_1_1tokenize}{}\label{namespacecpp_1_1tokenize}\index{cpp.tokenize@{cpp.tokenize}}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classcpp_1_1tokenize_1_1_token}{Token}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacecpp_1_1tokenize_afa711895958f5f4d05c456be765b6f10}{\+\_\+\+Get\+String}} (\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}}, start, i)
+\item 
+\mbox{\hyperlink{namespacecpp_1_1tokenize_acd467b0bde12e7f818ae2961364b3a3d}{\+\_\+\+Get\+Char}} (\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}}, start, i)
+\item 
+\mbox{\hyperlink{namespacecpp_1_1tokenize_abdc89f5b08e972e7404e9b9ac1dd17ff}{Get\+Tokens}} (\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}})
+\item 
+\mbox{\hyperlink{namespacecpp_1_1tokenize_a28ff7996105f9b03b22335c579838769}{main}} (\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+str \mbox{\hyperlink{namespacecpp_1_1tokenize_a7184d66b4221a018ce89a3bdc5be462a}{\+\_\+letters}} = \textquotesingle{}abcdefghijklmnopqrstuvwxyz\textquotesingle{}
+\item 
+\mbox{\hyperlink{namespacecpp_1_1tokenize_a733f1cf605b1630fb6a0a7f30aaefbec}{VALID\+\_\+\+IDENTIFIER\+\_\+\+CHARS}} = set(\mbox{\hyperlink{namespacecpp_1_1tokenize_a7184d66b4221a018ce89a3bdc5be462a}{\+\_\+letters}} + \+\_\+letters.\+upper() + \textquotesingle{}\+\_\+0123456789\$\textquotesingle{})
+\item 
+\mbox{\hyperlink{namespacecpp_1_1tokenize_a8b45b0f0f2b504757e9ede9c342b2c36}{HEX\+\_\+\+DIGITS}} = set(\textquotesingle{}0123456789abcdef\+ABCDEF\textquotesingle{})
+\item 
+\mbox{\hyperlink{namespacecpp_1_1tokenize_ad8c6dd06d4e6ef2e24e9186acb0aff43}{INT\+\_\+\+OR\+\_\+\+FLOAT\+\_\+\+DIGITS}} = set(\textquotesingle{}01234567890eE-\/+\textquotesingle{})
+\item 
+\mbox{\hyperlink{namespacecpp_1_1tokenize_aef952930004258aec982a51c8875e82a}{\+\_\+\+STR\+\_\+\+PREFIXES}} = set((\textquotesingle{}\mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}\textquotesingle{}, \textquotesingle{}u8\textquotesingle{}, \textquotesingle{}u8R\textquotesingle{}, \textquotesingle{}u\textquotesingle{}, \textquotesingle{}uR\textquotesingle{}, \textquotesingle{}\mbox{\hyperlink{union_u}{U}}\textquotesingle{}, \textquotesingle{}UR\textquotesingle{}, \textquotesingle{}L\textquotesingle{}, \textquotesingle{}LR\textquotesingle{}))
+\item 
+str \mbox{\hyperlink{namespacecpp_1_1tokenize_a31fe52b9a13f1a1f917cd73f74912487}{UNKNOWN}} = \textquotesingle{}UNKNOWN\textquotesingle{}
+\item 
+str \mbox{\hyperlink{namespacecpp_1_1tokenize_a7631742d15d2fc4fa38971890756ea38}{SYNTAX}} = \textquotesingle{}SYNTAX\textquotesingle{}
+\item 
+str \mbox{\hyperlink{namespacecpp_1_1tokenize_a9b6f0ba84066474fbe0efe3e1054fbb6}{CONSTANT}} = \textquotesingle{}CONSTANT\textquotesingle{}
+\item 
+str \mbox{\hyperlink{namespacecpp_1_1tokenize_a208259db0db4d57d5ba342822d1d9047}{NAME}} = \textquotesingle{}NAME\textquotesingle{}
+\item 
+str \mbox{\hyperlink{namespacecpp_1_1tokenize_a498a39725ded32f55fb18b9b3a8e473f}{PREPROCESSOR}} = \textquotesingle{}PREPROCESSOR\textquotesingle{}
+\item 
+\mbox{\hyperlink{namespacecpp_1_1tokenize_a8dd117207e391864f7d9cb656e826a9e}{WHENCE\+\_\+\+STREAM}}
+\item 
+\mbox{\hyperlink{namespacecpp_1_1tokenize_ad02466a473c5e9c2ac256e18209f0967}{WHENCE\+\_\+\+QUEUE}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\begin{DoxyVerb}Tokenize C++ source code.\end{DoxyVerb}
+ 
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacecpp_1_1tokenize_acd467b0bde12e7f818ae2961364b3a3d}\index{cpp.tokenize@{cpp.tokenize}!\_GetChar@{\_GetChar}}
+\index{\_GetChar@{\_GetChar}!cpp.tokenize@{cpp.tokenize}}
+\doxysubsubsection{\texorpdfstring{\_GetChar()}{\_GetChar()}}
+{\footnotesize\ttfamily \label{namespacecpp_1_1tokenize_acd467b0bde12e7f818ae2961364b3a3d} 
+cpp.\+tokenize.\+\_\+\+Get\+Char (\begin{DoxyParamCaption}\item[{}]{source}{, }\item[{}]{start}{, }\item[{}]{i}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{tokenize_8py_source_l00105}{105}} of file \mbox{\hyperlink{tokenize_8py_source}{tokenize.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00105\ \textcolor{keyword}{def\ }\_GetChar(source,\ start,\ i):}
+\DoxyCodeLine{00106\ \ \ \ \ \textcolor{comment}{\#\ NOTE(nnorwitz):\ may\ not\ be\ quite\ correct,\ should\ be\ good\ enough.}}
+\DoxyCodeLine{00107\ \ \ \ \ i\ =\ source.find(\textcolor{stringliteral}{"{}'"{}},\ i+1)}
+\DoxyCodeLine{00108\ \ \ \ \ \textcolor{keywordflow}{while}\ source[i-\/1]\ ==\ \textcolor{stringliteral}{'\(\backslash\)\(\backslash\)'}:}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Need\ to\ special\ case\ '\(\backslash\)\(\backslash\)'.}}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (i\ -\/\ 2)\ >\ start\ \textcolor{keywordflow}{and}\ source[i-\/2]\ ==\ \textcolor{stringliteral}{'\(\backslash\)\(\backslash\)'}:}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break}}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ i\ =\ source.find(\textcolor{stringliteral}{"{}'"{}},\ i+1)}
+\DoxyCodeLine{00113\ \ \ \ \ \textcolor{comment}{\#\ Try\ to\ handle\ unterminated\ single\ quotes\ (in\ a\ \#if\ 0\ block).}}
+\DoxyCodeLine{00114\ \ \ \ \ \textcolor{keywordflow}{if}\ i\ <\ 0:}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ i\ =\ start}
+\DoxyCodeLine{00116\ \ \ \ \ \textcolor{keywordflow}{return}\ i\ +\ 1}
+\DoxyCodeLine{00117\ }
+\DoxyCodeLine{00118\ }
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacecpp_1_1tokenize_acd467b0bde12e7f818ae2961364b3a3d_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacecpp_1_1tokenize_afa711895958f5f4d05c456be765b6f10}\index{cpp.tokenize@{cpp.tokenize}!\_GetString@{\_GetString}}
+\index{\_GetString@{\_GetString}!cpp.tokenize@{cpp.tokenize}}
+\doxysubsubsection{\texorpdfstring{\_GetString()}{\_GetString()}}
+{\footnotesize\ttfamily \label{namespacecpp_1_1tokenize_afa711895958f5f4d05c456be765b6f10} 
+cpp.\+tokenize.\+\_\+\+Get\+String (\begin{DoxyParamCaption}\item[{}]{source}{, }\item[{}]{start}{, }\item[{}]{i}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{tokenize_8py_source_l00089}{89}} of file \mbox{\hyperlink{tokenize_8py_source}{tokenize.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00089\ \textcolor{keyword}{def\ }\_GetString(source,\ start,\ i):}
+\DoxyCodeLine{00090\ \ \ \ \ i\ =\ source.find(\textcolor{stringliteral}{'"{}'},\ i+1)}
+\DoxyCodeLine{00091\ \ \ \ \ \textcolor{keywordflow}{while}\ source[i-\/1]\ ==\ \textcolor{stringliteral}{'\(\backslash\)\(\backslash\)'}:}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Count\ the\ trailing\ backslashes.}}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ backslash\_count\ =\ 1}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ j\ =\ i\ -\/\ 2}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ source[j]\ ==\ \textcolor{stringliteral}{'\(\backslash\)\(\backslash\)'}:}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \ \ \ backslash\_count\ +=\ 1}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \ \ \ j\ -\/=\ 1}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ When\ trailing\ backslashes\ are\ even,\ they\ escape\ each\ other.}}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (backslash\_count\ \%\ 2)\ ==\ 0:}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break}}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ i\ =\ source.find(\textcolor{stringliteral}{'"{}'},\ i+1)}
+\DoxyCodeLine{00102\ \ \ \ \ \textcolor{keywordflow}{return}\ i\ +\ 1}
+\DoxyCodeLine{00103\ }
+\DoxyCodeLine{00104\ }
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacecpp_1_1tokenize_afa711895958f5f4d05c456be765b6f10_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacecpp_1_1tokenize_abdc89f5b08e972e7404e9b9ac1dd17ff}\index{cpp.tokenize@{cpp.tokenize}!GetTokens@{GetTokens}}
+\index{GetTokens@{GetTokens}!cpp.tokenize@{cpp.tokenize}}
+\doxysubsubsection{\texorpdfstring{GetTokens()}{GetTokens()}}
+{\footnotesize\ttfamily \label{namespacecpp_1_1tokenize_abdc89f5b08e972e7404e9b9ac1dd17ff} 
+cpp.\+tokenize.\+Get\+Tokens (\begin{DoxyParamCaption}\item[{}]{source}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Returns a sequence of Tokens.
+
+Args:
+  source: string of C++ source code.
+
+Yields:
+  Token that represents the next token in the source.
+\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{tokenize_8py_source_l00119}{119}} of file \mbox{\hyperlink{tokenize_8py_source}{tokenize.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00119\ \textcolor{keyword}{def\ }GetTokens(source):}
+\DoxyCodeLine{00120\ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Returns\ a\ sequence\ of\ Tokens.}}
+\DoxyCodeLine{00121\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00122\ \textcolor{stringliteral}{\ \ \ \ Args:}}
+\DoxyCodeLine{00123\ \textcolor{stringliteral}{\ \ \ \ \ \ source:\ string\ of\ C++\ source\ code.}}
+\DoxyCodeLine{00124\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00125\ \textcolor{stringliteral}{\ \ \ \ Yields:}}
+\DoxyCodeLine{00126\ \textcolor{stringliteral}{\ \ \ \ \ \ Token\ that\ represents\ the\ next\ token\ in\ the\ source.}}
+\DoxyCodeLine{00127\ \textcolor{stringliteral}{\ \ \ \ "{}"{}"{}}}
+\DoxyCodeLine{00128\ \ \ \ \ \textcolor{comment}{\#\ Cache\ various\ valid\ character\ sets\ for\ speed.}}
+\DoxyCodeLine{00129\ \ \ \ \ valid\_identifier\_chars\ =\ VALID\_IDENTIFIER\_CHARS}
+\DoxyCodeLine{00130\ \ \ \ \ hex\_digits\ =\ HEX\_DIGITS}
+\DoxyCodeLine{00131\ \ \ \ \ int\_or\_float\_digits\ =\ INT\_OR\_FLOAT\_DIGITS}
+\DoxyCodeLine{00132\ \ \ \ \ int\_or\_float\_digits2\ =\ int\_or\_float\_digits\ |\ set(\textcolor{stringliteral}{'.'})}
+\DoxyCodeLine{00133\ }
+\DoxyCodeLine{00134\ \ \ \ \ \textcolor{comment}{\#\ Only\ ignore\ errors\ while\ in\ a\ \#if\ 0\ block.}}
+\DoxyCodeLine{00135\ \ \ \ \ ignore\_errors\ =\ \textcolor{keyword}{False}}
+\DoxyCodeLine{00136\ \ \ \ \ count\_ifs\ =\ 0}
+\DoxyCodeLine{00137\ }
+\DoxyCodeLine{00138\ \ \ \ \ i\ =\ 0}
+\DoxyCodeLine{00139\ \ \ \ \ end\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}(source)}
+\DoxyCodeLine{00140\ \ \ \ \ \textcolor{keywordflow}{while}\ i\ <\ end:}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Skip\ whitespace.}}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ i\ <\ end\ \textcolor{keywordflow}{and}\ source[i].isspace():}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \ \ \ \ i\ +=\ 1}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ i\ >=\ end:}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}}
+\DoxyCodeLine{00146\ }
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ token\_type\ =\ UNKNOWN}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ start\ =\ i}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ c\ =\ source[i]}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ c.isalpha()\ \textcolor{keywordflow}{or}\ c\ ==\ \textcolor{stringliteral}{'\_'}:\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Find\ a\ string\ token.}}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ \ \ \ \ token\_type\ =\ NAME}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ source[i]\ \textcolor{keywordflow}{in}\ valid\_identifier\_chars:}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i\ +=\ 1}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ String\ and\ character\ constants\ can\ look\ like\ a\ name\ if}}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ they\ are\ something\ like\ L"{}"{}.}}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (source[i]\ ==\ \textcolor{stringliteral}{"{}'"{}}\ \textcolor{keywordflow}{and}\ (i\ -\/\ start)\ ==\ 1\ \textcolor{keywordflow}{and}}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ source[start:i]\ \textcolor{keywordflow}{in}\ \textcolor{stringliteral}{'uUL'}):}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ u,\ U,\ and\ L\ are\ valid\ C++0x\ character\ preffixes.}}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ token\_type\ =\ CONSTANT}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i\ =\ \_GetChar(source,\ start,\ i)}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{elif}\ source[i]\ ==\ \textcolor{stringliteral}{"{}'"{}}\ \textcolor{keywordflow}{and}\ source[start:i]\ \textcolor{keywordflow}{in}\ \_STR\_PREFIXES:}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ token\_type\ =\ CONSTANT}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i\ =\ \_GetString(source,\ start,\ i)}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{elif}\ c\ ==\ \textcolor{stringliteral}{'/'}\ \textcolor{keywordflow}{and}\ source[i+1]\ ==\ \textcolor{stringliteral}{'/'}:\ \ \ \ \textcolor{comment}{\#\ Find\ //\ comments.}}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \ \ \ \ i\ =\ source.find(\textcolor{stringliteral}{'\(\backslash\)n'},\ i)}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ i\ ==\ -\/1:\ \ \textcolor{comment}{\#\ Handle\ EOF.}}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i\ =\ end}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue}}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{elif}\ c\ ==\ \textcolor{stringliteral}{'/'}\ \textcolor{keywordflow}{and}\ source[i+1]\ ==\ \textcolor{stringliteral}{'*'}:\ \ \ \ \textcolor{comment}{\#\ Find\ /*\ comments.\ */}}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \ \ \ \ i\ =\ source.find(\textcolor{stringliteral}{'*/'},\ i)\ +\ 2}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue}}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{elif}\ c\ \textcolor{keywordflow}{in}\ \textcolor{stringliteral}{':+-\/<>\&|*='}:\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ :\ or\ ::\ (plus\ other\ chars).}}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ \ \ \ \ token\_type\ =\ SYNTAX}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ \ \ \ \ i\ +=\ 1}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \ \ \ \ new\_ch\ =\ source[i]}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ new\_ch\ ==\ c\ \textcolor{keywordflow}{and}\ c\ !=\ \textcolor{stringliteral}{'>'}:\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Treat\ "{}>>"{}\ as\ two\ tokens.}}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i\ +=\ 1}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{elif}\ c\ ==\ \textcolor{stringliteral}{'-\/'}\ \textcolor{keywordflow}{and}\ new\_ch\ ==\ \textcolor{stringliteral}{'>'}:}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i\ +=\ 1}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{elif}\ new\_ch\ ==\ \textcolor{stringliteral}{'='}:}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i\ +=\ 1}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{elif}\ c\ \textcolor{keywordflow}{in}\ \textcolor{stringliteral}{'()[]\{\}\string~!?\string^\%;/.,'}:\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Handle\ single\ char\ tokens.}}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \ \ \ \ \ \ token\_type\ =\ SYNTAX}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ \ \ \ \ i\ +=\ 1}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ c\ ==\ \textcolor{stringliteral}{'.'}\ \textcolor{keywordflow}{and}\ source[i].isdigit():}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ token\_type\ =\ CONSTANT}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i\ +=\ 1}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ source[i]\ \textcolor{keywordflow}{in}\ int\_or\_float\_digits:}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i\ +=\ 1}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Handle\ float\ suffixes.}}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ suffix\ \textcolor{keywordflow}{in}\ (\textcolor{stringliteral}{'l'},\ \textcolor{stringliteral}{'f'}):}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ suffix\ ==\ source[i:i+1].lower():}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i\ +=\ 1}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break}}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{elif}\ c.isdigit():\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Find\ integer.}}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \ \ \ \ token\_type\ =\ CONSTANT}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ c\ ==\ \textcolor{stringliteral}{'0'}\ \textcolor{keywordflow}{and}\ source[i+1]\ \textcolor{keywordflow}{in}\ \textcolor{stringliteral}{'xX'}:}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Handle\ hex\ digits.}}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i\ +=\ 2}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ source[i]\ \textcolor{keywordflow}{in}\ hex\_digits:}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i\ +=\ 1}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ source[i]\ \textcolor{keywordflow}{in}\ int\_or\_float\_digits2:}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i\ +=\ 1}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Handle\ integer\ (and\ float)\ suffixes.}}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ suffix\ \textcolor{keywordflow}{in}\ (\textcolor{stringliteral}{'ull'},\ \textcolor{stringliteral}{'ll'},\ \textcolor{stringliteral}{'ul'},\ \textcolor{stringliteral}{'l'},\ \textcolor{stringliteral}{'f'},\ \textcolor{stringliteral}{'u'}):}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ size\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}(suffix)}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ suffix\ ==\ source[i:i+size].lower():}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i\ +=\ size}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break}}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{elif}\ c\ ==\ \textcolor{stringliteral}{'"{}'}:\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Find\ string.}}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \ \ \ \ \ \ token\_type\ =\ CONSTANT}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \ \ \ \ \ \ i\ =\ \_GetString(source,\ start,\ i)}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{elif}\ c\ ==\ \textcolor{stringliteral}{"{}'"{}}:\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Find\ char.}}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \ \ \ \ \ \ token\_type\ =\ CONSTANT}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ \ \ \ \ i\ =\ \_GetChar(source,\ start,\ i)}
+\DoxyCodeLine{00217\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{elif}\ c\ ==\ \textcolor{stringliteral}{'\#'}:\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Find\ pre-\/processor\ command.}}
+\DoxyCodeLine{00218\ \ \ \ \ \ \ \ \ \ \ \ \ token\_type\ =\ PREPROCESSOR}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \ \ \ \ \ \ got\_if\ =\ source[i:i+3]\ ==\ \textcolor{stringliteral}{'\#if'}\ \textcolor{keywordflow}{and}\ source[i+3:i+4].isspace()}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ got\_if:}
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ count\_ifs\ +=\ 1}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{elif}\ source[i:i+6]\ ==\ \textcolor{stringliteral}{'\#endif'}:}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ count\_ifs\ -\/=\ 1}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ count\_ifs\ ==\ 0:}
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ignore\_errors\ =\ \textcolor{keyword}{False}}
+\DoxyCodeLine{00226\ }
+\DoxyCodeLine{00227\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ TODO(nnorwitz):\ handle\ preprocessor\ statements\ (\(\backslash\)\ continuations).}}
+\DoxyCodeLine{00228\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ 1:}
+\DoxyCodeLine{00229\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i1\ =\ source.find(\textcolor{stringliteral}{'\(\backslash\)n'},\ i)}
+\DoxyCodeLine{00230\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i2\ =\ source.find(\textcolor{stringliteral}{'//'},\ i)}
+\DoxyCodeLine{00231\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i3\ =\ source.find(\textcolor{stringliteral}{'/*'},\ i)}
+\DoxyCodeLine{00232\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i4\ =\ source.find(\textcolor{stringliteral}{'"{}'},\ i)}
+\DoxyCodeLine{00233\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ NOTE(nnorwitz):\ doesn't\ handle\ comments\ in\ \#define\ macros.}}
+\DoxyCodeLine{00234\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Get\ the\ first\ important\ symbol\ (newline,\ comment,\ EOF/end).}}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i\ =\ min([x\ \textcolor{keywordflow}{for}\ x\ \textcolor{keywordflow}{in}\ (i1,\ i2,\ i3,\ i4,\ end)\ \textcolor{keywordflow}{if}\ x\ !=\ -\/1])}
+\DoxyCodeLine{00236\ }
+\DoxyCodeLine{00237\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Handle\ \#include\ "{}dir//foo.h"{}\ properly.}}
+\DoxyCodeLine{00238\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ source[i]\ ==\ \textcolor{stringliteral}{'"{}'}:}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i\ =\ source.find(\textcolor{stringliteral}{'"{}'},\ i+1)\ +\ 1}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{assert}\ i\ >\ 0}
+\DoxyCodeLine{00241\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue}}
+\DoxyCodeLine{00242\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Keep\ going\ if\ end\ of\ the\ line\ and\ the\ line\ ends\ with\ \(\backslash\).}}
+\DoxyCodeLine{00243\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keywordflow}{not}\ (i\ ==\ i1\ \textcolor{keywordflow}{and}\ source[i-\/1]\ ==\ \textcolor{stringliteral}{'\(\backslash\)\(\backslash\)'}):}
+\DoxyCodeLine{00244\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ got\_if:}
+\DoxyCodeLine{00245\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ condition\ =\ source[start+4:i].lstrip()}
+\DoxyCodeLine{00246\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (condition.startswith(\textcolor{stringliteral}{'0'})\ \textcolor{keywordflow}{or}}
+\DoxyCodeLine{00247\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ condition.startswith(\textcolor{stringliteral}{'(0)'})):}
+\DoxyCodeLine{00248\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ignore\_errors\ =\ \textcolor{keyword}{True}}
+\DoxyCodeLine{00249\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break}}
+\DoxyCodeLine{00250\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i\ +=\ 1}
+\DoxyCodeLine{00251\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{elif}\ c\ ==\ \textcolor{stringliteral}{'\(\backslash\)\(\backslash\)'}:\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Handle\ \(\backslash\)\ in\ code.}}
+\DoxyCodeLine{00252\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ This\ is\ different\ from\ the\ pre-\/processor\ \(\backslash\)\ handling.}}
+\DoxyCodeLine{00253\ \ \ \ \ \ \ \ \ \ \ \ \ i\ +=\ 1}
+\DoxyCodeLine{00254\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue}}
+\DoxyCodeLine{00255\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{elif}\ ignore\_errors:}
+\DoxyCodeLine{00256\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ The\ tokenizer\ seems\ to\ be\ in\ pretty\ good\ shape.\ \ This}}
+\DoxyCodeLine{00257\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ raise\ is\ conditionally\ disabled\ so\ that\ bogus\ code}}
+\DoxyCodeLine{00258\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ in\ an\ \#if\ 0\ block\ can\ be\ handled.\ \ Since\ we\ will\ ignore}}
+\DoxyCodeLine{00259\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ it\ anyways,\ this\ is\ probably\ fine.\ \ So\ disable\ the}}
+\DoxyCodeLine{00260\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ exception\ and\ \ return\ the\ bogus\ char.}}
+\DoxyCodeLine{00261\ \ \ \ \ \ \ \ \ \ \ \ \ i\ +=\ 1}
+\DoxyCodeLine{00262\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{00263\ \ \ \ \ \ \ \ \ \ \ \ \ sys.stderr.write(\textcolor{stringliteral}{'Got\ invalid\ token\ in\ \%s\ @\ \%d\ token:\%s:\ \%r\(\backslash\)n'}\ \%}
+\DoxyCodeLine{00264\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{'?'},\ i,\ c,\ source[i-\/10:i+10]))}
+\DoxyCodeLine{00265\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{raise}\ RuntimeError(\textcolor{stringliteral}{'unexpected\ token'})}
+\DoxyCodeLine{00266\ }
+\DoxyCodeLine{00267\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ i\ <=\ 0:}
+\DoxyCodeLine{00268\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\textcolor{stringliteral}{'Invalid\ index,\ exiting\ now.'})}
+\DoxyCodeLine{00269\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}}
+\DoxyCodeLine{00270\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{yield}\ Token(token\_type,\ source[start:i],\ start,\ i)}
+\DoxyCodeLine{00271\ }
+\DoxyCodeLine{00272\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacecpp_1_1tokenize_abdc89f5b08e972e7404e9b9ac1dd17ff_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=333pt]{namespacecpp_1_1tokenize_abdc89f5b08e972e7404e9b9ac1dd17ff_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacecpp_1_1tokenize_a28ff7996105f9b03b22335c579838769}\index{cpp.tokenize@{cpp.tokenize}!main@{main}}
+\index{main@{main}!cpp.tokenize@{cpp.tokenize}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{namespacecpp_1_1tokenize_a28ff7996105f9b03b22335c579838769} 
+cpp.\+tokenize.\+main (\begin{DoxyParamCaption}\item[{}]{argv}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Driver mostly for testing purposes.\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{tokenize_8py_source_l00274}{274}} of file \mbox{\hyperlink{tokenize_8py_source}{tokenize.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00274\ \ \ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}(argv):}
+\DoxyCodeLine{00275\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Driver\ mostly\ for\ testing\ purposes."{}"{}"{}}}
+\DoxyCodeLine{00276\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ filename\ \textcolor{keywordflow}{in}\ argv[1:]:}
+\DoxyCodeLine{00277\ \ \ \ \ \ \ \ \ \ \ \ \ source\ =\ utils.ReadFile(filename)}
+\DoxyCodeLine{00278\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ source\ \textcolor{keywordflow}{is}\ \textcolor{keywordtype}{None}:}
+\DoxyCodeLine{00279\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue}}
+\DoxyCodeLine{00280\ }
+\DoxyCodeLine{00281\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ token\ \textcolor{keywordflow}{in}\ GetTokens(source):}
+\DoxyCodeLine{00282\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\textcolor{stringliteral}{'\%-\/12s:\ \%s'}\ \%\ (token.token\_type,\ token.name))}
+\DoxyCodeLine{00283\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ print('\(\backslash\)r\%6.2f\%\%'\ \%\ (100.0\ *\ index\ /\ token.end),)}}
+\DoxyCodeLine{00284\ \ \ \ \ \ \ \ \ \ \ \ \ sys.stdout.write(\textcolor{stringliteral}{'\(\backslash\)n'})}
+\DoxyCodeLine{00285\ }
+\DoxyCodeLine{00286\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacecpp_1_1tokenize_a28ff7996105f9b03b22335c579838769_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{namespacecpp_1_1tokenize_a7184d66b4221a018ce89a3bdc5be462a}\index{cpp.tokenize@{cpp.tokenize}!\_letters@{\_letters}}
+\index{\_letters@{\_letters}!cpp.tokenize@{cpp.tokenize}}
+\doxysubsubsection{\texorpdfstring{\_letters}{\_letters}}
+{\footnotesize\ttfamily \label{namespacecpp_1_1tokenize_a7184d66b4221a018ce89a3bdc5be462a} 
+str cpp.\+tokenize.\+\_\+letters = \textquotesingle{}abcdefghijklmnopqrstuvwxyz\textquotesingle{}\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{tokenize_8py_source_l00042}{42}} of file \mbox{\hyperlink{tokenize_8py_source}{tokenize.\+py}}.
+
+\Hypertarget{namespacecpp_1_1tokenize_aef952930004258aec982a51c8875e82a}\index{cpp.tokenize@{cpp.tokenize}!\_STR\_PREFIXES@{\_STR\_PREFIXES}}
+\index{\_STR\_PREFIXES@{\_STR\_PREFIXES}!cpp.tokenize@{cpp.tokenize}}
+\doxysubsubsection{\texorpdfstring{\_STR\_PREFIXES}{\_STR\_PREFIXES}}
+{\footnotesize\ttfamily \label{namespacecpp_1_1tokenize_aef952930004258aec982a51c8875e82a} 
+cpp.\+tokenize.\+\_\+\+STR\+\_\+\+PREFIXES = set((\textquotesingle{}\mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}\textquotesingle{}, \textquotesingle{}u8\textquotesingle{}, \textquotesingle{}u8R\textquotesingle{}, \textquotesingle{}u\textquotesingle{}, \textquotesingle{}uR\textquotesingle{}, \textquotesingle{}\mbox{\hyperlink{union_u}{U}}\textquotesingle{}, \textquotesingle{}UR\textquotesingle{}, \textquotesingle{}L\textquotesingle{}, \textquotesingle{}LR\textquotesingle{}))\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{tokenize_8py_source_l00049}{49}} of file \mbox{\hyperlink{tokenize_8py_source}{tokenize.\+py}}.
+
+\Hypertarget{namespacecpp_1_1tokenize_a9b6f0ba84066474fbe0efe3e1054fbb6}\index{cpp.tokenize@{cpp.tokenize}!CONSTANT@{CONSTANT}}
+\index{CONSTANT@{CONSTANT}!cpp.tokenize@{cpp.tokenize}}
+\doxysubsubsection{\texorpdfstring{CONSTANT}{CONSTANT}}
+{\footnotesize\ttfamily \label{namespacecpp_1_1tokenize_a9b6f0ba84066474fbe0efe3e1054fbb6} 
+str cpp.\+tokenize.\+CONSTANT = \textquotesingle{}CONSTANT\textquotesingle{}}
+
+
+
+Definition at line \mbox{\hyperlink{tokenize_8py_source_l00055}{55}} of file \mbox{\hyperlink{tokenize_8py_source}{tokenize.\+py}}.
+
+\Hypertarget{namespacecpp_1_1tokenize_a8b45b0f0f2b504757e9ede9c342b2c36}\index{cpp.tokenize@{cpp.tokenize}!HEX\_DIGITS@{HEX\_DIGITS}}
+\index{HEX\_DIGITS@{HEX\_DIGITS}!cpp.tokenize@{cpp.tokenize}}
+\doxysubsubsection{\texorpdfstring{HEX\_DIGITS}{HEX\_DIGITS}}
+{\footnotesize\ttfamily \label{namespacecpp_1_1tokenize_a8b45b0f0f2b504757e9ede9c342b2c36} 
+cpp.\+tokenize.\+HEX\+\_\+\+DIGITS = set(\textquotesingle{}0123456789abcdef\+ABCDEF\textquotesingle{})}
+
+
+
+Definition at line \mbox{\hyperlink{tokenize_8py_source_l00044}{44}} of file \mbox{\hyperlink{tokenize_8py_source}{tokenize.\+py}}.
+
+\Hypertarget{namespacecpp_1_1tokenize_ad8c6dd06d4e6ef2e24e9186acb0aff43}\index{cpp.tokenize@{cpp.tokenize}!INT\_OR\_FLOAT\_DIGITS@{INT\_OR\_FLOAT\_DIGITS}}
+\index{INT\_OR\_FLOAT\_DIGITS@{INT\_OR\_FLOAT\_DIGITS}!cpp.tokenize@{cpp.tokenize}}
+\doxysubsubsection{\texorpdfstring{INT\_OR\_FLOAT\_DIGITS}{INT\_OR\_FLOAT\_DIGITS}}
+{\footnotesize\ttfamily \label{namespacecpp_1_1tokenize_ad8c6dd06d4e6ef2e24e9186acb0aff43} 
+cpp.\+tokenize.\+INT\+\_\+\+OR\+\_\+\+FLOAT\+\_\+\+DIGITS = set(\textquotesingle{}01234567890eE-\/+\textquotesingle{})}
+
+
+
+Definition at line \mbox{\hyperlink{tokenize_8py_source_l00045}{45}} of file \mbox{\hyperlink{tokenize_8py_source}{tokenize.\+py}}.
+
+\Hypertarget{namespacecpp_1_1tokenize_a208259db0db4d57d5ba342822d1d9047}\index{cpp.tokenize@{cpp.tokenize}!NAME@{NAME}}
+\index{NAME@{NAME}!cpp.tokenize@{cpp.tokenize}}
+\doxysubsubsection{\texorpdfstring{NAME}{NAME}}
+{\footnotesize\ttfamily \label{namespacecpp_1_1tokenize_a208259db0db4d57d5ba342822d1d9047} 
+str cpp.\+tokenize.\+NAME = \textquotesingle{}NAME\textquotesingle{}}
+
+
+
+Definition at line \mbox{\hyperlink{tokenize_8py_source_l00056}{56}} of file \mbox{\hyperlink{tokenize_8py_source}{tokenize.\+py}}.
+
+\Hypertarget{namespacecpp_1_1tokenize_a498a39725ded32f55fb18b9b3a8e473f}\index{cpp.tokenize@{cpp.tokenize}!PREPROCESSOR@{PREPROCESSOR}}
+\index{PREPROCESSOR@{PREPROCESSOR}!cpp.tokenize@{cpp.tokenize}}
+\doxysubsubsection{\texorpdfstring{PREPROCESSOR}{PREPROCESSOR}}
+{\footnotesize\ttfamily \label{namespacecpp_1_1tokenize_a498a39725ded32f55fb18b9b3a8e473f} 
+str cpp.\+tokenize.\+PREPROCESSOR = \textquotesingle{}PREPROCESSOR\textquotesingle{}}
+
+
+
+Definition at line \mbox{\hyperlink{tokenize_8py_source_l00057}{57}} of file \mbox{\hyperlink{tokenize_8py_source}{tokenize.\+py}}.
+
+\Hypertarget{namespacecpp_1_1tokenize_a7631742d15d2fc4fa38971890756ea38}\index{cpp.tokenize@{cpp.tokenize}!SYNTAX@{SYNTAX}}
+\index{SYNTAX@{SYNTAX}!cpp.tokenize@{cpp.tokenize}}
+\doxysubsubsection{\texorpdfstring{SYNTAX}{SYNTAX}}
+{\footnotesize\ttfamily \label{namespacecpp_1_1tokenize_a7631742d15d2fc4fa38971890756ea38} 
+str cpp.\+tokenize.\+SYNTAX = \textquotesingle{}SYNTAX\textquotesingle{}}
+
+
+
+Definition at line \mbox{\hyperlink{tokenize_8py_source_l00054}{54}} of file \mbox{\hyperlink{tokenize_8py_source}{tokenize.\+py}}.
+
+\Hypertarget{namespacecpp_1_1tokenize_a31fe52b9a13f1a1f917cd73f74912487}\index{cpp.tokenize@{cpp.tokenize}!UNKNOWN@{UNKNOWN}}
+\index{UNKNOWN@{UNKNOWN}!cpp.tokenize@{cpp.tokenize}}
+\doxysubsubsection{\texorpdfstring{UNKNOWN}{UNKNOWN}}
+{\footnotesize\ttfamily \label{namespacecpp_1_1tokenize_a31fe52b9a13f1a1f917cd73f74912487} 
+str cpp.\+tokenize.\+UNKNOWN = \textquotesingle{}UNKNOWN\textquotesingle{}}
+
+
+
+Definition at line \mbox{\hyperlink{tokenize_8py_source_l00053}{53}} of file \mbox{\hyperlink{tokenize_8py_source}{tokenize.\+py}}.
+
+\Hypertarget{namespacecpp_1_1tokenize_a733f1cf605b1630fb6a0a7f30aaefbec}\index{cpp.tokenize@{cpp.tokenize}!VALID\_IDENTIFIER\_CHARS@{VALID\_IDENTIFIER\_CHARS}}
+\index{VALID\_IDENTIFIER\_CHARS@{VALID\_IDENTIFIER\_CHARS}!cpp.tokenize@{cpp.tokenize}}
+\doxysubsubsection{\texorpdfstring{VALID\_IDENTIFIER\_CHARS}{VALID\_IDENTIFIER\_CHARS}}
+{\footnotesize\ttfamily \label{namespacecpp_1_1tokenize_a733f1cf605b1630fb6a0a7f30aaefbec} 
+cpp.\+tokenize.\+VALID\+\_\+\+IDENTIFIER\+\_\+\+CHARS = set(\mbox{\hyperlink{namespacecpp_1_1tokenize_a7184d66b4221a018ce89a3bdc5be462a}{\+\_\+letters}} + \+\_\+letters.\+upper() + \textquotesingle{}\+\_\+0123456789\$\textquotesingle{})}
+
+
+
+Definition at line \mbox{\hyperlink{tokenize_8py_source_l00043}{43}} of file \mbox{\hyperlink{tokenize_8py_source}{tokenize.\+py}}.
+
+\Hypertarget{namespacecpp_1_1tokenize_ad02466a473c5e9c2ac256e18209f0967}\index{cpp.tokenize@{cpp.tokenize}!WHENCE\_QUEUE@{WHENCE\_QUEUE}}
+\index{WHENCE\_QUEUE@{WHENCE\_QUEUE}!cpp.tokenize@{cpp.tokenize}}
+\doxysubsubsection{\texorpdfstring{WHENCE\_QUEUE}{WHENCE\_QUEUE}}
+{\footnotesize\ttfamily \label{namespacecpp_1_1tokenize_ad02466a473c5e9c2ac256e18209f0967} 
+cpp.\+tokenize.\+WHENCE\+\_\+\+QUEUE}
+
+
+
+Definition at line \mbox{\hyperlink{tokenize_8py_source_l00061}{61}} of file \mbox{\hyperlink{tokenize_8py_source}{tokenize.\+py}}.
+
+\Hypertarget{namespacecpp_1_1tokenize_a8dd117207e391864f7d9cb656e826a9e}\index{cpp.tokenize@{cpp.tokenize}!WHENCE\_STREAM@{WHENCE\_STREAM}}
+\index{WHENCE\_STREAM@{WHENCE\_STREAM}!cpp.tokenize@{cpp.tokenize}}
+\doxysubsubsection{\texorpdfstring{WHENCE\_STREAM}{WHENCE\_STREAM}}
+{\footnotesize\ttfamily \label{namespacecpp_1_1tokenize_a8dd117207e391864f7d9cb656e826a9e} 
+cpp.\+tokenize.\+WHENCE\+\_\+\+STREAM}
+
+
+
+Definition at line \mbox{\hyperlink{tokenize_8py_source_l00061}{61}} of file \mbox{\hyperlink{tokenize_8py_source}{tokenize.\+py}}.
+

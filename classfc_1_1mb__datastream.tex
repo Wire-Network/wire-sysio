@@ -1,0 +1,132 @@
+\doxysection{fc\+::mb\+\_\+datastream\texorpdfstring{$<$}{<} buffer\+\_\+len \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classfc_1_1mb__datastream}{}\label{classfc_1_1mb__datastream}\index{fc::mb\_datastream$<$ buffer\_len $>$@{fc::mb\_datastream$<$ buffer\_len $>$}}
+
+
+{\ttfamily \#include $<$message\+\_\+buffer.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1mb__datastream_a314014c953aaebfdb70e080a253bf42e}{mb\+\_\+datastream}} (\mbox{\hyperlink{classfc_1_1message__buffer}{message\+\_\+buffer}}$<$ buffer\+\_\+len $>$ \&m)
+\item 
+void \mbox{\hyperlink{classfc_1_1mb__datastream_a077168bd2fb11db18b59946dc2f04346}{skip}} (size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\item 
+bool \mbox{\hyperlink{classfc_1_1mb__datastream_af06ea25f78f786387ef55128df65c931}{read}} (char \texorpdfstring{$\ast$}{*}d, size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\item 
+bool \mbox{\hyperlink{classfc_1_1mb__datastream_a5a254a69f5eabcd9d9aa44fca01008cf}{get}} (unsigned char \&c)
+\item 
+bool \mbox{\hyperlink{classfc_1_1mb__datastream_a37ab96294f98fc8dddee0438de0ec802}{get}} (char \&c)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} buffer\+\_\+len$>$\newline
+class fc\+::mb\+\_\+datastream$<$ buffer\+\_\+len $>$}
+
+
+Definition at line \mbox{\hyperlink{message__buffer_8hpp_source_l00292}{292}} of file \mbox{\hyperlink{message__buffer_8hpp_source}{message\+\_\+buffer.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1mb__datastream_a314014c953aaebfdb70e080a253bf42e}\index{fc::mb\_datastream$<$ buffer\_len $>$@{fc::mb\_datastream$<$ buffer\_len $>$}!mb\_datastream@{mb\_datastream}}
+\index{mb\_datastream@{mb\_datastream}!fc::mb\_datastream$<$ buffer\_len $>$@{fc::mb\_datastream$<$ buffer\_len $>$}}
+\doxysubsubsection{\texorpdfstring{mb\_datastream()}{mb\_datastream()}}
+{\footnotesize\ttfamily \label{classfc_1_1mb__datastream_a314014c953aaebfdb70e080a253bf42e} 
+template$<$\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} buffer\+\_\+len$>$ \\
+\mbox{\hyperlink{classfc_1_1mb__datastream}{fc\+::mb\+\_\+datastream}}$<$ buffer\+\_\+len $>$\+::mb\+\_\+datastream (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1message__buffer}{message\+\_\+buffer}}$<$ buffer\+\_\+len $>$ \&}]{m}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{message__buffer_8hpp_source_l00294}{294}} of file \mbox{\hyperlink{message__buffer_8hpp_source}{message\+\_\+buffer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00294\ :\ mb(m)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1mb__datastream_a37ab96294f98fc8dddee0438de0ec802}\index{fc::mb\_datastream$<$ buffer\_len $>$@{fc::mb\_datastream$<$ buffer\_len $>$}!get@{get}}
+\index{get@{get}!fc::mb\_datastream$<$ buffer\_len $>$@{fc::mb\_datastream$<$ buffer\_len $>$}}
+\doxysubsubsection{\texorpdfstring{get()}{get()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1mb__datastream_a37ab96294f98fc8dddee0438de0ec802} 
+template$<$\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} buffer\+\_\+len$>$ \\
+bool \mbox{\hyperlink{classfc_1_1mb__datastream}{fc\+::mb\+\_\+datastream}}$<$ buffer\+\_\+len $>$\+::get (\begin{DoxyParamCaption}\item[{char \&}]{c}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{message__buffer_8hpp_source_l00306}{306}} of file \mbox{\hyperlink{message__buffer_8hpp_source}{message\+\_\+buffer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00306\ \{\ \textcolor{keywordflow}{return}\ mb.read(\&c,\ 1);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1mb__datastream_a5a254a69f5eabcd9d9aa44fca01008cf}\index{fc::mb\_datastream$<$ buffer\_len $>$@{fc::mb\_datastream$<$ buffer\_len $>$}!get@{get}}
+\index{get@{get}!fc::mb\_datastream$<$ buffer\_len $>$@{fc::mb\_datastream$<$ buffer\_len $>$}}
+\doxysubsubsection{\texorpdfstring{get()}{get()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1mb__datastream_a5a254a69f5eabcd9d9aa44fca01008cf} 
+template$<$\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} buffer\+\_\+len$>$ \\
+bool \mbox{\hyperlink{classfc_1_1mb__datastream}{fc\+::mb\+\_\+datastream}}$<$ buffer\+\_\+len $>$\+::get (\begin{DoxyParamCaption}\item[{unsigned char \&}]{c}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{message__buffer_8hpp_source_l00305}{305}} of file \mbox{\hyperlink{message__buffer_8hpp_source}{message\+\_\+buffer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00305\ \{\ \textcolor{keywordflow}{return}\ mb.read(\&c,\ 1);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1mb__datastream_af06ea25f78f786387ef55128df65c931}\index{fc::mb\_datastream$<$ buffer\_len $>$@{fc::mb\_datastream$<$ buffer\_len $>$}!read@{read}}
+\index{read@{read}!fc::mb\_datastream$<$ buffer\_len $>$@{fc::mb\_datastream$<$ buffer\_len $>$}}
+\doxysubsubsection{\texorpdfstring{read()}{read()}}
+{\footnotesize\ttfamily \label{classfc_1_1mb__datastream_af06ea25f78f786387ef55128df65c931} 
+template$<$\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} buffer\+\_\+len$>$ \\
+bool \mbox{\hyperlink{classfc_1_1mb__datastream}{fc\+::mb\+\_\+datastream}}$<$ buffer\+\_\+len $>$\+::read (\begin{DoxyParamCaption}\item[{char \texorpdfstring{$\ast$}{*}}]{d}{, }\item[{size\+\_\+t}]{s}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{message__buffer_8hpp_source_l00297}{297}} of file \mbox{\hyperlink{message__buffer_8hpp_source}{message\+\_\+buffer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00297\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00298\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (mb.bytes\_to\_read()\ >=\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})\ \{}
+\DoxyCodeLine{00299\ \ \ \ \ \ \ \ \ \ \ \ \ mb.read(d,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{00300\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00301\ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00302\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1detail_a20e12fc3683b005cd6430a4a3c066bc0}{fc::detail::throw\_datastream\_range\_error}}(\ \textcolor{stringliteral}{"{}read"{}},\ mb.bytes\_to\_read(),\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ -\/\ mb.bytes\_to\_read());}
+\DoxyCodeLine{00303\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1mb__datastream_af06ea25f78f786387ef55128df65c931_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1mb__datastream_a077168bd2fb11db18b59946dc2f04346}\index{fc::mb\_datastream$<$ buffer\_len $>$@{fc::mb\_datastream$<$ buffer\_len $>$}!skip@{skip}}
+\index{skip@{skip}!fc::mb\_datastream$<$ buffer\_len $>$@{fc::mb\_datastream$<$ buffer\_len $>$}}
+\doxysubsubsection{\texorpdfstring{skip()}{skip()}}
+{\footnotesize\ttfamily \label{classfc_1_1mb__datastream_a077168bd2fb11db18b59946dc2f04346} 
+template$<$\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} buffer\+\_\+len$>$ \\
+void \mbox{\hyperlink{classfc_1_1mb__datastream}{fc\+::mb\+\_\+datastream}}$<$ buffer\+\_\+len $>$\+::skip (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{s}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{message__buffer_8hpp_source_l00296}{296}} of file \mbox{\hyperlink{message__buffer_8hpp_source}{message\+\_\+buffer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00296\ \{\ mb.advance\_read\_ptr(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});\ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/network/\mbox{\hyperlink{message__buffer_8hpp}{message\+\_\+buffer.\+hpp}}\end{DoxyCompactItemize}

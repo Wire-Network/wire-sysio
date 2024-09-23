@@ -1,0 +1,15 @@
+<map id="sysio::chain::trim_data::trim_data" name="sysio::chain::trim_data::trim_data">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,136,127,177"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1chain_1_1block__log.html#a370e648384d16b6d60ca211921501cc6" title=" " alt="" coords="191,5,348,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="84,134,123,95,173,57,184,51,187,55,176,61,126,99,87,137"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1chain_1_1block__log.html#ad760661c5030845b1369fee21e08a909" title=" " alt="" coords="175,71,365,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="126,134,189,114,191,119,128,139"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1chain_1_1block__log.html#a5afbeabca60a1f842b83c107ec54cf99" title=" " alt="" coords="182,136,358,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="127,154,166,154,166,159,127,159"/>
+<area shape="rect" id="Node000005" href="$namespacefc.html#aab567c89004d329f560014d9943afcd6" title=" " alt="" coords="230,225,310,250"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="120,175,222,216,220,221,118,180"/>
+<area shape="rect" id="Node000006" href="$namespacefc_1_1raw.html#a0b442d98ceb22dd5a6ae84745e43ffab" title=" " alt="" coords="214,298,326,324"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="87,175,126,217,176,261,224,289,221,293,173,265,122,221,83,179"/>
+<area shape="poly" id="edge5_Node000005_Node000005" title=" " alt="" coords="236,226,229,216,233,206,247,200,270,198,295,201,308,208,305,212,293,206,270,203,248,205,237,210,234,216,240,223"/>
+<area shape="poly" id="edge7_Node000006_Node000006" title=" " alt="" coords="236,299,229,290,233,280,247,274,270,272,295,274,308,281,305,286,293,279,270,277,248,279,237,284,234,289,240,296"/>
+</map>

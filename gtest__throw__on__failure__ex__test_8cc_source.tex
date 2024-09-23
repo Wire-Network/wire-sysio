@@ -1,0 +1,98 @@
+\doxysection{gtest\+\_\+throw\+\_\+on\+\_\+failure\+\_\+ex\+\_\+test.\+cc}
+\hypertarget{gtest__throw__on__failure__ex__test_8cc_source}{}\label{gtest__throw__on__failure__ex__test_8cc_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/test/gtest\_throw\_on\_failure\_ex\_test.cc@{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/test/gtest\_throw\_on\_failure\_ex\_test.cc}}
+\mbox{\hyperlink{gtest__throw__on__failure__ex__test_8cc}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00001}00001\ \textcolor{comment}{//\ Copyright\ 2009,\ Google\ Inc.}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00002}00002\ \textcolor{comment}{//\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00003}00003\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00004}00004\ \textcolor{comment}{//\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00005}00005\ \textcolor{comment}{//\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00006}00006\ \textcolor{comment}{//\ met:}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00007}00007\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00008}00008\ \textcolor{comment}{//\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00009}00009\ \textcolor{comment}{//\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00010}00010\ \textcolor{comment}{//\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00011}00011\ \textcolor{comment}{//\ copyright\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00012}00012\ \textcolor{comment}{//\ in\ the\ documentation\ and/or\ other\ materials\ provided\ with\ the}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00013}00013\ \textcolor{comment}{//\ distribution.}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00014}00014\ \textcolor{comment}{//\ \ \ \ \ *\ Neither\ the\ name\ of\ Google\ Inc.\ nor\ the\ names\ of\ its}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00015}00015\ \textcolor{comment}{//\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products\ derived\ from}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00016}00016\ \textcolor{comment}{//\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00017}00017\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00018}00018\ \textcolor{comment}{//\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00019}00019\ \textcolor{comment}{//\ "{}AS\ IS"{}\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00020}00020\ \textcolor{comment}{//\ LIMITED\ TO,\ THE\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00021}00021\ \textcolor{comment}{//\ A\ PARTICULAR\ PURPOSE\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ THE\ COPYRIGHT}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00022}00022\ \textcolor{comment}{//\ OWNER\ OR\ CONTRIBUTORS\ BE\ LIABLE\ FOR\ ANY\ DIRECT,\ INDIRECT,\ INCIDENTAL,}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00023}00023\ \textcolor{comment}{//\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES\ (INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00024}00024\ \textcolor{comment}{//\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;\ LOSS\ OF\ USE,}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00025}00025\ \textcolor{comment}{//\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND\ ON\ ANY}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00026}00026\ \textcolor{comment}{//\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00027}00027\ \textcolor{comment}{//\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00028}00028\ \textcolor{comment}{//\ OF\ THIS\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00029}00029\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00030}00030\ \textcolor{comment}{//\ Author:\ wan@google.com\ (Zhanyong\ Wan)}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00032}00032\ \textcolor{comment}{//\ Tests\ Google\ Test's\ throw-\/on-\/failure\ mode\ with\ exceptions\ enabled.}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00034}00034\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{gtest_8h}{gtest/gtest.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00036}00036\ \textcolor{preprocessor}{\#include\ <stdlib.h>}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00037}00037\ \textcolor{preprocessor}{\#include\ <stdio.h>}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00038}00038\ \textcolor{preprocessor}{\#include\ <string.h>}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00039}00039\ \textcolor{preprocessor}{\#include\ <stdexcept>}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00041}00041\ \textcolor{comment}{//\ Prints\ the\ given\ failure\ message\ and\ exits\ the\ program\ with}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00042}00042\ \textcolor{comment}{//\ non-\/zero.\ \ We\ use\ this\ instead\ of\ a\ Google\ Test\ assertion\ to}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00043}00043\ \textcolor{comment}{//\ indicate\ a\ failure,\ as\ the\ latter\ is\ been\ tested\ and\ cannot\ be}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00044}00044\ \textcolor{comment}{//\ relied\ on.}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00045}\mbox{\hyperlink{gtest__throw__on__failure__ex__test_8cc_a78ecbe7682643ac0413d57d0b9f27fa6}{00045}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{gtest__throw__on__failure__ex__test_8cc_a78ecbe7682643ac0413d57d0b9f27fa6}{Fail}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ msg)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00046}00046\ \ \ printf(\textcolor{stringliteral}{"{}FAILURE:\ \%s\(\backslash\)n"{}},\ msg);}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00047}00047\ \ \ fflush(stdout);}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00048}00048\ \ \ exit(1);}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00049}00049\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00051}00051\ \textcolor{comment}{//\ Tests\ that\ an\ assertion\ failure\ throws\ a\ subclass\ of}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00052}00052\ \textcolor{comment}{//\ std::runtime\_error.}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00053}\mbox{\hyperlink{gtest__throw__on__failure__ex__test_8cc_a3ddff869a4b3365dd7a9c3727b996a1d}{00053}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{gtest__throw__on__failure__ex__test_8cc_a3ddff869a4b3365dd7a9c3727b996a1d}{TestFailureThrowsRuntimeError}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00054}00054\ \ \ testing::GTEST\_FLAG(throw\_on\_failure)\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00056}00056\ \ \ \textcolor{comment}{//\ A\ successful\ assertion\ shouldn't\ throw.}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00057}00057\ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00058}00058\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(3,\ 3);}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00059}00059\ \ \ \}\ \textcolor{keywordflow}{catch}(...)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00060}00060\ \ \ \ \ \mbox{\hyperlink{gtest__throw__on__failure__ex__test_8cc_a78ecbe7682643ac0413d57d0b9f27fa6}{Fail}}(\textcolor{stringliteral}{"{}A\ successful\ assertion\ wrongfully\ threw."{}});}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00061}00061\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00062}00062\ }
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00063}00063\ \ \ \textcolor{comment}{//\ A\ failed\ assertion\ should\ throw\ a\ subclass\ of\ std::runtime\_error.}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00064}00064\ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00065}00065\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(2,\ 3)\ <<\ \textcolor{stringliteral}{"{}Expected\ failure"{}};}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00066}00066\ \ \ \}\ \textcolor{keywordflow}{catch}(\textcolor{keyword}{const}\ std::runtime\_error\&\ e)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00067}00067\ \ \ \ \ \textcolor{keywordflow}{if}\ (strstr(e.what(),\ \textcolor{stringliteral}{"{}Expected\ failure"{}})\ !=\ NULL)}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00068}00068\ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00069}00069\ }
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00070}00070\ \ \ \ \ printf(\textcolor{stringliteral}{"{}\%s"{}},}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00071}00071\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}A\ failed\ assertion\ did\ throw\ an\ exception\ of\ the\ right\ type,\ "{}}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}but\ the\ message\ is\ incorrect.\ \ Instead\ of\ containing\ \(\backslash\)"{}Expected\ "{}}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00073}00073\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}failure\(\backslash\)"{},\ it\ is:\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00074}00074\ \ \ \ \ \mbox{\hyperlink{gtest__throw__on__failure__ex__test_8cc_a78ecbe7682643ac0413d57d0b9f27fa6}{Fail}}(e.what());}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00075}00075\ \ \ \}\ \textcolor{keywordflow}{catch}(...)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00076}00076\ \ \ \ \ \mbox{\hyperlink{gtest__throw__on__failure__ex__test_8cc_a78ecbe7682643ac0413d57d0b9f27fa6}{Fail}}(\textcolor{stringliteral}{"{}A\ failed\ assertion\ threw\ the\ wrong\ type\ of\ exception."{}});}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00077}00077\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00078}00078\ \ \ \mbox{\hyperlink{gtest__throw__on__failure__ex__test_8cc_a78ecbe7682643ac0413d57d0b9f27fa6}{Fail}}(\textcolor{stringliteral}{"{}A\ failed\ assertion\ should've\ thrown\ but\ didn't."{}});}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00079}00079\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00080}00080\ }
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00081}\mbox{\hyperlink{gtest__throw__on__failure__ex__test_8cc_a3c04138a5bfe5d72780bb7e82a18e627}{00081}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}(\textcolor{keywordtype}{int}\ argc,\ \textcolor{keywordtype}{char}**\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}})\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00082}00082\ \ \ \mbox{\hyperlink{namespacetesting_afd726ae08c9bd16dc52f78c822d9946b}{testing::InitGoogleTest}}(\&argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}});}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00083}00083\ }
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00084}00084\ \ \ \textcolor{comment}{//\ We\ want\ to\ ensure\ that\ people\ can\ use\ Google\ Test\ assertions\ in}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00085}00085\ \ \ \textcolor{comment}{//\ other\ testing\ frameworks,\ as\ long\ as\ they\ initialize\ Google\ Test}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00086}00086\ \ \ \textcolor{comment}{//\ properly\ and\ set\ the\ thrown-\/on-\/failure\ mode.\ \ Therefore,\ we\ don't}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00087}00087\ \ \ \textcolor{comment}{//\ use\ Google\ Test's\ constructs\ for\ defining\ and\ running\ tests}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00088}00088\ \ \ \textcolor{comment}{//\ (e.g.\ TEST\ and\ RUN\_ALL\_TESTS)\ here.}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00089}00089\ }
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00090}00090\ \ \ \mbox{\hyperlink{gtest__throw__on__failure__ex__test_8cc_a3ddff869a4b3365dd7a9c3727b996a1d}{TestFailureThrowsRuntimeError}}();}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00091}00091\ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__ex__test_8cc_source_l00092}00092\ \}}
+
+\end{DoxyCode}

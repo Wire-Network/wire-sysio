@@ -1,0 +1,728 @@
+\doxysection{sysiosystem Namespace Reference}
+\hypertarget{namespacesysiosystem}{}\label{namespacesysiosystem}\index{sysiosystem@{sysiosystem}}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysiosystem_1_1block__info}{block\+\_\+info}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysiosystem_1_1abi__hash}{abi\+\_\+hash}}
+\item 
+struct \mbox{\hyperlink{structsysiosystem_1_1authority}{authority}}
+\item 
+struct \mbox{\hyperlink{structsysiosystem_1_1bid__refund}{bid\+\_\+refund}}
+\item 
+struct \mbox{\hyperlink{structsysiosystem_1_1block__header}{block\+\_\+header}}
+\item 
+struct \mbox{\hyperlink{structsysiosystem_1_1delegated__bandwidth}{delegated\+\_\+bandwidth}}
+\item 
+struct \mbox{\hyperlink{structsysiosystem_1_1exchange__state}{exchange\+\_\+state}}
+\item 
+struct \mbox{\hyperlink{structsysiosystem_1_1key__weight}{key\+\_\+weight}}
+\item 
+struct \mbox{\hyperlink{structsysiosystem_1_1limit__auth__change}{limit\+\_\+auth\+\_\+change}}
+\item 
+struct \mbox{\hyperlink{structsysiosystem_1_1name__bid}{name\+\_\+bid}}
+\item 
+class \mbox{\hyperlink{classsysiosystem_1_1native}{native}}
+\item 
+struct \mbox{\hyperlink{structsysiosystem_1_1pair__time__point__sec__int64}{pair\+\_\+time\+\_\+point\+\_\+sec\+\_\+int64}}
+\item 
+struct \mbox{\hyperlink{structsysiosystem_1_1permission__level__weight}{permission\+\_\+level\+\_\+weight}}
+\item 
+struct \mbox{\hyperlink{structsysiosystem_1_1powerup__config}{powerup\+\_\+config}}
+\item 
+struct \mbox{\hyperlink{structsysiosystem_1_1powerup__config__resource}{powerup\+\_\+config\+\_\+resource}}
+\item 
+struct \mbox{\hyperlink{structsysiosystem_1_1powerup__order}{powerup\+\_\+order}}
+\item 
+struct \mbox{\hyperlink{structsysiosystem_1_1powerup__state}{powerup\+\_\+state}}
+\item 
+struct \mbox{\hyperlink{structsysiosystem_1_1powerup__state__resource}{powerup\+\_\+state\+\_\+resource}}
+\item 
+struct \mbox{\hyperlink{structsysiosystem_1_1producer__info}{producer\+\_\+info}}
+\item 
+struct \mbox{\hyperlink{structsysiosystem_1_1producer__info2}{producer\+\_\+info2}}
+\item 
+struct \mbox{\hyperlink{structsysiosystem_1_1refund__request}{refund\+\_\+request}}
+\item 
+struct \mbox{\hyperlink{structsysiosystem_1_1rex__balance}{rex\+\_\+balance}}
+\item 
+struct \mbox{\hyperlink{structsysiosystem_1_1rex__fund}{rex\+\_\+fund}}
+\item 
+struct \mbox{\hyperlink{structsysiosystem_1_1rex__loan}{rex\+\_\+loan}}
+\item 
+struct \mbox{\hyperlink{structsysiosystem_1_1rex__order}{rex\+\_\+order}}
+\item 
+struct \mbox{\hyperlink{structsysiosystem_1_1rex__order__outcome}{rex\+\_\+order\+\_\+outcome}}
+\item 
+struct \mbox{\hyperlink{structsysiosystem_1_1rex__pool}{rex\+\_\+pool}}
+\item 
+struct \mbox{\hyperlink{structsysiosystem_1_1rex__return__buckets}{rex\+\_\+return\+\_\+buckets}}
+\item 
+struct \mbox{\hyperlink{structsysiosystem_1_1rex__return__pool}{rex\+\_\+return\+\_\+pool}}
+\item 
+struct \mbox{\hyperlink{structsysiosystem_1_1sysio__global__state}{sysio\+\_\+global\+\_\+state}}
+\item 
+struct \mbox{\hyperlink{structsysiosystem_1_1sysio__global__state2}{sysio\+\_\+global\+\_\+state2}}
+\item 
+struct \mbox{\hyperlink{structsysiosystem_1_1sysio__global__state3}{sysio\+\_\+global\+\_\+state3}}
+\item 
+struct \mbox{\hyperlink{structsysiosystem_1_1sysio__global__state4}{sysio\+\_\+global\+\_\+state4}}
+\item 
+class \mbox{\hyperlink{classsysiosystem_1_1system__contract}{system\+\_\+contract}}
+\item 
+struct \mbox{\hyperlink{structsysiosystem_1_1user__resources}{user\+\_\+resources}}
+\item 
+struct \mbox{\hyperlink{structsysiosystem_1_1voter__info}{voter\+\_\+info}}
+\item 
+struct \mbox{\hyperlink{structsysiosystem_1_1wait__weight}{wait\+\_\+weight}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef sysio\+::multi\+\_\+index$<$ "{}rammarket"{}\+\_\+n, \mbox{\hyperlink{structsysiosystem_1_1exchange__state}{exchange\+\_\+state}} $>$ \mbox{\hyperlink{namespacesysiosystem_a108f99be51774f766e631351a23c5ae9}{rammarket}}
+\item 
+typedef sysio\+::multi\+\_\+index$<$"{}limitauthchg"{}\+\_\+n, \mbox{\hyperlink{structsysiosystem_1_1limit__auth__change}{limit\+\_\+auth\+\_\+change}} $>$ \mbox{\hyperlink{namespacesysiosystem_a7202a293f65ab06976b1f9d692df9508}{limit\+\_\+auth\+\_\+change\+\_\+table}}
+\item 
+using \mbox{\hyperlink{namespacesysiosystem_a2dd9ef5850d0ee209156054723d3ba34}{blockchain\+\_\+parameters\+\_\+t}} = sysio\+::blockchain\+\_\+parameters
+\item 
+typedef sysio\+::multi\+\_\+index$<$ "{}namebids"{}\+\_\+n, \mbox{\hyperlink{structsysiosystem_1_1name__bid}{name\+\_\+bid}}, indexed\+\_\+by$<$"{}highbid"{}\+\_\+n, const\+\_\+mem\+\_\+fun$<$ \mbox{\hyperlink{structsysiosystem_1_1name__bid}{name\+\_\+bid}}, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}, \&\mbox{\hyperlink{structsysiosystem_1_1name__bid_a3a645c20f866885024966c16c4e1278d}{name\+\_\+bid\+::by\+\_\+high\+\_\+bid}} $>$ $>$ $>$ \mbox{\hyperlink{namespacesysiosystem_a3e1fecc8ab83c8e8f634cbdc1073e484}{name\+\_\+bid\+\_\+table}}
+\item 
+typedef sysio\+::multi\+\_\+index$<$ "{}bidrefunds"{}\+\_\+n, \mbox{\hyperlink{structsysiosystem_1_1bid__refund}{bid\+\_\+refund}} $>$ \mbox{\hyperlink{namespacesysiosystem_ade3fba06d389843fb55ca3c42f86e327}{bid\+\_\+refund\+\_\+table}}
+\item 
+typedef sysio\+::multi\+\_\+index$<$ "{}voters"{}\+\_\+n, \mbox{\hyperlink{structsysiosystem_1_1voter__info}{voter\+\_\+info}} $>$ \mbox{\hyperlink{namespacesysiosystem_aa9ab56bc489bc93d31995108b05e36d2}{voters\+\_\+table}}
+\item 
+typedef sysio\+::multi\+\_\+index$<$ "{}producers"{}\+\_\+n, \mbox{\hyperlink{structsysiosystem_1_1producer__info}{producer\+\_\+info}}, indexed\+\_\+by$<$"{}prototalvote"{}\+\_\+n, const\+\_\+mem\+\_\+fun$<$ \mbox{\hyperlink{structsysiosystem_1_1producer__info}{producer\+\_\+info}}, double, \&\mbox{\hyperlink{structsysiosystem_1_1producer__info_a7d82ca1151d4571ce74db688240e83ae}{producer\+\_\+info\+::by\+\_\+votes}} $>$ $>$ $>$ \mbox{\hyperlink{namespacesysiosystem_aa70b51f168bb154e250987a181916601}{producers\+\_\+table}}
+\item 
+typedef sysio\+::multi\+\_\+index$<$ "{}producers2"{}\+\_\+n, \mbox{\hyperlink{structsysiosystem_1_1producer__info2}{producer\+\_\+info2}} $>$ \mbox{\hyperlink{namespacesysiosystem_adf1d5f4a462d82a31bb49341b66b7df9}{producers\+\_\+table2}}
+\item 
+typedef sysio\+::singleton$<$ "{}global"{}\+\_\+n, \mbox{\hyperlink{structsysiosystem_1_1sysio__global__state}{sysio\+\_\+global\+\_\+state}} $>$ \mbox{\hyperlink{namespacesysiosystem_a4d63507e05c3277788fd6f2255828a3b}{global\+\_\+state\+\_\+singleton}}
+\item 
+typedef sysio\+::singleton$<$ "{}global2"{}\+\_\+n, \mbox{\hyperlink{structsysiosystem_1_1sysio__global__state2}{sysio\+\_\+global\+\_\+state2}} $>$ \mbox{\hyperlink{namespacesysiosystem_a8837bf97728a1617e4fd96df2fc23c04}{global\+\_\+state2\+\_\+singleton}}
+\item 
+typedef sysio\+::singleton$<$ "{}global3"{}\+\_\+n, \mbox{\hyperlink{structsysiosystem_1_1sysio__global__state3}{sysio\+\_\+global\+\_\+state3}} $>$ \mbox{\hyperlink{namespacesysiosystem_ab5cc36dbb9a8c302d27613fb3c710cb9}{global\+\_\+state3\+\_\+singleton}}
+\item 
+typedef sysio\+::singleton$<$ "{}global4"{}\+\_\+n, \mbox{\hyperlink{structsysiosystem_1_1sysio__global__state4}{sysio\+\_\+global\+\_\+state4}} $>$ \mbox{\hyperlink{namespacesysiosystem_a64908e07c391033f9a04c46578c0f956}{global\+\_\+state4\+\_\+singleton}}
+\item 
+typedef sysio\+::multi\+\_\+index$<$ "{}userres"{}\+\_\+n, \mbox{\hyperlink{structsysiosystem_1_1user__resources}{user\+\_\+resources}} $>$ \mbox{\hyperlink{namespacesysiosystem_aeda3aa12065ee04f138f8538184b8e54}{user\+\_\+resources\+\_\+table}}
+\item 
+typedef sysio\+::multi\+\_\+index$<$ "{}delband"{}\+\_\+n, \mbox{\hyperlink{structsysiosystem_1_1delegated__bandwidth}{delegated\+\_\+bandwidth}} $>$ \mbox{\hyperlink{namespacesysiosystem_a205c7938369bd90edc20122ae99826be}{del\+\_\+bandwidth\+\_\+table}}
+\item 
+typedef sysio\+::multi\+\_\+index$<$ "{}refunds"{}\+\_\+n, \mbox{\hyperlink{structsysiosystem_1_1refund__request}{refund\+\_\+request}} $>$ \mbox{\hyperlink{namespacesysiosystem_a26c6e658ca5a182ea69d27bab1cc74a4}{refunds\+\_\+table}}
+\item 
+typedef sysio\+::multi\+\_\+index$<$ "{}rexpool"{}\+\_\+n, \mbox{\hyperlink{structsysiosystem_1_1rex__pool}{rex\+\_\+pool}} $>$ \mbox{\hyperlink{namespacesysiosystem_a19b5da7cb8313e7e564b006879432fb1}{rex\+\_\+pool\+\_\+table}}
+\item 
+typedef sysio\+::multi\+\_\+index$<$ "{}rexretpool"{}\+\_\+n, \mbox{\hyperlink{structsysiosystem_1_1rex__return__pool}{rex\+\_\+return\+\_\+pool}} $>$ \mbox{\hyperlink{namespacesysiosystem_a38ac6cdd3285fe86755f4b280d2b85ee}{rex\+\_\+return\+\_\+pool\+\_\+table}}
+\item 
+typedef sysio\+::multi\+\_\+index$<$ "{}retbuckets"{}\+\_\+n, \mbox{\hyperlink{structsysiosystem_1_1rex__return__buckets}{rex\+\_\+return\+\_\+buckets}} $>$ \mbox{\hyperlink{namespacesysiosystem_a021421a7769ad3f4e2a2c629eb4fefd4}{rex\+\_\+return\+\_\+buckets\+\_\+table}}
+\item 
+typedef sysio\+::multi\+\_\+index$<$ "{}rexfund"{}\+\_\+n, \mbox{\hyperlink{structsysiosystem_1_1rex__fund}{rex\+\_\+fund}} $>$ \mbox{\hyperlink{namespacesysiosystem_a66612e75762b2492f5c75fe59fdf87ea}{rex\+\_\+fund\+\_\+table}}
+\item 
+typedef sysio\+::multi\+\_\+index$<$ "{}rexbal"{}\+\_\+n, \mbox{\hyperlink{structsysiosystem_1_1rex__balance}{rex\+\_\+balance}} $>$ \mbox{\hyperlink{namespacesysiosystem_a65867d106683a5ea0c132aff38814145}{rex\+\_\+balance\+\_\+table}}
+\item 
+typedef sysio\+::multi\+\_\+index$<$ "{}cpuloan"{}\+\_\+n, \mbox{\hyperlink{structsysiosystem_1_1rex__loan}{rex\+\_\+loan}}, indexed\+\_\+by$<$"{}byexpr"{}\+\_\+n, const\+\_\+mem\+\_\+fun$<$ \mbox{\hyperlink{structsysiosystem_1_1rex__loan}{rex\+\_\+loan}}, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}, \&\mbox{\hyperlink{structsysiosystem_1_1rex__loan_ac841a18bfaf9c6470a333d6a5820df4b}{rex\+\_\+loan\+::by\+\_\+expr}} $>$ $>$, indexed\+\_\+by$<$"{}byowner"{}\+\_\+n, const\+\_\+mem\+\_\+fun$<$ \mbox{\hyperlink{structsysiosystem_1_1rex__loan}{rex\+\_\+loan}}, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}, \&\mbox{\hyperlink{structsysiosystem_1_1rex__loan_acb8eb05f8eec790d86c77d26bee48866}{rex\+\_\+loan\+::by\+\_\+owner}} $>$ $>$ $>$ \mbox{\hyperlink{namespacesysiosystem_a2b6105db3f0018cb55e05ef0f062aab0}{rex\+\_\+cpu\+\_\+loan\+\_\+table}}
+\item 
+typedef sysio\+::multi\+\_\+index$<$ "{}netloan"{}\+\_\+n, \mbox{\hyperlink{structsysiosystem_1_1rex__loan}{rex\+\_\+loan}}, indexed\+\_\+by$<$"{}byexpr"{}\+\_\+n, const\+\_\+mem\+\_\+fun$<$ \mbox{\hyperlink{structsysiosystem_1_1rex__loan}{rex\+\_\+loan}}, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}, \&\mbox{\hyperlink{structsysiosystem_1_1rex__loan_ac841a18bfaf9c6470a333d6a5820df4b}{rex\+\_\+loan\+::by\+\_\+expr}} $>$ $>$, indexed\+\_\+by$<$"{}byowner"{}\+\_\+n, const\+\_\+mem\+\_\+fun$<$ \mbox{\hyperlink{structsysiosystem_1_1rex__loan}{rex\+\_\+loan}}, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}, \&\mbox{\hyperlink{structsysiosystem_1_1rex__loan_acb8eb05f8eec790d86c77d26bee48866}{rex\+\_\+loan\+::by\+\_\+owner}} $>$ $>$ $>$ \mbox{\hyperlink{namespacesysiosystem_ae19f143ed0d859ca1adee15b440e3826}{rex\+\_\+net\+\_\+loan\+\_\+table}}
+\item 
+typedef sysio\+::multi\+\_\+index$<$ "{}rexqueue"{}\+\_\+n, \mbox{\hyperlink{structsysiosystem_1_1rex__order}{rex\+\_\+order}}, indexed\+\_\+by$<$"{}bytime"{}\+\_\+n, const\+\_\+mem\+\_\+fun$<$ \mbox{\hyperlink{structsysiosystem_1_1rex__order}{rex\+\_\+order}}, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}, \&\mbox{\hyperlink{structsysiosystem_1_1rex__order_a01bc1a2b9157963d58c9d70fa54b51c9}{rex\+\_\+order\+::by\+\_\+time}} $>$ $>$ $>$ \mbox{\hyperlink{namespacesysiosystem_a518ded668c4cbb2b0868d24e3c43d02e}{rex\+\_\+order\+\_\+table}}
+\item 
+typedef sysio\+::singleton$<$"{}powup.\+state"{}\+\_\+n, \mbox{\hyperlink{structsysiosystem_1_1powerup__state}{powerup\+\_\+state}} $>$ \mbox{\hyperlink{namespacesysiosystem_a3c287107a5ad7714f2781979417e41f9}{powerup\+\_\+state\+\_\+singleton}}
+\item 
+typedef sysio\+::multi\+\_\+index$<$ "{}powup.\+order"{}\+\_\+n, \mbox{\hyperlink{structsysiosystem_1_1powerup__order}{powerup\+\_\+order}}, indexed\+\_\+by$<$"{}byowner"{}\+\_\+n, const\+\_\+mem\+\_\+fun$<$ \mbox{\hyperlink{structsysiosystem_1_1powerup__order}{powerup\+\_\+order}}, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}, \&\mbox{\hyperlink{structsysiosystem_1_1powerup__order_ae2f3aca585ef167fc2b3b37da5bb0617}{powerup\+\_\+order\+::by\+\_\+owner}} $>$ $>$, indexed\+\_\+by$<$"{}byexpires"{}\+\_\+n, const\+\_\+mem\+\_\+fun$<$ \mbox{\hyperlink{structsysiosystem_1_1powerup__order}{powerup\+\_\+order}}, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}, \&\mbox{\hyperlink{structsysiosystem_1_1powerup__order_a0764dbb1a184d07ede0397f3dd9d728c}{powerup\+\_\+order\+::by\+\_\+expires}} $>$ $>$ $>$ \mbox{\hyperlink{namespacesysiosystem_af07777a36bd75e30b66675f66842690c}{powerup\+\_\+order\+\_\+table}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{namespacesysiosystem_a5de3a548ea8323b8a776a119bd5bb724}{check\+\_\+auth\+\_\+change}} (\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} contract, \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} account, const binary\+\_\+extension$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$ \&authorized\+\_\+by)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_a5d68aec4c925d17b62f0a9b543fabfc5}{sysio\+::block\+\_\+signing\+\_\+authority}} \mbox{\hyperlink{namespacesysiosystem_ac27d53bfd98cafb3f2da089102f5a490}{convert\+\_\+to\+\_\+block\+\_\+signing\+\_\+authority}} (const \mbox{\hyperlink{classfc_1_1crypto_1_1r1_1_1public__key}{sysio\+::public\+\_\+key}} \&producer\+\_\+key)
+\item 
+void \mbox{\hyperlink{namespacesysiosystem_aed36584da36967a186e611f01af041cc}{validate\+\_\+b1\+\_\+vesting}} (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} stake)
+\item 
+void \mbox{\hyperlink{namespacesysiosystem_a3d068598c53a51b1ed1d9782e9732f9e}{update\+\_\+weight}} (\mbox{\hyperlink{classfc_1_1time__point__sec}{time\+\_\+point\+\_\+sec}} now, \mbox{\hyperlink{structsysiosystem_1_1powerup__state__resource}{powerup\+\_\+state\+\_\+resource}} \&res, \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \&delta\+\_\+available)
+\item 
+void \mbox{\hyperlink{namespacesysiosystem_a02c0023b5bdc321b157afe535f641c55}{update\+\_\+utilization}} (\mbox{\hyperlink{classfc_1_1time__point__sec}{time\+\_\+point\+\_\+sec}} now, \mbox{\hyperlink{structsysiosystem_1_1powerup__state__resource}{powerup\+\_\+state\+\_\+resource}} \&res)
+\item 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{namespacesysiosystem_aef52abde82b1b047f831dec402a48690}{calc\+\_\+powerup\+\_\+fee}} (const \mbox{\hyperlink{structsysiosystem_1_1powerup__state__resource}{powerup\+\_\+state\+\_\+resource}} \&\mbox{\hyperlink{structstate}{state}}, \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} utilization\+\_\+increase)
+\item 
+double \mbox{\hyperlink{namespacesysiosystem_ae2d9e67902c4107172b1eb64310251e5}{get\+\_\+continuous\+\_\+rate}} (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} annual\+\_\+rate)
+\item 
+double \mbox{\hyperlink{namespacesysiosystem_a41b99f8cd7ffeb86ed9c1be086f2ec22}{stake2vote}} (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} staked)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+constexpr \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{namespacesysiosystem_a0c870d7ce8b7146e2f9fbc64203aa0d0}{powerup\+\_\+frac}} = 1\textquotesingle{}000\textquotesingle{}000\textquotesingle{}000\textquotesingle{}000\textquotesingle{}000ll
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{namespacesysiosystem_ade3fba06d389843fb55ca3c42f86e327}\index{sysiosystem@{sysiosystem}!bid\_refund\_table@{bid\_refund\_table}}
+\index{bid\_refund\_table@{bid\_refund\_table}!sysiosystem@{sysiosystem}}
+\doxysubsubsection{\texorpdfstring{bid\_refund\_table}{bid\_refund\_table}}
+{\footnotesize\ttfamily \label{namespacesysiosystem_ade3fba06d389843fb55ca3c42f86e327} 
+typedef sysio\+::multi\+\_\+index$<$ "{}bidrefunds"{}\+\_\+n, \mbox{\hyperlink{structsysiosystem_1_1bid__refund}{bid\+\_\+refund}} $>$ \mbox{\hyperlink{namespacesysiosystem_ade3fba06d389843fb55ca3c42f86e327}{sysiosystem\+::bid\+\_\+refund\+\_\+table}}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00138}{138}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{namespacesysiosystem_a2dd9ef5850d0ee209156054723d3ba34}\index{sysiosystem@{sysiosystem}!blockchain\_parameters\_t@{blockchain\_parameters\_t}}
+\index{blockchain\_parameters\_t@{blockchain\_parameters\_t}!sysiosystem@{sysiosystem}}
+\doxysubsubsection{\texorpdfstring{blockchain\_parameters\_t}{blockchain\_parameters\_t}}
+{\footnotesize\ttfamily \label{namespacesysiosystem_a2dd9ef5850d0ee209156054723d3ba34} 
+using \mbox{\hyperlink{namespacesysiosystem_a2dd9ef5850d0ee209156054723d3ba34}{sysiosystem\+::blockchain\+\_\+parameters\+\_\+t}} = sysio\+::blockchain\+\_\+parameters}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00093}{93}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{namespacesysiosystem_a205c7938369bd90edc20122ae99826be}\index{sysiosystem@{sysiosystem}!del\_bandwidth\_table@{del\_bandwidth\_table}}
+\index{del\_bandwidth\_table@{del\_bandwidth\_table}!sysiosystem@{sysiosystem}}
+\doxysubsubsection{\texorpdfstring{del\_bandwidth\_table}{del\_bandwidth\_table}}
+{\footnotesize\ttfamily \label{namespacesysiosystem_a205c7938369bd90edc20122ae99826be} 
+typedef sysio\+::multi\+\_\+index$<$ "{}delband"{}\+\_\+n, \mbox{\hyperlink{structsysiosystem_1_1delegated__bandwidth}{delegated\+\_\+bandwidth}} $>$ \mbox{\hyperlink{namespacesysiosystem_a205c7938369bd90edc20122ae99826be}{sysiosystem\+::del\+\_\+bandwidth\+\_\+table}}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00384}{384}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{namespacesysiosystem_a8837bf97728a1617e4fd96df2fc23c04}\index{sysiosystem@{sysiosystem}!global\_state2\_singleton@{global\_state2\_singleton}}
+\index{global\_state2\_singleton@{global\_state2\_singleton}!sysiosystem@{sysiosystem}}
+\doxysubsubsection{\texorpdfstring{global\_state2\_singleton}{global\_state2\_singleton}}
+{\footnotesize\ttfamily \label{namespacesysiosystem_a8837bf97728a1617e4fd96df2fc23c04} 
+typedef sysio\+::singleton$<$ "{}global2"{}\+\_\+n, \mbox{\hyperlink{structsysiosystem_1_1sysio__global__state2}{sysio\+\_\+global\+\_\+state2}} $>$ \mbox{\hyperlink{namespacesysiosystem_a8837bf97728a1617e4fd96df2fc23c04}{sysiosystem\+::global\+\_\+state2\+\_\+singleton}}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00335}{335}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{namespacesysiosystem_ab5cc36dbb9a8c302d27613fb3c710cb9}\index{sysiosystem@{sysiosystem}!global\_state3\_singleton@{global\_state3\_singleton}}
+\index{global\_state3\_singleton@{global\_state3\_singleton}!sysiosystem@{sysiosystem}}
+\doxysubsubsection{\texorpdfstring{global\_state3\_singleton}{global\_state3\_singleton}}
+{\footnotesize\ttfamily \label{namespacesysiosystem_ab5cc36dbb9a8c302d27613fb3c710cb9} 
+typedef sysio\+::singleton$<$ "{}global3"{}\+\_\+n, \mbox{\hyperlink{structsysiosystem_1_1sysio__global__state3}{sysio\+\_\+global\+\_\+state3}} $>$ \mbox{\hyperlink{namespacesysiosystem_ab5cc36dbb9a8c302d27613fb3c710cb9}{sysiosystem\+::global\+\_\+state3\+\_\+singleton}}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00337}{337}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{namespacesysiosystem_a64908e07c391033f9a04c46578c0f956}\index{sysiosystem@{sysiosystem}!global\_state4\_singleton@{global\_state4\_singleton}}
+\index{global\_state4\_singleton@{global\_state4\_singleton}!sysiosystem@{sysiosystem}}
+\doxysubsubsection{\texorpdfstring{global\_state4\_singleton}{global\_state4\_singleton}}
+{\footnotesize\ttfamily \label{namespacesysiosystem_a64908e07c391033f9a04c46578c0f956} 
+typedef sysio\+::singleton$<$ "{}global4"{}\+\_\+n, \mbox{\hyperlink{structsysiosystem_1_1sysio__global__state4}{sysio\+\_\+global\+\_\+state4}} $>$ \mbox{\hyperlink{namespacesysiosystem_a64908e07c391033f9a04c46578c0f956}{sysiosystem\+::global\+\_\+state4\+\_\+singleton}}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00339}{339}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{namespacesysiosystem_a4d63507e05c3277788fd6f2255828a3b}\index{sysiosystem@{sysiosystem}!global\_state\_singleton@{global\_state\_singleton}}
+\index{global\_state\_singleton@{global\_state\_singleton}!sysiosystem@{sysiosystem}}
+\doxysubsubsection{\texorpdfstring{global\_state\_singleton}{global\_state\_singleton}}
+{\footnotesize\ttfamily \label{namespacesysiosystem_a4d63507e05c3277788fd6f2255828a3b} 
+typedef sysio\+::singleton$<$ "{}global"{}\+\_\+n, \mbox{\hyperlink{structsysiosystem_1_1sysio__global__state}{sysio\+\_\+global\+\_\+state}} $>$ \mbox{\hyperlink{namespacesysiosystem_a4d63507e05c3277788fd6f2255828a3b}{sysiosystem\+::global\+\_\+state\+\_\+singleton}}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00333}{333}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{namespacesysiosystem_a7202a293f65ab06976b1f9d692df9508}\index{sysiosystem@{sysiosystem}!limit\_auth\_change\_table@{limit\_auth\_change\_table}}
+\index{limit\_auth\_change\_table@{limit\_auth\_change\_table}!sysiosystem@{sysiosystem}}
+\doxysubsubsection{\texorpdfstring{limit\_auth\_change\_table}{limit\_auth\_change\_table}}
+{\footnotesize\ttfamily \label{namespacesysiosystem_a7202a293f65ab06976b1f9d692df9508} 
+typedef sysio\+::multi\+\_\+index$<$"{}limitauthchg"{}\+\_\+n, \mbox{\hyperlink{structsysiosystem_1_1limit__auth__change}{limit\+\_\+auth\+\_\+change}}$>$ \mbox{\hyperlink{namespacesysiosystem_a7202a293f65ab06976b1f9d692df9508}{sysiosystem\+::limit\+\_\+auth\+\_\+change\+\_\+table}}}
+
+
+
+Definition at line \mbox{\hyperlink{limit__auth__changes_8hpp_source_l00019}{19}} of file \mbox{\hyperlink{limit__auth__changes_8hpp_source}{limit\+\_\+auth\+\_\+changes.\+hpp}}.
+
+\Hypertarget{namespacesysiosystem_a3e1fecc8ab83c8e8f634cbdc1073e484}\index{sysiosystem@{sysiosystem}!name\_bid\_table@{name\_bid\_table}}
+\index{name\_bid\_table@{name\_bid\_table}!sysiosystem@{sysiosystem}}
+\doxysubsubsection{\texorpdfstring{name\_bid\_table}{name\_bid\_table}}
+{\footnotesize\ttfamily \label{namespacesysiosystem_a3e1fecc8ab83c8e8f634cbdc1073e484} 
+typedef sysio\+::multi\+\_\+index$<$ "{}namebids"{}\+\_\+n, \mbox{\hyperlink{structsysiosystem_1_1name__bid}{name\+\_\+bid}}, indexed\+\_\+by$<$"{}highbid"{}\+\_\+n, const\+\_\+mem\+\_\+fun$<$\mbox{\hyperlink{structsysiosystem_1_1name__bid}{name\+\_\+bid}}, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}, \&\mbox{\hyperlink{structsysiosystem_1_1name__bid_a3a645c20f866885024966c16c4e1278d}{name\+\_\+bid\+::by\+\_\+high\+\_\+bid}}$>$ $>$ $>$ \mbox{\hyperlink{namespacesysiosystem_a3e1fecc8ab83c8e8f634cbdc1073e484}{sysiosystem\+::name\+\_\+bid\+\_\+table}}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00136}{136}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{namespacesysiosystem_af07777a36bd75e30b66675f66842690c}\index{sysiosystem@{sysiosystem}!powerup\_order\_table@{powerup\_order\_table}}
+\index{powerup\_order\_table@{powerup\_order\_table}!sysiosystem@{sysiosystem}}
+\doxysubsubsection{\texorpdfstring{powerup\_order\_table}{powerup\_order\_table}}
+{\footnotesize\ttfamily \label{namespacesysiosystem_af07777a36bd75e30b66675f66842690c} 
+typedef sysio\+::multi\+\_\+index$<$ "{}powup.\+order"{}\+\_\+n, \mbox{\hyperlink{structsysiosystem_1_1powerup__order}{powerup\+\_\+order}}, indexed\+\_\+by$<$"{}byowner"{}\+\_\+n, const\+\_\+mem\+\_\+fun$<$\mbox{\hyperlink{structsysiosystem_1_1powerup__order}{powerup\+\_\+order}}, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}, \&\mbox{\hyperlink{structsysiosystem_1_1powerup__order_ae2f3aca585ef167fc2b3b37da5bb0617}{powerup\+\_\+order\+::by\+\_\+owner}}$>$ $>$, indexed\+\_\+by$<$"{}byexpires"{}\+\_\+n, const\+\_\+mem\+\_\+fun$<$\mbox{\hyperlink{structsysiosystem_1_1powerup__order}{powerup\+\_\+order}}, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}, \&\mbox{\hyperlink{structsysiosystem_1_1powerup__order_a0764dbb1a184d07ede0397f3dd9d728c}{powerup\+\_\+order\+::by\+\_\+expires}}$>$ $>$ $>$ \mbox{\hyperlink{namespacesysiosystem_af07777a36bd75e30b66675f66842690c}{sysiosystem\+::powerup\+\_\+order\+\_\+table}}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00663}{663}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{namespacesysiosystem_a3c287107a5ad7714f2781979417e41f9}\index{sysiosystem@{sysiosystem}!powerup\_state\_singleton@{powerup\_state\_singleton}}
+\index{powerup\_state\_singleton@{powerup\_state\_singleton}!sysiosystem@{sysiosystem}}
+\doxysubsubsection{\texorpdfstring{powerup\_state\_singleton}{powerup\_state\_singleton}}
+{\footnotesize\ttfamily \label{namespacesysiosystem_a3c287107a5ad7714f2781979417e41f9} 
+typedef sysio\+::singleton$<$"{}powup.\+state"{}\+\_\+n, \mbox{\hyperlink{structsysiosystem_1_1powerup__state}{powerup\+\_\+state}}$>$ \mbox{\hyperlink{namespacesysiosystem_a3c287107a5ad7714f2781979417e41f9}{sysiosystem\+::powerup\+\_\+state\+\_\+singleton}}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00645}{645}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{namespacesysiosystem_aa70b51f168bb154e250987a181916601}\index{sysiosystem@{sysiosystem}!producers\_table@{producers\_table}}
+\index{producers\_table@{producers\_table}!sysiosystem@{sysiosystem}}
+\doxysubsubsection{\texorpdfstring{producers\_table}{producers\_table}}
+{\footnotesize\ttfamily \label{namespacesysiosystem_aa70b51f168bb154e250987a181916601} 
+typedef sysio\+::multi\+\_\+index$<$ "{}producers"{}\+\_\+n, \mbox{\hyperlink{structsysiosystem_1_1producer__info}{producer\+\_\+info}}, indexed\+\_\+by$<$"{}prototalvote"{}\+\_\+n, const\+\_\+mem\+\_\+fun$<$\mbox{\hyperlink{structsysiosystem_1_1producer__info}{producer\+\_\+info}}, double, \&\mbox{\hyperlink{structsysiosystem_1_1producer__info_a7d82ca1151d4571ce74db688240e83ae}{producer\+\_\+info\+::by\+\_\+votes}}$>$ $>$ $>$ \mbox{\hyperlink{namespacesysiosystem_aa70b51f168bb154e250987a181916601}{sysiosystem\+::producers\+\_\+table}}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00328}{328}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{namespacesysiosystem_adf1d5f4a462d82a31bb49341b66b7df9}\index{sysiosystem@{sysiosystem}!producers\_table2@{producers\_table2}}
+\index{producers\_table2@{producers\_table2}!sysiosystem@{sysiosystem}}
+\doxysubsubsection{\texorpdfstring{producers\_table2}{producers\_table2}}
+{\footnotesize\ttfamily \label{namespacesysiosystem_adf1d5f4a462d82a31bb49341b66b7df9} 
+typedef sysio\+::multi\+\_\+index$<$ "{}producers2"{}\+\_\+n, \mbox{\hyperlink{structsysiosystem_1_1producer__info2}{producer\+\_\+info2}} $>$ \mbox{\hyperlink{namespacesysiosystem_adf1d5f4a462d82a31bb49341b66b7df9}{sysiosystem\+::producers\+\_\+table2}}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00330}{330}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{namespacesysiosystem_a108f99be51774f766e631351a23c5ae9}\index{sysiosystem@{sysiosystem}!rammarket@{rammarket}}
+\index{rammarket@{rammarket}!sysiosystem@{sysiosystem}}
+\doxysubsubsection{\texorpdfstring{rammarket}{rammarket}}
+{\footnotesize\ttfamily \label{namespacesysiosystem_a108f99be51774f766e631351a23c5ae9} 
+typedef sysio\+::multi\+\_\+index$<$ "{}rammarket"{}\+\_\+n, \mbox{\hyperlink{structsysiosystem_1_1exchange__state}{exchange\+\_\+state}} $>$ \mbox{\hyperlink{namespacesysiosystem_a108f99be51774f766e631351a23c5ae9}{sysiosystem\+::rammarket}}}
+
+
+
+Definition at line \mbox{\hyperlink{exchange__state_8hpp_source_l00047}{47}} of file \mbox{\hyperlink{exchange__state_8hpp_source}{exchange\+\_\+state.\+hpp}}.
+
+\Hypertarget{namespacesysiosystem_a26c6e658ca5a182ea69d27bab1cc74a4}\index{sysiosystem@{sysiosystem}!refunds\_table@{refunds\_table}}
+\index{refunds\_table@{refunds\_table}!sysiosystem@{sysiosystem}}
+\doxysubsubsection{\texorpdfstring{refunds\_table}{refunds\_table}}
+{\footnotesize\ttfamily \label{namespacesysiosystem_a26c6e658ca5a182ea69d27bab1cc74a4} 
+typedef sysio\+::multi\+\_\+index$<$ "{}refunds"{}\+\_\+n, \mbox{\hyperlink{structsysiosystem_1_1refund__request}{refund\+\_\+request}} $>$ \mbox{\hyperlink{namespacesysiosystem_a26c6e658ca5a182ea69d27bab1cc74a4}{sysiosystem\+::refunds\+\_\+table}}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00385}{385}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{namespacesysiosystem_a65867d106683a5ea0c132aff38814145}\index{sysiosystem@{sysiosystem}!rex\_balance\_table@{rex\_balance\_table}}
+\index{rex\_balance\_table@{rex\_balance\_table}!sysiosystem@{sysiosystem}}
+\doxysubsubsection{\texorpdfstring{rex\_balance\_table}{rex\_balance\_table}}
+{\footnotesize\ttfamily \label{namespacesysiosystem_a65867d106683a5ea0c132aff38814145} 
+typedef sysio\+::multi\+\_\+index$<$ "{}rexbal"{}\+\_\+n, \mbox{\hyperlink{structsysiosystem_1_1rex__balance}{rex\+\_\+balance}} $>$ \mbox{\hyperlink{namespacesysiosystem_a65867d106683a5ea0c132aff38814145}{sysiosystem\+::rex\+\_\+balance\+\_\+table}}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00488}{488}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{namespacesysiosystem_a2b6105db3f0018cb55e05ef0f062aab0}\index{sysiosystem@{sysiosystem}!rex\_cpu\_loan\_table@{rex\_cpu\_loan\_table}}
+\index{rex\_cpu\_loan\_table@{rex\_cpu\_loan\_table}!sysiosystem@{sysiosystem}}
+\doxysubsubsection{\texorpdfstring{rex\_cpu\_loan\_table}{rex\_cpu\_loan\_table}}
+{\footnotesize\ttfamily \label{namespacesysiosystem_a2b6105db3f0018cb55e05ef0f062aab0} 
+typedef sysio\+::multi\+\_\+index$<$ "{}cpuloan"{}\+\_\+n, \mbox{\hyperlink{structsysiosystem_1_1rex__loan}{rex\+\_\+loan}}, indexed\+\_\+by$<$"{}byexpr"{}\+\_\+n, const\+\_\+mem\+\_\+fun$<$\mbox{\hyperlink{structsysiosystem_1_1rex__loan}{rex\+\_\+loan}}, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}, \&\mbox{\hyperlink{structsysiosystem_1_1rex__loan_ac841a18bfaf9c6470a333d6a5820df4b}{rex\+\_\+loan\+::by\+\_\+expr}}$>$ $>$, indexed\+\_\+by$<$"{}byowner"{}\+\_\+n, const\+\_\+mem\+\_\+fun$<$\mbox{\hyperlink{structsysiosystem_1_1rex__loan}{rex\+\_\+loan}}, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}, \&\mbox{\hyperlink{structsysiosystem_1_1rex__loan_acb8eb05f8eec790d86c77d26bee48866}{rex\+\_\+loan\+::by\+\_\+owner}}$>$ $>$ $>$ \mbox{\hyperlink{namespacesysiosystem_a2b6105db3f0018cb55e05ef0f062aab0}{sysiosystem\+::rex\+\_\+cpu\+\_\+loan\+\_\+table}}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00518}{518}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{namespacesysiosystem_a66612e75762b2492f5c75fe59fdf87ea}\index{sysiosystem@{sysiosystem}!rex\_fund\_table@{rex\_fund\_table}}
+\index{rex\_fund\_table@{rex\_fund\_table}!sysiosystem@{sysiosystem}}
+\doxysubsubsection{\texorpdfstring{rex\_fund\_table}{rex\_fund\_table}}
+{\footnotesize\ttfamily \label{namespacesysiosystem_a66612e75762b2492f5c75fe59fdf87ea} 
+typedef sysio\+::multi\+\_\+index$<$ "{}rexfund"{}\+\_\+n, \mbox{\hyperlink{structsysiosystem_1_1rex__fund}{rex\+\_\+fund}} $>$ \mbox{\hyperlink{namespacesysiosystem_a66612e75762b2492f5c75fe59fdf87ea}{sysiosystem\+::rex\+\_\+fund\+\_\+table}}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00469}{469}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{namespacesysiosystem_ae19f143ed0d859ca1adee15b440e3826}\index{sysiosystem@{sysiosystem}!rex\_net\_loan\_table@{rex\_net\_loan\_table}}
+\index{rex\_net\_loan\_table@{rex\_net\_loan\_table}!sysiosystem@{sysiosystem}}
+\doxysubsubsection{\texorpdfstring{rex\_net\_loan\_table}{rex\_net\_loan\_table}}
+{\footnotesize\ttfamily \label{namespacesysiosystem_ae19f143ed0d859ca1adee15b440e3826} 
+typedef sysio\+::multi\+\_\+index$<$ "{}netloan"{}\+\_\+n, \mbox{\hyperlink{structsysiosystem_1_1rex__loan}{rex\+\_\+loan}}, indexed\+\_\+by$<$"{}byexpr"{}\+\_\+n, const\+\_\+mem\+\_\+fun$<$\mbox{\hyperlink{structsysiosystem_1_1rex__loan}{rex\+\_\+loan}}, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}, \&\mbox{\hyperlink{structsysiosystem_1_1rex__loan_ac841a18bfaf9c6470a333d6a5820df4b}{rex\+\_\+loan\+::by\+\_\+expr}}$>$ $>$, indexed\+\_\+by$<$"{}byowner"{}\+\_\+n, const\+\_\+mem\+\_\+fun$<$\mbox{\hyperlink{structsysiosystem_1_1rex__loan}{rex\+\_\+loan}}, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}, \&\mbox{\hyperlink{structsysiosystem_1_1rex__loan_acb8eb05f8eec790d86c77d26bee48866}{rex\+\_\+loan\+::by\+\_\+owner}}$>$ $>$ $>$ \mbox{\hyperlink{namespacesysiosystem_ae19f143ed0d859ca1adee15b440e3826}{sysiosystem\+::rex\+\_\+net\+\_\+loan\+\_\+table}}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00523}{523}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{namespacesysiosystem_a518ded668c4cbb2b0868d24e3c43d02e}\index{sysiosystem@{sysiosystem}!rex\_order\_table@{rex\_order\_table}}
+\index{rex\_order\_table@{rex\_order\_table}!sysiosystem@{sysiosystem}}
+\doxysubsubsection{\texorpdfstring{rex\_order\_table}{rex\_order\_table}}
+{\footnotesize\ttfamily \label{namespacesysiosystem_a518ded668c4cbb2b0868d24e3c43d02e} 
+typedef sysio\+::multi\+\_\+index$<$ "{}rexqueue"{}\+\_\+n, \mbox{\hyperlink{structsysiosystem_1_1rex__order}{rex\+\_\+order}}, indexed\+\_\+by$<$"{}bytime"{}\+\_\+n, const\+\_\+mem\+\_\+fun$<$\mbox{\hyperlink{structsysiosystem_1_1rex__order}{rex\+\_\+order}}, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}, \&\mbox{\hyperlink{structsysiosystem_1_1rex__order_a01bc1a2b9157963d58c9d70fa54b51c9}{rex\+\_\+order\+::by\+\_\+time}}$>$ $>$ $>$ \mbox{\hyperlink{namespacesysiosystem_a518ded668c4cbb2b0868d24e3c43d02e}{sysiosystem\+::rex\+\_\+order\+\_\+table}}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00540}{540}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{namespacesysiosystem_a19b5da7cb8313e7e564b006879432fb1}\index{sysiosystem@{sysiosystem}!rex\_pool\_table@{rex\_pool\_table}}
+\index{rex\_pool\_table@{rex\_pool\_table}!sysiosystem@{sysiosystem}}
+\doxysubsubsection{\texorpdfstring{rex\_pool\_table}{rex\_pool\_table}}
+{\footnotesize\ttfamily \label{namespacesysiosystem_a19b5da7cb8313e7e564b006879432fb1} 
+typedef sysio\+::multi\+\_\+index$<$ "{}rexpool"{}\+\_\+n, \mbox{\hyperlink{structsysiosystem_1_1rex__pool}{rex\+\_\+pool}} $>$ \mbox{\hyperlink{namespacesysiosystem_a19b5da7cb8313e7e564b006879432fb1}{sysiosystem\+::rex\+\_\+pool\+\_\+table}}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00409}{409}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{namespacesysiosystem_a021421a7769ad3f4e2a2c629eb4fefd4}\index{sysiosystem@{sysiosystem}!rex\_return\_buckets\_table@{rex\_return\_buckets\_table}}
+\index{rex\_return\_buckets\_table@{rex\_return\_buckets\_table}!sysiosystem@{sysiosystem}}
+\doxysubsubsection{\texorpdfstring{rex\_return\_buckets\_table}{rex\_return\_buckets\_table}}
+{\footnotesize\ttfamily \label{namespacesysiosystem_a021421a7769ad3f4e2a2c629eb4fefd4} 
+typedef sysio\+::multi\+\_\+index$<$ "{}retbuckets"{}\+\_\+n, \mbox{\hyperlink{structsysiosystem_1_1rex__return__buckets}{rex\+\_\+return\+\_\+buckets}} $>$ \mbox{\hyperlink{namespacesysiosystem_a021421a7769ad3f4e2a2c629eb4fefd4}{sysiosystem\+::rex\+\_\+return\+\_\+buckets\+\_\+table}}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00455}{455}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{namespacesysiosystem_a38ac6cdd3285fe86755f4b280d2b85ee}\index{sysiosystem@{sysiosystem}!rex\_return\_pool\_table@{rex\_return\_pool\_table}}
+\index{rex\_return\_pool\_table@{rex\_return\_pool\_table}!sysiosystem@{sysiosystem}}
+\doxysubsubsection{\texorpdfstring{rex\_return\_pool\_table}{rex\_return\_pool\_table}}
+{\footnotesize\ttfamily \label{namespacesysiosystem_a38ac6cdd3285fe86755f4b280d2b85ee} 
+typedef sysio\+::multi\+\_\+index$<$ "{}rexretpool"{}\+\_\+n, \mbox{\hyperlink{structsysiosystem_1_1rex__return__pool}{rex\+\_\+return\+\_\+pool}} $>$ \mbox{\hyperlink{namespacesysiosystem_a38ac6cdd3285fe86755f4b280d2b85ee}{sysiosystem\+::rex\+\_\+return\+\_\+pool\+\_\+table}}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00436}{436}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{namespacesysiosystem_aeda3aa12065ee04f138f8538184b8e54}\index{sysiosystem@{sysiosystem}!user\_resources\_table@{user\_resources\_table}}
+\index{user\_resources\_table@{user\_resources\_table}!sysiosystem@{sysiosystem}}
+\doxysubsubsection{\texorpdfstring{user\_resources\_table}{user\_resources\_table}}
+{\footnotesize\ttfamily \label{namespacesysiosystem_aeda3aa12065ee04f138f8538184b8e54} 
+typedef sysio\+::multi\+\_\+index$<$ "{}userres"{}\+\_\+n, \mbox{\hyperlink{structsysiosystem_1_1user__resources}{user\+\_\+resources}} $>$ \mbox{\hyperlink{namespacesysiosystem_aeda3aa12065ee04f138f8538184b8e54}{sysiosystem\+::user\+\_\+resources\+\_\+table}}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00383}{383}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{namespacesysiosystem_aa9ab56bc489bc93d31995108b05e36d2}\index{sysiosystem@{sysiosystem}!voters\_table@{voters\_table}}
+\index{voters\_table@{voters\_table}!sysiosystem@{sysiosystem}}
+\doxysubsubsection{\texorpdfstring{voters\_table}{voters\_table}}
+{\footnotesize\ttfamily \label{namespacesysiosystem_aa9ab56bc489bc93d31995108b05e36d2} 
+typedef sysio\+::multi\+\_\+index$<$ "{}voters"{}\+\_\+n, \mbox{\hyperlink{structsysiosystem_1_1voter__info}{voter\+\_\+info}} $>$ \mbox{\hyperlink{namespacesysiosystem_aa9ab56bc489bc93d31995108b05e36d2}{sysiosystem\+::voters\+\_\+table}}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00323}{323}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacesysiosystem_aef52abde82b1b047f831dec402a48690}\index{sysiosystem@{sysiosystem}!calc\_powerup\_fee@{calc\_powerup\_fee}}
+\index{calc\_powerup\_fee@{calc\_powerup\_fee}!sysiosystem@{sysiosystem}}
+\doxysubsubsection{\texorpdfstring{calc\_powerup\_fee()}{calc\_powerup\_fee()}}
+{\footnotesize\ttfamily \label{namespacesysiosystem_aef52abde82b1b047f831dec402a48690} 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} sysiosystem\+::calc\+\_\+powerup\+\_\+fee (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysiosystem_1_1powerup__state__resource}{powerup\+\_\+state\+\_\+resource}} \&}]{state}{, }\item[{\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}}]{utilization\+\_\+increase}{}\end{DoxyParamCaption})}
+
+\begin{DoxyPrecond}{Precondition}
+0 \texorpdfstring{$<$}{<}= state.\+min\+\_\+price.\+amount \texorpdfstring{$<$}{<}= state.\+max\+\_\+price.\+amount 
+
+0 \texorpdfstring{$<$}{<} state.\+max\+\_\+price.\+amount 
+
+1.\+0 \texorpdfstring{$<$}{<}= state.\+exponent 
+
+0 \texorpdfstring{$<$}{<}= state.\+utilization \texorpdfstring{$<$}{<}= state.\+adjusted\+\_\+utilization \texorpdfstring{$<$}{<}= state.\+weight 
+
+0 \texorpdfstring{$<$}{<}= utilization\+\_\+increase \texorpdfstring{$<$}{<}= (state.\+weight -\/ state.\+utilization) 
+\end{DoxyPrecond}
+
+
+Definition at line \mbox{\hyperlink{powerup_8cpp_source_l00262}{262}} of file \mbox{\hyperlink{powerup_8cpp_source}{powerup.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00262\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00263\ \ \ \ \textcolor{keywordflow}{if}(\ utilization\_increase\ <=\ 0\ )\ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00264\ }
+\DoxyCodeLine{00265\ \ \ \ \textcolor{comment}{//\ Let\ p(u)\ =\ price\ as\ a\ function\ of\ the\ utilization\ fraction\ u\ which\ is\ defined\ for\ u\ in\ [0.0,\ 1.0].}}
+\DoxyCodeLine{00266\ \ \ \ \textcolor{comment}{//\ Let\ f(u)\ =\ integral\ of\ the\ price\ function\ p(x)\ from\ x\ =\ 0.0\ to\ x\ =\ u,\ again\ defined\ for\ u\ in\ [0.0,\ 1.0].}}
+\DoxyCodeLine{00267\ }
+\DoxyCodeLine{00268\ \ \ \ \textcolor{comment}{//\ In\ particular\ we\ choose\ f(u)\ =\ min\_price\ *\ u\ +\ ((max\_price\ -\/\ min\_price)\ /\ exponent)\ *\ (u\ \string^\ exponent).}}
+\DoxyCodeLine{00269\ \ \ \ \textcolor{comment}{//\ And\ so\ p(u)\ =\ min\_price\ +\ (max\_price\ -\/\ min\_price)\ *\ (u\ \string^\ (exponent\ -\/\ 1.0)).}}
+\DoxyCodeLine{00270\ }
+\DoxyCodeLine{00271\ \ \ \ \textcolor{comment}{//\ Returns\ f(double(end\_utilization)/state.weight)\ -\/\ f(double(start\_utilization)/state.weight)\ which\ is\ equivalent\ to}}
+\DoxyCodeLine{00272\ \ \ \ \textcolor{comment}{//\ the\ integral\ of\ p(x)\ from\ x\ =\ double(start\_utilization)/state.weight\ to\ x\ =\ double(end\_utilization)/state.weight.}}
+\DoxyCodeLine{00273\ \ \ \ \textcolor{comment}{//\ @pre\ 0\ <=\ start\_utilization\ <=\ end\_utilization\ <=\ state.weight}}
+\DoxyCodeLine{00274\ \ \ \ \textcolor{keyword}{auto}\ price\_integral\_delta\ =\ [\&\mbox{\hyperlink{structstate}{state}}](\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ start\_utilization,\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ end\_utilization)\ -\/>\ \textcolor{keywordtype}{double}\ \{}
+\DoxyCodeLine{00275\ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ coefficient\ =\ (\mbox{\hyperlink{structstate}{state}}.max\_price.amount\ -\/\ \mbox{\hyperlink{structstate}{state}}.min\_price.amount)\ /\ \mbox{\hyperlink{structstate}{state}}.exponent;}
+\DoxyCodeLine{00276\ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ start\_u\ \ \ \ \ =\ double(start\_utilization)\ /\ \mbox{\hyperlink{structstate}{state}}.weight;}
+\DoxyCodeLine{00277\ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ end\_u\ \ \ \ \ \ \ =\ double(end\_utilization)\ /\ \mbox{\hyperlink{structstate}{state}}.weight;}
+\DoxyCodeLine{00278\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structstate}{state}}.min\_price.amount\ *\ end\_u\ -\/\ \mbox{\hyperlink{structstate}{state}}.min\_price.amount\ *\ start\_u\ +}
+\DoxyCodeLine{00279\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ coefficient\ *\ std::pow(end\_u,\ \mbox{\hyperlink{structstate}{state}}.exponent)\ -\/\ coefficient\ *\ std::pow(start\_u,\ \mbox{\hyperlink{structstate}{state}}.exponent);}
+\DoxyCodeLine{00280\ \ \ \ \};}
+\DoxyCodeLine{00281\ }
+\DoxyCodeLine{00282\ \ \ \ \textcolor{comment}{//\ Returns\ p(double(utilization)/state.weight).}}
+\DoxyCodeLine{00283\ \ \ \ \textcolor{comment}{//\ @pre\ 0\ <=\ utilization\ <=\ state.weight}}
+\DoxyCodeLine{00284\ \ \ \ \textcolor{keyword}{auto}\ price\_function\ =\ [\&\mbox{\hyperlink{structstate}{state}}](\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ utilization)\ -\/>\ \textcolor{keywordtype}{double}\ \{}
+\DoxyCodeLine{00285\ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ price\ =\ \mbox{\hyperlink{structstate}{state}}.min\_price.amount;}
+\DoxyCodeLine{00286\ \ \ \ \ \ \ \textcolor{comment}{//\ state.exponent\ >=\ 1.0,\ therefore\ the\ exponent\ passed\ into\ std::pow\ is\ >=\ 0.0.}}
+\DoxyCodeLine{00287\ \ \ \ \ \ \ \textcolor{comment}{//\ Since\ the\ exponent\ passed\ into\ std::pow\ could\ be\ 0.0\ and\ simultaneously\ so\ could\ double(utilization)/state.weight,}}
+\DoxyCodeLine{00288\ \ \ \ \ \ \ \textcolor{comment}{//\ the\ safest\ thing\ to\ do\ is\ handle\ that\ as\ a\ special\ case\ explicitly\ rather\ than\ relying\ on\ std::pow\ to\ return\ 1.0}}
+\DoxyCodeLine{00289\ \ \ \ \ \ \ \textcolor{comment}{//\ instead\ of\ triggering\ a\ domain\ error.}}
+\DoxyCodeLine{00290\ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ new\_exponent\ =\ \mbox{\hyperlink{structstate}{state}}.exponent\ -\/\ 1.0;}
+\DoxyCodeLine{00291\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (new\_exponent\ <=\ 0.0)\ \{}
+\DoxyCodeLine{00292\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structstate}{state}}.max\_price.amount;}
+\DoxyCodeLine{00293\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00294\ \ \ \ \ \ \ \ \ \ price\ +=\ (\mbox{\hyperlink{structstate}{state}}.max\_price.amount\ -\/\ \mbox{\hyperlink{structstate}{state}}.min\_price.amount)\ *\ std::pow(\textcolor{keywordtype}{double}(utilization)\ /\ \mbox{\hyperlink{structstate}{state}}.weight,\ new\_exponent);}
+\DoxyCodeLine{00295\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00296\ }
+\DoxyCodeLine{00297\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ price;}
+\DoxyCodeLine{00298\ \ \ \ \};}
+\DoxyCodeLine{00299\ }
+\DoxyCodeLine{00300\ \ \ \ \textcolor{keywordtype}{double}\ \ fee\ =\ 0.0;}
+\DoxyCodeLine{00301\ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ start\_utilization\ =\ \mbox{\hyperlink{structstate}{state}}.utilization;}
+\DoxyCodeLine{00302\ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ end\_utilization\ \ \ =\ start\_utilization\ +\ utilization\_increase;}
+\DoxyCodeLine{00303\ }
+\DoxyCodeLine{00304\ \ \ \ \textcolor{keywordflow}{if}\ (start\_utilization\ <\ \mbox{\hyperlink{structstate}{state}}.adjusted\_utilization)\ \{}
+\DoxyCodeLine{00305\ \ \ \ \ \ \ fee\ +=\ price\_function(\mbox{\hyperlink{structstate}{state}}.adjusted\_utilization)\ *}
+\DoxyCodeLine{00306\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::min(utilization\_increase,\ \mbox{\hyperlink{structstate}{state}}.adjusted\_utilization\ -\/\ start\_utilization)\ /\ \mbox{\hyperlink{structstate}{state}}.weight;}
+\DoxyCodeLine{00307\ \ \ \ \ \ \ start\_utilization\ =\ \mbox{\hyperlink{structstate}{state}}.adjusted\_utilization;}
+\DoxyCodeLine{00308\ \ \ \ \}}
+\DoxyCodeLine{00309\ }
+\DoxyCodeLine{00310\ \ \ \ \textcolor{keywordflow}{if}\ (start\_utilization\ <\ end\_utilization)\ \{}
+\DoxyCodeLine{00311\ \ \ \ \ \ \ fee\ +=\ price\_integral\_delta(start\_utilization,\ end\_utilization);}
+\DoxyCodeLine{00312\ \ \ \ \}}
+\DoxyCodeLine{00313\ }
+\DoxyCodeLine{00314\ \ \ \ \textcolor{keywordflow}{return}\ std::ceil(fee);}
+\DoxyCodeLine{00315\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysiosystem_aef52abde82b1b047f831dec402a48690_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacesysiosystem_a5de3a548ea8323b8a776a119bd5bb724}\index{sysiosystem@{sysiosystem}!check\_auth\_change@{check\_auth\_change}}
+\index{check\_auth\_change@{check\_auth\_change}!sysiosystem@{sysiosystem}}
+\doxysubsubsection{\texorpdfstring{check\_auth\_change()}{check\_auth\_change()}}
+{\footnotesize\ttfamily \label{namespacesysiosystem_a5de3a548ea8323b8a776a119bd5bb724} 
+void sysiosystem\+::check\+\_\+auth\+\_\+change (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}}]{contract}{, }\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}}]{account}{, }\item[{const binary\+\_\+extension$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$ \&}]{authorized\+\_\+by}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{limit__auth__changes_8cpp_source_l00037}{37}} of file \mbox{\hyperlink{limit__auth__changes_8cpp_source}{limit\+\_\+auth\+\_\+changes.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\ by(authorized\_by.has\_value()\ ?\ authorized\_by.value().value\ :\ 0);}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(by.value)}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ sysio::require\_auth(\{account,\ by\});}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ limit\_auth\_change\_table\ table(contract,\ contract.value);}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ it\ =\ table.find(account.value);}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(it\ ==\ table.end())}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ sysio::check(by.value,\ \textcolor{stringliteral}{"{}authorized\_by\ is\ required\ for\ this\ account"{}});}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!it-\/>allow\_perms.empty())}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ sysio::check(}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \ \ \ std::find(it-\/>allow\_perms.begin(),\ it-\/>allow\_perms.end(),\ by)\ !=\ it-\/>allow\_perms.end(),}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}authorized\_by\ does\ not\ appear\ in\ allow\_perms"{}});}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ sysio::check(}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \ \ std::find(it-\/>disallow\_perms.begin(),\ it-\/>disallow\_perms.end(),\ by)\ ==\ it-\/>disallow\_perms.end(),}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}authorized\_by\ appears\ in\ disallow\_perms"{}});}
+\DoxyCodeLine{00054\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=324pt]{namespacesysiosystem_a5de3a548ea8323b8a776a119bd5bb724_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacesysiosystem_ac27d53bfd98cafb3f2da089102f5a490}\index{sysiosystem@{sysiosystem}!convert\_to\_block\_signing\_authority@{convert\_to\_block\_signing\_authority}}
+\index{convert\_to\_block\_signing\_authority@{convert\_to\_block\_signing\_authority}!sysiosystem@{sysiosystem}}
+\doxysubsubsection{\texorpdfstring{convert\_to\_block\_signing\_authority()}{convert\_to\_block\_signing\_authority()}}
+{\footnotesize\ttfamily \label{namespacesysiosystem_ac27d53bfd98cafb3f2da089102f5a490} 
+\mbox{\hyperlink{namespacesysio_1_1chain_a5d68aec4c925d17b62f0a9b543fabfc5}{sysio\+::block\+\_\+signing\+\_\+authority}} sysiosystem\+::convert\+\_\+to\+\_\+block\+\_\+signing\+\_\+authority (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1crypto_1_1r1_1_1public__key}{sysio\+::public\+\_\+key}} \&}]{producer\+\_\+key}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00200}{200}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1chain_1_1block__signing__authority__v0}{sysio::block\_signing\_authority\_v0}}\{\ .threshold\ =\ 1,\ .keys\ =\ \{\{producer\_key,\ 1\}\}\ \};}
+\DoxyCodeLine{00202\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysiosystem_ac27d53bfd98cafb3f2da089102f5a490_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacesysiosystem_ae2d9e67902c4107172b1eb64310251e5}\index{sysiosystem@{sysiosystem}!get\_continuous\_rate@{get\_continuous\_rate}}
+\index{get\_continuous\_rate@{get\_continuous\_rate}!sysiosystem@{sysiosystem}}
+\doxysubsubsection{\texorpdfstring{get\_continuous\_rate()}{get\_continuous\_rate()}}
+{\footnotesize\ttfamily \label{namespacesysiosystem_ae2d9e67902c4107172b1eb64310251e5} 
+double sysiosystem\+::get\+\_\+continuous\+\_\+rate (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}}]{annual\+\_\+rate}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8cpp_source_l00014}{14}} of file \mbox{\hyperlink{sysio_8system_8cpp_source}{sysio.\+system.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00014\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::log1p(\textcolor{keywordtype}{double}(annual\_rate)/\textcolor{keywordtype}{double}(100*inflation\_precision));}
+\DoxyCodeLine{00016\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysiosystem_ae2d9e67902c4107172b1eb64310251e5_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacesysiosystem_a41b99f8cd7ffeb86ed9c1be086f2ec22}\index{sysiosystem@{sysiosystem}!stake2vote@{stake2vote}}
+\index{stake2vote@{stake2vote}!sysiosystem@{sysiosystem}}
+\doxysubsubsection{\texorpdfstring{stake2vote()}{stake2vote()}}
+{\footnotesize\ttfamily \label{namespacesysiosystem_a41b99f8cd7ffeb86ed9c1be086f2ec22} 
+double sysiosystem\+::stake2vote (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}}]{staked}{}\end{DoxyParamCaption})}
+
+TODO subtract 2080 brings the large numbers closer to this decade
+
+Definition at line \mbox{\hyperlink{voting_8cpp_source_l00145}{145}} of file \mbox{\hyperlink{voting_8cpp_source}{voting.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ weight\ =\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}(\ (current\_time\_point().sec\_since\_epoch()\ -\/\ (block\_timestamp::block\_timestamp\_epoch\ /\ 1000))\ /\ (seconds\_per\_day\ *\ 7)\ )\ \ /\ double(\ 52\ );}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ double(staked)\ *\ std::pow(\ 2,\ weight\ );}
+\DoxyCodeLine{00149\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacesysiosystem_a02c0023b5bdc321b157afe535f641c55}\index{sysiosystem@{sysiosystem}!update\_utilization@{update\_utilization}}
+\index{update\_utilization@{update\_utilization}!sysiosystem@{sysiosystem}}
+\doxysubsubsection{\texorpdfstring{update\_utilization()}{update\_utilization()}}
+{\footnotesize\ttfamily \label{namespacesysiosystem_a02c0023b5bdc321b157afe535f641c55} 
+void sysiosystem\+::update\+\_\+utilization (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1time__point__sec}{time\+\_\+point\+\_\+sec}}}]{now}{, }\item[{\mbox{\hyperlink{structsysiosystem_1_1powerup__state__resource}{powerup\+\_\+state\+\_\+resource}} \&}]{res}{}\end{DoxyParamCaption})}
+
+\begin{DoxyPrecond}{Precondition}
+now \texorpdfstring{$>$}{>}= res.\+utilization\+\_\+timestamp 
+\end{DoxyPrecond}
+\begin{DoxyPostcond}{Postcondition}
+res.\+utilization \texorpdfstring{$<$}{<}= new res.\+adjusted\+\_\+utilization 
+
+if res.\+utilization \texorpdfstring{$<$}{<} old res.\+adjusted\+\_\+utilization, then new res.\+adjusted\+\_\+utilization \texorpdfstring{$<$}{<}= old res.\+adjusted\+\_\+utilization 
+
+if res.\+utilization \texorpdfstring{$>$}{>}= old res.\+adjusted\+\_\+utilization, then new res.\+adjusted\+\_\+utilization == res.\+utilization 
+\end{DoxyPostcond}
+
+
+Definition at line \mbox{\hyperlink{powerup_8cpp_source_l00105}{105}} of file \mbox{\hyperlink{powerup_8cpp_source}{powerup.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00106\ \ \ \ \textcolor{keywordflow}{if}\ (now\ <=\ res.\mbox{\hyperlink{structsysiosystem_1_1powerup__state__resource_aaa4afcb7dc5bd33be50830c4c14e3705}{utilization\_timestamp}})\ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00107\ }
+\DoxyCodeLine{00108\ \ \ \ \textcolor{keywordflow}{if}\ (res.\mbox{\hyperlink{structsysiosystem_1_1powerup__state__resource_afd423dc8fae1a13be14a6680f0428dd6}{utilization}}\ >=\ res.\mbox{\hyperlink{structsysiosystem_1_1powerup__state__resource_a558370c61c0a9ef4b116f3849ad5b494}{adjusted\_utilization}})\ \{}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ res.\mbox{\hyperlink{structsysiosystem_1_1powerup__state__resource_a558370c61c0a9ef4b116f3849ad5b494}{adjusted\_utilization}}\ =\ res.\mbox{\hyperlink{structsysiosystem_1_1powerup__state__resource_afd423dc8fae1a13be14a6680f0428dd6}{utilization}};}
+\DoxyCodeLine{00110\ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ \mbox{\hyperlink{jmp_8cpp_aca9876635a5afd01576dae38f10dc723}{diff}}\ \ =\ res.\mbox{\hyperlink{structsysiosystem_1_1powerup__state__resource_a558370c61c0a9ef4b116f3849ad5b494}{adjusted\_utilization}}\ -\/\ res.\mbox{\hyperlink{structsysiosystem_1_1powerup__state__resource_afd423dc8fae1a13be14a6680f0428dd6}{utilization}};}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ delta\ =\ \mbox{\hyperlink{jmp_8cpp_aca9876635a5afd01576dae38f10dc723}{diff}}\ *\ std::exp(-\/\textcolor{keywordtype}{double}(now.utc\_seconds\ -\/\ res.\mbox{\hyperlink{structsysiosystem_1_1powerup__state__resource_aaa4afcb7dc5bd33be50830c4c14e3705}{utilization\_timestamp}}.utc\_seconds)\ /\ \textcolor{keywordtype}{double}(res.\mbox{\hyperlink{structsysiosystem_1_1powerup__state__resource_abdafc9d5e96ed5dabd534e8225083aa1}{decay\_secs}}));}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ delta\ =\ std::clamp(\ delta,\ 0ll,\ \mbox{\hyperlink{jmp_8cpp_aca9876635a5afd01576dae38f10dc723}{diff}});}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ res.\mbox{\hyperlink{structsysiosystem_1_1powerup__state__resource_a558370c61c0a9ef4b116f3849ad5b494}{adjusted\_utilization}}\ =\ res.\mbox{\hyperlink{structsysiosystem_1_1powerup__state__resource_afd423dc8fae1a13be14a6680f0428dd6}{utilization}}\ +\ delta;}
+\DoxyCodeLine{00115\ \ \ \ \}}
+\DoxyCodeLine{00116\ \ \ \ res.\mbox{\hyperlink{structsysiosystem_1_1powerup__state__resource_aaa4afcb7dc5bd33be50830c4c14e3705}{utilization\_timestamp}}\ =\ now;}
+\DoxyCodeLine{00117\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=252pt]{namespacesysiosystem_a02c0023b5bdc321b157afe535f641c55_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=336pt]{namespacesysiosystem_a02c0023b5bdc321b157afe535f641c55_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacesysiosystem_a3d068598c53a51b1ed1d9782e9732f9e}\index{sysiosystem@{sysiosystem}!update\_weight@{update\_weight}}
+\index{update\_weight@{update\_weight}!sysiosystem@{sysiosystem}}
+\doxysubsubsection{\texorpdfstring{update\_weight()}{update\_weight()}}
+{\footnotesize\ttfamily \label{namespacesysiosystem_a3d068598c53a51b1ed1d9782e9732f9e} 
+void sysiosystem\+::update\+\_\+weight (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1time__point__sec}{time\+\_\+point\+\_\+sec}}}]{now}{, }\item[{\mbox{\hyperlink{structsysiosystem_1_1powerup__state__resource}{powerup\+\_\+state\+\_\+resource}} \&}]{res}{, }\item[{\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \&}]{delta\+\_\+available}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{powerup_8cpp_source_l00091}{91}} of file \mbox{\hyperlink{powerup_8cpp_source}{powerup.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00092\ \ \ \ \textcolor{keywordflow}{if}\ (now\ >=\ res.\mbox{\hyperlink{structsysiosystem_1_1powerup__state__resource_ab6f349d7ea3d3191600a1fb21f48a9de}{target\_timestamp}})\ \{}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ res.\mbox{\hyperlink{structsysiosystem_1_1powerup__state__resource_a05d8d68065b2519fe8a2402e1192640f}{weight\_ratio}}\ =\ res.\mbox{\hyperlink{structsysiosystem_1_1powerup__state__resource_ae501a9f3a65fbe90e26c38570a27b3b1}{target\_weight\_ratio}};}
+\DoxyCodeLine{00094\ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ res.\mbox{\hyperlink{structsysiosystem_1_1powerup__state__resource_a05d8d68065b2519fe8a2402e1192640f}{weight\_ratio}}\ =\ res.\mbox{\hyperlink{structsysiosystem_1_1powerup__state__resource_a3ea28db502c6d077566345821fa28416}{initial\_weight\_ratio}}\ +\ \textcolor{comment}{//}}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int128\_t(res.\mbox{\hyperlink{structsysiosystem_1_1powerup__state__resource_ae501a9f3a65fbe90e26c38570a27b3b1}{target\_weight\_ratio}}\ -\/\ res.\mbox{\hyperlink{structsysiosystem_1_1powerup__state__resource_a3ea28db502c6d077566345821fa28416}{initial\_weight\_ratio}})\ *}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (now.utc\_seconds\ -\/\ res.\mbox{\hyperlink{structsysiosystem_1_1powerup__state__resource_a64407e3d25c49c860defbdc9a8d56cf4}{initial\_timestamp}}.utc\_seconds)\ /}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (res.\mbox{\hyperlink{structsysiosystem_1_1powerup__state__resource_ab6f349d7ea3d3191600a1fb21f48a9de}{target\_timestamp}}.utc\_seconds\ -\/\ res.\mbox{\hyperlink{structsysiosystem_1_1powerup__state__resource_a64407e3d25c49c860defbdc9a8d56cf4}{initial\_timestamp}}.utc\_seconds);}
+\DoxyCodeLine{00099\ \ \ \ \}}
+\DoxyCodeLine{00100\ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ new\_weight\ \ \ \ =\ res.\mbox{\hyperlink{structsysiosystem_1_1powerup__state__resource_ae58913bdfb47036cd3a7077a522b32bf}{assumed\_stake\_weight}}\ *\ \mbox{\hyperlink{namespacesysio_1_1chain_a1bb5400f29594a546f9db9458b84600e}{int128\_t}}(powerup\_frac)\ /\ res.\mbox{\hyperlink{structsysiosystem_1_1powerup__state__resource_a05d8d68065b2519fe8a2402e1192640f}{weight\_ratio}}\ -\/\ res.\mbox{\hyperlink{structsysiosystem_1_1powerup__state__resource_ae58913bdfb47036cd3a7077a522b32bf}{assumed\_stake\_weight}};}
+\DoxyCodeLine{00101\ \ \ \ delta\_available\ +=\ new\_weight\ -\/\ res.\mbox{\hyperlink{structsysiosystem_1_1powerup__state__resource_a3982055a238765dcb0266efabf9573ef}{weight}};}
+\DoxyCodeLine{00102\ \ \ \ res.\mbox{\hyperlink{structsysiosystem_1_1powerup__state__resource_a3982055a238765dcb0266efabf9573ef}{weight}}\ =\ new\_weight;}
+\DoxyCodeLine{00103\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=336pt]{namespacesysiosystem_a3d068598c53a51b1ed1d9782e9732f9e_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacesysiosystem_aed36584da36967a186e611f01af041cc}\index{sysiosystem@{sysiosystem}!validate\_b1\_vesting@{validate\_b1\_vesting}}
+\index{validate\_b1\_vesting@{validate\_b1\_vesting}!sysiosystem@{sysiosystem}}
+\doxysubsubsection{\texorpdfstring{validate\_b1\_vesting()}{validate\_b1\_vesting()}}
+{\footnotesize\ttfamily \label{namespacesysiosystem_aed36584da36967a186e611f01af041cc} 
+void sysiosystem\+::validate\+\_\+b1\+\_\+vesting (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}}]{stake}{}\end{DoxyParamCaption})}
+
+Friday, June 1, 2018 12\+:00\+:00 AM UTC
+
+Tuesday, December 7, 2021 11\+:59\+:00 PM UTC
+
+Definition at line \mbox{\hyperlink{delegate__bandwidth_8cpp_source_l00161}{161}} of file \mbox{\hyperlink{delegate__bandwidth_8cpp_source}{delegate\+\_\+bandwidth.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ base\_time\ =\ 1527811200;\ }
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ current\_time\ =\ 1638921540;\ }
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ max\_claimable\ =\ 100'000'000'0000ll;}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ claimable\ =\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}(max\_claimable\ *\ \textcolor{keywordtype}{double}(current\_time\ -\/\ base\_time)\ /\ (10*seconds\_per\_year)\ );}
+\DoxyCodeLine{00166\ }
+\DoxyCodeLine{00167\ \ \ \ \ \ \ check(\ max\_claimable\ -\/\ claimable\ <=\ stake,\ \textcolor{stringliteral}{"{}b1\ can\ only\ claim\ their\ tokens\ over\ 10\ years"{}}\ );}
+\DoxyCodeLine{00168\ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{namespacesysiosystem_a0c870d7ce8b7146e2f9fbc64203aa0d0}\index{sysiosystem@{sysiosystem}!powerup\_frac@{powerup\_frac}}
+\index{powerup\_frac@{powerup\_frac}!sysiosystem@{sysiosystem}}
+\doxysubsubsection{\texorpdfstring{powerup\_frac}{powerup\_frac}}
+{\footnotesize\ttfamily \label{namespacesysiosystem_a0c870d7ce8b7146e2f9fbc64203aa0d0} 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} sysiosystem\+::powerup\+\_\+frac = 1\textquotesingle{}000\textquotesingle{}000\textquotesingle{}000\textquotesingle{}000\textquotesingle{}000ll\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00044}{44}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+

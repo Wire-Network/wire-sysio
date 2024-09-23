@@ -1,0 +1,112 @@
+\doxysection{sysio\+::wrap Class Reference}
+\hypertarget{classsysio_1_1wrap}{}\label{classsysio_1_1wrap}\index{sysio::wrap@{sysio::wrap}}
+
+
+{\ttfamily \#include $<$sysio.\+wrap.\+hpp$>$}
+
+
+
+Inheritance diagram for sysio\+::wrap\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=146pt]{classsysio_1_1wrap__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for sysio\+::wrap\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=146pt]{classsysio_1_1wrap__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{classsysio_1_1wrap_a5f891d8270db072d866f7fe0daab18cb}{exec\+\_\+action}} = sysio\+::action\+\_\+wrapper$<$"{}exec"{}\+\_\+n, \&\mbox{\hyperlink{classsysio_1_1wrap_a1b2aa35e1b8cfae8f43afb9e8c3b9eae}{wrap\+::exec}}$>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{classsysio_1_1wrap_a1b2aa35e1b8cfae8f43afb9e8c3b9eae}{exec}} (ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$ executer, ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1transaction}{transaction}} $>$ trx)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+The {\ttfamily \doxylink{classsysio_1_1wrap}{sysio.\+wrap}} system contract allows block producers to bypass authorization checks or run privileged actions with 15/21 producer approval and thus simplifies block producers superuser actions. It also makes these actions easier to audit.
+
+It does not give block producers any additional powers or privileges that do not already exist within the EOSIO based blockchains. As it is implemented, in an EOSIO based blockchain, 15/21 block producers can change an account\textquotesingle{}s permissions or modify an account\textquotesingle{}s contract code if they decided it is beneficial for the blockchain and community. However, the current method is opaque and leaves undesirable side effects on specific system accounts, and thus the {\ttfamily \doxylink{classsysio_1_1wrap}{sysio.\+wrap}}contract solves this matter by providing an easier method of executing important governance actions.
+
+The only action implemented by the {\ttfamily \doxylink{classsysio_1_1wrap}{sysio.\+wrap}} system contract is the {\ttfamily exec} action. This action allows for execution of a transaction, which is passed to the {\ttfamily exec} method in the form of a packed transaction in json format via the \textquotesingle{}trx\textquotesingle{} parameter and the {\ttfamily executer} account that executes the transaction. The same {\ttfamily executer} account will also be used to pay the RAM and CPU fees needed to execute the transaction. 
+
+Definition at line \mbox{\hyperlink{sysio_8wrap_8hpp_source_l00015}{15}} of file \mbox{\hyperlink{sysio_8wrap_8hpp_source}{sysio.\+wrap.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classsysio_1_1wrap_a5f891d8270db072d866f7fe0daab18cb}\index{sysio::wrap@{sysio::wrap}!exec\_action@{exec\_action}}
+\index{exec\_action@{exec\_action}!sysio::wrap@{sysio::wrap}}
+\doxysubsubsection{\texorpdfstring{exec\_action}{exec\_action}}
+{\footnotesize\ttfamily \label{classsysio_1_1wrap_a5f891d8270db072d866f7fe0daab18cb} 
+using \mbox{\hyperlink{classsysio_1_1wrap_a5f891d8270db072d866f7fe0daab18cb}{sysio\+::wrap\+::exec\+\_\+action}} = sysio\+::action\+\_\+wrapper$<$"{}exec"{}\+\_\+n, \&\mbox{\hyperlink{classsysio_1_1wrap_a1b2aa35e1b8cfae8f43afb9e8c3b9eae}{wrap\+::exec}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8wrap_8hpp_source_l00036}{36}} of file \mbox{\hyperlink{sysio_8wrap_8hpp_source}{sysio.\+wrap.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1wrap_a1b2aa35e1b8cfae8f43afb9e8c3b9eae}\index{sysio::wrap@{sysio::wrap}!exec@{exec}}
+\index{exec@{exec}!sysio::wrap@{sysio::wrap}}
+\doxysubsubsection{\texorpdfstring{exec()}{exec()}}
+{\footnotesize\ttfamily \label{classsysio_1_1wrap_a1b2aa35e1b8cfae8f43afb9e8c3b9eae} 
+void sysio\+::wrap\+::exec (\begin{DoxyParamCaption}\item[{ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$}]{executer}{, }\item[{ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1transaction}{transaction}} $>$}]{trx}{}\end{DoxyParamCaption})}
+
+Execute action.
+
+Execute a transaction while bypassing regular authorization checks.
+
+Preconditions\+:
+\begin{DoxyItemize}
+\item Requires authorization of \doxylink{classsysio_1_1wrap}{sysio.\+wrap} which needs to be a privileged account.
+\end{DoxyItemize}
+
+Postconditions\+:
+\begin{DoxyItemize}
+\item Deferred transaction RAM usage is billed to \textquotesingle{}executer\textquotesingle{} \texorpdfstring{$\ast$}{*}
+\end{DoxyItemize}
+
+
+\begin{DoxyParams}{Parameters}
+{\em executer} & -\/ account executing the transaction, \\
+\hline
+{\em trx} & -\/ the transaction to be executed. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{sysio_8wrap_8cpp_source_l00005}{5}} of file \mbox{\hyperlink{sysio_8wrap_8cpp_source}{sysio.\+wrap.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00005\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00006\ \ \ \ require\_auth(\ get\_self()\ );}
+\DoxyCodeLine{00007\ }
+\DoxyCodeLine{00008\ \ \ \ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ executer;}
+\DoxyCodeLine{00009\ \ \ \ \_ds\ >>\ executer;}
+\DoxyCodeLine{00010\ }
+\DoxyCodeLine{00011\ \ \ \ require\_auth(\ executer\ );}
+\DoxyCodeLine{00012\ }
+\DoxyCodeLine{00013\ \ \ \ send\_deferred(\ (\mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a376f631fcb770bd4b2e8349a33e52f8a}{uint128\_t}}(executer.value)\ <<\ 64)\ |\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})current\_time\_point().time\_since\_epoch().\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}(),\ executer,\ \_ds.pos(),\ \_ds.remaining()\ );}
+\DoxyCodeLine{00014\ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/svetlasyrimis/\+Desktop/wire-\/network/\+WN-\/org/wire-\/system-\/contracts/contracts/sysio.\+wrap/include/sysio.\+wrap/\mbox{\hyperlink{sysio_8wrap_8hpp}{sysio.\+wrap.\+hpp}}\item 
+/\+Users/svetlasyrimis/\+Desktop/wire-\/network/\+WN-\/org/wire-\/system-\/contracts/contracts/sysio.\+wrap/src/\mbox{\hyperlink{sysio_8wrap_8cpp}{sysio.\+wrap.\+cpp}}\end{DoxyCompactItemize}

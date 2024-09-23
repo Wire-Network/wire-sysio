@@ -1,0 +1,171 @@
+\doxysection{logger.\+hpp}
+\hypertarget{logger_8hpp_source}{}\label{logger_8hpp_source}\index{libraries/fc/include/fc/log/logger.hpp@{libraries/fc/include/fc/log/logger.hpp}}
+\mbox{\hyperlink{logger_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{string_8hpp}{fc/string.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{include_2fc_2time_8hpp}{fc/time.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{log__message_8hpp}{fc/log/log\_message.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00006}00006\ \textcolor{preprocessor}{\#ifndef\ DEFAULT\_LOGGER}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00007}\mbox{\hyperlink{logger_8hpp_a8c7a288fea519c7e895518f8dff4888f}{00007}}\ \textcolor{preprocessor}{\#define\ DEFAULT\_LOGGER\ "{}default"{}}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00008}00008\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00010}00010\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00011}00011\ \{}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00013}00013\ \ \ \ \textcolor{keyword}{class\ }appender;}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00025}\mbox{\hyperlink{classfc_1_1logger}{00025}}\ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classfc_1_1logger}{logger}}\ }
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00026}00026\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00027}00027\ \ \ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00028}00028\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classfc_1_1logger}{logger}}\ \mbox{\hyperlink{classfc_1_1logger_a4e12ef2e794551d593e497b4b90601ab}{get}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc::string}}\&\ \mbox{\hyperlink{classfc_1_1logger_ad8267d78496b4a3241148afd11fa2e03}{name}}\ =\ \mbox{\hyperlink{logger_8hpp_a8c7a288fea519c7e895518f8dff4888f}{DEFAULT\_LOGGER}}\ );}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00029}00029\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1logger_a2214632598874a4e52a5500a6346515e}{update}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc::string}}\&\ \mbox{\hyperlink{classfc_1_1logger_ad8267d78496b4a3241148afd11fa2e03}{name}},\ \mbox{\hyperlink{classfc_1_1logger}{logger}}\&\ log\ );}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00031}00031\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1logger_ac541c6ab75f50c5ed68967d857bcf61f}{logger}}();}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00032}00032\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1logger_ac541c6ab75f50c5ed68967d857bcf61f}{logger}}(\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\&\ \mbox{\hyperlink{classfc_1_1logger_ad8267d78496b4a3241148afd11fa2e03}{name}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1logger}{logger}}\&\ parent\ =\ \textcolor{keyword}{nullptr}\ );}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00033}\mbox{\hyperlink{classfc_1_1logger_aa80401fe80edd1fea76dbea15d01ce76}{00033}}\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1logger_aa80401fe80edd1fea76dbea15d01ce76}{logger}}(\ std::nullptr\_t\ );}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00034}00034\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1logger_ac541c6ab75f50c5ed68967d857bcf61f}{logger}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1logger}{logger}}\&\ c\ );}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00035}00035\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1logger_ac541c6ab75f50c5ed68967d857bcf61f}{logger}}(\ \mbox{\hyperlink{classfc_1_1logger}{logger}}\&\&\ c\ );}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00036}00036\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1logger_afb7a34b2276c8b909cef0b372aa26661}{\string~logger}}();}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00037}00037\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1logger}{logger}}\&\ \mbox{\hyperlink{classfc_1_1logger_a393c825c3bde5d27ff565e08ce2035de}{operator=}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1logger}{logger}}\&);}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00038}00038\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1logger}{logger}}\&\ \mbox{\hyperlink{classfc_1_1logger_a393c825c3bde5d27ff565e08ce2035de}{operator=}}(\mbox{\hyperlink{classfc_1_1logger}{logger}}\&\&);}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00039}\mbox{\hyperlink{classfc_1_1logger_ab2ee0eaa8aeb8e0da7fa6147fc615e58}{00039}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{friend}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classfc_1_1logger_ab2ee0eaa8aeb8e0da7fa6147fc615e58}{operator==}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1logger}{logger}}\&,\ \mbox{\hyperlink{namespacefc_aeffaff8d6d824699c60630a03055fd2f}{nullptr\_t}}\ );}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00040}\mbox{\hyperlink{classfc_1_1logger_a293b30207b513148f76f97b13af387ac}{00040}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{friend}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classfc_1_1logger_a293b30207b513148f76f97b13af387ac}{operator!=}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1logger}{logger}}\&,\ \mbox{\hyperlink{namespacefc_aeffaff8d6d824699c60630a03055fd2f}{nullptr\_t}}\ );}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00042}00042\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1logger}{logger}}\&\ \ \ \ \mbox{\hyperlink{classfc_1_1logger_a4c22e498cec41efb806fda9733662650}{set\_log\_level}}(\ \mbox{\hyperlink{classfc_1_1log__level}{log\_level}}\ e\ );}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00043}00043\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1log__level}{log\_level}}\ \ \mbox{\hyperlink{classfc_1_1logger_ab4ee187ac7a43ba90d16c93da35e9954}{get\_log\_level}}()\textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00044}00044\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1logger}{logger}}\&\ \ \ \ \mbox{\hyperlink{classfc_1_1logger_a8957908ed8f530c1b97a979552dd19e6}{set\_parent}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1logger}{logger}}\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}\ );}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00045}00045\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1logger}{logger}}\ \ \ \ \ \mbox{\hyperlink{classfc_1_1logger_a2d94a15c5f6573dc2a30828d3bb5b756}{get\_parent}}()\textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00047}00047\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \ \mbox{\hyperlink{classfc_1_1logger_a8e05d4d63c46991db440482752af9fd8}{set\_name}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc::string}}\&\ n\ );}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc::string}}\&\ \mbox{\hyperlink{classfc_1_1logger_ad8267d78496b4a3241148afd11fa2e03}{name}}()\textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00050}00050\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classfc_1_1logger_afbae9b6cd7f4f604f654a4c1914677ac}{is\_enabled}}(\ \mbox{\hyperlink{classfc_1_1log__level}{log\_level}}\ e\ )\textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00051}00051\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1logger_a8699bbd7c059f568f456b1446b97b0e4}{log}}(\ \mbox{\hyperlink{classfc_1_1log__message}{log\_message}}\ m\ );}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00052}00052\ }
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00053}00053\ \ \ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00054}\mbox{\hyperlink{classfc_1_1logger_acc32d9811f7b7f59003166237003957b}{00054}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{friend}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structfc_1_1log__config}{log\_config}};}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ add\_appender(\ \textcolor{keyword}{const}\ std::shared\_ptr<appender>\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ );}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00057}00057\ \ \ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classfc_1_1logger_1_1impl}{impl}};}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00059}00059\ \ \ \ \ \ \ \ \ \ std::shared\_ptr<impl>\ my;}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00060}00060\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00062}00062\ \}\ \textcolor{comment}{//\ namespace\ fc}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00064}00064\ \textcolor{comment}{//\ suppress\ warning\ "{}conditional\ expression\ is\ constant"{}\ in\ the\ while(0)\ for\ visual\ c++}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00065}00065\ \textcolor{comment}{//\ http://cnicholson.net/2009/03/stupid-\/c-\/tricks-\/dowhile0-\/and-\/c4127/}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00066}\mbox{\hyperlink{logger_8hpp_aca39b0acd8f2d04c4ab97b152d87557d}{00066}}\ \textcolor{preprocessor}{\#define\ FC\_MULTILINE\_MACRO\_BEGIN\ do\ \{}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00067}00067\ \textcolor{preprocessor}{\#ifdef\ \_MSC\_VER}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00068}00068\ \textcolor{preprocessor}{\#\ define\ FC\_MULTILINE\_MACRO\_END\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00069}00069\ \textcolor{preprocessor}{\ \ \ \ \_\_pragma(warning(push))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00070}00070\ \textcolor{preprocessor}{\ \ \ \ \_\_pragma(warning(disable:4127))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00071}00071\ \textcolor{preprocessor}{\ \ \ \ \}\ while\ (0)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00072}00072\ \textcolor{preprocessor}{\ \ \ \ \_\_pragma(warning(pop))}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00073}00073\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00074}\mbox{\hyperlink{logger_8hpp_a593df1a27f2ade3ef3418a67bae4ee9e}{00074}}\ \textcolor{preprocessor}{\#\ define\ FC\_MULTILINE\_MACRO\_END\ \ \}\ while\ (0)}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00075}00075\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00076}00076\ }
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00077}\mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{00077}}\ \textcolor{preprocessor}{\#define\ fc\_dlog(\ LOGGER,\ FORMAT,\ ...\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00078}00078\ \textcolor{preprocessor}{\ \ FC\_MULTILINE\_MACRO\_BEGIN\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00079}00079\ \textcolor{preprocessor}{\ \ \ if(\ (LOGGER).is\_enabled(\ fc::log\_level::debug\ )\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00080}00080\ \textcolor{preprocessor}{\ \ \ \ \ \ (LOGGER).log(\ FC\_LOG\_MESSAGE(\ debug,\ FORMAT,\ \_\_VA\_ARGS\_\_\ )\ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00081}00081\ \textcolor{preprocessor}{\ \ FC\_MULTILINE\_MACRO\_END}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00083}\mbox{\hyperlink{logger_8hpp_a067e87b091ade3787bcdda5775354654}{00083}}\ \textcolor{preprocessor}{\#define\ fc\_ilog(\ LOGGER,\ FORMAT,\ ...\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00084}00084\ \textcolor{preprocessor}{\ \ FC\_MULTILINE\_MACRO\_BEGIN\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00085}00085\ \textcolor{preprocessor}{\ \ \ if(\ (LOGGER).is\_enabled(\ fc::log\_level::info\ )\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00086}00086\ \textcolor{preprocessor}{\ \ \ \ \ \ (LOGGER).log(\ FC\_LOG\_MESSAGE(\ info,\ FORMAT,\ \_\_VA\_ARGS\_\_\ )\ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00087}00087\ \textcolor{preprocessor}{\ \ FC\_MULTILINE\_MACRO\_END}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00088}00088\ }
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00089}\mbox{\hyperlink{logger_8hpp_af3086372b1da6bfce45ff871734f2e8d}{00089}}\ \textcolor{preprocessor}{\#define\ fc\_wlog(\ LOGGER,\ FORMAT,\ ...\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00090}00090\ \textcolor{preprocessor}{\ \ FC\_MULTILINE\_MACRO\_BEGIN\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00091}00091\ \textcolor{preprocessor}{\ \ \ if(\ (LOGGER).is\_enabled(\ fc::log\_level::warn\ )\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00092}00092\ \textcolor{preprocessor}{\ \ \ \ \ \ (LOGGER).log(\ FC\_LOG\_MESSAGE(\ warn,\ FORMAT,\ \_\_VA\_ARGS\_\_\ )\ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00093}00093\ \textcolor{preprocessor}{\ \ FC\_MULTILINE\_MACRO\_END}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00094}00094\ }
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00095}\mbox{\hyperlink{logger_8hpp_ae75bea0ceb7483fdf0ed20c22556a907}{00095}}\ \textcolor{preprocessor}{\#define\ fc\_elog(\ LOGGER,\ FORMAT,\ ...\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00096}00096\ \textcolor{preprocessor}{\ \ FC\_MULTILINE\_MACRO\_BEGIN\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00097}00097\ \textcolor{preprocessor}{\ \ \ if(\ (LOGGER).is\_enabled(\ fc::log\_level::error\ )\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00098}00098\ \textcolor{preprocessor}{\ \ \ \ \ \ (LOGGER).log(\ FC\_LOG\_MESSAGE(\ error,\ FORMAT,\ \_\_VA\_ARGS\_\_\ )\ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00099}00099\ \textcolor{preprocessor}{\ \ FC\_MULTILINE\_MACRO\_END}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00100}00100\ }
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00101}\mbox{\hyperlink{logger_8hpp_a3da1571bad6ca6c94df9a3660b2115ee}{00101}}\ \textcolor{preprocessor}{\#define\ dlog(\ FORMAT,\ ...\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00102}00102\ \textcolor{preprocessor}{\ \ FC\_MULTILINE\_MACRO\_BEGIN\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00103}00103\ \textcolor{preprocessor}{\ \ \ if(\ (fc::logger::get(DEFAULT\_LOGGER)).is\_enabled(\ fc::log\_level::debug\ )\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00104}00104\ \textcolor{preprocessor}{\ \ \ \ \ \ (fc::logger::get(DEFAULT\_LOGGER)).log(\ FC\_LOG\_MESSAGE(\ debug,\ FORMAT,\ \_\_VA\_ARGS\_\_\ )\ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00105}00105\ \textcolor{preprocessor}{\ \ FC\_MULTILINE\_MACRO\_END}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00106}00106\ }
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00111}\mbox{\hyperlink{logger_8hpp_ac513cc2a5da0419b4e241277d20b37fb}{00111}}\ \textcolor{preprocessor}{\#define\ ulog(\ FORMAT,\ ...\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00112}00112\ \textcolor{preprocessor}{\ \ FC\_MULTILINE\_MACRO\_BEGIN\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00113}00113\ \textcolor{preprocessor}{\ \ \ if(\ (fc::logger::get("{}user"{})).is\_enabled(\ fc::log\_level::debug\ )\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00114}00114\ \textcolor{preprocessor}{\ \ \ \ \ \ (fc::logger::get("{}user"{})).log(\ FC\_LOG\_MESSAGE(\ debug,\ FORMAT,\ \_\_VA\_ARGS\_\_\ )\ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00115}00115\ \textcolor{preprocessor}{\ \ FC\_MULTILINE\_MACRO\_END}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00116}00116\ }
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00117}00117\ }
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00118}\mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{00118}}\ \textcolor{preprocessor}{\#define\ ilog(\ FORMAT,\ ...\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00119}00119\ \textcolor{preprocessor}{\ \ FC\_MULTILINE\_MACRO\_BEGIN\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00120}00120\ \textcolor{preprocessor}{\ \ \ if(\ (fc::logger::get(DEFAULT\_LOGGER)).is\_enabled(\ fc::log\_level::info\ )\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00121}00121\ \textcolor{preprocessor}{\ \ \ \ \ \ (fc::logger::get(DEFAULT\_LOGGER)).log(\ FC\_LOG\_MESSAGE(\ info,\ FORMAT,\ \_\_VA\_ARGS\_\_\ )\ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00122}00122\ \textcolor{preprocessor}{\ \ FC\_MULTILINE\_MACRO\_END}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00123}00123\ }
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00124}\mbox{\hyperlink{logger_8hpp_a1759e5c9691d8ad754bdf5eff8bb23ac}{00124}}\ \textcolor{preprocessor}{\#define\ wlog(\ FORMAT,\ ...\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00125}00125\ \textcolor{preprocessor}{\ \ FC\_MULTILINE\_MACRO\_BEGIN\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00126}00126\ \textcolor{preprocessor}{\ \ \ if(\ (fc::logger::get(DEFAULT\_LOGGER)).is\_enabled(\ fc::log\_level::warn\ )\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00127}00127\ \textcolor{preprocessor}{\ \ \ \ \ \ (fc::logger::get(DEFAULT\_LOGGER)).log(\ FC\_LOG\_MESSAGE(\ warn,\ FORMAT,\ \_\_VA\_ARGS\_\_\ )\ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00128}00128\ \textcolor{preprocessor}{\ \ FC\_MULTILINE\_MACRO\_END}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00129}00129\ }
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00130}\mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{00130}}\ \textcolor{preprocessor}{\#define\ elog(\ FORMAT,\ ...\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00131}00131\ \textcolor{preprocessor}{\ \ FC\_MULTILINE\_MACRO\_BEGIN\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00132}00132\ \textcolor{preprocessor}{\ \ \ if(\ (fc::logger::get(DEFAULT\_LOGGER)).is\_enabled(\ fc::log\_level::error\ )\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00133}00133\ \textcolor{preprocessor}{\ \ \ \ \ \ (fc::logger::get(DEFAULT\_LOGGER)).log(\ FC\_LOG\_MESSAGE(\ error,\ FORMAT,\ \_\_VA\_ARGS\_\_\ )\ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00134}00134\ \textcolor{preprocessor}{\ \ FC\_MULTILINE\_MACRO\_END}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00135}00135\ }
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00136}00136\ \textcolor{preprocessor}{\#include\ <boost/preprocessor/seq/for\_each.hpp>}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00137}00137\ \textcolor{preprocessor}{\#include\ <boost/preprocessor/seq/enum.hpp>}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00138}00138\ \textcolor{preprocessor}{\#include\ <boost/preprocessor/seq/size.hpp>}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00139}00139\ \textcolor{preprocessor}{\#include\ <boost/preprocessor/seq/seq.hpp>}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00140}00140\ \textcolor{preprocessor}{\#include\ <boost/preprocessor/stringize.hpp>}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00141}00141\ \textcolor{preprocessor}{\#include\ <boost/preprocessor/punctuation/paren.hpp>}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00142}00142\ }
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00143}00143\ }
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00144}\mbox{\hyperlink{logger_8hpp_a32d0170fcd76c3c02d02a4c27a9186b8}{00144}}\ \textcolor{preprocessor}{\#define\ FC\_FORMAT\_ARG(r,\ unused,\ base)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00145}00145\ \textcolor{preprocessor}{\ \ BOOST\_PP\_STRINGIZE(base)\ "{}:\ \$\{"{}\ BOOST\_PP\_STRINGIZE(\ base\ )\ "{}\}\ "{}}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00146}00146\ }
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00147}\mbox{\hyperlink{logger_8hpp_af736c3c039132f8054d706ebb5af5039}{00147}}\ \textcolor{preprocessor}{\#define\ FC\_FORMAT\_ARGS(r,\ unused,\ base)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00148}00148\ \textcolor{preprocessor}{\ \ BOOST\_PP\_LPAREN()\ BOOST\_PP\_STRINGIZE(base),fc::variant(base)\ BOOST\_PP\_RPAREN()}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00149}00149\ }
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00150}\mbox{\hyperlink{logger_8hpp_a3390a98a18a3f555157b7e8057d11529}{00150}}\ \textcolor{preprocessor}{\#define\ FC\_FORMAT(\ SEQ\ )\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00151}00151\ \textcolor{preprocessor}{\ \ \ \ BOOST\_PP\_SEQ\_FOR\_EACH(\ FC\_FORMAT\_ARG,\ v,\ SEQ\ )\ }}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00152}00152\ }
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00153}00153\ \textcolor{comment}{//\ takes\ a\ ...\ instead\ of\ a\ SEQ\ arg\ because\ it\ can\ be\ called\ with\ an\ empty\ SEQ\ }}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00154}00154\ \textcolor{comment}{//\ from\ FC\_CAPTURE\_AND\_THROW()}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00155}\mbox{\hyperlink{logger_8hpp_aeb3351df93084ed835f9ff7946cde4f7}{00155}}\ \textcolor{preprocessor}{\#define\ FC\_FORMAT\_ARG\_PARAMS(\ ...\ )\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00156}00156\ \textcolor{preprocessor}{\ \ \ \ BOOST\_PP\_SEQ\_FOR\_EACH(\ FC\_FORMAT\_ARGS,\ v,\ \_\_VA\_ARGS\_\_\ )\ }}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00157}00157\ }
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00158}\mbox{\hyperlink{logger_8hpp_ac7f967269d8cfcc4cab16d2ec7a04b91}{00158}}\ \textcolor{preprocessor}{\#define\ idump(\ SEQ\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00159}00159\ \textcolor{preprocessor}{\ \ \ \ ilog(\ FC\_FORMAT(SEQ),\ FC\_FORMAT\_ARG\_PARAMS(SEQ)\ )\ \ }}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00160}\mbox{\hyperlink{logger_8hpp_a4d1a1f9c3a9f914e9eb0363d72e5fff0}{00160}}\ \textcolor{preprocessor}{\#define\ wdump(\ SEQ\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00161}00161\ \textcolor{preprocessor}{\ \ \ \ wlog(\ FC\_FORMAT(SEQ),\ FC\_FORMAT\_ARG\_PARAMS(SEQ)\ )\ \ }}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00162}\mbox{\hyperlink{logger_8hpp_a26aaf645dd9dc96836635d6b18bd1090}{00162}}\ \textcolor{preprocessor}{\#define\ edump(\ SEQ\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00163}00163\ \textcolor{preprocessor}{\ \ \ \ elog(\ FC\_FORMAT(SEQ),\ FC\_FORMAT\_ARG\_PARAMS(SEQ)\ )\ \ }}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00164}00164\ }
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00165}00165\ \textcolor{comment}{//\ this\ disables\ all\ normal\ logging\ statements\ -\/-\/\ not\ something\ you'd\ normally\ want\ to\ do,}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00166}00166\ \textcolor{comment}{//\ but\ it's\ useful\ if\ you're\ benchmarking\ something\ and\ suspect\ logging\ is\ causing}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00167}00167\ \textcolor{comment}{//\ a\ slowdown.}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00168}00168\ \textcolor{preprocessor}{\#ifdef\ FC\_DISABLE\_LOGGING}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00169}00169\ \textcolor{preprocessor}{\#\ undef\ ulog}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00170}00170\ \textcolor{preprocessor}{\#\ define\ ulog(...)\ FC\_MULTILINE\_MACRO\_BEGIN\ FC\_MULTILINE\_MACRO\_END}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00171}00171\ \textcolor{preprocessor}{\#\ undef\ elog}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00172}00172\ \textcolor{preprocessor}{\#\ define\ elog(...)\ FC\_MULTILINE\_MACRO\_BEGIN\ FC\_MULTILINE\_MACRO\_END}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00173}00173\ \textcolor{preprocessor}{\#\ undef\ wlog}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00174}00174\ \textcolor{preprocessor}{\#\ define\ wlog(...)\ FC\_MULTILINE\_MACRO\_BEGIN\ FC\_MULTILINE\_MACRO\_END}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00175}00175\ \textcolor{preprocessor}{\#\ undef\ ilog}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00176}00176\ \textcolor{preprocessor}{\#\ define\ ilog(...)\ FC\_MULTILINE\_MACRO\_BEGIN\ FC\_MULTILINE\_MACRO\_END}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00177}00177\ \textcolor{preprocessor}{\#\ undef\ dlog}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00178}00178\ \textcolor{preprocessor}{\#\ define\ dlog(...)\ FC\_MULTILINE\_MACRO\_BEGIN\ FC\_MULTILINE\_MACRO\_END}}
+\DoxyCodeLine{\Hypertarget{logger_8hpp_source_l00179}00179\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

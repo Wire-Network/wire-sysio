@@ -1,0 +1,5 @@
+<map id="sysio::chain::global_property_object" name="sysio::chain::global_property_object">
+<area shape="rect" id="Node000001" title="Maintains global state information about block producer schedules and chain configuration parameters." alt="" coords="16,124,150,165"/>
+<area shape="rect" id="Node000002" href="$structchainbase_1_1object.html" title=" " alt="" coords="5,5,161,76"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="86,91,86,124,80,124,80,91"/>
+</map>

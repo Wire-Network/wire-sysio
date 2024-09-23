@@ -1,0 +1,7 @@
+<map id="softfloat_propagateNaNF128M" name="softfloat_propagateNaNF128M">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,205,56"/>
+<area shape="rect" id="Node000002" href="$softfloat_2source_28086-_s_s_e_2f128_m__is_signaling_na_n_8c.html#a641033e2d5605286e9cdd3e0bf651cb9" title=" " alt="" coords="253,5,407,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="205,30,237,26,237,31,205,35"/>
+<area shape="rect" id="Node000003" href="$softfloat_2source_28086-_s_s_e_2softfloat__raise_flags_8c.html#ac16bbf09eca0fe8ff91301d82c5a667f" title=" " alt="" coords="262,55,398,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="205,52,247,56,247,61,205,57"/>
+</map>

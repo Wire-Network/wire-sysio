@@ -1,0 +1,19 @@
+<map id="sysio::connection::resolve_and_connect" name="sysio::connection::resolve_and_connect">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,160,150,201"/>
+<area shape="rect" id="Node000002" href="$classfc_1_1time__point.html#aa164ff1268a16d4b32afcff181f6100e" title=" " alt="" coords="198,110,330,136"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="145,157,204,138,206,144,146,162"/>
+<area shape="rect" id="Node000008" href="$classsysio_1_1connection.html#aca3e3acacf8047c389e0bda758da197d" title=" " alt="" coords="198,160,330,201"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="150,178,183,178,183,183,150,183"/>
+<area shape="rect" id="Node000009" href="$namespacesysio.html#a9d60317a4b83cb3c91674336886005ee" title=" " alt="" coords="203,225,324,250"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="146,199,206,217,204,222,145,204"/>
+<area shape="rect" id="Node000003" href="$classfc_1_1mock__time__traits.html#a0bed781012a73b8c15882648397b56be" title=" " alt="" coords="378,5,518,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="287,107,377,57,388,51,390,56,379,61,289,112"/>
+<area shape="rect" id="Node000005" href="$classfc_1_1mock__time__traits.html#adddeebdf472c33f927827c111ddbf0b1" title=" " alt="" coords="378,71,518,111"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="330,109,363,103,364,108,331,114"/>
+<area shape="rect" id="Node000006" href="$classfc_1_1time__point.html#ab46781dcaab4880902bc136f36e39e5e" title=" " alt="" coords="382,136,515,177"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="331,132,366,139,366,144,330,138"/>
+<area shape="rect" id="Node000007" href="$classfc_1_1time__point.html#abfea5efbe9ef58024cda814395ee9945" title=" " alt="" coords="382,201,515,242"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="307,134,331,146,356,166,380,186,388,191,385,196,376,190,353,170,329,151,304,139"/>
+<area shape="rect" id="Node000004" href="$classfc_1_1mock__time__traits.html#a0d7245b32fd62b3bc712f658250cc4db" title=" " alt="" coords="566,13,739,38"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="519,23,551,23,551,28,519,28"/>
+</map>

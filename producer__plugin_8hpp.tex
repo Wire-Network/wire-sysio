@@ -1,0 +1,67 @@
+\doxysection{plugins/producer\+\_\+plugin/include/sysio/producer\+\_\+plugin/producer\+\_\+plugin.hpp File Reference}
+\hypertarget{producer__plugin_8hpp}{}\label{producer__plugin_8hpp}\index{plugins/producer\_plugin/include/sysio/producer\_plugin/producer\_plugin.hpp@{plugins/producer\_plugin/include/sysio/producer\_plugin/producer\_plugin.hpp}}
+{\ttfamily \#include $<$sysio/chain\+\_\+plugin/chain\+\_\+plugin.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/http\+\_\+client\+\_\+plugin/http\+\_\+client\+\_\+plugin.\+hpp$>$}\newline
+{\ttfamily \#include $<$appbase/application.\+hpp$>$}\newline
+Include dependency graph for producer\+\_\+plugin.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{producer__plugin_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{producer__plugin_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classsysio_1_1producer__plugin}{sysio\+::producer\+\_\+plugin}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1producer__plugin_1_1whitelist__blacklist}{sysio\+::producer\+\_\+plugin\+::whitelist\+\_\+blacklist}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1producer__plugin_1_1greylist__params}{sysio\+::producer\+\_\+plugin\+::greylist\+\_\+params}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1producer__plugin_1_1integrity__hash__information}{sysio\+::producer\+\_\+plugin\+::integrity\+\_\+hash\+\_\+information}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1producer__plugin_1_1snapshot__information}{sysio\+::producer\+\_\+plugin\+::snapshot\+\_\+information}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1producer__plugin_1_1scheduled__protocol__feature__activations}{sysio\+::producer\+\_\+plugin\+::scheduled\+\_\+protocol\+\_\+feature\+\_\+activations}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1producer__plugin_1_1get__supported__protocol__features__params}{sysio\+::producer\+\_\+plugin\+::get\+\_\+supported\+\_\+protocol\+\_\+features\+\_\+params}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1producer__plugin_1_1get__account__ram__corrections__params}{sysio\+::producer\+\_\+plugin\+::get\+\_\+account\+\_\+ram\+\_\+corrections\+\_\+params}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1producer__plugin_1_1get__account__ram__corrections__result}{sysio\+::producer\+\_\+plugin\+::get\+\_\+account\+\_\+ram\+\_\+corrections\+\_\+result}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{producer__plugin_8hpp_a3e1151bc8a0c952c7839e8df92d47674}{FC\+\_\+\+REFLECT}} (sysio\+::producer\+\_\+plugin\+::runtime\+\_\+options,(max\+\_\+transaction\+\_\+time)(max\+\_\+irreversible\+\_\+block\+\_\+age)(produce\+\_\+time\+\_\+offset\+\_\+us)(last\+\_\+block\+\_\+time\+\_\+offset\+\_\+us)(max\+\_\+scheduled\+\_\+transaction\+\_\+time\+\_\+per\+\_\+block\+\_\+ms)(subjective\+\_\+cpu\+\_\+leeway\+\_\+us)(incoming\+\_\+defer\+\_\+ratio)(greylist\+\_\+limit))
+\item 
+\mbox{\hyperlink{producer__plugin_8hpp_a220d234578d391182ed40bd7edcf3537}{FC\+\_\+\+REFLECT}} (\mbox{\hyperlink{structsysio_1_1producer__plugin_1_1greylist__params}{sysio\+::producer\+\_\+plugin\+::greylist\+\_\+params}},(accounts))
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{producer__plugin_8hpp_a220d234578d391182ed40bd7edcf3537}\index{producer\_plugin.hpp@{producer\_plugin.hpp}!FC\_REFLECT@{FC\_REFLECT}}
+\index{FC\_REFLECT@{FC\_REFLECT}!producer\_plugin.hpp@{producer\_plugin.hpp}}
+\doxysubsubsection{\texorpdfstring{FC\_REFLECT()}{FC\_REFLECT()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{producer__plugin_8hpp_a220d234578d391182ed40bd7edcf3537} 
+FC\+\_\+\+REFLECT (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1producer__plugin_1_1greylist__params}{sysio\+::producer\+\_\+plugin\+::greylist\+\_\+params}}}]{}{, }\item[{(accounts)}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{producer__plugin_8hpp_a3e1151bc8a0c952c7839e8df92d47674}\index{producer\_plugin.hpp@{producer\_plugin.hpp}!FC\_REFLECT@{FC\_REFLECT}}
+\index{FC\_REFLECT@{FC\_REFLECT}!producer\_plugin.hpp@{producer\_plugin.hpp}}
+\doxysubsubsection{\texorpdfstring{FC\_REFLECT()}{FC\_REFLECT()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{producer__plugin_8hpp_a3e1151bc8a0c952c7839e8df92d47674} 
+FC\+\_\+\+REFLECT (\begin{DoxyParamCaption}\item[{sysio\+::producer\+\_\+plugin\+::runtime\+\_\+options}]{}{, }\item[{(max\+\_\+transaction\+\_\+time)(max\+\_\+irreversible\+\_\+block\+\_\+age)(produce\+\_\+time\+\_\+offset\+\_\+us)(last\+\_\+block\+\_\+time\+\_\+offset\+\_\+us)(max\+\_\+scheduled\+\_\+transaction\+\_\+time\+\_\+per\+\_\+block\+\_\+ms)(subjective\+\_\+cpu\+\_\+leeway\+\_\+us)(incoming\+\_\+defer\+\_\+ratio)(greylist\+\_\+limit)}]{}{}\end{DoxyParamCaption})}
+

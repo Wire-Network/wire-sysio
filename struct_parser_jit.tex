@@ -1,0 +1,143 @@
+\doxysection{Parser\+Jit\texorpdfstring{$<$}{<} Iterator \texorpdfstring{$>$}{>} Struct Template Reference}
+\hypertarget{struct_parser_jit}{}\label{struct_parser_jit}\index{ParserJit$<$ Iterator $>$@{ParserJit$<$ Iterator $>$}}
+
+
+Inheritance diagram for Parser\+Jit\texorpdfstring{$<$}{<} Iterator \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=215pt]{struct_parser_jit__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Parser\+Jit\texorpdfstring{$<$}{<} Iterator \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_parser_jit__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_parser_jit_aced71b7f0b9c2d932d2db05b0c873728}{Parser\+Jit}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+boost\+::spirit\+::qi\+::rule$<$ Iterator, boost\+::spirit\+::ascii\+::space\+\_\+type $>$ \mbox{\hyperlink{struct_parser_jit_aab33bb077c67352eabdadcc701861a0b}{expression}}
+\item 
+boost\+::spirit\+::qi\+::rule$<$ Iterator, boost\+::spirit\+::ascii\+::space\+\_\+type $>$ \mbox{\hyperlink{struct_parser_jit_af0a8d5836c24c89ec3f794631d283ce3}{term}}
+\item 
+boost\+::spirit\+::qi\+::rule$<$ Iterator, boost\+::spirit\+::ascii\+::space\+\_\+type $>$ \mbox{\hyperlink{struct_parser_jit_aa00d8fdbc9ba878b4c87fc9a0e77f02f}{factor}}
+\item 
+\mbox{\hyperlink{class_jit}{Jit}} \mbox{\hyperlink{struct_parser_jit_a0bf6be16d955a16b8a1180a1bb56ae88}{code\+\_\+}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Iterator$>$\newline
+struct Parser\+Jit$<$ Iterator $>$}
+
+
+Definition at line \mbox{\hyperlink{calc2_8cpp_source_l00228}{228}} of file \mbox{\hyperlink{calc2_8cpp_source}{calc2.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{struct_parser_jit_aced71b7f0b9c2d932d2db05b0c873728}\index{ParserJit$<$ Iterator $>$@{ParserJit$<$ Iterator $>$}!ParserJit@{ParserJit}}
+\index{ParserJit@{ParserJit}!ParserJit$<$ Iterator $>$@{ParserJit$<$ Iterator $>$}}
+\doxysubsubsection{\texorpdfstring{ParserJit()}{ParserJit()}}
+{\footnotesize\ttfamily \label{struct_parser_jit_aced71b7f0b9c2d932d2db05b0c873728} 
+template$<$typename Iterator $>$ \\
+\mbox{\hyperlink{struct_parser_jit}{Parser\+Jit}}$<$ Iterator $>$\mbox{\hyperlink{struct_parser_jit}{\+::\+Parser\+Jit}} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{calc2_8cpp_source_l00231}{231}} of file \mbox{\hyperlink{calc2_8cpp_source}{calc2.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00232\ \ \ \ \ \ \ \ \ :\ ParserJit::base\_type(\mbox{\hyperlink{struct_parser_jit_aab33bb077c67352eabdadcc701861a0b}{expression}})}
+\DoxyCodeLine{00233\ \ \ \ \ \{}
+\DoxyCodeLine{00234\ \ \ \ \ \ \ \ \ \textcolor{keyword}{namespace\ }qi\ =\ boost::spirit::qi;}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ namespace\ }qi::labels;}
+\DoxyCodeLine{00236\ }
+\DoxyCodeLine{00237\ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ }boost::phoenix::ref;}
+\DoxyCodeLine{00238\ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ }boost::phoenix::push\_back;}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ }boost::phoenix::bind;}
+\DoxyCodeLine{00240\ }
+\DoxyCodeLine{00241\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_parser_jit_aab33bb077c67352eabdadcc701861a0b}{expression}}\ =\ \mbox{\hyperlink{struct_parser_jit_af0a8d5836c24c89ec3f794631d283ce3}{term}}\ >>\ *((\textcolor{charliteral}{'+'}\ >\ \mbox{\hyperlink{struct_parser_jit_af0a8d5836c24c89ec3f794631d283ce3}{term}}[bind(\&\mbox{\hyperlink{class_jit_a0e719ae3cfa17e3ff3c28a8c99f0229f}{Jit::genAdd}},\ ref(\mbox{\hyperlink{struct_parser_jit_a0bf6be16d955a16b8a1180a1bb56ae88}{code\_}}))])}
+\DoxyCodeLine{00242\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ (\textcolor{charliteral}{'-\/'}\ >\ \mbox{\hyperlink{struct_parser_jit_af0a8d5836c24c89ec3f794631d283ce3}{term}}[bind(\&\mbox{\hyperlink{class_jit_aba91f9ad9a200f6fcddb29692d389aa6}{Jit::genSub}},\ ref(\mbox{\hyperlink{struct_parser_jit_a0bf6be16d955a16b8a1180a1bb56ae88}{code\_}}))]));}
+\DoxyCodeLine{00243\ }
+\DoxyCodeLine{00244\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_parser_jit_af0a8d5836c24c89ec3f794631d283ce3}{term}}\ =\ \mbox{\hyperlink{struct_parser_jit_aa00d8fdbc9ba878b4c87fc9a0e77f02f}{factor}}\ >>\ *((\textcolor{charliteral}{'*'}\ >\ \mbox{\hyperlink{struct_parser_jit_aa00d8fdbc9ba878b4c87fc9a0e77f02f}{factor}}[bind(\&\mbox{\hyperlink{class_jit_a8e69669449ed5996b1cd1d0f2a99ac1a}{Jit::genMul}},\ ref(\mbox{\hyperlink{struct_parser_jit_a0bf6be16d955a16b8a1180a1bb56ae88}{code\_}}))])}
+\DoxyCodeLine{00245\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ (\textcolor{charliteral}{'/'}\ >\ \mbox{\hyperlink{struct_parser_jit_aa00d8fdbc9ba878b4c87fc9a0e77f02f}{factor}}[bind(\&\mbox{\hyperlink{class_jit_aa46a239ebb56bb0e5374fee189b5a0a5}{Jit::genDiv}},\ ref(\mbox{\hyperlink{struct_parser_jit_a0bf6be16d955a16b8a1180a1bb56ae88}{code\_}}))]));}
+\DoxyCodeLine{00246\ }
+\DoxyCodeLine{00247\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_parser_jit_aa00d8fdbc9ba878b4c87fc9a0e77f02f}{factor}}\ =\ qi::double\_[bind(\&\mbox{\hyperlink{class_jit_a8d2c4acf1de05c208c57b72eda237237}{Jit::genPush}},\ ref(\mbox{\hyperlink{struct_parser_jit_a0bf6be16d955a16b8a1180a1bb56ae88}{code\_}}),\ \_1)]}
+\DoxyCodeLine{00248\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ qi::lit(\textcolor{charliteral}{'x'})[bind(\&\mbox{\hyperlink{class_jit_a8bda7554d2e4a6d0d926b6300fdc61d7}{Jit::genVarX}},\ ref(\mbox{\hyperlink{struct_parser_jit_a0bf6be16d955a16b8a1180a1bb56ae88}{code\_}}))]}
+\DoxyCodeLine{00249\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ (\textcolor{charliteral}{'('}\ >\ \mbox{\hyperlink{struct_parser_jit_aab33bb077c67352eabdadcc701861a0b}{expression}}\ >\ \textcolor{charliteral}{')'})}
+\DoxyCodeLine{00250\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ (\textcolor{charliteral}{'-\/'}\ >\ \mbox{\hyperlink{struct_parser_jit_aa00d8fdbc9ba878b4c87fc9a0e77f02f}{factor}}[bind(\&\mbox{\hyperlink{class_jit_ad0fb5659b4c999ef649e53143f4f0853}{Jit::genNeg}},\ ref(\mbox{\hyperlink{struct_parser_jit_a0bf6be16d955a16b8a1180a1bb56ae88}{code\_}}))])}
+\DoxyCodeLine{00251\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ (\textcolor{charliteral}{'+'}\ >\ \mbox{\hyperlink{struct_parser_jit_aa00d8fdbc9ba878b4c87fc9a0e77f02f}{factor}});}
+\DoxyCodeLine{00252\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_parser_jit_aced71b7f0b9c2d932d2db05b0c873728_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_parser_jit_a0bf6be16d955a16b8a1180a1bb56ae88}\index{ParserJit$<$ Iterator $>$@{ParserJit$<$ Iterator $>$}!code\_@{code\_}}
+\index{code\_@{code\_}!ParserJit$<$ Iterator $>$@{ParserJit$<$ Iterator $>$}}
+\doxysubsubsection{\texorpdfstring{code\_}{code\_}}
+{\footnotesize\ttfamily \label{struct_parser_jit_a0bf6be16d955a16b8a1180a1bb56ae88} 
+template$<$typename Iterator $>$ \\
+\mbox{\hyperlink{class_jit}{Jit}} \mbox{\hyperlink{struct_parser_jit}{Parser\+Jit}}$<$ Iterator $>$\+::code\+\_\+}
+
+
+
+Definition at line \mbox{\hyperlink{calc2_8cpp_source_l00230}{230}} of file \mbox{\hyperlink{calc2_8cpp_source}{calc2.\+cpp}}.
+
+\Hypertarget{struct_parser_jit_aab33bb077c67352eabdadcc701861a0b}\index{ParserJit$<$ Iterator $>$@{ParserJit$<$ Iterator $>$}!expression@{expression}}
+\index{expression@{expression}!ParserJit$<$ Iterator $>$@{ParserJit$<$ Iterator $>$}}
+\doxysubsubsection{\texorpdfstring{expression}{expression}}
+{\footnotesize\ttfamily \label{struct_parser_jit_aab33bb077c67352eabdadcc701861a0b} 
+template$<$typename Iterator $>$ \\
+boost\+::spirit\+::qi\+::rule$<$Iterator, boost\+::spirit\+::ascii\+::space\+\_\+type$>$ \mbox{\hyperlink{struct_parser_jit}{Parser\+Jit}}$<$ Iterator $>$\+::expression}
+
+
+
+Definition at line \mbox{\hyperlink{calc2_8cpp_source_l00229}{229}} of file \mbox{\hyperlink{calc2_8cpp_source}{calc2.\+cpp}}.
+
+\Hypertarget{struct_parser_jit_aa00d8fdbc9ba878b4c87fc9a0e77f02f}\index{ParserJit$<$ Iterator $>$@{ParserJit$<$ Iterator $>$}!factor@{factor}}
+\index{factor@{factor}!ParserJit$<$ Iterator $>$@{ParserJit$<$ Iterator $>$}}
+\doxysubsubsection{\texorpdfstring{factor}{factor}}
+{\footnotesize\ttfamily \label{struct_parser_jit_aa00d8fdbc9ba878b4c87fc9a0e77f02f} 
+template$<$typename Iterator $>$ \\
+boost\+::spirit\+::qi\+::rule$<$Iterator, boost\+::spirit\+::ascii\+::space\+\_\+type$>$ \mbox{\hyperlink{struct_parser_jit}{Parser\+Jit}}$<$ Iterator $>$\+::factor}
+
+
+
+Definition at line \mbox{\hyperlink{calc2_8cpp_source_l00229}{229}} of file \mbox{\hyperlink{calc2_8cpp_source}{calc2.\+cpp}}.
+
+\Hypertarget{struct_parser_jit_af0a8d5836c24c89ec3f794631d283ce3}\index{ParserJit$<$ Iterator $>$@{ParserJit$<$ Iterator $>$}!term@{term}}
+\index{term@{term}!ParserJit$<$ Iterator $>$@{ParserJit$<$ Iterator $>$}}
+\doxysubsubsection{\texorpdfstring{term}{term}}
+{\footnotesize\ttfamily \label{struct_parser_jit_af0a8d5836c24c89ec3f794631d283ce3} 
+template$<$typename Iterator $>$ \\
+boost\+::spirit\+::qi\+::rule$<$Iterator, boost\+::spirit\+::ascii\+::space\+\_\+type$>$ \mbox{\hyperlink{struct_parser_jit}{Parser\+Jit}}$<$ Iterator $>$\+::term}
+
+
+
+Definition at line \mbox{\hyperlink{calc2_8cpp_source_l00229}{229}} of file \mbox{\hyperlink{calc2_8cpp_source}{calc2.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/libraries/ff/depends/xbyak/sample/\mbox{\hyperlink{calc2_8cpp}{calc2.\+cpp}}\end{DoxyCompactItemize}

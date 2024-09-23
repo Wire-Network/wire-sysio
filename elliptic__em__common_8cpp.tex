@@ -1,0 +1,79 @@
+\doxysection{libraries/fc/src/crypto/elliptic\+\_\+em\+\_\+common.cpp File Reference}
+\hypertarget{elliptic__em__common_8cpp}{}\label{elliptic__em__common_8cpp}\index{libraries/fc/src/crypto/elliptic\_em\_common.cpp@{libraries/fc/src/crypto/elliptic\_em\_common.cpp}}
+{\ttfamily \#include $<$fc/crypto/base58.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/crypto/elliptic.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/crypto/elliptic\+\_\+em.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/io/raw.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/crypto/hmac.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/crypto/openssl.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/crypto/ripemd160.\+hpp$>$}\newline
+{\ttfamily \#include $<$alloca.\+h$>$}\newline
+Include dependency graph for elliptic\+\_\+em\+\_\+common.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{elliptic__em__common_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacefc}{fc}}
+\begin{DoxyCompactList}\small\item\em namespace \doxylink{namespacesysio_1_1chain}{sysio\+::chain} \end{DoxyCompactList}\item 
+namespace \mbox{\hyperlink{namespacefc_1_1em}{fc\+::em}}
+\item 
+namespace \mbox{\hyperlink{namespacefc_1_1em_1_1detail}{fc\+::em\+::detail}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{elliptic__em__common_8cpp_aecf069285f56d4ea910d77b70a8c5843}{BTC\+\_\+\+EXT\+\_\+\+PUB\+\_\+\+MAGIC}}~(0x0488\+B21E)
+\item 
+\#define \mbox{\hyperlink{elliptic__em__common_8cpp_aba9bcacbfb7b867ec3157c72644229ca}{BTC\+\_\+\+EXT\+\_\+\+PRIV\+\_\+\+MAGIC}}~(0x0488\+ADE4)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1sha256}{fc\+::sha256}} \mbox{\hyperlink{namespacefc_1_1em_1_1detail_a93ee9919f6873935e98b8b4e6a0a6d2b}{fc\+::em\+::detail\+::\+\_\+left}} (const \mbox{\hyperlink{classfc_1_1sha512}{fc\+::sha512}} \&v)
+\item 
+\mbox{\hyperlink{classfc_1_1sha256}{fc\+::sha256}} \mbox{\hyperlink{namespacefc_1_1em_1_1detail_aba71216ae4f9ef97c6fc369da4c73949}{fc\+::em\+::detail\+::\+\_\+right}} (const \mbox{\hyperlink{classfc_1_1sha512}{fc\+::sha512}} \&v)
+\item 
+\mbox{\hyperlink{namespacefc_1_1em_1_1detail_a9c0569f79125636061ea2de8ce7e72e4}{chr37}} \mbox{\hyperlink{namespacefc_1_1em_1_1detail_a93816298a63426acda0480565941ae0f}{fc\+::em\+::detail\+::\+\_\+derive\+\_\+message}} (const \mbox{\hyperlink{namespacefc_1_1em_a1627d67937daf81f9156f8e630b6578c}{public\+\_\+key\+\_\+data}} \&key, int i)
+\item 
+const ec\+\_\+group \& \mbox{\hyperlink{namespacefc_1_1em_1_1detail_a9202ff2d16099cd15727f70839b339bf}{fc\+::em\+::detail\+::get\+\_\+curve}} ()
+\item 
+const private\+\_\+key\+\_\+secret \& \mbox{\hyperlink{namespacefc_1_1em_1_1detail_a65fd8894fa465fa022db3d60c3a5a896}{fc\+::em\+::detail\+::get\+\_\+curve\+\_\+order}} ()
+\item 
+const private\+\_\+key\+\_\+secret \& \mbox{\hyperlink{namespacefc_1_1em_1_1detail_af64d3f2a7d95222e4791e20b73c89855}{fc\+::em\+::detail\+::get\+\_\+half\+\_\+curve\+\_\+order}} ()
+\item 
+void \mbox{\hyperlink{namespacefc_a61d89d3b2913f40f8a94aed7c241011a}{fc\+::to\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1em_1_1private__key}{em\+::private\+\_\+key}} \&var, \mbox{\hyperlink{classfc_1_1variant}{variant}} \&vo)
+\item 
+void \mbox{\hyperlink{namespacefc_aaf71cf15f468f78447911bc96f281f03}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{variant}} \&var, \mbox{\hyperlink{classfc_1_1em_1_1private__key}{em\+::private\+\_\+key}} \&vo)
+\item 
+void \mbox{\hyperlink{namespacefc_a38400bca4e54bbb859ad1c9aaaf0a6e8}{fc\+::to\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1em_1_1public__key}{em\+::public\+\_\+key}} \&var, \mbox{\hyperlink{classfc_1_1variant}{variant}} \&vo)
+\item 
+void \mbox{\hyperlink{namespacefc_aafd2377171149c102be2b1b693ea8787}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{variant}} \&var, \mbox{\hyperlink{classfc_1_1em_1_1public__key}{em\+::public\+\_\+key}} \&vo)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{elliptic__em__common_8cpp_aba9bcacbfb7b867ec3157c72644229ca}\index{elliptic\_em\_common.cpp@{elliptic\_em\_common.cpp}!BTC\_EXT\_PRIV\_MAGIC@{BTC\_EXT\_PRIV\_MAGIC}}
+\index{BTC\_EXT\_PRIV\_MAGIC@{BTC\_EXT\_PRIV\_MAGIC}!elliptic\_em\_common.cpp@{elliptic\_em\_common.cpp}}
+\doxysubsubsection{\texorpdfstring{BTC\_EXT\_PRIV\_MAGIC}{BTC\_EXT\_PRIV\_MAGIC}}
+{\footnotesize\ttfamily \label{elliptic__em__common_8cpp_aba9bcacbfb7b867ec3157c72644229ca} 
+\#define BTC\+\_\+\+EXT\+\_\+\+PRIV\+\_\+\+MAGIC~(0x0488\+ADE4)}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic__em__common_8cpp_source_l00020}{20}} of file \mbox{\hyperlink{elliptic__em__common_8cpp_source}{elliptic\+\_\+em\+\_\+common.\+cpp}}.
+
+\Hypertarget{elliptic__em__common_8cpp_aecf069285f56d4ea910d77b70a8c5843}\index{elliptic\_em\_common.cpp@{elliptic\_em\_common.cpp}!BTC\_EXT\_PUB\_MAGIC@{BTC\_EXT\_PUB\_MAGIC}}
+\index{BTC\_EXT\_PUB\_MAGIC@{BTC\_EXT\_PUB\_MAGIC}!elliptic\_em\_common.cpp@{elliptic\_em\_common.cpp}}
+\doxysubsubsection{\texorpdfstring{BTC\_EXT\_PUB\_MAGIC}{BTC\_EXT\_PUB\_MAGIC}}
+{\footnotesize\ttfamily \label{elliptic__em__common_8cpp_aecf069285f56d4ea910d77b70a8c5843} 
+\#define BTC\+\_\+\+EXT\+\_\+\+PUB\+\_\+\+MAGIC~(0x0488\+B21E)}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic__em__common_8cpp_source_l00019}{19}} of file \mbox{\hyperlink{elliptic__em__common_8cpp_source}{elliptic\+\_\+em\+\_\+common.\+cpp}}.
+

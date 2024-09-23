@@ -1,0 +1,9 @@
+<map id="libff::alt_bn128_G1::is_special" name="libff::alt_bn128_G1::is_special">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,41,136,82"/>
+<area shape="rect" id="Node000002" href="$classlibff_1_1alt__bn128___g1.html#a9da4b7d0889e203316db553a7444b385" title=" " alt="" coords="208,5,338,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="136,47,192,37,193,43,137,53"/>
+<area shape="rect" id="Node000004" href="$classlibff_1_1_fp__model.html#a408a92e1b8192eaac73e5eab3a092070" title=" " alt="" coords="184,70,363,126"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="137,71,169,76,168,82,136,76"/>
+<area shape="rect" id="Node000003" href="$classlibff_1_1_fp__model.html#a121b2621e9557b86faa6806774f42837" title=" " alt="" coords="411,13,568,38"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="339,23,396,23,396,28,339,28"/>
+</map>

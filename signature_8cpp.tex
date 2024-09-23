@@ -1,0 +1,45 @@
+\doxysection{libraries/fc/src/crypto/signature.cpp File Reference}
+\hypertarget{signature_8cpp}{}\label{signature_8cpp}\index{libraries/fc/src/crypto/signature.cpp@{libraries/fc/src/crypto/signature.cpp}}
+{\ttfamily \#include $<$fc/crypto/signature.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/crypto/common.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/exception/exception.\+hpp$>$}\newline
+Include dependency graph for signature.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{signature_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structfc_1_1crypto_1_1hash__visitor}{fc\+::crypto\+::hash\+\_\+visitor}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1crypto_1_1overloaded}{fc\+::crypto\+::overloaded$<$ Ts $>$}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacefc}{fc}}
+\begin{DoxyCompactList}\small\item\em namespace \doxylink{namespacesysio_1_1chain}{sysio\+::chain} \end{DoxyCompactList}\item 
+namespace \mbox{\hyperlink{namespacefc_1_1crypto}{fc\+::crypto}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$class... Ts$>$ }\\\mbox{\hyperlink{namespacefc_1_1crypto_a31718e1baf7ba5d37f8a233db473eedf}{fc\+::crypto\+::overloaded}} (Ts...) -\/$>$ overloaded$<$ Ts... $>$
+\item 
+std\+::ostream \& \mbox{\hyperlink{namespacefc_1_1crypto_a62f3fb1b619cf4626e59a824dad86927}{fc\+::crypto\+::operator$<$$<$}} (std\+::ostream \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, const \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{signature}} \&k)
+\item 
+bool \mbox{\hyperlink{namespacefc_1_1crypto_a343a6b1e3b0ead69d8e4fa16f56c03a3}{fc\+::crypto\+::operator==}} (const \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{signature}} \&p1, const \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{signature}} \&p2)
+\item 
+bool \mbox{\hyperlink{namespacefc_1_1crypto_a9ad2136c8dd3aae7a497e810a6a5ae6d}{fc\+::crypto\+::operator!=}} (const \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{signature}} \&p1, const \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{signature}} \&p2)
+\item 
+bool \mbox{\hyperlink{namespacefc_1_1crypto_a5aec096f07e3df869bfeb098ce5d7349}{fc\+::crypto\+::operator$<$}} (const \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{signature}} \&p1, const \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{signature}} \&p2)
+\item 
+size\+\_\+t \mbox{\hyperlink{namespacefc_1_1crypto_a94acf114d8936bc8b79952c01d3a84fe}{fc\+::crypto\+::hash\+\_\+value}} (const \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{signature}} \&b)
+\item 
+void \mbox{\hyperlink{namespacefc_a973cc5e78100b1312d14f405dcb0ccd6}{fc\+::to\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{crypto\+::signature}} \&var, \mbox{\hyperlink{classfc_1_1variant}{variant}} \&vo, const \mbox{\hyperlink{namespacefc_a978f9e97f64eb2ce6cbe892d3cc93397}{fc\+::yield\+\_\+function\+\_\+t}} \&yield=\mbox{\hyperlink{namespacefc_a978f9e97f64eb2ce6cbe892d3cc93397}{fc\+::yield\+\_\+function\+\_\+t}}())
+\item 
+void \mbox{\hyperlink{namespacefc_a5df83b6ab6fb04781a438ac3ad62970b}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{variant}} \&var, \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{crypto\+::signature}} \&vo)
+\end{DoxyCompactItemize}

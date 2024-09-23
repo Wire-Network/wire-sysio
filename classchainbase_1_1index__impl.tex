@@ -1,0 +1,361 @@
+\doxysection{chainbase\+::index\+\_\+impl\texorpdfstring{$<$}{<} Base\+Index \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classchainbase_1_1index__impl}{}\label{classchainbase_1_1index__impl}\index{chainbase::index\_impl$<$ BaseIndex $>$@{chainbase::index\_impl$<$ BaseIndex $>$}}
+
+
+{\ttfamily \#include $<$chainbase.\+hpp$>$}
+
+
+
+Inheritance diagram for chainbase\+::index\+\_\+impl\texorpdfstring{$<$}{<} Base\+Index \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=193pt]{classchainbase_1_1index__impl__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for chainbase\+::index\+\_\+impl\texorpdfstring{$<$}{<} Base\+Index \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=193pt]{classchainbase_1_1index__impl__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classchainbase_1_1index__impl_ad0e17e7fc55ae28d3c24b6431cfb88d9}{index\+\_\+impl}} (Base\+Index \&base)
+\item 
+virtual unique\+\_\+ptr$<$ \mbox{\hyperlink{classchainbase_1_1abstract__session}{abstract\+\_\+session}} $>$ \mbox{\hyperlink{classchainbase_1_1index__impl_a37d274e3dab46146132c8f2c9e16ffaf}{start\+\_\+undo\+\_\+session}} (bool enabled) override
+\item 
+virtual void \mbox{\hyperlink{classchainbase_1_1index__impl_aea66d0d68a1b77c603d04fdec5708d9b}{set\+\_\+revision}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{classchainbase_1_1index__impl_a58bec3224f3613f34590a98120121621}{revision}}) override
+\item 
+virtual \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{classchainbase_1_1index__impl_a58bec3224f3613f34590a98120121621}{revision}} () const override
+\item 
+virtual void \mbox{\hyperlink{classchainbase_1_1index__impl_a0d8a7b495849376d70abedd338cd0ea8}{undo}} () const override
+\item 
+virtual void \mbox{\hyperlink{classchainbase_1_1index__impl_aadb98ff6c524d6013ffccf80b50936b8}{squash}} () const override
+\item 
+virtual void \mbox{\hyperlink{classchainbase_1_1index__impl_a750b8876694e1d659d9d06a269463075}{commit}} (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{classchainbase_1_1index__impl_a58bec3224f3613f34590a98120121621}{revision}}) const override
+\item 
+virtual void \mbox{\hyperlink{classchainbase_1_1index__impl_ac7d2724a774bbf18eb804d7f3ebbb76e}{undo\+\_\+all}} () const override
+\item 
+virtual \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classchainbase_1_1index__impl_a15c607949abbedfc0a5761144cd61729}{type\+\_\+id}} () const override
+\item 
+virtual \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{classchainbase_1_1index__impl_ad642978440a4f892bd57328c8f11ad02}{row\+\_\+count}} () const override
+\item 
+virtual const std\+::string \& \mbox{\hyperlink{classchainbase_1_1index__impl_a028d63fc318191f93930d8e44dca6048}{type\+\_\+name}} () const override
+\item 
+virtual std\+::pair$<$ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}, \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} $>$ \mbox{\hyperlink{classchainbase_1_1index__impl_a95301c4d013399875b77666ff3144d9d}{undo\+\_\+stack\+\_\+revision\+\_\+range}} () const override
+\item 
+virtual void \mbox{\hyperlink{classchainbase_1_1index__impl_abca36d34cfd673d5602aed01fce2437e}{remove\+\_\+object}} (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{code__cache_8cpp_aa0efefe21f4700d78692edc823e763be}{id}}) override
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classchainbase_1_1abstract__index}{chainbase\+::abstract\+\_\+index}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classchainbase_1_1abstract__index_ab87f0755ea957145b06a0b6fd7211932}{abstract\+\_\+index}} (void \texorpdfstring{$\ast$}{*}i)
+\item 
+virtual \mbox{\hyperlink{classchainbase_1_1abstract__index_a5165c137eaf3cd6a7019b526812ee514}{\texorpdfstring{$\sim$}{\string~}abstract\+\_\+index}} ()
+\item 
+void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classchainbase_1_1abstract__index_abcb58573b32f59721d898ba53e04133e}{get}} () const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Base\+Index$>$\newline
+class chainbase\+::index\+\_\+impl$<$ Base\+Index $>$}
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00185}{185}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classchainbase_1_1index__impl_ad0e17e7fc55ae28d3c24b6431cfb88d9}\index{chainbase::index\_impl$<$ BaseIndex $>$@{chainbase::index\_impl$<$ BaseIndex $>$}!index\_impl@{index\_impl}}
+\index{index\_impl@{index\_impl}!chainbase::index\_impl$<$ BaseIndex $>$@{chainbase::index\_impl$<$ BaseIndex $>$}}
+\doxysubsubsection{\texorpdfstring{index\_impl()}{index\_impl()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1index__impl_ad0e17e7fc55ae28d3c24b6431cfb88d9} 
+template$<$typename Base\+Index $>$ \\
+\mbox{\hyperlink{classchainbase_1_1index__impl}{chainbase\+::index\+\_\+impl}}$<$ Base\+Index $>$\+::index\+\_\+impl (\begin{DoxyParamCaption}\item[{Base\+Index \&}]{base}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00187}{187}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00187\ :\mbox{\hyperlink{classchainbase_1_1abstract__index_ab87f0755ea957145b06a0b6fd7211932}{abstract\_index}}(\ \&base\ ),\_base(base)\{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classchainbase_1_1index__impl_a750b8876694e1d659d9d06a269463075}\index{chainbase::index\_impl$<$ BaseIndex $>$@{chainbase::index\_impl$<$ BaseIndex $>$}!commit@{commit}}
+\index{commit@{commit}!chainbase::index\_impl$<$ BaseIndex $>$@{chainbase::index\_impl$<$ BaseIndex $>$}}
+\doxysubsubsection{\texorpdfstring{commit()}{commit()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1index__impl_a750b8876694e1d659d9d06a269463075} 
+template$<$typename Base\+Index $>$ \\
+virtual void \mbox{\hyperlink{classchainbase_1_1index__impl}{chainbase\+::index\+\_\+impl}}$<$ Base\+Index $>$\+::commit (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}}]{revision}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classchainbase_1_1abstract__index_a14f76f6b884e87e5cd99ba10e0dcd1ec}{chainbase\+::abstract\+\_\+index}}.
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00197}{197}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00197\ \{\ \_base.commit(\mbox{\hyperlink{classchainbase_1_1index__impl_a58bec3224f3613f34590a98120121621}{revision}});\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=342pt]{classchainbase_1_1index__impl_a750b8876694e1d659d9d06a269463075_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classchainbase_1_1index__impl_abca36d34cfd673d5602aed01fce2437e}\index{chainbase::index\_impl$<$ BaseIndex $>$@{chainbase::index\_impl$<$ BaseIndex $>$}!remove\_object@{remove\_object}}
+\index{remove\_object@{remove\_object}!chainbase::index\_impl$<$ BaseIndex $>$@{chainbase::index\_impl$<$ BaseIndex $>$}}
+\doxysubsubsection{\texorpdfstring{remove\_object()}{remove\_object()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1index__impl_abca36d34cfd673d5602aed01fce2437e} 
+template$<$typename Base\+Index $>$ \\
+virtual void \mbox{\hyperlink{classchainbase_1_1index__impl}{chainbase\+::index\+\_\+impl}}$<$ Base\+Index $>$\+::remove\+\_\+object (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}}]{id}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classchainbase_1_1abstract__index_ac61e9c755ddde5e123e43304dde40f1d}{chainbase\+::abstract\+\_\+index}}.
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00204}{204}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00204\ \{\ \textcolor{keywordflow}{return}\ \_base.remove\_object(\ \textcolor{keywordtype}{id}\ );\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classchainbase_1_1index__impl_a58bec3224f3613f34590a98120121621}\index{chainbase::index\_impl$<$ BaseIndex $>$@{chainbase::index\_impl$<$ BaseIndex $>$}!revision@{revision}}
+\index{revision@{revision}!chainbase::index\_impl$<$ BaseIndex $>$@{chainbase::index\_impl$<$ BaseIndex $>$}}
+\doxysubsubsection{\texorpdfstring{revision()}{revision()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1index__impl_a58bec3224f3613f34590a98120121621} 
+template$<$typename Base\+Index $>$ \\
+virtual \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{classchainbase_1_1index__impl}{chainbase\+::index\+\_\+impl}}$<$ Base\+Index $>$\+::revision (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classchainbase_1_1abstract__index_a5d516edfe41f7652301047157ae9637a}{chainbase\+::abstract\+\_\+index}}.
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00194}{194}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00194\ \{\ \textcolor{keywordflow}{return}\ \_base.revision();\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=342pt]{classchainbase_1_1index__impl_a58bec3224f3613f34590a98120121621_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classchainbase_1_1index__impl_ad642978440a4f892bd57328c8f11ad02}\index{chainbase::index\_impl$<$ BaseIndex $>$@{chainbase::index\_impl$<$ BaseIndex $>$}!row\_count@{row\_count}}
+\index{row\_count@{row\_count}!chainbase::index\_impl$<$ BaseIndex $>$@{chainbase::index\_impl$<$ BaseIndex $>$}}
+\doxysubsubsection{\texorpdfstring{row\_count()}{row\_count()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1index__impl_ad642978440a4f892bd57328c8f11ad02} 
+template$<$typename Base\+Index $>$ \\
+virtual \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{classchainbase_1_1index__impl}{chainbase\+::index\+\_\+impl}}$<$ Base\+Index $>$\+::row\+\_\+count (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classchainbase_1_1abstract__index_ae099b07231f83f5bbe8907e8664603ef}{chainbase\+::abstract\+\_\+index}}.
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00200}{200}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00200\ \{\ \textcolor{keywordflow}{return}\ \_base.indices().size();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classchainbase_1_1index__impl_aea66d0d68a1b77c603d04fdec5708d9b}\index{chainbase::index\_impl$<$ BaseIndex $>$@{chainbase::index\_impl$<$ BaseIndex $>$}!set\_revision@{set\_revision}}
+\index{set\_revision@{set\_revision}!chainbase::index\_impl$<$ BaseIndex $>$@{chainbase::index\_impl$<$ BaseIndex $>$}}
+\doxysubsubsection{\texorpdfstring{set\_revision()}{set\_revision()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1index__impl_aea66d0d68a1b77c603d04fdec5708d9b} 
+template$<$typename Base\+Index $>$ \\
+virtual void \mbox{\hyperlink{classchainbase_1_1index__impl}{chainbase\+::index\+\_\+impl}}$<$ Base\+Index $>$\+::set\+\_\+revision (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{revision}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classchainbase_1_1abstract__index_afbbf53c11335ab092f9ae9ad61ab4713}{chainbase\+::abstract\+\_\+index}}.
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00193}{193}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00193\ \{\ \_base.set\_revision(\ \mbox{\hyperlink{classchainbase_1_1index__impl_a58bec3224f3613f34590a98120121621}{revision}}\ );\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=342pt]{classchainbase_1_1index__impl_aea66d0d68a1b77c603d04fdec5708d9b_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classchainbase_1_1index__impl_aadb98ff6c524d6013ffccf80b50936b8}\index{chainbase::index\_impl$<$ BaseIndex $>$@{chainbase::index\_impl$<$ BaseIndex $>$}!squash@{squash}}
+\index{squash@{squash}!chainbase::index\_impl$<$ BaseIndex $>$@{chainbase::index\_impl$<$ BaseIndex $>$}}
+\doxysubsubsection{\texorpdfstring{squash()}{squash()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1index__impl_aadb98ff6c524d6013ffccf80b50936b8} 
+template$<$typename Base\+Index $>$ \\
+virtual void \mbox{\hyperlink{classchainbase_1_1index__impl}{chainbase\+::index\+\_\+impl}}$<$ Base\+Index $>$\+::squash (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classchainbase_1_1abstract__index_ab3da2a8b3f20754bfb48fe69e7e54022}{chainbase\+::abstract\+\_\+index}}.
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00196}{196}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00196\ \{\ \_base.squash();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classchainbase_1_1index__impl_a37d274e3dab46146132c8f2c9e16ffaf}\index{chainbase::index\_impl$<$ BaseIndex $>$@{chainbase::index\_impl$<$ BaseIndex $>$}!start\_undo\_session@{start\_undo\_session}}
+\index{start\_undo\_session@{start\_undo\_session}!chainbase::index\_impl$<$ BaseIndex $>$@{chainbase::index\_impl$<$ BaseIndex $>$}}
+\doxysubsubsection{\texorpdfstring{start\_undo\_session()}{start\_undo\_session()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1index__impl_a37d274e3dab46146132c8f2c9e16ffaf} 
+template$<$typename Base\+Index $>$ \\
+virtual unique\+\_\+ptr$<$ \mbox{\hyperlink{classchainbase_1_1abstract__session}{abstract\+\_\+session}} $>$ \mbox{\hyperlink{classchainbase_1_1index__impl}{chainbase\+::index\+\_\+impl}}$<$ Base\+Index $>$\+::start\+\_\+undo\+\_\+session (\begin{DoxyParamCaption}\item[{bool}]{enabled}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classchainbase_1_1abstract__index_a10a45a95a0c0d7eebbd9ccae923aa0ad}{chainbase\+::abstract\+\_\+index}}.
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00189}{189}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ unique\_ptr<abstract\_session>(\textcolor{keyword}{new}\ session\_impl<typename\ BaseIndex::session>(\ \_base.start\_undo\_session(\ enabled\ )\ )\ );}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classchainbase_1_1index__impl_a15c607949abbedfc0a5761144cd61729}\index{chainbase::index\_impl$<$ BaseIndex $>$@{chainbase::index\_impl$<$ BaseIndex $>$}!type\_id@{type\_id}}
+\index{type\_id@{type\_id}!chainbase::index\_impl$<$ BaseIndex $>$@{chainbase::index\_impl$<$ BaseIndex $>$}}
+\doxysubsubsection{\texorpdfstring{type\_id()}{type\_id()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1index__impl_a15c607949abbedfc0a5761144cd61729} 
+template$<$typename Base\+Index $>$ \\
+virtual \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classchainbase_1_1index__impl}{chainbase\+::index\+\_\+impl}}$<$ Base\+Index $>$\+::type\+\_\+id (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classchainbase_1_1abstract__index_af88f60ca72249096329fb9a59c4010ca}{chainbase\+::abstract\+\_\+index}}.
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00199}{199}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00199\ \{\ \textcolor{keywordflow}{return}\ BaseIndex::value\_type::type\_id;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classchainbase_1_1index__impl_a028d63fc318191f93930d8e44dca6048}\index{chainbase::index\_impl$<$ BaseIndex $>$@{chainbase::index\_impl$<$ BaseIndex $>$}!type\_name@{type\_name}}
+\index{type\_name@{type\_name}!chainbase::index\_impl$<$ BaseIndex $>$@{chainbase::index\_impl$<$ BaseIndex $>$}}
+\doxysubsubsection{\texorpdfstring{type\_name()}{type\_name()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1index__impl_a028d63fc318191f93930d8e44dca6048} 
+template$<$typename Base\+Index $>$ \\
+virtual const std\+::string \& \mbox{\hyperlink{classchainbase_1_1index__impl}{chainbase\+::index\+\_\+impl}}$<$ Base\+Index $>$\+::type\+\_\+name (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classchainbase_1_1abstract__index_ae4794e898d22bc8b1102ddf05c0be6a0}{chainbase\+::abstract\+\_\+index}}.
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00201}{201}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00201\ \{\ \textcolor{keywordflow}{return}\ BaseIndex\_name;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classchainbase_1_1index__impl_a0d8a7b495849376d70abedd338cd0ea8}\index{chainbase::index\_impl$<$ BaseIndex $>$@{chainbase::index\_impl$<$ BaseIndex $>$}!undo@{undo}}
+\index{undo@{undo}!chainbase::index\_impl$<$ BaseIndex $>$@{chainbase::index\_impl$<$ BaseIndex $>$}}
+\doxysubsubsection{\texorpdfstring{undo()}{undo()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1index__impl_a0d8a7b495849376d70abedd338cd0ea8} 
+template$<$typename Base\+Index $>$ \\
+virtual void \mbox{\hyperlink{classchainbase_1_1index__impl}{chainbase\+::index\+\_\+impl}}$<$ Base\+Index $>$\+::undo (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classchainbase_1_1abstract__index_a71f1306a939617ecf6e12998f611de41}{chainbase\+::abstract\+\_\+index}}.
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00195}{195}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00195\ \{\ \_base.undo();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classchainbase_1_1index__impl_ac7d2724a774bbf18eb804d7f3ebbb76e}\index{chainbase::index\_impl$<$ BaseIndex $>$@{chainbase::index\_impl$<$ BaseIndex $>$}!undo\_all@{undo\_all}}
+\index{undo\_all@{undo\_all}!chainbase::index\_impl$<$ BaseIndex $>$@{chainbase::index\_impl$<$ BaseIndex $>$}}
+\doxysubsubsection{\texorpdfstring{undo\_all()}{undo\_all()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1index__impl_ac7d2724a774bbf18eb804d7f3ebbb76e} 
+template$<$typename Base\+Index $>$ \\
+virtual void \mbox{\hyperlink{classchainbase_1_1index__impl}{chainbase\+::index\+\_\+impl}}$<$ Base\+Index $>$\+::undo\+\_\+all (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classchainbase_1_1abstract__index_a2ad4109af3219e4dd6c06ccb580e0645}{chainbase\+::abstract\+\_\+index}}.
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00198}{198}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00198\ \{\_base.undo\_all();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classchainbase_1_1index__impl_a95301c4d013399875b77666ff3144d9d}\index{chainbase::index\_impl$<$ BaseIndex $>$@{chainbase::index\_impl$<$ BaseIndex $>$}!undo\_stack\_revision\_range@{undo\_stack\_revision\_range}}
+\index{undo\_stack\_revision\_range@{undo\_stack\_revision\_range}!chainbase::index\_impl$<$ BaseIndex $>$@{chainbase::index\_impl$<$ BaseIndex $>$}}
+\doxysubsubsection{\texorpdfstring{undo\_stack\_revision\_range()}{undo\_stack\_revision\_range()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1index__impl_a95301c4d013399875b77666ff3144d9d} 
+template$<$typename Base\+Index $>$ \\
+virtual std\+::pair$<$ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}, \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} $>$ \mbox{\hyperlink{classchainbase_1_1index__impl}{chainbase\+::index\+\_\+impl}}$<$ Base\+Index $>$\+::undo\+\_\+stack\+\_\+revision\+\_\+range (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classchainbase_1_1abstract__index_ade4f38f88a3d165ede21d6dc9b14e055}{chainbase\+::abstract\+\_\+index}}.
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00202}{202}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00202\ \{\ \textcolor{keywordflow}{return}\ \_base.undo\_stack\_revision\_range();\ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chainbase/include/chainbase/\mbox{\hyperlink{chainbase_8hpp}{chainbase.\+hpp}}\end{DoxyCompactItemize}

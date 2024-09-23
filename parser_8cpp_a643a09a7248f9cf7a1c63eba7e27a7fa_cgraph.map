@@ -1,0 +1,19 @@
+<map id="BOOST_AUTO_TEST_CASE" name="BOOST_AUTO_TEST_CASE">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,117,202,142"/>
+<area shape="rect" id="Node000002" href="$namespacewebsocketpp_1_1http_1_1parser.html#ac13fb3aca2101c9e6d2ee14039f1a758" title="Extract HTTP attributes." alt="" coords="250,109,416,150"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="202,127,234,127,234,132,202,132"/>
+<area shape="rect" id="Node000003" href="$namespacewebsocketpp_1_1http_1_1parser.html#a263c7c466bbed56948d5877b9c33c354" title="Read and discard linear whitespace." alt="" coords="464,37,616,78"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="392,106,464,81,466,86,394,111"/>
+<area shape="rect" id="Node000007" href="$namespacewebsocketpp_1_1http_1_1parser.html#a2a35158d976b84679dda4fd4a4b237bc" title="Read and return the next quoted string in the stream." alt="" coords="464,102,616,158"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="416,127,449,127,449,132,416,132"/>
+<area shape="rect" id="Node000008" href="$namespacewebsocketpp_1_1http_1_1parser.html#a6c56e2f70369551a1dcd9816f3d4d2eb" title="Read and return the next token in the stream." alt="" coords="468,181,612,222"/>
+<area shape="poly" id="edge7_Node000002_Node000008" title=" " alt="" coords="394,148,466,173,464,178,392,153"/>
+<area shape="rect" id="Node000004" href="$namespacewebsocketpp_1_1http_1_1parser.html#a1dacef9abccd8e5b6c572447d9f5a3ab" title="Read and discard one unit of linear whitespace." alt="" coords="664,37,801,78"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="616,55,649,55,649,60,616,60"/>
+<area shape="rect" id="Node000005" href="$namespacewebsocketpp_1_1http.html#a95df9e609616688298d34fee9ec34945" title="Is the character non&#45;whitespace." alt="" coords="849,5,1010,46"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="801,44,833,39,833,44,802,49"/>
+<area shape="rect" id="Node000006" href="$namespacewebsocketpp_1_1http.html#a8ff7039dd19159bdbce3b98159c66ae2" title="Is the character whitespace." alt="" coords="861,71,998,111"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="802,67,846,74,846,80,801,72"/>
+<area shape="rect" id="Node000009" href="$namespacewebsocketpp_1_1http.html#a45a9b60b72b68de7b32fb75d89ad4c04" title="Is the character a non&#45;token." alt="" coords="664,181,801,222"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="613,199,649,199,649,204,613,204"/>
+</map>

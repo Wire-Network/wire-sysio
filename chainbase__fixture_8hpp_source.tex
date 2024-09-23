@@ -1,0 +1,32 @@
+\doxysection{chainbase\+\_\+fixture.\+hpp}
+\hypertarget{chainbase__fixture_8hpp_source}{}\label{chainbase__fixture_8hpp_source}\index{libraries/testing/include/sysio/testing/chainbase\_fixture.hpp@{libraries/testing/include/sysio/testing/chainbase\_fixture.hpp}}
+\mbox{\hyperlink{chainbase__fixture_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{chainbase__fixture_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{chainbase_8hpp}{chainbase/chainbase.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{chainbase__fixture_8hpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{filesystem_8hpp}{fc/filesystem.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{chainbase__fixture_8hpp_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{chainbase__fixture_8hpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <memory>}}
+\DoxyCodeLine{\Hypertarget{chainbase__fixture_8hpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{chainbase__fixture_8hpp_source_l00006}\mbox{\hyperlink{namespacesysio_1_1testing}{00006}}\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetesting}{testing}}\ \{}
+\DoxyCodeLine{\Hypertarget{chainbase__fixture_8hpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{chainbase__fixture_8hpp_source_l00013}00013\ \textcolor{keyword}{template}<u\textcolor{keywordtype}{int}64\_t\ MAX\_SIZE>}
+\DoxyCodeLine{\Hypertarget{chainbase__fixture_8hpp_source_l00014}\mbox{\hyperlink{structsysio_1_1testing_1_1chainbase__fixture}{00014}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structsysio_1_1testing_1_1chainbase__fixture}{chainbase\_fixture}}\ \{}
+\DoxyCodeLine{\Hypertarget{chainbase__fixture_8hpp_source_l00015}\mbox{\hyperlink{structsysio_1_1testing_1_1chainbase__fixture_a6f3a1ed5ae6c98b0a54d4d9f3bab5732}{00015}}\ \ \ \ \mbox{\hyperlink{structsysio_1_1testing_1_1chainbase__fixture_a6f3a1ed5ae6c98b0a54d4d9f3bab5732}{chainbase\_fixture}}()}
+\DoxyCodeLine{\Hypertarget{chainbase__fixture_8hpp_source_l00016}00016\ \ \ \ :\ \mbox{\hyperlink{structsysio_1_1testing_1_1chainbase__fixture_aa5a9bbfcab50c77b5154ee8ea07899b9}{\_tempdir}}()}
+\DoxyCodeLine{\Hypertarget{chainbase__fixture_8hpp_source_l00017}00017\ \ \ \ ,\ \mbox{\hyperlink{structsysio_1_1testing_1_1chainbase__fixture_ad265b0df832ed5fed55ffb0131c18d78}{\_db}}(\mbox{\hyperlink{namespacestd}{std}}::make\_unique<\mbox{\hyperlink{namespacechainbase}{chainbase}}::\mbox{\hyperlink{classchainbase_1_1database}{database}}>(\mbox{\hyperlink{structsysio_1_1testing_1_1chainbase__fixture_aa5a9bbfcab50c77b5154ee8ea07899b9}{\_tempdir}}.\mbox{\hyperlink{classfc_1_1path}{path}}(),\ \mbox{\hyperlink{namespacechainbase}{chainbase}}::\mbox{\hyperlink{classchainbase_1_1database}{database}}::\mbox{\hyperlink{namespacefc_a3d8a2be677709cc41f09aa7925f2d55fa4eaf6936474fac52a87743f3de041c42}{read\_write}},\ MAX\_SIZE))}
+\DoxyCodeLine{\Hypertarget{chainbase__fixture_8hpp_source_l00018}00018\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{chainbase__fixture_8hpp_source_l00019}00019\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{chainbase__fixture_8hpp_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{chainbase__fixture_8hpp_source_l00021}\mbox{\hyperlink{structsysio_1_1testing_1_1chainbase__fixture_a89b1ea0732726542b71ac9ba7f906b42}{00021}}\ \ \ \ \mbox{\hyperlink{structsysio_1_1testing_1_1chainbase__fixture_a89b1ea0732726542b71ac9ba7f906b42}{\string~chainbase\_fixture}}()}
+\DoxyCodeLine{\Hypertarget{chainbase__fixture_8hpp_source_l00022}00022\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{chainbase__fixture_8hpp_source_l00023}00023\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1testing_1_1chainbase__fixture_ad265b0df832ed5fed55ffb0131c18d78}{\_db}}.reset();}
+\DoxyCodeLine{\Hypertarget{chainbase__fixture_8hpp_source_l00024}00024\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1testing_1_1chainbase__fixture_aa5a9bbfcab50c77b5154ee8ea07899b9}{\_tempdir}}.\mbox{\hyperlink{classfc_1_1temp__file__base_a11fa97c029408fca1d14dfc5ca81be26}{remove}}();}
+\DoxyCodeLine{\Hypertarget{chainbase__fixture_8hpp_source_l00025}00025\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{chainbase__fixture_8hpp_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{chainbase__fixture_8hpp_source_l00027}\mbox{\hyperlink{structsysio_1_1testing_1_1chainbase__fixture_aa5a9bbfcab50c77b5154ee8ea07899b9}{00027}}\ \ \ \ \mbox{\hyperlink{classfc_1_1temp__directory}{fc::temp\_directory}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1testing_1_1chainbase__fixture_aa5a9bbfcab50c77b5154ee8ea07899b9}{\_tempdir}};}
+\DoxyCodeLine{\Hypertarget{chainbase__fixture_8hpp_source_l00028}\mbox{\hyperlink{structsysio_1_1testing_1_1chainbase__fixture_ad265b0df832ed5fed55ffb0131c18d78}{00028}}\ \ \ \ std::unique\_ptr<chainbase::database>\ \ \mbox{\hyperlink{structsysio_1_1testing_1_1chainbase__fixture_ad265b0df832ed5fed55ffb0131c18d78}{\_db}};}
+\DoxyCodeLine{\Hypertarget{chainbase__fixture_8hpp_source_l00029}00029\ \};}
+\DoxyCodeLine{\Hypertarget{chainbase__fixture_8hpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{chainbase__fixture_8hpp_source_l00031}00031\ \}\ \}\ \ \textcolor{comment}{//\ sysio::testing}}
+
+\end{DoxyCode}

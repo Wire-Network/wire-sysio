@@ -1,0 +1,19 @@
+<map id="sysio::vm::invoke_impl" name="sysio::vm::invoke_impl">
+<area shape="rect" id="Node000001" title=" " alt="" coords="1147,64,1302,90"/>
+<area shape="rect" id="Node000002" href="$namespacesysio_1_1vm.html#aa4e6b3dd94060b8acb13335f2c444b53" title=" " alt="" coords="944,57,1099,98"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1132,80,1100,80,1100,74,1132,74"/>
+<area shape="rect" id="Node000003" href="$namespacesysio_1_1vm.html#a7807fbd22c5d50e7045619100189fda0" title=" " alt="" coords="708,64,896,90"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="928,80,896,80,896,74,928,74"/>
+<area shape="rect" id="Node000004" href="$namespacesysio_1_1vm.html#aade1d3d5329b64aae3f2dab5c018e49f" title=" " alt="" coords="483,28,658,54"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="700,64,657,57,658,52,701,59"/>
+<area shape="rect" id="Node000006" href="$namespacesysio_1_1chain_1_1webassembly_1_1eosvmoc.html#ac6593044ffde3f1589b705c6e21f342d" title=" " alt="" coords="481,85,660,126"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="693,93,661,97,661,92,693,88"/>
+<area shape="rect" id="Node000005" href="$structsysio_1_1vm_1_1registered__host__functions_1_1mappings.html#af26f42cea5b288ea5ab591e8ac05e2b7" title=" " alt="" coords="244,5,422,61"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="467,40,422,39,422,33,468,35"/>
+<area shape="rect" id="Node000007" href="$namespacesysio_1_1chain_1_1webassembly_1_1eosvmoc.html#a83daa42506d4e17a27f0a60b36aa6f46" title=" " alt="" coords="243,85,422,126"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="465,108,423,108,423,102,465,102"/>
+<area shape="rect" id="Node000008" href="$namespacesysio_1_1chain_1_1webassembly_1_1eosvmoc.html#a6efa174d4d38f5f348b1a3dc0c9d9c0b" title=" " alt="" coords="233,150,433,191"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="481,133,410,152,409,147,479,127"/>
+<area shape="rect" id="Node000009" href="$structsysio_1_1chain_1_1webassembly_1_1host__function__registrator.html#a8373c77aa3ef9e367a25f8f52c55ea7d" title=" " alt="" coords="5,143,185,198"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="217,173,185,173,185,168,217,168"/>
+</map>

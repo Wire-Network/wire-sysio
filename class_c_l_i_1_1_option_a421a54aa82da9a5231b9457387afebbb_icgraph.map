@@ -1,0 +1,9 @@
+<map id="CLI::Option::multi_option_policy" name="CLI::Option::multi_option_policy">
+<area shape="rect" id="Node000001" title="Take the last argument if given multiple times (or another policy)" alt="" coords="184,47,308,88"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_app.html#aba52c086839e22901b835dfa3c13337c" title="Vector version to capture multiple flags." alt="" coords="5,5,136,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="168,48,118,34,120,29,169,43"/>
+<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_app.html#a460d387f503d26ea8d3fe1be51fbc2fc" title=" " alt="" coords="5,55,136,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="168,70,136,70,136,65,168,65"/>
+<area shape="rect" id="Node000004" href="$class_c_l_i_1_1_app.html#a6d1bd422f6767ce42e0bb872228cdab7" title="Add option for callback with an integer value." alt="" coords="5,104,136,145"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="170,95,136,106,134,101,168,90"/>
+</map>

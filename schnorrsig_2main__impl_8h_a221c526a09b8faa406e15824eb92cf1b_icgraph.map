@@ -1,0 +1,9 @@
+<map id="secp256k1_schnorrsig_sign" name="secp256k1_schnorrsig_sign">
+<area shape="rect" id="Node000001" title=" " alt="" coords="482,5,665,31"/>
+<area shape="rect" id="Node000002" href="$schnorrsig_2tests__impl_8h.html#a12bd744ae085199a91c835561c1638f5" title=" " alt="" coords="293,5,434,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="467,21,434,21,434,16,467,16"/>
+<area shape="rect" id="Node000003" href="$schnorrsig_2tests__impl_8h.html#ac157ab3450c7cca7e46cdc65e8019392" title=" " alt="" coords="103,5,245,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="278,21,246,21,246,16,278,16"/>
+<area shape="rect" id="Node000004" href="$tests_8c.html#a3c04138a5bfe5d72780bb7e82a18e627" title=" " alt="" coords="5,5,55,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="87,21,55,21,55,16,87,16"/>
+</map>

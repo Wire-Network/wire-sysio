@@ -1,0 +1,9 @@
+<map id="appbase::plugin::startup" name="appbase::plugin::startup">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,42,166,68"/>
+<area shape="rect" id="Node000002" href="$namespaceappbase.html#a99374dc23934f008a09f2f79be9eae40" title=" " alt="" coords="234,13,334,38"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="165,41,218,33,219,38,166,46"/>
+<area shape="rect" id="Node000004" href="$classappbase_1_1application.html#ad5635d30c2f520340d58665ed99f8a4d" title=" " alt="" coords="214,63,354,103"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="166,64,199,68,198,74,165,69"/>
+<area shape="rect" id="Node000003" href="$classappbase_1_1application.html#ac874b2659b400fe254f1ae4260d06ecf" title=" " alt="" coords="402,5,542,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="334,23,386,23,386,28,334,28"/>
+</map>

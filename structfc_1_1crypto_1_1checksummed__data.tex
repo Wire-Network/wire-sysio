@@ -1,0 +1,122 @@
+\doxysection{fc\+::crypto\+::checksummed\+\_\+data\texorpdfstring{$<$}{<} Data\+Type \texorpdfstring{$>$}{>} Struct Template Reference}
+\hypertarget{structfc_1_1crypto_1_1checksummed__data}{}\label{structfc_1_1crypto_1_1checksummed__data}\index{fc::crypto::checksummed\_data$<$ DataType $>$@{fc::crypto::checksummed\_data$<$ DataType $>$}}
+
+
+{\ttfamily \#include $<$common.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structfc_1_1crypto_1_1checksummed__data_a73fa3626f4b9f80b179d8291e300170c}{checksummed\+\_\+data}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static auto \mbox{\hyperlink{structfc_1_1crypto_1_1checksummed__data_a7ce7f7d88ebeb49c7ef7edb227b751fd}{calculate\+\_\+checksum}} (const Data\+Type \&\mbox{\hyperlink{structfc_1_1crypto_1_1checksummed__data_a16be7bf9dccbcd7dc8c9cd396f83a15c}{data}}, const char \texorpdfstring{$\ast$}{*}prefix=nullptr)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structfc_1_1crypto_1_1checksummed__data_adb4ec9905a3b83f46b8ecaf5ae3b583c}{check}} = 0
+\item 
+Data\+Type \mbox{\hyperlink{structfc_1_1crypto_1_1checksummed__data_a16be7bf9dccbcd7dc8c9cd396f83a15c}{data}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Data\+Type$>$\newline
+struct fc\+::crypto\+::checksummed\+\_\+data$<$ Data\+Type $>$}
+
+
+Definition at line \mbox{\hyperlink{libraries_2fc_2include_2fc_2crypto_2common_8hpp_source_l00011}{11}} of file \mbox{\hyperlink{libraries_2fc_2include_2fc_2crypto_2common_8hpp_source}{common.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structfc_1_1crypto_1_1checksummed__data_a73fa3626f4b9f80b179d8291e300170c}\index{fc::crypto::checksummed\_data$<$ DataType $>$@{fc::crypto::checksummed\_data$<$ DataType $>$}!checksummed\_data@{checksummed\_data}}
+\index{checksummed\_data@{checksummed\_data}!fc::crypto::checksummed\_data$<$ DataType $>$@{fc::crypto::checksummed\_data$<$ DataType $>$}}
+\doxysubsubsection{\texorpdfstring{checksummed\_data()}{checksummed\_data()}}
+{\footnotesize\ttfamily \label{structfc_1_1crypto_1_1checksummed__data_a73fa3626f4b9f80b179d8291e300170c} 
+template$<$typename Data\+Type $>$ \\
+\mbox{\hyperlink{structfc_1_1crypto_1_1checksummed__data}{fc\+::crypto\+::checksummed\+\_\+data}}$<$ Data\+Type $>$\+::checksummed\+\_\+data (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{libraries_2fc_2include_2fc_2crypto_2common_8hpp_source_l00012}{12}} of file \mbox{\hyperlink{libraries_2fc_2include_2fc_2crypto_2common_8hpp_source}{common.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00012\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structfc_1_1crypto_1_1checksummed__data_a7ce7f7d88ebeb49c7ef7edb227b751fd}\index{fc::crypto::checksummed\_data$<$ DataType $>$@{fc::crypto::checksummed\_data$<$ DataType $>$}!calculate\_checksum@{calculate\_checksum}}
+\index{calculate\_checksum@{calculate\_checksum}!fc::crypto::checksummed\_data$<$ DataType $>$@{fc::crypto::checksummed\_data$<$ DataType $>$}}
+\doxysubsubsection{\texorpdfstring{calculate\_checksum()}{calculate\_checksum()}}
+{\footnotesize\ttfamily \label{structfc_1_1crypto_1_1checksummed__data_a7ce7f7d88ebeb49c7ef7edb227b751fd} 
+template$<$typename Data\+Type $>$ \\
+static auto \mbox{\hyperlink{structfc_1_1crypto_1_1checksummed__data}{fc\+::crypto\+::checksummed\+\_\+data}}$<$ Data\+Type $>$\+::calculate\+\_\+checksum (\begin{DoxyParamCaption}\item[{const Data\+Type \&}]{data}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{prefix}{ = {\ttfamily nullptr}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{libraries_2fc_2include_2fc_2crypto_2common_8hpp_source_l00016}{16}} of file \mbox{\hyperlink{libraries_2fc_2include_2fc_2crypto_2common_8hpp_source}{common.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00017\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ encoder\ =\ ripemd160::encoder();}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{raw::pack}}(encoder,\ data);}
+\DoxyCodeLine{00019\ }
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (prefix\ !=\ \textcolor{keyword}{nullptr})\ \{}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \ \ \ \ encoder.write(prefix,\ \mbox{\hyperlink{namespacefc_a3ef687c18276fdf95a78c568b0b27a32}{const\_strlen}}(prefix));}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ encoder.result().\_hash[0];}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=335pt]{structfc_1_1crypto_1_1checksummed__data_a7ce7f7d88ebeb49c7ef7edb227b751fd_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structfc_1_1crypto_1_1checksummed__data_a7ce7f7d88ebeb49c7ef7edb227b751fd_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structfc_1_1crypto_1_1checksummed__data_adb4ec9905a3b83f46b8ecaf5ae3b583c}\index{fc::crypto::checksummed\_data$<$ DataType $>$@{fc::crypto::checksummed\_data$<$ DataType $>$}!check@{check}}
+\index{check@{check}!fc::crypto::checksummed\_data$<$ DataType $>$@{fc::crypto::checksummed\_data$<$ DataType $>$}}
+\doxysubsubsection{\texorpdfstring{check}{check}}
+{\footnotesize\ttfamily \label{structfc_1_1crypto_1_1checksummed__data_adb4ec9905a3b83f46b8ecaf5ae3b583c} 
+template$<$typename Data\+Type $>$ \\
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structfc_1_1crypto_1_1checksummed__data}{fc\+::crypto\+::checksummed\+\_\+data}}$<$ Data\+Type $>$\+::check = 0}
+
+
+
+Definition at line \mbox{\hyperlink{libraries_2fc_2include_2fc_2crypto_2common_8hpp_source_l00013}{13}} of file \mbox{\hyperlink{libraries_2fc_2include_2fc_2crypto_2common_8hpp_source}{common.\+hpp}}.
+
+\Hypertarget{structfc_1_1crypto_1_1checksummed__data_a16be7bf9dccbcd7dc8c9cd396f83a15c}\index{fc::crypto::checksummed\_data$<$ DataType $>$@{fc::crypto::checksummed\_data$<$ DataType $>$}!data@{data}}
+\index{data@{data}!fc::crypto::checksummed\_data$<$ DataType $>$@{fc::crypto::checksummed\_data$<$ DataType $>$}}
+\doxysubsubsection{\texorpdfstring{data}{data}}
+{\footnotesize\ttfamily \label{structfc_1_1crypto_1_1checksummed__data_a16be7bf9dccbcd7dc8c9cd396f83a15c} 
+template$<$typename Data\+Type $>$ \\
+Data\+Type \mbox{\hyperlink{structfc_1_1crypto_1_1checksummed__data}{fc\+::crypto\+::checksummed\+\_\+data}}$<$ Data\+Type $>$\+::data}
+
+
+
+Definition at line \mbox{\hyperlink{libraries_2fc_2include_2fc_2crypto_2common_8hpp_source_l00014}{14}} of file \mbox{\hyperlink{libraries_2fc_2include_2fc_2crypto_2common_8hpp_source}{common.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/\mbox{\hyperlink{libraries_2fc_2include_2fc_2crypto_2common_8hpp}{common.\+hpp}}\end{DoxyCompactItemize}

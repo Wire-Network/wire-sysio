@@ -1,0 +1,11 @@
+<map id="Catch::filterTests" name="Catch::filterTests">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,127,56"/>
+<area shape="rect" id="Node000002" href="$class_catch_1_1_test_spec.html#ac6d69b4a19677d95e46af0467fc72ecd" title=" " alt="" coords="175,5,359,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="127,33,159,29,160,34,128,38"/>
+<area shape="rect" id="Node000003" href="$namespace_catch.html#aadef80fbc6bc84589777a462770cef49" title=" " alt="" coords="204,55,330,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="128,48,189,56,188,61,127,53"/>
+<area shape="rect" id="Node000004" href="$class_catch_1_1_test_spec.html#a2342df9eff2c7db0d26432c1ddef796f" title=" " alt="" coords="407,25,584,51"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="330,57,391,49,392,54,330,62"/>
+<area shape="rect" id="Node000005" href="$struct_catch_1_1_test_case_info.html#afc70d4379a2070cc22b693ffe3932c1a" title=" " alt="" coords="424,75,567,116"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="330,73,409,82,409,88,330,78"/>
+</map>

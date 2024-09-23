@@ -1,0 +1,9 @@
+<map id="testing::MatchesRegex" name="testing::MatchesRegex">
+<area shape="rect" id="Node000001" title=" " alt="" coords="222,63,378,88"/>
+<area shape="rect" id="Node000002" href="$namespacetesting.html#a49d82a8b08cad0ae159ecdf125b5e3d6" title=" " alt="" coords="11,5,168,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="235,61,139,34,140,29,236,55"/>
+<area shape="rect" id="Node000003" href="$namespacetesting_1_1gmock__matchers__test.html#acb4e75ec699fe1bc178e7ec32fb479c8" title=" " alt="" coords="5,55,174,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="206,78,174,78,174,73,206,73"/>
+<area shape="rect" id="Node000004" href="$namespacetesting_1_1gmock__matchers__test.html#a5983e981b59498c6427ddb183c414bb7" title=" " alt="" coords="5,120,174,161"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="242,96,158,122,157,117,241,91"/>
+</map>

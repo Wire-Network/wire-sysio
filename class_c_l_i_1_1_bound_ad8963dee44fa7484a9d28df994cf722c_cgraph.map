@@ -1,0 +1,7 @@
+<map id="CLI::Bound::Bound" name="CLI::Bound::Bound">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,138,56"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_validator.html#a35930c9b193bb0f7c5b7597dfe002e1f" title="Specify the type string." alt="" coords="186,5,357,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="138,32,170,28,171,34,138,38"/>
+<area shape="rect" id="Node000003" href="$namespace_c_l_i_1_1detail.html#a0e94052d485636fc9f18c21009026577" title="Convert an object to a string (directly forward if this can become a string)" alt="" coords="202,55,341,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="138,49,186,55,186,60,138,54"/>
+</map>

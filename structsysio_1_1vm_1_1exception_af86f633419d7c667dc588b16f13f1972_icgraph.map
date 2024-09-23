@@ -1,0 +1,13 @@
+<map id="sysio::vm::exception::detail" name="sysio::vm::exception::detail">
+<area shape="rect" id="Node000001" title=" " alt="" coords="593,55,736,96"/>
+<area shape="rect" id="Node000002" href="$bench__interp_8cpp.html#a3c04138a5bfe5d72780bb7e82a18e627" title=" " alt="" coords="431,5,480,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="578,54,480,27,481,22,579,49"/>
+<area shape="rect" id="Node000003" href="$namespacesysio_1_1chain_1_1webassembly_1_1eos__vm__runtime.html#a9cd22b0e9d05f910358f809fcd29ffec" title=" " alt="" coords="366,55,545,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="578,78,546,78,546,73,578,73"/>
+<area shape="rect" id="Node000004" href="$namespacesysio_1_1chain_1_1webassembly_1_1eos__vm__runtime.html#a78d9d364a9ab60de8d18b4660f592d5f" title=" " alt="" coords="366,120,545,161"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="584,103,524,122,522,117,582,98"/>
+<area shape="rect" id="Node000005" href="$classsysio_1_1chain_1_1wasm__interface.html#a0748761343232176fe57ede67dd254ae" title=" " alt="" coords="184,120,318,161"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="351,144,318,144,318,138,351,138"/>
+<area shape="rect" id="Node000006" href="$group__native__action__handlers.html#ga88394625fa30b19cd99bb0e89cda07dd" title=" " alt="" coords="5,120,136,161"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="168,144,136,144,136,138,168,138"/>
+</map>

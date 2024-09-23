@@ -1,0 +1,21 @@
+<map id="Catch::XmlReporter" name="Catch::XmlReporter">
+<area shape="rect" id="Node000001" title=" " alt="" coords="781,128,918,154"/>
+<area shape="rect" id="Node000002" href="$struct_catch_1_1_streaming_reporter_base.html" title=" " alt="" coords="558,120,732,161"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="747,138,781,138,781,144,747,144"/>
+<area shape="rect" id="Node000003" href="$struct_catch_1_1_i_streaming_reporter.html" title=" " alt="" coords="208,5,385,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="388,32,461,50,535,76,577,96,614,118,611,122,575,101,533,81,459,56,386,37"/>
+<area shape="rect" id="Node000004" href="$struct_catch_1_1_lazy_stat.html" title=" " alt="" coords="214,55,378,96"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="394,91,558,122,557,127,393,96"/>
+<area shape="rect" id="Node000005" href="$class_catch_1_1_option.html" title=" " alt="" coords="5,55,155,96"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="170,73,214,73,214,78,170,78"/>
+<area shape="rect" id="Node000006" href="$struct_catch_1_1_lazy_stat.html" title=" " alt="" coords="214,120,378,161"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="393,138,558,138,558,144,393,144"/>
+<area shape="rect" id="Node000007" href="$class_catch_1_1_option.html" title=" " alt="" coords="5,120,155,161"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="170,138,214,138,214,144,170,144"/>
+<area shape="rect" id="Node000008" href="$struct_catch_1_1_lazy_stat.html" title=" " alt="" coords="214,186,378,226"/>
+<area shape="poly" id="edge7_Node000002_Node000008" title=" " alt="" coords="393,185,557,154,558,160,394,191"/>
+<area shape="rect" id="Node000009" href="$class_catch_1_1_option.html" title=" " alt="" coords="5,186,155,226"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="170,204,214,204,214,209,170,209"/>
+<area shape="rect" id="Node000010" href="$struct_catch_1_1_reporter_preferences.html" title=" " alt="" coords="204,251,388,276"/>
+<area shape="poly" id="edge9_Node000002_Node000010" title=" " alt="" coords="387,244,460,226,533,201,575,181,611,159,614,164,577,186,535,206,461,231,388,250"/>
+</map>

@@ -1,0 +1,13 @@
+<map id="fc::message_buffer::get_buffer_sequence_for_boost_async_read" name="fc::message_buffer::get_buffer_sequence_for_boost_async_read">
+<area shape="rect" id="Node000001" title=" " alt="" coords="429,65,585,121"/>
+<area shape="rect" id="Node000002" href="$test__message__buffer_8cpp.html#a726ea74fa85bcd71c27873a80f644ecb" title="Test default construction and buffer sequence generation." alt="" coords="185,5,381,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="426,61,380,45,343,34,345,29,382,40,428,56"/>
+<area shape="rect" id="Node000003" href="$test__message__buffer_8cpp.html#ac64fd5998672b472a05dead509a6e008" title="Test buffer growth and shrinking." alt="" coords="185,55,381,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="414,85,381,81,382,76,414,80"/>
+<area shape="rect" id="Node000004" href="$test__message__buffer_8cpp.html#a51213da5fa9bc94beae58bc546fe060c" title="Test automatic allocation when advancing the read_ptr to the end." alt="" coords="185,104,381,130"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="414,105,382,109,381,104,414,100"/>
+<area shape="rect" id="Node000005" href="$classsysio_1_1connection.html#a5b1658474d4667bfca0ee4e1e2c605a8" title=" " alt="" coords="213,154,352,194"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="423,129,382,145,350,156,348,151,380,140,421,124"/>
+<area shape="rect" id="Node000006" href="$classsysio_1_1connection.html#a4267b7b591fb8051841cf1d11228e0e1" title=" " alt="" coords="5,154,137,194"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="198,177,137,177,137,172,198,172"/>
+</map>

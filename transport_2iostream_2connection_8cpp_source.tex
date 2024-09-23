@@ -1,0 +1,614 @@
+\doxysection{connection.\+cpp}
+\hypertarget{transport_2iostream_2connection_8cpp_source}{}\label{transport_2iostream_2connection_8cpp_source}\index{libraries/fc/vendor/websocketpp/test/transport/iostream/connection.cpp@{libraries/fc/vendor/websocketpp/test/transport/iostream/connection.cpp}}
+\mbox{\hyperlink{transport_2iostream_2connection_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2014,\ Peter\ Thorson.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00004}00004\ \textcolor{comment}{\ *\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00005}00005\ \textcolor{comment}{\ *\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are\ met:}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00006}00006\ \textcolor{comment}{\ *\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00007}00007\ \textcolor{comment}{\ *\ \ \ \ \ \ \ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00008}00008\ \textcolor{comment}{\ *\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00009}00009\ \textcolor{comment}{\ *\ \ \ \ \ \ \ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer\ in\ the}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00010}00010\ \textcolor{comment}{\ *\ \ \ \ \ \ \ documentation\ and/or\ other\ materials\ provided\ with\ the\ distribution.}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00011}00011\ \textcolor{comment}{\ *\ \ \ \ \ *\ Neither\ the\ name\ of\ the\ WebSocket++\ Project\ nor\ the}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00012}00012\ \textcolor{comment}{\ *\ \ \ \ \ \ \ names\ of\ its\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00013}00013\ \textcolor{comment}{\ *\ \ \ \ \ \ \ derived\ from\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00014}00014\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00015}00015\ \textcolor{comment}{\ *\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS\ "{}AS\ IS"{}}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00016}00016\ \textcolor{comment}{\ *\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ THE}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00017}00017\ \textcolor{comment}{\ *\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR\ A\ PARTICULAR\ PURPOSE}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00018}00018\ \textcolor{comment}{\ *\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ PETER\ THORSON\ BE\ LIABLE\ FOR\ ANY}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00019}00019\ \textcolor{comment}{\ *\ DIRECT,\ INDIRECT,\ INCIDENTAL,\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00020}00020\ \textcolor{comment}{\ *\ (INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00021}00021\ \textcolor{comment}{\ *\ LOSS\ OF\ USE,\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00022}00022\ \textcolor{comment}{\ *\ ON\ ANY\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00023}00023\ \textcolor{comment}{\ *\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE\ OF\ THIS}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00024}00024\ \textcolor{comment}{\ *\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00025}00025\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00026}00026\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00027}00027\ \textcolor{comment}{//\#define\ BOOST\_TEST\_DYN\_LINK}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00028}\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a6b2a3852db8bb19ab6909bac01859985}{00028}}\ \textcolor{preprocessor}{\#define\ BOOST\_TEST\_MODULE\ transport\_iostream\_connection}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00029}00029\ \textcolor{preprocessor}{\#include\ <boost/test/unit\_test.hpp>}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00031}00031\ \textcolor{preprocessor}{\#include\ <iostream>}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00032}00032\ \textcolor{preprocessor}{\#include\ <cstring>}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00033}00033\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00035}00035\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp}{websocketpp/common/memory.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00037}00037\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{error_8hpp}{websocketpp/error.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00038}00038\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{transport_2iostream_2connection_8hpp}{websocketpp/transport/iostream/connection.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00040}00040\ \textcolor{comment}{//\ Policies}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00041}00041\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{concurrency_2basic_8hpp}{websocketpp/concurrency/basic.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00042}00042\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{logger_2basic_8hpp}{websocketpp/logger/basic.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00044}00044\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{classconfig}{config}}\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00045}\mbox{\hyperlink{classconfig_a74e71161493801718f44701955bff290}{00045}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1concurrency_1_1basic}{websocketpp::concurrency::basic}}\ \mbox{\hyperlink{classconfig_a74e71161493801718f44701955bff290}{concurrency\_type}};}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00046}00046\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic}{websocketpp::log::basic}}<\mbox{\hyperlink{classwebsocketpp_1_1concurrency_1_1none}{concurrency\_type}},}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00047}\mbox{\hyperlink{classconfig_a2d38fa9535f994a3b330555836b39878}{00047}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structwebsocketpp_1_1log_1_1elevel}{websocketpp::log::elevel}}>\ \mbox{\hyperlink{classconfig_a2d38fa9535f994a3b330555836b39878}{elog\_type}};}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00048}00048\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic}{websocketpp::log::basic}}<\mbox{\hyperlink{classwebsocketpp_1_1concurrency_1_1none}{concurrency\_type}},}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00049}\mbox{\hyperlink{classconfig_abd0db8ed128222f7840091ec3ef1836c}{00049}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel}{websocketpp::log::alevel}}>\ \mbox{\hyperlink{classconfig_abd0db8ed128222f7840091ec3ef1836c}{alog\_type}};}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00050}00050\ \};}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00052}\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a7f963466ab1e19b852c26b966f998dcc}{00052}}\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection}{websocketpp::transport::iostream::connection<config>}}\ \mbox{\hyperlink{transport_2iostream_2connection_8cpp_a7f963466ab1e19b852c26b966f998dcc}{iostream\_con}};}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00054}00054\ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1iostream_1_1error_a6b208c9eb4b1b76090e564e6e462fbcf}{websocketpp::transport::iostream::error::make\_error\_code}};}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00056}\mbox{\hyperlink{structstub__con}{00056}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structstub__con}{stub\_con}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection}{iostream\_con}}\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00057}\mbox{\hyperlink{structstub__con_a5e6687afa2772901e6205324c14b838e}{00057}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{structstub__con}{stub\_con}}\ \mbox{\hyperlink{structstub__con_a5e6687afa2772901e6205324c14b838e}{type}};}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00058}\mbox{\hyperlink{structstub__con_a8dc06cf0843531c67a375c6d9837bf95}{00058}}\ \ \ \ \ \textcolor{keyword}{typedef}\ websocketpp::lib::shared\_ptr<type>\ \mbox{\hyperlink{structstub__con_a8dc06cf0843531c67a375c6d9837bf95}{ptr}};}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00059}\mbox{\hyperlink{structstub__con_adf832bb6ebe2a6527dae78dc651f9f15}{00059}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_aa993f99a9b31b42fe3ef1ec471cbc2e8}{iostream\_con::timer\_ptr}}\ \mbox{\hyperlink{structstub__con_adf832bb6ebe2a6527dae78dc651f9f15}{timer\_ptr}};}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00061}\mbox{\hyperlink{structstub__con_a7ad39065d251d72c86178e4a1bf4f9f1}{00061}}\ \ \ \ \ \mbox{\hyperlink{structstub__con_a7ad39065d251d72c86178e4a1bf4f9f1}{stub\_con}}(\textcolor{keywordtype}{bool}\ is\_server,\ config::alog\_type\ \&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ config::elog\_type\ \&\ e)}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00062}00062\ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection}{iostream\_con}}(is\_server,\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},e)}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00063}00063\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Set\ the\ error\ to\ a\ known\ code\ that\ is\ unused\ by\ the\ library}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00064}00064\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ This\ way\ we\ can\ easily\ confirm\ that\ the\ handler\ was\ run\ at\ all.}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00065}00065\ \ \ \ \ \ \ \ \ ,\ \mbox{\hyperlink{structstub__con_a9e791dd7df34a3c59adb1255bf8ad531}{ec}}(\mbox{\hyperlink{namespacewebsocketpp}{websocketpp}}::error::make\_error\_code(\mbox{\hyperlink{namespacewebsocketpp}{websocketpp}}::error::test))}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00066}00066\ \ \ \ \ \ \ \ \ ,\ \mbox{\hyperlink{structstub__con_adc048dddd9b964b03e937c69fbce1c8e}{indef\_read\_total}}(0)}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00067}00067\ \ \ \ \ \{\}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00070}\mbox{\hyperlink{structstub__con_adc3b613da536874da64369433eceaf19}{00070}}\ \ \ \ \ \mbox{\hyperlink{structstub__con_a8dc06cf0843531c67a375c6d9837bf95}{ptr}}\ \mbox{\hyperlink{structstub__con_adc3b613da536874da64369433eceaf19}{get\_shared}}()\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00071}00071\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ websocketpp::lib::static\_pointer\_cast<type>(\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_afab9454b5af00a8edb494fdd2e32a41e}{iostream\_con::get\_shared}}());}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00072}00072\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00073}00073\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00074}\mbox{\hyperlink{structstub__con_a66c12a3d422977b7a278020b94d7611b}{00074}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structstub__con_a66c12a3d422977b7a278020b94d7611b}{write}}(std::string\ msg)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00075}00075\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a6bc18b4c6b20bb9bc5d0c41cad53d602}{iostream\_con::async\_write}}(}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \ \ \ msg.data(),}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ msg.size(),}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00078}00078\ \ \ \ \ \ \ \ \ \ \ \ \ websocketpp::lib::bind(}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{structstub__con_a95bfb56bec27e86ba2e30af2bca1c213}{stub\_con::handle\_op}},}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00080}00080\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstub__con_adc3b613da536874da64369433eceaf19}{type::get\_shared}}(),}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00081}00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ websocketpp::lib::placeholders::\_1}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00082}00082\ \ \ \ \ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00083}00083\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00084}00084\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00085}00085\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00086}\mbox{\hyperlink{structstub__con_a14e97604627969cec94295201745f893}{00086}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structstub__con_a14e97604627969cec94295201745f893}{write}}(std::vector<websocketpp::transport::buffer>\ \&\ bufs)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00087}00087\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a6bc18b4c6b20bb9bc5d0c41cad53d602}{iostream\_con::async\_write}}(}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00088}00088\ \ \ \ \ \ \ \ \ \ \ \ \ bufs,}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00089}00089\ \ \ \ \ \ \ \ \ \ \ \ \ websocketpp::lib::bind(}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00090}00090\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{structstub__con_a95bfb56bec27e86ba2e30af2bca1c213}{stub\_con::handle\_op}},}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00091}00091\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstub__con_adc3b613da536874da64369433eceaf19}{type::get\_shared}}(),}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00092}00092\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ websocketpp::lib::placeholders::\_1}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00093}00093\ \ \ \ \ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00094}00094\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00095}00095\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00096}00096\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00097}\mbox{\hyperlink{structstub__con_a3ada58523e3f8e28cf501dc97c16444f}{00097}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structstub__con_a3ada58523e3f8e28cf501dc97c16444f}{async\_read\_at\_least}}(\textcolor{keywordtype}{size\_t}\ num\_bytes,\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00098}00098\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00099}00099\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_ad66fa146a7cdc19bfca3e32da23b9c60}{iostream\_con::async\_read\_at\_least}}(}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00100}00100\ \ \ \ \ \ \ \ \ \ \ \ \ num\_bytes,}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00101}00101\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00102}00102\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00103}00103\ \ \ \ \ \ \ \ \ \ \ \ \ websocketpp::lib::bind(}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00104}00104\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{structstub__con_a95bfb56bec27e86ba2e30af2bca1c213}{stub\_con::handle\_op}},}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00105}00105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstub__con_adc3b613da536874da64369433eceaf19}{type::get\_shared}}(),}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00106}00106\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ websocketpp::lib::placeholders::\_1}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00107}00107\ \ \ \ \ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00108}00108\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00109}00109\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00110}00110\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00111}\mbox{\hyperlink{structstub__con_a95bfb56bec27e86ba2e30af2bca1c213}{00111}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structstub__con_a95bfb56bec27e86ba2e30af2bca1c213}{handle\_op}}(websocketpp::lib::error\_code\ \textcolor{keyword}{const}\ \&\ e)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00112}00112\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstub__con_a9e791dd7df34a3c59adb1255bf8ad531}{ec}}\ =\ e;}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00113}00113\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00114}00114\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00115}\mbox{\hyperlink{structstub__con_adce6bc3610b7465c5a3fca87ae02cda1}{00115}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structstub__con_adce6bc3610b7465c5a3fca87ae02cda1}{async\_read\_indef}}(\textcolor{keywordtype}{size\_t}\ num\_bytes,\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00116}00116\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00117}00117\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstub__con_a7874b39f63070e3f8d638ec08833fa32}{indef\_read\_size}}\ =\ num\_bytes;}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00118}00118\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstub__con_a7c30a1651bfeda92ba5798f37fbab4e0}{indef\_read\_buf}}\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}};}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00119}00119\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstub__con_a259aa44e4b056988d48838539a134db9}{indef\_read\_len}}\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}};}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00120}00120\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00121}00121\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstub__con_a122900a3be17dcbd6cc693ef8c025358}{indef\_read}}();}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00122}00122\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00123}00123\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00124}\mbox{\hyperlink{structstub__con_a122900a3be17dcbd6cc693ef8c025358}{00124}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structstub__con_a122900a3be17dcbd6cc693ef8c025358}{indef\_read}}()\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00125}00125\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_ad66fa146a7cdc19bfca3e32da23b9c60}{iostream\_con::async\_read\_at\_least}}(}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00126}00126\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstub__con_a7874b39f63070e3f8d638ec08833fa32}{indef\_read\_size}},}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00127}00127\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstub__con_a7c30a1651bfeda92ba5798f37fbab4e0}{indef\_read\_buf}},}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00128}00128\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstub__con_a259aa44e4b056988d48838539a134db9}{indef\_read\_len}},}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00129}00129\ \ \ \ \ \ \ \ \ \ \ \ \ websocketpp::lib::bind(}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00130}00130\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{structstub__con_a054f8943e3032fe19b3d9bf48bdf0039}{stub\_con::handle\_indef}},}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00131}00131\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstub__con_adc3b613da536874da64369433eceaf19}{type::get\_shared}}(),}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00132}00132\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ websocketpp::lib::placeholders::\_1,}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00133}00133\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ websocketpp::lib::placeholders::\_2}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00134}00134\ \ \ \ \ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00135}00135\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00136}00136\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00137}00137\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00138}\mbox{\hyperlink{structstub__con_a054f8943e3032fe19b3d9bf48bdf0039}{00138}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structstub__con_a054f8943e3032fe19b3d9bf48bdf0039}{handle\_indef}}(websocketpp::lib::error\_code\ \textcolor{keyword}{const}\ \&\ e,\ \textcolor{keywordtype}{size\_t}\ amt\_read)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00139}00139\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstub__con_a9e791dd7df34a3c59adb1255bf8ad531}{ec}}\ =\ e;}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00140}00140\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstub__con_adc048dddd9b964b03e937c69fbce1c8e}{indef\_read\_total}}\ +=\ amt\_read;}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00141}00141\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00142}00142\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstub__con_a122900a3be17dcbd6cc693ef8c025358}{indef\_read}}();}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00143}00143\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00144}00144\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00145}\mbox{\hyperlink{structstub__con_a206b67c35da3da4fed8bfb2e2e783993}{00145}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structstub__con_a206b67c35da3da4fed8bfb2e2e783993}{shutdown}}()\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00146}00146\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a2db617fadc96d53034eae1d0f3f1a68a}{iostream\_con::async\_shutdown}}(}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00147}00147\ \ \ \ \ \ \ \ \ \ \ \ \ websocketpp::lib::bind(}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00148}00148\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{structstub__con_ab1acd168c2d28834e21ff352759f9c66}{stub\_con::handle\_async\_shutdown}},}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00149}00149\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstub__con_adc3b613da536874da64369433eceaf19}{type::get\_shared}}(),}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00150}00150\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ websocketpp::lib::placeholders::\_1}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00151}00151\ \ \ \ \ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00152}00152\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00153}00153\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00154}00154\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00155}\mbox{\hyperlink{structstub__con_ab1acd168c2d28834e21ff352759f9c66}{00155}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structstub__con_ab1acd168c2d28834e21ff352759f9c66}{handle\_async\_shutdown}}(websocketpp::lib::error\_code\ \textcolor{keyword}{const}\ \&\ e)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00156}00156\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstub__con_a9e791dd7df34a3c59adb1255bf8ad531}{ec}}\ =\ e;}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00157}00157\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00158}00158\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00159}\mbox{\hyperlink{structstub__con_a9e791dd7df34a3c59adb1255bf8ad531}{00159}}\ \ \ \ \ websocketpp::lib::error\_code\ \mbox{\hyperlink{structstub__con_a9e791dd7df34a3c59adb1255bf8ad531}{ec}};}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00160}\mbox{\hyperlink{structstub__con_a7874b39f63070e3f8d638ec08833fa32}{00160}}\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{structstub__con_a7874b39f63070e3f8d638ec08833fa32}{indef\_read\_size}};}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00161}\mbox{\hyperlink{structstub__con_a7c30a1651bfeda92ba5798f37fbab4e0}{00161}}\ \ \ \ \ \textcolor{keywordtype}{char}\ *\ \mbox{\hyperlink{structstub__con_a7c30a1651bfeda92ba5798f37fbab4e0}{indef\_read\_buf}};}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00162}\mbox{\hyperlink{structstub__con_a259aa44e4b056988d48838539a134db9}{00162}}\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{structstub__con_a259aa44e4b056988d48838539a134db9}{indef\_read\_len}};}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00163}\mbox{\hyperlink{structstub__con_adc048dddd9b964b03e937c69fbce1c8e}{00163}}\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{structstub__con_adc048dddd9b964b03e937c69fbce1c8e}{indef\_read\_total}};}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00164}00164\ \};}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00165}00165\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00166}00166\ \textcolor{comment}{//\ Stubs}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00167}\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a1b864540e98dac6ff21ffff8d125719f}{00167}}\ config::alog\_type\ \mbox{\hyperlink{transport_2iostream_2connection_8cpp_a1b864540e98dac6ff21ffff8d125719f}{alogger}};}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00168}\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a6e9916d5db43239ef65859ccf37eb0a1}{00168}}\ config::elog\_type\ \mbox{\hyperlink{transport_2iostream_2connection_8cpp_a6e9916d5db43239ef65859ccf37eb0a1}{elogger}};}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00169}00169\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00170}\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a2a4ea05821cb997c72547a7298ec126e}{00170}}\ \mbox{\hyperlink{transport_2iostream_2connection_8cpp_a2a4ea05821cb997c72547a7298ec126e}{BOOST\_AUTO\_TEST\_CASE}}(\ const\_methods\ )\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00171}00171\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a5edb16646621ff775f2529c2a6910c82}{iostream\_con::ptr}}\ con(\textcolor{keyword}{new}\ \mbox{\hyperlink{transport_2iostream_2connection_8cpp_a7f963466ab1e19b852c26b966f998dcc}{iostream\_con}}(\textcolor{keyword}{true},\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a1b864540e98dac6ff21ffff8d125719f}{alogger}},\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a6e9916d5db43239ef65859ccf37eb0a1}{elogger}}));}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00172}00172\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00173}00173\ \ \ \ \ BOOST\_CHECK(\ !con-\/>is\_secure()\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00174}00174\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ con-\/>get\_remote\_endpoint(),\ \textcolor{stringliteral}{"{}iostream\ transport"{}}\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00175}00175\ \}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00176}00176\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00177}\mbox{\hyperlink{transport_2iostream_2connection_8cpp_af9e6b616c681f7ec6168d06d60611de5}{00177}}\ \mbox{\hyperlink{transport_2iostream_2connection_8cpp_a2a4ea05821cb997c72547a7298ec126e}{BOOST\_AUTO\_TEST\_CASE}}(\ write\_before\_output\_method\_set\ )\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00178}00178\ \ \ \ \ \mbox{\hyperlink{structstub__con_a8dc06cf0843531c67a375c6d9837bf95}{stub\_con::ptr}}\ con(\textcolor{keyword}{new}\ \mbox{\hyperlink{structstub__con}{stub\_con}}(\textcolor{keyword}{true},\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a1b864540e98dac6ff21ffff8d125719f}{alogger}},\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a6e9916d5db43239ef65859ccf37eb0a1}{elogger}}));}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00179}00179\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00180}00180\ \ \ \ \ con-\/>write(\textcolor{stringliteral}{"{}foo"{}});}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00181}00181\ \ \ \ \ BOOST\_CHECK(\ con-\/>ec\ ==\ make\_error\_code(\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1iostream_1_1error_a647b428e260748d7606c92255e1e9737a92341254bd27c7cb97fb5e1aca5310f3}{websocketpp::transport::iostream::error::output\_stream\_required}})\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00182}00182\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00183}00183\ \ \ \ \ std::vector<websocketpp::transport::buffer>\ bufs;}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00184}00184\ \ \ \ \ con-\/>write(bufs);}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00185}00185\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ con-\/>ec,\ make\_error\_code(\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1iostream_1_1error_a647b428e260748d7606c92255e1e9737a92341254bd27c7cb97fb5e1aca5310f3}{websocketpp::transport::iostream::error::output\_stream\_required}})\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00186}00186\ \}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00187}00187\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00188}\mbox{\hyperlink{transport_2iostream_2connection_8cpp_ab3f718a5a2166e7c8572b969169cce5e}{00188}}\ \mbox{\hyperlink{transport_2iostream_2connection_8cpp_a2a4ea05821cb997c72547a7298ec126e}{BOOST\_AUTO\_TEST\_CASE}}(\ async\_write\_ostream\ )\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00189}00189\ \ \ \ \ \mbox{\hyperlink{structstub__con_a8dc06cf0843531c67a375c6d9837bf95}{stub\_con::ptr}}\ con(\textcolor{keyword}{new}\ \mbox{\hyperlink{structstub__con}{stub\_con}}(\textcolor{keyword}{true},\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a1b864540e98dac6ff21ffff8d125719f}{alogger}},\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a6e9916d5db43239ef65859ccf37eb0a1}{elogger}}));}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00190}00190\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00191}00191\ \ \ \ \ std::stringstream\ output;}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00192}00192\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00193}00193\ \ \ \ \ con-\/>register\_ostream(\&output);}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00194}00194\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00195}00195\ \ \ \ \ con-\/>write(\textcolor{stringliteral}{"{}foo"{}});}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00196}00196\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00197}00197\ \ \ \ \ BOOST\_CHECK(\ !con-\/>ec\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00198}00198\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ output.str(),\ \textcolor{stringliteral}{"{}foo"{}}\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00199}00199\ \}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00200}00200\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00201}\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a796ca1e7f9c3cdaee01b2172fd2c37e4}{00201}}\ websocketpp::lib::error\_code\ \mbox{\hyperlink{transport_2iostream_2connection_8cpp_a796ca1e7f9c3cdaee01b2172fd2c37e4}{write\_handler}}(std::string\ \&\ o,\ \mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{websocketpp::connection\_hdl}},\ \textcolor{keywordtype}{char}\ \textcolor{keyword}{const}\ *\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00202}00202\ \ \ \ \ o\ +=\ std::string(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}});}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00203}00203\ \ \ \ \ \textcolor{keywordflow}{return}\ websocketpp::lib::error\_code();}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00204}00204\ \}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00205}00205\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00206}\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a7d16e745637c81343da70132ba3c6394}{00206}}\ websocketpp::lib::error\_code\ \mbox{\hyperlink{transport_2iostream_2connection_8cpp_a7d16e745637c81343da70132ba3c6394}{vector\_write\_handler}}(std::string\ \&\ o,\ \mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{websocketpp::connection\_hdl}},\ std::vector<websocketpp::transport::buffer>\ \textcolor{keyword}{const}\ \&\ bufs)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00207}00207\ \ \ \ \ std::vector<websocketpp::transport::buffer>::const\_iterator\ it;}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00208}00208\ \ \ \ \ \textcolor{keywordflow}{for}\ (it\ =\ bufs.begin();\ it\ !=\ bufs.end();\ it++)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00209}00209\ \ \ \ \ \ \ \ \ o\ +=\ std::string((*it).buf,\ (*it).len);}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00210}00210\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00211}00211\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00212}00212\ \ \ \ \ \textcolor{keywordflow}{return}\ websocketpp::lib::error\_code();}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00213}00213\ \}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00214}00214\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00215}\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a046cb2b50bdc6d3046cb08d9281f4a39}{00215}}\ websocketpp::lib::error\_code\ \mbox{\hyperlink{transport_2iostream_2connection_8cpp_a046cb2b50bdc6d3046cb08d9281f4a39}{write\_handler\_error}}(\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{websocketpp::connection\_hdl}},\ \textcolor{keywordtype}{char}\ \textcolor{keyword}{const}\ *,\ \textcolor{keywordtype}{size\_t})\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00216}00216\ \ \ \ \ \textcolor{keywordflow}{return}\ make\_error\_code(\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0a161bc0c8148996271f7126aea2c24416}{websocketpp::transport::error::general}});}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00217}00217\ \}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00218}00218\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00219}\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a2a8d65d73c60977a2d655f3ecf508c7b}{00219}}\ \mbox{\hyperlink{transport_2iostream_2connection_8cpp_a2a4ea05821cb997c72547a7298ec126e}{BOOST\_AUTO\_TEST\_CASE}}(\ async\_write\_handler\ )\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00220}00220\ \ \ \ \ \mbox{\hyperlink{structstub__con_a8dc06cf0843531c67a375c6d9837bf95}{stub\_con::ptr}}\ con(\textcolor{keyword}{new}\ \mbox{\hyperlink{structstub__con}{stub\_con}}(\textcolor{keyword}{true},\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a1b864540e98dac6ff21ffff8d125719f}{alogger}},\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a6e9916d5db43239ef65859ccf37eb0a1}{elogger}}));}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00221}00221\ \ \ \ \ std::string\ output;}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00222}00222\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00223}00223\ \ \ \ \ con-\/>set\_write\_handler(websocketpp::lib::bind(}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00224}00224\ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a796ca1e7f9c3cdaee01b2172fd2c37e4}{write\_handler}},}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00225}00225\ \ \ \ \ \ \ \ \ websocketpp::lib::ref(output),}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00226}00226\ \ \ \ \ \ \ \ \ websocketpp::lib::placeholders::\_1,}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00227}00227\ \ \ \ \ \ \ \ \ websocketpp::lib::placeholders::\_2,}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00228}00228\ \ \ \ \ \ \ \ \ websocketpp::lib::placeholders::\_3}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00229}00229\ \ \ \ \ ));}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00230}00230\ \ \ \ \ con-\/>write(\textcolor{stringliteral}{"{}foo"{}});}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00231}00231\ \ \ \ \ BOOST\_CHECK(\ !con-\/>ec\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00232}00232\ \ \ \ \ BOOST\_CHECK\_EQUAL(output,\ \textcolor{stringliteral}{"{}foo"{}});}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00233}00233\ \}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00234}00234\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00235}\mbox{\hyperlink{transport_2iostream_2connection_8cpp_ac33741da3b88f2c349381649acf9720b}{00235}}\ \mbox{\hyperlink{transport_2iostream_2connection_8cpp_a2a4ea05821cb997c72547a7298ec126e}{BOOST\_AUTO\_TEST\_CASE}}(\ async\_write\_handler\_error\ )\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00236}00236\ \ \ \ \ \mbox{\hyperlink{structstub__con_a8dc06cf0843531c67a375c6d9837bf95}{stub\_con::ptr}}\ con(\textcolor{keyword}{new}\ \mbox{\hyperlink{structstub__con}{stub\_con}}(\textcolor{keyword}{true},\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a1b864540e98dac6ff21ffff8d125719f}{alogger}},\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a6e9916d5db43239ef65859ccf37eb0a1}{elogger}}));}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00237}00237\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00238}00238\ \ \ \ \ con-\/>set\_write\_handler(\&\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a046cb2b50bdc6d3046cb08d9281f4a39}{write\_handler\_error}});}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00239}00239\ \ \ \ \ con-\/>write(\textcolor{stringliteral}{"{}foo"{}});}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00240}00240\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ con-\/>ec,\ make\_error\_code(\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0a161bc0c8148996271f7126aea2c24416}{websocketpp::transport::error::general}})\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00241}00241\ \}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00242}00242\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00243}\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a0ced120d5381ab9e3315cada8151821d}{00243}}\ \mbox{\hyperlink{transport_2iostream_2connection_8cpp_a2a4ea05821cb997c72547a7298ec126e}{BOOST\_AUTO\_TEST\_CASE}}(\ async\_write\_vector\_0\_ostream\ )\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00244}00244\ \ \ \ \ std::stringstream\ output;}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00245}00245\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00246}00246\ \ \ \ \ \mbox{\hyperlink{structstub__con_a8dc06cf0843531c67a375c6d9837bf95}{stub\_con::ptr}}\ con(\textcolor{keyword}{new}\ \mbox{\hyperlink{structstub__con}{stub\_con}}(\textcolor{keyword}{true},\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a1b864540e98dac6ff21ffff8d125719f}{alogger}},\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a6e9916d5db43239ef65859ccf37eb0a1}{elogger}}));}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00247}00247\ \ \ \ \ con-\/>register\_ostream(\&output);}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00248}00248\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00249}00249\ \ \ \ \ std::vector<websocketpp::transport::buffer>\ bufs;}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00250}00250\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00251}00251\ \ \ \ \ con-\/>write(bufs);}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00252}00252\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00253}00253\ \ \ \ \ BOOST\_CHECK(\ !con-\/>ec\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00254}00254\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ output.str(),\ \textcolor{stringliteral}{"{}"{}}\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00255}00255\ \}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00256}00256\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00257}\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a6e66d4c9cd78f4360e02fe3109b8e5fc}{00257}}\ \mbox{\hyperlink{transport_2iostream_2connection_8cpp_a2a4ea05821cb997c72547a7298ec126e}{BOOST\_AUTO\_TEST\_CASE}}(\ async\_write\_vector\_0\_write\_handler\ )\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00258}00258\ \ \ \ \ std::string\ output;}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00259}00259\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00260}00260\ \ \ \ \ \mbox{\hyperlink{structstub__con_a8dc06cf0843531c67a375c6d9837bf95}{stub\_con::ptr}}\ con(\textcolor{keyword}{new}\ \mbox{\hyperlink{structstub__con}{stub\_con}}(\textcolor{keyword}{true},\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a1b864540e98dac6ff21ffff8d125719f}{alogger}},\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a6e9916d5db43239ef65859ccf37eb0a1}{elogger}}));}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00261}00261\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00262}00262\ \ \ \ \ con-\/>set\_write\_handler(websocketpp::lib::bind(}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00263}00263\ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a796ca1e7f9c3cdaee01b2172fd2c37e4}{write\_handler}},}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00264}00264\ \ \ \ \ \ \ \ \ websocketpp::lib::ref(output),}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00265}00265\ \ \ \ \ \ \ \ \ websocketpp::lib::placeholders::\_1,}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00266}00266\ \ \ \ \ \ \ \ \ websocketpp::lib::placeholders::\_2,}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00267}00267\ \ \ \ \ \ \ \ \ websocketpp::lib::placeholders::\_3}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00268}00268\ \ \ \ \ ));}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00269}00269\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00270}00270\ \ \ \ \ std::vector<websocketpp::transport::buffer>\ bufs;}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00271}00271\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00272}00272\ \ \ \ \ con-\/>write(bufs);}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00273}00273\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00274}00274\ \ \ \ \ BOOST\_CHECK(\ !con-\/>ec\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00275}00275\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ output,\ \textcolor{stringliteral}{"{}"{}}\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00276}00276\ \}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00277}00277\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00278}\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a371a9dfca086d01cd9940c8329488fa8}{00278}}\ \mbox{\hyperlink{transport_2iostream_2connection_8cpp_a2a4ea05821cb997c72547a7298ec126e}{BOOST\_AUTO\_TEST\_CASE}}(\ async\_write\_vector\_1\_ostream\ )\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00279}00279\ \ \ \ \ std::stringstream\ output;}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00280}00280\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00281}00281\ \ \ \ \ \mbox{\hyperlink{structstub__con_a8dc06cf0843531c67a375c6d9837bf95}{stub\_con::ptr}}\ con(\textcolor{keyword}{new}\ \mbox{\hyperlink{structstub__con}{stub\_con}}(\textcolor{keyword}{true},\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a1b864540e98dac6ff21ffff8d125719f}{alogger}},\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a6e9916d5db43239ef65859ccf37eb0a1}{elogger}}));}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00282}00282\ \ \ \ \ con-\/>register\_ostream(\&output);}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00283}00283\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00284}00284\ \ \ \ \ std::vector<websocketpp::transport::buffer>\ bufs;}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00285}00285\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00286}00286\ \ \ \ \ std::string\ \mbox{\hyperlink{namespacefoo}{foo}}\ =\ \textcolor{stringliteral}{"{}foo"{}};}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00287}00287\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00288}00288\ \ \ \ \ bufs.push\_back(\mbox{\hyperlink{structwebsocketpp_1_1transport_1_1buffer}{websocketpp::transport::buffer}}(\mbox{\hyperlink{namespacefoo}{foo}}.data(),\mbox{\hyperlink{namespacefoo}{foo}}.size()));}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00289}00289\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00290}00290\ \ \ \ \ con-\/>write(bufs);}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00291}00291\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00292}00292\ \ \ \ \ BOOST\_CHECK(\ !con-\/>ec\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00293}00293\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ output.str(),\ \textcolor{stringliteral}{"{}foo"{}}\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00294}00294\ \}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00295}00295\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00296}\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a058942174d953bdcbf3fe06f8286a947}{00296}}\ \mbox{\hyperlink{transport_2iostream_2connection_8cpp_a2a4ea05821cb997c72547a7298ec126e}{BOOST\_AUTO\_TEST\_CASE}}(\ async\_write\_vector\_1\_write\_handler\ )\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00297}00297\ \ \ \ \ std::string\ output;}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00298}00298\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00299}00299\ \ \ \ \ \mbox{\hyperlink{structstub__con_a8dc06cf0843531c67a375c6d9837bf95}{stub\_con::ptr}}\ con(\textcolor{keyword}{new}\ \mbox{\hyperlink{structstub__con}{stub\_con}}(\textcolor{keyword}{true},\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a1b864540e98dac6ff21ffff8d125719f}{alogger}},\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a6e9916d5db43239ef65859ccf37eb0a1}{elogger}}));}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00300}00300\ \ \ \ \ con-\/>set\_write\_handler(websocketpp::lib::bind(}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00301}00301\ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a796ca1e7f9c3cdaee01b2172fd2c37e4}{write\_handler}},}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00302}00302\ \ \ \ \ \ \ \ \ websocketpp::lib::ref(output),}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00303}00303\ \ \ \ \ \ \ \ \ websocketpp::lib::placeholders::\_1,}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00304}00304\ \ \ \ \ \ \ \ \ websocketpp::lib::placeholders::\_2,}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00305}00305\ \ \ \ \ \ \ \ \ websocketpp::lib::placeholders::\_3}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00306}00306\ \ \ \ \ ));}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00307}00307\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00308}00308\ \ \ \ \ std::vector<websocketpp::transport::buffer>\ bufs;}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00309}00309\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00310}00310\ \ \ \ \ std::string\ \mbox{\hyperlink{namespacefoo}{foo}}\ =\ \textcolor{stringliteral}{"{}foo"{}};}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00311}00311\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00312}00312\ \ \ \ \ bufs.push\_back(\mbox{\hyperlink{structwebsocketpp_1_1transport_1_1buffer}{websocketpp::transport::buffer}}(\mbox{\hyperlink{namespacefoo}{foo}}.data(),\mbox{\hyperlink{namespacefoo}{foo}}.size()));}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00313}00313\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00314}00314\ \ \ \ \ con-\/>write(bufs);}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00315}00315\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00316}00316\ \ \ \ \ BOOST\_CHECK(\ !con-\/>ec\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00317}00317\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ output,\ \textcolor{stringliteral}{"{}foo"{}}\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00318}00318\ \}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00319}00319\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00320}\mbox{\hyperlink{transport_2iostream_2connection_8cpp_ab01d67e7c4dbd4d138a7433a96f0d057}{00320}}\ \mbox{\hyperlink{transport_2iostream_2connection_8cpp_a2a4ea05821cb997c72547a7298ec126e}{BOOST\_AUTO\_TEST\_CASE}}(\ async\_write\_vector\_2\_ostream\ )\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00321}00321\ \ \ \ \ std::stringstream\ output;}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00322}00322\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00323}00323\ \ \ \ \ \mbox{\hyperlink{structstub__con_a8dc06cf0843531c67a375c6d9837bf95}{stub\_con::ptr}}\ con(\textcolor{keyword}{new}\ \mbox{\hyperlink{structstub__con}{stub\_con}}(\textcolor{keyword}{true},\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a1b864540e98dac6ff21ffff8d125719f}{alogger}},\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a6e9916d5db43239ef65859ccf37eb0a1}{elogger}}));}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00324}00324\ \ \ \ \ con-\/>register\_ostream(\&output);}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00325}00325\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00326}00326\ \ \ \ \ std::vector<websocketpp::transport::buffer>\ bufs;}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00327}00327\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00328}00328\ \ \ \ \ std::string\ \mbox{\hyperlink{namespacefoo}{foo}}\ =\ \textcolor{stringliteral}{"{}foo"{}};}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00329}00329\ \ \ \ \ std::string\ \mbox{\hyperlink{namespacebar}{bar}}\ =\ \textcolor{stringliteral}{"{}bar"{}};}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00330}00330\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00331}00331\ \ \ \ \ bufs.push\_back(\mbox{\hyperlink{structwebsocketpp_1_1transport_1_1buffer}{websocketpp::transport::buffer}}(\mbox{\hyperlink{namespacefoo}{foo}}.data(),\mbox{\hyperlink{namespacefoo}{foo}}.size()));}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00332}00332\ \ \ \ \ bufs.push\_back(\mbox{\hyperlink{structwebsocketpp_1_1transport_1_1buffer}{websocketpp::transport::buffer}}(\mbox{\hyperlink{namespacebar}{bar}}.data(),\mbox{\hyperlink{namespacebar}{bar}}.size()));}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00333}00333\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00334}00334\ \ \ \ \ con-\/>write(bufs);}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00335}00335\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00336}00336\ \ \ \ \ BOOST\_CHECK(\ !con-\/>ec\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00337}00337\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ output.str(),\ \textcolor{stringliteral}{"{}foobar"{}}\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00338}00338\ \}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00339}00339\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00340}\mbox{\hyperlink{transport_2iostream_2connection_8cpp_ab00cd1701a0e1ff2ce54a2996aa20f01}{00340}}\ \mbox{\hyperlink{transport_2iostream_2connection_8cpp_a2a4ea05821cb997c72547a7298ec126e}{BOOST\_AUTO\_TEST\_CASE}}(\ async\_write\_vector\_2\_write\_handler\ )\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00341}00341\ \ \ \ \ std::string\ output;}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00342}00342\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00343}00343\ \ \ \ \ \mbox{\hyperlink{structstub__con_a8dc06cf0843531c67a375c6d9837bf95}{stub\_con::ptr}}\ con(\textcolor{keyword}{new}\ \mbox{\hyperlink{structstub__con}{stub\_con}}(\textcolor{keyword}{true},\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a1b864540e98dac6ff21ffff8d125719f}{alogger}},\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a6e9916d5db43239ef65859ccf37eb0a1}{elogger}}));}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00344}00344\ \ \ \ \ con-\/>set\_write\_handler(websocketpp::lib::bind(}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00345}00345\ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a796ca1e7f9c3cdaee01b2172fd2c37e4}{write\_handler}},}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00346}00346\ \ \ \ \ \ \ \ \ websocketpp::lib::ref(output),}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00347}00347\ \ \ \ \ \ \ \ \ websocketpp::lib::placeholders::\_1,}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00348}00348\ \ \ \ \ \ \ \ \ websocketpp::lib::placeholders::\_2,}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00349}00349\ \ \ \ \ \ \ \ \ websocketpp::lib::placeholders::\_3}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00350}00350\ \ \ \ \ ));}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00351}00351\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00352}00352\ \ \ \ \ std::vector<websocketpp::transport::buffer>\ bufs;}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00353}00353\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00354}00354\ \ \ \ \ std::string\ \mbox{\hyperlink{namespacefoo}{foo}}\ =\ \textcolor{stringliteral}{"{}foo"{}};}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00355}00355\ \ \ \ \ std::string\ \mbox{\hyperlink{namespacebar}{bar}}\ =\ \textcolor{stringliteral}{"{}bar"{}};}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00356}00356\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00357}00357\ \ \ \ \ bufs.push\_back(\mbox{\hyperlink{structwebsocketpp_1_1transport_1_1buffer}{websocketpp::transport::buffer}}(\mbox{\hyperlink{namespacefoo}{foo}}.data(),\mbox{\hyperlink{namespacefoo}{foo}}.size()));}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00358}00358\ \ \ \ \ bufs.push\_back(\mbox{\hyperlink{structwebsocketpp_1_1transport_1_1buffer}{websocketpp::transport::buffer}}(\mbox{\hyperlink{namespacebar}{bar}}.data(),\mbox{\hyperlink{namespacebar}{bar}}.size()));}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00359}00359\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00360}00360\ \ \ \ \ con-\/>write(bufs);}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00361}00361\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00362}00362\ \ \ \ \ BOOST\_CHECK(\ !con-\/>ec\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00363}00363\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ output,\ \textcolor{stringliteral}{"{}foobar"{}}\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00364}00364\ \}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00365}00365\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00366}\mbox{\hyperlink{transport_2iostream_2connection_8cpp_ad4a12ab30feb0f250b00ba28c6e56790}{00366}}\ \mbox{\hyperlink{transport_2iostream_2connection_8cpp_a2a4ea05821cb997c72547a7298ec126e}{BOOST\_AUTO\_TEST\_CASE}}(\ async\_write\_vector\_2\_vector\_write\_handler\ )\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00367}00367\ \ \ \ \ std::string\ output;}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00368}00368\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00369}00369\ \ \ \ \ \mbox{\hyperlink{structstub__con_a8dc06cf0843531c67a375c6d9837bf95}{stub\_con::ptr}}\ con(\textcolor{keyword}{new}\ \mbox{\hyperlink{structstub__con}{stub\_con}}(\textcolor{keyword}{true},\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a1b864540e98dac6ff21ffff8d125719f}{alogger}},\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a6e9916d5db43239ef65859ccf37eb0a1}{elogger}}));}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00370}00370\ \ \ \ \ con-\/>set\_vector\_write\_handler(websocketpp::lib::bind(}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00371}00371\ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a7d16e745637c81343da70132ba3c6394}{vector\_write\_handler}},}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00372}00372\ \ \ \ \ \ \ \ \ websocketpp::lib::ref(output),}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00373}00373\ \ \ \ \ \ \ \ \ websocketpp::lib::placeholders::\_1,}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00374}00374\ \ \ \ \ \ \ \ \ websocketpp::lib::placeholders::\_2}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00375}00375\ \ \ \ \ ));}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00376}00376\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00377}00377\ \ \ \ \ std::vector<websocketpp::transport::buffer>\ bufs;}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00378}00378\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00379}00379\ \ \ \ \ std::string\ \mbox{\hyperlink{namespacefoo}{foo}}\ =\ \textcolor{stringliteral}{"{}foo"{}};}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00380}00380\ \ \ \ \ std::string\ \mbox{\hyperlink{namespacebar}{bar}}\ =\ \textcolor{stringliteral}{"{}bar"{}};}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00381}00381\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00382}00382\ \ \ \ \ bufs.push\_back(\mbox{\hyperlink{structwebsocketpp_1_1transport_1_1buffer}{websocketpp::transport::buffer}}(\mbox{\hyperlink{namespacefoo}{foo}}.data(),\mbox{\hyperlink{namespacefoo}{foo}}.size()));}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00383}00383\ \ \ \ \ bufs.push\_back(\mbox{\hyperlink{structwebsocketpp_1_1transport_1_1buffer}{websocketpp::transport::buffer}}(\mbox{\hyperlink{namespacebar}{bar}}.data(),\mbox{\hyperlink{namespacebar}{bar}}.size()));}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00384}00384\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00385}00385\ \ \ \ \ con-\/>write(bufs);}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00386}00386\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00387}00387\ \ \ \ \ BOOST\_CHECK(\ !con-\/>ec\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00388}00388\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ output,\ \textcolor{stringliteral}{"{}foobar"{}}\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00389}00389\ \}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00390}00390\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00391}\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a9500b32aa161e09905bda9d2865f1b36}{00391}}\ \mbox{\hyperlink{transport_2iostream_2connection_8cpp_a2a4ea05821cb997c72547a7298ec126e}{BOOST\_AUTO\_TEST\_CASE}}(\ async\_read\_at\_least\_too\_much\ )\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00392}00392\ \ \ \ \ \mbox{\hyperlink{structstub__con_a8dc06cf0843531c67a375c6d9837bf95}{stub\_con::ptr}}\ con(\textcolor{keyword}{new}\ \mbox{\hyperlink{structstub__con}{stub\_con}}(\textcolor{keyword}{true},\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a1b864540e98dac6ff21ffff8d125719f}{alogger}},\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a6e9916d5db43239ef65859ccf37eb0a1}{elogger}}));}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00393}00393\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00394}00394\ \ \ \ \ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}[10];}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00395}00395\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00396}00396\ \ \ \ \ con-\/>async\_read\_at\_least(11,\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},10);}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00397}00397\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ con-\/>ec,\ make\_error\_code(\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1iostream_1_1error_a647b428e260748d7606c92255e1e9737aa185b313b5353e821c3fce4bf62f50a6}{websocketpp::transport::iostream::error::invalid\_num\_bytes}})\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00398}00398\ \}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00399}00399\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00400}\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a455c0a4ed8a2b22433370eb27d0cabaa}{00400}}\ \mbox{\hyperlink{transport_2iostream_2connection_8cpp_a2a4ea05821cb997c72547a7298ec126e}{BOOST\_AUTO\_TEST\_CASE}}(\ async\_read\_at\_least\_double\_read\ )\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00401}00401\ \ \ \ \ \mbox{\hyperlink{structstub__con_a8dc06cf0843531c67a375c6d9837bf95}{stub\_con::ptr}}\ con(\textcolor{keyword}{new}\ \mbox{\hyperlink{structstub__con}{stub\_con}}(\textcolor{keyword}{true},\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a1b864540e98dac6ff21ffff8d125719f}{alogger}},\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a6e9916d5db43239ef65859ccf37eb0a1}{elogger}}));}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00402}00402\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00403}00403\ \ \ \ \ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}[10];}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00404}00404\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00405}00405\ \ \ \ \ con-\/>async\_read\_at\_least(5,\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},10);}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00406}00406\ \ \ \ \ con-\/>async\_read\_at\_least(5,\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},10);}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00407}00407\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ con-\/>ec,\ make\_error\_code(\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1iostream_1_1error_a647b428e260748d7606c92255e1e9737ac1ae213118c53b4d7eceb10876d88266}{websocketpp::transport::iostream::error::double\_read}})\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00408}00408\ \}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00409}00409\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00410}\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a128c0f01e8397ed0ee786b7b319552e7}{00410}}\ \mbox{\hyperlink{transport_2iostream_2connection_8cpp_a2a4ea05821cb997c72547a7298ec126e}{BOOST\_AUTO\_TEST\_CASE}}(\ async\_read\_at\_least\ )\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00411}00411\ \ \ \ \ \mbox{\hyperlink{structstub__con_a8dc06cf0843531c67a375c6d9837bf95}{stub\_con::ptr}}\ con(\textcolor{keyword}{new}\ \mbox{\hyperlink{structstub__con}{stub\_con}}(\textcolor{keyword}{true},\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a1b864540e98dac6ff21ffff8d125719f}{alogger}},\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a6e9916d5db43239ef65859ccf37eb0a1}{elogger}}));}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00412}00412\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00413}00413\ \ \ \ \ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}[10];}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00414}00414\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00415}00415\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\textcolor{charliteral}{'x'},10);}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00416}00416\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00417}00417\ \ \ \ \ con-\/>async\_read\_at\_least(5,\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},10);}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00418}00418\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ con-\/>ec,\ make\_error\_code(\mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68daee5b74d2be31ca48e104578d6c2b7425}{websocketpp::error::test}})\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00419}00419\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00420}00420\ \ \ \ \ std::stringstream\ channel;}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00421}00421\ \ \ \ \ channel\ <<\ \textcolor{stringliteral}{"{}abcd"{}};}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00422}00422\ \ \ \ \ channel\ >>\ *con;}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00423}00423\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ channel.tellg(),\ -\/1\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00424}00424\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ con-\/>ec,\ make\_error\_code(\mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68daee5b74d2be31ca48e104578d6c2b7425}{websocketpp::error::test}})\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00425}00425\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00426}00426\ \ \ \ \ std::stringstream\ channel2;}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00427}00427\ \ \ \ \ channel2\ <<\ \textcolor{stringliteral}{"{}e"{}};}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00428}00428\ \ \ \ \ channel2\ >>\ *con;}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00429}00429\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ channel2.tellg(),\ -\/1\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00430}00430\ \ \ \ \ BOOST\_CHECK(\ !con-\/>ec\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00431}00431\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ std::string(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},10),\ \textcolor{stringliteral}{"{}abcdexxxxx"{}}\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00432}00432\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00433}00433\ \ \ \ \ std::stringstream\ channel3;}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00434}00434\ \ \ \ \ channel3\ <<\ \textcolor{stringliteral}{"{}f"{}};}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00435}00435\ \ \ \ \ channel3\ >>\ *con;}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00436}00436\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ channel3.tellg(),\ 0\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00437}00437\ \ \ \ \ BOOST\_CHECK(\ !con-\/>ec\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00438}00438\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ std::string(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},10),\ \textcolor{stringliteral}{"{}abcdexxxxx"{}}\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00439}00439\ \ \ \ \ con-\/>async\_read\_at\_least(1,\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}+5,5);}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00440}00440\ \ \ \ \ channel3\ >>\ *con;}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00441}00441\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ channel3.tellg(),\ -\/1\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00442}00442\ \ \ \ \ BOOST\_CHECK(\ !con-\/>ec\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00443}00443\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ std::string(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},10),\ \textcolor{stringliteral}{"{}abcdefxxxx"{}}\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00444}00444\ \}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00445}00445\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00446}\mbox{\hyperlink{transport_2iostream_2connection_8cpp_ae7e344f1d416c424fac592958956d6dd}{00446}}\ \mbox{\hyperlink{transport_2iostream_2connection_8cpp_a2a4ea05821cb997c72547a7298ec126e}{BOOST\_AUTO\_TEST\_CASE}}(\ async\_read\_at\_least2\ )\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00447}00447\ \ \ \ \ \mbox{\hyperlink{structstub__con_a8dc06cf0843531c67a375c6d9837bf95}{stub\_con::ptr}}\ con(\textcolor{keyword}{new}\ \mbox{\hyperlink{structstub__con}{stub\_con}}(\textcolor{keyword}{true},\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a1b864540e98dac6ff21ffff8d125719f}{alogger}},\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a6e9916d5db43239ef65859ccf37eb0a1}{elogger}}));}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00448}00448\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00449}00449\ \ \ \ \ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}[10];}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00450}00450\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00451}00451\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\textcolor{charliteral}{'x'},10);}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00452}00452\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00453}00453\ \ \ \ \ con-\/>async\_read\_at\_least(5,\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},5);}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00454}00454\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ con-\/>ec,\ make\_error\_code(\mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68daee5b74d2be31ca48e104578d6c2b7425}{websocketpp::error::test}})\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00455}00455\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00456}00456\ \ \ \ \ std::stringstream\ channel;}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00457}00457\ \ \ \ \ channel\ <<\ \textcolor{stringliteral}{"{}abcdefg"{}};}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00458}00458\ \ \ \ \ channel\ >>\ *con;}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00459}00459\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ channel.tellg(),\ 5\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00460}00460\ \ \ \ \ BOOST\_CHECK(\ !con-\/>ec\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00461}00461\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ std::string(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},10),\ \textcolor{stringliteral}{"{}abcdexxxxx"{}}\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00462}00462\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00463}00463\ \ \ \ \ con-\/>async\_read\_at\_least(1,\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}+5,5);}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00464}00464\ \ \ \ \ channel\ >>\ *con;}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00465}00465\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ channel.tellg(),\ -\/1\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00466}00466\ \ \ \ \ BOOST\_CHECK(\ !con-\/>ec\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00467}00467\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ std::string(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},10),\ \textcolor{stringliteral}{"{}abcdefgxxx"{}}\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00468}00468\ \}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00469}00469\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00470}\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a0f6d0c9320b1423f9cb85ea06aab6464}{00470}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{transport_2iostream_2connection_8cpp_a0f6d0c9320b1423f9cb85ea06aab6464}{timer\_callback\_stub}}(websocketpp::lib::error\_code\ \textcolor{keyword}{const}\ \&)\ \{\}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00471}00471\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00472}\mbox{\hyperlink{transport_2iostream_2connection_8cpp_ac5dcf7ead611cc5e065e2f58b412142e}{00472}}\ \mbox{\hyperlink{transport_2iostream_2connection_8cpp_a2a4ea05821cb997c72547a7298ec126e}{BOOST\_AUTO\_TEST\_CASE}}(\ set\_timer\ )\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00473}00473\ \ \ \ \mbox{\hyperlink{structstub__con_a8dc06cf0843531c67a375c6d9837bf95}{stub\_con::ptr}}\ con(\textcolor{keyword}{new}\ \mbox{\hyperlink{structstub__con}{stub\_con}}(\textcolor{keyword}{true},\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a1b864540e98dac6ff21ffff8d125719f}{alogger}},\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a6e9916d5db43239ef65859ccf37eb0a1}{elogger}}));}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00474}00474\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00475}00475\ \ \ \ \ \mbox{\hyperlink{structstub__con_adf832bb6ebe2a6527dae78dc651f9f15}{stub\_con::timer\_ptr}}\ tp\ =\ con-\/>set\_timer(1000,\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a0f6d0c9320b1423f9cb85ea06aab6464}{timer\_callback\_stub}});}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00476}00476\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00477}00477\ \ \ \ \ BOOST\_CHECK(\ !tp\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00478}00478\ \}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00479}00479\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00480}\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a500b26bb2994cc2d8e10e15c0a0509a1}{00480}}\ \mbox{\hyperlink{transport_2iostream_2connection_8cpp_a2a4ea05821cb997c72547a7298ec126e}{BOOST\_AUTO\_TEST\_CASE}}(\ async\_read\_at\_least\_read\_some\ )\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00481}00481\ \ \ \ \ \mbox{\hyperlink{structstub__con_a8dc06cf0843531c67a375c6d9837bf95}{stub\_con::ptr}}\ con(\textcolor{keyword}{new}\ \mbox{\hyperlink{structstub__con}{stub\_con}}(\textcolor{keyword}{true},\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a1b864540e98dac6ff21ffff8d125719f}{alogger}},\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a6e9916d5db43239ef65859ccf37eb0a1}{elogger}}));}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00482}00482\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00483}00483\ \ \ \ \ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}[10];}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00484}00484\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\textcolor{charliteral}{'x'},10);}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00485}00485\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00486}00486\ \ \ \ \ con-\/>async\_read\_at\_least(5,\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},5);}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00487}00487\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ con-\/>ec,\ make\_error\_code(\mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68daee5b74d2be31ca48e104578d6c2b7425}{websocketpp::error::test}})\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00488}00488\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00489}00489\ \ \ \ \ \textcolor{keywordtype}{char}\ input[10]\ =\ \textcolor{stringliteral}{"{}abcdefg"{}};}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00490}00490\ \ \ \ \ BOOST\_CHECK\_EQUAL(con-\/>read\_some(input,5),\ 5);}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00491}00491\ \ \ \ \ BOOST\_CHECK(\ !con-\/>ec\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00492}00492\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ std::string(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},10),\ \textcolor{stringliteral}{"{}abcdexxxxx"{}}\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00493}00493\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00494}00494\ \ \ \ \ BOOST\_CHECK\_EQUAL(con-\/>read\_some(input+5,2),\ 0);}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00495}00495\ \ \ \ \ BOOST\_CHECK(\ !con-\/>ec\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00496}00496\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ std::string(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},10),\ \textcolor{stringliteral}{"{}abcdexxxxx"{}}\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00497}00497\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00498}00498\ \ \ \ \ con-\/>async\_read\_at\_least(1,\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}+5,5);}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00499}00499\ \ \ \ \ BOOST\_CHECK\_EQUAL(con-\/>read\_some(input+5,2),\ 2);}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00500}00500\ \ \ \ \ BOOST\_CHECK(\ !con-\/>ec\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00501}00501\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ std::string(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},10),\ \textcolor{stringliteral}{"{}abcdefgxxx"{}}\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00502}00502\ \}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00503}00503\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00504}\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a4d4f4d23850be62d7e6e69f791a06178}{00504}}\ \mbox{\hyperlink{transport_2iostream_2connection_8cpp_a2a4ea05821cb997c72547a7298ec126e}{BOOST\_AUTO\_TEST\_CASE}}(\ async\_read\_at\_least\_read\_some\_indef\ )\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00505}00505\ \ \ \ \ \mbox{\hyperlink{structstub__con_a8dc06cf0843531c67a375c6d9837bf95}{stub\_con::ptr}}\ con(\textcolor{keyword}{new}\ \mbox{\hyperlink{structstub__con}{stub\_con}}(\textcolor{keyword}{true},\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a1b864540e98dac6ff21ffff8d125719f}{alogger}},\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a6e9916d5db43239ef65859ccf37eb0a1}{elogger}}));}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00506}00506\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00507}00507\ \ \ \ \ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}[20];}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00508}00508\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\textcolor{charliteral}{'x'},20);}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00509}00509\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00510}00510\ \ \ \ \ con-\/>async\_read\_indef(5,\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},5);}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00511}00511\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ con-\/>ec,\ make\_error\_code(\mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68daee5b74d2be31ca48e104578d6c2b7425}{websocketpp::error::test}})\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00512}00512\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00513}00513\ \ \ \ \ \textcolor{comment}{//\ here\ we\ expect\ to\ return\ early\ from\ read\ some\ because\ the\ outstanding}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00514}00514\ \ \ \ \ \textcolor{comment}{//\ read\ was\ for\ 5\ bytes\ and\ we\ were\ called\ with\ 10.}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00515}00515\ \ \ \ \ \textcolor{keywordtype}{char}\ input[11]\ =\ \textcolor{stringliteral}{"{}aaaaabbbbb"{}};}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00516}00516\ \ \ \ \ BOOST\_CHECK\_EQUAL(con-\/>read\_some(input,10),\ 5);}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00517}00517\ \ \ \ \ BOOST\_CHECK(\ !con-\/>ec\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00518}00518\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ std::string(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},10),\ \textcolor{stringliteral}{"{}aaaaaxxxxx"{}}\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00519}00519\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ con-\/>indef\_read\_total,\ 5\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00520}00520\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00521}00521\ \ \ \ \ \textcolor{comment}{//\ A\ subsequent\ read\ should\ read\ 5\ more\ because\ the\ indef\ read\ refreshes}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00522}00522\ \ \ \ \ \textcolor{comment}{//\ itself.\ The\ new\ read\ will\ start\ again\ at\ the\ beginning\ of\ the\ buffer.}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00523}00523\ \ \ \ \ BOOST\_CHECK\_EQUAL(con-\/>read\_some(input+5,5),\ 5);}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00524}00524\ \ \ \ \ BOOST\_CHECK(\ !con-\/>ec\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00525}00525\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ std::string(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},10),\ \textcolor{stringliteral}{"{}bbbbbxxxxx"{}}\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00526}00526\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ con-\/>indef\_read\_total,\ 10\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00527}00527\ \}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00528}00528\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00529}\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a8a865e2782e15c75224c32e21ec3fc15}{00529}}\ \mbox{\hyperlink{transport_2iostream_2connection_8cpp_a2a4ea05821cb997c72547a7298ec126e}{BOOST\_AUTO\_TEST\_CASE}}(\ async\_read\_at\_least\_read\_all\ )\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00530}00530\ \ \ \ \ \mbox{\hyperlink{structstub__con_a8dc06cf0843531c67a375c6d9837bf95}{stub\_con::ptr}}\ con(\textcolor{keyword}{new}\ \mbox{\hyperlink{structstub__con}{stub\_con}}(\textcolor{keyword}{true},\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a1b864540e98dac6ff21ffff8d125719f}{alogger}},\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a6e9916d5db43239ef65859ccf37eb0a1}{elogger}}));}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00531}00531\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00532}00532\ \ \ \ \ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}[20];}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00533}00533\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\textcolor{charliteral}{'x'},20);}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00534}00534\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00535}00535\ \ \ \ \ con-\/>async\_read\_indef(5,\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},5);}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00536}00536\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ con-\/>ec,\ make\_error\_code(\mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68daee5b74d2be31ca48e104578d6c2b7425}{websocketpp::error::test}})\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00537}00537\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00538}00538\ \ \ \ \ \textcolor{keywordtype}{char}\ input[11]\ =\ \textcolor{stringliteral}{"{}aaaaabbbbb"{}};}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00539}00539\ \ \ \ \ BOOST\_CHECK\_EQUAL(con-\/>read\_all(input,10),\ 10);}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00540}00540\ \ \ \ \ BOOST\_CHECK(\ !con-\/>ec\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00541}00541\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ std::string(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},10),\ \textcolor{stringliteral}{"{}bbbbbxxxxx"{}}\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00542}00542\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ con-\/>indef\_read\_total,\ 10\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00543}00543\ \}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00544}00544\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00545}\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a8230dbfe8d17109d8588f62cbdc2cb31}{00545}}\ \mbox{\hyperlink{transport_2iostream_2connection_8cpp_a2a4ea05821cb997c72547a7298ec126e}{BOOST\_AUTO\_TEST\_CASE}}(\ eof\_flag\ )\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00546}00546\ \ \ \ \ \mbox{\hyperlink{structstub__con_a8dc06cf0843531c67a375c6d9837bf95}{stub\_con::ptr}}\ con(\textcolor{keyword}{new}\ \mbox{\hyperlink{structstub__con}{stub\_con}}(\textcolor{keyword}{true},\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a1b864540e98dac6ff21ffff8d125719f}{alogger}},\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a6e9916d5db43239ef65859ccf37eb0a1}{elogger}}));}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00547}00547\ \ \ \ \ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}[10];}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00548}00548\ \ \ \ \ con-\/>async\_read\_at\_least(5,\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},5);}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00549}00549\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ con-\/>ec,\ make\_error\_code(\mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68daee5b74d2be31ca48e104578d6c2b7425}{websocketpp::error::test}})\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00550}00550\ \ \ \ \ con-\/>eof();}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00551}00551\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ con-\/>ec,\ make\_error\_code(\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0a73dd0d0f22cd67b7bcc031cd6bdef743}{websocketpp::transport::error::eof}})\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00552}00552\ \}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00553}00553\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00554}\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a1de191c0aae15d870d37e331f26e00f5}{00554}}\ \mbox{\hyperlink{transport_2iostream_2connection_8cpp_a2a4ea05821cb997c72547a7298ec126e}{BOOST\_AUTO\_TEST\_CASE}}(\ fatal\_error\_flag\ )\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00555}00555\ \ \ \ \ \mbox{\hyperlink{structstub__con_a8dc06cf0843531c67a375c6d9837bf95}{stub\_con::ptr}}\ con(\textcolor{keyword}{new}\ \mbox{\hyperlink{structstub__con}{stub\_con}}(\textcolor{keyword}{true},\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a1b864540e98dac6ff21ffff8d125719f}{alogger}},\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a6e9916d5db43239ef65859ccf37eb0a1}{elogger}}));}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00556}00556\ \ \ \ \ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}[10];}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00557}00557\ \ \ \ \ con-\/>async\_read\_at\_least(5,\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},5);}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00558}00558\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ con-\/>ec,\ make\_error\_code(\mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68daee5b74d2be31ca48e104578d6c2b7425}{websocketpp::error::test}})\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00559}00559\ \ \ \ \ con-\/>fatal\_error();}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00560}00560\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ con-\/>ec,\ make\_error\_code(\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0a6a7cb8ef776c9eabe2324a529e991732}{websocketpp::transport::error::pass\_through}})\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00561}00561\ \}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00562}00562\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00563}\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a071653c416615c29a3ed0971c8912a1a}{00563}}\ \mbox{\hyperlink{transport_2iostream_2connection_8cpp_a2a4ea05821cb997c72547a7298ec126e}{BOOST\_AUTO\_TEST\_CASE}}(\ shutdown\ )\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00564}00564\ \ \ \ \ \mbox{\hyperlink{structstub__con_a8dc06cf0843531c67a375c6d9837bf95}{stub\_con::ptr}}\ con(\textcolor{keyword}{new}\ \mbox{\hyperlink{structstub__con}{stub\_con}}(\textcolor{keyword}{true},\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a1b864540e98dac6ff21ffff8d125719f}{alogger}},\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a6e9916d5db43239ef65859ccf37eb0a1}{elogger}}));}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00565}00565\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ con-\/>ec,\ make\_error\_code(\mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68daee5b74d2be31ca48e104578d6c2b7425}{websocketpp::error::test}})\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00566}00566\ \ \ \ \ con-\/>shutdown();}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00567}00567\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ con-\/>ec,\ websocketpp::lib::error\_code()\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00568}00568\ \}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00569}00569\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00570}\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a351f2f50831010e9ce6df8b51b36616a}{00570}}\ websocketpp::lib::error\_code\ \mbox{\hyperlink{transport_2iostream_2connection_8cpp_a351f2f50831010e9ce6df8b51b36616a}{sd\_handler}}(\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{websocketpp::connection\_hdl}})\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00571}00571\ \ \ \ \ \textcolor{keywordflow}{return}\ make\_error\_code(\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0a161bc0c8148996271f7126aea2c24416}{websocketpp::transport::error::general}});}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00572}00572\ \}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00573}00573\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00574}\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a2a3211c3ecfbe23fb4a62ec2a2863406}{00574}}\ \mbox{\hyperlink{transport_2iostream_2connection_8cpp_a2a4ea05821cb997c72547a7298ec126e}{BOOST\_AUTO\_TEST\_CASE}}(\ shutdown\_handler\ )\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00575}00575\ \ \ \ \ \mbox{\hyperlink{structstub__con_a8dc06cf0843531c67a375c6d9837bf95}{stub\_con::ptr}}\ con(\textcolor{keyword}{new}\ \mbox{\hyperlink{structstub__con}{stub\_con}}(\textcolor{keyword}{true},\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a1b864540e98dac6ff21ffff8d125719f}{alogger}},\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a6e9916d5db43239ef65859ccf37eb0a1}{elogger}}));}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00576}00576\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00577}00577\ \ \ \ \ con-\/>set\_shutdown\_handler(\&\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a351f2f50831010e9ce6df8b51b36616a}{sd\_handler}});}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00578}00578\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ con-\/>ec,\ make\_error\_code(\mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68daee5b74d2be31ca48e104578d6c2b7425}{websocketpp::error::test}})\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00579}00579\ \ \ \ \ con-\/>shutdown();}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00580}00580\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ con-\/>ec,\ make\_error\_code(\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0a161bc0c8148996271f7126aea2c24416}{websocketpp::transport::error::general}})\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00581}00581\ \}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00582}00582\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00583}\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a5758d63151fef22028332bd6ca420135}{00583}}\ \mbox{\hyperlink{transport_2iostream_2connection_8cpp_a2a4ea05821cb997c72547a7298ec126e}{BOOST\_AUTO\_TEST\_CASE}}(\ shared\_pointer\_memory\_cleanup\ )\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00584}00584\ \ \ \ \ \mbox{\hyperlink{structstub__con_a8dc06cf0843531c67a375c6d9837bf95}{stub\_con::ptr}}\ con(\textcolor{keyword}{new}\ \mbox{\hyperlink{structstub__con}{stub\_con}}(\textcolor{keyword}{true},\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a1b864540e98dac6ff21ffff8d125719f}{alogger}},\mbox{\hyperlink{transport_2iostream_2connection_8cpp_a6e9916d5db43239ef65859ccf37eb0a1}{elogger}}));}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00585}00585\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00586}00586\ \ \ \ \ BOOST\_CHECK\_EQUAL(con.use\_count(),\ 1);}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00587}00587\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00588}00588\ \ \ \ \ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}[10];}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00589}00589\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\textcolor{charliteral}{'x'},10);}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00590}00590\ \ \ \ \ con-\/>async\_read\_at\_least(5,\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},5);}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00591}00591\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ con-\/>ec,\ make\_error\_code(\mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68daee5b74d2be31ca48e104578d6c2b7425}{websocketpp::error::test}})\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00592}00592\ \ \ \ \ BOOST\_CHECK\_EQUAL(con.use\_count(),\ 2);}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00593}00593\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00594}00594\ \ \ \ \ \textcolor{keywordtype}{char}\ input[10]\ =\ \textcolor{stringliteral}{"{}foo"{}};}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00595}00595\ \ \ \ \ con-\/>read\_some(input,3);}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00596}00596\ \ \ \ \ BOOST\_CHECK\_EQUAL(con.use\_count(),\ 2);}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00597}00597\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00598}00598\ \ \ \ \ con-\/>read\_some(input,2);}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00599}00599\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ std::string(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},10),\ \textcolor{stringliteral}{"{}foofoxxxxx"{}}\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00600}00600\ \ \ \ \ BOOST\_CHECK\_EQUAL(con.use\_count(),\ 1);}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00601}00601\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00602}00602\ \ \ \ \ con-\/>async\_read\_at\_least(5,\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},5);}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00603}00603\ \ \ \ \ BOOST\_CHECK\_EQUAL(con.use\_count(),\ 2);}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00604}00604\ }
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00605}00605\ \ \ \ \ con-\/>eof();}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00606}00606\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ con-\/>ec,\ make\_error\_code(\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0a73dd0d0f22cd67b7bcc031cd6bdef743}{websocketpp::transport::error::eof}})\ );}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00607}00607\ \ \ \ \ BOOST\_CHECK\_EQUAL(con.use\_count(),\ 1);}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00608}00608\ \}}
+\DoxyCodeLine{\Hypertarget{transport_2iostream_2connection_8cpp_source_l00609}00609\ }
+
+\end{DoxyCode}

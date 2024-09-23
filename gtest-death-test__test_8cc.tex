@@ -1,0 +1,204 @@
+\doxysection{libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/test/gtest-\/death-\/test\+\_\+test.cc File Reference}
+\hypertarget{gtest-death-test__test_8cc}{}\label{gtest-death-test__test_8cc}\index{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/test/gtest-\/death-\/test\_test.cc@{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/test/gtest-\/death-\/test\_test.cc}}
+{\ttfamily \#include "{}gtest/gtest-\/death-\/test.\+h"{}}\newline
+{\ttfamily \#include "{}gtest/gtest.\+h"{}}\newline
+{\ttfamily \#include "{}gtest/internal/gtest-\/filepath.\+h"{}}\newline
+Include dependency graph for gtest-\/death-\/test\+\_\+test.cc\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{gtest-death-test__test_8cc__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{gtest-death-test__test_8cc_a8a47cdbd11c2456db464fe098d134aa0}{TEST}} (Conditional\+Death\+Macros\+Test, Warns\+When\+Death\+Tests\+Not\+Available)
+\item 
+void \mbox{\hyperlink{gtest-death-test__test_8cc_afe40addf0e0bb4657d18f512092ef03b}{Func\+With\+Assert}} (int \texorpdfstring{$\ast$}{*}n)
+\item 
+\mbox{\hyperlink{gtest-death-test__test_8cc_acdbff3626995270fcbcc0b97e303d742}{TEST}} (Conditional\+Death\+Macros\+Test, Assert\+Deat\+Does\+Not\+Returnh\+If\+Unsupported)
+\item 
+\mbox{\hyperlink{gtest-death-test__test_8cc_aacb04a80e0263de84b203b95cc421437}{TEST}} (Conditional\+Death\+Macros\+Syntax\+Death\+Test, Single\+Statement)
+\item 
+\mbox{\hyperlink{gtest-death-test__test_8cc_a8d27f7b1efa4db83935274467e17f40c}{TEST}} (Conditional\+Death\+Macros\+Syntax\+Death\+Test, Switch\+Statement)
+\item 
+\mbox{\hyperlink{gtest-death-test__test_8cc_af77aa369d8ed7d7ceefda4e7b073b05a}{TEST}} (Not\+ADeath\+Test, \mbox{\hyperlink{class_test}{Test}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{gtest-death-test__test_8cc_afe40addf0e0bb4657d18f512092ef03b}\index{gtest-\/death-\/test\_test.cc@{gtest-\/death-\/test\_test.cc}!FuncWithAssert@{FuncWithAssert}}
+\index{FuncWithAssert@{FuncWithAssert}!gtest-\/death-\/test\_test.cc@{gtest-\/death-\/test\_test.cc}}
+\doxysubsubsection{\texorpdfstring{FuncWithAssert()}{FuncWithAssert()}}
+{\footnotesize\ttfamily \label{gtest-death-test__test_8cc_afe40addf0e0bb4657d18f512092ef03b} 
+void Func\+With\+Assert (\begin{DoxyParamCaption}\item[{int \texorpdfstring{$\ast$}{*}}]{n}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-death-test__test_8cc_source_l01360}{1360}} of file \mbox{\hyperlink{gtest-death-test__test_8cc_source}{gtest-\/death-\/test\+\_\+test.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01360\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01361\ \ \ \mbox{\hyperlink{gtest-death-test_8h_ab2f0f25b46353767179a49ebd15b7345}{ASSERT\_DEATH\_IF\_SUPPORTED}}(\textcolor{keywordflow}{return};,\ \textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{01362\ \ \ (*n)++;}
+\DoxyCodeLine{01363\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=244pt]{gtest-death-test__test_8cc_afe40addf0e0bb4657d18f512092ef03b_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{gtest-death-test__test_8cc_aacb04a80e0263de84b203b95cc421437}\index{gtest-\/death-\/test\_test.cc@{gtest-\/death-\/test\_test.cc}!TEST@{TEST}}
+\index{TEST@{TEST}!gtest-\/death-\/test\_test.cc@{gtest-\/death-\/test\_test.cc}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [1/5]}}
+{\footnotesize\ttfamily \label{gtest-death-test__test_8cc_aacb04a80e0263de84b203b95cc421437} 
+TEST (\begin{DoxyParamCaption}\item[{Conditional\+Death\+Macros\+Syntax\+Death\+Test}]{}{, }\item[{Single\+Statement}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-death-test__test_8cc_source_l01380}{1380}} of file \mbox{\hyperlink{gtest-death-test__test_8cc_source}{gtest-\/death-\/test\+\_\+test.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01380\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01381\ \ \ \textcolor{keywordflow}{if}\ (AlwaysFalse())}
+\DoxyCodeLine{01382\ \ \ \ \ \textcolor{comment}{//\ This\ would\ fail\ if\ executed;\ this\ is\ a\ compilation\ test\ only}}
+\DoxyCodeLine{01383\ \ \ \ \ \mbox{\hyperlink{gtest-death-test_8h_ab2f0f25b46353767179a49ebd15b7345}{ASSERT\_DEATH\_IF\_SUPPORTED}}(\textcolor{keywordflow}{return},\ \textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{01384\ }
+\DoxyCodeLine{01385\ \ \ \textcolor{keywordflow}{if}\ (AlwaysTrue())}
+\DoxyCodeLine{01386\ \ \ \ \ \mbox{\hyperlink{gtest-death-test_8h_a8564de0e012dd0898949c513d1571f8b}{EXPECT\_DEATH\_IF\_SUPPORTED}}(\_exit(1),\ \textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{01387\ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{01388\ \ \ \ \ \textcolor{comment}{//\ This\ empty\ "{}else"{}\ branch\ is\ meant\ to\ ensure\ that\ EXPECT\_DEATH}}
+\DoxyCodeLine{01389\ \ \ \ \ \textcolor{comment}{//\ doesn't\ expand\ into\ an\ "{}if"{}\ statement\ without\ an\ "{}else"{}}}
+\DoxyCodeLine{01390\ \ \ \ \ ;\ \ \textcolor{comment}{//\ NOLINT}}
+\DoxyCodeLine{01391\ }
+\DoxyCodeLine{01392\ \ \ \textcolor{keywordflow}{if}\ (AlwaysFalse())}
+\DoxyCodeLine{01393\ \ \ \ \ \mbox{\hyperlink{gtest-death-test_8h_ab2f0f25b46353767179a49ebd15b7345}{ASSERT\_DEATH\_IF\_SUPPORTED}}(\textcolor{keywordflow}{return},\ \textcolor{stringliteral}{"{}"{}})\ <<\ \textcolor{stringliteral}{"{}did\ not\ die"{}};}
+\DoxyCodeLine{01394\ }
+\DoxyCodeLine{01395\ \ \ \textcolor{keywordflow}{if}\ (AlwaysFalse())}
+\DoxyCodeLine{01396\ \ \ \ \ ;\ \ \textcolor{comment}{//\ NOLINT}}
+\DoxyCodeLine{01397\ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{01398\ \ \ \ \ \mbox{\hyperlink{gtest-death-test_8h_a8564de0e012dd0898949c513d1571f8b}{EXPECT\_DEATH\_IF\_SUPPORTED}}(\_exit(1),\ \textcolor{stringliteral}{"{}"{}})\ <<\ 1\ <<\ 2\ <<\ 3;}
+\DoxyCodeLine{01399\ \}}
+
+\end{DoxyCode}
+\Hypertarget{gtest-death-test__test_8cc_a8d27f7b1efa4db83935274467e17f40c}\index{gtest-\/death-\/test\_test.cc@{gtest-\/death-\/test\_test.cc}!TEST@{TEST}}
+\index{TEST@{TEST}!gtest-\/death-\/test\_test.cc@{gtest-\/death-\/test\_test.cc}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [2/5]}}
+{\footnotesize\ttfamily \label{gtest-death-test__test_8cc_a8d27f7b1efa4db83935274467e17f40c} 
+TEST (\begin{DoxyParamCaption}\item[{Conditional\+Death\+Macros\+Syntax\+Death\+Test}]{}{, }\item[{Switch\+Statement}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-death-test__test_8cc_source_l01403}{1403}} of file \mbox{\hyperlink{gtest-death-test__test_8cc_source}{gtest-\/death-\/test\+\_\+test.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01403\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01404\ \ \ \textcolor{comment}{//\ Microsoft\ compiler\ usually\ complains\ about\ switch\ statements\ without}}
+\DoxyCodeLine{01405\ \ \ \textcolor{comment}{//\ case\ labels.\ We\ suppress\ that\ warning\ for\ this\ test.}}
+\DoxyCodeLine{01406\ \ \ \mbox{\hyperlink{gtest-port_8h_a86994cc68e844d8b82089c70408dfc61}{GTEST\_DISABLE\_MSC\_WARNINGS\_PUSH\_}}(4065)}
+\DoxyCodeLine{01407\ }
+\DoxyCodeLine{01408\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a421613c463b38298abf1340f60a1877e}{switch}}\ (0)}
+\DoxyCodeLine{01409\ \ \ \ \ default:}
+\DoxyCodeLine{01410\ \ \ \ \ \ \ \mbox{\hyperlink{gtest-death-test_8h_ab2f0f25b46353767179a49ebd15b7345}{ASSERT\_DEATH\_IF\_SUPPORTED}}(\_exit(1),\ "{}"{})}
+\DoxyCodeLine{01411\ \ \ \ \ \ \ \ \ \ \ <<\ "{}exit\ in\ default\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a421613c463b38298abf1340f60a1877e}{switch}}\ handler"{};}
+\DoxyCodeLine{01412\ }
+\DoxyCodeLine{01413\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a421613c463b38298abf1340f60a1877e}{switch}}\ (0)}
+\DoxyCodeLine{01414\ \ \ \ \ case\ 0:}
+\DoxyCodeLine{01415\ \ \ \ \ \ \ \mbox{\hyperlink{gtest-death-test_8h_a8564de0e012dd0898949c513d1571f8b}{EXPECT\_DEATH\_IF\_SUPPORTED}}(\_exit(1),\ "{}"{})\ <<\ "{}exit\ in\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a421613c463b38298abf1340f60a1877e}{switch}}\ case"{};}
+\DoxyCodeLine{01416\ }
+\DoxyCodeLine{01417\ \ \ \mbox{\hyperlink{gtest-port_8h_ab4c44546d6d9aced68993b87b608fc06}{GTEST\_DISABLE\_MSC\_WARNINGS\_POP\_}}()}
+\DoxyCodeLine{01418\ \}}
+
+\end{DoxyCode}
+\Hypertarget{gtest-death-test__test_8cc_acdbff3626995270fcbcc0b97e303d742}\index{gtest-\/death-\/test\_test.cc@{gtest-\/death-\/test\_test.cc}!TEST@{TEST}}
+\index{TEST@{TEST}!gtest-\/death-\/test\_test.cc@{gtest-\/death-\/test\_test.cc}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [3/5]}}
+{\footnotesize\ttfamily \label{gtest-death-test__test_8cc_acdbff3626995270fcbcc0b97e303d742} 
+TEST (\begin{DoxyParamCaption}\item[{Conditional\+Death\+Macros\+Test}]{}{, }\item[{Assert\+Deat\+Does\+Not\+Returnh\+If\+Unsupported}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-death-test__test_8cc_source_l01367}{1367}} of file \mbox{\hyperlink{gtest-death-test__test_8cc_source}{gtest-\/death-\/test\+\_\+test.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01367\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01368\ \ \ \textcolor{keywordtype}{int}\ n\ =\ 0;}
+\DoxyCodeLine{01369\ \ \ \mbox{\hyperlink{gtest-death-test__test_8cc_afe40addf0e0bb4657d18f512092ef03b}{FuncWithAssert}}(\&n);}
+\DoxyCodeLine{01370\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(1,\ n);}
+\DoxyCodeLine{01371\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=244pt]{gtest-death-test__test_8cc_acdbff3626995270fcbcc0b97e303d742_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{gtest-death-test__test_8cc_a8a47cdbd11c2456db464fe098d134aa0}\index{gtest-\/death-\/test\_test.cc@{gtest-\/death-\/test\_test.cc}!TEST@{TEST}}
+\index{TEST@{TEST}!gtest-\/death-\/test\_test.cc@{gtest-\/death-\/test\_test.cc}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [4/5]}}
+{\footnotesize\ttfamily \label{gtest-death-test__test_8cc_a8a47cdbd11c2456db464fe098d134aa0} 
+TEST (\begin{DoxyParamCaption}\item[{Conditional\+Death\+Macros\+Test}]{}{, }\item[{Warns\+When\+Death\+Tests\+Not\+Available}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-death-test__test_8cc_source_l01331}{1331}} of file \mbox{\hyperlink{gtest-death-test__test_8cc_source}{gtest-\/death-\/test\+\_\+test.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01331\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01332\ \ \ \textcolor{comment}{//\ Empty\ statement\ will\ not\ crash,\ but\ that\ should\ not\ trigger\ a\ failure}}
+\DoxyCodeLine{01333\ \ \ \textcolor{comment}{//\ when\ death\ tests\ are\ not\ supported.}}
+\DoxyCodeLine{01334\ \ \ CaptureStderr();}
+\DoxyCodeLine{01335\ \ \ \mbox{\hyperlink{gtest-death-test_8h_a8564de0e012dd0898949c513d1571f8b}{EXPECT\_DEATH\_IF\_SUPPORTED}}(;,\ \textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{01336\ \ \ std::string\ output\ =\ GetCapturedStderr();}
+\DoxyCodeLine{01337\ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(NULL\ !=\ strstr(output.c\_str(),}
+\DoxyCodeLine{01338\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Death\ tests\ are\ not\ supported\ on\ this\ platform"{}}));}
+\DoxyCodeLine{01339\ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(NULL\ !=\ strstr(output.c\_str(),\ \textcolor{stringliteral}{"{};"{}}));}
+\DoxyCodeLine{01340\ }
+\DoxyCodeLine{01341\ \ \ \textcolor{comment}{//\ The\ streamed\ message\ should\ not\ be\ printed\ as\ there\ is\ no\ test\ failure.}}
+\DoxyCodeLine{01342\ \ \ CaptureStderr();}
+\DoxyCodeLine{01343\ \ \ \mbox{\hyperlink{gtest-death-test_8h_a8564de0e012dd0898949c513d1571f8b}{EXPECT\_DEATH\_IF\_SUPPORTED}}(;,\ \textcolor{stringliteral}{"{}"{}})\ <<\ \textcolor{stringliteral}{"{}streamed\ message"{}};}
+\DoxyCodeLine{01344\ \ \ output\ =\ GetCapturedStderr();}
+\DoxyCodeLine{01345\ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(NULL\ ==\ strstr(output.c\_str(),\ \textcolor{stringliteral}{"{}streamed\ message"{}}));}
+\DoxyCodeLine{01346\ }
+\DoxyCodeLine{01347\ \ \ CaptureStderr();}
+\DoxyCodeLine{01348\ \ \ \mbox{\hyperlink{gtest-death-test_8h_ab2f0f25b46353767179a49ebd15b7345}{ASSERT\_DEATH\_IF\_SUPPORTED}}(;,\ \textcolor{stringliteral}{"{}"{}});\ \ \textcolor{comment}{//\ NOLINT}}
+\DoxyCodeLine{01349\ \ \ output\ =\ GetCapturedStderr();}
+\DoxyCodeLine{01350\ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(NULL\ !=\ strstr(output.c\_str(),}
+\DoxyCodeLine{01351\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Death\ tests\ are\ not\ supported\ on\ this\ platform"{}}));}
+\DoxyCodeLine{01352\ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(NULL\ !=\ strstr(output.c\_str(),\ \textcolor{stringliteral}{"{};"{}}));}
+\DoxyCodeLine{01353\ }
+\DoxyCodeLine{01354\ \ \ CaptureStderr();}
+\DoxyCodeLine{01355\ \ \ \mbox{\hyperlink{gtest-death-test_8h_ab2f0f25b46353767179a49ebd15b7345}{ASSERT\_DEATH\_IF\_SUPPORTED}}(;,\ \textcolor{stringliteral}{"{}"{}})\ <<\ \textcolor{stringliteral}{"{}streamed\ message"{}};\ \ \textcolor{comment}{//\ NOLINT}}
+\DoxyCodeLine{01356\ \ \ output\ =\ GetCapturedStderr();}
+\DoxyCodeLine{01357\ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(NULL\ ==\ strstr(output.c\_str(),\ \textcolor{stringliteral}{"{}streamed\ message"{}}));}
+\DoxyCodeLine{01358\ \}}
+
+\end{DoxyCode}
+\Hypertarget{gtest-death-test__test_8cc_af77aa369d8ed7d7ceefda4e7b073b05a}\index{gtest-\/death-\/test\_test.cc@{gtest-\/death-\/test\_test.cc}!TEST@{TEST}}
+\index{TEST@{TEST}!gtest-\/death-\/test\_test.cc@{gtest-\/death-\/test\_test.cc}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [5/5]}}
+{\footnotesize\ttfamily \label{gtest-death-test__test_8cc_af77aa369d8ed7d7ceefda4e7b073b05a} 
+TEST (\begin{DoxyParamCaption}\item[{Not\+ADeath\+Test}]{}{, }\item[{\mbox{\hyperlink{class_test}{Test}}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-death-test__test_8cc_source_l01422}{1422}} of file \mbox{\hyperlink{gtest-death-test__test_8cc_source}{gtest-\/death-\/test\+\_\+test.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01422\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01423\ \ \ \mbox{\hyperlink{gtest_8h_a75adcdf89f69b0b615e395daafc315af}{SUCCEED}}();}
+\DoxyCodeLine{01424\ \}}
+
+\end{DoxyCode}

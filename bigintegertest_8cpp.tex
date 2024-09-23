@@ -1,0 +1,242 @@
+\doxysection{libraries/fc/include/fc/crypto/webauthn\+\_\+json/test/unittest/bigintegertest.cpp File Reference}
+\hypertarget{bigintegertest_8cpp}{}\label{bigintegertest_8cpp}\index{libraries/fc/include/fc/crypto/webauthn\_json/test/unittest/bigintegertest.cpp@{libraries/fc/include/fc/crypto/webauthn\_json/test/unittest/bigintegertest.cpp}}
+{\ttfamily \#include "{}unittest.\+h"{}}\newline
+{\ttfamily \#include "{}rapidjson/internal/biginteger.\+h"{}}\newline
+Include dependency graph for bigintegertest.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{bigintegertest_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{bigintegertest_8cpp_a92485163f9780d3f913ba6241bb668a1}{BIGINTEGER\+\_\+\+LITERAL}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{bigintegertest_8cpp_aa8cf7efbc0acc1faf78ac414a6bdc697}{TEST}} (Big\+Integer, Constructor)
+\item 
+\mbox{\hyperlink{bigintegertest_8cpp_adbf90ce017efe6df9513580a1e92adfb}{TEST}} (Big\+Integer, Add\+Uint64)
+\item 
+\mbox{\hyperlink{bigintegertest_8cpp_a3593c420038e83831fcd23c1df6e32c8}{TEST}} (Big\+Integer, Multiply\+Uint64)
+\item 
+\mbox{\hyperlink{bigintegertest_8cpp_aa9f8b4097ff348a7cc1ba276dac1d1d6}{TEST}} (Big\+Integer, Multiply\+Uint32)
+\item 
+\mbox{\hyperlink{bigintegertest_8cpp_a056b4f0cf92be264641638a89d1bb022}{TEST}} (Big\+Integer, Left\+Shift)
+\item 
+\mbox{\hyperlink{bigintegertest_8cpp_acc87e5f0c34e0c395cecdb2f3b2a00bd}{TEST}} (Big\+Integer, Compare)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{bigintegertest_8cpp_a92485163f9780d3f913ba6241bb668a1}\index{bigintegertest.cpp@{bigintegertest.cpp}!BIGINTEGER\_LITERAL@{BIGINTEGER\_LITERAL}}
+\index{BIGINTEGER\_LITERAL@{BIGINTEGER\_LITERAL}!bigintegertest.cpp@{bigintegertest.cpp}}
+\doxysubsubsection{\texorpdfstring{BIGINTEGER\_LITERAL}{BIGINTEGER\_LITERAL}}
+{\footnotesize\ttfamily \label{bigintegertest_8cpp_a92485163f9780d3f913ba6241bb668a1} 
+\#define BIGINTEGER\+\_\+\+LITERAL(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{BigInteger(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})\ -\/\ 1)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{bigintegertest_8cpp_source_l00021}{21}} of file \mbox{\hyperlink{bigintegertest_8cpp_source}{bigintegertest.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{bigintegertest_8cpp_adbf90ce017efe6df9513580a1e92adfb}\index{bigintegertest.cpp@{bigintegertest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!bigintegertest.cpp@{bigintegertest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [1/6]}}
+{\footnotesize\ttfamily \label{bigintegertest_8cpp_adbf90ce017efe6df9513580a1e92adfb} 
+TEST (\begin{DoxyParamCaption}\item[{Big\+Integer}]{}{, }\item[{Add\+Uint64}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bigintegertest_8cpp_source_l00044}{44}} of file \mbox{\hyperlink{bigintegertest_8cpp_source}{bigintegertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00045\ \ \ \ \ BigInteger\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ =\ kZero;}
+\DoxyCodeLine{00046\ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ +=\ 0u;}
+\DoxyCodeLine{00047\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(kZero\ ==\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{00048\ }
+\DoxyCodeLine{00049\ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ +=\ 1u;}
+\DoxyCodeLine{00050\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(kOne\ ==\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{00051\ }
+\DoxyCodeLine{00052\ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ +=\ 1u;}
+\DoxyCodeLine{00053\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(BigInteger(2)\ ==\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{00054\ }
+\DoxyCodeLine{00055\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(BigInteger(\mbox{\hyperlink{rapidjson_8h_aaee1245f375a71be1ac9b8a07ba5fb8f}{RAPIDJSON\_UINT64\_C2}}(0xFFFFFFFF,\ 0xFFFFFFFF))\ ==\ kUint64Max);}
+\DoxyCodeLine{00056\ \ \ \ \ BigInteger\ b\ =\ kUint64Max;}
+\DoxyCodeLine{00057\ \ \ \ \ b\ +=\ 1u;}
+\DoxyCodeLine{00058\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(kTwo64\ ==\ b);}
+\DoxyCodeLine{00059\ \ \ \ \ b\ +=\ \mbox{\hyperlink{rapidjson_8h_aaee1245f375a71be1ac9b8a07ba5fb8f}{RAPIDJSON\_UINT64\_C2}}(0xFFFFFFFF,\ 0xFFFFFFFF);}
+\DoxyCodeLine{00060\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{bigintegertest_8cpp_a92485163f9780d3f913ba6241bb668a1}{BIGINTEGER\_LITERAL}}(\textcolor{stringliteral}{"{}36893488147419103231"{}})\ ==\ b);}
+\DoxyCodeLine{00061\ \}}
+
+\end{DoxyCode}
+\Hypertarget{bigintegertest_8cpp_acc87e5f0c34e0c395cecdb2f3b2a00bd}\index{bigintegertest.cpp@{bigintegertest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!bigintegertest.cpp@{bigintegertest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [2/6]}}
+{\footnotesize\ttfamily \label{bigintegertest_8cpp_acc87e5f0c34e0c395cecdb2f3b2a00bd} 
+TEST (\begin{DoxyParamCaption}\item[{Big\+Integer}]{}{, }\item[{Compare}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bigintegertest_8cpp_source_l00130}{130}} of file \mbox{\hyperlink{bigintegertest_8cpp_source}{bigintegertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00131\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0,\ kZero.Compare(kZero));}
+\DoxyCodeLine{00132\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(1,\ kOne.Compare(kZero));}
+\DoxyCodeLine{00133\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(-\/1,\ kZero.Compare(kOne));}
+\DoxyCodeLine{00134\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0,\ kUint64Max.Compare(kUint64Max));}
+\DoxyCodeLine{00135\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0,\ kTwo64.Compare(kTwo64));}
+\DoxyCodeLine{00136\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(-\/1,\ kUint64Max.Compare(kTwo64));}
+\DoxyCodeLine{00137\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(1,\ kTwo64.Compare(kUint64Max));}
+\DoxyCodeLine{00138\ \}}
+
+\end{DoxyCode}
+\Hypertarget{bigintegertest_8cpp_aa8cf7efbc0acc1faf78ac414a6bdc697}\index{bigintegertest.cpp@{bigintegertest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!bigintegertest.cpp@{bigintegertest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [3/6]}}
+{\footnotesize\ttfamily \label{bigintegertest_8cpp_aa8cf7efbc0acc1faf78ac414a6bdc697} 
+TEST (\begin{DoxyParamCaption}\item[{Big\+Integer}]{}{, }\item[{Constructor}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bigintegertest_8cpp_source_l00028}{28}} of file \mbox{\hyperlink{bigintegertest_8cpp_source}{bigintegertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00029\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(kZero.IsZero());}
+\DoxyCodeLine{00030\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(kZero\ ==\ kZero);}
+\DoxyCodeLine{00031\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(kZero\ ==\ \mbox{\hyperlink{bigintegertest_8cpp_a92485163f9780d3f913ba6241bb668a1}{BIGINTEGER\_LITERAL}}(\textcolor{stringliteral}{"{}0"{}}));}
+\DoxyCodeLine{00032\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(kZero\ ==\ \mbox{\hyperlink{bigintegertest_8cpp_a92485163f9780d3f913ba6241bb668a1}{BIGINTEGER\_LITERAL}}(\textcolor{stringliteral}{"{}00"{}}));}
+\DoxyCodeLine{00033\ }
+\DoxyCodeLine{00034\ \ \ \ \ \textcolor{keyword}{const}\ BigInteger\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}(123);}
+\DoxyCodeLine{00035\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ ==\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{00036\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ ==\ \mbox{\hyperlink{bigintegertest_8cpp_a92485163f9780d3f913ba6241bb668a1}{BIGINTEGER\_LITERAL}}(\textcolor{stringliteral}{"{}123"{}}));}
+\DoxyCodeLine{00037\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ ==\ \mbox{\hyperlink{bigintegertest_8cpp_a92485163f9780d3f913ba6241bb668a1}{BIGINTEGER\_LITERAL}}(\textcolor{stringliteral}{"{}0123"{}}));}
+\DoxyCodeLine{00038\ }
+\DoxyCodeLine{00039\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(2u,\ kTwo64.GetCount());}
+\DoxyCodeLine{00040\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0u,\ kTwo64.GetDigit(0));}
+\DoxyCodeLine{00041\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(1u,\ kTwo64.GetDigit(1));}
+\DoxyCodeLine{00042\ \}}
+
+\end{DoxyCode}
+\Hypertarget{bigintegertest_8cpp_a056b4f0cf92be264641638a89d1bb022}\index{bigintegertest.cpp@{bigintegertest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!bigintegertest.cpp@{bigintegertest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [4/6]}}
+{\footnotesize\ttfamily \label{bigintegertest_8cpp_a056b4f0cf92be264641638a89d1bb022} 
+TEST (\begin{DoxyParamCaption}\item[{Big\+Integer}]{}{, }\item[{Left\+Shift}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bigintegertest_8cpp_source_l00107}{107}} of file \mbox{\hyperlink{bigintegertest_8cpp_source}{bigintegertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00108\ \ \ \ \ BigInteger\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ =\ kZero;}
+\DoxyCodeLine{00109\ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ <<=\ 1;}
+\DoxyCodeLine{00110\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(kZero\ ==\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{00111\ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ <<=\ 64;}
+\DoxyCodeLine{00112\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(kZero\ ==\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{00113\ }
+\DoxyCodeLine{00114\ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ =\ BigInteger(123);}
+\DoxyCodeLine{00115\ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ <<=\ 0;}
+\DoxyCodeLine{00116\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(BigInteger(123)\ ==\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{00117\ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ <<=\ 1;}
+\DoxyCodeLine{00118\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(BigInteger(246)\ ==\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{00119\ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ <<=\ 64;}
+\DoxyCodeLine{00120\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{bigintegertest_8cpp_a92485163f9780d3f913ba6241bb668a1}{BIGINTEGER\_LITERAL}}(\textcolor{stringliteral}{"{}4537899042132549697536"{}})\ ==\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{00121\ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ <<=\ 99;}
+\DoxyCodeLine{00122\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{bigintegertest_8cpp_a92485163f9780d3f913ba6241bb668a1}{BIGINTEGER\_LITERAL}}(\textcolor{stringliteral}{"{}2876235222267216943024851750785644982682875244576768"{}})\ ==\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{00123\ }
+\DoxyCodeLine{00124\ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ =\ 1;}
+\DoxyCodeLine{00125\ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ <<=\ 64;\ \textcolor{comment}{//\ a.count\_\ !=\ 1}}
+\DoxyCodeLine{00126\ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ <<=\ 256;\ \textcolor{comment}{//\ interShift\ ==\ 0}}
+\DoxyCodeLine{00127\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{bigintegertest_8cpp_a92485163f9780d3f913ba6241bb668a1}{BIGINTEGER\_LITERAL}}(\textcolor{stringliteral}{"{}2135987035920910082395021706169552114602704522356652769947041607822219725780640550022962086936576"{}})\ ==\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{00128\ \}}
+
+\end{DoxyCode}
+\Hypertarget{bigintegertest_8cpp_aa9f8b4097ff348a7cc1ba276dac1d1d6}\index{bigintegertest.cpp@{bigintegertest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!bigintegertest.cpp@{bigintegertest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [5/6]}}
+{\footnotesize\ttfamily \label{bigintegertest_8cpp_aa9f8b4097ff348a7cc1ba276dac1d1d6} 
+TEST (\begin{DoxyParamCaption}\item[{Big\+Integer}]{}{, }\item[{Multiply\+Uint32}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bigintegertest_8cpp_source_l00085}{85}} of file \mbox{\hyperlink{bigintegertest_8cpp_source}{bigintegertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00086\ \ \ \ \ BigInteger\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ =\ kZero;}
+\DoxyCodeLine{00087\ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ *=\ \textcolor{keyword}{static\_cast\ <}\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\textcolor{keyword}{>}(0);}
+\DoxyCodeLine{00088\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(kZero\ ==\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{00089\ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ *=\ \textcolor{keyword}{static\_cast\ <}\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\textcolor{keyword}{>}(123);}
+\DoxyCodeLine{00090\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(kZero\ ==\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{00091\ }
+\DoxyCodeLine{00092\ \ \ \ \ BigInteger\ b\ =\ kOne;}
+\DoxyCodeLine{00093\ \ \ \ \ b\ *=\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\textcolor{keyword}{>}(1);}
+\DoxyCodeLine{00094\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(kOne\ ==\ b);}
+\DoxyCodeLine{00095\ \ \ \ \ b\ *=\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\textcolor{keyword}{>}(0);}
+\DoxyCodeLine{00096\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(kZero\ ==\ b);}
+\DoxyCodeLine{00097\ }
+\DoxyCodeLine{00098\ \ \ \ \ BigInteger\ c(123);}
+\DoxyCodeLine{00099\ \ \ \ \ c\ *=\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\textcolor{keyword}{>}(456u);}
+\DoxyCodeLine{00100\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(BigInteger(123u\ *\ 456u)\ ==\ c);}
+\DoxyCodeLine{00101\ \ \ \ \ c\ *=\ 0xFFFFFFFFu;}
+\DoxyCodeLine{00102\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{bigintegertest_8cpp_a92485163f9780d3f913ba6241bb668a1}{BIGINTEGER\_LITERAL}}(\textcolor{stringliteral}{"{}240896125641960"{}})\ ==\ c);}
+\DoxyCodeLine{00103\ \ \ \ \ c\ *=\ 0xFFFFFFFFu;}
+\DoxyCodeLine{00104\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{bigintegertest_8cpp_a92485163f9780d3f913ba6241bb668a1}{BIGINTEGER\_LITERAL}}(\textcolor{stringliteral}{"{}1034640981124429079698200"{}})\ ==\ c);}
+\DoxyCodeLine{00105\ \}}
+
+\end{DoxyCode}
+\Hypertarget{bigintegertest_8cpp_a3593c420038e83831fcd23c1df6e32c8}\index{bigintegertest.cpp@{bigintegertest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!bigintegertest.cpp@{bigintegertest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [6/6]}}
+{\footnotesize\ttfamily \label{bigintegertest_8cpp_a3593c420038e83831fcd23c1df6e32c8} 
+TEST (\begin{DoxyParamCaption}\item[{Big\+Integer}]{}{, }\item[{Multiply\+Uint64}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bigintegertest_8cpp_source_l00063}{63}} of file \mbox{\hyperlink{bigintegertest_8cpp_source}{bigintegertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00064\ \ \ \ \ BigInteger\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ =\ kZero;}
+\DoxyCodeLine{00065\ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ *=\ \textcolor{keyword}{static\_cast\ <}\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\textcolor{keyword}{>}(0);}
+\DoxyCodeLine{00066\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(kZero\ ==\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{00067\ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ *=\ \textcolor{keyword}{static\_cast\ <}\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\textcolor{keyword}{>}(123);}
+\DoxyCodeLine{00068\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(kZero\ ==\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{00069\ }
+\DoxyCodeLine{00070\ \ \ \ \ BigInteger\ b\ =\ kOne;}
+\DoxyCodeLine{00071\ \ \ \ \ b\ *=\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\textcolor{keyword}{>}(1);}
+\DoxyCodeLine{00072\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(kOne\ ==\ b);}
+\DoxyCodeLine{00073\ \ \ \ \ b\ *=\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\textcolor{keyword}{>}(0);}
+\DoxyCodeLine{00074\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(kZero\ ==\ b);}
+\DoxyCodeLine{00075\ }
+\DoxyCodeLine{00076\ \ \ \ \ BigInteger\ c(123);}
+\DoxyCodeLine{00077\ \ \ \ \ c\ *=\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\textcolor{keyword}{>}(456u);}
+\DoxyCodeLine{00078\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(BigInteger(123u\ *\ 456u)\ ==\ c);}
+\DoxyCodeLine{00079\ \ \ \ \ c\ *=\ \mbox{\hyperlink{rapidjson_8h_aaee1245f375a71be1ac9b8a07ba5fb8f}{RAPIDJSON\_UINT64\_C2}}(0xFFFFFFFF,\ 0xFFFFFFFF);}
+\DoxyCodeLine{00080\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{bigintegertest_8cpp_a92485163f9780d3f913ba6241bb668a1}{BIGINTEGER\_LITERAL}}(\textcolor{stringliteral}{"{}1034640981606221330982120"{}})\ ==\ c);}
+\DoxyCodeLine{00081\ \ \ \ \ c\ *=\ \mbox{\hyperlink{rapidjson_8h_aaee1245f375a71be1ac9b8a07ba5fb8f}{RAPIDJSON\_UINT64\_C2}}(0xFFFFFFFF,\ 0xFFFFFFFF);}
+\DoxyCodeLine{00082\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{bigintegertest_8cpp_a92485163f9780d3f913ba6241bb668a1}{BIGINTEGER\_LITERAL}}(\textcolor{stringliteral}{"{}19085757395861596536664473018420572782123800"{}})\ ==\ c);}
+\DoxyCodeLine{00083\ \}}
+
+\end{DoxyCode}

@@ -1,0 +1,9 @@
+<map id="sysio::chain::detail::snapshot_row_traits&lt; global_property_object &gt;::to_snapshot_row" name="sysio::chain::detail::snapshot_row_traits&lt; global_property_object &gt;::to_snapshot_row">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,169,76"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1producer__authority__schedule.html#a4b0d95b22a8be15ac06dc3b105638c54" title=" " alt="" coords="217,13,388,68"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="169,38,201,38,201,43,169,43"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1chain_1_1producer__authority.html#a1861665169e509d0bcf56bbf6064a1f9" title=" " alt="" coords="436,20,594,61"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="389,38,420,38,420,43,389,43"/>
+<area shape="rect" id="Node000004" href="$structsysio_1_1chain_1_1block__signing__authority__v0.html#a939082a81292f2aed3e844140b59461c" title=" " alt="" coords="642,13,790,68"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="595,38,627,38,627,43,595,43"/>
+</map>

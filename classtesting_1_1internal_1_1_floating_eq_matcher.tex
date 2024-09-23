@@ -1,0 +1,161 @@
+\doxysection{testing\+::internal\+::Floating\+Eq\+Matcher\texorpdfstring{$<$}{<} Float\+Type \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classtesting_1_1internal_1_1_floating_eq_matcher}{}\label{classtesting_1_1internal_1_1_floating_eq_matcher}\index{testing::internal::FloatingEqMatcher$<$ FloatType $>$@{testing::internal::FloatingEqMatcher$<$ FloatType $>$}}
+
+
+{\ttfamily \#include $<$gmock-\/matchers.\+h$>$}
+
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classtesting_1_1internal_1_1_floating_eq_matcher_1_1_impl}{Impl}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_floating_eq_matcher_a92b08d1635c900fa8571ff4eff30b4bb}{Floating\+Eq\+Matcher}} (Float\+Type expected, bool nan\+\_\+eq\+\_\+nan)
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_floating_eq_matcher_a07674c4b017965493a3c20a218f9a74f}{Floating\+Eq\+Matcher}} (Float\+Type expected, bool nan\+\_\+eq\+\_\+nan, Float\+Type max\+\_\+abs\+\_\+error)
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_floating_eq_matcher_abd377dfafd89bdb7effdd80989aeee80}{operator Matcher$<$ Float\+Type $>$}} () const
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_floating_eq_matcher_a834ec2324c039c627b991a87a7fef705}{operator Matcher$<$ const Float\+Type \& $>$}} () const
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_floating_eq_matcher_a3d7a2d421be101095470630419c1a5fd}{operator Matcher$<$ Float\+Type \& $>$}} () const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Float\+Type$>$\newline
+class testing\+::internal\+::\+Floating\+Eq\+Matcher$<$ Float\+Type $>$}
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l02084}{2084}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_floating_eq_matcher_a92b08d1635c900fa8571ff4eff30b4bb}\index{testing::internal::FloatingEqMatcher$<$ FloatType $>$@{testing::internal::FloatingEqMatcher$<$ FloatType $>$}!FloatingEqMatcher@{FloatingEqMatcher}}
+\index{FloatingEqMatcher@{FloatingEqMatcher}!testing::internal::FloatingEqMatcher$<$ FloatType $>$@{testing::internal::FloatingEqMatcher$<$ FloatType $>$}}
+\doxysubsubsection{\texorpdfstring{FloatingEqMatcher()}{FloatingEqMatcher()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_floating_eq_matcher_a92b08d1635c900fa8571ff4eff30b4bb} 
+template$<$typename Float\+Type $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_floating_eq_matcher}{testing\+::internal\+::\+Floating\+Eq\+Matcher}}$<$ Float\+Type $>$\+::\+Floating\+Eq\+Matcher (\begin{DoxyParamCaption}\item[{Float\+Type}]{expected}{, }\item[{bool}]{nan\+\_\+eq\+\_\+nan}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l02092}{2092}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02092\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :}
+\DoxyCodeLine{02093\ \ \ \ \ expected\_(expected),\ nan\_eq\_nan\_(nan\_eq\_nan),\ max\_abs\_error\_(-\/1)\ \{}
+\DoxyCodeLine{02094\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1internal_1_1_floating_eq_matcher_a07674c4b017965493a3c20a218f9a74f}\index{testing::internal::FloatingEqMatcher$<$ FloatType $>$@{testing::internal::FloatingEqMatcher$<$ FloatType $>$}!FloatingEqMatcher@{FloatingEqMatcher}}
+\index{FloatingEqMatcher@{FloatingEqMatcher}!testing::internal::FloatingEqMatcher$<$ FloatType $>$@{testing::internal::FloatingEqMatcher$<$ FloatType $>$}}
+\doxysubsubsection{\texorpdfstring{FloatingEqMatcher()}{FloatingEqMatcher()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_floating_eq_matcher_a07674c4b017965493a3c20a218f9a74f} 
+template$<$typename Float\+Type $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_floating_eq_matcher}{testing\+::internal\+::\+Floating\+Eq\+Matcher}}$<$ Float\+Type $>$\+::\+Floating\+Eq\+Matcher (\begin{DoxyParamCaption}\item[{Float\+Type}]{expected}{, }\item[{bool}]{nan\+\_\+eq\+\_\+nan}{, }\item[{Float\+Type}]{max\+\_\+abs\+\_\+error}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l02099}{2099}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02101\ \ \ \ \ \ \ :\ expected\_(expected),}
+\DoxyCodeLine{02102\ \ \ \ \ \ \ \ \ nan\_eq\_nan\_(nan\_eq\_nan),}
+\DoxyCodeLine{02103\ \ \ \ \ \ \ \ \ max\_abs\_error\_(max\_abs\_error)\ \{}
+\DoxyCodeLine{02104\ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_ab54343f0a36dc4cb0ce8a478dd7847b8}{GTEST\_CHECK\_}}(max\_abs\_error\ >=\ 0)}
+\DoxyCodeLine{02105\ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{},\ where\ max\_abs\_error\ is"{}}\ <<\ max\_abs\_error;}
+\DoxyCodeLine{02106\ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_floating_eq_matcher_a834ec2324c039c627b991a87a7fef705}\index{testing::internal::FloatingEqMatcher$<$ FloatType $>$@{testing::internal::FloatingEqMatcher$<$ FloatType $>$}!operator Matcher$<$ const FloatType \& $>$@{operator Matcher$<$ const FloatType \& $>$}}
+\index{operator Matcher$<$ const FloatType \& $>$@{operator Matcher$<$ const FloatType \& $>$}!testing::internal::FloatingEqMatcher$<$ FloatType $>$@{testing::internal::FloatingEqMatcher$<$ FloatType $>$}}
+\doxysubsubsection{\texorpdfstring{operator Matcher$<$ const FloatType \& $>$()}{operator Matcher< const FloatType \& >()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_floating_eq_matcher_a834ec2324c039c627b991a87a7fef705} 
+template$<$typename Float\+Type $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_floating_eq_matcher}{testing\+::internal\+::\+Floating\+Eq\+Matcher}}$<$ Float\+Type $>$\+::operator \mbox{\hyperlink{classtesting_1_1_matcher}{Matcher}}$<$ const Float\+Type \& $>$ (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l02217}{2217}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02217\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02218\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetesting_aca6c4c4fdf7fb7257ea4fc76971cb82c}{MakeMatcher}}(}
+\DoxyCodeLine{02219\ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ Impl<const\ FloatType\&>(expected\_,\ nan\_eq\_nan\_,\ max\_abs\_error\_));}
+\DoxyCodeLine{02220\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_floating_eq_matcher_a834ec2324c039c627b991a87a7fef705_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_floating_eq_matcher_a3d7a2d421be101095470630419c1a5fd}\index{testing::internal::FloatingEqMatcher$<$ FloatType $>$@{testing::internal::FloatingEqMatcher$<$ FloatType $>$}!operator Matcher$<$ FloatType \& $>$@{operator Matcher$<$ FloatType \& $>$}}
+\index{operator Matcher$<$ FloatType \& $>$@{operator Matcher$<$ FloatType \& $>$}!testing::internal::FloatingEqMatcher$<$ FloatType $>$@{testing::internal::FloatingEqMatcher$<$ FloatType $>$}}
+\doxysubsubsection{\texorpdfstring{operator Matcher$<$ FloatType \& $>$()}{operator Matcher< FloatType \& >()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_floating_eq_matcher_a3d7a2d421be101095470630419c1a5fd} 
+template$<$typename Float\+Type $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_floating_eq_matcher}{testing\+::internal\+::\+Floating\+Eq\+Matcher}}$<$ Float\+Type $>$\+::operator \mbox{\hyperlink{classtesting_1_1_matcher}{Matcher}}$<$ Float\+Type \& $>$ (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l02222}{2222}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02222\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02223\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetesting_aca6c4c4fdf7fb7257ea4fc76971cb82c}{MakeMatcher}}(}
+\DoxyCodeLine{02224\ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ Impl<FloatType\&>(expected\_,\ nan\_eq\_nan\_,\ max\_abs\_error\_));}
+\DoxyCodeLine{02225\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_floating_eq_matcher_a3d7a2d421be101095470630419c1a5fd_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_floating_eq_matcher_abd377dfafd89bdb7effdd80989aeee80}\index{testing::internal::FloatingEqMatcher$<$ FloatType $>$@{testing::internal::FloatingEqMatcher$<$ FloatType $>$}!operator Matcher$<$ FloatType $>$@{operator Matcher$<$ FloatType $>$}}
+\index{operator Matcher$<$ FloatType $>$@{operator Matcher$<$ FloatType $>$}!testing::internal::FloatingEqMatcher$<$ FloatType $>$@{testing::internal::FloatingEqMatcher$<$ FloatType $>$}}
+\doxysubsubsection{\texorpdfstring{operator Matcher$<$ FloatType $>$()}{operator Matcher< FloatType >()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_floating_eq_matcher_abd377dfafd89bdb7effdd80989aeee80} 
+template$<$typename Float\+Type $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_floating_eq_matcher}{testing\+::internal\+::\+Floating\+Eq\+Matcher}}$<$ Float\+Type $>$\+::operator \mbox{\hyperlink{classtesting_1_1_matcher}{Matcher}}$<$ Float\+Type $>$ (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l02212}{2212}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02212\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02213\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetesting_aca6c4c4fdf7fb7257ea4fc76971cb82c}{MakeMatcher}}(}
+\DoxyCodeLine{02214\ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ Impl<FloatType>(expected\_,\ nan\_eq\_nan\_,\ max\_abs\_error\_));}
+\DoxyCodeLine{02215\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_floating_eq_matcher_abd377dfafd89bdb7effdd80989aeee80_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/include/gmock/\mbox{\hyperlink{gmock-matchers_8h}{gmock-\/matchers.\+h}}\end{DoxyCompactItemize}

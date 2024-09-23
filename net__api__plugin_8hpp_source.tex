@@ -1,0 +1,37 @@
+\doxysection{net\+\_\+api\+\_\+plugin.\+hpp}
+\hypertarget{net__api__plugin_8hpp_source}{}\label{net__api__plugin_8hpp_source}\index{plugins/net\_api\_plugin/include/sysio/net\_api\_plugin/net\_api\_plugin.hpp@{plugins/net\_api\_plugin/include/sysio/net\_api\_plugin/net\_api\_plugin.hpp}}
+\mbox{\hyperlink{net__api__plugin_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{net__api__plugin_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{net__api__plugin_8hpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{net__api__plugin_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{net__plugin_8hpp}{sysio/net\_plugin/net\_plugin.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{net__api__plugin_8hpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{http__plugin_8hpp}{sysio/http\_plugin/http\_plugin.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{net__api__plugin_8hpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{net__api__plugin_8hpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{application_8hpp}{appbase/application.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{net__api__plugin_8hpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{net__api__plugin_8hpp_source_l00008}00008\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{}
+\DoxyCodeLine{\Hypertarget{net__api__plugin_8hpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{net__api__plugin_8hpp_source_l00010}00010\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespaceappbase}{appbase}};}
+\DoxyCodeLine{\Hypertarget{net__api__plugin_8hpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{net__api__plugin_8hpp_source_l00012}\mbox{\hyperlink{classsysio_1_1net__api__plugin}{00012}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1net__api__plugin}{net\_api\_plugin}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classappbase_1_1plugin}{plugin}}<net\_api\_plugin>\ \{}
+\DoxyCodeLine{\Hypertarget{net__api__plugin_8hpp_source_l00013}00013\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{net__api__plugin_8hpp_source_l00014}\mbox{\hyperlink{classsysio_1_1net__api__plugin_a96000fa48f1f2733f2dfbfc6aa8b9355}{00014}}\ \ \ \ \mbox{\hyperlink{classsysio_1_1net__api__plugin_a96000fa48f1f2733f2dfbfc6aa8b9355}{APPBASE\_PLUGIN\_REQUIRES}}((\mbox{\hyperlink{classsysio_1_1net__plugin}{net\_plugin}})\ (\mbox{\hyperlink{classsysio_1_1http__plugin}{http\_plugin}}))}
+\DoxyCodeLine{\Hypertarget{net__api__plugin_8hpp_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{net__api__plugin_8hpp_source_l00016}00016\ \ \ \ \mbox{\hyperlink{classsysio_1_1net__api__plugin_a730343d3188480bc9f82d93204462b05}{net\_api\_plugin}}()\ =\ \textcolor{keywordflow}{default};}
+\DoxyCodeLine{\Hypertarget{net__api__plugin_8hpp_source_l00017}\mbox{\hyperlink{classsysio_1_1net__api__plugin_a730343d3188480bc9f82d93204462b05}{00017}}\ \ \ \ \mbox{\hyperlink{classsysio_1_1net__api__plugin_a730343d3188480bc9f82d93204462b05}{net\_api\_plugin}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1net__api__plugin}{net\_api\_plugin}}\&)\ =\ \textcolor{keyword}{delete};}
+\DoxyCodeLine{\Hypertarget{net__api__plugin_8hpp_source_l00018}\mbox{\hyperlink{classsysio_1_1net__api__plugin_ad7b0e40d61fca13a67af68da4ec9745b}{00018}}\ \ \ \ \mbox{\hyperlink{classsysio_1_1net__api__plugin_ad7b0e40d61fca13a67af68da4ec9745b}{net\_api\_plugin}}(\mbox{\hyperlink{classsysio_1_1net__api__plugin}{net\_api\_plugin}}\&\&)\ =\ \textcolor{keyword}{delete};}
+\DoxyCodeLine{\Hypertarget{net__api__plugin_8hpp_source_l00019}\mbox{\hyperlink{classsysio_1_1net__api__plugin_a7b28bc40ae9e4c6a98289fbec015409e}{00019}}\ \ \ \ \mbox{\hyperlink{classsysio_1_1net__api__plugin}{net\_api\_plugin}}\&\ \mbox{\hyperlink{classsysio_1_1net__api__plugin_a7b28bc40ae9e4c6a98289fbec015409e}{operator=}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1net__api__plugin}{net\_api\_plugin}}\&)\ =\ \textcolor{keyword}{delete};}
+\DoxyCodeLine{\Hypertarget{net__api__plugin_8hpp_source_l00020}\mbox{\hyperlink{classsysio_1_1net__api__plugin_a1988d6e5e5c3953feef89bef842a8423}{00020}}\ \ \ \ \mbox{\hyperlink{classsysio_1_1net__api__plugin}{net\_api\_plugin}}\&\ \mbox{\hyperlink{classsysio_1_1net__api__plugin_a1988d6e5e5c3953feef89bef842a8423}{operator=}}(\mbox{\hyperlink{classsysio_1_1net__api__plugin}{net\_api\_plugin}}\&\&)\ =\ \textcolor{keyword}{delete};}
+\DoxyCodeLine{\Hypertarget{net__api__plugin_8hpp_source_l00021}\mbox{\hyperlink{classsysio_1_1net__api__plugin_af3419250281e7d73ae641b3f9b735732}{00021}}\ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classsysio_1_1net__api__plugin_af3419250281e7d73ae641b3f9b735732}{\string~net\_api\_plugin}}()\ \textcolor{keyword}{override}\ =\ \textcolor{keywordflow}{default};}
+\DoxyCodeLine{\Hypertarget{net__api__plugin_8hpp_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{net__api__plugin_8hpp_source_l00023}\mbox{\hyperlink{classsysio_1_1net__api__plugin_ac1638107ca3068c43ca0a6e1891fbe86}{00023}}\ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1net__api__plugin_ac1638107ca3068c43ca0a6e1891fbe86}{set\_program\_options}}(options\_description\&\ \mbox{\hyperlink{xbyak__mnemonic_8h_a4229a9b84f8b8673326f12bd41acd27c}{cli}},\ options\_description\&\ cfg)\textcolor{keyword}{\ override\ }\{\}}
+\DoxyCodeLine{\Hypertarget{net__api__plugin_8hpp_source_l00024}00024\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1net__api__plugin_a9573ab6d05fdac827a7e6755cafb43ac}{plugin\_initialize}}(\textcolor{keyword}{const}\ variables\_map\&\ vm);}
+\DoxyCodeLine{\Hypertarget{net__api__plugin_8hpp_source_l00025}00025\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1net__api__plugin_ad23db5c83bf23d74cbe5e2ebe29c1f9b}{plugin\_startup}}();}
+\DoxyCodeLine{\Hypertarget{net__api__plugin_8hpp_source_l00026}\mbox{\hyperlink{classsysio_1_1net__api__plugin_af46fd48cd16c841c9746bb220b7a24a3}{00026}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1net__api__plugin_af46fd48cd16c841c9746bb220b7a24a3}{plugin\_shutdown}}()\ \{\}}
+\DoxyCodeLine{\Hypertarget{net__api__plugin_8hpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{net__api__plugin_8hpp_source_l00028}00028\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{net__api__plugin_8hpp_source_l00029}00029\ \};}
+\DoxyCodeLine{\Hypertarget{net__api__plugin_8hpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{net__api__plugin_8hpp_source_l00031}00031\ \}}
+
+\end{DoxyCode}

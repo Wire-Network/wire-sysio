@@ -1,0 +1,7 @@
+<map id="sysio::node_transaction_state" name="sysio::node_transaction_state">
+<area shape="rect" id="Node000001" title=" " alt="" coords="31,94,190,135"/>
+<area shape="rect" id="Node000002" href="$classfc_1_1sha256.html" title=" " alt="" coords="5,5,88,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="65,42,99,92,95,95,61,45"/>
+<area shape="rect" id="Node000003" href="$classfc_1_1time__point__sec.html" title=" " alt="" coords="112,5,240,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="161,45,126,95,122,92,157,42"/>
+</map>

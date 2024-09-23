@@ -1,0 +1,59 @@
+\doxysection{libraries/wasm-\/jit/\+Source/\+WAST/\+NFA.h File Reference}
+\hypertarget{_n_f_a_8h}{}\label{_n_f_a_8h}\index{libraries/wasm-\/jit/Source/WAST/NFA.h@{libraries/wasm-\/jit/Source/WAST/NFA.h}}
+{\ttfamily \#include "{}Inline/\+Basic\+Types.\+h"{}}\newline
+{\ttfamily \#include "{}Inline/\+Dense\+Static\+Int\+Set.\+h"{}}\newline
+{\ttfamily \#include $<$string$>$}\newline
+Include dependency graph for NFA.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{_n_f_a_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{_n_f_a_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_n_f_a_1_1_machine}{NFA\+::\+Machine}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespace_n_f_a}{NFA}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{struct_dense_static_int_set}{Dense\+Static\+Int\+Set}}$<$ \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}, 256 $>$ \mbox{\hyperlink{namespace_n_f_a_aab46c702df98598c70d9290d164ffa99}{NFA\+::\+Char\+Set}}
+\item 
+typedef \mbox{\hyperlink{_basic_types_8h_a393f3d55b6dd420b4ec0482d11fb0d9b}{I16}} \mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{NFA\+::\+State\+Index}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \{ \mbox{\hyperlink{namespace_n_f_a_ad9fb95d6afb96fea8750c3543ee293a1ab7afa25e880146b8ce78efc4cb221274}{NFA\+::edge\+Doesnt\+Consume\+Input\+Flag}} = (State\+Index)0x4000
+, \mbox{\hyperlink{namespace_n_f_a_ad9fb95d6afb96fea8750c3543ee293a1ac83c0f7e053c5efc232f432bba1ab6c6}{NFA\+::unmatched\+Character\+Terminal}} = (State\+Index)0x8000
+, \mbox{\hyperlink{namespace_n_f_a_ad9fb95d6afb96fea8750c3543ee293a1a6df9f5bfcb1889079b46027cf7bdac15}{NFA\+::maximum\+Terminal\+State\+Index}} = (State\+Index)0xbfff
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_n_f_a_1_1_builder}{Builder}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_n_f_a_adf36678137843faef3c32d8f0a9dcb25}{NFA\+::create\+Builder}} ()
+\item 
+\mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{State\+Index}} \mbox{\hyperlink{namespace_n_f_a_aa1fa2de1cb3ea820ec7ae1994d624803}{NFA\+::add\+State}} (\mbox{\hyperlink{struct_n_f_a_1_1_builder}{Builder}} \texorpdfstring{$\ast$}{*}builder)
+\item 
+void \mbox{\hyperlink{namespace_n_f_a_a7fcfabbb0aaf904f594a4c6d72e9e54c}{NFA\+::add\+Edge}} (\mbox{\hyperlink{struct_n_f_a_1_1_builder}{Builder}} \texorpdfstring{$\ast$}{*}builder, \mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{State\+Index}} initial\+State, const \mbox{\hyperlink{namespace_n_f_a_aab46c702df98598c70d9290d164ffa99}{Char\+Set}} \&predicate, \mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{State\+Index}} next\+State)
+\item 
+void \mbox{\hyperlink{namespace_n_f_a_acfdce2879b3ebd805fc8512239d7dd44}{NFA\+::add\+Epsilon\+Edge}} (\mbox{\hyperlink{struct_n_f_a_1_1_builder}{Builder}} \texorpdfstring{$\ast$}{*}builder, \mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{State\+Index}} initial\+State, \mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{State\+Index}} next\+State)
+\item 
+\mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{State\+Index}} \mbox{\hyperlink{namespace_n_f_a_ad1e9e5dd3c2cdbefdf6ba97f12d26eae}{NFA\+::get\+Non\+Terminal\+Edge}} (\mbox{\hyperlink{struct_n_f_a_1_1_builder}{Builder}} \texorpdfstring{$\ast$}{*}builder, \mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{State\+Index}} initial\+State, char c)
+\item 
+std\+::string \mbox{\hyperlink{namespace_n_f_a_ad2bae1dc95f748e75ed2ef3d06b38868}{NFA\+::dump\+NFAGraph\+Viz}} (const \mbox{\hyperlink{struct_n_f_a_1_1_builder}{Builder}} \texorpdfstring{$\ast$}{*}builder)
+\end{DoxyCompactItemize}

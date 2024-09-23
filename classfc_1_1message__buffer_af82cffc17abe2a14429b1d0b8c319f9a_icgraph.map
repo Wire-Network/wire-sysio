@@ -1,0 +1,7 @@
+<map id="fc::message_buffer::add_buffer_to_chain" name="fc::message_buffer::add_buffer_to_chain">
+<area shape="rect" id="Node000001" title=" " alt="" coords="250,23,396,64"/>
+<area shape="rect" id="Node000002" href="$test__message__buffer_8cpp.html#ac64fd5998672b472a05dead509a6e008" title="Test buffer growth and shrinking." alt="" coords="5,5,202,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="234,36,202,32,202,27,234,31"/>
+<area shape="rect" id="Node000003" href="$test__message__buffer_8cpp.html#a6687d4ea18cd8c8a2244e87202a36dfe" title=" " alt="" coords="5,55,202,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="234,56,202,59,202,54,234,51"/>
+</map>

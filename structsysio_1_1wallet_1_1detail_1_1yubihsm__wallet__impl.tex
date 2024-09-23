@@ -1,0 +1,550 @@
+\doxysection{sysio\+::wallet\+::detail\+::yubihsm\+\_\+wallet\+\_\+impl Struct Reference}
+\hypertarget{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl}{}\label{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl}\index{sysio::wallet::detail::yubihsm\_wallet\_impl@{sysio::wallet::detail::yubihsm\_wallet\_impl}}
+
+
+Collaboration diagram for sysio\+::wallet\+::detail\+::yubihsm\+\_\+wallet\+\_\+impl\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a6da9d4e471e4e9b73f07442b04a28a8a}{key\+\_\+map\+\_\+type}} = map$<$\mbox{\hyperlink{namespacesysio_1_1chain_a0628a11f388cd2e43b1ccc1260a1042f}{public\+\_\+key\+\_\+type}},\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}}$>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_aab88a7a970733811d37fed3fb5041350}{yubihsm\+\_\+wallet\+\_\+impl}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&ep, const \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} ak)
+\item 
+\mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_af535b22a76cac37f33ef43715865648c}{\texorpdfstring{$\sim$}{\string~}yubihsm\+\_\+wallet\+\_\+impl}} ()
+\item 
+bool \mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a7ef2e33eace8bf02ac51cfbe036c4840}{is\+\_\+locked}} () const
+\item 
+key\+\_\+map\+\_\+type\+::iterator \mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_adbeac5d7c3d1ad9d3cb6c37cc996d8c5}{populate\+\_\+key\+\_\+map\+\_\+with\+\_\+keyid}} (const \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{yubihsm__pkcs11_8c_ada12860f8f9f5f3cac5b179ef352434c}{key\+\_\+id}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a00ee0ac7ac4a819d0b8755bf4f442263}{unlock}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&password)
+\item 
+void \mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a5920ace754a2d851bdb11322372b849c}{lock}} ()
+\item 
+void \mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a6412f92a0ad381f2370582372a5b6082}{prime\+\_\+keepalive\+\_\+timer}} ()
+\item 
+std\+::optional$<$ \mbox{\hyperlink{namespacesysio_1_1chain_af141a69eb789b86fa0eb93c2d263f0df}{signature\+\_\+type}} $>$ \mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a8987016445813c0391f04894e9bdb002}{try\+\_\+sign\+\_\+digest}} (const \mbox{\hyperlink{namespacesysio_1_1chain_a357fd9478475457e5bb386a3143079b6}{digest\+\_\+type}} d, const \mbox{\hyperlink{namespacesysio_1_1chain_a0628a11f388cd2e43b1ccc1260a1042f}{public\+\_\+key\+\_\+type}} \mbox{\hyperlink{classfc_1_1crypto_1_1r1_1_1public__key}{public\+\_\+key}})
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_a0628a11f388cd2e43b1ccc1260a1042f}{public\+\_\+key\+\_\+type}} \mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a6266bcd9001ddbb02101bea6088f299b}{create}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structyh__connector}{yh\+\_\+connector}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a3fc0c601d7e7a46bc3fa2cb24173bfd0}{connector}} = nullptr
+\item 
+\mbox{\hyperlink{structyh__session}{yh\+\_\+session}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a404062c94817a821f452eb9a58237602}{session}} = nullptr
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a84c5a15f3ed4be1039139f262afe9902}{endpoint}}
+\item 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a302ef005c4374995ad2f38dae8c52660}{authkey}}
+\item 
+map$<$ \mbox{\hyperlink{namespacesysio_1_1chain_a0628a11f388cd2e43b1ccc1260a1042f}{public\+\_\+key\+\_\+type}}, \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} $>$ \mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a948f3999fdf3a68b107c100453bf9f89}{\+\_\+keys}}
+\item 
+\mbox{\hyperlink{structyh__capabilities}{yh\+\_\+capabilities}} \mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a00ad07ae762532d33f79d0044c3eda48}{authkey\+\_\+caps}}
+\item 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a47e114b6d65d657d7dacfd0d2e850f0b}{authkey\+\_\+domains}}
+\item 
+boost\+::asio\+::steady\+\_\+timer \mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a1180885d46905bf11d2f1501bd244cb1}{keepalive\+\_\+timer}} \{\mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{appbase\+::app}}().get\+\_\+io\+\_\+service()\}
+\item 
+fc\+::ec\+\_\+key \mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_ac0eebf9643d30c4e0e28ff6398855a71}{key}} = EC\+\_\+\+KEY\+\_\+new\+\_\+by\+\_\+curve\+\_\+name(NID\+\_\+\+X9\+\_\+62\+\_\+prime256v1)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{yubihsm__wallet_8cpp_source_l00020}{20}} of file \mbox{\hyperlink{yubihsm__wallet_8cpp_source}{yubihsm\+\_\+wallet.\+cpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a6da9d4e471e4e9b73f07442b04a28a8a}\index{sysio::wallet::detail::yubihsm\_wallet\_impl@{sysio::wallet::detail::yubihsm\_wallet\_impl}!key\_map\_type@{key\_map\_type}}
+\index{key\_map\_type@{key\_map\_type}!sysio::wallet::detail::yubihsm\_wallet\_impl@{sysio::wallet::detail::yubihsm\_wallet\_impl}}
+\doxysubsubsection{\texorpdfstring{key\_map\_type}{key\_map\_type}}
+{\footnotesize\ttfamily \label{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a6da9d4e471e4e9b73f07442b04a28a8a} 
+using \mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a6da9d4e471e4e9b73f07442b04a28a8a}{sysio\+::wallet\+::detail\+::yubihsm\+\_\+wallet\+\_\+impl\+::key\+\_\+map\+\_\+type}} = map$<$\mbox{\hyperlink{namespacesysio_1_1chain_a0628a11f388cd2e43b1ccc1260a1042f}{public\+\_\+key\+\_\+type}},\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__wallet_8cpp_source_l00021}{21}} of file \mbox{\hyperlink{yubihsm__wallet_8cpp_source}{yubihsm\+\_\+wallet.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_aab88a7a970733811d37fed3fb5041350}\index{sysio::wallet::detail::yubihsm\_wallet\_impl@{sysio::wallet::detail::yubihsm\_wallet\_impl}!yubihsm\_wallet\_impl@{yubihsm\_wallet\_impl}}
+\index{yubihsm\_wallet\_impl@{yubihsm\_wallet\_impl}!sysio::wallet::detail::yubihsm\_wallet\_impl@{sysio::wallet::detail::yubihsm\_wallet\_impl}}
+\doxysubsubsection{\texorpdfstring{yubihsm\_wallet\_impl()}{yubihsm\_wallet\_impl()}}
+{\footnotesize\ttfamily \label{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_aab88a7a970733811d37fed3fb5041350} 
+sysio\+::wallet\+::detail\+::yubihsm\+\_\+wallet\+\_\+impl\+::yubihsm\+\_\+wallet\+\_\+impl (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&}]{ep}{, }\item[{const \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}}}]{ak}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__wallet_8cpp_source_l00023}{23}} of file \mbox{\hyperlink{yubihsm__wallet_8cpp_source}{yubihsm\+\_\+wallet.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a84c5a15f3ed4be1039139f262afe9902}{endpoint}}(ep),\ \mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a302ef005c4374995ad2f38dae8c52660}{authkey}}(ak)\ \{}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366}{yh\_rc}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}};}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \textcolor{keywordflow}{if}((\mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a5392844a98c6220c69fe08d3dcf8f1bc}{yh\_init}}()))}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a3a1fa84768603c99866fe61af96c9f36}{FC\_THROW}}(\textcolor{stringliteral}{"{}yubihsm\ init\ failure:\ \$\{c\}"{}},\ (\textcolor{stringliteral}{"{}c"{}},\ \mbox{\hyperlink{lib_2error_8c_a238eedb1e27dbff2a0ab9a3932eb3f8b}{yh\_strerror}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}})));}
+\DoxyCodeLine{00027\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=291pt]{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_aab88a7a970733811d37fed3fb5041350_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_af535b22a76cac37f33ef43715865648c}\index{sysio::wallet::detail::yubihsm\_wallet\_impl@{sysio::wallet::detail::yubihsm\_wallet\_impl}!````~yubihsm\_wallet\_impl@{\texorpdfstring{$\sim$}{\string~}yubihsm\_wallet\_impl}}
+\index{````~yubihsm\_wallet\_impl@{\texorpdfstring{$\sim$}{\string~}yubihsm\_wallet\_impl}!sysio::wallet::detail::yubihsm\_wallet\_impl@{sysio::wallet::detail::yubihsm\_wallet\_impl}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}yubihsm\_wallet\_impl()}{\string~yubihsm\_wallet\_impl()}}
+{\footnotesize\ttfamily \label{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_af535b22a76cac37f33ef43715865648c} 
+sysio\+::wallet\+::detail\+::yubihsm\+\_\+wallet\+\_\+impl\+::\texorpdfstring{$\sim$}{\string~}yubihsm\+\_\+wallet\+\_\+impl (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+XXX Probably a race condition on timer shutdown and appbase destruction
+
+Definition at line \mbox{\hyperlink{yubihsm__wallet_8cpp_source_l00029}{29}} of file \mbox{\hyperlink{yubihsm__wallet_8cpp_source}{yubihsm\+\_\+wallet.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a5920ace754a2d851bdb11322372b849c}{lock}}();}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm_8c_a36e3d9a07c6689e14a9339ca1ebb7259}{yh\_exit}}();}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \textcolor{comment}{//bizarre,\ is\ there\ no\ way\ to\ destroy\ a\ yh\_connector??}}
+\DoxyCodeLine{00033\ }
+\DoxyCodeLine{00035\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_af535b22a76cac37f33ef43715865648c_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a6266bcd9001ddbb02101bea6088f299b}\index{sysio::wallet::detail::yubihsm\_wallet\_impl@{sysio::wallet::detail::yubihsm\_wallet\_impl}!create@{create}}
+\index{create@{create}!sysio::wallet::detail::yubihsm\_wallet\_impl@{sysio::wallet::detail::yubihsm\_wallet\_impl}}
+\doxysubsubsection{\texorpdfstring{create()}{create()}}
+{\footnotesize\ttfamily \label{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a6266bcd9001ddbb02101bea6088f299b} 
+\mbox{\hyperlink{namespacesysio_1_1chain_a0628a11f388cd2e43b1ccc1260a1042f}{public\+\_\+key\+\_\+type}} sysio\+::wallet\+::detail\+::yubihsm\+\_\+wallet\+\_\+impl\+::create (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__wallet_8cpp_source_l00174}{174}} of file \mbox{\hyperlink{yubihsm__wallet_8cpp_source}{yubihsm\+\_\+wallet.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!\mbox{\hyperlink{yubihsm_8c_aba384949362ccaf19cbeae3bb046489c}{yh\_check\_capability}}(\&\mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a00ad07ae762532d33f79d0044c3eda48}{authkey\_caps}},\ \textcolor{stringliteral}{"{}generate-\/asymmetric-\/key"{}}))}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(chain::wallet\_exception,\ \textcolor{stringliteral}{"{}Given\ authkey\ cannot\ create\ keys"{}});}
+\DoxyCodeLine{00177\ }
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366}{yh\_rc}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}};}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ new\_key\_id\ =\ 0;}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \mbox{\hyperlink{structyh__capabilities}{yh\_capabilities}}\ creation\_caps\ =\ \{\};}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{yubihsm_8c_aab440e1cb671d9ba7a2e7d1243960e42}{yh\_string\_to\_capabilities}}(\textcolor{stringliteral}{"{}sign-\/ecdsa:export-\/wrapped"{}},\ \&creation\_caps))}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(chain::wallet\_exception,\ \textcolor{stringliteral}{"{}Cannot\ create\ caps\ mask"{}});}
+\DoxyCodeLine{00183\ }
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}((\mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a2db9bbd57a908c5c454fc6254f57dcff}{yh\_util\_generate\_ec\_key}}(\mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a404062c94817a821f452eb9a58237602}{session}},\ \&new\_key\_id,\ \textcolor{stringliteral}{"{}kiod\ created\ key"{}},\ \mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a47e114b6d65d657d7dacfd0d2e850f0b}{authkey\_domains}},\ \&creation\_caps,\ \mbox{\hyperlink{yubihsm_8h_a498937b5a72accbb0ef21bb1dcdd55caae4b191baf5c65f9234120080264d129b}{YH\_ALGO\_EC\_P256}})))}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(chain::wallet\_exception,\ \textcolor{stringliteral}{"{}yh\_util\_generate\_ec\_key\ failed:\ \$\{m\}"{}},\ (\textcolor{stringliteral}{"{}m"{}},\ \mbox{\hyperlink{lib_2error_8c_a238eedb1e27dbff2a0ab9a3932eb3f8b}{yh\_strerror}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}})));}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_adbeac5d7c3d1ad9d3cb6c37cc996d8c5}{populate\_key\_map\_with\_keyid}}(new\_key\_id)-\/>first;}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \textcolor{keywordflow}{catch}(chain::wallet\_exception\&\ e)\ \{}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a5920ace754a2d851bdb11322372b849c}{lock}}();}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw};}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00193\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a6266bcd9001ddbb02101bea6088f299b_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a7ef2e33eace8bf02ac51cfbe036c4840}\index{sysio::wallet::detail::yubihsm\_wallet\_impl@{sysio::wallet::detail::yubihsm\_wallet\_impl}!is\_locked@{is\_locked}}
+\index{is\_locked@{is\_locked}!sysio::wallet::detail::yubihsm\_wallet\_impl@{sysio::wallet::detail::yubihsm\_wallet\_impl}}
+\doxysubsubsection{\texorpdfstring{is\_locked()}{is\_locked()}}
+{\footnotesize\ttfamily \label{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a7ef2e33eace8bf02ac51cfbe036c4840} 
+bool sysio\+::wallet\+::detail\+::yubihsm\+\_\+wallet\+\_\+impl\+::is\+\_\+locked (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__wallet_8cpp_source_l00037}{37}} of file \mbox{\hyperlink{yubihsm__wallet_8cpp_source}{yubihsm\+\_\+wallet.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !\mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a3fc0c601d7e7a46bc3fa2cb24173bfd0}{connector}};}
+\DoxyCodeLine{00039\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a5920ace754a2d851bdb11322372b849c}\index{sysio::wallet::detail::yubihsm\_wallet\_impl@{sysio::wallet::detail::yubihsm\_wallet\_impl}!lock@{lock}}
+\index{lock@{lock}!sysio::wallet::detail::yubihsm\_wallet\_impl@{sysio::wallet::detail::yubihsm\_wallet\_impl}}
+\doxysubsubsection{\texorpdfstring{lock()}{lock()}}
+{\footnotesize\ttfamily \label{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a5920ace754a2d851bdb11322372b849c} 
+void sysio\+::wallet\+::detail\+::yubihsm\+\_\+wallet\+\_\+impl\+::lock (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__wallet_8cpp_source_l00104}{104}} of file \mbox{\hyperlink{yubihsm__wallet_8cpp_source}{yubihsm\+\_\+wallet.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a404062c94817a821f452eb9a58237602}{session}})\ \{}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm_8c_a61ab8dbab67b1cceb49cd306f8c3f4b1}{yh\_util\_close\_session}}(\mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a404062c94817a821f452eb9a58237602}{session}});}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm_8c_a1a35f8ae5a739848408633a514e41b2d}{yh\_destroy\_session}}(\&\mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a404062c94817a821f452eb9a58237602}{session}});}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a404062c94817a821f452eb9a58237602}{session}}\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a3fc0c601d7e7a46bc3fa2cb24173bfd0}{connector}})}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm_8c_ab12d5a42d2219741bd3630b99ed1c7d2}{yh\_disconnect}}(\mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a3fc0c601d7e7a46bc3fa2cb24173bfd0}{connector}});}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \textcolor{comment}{//it\ would\ seem\ like\ this\ would\ leak-\/-\/\ there\ is\ no\ destroy()\ call\ for\ it.\ But\ I\ clearly\ can't\ reuse\ connectors}}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \textcolor{comment}{//\ as\ that\ fails\ with\ a\ "{}Unable\ to\ find\ a\ suitable\ connector"{}}}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a3fc0c601d7e7a46bc3fa2cb24173bfd0}{connector}}\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00115\ }
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a948f3999fdf3a68b107c100453bf9f89}{\_keys}}.clear();}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a1180885d46905bf11d2f1501bd244cb1}{keepalive\_timer}}.cancel();}
+\DoxyCodeLine{00118\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a5920ace754a2d851bdb11322372b849c_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a5920ace754a2d851bdb11322372b849c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_adbeac5d7c3d1ad9d3cb6c37cc996d8c5}\index{sysio::wallet::detail::yubihsm\_wallet\_impl@{sysio::wallet::detail::yubihsm\_wallet\_impl}!populate\_key\_map\_with\_keyid@{populate\_key\_map\_with\_keyid}}
+\index{populate\_key\_map\_with\_keyid@{populate\_key\_map\_with\_keyid}!sysio::wallet::detail::yubihsm\_wallet\_impl@{sysio::wallet::detail::yubihsm\_wallet\_impl}}
+\doxysubsubsection{\texorpdfstring{populate\_key\_map\_with\_keyid()}{populate\_key\_map\_with\_keyid()}}
+{\footnotesize\ttfamily \label{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_adbeac5d7c3d1ad9d3cb6c37cc996d8c5} 
+key\+\_\+map\+\_\+type\+::iterator sysio\+::wallet\+::detail\+::yubihsm\+\_\+wallet\+\_\+impl\+::populate\+\_\+key\+\_\+map\+\_\+with\+\_\+keyid (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}}}]{key\+\_\+id}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+XXX This is junky and common with SE wallet; commonize it
+
+Definition at line \mbox{\hyperlink{yubihsm__wallet_8cpp_source_l00041}{41}} of file \mbox{\hyperlink{yubihsm__wallet_8cpp_source}{yubihsm\+\_\+wallet.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366}{yh\_rc}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}};}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ blob\_sz\ =\ 128;}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \mbox{\hyperlink{structfc_1_1blob}{blob}}[blob\_sz];}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \textcolor{keywordflow}{if}((\mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}}\ =\ \mbox{\hyperlink{yubihsm_8c_aa7b8b42156c4bdaf41d8b9758a2fd73f}{yh\_util\_get\_public\_key}}(\mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a404062c94817a821f452eb9a58237602}{session}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_ada12860f8f9f5f3cac5b179ef352434c}{key\_id}},\ \mbox{\hyperlink{structfc_1_1blob}{blob}},\ \&blob\_sz,\ \textcolor{keyword}{nullptr})))}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(chain::wallet\_exception,\ \textcolor{stringliteral}{"{}yh\_util\_get\_public\_key\ failed:\ \$\{m\}"{}},\ (\textcolor{stringliteral}{"{}m"{}},\ \mbox{\hyperlink{lib_2error_8c_a238eedb1e27dbff2a0ab9a3932eb3f8b}{yh\_strerror}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}})));}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(blob\_sz\ !=\ 64)}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(chain::wallet\_exception,\ \textcolor{stringliteral}{"{}unexpected\ pubkey\ size\ from\ yh\_util\_get\_public\_key"{}});}
+\DoxyCodeLine{00049\ }
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ serialized\_pub\_key[\textcolor{keyword}{sizeof}(\mbox{\hyperlink{namespacefc_1_1crypto_1_1r1_a2bfc308262de40acfc2a5e7c725bbe3f}{public\_key\_data}})\ +\ 1];}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ serialized\_pub\_key[0]\ =\ 0x01;\ \textcolor{comment}{//means\ R1\ key}}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ serialized\_pub\_key[1]\ =\ 0x02\ +\ (\mbox{\hyperlink{structfc_1_1blob}{blob}}[63]\&1);\ \textcolor{comment}{//R1\ header;\ even\ or\ odd\ Y}}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(serialized\_pub\_key+2,\ \mbox{\hyperlink{structfc_1_1blob}{blob}},\ 32);\ \textcolor{comment}{//copy\ in\ the\ 32\ bytes\ of\ X}}
+\DoxyCodeLine{00055\ }
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1crypto_1_1public__key}{public\_key\_type}}\ pub\_key;}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1datastream}{fc::datastream<const\ char\ *>}}\ \mbox{\hyperlink{namespace_xbyak_1_1util_a4b2aef26182d21706896022467868f7c}{ds}}(serialized\_pub\_key,\ \textcolor{keyword}{sizeof}(serialized\_pub\_key));}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a0b442d98ceb22dd5a6ae84745e43ffab}{fc::raw::unpack}}(ds,\ pub\_key);}
+\DoxyCodeLine{00059\ }
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a948f3999fdf3a68b107c100453bf9f89}{\_keys}}.emplace(pub\_key,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_ada12860f8f9f5f3cac5b179ef352434c}{key\_id}}).first;}
+\DoxyCodeLine{00061\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_adbeac5d7c3d1ad9d3cb6c37cc996d8c5_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_adbeac5d7c3d1ad9d3cb6c37cc996d8c5_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a6412f92a0ad381f2370582372a5b6082}\index{sysio::wallet::detail::yubihsm\_wallet\_impl@{sysio::wallet::detail::yubihsm\_wallet\_impl}!prime\_keepalive\_timer@{prime\_keepalive\_timer}}
+\index{prime\_keepalive\_timer@{prime\_keepalive\_timer}!sysio::wallet::detail::yubihsm\_wallet\_impl@{sysio::wallet::detail::yubihsm\_wallet\_impl}}
+\doxysubsubsection{\texorpdfstring{prime\_keepalive\_timer()}{prime\_keepalive\_timer()}}
+{\footnotesize\ttfamily \label{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a6412f92a0ad381f2370582372a5b6082} 
+void sysio\+::wallet\+::detail\+::yubihsm\+\_\+wallet\+\_\+impl\+::prime\+\_\+keepalive\+\_\+timer (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__wallet_8cpp_source_l00120}{120}} of file \mbox{\hyperlink{yubihsm__wallet_8cpp_source}{yubihsm\+\_\+wallet.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a1180885d46905bf11d2f1501bd244cb1}{keepalive\_timer}}.expires\_at(std::chrono::steady\_clock::now()\ +\ std::chrono::seconds(20));}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a1180885d46905bf11d2f1501bd244cb1}{keepalive\_timer}}.async\_wait([\textcolor{keyword}{this}](\textcolor{keyword}{const}\ boost::system::error\_code\&\ ec)\{}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(ec\ ||\ !\mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a404062c94817a821f452eb9a58237602}{session}})}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00125\ }
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ data,\ resp;}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm_8h_aa5415bafa9c48dfef0e183d8df504b7e}{yh\_cmd}}\ resp\_cmd;}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ resp\_sz\ =\ 1;}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{yubihsm_8c_a4c26f003b72e800e9c934bca922a404a}{yh\_send\_secure\_msg}}(\mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a404062c94817a821f452eb9a58237602}{session}},\ YHC\_ECHO,\ \&data,\ 1,\ \&resp\_cmd,\ \&resp,\ \&resp\_sz))}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a5920ace754a2d851bdb11322372b849c}{lock}}();}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a6412f92a0ad381f2370582372a5b6082}{prime\_keepalive\_timer}}();}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00134\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a6412f92a0ad381f2370582372a5b6082_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=348pt]{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a6412f92a0ad381f2370582372a5b6082_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a8987016445813c0391f04894e9bdb002}\index{sysio::wallet::detail::yubihsm\_wallet\_impl@{sysio::wallet::detail::yubihsm\_wallet\_impl}!try\_sign\_digest@{try\_sign\_digest}}
+\index{try\_sign\_digest@{try\_sign\_digest}!sysio::wallet::detail::yubihsm\_wallet\_impl@{sysio::wallet::detail::yubihsm\_wallet\_impl}}
+\doxysubsubsection{\texorpdfstring{try\_sign\_digest()}{try\_sign\_digest()}}
+{\footnotesize\ttfamily \label{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a8987016445813c0391f04894e9bdb002} 
+std\+::optional$<$ \mbox{\hyperlink{namespacesysio_1_1chain_af141a69eb789b86fa0eb93c2d263f0df}{signature\+\_\+type}} $>$ sysio\+::wallet\+::detail\+::yubihsm\+\_\+wallet\+\_\+impl\+::try\+\_\+sign\+\_\+digest (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_a357fd9478475457e5bb386a3143079b6}{digest\+\_\+type}}}]{d}{, }\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_a0628a11f388cd2e43b1ccc1260a1042f}{public\+\_\+key\+\_\+type}}}]{public\+\_\+key}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+XXX a lot of this below is similar to SE wallet; commonize it in non-\/junky way
+
+Definition at line \mbox{\hyperlink{yubihsm__wallet_8cpp_source_l00136}{136}} of file \mbox{\hyperlink{yubihsm__wallet_8cpp_source}{yubihsm\+\_\+wallet.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ it\ =\ \mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a948f3999fdf3a68b107c100453bf9f89}{\_keys}}.find(\mbox{\hyperlink{classfc_1_1public__key}{public\_key}});}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(it\ ==\ \mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a948f3999fdf3a68b107c100453bf9f89}{\_keys}}.end())}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::optional<signature\_type>();}
+\DoxyCodeLine{00140\ }
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ der\_sig\_sz\ =\ 128;}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ der\_sig[der\_sig\_sz];}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366}{yh\_rc}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}};}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \textcolor{keywordflow}{if}((\mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a5121c90d3bd745afd8264fef2ef39ace}{yh\_util\_sign\_ecdsa}}(\mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a404062c94817a821f452eb9a58237602}{session}},\ it-\/>second,\ (\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}*)\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.data(),\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.data\_size(),\ der\_sig,\ \&der\_sig\_sz)))\ \{}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a5920ace754a2d851bdb11322372b849c}{lock}}();}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(chain::wallet\_exception,\ \textcolor{stringliteral}{"{}yh\_util\_sign\_ecdsa\ failed:\ \$\{m\}"{}},\ (\textcolor{stringliteral}{"{}m"{}},\ \mbox{\hyperlink{lib_2error_8c_a238eedb1e27dbff2a0ab9a3932eb3f8b}{yh\_strerror}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}})));}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00148\ }
+\DoxyCodeLine{00150\ \ \ \ \ \ \ fc::ecdsa\_sig\ sig\ =\ ECDSA\_SIG\_new();}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_a62125ea4e1d748a4a9c1aed9766f451a}{BIGNUM}}\ *\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ =\ BN\_new(),\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ =\ BN\_new();}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ BN\_bin2bn(der\_sig+4,\ der\_sig[3],\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}});}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ BN\_bin2bn(der\_sig+6+der\_sig[3],\ der\_sig[4+der\_sig[3]+1],\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \mbox{\hyperlink{openssl-compat_8c_ae2f28de42b8345422b7ac3b28f330b9b}{ECDSA\_SIG\_set0}}(sig,\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{00155\ }
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ pub\_key\_shim\_data[64];}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1datastream}{fc::datastream<char\ *>}}\ eds(pub\_key\_shim\_data,\ \textcolor{keyword}{sizeof}(pub\_key\_shim\_data));}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(eds,\ it-\/>first);}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1crypto_1_1r1_a2bfc308262de40acfc2a5e7c725bbe3f}{public\_key\_data}}*\ kd\ =\ (\mbox{\hyperlink{namespacefc_1_1crypto_1_1r1_a2bfc308262de40acfc2a5e7c725bbe3f}{public\_key\_data}}*)(pub\_key\_shim\_data+1);}
+\DoxyCodeLine{00160\ }
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1crypto_1_1r1_ae05a9b8a3e71b719d56c0a87c491a8f6}{compact\_signature}}\ compact\_sig;}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ compact\_sig\ =\ \mbox{\hyperlink{namespacefc_1_1crypto_1_1r1_a69fb535e6486039f3d86e9d5dd3ab954}{signature\_from\_ecdsa}}(key,\ *kd,\ sig,\ d);}
+\DoxyCodeLine{00163\ }
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ serialized\_signature[\textcolor{keyword}{sizeof}(compact\_sig)\ +\ 1];}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ serialized\_signature[0]\ =\ 0x01;}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(serialized\_signature+1,\ compact\_sig.data,\ \textcolor{keyword}{sizeof}(compact\_sig));}
+\DoxyCodeLine{00167\ }
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{signature\_type}}\ final\_signature;}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1datastream}{fc::datastream<const\ char\ *>}}\ \mbox{\hyperlink{namespace_xbyak_1_1util_a4b2aef26182d21706896022467868f7c}{ds}}(serialized\_signature,\ \textcolor{keyword}{sizeof}(serialized\_signature));}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a0b442d98ceb22dd5a6ae84745e43ffab}{fc::raw::unpack}}(ds,\ final\_signature);}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ final\_signature;}
+\DoxyCodeLine{00172\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a8987016445813c0391f04894e9bdb002_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a00ee0ac7ac4a819d0b8755bf4f442263}\index{sysio::wallet::detail::yubihsm\_wallet\_impl@{sysio::wallet::detail::yubihsm\_wallet\_impl}!unlock@{unlock}}
+\index{unlock@{unlock}!sysio::wallet::detail::yubihsm\_wallet\_impl@{sysio::wallet::detail::yubihsm\_wallet\_impl}}
+\doxysubsubsection{\texorpdfstring{unlock()}{unlock()}}
+{\footnotesize\ttfamily \label{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a00ee0ac7ac4a819d0b8755bf4f442263} 
+void sysio\+::wallet\+::detail\+::yubihsm\+\_\+wallet\+\_\+impl\+::unlock (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&}]{password}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__wallet_8cpp_source_l00063}{63}} of file \mbox{\hyperlink{yubihsm__wallet_8cpp_source}{yubihsm\+\_\+wallet.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366}{yh\_rc}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}};}
+\DoxyCodeLine{00065\ }
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}((\mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a9c700747902a722d6c1d2073277de294}{yh\_init\_connector}}(\mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a84c5a15f3ed4be1039139f262afe9902}{endpoint}}.c\_str(),\ \&\mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a3fc0c601d7e7a46bc3fa2cb24173bfd0}{connector}})))}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(chain::wallet\_exception,\ \textcolor{stringliteral}{"{}Failled\ to\ initialize\ yubihsm\ connector\ URL:\ \$\{c\}"{}},\ (\textcolor{stringliteral}{"{}c"{}},\ \mbox{\hyperlink{lib_2error_8c_a238eedb1e27dbff2a0ab9a3932eb3f8b}{yh\_strerror}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}})));}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}((\mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}}\ =\ \mbox{\hyperlink{yubihsm_8c_aa19be6ac70a2a5d1cef8d7e6902fe05f}{yh\_connect}}(\mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a3fc0c601d7e7a46bc3fa2cb24173bfd0}{connector}},\ 0)))}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(chain::wallet\_exception,\ \textcolor{stringliteral}{"{}Failed\ to\ connect\ to\ YubiHSM\ connector:\ \$\{m\}"{}},\ (\textcolor{stringliteral}{"{}m"{}},\ \mbox{\hyperlink{lib_2error_8c_a238eedb1e27dbff2a0ab9a3932eb3f8b}{yh\_strerror}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}})));}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}((\mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a3be331dcf8907ff3569e4dc230e1c615}{yh\_create\_session\_derived}}(\mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a3fc0c601d7e7a46bc3fa2cb24173bfd0}{connector}},\ \mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a302ef005c4374995ad2f38dae8c52660}{authkey}},\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *)password.data(),\ password.size(),\ \textcolor{keyword}{false},\ \&\mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a404062c94817a821f452eb9a58237602}{session}})))}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(chain::wallet\_exception,\ \textcolor{stringliteral}{"{}Failed\ to\ create\ YubiHSM\ session:\ \$\{m\}"{}},\ (\textcolor{stringliteral}{"{}m"{}},\ \mbox{\hyperlink{lib_2error_8c_a238eedb1e27dbff2a0ab9a3932eb3f8b}{yh\_strerror}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}})));}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}((\mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a77870209747d5ccd90f9da3aae2bdfa8}{yh\_authenticate\_session}}(\mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a404062c94817a821f452eb9a58237602}{session}})))}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(chain::wallet\_exception,\ \textcolor{stringliteral}{"{}Failed\ to\ authenticate\ YubiHSM\ session:\ \$\{m\}"{}},\ (\textcolor{stringliteral}{"{}m"{}},\ \mbox{\hyperlink{lib_2error_8c_a238eedb1e27dbff2a0ab9a3932eb3f8b}{yh\_strerror}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}})));}
+\DoxyCodeLine{00075\ }
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structyh__object__descriptor}{yh\_object\_descriptor}}\ authkey\_desc;}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}((\mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a7b5f1f0c1cbca11fbe21e7e4e6b29a1b}{yh\_util\_get\_object\_info}}(\mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a404062c94817a821f452eb9a58237602}{session}},\ \mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a302ef005c4374995ad2f38dae8c52660}{authkey}},\ \mbox{\hyperlink{yubihsm_8h_a2fe39512cb4df34b270a67dbb8e13583acee44b775b3c5b6157f0732699935074}{YH\_AUTHENTICATION\_KEY}},\ \&authkey\_desc)))}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(chain::wallet\_exception,\ \textcolor{stringliteral}{"{}Failed\ to\ get\ authkey\ info:\ \$\{m\}"{}},\ (\textcolor{stringliteral}{"{}m"{}},\ \mbox{\hyperlink{lib_2error_8c_a238eedb1e27dbff2a0ab9a3932eb3f8b}{yh\_strerror}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}})));}
+\DoxyCodeLine{00079\ }
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a00ad07ae762532d33f79d0044c3eda48}{authkey\_caps}}\ =\ authkey\_desc.\mbox{\hyperlink{structyh__object__descriptor_a94fcb9bbe5ffacadafc207c166f6239f}{capabilities}};}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a47e114b6d65d657d7dacfd0d2e850f0b}{authkey\_domains}}\ =\ authkey\_desc.\mbox{\hyperlink{structyh__object__descriptor_a31a501a1378bc07a3320febdb21fc898}{domains}};}
+\DoxyCodeLine{00082\ }
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!\mbox{\hyperlink{yubihsm_8c_aba384949362ccaf19cbeae3bb046489c}{yh\_check\_capability}}(\&\mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a00ad07ae762532d33f79d0044c3eda48}{authkey\_caps}},\ \textcolor{stringliteral}{"{}sign-\/ecdsa"{}}))}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(chain::wallet\_exception,\ \textcolor{stringliteral}{"{}Given\ authkey\ cannot\ perform\ signing"{}});}
+\DoxyCodeLine{00085\ }
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ found\_objects\_n\ =\ 64*1024;}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structyh__object__descriptor}{yh\_object\_descriptor}}\ found\_objs[found\_objects\_n];}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structyh__capabilities}{yh\_capabilities}}\ find\_caps;}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm_8c_aab440e1cb671d9ba7a2e7d1243960e42}{yh\_string\_to\_capabilities}}(\textcolor{stringliteral}{"{}sign-\/ecdsa"{}},\ \&find\_caps);}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}((\mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a7cbea7103efff8473ccfaaa35bfc6346}{yh\_util\_list\_objects}}(\mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a404062c94817a821f452eb9a58237602}{session}},\ 0,\ \mbox{\hyperlink{yubihsm_8h_a2fe39512cb4df34b270a67dbb8e13583ab71424e16384319d6e6a12f9a3d8ceae}{YH\_ASYMMETRIC\_KEY}},\ 0,\ \&find\_caps,\ \mbox{\hyperlink{yubihsm_8h_a498937b5a72accbb0ef21bb1dcdd55caae4b191baf5c65f9234120080264d129b}{YH\_ALGO\_EC\_P256}},\ \textcolor{keyword}{nullptr},\ found\_objs,\ \&found\_objects\_n)))}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(chain::wallet\_exception,\ \textcolor{stringliteral}{"{}yh\_util\_list\_objects\ failed:\ \$\{m\}"{}},\ (\textcolor{stringliteral}{"{}m"{}},\ \mbox{\hyperlink{lib_2error_8c_a238eedb1e27dbff2a0ab9a3932eb3f8b}{yh\_strerror}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}})));}
+\DoxyCodeLine{00092\ }
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ found\_objects\_n;\ ++i)}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_adbeac5d7c3d1ad9d3cb6c37cc996d8c5}{populate\_key\_map\_with\_keyid}}(found\_objs[i].\textcolor{keywordtype}{id});}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \textcolor{keywordflow}{catch}(chain::wallet\_exception\&\ e)\ \{}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a5920ace754a2d851bdb11322372b849c}{lock}}();}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw};}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00100\ }
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a6412f92a0ad381f2370582372a5b6082}{prime\_keepalive\_timer}}();}
+\DoxyCodeLine{00102\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a00ee0ac7ac4a819d0b8755bf4f442263_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a948f3999fdf3a68b107c100453bf9f89}\index{sysio::wallet::detail::yubihsm\_wallet\_impl@{sysio::wallet::detail::yubihsm\_wallet\_impl}!\_keys@{\_keys}}
+\index{\_keys@{\_keys}!sysio::wallet::detail::yubihsm\_wallet\_impl@{sysio::wallet::detail::yubihsm\_wallet\_impl}}
+\doxysubsubsection{\texorpdfstring{\_keys}{\_keys}}
+{\footnotesize\ttfamily \label{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a948f3999fdf3a68b107c100453bf9f89} 
+map$<$\mbox{\hyperlink{namespacesysio_1_1chain_a0628a11f388cd2e43b1ccc1260a1042f}{public\+\_\+key\+\_\+type}},\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}}$>$ sysio\+::wallet\+::detail\+::yubihsm\+\_\+wallet\+\_\+impl\+::\+\_\+keys}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__wallet_8cpp_source_l00200}{200}} of file \mbox{\hyperlink{yubihsm__wallet_8cpp_source}{yubihsm\+\_\+wallet.\+cpp}}.
+
+\Hypertarget{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a302ef005c4374995ad2f38dae8c52660}\index{sysio::wallet::detail::yubihsm\_wallet\_impl@{sysio::wallet::detail::yubihsm\_wallet\_impl}!authkey@{authkey}}
+\index{authkey@{authkey}!sysio::wallet::detail::yubihsm\_wallet\_impl@{sysio::wallet::detail::yubihsm\_wallet\_impl}}
+\doxysubsubsection{\texorpdfstring{authkey}{authkey}}
+{\footnotesize\ttfamily \label{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a302ef005c4374995ad2f38dae8c52660} 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} sysio\+::wallet\+::detail\+::yubihsm\+\_\+wallet\+\_\+impl\+::authkey}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__wallet_8cpp_source_l00198}{198}} of file \mbox{\hyperlink{yubihsm__wallet_8cpp_source}{yubihsm\+\_\+wallet.\+cpp}}.
+
+\Hypertarget{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a00ad07ae762532d33f79d0044c3eda48}\index{sysio::wallet::detail::yubihsm\_wallet\_impl@{sysio::wallet::detail::yubihsm\_wallet\_impl}!authkey\_caps@{authkey\_caps}}
+\index{authkey\_caps@{authkey\_caps}!sysio::wallet::detail::yubihsm\_wallet\_impl@{sysio::wallet::detail::yubihsm\_wallet\_impl}}
+\doxysubsubsection{\texorpdfstring{authkey\_caps}{authkey\_caps}}
+{\footnotesize\ttfamily \label{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a00ad07ae762532d33f79d0044c3eda48} 
+\mbox{\hyperlink{structyh__capabilities}{yh\+\_\+capabilities}} sysio\+::wallet\+::detail\+::yubihsm\+\_\+wallet\+\_\+impl\+::authkey\+\_\+caps}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__wallet_8cpp_source_l00202}{202}} of file \mbox{\hyperlink{yubihsm__wallet_8cpp_source}{yubihsm\+\_\+wallet.\+cpp}}.
+
+\Hypertarget{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a47e114b6d65d657d7dacfd0d2e850f0b}\index{sysio::wallet::detail::yubihsm\_wallet\_impl@{sysio::wallet::detail::yubihsm\_wallet\_impl}!authkey\_domains@{authkey\_domains}}
+\index{authkey\_domains@{authkey\_domains}!sysio::wallet::detail::yubihsm\_wallet\_impl@{sysio::wallet::detail::yubihsm\_wallet\_impl}}
+\doxysubsubsection{\texorpdfstring{authkey\_domains}{authkey\_domains}}
+{\footnotesize\ttfamily \label{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a47e114b6d65d657d7dacfd0d2e850f0b} 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} sysio\+::wallet\+::detail\+::yubihsm\+\_\+wallet\+\_\+impl\+::authkey\+\_\+domains}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__wallet_8cpp_source_l00203}{203}} of file \mbox{\hyperlink{yubihsm__wallet_8cpp_source}{yubihsm\+\_\+wallet.\+cpp}}.
+
+\Hypertarget{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a3fc0c601d7e7a46bc3fa2cb24173bfd0}\index{sysio::wallet::detail::yubihsm\_wallet\_impl@{sysio::wallet::detail::yubihsm\_wallet\_impl}!connector@{connector}}
+\index{connector@{connector}!sysio::wallet::detail::yubihsm\_wallet\_impl@{sysio::wallet::detail::yubihsm\_wallet\_impl}}
+\doxysubsubsection{\texorpdfstring{connector}{connector}}
+{\footnotesize\ttfamily \label{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a3fc0c601d7e7a46bc3fa2cb24173bfd0} 
+\mbox{\hyperlink{structyh__connector}{yh\+\_\+connector}}\texorpdfstring{$\ast$}{*} sysio\+::wallet\+::detail\+::yubihsm\+\_\+wallet\+\_\+impl\+::connector = nullptr}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__wallet_8cpp_source_l00195}{195}} of file \mbox{\hyperlink{yubihsm__wallet_8cpp_source}{yubihsm\+\_\+wallet.\+cpp}}.
+
+\Hypertarget{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a84c5a15f3ed4be1039139f262afe9902}\index{sysio::wallet::detail::yubihsm\_wallet\_impl@{sysio::wallet::detail::yubihsm\_wallet\_impl}!endpoint@{endpoint}}
+\index{endpoint@{endpoint}!sysio::wallet::detail::yubihsm\_wallet\_impl@{sysio::wallet::detail::yubihsm\_wallet\_impl}}
+\doxysubsubsection{\texorpdfstring{endpoint}{endpoint}}
+{\footnotesize\ttfamily \label{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a84c5a15f3ed4be1039139f262afe9902} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::wallet\+::detail\+::yubihsm\+\_\+wallet\+\_\+impl\+::endpoint}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__wallet_8cpp_source_l00197}{197}} of file \mbox{\hyperlink{yubihsm__wallet_8cpp_source}{yubihsm\+\_\+wallet.\+cpp}}.
+
+\Hypertarget{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a1180885d46905bf11d2f1501bd244cb1}\index{sysio::wallet::detail::yubihsm\_wallet\_impl@{sysio::wallet::detail::yubihsm\_wallet\_impl}!keepalive\_timer@{keepalive\_timer}}
+\index{keepalive\_timer@{keepalive\_timer}!sysio::wallet::detail::yubihsm\_wallet\_impl@{sysio::wallet::detail::yubihsm\_wallet\_impl}}
+\doxysubsubsection{\texorpdfstring{keepalive\_timer}{keepalive\_timer}}
+{\footnotesize\ttfamily \label{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a1180885d46905bf11d2f1501bd244cb1} 
+boost\+::asio\+::steady\+\_\+timer sysio\+::wallet\+::detail\+::yubihsm\+\_\+wallet\+\_\+impl\+::keepalive\+\_\+timer \{\mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{appbase\+::app}}().get\+\_\+io\+\_\+service()\}}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__wallet_8cpp_source_l00205}{205}} of file \mbox{\hyperlink{yubihsm__wallet_8cpp_source}{yubihsm\+\_\+wallet.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00205\ \{\mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{appbase::app}}().\mbox{\hyperlink{classappbase_1_1application_a916a3366706654967671be9b82ab0e35}{get\_io\_service}}()\};}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_ac0eebf9643d30c4e0e28ff6398855a71}\index{sysio::wallet::detail::yubihsm\_wallet\_impl@{sysio::wallet::detail::yubihsm\_wallet\_impl}!key@{key}}
+\index{key@{key}!sysio::wallet::detail::yubihsm\_wallet\_impl@{sysio::wallet::detail::yubihsm\_wallet\_impl}}
+\doxysubsubsection{\texorpdfstring{key}{key}}
+{\footnotesize\ttfamily \label{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_ac0eebf9643d30c4e0e28ff6398855a71} 
+fc\+::ec\+\_\+key sysio\+::wallet\+::detail\+::yubihsm\+\_\+wallet\+\_\+impl\+::key = EC\+\_\+\+KEY\+\_\+new\+\_\+by\+\_\+curve\+\_\+name(NID\+\_\+\+X9\+\_\+62\+\_\+prime256v1)}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__wallet_8cpp_source_l00206}{206}} of file \mbox{\hyperlink{yubihsm__wallet_8cpp_source}{yubihsm\+\_\+wallet.\+cpp}}.
+
+\Hypertarget{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a404062c94817a821f452eb9a58237602}\index{sysio::wallet::detail::yubihsm\_wallet\_impl@{sysio::wallet::detail::yubihsm\_wallet\_impl}!session@{session}}
+\index{session@{session}!sysio::wallet::detail::yubihsm\_wallet\_impl@{sysio::wallet::detail::yubihsm\_wallet\_impl}}
+\doxysubsubsection{\texorpdfstring{session}{session}}
+{\footnotesize\ttfamily \label{structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl_a404062c94817a821f452eb9a58237602} 
+\mbox{\hyperlink{structyh__session}{yh\+\_\+session}}\texorpdfstring{$\ast$}{*} sysio\+::wallet\+::detail\+::yubihsm\+\_\+wallet\+\_\+impl\+::session = nullptr}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__wallet_8cpp_source_l00196}{196}} of file \mbox{\hyperlink{yubihsm__wallet_8cpp_source}{yubihsm\+\_\+wallet.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+plugins/wallet\+\_\+plugin/\mbox{\hyperlink{yubihsm__wallet_8cpp}{yubihsm\+\_\+wallet.\+cpp}}\end{DoxyCompactItemize}

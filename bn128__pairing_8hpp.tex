@@ -1,0 +1,65 @@
+\doxysection{libraries/fc/libraries/ff/libff/algebra/curves/bn128/bn128\+\_\+pairing.hpp File Reference}
+\hypertarget{bn128__pairing_8hpp}{}\label{bn128__pairing_8hpp}\index{libraries/fc/libraries/ff/libff/algebra/curves/bn128/bn128\_pairing.hpp@{libraries/fc/libraries/ff/libff/algebra/curves/bn128/bn128\_pairing.hpp}}
+{\ttfamily \#include "{}depends/ate-\/pairing/include/bn.\+h"{}}\newline
+{\ttfamily \#include $<$libff/algebra/curves/bn128/bn128\+\_\+g1.\+hpp$>$}\newline
+{\ttfamily \#include $<$libff/algebra/curves/bn128/bn128\+\_\+g2.\+hpp$>$}\newline
+{\ttfamily \#include $<$libff/algebra/curves/bn128/bn128\+\_\+gt.\+hpp$>$}\newline
+Include dependency graph for bn128\+\_\+pairing.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{bn128__pairing_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{bn128__pairing_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structlibff_1_1bn128__ate___g1__precomp}{libff\+::bn128\+\_\+ate\+\_\+\+G1\+\_\+precomp}}
+\item 
+struct \mbox{\hyperlink{structlibff_1_1bn128__ate___g2__precomp}{libff\+::bn128\+\_\+ate\+\_\+\+G2\+\_\+precomp}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacelibff}{libff}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{namespacebn_a011312b1273d2b6f5d88762678205814}{bn\+::\+Fp6}} \mbox{\hyperlink{namespacelibff_a11567b32f2e7f7f1f95673368e0d80bf}{libff\+::bn128\+\_\+ate\+\_\+ell\+\_\+coeffs}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structlibff_1_1bn128__ate___g1__precomp}{bn128\+\_\+ate\+\_\+\+G1\+\_\+precomp}} \mbox{\hyperlink{namespacelibff_afab71143fae177429731dac6f7642a74}{libff\+::bn128\+\_\+ate\+\_\+precompute\+\_\+\+G1}} (const \mbox{\hyperlink{classlibff_1_1bn128___g1}{bn128\+\_\+\+G1}} \&\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}})
+\item 
+\mbox{\hyperlink{structlibff_1_1bn128__ate___g2__precomp}{bn128\+\_\+ate\+\_\+\+G2\+\_\+precomp}} \mbox{\hyperlink{namespacelibff_a4822f3dd76b083bdba87ee80865b25ed}{libff\+::bn128\+\_\+ate\+\_\+precompute\+\_\+\+G2}} (const \mbox{\hyperlink{classlibff_1_1bn128___g2}{bn128\+\_\+\+G2}} \&Q)
+\item 
+\mbox{\hyperlink{namespacelibff_ac0733749594209226e40427fe723aed3}{bn128\+\_\+\+Fq12}} \mbox{\hyperlink{namespacelibff_a4098fab909d49417e9051db55932f6cd}{libff\+::bn128\+\_\+double\+\_\+ate\+\_\+miller\+\_\+loop}} (const \mbox{\hyperlink{structlibff_1_1bn128__ate___g1__precomp}{bn128\+\_\+ate\+\_\+\+G1\+\_\+precomp}} \&prec\+\_\+\+P1, const \mbox{\hyperlink{structlibff_1_1bn128__ate___g2__precomp}{bn128\+\_\+ate\+\_\+\+G2\+\_\+precomp}} \&prec\+\_\+\+Q1, const \mbox{\hyperlink{structlibff_1_1bn128__ate___g1__precomp}{bn128\+\_\+ate\+\_\+\+G1\+\_\+precomp}} \&prec\+\_\+\+P2, const \mbox{\hyperlink{structlibff_1_1bn128__ate___g2__precomp}{bn128\+\_\+ate\+\_\+\+G2\+\_\+precomp}} \&prec\+\_\+\+Q2)
+\item 
+\mbox{\hyperlink{namespacelibff_ac0733749594209226e40427fe723aed3}{bn128\+\_\+\+Fq12}} \mbox{\hyperlink{namespacelibff_a4af9894412498937172d90343a9bbb90}{libff\+::bn128\+\_\+ate\+\_\+miller\+\_\+loop}} (const \mbox{\hyperlink{structlibff_1_1bn128__ate___g1__precomp}{bn128\+\_\+ate\+\_\+\+G1\+\_\+precomp}} \&prec\+\_\+P, const \mbox{\hyperlink{structlibff_1_1bn128__ate___g2__precomp}{bn128\+\_\+ate\+\_\+\+G2\+\_\+precomp}} \&prec\+\_\+Q)
+\item 
+\mbox{\hyperlink{classlibff_1_1bn128___g_t}{bn128\+\_\+\+GT}} \mbox{\hyperlink{namespacelibff_a94cda500a6c4fadd7c821134984f01ee}{libff\+::bn128\+\_\+final\+\_\+exponentiation}} (const \mbox{\hyperlink{namespacelibff_ac0733749594209226e40427fe723aed3}{bn128\+\_\+\+Fq12}} \&elt)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Declares functions for computing Ate pairings over the bn128 curves, split into a offline and online stages.
+
+\begin{DoxyAuthor}{Author}
+This file is part of libff, developed by SCIPR Lab and contributors (see AUTHORS). 
+\end{DoxyAuthor}
+\begin{DoxyCopyright}{Copyright}
+MIT license (see LICENSE file) 
+\end{DoxyCopyright}
+
+
+Definition in file \mbox{\hyperlink{bn128__pairing_8hpp_source}{bn128\+\_\+pairing.\+hpp}}.
+

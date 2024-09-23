@@ -1,0 +1,10 @@
+<map id="CLI::App::_move_option" name="CLI::App::_move_option">
+<area shape="rect" id="Node000001" title="function that could be used by subclasses of App to shift options around into subcommands" alt="" coords="555,42,718,68"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_option__group.html#a29c346abf87173bccd860d3a9813a5c5" title="Add an existing option to the Option_group." alt="" coords="372,35,507,75"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="540,58,508,58,508,52,540,52"/>
+<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_option__group.html#afdc8b0b76fcc2ef4df8fbf2218edfd20" title="Add an existing option to the Option_group." alt="" coords="189,5,324,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="356,44,324,39,325,34,357,39"/>
+<area shape="rect" id="Node000004" href="$class_c_l_i_1_1_option__group.html#a449fcf469561e36a9276707097fd9935" title="Add a bunch of options to the group." alt="" coords="5,35,141,75"/>
+<area shape="poly" id="edge4_Node000002_Node000004" title=" " alt="" coords="357,60,324,60,189,60,141,59,141,54,189,55,324,55,356,54"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="174,42,141,47,140,42,173,36"/>
+</map>

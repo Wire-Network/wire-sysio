@@ -1,0 +1,116 @@
+\doxysection{Transcoder\texorpdfstring{$<$}{<} Source\+Encoding, Target\+Encoding \texorpdfstring{$>$}{>} Struct Template Reference}
+\hypertarget{struct_transcoder}{}\label{struct_transcoder}\index{Transcoder$<$ SourceEncoding, TargetEncoding $>$@{Transcoder$<$ SourceEncoding, TargetEncoding $>$}}
+
+
+Encoding conversion.  
+
+
+
+
+{\ttfamily \#include $<$encodings.\+h$>$}
+
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename Input\+Stream , typename Output\+Stream $>$ }\\static RAPIDJSON\+\_\+\+FORCEINLINE bool \mbox{\hyperlink{struct_transcoder_a0ea2edfe35784ebf1063921d2bd5fb66}{Transcode}} (Input\+Stream \&is, Output\+Stream \&os)
+\begin{DoxyCompactList}\small\item\em Take one Unicode codepoint from source encoding, convert it to target encoding and put it to the output stream. \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename Input\+Stream , typename Output\+Stream $>$ }\\static RAPIDJSON\+\_\+\+FORCEINLINE bool \mbox{\hyperlink{struct_transcoder_a16345a912c679b2ea197328eb1444f82}{Transcode\+Unsafe}} (Input\+Stream \&is, Output\+Stream \&os)
+\item 
+{\footnotesize template$<$typename Input\+Stream , typename Output\+Stream $>$ }\\static RAPIDJSON\+\_\+\+FORCEINLINE bool \mbox{\hyperlink{struct_transcoder_a8a64aa837f7962894a99f63232472543}{Validate}} (Input\+Stream \&is, Output\+Stream \&os)
+\begin{DoxyCompactList}\small\item\em Validate one Unicode codepoint from an encoded stream. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Source\+Encoding, typename Target\+Encoding$>$\newline
+struct Transcoder$<$ Source\+Encoding, Target\+Encoding $>$}
+
+
+Definition at line \mbox{\hyperlink{encodings_8h_source_l00658}{658}} of file \mbox{\hyperlink{encodings_8h_source}{encodings.\+h}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_transcoder_a0ea2edfe35784ebf1063921d2bd5fb66}\index{Transcoder$<$ SourceEncoding, TargetEncoding $>$@{Transcoder$<$ SourceEncoding, TargetEncoding $>$}!Transcode@{Transcode}}
+\index{Transcode@{Transcode}!Transcoder$<$ SourceEncoding, TargetEncoding $>$@{Transcoder$<$ SourceEncoding, TargetEncoding $>$}}
+\doxysubsubsection{\texorpdfstring{Transcode()}{Transcode()}}
+{\footnotesize\ttfamily \label{struct_transcoder_a0ea2edfe35784ebf1063921d2bd5fb66} 
+template$<$typename Source\+Encoding , typename Target\+Encoding $>$ \\
+template$<$typename Input\+Stream , typename Output\+Stream $>$ \\
+static RAPIDJSON\+\_\+\+FORCEINLINE bool \mbox{\hyperlink{struct_transcoder}{Transcoder}}$<$ Source\+Encoding, Target\+Encoding $>$\+::\+Transcode (\begin{DoxyParamCaption}\item[{Input\+Stream \&}]{is}{, }\item[{Output\+Stream \&}]{os}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{encodings_8h_source_l00661}{661}} of file \mbox{\hyperlink{encodings_8h_source}{encodings.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00661\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00662\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ codepoint;}
+\DoxyCodeLine{00663\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!SourceEncoding::Decode(is,\ \&codepoint))}
+\DoxyCodeLine{00664\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00665\ \ \ \ \ \ \ \ \ TargetEncoding::Encode(os,\ codepoint);}
+\DoxyCodeLine{00666\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00667\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=338pt]{struct_transcoder_a0ea2edfe35784ebf1063921d2bd5fb66_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_transcoder_a16345a912c679b2ea197328eb1444f82}\index{Transcoder$<$ SourceEncoding, TargetEncoding $>$@{Transcoder$<$ SourceEncoding, TargetEncoding $>$}!TranscodeUnsafe@{TranscodeUnsafe}}
+\index{TranscodeUnsafe@{TranscodeUnsafe}!Transcoder$<$ SourceEncoding, TargetEncoding $>$@{Transcoder$<$ SourceEncoding, TargetEncoding $>$}}
+\doxysubsubsection{\texorpdfstring{TranscodeUnsafe()}{TranscodeUnsafe()}}
+{\footnotesize\ttfamily \label{struct_transcoder_a16345a912c679b2ea197328eb1444f82} 
+template$<$typename Source\+Encoding , typename Target\+Encoding $>$ \\
+template$<$typename Input\+Stream , typename Output\+Stream $>$ \\
+static RAPIDJSON\+\_\+\+FORCEINLINE bool \mbox{\hyperlink{struct_transcoder}{Transcoder}}$<$ Source\+Encoding, Target\+Encoding $>$\+::\+Transcode\+Unsafe (\begin{DoxyParamCaption}\item[{Input\+Stream \&}]{is}{, }\item[{Output\+Stream \&}]{os}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{encodings_8h_source_l00670}{670}} of file \mbox{\hyperlink{encodings_8h_source}{encodings.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00670\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00671\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ codepoint;}
+\DoxyCodeLine{00672\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!SourceEncoding::Decode(is,\ \&codepoint))}
+\DoxyCodeLine{00673\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00674\ \ \ \ \ \ \ \ \ TargetEncoding::EncodeUnsafe(os,\ codepoint);}
+\DoxyCodeLine{00675\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00676\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_transcoder_a8a64aa837f7962894a99f63232472543}\index{Transcoder$<$ SourceEncoding, TargetEncoding $>$@{Transcoder$<$ SourceEncoding, TargetEncoding $>$}!Validate@{Validate}}
+\index{Validate@{Validate}!Transcoder$<$ SourceEncoding, TargetEncoding $>$@{Transcoder$<$ SourceEncoding, TargetEncoding $>$}}
+\doxysubsubsection{\texorpdfstring{Validate()}{Validate()}}
+{\footnotesize\ttfamily \label{struct_transcoder_a8a64aa837f7962894a99f63232472543} 
+template$<$typename Source\+Encoding , typename Target\+Encoding $>$ \\
+template$<$typename Input\+Stream , typename Output\+Stream $>$ \\
+static RAPIDJSON\+\_\+\+FORCEINLINE bool \mbox{\hyperlink{struct_transcoder}{Transcoder}}$<$ Source\+Encoding, Target\+Encoding $>$\+::\+Validate (\begin{DoxyParamCaption}\item[{Input\+Stream \&}]{is}{, }\item[{Output\+Stream \&}]{os}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{encodings_8h_source_l00680}{680}} of file \mbox{\hyperlink{encodings_8h_source}{encodings.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00680\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00681\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_transcoder_a0ea2edfe35784ebf1063921d2bd5fb66}{Transcode}}(is,\ os);\ \ \ \textcolor{comment}{//\ Since\ source/target\ encoding\ is\ different,\ must\ transcode.}}
+\DoxyCodeLine{00682\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=338pt]{struct_transcoder_a8a64aa837f7962894a99f63232472543_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/\mbox{\hyperlink{encodings_8h}{encodings.\+h}}\end{DoxyCompactItemize}

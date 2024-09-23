@@ -1,0 +1,39 @@
+\doxysection{310-\/Gen-\/\+Variables\+In\+Generators.cpp}
+\hypertarget{310-_gen-_variables_in_generators_8cpp_source}{}\label{310-_gen-_variables_in_generators_8cpp_source}\index{libraries/sys-\/vm/external/Catch2/examples/310-\/Gen-\/VariablesInGenerators.cpp@{libraries/sys-\/vm/external/Catch2/examples/310-\/Gen-\/VariablesInGenerators.cpp}}
+\mbox{\hyperlink{310-_gen-_variables_in_generators_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{310-_gen-_variables_in_generators_8cpp_source_l00001}00001\ \textcolor{comment}{//\ 310-\/Gen-\/VariablesInGenerator.cpp}}
+\DoxyCodeLine{\Hypertarget{310-_gen-_variables_in_generators_8cpp_source_l00002}00002\ \textcolor{comment}{//\ Shows\ how\ to\ use\ variables\ when\ creating\ generators.}}
+\DoxyCodeLine{\Hypertarget{310-_gen-_variables_in_generators_8cpp_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{310-_gen-_variables_in_generators_8cpp_source_l00004}00004\ \textcolor{comment}{//\ Note\ that\ using\ variables\ inside\ generators\ is\ dangerous\ and\ should}}
+\DoxyCodeLine{\Hypertarget{310-_gen-_variables_in_generators_8cpp_source_l00005}00005\ \textcolor{comment}{//\ be\ done\ only\ if\ you\ know\ what\ you\ are\ doing,\ because\ the\ generators}}
+\DoxyCodeLine{\Hypertarget{310-_gen-_variables_in_generators_8cpp_source_l00006}00006\ \textcolor{comment}{//\ \_WILL\_\ outlive\ the\ variables\ -\/-\/\ thus\ they\ should\ be\ either\ captured}}
+\DoxyCodeLine{\Hypertarget{310-_gen-_variables_in_generators_8cpp_source_l00007}00007\ \textcolor{comment}{//\ by\ value\ directly,\ or\ copied\ by\ the\ generators\ during\ construction.}}
+\DoxyCodeLine{\Hypertarget{310-_gen-_variables_in_generators_8cpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{310-_gen-_variables_in_generators_8cpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{single__include_2catch2_2catch_8hpp}{catch2/catch.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{310-_gen-_variables_in_generators_8cpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{310-_gen-_variables_in_generators_8cpp_source_l00011}\mbox{\hyperlink{310-_gen-_variables_in_generators_8cpp_ad15ab98094325b13ef69551880d32d08}{00011}}\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\textcolor{stringliteral}{"{}Generate\ random\ doubles\ across\ different\ ranges"{}},}
+\DoxyCodeLine{\Hypertarget{310-_gen-_variables_in_generators_8cpp_source_l00012}00012\ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}[generator][example][advanced]"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{310-_gen-_variables_in_generators_8cpp_source_l00013}00013\ \ \ \ \ \textcolor{comment}{//\ Workaround\ for\ old\ libstdc++}}
+\DoxyCodeLine{\Hypertarget{310-_gen-_variables_in_generators_8cpp_source_l00014}00014\ \ \ \ \ \textcolor{keyword}{using\ }record\ =\ std::tuple<double,\ double>;}
+\DoxyCodeLine{\Hypertarget{310-_gen-_variables_in_generators_8cpp_source_l00015}00015\ \ \ \ \ \textcolor{comment}{//\ Set\ up\ 3\ ranges\ to\ generate\ numbers\ from}}
+\DoxyCodeLine{\Hypertarget{310-_gen-_variables_in_generators_8cpp_source_l00016}00016\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ =\ \mbox{\hyperlink{catch__generators_8hpp_a4941c6427cfa36ee7c52d734e460f9df}{GENERATE}}(table<double,\ double>(\{}
+\DoxyCodeLine{\Hypertarget{310-_gen-_variables_in_generators_8cpp_source_l00017}00017\ \ \ \ \ \ \ \ \ record\{3,\ 4\},}
+\DoxyCodeLine{\Hypertarget{310-_gen-_variables_in_generators_8cpp_source_l00018}00018\ \ \ \ \ \ \ \ \ record\{-\/4,\ -\/3\},}
+\DoxyCodeLine{\Hypertarget{310-_gen-_variables_in_generators_8cpp_source_l00019}00019\ \ \ \ \ \ \ \ \ record\{10,\ 1000\}}
+\DoxyCodeLine{\Hypertarget{310-_gen-_variables_in_generators_8cpp_source_l00020}00020\ \ \ \ \ \}));}
+\DoxyCodeLine{\Hypertarget{310-_gen-_variables_in_generators_8cpp_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{310-_gen-_variables_in_generators_8cpp_source_l00022}00022\ \ \ \ \ \textcolor{comment}{//\ This\ will\ not\ compile\ (intentionally),\ because\ it\ accesses\ a\ variable}}
+\DoxyCodeLine{\Hypertarget{310-_gen-_variables_in_generators_8cpp_source_l00023}00023\ \ \ \ \ \textcolor{comment}{//\ auto\ number\ =\ GENERATE(take(50,\ random(std::get<0>(r),\ std::get<1>(r))));}}
+\DoxyCodeLine{\Hypertarget{310-_gen-_variables_in_generators_8cpp_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{310-_gen-_variables_in_generators_8cpp_source_l00025}00025\ \ \ \ \textcolor{comment}{//\ GENERATE\_COPY\ copies\ all\ variables\ mentioned\ inside\ the\ expression}}
+\DoxyCodeLine{\Hypertarget{310-_gen-_variables_in_generators_8cpp_source_l00026}00026\ \ \ \ \textcolor{comment}{//\ thus\ this\ will\ work.}}
+\DoxyCodeLine{\Hypertarget{310-_gen-_variables_in_generators_8cpp_source_l00027}00027\ \ \ \ \ \textcolor{keyword}{auto}\ number\ =\ \mbox{\hyperlink{catch__generators_8hpp_a44e2fff00253a218f0a392ad6abac624}{GENERATE\_COPY}}(take(50,\ \mbox{\hyperlink{yubico__otp_8c_a7ba1784f91d04c32f9b3139bc6fd8137}{random}}(std::get<0>(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}),\ std::get<1>(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}))));}
+\DoxyCodeLine{\Hypertarget{310-_gen-_variables_in_generators_8cpp_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{310-_gen-_variables_in_generators_8cpp_source_l00029}00029\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(std::abs(number)\ >\ 0);}
+\DoxyCodeLine{\Hypertarget{310-_gen-_variables_in_generators_8cpp_source_l00030}00030\ \}}
+\DoxyCodeLine{\Hypertarget{310-_gen-_variables_in_generators_8cpp_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{310-_gen-_variables_in_generators_8cpp_source_l00032}00032\ \textcolor{comment}{//\ Compiling\ and\ running\ this\ file\ will\ result\ in\ 150\ successful\ assertions}}
+\DoxyCodeLine{\Hypertarget{310-_gen-_variables_in_generators_8cpp_source_l00033}00033\ }
+
+\end{DoxyCode}

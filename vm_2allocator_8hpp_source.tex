@@ -1,0 +1,494 @@
+\doxysection{allocator.\+hpp}
+\hypertarget{vm_2allocator_8hpp_source}{}\label{vm_2allocator_8hpp_source}\index{libraries/sys-\/vm/include/sysio/vm/allocator.hpp@{libraries/sys-\/vm/include/sysio/vm/allocator.hpp}}
+\mbox{\hyperlink{vm_2allocator_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <sysio/vm/constants.hpp>}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <sysio/vm/exceptions.hpp>}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <cassert>}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <cstddef>}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <cstdint>}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ <cstring>}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <map>}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00011}00011\ \textcolor{preprocessor}{\#include\ <set>}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00012}00012\ \textcolor{preprocessor}{\#include\ <memory>}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00013}00013\ \textcolor{preprocessor}{\#include\ <mutex>}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00014}00014\ \textcolor{preprocessor}{\#include\ <utility>}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00015}00015\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00017}00017\ \textcolor{preprocessor}{\#include\ <sys/mman.h>}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00018}00018\ \textcolor{preprocessor}{\#include\ <unistd.h>}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00020}00020\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{\ \textcolor{keyword}{namespace\ }vm\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00021}\mbox{\hyperlink{classsysio_1_1vm_1_1bounded__allocator}{00021}}\ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1vm_1_1bounded__allocator}{bounded\_allocator}}\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00022}00022\ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00023}\mbox{\hyperlink{classsysio_1_1vm_1_1bounded__allocator_a61da40de2e123973dfe6f3b6537deb64}{00023}}\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1bounded__allocator_a61da40de2e123973dfe6f3b6537deb64}{bounded\_allocator}}(\textcolor{keywordtype}{size\_t}\ size)\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00024}00024\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1bounded__allocator_a67c99d23b2977c2ea444da4376824c91}{mem\_size}}\ =\ size;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00025}00025\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1bounded__allocator_a771ca05bccf09fa9d35edce960d23384}{raw}}\ \ \ \ \ \ =\ std::unique\_ptr<uint8\_t[]>(\textcolor{keyword}{new}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}[\mbox{\hyperlink{classsysio_1_1vm_1_1bounded__allocator_a67c99d23b2977c2ea444da4376824c91}{mem\_size}}]);}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00026}00026\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00027}00027\ \ \ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00028}\mbox{\hyperlink{classsysio_1_1vm_1_1bounded__allocator_a09801c9d570feb876a3eb81a3da82899}{00028}}\ \ \ \ \ \ \ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ \mbox{\hyperlink{classsysio_1_1vm_1_1bounded__allocator_a09801c9d570feb876a3eb81a3da82899}{alloc}}(\textcolor{keywordtype}{size\_t}\ size\ =\ 1)\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00029}00029\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}((\textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}})\ *\ size)\ +\ index\ <=\ \mbox{\hyperlink{classsysio_1_1vm_1_1bounded__allocator_a67c99d23b2977c2ea444da4376824c91}{mem\_size}},\ wasm\_bad\_alloc,\ \textcolor{stringliteral}{"{}wasm\ failed\ to\ allocate\ native"{}});}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00030}00030\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*)(\mbox{\hyperlink{classsysio_1_1vm_1_1bounded__allocator_a771ca05bccf09fa9d35edce960d23384}{raw}}.get()\ +\ index);}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00031}00031\ \ \ \ \ \ \ \ \ \ index\ +=\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}})\ *\ size;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00032}00032\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00033}00033\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00035}00035\ \ \ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00036}\mbox{\hyperlink{classsysio_1_1vm_1_1bounded__allocator_a52bb022595c34e2d75d6bc2d388aae9f}{00036}}\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1vm_1_1bounded__allocator_a52bb022595c34e2d75d6bc2d388aae9f}{reclaim}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ ptr,\ \textcolor{keywordtype}{size\_t}\ size=0)\ \{\ \textcolor{comment}{/*\ noop\ for\ now\ */}\ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00038}\mbox{\hyperlink{classsysio_1_1vm_1_1bounded__allocator_a8c06380ef0713b6e4b4994ec4961d6b6}{00038}}\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1vm_1_1bounded__allocator_a8c06380ef0713b6e4b4994ec4961d6b6}{free}}()\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00039}00039\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(index\ >\ 0,\ wasm\_double\_free,\ \textcolor{stringliteral}{"{}double\ free"{}});}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00040}00040\ \ \ \ \ \ \ \ \ \ index\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00041}00041\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00042}\mbox{\hyperlink{classsysio_1_1vm_1_1bounded__allocator_a30a2e9dd67a64c4f279e249b573bf6e2}{00042}}\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1bounded__allocator_a30a2e9dd67a64c4f279e249b573bf6e2}{reset}}()\ \{\ index\ =\ 0;\ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00043}00043\ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1bounded__allocator_a67c99d23b2977c2ea444da4376824c91}{mem\_size}};}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00044}00044\ \ \ \ \ \ \ std::unique\_ptr<uint8\_t[]>\ \mbox{\hyperlink{classsysio_1_1vm_1_1bounded__allocator_a771ca05bccf09fa9d35edce960d23384}{raw}};}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00045}00045\ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ index\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00046}00046\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00048}00048\ \ \ \ \textcolor{comment}{//\ Conditionally\ allocates\ a\ new\ stack\ leaving\ enough\ room}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00049}00049\ \ \ \ \textcolor{comment}{//\ for\ host\ function\ and\ signal\ handler\ execution.\ \ If}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00050}00050\ \ \ \ \textcolor{comment}{//\ the\ required\ stack\ size\ is\ small\ enough\ to\ fit\ in\ the}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00051}00051\ \ \ \ \textcolor{comment}{//\ regular\ program\ stack,\ does\ nothing\ and\ returns\ nullptr.}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00052}\mbox{\hyperlink{classsysio_1_1vm_1_1stack__allocator}{00052}}\ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1vm_1_1stack__allocator}{stack\_allocator}}\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00053}00053\ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00054}\mbox{\hyperlink{classsysio_1_1vm_1_1stack__allocator_a01d45f4a18584a43b9c408b122b5c803}{00054}}\ \ \ \ \ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classsysio_1_1vm_1_1stack__allocator_a01d45f4a18584a43b9c408b122b5c803}{stack\_allocator}}(std::size\_t\ min\_size)\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(min\_size\ >\ 4*1024*1024)\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \ \ \ std::size\_t\ pagesize\ =\ \textcolor{keyword}{static\_cast<}std::size\_t\textcolor{keyword}{>}(::sysconf(\_SC\_PAGESIZE));}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \ \ \ \_size\ =\ ((min\_size\ +\ pagesize\ -\/\ 1)\ \&\ \string~(pagesize\ -\/\ 1))\ +\ 4*1024*1024;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae0ed371842ace71a7886a6134ecbcb62}{flags}}\ =\ MAP\_PRIVATE\ |\ MAP\_ANONYMOUS;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00059}00059\ \textcolor{preprocessor}{\#ifdef\ MAP\_STACK}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae0ed371842ace71a7886a6134ecbcb62}{flags}}\ |=\ MAP\_STACK;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00061}00061\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00062}00062\ \ \ \ \ \ \ \ \ \ \ \ \ \_ptr\ =\ ::mmap(\textcolor{keyword}{nullptr},\ \_size,\ PROT\_READ\ |\ PROT\_WRITE,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae0ed371842ace71a7886a6134ecbcb62}{flags}},\ -\/1,\ 0);}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00064}00064\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00065}\mbox{\hyperlink{classsysio_1_1vm_1_1stack__allocator_a7a37f084f97ff35e1fdd7d7ca1132152}{00065}}\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1stack__allocator_a7a37f084f97ff35e1fdd7d7ca1132152}{\string~stack\_allocator}}()\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00066}00066\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\_ptr)\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00067}00067\ \ \ \ \ \ \ \ \ \ \ \ \ ::munmap(\_ptr,\ \_size);}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00069}00069\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00070}\mbox{\hyperlink{classsysio_1_1vm_1_1stack__allocator_aa074c483bd9a1b6ef0b18a0ea869f541}{00070}}\ \ \ \ \ \ \ \textcolor{keywordtype}{void}*\ \mbox{\hyperlink{classsysio_1_1vm_1_1stack__allocator_aa074c483bd9a1b6ef0b18a0ea869f541}{top}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00071}00071\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\_ptr)\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(\_ptr)\ +\ \_size;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00073}00073\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00074}00074\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00075}00075\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00076}00076\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00077}00077\ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00078}00078\ \ \ \ \ \ \ \textcolor{keywordtype}{void}*\ \_ptr\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00079}00079\ \ \ \ \ \ \ std::size\_t\ \_size;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00080}00080\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00081}00081\ }
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00082}\mbox{\hyperlink{classsysio_1_1vm_1_1contiguous__allocator}{00082}}\ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1vm_1_1contiguous__allocator}{contiguous\_allocator}}\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00083}00083\ \ \ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00084}00084\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}<std::\textcolor{keywordtype}{size\_t}\ align\_amt>}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00085}\mbox{\hyperlink{classsysio_1_1vm_1_1contiguous__allocator_af9d558d959373378bb7d16d31eb0a774}{00085}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classsysio_1_1vm_1_1contiguous__allocator_af9d558d959373378bb7d16d31eb0a774}{align\_offset}}(\textcolor{keywordtype}{size\_t}\ offset)\ \{\ \textcolor{keywordflow}{return}\ (offset\ +\ align\_amt\ -\/\ 1)\ \&\ \string~(align\_amt\ -\/\ 1);\ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00086}00086\ }
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00087}\mbox{\hyperlink{classsysio_1_1vm_1_1contiguous__allocator_a4f361a827947319dffa10d52a370acb5}{00087}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ std::size\_t\ \mbox{\hyperlink{classsysio_1_1vm_1_1contiguous__allocator_a4f361a827947319dffa10d52a370acb5}{align\_to\_page}}(std::size\_t\ offset)\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00088}00088\ \ \ \ \ \ \ \ \ \ \ \ \ std::size\_t\ pagesize\ =\ \textcolor{keyword}{static\_cast<}std::size\_t\textcolor{keyword}{>}(::sysconf(\_SC\_PAGESIZE));}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00089}00089\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (offset\ +\ pagesize\ -\/\ 1)\ \&\ \string~(pagesize\ -\/\ 1);}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00090}00090\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00091}00091\ }
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00092}\mbox{\hyperlink{classsysio_1_1vm_1_1contiguous__allocator_a77a56083ca544b234525074149d547eb}{00092}}\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1contiguous__allocator_a77a56083ca544b234525074149d547eb}{contiguous\_allocator}}(\textcolor{keywordtype}{size\_t}\ size)\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00093}00093\ \ \ \ \ \ \ \ \ \ \ \ \ \_size\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1contiguous__allocator_a4f361a827947319dffa10d52a370acb5}{align\_to\_page}}(size);}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00094}00094\ \ \ \ \ \ \ \ \ \ \ \ \ \_base\ =\ (\textcolor{keywordtype}{char}*)mmap(NULL,\ \_size,\ PROT\_READ\ |\ PROT\_WRITE,\ MAP\_PRIVATE\ |\ MAP\_ANONYMOUS,\ -\/1,\ 0);}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00095}00095\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(\_base\ !=\ MAP\_FAILED,\ wasm\_bad\_alloc,\ \textcolor{stringliteral}{"{}mmap\ failed."{}});}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00096}00096\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00097}\mbox{\hyperlink{classsysio_1_1vm_1_1contiguous__allocator_ae82c4cba86ddaecbc8c8429426af3796}{00097}}\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1contiguous__allocator_ae82c4cba86ddaecbc8c8429426af3796}{\string~contiguous\_allocator}}()\ \{\ munmap(\_base,\ \mbox{\hyperlink{classsysio_1_1vm_1_1contiguous__allocator_a4f361a827947319dffa10d52a370acb5}{align\_to\_page}}(\_size));\ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00098}00098\ }
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00099}00099\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00100}\mbox{\hyperlink{classsysio_1_1vm_1_1contiguous__allocator_a04bab55fbfbb6ee587047526c04eb378}{00100}}\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ \mbox{\hyperlink{classsysio_1_1vm_1_1contiguous__allocator_a04bab55fbfbb6ee587047526c04eb378}{alloc}}(\textcolor{keywordtype}{size\_t}\ size\ =\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00101}00101\ \ \ \ \ \ \ \ \ \ \ \ \ \_offset\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1contiguous__allocator_af9d558d959373378bb7d16d31eb0a774}{align\_offset<alignof(T)>}}(\_offset);}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00102}00102\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{structfc_1_1aligned}{aligned}}\ =\ (\textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}})\ *\ size)\ +\ \_offset;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00103}00103\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structfc_1_1aligned}{aligned}}\ >\ \_size)\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00104}00104\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ new\_size\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1contiguous__allocator_a4f361a827947319dffa10d52a370acb5}{align\_to\_page}}(\mbox{\hyperlink{structfc_1_1aligned}{aligned}});}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00105}00105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}*\ new\_base\ =\ (\textcolor{keywordtype}{char}*)mmap(NULL,\ new\_size,\ PROT\_READ\ |\ PROT\_WRITE,\ MAP\_PRIVATE\ |\ MAP\_ANONYMOUS,\ -\/1,\ 0);}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00106}00106\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(new\_base\ !=\ MAP\_FAILED,\ wasm\_bad\_alloc,\ \textcolor{stringliteral}{"{}mmap\ failed."{}});}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00107}00107\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(new\_base,\ \_base,\ \_size);}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00108}00108\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ munmap(\_base,\ \_size);}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00109}00109\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_size\ =\ new\_size;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00110}00110\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_base\ =\ new\_base;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00111}00111\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00112}00112\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ ptr\ =\ (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*)(\_base\ +\ \_offset);}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00113}00113\ \ \ \ \ \ \ \ \ \ \ \ \ \_offset\ =\ \mbox{\hyperlink{structfc_1_1aligned}{aligned}};}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00114}00114\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ptr;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00115}00115\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00116}00116\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00117}\mbox{\hyperlink{classsysio_1_1vm_1_1contiguous__allocator_aaf4f224b2e566dc7de189384d48ad8cb}{00117}}\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1vm_1_1contiguous__allocator_aaf4f224b2e566dc7de189384d48ad8cb}{reclaim}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ ptr,\ \textcolor{keywordtype}{size\_t}\ size=0)\ \{\ \textcolor{comment}{/*\ noop\ for\ now\ */}\ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00118}\mbox{\hyperlink{classsysio_1_1vm_1_1contiguous__allocator_ad6dfc25858e9e2a56d2679ea9f6b9fc4}{00118}}\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1vm_1_1contiguous__allocator_ad6dfc25858e9e2a56d2679ea9f6b9fc4}{free}}()\ \{\ \textcolor{comment}{/*\ noop\ for\ now\ */}\ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00119}00119\ }
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00120}00120\ \ \ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00121}00121\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \_offset\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00122}00122\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \_size\ \ \ =\ 0;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00123}00123\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}*\ \ \_base;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00124}00124\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00125}00125\ }
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00126}\mbox{\hyperlink{classsysio_1_1vm_1_1jit__allocator}{00126}}\ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1vm_1_1jit__allocator}{jit\_allocator}}\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00127}00127\ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ std::size\_t\ segment\_size\ =\ std::size\_t\{1024u\}\ *\ 1024u\ *\ 1024u;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00128}00128\ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00129}00129\ \ \ \ \ \ \ \textcolor{comment}{//\ allocates\ page\ aligned\ memory\ with\ executable\ permission}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00130}\mbox{\hyperlink{classsysio_1_1vm_1_1jit__allocator_a6a8f74933109f1f2331ea038482f9b41}{00130}}\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ *\ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__allocator_a6a8f74933109f1f2331ea038482f9b41}{alloc}}(std::size\_t\ size)\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00131}00131\ \ \ \ \ \ \ \ \ \ std::lock\_guard\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}\{\_mutex\};}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00132}00132\ \ \ \ \ \ \ \ \ \ size\ =\ round\_to\_page(size);}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00133}00133\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ best\ =\ free\_blocks\_by\_size.lower\_bound(size);}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00134}00134\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(best\ ==\ free\_blocks\_by\_size.end())\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00135}00135\ \ \ \ \ \ \ \ \ \ \ \ \ best\ =\ allocate\_segment(size);}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00136}00136\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00137}00137\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (best-\/>first\ >\ size)\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00138}00138\ \ \ \ \ \ \ \ \ \ \ \ \ best\ =\ split\_block(best,\ size);}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00139}00139\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00140}00140\ \ \ \ \ \ \ \ \ \ transfer\_node(free\_blocks,\ allocated\_blocks,\ best-\/>second);}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00141}00141\ \ \ \ \ \ \ \ \ \ best\ =\ transfer\_node(free\_blocks\_by\_size,\ allocated\_blocks\_by\_size,\ *best);}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00142}00142\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ best-\/>second;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00143}00143\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00144}00144\ \ \ \ \ \ \ \textcolor{comment}{//\ ptr\ must\ be\ previously\ allocated\ by\ a\ call\ to\ alloc}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00145}\mbox{\hyperlink{classsysio_1_1vm_1_1jit__allocator_a602363acba307fbc4e06fb7bab007f82}{00145}}\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__allocator_a602363acba307fbc4e06fb7bab007f82}{free}}(\textcolor{keywordtype}{void}*\ ptr)\ \textcolor{keyword}{noexcept}\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00146}00146\ \ \ \ \ \ \ \ \ \ std::lock\_guard\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}\{\_mutex\};}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00147}00147\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ pos\ =\ transfer\_node(allocated\_blocks,\ free\_blocks,\ ptr);}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00148}00148\ \ \ \ \ \ \ \ \ \ transfer\_node(allocated\_blocks\_by\_size,\ free\_blocks\_by\_size,\ \{pos-\/>second,\ pos-\/>first\});}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00149}00149\ }
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00150}00150\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ merge\ the\ freed\ block\ with\ adjacent\ free\ blocks}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00151}00151\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(pos\ !=\ free\_blocks.begin())\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00152}00152\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ prev\ =\ pos;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00153}00153\ \ \ \ \ \ \ \ \ \ \ \ \ -\/-\/prev;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00154}00154\ \ \ \ \ \ \ \ \ \ \ \ \ pos\ =\ maybe\_consolidate\_blocks(prev,\ pos);}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00155}00155\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00156}00156\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ next\ =\ pos;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00157}00157\ \ \ \ \ \ \ \ \ \ ++next;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00158}00158\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (next\ !=\ free\_blocks.end())\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00159}00159\ \ \ \ \ \ \ \ \ \ \ \ \ maybe\_consolidate\_blocks(pos,\ next);}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00160}00160\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00161}00161\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00162}\mbox{\hyperlink{classsysio_1_1vm_1_1jit__allocator_a3f0facc0b61e7eac38b41c15db4c4f00}{00162}}\ \ \ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__allocator}{jit\_allocator}}\&\ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__allocator_a3f0facc0b61e7eac38b41c15db4c4f00}{instance}}()\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00163}00163\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__allocator}{jit\_allocator}}\ the\_jit\_allocator;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00164}00164\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ the\_jit\_allocator;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00165}00165\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00166}00166\ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00167}00167\ \ \ \ \ \ \ \textcolor{keyword}{struct\ }segment\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00168}00168\ \ \ \ \ \ \ \ \ \ segment(\textcolor{keywordtype}{void}\ *\ base,\ std::size\_t\ size)\ :\ base(base),\ size(size)\ \{\}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00169}00169\ \ \ \ \ \ \ \ \ \ segment(segment\&\&\ other)\ :\ base(other.base),\ size(other.size)\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00170}00170\ \ \ \ \ \ \ \ \ \ \ \ \ other.base\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00171}00171\ \ \ \ \ \ \ \ \ \ \ \ \ other.size\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00172}00172\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00173}00173\ \ \ \ \ \ \ \ \ \ segment\&\ operator=(\textcolor{keyword}{const}\ segment\&\ other)\ =\ \textcolor{keyword}{delete};}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00174}00174\ \ \ \ \ \ \ \ \ \ \string~segment()\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00175}00175\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(base)\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00176}00176\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ::munmap(base,\ size);}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00177}00177\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00178}00178\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00179}00179\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ *\ base;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00180}00180\ \ \ \ \ \ \ \ \ \ std::size\_t\ size;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00181}00181\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00182}00182\ \ \ \ \ \ \ \textcolor{keyword}{using\ }block\ =\ std::pair<std::size\_t,\ void*>;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00183}00183\ \ \ \ \ \ \ \textcolor{keyword}{struct\ }by\_size\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00184}00184\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ }is\_transparent\ =\ void;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00185}00185\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ operator()(\textcolor{keyword}{const}\ block\&\ lhs,\ \textcolor{keyword}{const}\ block\&\ rhs)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00186}00186\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ lhs.first\ <\ rhs.first\ ||\ (lhs.first\ ==\ rhs.first\ \&\&\ std::less<void*>\{\}(lhs.second,\ rhs.second));}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00187}00187\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00188}00188\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ operator()(\textcolor{keyword}{const}\ block\&\ lhs,\ std::size\_t\ rhs)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00189}00189\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ lhs.first\ <\ rhs;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00190}00190\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00191}00191\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ operator()(std::size\_t\ lhs,\ \textcolor{keyword}{const}\ block\&\ rhs)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00192}00192\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ lhs\ <\ rhs.first;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00193}00193\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00194}00194\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00195}00195\ \ \ \ \ \ \ std::vector<segment>\ \_segments;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00196}00196\ \ \ \ \ \ \ std::set<block,\ by\_size>\ free\_blocks\_by\_size;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00197}00197\ \ \ \ \ \ \ std::set<block,\ by\_size>\ allocated\_blocks\_by\_size;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00198}00198\ \ \ \ \ \ \ std::map<void*,\ std::size\_t>\ free\_blocks;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00199}00199\ \ \ \ \ \ \ std::map<void*,\ std::size\_t>\ allocated\_blocks;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00200}00200\ \ \ \ \ \ \ std::mutex\ \_mutex;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00201}00201\ \ \ \ \ \ \ \textcolor{keyword}{using\ }blocks\_by\_size\_t\ =\ std::set<block,\ by\_size>;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00202}00202\ \ \ \ \ \ \ \textcolor{keyword}{using\ }blocks\_t\ =\ std::map<void*,\ size\_t>;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00203}00203\ }
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00204}00204\ \ \ \ \ \ \ \textcolor{comment}{//\ moves\ an\ element\ from\ one\ associative\ container\ to\ another}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00205}00205\ \ \ \ \ \ \ \textcolor{comment}{//\ @pre\ key\ must\ be\ present\ in\ from,\ but\ not\ in\ to}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00206}00206\ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ C>}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00207}00207\ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{typename}\ C::iterator\ transfer\_node(C\&\ from,\ C\&\ to,\ \textcolor{keyword}{typename}\ C::key\_type\ key)\ \textcolor{keyword}{noexcept}\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00208}00208\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ node\ =\ from.extract(key);}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00209}00209\ \ \ \ \ \ \ \ \ \ assert(node);}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00210}00210\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ [pos,\ inserted,\ \mbox{\hyperlink{localize_8hpp_a6554a5ea005e85d0f84f2f34c11de938}{\_}}]\ =\ to.insert(std::move(node));}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00211}00211\ \ \ \ \ \ \ \ \ \ assert(inserted);}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00212}00212\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ pos;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00213}00213\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00214}00214\ }
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00215}00215\ \ \ \ \ \ \ blocks\_by\_size\_t::iterator\ allocate\_segment(std::size\_t\ min\_size)\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00216}00216\ \ \ \ \ \ \ \ \ \ std::size\_t\ size\ =\ std::max(min\_size,\ segment\_size);}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00217}00217\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}*\ base\ =\ mmap(\textcolor{keyword}{nullptr},\ size,\ PROT\_EXEC,\ MAP\_PRIVATE\ |\ MAP\_ANONYMOUS,\ -\/1,\ 0);}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00218}00218\ \ \ \ \ \ \ \ \ \ segment\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\{base,\ size\};}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00219}00219\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(base\ !=\ MAP\_FAILED,\ wasm\_bad\_alloc,\ \textcolor{stringliteral}{"{}failed\ to\ allocate\ jit\ segment"{}});}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00220}00220\ \ \ \ \ \ \ \ \ \ \_segments.emplace\_back(std::move(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}));}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00221}00221\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a72ffd6653260a2dedcc4b55e39e10973a4e09c20e9a85794807a130e8283e8769}{success}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00222}00222\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ guard\_1\ =\ scope\_guard\{[\&]\ \{\ \textcolor{keywordflow}{if}(!success)\ \{\ \_segments.pop\_back();\ \}\ \}\};}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00223}00223\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ pos2\ =\ free\_blocks\_by\_size.insert(\{size,\ base\}).first;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00224}00224\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ guard\_2\ =\ scope\_guard\{[\&]\ \{\ \textcolor{keywordflow}{if}(!success)\ \{\ free\_blocks\_by\_size.erase(pos2);\ \}\}\};}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00225}00225\ \ \ \ \ \ \ \ \ \ free\_blocks.insert(\{base,\ size\});}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00226}00226\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a72ffd6653260a2dedcc4b55e39e10973a4e09c20e9a85794807a130e8283e8769}{success}}\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00227}00227\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ pos2;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00228}00228\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00229}00229\ }
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00230}00230\ \ \ \ \ \ \ blocks\_by\_size\_t::iterator\ split\_block(blocks\_by\_size\_t::iterator\ pos,\ std::size\_t\ size)\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00231}00231\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a72ffd6653260a2dedcc4b55e39e10973a4e09c20e9a85794807a130e8283e8769}{success}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00232}00232\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ new1\ =\ free\_blocks\_by\_size.insert(\{size,\ pos-\/>second\}).first;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00233}00233\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ guard1\ =\ scope\_guard\{[\&]\{\ \textcolor{keywordflow}{if}(!success)\ \{\ free\_blocks\_by\_size.erase(new1);\ \}\ \}\};}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00234}00234\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ new2\ =\ free\_blocks\_by\_size.insert(\{pos-\/>first\ -\/\ size,\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(pos-\/>second)\ +\ size\}).first;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00235}00235\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ guard2\ =\ scope\_guard\{[\&]\{\ \textcolor{keywordflow}{if}(!success)\ \{\ free\_blocks\_by\_size.erase(new2);\ \}\ \}\};}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00236}00236\ \ \ \ \ \ \ \ \ \ free\_blocks.insert(\{new2-\/>second,\ new2-\/>first\});}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00237}00237\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ the\ rest\ is\ nothrow}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00238}00238\ \ \ \ \ \ \ \ \ \ free\_blocks\_by\_size.erase(pos);}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00239}00239\ \ \ \ \ \ \ \ \ \ free\_blocks[new1-\/>second]\ =\ new1-\/>first;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00240}00240\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a72ffd6653260a2dedcc4b55e39e10973a4e09c20e9a85794807a130e8283e8769}{success}}\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00241}00241\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ new1;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00242}00242\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00243}00243\ }
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00244}00244\ \ \ \ \ \ \ blocks\_t::iterator\ maybe\_consolidate\_blocks(blocks\_t::iterator\ lhs,\ blocks\_t::iterator\ rhs)\ \textcolor{keyword}{noexcept}\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00245}00245\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(lhs-\/>first)\ +\ lhs-\/>second\ ==\ rhs-\/>first)\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00246}00246\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ merge\ blocks\ in\ free\_blocks\_by\_size}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00247}00247\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ node\ =\ free\_blocks\_by\_size.extract(\{lhs-\/>second,\ lhs-\/>first\});}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00248}00248\ \ \ \ \ \ \ \ \ \ \ \ \ assert(node);}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00249}00249\ \ \ \ \ \ \ \ \ \ \ \ \ node.value().first\ +=\ rhs-\/>second;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00250}00250\ \ \ \ \ \ \ \ \ \ \ \ \ free\_blocks\_by\_size.insert(std::move(node));}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00251}00251\ \ \ \ \ \ \ \ \ \ \ \ \ free\_blocks\_by\_size.erase(\{rhs-\/>second,\ rhs-\/>first\});}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00252}00252\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ merge\ the\ blocks\ in\ free\_blocks}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00253}00253\ \ \ \ \ \ \ \ \ \ \ \ \ lhs-\/>second\ +=\ rhs-\/>second;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00254}00254\ \ \ \ \ \ \ \ \ \ \ \ \ free\_blocks.erase(rhs);}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00255}00255\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ lhs;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00256}00256\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00257}00257\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ rhs;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00258}00258\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00259}00259\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00260}00260\ }
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00261}00261\ \ \ \ \ \ \ \textcolor{keyword}{static}\ std::size\_t\ round\_to\_page(std::size\_t\ offset)\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00262}00262\ \ \ \ \ \ \ \ \ \ std::size\_t\ pagesize\ =\ \textcolor{keyword}{static\_cast<}std::size\_t\textcolor{keyword}{>}(::sysconf(\_SC\_PAGESIZE));}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00263}00263\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (offset\ +\ pagesize\ -\/\ 1)\ \&\ \string~(pagesize\ -\/\ 1);}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00264}00264\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00265}00265\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00266}00266\ }
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00267}\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator}{00267}}\ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator}{growable\_allocator}}\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00268}00268\ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00269}00269\ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1a3da972f341769c0334debea85c02fb}{max\_memory\_size}}\ =\ 1024\ *\ 1024\ *\ 1024;\ \textcolor{comment}{//\ 1GB}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00270}00270\ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_aa9b20a281dcefb59b7aedcb489036355}{chunk\_size}}\ \ \ \ \ \ =\ 128\ *\ 1024;\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ 128KB}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00271}00271\ \ \ \ \ \ \ \textcolor{keyword}{template}<std::\textcolor{keywordtype}{size\_t}\ align\_amt>}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00272}\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a864b318420afb03072753423044548b8}{00272}}\ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a864b318420afb03072753423044548b8}{align\_offset}}(\textcolor{keywordtype}{size\_t}\ offset)\ \{\ \textcolor{keywordflow}{return}\ (offset\ +\ align\_amt\ -\/\ 1)\ \&\ \string~(align\_amt\ -\/\ 1);\ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00273}00273\ }
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00274}\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_acb056eb364fabf0e6a2641fbde6503e5}{00274}}\ \ \ \ \ \ \ \textcolor{keyword}{static}\ std::size\_t\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_acb056eb364fabf0e6a2641fbde6503e5}{align\_to\_page}}(std::size\_t\ offset)\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00275}00275\ \ \ \ \ \ \ \ \ \ std::size\_t\ pagesize\ =\ \textcolor{keyword}{static\_cast<}std::size\_t\textcolor{keyword}{>}(::sysconf(\_SC\_PAGESIZE));}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00276}00276\ \ \ \ \ \ \ \ \ \ assert(\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1a3da972f341769c0334debea85c02fb}{max\_memory\_size}}\ \%\ \mbox{\hyperlink{namespacesysio_1_1vm_a0ae6751a77293216df4656dee5081eb2a10108b6260714ad13914454c1dd1ec8f}{page\_size}}\ ==\ 0);}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00277}00277\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (offset\ +\ pagesize\ -\/\ 1)\ \&\ \string~(pagesize\ -\/\ 1);}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00278}00278\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00279}00279\ }
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00280}00280\ \ \ \ \ \ \ \textcolor{comment}{//\ size\ in\ bytes}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00281}\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a0349e53d197ca12de2924486329ce64c}{00281}}\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a0349e53d197ca12de2924486329ce64c}{growable\_allocator}}(\textcolor{keywordtype}{size\_t}\ size)\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00282}00282\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(size\ <=\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1a3da972f341769c0334debea85c02fb}{max\_memory\_size}},\ wasm\_bad\_alloc,\ \textcolor{stringliteral}{"{}Too\ large\ initial\ memory\ size"{}});}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00283}00283\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9848885bcca3edad4c739a9472b54194}{\_base}}\ =\ (\textcolor{keywordtype}{char}*)mmap(NULL,\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1a3da972f341769c0334debea85c02fb}{max\_memory\_size}},\ PROT\_NONE,\ MAP\_PRIVATE\ |\ MAP\_ANONYMOUS,\ -\/1,\ 0);}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00284}00284\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9848885bcca3edad4c739a9472b54194}{\_base}}\ !=\ MAP\_FAILED,\ wasm\_bad\_alloc,\ \textcolor{stringliteral}{"{}mmap\ failed."{}});}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00285}00285\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (size\ !=\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00286}00286\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ chunks\_to\_alloc\ =\ (\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a864b318420afb03072753423044548b8}{align\_offset<chunk\_size>}}(size)\ /\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_aa9b20a281dcefb59b7aedcb489036355}{chunk\_size}});}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00287}00287\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1beb84251b8c27b8efe2f847b7ce55a1}{\_size}}\ +=\ (\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_aa9b20a281dcefb59b7aedcb489036355}{chunk\_size}}\ *\ chunks\_to\_alloc);}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00288}00288\ \ \ \ \ \ \ \ \ \ \ \ \ mprotect((\textcolor{keywordtype}{char}*)\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9848885bcca3edad4c739a9472b54194}{\_base}},\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1beb84251b8c27b8efe2f847b7ce55a1}{\_size}},\ PROT\_READ\ |\ PROT\_WRITE);}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00289}00289\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00290}00290\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9ead3933f35d984d9dba8bf14a29965f}{\_capacity}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1a3da972f341769c0334debea85c02fb}{max\_memory\_size}};}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00291}00291\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00292}00292\ }
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00293}\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a4ede1512163b47c6a7d6e87620984549}{00293}}\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a4ede1512163b47c6a7d6e87620984549}{\string~growable\_allocator}}()\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00294}00294\ \ \ \ \ \ \ \ \ \ munmap(\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9848885bcca3edad4c739a9472b54194}{\_base}},\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9ead3933f35d984d9dba8bf14a29965f}{\_capacity}});}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00295}00295\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1155e0065cf9a3cdb380751b67ea5b24}{is\_jit}})\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00296}00296\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__allocator_a3f0facc0b61e7eac38b41c15db4c4f00}{jit\_allocator::instance}}().\mbox{\hyperlink{classsysio_1_1vm_1_1jit__allocator_a602363acba307fbc4e06fb7bab007f82}{free}}(\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1d8add8bc04002ce9dd681dab5550d0d}{\_code\_base}});}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00297}00297\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00298}00298\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00299}00299\ }
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00300}00300\ \ \ \ \ \ \ \textcolor{comment}{//\ TODO\ use\ Outcome\ library}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00301}00301\ \ \ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00302}\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a5fc8b2ef9ef1ef157d18ec40cf9310ee}{00302}}\ \ \ \ \ \ \ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a5fc8b2ef9ef1ef157d18ec40cf9310ee}{alloc}}(\textcolor{keywordtype}{size\_t}\ size\ =\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00303}00303\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_assert}(\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1a3da972f341769c0334debea85c02fb}{max\_memory\_size}}\ \%\ \textcolor{keyword}{alignof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}})\ ==\ 0,\ \textcolor{stringliteral}{"{}alignment\ must\ divide\ max\_memory\_size."{}});}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00304}00304\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a864b318420afb03072753423044548b8}{align\_offset<alignof(T)>}}(\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}});}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00305}00305\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Evaluating\ the\ inequality\ in\ this\ form\ cannot\ cause\ integer\ overflow.}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00306}00306\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Once\ this\ assertion\ passes,\ the\ rest\ of\ the\ function\ is\ safe.}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00307}00307\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}\ ((\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1a3da972f341769c0334debea85c02fb}{max\_memory\_size}}\ -\/\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}})\ /\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}})\ >=\ size,\ wasm\_bad\_alloc,\ \textcolor{stringliteral}{"{}Allocated\ too\ much\ memory"{}});}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00308}00308\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{structfc_1_1aligned}{aligned}}\ =\ (\textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}})\ *\ size)\ +\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}};}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00309}00309\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structfc_1_1aligned}{aligned}}\ >\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1beb84251b8c27b8efe2f847b7ce55a1}{\_size}})\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00310}00310\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ chunks\_to\_alloc\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a864b318420afb03072753423044548b8}{align\_offset<chunk\_size>}}(\mbox{\hyperlink{structfc_1_1aligned}{aligned}}\ -\/\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1beb84251b8c27b8efe2f847b7ce55a1}{\_size}})\ /\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_aa9b20a281dcefb59b7aedcb489036355}{chunk\_size}};}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00311}00311\ \ \ \ \ \ \ \ \ \ \ \ \ mprotect((\textcolor{keywordtype}{char}*)\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9848885bcca3edad4c739a9472b54194}{\_base}}\ +\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1beb84251b8c27b8efe2f847b7ce55a1}{\_size}},\ (\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_aa9b20a281dcefb59b7aedcb489036355}{chunk\_size}}\ *\ chunks\_to\_alloc),\ PROT\_READ\ |\ PROT\_WRITE);}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00312}00312\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1beb84251b8c27b8efe2f847b7ce55a1}{\_size}}\ +=\ (\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_aa9b20a281dcefb59b7aedcb489036355}{chunk\_size}}\ *\ chunks\_to\_alloc);}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00313}00313\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00314}00314\ }
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00315}00315\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ ptr\ \ =\ (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*)(\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9848885bcca3edad4c739a9472b54194}{\_base}}\ +\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}});}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00316}00316\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}}\ =\ \mbox{\hyperlink{structfc_1_1aligned}{aligned}};}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00317}00317\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ptr;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00318}00318\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00319}00319\ }
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00320}\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_afee3bafc0705850fe8b2d4bdc4601521}{00320}}\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ *\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_afee3bafc0705850fe8b2d4bdc4601521}{start\_code}}()\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00321}00321\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_acb056eb364fabf0e6a2641fbde6503e5}{align\_to\_page}}(\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}});}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00322}00322\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9848885bcca3edad4c739a9472b54194}{\_base}}\ +\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}};}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00323}00323\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00324}00324\ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keywordtype}{bool}\ IsJit>}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00325}\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_af145745e6a5b2238fa56d6a2f422be51}{00325}}\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_af145745e6a5b2238fa56d6a2f422be51}{end\_code}}(\textcolor{keywordtype}{void}\ *\ code\_base)\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00326}00326\ \ \ \ \ \ \ \ \ \ assert((\textcolor{keywordtype}{char}*)code\_base\ >=\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9848885bcca3edad4c739a9472b54194}{\_base}});}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00327}00327\ \ \ \ \ \ \ \ \ \ assert((\textcolor{keywordtype}{char}*)code\_base\ <=\ (\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9848885bcca3edad4c739a9472b54194}{\_base}}+\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}}));}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00328}00328\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_acb056eb364fabf0e6a2641fbde6503e5}{align\_to\_page}}(\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}});}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00329}00329\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1d8add8bc04002ce9dd681dab5550d0d}{\_code\_base}}\ =\ (\textcolor{keywordtype}{char}*)code\_base;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00330}00330\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_adb2de0ed256807f52a2b09d1f45764a9}{\_code\_size}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}}\ -\/\ ((\textcolor{keywordtype}{char}*)code\_base\ -\/\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9848885bcca3edad4c739a9472b54194}{\_base}});}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00331}00331\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keyword}{constexpr}\ (IsJit)\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00332}00332\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \&\ jit\_alloc\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__allocator_a3f0facc0b61e7eac38b41c15db4c4f00}{jit\_allocator::instance}}();}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00333}00333\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ *\ executable\_code\ =\ jit\_alloc.alloc(\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_adb2de0ed256807f52a2b09d1f45764a9}{\_code\_size}});}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00334}00334\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ err\ =\ mprotect(executable\_code,\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_adb2de0ed256807f52a2b09d1f45764a9}{\_code\_size}},\ PROT\_READ\ |\ PROT\_WRITE);}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00335}00335\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(err\ ==\ 0,\ wasm\_bad\_alloc,\ \textcolor{stringliteral}{"{}mprotect\ failed"{}});}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00336}00336\ \ \ \ \ \ \ \ \ \ \ \ \ std::memcpy(executable\_code,\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1d8add8bc04002ce9dd681dab5550d0d}{\_code\_base}},\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_adb2de0ed256807f52a2b09d1f45764a9}{\_code\_size}});}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00337}00337\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1155e0065cf9a3cdb380751b67ea5b24}{is\_jit}}\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00338}00338\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1d8add8bc04002ce9dd681dab5550d0d}{\_code\_base}}\ =\ (\textcolor{keywordtype}{char}*)executable\_code;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00339}00339\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}}\ =\ (\textcolor{keywordtype}{char}*)code\_base\ -\/\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9848885bcca3edad4c739a9472b54194}{\_base}};}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00340}00340\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00341}00341\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_aad6e55de7db90487d6575343114a755d}{enable\_code}}(IsJit);}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00342}00342\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00343}00343\ }
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00344}00344\ \ \ \ \ \ \ \textcolor{comment}{//\ Sets\ protection\ on\ code\ pages\ to\ allow\ them\ to\ be\ executed.}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00345}\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_aad6e55de7db90487d6575343114a755d}{00345}}\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_aad6e55de7db90487d6575343114a755d}{enable\_code}}(\textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1155e0065cf9a3cdb380751b67ea5b24}{is\_jit}})\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00346}00346\ \ \ \ \ \ \ \ \ \ mprotect(\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1d8add8bc04002ce9dd681dab5550d0d}{\_code\_base}},\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_adb2de0ed256807f52a2b09d1f45764a9}{\_code\_size}},\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1155e0065cf9a3cdb380751b67ea5b24}{is\_jit}}?PROT\_EXEC:(PROT\_READ|PROT\_WRITE));}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00347}00347\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00348}00348\ \ \ \ \ \ \ \textcolor{comment}{//\ Make\ code\ pages\ unexecutable}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00349}\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a62721749cc0a0e1af38c3c82e2a31dcf}{00349}}\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a62721749cc0a0e1af38c3c82e2a31dcf}{disable\_code}}()\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00350}00350\ \ \ \ \ \ \ \ \ \ mprotect(\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1d8add8bc04002ce9dd681dab5550d0d}{\_code\_base}},\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_adb2de0ed256807f52a2b09d1f45764a9}{\_code\_size}},\ PROT\_NONE);}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00351}00351\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00352}00352\ }
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00353}\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a5d23df5b7092184fdf575b6fea6fe496}{00353}}\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{void}*\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a5d23df5b7092184fdf575b6fea6fe496}{get\_code\_start}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1d8add8bc04002ce9dd681dab5550d0d}{\_code\_base}};\ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00354}00354\ }
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00355}00355\ \ \ \ \ \ \ \textcolor{comment}{/*\ different\ semantics\ than\ free,}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00356}00356\ \textcolor{comment}{\ \ \ \ \ \ \ *\ the\ memory\ must\ be\ at\ the\ end\ of\ the\ most\ recently\ allocated\ block.}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00357}00357\ \textcolor{comment}{\ \ \ \ \ \ \ */}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00358}00358\ \ \ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00359}\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_ad9ed557611289b11da2b169bb45484cd}{00359}}\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_ad9ed557611289b11da2b169bb45484cd}{reclaim}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ ptr,\ \textcolor{keywordtype}{size\_t}\ size=0)\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00360}00360\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}}\ /\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}})\ >=\ size,\ wasm\_bad\_alloc,\ \textcolor{stringliteral}{"{}reclaimed\ too\ much\ memory"{}}\ );}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00361}00361\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(\ size\ ==\ 0\ ||\ (\textcolor{keywordtype}{char}*)(ptr\ +\ size)\ ==\ (\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9848885bcca3edad4c739a9472b54194}{\_base}}\ +\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}}),\ wasm\_bad\_alloc,\ \textcolor{stringliteral}{"{}reclaiming\ memory\ must\ be\ strictly\ LIFO"{}});}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00362}00362\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ size\ !=\ 0\ )}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00363}00363\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}}\ =\ ((\textcolor{keywordtype}{char}*)ptr\ -\/\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9848885bcca3edad4c739a9472b54194}{\_base}});}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00364}00364\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00365}00365\ }
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00366}00366\ \ \ \ \ \ \ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00367}00367\ \textcolor{comment}{\ \ \ \ \ \ \ *\ Finalize\ the\ memory\ by\ unmapping\ any\ excess\ pages,\ this\ means\ that\ the\ allocator\ will\ no\ longer\ grow}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00368}00368\ \textcolor{comment}{\ \ \ \ \ \ \ */}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00369}\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a37801d94046523d46c5a77b857359986}{00369}}\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a37801d94046523d46c5a77b857359986}{finalize}}()\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00370}00370\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9ead3933f35d984d9dba8bf14a29965f}{\_capacity}}\ !=\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}})\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00371}00371\ \ \ \ \ \ \ \ \ \ \ \ \ std::size\_t\ final\_size\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_acb056eb364fabf0e6a2641fbde6503e5}{align\_to\_page}}(\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}});}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00372}00372\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(munmap(\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9848885bcca3edad4c739a9472b54194}{\_base}}\ +\ final\_size,\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9ead3933f35d984d9dba8bf14a29965f}{\_capacity}}\ -\/\ final\_size)\ ==\ 0,\ wasm\_bad\_alloc,\ \textcolor{stringliteral}{"{}failed\ to\ finalize\ growable\_allocator"{}});}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00373}00373\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9ead3933f35d984d9dba8bf14a29965f}{\_capacity}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1beb84251b8c27b8efe2f847b7ce55a1}{\_size}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}}\ =\ final\_size;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00374}00374\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00375}00375\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00376}00376\ }
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00377}\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a7a09ef6a8d73e1458ee9f9edce986bd8}{00377}}\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a7a09ef6a8d73e1458ee9f9edce986bd8}{free}}()\ \{\ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(\textcolor{keyword}{false},\ wasm\_bad\_alloc,\ \textcolor{stringliteral}{"{}unimplemented"{}});\ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00378}00378\ }
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00379}\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_ab46b67aaafe30db996930c6dec473ce8}{00379}}\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_ab46b67aaafe30db996930c6dec473ce8}{reset}}()\ \{\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}}\ =\ 0;\ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00380}00380\ }
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00381}00381\ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00382}00382\ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1beb84251b8c27b8efe2f847b7ce55a1}{\_size}}\ \ \ =\ 0;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00383}00383\ \ \ \ \ \ \ std::size\_t\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9ead3933f35d984d9dba8bf14a29965f}{\_capacity}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00384}00384\ \ \ \ \ \ \ \textcolor{keywordtype}{char}*\ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9848885bcca3edad4c739a9472b54194}{\_base}};}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00385}00385\ \ \ \ \ \ \ \textcolor{keywordtype}{char}*\ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1d8add8bc04002ce9dd681dab5550d0d}{\_code\_base}}\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00386}00386\ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_adb2de0ed256807f52a2b09d1f45764a9}{\_code\_size}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00387}00387\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1155e0065cf9a3cdb380751b67ea5b24}{is\_jit}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00388}00388\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00389}00389\ }
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00390}00390\ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00391}\mbox{\hyperlink{classsysio_1_1vm_1_1fixed__stack__allocator}{00391}}\ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1vm_1_1fixed__stack__allocator}{fixed\_stack\_allocator}}\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00392}00392\ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00393}00393\ \ \ \ \ \ \ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ \ \ \ \ raw\ \ \ \ \ \ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00394}00394\ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ max\_size\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00395}00395\ }
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00396}00396\ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00397}00397\ \ \ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ U>}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00398}\mbox{\hyperlink{classsysio_1_1vm_1_1fixed__stack__allocator_a4bc8a0c32d02d1dd6c21ad6e08275855}{00398}}\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1vm_1_1fixed__stack__allocator_a4bc8a0c32d02d1dd6c21ad6e08275855}{free}}()\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00399}00399\ \ \ \ \ \ \ \ \ \ munmap(raw,\ \mbox{\hyperlink{namespacesysio_1_1vm_a0ae6751a77293216df4656dee5081eb2a446368544d7541868ef6f10911dea7dd}{max\_memory}});}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00400}00400\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00401}\mbox{\hyperlink{classsysio_1_1vm_1_1fixed__stack__allocator_a7745fe0ed6834f0a06d3305f8e3cd485}{00401}}\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1fixed__stack__allocator_a7745fe0ed6834f0a06d3305f8e3cd485}{fixed\_stack\_allocator}}(\textcolor{keywordtype}{size\_t}\ max\_size)\ :\ max\_size(max\_size)\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00402}00402\ \ \ \ \ \ \ \ \ \ raw\ =\ (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*)mmap(NULL,\ \mbox{\hyperlink{namespacesysio_1_1vm_a0ae6751a77293216df4656dee5081eb2a446368544d7541868ef6f10911dea7dd}{max\_memory}},\ PROT\_NONE,\ MAP\_PRIVATE\ |\ MAP\_ANONYMOUS,\ -\/1,\ 0);}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00403}00403\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(\ raw\ !=\ MAP\_FAILED,\ wasm\_bad\_alloc,\ \textcolor{stringliteral}{"{}mmap\ failed\ to\ alloca\ pages"{}}\ );}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00404}00404\ \ \ \ \ \ \ \ \ \ mprotect(raw,\ max\_size\ *\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}),\ PROT\_READ\ |\ PROT\_WRITE);}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00405}00405\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00406}\mbox{\hyperlink{classsysio_1_1vm_1_1fixed__stack__allocator_a6070ae43ad5e95de9fb7ccb30571d1bc}{00406}}\ \ \ \ \ \ \ \textcolor{keyword}{inline}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ \mbox{\hyperlink{classsysio_1_1vm_1_1fixed__stack__allocator_a6070ae43ad5e95de9fb7ccb30571d1bc}{get\_base\_ptr}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ raw;\ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00407}00407\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00408}00408\ }
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00409}\mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator}{00409}}\ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator}{wasm\_allocator}}\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00410}00410\ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00411}00411\ \ \ \ \ \ \ \textcolor{keywordtype}{char}*\ \ \ raw\ \ \ \ \ \ \ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00412}00412\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}}\ page\ \ \ \ \ \ =\ 0;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00413}00413\ }
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00414}00414\ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00415}00415\ \ \ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00416}\mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator_a5d174bad6aeb4700da180e9c00634dbd}{00416}}\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator_a5d174bad6aeb4700da180e9c00634dbd}{alloc}}(\textcolor{keywordtype}{size\_t}\ size\ =\ 1\ \textcolor{comment}{/*in\ pages*/})\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00417}00417\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (size\ ==\ 0)\ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00418}00418\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(page\ >=\ 0,\ wasm\_bad\_alloc,\ \textcolor{stringliteral}{"{}require\ memory\ to\ allocate"{}});}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00419}00419\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(size\ +\ page\ <=\ \mbox{\hyperlink{namespacesysio_1_1vm_a0ae6751a77293216df4656dee5081eb2a95b0fd1e8f1e450ae134af180be894f3}{max\_pages}},\ wasm\_bad\_alloc,\ \textcolor{stringliteral}{"{}exceeded\ max\ number\ of\ pages"{}});}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00420}00420\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ err\ =\ mprotect(raw\ +\ (\mbox{\hyperlink{namespacesysio_1_1vm_a0ae6751a77293216df4656dee5081eb2a10108b6260714ad13914454c1dd1ec8f}{page\_size}}\ *\ page),\ (\mbox{\hyperlink{namespacesysio_1_1vm_a0ae6751a77293216df4656dee5081eb2a10108b6260714ad13914454c1dd1ec8f}{page\_size}}\ *\ size),\ PROT\_READ\ |\ PROT\_WRITE);}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00421}00421\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(err\ ==\ 0,\ wasm\_bad\_alloc,\ \textcolor{stringliteral}{"{}mprotect\ failed"{}});}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00422}00422\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ ptr\ \ \ \ =\ (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*)(raw\ +\ (\mbox{\hyperlink{namespacesysio_1_1vm_a0ae6751a77293216df4656dee5081eb2a10108b6260714ad13914454c1dd1ec8f}{page\_size}}\ *\ page));}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00423}00423\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(ptr,\ 0,\ \mbox{\hyperlink{namespacesysio_1_1vm_a0ae6751a77293216df4656dee5081eb2a10108b6260714ad13914454c1dd1ec8f}{page\_size}}\ *\ size);}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00424}00424\ \ \ \ \ \ \ \ \ \ page\ +=\ size;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00425}00425\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00426}00426\ \ \ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00427}\mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator_a50a1cea0225ea715ba193c7001033770}{00427}}\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator_a50a1cea0225ea715ba193c7001033770}{free}}(std::size\_t\ size)\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00428}00428\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (size\ ==\ 0)\ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00429}00429\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(page\ >=\ 0,\ wasm\_bad\_alloc,\ \textcolor{stringliteral}{"{}require\ memory\ to\ deallocate"{}});}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00430}00430\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(size\ <=\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\textcolor{keyword}{>}(page),\ wasm\_bad\_alloc,\ \textcolor{stringliteral}{"{}freed\ too\ many\ pages"{}});}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00431}00431\ \ \ \ \ \ \ \ \ \ page\ -\/=\ size;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00432}00432\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ err\ =\ mprotect(raw\ +\ (\mbox{\hyperlink{namespacesysio_1_1vm_a0ae6751a77293216df4656dee5081eb2a10108b6260714ad13914454c1dd1ec8f}{page\_size}}\ *\ page),\ (\mbox{\hyperlink{namespacesysio_1_1vm_a0ae6751a77293216df4656dee5081eb2a10108b6260714ad13914454c1dd1ec8f}{page\_size}}\ *\ size),\ PROT\_NONE);}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00433}00433\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(err\ ==\ 0,\ wasm\_bad\_alloc,\ \textcolor{stringliteral}{"{}mprotect\ failed"{}});}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00434}00434\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00435}\mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator_a43f9df092df03816ee697f23f65b3d3c}{00435}}\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator_a43f9df092df03816ee697f23f65b3d3c}{free}}()\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00436}00436\ \ \ \ \ \ \ \ \ \ std::size\_t\ syspagesize\ =\ \textcolor{keyword}{static\_cast<}std::size\_t\textcolor{keyword}{>}(::sysconf(\_SC\_PAGESIZE));}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00437}00437\ \ \ \ \ \ \ \ \ \ munmap(raw\ -\/\ syspagesize,\ \mbox{\hyperlink{namespacesysio_1_1vm_a0ae6751a77293216df4656dee5081eb2a446368544d7541868ef6f10911dea7dd}{max\_memory}}\ +\ 2*syspagesize);}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00438}00438\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00439}\mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator_a1f154349710d36d9ee98ecbf5df240e3}{00439}}\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator_a1f154349710d36d9ee98ecbf5df240e3}{wasm\_allocator}}()\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00440}00440\ \ \ \ \ \ \ \ \ \ std::size\_t\ syspagesize\ =\ \textcolor{keyword}{static\_cast<}std::size\_t\textcolor{keyword}{>}(::sysconf(\_SC\_PAGESIZE));}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00441}00441\ \ \ \ \ \ \ \ \ \ raw\ \ =\ (\textcolor{keywordtype}{char}*)mmap(NULL,\ \mbox{\hyperlink{namespacesysio_1_1vm_a0ae6751a77293216df4656dee5081eb2a446368544d7541868ef6f10911dea7dd}{max\_memory}}\ +\ 2*syspagesize,\ PROT\_NONE,\ MAP\_PRIVATE\ |\ MAP\_ANONYMOUS,\ -\/1,\ 0);}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00442}00442\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(\ raw\ !=\ MAP\_FAILED,\ wasm\_bad\_alloc,\ \textcolor{stringliteral}{"{}mmap\ failed\ to\ alloca\ pages"{}}\ );}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00443}00443\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ err\ =\ mprotect(raw,\ syspagesize,\ PROT\_READ);}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00444}00444\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(err\ ==\ 0,\ wasm\_bad\_alloc,\ \textcolor{stringliteral}{"{}mprotect\ failed"{}});}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00445}00445\ \ \ \ \ \ \ \ \ \ raw\ +=\ syspagesize;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00446}00446\ \ \ \ \ \ \ \ \ \ page\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00447}00447\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00448}00448\ \ \ \ \ \ \ \textcolor{comment}{//\ Initializes\ the\ memory\ controlled\ by\ the\ allocator.}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00449}00449\ \ \ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00450}00450\ \ \ \ \ \ \ \textcolor{comment}{//\ \(\backslash\)post\ get\_current\_page()\ ==\ new\_pages}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00451}00451\ \ \ \ \ \ \ \textcolor{comment}{//\ \(\backslash\)post\ all\ allocated\ pages\ are\ zero-\/filled.}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00452}\mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator_ac5130b2c7bf09724ca485e66f381e95c}{00452}}\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator_ac5130b2c7bf09724ca485e66f381e95c}{reset}}(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ new\_pages)\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00453}00453\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (page\ >=\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00454}00454\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(raw,\ \textcolor{charliteral}{'\(\backslash\)0'},\ \mbox{\hyperlink{namespacesysio_1_1vm_a0ae6751a77293216df4656dee5081eb2a10108b6260714ad13914454c1dd1ec8f}{page\_size}}\ *\ page);\ \textcolor{comment}{//\ zero\ the\ memory}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00455}00455\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00456}00456\ \ \ \ \ \ \ \ \ \ \ \ \ std::size\_t\ syspagesize\ =\ \textcolor{keyword}{static\_cast<}std::size\_t\textcolor{keyword}{>}(::sysconf(\_SC\_PAGESIZE));}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00457}00457\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ err\ =\ mprotect(raw\ -\/\ syspagesize,\ syspagesize,\ PROT\_READ);}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00458}00458\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(err\ ==\ 0,\ wasm\_bad\_alloc,\ \textcolor{stringliteral}{"{}mprotect\ failed"{}});}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00459}00459\ \ \ \ \ \ \ \ \ \ \ \ \ page\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00460}00460\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00461}00461\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(new\_pages\ >\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\textcolor{keyword}{>}(page))\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00462}00462\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator_a5d174bad6aeb4700da180e9c00634dbd}{alloc<char>}}(new\_pages\ -\/\ page);}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00463}00463\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(new\_pages\ <\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\textcolor{keyword}{>}(page))\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00464}00464\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator_a43f9df092df03816ee697f23f65b3d3c}{free<char>}}(page\ -\/\ new\_pages);}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00465}00465\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00466}00466\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00467}00467\ }
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00468}00468\ \ \ \ \ \ \ \textcolor{comment}{//\ Signal\ no\ memory\ defined}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00469}\mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator_a2ae95cde26beb7e3a07994d2ae32439b}{00469}}\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator_a2ae95cde26beb7e3a07994d2ae32439b}{reset}}()\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00470}00470\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (page\ >=\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00471}00471\ \ \ \ \ \ \ \ \ \ \ \ \ std::size\_t\ syspagesize\ =\ \textcolor{keyword}{static\_cast<}std::size\_t\textcolor{keyword}{>}(::sysconf(\_SC\_PAGESIZE));}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00472}00472\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(raw,\ \textcolor{charliteral}{'\(\backslash\)0'},\ \mbox{\hyperlink{namespacesysio_1_1vm_a0ae6751a77293216df4656dee5081eb2a10108b6260714ad13914454c1dd1ec8f}{page\_size}}\ *\ page);\ \textcolor{comment}{//\ zero\ the\ memory}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00473}00473\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ err\ =\ mprotect(raw\ -\/\ syspagesize,\ \mbox{\hyperlink{namespacesysio_1_1vm_a0ae6751a77293216df4656dee5081eb2a10108b6260714ad13914454c1dd1ec8f}{page\_size}}\ *\ page\ +\ syspagesize,\ PROT\_NONE);}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00474}00474\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(err\ ==\ 0,\ wasm\_bad\_alloc,\ \textcolor{stringliteral}{"{}mprotect\ failed"{}});}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00475}00475\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00476}00476\ \ \ \ \ \ \ \ \ \ page\ =\ -\/1;}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00477}00477\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00478}00478\ }
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00479}00479\ \ \ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00480}\mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator_a5275a3af2d420d98993842bd2aba9fec}{00480}}\ \ \ \ \ \ \ \textcolor{keyword}{inline}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ \mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator_a5275a3af2d420d98993842bd2aba9fec}{get\_base\_ptr}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00481}00481\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\textcolor{keyword}{>}(raw);}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00482}00482\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00483}00483\ \ \ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00484}\mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator_a347f7084effa44ec98029dd6f2b277af}{00484}}\ \ \ \ \ \ \ \textcolor{keyword}{inline}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ \mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator_a347f7084effa44ec98029dd6f2b277af}{create\_pointer}}(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ offset)\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\textcolor{keyword}{>}(raw\ +\ offset);\ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00485}\mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator_ac7b27cff26088c7ad01afb6118d547d2}{00485}}\ \ \ \ \ \ \ \textcolor{keyword}{inline}\ \mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}}\ \mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator_ac7b27cff26088c7ad01afb6118d547d2}{get\_current\_page}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ page;\ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00486}\mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator_a6a24354c88e1bcd08c33b663f36a281d}{00486}}\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator_a6a24354c88e1bcd08c33b663f36a281d}{is\_in\_region}}(\textcolor{keywordtype}{char}*\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ >=\ raw\ \&\&\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ <\ raw\ +\ \mbox{\hyperlink{namespacesysio_1_1vm_a0ae6751a77293216df4656dee5081eb2a446368544d7541868ef6f10911dea7dd}{max\_memory}};\ \}}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00487}00487\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{vm_2allocator_8hpp_source_l00488}00488\ \}\}\ \textcolor{comment}{//\ namespace\ sysio::vm}}
+
+\end{DoxyCode}

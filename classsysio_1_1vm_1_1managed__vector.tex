@@ -1,0 +1,160 @@
+\doxysection{sysio\+::vm\+::managed\+\_\+vector\texorpdfstring{$<$}{<} T, Allocator \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classsysio_1_1vm_1_1managed__vector}{}\label{classsysio_1_1vm_1_1managed__vector}\index{sysio::vm::managed\_vector$<$ T, Allocator $>$@{sysio::vm::managed\_vector$<$ T, Allocator $>$}}
+
+
+{\ttfamily \#include $<$vector.\+hpp$>$}
+
+
+
+Inheritance diagram for sysio\+::vm\+::managed\+\_\+vector\texorpdfstring{$<$}{<} T, Allocator \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=194pt]{classsysio_1_1vm_1_1managed__vector__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for sysio\+::vm\+::managed\+\_\+vector\texorpdfstring{$<$}{<} T, Allocator \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=194pt]{classsysio_1_1vm_1_1managed__vector__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+constexpr void \mbox{\hyperlink{classsysio_1_1vm_1_1managed__vector_a1fe18e513b52e312bbef033c688b5beb}{set\+\_\+owner}} (\mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} \&alloc)
+\item 
+constexpr void \mbox{\hyperlink{classsysio_1_1vm_1_1managed__vector_a1fe18e513b52e312bbef033c688b5beb}{set\+\_\+owner}} (\mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} \&alloc)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{sysio\+::vm\+::detail\+::vector$<$ T, Allocator $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+constexpr \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_a166d4c1e0d0e7060df5665098ea1ce3c}{vector}} (\mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} \&\mbox{\hyperlink{namespacechainbase_add7d4cf66ab3f2808fe613e6b0343b89}{allocator}}, size\+\_\+t \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_aff0b6c2a0666cc8d6ec1f1e64cdd9036}{size}}=0)
+\item 
+constexpr \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_a3d118accc27c58028e60de13e9d4c923}{vector}} (const \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{vector}} \&mv)=delete
+\item 
+constexpr \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_a84df95733e22b103c19cef74d25ef8d4}{vector}} (\mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{vector}} \&\&mv)=default
+\item 
+constexpr \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{vector}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_a1187ddc4e26a89beeeeea922ecb201d4}{operator=}} (\mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{vector}} \&\&mv)=default
+\item 
+constexpr void \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_afc1d102d8b0144266a1adbc474bbdb40}{resize}} (size\+\_\+t \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_aff0b6c2a0666cc8d6ec1f1e64cdd9036}{size}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{union_u}{U}} , typename  = std\+::enable\+\_\+if\+\_\+t$<$std\+::is\+\_\+same\+\_\+v$<$\+T, std\+::decay\+\_\+t$<$\+U$>$$>$, int$>$$>$ }\\constexpr void \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_a9f4d37cc24f1b29d403366a9e5074659}{push\+\_\+back}} (\mbox{\hyperlink{union_u}{U}} \&\&val)
+\item 
+constexpr void \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_a9b8945d9c76c3ae28e78101d91b5ea9f}{emplace\+\_\+back}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\&val)
+\item 
+constexpr void \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_a1d1a1b718817bc05c2f63d939e9f4874}{back}} ()
+\item 
+constexpr void \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_a3b37bffe783905515944e7dde1838909}{pop\+\_\+back}} ()
+\item 
+constexpr \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_aa56c22e9b50f5cec1a3a48dfd2a867ba}{at}} (size\+\_\+t i)
+\item 
+constexpr \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_a581ddd7297e96d46b6b775409ac691f3}{at}} (size\+\_\+t i) const
+\item 
+constexpr \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_a19b5ac3b97a8d9e4d1abcb91d2adc28c}{at\+\_\+no\+\_\+check}} (size\+\_\+t i)
+\item 
+constexpr \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_ab0329eca0a8eed915a01e1f0f7967725}{at\+\_\+no\+\_\+check}} (size\+\_\+t i) const
+\item 
+constexpr \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_a4852b1b2ddcbb5c40c3f1763ec9865a9}{operator\mbox{[}$\,$\mbox{]}}} (size\+\_\+t i) const
+\item 
+constexpr \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_aa19a5683a80d614fda1f7cf02043f089}{operator\mbox{[}$\,$\mbox{]}}} (size\+\_\+t i)
+\item 
+constexpr \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_aac5b08caaaf15b5cef7539b0423ecc4c}{raw}} () const
+\item 
+constexpr size\+\_\+t \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_aff0b6c2a0666cc8d6ec1f1e64cdd9036}{size}} () const
+\item 
+constexpr void \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_a1f3f2b0014a7487b6d7f8e044ae13556}{set}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*}data, size\+\_\+t \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_aff0b6c2a0666cc8d6ec1f1e64cdd9036}{size}}, size\+\_\+t index=-\/1)
+\item 
+constexpr void \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_ac277a0c3dcf579d18e84c349357dce61}{copy}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*}data, size\+\_\+t \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_aff0b6c2a0666cc8d6ec1f1e64cdd9036}{size}})
+\item 
+constexpr \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_a166d4c1e0d0e7060df5665098ea1ce3c}{vector}} (\mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} \&\mbox{\hyperlink{namespacechainbase_add7d4cf66ab3f2808fe613e6b0343b89}{allocator}}, size\+\_\+t \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_aff0b6c2a0666cc8d6ec1f1e64cdd9036}{size}}=0)
+\item 
+constexpr \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_a3d118accc27c58028e60de13e9d4c923}{vector}} (const \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{vector}} \&mv)=delete
+\item 
+constexpr \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_a84df95733e22b103c19cef74d25ef8d4}{vector}} (\mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{vector}} \&\&mv)=default
+\item 
+constexpr \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{vector}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_a1187ddc4e26a89beeeeea922ecb201d4}{operator=}} (\mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{vector}} \&\&mv)=default
+\item 
+constexpr void \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_afc1d102d8b0144266a1adbc474bbdb40}{resize}} (size\+\_\+t \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_aff0b6c2a0666cc8d6ec1f1e64cdd9036}{size}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{union_u}{U}} , typename  = std\+::enable\+\_\+if\+\_\+t$<$std\+::is\+\_\+same\+\_\+v$<$\+T, std\+::decay\+\_\+t$<$\+U$>$$>$, int$>$$>$ }\\constexpr void \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_a9f4d37cc24f1b29d403366a9e5074659}{push\+\_\+back}} (\mbox{\hyperlink{union_u}{U}} \&\&val)
+\item 
+constexpr void \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_a9b8945d9c76c3ae28e78101d91b5ea9f}{emplace\+\_\+back}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\&val)
+\item 
+constexpr void \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_a1d1a1b718817bc05c2f63d939e9f4874}{back}} ()
+\item 
+constexpr void \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_a3b37bffe783905515944e7dde1838909}{pop\+\_\+back}} ()
+\item 
+constexpr \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_aa56c22e9b50f5cec1a3a48dfd2a867ba}{at}} (size\+\_\+t i)
+\item 
+constexpr \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_a581ddd7297e96d46b6b775409ac691f3}{at}} (size\+\_\+t i) const
+\item 
+constexpr \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_a19b5ac3b97a8d9e4d1abcb91d2adc28c}{at\+\_\+no\+\_\+check}} (size\+\_\+t i)
+\item 
+constexpr \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_ab0329eca0a8eed915a01e1f0f7967725}{at\+\_\+no\+\_\+check}} (size\+\_\+t i) const
+\item 
+constexpr \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_a4852b1b2ddcbb5c40c3f1763ec9865a9}{operator\mbox{[}$\,$\mbox{]}}} (size\+\_\+t i) const
+\item 
+constexpr \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_aa19a5683a80d614fda1f7cf02043f089}{operator\mbox{[}$\,$\mbox{]}}} (size\+\_\+t i)
+\item 
+constexpr \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_aac5b08caaaf15b5cef7539b0423ecc4c}{raw}} () const
+\item 
+constexpr size\+\_\+t \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_aff0b6c2a0666cc8d6ec1f1e64cdd9036}{size}} () const
+\item 
+constexpr void \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_a1f3f2b0014a7487b6d7f8e044ae13556}{set}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*}data, size\+\_\+t \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_aff0b6c2a0666cc8d6ec1f1e64cdd9036}{size}}, size\+\_\+t index=-\/1)
+\item 
+constexpr void \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_ac277a0c3dcf579d18e84c349357dce61}{copy}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*}data, size\+\_\+t \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_aff0b6c2a0666cc8d6ec1f1e64cdd9036}{size}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}$>$\newline
+class sysio\+::vm\+::managed\+\_\+vector$<$ T, Allocator $>$}
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2vector_8hpp_source_l00101}{101}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2vector_8hpp_source}{vector.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1vm_1_1managed__vector_a1fe18e513b52e312bbef033c688b5beb}\index{sysio::vm::managed\_vector$<$ T, Allocator $>$@{sysio::vm::managed\_vector$<$ T, Allocator $>$}!set\_owner@{set\_owner}}
+\index{set\_owner@{set\_owner}!sysio::vm::managed\_vector$<$ T, Allocator $>$@{sysio::vm::managed\_vector$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{set\_owner()}{set\_owner()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1managed__vector_a1fe18e513b52e312bbef033c688b5beb} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+void \mbox{\hyperlink{classsysio_1_1vm_1_1managed__vector}{sysio\+::vm\+::managed\+\_\+vector}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::set\+\_\+owner (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} \&}]{alloc}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2vector_8hpp_source_l00104}{104}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2vector_8hpp_source}{vector.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00104\ \{\ detail::vector<T,\ Allocator>::\_allocator\ =\ \&alloc;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1managed__vector_a1fe18e513b52e312bbef033c688b5beb}\index{sysio::vm::managed\_vector$<$ T, Allocator $>$@{sysio::vm::managed\_vector$<$ T, Allocator $>$}!set\_owner@{set\_owner}}
+\index{set\_owner@{set\_owner}!sysio::vm::managed\_vector$<$ T, Allocator $>$@{sysio::vm::managed\_vector$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{set\_owner()}{set\_owner()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1managed__vector_a1fe18e513b52e312bbef033c688b5beb} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+void \mbox{\hyperlink{classsysio_1_1vm_1_1managed__vector}{sysio\+::vm\+::managed\+\_\+vector}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::set\+\_\+owner (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} \&}]{alloc}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2vector_8hpp_source_l00104}{104}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2vector_8hpp_source}{vector.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00104\ \{\ detail::vector<T,\ Allocator>::\_allocator\ =\ \&alloc;\ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/include/sysio/sysio/vm/\mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2vector_8hpp}{vector.\+hpp}}\item 
+libraries/sys-\/vm/include/sysio/vm/\mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2vector_8hpp}{vector.\+hpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,9 @@
+<map id="websocketpp::transport::asio::endpoint::listen" name="websocketpp::transport::asio::endpoint::listen">
+<area shape="rect" id="Node000001" title="Set up endpoint for listening on a host and service (exception free)" alt="" coords="5,5,163,46"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1transport_1_1asio_1_1endpoint.html#ac36c2b22a7c2550663792472a728f615" title="Set up endpoint for listening manually (exception free)" alt="" coords="211,5,368,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="163,23,195,23,195,28,163,28"/>
+<area shape="rect" id="Node000003" href="$namespacewebsocketpp_1_1error.html#a3344622df8c36e8ae03c59164e7b5e89" title=" " alt="" coords="416,5,548,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="369,23,400,23,400,28,369,28"/>
+<area shape="rect" id="Node000004" href="$namespacewebsocketpp_1_1error.html#ac1acac2bfb24bbd2b1791db80993b0c2" title=" " alt="" coords="596,5,729,46"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="549,23,581,23,581,28,549,28"/>
+</map>

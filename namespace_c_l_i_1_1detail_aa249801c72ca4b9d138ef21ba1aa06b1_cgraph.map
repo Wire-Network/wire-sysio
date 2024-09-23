@@ -1,0 +1,11 @@
+<map id="CLI::detail::while" name="CLI::detail::while">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,42,125,68"/>
+<area shape="rect" id="Node000002" href="$namespace_c_l_i_1_1detail.html#ab39b1977d7375250cc57d90723cf1554" title="Find and replace a substring with another substring." alt="" coords="173,5,311,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="125,42,157,37,158,42,126,48"/>
+<area shape="rect" id="Node000003" href="$namespace_c_l_i_1_1detail.html#a621323632158048f6168deacc432b838" title="Trim whitespace from string." alt="" coords="186,70,298,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="126,62,171,69,170,74,125,67"/>
+<area shape="rect" id="Node000004" href="$namespace_c_l_i_1_1detail.html#aa06bf54cb3fb347d68d23d31384af42f" title="Trim whitespace from left of string." alt="" coords="360,45,474,70"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="298,72,344,66,344,71,299,78"/>
+<area shape="rect" id="Node000005" href="$namespace_c_l_i_1_1detail.html#a32d84ce1a65de779e88fdf4aa3b54ea6" title="Trim whitespace from right of string." alt="" coords="359,94,474,120"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="298,88,344,94,343,100,298,93"/>
+</map>

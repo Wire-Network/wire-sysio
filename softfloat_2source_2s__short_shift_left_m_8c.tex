@@ -1,0 +1,52 @@
+\doxysection{libraries/softfloat/source/s\+\_\+short\+Shift\+LeftM.c File Reference}
+\hypertarget{softfloat_2source_2s__short_shift_left_m_8c}{}\label{softfloat_2source_2s__short_shift_left_m_8c}\index{libraries/softfloat/source/s\_shortShiftLeftM.c@{libraries/softfloat/source/s\_shortShiftLeftM.c}}
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include "{}platform.\+h"{}}\newline
+{\ttfamily \#include "{}primitive\+Types.\+h"{}}\newline
+Include dependency graph for s\+\_\+short\+Shift\+Left\+M.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=343pt]{softfloat_2source_2s__short_shift_left_m_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{softfloat_2source_2s__short_shift_left_m_8c_acdbb59a6e727d2d4a7cdb2ea0c7afbb1}{softfloat\+\_\+short\+Shift\+LeftM}} (\mbox{\hyperlink{stdint_8h_ad0fca8b15c218d2c687f8c373a71d228}{uint\+\_\+fast8\+\_\+t}} size\+\_\+words, const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*}a\+Ptr, \mbox{\hyperlink{stdint_8h_ad0fca8b15c218d2c687f8c373a71d228}{uint\+\_\+fast8\+\_\+t}} dist, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*}z\+Ptr)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{softfloat_2source_2s__short_shift_left_m_8c_acdbb59a6e727d2d4a7cdb2ea0c7afbb1}\index{s\_shortShiftLeftM.c@{s\_shortShiftLeftM.c}!softfloat\_shortShiftLeftM@{softfloat\_shortShiftLeftM}}
+\index{softfloat\_shortShiftLeftM@{softfloat\_shortShiftLeftM}!s\_shortShiftLeftM.c@{s\_shortShiftLeftM.c}}
+\doxysubsubsection{\texorpdfstring{softfloat\_shortShiftLeftM()}{softfloat\_shortShiftLeftM()}}
+{\footnotesize\ttfamily \label{softfloat_2source_2s__short_shift_left_m_8c_acdbb59a6e727d2d4a7cdb2ea0c7afbb1} 
+void softfloat\+\_\+short\+Shift\+LeftM (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_ad0fca8b15c218d2c687f8c373a71d228}{uint\+\_\+fast8\+\_\+t}}}]{size\+\_\+words}{, }\item[{const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{a\+Ptr}{, }\item[{\mbox{\hyperlink{stdint_8h_ad0fca8b15c218d2c687f8c373a71d228}{uint\+\_\+fast8\+\_\+t}}}]{dist}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{z\+Ptr}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2s__short_shift_left_m_8c_source_l00044}{44}} of file \mbox{\hyperlink{softfloat_2source_2s__short_shift_left_m_8c_source}{s\+\_\+short\+Shift\+Left\+M.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00050\ \{}
+\DoxyCodeLine{00051\ \ \ \ \ \mbox{\hyperlink{stdint_8h_ad0fca8b15c218d2c687f8c373a71d228}{uint\_fast8\_t}}\ uNegDist;}
+\DoxyCodeLine{00052\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ index,\ lastIndex;}
+\DoxyCodeLine{00053\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ partWordZ,\ wordA;}
+\DoxyCodeLine{00054\ }
+\DoxyCodeLine{00055\ \ \ \ \ uNegDist\ =\ -\/dist;}
+\DoxyCodeLine{00056\ \ \ \ \ index\ =\ \mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_aa3af452dd34ad7a607f4ad31c234fda7}{indexWordHi}}(\ size\_words\ );}
+\DoxyCodeLine{00057\ \ \ \ \ lastIndex\ =\ \mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a28a8ad1b8455a20d428c59cf01e36a66}{indexWordLo}}(\ size\_words\ );}
+\DoxyCodeLine{00058\ \ \ \ \ partWordZ\ =\ aPtr[index]<<dist;}
+\DoxyCodeLine{00059\ \ \ \ \ \textcolor{keywordflow}{while}\ (\ index\ !=\ lastIndex\ )\ \{}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ wordA\ =\ aPtr[index\ -\/\ \mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a22ffd10aefa829eef57da03cff970e45}{wordIncr}}];}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ zPtr[index]\ =\ partWordZ\ |\ wordA>>(uNegDist\ \&\ 31);}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ index\ -\/=\ \mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a22ffd10aefa829eef57da03cff970e45}{wordIncr}};}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ partWordZ\ =\ wordA<<dist;}
+\DoxyCodeLine{00064\ \ \ \ \ \}}
+\DoxyCodeLine{00065\ \ \ \ \ zPtr[index]\ =\ partWordZ;}
+\DoxyCodeLine{00066\ }
+\DoxyCodeLine{00067\ \}}
+
+\end{DoxyCode}

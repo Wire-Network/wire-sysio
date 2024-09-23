@@ -1,0 +1,14 @@
+<map id="sysio::chain::impl::abi_traverse_context_with_path" name="sysio::chain::impl::abi_traverse_context_with_path">
+<area shape="rect" id="Node000001" title=" " alt="" coords="575,88,725,144"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1impl_1_1abi__traverse__context.html" title=" " alt="" coords="335,39,486,79"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="502,78,575,96,574,101,500,83"/>
+<area shape="rect" id="Node000003" href="$classfc_1_1optional__delegate.html" title=" " alt="" coords="5,5,147,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="162,32,335,49,334,54,162,37"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="48,86,104,112"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="119,91,334,65,335,71,120,97"/>
+<area shape="rect" id="Node000005" href="$structsysio_1_1chain_1_1abi__serializer.html" title=" " alt="" coords="323,104,498,129"/>
+<area shape="poly" id="edge5_Node000005_Node000004" title=" " alt="" coords="120,105,171,113,248,117,322,117,322,122,248,122,170,118,119,111"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="513,114,574,114,574,119,513,119"/>
+<area shape="rect" id="Node000006" href="$classfc_1_1vector.html" title=" " alt="" coords="332,153,489,178"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="491,146,574,129,575,134,492,152"/>
+</map>

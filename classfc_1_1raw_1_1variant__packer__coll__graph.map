@@ -1,0 +1,7 @@
+<map id="fc::raw::variant_packer&lt; Stream &gt;" name="fc::raw::variant_packer&lt; Stream &gt;">
+<area shape="rect" id="Node000001" title=" " alt="" coords="48,94,202,135"/>
+<area shape="rect" id="Node000002" href="$classfc_1_1variant_1_1visitor.html" title=" " alt="" coords="5,5,128,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="84,43,115,92,111,95,80,45"/>
+<area shape="rect" id="Node000003" href="$classrapidjson_1_1_stream.html" title="Concept for reading and writing characters." alt="" coords="152,5,216,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="171,45,140,95,135,92,166,43"/>
+</map>

@@ -1,0 +1,85 @@
+\doxysection{sysio\+::trx\+\_\+buffer\+\_\+factory Struct Reference}
+\hypertarget{structsysio_1_1trx__buffer__factory}{}\label{structsysio_1_1trx__buffer__factory}\index{sysio::trx\_buffer\_factory@{sysio::trx\_buffer\_factory}}
+
+
+Inheritance diagram for sysio\+::trx\+\_\+buffer\+\_\+factory\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=202pt]{structsysio_1_1trx__buffer__factory__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for sysio\+::trx\+\_\+buffer\+\_\+factory\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=202pt]{structsysio_1_1trx__buffer__factory__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+const \mbox{\hyperlink{namespacesysio_a4a604ada505f8ee61ec551331a35e99e}{send\+\_\+buffer\+\_\+type}} \& \mbox{\hyperlink{structsysio_1_1trx__buffer__factory_abea6acc9d039dd6f7cd045418b05c49b}{get\+\_\+send\+\_\+buffer}} (const \mbox{\hyperlink{namespacesysio_1_1chain_a7041c0316bd294d0866609ab3e0cc7a7}{packed\+\_\+transaction\+\_\+ptr}} \&trx)
+\begin{DoxyCompactList}\small\item\em caches result for subsequent calls, only provide same packed\+\_\+transaction\+\_\+ptr instance for each invocation. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{structsysio_1_1buffer__factory}{sysio\+::buffer\+\_\+factory}}}
+\begin{DoxyCompactItemize}
+\item 
+const \mbox{\hyperlink{namespacesysio_a4a604ada505f8ee61ec551331a35e99e}{send\+\_\+buffer\+\_\+type}} \& \mbox{\hyperlink{structsysio_1_1buffer__factory_a480d021121170a01b8148078a6f4e29f}{get\+\_\+send\+\_\+buffer}} (const \mbox{\hyperlink{namespacesysio_a783ade47a6f13a71a9b75cd2c68d9965}{net\+\_\+message}} \&m)
+\begin{DoxyCompactList}\small\item\em caches result for subsequent calls, only provide same net\+\_\+message instance for each invocation \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Static Protected Member Functions inherited from \mbox{\hyperlink{structsysio_1_1buffer__factory}{sysio\+::buffer\+\_\+factory}}}
+\begin{DoxyCompactItemize}
+\item 
+static \mbox{\hyperlink{namespacesysio_a4a604ada505f8ee61ec551331a35e99e}{send\+\_\+buffer\+\_\+type}} \mbox{\hyperlink{structsysio_1_1buffer__factory_a9d7e515856995325a99cc40aebf505e2}{create\+\_\+send\+\_\+buffer}} (const \mbox{\hyperlink{namespacesysio_a783ade47a6f13a71a9b75cd2c68d9965}{net\+\_\+message}} \&m)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\static \mbox{\hyperlink{namespacesysio_a4a604ada505f8ee61ec551331a35e99e}{send\+\_\+buffer\+\_\+type}} \mbox{\hyperlink{structsysio_1_1buffer__factory_a1215ab02e102e2fcb951e16798e71e72}{create\+\_\+send\+\_\+buffer}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} which, const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&v)
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Attributes inherited from \mbox{\hyperlink{structsysio_1_1buffer__factory}{sysio\+::buffer\+\_\+factory}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacesysio_a4a604ada505f8ee61ec551331a35e99e}{send\+\_\+buffer\+\_\+type}} \mbox{\hyperlink{structsysio_1_1buffer__factory_affe3353e4d4a787692a5b45715cd6c17}{send\+\_\+buffer}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l01391}{1391}} of file \mbox{\hyperlink{net__plugin_8cpp_source}{net\+\_\+plugin.\+cpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1trx__buffer__factory_abea6acc9d039dd6f7cd045418b05c49b}\index{sysio::trx\_buffer\_factory@{sysio::trx\_buffer\_factory}!get\_send\_buffer@{get\_send\_buffer}}
+\index{get\_send\_buffer@{get\_send\_buffer}!sysio::trx\_buffer\_factory@{sysio::trx\_buffer\_factory}}
+\doxysubsubsection{\texorpdfstring{get\_send\_buffer()}{get\_send\_buffer()}}
+{\footnotesize\ttfamily \label{structsysio_1_1trx__buffer__factory_abea6acc9d039dd6f7cd045418b05c49b} 
+const \mbox{\hyperlink{namespacesysio_a4a604ada505f8ee61ec551331a35e99e}{send\+\_\+buffer\+\_\+type}} \& sysio\+::trx\+\_\+buffer\+\_\+factory\+::get\+\_\+send\+\_\+buffer (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_a7041c0316bd294d0866609ab3e0cc7a7}{packed\+\_\+transaction\+\_\+ptr}} \&}]{trx}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l01394}{1394}} of file \mbox{\hyperlink{net__plugin_8cpp_source}{net\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01394\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01395\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !\mbox{\hyperlink{structsysio_1_1buffer__factory_affe3353e4d4a787692a5b45715cd6c17}{send\_buffer}}\ )\ \{}
+\DoxyCodeLine{01396\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1buffer__factory_affe3353e4d4a787692a5b45715cd6c17}{send\_buffer}}\ =\ create\_send\_buffer(\ trx\ );}
+\DoxyCodeLine{01397\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01398\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1buffer__factory_affe3353e4d4a787692a5b45715cd6c17}{send\_buffer}};}
+\DoxyCodeLine{01399\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1trx__buffer__factory_abea6acc9d039dd6f7cd045418b05c49b_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+plugins/net\+\_\+plugin/\mbox{\hyperlink{net__plugin_8cpp}{net\+\_\+plugin.\+cpp}}\end{DoxyCompactItemize}

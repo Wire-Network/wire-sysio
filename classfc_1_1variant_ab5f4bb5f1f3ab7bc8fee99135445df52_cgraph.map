@@ -1,0 +1,28 @@
+<map id="fc::variant::estimated_size" name="fc::variant::estimated_size">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,232,181,258"/>
+<area shape="rect" id="Node000002" href="$classfc_1_1variant.html#acbd70a93184e4277631f2a261acb707c" title=" " alt="" coords="232,105,372,131"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="109,229,161,191,227,148,252,135,254,140,230,152,164,195,113,234"/>
+<area shape="rect" id="Node000005" href="$classfc_1_1variant.html#aa475101b0f2181350d76a2fdc6cf7c76" title=" " alt="" coords="424,156,560,182"/>
+<area shape="poly" id="edge12_Node000001_Node000005" title=" " alt="" coords="122,229,171,209,228,192,321,176,408,169,409,174,322,181,229,197,173,214,124,234"/>
+<area shape="rect" id="Node000006" href="$classfc_1_1variant.html#afaae1df286ff97c83301eda21dbd51ea" title=" " alt="" coords="621,207,758,232"/>
+<area shape="poly" id="edge15_Node000001_Node000006" title=" " alt="" coords="181,244,376,242,605,225,606,231,376,247,181,249"/>
+<area shape="rect" id="Node000008" href="$classfc_1_1variant__object.html#a2b3dd60b8f874f342ffda9d9d68eb7b6" title=" " alt="" coords="242,358,363,398"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="111,256,162,298,230,344,238,348,235,353,227,348,159,302,108,260"/>
+<area shape="rect" id="Node000010" href="$classfc_1_1variant.html#aea83c87e4e1b1e185f57717b4bd683a5" title=" " alt="" coords="232,207,373,232"/>
+<area shape="poly" id="edge10_Node000001_Node000010" title=" " alt="" coords="180,232,216,227,216,233,181,237"/>
+<area shape="rect" id="Node000011" href="$classfc_1_1variant.html#a17a7054a10963360c6a14d60f6e30128" title=" " alt="" coords="229,308,376,334"/>
+<area shape="poly" id="edge13_Node000001_Node000011" title=" " alt="" coords="132,256,251,300,250,305,130,261"/>
+<area shape="rect" id="Node000003" href="$namespacefc.html#a3668095306e6c6c4c53de5d7701e4dde" title=" " alt="" coords="426,5,558,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="321,103,366,72,423,40,434,35,436,40,425,45,369,77,324,107"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="354,129,428,149,426,154,353,134"/>
+<area shape="poly" id="edge6_Node000002_Node000006" title=" " alt="" coords="373,114,464,120,513,128,561,141,615,166,661,195,658,199,613,170,559,146,512,134,463,126,373,120"/>
+<area shape="rect" id="Node000007" href="$namespacefc.html#a4e07b3870aa72f8c38bdd5f78044dad1" title=" " alt="" coords="447,55,537,80"/>
+<area shape="poly" id="edge7_Node000002_Node000007" title=" " alt="" coords="353,102,431,81,433,86,354,107"/>
+<area shape="rect" id="Node000004" href="$namespacefc.html#a7c8b089501fd00e09e068aa02eacf3de" title=" " alt="" coords="608,5,771,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="558,16,593,16,593,21,558,21"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="546,180,623,200,621,205,544,185"/>
+<area shape="rect" id="Node000009" href="$classfc_1_1variant__object.html#a0e523ff3ad212b0582ad2ac8a07773ae" title=" " alt="" coords="432,358,553,398"/>
+<area shape="poly" id="edge9_Node000008_Node000009" title=" " alt="" coords="363,376,416,376,416,381,363,381"/>
+<area shape="poly" id="edge11_Node000010_Node000006" title=" " alt="" coords="373,217,605,217,605,222,373,222"/>
+<area shape="poly" id="edge14_Node000011_Node000006" title=" " alt="" coords="376,316,465,307,513,299,559,286,611,264,655,239,658,244,613,269,561,291,514,304,466,313,377,322"/>
+</map>

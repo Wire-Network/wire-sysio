@@ -1,0 +1,88 @@
+\doxysection{main.\+cpp}
+\hypertarget{libraries_2appbase_2examples_2main_8cpp_source}{}\label{libraries_2appbase_2examples_2main_8cpp_source}\index{libraries/appbase/examples/main.cpp@{libraries/appbase/examples/main.cpp}}
+\mbox{\hyperlink{libraries_2appbase_2examples_2main_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{application_8hpp}{appbase/application.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <iostream>}}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <boost/exception/diagnostic\_information.hpp>}}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00005}\mbox{\hyperlink{structdatabase}{00005}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structdatabase}{database}}\ \{\ \};}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00007}00007\ \textcolor{keyword}{namespace\ }bpo\ =\ boost::program\_options;}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00009}00009\ \textcolor{keyword}{using\ }bpo::options\_description;}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00010}00010\ \textcolor{keyword}{using\ }bpo::variables\_map;}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00011}00011\ \textcolor{keyword}{using\ }std::string;}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00012}00012\ \textcolor{keyword}{using\ }std::vector;}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00014}\mbox{\hyperlink{classchain__plugin}{00014}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classchain__plugin}{chain\_plugin}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classappbase_1_1plugin}{appbase::plugin}}<chain\_plugin>}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00015}00015\ \{}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00016}00016\ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00017}\mbox{\hyperlink{classchain__plugin_a3df251841b594a6e555f40f3caa6a986}{00017}}\ \ \ \ \ \ \mbox{\hyperlink{classchain__plugin_a3df251841b594a6e555f40f3caa6a986}{APPBASE\_PLUGIN\_REQUIRES}}();}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00019}\mbox{\hyperlink{classchain__plugin_a23f5f088e302e535ccf74747ec7993d4}{00019}}\ \ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classchain__plugin_a23f5f088e302e535ccf74747ec7993d4}{set\_program\_options}}(\ options\_description\&\ \mbox{\hyperlink{xbyak__mnemonic_8h_a4229a9b84f8b8673326f12bd41acd27c}{cli}},\ options\_description\&\ cfg\ )\textcolor{keyword}{\ override}}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00020}00020\ \textcolor{keyword}{\ \ \ \ \ }\{}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00021}00021\ \ \ \ \ \ \ \ \ \ cfg.add\_options()}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00022}00022\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}readonly"{}},\ \textcolor{stringliteral}{"{}open\ the\ database\ in\ read\ only\ mode"{}})}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00023}00023\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}dbsize"{}},\ bpo::value<uint64\_t>()-\/>default\_value(\ 8*1024\ ),\ \textcolor{stringliteral}{"{}Minimum\ size\ MB\ of\ database\ shared\ memory\ file"{}})}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00024}00024\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00025}00025\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{xbyak__mnemonic_8h_a4229a9b84f8b8673326f12bd41acd27c}{cli}}.add\_options()}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00026}00026\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}replay"{}},\ \textcolor{stringliteral}{"{}clear\ chain\ database\ and\ replay\ all\ blocks"{}}\ )}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00027}00027\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}reset"{}},\ \textcolor{stringliteral}{"{}clear\ chain\ database\ and\ block\ log"{}}\ )}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00028}00028\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00029}00029\ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00031}\mbox{\hyperlink{classchain__plugin_a0192ac61f3f59d4fdf2dcbbd2c7104ca}{00031}}\ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classchain__plugin_a0192ac61f3f59d4fdf2dcbbd2c7104ca}{plugin\_initialize}}(\ \textcolor{keyword}{const}\ variables\_map\&\ options\ )\ \{\ std::cout\ <<\ \textcolor{stringliteral}{"{}initialize\ chain\ plugin\(\backslash\)n"{}};\ \}}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00032}\mbox{\hyperlink{classchain__plugin_affe5ea83d9db4d721af39fd7568c5875}{00032}}\ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classchain__plugin_affe5ea83d9db4d721af39fd7568c5875}{plugin\_startup}}()\ \ \{\ std::cout\ <<\ \textcolor{stringliteral}{"{}starting\ chain\ plugin\ \(\backslash\)n"{}};\ \}}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00033}\mbox{\hyperlink{classchain__plugin_a3ed4600a8200efd4cbad0e547a3ffbde}{00033}}\ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classchain__plugin_a3ed4600a8200efd4cbad0e547a3ffbde}{plugin\_shutdown}}()\ \{\ std::cout\ <<\ \textcolor{stringliteral}{"{}shutdown\ chain\ plugin\ \(\backslash\)n"{}};\ \}}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00035}\mbox{\hyperlink{classchain__plugin_ae490ca01000e820cbae95dc27bb90009}{00035}}\ \ \ \ \ \ \mbox{\hyperlink{structdatabase}{database}}\&\ \mbox{\hyperlink{classchain__plugin_ae490ca01000e820cbae95dc27bb90009}{db}}()\ \{\ \textcolor{keywordflow}{return}\ \_db;\ \}}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00037}00037\ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00038}00038\ \ \ \ \ \ \mbox{\hyperlink{structdatabase}{database}}\ \_db;}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00039}00039\ \};}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00041}\mbox{\hyperlink{classnet__plugin}{00041}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classnet__plugin}{net\_plugin}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classappbase_1_1plugin}{appbase::plugin}}<net\_plugin>}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00042}00042\ \{}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00043}00043\ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00044}\mbox{\hyperlink{classnet__plugin_af299d0c750406ee64fd2497cd7555af2}{00044}}\ \ \ \ \ \ \mbox{\hyperlink{classnet__plugin_af299d0c750406ee64fd2497cd7555af2}{net\_plugin}}()\{\};}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00045}\mbox{\hyperlink{classnet__plugin_a6fb4d49c2005720c31bdcb6685105e07}{00045}}\ \ \ \ \ \ \mbox{\hyperlink{classnet__plugin_a6fb4d49c2005720c31bdcb6685105e07}{\string~net\_plugin}}()\{\};}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00047}\mbox{\hyperlink{classnet__plugin_a5b521845f266f661de90b7124f9899d2}{00047}}\ \ \ \ \ \ \mbox{\hyperlink{classnet__plugin_a5b521845f266f661de90b7124f9899d2}{APPBASE\_PLUGIN\_REQUIRES}}(\ (\mbox{\hyperlink{classchain__plugin}{chain\_plugin}})\ );}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00049}\mbox{\hyperlink{classnet__plugin_aec9a119cdf9e78dda3108afb6a5d6c2e}{00049}}\ \ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classnet__plugin_aec9a119cdf9e78dda3108afb6a5d6c2e}{set\_program\_options}}(\ options\_description\&\ \mbox{\hyperlink{xbyak__mnemonic_8h_a4229a9b84f8b8673326f12bd41acd27c}{cli}},\ options\_description\&\ cfg\ )\textcolor{keyword}{\ override}}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00050}00050\ \textcolor{keyword}{\ \ \ \ \ }\{}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00051}00051\ \ \ \ \ \ \ \ \ cfg.add\_options()}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}listen-\/endpoint"{}},\ bpo::value<string>()-\/>default\_value(\ \textcolor{stringliteral}{"{}127.0.0.1:9876"{}}\ ),\ \textcolor{stringliteral}{"{}The\ local\ IP\ address\ and\ port\ to\ listen\ for\ incoming\ connections."{}})}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}remote-\/endpoint"{}},\ bpo::value<\ vector<string>\ >()-\/>composing(),\ \textcolor{stringliteral}{"{}The\ IP\ address\ and\ port\ of\ a\ remote\ peer\ to\ sync\ with."{}})}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}public-\/endpoint"{}},\ bpo::value<string>()-\/>default\_value(\ \textcolor{stringliteral}{"{}0.0.0.0:9876"{}}\ ),\ \textcolor{stringliteral}{"{}The\ public\ IP\ address\ and\ port\ that\ should\ be\ advertized\ to\ peers."{}})}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00056}00056\ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00058}\mbox{\hyperlink{classnet__plugin_a35cbef8ad1bbd64e44d9a09672f5c206}{00058}}\ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classnet__plugin_a35cbef8ad1bbd64e44d9a09672f5c206}{plugin\_initialize}}(\ \textcolor{keyword}{const}\ variables\_map\&\ options\ )\ \{\ std::cout\ <<\ \textcolor{stringliteral}{"{}initialize\ net\ plugin\(\backslash\)n"{}};\ \}}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00059}\mbox{\hyperlink{classnet__plugin_a2ac6db4551f2fbacf42b72d71f9bcbb2}{00059}}\ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classnet__plugin_a2ac6db4551f2fbacf42b72d71f9bcbb2}{plugin\_startup}}()\ \ \{\ std::cout\ <<\ \textcolor{stringliteral}{"{}starting\ net\ plugin\ \(\backslash\)n"{}};\ \}}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00060}\mbox{\hyperlink{classnet__plugin_a9a4274f04d57a07434e3df9dd58359b4}{00060}}\ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classnet__plugin_a9a4274f04d57a07434e3df9dd58359b4}{plugin\_shutdown}}()\ \{\ std::cout\ <<\ \textcolor{stringliteral}{"{}shutdown\ net\ plugin\ \(\backslash\)n"{}};\ \}}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00062}00062\ \};}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00066}\mbox{\hyperlink{libraries_2appbase_2examples_2main_8cpp_a3c04138a5bfe5d72780bb7e82a18e627}{00066}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}(\ \textcolor{keywordtype}{int}\ argc,\ \textcolor{keywordtype}{char}**\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00067}00067\ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00068}00068\ \ \ \ \ \ \ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{appbase::app}}().\mbox{\hyperlink{classappbase_1_1application_a87e84549150056c56c0327cc4976cc2a}{register\_plugin}}<\mbox{\hyperlink{classnet__plugin}{net\_plugin}}>();}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00069}00069\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !\mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{appbase::app}}().initialize(\ argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}\ )\ )}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ -\/1;}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00071}00071\ \ \ \ \ \ \ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{appbase::app}}().\mbox{\hyperlink{classappbase_1_1application_a3b77bd811744da79c9d8ba0d078e7668}{startup}}();}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00072}00072\ \ \ \ \ \ \ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{appbase::app}}().\mbox{\hyperlink{classappbase_1_1application_a39286b0b034b97f6940568a00f44edaf}{exec}}();}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00073}00073\ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\ \textcolor{keyword}{const}\ boost::exception\&\ e\ )\ \{}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00074}00074\ \ \ \ \ \ \ std::cerr\ <<\ boost::diagnostic\_information(e)\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00075}00075\ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\ \textcolor{keyword}{const}\ std::exception\&\ e\ )\ \{}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00076}00076\ \ \ \ \ \ \ std::cerr\ <<\ e.what()\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00077}00077\ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\ ...\ )\ \{}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00078}00078\ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}unknown\ exception\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00079}00079\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00080}00080\ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}exited\ cleanly\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00081}00081\ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{libraries_2appbase_2examples_2main_8cpp_source_l00082}00082\ \}}
+
+\end{DoxyCode}

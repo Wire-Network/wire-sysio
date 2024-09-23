@@ -1,0 +1,9 @@
+<map id="sysio::wallet::valid_filename" name="sysio::wallet::valid_filename">
+<area shape="rect" id="Node000001" title=" " alt="" coords="374,39,503,79"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1wallet_1_1wallet__manager.html#a9c1673ae072e569c07ab5af68fc3ae34" title=" " alt="" coords="190,5,326,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="358,47,326,41,327,36,359,42"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1wallet_1_1wallet__manager.html#aa2afccf9173458e34f4ce2aba878efb4" title=" " alt="" coords="190,71,326,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="359,76,327,82,326,76,358,71"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1wallet_1_1wallet__manager.html#a108a129e4176fb7a1b782344e9cecc8f" title=" " alt="" coords="5,71,142,111"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="174,94,142,94,142,88,174,88"/>
+</map>

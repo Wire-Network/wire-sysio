@@ -1,0 +1,8 @@
+<map id="Test::putGather" name="Test::putGather">
+<area shape="rect" id="Node000001" title=" " alt="" coords="292,5,403,31"/>
+<area shape="rect" id="Node000002" href="$class_test.html#add7b7259a4124a0a69532b2d7da2f5c9" title=" " alt="" coords="5,5,78,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="276,21,78,21,78,16,276,16"/>
+<area shape="rect" id="Node000003" href="$class_test.html#a58f23563589958ebf55499ba14b24173" title=" " alt="" coords="126,31,244,56"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="277,32,245,37,244,32,276,27"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="110,33,77,27,78,22,111,28"/>
+</map>

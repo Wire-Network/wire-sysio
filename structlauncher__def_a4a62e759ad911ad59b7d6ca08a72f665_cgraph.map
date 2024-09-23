@@ -1,0 +1,13 @@
+<map id="launcher_def::roll" name="launcher_def::roll">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,35,126,60"/>
+<area shape="rect" id="Node000002" href="$structlauncher__def.html#a1640b42b5e79d6479e3944e06b125147" title=" " alt="" coords="175,5,356,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="126,36,159,31,160,36,127,41"/>
+<area shape="rect" id="Node000005" href="$structlauncher__def.html#a3f52c46eb6f3592d0f19d5d8c1be5ed8" title=" " alt="" coords="174,55,358,96"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="127,53,158,58,158,63,126,59"/>
+<area shape="rect" id="Node000003" href="$structlauncher__def.html#a016f09fbb85268c29c46e28c1ae06660" title=" " alt="" coords="406,5,551,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="357,16,391,16,391,21,357,21"/>
+<area shape="rect" id="Node000004" href="$structlauncher__def.html#af1b7d62253cacd97d1b757a5ff912bcf" title=" " alt="" coords="599,5,768,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="552,16,584,16,584,21,552,21"/>
+<area shape="rect" id="Node000006" href="$programs_2sysio-launcher_2main_8cpp.html#a8d747b8417c90b78c386111de7934753" title=" " alt="" coords="456,63,502,88"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="358,73,440,73,440,78,358,78"/>
+</map>

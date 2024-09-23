@@ -1,0 +1,25 @@
+<map id="sysio::trace_api::store_provider::read_data_log" name="sysio::trace_api::store_provider::read_data_log">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,158,169,198"/>
+<area shape="rect" id="Node000002" href="$namespacefc.html#aae3e907b120751591ca6919ac66c384b" title=" " alt="" coords="265,5,354,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="100,156,147,99,179,68,215,41,249,27,251,32,218,46,182,72,151,102,104,159"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1trace__api_1_1slice__directory.html#a79cb70775a7aa5e99311529fa6ce30a2" title=" " alt="" coords="217,56,402,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="135,155,227,115,229,120,138,160"/>
+<area shape="rect" id="Node000005" href="$classsysio_1_1trace__api_1_1slice__directory.html#a47a30741cf28932df1556209da63b227" title=" " alt="" coords="450,128,613,169"/>
+<area shape="poly" id="edge13_Node000001_Node000005" title=" " alt="" coords="169,170,434,153,435,158,169,175"/>
+<area shape="rect" id="Node000006" href="$classsysio_1_1trace__api_1_1slice__directory.html#a314838e3f2122e4bcc7f1279b78f7d0c" title=" " alt="" coords="221,186,398,226"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="169,186,205,190,205,196,169,191"/>
+<area shape="rect" id="Node000007" href="$classfc_1_1cfile.html#a6eb4fe4530480f13c6cf773a7f1e3847" title=" " alt="" coords="482,243,582,268"/>
+<area shape="poly" id="edge12_Node000001_Node000007" title=" " alt="" coords="125,197,168,218,217,236,283,248,349,255,466,256,466,262,349,260,282,253,216,241,166,223,122,201"/>
+<area shape="rect" id="Node000010" href="$classfc_1_1cfile.html#aba9b5dcf06d12cc653b8eb4224351ff7" title=" " alt="" coords="236,301,382,327"/>
+<area shape="poly" id="edge11_Node000001_Node000010" title=" " alt="" coords="111,197,158,238,218,280,247,293,244,298,215,284,155,243,108,201"/>
+<area shape="rect" id="Node000004" href="$namespacefc.html#a3fcf0d920aea28014aacae50a51d8485" title=" " alt="" coords="494,71,569,96"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="403,81,479,81,479,86,403,86"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="403,108,446,121,445,126,402,113"/>
+<area shape="poly" id="edge10_Node000006_Node000005" title=" " alt="" coords="390,183,435,171,436,176,391,188"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="399,223,467,238,466,244,398,228"/>
+<area shape="rect" id="Node000009" href="$classfc_1_1cfile.html#a29badc2b6c1f589d0c79b20ce31cacf0" title=" " alt="" coords="468,193,596,219"/>
+<area shape="poly" id="edge8_Node000006_Node000009" title=" " alt="" coords="398,204,452,204,452,209,398,209"/>
+<area shape="rect" id="Node000008" href="$classfc_1_1path.html#ab1eae2062df4ea01435348ec52fb3784" title=" " alt="" coords="661,219,816,244"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="582,247,645,240,646,245,583,252"/>
+<area shape="poly" id="edge9_Node000009_Node000008" title=" " alt="" coords="597,211,646,218,645,223,596,217"/>
+</map>

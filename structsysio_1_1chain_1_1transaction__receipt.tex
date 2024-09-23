@@ -1,0 +1,177 @@
+\doxysection{sysio\+::chain\+::transaction\+\_\+receipt Struct Reference}
+\hypertarget{structsysio_1_1chain_1_1transaction__receipt}{}\label{structsysio_1_1chain_1_1transaction__receipt}\index{sysio::chain::transaction\_receipt@{sysio::chain::transaction\_receipt}}
+
+
+{\ttfamily \#include $<$block.\+hpp$>$}
+
+
+
+Inheritance diagram for sysio\+::chain\+::transaction\+\_\+receipt\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=203pt]{structsysio_1_1chain_1_1transaction__receipt__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for sysio\+::chain\+::transaction\+\_\+receipt\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=303pt]{structsysio_1_1chain_1_1transaction__receipt__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1transaction__receipt_a7184d16d66f89a135aac08e45c1ceea2}{transaction\+\_\+receipt}} ()
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1transaction__receipt_a1e369556963e245d1ff0c295906ca866}{transaction\+\_\+receipt}} (const \mbox{\hyperlink{namespacesysio_1_1chain_aa85a3b49b3b219d1e3840567579e7e63}{transaction\+\_\+id\+\_\+type}} \&tid)
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1transaction__receipt_a95624cf4afd460d7c0a7da1e0fb02fde}{transaction\+\_\+receipt}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1packed__transaction}{packed\+\_\+transaction}} \&ptrx)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_a357fd9478475457e5bb386a3143079b6}{digest\+\_\+type}} \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__receipt_abcf6076b95386dc78163e7585a15c955}{digest}} () const
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__receipt__header}{sysio\+::chain\+::transaction\+\_\+receipt\+\_\+header}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1transaction__receipt__header_abcb38f830d7d1b1b7d6d99e1b8959308}{transaction\+\_\+receipt\+\_\+header}} ()
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1transaction__receipt__header_a2f54528ee08769fb6641f284fccbcafc}{transaction\+\_\+receipt\+\_\+header}} (\mbox{\hyperlink{structsysio_1_1chain_1_1transaction__receipt__header_a2bb00bac16048e6f624c2ded867ebf55}{status\+\_\+enum}} \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::variant$<$ \mbox{\hyperlink{namespacesysio_1_1chain_aa85a3b49b3b219d1e3840567579e7e63}{transaction\+\_\+id\+\_\+type}}, \mbox{\hyperlink{structsysio_1_1chain_1_1packed__transaction}{packed\+\_\+transaction}} $>$ \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__receipt_a1cdef54eb483eb5d4278214b1057e0a7}{trx}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes inherited from \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__receipt__header}{sysio\+::chain\+::transaction\+\_\+receipt\+\_\+header}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1enum__type}{fc\+::enum\+\_\+type}}$<$ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}}, \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__receipt__header_a2bb00bac16048e6f624c2ded867ebf55}{status\+\_\+enum}} $>$ \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__receipt__header_aa091f1c31840776bd0d2ab3d800e3527}{status}}
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__receipt__header_adda526d2bea4feb067c8720e9ea63bd1}{cpu\+\_\+usage\+\_\+us}} = 0
+\begin{DoxyCompactList}\small\item\em total billed CPU usage (microseconds) \end{DoxyCompactList}\item 
+\mbox{\hyperlink{structfc_1_1unsigned__int}{fc\+::unsigned\+\_\+int}} \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__receipt__header_a6066dc9878cf41e9f35e2a555db82f27}{net\+\_\+usage\+\_\+words}}
+\begin{DoxyCompactList}\small\item\em total billed NET usage, so we can reconstruct resource state when skipping context free data... hard failures... \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Public Types inherited from \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__receipt__header}{sysio\+::chain\+::transaction\+\_\+receipt\+\_\+header}}}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__receipt__header_a2bb00bac16048e6f624c2ded867ebf55}{status\+\_\+enum}} \{ \newline
+\mbox{\hyperlink{structsysio_1_1chain_1_1transaction__receipt__header_a2bb00bac16048e6f624c2ded867ebf55a7a6de58f1f84063a5f85bbfb59b43608}{executed}} = 0
+, \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__receipt__header_a2bb00bac16048e6f624c2ded867ebf55a98d0df834b74445e549f5d2123443b4e}{soft\+\_\+fail}} = 1
+, \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__receipt__header_a2bb00bac16048e6f624c2ded867ebf55ac705728ca8b5f3a44d8026e14990c463}{hard\+\_\+fail}} = 2
+, \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__receipt__header_a2bb00bac16048e6f624c2ded867ebf55a6b6365bc9e75414c669484391aa7729d}{delayed}} = 3
+, \newline
+\mbox{\hyperlink{structsysio_1_1chain_1_1transaction__receipt__header_a2bb00bac16048e6f624c2ded867ebf55ac9a3d403c49bf068d1f8f07e20df72b5}{expired}} = 4
+ \}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{block_8hpp_source_l00033}{33}} of file \mbox{\hyperlink{block_8hpp_source}{block.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structsysio_1_1chain_1_1transaction__receipt_a7184d16d66f89a135aac08e45c1ceea2}\index{sysio::chain::transaction\_receipt@{sysio::chain::transaction\_receipt}!transaction\_receipt@{transaction\_receipt}}
+\index{transaction\_receipt@{transaction\_receipt}!sysio::chain::transaction\_receipt@{sysio::chain::transaction\_receipt}}
+\doxysubsubsection{\texorpdfstring{transaction\_receipt()}{transaction\_receipt()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1transaction__receipt_a7184d16d66f89a135aac08e45c1ceea2} 
+sysio\+::chain\+::transaction\+\_\+receipt\+::transaction\+\_\+receipt (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{block_8hpp_source_l00035}{35}} of file \mbox{\hyperlink{block_8hpp_source}{block.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00035\ :\mbox{\hyperlink{structsysio_1_1chain_1_1transaction__receipt__header_abcb38f830d7d1b1b7d6d99e1b8959308}{transaction\_receipt\_header}}()\{\}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1transaction__receipt_a1e369556963e245d1ff0c295906ca866}\index{sysio::chain::transaction\_receipt@{sysio::chain::transaction\_receipt}!transaction\_receipt@{transaction\_receipt}}
+\index{transaction\_receipt@{transaction\_receipt}!sysio::chain::transaction\_receipt@{sysio::chain::transaction\_receipt}}
+\doxysubsubsection{\texorpdfstring{transaction\_receipt()}{transaction\_receipt()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1transaction__receipt_a1e369556963e245d1ff0c295906ca866} 
+sysio\+::chain\+::transaction\+\_\+receipt\+::transaction\+\_\+receipt (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_aa85a3b49b3b219d1e3840567579e7e63}{transaction\+\_\+id\+\_\+type}} \&}]{tid}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{block_8hpp_source_l00036}{36}} of file \mbox{\hyperlink{block_8hpp_source}{block.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00036\ :\mbox{\hyperlink{structsysio_1_1chain_1_1transaction__receipt__header_abcb38f830d7d1b1b7d6d99e1b8959308}{transaction\_receipt\_header}}(executed),\mbox{\hyperlink{structsysio_1_1chain_1_1transaction__receipt_a1cdef54eb483eb5d4278214b1057e0a7}{trx}}(tid)\{\}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1transaction__receipt_a95624cf4afd460d7c0a7da1e0fb02fde}\index{sysio::chain::transaction\_receipt@{sysio::chain::transaction\_receipt}!transaction\_receipt@{transaction\_receipt}}
+\index{transaction\_receipt@{transaction\_receipt}!sysio::chain::transaction\_receipt@{sysio::chain::transaction\_receipt}}
+\doxysubsubsection{\texorpdfstring{transaction\_receipt()}{transaction\_receipt()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1transaction__receipt_a95624cf4afd460d7c0a7da1e0fb02fde} 
+sysio\+::chain\+::transaction\+\_\+receipt\+::transaction\+\_\+receipt (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1packed__transaction}{packed\+\_\+transaction}} \&}]{ptrx}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{block_8hpp_source_l00037}{37}} of file \mbox{\hyperlink{block_8hpp_source}{block.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00037\ :\mbox{\hyperlink{structsysio_1_1chain_1_1transaction__receipt__header_abcb38f830d7d1b1b7d6d99e1b8959308}{transaction\_receipt\_header}}(executed),\mbox{\hyperlink{structsysio_1_1chain_1_1transaction__receipt_a1cdef54eb483eb5d4278214b1057e0a7}{trx}}(std::in\_place\_type<packed\_transaction>,\ ptrx)\{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1chain_1_1transaction__receipt_abcf6076b95386dc78163e7585a15c955}\index{sysio::chain::transaction\_receipt@{sysio::chain::transaction\_receipt}!digest@{digest}}
+\index{digest@{digest}!sysio::chain::transaction\_receipt@{sysio::chain::transaction\_receipt}}
+\doxysubsubsection{\texorpdfstring{digest()}{digest()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1transaction__receipt_abcf6076b95386dc78163e7585a15c955} 
+\mbox{\hyperlink{namespacesysio_1_1chain_a357fd9478475457e5bb386a3143079b6}{digest\+\_\+type}} sysio\+::chain\+::transaction\+\_\+receipt\+::digest (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{block_8hpp_source_l00041}{41}} of file \mbox{\hyperlink{block_8hpp_source}{block.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ digest\_type::encoder\ enc;}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(\ enc,\ \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__receipt__header_aa091f1c31840776bd0d2ab3d800e3527}{status}}\ );}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(\ enc,\ \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__receipt__header_adda526d2bea4feb067c8720e9ea63bd1}{cpu\_usage\_us}}\ );}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(\ enc,\ \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__receipt__header_a6066dc9878cf41e9f35e2a555db82f27}{net\_usage\_words}}\ );}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ std::holds\_alternative<transaction\_id\_type>(\mbox{\hyperlink{structsysio_1_1chain_1_1transaction__receipt_a1cdef54eb483eb5d4278214b1057e0a7}{trx}})\ )}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(\ enc,\ std::get<transaction\_id\_type>(\mbox{\hyperlink{structsysio_1_1chain_1_1transaction__receipt_a1cdef54eb483eb5d4278214b1057e0a7}{trx}})\ );}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(\ enc,\ std::get<packed\_transaction>(\mbox{\hyperlink{structsysio_1_1chain_1_1transaction__receipt_a1cdef54eb483eb5d4278214b1057e0a7}{trx}}).packed\_digest()\ );}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ enc.result();}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1transaction__receipt_abcf6076b95386dc78163e7585a15c955_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1chain_1_1transaction__receipt_a1cdef54eb483eb5d4278214b1057e0a7}\index{sysio::chain::transaction\_receipt@{sysio::chain::transaction\_receipt}!trx@{trx}}
+\index{trx@{trx}!sysio::chain::transaction\_receipt@{sysio::chain::transaction\_receipt}}
+\doxysubsubsection{\texorpdfstring{trx}{trx}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1transaction__receipt_a1cdef54eb483eb5d4278214b1057e0a7} 
+std\+::variant$<$\mbox{\hyperlink{namespacesysio_1_1chain_aa85a3b49b3b219d1e3840567579e7e63}{transaction\+\_\+id\+\_\+type}}, \mbox{\hyperlink{structsysio_1_1chain_1_1packed__transaction}{packed\+\_\+transaction}}$>$ sysio\+::chain\+::transaction\+\_\+receipt\+::trx}
+
+
+
+Definition at line \mbox{\hyperlink{block_8hpp_source_l00039}{39}} of file \mbox{\hyperlink{block_8hpp_source}{block.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{block_8hpp}{block.\+hpp}}\end{DoxyCompactItemize}

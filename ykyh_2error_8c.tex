@@ -1,0 +1,112 @@
+\doxysection{libraries/yubihsm/ykyh/error.c File Reference}
+\hypertarget{ykyh_2error_8c}{}\label{ykyh_2error_8c}\index{libraries/yubihsm/ykyh/error.c@{libraries/yubihsm/ykyh/error.c}}
+{\ttfamily \#include "{}ykyh.\+h"{}}\newline
+{\ttfamily \#include $<$stddef.\+h$>$}\newline
+Include dependency graph for error.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=236pt]{ykyh_2error_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structerr__t}{err\+\_\+t}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{ykyh_2error_8c_a9031fdea07a95f7cc4b194bce387e0a2}{ERR}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  desc)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{ykyh_2error_8c_a4544a3e0741c078e01233bb1ab541805}{ykyh\+\_\+strerror}} (\mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112}{ykyh\+\_\+rc}} err)
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{ykyh_2error_8c_ad38c0d31859cc20ece3748e74e9bbd75}{ykyh\+\_\+strerror\+\_\+name}} (\mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112}{ykyh\+\_\+rc}} err)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{ykyh_2error_8c_a9031fdea07a95f7cc4b194bce387e0a2}\index{error.c@{error.c}!ERR@{ERR}}
+\index{ERR@{ERR}!error.c@{error.c}}
+\doxysubsubsection{\texorpdfstring{ERR}{ERR}}
+{\footnotesize\ttfamily \label{ykyh_2error_8c_a9031fdea07a95f7cc4b194bce387e0a2} 
+\#define ERR(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{desc}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \{\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ \#\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ desc\ \}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{ykyh_2error_8c_source_l00021}{21}} of file \mbox{\hyperlink{ykyh_2error_8c_source}{error.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#define\ ERR(name,\ desc)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\ \ \{\ name,\ \#name,\ desc\ \}}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{ykyh_2error_8c_a4544a3e0741c078e01233bb1ab541805}\index{error.c@{error.c}!ykyh\_strerror@{ykyh\_strerror}}
+\index{ykyh\_strerror@{ykyh\_strerror}!error.c@{error.c}}
+\doxysubsubsection{\texorpdfstring{ykyh\_strerror()}{ykyh\_strerror()}}
+{\footnotesize\ttfamily \label{ykyh_2error_8c_a4544a3e0741c078e01233bb1ab541805} 
+const char \texorpdfstring{$\ast$}{*} ykyh\+\_\+strerror (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112}{ykyh\+\_\+rc}}}]{err}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{ykyh_2error_8c_source_l00040}{40}} of file \mbox{\hyperlink{ykyh_2error_8c_source}{error.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00041\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_ac160cc61da581bdcf075273493b9f156}{unknown}}\ =\ \textcolor{stringliteral}{"{}Unknown\ ykyh\ error"{}};}
+\DoxyCodeLine{00042\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}};}
+\DoxyCodeLine{00043\ }
+\DoxyCodeLine{00044\ \ \ \textcolor{keywordflow}{if}\ (-\/err\ <\ 0\ ||\ -\/err\ >=\ (\textcolor{keywordtype}{int})\ (\textcolor{keyword}{sizeof}(errors)\ /\ \textcolor{keyword}{sizeof}(errors[0])))\ \{}
+\DoxyCodeLine{00045\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_ac160cc61da581bdcf075273493b9f156}{unknown}};}
+\DoxyCodeLine{00046\ \ \ \}}
+\DoxyCodeLine{00047\ }
+\DoxyCodeLine{00048\ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ errors[-\/err].\mbox{\hyperlink{structerr__t_a5443ed757b35a94fdb06a5dccaa2c427}{description}};}
+\DoxyCodeLine{00049\ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})\ \{}
+\DoxyCodeLine{00050\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_ac160cc61da581bdcf075273493b9f156}{unknown}};}
+\DoxyCodeLine{00051\ \ \ \}}
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}};}
+\DoxyCodeLine{00054\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{ykyh_2error_8c_a4544a3e0741c078e01233bb1ab541805_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{ykyh_2error_8c_ad38c0d31859cc20ece3748e74e9bbd75}\index{error.c@{error.c}!ykyh\_strerror\_name@{ykyh\_strerror\_name}}
+\index{ykyh\_strerror\_name@{ykyh\_strerror\_name}!error.c@{error.c}}
+\doxysubsubsection{\texorpdfstring{ykyh\_strerror\_name()}{ykyh\_strerror\_name()}}
+{\footnotesize\ttfamily \label{ykyh_2error_8c_ad38c0d31859cc20ece3748e74e9bbd75} 
+const char \texorpdfstring{$\ast$}{*} ykyh\+\_\+strerror\+\_\+name (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112}{ykyh\+\_\+rc}}}]{err}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{ykyh_2error_8c_source_l00056}{56}} of file \mbox{\hyperlink{ykyh_2error_8c_source}{error.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00057\ \ \ \textcolor{keywordflow}{if}\ (-\/err\ <\ 0\ ||\ -\/err\ >=\ (\textcolor{keywordtype}{int})\ (\textcolor{keyword}{sizeof}(errors)\ /\ \textcolor{keyword}{sizeof}(errors[0])))\ \{}
+\DoxyCodeLine{00058\ \ \ \ \ \textcolor{keywordflow}{return}\ NULL;}
+\DoxyCodeLine{00059\ \ \ \}}
+\DoxyCodeLine{00060\ }
+\DoxyCodeLine{00061\ \ \ \textcolor{keywordflow}{return}\ errors[-\/err].\mbox{\hyperlink{structerr__t_a57a5cce969fd1a24d67633246758d479}{name}};}
+\DoxyCodeLine{00062\ \}}
+
+\end{DoxyCode}

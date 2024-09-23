@@ -1,0 +1,99 @@
+\doxysection{testing\+::internal\+::Default\+Global\+Test\+Part\+Result\+Reporter Class Reference}
+\hypertarget{classtesting_1_1internal_1_1_default_global_test_part_result_reporter}{}\label{classtesting_1_1internal_1_1_default_global_test_part_result_reporter}\index{testing::internal::DefaultGlobalTestPartResultReporter@{testing::internal::DefaultGlobalTestPartResultReporter}}
+
+
+{\ttfamily \#include $<$gtest-\/internal-\/inl.\+h$>$}
+
+
+
+Inheritance diagram for testing\+::internal\+::Default\+Global\+Test\+Part\+Result\+Reporter\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=234pt]{classtesting_1_1internal_1_1_default_global_test_part_result_reporter__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for testing\+::internal\+::Default\+Global\+Test\+Part\+Result\+Reporter\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=234pt]{classtesting_1_1internal_1_1_default_global_test_part_result_reporter__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_default_global_test_part_result_reporter_a3900ea7f34b34afd48c7d1d0312a1488}{Default\+Global\+Test\+Part\+Result\+Reporter}} (\mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl}{Unit\+Test\+Impl}} \texorpdfstring{$\ast$}{*}unit\+\_\+test)
+\item 
+virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_default_global_test_part_result_reporter_a6081576a23b964cfecab1e424d8044fc}{Report\+Test\+Part\+Result}} (const \mbox{\hyperlink{classtesting_1_1_test_part_result}{Test\+Part\+Result}} \&result)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classtesting_1_1_test_part_result_reporter_interface}{testing\+::\+Test\+Part\+Result\+Reporter\+Interface}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{classtesting_1_1_test_part_result_reporter_interface_a338b51591ed654f84dc0feaaf2b66917}{\texorpdfstring{$\sim$}{\string~}\+Test\+Part\+Result\+Reporter\+Interface}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{gtest-internal-inl_8h_source_l00461}{461}} of file \mbox{\hyperlink{gtest-internal-inl_8h_source}{gtest-\/internal-\/inl.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_default_global_test_part_result_reporter_a3900ea7f34b34afd48c7d1d0312a1488}\index{testing::internal::DefaultGlobalTestPartResultReporter@{testing::internal::DefaultGlobalTestPartResultReporter}!DefaultGlobalTestPartResultReporter@{DefaultGlobalTestPartResultReporter}}
+\index{DefaultGlobalTestPartResultReporter@{DefaultGlobalTestPartResultReporter}!testing::internal::DefaultGlobalTestPartResultReporter@{testing::internal::DefaultGlobalTestPartResultReporter}}
+\doxysubsubsection{\texorpdfstring{DefaultGlobalTestPartResultReporter()}{DefaultGlobalTestPartResultReporter()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_default_global_test_part_result_reporter_a3900ea7f34b34afd48c7d1d0312a1488} 
+testing\+::internal\+::\+Default\+Global\+Test\+Part\+Result\+Reporter\+::\+Default\+Global\+Test\+Part\+Result\+Reporter (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl}{Unit\+Test\+Impl}} \texorpdfstring{$\ast$}{*}}]{unit\+\_\+test}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8cc_source_l00700}{700}} of file \mbox{\hyperlink{gtest_8cc_source}{gtest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00701\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ unit\_test\_(unit\_test)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_default_global_test_part_result_reporter_a6081576a23b964cfecab1e424d8044fc}\index{testing::internal::DefaultGlobalTestPartResultReporter@{testing::internal::DefaultGlobalTestPartResultReporter}!ReportTestPartResult@{ReportTestPartResult}}
+\index{ReportTestPartResult@{ReportTestPartResult}!testing::internal::DefaultGlobalTestPartResultReporter@{testing::internal::DefaultGlobalTestPartResultReporter}}
+\doxysubsubsection{\texorpdfstring{ReportTestPartResult()}{ReportTestPartResult()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_default_global_test_part_result_reporter_a6081576a23b964cfecab1e424d8044fc} 
+void testing\+::internal\+::\+Default\+Global\+Test\+Part\+Result\+Reporter\+::\+Report\+Test\+Part\+Result (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classtesting_1_1_test_part_result}{Test\+Part\+Result}} \&}]{result}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classtesting_1_1_test_part_result_reporter_interface_aa2f920e7a5a0a6d0faf19e3727928c22}{testing\+::\+Test\+Part\+Result\+Reporter\+Interface}}.
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8cc_source_l00703}{703}} of file \mbox{\hyperlink{gtest_8cc_source}{gtest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00704\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00705\ \ \ unit\_test\_-\/>\mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl_aba3caef4ad23ce98be80250aeb0cc787}{current\_test\_result}}()-\/>AddTestPartResult(result);}
+\DoxyCodeLine{00706\ \ \ unit\_test\_-\/>\mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl_a22544d28679e9d1e2eaa3735607c8b63}{listeners}}()-\/>repeater()-\/>\mbox{\hyperlink{classtesting_1_1_test_event_listener_a054f8705c883fa120b91473aff38f2ee}{OnTestPartResult}}(result);}
+\DoxyCodeLine{00707\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_default_global_test_part_result_reporter_a6081576a23b964cfecab1e424d8044fc_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/src/\mbox{\hyperlink{gtest-internal-inl_8h}{gtest-\/internal-\/inl.\+h}}\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/src/\mbox{\hyperlink{gtest_8cc}{gtest.\+cc}}\end{DoxyCompactItemize}

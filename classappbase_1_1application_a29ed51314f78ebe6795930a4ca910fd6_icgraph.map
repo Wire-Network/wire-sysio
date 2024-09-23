@@ -1,0 +1,5 @@
+<map id="appbase::application::initialize" name="appbase::application::initialize">
+<area shape="rect" id="Node000001" title="Looks for the –plugin commandline / config option and calls initialize on those plugins." alt="" coords="250,5,390,46"/>
+<area shape="rect" id="Node000002" href="$test__trx__full_8cpp.html#afdace07785a80c02d7fbb1d13154c2c4" title=" " alt="" coords="5,13,202,38"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="234,28,202,28,202,23,234,23"/>
+</map>

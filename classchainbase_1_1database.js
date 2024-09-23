@@ -1,0 +1,38 @@
+var classchainbase_1_1database =
+[
+    [ "session", "structchainbase_1_1database_1_1session.html", "structchainbase_1_1database_1_1session" ],
+    [ "database_index_row_count_multiset", "classchainbase_1_1database.html#a7780c270726e90372b252a354095ea3a", null ],
+    [ "open_flags", "classchainbase_1_1database.html#a3d0148ef1d3bf633f3d0bfab420250ee", [
+      [ "read_only", "classchainbase_1_1database.html#a3d0148ef1d3bf633f3d0bfab420250eea51c3754046d280c74c384e0e74a45b47", null ],
+      [ "read_write", "classchainbase_1_1database.html#a3d0148ef1d3bf633f3d0bfab420250eea3ed40e30ae731cdc45c9dc5b782d88f4", null ]
+    ] ],
+    [ "database", "classchainbase_1_1database.html#a461fee5fe782650c4642bf1e5817e646", null ],
+    [ "~database", "classchainbase_1_1database.html#a31008de680565a626cd975c25d4351db", null ],
+    [ "database", "classchainbase_1_1database.html#ac1f047331d68fca270e8323a23e86922", null ],
+    [ "add_index", "classchainbase_1_1database.html#a43a85f8b7d728b69dbf7a9d69c9ebc1c", null ],
+    [ "commit", "classchainbase_1_1database.html#aca6d7bcd700644f077b89203b2e8b7ef", null ],
+    [ "create", "classchainbase_1_1database.html#adc8f336b33d7013d1b0400399b16c5a7", null ],
+    [ "find", "classchainbase_1_1database.html#aa5a2ca0da0092693ac49b36b7ec6817a", null ],
+    [ "find", "classchainbase_1_1database.html#a248bf27038d616496ed18db76c69a8e1", null ],
+    [ "flush", "classchainbase_1_1database.html#a7afc3526294cf634f71cc25376deaa21", null ],
+    [ "get", "classchainbase_1_1database.html#afcfe00f81a526c1376d4f51197dd3a9a", null ],
+    [ "get", "classchainbase_1_1database.html#a41bee39b4bab8d338193d1032b451a1e", null ],
+    [ "get_free_memory", "classchainbase_1_1database.html#a63a87fe56634ee1e93511a894b98e40d", null ],
+    [ "get_index", "classchainbase_1_1database.html#a4d5297635dcf70be481d9b600da9bc13", null ],
+    [ "get_index", "classchainbase_1_1database.html#af35a648524fb0240a78a0450c0266046", null ],
+    [ "get_mutable_index", "classchainbase_1_1database.html#afaea057692a8bbbf3f506b64c60308b6", null ],
+    [ "get_segment_manager", "classchainbase_1_1database.html#a64133afb9e0ae374eeab86bd1d4db08b", null ],
+    [ "get_segment_manager", "classchainbase_1_1database.html#a50525f9d37dd23fb33307990aa839e06", null ],
+    [ "is_read_only", "classchainbase_1_1database.html#ac34261887e651719813a8cffb4f31d87", null ],
+    [ "modify", "classchainbase_1_1database.html#a9ebc006075e8fc2e84357a0e068b58d4", null ],
+    [ "operator=", "classchainbase_1_1database.html#a2c97ee00b7904ba08050f32e8ac52160", null ],
+    [ "remove", "classchainbase_1_1database.html#ac6bb29708e4fdfb6899028e3c351fe0b", null ],
+    [ "revision", "classchainbase_1_1database.html#a224fc0c346a93fd027bfa2515f54bf98", null ],
+    [ "row_count_per_index", "classchainbase_1_1database.html#ae1a365762e37490551a8de3adda5665e", null ],
+    [ "set_require_locking", "classchainbase_1_1database.html#ad544b6a999bff16775ebd96dfb6b8e27", null ],
+    [ "set_revision", "classchainbase_1_1database.html#a24e7f6336cad0bd2fc280dab381665ed", null ],
+    [ "squash", "classchainbase_1_1database.html#ace133a4e1820ea8663fb4eaa19145e57", null ],
+    [ "start_undo_session", "classchainbase_1_1database.html#abb570c03bda1ee6ae1b428d41481b476", null ],
+    [ "undo", "classchainbase_1_1database.html#a167bce30384de1f373ebe0c25d4d0de6", null ],
+    [ "undo_all", "classchainbase_1_1database.html#a832c383b7d8573d399e6149d4c715bd6", null ]
+];

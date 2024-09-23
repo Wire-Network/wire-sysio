@@ -1,0 +1,17 @@
+<map id="fc::resolve" name="fc::resolve">
+<area shape="rect" id="Node000001" title=" " alt="" coords="720,46,802,72"/>
+<area shape="rect" id="Node000002" href="$classfc_1_1gelf__appender.html#ab6509d82a033f86a7066849841465ff0" title="Required for name resolution and socket initialization." alt="" coords="542,5,672,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="704,49,671,42,673,37,705,44"/>
+<area shape="rect" id="Node000003" href="$classfc_1_1detail_1_1ntp__impl.html#aabb55b1b1ca4de17db3d2b7f3f3ab56a" title=" " alt="" coords="543,71,671,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="705,73,672,80,671,75,704,68"/>
+<area shape="rect" id="Node000004" href="$classfc_1_1detail_1_1ntp__impl.html#a5b3a58d9010e8ca23ee3e287595b8967" title=" " alt="" coords="182,43,310,83"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="529,69,494,62,398,56,311,59,310,54,398,50,495,56,530,64"/>
+<area shape="rect" id="Node000006" href="$classfc_1_1detail_1_1ntp__impl.html#ab2beecf0f92d0bad2bdd8047f45ab599" title=" " alt="" coords="358,71,494,111"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="527,94,495,94,495,88,527,88"/>
+<area shape="rect" id="Node000007" href="$classfc_1_1detail_1_1ntp__impl.html#a3ee1de6f11e03bf63ac439e5bddec0b7" title=" " alt="" coords="362,160,490,201"/>
+<area shape="poly" id="edge7_Node000003_Node000007" title=" " alt="" coords="551,121,470,162,468,157,549,116"/>
+<area shape="rect" id="Node000005" href="$classfc_1_1detail_1_1ntp__impl.html#a70d5cd30257c17171bc81e7dba288664" title=" " alt="" coords="5,43,134,83"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="166,66,134,66,134,60,166,60"/>
+<area shape="poly" id="edge6_Node000006_Node000004" title=" " alt="" coords="342,81,310,76,311,70,343,75"/>
+<area shape="poly" id="edge8_Node000007_Node000007" title=" " alt="" coords="455,147,444,141,426,139,409,141,399,145,395,151,397,159,392,160,390,150,396,141,408,135,426,133,446,136,458,142"/>
+</map>

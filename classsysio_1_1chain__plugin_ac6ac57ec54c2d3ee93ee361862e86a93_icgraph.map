@@ -1,0 +1,7 @@
+<map id="sysio::chain_plugin::accept_transaction" name="sysio::chain_plugin::accept_transaction">
+<area shape="rect" id="Node000001" title=" " alt="" coords="215,41,354,82"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1connection.html#a5b525888f8a53ca2b7665fc7f5860746" title=" " alt="" coords="20,5,152,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="199,49,151,40,152,35,200,44"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1txn__test__gen__plugin__impl.html#ab604324f85747b68a47c453df264dce0" title=" " alt="" coords="5,70,167,126"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="200,80,168,86,167,80,199,74"/>
+</map>

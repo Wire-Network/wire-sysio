@@ -1,0 +1,54 @@
+\doxysection{libraries/fc/vendor/websocketpp/websocketpp/utilities.hpp File Reference}
+\hypertarget{utilities_8hpp}{}\label{utilities_8hpp}\index{libraries/fc/vendor/websocketpp/websocketpp/utilities.hpp@{libraries/fc/vendor/websocketpp/websocketpp/utilities.hpp}}
+{\ttfamily \#include $<$websocketpp/common/stdint.\+hpp$>$}\newline
+{\ttfamily \#include $<$algorithm$>$}\newline
+{\ttfamily \#include $<$string$>$}\newline
+{\ttfamily \#include $<$locale$>$}\newline
+{\ttfamily \#include $<$websocketpp/impl/utilities\+\_\+impl.\+hpp$>$}\newline
+Include dependency graph for utilities.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{utilities_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{utilities_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structwebsocketpp_1_1utility_1_1my__equal}{websocketpp\+::utility\+::my\+\_\+equal$<$ char\+T $>$}}
+\begin{DoxyCompactList}\small\item\em Helper functor for case insensitive find. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{structwebsocketpp_1_1utility_1_1ci__less}{websocketpp\+::utility\+::ci\+\_\+less}}
+\begin{DoxyCompactList}\small\item\em Helper less than functor for case insensitive find. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{structwebsocketpp_1_1utility_1_1ci__less_1_1nocase__compare}{websocketpp\+::utility\+::ci\+\_\+less\+::nocase\+\_\+compare}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacewebsocketpp}{websocketpp}}
+\begin{DoxyCompactList}\small\item\em Namespace for the Web\+Socket++ project. \end{DoxyCompactList}\item 
+namespace \mbox{\hyperlink{namespacewebsocketpp_1_1utility}{websocketpp\+::utility}}
+\begin{DoxyCompactList}\small\item\em Generic non-\/websocket specific utility functions and data structures. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\T\+::const\+\_\+iterator \mbox{\hyperlink{namespacewebsocketpp_1_1utility_a484f1287b93cf58cc6514e46eed41568}{websocketpp\+::utility\+::ci\+\_\+find\+\_\+substr}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const \&haystack, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const \&needle, std\+::locale const \&loc=std\+::locale())
+\begin{DoxyCompactList}\small\item\em Find substring (case insensitive) \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\T\+::const\+\_\+iterator \mbox{\hyperlink{namespacewebsocketpp_1_1utility_a90383b2decd273f7a66bbb87c66b5ddd}{websocketpp\+::utility\+::ci\+\_\+find\+\_\+substr}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const \&haystack, typename T\+::value\+\_\+type const \texorpdfstring{$\ast$}{*}needle, typename T\+::size\+\_\+type size, std\+::locale const \&loc=std\+::locale())
+\begin{DoxyCompactList}\small\item\em Find substring (case insensitive) \end{DoxyCompactList}\item 
+std\+::string \mbox{\hyperlink{namespacewebsocketpp_1_1utility_aa96a743a4f0392aac39742c3e5dfd1cc}{websocketpp\+::utility\+::to\+\_\+lower}} (std\+::string const \&in)
+\begin{DoxyCompactList}\small\item\em Convert a string to lowercase. \end{DoxyCompactList}\item 
+std\+::string \mbox{\hyperlink{namespacewebsocketpp_1_1utility_a5d36afd6d8da4b22b5d634e035bfb450}{websocketpp\+::utility\+::string\+\_\+replace\+\_\+all}} (std\+::string subject, std\+::string const \&search, std\+::string const \&replace)
+\begin{DoxyCompactList}\small\item\em Replace all occurrances of a substring with another. \end{DoxyCompactList}\item 
+std\+::string \mbox{\hyperlink{namespacewebsocketpp_1_1utility_a26e5a26395d95d2f6bf3a9edb8d06dd2}{websocketpp\+::utility\+::to\+\_\+hex}} (std\+::string const \&input)
+\begin{DoxyCompactList}\small\item\em Convert std\+::string to ascii printed string of hex digits. \end{DoxyCompactList}\item 
+std\+::string \mbox{\hyperlink{namespacewebsocketpp_1_1utility_a42132bbbc1632f7ba964bd87ac5f288f}{websocketpp\+::utility\+::to\+\_\+hex}} (\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} const \texorpdfstring{$\ast$}{*}input, size\+\_\+t length)
+\begin{DoxyCompactList}\small\item\em Convert byte array (uint8\+\_\+t) to ascii printed string of hex digits. \end{DoxyCompactList}\item 
+std\+::string \mbox{\hyperlink{namespacewebsocketpp_1_1utility_a9f9ed51337c9b493abc97b639b0fbe2e}{websocketpp\+::utility\+::to\+\_\+hex}} (char const \texorpdfstring{$\ast$}{*}input, size\+\_\+t length)
+\begin{DoxyCompactList}\small\item\em Convert char array to ascii printed string of hex digits. \end{DoxyCompactList}\end{DoxyCompactItemize}

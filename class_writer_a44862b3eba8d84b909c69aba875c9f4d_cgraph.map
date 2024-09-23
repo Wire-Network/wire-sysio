@@ -1,0 +1,7 @@
+<map id="Writer::WriteNull" name="Writer::WriteNull">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,122,56"/>
+<area shape="rect" id="Node000002" href="$stream_8h.html#aa817b00a466bb84d96c5de1616436c95" title="Reserve n characters for writing to a stream." alt="" coords="170,5,260,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="122,31,154,26,155,31,123,36"/>
+<area shape="rect" id="Node000003" href="$stream_8h.html#ad57ba7f2912c5509924b69dec7db4396" title="Write character to a stream, presuming buffer is reserved." alt="" coords="173,55,256,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="123,50,158,56,158,61,122,55"/>
+</map>

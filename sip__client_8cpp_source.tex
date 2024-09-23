@@ -1,0 +1,90 @@
+\doxysection{sip\+\_\+client.\+cpp}
+\hypertarget{sip__client_8cpp_source}{}\label{sip__client_8cpp_source}\index{libraries/fc/vendor/websocketpp/examples/sip\_client/sip\_client.cpp@{libraries/fc/vendor/websocketpp/examples/sip\_client/sip\_client.cpp}}
+\mbox{\hyperlink{sip__client_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <condition\_variable>}}
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{asio__no__tls__client_8hpp}{websocketpp/config/asio\_no\_tls\_client.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{client_8hpp}{websocketpp/client.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <iostream>}}
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ <boost/thread/thread.hpp>}}
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00011}\mbox{\hyperlink{sip__client_8cpp_aff8c62b83a9c8aefc476f96166656b76}{00011}}\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1client}{websocketpp::client<websocketpp::config::asio\_client>}}\ \mbox{\hyperlink{sip__client_8cpp_aff8c62b83a9c8aefc476f96166656b76}{client}};}
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00013}00013\ \textcolor{keyword}{using\ }websocketpp::lib::placeholders::\_1;}
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00014}00014\ \textcolor{keyword}{using\ }websocketpp::lib::placeholders::\_2;}
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00015}00015\ \textcolor{keyword}{using\ }websocketpp::lib::bind;}
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00017}00017\ \textcolor{comment}{//\ pull\ out\ the\ type\ of\ messages\ sent\ by\ our\ config}}
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00018}00018\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message_a665ccc8a3883dbea049aef85c46efe7f}{websocketpp::config::asio\_client::message\_type::ptr}}\ \mbox{\hyperlink{debug__client_8cpp_a08398c4d31a4dc3e42d1b9a9ef64c6ad}{message\_ptr}};}
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00020}00020\ \textcolor{comment}{//\ Create\ a\ server\ endpoint}}
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00021}\mbox{\hyperlink{sip__client_8cpp_a25a83214e5578f123d0ca4281c6de6e5}{00021}}\ \mbox{\hyperlink{classwebsocketpp_1_1client}{client}}\ \mbox{\hyperlink{sip__client_8cpp_a25a83214e5578f123d0ca4281c6de6e5}{sip\_client}};}
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00024}\mbox{\hyperlink{sip__client_8cpp_a6dbe87354d47906dcbb42c7ba634b102}{00024}}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{sip__client_8cpp_a6dbe87354d47906dcbb42c7ba634b102}{received}};}
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00026}\mbox{\hyperlink{sip__client_8cpp_a9602fc6fab09cf0b8aa1fbe3973de3ad}{00026}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{sip__client_8cpp_a9602fc6fab09cf0b8aa1fbe3973de3ad}{on\_open}}(\mbox{\hyperlink{classwebsocketpp_1_1client}{client}}*\ c,\ \mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{websocketpp::connection\_hdl}}\ hdl)\ \{}
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00027}00027\ \ \ \ \ \textcolor{comment}{//\ now\ it\ is\ safe\ to\ use\ the\ connection}}
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00028}00028\ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}connection\ ready"{}}\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00030}00030\ \ \ \ \ \mbox{\hyperlink{sip__client_8cpp_a6dbe87354d47906dcbb42c7ba634b102}{received}}=\textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00031}00031\ \ \ \ \ \textcolor{comment}{//\ Send\ a\ SIP\ OPTIONS\ message\ to\ the\ server:}}
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00032}00032\ \ \ \ \ std::string\ SIP\_msg=\textcolor{stringliteral}{"{}OPTIONS\ sip:carol@chicago.com\ SIP/2.0\(\backslash\)r\(\backslash\)nVia:\ SIP/2.0/WS\ df7jal23ls0d.invalid;rport;branch=z9hG4bKhjhs8ass877\(\backslash\)r\(\backslash\)nMax-\/Forwards:\ 70\(\backslash\)r\(\backslash\)nTo:\ <sip:carol@chicago.com>\(\backslash\)r\(\backslash\)nFrom:\ Alice\ <sip:alice@atlanta.com>;tag=1928301774\(\backslash\)r\(\backslash\)nCall-\/ID:\ a84b4c76e66710\(\backslash\)r\(\backslash\)nCSeq:\ 63104\ OPTIONS\(\backslash\)r\(\backslash\)nContact:\ <sip:alice@pc33.atlanta.com>\(\backslash\)r\(\backslash\)nAccept:\ application/sdp\(\backslash\)r\(\backslash\)nContent-\/Length:\ 0\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00033}00033\ \ \ \ \ \mbox{\hyperlink{sip__client_8cpp_a25a83214e5578f123d0ca4281c6de6e5}{sip\_client}}.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a5341f59de7ef1a565a2fd93daba212d5}{send}}(hdl,\ SIP\_msg.c\_str(),\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea6b65f28626b19b2eef447744c564e727}{websocketpp::frame::opcode::text}});}
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00034}00034\ \}}
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00036}\mbox{\hyperlink{sip__client_8cpp_a8c13595a4801a15825ae3f8c8bb37ed4}{00036}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{sip__client_8cpp_a8c13595a4801a15825ae3f8c8bb37ed4}{on\_message}}(\mbox{\hyperlink{classwebsocketpp_1_1client}{client}}*\ c,\ \mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{websocketpp::connection\_hdl}}\ hdl,\ \mbox{\hyperlink{debug__client_8cpp_a08398c4d31a4dc3e42d1b9a9ef64c6ad}{message\_ptr}}\ msg)\ \{}
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00037}00037\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1client_ad9e541a43023d33d5cd5669d62a13edc}{client::connection\_ptr}}\ con\ =\ \mbox{\hyperlink{sip__client_8cpp_a25a83214e5578f123d0ca4281c6de6e5}{sip\_client}}.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a0fe4457427d4124abe7ca022ba7afbb4}{get\_con\_from\_hdl}}(hdl);}
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00039}00039\ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}Received\ a\ reply:"{}}\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00040}00040\ \ \ \ \ fwrite(msg-\/>get\_payload().c\_str(),\ msg-\/>get\_payload().size(),\ 1,\ stdout);}
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00041}00041\ \ \ \ \ \mbox{\hyperlink{sip__client_8cpp_a6dbe87354d47906dcbb42c7ba634b102}{received}}=\textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00042}00042\ \}}
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00044}\mbox{\hyperlink{sip__client_8cpp_a0ddf1224851353fc92bfbff6f499fa97}{00044}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}(\textcolor{keywordtype}{int}\ argc,\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[])\ \{}
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00046}00046\ \ \ \ \ std::string\ uri\ =\ \textcolor{stringliteral}{"{}ws://localhost:9001"{}};}
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00048}00048\ \ \ \ \ \textcolor{keywordflow}{if}\ (argc\ ==\ 2)\ \{}
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00049}00049\ \ \ \ \ \ \ \ \ uri\ =\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[1];}
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00050}00050\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00052}00052\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ We\ expect\ there\ to\ be\ a\ lot\ of\ errors,\ so\ suppress\ them}}
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00054}00054\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sip__client_8cpp_a25a83214e5578f123d0ca4281c6de6e5}{sip\_client}}.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a3fe357b3c6434273a9965eb52902575d}{clear\_access\_channels}}(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a853aa0b8976e53f3181af3bc398d493e}{websocketpp::log::alevel::all}});}
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00055}00055\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sip__client_8cpp_a25a83214e5578f123d0ca4281c6de6e5}{sip\_client}}.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a8cefa4fc37c0df4eb6ed0bcf04bb0da5}{clear\_error\_channels}}(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1elevel_a9b31ff708c221d314f9f4eb3ff2b1ad7}{websocketpp::log::elevel::all}});}
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00057}00057\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Initialize\ ASIO}}
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00058}00058\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sip__client_8cpp_a25a83214e5578f123d0ca4281c6de6e5}{sip\_client}}.init\_asio();}
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00060}00060\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Register\ our\ handlers}}
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00061}00061\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sip__client_8cpp_a25a83214e5578f123d0ca4281c6de6e5}{sip\_client}}.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a5753d9848aefc04ee91da401c0cc65b8}{set\_open\_handler}}(bind(\&\mbox{\hyperlink{sip__client_8cpp_a9602fc6fab09cf0b8aa1fbe3973de3ad}{on\_open}},\&\mbox{\hyperlink{sip__client_8cpp_a25a83214e5578f123d0ca4281c6de6e5}{sip\_client}},::\_1));}
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00062}00062\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sip__client_8cpp_a25a83214e5578f123d0ca4281c6de6e5}{sip\_client}}.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a34a3a8351bff65ba878975be471cab85}{set\_message\_handler}}(bind(\&\mbox{\hyperlink{sip__client_8cpp_a8c13595a4801a15825ae3f8c8bb37ed4}{on\_message}},\&\mbox{\hyperlink{sip__client_8cpp_a25a83214e5578f123d0ca4281c6de6e5}{sip\_client}},::\_1,::\_2));}
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00064}00064\ \ \ \ \ \ \ \ \ websocketpp::lib::error\_code\ ec;}
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00065}00065\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1client_ad9e541a43023d33d5cd5669d62a13edc}{client::connection\_ptr}}\ con\ =\ \mbox{\hyperlink{sip__client_8cpp_a25a83214e5578f123d0ca4281c6de6e5}{sip\_client}}.\mbox{\hyperlink{classwebsocketpp_1_1client_aa95cec974921e32bc37a61c683ae240d}{get\_connection}}(uri,\ ec);}
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00067}00067\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Specify\ the\ SIP\ subprotocol:}}
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00068}00068\ \ \ \ \ \ \ \ \ con-\/>add\_subprotocol(\textcolor{stringliteral}{"{}sip"{}});}
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00069}00069\ }
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00070}00070\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sip__client_8cpp_a25a83214e5578f123d0ca4281c6de6e5}{sip\_client}}.\mbox{\hyperlink{classwebsocketpp_1_1client_a818c30343180123bf1fee6dc21524bae}{connect}}(con);}
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00072}00072\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Start\ the\ ASIO\ io\_service\ run\ loop}}
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00073}00073\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sip__client_8cpp_a25a83214e5578f123d0ca4281c6de6e5}{sip\_client}}.run();}
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00074}00074\ }
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00075}00075\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(!\mbox{\hyperlink{sip__client_8cpp_a6dbe87354d47906dcbb42c7ba634b102}{received}})\ \{}
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \ \ \ boost::this\_thread::sleep(boost::posix\_time::milliseconds(100));}
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00077}00077\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00079}00079\ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}done"{}}\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00080}00080\ }
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00081}00081\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\mbox{\hyperlink{classwebsocketpp_1_1exception}{websocketpp::exception}}\ \textcolor{keyword}{const}\ \&\ e)\ \{}
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00082}00082\ \ \ \ \ \ \ \ \ std::cout\ <<\ e.\mbox{\hyperlink{classwebsocketpp_1_1exception_a62dabd977bc59faaca6dc268744a6089}{what}}()\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00083}00083\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sip__client_8cpp_source_l00084}00084\ \}}
+
+\end{DoxyCode}

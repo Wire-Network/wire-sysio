@@ -1,0 +1,15 @@
+<map id="GenericReader::IterativeParseInit" name="GenericReader::IterativeParseInit">
+<area shape="rect" id="Node000001" title="Initialize JSON text token&#45;by&#45;token parsing." alt="" coords="229,137,392,178"/>
+<area shape="rect" id="Node000002" href="$class_lookahead_parser_handler.html#aa56a8db4091e158c3dfecea6b2e7c96e" title=" " alt="" coords="5,5,181,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="274,129,230,94,179,60,156,49,159,44,182,55,233,89,277,125"/>
+<area shape="rect" id="Node000003" href="$simplepullreader_8cpp.html#ae66f6b31b5ad750f1fe042a706a4e3d4" title=" " alt="" coords="68,70,118,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="245,134,180,110,117,91,119,86,182,104,247,129"/>
+<area shape="rect" id="Node000004" href="$jsoncheckertest_8cpp.html#a4d38202adffe61dff1743cfce7c6da8f" title=" " alt="" coords="65,120,121,145"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="213,149,121,138,122,133,214,144"/>
+<area shape="rect" id="Node000005" href="$readertest_8cpp.html#a70dd9ea1fe24447f13125e256e315086" title=" " alt="" coords="65,169,121,194"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="214,171,122,181,121,176,213,166"/>
+<area shape="rect" id="Node000006" href="$rapidjsontest_8cpp.html#ae9f355efa759013fb88ce867af8534b5" title=" " alt="" coords="58,218,128,244"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="245,187,181,210,129,225,128,220,180,204,243,182"/>
+<area shape="rect" id="Node000007" href="$rapidjsontest_8cpp.html#a05a7bbdf647c72c2d8e75cd3ee31c57f" title=" " alt="" coords="58,268,128,293"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="278,190,234,226,182,259,130,277,128,271,180,254,231,222,275,186"/>
+</map>

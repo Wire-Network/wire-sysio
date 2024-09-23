@@ -1,0 +1,458 @@
+\doxysection{exception.\+hpp}
+\hypertarget{exception_8hpp_source}{}\label{exception_8hpp_source}\index{libraries/fc/include/fc/exception/exception.hpp@{libraries/fc/include/fc/exception/exception.hpp}}
+\mbox{\hyperlink{exception_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{logger_8hpp}{fc/log/logger.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <exception>}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <functional>}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ <unordered\_map>}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <boost/core/typeinfo.hpp>}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00011}00011\ \textcolor{preprocessor}{\#include\ <boost/interprocess/exceptions.hpp>}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00013}00013\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00014}00014\ \{}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00015}00015\ \ \ \ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacedetail}{detail}}\ \{\ \textcolor{keyword}{class\ }exception\_impl;\ \}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00017}\mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35c}{00017}}\ \ \ \ \textcolor{keyword}{enum}\ \mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35c}{exception\_code}}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00018}00018\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00020}\mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca54c3c8b9caa13270a23c57af7bf9c52c}{00020}}\ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca54c3c8b9caa13270a23c57af7bf9c52c}{unspecified\_exception\_code}}\ \ \ \ \ \ \ \ =\ 0,}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00021}\mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca10adcbd9bf1986da4c289d2f0210cd85}{00021}}\ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca10adcbd9bf1986da4c289d2f0210cd85}{unhandled\_exception\_code}}\ \ \ \ \ \ \ \ \ \ =\ 1,\ }
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00022}\mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca0269f214acef1ad4c7531974bc011893}{00022}}\ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca0269f214acef1ad4c7531974bc011893}{timeout\_exception\_code}}\ \ \ \ \ \ \ \ \ \ \ \ =\ 2,\ }
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00023}\mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca39cab94a272e08bc5cdc93f64bf42807}{00023}}\ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca39cab94a272e08bc5cdc93f64bf42807}{file\_not\_found\_exception\_code}}\ \ \ \ \ =\ 3,}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00024}\mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca5b91c403f2d77988e737fedf17bbd412}{00024}}\ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca5b91c403f2d77988e737fedf17bbd412}{parse\_error\_exception\_code}}\ \ \ \ \ \ \ \ =\ 4,}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00025}\mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca68eb1b23cb82c44ef0f142c5dfc0d904}{00025}}\ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca68eb1b23cb82c44ef0f142c5dfc0d904}{invalid\_arg\_exception\_code}}\ \ \ \ \ \ \ \ =\ 5,}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00026}\mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca727029291eee67ac62d1a0878e94070c}{00026}}\ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca727029291eee67ac62d1a0878e94070c}{key\_not\_found\_exception\_code}}\ \ \ \ \ \ =\ 6,}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00027}\mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca0c4ff755a0bba3982b4e737470bf1d39}{00027}}\ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca0c4ff755a0bba3982b4e737470bf1d39}{bad\_cast\_exception\_code}}\ \ \ \ \ \ \ \ \ \ \ =\ 7,}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00028}\mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35caf972859aafe0f2ea87fb5a12f2cad5fa}{00028}}\ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35caf972859aafe0f2ea87fb5a12f2cad5fa}{out\_of\_range\_exception\_code}}\ \ \ \ \ \ \ =\ 8,}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00029}\mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35cab00067de165140788c7d542c04e14f4d}{00029}}\ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35cab00067de165140788c7d542c04e14f4d}{canceled\_exception\_code}}\ \ \ \ \ \ \ \ \ \ \ =\ 9,}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00030}\mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca0609f726018df8d223cd932c85d31b6c}{00030}}\ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca0609f726018df8d223cd932c85d31b6c}{assert\_exception\_code}}\ \ \ \ \ \ \ \ \ \ \ \ \ =\ 10,}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00031}\mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35cae485cf170ef74efe7bb8f48e01d68637}{00031}}\ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35cae485cf170ef74efe7bb8f48e01d68637}{eof\_exception\_code}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ 11,}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00032}\mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca969f910e4a1ec90bac8bf8eca1a8cec0}{00032}}\ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca969f910e4a1ec90bac8bf8eca1a8cec0}{std\_exception\_code}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ 13,}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00033}\mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35caf862720abffe585a5f5f8d7162c39e2c}{00033}}\ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35caf862720abffe585a5f5f8d7162c39e2c}{invalid\_operation\_exception\_code}}\ \ =\ 14,}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00034}\mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca04557e59532fe8ed76a7b27678f3a596}{00034}}\ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca04557e59532fe8ed76a7b27678f3a596}{unknown\_host\_exception\_code}}\ \ \ \ \ \ \ =\ 15,}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00035}\mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca594c9e76fdd2f38b1a829a2dff2f0cf8}{00035}}\ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca594c9e76fdd2f38b1a829a2dff2f0cf8}{null\_optional\_code}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ 16,}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00036}\mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca197f759d3a4fb4a735d90651fd705b11}{00036}}\ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca197f759d3a4fb4a735d90651fd705b11}{udt\_error\_code}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ 17,}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00037}\mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca1eb51dcf3fc25d83e37600fcdfb6bc17}{00037}}\ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca1eb51dcf3fc25d83e37600fcdfb6bc17}{aes\_error\_code}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ 18,}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00038}\mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35cafcfd5276f3288a4d5728f3d3d748cec3}{00038}}\ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35cafcfd5276f3288a4d5728f3d3d748cec3}{overflow\_code}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ 19,}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00039}\mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35cafe347d7697fa66fd53f6c55db8bfa275}{00039}}\ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35cafe347d7697fa66fd53f6c55db8bfa275}{underflow\_code}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ 20,}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00040}00040\ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca20077a699d37a68d7eeeda0b0d1ac169}{divide\_by\_zero\_code}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ 21}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00041}\mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca20077a699d37a68d7eeeda0b0d1ac169}{00041}}\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00057}\mbox{\hyperlink{classfc_1_1exception}{00057}}\ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classfc_1_1exception}{exception}}\ :\ \textcolor{keyword}{public}\ std::exception}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00058}00058\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00059}00059\ \ \ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00060}\mbox{\hyperlink{classfc_1_1exception_a13463219d1d09f150e987fe1b0368752}{00060}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{classfc_1_1microseconds}{fc::microseconds}}\ \mbox{\hyperlink{classfc_1_1exception_a13463219d1d09f150e987fe1b0368752}{format\_time\_limit}}\ =\ \mbox{\hyperlink{namespacefc_a76ae235ec7e9b8862e70740058d7eb1b}{fc::milliseconds}}(\ 10\ );\ \textcolor{comment}{//\ limit\ time\ spent\ formatting\ exceptions}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00062}\mbox{\hyperlink{classfc_1_1exception_a2635b9fb22bb7f1471b8353463ef9b66}{00062}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{enum}\ \mbox{\hyperlink{classfc_1_1exception_a2635b9fb22bb7f1471b8353463ef9b66}{code\_enum}}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00064}00064\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1exception_a2635b9fb22bb7f1471b8353463ef9b66a6f4e6d3d84df9d159d7643c8d76a93b0}{code\_value}}\ =\ \mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca54c3c8b9caa13270a23c57af7bf9c52c}{unspecified\_exception\_code}}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00065}\mbox{\hyperlink{classfc_1_1exception_a2635b9fb22bb7f1471b8353463ef9b66a6f4e6d3d84df9d159d7643c8d76a93b0}{00065}}\ \ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00067}00067\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1exception_a438cb875c834068b29e0a6cd3319e7f3}{exception}}(\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ code\ =\ \mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca54c3c8b9caa13270a23c57af7bf9c52c}{unspecified\_exception\_code}},}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::string\&\ name\_value\ =\ \textcolor{stringliteral}{"{}exception"{}},}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::string\&\ what\_value\ =\ \textcolor{stringliteral}{"{}unspecified"{}});}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1exception_a438cb875c834068b29e0a6cd3319e7f3}{exception}}(\ \mbox{\hyperlink{classfc_1_1log__message}{log\_message}}\&\&,\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ code\ =\ \mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca54c3c8b9caa13270a23c57af7bf9c52c}{unspecified\_exception\_code}},}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00071}00071\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::string\&\ name\_value\ =\ \textcolor{stringliteral}{"{}exception"{}},}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::string\&\ what\_value\ =\ \textcolor{stringliteral}{"{}unspecified"{}});}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00073}00073\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1exception_a438cb875c834068b29e0a6cd3319e7f3}{exception}}(\ \mbox{\hyperlink{namespacefc_a54370140f7c964a12e90393d525605d1}{log\_messages}}\&\&,\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ code\ =\ \mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca54c3c8b9caa13270a23c57af7bf9c52c}{unspecified\_exception\_code}},}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00074}00074\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::string\&\ name\_value\ =\ \textcolor{stringliteral}{"{}exception"{}},}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00075}00075\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::string\&\ what\_value\ =\ \textcolor{stringliteral}{"{}unspecified"{}});}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1exception_a438cb875c834068b29e0a6cd3319e7f3}{exception}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacefc_a54370140f7c964a12e90393d525605d1}{log\_messages}}\&,}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ code\ =\ \mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca54c3c8b9caa13270a23c57af7bf9c52c}{unspecified\_exception\_code}},}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00078}00078\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::string\&\ name\_value\ =\ \textcolor{stringliteral}{"{}exception"{}},}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::string\&\ what\_value\ =\ \textcolor{stringliteral}{"{}unspecified"{}});}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00080}00080\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1exception_a438cb875c834068b29e0a6cd3319e7f3}{exception}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1exception}{exception}}\&\ e\ );}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00081}00081\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1exception_a438cb875c834068b29e0a6cd3319e7f3}{exception}}(\ \mbox{\hyperlink{classfc_1_1exception}{exception}}\&\&\ e\ );}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00082}00082\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classfc_1_1exception_a72f637422588d6f2e59ce35d53882522}{\string~exception}}();}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00083}00083\ }
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00084}00084\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1exception_aa5734af6ae6e44c7c8a9b3c4ea8131e1}{name}}()\textcolor{keyword}{const}\ throw();}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00085}00085\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ code()const\ throw();}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00086}00086\ \ \ \ \ \ \ \ \ \ const\ \textcolor{keywordtype}{char}*\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1exception_ab1104818bf0d9b6a29f0dfe036cf97f6}{what}}()const\ noexcept\ override;}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00087}00087\ }
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00092}00092\ \ \ \ \ \ \ \ \ \ const\ \mbox{\hyperlink{namespacefc_a54370140f7c964a12e90393d525605d1}{log\_messages}}\&\ \ \mbox{\hyperlink{classfc_1_1exception_a70b72c1e4fe0d17485a8b7a0a6f397de}{get\_log}}()const;}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00093}00093\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1exception_a685fab238fa9b86dcf64b35417eb63b2}{append\_log}}(\ \mbox{\hyperlink{classfc_1_1log__message}{log\_message}}\ m\ );}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00094}00094\ }
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00100}00100\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacestd}{std}}::\textcolor{keywordtype}{string}\ \mbox{\hyperlink{classfc_1_1exception_a7611ea8fbe25dde56649b685c2298a37}{to\_detail\_string}}(\ \mbox{\hyperlink{classfc_1_1log__level}{log\_level}}\ ll\ =\ \mbox{\hyperlink{classfc_1_1log__level}{log\_level}}::all\ )const;}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00101}00101\ }
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00105}00105\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacestd}{std}}::\textcolor{keywordtype}{string}\ to\_string(\ \mbox{\hyperlink{classfc_1_1log__level}{log\_level}}\ ll\ =\ \mbox{\hyperlink{classfc_1_1log__level}{log\_level}}::info\ \ )const;}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00106}00106\ }
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00110}00110\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacestd}{std}}::\textcolor{keywordtype}{string}\ \mbox{\hyperlink{classfc_1_1exception_aeea900db85f79e5b4be0710a9df373db}{top\_message}}(\ )const;}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00111}00111\ }
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00117}00117\ \ \ \ \ \ \ \ \ \ virtual\ \mbox{\hyperlink{utility_8hpp_a9bc43e3ee0ae83643b65e07fe1fd0132}{NO\_RETURN}}\ \textcolor{keywordtype}{void}\ \ \ \ \ \mbox{\hyperlink{classfc_1_1exception_ace951e3b4efa51ea203b0e111f7e99a2}{dynamic\_rethrow\_exception}}()const;}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00118}00118\ }
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00126}00126\ \ \ \ \ \ \ \ \ \ \ virtual\ \mbox{\hyperlink{namespacestd}{std}}::shared\_ptr<\mbox{\hyperlink{classfc_1_1exception}{exception}}>\ \mbox{\hyperlink{classfc_1_1exception_a38ac38d910ba13a339ce5855a51c9127}{dynamic\_copy\_exception}}()const;}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00127}00127\ }
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00128}00128\ \ \ \ \ \ \ \ \ \ friend\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1exception_a3c086911538b2c7cd63462c1d237c79d}{to\_variant}}(\ const\ \mbox{\hyperlink{classfc_1_1exception}{exception}}\&\ e,\ \mbox{\hyperlink{classfc_1_1variant}{variant}}\&\ v\ );}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00129}00129\ \ \ \ \ \ \ \ \ \ friend\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1exception_a9b482ebad3fb861a17f968e015519e41}{from\_variant}}(\ const\ \mbox{\hyperlink{classfc_1_1variant}{variant}}\&\ e,\ \mbox{\hyperlink{classfc_1_1exception}{exception}}\&\ ll\ );}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00130}00130\ }
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00131}00131\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1exception}{exception}}\&\ operator=(\ const\ \mbox{\hyperlink{classfc_1_1exception}{exception}}\&\ \mbox{\hyperlink{namespacefc_a79771837fffd80fcc4bc658ee2fc4b2b}{copy}}\ );}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00132}00132\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1exception}{exception}}\&\ operator=(\ \mbox{\hyperlink{classfc_1_1exception}{exception}}\&\&\ \mbox{\hyperlink{namespacefc_a79771837fffd80fcc4bc658ee2fc4b2b}{copy}}\ );}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00133}00133\ \ \ \ \ \ \ protected:}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00134}\mbox{\hyperlink{classfc_1_1exception_a91cc1ed42499761c2f750de4a89ce627}{00134}}\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacestd}{std}}::\mbox{\hyperlink{classfc_1_1unique__ptr}{unique\_ptr}}<\mbox{\hyperlink{namespacedetail}{detail}}::exception\_impl>\ \mbox{\hyperlink{classfc_1_1exception_a91cc1ed42499761c2f750de4a89ce627}{my}};}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00135}00135\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00136}00136\ }
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00137}00137\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1exception_a3c086911538b2c7cd63462c1d237c79d}{to\_variant}}(\ const\ \mbox{\hyperlink{classfc_1_1exception}{exception}}\&\ e,\ \mbox{\hyperlink{classfc_1_1variant}{variant}}\&\ v\ );}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00138}00138\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1exception_a9b482ebad3fb861a17f968e015519e41}{from\_variant}}(\ const\ \mbox{\hyperlink{classfc_1_1variant}{variant}}\&\ e,\ \mbox{\hyperlink{classfc_1_1exception}{exception}}\&\ ll\ );}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00139}\mbox{\hyperlink{namespacefc_a15170d1be1e682691dfe6ae09790edce}{00139}}\ \ \ \ typedef\ \mbox{\hyperlink{namespacestd}{std}}::shared\_ptr<\mbox{\hyperlink{classfc_1_1exception}{exception}}>\ \mbox{\hyperlink{namespacefc_a15170d1be1e682691dfe6ae09790edce}{exception\_ptr}};}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00140}00140\ }
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00141}\mbox{\hyperlink{namespacefc_af3c22fe3461a1cc0c4d2907b02e54eab}{00141}}\ \ \ \ typedef\ \mbox{\hyperlink{namespacestd}{std}}::optional<\mbox{\hyperlink{classfc_1_1exception}{exception}}>\ \mbox{\hyperlink{namespacefc_af3c22fe3461a1cc0c4d2907b02e54eab}{oexception}};}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00142}00142\ }
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00143}00143\ }
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00154}\mbox{\hyperlink{classfc_1_1unhandled__exception}{00154}}\ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}}\ \mbox{\hyperlink{classfc_1_1unhandled__exception}{unhandled\_exception}}\ :\ public\ \mbox{\hyperlink{classfc_1_1exception}{exception}}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00155}00155\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00156}00156\ \ \ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00157}\mbox{\hyperlink{classfc_1_1unhandled__exception_a9b059031419041311998822df4d27ac1}{00157}}\ \ \ \ \ \ \ \ \textcolor{keyword}{enum}\ \mbox{\hyperlink{classfc_1_1unhandled__exception_a9b059031419041311998822df4d27ac1}{code\_enum}}\ \{}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00158}\mbox{\hyperlink{classfc_1_1unhandled__exception_a9b059031419041311998822df4d27ac1aed517d376c8981388093f67452ce3091}{00158}}\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1exception_a2635b9fb22bb7f1471b8353463ef9b66a6f4e6d3d84df9d159d7643c8d76a93b0}{code\_value}}\ =\ \mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca10adcbd9bf1986da4c289d2f0210cd85}{unhandled\_exception\_code}},}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00159}00159\ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00160}00160\ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1unhandled__exception}{unhandled\_exception}}(\ \mbox{\hyperlink{classfc_1_1log__message}{log\_message}}\&\&\ m,\ std::exception\_ptr\ e\ =\ std::current\_exception()\ );}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00161}00161\ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1unhandled__exception}{unhandled\_exception}}(\ \mbox{\hyperlink{namespacefc_a54370140f7c964a12e90393d525605d1}{log\_messages}}\ );}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00162}00162\ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1unhandled__exception}{unhandled\_exception}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1exception}{exception}}\&\ \ );}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00163}00163\ }
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00164}00164\ \ \ \ \ \ \ \ std::exception\_ptr\ get\_inner\_exception()\textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00165}00165\ }
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00166}00166\ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{utility_8hpp_a9bc43e3ee0ae83643b65e07fe1fd0132}{NO\_RETURN}}\ \textcolor{keywordtype}{void}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1exception_ace951e3b4efa51ea203b0e111f7e99a2}{dynamic\_rethrow\_exception}}()\textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00167}00167\ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ std::shared\_ptr<exception>\ \ \ \mbox{\hyperlink{classfc_1_1exception_a38ac38d910ba13a339ce5855a51c9127}{dynamic\_copy\_exception}}()\textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00168}00168\ \ \ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00169}00169\ \ \ \ \ \ \ \ std::exception\_ptr\ \_inner;}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00170}00170\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00171}00171\ }
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00179}\mbox{\hyperlink{classfc_1_1std__exception__wrapper}{00179}}\ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classfc_1_1std__exception__wrapper}{std\_exception\_wrapper}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classfc_1_1exception}{exception}}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00180}00180\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00181}00181\ \ \ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00182}00182\ \ \ \ \ \ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classfc_1_1std__exception__wrapper}{std\_exception\_wrapper}}(\ \mbox{\hyperlink{classfc_1_1log__message}{log\_message}}\&\&\ m,}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00183}00183\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::exception\_ptr\ e\ =\ std::current\_exception(),}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00184}00184\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::string\&\ name\_value\ =\ \textcolor{stringliteral}{"{}exception"{}},}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00185}00185\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::string\&\ what\_value\ =\ \textcolor{stringliteral}{"{}unspecified"{}});}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00186}00186\ }
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00187}00187\ \ \ \ \ \ \ \ std::exception\_ptr\ get\_inner\_exception()\textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00188}00188\ }
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00189}00189\ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classfc_1_1std__exception__wrapper}{std\_exception\_wrapper}}\ from\_current\_exception(\textcolor{keyword}{const}\ std::exception\&\ e);}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00190}00190\ }
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00191}00191\ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{utility_8hpp_a9bc43e3ee0ae83643b65e07fe1fd0132}{NO\_RETURN}}\ \textcolor{keywordtype}{void}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ dynamic\_rethrow\_exception()\textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00192}00192\ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ std::shared\_ptr<exception>\ \ \ dynamic\_copy\_exception()\textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00193}00193\ \ \ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00194}00194\ \ \ \ \ \ \ \ std::exception\_ptr\ \_inner;}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00195}00195\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00196}00196\ }
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00197}00197\ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00198}\mbox{\hyperlink{namespacefc_a1647dced269f496f726a7fe5181b35d6}{00198}}\ \ \ \ \mbox{\hyperlink{namespacefc_a15170d1be1e682691dfe6ae09790edce}{fc::exception\_ptr}}\ \mbox{\hyperlink{namespacefc_a1647dced269f496f726a7fe5181b35d6}{copy\_exception}}(\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\&\ e\ )}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00199}00199\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00200}00200\ \textcolor{preprocessor}{\#if\ defined(\_MSC\_VER)\ \&\&\ (\_MSC\_VER\ <\ 1700)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00201}00201\ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::make\_shared<unhandled\_exception>(\ \mbox{\hyperlink{classfc_1_1log__message}{log\_message}}(),}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00202}00202\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::copy\_exception(fc::forward<T>(e))\ );}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00203}00203\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00204}00204\ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::make\_shared<unhandled\_exception>(\ \mbox{\hyperlink{classfc_1_1log__message}{log\_message}}(),}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00205}00205\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::make\_exception\_ptr(fc::forward<T>(e))\ );}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00206}00206\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00207}00207\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00208}00208\ }
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00209}00209\ }
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00210}\mbox{\hyperlink{classfc_1_1exception__factory}{00210}}\ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classfc_1_1exception__factory}{exception\_factory}}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00211}00211\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00212}00212\ \ \ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00213}\mbox{\hyperlink{structfc_1_1exception__factory_1_1base__exception__builder}{00213}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structfc_1_1exception__factory_1_1base__exception__builder}{base\_exception\_builder}}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00214}00214\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00215}\mbox{\hyperlink{structfc_1_1exception__factory_1_1base__exception__builder_a843cb1c8cbc9af5165ccf115166581c4}{00215}}\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{utility_8hpp_a9bc43e3ee0ae83643b65e07fe1fd0132}{NO\_RETURN}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structfc_1_1exception__factory_1_1base__exception__builder_a843cb1c8cbc9af5165ccf115166581c4}{rethrow}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1exception}{exception}}\&\ e\ )\textcolor{keyword}{const}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00216}00216\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00217}00217\ }
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00218}00218\ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00219}\mbox{\hyperlink{structfc_1_1exception__factory_1_1exception__builder}{00219}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structfc_1_1exception__factory_1_1exception__builder}{exception\_builder}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{structfc_1_1exception__factory_1_1base__exception__builder}{base\_exception\_builder}}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00220}00220\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00221}\mbox{\hyperlink{structfc_1_1exception__factory_1_1exception__builder_a2eacba38f769e8b9e20dc7559a956420}{00221}}\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{utility_8hpp_a9bc43e3ee0ae83643b65e07fe1fd0132}{NO\_RETURN}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structfc_1_1exception__factory_1_1exception__builder_a2eacba38f769e8b9e20dc7559a956420}{rethrow}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1exception}{exception}}\&\ e\ )\textcolor{keyword}{const\ override}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00222}00222\ \textcolor{keyword}{\ \ \ \ \ \ \ \ \ \ \ }\{}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00223}00223\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}(\ e\ );}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00224}00224\ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00225}00225\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00226}00226\ }
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00227}00227\ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00228}\mbox{\hyperlink{classfc_1_1exception__factory_a59581ba21d7c93104a43a0f5fed3cc9d}{00228}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1exception__factory_a59581ba21d7c93104a43a0f5fed3cc9d}{register\_exception}}()}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00229}00229\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00230}00230\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{structfc_1_1exception__factory_1_1exception__builder}{exception\_builder<T>}}\ builder;}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00231}00231\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ \_registered\_exceptions.find(\ T::code\_value\ );}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00232}00232\ \ \ \ \ \ \ \ \ \ \ \ assert(\ itr\ ==\ \_registered\_exceptions.end()\ );}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00233}00233\ \ \ \ \ \ \ \ \ \ \ \ (void)itr;\ \textcolor{comment}{//\ in\ release\ builds\ this\ hides\ warnings}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00234}00234\ \ \ \ \ \ \ \ \ \ \ \ \_registered\_exceptions[T::code\_value]\ =\ \&builder;}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00235}00235\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00236}00236\ }
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00237}00237\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{utility_8hpp_a9bc43e3ee0ae83643b65e07fe1fd0132}{NO\_RETURN}}\ rethrow(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1exception}{exception}}\&\ e\ )\textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00238}00238\ }
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00239}\mbox{\hyperlink{classfc_1_1exception__factory_abd81007923f875be9136102a48609f8c}{00239}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classfc_1_1exception__factory}{exception\_factory}}\&\ \mbox{\hyperlink{classfc_1_1exception__factory_abd81007923f875be9136102a48609f8c}{instance}}()}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00240}00240\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00241}00241\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classfc_1_1exception__factory}{exception\_factory}}\ once;}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00242}00242\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ once;}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00243}00243\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00244}00244\ }
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00245}00245\ \ \ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00246}00246\ \ \ \ \ \ \ \ \ std::unordered\_map<int64\_t,base\_exception\_builder*>\ \_registered\_exceptions;}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00247}00247\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00248}\mbox{\hyperlink{exception_8hpp_ad9018e1b128b29e8f4c810101c54cae2}{00248}}\ \textcolor{preprocessor}{\#define\ FC\_REGISTER\_EXCEPTION(r,\ unused,\ base)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00249}00249\ \textcolor{preprocessor}{\ \ \ fc::exception\_factory::instance().register\_exception<base>();}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00250}00250\ }
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00251}\mbox{\hyperlink{exception_8hpp_a4c97e768c413b4402c4b4051275c2ea2}{00251}}\ \textcolor{preprocessor}{\#define\ FC\_REGISTER\_EXCEPTIONS(\ SEQ\ )\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00252}00252\ \textcolor{preprocessor}{\ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00253}00253\ \textcolor{preprocessor}{\ \ \ static\ bool\ exception\_init\ =\ []()-\/>bool\{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00254}00254\ \textcolor{preprocessor}{\ \ \ \ BOOST\_PP\_SEQ\_FOR\_EACH(\ FC\_REGISTER\_EXCEPTION,\ v,\ SEQ\ )\ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00255}00255\ \textcolor{preprocessor}{\ \ \ \ \ \ return\ true;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00256}00256\ \textcolor{preprocessor}{\ \ \ \}();\ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00257}00257\ \textcolor{preprocessor}{}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00258}00258\ }
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00259}\mbox{\hyperlink{exception_8hpp_a4a66b5602355bb8618e68d9045861050}{00259}}\ \textcolor{preprocessor}{\#define\ FC\_DECLARE\_DERIVED\_EXCEPTION(\ TYPE,\ BASE,\ CODE,\ WHAT\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00260}00260\ \textcolor{preprocessor}{\ \ \ class\ TYPE\ :\ public\ BASE\ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00261}00261\ \textcolor{preprocessor}{\ \ \ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00262}00262\ \textcolor{preprocessor}{\ \ \ \ \ \ public:\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00263}00263\ \textcolor{preprocessor}{\ \ \ \ \ \ \ enum\ code\_enum\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00264}00264\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ code\_value\ =\ CODE,\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00265}00265\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \};\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00266}00266\ \textcolor{preprocessor}{\ \ \ \ \ \ \ explicit\ TYPE(\ int64\_t\ code,\ const\ std::string\&\ name\_value,\ const\ std::string\&\ what\_value\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00267}00267\ \textcolor{preprocessor}{\ \ \ \ \ \ \ :BASE(\ code,\ name\_value,\ what\_value\ )\{\}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00268}00268\ \textcolor{preprocessor}{\ \ \ \ \ \ \ explicit\ TYPE(\ fc::log\_message\&\&\ m,\ int64\_t\ code,\ const\ std::string\&\ name\_value,\ const\ std::string\&\ what\_value\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00269}00269\ \textcolor{preprocessor}{\ \ \ \ \ \ \ :BASE(\ std::move(m),\ code,\ name\_value,\ what\_value\ )\{\}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00270}00270\ \textcolor{preprocessor}{\ \ \ \ \ \ \ explicit\ TYPE(\ fc::log\_messages\&\&\ m,\ int64\_t\ code,\ const\ std::string\&\ name\_value,\ const\ std::string\&\ what\_value\ )\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00271}00271\ \textcolor{preprocessor}{\ \ \ \ \ \ \ :BASE(\ std::move(m),\ code,\ name\_value,\ what\_value\ )\{\}\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00272}00272\ \textcolor{preprocessor}{\ \ \ \ \ \ \ explicit\ TYPE(\ const\ fc::log\_messages\&\ m,\ int64\_t\ code,\ const\ std::string\&\ name\_value,\ const\ std::string\&\ what\_value\ )\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00273}00273\ \textcolor{preprocessor}{\ \ \ \ \ \ \ :BASE(\ m,\ code,\ name\_value,\ what\_value\ )\{\}\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00274}00274\ \textcolor{preprocessor}{\ \ \ \ \ \ \ TYPE(\ const\ std::string\&\ what\_value,\ const\ fc::log\_messages\&\ m\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00275}00275\ \textcolor{preprocessor}{\ \ \ \ \ \ \ :BASE(\ m,\ CODE,\ BOOST\_PP\_STRINGIZE(TYPE),\ what\_value\ )\{\}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00276}00276\ \textcolor{preprocessor}{\ \ \ \ \ \ \ TYPE(\ fc::log\_message\&\&\ m\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00277}00277\ \textcolor{preprocessor}{\ \ \ \ \ \ \ :BASE(\ fc::move(m),\ CODE,\ BOOST\_PP\_STRINGIZE(TYPE),\ WHAT\ )\{\}\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00278}00278\ \textcolor{preprocessor}{\ \ \ \ \ \ \ TYPE(\ fc::log\_messages\ msgs\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00279}00279\ \textcolor{preprocessor}{\ \ \ \ \ \ \ :BASE(\ fc::move(\ msgs\ ),\ CODE,\ BOOST\_PP\_STRINGIZE(TYPE),\ WHAT\ )\ \{\}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00280}00280\ \textcolor{preprocessor}{\ \ \ \ \ \ \ TYPE(\ const\ TYPE\&\ c\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00281}00281\ \textcolor{preprocessor}{\ \ \ \ \ \ \ :BASE(c)\{\}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00282}00282\ \textcolor{preprocessor}{\ \ \ \ \ \ \ TYPE(\ const\ BASE\&\ c\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00283}00283\ \textcolor{preprocessor}{\ \ \ \ \ \ \ :BASE(c)\{\}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00284}00284\ \textcolor{preprocessor}{\ \ \ \ \ \ \ TYPE():BASE(CODE,\ BOOST\_PP\_STRINGIZE(TYPE),\ WHAT)\{\}\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00285}00285\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00286}00286\ \textcolor{preprocessor}{\ \ \ \ \ \ \ virtual\ std::shared\_ptr<fc::exception>\ dynamic\_copy\_exception()const\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00287}00287\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \{\ return\ std::make\_shared<TYPE>(\ *this\ );\ \}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00288}00288\ \textcolor{preprocessor}{\ \ \ \ \ \ \ virtual\ NO\_RETURN\ void\ \ \ \ \ dynamic\_rethrow\_exception()const\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00289}00289\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \{\ if(\ code()\ ==\ CODE\ )\ throw\ *this;\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00290}00290\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ else\ fc::exception::dynamic\_rethrow\_exception();\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00291}00291\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00292}00292\ \textcolor{preprocessor}{\ \ \ \};}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00293}00293\ }
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00294}\mbox{\hyperlink{exception_8hpp_a36c2b6126de9aa91375c1184d9353c56}{00294}}\ \textcolor{preprocessor}{\ \ \#define\ FC\_DECLARE\_EXCEPTION(\ TYPE,\ CODE,\ WHAT\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00295}00295\ \textcolor{preprocessor}{\ \ \ \ \ \ FC\_DECLARE\_DERIVED\_EXCEPTION(\ TYPE,\ fc::exception,\ CODE,\ WHAT\ )}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00296}00296\ }
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00297}\mbox{\hyperlink{namespacefc_a768347715403dc13ed9b3a3cb2b28643}{00297}}\ \ \ \mbox{\hyperlink{exception_8hpp_a36c2b6126de9aa91375c1184d9353c56}{FC\_DECLARE\_EXCEPTION}}(\ timeout\_exception,\ \mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca0269f214acef1ad4c7531974bc011893}{timeout\_exception\_code}},\ \textcolor{stringliteral}{"{}Timeout"{}}\ );}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00298}\mbox{\hyperlink{namespacefc_aef7440e7f364356c25f11ed630b12f5b}{00298}}\ \ \ \mbox{\hyperlink{exception_8hpp_a36c2b6126de9aa91375c1184d9353c56}{FC\_DECLARE\_EXCEPTION}}(\ file\_not\_found\_exception,\ \mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca39cab94a272e08bc5cdc93f64bf42807}{file\_not\_found\_exception\_code}},\ \textcolor{stringliteral}{"{}File\ Not\ Found"{}}\ );}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00302}\mbox{\hyperlink{namespacefc_ab3bde4c2482b5f385cb18819b9c805ca}{00302}}\ \ \ \mbox{\hyperlink{exception_8hpp_a36c2b6126de9aa91375c1184d9353c56}{FC\_DECLARE\_EXCEPTION}}(\ parse\_error\_exception,\ \mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca5b91c403f2d77988e737fedf17bbd412}{parse\_error\_exception\_code}},\ \textcolor{stringliteral}{"{}Parse\ Error"{}}\ );}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00303}\mbox{\hyperlink{namespacefc_ae299263990879af936f6ca91f4475923}{00303}}\ \ \ \mbox{\hyperlink{exception_8hpp_a36c2b6126de9aa91375c1184d9353c56}{FC\_DECLARE\_EXCEPTION}}(\ invalid\_arg\_exception,\ \mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca68eb1b23cb82c44ef0f142c5dfc0d904}{invalid\_arg\_exception\_code}},\ \textcolor{stringliteral}{"{}Invalid\ Argument"{}}\ );}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00307}\mbox{\hyperlink{namespacefc_a7ca98604862f52a50ebfff0612babfe5}{00307}}\ \ \ \mbox{\hyperlink{exception_8hpp_a36c2b6126de9aa91375c1184d9353c56}{FC\_DECLARE\_EXCEPTION}}(\ key\_not\_found\_exception,\ \mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca727029291eee67ac62d1a0878e94070c}{key\_not\_found\_exception\_code}},\ \textcolor{stringliteral}{"{}Key\ Not\ Found"{}}\ );}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00308}\mbox{\hyperlink{namespacefc_a02558ca2db8e32113bc1af4914624b25}{00308}}\ \ \ \mbox{\hyperlink{exception_8hpp_a36c2b6126de9aa91375c1184d9353c56}{FC\_DECLARE\_EXCEPTION}}(\ bad\_cast\_exception,\ \mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca0c4ff755a0bba3982b4e737470bf1d39}{bad\_cast\_exception\_code}},\ \textcolor{stringliteral}{"{}Bad\ Cast"{}}\ );}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00309}\mbox{\hyperlink{namespacefc_a593ff1e144fe027ebc780b9b334112c2}{00309}}\ \ \ \mbox{\hyperlink{exception_8hpp_a36c2b6126de9aa91375c1184d9353c56}{FC\_DECLARE\_EXCEPTION}}(\ out\_of\_range\_exception,\ \mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35caf972859aafe0f2ea87fb5a12f2cad5fa}{out\_of\_range\_exception\_code}},\ \textcolor{stringliteral}{"{}Out\ of\ Range"{}}\ );}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00310}00310\ }
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00312}\mbox{\hyperlink{namespacefc_ac9067889b0fa0539d1ccfcb908f56929}{00312}}\ \ \ \mbox{\hyperlink{exception_8hpp_a36c2b6126de9aa91375c1184d9353c56}{FC\_DECLARE\_EXCEPTION}}(\ invalid\_operation\_exception,}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00313}00313\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35caf862720abffe585a5f5f8d7162c39e2c}{invalid\_operation\_exception\_code}},}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00314}00314\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Invalid\ Operation"{}}\ );}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00316}\mbox{\hyperlink{namespacefc_a2fc4017ec771b7519ee964ade01dbc3d}{00316}}\ \ \ \mbox{\hyperlink{exception_8hpp_a36c2b6126de9aa91375c1184d9353c56}{FC\_DECLARE\_EXCEPTION}}(\ unknown\_host\_exception,}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00317}00317\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca04557e59532fe8ed76a7b27678f3a596}{unknown\_host\_exception\_code}},}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00318}00318\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Unknown\ Host"{}}\ );}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00319}00319\ }
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00323}\mbox{\hyperlink{namespacefc_af312996148d82e3961a42b246b6847e0}{00323}}\ \ \ \mbox{\hyperlink{exception_8hpp_a36c2b6126de9aa91375c1184d9353c56}{FC\_DECLARE\_EXCEPTION}}(\ canceled\_exception,\ \mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35cab00067de165140788c7d542c04e14f4d}{canceled\_exception\_code}},\ \textcolor{stringliteral}{"{}Canceled"{}}\ );}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00327}\mbox{\hyperlink{namespacefc_ab26f4a2e020010a65363829a0ad91b97}{00327}}\ \ \ \mbox{\hyperlink{exception_8hpp_a36c2b6126de9aa91375c1184d9353c56}{FC\_DECLARE\_EXCEPTION}}(\ assert\_exception,\ \mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca0609f726018df8d223cd932c85d31b6c}{assert\_exception\_code}},\ \textcolor{stringliteral}{"{}Assert\ Exception"{}}\ );}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00328}\mbox{\hyperlink{namespacefc_a1c305e6ffe96fd396f50ab104af6e991}{00328}}\ \ \ \mbox{\hyperlink{exception_8hpp_a36c2b6126de9aa91375c1184d9353c56}{FC\_DECLARE\_EXCEPTION}}(\ eof\_exception,\ \mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35cae485cf170ef74efe7bb8f48e01d68637}{eof\_exception\_code}},\ \textcolor{stringliteral}{"{}End\ Of\ File"{}}\ );}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00329}\mbox{\hyperlink{namespacefc_a62b41ad6ddc4902b1b4aac336c224cf5}{00329}}\ \ \ \mbox{\hyperlink{exception_8hpp_a36c2b6126de9aa91375c1184d9353c56}{FC\_DECLARE\_EXCEPTION}}(\ null\_optional,\ \mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca594c9e76fdd2f38b1a829a2dff2f0cf8}{null\_optional\_code}},\ \textcolor{stringliteral}{"{}null\ optional"{}}\ );}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00330}\mbox{\hyperlink{namespacefc_a58016c94cbc3d339bbb0f2016b0d449c}{00330}}\ \ \ \mbox{\hyperlink{exception_8hpp_a36c2b6126de9aa91375c1184d9353c56}{FC\_DECLARE\_EXCEPTION}}(\ udt\_exception,\ \mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca197f759d3a4fb4a735d90651fd705b11}{udt\_error\_code}},\ \textcolor{stringliteral}{"{}UDT\ error"{}}\ );}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00331}\mbox{\hyperlink{namespacefc_a8609e49b94b7368af5d6659d376b6350}{00331}}\ \ \ \mbox{\hyperlink{exception_8hpp_a36c2b6126de9aa91375c1184d9353c56}{FC\_DECLARE\_EXCEPTION}}(\ aes\_exception,\ \mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca1eb51dcf3fc25d83e37600fcdfb6bc17}{aes\_error\_code}},\ \textcolor{stringliteral}{"{}AES\ error"{}}\ );}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00332}\mbox{\hyperlink{namespacefc_afeb0290df9b8b0856ebf9f30894a448b}{00332}}\ \ \ \mbox{\hyperlink{exception_8hpp_a36c2b6126de9aa91375c1184d9353c56}{FC\_DECLARE\_EXCEPTION}}(\ overflow\_exception,\ \mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35cafcfd5276f3288a4d5728f3d3d748cec3}{overflow\_code}},\ \textcolor{stringliteral}{"{}Integer\ Overflow"{}}\ );}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00333}\mbox{\hyperlink{namespacefc_a6dc26c87aba3f7d662afbe11237a4b00}{00333}}\ \ \ \mbox{\hyperlink{exception_8hpp_a36c2b6126de9aa91375c1184d9353c56}{FC\_DECLARE\_EXCEPTION}}(\ \mbox{\hyperlink{namespacefc_ac04422061abe7cb036ece1333fdd7345}{underflow\_exception}},\ \mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35cafe347d7697fa66fd53f6c55db8bfa275}{underflow\_code}},\ \textcolor{stringliteral}{"{}Integer\ Underflow"{}}\ );}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00334}\mbox{\hyperlink{namespacefc_af22200137421e387bbd933e17123634b}{00334}}\ \ \ \mbox{\hyperlink{exception_8hpp_a36c2b6126de9aa91375c1184d9353c56}{FC\_DECLARE\_EXCEPTION}}(\ divide\_by\_zero\_exception,\ \mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca20077a699d37a68d7eeeda0b0d1ac169}{divide\_by\_zero\_code}},\ \textcolor{stringliteral}{"{}Integer\ Divide\ By\ Zero"{}}\ );}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00335}00335\ }
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00336}00336\ \ \ std::string\ \mbox{\hyperlink{namespacefc_a2bbff129626558fab1e343fcd5ad8bc5}{except\_str}}();}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00337}00337\ }
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00338}00338\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefc_a4e83f6ac6009aff9e3cef3db1cc6b605}{record\_assert\_trip}}(}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00339}00339\ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ filename,}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00340}00340\ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ lineno,}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00341}00341\ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ expr}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00342}00342\ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00343}00343\ }
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00344}00344\ \ \ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacefc_a3cc0ae501000dcf3ad7ad8124b985b05}{enable\_record\_assert\_trip}};}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00345}00345\ \}\ \textcolor{comment}{//\ namespace\ fc}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00346}00346\ }
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00347}00347\ \textcolor{preprocessor}{\#if\ \_\_APPLE\_\_}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00348}00348\ \textcolor{preprocessor}{\ \ \ \ \#define\ LIKELY(x)\ \ \ \ \_\_builtin\_expect((long)!!(x),\ 1L)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00349}00349\ \textcolor{preprocessor}{\ \ \ \ \#define\ UNLIKELY(x)\ \ \_\_builtin\_expect((long)!!(x),\ 0L)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00350}00350\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00351}\mbox{\hyperlink{exception_8hpp_affde14445f49f65ff4f5b592e44ee71a}{00351}}\ \textcolor{preprocessor}{\ \ \ \ \#define\ LIKELY(x)\ \ \ (x)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00352}\mbox{\hyperlink{exception_8hpp_ab10d0a221f4d7a706701b806c8135fd7}{00352}}\ \textcolor{preprocessor}{\ \ \ \ \#define\ UNLIKELY(x)\ (x)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00353}00353\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00354}00354\ }
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00358}\mbox{\hyperlink{exception_8hpp_ab496610ee12b958d6406f6499df7745f}{00358}}\ \textcolor{preprocessor}{\#define\ FC\_EXPAND\_MACRO(\ x\ )\ x}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00362}\mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{00362}}\ \textcolor{preprocessor}{\#define\ FC\_ASSERT(\ TEST,\ ...\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00363}00363\ \textcolor{preprocessor}{\ \ FC\_EXPAND\_MACRO(\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00364}00364\ \textcolor{preprocessor}{\ \ \ \ FC\_MULTILINE\_MACRO\_BEGIN\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00365}00365\ \textcolor{preprocessor}{\ \ \ \ \ \ if(\ UNLIKELY(!(TEST))\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00366}00366\ \textcolor{preprocessor}{\ \ \ \ \ \ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00367}00367\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ if(\ fc::enable\_record\_assert\_trip\ )\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00368}00368\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ fc::record\_assert\_trip(\ \_\_FILE\_\_,\ \_\_LINE\_\_,\ \#TEST\ );\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00369}00369\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ FC\_THROW\_EXCEPTION(\ fc::assert\_exception,\ \#TEST\ "{}:\ "{}\ \ \_\_VA\_ARGS\_\_\ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00370}00370\ \textcolor{preprocessor}{\ \ \ \ \ \ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00371}00371\ \textcolor{preprocessor}{\ \ \ \ FC\_MULTILINE\_MACRO\_END\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00372}00372\ \textcolor{preprocessor}{\ \ )}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00373}00373\ }
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00374}\mbox{\hyperlink{exception_8hpp_a79fc52be32cc4624d8b4be8cea281bf9}{00374}}\ \textcolor{preprocessor}{\#define\ FC\_CAPTURE\_AND\_THROW(\ EXCEPTION\_TYPE,\ ...\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00375}00375\ \textcolor{preprocessor}{\ \ FC\_MULTILINE\_MACRO\_BEGIN\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00376}00376\ \textcolor{preprocessor}{\ \ \ \ throw\ EXCEPTION\_TYPE(\ FC\_LOG\_MESSAGE(\ error,\ "{}"{},\ FC\_FORMAT\_ARG\_PARAMS(\_\_VA\_ARGS\_\_)\ )\ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00377}00377\ \textcolor{preprocessor}{\ \ FC\_MULTILINE\_MACRO\_END}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00378}00378\ }
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00379}00379\ \textcolor{comment}{//\#define\ FC\_THROW(\ FORMAT,\ ...\ )}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00380}00380\ \textcolor{comment}{//\ FC\_INDIRECT\_EXPAND\ workas\ around\ a\ bug\ in\ Visual\ C++\ variadic\ macro\ processing\ that\ prevents\ it}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00381}00381\ \textcolor{comment}{//\ from\ separating\ \_\_VA\_ARGS\_\_\ into\ separate\ tokens}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00382}\mbox{\hyperlink{exception_8hpp_a365bedf777ab53ecddd7397088b5c6b7}{00382}}\ \textcolor{preprocessor}{\#define\ FC\_INDIRECT\_EXPAND(MACRO,\ ARGS)\ MACRO\ ARGS}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00383}\mbox{\hyperlink{exception_8hpp_a3a1fa84768603c99866fe61af96c9f36}{00383}}\ \textcolor{preprocessor}{\#define\ FC\_THROW(\ \ ...\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00384}00384\ \textcolor{preprocessor}{\ \ FC\_MULTILINE\_MACRO\_BEGIN\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00385}00385\ \textcolor{preprocessor}{\ \ \ \ throw\ fc::exception(\ FC\_INDIRECT\_EXPAND(FC\_LOG\_MESSAGE,\ (\ error,\ \_\_VA\_ARGS\_\_\ ))\ );\ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00386}00386\ \textcolor{preprocessor}{\ \ FC\_MULTILINE\_MACRO\_END}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00387}00387\ }
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00388}\mbox{\hyperlink{exception_8hpp_a327d3b5812f556b945bec03c3768f9f7}{00388}}\ \textcolor{preprocessor}{\#define\ FC\_EXCEPTION(\ EXCEPTION\_TYPE,\ FORMAT,\ ...\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00389}00389\ \textcolor{preprocessor}{\ \ \ \ EXCEPTION\_TYPE(\ FC\_LOG\_MESSAGE(\ error,\ FORMAT,\ \_\_VA\_ARGS\_\_\ )\ )}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00395}\mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{00395}}\ \textcolor{preprocessor}{\#define\ FC\_THROW\_EXCEPTION(\ EXCEPTION,\ FORMAT,\ ...\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00396}00396\ \textcolor{preprocessor}{\ \ FC\_MULTILINE\_MACRO\_BEGIN\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00397}00397\ \textcolor{preprocessor}{\ \ \ \ throw\ EXCEPTION(\ FC\_LOG\_MESSAGE(\ error,\ FORMAT,\ \_\_VA\_ARGS\_\_\ )\ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00398}00398\ \textcolor{preprocessor}{\ \ FC\_MULTILINE\_MACRO\_END}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00399}00399\ }
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00400}00400\ }
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00405}\mbox{\hyperlink{exception_8hpp_ad1d295500555ec25b5cc63a27c2eaa59}{00405}}\ \textcolor{preprocessor}{\#define\ FC\_RETHROW\_EXCEPTION(\ ER,\ LOG\_LEVEL,\ FORMAT,\ ...\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00406}00406\ \textcolor{preprocessor}{\ \ FC\_MULTILINE\_MACRO\_BEGIN\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00407}00407\ \textcolor{preprocessor}{\ \ \ \ ER.append\_log(\ FC\_LOG\_MESSAGE(\ LOG\_LEVEL,\ FORMAT,\ \_\_VA\_ARGS\_\_\ )\ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00408}00408\ \textcolor{preprocessor}{\ \ \ \ throw;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00409}00409\ \textcolor{preprocessor}{\ \ FC\_MULTILINE\_MACRO\_END}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00410}00410\ }
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00411}\mbox{\hyperlink{exception_8hpp_ae70bfa24f5a3bc0917382b3c17fc033c}{00411}}\ \textcolor{preprocessor}{\#define\ FC\_LOG\_AND\_RETHROW(\ )\ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00412}00412\ \textcolor{preprocessor}{\ \ \ catch(\ const\ boost::interprocess::bad\_alloc\&\ )\ \{\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00413}00413\ \textcolor{preprocessor}{\ \ \ \ \ \ throw;\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00414}00414\ \textcolor{preprocessor}{\ \ \ \}\ catch(\ fc::exception\&\ er\ )\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00415}00415\ \textcolor{preprocessor}{\ \ \ \ \ \ wlog(\ "{}\$\{details\}"{},\ ("{}details"{},er.to\_detail\_string())\ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00416}00416\ \textcolor{preprocessor}{\ \ \ \ \ \ FC\_RETHROW\_EXCEPTION(\ er,\ warn,\ "{}rethrow"{}\ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00417}00417\ \textcolor{preprocessor}{\ \ \ \}\ catch(\ const\ std::exception\&\ e\ )\ \{\ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00418}00418\ \textcolor{preprocessor}{\ \ \ \ \ \ fc::std\_exception\_wrapper\ sew(\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00419}00419\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ FC\_LOG\_MESSAGE(\ warn,\ "{}rethrow\ \$\{what\}:\ "{},\ ("{}what"{},e.what())),\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00420}00420\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::current\_exception(),\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00421}00421\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_CORE\_TYPEID(e).name(),\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00422}00422\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ e.what()\ )\ ;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00423}00423\ \textcolor{preprocessor}{\ \ \ \ \ \ wlog(\ "{}\$\{details\}"{},\ ("{}details"{},sew.to\_detail\_string())\ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00424}00424\ \textcolor{preprocessor}{\ \ \ \ \ \ throw\ sew;\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00425}00425\ \textcolor{preprocessor}{\ \ \ \}\ catch(\ ...\ )\ \{\ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00426}00426\ \textcolor{preprocessor}{\ \ \ \ \ \ fc::unhandled\_exception\ e(\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00427}00427\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ FC\_LOG\_MESSAGE(\ warn,\ "{}rethrow"{}),\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00428}00428\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::current\_exception()\ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00429}00429\ \textcolor{preprocessor}{\ \ \ \ \ \ wlog(\ "{}\$\{details\}"{},\ ("{}details"{},e.to\_detail\_string())\ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00430}00430\ \textcolor{preprocessor}{\ \ \ \ \ \ throw\ e;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00431}00431\ \textcolor{preprocessor}{\ \ \ \}}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00432}00432\ }
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00433}\mbox{\hyperlink{exception_8hpp_ab46aa678a7742e0ed071b10eb88c615b}{00433}}\ \textcolor{preprocessor}{\#define\ FC\_CAPTURE\_LOG\_AND\_RETHROW(\ ...\ )\ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00434}00434\ \textcolor{preprocessor}{\ \ \ catch(\ const\ boost::interprocess::bad\_alloc\&\ )\ \{\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00435}00435\ \textcolor{preprocessor}{\ \ \ \ \ \ throw;\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00436}00436\ \textcolor{preprocessor}{\ \ \ \}\ catch(\ fc::exception\&\ er\ )\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00437}00437\ \textcolor{preprocessor}{\ \ \ \ \ \ wlog(\ "{}\$\{details\}"{},\ ("{}details"{},er.to\_detail\_string())\ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00438}00438\ \textcolor{preprocessor}{\ \ \ \ \ \ wdump(\ \_\_VA\_ARGS\_\_\ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00439}00439\ \textcolor{preprocessor}{\ \ \ \ \ \ FC\_RETHROW\_EXCEPTION(\ er,\ warn,\ "{}rethrow"{},\ FC\_FORMAT\_ARG\_PARAMS(\_\_VA\_ARGS\_\_)\ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00440}00440\ \textcolor{preprocessor}{\ \ \ \}\ catch(\ const\ std::exception\&\ e\ )\ \{\ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00441}00441\ \textcolor{preprocessor}{\ \ \ \ \ \ fc::std\_exception\_wrapper\ sew(\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00442}00442\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ FC\_LOG\_MESSAGE(\ warn,\ "{}rethrow\ \$\{what\}:\ "{},\ FC\_FORMAT\_ARG\_PARAMS(\ \_\_VA\_ARGS\_\_\ )("{}what"{},e.what())),\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00443}00443\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::current\_exception(),\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00444}00444\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_CORE\_TYPEID(e).name(),\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00445}00445\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ e.what()\ )\ ;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00446}00446\ \textcolor{preprocessor}{\ \ \ \ \ \ wlog(\ "{}\$\{details\}"{},\ ("{}details"{},sew.to\_detail\_string())\ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00447}00447\ \textcolor{preprocessor}{\ \ \ \ \ \ wdump(\ \_\_VA\_ARGS\_\_\ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00448}00448\ \textcolor{preprocessor}{\ \ \ \ \ \ throw\ sew;\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00449}00449\ \textcolor{preprocessor}{\ \ \ \}\ catch(\ ...\ )\ \{\ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00450}00450\ \textcolor{preprocessor}{\ \ \ \ \ \ fc::unhandled\_exception\ e(\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00451}00451\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ FC\_LOG\_MESSAGE(\ warn,\ "{}rethrow"{},\ FC\_FORMAT\_ARG\_PARAMS(\ \_\_VA\_ARGS\_\_)\ ),\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00452}00452\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::current\_exception()\ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00453}00453\ \textcolor{preprocessor}{\ \ \ \ \ \ wlog(\ "{}\$\{details\}"{},\ ("{}details"{},e.to\_detail\_string())\ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00454}00454\ \textcolor{preprocessor}{\ \ \ \ \ \ wdump(\ \_\_VA\_ARGS\_\_\ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00455}00455\ \textcolor{preprocessor}{\ \ \ \ \ \ throw\ e;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00456}00456\ \textcolor{preprocessor}{\ \ \ \}}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00457}00457\ }
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00458}\mbox{\hyperlink{exception_8hpp_aa7c815ca4d1b3248a9b18a1b30c96e23}{00458}}\ \textcolor{preprocessor}{\#define\ FC\_CAPTURE\_AND\_LOG(\ ...\ )\ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00459}00459\ \textcolor{preprocessor}{\ \ \ catch(\ const\ boost::interprocess::bad\_alloc\&\ )\ \{\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00460}00460\ \textcolor{preprocessor}{\ \ \ \ \ \ throw;\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00461}00461\ \textcolor{preprocessor}{\ \ \ \}\ catch(\ fc::exception\&\ er\ )\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00462}00462\ \textcolor{preprocessor}{\ \ \ \ \ \ wlog(\ "{}\$\{details\}"{},\ ("{}details"{},er.to\_detail\_string())\ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00463}00463\ \textcolor{preprocessor}{\ \ \ \ \ \ wdump(\ \_\_VA\_ARGS\_\_\ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00464}00464\ \textcolor{preprocessor}{\ \ \ \}\ catch(\ const\ std::exception\&\ e\ )\ \{\ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00465}00465\ \textcolor{preprocessor}{\ \ \ \ \ \ fc::std\_exception\_wrapper\ sew(\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00466}00466\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ FC\_LOG\_MESSAGE(\ warn,\ "{}rethrow\ \$\{what\}:\ "{},FC\_FORMAT\_ARG\_PARAMS(\ \_\_VA\_ARGS\_\_\ \ )("{}what"{},e.what())\ ),\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00467}00467\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::current\_exception(),\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00468}00468\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_CORE\_TYPEID(e).name(),\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00469}00469\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ e.what()\ )\ ;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00470}00470\ \textcolor{preprocessor}{\ \ \ \ \ \ wlog(\ "{}\$\{details\}"{},\ ("{}details"{},sew.to\_detail\_string())\ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00471}00471\ \textcolor{preprocessor}{\ \ \ \ \ \ wdump(\ \_\_VA\_ARGS\_\_\ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00472}00472\ \textcolor{preprocessor}{\ \ \ \}\ catch(\ ...\ )\ \{\ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00473}00473\ \textcolor{preprocessor}{\ \ \ \ \ \ fc::unhandled\_exception\ e(\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00474}00474\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ FC\_LOG\_MESSAGE(\ warn,\ "{}rethrow"{},\ FC\_FORMAT\_ARG\_PARAMS(\ \_\_VA\_ARGS\_\_)\ ),\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00475}00475\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::current\_exception()\ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00476}00476\ \textcolor{preprocessor}{\ \ \ \ \ \ wlog(\ "{}\$\{details\}"{},\ ("{}details"{},e.to\_detail\_string())\ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00477}00477\ \textcolor{preprocessor}{\ \ \ \ \ \ wdump(\ \_\_VA\_ARGS\_\_\ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00478}00478\ \textcolor{preprocessor}{\ \ \ \}}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00479}00479\ }
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00480}\mbox{\hyperlink{exception_8hpp_aed56aa2593b6f6fc6a839b7cb5c6e8e3}{00480}}\ \textcolor{preprocessor}{\#define\ FC\_LOG\_AND\_DROP(\ ...\ )\ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00481}00481\ \textcolor{preprocessor}{\ \ \ catch(\ const\ boost::interprocess::bad\_alloc\&\ )\ \{\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00482}00482\ \textcolor{preprocessor}{\ \ \ \ \ \ throw;\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00483}00483\ \textcolor{preprocessor}{\ \ \ \}\ catch(\ fc::exception\&\ er\ )\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00484}00484\ \textcolor{preprocessor}{\ \ \ \ \ \ wlog(\ "{}\$\{details\}"{},\ ("{}details"{},er.to\_detail\_string())\ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00485}00485\ \textcolor{preprocessor}{\ \ \ \}\ catch(\ const\ std::exception\&\ e\ )\ \{\ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00486}00486\ \textcolor{preprocessor}{\ \ \ \ \ \ fc::std\_exception\_wrapper\ sew(\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00487}00487\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ FC\_LOG\_MESSAGE(\ warn,\ "{}rethrow\ \$\{what\}:\ "{},FC\_FORMAT\_ARG\_PARAMS(\ \_\_VA\_ARGS\_\_\ \ )("{}what"{},e.what())\ ),\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00488}00488\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::current\_exception(),\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00489}00489\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_CORE\_TYPEID(e).name(),\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00490}00490\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ e.what()\ )\ ;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00491}00491\ \textcolor{preprocessor}{\ \ \ \ \ \ wlog(\ "{}\$\{details\}"{},\ ("{}details"{},sew.to\_detail\_string())\ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00492}00492\ \textcolor{preprocessor}{\ \ \ \}\ catch(\ ...\ )\ \{\ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00493}00493\ \textcolor{preprocessor}{\ \ \ \ \ \ fc::unhandled\_exception\ e(\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00494}00494\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ FC\_LOG\_MESSAGE(\ warn,\ "{}rethrow"{},\ FC\_FORMAT\_ARG\_PARAMS(\ \_\_VA\_ARGS\_\_)\ ),\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00495}00495\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::current\_exception()\ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00496}00496\ \textcolor{preprocessor}{\ \ \ \ \ \ wlog(\ "{}\$\{details\}"{},\ ("{}details"{},e.to\_detail\_string())\ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00497}00497\ \textcolor{preprocessor}{\ \ \ \}}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00498}00498\ }
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00499}00499\ }
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00505}\mbox{\hyperlink{exception_8hpp_af3731d6e3beb140d9e652adf7a18113b}{00505}}\ \textcolor{preprocessor}{\#define\ FC\_RETHROW\_EXCEPTIONS(\ LOG\_LEVEL,\ FORMAT,\ ...\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00506}00506\ \textcolor{preprocessor}{\ \ \ catch(\ const\ boost::interprocess::bad\_alloc\&\ )\ \{\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00507}00507\ \textcolor{preprocessor}{\ \ \ \ \ \ throw;\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00508}00508\ \textcolor{preprocessor}{\ \ \ \}\ catch(\ fc::exception\&\ er\ )\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00509}00509\ \textcolor{preprocessor}{\ \ \ \ \ \ FC\_RETHROW\_EXCEPTION(\ er,\ LOG\_LEVEL,\ FORMAT,\ \_\_VA\_ARGS\_\_\ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00510}00510\ \textcolor{preprocessor}{\ \ \ \}\ catch(\ const\ std::exception\&\ e\ )\ \{\ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00511}00511\ \textcolor{preprocessor}{\ \ \ \ \ \ fc::std\_exception\_wrapper\ sew(\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00512}00512\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ FC\_LOG\_MESSAGE(\ LOG\_LEVEL,\ "{}\$\{what\}:\ "{}\ FORMAT,\_\_VA\_ARGS\_\_("{}what"{},e.what())),\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00513}00513\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::current\_exception(),\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00514}00514\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_CORE\_TYPEID(e).name(),\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00515}00515\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ e.what()\ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00516}00516\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ throw\ sew;\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00517}00517\ \textcolor{preprocessor}{\ \ \ \}\ catch(\ ...\ )\ \{\ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00518}00518\ \textcolor{preprocessor}{\ \ \ \ \ \ throw\ fc::unhandled\_exception(\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00519}00519\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ FC\_LOG\_MESSAGE(\ LOG\_LEVEL,\ FORMAT,\_\_VA\_ARGS\_\_),\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00520}00520\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::current\_exception()\ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00521}00521\ \textcolor{preprocessor}{\ \ \ \}}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00522}00522\ }
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00523}\mbox{\hyperlink{exception_8hpp_a094902280cad82ad6529ebbd12a697eb}{00523}}\ \textcolor{preprocessor}{\#define\ FC\_CAPTURE\_AND\_RETHROW(\ ...\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00524}00524\ \textcolor{preprocessor}{\ \ \ catch(\ const\ boost::interprocess::bad\_alloc\&\ )\ \{\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00525}00525\ \textcolor{preprocessor}{\ \ \ \ \ \ throw;\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00526}00526\ \textcolor{preprocessor}{\ \ \ \}\ catch(\ fc::exception\&\ er\ )\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00527}00527\ \textcolor{preprocessor}{\ \ \ \ \ \ FC\_RETHROW\_EXCEPTION(\ er,\ warn,\ "{}"{},\ FC\_FORMAT\_ARG\_PARAMS(\_\_VA\_ARGS\_\_)\ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00528}00528\ \textcolor{preprocessor}{\ \ \ \}\ catch(\ const\ std::exception\&\ e\ )\ \{\ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00529}00529\ \textcolor{preprocessor}{\ \ \ \ \ \ fc::std\_exception\_wrapper\ sew(\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00530}00530\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ FC\_LOG\_MESSAGE(\ warn,\ "{}\$\{what\}:\ "{},FC\_FORMAT\_ARG\_PARAMS(\_\_VA\_ARGS\_\_)("{}what"{},e.what())),\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00531}00531\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::current\_exception(),\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00532}00532\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_CORE\_TYPEID(e).name(),\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00533}00533\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ e.what()\ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00534}00534\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ throw\ sew;\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00535}00535\ \textcolor{preprocessor}{\ \ \ \}\ catch(\ ...\ )\ \{\ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00536}00536\ \textcolor{preprocessor}{\ \ \ \ \ \ throw\ fc::unhandled\_exception(\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00537}00537\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ FC\_LOG\_MESSAGE(\ warn,\ "{}"{},FC\_FORMAT\_ARG\_PARAMS(\_\_VA\_ARGS\_\_)),\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00538}00538\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::current\_exception()\ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00539}00539\ \textcolor{preprocessor}{\ \ \ \}}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00540}00540\ }
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00541}\mbox{\hyperlink{exception_8hpp_a03f2a3185ee8e8b39a309dfd336b64b5}{00541}}\ \textcolor{preprocessor}{\#define\ FC\_CHECK\_DEADLINE(\ DEADLINE,\ ...\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00542}00542\ \textcolor{preprocessor}{\ \ FC\_MULTILINE\_MACRO\_BEGIN\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00543}00543\ \textcolor{preprocessor}{\ \ \ \ if(\ DEADLINE\ <\ fc::time\_point::maximum()\ \&\&\ DEADLINE\ <\ fc::time\_point::now()\ )\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00544}00544\ \textcolor{preprocessor}{\ \ \ \ \ \ \ auto\ log\_mgs\ =\ FC\_LOG\_MESSAGE(\ error,\ "{}deadline\ \$\{d\}\ exceeded\ by\ \$\{t\}us\ "{},\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00545}00545\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ FC\_FORMAT\_ARG\_PARAMS(\_\_VA\_ARGS\_\_)("{}d"{},\ DEADLINE)("{}t"{},\ fc::time\_point::now()\ -\/\ DEADLINE)\ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00546}00546\ \textcolor{preprocessor}{\ \ \ \ \ \ \ auto\ msg\ =\ log\_mgs.get\_limited\_message();\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00547}00547\ \textcolor{preprocessor}{\ \ \ \ \ \ \ throw\ fc::timeout\_exception(\ std::move(\ log\_mgs\ ),\ fc::timeout\_exception\_code,\ "{}timeout\_exception"{},\ std::move(\ msg\ )\ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00548}00548\ \textcolor{preprocessor}{\ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{exception_8hpp_source_l00549}00549\ \textcolor{preprocessor}{\ \ FC\_MULTILINE\_MACRO\_END}}
+
+\end{DoxyCode}

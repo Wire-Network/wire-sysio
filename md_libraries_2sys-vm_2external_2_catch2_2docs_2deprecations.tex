@@ -1,0 +1,59 @@
+\chapter{deprecations}
+\hypertarget{md_libraries_2sys-vm_2external_2_catch2_2docs_2deprecations}{}\label{md_libraries_2sys-vm_2external_2_catch2_2docs_2deprecations}\index{deprecations@{deprecations}}
+\label{_top}%
+ \doxysection*{Deprecations and incoming changes}
+
+This page documents current deprecations and upcoming planned changes inside Catch2. The difference between these is that a deprecated feature will be removed, while a planned change to a feature means that the feature will behave differently, but will still be present. Obviously, either of these is a breaking change, and thus will not happen until at least the next major release.
+
+\doxysubsection*{Deprecations}
+
+\doxysubsubsection*{{\ttfamily -\/-\/list-\/\texorpdfstring{$\ast$}{*}} return values}
+
+The return codes of the {\ttfamily -\/-\/list-\/\texorpdfstring{$\ast$}{*}} family of command line arguments will no longer be equal to the number of tests/tags/etc found, instead it will be 0 for success and non-\/zero for failure.
+
+\doxysubsubsection*{{\ttfamily -\/-\/list-\/test-\/names-\/only}}
+
+{\ttfamily -\/-\/list-\/test-\/names-\/only} command line argument will be removed.
+
+\doxysubsubsection*{{\ttfamily ANON\+\_\+\+TEST\+\_\+\+CASE}}
+
+{\ttfamily ANON\+\_\+\+TEST\+\_\+\+CASE} is scheduled for removal, as it can be fully replaced by a {\ttfamily TEST\+\_\+\+CASE} with no arguments.
+
+\doxysubsubsection*{Secondary description amongst tags}
+
+Currently, the tags part of {\ttfamily TEST\+\_\+\+CASE} (and others) macro can also contain text that is not part of tags. This text is then separated into a "{}description"{} of the test case, but the description is then never used apart from writing it out for {\ttfamily -\/-\/list-\/tests -\/v high}.
+
+Because it isn\textquotesingle{}t actually used nor documented, and brings complications to Catch2\textquotesingle{}s internals, description support will be removed.
+
+\doxysubsection*{Planned changes}
+
+\doxysubsubsection*{Reporter verbosities}
+
+The current implementation of verbosities, where the reporter is checked up-\/front whether it supports the requested verbosity, is fundamentally misguided and will be changed. The new implementation will no longer check whether the specified reporter supports the requested verbosity, instead it will be up to the reporters to deal with verbosities as they see fit (with an expectation that unsupported verbosities will be, at most, warnings, but not errors).
+
+\doxysubsubsection*{Output format of {\ttfamily -\/-\/list-\/\texorpdfstring{$\ast$}{*}} command line parameters}
+
+The various list operations will be piped through reporters. This means that e.\+g. XML reporter will write the output as machine-\/parseable XML, while the Console reporter will keep the current, human-\/oriented output.
+
+\doxysubsubsection*{{\ttfamily CHECKED\+\_\+\+IF} and {\ttfamily CHECKED\+\_\+\+ELSE}}
+
+To make the {\ttfamily CHECKED\+\_\+\+IF} and {\ttfamily CHECKED\+\_\+\+ELSE} macros more useful, they will be marked as "{}\+OK to fail"{} ({\ttfamily \doxylink{struct_catch_1_1_result_disposition_a3396cad6e2259af326b3aae93e23e9d8ac6212775ec7a943e9c49e451f5ff5467}{Catch\+::\+Result\+Disposition\+::\+Suppress\+Fail}} flag will be added), which means that their failure will not fail the test, making the {\ttfamily else} actually useful.
+
+\doxysubsubsection*{Change semantics of {\ttfamily \mbox{[}.\mbox{]}} and tag exclusion}
+
+Currently, given these 2 tests 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\textcolor{stringliteral}{"{}A"{}},\ \textcolor{stringliteral}{"{}[.][foo]"{}})\ \{\}}
+\DoxyCodeLine{\mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\textcolor{stringliteral}{"{}B"{}},\ \textcolor{stringliteral}{"{}[.][bar]"{}})\ \{\}}
+
+\end{DoxyCode}
+ specifying {\ttfamily \mbox{[}foo\mbox{]}} as the testspec will run test "{}\+A"{} and specifying {\ttfamily \texorpdfstring{$\sim$}{\string~}\mbox{[}foo\mbox{]}} will run test "{}\+B"{}, even though it is hidden. Also, specifying {\ttfamily \texorpdfstring{$\sim$}{\string~}\mbox{[}baz\mbox{]}} will run both tests. This behaviour is often surprising and will be changed so that hidden tests are included in a run only if they positively match a testspec.
+
+\doxysubsubsection*{Console Colour API}
+
+The API for Catch2\textquotesingle{}s console colour will be changed to take an extra argument, the stream to which the colour code should be applied.
+
+\DoxyHorRuler{0}
+
+
+\href{Readme.md\#top}{\texttt{ Home}} 

@@ -1,0 +1,88 @@
+\doxysection{plugins/test\+\_\+control\+\_\+api\+\_\+plugin/test\+\_\+control\+\_\+api\+\_\+plugin.cpp File Reference}
+\hypertarget{test__control__api__plugin_8cpp}{}\label{test__control__api__plugin_8cpp}\index{plugins/test\_control\_api\_plugin/test\_control\_api\_plugin.cpp@{plugins/test\_control\_api\_plugin/test\_control\_api\_plugin.cpp}}
+{\ttfamily \#include $<$sysio/test\+\_\+control\+\_\+api\+\_\+plugin/test\+\_\+control\+\_\+api\+\_\+plugin.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/exceptions.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/io/json.\+hpp$>$}\newline
+Include dependency graph for test\+\_\+control\+\_\+api\+\_\+plugin.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__control__api__plugin_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classsysio_1_1test__control__api__plugin__impl}{sysio\+::test\+\_\+control\+\_\+api\+\_\+plugin\+\_\+impl}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1async__result__visitor}{sysio\+::async\+\_\+result\+\_\+visitor}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{test__control__api__plugin_8cpp_adadf85cde0ceefdda8d298df0e961f02}{CALL\+\_\+\+WITH\+\_\+\+API\+\_\+400}}(api\+\_\+name,  api\+\_\+handle,  api\+\_\+namespace,  call\+\_\+name,  http\+\_\+response\+\_\+code,  params\+\_\+type)
+\item 
+\#define \mbox{\hyperlink{test__control__api__plugin_8cpp_adeb8711f048b492b66404f144f9ea61f}{TEST\+\_\+\+CONTROL\+\_\+\+RW\+\_\+\+CALL}}(call\+\_\+name,  http\+\_\+response\+\_\+code,  params\+\_\+type)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{test__control__api__plugin_8cpp_adadf85cde0ceefdda8d298df0e961f02}\index{test\_control\_api\_plugin.cpp@{test\_control\_api\_plugin.cpp}!CALL\_WITH\_API\_400@{CALL\_WITH\_API\_400}}
+\index{CALL\_WITH\_API\_400@{CALL\_WITH\_API\_400}!test\_control\_api\_plugin.cpp@{test\_control\_api\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{CALL\_WITH\_API\_400}{CALL\_WITH\_API\_400}}
+{\footnotesize\ttfamily \label{test__control__api__plugin_8cpp_adadf85cde0ceefdda8d298df0e961f02} 
+\#define CALL\+\_\+\+WITH\+\_\+\+API\+\_\+400(\begin{DoxyParamCaption}\item[{}]{api\+\_\+name}{, }\item[{}]{api\+\_\+handle}{, }\item[{}]{api\+\_\+namespace}{, }\item[{}]{call\+\_\+name}{, }\item[{}]{http\+\_\+response\+\_\+code}{, }\item[{}]{params\+\_\+type}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\{std::string(\textcolor{stringliteral}{"{}/v1/"{}}\ \#api\_name\ \textcolor{stringliteral}{"{}/"{}}\ \#call\_name),\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ [api\_handle](string,\ \textcolor{keywordtype}{string}\ body,\ url\_response\_callback\ cb)\ \textcolor{keyword}{mutable}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}}\ =\ parse\_params<api\_namespace::call\_name\ \#\#\ \_params,\ params\_type>(body);\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}\ result(\ api\_handle.call\_name(\ std::move(\mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}})\ )\ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ cb(http\_response\_code,\ std::move(result));\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ http\_plugin::handle\_exception(\#api\_name,\ \#call\_name,\ body,\ cb);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \}\}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{test__control__api__plugin_8cpp_source_l00034}{34}} of file \mbox{\hyperlink{test__control__api__plugin_8cpp_source}{test\+\_\+control\+\_\+api\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00034\ \textcolor{preprocessor}{\#define\ CALL\_WITH\_API\_400(api\_name,\ api\_handle,\ api\_namespace,\ call\_name,\ http\_response\_code,\ params\_type)\ \(\backslash\)}}
+\DoxyCodeLine{00035\ \textcolor{preprocessor}{\{std::string("{}/v1/"{}\ \#api\_name\ "{}/"{}\ \#call\_name),\ \(\backslash\)}}
+\DoxyCodeLine{00036\ \textcolor{preprocessor}{\ \ \ [api\_handle](string,\ string\ body,\ url\_response\_callback\ cb)\ mutable\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00037\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ try\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00038\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ auto\ params\ =\ parse\_params<api\_namespace::call\_name\ \#\#\ \_params,\ params\_type>(body);\(\backslash\)}}
+\DoxyCodeLine{00039\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ fc::variant\ result(\ api\_handle.call\_name(\ std::move(params)\ )\ );\ \(\backslash\)}}
+\DoxyCodeLine{00040\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ cb(http\_response\_code,\ std::move(result));\ \(\backslash\)}}
+\DoxyCodeLine{00041\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \}\ catch\ (...)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00042\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ http\_plugin::handle\_exception(\#api\_name,\ \#call\_name,\ body,\ cb);\ \(\backslash\)}}
+\DoxyCodeLine{00043\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00044\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \}\}}}
+
+\end{DoxyCode}
+\Hypertarget{test__control__api__plugin_8cpp_adeb8711f048b492b66404f144f9ea61f}\index{test\_control\_api\_plugin.cpp@{test\_control\_api\_plugin.cpp}!TEST\_CONTROL\_RW\_CALL@{TEST\_CONTROL\_RW\_CALL}}
+\index{TEST\_CONTROL\_RW\_CALL@{TEST\_CONTROL\_RW\_CALL}!test\_control\_api\_plugin.cpp@{test\_control\_api\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CONTROL\_RW\_CALL}{TEST\_CONTROL\_RW\_CALL}}
+{\footnotesize\ttfamily \label{test__control__api__plugin_8cpp_adeb8711f048b492b66404f144f9ea61f} 
+\#define TEST\+\_\+\+CONTROL\+\_\+\+RW\+\_\+\+CALL(\begin{DoxyParamCaption}\item[{}]{call\+\_\+name}{, }\item[{}]{http\+\_\+response\+\_\+code}{, }\item[{}]{params\+\_\+type}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{test__control__api__plugin_8cpp_adadf85cde0ceefdda8d298df0e961f02}{CALL\_WITH\_API\_400}}(test\_control,\ rw\_api,\ test\_control\_apis::read\_write,\ call\_name,\ http\_response\_code,\ params\_type)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{test__control__api__plugin_8cpp_source_l00046}{46}} of file \mbox{\hyperlink{test__control__api__plugin_8cpp_source}{test\+\_\+control\+\_\+api\+\_\+plugin.\+cpp}}.
+

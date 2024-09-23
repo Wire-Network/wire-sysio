@@ -1,0 +1,117 @@
+\doxysection{memfunc.\+cpp}
+\hypertarget{memfunc_8cpp_source}{}\label{memfunc_8cpp_source}\index{libraries/fc/libraries/ff/depends/xbyak/sample/memfunc.cpp@{libraries/fc/libraries/ff/depends/xbyak/sample/memfunc.cpp}}
+\mbox{\hyperlink{memfunc_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <stdio.h>}}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <stdlib.h>}}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <memory.h>}}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00004}\mbox{\hyperlink{memfunc_8cpp_a3ede98665532cce0e33f614fac5150f9}{00004}}\ \textcolor{preprocessor}{\#define\ XBYAK\_NO\_OP\_NAMES}}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{xbyak_8h}{xbyak/xbyak.h}}>}}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00007}\mbox{\hyperlink{struct_a}{00007}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{namespace_a}{A}}\ \{}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00008}\mbox{\hyperlink{struct_a_a8e38d7d071791e910ec54cd49b1d1743}{00008}}\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{struct_a_a8e38d7d071791e910ec54cd49b1d1743}{x\_}};}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00009}\mbox{\hyperlink{struct_a_ae1898a9314066b0e7b78fdb7dd889b83}{00009}}\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{struct_a_ae1898a9314066b0e7b78fdb7dd889b83}{y\_}};}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00010}\mbox{\hyperlink{struct_a_a4142862ec27f2f3d8deb026d51a5c5a0}{00010}}\ \ \ \ \ \mbox{\hyperlink{struct_a_a4142862ec27f2f3d8deb026d51a5c5a0}{A}}()\ :\ x\_(3),\ y\_(5)\ \{\}}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00011}\mbox{\hyperlink{struct_a_a668a711e7063925b5bcd2877bb97943d}{00011}}\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{struct_a_a668a711e7063925b5bcd2877bb97943d}{func}}(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \textcolor{keywordtype}{int}\ b,\ \textcolor{keywordtype}{int}\ c,\ \textcolor{keywordtype}{int}\ d,\ \textcolor{keywordtype}{int}\ e)\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ x\_\ +\ y\_\ +\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ +\ b\ +\ c\ +\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ +\ e;\ \}}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00012}00012\ \};}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00014}00014\ \textcolor{preprocessor}{\#ifdef\ \_MSC\_VER}}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00015}00015\ \textcolor{preprocessor}{\ \ \ \ \#pragma\ warning(disable\ :\ 4510\ 4512\ 4610)}}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00016}00016\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00018}00018\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_code}{Code}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{class_xbyak_1_1_code_generator}{Xbyak::CodeGenerator}}\ \{}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00019}\mbox{\hyperlink{struct_code_a3605683bd8fd54691437ff05ba4431b9}{00019}}\ \ \ \ \ \mbox{\hyperlink{struct_code_a3605683bd8fd54691437ff05ba4431b9}{Code}}()}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00020}00020\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00021}00021\ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespace_xbyak}{Xbyak}};}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00023}00023\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ RET\_ADJ\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00024}00024\ \textcolor{preprocessor}{\#ifdef\ XBYAK32}}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00025}00025\ \textcolor{preprocessor}{\ \ \ \ \#ifdef\ \_WIN32}}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00026}00026\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ PARA\_ADJ\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00027}00027\ \ \ \ \ \ \ \ \ RET\_ADJ\ =\ 5\ *\ 4;}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00028}00028\ \textcolor{preprocessor}{\ \ \ \ \#else}}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00029}00029\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ PARA\_ADJ\ =\ 4;}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00030}00030\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_code_generator_ac01f285f4da251eb2fa144d5c49c9e3e}{mov}}(\mbox{\hyperlink{class_xbyak_1_1_code_generator_a7afdbb52d9aa5c1fb0a9e42181e79621}{ecx}},\ \mbox{\hyperlink{class_xbyak_1_1_code_generator_afed7c06309f882ffc109dd9136eb3ee1}{ptr}}\ [\mbox{\hyperlink{class_xbyak_1_1_code_generator_a677a65f34079fe5e53c397f0fb00e018}{esp}}\ +\ 4]);}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00031}00031\ \textcolor{preprocessor}{\ \ \ \ \#endif}}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00032}00032\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00033}00033\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00034}00034\ \textcolor{preprocessor}{\#ifdef\ XBYAK32}}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00035}00035\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_xbyak_1_1_reg32}{Reg32}}\&\ self;}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00036}00036\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00037}00037\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ Reg64\&\ self;}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00038}00038\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00039}00039\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{calc2_8cpp_a0cab31dfe640baa3b72c492ed1d0a4a9}{Operand}}\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}};}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00040}00040\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{calc2_8cpp_a0cab31dfe640baa3b72c492ed1d0a4a9}{Operand}}\&\ b;}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00041}00041\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{calc2_8cpp_a0cab31dfe640baa3b72c492ed1d0a4a9}{Operand}}\&\ c;}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00042}00042\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{calc2_8cpp_a0cab31dfe640baa3b72c492ed1d0a4a9}{Operand}}\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}};}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00043}00043\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{calc2_8cpp_a0cab31dfe640baa3b72c492ed1d0a4a9}{Operand}}\&\ e;}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00044}00044\ \ \ \ \ \ \ \ \ \}\ para\ =\ \{}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00045}00045\ \textcolor{preprocessor}{\#if\ defined(XBYAK64\_WIN)}}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00046}00046\ \ \ \ \ \ \ \ \ \ \ \ \ rcx,}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00047}00047\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_code_generator_ab442b30a131a655e6a8b3d47a80935a6}{edx}},}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \ \ \ r8d,}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \ \ \ \ r9d,}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00050}00050\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_code_generator_afed7c06309f882ffc109dd9136eb3ee1}{ptr}}\ [rsp\ +\ 8\ *\ 5],}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00051}00051\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_code_generator_afed7c06309f882ffc109dd9136eb3ee1}{ptr}}\ [rsp\ +\ 8\ *\ 6],}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00052}00052\ \textcolor{preprocessor}{\#elif\ defined(XBYAK64\_GCC)}}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \ \ \ rdi,}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_code_generator_ac8e01e4935949b4f0eefc2d9ea358039}{esi}},}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_code_generator_ab442b30a131a655e6a8b3d47a80935a6}{edx}},}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_code_generator_a7afdbb52d9aa5c1fb0a9e42181e79621}{ecx}},}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \ \ \ r8d,}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \ \ \ r9d,}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00059}00059\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_code_generator_a7afdbb52d9aa5c1fb0a9e42181e79621}{ecx}},}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00061}00061\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_code_generator_afed7c06309f882ffc109dd9136eb3ee1}{ptr}}\ [\mbox{\hyperlink{class_xbyak_1_1_code_generator_a677a65f34079fe5e53c397f0fb00e018}{esp}}\ +\ 4\ +\ PARA\_ADJ],}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00062}00062\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_code_generator_afed7c06309f882ffc109dd9136eb3ee1}{ptr}}\ [\mbox{\hyperlink{class_xbyak_1_1_code_generator_a677a65f34079fe5e53c397f0fb00e018}{esp}}\ +\ 8\ +\ PARA\_ADJ],}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_code_generator_afed7c06309f882ffc109dd9136eb3ee1}{ptr}}\ [\mbox{\hyperlink{class_xbyak_1_1_code_generator_a677a65f34079fe5e53c397f0fb00e018}{esp}}\ +\ 12\ +\ PARA\_ADJ],}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00064}00064\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_code_generator_afed7c06309f882ffc109dd9136eb3ee1}{ptr}}\ [\mbox{\hyperlink{class_xbyak_1_1_code_generator_a677a65f34079fe5e53c397f0fb00e018}{esp}}\ +\ 16\ +\ PARA\_ADJ],}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00065}00065\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_code_generator_afed7c06309f882ffc109dd9136eb3ee1}{ptr}}\ [\mbox{\hyperlink{class_xbyak_1_1_code_generator_a677a65f34079fe5e53c397f0fb00e018}{esp}}\ +\ 20\ +\ PARA\_ADJ],}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00066}00066\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00067}00067\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00068}00068\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_code_generator_ac01f285f4da251eb2fa144d5c49c9e3e}{mov}}(\mbox{\hyperlink{class_xbyak_1_1_code_generator_a682bca64626bf98c33660e1e245392d1}{eax}},\ \mbox{\hyperlink{class_xbyak_1_1_code_generator_afed7c06309f882ffc109dd9136eb3ee1}{ptr}}\ [para.self]);}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00069}00069\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_code_generator_a85fe10a4f726797de78179d535bcb626}{add}}(\mbox{\hyperlink{class_xbyak_1_1_code_generator_a682bca64626bf98c33660e1e245392d1}{eax}},\ \mbox{\hyperlink{class_xbyak_1_1_code_generator_afed7c06309f882ffc109dd9136eb3ee1}{ptr}}\ [para.self\ +\ 4]);}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00070}00070\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_code_generator_a85fe10a4f726797de78179d535bcb626}{add}}(\mbox{\hyperlink{class_xbyak_1_1_code_generator_a682bca64626bf98c33660e1e245392d1}{eax}},\ para.a);}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00071}00071\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_code_generator_a85fe10a4f726797de78179d535bcb626}{add}}(\mbox{\hyperlink{class_xbyak_1_1_code_generator_a682bca64626bf98c33660e1e245392d1}{eax}},\ para.b);}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00072}00072\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_code_generator_a85fe10a4f726797de78179d535bcb626}{add}}(\mbox{\hyperlink{class_xbyak_1_1_code_generator_a682bca64626bf98c33660e1e245392d1}{eax}},\ para.c);}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00073}00073\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_code_generator_a85fe10a4f726797de78179d535bcb626}{add}}(\mbox{\hyperlink{class_xbyak_1_1_code_generator_a682bca64626bf98c33660e1e245392d1}{eax}},\ para.d);}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00074}00074\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_code_generator_a85fe10a4f726797de78179d535bcb626}{add}}(\mbox{\hyperlink{class_xbyak_1_1_code_generator_a682bca64626bf98c33660e1e245392d1}{eax}},\ para.e);}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00075}00075\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}(RET\_ADJ);}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00076}00076\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00077}00077\ \};}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00079}\mbox{\hyperlink{memfunc_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{00079}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{memfunc_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}()}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00080}00080\ \{}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00081}00081\ \textcolor{preprocessor}{\#ifdef\ XBYAK64}}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00082}00082\ \ \ \ \ printf(\textcolor{stringliteral}{"{}64bit"{}});}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00083}00083\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00084}00084\ \ \ \ \ printf(\textcolor{stringliteral}{"{}32bit"{}});}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00085}00085\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00086}00086\ \textcolor{preprocessor}{\#ifdef\ \_WIN32}}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00087}00087\ \ \ \ \ puts(\textcolor{stringliteral}{"{}\ win"{}});}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00088}00088\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00089}00089\ \ \ \ \ puts(\textcolor{stringliteral}{"{}\ linux"{}});}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00090}00090\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00091}00091\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00092}00092\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_code}{Code}}\ code;}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00093}00093\ \ \ \ \ \ \ \ \ int\ (\mbox{\hyperlink{namespace_a}{A}}::*\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})(int,\ int,\ int,\ int,\ int)\ \textcolor{keyword}{const}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00094}00094\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{void}\ *addr\ =\ code.\mbox{\hyperlink{class_xbyak_1_1_code_array_a9ad8a38842d1e0de9045338e460f58ce}{getCode}}<\textcolor{keywordtype}{void}*>();}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00095}00095\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(\&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\ \&addr,\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{void}*));}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00096}00096\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ 10;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00097}00097\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_a}{A}}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}};}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00098}00098\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ t1,\ t2,\ t3,\ t4,\ t5,\ x,\ y;}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00099}00099\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.x\_\ =\ rand();\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.y\_\ =\ rand();}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00100}00100\ \ \ \ \ \ \ \ \ \ \ \ \ t1\ =\ rand();\ t2\ =\ rand();\ t3\ =\ rand();}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00101}00101\ \ \ \ \ \ \ \ \ \ \ \ \ t4\ =\ rand();\ t5\ =\ rand();}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00102}00102\ \ \ \ \ \ \ \ \ \ \ \ \ x\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.func(t1,\ t2,\ t3,\ t4,\ t5);}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00103}00103\ \ \ \ \ \ \ \ \ \ \ \ \ y\ =\ (\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.*\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})(t1,\ t2,\ t3,\ t4,\ t5);}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00104}00104\ \ \ \ \ \ \ \ \ \ \ \ \ printf(\textcolor{stringliteral}{"{}\%c\ \%d,\ \%d\(\backslash\)n"{}},\ x\ ==\ y\ ?\ \textcolor{charliteral}{'o'}\ :\ \textcolor{charliteral}{'x'},\ x,\ y);}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00105}00105\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00106}00106\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (std::exception\&\ e)\ \{}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00107}00107\ \ \ \ \ \ \ \ \ printf(\textcolor{stringliteral}{"{}err=\%s\(\backslash\)n"{}},\ e.what());}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00108}00108\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00109}00109\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00110}00110\ \}}
+\DoxyCodeLine{\Hypertarget{memfunc_8cpp_source_l00111}00111\ }
+
+\end{DoxyCode}

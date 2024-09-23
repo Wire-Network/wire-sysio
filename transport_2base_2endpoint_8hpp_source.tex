@@ -1,0 +1,51 @@
+\doxysection{endpoint.\+hpp}
+\hypertarget{transport_2base_2endpoint_8hpp_source}{}\label{transport_2base_2endpoint_8hpp_source}\index{libraries/fc/vendor/websocketpp/websocketpp/transport/base/endpoint.hpp@{libraries/fc/vendor/websocketpp/websocketpp/transport/base/endpoint.hpp}}
+\mbox{\hyperlink{transport_2base_2endpoint_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{transport_2base_2endpoint_8hpp_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{transport_2base_2endpoint_8hpp_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2014,\ Peter\ Thorson.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{transport_2base_2endpoint_8hpp_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{transport_2base_2endpoint_8hpp_source_l00004}00004\ \textcolor{comment}{\ *\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{transport_2base_2endpoint_8hpp_source_l00005}00005\ \textcolor{comment}{\ *\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are\ met:}}
+\DoxyCodeLine{\Hypertarget{transport_2base_2endpoint_8hpp_source_l00006}00006\ \textcolor{comment}{\ *\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{transport_2base_2endpoint_8hpp_source_l00007}00007\ \textcolor{comment}{\ *\ \ \ \ \ \ \ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{transport_2base_2endpoint_8hpp_source_l00008}00008\ \textcolor{comment}{\ *\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{transport_2base_2endpoint_8hpp_source_l00009}00009\ \textcolor{comment}{\ *\ \ \ \ \ \ \ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer\ in\ the}}
+\DoxyCodeLine{\Hypertarget{transport_2base_2endpoint_8hpp_source_l00010}00010\ \textcolor{comment}{\ *\ \ \ \ \ \ \ documentation\ and/or\ other\ materials\ provided\ with\ the\ distribution.}}
+\DoxyCodeLine{\Hypertarget{transport_2base_2endpoint_8hpp_source_l00011}00011\ \textcolor{comment}{\ *\ \ \ \ \ *\ Neither\ the\ name\ of\ the\ WebSocket++\ Project\ nor\ the}}
+\DoxyCodeLine{\Hypertarget{transport_2base_2endpoint_8hpp_source_l00012}00012\ \textcolor{comment}{\ *\ \ \ \ \ \ \ names\ of\ its\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products}}
+\DoxyCodeLine{\Hypertarget{transport_2base_2endpoint_8hpp_source_l00013}00013\ \textcolor{comment}{\ *\ \ \ \ \ \ \ derived\ from\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{transport_2base_2endpoint_8hpp_source_l00014}00014\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{transport_2base_2endpoint_8hpp_source_l00015}00015\ \textcolor{comment}{\ *\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS\ "{}AS\ IS"{}}}
+\DoxyCodeLine{\Hypertarget{transport_2base_2endpoint_8hpp_source_l00016}00016\ \textcolor{comment}{\ *\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ THE}}
+\DoxyCodeLine{\Hypertarget{transport_2base_2endpoint_8hpp_source_l00017}00017\ \textcolor{comment}{\ *\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR\ A\ PARTICULAR\ PURPOSE}}
+\DoxyCodeLine{\Hypertarget{transport_2base_2endpoint_8hpp_source_l00018}00018\ \textcolor{comment}{\ *\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ PETER\ THORSON\ BE\ LIABLE\ FOR\ ANY}}
+\DoxyCodeLine{\Hypertarget{transport_2base_2endpoint_8hpp_source_l00019}00019\ \textcolor{comment}{\ *\ DIRECT,\ INDIRECT,\ INCIDENTAL,\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES}}
+\DoxyCodeLine{\Hypertarget{transport_2base_2endpoint_8hpp_source_l00020}00020\ \textcolor{comment}{\ *\ (INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;}}
+\DoxyCodeLine{\Hypertarget{transport_2base_2endpoint_8hpp_source_l00021}00021\ \textcolor{comment}{\ *\ LOSS\ OF\ USE,\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND}}
+\DoxyCodeLine{\Hypertarget{transport_2base_2endpoint_8hpp_source_l00022}00022\ \textcolor{comment}{\ *\ ON\ ANY\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{transport_2base_2endpoint_8hpp_source_l00023}00023\ \textcolor{comment}{\ *\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE\ OF\ THIS}}
+\DoxyCodeLine{\Hypertarget{transport_2base_2endpoint_8hpp_source_l00024}00024\ \textcolor{comment}{\ *\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{transport_2base_2endpoint_8hpp_source_l00025}00025\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{transport_2base_2endpoint_8hpp_source_l00026}00026\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{transport_2base_2endpoint_8hpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{transport_2base_2endpoint_8hpp_source_l00028}00028\ \textcolor{preprocessor}{\#ifndef\ WEBSOCKETPP\_TRANSPORT\_BASE\_HPP}}
+\DoxyCodeLine{\Hypertarget{transport_2base_2endpoint_8hpp_source_l00029}00029\ \textcolor{preprocessor}{\#define\ WEBSOCKETPP\_TRANSPORT\_BASE\_HPP}}
+\DoxyCodeLine{\Hypertarget{transport_2base_2endpoint_8hpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{transport_2base_2endpoint_8hpp_source_l00031}00031\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{functional_8hpp}{websocketpp/common/functional.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{transport_2base_2endpoint_8hpp_source_l00032}00032\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{system__error_8hpp}{websocketpp/common/system\_error.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{transport_2base_2endpoint_8hpp_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{transport_2base_2endpoint_8hpp_source_l00034}00034\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacewebsocketpp}{websocketpp}}\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2base_2endpoint_8hpp_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{transport_2base_2endpoint_8hpp_source_l00066}00066\ \textcolor{keyword}{namespace\ }transport\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2base_2endpoint_8hpp_source_l00067}00067\ }
+\DoxyCodeLine{\Hypertarget{transport_2base_2endpoint_8hpp_source_l00069}\mbox{\hyperlink{namespacewebsocketpp_1_1transport_a9326ea831379368ee47841b2e46cb009}{00069}}\ \textcolor{keyword}{typedef}\ lib::function<void(lib::error\_code\ \textcolor{keyword}{const}\ \&)>\ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_a9326ea831379368ee47841b2e46cb009}{accept\_handler}};}
+\DoxyCodeLine{\Hypertarget{transport_2base_2endpoint_8hpp_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{transport_2base_2endpoint_8hpp_source_l00072}\mbox{\hyperlink{namespacewebsocketpp_1_1transport_ac392fca34e946b48414278c0c3addfa5}{00072}}\ \textcolor{keyword}{typedef}\ lib::function<void(lib::error\_code\ \textcolor{keyword}{const}\ \&)>\ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_ac392fca34e946b48414278c0c3addfa5}{connect\_handler}};}
+\DoxyCodeLine{\Hypertarget{transport_2base_2endpoint_8hpp_source_l00073}00073\ }
+\DoxyCodeLine{\Hypertarget{transport_2base_2endpoint_8hpp_source_l00074}00074\ \}\ \textcolor{comment}{//\ namespace\ transport}}
+\DoxyCodeLine{\Hypertarget{transport_2base_2endpoint_8hpp_source_l00075}00075\ \}\ \textcolor{comment}{//\ namespace\ websocketpp}}
+\DoxyCodeLine{\Hypertarget{transport_2base_2endpoint_8hpp_source_l00076}00076\ }
+\DoxyCodeLine{\Hypertarget{transport_2base_2endpoint_8hpp_source_l00077}00077\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ WEBSOCKETPP\_TRANSPORT\_BASE\_HPP}}
+
+\end{DoxyCode}

@@ -1,0 +1,16 @@
+<map id="sysio::chain::block_log::is_pruned_log" name="sysio::chain::block_log::is_pruned_log">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,96,139,137"/>
+<area shape="rect" id="Node000002" href="$classfc_1_1cfile.html#a9e01adaeee108420312ed271133a2d7d" title=" " alt="" coords="210,55,310,80"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="138,97,194,82,195,87,140,102"/>
+<area shape="rect" id="Node000005" href="$classfc_1_1cfile.html#ac4a0191d7846c07a907d3c7eb35e848d" title=" " alt="" coords="187,104,333,130"/>
+<area shape="poly" id="edge6_Node000001_Node000005" title=" " alt="" coords="139,114,171,114,171,120,139,120"/>
+<area shape="rect" id="Node000006" href="$namespacefc_1_1raw.html#a0b442d98ceb22dd5a6ae84745e43ffab" title=" " alt="" coords="204,177,316,203"/>
+<area shape="poly" id="edge7_Node000001_Node000006" title=" " alt="" coords="127,135,211,169,209,174,125,140"/>
+<area shape="rect" id="Node000003" href="$classfc_1_1cfile.html#a3b11f29f74860527a8bba66e4ae0317d" title=" " alt="" coords="381,29,484,55"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="310,58,365,49,366,55,311,63"/>
+<area shape="rect" id="Node000004" href="$classfc_1_1path.html#ab1eae2062df4ea01435348ec52fb3784" title=" " alt="" coords="532,55,687,80"/>
+<area shape="poly" id="edge5_Node000002_Node000004" title=" " alt="" coords="311,65,517,65,517,70,311,70"/>
+<area shape="poly" id="edge3_Node000003_Node000003" title=" " alt="" coords="403,30,398,21,401,11,413,5,433,3,454,5,465,12,462,16,452,10,433,8,415,10,405,15,403,20,408,28"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="485,47,517,52,516,57,484,52"/>
+<area shape="poly" id="edge8_Node000006_Node000006" title=" " alt="" coords="231,178,225,169,228,159,240,153,260,151,281,153,292,160,289,164,279,158,260,156,242,158,232,163,230,168,235,176"/>
+</map>

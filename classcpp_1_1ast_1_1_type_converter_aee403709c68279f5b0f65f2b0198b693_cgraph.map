@@ -1,0 +1,11 @@
+<map id="cpp.ast.TypeConverter.CreateReturnType" name="cpp.ast.TypeConverter.CreateReturnType">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,201,46"/>
+<area shape="rect" id="Node000002" href="$classcpp_1_1ast_1_1_type_converter.html#ab4d1f20ddb72e831c4f01a946c12b1f3" title=" " alt="" coords="249,5,471,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="201,23,233,23,233,28,201,28"/>
+<area shape="rect" id="Node000003" href="$classcpp_1_1ast_1_1_type_converter.html#addae0e30b289a768cc9fa1e7e5740b2a" title=" " alt="" coords="765,5,922,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="471,14,519,11,618,8,717,11,750,13,750,18,717,16,618,13,519,16,472,19"/>
+<area shape="rect" id="Node000004" href="$classcpp_1_1ast_1_1_type_converter.html#a7742fbf10acd32ae2931a2c6c2813a6d" title=" " alt="" coords="519,50,717,76"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="472,39,510,45,509,50,471,44"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="699,47,749,39,750,44,700,52"/>
+<area shape="poly" id="edge5_Node000004_Node000004" title=" " alt="" coords="581,51,573,42,578,32,593,26,618,24,646,26,660,33,657,38,644,31,618,29,594,31,581,36,579,41,585,48"/>
+</map>

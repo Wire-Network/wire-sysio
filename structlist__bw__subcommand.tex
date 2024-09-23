@@ -1,0 +1,104 @@
+\doxysection{list\+\_\+bw\+\_\+subcommand Struct Reference}
+\hypertarget{structlist__bw__subcommand}{}\label{structlist__bw__subcommand}\index{list\_bw\_subcommand@{list\_bw\_subcommand}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structlist__bw__subcommand_aec0cc3e4fa1c272feedc64742d1db2b7}{list\+\_\+bw\+\_\+subcommand}} (\mbox{\hyperlink{class_c_l_i_1_1_app}{CLI\+::\+App}} \texorpdfstring{$\ast$}{*}action\+Root)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structlist__bw__subcommand_ae997c9b12afeae5ca8754fff8213715c}{account}}
+\item 
+bool \mbox{\hyperlink{structlist__bw__subcommand_a1a3d0e8e2085a54280af551c67cb2732}{print\+\_\+json}} = false
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01652}{1652}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structlist__bw__subcommand_aec0cc3e4fa1c272feedc64742d1db2b7}\index{list\_bw\_subcommand@{list\_bw\_subcommand}!list\_bw\_subcommand@{list\_bw\_subcommand}}
+\index{list\_bw\_subcommand@{list\_bw\_subcommand}!list\_bw\_subcommand@{list\_bw\_subcommand}}
+\doxysubsubsection{\texorpdfstring{list\_bw\_subcommand()}{list\_bw\_subcommand()}}
+{\footnotesize\ttfamily \label{structlist__bw__subcommand_aec0cc3e4fa1c272feedc64742d1db2b7} 
+list\+\_\+bw\+\_\+subcommand\+::list\+\_\+bw\+\_\+subcommand (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_c_l_i_1_1_app}{CLI\+::\+App}} \texorpdfstring{$\ast$}{*}}]{action\+Root}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01656}{1656}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01656\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01657\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ list\_bw\ =\ actionRoot-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_a8b461d2233ec4121259011b5ed24b336}{add\_subcommand}}(\textcolor{stringliteral}{"{}listbw"{}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}List\ delegated\ bandwidth"{}}));}
+\DoxyCodeLine{01658\ \ \ \ \ \ \ list\_bw-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_a8c812d42c7720ecb5cd0aec41b5aa941}{add\_option}}(\textcolor{stringliteral}{"{}account"{}},\ account,\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}The\ account\ delegated\ bandwidth"{}}))-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a}{required}}();}
+\DoxyCodeLine{01659\ \ \ \ \ \ \ list\_bw-\/>add\_flag(\textcolor{stringliteral}{"{}-\/-\/json,-\/j"{}},\ \mbox{\hyperlink{structlist__bw__subcommand_a1a3d0e8e2085a54280af551c67cb2732}{print\_json}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}Output\ in\ JSON\ format"{}})\ );}
+\DoxyCodeLine{01660\ }
+\DoxyCodeLine{01661\ \ \ \ \ \ \ list\_bw-\/>callback([\textcolor{keyword}{this}]\ \{}
+\DoxyCodeLine{01662\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//get\ entire\ table\ in\ scope\ of\ user\ account}}
+\DoxyCodeLine{01663\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ result\ =\ \mbox{\hyperlink{programs_2clio_2main_8cpp_af931af8e9f099860a2670931f8d3ad2c}{call}}(\mbox{\hyperlink{namespacesysio_1_1client_1_1http_a74c28475d2f7d2cb4c99cb361c2279a0}{get\_table\_func}},\ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}(\textcolor{stringliteral}{"{}json"{}},\ \textcolor{keyword}{true})}
+\DoxyCodeLine{01664\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}code"{}},\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(config::system\_account\_name).\mbox{\hyperlink{namespacefc_a4e07b3870aa72f8c38bdd5f78044dad1}{to\_string}}())}
+\DoxyCodeLine{01665\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}scope"{}},\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(account).\mbox{\hyperlink{namespacefc_a4e07b3870aa72f8c38bdd5f78044dad1}{to\_string}}())}
+\DoxyCodeLine{01666\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}table"{}},\ \textcolor{stringliteral}{"{}delband"{}})}
+\DoxyCodeLine{01667\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{01668\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{structlist__bw__subcommand_a1a3d0e8e2085a54280af551c67cb2732}{print\_json}})\ \{}
+\DoxyCodeLine{01669\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ res\ =\ result.as<\mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1get__table__rows__result}{sysio::chain\_apis::read\_only::get\_table\_rows\_result}}>();}
+\DoxyCodeLine{01670\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ !res.rows.empty()\ )\ \{}
+\DoxyCodeLine{01671\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ std::setw(13)\ <<\ std::left\ <<\ \textcolor{stringliteral}{"{}Receiver"{}}\ <<\ std::setw(21)\ <<\ std::left\ <<\ \textcolor{stringliteral}{"{}Net\ bandwidth"{}}}
+\DoxyCodeLine{01672\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ std::setw(21)\ <<\ std::left\ <<\ \textcolor{stringliteral}{"{}CPU\ bandwidth"{}}\ <<\ std::endl;}
+\DoxyCodeLine{01673\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ :\ res.rows\ )\{}
+\DoxyCodeLine{01674\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ std::setw(13)\ <<\ std::left\ <<\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}[\textcolor{stringliteral}{"{}to"{}}].as\_string()}
+\DoxyCodeLine{01675\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ std::setw(21)\ <<\ std::left\ <<\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}[\textcolor{stringliteral}{"{}net\_weight"{}}].as\_string()}
+\DoxyCodeLine{01676\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ std::setw(21)\ <<\ std::left\ <<\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}[\textcolor{stringliteral}{"{}cpu\_weight"{}}].as\_string()}
+\DoxyCodeLine{01677\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ std::endl;}
+\DoxyCodeLine{01678\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01679\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{01680\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}Delegated\ bandwidth\ not\ found"{}}\ <<\ std::endl;}
+\DoxyCodeLine{01681\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01682\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{01683\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ \mbox{\hyperlink{classfc_1_1json_ae6c022ab581a9552ae2c97ff5d73aaf8}{fc::json::to\_pretty\_string}}(result)\ <<\ std::endl;}
+\DoxyCodeLine{01684\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01685\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{01686\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structlist__bw__subcommand_aec0cc3e4fa1c272feedc64742d1db2b7_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structlist__bw__subcommand_ae997c9b12afeae5ca8754fff8213715c}\index{list\_bw\_subcommand@{list\_bw\_subcommand}!account@{account}}
+\index{account@{account}!list\_bw\_subcommand@{list\_bw\_subcommand}}
+\doxysubsubsection{\texorpdfstring{account}{account}}
+{\footnotesize\ttfamily \label{structlist__bw__subcommand_ae997c9b12afeae5ca8754fff8213715c} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} list\+\_\+bw\+\_\+subcommand\+::account}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01653}{1653}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{structlist__bw__subcommand_a1a3d0e8e2085a54280af551c67cb2732}\index{list\_bw\_subcommand@{list\_bw\_subcommand}!print\_json@{print\_json}}
+\index{print\_json@{print\_json}!list\_bw\_subcommand@{list\_bw\_subcommand}}
+\doxysubsubsection{\texorpdfstring{print\_json}{print\_json}}
+{\footnotesize\ttfamily \label{structlist__bw__subcommand_a1a3d0e8e2085a54280af551c67cb2732} 
+bool list\+\_\+bw\+\_\+subcommand\+::print\+\_\+json = false}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01654}{1654}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+programs/clio/\mbox{\hyperlink{programs_2clio_2main_8cpp}{main.\+cpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,74 @@
+\doxysection{testing\+::internal\+::Return\+Ref\+Action\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classtesting_1_1internal_1_1_return_ref_action}{}\label{classtesting_1_1internal_1_1_return_ref_action}\index{testing::internal::ReturnRefAction$<$ T $>$@{testing::internal::ReturnRefAction$<$ T $>$}}
+
+
+{\ttfamily \#include $<$gmock-\/actions.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_return_ref_action_a1384b1cd78f3069f0493e2302f143701}{Return\+Ref\+Action}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&ref)
+\item 
+{\footnotesize template$<$typename F $>$ }\\\mbox{\hyperlink{classtesting_1_1internal_1_1_return_ref_action_a48e5d411097707e558af62eb68edc162}{operator Action$<$ F $>$}} () const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$\newline
+class testing\+::internal\+::\+Return\+Ref\+Action$<$ T $>$}
+
+
+Definition at line \mbox{\hyperlink{gmock-actions_8h_source_l00683}{683}} of file \mbox{\hyperlink{gmock-actions_8h_source}{gmock-\/actions.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_return_ref_action_a1384b1cd78f3069f0493e2302f143701}\index{testing::internal::ReturnRefAction$<$ T $>$@{testing::internal::ReturnRefAction$<$ T $>$}!ReturnRefAction@{ReturnRefAction}}
+\index{ReturnRefAction@{ReturnRefAction}!testing::internal::ReturnRefAction$<$ T $>$@{testing::internal::ReturnRefAction$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{ReturnRefAction()}{ReturnRefAction()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_return_ref_action_a1384b1cd78f3069f0493e2302f143701} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_return_ref_action}{testing\+::internal\+::\+Return\+Ref\+Action}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::\+Return\+Ref\+Action (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{ref}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-actions_8h_source_l00686}{686}} of file \mbox{\hyperlink{gmock-actions_8h_source}{gmock-\/actions.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00686\ :\ ref\_(ref)\ \{\}\ \ \textcolor{comment}{//\ NOLINT}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_return_ref_action_a48e5d411097707e558af62eb68edc162}\index{testing::internal::ReturnRefAction$<$ T $>$@{testing::internal::ReturnRefAction$<$ T $>$}!operator Action$<$ F $>$@{operator Action$<$ F $>$}}
+\index{operator Action$<$ F $>$@{operator Action$<$ F $>$}!testing::internal::ReturnRefAction$<$ T $>$@{testing::internal::ReturnRefAction$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{operator Action$<$ F $>$()}{operator Action< F >()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_return_ref_action_a48e5d411097707e558af62eb68edc162} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+template$<$typename F $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_return_ref_action}{testing\+::internal\+::\+Return\+Ref\+Action}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::operator \mbox{\hyperlink{classtesting_1_1_action}{Action}}$<$ F $>$ (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-actions_8h_source_l00691}{691}} of file \mbox{\hyperlink{gmock-actions_8h_source}{gmock-\/actions.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00691\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00692\ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{typename}\ Function<F>::Result\ Result;}
+\DoxyCodeLine{00693\ \ \ \ \ \textcolor{comment}{//\ Asserts\ that\ the\ function\ return\ type\ is\ a\ reference.\ \ This}}
+\DoxyCodeLine{00694\ \ \ \ \ \textcolor{comment}{//\ catches\ the\ user\ error\ of\ using\ ReturnRef(x)\ when\ Return(x)}}
+\DoxyCodeLine{00695\ \ \ \ \ \textcolor{comment}{//\ should\ be\ used,\ and\ generates\ some\ helpful\ error\ message.}}
+\DoxyCodeLine{00696\ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_ae1f37dc71d5daa6fb49ca1b6047d4a8c}{GTEST\_COMPILE\_ASSERT\_}}(\mbox{\hyperlink{structtesting_1_1internal_1_1bool__constant_a499fba6576296b04d99690a486424b32}{internal::is\_reference<Result>::value}},}
+\DoxyCodeLine{00697\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ use\_Return\_instead\_of\_ReturnRef\_to\_return\_a\_value);}
+\DoxyCodeLine{00698\ \ \ \ \ \textcolor{keywordflow}{return}\ Action<F>(\textcolor{keyword}{new}\ Impl<F>(ref\_));}
+\DoxyCodeLine{00699\ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/include/gmock/\mbox{\hyperlink{gmock-actions_8h}{gmock-\/actions.\+h}}\end{DoxyCompactItemize}

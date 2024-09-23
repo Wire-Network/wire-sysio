@@ -1,0 +1,5 @@
+<map id="sysio::vm::detail::max_func_local_bytes_stack_checker::push_unreachable" name="sysio::vm::detail::max_func_local_bytes_stack_checker::push_unreachable">
+<area shape="rect" id="Node000001" title=" " alt="" coords="247,5,398,76"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker.html#a2e46720d4a76f569e3b671873c76c7b8" title=" " alt="" coords="5,13,199,68"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="231,43,199,43,199,38,231,38"/>
+</map>

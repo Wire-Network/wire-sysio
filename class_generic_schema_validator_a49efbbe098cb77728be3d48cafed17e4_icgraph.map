@@ -1,0 +1,11 @@
+<map id="GenericSchemaValidator::Reset" name="GenericSchemaValidator::Reset">
+<area shape="rect" id="Node000001" title="Reset the internal states." alt="" coords="234,72,398,113"/>
+<area shape="rect" id="Node000002" href="$unittest_2schematest_8cpp.html#ac186f00696812780b761e09d26c1dc14" title=" " alt="" coords="68,5,123,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="251,69,185,45,123,27,124,22,186,40,252,64"/>
+<area shape="rect" id="Node000003" href="$unittest_2schematest_8cpp.html#ad5dcf99ad5149b042298ea200495c701" title=" " alt="" coords="68,55,123,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="218,84,123,73,124,68,219,79"/>
+<area shape="rect" id="Node000004" href="$perftest_2schematest_8cpp.html#a2c5e22c20fbad50bc8a47803b79d552e" title=" " alt="" coords="60,104,131,130"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="219,106,132,116,131,110,218,101"/>
+<area shape="rect" id="Node000005" href="$class_generic_schema_validator.html#a3eab83d483a50efb0c0390adf3291963" title="Destructor." alt="" coords="5,154,186,194"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="248,122,187,145,156,156,154,151,185,140,246,117"/>
+</map>

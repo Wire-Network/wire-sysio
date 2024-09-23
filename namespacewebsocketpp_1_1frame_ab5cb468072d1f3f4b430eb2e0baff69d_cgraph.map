@@ -1,0 +1,7 @@
+<map id="websocketpp::frame::word_mask_exact" name="websocketpp::frame::word_mask_exact">
+<area shape="rect" id="Node000001" title="Exact word aligned mask/unmask (in place)" alt="" coords="5,5,145,46"/>
+<area shape="rect" id="Node000002" href="$namespacewebsocketpp_1_1frame.html#acb2ccda66981a8a12a3b97fb4b179aa3" title="Exact word aligned mask/unmask." alt="" coords="193,5,332,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="145,23,177,23,177,28,145,28"/>
+<area shape="rect" id="Node000003" href="$namespacewebsocketpp_1_1frame.html#af80eee705eb39fb533cf4ab3d7a6d3bb" title="Extract a masking key into a value the size of a machine word." alt="" coords="380,5,536,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="332,23,365,23,365,28,332,28"/>
+</map>

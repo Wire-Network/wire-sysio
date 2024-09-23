@@ -1,0 +1,328 @@
+\doxysection{yubihsm\+\_\+winusb.\+c}
+\hypertarget{yubihsm__winusb_8c_source}{}\label{yubihsm__winusb_8c_source}\index{libraries/yubihsm/lib/yubihsm\_winusb.c@{libraries/yubihsm/lib/yubihsm\_winusb.c}}
+\mbox{\hyperlink{yubihsm__winusb_8c}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ 2015-\/2018\ Yubico\ AB}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00004}00004\ \textcolor{comment}{\ *\ Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00005}00005\ \textcolor{comment}{\ *\ you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00006}00006\ \textcolor{comment}{\ *\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00008}00008\ \textcolor{comment}{\ *\ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00009}00009\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00010}00010\ \textcolor{comment}{\ *\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00011}00011\ \textcolor{comment}{\ *\ distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00012}00012\ \textcolor{comment}{\ *\ WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00013}00013\ \textcolor{comment}{\ *\ See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00014}00014\ \textcolor{comment}{\ *\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00015}00015\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00017}00017\ \textcolor{preprocessor}{\#include\ <windows.h>}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00018}00018\ \textcolor{preprocessor}{\#include\ <winusb.h>}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00019}00019\ \textcolor{preprocessor}{\#include\ <string.h>}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00020}00020\ \textcolor{preprocessor}{\#include\ <setupapi.h>}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00022}00022\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{yubihsm_8h}{yubihsm.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00023}00023\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{lib_2internal_8h}{internal.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00024}00024\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{yubihsm__usb_8h}{yubihsm\_usb.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00025}00025\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{debug__lib_8h}{debug\_lib.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00027}00027\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structstate}{state}}\ \{}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00028}\mbox{\hyperlink{structstate_acf21ac1d62465dec9bdbc6fa196ca202}{00028}}\ \ \ HANDLE\ \mbox{\hyperlink{structstate_acf21ac1d62465dec9bdbc6fa196ca202}{hDevice}};}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00029}\mbox{\hyperlink{structstate_a8ab01fdf8a0356f22b4cf3453bc11c02}{00029}}\ \ \ WINUSB\_INTERFACE\_HANDLE\ \mbox{\hyperlink{structstate_a8ab01fdf8a0356f22b4cf3453bc11c02}{hWinUSB}};}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00030}00030\ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{structstate_a427c87eb42b2a735f1ac44b76aba1664}{serial}};}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00031}00031\ \};}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00033}00033\ \textcolor{comment}{//\ Device\ GUID\ \{D1D3C87E-\/0574-\/4E38-\/8346-\/A56439234528\}}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00034}00034\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ GUID\ devGUID\ =\ \{0xD1D3C87E,}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00035}00035\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x0574,}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00036}00036\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x4E38,}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00037}00037\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{0x83,\ 0x46,\ 0xA5,\ 0x64,\ 0x39,\ 0x23,\ 0x45,\ 0x28\}\};}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00039}\mbox{\hyperlink{yubihsm__winusb_8c_af2aa1b20c10d6507c47f11588e21c324}{00039}}\ \textcolor{preprocessor}{\#define\ PIPE\_OUT\ 0x01\ }\textcolor{comment}{//\ Must\ match\ endpoint\ descriptor\ definitions}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00040}\mbox{\hyperlink{yubihsm__winusb_8c_a3fc15bc38c2cd3ce6f7dd40f4c0115dd}{00040}}\ \textcolor{preprocessor}{\#define\ PIPE\_IN\ 0x81}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00042}\mbox{\hyperlink{yubihsm__winusb_8c_a7ae85ad3f1d05331c3c7ccdc3443dbe4}{00042}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{yubihsm__winusb_8c_a7ae85ad3f1d05331c3c7ccdc3443dbe4}{usb\_set\_serial}}(\mbox{\hyperlink{structstate}{yh\_backend}}\ *\mbox{\hyperlink{structstate}{state}},\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a1149ca4bd0659030412db8e77bebdf88}{serial}})\ \{}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00043}00043\ \ \ \mbox{\hyperlink{structstate}{state}}-\/>\mbox{\hyperlink{structstate_a427c87eb42b2a735f1ac44b76aba1664}{serial}}\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a1149ca4bd0659030412db8e77bebdf88}{serial}};}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00044}00044\ \}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00046}\mbox{\hyperlink{yubihsm__winusb_8c_ab7b5c16cf1c8af0f6ce8b8623b612689}{00046}}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{yubihsm__winusb_8c_ab7b5c16cf1c8af0f6ce8b8623b612689}{usb\_open\_device}}(\mbox{\hyperlink{structstate}{yh\_backend}}\ *backend)\ \{}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00047}00047\ \ \ BOOL\ bResult\ =\ \mbox{\hyperlink{pkcs11_8h_aa8cecfc5c5c054d2875c03e77b7be15d}{TRUE}};}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00048}00048\ \ \ HDEVINFO\ hDeviceInfo;}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00049}00049\ \ \ SP\_DEVINFO\_DATA\ DeviceInfoData;}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00050}00050\ \ \ SP\_DEVICE\_INTERFACE\_DATA\ deviceInterfaceData;}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00051}00051\ \ \ PSP\_DEVICE\_INTERFACE\_DETAIL\_DATA\ pInterfaceDetailData\ =\ NULL;}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00052}00052\ \ \ ULONG\ requiredLength\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00053}00053\ \ \ DWORD\ index\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00054}00054\ \ \ HANDLE\ hnd\ =\ INVALID\_HANDLE\_VALUE;}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00055}00055\ \ \ WINUSB\_INTERFACE\_HANDLE\ wusbHnd\ =\ INVALID\_HANDLE\_VALUE;}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00057}00057\ \ \ \textcolor{comment}{//\ Get\ information\ about\ all\ the\ installed\ devices\ for\ the\ specified}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00058}00058\ \ \ \textcolor{comment}{//\ device\ interface\ class.}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00059}00059\ \ \ hDeviceInfo\ =\ SetupDiGetClassDevs(\&devGUID,\ NULL,\ NULL,}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ DIGCF\_PRESENT\ |\ DIGCF\_DEVICEINTERFACE);}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00062}00062\ \ \ \textcolor{keywordflow}{if}\ (hDeviceInfo\ ==\ INVALID\_HANDLE\_VALUE)\ \{}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00063}00063\ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a2e3ed21e5ffba18d940d164aaec64a2a}{DBG\_ERR}}(\textcolor{stringliteral}{"{}SetupDiGetClassDevs\ failed,\ error=\%lx\(\backslash\)n"{}},\ GetLastError());}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00064}00064\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00065}00065\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00067}00067\ \ \ \textcolor{comment}{//\ Enumerate\ all\ the\ device\ interfaces\ in\ the\ device\ information\ set.}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00068}00068\ \ \ DeviceInfoData.cbSize\ =\ \textcolor{keyword}{sizeof}(SP\_DEVINFO\_DATA);}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00069}00069\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00070}00070\ \ \ \textcolor{keywordflow}{for}\ (index\ =\ 0;\ SetupDiEnumDeviceInfo(hDeviceInfo,\ index,\ \&DeviceInfoData);}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00071}00071\ \ \ \ \ \ \ \ index++)\ \{}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00073}00073\ \ \ \ \ deviceInterfaceData.cbSize\ =\ \textcolor{keyword}{sizeof}(SP\_INTERFACE\_DEVICE\_DATA);}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00074}00074\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00075}00075\ \ \ \ \ \textcolor{comment}{//\ Get\ information\ about\ the\ device\ interface.}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00076}00076\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00077}00077\ \ \ \ \ bResult\ =\ SetupDiEnumDeviceInterfaces(hDeviceInfo,\ \&DeviceInfoData,}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00078}00078\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&devGUID,\ 0,\ \&deviceInterfaceData);}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00080}00080\ \ \ \ \ \textcolor{keywordflow}{if}\ (!bResult)\ \{}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00081}00081\ \ \ \ \ \ \ \textcolor{comment}{//\ Check\ if\ last\ item}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00082}00082\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (GetLastError()\ ==\ ERROR\_NO\_MORE\_ITEMS)\ \{}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00083}00083\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a2e3ed21e5ffba18d940d164aaec64a2a}{DBG\_ERR}}(\textcolor{stringliteral}{"{}No\ more\ items\ found"{}});}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00084}00084\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ out;}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00085}00085\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00086}00086\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00087}00087\ \ \ \ \ \ \ \textcolor{comment}{//\ Check\ for\ some\ other\ error}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00088}00088\ \ \ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a2e3ed21e5ffba18d940d164aaec64a2a}{DBG\_ERR}}(\textcolor{stringliteral}{"{}SetupDiEnumDeviceInterfaces(1)\ failed,\ error=\%lx\(\backslash\)n"{}},}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00089}00089\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ GetLastError());}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00090}00090\ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ out;}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00091}00091\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00092}00092\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00093}00093\ \ \ \ \ \textcolor{comment}{//\ Interface\ data\ is\ returned\ in\ SP\_DEVICE\_INTERFACE\_DETAIL\_DATA}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00094}00094\ \ \ \ \ \textcolor{comment}{//\ which\ we\ need\ to\ allocate,\ so\ we\ have\ to\ call\ this\ function\ twice.}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00095}00095\ \ \ \ \ \textcolor{comment}{//\ First\ to\ get\ the\ size\ so\ that\ we\ know\ how\ much\ to\ allocate}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00096}00096\ \ \ \ \ \textcolor{comment}{//\ Second,\ the\ actual\ call\ with\ the\ allocated\ buffer}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00097}00097\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00098}00098\ \ \ \ \ bResult\ =\ SetupDiGetDeviceInterfaceDetail(hDeviceInfo,\ \&deviceInterfaceData,}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00099}00099\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ NULL,\ 0,\ \&requiredLength,\ NULL);}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00100}00100\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00101}00101\ \ \ \ \ \textcolor{keywordflow}{if}\ (!bResult\ \&\&\ (GetLastError()\ !=\ ERROR\_INSUFFICIENT\_BUFFER))\ \{}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00102}00102\ \ \ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a2e3ed21e5ffba18d940d164aaec64a2a}{DBG\_ERR}}(\textcolor{stringliteral}{"{}SetupDiEnumDeviceInterfaces(2)\ failed,\ error=\%lx\(\backslash\)n"{}},}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00103}00103\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ GetLastError());}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00104}00104\ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ out;}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00105}00105\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00106}00106\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00107}00107\ \ \ \ \ \textcolor{comment}{//\ Get\ the\ interface\ detailed\ data\ and\ allocate\ storage}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00108}00108\ \ \ \ \ pInterfaceDetailData\ =\ malloc(requiredLength);}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00109}00109\ \ \ \ \ pInterfaceDetailData-\/>cbSize\ =\ \textcolor{keyword}{sizeof}(SP\_DEVICE\_INTERFACE\_DETAIL\_DATA);}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00110}00110\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00111}00111\ \ \ \ \ \textcolor{comment}{//\ Now\ call\ it\ with\ the\ correct\ size\ and\ allocated\ buffer}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00112}00112\ \ \ \ \ bResult\ =}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00113}00113\ \ \ \ \ \ \ SetupDiGetDeviceInterfaceDetail(hDeviceInfo,\ \&deviceInterfaceData,}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00114}00114\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ pInterfaceDetailData,\ requiredLength,}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00115}00115\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ NULL,\ \&DeviceInfoData);}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00116}00116\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00117}00117\ \ \ \ \ \textcolor{keywordflow}{if}\ (!bResult)\ \{}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00118}00118\ \ \ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a2e3ed21e5ffba18d940d164aaec64a2a}{DBG\_ERR}}(\textcolor{stringliteral}{"{}SetupDiGetDeviceInterfaceDetail\ failed,\ error=\%lx\(\backslash\)n"{}},}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00119}00119\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ GetLastError());}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00120}00120\ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ out;}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00121}00121\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00122}00122\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00123}00123\ \ \ \ \ hnd\ =}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00124}00124\ \ \ \ \ \ \ CreateFile(pInterfaceDetailData-\/>DevicePath,\ GENERIC\_READ\ |\ GENERIC\_WRITE,}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00125}00125\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ FILE\_SHARE\_READ\ |\ FILE\_SHARE\_WRITE,\ NULL,\ OPEN\_EXISTING,}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00126}00126\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ FILE\_FLAG\_OVERLAPPED,\ NULL);}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00127}00127\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00128}00128\ \ \ \ \ free(pInterfaceDetailData);}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00129}00129\ \ \ \ \ pInterfaceDetailData\ =\ NULL;}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00130}00130\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00131}00131\ \ \ \ \ \textcolor{keywordflow}{if}\ (hnd\ ==\ INVALID\_HANDLE\_VALUE)\ \{}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00132}00132\ \ \ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a2e3ed21e5ffba18d940d164aaec64a2a}{DBG\_ERR}}(\textcolor{stringliteral}{"{}CreateFile\ failed,\ error=\%lx"{}},\ GetLastError());}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00133}00133\ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00134}00134\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00135}00135\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00136}00136\ \ \ \ \ \textcolor{keywordflow}{if}\ (!WinUsb\_Initialize(hnd,\ \&wusbHnd))\ \{}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00137}00137\ \ \ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a2e3ed21e5ffba18d940d164aaec64a2a}{DBG\_ERR}}(\textcolor{stringliteral}{"{}WinUsb\_Initialize\ failed,\ error=\%lx"{}},\ GetLastError());}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00138}00138\ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ next;}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00139}00139\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00140}00140\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00141}00141\ \ \ \ \ \textcolor{keywordflow}{if}\ (backend-\/>\mbox{\hyperlink{structstate_a427c87eb42b2a735f1ac44b76aba1664}{serial}}\ !=\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00142}00142\ \ \ \ \ \ \ USB\_DEVICE\_DESCRIPTOR\ desc;}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00143}00143\ \ \ \ \ \ \ ULONG\ written;}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00144}00144\ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ ser\_num[128]\ =\ \{0\};}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00145}00145\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00146}00146\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!WinUsb\_GetDescriptor(wusbHnd,\ USB\_DEVICE\_DESCRIPTOR\_TYPE,\ 0,\ 0,}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00147}00147\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \&desc,\ \textcolor{keyword}{sizeof}(desc),}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00148}00148\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&written))\ \{}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00149}00149\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a2e3ed21e5ffba18d940d164aaec64a2a}{DBG\_ERR}}(\textcolor{stringliteral}{"{}WinUsb\_GetDescriptor\ failed,\ error=\%lx"{}},\ GetLastError());}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00150}00150\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ next;}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00151}00151\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00152}00152\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00153}00153\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!WinUsb\_GetDescriptor(wusbHnd,\ USB\_STRING\_DESCRIPTOR\_TYPE,}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00154}00154\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ desc.iSerialNumber,}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00155}00155\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x0409,\ \textcolor{comment}{//\ English\ (US)}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00156}00156\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ser\_num,\ \textcolor{keyword}{sizeof}(ser\_num),\ \&written))\ \{}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00157}00157\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a2e3ed21e5ffba18d940d164aaec64a2a}{DBG\_ERR}}(\textcolor{stringliteral}{"{}WinUsb\_GetDescriptor\ failed,\ error=\%lx"{}},\ GetLastError());}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00158}00158\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ next;}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00159}00159\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00160}00160\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00161}00161\ \ \ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a8c4742440a149ad8bcb5d58ae76c5ed3}{DBG\_INFO}}(\textcolor{stringliteral}{"{}Extracted\ serial\ \%ls\ (\%lu\ bytes)\ from\ device\ desc\ \%d"{}},}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00162}00162\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{keywordtype}{wchar\_t}\ *)\ (ser\_num\ +\ 2),\ written,\ desc.iSerialNumber);}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00163}00163\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00164}00164\ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ devSerial\ =\ wcstoul((\textcolor{keywordtype}{wchar\_t}\ *)\ (ser\_num\ +\ 2),\ NULL,\ 10);}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00165}00165\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (devSerial\ !=\ backend-\/>\mbox{\hyperlink{structstate_a427c87eb42b2a735f1ac44b76aba1664}{serial}})\ \{}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00166}00166\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a8c4742440a149ad8bcb5d58ae76c5ed3}{DBG\_INFO}}(\textcolor{stringliteral}{"{}Device\ has\ serial\ \%lu,\ not\ matching\ searched\ \%lu"{}},\ devSerial,}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00167}00167\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ backend-\/>\mbox{\hyperlink{structstate_a427c87eb42b2a735f1ac44b76aba1664}{serial}});}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00168}00168\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ next;}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00169}00169\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00170}00170\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00171}00171\ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00172}00172\ \ \ next:}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00173}00173\ \ \ \ \ \textcolor{keywordflow}{if}\ (wusbHnd\ !=\ INVALID\_HANDLE\_VALUE)\ \{}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00174}00174\ \ \ \ \ \ \ WinUsb\_Free(wusbHnd);}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00175}00175\ \ \ \ \ \ \ wusbHnd\ =\ INVALID\_HANDLE\_VALUE;}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00176}00176\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00177}00177\ \ \ \ \ \textcolor{keywordflow}{if}\ (hnd\ !=\ INVALID\_HANDLE\_VALUE)\ \{}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00178}00178\ \ \ \ \ \ \ CloseHandle(hnd);}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00179}00179\ \ \ \ \ \ \ hnd\ =\ INVALID\_HANDLE\_VALUE;}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00180}00180\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00181}00181\ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00182}00182\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00183}00183\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00184}00184\ \ \ \textcolor{keywordflow}{if}\ (wusbHnd\ !=\ INVALID\_HANDLE\_VALUE)\ \{}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00185}00185\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00186}00186\ \ \ \ \ \textcolor{comment}{//\ Make\ sure\ we\ get\ a\ ZLP\ at\ the\ end\ every\ time}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00187}00187\ \ \ \ \ bResult\ =\ WinUsb\_SetPipePolicy(wusbHnd,\ \mbox{\hyperlink{yubihsm__winusb_8c_af2aa1b20c10d6507c47f11588e21c324}{PIPE\_OUT}},\ SHORT\_PACKET\_TERMINATE,\ 1,}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00188}00188\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (PVOID)\ \textcolor{stringliteral}{"{}\(\backslash\)x1"{}});}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00189}00189\ \ \ \ \ \textcolor{keywordflow}{if}\ (!bResult)\ \{}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00190}00190\ \ \ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a2e3ed21e5ffba18d940d164aaec64a2a}{DBG\_ERR}}(\textcolor{stringliteral}{"{}SetPipePolicy\ failed"{}});}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00191}00191\ \ \ \ \ \ \ WinUsb\_Free(wusbHnd);}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00192}00192\ \ \ \ \ \ \ wusbHnd\ =\ INVALID\_HANDLE\_VALUE;}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00193}00193\ \ \ \ \ \ \ CloseHandle(hnd);}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00194}00194\ \ \ \ \ \ \ hnd\ =\ INVALID\_HANDLE\_VALUE;}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00195}00195\ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ out;}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00196}00196\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00197}00197\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00198}00198\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00199}00199\ \ \ \ \ \ \ \textcolor{comment}{//\ we\ set\ up\ a\ dummy\ read\ with\ a\ 10ms\ timeout\ here,\ if\ the\ timeout\ is\ too}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00200}00200\ \ \ \ \ \ \ \textcolor{comment}{//\ short\ this\ times\ out\ before\ it\ has\ time\ to\ complete.\ The\ reason\ for}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00201}00201\ \ \ \ \ \ \ \textcolor{comment}{//\ doing\ this\ is\ that\ there\ might\ be\ data\ left\ in\ the\ device\ buffers\ from}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00202}00202\ \ \ \ \ \ \ \textcolor{comment}{//\ earlier\ transactions,\ this\ should\ flush\ it.}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00203}00203\ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}[\mbox{\hyperlink{yubihsm_8h_a706bd8e7adf0de85e6cfb0efc8981d3f}{YH\_MSG\_BUF\_SIZE}}];}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00204}00204\ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ transferred\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00205}00205\ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ timeout\ =\ 10;}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00206}00206\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00207}00207\ \ \ \ \ \ \ bResult\ =\ WinUsb\_SetPipePolicy(wusbHnd,\ \mbox{\hyperlink{yubihsm__winusb_8c_a3fc15bc38c2cd3ce6f7dd40f4c0115dd}{PIPE\_IN}},\ PIPE\_TRANSFER\_TIMEOUT,}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00208}00208\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{sizeof}(timeout),\ \&timeout);}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00209}00209\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!bResult)\ \{}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00210}00210\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a2e3ed21e5ffba18d940d164aaec64a2a}{DBG\_ERR}}(\textcolor{stringliteral}{"{}SetPipePolicy\ failed"{}});}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00211}00211\ \ \ \ \ \ \ \ \ WinUsb\_Free(wusbHnd);}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00212}00212\ \ \ \ \ \ \ \ \ wusbHnd\ =\ INVALID\_HANDLE\_VALUE;}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00213}00213\ \ \ \ \ \ \ \ \ CloseHandle(hnd);}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00214}00214\ \ \ \ \ \ \ \ \ hnd\ =\ INVALID\_HANDLE\_VALUE;}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00215}00215\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ out;}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00216}00216\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00217}00217\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00218}00218\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (WinUsb\_ReadPipe(wusbHnd,\ \mbox{\hyperlink{yubihsm__winusb_8c_a3fc15bc38c2cd3ce6f7dd40f4c0115dd}{PIPE\_IN}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}),\ \&transferred,}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00219}00219\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0))\ \{}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00220}00220\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a8c4742440a149ad8bcb5d58ae76c5ed3}{DBG\_INFO}}(\textcolor{stringliteral}{"{}\%lu\ bytes\ of\ stale\ data\ read"{}},\ transferred);}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00221}00221\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00222}00222\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00223}00223\ \ \ \ \ \ \ timeout\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00224}00224\ \ \ \ \ \ \ bResult\ =\ WinUsb\_SetPipePolicy(wusbHnd,\ \mbox{\hyperlink{yubihsm__winusb_8c_a3fc15bc38c2cd3ce6f7dd40f4c0115dd}{PIPE\_IN}},\ PIPE\_TRANSFER\_TIMEOUT,}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00225}00225\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{sizeof}(timeout),\ \&timeout);}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00226}00226\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!bResult)\ \{}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00227}00227\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a2e3ed21e5ffba18d940d164aaec64a2a}{DBG\_ERR}}(\textcolor{stringliteral}{"{}SetPipePolicy\ failed"{}});}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00228}00228\ \ \ \ \ \ \ \ \ WinUsb\_Free(wusbHnd);}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00229}00229\ \ \ \ \ \ \ \ \ wusbHnd\ =\ INVALID\_HANDLE\_VALUE;}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00230}00230\ \ \ \ \ \ \ \ \ CloseHandle(hnd);}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00231}00231\ \ \ \ \ \ \ \ \ hnd\ =\ INVALID\_HANDLE\_VALUE;}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00232}00232\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ out;}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00233}00233\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00234}00234\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00235}00235\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00236}00236\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00237}00237\ out:}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00238}00238\ \ \ backend-\/>\mbox{\hyperlink{structstate_acf21ac1d62465dec9bdbc6fa196ca202}{hDevice}}\ =\ hnd;}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00239}00239\ \ \ backend-\/>\mbox{\hyperlink{structstate_a8ab01fdf8a0356f22b4cf3453bc11c02}{hWinUSB}}\ =\ wusbHnd;}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00240}00240\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00241}00241\ \ \ \textcolor{keywordflow}{if}\ (hDeviceInfo)\ \{}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00242}00242\ \ \ \ \ SetupDiDestroyDeviceInfoList(hDeviceInfo);}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00243}00243\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00244}00244\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00245}00245\ \ \ free(pInterfaceDetailData);}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00246}00246\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00247}00247\ \ \ \textcolor{keywordflow}{if}\ (wusbHnd\ !=\ INVALID\_HANDLE\_VALUE)\ \{}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00248}00248\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00249}00249\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00250}00250\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00251}00251\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00252}00252\ \}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00253}00253\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00254}\mbox{\hyperlink{yubihsm__winusb_8c_a7d85725309ab01a6ec82ee958806102b}{00254}}\ \mbox{\hyperlink{structstate}{yh\_backend}}\ *\mbox{\hyperlink{yubihsm__winusb_8c_a7d85725309ab01a6ec82ee958806102b}{backend\_create}}(\textcolor{keywordtype}{void})\ \{}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00255}00255\ \ \ \mbox{\hyperlink{structstate}{yh\_backend}}\ *backend\ =\ calloc(1,\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{structstate}{yh\_backend}}));}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00256}00256\ \ \ \textcolor{keywordflow}{return}\ backend;}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00257}00257\ \}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00258}00258\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00259}\mbox{\hyperlink{yubihsm__winusb_8c_a71df5e0ff7b712f398eacfc6fcf878f0}{00259}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{yubihsm__winusb_8c_a71df5e0ff7b712f398eacfc6fcf878f0}{usb\_close}}(\mbox{\hyperlink{structstate}{yh\_backend}}\ *\mbox{\hyperlink{structstate}{state}})\ \{}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00260}00260\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structstate}{state}}\ \&\&\ \mbox{\hyperlink{structstate}{state}}-\/>\mbox{\hyperlink{structstate_acf21ac1d62465dec9bdbc6fa196ca202}{hDevice}}\ !=\ INVALID\_HANDLE\_VALUE)\ \{}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00261}00261\ \ \ \ \ CloseHandle(\mbox{\hyperlink{structstate}{state}}-\/>\mbox{\hyperlink{structstate_acf21ac1d62465dec9bdbc6fa196ca202}{hDevice}});}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00262}00262\ \ \ \ \ \mbox{\hyperlink{structstate}{state}}-\/>\mbox{\hyperlink{structstate_acf21ac1d62465dec9bdbc6fa196ca202}{hDevice}}\ =\ INVALID\_HANDLE\_VALUE;}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00263}00263\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00264}00264\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structstate}{state}}\ \&\&\ \mbox{\hyperlink{structstate}{state}}-\/>\mbox{\hyperlink{structstate_a8ab01fdf8a0356f22b4cf3453bc11c02}{hWinUSB}}\ !=\ INVALID\_HANDLE\_VALUE)\ \{}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00265}00265\ \ \ \ \ WinUsb\_Free(\mbox{\hyperlink{structstate}{state}}-\/>\mbox{\hyperlink{structstate_a8ab01fdf8a0356f22b4cf3453bc11c02}{hWinUSB}});}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00266}00266\ \ \ \ \ \mbox{\hyperlink{structstate}{state}}-\/>\mbox{\hyperlink{structstate_a8ab01fdf8a0356f22b4cf3453bc11c02}{hWinUSB}}\ =\ INVALID\_HANDLE\_VALUE;}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00267}00267\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00268}00268\ \}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00269}00269\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00270}\mbox{\hyperlink{yubihsm__winusb_8c_a5c7d1af3985bcf7fd85536f9d109e837}{00270}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{yubihsm__winusb_8c_a5c7d1af3985bcf7fd85536f9d109e837}{usb\_destroy}}(\mbox{\hyperlink{structstate}{yh\_backend}}\ **\mbox{\hyperlink{structstate}{state}})\ \{}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00271}00271\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structstate}{state}}\ \&\&\ *\mbox{\hyperlink{structstate}{state}})\ \{}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00272}00272\ \ \ \ \ free(*\mbox{\hyperlink{structstate}{state}});}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00273}00273\ \ \ \ \ *\mbox{\hyperlink{structstate}{state}}\ =\ NULL;}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00274}00274\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00275}00275\ \}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00276}00276\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00277}\mbox{\hyperlink{yubihsm__winusb_8c_ad588c46d8af37c48a320beae5d18617a}{00277}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__winusb_8c_ad588c46d8af37c48a320beae5d18617a}{usb\_write}}(\mbox{\hyperlink{structstate}{yh\_backend}}\ *\mbox{\hyperlink{structstate}{state}},\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ \textcolor{keywordtype}{long}\ \textcolor{keywordtype}{unsigned}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})\ \{}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00278}00278\ \ \ \textcolor{keywordtype}{long}\ \textcolor{keywordtype}{unsigned}\ transferred;}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00279}00279\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00280}00280\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structstate}{state}}-\/>\mbox{\hyperlink{structstate_a8ab01fdf8a0356f22b4cf3453bc11c02}{hWinUSB}}\ ==\ INVALID\_HANDLE\_VALUE)\ \{}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00281}00281\ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a2e3ed21e5ffba18d940d164aaec64a2a}{DBG\_ERR}}(\textcolor{stringliteral}{"{}No\ connected\ device"{}});}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00282}00282\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00283}00283\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00284}00284\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00285}00285\ \ \ BOOL\ bResult\ =}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00286}00286\ \ \ \ \ WinUsb\_WritePipe(\mbox{\hyperlink{structstate}{state}}-\/>\mbox{\hyperlink{structstate_a8ab01fdf8a0356f22b4cf3453bc11c02}{hWinUSB}},\ \mbox{\hyperlink{yubihsm__winusb_8c_af2aa1b20c10d6507c47f11588e21c324}{PIPE\_OUT}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ \&transferred,\ 0);}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00287}00287\ \ \ \textcolor{keywordflow}{if}\ (bResult)\ \{}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00288}00288\ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a8c4742440a149ad8bcb5d58ae76c5ed3}{DBG\_INFO}}(\textcolor{stringliteral}{"{}Written\ \%lu\ bytes"{}},\ transferred);}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00289}00289\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00290}00290\ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a2e3ed21e5ffba18d940d164aaec64a2a}{DBG\_ERR}}(\textcolor{stringliteral}{"{}WinUsb\_WritePipe\ failed,\ error=\%lx"{}},\ GetLastError());}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00291}00291\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00292}00292\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00293}00293\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00294}00294\ \ \ \textcolor{keywordflow}{if}\ (transferred\ !=\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})\ \{}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00295}00295\ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a2e3ed21e5ffba18d940d164aaec64a2a}{DBG\_ERR}}(\textcolor{stringliteral}{"{}Transferred\ did\ not\ match\ len\ of\ write\ \%lu-\/\%lu"{}},\ transferred,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}});}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00296}00296\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00297}00297\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00298}00298\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00299}00299\ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00300}00300\ \}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00301}00301\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00302}\mbox{\hyperlink{yubihsm__usb_8h_a1afd311980b8a12cdde82bc85dc9b963}{00302}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__winusb_8c_a5c40f15e76018a849b36d53f70c4f101}{usb\_read}}(\mbox{\hyperlink{structstate}{yh\_backend}}\ *\mbox{\hyperlink{structstate}{state}},\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ \textcolor{keywordtype}{long}\ \textcolor{keywordtype}{unsigned}\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})\ \{}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00303}00303\ \ \ \textcolor{keywordtype}{long}\ \textcolor{keywordtype}{unsigned}\ transferred\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00304}00304\ \ \ BOOL\ bResult;}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00305}00305\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00306}00306\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structstate}{state}}-\/>\mbox{\hyperlink{structstate_a8ab01fdf8a0356f22b4cf3453bc11c02}{hWinUSB}}\ ==\ INVALID\_HANDLE\_VALUE)\ \{}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00307}00307\ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a2e3ed21e5ffba18d940d164aaec64a2a}{DBG\_ERR}}(\textcolor{stringliteral}{"{}No\ connected\ device"{}});}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00308}00308\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00309}00309\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00310}00310\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00311}00311\ \ \ \mbox{\hyperlink{debug__lib_8h_a8c4742440a149ad8bcb5d58ae76c5ed3}{DBG\_INFO}}(\textcolor{stringliteral}{"{}Doing\ usb\ read"{}});}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00312}00312\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00313}00313\ \ \ bResult\ =}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00314}00314\ \ \ \ \ WinUsb\_ReadPipe(\mbox{\hyperlink{structstate}{state}}-\/>\mbox{\hyperlink{structstate_a8ab01fdf8a0356f22b4cf3453bc11c02}{hWinUSB}},\ \mbox{\hyperlink{yubihsm__winusb_8c_a3fc15bc38c2cd3ce6f7dd40f4c0115dd}{PIPE\_IN}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ \&transferred,\ 0);}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00315}00315\ \ \ \textcolor{keywordflow}{if}\ (!bResult)\ \{}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00316}00316\ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a2e3ed21e5ffba18d940d164aaec64a2a}{DBG\_ERR}}(\textcolor{stringliteral}{"{}WinUsb\_ReadPipe\ failed,\ error=\%lx\(\backslash\)n"{}},\ GetLastError());}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00317}00317\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00318}00318\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00319}00319\ \ \ \mbox{\hyperlink{debug__lib_8h_a8c4742440a149ad8bcb5d58ae76c5ed3}{DBG\_INFO}}(\textcolor{stringliteral}{"{}Read\ \%lu\ bytes"{}},\ transferred);}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00320}00320\ \ \ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ =\ transferred;}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00321}00321\ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{\Hypertarget{yubihsm__winusb_8c_source_l00322}00322\ \}}
+
+\end{DoxyCode}

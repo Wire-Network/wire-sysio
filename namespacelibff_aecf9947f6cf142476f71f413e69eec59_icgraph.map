@@ -1,0 +1,19 @@
+<map id="libff::batch_invert" name="libff::batch_invert">
+<area shape="rect" id="Node000001" title=" " alt="" coords="228,296,349,322"/>
+<area shape="rect" id="Node000002" href="$classlibff_1_1alt__bn128___g1.html#a6e21ba42e98c38fcdf20133f29f5ade0" title=" " alt="" coords="19,5,166,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="278,282,266,238,246,183,217,126,178,75,164,63,167,59,182,71,221,123,251,181,271,236,284,281"/>
+<area shape="rect" id="Node000003" href="$classlibff_1_1alt__bn128___g2.html#aec0a4572755416fa05606359a7081e1f" title=" " alt="" coords="19,85,166,141"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="272,283,234,220,208,186,178,155,162,144,165,139,181,151,212,182,239,217,276,281"/>
+<area shape="rect" id="Node000004" href="$classlibff_1_1edwards___g1.html#aa18a38a1accc97fd486aa6cf0543f490" title=" " alt="" coords="23,165,162,221"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="257,289,178,235,157,224,159,219,181,231,260,284"/>
+<area shape="rect" id="Node000005" href="$classlibff_1_1edwards___g2.html#a3b20beccdcab25ef4a595a5a17fe6c7f" title=" " alt="" coords="23,245,162,301"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="212,298,162,289,163,283,213,293"/>
+<area shape="rect" id="Node000006" href="$classlibff_1_1mnt4___g1.html#af226f114fa8484604c27cd6bc1f1109b" title=" " alt="" coords="5,325,180,366"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="213,326,181,332,180,326,212,320"/>
+<area shape="rect" id="Node000007" href="$classlibff_1_1mnt4___g2.html#a4e7e0c0853a2793159fc8254f3a7d3f4" title=" " alt="" coords="5,390,180,431"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="257,334,181,380,153,392,151,387,178,375,254,329"/>
+<area shape="rect" id="Node000008" href="$classlibff_1_1mnt6___g1.html#ae19e8f33fe63e6acde51242063809da8" title=" " alt="" coords="5,456,180,496"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="274,337,236,391,210,419,181,445,160,457,157,453,178,440,207,416,232,387,270,334"/>
+<area shape="rect" id="Node000009" href="$classlibff_1_1mnt6___g2.html#a31b7575691c715b73bf0bab914f142fb" title=" " alt="" coords="5,521,180,562"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="282,337,268,375,247,421,218,469,181,510,163,522,160,518,178,506,214,465,242,419,263,373,277,336"/>
+</map>

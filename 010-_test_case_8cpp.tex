@@ -1,0 +1,123 @@
+\doxysection{libraries/sys-\/vm/external/\+Catch2/examples/010-\/\+Test\+Case.cpp File Reference}
+\hypertarget{010-_test_case_8cpp}{}\label{010-_test_case_8cpp}\index{libraries/sys-\/vm/external/Catch2/examples/010-\/TestCase.cpp@{libraries/sys-\/vm/external/Catch2/examples/010-\/TestCase.cpp}}
+{\ttfamily \#include $<$catch2/catch.\+hpp$>$}\newline
+Include dependency graph for 010-\/Test\+Case.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{010-_test_case_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{010-_test_case_8cpp_a656eb5868e824d59f489f910db438420}{CATCH\+\_\+\+CONFIG\+\_\+\+MAIN}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{010-_test_case_8cpp_add2051c05ae0af82b9f85a7aed140679}{Factorial}} (int number)
+\item 
+\mbox{\hyperlink{010-_test_case_8cpp_aede3c4edb62337049cf2b7fc463b9539}{TEST\+\_\+\+CASE}} ("{}Factorial of 0 is 1 (fail)"{}, "{}\mbox{[}single-\/file\mbox{]}"{})
+\item 
+\mbox{\hyperlink{010-_test_case_8cpp_ae4a225917ee96bff1145341e8084ab47}{TEST\+\_\+\+CASE}} ("{}Factorials of 1 and higher are computed (pass)"{}, "{}\mbox{[}single-\/file\mbox{]}"{})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{010-_test_case_8cpp_a656eb5868e824d59f489f910db438420}\index{010-\/TestCase.cpp@{010-\/TestCase.cpp}!CATCH\_CONFIG\_MAIN@{CATCH\_CONFIG\_MAIN}}
+\index{CATCH\_CONFIG\_MAIN@{CATCH\_CONFIG\_MAIN}!010-\/TestCase.cpp@{010-\/TestCase.cpp}}
+\doxysubsubsection{\texorpdfstring{CATCH\_CONFIG\_MAIN}{CATCH\_CONFIG\_MAIN}}
+{\footnotesize\ttfamily \label{010-_test_case_8cpp_a656eb5868e824d59f489f910db438420} 
+\#define CATCH\+\_\+\+CONFIG\+\_\+\+MAIN}
+
+
+
+Definition at line \mbox{\hyperlink{010-_test_case_8cpp_source_l00004}{4}} of file \mbox{\hyperlink{010-_test_case_8cpp_source}{010-\/\+Test\+Case.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{010-_test_case_8cpp_add2051c05ae0af82b9f85a7aed140679}\index{010-\/TestCase.cpp@{010-\/TestCase.cpp}!Factorial@{Factorial}}
+\index{Factorial@{Factorial}!010-\/TestCase.cpp@{010-\/TestCase.cpp}}
+\doxysubsubsection{\texorpdfstring{Factorial()}{Factorial()}}
+{\footnotesize\ttfamily \label{010-_test_case_8cpp_add2051c05ae0af82b9f85a7aed140679} 
+int Factorial (\begin{DoxyParamCaption}\item[{int}]{number}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{010-_test_case_8cpp_source_l00008}{8}} of file \mbox{\hyperlink{010-_test_case_8cpp_source}{010-\/\+Test\+Case.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00008\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00009\ \ \ \ \textcolor{keywordflow}{return}\ number\ <=\ 1\ ?\ number\ :\ \mbox{\hyperlink{010-_test_case_8cpp_add2051c05ae0af82b9f85a7aed140679}{Factorial}}(\ number\ -\/\ 1\ )\ *\ number;\ \ \textcolor{comment}{//\ fail}}
+\DoxyCodeLine{00010\ \textcolor{comment}{//\ return\ number\ <=\ 1\ ?\ 1\ \ \ \ \ \ :\ Factorial(\ number\ -\/\ 1\ )\ *\ number;\ \ //\ pass}}
+\DoxyCodeLine{00011\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=134pt]{010-_test_case_8cpp_add2051c05ae0af82b9f85a7aed140679_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=244pt]{010-_test_case_8cpp_add2051c05ae0af82b9f85a7aed140679_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{010-_test_case_8cpp_aede3c4edb62337049cf2b7fc463b9539}\index{010-\/TestCase.cpp@{010-\/TestCase.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!010-\/TestCase.cpp@{010-\/TestCase.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{010-_test_case_8cpp_aede3c4edb62337049cf2b7fc463b9539} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Factorial of 0 is 1 (fail)"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}single-\/file\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{010-_test_case_8cpp_source_l00013}{13}} of file \mbox{\hyperlink{010-_test_case_8cpp_source}{010-\/\+Test\+Case.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00013\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00014\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{010-_test_case_8cpp_add2051c05ae0af82b9f85a7aed140679}{Factorial}}(0)\ ==\ 1\ );}
+\DoxyCodeLine{00015\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=244pt]{010-_test_case_8cpp_aede3c4edb62337049cf2b7fc463b9539_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{010-_test_case_8cpp_ae4a225917ee96bff1145341e8084ab47}\index{010-\/TestCase.cpp@{010-\/TestCase.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!010-\/TestCase.cpp@{010-\/TestCase.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{010-_test_case_8cpp_ae4a225917ee96bff1145341e8084ab47} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Factorials of 1 and higher are computed (pass)"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}single-\/file\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{010-_test_case_8cpp_source_l00017}{17}} of file \mbox{\hyperlink{010-_test_case_8cpp_source}{010-\/\+Test\+Case.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00017\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00018\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{010-_test_case_8cpp_add2051c05ae0af82b9f85a7aed140679}{Factorial}}(1)\ ==\ 1\ );}
+\DoxyCodeLine{00019\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{010-_test_case_8cpp_add2051c05ae0af82b9f85a7aed140679}{Factorial}}(2)\ ==\ 2\ );}
+\DoxyCodeLine{00020\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{010-_test_case_8cpp_add2051c05ae0af82b9f85a7aed140679}{Factorial}}(3)\ ==\ 6\ );}
+\DoxyCodeLine{00021\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{010-_test_case_8cpp_add2051c05ae0af82b9f85a7aed140679}{Factorial}}(10)\ ==\ 3628800\ );}
+\DoxyCodeLine{00022\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=244pt]{010-_test_case_8cpp_ae4a225917ee96bff1145341e8084ab47_cgraph}
+\end{center}
+\end{figure}

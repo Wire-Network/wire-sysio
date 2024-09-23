@@ -1,0 +1,305 @@
+\doxysection{libraries/fc/test/io/test\+\_\+json.cpp File Reference}
+\hypertarget{test__json_8cpp}{}\label{test__json_8cpp}\index{libraries/fc/test/io/test\_json.cpp@{libraries/fc/test/io/test\_json.cpp}}
+{\ttfamily \#include $<$boost/test/included/unit\+\_\+test.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/io/json.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/exception/exception.\+hpp$>$}\newline
+Include dependency graph for test\+\_\+json.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__json_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacejson__test__util}{json\+\_\+test\+\_\+util}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{test__json_8cpp_a6b2a3852db8bb19ab6909bac01859985}{BOOST\+\_\+\+TEST\+\_\+\+MODULE}}~io\+\_\+json
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+const std\+::string \mbox{\hyperlink{namespacejson__test__util_ad6bad2ec8fd89dc114b6599ca0416dc9}{json\+\_\+test\+\_\+util\+::repeat\+\_\+chars}} (\mbox{\hyperlink{namespacejson__test__util_aca7d837defed360c051388763cb7f97b}{repeat\+\_\+char\+\_\+num}}, \textquotesingle{}\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\textquotesingle{})
+\item 
+\mbox{\hyperlink{test__json_8cpp_a4fd4e2a2663951258d0a6311162e76dc}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (to\+\_\+string\+\_\+test)
+\item 
+\mbox{\hyperlink{test__json_8cpp_acd07414856f20fea69de25c12f9e7bdf}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (to\+\_\+pretty\+\_\+string\+\_\+test)
+\item 
+\mbox{\hyperlink{test__json_8cpp_a22a029d884cbfab8b5abc9007a64b0e5}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (escape\+\_\+string\+\_\+test)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+constexpr size\+\_\+t \mbox{\hyperlink{namespacejson__test__util_a833dc54843a301f60cbf9763b9ea85ab}{json\+\_\+test\+\_\+util\+::exception\+\_\+limit\+\_\+size}} = 250
+\item 
+const json\+::yield\+\_\+function\+\_\+t \mbox{\hyperlink{namespacejson__test__util_a60038ccb3db7302bd3d8d4d609d95bf0}{json\+\_\+test\+\_\+util\+::yield\+\_\+deadline\+\_\+exception\+\_\+at\+\_\+start}}
+\item 
+const json\+::yield\+\_\+function\+\_\+t \mbox{\hyperlink{namespacejson__test__util_a5853467a7c801e3b9435ea0968547fc5}{json\+\_\+test\+\_\+util\+::yield\+\_\+deadline\+\_\+exception\+\_\+in\+\_\+mid}}
+\item 
+const json\+::yield\+\_\+function\+\_\+t \mbox{\hyperlink{namespacejson__test__util_a80ef3394249c0f81b96431022b7e35f6}{json\+\_\+test\+\_\+util\+::yield\+\_\+length\+\_\+exception}}
+\item 
+const json\+::yield\+\_\+function\+\_\+t \mbox{\hyperlink{namespacejson__test__util_a8059bee23fb1d9a620cd07a1fadd0494}{json\+\_\+test\+\_\+util\+::yield\+\_\+no\+\_\+limitation}}
+\item 
+const auto \mbox{\hyperlink{namespacejson__test__util_a9d1e4b2c8886716c2b0f2a669d8e3c7f}{json\+\_\+test\+\_\+util\+::time\+\_\+except\+\_\+verf\+\_\+func}}
+\item 
+const auto \mbox{\hyperlink{namespacejson__test__util_a82dbdaa15a0f3c178a264a8e5a24c805}{json\+\_\+test\+\_\+util\+::length\+\_\+limit\+\_\+except\+\_\+verf\+\_\+func}}
+\item 
+constexpr size\+\_\+t \mbox{\hyperlink{namespacejson__test__util_aca7d837defed360c051388763cb7f97b}{json\+\_\+test\+\_\+util\+::repeat\+\_\+char\+\_\+num}} = 512
+\item 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacejson__test__util_ab040b504922fea186b59a23c84b7b6c0}{json\+\_\+test\+\_\+util\+::escape\+\_\+input\+\_\+str}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{test__json_8cpp_a6b2a3852db8bb19ab6909bac01859985}\index{test\_json.cpp@{test\_json.cpp}!BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}}
+\index{BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}!test\_json.cpp@{test\_json.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_TEST\_MODULE}{BOOST\_TEST\_MODULE}}
+{\footnotesize\ttfamily \label{test__json_8cpp_a6b2a3852db8bb19ab6909bac01859985} 
+\#define BOOST\+\_\+\+TEST\+\_\+\+MODULE~io\+\_\+json}
+
+
+
+Definition at line \mbox{\hyperlink{test__json_8cpp_source_l00001}{1}} of file \mbox{\hyperlink{test__json_8cpp_source}{test\+\_\+json.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{test__json_8cpp_a22a029d884cbfab8b5abc9007a64b0e5}\index{test\_json.cpp@{test\_json.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!test\_json.cpp@{test\_json.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{test__json_8cpp_a22a029d884cbfab8b5abc9007a64b0e5} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{escape\+\_\+string\+\_\+test}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__json_8cpp_source_l00199}{199}} of file \mbox{\hyperlink{test__json_8cpp_source}{test\+\_\+json.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00200\ \{}
+\DoxyCodeLine{00201\ \ \ \ std::string\ escape\_out\_str;}
+\DoxyCodeLine{00202\ \ \ \ escape\_out\_str\ =\ \mbox{\hyperlink{namespacefc_aee7bbe89bfe8d6273f5212938cc1d458}{fc::escape\_string}}(\mbox{\hyperlink{namespacejson__test__util_ab040b504922fea186b59a23c84b7b6c0}{json\_test\_util::escape\_input\_str}},\ \mbox{\hyperlink{namespacejson__test__util_a8059bee23fb1d9a620cd07a1fadd0494}{json\_test\_util::yield\_no\_limitation}});}
+\DoxyCodeLine{00203\ \ \ \ BOOST\_CHECK\_LT(\mbox{\hyperlink{namespacejson__test__util_aca7d837defed360c051388763cb7f97b}{json\_test\_util::repeat\_char\_num}},\ \mbox{\hyperlink{namespacejson__test__util_ab040b504922fea186b59a23c84b7b6c0}{json\_test\_util::escape\_input\_str}}.size());}
+\DoxyCodeLine{00204\ \ \ \ BOOST\_CHECK\_LT(\mbox{\hyperlink{namespacejson__test__util_ab040b504922fea186b59a23c84b7b6c0}{json\_test\_util::escape\_input\_str}}.size()\ -\/\ \mbox{\hyperlink{namespacejson__test__util_aca7d837defed360c051388763cb7f97b}{json\_test\_util::repeat\_char\_num}},\ \mbox{\hyperlink{namespacejson__test__util_a833dc54843a301f60cbf9763b9ea85ab}{json\_test\_util::exception\_limit\_size}});\ \ \textcolor{comment}{//\ by\ using\ size\_different\ to\ calculate\ expected\ string}}
+\DoxyCodeLine{00205\ \ \ \ \{}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \textcolor{comment}{//\ simulate\ exceed\ time\ exception\ at\ the\ beginning\ of\ processing}}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ BOOST\_CHECK\_EXCEPTION(\mbox{\hyperlink{namespacefc_aee7bbe89bfe8d6273f5212938cc1d458}{escape\_string}}(\mbox{\hyperlink{namespacejson__test__util_ab040b504922fea186b59a23c84b7b6c0}{json\_test\_util::escape\_input\_str}},\ \mbox{\hyperlink{namespacejson__test__util_a60038ccb3db7302bd3d8d4d609d95bf0}{json\_test\_util::yield\_deadline\_exception\_at\_start}}),}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fc::timeout\_exception,}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacejson__test__util_a9d1e4b2c8886716c2b0f2a669d8e3c7f}{json\_test\_util::time\_except\_verf\_func}});}
+\DoxyCodeLine{00210\ \ \ \ \}}
+\DoxyCodeLine{00211\ \ \ \ \{}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \textcolor{comment}{//\ simulate\ exceed\ time\ exception\ in\ the\ middle\ of\ processing}}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ BOOST\_CHECK\_EXCEPTION(\mbox{\hyperlink{namespacefc_aee7bbe89bfe8d6273f5212938cc1d458}{escape\_string}}(\mbox{\hyperlink{namespacejson__test__util_ab040b504922fea186b59a23c84b7b6c0}{json\_test\_util::escape\_input\_str}},\ \mbox{\hyperlink{namespacejson__test__util_a5853467a7c801e3b9435ea0968547fc5}{json\_test\_util::yield\_deadline\_exception\_in\_mid}}),}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fc::timeout\_exception,}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacejson__test__util_a9d1e4b2c8886716c2b0f2a669d8e3c7f}{json\_test\_util::time\_except\_verf\_func}});}
+\DoxyCodeLine{00216\ \ \ \ \}}
+\DoxyCodeLine{00217\ \ \ \ \{}
+\DoxyCodeLine{00218\ \ \ \ \ \ \ \textcolor{comment}{//\ length\ limitation\ exception\ in\ the\ middle\ of\ processing}}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ BOOST\_CHECK\_EXCEPTION(\mbox{\hyperlink{namespacefc_aee7bbe89bfe8d6273f5212938cc1d458}{escape\_string}}(\mbox{\hyperlink{namespacejson__test__util_ab040b504922fea186b59a23c84b7b6c0}{json\_test\_util::escape\_input\_str}},\ \mbox{\hyperlink{namespacejson__test__util_a80ef3394249c0f81b96431022b7e35f6}{json\_test\_util::yield\_length\_exception}}),}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fc::assert\_exception,}
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacejson__test__util_a82dbdaa15a0f3c178a264a8e5a24c805}{json\_test\_util::length\_limit\_except\_verf\_func}});}
+\DoxyCodeLine{00222\ \ \ \ \}}
+\DoxyCodeLine{00223\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__json_8cpp_a22a029d884cbfab8b5abc9007a64b0e5_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__json_8cpp_acd07414856f20fea69de25c12f9e7bdf}\index{test\_json.cpp@{test\_json.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!test\_json.cpp@{test\_json.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{test__json_8cpp_acd07414856f20fea69de25c12f9e7bdf} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{to\+\_\+pretty\+\_\+string\+\_\+test}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__json_8cpp_source_l00123}{123}} of file \mbox{\hyperlink{test__json_8cpp_source}{test\+\_\+json.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00124\ \{}
+\DoxyCodeLine{00125\ \ \ \ \{\ \ \textcolor{comment}{//\ to\_pretty\_string(\ const\ variant\&\ v,\ const\ fc::time\_point\&\ deadline,\ const\ uint64\_t\ max\_len\ =\ max\_length\_limit,\ output\_formatting\ format\ =\ stringify\_large\_ints\_and\_doubles\ );}}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{variant}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}(\mbox{\hyperlink{namespacejson__test__util_ab040b504922fea186b59a23c84b7b6c0}{json\_test\_util::escape\_input\_str}});}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \ std::string\ deadline\_exception\_at\_start\_str;}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EXCEPTION(deadline\_exception\_at\_start\_str\ =\ json::to\_pretty\_string(\ v,\ \mbox{\hyperlink{classfc_1_1time__point_a841ec8241bcfda97fd0a648d631ff16c}{fc::time\_point::min}}(),\ json::output\_formatting::stringify\_large\_ints\_and\_doubles,\ json::max\_length\_limit),}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ fc::timeout\_exception,}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacejson__test__util_a9d1e4b2c8886716c2b0f2a669d8e3c7f}{json\_test\_util::time\_except\_verf\_func}});}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(deadline\_exception\_at\_start\_str.empty(),\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{size\_t}\ max\_len\ =\ 10;}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{variant}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}(\mbox{\hyperlink{namespacejson__test__util_ad6bad2ec8fd89dc114b6599ca0416dc9}{json\_test\_util::repeat\_chars}});}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ std::string\ deadline\_exception\_at\_start\_str;}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(deadline\_exception\_at\_start\_str.empty(),\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EXCEPTION(deadline\_exception\_at\_start\_str\ =\ json::to\_pretty\_string(\ v,\ \mbox{\hyperlink{classfc_1_1time__point_aeccf1b70aa34b132c5269313b8a50573}{fc::time\_point::maximum}}(),\ json::output\_formatting::stringify\_large\_ints\_and\_doubles,\ max\_len),}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fc::assert\_exception,}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacejson__test__util_a82dbdaa15a0f3c178a264a8e5a24c805}{json\_test\_util::length\_limit\_except\_verf\_func}});}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(deadline\_exception\_at\_start\_str.empty(),\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{variant}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}(\mbox{\hyperlink{namespacejson__test__util_ad6bad2ec8fd89dc114b6599ca0416dc9}{json\_test\_util::repeat\_chars}});}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \ std::string\ length\_exception\_in\_mid\_str;}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \ BOOST\_CHECK\_NO\_THROW(length\_exception\_in\_mid\_str\ =\ json::to\_pretty\_string(\ v,\ \mbox{\hyperlink{classfc_1_1time__point_aeccf1b70aa34b132c5269313b8a50573}{fc::time\_point::maximum}}(),\ json::output\_formatting::stringify\_large\_ints\_and\_doubles,\ json::max\_length\_limit));}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(length\_exception\_in\_mid\_str,\ \textcolor{stringliteral}{"{}\(\backslash\)"{}"{}}\ +\ \mbox{\hyperlink{namespacejson__test__util_ad6bad2ec8fd89dc114b6599ca0416dc9}{json\_test\_util::repeat\_chars}}\ +\ \textcolor{stringliteral}{"{}\(\backslash\)"{}"{}});}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00150\ \ \ \ \}}
+\DoxyCodeLine{00151\ \ \ \ \{\ \ \textcolor{comment}{//\ to\_pretty\_string(\ const\ variant\&\ v,\ const\ yield\_function\_t\&\ yield,\ output\_formatting\ format\ =\ stringify\_large\_ints\_and\_doubles\ );}}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1variant}{variant}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}(\mbox{\hyperlink{namespacejson__test__util_ad6bad2ec8fd89dc114b6599ca0416dc9}{json\_test\_util::repeat\_chars}});}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ BOOST\_CHECK\_LT(\mbox{\hyperlink{namespacejson__test__util_a833dc54843a301f60cbf9763b9ea85ab}{json\_test\_util::exception\_limit\_size}},\ \mbox{\hyperlink{namespacejson__test__util_ad6bad2ec8fd89dc114b6599ca0416dc9}{json\_test\_util::repeat\_chars}}.size());}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \ std::string\ deadline\_exception\_at\_start\_str;}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EXCEPTION(deadline\_exception\_at\_start\_str\ =\ json::to\_pretty\_string(\ v,\ \mbox{\hyperlink{namespacejson__test__util_a60038ccb3db7302bd3d8d4d609d95bf0}{json\_test\_util::yield\_deadline\_exception\_at\_start}}),}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fc::timeout\_exception,}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacejson__test__util_a9d1e4b2c8886716c2b0f2a669d8e3c7f}{json\_test\_util::time\_except\_verf\_func}});}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(deadline\_exception\_at\_start\_str.empty(),\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \ \ \ std::string\ deadline\_exception\_in\_mid\_str;}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EXCEPTION(deadline\_exception\_in\_mid\_str\ =\ json::to\_pretty\_string(\ v,\ \mbox{\hyperlink{namespacejson__test__util_a5853467a7c801e3b9435ea0968547fc5}{json\_test\_util::yield\_deadline\_exception\_in\_mid}}),}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fc::timeout\_exception,}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacejson__test__util_a9d1e4b2c8886716c2b0f2a669d8e3c7f}{json\_test\_util::time\_except\_verf\_func}});}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(deadline\_exception\_in\_mid\_str.empty(),\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \ std::string\ length\_exception\_in\_mid\_str;}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EXCEPTION(length\_exception\_in\_mid\_str\ =\ json::to\_pretty\_string(\ v,\ \mbox{\hyperlink{namespacejson__test__util_a80ef3394249c0f81b96431022b7e35f6}{json\_test\_util::yield\_length\_exception}}),}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fc::assert\_exception,}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacejson__test__util_a82dbdaa15a0f3c178a264a8e5a24c805}{json\_test\_util::length\_limit\_except\_verf\_func}});}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(length\_exception\_in\_mid\_str.empty(),\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \ std::string\ no\_exception\_str;}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \ BOOST\_CHECK\_NO\_THROW(no\_exception\_str\ =\ json::to\_pretty\_string(\ v,\ \mbox{\hyperlink{namespacejson__test__util_a8059bee23fb1d9a620cd07a1fadd0494}{json\_test\_util::yield\_no\_limitation}}));}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(no\_exception\_str,\ \textcolor{stringliteral}{"{}\(\backslash\)"{}"{}}\ +\ \mbox{\hyperlink{namespacejson__test__util_ad6bad2ec8fd89dc114b6599ca0416dc9}{json\_test\_util::repeat\_chars}}\ +\ \textcolor{stringliteral}{"{}\(\backslash\)"{}"{}});}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00180\ \ \ \ \}}
+\DoxyCodeLine{00181\ \ \ \ \{\ \textcolor{comment}{//\ to\_pretty\_string\ template\ call}}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ \textcolor{keywordtype}{id}\ =\ 1000;}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ =\ 3;}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::string\ id\_ret\_1\ =\ json::to\_pretty\_string(\ \textcolor{keywordtype}{id},\ \mbox{\hyperlink{classfc_1_1time__point_aeccf1b70aa34b132c5269313b8a50573}{fc::time\_point::maximum}}());}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(std::to\_string(\textcolor{keywordtype}{id}),\ id\_ret\_1);}
+\DoxyCodeLine{00186\ }
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \textcolor{comment}{//\ exceed\ length}}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ std::string\ id\_ret\_2;}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ BOOST\_REQUIRE\_THROW(id\_ret\_2\ =\ json::to\_pretty\_string(\ \textcolor{keywordtype}{id},\ \mbox{\hyperlink{classfc_1_1time__point_aeccf1b70aa34b132c5269313b8a50573}{fc::time\_point::maximum}}(),\ json::output\_formatting::stringify\_large\_ints\_and\_doubles,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}),\ fc::assert\_exception);}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(id\_ret\_2.empty(),\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00191\ }
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \textcolor{comment}{//\ time\_out}}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ std::string\ id\_ret\_3;}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ BOOST\_REQUIRE\_THROW(id\_ret\_3\ =\ json::to\_pretty\_string(\ \textcolor{keywordtype}{id},\ \mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{fc::time\_point::now}}()\ -\/\ \mbox{\hyperlink{namespacefc_a76ae235ec7e9b8862e70740058d7eb1b}{fc::milliseconds}}(1)\ ),\ fc::timeout\_exception);}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(id\_ret\_3.empty(),\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00196\ \ \ \ \}}
+\DoxyCodeLine{00197\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__json_8cpp_acd07414856f20fea69de25c12f9e7bdf_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__json_8cpp_a4fd4e2a2663951258d0a6311162e76dc}\index{test\_json.cpp@{test\_json.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!test\_json.cpp@{test\_json.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{test__json_8cpp_a4fd4e2a2663951258d0a6311162e76dc} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{to\+\_\+string\+\_\+test}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__json_8cpp_source_l00047}{47}} of file \mbox{\hyperlink{test__json_8cpp_source}{test\+\_\+json.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00048\ \{}
+\DoxyCodeLine{00049\ \ \ \ \{\ \ \textcolor{comment}{//\ to\_string(\ const\ variant\&\ v,\ const\ fc::time\_point\&\ deadline,\ const\ uint64\_t\ max\_len\ =\ max\_length\_limit,\ output\_formatting\ format\ =\ stringify\_large\_ints\_and\_doubles);}}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{variant}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}(\mbox{\hyperlink{namespacejson__test__util_ab040b504922fea186b59a23c84b7b6c0}{json\_test\_util::escape\_input\_str}});}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ std::string\ deadline\_exception\_at\_start\_str;}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EXCEPTION(deadline\_exception\_at\_start\_str\ =\ json::to\_string(\ v,\ \mbox{\hyperlink{classfc_1_1time__point_a841ec8241bcfda97fd0a648d631ff16c}{fc::time\_point::min}}(),\ json::output\_formatting::stringify\_large\_ints\_and\_doubles,\ json::max\_length\_limit),}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fc::timeout\_exception,}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacejson__test__util_a9d1e4b2c8886716c2b0f2a669d8e3c7f}{json\_test\_util::time\_except\_verf\_func}});}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(deadline\_exception\_at\_start\_str.empty(),\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{size\_t}\ max\_len\ =\ 10;}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{variant}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}(\mbox{\hyperlink{namespacejson__test__util_ad6bad2ec8fd89dc114b6599ca0416dc9}{json\_test\_util::repeat\_chars}});}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \ std::string\ deadline\_exception\_at\_start\_str;}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(deadline\_exception\_at\_start\_str.empty(),\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EXCEPTION(deadline\_exception\_at\_start\_str\ =\ json::to\_string(\ v,\ \mbox{\hyperlink{classfc_1_1time__point_aeccf1b70aa34b132c5269313b8a50573}{fc::time\_point::maximum}}(),\ json::output\_formatting::stringify\_large\_ints\_and\_doubles,\ max\_len),}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fc::assert\_exception,}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacejson__test__util_a82dbdaa15a0f3c178a264a8e5a24c805}{json\_test\_util::length\_limit\_except\_verf\_func}});}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(deadline\_exception\_at\_start\_str.empty(),\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{variant}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}(\mbox{\hyperlink{namespacejson__test__util_ad6bad2ec8fd89dc114b6599ca0416dc9}{json\_test\_util::repeat\_chars}});}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ std::string\ length\_exception\_in\_mid\_str;}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ BOOST\_CHECK\_NO\_THROW(length\_exception\_in\_mid\_str\ =\ json::to\_string(\ v,\ \mbox{\hyperlink{classfc_1_1time__point_aeccf1b70aa34b132c5269313b8a50573}{fc::time\_point::maximum}}(),\ json::output\_formatting::stringify\_large\_ints\_and\_doubles,\ json::max\_length\_limit));}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(length\_exception\_in\_mid\_str,\ \textcolor{stringliteral}{"{}\(\backslash\)"{}"{}}\ +\ \mbox{\hyperlink{namespacejson__test__util_ad6bad2ec8fd89dc114b6599ca0416dc9}{json\_test\_util::repeat\_chars}}\ +\ \textcolor{stringliteral}{"{}\(\backslash\)"{}"{}});}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00074\ \ \ \ \}}
+\DoxyCodeLine{00075\ \ \ \ \{\ \ \textcolor{comment}{//\ to\_string(\ const\ variant\&\ v,\ const\ yield\_function\_t\&\ yield,\ output\_formatting\ format\ =\ stringify\_large\_ints\_and\_doubles);}}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1variant}{variant}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}(\mbox{\hyperlink{namespacejson__test__util_ad6bad2ec8fd89dc114b6599ca0416dc9}{json\_test\_util::repeat\_chars}});}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ BOOST\_CHECK\_LT(\mbox{\hyperlink{namespacejson__test__util_a833dc54843a301f60cbf9763b9ea85ab}{json\_test\_util::exception\_limit\_size}},\ \mbox{\hyperlink{namespacejson__test__util_ad6bad2ec8fd89dc114b6599ca0416dc9}{json\_test\_util::repeat\_chars}}.size());}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ std::string\ deadline\_exception\_at\_start\_str;}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EXCEPTION(deadline\_exception\_at\_start\_str\ =\ json::to\_string(\ v,\ \mbox{\hyperlink{namespacejson__test__util_a60038ccb3db7302bd3d8d4d609d95bf0}{json\_test\_util::yield\_deadline\_exception\_at\_start}}),}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fc::timeout\_exception,}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacejson__test__util_a9d1e4b2c8886716c2b0f2a669d8e3c7f}{json\_test\_util::time\_except\_verf\_func}});}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(deadline\_exception\_at\_start\_str.empty(),\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \ std::string\ deadline\_exception\_in\_mid\_str;}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EXCEPTION(deadline\_exception\_in\_mid\_str\ =\ json::to\_string(\ v,\ \mbox{\hyperlink{namespacejson__test__util_a5853467a7c801e3b9435ea0968547fc5}{json\_test\_util::yield\_deadline\_exception\_in\_mid}}),}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fc::timeout\_exception,}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacejson__test__util_a9d1e4b2c8886716c2b0f2a669d8e3c7f}{json\_test\_util::time\_except\_verf\_func}});}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(deadline\_exception\_in\_mid\_str.empty(),\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ std::string\ length\_exception\_in\_mid\_str;}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EXCEPTION(length\_exception\_in\_mid\_str\ =\ json::to\_string(\ v,\ \mbox{\hyperlink{namespacejson__test__util_a80ef3394249c0f81b96431022b7e35f6}{json\_test\_util::yield\_length\_exception}}),}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fc::assert\_exception,}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacejson__test__util_a82dbdaa15a0f3c178a264a8e5a24c805}{json\_test\_util::length\_limit\_except\_verf\_func}});}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(length\_exception\_in\_mid\_str.empty(),\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ std::string\ no\_exception\_str;}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ BOOST\_CHECK\_NO\_THROW(no\_exception\_str\ =\ json::to\_string(\ v,\ \mbox{\hyperlink{namespacejson__test__util_a8059bee23fb1d9a620cd07a1fadd0494}{json\_test\_util::yield\_no\_limitation}}));}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(no\_exception\_str,\ \textcolor{stringliteral}{"{}\(\backslash\)"{}"{}}\ +\ \mbox{\hyperlink{namespacejson__test__util_ad6bad2ec8fd89dc114b6599ca0416dc9}{json\_test\_util::repeat\_chars}}\ +\ \textcolor{stringliteral}{"{}\(\backslash\)"{}"{}});}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00104\ \ \ \ \}}
+\DoxyCodeLine{00105\ \ \ \ \{\ \textcolor{comment}{//\ to\_string\ template\ call}}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ \textcolor{keywordtype}{id}\ =\ 1000;}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ =\ 3;}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::string\ id\_ret\_1\ =\ json::to\_string(\ \textcolor{keywordtype}{id},\ \mbox{\hyperlink{classfc_1_1time__point_aeccf1b70aa34b132c5269313b8a50573}{fc::time\_point::maximum}}());}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(std::to\_string(\textcolor{keywordtype}{id}),\ id\_ret\_1);}
+\DoxyCodeLine{00110\ }
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \textcolor{comment}{//\ exceed\ length}}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ std::string\ id\_ret\_2;}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ BOOST\_REQUIRE\_THROW(id\_ret\_2\ =\ json::to\_string(\ \textcolor{keywordtype}{id},\ \mbox{\hyperlink{classfc_1_1time__point_aeccf1b70aa34b132c5269313b8a50573}{fc::time\_point::maximum}}(),\ json::output\_formatting::stringify\_large\_ints\_and\_doubles,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}),\ fc::assert\_exception);}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(id\_ret\_2.empty(),\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00115\ }
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \textcolor{comment}{//\ time\_out}}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ std::string\ id\_ret\_3;}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ BOOST\_REQUIRE\_THROW(id\_ret\_3\ =\ json::to\_string(\ \textcolor{keywordtype}{id},\ \mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{fc::time\_point::now}}()\ -\/\ \mbox{\hyperlink{namespacefc_a76ae235ec7e9b8862e70740058d7eb1b}{fc::milliseconds}}(1)\ ),\ fc::timeout\_exception);}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(id\_ret\_3.empty(),\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00120\ \ \ \ \}}
+\DoxyCodeLine{00121\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__json_8cpp_a4fd4e2a2663951258d0a6311162e76dc_cgraph}
+\end{center}
+\end{figure}

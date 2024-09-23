@@ -1,0 +1,9 @@
+<map id="chainbase::undo_index::get" name="chainbase::undo_index::get">
+<area shape="rect" id="Node000001" title=" " alt="" coords="250,55,430,80"/>
+<area shape="rect" id="Node000002" href="$undo__index_8cpp.html#ad2c851d4d6932a1b1e4686add49993b0" title=" " alt="" coords="5,5,202,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="259,54,168,34,169,29,261,48"/>
+<area shape="rect" id="Node000003" href="$undo__index_8cpp.html#ade06c047298c551422cfe3fd33ad1ca0" title=" " alt="" coords="11,55,196,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="234,70,196,70,196,65,234,65"/>
+<area shape="rect" id="Node000004" href="$undo__index_8cpp.html#a5f6f2f5e97f312c11b1acd2d55a9a7e1" title=" " alt="" coords="11,104,196,130"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="261,87,169,106,168,101,259,81"/>
+</map>

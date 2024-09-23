@@ -1,0 +1,68 @@
+\doxysection{none.\+hpp}
+\hypertarget{concurrency_2none_8hpp_source}{}\label{concurrency_2none_8hpp_source}\index{libraries/fc/vendor/websocketpp/websocketpp/concurrency/none.hpp@{libraries/fc/vendor/websocketpp/websocketpp/concurrency/none.hpp}}
+\mbox{\hyperlink{concurrency_2none_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2014,\ Peter\ Thorson.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00004}00004\ \textcolor{comment}{\ *\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00005}00005\ \textcolor{comment}{\ *\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are\ met:}}
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00006}00006\ \textcolor{comment}{\ *\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00007}00007\ \textcolor{comment}{\ *\ \ \ \ \ \ \ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00008}00008\ \textcolor{comment}{\ *\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00009}00009\ \textcolor{comment}{\ *\ \ \ \ \ \ \ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer\ in\ the}}
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00010}00010\ \textcolor{comment}{\ *\ \ \ \ \ \ \ documentation\ and/or\ other\ materials\ provided\ with\ the\ distribution.}}
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00011}00011\ \textcolor{comment}{\ *\ \ \ \ \ *\ Neither\ the\ name\ of\ the\ WebSocket++\ Project\ nor\ the}}
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00012}00012\ \textcolor{comment}{\ *\ \ \ \ \ \ \ names\ of\ its\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products}}
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00013}00013\ \textcolor{comment}{\ *\ \ \ \ \ \ \ derived\ from\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00014}00014\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00015}00015\ \textcolor{comment}{\ *\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS\ "{}AS\ IS"{}}}
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00016}00016\ \textcolor{comment}{\ *\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ THE}}
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00017}00017\ \textcolor{comment}{\ *\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR\ A\ PARTICULAR\ PURPOSE}}
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00018}00018\ \textcolor{comment}{\ *\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ PETER\ THORSON\ BE\ LIABLE\ FOR\ ANY}}
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00019}00019\ \textcolor{comment}{\ *\ DIRECT,\ INDIRECT,\ INCIDENTAL,\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES}}
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00020}00020\ \textcolor{comment}{\ *\ (INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;}}
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00021}00021\ \textcolor{comment}{\ *\ LOSS\ OF\ USE,\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND}}
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00022}00022\ \textcolor{comment}{\ *\ ON\ ANY\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00023}00023\ \textcolor{comment}{\ *\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE\ OF\ THIS}}
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00024}00024\ \textcolor{comment}{\ *\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00025}00025\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00026}00026\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00028}00028\ \textcolor{preprocessor}{\#ifndef\ WEBSOCKETPP\_CONCURRENCY\_NONE\_HPP}}
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00029}00029\ \textcolor{preprocessor}{\#define\ WEBSOCKETPP\_CONCURRENCY\_NONE\_HPP}}
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00031}00031\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacewebsocketpp}{websocketpp}}\ \{}
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00034}00034\ \textcolor{keyword}{namespace\ }concurrency\ \{}
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00037}\mbox{\hyperlink{namespacewebsocketpp_1_1concurrency_1_1none__impl}{00037}}\ \textcolor{keyword}{namespace\ }none\_impl\ \{}
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00039}\mbox{\hyperlink{classwebsocketpp_1_1concurrency_1_1none__impl_1_1fake__mutex}{00039}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classwebsocketpp_1_1concurrency_1_1none__impl_1_1fake__mutex}{fake\_mutex}}\ \{}
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00040}00040\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00041}\mbox{\hyperlink{classwebsocketpp_1_1concurrency_1_1none__impl_1_1fake__mutex_ae0d195982a53fda6c5108e0a959455e6}{00041}}\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1concurrency_1_1none__impl_1_1fake__mutex_ae0d195982a53fda6c5108e0a959455e6}{fake\_mutex}}()\ \{\}}
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00042}\mbox{\hyperlink{classwebsocketpp_1_1concurrency_1_1none__impl_1_1fake__mutex_a039c81f54e5a650da5182050477bc34b}{00042}}\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1concurrency_1_1none__impl_1_1fake__mutex_a039c81f54e5a650da5182050477bc34b}{\string~fake\_mutex}}()\ \{\}}
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00043}00043\ \};}
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00046}\mbox{\hyperlink{classwebsocketpp_1_1concurrency_1_1none__impl_1_1fake__lock__guard}{00046}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classwebsocketpp_1_1concurrency_1_1none__impl_1_1fake__lock__guard}{fake\_lock\_guard}}\ \{}
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00047}00047\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00048}\mbox{\hyperlink{classwebsocketpp_1_1concurrency_1_1none__impl_1_1fake__lock__guard_a6b1764d95374ca8e341e187427088150}{00048}}\ \ \ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classwebsocketpp_1_1concurrency_1_1none__impl_1_1fake__lock__guard_a6b1764d95374ca8e341e187427088150}{fake\_lock\_guard}}(\mbox{\hyperlink{classwebsocketpp_1_1concurrency_1_1none__impl_1_1fake__mutex}{fake\_mutex}})\ \{\}}
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00049}\mbox{\hyperlink{classwebsocketpp_1_1concurrency_1_1none__impl_1_1fake__lock__guard_a727b1ccbb3e732fae072820dcced7a49}{00049}}\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1concurrency_1_1none__impl_1_1fake__lock__guard_a727b1ccbb3e732fae072820dcced7a49}{\string~fake\_lock\_guard}}()\ \{\}}
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00050}00050\ \};}
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00051}00051\ \}\ \textcolor{comment}{//\ namespace\ none\_impl}}
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00052}00052\ }
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00054}00054\ }
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00060}\mbox{\hyperlink{classwebsocketpp_1_1concurrency_1_1none}{00060}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classwebsocketpp_1_1concurrency_1_1none}{none}}\ \{}
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00061}00061\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00066}\mbox{\hyperlink{classwebsocketpp_1_1concurrency_1_1none_a1768441855790bab4b7751a26821fcb3}{00066}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1concurrency_1_1none__impl_1_1fake__mutex}{none\_impl::fake\_mutex}}\ \mbox{\hyperlink{classwebsocketpp_1_1concurrency_1_1none_a1768441855790bab4b7751a26821fcb3}{mutex\_type}};}
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00067}00067\ }
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00069}00069\ }
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00074}\mbox{\hyperlink{classwebsocketpp_1_1concurrency_1_1none_a88fb8e4883c82e6bfa3638118ddff2aa}{00074}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1concurrency_1_1none__impl_1_1fake__lock__guard}{none\_impl::fake\_lock\_guard}}\ \mbox{\hyperlink{classwebsocketpp_1_1concurrency_1_1none_a88fb8e4883c82e6bfa3638118ddff2aa}{scoped\_lock\_type}};}
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00075}00075\ \};}
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00076}00076\ }
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00077}00077\ \}\ \textcolor{comment}{//\ namespace\ concurrency}}
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00078}00078\ \}\ \textcolor{comment}{//\ namespace\ websocketpp}}
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{concurrency_2none_8hpp_source_l00080}00080\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ WEBSOCKETPP\_CONCURRENCY\_ASYNC\_HPP}}
+
+\end{DoxyCode}

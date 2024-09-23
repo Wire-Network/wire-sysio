@@ -1,0 +1,96 @@
+\doxysection{Catch\+::Reporter\+Config Struct Reference}
+\hypertarget{struct_catch_1_1_reporter_config}{}\label{struct_catch_1_1_reporter_config}\index{Catch::ReporterConfig@{Catch::ReporterConfig}}
+
+
+{\ttfamily \#include $<$catch\+\_\+interfaces\+\_\+reporter.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_catch_1_1_reporter_config_abea14ccc8c49681b870f96403f129126}{Reporter\+Config}} (\mbox{\hyperlink{namespace_catch_a961f6f5f07e265684c220a8ae014d7d6}{IConfig\+Ptr}} const \&\+\_\+full\+Config)
+\item 
+\mbox{\hyperlink{struct_catch_1_1_reporter_config_a5cbc8a63133f89bb1cb2ac2e060a207c}{Reporter\+Config}} (\mbox{\hyperlink{namespace_catch_a961f6f5f07e265684c220a8ae014d7d6}{IConfig\+Ptr}} const \&\+\_\+full\+Config, std\+::ostream \&\+\_\+stream)
+\item 
+std\+::ostream \& \mbox{\hyperlink{struct_catch_1_1_reporter_config_a0bf313b11c33b54cfd8ec731fae334a9}{stream}} () const
+\item 
+\mbox{\hyperlink{namespace_catch_a961f6f5f07e265684c220a8ae014d7d6}{IConfig\+Ptr}} \mbox{\hyperlink{struct_catch_1_1_reporter_config_a795442fba53c23f5b38516c02f820d4b}{full\+Config}} () const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{catch__interfaces__reporter_8h_source_l00030}{30}} of file \mbox{\hyperlink{catch__interfaces__reporter_8h_source}{catch\+\_\+interfaces\+\_\+reporter.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{struct_catch_1_1_reporter_config_abea14ccc8c49681b870f96403f129126}\index{Catch::ReporterConfig@{Catch::ReporterConfig}!ReporterConfig@{ReporterConfig}}
+\index{ReporterConfig@{ReporterConfig}!Catch::ReporterConfig@{Catch::ReporterConfig}}
+\doxysubsubsection{\texorpdfstring{ReporterConfig()}{ReporterConfig()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_reporter_config_abea14ccc8c49681b870f96403f129126} 
+Catch\+::\+Reporter\+Config\+::\+Reporter\+Config (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespace_catch_a961f6f5f07e265684c220a8ae014d7d6}{IConfig\+Ptr}} const \&}]{\+\_\+full\+Config}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{include_2internal_2catch__interfaces__reporter_8cpp_source_l00013}{13}} of file \mbox{\hyperlink{include_2internal_2catch__interfaces__reporter_8cpp_source}{catch\+\_\+interfaces\+\_\+reporter.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00014\ \ \ \ \ :\ \ \ m\_stream(\ \&\_fullConfig-\/>stream()\ ),\ m\_fullConfig(\ \_fullConfig\ )\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{struct_catch_1_1_reporter_config_a5cbc8a63133f89bb1cb2ac2e060a207c}\index{Catch::ReporterConfig@{Catch::ReporterConfig}!ReporterConfig@{ReporterConfig}}
+\index{ReporterConfig@{ReporterConfig}!Catch::ReporterConfig@{Catch::ReporterConfig}}
+\doxysubsubsection{\texorpdfstring{ReporterConfig()}{ReporterConfig()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_reporter_config_a5cbc8a63133f89bb1cb2ac2e060a207c} 
+Catch\+::\+Reporter\+Config\+::\+Reporter\+Config (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespace_catch_a961f6f5f07e265684c220a8ae014d7d6}{IConfig\+Ptr}} const \&}]{\+\_\+full\+Config}{, }\item[{std\+::ostream \&}]{\+\_\+stream}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{include_2internal_2catch__interfaces__reporter_8cpp_source_l00016}{16}} of file \mbox{\hyperlink{include_2internal_2catch__interfaces__reporter_8cpp_source}{catch\+\_\+interfaces\+\_\+reporter.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00017\ \ \ \ \ :\ \ \ m\_stream(\ \&\_stream\ ),\ m\_fullConfig(\ \_fullConfig\ )\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_catch_1_1_reporter_config_a795442fba53c23f5b38516c02f820d4b}\index{Catch::ReporterConfig@{Catch::ReporterConfig}!fullConfig@{fullConfig}}
+\index{fullConfig@{fullConfig}!Catch::ReporterConfig@{Catch::ReporterConfig}}
+\doxysubsubsection{\texorpdfstring{fullConfig()}{fullConfig()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_reporter_config_a795442fba53c23f5b38516c02f820d4b} 
+\mbox{\hyperlink{namespace_catch_a961f6f5f07e265684c220a8ae014d7d6}{IConfig\+Ptr}} Catch\+::\+Reporter\+Config\+::full\+Config (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{include_2internal_2catch__interfaces__reporter_8cpp_source_l00020}{20}} of file \mbox{\hyperlink{include_2internal_2catch__interfaces__reporter_8cpp_source}{catch\+\_\+interfaces\+\_\+reporter.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00020\ \{\ \textcolor{keywordflow}{return}\ m\_fullConfig;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_catch_1_1_reporter_config_a0bf313b11c33b54cfd8ec731fae334a9}\index{Catch::ReporterConfig@{Catch::ReporterConfig}!stream@{stream}}
+\index{stream@{stream}!Catch::ReporterConfig@{Catch::ReporterConfig}}
+\doxysubsubsection{\texorpdfstring{stream()}{stream()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_reporter_config_a0bf313b11c33b54cfd8ec731fae334a9} 
+std\+::ostream \& Catch\+::\+Reporter\+Config\+::stream (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{include_2internal_2catch__interfaces__reporter_8cpp_source_l00019}{19}} of file \mbox{\hyperlink{include_2internal_2catch__interfaces__reporter_8cpp_source}{catch\+\_\+interfaces\+\_\+reporter.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00019\ \{\ \textcolor{keywordflow}{return}\ *m\_stream;\ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__interfaces__reporter_8h}{catch\+\_\+interfaces\+\_\+reporter.\+h}}\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{include_2internal_2catch__interfaces__reporter_8cpp}{catch\+\_\+interfaces\+\_\+reporter.\+cpp}}\end{DoxyCompactItemize}

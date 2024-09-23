@@ -1,0 +1,11 @@
+<map id="sysio::vm::execution_context_base::grow_linear_memory" name="sysio::vm::execution_context_base::grow_linear_memory">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,63,186,119"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1vm_1_1wasm__allocator.html#a5d174bad6aeb4700da180e9c00634dbd" title=" " alt="" coords="234,5,411,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="185,62,234,48,235,53,187,68"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1vm_1_1wasm__allocator.html#a50a1cea0225ea715ba193c7001033770" title=" " alt="" coords="234,71,411,111"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="186,88,218,88,218,94,186,94"/>
+<area shape="rect" id="Node000005" href="$classsysio_1_1vm_1_1wasm__allocator.html#ac7b27cff26088c7ad01afb6118d547d2" title=" " alt="" coords="234,136,411,177"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="187,114,235,129,234,134,185,120"/>
+<area shape="rect" id="Node000003" href="$yubihsm__pkcs11_8c.html#adc4bd59a60361844aa0e852efa210105" title=" " alt="" coords="459,13,527,38"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="411,23,443,23,443,28,411,28"/>
+</map>

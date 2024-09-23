@@ -1,0 +1,76 @@
+\doxysection{libraries/fc/vendor/websocketpp/tutorials/utility\+\_\+client/step2.cpp File Reference}
+\hypertarget{utility__client_2step2_8cpp}{}\label{utility__client_2step2_8cpp}\index{libraries/fc/vendor/websocketpp/tutorials/utility\_client/step2.cpp@{libraries/fc/vendor/websocketpp/tutorials/utility\_client/step2.cpp}}
+{\ttfamily \#include $<$websocketpp/config/asio\+\_\+no\+\_\+tls\+\_\+client.\+hpp$>$}\newline
+{\ttfamily \#include $<$websocketpp/client.\+hpp$>$}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$string$>$}\newline
+Include dependency graph for step2.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{utility__client_2step2_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1client}{websocketpp\+::client}}$<$ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio__client}{websocketpp\+::config\+::asio\+\_\+client}} $>$ \mbox{\hyperlink{utility__client_2step2_8cpp_aff8c62b83a9c8aefc476f96166656b76}{client}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{utility__client_2step2_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{utility__client_2step2_8cpp_aff8c62b83a9c8aefc476f96166656b76}\index{step2.cpp@{step2.cpp}!client@{client}}
+\index{client@{client}!step2.cpp@{step2.cpp}}
+\doxysubsubsection{\texorpdfstring{client}{client}}
+{\footnotesize\ttfamily \label{utility__client_2step2_8cpp_aff8c62b83a9c8aefc476f96166656b76} 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1client}{websocketpp\+::client}}$<$\mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio__client}{websocketpp\+::config\+::asio\+\_\+client}}$>$ \mbox{\hyperlink{debug__client_8cpp_aff8c62b83a9c8aefc476f96166656b76}{client}}}
+
+
+
+Definition at line \mbox{\hyperlink{utility__client_2step2_8cpp_source_l00037}{37}} of file \mbox{\hyperlink{utility__client_2step2_8cpp_source}{step2.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{utility__client_2step2_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}\index{step2.cpp@{step2.cpp}!main@{main}}
+\index{main@{main}!step2.cpp@{step2.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{utility__client_2step2_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4} 
+int main (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{utility__client_2step2_8cpp_source_l00039}{39}} of file \mbox{\hyperlink{utility__client_2step2_8cpp_source}{step2.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00040\ \ \ \ \ \textcolor{keywordtype}{bool}\ done\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00041\ \ \ \ \ std::string\ input;}
+\DoxyCodeLine{00042\ }
+\DoxyCodeLine{00043\ \ \ \ \ \textcolor{keywordflow}{while}\ (!done)\ \{}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}Enter\ Command:\ "{}};}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ std::getline(std::cin,\ input);}
+\DoxyCodeLine{00046\ }
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (input\ ==\ \textcolor{stringliteral}{"{}quit"{}})\ \{}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \ \ \ done\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (input\ ==\ \textcolor{stringliteral}{"{}help"{}})\ \{}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \ \ \ std::cout}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\(\backslash\)nCommand\ List:\(\backslash\)n"{}}}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}help:\ Display\ this\ help\ text\(\backslash\)n"{}}}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}quit:\ Exit\ the\ program\(\backslash\)n"{}}}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ std::endl;}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}Unrecognized\ Command"{}}\ <<\ std::endl;}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00058\ \ \ \ \ \}}
+\DoxyCodeLine{00059\ }
+\DoxyCodeLine{00060\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00061\ \}}
+
+\end{DoxyCode}

@@ -1,0 +1,231 @@
+\doxysection{chainbase\+::abstract\+\_\+index Class Reference}
+\hypertarget{classchainbase_1_1abstract__index}{}\label{classchainbase_1_1abstract__index}\index{chainbase::abstract\_index@{chainbase::abstract\_index}}
+
+
+{\ttfamily \#include $<$chainbase.\+hpp$>$}
+
+
+
+Inheritance diagram for chainbase\+::abstract\+\_\+index\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=344pt]{classchainbase_1_1abstract__index__inherit__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classchainbase_1_1abstract__index_ab87f0755ea957145b06a0b6fd7211932}{abstract\+\_\+index}} (void \texorpdfstring{$\ast$}{*}i)
+\item 
+virtual \mbox{\hyperlink{classchainbase_1_1abstract__index_a5165c137eaf3cd6a7019b526812ee514}{\texorpdfstring{$\sim$}{\string~}abstract\+\_\+index}} ()
+\item 
+virtual void \mbox{\hyperlink{classchainbase_1_1abstract__index_afbbf53c11335ab092f9ae9ad61ab4713}{set\+\_\+revision}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{classchainbase_1_1abstract__index_a5d516edfe41f7652301047157ae9637a}{revision}})=0
+\item 
+virtual unique\+\_\+ptr$<$ \mbox{\hyperlink{classchainbase_1_1abstract__session}{abstract\+\_\+session}} $>$ \mbox{\hyperlink{classchainbase_1_1abstract__index_a10a45a95a0c0d7eebbd9ccae923aa0ad}{start\+\_\+undo\+\_\+session}} (bool enabled)=0
+\item 
+virtual \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{classchainbase_1_1abstract__index_a5d516edfe41f7652301047157ae9637a}{revision}} () const =0
+\item 
+virtual void \mbox{\hyperlink{classchainbase_1_1abstract__index_a71f1306a939617ecf6e12998f611de41}{undo}} () const =0
+\item 
+virtual void \mbox{\hyperlink{classchainbase_1_1abstract__index_ab3da2a8b3f20754bfb48fe69e7e54022}{squash}} () const =0
+\item 
+virtual void \mbox{\hyperlink{classchainbase_1_1abstract__index_a14f76f6b884e87e5cd99ba10e0dcd1ec}{commit}} (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{classchainbase_1_1abstract__index_a5d516edfe41f7652301047157ae9637a}{revision}}) const =0
+\item 
+virtual void \mbox{\hyperlink{classchainbase_1_1abstract__index_a2ad4109af3219e4dd6c06ccb580e0645}{undo\+\_\+all}} () const =0
+\item 
+virtual \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classchainbase_1_1abstract__index_af88f60ca72249096329fb9a59c4010ca}{type\+\_\+id}} () const =0
+\item 
+virtual \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{classchainbase_1_1abstract__index_ae099b07231f83f5bbe8907e8664603ef}{row\+\_\+count}} () const =0
+\item 
+virtual const std\+::string \& \mbox{\hyperlink{classchainbase_1_1abstract__index_ae4794e898d22bc8b1102ddf05c0be6a0}{type\+\_\+name}} () const =0
+\item 
+virtual std\+::pair$<$ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}, \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} $>$ \mbox{\hyperlink{classchainbase_1_1abstract__index_ade4f38f88a3d165ede21d6dc9b14e055}{undo\+\_\+stack\+\_\+revision\+\_\+range}} () const =0
+\item 
+virtual void \mbox{\hyperlink{classchainbase_1_1abstract__index_ac61e9c755ddde5e123e43304dde40f1d}{remove\+\_\+object}} (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{code__cache_8cpp_aa0efefe21f4700d78692edc823e763be}{id}})=0
+\item 
+void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classchainbase_1_1abstract__index_abcb58573b32f59721d898ba53e04133e}{get}} () const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00159}{159}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classchainbase_1_1abstract__index_ab87f0755ea957145b06a0b6fd7211932}\index{chainbase::abstract\_index@{chainbase::abstract\_index}!abstract\_index@{abstract\_index}}
+\index{abstract\_index@{abstract\_index}!chainbase::abstract\_index@{chainbase::abstract\_index}}
+\doxysubsubsection{\texorpdfstring{abstract\_index()}{abstract\_index()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1abstract__index_ab87f0755ea957145b06a0b6fd7211932} 
+chainbase\+::abstract\+\_\+index\+::abstract\+\_\+index (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{i}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00162}{162}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00162\ :\_idx\_ptr(i)\{\}}
+
+\end{DoxyCode}
+\Hypertarget{classchainbase_1_1abstract__index_a5165c137eaf3cd6a7019b526812ee514}\index{chainbase::abstract\_index@{chainbase::abstract\_index}!````~abstract\_index@{\texorpdfstring{$\sim$}{\string~}abstract\_index}}
+\index{````~abstract\_index@{\texorpdfstring{$\sim$}{\string~}abstract\_index}!chainbase::abstract\_index@{chainbase::abstract\_index}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}abstract\_index()}{\string~abstract\_index()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1abstract__index_a5165c137eaf3cd6a7019b526812ee514} 
+virtual chainbase\+::abstract\+\_\+index\+::\texorpdfstring{$\sim$}{\string~}abstract\+\_\+index (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00163}{163}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00163\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classchainbase_1_1abstract__index_a14f76f6b884e87e5cd99ba10e0dcd1ec}\index{chainbase::abstract\_index@{chainbase::abstract\_index}!commit@{commit}}
+\index{commit@{commit}!chainbase::abstract\_index@{chainbase::abstract\_index}}
+\doxysubsubsection{\texorpdfstring{commit()}{commit()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1abstract__index_a14f76f6b884e87e5cd99ba10e0dcd1ec} 
+virtual void chainbase\+::abstract\+\_\+index\+::commit (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}}]{revision}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{classchainbase_1_1index__impl_a750b8876694e1d659d9d06a269463075}{chainbase\+::index\+\_\+impl$<$ Base\+Index $>$}}, and \mbox{\hyperlink{classchainbase_1_1index__impl_a750b8876694e1d659d9d06a269463075}{chainbase\+::index\+\_\+impl$<$ Index\+Type $>$}}.
+
+\Hypertarget{classchainbase_1_1abstract__index_abcb58573b32f59721d898ba53e04133e}\index{chainbase::abstract\_index@{chainbase::abstract\_index}!get@{get}}
+\index{get@{get}!chainbase::abstract\_index@{chainbase::abstract\_index}}
+\doxysubsubsection{\texorpdfstring{get()}{get()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1abstract__index_abcb58573b32f59721d898ba53e04133e} 
+void \texorpdfstring{$\ast$}{*} chainbase\+::abstract\+\_\+index\+::get (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00179}{179}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00179\ \{\ \textcolor{keywordflow}{return}\ \_idx\_ptr;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classchainbase_1_1abstract__index_ac61e9c755ddde5e123e43304dde40f1d}\index{chainbase::abstract\_index@{chainbase::abstract\_index}!remove\_object@{remove\_object}}
+\index{remove\_object@{remove\_object}!chainbase::abstract\_index@{chainbase::abstract\_index}}
+\doxysubsubsection{\texorpdfstring{remove\_object()}{remove\_object()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1abstract__index_ac61e9c755ddde5e123e43304dde40f1d} 
+virtual void chainbase\+::abstract\+\_\+index\+::remove\+\_\+object (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}}]{id}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{classchainbase_1_1index__impl_abca36d34cfd673d5602aed01fce2437e}{chainbase\+::index\+\_\+impl$<$ Base\+Index $>$}}, and \mbox{\hyperlink{classchainbase_1_1index__impl_abca36d34cfd673d5602aed01fce2437e}{chainbase\+::index\+\_\+impl$<$ Index\+Type $>$}}.
+
+\Hypertarget{classchainbase_1_1abstract__index_a5d516edfe41f7652301047157ae9637a}\index{chainbase::abstract\_index@{chainbase::abstract\_index}!revision@{revision}}
+\index{revision@{revision}!chainbase::abstract\_index@{chainbase::abstract\_index}}
+\doxysubsubsection{\texorpdfstring{revision()}{revision()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1abstract__index_a5d516edfe41f7652301047157ae9637a} 
+virtual \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} chainbase\+::abstract\+\_\+index\+::revision (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{classchainbase_1_1index__impl_a58bec3224f3613f34590a98120121621}{chainbase\+::index\+\_\+impl$<$ Base\+Index $>$}}, and \mbox{\hyperlink{classchainbase_1_1index__impl_a58bec3224f3613f34590a98120121621}{chainbase\+::index\+\_\+impl$<$ Index\+Type $>$}}.
+
+\Hypertarget{classchainbase_1_1abstract__index_ae099b07231f83f5bbe8907e8664603ef}\index{chainbase::abstract\_index@{chainbase::abstract\_index}!row\_count@{row\_count}}
+\index{row\_count@{row\_count}!chainbase::abstract\_index@{chainbase::abstract\_index}}
+\doxysubsubsection{\texorpdfstring{row\_count()}{row\_count()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1abstract__index_ae099b07231f83f5bbe8907e8664603ef} 
+virtual \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} chainbase\+::abstract\+\_\+index\+::row\+\_\+count (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{classchainbase_1_1index__impl_ad642978440a4f892bd57328c8f11ad02}{chainbase\+::index\+\_\+impl$<$ Base\+Index $>$}}, and \mbox{\hyperlink{classchainbase_1_1index__impl_ad642978440a4f892bd57328c8f11ad02}{chainbase\+::index\+\_\+impl$<$ Index\+Type $>$}}.
+
+\Hypertarget{classchainbase_1_1abstract__index_afbbf53c11335ab092f9ae9ad61ab4713}\index{chainbase::abstract\_index@{chainbase::abstract\_index}!set\_revision@{set\_revision}}
+\index{set\_revision@{set\_revision}!chainbase::abstract\_index@{chainbase::abstract\_index}}
+\doxysubsubsection{\texorpdfstring{set\_revision()}{set\_revision()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1abstract__index_afbbf53c11335ab092f9ae9ad61ab4713} 
+virtual void chainbase\+::abstract\+\_\+index\+::set\+\_\+revision (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{revision}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{classchainbase_1_1index__impl_aea66d0d68a1b77c603d04fdec5708d9b}{chainbase\+::index\+\_\+impl$<$ Base\+Index $>$}}, and \mbox{\hyperlink{classchainbase_1_1index__impl_aea66d0d68a1b77c603d04fdec5708d9b}{chainbase\+::index\+\_\+impl$<$ Index\+Type $>$}}.
+
+\Hypertarget{classchainbase_1_1abstract__index_ab3da2a8b3f20754bfb48fe69e7e54022}\index{chainbase::abstract\_index@{chainbase::abstract\_index}!squash@{squash}}
+\index{squash@{squash}!chainbase::abstract\_index@{chainbase::abstract\_index}}
+\doxysubsubsection{\texorpdfstring{squash()}{squash()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1abstract__index_ab3da2a8b3f20754bfb48fe69e7e54022} 
+virtual void chainbase\+::abstract\+\_\+index\+::squash (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{classchainbase_1_1index__impl_aadb98ff6c524d6013ffccf80b50936b8}{chainbase\+::index\+\_\+impl$<$ Base\+Index $>$}}, and \mbox{\hyperlink{classchainbase_1_1index__impl_aadb98ff6c524d6013ffccf80b50936b8}{chainbase\+::index\+\_\+impl$<$ Index\+Type $>$}}.
+
+\Hypertarget{classchainbase_1_1abstract__index_a10a45a95a0c0d7eebbd9ccae923aa0ad}\index{chainbase::abstract\_index@{chainbase::abstract\_index}!start\_undo\_session@{start\_undo\_session}}
+\index{start\_undo\_session@{start\_undo\_session}!chainbase::abstract\_index@{chainbase::abstract\_index}}
+\doxysubsubsection{\texorpdfstring{start\_undo\_session()}{start\_undo\_session()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1abstract__index_a10a45a95a0c0d7eebbd9ccae923aa0ad} 
+virtual unique\+\_\+ptr$<$ \mbox{\hyperlink{classchainbase_1_1abstract__session}{abstract\+\_\+session}} $>$ chainbase\+::abstract\+\_\+index\+::start\+\_\+undo\+\_\+session (\begin{DoxyParamCaption}\item[{bool}]{enabled}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{classchainbase_1_1index__impl_a37d274e3dab46146132c8f2c9e16ffaf}{chainbase\+::index\+\_\+impl$<$ Base\+Index $>$}}, and \mbox{\hyperlink{classchainbase_1_1index__impl_a37d274e3dab46146132c8f2c9e16ffaf}{chainbase\+::index\+\_\+impl$<$ Index\+Type $>$}}.
+
+\Hypertarget{classchainbase_1_1abstract__index_af88f60ca72249096329fb9a59c4010ca}\index{chainbase::abstract\_index@{chainbase::abstract\_index}!type\_id@{type\_id}}
+\index{type\_id@{type\_id}!chainbase::abstract\_index@{chainbase::abstract\_index}}
+\doxysubsubsection{\texorpdfstring{type\_id()}{type\_id()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1abstract__index_af88f60ca72249096329fb9a59c4010ca} 
+virtual \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} chainbase\+::abstract\+\_\+index\+::type\+\_\+id (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{classchainbase_1_1index__impl_a15c607949abbedfc0a5761144cd61729}{chainbase\+::index\+\_\+impl$<$ Base\+Index $>$}}, and \mbox{\hyperlink{classchainbase_1_1index__impl_a15c607949abbedfc0a5761144cd61729}{chainbase\+::index\+\_\+impl$<$ Index\+Type $>$}}.
+
+\Hypertarget{classchainbase_1_1abstract__index_ae4794e898d22bc8b1102ddf05c0be6a0}\index{chainbase::abstract\_index@{chainbase::abstract\_index}!type\_name@{type\_name}}
+\index{type\_name@{type\_name}!chainbase::abstract\_index@{chainbase::abstract\_index}}
+\doxysubsubsection{\texorpdfstring{type\_name()}{type\_name()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1abstract__index_ae4794e898d22bc8b1102ddf05c0be6a0} 
+virtual const std\+::string \& chainbase\+::abstract\+\_\+index\+::type\+\_\+name (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{classchainbase_1_1index__impl_a028d63fc318191f93930d8e44dca6048}{chainbase\+::index\+\_\+impl$<$ Base\+Index $>$}}, and \mbox{\hyperlink{classchainbase_1_1index__impl_a028d63fc318191f93930d8e44dca6048}{chainbase\+::index\+\_\+impl$<$ Index\+Type $>$}}.
+
+\Hypertarget{classchainbase_1_1abstract__index_a71f1306a939617ecf6e12998f611de41}\index{chainbase::abstract\_index@{chainbase::abstract\_index}!undo@{undo}}
+\index{undo@{undo}!chainbase::abstract\_index@{chainbase::abstract\_index}}
+\doxysubsubsection{\texorpdfstring{undo()}{undo()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1abstract__index_a71f1306a939617ecf6e12998f611de41} 
+virtual void chainbase\+::abstract\+\_\+index\+::undo (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{classchainbase_1_1index__impl_a0d8a7b495849376d70abedd338cd0ea8}{chainbase\+::index\+\_\+impl$<$ Base\+Index $>$}}, and \mbox{\hyperlink{classchainbase_1_1index__impl_a0d8a7b495849376d70abedd338cd0ea8}{chainbase\+::index\+\_\+impl$<$ Index\+Type $>$}}.
+
+\Hypertarget{classchainbase_1_1abstract__index_a2ad4109af3219e4dd6c06ccb580e0645}\index{chainbase::abstract\_index@{chainbase::abstract\_index}!undo\_all@{undo\_all}}
+\index{undo\_all@{undo\_all}!chainbase::abstract\_index@{chainbase::abstract\_index}}
+\doxysubsubsection{\texorpdfstring{undo\_all()}{undo\_all()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1abstract__index_a2ad4109af3219e4dd6c06ccb580e0645} 
+virtual void chainbase\+::abstract\+\_\+index\+::undo\+\_\+all (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{classchainbase_1_1index__impl_ac7d2724a774bbf18eb804d7f3ebbb76e}{chainbase\+::index\+\_\+impl$<$ Base\+Index $>$}}, and \mbox{\hyperlink{classchainbase_1_1index__impl_ac7d2724a774bbf18eb804d7f3ebbb76e}{chainbase\+::index\+\_\+impl$<$ Index\+Type $>$}}.
+
+\Hypertarget{classchainbase_1_1abstract__index_ade4f38f88a3d165ede21d6dc9b14e055}\index{chainbase::abstract\_index@{chainbase::abstract\_index}!undo\_stack\_revision\_range@{undo\_stack\_revision\_range}}
+\index{undo\_stack\_revision\_range@{undo\_stack\_revision\_range}!chainbase::abstract\_index@{chainbase::abstract\_index}}
+\doxysubsubsection{\texorpdfstring{undo\_stack\_revision\_range()}{undo\_stack\_revision\_range()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1abstract__index_ade4f38f88a3d165ede21d6dc9b14e055} 
+virtual std\+::pair$<$ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}, \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} $>$ chainbase\+::abstract\+\_\+index\+::undo\+\_\+stack\+\_\+revision\+\_\+range (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{classchainbase_1_1index__impl_a95301c4d013399875b77666ff3144d9d}{chainbase\+::index\+\_\+impl$<$ Base\+Index $>$}}, and \mbox{\hyperlink{classchainbase_1_1index__impl_a95301c4d013399875b77666ff3144d9d}{chainbase\+::index\+\_\+impl$<$ Index\+Type $>$}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chainbase/include/chainbase/\mbox{\hyperlink{chainbase_8hpp}{chainbase.\+hpp}}\end{DoxyCompactItemize}

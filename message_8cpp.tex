@@ -1,0 +1,94 @@
+\doxysection{libraries/fc/vendor/websocketpp/test/message\+\_\+buffer/message.cpp File Reference}
+\hypertarget{message_8cpp}{}\label{message_8cpp}\index{libraries/fc/vendor/websocketpp/test/message\_buffer/message.cpp@{libraries/fc/vendor/websocketpp/test/message\_buffer/message.cpp}}
+{\ttfamily \#include $<$boost/test/unit\+\_\+test.\+hpp$>$}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$string$>$}\newline
+{\ttfamily \#include $<$websocketpp/message\+\_\+buffer/message.\+hpp$>$}\newline
+Include dependency graph for message.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{message_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structstub}{stub$<$ con\+\_\+msg\+\_\+manager $>$}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{message_8cpp_a6b2a3852db8bb19ab6909bac01859985}{BOOST\+\_\+\+TEST\+\_\+\+MODULE}}~message
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{message_8cpp_a6c02085f05f011500ee2520fbc799a22}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (basic\+\_\+size\+\_\+check)
+\item 
+\mbox{\hyperlink{message_8cpp_a3eeb1e70b0ee8f6acf1ad68e3d9955b0}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (recycle)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{message_8cpp_a6b2a3852db8bb19ab6909bac01859985}\index{message.cpp@{message.cpp}!BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}}
+\index{BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}!message.cpp@{message.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_TEST\_MODULE}{BOOST\_TEST\_MODULE}}
+{\footnotesize\ttfamily \label{message_8cpp_a6b2a3852db8bb19ab6909bac01859985} 
+\#define BOOST\+\_\+\+TEST\+\_\+\+MODULE~message}
+
+
+
+Definition at line \mbox{\hyperlink{message_8cpp_source_l00028}{28}} of file \mbox{\hyperlink{message_8cpp_source}{message.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{message_8cpp_a6c02085f05f011500ee2520fbc799a22}\index{message.cpp@{message.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!message.cpp@{message.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{message_8cpp_a6c02085f05f011500ee2520fbc799a22} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{basic\+\_\+size\+\_\+check}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{message_8cpp_source_l00051}{51}} of file \mbox{\hyperlink{message_8cpp_source}{message.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00052\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message}{websocketpp::message\_buffer::message<stub>}}\ message\_type;}
+\DoxyCodeLine{00053\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{structstub}{stub<message\_type>}}\ stub\_type;}
+\DoxyCodeLine{00054\ }
+\DoxyCodeLine{00055\ \ \ \ \ stub\_type::ptr\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}(\textcolor{keyword}{new}\ stub\_type());}
+\DoxyCodeLine{00056\ \ \ \ \ message\_type::ptr\ msg(\textcolor{keyword}{new}\ message\_type(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea35faaee264826923566fc05bdfd76b72}{websocketpp::frame::opcode::TEXT}},500));}
+\DoxyCodeLine{00057\ }
+\DoxyCodeLine{00058\ \ \ \ \ BOOST\_CHECK(msg-\/>get\_payload().capacity()\ >=\ 500);}
+\DoxyCodeLine{00059\ \}}
+
+\end{DoxyCode}
+\Hypertarget{message_8cpp_a3eeb1e70b0ee8f6acf1ad68e3d9955b0}\index{message.cpp@{message.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!message.cpp@{message.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{message_8cpp_a3eeb1e70b0ee8f6acf1ad68e3d9955b0} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{recycle}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{message_8cpp_source_l00061}{61}} of file \mbox{\hyperlink{message_8cpp_source}{message.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00062\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message}{websocketpp::message\_buffer::message<stub>}}\ message\_type;}
+\DoxyCodeLine{00063\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{structstub}{stub<message\_type>}}\ stub\_type;}
+\DoxyCodeLine{00064\ }
+\DoxyCodeLine{00065\ \ \ \ \ stub\_type::ptr\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}(\textcolor{keyword}{new}\ stub\_type());}
+\DoxyCodeLine{00066\ \ \ \ \ message\_type::ptr\ msg(\textcolor{keyword}{new}\ message\_type(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea35faaee264826923566fc05bdfd76b72}{websocketpp::frame::opcode::TEXT}},500));}
+\DoxyCodeLine{00067\ }
+\DoxyCodeLine{00068\ \ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}-\/>recycled\ ==\ \textcolor{keyword}{false});}
+\DoxyCodeLine{00069\ \ \ \ \ BOOST\_CHECK(msg-\/>recycle()\ ==\ \textcolor{keyword}{false});}
+\DoxyCodeLine{00070\ \ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}-\/>recycled\ ==\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00071\ \}}
+
+\end{DoxyCode}

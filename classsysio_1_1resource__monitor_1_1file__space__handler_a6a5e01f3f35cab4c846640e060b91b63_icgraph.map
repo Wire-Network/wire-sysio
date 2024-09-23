@@ -1,0 +1,17 @@
+<map id="sysio::resource_monitor::file_space_handler::add_file_system" name="sysio::resource_monitor::file_space_handler::add_file_system">
+<area shape="rect" id="Node000001" title=" " alt="" coords="444,111,604,166"/>
+<area shape="rect" id="Node000002" href="$structadd__file__system__fixture.html#a410690d2dfbe7f640f3902326882af60" title=" " alt="" coords="225,16,384,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="456,106,395,76,357,59,359,54,397,71,458,101"/>
+<area shape="rect" id="Node000004" href="$structspace__handler__fixture.html#a6ca65640a8148ac9e60879dd2dc356e6" title=" " alt="" coords="231,85,379,126"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="428,127,379,119,380,114,429,121"/>
+<area shape="rect" id="Node000006" href="$structthreshold__fixture.html#a62923953a5ed42843dbef6af9645bb27" title=" " alt="" coords="242,150,368,191"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="429,155,368,164,368,159,428,150"/>
+<area shape="rect" id="Node000008" href="$classsysio_1_1resource__monitor__plugin__impl.html#ae06c885da6f082b29ca5b5ff8c5724e4" title=" " alt="" coords="214,216,396,256"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="457,176,397,205,366,217,364,212,395,200,455,171"/>
+<area shape="rect" id="Node000003" href="$structadd__file__system__fixture.html#a4ba2fd51e1f8dbf032aef91f987a1dfd" title=" " alt="" coords="5,5,166,61"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="210,37,166,37,166,31,210,32"/>
+<area shape="rect" id="Node000005" href="$structspace__handler__fixture.html#a2f88ee3184e87f67f178e4c4074be6f3" title=" " alt="" coords="11,85,160,126"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="215,108,160,108,160,102,215,102"/>
+<area shape="rect" id="Node000007" href="$structthreshold__fixture.html#a12384110a96ecb01358f005d70b3d108" title=" " alt="" coords="5,150,166,191"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="227,173,166,173,166,168,227,168"/>
+</map>

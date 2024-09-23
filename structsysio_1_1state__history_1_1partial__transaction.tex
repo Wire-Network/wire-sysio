@@ -1,0 +1,217 @@
+\doxysection{sysio\+::state\+\_\+history\+::partial\+\_\+transaction Struct Reference}
+\hypertarget{structsysio_1_1state__history_1_1partial__transaction}{}\label{structsysio_1_1state__history_1_1partial__transaction}\index{sysio::state\_history::partial\_transaction@{sysio::state\_history::partial\_transaction}}
+
+
+{\ttfamily \#include $<$types.\+hpp$>$}
+
+
+
+Collaboration diagram for sysio\+::state\+\_\+history\+::partial\+\_\+transaction\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1state__history_1_1partial__transaction__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1state__history_1_1partial__transaction_ac7331ec1e6d91937550229c577514f92}{partial\+\_\+transaction}} (const \mbox{\hyperlink{namespacesysio_1_1chain_a7041c0316bd294d0866609ab3e0cc7a7}{chain\+::packed\+\_\+transaction\+\_\+ptr}} \&t)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1time__point__sec}{fc\+::time\+\_\+point\+\_\+sec}} \mbox{\hyperlink{structsysio_1_1state__history_1_1partial__transaction_ac64d7b5efd2b62f71c525bfa43edcd21}{expiration}} = \{\}
+\item 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{structsysio_1_1state__history_1_1partial__transaction_a99bf4aa8f782b8bb7942aa436cd81754}{ref\+\_\+block\+\_\+num}} = \{\}
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1state__history_1_1partial__transaction_a6f3894b5ba119551fedc802676450631}{ref\+\_\+block\+\_\+prefix}} = \{\}
+\item 
+\mbox{\hyperlink{structfc_1_1unsigned__int}{fc\+::unsigned\+\_\+int}} \mbox{\hyperlink{structsysio_1_1state__history_1_1partial__transaction_a662c055807fbcfce8d7b15a9e6e8b290}{max\+\_\+net\+\_\+usage\+\_\+words}} = \{\}
+\item 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{structsysio_1_1state__history_1_1partial__transaction_aea21a74fb578f7e0bb60a859c1340c10}{max\+\_\+cpu\+\_\+usage\+\_\+ms}} = \{\}
+\item 
+\mbox{\hyperlink{structfc_1_1unsigned__int}{fc\+::unsigned\+\_\+int}} \mbox{\hyperlink{structsysio_1_1state__history_1_1partial__transaction_a061967b5e6705f61c705aead8e1d9bba}{delay\+\_\+sec}} = \{\}
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_a73874b5910498c8a58def7defc7eaee8}{extensions\+\_\+type}} \mbox{\hyperlink{structsysio_1_1state__history_1_1partial__transaction_a397ee995fed25045ea8f7042123f2d7e}{transaction\+\_\+extensions}} = \{\}
+\item 
+std\+::vector$<$ \mbox{\hyperlink{namespacesysio_1_1chain_af141a69eb789b86fa0eb93c2d263f0df}{signature\+\_\+type}} $>$ \mbox{\hyperlink{structsysio_1_1state__history_1_1partial__transaction_a2867837d8076f437ed1e36802831db46}{signatures}} = \{\}
+\item 
+std\+::vector$<$ \mbox{\hyperlink{namespacesysio_1_1chain_ac6f5a1f1e061f000983f5d5f3ac25dfa}{bytes}} $>$ \mbox{\hyperlink{structsysio_1_1state__history_1_1partial__transaction_abfe68295f43cd1bbd330496ff94afc0b}{context\+\_\+free\+\_\+data}} = \{\}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{state__history_2include_2sysio_2state__history_2types_8hpp_source_l00020}{20}} of file \mbox{\hyperlink{state__history_2include_2sysio_2state__history_2types_8hpp_source}{types.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structsysio_1_1state__history_1_1partial__transaction_ac7331ec1e6d91937550229c577514f92}\index{sysio::state\_history::partial\_transaction@{sysio::state\_history::partial\_transaction}!partial\_transaction@{partial\_transaction}}
+\index{partial\_transaction@{partial\_transaction}!sysio::state\_history::partial\_transaction@{sysio::state\_history::partial\_transaction}}
+\doxysubsubsection{\texorpdfstring{partial\_transaction()}{partial\_transaction()}}
+{\footnotesize\ttfamily \label{structsysio_1_1state__history_1_1partial__transaction_ac7331ec1e6d91937550229c577514f92} 
+sysio\+::state\+\_\+history\+::partial\+\_\+transaction\+::partial\+\_\+transaction (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_a7041c0316bd294d0866609ab3e0cc7a7}{chain\+::packed\+\_\+transaction\+\_\+ptr}} \&}]{t}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{state__history_2include_2sysio_2state__history_2types_8hpp_source_l00031}{31}} of file \mbox{\hyperlink{state__history_2include_2sysio_2state__history_2types_8hpp_source}{types.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{structsysio_1_1state__history_1_1partial__transaction_ac64d7b5efd2b62f71c525bfa43edcd21}{expiration}}(t-\/>get\_transaction().expiration)}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ ,\ \mbox{\hyperlink{structsysio_1_1state__history_1_1partial__transaction_a99bf4aa8f782b8bb7942aa436cd81754}{ref\_block\_num}}(t-\/>get\_transaction().ref\_block\_num)}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ ,\ \mbox{\hyperlink{structsysio_1_1state__history_1_1partial__transaction_a6f3894b5ba119551fedc802676450631}{ref\_block\_prefix}}(t-\/>get\_transaction().ref\_block\_prefix)}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ ,\ \mbox{\hyperlink{structsysio_1_1state__history_1_1partial__transaction_a662c055807fbcfce8d7b15a9e6e8b290}{max\_net\_usage\_words}}(t-\/>get\_transaction().max\_net\_usage\_words)}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ ,\ \mbox{\hyperlink{structsysio_1_1state__history_1_1partial__transaction_aea21a74fb578f7e0bb60a859c1340c10}{max\_cpu\_usage\_ms}}(t-\/>get\_transaction().max\_cpu\_usage\_ms)}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ ,\ \mbox{\hyperlink{structsysio_1_1state__history_1_1partial__transaction_a061967b5e6705f61c705aead8e1d9bba}{delay\_sec}}(t-\/>get\_transaction().delay\_sec)}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ ,\ \mbox{\hyperlink{structsysio_1_1state__history_1_1partial__transaction_a397ee995fed25045ea8f7042123f2d7e}{transaction\_extensions}}(t-\/>get\_transaction().transaction\_extensions)}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ ,\ \mbox{\hyperlink{structsysio_1_1state__history_1_1partial__transaction_a2867837d8076f437ed1e36802831db46}{signatures}}(t-\/>get\_signed\_transaction().signatures)}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ ,\ \mbox{\hyperlink{structsysio_1_1state__history_1_1partial__transaction_abfe68295f43cd1bbd330496ff94afc0b}{context\_free\_data}}(t-\/>get\_signed\_transaction().context\_free\_data)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1state__history_1_1partial__transaction_abfe68295f43cd1bbd330496ff94afc0b}\index{sysio::state\_history::partial\_transaction@{sysio::state\_history::partial\_transaction}!context\_free\_data@{context\_free\_data}}
+\index{context\_free\_data@{context\_free\_data}!sysio::state\_history::partial\_transaction@{sysio::state\_history::partial\_transaction}}
+\doxysubsubsection{\texorpdfstring{context\_free\_data}{context\_free\_data}}
+{\footnotesize\ttfamily \label{structsysio_1_1state__history_1_1partial__transaction_abfe68295f43cd1bbd330496ff94afc0b} 
+std\+::vector$<$\mbox{\hyperlink{namespacesysio_1_1chain_ac6f5a1f1e061f000983f5d5f3ac25dfa}{bytes}}$>$ sysio\+::state\+\_\+history\+::partial\+\_\+transaction\+::context\+\_\+free\+\_\+data = \{\}}
+
+
+
+Definition at line \mbox{\hyperlink{state__history_2include_2sysio_2state__history_2types_8hpp_source_l00029}{29}} of file \mbox{\hyperlink{state__history_2include_2sysio_2state__history_2types_8hpp_source}{types.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00029\ \{\};}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1state__history_1_1partial__transaction_a061967b5e6705f61c705aead8e1d9bba}\index{sysio::state\_history::partial\_transaction@{sysio::state\_history::partial\_transaction}!delay\_sec@{delay\_sec}}
+\index{delay\_sec@{delay\_sec}!sysio::state\_history::partial\_transaction@{sysio::state\_history::partial\_transaction}}
+\doxysubsubsection{\texorpdfstring{delay\_sec}{delay\_sec}}
+{\footnotesize\ttfamily \label{structsysio_1_1state__history_1_1partial__transaction_a061967b5e6705f61c705aead8e1d9bba} 
+\mbox{\hyperlink{structfc_1_1unsigned__int}{fc\+::unsigned\+\_\+int}} sysio\+::state\+\_\+history\+::partial\+\_\+transaction\+::delay\+\_\+sec = \{\}}
+
+
+
+Definition at line \mbox{\hyperlink{state__history_2include_2sysio_2state__history_2types_8hpp_source_l00026}{26}} of file \mbox{\hyperlink{state__history_2include_2sysio_2state__history_2types_8hpp_source}{types.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00026\ \{\};}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1state__history_1_1partial__transaction_ac64d7b5efd2b62f71c525bfa43edcd21}\index{sysio::state\_history::partial\_transaction@{sysio::state\_history::partial\_transaction}!expiration@{expiration}}
+\index{expiration@{expiration}!sysio::state\_history::partial\_transaction@{sysio::state\_history::partial\_transaction}}
+\doxysubsubsection{\texorpdfstring{expiration}{expiration}}
+{\footnotesize\ttfamily \label{structsysio_1_1state__history_1_1partial__transaction_ac64d7b5efd2b62f71c525bfa43edcd21} 
+\mbox{\hyperlink{classfc_1_1time__point__sec}{fc\+::time\+\_\+point\+\_\+sec}} sysio\+::state\+\_\+history\+::partial\+\_\+transaction\+::expiration = \{\}}
+
+
+
+Definition at line \mbox{\hyperlink{state__history_2include_2sysio_2state__history_2types_8hpp_source_l00021}{21}} of file \mbox{\hyperlink{state__history_2include_2sysio_2state__history_2types_8hpp_source}{types.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00021\ \{\};}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1state__history_1_1partial__transaction_aea21a74fb578f7e0bb60a859c1340c10}\index{sysio::state\_history::partial\_transaction@{sysio::state\_history::partial\_transaction}!max\_cpu\_usage\_ms@{max\_cpu\_usage\_ms}}
+\index{max\_cpu\_usage\_ms@{max\_cpu\_usage\_ms}!sysio::state\_history::partial\_transaction@{sysio::state\_history::partial\_transaction}}
+\doxysubsubsection{\texorpdfstring{max\_cpu\_usage\_ms}{max\_cpu\_usage\_ms}}
+{\footnotesize\ttfamily \label{structsysio_1_1state__history_1_1partial__transaction_aea21a74fb578f7e0bb60a859c1340c10} 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} sysio\+::state\+\_\+history\+::partial\+\_\+transaction\+::max\+\_\+cpu\+\_\+usage\+\_\+ms = \{\}}
+
+
+
+Definition at line \mbox{\hyperlink{state__history_2include_2sysio_2state__history_2types_8hpp_source_l00025}{25}} of file \mbox{\hyperlink{state__history_2include_2sysio_2state__history_2types_8hpp_source}{types.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00025\ \{\};}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1state__history_1_1partial__transaction_a662c055807fbcfce8d7b15a9e6e8b290}\index{sysio::state\_history::partial\_transaction@{sysio::state\_history::partial\_transaction}!max\_net\_usage\_words@{max\_net\_usage\_words}}
+\index{max\_net\_usage\_words@{max\_net\_usage\_words}!sysio::state\_history::partial\_transaction@{sysio::state\_history::partial\_transaction}}
+\doxysubsubsection{\texorpdfstring{max\_net\_usage\_words}{max\_net\_usage\_words}}
+{\footnotesize\ttfamily \label{structsysio_1_1state__history_1_1partial__transaction_a662c055807fbcfce8d7b15a9e6e8b290} 
+\mbox{\hyperlink{structfc_1_1unsigned__int}{fc\+::unsigned\+\_\+int}} sysio\+::state\+\_\+history\+::partial\+\_\+transaction\+::max\+\_\+net\+\_\+usage\+\_\+words = \{\}}
+
+
+
+Definition at line \mbox{\hyperlink{state__history_2include_2sysio_2state__history_2types_8hpp_source_l00024}{24}} of file \mbox{\hyperlink{state__history_2include_2sysio_2state__history_2types_8hpp_source}{types.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00024\ \{\};}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1state__history_1_1partial__transaction_a99bf4aa8f782b8bb7942aa436cd81754}\index{sysio::state\_history::partial\_transaction@{sysio::state\_history::partial\_transaction}!ref\_block\_num@{ref\_block\_num}}
+\index{ref\_block\_num@{ref\_block\_num}!sysio::state\_history::partial\_transaction@{sysio::state\_history::partial\_transaction}}
+\doxysubsubsection{\texorpdfstring{ref\_block\_num}{ref\_block\_num}}
+{\footnotesize\ttfamily \label{structsysio_1_1state__history_1_1partial__transaction_a99bf4aa8f782b8bb7942aa436cd81754} 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} sysio\+::state\+\_\+history\+::partial\+\_\+transaction\+::ref\+\_\+block\+\_\+num = \{\}}
+
+
+
+Definition at line \mbox{\hyperlink{state__history_2include_2sysio_2state__history_2types_8hpp_source_l00022}{22}} of file \mbox{\hyperlink{state__history_2include_2sysio_2state__history_2types_8hpp_source}{types.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00022\ \{\};}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1state__history_1_1partial__transaction_a6f3894b5ba119551fedc802676450631}\index{sysio::state\_history::partial\_transaction@{sysio::state\_history::partial\_transaction}!ref\_block\_prefix@{ref\_block\_prefix}}
+\index{ref\_block\_prefix@{ref\_block\_prefix}!sysio::state\_history::partial\_transaction@{sysio::state\_history::partial\_transaction}}
+\doxysubsubsection{\texorpdfstring{ref\_block\_prefix}{ref\_block\_prefix}}
+{\footnotesize\ttfamily \label{structsysio_1_1state__history_1_1partial__transaction_a6f3894b5ba119551fedc802676450631} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::state\+\_\+history\+::partial\+\_\+transaction\+::ref\+\_\+block\+\_\+prefix = \{\}}
+
+
+
+Definition at line \mbox{\hyperlink{state__history_2include_2sysio_2state__history_2types_8hpp_source_l00023}{23}} of file \mbox{\hyperlink{state__history_2include_2sysio_2state__history_2types_8hpp_source}{types.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00023\ \{\};}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1state__history_1_1partial__transaction_a2867837d8076f437ed1e36802831db46}\index{sysio::state\_history::partial\_transaction@{sysio::state\_history::partial\_transaction}!signatures@{signatures}}
+\index{signatures@{signatures}!sysio::state\_history::partial\_transaction@{sysio::state\_history::partial\_transaction}}
+\doxysubsubsection{\texorpdfstring{signatures}{signatures}}
+{\footnotesize\ttfamily \label{structsysio_1_1state__history_1_1partial__transaction_a2867837d8076f437ed1e36802831db46} 
+std\+::vector$<$\mbox{\hyperlink{namespacesysio_1_1chain_af141a69eb789b86fa0eb93c2d263f0df}{signature\+\_\+type}}$>$ sysio\+::state\+\_\+history\+::partial\+\_\+transaction\+::signatures = \{\}}
+
+
+
+Definition at line \mbox{\hyperlink{state__history_2include_2sysio_2state__history_2types_8hpp_source_l00028}{28}} of file \mbox{\hyperlink{state__history_2include_2sysio_2state__history_2types_8hpp_source}{types.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00028\ \{\};}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1state__history_1_1partial__transaction_a397ee995fed25045ea8f7042123f2d7e}\index{sysio::state\_history::partial\_transaction@{sysio::state\_history::partial\_transaction}!transaction\_extensions@{transaction\_extensions}}
+\index{transaction\_extensions@{transaction\_extensions}!sysio::state\_history::partial\_transaction@{sysio::state\_history::partial\_transaction}}
+\doxysubsubsection{\texorpdfstring{transaction\_extensions}{transaction\_extensions}}
+{\footnotesize\ttfamily \label{structsysio_1_1state__history_1_1partial__transaction_a397ee995fed25045ea8f7042123f2d7e} 
+\mbox{\hyperlink{namespacesysio_1_1chain_a73874b5910498c8a58def7defc7eaee8}{extensions\+\_\+type}} sysio\+::state\+\_\+history\+::partial\+\_\+transaction\+::transaction\+\_\+extensions = \{\}}
+
+
+
+Definition at line \mbox{\hyperlink{state__history_2include_2sysio_2state__history_2types_8hpp_source_l00027}{27}} of file \mbox{\hyperlink{state__history_2include_2sysio_2state__history_2types_8hpp_source}{types.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00027\ \{\};}
+
+\end{DoxyCode}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/state\+\_\+history/include/sysio/state\+\_\+history/\mbox{\hyperlink{state__history_2include_2sysio_2state__history_2types_8hpp}{types.\+hpp}}\end{DoxyCompactItemize}

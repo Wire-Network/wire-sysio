@@ -1,0 +1,243 @@
+\doxysection{cybozu\+::Cpu\+Clock Class Reference}
+\hypertarget{classcybozu_1_1_cpu_clock}{}\label{classcybozu_1_1_cpu_clock}\index{cybozu::CpuClock@{cybozu::CpuClock}}
+
+
+{\ttfamily \#include $<$benchmark.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classcybozu_1_1_cpu_clock_a5a021bdb924d794ab1a7e746240d68d1}{Cpu\+Clock}} ()
+\item 
+void \mbox{\hyperlink{classcybozu_1_1_cpu_clock_ae433b02824c0b180069de6fac28cd4a7}{begin}} ()
+\item 
+void \mbox{\hyperlink{classcybozu_1_1_cpu_clock_afc54d499d1294d93b29e02f2a316414c}{end}} ()
+\item 
+int \mbox{\hyperlink{classcybozu_1_1_cpu_clock_a32782222fb9b55cbcab192b57ad5352e}{get\+Count}} () const
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{classcybozu_1_1_cpu_clock_aace2abd7e821b450052db76488cd5965}{get\+Clock}} () const
+\item 
+void \mbox{\hyperlink{classcybozu_1_1_cpu_clock_ad1b2fd6d0e06e0774a34b0284a9a0719}{clear}} ()
+\item 
+void \mbox{\hyperlink{classcybozu_1_1_cpu_clock_a8fcf697e02ac4df9eeaea7340604972e}{put}} (const char \texorpdfstring{$\ast$}{*}msg=0, int \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}=1) const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static const int \mbox{\hyperlink{classcybozu_1_1_cpu_clock_a4deb211ea6e958f2d694343870ed42b5}{loop\+N1}} = 1000000
+\item 
+static const int \mbox{\hyperlink{classcybozu_1_1_cpu_clock_a87c17b81605613b6a49d5e77b86f7ec4}{loop\+N2}} = 1000
+\item 
+static const \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{classcybozu_1_1_cpu_clock_a968cb4502710906f906185b381ec0fb8}{max\+Clk}} = (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}})500
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{benchmark_8hpp_source_l00079}{79}} of file \mbox{\hyperlink{benchmark_8hpp_source}{benchmark.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classcybozu_1_1_cpu_clock_a5a021bdb924d794ab1a7e746240d68d1}\index{cybozu::CpuClock@{cybozu::CpuClock}!CpuClock@{CpuClock}}
+\index{CpuClock@{CpuClock}!cybozu::CpuClock@{cybozu::CpuClock}}
+\doxysubsubsection{\texorpdfstring{CpuClock()}{CpuClock()}}
+{\footnotesize\ttfamily \label{classcybozu_1_1_cpu_clock_a5a021bdb924d794ab1a7e746240d68d1} 
+cybozu\+::\+Cpu\+Clock\+::\+Cpu\+Clock (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{benchmark_8hpp_source_l00084}{84}} of file \mbox{\hyperlink{benchmark_8hpp_source}{benchmark.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00084\ :\ clock\_(0),\ count\_(0)\ \{\ t\_.setTime(0,\ 0);\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classcybozu_1_1_cpu_clock_ae433b02824c0b180069de6fac28cd4a7}\index{cybozu::CpuClock@{cybozu::CpuClock}!begin@{begin}}
+\index{begin@{begin}!cybozu::CpuClock@{cybozu::CpuClock}}
+\doxysubsubsection{\texorpdfstring{begin()}{begin()}}
+{\footnotesize\ttfamily \label{classcybozu_1_1_cpu_clock_ae433b02824c0b180069de6fac28cd4a7} 
+void cybozu\+::\+Cpu\+Clock\+::begin (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{benchmark_8hpp_source_l00085}{85}} of file \mbox{\hyperlink{benchmark_8hpp_source}{benchmark.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00086\ \ \ \ \ \{}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (count\_\ ==\ 0)\ t\_.setCurrentTime();\ \textcolor{comment}{//\ start}}
+\DoxyCodeLine{00088\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classcybozu_1_1_cpu_clock_ad1b2fd6d0e06e0774a34b0284a9a0719}\index{cybozu::CpuClock@{cybozu::CpuClock}!clear@{clear}}
+\index{clear@{clear}!cybozu::CpuClock@{cybozu::CpuClock}}
+\doxysubsubsection{\texorpdfstring{clear()}{clear()}}
+{\footnotesize\ttfamily \label{classcybozu_1_1_cpu_clock_ad1b2fd6d0e06e0774a34b0284a9a0719} 
+void cybozu\+::\+Cpu\+Clock\+::clear (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{benchmark_8hpp_source_l00103}{103}} of file \mbox{\hyperlink{benchmark_8hpp_source}{benchmark.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00103\ \{\ t\_.setTime(0,\ 0);\ clock\_\ =\ 0;\ count\_\ =\ 0;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classcybozu_1_1_cpu_clock_afc54d499d1294d93b29e02f2a316414c}\index{cybozu::CpuClock@{cybozu::CpuClock}!end@{end}}
+\index{end@{end}!cybozu::CpuClock@{cybozu::CpuClock}}
+\doxysubsubsection{\texorpdfstring{end()}{end()}}
+{\footnotesize\ttfamily \label{classcybozu_1_1_cpu_clock_afc54d499d1294d93b29e02f2a316414c} 
+void cybozu\+::\+Cpu\+Clock\+::end (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{benchmark_8hpp_source_l00092}{92}} of file \mbox{\hyperlink{benchmark_8hpp_source}{benchmark.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00093\ \ \ \ \ \{}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ cybozu::Time\ cur(\textcolor{keyword}{true});}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ diffSec\ =\ (int)(cur.getTime()\ -\/\ t\_.getTime());}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ diffMsec\ =\ cur.getMsec()\ -\/\ t\_.getMsec();}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{jmp_8cpp_aca9876635a5afd01576dae38f10dc723}{diff}}\ =\ diffSec\ *\ 1000\ +\ diffMsec;}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ clock\_\ =\ \mbox{\hyperlink{jmp_8cpp_aca9876635a5afd01576dae38f10dc723}{diff}};}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ count\_++;}
+\DoxyCodeLine{00100\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=264pt]{classcybozu_1_1_cpu_clock_afc54d499d1294d93b29e02f2a316414c_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcybozu_1_1_cpu_clock_afc54d499d1294d93b29e02f2a316414c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classcybozu_1_1_cpu_clock_aace2abd7e821b450052db76488cd5965}\index{cybozu::CpuClock@{cybozu::CpuClock}!getClock@{getClock}}
+\index{getClock@{getClock}!cybozu::CpuClock@{cybozu::CpuClock}}
+\doxysubsubsection{\texorpdfstring{getClock()}{getClock()}}
+{\footnotesize\ttfamily \label{classcybozu_1_1_cpu_clock_aace2abd7e821b450052db76488cd5965} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} cybozu\+::\+Cpu\+Clock\+::get\+Clock (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{benchmark_8hpp_source_l00102}{102}} of file \mbox{\hyperlink{benchmark_8hpp_source}{benchmark.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00102\ \{\ \textcolor{keywordflow}{return}\ clock\_;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcybozu_1_1_cpu_clock_aace2abd7e821b450052db76488cd5965_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classcybozu_1_1_cpu_clock_a32782222fb9b55cbcab192b57ad5352e}\index{cybozu::CpuClock@{cybozu::CpuClock}!getCount@{getCount}}
+\index{getCount@{getCount}!cybozu::CpuClock@{cybozu::CpuClock}}
+\doxysubsubsection{\texorpdfstring{getCount()}{getCount()}}
+{\footnotesize\ttfamily \label{classcybozu_1_1_cpu_clock_a32782222fb9b55cbcab192b57ad5352e} 
+int cybozu\+::\+Cpu\+Clock\+::get\+Count (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{benchmark_8hpp_source_l00101}{101}} of file \mbox{\hyperlink{benchmark_8hpp_source}{benchmark.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00101\ \{\ \textcolor{keywordflow}{return}\ count\_;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcybozu_1_1_cpu_clock_a32782222fb9b55cbcab192b57ad5352e_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classcybozu_1_1_cpu_clock_a8fcf697e02ac4df9eeaea7340604972e}\index{cybozu::CpuClock@{cybozu::CpuClock}!put@{put}}
+\index{put@{put}!cybozu::CpuClock@{cybozu::CpuClock}}
+\doxysubsubsection{\texorpdfstring{put()}{put()}}
+{\footnotesize\ttfamily \label{classcybozu_1_1_cpu_clock_a8fcf697e02ac4df9eeaea7340604972e} 
+void cybozu\+::\+Cpu\+Clock\+::put (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{msg}{ = {\ttfamily 0}, }\item[{int}]{N}{ = {\ttfamily 1}}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{benchmark_8hpp_source_l00104}{104}} of file \mbox{\hyperlink{benchmark_8hpp_source}{benchmark.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00105\ \ \ \ \ \{}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ t\ =\ \mbox{\hyperlink{classcybozu_1_1_cpu_clock_aace2abd7e821b450052db76488cd5965}{getClock}}()\ /\ double(\mbox{\hyperlink{classcybozu_1_1_cpu_clock_a32782222fb9b55cbcab192b57ad5352e}{getCount}}())\ /\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}};}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (msg\ \&\&\ *msg)\ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\%s\ "{}},\ msg);}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (t\ >\ 1)\ \{}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\%6.2fmsec"{}},\ t);}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (t\ >\ 1e-\/3)\ \{}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\%6.2fusec"{}},\ t\ *\ 1e3);}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\%6.2fnsec"{}},\ t\ *\ 1e6);}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (msg\ \&\&\ *msg)\ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{00116\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcybozu_1_1_cpu_clock_a8fcf697e02ac4df9eeaea7340604972e_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classcybozu_1_1_cpu_clock_a4deb211ea6e958f2d694343870ed42b5}\index{cybozu::CpuClock@{cybozu::CpuClock}!loopN1@{loopN1}}
+\index{loopN1@{loopN1}!cybozu::CpuClock@{cybozu::CpuClock}}
+\doxysubsubsection{\texorpdfstring{loopN1}{loopN1}}
+{\footnotesize\ttfamily \label{classcybozu_1_1_cpu_clock_a4deb211ea6e958f2d694343870ed42b5} 
+const int cybozu\+::\+Cpu\+Clock\+::loop\+N1 = 1000000\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{benchmark_8hpp_source_l00118}{118}} of file \mbox{\hyperlink{benchmark_8hpp_source}{benchmark.\+hpp}}.
+
+\Hypertarget{classcybozu_1_1_cpu_clock_a87c17b81605613b6a49d5e77b86f7ec4}\index{cybozu::CpuClock@{cybozu::CpuClock}!loopN2@{loopN2}}
+\index{loopN2@{loopN2}!cybozu::CpuClock@{cybozu::CpuClock}}
+\doxysubsubsection{\texorpdfstring{loopN2}{loopN2}}
+{\footnotesize\ttfamily \label{classcybozu_1_1_cpu_clock_a87c17b81605613b6a49d5e77b86f7ec4} 
+const int cybozu\+::\+Cpu\+Clock\+::loop\+N2 = 1000\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{benchmark_8hpp_source_l00119}{119}} of file \mbox{\hyperlink{benchmark_8hpp_source}{benchmark.\+hpp}}.
+
+\Hypertarget{classcybozu_1_1_cpu_clock_a968cb4502710906f906185b381ec0fb8}\index{cybozu::CpuClock@{cybozu::CpuClock}!maxClk@{maxClk}}
+\index{maxClk@{maxClk}!cybozu::CpuClock@{cybozu::CpuClock}}
+\doxysubsubsection{\texorpdfstring{maxClk}{maxClk}}
+{\footnotesize\ttfamily \label{classcybozu_1_1_cpu_clock_a968cb4502710906f906185b381ec0fb8} 
+const \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} cybozu\+::\+Cpu\+Clock\+::max\+Clk = (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}})500\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{benchmark_8hpp_source_l00120}{120}} of file \mbox{\hyperlink{benchmark_8hpp_source}{benchmark.\+hpp}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/libraries/ff/depends/ate-\/pairing/include/cybozu/\mbox{\hyperlink{benchmark_8hpp}{benchmark.\+hpp}}\end{DoxyCompactItemize}

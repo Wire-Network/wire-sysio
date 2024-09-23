@@ -1,0 +1,13 @@
+<map id="CLI::detail::find_member" name="CLI::detail::find_member">
+<area shape="rect" id="Node000001" title="Check if a string is a member of a list of strings and optionally ignore case or ignore underscores." alt="" coords="5,81,170,107"/>
+<area shape="rect" id="Node000002" href="$namespace_c_l_i.html#a0c52326d2681814c22aa1a93ce43375e" title="Helper function to allow ignore_case to be passed to IsMember or Transform." alt="" coords="236,5,356,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="124,78,243,34,245,39,126,83"/>
+<area shape="rect" id="Node000003" href="$namespace_c_l_i_1_1detail.html#ae83709ec148057ec53df4383645727e9" title="Return a lower case version of a string." alt="" coords="422,43,560,68"/>
+<area shape="poly" id="edge6_Node000001_Node000003" title=" " alt="" coords="170,84,406,61,407,66,170,89"/>
+<area shape="rect" id="Node000004" href="$namespace_c_l_i.html#a111b6f05d21b9b84e7ba933ade79884c" title="Helper function to allow ignore_underscore to be passed to IsMember or Transform." alt="" coords="218,107,374,132"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="170,102,203,105,202,111,170,107"/>
+<area shape="rect" id="Node000005" href="$namespace_c_l_i_1_1detail.html#a5359a7a0e33366a12e15523b100f591a" title="remove underscores from a string" alt="" coords="425,114,557,154"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="116,105,163,126,218,142,267,148,317,150,409,144,410,149,317,155,267,154,217,147,161,131,114,110"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="357,27,407,37,406,42,356,32"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="375,123,410,125,410,131,374,128"/>
+</map>

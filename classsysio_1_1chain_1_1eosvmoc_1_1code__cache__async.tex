@@ -1,0 +1,236 @@
+\doxysection{sysio\+::chain\+::eosvmoc\+::code\+\_\+cache\+\_\+async Class Reference}
+\hypertarget{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__async}{}\label{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__async}\index{sysio::chain::eosvmoc::code\_cache\_async@{sysio::chain::eosvmoc::code\_cache\_async}}
+
+
+{\ttfamily \#include $<$code\+\_\+cache.\+hpp$>$}
+
+
+
+Inheritance diagram for sysio\+::chain\+::eosvmoc\+::code\+\_\+cache\+\_\+async\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=194pt]{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__async__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for sysio\+::chain\+::eosvmoc\+::code\+\_\+cache\+\_\+async\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=302pt]{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__async__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__async_ab5e9f17c574c6388b10a05dcedea7fde}{code\+\_\+cache\+\_\+async}} (const bfs\+::path data\+\_\+dir, const \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1config}{eosvmoc\+::config}} \&eosvmoc\+\_\+config, const \mbox{\hyperlink{classchainbase_1_1database}{chainbase\+::database}} \&db)
+\item 
+\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__async_ab8076b08d9220abbf0a2ec7f717d5925}{\texorpdfstring{$\sim$}{\string~}code\+\_\+cache\+\_\+async}} ()
+\item 
+const \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1code__descriptor}{code\+\_\+descriptor}} \texorpdfstring{$\ast$}{*}const \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__async_ae6565ec4ecff75fbdbf99ab37604c2b0}{get\+\_\+descriptor\+\_\+for\+\_\+code}} (const \mbox{\hyperlink{namespacesysio_1_1chain_a357fd9478475457e5bb386a3143079b6}{digest\+\_\+type}} \&code\+\_\+id, const \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \&vm\+\_\+version)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base}{sysio\+::chain\+::eosvmoc\+::code\+\_\+cache\+\_\+base}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_ab31065b1fab5b6d5910d1cae71bb15cf}{code\+\_\+cache\+\_\+base}} (const bfs\+::path data\+\_\+dir, const \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1config}{eosvmoc\+::config}} \&eosvmoc\+\_\+config, const \mbox{\hyperlink{classchainbase_1_1database}{chainbase\+::database}} \&db)
+\item 
+\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_ac04c389f3eef6d9860d507ce690a4781}{\texorpdfstring{$\sim$}{\string~}code\+\_\+cache\+\_\+base}} ()
+\item 
+const int \& \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_ad77b7e524be52fdfab8d5faef376b4db}{fd}} () const
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_a898c78da95cb62a1fc2fbdb197f2836d}{free\+\_\+code}} (const \mbox{\hyperlink{namespacesysio_1_1chain_a357fd9478475457e5bb386a3143079b6}{digest\+\_\+type}} \&code\+\_\+id, const \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \&vm\+\_\+version)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Protected Types inherited from \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base}{sysio\+::chain\+::eosvmoc\+::code\+\_\+cache\+\_\+base}}}
+\begin{DoxyCompactItemize}
+\item 
+typedef boost\+::multi\+\_\+index\+\_\+container$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1code__descriptor}{code\+\_\+descriptor}}, indexed\+\_\+by$<$ sequenced$<$$>$, hashed\+\_\+unique$<$ tag$<$ by\+\_\+hash $>$, composite\+\_\+key$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1code__descriptor}{code\+\_\+descriptor}}, member$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1code__descriptor}{code\+\_\+descriptor}}, \mbox{\hyperlink{namespacesysio_1_1chain_a357fd9478475457e5bb386a3143079b6}{digest\+\_\+type}}, \&\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1code__descriptor_ada2be2602cbf3bad4ae32cfed797abde}{code\+\_\+descriptor\+::code\+\_\+hash}} $>$, member$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1code__descriptor}{code\+\_\+descriptor}}, \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}}, \&\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1code__descriptor_aea83d482172d4dedadbc9dd54e9a5a29}{code\+\_\+descriptor\+::vm\+\_\+version}} $>$ $>$ $>$ $>$ $>$ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_a30f70ce315e8da4166face9c8b4ea5e5}{code\+\_\+cache\+\_\+index}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Member Functions inherited from \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base}{sysio\+::chain\+::eosvmoc\+::code\+\_\+cache\+\_\+base}}}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_a249bdb27d2796f53a728b85a2889db44}{check\+\_\+eviction\+\_\+threshold}} (size\+\_\+t free\+\_\+bytes)
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_a543e8301b86cc0682a715686279dc1c3}{run\+\_\+eviction\+\_\+round}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_a9933307339971ede770f460277491587}{set\+\_\+on\+\_\+disk\+\_\+region\+\_\+dirty}} (bool)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_a06095b550460307a8e11b2b8a1083230}{serialize\+\_\+cache\+\_\+index}} (\mbox{\hyperlink{classfc_1_1datastream}{fc\+::datastream}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&ds)
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Attributes inherited from \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base}{sysio\+::chain\+::eosvmoc\+::code\+\_\+cache\+\_\+base}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_a30f70ce315e8da4166face9c8b4ea5e5}{code\+\_\+cache\+\_\+index}} \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_adb969be895a25820aa4e599304dfa252}{\+\_\+cache\+\_\+index}}
+\item 
+const \mbox{\hyperlink{classchainbase_1_1database}{chainbase\+::database}} \& \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_ad7e0e5b63b94e48e35baacc15644b0b7}{\+\_\+db}}
+\item 
+bfs\+::path \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_abbf29e52e658f8089958c93ae87402ac}{\+\_\+cache\+\_\+file\+\_\+path}}
+\item 
+int \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_aaee1ae29b4dc9f8f3cb0b86f32998dc4}{\+\_\+cache\+\_\+fd}}
+\item 
+io\+\_\+context \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_acccb3fc4fe49eb154ea915ee8b350f70}{\+\_\+ctx}}
+\item 
+local\+::datagram\+\_\+protocol\+::socket \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_a1ea07bb510f7b82ecfb324bca6225728}{\+\_\+compile\+\_\+monitor\+\_\+write\+\_\+socket}} \{\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_acccb3fc4fe49eb154ea915ee8b350f70}{\+\_\+ctx}}\}
+\item 
+local\+::datagram\+\_\+protocol\+::socket \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_a3422663ea869e784bf6b6e72cb43f96b}{\+\_\+compile\+\_\+monitor\+\_\+read\+\_\+socket}} \{\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_acccb3fc4fe49eb154ea915ee8b350f70}{\+\_\+ctx}}\}
+\item 
+std\+::unordered\+\_\+set$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1code__tuple}{code\+\_\+tuple}} $>$ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_a44c50f4deb837180fa47026465c55d8a}{\+\_\+queued\+\_\+compiles}}
+\item 
+std\+::unordered\+\_\+map$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1code__tuple}{code\+\_\+tuple}}, bool $>$ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_a6f9d3065fa9328cb776d6c68b0c9ef1f}{\+\_\+outstanding\+\_\+compiles\+\_\+and\+\_\+poison}}
+\item 
+size\+\_\+t \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_aa4b8115d88fae51bcaf70a15bd3db3bc}{\+\_\+free\+\_\+bytes\+\_\+eviction\+\_\+threshold}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{code__cache_8hpp_source_l00089}{89}} of file \mbox{\hyperlink{code__cache_8hpp_source}{code\+\_\+cache.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__async_ab5e9f17c574c6388b10a05dcedea7fde}\index{sysio::chain::eosvmoc::code\_cache\_async@{sysio::chain::eosvmoc::code\_cache\_async}!code\_cache\_async@{code\_cache\_async}}
+\index{code\_cache\_async@{code\_cache\_async}!sysio::chain::eosvmoc::code\_cache\_async@{sysio::chain::eosvmoc::code\_cache\_async}}
+\doxysubsubsection{\texorpdfstring{code\_cache\_async()}{code\_cache\_async()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__async_ab5e9f17c574c6388b10a05dcedea7fde} 
+sysio\+::chain\+::eosvmoc\+::code\+\_\+cache\+\_\+async\+::code\+\_\+cache\+\_\+async (\begin{DoxyParamCaption}\item[{const bfs\+::path}]{data\+\_\+dir}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1config}{eosvmoc\+::config}} \&}]{eosvmoc\+\_\+config}{, }\item[{const \mbox{\hyperlink{classchainbase_1_1database}{chainbase\+::database}} \&}]{db}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{code__cache_8cpp_source_l00042}{42}} of file \mbox{\hyperlink{code__cache_8cpp_source}{code\+\_\+cache.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :}
+\DoxyCodeLine{00043\ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_ab31065b1fab5b6d5910d1cae71bb15cf}{code\_cache\_base}}(data\_dir,\ eosvmoc\_config,\ db),}
+\DoxyCodeLine{00044\ \ \ \ \_result\_queue(eosvmoc\_config.threads\ *\ 2),}
+\DoxyCodeLine{00045\ \ \ \ \_threads(eosvmoc\_config.threads)}
+\DoxyCodeLine{00046\ \{}
+\DoxyCodeLine{00047\ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\_threads,\ \textcolor{stringliteral}{"{}SYS\ VM\ OC\ requires\ at\ least\ 1\ compile\ thread"{}});}
+\DoxyCodeLine{00048\ }
+\DoxyCodeLine{00049\ \ \ \ wait\_on\_compile\_monitor\_message();}
+\DoxyCodeLine{00050\ }
+\DoxyCodeLine{00051\ \ \ \ \_monitor\_reply\_thread\ =\ std::thread([\textcolor{keyword}{this}]()\ \{}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_ab58a7f71e88d7d4d5761bbd24837c595}{fc::set\_os\_thread\_name}}(\textcolor{stringliteral}{"{}oc-\/monitor"{}});}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_acccb3fc4fe49eb154ea915ee8b350f70}{\_ctx}}.run();}
+\DoxyCodeLine{00054\ \ \ \ \});}
+\DoxyCodeLine{00055\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__async_ab5e9f17c574c6388b10a05dcedea7fde_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__async_ab8076b08d9220abbf0a2ec7f717d5925}\index{sysio::chain::eosvmoc::code\_cache\_async@{sysio::chain::eosvmoc::code\_cache\_async}!````~code\_cache\_async@{\texorpdfstring{$\sim$}{\string~}code\_cache\_async}}
+\index{````~code\_cache\_async@{\texorpdfstring{$\sim$}{\string~}code\_cache\_async}!sysio::chain::eosvmoc::code\_cache\_async@{sysio::chain::eosvmoc::code\_cache\_async}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}code\_cache\_async()}{\string~code\_cache\_async()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__async_ab8076b08d9220abbf0a2ec7f717d5925} 
+sysio\+::chain\+::eosvmoc\+::code\+\_\+cache\+\_\+async\+::\texorpdfstring{$\sim$}{\string~}code\+\_\+cache\+\_\+async (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{code__cache_8cpp_source_l00057}{57}} of file \mbox{\hyperlink{code__cache_8cpp_source}{code\+\_\+cache.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00058\ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_a1ea07bb510f7b82ecfb324bca6225728}{\_compile\_monitor\_write\_socket}}.shutdown(local::datagram\_protocol::socket::shutdown\_send);}
+\DoxyCodeLine{00059\ \ \ \ \_monitor\_reply\_thread.join();}
+\DoxyCodeLine{00060\ \ \ \ consume\_compile\_thread\_queue();}
+\DoxyCodeLine{00061\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__async_ae6565ec4ecff75fbdbf99ab37604c2b0}\index{sysio::chain::eosvmoc::code\_cache\_async@{sysio::chain::eosvmoc::code\_cache\_async}!get\_descriptor\_for\_code@{get\_descriptor\_for\_code}}
+\index{get\_descriptor\_for\_code@{get\_descriptor\_for\_code}!sysio::chain::eosvmoc::code\_cache\_async@{sysio::chain::eosvmoc::code\_cache\_async}}
+\doxysubsubsection{\texorpdfstring{get\_descriptor\_for\_code()}{get\_descriptor\_for\_code()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__async_ae6565ec4ecff75fbdbf99ab37604c2b0} 
+const \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1code__descriptor}{code\+\_\+descriptor}} \texorpdfstring{$\ast$}{*}const sysio\+::chain\+::eosvmoc\+::code\+\_\+cache\+\_\+async\+::get\+\_\+descriptor\+\_\+for\+\_\+code (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_a357fd9478475457e5bb386a3143079b6}{digest\+\_\+type}} \&}]{code\+\_\+id}{, }\item[{const \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \&}]{vm\+\_\+version}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{code__cache_8cpp_source_l00109}{109}} of file \mbox{\hyperlink{code__cache_8cpp_source}{code\+\_\+cache.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00110\ \ \ \ \textcolor{comment}{//if\ there\ are\ any\ outstanding\ compiles,\ process\ the\ result\ queue\ now}}
+\DoxyCodeLine{00111\ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_a6f9d3065fa9328cb776d6c68b0c9ef1f}{\_outstanding\_compiles\_and\_poison}}.size())\ \{}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ [count\_processed,\ bytes\_remaining]\ =\ consume\_compile\_thread\_queue();}
+\DoxyCodeLine{00113\ }
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(count\_processed)}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_a249bdb27d2796f53a728b85a2889db44}{check\_eviction\_threshold}}(bytes\_remaining);}
+\DoxyCodeLine{00116\ }
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \textcolor{keywordflow}{while}(count\_processed\ \&\&\ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_a44c50f4deb837180fa47026465c55d8a}{\_queued\_compiles}}.size())\ \{}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ nextup\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_a44c50f4deb837180fa47026465c55d8a}{\_queued\_compiles}}.begin();}
+\DoxyCodeLine{00119\ }
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//it's\ not\ clear\ this\ check\ is\ required:\ if\ apply()\ was\ called\ for\ code\ then\ it\ existed\ in\ the\ code\_index;\ and\ then}}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ if\ we\ got\ notification\ of\ it\ no\ longer\ existing\ we\ would\ have\ removed\ it\ from\ queued\_compiles}}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ code\_object*\ \textcolor{keyword}{const}\ codeobject\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_ad7e0e5b63b94e48e35baacc15644b0b7}{\_db}}.\mbox{\hyperlink{classchainbase_1_1database_aa5a2ca0da0092693ac49b36b7ec6817a}{find}}<code\_object,by\_code\_hash>(boost::make\_tuple(nextup-\/>code\_id,\ 0,\ nextup-\/>vm\_version));}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(codeobject)\ \{}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_a6f9d3065fa9328cb776d6c68b0c9ef1f}{\_outstanding\_compiles\_and\_poison}}.emplace(*nextup,\ \textcolor{keyword}{false});}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \ \ \ \ std::vector<wrapped\_fd>\ fds\_to\_pass;}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \ \ \ fds\_to\_pass.emplace\_back(\mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_afe4909c18643f64d0c67a83885aefd90}{memfd\_for\_bytearray}}(codeobject-\/>code));}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a8715d32fd2e6a4a668578ca0d946b58b}{write\_message\_with\_fds}}(\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_a1ea07bb510f7b82ecfb324bca6225728}{\_compile\_monitor\_write\_socket}},\ compile\_wasm\_message\{\ *nextup\ \},\ fds\_to\_pass),\ \textcolor{stringliteral}{"{}SYS\ VM\ failed\ to\ communicate\ to\ OOP\ manager"{}});}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \ \ \ \ -\/-\/count\_processed;}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_a44c50f4deb837180fa47026465c55d8a}{\_queued\_compiles}}.erase(nextup);}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00132\ \ \ \ \}}
+\DoxyCodeLine{00133\ }
+\DoxyCodeLine{00134\ \ \ \ \textcolor{comment}{//check\ for\ entry\ in\ cache}}
+\DoxyCodeLine{00135\ \ \ \ code\_cache\_index::index<by\_hash>::type::iterator\ it\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_adb969be895a25820aa4e599304dfa252}{\_cache\_index}}.get<by\_hash>().\mbox{\hyperlink{namespace_intrinsics_a7b30616029cc015f330ebf338c3fb454}{find}}(boost::make\_tuple(code\_id,\ vm\_version));}
+\DoxyCodeLine{00136\ \ \ \ \textcolor{keywordflow}{if}(it\ !=\ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_adb969be895a25820aa4e599304dfa252}{\_cache\_index}}.get<by\_hash>().end())\ \{}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_adb969be895a25820aa4e599304dfa252}{\_cache\_index}}.relocate(\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_adb969be895a25820aa4e599304dfa252}{\_cache\_index}}.begin(),\ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_adb969be895a25820aa4e599304dfa252}{\_cache\_index}}.project<0>(it));}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \&*it;}
+\DoxyCodeLine{00139\ \ \ \ \}}
+\DoxyCodeLine{00140\ }
+\DoxyCodeLine{00141\ \ \ \ \textcolor{keyword}{const}\ code\_tuple\ ct\ =\ code\_tuple\{code\_id,\ vm\_version\};}
+\DoxyCodeLine{00142\ }
+\DoxyCodeLine{00143\ \ \ \ \textcolor{keywordflow}{if}(\_blacklist.find(ct)\ !=\ \_blacklist.end())}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00145\ \ \ \ \textcolor{keywordflow}{if}(\textcolor{keyword}{auto}\ it\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_a6f9d3065fa9328cb776d6c68b0c9ef1f}{\_outstanding\_compiles\_and\_poison}}.find(ct);\ it\ !=\ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_a6f9d3065fa9328cb776d6c68b0c9ef1f}{\_outstanding\_compiles\_and\_poison}}.end())\ \{}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ it-\/>second\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00148\ \ \ \ \}}
+\DoxyCodeLine{00149\ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_a44c50f4deb837180fa47026465c55d8a}{\_queued\_compiles}}.find(ct)\ !=\ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_a44c50f4deb837180fa47026465c55d8a}{\_queued\_compiles}}.end())}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00151\ }
+\DoxyCodeLine{00152\ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_a6f9d3065fa9328cb776d6c68b0c9ef1f}{\_outstanding\_compiles\_and\_poison}}.size()\ >=\ \_threads)\ \{}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_a44c50f4deb837180fa47026465c55d8a}{\_queued\_compiles}}.emplace(ct);}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00155\ \ \ \ \}}
+\DoxyCodeLine{00156\ }
+\DoxyCodeLine{00157\ \ \ \ \textcolor{keyword}{const}\ code\_object*\ \textcolor{keyword}{const}\ codeobject\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_ad7e0e5b63b94e48e35baacc15644b0b7}{\_db}}.\mbox{\hyperlink{classchainbase_1_1database_aa5a2ca0da0092693ac49b36b7ec6817a}{find}}<code\_object,by\_code\_hash>(boost::make\_tuple(code\_id,\ 0,\ vm\_version));}
+\DoxyCodeLine{00158\ \ \ \ \textcolor{keywordflow}{if}(!codeobject)\ \textcolor{comment}{//should\ be\ impossible\ right?}}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00160\ }
+\DoxyCodeLine{00161\ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_a6f9d3065fa9328cb776d6c68b0c9ef1f}{\_outstanding\_compiles\_and\_poison}}.emplace(ct,\ \textcolor{keyword}{false});}
+\DoxyCodeLine{00162\ \ \ \ std::vector<wrapped\_fd>\ fds\_to\_pass;}
+\DoxyCodeLine{00163\ \ \ \ fds\_to\_pass.emplace\_back(\mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_afe4909c18643f64d0c67a83885aefd90}{memfd\_for\_bytearray}}(codeobject-\/>code));}
+\DoxyCodeLine{00164\ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a8715d32fd2e6a4a668578ca0d946b58b}{write\_message\_with\_fds}}(\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_a1ea07bb510f7b82ecfb324bca6225728}{\_compile\_monitor\_write\_socket}},\ compile\_wasm\_message\{\ ct\ \},\ fds\_to\_pass);}
+\DoxyCodeLine{00165\ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00166\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__async_ae6565ec4ecff75fbdbf99ab37604c2b0_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/webassembly/sys-\/vm-\/oc/\mbox{\hyperlink{code__cache_8hpp}{code\+\_\+cache.\+hpp}}\item 
+libraries/chain/webassembly/runtimes/sys-\/vm-\/oc/\mbox{\hyperlink{code__cache_8cpp}{code\+\_\+cache.\+cpp}}\end{DoxyCompactItemize}

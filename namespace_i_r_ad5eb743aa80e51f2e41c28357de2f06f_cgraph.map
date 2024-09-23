@@ -1,0 +1,9 @@
+<map id="IR::serialize" name="IR::serialize">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,13,97,38"/>
+<area shape="rect" id="Node000002" href="$namespace_i_r.html#afac891781684998f67dfba2c45bfed39" title=" " alt="" coords="145,13,236,38"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="97,23,129,23,129,28,97,28"/>
+<area shape="rect" id="Node000003" href="$namespace_serialization.html#aa3a610a68eadc6fc16175ae3b4e3a829" title=" " alt="" coords="284,5,432,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="236,23,268,23,268,28,236,28"/>
+<area shape="rect" id="Node000004" href="$namespace_serialization.html#a7542db4eecbd9af4bc8398241da2614d" title=" " alt="" coords="480,5,629,46"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="433,23,465,23,465,28,433,28"/>
+</map>

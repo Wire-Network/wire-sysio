@@ -1,0 +1,15 @@
+<map id="TEST" name="TEST">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,78,61,104"/>
+<area shape="rect" id="Node000002" href="$class_generic_string_buffer.html#a42f15c959046d899cb74c3120a6995f9" title=" " alt="" coords="109,5,244,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="60,76,115,51,117,55,62,81"/>
+<area shape="rect" id="Node000003" href="$class_generic_string_buffer.html#a42079865bab1deb930c6cff7d491c719" title=" " alt="" coords="109,71,244,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="61,88,93,88,93,94,61,94"/>
+<area shape="rect" id="Node000006" href="$unittest_8h.html#a8d8e3cf93e9b811c207711d0b353de02" title=" " alt="" coords="143,136,210,161"/>
+<area shape="poly" id="edge7_Node000001_Node000006" title=" " alt="" coords="62,100,110,121,129,128,127,133,108,125,60,105"/>
+<area shape="rect" id="Node000004" href="$class_generic_string_buffer.html#a0038e53ba03c271bc4cbbac403ec4de4" title=" " alt="" coords="292,38,458,64"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="244,75,293,65,294,70,245,80"/>
+<area shape="rect" id="Node000005" href="$class_generic_string_buffer.html#a80af78c43da93126a940a40d1889278a" title=" " alt="" coords="308,112,443,153"/>
+<area shape="poly" id="edge5_Node000003_Node000005" title=" " alt="" coords="245,102,293,113,292,118,244,108"/>
+<area shape="poly" id="edge4_Node000004_Node000004" title=" " alt="" coords="342,39,335,30,339,20,353,14,375,12,400,14,412,21,410,26,398,19,375,17,354,19,343,24,341,29,346,36"/>
+<area shape="poly" id="edge6_Node000005_Node000005" title=" " alt="" coords="337,112,335,102,342,93,355,87,375,85,397,88,410,94,407,99,395,93,375,91,356,93,345,97,341,103,343,111"/>
+</map>

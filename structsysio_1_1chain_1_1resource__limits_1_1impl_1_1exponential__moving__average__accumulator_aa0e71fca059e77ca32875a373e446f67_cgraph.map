@@ -1,0 +1,14 @@
+<map id="sysio::chain::resource_limits::impl::exponential_moving_average_accumulator::add" name="sysio::chain::resource_limits::impl::exponential_moving_average_accumulator::add">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,116,236,171"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator.html#ac565af684cfacb1625e39084e88ec742" title=" " alt="" coords="284,5,485,76"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="193,112,277,80,279,85,195,117"/>
+<area shape="rect" id="Node000003" href="$namespacesysio_1_1chain_1_1resource__limits_1_1impl.html#a27299c32ef2c573ed173bd68edd2cd21" title=" " alt="" coords="533,46,682,102"/>
+<area shape="poly" id="edge5_Node000001_Node000003" title=" " alt="" coords="236,124,517,84,518,89,236,130"/>
+<area shape="rect" id="Node000004" href="$namespacesysio_1_1chain_1_1resource__limits_1_1impl.html#ad13603146ccf93edbdb851067320dd6e" title=" " alt="" coords="287,151,482,192"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="236,153,272,157,271,162,236,158"/>
+<area shape="rect" id="Node000006" href="$namespacesysio_1_1chain_1_1resource__limits_1_1impl.html#a4b7474bf36737d614cdfe51ed0ca0b6a" title=" " alt="" coords="303,216,466,257"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="198,169,285,201,306,208,305,213,283,206,196,174"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="485,53,518,58,517,63,485,58"/>
+<area shape="rect" id="Node000005" href="$namespacefc.html#aa3ea11c18de71ec23b19c3cc571fb8ff" title=" " alt="" coords="577,158,638,184"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="482,169,561,169,561,174,482,174"/>
+</map>

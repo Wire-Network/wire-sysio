@@ -1,0 +1,69 @@
+\doxysection{testing\+::internal\+::Invoke\+Method\+Action\texorpdfstring{$<$}{<} Class, Method\+Ptr \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classtesting_1_1internal_1_1_invoke_method_action}{}\label{classtesting_1_1internal_1_1_invoke_method_action}\index{testing::internal::InvokeMethodAction$<$ Class, MethodPtr $>$@{testing::internal::InvokeMethodAction$<$ Class, MethodPtr $>$}}
+
+
+{\ttfamily \#include $<$gmock-\/more-\/actions.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_invoke_method_action_a16e545f6166e2d54eeafdc2ab3adf06b}{Invoke\+Method\+Action}} (Class \texorpdfstring{$\ast$}{*}obj\+\_\+ptr, Method\+Ptr method\+\_\+ptr)
+\item 
+{\footnotesize template$<$typename Result , typename Argument\+Tuple $>$ }\\Result \mbox{\hyperlink{classtesting_1_1internal_1_1_invoke_method_action_aed6971c668bc2c7671d512306b25b1ab}{Perform}} (const Argument\+Tuple \&args) const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} Class, typename Method\+Ptr$>$\newline
+class testing\+::internal\+::\+Invoke\+Method\+Action$<$ Class, Method\+Ptr $>$}
+
+
+Definition at line \mbox{\hyperlink{gmock-more-actions_8h_source_l00072}{72}} of file \mbox{\hyperlink{gmock-more-actions_8h_source}{gmock-\/more-\/actions.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_invoke_method_action_a16e545f6166e2d54eeafdc2ab3adf06b}\index{testing::internal::InvokeMethodAction$<$ Class, MethodPtr $>$@{testing::internal::InvokeMethodAction$<$ Class, MethodPtr $>$}!InvokeMethodAction@{InvokeMethodAction}}
+\index{InvokeMethodAction@{InvokeMethodAction}!testing::internal::InvokeMethodAction$<$ Class, MethodPtr $>$@{testing::internal::InvokeMethodAction$<$ Class, MethodPtr $>$}}
+\doxysubsubsection{\texorpdfstring{InvokeMethodAction()}{InvokeMethodAction()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_invoke_method_action_a16e545f6166e2d54eeafdc2ab3adf06b} 
+template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} Class , typename Method\+Ptr $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_invoke_method_action}{testing\+::internal\+::\+Invoke\+Method\+Action}}$<$ Class, Method\+Ptr $>$\+::\+Invoke\+Method\+Action (\begin{DoxyParamCaption}\item[{Class \texorpdfstring{$\ast$}{*}}]{obj\+\_\+ptr}{, }\item[{Method\+Ptr}]{method\+\_\+ptr}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-more-actions_8h_source_l00074}{74}} of file \mbox{\hyperlink{gmock-more-actions_8h_source}{gmock-\/more-\/actions.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ :\ method\_ptr\_(method\_ptr),\ obj\_ptr\_(obj\_ptr)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_invoke_method_action_aed6971c668bc2c7671d512306b25b1ab}\index{testing::internal::InvokeMethodAction$<$ Class, MethodPtr $>$@{testing::internal::InvokeMethodAction$<$ Class, MethodPtr $>$}!Perform@{Perform}}
+\index{Perform@{Perform}!testing::internal::InvokeMethodAction$<$ Class, MethodPtr $>$@{testing::internal::InvokeMethodAction$<$ Class, MethodPtr $>$}}
+\doxysubsubsection{\texorpdfstring{Perform()}{Perform()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_invoke_method_action_aed6971c668bc2c7671d512306b25b1ab} 
+template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} Class , typename Method\+Ptr $>$ \\
+template$<$typename Result , typename Argument\+Tuple $>$ \\
+Result \mbox{\hyperlink{classtesting_1_1internal_1_1_invoke_method_action}{testing\+::internal\+::\+Invoke\+Method\+Action}}$<$ Class, Method\+Ptr $>$\+::\+Perform (\begin{DoxyParamCaption}\item[{const Argument\+Tuple \&}]{args}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-more-actions_8h_source_l00078}{78}} of file \mbox{\hyperlink{gmock-more-actions_8h_source}{gmock-\/more-\/actions.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00079\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_invoke_helper}{InvokeHelper<Result,\ ArgumentTuple>::InvokeMethod}}(}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ obj\_ptr\_,\ method\_ptr\_,\ args);}
+\DoxyCodeLine{00081\ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/include/gmock/\mbox{\hyperlink{gmock-more-actions_8h}{gmock-\/more-\/actions.\+h}}\end{DoxyCompactItemize}

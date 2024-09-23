@@ -1,0 +1,104 @@
+\doxysection{libraries/fc/libraries/ff/libff/algebra/curves/mnt/mnt6/mnt6\+\_\+init.hpp File Reference}
+\hypertarget{mnt6__init_8hpp}{}\label{mnt6__init_8hpp}\index{libraries/fc/libraries/ff/libff/algebra/curves/mnt/mnt6/mnt6\_init.hpp@{libraries/fc/libraries/ff/libff/algebra/curves/mnt/mnt6/mnt6\_init.hpp}}
+{\ttfamily \#include $<$libff/algebra/curves/mnt/mnt46\+\_\+common.\+hpp$>$}\newline
+{\ttfamily \#include $<$libff/algebra/curves/public\+\_\+params.\+hpp$>$}\newline
+{\ttfamily \#include $<$libff/algebra/fields/fp.\+hpp$>$}\newline
+{\ttfamily \#include $<$libff/algebra/fields/fp3.\+hpp$>$}\newline
+{\ttfamily \#include $<$libff/algebra/fields/fp6\+\_\+2over3.\+hpp$>$}\newline
+Include dependency graph for mnt6\+\_\+init.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{mnt6__init_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{mnt6__init_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacelibff}{libff}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{mnt6__init_8hpp_a896d66757fd5c706b0ef2f8c048ac176}{mnt6\+\_\+modulus\+\_\+r}}~mnt46\+\_\+modulus\+\_\+B
+\item 
+\#define \mbox{\hyperlink{mnt6__init_8hpp_ad5113fdaf825929a731565ce9842f0b7}{mnt6\+\_\+modulus\+\_\+q}}~mnt46\+\_\+modulus\+\_\+A
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}}$<$ \mbox{\hyperlink{namespacelibff_a0144b8cef54f5a4488443b43abe0e5e3}{mnt6\+\_\+r\+\_\+limbs}}, \mbox{\hyperlink{namespacelibff_a0e85563552222ac015948e63d4332566}{mnt6\+\_\+modulus\+\_\+r}} $>$ \mbox{\hyperlink{namespacelibff_a8f3c635e051466da457c430c522285d9}{libff\+::mnt6\+\_\+\+Fr}}
+\item 
+typedef \mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}}$<$ \mbox{\hyperlink{namespacelibff_a899d14f72602eef1b7517d901fafb3f7}{mnt6\+\_\+q\+\_\+limbs}}, \mbox{\hyperlink{namespacelibff_a4c56ab789eb167e334a8613ee62fa54b}{mnt6\+\_\+modulus\+\_\+q}} $>$ \mbox{\hyperlink{namespacelibff_a956442671f9bb7880b3dff2e80c69f8f}{libff\+::mnt6\+\_\+\+Fq}}
+\item 
+typedef \mbox{\hyperlink{classlibff_1_1_fp3__model}{Fp3\+\_\+model}}$<$ \mbox{\hyperlink{namespacelibff_a899d14f72602eef1b7517d901fafb3f7}{mnt6\+\_\+q\+\_\+limbs}}, \mbox{\hyperlink{namespacelibff_a4c56ab789eb167e334a8613ee62fa54b}{mnt6\+\_\+modulus\+\_\+q}} $>$ \mbox{\hyperlink{namespacelibff_ad13fd48c480a123c223f4587ac92321b}{libff\+::mnt6\+\_\+\+Fq3}}
+\item 
+typedef \mbox{\hyperlink{classlibff_1_1_fp6__2over3__model}{Fp6\+\_\+2over3\+\_\+model}}$<$ \mbox{\hyperlink{namespacelibff_a899d14f72602eef1b7517d901fafb3f7}{mnt6\+\_\+q\+\_\+limbs}}, \mbox{\hyperlink{namespacelibff_a4c56ab789eb167e334a8613ee62fa54b}{mnt6\+\_\+modulus\+\_\+q}} $>$ \mbox{\hyperlink{namespacelibff_a05c88eafe15e4902420decd263b7552a}{libff\+::mnt6\+\_\+\+Fq6}}
+\item 
+typedef \mbox{\hyperlink{namespacelibff_a05c88eafe15e4902420decd263b7552a}{mnt6\+\_\+\+Fq6}} \mbox{\hyperlink{namespacelibff_a980f01e00963b1deb05e1b59e9ebe5ec}{libff\+::mnt6\+\_\+\+GT}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{namespacelibff_a43aa84da89b1fe08dc54a140165e6f8f}{libff\+::init\+\_\+mnt6\+\_\+params}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+const mp\+\_\+size\+\_\+t \mbox{\hyperlink{namespacelibff_ab990a2ee72b1213f3b05904a7d358718}{libff\+::mnt6\+\_\+r\+\_\+bitcount}} = \mbox{\hyperlink{namespacelibff_a4dcac82e16e879f09821463c88ce9867}{mnt46\+\_\+\+B\+\_\+bitcount}}
+\item 
+const mp\+\_\+size\+\_\+t \mbox{\hyperlink{namespacelibff_a2ebe051dd2f6036dbd1fa2f06a22ff10}{libff\+::mnt6\+\_\+q\+\_\+bitcount}} = \mbox{\hyperlink{namespacelibff_aa2953c5eab167d60a11456440ae802df}{mnt46\+\_\+\+A\+\_\+bitcount}}
+\item 
+const mp\+\_\+size\+\_\+t \mbox{\hyperlink{namespacelibff_a0144b8cef54f5a4488443b43abe0e5e3}{libff\+::mnt6\+\_\+r\+\_\+limbs}} = \mbox{\hyperlink{namespacelibff_ab1c78d21e299b6d4cfc20c1737f0c103}{mnt46\+\_\+\+B\+\_\+limbs}}
+\item 
+const mp\+\_\+size\+\_\+t \mbox{\hyperlink{namespacelibff_a899d14f72602eef1b7517d901fafb3f7}{libff\+::mnt6\+\_\+q\+\_\+limbs}} = \mbox{\hyperlink{namespacelibff_a5c9daf492971fd861a17bd0719efc7c7}{mnt46\+\_\+\+A\+\_\+limbs}}
+\item 
+\mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ \mbox{\hyperlink{namespacelibff_a0144b8cef54f5a4488443b43abe0e5e3}{mnt6\+\_\+r\+\_\+limbs}} $>$ \mbox{\hyperlink{namespacelibff_a0e85563552222ac015948e63d4332566}{libff\+::mnt6\+\_\+modulus\+\_\+r}}
+\item 
+\mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ \mbox{\hyperlink{namespacelibff_a899d14f72602eef1b7517d901fafb3f7}{mnt6\+\_\+q\+\_\+limbs}} $>$ \mbox{\hyperlink{namespacelibff_a4c56ab789eb167e334a8613ee62fa54b}{libff\+::mnt6\+\_\+modulus\+\_\+q}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Declaration of interfaces for initializing MNT6.
+
+\begin{DoxyAuthor}{Author}
+This file is part of libff, developed by SCIPR Lab and contributors (see AUTHORS). 
+\end{DoxyAuthor}
+\begin{DoxyCopyright}{Copyright}
+MIT license (see LICENSE file) 
+\end{DoxyCopyright}
+
+
+Definition in file \mbox{\hyperlink{mnt6__init_8hpp_source}{mnt6\+\_\+init.\+hpp}}.
+
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{mnt6__init_8hpp_ad5113fdaf825929a731565ce9842f0b7}\index{mnt6\_init.hpp@{mnt6\_init.hpp}!mnt6\_modulus\_q@{mnt6\_modulus\_q}}
+\index{mnt6\_modulus\_q@{mnt6\_modulus\_q}!mnt6\_init.hpp@{mnt6\_init.hpp}}
+\doxysubsubsection{\texorpdfstring{mnt6\_modulus\_q}{mnt6\_modulus\_q}}
+{\footnotesize\ttfamily \label{mnt6__init_8hpp_ad5113fdaf825929a731565ce9842f0b7} 
+\#define mnt6\+\_\+modulus\+\_\+q~mnt46\+\_\+modulus\+\_\+A}
+
+
+
+Definition at line \mbox{\hyperlink{mnt6__init_8hpp_source_l00024}{24}} of file \mbox{\hyperlink{mnt6__init_8hpp_source}{mnt6\+\_\+init.\+hpp}}.
+
+\Hypertarget{mnt6__init_8hpp_a896d66757fd5c706b0ef2f8c048ac176}\index{mnt6\_init.hpp@{mnt6\_init.hpp}!mnt6\_modulus\_r@{mnt6\_modulus\_r}}
+\index{mnt6\_modulus\_r@{mnt6\_modulus\_r}!mnt6\_init.hpp@{mnt6\_init.hpp}}
+\doxysubsubsection{\texorpdfstring{mnt6\_modulus\_r}{mnt6\_modulus\_r}}
+{\footnotesize\ttfamily \label{mnt6__init_8hpp_a896d66757fd5c706b0ef2f8c048ac176} 
+\#define mnt6\+\_\+modulus\+\_\+r~mnt46\+\_\+modulus\+\_\+B}
+
+
+
+Definition at line \mbox{\hyperlink{mnt6__init_8hpp_source_l00023}{23}} of file \mbox{\hyperlink{mnt6__init_8hpp_source}{mnt6\+\_\+init.\+hpp}}.
+

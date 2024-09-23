@@ -1,0 +1,55 @@
+\doxysection{libraries/fc/include/fc/crypto/webauthn\+\_\+json/example/simplereader/simplereader.cpp File Reference}
+\hypertarget{simplereader_8cpp}{}\label{simplereader_8cpp}\index{libraries/fc/include/fc/crypto/webauthn\_json/example/simplereader/simplereader.cpp@{libraries/fc/include/fc/crypto/webauthn\_json/example/simplereader/simplereader.cpp}}
+{\ttfamily \#include "{}rapidjson/reader.\+h"{}}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+Include dependency graph for simplereader.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{simplereader_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_my_handler}{My\+Handler}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{simplereader_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{simplereader_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}\index{simplereader.cpp@{simplereader.cpp}!main@{main}}
+\index{main@{main}!simplereader.cpp@{simplereader.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{simplereader_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4} 
+int main (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{simplereader_8cpp_source_l00033}{33}} of file \mbox{\hyperlink{simplereader_8cpp_source}{simplereader.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00034\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ json[]\ =\ \textcolor{stringliteral}{"{}\ \{\ \(\backslash\)"{}hello\(\backslash\)"{}\ :\ \(\backslash\)"{}world\(\backslash\)"{},\ \(\backslash\)"{}t\(\backslash\)"{}\ :\ true\ ,\ \(\backslash\)"{}f\(\backslash\)"{}\ :\ false,\ \(\backslash\)"{}n\(\backslash\)"{}:\ null,\ \(\backslash\)"{}i\(\backslash\)"{}:123,\ \(\backslash\)"{}pi\(\backslash\)"{}:\ 3.1416,\ \(\backslash\)"{}a\(\backslash\)"{}:[1,\ 2,\ 3,\ 4]\ \}\ "{}};}
+\DoxyCodeLine{00035\ }
+\DoxyCodeLine{00036\ \ \ \ \ \mbox{\hyperlink{struct_my_handler}{MyHandler}}\ handler;}
+\DoxyCodeLine{00037\ \ \ \ \ \mbox{\hyperlink{class_generic_reader}{Reader}}\ reader;}
+\DoxyCodeLine{00038\ \ \ \ \ \mbox{\hyperlink{struct_generic_string_stream}{StringStream}}\ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}(json);}
+\DoxyCodeLine{00039\ \ \ \ \ reader.\mbox{\hyperlink{class_generic_reader_a0c450620d14ff1824e58bb7bd9b42099}{Parse}}(ss,\ handler);}
+\DoxyCodeLine{00040\ }
+\DoxyCodeLine{00041\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00042\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{simplereader_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4_cgraph}
+\end{center}
+\end{figure}

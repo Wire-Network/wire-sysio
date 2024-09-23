@@ -1,0 +1,265 @@
+\doxysection{libraries/yubihsm/examples/wrap.c File Reference}
+\hypertarget{wrap_8c}{}\label{wrap_8c}\index{libraries/yubihsm/examples/wrap.c@{libraries/yubihsm/examples/wrap.c}}
+{\ttfamily \#include $<$assert.\+h$>$}\newline
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include $<$yubihsm.\+h$>$}\newline
+Include dependency graph for wrap.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{wrap_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{wrap_8c_a377ec96b1eb26c7b26b84bb5b0c9a928}{DEFAULT\+\_\+\+CONNECTOR\+\_\+\+URL}}~"{}http\+://127.\+0.\+0.\+1\+:12345"{}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{wrap_8c_a840291bc02cba5474a4cb46a9b9566fe}{main}} (void)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{wrap_8c_a870e61ded67e4529500d708a5f1af286}{key\+\_\+label}} = "{}label"{}
+\item 
+const \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{wrap_8c_abd7f8a696584d8ab4b9f4d1e1970be37}{password}} \mbox{[}$\,$\mbox{]} = "{}password"{}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{wrap_8c_a377ec96b1eb26c7b26b84bb5b0c9a928}\index{wrap.c@{wrap.c}!DEFAULT\_CONNECTOR\_URL@{DEFAULT\_CONNECTOR\_URL}}
+\index{DEFAULT\_CONNECTOR\_URL@{DEFAULT\_CONNECTOR\_URL}!wrap.c@{wrap.c}}
+\doxysubsubsection{\texorpdfstring{DEFAULT\_CONNECTOR\_URL}{DEFAULT\_CONNECTOR\_URL}}
+{\footnotesize\ttfamily \label{wrap_8c_a377ec96b1eb26c7b26b84bb5b0c9a928} 
+\#define DEFAULT\+\_\+\+CONNECTOR\+\_\+\+URL~"{}http\+://127.\+0.\+0.\+1\+:12345"{}}
+
+
+
+Definition at line \mbox{\hyperlink{wrap_8c_source_l00029}{29}} of file \mbox{\hyperlink{wrap_8c_source}{wrap.\+c}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{wrap_8c_a840291bc02cba5474a4cb46a9b9566fe}\index{wrap.c@{wrap.c}!main@{main}}
+\index{main@{main}!wrap.c@{wrap.c}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{wrap_8c_a840291bc02cba5474a4cb46a9b9566fe} 
+int main (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{wrap_8c_source_l00035}{35}} of file \mbox{\hyperlink{wrap_8c_source}{wrap.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00036\ \ \ \mbox{\hyperlink{structyh__connector}{yh\_connector}}\ *connector\ =\ NULL;}
+\DoxyCodeLine{00037\ \ \ \mbox{\hyperlink{structyh__session}{yh\_session}}\ *\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}}\ =\ NULL;}
+\DoxyCodeLine{00038\ \ \ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366}{yh\_rc}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a39fbc5bce29b178582419ae9d31ad252}{YHR\_GENERIC\_ERROR}};}
+\DoxyCodeLine{00039\ }
+\DoxyCodeLine{00040\ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ authkey\ =\ 1;}
+\DoxyCodeLine{00041\ }
+\DoxyCodeLine{00042\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *connector\_url;}
+\DoxyCodeLine{00043\ }
+\DoxyCodeLine{00044\ \ \ connector\_url\ =\ getenv(\textcolor{stringliteral}{"{}DEFAULT\_CONNECTOR\_URL"{}});}
+\DoxyCodeLine{00045\ \ \ \textcolor{keywordflow}{if}\ (connector\_url\ ==\ NULL)\ \{}
+\DoxyCodeLine{00046\ \ \ \ \ connector\_url\ =\ \mbox{\hyperlink{wrap_8c_a377ec96b1eb26c7b26b84bb5b0c9a928}{DEFAULT\_CONNECTOR\_URL}};}
+\DoxyCodeLine{00047\ \ \ \}}
+\DoxyCodeLine{00048\ }
+\DoxyCodeLine{00049\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a5392844a98c6220c69fe08d3dcf8f1bc}{yh\_init}}();}
+\DoxyCodeLine{00050\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{00051\ }
+\DoxyCodeLine{00052\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a9c700747902a722d6c1d2073277de294}{yh\_init\_connector}}(connector\_url,\ \&connector);}
+\DoxyCodeLine{00053\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{00054\ }
+\DoxyCodeLine{00055\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_aa19be6ac70a2a5d1cef8d7e6902fe05f}{yh\_connect}}(connector,\ 0);}
+\DoxyCodeLine{00056\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{00057\ }
+\DoxyCodeLine{00058\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a3be331dcf8907ff3569e4dc230e1c615}{yh\_create\_session\_derived}}(connector,\ authkey,\ password,}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{sizeof}(password),\ \textcolor{keyword}{false},\ \&\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}});}
+\DoxyCodeLine{00060\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{00061\ }
+\DoxyCodeLine{00062\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a77870209747d5ccd90f9da3aae2bdfa8}{yh\_authenticate\_session}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}});}
+\DoxyCodeLine{00063\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{00064\ }
+\DoxyCodeLine{00065\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ session\_id;}
+\DoxyCodeLine{00066\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_aeabf472faf1ba8d963b39866e04df6b0}{yh\_get\_session\_id}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}},\ \&session\_id);}
+\DoxyCodeLine{00067\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{00068\ }
+\DoxyCodeLine{00069\ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Successfully\ established\ session\ \%02d\(\backslash\)n"{}},\ session\_id);}
+\DoxyCodeLine{00070\ }
+\DoxyCodeLine{00071\ \ \ \mbox{\hyperlink{structyh__capabilities}{yh\_capabilities}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a08393519edfd7c59fb01fb8db97514b5}{capabilities}}\ =\ \{\{0\}\};}
+\DoxyCodeLine{00072\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =}
+\DoxyCodeLine{00073\ \ \ \ \ \mbox{\hyperlink{yubihsm_8c_aab440e1cb671d9ba7a2e7d1243960e42}{yh\_string\_to\_capabilities}}(\textcolor{stringliteral}{"{}export-\/wrapped:import-\/wrapped"{}},\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a08393519edfd7c59fb01fb8db97514b5}{capabilities}});}
+\DoxyCodeLine{00074\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{00075\ }
+\DoxyCodeLine{00076\ \ \ \mbox{\hyperlink{structyh__capabilities}{yh\_capabilities}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_afa62e10709d52e5162a732e81369a7ec}{delegated\_capabilities}}\ =\ \{\{0\}\};}
+\DoxyCodeLine{00077\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_aab440e1cb671d9ba7a2e7d1243960e42}{yh\_string\_to\_capabilities}}(\textcolor{stringliteral}{"{}sign-\/ecdsa:exportable-\/under-\/wrap"{}},}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_afa62e10709d52e5162a732e81369a7ec}{delegated\_capabilities}});\ \textcolor{comment}{//\ delegated}}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ capabilities\ has}}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ to\ match\ the}}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ capabilities\ of}}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ the\ object\ we}}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ want\ to\ export}}
+\DoxyCodeLine{00084\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{00085\ }
+\DoxyCodeLine{00086\ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ domain\_five\ =\ 0;}
+\DoxyCodeLine{00087\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a96a4c751a281515d5610adb8fd779438}{yh\_string\_to\_domains}}(\textcolor{stringliteral}{"{}5"{}},\ \&domain\_five);}
+\DoxyCodeLine{00088\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{00089\ }
+\DoxyCodeLine{00090\ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ wrapping\_key\_id\ =\ 0;\ \textcolor{comment}{//\ ID\ 0\ lets\ the\ device\ generate\ an\ ID}}
+\DoxyCodeLine{00091\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =}
+\DoxyCodeLine{00092\ \ \ \ \ \mbox{\hyperlink{yubihsm_8c_a1f749a696792e7911844629e056d9c15}{yh\_util\_generate\_wrap\_key}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}},\ \&wrapping\_key\_id,\ \mbox{\hyperlink{wrap_8c_a870e61ded67e4529500d708a5f1af286}{key\_label}},\ domain\_five,}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a08393519edfd7c59fb01fb8db97514b5}{capabilities}},\ \mbox{\hyperlink{yubihsm_8h_a498937b5a72accbb0ef21bb1dcdd55caa927e2246e5657f946b4da4b71092b022}{YH\_ALGO\_AES256\_CCM\_WRAP}},}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_afa62e10709d52e5162a732e81369a7ec}{delegated\_capabilities}});}
+\DoxyCodeLine{00095\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{00096\ }
+\DoxyCodeLine{00097\ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Generated\ wrapping\ key\ with\ ID\ \%04x\(\backslash\)n"{}},\ wrapping\_key\_id);}
+\DoxyCodeLine{00098\ }
+\DoxyCodeLine{00099\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a08393519edfd7c59fb01fb8db97514b5}{capabilities}}.\mbox{\hyperlink{structyh__capabilities_a5398bad7e61385aa127265ba0a053079}{capabilities}},\ 0,\ \mbox{\hyperlink{yubihsm_8h_ad3c904849d17cae0a6f426e8007731d7}{YH\_CAPABILITIES\_LEN}});}
+\DoxyCodeLine{00100\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_aab440e1cb671d9ba7a2e7d1243960e42}{yh\_string\_to\_capabilities}}(\textcolor{stringliteral}{"{}sign-\/ecdsa:exportable-\/under-\/wrap"{}},}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a08393519edfd7c59fb01fb8db97514b5}{capabilities}});}
+\DoxyCodeLine{00102\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{00103\ }
+\DoxyCodeLine{00104\ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ key\_id\_before\ =\ 0;\ \textcolor{comment}{//\ ID\ 0\ lets\ the\ device\ generate\ an\ ID}}
+\DoxyCodeLine{00105\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a2db9bbd57a908c5c454fc6254f57dcff}{yh\_util\_generate\_ec\_key}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}},\ \&key\_id\_before,\ \mbox{\hyperlink{wrap_8c_a870e61ded67e4529500d708a5f1af286}{key\_label}},\ domain\_five,}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a08393519edfd7c59fb01fb8db97514b5}{capabilities}},\ \mbox{\hyperlink{yubihsm_8h_a498937b5a72accbb0ef21bb1dcdd55caae4b191baf5c65f9234120080264d129b}{YH\_ALGO\_EC\_P256}});}
+\DoxyCodeLine{00107\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{00108\ }
+\DoxyCodeLine{00109\ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Generated\ ec\ key\ with\ ID\ \%04x\(\backslash\)n"{}},\ key\_id\_before);}
+\DoxyCodeLine{00110\ }
+\DoxyCodeLine{00111\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ public\_key\_before[512];}
+\DoxyCodeLine{00112\ \ \ \textcolor{keywordtype}{size\_t}\ public\_key\_before\_len\ =\ \textcolor{keyword}{sizeof}(public\_key\_before);}
+\DoxyCodeLine{00113\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_aa7b8b42156c4bdaf41d8b9758a2fd73f}{yh\_util\_get\_public\_key}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}},\ key\_id\_before,\ public\_key\_before,}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&public\_key\_before\_len,\ NULL);}
+\DoxyCodeLine{00115\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{00116\ }
+\DoxyCodeLine{00117\ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Public\ key\ before\ (\%zu\ bytes)\ is:"{}},\ public\_key\_before\_len);}
+\DoxyCodeLine{00118\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ public\_key\_before\_len;\ i++)\ \{}
+\DoxyCodeLine{00119\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\ \%02x"{}},\ public\_key\_before[i]);}
+\DoxyCodeLine{00120\ \ \ \}}
+\DoxyCodeLine{00121\ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{00122\ }
+\DoxyCodeLine{00123\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ wrapped\_object[512];}
+\DoxyCodeLine{00124\ \ \ \textcolor{keywordtype}{size\_t}\ wrapped\_object\_len\ =\ \textcolor{keyword}{sizeof}(wrapped\_object);}
+\DoxyCodeLine{00125\ \ \ \mbox{\hyperlink{yubihsm_8h_a2fe39512cb4df34b270a67dbb8e13583}{yh\_object\_type}}\ object\_type\_after;}
+\DoxyCodeLine{00126\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =}
+\DoxyCodeLine{00127\ \ \ \ \ \mbox{\hyperlink{yubihsm_8c_aa3f473e6dbb9188ad0269b40921c4f5f}{yh\_util\_export\_wrapped}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}},\ wrapping\_key\_id,\ \mbox{\hyperlink{yubihsm_8h_a2fe39512cb4df34b270a67dbb8e13583ab71424e16384319d6e6a12f9a3d8ceae}{YH\_ASYMMETRIC\_KEY}},}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ key\_id\_before,\ wrapped\_object,\ \&wrapped\_object\_len);}
+\DoxyCodeLine{00129\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{00130\ }
+\DoxyCodeLine{00131\ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Wrapped\ object\ (\%zu\ bytes)\ is:"{}},\ wrapped\_object\_len);}
+\DoxyCodeLine{00132\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ wrapped\_object\_len;\ i++)\ \{}
+\DoxyCodeLine{00133\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\ \%02x"{}},\ wrapped\_object[i]);}
+\DoxyCodeLine{00134\ \ \ \}}
+\DoxyCodeLine{00135\ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{00136\ }
+\DoxyCodeLine{00137\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_ae736702f9463878db4adfd45b6a597f9}{yh\_util\_delete\_object}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}},\ key\_id\_before,\ \mbox{\hyperlink{yubihsm_8h_a2fe39512cb4df34b270a67dbb8e13583ab71424e16384319d6e6a12f9a3d8ceae}{YH\_ASYMMETRIC\_KEY}});}
+\DoxyCodeLine{00138\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{00139\ }
+\DoxyCodeLine{00140\ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Successfully\ deleted\ ec\ key\ with\ ID\ \%04x\(\backslash\)n"{}},\ key\_id\_before);}
+\DoxyCodeLine{00141\ }
+\DoxyCodeLine{00142\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ public\_key\_after[512];}
+\DoxyCodeLine{00143\ \ \ \textcolor{keywordtype}{size\_t}\ public\_key\_after\_len\ =\ \textcolor{keyword}{sizeof}(public\_key\_after);}
+\DoxyCodeLine{00144\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_aa7b8b42156c4bdaf41d8b9758a2fd73f}{yh\_util\_get\_public\_key}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}},\ key\_id\_before,\ public\_key\_after,}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&public\_key\_after\_len,\ NULL);}
+\DoxyCodeLine{00146\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a9bc4026d75a26dcaa51ba3310d6b8393}{YHR\_DEVICE\_OBJECT\_NOT\_FOUND}});}
+\DoxyCodeLine{00147\ }
+\DoxyCodeLine{00148\ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Unable\ to\ get\ public\ key\ for\ ec\ key\ with\ ID\ \%04x\(\backslash\)n"{}},\ key\_id\_before);}
+\DoxyCodeLine{00149\ }
+\DoxyCodeLine{00150\ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ key\_id\_after;}
+\DoxyCodeLine{00151\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_ae5bf13f9558bb0340468b722accf94d3}{yh\_util\_import\_wrapped}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}},\ wrapping\_key\_id,\ wrapped\_object,}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ wrapped\_object\_len,\ \&object\_type\_after,}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&key\_id\_after);}
+\DoxyCodeLine{00154\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{00155\ }
+\DoxyCodeLine{00156\ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Successfully\ imported\ wrapped\ object\ with\ ID\ \%04x\(\backslash\)n"{}},\ key\_id\_after);}
+\DoxyCodeLine{00157\ }
+\DoxyCodeLine{00158\ \ \ \textcolor{keywordflow}{if}\ (object\_type\_after\ !=\ \mbox{\hyperlink{yubihsm_8h_a2fe39512cb4df34b270a67dbb8e13583ab71424e16384319d6e6a12f9a3d8ceae}{YH\_ASYMMETRIC\_KEY}})\ \{}
+\DoxyCodeLine{00159\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Unexpected\ odbject\ type\(\backslash\)n"{}});}
+\DoxyCodeLine{00160\ \ \ \ \ exit(EXIT\_FAILURE);}
+\DoxyCodeLine{00161\ \ \ \}}
+\DoxyCodeLine{00162\ }
+\DoxyCodeLine{00163\ \ \ \textcolor{keywordflow}{if}\ (key\_id\_before\ !=\ key\_id\_after)\ \{}
+\DoxyCodeLine{00164\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}ID\ \%04x\ and\ \%04x\ do\ not\ match\(\backslash\)n"{}},\ key\_id\_before,\ key\_id\_after);}
+\DoxyCodeLine{00165\ \ \ \ \ exit(EXIT\_FAILURE);}
+\DoxyCodeLine{00166\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00167\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}ID\ \%04x\ and\ \%04x\ match\(\backslash\)n"{}},\ key\_id\_before,\ key\_id\_after);}
+\DoxyCodeLine{00168\ \ \ \}}
+\DoxyCodeLine{00169\ }
+\DoxyCodeLine{00170\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_aa7b8b42156c4bdaf41d8b9758a2fd73f}{yh\_util\_get\_public\_key}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}},\ key\_id\_after,\ public\_key\_after,}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&public\_key\_after\_len,\ NULL);}
+\DoxyCodeLine{00172\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{00173\ }
+\DoxyCodeLine{00174\ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Public\ key\ after\ (\%zu\ bytes)\ is:"{}},\ public\_key\_after\_len);}
+\DoxyCodeLine{00175\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ public\_key\_after\_len;\ i++)\ \{}
+\DoxyCodeLine{00176\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\ \%02x"{}},\ public\_key\_after[i]);}
+\DoxyCodeLine{00177\ \ \ \}}
+\DoxyCodeLine{00178\ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{00179\ }
+\DoxyCodeLine{00180\ \ \ \textcolor{keywordflow}{if}\ (public\_key\_before\_len\ !=\ public\_key\_after\_len\ ||}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ memcmp(public\_key\_before,\ public\_key\_after,\ public\_key\_before\_len)\ !=\ 0)\ \{}
+\DoxyCodeLine{00182\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Public\ key\ before\ and\ after\ do\ not\ match\(\backslash\)n"{}});}
+\DoxyCodeLine{00183\ \ \ \ \ exit(EXIT\_FAILURE);}
+\DoxyCodeLine{00184\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00185\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Public\ key\ before\ and\ after\ match\(\backslash\)n"{}});}
+\DoxyCodeLine{00186\ \ \ \}}
+\DoxyCodeLine{00187\ }
+\DoxyCodeLine{00188\ \ \ \mbox{\hyperlink{structyh__object__descriptor}{yh\_object\_descriptor}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}};}
+\DoxyCodeLine{00189\ }
+\DoxyCodeLine{00190\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =}
+\DoxyCodeLine{00191\ \ \ \ \ \mbox{\hyperlink{yubihsm_8c_a7b5f1f0c1cbca11fbe21e7e4e6b29a1b}{yh\_util\_get\_object\_info}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}},\ key\_id\_after,\ \mbox{\hyperlink{yubihsm_8h_a2fe39512cb4df34b270a67dbb8e13583ab71424e16384319d6e6a12f9a3d8ceae}{YH\_ASYMMETRIC\_KEY}},\ \&\textcolor{keywordtype}{object});}
+\DoxyCodeLine{00192\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{00193\ }
+\DoxyCodeLine{00194\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a61ab8dbab67b1cceb49cd306f8c3f4b1}{yh\_util\_close\_session}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}});}
+\DoxyCodeLine{00195\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{00196\ }
+\DoxyCodeLine{00197\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a1a35f8ae5a739848408633a514e41b2d}{yh\_destroy\_session}}(\&\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}});}
+\DoxyCodeLine{00198\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{00199\ }
+\DoxyCodeLine{00200\ \ \ \mbox{\hyperlink{yubihsm_8c_ab12d5a42d2219741bd3630b99ed1c7d2}{yh\_disconnect}}(connector);}
+\DoxyCodeLine{00201\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{00202\ }
+\DoxyCodeLine{00203\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a36e3d9a07c6689e14a9339ca1ebb7259}{yh\_exit}}();}
+\DoxyCodeLine{00204\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{00205\ }
+\DoxyCodeLine{00206\ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00207\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{wrap_8c_a840291bc02cba5474a4cb46a9b9566fe_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{wrap_8c_a870e61ded67e4529500d708a5f1af286}\index{wrap.c@{wrap.c}!key\_label@{key\_label}}
+\index{key\_label@{key\_label}!wrap.c@{wrap.c}}
+\doxysubsubsection{\texorpdfstring{key\_label}{key\_label}}
+{\footnotesize\ttfamily \label{wrap_8c_a870e61ded67e4529500d708a5f1af286} 
+const char\texorpdfstring{$\ast$}{*} key\+\_\+label = "{}label"{}}
+
+
+
+Definition at line \mbox{\hyperlink{wrap_8c_source_l00032}{32}} of file \mbox{\hyperlink{wrap_8c_source}{wrap.\+c}}.
+
+\Hypertarget{wrap_8c_abd7f8a696584d8ab4b9f4d1e1970be37}\index{wrap.c@{wrap.c}!password@{password}}
+\index{password@{password}!wrap.c@{wrap.c}}
+\doxysubsubsection{\texorpdfstring{password}{password}}
+{\footnotesize\ttfamily \label{wrap_8c_abd7f8a696584d8ab4b9f4d1e1970be37} 
+const \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} password\mbox{[}$\,$\mbox{]} = "{}password"{}}
+
+
+
+Definition at line \mbox{\hyperlink{wrap_8c_source_l00033}{33}} of file \mbox{\hyperlink{wrap_8c_source}{wrap.\+c}}.
+

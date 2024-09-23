@@ -1,0 +1,179 @@
+\doxysection{test\+\_\+resmon\+\_\+plugin.\+cpp}
+\hypertarget{test__resmon__plugin_8cpp_source}{}\label{test__resmon__plugin_8cpp_source}\index{plugins/resource\_monitor\_plugin/test/test\_resmon\_plugin.cpp@{plugins/resource\_monitor\_plugin/test/test\_resmon\_plugin.cpp}}
+\mbox{\hyperlink{test__resmon__plugin_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00001}\mbox{\hyperlink{test__resmon__plugin_8cpp_a6b2a3852db8bb19ab6909bac01859985}{00001}}\ \textcolor{preprocessor}{\#define\ BOOST\_TEST\_MODULE\ test\_resmom\_plugin}}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <boost/test/included/unit\_test.hpp>}}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{variant__object_8hpp}{fc/variant\_object.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{resource__monitor__plugin_8hpp}{sysio/resource\_monitor\_plugin/resource\_monitor\_plugin.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <thread>}}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00010}00010\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}};}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00011}00011\ \textcolor{keyword}{using\ namespace\ }boost::system;}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00013}00013\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceboost_1_1filesystem}{bfs}}\ =\ \mbox{\hyperlink{namespaceboost_1_1filesystem}{boost::filesystem}};}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00015}00015\ \textcolor{comment}{//\ For\ program\ options}}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00016}00016\ \textcolor{keyword}{namespace\ }bpo\ =\ boost::program\_options;}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00017}00017\ \textcolor{keyword}{using\ }bpo::options\_description;}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00018}00018\ \textcolor{keyword}{using\ }bpo::variables\_map;}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00020}\mbox{\hyperlink{structresmon__fixture}{00020}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structresmon__fixture}{resmon\_fixture}}\ \{}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00021}\mbox{\hyperlink{structresmon__fixture_af5d15c1bb948ca8150b97a3e46247686}{00021}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structresmon__fixture_af5d15c1bb948ca8150b97a3e46247686}{set\_program\_options}}()\ \{}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00022}00022\ \ \ \ \ \ \ options\_description\ dummy;}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00023}00023\ \ \ \ \ \ \ \mbox{\hyperlink{structresmon__fixture_a4136c5f10d574c6cbd1d15ef1af31837}{\_my}}.\mbox{\hyperlink{classsysio_1_1resource__monitor__plugin_a6d82af2b00041a1f160d7268c1b454b7}{set\_program\_options}}(dummy,\ \mbox{\hyperlink{structresmon__fixture_a4c75064976b2e8857322afb6000f32f7}{\_cfg}});}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00024}00024\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00026}\mbox{\hyperlink{structresmon__fixture_a68bd6bd03fb7e49249e6d7fcfc3dd16d}{00026}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structresmon__fixture_a68bd6bd03fb7e49249e6d7fcfc3dd16d}{initialize}}(\textcolor{keyword}{const}\ std::vector<std::string>\&\ args)\{}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00027}00027\ \ \ \ \ \ \ \textcolor{comment}{//\ We\ only\ have\ at\ most\ 3\ arguments.\ OK\ to\ hardcodied\ in\ test}}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00028}00028\ \ \ \ \ \ \ \textcolor{comment}{//\ programs.}}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00029}00029\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[10];}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00030}00030\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(args.size()\ <\ 10,\ chain::plugin\_exception,\ \textcolor{stringliteral}{"{}number\ of\ arguments\ \ (\$\{size\})\ must\ be\ less\ than\ 10"{}},\ (\textcolor{stringliteral}{"{}size"{}},\ args.size()));}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00032}00032\ \ \ \ \ \ \ \textcolor{comment}{//\ argv[0]\ is\ program\ name,\ no\ need\ to\ fill\ in}}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00033}00033\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i=0;\ i<args.size();\ ++i)\ \{}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00034}00034\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[i+1]\ =\ args[i].c\_str();}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00035}00035\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00037}00037\ \ \ \ \ \ \ bpo::variables\_map\ options;}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00038}00038\ \ \ \ \ \ \ bpo::store(bpo::parse\_command\_line(args.size()+1,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \mbox{\hyperlink{structresmon__fixture_a4c75064976b2e8857322afb6000f32f7}{\_cfg}}),\ options);}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00039}00039\ \ \ \ \ \ \ bpo::notify(options);}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00041}00041\ \ \ \ \ \ \ \mbox{\hyperlink{structresmon__fixture_a4136c5f10d574c6cbd1d15ef1af31837}{\_my}}.\mbox{\hyperlink{classsysio_1_1resource__monitor__plugin_a8aa338848d9b4ea7f0af24674fb9afe3}{plugin\_initialize}}(options);}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00042}00042\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00044}\mbox{\hyperlink{structresmon__fixture_a7138a1a6fe46f645488210b544163f05}{00044}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structresmon__fixture_a7138a1a6fe46f645488210b544163f05}{set\_options}}(\textcolor{keyword}{const}\ std::vector<std::string>\&\ arg)\ \{}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00045}00045\ \ \ \ \ \ \ \mbox{\hyperlink{structresmon__fixture_af5d15c1bb948ca8150b97a3e46247686}{set\_program\_options}}();}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00046}00046\ \ \ \ \ \ \ \mbox{\hyperlink{structresmon__fixture_a68bd6bd03fb7e49249e6d7fcfc3dd16d}{initialize}}(arg);}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00047}00047\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00049}\mbox{\hyperlink{structresmon__fixture_aef5a903ad369335d6a5a79061be32b03}{00049}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structresmon__fixture_aef5a903ad369335d6a5a79061be32b03}{plugin\_startup}}(\textcolor{keyword}{const}\ std::vector<bfs::path>\&\ dirs,\ \textcolor{keywordtype}{int}\ runTimeSecs=3)\ \{}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00050}00050\ \ \ \ \ \ \ \mbox{\hyperlink{structresmon__fixture_a7138a1a6fe46f645488210b544163f05}{set\_options}}(\{\textcolor{stringliteral}{"{}-\/-\/resource-\/monitor-\/interval-\/seconds=1"{}}\});}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00052}00052\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\&\ dir:\ dirs)\ \{}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structresmon__fixture_a4136c5f10d574c6cbd1d15ef1af31837}{\_my}}.\mbox{\hyperlink{classsysio_1_1resource__monitor__plugin_a756d8d52fe7acf391a9e11e27a1a482b}{monitor\_directory}}(dir);}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00054}00054\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00056}00056\ \ \ \ \ \ \ \mbox{\hyperlink{structresmon__fixture_a4136c5f10d574c6cbd1d15ef1af31837}{\_my}}.\mbox{\hyperlink{classsysio_1_1resource__monitor__plugin_a9450b8a934658e7baa38d0b581c98812}{plugin\_startup}}();}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00057}00057\ \ \ \ \ \ \ std::this\_thread::sleep\_for(\ std::chrono::milliseconds(runTimeSecs*1000)\ );}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00058}00058\ \ \ \ \ \ \ \mbox{\hyperlink{structresmon__fixture_a4136c5f10d574c6cbd1d15ef1af31837}{\_my}}.\mbox{\hyperlink{classsysio_1_1resource__monitor__plugin_aec66e2d4bf2493717a81701b2504e138}{plugin\_shutdown}}();}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00059}00059\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00061}\mbox{\hyperlink{structresmon__fixture_a4136c5f10d574c6cbd1d15ef1af31837}{00061}}\ \ \ \ \mbox{\hyperlink{classsysio_1_1resource__monitor__plugin}{resource\_monitor\_plugin}}\ \mbox{\hyperlink{structresmon__fixture_a4136c5f10d574c6cbd1d15ef1af31837}{\_my}};}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00062}\mbox{\hyperlink{structresmon__fixture_a4c75064976b2e8857322afb6000f32f7}{00062}}\ \ \ \ options\_description\ \mbox{\hyperlink{structresmon__fixture_a4c75064976b2e8857322afb6000f32f7}{\_cfg}};}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00063}00063\ \};}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00065}00065\ BOOST\_AUTO\_TEST\_SUITE(resmon\_plugin\_tests)}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00066}\mbox{\hyperlink{test__resmon__plugin_8cpp_a5bab595fc9809eeb580e8ae3178b5157}{00066}}\ \ \ \ \mbox{\hyperlink{test__resmon__plugin_8cpp_a5bab595fc9809eeb580e8ae3178b5157}{BOOST\_FIXTURE\_TEST\_CASE}}(intervalTooBig,\ \mbox{\hyperlink{structresmon__fixture}{resmon\_fixture}})}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00067}00067\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00068}00068\ \ \ \ \ \ \ BOOST\_REQUIRE\_THROW(set\_options(\{\textcolor{stringliteral}{"{}-\/-\/resource-\/monitor-\/interval-\/seconds=301"{}}\}),\ chain::plugin\_config\_exception);}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00069}00069\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00071}\mbox{\hyperlink{test__resmon__plugin_8cpp_a931326fb254c1f3e563d0cb67a4eaa94}{00071}}\ \ \ \ \mbox{\hyperlink{test__resmon__plugin_8cpp_a5bab595fc9809eeb580e8ae3178b5157}{BOOST\_FIXTURE\_TEST\_CASE}}(intervalTooSmall,\ \mbox{\hyperlink{structresmon__fixture}{resmon\_fixture}})}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00072}00072\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00073}00073\ \ \ \ \ \ \ BOOST\_REQUIRE\_THROW(set\_options(\{\textcolor{stringliteral}{"{}-\/-\/resource-\/monitor-\/interval-\/seconds=0"{}}\}),\ chain::plugin\_config\_exception);}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00074}00074\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00075}00075\ }
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00076}\mbox{\hyperlink{test__resmon__plugin_8cpp_ae001c6d855551e5214b79402fdc3cb66}{00076}}\ \ \ \ \mbox{\hyperlink{test__resmon__plugin_8cpp_a5bab595fc9809eeb580e8ae3178b5157}{BOOST\_FIXTURE\_TEST\_CASE}}(intervalLowBound,\ \mbox{\hyperlink{structresmon__fixture}{resmon\_fixture}})}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00077}00077\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00078}00078\ \ \ \ \ \ \ BOOST\_REQUIRE\_NO\_THROW(set\_options(\{\textcolor{stringliteral}{"{}-\/-\/resource-\/monitor-\/interval-\/seconds=1"{}}\}));}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00079}00079\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00080}00080\ }
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00081}\mbox{\hyperlink{test__resmon__plugin_8cpp_a47183db0492b1bc1c648084b4ead5db5}{00081}}\ \ \ \ \mbox{\hyperlink{test__resmon__plugin_8cpp_a5bab595fc9809eeb580e8ae3178b5157}{BOOST\_FIXTURE\_TEST\_CASE}}(intervalMiddle,\ \mbox{\hyperlink{structresmon__fixture}{resmon\_fixture}})}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00082}00082\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00083}00083\ \ \ \ \ \ \ BOOST\_REQUIRE\_NO\_THROW(set\_options(\{\textcolor{stringliteral}{"{}-\/-\/resource-\/monitor-\/interval-\/seconds=150"{}}\}));}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00084}00084\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00085}00085\ }
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00086}\mbox{\hyperlink{test__resmon__plugin_8cpp_aa7a41233fb3d541ac49b2a8fbf009d44}{00086}}\ \ \ \ \mbox{\hyperlink{test__resmon__plugin_8cpp_a5bab595fc9809eeb580e8ae3178b5157}{BOOST\_FIXTURE\_TEST\_CASE}}(intervalHighBound,\ \mbox{\hyperlink{structresmon__fixture}{resmon\_fixture}})}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00087}00087\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00088}00088\ \ \ \ \ \ \ BOOST\_REQUIRE\_NO\_THROW(set\_options(\{\textcolor{stringliteral}{"{}-\/-\/resource-\/monitor-\/interval-\/seconds=300"{}}\}));}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00089}00089\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00090}00090\ }
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00091}\mbox{\hyperlink{test__resmon__plugin_8cpp_a0696aff6ed74e9ffc6982d868ac41d61}{00091}}\ \ \ \ \mbox{\hyperlink{test__resmon__plugin_8cpp_a5bab595fc9809eeb580e8ae3178b5157}{BOOST\_FIXTURE\_TEST\_CASE}}(thresholdTooBig,\ \mbox{\hyperlink{structresmon__fixture}{resmon\_fixture}})}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00092}00092\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00093}00093\ \ \ \ \ \ \ BOOST\_REQUIRE\_THROW(set\_options(\{\textcolor{stringliteral}{"{}-\/-\/resource-\/monitor-\/space-\/threshold=100"{}}\}),\ chain::plugin\_config\_exception);}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00094}00094\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00095}00095\ }
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00096}\mbox{\hyperlink{test__resmon__plugin_8cpp_a72aa2115725a3b668f5807b5c1aa2600}{00096}}\ \ \ \ \mbox{\hyperlink{test__resmon__plugin_8cpp_a5bab595fc9809eeb580e8ae3178b5157}{BOOST\_FIXTURE\_TEST\_CASE}}(thresholdTooSmall,\ \mbox{\hyperlink{structresmon__fixture}{resmon\_fixture}})}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00097}00097\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00098}00098\ \ \ \ \ \ \ BOOST\_REQUIRE\_THROW(set\_options(\{\textcolor{stringliteral}{"{}-\/-\/resource-\/monitor-\/space-\/threshold=5"{}}\}),\ chain::plugin\_config\_exception);}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00099}00099\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00100}00100\ }
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00101}\mbox{\hyperlink{test__resmon__plugin_8cpp_a05b49a0fcaf5d1d3bc506082372e879f}{00101}}\ \ \ \ \mbox{\hyperlink{test__resmon__plugin_8cpp_a5bab595fc9809eeb580e8ae3178b5157}{BOOST\_FIXTURE\_TEST\_CASE}}(thresholdLowBound,\ \mbox{\hyperlink{structresmon__fixture}{resmon\_fixture}})}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00102}00102\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00103}00103\ \ \ \ \ \ \ BOOST\_REQUIRE\_NO\_THROW(set\_options(\{\textcolor{stringliteral}{"{}-\/-\/resource-\/monitor-\/space-\/threshold=6"{}}\}));}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00104}00104\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00105}00105\ }
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00106}\mbox{\hyperlink{test__resmon__plugin_8cpp_a3561912b373c48d89f45a753910b4ac3}{00106}}\ \ \ \ \mbox{\hyperlink{test__resmon__plugin_8cpp_a5bab595fc9809eeb580e8ae3178b5157}{BOOST\_FIXTURE\_TEST\_CASE}}(thresholdMiddle,\ \mbox{\hyperlink{structresmon__fixture}{resmon\_fixture}})}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00107}00107\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00108}00108\ \ \ \ \ \ \ BOOST\_REQUIRE\_NO\_THROW(set\_options(\{\textcolor{stringliteral}{"{}-\/-\/resource-\/monitor-\/space-\/threshold=60"{}}\}));}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00109}00109\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00110}00110\ }
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00111}\mbox{\hyperlink{test__resmon__plugin_8cpp_ab529cfb5f945cddfd6fdf6f51f8d63c9}{00111}}\ \ \ \ \mbox{\hyperlink{test__resmon__plugin_8cpp_a5bab595fc9809eeb580e8ae3178b5157}{BOOST\_FIXTURE\_TEST\_CASE}}(thresholdHighBound,\ \mbox{\hyperlink{structresmon__fixture}{resmon\_fixture}})}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00112}00112\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00113}00113\ \ \ \ \ \ \ BOOST\_REQUIRE\_NO\_THROW(set\_options(\{\textcolor{stringliteral}{"{}-\/-\/resource-\/monitor-\/space-\/threshold=99"{}}\}));}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00114}00114\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00115}00115\ }
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00116}\mbox{\hyperlink{test__resmon__plugin_8cpp_a0a1d8b3d4a0dae3da9d258c70bc5d2a6}{00116}}\ \ \ \ \mbox{\hyperlink{test__resmon__plugin_8cpp_a5bab595fc9809eeb580e8ae3178b5157}{BOOST\_FIXTURE\_TEST\_CASE}}(noShutdown,\ \mbox{\hyperlink{structresmon__fixture}{resmon\_fixture}})}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00117}00117\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00118}00118\ \ \ \ \ \ \ BOOST\_REQUIRE\_NO\_THROW(set\_options(\{\textcolor{stringliteral}{"{}-\/-\/resource-\/monitor-\/not-\/shutdown-\/on-\/threshold-\/exceeded"{}}\}));}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00119}00119\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00120}00120\ }
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00121}\mbox{\hyperlink{test__resmon__plugin_8cpp_aa5fb9d9229324ef19888ac04ac8bb18b}{00121}}\ \ \ \ \mbox{\hyperlink{test__resmon__plugin_8cpp_a5bab595fc9809eeb580e8ae3178b5157}{BOOST\_FIXTURE\_TEST\_CASE}}(startupNormal,\ \mbox{\hyperlink{structresmon__fixture}{resmon\_fixture}})}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00122}00122\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00123}00123\ \ \ \ \ \ \ BOOST\_REQUIRE\_NO\_THROW(\ plugin\_startup(\{\textcolor{stringliteral}{"{}/tmp"{}}\}));}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00124}00124\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00125}00125\ }
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00126}\mbox{\hyperlink{test__resmon__plugin_8cpp_a1c09b621e90ca6a83ec810541b886274}{00126}}\ \ \ \ \mbox{\hyperlink{test__resmon__plugin_8cpp_a5bab595fc9809eeb580e8ae3178b5157}{BOOST\_FIXTURE\_TEST\_CASE}}(startupDuplicateDirs,\ \mbox{\hyperlink{structresmon__fixture}{resmon\_fixture}})}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00127}00127\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00128}00128\ \ \ \ \ \ \ BOOST\_REQUIRE\_NO\_THROW(\ plugin\_startup(\{\textcolor{stringliteral}{"{}/tmp"{}},\ \textcolor{stringliteral}{"{}/tmp"{}}\}));}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00129}00129\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00130}00130\ }
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00131}\mbox{\hyperlink{test__resmon__plugin_8cpp_a950550d0894840fa0ee246296ee5aef7}{00131}}\ \ \ \ \mbox{\hyperlink{test__resmon__plugin_8cpp_a5bab595fc9809eeb580e8ae3178b5157}{BOOST\_FIXTURE\_TEST\_CASE}}(startupMultDirs,\ \mbox{\hyperlink{structresmon__fixture}{resmon\_fixture}})}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00132}00132\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00133}00133\ \ \ \ \ \ \ \textcolor{comment}{//\ Under\ "{}/"{}\ are\ multiple\ file\ systems}}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00134}00134\ \ \ \ \ \ \ BOOST\_REQUIRE\_NO\_THROW(\ plugin\_startup(\{\textcolor{stringliteral}{"{}/"{}},\ \textcolor{stringliteral}{"{}/tmp"{}}\}));}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00135}00135\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00136}00136\ }
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00137}\mbox{\hyperlink{test__resmon__plugin_8cpp_ae4fab4fd51f35dd971e727869118cf03}{00137}}\ \ \ \ \mbox{\hyperlink{test__resmon__plugin_8cpp_a5bab595fc9809eeb580e8ae3178b5157}{BOOST\_FIXTURE\_TEST\_CASE}}(startupNoExistingDirs,\ \mbox{\hyperlink{structresmon__fixture}{resmon\_fixture}})}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00138}00138\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00139}00139\ \ \ \ \ \ \ \textcolor{comment}{//\ "{}hsdfgd983"{}\ a\ random\ file\ and\ not\ existing}}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00140}00140\ \ \ \ \ \ \ BOOST\_REQUIRE\_THROW(\ plugin\_startup(\{\textcolor{stringliteral}{"{}/tmp"{}},\ \textcolor{stringliteral}{"{}hsdfgd983"{}}\}),\ chain::plugin\_config\_exception);}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00141}00141\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00142}00142\ }
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00143}\mbox{\hyperlink{test__resmon__plugin_8cpp_ab2edc5f7400661184c7400c6db7aea5d}{00143}}\ \ \ \ \mbox{\hyperlink{test__resmon__plugin_8cpp_a5bab595fc9809eeb580e8ae3178b5157}{BOOST\_FIXTURE\_TEST\_CASE}}(startupLongRun,\ \mbox{\hyperlink{structresmon__fixture}{resmon\_fixture}})}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00144}00144\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00145}00145\ \ \ \ \ \ \ BOOST\_REQUIRE\_NO\_THROW(\ plugin\_startup(\{\textcolor{stringliteral}{"{}/tmp"{}}\},\ 120));}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00146}00146\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00147}00147\ }
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00148}\mbox{\hyperlink{test__resmon__plugin_8cpp_a7073ad4e00cb2bf216498017d6485e18}{00148}}\ \ \ \ \mbox{\hyperlink{test__resmon__plugin_8cpp_a5bab595fc9809eeb580e8ae3178b5157}{BOOST\_FIXTURE\_TEST\_CASE}}(warningIntervalTooBig,\ \mbox{\hyperlink{structresmon__fixture}{resmon\_fixture}})}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00149}00149\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00150}00150\ \ \ \ \ \ \ BOOST\_REQUIRE\_THROW(set\_options(\{\textcolor{stringliteral}{"{}-\/-\/resource-\/monitor-\/warning-\/interval=451"{}}\}),\ chain::plugin\_config\_exception);}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00151}00151\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00152}00152\ }
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00153}\mbox{\hyperlink{test__resmon__plugin_8cpp_ae09fd8bcdd739c5bd4d46dfc23eff72e}{00153}}\ \ \ \ \mbox{\hyperlink{test__resmon__plugin_8cpp_a5bab595fc9809eeb580e8ae3178b5157}{BOOST\_FIXTURE\_TEST\_CASE}}(warningIntervalTooSmall,\ \mbox{\hyperlink{structresmon__fixture}{resmon\_fixture}})}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00154}00154\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00155}00155\ \ \ \ \ \ \ BOOST\_REQUIRE\_THROW(set\_options(\{\textcolor{stringliteral}{"{}-\/-\/resource-\/monitor-\/warning-\/interval=0"{}}\}),\ chain::plugin\_config\_exception);}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00156}00156\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00157}00157\ }
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00158}\mbox{\hyperlink{test__resmon__plugin_8cpp_a4d039edfa7e1b2937c1d5e8baaf31ad5}{00158}}\ \ \ \ \mbox{\hyperlink{test__resmon__plugin_8cpp_a5bab595fc9809eeb580e8ae3178b5157}{BOOST\_FIXTURE\_TEST\_CASE}}(warningIntervalLowBound,\ \mbox{\hyperlink{structresmon__fixture}{resmon\_fixture}})}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00159}00159\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00160}00160\ \ \ \ \ \ \ BOOST\_REQUIRE\_NO\_THROW(set\_options(\{\textcolor{stringliteral}{"{}-\/-\/resource-\/monitor-\/warning-\/interval=1"{}}\}));}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00161}00161\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00162}00162\ }
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00163}\mbox{\hyperlink{test__resmon__plugin_8cpp_a60f2131dd73b228f27e789cad7a50c83}{00163}}\ \ \ \ \mbox{\hyperlink{test__resmon__plugin_8cpp_a5bab595fc9809eeb580e8ae3178b5157}{BOOST\_FIXTURE\_TEST\_CASE}}(warningIntervalMiddle,\ \mbox{\hyperlink{structresmon__fixture}{resmon\_fixture}})}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00164}00164\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00165}00165\ \ \ \ \ \ \ BOOST\_REQUIRE\_NO\_THROW(set\_options(\{\textcolor{stringliteral}{"{}-\/-\/resource-\/monitor-\/warning-\/interval=225"{}}\}));}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00166}00166\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00167}00167\ }
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00168}\mbox{\hyperlink{test__resmon__plugin_8cpp_a7ee7252427cb0e8944418250987a11f3}{00168}}\ \ \ \ \mbox{\hyperlink{test__resmon__plugin_8cpp_a5bab595fc9809eeb580e8ae3178b5157}{BOOST\_FIXTURE\_TEST\_CASE}}(warningIntervalHighBound,\ \mbox{\hyperlink{structresmon__fixture}{resmon\_fixture}})}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00169}00169\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00170}00170\ \ \ \ \ \ \ BOOST\_REQUIRE\_NO\_THROW(set\_options(\{\textcolor{stringliteral}{"{}-\/-\/resource-\/monitor-\/warning-\/interval=450"{}}\}));}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00171}00171\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00172}00172\ }
+\DoxyCodeLine{\Hypertarget{test__resmon__plugin_8cpp_source_l00173}00173\ BOOST\_AUTO\_TEST\_SUITE\_END()}
+
+\end{DoxyCode}

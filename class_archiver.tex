@@ -1,0 +1,45 @@
+\doxysection{Archiver Class Reference}
+\hypertarget{class_archiver}{}\label{class_archiver}\index{Archiver@{Archiver}}
+
+
+\doxylink{class_archiver}{Archiver} concept.  
+
+
+
+
+{\ttfamily \#include $<$archiver.\+h$>$}
+
+
+
+\doxysubsection{Detailed Description}
+\doxylink{class_archiver}{Archiver} can be a reader or writer for serialization or deserialization respectively.
+
+class \doxylink{class_archiver}{Archiver} \{ public\+: / \begin{DoxyReturn}{Returns}
+true if the archiver is in normal state. false if it has errors. operator bool() const;
+\end{DoxyReturn}
+/ Starts an object \doxylink{class_archiver}{Archiver}\& Start\+Object();
+
+/ After calling Start\+Object(), assign a member with a name \doxylink{class_archiver}{Archiver}\& Member(const char\texorpdfstring{$\ast$}{*} name);
+
+/ After calling Start\+Object(), check if a member presents bool Has\+Member(const char\texorpdfstring{$\ast$}{*} name) const;
+
+/ Ends an object \doxylink{class_archiver}{Archiver}\& End\+Object();
+
+/ Starts an array /
+\begin{DoxyParams}{Parameters}
+{\em size} & If Archiver\+::\+Is\+Reader is true, the size of array is written. \doxylink{class_archiver}{Archiver}\& Start\+Array(size\+\_\+t\texorpdfstring{$\ast$}{*} size = 0);\\
+\hline
+\end{DoxyParams}
+/ Ends an array \doxylink{class_archiver}{Archiver}\& End\+Array();
+
+/ Read/\+Write primitive types. \doxylink{class_archiver}{Archiver}\& operator\&(bool\& b); \doxylink{class_archiver}{Archiver}\& operator\&(unsigned\& u); \doxylink{class_archiver}{Archiver}\& operator\&(int\& i); \doxylink{class_archiver}{Archiver}\& operator\&(double\& d); \doxylink{class_archiver}{Archiver}\& operator\&(std\+::string\& s);
+
+/ Write primitive types. \doxylink{class_archiver}{Archiver}\& Set\+Null();
+
+! Whether it is a reader. static const bool Is\+Reader;
+
+! Whether it is a writer. static const bool Is\+Writer; \}; 
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/example/archiver/\mbox{\hyperlink{archiver_8h}{archiver.\+h}}\end{DoxyCompactItemize}

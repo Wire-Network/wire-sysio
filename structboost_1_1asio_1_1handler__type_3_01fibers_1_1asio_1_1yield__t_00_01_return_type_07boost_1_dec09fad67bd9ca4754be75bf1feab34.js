@@ -1,0 +1,4 @@
+var structboost_1_1asio_1_1handler__type_3_01fibers_1_1asio_1_1yield__t_00_01_return_type_07boost_1_dec09fad67bd9ca4754be75bf1feab34 =
+[
+    [ "type", "structboost_1_1asio_1_1handler__type_3_01fibers_1_1asio_1_1yield__t_00_01_return_type_07boost_1_dec09fad67bd9ca4754be75bf1feab34.html#ade1eae5885f8d4b44fb48ac4ed20b311", null ]
+];

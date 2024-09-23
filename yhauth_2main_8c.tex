@@ -1,0 +1,199 @@
+\doxysection{libraries/yubihsm/yhauth/main.c File Reference}
+\hypertarget{yhauth_2main_8c}{}\label{yhauth_2main_8c}\index{libraries/yubihsm/yhauth/main.c@{libraries/yubihsm/yhauth/main.c}}
+{\ttfamily \#include $<$ctype.\+h$>$}\newline
+{\ttfamily \#include $<$stdbool.\+h$>$}\newline
+{\ttfamily \#include $<$stddef.\+h$>$}\newline
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include $<$ykyh.\+h$>$}\newline
+{\ttfamily \#include $<$openssl/evp.\+h$>$}\newline
+{\ttfamily \#include "{}parsing.\+h"{}}\newline
+{\ttfamily \#include "{}cmdline.\+h"{}}\newline
+Include dependency graph for main.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{yhauth_2main_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{yhauth_2main_8c_a5826d7c243fd886232232814de1f7284}{reset\+\_\+device}} (\mbox{\hyperlink{structykyh__state}{ykyh\+\_\+state}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{structstate}{state}})
+\item 
+bool \mbox{\hyperlink{yhauth_2main_8c_a529cf891bd3db522b553c69e9d56d4a3}{get\+\_\+version}} (\mbox{\hyperlink{structykyh__state}{ykyh\+\_\+state}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{structstate}{state}})
+\item 
+int \mbox{\hyperlink{yhauth_2main_8c_a0ddf1224851353fc92bfbff6f499fa97}{main}} (int argc, char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}\mbox{[}$\,$\mbox{]})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{yhauth_2main_8c_a529cf891bd3db522b553c69e9d56d4a3}\index{main.c@{main.c}!get\_version@{get\_version}}
+\index{get\_version@{get\_version}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{get\_version()}{get\_version()}}
+{\footnotesize\ttfamily \label{yhauth_2main_8c_a529cf891bd3db522b553c69e9d56d4a3} 
+bool get\+\_\+version (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structykyh__state}{ykyh\+\_\+state}} \texorpdfstring{$\ast$}{*}}]{state}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{yhauth_2main_8c_source_l00272}{272}} of file \mbox{\hyperlink{yhauth_2main_8c_source}{main.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00272\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00273\ \ \ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112}{ykyh\_rc}}\ ykyhrc;}
+\DoxyCodeLine{00274\ \ \ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1state_a12f378e0c6dbf373781e7988ee4a0853a08c88a938bc459c7997b48f74248752f}{version}}[64];}
+\DoxyCodeLine{00275\ \ \ \textcolor{keywordtype}{size\_t}\ version\_len\ =\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1state_a12f378e0c6dbf373781e7988ee4a0853a08c88a938bc459c7997b48f74248752f}{version}});}
+\DoxyCodeLine{00276\ }
+\DoxyCodeLine{00277\ \ \ ykyhrc\ =\ \mbox{\hyperlink{ykyh_8c_a14f49c7ef8ee9ac66936346e7f21d6ce}{ykyh\_get\_version}}(\mbox{\hyperlink{structstate}{state}},\ version,\ version\_len);}
+\DoxyCodeLine{00278\ \ \ \textcolor{keywordflow}{if}\ (ykyhrc\ !=\ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112a40500f2b4bd15d31f1348475e35f2459}{YKYHR\_SUCCESS}})\ \{}
+\DoxyCodeLine{00279\ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Unable\ to\ get\ version:\ \%s\(\backslash\)n"{}},\ \mbox{\hyperlink{ykyh_2error_8c_a4544a3e0741c078e01233bb1ab541805}{ykyh\_strerror}}(ykyhrc));}
+\DoxyCodeLine{00280\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00281\ \ \ \}}
+\DoxyCodeLine{00282\ }
+\DoxyCodeLine{00283\ \ \ fprintf(stdout,\ \textcolor{stringliteral}{"{}Version\ \%s\(\backslash\)n"{}},\ version);}
+\DoxyCodeLine{00284\ }
+\DoxyCodeLine{00285\ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00286\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{yhauth_2main_8c_a529cf891bd3db522b553c69e9d56d4a3_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=219pt]{yhauth_2main_8c_a529cf891bd3db522b553c69e9d56d4a3_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{yhauth_2main_8c_a0ddf1224851353fc92bfbff6f499fa97}\index{main.c@{main.c}!main@{main}}
+\index{main@{main}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{yhauth_2main_8c_a0ddf1224851353fc92bfbff6f499fa97} 
+int main (\begin{DoxyParamCaption}\item[{int}]{argc}{, }\item[{char \texorpdfstring{$\ast$}{*}}]{argv}{\mbox{[}$\,$\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{yhauth_2main_8c_source_l00288}{288}} of file \mbox{\hyperlink{yhauth_2main_8c_source}{main.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00288\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00289\ \ \ \textcolor{keyword}{struct\ }gengetopt\_args\_info\ args\_info;}
+\DoxyCodeLine{00290\ \ \ \mbox{\hyperlink{structykyh__state}{ykyh\_state}}\ *\mbox{\hyperlink{structstate}{state}}\ =\ NULL;}
+\DoxyCodeLine{00291\ \ \ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112}{ykyh\_rc}}\ ykyhrc;}
+\DoxyCodeLine{00292\ }
+\DoxyCodeLine{00293\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}}\ =\ EXIT\_FAILURE;}
+\DoxyCodeLine{00294\ }
+\DoxyCodeLine{00295\ \ \ \textcolor{keywordflow}{if}\ (cmdline\_parser(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \&args\_info)\ !=\ 0)\ \{}
+\DoxyCodeLine{00296\ \ \ \ \ \textcolor{keywordflow}{goto}\ main\_exit;}
+\DoxyCodeLine{00297\ \ \ \}}
+\DoxyCodeLine{00298\ }
+\DoxyCodeLine{00299\ \ \ ykyhrc\ =\ \mbox{\hyperlink{ykyh_8c_aaf8c4d6e022e4363c006d9066991776b}{ykyh\_init}}(\&\mbox{\hyperlink{structstate}{state}},\ args\_info.verbose\_arg);}
+\DoxyCodeLine{00300\ \ \ \textcolor{keywordflow}{if}\ (ykyhrc\ !=\ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112a40500f2b4bd15d31f1348475e35f2459}{YKYHR\_SUCCESS}})\ \{}
+\DoxyCodeLine{00301\ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Failed\ to\ initialize\ libykyh\(\backslash\)n"{}});}
+\DoxyCodeLine{00302\ \ \ \ \ \textcolor{keywordflow}{goto}\ main\_exit;}
+\DoxyCodeLine{00303\ \ \ \}}
+\DoxyCodeLine{00304\ }
+\DoxyCodeLine{00305\ \ \ ykyhrc\ =\ \mbox{\hyperlink{ykyh_8c_a6b53f9d9825a88a6a20352c9734e4a4d}{ykyh\_connect}}(\mbox{\hyperlink{structstate}{state}},\ args\_info.reader\_arg);}
+\DoxyCodeLine{00306\ \ \ \textcolor{keywordflow}{if}\ (ykyhrc\ !=\ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112a40500f2b4bd15d31f1348475e35f2459}{YKYHR\_SUCCESS}})\ \{}
+\DoxyCodeLine{00307\ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Unable\ to\ connect:\ \%s\(\backslash\)n"{}},\ \mbox{\hyperlink{ykyh_2error_8c_a4544a3e0741c078e01233bb1ab541805}{ykyh\_strerror}}(ykyhrc));}
+\DoxyCodeLine{00308\ \ \ \ \ \textcolor{keywordflow}{goto}\ main\_exit;}
+\DoxyCodeLine{00309\ \ \ \}}
+\DoxyCodeLine{00310\ }
+\DoxyCodeLine{00311\ \ \ \textcolor{keywordtype}{bool}\ result\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00312\ \ \ \textcolor{keywordflow}{switch}\ (args\_info.action\_arg)\ \{}
+\DoxyCodeLine{00313\ \ \ \ \ \textcolor{keywordflow}{case}\ action\_arg\_delete:}
+\DoxyCodeLine{00314\ \ \ \ \ \ \ result\ =\ delete\_credential(\mbox{\hyperlink{structstate}{state}},\ args\_info.name\_arg);}
+\DoxyCodeLine{00315\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00316\ }
+\DoxyCodeLine{00317\ \ \ \ \ \textcolor{keywordflow}{case}\ action\_arg\_list:}
+\DoxyCodeLine{00318\ \ \ \ \ \ \ result\ =\ list\_credentials(\mbox{\hyperlink{structstate}{state}});}
+\DoxyCodeLine{00319\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00320\ }
+\DoxyCodeLine{00321\ \ \ \ \ \textcolor{keywordflow}{case}\ action\_arg\_put:}
+\DoxyCodeLine{00322\ \ \ \ \ \ \ result\ =\ put\_credential(\mbox{\hyperlink{structstate}{state}},\ args\_info.name\_arg,}
+\DoxyCodeLine{00323\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ args\_info.derivation\_password\_arg,}
+\DoxyCodeLine{00324\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ args\_info.enckey\_arg,\ args\_info.mackey\_arg,}
+\DoxyCodeLine{00325\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ args\_info.password\_arg,\ args\_info.touch\_arg);}
+\DoxyCodeLine{00326\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00327\ }
+\DoxyCodeLine{00328\ \ \ \ \ \textcolor{keywordflow}{case}\ action\_arg\_reset:}
+\DoxyCodeLine{00329\ \ \ \ \ \ \ result\ =\ \mbox{\hyperlink{yhauth_2main_8c_a5826d7c243fd886232232814de1f7284}{reset\_device}}(\mbox{\hyperlink{structstate}{state}});}
+\DoxyCodeLine{00330\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00331\ }
+\DoxyCodeLine{00332\ \ \ \ \ \textcolor{keywordflow}{case}\ action\_arg\_version:}
+\DoxyCodeLine{00333\ \ \ \ \ \ \ result\ =\ \mbox{\hyperlink{yhauth_2main_8c_a529cf891bd3db522b553c69e9d56d4a3}{get\_version}}(\mbox{\hyperlink{structstate}{state}});}
+\DoxyCodeLine{00334\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00335\ }
+\DoxyCodeLine{00336\ \ \ \ \ \textcolor{keywordflow}{case}\ action\_\_NULL:}
+\DoxyCodeLine{00337\ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}No\ action\ given,\ nothing\ to\ do\(\backslash\)n"{}});}
+\DoxyCodeLine{00338\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00339\ \ \ \}}
+\DoxyCodeLine{00340\ }
+\DoxyCodeLine{00341\ \ \ \textcolor{keywordflow}{if}\ (result\ ==\ \textcolor{keyword}{true})\ \{}
+\DoxyCodeLine{00342\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}}\ =\ EXIT\_SUCCESS;}
+\DoxyCodeLine{00343\ \ \ \}}
+\DoxyCodeLine{00344\ }
+\DoxyCodeLine{00345\ main\_exit:}
+\DoxyCodeLine{00346\ }
+\DoxyCodeLine{00347\ \ \ \mbox{\hyperlink{ykyh_8c_a6833a1e74b0e7494cc904dc94cf276c0}{ykyh\_done}}(\mbox{\hyperlink{structstate}{state}});}
+\DoxyCodeLine{00348\ }
+\DoxyCodeLine{00349\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}};}
+\DoxyCodeLine{00350\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{yhauth_2main_8c_a0ddf1224851353fc92bfbff6f499fa97_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{yhauth_2main_8c_a5826d7c243fd886232232814de1f7284}\index{main.c@{main.c}!reset\_device@{reset\_device}}
+\index{reset\_device@{reset\_device}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{reset\_device()}{reset\_device()}}
+{\footnotesize\ttfamily \label{yhauth_2main_8c_a5826d7c243fd886232232814de1f7284} 
+bool reset\+\_\+device (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structykyh__state}{ykyh\+\_\+state}} \texorpdfstring{$\ast$}{*}}]{state}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{yhauth_2main_8c_source_l00258}{258}} of file \mbox{\hyperlink{yhauth_2main_8c_source}{main.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00258\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00259\ \ \ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112}{ykyh\_rc}}\ ykyhrc;}
+\DoxyCodeLine{00260\ }
+\DoxyCodeLine{00261\ \ \ ykyhrc\ =\ \mbox{\hyperlink{ykyh_8c_a94ec07237ae4d03c38751f3d966194e3}{ykyh\_reset}}(\mbox{\hyperlink{structstate}{state}});}
+\DoxyCodeLine{00262\ \ \ \textcolor{keywordflow}{if}\ (ykyhrc\ !=\ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112a40500f2b4bd15d31f1348475e35f2459}{YKYHR\_SUCCESS}})\ \{}
+\DoxyCodeLine{00263\ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Unable\ to\ reset\ device:\ \%s\(\backslash\)n"{}},\ \mbox{\hyperlink{ykyh_2error_8c_a4544a3e0741c078e01233bb1ab541805}{ykyh\_strerror}}(ykyhrc));}
+\DoxyCodeLine{00264\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00265\ \ \ \}}
+\DoxyCodeLine{00266\ }
+\DoxyCodeLine{00267\ \ \ fprintf(stdout,\ \textcolor{stringliteral}{"{}Device\ successuflly\ reset\(\backslash\)n"{}});}
+\DoxyCodeLine{00268\ }
+\DoxyCodeLine{00269\ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00270\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{yhauth_2main_8c_a5826d7c243fd886232232814de1f7284_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=225pt]{yhauth_2main_8c_a5826d7c243fd886232232814de1f7284_icgraph}
+\end{center}
+\end{figure}

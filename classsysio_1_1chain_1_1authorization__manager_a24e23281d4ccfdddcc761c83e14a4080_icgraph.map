@@ -1,0 +1,9 @@
+<map id="sysio::chain::authorization_manager::add_to_snapshot" name="sysio::chain::authorization_manager::add_to_snapshot">
+<area shape="rect" id="Node000001" title=" " alt="" coords="661,5,847,46"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1controller__impl.html#a8477bef06de9c6d5f1c8a0a8cf1c8795" title=" " alt="" coords="454,5,613,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="646,28,614,28,614,23,646,23"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1chain_1_1controller__impl.html#ae80ad4ddd1eff225dc19c50439d82ef6" title=" " alt="" coords="206,5,406,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="438,28,406,28,406,23,438,23"/>
+<area shape="rect" id="Node000004" href="$structsysio_1_1chain_1_1controller__impl.html#a18bcf25847599b0f9caa6566364bb0ac" title=" " alt="" coords="5,5,158,46"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="190,28,158,28,158,23,190,23"/>
+</map>

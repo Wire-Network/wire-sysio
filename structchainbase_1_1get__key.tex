@@ -1,0 +1,63 @@
+\doxysection{chainbase\+::get\+\_\+key\texorpdfstring{$<$}{<} Key\+Extractor, T \texorpdfstring{$>$}{>} Struct Template Reference}
+\hypertarget{structchainbase_1_1get__key}{}\label{structchainbase_1_1get__key}\index{chainbase::get\_key$<$ KeyExtractor, T $>$@{chainbase::get\_key$<$ KeyExtractor, T $>$}}
+
+
+{\ttfamily \#include $<$undo\+\_\+index.\+hpp$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{structchainbase_1_1get__key_a43e6a86f52a99f7c4b3a3137df2512b6}{type}} = std\+::decay\+\_\+t$<$decltype(Key\+Extractor\{\}(std\+::declval$<$const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&$>$()))$>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+decltype(auto) \mbox{\hyperlink{structchainbase_1_1get__key_a2483157ca4c64193dac42c3c633a7e4c}{operator()}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&arg) const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Key\+Extractor, typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$\newline
+struct chainbase\+::get\+\_\+key$<$ Key\+Extractor, T $>$}
+
+
+Definition at line \mbox{\hyperlink{undo__index_8hpp_source_l00038}{38}} of file \mbox{\hyperlink{undo__index_8hpp_source}{undo\+\_\+index.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{structchainbase_1_1get__key_a43e6a86f52a99f7c4b3a3137df2512b6}\index{chainbase::get\_key$<$ KeyExtractor, T $>$@{chainbase::get\_key$<$ KeyExtractor, T $>$}!type@{type}}
+\index{type@{type}!chainbase::get\_key$<$ KeyExtractor, T $>$@{chainbase::get\_key$<$ KeyExtractor, T $>$}}
+\doxysubsubsection{\texorpdfstring{type}{type}}
+{\footnotesize\ttfamily \label{structchainbase_1_1get__key_a43e6a86f52a99f7c4b3a3137df2512b6} 
+template$<$typename Key\+Extractor , typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+using \mbox{\hyperlink{structchainbase_1_1get__key}{chainbase\+::get\+\_\+key}}$<$ Key\+Extractor, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::type = std\+::decay\+\_\+t$<$decltype(Key\+Extractor\{\}(std\+::declval$<$const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&$>$()))$>$}
+
+
+
+Definition at line \mbox{\hyperlink{undo__index_8hpp_source_l00039}{39}} of file \mbox{\hyperlink{undo__index_8hpp_source}{undo\+\_\+index.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structchainbase_1_1get__key_a2483157ca4c64193dac42c3c633a7e4c}\index{chainbase::get\_key$<$ KeyExtractor, T $>$@{chainbase::get\_key$<$ KeyExtractor, T $>$}!operator()@{operator()}}
+\index{operator()@{operator()}!chainbase::get\_key$<$ KeyExtractor, T $>$@{chainbase::get\_key$<$ KeyExtractor, T $>$}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}}
+{\footnotesize\ttfamily \label{structchainbase_1_1get__key_a2483157ca4c64193dac42c3c633a7e4c} 
+template$<$typename Key\+Extractor , typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+decltype(auto) \mbox{\hyperlink{structchainbase_1_1get__key}{chainbase\+::get\+\_\+key}}$<$ Key\+Extractor, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::operator() (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{arg}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{undo__index_8hpp_source_l00040}{40}} of file \mbox{\hyperlink{undo__index_8hpp_source}{undo\+\_\+index.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00040\ \{\ \textcolor{keywordflow}{return}\ KeyExtractor\{\}(arg);\ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chainbase/include/chainbase/\mbox{\hyperlink{undo__index_8hpp}{undo\+\_\+index.\+hpp}}\end{DoxyCompactItemize}

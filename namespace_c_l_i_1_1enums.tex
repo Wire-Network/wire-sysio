@@ -1,0 +1,32 @@
+\doxysection{CLI\+::enums Namespace Reference}
+\hypertarget{namespace_c_l_i_1_1enums}{}\label{namespace_c_l_i_1_1enums}\index{CLI::enums@{CLI::enums}}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename  = typename std\+::enable\+\_\+if$<$std\+::is\+\_\+enum$<$\+T$>$\+::value$>$\+::type$>$ }\\std\+::ostream \& \mbox{\hyperlink{namespace_c_l_i_1_1enums_a0d566286e31ca3fb0f2a97de03492e65}{operator$<$$<$}} (std\+::ostream \&in, const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&item)
+\begin{DoxyCompactList}\small\item\em output streaming for enumerations \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Include the items in this namespace to get free conversion of enums to/from streams. (This is available inside \doxylink{namespace_c_l_i}{CLI} as well, so CLI11 will use this without a using statement). 
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespace_c_l_i_1_1enums_a0d566286e31ca3fb0f2a97de03492e65}\index{CLI::enums@{CLI::enums}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!CLI::enums@{CLI::enums}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}}
+{\footnotesize\ttfamily \label{namespace_c_l_i_1_1enums_a0d566286e31ca3fb0f2a97de03492e65} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename  = typename std\+::enable\+\_\+if$<$std\+::is\+\_\+enum$<$\+T$>$\+::value$>$\+::type$>$ \\
+std\+::ostream \& CLI\+::enums\+::operator$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{in}{, }\item[{const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{item}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l00163}{163}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00164\ \ \ \ \ \textcolor{comment}{//\ make\ sure\ this\ is\ out\ of\ the\ detail\ namespace\ otherwise\ it\ won't\ be\ found\ when\ needed}}
+\DoxyCodeLine{00165\ \ \ \ \ \textcolor{keywordflow}{return}\ in\ <<\ static\_cast<typename\ std::underlying\_type<T>::type>(item);}
+\DoxyCodeLine{00166\ \}}
+
+\end{DoxyCode}

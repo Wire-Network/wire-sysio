@@ -1,0 +1,923 @@
+\doxysection{fc\+::bigint Class Reference}
+\hypertarget{classfc_1_1bigint}{}\label{classfc_1_1bigint}\index{fc::bigint@{fc::bigint}}
+
+
+{\ttfamily \#include $<$bigint.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1bigint_acb4c464f1e016ccb00f0fa5a51a9873f}{bigint}} (const std\+::vector$<$ char $>$ \&bige)
+\item 
+\mbox{\hyperlink{classfc_1_1bigint_af1df19a5e31f1b0620299c009d487c09}{bigint}} (const char \texorpdfstring{$\ast$}{*}bige, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}})
+\item 
+\mbox{\hyperlink{classfc_1_1bigint_a7875b887d6497e99944c10aeb6edf319}{bigint}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+\mbox{\hyperlink{classfc_1_1bigint_a292d6c31fad8a84cfdddb24a6be1abae}{bigint}} ()
+\item 
+\mbox{\hyperlink{classfc_1_1bigint_abda40ee38fb31fb92e75f8563ccb55d9}{bigint}} (const \mbox{\hyperlink{classfc_1_1bigint}{bigint}} \&c)
+\item 
+\mbox{\hyperlink{classfc_1_1bigint_a58132cc8096d969f5f058f346a259abf}{bigint}} (\mbox{\hyperlink{classfc_1_1bigint}{bigint}} \&\&c)
+\item 
+\mbox{\hyperlink{classfc_1_1bigint_a187e7d0c2cbad88460b3eb61697a5c01}{bigint}} (\mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_a62125ea4e1d748a4a9c1aed9766f451a}{BIGNUM}} \texorpdfstring{$\ast$}{*}n)
+\item 
+\mbox{\hyperlink{classfc_1_1bigint_a87f2030b5a9b9813c757d57a5880c9c5}{\texorpdfstring{$\sim$}{\string~}bigint}} ()
+\item 
+\mbox{\hyperlink{classfc_1_1bigint}{bigint}} \& \mbox{\hyperlink{classfc_1_1bigint_a1b72b15a739f7a04bb87b32bb4f153d5}{operator=}} (const \mbox{\hyperlink{classfc_1_1bigint}{bigint}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})
+\item 
+\mbox{\hyperlink{classfc_1_1bigint}{bigint}} \& \mbox{\hyperlink{classfc_1_1bigint_a3d6a9c0873e3b4e1546003ab9bb3f024}{operator=}} (\mbox{\hyperlink{classfc_1_1bigint}{bigint}} \&\&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})
+\item 
+\mbox{\hyperlink{classfc_1_1bigint_ad2fed7f0d170376ea3ef7e9dd364b321}{operator bool}} () const
+\item 
+bool \mbox{\hyperlink{classfc_1_1bigint_a8b2d3a048ea4ff9f245eb0f34e18a660}{is\+\_\+negative}} () const
+\item 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{classfc_1_1bigint_aae6162af1da04e4423975054d9b8f728}{to\+\_\+int64}} () const
+\item 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{classfc_1_1bigint_af969a998e489c5f8bd81c07b738519df}{log2}} () const
+\item 
+\mbox{\hyperlink{classfc_1_1bigint}{bigint}} \mbox{\hyperlink{classfc_1_1bigint_a8bb114eb168697d5d697f0b3452bd0aa}{exp}} (const \mbox{\hyperlink{classfc_1_1bigint}{bigint}} \&c) const
+\item 
+bool \mbox{\hyperlink{classfc_1_1bigint_a8fcaf1fa0b03c87ce99abaf4c32840ee}{operator$<$}} (const \mbox{\hyperlink{classfc_1_1bigint}{bigint}} \&c) const
+\item 
+bool \mbox{\hyperlink{classfc_1_1bigint_a79a57688c437dca31a7b3e394b41acba}{operator$>$}} (const \mbox{\hyperlink{classfc_1_1bigint}{bigint}} \&c) const
+\item 
+bool \mbox{\hyperlink{classfc_1_1bigint_a1b52e45b5efa4098d406376f78749e48}{operator$>$=}} (const \mbox{\hyperlink{classfc_1_1bigint}{bigint}} \&c) const
+\item 
+bool \mbox{\hyperlink{classfc_1_1bigint_a649bffcc80e6348453a9704072f99b7e}{operator==}} (const \mbox{\hyperlink{classfc_1_1bigint}{bigint}} \&c) const
+\item 
+bool \mbox{\hyperlink{classfc_1_1bigint_ab887f3066de9cd1daad336cec80437c0}{operator!=}} (const \mbox{\hyperlink{classfc_1_1bigint}{bigint}} \&c) const
+\item 
+\mbox{\hyperlink{classfc_1_1bigint}{bigint}} \mbox{\hyperlink{classfc_1_1bigint_a40ba09f4b0d2420bbd69823e41b13145}{operator+}} (const \mbox{\hyperlink{classfc_1_1bigint}{bigint}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}) const
+\item 
+\mbox{\hyperlink{classfc_1_1bigint}{bigint}} \mbox{\hyperlink{classfc_1_1bigint_a34e71f5ebcd8d8d53db777bcd8b53f00}{operator\texorpdfstring{$\ast$}{*}}} (const \mbox{\hyperlink{classfc_1_1bigint}{bigint}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}) const
+\item 
+\mbox{\hyperlink{classfc_1_1bigint}{bigint}} \mbox{\hyperlink{classfc_1_1bigint_a502fa596e53b743dc04a72879a21eb9d}{operator/}} (const \mbox{\hyperlink{classfc_1_1bigint}{bigint}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}) const
+\item 
+\mbox{\hyperlink{classfc_1_1bigint}{bigint}} \mbox{\hyperlink{classfc_1_1bigint_a824ed8d894a438619d3dac72189838fc}{operator\%}} (const \mbox{\hyperlink{classfc_1_1bigint}{bigint}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}) const
+\item 
+\mbox{\hyperlink{classfc_1_1bigint}{bigint}} \mbox{\hyperlink{classfc_1_1bigint_aec66b7c4e3adfc4bb40c748afcff0b3e}{operator/=}} (const \mbox{\hyperlink{classfc_1_1bigint}{bigint}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})
+\item 
+\mbox{\hyperlink{classfc_1_1bigint}{bigint}} \mbox{\hyperlink{classfc_1_1bigint_ab672316597423732aaebff19d43012fa}{operator\texorpdfstring{$\ast$}{*}=}} (const \mbox{\hyperlink{classfc_1_1bigint}{bigint}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})
+\item 
+\mbox{\hyperlink{classfc_1_1bigint}{bigint}} \& \mbox{\hyperlink{classfc_1_1bigint_a899c326f06b59a060dab8b903199213d}{operator+=}} (const \mbox{\hyperlink{classfc_1_1bigint}{bigint}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})
+\item 
+\mbox{\hyperlink{classfc_1_1bigint}{bigint}} \& \mbox{\hyperlink{classfc_1_1bigint_a8df3ffe8605b849cc71c8111818c53a3}{operator-\/=}} (const \mbox{\hyperlink{classfc_1_1bigint}{bigint}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})
+\item 
+\mbox{\hyperlink{classfc_1_1bigint}{bigint}} \& \mbox{\hyperlink{classfc_1_1bigint_a459bafab93e3ce8ed07939595fe1fc34}{operator$<$$<$=}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} i)
+\item 
+\mbox{\hyperlink{classfc_1_1bigint}{bigint}} \& \mbox{\hyperlink{classfc_1_1bigint_abe6fa0986e47e98753b42924ad157a57}{operator$>$$>$=}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} i)
+\item 
+\mbox{\hyperlink{classfc_1_1bigint}{bigint}} \mbox{\hyperlink{classfc_1_1bigint_acf0167324b72a936b3777f5f4efcf15a}{operator-\/}} (const \mbox{\hyperlink{classfc_1_1bigint}{bigint}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}) const
+\item 
+\mbox{\hyperlink{classfc_1_1bigint}{bigint}} \mbox{\hyperlink{classfc_1_1bigint_aeeed63218ddee1945d2903ec8de127df}{operator++}} (int)
+\item 
+\mbox{\hyperlink{classfc_1_1bigint}{bigint}} \& \mbox{\hyperlink{classfc_1_1bigint_ad9bdb01f12f428d0e5addfa59c295962}{operator++}} ()
+\item 
+\mbox{\hyperlink{classfc_1_1bigint}{bigint}} \mbox{\hyperlink{classfc_1_1bigint_a3832b6df4103eff5b58ba388a0b2c6b3}{operator-\/-\/}} (int)
+\item 
+\mbox{\hyperlink{classfc_1_1bigint}{bigint}} \& \mbox{\hyperlink{classfc_1_1bigint_a14299996f33c1f7abb645a1d0b20f8fd}{operator-\/-\/}} ()
+\item 
+\mbox{\hyperlink{classfc_1_1bigint_a084ca00b3c29ec193133f4e676b43a63}{operator fc\+::string}} () const
+\item 
+\mbox{\hyperlink{classfc_1_1bigint_a8c10185176c6dfb4a10f16a760b79d72}{operator std\+::vector$<$ char $>$}} () const
+\item 
+\mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_a62125ea4e1d748a4a9c1aed9766f451a}{BIGNUM}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classfc_1_1bigint_a4b2255410ddb1e3061f090746048c798}{dup}} () const
+\item 
+\mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_a62125ea4e1d748a4a9c1aed9766f451a}{BIGNUM}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classfc_1_1bigint_ad030cb7d1cde7c3c365a2b2f1057bb43}{get}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static \mbox{\hyperlink{classfc_1_1bigint}{bigint}} \mbox{\hyperlink{classfc_1_1bigint_a5c1dd3c77d67ffc96ed46717f1a25d54}{random}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} bits, int t, int)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_source_l00010}{10}} of file \mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_source}{bigint.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1bigint_acb4c464f1e016ccb00f0fa5a51a9873f}\index{fc::bigint@{fc::bigint}!bigint@{bigint}}
+\index{bigint@{bigint}!fc::bigint@{fc::bigint}}
+\doxysubsubsection{\texorpdfstring{bigint()}{bigint()}\hspace{0.1cm}{\footnotesize\ttfamily [1/7]}}
+{\footnotesize\ttfamily \label{classfc_1_1bigint_acb4c464f1e016ccb00f0fa5a51a9873f} 
+fc\+::bigint\+::bigint (\begin{DoxyParamCaption}\item[{const std\+::vector$<$ char $>$ \&}]{bige}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bigint_8cpp_source_l00015}{15}} of file \mbox{\hyperlink{bigint_8cpp_source}{bigint.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \ \ n\ =\ BN\_bin2bn(\ (\textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)bige.data(),\ bige.size(),\ NULL\ );}
+\DoxyCodeLine{00017\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ n\ !=\ \textcolor{keyword}{nullptr}\ );}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1bigint_af1df19a5e31f1b0620299c009d487c09}\index{fc::bigint@{fc::bigint}!bigint@{bigint}}
+\index{bigint@{bigint}!fc::bigint@{fc::bigint}}
+\doxysubsubsection{\texorpdfstring{bigint()}{bigint()}\hspace{0.1cm}{\footnotesize\ttfamily [2/7]}}
+{\footnotesize\ttfamily \label{classfc_1_1bigint_af1df19a5e31f1b0620299c009d487c09} 
+fc\+::bigint\+::bigint (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{bige}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{l}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bigint_8cpp_source_l00011}{11}} of file \mbox{\hyperlink{bigint_8cpp_source}{bigint.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00011\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00012\ \ \ \ \ \ \ \ \ n\ =\ BN\_bin2bn(\ (\textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)bige,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}},\ NULL\ );}
+\DoxyCodeLine{00013\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ n\ !=\ \textcolor{keyword}{nullptr}\ );}
+\DoxyCodeLine{00014\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1bigint_a7875b887d6497e99944c10aeb6edf319}\index{fc::bigint@{fc::bigint}!bigint@{bigint}}
+\index{bigint@{bigint}!fc::bigint@{fc::bigint}}
+\doxysubsubsection{\texorpdfstring{bigint()}{bigint()}\hspace{0.1cm}{\footnotesize\ttfamily [3/7]}}
+{\footnotesize\ttfamily \label{classfc_1_1bigint_a7875b887d6497e99944c10aeb6edf319} 
+fc\+::bigint\+::bigint (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{value}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bigint_8cpp_source_l00032}{32}} of file \mbox{\hyperlink{bigint_8cpp_source}{bigint.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ big\_endian\_value\ =\ bswap\_64(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}});}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ n\ =\ BN\_bin2bn((\textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)\&big\_endian\_value,\ \textcolor{keyword}{sizeof}(big\_endian\_value),\ NULL);}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1bigint_a292d6c31fad8a84cfdddb24a6be1abae}\index{fc::bigint@{fc::bigint}!bigint@{bigint}}
+\index{bigint@{bigint}!fc::bigint@{fc::bigint}}
+\doxysubsubsection{\texorpdfstring{bigint()}{bigint()}\hspace{0.1cm}{\footnotesize\ttfamily [4/7]}}
+{\footnotesize\ttfamily \label{classfc_1_1bigint_a292d6c31fad8a84cfdddb24a6be1abae} 
+fc\+::bigint\+::bigint (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bigint_8cpp_source_l00023}{23}} of file \mbox{\hyperlink{bigint_8cpp_source}{bigint.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ :n(BN\_new())\ }
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \{\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=306pt]{classfc_1_1bigint_a292d6c31fad8a84cfdddb24a6be1abae_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1bigint_abda40ee38fb31fb92e75f8563ccb55d9}\index{fc::bigint@{fc::bigint}!bigint@{bigint}}
+\index{bigint@{bigint}!fc::bigint@{fc::bigint}}
+\doxysubsubsection{\texorpdfstring{bigint()}{bigint()}\hspace{0.1cm}{\footnotesize\ttfamily [5/7]}}
+{\footnotesize\ttfamily \label{classfc_1_1bigint_abda40ee38fb31fb92e75f8563ccb55d9} 
+fc\+::bigint\+::bigint (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1bigint}{bigint}} \&}]{c}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bigint_8cpp_source_l00038}{38}} of file \mbox{\hyperlink{bigint_8cpp_source}{bigint.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ n\ =\ BN\_dup(\ c.n\ );}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1bigint_a58132cc8096d969f5f058f346a259abf}\index{fc::bigint@{fc::bigint}!bigint@{bigint}}
+\index{bigint@{bigint}!fc::bigint@{fc::bigint}}
+\doxysubsubsection{\texorpdfstring{bigint()}{bigint()}\hspace{0.1cm}{\footnotesize\ttfamily [6/7]}}
+{\footnotesize\ttfamily \label{classfc_1_1bigint_a58132cc8096d969f5f058f346a259abf} 
+fc\+::bigint\+::bigint (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1bigint}{bigint}} \&\&}]{c}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bigint_8cpp_source_l00042}{42}} of file \mbox{\hyperlink{bigint_8cpp_source}{bigint.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ n\ =\ b.n;}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ b.n\ =\ 0;}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1bigint_a187e7d0c2cbad88460b3eb61697a5c01}\index{fc::bigint@{fc::bigint}!bigint@{bigint}}
+\index{bigint@{bigint}!fc::bigint@{fc::bigint}}
+\doxysubsubsection{\texorpdfstring{bigint()}{bigint()}\hspace{0.1cm}{\footnotesize\ttfamily [7/7]}}
+{\footnotesize\ttfamily \label{classfc_1_1bigint_a187e7d0c2cbad88460b3eb61697a5c01} 
+fc\+::bigint\+::bigint (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_a62125ea4e1d748a4a9c1aed9766f451a}{BIGNUM}} \texorpdfstring{$\ast$}{*}}]{n}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{bigint_8cpp_source_l00019}{19}} of file \mbox{\hyperlink{bigint_8cpp_source}{bigint.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ n\ =\ BN\_dup(in);}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1bigint_a87f2030b5a9b9813c757d57a5880c9c5}\index{fc::bigint@{fc::bigint}!````~bigint@{\texorpdfstring{$\sim$}{\string~}bigint}}
+\index{````~bigint@{\texorpdfstring{$\sim$}{\string~}bigint}!fc::bigint@{fc::bigint}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}bigint()}{\string~bigint()}}
+{\footnotesize\ttfamily \label{classfc_1_1bigint_a87f2030b5a9b9813c757d57a5880c9c5} 
+fc\+::bigint\+::\texorpdfstring{$\sim$}{\string~}bigint (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bigint_8cpp_source_l00047}{47}} of file \mbox{\hyperlink{bigint_8cpp_source}{bigint.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(n!=0)\ BN\_free(n);}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1bigint_a4b2255410ddb1e3061f090746048c798}\index{fc::bigint@{fc::bigint}!dup@{dup}}
+\index{dup@{dup}!fc::bigint@{fc::bigint}}
+\doxysubsubsection{\texorpdfstring{dup()}{dup()}}
+{\footnotesize\ttfamily \label{classfc_1_1bigint_a4b2255410ddb1e3061f090746048c798} 
+\mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_a62125ea4e1d748a4a9c1aed9766f451a}{BIGNUM}} \texorpdfstring{$\ast$}{*} fc\+::bigint\+::dup (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{bigint_8cpp_source_l00027}{27}} of file \mbox{\hyperlink{bigint_8cpp_source}{bigint.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ BN\_dup(\ n\ );}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1bigint_a8bb114eb168697d5d697f0b3452bd0aa}\index{fc::bigint@{fc::bigint}!exp@{exp}}
+\index{exp@{exp}!fc::bigint@{fc::bigint}}
+\doxysubsubsection{\texorpdfstring{exp()}{exp()}}
+{\footnotesize\ttfamily \label{classfc_1_1bigint_a8bb114eb168697d5d697f0b3452bd0aa} 
+\mbox{\hyperlink{classfc_1_1bigint}{bigint}} fc\+::bigint\+::exp (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1bigint}{bigint}} \&}]{c}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{bigint_8cpp_source_l00180}{180}} of file \mbox{\hyperlink{bigint_8cpp_source}{bigint.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ BN\_CTX*\ ctx\ =\ BN\_CTX\_new();}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bigint_a292d6c31fad8a84cfdddb24a6be1abae}{bigint}}\ tmp;}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ BN\_exp(\ tmp.n,\ n,\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.n,\ ctx\ );}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \ \ BN\_CTX\_free(ctx);}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ tmp;}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=278pt]{classfc_1_1bigint_a8bb114eb168697d5d697f0b3452bd0aa_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1bigint_ad030cb7d1cde7c3c365a2b2f1057bb43}\index{fc::bigint@{fc::bigint}!get@{get}}
+\index{get@{get}!fc::bigint@{fc::bigint}}
+\doxysubsubsection{\texorpdfstring{get()}{get()}}
+{\footnotesize\ttfamily \label{classfc_1_1bigint_ad030cb7d1cde7c3c365a2b2f1057bb43} 
+\mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_a62125ea4e1d748a4a9c1aed9766f451a}{BIGNUM}} \texorpdfstring{$\ast$}{*} fc\+::bigint\+::get (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_source_l00065}{65}} of file \mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_source}{bigint.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00065\ \{\ \textcolor{keywordflow}{return}\ n;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1bigint_a8b2d3a048ea4ff9f245eb0f34e18a660}\index{fc::bigint@{fc::bigint}!is\_negative@{is\_negative}}
+\index{is\_negative@{is\_negative}!fc::bigint@{fc::bigint}}
+\doxysubsubsection{\texorpdfstring{is\_negative()}{is\_negative()}}
+{\footnotesize\ttfamily \label{classfc_1_1bigint_a8b2d3a048ea4ff9f245eb0f34e18a660} 
+bool fc\+::bigint\+::is\+\_\+negative (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{bigint_8cpp_source_l00051}{51}} of file \mbox{\hyperlink{bigint_8cpp_source}{bigint.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00051\ \{\ \textcolor{keywordflow}{return}\ BN\_is\_negative(n);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1bigint_af969a998e489c5f8bd81c07b738519df}\index{fc::bigint@{fc::bigint}!log2@{log2}}
+\index{log2@{log2}!fc::bigint@{fc::bigint}}
+\doxysubsubsection{\texorpdfstring{log2()}{log2()}}
+{\footnotesize\ttfamily \label{classfc_1_1bigint_af969a998e489c5f8bd81c07b738519df} 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} fc\+::bigint\+::log2 (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{bigint_8cpp_source_l00062}{62}} of file \mbox{\hyperlink{bigint_8cpp_source}{bigint.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00062\ \{\ \textcolor{keywordflow}{return}\ BN\_num\_bits(n);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1bigint_ad2fed7f0d170376ea3ef7e9dd364b321}\index{fc::bigint@{fc::bigint}!operator bool@{operator bool}}
+\index{operator bool@{operator bool}!fc::bigint@{fc::bigint}}
+\doxysubsubsection{\texorpdfstring{operator bool()}{operator bool()}}
+{\footnotesize\ttfamily \label{classfc_1_1bigint_ad2fed7f0d170376ea3ef7e9dd364b321} 
+fc\+::bigint\+::operator bool (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{bigint_8cpp_source_l00078}{78}} of file \mbox{\hyperlink{bigint_8cpp_source}{bigint.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !BN\_is\_zero(\ n\ );}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1bigint_a084ca00b3c29ec193133f4e676b43a63}\index{fc::bigint@{fc::bigint}!operator fc::string@{operator fc::string}}
+\index{operator fc::string@{operator fc::string}!fc::bigint@{fc::bigint}}
+\doxysubsubsection{\texorpdfstring{operator fc::string()}{operator fc::string()}}
+{\footnotesize\ttfamily \label{classfc_1_1bigint_a084ca00b3c29ec193133f4e676b43a63} 
+fc\+::bigint\+::operator \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{bigint_8cpp_source_l00200}{200}} of file \mbox{\hyperlink{bigint_8cpp_source}{bigint.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ BN\_bn2dec(n);}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=327pt]{classfc_1_1bigint_a084ca00b3c29ec193133f4e676b43a63_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1bigint_a8c10185176c6dfb4a10f16a760b79d72}\index{fc::bigint@{fc::bigint}!operator std::vector$<$ char $>$@{operator std::vector$<$ char $>$}}
+\index{operator std::vector$<$ char $>$@{operator std::vector$<$ char $>$}!fc::bigint@{fc::bigint}}
+\doxysubsubsection{\texorpdfstring{operator std::vector$<$ char $>$()}{operator std::vector< char >()}}
+{\footnotesize\ttfamily \label{classfc_1_1bigint_a8c10185176c6dfb4a10f16a760b79d72} 
+fc\+::bigint\+::operator std\+::vector$<$ char $>$ (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{bigint_8cpp_source_l00204}{204}} of file \mbox{\hyperlink{bigint_8cpp_source}{bigint.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ std::vector<char>\ to(BN\_num\_bytes(n));\ }
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ BN\_bn2bin(n,(\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)to.data());}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ to;}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1bigint_ab887f3066de9cd1daad336cec80437c0}\index{fc::bigint@{fc::bigint}!operator"!=@{operator"!=}}
+\index{operator"!=@{operator"!=}!fc::bigint@{fc::bigint}}
+\doxysubsubsection{\texorpdfstring{operator"!=()}{operator!=()}}
+{\footnotesize\ttfamily \label{classfc_1_1bigint_ab887f3066de9cd1daad336cec80437c0} 
+bool fc\+::bigint\+::operator!= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1bigint}{bigint}} \&}]{c}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{bigint_8cpp_source_l00075}{75}} of file \mbox{\hyperlink{bigint_8cpp_source}{bigint.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ BN\_cmp(\ n,\ c.n\ )\ !=\ 0;}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1bigint_a824ed8d894a438619d3dac72189838fc}\index{fc::bigint@{fc::bigint}!operator\%@{operator\%}}
+\index{operator\%@{operator\%}!fc::bigint@{fc::bigint}}
+\doxysubsubsection{\texorpdfstring{operator\%()}{operator\%()}}
+{\footnotesize\ttfamily \label{classfc_1_1bigint_a824ed8d894a438619d3dac72189838fc} 
+\mbox{\hyperlink{classfc_1_1bigint}{bigint}} fc\+::bigint\+::operator\% (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1bigint}{bigint}} \&}]{a}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{bigint_8cpp_source_l00136}{136}} of file \mbox{\hyperlink{bigint_8cpp_source}{bigint.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ BN\_CTX*\ ctx\ =\ BN\_CTX\_new();}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bigint_a292d6c31fad8a84cfdddb24a6be1abae}{bigint}}\ tmp;\textcolor{comment}{//(*this);}}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ BN\_mod(\ tmp.n,\ n,\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.n,\ ctx\ );}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ BN\_CTX\_free(ctx);}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ tmp;}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1bigint_a34e71f5ebcd8d8d53db777bcd8b53f00}\index{fc::bigint@{fc::bigint}!operator\texorpdfstring{$\ast$}{*}@{operator\texorpdfstring{$\ast$}{*}}}
+\index{operator\texorpdfstring{$\ast$}{*}@{operator\texorpdfstring{$\ast$}{*}}!fc::bigint@{fc::bigint}}
+\doxysubsubsection{\texorpdfstring{operator\texorpdfstring{$\ast$}{*}()}{operator*()}}
+{\footnotesize\ttfamily \label{classfc_1_1bigint_a34e71f5ebcd8d8d53db777bcd8b53f00} 
+\mbox{\hyperlink{classfc_1_1bigint}{bigint}} fc\+::bigint\+::operator\texorpdfstring{$\ast$}{*} (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1bigint}{bigint}} \&}]{a}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{bigint_8cpp_source_l00122}{122}} of file \mbox{\hyperlink{bigint_8cpp_source}{bigint.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ BN\_CTX*\ ctx\ =\ BN\_CTX\_new();}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bigint_a292d6c31fad8a84cfdddb24a6be1abae}{bigint}}\ tmp(*\textcolor{keyword}{this});}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ BN\_mul(\ tmp.n,\ n,\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.n,\ ctx\ );}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ BN\_CTX\_free(ctx);}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ tmp;}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1bigint_ab672316597423732aaebff19d43012fa}\index{fc::bigint@{fc::bigint}!operator\texorpdfstring{$\ast$}{*}=@{operator\texorpdfstring{$\ast$}{*}=}}
+\index{operator\texorpdfstring{$\ast$}{*}=@{operator\texorpdfstring{$\ast$}{*}=}!fc::bigint@{fc::bigint}}
+\doxysubsubsection{\texorpdfstring{operator\texorpdfstring{$\ast$}{*}=()}{operator*=()}}
+{\footnotesize\ttfamily \label{classfc_1_1bigint_ab672316597423732aaebff19d43012fa} 
+\mbox{\hyperlink{classfc_1_1bigint}{bigint}} fc\+::bigint\+::operator\texorpdfstring{$\ast$}{*}= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1bigint}{bigint}} \&}]{a}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bigint_8cpp_source_l00152}{152}} of file \mbox{\hyperlink{bigint_8cpp_source}{bigint.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ tmp\ =\ *\textcolor{keyword}{this}\ *\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}};}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ *\textcolor{keyword}{this}\ =\ std::move(tmp);}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1bigint_a40ba09f4b0d2420bbd69823e41b13145}\index{fc::bigint@{fc::bigint}!operator+@{operator+}}
+\index{operator+@{operator+}!fc::bigint@{fc::bigint}}
+\doxysubsubsection{\texorpdfstring{operator+()}{operator+()}}
+{\footnotesize\ttfamily \label{classfc_1_1bigint_a40ba09f4b0d2420bbd69823e41b13145} 
+\mbox{\hyperlink{classfc_1_1bigint}{bigint}} fc\+::bigint\+::operator+ (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1bigint}{bigint}} \&}]{a}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{bigint_8cpp_source_l00103}{103}} of file \mbox{\hyperlink{bigint_8cpp_source}{bigint.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bigint_a292d6c31fad8a84cfdddb24a6be1abae}{bigint}}\ tmp(*\textcolor{keyword}{this});}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ BN\_add(\ tmp.n,\ n,\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.n\ );}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ tmp;}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1bigint_ad9bdb01f12f428d0e5addfa59c295962}\index{fc::bigint@{fc::bigint}!operator++@{operator++}}
+\index{operator++@{operator++}!fc::bigint@{fc::bigint}}
+\doxysubsubsection{\texorpdfstring{operator++()}{operator++()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1bigint_ad9bdb01f12f428d0e5addfa59c295962} 
+\mbox{\hyperlink{classfc_1_1bigint}{bigint}} \& fc\+::bigint\+::operator++ (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bigint_8cpp_source_l00088}{88}} of file \mbox{\hyperlink{bigint_8cpp_source}{bigint.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this}\ =\ *\textcolor{keyword}{this}\ +\ \mbox{\hyperlink{classfc_1_1bigint_a292d6c31fad8a84cfdddb24a6be1abae}{bigint}}(1);}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=306pt]{classfc_1_1bigint_ad9bdb01f12f428d0e5addfa59c295962_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1bigint_aeeed63218ddee1945d2903ec8de127df}\index{fc::bigint@{fc::bigint}!operator++@{operator++}}
+\index{operator++@{operator++}!fc::bigint@{fc::bigint}}
+\doxysubsubsection{\texorpdfstring{operator++()}{operator++()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1bigint_aeeed63218ddee1945d2903ec8de127df} 
+\mbox{\hyperlink{classfc_1_1bigint}{bigint}} fc\+::bigint\+::operator++ (\begin{DoxyParamCaption}\item[{int}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bigint_8cpp_source_l00082}{82}} of file \mbox{\hyperlink{bigint_8cpp_source}{bigint.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bigint_a292d6c31fad8a84cfdddb24a6be1abae}{bigint}}\ tmp\ =\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ *\textcolor{keyword}{this}\ =\ *\textcolor{keyword}{this}\ +\ \mbox{\hyperlink{classfc_1_1bigint_a292d6c31fad8a84cfdddb24a6be1abae}{bigint}}(1);}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ tmp;}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=306pt]{classfc_1_1bigint_aeeed63218ddee1945d2903ec8de127df_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1bigint_a899c326f06b59a060dab8b903199213d}\index{fc::bigint@{fc::bigint}!operator+=@{operator+=}}
+\index{operator+=@{operator+=}!fc::bigint@{fc::bigint}}
+\doxysubsubsection{\texorpdfstring{operator+=()}{operator+=()}}
+{\footnotesize\ttfamily \label{classfc_1_1bigint_a899c326f06b59a060dab8b903199213d} 
+\mbox{\hyperlink{classfc_1_1bigint}{bigint}} \& fc\+::bigint\+::operator+= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1bigint}{bigint}} \&}]{a}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bigint_8cpp_source_l00108}{108}} of file \mbox{\hyperlink{bigint_8cpp_source}{bigint.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bigint_a292d6c31fad8a84cfdddb24a6be1abae}{bigint}}\ tmp(*\textcolor{keyword}{this});}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ BN\_add(\ tmp.n,\ n,\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.n\ );}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacestd_abb7e41c7063536ff6eeee4bb5f66de6c}{std::swap}}(*\textcolor{keyword}{this},tmp);}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1bigint_a899c326f06b59a060dab8b903199213d_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1bigint_acf0167324b72a936b3777f5f4efcf15a}\index{fc::bigint@{fc::bigint}!operator-\/@{operator-\/}}
+\index{operator-\/@{operator-\/}!fc::bigint@{fc::bigint}}
+\doxysubsubsection{\texorpdfstring{operator-\/()}{operator-()}}
+{\footnotesize\ttfamily \label{classfc_1_1bigint_acf0167324b72a936b3777f5f4efcf15a} 
+\mbox{\hyperlink{classfc_1_1bigint}{bigint}} fc\+::bigint\+::operator-\/ (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1bigint}{bigint}} \&}]{a}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{bigint_8cpp_source_l00175}{175}} of file \mbox{\hyperlink{bigint_8cpp_source}{bigint.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bigint_a292d6c31fad8a84cfdddb24a6be1abae}{bigint}}\ tmp;}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ BN\_sub(\ tmp.n,\ n,\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.n\ );}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ tmp;}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1bigint_a14299996f33c1f7abb645a1d0b20f8fd}\index{fc::bigint@{fc::bigint}!operator-\/-\/@{operator-\/-\/}}
+\index{operator-\/-\/@{operator-\/-\/}!fc::bigint@{fc::bigint}}
+\doxysubsubsection{\texorpdfstring{operator-\/-\/()}{operator--()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1bigint_a14299996f33c1f7abb645a1d0b20f8fd} 
+\mbox{\hyperlink{classfc_1_1bigint}{bigint}} \& fc\+::bigint\+::operator-\/-\/ (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bigint_8cpp_source_l00098}{98}} of file \mbox{\hyperlink{bigint_8cpp_source}{bigint.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this}\ =\ *\textcolor{keyword}{this}\ -\/\ \mbox{\hyperlink{classfc_1_1bigint_a292d6c31fad8a84cfdddb24a6be1abae}{bigint}}(1);}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=300pt]{classfc_1_1bigint_a14299996f33c1f7abb645a1d0b20f8fd_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1bigint_a3832b6df4103eff5b58ba388a0b2c6b3}\index{fc::bigint@{fc::bigint}!operator-\/-\/@{operator-\/-\/}}
+\index{operator-\/-\/@{operator-\/-\/}!fc::bigint@{fc::bigint}}
+\doxysubsubsection{\texorpdfstring{operator-\/-\/()}{operator--()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1bigint_a3832b6df4103eff5b58ba388a0b2c6b3} 
+\mbox{\hyperlink{classfc_1_1bigint}{bigint}} fc\+::bigint\+::operator-\/-\/ (\begin{DoxyParamCaption}\item[{int}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bigint_8cpp_source_l00092}{92}} of file \mbox{\hyperlink{bigint_8cpp_source}{bigint.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bigint_a292d6c31fad8a84cfdddb24a6be1abae}{bigint}}\ tmp\ =\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ *\textcolor{keyword}{this}\ =\ *\textcolor{keyword}{this}\ -\/\ \mbox{\hyperlink{classfc_1_1bigint_a292d6c31fad8a84cfdddb24a6be1abae}{bigint}}(1);}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ tmp;}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=300pt]{classfc_1_1bigint_a3832b6df4103eff5b58ba388a0b2c6b3_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1bigint_a8df3ffe8605b849cc71c8111818c53a3}\index{fc::bigint@{fc::bigint}!operator-\/=@{operator-\/=}}
+\index{operator-\/=@{operator-\/=}!fc::bigint@{fc::bigint}}
+\doxysubsubsection{\texorpdfstring{operator-\/=()}{operator-=()}}
+{\footnotesize\ttfamily \label{classfc_1_1bigint_a8df3ffe8605b849cc71c8111818c53a3} 
+\mbox{\hyperlink{classfc_1_1bigint}{bigint}} \& fc\+::bigint\+::operator-\/= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1bigint}{bigint}} \&}]{a}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bigint_8cpp_source_l00114}{114}} of file \mbox{\hyperlink{bigint_8cpp_source}{bigint.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bigint_a292d6c31fad8a84cfdddb24a6be1abae}{bigint}}\ tmp(*\textcolor{keyword}{this});}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ BN\_sub(\ tmp.n,\ n,\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.n\ );}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacestd_abb7e41c7063536ff6eeee4bb5f66de6c}{std::swap}}(*\textcolor{keyword}{this},tmp);}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1bigint_a8df3ffe8605b849cc71c8111818c53a3_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1bigint_a502fa596e53b743dc04a72879a21eb9d}\index{fc::bigint@{fc::bigint}!operator/@{operator/}}
+\index{operator/@{operator/}!fc::bigint@{fc::bigint}}
+\doxysubsubsection{\texorpdfstring{operator/()}{operator/()}}
+{\footnotesize\ttfamily \label{classfc_1_1bigint_a502fa596e53b743dc04a72879a21eb9d} 
+\mbox{\hyperlink{classfc_1_1bigint}{bigint}} fc\+::bigint\+::operator/ (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1bigint}{bigint}} \&}]{a}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{bigint_8cpp_source_l00129}{129}} of file \mbox{\hyperlink{bigint_8cpp_source}{bigint.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ BN\_CTX*\ ctx\ =\ BN\_CTX\_new();}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bigint_a292d6c31fad8a84cfdddb24a6be1abae}{bigint}}\ tmp;\textcolor{comment}{//(*this);}}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ BN\_div(\ tmp.n,\ NULL,\ n,\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.n,\ ctx\ );}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ BN\_CTX\_free(ctx);}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ tmp;}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1bigint_aec66b7c4e3adfc4bb40c748afcff0b3e}\index{fc::bigint@{fc::bigint}!operator/=@{operator/=}}
+\index{operator/=@{operator/=}!fc::bigint@{fc::bigint}}
+\doxysubsubsection{\texorpdfstring{operator/=()}{operator/=()}}
+{\footnotesize\ttfamily \label{classfc_1_1bigint_aec66b7c4e3adfc4bb40c748afcff0b3e} 
+\mbox{\hyperlink{classfc_1_1bigint}{bigint}} fc\+::bigint\+::operator/= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1bigint}{bigint}} \&}]{a}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bigint_8cpp_source_l00144}{144}} of file \mbox{\hyperlink{bigint_8cpp_source}{bigint.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ BN\_CTX*\ ctx\ =\ BN\_CTX\_new();}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bigint_a292d6c31fad8a84cfdddb24a6be1abae}{bigint}}\ tmp;\textcolor{comment}{//*this);}}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ BN\_div(\ tmp.n,\ NULL,\ n,\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.n,\ ctx\ );}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{utility_8hpp_aa8fc7454c03dcfc9e542977e3b9250fa}{fc\_swap}}(\ tmp.n,\ n\ );}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ BN\_CTX\_free(ctx);}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ tmp;}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=273pt]{classfc_1_1bigint_aec66b7c4e3adfc4bb40c748afcff0b3e_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1bigint_a8fcaf1fa0b03c87ce99abaf4c32840ee}\index{fc::bigint@{fc::bigint}!operator$<$@{operator$<$}}
+\index{operator$<$@{operator$<$}!fc::bigint@{fc::bigint}}
+\doxysubsubsection{\texorpdfstring{operator$<$()}{operator<()}}
+{\footnotesize\ttfamily \label{classfc_1_1bigint_a8fcaf1fa0b03c87ce99abaf4c32840ee} 
+bool fc\+::bigint\+::operator$<$ (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1bigint}{bigint}} \&}]{c}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{bigint_8cpp_source_l00063}{63}} of file \mbox{\hyperlink{bigint_8cpp_source}{bigint.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ BN\_cmp(\ n,\ c.n\ )\ <\ 0;}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1bigint_a459bafab93e3ce8ed07939595fe1fc34}\index{fc::bigint@{fc::bigint}!operator$<$$<$=@{operator$<$$<$=}}
+\index{operator$<$$<$=@{operator$<$$<$=}!fc::bigint@{fc::bigint}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$=()}{operator<<=()}}
+{\footnotesize\ttfamily \label{classfc_1_1bigint_a459bafab93e3ce8ed07939595fe1fc34} 
+\mbox{\hyperlink{classfc_1_1bigint}{bigint}} \& fc\+::bigint\+::operator$<$$<$= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{i}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bigint_8cpp_source_l00165}{165}} of file \mbox{\hyperlink{bigint_8cpp_source}{bigint.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bigint_a292d6c31fad8a84cfdddb24a6be1abae}{bigint}}\ tmp;}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ tmp.n\ !=\ \textcolor{keyword}{nullptr}\ );}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ n\ !=\ \textcolor{keyword}{nullptr}\ );}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \ BN\_lshift(\ tmp.n,\ n,\ i\ );}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacestd_abb7e41c7063536ff6eeee4bb5f66de6c}{std::swap}}(*\textcolor{keyword}{this},tmp);}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1bigint_a459bafab93e3ce8ed07939595fe1fc34_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1bigint_a3d6a9c0873e3b4e1546003ab9bb3f024}\index{fc::bigint@{fc::bigint}!operator=@{operator=}}
+\index{operator=@{operator=}!fc::bigint@{fc::bigint}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1bigint_a3d6a9c0873e3b4e1546003ab9bb3f024} 
+\mbox{\hyperlink{classfc_1_1bigint}{bigint}} \& fc\+::bigint\+::operator= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1bigint}{bigint}} \&\&}]{a}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bigint_8cpp_source_l00190}{190}} of file \mbox{\hyperlink{bigint_8cpp_source}{bigint.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{utility_8hpp_aa8fc7454c03dcfc9e542977e3b9250fa}{fc\_swap}}(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.n,\ n\ );}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=270pt]{classfc_1_1bigint_a3d6a9c0873e3b4e1546003ab9bb3f024_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1bigint_a1b72b15a739f7a04bb87b32bb4f153d5}\index{fc::bigint@{fc::bigint}!operator=@{operator=}}
+\index{operator=@{operator=}!fc::bigint@{fc::bigint}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1bigint_a1b72b15a739f7a04bb87b32bb4f153d5} 
+\mbox{\hyperlink{classfc_1_1bigint}{bigint}} \& fc\+::bigint\+::operator= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1bigint}{bigint}} \&}]{a}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bigint_8cpp_source_l00194}{194}} of file \mbox{\hyperlink{bigint_8cpp_source}{bigint.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ ==\ \textcolor{keyword}{this}\ )\ }
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ BN\_copy(\ n,\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.n\ );}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1bigint_a649bffcc80e6348453a9704072f99b7e}\index{fc::bigint@{fc::bigint}!operator==@{operator==}}
+\index{operator==@{operator==}!fc::bigint@{fc::bigint}}
+\doxysubsubsection{\texorpdfstring{operator==()}{operator==()}}
+{\footnotesize\ttfamily \label{classfc_1_1bigint_a649bffcc80e6348453a9704072f99b7e} 
+bool fc\+::bigint\+::operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1bigint}{bigint}} \&}]{c}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{bigint_8cpp_source_l00072}{72}} of file \mbox{\hyperlink{bigint_8cpp_source}{bigint.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ BN\_cmp(\ n,\ c.n\ )\ ==\ 0;}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1bigint_a79a57688c437dca31a7b3e394b41acba}\index{fc::bigint@{fc::bigint}!operator$>$@{operator$>$}}
+\index{operator$>$@{operator$>$}!fc::bigint@{fc::bigint}}
+\doxysubsubsection{\texorpdfstring{operator$>$()}{operator>()}}
+{\footnotesize\ttfamily \label{classfc_1_1bigint_a79a57688c437dca31a7b3e394b41acba} 
+bool fc\+::bigint\+::operator$>$ (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1bigint}{bigint}} \&}]{c}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{bigint_8cpp_source_l00066}{66}} of file \mbox{\hyperlink{bigint_8cpp_source}{bigint.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ BN\_cmp(\ n,\ c.n\ )\ >\ 0;}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1bigint_a1b52e45b5efa4098d406376f78749e48}\index{fc::bigint@{fc::bigint}!operator$>$=@{operator$>$=}}
+\index{operator$>$=@{operator$>$=}!fc::bigint@{fc::bigint}}
+\doxysubsubsection{\texorpdfstring{operator$>$=()}{operator>=()}}
+{\footnotesize\ttfamily \label{classfc_1_1bigint_a1b52e45b5efa4098d406376f78749e48} 
+bool fc\+::bigint\+::operator$>$= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1bigint}{bigint}} \&}]{c}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{bigint_8cpp_source_l00069}{69}} of file \mbox{\hyperlink{bigint_8cpp_source}{bigint.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ BN\_cmp(\ n,\ c.n\ )\ >=\ 0;}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1bigint_abe6fa0986e47e98753b42924ad157a57}\index{fc::bigint@{fc::bigint}!operator$>$$>$=@{operator$>$$>$=}}
+\index{operator$>$$>$=@{operator$>$$>$=}!fc::bigint@{fc::bigint}}
+\doxysubsubsection{\texorpdfstring{operator$>$$>$=()}{operator>>=()}}
+{\footnotesize\ttfamily \label{classfc_1_1bigint_abe6fa0986e47e98753b42924ad157a57} 
+\mbox{\hyperlink{classfc_1_1bigint}{bigint}} \& fc\+::bigint\+::operator$>$$>$= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{i}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bigint_8cpp_source_l00157}{157}} of file \mbox{\hyperlink{bigint_8cpp_source}{bigint.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bigint_a292d6c31fad8a84cfdddb24a6be1abae}{bigint}}\ tmp;}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \ BN\_rshift(\ tmp.n,\ n,\ i\ );}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacestd_abb7e41c7063536ff6eeee4bb5f66de6c}{std::swap}}(*\textcolor{keyword}{this},tmp);}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1bigint_abe6fa0986e47e98753b42924ad157a57_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1bigint_a5c1dd3c77d67ffc96ed46717f1a25d54}\index{fc::bigint@{fc::bigint}!random@{random}}
+\index{random@{random}!fc::bigint@{fc::bigint}}
+\doxysubsubsection{\texorpdfstring{random()}{random()}}
+{\footnotesize\ttfamily \label{classfc_1_1bigint_a5c1dd3c77d67ffc96ed46717f1a25d54} 
+static \mbox{\hyperlink{classfc_1_1bigint}{bigint}} fc\+::bigint\+::random (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{bits}{, }\item[{int}]{t}{, }\item[{int}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+\Hypertarget{classfc_1_1bigint_aae6162af1da04e4423975054d9b8f728}\index{fc::bigint@{fc::bigint}!to\_int64@{to\_int64}}
+\index{to\_int64@{to\_int64}!fc::bigint@{fc::bigint}}
+\doxysubsubsection{\texorpdfstring{to\_int64()}{to\_int64()}}
+{\footnotesize\ttfamily \label{classfc_1_1bigint_aae6162af1da04e4423975054d9b8f728} 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} fc\+::bigint\+::to\+\_\+int64 (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{bigint_8cpp_source_l00053}{53}} of file \mbox{\hyperlink{bigint_8cpp_source}{bigint.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(BN\_num\_bits(n)\ <=\ 63);}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ size\ =\ BN\_num\_bytes(n);}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ abs\_value\ =\ 0;}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ BN\_bn2bin(n,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)\&abs\_value\ +\ (\textcolor{keyword}{sizeof}(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})\ -\/\ size));}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ BN\_is\_negative(n)\ ?\ -\/(\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}})bswap\_64(abs\_value)\ :\ bswap\_64(abs\_value);}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/\mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp}{bigint.\+hpp}}\item 
+libraries/fc/src/crypto/\mbox{\hyperlink{bigint_8cpp}{bigint.\+cpp}}\end{DoxyCompactItemize}

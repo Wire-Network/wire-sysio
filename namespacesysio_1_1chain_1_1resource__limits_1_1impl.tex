@@ -1,0 +1,158 @@
+\doxysection{sysio\+::chain\+::resource\+\_\+limits\+::impl Namespace Reference}
+\hypertarget{namespacesysio_1_1chain_1_1resource__limits_1_1impl}{}\label{namespacesysio_1_1chain_1_1resource__limits_1_1impl}\index{sysio::chain::resource\_limits::impl@{sysio::chain::resource\_limits::impl}}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__decay__accumulator}{exponential\+\_\+decay\+\_\+accumulator}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator}{exponential\+\_\+moving\+\_\+average\+\_\+accumulator}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1ratio}{ratio}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1ratio}{ratio}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \mbox{\hyperlink{namespacesysio_1_1chain_1_1resource__limits_1_1impl_a4b7474bf36737d614cdfe51ed0ca0b6a}{make\+\_\+ratio}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} n, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} d)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{namespacesysio_1_1chain_1_1resource__limits_1_1impl_acfd4c065875ba908f6727196d39e16b9}{operator\texorpdfstring{$\ast$}{*}}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}, const \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1ratio}{ratio}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}})
+\item 
+{\footnotesize template$<$typename Unsigned\+Int\+Type $>$ }\\constexpr Unsigned\+Int\+Type \mbox{\hyperlink{namespacesysio_1_1chain_1_1resource__limits_1_1impl_a27299c32ef2c573ed173bd68edd2cd21}{integer\+\_\+divide\+\_\+ceil}} (Unsigned\+Int\+Type num, Unsigned\+Int\+Type den)
+\item 
+{\footnotesize template$<$typename Lesser\+Int\+Type , typename Greater\+Int\+Type $>$ }\\constexpr auto \mbox{\hyperlink{namespacesysio_1_1chain_1_1resource__limits_1_1impl_ad13603146ccf93edbdb851067320dd6e}{downgrade\+\_\+cast}} (Greater\+Int\+Type val) -\/$>$ std\+::enable\+\_\+if\+\_\+t$<$ \mbox{\hyperlink{namespacesysio_1_1chain_1_1resource__limits_1_1impl_ae2e0ef4a6a93115ddc3dad838446c2e4}{is\+\_\+valid\+\_\+downgrade\+\_\+cast}}$<$ Lesser\+Int\+Type, Greater\+Int\+Type $>$ \&\&std\+::is\+\_\+signed$<$ Lesser\+Int\+Type $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}}==std\+::is\+\_\+signed$<$ Greater\+Int\+Type $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}}, Lesser\+Int\+Type $>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename Lesser\+Int\+Type , typename Greater\+Int\+Type $>$ }\\constexpr bool \mbox{\hyperlink{namespacesysio_1_1chain_1_1resource__limits_1_1impl_ae2e0ef4a6a93115ddc3dad838446c2e4}{is\+\_\+valid\+\_\+downgrade\+\_\+cast}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacesysio_1_1chain_1_1resource__limits_1_1impl_ad13603146ccf93edbdb851067320dd6e}\index{sysio::chain::resource\_limits::impl@{sysio::chain::resource\_limits::impl}!downgrade\_cast@{downgrade\_cast}}
+\index{downgrade\_cast@{downgrade\_cast}!sysio::chain::resource\_limits::impl@{sysio::chain::resource\_limits::impl}}
+\doxysubsubsection{\texorpdfstring{downgrade\_cast()}{downgrade\_cast()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1resource__limits_1_1impl_ad13603146ccf93edbdb851067320dd6e} 
+template$<$typename Lesser\+Int\+Type , typename Greater\+Int\+Type $>$ \\
+auto sysio\+::chain\+::resource\+\_\+limits\+::impl\+::downgrade\+\_\+cast (\begin{DoxyParamCaption}\item[{Greater\+Int\+Type}]{val}{}\end{DoxyParamCaption}) -\/$>$ std\+::enable\+\_\+if\+\_\+t$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1resource__limits_1_1impl_ae2e0ef4a6a93115ddc3dad838446c2e4}{is\+\_\+valid\+\_\+downgrade\+\_\+cast}}$<$Lesser\+Int\+Type,Greater\+Int\+Type$>$ \&\& std\+::is\+\_\+signed$<$Lesser\+Int\+Type$>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}} == std\+::is\+\_\+signed$<$Greater\+Int\+Type$>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}}, Lesser\+Int\+Type$>$       \hspace{0.3cm}{\ttfamily [constexpr]}}
+
+Specialization for Signedness matching integer types
+
+Specialization for Signedness mismatching integer types 
+
+Definition at line \mbox{\hyperlink{resource__limits__private_8hpp_source_l00040}{40}} of file \mbox{\hyperlink{resource__limits__private_8hpp_source}{resource\+\_\+limits\+\_\+private.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ GreaterIntType\ max\ =\ std::numeric\_limits<LesserIntType>::max();}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ GreaterIntType\ \mbox{\hyperlink{namespacefc_aa3ea11c18de71ec23b19c3cc571fb8ff}{min}}\ =\ std::numeric\_limits<LesserIntType>::min();}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ val\ >=\ min\ \&\&\ val\ <=\ max,\ rate\_limiting\_state\_inconsistent,\ \textcolor{stringliteral}{"{}Casting\ a\ higher\ bit\ integer\ value\ \$\{v\}\ to\ a\ lower\ bit\ integer\ value\ which\ cannot\ contain\ the\ value,\ valid\ range\ is\ [\$\{min\},\ \$\{max\}]"{}},\ (\textcolor{stringliteral}{"{}v"{}},\ val)(\textcolor{stringliteral}{"{}min"{}},\ min)(\textcolor{stringliteral}{"{}max"{}},max)\ );}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ LesserIntType(val);}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \};}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=308pt]{namespacesysio_1_1chain_1_1resource__limits_1_1impl_ad13603146ccf93edbdb851067320dd6e_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1chain_1_1resource__limits_1_1impl_ad13603146ccf93edbdb851067320dd6e_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacesysio_1_1chain_1_1resource__limits_1_1impl_a27299c32ef2c573ed173bd68edd2cd21}\index{sysio::chain::resource\_limits::impl@{sysio::chain::resource\_limits::impl}!integer\_divide\_ceil@{integer\_divide\_ceil}}
+\index{integer\_divide\_ceil@{integer\_divide\_ceil}!sysio::chain::resource\_limits::impl@{sysio::chain::resource\_limits::impl}}
+\doxysubsubsection{\texorpdfstring{integer\_divide\_ceil()}{integer\_divide\_ceil()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1resource__limits_1_1impl_a27299c32ef2c573ed173bd68edd2cd21} 
+template$<$typename Unsigned\+Int\+Type $>$ \\
+Unsigned\+Int\+Type sysio\+::chain\+::resource\+\_\+limits\+::impl\+::integer\+\_\+divide\+\_\+ceil (\begin{DoxyParamCaption}\item[{Unsigned\+Int\+Type}]{num}{, }\item[{Unsigned\+Int\+Type}]{den}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{resource__limits__private_8hpp_source_l00025}{25}} of file \mbox{\hyperlink{resource__limits__private_8hpp_source}{resource\+\_\+limits\+\_\+private.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (num\ /\ den)\ +\ ((num\ \%\ den)\ >\ 0\ ?\ 1\ :\ 0);}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1chain_1_1resource__limits_1_1impl_a27299c32ef2c573ed173bd68edd2cd21_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacesysio_1_1chain_1_1resource__limits_1_1impl_a4b7474bf36737d614cdfe51ed0ca0b6a}\index{sysio::chain::resource\_limits::impl@{sysio::chain::resource\_limits::impl}!make\_ratio@{make\_ratio}}
+\index{make\_ratio@{make\_ratio}!sysio::chain::resource\_limits::impl@{sysio::chain::resource\_limits::impl}}
+\doxysubsubsection{\texorpdfstring{make\_ratio()}{make\_ratio()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1resource__limits_1_1impl_a4b7474bf36737d614cdfe51ed0ca0b6a} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1ratio}{ratio}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ sysio\+::chain\+::resource\+\_\+limits\+::impl\+::make\+\_\+ratio (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}}]{n}{, }\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}}]{d}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{resource__limits__private_8hpp_source_l00014}{14}} of file \mbox{\hyperlink{resource__limits__private_8hpp_source}{resource\+\_\+limits\+\_\+private.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00014\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1ratio}{ratio<T>}}\{n,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\};}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1chain_1_1resource__limits_1_1impl_a4b7474bf36737d614cdfe51ed0ca0b6a_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacesysio_1_1chain_1_1resource__limits_1_1impl_acfd4c065875ba908f6727196d39e16b9}\index{sysio::chain::resource\_limits::impl@{sysio::chain::resource\_limits::impl}!operator\texorpdfstring{$\ast$}{*}@{operator\texorpdfstring{$\ast$}{*}}}
+\index{operator\texorpdfstring{$\ast$}{*}@{operator\texorpdfstring{$\ast$}{*}}!sysio::chain::resource\_limits::impl@{sysio::chain::resource\_limits::impl}}
+\doxysubsubsection{\texorpdfstring{operator\texorpdfstring{$\ast$}{*}()}{operator*()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1resource__limits_1_1impl_acfd4c065875ba908f6727196d39e16b9} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} sysio\+::chain\+::resource\+\_\+limits\+::impl\+::operator\texorpdfstring{$\ast$}{*} (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}}]{value}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1ratio}{ratio}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&}]{r}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{resource__limits__private_8hpp_source_l00019}{19}} of file \mbox{\hyperlink{resource__limits__private_8hpp_source}{resource\+\_\+limits\+\_\+private.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.numerator\ ==\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}(0)\ ||\ std::numeric\_limits<T>::max()\ /\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.numerator\ >=\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\ rate\_limiting\_state\_inconsistent,\ \textcolor{stringliteral}{"{}Usage\ exceeds\ maximum\ value\ representable\ after\ extending\ for\ precision"{}});}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ *\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.numerator)\ /\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.denominator;}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{namespacesysio_1_1chain_1_1resource__limits_1_1impl_ae2e0ef4a6a93115ddc3dad838446c2e4}\index{sysio::chain::resource\_limits::impl@{sysio::chain::resource\_limits::impl}!is\_valid\_downgrade\_cast@{is\_valid\_downgrade\_cast}}
+\index{is\_valid\_downgrade\_cast@{is\_valid\_downgrade\_cast}!sysio::chain::resource\_limits::impl@{sysio::chain::resource\_limits::impl}}
+\doxysubsubsection{\texorpdfstring{is\_valid\_downgrade\_cast}{is\_valid\_downgrade\_cast}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1resource__limits_1_1impl_ae2e0ef4a6a93115ddc3dad838446c2e4} 
+template$<$typename Lesser\+Int\+Type , typename Greater\+Int\+Type $>$ \\
+bool sysio\+::chain\+::resource\+\_\+limits\+::impl\+::is\+\_\+valid\+\_\+downgrade\+\_\+cast\hspace{0.3cm}{\ttfamily [constexpr]}}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ std::is\_integral<LesserIntType>::value\ \&\&\ \ }
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ std::is\_integral<GreaterIntType>::value\ \&\&\ }
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ (std::numeric\_limits<LesserIntType>::max()\ <=\ std::numeric\_limits<GreaterIntType>::max())}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{resource__limits__private_8hpp_source_l00031}{31}} of file \mbox{\hyperlink{resource__limits__private_8hpp_source}{resource\+\_\+limits\+\_\+private.\+hpp}}.
+

@@ -1,0 +1,164 @@
+\doxysection{libff\+::mnt4\+\_\+ate\+\_\+\+G1\+\_\+precomp Struct Reference}
+\hypertarget{structlibff_1_1mnt4__ate___g1__precomp}{}\label{structlibff_1_1mnt4__ate___g1__precomp}\index{libff::mnt4\_ate\_G1\_precomp@{libff::mnt4\_ate\_G1\_precomp}}
+
+
+{\ttfamily \#include $<$mnt4\+\_\+pairing.\+hpp$>$}
+
+
+
+Collaboration diagram for libff\+::mnt4\+\_\+ate\+\_\+\+G1\+\_\+precomp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structlibff_1_1mnt4__ate___g1__precomp__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{structlibff_1_1mnt4__ate___g1__precomp_a6022f0c74a8a48ea9ff0df30241cd42d}{operator==}} (const \mbox{\hyperlink{structlibff_1_1mnt4__ate___g1__precomp}{mnt4\+\_\+ate\+\_\+\+G1\+\_\+precomp}} \&other) const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacelibff_a154a17eb594eb795e7a034ccfd2e397a}{mnt4\+\_\+\+Fq}} \mbox{\hyperlink{structlibff_1_1mnt4__ate___g1__precomp_a64466e8aeb52b35b2711d056c4d81656}{PX}}
+\item 
+\mbox{\hyperlink{namespacelibff_a154a17eb594eb795e7a034ccfd2e397a}{mnt4\+\_\+\+Fq}} \mbox{\hyperlink{structlibff_1_1mnt4__ate___g1__precomp_a31dd7de33f29ddf48671ea3330f6e342}{PY}}
+\item 
+\mbox{\hyperlink{namespacelibff_ad38f36eb4d1adc0b1205acb4fb00cef6}{mnt4\+\_\+\+Fq2}} \mbox{\hyperlink{structlibff_1_1mnt4__ate___g1__precomp_a04badfaa8c13c6ad5d6a1623c4ddbcbc}{PX\+\_\+twist}}
+\item 
+\mbox{\hyperlink{namespacelibff_ad38f36eb4d1adc0b1205acb4fb00cef6}{mnt4\+\_\+\+Fq2}} \mbox{\hyperlink{structlibff_1_1mnt4__ate___g1__precomp_a679c97a24f1be0571cae90294a0902ad}{PY\+\_\+twist}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+std\+::ostream \& \mbox{\hyperlink{structlibff_1_1mnt4__ate___g1__precomp_a054560c60c95f1013d6aa6b2d22c0740}{operator$<$$<$}} (std\+::ostream \&out, const \mbox{\hyperlink{structlibff_1_1mnt4__ate___g1__precomp}{mnt4\+\_\+ate\+\_\+\+G1\+\_\+precomp}} \&prec\+\_\+P)
+\item 
+std\+::istream \& \mbox{\hyperlink{structlibff_1_1mnt4__ate___g1__precomp_a3bdf219bad724e3fe5666a8671aac833}{operator$>$$>$}} (std\+::istream \&in, \mbox{\hyperlink{structlibff_1_1mnt4__ate___g1__precomp}{mnt4\+\_\+ate\+\_\+\+G1\+\_\+precomp}} \&prec\+\_\+P)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{mnt4__pairing_8hpp_source_l00060}{60}} of file \mbox{\hyperlink{mnt4__pairing_8hpp_source}{mnt4\+\_\+pairing.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structlibff_1_1mnt4__ate___g1__precomp_a6022f0c74a8a48ea9ff0df30241cd42d}\index{libff::mnt4\_ate\_G1\_precomp@{libff::mnt4\_ate\_G1\_precomp}!operator==@{operator==}}
+\index{operator==@{operator==}!libff::mnt4\_ate\_G1\_precomp@{libff::mnt4\_ate\_G1\_precomp}}
+\doxysubsubsection{\texorpdfstring{operator==()}{operator==()}}
+{\footnotesize\ttfamily \label{structlibff_1_1mnt4__ate___g1__precomp_a6022f0c74a8a48ea9ff0df30241cd42d} 
+bool libff\+::mnt4\+\_\+ate\+\_\+\+G1\+\_\+precomp\+::operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structlibff_1_1mnt4__ate___g1__precomp}{mnt4\+\_\+ate\+\_\+\+G1\+\_\+precomp}} \&}]{other}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{mnt4__pairing_8cpp_source_l00025}{25}} of file \mbox{\hyperlink{mnt4__pairing_8cpp_source}{mnt4\+\_\+pairing.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00026\ \{}
+\DoxyCodeLine{00027\ \ \ \ \ \textcolor{keywordflow}{return}\ (this-\/>\mbox{\hyperlink{structlibff_1_1mnt4__ate___g1__precomp_a64466e8aeb52b35b2711d056c4d81656}{PX}}\ ==\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.PX\ \&\&}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \ \ \ \ this-\/>PY\ ==\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.PY\ \&\&}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ \ \ \ this-\/>PX\_twist\ ==\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.PX\_twist\ \&\&}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ \ \ \ this-\/>PY\_twist\ ==\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.PY\_twist);}
+\DoxyCodeLine{00031\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{structlibff_1_1mnt4__ate___g1__precomp_a054560c60c95f1013d6aa6b2d22c0740}\index{libff::mnt4\_ate\_G1\_precomp@{libff::mnt4\_ate\_G1\_precomp}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!libff::mnt4\_ate\_G1\_precomp@{libff::mnt4\_ate\_G1\_precomp}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$}{operator<<}}
+{\footnotesize\ttfamily \label{structlibff_1_1mnt4__ate___g1__precomp_a054560c60c95f1013d6aa6b2d22c0740} 
+std\+::ostream \& operator$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{out}{, }\item[{const \mbox{\hyperlink{structlibff_1_1mnt4__ate___g1__precomp}{mnt4\+\_\+ate\+\_\+\+G1\+\_\+precomp}} \&}]{prec\+\_\+P}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{mnt4__pairing_8cpp_source_l00033}{33}} of file \mbox{\hyperlink{mnt4__pairing_8cpp_source}{mnt4\+\_\+pairing.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00034\ \{}
+\DoxyCodeLine{00035\ \ \ \ \ out\ <<\ prec\_P.PX\ <<\ \mbox{\hyperlink{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_ad80cfbe7456c7d029544e8bc2cec16c8}{OUTPUT\_SEPARATOR}}\ <<\ prec\_P.PY\ <<\ \mbox{\hyperlink{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_ad80cfbe7456c7d029544e8bc2cec16c8}{OUTPUT\_SEPARATOR}}\ <<\ prec\_P.PX\_twist\ <<\ \mbox{\hyperlink{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_ad80cfbe7456c7d029544e8bc2cec16c8}{OUTPUT\_SEPARATOR}}\ <<\ prec\_P.PY\_twist;}
+\DoxyCodeLine{00036\ }
+\DoxyCodeLine{00037\ \ \ \ \ \textcolor{keywordflow}{return}\ out;}
+\DoxyCodeLine{00038\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structlibff_1_1mnt4__ate___g1__precomp_a3bdf219bad724e3fe5666a8671aac833}\index{libff::mnt4\_ate\_G1\_precomp@{libff::mnt4\_ate\_G1\_precomp}!operator$>$$>$@{operator$>$$>$}}
+\index{operator$>$$>$@{operator$>$$>$}!libff::mnt4\_ate\_G1\_precomp@{libff::mnt4\_ate\_G1\_precomp}}
+\doxysubsubsection{\texorpdfstring{operator$>$$>$}{operator>>}}
+{\footnotesize\ttfamily \label{structlibff_1_1mnt4__ate___g1__precomp_a3bdf219bad724e3fe5666a8671aac833} 
+std\+::istream \& operator$>$$>$ (\begin{DoxyParamCaption}\item[{std\+::istream \&}]{in}{, }\item[{\mbox{\hyperlink{structlibff_1_1mnt4__ate___g1__precomp}{mnt4\+\_\+ate\+\_\+\+G1\+\_\+precomp}} \&}]{prec\+\_\+P}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{mnt4__pairing_8cpp_source_l00040}{40}} of file \mbox{\hyperlink{mnt4__pairing_8cpp_source}{mnt4\+\_\+pairing.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00041\ \{}
+\DoxyCodeLine{00042\ \ \ \ \ in\ >>\ prec\_P.PX;}
+\DoxyCodeLine{00043\ \ \ \ \ \mbox{\hyperlink{namespacelibff_a3b7a446329c9be967e16ab1c04f260e6}{consume\_OUTPUT\_SEPARATOR}}(in);}
+\DoxyCodeLine{00044\ \ \ \ \ in\ >>\ prec\_P.PY;}
+\DoxyCodeLine{00045\ \ \ \ \ \mbox{\hyperlink{namespacelibff_a3b7a446329c9be967e16ab1c04f260e6}{consume\_OUTPUT\_SEPARATOR}}(in);}
+\DoxyCodeLine{00046\ \ \ \ \ in\ >>\ prec\_P.PX\_twist;}
+\DoxyCodeLine{00047\ \ \ \ \ \mbox{\hyperlink{namespacelibff_a3b7a446329c9be967e16ab1c04f260e6}{consume\_OUTPUT\_SEPARATOR}}(in);}
+\DoxyCodeLine{00048\ \ \ \ \ in\ >>\ prec\_P.PY\_twist;}
+\DoxyCodeLine{00049\ }
+\DoxyCodeLine{00050\ \ \ \ \ \textcolor{keywordflow}{return}\ in;}
+\DoxyCodeLine{00051\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structlibff_1_1mnt4__ate___g1__precomp_a64466e8aeb52b35b2711d056c4d81656}\index{libff::mnt4\_ate\_G1\_precomp@{libff::mnt4\_ate\_G1\_precomp}!PX@{PX}}
+\index{PX@{PX}!libff::mnt4\_ate\_G1\_precomp@{libff::mnt4\_ate\_G1\_precomp}}
+\doxysubsubsection{\texorpdfstring{PX}{PX}}
+{\footnotesize\ttfamily \label{structlibff_1_1mnt4__ate___g1__precomp_a64466e8aeb52b35b2711d056c4d81656} 
+\mbox{\hyperlink{namespacelibff_a154a17eb594eb795e7a034ccfd2e397a}{mnt4\+\_\+\+Fq}} libff\+::mnt4\+\_\+ate\+\_\+\+G1\+\_\+precomp\+::\+PX}
+
+
+
+Definition at line \mbox{\hyperlink{mnt4__pairing_8hpp_source_l00061}{61}} of file \mbox{\hyperlink{mnt4__pairing_8hpp_source}{mnt4\+\_\+pairing.\+hpp}}.
+
+\Hypertarget{structlibff_1_1mnt4__ate___g1__precomp_a04badfaa8c13c6ad5d6a1623c4ddbcbc}\index{libff::mnt4\_ate\_G1\_precomp@{libff::mnt4\_ate\_G1\_precomp}!PX\_twist@{PX\_twist}}
+\index{PX\_twist@{PX\_twist}!libff::mnt4\_ate\_G1\_precomp@{libff::mnt4\_ate\_G1\_precomp}}
+\doxysubsubsection{\texorpdfstring{PX\_twist}{PX\_twist}}
+{\footnotesize\ttfamily \label{structlibff_1_1mnt4__ate___g1__precomp_a04badfaa8c13c6ad5d6a1623c4ddbcbc} 
+\mbox{\hyperlink{namespacelibff_ad38f36eb4d1adc0b1205acb4fb00cef6}{mnt4\+\_\+\+Fq2}} libff\+::mnt4\+\_\+ate\+\_\+\+G1\+\_\+precomp\+::\+PX\+\_\+twist}
+
+
+
+Definition at line \mbox{\hyperlink{mnt4__pairing_8hpp_source_l00063}{63}} of file \mbox{\hyperlink{mnt4__pairing_8hpp_source}{mnt4\+\_\+pairing.\+hpp}}.
+
+\Hypertarget{structlibff_1_1mnt4__ate___g1__precomp_a31dd7de33f29ddf48671ea3330f6e342}\index{libff::mnt4\_ate\_G1\_precomp@{libff::mnt4\_ate\_G1\_precomp}!PY@{PY}}
+\index{PY@{PY}!libff::mnt4\_ate\_G1\_precomp@{libff::mnt4\_ate\_G1\_precomp}}
+\doxysubsubsection{\texorpdfstring{PY}{PY}}
+{\footnotesize\ttfamily \label{structlibff_1_1mnt4__ate___g1__precomp_a31dd7de33f29ddf48671ea3330f6e342} 
+\mbox{\hyperlink{namespacelibff_a154a17eb594eb795e7a034ccfd2e397a}{mnt4\+\_\+\+Fq}} libff\+::mnt4\+\_\+ate\+\_\+\+G1\+\_\+precomp\+::\+PY}
+
+
+
+Definition at line \mbox{\hyperlink{mnt4__pairing_8hpp_source_l00062}{62}} of file \mbox{\hyperlink{mnt4__pairing_8hpp_source}{mnt4\+\_\+pairing.\+hpp}}.
+
+\Hypertarget{structlibff_1_1mnt4__ate___g1__precomp_a679c97a24f1be0571cae90294a0902ad}\index{libff::mnt4\_ate\_G1\_precomp@{libff::mnt4\_ate\_G1\_precomp}!PY\_twist@{PY\_twist}}
+\index{PY\_twist@{PY\_twist}!libff::mnt4\_ate\_G1\_precomp@{libff::mnt4\_ate\_G1\_precomp}}
+\doxysubsubsection{\texorpdfstring{PY\_twist}{PY\_twist}}
+{\footnotesize\ttfamily \label{structlibff_1_1mnt4__ate___g1__precomp_a679c97a24f1be0571cae90294a0902ad} 
+\mbox{\hyperlink{namespacelibff_ad38f36eb4d1adc0b1205acb4fb00cef6}{mnt4\+\_\+\+Fq2}} libff\+::mnt4\+\_\+ate\+\_\+\+G1\+\_\+precomp\+::\+PY\+\_\+twist}
+
+
+
+Definition at line \mbox{\hyperlink{mnt4__pairing_8hpp_source_l00064}{64}} of file \mbox{\hyperlink{mnt4__pairing_8hpp_source}{mnt4\+\_\+pairing.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/libraries/ff/libff/algebra/curves/mnt/mnt4/\mbox{\hyperlink{mnt4__pairing_8hpp}{mnt4\+\_\+pairing.\+hpp}}\item 
+libraries/fc/libraries/ff/libff/algebra/curves/mnt/mnt4/\mbox{\hyperlink{mnt4__pairing_8cpp}{mnt4\+\_\+pairing.\+cpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,89 @@
+\doxysection{sample2.\+h}
+\hypertarget{sample2_8h_source}{}\label{sample2_8h_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/samples/sample2.h@{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/samples/sample2.h}}
+\mbox{\hyperlink{sample2_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00001}00001\ \textcolor{comment}{//\ Copyright\ 2005,\ Google\ Inc.}}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00002}00002\ \textcolor{comment}{//\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00003}00003\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00004}00004\ \textcolor{comment}{//\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00005}00005\ \textcolor{comment}{//\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are}}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00006}00006\ \textcolor{comment}{//\ met:}}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00007}00007\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00008}00008\ \textcolor{comment}{//\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00009}00009\ \textcolor{comment}{//\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00010}00010\ \textcolor{comment}{//\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above}}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00011}00011\ \textcolor{comment}{//\ copyright\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer}}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00012}00012\ \textcolor{comment}{//\ in\ the\ documentation\ and/or\ other\ materials\ provided\ with\ the}}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00013}00013\ \textcolor{comment}{//\ distribution.}}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00014}00014\ \textcolor{comment}{//\ \ \ \ \ *\ Neither\ the\ name\ of\ Google\ Inc.\ nor\ the\ names\ of\ its}}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00015}00015\ \textcolor{comment}{//\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products\ derived\ from}}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00016}00016\ \textcolor{comment}{//\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00017}00017\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00018}00018\ \textcolor{comment}{//\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS}}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00019}00019\ \textcolor{comment}{//\ "{}AS\ IS"{}\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00020}00020\ \textcolor{comment}{//\ LIMITED\ TO,\ THE\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR}}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00021}00021\ \textcolor{comment}{//\ A\ PARTICULAR\ PURPOSE\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ THE\ COPYRIGHT}}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00022}00022\ \textcolor{comment}{//\ OWNER\ OR\ CONTRIBUTORS\ BE\ LIABLE\ FOR\ ANY\ DIRECT,\ INDIRECT,\ INCIDENTAL,}}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00023}00023\ \textcolor{comment}{//\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES\ (INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00024}00024\ \textcolor{comment}{//\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;\ LOSS\ OF\ USE,}}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00025}00025\ \textcolor{comment}{//\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND\ ON\ ANY}}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00026}00026\ \textcolor{comment}{//\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00027}00027\ \textcolor{comment}{//\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE}}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00028}00028\ \textcolor{comment}{//\ OF\ THIS\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00030}00030\ \textcolor{comment}{//\ A\ sample\ program\ demonstrating\ using\ Google\ C++\ testing\ framework.}}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00031}00031\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00032}00032\ \textcolor{comment}{//\ Author:\ wan@google.com\ (Zhanyong\ Wan)}}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00034}00034\ \textcolor{preprocessor}{\#ifndef\ GTEST\_SAMPLES\_SAMPLE2\_H\_}}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00035}00035\ \textcolor{preprocessor}{\#define\ GTEST\_SAMPLES\_SAMPLE2\_H\_}}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00037}00037\ \textcolor{preprocessor}{\#include\ <string.h>}}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00040}00040\ \textcolor{comment}{//\ A\ simple\ string\ class.}}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00041}\mbox{\hyperlink{class_my_string}{00041}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_my_string}{MyString}}\ \{}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00042}00042\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00043}00043\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ c\_string\_;}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00044}00044\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_my_string}{MyString}}\&\ operator=(\textcolor{keyword}{const}\ \mbox{\hyperlink{class_my_string}{MyString}}\&\ rhs);}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00046}00046\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00047}00047\ \ \ \textcolor{comment}{//\ Clones\ a\ 0-\/terminated\ C\ string,\ allocating\ memory\ using\ new.}}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00048}00048\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{class_my_string_a40753dcfa3314a8993f32bdd75d67ce2}{CloneCString}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ a\_c\_string);}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00051}00051\ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00052}00052\ \ \ \textcolor{comment}{//\ C'tors}}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00054}00054\ \ \ \textcolor{comment}{//\ The\ default\ c'tor\ constructs\ a\ NULL\ string.}}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00055}\mbox{\hyperlink{class_my_string_a1cb17852b83614394b59720779c5f918}{00055}}\ \ \ \mbox{\hyperlink{class_my_string_a1cb17852b83614394b59720779c5f918}{MyString}}()\ :\ c\_string\_(NULL)\ \{\}}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00057}00057\ \ \ \textcolor{comment}{//\ Constructs\ a\ MyString\ by\ cloning\ a\ 0-\/terminated\ C\ string.}}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00058}\mbox{\hyperlink{class_my_string_a28134eb91b6698f46b12accefa157d0f}{00058}}\ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{class_my_string_a28134eb91b6698f46b12accefa157d0f}{MyString}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ a\_c\_string)\ :\ c\_string\_(NULL)\ \{}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00059}00059\ \ \ \ \ \mbox{\hyperlink{class_my_string_a521c4cd7eccac6ce554d8a51505e4970}{Set}}(a\_c\_string);}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00060}00060\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00062}00062\ \ \ \textcolor{comment}{//\ Copy\ c'tor}}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00063}\mbox{\hyperlink{class_my_string_ae24c7cf89a58dd2287303df2ac054c66}{00063}}\ \ \ \mbox{\hyperlink{class_my_string_ae24c7cf89a58dd2287303df2ac054c66}{MyString}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{class_my_string}{MyString}}\&\ \textcolor{keywordtype}{string})\ :\ c\_string\_(NULL)\ \{}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00064}00064\ \ \ \ \ \mbox{\hyperlink{class_my_string_a521c4cd7eccac6ce554d8a51505e4970}{Set}}(\textcolor{keywordtype}{string}.c\_string\_);}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00065}00065\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00068}00068\ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00069}00069\ \ \ \textcolor{comment}{//\ D'tor.\ \ MyString\ is\ intended\ to\ be\ a\ final\ class,\ so\ the\ d'tor}}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00070}00070\ \ \ \textcolor{comment}{//\ doesn't\ need\ to\ be\ virtual.}}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00071}\mbox{\hyperlink{class_my_string_a7bee4fe8ad82a0b7b8f65b02054b156b}{00071}}\ \ \ \mbox{\hyperlink{class_my_string_a7bee4fe8ad82a0b7b8f65b02054b156b}{\string~MyString}}()\ \{\ \textcolor{keyword}{delete}[]\ c\_string\_;\ \}}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00073}00073\ \ \ \textcolor{comment}{//\ Gets\ the\ 0-\/terminated\ C\ string\ this\ MyString\ object\ represents.}}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00074}\mbox{\hyperlink{class_my_string_a9aaa3c66a6f423219d7a9449699a30e8}{00074}}\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{class_my_string_a9aaa3c66a6f423219d7a9449699a30e8}{c\_string}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ c\_string\_;\ \}}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00075}00075\ }
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00076}\mbox{\hyperlink{class_my_string_a4eb168b1ec401a732b3859abe004d648}{00076}}\ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{class_my_string_a4eb168b1ec401a732b3859abe004d648}{Length}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00077}00077\ \ \ \ \ \textcolor{keywordflow}{return}\ c\_string\_\ ==\ NULL\ ?\ 0\ :\ strlen(c\_string\_);}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00078}00078\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00080}00080\ \ \ \textcolor{comment}{//\ Sets\ the\ 0-\/terminated\ C\ string\ this\ MyString\ object\ represents.}}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00081}00081\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_my_string_a521c4cd7eccac6ce554d8a51505e4970}{Set}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{class_my_string_a9aaa3c66a6f423219d7a9449699a30e8}{c\_string}});}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00082}00082\ \};}
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00083}00083\ }
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00084}00084\ }
+\DoxyCodeLine{\Hypertarget{sample2_8h_source_l00085}00085\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_SAMPLES\_SAMPLE2\_H\_}}
+
+\end{DoxyCode}

@@ -1,0 +1,38 @@
+<map id="libraries/wasm&#45;jit/Include/Inline/Serialization.h" name="libraries/wasm&#45;jit/Include/Inline/Serialization.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="251,5,440,46"/>
+<area shape="rect" id="Node000002" href="$wasm-jit_2_include_2_platform_2platform_8h.html" title=" " alt="" coords="220,109,354,135"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="336,48,304,97,300,95,331,45"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="35,198,93,223"/>
+<area shape="poly" id="edge17_Node000001_Node000003" title=" " alt="" coords="251,36,182,44,112,56,53,73,31,84,17,96,10,108,8,120,17,149,27,168,41,185,37,188,23,171,12,151,3,121,4,107,13,92,28,79,51,68,111,50,181,38,251,30"/>
+<area shape="rect" id="Node000014" href="$wasm__sysio__constraints_8hpp.html" title=" " alt="" coords="27,94,195,150"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="297,49,194,90,192,85,295,44"/>
+<area shape="rect" id="Node000015" title=" " alt="" coords="377,109,431,135"/>
+<area shape="poly" id="edge16_Node000001_Node000015" title=" " alt="" coords="360,45,391,95,387,97,355,48"/>
+<area shape="rect" id="Node000016" title=" " alt="" coords="455,109,519,135"/>
+<area shape="poly" id="edge18_Node000001_Node000016" title=" " alt="" coords="377,44,457,98,454,102,374,49"/>
+<area shape="rect" id="Node000017" title=" " alt="" coords="543,109,617,135"/>
+<area shape="poly" id="edge19_Node000001_Node000017" title=" " alt="" coords="407,44,532,92,547,99,545,104,530,96,406,49"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="256,138,108,195,106,190,254,133"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="117,198,195,223"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="270,137,189,191,186,187,267,133"/>
+<area shape="rect" id="Node000005" href="$_basic_types_8h.html" title=" " alt="" coords="219,198,354,223"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="289,135,289,182,284,182,284,135"/>
+<area shape="rect" id="Node000008" href="$_errors_8h.html" title=" " alt="" coords="452,198,554,223"/>
+<area shape="poly" id="edge7_Node000002_Node000008" title=" " alt="" coords="318,133,459,189,457,194,316,138"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="257,271,317,297"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="289,224,289,256,284,256,284,224"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="168,271,232,297"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="274,226,228,263,225,259,270,222"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="699,271,768,297"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="543,221,685,265,684,270,541,226"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="341,271,409,297"/>
+<area shape="poly" id="edge9_Node000008_Node000010" title=" " alt="" coords="482,226,411,266,409,261,480,222"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="433,271,490,297"/>
+<area shape="poly" id="edge10_Node000008_Node000011" title=" " alt="" coords="498,225,478,259,474,256,494,222"/>
+<area shape="rect" id="Node000012" title=" " alt="" coords="513,271,572,297"/>
+<area shape="poly" id="edge11_Node000008_Node000012" title=" " alt="" coords="512,222,531,257,526,259,507,225"/>
+<area shape="rect" id="Node000013" title=" " alt="" coords="597,271,675,297"/>
+<area shape="poly" id="edge12_Node000008_Node000013" title=" " alt="" coords="527,222,601,261,599,266,524,226"/>
+<area shape="poly" id="edge15_Node000014_Node000003" title=" " alt="" coords="99,151,80,185,76,183,94,149"/>
+<area shape="poly" id="edge14_Node000014_Node000004" title=" " alt="" coords="127,149,145,182,140,185,123,151"/>
+</map>

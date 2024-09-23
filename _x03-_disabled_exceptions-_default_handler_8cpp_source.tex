@@ -1,0 +1,29 @@
+\doxysection{X03-\/\+Disabled\+Exceptions-\/\+Default\+Handler.cpp}
+\hypertarget{_x03-_disabled_exceptions-_default_handler_8cpp_source}{}\label{_x03-_disabled_exceptions-_default_handler_8cpp_source}\index{libraries/sys-\/vm/external/Catch2/projects/ExtraTests/X03-\/DisabledExceptions-\/DefaultHandler.cpp@{libraries/sys-\/vm/external/Catch2/projects/ExtraTests/X03-\/DisabledExceptions-\/DefaultHandler.cpp}}
+\mbox{\hyperlink{_x03-_disabled_exceptions-_default_handler_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_x03-_disabled_exceptions-_default_handler_8cpp_source_l00001}\mbox{\hyperlink{_x03-_disabled_exceptions-_default_handler_8cpp_a656eb5868e824d59f489f910db438420}{00001}}\ \textcolor{preprocessor}{\#define\ CATCH\_CONFIG\_MAIN}}
+\DoxyCodeLine{\Hypertarget{_x03-_disabled_exceptions-_default_handler_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{single__include_2catch2_2catch_8hpp}{catch2/catch.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{_x03-_disabled_exceptions-_default_handler_8cpp_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{_x03-_disabled_exceptions-_default_handler_8cpp_source_l00004}\mbox{\hyperlink{_x03-_disabled_exceptions-_default_handler_8cpp_aa07a28d6c769eba97cd7de6231431d3d}{00004}}\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\textcolor{stringliteral}{"{}Tests\ that\ run"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{_x03-_disabled_exceptions-_default_handler_8cpp_source_l00005}00005\ \ \ \ \ \textcolor{comment}{//\ All\ of\ these\ should\ be\ run\ and\ be\ reported}}
+\DoxyCodeLine{\Hypertarget{_x03-_disabled_exceptions-_default_handler_8cpp_source_l00006}00006\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(1\ ==\ 2);}
+\DoxyCodeLine{\Hypertarget{_x03-_disabled_exceptions-_default_handler_8cpp_source_l00007}00007\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(1\ ==\ 1);}
+\DoxyCodeLine{\Hypertarget{_x03-_disabled_exceptions-_default_handler_8cpp_source_l00008}00008\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(1\ !=\ 3);}
+\DoxyCodeLine{\Hypertarget{_x03-_disabled_exceptions-_default_handler_8cpp_source_l00009}00009\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(1\ ==\ 4);}
+\DoxyCodeLine{\Hypertarget{_x03-_disabled_exceptions-_default_handler_8cpp_source_l00010}00010\ \}}
+\DoxyCodeLine{\Hypertarget{_x03-_disabled_exceptions-_default_handler_8cpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{_x03-_disabled_exceptions-_default_handler_8cpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{_x03-_disabled_exceptions-_default_handler_8cpp_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{_x03-_disabled_exceptions-_default_handler_8cpp_source_l00014}\mbox{\hyperlink{_x03-_disabled_exceptions-_default_handler_8cpp_a6bee8da195893a3daf97a491f19c73c0}{00014}}\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\textcolor{stringliteral}{"{}Tests\ that\ abort"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{_x03-_disabled_exceptions-_default_handler_8cpp_source_l00015}00015\ \ \ \ \ \textcolor{comment}{//\ Avoid\ abort\ and\ other\ exceptional\ exits\ -\/-\/\ there\ is\ no\ way}}
+\DoxyCodeLine{\Hypertarget{_x03-_disabled_exceptions-_default_handler_8cpp_source_l00016}00016\ \ \ \ \ \textcolor{comment}{//\ to\ tell\ CMake\ that\ abort\ is\ the\ desired\ outcome\ of\ a\ test.}}
+\DoxyCodeLine{\Hypertarget{_x03-_disabled_exceptions-_default_handler_8cpp_source_l00017}00017\ \ \ \ \ std::set\_terminate([]()\{exit(1);\});}
+\DoxyCodeLine{\Hypertarget{_x03-_disabled_exceptions-_default_handler_8cpp_source_l00018}00018\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(1\ ==\ 1);}
+\DoxyCodeLine{\Hypertarget{_x03-_disabled_exceptions-_default_handler_8cpp_source_l00019}00019\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(1\ !=\ 2);}
+\DoxyCodeLine{\Hypertarget{_x03-_disabled_exceptions-_default_handler_8cpp_source_l00020}00020\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(1\ ==\ 3);}
+\DoxyCodeLine{\Hypertarget{_x03-_disabled_exceptions-_default_handler_8cpp_source_l00021}00021\ \ \ \ \ \textcolor{comment}{//\ We\ should\ not\ get\ here,\ because\ the\ test\ above\ aborts}}
+\DoxyCodeLine{\Hypertarget{_x03-_disabled_exceptions-_default_handler_8cpp_source_l00022}00022\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(1\ !=\ 4);}
+\DoxyCodeLine{\Hypertarget{_x03-_disabled_exceptions-_default_handler_8cpp_source_l00023}00023\ \}}
+
+\end{DoxyCode}

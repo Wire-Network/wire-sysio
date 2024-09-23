@@ -1,0 +1,64 @@
+\doxysection{sysio\+::detail Namespace Reference}
+\hypertarget{namespacesysio_1_1detail}{}\label{namespacesysio_1_1detail}\index{sysio::detail@{sysio::detail}}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1detail_1_1abstract__conn}{abstract\+\_\+conn}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1detail_1_1asio__local__with__stub__log}{asio\+\_\+local\+\_\+with\+\_\+stub\+\_\+log}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1detail_1_1asio__with__stub__log}{asio\+\_\+with\+\_\+stub\+\_\+log}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1detail_1_1net__api__plugin__empty}{net\+\_\+api\+\_\+plugin\+\_\+empty}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1detail_1_1producer__api__plugin__response}{producer\+\_\+api\+\_\+plugin\+\_\+response}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1detail_1_1txn__test__gen__empty}{txn\+\_\+test\+\_\+gen\+\_\+empty}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1detail_1_1txn__test__gen__status}{txn\+\_\+test\+\_\+gen\+\_\+status}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1detail_1_1wallet__api__plugin__empty}{wallet\+\_\+api\+\_\+plugin\+\_\+empty}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1detail_a82b57dc6a62fb7b0a6ee7fb7cd596f4c}{abstract\+\_\+conn\+\_\+ptr}} = std\+::shared\+\_\+ptr$<$\mbox{\hyperlink{structsysio_1_1detail_1_1abstract__conn}{abstract\+\_\+conn}}$>$
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\using \mbox{\hyperlink{namespacesysio_1_1detail_aad9410be87036ae969dc328050560d6a}{connection\+\_\+ptr}} = typename \mbox{\hyperlink{classwebsocketpp_1_1server}{websocketpp\+::server}}$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$\mbox{\hyperlink{debug__client_8cpp_ae9c9779aea742ab80689add7e553df0d}{\+::connection\+\_\+ptr}}
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1detail_a69779241e30dfcc06bd60e313d84f78a}{internal\+\_\+url\+\_\+handler}} = std\+::function$<$void(\mbox{\hyperlink{namespacesysio_1_1detail_a82b57dc6a62fb7b0a6ee7fb7cd596f4c}{abstract\+\_\+conn\+\_\+ptr}}, \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}}, \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}}, \mbox{\hyperlink{namespacesysio_ababf376b47a253805b530a023df4768c}{url\+\_\+response\+\_\+callback}})$>$
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{namespacesysio_1_1detail_a82b57dc6a62fb7b0a6ee7fb7cd596f4c}\index{sysio::detail@{sysio::detail}!abstract\_conn\_ptr@{abstract\_conn\_ptr}}
+\index{abstract\_conn\_ptr@{abstract\_conn\_ptr}!sysio::detail@{sysio::detail}}
+\doxysubsubsection{\texorpdfstring{abstract\_conn\_ptr}{abstract\_conn\_ptr}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1detail_a82b57dc6a62fb7b0a6ee7fb7cd596f4c} 
+using \mbox{\hyperlink{namespacesysio_1_1detail_a82b57dc6a62fb7b0a6ee7fb7cd596f4c}{sysio\+::detail\+::abstract\+\_\+conn\+\_\+ptr}} = std\+::shared\+\_\+ptr$<$\mbox{\hyperlink{structsysio_1_1detail_1_1abstract__conn}{abstract\+\_\+conn}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{http__plugin_8cpp_source_l00137}{137}} of file \mbox{\hyperlink{http__plugin_8cpp_source}{http\+\_\+plugin.\+cpp}}.
+
+\Hypertarget{namespacesysio_1_1detail_aad9410be87036ae969dc328050560d6a}\index{sysio::detail@{sysio::detail}!connection\_ptr@{connection\_ptr}}
+\index{connection\_ptr@{connection\_ptr}!sysio::detail@{sysio::detail}}
+\doxysubsubsection{\texorpdfstring{connection\_ptr}{connection\_ptr}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1detail_aad9410be87036ae969dc328050560d6a} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+using \mbox{\hyperlink{namespacesysio_1_1detail_aad9410be87036ae969dc328050560d6a}{sysio\+::detail\+::connection\+\_\+ptr}} = typename \mbox{\hyperlink{classwebsocketpp_1_1server}{websocketpp\+::server}}$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$\mbox{\hyperlink{debug__client_8cpp_ae9c9779aea742ab80689add7e553df0d}{\+::connection\+\_\+ptr}}}
+
+
+
+Definition at line \mbox{\hyperlink{http__plugin_8cpp_source_l00140}{140}} of file \mbox{\hyperlink{http__plugin_8cpp_source}{http\+\_\+plugin.\+cpp}}.
+
+\Hypertarget{namespacesysio_1_1detail_a69779241e30dfcc06bd60e313d84f78a}\index{sysio::detail@{sysio::detail}!internal\_url\_handler@{internal\_url\_handler}}
+\index{internal\_url\_handler@{internal\_url\_handler}!sysio::detail@{sysio::detail}}
+\doxysubsubsection{\texorpdfstring{internal\_url\_handler}{internal\_url\_handler}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1detail_a69779241e30dfcc06bd60e313d84f78a} 
+using \mbox{\hyperlink{namespacesysio_1_1detail_a69779241e30dfcc06bd60e313d84f78a}{sysio\+::detail\+::internal\+\_\+url\+\_\+handler}} = std\+::function$<$void(\mbox{\hyperlink{namespacesysio_1_1detail_a82b57dc6a62fb7b0a6ee7fb7cd596f4c}{abstract\+\_\+conn\+\_\+ptr}}, \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}}, \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}}, \mbox{\hyperlink{namespacesysio_ababf376b47a253805b530a023df4768c}{url\+\_\+response\+\_\+callback}})$>$}
+
+internal url handler that contains more parameters than the handlers provided by external systems 
+
+Definition at line \mbox{\hyperlink{http__plugin_8cpp_source_l00145}{145}} of file \mbox{\hyperlink{http__plugin_8cpp_source}{http\+\_\+plugin.\+cpp}}.
+

@@ -1,0 +1,13 @@
+<map id="fc::crypto::r1::public_key::serialize" name="fc::crypto::r1::public_key::serialize">
+<area shape="rect" id="Node000001" title=" " alt="" coords="213,158,350,199"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1testing_1_1mock_1_1webauthn__private__key.html#aea8772215cc3512d70b352a50a990fdb" title=" " alt="" coords="5,5,165,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="248,149,209,112,163,75,145,64,147,59,166,71,212,108,252,145"/>
+<area shape="rect" id="Node000003" href="$classfc_1_1crypto_1_1r1_1_1public__key.html#a18ba35da2c30240b690d704389f3287c" title=" " alt="" coords="14,85,156,141"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="203,155,156,139,157,134,205,150"/>
+<area shape="rect" id="Node000004" href="$namespacefc_1_1raw.html#a7bdf702cd32dd7050ab6c0b29a28a0e2" title=" " alt="" coords="36,166,134,191"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="198,181,134,181,134,176,198,176"/>
+<area shape="rect" id="Node000005" href="$classfc_1_1crypto_1_1r1_1_1public__key.html#a551039afa115c4e78d812945454dd1a8" title="Allows to convert current public key object into base58 number." alt="" coords="16,216,154,256"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="199,205,154,218,153,213,197,200"/>
+<area shape="rect" id="Node000006" href="$namespacefc.html#a76c04110e74473afe1c5378b9e1e2232" title=" " alt="" coords="36,280,134,306"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="249,211,210,242,166,270,135,283,133,278,163,265,207,238,245,207"/>
+</map>

@@ -1,0 +1,344 @@
+\doxysection{appbase\+::plugin\texorpdfstring{$<$}{<} Impl \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classappbase_1_1plugin}{}\label{classappbase_1_1plugin}\index{appbase::plugin$<$ Impl $>$@{appbase::plugin$<$ Impl $>$}}
+
+
+{\ttfamily \#include $<$application.\+hpp$>$}
+
+
+
+Inheritance diagram for appbase\+::plugin\texorpdfstring{$<$}{<} Impl \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=205pt]{classappbase_1_1plugin__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for appbase\+::plugin\texorpdfstring{$<$}{<} Impl \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=205pt]{classappbase_1_1plugin__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classappbase_1_1plugin_a3cf5509f2854ffb274018dca8606c50a}{plugin}} ()
+\item 
+virtual \mbox{\hyperlink{classappbase_1_1plugin_a6c83bcf2c8ee3de87593824da807e4ba}{\texorpdfstring{$\sim$}{\string~}plugin}} ()
+\item 
+virtual \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408}{state}} \mbox{\hyperlink{classappbase_1_1plugin_a857288c2424b57a898c0579d25dacbb0}{get\+\_\+state}} () const override
+\item 
+virtual const std\+::string \& \mbox{\hyperlink{classappbase_1_1plugin_a274f072d2f7f37d43ae74e01edd0ba62}{name}} () const override
+\item 
+virtual void \mbox{\hyperlink{classappbase_1_1plugin_a6a0cd7ccc873527ebb5e6716b249ea17}{register\+\_\+dependencies}} ()
+\item 
+virtual void \mbox{\hyperlink{classappbase_1_1plugin_ac28755a82831d41e5d0ef0ce56b10fa9}{initialize}} (const variables\+\_\+map \&options) override
+\item 
+virtual void \mbox{\hyperlink{classappbase_1_1plugin_ab314bd778e71a91de584cd9b8a999867}{handle\+\_\+sighup}} () override
+\item 
+virtual void \mbox{\hyperlink{classappbase_1_1plugin_a10e4e1c582bfadf67f510df76d87abfd}{startup}} () override
+\item 
+virtual void \mbox{\hyperlink{classappbase_1_1plugin_a21e5be5587fca41fbc91367d449b8f27}{shutdown}} () override
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classappbase_1_1abstract__plugin}{appbase\+::abstract\+\_\+plugin}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4643a2618ac94aa2ef56e59fe363f828}{\texorpdfstring{$\sim$}{\string~}abstract\+\_\+plugin}} ()
+\item 
+virtual void \mbox{\hyperlink{classappbase_1_1abstract__plugin_a274a3c7462de3c699a8eb23741ed7655}{set\+\_\+program\+\_\+options}} (options\+\_\+description \&\mbox{\hyperlink{xbyak__mnemonic_8h_a4229a9b84f8b8673326f12bd41acd27c}{cli}}, options\+\_\+description \&cfg)=0
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classappbase_1_1plugin_a51f43c3c64ab8524928698a72a186822}{plugin}} (const string \&\mbox{\hyperlink{classappbase_1_1plugin_a274f072d2f7f37d43ae74e01edd0ba62}{name}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Public Types inherited from \mbox{\hyperlink{classappbase_1_1abstract__plugin}{appbase\+::abstract\+\_\+plugin}}}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408}{state}} \{ \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408ac712ce3482a78b8bf87080aefd77cf7d}{registered}}
+, \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408a9ae208bba76e9c0eab1cac52953f947b}{initialized}}
+, \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408a808ebbf475942017567644697eca3224}{started}}
+, \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408a320c2eebb5306f385aebfca07336d29e}{stopped}}
+ \}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Impl$>$\newline
+class appbase\+::plugin$<$ Impl $>$}
+
+
+Definition at line \mbox{\hyperlink{plugin_8hpp_source_l00048}{48}} of file \mbox{\hyperlink{plugin_8hpp_source}{plugin.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classappbase_1_1plugin_a3cf5509f2854ffb274018dca8606c50a}\index{appbase::plugin$<$ Impl $>$@{appbase::plugin$<$ Impl $>$}!plugin@{plugin}}
+\index{plugin@{plugin}!appbase::plugin$<$ Impl $>$@{appbase::plugin$<$ Impl $>$}}
+\doxysubsubsection{\texorpdfstring{plugin()}{plugin()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classappbase_1_1plugin_a3cf5509f2854ffb274018dca8606c50a} 
+template$<$typename Impl $>$ \\
+\mbox{\hyperlink{classappbase_1_1plugin}{appbase\+::plugin}}$<$ Impl $>$\+::plugin (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{application_8hpp_source_l00284}{284}} of file \mbox{\hyperlink{application_8hpp_source}{application.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00284\ :\_name(boost::core::demangle(\textcolor{keyword}{typeid}(Impl).\mbox{\hyperlink{classappbase_1_1plugin_a274f072d2f7f37d43ae74e01edd0ba62}{name}}()))\{\}}
+
+\end{DoxyCode}
+\Hypertarget{classappbase_1_1plugin_a6c83bcf2c8ee3de87593824da807e4ba}\index{appbase::plugin$<$ Impl $>$@{appbase::plugin$<$ Impl $>$}!````~plugin@{\texorpdfstring{$\sim$}{\string~}plugin}}
+\index{````~plugin@{\texorpdfstring{$\sim$}{\string~}plugin}!appbase::plugin$<$ Impl $>$@{appbase::plugin$<$ Impl $>$}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}plugin()}{\string~plugin()}}
+{\footnotesize\ttfamily \label{classappbase_1_1plugin_a6c83bcf2c8ee3de87593824da807e4ba} 
+template$<$typename Impl $>$ \\
+virtual \mbox{\hyperlink{classappbase_1_1plugin}{appbase\+::plugin}}$<$ Impl $>$\+::\texorpdfstring{$\sim$}{\string~}\mbox{\hyperlink{classappbase_1_1plugin}{plugin}} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{application_8hpp_source_l00285}{285}} of file \mbox{\hyperlink{application_8hpp_source}{application.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00285\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classappbase_1_1plugin_a51f43c3c64ab8524928698a72a186822}\index{appbase::plugin$<$ Impl $>$@{appbase::plugin$<$ Impl $>$}!plugin@{plugin}}
+\index{plugin@{plugin}!appbase::plugin$<$ Impl $>$@{appbase::plugin$<$ Impl $>$}}
+\doxysubsubsection{\texorpdfstring{plugin()}{plugin()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classappbase_1_1plugin_a51f43c3c64ab8524928698a72a186822} 
+template$<$typename Impl $>$ \\
+\mbox{\hyperlink{classappbase_1_1plugin}{appbase\+::plugin}}$<$ Impl $>$\+::plugin (\begin{DoxyParamCaption}\item[{const string \&}]{name}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{application_8hpp_source_l00327}{327}} of file \mbox{\hyperlink{application_8hpp_source}{application.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00327\ :\ \_name(\mbox{\hyperlink{classappbase_1_1plugin_a274f072d2f7f37d43ae74e01edd0ba62}{name}})\{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classappbase_1_1plugin_a857288c2424b57a898c0579d25dacbb0}\index{appbase::plugin$<$ Impl $>$@{appbase::plugin$<$ Impl $>$}!get\_state@{get\_state}}
+\index{get\_state@{get\_state}!appbase::plugin$<$ Impl $>$@{appbase::plugin$<$ Impl $>$}}
+\doxysubsubsection{\texorpdfstring{get\_state()}{get\_state()}}
+{\footnotesize\ttfamily \label{classappbase_1_1plugin_a857288c2424b57a898c0579d25dacbb0} 
+template$<$typename Impl $>$ \\
+virtual \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408}{state}} \mbox{\hyperlink{classappbase_1_1plugin}{appbase\+::plugin}}$<$ Impl $>$\+::get\+\_\+state (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classappbase_1_1abstract__plugin_a8a035293a88d04abf64883c45ac466a5}{appbase\+::abstract\+\_\+plugin}}.
+
+
+
+Definition at line \mbox{\hyperlink{application_8hpp_source_l00287}{287}} of file \mbox{\hyperlink{application_8hpp_source}{application.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00287\ \{\ \textcolor{keywordflow}{return}\ \_state;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classappbase_1_1plugin_a857288c2424b57a898c0579d25dacbb0_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classappbase_1_1plugin_ab314bd778e71a91de584cd9b8a999867}\index{appbase::plugin$<$ Impl $>$@{appbase::plugin$<$ Impl $>$}!handle\_sighup@{handle\_sighup}}
+\index{handle\_sighup@{handle\_sighup}!appbase::plugin$<$ Impl $>$@{appbase::plugin$<$ Impl $>$}}
+\doxysubsubsection{\texorpdfstring{handle\_sighup()}{handle\_sighup()}}
+{\footnotesize\ttfamily \label{classappbase_1_1plugin_ab314bd778e71a91de584cd9b8a999867} 
+template$<$typename Impl $>$ \\
+virtual void \mbox{\hyperlink{classappbase_1_1plugin}{appbase\+::plugin}}$<$ Impl $>$\+::handle\+\_\+sighup (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classappbase_1_1abstract__plugin_a3baa35cd2c37e965677d45d7aa3c4503}{appbase\+::abstract\+\_\+plugin}}.
+
+
+
+Reimplemented in \mbox{\hyperlink{classsysio_1_1chain__plugin_af289b36dc5f753a772617ff3603090df}{sysio\+::chain\+\_\+plugin}}, \mbox{\hyperlink{classsysio_1_1http__plugin_af06f52d9b86dc41618f6392a4c0640a5}{sysio\+::http\+\_\+plugin}}, \mbox{\hyperlink{classsysio_1_1net__plugin_a961ce31b4538d04eac61b299bc970621}{sysio\+::net\+\_\+plugin}}, \mbox{\hyperlink{classsysio_1_1producer__plugin_a9c78e75e5222bbb493a5c1fb0919a9e2}{sysio\+::producer\+\_\+plugin}}, \mbox{\hyperlink{classsysio_1_1trace__api__plugin_aca24a14fa319b5bed80374e065c4302f}{sysio\+::trace\+\_\+api\+\_\+plugin}}, and \mbox{\hyperlink{classsysio_1_1trace__api__rpc__plugin_ae61f78d2d9607ca4ad43e998e8d6600e}{sysio\+::trace\+\_\+api\+\_\+rpc\+\_\+plugin}}.
+
+
+
+Definition at line \mbox{\hyperlink{application_8hpp_source_l00305}{305}} of file \mbox{\hyperlink{application_8hpp_source}{application.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00305\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00306\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classappbase_1_1plugin_ac28755a82831d41e5d0ef0ce56b10fa9}\index{appbase::plugin$<$ Impl $>$@{appbase::plugin$<$ Impl $>$}!initialize@{initialize}}
+\index{initialize@{initialize}!appbase::plugin$<$ Impl $>$@{appbase::plugin$<$ Impl $>$}}
+\doxysubsubsection{\texorpdfstring{initialize()}{initialize()}}
+{\footnotesize\ttfamily \label{classappbase_1_1plugin_ac28755a82831d41e5d0ef0ce56b10fa9} 
+template$<$typename Impl $>$ \\
+virtual void \mbox{\hyperlink{classappbase_1_1plugin}{appbase\+::plugin}}$<$ Impl $>$\+::initialize (\begin{DoxyParamCaption}\item[{const variables\+\_\+map \&}]{options}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+if initial state was not registered, final state cannot be initialized
+
+Implements \mbox{\hyperlink{classappbase_1_1abstract__plugin_a7d8521f978f28ee7689ae336afd64a34}{appbase\+::abstract\+\_\+plugin}}.
+
+
+
+Definition at line \mbox{\hyperlink{application_8hpp_source_l00294}{294}} of file \mbox{\hyperlink{application_8hpp_source}{application.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00294\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00295\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\_state\ ==\ \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408ac712ce3482a78b8bf87080aefd77cf7d}{registered}})\ \{}
+\DoxyCodeLine{00296\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_state\ =\ \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408a9ae208bba76e9c0eab1cac52953f947b}{initialized}};}
+\DoxyCodeLine{00297\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}Impl*\textcolor{keyword}{>}(\textcolor{keyword}{this})-\/>plugin\_requires([\&](\textcolor{keyword}{auto}\&\ plug)\{\ plug.initialize(options);\ \});}
+\DoxyCodeLine{00298\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}Impl*\textcolor{keyword}{>}(\textcolor{keyword}{this})-\/>plugin\_initialize(options);}
+\DoxyCodeLine{00299\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//ilog(\ "{}initializing\ plugin\ \$\{name\}"{},\ ("{}name"{},name())\ );}}
+\DoxyCodeLine{00300\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_a110137cd2c59d1d998750eeb28443b5d}{plugin\_initialized}}(*\textcolor{keyword}{this});}
+\DoxyCodeLine{00301\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00302\ \ \ \ \ \ \ \ \ \ \ \ \ assert(\_state\ ==\ \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408a9ae208bba76e9c0eab1cac52953f947b}{initialized}});\ }
+\DoxyCodeLine{00303\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classappbase_1_1plugin_ac28755a82831d41e5d0ef0ce56b10fa9_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classappbase_1_1plugin_ac28755a82831d41e5d0ef0ce56b10fa9_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classappbase_1_1plugin_a274f072d2f7f37d43ae74e01edd0ba62}\index{appbase::plugin$<$ Impl $>$@{appbase::plugin$<$ Impl $>$}!name@{name}}
+\index{name@{name}!appbase::plugin$<$ Impl $>$@{appbase::plugin$<$ Impl $>$}}
+\doxysubsubsection{\texorpdfstring{name()}{name()}}
+{\footnotesize\ttfamily \label{classappbase_1_1plugin_a274f072d2f7f37d43ae74e01edd0ba62} 
+template$<$typename Impl $>$ \\
+virtual const std\+::string \& \mbox{\hyperlink{classappbase_1_1plugin}{appbase\+::plugin}}$<$ Impl $>$\+::name (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classappbase_1_1abstract__plugin_a5b77f67ec26f81a9fc24213bce4fcbf5}{appbase\+::abstract\+\_\+plugin}}.
+
+
+
+Definition at line \mbox{\hyperlink{application_8hpp_source_l00288}{288}} of file \mbox{\hyperlink{application_8hpp_source}{application.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00288\ \{\ \textcolor{keywordflow}{return}\ \_name;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classappbase_1_1plugin_a274f072d2f7f37d43ae74e01edd0ba62_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classappbase_1_1plugin_a6a0cd7ccc873527ebb5e6716b249ea17}\index{appbase::plugin$<$ Impl $>$@{appbase::plugin$<$ Impl $>$}!register\_dependencies@{register\_dependencies}}
+\index{register\_dependencies@{register\_dependencies}!appbase::plugin$<$ Impl $>$@{appbase::plugin$<$ Impl $>$}}
+\doxysubsubsection{\texorpdfstring{register\_dependencies()}{register\_dependencies()}}
+{\footnotesize\ttfamily \label{classappbase_1_1plugin_a6a0cd7ccc873527ebb5e6716b249ea17} 
+template$<$typename Impl $>$ \\
+virtual void \mbox{\hyperlink{classappbase_1_1plugin}{appbase\+::plugin}}$<$ Impl $>$\+::register\+\_\+dependencies (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{application_8hpp_source_l00290}{290}} of file \mbox{\hyperlink{application_8hpp_source}{application.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00290\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00291\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}Impl*\textcolor{keyword}{>}(\textcolor{keyword}{this})-\/>plugin\_requires([\&](\textcolor{keyword}{auto}\&\ plug)\{\});}
+\DoxyCodeLine{00292\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classappbase_1_1plugin_a21e5be5587fca41fbc91367d449b8f27}\index{appbase::plugin$<$ Impl $>$@{appbase::plugin$<$ Impl $>$}!shutdown@{shutdown}}
+\index{shutdown@{shutdown}!appbase::plugin$<$ Impl $>$@{appbase::plugin$<$ Impl $>$}}
+\doxysubsubsection{\texorpdfstring{shutdown()}{shutdown()}}
+{\footnotesize\ttfamily \label{classappbase_1_1plugin_a21e5be5587fca41fbc91367d449b8f27} 
+template$<$typename Impl $>$ \\
+virtual void \mbox{\hyperlink{classappbase_1_1plugin}{appbase\+::plugin}}$<$ Impl $>$\+::shutdown (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classappbase_1_1abstract__plugin_ad615b1c385c4cb047e8adbe2e5a13322}{appbase\+::abstract\+\_\+plugin}}.
+
+
+
+Definition at line \mbox{\hyperlink{application_8hpp_source_l00318}{318}} of file \mbox{\hyperlink{application_8hpp_source}{application.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00318\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00319\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\_state\ ==\ \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408a808ebbf475942017567644697eca3224}{started}})\ \{}
+\DoxyCodeLine{00320\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_state\ =\ \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408a320c2eebb5306f385aebfca07336d29e}{stopped}};}
+\DoxyCodeLine{00321\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//ilog(\ "{}shutting\ down\ plugin\ \$\{name\}"{},\ ("{}name"{},name())\ );}}
+\DoxyCodeLine{00322\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}Impl*\textcolor{keyword}{>}(\textcolor{keyword}{this})-\/>plugin\_shutdown();}
+\DoxyCodeLine{00323\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00324\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classappbase_1_1plugin_a10e4e1c582bfadf67f510df76d87abfd}\index{appbase::plugin$<$ Impl $>$@{appbase::plugin$<$ Impl $>$}!startup@{startup}}
+\index{startup@{startup}!appbase::plugin$<$ Impl $>$@{appbase::plugin$<$ Impl $>$}}
+\doxysubsubsection{\texorpdfstring{startup()}{startup()}}
+{\footnotesize\ttfamily \label{classappbase_1_1plugin_a10e4e1c582bfadf67f510df76d87abfd} 
+template$<$typename Impl $>$ \\
+virtual void \mbox{\hyperlink{classappbase_1_1plugin}{appbase\+::plugin}}$<$ Impl $>$\+::startup (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classappbase_1_1abstract__plugin_addfbf314be55e7a774db7c65c08e58f7}{appbase\+::abstract\+\_\+plugin}}.
+
+
+
+Definition at line \mbox{\hyperlink{application_8hpp_source_l00308}{308}} of file \mbox{\hyperlink{application_8hpp_source}{application.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00308\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00309\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\_state\ ==\ \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408a9ae208bba76e9c0eab1cac52953f947b}{initialized}})\ \{}
+\DoxyCodeLine{00310\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_state\ =\ \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408a808ebbf475942017567644697eca3224}{started}};}
+\DoxyCodeLine{00311\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}Impl*\textcolor{keyword}{>}(\textcolor{keyword}{this})-\/>plugin\_requires([\&](\textcolor{keyword}{auto}\&\ plug)\{\ plug.startup();\ \});}
+\DoxyCodeLine{00312\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}Impl*\textcolor{keyword}{>}(\textcolor{keyword}{this})-\/>plugin\_startup();}
+\DoxyCodeLine{00313\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_ad5635d30c2f520340d58665ed99f8a4d}{plugin\_started}}(*\textcolor{keyword}{this});}
+\DoxyCodeLine{00314\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00315\ \ \ \ \ \ \ \ \ \ \ \ \ assert(\_state\ ==\ \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408a808ebbf475942017567644697eca3224}{started}});\ \textcolor{comment}{//\ if\ initial\ state\ was\ not\ initialized,\ final\ state\ cannot\ be\ started}}
+\DoxyCodeLine{00316\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classappbase_1_1plugin_a10e4e1c582bfadf67f510df76d87abfd_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classappbase_1_1plugin_a10e4e1c582bfadf67f510df76d87abfd_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/appbase/include/appbase/\mbox{\hyperlink{application_8hpp}{application.\+hpp}}\item 
+libraries/appbase/include/appbase/\mbox{\hyperlink{plugin_8hpp}{plugin.\+hpp}}\end{DoxyCompactItemize}

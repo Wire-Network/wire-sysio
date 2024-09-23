@@ -1,0 +1,190 @@
+\doxysection{testing\+::Scoped\+Fake\+Test\+Part\+Result\+Reporter Class Reference}
+\hypertarget{classtesting_1_1_scoped_fake_test_part_result_reporter}{}\label{classtesting_1_1_scoped_fake_test_part_result_reporter}\index{testing::ScopedFakeTestPartResultReporter@{testing::ScopedFakeTestPartResultReporter}}
+
+
+{\ttfamily \#include $<$gtest-\/spi.\+h$>$}
+
+
+
+Inheritance diagram for testing\+::Scoped\+Fake\+Test\+Part\+Result\+Reporter\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=234pt]{classtesting_1_1_scoped_fake_test_part_result_reporter__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for testing\+::Scoped\+Fake\+Test\+Part\+Result\+Reporter\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=234pt]{classtesting_1_1_scoped_fake_test_part_result_reporter__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{classtesting_1_1_scoped_fake_test_part_result_reporter_a82f6209b3cf5c4b15ec8bd8041dbc2d5}{Intercept\+Mode}} \{ \mbox{\hyperlink{classtesting_1_1_scoped_fake_test_part_result_reporter_a82f6209b3cf5c4b15ec8bd8041dbc2d5aed6c5f87d33207768db503526e6a1e8a}{INTERCEPT\+\_\+\+ONLY\+\_\+\+CURRENT\+\_\+\+THREAD}}
+, \mbox{\hyperlink{classtesting_1_1_scoped_fake_test_part_result_reporter_a82f6209b3cf5c4b15ec8bd8041dbc2d5a187f4164aad7fbb9414b263c68a693cd}{INTERCEPT\+\_\+\+ALL\+\_\+\+THREADS}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1_scoped_fake_test_part_result_reporter_aa0100ecf4799fb51d45167be6a5de1d5}{Scoped\+Fake\+Test\+Part\+Result\+Reporter}} (\mbox{\hyperlink{classtesting_1_1_test_part_result_array}{Test\+Part\+Result\+Array}} \texorpdfstring{$\ast$}{*}result)
+\item 
+\mbox{\hyperlink{classtesting_1_1_scoped_fake_test_part_result_reporter_a57cbc09ed48627c8a73e622618dc4b4f}{Scoped\+Fake\+Test\+Part\+Result\+Reporter}} (\mbox{\hyperlink{classtesting_1_1_scoped_fake_test_part_result_reporter_a82f6209b3cf5c4b15ec8bd8041dbc2d5}{Intercept\+Mode}} intercept\+\_\+mode, \mbox{\hyperlink{classtesting_1_1_test_part_result_array}{Test\+Part\+Result\+Array}} \texorpdfstring{$\ast$}{*}result)
+\item 
+virtual \mbox{\hyperlink{classtesting_1_1_scoped_fake_test_part_result_reporter_a4817d59ca70228ebd5d5c3c4e8dd729d}{\texorpdfstring{$\sim$}{\string~}\+Scoped\+Fake\+Test\+Part\+Result\+Reporter}} ()
+\item 
+virtual void \mbox{\hyperlink{classtesting_1_1_scoped_fake_test_part_result_reporter_a82531434f51632d98ed7cdcdb10b8b92}{Report\+Test\+Part\+Result}} (const \mbox{\hyperlink{classtesting_1_1_test_part_result}{Test\+Part\+Result}} \&result)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classtesting_1_1_test_part_result_reporter_interface}{testing\+::\+Test\+Part\+Result\+Reporter\+Interface}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{classtesting_1_1_test_part_result_reporter_interface_a338b51591ed654f84dc0feaaf2b66917}{\texorpdfstring{$\sim$}{\string~}\+Test\+Part\+Result\+Reporter\+Interface}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{gtest-spi_8h_source_l00051}{51}} of file \mbox{\hyperlink{gtest-spi_8h_source}{gtest-\/spi.\+h}}.
+
+
+
+\doxysubsection{Member Enumeration Documentation}
+\Hypertarget{classtesting_1_1_scoped_fake_test_part_result_reporter_a82f6209b3cf5c4b15ec8bd8041dbc2d5}\index{testing::ScopedFakeTestPartResultReporter@{testing::ScopedFakeTestPartResultReporter}!InterceptMode@{InterceptMode}}
+\index{InterceptMode@{InterceptMode}!testing::ScopedFakeTestPartResultReporter@{testing::ScopedFakeTestPartResultReporter}}
+\doxysubsubsection{\texorpdfstring{InterceptMode}{InterceptMode}}
+{\footnotesize\ttfamily \label{classtesting_1_1_scoped_fake_test_part_result_reporter_a82f6209b3cf5c4b15ec8bd8041dbc2d5} 
+enum \mbox{\hyperlink{classtesting_1_1_scoped_fake_test_part_result_reporter_a82f6209b3cf5c4b15ec8bd8041dbc2d5}{testing\+::\+Scoped\+Fake\+Test\+Part\+Result\+Reporter\+::\+Intercept\+Mode}}}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{INTERCEPT\_ONLY\_CURRENT\_THREAD@{INTERCEPT\_ONLY\_CURRENT\_THREAD}!testing::ScopedFakeTestPartResultReporter@{testing::ScopedFakeTestPartResultReporter}}\index{testing::ScopedFakeTestPartResultReporter@{testing::ScopedFakeTestPartResultReporter}!INTERCEPT\_ONLY\_CURRENT\_THREAD@{INTERCEPT\_ONLY\_CURRENT\_THREAD}}}\Hypertarget{classtesting_1_1_scoped_fake_test_part_result_reporter_a82f6209b3cf5c4b15ec8bd8041dbc2d5aed6c5f87d33207768db503526e6a1e8a}\label{classtesting_1_1_scoped_fake_test_part_result_reporter_a82f6209b3cf5c4b15ec8bd8041dbc2d5} 
+INTERCEPT\+\_\+\+ONLY\+\_\+\+CURRENT\+\_\+\+THREAD&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{INTERCEPT\_ALL\_THREADS@{INTERCEPT\_ALL\_THREADS}!testing::ScopedFakeTestPartResultReporter@{testing::ScopedFakeTestPartResultReporter}}\index{testing::ScopedFakeTestPartResultReporter@{testing::ScopedFakeTestPartResultReporter}!INTERCEPT\_ALL\_THREADS@{INTERCEPT\_ALL\_THREADS}}}\Hypertarget{classtesting_1_1_scoped_fake_test_part_result_reporter_a82f6209b3cf5c4b15ec8bd8041dbc2d5a187f4164aad7fbb9414b263c68a693cd}\label{classtesting_1_1_scoped_fake_test_part_result_reporter_a82f6209b3cf5c4b15ec8bd8041dbc2d5} 
+INTERCEPT\+\_\+\+ALL\+\_\+\+THREADS&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{gtest-spi_8h_source_l00055}{55}} of file \mbox{\hyperlink{gtest-spi_8h_source}{gtest-\/spi.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00056\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1_scoped_fake_test_part_result_reporter_a82f6209b3cf5c4b15ec8bd8041dbc2d5aed6c5f87d33207768db503526e6a1e8a}{INTERCEPT\_ONLY\_CURRENT\_THREAD}},\ \ \textcolor{comment}{//\ Intercepts\ only\ thread\ local\ failures.}}
+\DoxyCodeLine{00057\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1_scoped_fake_test_part_result_reporter_a82f6209b3cf5c4b15ec8bd8041dbc2d5a187f4164aad7fbb9414b263c68a693cd}{INTERCEPT\_ALL\_THREADS}}\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Intercepts\ all\ failures.}}
+\DoxyCodeLine{00058\ \ \ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1_scoped_fake_test_part_result_reporter_aa0100ecf4799fb51d45167be6a5de1d5}\index{testing::ScopedFakeTestPartResultReporter@{testing::ScopedFakeTestPartResultReporter}!ScopedFakeTestPartResultReporter@{ScopedFakeTestPartResultReporter}}
+\index{ScopedFakeTestPartResultReporter@{ScopedFakeTestPartResultReporter}!testing::ScopedFakeTestPartResultReporter@{testing::ScopedFakeTestPartResultReporter}}
+\doxysubsubsection{\texorpdfstring{ScopedFakeTestPartResultReporter()}{ScopedFakeTestPartResultReporter()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classtesting_1_1_scoped_fake_test_part_result_reporter_aa0100ecf4799fb51d45167be6a5de1d5} 
+testing\+::\+Scoped\+Fake\+Test\+Part\+Result\+Reporter\+::\+Scoped\+Fake\+Test\+Part\+Result\+Reporter (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classtesting_1_1_test_part_result_array}{Test\+Part\+Result\+Array}} \texorpdfstring{$\ast$}{*}}]{result}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8cc_source_l00580}{580}} of file \mbox{\hyperlink{gtest_8cc_source}{gtest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00582\ \ \ \ \ :\ intercept\_mode\_(\mbox{\hyperlink{classtesting_1_1_scoped_fake_test_part_result_reporter_a82f6209b3cf5c4b15ec8bd8041dbc2d5aed6c5f87d33207768db503526e6a1e8a}{INTERCEPT\_ONLY\_CURRENT\_THREAD}}),}
+\DoxyCodeLine{00583\ \ \ \ \ \ \ result\_(result)\ \{}
+\DoxyCodeLine{00584\ \ \ \mbox{\hyperlink{struct_init}{Init}}();}
+\DoxyCodeLine{00585\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1_scoped_fake_test_part_result_reporter_a57cbc09ed48627c8a73e622618dc4b4f}\index{testing::ScopedFakeTestPartResultReporter@{testing::ScopedFakeTestPartResultReporter}!ScopedFakeTestPartResultReporter@{ScopedFakeTestPartResultReporter}}
+\index{ScopedFakeTestPartResultReporter@{ScopedFakeTestPartResultReporter}!testing::ScopedFakeTestPartResultReporter@{testing::ScopedFakeTestPartResultReporter}}
+\doxysubsubsection{\texorpdfstring{ScopedFakeTestPartResultReporter()}{ScopedFakeTestPartResultReporter()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classtesting_1_1_scoped_fake_test_part_result_reporter_a57cbc09ed48627c8a73e622618dc4b4f} 
+testing\+::\+Scoped\+Fake\+Test\+Part\+Result\+Reporter\+::\+Scoped\+Fake\+Test\+Part\+Result\+Reporter (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classtesting_1_1_scoped_fake_test_part_result_reporter_a82f6209b3cf5c4b15ec8bd8041dbc2d5}{Intercept\+Mode}}}]{intercept\+\_\+mode}{, }\item[{\mbox{\hyperlink{classtesting_1_1_test_part_result_array}{Test\+Part\+Result\+Array}} \texorpdfstring{$\ast$}{*}}]{result}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8cc_source_l00590}{590}} of file \mbox{\hyperlink{gtest_8cc_source}{gtest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00592\ \ \ \ \ :\ intercept\_mode\_(intercept\_mode),}
+\DoxyCodeLine{00593\ \ \ \ \ \ \ result\_(result)\ \{}
+\DoxyCodeLine{00594\ \ \ \mbox{\hyperlink{struct_init}{Init}}();}
+\DoxyCodeLine{00595\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1_scoped_fake_test_part_result_reporter_a4817d59ca70228ebd5d5c3c4e8dd729d}\index{testing::ScopedFakeTestPartResultReporter@{testing::ScopedFakeTestPartResultReporter}!````~ScopedFakeTestPartResultReporter@{\texorpdfstring{$\sim$}{\string~}ScopedFakeTestPartResultReporter}}
+\index{````~ScopedFakeTestPartResultReporter@{\texorpdfstring{$\sim$}{\string~}ScopedFakeTestPartResultReporter}!testing::ScopedFakeTestPartResultReporter@{testing::ScopedFakeTestPartResultReporter}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}ScopedFakeTestPartResultReporter()}{\string~ScopedFakeTestPartResultReporter()}}
+{\footnotesize\ttfamily \label{classtesting_1_1_scoped_fake_test_part_result_reporter_a4817d59ca70228ebd5d5c3c4e8dd729d} 
+testing\+::\+Scoped\+Fake\+Test\+Part\+Result\+Reporter\+::\texorpdfstring{$\sim$}{\string~}\+Scoped\+Fake\+Test\+Part\+Result\+Reporter (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8cc_source_l00610}{610}} of file \mbox{\hyperlink{gtest_8cc_source}{gtest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00610\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00611\ \ \ internal::UnitTestImpl*\ \textcolor{keyword}{const}\ impl\ =\ \mbox{\hyperlink{namespacetesting_1_1internal_a9bd0caf5d16512de38b39599c13ee634}{internal::GetUnitTestImpl}}();}
+\DoxyCodeLine{00612\ \ \ \textcolor{keywordflow}{if}\ (intercept\_mode\_\ ==\ \mbox{\hyperlink{classtesting_1_1_scoped_fake_test_part_result_reporter_a82f6209b3cf5c4b15ec8bd8041dbc2d5a187f4164aad7fbb9414b263c68a693cd}{INTERCEPT\_ALL\_THREADS}})\ \{}
+\DoxyCodeLine{00613\ \ \ \ \ impl-\/>SetGlobalTestPartResultReporter(old\_reporter\_);}
+\DoxyCodeLine{00614\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00615\ \ \ \ \ impl-\/>SetTestPartResultReporterForCurrentThread(old\_reporter\_);}
+\DoxyCodeLine{00616\ \ \ \}}
+\DoxyCodeLine{00617\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1_scoped_fake_test_part_result_reporter_a4817d59ca70228ebd5d5c3c4e8dd729d_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1_scoped_fake_test_part_result_reporter_a82531434f51632d98ed7cdcdb10b8b92}\index{testing::ScopedFakeTestPartResultReporter@{testing::ScopedFakeTestPartResultReporter}!ReportTestPartResult@{ReportTestPartResult}}
+\index{ReportTestPartResult@{ReportTestPartResult}!testing::ScopedFakeTestPartResultReporter@{testing::ScopedFakeTestPartResultReporter}}
+\doxysubsubsection{\texorpdfstring{ReportTestPartResult()}{ReportTestPartResult()}}
+{\footnotesize\ttfamily \label{classtesting_1_1_scoped_fake_test_part_result_reporter_a82531434f51632d98ed7cdcdb10b8b92} 
+void testing\+::\+Scoped\+Fake\+Test\+Part\+Result\+Reporter\+::\+Report\+Test\+Part\+Result (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classtesting_1_1_test_part_result}{Test\+Part\+Result}} \&}]{result}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classtesting_1_1_test_part_result_reporter_interface_aa2f920e7a5a0a6d0faf19e3727928c22}{testing\+::\+Test\+Part\+Result\+Reporter\+Interface}}.
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8cc_source_l00621}{621}} of file \mbox{\hyperlink{gtest_8cc_source}{gtest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00622\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00623\ \ \ result\_-\/>\mbox{\hyperlink{classtesting_1_1_test_part_result_array_a01844bd505b18a666324617a1b459558}{Append}}(result);}
+\DoxyCodeLine{00624\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1_scoped_fake_test_part_result_reporter_a82531434f51632d98ed7cdcdb10b8b92_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/include/gtest/\mbox{\hyperlink{gtest-spi_8h}{gtest-\/spi.\+h}}\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/src/\mbox{\hyperlink{gtest_8cc}{gtest.\+cc}}\end{DoxyCompactItemize}

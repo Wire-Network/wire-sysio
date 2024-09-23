@@ -1,0 +1,174 @@
+\chapter{Features}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2features}{}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2features}\index{Features@{Features}}
+\doxysection*{General}
+
+
+\begin{DoxyItemize}
+\item Cross-\/platform
+\begin{DoxyItemize}
+\item Compilers\+: Visual Studio, gcc, clang, etc.
+\item Architectures\+: x86, x64, ARM, etc.
+\item Operating systems\+: Windows, Mac OS X, Linux, i\+OS, Android, etc.
+\end{DoxyItemize}
+\item Easy installation
+\begin{DoxyItemize}
+\item Header files only library. Just copy the headers to your project.
+\end{DoxyItemize}
+\item Self-\/contained, minimal dependences
+\begin{DoxyItemize}
+\item No STL, BOOST, etc.
+\item Only included {\ttfamily \texorpdfstring{$<$}{<}cstdio\texorpdfstring{$>$}{>}}, {\ttfamily \texorpdfstring{$<$}{<}cstdlib\texorpdfstring{$>$}{>}}, {\ttfamily \texorpdfstring{$<$}{<}cstring\texorpdfstring{$>$}{>}}, {\ttfamily \texorpdfstring{$<$}{<}\doxylink{inttypes_8h}{inttypes.\+h}\texorpdfstring{$>$}{>}}, {\ttfamily \texorpdfstring{$<$}{<}new\texorpdfstring{$>$}{>}}, {\ttfamily \texorpdfstring{$<$}{<}\doxylink{stdint_8h}{stdint.\+h}\texorpdfstring{$>$}{>}}.
+\end{DoxyItemize}
+\item Without C++ exception, RTTI
+\item High performance
+\begin{DoxyItemize}
+\item Use template and inline functions to reduce function call overheads.
+\item Internal optimized Grisu2 and floating point parsing implementations.
+\item Optional SSE2/\+SSE4.\+2 support.
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+\doxysection*{Standard compliance}
+
+
+\begin{DoxyItemize}
+\item Rapid\+JSON should be fully RFC4627/\+ECMA-\/404 compliance.
+\item Support JSON Pointer (RFC6901).
+\item Support JSON \doxylink{class_schema}{Schema} Draft v4.
+\item Support Unicode surrogate.
+\item Support null character ({\ttfamily "{}\textbackslash{}u0000"{}})
+\begin{DoxyItemize}
+\item For example, {\ttfamily \mbox{[}"{}\+Hello\textbackslash{}u0000\+World"{}\mbox{]}} can be parsed and handled gracefully. There is API for getting/setting lengths of string.
+\end{DoxyItemize}
+\item Support optional relaxed syntax.
+\begin{DoxyItemize}
+\item Single line ({\ttfamily // ...}) and multiple line ({\ttfamily /\texorpdfstring{$\ast$}{*} ... \texorpdfstring{$\ast$}{*}/}) comments ({\ttfamily k\+Parse\+Comments\+Flag}).
+\item Trailing commas at the end of objects and arrays ({\ttfamily k\+Parse\+Trailing\+Commas\+Flag}).
+\item {\ttfamily NaN}, {\ttfamily Inf}, {\ttfamily Infinity}, {\ttfamily -\/Inf} and {\ttfamily -\/Infinity} as {\ttfamily double} values ({\ttfamily k\+Parse\+Nan\+And\+Inf\+Flag})
+\end{DoxyItemize}
+\item \href{http://github.com/Tencent/rapidjson/blob/master/doc/npm.md}{\texttt{ NPM compliant}}.
+\end{DoxyItemize}
+
+\doxysection*{Unicode}
+
+
+\begin{DoxyItemize}
+\item Support UTF-\/8, UTF-\/16, UTF-\/32 encodings, including little endian and big endian.
+\begin{DoxyItemize}
+\item These encodings are used in input/output streams and in-\/memory representation.
+\end{DoxyItemize}
+\item Support automatic detection of encodings in input stream.
+\item Support transcoding between encodings internally.
+\begin{DoxyItemize}
+\item For example, you can read a UTF-\/8 file and let Rapid\+JSON transcode the JSON strings into UTF-\/16 in the DOM.
+\end{DoxyItemize}
+\item Support encoding validation internally.
+\begin{DoxyItemize}
+\item For example, you can read a UTF-\/8 file, and let Rapid\+JSON check whether all JSON strings are valid UTF-\/8 byte sequence.
+\end{DoxyItemize}
+\item Support custom character types.
+\begin{DoxyItemize}
+\item By default the character types are {\ttfamily char} for \doxylink{struct_u_t_f8}{UTF8}, {\ttfamily wchar\+\_\+t} for \doxylink{struct_u_t_f16}{UTF16}, {\ttfamily uint32\+\_\+t} for \doxylink{struct_u_t_f32}{UTF32}.
+\end{DoxyItemize}
+\item Support custom encodings.
+\end{DoxyItemize}
+
+\doxysection*{API styles}
+
+
+\begin{DoxyItemize}
+\item SAX (Simple API for XML) style API
+\begin{DoxyItemize}
+\item Similar to \href{http://en.wikipedia.org/wiki/Simple_API_for_XML}{\texttt{ SAX}}, Rapid\+JSON provides a event sequential access parser API ({\ttfamily rapidjson\+::\+Generic\+Reader}). It also provides a generator API ({\ttfamily rapidjson\+::\+Writer}) which consumes the same set of events.
+\end{DoxyItemize}
+\item DOM (Document Object Model) style API
+\begin{DoxyItemize}
+\item Similar to \href{http://en.wikipedia.org/wiki/Document_Object_Model}{\texttt{ DOM}} for HTML/\+XML, Rapid\+JSON can parse JSON into a DOM representation ({\ttfamily rapidjson\+::\+Generic\+Document}), for easy manipulation, and finally stringify back to JSON if needed.
+\item The DOM style API ({\ttfamily rapidjson\+::\+Generic\+Document}) is actually implemented with SAX style API ({\ttfamily rapidjson\+::\+Generic\+Reader}). SAX is faster but sometimes DOM is easier. Users can pick their choices according to scenarios.
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+\doxysection*{Parsing}
+
+
+\begin{DoxyItemize}
+\item Recursive (default) and iterative parser
+\begin{DoxyItemize}
+\item Recursive parser is faster but prone to stack overflow in extreme cases.
+\item Iterative parser use custom stack to keep parsing state.
+\end{DoxyItemize}
+\item Support {\itshape in situ} parsing.
+\begin{DoxyItemize}
+\item Parse JSON string values in-\/place at the source JSON, and then the DOM points to addresses of those strings.
+\item Faster than convention parsing\+: no allocation for strings, no copy (if string does not contain escapes), cache-\/friendly.
+\end{DoxyItemize}
+\item Support 32-\/bit/64-\/bit signed/unsigned integer and {\ttfamily double} for JSON number type.
+\item Support parsing multiple JSONs in input stream ({\ttfamily k\+Parse\+Stop\+When\+Done\+Flag}).
+\item Error Handling
+\begin{DoxyItemize}
+\item Support comprehensive error code if parsing failed.
+\item Support error message localization.
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+\doxysection*{DOM (Document)}
+
+
+\begin{DoxyItemize}
+\item Rapid\+JSON checks range of numerical values for conversions.
+\item Optimization for string literal
+\begin{DoxyItemize}
+\item Only store pointer instead of copying
+\end{DoxyItemize}
+\item Optimization for "{}short"{} strings
+\begin{DoxyItemize}
+\item Store short string in {\ttfamily Value} internally without additional allocation.
+\item For UTF-\/8 string\+: maximum 11 characters in 32-\/bit, 21 characters in 64-\/bit (13 characters in x86-\/64).
+\end{DoxyItemize}
+\item Optionally support {\ttfamily std\+::string} (define {\ttfamily RAPIDJSON\+\_\+\+HAS\+\_\+\+STDSTRING=1})
+\end{DoxyItemize}
+
+\doxysection*{Generation}
+
+
+\begin{DoxyItemize}
+\item Support {\ttfamily rapidjson\+::\+Pretty\+Writer} for adding newlines and indentations.
+\end{DoxyItemize}
+
+\doxysection*{Stream}
+
+
+\begin{DoxyItemize}
+\item Support {\ttfamily rapidjson\+::\+Generic\+String\+Buffer} for storing the output JSON as string.
+\item Support {\ttfamily rapidjson\+::\+File\+Read\+Stream} and {\ttfamily rapidjson\+::\+File\+Write\+Stream} for input/output {\ttfamily FILE} object.
+\item Support custom streams.
+\end{DoxyItemize}
+
+\doxysection*{Memory}
+
+
+\begin{DoxyItemize}
+\item Minimize memory overheads for DOM.
+\begin{DoxyItemize}
+\item Each JSON value occupies exactly 16/20 bytes for most 32/64-\/bit machines (excluding text string).
+\end{DoxyItemize}
+\item Support fast default allocator.
+\begin{DoxyItemize}
+\item \doxylink{struct_a}{A} stack-\/based allocator (allocate sequentially, prohibit to free individual allocations, suitable for parsing).
+\item User can provide a pre-\/allocated buffer. (Possible to parse a number of JSONs without any CRT allocation)
+\end{DoxyItemize}
+\item Support standard CRT(C-\/runtime) allocator.
+\item Support custom allocators.
+\end{DoxyItemize}
+
+\doxysection*{Miscellaneous}
+
+
+\begin{DoxyItemize}
+\item Some C++11 support (optional)
+\begin{DoxyItemize}
+\item Rvalue reference
+\item {\ttfamily noexcept} specifier
+\item Range-\/based for loop 
+\end{DoxyItemize}
+\end{DoxyItemize}

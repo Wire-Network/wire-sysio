@@ -1,0 +1,136 @@
+\doxysection{sysio\+::trace\+\_\+api\+::chain\+\_\+extraction\+\_\+impl\+\_\+type\texorpdfstring{$<$}{<} Store\+Provider \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classsysio_1_1trace__api_1_1chain__extraction__impl__type}{}\label{classsysio_1_1trace__api_1_1chain__extraction__impl__type}\index{sysio::trace\_api::chain\_extraction\_impl\_type$<$ StoreProvider $>$@{sysio::trace\_api::chain\_extraction\_impl\_type$<$ StoreProvider $>$}}
+
+
+{\ttfamily \#include $<$chain\+\_\+extraction.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classsysio_1_1trace__api_1_1chain__extraction__impl__type_a0254e80f0fbd52a370f26a93ff1e8c63}{chain\+\_\+extraction\+\_\+impl\+\_\+type}} (Store\+Provider store, \mbox{\hyperlink{namespacesysio_1_1trace__api_abe71d6f34a01119df1abb45e75c65a0f}{exception\+\_\+handler}} except\+\_\+handler)
+\item 
+void \mbox{\hyperlink{classsysio_1_1trace__api_1_1chain__extraction__impl__type_adb77ac33f05a4a8be51b45baaac52286}{signal\+\_\+applied\+\_\+transaction}} (const \mbox{\hyperlink{namespacesysio_1_1chain_a4ee2867a6bec961c7a78b203cfd76be9}{chain\+::transaction\+\_\+trace\+\_\+ptr}} \&trace, const \mbox{\hyperlink{namespacesysio_1_1chain_a7041c0316bd294d0866609ab3e0cc7a7}{chain\+::packed\+\_\+transaction\+\_\+ptr}} \&ptrx)
+\begin{DoxyCompactList}\small\item\em connect to chain controller applied\+\_\+transaction signal \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classsysio_1_1trace__api_1_1chain__extraction__impl__type_aac293171a1575c4343ebbdc3f7c3f3e5}{signal\+\_\+accepted\+\_\+block}} (const \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{chain\+::block\+\_\+state\+\_\+ptr}} \&bsp)
+\begin{DoxyCompactList}\small\item\em connect to chain controller accepted\+\_\+block signal \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classsysio_1_1trace__api_1_1chain__extraction__impl__type_a3ebf5547ca63fa58c654fe8ac1c8a19c}{signal\+\_\+irreversible\+\_\+block}} (const \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{chain\+::block\+\_\+state\+\_\+ptr}} \&bsp)
+\begin{DoxyCompactList}\small\item\em connect to chain controller irreversible\+\_\+block signal \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classsysio_1_1trace__api_1_1chain__extraction__impl__type_a171e5c5e783a6a569e2f0e0989a41711}{signal\+\_\+block\+\_\+start}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} block\+\_\+num)
+\begin{DoxyCompactList}\small\item\em connect to chain controller block\+\_\+start signal \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Store\+Provider$>$\newline
+class sysio\+::trace\+\_\+api\+::chain\+\_\+extraction\+\_\+impl\+\_\+type$<$ Store\+Provider $>$}
+
+
+Definition at line \mbox{\hyperlink{chain__extraction_8hpp_source_l00016}{16}} of file \mbox{\hyperlink{chain__extraction_8hpp_source}{chain\+\_\+extraction.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classsysio_1_1trace__api_1_1chain__extraction__impl__type_a0254e80f0fbd52a370f26a93ff1e8c63}\index{sysio::trace\_api::chain\_extraction\_impl\_type$<$ StoreProvider $>$@{sysio::trace\_api::chain\_extraction\_impl\_type$<$ StoreProvider $>$}!chain\_extraction\_impl\_type@{chain\_extraction\_impl\_type}}
+\index{chain\_extraction\_impl\_type@{chain\_extraction\_impl\_type}!sysio::trace\_api::chain\_extraction\_impl\_type$<$ StoreProvider $>$@{sysio::trace\_api::chain\_extraction\_impl\_type$<$ StoreProvider $>$}}
+\doxysubsubsection{\texorpdfstring{chain\_extraction\_impl\_type()}{chain\_extraction\_impl\_type()}}
+{\footnotesize\ttfamily \label{classsysio_1_1trace__api_1_1chain__extraction__impl__type_a0254e80f0fbd52a370f26a93ff1e8c63} 
+template$<$typename Store\+Provider $>$ \\
+\mbox{\hyperlink{classsysio_1_1trace__api_1_1chain__extraction__impl__type}{sysio\+::trace\+\_\+api\+::chain\+\_\+extraction\+\_\+impl\+\_\+type}}$<$ Store\+Provider $>$\+::chain\+\_\+extraction\+\_\+impl\+\_\+type (\begin{DoxyParamCaption}\item[{Store\+Provider}]{store}{, }\item[{\mbox{\hyperlink{namespacesysio_1_1trace__api_abe71d6f34a01119df1abb45e75c65a0f}{exception\+\_\+handler}}}]{except\+\_\+handler}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Chain Extractor for capturing transaction traces, action traces, and block info. 
+\begin{DoxyParams}{Parameters}
+{\em store} & provider of append \& append\+\_\+lib \\
+\hline
+{\em except\+\_\+handler} & called on exceptions, logging if any is left to the user \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{chain__extraction_8hpp_source_l00023}{23}} of file \mbox{\hyperlink{chain__extraction_8hpp_source}{chain\+\_\+extraction.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00024\ \ \ \ :\ store(std::move(store))}
+\DoxyCodeLine{00025\ \ \ \ ,\ except\_handler(std::move(except\_handler))}
+\DoxyCodeLine{00026\ \ \ \ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1trace__api_1_1chain__extraction__impl__type_aac293171a1575c4343ebbdc3f7c3f3e5}\index{sysio::trace\_api::chain\_extraction\_impl\_type$<$ StoreProvider $>$@{sysio::trace\_api::chain\_extraction\_impl\_type$<$ StoreProvider $>$}!signal\_accepted\_block@{signal\_accepted\_block}}
+\index{signal\_accepted\_block@{signal\_accepted\_block}!sysio::trace\_api::chain\_extraction\_impl\_type$<$ StoreProvider $>$@{sysio::trace\_api::chain\_extraction\_impl\_type$<$ StoreProvider $>$}}
+\doxysubsubsection{\texorpdfstring{signal\_accepted\_block()}{signal\_accepted\_block()}}
+{\footnotesize\ttfamily \label{classsysio_1_1trace__api_1_1chain__extraction__impl__type_aac293171a1575c4343ebbdc3f7c3f3e5} 
+template$<$typename Store\+Provider $>$ \\
+void \mbox{\hyperlink{classsysio_1_1trace__api_1_1chain__extraction__impl__type}{sysio\+::trace\+\_\+api\+::chain\+\_\+extraction\+\_\+impl\+\_\+type}}$<$ Store\+Provider $>$\+::signal\+\_\+accepted\+\_\+block (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{chain\+::block\+\_\+state\+\_\+ptr}} \&}]{bsp}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{chain__extraction_8hpp_source_l00034}{34}} of file \mbox{\hyperlink{chain__extraction_8hpp_source}{chain\+\_\+extraction.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ on\_accepted\_block(\ bsp\ );}
+\DoxyCodeLine{00036\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1trace__api_1_1chain__extraction__impl__type_adb77ac33f05a4a8be51b45baaac52286}\index{sysio::trace\_api::chain\_extraction\_impl\_type$<$ StoreProvider $>$@{sysio::trace\_api::chain\_extraction\_impl\_type$<$ StoreProvider $>$}!signal\_applied\_transaction@{signal\_applied\_transaction}}
+\index{signal\_applied\_transaction@{signal\_applied\_transaction}!sysio::trace\_api::chain\_extraction\_impl\_type$<$ StoreProvider $>$@{sysio::trace\_api::chain\_extraction\_impl\_type$<$ StoreProvider $>$}}
+\doxysubsubsection{\texorpdfstring{signal\_applied\_transaction()}{signal\_applied\_transaction()}}
+{\footnotesize\ttfamily \label{classsysio_1_1trace__api_1_1chain__extraction__impl__type_adb77ac33f05a4a8be51b45baaac52286} 
+template$<$typename Store\+Provider $>$ \\
+void \mbox{\hyperlink{classsysio_1_1trace__api_1_1chain__extraction__impl__type}{sysio\+::trace\+\_\+api\+::chain\+\_\+extraction\+\_\+impl\+\_\+type}}$<$ Store\+Provider $>$\+::signal\+\_\+applied\+\_\+transaction (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_a4ee2867a6bec961c7a78b203cfd76be9}{chain\+::transaction\+\_\+trace\+\_\+ptr}} \&}]{trace}{, }\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_a7041c0316bd294d0866609ab3e0cc7a7}{chain\+::packed\+\_\+transaction\+\_\+ptr}} \&}]{ptrx}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{chain__extraction_8hpp_source_l00029}{29}} of file \mbox{\hyperlink{chain__extraction_8hpp_source}{chain\+\_\+extraction.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ on\_applied\_transaction(\ trace,\ ptrx\ );}
+\DoxyCodeLine{00031\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1trace__api_1_1chain__extraction__impl__type_a171e5c5e783a6a569e2f0e0989a41711}\index{sysio::trace\_api::chain\_extraction\_impl\_type$<$ StoreProvider $>$@{sysio::trace\_api::chain\_extraction\_impl\_type$<$ StoreProvider $>$}!signal\_block\_start@{signal\_block\_start}}
+\index{signal\_block\_start@{signal\_block\_start}!sysio::trace\_api::chain\_extraction\_impl\_type$<$ StoreProvider $>$@{sysio::trace\_api::chain\_extraction\_impl\_type$<$ StoreProvider $>$}}
+\doxysubsubsection{\texorpdfstring{signal\_block\_start()}{signal\_block\_start()}}
+{\footnotesize\ttfamily \label{classsysio_1_1trace__api_1_1chain__extraction__impl__type_a171e5c5e783a6a569e2f0e0989a41711} 
+template$<$typename Store\+Provider $>$ \\
+void \mbox{\hyperlink{classsysio_1_1trace__api_1_1chain__extraction__impl__type}{sysio\+::trace\+\_\+api\+::chain\+\_\+extraction\+\_\+impl\+\_\+type}}$<$ Store\+Provider $>$\+::signal\+\_\+block\+\_\+start (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{block\+\_\+num}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{chain__extraction_8hpp_source_l00044}{44}} of file \mbox{\hyperlink{chain__extraction_8hpp_source}{chain\+\_\+extraction.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ on\_block\_start(\ block\_num\ );}
+\DoxyCodeLine{00046\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1trace__api_1_1chain__extraction__impl__type_a3ebf5547ca63fa58c654fe8ac1c8a19c}\index{sysio::trace\_api::chain\_extraction\_impl\_type$<$ StoreProvider $>$@{sysio::trace\_api::chain\_extraction\_impl\_type$<$ StoreProvider $>$}!signal\_irreversible\_block@{signal\_irreversible\_block}}
+\index{signal\_irreversible\_block@{signal\_irreversible\_block}!sysio::trace\_api::chain\_extraction\_impl\_type$<$ StoreProvider $>$@{sysio::trace\_api::chain\_extraction\_impl\_type$<$ StoreProvider $>$}}
+\doxysubsubsection{\texorpdfstring{signal\_irreversible\_block()}{signal\_irreversible\_block()}}
+{\footnotesize\ttfamily \label{classsysio_1_1trace__api_1_1chain__extraction__impl__type_a3ebf5547ca63fa58c654fe8ac1c8a19c} 
+template$<$typename Store\+Provider $>$ \\
+void \mbox{\hyperlink{classsysio_1_1trace__api_1_1chain__extraction__impl__type}{sysio\+::trace\+\_\+api\+::chain\+\_\+extraction\+\_\+impl\+\_\+type}}$<$ Store\+Provider $>$\+::signal\+\_\+irreversible\+\_\+block (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{chain\+::block\+\_\+state\+\_\+ptr}} \&}]{bsp}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{chain__extraction_8hpp_source_l00039}{39}} of file \mbox{\hyperlink{chain__extraction_8hpp_source}{chain\+\_\+extraction.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ on\_irreversible\_block(\ bsp\ );}
+\DoxyCodeLine{00041\ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+plugins/trace\+\_\+api\+\_\+plugin/include/sysio/trace\+\_\+api/\mbox{\hyperlink{chain__extraction_8hpp}{chain\+\_\+extraction.\+hpp}}\end{DoxyCompactItemize}

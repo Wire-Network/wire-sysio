@@ -1,0 +1,9 @@
+<map id="CLI::detail::type_name" name="CLI::detail::type_name">
+<area shape="rect" id="Node000001" title="Print name for enumeration types." alt="" coords="217,63,370,88"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_app.html#a27ca8c7e673f9fdac9a5a80c1a0704ea" title="Add option for assigning to a variable." alt="" coords="15,5,159,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="229,60,135,34,137,29,230,55"/>
+<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_app.html#a199d89ab0bbb8eedaf23bea5ca27a3e1" title="Add option for a callback of a specific type." alt="" coords="15,55,159,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="201,78,160,78,160,73,201,73"/>
+<area shape="rect" id="Node000004" href="$class_c_l_i_1_1_as_number_with_unit.html#af5d2fc29cd92c1821e653a97f91b00cb" title=" " alt="" coords="5,120,169,161"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="237,96,154,122,153,117,235,91"/>
+</map>

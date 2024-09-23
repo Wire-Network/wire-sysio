@@ -1,0 +1,151 @@
+\doxysection{release\+Common.\+py}
+\hypertarget{release_common_8py_source}{}\label{release_common_8py_source}\index{libraries/sys-\/vm/external/Catch2/scripts/releaseCommon.py@{libraries/sys-\/vm/external/Catch2/scripts/releaseCommon.py}}
+\mbox{\hyperlink{release_common_8py}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00001}\mbox{\hyperlink{namespacerelease_common}{00001}}\ \textcolor{keyword}{from}\ \ \_\_future\_\_\ \textcolor{keyword}{import}\ \ print\_function}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00003}00003\ \textcolor{keyword}{import}\ os}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00004}00004\ \textcolor{keyword}{import}\ sys}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00005}00005\ \textcolor{keyword}{import}\ re}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00006}00006\ \textcolor{keyword}{import}\ string}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00008}00008\ \textcolor{keyword}{from}\ scriptCommon\ \textcolor{keyword}{import}\ catchPath}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00010}\mbox{\hyperlink{namespacerelease_common_ace4499e1b85dbec6156608f150b4ddf3}{00010}}\ versionParser\ =\ re.compile(\ \textcolor{stringliteral}{r'(\(\backslash\)s*static\(\backslash\)sVersion\(\backslash\)sversion)\(\backslash\)s*\(\backslash\)(\(\backslash\)s*(.*)\(\backslash\)s*,\(\backslash\)s*(.*)\(\backslash\)s*,\(\backslash\)s*(.*)\(\backslash\)s*,\(\backslash\)s*\(\backslash\)"{}(.*)\(\backslash\)"{}\(\backslash\)s*,\(\backslash\)s*(.*)\(\backslash\)s*\(\backslash\)).*'}\ )}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00011}\mbox{\hyperlink{namespacerelease_common_a281314d8931f55a1d6621ba6bd8a582a}{00011}}\ rootPath\ =\ os.path.join(\ catchPath,\ \textcolor{stringliteral}{'include/'}\ )}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00012}\mbox{\hyperlink{namespacerelease_common_ab0b4b7702663c46948809bf56fee7baa}{00012}}\ versionPath\ =\ os.path.join(\ rootPath,\ \textcolor{stringliteral}{"{}internal/catch\_version.cpp"{}}\ )}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00013}\mbox{\hyperlink{namespacerelease_common_a585e6a0c3722420cb03bf0abb5a2f6c5}{00013}}\ definePath\ =\ os.path.join(rootPath,\ \textcolor{stringliteral}{'catch.hpp'})}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00014}\mbox{\hyperlink{namespacerelease_common_a3ea4dd2ac4edbb117328127cfe546f97}{00014}}\ readmePath\ =\ os.path.join(\ catchPath,\ \textcolor{stringliteral}{"{}README.md"{}}\ )}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00015}\mbox{\hyperlink{namespacerelease_common_a25066420e46b2ec29f19fc10d5932e67}{00015}}\ cmakePath\ =\ os.path.join(catchPath,\ \textcolor{stringliteral}{'CMakeLists.txt'})}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00017}\mbox{\hyperlink{classrelease_common_1_1_version}{00017}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classrelease_common_1_1_version}{Version}}:}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00018}\mbox{\hyperlink{classrelease_common_1_1_version_ab61925fb1035d268725c222120d80de3}{00018}}\ \ \ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classrelease_common_1_1_version_ab61925fb1035d268725c222120d80de3}{\_\_init\_\_}}(self):}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00019}00019\ \ \ \ \ \ \ \ \ f\ =\ open(\ versionPath,\ \textcolor{stringliteral}{'r'}\ )}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00020}00020\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ line\ \textcolor{keywordflow}{in}\ f:}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00021}00021\ \ \ \ \ \ \ \ \ \ \ \ \ m\ =\ versionParser.match(\ line\ )}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00022}00022\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ m:}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00023}\mbox{\hyperlink{classrelease_common_1_1_version_a4a00b9035b7dc1f832873d19da9f6d3a}{00023}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ self.\mbox{\hyperlink{classrelease_common_1_1_version_a4a00b9035b7dc1f832873d19da9f6d3a}{variableDecl}}\ =\ m.group(1)}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00024}\mbox{\hyperlink{classrelease_common_1_1_version_a2b32079fa1a13e437e5ef2bbba05ccfb}{00024}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ self.\mbox{\hyperlink{classrelease_common_1_1_version_a2b32079fa1a13e437e5ef2bbba05ccfb}{majorVersion}}\ =\ int(m.group(2))}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00025}\mbox{\hyperlink{classrelease_common_1_1_version_acd4b29b7d352e4ae94c5653ce3c24d8f}{00025}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ self.\mbox{\hyperlink{classrelease_common_1_1_version_acd4b29b7d352e4ae94c5653ce3c24d8f}{minorVersion}}\ =\ int(m.group(3))}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00026}\mbox{\hyperlink{classrelease_common_1_1_version_a1e32658e61d73bcdf8908e66d39138fc}{00026}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ self.\mbox{\hyperlink{classrelease_common_1_1_version_a1e32658e61d73bcdf8908e66d39138fc}{patchNumber}}\ =\ int(m.group(4))}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00027}\mbox{\hyperlink{classrelease_common_1_1_version_af7deb079598503586c9371e57db4cbcd}{00027}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ self.\mbox{\hyperlink{classrelease_common_1_1_version_af7deb079598503586c9371e57db4cbcd}{branchName}}\ =\ m.group(5)}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00028}\mbox{\hyperlink{classrelease_common_1_1_version_a390fc492b86c8988a20faa51f0c1639c}{00028}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ self.\mbox{\hyperlink{classrelease_common_1_1_version_a390fc492b86c8988a20faa51f0c1639c}{buildNumber}}\ =\ int(m.group(6))}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00029}00029\ \ \ \ \ \ \ \ \ f.close()}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00031}\mbox{\hyperlink{classrelease_common_1_1_version_a110b9d8f7009e5c954a6e98ce078fce4}{00031}}\ \ \ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classrelease_common_1_1_version_a110b9d8f7009e5c954a6e98ce078fce4}{nonDevelopRelease}}(self):}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00032}00032\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ self.\mbox{\hyperlink{classrelease_common_1_1_version_af7deb079598503586c9371e57db4cbcd}{branchName}}\ !=\ \textcolor{stringliteral}{"{}"{}}:}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00033}00033\ \ \ \ \ \ \ \ \ \ \ \ \ self.\mbox{\hyperlink{classrelease_common_1_1_version_af7deb079598503586c9371e57db4cbcd}{branchName}}\ =\ \textcolor{stringliteral}{"{}"{}}}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00034}00034\ \ \ \ \ \ \ \ \ \ \ \ \ self.\mbox{\hyperlink{classrelease_common_1_1_version_a390fc492b86c8988a20faa51f0c1639c}{buildNumber}}\ =\ 0}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00035}\mbox{\hyperlink{classrelease_common_1_1_version_ac1318ae9713379b1bf2a47eb29093ac1}{00035}}\ \ \ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacedevelop_build}{developBuild}}(self):}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00036}00036\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ self.\mbox{\hyperlink{classrelease_common_1_1_version_af7deb079598503586c9371e57db4cbcd}{branchName}}\ ==\ \textcolor{stringliteral}{"{}"{}}:}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00037}00037\ \ \ \ \ \ \ \ \ \ \ \ \ self.\mbox{\hyperlink{classrelease_common_1_1_version_af7deb079598503586c9371e57db4cbcd}{branchName}}\ =\ \textcolor{stringliteral}{"{}develop"{}}}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00038}00038\ \ \ \ \ \ \ \ \ \ \ \ \ self.\mbox{\hyperlink{classrelease_common_1_1_version_a390fc492b86c8988a20faa51f0c1639c}{buildNumber}}\ =\ 0}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00040}\mbox{\hyperlink{classrelease_common_1_1_version_aaad096771dd03bad55852d88fd368720}{00040}}\ \ \ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classrelease_common_1_1_version_aaad096771dd03bad55852d88fd368720}{incrementBuildNumber}}(self):}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00041}00041\ \ \ \ \ \ \ \ \ self.\mbox{\hyperlink{classrelease_common_1_1_version_ac1318ae9713379b1bf2a47eb29093ac1}{developBuild}}()}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00042}00042\ \ \ \ \ \ \ \ \ self.\mbox{\hyperlink{classrelease_common_1_1_version_a390fc492b86c8988a20faa51f0c1639c}{buildNumber}}\ =\ self.\mbox{\hyperlink{classrelease_common_1_1_version_a390fc492b86c8988a20faa51f0c1639c}{buildNumber}}+1}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00044}\mbox{\hyperlink{classrelease_common_1_1_version_a113ea99eeb6924d832065248670df068}{00044}}\ \ \ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classrelease_common_1_1_version_a113ea99eeb6924d832065248670df068}{incrementPatchNumber}}(self):}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00045}00045\ \ \ \ \ \ \ \ \ self.\mbox{\hyperlink{classrelease_common_1_1_version_a110b9d8f7009e5c954a6e98ce078fce4}{nonDevelopRelease}}()}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00046}00046\ \ \ \ \ \ \ \ \ self.\mbox{\hyperlink{classrelease_common_1_1_version_a1e32658e61d73bcdf8908e66d39138fc}{patchNumber}}\ =\ self.\mbox{\hyperlink{classrelease_common_1_1_version_a1e32658e61d73bcdf8908e66d39138fc}{patchNumber}}+1}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00048}\mbox{\hyperlink{classrelease_common_1_1_version_a4abe31e6ff2ef91141429ac6d5b807e0}{00048}}\ \ \ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classrelease_common_1_1_version_a4abe31e6ff2ef91141429ac6d5b807e0}{incrementMinorVersion}}(self):}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00049}00049\ \ \ \ \ \ \ \ \ self.\mbox{\hyperlink{classrelease_common_1_1_version_a110b9d8f7009e5c954a6e98ce078fce4}{nonDevelopRelease}}()}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00050}00050\ \ \ \ \ \ \ \ \ self.\mbox{\hyperlink{classrelease_common_1_1_version_a1e32658e61d73bcdf8908e66d39138fc}{patchNumber}}\ =\ 0}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00051}00051\ \ \ \ \ \ \ \ \ self.\mbox{\hyperlink{classrelease_common_1_1_version_acd4b29b7d352e4ae94c5653ce3c24d8f}{minorVersion}}\ =\ self.\mbox{\hyperlink{classrelease_common_1_1_version_acd4b29b7d352e4ae94c5653ce3c24d8f}{minorVersion}}+1}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00052}00052\ }
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00053}\mbox{\hyperlink{classrelease_common_1_1_version_a036ac2b11f0c587978666b455965846f}{00053}}\ \ \ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classrelease_common_1_1_version_a036ac2b11f0c587978666b455965846f}{incrementMajorVersion}}(self):}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00054}00054\ \ \ \ \ \ \ \ \ self.\mbox{\hyperlink{classrelease_common_1_1_version_a110b9d8f7009e5c954a6e98ce078fce4}{nonDevelopRelease}}()}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00055}00055\ \ \ \ \ \ \ \ \ self.\mbox{\hyperlink{classrelease_common_1_1_version_a1e32658e61d73bcdf8908e66d39138fc}{patchNumber}}\ =\ 0}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00056}00056\ \ \ \ \ \ \ \ \ self.\mbox{\hyperlink{classrelease_common_1_1_version_acd4b29b7d352e4ae94c5653ce3c24d8f}{minorVersion}}\ =\ 0}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00057}00057\ \ \ \ \ \ \ \ \ self.\mbox{\hyperlink{classrelease_common_1_1_version_a2b32079fa1a13e437e5ef2bbba05ccfb}{majorVersion}}\ =\ self.\mbox{\hyperlink{classrelease_common_1_1_version_a2b32079fa1a13e437e5ef2bbba05ccfb}{majorVersion}}+1}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00059}\mbox{\hyperlink{classrelease_common_1_1_version_a673bd97b49fc5200514820972968af1f}{00059}}\ \ \ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{xbyak__mnemonic_8h_a763bb04090d75c0da16b420b76741318}{getVersionString}}(self):}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00060}00060\ \ \ \ \ \ \ \ \ versionString\ =\ \textcolor{stringliteral}{'\{0\}.\{1\}.\{2\}'}.\mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}(\ self.\mbox{\hyperlink{classrelease_common_1_1_version_a2b32079fa1a13e437e5ef2bbba05ccfb}{majorVersion}},\ self.\mbox{\hyperlink{classrelease_common_1_1_version_acd4b29b7d352e4ae94c5653ce3c24d8f}{minorVersion}},\ self.\mbox{\hyperlink{classrelease_common_1_1_version_a1e32658e61d73bcdf8908e66d39138fc}{patchNumber}}\ )}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00061}00061\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ self.\mbox{\hyperlink{classrelease_common_1_1_version_af7deb079598503586c9371e57db4cbcd}{branchName}}\ !=\ \textcolor{stringliteral}{"{}"{}}:}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00062}00062\ \ \ \ \ \ \ \ \ \ \ \ \ versionString\ =\ versionString\ +\ \textcolor{stringliteral}{'-\/\{0\}.\{1\}'}.\mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}(\ self.\mbox{\hyperlink{classrelease_common_1_1_version_af7deb079598503586c9371e57db4cbcd}{branchName}},\ self.\mbox{\hyperlink{classrelease_common_1_1_version_a390fc492b86c8988a20faa51f0c1639c}{buildNumber}}\ )}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00063}00063\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ versionString}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00065}\mbox{\hyperlink{classrelease_common_1_1_version_a4c0d9fb29986fed932fa61f8036f550e}{00065}}\ \ \ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classrelease_common_1_1_version_a4c0d9fb29986fed932fa61f8036f550e}{updateVersionFile}}(self):}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00066}00066\ \ \ \ \ \ \ \ \ f\ =\ open(\ versionPath,\ \textcolor{stringliteral}{'r'}\ )}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00067}00067\ \ \ \ \ \ \ \ \ lines\ =\ []}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00068}00068\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ line\ \textcolor{keywordflow}{in}\ f:}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \ \ \ m\ =\ versionParser.match(\ line\ )}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ m:}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00071}00071\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lines.append(\ \textcolor{stringliteral}{'\{0\}(\ \{1\},\ \{2\},\ \{3\},\ "{}\{4\}"{},\ \{5\}\ );'}.\mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}(\ self.\mbox{\hyperlink{classrelease_common_1_1_version_a4a00b9035b7dc1f832873d19da9f6d3a}{variableDecl}},\ self.\mbox{\hyperlink{classrelease_common_1_1_version_a2b32079fa1a13e437e5ef2bbba05ccfb}{majorVersion}},\ self.\mbox{\hyperlink{classrelease_common_1_1_version_acd4b29b7d352e4ae94c5653ce3c24d8f}{minorVersion}},\ self.\mbox{\hyperlink{classrelease_common_1_1_version_a1e32658e61d73bcdf8908e66d39138fc}{patchNumber}},\ self.\mbox{\hyperlink{classrelease_common_1_1_version_af7deb079598503586c9371e57db4cbcd}{branchName}},\ self.\mbox{\hyperlink{classrelease_common_1_1_version_a390fc492b86c8988a20faa51f0c1639c}{buildNumber}}\ )\ )}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00073}00073\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lines.append(\ line.rstrip()\ )}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00074}00074\ \ \ \ \ \ \ \ \ f.close()}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00075}00075\ \ \ \ \ \ \ \ \ f\ =\ open(\ versionPath,\ \textcolor{stringliteral}{'w'}\ )}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00076}00076\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ line\ \textcolor{keywordflow}{in}\ lines:}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ f.write(\ line\ +\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}\ )}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00079}\mbox{\hyperlink{namespacerelease_common_abc5939e12d34a01a370d4e8b469abec3}{00079}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacerelease_common_abc5939e12d34a01a370d4e8b469abec3}{updateReadmeFile}}(version):}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00080}00080\ \ \ \ \ \textcolor{keyword}{import}\ updateWandbox}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00081}00081\ }
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00082}00082\ \ \ \ \ downloadParser\ =\ re.compile(\ \textcolor{stringliteral}{r'<a\ href=\(\backslash\)"{}https://github.com/catchorg/Catch2/releases/download/v\(\backslash\)d+\(\backslash\).\(\backslash\)d+\(\backslash\).\(\backslash\)d+/catch.hpp\(\backslash\)"{}>'}\ )}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00083}00083\ \ \ \ \ success,\ wandboxLink\ =\ \mbox{\hyperlink{namespaceupdate_wandbox_aafd943f4137e2dc29b9d22e4fe8f5f05}{updateWandbox.uploadFiles}}()}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00084}00084\ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keywordflow}{not}\ success:}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00085}00085\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\textcolor{stringliteral}{'Error\ when\ uploading\ to\ wandbox:\ \{\}'}.\mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}(wandboxLink))}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00086}00086\ \ \ \ \ \ \ \ \ exit(1)}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00087}00087\ \ \ \ \ f\ =\ open(\ readmePath,\ \textcolor{stringliteral}{'r'}\ )}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00088}00088\ \ \ \ \ lines\ =\ []}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00089}00089\ \ \ \ \ \textcolor{keywordflow}{for}\ line\ \textcolor{keywordflow}{in}\ f:}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00090}00090\ \ \ \ \ \ \ \ \ lines.append(\ line.rstrip()\ )}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00091}00091\ \ \ \ \ f.close()}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00092}00092\ \ \ \ \ f\ =\ open(\ readmePath,\ \textcolor{stringliteral}{'w'}\ )}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00093}00093\ \ \ \ \ \textcolor{keywordflow}{for}\ line\ \textcolor{keywordflow}{in}\ lines:}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00094}00094\ \ \ \ \ \ \ \ \ line\ =\ downloadParser.sub(\ \textcolor{stringliteral}{r'<a\ href="{}https://github.com/catchorg/Catch2/releases/download/v\{0\}/catch.hpp"{}>'}.\mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}(version.getVersionString())\ ,\ line)}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00095}00095\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{stringliteral}{'[![Try\ online](https://img.shields.io/badge/try-\/online-\/blue.svg)]'}\ \textcolor{keywordflow}{in}\ line:}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00096}00096\ \ \ \ \ \ \ \ \ \ \ \ \ line\ =\ \textcolor{stringliteral}{'[![Try\ online](https://img.shields.io/badge/try-\/online-\/blue.svg)](\{0\})'}.\mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}(wandboxLink)}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00097}00097\ \ \ \ \ \ \ \ \ f.write(\ line\ +\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}\ )}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00098}00098\ }
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00099}00099\ }
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00100}\mbox{\hyperlink{namespacerelease_common_aa82f371b478e16fde4b738065af344a2}{00100}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacerelease_common_aa82f371b478e16fde4b738065af344a2}{updateCmakeFile}}(version):}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00101}00101\ \ \ \ \ \textcolor{keyword}{with}\ open(cmakePath,\ \textcolor{stringliteral}{'r'})\ \textcolor{keyword}{as}\ file:}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00102}00102\ \ \ \ \ \ \ \ \ lines\ =\ file.readlines()}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00103}00103\ \ \ \ \ \textcolor{keyword}{with}\ open(cmakePath,\ \textcolor{stringliteral}{'w'})\ \textcolor{keyword}{as}\ file:}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00104}00104\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ line\ \textcolor{keywordflow}{in}\ lines:}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00105}00105\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{stringliteral}{'project(Catch2\ LANGUAGES\ CXX\ VERSION\ '}\ \textcolor{keywordflow}{in}\ line:}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00106}00106\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ file.write(\textcolor{stringliteral}{'project(Catch2\ LANGUAGES\ CXX\ VERSION\ \{0\})\(\backslash\)n'}.\mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}(version.getVersionString()))}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00107}00107\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00108}00108\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ file.write(line)}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00109}00109\ }
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00110}00110\ }
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00111}\mbox{\hyperlink{namespacerelease_common_a24440cfbbd912cfb1f83ee2665d7f762}{00111}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacerelease_common_a24440cfbbd912cfb1f83ee2665d7f762}{updateVersionDefine}}(version):}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00112}00112\ \ \ \ \ \textcolor{keyword}{with}\ open(definePath,\ \textcolor{stringliteral}{'r'})\ \textcolor{keyword}{as}\ file:}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00113}00113\ \ \ \ \ \ \ \ \ lines\ =\ file.readlines()}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00114}00114\ \ \ \ \ \textcolor{keyword}{with}\ open(definePath,\ \textcolor{stringliteral}{'w'})\ \textcolor{keyword}{as}\ file:}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00115}00115\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ line\ \textcolor{keywordflow}{in}\ lines:}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00116}00116\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{stringliteral}{'\#define\ CATCH\_VERSION\_MAJOR'}\ \textcolor{keywordflow}{in}\ line:}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00117}00117\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ file.write(\textcolor{stringliteral}{'\#define\ CATCH\_VERSION\_MAJOR\ \{\}\(\backslash\)n'}.\mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}(version.majorVersion))}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00118}00118\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{elif}\ \textcolor{stringliteral}{'\#define\ CATCH\_VERSION\_MINOR'}\ \textcolor{keywordflow}{in}\ line:}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00119}00119\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ file.write(\textcolor{stringliteral}{'\#define\ CATCH\_VERSION\_MINOR\ \{\}\(\backslash\)n'}.\mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}(version.minorVersion))}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00120}00120\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{elif}\ \textcolor{stringliteral}{'\#define\ CATCH\_VERSION\_PATCH'}\ \textcolor{keywordflow}{in}\ line:}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00121}00121\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ file.write(\textcolor{stringliteral}{'\#define\ CATCH\_VERSION\_PATCH\ \{\}\(\backslash\)n'}.\mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}(version.patchNumber))}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00122}00122\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00123}00123\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ file.write(line)}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00124}00124\ }
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00125}00125\ }
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00126}\mbox{\hyperlink{namespacerelease_common_a75ab03785e12e837df3e858db5c7b896}{00126}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacerelease_common_a75ab03785e12e837df3e858db5c7b896}{performUpdates}}(version):}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00127}00127\ \ \ \ \ \textcolor{comment}{\#\ First\ update\ version\ file,\ so\ we\ can\ regenerate\ single\ header\ and}}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00128}00128\ \ \ \ \ \textcolor{comment}{\#\ have\ it\ ready\ for\ upload\ to\ wandbox,\ when\ updating\ readme}}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00129}00129\ \ \ \ \ version.updateVersionFile()}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00130}00130\ \ \ \ \ \mbox{\hyperlink{namespacerelease_common_a24440cfbbd912cfb1f83ee2665d7f762}{updateVersionDefine}}(version)}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00131}00131\ }
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00132}00132\ \ \ \ \ \textcolor{keyword}{import}\ generateSingleHeader}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00133}00133\ \ \ \ \ \mbox{\hyperlink{namespacegenerate_single_header_a68b36c55964b0e4d53413e63f8597fb5}{generateSingleHeader.generate}}(version)}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00134}00134\ }
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00135}00135\ \ \ \ \ \textcolor{comment}{\#\ Then\ copy\ the\ reporters\ to\ single\ include\ folder\ to\ keep\ them\ in\ sync}}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00136}00136\ \ \ \ \ \textcolor{comment}{\#\ We\ probably\ should\ have\ some\ kind\ of\ convention\ to\ select\ which\ reporters\ need\ to\ be\ copied\ automagically,}}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00137}00137\ \ \ \ \ \textcolor{comment}{\#\ but\ this\ works\ for\ now}}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00138}00138\ \ \ \ \ \textcolor{keyword}{import}\ shutil}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00139}00139\ \ \ \ \ \textcolor{keywordflow}{for}\ rep\ \textcolor{keywordflow}{in}\ (\textcolor{stringliteral}{'automake'},\ \textcolor{stringliteral}{'tap'},\ \textcolor{stringliteral}{'teamcity'}):}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00140}00140\ \ \ \ \ \ \ \ \ sourceFile\ =\ os.path.join(catchPath,\ \textcolor{stringliteral}{'include/reporters/catch\_reporter\_\{\}.hpp'}.\mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}(rep))}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00141}00141\ \ \ \ \ \ \ \ \ destFile\ =\ os.path.join(catchPath,\ \textcolor{stringliteral}{'single\_include'},\ \textcolor{stringliteral}{'catch2'},\ \textcolor{stringliteral}{'catch\_reporter\_\{\}.hpp'}.\mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}(rep))}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00142}00142\ \ \ \ \ \ \ \ \ shutil.copyfile(sourceFile,\ destFile)}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00143}00143\ }
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00144}00144\ \ \ \ \ \mbox{\hyperlink{namespacerelease_common_abc5939e12d34a01a370d4e8b469abec3}{updateReadmeFile}}(version)}
+\DoxyCodeLine{\Hypertarget{release_common_8py_source_l00145}00145\ \ \ \ \ \mbox{\hyperlink{namespacerelease_common_aa82f371b478e16fde4b738065af344a2}{updateCmakeFile}}(version)}
+
+\end{DoxyCode}

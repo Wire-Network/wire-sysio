@@ -1,0 +1,21 @@
+<map id="yh_util_sign_ssh_certificate" name="yh_util_sign_ssh_certificate">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,80,188,106"/>
+<area shape="rect" id="Node000002" href="$yubihsm__pkcs11_8c.html#ae785d5badbf1f08b491af31f32a135a1" title=" " alt="" coords="661,5,733,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="167,77,235,65,464,36,645,19,646,25,465,41,236,70,168,82"/>
+<area shape="rect" id="Node000003" href="$yubihsm_8c.html#a4c26f003b72e800e9c934bca922a404a" title=" " alt="" coords="236,80,384,106"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="188,90,220,90,220,96,188,96"/>
+<area shape="rect" id="Node000006" href="$lib_2error_8c.html#a238eedb1e27dbff2a0ab9a3932eb3f8b" title=" " alt="" coords="655,104,739,130"/>
+<area shape="poly" id="edge11_Node000001_Node000006" title=" " alt="" coords="167,104,236,116,417,144,496,148,597,140,640,131,641,136,598,145,496,153,416,150,235,121,166,109"/>
+<area shape="rect" id="Node000004" href="$yubihsm_8c.html#a77870209747d5ccd90f9da3aae2bdfa8" title=" " alt="" coords="432,55,597,80"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="384,81,416,77,417,82,384,86"/>
+<area shape="rect" id="Node000007" href="$yubihsm_8c.html#a0e96ea59c5f32def80843fec5a3c2142" title=" " alt="" coords="450,104,580,130"/>
+<area shape="poly" id="edge7_Node000003_Node000007" title=" " alt="" coords="384,99,435,105,434,110,384,104"/>
+<area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="564,51,646,29,647,34,566,57"/>
+<area shape="rect" id="Node000005" href="$yubihsm__pkcs11_8c.html#adc4bd59a60361844aa0e852efa210105" title=" " alt="" coords="663,55,731,80"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="598,65,647,65,647,70,598,70"/>
+<area shape="poly" id="edge6_Node000004_Node000006" title=" " alt="" coords="566,78,641,99,640,104,564,84"/>
+<area shape="poly" id="edge8_Node000007_Node000002" title=" " alt="" coords="574,101,596,91,611,79,620,67,629,54,644,40,649,37,652,41,647,44,633,57,624,70,614,83,599,95,576,106"/>
+<area shape="poly" id="edge10_Node000007_Node000006" title=" " alt="" coords="580,114,640,114,640,120,580,120"/>
+<area shape="rect" id="Node000008" href="$rand_8c.html#a2d3d1e86f4093fbe0a1b2a7eede4cd75" title=" " alt="" coords="645,153,749,179"/>
+<area shape="poly" id="edge9_Node000007_Node000008" title=" " alt="" coords="566,128,633,146,631,151,564,133"/>
+</map>

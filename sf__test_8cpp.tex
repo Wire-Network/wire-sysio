@@ -1,0 +1,410 @@
+\doxysection{libraries/fc/libraries/ff/depends/xbyak/test/sf\+\_\+test.cpp File Reference}
+\hypertarget{sf__test_8cpp}{}\label{sf__test_8cpp}\index{libraries/fc/libraries/ff/depends/xbyak/test/sf\_test.cpp@{libraries/fc/libraries/ff/depends/xbyak/test/sf\_test.cpp}}
+{\ttfamily \#include $<$xbyak/xbyak\+\_\+util.\+h$>$}\newline
+Include dependency graph for sf\+\_\+test.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sf__test_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_code}{Code}}
+\item 
+struct \mbox{\hyperlink{struct_code2}{Code2}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{sf__test_8cpp_a3ede98665532cce0e33f614fac5150f9}{XBYAK\+\_\+\+NO\+\_\+\+OP\+\_\+\+NAMES}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{sf__test_8cpp_a44470eb070793b3cd9ce4001a15a162a}{check}} (int x, int y)
+\item 
+void \mbox{\hyperlink{sf__test_8cpp_a738c51c7f8fecf3c0137df6f619326c5}{verify}} (const \mbox{\hyperlink{normalize__prefix_8cpp_adde6aaee8457bee49c2a92621fe22b79}{Xbyak\+::uint8}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}, int p\+Num)
+\item 
+void \mbox{\hyperlink{sf__test_8cpp_aaf3144490c23fd419510cb1e0f341749}{test\+All}} ()
+\item 
+void \mbox{\hyperlink{sf__test_8cpp_a5ab19c1d0c7193e444a83dfb33e0ea00}{test\+Partial}} ()
+\item 
+void \mbox{\hyperlink{sf__test_8cpp_a8e0c81be4adb0a1300d0986f4183f5eb}{put}} (const Xbyak\+::util\+::\+Pack \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})
+\item 
+void \mbox{\hyperlink{sf__test_8cpp_abd4504686f1d31bd9d489162e8808b40}{verify\+Pack}} (const Xbyak\+::util\+::\+Pack \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}, const int \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{cvt__test_8cpp_af73a49a9258b274934a51f5b17b0d1be}{tbl}}, size\+\_\+t tbl\+Num)
+\item 
+void \mbox{\hyperlink{sf__test_8cpp_acf079aacfa943959697ae7c08853258f}{test\+Pack}} ()
+\item 
+int \mbox{\hyperlink{sf__test_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{sf__test_8cpp_a3ede98665532cce0e33f614fac5150f9}\index{sf\_test.cpp@{sf\_test.cpp}!XBYAK\_NO\_OP\_NAMES@{XBYAK\_NO\_OP\_NAMES}}
+\index{XBYAK\_NO\_OP\_NAMES@{XBYAK\_NO\_OP\_NAMES}!sf\_test.cpp@{sf\_test.cpp}}
+\doxysubsubsection{\texorpdfstring{XBYAK\_NO\_OP\_NAMES}{XBYAK\_NO\_OP\_NAMES}}
+{\footnotesize\ttfamily \label{sf__test_8cpp_a3ede98665532cce0e33f614fac5150f9} 
+\#define XBYAK\+\_\+\+NO\+\_\+\+OP\+\_\+\+NAMES}
+
+
+
+Definition at line \mbox{\hyperlink{sf__test_8cpp_source_l00001}{1}} of file \mbox{\hyperlink{sf__test_8cpp_source}{sf\+\_\+test.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{sf__test_8cpp_a44470eb070793b3cd9ce4001a15a162a}\index{sf\_test.cpp@{sf\_test.cpp}!check@{check}}
+\index{check@{check}!sf\_test.cpp@{sf\_test.cpp}}
+\doxysubsubsection{\texorpdfstring{check()}{check()}}
+{\footnotesize\ttfamily \label{sf__test_8cpp_a44470eb070793b3cd9ce4001a15a162a} 
+void check (\begin{DoxyParamCaption}\item[{int}]{x}{, }\item[{int}]{y}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sf__test_8cpp_source_l00158}{158}} of file \mbox{\hyperlink{sf__test_8cpp_source}{sf\+\_\+test.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00159\ \{}
+\DoxyCodeLine{00160\ \ \ \ \ \textcolor{keywordflow}{if}\ (x\ !=\ y)\ \{}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}err\ x=\%d,\ y=\%d\(\backslash\)n"{}},\ x,\ y);}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cvt__test_8cpp_a07add4c3fbc9203071b82b0b43556724}{errNum}}++;}
+\DoxyCodeLine{00163\ \ \ \ \ \}}
+\DoxyCodeLine{00164\ \}}
+
+\end{DoxyCode}
+\Hypertarget{sf__test_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}\index{sf\_test.cpp@{sf\_test.cpp}!main@{main}}
+\index{main@{main}!sf\_test.cpp@{sf\_test.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{sf__test_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4} 
+int main (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sf__test_8cpp_source_l00323}{323}} of file \mbox{\hyperlink{sf__test_8cpp_source}{sf\+\_\+test.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00325\ \{}
+\DoxyCodeLine{00326\ \ \ \ \ \mbox{\hyperlink{sf__test_8cpp_aaf3144490c23fd419510cb1e0f341749}{testAll}}();}
+\DoxyCodeLine{00327\ }
+\DoxyCodeLine{00328\ \ \ \ \ \mbox{\hyperlink{sf__test_8cpp_a5ab19c1d0c7193e444a83dfb33e0ea00}{testPartial}}();}
+\DoxyCodeLine{00329\ \ \ \ \ \mbox{\hyperlink{sf__test_8cpp_acf079aacfa943959697ae7c08853258f}{testPack}}();}
+\DoxyCodeLine{00330\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}errNum=\%d\(\backslash\)n"{}},\ errNum);}
+\DoxyCodeLine{00331\ \}\ \textcolor{keywordflow}{catch}\ (std::exception\&\ e)\ \{}
+\DoxyCodeLine{00332\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}err\ \%s\(\backslash\)n"{}},\ e.what());}
+\DoxyCodeLine{00333\ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{00334\ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{}
+\DoxyCodeLine{00335\ \ \ \ \ puts(\textcolor{stringliteral}{"{}ERR"{}});}
+\DoxyCodeLine{00336\ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{00337\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sf__test_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{sf__test_8cpp_a8e0c81be4adb0a1300d0986f4183f5eb}\index{sf\_test.cpp@{sf\_test.cpp}!put@{put}}
+\index{put@{put}!sf\_test.cpp@{sf\_test.cpp}}
+\doxysubsubsection{\texorpdfstring{put()}{put()}}
+{\footnotesize\ttfamily \label{sf__test_8cpp_a8e0c81be4adb0a1300d0986f4183f5eb} 
+void put (\begin{DoxyParamCaption}\item[{const Xbyak\+::util\+::\+Pack \&}]{p}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sf__test_8cpp_source_l00273}{273}} of file \mbox{\hyperlink{sf__test_8cpp_source}{sf\+\_\+test.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00274\ \{}
+\DoxyCodeLine{00275\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0,\ n\ =\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.\mbox{\hyperlink{structmie_1_1_vuint_t_a1be409ac9e110dc4b60234ce37cbf0c8}{size}}();\ i\ <\ n;\ i++)\ \{}
+\DoxyCodeLine{00276\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\%s\ "{}},\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}[i].toString());}
+\DoxyCodeLine{00277\ \ \ \ \ \}}
+\DoxyCodeLine{00278\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{00279\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=234pt]{sf__test_8cpp_a8e0c81be4adb0a1300d0986f4183f5eb_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{sf__test_8cpp_aaf3144490c23fd419510cb1e0f341749}\index{sf\_test.cpp@{sf\_test.cpp}!testAll@{testAll}}
+\index{testAll@{testAll}!sf\_test.cpp@{sf\_test.cpp}}
+\doxysubsubsection{\texorpdfstring{testAll()}{testAll()}}
+{\footnotesize\ttfamily \label{sf__test_8cpp_aaf3144490c23fd419510cb1e0f341749} 
+void test\+All (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sf__test_8cpp_source_l00190}{190}} of file \mbox{\hyperlink{sf__test_8cpp_source}{sf\+\_\+test.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00191\ \{}
+\DoxyCodeLine{00192\ \ \ \ \ \mbox{\hyperlink{struct_code2}{Code2}}\ code;}
+\DoxyCodeLine{00193\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ stackSize\ =\ 0;\ stackSize\ <\ 32;\ stackSize\ +=\ 7)\ \{}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ pNum\ =\ 0;\ pNum\ <\ 4;\ pNum++)\ \{}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ mode\ =\ 0;\ mode\ <\ 4;\ mode++)\ \{}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ maxNum\ =\ 0;}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ opt\ =\ 0;}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (mode\ ==\ 0)\ \{}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ maxNum\ =\ 10;}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (mode\ ==\ 1)\ \{}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ maxNum\ =\ 9;}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ opt\ =\ UseRCX;}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (mode\ ==\ 2)\ \{}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ maxNum\ =\ 9;}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ opt\ =\ UseRDX;}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ maxNum\ =\ 8;}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ opt\ =\ UseRCX\ |\ UseRDX;}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ tNum\ =\ 0;\ tNum\ <\ maxNum;\ tNum++)\ \{}
+\DoxyCodeLine{00211\ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ printf("{}pNum=\%d,\ tNum=\%d,\ stackSize=\%d\(\backslash\)n"{},\ pNum,\ tNum\ |\ opt,\ stackSize);}}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ Xbyak::uint8\ *\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}\ =\ code.getCurr();}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ code.gen(pNum,\ tNum\ |\ opt,\ stackSize);}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sf__test_8cpp_a738c51c7f8fecf3c0137df6f619326c5}{verify}}(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}},\ pNum);}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00217\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00218\ \ \ \ \ \}}
+\DoxyCodeLine{00219\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=317pt]{sf__test_8cpp_aaf3144490c23fd419510cb1e0f341749_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=197pt]{sf__test_8cpp_aaf3144490c23fd419510cb1e0f341749_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{sf__test_8cpp_acf079aacfa943959697ae7c08853258f}\index{sf\_test.cpp@{sf\_test.cpp}!testPack@{testPack}}
+\index{testPack@{testPack}!sf\_test.cpp@{sf\_test.cpp}}
+\doxysubsubsection{\texorpdfstring{testPack()}{testPack()}}
+{\footnotesize\ttfamily \label{sf__test_8cpp_acf079aacfa943959697ae7c08853258f} 
+void test\+Pack (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sf__test_8cpp_source_l00288}{288}} of file \mbox{\hyperlink{sf__test_8cpp_source}{sf\+\_\+test.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00289\ \{}
+\DoxyCodeLine{00290\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\ =\ 10;}
+\DoxyCodeLine{00291\ \ \ \ \ Xbyak::Reg64\ regTbl[\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}];}
+\DoxyCodeLine{00292\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}};\ i++)\ \{}
+\DoxyCodeLine{00293\ \ \ \ \ \ \ \ \ regTbl[i]\ =\ Xbyak::Reg64(i);}
+\DoxyCodeLine{00294\ \ \ \ \ \}}
+\DoxyCodeLine{00295\ \ \ \ \ Xbyak::util::Pack\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}(regTbl,\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}});}
+\DoxyCodeLine{00296\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00297\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ pos;}
+\DoxyCodeLine{00298\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6a0fc3cfbc27e91ea60a787de13dae3e3c}{num}};}
+\DoxyCodeLine{00299\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{cvt__test_8cpp_af73a49a9258b274934a51f5b17b0d1be}{tbl}}[10];}
+\DoxyCodeLine{00300\ \ \ \ \ \}\ \mbox{\hyperlink{cvt__test_8cpp_af73a49a9258b274934a51f5b17b0d1be}{tbl}}[]\ =\ \{}
+\DoxyCodeLine{00301\ \ \ \ \ \ \ \ \ \{\ 0,\ 10,\ \{\ 0,\ 1,\ 2,\ 3,\ 4,\ 5,\ 6,\ 7,\ 8,\ 9\ \}\ \},}
+\DoxyCodeLine{00302\ \ \ \ \ \ \ \ \ \{\ 1,\ 9,\ \{\ 1,\ 2,\ 3,\ 4,\ 5,\ 6,\ 7,\ 8,\ 9\ \}\ \},}
+\DoxyCodeLine{00303\ \ \ \ \ \ \ \ \ \{\ 2,\ 8,\ \{\ 2,\ 3,\ 4,\ 5,\ 6,\ 7,\ 8,\ 9\ \}\ \},}
+\DoxyCodeLine{00304\ \ \ \ \ \ \ \ \ \{\ 3,\ 7,\ \{\ 3,\ 4,\ 5,\ 6,\ 7,\ 8,\ 9\ \}\ \},}
+\DoxyCodeLine{00305\ \ \ \ \ \ \ \ \ \{\ 4,\ 6,\ \{\ 4,\ 5,\ 6,\ 7,\ 8,\ 9\ \}\ \},}
+\DoxyCodeLine{00306\ \ \ \ \ \ \ \ \ \{\ 5,\ 5,\ \{\ 5,\ 6,\ 7,\ 8,\ 9\ \}\ \},}
+\DoxyCodeLine{00307\ \ \ \ \ \ \ \ \ \{\ 6,\ 4,\ \{\ 6,\ 7,\ 8,\ 9\ \}\ \},}
+\DoxyCodeLine{00308\ \ \ \ \ \ \ \ \ \{\ 7,\ 3,\ \{\ 7,\ 8,\ 9\ \}\ \},}
+\DoxyCodeLine{00309\ \ \ \ \ \ \ \ \ \{\ 8,\ 2,\ \{\ 8,\ 9\ \}\ \},}
+\DoxyCodeLine{00310\ \ \ \ \ \ \ \ \ \{\ 9,\ 1,\ \{\ 9\ \}\ \},}
+\DoxyCodeLine{00311\ \ \ \ \ \ \ \ \ \{\ 3,\ 5,\ \{\ 3,\ 4,\ 5,\ 6,\ 7\ \}\ \},}
+\DoxyCodeLine{00312\ \ \ \ \ \};}
+\DoxyCodeLine{00313\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{cvt__test_8cpp_af73a49a9258b274934a51f5b17b0d1be}{tbl}})\ /\ \textcolor{keyword}{sizeof}(*tbl);\ i++)\ \{}
+\DoxyCodeLine{00314\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ pos\ =\ \mbox{\hyperlink{cvt__test_8cpp_af73a49a9258b274934a51f5b17b0d1be}{tbl}}[i].pos;}
+\DoxyCodeLine{00315\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6a0fc3cfbc27e91ea60a787de13dae3e3c}{num}}\ =\ \mbox{\hyperlink{cvt__test_8cpp_af73a49a9258b274934a51f5b17b0d1be}{tbl}}[i].num;}
+\DoxyCodeLine{00316\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sf__test_8cpp_abd4504686f1d31bd9d489162e8808b40}{verifyPack}}(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.\mbox{\hyperlink{structmie_1_1_vuint_t_ad85b40342da8c0192de25bf5a617b816}{sub}}(pos,\ num),\ \mbox{\hyperlink{cvt__test_8cpp_af73a49a9258b274934a51f5b17b0d1be}{tbl}}[i].tbl,\ num);}
+\DoxyCodeLine{00317\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (pos\ +\ num\ ==\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}})\ \{}
+\DoxyCodeLine{00318\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sf__test_8cpp_abd4504686f1d31bd9d489162e8808b40}{verifyPack}}(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.\mbox{\hyperlink{structmie_1_1_vuint_t_ad85b40342da8c0192de25bf5a617b816}{sub}}(pos),\ \mbox{\hyperlink{cvt__test_8cpp_af73a49a9258b274934a51f5b17b0d1be}{tbl}}[i].tbl,\ num);}
+\DoxyCodeLine{00319\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00320\ \ \ \ \ \}}
+\DoxyCodeLine{00321\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sf__test_8cpp_acf079aacfa943959697ae7c08853258f_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=208pt]{sf__test_8cpp_acf079aacfa943959697ae7c08853258f_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{sf__test_8cpp_a5ab19c1d0c7193e444a83dfb33e0ea00}\index{sf\_test.cpp@{sf\_test.cpp}!testPartial@{testPartial}}
+\index{testPartial@{testPartial}!sf\_test.cpp@{sf\_test.cpp}}
+\doxysubsubsection{\texorpdfstring{testPartial()}{testPartial()}}
+{\footnotesize\ttfamily \label{sf__test_8cpp_a5ab19c1d0c7193e444a83dfb33e0ea00} 
+void test\+Partial (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sf__test_8cpp_source_l00221}{221}} of file \mbox{\hyperlink{sf__test_8cpp_source}{sf\+\_\+test.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00222\ \{}
+\DoxyCodeLine{00223\ \ \ \ \ \mbox{\hyperlink{struct_code}{Code}}\ code;}
+\DoxyCodeLine{00224\ \ \ \ \ int\ (*f1)(int)\ =\ code.\mbox{\hyperlink{class_xbyak_1_1_code_array_afabcf388ffe9ce14cb1b36c333d96f4b}{getCurr}}<int\ (*)(int)>();}
+\DoxyCodeLine{00225\ \ \ \ \ code.gen1();}
+\DoxyCodeLine{00226\ \ \ \ \ check(5,\ \mbox{\hyperlink{namespacestd_1_1tr1_a9c0fa65b105f8e2f58ba59ecf75fd000}{f1}}(5));}
+\DoxyCodeLine{00227\ }
+\DoxyCodeLine{00228\ \ \ \ \ int\ (*f2)(int,\ int)\ =\ code.getCurr<int\ (*)(int,\ int)>();}
+\DoxyCodeLine{00229\ \ \ \ \ code.gen2();}
+\DoxyCodeLine{00230\ \ \ \ \ check(9,\ \mbox{\hyperlink{namespacestd_1_1tr1_a87dd9e009868361317f587126dba63d4}{f2}}(3,\ 6));}
+\DoxyCodeLine{00231\ }
+\DoxyCodeLine{00232\ \ \ \ \ int\ (*f3)(int,\ int,\ int)\ =\ code.getCurr<int\ (*)(int,\ int,\ int)>();}
+\DoxyCodeLine{00233\ \ \ \ \ code.gen3();}
+\DoxyCodeLine{00234\ \ \ \ \ check(14,\ \mbox{\hyperlink{namespacestd_1_1tr1_a0f7c3b47d27d42d82d1a333ea420ce4e}{f3}}(1,\ 4,\ 9));}
+\DoxyCodeLine{00235\ }
+\DoxyCodeLine{00236\ \ \ \ \ int\ (*f4)(int,\ int,\ int,\ int)\ =\ code.getCurr<int\ (*)(int,\ int,\ int,\ int)>();}
+\DoxyCodeLine{00237\ \ \ \ \ code.gen4();}
+\DoxyCodeLine{00238\ \ \ \ \ check(30,\ \mbox{\hyperlink{namespacestd_1_1tr1_adc796e02b7385d526aff708189564f67}{f4}}(1,\ 4,\ 9,\ 16));}
+\DoxyCodeLine{00239\ }
+\DoxyCodeLine{00240\ \ \ \ \ int\ (*f5)(int,\ int,\ int,\ int)\ =\ code.getCurr<int\ (*)(int,\ int,\ int,\ int)>();}
+\DoxyCodeLine{00241\ \ \ \ \ code.gen5();}
+\DoxyCodeLine{00242\ \ \ \ \ check(23,\ \mbox{\hyperlink{namespacestd_1_1tr1_a9c1eb66b2b2fa321942af95405232a0d}{f5}}(2,\ 5,\ 7,\ 9));}
+\DoxyCodeLine{00243\ }
+\DoxyCodeLine{00244\ \ \ \ \ int\ (*f6)(int,\ int,\ int,\ int)\ =\ code.getCurr<int\ (*)(int,\ int,\ int,\ int)>();}
+\DoxyCodeLine{00245\ \ \ \ \ code.gen6();}
+\DoxyCodeLine{00246\ \ \ \ \ check(18,\ \mbox{\hyperlink{namespacestd_1_1tr1_a6b62f32e1e3e21bceb94eb46c4cbfd56}{f6}}(3,\ 4,\ 5,\ 6));}
+\DoxyCodeLine{00247\ }
+\DoxyCodeLine{00248\ \ \ \ \ int\ (*f7)(int,\ int,\ int)\ =\ code.getCurr<int\ (*)(int,\ int,\ int)>();}
+\DoxyCodeLine{00249\ \ \ \ \ code.gen7();}
+\DoxyCodeLine{00250\ \ \ \ \ check(12,\ \mbox{\hyperlink{namespacestd_1_1tr1_a2185f3a1c07f2df072c39cb91ffa89a4}{f7}}(3,\ 4,\ 5));}
+\DoxyCodeLine{00251\ }
+\DoxyCodeLine{00252\ \ \ \ \ int\ (*f8)(int,\ int,\ int)\ =\ code.getCurr<int\ (*)(int,\ int,\ int)>();}
+\DoxyCodeLine{00253\ \ \ \ \ code.gen8();}
+\DoxyCodeLine{00254\ \ \ \ \ check(23,\ \mbox{\hyperlink{namespacestd_1_1tr1_ab998afa41cea8d6d26d7e4288b0bf974}{f8}}(5,\ 8,\ 10));}
+\DoxyCodeLine{00255\ }
+\DoxyCodeLine{00256\ \ \ \ \ int\ (*f9)(int,\ int,\ int)\ =\ code.getCurr<int\ (*)(int,\ int,\ int)>();}
+\DoxyCodeLine{00257\ \ \ \ \ code.gen9();}
+\DoxyCodeLine{00258\ \ \ \ \ check(60,\ \mbox{\hyperlink{namespacestd_1_1tr1_a216d2c7cdfaaf415caba2f88e2c34413}{f9}}(10,\ 20,\ 30));}
+\DoxyCodeLine{00259\ }
+\DoxyCodeLine{00260\ \ \ \ \ int\ (*f10)(int,\ int,\ int,\ int)\ =\ code.getCurr<int\ (*)(int,\ int,\ int,\ int)>();}
+\DoxyCodeLine{00261\ \ \ \ \ code.gen10();}
+\DoxyCodeLine{00262\ \ \ \ \ check(100,\ f10(10,\ 20,\ 30,\ 40));}
+\DoxyCodeLine{00263\ }
+\DoxyCodeLine{00264\ \ \ \ \ int\ (*f11)()\ =\ code.getCurr<int\ (*)()>();}
+\DoxyCodeLine{00265\ \ \ \ \ code.gen11();}
+\DoxyCodeLine{00266\ \ \ \ \ check(3,\ f11());}
+\DoxyCodeLine{00267\ }
+\DoxyCodeLine{00268\ \ \ \ \ int\ (*f12)(int,\ int,\ int,\ int)\ =\ code.getCurr<int\ (*)(int,\ int,\ int,\ int)>();}
+\DoxyCodeLine{00269\ \ \ \ \ code.gen12();}
+\DoxyCodeLine{00270\ \ \ \ \ check(24,\ f12(3,\ 5,\ 7,\ 9));}
+\DoxyCodeLine{00271\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=311pt]{sf__test_8cpp_a5ab19c1d0c7193e444a83dfb33e0ea00_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=213pt]{sf__test_8cpp_a5ab19c1d0c7193e444a83dfb33e0ea00_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{sf__test_8cpp_a738c51c7f8fecf3c0137df6f619326c5}\index{sf\_test.cpp@{sf\_test.cpp}!verify@{verify}}
+\index{verify@{verify}!sf\_test.cpp@{sf\_test.cpp}}
+\doxysubsubsection{\texorpdfstring{verify()}{verify()}}
+{\footnotesize\ttfamily \label{sf__test_8cpp_a738c51c7f8fecf3c0137df6f619326c5} 
+void verify (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{normalize__prefix_8cpp_adde6aaee8457bee49c2a92621fe22b79}{Xbyak\+::uint8}} \texorpdfstring{$\ast$}{*}}]{f}{, }\item[{int}]{p\+Num}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sf__test_8cpp_source_l00166}{166}} of file \mbox{\hyperlink{sf__test_8cpp_source}{sf\+\_\+test.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00167\ \{}
+\DoxyCodeLine{00168\ \ \ \ \ \textcolor{keywordflow}{switch}\ (pNum)\ \{}
+\DoxyCodeLine{00169\ \ \ \ \ \textcolor{keywordflow}{case}\ 0:}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ check(1,\ \mbox{\hyperlink{namespace_xbyak_ad60ea5f6215534109ed45a19f413a6f0}{Xbyak::CastTo}}<\textcolor{keywordtype}{int}\ (*)()>(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})());}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00172\ \ \ \ \ \textcolor{keywordflow}{case}\ 1:}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ check(11,\ \mbox{\hyperlink{namespace_xbyak_ad60ea5f6215534109ed45a19f413a6f0}{Xbyak::CastTo}}<\textcolor{keywordtype}{int}\ (*)(\textcolor{keywordtype}{int})>(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})(10));}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00175\ \ \ \ \ \textcolor{keywordflow}{case}\ 2:}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ check(111,\ \mbox{\hyperlink{namespace_xbyak_ad60ea5f6215534109ed45a19f413a6f0}{Xbyak::CastTo}}<\textcolor{keywordtype}{int}\ (*)(\textcolor{keywordtype}{int},\ \textcolor{keywordtype}{int})>(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})(10,\ 100));}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00178\ \ \ \ \ \textcolor{keywordflow}{case}\ 3:}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ check(1111,\ \mbox{\hyperlink{namespace_xbyak_ad60ea5f6215534109ed45a19f413a6f0}{Xbyak::CastTo}}<\textcolor{keywordtype}{int}\ (*)(\textcolor{keywordtype}{int},\ \textcolor{keywordtype}{int},\ \textcolor{keywordtype}{int})>(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})(10,\ 100,\ 1000));}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00181\ \ \ \ \ \textcolor{keywordflow}{case}\ 4:}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ check(11111,\ \mbox{\hyperlink{namespace_xbyak_ad60ea5f6215534109ed45a19f413a6f0}{Xbyak::CastTo}}<\textcolor{keywordtype}{int}\ (*)(\textcolor{keywordtype}{int},\ \textcolor{keywordtype}{int},\ \textcolor{keywordtype}{int},\ \textcolor{keywordtype}{int})>(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})(10,\ 100,\ 1000,\ 10000));}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00184\ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}ERR\ pNum=\%d\(\backslash\)n"{}},\ pNum);}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ exit(1);}
+\DoxyCodeLine{00187\ \ \ \ \ \}}
+\DoxyCodeLine{00188\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=237pt]{sf__test_8cpp_a738c51c7f8fecf3c0137df6f619326c5_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=273pt]{sf__test_8cpp_a738c51c7f8fecf3c0137df6f619326c5_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{sf__test_8cpp_abd4504686f1d31bd9d489162e8808b40}\index{sf\_test.cpp@{sf\_test.cpp}!verifyPack@{verifyPack}}
+\index{verifyPack@{verifyPack}!sf\_test.cpp@{sf\_test.cpp}}
+\doxysubsubsection{\texorpdfstring{verifyPack()}{verifyPack()}}
+{\footnotesize\ttfamily \label{sf__test_8cpp_abd4504686f1d31bd9d489162e8808b40} 
+void verify\+Pack (\begin{DoxyParamCaption}\item[{const Xbyak\+::util\+::\+Pack \&}]{p}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{tbl}{, }\item[{size\+\_\+t}]{tbl\+Num}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sf__test_8cpp_source_l00281}{281}} of file \mbox{\hyperlink{sf__test_8cpp_source}{sf\+\_\+test.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00282\ \{}
+\DoxyCodeLine{00283\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ tblNum;\ i++)\ \{}
+\DoxyCodeLine{00284\ \ \ \ \ \ \ \ \ check(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}[i].getIdx(),\ \mbox{\hyperlink{cvt__test_8cpp_af73a49a9258b274934a51f5b17b0d1be}{tbl}}[i]);}
+\DoxyCodeLine{00285\ \ \ \ \ \}}
+\DoxyCodeLine{00286\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=307pt]{sf__test_8cpp_abd4504686f1d31bd9d489162e8808b40_icgraph}
+\end{center}
+\end{figure}

@@ -1,0 +1,735 @@
+\doxysection{libraries/chain/webassembly/runtimes/sys-\/vm.cpp File Reference}
+\hypertarget{sys-vm_8cpp}{}\label{sys-vm_8cpp}\index{libraries/chain/webassembly/runtimes/sys-\/vm.cpp@{libraries/chain/webassembly/runtimes/sys-\/vm.cpp}}
+{\ttfamily \#include $<$sysio/chain/webassembly/sys-\/vm.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/webassembly/interface.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/apply\+\_\+context.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/transaction\+\_\+context.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/global\+\_\+property\+\_\+object.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/wasm\+\_\+sysio\+\_\+constraints.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/vm/backend.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/webassembly/preconditions.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/hana/string.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/hana/equal.\+hpp$>$}\newline
+Include dependency graph for sys-\/vm.cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sys-vm_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1setcode__options}{sysio\+::chain\+::webassembly\+::eos\+\_\+vm\+\_\+runtime\+::setcode\+\_\+options}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1apply__options}{sysio\+::chain\+::webassembly\+::eos\+\_\+vm\+\_\+runtime\+::apply\+\_\+options}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1eos__vm__instantiated__module}{sysio\+::chain\+::webassembly\+::eos\+\_\+vm\+\_\+runtime\+::eos\+\_\+vm\+\_\+instantiated\+\_\+module$<$ Impl $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1webassembly_1_1host__function__registrator}{sysio\+::chain\+::webassembly\+::host\+\_\+function\+\_\+registrator$<$ Host\+Function, Preconditions $>$}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain}{sysio\+::chain}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly}{sysio\+::chain\+::webassembly}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_1_1eos__vm__runtime}{sysio\+::chain\+::webassembly\+::eos\+\_\+vm\+\_\+runtime}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{sys-vm_8cpp_abfb296a38e808912704c00b675563426}{REGISTER\+\_\+\+INJECTED\+\_\+\+HOST\+\_\+\+FUNCTION}}(\mbox{\hyperlink{pointertest_8cpp_a59c7737920212dcb3bb9df58d7062de4}{NAME}}, ...)
+\item 
+\#define \mbox{\hyperlink{sys-vm_8cpp_a955991a960d19caf9a2fe8316fe1a3ce}{REGISTER\+\_\+\+HOST\+\_\+\+FUNCTION}}(\mbox{\hyperlink{pointertest_8cpp_a59c7737920212dcb3bb9df58d7062de4}{NAME}}, ...)
+\item 
+\#define \mbox{\hyperlink{sys-vm_8cpp_a0aa4259a0e30c27c2ec0fb0c1da3d839}{REGISTER\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}}(\mbox{\hyperlink{pointertest_8cpp_a59c7737920212dcb3bb9df58d7062de4}{NAME}}, ...)
+\item 
+\#define \mbox{\hyperlink{sys-vm_8cpp_a2489344683e1771a6ff59a98b1543d52}{REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION}}(\mbox{\hyperlink{pointertest_8cpp_a59c7737920212dcb3bb9df58d7062de4}{NAME}}, ...)
+\item 
+\#define \mbox{\hyperlink{sys-vm_8cpp_a5e72f2d1a4ce1437e982af86a372595b}{REGISTER\+\_\+\+LEGACY\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}}(\mbox{\hyperlink{pointertest_8cpp_a59c7737920212dcb3bb9df58d7062de4}{NAME}}, ...)
+\item 
+\#define \mbox{\hyperlink{sys-vm_8cpp_a26efb7c7e42b1c7359676e60b6b3fa9d}{REGISTER\+\_\+\+LEGACY\+\_\+\+CF\+\_\+\+ONLY\+\_\+\+HOST\+\_\+\+FUNCTION}}(\mbox{\hyperlink{pointertest_8cpp_a59c7737920212dcb3bb9df58d7062de4}{NAME}}, ...)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_a78d9d364a9ab60de8d18b4660f592d5f}{sysio\+::chain\+::webassembly\+::eos\+\_\+vm\+\_\+runtime\+::validate}} (const \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}} \&code, const \mbox{\hyperlink{namespacesysio_1_1chain_ab67e634f02d35e09950917271779b2ff}{whitelisted\+\_\+intrinsics\+\_\+type}} \&intrinsics)
+\item 
+void \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_a9cd22b0e9d05f910358f809fcd29ffec}{sysio\+::chain\+::webassembly\+::eos\+\_\+vm\+\_\+runtime\+::validate}} (const \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}} \&code, const \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config}{wasm\+\_\+config}} \&cfg, const \mbox{\hyperlink{namespacesysio_1_1chain_ab67e634f02d35e09950917271779b2ff}{whitelisted\+\_\+intrinsics\+\_\+type}} \&intrinsics)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a9196a443c89203ea09cfab76b181dc0b}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+HOST\+\_\+\+FUNCTION}} (is\+\_\+feature\+\_\+active, privileged\+\_\+check)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a9439fbc4b6c4988fa557801856c2382f}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+HOST\+\_\+\+FUNCTION}} (activate\+\_\+feature, privileged\+\_\+check)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a65ca1f3f76128cea123669ee707e1abd}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION}} (\mbox{\hyperlink{namespacesysio_1_1chain_a406d45a184cdba0af316b5bf34bf56cfa26c81486f55acca0e2de7ec342d97105}{preactivate\+\_\+feature}}, privileged\+\_\+check)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a6d99b354f21e8b71d9eaf7bb86f53554}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+HOST\+\_\+\+FUNCTION}} (set\+\_\+resource\+\_\+limits, privileged\+\_\+check)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a48cea15600f89613c31cb1aeb8eb7342}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION}} (get\+\_\+resource\+\_\+limits, privileged\+\_\+check)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a42c6f3e00c8177d146f221093c57dece}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+HOST\+\_\+\+FUNCTION}} (get\+\_\+parameters\+\_\+packed, privileged\+\_\+check)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_aba7ed884dd1a6add72a1ce38dbe1cbbc}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+HOST\+\_\+\+FUNCTION}} (set\+\_\+parameters\+\_\+packed, privileged\+\_\+check)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a1c9e03082e2746f704531884da6aa330}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+HOST\+\_\+\+FUNCTION}} (get\+\_\+wasm\+\_\+parameters\+\_\+packed, privileged\+\_\+check)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_acf8d209f628df11ba61f82cd74d31051}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+HOST\+\_\+\+FUNCTION}} (set\+\_\+wasm\+\_\+parameters\+\_\+packed, privileged\+\_\+check)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a93ae68e3970d872fb089a1af572f8352}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION}} (set\+\_\+proposed\+\_\+producers, privileged\+\_\+check)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_aa5ccae69d51165e62337b0a2d1bbfe94}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION}} (set\+\_\+proposed\+\_\+producers\+\_\+ex, privileged\+\_\+check)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_afc0297eff628338c02fcdc0b613d75af}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION}} (get\+\_\+blockchain\+\_\+parameters\+\_\+packed, privileged\+\_\+check)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_aee450cca1e9aa7dcd5507f9637988c81}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION}} (set\+\_\+blockchain\+\_\+parameters\+\_\+packed, privileged\+\_\+check)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a9780a9130444e4672da348a0036ccf3c}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+HOST\+\_\+\+FUNCTION}} (is\+\_\+privileged, privileged\+\_\+check)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_acd8bb318bc17db213876e69892384e86}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+HOST\+\_\+\+FUNCTION}} (set\+\_\+privileged, privileged\+\_\+check)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_aefbbc4113015d07f2970a763c5f261f2}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+INJECTED\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+sysio\+\_\+f32\+\_\+add)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a2d56a2b97dd121bb19f5fe2e99af377f}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+INJECTED\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+sysio\+\_\+f32\+\_\+sub)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a1e9de77b2cc7c8a501372ef917fb8d2a}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+INJECTED\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+sysio\+\_\+f32\+\_\+div)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a2361dda1ff9e508427e66df47072e8f4}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+INJECTED\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+sysio\+\_\+f32\+\_\+mul)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a2cb8efece5f958ce9dfd2c1fcb34a286}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+INJECTED\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+sysio\+\_\+f32\+\_\+min)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_aa1e665e1ce39c4c5c1418352c2a2877a}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+INJECTED\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+sysio\+\_\+f32\+\_\+max)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a32795676248322d6c6341a919db91761}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+INJECTED\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+sysio\+\_\+f32\+\_\+copysign)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_ad842ab11fde4d0432344cd3754826552}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+INJECTED\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+sysio\+\_\+f32\+\_\+abs)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a6469b0b2613213a9ac6204828103d1ed}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+INJECTED\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+sysio\+\_\+f32\+\_\+neg)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a979f9fac10657856c7b3450779a4279e}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+INJECTED\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+sysio\+\_\+f32\+\_\+sqrt)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a67887136bf061f1e0a1b37e8d45fcd1f}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+INJECTED\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+sysio\+\_\+f32\+\_\+ceil)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a010954a51f7e578995b76cd423645e72}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+INJECTED\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+sysio\+\_\+f32\+\_\+floor)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a5d736ad788910903a52f50ba0bc4298c}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+INJECTED\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+sysio\+\_\+f32\+\_\+trunc)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_abcc564c75713c5d997b5c238c3826465}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+INJECTED\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+sysio\+\_\+f32\+\_\+nearest)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a2319dbee9c9c43280e8775a271972fee}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+INJECTED\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+sysio\+\_\+f32\+\_\+eq)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a813e1d990e90f59f37d61fe453dac0e7}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+INJECTED\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+sysio\+\_\+f32\+\_\+ne)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a2295f389d126d13c5e1a5324b9170862}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+INJECTED\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+sysio\+\_\+f32\+\_\+lt)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_adc18db13852e58e2a799c9cba44f40ac}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+INJECTED\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+sysio\+\_\+f32\+\_\+le)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a97f0f83a8f4ed1a565b250cf2e346639}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+INJECTED\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+sysio\+\_\+f32\+\_\+gt)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a8d58a148f46d3da33185c24181608685}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+INJECTED\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+sysio\+\_\+f32\+\_\+ge)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a2faf8c12242acbc355d8149181ccf368}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+INJECTED\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+sysio\+\_\+f64\+\_\+add)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_ac17e386e1a7836cef8d1cd5369f0d485}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+INJECTED\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+sysio\+\_\+f64\+\_\+sub)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_adf300931ab3ffe20511bd4acef83c61e}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+INJECTED\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+sysio\+\_\+f64\+\_\+div)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a705e51148a851775e6ff3836e0d4f12d}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+INJECTED\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+sysio\+\_\+f64\+\_\+mul)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a5f5961ffdf77d0721d6646e3607ca1a5}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+INJECTED\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+sysio\+\_\+f64\+\_\+min)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a2edb7a691c5e9df20dfe62e789082135}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+INJECTED\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+sysio\+\_\+f64\+\_\+max)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a159f4d7c1e8ed1dda3187c6d193d67cf}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+INJECTED\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+sysio\+\_\+f64\+\_\+copysign)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a16138beeca6a4b92685d7b276fb68e22}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+INJECTED\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+sysio\+\_\+f64\+\_\+abs)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a5bef56b04c52041bb874815ad1e05f5e}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+INJECTED\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+sysio\+\_\+f64\+\_\+neg)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a52d131530d4a9e904d4c6c5bfe33c86a}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+INJECTED\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+sysio\+\_\+f64\+\_\+sqrt)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_ad54d04e978a736be665371d94cf08f38}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+INJECTED\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+sysio\+\_\+f64\+\_\+ceil)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a250938bc82eff201e13f245b9315cc49}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+INJECTED\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+sysio\+\_\+f64\+\_\+floor)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a86159901ea3190a4e63b55359b455ac7}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+INJECTED\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+sysio\+\_\+f64\+\_\+trunc)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a5dca71505d8bf34364c160cfbf1dd650}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+INJECTED\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+sysio\+\_\+f64\+\_\+nearest)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_ae50ced2810a4c95d7f95e2983e237637}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+INJECTED\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+sysio\+\_\+f64\+\_\+eq)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a2ac4685487f19299d95d802e171e0620}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+INJECTED\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+sysio\+\_\+f64\+\_\+ne)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a0d6d630fc09cbc4520575353519ce6f9}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+INJECTED\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+sysio\+\_\+f64\+\_\+lt)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a446b853319efced34ccbbf39b1e6e9fb}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+INJECTED\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+sysio\+\_\+f64\+\_\+le)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_adb7fc77e44bf309853e95a3777330754}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+INJECTED\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+sysio\+\_\+f64\+\_\+gt)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_aea79f43066299bf84923a973c498dcd8}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+INJECTED\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+sysio\+\_\+f64\+\_\+ge)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_ae5f200e17528c560c288fe794f79bb16}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+INJECTED\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+sysio\+\_\+f32\+\_\+promote)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a9b5a9841396e652d17654ad126419ca8}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+INJECTED\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+sysio\+\_\+f64\+\_\+demote)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a13479f34735ae7decb7602639c13246e}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+INJECTED\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+sysio\+\_\+f32\+\_\+trunc\+\_\+i32s)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a0e2f91cd424986bd55a7f0e1e9f049e4}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+INJECTED\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+sysio\+\_\+f64\+\_\+trunc\+\_\+i32s)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a753491bb78796e273b8909bd4358f644}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+INJECTED\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+sysio\+\_\+f32\+\_\+trunc\+\_\+i32u)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a90a5db9736114b1ccc22815283f9e251}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+INJECTED\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+sysio\+\_\+f64\+\_\+trunc\+\_\+i32u)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_ab857a41a4bc2e3d116b8579b19ba8d5d}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+INJECTED\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+sysio\+\_\+f32\+\_\+trunc\+\_\+i64s)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a5a22de1687fcc6ee3bf5c1e158248f67}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+INJECTED\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+sysio\+\_\+f64\+\_\+trunc\+\_\+i64s)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_ac034f9967f69f1ad164e2add568f8229}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+INJECTED\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+sysio\+\_\+f32\+\_\+trunc\+\_\+i64u)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a17e8edb81ce709fcda234b9d6f51b5a6}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+INJECTED\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+sysio\+\_\+f64\+\_\+trunc\+\_\+i64u)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a019e0698e00027fa4bbb871eb437da6b}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+INJECTED\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+sysio\+\_\+i32\+\_\+to\+\_\+f32)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a367f23a4bbc1bda6c61a6d5f76ddebb6}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+INJECTED\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+sysio\+\_\+i64\+\_\+to\+\_\+f32)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a961ef49329a7dff1234813e78e238f43}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+INJECTED\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+sysio\+\_\+ui32\+\_\+to\+\_\+f32)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a630a9d23e5ad3d780eb5e8ea6780638c}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+INJECTED\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+sysio\+\_\+ui64\+\_\+to\+\_\+f32)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a1bbf04d621ad903a7913b0259fd9a1da}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+INJECTED\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+sysio\+\_\+i32\+\_\+to\+\_\+f64)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a0635b3d29c3ea392198e6c2433d1a5b7}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+INJECTED\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+sysio\+\_\+i64\+\_\+to\+\_\+f64)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a8222a2f2c37fc2cb88d7dd0db2a47c41}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+INJECTED\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+sysio\+\_\+ui32\+\_\+to\+\_\+f64)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a117ea83706d35de33b022986c8f46266}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+INJECTED\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+sysio\+\_\+ui64\+\_\+to\+\_\+f64)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_ab366f44a179937d35e2a721e49069191}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION}} (get\+\_\+active\+\_\+producers)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a598db61b80562f31d16b109a06275493}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (assert\+\_\+recover\+\_\+key)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a9c75a537059bde78adefea10ae253194}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (recover\+\_\+key)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a802af78865d3a5860d14d98782a755c3}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (assert\+\_\+sha256)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a67bb196d37d541916e678398d3d8a8d0}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (assert\+\_\+sha1)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_ac99dccbacee68bc9f4738c4b4a98f495}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (assert\+\_\+sha512)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a4217d51741762a125cba4bc308ec3348}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (assert\+\_\+ripemd160)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a4279fe148bc5133bc1f2a7cf19388fba}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (\mbox{\hyperlink{classfc_1_1sha256}{sha256}})
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a6b872e1f80591197a7401834106105bb}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (\mbox{\hyperlink{classfc_1_1sha1}{sha1}})
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_af27d0f78a8c5a13f9f900a024e9a6a3a}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (\mbox{\hyperlink{classfc_1_1sha512}{sha512}})
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a27f4f2469d405651a7b9a5ac9e3c5007}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (\mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}})
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a2390864bc05f0d31325b6d293e814033}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION}} (check\+\_\+transaction\+\_\+authorization)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a03682c050f56a12a53bafe8f96548a65}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION}} (check\+\_\+permission\+\_\+authorization)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a9165c9194223784bb0f99ff68b36d73e}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+HOST\+\_\+\+FUNCTION}} (get\+\_\+permission\+\_\+last\+\_\+used)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a5026f84535f5dbc37cdd9737cc603c27}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+HOST\+\_\+\+FUNCTION}} (get\+\_\+account\+\_\+creation\+\_\+time)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_aca48b89bc5d9ca8e2fe520ec3feb543f}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+HOST\+\_\+\+FUNCTION}} (require\+\_\+auth)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_ad441fef7087ece6e90cb2cb07a087326}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+HOST\+\_\+\+FUNCTION}} (require\+\_\+auth2)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a79128d5483f6e947405fed3b8670eab4}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+HOST\+\_\+\+FUNCTION}} (has\+\_\+auth)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a0b5fab142a03d6df0151e56ee1441f60}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+HOST\+\_\+\+FUNCTION}} (require\+\_\+recipient)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a7bfb2c4da2edf12f3f8bb3ed2de0a26e}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+HOST\+\_\+\+FUNCTION}} (is\+\_\+account)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a4fea634d42aba5e61971ea3ec18d3c4f}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+HOST\+\_\+\+FUNCTION}} (\mbox{\hyperlink{namespacesysio_1_1chain_a406d45a184cdba0af316b5bf34bf56cfa47b372aeb97f49fd5861d48bd3f94a38}{get\+\_\+code\+\_\+hash}})
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_aaf792b340618e689e66921949fd375b6}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+HOST\+\_\+\+FUNCTION}} (current\+\_\+time)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_ac48a12c43514b2a538c1302e0cf7c90c}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+HOST\+\_\+\+FUNCTION}} (publication\+\_\+time)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a5a3e125e94f32f6c8433bfc721a200c8}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION}} (is\+\_\+feature\+\_\+activated)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a7c5ee9c0e21d0997536ee6d5ed0ea5d2}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+HOST\+\_\+\+FUNCTION}} (\mbox{\hyperlink{namespacesysio_1_1chain_a406d45a184cdba0af316b5bf34bf56cfa2a240784a064c3db8c7ad2e2fe2ec400}{get\+\_\+sender}})
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a6518d57b1b65f5eb7ae5503350376d1a}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (read\+\_\+action\+\_\+data)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a119c1131783d75888a4a3e33376fd228}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (action\+\_\+data\+\_\+size)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a503a108565e1bb5785a623562bac93a5}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (current\+\_\+receiver)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_ac68049f3b786a5af3a93621673ccdb41}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+HOST\+\_\+\+FUNCTION}} (set\+\_\+action\+\_\+return\+\_\+value)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a3ca1d1f5366572af8c3cd46bd745db2f}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (prints)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a8a402a07d1c3af8c012959ce7af119e3}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (prints\+\_\+l)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a722bd28984867e6be513a4e21db0aba4}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (printi)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_accadb82a3282d291c0126e114079ef18}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (printui)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_af81ad94c04052d13aeb1c50b4e6cf8e8}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (printi128)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a6aa1c32315e2a294ccf8f4a4e1bc47af}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (printui128)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a17cb73a909d19e5accf177d51212fb03}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (printsf)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a9dcc2694e24f603d4ca759456254895f}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (printdf)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_af5dd0c8d62eb8874630b336dae941467}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (printqf)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a697226a2172da6ad33a43652b1521c2c}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (printn)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a563554b9d66bbfdbe41724e579c5223f}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (printhex)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_ab69c7c9df50340625f16fb85eff44c56}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION}} (db\+\_\+store\+\_\+i64)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a5554847f989b17dbef9f3e497c60363e}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION}} (db\+\_\+update\+\_\+i64)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a17e244cf043f326c49bc29e2a7c8e814}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+HOST\+\_\+\+FUNCTION}} (db\+\_\+remove\+\_\+i64)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a348f0ed4e37bd83ace4d321e60f0d6f8}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION}} (db\+\_\+get\+\_\+i64)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a902a3b6c279396aa6583d49c255516e6}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION}} (db\+\_\+next\+\_\+i64)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_ad73b1531c71427139e49e35a3695edff}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION}} (db\+\_\+previous\+\_\+i64)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_ac60dbd45b298e7694c26b6c1bd90812f}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+HOST\+\_\+\+FUNCTION}} (db\+\_\+find\+\_\+i64)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_afb7c0e4e34b87fab346ef811a4780cb7}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+HOST\+\_\+\+FUNCTION}} (db\+\_\+lowerbound\+\_\+i64)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a8b68f6d094fe3caa255a0267b0922f2a}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+HOST\+\_\+\+FUNCTION}} (db\+\_\+upperbound\+\_\+i64)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a3b741c1854d8a396d90ede9ede408bc4}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+HOST\+\_\+\+FUNCTION}} (db\+\_\+end\+\_\+i64)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a42b0eab5e23add661f99c37456808026}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION}} (db\+\_\+idx64\+\_\+store)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a374b4082ca81c98c05a046d39c42a4d1}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION}} (db\+\_\+idx64\+\_\+update)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_ad8395864c723b9e008e0a72bc3c51309}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+HOST\+\_\+\+FUNCTION}} (db\+\_\+idx64\+\_\+remove)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a2fb28fe12e78f420a8ba0e6b6cc1547f}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION}} (db\+\_\+idx64\+\_\+find\+\_\+secondary)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_abfd39f8039e6cae40e846d3165bf7892}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION}} (db\+\_\+idx64\+\_\+find\+\_\+primary)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a49787dddce4195794e856aaa125a0e3b}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION}} (db\+\_\+idx64\+\_\+lowerbound)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a1cc1d4b7a8fd77633b83b24943346693}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION}} (db\+\_\+idx64\+\_\+upperbound)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_ace09aa90a2c1e1cd53a98c55cbafe612}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+HOST\+\_\+\+FUNCTION}} (db\+\_\+idx64\+\_\+end)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a8034a4d676d32c13faa21d7b4ae96121}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION}} (db\+\_\+idx64\+\_\+next)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a6234b52a321ac20c3c3bde0f1a1ea846}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION}} (db\+\_\+idx64\+\_\+previous)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a99666601e29cf9cac19d2c7d2e76a60f}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION}} (db\+\_\+idx128\+\_\+store)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a2f9280f9b69294723614fec351faaf7a}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION}} (db\+\_\+idx128\+\_\+update)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a8ad3b8b86a394205ef433ebb0821e683}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+HOST\+\_\+\+FUNCTION}} (db\+\_\+idx128\+\_\+remove)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a30d5c8ec218d2089bef7f98c078b1bed}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION}} (db\+\_\+idx128\+\_\+find\+\_\+secondary)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a970c21f5f4740de04064ed3e0cf87b39}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION}} (db\+\_\+idx128\+\_\+find\+\_\+primary)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_afa6b4b310641df62441b33ffd63b2c4f}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION}} (db\+\_\+idx128\+\_\+lowerbound)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_af8b4f896eb56d37e0eccc747753ba699}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION}} (db\+\_\+idx128\+\_\+upperbound)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a2ec626f4d55c37759e1f6a0cd392cf37}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+HOST\+\_\+\+FUNCTION}} (db\+\_\+idx128\+\_\+end)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_afa603dc516a8c1cda682f37b1086e0da}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION}} (db\+\_\+idx128\+\_\+next)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a11947f0deef7e100d4668d33d51eaae6}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION}} (db\+\_\+idx128\+\_\+previous)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a55d6e4d11599fab8505ab08d41a46ca1}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION}} (db\+\_\+idx256\+\_\+store)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a6bbe33cd0ccacfe6d2073c42cbcee5ed}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION}} (db\+\_\+idx256\+\_\+update)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a687d7538107642baaa39c918602b638f}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+HOST\+\_\+\+FUNCTION}} (db\+\_\+idx256\+\_\+remove)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_abaf78388378a15d9da5c9c35745751c5}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION}} (db\+\_\+idx256\+\_\+find\+\_\+secondary)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a85011b3be73279f804556a900ae50df1}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION}} (db\+\_\+idx256\+\_\+find\+\_\+primary)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a9b3dde5c5a15aa38f007deb44b0c3edc}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION}} (db\+\_\+idx256\+\_\+lowerbound)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a23bbe8e0d4d9bb1136217ca9c853caf5}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION}} (db\+\_\+idx256\+\_\+upperbound)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_ac078330830f38a99f57e2a1464ccc130}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+HOST\+\_\+\+FUNCTION}} (db\+\_\+idx256\+\_\+end)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a33ce6722577acbeadb8be43c60e1ed42}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION}} (db\+\_\+idx256\+\_\+next)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a69de18dd409d1c55b9c6229650f90281}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION}} (db\+\_\+idx256\+\_\+previous)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a0359b93d582eb0a9b5406cdc72524ec3}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION}} (db\+\_\+idx\+\_\+double\+\_\+store, is\+\_\+nan\+\_\+check)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a10fecdb496423c20ac5cefedeadc6337}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION}} (db\+\_\+idx\+\_\+double\+\_\+update, is\+\_\+nan\+\_\+check)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_aa49c5aae85d58cb798aad894e9c9a3ea}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+HOST\+\_\+\+FUNCTION}} (db\+\_\+idx\+\_\+double\+\_\+remove)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a54e24e4f554451514818d9f7134a8781}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION}} (db\+\_\+idx\+\_\+double\+\_\+find\+\_\+secondary, is\+\_\+nan\+\_\+check)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_aad977a24715dc2b495e036e0f0111c04}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION}} (db\+\_\+idx\+\_\+double\+\_\+find\+\_\+primary)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_abe91698f0789212300b611e564c0ed1f}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION}} (db\+\_\+idx\+\_\+double\+\_\+lowerbound, is\+\_\+nan\+\_\+check)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_ad99779cd5463a72052466d0b3381bd55}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION}} (db\+\_\+idx\+\_\+double\+\_\+upperbound, is\+\_\+nan\+\_\+check)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a60b0ed291826ff4e73d292412974eb5e}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+HOST\+\_\+\+FUNCTION}} (db\+\_\+idx\+\_\+double\+\_\+end)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a1647b7493e49b35e199da877d471f26e}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION}} (db\+\_\+idx\+\_\+double\+\_\+next)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a84dd5a92101b0ba52d0dae8816d5329c}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION}} (db\+\_\+idx\+\_\+double\+\_\+previous)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a455cc1dc59f80b6877172e115c3ded50}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION}} (db\+\_\+idx\+\_\+long\+\_\+double\+\_\+store, is\+\_\+nan\+\_\+check)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a9f4417bb91d5fe989ce787ed5a97d92b}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION}} (db\+\_\+idx\+\_\+long\+\_\+double\+\_\+update, is\+\_\+nan\+\_\+check)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a61359ee8bfdefadbe0fe9258c6e04b55}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+HOST\+\_\+\+FUNCTION}} (db\+\_\+idx\+\_\+long\+\_\+double\+\_\+remove)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_ab2c199b8160f0bb483303a61528af95c}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION}} (db\+\_\+idx\+\_\+long\+\_\+double\+\_\+find\+\_\+secondary, is\+\_\+nan\+\_\+check)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a412adde3737e95d5e6d8dbb01ddab406}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION}} (db\+\_\+idx\+\_\+long\+\_\+double\+\_\+find\+\_\+primary)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a2ed0de74a4ef56a8bbe36ab7012f938c}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION}} (db\+\_\+idx\+\_\+long\+\_\+double\+\_\+lowerbound, is\+\_\+nan\+\_\+check)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_acb332ba00803b9ae62170a0c8d318e40}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION}} (db\+\_\+idx\+\_\+long\+\_\+double\+\_\+upperbound, is\+\_\+nan\+\_\+check)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_ae2ab7bb10afca64988f90f0329eb71c9}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+HOST\+\_\+\+FUNCTION}} (db\+\_\+idx\+\_\+long\+\_\+double\+\_\+end)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a3d0a089db8d05bbd8a1c3f917e538f0f}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION}} (db\+\_\+idx\+\_\+long\+\_\+double\+\_\+next)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a90218c1ccf2682d96620101c9c2aed59}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION}} (db\+\_\+idx\+\_\+long\+\_\+double\+\_\+previous)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a8e5e730067190b9be66a3780756c028f}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (\mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}})
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a6411898003606413589bec62de620d76}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (memmove)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_afddde81b23c3c690f05f04ee17074fed}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (memcmp)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a8c6eac921d92b998ddfa86ee51f59be3}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (\mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}})
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_ad310a3053d648cf78eca0999b5ce6af7}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION}} (send\+\_\+inline)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_aa212a836e6acf3f07ce4c85efeff3a3b}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION}} (send\+\_\+context\+\_\+free\+\_\+inline)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a5fb5fe746a0658b06149bacef20d46ea}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION}} (send\+\_\+deferred)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a57b751ab090a6d5b571c204d38295b04}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION}} (cancel\+\_\+deferred)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_acf2d6eea1b3633f00d8b142de54ccb27}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (read\+\_\+transaction)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_ae70912d5b2f6325559dcbcdbb4628292}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (transaction\+\_\+size)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a5f33402c79aa87e9a703b307587ffb19}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (expiration)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a11686ec82d7e7c62e12aeaff47d528e1}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (tapos\+\_\+block\+\_\+num)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a08d58ca5579554dcada485f00ba7f0ed}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (tapos\+\_\+block\+\_\+prefix)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a62b8b46253fe66ebed8a99912aed919e}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (get\+\_\+action)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_ab1bad2eeac4d75a943dcf3c8890adf08}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+\+\_\+ashlti3)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a03ff1fa69e4d27fe1d51505d9f70d96c}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+\+\_\+ashrti3)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a9699da8f0733f295a8178f44e4cebb28}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+\+\_\+lshlti3)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a1980bd7bf8d1bea2a8889544ff6e97f8}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+\+\_\+lshrti3)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_ad8f0ed81e5722a69e1573d5c64f067d5}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+\+\_\+divti3)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a3ebc80705180b2932057396516a84ce4}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+\+\_\+udivti3)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a2621e379ceda2c9b9ae14e9c1b28a0ff}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+\+\_\+multi3)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a2578dd92c88b09e2954bea1ee73138aa}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+\+\_\+modti3)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_adbc3ba07264cb10674a61d510b2c077d}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+\+\_\+umodti3)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a343f932afa8ace020ebdff9fb85785cb}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+\+\_\+addtf3)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a9cd42f188d87c073e37658236e5dcc92}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+\+\_\+subtf3)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a28ddf390e9bb1cb418d5eff77c05e023}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+\+\_\+multf3)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a2c682ff8945ff4c9b749399d21063ab9}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+\+\_\+divtf3)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a9feef525159ec23815bb135131d5cfe6}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+\+\_\+negtf2)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a694cd197fa4611ff066d65e08f467ed6}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+\+\_\+extendsftf2)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_ae310591d7d8babbbac06bd61f43957c8}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+\+\_\+extenddftf2)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a7dac22af73eed496d6ec554cec280f20}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+\+\_\+trunctfdf2)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a73ed1ff3f9ba554a36600ed401497f7c}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+\+\_\+trunctfsf2)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a9001f79e78484f384c11b57ff781027e}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+\+\_\+fixtfsi)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a077360c3a14424fb55997c08f77c2123}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+\+\_\+fixtfdi)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a5531ff6bb1e0615595ff445d5935242b}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+\+\_\+fixtfti)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a24fa150171d12caf9a8578cc5063d933}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+\+\_\+fixunstfsi)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a13d87460d22cdbabbf6fd1c781d891a9}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+\+\_\+fixunstfdi)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a142236bd0dbf0e17060bbd177e0fa5c5}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+\+\_\+fixunstfti)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_abaac2d0ef4cd448c1d583288330be7df}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+\+\_\+fixsfti)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a8541649b6fceef4e4f8867d37b0e933e}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+\+\_\+fixdfti)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a3db163802bedc89e1de8cfcfe0a594b0}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+\+\_\+fixunssfti)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a6751362fac31089ebb30287ef9d9de4c}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+\+\_\+fixunsdfti)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_aeba268efce0e35d3708a85001b60345d}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+\+\_\+floatsidf)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a234a187f46f42897ea077b8d62771b02}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+\+\_\+floatsitf)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a337e150f00d8ecc8d1ccbcfd817f213c}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+\+\_\+floatditf)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a1d718d478ab9d2c0a7d684fc837a5e50}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+\+\_\+floatunsitf)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a78d05f696d9790a5ab6d7cb34b19c926}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+LEGACY\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+\+\_\+floatunditf)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_ad398d72009eacddfb4024c256c53848d}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+\+\_\+floattidf)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a68d881930b88382a22f28c8f4198976f}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+\+\_\+floatuntidf)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_ad17969eb74e3a267d6332c6608147430}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+\+\_\+cmptf2)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a0accdd5896ecd6c6a3490ded483069c6}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+\+\_\+eqtf2)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a467a6ae13bc74a0d9b93c4640608520a}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+\+\_\+netf2)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_ac24243aa9b111106a08ba72a7a100640}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+\+\_\+getf2)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a4ea63466267287b3d8e9858d734e4b33}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+\+\_\+gttf2)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_af9b795c4a25be10ff694c98903a4e4cd}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+\+\_\+letf2)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_aaf0c750275b96494fcc9221e3f40a52c}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+\+\_\+lttf2)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_ac982e90851b85bb396ce8ffd09c2f4b4}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (\+\_\+\+\_\+unordtf2)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_ac094890c1e3edea938491799e91b8b80}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (\mbox{\hyperlink{namespacesysio_1_1chain_a406d45a184cdba0af316b5bf34bf56cfa0673242d5f29c0e22cd667613434e0c6}{get\+\_\+block\+\_\+num}})
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a0bab06f7b1aaba5abc8c6d3de0c43b8a}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (\mbox{\hyperlink{namespacefc_aaccc65ddd035c56d5e92bedde7de3bde}{alt\+\_\+bn128\+\_\+add}})
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a9237327eb3e21eabd6cbd85bd63bc9d3}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (\mbox{\hyperlink{namespacefc_adabebd5c846d83006ef00e1e63c5ec09}{alt\+\_\+bn128\+\_\+mul}})
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a721abb6d8e5234250bbad93fe0bc1cdd}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (\mbox{\hyperlink{namespacefc_afff05d8da5063eecb517149a272d20ed}{alt\+\_\+bn128\+\_\+pair}})
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a9812d5c7d160535fe59a1013f4db3874}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (mod\+\_\+exp)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_af60a50ead2d1c8f69209255ad2f37e6e}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (blake2\+\_\+f)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_aa58f0e424404842a87bf3233ca1f93b6}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (\mbox{\hyperlink{classfc_1_1sha3}{sha3}})
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_ae70d7ea5747bdc33c935eeddf93e0fa3}{sysio\+::chain\+::webassembly\+::\+REGISTER\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION}} (\mbox{\hyperlink{namespacefc_ad33908e48c447780b71e5e4ba567d523}{k1\+\_\+recover}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{sys-vm_8cpp_a0aa4259a0e30c27c2ec0fb0c1da3d839}\index{sys-\/vm.cpp@{sys-\/vm.cpp}!REGISTER\_CF\_HOST\_FUNCTION@{REGISTER\_CF\_HOST\_FUNCTION}}
+\index{REGISTER\_CF\_HOST\_FUNCTION@{REGISTER\_CF\_HOST\_FUNCTION}!sys-\/vm.cpp@{sys-\/vm.cpp}}
+\doxysubsubsection{\texorpdfstring{REGISTER\_CF\_HOST\_FUNCTION}{REGISTER\_CF\_HOST\_FUNCTION}}
+{\footnotesize\ttfamily \label{sys-vm_8cpp_a0aa4259a0e30c27c2ec0fb0c1da3d839} 
+\#define REGISTER\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{pointertest_8cpp_a59c7737920212dcb3bb9df58d7062de4}{NAME}}}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \textcolor{keyword}{static}\ host\_function\_registrator<\&interface::NAME,\ core\_precondition,\ \#\#\_\_VA\_ARGS\_\_>\ \mbox{\hyperlink{pointertest_8cpp_a59c7737920212dcb3bb9df58d7062de4}{NAME}}\#\#\_registrator\_impl()\ \{\ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{BOOST\_HANA\_STRING(\textcolor{stringliteral}{"{}env"{}}),\ BOOST\_HANA\_STRING(\#\mbox{\hyperlink{pointertest_8cpp_a59c7737920212dcb3bb9df58d7062de4}{NAME}})\};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{pointertest_8cpp_a59c7737920212dcb3bb9df58d7062de4}{NAME}}\#\#\_registrator\ =\ \mbox{\hyperlink{pointertest_8cpp_a59c7737920212dcb3bb9df58d7062de4}{NAME}}\#\#\_registrator\_impl();}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{sys-vm_8cpp_source_l00314}{314}} of file \mbox{\hyperlink{sys-vm_8cpp_source}{sys-\/vm.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00314\ \textcolor{preprocessor}{\#define\ REGISTER\_CF\_HOST\_FUNCTION(NAME,\ ...)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00315\ \textcolor{preprocessor}{\ \ \ static\ host\_function\_registrator<\&interface::NAME,\ core\_precondition,\ \#\#\_\_VA\_ARGS\_\_>\ NAME\#\#\_registrator\_impl()\ \{\ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00316\ \textcolor{preprocessor}{\ \ \ \ \ \ return\ \{BOOST\_HANA\_STRING("{}env"{}),\ BOOST\_HANA\_STRING(\#NAME)\};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00317\ \textcolor{preprocessor}{\ \ \ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00318\ \textcolor{preprocessor}{\ \ \ inline\ static\ auto\ NAME\#\#\_registrator\ =\ NAME\#\#\_registrator\_impl();}}
+
+\end{DoxyCode}
+\Hypertarget{sys-vm_8cpp_a955991a960d19caf9a2fe8316fe1a3ce}\index{sys-\/vm.cpp@{sys-\/vm.cpp}!REGISTER\_HOST\_FUNCTION@{REGISTER\_HOST\_FUNCTION}}
+\index{REGISTER\_HOST\_FUNCTION@{REGISTER\_HOST\_FUNCTION}!sys-\/vm.cpp@{sys-\/vm.cpp}}
+\doxysubsubsection{\texorpdfstring{REGISTER\_HOST\_FUNCTION}{REGISTER\_HOST\_FUNCTION}}
+{\footnotesize\ttfamily \label{sys-vm_8cpp_a955991a960d19caf9a2fe8316fe1a3ce} 
+\#define REGISTER\+\_\+\+HOST\+\_\+\+FUNCTION(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{pointertest_8cpp_a59c7737920212dcb3bb9df58d7062de4}{NAME}}}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \textcolor{keyword}{static}\ host\_function\_registrator<\&interface::NAME,\ core\_precondition,\ context\_aware\_check,\ \#\#\_\_VA\_ARGS\_\_>\ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \mbox{\hyperlink{pointertest_8cpp_a59c7737920212dcb3bb9df58d7062de4}{NAME}}\#\#\_registrator\_impl()\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{BOOST\_HANA\_STRING(\textcolor{stringliteral}{"{}env"{}}),\ BOOST\_HANA\_STRING(\#\mbox{\hyperlink{pointertest_8cpp_a59c7737920212dcb3bb9df58d7062de4}{NAME}})\};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{pointertest_8cpp_a59c7737920212dcb3bb9df58d7062de4}{NAME}}\#\#\_registrator\ =\ \mbox{\hyperlink{pointertest_8cpp_a59c7737920212dcb3bb9df58d7062de4}{NAME}}\#\#\_registrator\_impl();}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{sys-vm_8cpp_source_l00307}{307}} of file \mbox{\hyperlink{sys-vm_8cpp_source}{sys-\/vm.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00307\ \textcolor{preprocessor}{\#define\ REGISTER\_HOST\_FUNCTION(NAME,\ ...)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00308\ \textcolor{preprocessor}{\ \ \ static\ host\_function\_registrator<\&interface::NAME,\ core\_precondition,\ context\_aware\_check,\ \#\#\_\_VA\_ARGS\_\_>\ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00309\ \textcolor{preprocessor}{\ \ \ \ \ \ \ NAME\#\#\_registrator\_impl()\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00310\ \textcolor{preprocessor}{\ \ \ \ \ \ return\ \{BOOST\_HANA\_STRING("{}env"{}),\ BOOST\_HANA\_STRING(\#NAME)\};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00311\ \textcolor{preprocessor}{\ \ \ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00312\ \textcolor{preprocessor}{\ \ \ inline\ static\ auto\ NAME\#\#\_registrator\ =\ NAME\#\#\_registrator\_impl();}}
+
+\end{DoxyCode}
+\Hypertarget{sys-vm_8cpp_abfb296a38e808912704c00b675563426}\index{sys-\/vm.cpp@{sys-\/vm.cpp}!REGISTER\_INJECTED\_HOST\_FUNCTION@{REGISTER\_INJECTED\_HOST\_FUNCTION}}
+\index{REGISTER\_INJECTED\_HOST\_FUNCTION@{REGISTER\_INJECTED\_HOST\_FUNCTION}!sys-\/vm.cpp@{sys-\/vm.cpp}}
+\doxysubsubsection{\texorpdfstring{REGISTER\_INJECTED\_HOST\_FUNCTION}{REGISTER\_INJECTED\_HOST\_FUNCTION}}
+{\footnotesize\ttfamily \label{sys-vm_8cpp_abfb296a38e808912704c00b675563426} 
+\#define REGISTER\+\_\+\+INJECTED\+\_\+\+HOST\+\_\+\+FUNCTION(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{pointertest_8cpp_a59c7737920212dcb3bb9df58d7062de4}{NAME}}}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \textcolor{keyword}{static}\ host\_function\_registrator<\&interface::NAME,\ \#\#\_\_VA\_ARGS\_\_>\ \mbox{\hyperlink{pointertest_8cpp_a59c7737920212dcb3bb9df58d7062de4}{NAME}}\#\#\_registrator\_impl()\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{BOOST\_HANA\_STRING(\mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2webassembly_2common_8hpp_aae5a8b77b3dce5df71e1c16ef2f4cac3}{SYSIO\_INJECTED\_MODULE\_NAME}}),\ BOOST\_HANA\_STRING(\#\mbox{\hyperlink{pointertest_8cpp_a59c7737920212dcb3bb9df58d7062de4}{NAME}})\};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{pointertest_8cpp_a59c7737920212dcb3bb9df58d7062de4}{NAME}}\#\#\_registrator\ =\ \mbox{\hyperlink{pointertest_8cpp_a59c7737920212dcb3bb9df58d7062de4}{NAME}}\#\#\_registrator\_impl();}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{sys-vm_8cpp_source_l00301}{301}} of file \mbox{\hyperlink{sys-vm_8cpp_source}{sys-\/vm.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00301\ \textcolor{preprocessor}{\#define\ REGISTER\_INJECTED\_HOST\_FUNCTION(NAME,\ ...)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00302\ \textcolor{preprocessor}{\ \ \ static\ host\_function\_registrator<\&interface::NAME,\ \#\#\_\_VA\_ARGS\_\_>\ NAME\#\#\_registrator\_impl()\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00303\ \textcolor{preprocessor}{\ \ \ \ \ \ return\ \{BOOST\_HANA\_STRING(SYSIO\_INJECTED\_MODULE\_NAME),\ BOOST\_HANA\_STRING(\#NAME)\};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00304\ \textcolor{preprocessor}{\ \ \ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00305\ \textcolor{preprocessor}{\ \ \ inline\ static\ auto\ NAME\#\#\_registrator\ =\ NAME\#\#\_registrator\_impl();}}
+
+\end{DoxyCode}
+\Hypertarget{sys-vm_8cpp_a5e72f2d1a4ce1437e982af86a372595b}\index{sys-\/vm.cpp@{sys-\/vm.cpp}!REGISTER\_LEGACY\_CF\_HOST\_FUNCTION@{REGISTER\_LEGACY\_CF\_HOST\_FUNCTION}}
+\index{REGISTER\_LEGACY\_CF\_HOST\_FUNCTION@{REGISTER\_LEGACY\_CF\_HOST\_FUNCTION}!sys-\/vm.cpp@{sys-\/vm.cpp}}
+\doxysubsubsection{\texorpdfstring{REGISTER\_LEGACY\_CF\_HOST\_FUNCTION}{REGISTER\_LEGACY\_CF\_HOST\_FUNCTION}}
+{\footnotesize\ttfamily \label{sys-vm_8cpp_a5e72f2d1a4ce1437e982af86a372595b} 
+\#define REGISTER\+\_\+\+LEGACY\+\_\+\+CF\+\_\+\+HOST\+\_\+\+FUNCTION(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{pointertest_8cpp_a59c7737920212dcb3bb9df58d7062de4}{NAME}}}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \textcolor{keyword}{static}\ host\_function\_registrator<\&interface::NAME,\ legacy\_static\_check\_wl\_args,\ \#\#\_\_VA\_ARGS\_\_>\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \mbox{\hyperlink{pointertest_8cpp_a59c7737920212dcb3bb9df58d7062de4}{NAME}}\#\#\_registrator\_impl()\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{BOOST\_HANA\_STRING(\textcolor{stringliteral}{"{}env"{}}),\ BOOST\_HANA\_STRING(\#\mbox{\hyperlink{pointertest_8cpp_a59c7737920212dcb3bb9df58d7062de4}{NAME}})\};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{pointertest_8cpp_a59c7737920212dcb3bb9df58d7062de4}{NAME}}\#\#\_registrator\ =\ \mbox{\hyperlink{pointertest_8cpp_a59c7737920212dcb3bb9df58d7062de4}{NAME}}\#\#\_registrator\_impl();}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{sys-vm_8cpp_source_l00327}{327}} of file \mbox{\hyperlink{sys-vm_8cpp_source}{sys-\/vm.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00327\ \textcolor{preprocessor}{\#define\ REGISTER\_LEGACY\_CF\_HOST\_FUNCTION(NAME,\ ...)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00328\ \textcolor{preprocessor}{\ \ \ static\ host\_function\_registrator<\&interface::NAME,\ legacy\_static\_check\_wl\_args,\ \#\#\_\_VA\_ARGS\_\_>\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00329\ \textcolor{preprocessor}{\ \ \ \ \ \ \ NAME\#\#\_registrator\_impl()\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00330\ \textcolor{preprocessor}{\ \ \ \ \ \ return\ \{BOOST\_HANA\_STRING("{}env"{}),\ BOOST\_HANA\_STRING(\#NAME)\};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00331\ \textcolor{preprocessor}{\ \ \ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00332\ \textcolor{preprocessor}{\ \ \ inline\ static\ auto\ NAME\#\#\_registrator\ =\ NAME\#\#\_registrator\_impl();}}
+
+\end{DoxyCode}
+\Hypertarget{sys-vm_8cpp_a26efb7c7e42b1c7359676e60b6b3fa9d}\index{sys-\/vm.cpp@{sys-\/vm.cpp}!REGISTER\_LEGACY\_CF\_ONLY\_HOST\_FUNCTION@{REGISTER\_LEGACY\_CF\_ONLY\_HOST\_FUNCTION}}
+\index{REGISTER\_LEGACY\_CF\_ONLY\_HOST\_FUNCTION@{REGISTER\_LEGACY\_CF\_ONLY\_HOST\_FUNCTION}!sys-\/vm.cpp@{sys-\/vm.cpp}}
+\doxysubsubsection{\texorpdfstring{REGISTER\_LEGACY\_CF\_ONLY\_HOST\_FUNCTION}{REGISTER\_LEGACY\_CF\_ONLY\_HOST\_FUNCTION}}
+{\footnotesize\ttfamily \label{sys-vm_8cpp_a26efb7c7e42b1c7359676e60b6b3fa9d} 
+\#define REGISTER\+\_\+\+LEGACY\+\_\+\+CF\+\_\+\+ONLY\+\_\+\+HOST\+\_\+\+FUNCTION(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{pointertest_8cpp_a59c7737920212dcb3bb9df58d7062de4}{NAME}}}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \textcolor{keyword}{static}\ host\_function\_registrator<\&interface::NAME,\ legacy\_static\_check\_wl\_args,\ context\_free\_check,\ \#\#\_\_VA\_ARGS\_\_>\ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \mbox{\hyperlink{pointertest_8cpp_a59c7737920212dcb3bb9df58d7062de4}{NAME}}\#\#\_registrator\_impl()\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{BOOST\_HANA\_STRING(\textcolor{stringliteral}{"{}env"{}}),\ BOOST\_HANA\_STRING(\#\mbox{\hyperlink{pointertest_8cpp_a59c7737920212dcb3bb9df58d7062de4}{NAME}})\};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{pointertest_8cpp_a59c7737920212dcb3bb9df58d7062de4}{NAME}}\#\#\_registrator\ =\ \mbox{\hyperlink{pointertest_8cpp_a59c7737920212dcb3bb9df58d7062de4}{NAME}}\#\#\_registrator\_impl();}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{sys-vm_8cpp_source_l00334}{334}} of file \mbox{\hyperlink{sys-vm_8cpp_source}{sys-\/vm.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00334\ \textcolor{preprocessor}{\#define\ REGISTER\_LEGACY\_CF\_ONLY\_HOST\_FUNCTION(NAME,\ ...)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00335\ \textcolor{preprocessor}{\ \ \ static\ host\_function\_registrator<\&interface::NAME,\ legacy\_static\_check\_wl\_args,\ context\_free\_check,\ \#\#\_\_VA\_ARGS\_\_>\ \ \(\backslash\)}}
+\DoxyCodeLine{00336\ \textcolor{preprocessor}{\ \ \ \ \ \ \ NAME\#\#\_registrator\_impl()\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00337\ \textcolor{preprocessor}{\ \ \ \ \ \ return\ \{BOOST\_HANA\_STRING("{}env"{}),\ BOOST\_HANA\_STRING(\#NAME)\};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00338\ \textcolor{preprocessor}{\ \ \ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00339\ \textcolor{preprocessor}{\ \ \ inline\ static\ auto\ NAME\#\#\_registrator\ =\ NAME\#\#\_registrator\_impl();}}
+
+\end{DoxyCode}
+\Hypertarget{sys-vm_8cpp_a2489344683e1771a6ff59a98b1543d52}\index{sys-\/vm.cpp@{sys-\/vm.cpp}!REGISTER\_LEGACY\_HOST\_FUNCTION@{REGISTER\_LEGACY\_HOST\_FUNCTION}}
+\index{REGISTER\_LEGACY\_HOST\_FUNCTION@{REGISTER\_LEGACY\_HOST\_FUNCTION}!sys-\/vm.cpp@{sys-\/vm.cpp}}
+\doxysubsubsection{\texorpdfstring{REGISTER\_LEGACY\_HOST\_FUNCTION}{REGISTER\_LEGACY\_HOST\_FUNCTION}}
+{\footnotesize\ttfamily \label{sys-vm_8cpp_a2489344683e1771a6ff59a98b1543d52} 
+\#define REGISTER\+\_\+\+LEGACY\+\_\+\+HOST\+\_\+\+FUNCTION(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{pointertest_8cpp_a59c7737920212dcb3bb9df58d7062de4}{NAME}}}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \textcolor{keyword}{static}\ host\_function\_registrator<\&interface::NAME,\ legacy\_static\_check\_wl\_args,\ context\_aware\_check,\ \#\#\_\_VA\_ARGS\_\_>\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \mbox{\hyperlink{pointertest_8cpp_a59c7737920212dcb3bb9df58d7062de4}{NAME}}\#\#\_registrator\_impl()\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{BOOST\_HANA\_STRING(\textcolor{stringliteral}{"{}env"{}}),\ BOOST\_HANA\_STRING(\#\mbox{\hyperlink{pointertest_8cpp_a59c7737920212dcb3bb9df58d7062de4}{NAME}})\};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{pointertest_8cpp_a59c7737920212dcb3bb9df58d7062de4}{NAME}}\#\#\_registrator\ =\ \mbox{\hyperlink{pointertest_8cpp_a59c7737920212dcb3bb9df58d7062de4}{NAME}}\#\#\_registrator\_impl();}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{sys-vm_8cpp_source_l00320}{320}} of file \mbox{\hyperlink{sys-vm_8cpp_source}{sys-\/vm.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00320\ \textcolor{preprocessor}{\#define\ REGISTER\_LEGACY\_HOST\_FUNCTION(NAME,\ ...)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00321\ \textcolor{preprocessor}{\ \ \ static\ host\_function\_registrator<\&interface::NAME,\ legacy\_static\_check\_wl\_args,\ context\_aware\_check,\ \#\#\_\_VA\_ARGS\_\_>\ \(\backslash\)}}
+\DoxyCodeLine{00322\ \textcolor{preprocessor}{\ \ \ \ \ \ \ NAME\#\#\_registrator\_impl()\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00323\ \textcolor{preprocessor}{\ \ \ \ \ \ return\ \{BOOST\_HANA\_STRING("{}env"{}),\ BOOST\_HANA\_STRING(\#NAME)\};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00324\ \textcolor{preprocessor}{\ \ \ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00325\ \textcolor{preprocessor}{\ \ \ inline\ static\ auto\ NAME\#\#\_registrator\ =\ NAME\#\#\_registrator\_impl();}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{sys-vm_8cpp_addc2ff7833ac9ef1ec5dc3fc46a15c75}\index{sys-\/vm.cpp@{sys-\/vm.cpp}!\_func@{\_func}}
+\index{\_func@{\_func}!sys-\/vm.cpp@{sys-\/vm.cpp}}
+\doxysubsubsection{\texorpdfstring{\_func}{\_func}}
+{\footnotesize\ttfamily \label{sys-vm_8cpp_addc2ff7833ac9ef1ec5dc3fc46a15c75} 
+F \+\_\+func}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_8cpp_source_l00043}{43}} of file \mbox{\hyperlink{sys-vm_8cpp_source}{sys-\/vm.\+cpp}}.
+
+\Hypertarget{sys-vm_8cpp_a32ff5901c3a451a048ff45b692591ba3}\index{sys-\/vm.cpp@{sys-\/vm.cpp}!\_timer@{\_timer}}
+\index{\_timer@{\_timer}!sys-\/vm.cpp@{sys-\/vm.cpp}}
+\doxysubsubsection{\texorpdfstring{\_timer}{\_timer}}
+{\footnotesize\ttfamily \label{sys-vm_8cpp_a32ff5901c3a451a048ff45b692591ba3} 
+transaction\+\_\+checktime\+\_\+timer\& \+\_\+timer}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_8cpp_source_l00042}{42}} of file \mbox{\hyperlink{sys-vm_8cpp_source}{sys-\/vm.\+cpp}}.
+

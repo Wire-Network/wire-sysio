@@ -1,0 +1,39 @@
+\doxysection{Name\+Comparator Struct Reference}
+\hypertarget{struct_name_comparator}{}\label{struct_name_comparator}\index{NameComparator@{NameComparator}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{struct_name_comparator_a7282aa3876306be900a5bf96a6f08a01}{operator()}} (const \mbox{\hyperlink{class_generic_value_a41fba065b6f19c64ff8313939f981f4c}{Value\+::\+Member}} \&lhs, const \mbox{\hyperlink{class_generic_value_a41fba065b6f19c64ff8313939f981f4c}{Value\+::\+Member}} \&rhs) const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{sortkeys_8cpp_source_l00019}{19}} of file \mbox{\hyperlink{sortkeys_8cpp_source}{sortkeys.\+cpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_name_comparator_a7282aa3876306be900a5bf96a6f08a01}\index{NameComparator@{NameComparator}!operator()@{operator()}}
+\index{operator()@{operator()}!NameComparator@{NameComparator}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}}
+{\footnotesize\ttfamily \label{struct_name_comparator_a7282aa3876306be900a5bf96a6f08a01} 
+bool Name\+Comparator\+::operator() (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_generic_value_a41fba065b6f19c64ff8313939f981f4c}{Value\+::\+Member}} \&}]{lhs}{, }\item[{const \mbox{\hyperlink{class_generic_value_a41fba065b6f19c64ff8313939f981f4c}{Value\+::\+Member}} \&}]{rhs}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sortkeys_8cpp_source_l00020}{20}} of file \mbox{\hyperlink{sortkeys_8cpp_source}{sortkeys.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (strcmp(lhs.\mbox{\hyperlink{struct_generic_member_a7124f7ccd67421533d33139938604fac}{name}}.GetString(),\ rhs.\mbox{\hyperlink{struct_generic_member_a7124f7ccd67421533d33139938604fac}{name}}.GetString())\ <\ 0);}
+\DoxyCodeLine{00022\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/example/sortkeys/\mbox{\hyperlink{sortkeys_8cpp}{sortkeys.\+cpp}}\end{DoxyCompactItemize}

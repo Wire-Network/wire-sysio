@@ -1,0 +1,163 @@
+\doxysection{libraries/fc/test/static\+\_\+variant/test\+\_\+static\+\_\+variant.cpp File Reference}
+\hypertarget{test__static__variant_8cpp}{}\label{test__static__variant_8cpp}\index{libraries/fc/test/static\_variant/test\_static\_variant.cpp@{libraries/fc/test/static\_variant/test\_static\_variant.cpp}}
+{\ttfamily \#include $<$boost/test/included/unit\+\_\+test.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/exception/exception.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/static\+\_\+variant.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/variant.\+hpp$>$}\newline
+Include dependency graph for test\+\_\+static\+\_\+variant.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__static__variant_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{test__static__variant_8cpp_a6b2a3852db8bb19ab6909bac01859985}{BOOST\+\_\+\+TEST\+\_\+\+MODULE}}~static\+\_\+variant
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{test__static__variant_8cpp_aa9908ea5d99985771d3e7da5a939ce32}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (to\+\_\+from\+\_\+fc\+\_\+variant)
+\item 
+\mbox{\hyperlink{test__static__variant_8cpp_a33cdc45ca0a790286c9549498f84ef87}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (get)
+\item 
+\mbox{\hyperlink{test__static__variant_8cpp_a64b07157437d1978950ed804e546a5da}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (static\+\_\+variant\+\_\+from\+\_\+index)
+\item 
+\mbox{\hyperlink{test__static__variant_8cpp_a1ad0f7768b734082d34fa89cab75ce05}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (static\+\_\+variant\+\_\+get\+\_\+index)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{test__static__variant_8cpp_a6b2a3852db8bb19ab6909bac01859985}\index{test\_static\_variant.cpp@{test\_static\_variant.cpp}!BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}}
+\index{BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}!test\_static\_variant.cpp@{test\_static\_variant.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_TEST\_MODULE}{BOOST\_TEST\_MODULE}}
+{\footnotesize\ttfamily \label{test__static__variant_8cpp_a6b2a3852db8bb19ab6909bac01859985} 
+\#define BOOST\+\_\+\+TEST\+\_\+\+MODULE~static\+\_\+variant}
+
+
+
+Definition at line \mbox{\hyperlink{test__static__variant_8cpp_source_l00001}{1}} of file \mbox{\hyperlink{test__static__variant_8cpp_source}{test\+\_\+static\+\_\+variant.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{test__static__variant_8cpp_a33cdc45ca0a790286c9549498f84ef87}\index{test\_static\_variant.cpp@{test\_static\_variant.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!test\_static\_variant.cpp@{test\_static\_variant.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{test__static__variant_8cpp_a33cdc45ca0a790286c9549498f84ef87} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{get}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__static__variant_8cpp_source_l00022}{22}} of file \mbox{\hyperlink{test__static__variant_8cpp_source}{test\+\_\+static\+\_\+variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00023\ \ \ \ \{}
+\DoxyCodeLine{00024\ \ \ \ \ \ \textcolor{keyword}{using\ }variant\_type\ =\ std::variant<int32\_t,\ bool,\ std::string>;}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \ \ \ \ \ \textcolor{keyword}{auto}\ v1\ =\ variant\_type\{std::string\{\textcolor{stringliteral}{"{}hello\ world"{}}\}\};}
+\DoxyCodeLine{00027\ \ \ \ \ \ BOOST\_CHECK\_EXCEPTION(std::get<int32\_t>(v1),\ std::bad\_variant\_access,\ [](\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ e)\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \});}
+\DoxyCodeLine{00028\ \ \ \ \ \ \textcolor{keyword}{auto}\ result1\ =\ std::get<std::string>(v1);}
+\DoxyCodeLine{00029\ \ \ \ \ \ BOOST\_REQUIRE(result1\ ==\ std::string\{\textcolor{stringliteral}{"{}hello\ world"{}}\});}
+\DoxyCodeLine{00030\ }
+\DoxyCodeLine{00031\ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ v2\ =\ variant\_type\{std::string\{\textcolor{stringliteral}{"{}hello\ world"{}}\}\};}
+\DoxyCodeLine{00032\ \ \ \ \ \ BOOST\_CHECK\_EXCEPTION(std::get<int32\_t>(v2),\ std::bad\_variant\_access,\ [](\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ e)\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \});}
+\DoxyCodeLine{00033\ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ result2\ =\ std::get<std::string>(v2);}
+\DoxyCodeLine{00034\ \ \ \ \ \ BOOST\_REQUIRE(result2\ ==\ std::string\{\textcolor{stringliteral}{"{}hello\ world"{}}\});}
+\DoxyCodeLine{00035\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{test__static__variant_8cpp_a64b07157437d1978950ed804e546a5da}\index{test\_static\_variant.cpp@{test\_static\_variant.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!test\_static\_variant.cpp@{test\_static\_variant.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{test__static__variant_8cpp_a64b07157437d1978950ed804e546a5da} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{static\+\_\+variant\+\_\+from\+\_\+index}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__static__variant_8cpp_source_l00037}{37}} of file \mbox{\hyperlink{test__static__variant_8cpp_source}{test\+\_\+static\+\_\+variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00038\ \ \ \ \{}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \textcolor{keyword}{using\ }variant\_type\ =\ std::variant<int32\_t,\ bool,\ std::string>;}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ =\ variant\_type\{\};}
+\DoxyCodeLine{00041\ }
+\DoxyCodeLine{00042\ \ \ \ \ \ \ BOOST\_CHECK\_EXCEPTION(\mbox{\hyperlink{namespacefc_afc8acfd464a85f8a41ec497039c22934}{fc::from\_index}}(v,\ 3),\ fc::assert\_exception,\ [](\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ e)\ \{\ \textcolor{keywordflow}{return}\ e.code()\ ==\ \mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca0609f726018df8d223cd932c85d31b6c}{fc::assert\_exception\_code}};\ \});}
+\DoxyCodeLine{00043\ }
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_afc8acfd464a85f8a41ec497039c22934}{fc::from\_index}}(v,\ 2);}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ BOOST\_REQUIRE(std::string\{\}\ ==\ std::get<std::string>(v));}
+\DoxyCodeLine{00046\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=342pt]{test__static__variant_8cpp_a64b07157437d1978950ed804e546a5da_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__static__variant_8cpp_a1ad0f7768b734082d34fa89cab75ce05}\index{test\_static\_variant.cpp@{test\_static\_variant.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!test\_static\_variant.cpp@{test\_static\_variant.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{test__static__variant_8cpp_a1ad0f7768b734082d34fa89cab75ce05} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{static\+\_\+variant\+\_\+get\+\_\+index}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__static__variant_8cpp_source_l00048}{48}} of file \mbox{\hyperlink{test__static__variant_8cpp_source}{test\+\_\+static\+\_\+variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00049\ \ \ \ \{}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \textcolor{keyword}{using\ }variant\_type\ =\ std::variant<int32\_t,\ bool,\ std::string>;}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ BOOST\_REQUIRE((\mbox{\hyperlink{namespacefc_ae009b19d1fecf5979996e9f326cd98c3}{fc::get\_index<variant\_type,\ int32\_t>}}()\ ==\ 0));}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ BOOST\_REQUIRE((\mbox{\hyperlink{namespacefc_ae009b19d1fecf5979996e9f326cd98c3}{fc::get\_index<variant\_type,\ bool>}}()\ ==\ 1));}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ BOOST\_REQUIRE((\mbox{\hyperlink{namespacefc_ae009b19d1fecf5979996e9f326cd98c3}{fc::get\_index<variant\_type,\ std::string>}}()\ ==\ 2));}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ BOOST\_REQUIRE((\mbox{\hyperlink{namespacefc_ae009b19d1fecf5979996e9f326cd98c3}{fc::get\_index<variant\_type,\ double>}}()\ ==\ std::variant\_size\_v<variant\_type>));\ \textcolor{comment}{//\ Isn't\ a\ type\ contained\ in\ variant.}}
+\DoxyCodeLine{00055\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=336pt]{test__static__variant_8cpp_a1ad0f7768b734082d34fa89cab75ce05_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__static__variant_8cpp_aa9908ea5d99985771d3e7da5a939ce32}\index{test\_static\_variant.cpp@{test\_static\_variant.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!test\_static\_variant.cpp@{test\_static\_variant.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{test__static__variant_8cpp_aa9908ea5d99985771d3e7da5a939ce32} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{to\+\_\+from\+\_\+fc\+\_\+variant}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__static__variant_8cpp_source_l00008}{8}} of file \mbox{\hyperlink{test__static__variant_8cpp_source}{test\+\_\+static\+\_\+variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00009\ \ \ \ \{}
+\DoxyCodeLine{00010\ \ \ \ \ \ \ \textcolor{keyword}{using\ }variant\_type\ =\ std::variant<int32\_t,\ bool>;}
+\DoxyCodeLine{00011\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ std\_variant\_1\ =\ variant\_type\{\textcolor{keyword}{false}\};}
+\DoxyCodeLine{00012\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ fc\_variant\ =\ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}\{\};}
+\DoxyCodeLine{00013\ }
+\DoxyCodeLine{00014\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_adea61f2343de94d0fbcb920a32332ad9}{fc::to\_variant}}(std\_variant\_1,\ fc\_variant);}
+\DoxyCodeLine{00015\ }
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ std\_variant\_2\ =\ variant\_type\{\};}
+\DoxyCodeLine{00017\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_accef08adf4ee05c36ccc550d8101b08f}{fc::from\_variant}}(fc\_variant,\ std\_variant\_2);}
+\DoxyCodeLine{00018\ }
+\DoxyCodeLine{00019\ \ \ \ \ \ \ BOOST\_REQUIRE(std\_variant\_1\ ==\ std\_variant\_2);}
+\DoxyCodeLine{00020\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__static__variant_8cpp_aa9908ea5d99985771d3e7da5a939ce32_cgraph}
+\end{center}
+\end{figure}

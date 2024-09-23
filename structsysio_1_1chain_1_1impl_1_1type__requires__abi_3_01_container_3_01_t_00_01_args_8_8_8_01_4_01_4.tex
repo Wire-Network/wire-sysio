@@ -1,0 +1,65 @@
+\doxysection{sysio\+::chain\+::impl\+::type\+\_\+requires\+\_\+abi\texorpdfstring{$<$}{<} Container\texorpdfstring{$<$}{<} T, Args... \texorpdfstring{$>$}{>} \texorpdfstring{$>$}{>} Struct Template Reference}
+\hypertarget{structsysio_1_1chain_1_1impl_1_1type__requires__abi_3_01_container_3_01_t_00_01_args_8_8_8_01_4_01_4}{}\label{structsysio_1_1chain_1_1impl_1_1type__requires__abi_3_01_container_3_01_t_00_01_args_8_8_8_01_4_01_4}\index{sysio::chain::impl::type\_requires\_abi$<$ Container$<$ T, Args... $>$ $>$@{sysio::chain::impl::type\_requires\_abi$<$ Container$<$ T, Args... $>$ $>$}}
+
+
+{\ttfamily \#include $<$abi\+\_\+serializer.\+hpp$>$}
+
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static constexpr bool \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1type__requires__abi_3_01_container_3_01_t_00_01_args_8_8_8_01_4_01_4_abb2b0a7b2894cab2a681508c6bfca609}{value}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a53ef06e29c840024a683512c1acd791a}{template}}$<$ typename ... $>$ \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} Container, typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, typename ... Args$>$\newline
+struct sysio\+::chain\+::impl\+::type\+\_\+requires\+\_\+abi$<$ Container$<$ T, Args... $>$ $>$}
+specialization that catches common container patterns and checks their contained-\/type 
+\begin{DoxyTemplParams}{Template Parameters}
+{\em Container} & -\/ a templated container type whose first argument is the contained type \\
+\hline
+\end{DoxyTemplParams}
+
+
+Definition at line \mbox{\hyperlink{abi__serializer_8hpp_source_l00311}{311}} of file \mbox{\hyperlink{abi__serializer_8hpp_source}{abi\+\_\+serializer.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1chain_1_1impl_1_1type__requires__abi_3_01_container_3_01_t_00_01_args_8_8_8_01_4_01_4_abb2b0a7b2894cab2a681508c6bfca609}\index{sysio::chain::impl::type\_requires\_abi$<$ Container$<$ T, Args... $>$ $>$@{sysio::chain::impl::type\_requires\_abi$<$ Container$<$ T, Args... $>$ $>$}!value@{value}}
+\index{value@{value}!sysio::chain::impl::type\_requires\_abi$<$ Container$<$ T, Args... $>$ $>$@{sysio::chain::impl::type\_requires\_abi$<$ Container$<$ T, Args... $>$ $>$}}
+\doxysubsubsection{\texorpdfstring{value()}{value()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1impl_1_1type__requires__abi_3_01_container_3_01_t_00_01_args_8_8_8_01_4_01_4_abb2b0a7b2894cab2a681508c6bfca609} 
+template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a53ef06e29c840024a683512c1acd791a}{template}}$<$ typename ... $>$ \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} Container, typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename ... Args$>$ \\
+static constexpr bool \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1type__requires__abi}{sysio\+::chain\+::impl\+::type\+\_\+requires\+\_\+abi}}$<$ Container$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Args... $>$ $>$\+::value (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{abi__serializer_8hpp_source_l00312}{312}} of file \mbox{\hyperlink{abi__serializer_8hpp_source}{abi\+\_\+serializer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00312\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00313\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1impl_ae2a8afdb5f6805ad9d0bebc0bc44dd0f}{single\_type\_requires\_abi\_v<T>}}();}
+\DoxyCodeLine{00314\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1impl_1_1type__requires__abi_3_01_container_3_01_t_00_01_args_8_8_8_01_4_01_4_abb2b0a7b2894cab2a681508c6bfca609_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=336pt]{structsysio_1_1chain_1_1impl_1_1type__requires__abi_3_01_container_3_01_t_00_01_args_8_8_8_01_4_01_4_abb2b0a7b2894cab2a681508c6bfca609_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{abi__serializer_8hpp}{abi\+\_\+serializer.\+hpp}}\end{DoxyCompactItemize}

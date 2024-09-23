@@ -1,0 +1,38 @@
+\doxysection{rex.\+results.\+hpp}
+\hypertarget{rex_8results_8hpp_source}{}\label{rex_8results_8hpp_source}\index{/Users/svetlasyrimis/Desktop/wire-\/network/WN-\/org/wire-\/system-\/contracts/contracts/sysio.system/include/sysio.system/rex.results.hpp@{/Users/svetlasyrimis/Desktop/wire-\/network/WN-\/org/wire-\/system-\/contracts/contracts/sysio.system/include/sysio.system/rex.results.hpp}}
+\mbox{\hyperlink{rex_8results_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{rex_8results_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{rex_8results_8hpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{rex_8results_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <sysio/asset.hpp>}}
+\DoxyCodeLine{\Hypertarget{rex_8results_8hpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <sysio/sysio.hpp>}}
+\DoxyCodeLine{\Hypertarget{rex_8results_8hpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <sysio/name.hpp>}}
+\DoxyCodeLine{\Hypertarget{rex_8results_8hpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{rex_8results_8hpp_source_l00007}00007\ \textcolor{keyword}{using\ }sysio::action\_wrapper;}
+\DoxyCodeLine{\Hypertarget{rex_8results_8hpp_source_l00008}00008\ \textcolor{keyword}{using\ }\mbox{\hyperlink{structsysio_1_1chain_1_1asset}{sysio::asset}};}
+\DoxyCodeLine{\Hypertarget{rex_8results_8hpp_source_l00009}00009\ \textcolor{keyword}{using\ }\mbox{\hyperlink{structsysio_1_1chain_1_1name}{sysio::name}};}
+\DoxyCodeLine{\Hypertarget{rex_8results_8hpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{rex_8results_8hpp_source_l00017}\mbox{\hyperlink{classrex__results}{00017}}\ \textcolor{keyword}{class\ }[[sysio::contract(\textcolor{stringliteral}{"{}rex.results"{}})]]\ \mbox{\hyperlink{classrex__results}{rex\_results}}\ :\ sysio::contract\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8results_8hpp_source_l00018}00018\ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{rex_8results_8hpp_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{rex_8results_8hpp_source_l00020}00020\ \ \ \ \ \ \ \textcolor{keyword}{using\ }sysio::contract::contract;}
+\DoxyCodeLine{\Hypertarget{rex_8results_8hpp_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{rex_8results_8hpp_source_l00027}00027\ \ \ \ \ \ \ [[\mbox{\hyperlink{structsysio_1_1chain_1_1action}{sysio::action}}]]}
+\DoxyCodeLine{\Hypertarget{rex_8results_8hpp_source_l00028}00028\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ buyresult(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\&\ rex\_received\ );}
+\DoxyCodeLine{\Hypertarget{rex_8results_8hpp_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{rex_8results_8hpp_source_l00035}00035\ \ \ \ \ \ \ [[\mbox{\hyperlink{structsysio_1_1chain_1_1action}{sysio::action}}]]}
+\DoxyCodeLine{\Hypertarget{rex_8results_8hpp_source_l00036}00036\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ sellresult(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\&\ proceeds\ );}
+\DoxyCodeLine{\Hypertarget{rex_8results_8hpp_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{rex_8results_8hpp_source_l00044}00044\ \ \ \ \ \ \ [[\mbox{\hyperlink{structsysio_1_1chain_1_1action}{sysio::action}}]]}
+\DoxyCodeLine{\Hypertarget{rex_8results_8hpp_source_l00045}00045\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ orderresult(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\&\ owner,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\&\ proceeds\ );}
+\DoxyCodeLine{\Hypertarget{rex_8results_8hpp_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{rex_8results_8hpp_source_l00052}00052\ \ \ \ \ \ \ [[\mbox{\hyperlink{structsysio_1_1chain_1_1action}{sysio::action}}]]}
+\DoxyCodeLine{\Hypertarget{rex_8results_8hpp_source_l00053}00053\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ rentresult(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\&\ rented\_tokens\ );}
+\DoxyCodeLine{\Hypertarget{rex_8results_8hpp_source_l00054}00054\ }
+\DoxyCodeLine{\Hypertarget{rex_8results_8hpp_source_l00055}\mbox{\hyperlink{classrex__results_ad4414abfcdbc98787ff8195a62d6d848}{00055}}\ \ \ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classrex__results_ad4414abfcdbc98787ff8195a62d6d848}{buyresult\_action}}\ \ \ =\ action\_wrapper<\textcolor{stringliteral}{"{}buyresult"{}}\_n,\ \ \ \&\mbox{\hyperlink{classrex__results_a955ccff2c80578de034ee8c16bb29b47}{rex\_results::buyresult}}>;}
+\DoxyCodeLine{\Hypertarget{rex_8results_8hpp_source_l00056}\mbox{\hyperlink{classrex__results_a131d5bc79c6ec44898e7760f4e2ceeb2}{00056}}\ \ \ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classrex__results_a131d5bc79c6ec44898e7760f4e2ceeb2}{sellresult\_action}}\ \ =\ action\_wrapper<\textcolor{stringliteral}{"{}sellresult"{}}\_n,\ \ \&\mbox{\hyperlink{classrex__results_a2fdb9897a541ee103c618e8b311afab9}{rex\_results::sellresult}}>;}
+\DoxyCodeLine{\Hypertarget{rex_8results_8hpp_source_l00057}\mbox{\hyperlink{classrex__results_a9cc818bbdd737994bf6c6c028cbadf88}{00057}}\ \ \ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classrex__results_a9cc818bbdd737994bf6c6c028cbadf88}{orderresult\_action}}\ =\ action\_wrapper<\textcolor{stringliteral}{"{}orderresult"{}}\_n,\ \&\mbox{\hyperlink{classrex__results_aadee1538b7d17cbbe6efd8438fa46ae1}{rex\_results::orderresult}}>;}
+\DoxyCodeLine{\Hypertarget{rex_8results_8hpp_source_l00058}\mbox{\hyperlink{classrex__results_a55dcfa6ac376d5967deacaa562072738}{00058}}\ \ \ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classrex__results_a55dcfa6ac376d5967deacaa562072738}{rentresult\_action}}\ \ =\ action\_wrapper<\textcolor{stringliteral}{"{}rentresult"{}}\_n,\ \ \&\mbox{\hyperlink{classrex__results_ab9cb69866c17d4344e0d50ea810ecef4}{rex\_results::rentresult}}>;}
+\DoxyCodeLine{\Hypertarget{rex_8results_8hpp_source_l00059}00059\ \};}
+
+\end{DoxyCode}

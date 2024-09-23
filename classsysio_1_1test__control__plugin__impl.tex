@@ -1,0 +1,134 @@
+\doxysection{sysio\+::test\+\_\+control\+\_\+plugin\+\_\+impl Class Reference}
+\hypertarget{classsysio_1_1test__control__plugin__impl}{}\label{classsysio_1_1test__control__plugin__impl}\index{sysio::test\_control\_plugin\_impl@{sysio::test\_control\_plugin\_impl}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classsysio_1_1test__control__plugin__impl_a0009a9f0aab09ee90538abbafa3e8fc7}{test\+\_\+control\+\_\+plugin\+\_\+impl}} (\mbox{\hyperlink{classsysio_1_1chain_1_1controller}{chain\+::controller}} \&c)
+\item 
+void \mbox{\hyperlink{classsysio_1_1test__control__plugin__impl_a0259e2e85c9d35dc6ce7e1992b91c546}{connect}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1test__control__plugin__impl_aac553bcadf5117089508417cf30ab1ea}{disconnect}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1test__control__plugin__impl_a04a255cae39e03768ffcf6c3d39fc6a8}{kill\+\_\+on\+\_\+lib}} (\mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} prod, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} where\+\_\+in\+\_\+seq)
+\item 
+void \mbox{\hyperlink{classsysio_1_1test__control__plugin__impl_a288dfc0e47214b362348d058d8e03bad}{kill\+\_\+on\+\_\+head}} (\mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} prod, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} where\+\_\+in\+\_\+seq)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{test__control__plugin_8cpp_source_l00009}{9}} of file \mbox{\hyperlink{test__control__plugin_8cpp_source}{test\+\_\+control\+\_\+plugin.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classsysio_1_1test__control__plugin__impl_a0009a9f0aab09ee90538abbafa3e8fc7}\index{sysio::test\_control\_plugin\_impl@{sysio::test\_control\_plugin\_impl}!test\_control\_plugin\_impl@{test\_control\_plugin\_impl}}
+\index{test\_control\_plugin\_impl@{test\_control\_plugin\_impl}!sysio::test\_control\_plugin\_impl@{sysio::test\_control\_plugin\_impl}}
+\doxysubsubsection{\texorpdfstring{test\_control\_plugin\_impl()}{test\_control\_plugin\_impl()}}
+{\footnotesize\ttfamily \label{classsysio_1_1test__control__plugin__impl_a0009a9f0aab09ee90538abbafa3e8fc7} 
+sysio\+::test\+\_\+control\+\_\+plugin\+\_\+impl\+::test\+\_\+control\+\_\+plugin\+\_\+impl (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classsysio_1_1chain_1_1controller}{chain\+::controller}} \&}]{c}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{test__control__plugin_8cpp_source_l00011}{11}} of file \mbox{\hyperlink{test__control__plugin_8cpp_source}{test\+\_\+control\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00011\ :\ \_chain(c)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1test__control__plugin__impl_a0259e2e85c9d35dc6ce7e1992b91c546}\index{sysio::test\_control\_plugin\_impl@{sysio::test\_control\_plugin\_impl}!connect@{connect}}
+\index{connect@{connect}!sysio::test\_control\_plugin\_impl@{sysio::test\_control\_plugin\_impl}}
+\doxysubsubsection{\texorpdfstring{connect()}{connect()}}
+{\footnotesize\ttfamily \label{classsysio_1_1test__control__plugin__impl_a0259e2e85c9d35dc6ce7e1992b91c546} 
+void sysio\+::test\+\_\+control\+\_\+plugin\+\_\+impl\+::connect (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__control__plugin_8cpp_source_l00033}{33}} of file \mbox{\hyperlink{test__control__plugin_8cpp_source}{test\+\_\+control\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00034\ \ \ \ \_irreversible\_block\_connection.emplace(}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \_chain.\mbox{\hyperlink{classsysio_1_1chain_1_1controller_a27266ebf16b6dd19a860635f7d1f9930}{irreversible\_block}}.connect(\ [\&](\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{chain::block\_state\_ptr}}\&\ bs\ )\ \{}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ \ \ \ applied\_irreversible\_block(\ bs\ );}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \}\ ));}
+\DoxyCodeLine{00038\ \ \ \ \_accepted\_block\_connection\ =}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \_chain.\mbox{\hyperlink{classsysio_1_1chain_1_1controller_a1ff3607461fff45552db45cec5aca012}{accepted\_block}}.connect(\ [\&](\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{chain::block\_state\_ptr}}\&\ bs\ )\ \{}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ accepted\_block(\ bs\ );}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \}\ );}
+\DoxyCodeLine{00042\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1test__control__plugin__impl_aac553bcadf5117089508417cf30ab1ea}\index{sysio::test\_control\_plugin\_impl@{sysio::test\_control\_plugin\_impl}!disconnect@{disconnect}}
+\index{disconnect@{disconnect}!sysio::test\_control\_plugin\_impl@{sysio::test\_control\_plugin\_impl}}
+\doxysubsubsection{\texorpdfstring{disconnect()}{disconnect()}}
+{\footnotesize\ttfamily \label{classsysio_1_1test__control__plugin__impl_aac553bcadf5117089508417cf30ab1ea} 
+void sysio\+::test\+\_\+control\+\_\+plugin\+\_\+impl\+::disconnect (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__control__plugin_8cpp_source_l00044}{44}} of file \mbox{\hyperlink{test__control__plugin_8cpp_source}{test\+\_\+control\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00045\ \ \ \ \_accepted\_block\_connection.reset();}
+\DoxyCodeLine{00046\ \ \ \ \_irreversible\_block\_connection.reset();}
+\DoxyCodeLine{00047\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1test__control__plugin__impl_a288dfc0e47214b362348d058d8e03bad}\index{sysio::test\_control\_plugin\_impl@{sysio::test\_control\_plugin\_impl}!kill\_on\_head@{kill\_on\_head}}
+\index{kill\_on\_head@{kill\_on\_head}!sysio::test\_control\_plugin\_impl@{sysio::test\_control\_plugin\_impl}}
+\doxysubsubsection{\texorpdfstring{kill\_on\_head()}{kill\_on\_head()}}
+{\footnotesize\ttfamily \label{classsysio_1_1test__control__plugin__impl_a288dfc0e47214b362348d058d8e03bad} 
+void sysio\+::test\+\_\+control\+\_\+plugin\+\_\+impl\+::kill\+\_\+on\+\_\+head (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}}}]{prod}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{where\+\_\+in\+\_\+seq}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__control__plugin_8cpp_source_l00098}{98}} of file \mbox{\hyperlink{test__control__plugin_8cpp_source}{test\+\_\+control\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00099\ \ \ \ \_track\_lib\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00100\ \ \ \ \_producer\ =\ prod;}
+\DoxyCodeLine{00101\ \ \ \ \_where\_in\_sequence\ =\ where\_in\_seq;}
+\DoxyCodeLine{00102\ \ \ \ \_clean\_producer\_sequence\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00103\ \ \ \ \_started\_production\_round\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00104\ \ \ \ \_track\_head\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00105\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1test__control__plugin__impl_a04a255cae39e03768ffcf6c3d39fc6a8}\index{sysio::test\_control\_plugin\_impl@{sysio::test\_control\_plugin\_impl}!kill\_on\_lib@{kill\_on\_lib}}
+\index{kill\_on\_lib@{kill\_on\_lib}!sysio::test\_control\_plugin\_impl@{sysio::test\_control\_plugin\_impl}}
+\doxysubsubsection{\texorpdfstring{kill\_on\_lib()}{kill\_on\_lib()}}
+{\footnotesize\ttfamily \label{classsysio_1_1test__control__plugin__impl_a04a255cae39e03768ffcf6c3d39fc6a8} 
+void sysio\+::test\+\_\+control\+\_\+plugin\+\_\+impl\+::kill\+\_\+on\+\_\+lib (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}}}]{prod}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{where\+\_\+in\+\_\+seq}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__control__plugin_8cpp_source_l00089}{89}} of file \mbox{\hyperlink{test__control__plugin_8cpp_source}{test\+\_\+control\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00090\ \ \ \ \_track\_head\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00091\ \ \ \ \_producer\ =\ prod;}
+\DoxyCodeLine{00092\ \ \ \ \_where\_in\_sequence\ =\ where\_in\_seq;}
+\DoxyCodeLine{00093\ \ \ \ \_clean\_producer\_sequence\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00094\ \ \ \ \_started\_production\_round\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00095\ \ \ \ \_track\_lib\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00096\ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+plugins/test\+\_\+control\+\_\+plugin/\mbox{\hyperlink{test__control__plugin_8cpp}{test\+\_\+control\+\_\+plugin.\+cpp}}\end{DoxyCompactItemize}

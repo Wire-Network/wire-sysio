@@ -1,0 +1,11 @@
+<map id="IR::FunctionValidationContext::logOperator" name="IR::FunctionValidationContext::logOperator">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,47,201,88"/>
+<area shape="rect" id="Node000002" href="$namespace_i_r.html#a85d4203bbc1c989c8351490c711537f5" title=" " alt="" coords="270,5,362,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="193,44,255,30,256,35,194,49"/>
+<area shape="rect" id="Node000003" href="$namespace_log.html#a83926634a3916d0927abca4aca58a60a" title=" " alt="" coords="276,55,356,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="201,65,261,65,261,70,201,70"/>
+<area shape="rect" id="Node000004" href="$namespace_errors.html#a6959930ad6159fe3eb2e04ebf87c1b84" title=" " alt="" coords="249,104,383,130"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="194,86,243,97,242,103,193,91"/>
+<area shape="rect" id="Node000005" href="$namespace_errors.html#a719a329951edb01e45afe1443dfa2a92" title=" " alt="" coords="431,104,524,130"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="383,114,416,114,416,120,383,120"/>
+</map>

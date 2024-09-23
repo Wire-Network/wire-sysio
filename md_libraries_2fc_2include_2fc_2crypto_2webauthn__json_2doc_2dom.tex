@@ -1,0 +1,293 @@
+\chapter{DOM}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2dom}{}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2dom}\index{DOM@{DOM}}
+Document Object Model(\+DOM) is an in-\/memory representation of JSON for query and manipulation. The basic usage of DOM is described in \doxylink{fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8md}{Tutorial}. This section will describe some details and more advanced usages.\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2dom_8zh-cn_Template}{}\doxysection{\texorpdfstring{Template}{Template}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2dom_8zh-cn_Template}
+In the tutorial, {\ttfamily Value} and {\ttfamily Document} was used. Similarly to {\ttfamily std\+::string}, these are actually {\ttfamily typedef} of template classes\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacerapidjson}{rapidjson}}\ \{}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ Encoding,\ \textcolor{keyword}{typename}\ Allocator\ =\ MemoryPoolAllocator<>\ >}
+\DoxyCodeLine{\textcolor{keyword}{class\ }\mbox{\hyperlink{class_generic_value}{GenericValue}}\ \{}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ ...}}
+\DoxyCodeLine{\};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ Encoding,\ \textcolor{keyword}{typename}\ Allocator\ =\ MemoryPoolAllocator<>\ >}
+\DoxyCodeLine{\textcolor{keyword}{class\ }\mbox{\hyperlink{class_generic_document}{GenericDocument}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{class_generic_value}{GenericValue}}<Encoding,\ Allocator>\ \{}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ ...}}
+\DoxyCodeLine{\};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{typedef}\ \mbox{\hyperlink{class_generic_value}{GenericValue<UTF8<>}}\ >\ \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}};}
+\DoxyCodeLine{\textcolor{keyword}{typedef}\ \mbox{\hyperlink{class_generic_document}{GenericDocument<UTF8<>}}\ >\ \mbox{\hyperlink{document_8h_ac6ea5b168e3fe8c7fa532450fc9391f7}{Document}};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\}\ \textcolor{comment}{//\ namespace\ rapidjson}}
+
+\end{DoxyCode}
+
+
+User can customize these template parameters.\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2dom_8zh-cn_Encoding}{}\doxysubsection{\texorpdfstring{Encoding}{Encoding}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2dom_8zh-cn_Encoding}
+The {\ttfamily Encoding} parameter specifies the encoding of JSON String value in memory. Possible options are {\ttfamily \doxylink{struct_u_t_f8}{UTF8}}, {\ttfamily \doxylink{struct_u_t_f16}{UTF16}}, {\ttfamily \doxylink{struct_u_t_f32}{UTF32}}. Note that, these 3 types are also template class. {\ttfamily \doxylink{struct_u_t_f8}{UTF8}\texorpdfstring{$<$}{<}\texorpdfstring{$>$}{>}} is {\ttfamily \doxylink{struct_u_t_f8}{UTF8}\texorpdfstring{$<$}{<}char\texorpdfstring{$>$}{>}}, which means using char to store the characters. You may refer to \doxylink{encoding_8md}{Encoding} for details.
+
+Suppose a Windows application would query localization strings stored in JSON files. Unicode-\/enabled functions in Windows use UTF-\/16 (wide character) encoding. No matter what encoding was used in JSON files, we can store the strings in UTF-\/16 in memory.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacerapidjson}{rapidjson}};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{typedef}\ \mbox{\hyperlink{class_generic_document}{GenericDocument<UTF16<>}}\ >\ WDocument;}
+\DoxyCodeLine{\textcolor{keyword}{typedef}\ \mbox{\hyperlink{class_generic_value}{GenericValue<UTF16<>}}\ >\ WValue;}
+\DoxyCodeLine{}
+\DoxyCodeLine{FILE*\ fp\ =\ fopen(\textcolor{stringliteral}{"{}localization.json"{}},\ \textcolor{stringliteral}{"{}rb"{}});\ \textcolor{comment}{//\ non-\/Windows\ use\ "{}r"{}}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keywordtype}{char}\ readBuffer[256];}
+\DoxyCodeLine{\mbox{\hyperlink{class_file_read_stream}{FileReadStream}}\ bis(fp,\ readBuffer,\ \textcolor{keyword}{sizeof}(readBuffer));}
+\DoxyCodeLine{}
+\DoxyCodeLine{\mbox{\hyperlink{class_auto_u_t_f_input_stream}{AutoUTFInputStream<unsigned,\ FileReadStream>}}\ eis(bis);\ \ \textcolor{comment}{//\ wraps\ bis\ into\ eis}}
+\DoxyCodeLine{}
+\DoxyCodeLine{WDocument\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}};}
+\DoxyCodeLine{\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.ParseStream<0,\ \mbox{\hyperlink{struct_auto_u_t_f}{AutoUTF<unsigned>}}\ >(eis);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{const}\ WValue\ locale(L\textcolor{stringliteral}{"{}ja"{}});\ \textcolor{comment}{//\ Japanese}}
+\DoxyCodeLine{}
+\DoxyCodeLine{MessageBoxW(hWnd,\ d[locale].GetString(),\ L\textcolor{stringliteral}{"{}Test"{}},\ MB\_OK);}
+
+\end{DoxyCode}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2dom_8zh-cn_Allocator}{}\doxysubsection{\texorpdfstring{Allocator}{Allocator}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2dom_8zh-cn_Allocator}
+The {\ttfamily Allocator} defines which allocator class is used when allocating/deallocating memory for {\ttfamily Document}/{\ttfamily Value}. {\ttfamily Document} owns, or references to an {\ttfamily Allocator} instance. On the other hand, {\ttfamily Value} does not do so, in order to reduce memory consumption.
+
+The default allocator used in {\ttfamily \doxylink{class_generic_document}{Generic\+Document}} is {\ttfamily \doxylink{class_memory_pool_allocator}{Memory\+Pool\+Allocator}}. This allocator actually allocate memory sequentially, and cannot deallocate one by one. This is very suitable when parsing a JSON into a DOM tree.
+
+Another allocator is {\ttfamily \doxylink{class_crt_allocator}{Crt\+Allocator}}, of which CRT is short for C Run\+Time library. This allocator simply calls the standard {\ttfamily malloc()}/{\ttfamily realloc()}/{\ttfamily free()}. When there is a lot of add and remove operations, this allocator may be preferred. But this allocator is far less efficient than {\ttfamily \doxylink{class_memory_pool_allocator}{Memory\+Pool\+Allocator}}.\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2dom_8zh-cn_Parsing}{}\doxysection{\texorpdfstring{Parsing}{Parsing}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2dom_8zh-cn_Parsing}
+{\ttfamily Document} provides several functions for parsing. In below, (1) is the fundamental function, while the others are helpers which call (1).
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacerapidjson}{rapidjson}};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ (1)\ Fundamental}}
+\DoxyCodeLine{\textcolor{keyword}{template}\ <\textcolor{keywordtype}{unsigned}\ parseFlags,\ \textcolor{keyword}{typename}\ SourceEncoding,\ \textcolor{keyword}{typename}\ InputStream>}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_document}{GenericDocument}}\&\ \mbox{\hyperlink{class_generic_document_a7bc1827a7ab04de4789fe46237f0e921}{GenericDocument::ParseStream}}(InputStream\&\ is);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ (2)\ Using\ the\ same\ Encoding\ for\ stream}}
+\DoxyCodeLine{\textcolor{keyword}{template}\ <\textcolor{keywordtype}{unsigned}\ parseFlags,\ \textcolor{keyword}{typename}\ InputStream>}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_document}{GenericDocument}}\&\ \mbox{\hyperlink{class_generic_document_a7bc1827a7ab04de4789fe46237f0e921}{GenericDocument::ParseStream}}(InputStream\&\ is);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ (3)\ Using\ default\ parse\ flags}}
+\DoxyCodeLine{\textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ InputStream>}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_document}{GenericDocument}}\&\ \mbox{\hyperlink{class_generic_document_a7bc1827a7ab04de4789fe46237f0e921}{GenericDocument::ParseStream}}(InputStream\&\ is);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ (4)\ In\ situ\ parsing}}
+\DoxyCodeLine{\textcolor{keyword}{template}\ <\textcolor{keywordtype}{unsigned}\ parseFlags>}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_document}{GenericDocument}}\&\ \mbox{\hyperlink{class_generic_document_a13f68b1896a24eea4cdbc03a3916225f}{GenericDocument::ParseInsitu}}(\mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}*\ str);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ (5)\ In\ situ\ parsing,\ using\ default\ parse\ flags}}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_document}{GenericDocument}}\&\ \mbox{\hyperlink{class_generic_document_a13f68b1896a24eea4cdbc03a3916225f}{GenericDocument::ParseInsitu}}(\mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}*\ str);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ (6)\ Normal\ parsing\ of\ a\ string}}
+\DoxyCodeLine{\textcolor{keyword}{template}\ <\textcolor{keywordtype}{unsigned}\ parseFlags,\ \textcolor{keyword}{typename}\ SourceEncoding>}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_document}{GenericDocument}}\&\ \mbox{\hyperlink{class_generic_document_a901db1678f99a1b550003eed75bc380a}{GenericDocument::Parse}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}*\ str);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ (7)\ Normal\ parsing\ of\ a\ string,\ using\ same\ Encoding\ of\ Document}}
+\DoxyCodeLine{\textcolor{keyword}{template}\ <\textcolor{keywordtype}{unsigned}\ parseFlags>}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_document}{GenericDocument}}\&\ \mbox{\hyperlink{class_generic_document_a901db1678f99a1b550003eed75bc380a}{GenericDocument::Parse}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}*\ str);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ (8)\ Normal\ parsing\ of\ a\ string,\ using\ default\ parse\ flags}}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_document}{GenericDocument}}\&\ \mbox{\hyperlink{class_generic_document_a901db1678f99a1b550003eed75bc380a}{GenericDocument::Parse}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}*\ str);}
+
+\end{DoxyCode}
+
+
+The examples of \doxylink{fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8md}{tutorial} uses (8) for normal parsing of string. The examples of \doxylink{stream_8md}{stream} uses the first three. {\itshape In situ} parsing will be described soon.
+
+The {\ttfamily parse\+Flags} are combination of the following bit-\/flags\+:
+
+\tabulinesep=1mm
+\begin{longtabu}spread 0pt [c]{*{2}{|X[-1]}|}
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Parse flags   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Meaning    }\\\cline{1-2}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Parse flags   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Meaning    }\\\cline{1-2}
+\endhead
+{\ttfamily k\+Parse\+No\+Flags}   &No flag is set.    \\\cline{1-2}
+{\ttfamily k\+Parse\+Default\+Flags}   &Default parse flags. It is equal to macro {\ttfamily RAPIDJSON\+\_\+\+PARSE\+\_\+\+DEFAULT\+\_\+\+FLAGS}, which is defined as {\ttfamily k\+Parse\+No\+Flags}.    \\\cline{1-2}
+{\ttfamily k\+Parse\+Insitu\+Flag}   &In-\/situ(destructive) parsing.    \\\cline{1-2}
+{\ttfamily k\+Parse\+Validate\+Encoding\+Flag}   &Validate encoding of JSON strings.    \\\cline{1-2}
+{\ttfamily k\+Parse\+Iterative\+Flag}   &Iterative(constant complexity in terms of function call stack size) parsing.    \\\cline{1-2}
+{\ttfamily k\+Parse\+Stop\+When\+Done\+Flag}   &After parsing a complete JSON root from stream, stop further processing the rest of stream. When this flag is used, parser will not generate {\ttfamily k\+Parse\+Error\+Document\+Root\+Not\+Singular} error. Using this flag for parsing multiple JSONs in the same stream.    \\\cline{1-2}
+{\ttfamily k\+Parse\+Full\+Precision\+Flag}   &Parse number in full precision (slower). If this flag is not set, the normal precision (faster) is used. Normal precision has maximum 3 \href{http://en.wikipedia.org/wiki/Unit_in_the_last_place}{\texttt{ ULP}} error.    \\\cline{1-2}
+{\ttfamily k\+Parse\+Comments\+Flag}   &Allow one-\/line {\ttfamily // ...} and multi-\/line {\ttfamily /\texorpdfstring{$\ast$}{*} ... \texorpdfstring{$\ast$}{*}/} comments (relaxed JSON syntax).    \\\cline{1-2}
+{\ttfamily k\+Parse\+Numbers\+As\+Strings\+Flag}   &Parse numerical type values as strings.    \\\cline{1-2}
+{\ttfamily k\+Parse\+Trailing\+Commas\+Flag}   &Allow trailing commas at the end of objects and arrays (relaxed JSON syntax).    \\\cline{1-2}
+{\ttfamily k\+Parse\+Nan\+And\+Inf\+Flag}   &Allow parsing {\ttfamily NaN}, {\ttfamily Inf}, {\ttfamily Infinity}, {\ttfamily -\/Inf} and {\ttfamily -\/Infinity} as {\ttfamily double} values (relaxed JSON syntax).   \\\cline{1-2}
+\end{longtabu}
+
+
+By using a non-\/type template parameter, instead of a function parameter, C++ compiler can generate code which is optimized for specified combinations, improving speed, and reducing code size (if only using a single specialization). The downside is the flags needed to be determined in compile-\/time.
+
+The {\ttfamily Source\+Encoding} parameter defines what encoding is in the stream. This can be differed to the {\ttfamily Encoding} of the {\ttfamily Document}. See \doxysectlink{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2dom_8zh-cn_TranscodingAndValidation}{Transcoding and Validation}{2} section for details.
+
+And the {\ttfamily Input\+Stream} is type of input stream.\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2dom_8zh-cn_ParseError}{}\doxysubsection{\texorpdfstring{Parse Error}{Parse Error}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2dom_8zh-cn_ParseError}
+When the parse processing succeeded, the {\ttfamily Document} contains the parse results. When there is an error, the original DOM is {\itshape unchanged}. And the error state of parsing can be obtained by {\ttfamily bool Has\+Parse\+Error()}, {\ttfamily Parse\+Error\+Code Get\+Parse\+Error()} and {\ttfamily size\+\_\+t Get\+Error\+Offset()}.
+
+\tabulinesep=1mm
+\begin{longtabu}spread 0pt [c]{*{2}{|X[-1]}|}
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Parse Error \doxylink{struct_code}{Code}   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Description    }\\\cline{1-2}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Parse Error \doxylink{struct_code}{Code}   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Description    }\\\cline{1-2}
+\endhead
+{\ttfamily k\+Parse\+Error\+None}   &No error.    \\\cline{1-2}
+{\ttfamily k\+Parse\+Error\+Document\+Empty}   &The document is empty.    \\\cline{1-2}
+{\ttfamily k\+Parse\+Error\+Document\+Root\+Not\+Singular}   &The document root must not follow by other values.    \\\cline{1-2}
+{\ttfamily k\+Parse\+Error\+Value\+Invalid}   &Invalid value.    \\\cline{1-2}
+{\ttfamily k\+Parse\+Error\+Object\+Miss\+Name}   &Missing a name for object member.    \\\cline{1-2}
+{\ttfamily k\+Parse\+Error\+Object\+Miss\+Colon}   &Missing a colon after a name of object member.    \\\cline{1-2}
+{\ttfamily k\+Parse\+Error\+Object\+Miss\+Comma\+Or\+Curly\+Bracket}   &Missing a comma or {\ttfamily \}} after an object member.    \\\cline{1-2}
+{\ttfamily k\+Parse\+Error\+Array\+Miss\+Comma\+Or\+Square\+Bracket}   &Missing a comma or {\ttfamily \mbox{]}} after an array element.    \\\cline{1-2}
+{\ttfamily k\+Parse\+Error\+String\+Unicode\+Escape\+Invalid\+Hex}   &Incorrect hex digit after {\ttfamily \textbackslash{}\textbackslash{}u} escape in string.    \\\cline{1-2}
+{\ttfamily k\+Parse\+Error\+String\+Unicode\+Surrogate\+Invalid}   &The surrogate pair in string is invalid.    \\\cline{1-2}
+{\ttfamily k\+Parse\+Error\+String\+Escape\+Invalid}   &Invalid escape character in string.    \\\cline{1-2}
+{\ttfamily k\+Parse\+Error\+String\+Miss\+Quotation\+Mark}   &Missing a closing quotation mark in string.    \\\cline{1-2}
+{\ttfamily k\+Parse\+Error\+String\+Invalid\+Encoding}   &Invalid encoding in string.    \\\cline{1-2}
+{\ttfamily k\+Parse\+Error\+Number\+Too\+Big}   &Number too big to be stored in {\ttfamily double}.    \\\cline{1-2}
+{\ttfamily k\+Parse\+Error\+Number\+Miss\+Fraction}   &Miss fraction part in number.    \\\cline{1-2}
+{\ttfamily k\+Parse\+Error\+Number\+Miss\+Exponent}   &Miss exponent in number.   \\\cline{1-2}
+\end{longtabu}
+
+
+The offset of error is defined as the character number from beginning of stream. Currently Rapid\+JSON does not keep track of line number.
+
+To get an error message, Rapid\+JSON provided a English messages in {\ttfamily \doxylink{en_8h}{rapidjson/error/en.\+h}}. User can customize it for other locales, or use a custom localization system.
+
+Here shows an example of parse error handling.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{document_8h}{rapidjson/document.h}}"{}}}
+\DoxyCodeLine{\textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{en_8h}{rapidjson/error/en.h}}"{}}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ ...}}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_document}{Document}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}};}
+\DoxyCodeLine{\textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.Parse(json).HasParseError())\ \{}
+\DoxyCodeLine{\ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}\(\backslash\)nError(offset\ \%u):\ \%s\(\backslash\)n"{}},\ }
+\DoxyCodeLine{\ \ \ \ \ \ \ \ (\textcolor{keywordtype}{unsigned})\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.GetErrorOffset(),}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_ga28835eb93d2c3c07bbea13515eb31415}{GetParseError\_En}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.GetParseError()));}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ ...}}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2dom_8zh-cn_InSituParsing}{}\doxysubsection{\texorpdfstring{In Situ Parsing}{In Situ Parsing}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2dom_8zh-cn_InSituParsing}
+From \href{http://en.wikipedia.org/wiki/In_situ}{\texttt{ Wikipedia}}\+:
+
+\begin{quote}
+{\itshape In situ} ... is a Latin phrase that translates literally to "{}on site"{} or "{}in position"{}. It means "{}locally"{}, "{}on site"{}, "{}on the premises"{} or "{}in place"{} to describe an event where it takes place, and is used in many different contexts. ... (In computer science) An algorithm is said to be an in situ algorithm, or in-\/place algorithm, if the extra amount of memory required to execute the algorithm is O(1), that is, does not exceed a constant no matter how large the input. For example, heapsort is an in situ sorting algorithm. \end{quote}
+In normal parsing process, a large overhead is to decode JSON strings and copy them to other buffers. {\itshape In situ} parsing decodes those JSON string at the place where it is stored. It is possible in JSON because the length of decoded string is always shorter than or equal to the one in JSON. In this context, decoding a JSON string means to process the escapes, such as {\ttfamily "{}\textbackslash{}n"{}}, {\ttfamily "{}\textbackslash{}u1234"{}}, etc., and add a null terminator (`'\textbackslash{}0\textquotesingle{}\`{})at the end of string.
+
+The following diagrams compare normal and {\itshape in situ} parsing. The JSON string values contain pointers to the decoded string.
+
+
+
+In normal parsing, the decoded string are copied to freshly allocated buffers. {\ttfamily "{}\textbackslash{}\textbackslash{}n"{}} (2 characters) is decoded as {\ttfamily "{}\textbackslash{}n"{}} (1 character). {\ttfamily "{}\textbackslash{}\textbackslash{}u0073"{}} (6 characters) is decoded as {\ttfamily "{}s"{}} (1 character).
+
+
+
+{\itshape In situ} parsing just modified the original JSON. Updated characters are highlighted in the diagram. If the JSON string does not contain escape character, such as {\ttfamily "{}msg"{}}, the parsing process merely replace the closing double quotation mark with a null character.
+
+Since {\itshape in situ} parsing modify the input, the parsing API needs {\ttfamily char\texorpdfstring{$\ast$}{*}} instead of {\ttfamily const char\texorpdfstring{$\ast$}{*}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{comment}{//\ Read\ whole\ file\ into\ a\ buffer}}
+\DoxyCodeLine{FILE*\ fp\ =\ fopen(\textcolor{stringliteral}{"{}test.json"{}},\ \textcolor{stringliteral}{"{}r"{}});}
+\DoxyCodeLine{fseek(fp,\ 0,\ SEEK\_END);}
+\DoxyCodeLine{\textcolor{keywordtype}{size\_t}\ filesize\ =\ (size\_t)ftell(fp);}
+\DoxyCodeLine{fseek(fp,\ 0,\ SEEK\_SET);}
+\DoxyCodeLine{\textcolor{keywordtype}{char}*\ buffer\ =\ (\textcolor{keywordtype}{char}*)malloc(filesize\ +\ 1);}
+\DoxyCodeLine{\textcolor{keywordtype}{size\_t}\ readLength\ =\ fread(buffer,\ 1,\ filesize,\ fp);}
+\DoxyCodeLine{buffer[readLength]\ =\ \textcolor{charliteral}{'\(\backslash\)0'};}
+\DoxyCodeLine{fclose(fp);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ In\ situ\ parsing\ the\ buffer\ into\ d,\ buffer\ will\ also\ be\ modified}}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_document}{Document}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}};}
+\DoxyCodeLine{\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.ParseInsitu(buffer);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ Query/manipulate\ the\ DOM\ here...}}
+\DoxyCodeLine{}
+\DoxyCodeLine{free(buffer);}
+\DoxyCodeLine{\textcolor{comment}{//\ Note:\ At\ this\ point,\ d\ may\ have\ dangling\ pointers\ pointed\ to\ the\ deallocated\ buffer.}}
+
+\end{DoxyCode}
+
+
+The JSON strings are marked as const-\/string. But they may not be really "{}constant"{}. The life cycle of it depends on the JSON buffer.
+
+In situ parsing minimizes allocation overheads and memory copying. Generally this improves cache coherence, which is an important factor of performance in modern computer.
+
+There are some limitations of {\itshape in situ} parsing\+:
+
+
+\begin{DoxyEnumerate}
+\item The whole JSON is in memory.
+\item The source encoding in stream and target encoding in document must be the same.
+\item The buffer need to be retained until the document is no longer used.
+\item If the DOM need to be used for long period after parsing, and there are few JSON strings in the DOM, retaining the buffer may be a memory waste.
+\end{DoxyEnumerate}
+
+{\itshape In situ} parsing is mostly suitable for short-\/term JSON that only need to be processed once, and then be released from memory. In practice, these situation is very common, for example, deserializing JSON to C++ objects, processing web requests represented in JSON, etc.\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2dom_8zh-cn_TranscodingAndValidation}{}\doxysubsection{\texorpdfstring{Transcoding and Validation}{Transcoding and Validation}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2dom_8zh-cn_TranscodingAndValidation}
+Rapid\+JSON supports conversion between Unicode formats (officially termed UCS Transformation Format) internally. During DOM parsing, the source encoding of the stream can be different from the encoding of the DOM. For example, the source stream contains a UTF-\/8 JSON, while the DOM is using UTF-\/16 encoding. There is an example code in \doxylink{stream_8md}{Encoded\+Input\+Stream}.
+
+When writing a JSON from DOM to output stream, transcoding can also be used. An example is in \doxylink{stream_8md}{Encoded\+Output\+Stream}.
+
+During transcoding, the source string is decoded to into Unicode code points, and then the code points are encoded in the target format. During decoding, it will validate the byte sequence in the source string. If it is not a valid sequence, the parser will be stopped with {\ttfamily k\+Parse\+Error\+String\+Invalid\+Encoding} error.
+
+When the source encoding of stream is the same as encoding of DOM, by default, the parser will {\itshape not} validate the sequence. User may use {\ttfamily k\+Parse\+Validate\+Encoding\+Flag} to force validation.\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2dom_8zh-cn_Techniques}{}\doxysection{\texorpdfstring{Techniques}{Techniques}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2dom_8zh-cn_Techniques}
+Some techniques about using DOM API is discussed here.
+
+\doxysubsection*{DOM as SAX Event Publisher}
+
+In Rapid\+JSON, stringifying a DOM with {\ttfamily \doxylink{class_writer}{Writer}} may be look a little bit weird.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{comment}{//\ ...}}
+\DoxyCodeLine{\mbox{\hyperlink{class_writer}{Writer<StringBuffer>}}\ writer(buffer);}
+\DoxyCodeLine{\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.Accept(writer);}
+
+\end{DoxyCode}
+
+
+Actually, {\ttfamily Value\+::\+Accept()} is responsible for publishing SAX events about the value to the handler. With this design, {\ttfamily Value} and {\ttfamily \doxylink{class_writer}{Writer}} are decoupled. {\ttfamily Value} can generate SAX events, and {\ttfamily \doxylink{class_writer}{Writer}} can handle those events.
+
+User may create custom handlers for transforming the DOM into other formats. For example, a handler which converts the DOM into XML.
+
+For more about SAX events and handler, please refer to \doxylink{sax_8md}{SAX}.\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2dom_8zh-cn_UserBuffer}{}\doxysubsection{\texorpdfstring{User Buffer}{User Buffer}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2dom_8zh-cn_UserBuffer}
+Some applications may try to avoid memory allocations whenever possible.
+
+{\ttfamily \doxylink{class_memory_pool_allocator}{Memory\+Pool\+Allocator}} can support this by letting user to provide a buffer. The buffer can be on the program stack, or a "{}scratch buffer"{} which is statically allocated (a static/global array) for storing temporary data.
+
+{\ttfamily \doxylink{class_memory_pool_allocator}{Memory\+Pool\+Allocator}} will use the user buffer to satisfy allocations. When the user buffer is used up, it will allocate a chunk of memory from the base allocator (by default the {\ttfamily \doxylink{class_crt_allocator}{Crt\+Allocator}}).
+
+Here is an example of using stack memory. The first allocator is for storing values, while the second allocator is for storing temporary data during parsing.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{typedef}\ \mbox{\hyperlink{class_generic_document}{GenericDocument<UTF8<>}},\ \mbox{\hyperlink{class_memory_pool_allocator}{MemoryPoolAllocator<>}},\ \mbox{\hyperlink{class_memory_pool_allocator}{MemoryPoolAllocator<>}}>\ DocumentType;}
+\DoxyCodeLine{\textcolor{keywordtype}{char}\ valueBuffer[4096];}
+\DoxyCodeLine{\textcolor{keywordtype}{char}\ parseBuffer[1024];}
+\DoxyCodeLine{\mbox{\hyperlink{class_memory_pool_allocator}{MemoryPoolAllocator<>}}\ valueAllocator(valueBuffer,\ \textcolor{keyword}{sizeof}(valueBuffer));}
+\DoxyCodeLine{\mbox{\hyperlink{class_memory_pool_allocator}{MemoryPoolAllocator<>}}\ parseAllocator(parseBuffer,\ \textcolor{keyword}{sizeof}(parseBuffer));}
+\DoxyCodeLine{DocumentType\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}(\&valueAllocator,\ \textcolor{keyword}{sizeof}(parseBuffer),\ \&parseAllocator);}
+\DoxyCodeLine{\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.Parse(json);}
+
+\end{DoxyCode}
+
+
+If the total size of allocation is less than 4096+1024 bytes during parsing, this code does not invoke any heap allocation (via {\ttfamily new} or {\ttfamily malloc()}) at all.
+
+User can query the current memory consumption in bytes via {\ttfamily \doxylink{class_memory_pool_allocator_ae7fcf0341c13e899cf488bc7c8949956}{Memory\+Pool\+Allocator\+::\+Size()}}. And then user can determine a suitable size of user buffer. 

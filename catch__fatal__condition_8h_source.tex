@@ -1,0 +1,75 @@
+\doxysection{catch\+\_\+fatal\+\_\+condition.\+h}
+\hypertarget{catch__fatal__condition_8h_source}{}\label{catch__fatal__condition_8h_source}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_fatal\_condition.h@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_fatal\_condition.h}}
+\mbox{\hyperlink{catch__fatal__condition_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00002}00002\ \textcolor{comment}{\ *\ \ Created\ by\ Phil\ on\ 21/08/2014}}
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00003}00003\ \textcolor{comment}{\ *\ \ Copyright\ 2014\ Two\ Blue\ Cubes\ Ltd.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00004}00004\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00005}00005\ \textcolor{comment}{\ *\ \ Distributed\ under\ the\ Boost\ Software\ License,\ Version\ 1.0.\ (See\ accompanying}}
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00006}00006\ \textcolor{comment}{\ *\ \ file\ LICENSE\_1\_0.txt\ or\ copy\ at\ http://www.boost.org/LICENSE\_1\_0.txt)}}
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00008}00008\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00009}00009\ \textcolor{preprocessor}{\#ifndef\ TWOBLUECUBES\_CATCH\_FATAL\_CONDITION\_H\_INCLUDED}}
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00010}00010\ \textcolor{preprocessor}{\#define\ TWOBLUECUBES\_CATCH\_FATAL\_CONDITION\_H\_INCLUDED}}
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00012}00012\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__platform_8h}{catch\_platform.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00013}00013\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__compiler__capabilities_8h}{catch\_compiler\_capabilities.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00014}00014\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__windows__h__proxy_8h}{catch\_windows\_h\_proxy.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00017}00017\ \textcolor{preprocessor}{\#if\ defined(\ CATCH\_CONFIG\_WINDOWS\_SEH\ )}}
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00019}00019\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00021}00021\ \ \ \ \ \textcolor{keyword}{struct\ }FatalConditionHandler\ \{}
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00023}00023\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_aba10771e3ff645fe1305be4cae517573ac1fabfea54ec6011e694f211f3ffebf3}{LONG}}\ CALLBACK\ handleVectoredException(PEXCEPTION\_POINTERS\ ExceptionInfo);}
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00024}00024\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_fatal_condition_handler_a4c3eaa6d0ebe8eceb36c71a47f7de060}{FatalConditionHandler}}();}
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00025}00025\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_catch_1_1_fatal_condition_handler_a3199da248de3ee47dfbc51aef8859753}{reset}}();}
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00026}00026\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_fatal_condition_handler_ad4092a1121a26c3fae5cac9b7ff24d8c}{\string~FatalConditionHandler}}();}
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00028}00028\ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00029}00029\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_catch_1_1_fatal_condition_handler_a7d84daeed96b929385745b2562273aa0}{isSet}};}
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00030}00030\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ ULONG\ guaranteeSize;}
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00031}00031\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ PVOID\ exceptionHandlerHandle;}
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00032}00032\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00034}00034\ \}\ \textcolor{comment}{//\ namespace\ Catch}}
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00036}00036\ \textcolor{preprocessor}{\#elif\ defined\ (\ CATCH\_CONFIG\_POSIX\_SIGNALS\ )}}
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00038}00038\ \textcolor{preprocessor}{\#include\ <signal.h>}}
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00040}00040\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00042}\mbox{\hyperlink{struct_catch_1_1_fatal_condition_handler}{00042}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_catch_1_1_fatal_condition_handler}{FatalConditionHandler}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00044}\mbox{\hyperlink{struct_catch_1_1_fatal_condition_handler_a7d84daeed96b929385745b2562273aa0}{00044}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_catch_1_1_fatal_condition_handler_a7d84daeed96b929385745b2562273aa0}{isSet}};}
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00045}\mbox{\hyperlink{struct_catch_1_1_fatal_condition_handler_aae549e51862a794a33c35dd6d5202961}{00045}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{struct\ }sigaction\ \mbox{\hyperlink{struct_catch_1_1_fatal_condition_handler_aae549e51862a794a33c35dd6d5202961}{oldSigActions}}[];}
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00046}\mbox{\hyperlink{struct_catch_1_1_fatal_condition_handler_a1d9e8f593ef41471f549eb04056988b1}{00046}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ stack\_t\ \mbox{\hyperlink{struct_catch_1_1_fatal_condition_handler_a1d9e8f593ef41471f549eb04056988b1}{oldSigStack}};}
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00047}\mbox{\hyperlink{struct_catch_1_1_fatal_condition_handler_a5df1b82b5255ad4e62716ebbdf3d37fc}{00047}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{struct_catch_1_1_fatal_condition_handler_a5df1b82b5255ad4e62716ebbdf3d37fc}{altStackMem}}[];}
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00049}00049\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_catch_1_1_fatal_condition_handler_a50d4a6e4ecd795db0a255c391ccf0a31}{handleSignal}}(\ \textcolor{keywordtype}{int}\ sig\ );}
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00051}00051\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_fatal_condition_handler_a4c3eaa6d0ebe8eceb36c71a47f7de060}{FatalConditionHandler}}();}
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00052}00052\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_fatal_condition_handler_ad4092a1121a26c3fae5cac9b7ff24d8c}{\string~FatalConditionHandler}}();}
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00053}00053\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_catch_1_1_fatal_condition_handler_a3199da248de3ee47dfbc51aef8859753}{reset}}();}
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00054}00054\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00056}00056\ \}\ \textcolor{comment}{//\ namespace\ Catch}}
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00059}00059\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00061}00061\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00062}00062\ \ \ \ \ \textcolor{keyword}{struct\ }FatalConditionHandler\ \{}
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00063}00063\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_catch_1_1_fatal_condition_handler_a3199da248de3ee47dfbc51aef8859753}{reset}}();}
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00064}00064\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00065}00065\ \}}
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00067}00067\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{catch__fatal__condition_8h_source_l00069}00069\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ TWOBLUECUBES\_CATCH\_FATAL\_CONDITION\_H\_INCLUDED}}
+
+\end{DoxyCode}

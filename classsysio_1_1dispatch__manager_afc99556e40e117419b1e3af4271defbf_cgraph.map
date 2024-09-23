@@ -1,0 +1,9 @@
+<map id="sysio::dispatch_manager::retry_fetch" name="sysio::dispatch_manager::retry_fetch">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,63,172,103"/>
+<area shape="rect" id="Node000002" href="$namespacesysio.html#a0369be74f29dbab1c8afd88c3f6d2858" title=" " alt="" coords="229,5,377,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="166,60,213,47,214,52,168,65"/>
+<area shape="rect" id="Node000003" href="$namespacesysio.html#a454edd6d34c5564da3a8c796090837fe" title=" " alt="" coords="242,70,364,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="172,80,227,80,227,86,172,86"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1dispatch__manager.html#a6464105ad3fe908bfac43cae949b5539" title=" " alt="" coords="220,120,386,161"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="168,101,210,113,209,118,166,106"/>
+</map>

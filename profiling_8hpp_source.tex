@@ -1,0 +1,45 @@
+\doxysection{profiling.\+hpp}
+\hypertarget{profiling_8hpp_source}{}\label{profiling_8hpp_source}\index{libraries/fc/libraries/ff/libff/common/profiling.hpp@{libraries/fc/libraries/ff/libff/common/profiling.hpp}}
+\mbox{\hyperlink{profiling_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{profiling_8hpp_source_l00001}00001\ }
+\DoxyCodeLine{\Hypertarget{profiling_8hpp_source_l00014}00014\ \textcolor{preprocessor}{\#ifndef\ PROFILING\_HPP\_}}
+\DoxyCodeLine{\Hypertarget{profiling_8hpp_source_l00015}00015\ \textcolor{preprocessor}{\#define\ PROFILING\_HPP\_}}
+\DoxyCodeLine{\Hypertarget{profiling_8hpp_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{profiling_8hpp_source_l00017}00017\ \textcolor{preprocessor}{\#include\ <cstddef>}}
+\DoxyCodeLine{\Hypertarget{profiling_8hpp_source_l00018}00018\ \textcolor{preprocessor}{\#include\ <map>}}
+\DoxyCodeLine{\Hypertarget{profiling_8hpp_source_l00019}00019\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{\Hypertarget{profiling_8hpp_source_l00020}00020\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{\Hypertarget{profiling_8hpp_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{profiling_8hpp_source_l00022}00022\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacelibff}{libff}}\ \{}
+\DoxyCodeLine{\Hypertarget{profiling_8hpp_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{profiling_8hpp_source_l00024}00024\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacelibff_a4bcbacbbf8d028be4c4b2a863d21f4c6}{start\_profiling}}();}
+\DoxyCodeLine{\Hypertarget{profiling_8hpp_source_l00025}00025\ \textcolor{keywordtype}{long}\ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{namespacelibff_a81e225ed671a1a00f2dfe5753f89b6cf}{get\_nsec\_time}}();}
+\DoxyCodeLine{\Hypertarget{profiling_8hpp_source_l00026}00026\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacelibff_a5c3a5ae8d92ef971f647fd95b7fc756a}{print\_time}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ msg);}
+\DoxyCodeLine{\Hypertarget{profiling_8hpp_source_l00027}00027\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacelibff_a6314933e7708a41140279a9c1a5c25c8}{print\_header}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ msg);}
+\DoxyCodeLine{\Hypertarget{profiling_8hpp_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{profiling_8hpp_source_l00029}00029\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacelibff_af9fc78aab25c3773ef01a337a404e159}{print\_indent}}();}
+\DoxyCodeLine{\Hypertarget{profiling_8hpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{profiling_8hpp_source_l00031}00031\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacelibff_a8cc234e790d9c373c3b401902d7c5851}{inhibit\_profiling\_info}};}
+\DoxyCodeLine{\Hypertarget{profiling_8hpp_source_l00032}00032\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacelibff_ab90e4fc8e6d9a89f6f34aab68a382194}{inhibit\_profiling\_counters}};}
+\DoxyCodeLine{\Hypertarget{profiling_8hpp_source_l00033}00033\ \textcolor{keyword}{extern}\ std::map<std::string,\ size\_t>\ \mbox{\hyperlink{namespacelibff_a1bdeb17f276c22e5b4a8c9d3aa99e9ad}{invocation\_counts}};}
+\DoxyCodeLine{\Hypertarget{profiling_8hpp_source_l00034}00034\ \textcolor{keyword}{extern}\ std::map<std::string,\ long\ long>\ \mbox{\hyperlink{namespacelibff_aaf5a1ae5914029cc44ef5121bb077720}{last\_times}};}
+\DoxyCodeLine{\Hypertarget{profiling_8hpp_source_l00035}00035\ \textcolor{keyword}{extern}\ std::map<std::string,\ long\ long>\ \mbox{\hyperlink{namespacelibff_a4bbfd7fd787aef2e1ed4f6769d7f6f66}{cumulative\_times}};}
+\DoxyCodeLine{\Hypertarget{profiling_8hpp_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{profiling_8hpp_source_l00037}00037\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacelibff_a0c1ab4936e58a7a6736e8b372e13cb9a}{clear\_profiling\_counters}}();}
+\DoxyCodeLine{\Hypertarget{profiling_8hpp_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{profiling_8hpp_source_l00039}00039\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacelibff_a695d8da263c9ea66d57a62209bc5181d}{print\_cumulative\_time\_entry}}(\textcolor{keyword}{const}\ std::string\ \&key,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{long}\ \textcolor{keywordtype}{long}\ factor=1);}
+\DoxyCodeLine{\Hypertarget{profiling_8hpp_source_l00040}00040\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacelibff_a9c31079c49ebd33090e944ba3b5e4b3b}{print\_cumulative\_times}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{long}\ \textcolor{keywordtype}{long}\ factor=1);}
+\DoxyCodeLine{\Hypertarget{profiling_8hpp_source_l00041}00041\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacelibff_a55df5d0f12f359bed1088011015bc205}{print\_cumulative\_op\_counts}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ only\_fq=\textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{profiling_8hpp_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{profiling_8hpp_source_l00043}00043\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacelibff_a64168e59c1ced7a22a49f7d819c02794}{enter\_block}}(\textcolor{keyword}{const}\ std::string\ \&msg,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ indent=\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{profiling_8hpp_source_l00044}00044\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacelibff_ac68d4feb3f7413e9e7de86e06fe6ef1f}{leave\_block}}(\textcolor{keyword}{const}\ std::string\ \&msg,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ indent=\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{profiling_8hpp_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{profiling_8hpp_source_l00046}00046\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacelibff_a342ad9a9ee415ba99e1cc3f56b739894}{print\_mem}}(\textcolor{keyword}{const}\ std::string\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ =\ \textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{\Hypertarget{profiling_8hpp_source_l00047}00047\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacelibff_ae2b657d337cbf53d4ce21b530b76efc5}{print\_compilation\_info}}();}
+\DoxyCodeLine{\Hypertarget{profiling_8hpp_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{profiling_8hpp_source_l00049}00049\ \}\ \textcolor{comment}{//\ libff}}
+\DoxyCodeLine{\Hypertarget{profiling_8hpp_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{profiling_8hpp_source_l00051}00051\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ PROFILING\_HPP\_}}
+
+\end{DoxyCode}

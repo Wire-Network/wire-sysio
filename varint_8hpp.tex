@@ -1,0 +1,47 @@
+\doxysection{libraries/fc/include/fc/io/varint.hpp File Reference}
+\hypertarget{varint_8hpp}{}\label{varint_8hpp}\index{libraries/fc/include/fc/io/varint.hpp@{libraries/fc/include/fc/io/varint.hpp}}
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include $<$unordered\+\_\+map$>$}\newline
+Include dependency graph for varint.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=262pt]{varint_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{varint_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structfc_1_1unsigned__int}{fc\+::unsigned\+\_\+int}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1signed__int}{fc\+::signed\+\_\+int}}
+\begin{DoxyCompactList}\small\item\em serializes a 32 bit signed interger in as few bytes as possible \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{structstd_1_1hash_3_01fc_1_1signed__int_01_4}{std\+::hash$<$ fc\+::signed\+\_\+int $>$}}
+\item 
+struct \mbox{\hyperlink{structstd_1_1hash_3_01fc_1_1unsigned__int_01_4}{std\+::hash$<$ fc\+::unsigned\+\_\+int $>$}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacefc}{fc}}
+\begin{DoxyCompactList}\small\item\em namespace \doxylink{namespacesysio_1_1chain}{sysio\+::chain} \end{DoxyCompactList}\item 
+namespace \mbox{\hyperlink{namespacestd}{std}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{namespacefc_aec2092daf9694789ff5cf8ab45d6e456}{fc\+::to\+\_\+variant}} (const \mbox{\hyperlink{structfc_1_1signed__int}{signed\+\_\+int}} \&var, \mbox{\hyperlink{classfc_1_1variant}{variant}} \&vo)
+\item 
+void \mbox{\hyperlink{namespacefc_aa2d8b09f66dffd1d21e17a8ab3c23a8b}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{variant}} \&var, \mbox{\hyperlink{structfc_1_1signed__int}{signed\+\_\+int}} \&vo)
+\item 
+void \mbox{\hyperlink{namespacefc_ac888b5890131278da23a6525b993c85b}{fc\+::to\+\_\+variant}} (const \mbox{\hyperlink{structfc_1_1unsigned__int}{unsigned\+\_\+int}} \&var, \mbox{\hyperlink{classfc_1_1variant}{variant}} \&vo)
+\item 
+void \mbox{\hyperlink{namespacefc_a244a3398e2002f2f7bf256cccc9acde4}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{variant}} \&var, \mbox{\hyperlink{structfc_1_1unsigned__int}{unsigned\+\_\+int}} \&vo)
+\end{DoxyCompactItemize}

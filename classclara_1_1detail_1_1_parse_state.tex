@@ -1,0 +1,87 @@
+\doxysection{clara\+::detail\+::Parse\+State Class Reference}
+\hypertarget{classclara_1_1detail_1_1_parse_state}{}\label{classclara_1_1detail_1_1_parse_state}\index{clara::detail::ParseState@{clara::detail::ParseState}}
+
+
+{\ttfamily \#include $<$clara.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classclara_1_1detail_1_1_parse_state_aa2bfa5a9220c1375563208b407446ed0}{Parse\+State}} (\mbox{\hyperlink{namespaceclara_1_1detail_a8da7ceac0fa5d56539ef81f04348193b}{Parse\+Result\+Type}} \mbox{\hyperlink{classclara_1_1detail_1_1_parse_state_a1fc9501c12e35b85304b04a7396eb68e}{type}}, \mbox{\hyperlink{classclara_1_1detail_1_1_token_stream}{Token\+Stream}} const \&\mbox{\hyperlink{classclara_1_1detail_1_1_parse_state_adebe2f6216923e99103353f132a2f023}{remaining\+Tokens}})
+\item 
+auto \mbox{\hyperlink{classclara_1_1detail_1_1_parse_state_a1fc9501c12e35b85304b04a7396eb68e}{type}} () const -\/$>$ \mbox{\hyperlink{namespaceclara_1_1detail_a8da7ceac0fa5d56539ef81f04348193b}{Parse\+Result\+Type}}
+\item 
+auto \mbox{\hyperlink{classclara_1_1detail_1_1_parse_state_adebe2f6216923e99103353f132a2f023}{remaining\+Tokens}} () const -\/$>$ \mbox{\hyperlink{classclara_1_1detail_1_1_token_stream}{Token\+Stream}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{third__party_2clara_8hpp_source_l00629}{629}} of file \mbox{\hyperlink{third__party_2clara_8hpp_source}{clara.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classclara_1_1detail_1_1_parse_state_aa2bfa5a9220c1375563208b407446ed0}\index{clara::detail::ParseState@{clara::detail::ParseState}!ParseState@{ParseState}}
+\index{ParseState@{ParseState}!clara::detail::ParseState@{clara::detail::ParseState}}
+\doxysubsubsection{\texorpdfstring{ParseState()}{ParseState()}}
+{\footnotesize\ttfamily \label{classclara_1_1detail_1_1_parse_state_aa2bfa5a9220c1375563208b407446ed0} 
+clara\+::detail\+::\+Parse\+State\+::\+Parse\+State (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespaceclara_1_1detail_a8da7ceac0fa5d56539ef81f04348193b}{Parse\+Result\+Type}}}]{type}{, }\item[{\mbox{\hyperlink{classclara_1_1detail_1_1_token_stream}{Token\+Stream}} const \&}]{remaining\+Tokens}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{third__party_2clara_8hpp_source_l00632}{632}} of file \mbox{\hyperlink{third__party_2clara_8hpp_source}{clara.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00633\ \ \ \ \ \ \ \ \ :\ m\_type(type),}
+\DoxyCodeLine{00634\ \ \ \ \ \ \ \ \ \ \ m\_remainingTokens(\ \mbox{\hyperlink{classclara_1_1detail_1_1_parse_state_adebe2f6216923e99103353f132a2f023}{remainingTokens}}\ )}
+\DoxyCodeLine{00635\ \ \ \ \ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classclara_1_1detail_1_1_parse_state_adebe2f6216923e99103353f132a2f023}\index{clara::detail::ParseState@{clara::detail::ParseState}!remainingTokens@{remainingTokens}}
+\index{remainingTokens@{remainingTokens}!clara::detail::ParseState@{clara::detail::ParseState}}
+\doxysubsubsection{\texorpdfstring{remainingTokens()}{remainingTokens()}}
+{\footnotesize\ttfamily \label{classclara_1_1detail_1_1_parse_state_adebe2f6216923e99103353f132a2f023} 
+auto clara\+::detail\+::\+Parse\+State\+::remaining\+Tokens (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const -\/$>$ \mbox{\hyperlink{classclara_1_1detail_1_1_token_stream}{Token\+Stream}} \hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{third__party_2clara_8hpp_source_l00638}{638}} of file \mbox{\hyperlink{third__party_2clara_8hpp_source}{clara.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00638\ \{\ \textcolor{keywordflow}{return}\ m\_remainingTokens;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classclara_1_1detail_1_1_parse_state_a1fc9501c12e35b85304b04a7396eb68e}\index{clara::detail::ParseState@{clara::detail::ParseState}!type@{type}}
+\index{type@{type}!clara::detail::ParseState@{clara::detail::ParseState}}
+\doxysubsubsection{\texorpdfstring{type()}{type()}}
+{\footnotesize\ttfamily \label{classclara_1_1detail_1_1_parse_state_a1fc9501c12e35b85304b04a7396eb68e} 
+auto clara\+::detail\+::\+Parse\+State\+::type (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const -\/$>$ \mbox{\hyperlink{namespaceclara_1_1detail_a8da7ceac0fa5d56539ef81f04348193b}{Parse\+Result\+Type}} \hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{third__party_2clara_8hpp_source_l00637}{637}} of file \mbox{\hyperlink{third__party_2clara_8hpp_source}{clara.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00637\ \{\ \textcolor{keywordflow}{return}\ m\_type;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classclara_1_1detail_1_1_parse_state_a1fc9501c12e35b85304b04a7396eb68e_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/third\+\_\+party/\mbox{\hyperlink{third__party_2clara_8hpp}{clara.\+hpp}}\end{DoxyCompactItemize}

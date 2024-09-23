@@ -1,0 +1,103 @@
+\doxysection{signature.\+cpp}
+\hypertarget{signature_8cpp_source}{}\label{signature_8cpp_source}\index{libraries/fc/src/crypto/signature.cpp@{libraries/fc/src/crypto/signature.cpp}}
+\mbox{\hyperlink{signature_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{signature_8hpp}{fc/crypto/signature.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{libraries_2fc_2include_2fc_2crypto_2common_8hpp}{fc/crypto/common.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{exception_8hpp}{fc/exception/exception.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00005}00005\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}\ \{\ \textcolor{keyword}{namespace\ }crypto\ \{}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00006}\mbox{\hyperlink{structfc_1_1crypto_1_1hash__visitor}{00006}}\ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structfc_1_1crypto_1_1hash__visitor}{hash\_visitor}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{structfc_1_1visitor}{fc::visitor}}<size\_t>\ \{}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00007}00007\ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ SigType>}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00008}\mbox{\hyperlink{structfc_1_1crypto_1_1hash__visitor_acf367fa827ab81bc2ef53bdb15c1085b}{00008}}\ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{structfc_1_1crypto_1_1hash__visitor_acf367fa827ab81bc2ef53bdb15c1085b}{operator()}}(\textcolor{keyword}{const}\ SigType\&\ sig)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00009}00009\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_assert}(\textcolor{keyword}{sizeof}(sig.\_data.data)\ ==\ 65,\ \textcolor{stringliteral}{"{}sig\ size\ is\ expected\ to\ be\ 65"{}});}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00010}00010\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//signatures\ are\ two\ bignums:\ r\ \&\ s.\ Just\ add\ up\ least\ significant\ digits\ of\ the\ two}}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00011}00011\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *(\textcolor{keywordtype}{size\_t}*)\&sig.\_data.data[32-\/\textcolor{keyword}{sizeof}(\textcolor{keywordtype}{size\_t})]\ +\ *(\textcolor{keywordtype}{size\_t}*)\&sig.\_data.data[64-\/\textcolor{keyword}{sizeof}(\textcolor{keywordtype}{size\_t})];}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00012}00012\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00014}\mbox{\hyperlink{structfc_1_1crypto_1_1hash__visitor_aae14a3ad7bee5796babaf136b38fde13}{00014}}\ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{structfc_1_1crypto_1_1hash__visitor_aae14a3ad7bee5796babaf136b38fde13}{operator()}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1crypto_1_1webauthn_1_1signature}{webauthn::signature}}\&\ sig)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00015}00015\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ sig.\mbox{\hyperlink{classfc_1_1crypto_1_1webauthn_1_1signature_a149821dda07dd2af31ce043198d7429c}{get\_hash}}();}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00016}00016\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00017}00017\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00019}00019\ \ \ \ \textcolor{keyword}{static}\ signature::storage\_type\ sig\_parse\_base58(\textcolor{keyword}{const}\ std::string\&\ base58str)}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00020}00020\ \ \ \ \{\ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00021}00021\ \ \ \ \ \ \ \textcolor{keyword}{constexpr}\ \textcolor{keyword}{auto}\ prefix\ =\ config::signature\_base\_prefix;}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00023}00023\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ pivot\ =\ base58str.find(\textcolor{charliteral}{'\_'});}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00024}00024\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(pivot\ !=\ std::string::npos,\ \textcolor{stringliteral}{"{}No\ delimiter\ in\ string,\ cannot\ determine\ type:\ \$\{str\}"{}},\ (\textcolor{stringliteral}{"{}str"{}},\ base58str));}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00026}00026\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ prefix\_str\ =\ base58str.substr(0,\ pivot);}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00027}00027\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(prefix\ ==\ prefix\_str,\ \textcolor{stringliteral}{"{}Signature\ Key\ has\ invalid\ prefix:\ \$\{str\}"{}},\ (\textcolor{stringliteral}{"{}str"{}},\ base58str)(\textcolor{stringliteral}{"{}prefix\_str"{}},\ prefix\_str));}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00029}00029\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ data\_str\ =\ base58str.substr(pivot\ +\ 1);}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00030}00030\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(!data\_str.empty(),\ \textcolor{stringliteral}{"{}Signature\ has\ no\ data:\ \$\{str\}"{}},\ (\textcolor{stringliteral}{"{}str"{}},\ base58str));}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00031}00031\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ base58\_str\_parser<signature::storage\_type,\ config::signature\_prefix>::apply(data\_str);}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00032}00032\ \ \ \ \}\ \mbox{\hyperlink{exception_8hpp_af3731d6e3beb140d9e652adf7a18113b}{FC\_RETHROW\_EXCEPTIONS}}(\ warn,\ \textcolor{stringliteral}{"{}error\ parsing\ signature"{}},\ (\textcolor{stringliteral}{"{}str"{}},\ base58str\ )\ )\ \}}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00034}\mbox{\hyperlink{classfc_1_1crypto_1_1signature_ad579711d443f87a992609cee5826c34f}{00034}}\ \ \ \ signature::signature(\textcolor{keyword}{const}\ std::string\&\ base58str)}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00035}00035\ \ \ \ \ \ \ :\_storage(sig\_parse\_base58(base58str))}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00036}00036\ \ \ \ \{\}}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00038}\mbox{\hyperlink{classfc_1_1crypto_1_1signature_a5836b8b6af3714fdbdc77cf8743fdd0b}{00038}}\ \ \ \ \textcolor{keywordtype}{size\_t}\ signature::which()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00039}00039\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \_storage.index();}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00040}00040\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00042}\mbox{\hyperlink{structfc_1_1crypto_1_1overloaded}{00042}}\ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{class}...\ Ts>\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structfc_1_1crypto_1_1overloaded}{overloaded}}\ :\ Ts...\ \{\ \textcolor{keyword}{using\ }Ts::operator()...;\ \};}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00043}\mbox{\hyperlink{namespacefc_1_1crypto_a31718e1baf7ba5d37f8a233db473eedf}{00043}}\ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{class}...\ Ts>\ \mbox{\hyperlink{namespacefc_1_1crypto_a31718e1baf7ba5d37f8a233db473eedf}{overloaded}}(Ts...)\ -\/>\ \mbox{\hyperlink{structfc_1_1crypto_1_1overloaded}{overloaded}}<Ts...>;}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00045}\mbox{\hyperlink{classfc_1_1crypto_1_1signature_a74eac58b2b683ad8a4d048e13603ada5}{00045}}\ \ \ \ \textcolor{keywordtype}{size\_t}\ signature::variable\_size()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00046}00046\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::visit(\mbox{\hyperlink{structfc_1_1crypto_1_1overloaded}{overloaded}}\ \{}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00047}00047\ \ \ \ \ \ \ \ \ \ [\&](\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ k1r1)\ \{}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(0);}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00050}00050\ \ \ \ \ \ \ \ \ \ [\&](\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1crypto_1_1webauthn_1_1signature}{webauthn::signature}}\&\ \mbox{\hyperlink{allow__code__after__function__end__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}})\ \{}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00051}00051\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(\mbox{\hyperlink{allow__code__after__function__end__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}.variable\_size());}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00053}00053\ \ \ \ \ \ \ \},\ \_storage);}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00054}00054\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00056}\mbox{\hyperlink{classfc_1_1crypto_1_1signature_a9e02c6ea0f56ba55ffd9fb799ae0a940}{00056}}\ \ \ \ std::string\ signature::to\_string(\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1optional__delegate}{fc::yield\_function\_t}}\&\ yield)\textcolor{keyword}{\ const}}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00057}00057\ \textcolor{keyword}{\ \ \ }\{}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00058}00058\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ data\_str\ =\ std::visit(\mbox{\hyperlink{structfc_1_1crypto_1_1base58str__visitor}{base58str\_visitor<storage\_type,\ config::signature\_prefix>}}(yield),\ \_storage);}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00059}00059\ \ \ \ \ \ \ yield();}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00060}00060\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::string(config::signature\_base\_prefix)\ +\ \textcolor{stringliteral}{"{}\_"{}}\ +\ data\_str;}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00061}00061\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00062}00062\ }
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00063}\mbox{\hyperlink{namespacefc_1_1crypto_a62f3fb1b619cf4626e59a824dad86927}{00063}}\ \ \ \ std::ostream\&\ \mbox{\hyperlink{namespacefc_1_1crypto_a059817e20371c13458be5fa50cbf065e}{operator<<}}(std::ostream\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{signature}}\&\ k)\ \{}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00064}00064\ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ <<\ \textcolor{stringliteral}{"{}signature("{}}\ <<\ k.\mbox{\hyperlink{classfc_1_1crypto_1_1signature_a9e02c6ea0f56ba55ffd9fb799ae0a940}{to\_string}}()\ <<\ \textcolor{charliteral}{')'};}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00065}00065\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00066}00066\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00067}00067\ }
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00068}\mbox{\hyperlink{classfc_1_1crypto_1_1signature_ac2e519e4ae4118c9d1801c20f94c893b}{00068}}\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacefc_1_1crypto_abad4085318662bc781ea106f8fb96e43}{operator\ ==\ }}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{signature}}\&\ p1,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{signature}}\&\ p2)\ \{}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00069}00069\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structfc_1_1crypto_1_1eq__comparator_a4a970a346ebd907e27c65f298b571b75}{eq\_comparator<signature::storage\_type>::apply}}(p1.\_storage,\ p2.\_storage);}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00070}00070\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00072}\mbox{\hyperlink{classfc_1_1crypto_1_1signature_a44b742772ed7aa3e516dd4625abfe1d8}{00072}}\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacefc_1_1crypto_aa25f9556dc55dfc9e747ec761058c954}{operator\ !=\ }}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{signature}}\&\ p1,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{signature}}\&\ p2)\ \{}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00073}00073\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !\mbox{\hyperlink{structfc_1_1crypto_1_1eq__comparator_a4a970a346ebd907e27c65f298b571b75}{eq\_comparator<signature::storage\_type>::apply}}(p1.\_storage,\ p2.\_storage);}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00074}00074\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00075}00075\ }
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00076}\mbox{\hyperlink{classfc_1_1crypto_1_1signature_afb044052136e9b7515e3da14772089d1}{00076}}\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacefc_1_1crypto_a895e9cb33feda8dee0e2c33ec0ffa917}{operator\ <\ }}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{signature}}\&\ p1,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{signature}}\&\ p2)}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00077}00077\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00078}00078\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structfc_1_1crypto_1_1less__comparator_aa8a9e7b3cc483fc68e4d623063606fc9}{less\_comparator<signature::storage\_type>::apply}}(p1.\_storage,\ p2.\_storage);}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00079}00079\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00080}00080\ }
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00081}\mbox{\hyperlink{classfc_1_1crypto_1_1signature_a84a730a17bfc74f917830e31af1fc1a9}{00081}}\ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{namespacefc_1_1crypto_a94acf114d8936bc8b79952c01d3a84fe}{hash\_value}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{signature}}\&\ b)\ \{}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00082}00082\ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::visit(\mbox{\hyperlink{structfc_1_1crypto_1_1hash__visitor}{hash\_visitor}}(),\ b.\_storage);}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00083}00083\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00084}00084\ \}\ \}\ \textcolor{comment}{//\ sysio::blockchain}}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00085}00085\ }
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00086}00086\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00087}00087\ \{}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00088}\mbox{\hyperlink{namespacefc_a973cc5e78100b1312d14f405dcb0ccd6}{00088}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefc_adea61f2343de94d0fbcb920a32332ad9}{to\_variant}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{fc::crypto::signature}}\&\ var,\ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}\&\ vo,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1optional__delegate}{fc::yield\_function\_t}}\&\ yield)}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00089}00089\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00090}00090\ \ \ \ \ \ \ vo\ =\ var.\mbox{\hyperlink{classfc_1_1crypto_1_1signature_a9e02c6ea0f56ba55ffd9fb799ae0a940}{to\_string}}(yield);}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00091}00091\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00092}00092\ }
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00093}\mbox{\hyperlink{namespacefc_a5df83b6ab6fb04781a438ac3ad62970b}{00093}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefc_accef08adf4ee05c36ccc550d8101b08f}{from\_variant}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}\&\ var,\ \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{fc::crypto::signature}}\&\ vo)}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00094}00094\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00095}00095\ \ \ \ \ \ \ vo\ =\ \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{fc::crypto::signature}}(var.\mbox{\hyperlink{classfc_1_1variant_acbd70a93184e4277631f2a261acb707c}{as\_string}}());}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00096}00096\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{signature_8cpp_source_l00097}00097\ \}\ \textcolor{comment}{//\ fc}}
+
+\end{DoxyCode}

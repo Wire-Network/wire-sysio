@@ -1,0 +1,173 @@
+\doxysection{fc\+::detail\+::rate\+\_\+limited\+\_\+tcp\+\_\+read\+\_\+operation Class Reference}
+\hypertarget{classfc_1_1detail_1_1rate__limited__tcp__read__operation}{}\label{classfc_1_1detail_1_1rate__limited__tcp__read__operation}\index{fc::detail::rate\_limited\_tcp\_read\_operation@{fc::detail::rate\_limited\_tcp\_read\_operation}}
+
+
+Inheritance diagram for fc\+::detail\+::rate\+\_\+limited\+\_\+tcp\+\_\+read\+\_\+operation\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=190pt]{classfc_1_1detail_1_1rate__limited__tcp__read__operation__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for fc\+::detail\+::rate\+\_\+limited\+\_\+tcp\+\_\+read\+\_\+operation\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=207pt]{classfc_1_1detail_1_1rate__limited__tcp__read__operation__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__read__operation_a73b436865498dde61f65d6f5c2480ed1}{rate\+\_\+limited\+\_\+tcp\+\_\+read\+\_\+operation}} (boost\+::asio\+::ip\+::tcp\+::socket \&\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__read__operation_a4c916b88d155e708d9a1962b360b723e}{socket}}, char \texorpdfstring{$\ast$}{*}buffer, size\+\_\+t \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ae8457a63170710103e077ec951c26564}{length}}, size\+\_\+t \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_a6ba877d2a0fdcb8b029af48feb07421f}{offset}}, promise$<$ size\+\_\+t $>$\+::ptr \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ac8b6e31c5908b626e58252fe8048f8b9}{completion\+\_\+promise}})
+\item 
+\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__read__operation_a1249ab1b3f073593278b421f9739630b}{rate\+\_\+limited\+\_\+tcp\+\_\+read\+\_\+operation}} (boost\+::asio\+::ip\+::tcp\+::socket \&\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__read__operation_a4c916b88d155e708d9a1962b360b723e}{socket}}, const std\+::shared\+\_\+ptr$<$ char $>$ \&buffer, size\+\_\+t \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ae8457a63170710103e077ec951c26564}{length}}, size\+\_\+t \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_a6ba877d2a0fdcb8b029af48feb07421f}{offset}}, promise$<$ size\+\_\+t $>$\+::ptr \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ac8b6e31c5908b626e58252fe8048f8b9}{completion\+\_\+promise}})
+\item 
+virtual void \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__read__operation_a2a3b725337858366df8ba839db3e4b4b}{perform\+\_\+operation}} () override
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation}{fc\+::detail\+::rate\+\_\+limited\+\_\+operation}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_aa04333ce2124f5041df4d4c29edf6c43}{rate\+\_\+limited\+\_\+operation}} (size\+\_\+t \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ae8457a63170710103e077ec951c26564}{length}}, size\+\_\+t \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_a6ba877d2a0fdcb8b029af48feb07421f}{offset}}, promise$<$ size\+\_\+t $>$\+::ptr \&\&\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ac8b6e31c5908b626e58252fe8048f8b9}{completion\+\_\+promise}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+boost\+::asio\+::ip\+::tcp\+::socket \& \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__read__operation_a4c916b88d155e708d9a1962b360b723e}{socket}}
+\item 
+char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__read__operation_a13d0bf1fee25d9e43e8dadc16ed3e0f1}{raw\+\_\+buffer}}
+\item 
+std\+::shared\+\_\+ptr$<$ char $>$ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__read__operation_a0828f567076e86c02d32596215fa9fb6}{shared\+\_\+buffer}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes inherited from \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation}{fc\+::detail\+::rate\+\_\+limited\+\_\+operation}}}
+\begin{DoxyCompactItemize}
+\item 
+size\+\_\+t \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ae8457a63170710103e077ec951c26564}{length}}
+\item 
+size\+\_\+t \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_a6ba877d2a0fdcb8b029af48feb07421f}{offset}}
+\item 
+size\+\_\+t \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ae0ebd3357543b80e348bf68b75b796ad}{permitted\+\_\+length}}
+\item 
+promise$<$ size\+\_\+t $>$\+::ptr \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ac8b6e31c5908b626e58252fe8048f8b9}{completion\+\_\+promise}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00085}{85}} of file \mbox{\hyperlink{rate__limiting_8cpp_source}{rate\+\_\+limiting.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1detail_1_1rate__limited__tcp__read__operation_a73b436865498dde61f65d6f5c2480ed1}\index{fc::detail::rate\_limited\_tcp\_read\_operation@{fc::detail::rate\_limited\_tcp\_read\_operation}!rate\_limited\_tcp\_read\_operation@{rate\_limited\_tcp\_read\_operation}}
+\index{rate\_limited\_tcp\_read\_operation@{rate\_limited\_tcp\_read\_operation}!fc::detail::rate\_limited\_tcp\_read\_operation@{fc::detail::rate\_limited\_tcp\_read\_operation}}
+\doxysubsubsection{\texorpdfstring{rate\_limited\_tcp\_read\_operation()}{rate\_limited\_tcp\_read\_operation()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1rate__limited__tcp__read__operation_a73b436865498dde61f65d6f5c2480ed1} 
+fc\+::detail\+::rate\+\_\+limited\+\_\+tcp\+\_\+read\+\_\+operation\+::rate\+\_\+limited\+\_\+tcp\+\_\+read\+\_\+operation (\begin{DoxyParamCaption}\item[{boost\+::asio\+::ip\+::tcp\+::socket \&}]{socket}{, }\item[{char \texorpdfstring{$\ast$}{*}}]{buffer}{, }\item[{size\+\_\+t}]{length}{, }\item[{size\+\_\+t}]{offset}{, }\item[{promise$<$ size\+\_\+t $>$\+::ptr}]{completion\+\_\+promise}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00092}{92}} of file \mbox{\hyperlink{rate__limiting_8cpp_source}{rate\+\_\+limiting.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_aa04333ce2124f5041df4d4c29edf6c43}{rate\_limited\_operation}}(length,\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_a6ba877d2a0fdcb8b029af48feb07421f}{offset}},\ std::move(\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ac8b6e31c5908b626e58252fe8048f8b9}{completion\_promise}})),}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__read__operation_a4c916b88d155e708d9a1962b360b723e}{socket}}(socket),}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__read__operation_a13d0bf1fee25d9e43e8dadc16ed3e0f1}{raw\_buffer}}(buffer)}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1detail_1_1rate__limited__tcp__read__operation_a1249ab1b3f073593278b421f9739630b}\index{fc::detail::rate\_limited\_tcp\_read\_operation@{fc::detail::rate\_limited\_tcp\_read\_operation}!rate\_limited\_tcp\_read\_operation@{rate\_limited\_tcp\_read\_operation}}
+\index{rate\_limited\_tcp\_read\_operation@{rate\_limited\_tcp\_read\_operation}!fc::detail::rate\_limited\_tcp\_read\_operation@{fc::detail::rate\_limited\_tcp\_read\_operation}}
+\doxysubsubsection{\texorpdfstring{rate\_limited\_tcp\_read\_operation()}{rate\_limited\_tcp\_read\_operation()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1rate__limited__tcp__read__operation_a1249ab1b3f073593278b421f9739630b} 
+fc\+::detail\+::rate\+\_\+limited\+\_\+tcp\+\_\+read\+\_\+operation\+::rate\+\_\+limited\+\_\+tcp\+\_\+read\+\_\+operation (\begin{DoxyParamCaption}\item[{boost\+::asio\+::ip\+::tcp\+::socket \&}]{socket}{, }\item[{const std\+::shared\+\_\+ptr$<$ char $>$ \&}]{buffer}{, }\item[{size\+\_\+t}]{length}{, }\item[{size\+\_\+t}]{offset}{, }\item[{promise$<$ size\+\_\+t $>$\+::ptr}]{completion\+\_\+promise}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00101}{101}} of file \mbox{\hyperlink{rate__limiting_8cpp_source}{rate\+\_\+limiting.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_aa04333ce2124f5041df4d4c29edf6c43}{rate\_limited\_operation}}(length,\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_a6ba877d2a0fdcb8b029af48feb07421f}{offset}},\ std::move(\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ac8b6e31c5908b626e58252fe8048f8b9}{completion\_promise}})),}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__read__operation_a4c916b88d155e708d9a1962b360b723e}{socket}}(socket),}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__read__operation_a13d0bf1fee25d9e43e8dadc16ed3e0f1}{raw\_buffer}}(\textcolor{keyword}{nullptr}),}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__read__operation_a0828f567076e86c02d32596215fa9fb6}{shared\_buffer}}(buffer)}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1detail_1_1rate__limited__tcp__read__operation_a2a3b725337858366df8ba839db3e4b4b}\index{fc::detail::rate\_limited\_tcp\_read\_operation@{fc::detail::rate\_limited\_tcp\_read\_operation}!perform\_operation@{perform\_operation}}
+\index{perform\_operation@{perform\_operation}!fc::detail::rate\_limited\_tcp\_read\_operation@{fc::detail::rate\_limited\_tcp\_read\_operation}}
+\doxysubsubsection{\texorpdfstring{perform\_operation()}{perform\_operation()}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1rate__limited__tcp__read__operation_a2a3b725337858366df8ba839db3e4b4b} 
+virtual void fc\+::detail\+::rate\+\_\+limited\+\_\+tcp\+\_\+read\+\_\+operation\+::perform\+\_\+operation (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_a7090878b9387f70e1718021b5fc596cb}{fc\+::detail\+::rate\+\_\+limited\+\_\+operation}}.
+
+
+
+Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00111}{111}} of file \mbox{\hyperlink{rate__limiting_8cpp_source}{rate\+\_\+limiting.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__read__operation_a13d0bf1fee25d9e43e8dadc16ed3e0f1}{raw\_buffer}})}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \ \ asio::async\_read\_some(socket,}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__read__operation_a13d0bf1fee25d9e43e8dadc16ed3e0f1}{raw\_buffer}},\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ae0ebd3357543b80e348bf68b75b796ad}{permitted\_length}},}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ac8b6e31c5908b626e58252fe8048f8b9}{completion\_promise}});}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ asio::async\_read\_some(socket,}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__read__operation_a0828f567076e86c02d32596215fa9fb6}{shared\_buffer}},\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ae0ebd3357543b80e348bf68b75b796ad}{permitted\_length}},\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_a6ba877d2a0fdcb8b029af48feb07421f}{offset}},}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ac8b6e31c5908b626e58252fe8048f8b9}{completion\_promise}});}
+\DoxyCodeLine{00121\ }
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classfc_1_1detail_1_1rate__limited__tcp__read__operation_a13d0bf1fee25d9e43e8dadc16ed3e0f1}\index{fc::detail::rate\_limited\_tcp\_read\_operation@{fc::detail::rate\_limited\_tcp\_read\_operation}!raw\_buffer@{raw\_buffer}}
+\index{raw\_buffer@{raw\_buffer}!fc::detail::rate\_limited\_tcp\_read\_operation@{fc::detail::rate\_limited\_tcp\_read\_operation}}
+\doxysubsubsection{\texorpdfstring{raw\_buffer}{raw\_buffer}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1rate__limited__tcp__read__operation_a13d0bf1fee25d9e43e8dadc16ed3e0f1} 
+char\texorpdfstring{$\ast$}{*} fc\+::detail\+::rate\+\_\+limited\+\_\+tcp\+\_\+read\+\_\+operation\+::raw\+\_\+buffer}
+
+
+
+Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00089}{89}} of file \mbox{\hyperlink{rate__limiting_8cpp_source}{rate\+\_\+limiting.\+cpp}}.
+
+\Hypertarget{classfc_1_1detail_1_1rate__limited__tcp__read__operation_a0828f567076e86c02d32596215fa9fb6}\index{fc::detail::rate\_limited\_tcp\_read\_operation@{fc::detail::rate\_limited\_tcp\_read\_operation}!shared\_buffer@{shared\_buffer}}
+\index{shared\_buffer@{shared\_buffer}!fc::detail::rate\_limited\_tcp\_read\_operation@{fc::detail::rate\_limited\_tcp\_read\_operation}}
+\doxysubsubsection{\texorpdfstring{shared\_buffer}{shared\_buffer}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1rate__limited__tcp__read__operation_a0828f567076e86c02d32596215fa9fb6} 
+std\+::shared\+\_\+ptr$<$char$>$ fc\+::detail\+::rate\+\_\+limited\+\_\+tcp\+\_\+read\+\_\+operation\+::shared\+\_\+buffer}
+
+
+
+Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00090}{90}} of file \mbox{\hyperlink{rate__limiting_8cpp_source}{rate\+\_\+limiting.\+cpp}}.
+
+\Hypertarget{classfc_1_1detail_1_1rate__limited__tcp__read__operation_a4c916b88d155e708d9a1962b360b723e}\index{fc::detail::rate\_limited\_tcp\_read\_operation@{fc::detail::rate\_limited\_tcp\_read\_operation}!socket@{socket}}
+\index{socket@{socket}!fc::detail::rate\_limited\_tcp\_read\_operation@{fc::detail::rate\_limited\_tcp\_read\_operation}}
+\doxysubsubsection{\texorpdfstring{socket}{socket}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1rate__limited__tcp__read__operation_a4c916b88d155e708d9a1962b360b723e} 
+boost\+::asio\+::ip\+::tcp\+::socket\& fc\+::detail\+::rate\+\_\+limited\+\_\+tcp\+\_\+read\+\_\+operation\+::socket}
+
+
+
+Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00088}{88}} of file \mbox{\hyperlink{rate__limiting_8cpp_source}{rate\+\_\+limiting.\+cpp}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/src/network/\mbox{\hyperlink{rate__limiting_8cpp}{rate\+\_\+limiting.\+cpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,11 @@
+<map id="sysio::chain::apply_context::get_action" name="sysio::chain::apply_context::get_action">
+<area shape="rect" id="Node000001" title="Misc methods:" alt="" coords="5,63,145,103"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1packed__transaction.html#ad193d26eb97cfd5b3f7d8b957eaa35a2" title=" " alt="" coords="193,5,382,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="144,62,194,48,195,53,146,67"/>
+<area shape="rect" id="Node000003" href="$namespacefc_1_1raw.html#a3a18d8161aa5b4f4f02b6fcfdff5e5d1" title=" " alt="" coords="430,96,527,121"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="145,85,414,102,414,107,145,90"/>
+<area shape="rect" id="Node000004" href="$namespacefc_1_1raw.html#a64937a5adc8041247f7007882224e225" title=" " alt="" coords="223,121,352,146"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="146,97,216,114,215,119,144,102"/>
+<area shape="poly" id="edge3_Node000003_Node000003" title=" " alt="" coords="447,97,440,87,444,77,457,71,479,69,502,71,514,78,511,83,500,77,479,74,459,76,448,81,446,86,451,94"/>
+<area shape="poly" id="edge5_Node000004_Node000003" title=" " alt="" coords="352,123,414,114,415,119,352,128"/>
+</map>

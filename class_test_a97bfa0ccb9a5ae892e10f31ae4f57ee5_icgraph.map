@@ -1,0 +1,11 @@
+<map id="Test::separateFunc" name="Test::separateFunc">
+<area shape="rect" id="Node000001" title=" " alt="" coords="450,31,584,56"/>
+<area shape="rect" id="Node000002" href="$class_test.html#add7b7259a4124a0a69532b2d7da2f5c9" title=" " alt="" coords="5,5,78,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="435,32,402,27,311,21,220,18,78,20,78,14,220,13,311,16,403,22,435,26"/>
+<area shape="rect" id="Node000003" href="$class_test.html#a58f23563589958ebf55499ba14b24173" title=" " alt="" coords="126,31,244,56"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="434,46,244,46,244,41,434,41"/>
+<area shape="rect" id="Node000004" href="$class_test.html#a271020d267002002b08cc3d426d71039" title=" " alt="" coords="292,81,402,107"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="458,64,393,83,392,78,456,59"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="110,33,77,27,78,22,111,28"/>
+<area shape="poly" id="edge5_Node000004_Node000003" title=" " alt="" coords="288,79,227,59,229,54,290,74"/>
+</map>

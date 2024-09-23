@@ -1,0 +1,471 @@
+\doxysection{libraries/sys-\/vm/external/\+Catch2/include/internal/catch\+\_\+capture.hpp File Reference}
+\hypertarget{catch__capture_8hpp}{}\label{catch__capture_8hpp}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_capture.hpp@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_capture.hpp}}
+{\ttfamily \#include "{}catch\+\_\+assertionhandler.\+h"{}}\newline
+{\ttfamily \#include "{}catch\+\_\+interfaces\+\_\+capture.\+h"{}}\newline
+{\ttfamily \#include "{}catch\+\_\+message.\+h"{}}\newline
+{\ttfamily \#include "{}catch\+\_\+stringref.\+h"{}}\newline
+Include dependency graph for catch\+\_\+capture.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{catch__capture_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{catch__capture_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{catch__capture_8hpp_ab6dc42a98c8854e2e1d91874b1fe406c}{CATCH\+\_\+\+INTERNAL\+\_\+\+STRINGIFY}}(...)
+\item 
+\#define \mbox{\hyperlink{catch__capture_8hpp_af21395add3cdee3109e0a2e7c15a54bc}{INTERNAL\+\_\+\+CATCH\+\_\+\+TRY}}
+\item 
+\#define \mbox{\hyperlink{catch__capture_8hpp_a3ef8d1213eac4fd0e2fdb4e13bdb8070}{INTERNAL\+\_\+\+CATCH\+\_\+\+CATCH}}(capturer)
+\item 
+\#define \mbox{\hyperlink{catch__capture_8hpp_a87986fec7b6b65bdae29cd2fa62bec20}{INTERNAL\+\_\+\+CATCH\+\_\+\+REACT}}(handler)
+\item 
+\#define \mbox{\hyperlink{catch__capture_8hpp_ac3284f56c2f755d2b79fdb663cf9fb72}{INTERNAL\+\_\+\+CATCH\+\_\+\+TEST}}(macro\+Name,  result\+Disposition, ...)
+\item 
+\#define \mbox{\hyperlink{catch__capture_8hpp_abfd240b1bdcc699638464fb3c7131c1d}{INTERNAL\+\_\+\+CATCH\+\_\+\+IF}}(macro\+Name,  result\+Disposition, ...)
+\item 
+\#define \mbox{\hyperlink{catch__capture_8hpp_aaf2139c8903264bfe442e4b23b6673a9}{INTERNAL\+\_\+\+CATCH\+\_\+\+ELSE}}(macro\+Name,  result\+Disposition, ...)
+\item 
+\#define \mbox{\hyperlink{catch__capture_8hpp_ac340cc35716115abaec4dfbcb061da52}{INTERNAL\+\_\+\+CATCH\+\_\+\+NO\+\_\+\+THROW}}(macro\+Name,  result\+Disposition, ...)
+\item 
+\#define \mbox{\hyperlink{catch__capture_8hpp_a2f3028d4fd4510f2f47ddd20626cccae}{INTERNAL\+\_\+\+CATCH\+\_\+\+THROWS}}(macro\+Name,  result\+Disposition, ...)
+\item 
+\#define \mbox{\hyperlink{catch__capture_8hpp_a5e87b48ab40b7b128ae8428c14c25a91}{INTERNAL\+\_\+\+CATCH\+\_\+\+THROWS\+\_\+\+AS}}(macro\+Name,  exception\+Type,  result\+Disposition,  expr)
+\item 
+\#define \mbox{\hyperlink{catch__capture_8hpp_ad1f7d83040ad9b09020dc72c57019638}{INTERNAL\+\_\+\+CATCH\+\_\+\+MSG}}(macro\+Name,  message\+Type,  result\+Disposition, ...)
+\item 
+\#define \mbox{\hyperlink{catch__capture_8hpp_ad8c51fdad7ab7e39414cd1bf90a3ce06}{INTERNAL\+\_\+\+CATCH\+\_\+\+CAPTURE}}(var\+Name,  macro\+Name, ...)
+\item 
+\#define \mbox{\hyperlink{catch__capture_8hpp_ab0eb5cfab90a80f3113f0ecb65c62a1c}{INTERNAL\+\_\+\+CATCH\+\_\+\+INFO}}(macro\+Name,  log)
+\item 
+\#define \mbox{\hyperlink{catch__capture_8hpp_ab268c09b68167db4b163234f9934463f}{INTERNAL\+\_\+\+CATCH\+\_\+\+UNSCOPED\+\_\+\+INFO}}(macro\+Name,  log)
+\item 
+\#define \mbox{\hyperlink{catch__capture_8hpp_a4296ab989dbc1f6c52c24d60012144d6}{INTERNAL\+\_\+\+CATCH\+\_\+\+THROWS\+\_\+\+STR\+\_\+\+MATCHES}}(macro\+Name,  result\+Disposition,  matcher, ...)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{catch__capture_8hpp_ab6dc42a98c8854e2e1d91874b1fe406c}\index{catch\_capture.hpp@{catch\_capture.hpp}!CATCH\_INTERNAL\_STRINGIFY@{CATCH\_INTERNAL\_STRINGIFY}}
+\index{CATCH\_INTERNAL\_STRINGIFY@{CATCH\_INTERNAL\_STRINGIFY}!catch\_capture.hpp@{catch\_capture.hpp}}
+\doxysubsubsection{\texorpdfstring{CATCH\_INTERNAL\_STRINGIFY}{CATCH\_INTERNAL\_STRINGIFY}}
+{\footnotesize\ttfamily \label{catch__capture_8hpp_ab6dc42a98c8854e2e1d91874b1fe406c} 
+\#define CATCH\+\_\+\+INTERNAL\+\_\+\+STRINGIFY(\begin{DoxyParamCaption}\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{preprocessor}{\#\_\_VA\_ARGS\_\_}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__capture_8hpp_source_l00019}{19}} of file \mbox{\hyperlink{catch__capture_8hpp_source}{catch\+\_\+capture.\+hpp}}.
+
+\Hypertarget{catch__capture_8hpp_ad8c51fdad7ab7e39414cd1bf90a3ce06}\index{catch\_capture.hpp@{catch\_capture.hpp}!INTERNAL\_CATCH\_CAPTURE@{INTERNAL\_CATCH\_CAPTURE}}
+\index{INTERNAL\_CATCH\_CAPTURE@{INTERNAL\_CATCH\_CAPTURE}!catch\_capture.hpp@{catch\_capture.hpp}}
+\doxysubsubsection{\texorpdfstring{INTERNAL\_CATCH\_CAPTURE}{INTERNAL\_CATCH\_CAPTURE}}
+{\footnotesize\ttfamily \label{catch__capture_8hpp_ad8c51fdad7ab7e39414cd1bf90a3ce06} 
+\#define INTERNAL\+\_\+\+CATCH\+\_\+\+CAPTURE(\begin{DoxyParamCaption}\item[{}]{var\+Name}{, }\item[{}]{macro\+Name}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{auto}\ varName\ =\ \mbox{\hyperlink{class_catch_1_1_capturer}{Catch::Capturer}}(\ macroName,\ \mbox{\hyperlink{catch__common_8h_abc0b2405454c51748a31e0393d9ad5d1}{CATCH\_INTERNAL\_LINEINFO}},\ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efae8d83c08b4e070286dd95134ad2152bb}{Catch::ResultWas::Info}},\ \#\_\_VA\_ARGS\_\_\ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ varName.captureValues(\ 0,\ \_\_VA\_ARGS\_\_\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__capture_8hpp_source_l00125}{125}} of file \mbox{\hyperlink{catch__capture_8hpp_source}{catch\+\_\+capture.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00125\ \textcolor{preprocessor}{\#define\ INTERNAL\_CATCH\_CAPTURE(\ varName,\ macroName,\ ...\ )\ \(\backslash\)}}
+\DoxyCodeLine{00126\ \textcolor{preprocessor}{\ \ \ \ auto\ varName\ =\ Catch::Capturer(\ macroName,\ CATCH\_INTERNAL\_LINEINFO,\ Catch::ResultWas::Info,\ \#\_\_VA\_ARGS\_\_\ );\ \(\backslash\)}}
+\DoxyCodeLine{00127\ \textcolor{preprocessor}{\ \ \ \ varName.captureValues(\ 0,\ \_\_VA\_ARGS\_\_\ )}}
+
+\end{DoxyCode}
+\Hypertarget{catch__capture_8hpp_a3ef8d1213eac4fd0e2fdb4e13bdb8070}\index{catch\_capture.hpp@{catch\_capture.hpp}!INTERNAL\_CATCH\_CATCH@{INTERNAL\_CATCH\_CATCH}}
+\index{INTERNAL\_CATCH\_CATCH@{INTERNAL\_CATCH\_CATCH}!catch\_capture.hpp@{catch\_capture.hpp}}
+\doxysubsubsection{\texorpdfstring{INTERNAL\_CATCH\_CATCH}{INTERNAL\_CATCH\_CATCH}}
+{\footnotesize\ttfamily \label{catch__capture_8hpp_a3ef8d1213eac4fd0e2fdb4e13bdb8070} 
+\#define INTERNAL\+\_\+\+CATCH\+\_\+\+CATCH(\begin{DoxyParamCaption}\item[{}]{capturer}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__capture_8hpp_source_l00030}{30}} of file \mbox{\hyperlink{catch__capture_8hpp_source}{catch\+\_\+capture.\+hpp}}.
+
+\Hypertarget{catch__capture_8hpp_aaf2139c8903264bfe442e4b23b6673a9}\index{catch\_capture.hpp@{catch\_capture.hpp}!INTERNAL\_CATCH\_ELSE@{INTERNAL\_CATCH\_ELSE}}
+\index{INTERNAL\_CATCH\_ELSE@{INTERNAL\_CATCH\_ELSE}!catch\_capture.hpp@{catch\_capture.hpp}}
+\doxysubsubsection{\texorpdfstring{INTERNAL\_CATCH\_ELSE}{INTERNAL\_CATCH\_ELSE}}
+{\footnotesize\ttfamily \label{catch__capture_8hpp_aaf2139c8903264bfe442e4b23b6673a9} 
+\#define INTERNAL\+\_\+\+CATCH\+\_\+\+ELSE(\begin{DoxyParamCaption}\item[{}]{macro\+Name}{, }\item[{}]{result\+Disposition}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{catch__capture_8hpp_ac3284f56c2f755d2b79fdb663cf9fb72}{INTERNAL\_CATCH\_TEST}}(\ macroName,\ resultDisposition,\ \_\_VA\_ARGS\_\_\ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ if(\ !\mbox{\hyperlink{namespace_catch_af718eeab870712f292ed8dc6ee3f6488}{Catch::getResultCapture}}().lastAssertionPassed()\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__capture_8hpp_source_l00060}{60}} of file \mbox{\hyperlink{catch__capture_8hpp_source}{catch\+\_\+capture.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00060\ \textcolor{preprocessor}{\#define\ INTERNAL\_CATCH\_ELSE(\ macroName,\ resultDisposition,\ ...\ )\ \(\backslash\)}}
+\DoxyCodeLine{00061\ \textcolor{preprocessor}{\ \ \ \ INTERNAL\_CATCH\_TEST(\ macroName,\ resultDisposition,\ \_\_VA\_ARGS\_\_\ );\ \(\backslash\)}}
+\DoxyCodeLine{00062\ \textcolor{preprocessor}{\ \ \ \ if(\ !Catch::getResultCapture().lastAssertionPassed()\ )}}
+
+\end{DoxyCode}
+\Hypertarget{catch__capture_8hpp_abfd240b1bdcc699638464fb3c7131c1d}\index{catch\_capture.hpp@{catch\_capture.hpp}!INTERNAL\_CATCH\_IF@{INTERNAL\_CATCH\_IF}}
+\index{INTERNAL\_CATCH\_IF@{INTERNAL\_CATCH\_IF}!catch\_capture.hpp@{catch\_capture.hpp}}
+\doxysubsubsection{\texorpdfstring{INTERNAL\_CATCH\_IF}{INTERNAL\_CATCH\_IF}}
+{\footnotesize\ttfamily \label{catch__capture_8hpp_abfd240b1bdcc699638464fb3c7131c1d} 
+\#define INTERNAL\+\_\+\+CATCH\+\_\+\+IF(\begin{DoxyParamCaption}\item[{}]{macro\+Name}{, }\item[{}]{result\+Disposition}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{catch__capture_8hpp_ac3284f56c2f755d2b79fdb663cf9fb72}{INTERNAL\_CATCH\_TEST}}(\ macroName,\ resultDisposition,\ \_\_VA\_ARGS\_\_\ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ if(\ \mbox{\hyperlink{namespace_catch_af718eeab870712f292ed8dc6ee3f6488}{Catch::getResultCapture}}().lastAssertionPassed()\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__capture_8hpp_source_l00055}{55}} of file \mbox{\hyperlink{catch__capture_8hpp_source}{catch\+\_\+capture.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00055\ \textcolor{preprocessor}{\#define\ INTERNAL\_CATCH\_IF(\ macroName,\ resultDisposition,\ ...\ )\ \(\backslash\)}}
+\DoxyCodeLine{00056\ \textcolor{preprocessor}{\ \ \ \ INTERNAL\_CATCH\_TEST(\ macroName,\ resultDisposition,\ \_\_VA\_ARGS\_\_\ );\ \(\backslash\)}}
+\DoxyCodeLine{00057\ \textcolor{preprocessor}{\ \ \ \ if(\ Catch::getResultCapture().lastAssertionPassed()\ )}}
+
+\end{DoxyCode}
+\Hypertarget{catch__capture_8hpp_ab0eb5cfab90a80f3113f0ecb65c62a1c}\index{catch\_capture.hpp@{catch\_capture.hpp}!INTERNAL\_CATCH\_INFO@{INTERNAL\_CATCH\_INFO}}
+\index{INTERNAL\_CATCH\_INFO@{INTERNAL\_CATCH\_INFO}!catch\_capture.hpp@{catch\_capture.hpp}}
+\doxysubsubsection{\texorpdfstring{INTERNAL\_CATCH\_INFO}{INTERNAL\_CATCH\_INFO}}
+{\footnotesize\ttfamily \label{catch__capture_8hpp_ab0eb5cfab90a80f3113f0ecb65c62a1c} 
+\#define INTERNAL\+\_\+\+CATCH\+\_\+\+INFO(\begin{DoxyParamCaption}\item[{}]{macro\+Name}{, }\item[{}]{log}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{class_catch_1_1_scoped_message}{Catch::ScopedMessage}}\ \mbox{\hyperlink{catch__common_8h_afe320ceec108fc8c160f9ac3938f1bc8}{INTERNAL\_CATCH\_UNIQUE\_NAME}}(\ scopedMessage\ )(\ \mbox{\hyperlink{struct_catch_1_1_message_builder}{Catch::MessageBuilder}}(\ macroName\#\#\_catch\_sr,\ \mbox{\hyperlink{catch__common_8h_abc0b2405454c51748a31e0393d9ad5d1}{CATCH\_INTERNAL\_LINEINFO}},\ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efae8d83c08b4e070286dd95134ad2152bb}{Catch::ResultWas::Info}}\ )\ <<\ log\ );}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__capture_8hpp_source_l00130}{130}} of file \mbox{\hyperlink{catch__capture_8hpp_source}{catch\+\_\+capture.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00130\ \textcolor{preprocessor}{\#define\ INTERNAL\_CATCH\_INFO(\ macroName,\ log\ )\ \(\backslash\)}}
+\DoxyCodeLine{00131\ \textcolor{preprocessor}{\ \ \ \ Catch::ScopedMessage\ INTERNAL\_CATCH\_UNIQUE\_NAME(\ scopedMessage\ )(\ Catch::MessageBuilder(\ macroName\#\#\_catch\_sr,\ CATCH\_INTERNAL\_LINEINFO,\ Catch::ResultWas::Info\ )\ <<\ log\ );}}
+
+\end{DoxyCode}
+\Hypertarget{catch__capture_8hpp_ad1f7d83040ad9b09020dc72c57019638}\index{catch\_capture.hpp@{catch\_capture.hpp}!INTERNAL\_CATCH\_MSG@{INTERNAL\_CATCH\_MSG}}
+\index{INTERNAL\_CATCH\_MSG@{INTERNAL\_CATCH\_MSG}!catch\_capture.hpp@{catch\_capture.hpp}}
+\doxysubsubsection{\texorpdfstring{INTERNAL\_CATCH\_MSG}{INTERNAL\_CATCH\_MSG}}
+{\footnotesize\ttfamily \label{catch__capture_8hpp_ad1f7d83040ad9b09020dc72c57019638} 
+\#define INTERNAL\+\_\+\+CATCH\+\_\+\+MSG(\begin{DoxyParamCaption}\item[{}]{macro\+Name}{, }\item[{}]{message\+Type}{, }\item[{}]{result\+Disposition}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_assertion_handler}{Catch::AssertionHandler}}\ catchAssertionHandler(\ macroName\#\#\_catch\_sr,\ \mbox{\hyperlink{catch__common_8h_abc0b2405454c51748a31e0393d9ad5d1}{CATCH\_INTERNAL\_LINEINFO}},\ \mbox{\hyperlink{class_catch_1_1_string_ref}{Catch::StringRef}}(),\ resultDisposition\ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ catchAssertionHandler.handleMessage(\ messageType,\ (\ \mbox{\hyperlink{struct_catch_1_1_message_stream}{Catch::MessageStream}}()\ <<\ \_\_VA\_ARGS\_\_\ +\ \mbox{\hyperlink{struct_catch_1_1_stream_end_stop}{::Catch::StreamEndStop}}()\ ).m\_stream.str()\ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ INTERNAL\_CATCH\_REACT(\ catchAssertionHandler\ )\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{while}(\ \textcolor{keyword}{false}\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__capture_8hpp_source_l00117}{117}} of file \mbox{\hyperlink{catch__capture_8hpp_source}{catch\+\_\+capture.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00117\ \textcolor{preprocessor}{\#define\ INTERNAL\_CATCH\_MSG(\ macroName,\ messageType,\ resultDisposition,\ ...\ )\ \(\backslash\)}}
+\DoxyCodeLine{00118\ \textcolor{preprocessor}{\ \ \ \ do\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00119\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ Catch::AssertionHandler\ catchAssertionHandler(\ macroName\#\#\_catch\_sr,\ CATCH\_INTERNAL\_LINEINFO,\ Catch::StringRef(),\ resultDisposition\ );\ \(\backslash\)}}
+\DoxyCodeLine{00120\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ catchAssertionHandler.handleMessage(\ messageType,\ (\ Catch::MessageStream()\ <<\ \_\_VA\_ARGS\_\_\ +\ ::Catch::StreamEndStop()\ ).m\_stream.str()\ );\ \(\backslash\)}}
+\DoxyCodeLine{00121\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ INTERNAL\_CATCH\_REACT(\ catchAssertionHandler\ )\ \(\backslash\)}}
+\DoxyCodeLine{00122\ \textcolor{preprocessor}{\ \ \ \ \}\ while(\ false\ )}}
+
+\end{DoxyCode}
+\Hypertarget{catch__capture_8hpp_ac340cc35716115abaec4dfbcb061da52}\index{catch\_capture.hpp@{catch\_capture.hpp}!INTERNAL\_CATCH\_NO\_THROW@{INTERNAL\_CATCH\_NO\_THROW}}
+\index{INTERNAL\_CATCH\_NO\_THROW@{INTERNAL\_CATCH\_NO\_THROW}!catch\_capture.hpp@{catch\_capture.hpp}}
+\doxysubsubsection{\texorpdfstring{INTERNAL\_CATCH\_NO\_THROW}{INTERNAL\_CATCH\_NO\_THROW}}
+{\footnotesize\ttfamily \label{catch__capture_8hpp_ac340cc35716115abaec4dfbcb061da52} 
+\#define INTERNAL\+\_\+\+CATCH\+\_\+\+NO\+\_\+\+THROW(\begin{DoxyParamCaption}\item[{}]{macro\+Name}{, }\item[{}]{result\+Disposition}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_assertion_handler}{Catch::AssertionHandler}}\ catchAssertionHandler(\ macroName\#\#\_catch\_sr,\ \mbox{\hyperlink{catch__common_8h_abc0b2405454c51748a31e0393d9ad5d1}{CATCH\_INTERNAL\_LINEINFO}},\ \mbox{\hyperlink{catch__capture_8hpp_ab6dc42a98c8854e2e1d91874b1fe406c}{CATCH\_INTERNAL\_STRINGIFY}}(\_\_VA\_ARGS\_\_),\ resultDisposition\ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ static\_cast<void>(\_\_VA\_ARGS\_\_);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ catchAssertionHandler.handleExceptionNotThrownAsExpected();\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ catch(\ ...\ )\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ catchAssertionHandler.handleUnexpectedInflightException();\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ INTERNAL\_CATCH\_REACT(\ catchAssertionHandler\ )\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{while}(\ \textcolor{keyword}{false}\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__capture_8hpp_source_l00065}{65}} of file \mbox{\hyperlink{catch__capture_8hpp_source}{catch\+\_\+capture.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00065\ \textcolor{preprocessor}{\#define\ INTERNAL\_CATCH\_NO\_THROW(\ macroName,\ resultDisposition,\ ...\ )\ \(\backslash\)}}
+\DoxyCodeLine{00066\ \textcolor{preprocessor}{\ \ \ \ do\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00067\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ Catch::AssertionHandler\ catchAssertionHandler(\ macroName\#\#\_catch\_sr,\ CATCH\_INTERNAL\_LINEINFO,\ CATCH\_INTERNAL\_STRINGIFY(\_\_VA\_ARGS\_\_),\ resultDisposition\ );\ \(\backslash\)}}
+\DoxyCodeLine{00068\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ try\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00069\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ static\_cast<void>(\_\_VA\_ARGS\_\_);\ \(\backslash\)}}
+\DoxyCodeLine{00070\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ catchAssertionHandler.handleExceptionNotThrownAsExpected();\ \(\backslash\)}}
+\DoxyCodeLine{00071\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00072\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ catch(\ ...\ )\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00073\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ catchAssertionHandler.handleUnexpectedInflightException();\ \(\backslash\)}}
+\DoxyCodeLine{00074\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00075\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ INTERNAL\_CATCH\_REACT(\ catchAssertionHandler\ )\ \(\backslash\)}}
+\DoxyCodeLine{00076\ \textcolor{preprocessor}{\ \ \ \ \}\ while(\ false\ )}}
+
+\end{DoxyCode}
+\Hypertarget{catch__capture_8hpp_a87986fec7b6b65bdae29cd2fa62bec20}\index{catch\_capture.hpp@{catch\_capture.hpp}!INTERNAL\_CATCH\_REACT@{INTERNAL\_CATCH\_REACT}}
+\index{INTERNAL\_CATCH\_REACT@{INTERNAL\_CATCH\_REACT}!catch\_capture.hpp@{catch\_capture.hpp}}
+\doxysubsubsection{\texorpdfstring{INTERNAL\_CATCH\_REACT}{INTERNAL\_CATCH\_REACT}}
+{\footnotesize\ttfamily \label{catch__capture_8hpp_a87986fec7b6b65bdae29cd2fa62bec20} 
+\#define INTERNAL\+\_\+\+CATCH\+\_\+\+REACT(\begin{DoxyParamCaption}\item[{}]{handler}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{handler.complete();}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__capture_8hpp_source_l00039}{39}} of file \mbox{\hyperlink{catch__capture_8hpp_source}{catch\+\_\+capture.\+hpp}}.
+
+\Hypertarget{catch__capture_8hpp_ac3284f56c2f755d2b79fdb663cf9fb72}\index{catch\_capture.hpp@{catch\_capture.hpp}!INTERNAL\_CATCH\_TEST@{INTERNAL\_CATCH\_TEST}}
+\index{INTERNAL\_CATCH\_TEST@{INTERNAL\_CATCH\_TEST}!catch\_capture.hpp@{catch\_capture.hpp}}
+\doxysubsubsection{\texorpdfstring{INTERNAL\_CATCH\_TEST}{INTERNAL\_CATCH\_TEST}}
+{\footnotesize\ttfamily \label{catch__capture_8hpp_ac3284f56c2f755d2b79fdb663cf9fb72} 
+\#define INTERNAL\+\_\+\+CATCH\+\_\+\+TEST(\begin{DoxyParamCaption}\item[{}]{macro\+Name}{, }\item[{}]{result\+Disposition}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_assertion_handler}{Catch::AssertionHandler}}\ catchAssertionHandler(\ macroName\#\#\_catch\_sr,\ \mbox{\hyperlink{catch__common_8h_abc0b2405454c51748a31e0393d9ad5d1}{CATCH\_INTERNAL\_LINEINFO}},\ \mbox{\hyperlink{catch__capture_8hpp_ab6dc42a98c8854e2e1d91874b1fe406c}{CATCH\_INTERNAL\_STRINGIFY}}(\_\_VA\_ARGS\_\_),\ resultDisposition\ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{catch__capture_8hpp_af21395add3cdee3109e0a2e7c15a54bc}{INTERNAL\_CATCH\_TRY}}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ CATCH\_INTERNAL\_SUPPRESS\_PARENTHESES\_WARNINGS\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ catchAssertionHandler.handleExpr(\ \mbox{\hyperlink{struct_catch_1_1_decomposer}{Catch::Decomposer}}()\ <=\ \_\_VA\_ARGS\_\_\ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{catch__compiler__capabilities_8h_aec1f55c22f26366aaad1467206352792}{CATCH\_INTERNAL\_UNSUPPRESS\_PARENTHESES\_WARNINGS}}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \mbox{\hyperlink{catch__capture_8hpp_a3ef8d1213eac4fd0e2fdb4e13bdb8070}{INTERNAL\_CATCH\_CATCH}}(\ catchAssertionHandler\ )\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ INTERNAL\_CATCH\_REACT(\ catchAssertionHandler\ )\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{while}(\ (\textcolor{keywordtype}{void})0,\ (\textcolor{keyword}{false})\ \&\&\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{bool}\textcolor{keyword}{>}(\ !!(\_\_VA\_ARGS\_\_)\ )\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__capture_8hpp_source_l00042}{42}} of file \mbox{\hyperlink{catch__capture_8hpp_source}{catch\+\_\+capture.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00042\ \textcolor{preprocessor}{\#define\ INTERNAL\_CATCH\_TEST(\ macroName,\ resultDisposition,\ ...\ )\ \(\backslash\)}}
+\DoxyCodeLine{00043\ \textcolor{preprocessor}{\ \ \ \ do\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00044\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ Catch::AssertionHandler\ catchAssertionHandler(\ macroName\#\#\_catch\_sr,\ CATCH\_INTERNAL\_LINEINFO,\ CATCH\_INTERNAL\_STRINGIFY(\_\_VA\_ARGS\_\_),\ resultDisposition\ );\ \(\backslash\)}}
+\DoxyCodeLine{00045\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ INTERNAL\_CATCH\_TRY\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00046\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ CATCH\_INTERNAL\_SUPPRESS\_PARENTHESES\_WARNINGS\ \(\backslash\)}}
+\DoxyCodeLine{00047\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ catchAssertionHandler.handleExpr(\ Catch::Decomposer()\ <=\ \_\_VA\_ARGS\_\_\ );\ \(\backslash\)}}
+\DoxyCodeLine{00048\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ CATCH\_INTERNAL\_UNSUPPRESS\_PARENTHESES\_WARNINGS\ \(\backslash\)}}
+\DoxyCodeLine{00049\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \}\ INTERNAL\_CATCH\_CATCH(\ catchAssertionHandler\ )\ \(\backslash\)}}
+\DoxyCodeLine{00050\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ INTERNAL\_CATCH\_REACT(\ catchAssertionHandler\ )\ \(\backslash\)}}
+\DoxyCodeLine{00051\ \textcolor{preprocessor}{\ \ \ \ \}\ while(\ (void)0,\ (false)\ \&\&\ static\_cast<bool>(\ !!(\_\_VA\_ARGS\_\_)\ )\ )\ }\textcolor{comment}{//\ the\ expression\ here\ is\ never\ evaluated\ at\ runtime\ but\ it\ forces\ the\ compiler\ to\ give\ it\ a\ look}}
+
+\end{DoxyCode}
+\Hypertarget{catch__capture_8hpp_a2f3028d4fd4510f2f47ddd20626cccae}\index{catch\_capture.hpp@{catch\_capture.hpp}!INTERNAL\_CATCH\_THROWS@{INTERNAL\_CATCH\_THROWS}}
+\index{INTERNAL\_CATCH\_THROWS@{INTERNAL\_CATCH\_THROWS}!catch\_capture.hpp@{catch\_capture.hpp}}
+\doxysubsubsection{\texorpdfstring{INTERNAL\_CATCH\_THROWS}{INTERNAL\_CATCH\_THROWS}}
+{\footnotesize\ttfamily \label{catch__capture_8hpp_a2f3028d4fd4510f2f47ddd20626cccae} 
+\#define INTERNAL\+\_\+\+CATCH\+\_\+\+THROWS(\begin{DoxyParamCaption}\item[{}]{macro\+Name}{, }\item[{}]{result\+Disposition}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_assertion_handler}{Catch::AssertionHandler}}\ catchAssertionHandler(\ macroName\#\#\_catch\_sr,\ \mbox{\hyperlink{catch__common_8h_abc0b2405454c51748a31e0393d9ad5d1}{CATCH\_INTERNAL\_LINEINFO}},\ \mbox{\hyperlink{catch__capture_8hpp_ab6dc42a98c8854e2e1d91874b1fe406c}{CATCH\_INTERNAL\_STRINGIFY}}(\_\_VA\_ARGS\_\_),\ resultDisposition);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ if(\ catchAssertionHandler.allowThrows()\ )\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ static\_cast<void>(\_\_VA\_ARGS\_\_);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ catchAssertionHandler.handleUnexpectedExceptionNotThrown();\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ catch(\ ...\ )\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ catchAssertionHandler.handleExceptionThrownAsExpected();\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ else\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ catchAssertionHandler.handleThrowingCallSkipped();\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ INTERNAL\_CATCH\_REACT(\ catchAssertionHandler\ )\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{while}(\ \textcolor{keyword}{false}\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__capture_8hpp_source_l00079}{79}} of file \mbox{\hyperlink{catch__capture_8hpp_source}{catch\+\_\+capture.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00079\ \textcolor{preprocessor}{\#define\ INTERNAL\_CATCH\_THROWS(\ macroName,\ resultDisposition,\ ...\ )\ \(\backslash\)}}
+\DoxyCodeLine{00080\ \textcolor{preprocessor}{\ \ \ \ do\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00081\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ Catch::AssertionHandler\ catchAssertionHandler(\ macroName\#\#\_catch\_sr,\ CATCH\_INTERNAL\_LINEINFO,\ CATCH\_INTERNAL\_STRINGIFY(\_\_VA\_ARGS\_\_),\ resultDisposition);\ \(\backslash\)}}
+\DoxyCodeLine{00082\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ if(\ catchAssertionHandler.allowThrows()\ )\ \(\backslash\)}}
+\DoxyCodeLine{00083\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ try\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00084\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ static\_cast<void>(\_\_VA\_ARGS\_\_);\ \(\backslash\)}}
+\DoxyCodeLine{00085\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ catchAssertionHandler.handleUnexpectedExceptionNotThrown();\ \(\backslash\)}}
+\DoxyCodeLine{00086\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00087\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ catch(\ ...\ )\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00088\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ catchAssertionHandler.handleExceptionThrownAsExpected();\ \(\backslash\)}}
+\DoxyCodeLine{00089\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00090\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ else\ \(\backslash\)}}
+\DoxyCodeLine{00091\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ catchAssertionHandler.handleThrowingCallSkipped();\ \(\backslash\)}}
+\DoxyCodeLine{00092\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ INTERNAL\_CATCH\_REACT(\ catchAssertionHandler\ )\ \(\backslash\)}}
+\DoxyCodeLine{00093\ \textcolor{preprocessor}{\ \ \ \ \}\ while(\ false\ )}}
+
+\end{DoxyCode}
+\Hypertarget{catch__capture_8hpp_a5e87b48ab40b7b128ae8428c14c25a91}\index{catch\_capture.hpp@{catch\_capture.hpp}!INTERNAL\_CATCH\_THROWS\_AS@{INTERNAL\_CATCH\_THROWS\_AS}}
+\index{INTERNAL\_CATCH\_THROWS\_AS@{INTERNAL\_CATCH\_THROWS\_AS}!catch\_capture.hpp@{catch\_capture.hpp}}
+\doxysubsubsection{\texorpdfstring{INTERNAL\_CATCH\_THROWS\_AS}{INTERNAL\_CATCH\_THROWS\_AS}}
+{\footnotesize\ttfamily \label{catch__capture_8hpp_a5e87b48ab40b7b128ae8428c14c25a91} 
+\#define INTERNAL\+\_\+\+CATCH\+\_\+\+THROWS\+\_\+\+AS(\begin{DoxyParamCaption}\item[{}]{macro\+Name}{, }\item[{}]{exception\+Type}{, }\item[{}]{result\+Disposition}{, }\item[{}]{expr}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_assertion_handler}{Catch::AssertionHandler}}\ catchAssertionHandler(\ macroName\#\#\_catch\_sr,\ \mbox{\hyperlink{catch__common_8h_abc0b2405454c51748a31e0393d9ad5d1}{CATCH\_INTERNAL\_LINEINFO}},\ \mbox{\hyperlink{catch__capture_8hpp_ab6dc42a98c8854e2e1d91874b1fe406c}{CATCH\_INTERNAL\_STRINGIFY}}(expr)\ \textcolor{stringliteral}{"{},\ "{}}\ \mbox{\hyperlink{catch__capture_8hpp_ab6dc42a98c8854e2e1d91874b1fe406c}{CATCH\_INTERNAL\_STRINGIFY}}(exceptionType),\ resultDisposition\ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ if(\ catchAssertionHandler.allowThrows()\ )\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ static\_cast<void>(expr);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ catchAssertionHandler.handleUnexpectedExceptionNotThrown();\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ catch(\ exceptionType\ \textcolor{keyword}{const}\&\ )\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ catchAssertionHandler.handleExceptionThrownAsExpected();\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ catch(\ ...\ )\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ catchAssertionHandler.handleUnexpectedInflightException();\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ else\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ catchAssertionHandler.handleThrowingCallSkipped();\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ INTERNAL\_CATCH\_REACT(\ catchAssertionHandler\ )\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{while}(\ \textcolor{keyword}{false}\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__capture_8hpp_source_l00096}{96}} of file \mbox{\hyperlink{catch__capture_8hpp_source}{catch\+\_\+capture.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00096\ \textcolor{preprocessor}{\#define\ INTERNAL\_CATCH\_THROWS\_AS(\ macroName,\ exceptionType,\ resultDisposition,\ expr\ )\ \(\backslash\)}}
+\DoxyCodeLine{00097\ \textcolor{preprocessor}{\ \ \ \ do\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00098\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ Catch::AssertionHandler\ catchAssertionHandler(\ macroName\#\#\_catch\_sr,\ CATCH\_INTERNAL\_LINEINFO,\ CATCH\_INTERNAL\_STRINGIFY(expr)\ "{},\ "{}\ CATCH\_INTERNAL\_STRINGIFY(exceptionType),\ resultDisposition\ );\ \(\backslash\)}}
+\DoxyCodeLine{00099\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ if(\ catchAssertionHandler.allowThrows()\ )\ \(\backslash\)}}
+\DoxyCodeLine{00100\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ try\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00101\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ static\_cast<void>(expr);\ \(\backslash\)}}
+\DoxyCodeLine{00102\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ catchAssertionHandler.handleUnexpectedExceptionNotThrown();\ \(\backslash\)}}
+\DoxyCodeLine{00103\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00104\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ catch(\ exceptionType\ const\&\ )\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00105\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ catchAssertionHandler.handleExceptionThrownAsExpected();\ \(\backslash\)}}
+\DoxyCodeLine{00106\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00107\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ catch(\ ...\ )\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00108\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ catchAssertionHandler.handleUnexpectedInflightException();\ \(\backslash\)}}
+\DoxyCodeLine{00109\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00110\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ else\ \(\backslash\)}}
+\DoxyCodeLine{00111\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ catchAssertionHandler.handleThrowingCallSkipped();\ \(\backslash\)}}
+\DoxyCodeLine{00112\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ INTERNAL\_CATCH\_REACT(\ catchAssertionHandler\ )\ \(\backslash\)}}
+\DoxyCodeLine{00113\ \textcolor{preprocessor}{\ \ \ \ \}\ while(\ false\ )}}
+
+\end{DoxyCode}
+\Hypertarget{catch__capture_8hpp_a4296ab989dbc1f6c52c24d60012144d6}\index{catch\_capture.hpp@{catch\_capture.hpp}!INTERNAL\_CATCH\_THROWS\_STR\_MATCHES@{INTERNAL\_CATCH\_THROWS\_STR\_MATCHES}}
+\index{INTERNAL\_CATCH\_THROWS\_STR\_MATCHES@{INTERNAL\_CATCH\_THROWS\_STR\_MATCHES}!catch\_capture.hpp@{catch\_capture.hpp}}
+\doxysubsubsection{\texorpdfstring{INTERNAL\_CATCH\_THROWS\_STR\_MATCHES}{INTERNAL\_CATCH\_THROWS\_STR\_MATCHES}}
+{\footnotesize\ttfamily \label{catch__capture_8hpp_a4296ab989dbc1f6c52c24d60012144d6} 
+\#define INTERNAL\+\_\+\+CATCH\+\_\+\+THROWS\+\_\+\+STR\+\_\+\+MATCHES(\begin{DoxyParamCaption}\item[{}]{macro\+Name}{, }\item[{}]{result\+Disposition}{, }\item[{}]{matcher}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_assertion_handler}{Catch::AssertionHandler}}\ catchAssertionHandler(\ macroName\#\#\_catch\_sr,\ \mbox{\hyperlink{catch__common_8h_abc0b2405454c51748a31e0393d9ad5d1}{CATCH\_INTERNAL\_LINEINFO}},\ \mbox{\hyperlink{catch__capture_8hpp_ab6dc42a98c8854e2e1d91874b1fe406c}{CATCH\_INTERNAL\_STRINGIFY}}(\_\_VA\_ARGS\_\_)\ \textcolor{stringliteral}{"{},\ "{}}\ \mbox{\hyperlink{catch__capture_8hpp_ab6dc42a98c8854e2e1d91874b1fe406c}{CATCH\_INTERNAL\_STRINGIFY}}(matcher),\ resultDisposition\ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ if(\ catchAssertionHandler.allowThrows()\ )\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ static\_cast<void>(\_\_VA\_ARGS\_\_);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ catchAssertionHandler.handleUnexpectedExceptionNotThrown();\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ catch(\ ...\ )\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Catch::handleExceptionMatchExpr(\ catchAssertionHandler,\ matcher,\ \#matcher\#\#\_catch\_sr\ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ else\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ catchAssertionHandler.handleThrowingCallSkipped();\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ INTERNAL\_CATCH\_REACT(\ catchAssertionHandler\ )\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{while}(\ \textcolor{keyword}{false}\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__capture_8hpp_source_l00139}{139}} of file \mbox{\hyperlink{catch__capture_8hpp_source}{catch\+\_\+capture.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00139\ \textcolor{preprocessor}{\#define\ INTERNAL\_CATCH\_THROWS\_STR\_MATCHES(\ macroName,\ resultDisposition,\ matcher,\ ...\ )\ \(\backslash\)}}
+\DoxyCodeLine{00140\ \textcolor{preprocessor}{\ \ \ \ do\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00141\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ Catch::AssertionHandler\ catchAssertionHandler(\ macroName\#\#\_catch\_sr,\ CATCH\_INTERNAL\_LINEINFO,\ CATCH\_INTERNAL\_STRINGIFY(\_\_VA\_ARGS\_\_)\ "{},\ "{}\ CATCH\_INTERNAL\_STRINGIFY(matcher),\ resultDisposition\ );\ \(\backslash\)}}
+\DoxyCodeLine{00142\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ if(\ catchAssertionHandler.allowThrows()\ )\ \(\backslash\)}}
+\DoxyCodeLine{00143\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ try\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00144\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ static\_cast<void>(\_\_VA\_ARGS\_\_);\ \(\backslash\)}}
+\DoxyCodeLine{00145\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ catchAssertionHandler.handleUnexpectedExceptionNotThrown();\ \(\backslash\)}}
+\DoxyCodeLine{00146\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00147\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ catch(\ ...\ )\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00148\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Catch::handleExceptionMatchExpr(\ catchAssertionHandler,\ matcher,\ \#matcher\#\#\_catch\_sr\ );\ \(\backslash\)}}
+\DoxyCodeLine{00149\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00150\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ else\ \(\backslash\)}}
+\DoxyCodeLine{00151\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ catchAssertionHandler.handleThrowingCallSkipped();\ \(\backslash\)}}
+\DoxyCodeLine{00152\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ INTERNAL\_CATCH\_REACT(\ catchAssertionHandler\ )\ \(\backslash\)}}
+\DoxyCodeLine{00153\ \textcolor{preprocessor}{\ \ \ \ \}\ while(\ false\ )}}
+
+\end{DoxyCode}
+\Hypertarget{catch__capture_8hpp_af21395add3cdee3109e0a2e7c15a54bc}\index{catch\_capture.hpp@{catch\_capture.hpp}!INTERNAL\_CATCH\_TRY@{INTERNAL\_CATCH\_TRY}}
+\index{INTERNAL\_CATCH\_TRY@{INTERNAL\_CATCH\_TRY}!catch\_capture.hpp@{catch\_capture.hpp}}
+\doxysubsubsection{\texorpdfstring{INTERNAL\_CATCH\_TRY}{INTERNAL\_CATCH\_TRY}}
+{\footnotesize\ttfamily \label{catch__capture_8hpp_af21395add3cdee3109e0a2e7c15a54bc} 
+\#define INTERNAL\+\_\+\+CATCH\+\_\+\+TRY}
+
+
+
+Definition at line \mbox{\hyperlink{catch__capture_8hpp_source_l00029}{29}} of file \mbox{\hyperlink{catch__capture_8hpp_source}{catch\+\_\+capture.\+hpp}}.
+
+\Hypertarget{catch__capture_8hpp_ab268c09b68167db4b163234f9934463f}\index{catch\_capture.hpp@{catch\_capture.hpp}!INTERNAL\_CATCH\_UNSCOPED\_INFO@{INTERNAL\_CATCH\_UNSCOPED\_INFO}}
+\index{INTERNAL\_CATCH\_UNSCOPED\_INFO@{INTERNAL\_CATCH\_UNSCOPED\_INFO}!catch\_capture.hpp@{catch\_capture.hpp}}
+\doxysubsubsection{\texorpdfstring{INTERNAL\_CATCH\_UNSCOPED\_INFO}{INTERNAL\_CATCH\_UNSCOPED\_INFO}}
+{\footnotesize\ttfamily \label{catch__capture_8hpp_ab268c09b68167db4b163234f9934463f} 
+\#define INTERNAL\+\_\+\+CATCH\+\_\+\+UNSCOPED\+\_\+\+INFO(\begin{DoxyParamCaption}\item[{}]{macro\+Name}{, }\item[{}]{log}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{namespace_catch_af718eeab870712f292ed8dc6ee3f6488}{Catch::getResultCapture}}().\mbox{\hyperlink{struct_catch_1_1_i_result_capture_a49f74f1323ef8be71b8f9b8e8b2c0fc2}{emplaceUnscopedMessage}}(\ \mbox{\hyperlink{struct_catch_1_1_message_builder}{Catch::MessageBuilder}}(\ macroName\#\#\_catch\_sr,\ \mbox{\hyperlink{catch__common_8h_abc0b2405454c51748a31e0393d9ad5d1}{CATCH\_INTERNAL\_LINEINFO}},\ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efae8d83c08b4e070286dd95134ad2152bb}{Catch::ResultWas::Info}}\ )\ <<\ log\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__capture_8hpp_source_l00134}{134}} of file \mbox{\hyperlink{catch__capture_8hpp_source}{catch\+\_\+capture.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00134\ \textcolor{preprocessor}{\#define\ INTERNAL\_CATCH\_UNSCOPED\_INFO(\ macroName,\ log\ )\ \(\backslash\)}}
+\DoxyCodeLine{00135\ \textcolor{preprocessor}{\ \ \ \ Catch::getResultCapture().emplaceUnscopedMessage(\ Catch::MessageBuilder(\ macroName\#\#\_catch\_sr,\ CATCH\_INTERNAL\_LINEINFO,\ Catch::ResultWas::Info\ )\ <<\ log\ )}}
+
+\end{DoxyCode}

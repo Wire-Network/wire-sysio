@@ -1,0 +1,12 @@
+<map id="fc::tracked_storage::read" name="fc::tracked_storage::read">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,71,139,111"/>
+<area shape="rect" id="Node000002" href="$classfc_1_1tracked__storage.html#a6d24a6bf4512b48a846d88a1bf44b5b8" title=" " alt="" coords="187,5,320,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="129,68,180,49,181,54,131,73"/>
+<area shape="rect" id="Node000004" href="$classfc_1_1tracked__storage.html#a5bd678ec2e09568df574c8ecaa184962" title=" " alt="" coords="187,71,320,111"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="139,88,171,88,171,94,139,94"/>
+<area shape="rect" id="Node000005" href="$namespacefc_1_1raw.html#a0b442d98ceb22dd5a6ae84745e43ffab" title=" " alt="" coords="198,160,309,185"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="120,110,210,150,208,155,118,114"/>
+<area shape="rect" id="Node000003" href="$namespacefc_1_1tracked.html#a7a874ea77f5afa2de8f3d5fb6d19a241" title=" " alt="" coords="368,13,537,38"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="320,23,352,23,352,28,320,28"/>
+<area shape="poly" id="edge5_Node000005_Node000005" title=" " alt="" coords="223,161,217,151,220,141,233,135,253,133,275,135,287,142,284,147,274,140,253,138,234,140,224,145,222,150,227,158"/>
+</map>

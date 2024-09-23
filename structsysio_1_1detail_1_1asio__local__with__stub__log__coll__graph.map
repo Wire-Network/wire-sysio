@@ -1,0 +1,12 @@
+<map id="sysio::detail::asio_local_with_stub_log" name="sysio::detail::asio_local_with_stub_log">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,333,148,373"/>
+<area shape="rect" id="Node000002" href="$structwebsocketpp_1_1config_1_1asio.html" title="Server config with asio transport and TLS disabled." alt="" coords="130,243,271,283"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="162,294,106,334,103,330,159,290"/>
+<area shape="rect" id="Node000003" href="$structwebsocketpp_1_1config_1_1core.html" title="Server config with iostream transport." alt="" coords="162,139,303,180"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="224,195,209,243,204,241,219,194"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="59,5,104,31"/>
+<area shape="poly" id="edge5_Node000001_Node000004" title=" " alt="" coords="78,47,64,124,60,171,60,218,76,332,70,333,55,219,55,171,59,123,73,46"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="83,46,87,81,92,98,102,113,130,134,162,147,160,152,127,139,98,117,88,100,81,82,77,46"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="262,5,318,31"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="286,47,277,80,263,116,249,140,245,137,258,114,272,79,281,45"/>
+</map>

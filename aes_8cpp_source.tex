@@ -1,0 +1,366 @@
+\doxysection{aes.\+cpp}
+\hypertarget{aes_8cpp_source}{}\label{aes_8cpp_source}\index{libraries/fc/src/crypto/aes.cpp@{libraries/fc/src/crypto/aes.cpp}}
+\mbox{\hyperlink{aes_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{aes_8hpp}{fc/crypto/aes.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{openssl_8hpp}{fc/crypto/openssl.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{exception_8hpp}{fc/exception/exception.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{fwd__impl_8hpp}{fc/fwd\_impl.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00006}00006\ \textcolor{comment}{//\#include\ <fc/io/fstream.hpp>}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{raw_8hpp}{fc/io/raw.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{logger_8hpp}{fc/log/logger.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00011}00011\ \textcolor{preprocessor}{\#include\ <openssl/opensslconf.h>}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00012}00012\ \textcolor{preprocessor}{\#ifndef\ OPENSSL\_THREADS}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00013}00013\ \textcolor{preprocessor}{\#\ error\ "{}OpenSSL\ must\ be\ configured\ to\ support\ threads"{}}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00014}00014\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00015}00015\ \textcolor{preprocessor}{\#include\ <openssl/crypto.h>}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00017}00017\ \textcolor{preprocessor}{\#if\ defined(\_WIN32)}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00018}00018\ \textcolor{preprocessor}{\#\ include\ <windows.h>}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00019}00019\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00021}00021\ \textcolor{preprocessor}{\#include\ <thread>}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00022}00022\ \textcolor{preprocessor}{\#include\ <mutex>}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00023}00023\ \textcolor{preprocessor}{\#include\ <fstream>}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00024}00024\ \textcolor{preprocessor}{\#include\ <functional>}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00026}00026\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}\ \{}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00028}\mbox{\hyperlink{structfc_1_1aes__encoder_1_1impl}{00028}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structfc_1_1aes__encoder_1_1impl}{aes\_encoder::impl}}\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00029}00029\ \{}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00030}\mbox{\hyperlink{structfc_1_1aes__encoder_1_1impl_ad7f1f31c3e3825b834a6c7418e584085}{00030}}\ \ \ \ evp\_cipher\_ctx\ \mbox{\hyperlink{structfc_1_1aes__encoder_1_1impl_ad7f1f31c3e3825b834a6c7418e584085}{ctx}};}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00031}00031\ \};}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00034}\mbox{\hyperlink{classfc_1_1aes__encoder_a6b8e4c5453abc12a7a4a9ae6b4fad479}{00034}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1aes__encoder_a6b8e4c5453abc12a7a4a9ae6b4fad479}{aes\_encoder::init}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha256}{fc::sha256}}\&\ key,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1uint128}{fc::uint128}}\&\ init\_value\ )}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00035}00035\ \{}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00036}00036\ \ \ \ \ my-\/>ctx.obj\ =\ EVP\_CIPHER\_CTX\_new();}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00037}00037\ \ \ \ \ \textcolor{comment}{/*\ Create\ and\ initialise\ the\ context\ */}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00038}00038\ \ \ \ \ \textcolor{keywordflow}{if}(!my-\/>ctx)}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00039}00039\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00040}00040\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ aes\_exception,\ \textcolor{stringliteral}{"{}error\ allocating\ evp\ cipher\ context"{}},\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00041}00041\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}s"{}},\ ERR\_error\_string(\ ERR\_get\_error(),\ \textcolor{keyword}{nullptr})\ )\ );}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00042}00042\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00044}00044\ \ \ \ \ \textcolor{comment}{/*\ Initialise\ the\ encryption\ operation.\ IMPORTANT\ -\/\ ensure\ you\ use\ a\ key}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00045}00045\ \textcolor{comment}{\ \ \ \ *\ \ \ \ and\ IV\ size\ appropriate\ for\ your\ cipher}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00046}00046\ \textcolor{comment}{\ \ \ \ *\ \ \ \ In\ this\ example\ we\ are\ using\ 256\ bit\ AES\ (i.e.\ a\ 256\ bit\ key).\ The}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00047}00047\ \textcolor{comment}{\ \ \ \ *\ \ \ \ IV\ size\ for\ *most*\ modes\ is\ the\ same\ as\ the\ block\ size.\ For\ AES\ this}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00048}00048\ \textcolor{comment}{\ \ \ \ *\ \ \ \ is\ 128\ bits\ */}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00049}00049\ \ \ \ \ \textcolor{keywordflow}{if}(1\ !=\ EVP\_EncryptInit\_ex(my-\/>ctx,\ EVP\_aes\_256\_cbc(),\ NULL,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)\&key,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)\&init\_value))}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00050}00050\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00051}00051\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ aes\_exception,\ \textcolor{stringliteral}{"{}error\ during\ aes\ 256\ cbc\ encryption\ init"{}},\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}s"{}},\ ERR\_error\_string(\ ERR\_get\_error(),\ \textcolor{keyword}{nullptr})\ )\ );}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00053}00053\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00054}00054\ \ \ \ \ EVP\_CIPHER\_CTX\_set\_padding(\ my-\/>ctx,\ 0\ );}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00055}00055\ \}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00057}\mbox{\hyperlink{classfc_1_1aes__encoder_afe9b0c8cbe2b03143a1d1bfcdcc5319f}{00057}}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{classfc_1_1aes__encoder_afe9b0c8cbe2b03143a1d1bfcdcc5319f}{aes\_encoder::encode}}(\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ plaintxt,\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ plaintext\_len,\ \textcolor{keywordtype}{char}*\ ciphertxt\ )}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00058}00058\ \{}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00059}00059\ \ \ \ \ \textcolor{keywordtype}{int}\ ciphertext\_len\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00060}00060\ \ \ \ \ \textcolor{comment}{/*\ Provide\ the\ message\ to\ be\ encrypted,\ and\ obtain\ the\ encrypted\ output.}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00061}00061\ \textcolor{comment}{\ \ \ \ *\ \ \ \ *\ EVP\_EncryptUpdate\ can\ be\ called\ multiple\ times\ if\ necessary}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00062}00062\ \textcolor{comment}{\ \ \ \ *\ \ \ \ \ \ \ */}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00063}00063\ \ \ \ \ \textcolor{keywordflow}{if}(1\ !=\ EVP\_EncryptUpdate(my-\/>ctx,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)ciphertxt,\ \&ciphertext\_len,\ (\textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)plaintxt,\ plaintext\_len))}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00064}00064\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00065}00065\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ aes\_exception,\ \textcolor{stringliteral}{"{}error\ during\ aes\ 256\ cbc\ encryption\ update"{}},\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00066}00066\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}s"{}},\ ERR\_error\_string(\ ERR\_get\_error(),\ \textcolor{keyword}{nullptr})\ )\ );}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00067}00067\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00068}00068\ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ ciphertext\_len\ ==\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(plaintext\_len),\ \textcolor{stringliteral}{"{}"{}},\ (\textcolor{stringliteral}{"{}ciphertext\_len"{}},ciphertext\_len)(\textcolor{stringliteral}{"{}plaintext\_len"{}},plaintext\_len)\ );}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00069}00069\ \ \ \ \ \textcolor{keywordflow}{return}\ ciphertext\_len;}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00070}00070\ \}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00071}00071\ \textcolor{preprocessor}{\#if\ 0}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00072}00072\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ aes\_encoder::final\_encode(\ \textcolor{keywordtype}{char}*\ ciphertxt\ )}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00073}00073\ \{}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00074}00074\ \ \ \ \ \textcolor{keywordtype}{int}\ ciphertext\_len\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00075}00075\ \ \ \ \ \textcolor{comment}{/*\ Finalise\ the\ encryption.\ Further\ ciphertext\ bytes\ may\ be\ written\ at}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00076}00076\ \textcolor{comment}{\ \ \ \ *\ \ \ \ *\ this\ stage.}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00077}00077\ \textcolor{comment}{\ \ \ \ *\ \ \ \ \ \ \ */}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00078}00078\ \ \ \ \ \textcolor{keywordflow}{if}(1\ !=\ EVP\_EncryptFinal\_ex(my-\/>ctx,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)ciphertxt,\ \&ciphertext\_len))\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00079}00079\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00080}00080\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ \mbox{\hyperlink{classfc_1_1exception}{exception}},\ \textcolor{stringliteral}{"{}error\ during\ aes\ 256\ cbc\ encryption\ final"{}},\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00081}00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}s"{}},\ ERR\_error\_string(\ ERR\_get\_error(),\ \textcolor{keyword}{nullptr})\ )\ );}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00082}00082\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00083}00083\ \ \ \ \ \textcolor{keywordflow}{return}\ ciphertext\_len;}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00084}00084\ \}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00085}00085\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00086}00086\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00087}00087\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00088}\mbox{\hyperlink{structfc_1_1aes__decoder_1_1impl}{00088}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structfc_1_1aes__decoder_1_1impl}{aes\_decoder::impl}}\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00089}00089\ \{}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00090}\mbox{\hyperlink{structfc_1_1aes__decoder_1_1impl_a286d2af08a0edbcd1c97b8ad357c1421}{00090}}\ \ \ \ evp\_cipher\_ctx\ \mbox{\hyperlink{structfc_1_1aes__decoder_1_1impl_a286d2af08a0edbcd1c97b8ad357c1421}{ctx}};}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00091}00091\ \};}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00092}00092\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00093}\mbox{\hyperlink{classfc_1_1aes__decoder_a5c7a4afa8000d639708a4956ae78fe35}{00093}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1aes__decoder_a5c7a4afa8000d639708a4956ae78fe35}{aes\_decoder::init}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha256}{fc::sha256}}\&\ key,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1uint128}{fc::uint128}}\&\ init\_value\ )}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00094}00094\ \{}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00095}00095\ \ \ \ \ my-\/>ctx.obj\ =\ EVP\_CIPHER\_CTX\_new();}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00096}00096\ \ \ \ \ \textcolor{comment}{/*\ Create\ and\ initialise\ the\ context\ */}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00097}00097\ \ \ \ \ \textcolor{keywordflow}{if}(!my-\/>ctx)}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00098}00098\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00099}00099\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ aes\_exception,\ \textcolor{stringliteral}{"{}error\ allocating\ evp\ cipher\ context"{}},\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00100}00100\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}s"{}},\ ERR\_error\_string(\ ERR\_get\_error(),\ \textcolor{keyword}{nullptr})\ )\ );}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00101}00101\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00102}00102\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00103}00103\ \ \ \ \ \textcolor{comment}{/*\ Initialise\ the\ encryption\ operation.\ IMPORTANT\ -\/\ ensure\ you\ use\ a\ key}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00104}00104\ \textcolor{comment}{\ \ \ \ *\ \ \ \ and\ IV\ size\ appropriate\ for\ your\ cipher}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00105}00105\ \textcolor{comment}{\ \ \ \ *\ \ \ \ In\ this\ example\ we\ are\ using\ 256\ bit\ AES\ (i.e.\ a\ 256\ bit\ key).\ The}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00106}00106\ \textcolor{comment}{\ \ \ \ *\ \ \ \ IV\ size\ for\ *most*\ modes\ is\ the\ same\ as\ the\ block\ size.\ For\ AES\ this}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00107}00107\ \textcolor{comment}{\ \ \ \ *\ \ \ \ is\ 128\ bits\ */}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00108}00108\ \ \ \ \ \textcolor{keywordflow}{if}(1\ !=\ EVP\_DecryptInit\_ex(my-\/>ctx,\ EVP\_aes\_256\_cbc(),\ NULL,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)\&key,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)\&init\_value))}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00109}00109\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00110}00110\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ aes\_exception,\ \textcolor{stringliteral}{"{}error\ during\ aes\ 256\ cbc\ encryption\ init"{}},\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00111}00111\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}s"{}},\ ERR\_error\_string(\ ERR\_get\_error(),\ \textcolor{keyword}{nullptr})\ )\ );}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00112}00112\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00113}00113\ \ \ \ \ EVP\_CIPHER\_CTX\_set\_padding(\ my-\/>ctx,\ 0\ );}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00114}00114\ \}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00115}00115\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00116}\mbox{\hyperlink{classfc_1_1aes__decoder_a5466676d345dbd29d90d9c8785bf93e8}{00116}}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{classfc_1_1aes__decoder_a5466676d345dbd29d90d9c8785bf93e8}{aes\_decoder::decode}}(\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ ciphertxt,\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ ciphertxt\_len,\ \textcolor{keywordtype}{char}*\ plaintext\ )}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00117}00117\ \{}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00118}00118\ \ \ \ \ \textcolor{keywordtype}{int}\ plaintext\_len\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00119}00119\ \ \ \ \ \textcolor{comment}{/*\ Provide\ the\ message\ to\ be\ decrypted,\ and\ obtain\ the\ decrypted\ output.}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00120}00120\ \textcolor{comment}{\ \ \ \ *\ \ \ \ *\ EVP\_DecryptUpdate\ can\ be\ called\ multiple\ times\ if\ necessary}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00121}00121\ \textcolor{comment}{\ \ \ \ *\ \ \ \ \ \ \ */}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00122}00122\ \ \ \ \ \textcolor{keywordflow}{if}\ (1\ !=\ EVP\_DecryptUpdate(my-\/>ctx,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)plaintext,\ \&plaintext\_len,\ (\textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)ciphertxt,\ ciphertxt\_len))}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00123}00123\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00124}00124\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ aes\_exception,\ \textcolor{stringliteral}{"{}error\ during\ aes\ 256\ cbc\ decryption\ update"{}},\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00125}00125\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}s"{}},\ ERR\_error\_string(\ ERR\_get\_error(),\ \textcolor{keyword}{nullptr})\ )\ );}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00126}00126\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00127}00127\ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ ciphertxt\_len\ ==\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\textcolor{keyword}{>}(plaintext\_len),\ \textcolor{stringliteral}{"{}"{}},\ (\textcolor{stringliteral}{"{}ciphertxt\_len"{}},ciphertxt\_len)(\textcolor{stringliteral}{"{}plaintext\_len"{}},plaintext\_len)\ );}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00128}00128\ \ \ \ \ \textcolor{keywordflow}{return}\ plaintext\_len;}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00129}00129\ \}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00130}00130\ \textcolor{preprocessor}{\#if\ 0}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00131}00131\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ aes\_decoder::final\_decode(\ \textcolor{keywordtype}{char}*\ plaintext\ )}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00132}00132\ \{}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00133}00133\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00134}00134\ \ \ \ \ \textcolor{keywordtype}{int}\ ciphertext\_len\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00135}00135\ \ \ \ \ \textcolor{comment}{/*\ Finalise\ the\ encryption.\ Further\ ciphertext\ bytes\ may\ be\ written\ at}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00136}00136\ \textcolor{comment}{\ \ \ \ *\ \ \ \ *\ this\ stage.}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00137}00137\ \textcolor{comment}{\ \ \ \ *\ \ \ \ \ \ \ */}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00138}00138\ \ \ \ \ \textcolor{keywordflow}{if}(1\ !=\ EVP\_DecryptFinal\_ex(my-\/>ctx,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)plaintext,\ \&ciphertext\_len))\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00139}00139\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00140}00140\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ \mbox{\hyperlink{classfc_1_1exception}{exception}},\ \textcolor{stringliteral}{"{}error\ during\ aes\ 256\ cbc\ encryption\ final"{}},\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00141}00141\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}s"{}},\ ERR\_error\_string(\ ERR\_get\_error(),\ \textcolor{keyword}{nullptr})\ )\ );}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00142}00142\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00143}00143\ \ \ \ \ \textcolor{keywordflow}{return}\ ciphertext\_len;}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00144}00144\ \}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00145}00145\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00146}00146\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00147}00147\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00148}00148\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00149}00149\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00150}00150\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00151}00151\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00152}00152\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00153}00153\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00154}00154\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00155}00155\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00156}00156\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00157}00157\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00159}\mbox{\hyperlink{namespacefc_a71eea521fccf7c6c7a01402d66de6a3f}{00159}}\ \textcolor{keywordtype}{unsigned}\ \mbox{\hyperlink{namespacefc_a71eea521fccf7c6c7a01402d66de6a3f}{aes\_encrypt}}(\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *plaintext,\ \textcolor{keywordtype}{int}\ plaintext\_len,\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *key,}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00160}00160\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *iv,\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *ciphertext)}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00161}00161\ \{}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00162}00162\ \ \ \ \ evp\_cipher\_ctx\ ctx(\ EVP\_CIPHER\_CTX\_new()\ );}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00163}00163\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00164}00164\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00165}00165\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ ciphertext\_len\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00166}00166\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00167}00167\ \ \ \ \ \textcolor{comment}{/*\ Create\ and\ initialise\ the\ context\ */}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00168}00168\ \ \ \ \ \textcolor{keywordflow}{if}(!ctx)}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00169}00169\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00170}00170\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ aes\_exception,\ \textcolor{stringliteral}{"{}error\ allocating\ evp\ cipher\ context"{}},\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00171}00171\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}s"{}},\ ERR\_error\_string(\ ERR\_get\_error(),\ \textcolor{keyword}{nullptr})\ )\ );}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00172}00172\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00173}00173\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00174}00174\ \ \ \ \ \textcolor{comment}{/*\ Initialise\ the\ encryption\ operation.\ IMPORTANT\ -\/\ ensure\ you\ use\ a\ key}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00175}00175\ \textcolor{comment}{\ \ \ \ *\ \ \ \ and\ IV\ size\ appropriate\ for\ your\ cipher}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00176}00176\ \textcolor{comment}{\ \ \ \ *\ \ \ \ In\ this\ example\ we\ are\ using\ 256\ bit\ AES\ (i.e.\ a\ 256\ bit\ key).\ The}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00177}00177\ \textcolor{comment}{\ \ \ \ *\ \ \ \ IV\ size\ for\ *most*\ modes\ is\ the\ same\ as\ the\ block\ size.\ For\ AES\ this}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00178}00178\ \textcolor{comment}{\ \ \ \ *\ \ \ \ is\ 128\ bits\ */}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00179}00179\ \ \ \ \ \textcolor{keywordflow}{if}(1\ !=\ EVP\_EncryptInit\_ex(ctx,\ EVP\_aes\_256\_cbc(),\ NULL,\ key,\ iv))}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00180}00180\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00181}00181\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ aes\_exception,\ \textcolor{stringliteral}{"{}error\ during\ aes\ 256\ cbc\ encryption\ init"{}},\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00182}00182\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}s"{}},\ ERR\_error\_string(\ ERR\_get\_error(),\ \textcolor{keyword}{nullptr})\ )\ );}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00183}00183\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00184}00184\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00185}00185\ \ \ \ \ \textcolor{comment}{/*\ Provide\ the\ message\ to\ be\ encrypted,\ and\ obtain\ the\ encrypted\ output.}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00186}00186\ \textcolor{comment}{\ \ \ \ *\ \ \ \ *\ EVP\_EncryptUpdate\ can\ be\ called\ multiple\ times\ if\ necessary}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00187}00187\ \textcolor{comment}{\ \ \ \ *\ \ \ \ \ \ \ */}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00188}00188\ \ \ \ \ \textcolor{keywordflow}{if}(1\ !=\ EVP\_EncryptUpdate(ctx,\ ciphertext,\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ plaintext,\ plaintext\_len))}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00189}00189\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00190}00190\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ aes\_exception,\ \textcolor{stringliteral}{"{}error\ during\ aes\ 256\ cbc\ encryption\ update"{}},\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00191}00191\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}s"{}},\ ERR\_error\_string(\ ERR\_get\_error(),\ \textcolor{keyword}{nullptr})\ )\ );}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00192}00192\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00193}00193\ \ \ \ \ ciphertext\_len\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}};}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00194}00194\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00195}00195\ \ \ \ \ \textcolor{comment}{/*\ Finalise\ the\ encryption.\ Further\ ciphertext\ bytes\ may\ be\ written\ at}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00196}00196\ \textcolor{comment}{\ \ \ \ *\ \ \ \ *\ this\ stage.}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00197}00197\ \textcolor{comment}{\ \ \ \ *\ \ \ \ \ \ \ */}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00198}00198\ \ \ \ \ \textcolor{keywordflow}{if}(1\ !=\ EVP\_EncryptFinal\_ex(ctx,\ ciphertext\ +\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}))\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00199}00199\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00200}00200\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ aes\_exception,\ \textcolor{stringliteral}{"{}error\ during\ aes\ 256\ cbc\ encryption\ final"{}},\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00201}00201\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}s"{}},\ ERR\_error\_string(\ ERR\_get\_error(),\ \textcolor{keyword}{nullptr})\ )\ );}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00202}00202\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00203}00203\ \ \ \ \ ciphertext\_len\ +=\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}};}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00204}00204\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00205}00205\ \ \ \ \ \textcolor{keywordflow}{return}\ ciphertext\_len;}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00206}00206\ \}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00207}00207\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00208}\mbox{\hyperlink{namespacefc_a17a540884c97b458fd605c12222e8070}{00208}}\ \textcolor{keywordtype}{unsigned}\ \mbox{\hyperlink{namespacefc_a17a540884c97b458fd605c12222e8070}{aes\_decrypt}}(\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *ciphertext,\ \textcolor{keywordtype}{int}\ ciphertext\_len,\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *key,}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00209}00209\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *iv,\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *plaintext)}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00210}00210\ \{}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00211}00211\ \ \ \ \ evp\_cipher\_ctx\ ctx(\ EVP\_CIPHER\_CTX\_new()\ );}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00212}00212\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00213}00213\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ plaintext\_len\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00214}00214\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00215}00215\ \ \ \ \ \textcolor{comment}{/*\ Create\ and\ initialise\ the\ context\ */}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00216}00216\ \ \ \ \ \textcolor{keywordflow}{if}(!ctx)\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00217}00217\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00218}00218\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ aes\_exception,\ \textcolor{stringliteral}{"{}error\ allocating\ evp\ cipher\ context"{}},\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00219}00219\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}s"{}},\ ERR\_error\_string(\ ERR\_get\_error(),\ \textcolor{keyword}{nullptr})\ )\ );}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00220}00220\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00221}00221\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00222}00222\ \ \ \ \ \textcolor{comment}{/*\ Initialise\ the\ decryption\ operation.\ IMPORTANT\ -\/\ ensure\ you\ use\ a\ key}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00223}00223\ \textcolor{comment}{\ \ \ \ *\ \ \ \ *\ and\ IV\ size\ appropriate\ for\ your\ cipher}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00224}00224\ \textcolor{comment}{\ \ \ \ *\ \ \ \ \ \ \ *\ In\ this\ example\ we\ are\ using\ 256\ bit\ AES\ (i.e.\ a\ 256\ bit\ key).\ The}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00225}00225\ \textcolor{comment}{\ \ \ \ *\ \ \ \ \ \ \ \ \ \ *\ IV\ size\ for\ *most*\ modes\ is\ the\ same\ as\ the\ block\ size.\ For\ AES\ this}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00226}00226\ \textcolor{comment}{\ \ \ \ *\ \ \ \ \ \ \ \ \ \ \ \ \ *\ is\ 128\ bits\ */}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00227}00227\ \ \ \ \ \textcolor{keywordflow}{if}(1\ !=\ EVP\_DecryptInit\_ex(ctx,\ EVP\_aes\_256\_cbc(),\ NULL,\ key,\ iv))}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00228}00228\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00229}00229\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ aes\_exception,\ \textcolor{stringliteral}{"{}error\ during\ aes\ 256\ cbc\ decrypt\ init"{}},\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00230}00230\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}s"{}},\ ERR\_error\_string(\ ERR\_get\_error(),\ \textcolor{keyword}{nullptr})\ )\ );}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00231}00231\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00232}00232\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00233}00233\ \ \ \ \ \textcolor{comment}{/*\ Provide\ the\ message\ to\ be\ decrypted,\ and\ obtain\ the\ plaintext\ output.}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00234}00234\ \textcolor{comment}{\ \ \ \ *\ \ \ \ *\ EVP\_DecryptUpdate\ can\ be\ called\ multiple\ times\ if\ necessary}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00235}00235\ \textcolor{comment}{\ \ \ \ *\ \ \ \ \ \ \ */}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00236}00236\ \ \ \ \ \textcolor{keywordflow}{if}(1\ !=\ EVP\_DecryptUpdate(ctx,\ plaintext,\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ ciphertext,\ ciphertext\_len))}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00237}00237\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00238}00238\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ aes\_exception,\ \textcolor{stringliteral}{"{}error\ during\ aes\ 256\ cbc\ decrypt\ update"{}},\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00239}00239\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}s"{}},\ ERR\_error\_string(\ ERR\_get\_error(),\ \textcolor{keyword}{nullptr})\ )\ );}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00240}00240\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00241}00241\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00242}00242\ \ \ \ \ plaintext\_len\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}};}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00243}00243\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00244}00244\ \ \ \ \ \textcolor{comment}{/*\ Finalise\ the\ decryption.\ Further\ plaintext\ bytes\ may\ be\ written\ at}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00245}00245\ \textcolor{comment}{\ \ \ \ *\ \ \ \ *\ this\ stage.}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00246}00246\ \textcolor{comment}{\ \ \ \ *\ \ \ \ \ \ \ */}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00247}00247\ \ \ \ \ \textcolor{keywordflow}{if}(1\ !=\ EVP\_DecryptFinal\_ex(ctx,\ plaintext\ +\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}))\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00248}00248\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00249}00249\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ aes\_exception,\ \textcolor{stringliteral}{"{}error\ during\ aes\ 256\ cbc\ decrypt\ final"{}},\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00250}00250\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}s"{}},\ ERR\_error\_string(\ ERR\_get\_error(),\ \textcolor{keyword}{nullptr})\ )\ );}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00251}00251\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00252}00252\ \ \ \ \ plaintext\_len\ +=\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}};}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00253}00253\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00254}00254\ \ \ \ \ \textcolor{keywordflow}{return}\ plaintext\_len;}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00255}00255\ \}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00256}00256\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00257}\mbox{\hyperlink{namespacefc_a34e6438dfb3596540f7bf52faf97bbd2}{00257}}\ \textcolor{keywordtype}{unsigned}\ \mbox{\hyperlink{namespacefc_a34e6438dfb3596540f7bf52faf97bbd2}{aes\_cfb\_decrypt}}(\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *ciphertext,\ \textcolor{keywordtype}{int}\ ciphertext\_len,\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *key,}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00258}00258\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *iv,\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *plaintext)}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00259}00259\ \{}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00260}00260\ \ \ \ \ evp\_cipher\_ctx\ ctx(\ EVP\_CIPHER\_CTX\_new()\ );}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00261}00261\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00262}00262\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ plaintext\_len\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00263}00263\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00264}00264\ \ \ \ \ \textcolor{comment}{/*\ Create\ and\ initialise\ the\ context\ */}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00265}00265\ \ \ \ \ \textcolor{keywordflow}{if}(!ctx)}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00266}00266\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00267}00267\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ aes\_exception,\ \textcolor{stringliteral}{"{}error\ allocating\ evp\ cipher\ context"{}},}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00268}00268\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}s"{}},\ ERR\_error\_string(\ ERR\_get\_error(),\ \textcolor{keyword}{nullptr})\ )\ );}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00269}00269\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00270}00270\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00271}00271\ \ \ \ \ \textcolor{comment}{/*\ Initialise\ the\ decryption\ operation.\ IMPORTANT\ -\/\ ensure\ you\ use\ a\ key}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00272}00272\ \textcolor{comment}{\ \ \ \ *\ \ \ \ *\ and\ IV\ size\ appropriate\ for\ your\ cipher}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00273}00273\ \textcolor{comment}{\ \ \ \ *\ \ \ \ \ \ \ *\ In\ this\ example\ we\ are\ using\ 256\ bit\ AES\ (i.e.\ a\ 256\ bit\ key).\ The}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00274}00274\ \textcolor{comment}{\ \ \ \ *\ \ \ \ \ \ \ \ \ \ *\ IV\ size\ for\ *most*\ modes\ is\ the\ same\ as\ the\ block\ size.\ For\ AES\ this}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00275}00275\ \textcolor{comment}{\ \ \ \ *\ \ \ \ \ \ \ \ \ \ \ \ \ *\ is\ 128\ bits\ */}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00276}00276\ \ \ \ \ \textcolor{keywordflow}{if}(1\ !=\ EVP\_DecryptInit\_ex(ctx,\ EVP\_aes\_256\_cfb128(),\ NULL,\ key,\ iv))}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00277}00277\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00278}00278\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ aes\_exception,\ \textcolor{stringliteral}{"{}error\ during\ aes\ 256\ cbc\ decrypt\ init"{}},}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00279}00279\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}s"{}},\ ERR\_error\_string(\ ERR\_get\_error(),\ \textcolor{keyword}{nullptr})\ )\ );}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00280}00280\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00281}00281\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00282}00282\ \ \ \ \ \textcolor{comment}{/*\ Provide\ the\ message\ to\ be\ decrypted,\ and\ obtain\ the\ plaintext\ output.}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00283}00283\ \textcolor{comment}{\ \ \ \ *\ \ \ \ *\ EVP\_DecryptUpdate\ can\ be\ called\ multiple\ times\ if\ necessary}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00284}00284\ \textcolor{comment}{\ \ \ \ *\ \ \ \ \ \ \ */}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00285}00285\ \ \ \ \ \textcolor{keywordflow}{if}(1\ !=\ EVP\_DecryptUpdate(ctx,\ plaintext,\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ ciphertext,\ ciphertext\_len))}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00286}00286\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00287}00287\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ aes\_exception,\ \textcolor{stringliteral}{"{}error\ during\ aes\ 256\ cbc\ decrypt\ update"{}},}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00288}00288\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}s"{}},\ ERR\_error\_string(\ ERR\_get\_error(),\ \textcolor{keyword}{nullptr})\ )\ );}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00289}00289\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00290}00290\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00291}00291\ \ \ \ \ plaintext\_len\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}};}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00292}00292\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00293}00293\ \ \ \ \ \textcolor{comment}{/*\ Finalise\ the\ decryption.\ Further\ plaintext\ bytes\ may\ be\ written\ at}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00294}00294\ \textcolor{comment}{\ \ \ \ *\ \ \ \ *\ this\ stage.}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00295}00295\ \textcolor{comment}{\ \ \ \ *\ \ \ \ \ \ \ */}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00296}00296\ \ \ \ \ \textcolor{keywordflow}{if}(1\ !=\ EVP\_DecryptFinal\_ex(ctx,\ plaintext\ +\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}))}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00297}00297\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00298}00298\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ aes\_exception,\ \textcolor{stringliteral}{"{}error\ during\ aes\ 256\ cbc\ decrypt\ final"{}},}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00299}00299\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}s"{}},\ ERR\_error\_string(\ ERR\_get\_error(),\ \textcolor{keyword}{nullptr})\ )\ );}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00300}00300\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00301}00301\ \ \ \ \ plaintext\_len\ +=\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}};}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00302}00302\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00303}00303\ \ \ \ \ \textcolor{keywordflow}{return}\ plaintext\_len;}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00304}00304\ \}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00305}00305\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00306}\mbox{\hyperlink{namespacefc_af00401a48f0a79a846a8f6db60591d47}{00306}}\ std::vector<char>\ \mbox{\hyperlink{namespacefc_a71eea521fccf7c6c7a01402d66de6a3f}{aes\_encrypt}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha512}{fc::sha512}}\&\ key,\ \textcolor{keyword}{const}\ std::vector<char>\&\ plain\_text\ \ )}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00307}00307\ \{}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00308}00308\ \ \ \ \ std::vector<char>\ cipher\_text(plain\_text.size()+16);}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00309}00309\ \ \ \ \ \textcolor{keyword}{auto}\ cipher\_len\ =\ \mbox{\hyperlink{namespacefc_a71eea521fccf7c6c7a01402d66de6a3f}{aes\_encrypt}}(\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)plain\_text.data(),\ (\textcolor{keywordtype}{int})plain\_text.size(),\ \ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00310}00310\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)\&key,\ ((\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)\&key)+32,}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00311}00311\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)cipher\_text.data()\ );}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00312}00312\ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ cipher\_len\ <=\ cipher\_text.size()\ );}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00313}00313\ \ \ \ \ cipher\_text.resize(cipher\_len);}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00314}00314\ \ \ \ \ \textcolor{keywordflow}{return}\ cipher\_text;}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00315}00315\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00316}00316\ \}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00317}\mbox{\hyperlink{namespacefc_abaec8d5ba81a275a867004314358730c}{00317}}\ std::vector<char>\ \mbox{\hyperlink{namespacefc_a17a540884c97b458fd605c12222e8070}{aes\_decrypt}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha512}{fc::sha512}}\&\ key,\ \textcolor{keyword}{const}\ std::vector<char>\&\ cipher\_text\ )}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00318}00318\ \{}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00319}00319\ \ \ \ \ std::vector<char>\ plain\_text(\ cipher\_text.size()\ );}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00320}00320\ \ \ \ \ \textcolor{keyword}{auto}\ plain\_len\ =\ \mbox{\hyperlink{namespacefc_a17a540884c97b458fd605c12222e8070}{aes\_decrypt}}(\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)cipher\_text.data(),\ (\textcolor{keywordtype}{int})cipher\_text.size(),\ \ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00321}00321\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)\&key,\ ((\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)\&key)+32,}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00322}00322\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)plain\_text.data()\ );}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00323}00323\ \ \ \ \ plain\_text.resize(plain\_len);}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00324}00324\ \ \ \ \ \textcolor{keywordflow}{return}\ plain\_text;}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00325}00325\ \}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00326}00326\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00327}00327\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00331}\mbox{\hyperlink{namespacefc_a8373bafd21e20c371b433c3a4ea2161f}{00331}}\ \textcolor{keywordtype}{void}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a8373bafd21e20c371b433c3a4ea2161f}{aes\_save}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1path}{fc::path}}\&\ file,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha512}{fc::sha512}}\&\ key,\ std::vector<char>\ plain\_text\ )}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00332}00332\ \{\ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00333}00333\ \ \ \ \textcolor{keyword}{auto}\ cipher\ =\ \mbox{\hyperlink{namespacefc_a71eea521fccf7c6c7a01402d66de6a3f}{aes\_encrypt}}(\ key,\ plain\_text\ );}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00334}00334\ \ \ \ \mbox{\hyperlink{classfc_1_1sha512_1_1encoder}{fc::sha512::encoder}}\ check\_enc;}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00335}00335\ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(\ check\_enc,\ key\ );}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00336}00336\ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(\ check\_enc,\ cipher\ );}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00337}00337\ \ \ \ \textcolor{keyword}{auto}\ check\ =\ check\_enc.\mbox{\hyperlink{classfc_1_1sha512_1_1encoder_a11d1c279300d2ee6e5d411dc98404fb6}{result}}();}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00338}00338\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00339}00339\ \ \ \ std::ofstream\ out(file.generic\_string().c\_str());}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00340}00340\ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(\ out,\ check\ );}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00341}00341\ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(\ out,\ cipher\ );}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00342}00342\ \}\ \mbox{\hyperlink{exception_8hpp_af3731d6e3beb140d9e652adf7a18113b}{FC\_RETHROW\_EXCEPTIONS}}(\ warn,\ \textcolor{stringliteral}{"{}"{}},\ (\textcolor{stringliteral}{"{}file"{}},file)\ )\ \}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00343}00343\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00347}\mbox{\hyperlink{namespacefc_a971e5743b54d7c728f068af266a9e6f1}{00347}}\ std::vector<char>\ \mbox{\hyperlink{namespacefc_a971e5743b54d7c728f068af266a9e6f1}{aes\_load}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1path}{fc::path}}\&\ file,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha512}{fc::sha512}}\&\ key\ )}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00348}00348\ \{\ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00349}00349\ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ \mbox{\hyperlink{namespacefc_a3fcf0d920aea28014aacae50a51d8485}{fc::exists}}(\ file\ )\ );}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00350}00350\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00351}00351\ \ \ \ std::ifstream\ in(\ file.generic\_string().c\_str(),\ std::ifstream::binary\ );}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00352}00352\ \ \ \ \mbox{\hyperlink{classfc_1_1sha512}{fc::sha512}}\ check;}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00353}00353\ \ \ \ std::vector<char>\ cipher;}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00354}00354\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00355}00355\ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a0b442d98ceb22dd5a6ae84745e43ffab}{fc::raw::unpack}}(\ in,\ check\ );}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00356}00356\ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a0b442d98ceb22dd5a6ae84745e43ffab}{fc::raw::unpack}}(\ in,\ cipher\ );}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00357}00357\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00358}00358\ \ \ \ \mbox{\hyperlink{classfc_1_1sha512_1_1encoder}{fc::sha512::encoder}}\ check\_enc;}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00359}00359\ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(\ check\_enc,\ key\ );}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00360}00360\ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(\ check\_enc,\ cipher\ );}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00361}00361\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00362}00362\ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ check\_enc.\mbox{\hyperlink{classfc_1_1sha512_1_1encoder_a11d1c279300d2ee6e5d411dc98404fb6}{result}}()\ ==\ check\ );}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00363}00363\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00364}00364\ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_a17a540884c97b458fd605c12222e8070}{aes\_decrypt}}(\ key,\ cipher\ );}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00365}00365\ \}\ \mbox{\hyperlink{exception_8hpp_af3731d6e3beb140d9e652adf7a18113b}{FC\_RETHROW\_EXCEPTIONS}}(\ warn,\ \textcolor{stringliteral}{"{}"{}},\ (\textcolor{stringliteral}{"{}file"{}},file)\ )\ \}}
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00366}00366\ }
+\DoxyCodeLine{\Hypertarget{aes_8cpp_source_l00367}00367\ \}\ \ \textcolor{comment}{//\ namespace\ fc}}
+
+\end{DoxyCode}

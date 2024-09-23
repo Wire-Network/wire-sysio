@@ -1,0 +1,11 @@
+<map id="TEST_CASE" name="TEST_CASE">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,63,105,88"/>
+<area shape="rect" id="Node000002" href="$class_catch_1_1_tag_alias_registry.html#a37ae1fda30de783f563492c3c60ab414" title=" " alt="" coords="153,63,345,88"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="105,73,137,73,137,78,105,78"/>
+<area shape="rect" id="Node000003" href="$namespace_catch.html#ada025504f627feaf9ac68ca391515dff" title=" " alt="" coords="415,5,534,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="302,59,406,33,407,38,303,65"/>
+<area shape="rect" id="Node000004" href="$class_catch_1_1_tag_alias_registry.html#a3ac6e1870e096e6010072da60c23f89f" title=" " alt="" coords="393,55,556,96"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="345,73,377,73,377,78,345,78"/>
+<area shape="rect" id="Node000005" href="$namespace_catch.html#a695f62327be0676e046291eeaae15110" title=" " alt="" coords="412,120,537,146"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="303,86,407,113,406,118,302,92"/>
+</map>

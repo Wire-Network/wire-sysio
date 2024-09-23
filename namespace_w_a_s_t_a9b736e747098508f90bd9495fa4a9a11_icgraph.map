@@ -1,0 +1,10 @@
+<map id="WAST::bindName" name="WAST::bindName">
+<area shape="rect" id="Node000001" title=" " alt="" coords="689,5,814,31"/>
+<area shape="rect" id="Node000002" href="$namespace_w_a_s_t.html#ad67ed47b4a120f234a3a4a2da076418f" title=" " alt="" coords="5,7,174,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="674,19,469,17,222,18,174,19,174,14,222,13,469,12,674,14"/>
+<area shape="rect" id="Node000003" href="$namespace_w_a_s_t.html#afdc0ca4bc5028ce0d0d1f0b50eadf451" title=" " alt="" coords="466,31,641,56"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="674,31,642,35,641,30,673,25"/>
+<area shape="rect" id="Node000004" href="$namespace_w_a_s_t.html#ab72b47fe2520b8a7840ff4ce5d07684d" title=" " alt="" coords="222,27,418,68"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="450,48,419,48,418,43,450,43"/>
+<area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="206,36,174,32,174,27,206,31"/>
+</map>

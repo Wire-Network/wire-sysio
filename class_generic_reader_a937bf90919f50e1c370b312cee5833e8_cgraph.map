@@ -1,0 +1,5 @@
+<map id="GenericReader::GetParseErrorCode" name="GenericReader::GetParseErrorCode">
+<area shape="rect" id="Node000001" title="Get the ParseErrorCode of last parsing." alt="" coords="5,5,236,31"/>
+<area shape="rect" id="Node000002" href="$struct_parse_result.html#a2aae3c2f42b31cc2409ee1e03bc4852e" title="Get the error code." alt="" coords="284,5,416,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="236,16,268,16,268,21,236,21"/>
+</map>

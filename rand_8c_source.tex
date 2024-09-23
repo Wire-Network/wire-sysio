@@ -1,0 +1,55 @@
+\doxysection{rand.\+c}
+\hypertarget{rand_8c_source}{}\label{rand_8c_source}\index{libraries/yubihsm/common/rand.c@{libraries/yubihsm/common/rand.c}}
+\mbox{\hyperlink{rand_8c}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{rand_8c_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{rand_8c_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ 2015-\/2018\ Yubico\ AB}}
+\DoxyCodeLine{\Hypertarget{rand_8c_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{rand_8c_source_l00004}00004\ \textcolor{comment}{\ *\ Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{\Hypertarget{rand_8c_source_l00005}00005\ \textcolor{comment}{\ *\ you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{rand_8c_source_l00006}00006\ \textcolor{comment}{\ *\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{\Hypertarget{rand_8c_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{rand_8c_source_l00008}00008\ \textcolor{comment}{\ *\ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{\Hypertarget{rand_8c_source_l00009}00009\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{rand_8c_source_l00010}00010\ \textcolor{comment}{\ *\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{\Hypertarget{rand_8c_source_l00011}00011\ \textcolor{comment}{\ *\ distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{\Hypertarget{rand_8c_source_l00012}00012\ \textcolor{comment}{\ *\ WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{\Hypertarget{rand_8c_source_l00013}00013\ \textcolor{comment}{\ *\ See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{\Hypertarget{rand_8c_source_l00014}00014\ \textcolor{comment}{\ *\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{rand_8c_source_l00015}00015\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{rand_8c_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{rand_8c_source_l00017}00017\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{rand_8h}{rand.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{rand_8c_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{rand_8c_source_l00019}00019\ \textcolor{preprocessor}{\#ifdef\ \_WIN32\_BCRYPT}}
+\DoxyCodeLine{\Hypertarget{rand_8c_source_l00020}00020\ \textcolor{preprocessor}{\#include\ <windows.h>}}
+\DoxyCodeLine{\Hypertarget{rand_8c_source_l00021}00021\ \textcolor{preprocessor}{\#include\ <bcrypt.h>}}
+\DoxyCodeLine{\Hypertarget{rand_8c_source_l00022}00022\ \textcolor{preprocessor}{\#include\ <ntstatus.h>}}
+\DoxyCodeLine{\Hypertarget{rand_8c_source_l00023}00023\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{rand_8c_source_l00024}00024\ \textcolor{preprocessor}{\#include\ <openssl/rand.h>}}
+\DoxyCodeLine{\Hypertarget{rand_8c_source_l00025}00025\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{rand_8c_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{rand_8c_source_l00027}\mbox{\hyperlink{rand_8c_a2d3d1e86f4093fbe0a1b2a7eede4cd75}{00027}}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{rand_8c_a2d3d1e86f4093fbe0a1b2a7eede4cd75}{rand\_generate}}(\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ \textcolor{keywordtype}{size\_t}\ cb\_buf)\ \{}
+\DoxyCodeLine{\Hypertarget{rand_8c_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{rand_8c_source_l00029}00029\ \textcolor{preprocessor}{\#ifdef\ \_WIN32\_BCRYPT}}
+\DoxyCodeLine{\Hypertarget{rand_8c_source_l00030}00030\ \ \ NTSTATUS\ status\ =\ STATUS\_SUCCESS;}
+\DoxyCodeLine{\Hypertarget{rand_8c_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{rand_8c_source_l00032}00032\ \ \ BCRYPT\_ALG\_HANDLE\ hAlg\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{rand_8c_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{rand_8c_source_l00034}00034\ \ \ \textcolor{keywordflow}{if}\ (!BCRYPT\_SUCCESS(}
+\DoxyCodeLine{\Hypertarget{rand_8c_source_l00035}00035\ \ \ \ \ \ \ \ \ status\ =}
+\DoxyCodeLine{\Hypertarget{rand_8c_source_l00036}00036\ \ \ \ \ \ \ \ \ \ \ BCryptOpenAlgorithmProvider(\&hAlg,\ BCRYPT\_RNG\_ALGORITHM,\ NULL,\ 0)))\ \{}
+\DoxyCodeLine{\Hypertarget{rand_8c_source_l00037}00037\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{rand_8c_source_l00038}00038\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rand_8c_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{rand_8c_source_l00040}00040\ \ \ status\ =\ BCryptGenRandom(hAlg,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ (ULONG)\ cb\_buf,\ 0);}
+\DoxyCodeLine{\Hypertarget{rand_8c_source_l00041}00041\ \ \ BCryptCloseAlgorithmProvider(hAlg,\ 0);}
+\DoxyCodeLine{\Hypertarget{rand_8c_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{rand_8c_source_l00043}00043\ \ \ \textcolor{keywordflow}{return}\ BCRYPT\_SUCCESS(status);}
+\DoxyCodeLine{\Hypertarget{rand_8c_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{rand_8c_source_l00045}00045\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{rand_8c_source_l00046}00046\ \ \ \textcolor{keywordflow}{return}\ (1\ ==\ RAND\_bytes(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ cb\_buf));}
+\DoxyCodeLine{\Hypertarget{rand_8c_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{rand_8c_source_l00048}00048\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{rand_8c_source_l00049}00049\ \}}
+
+\end{DoxyCode}

@@ -1,0 +1,49 @@
+\doxysection{libraries/fc/include/fc/static\+\_\+variant.hpp File Reference}
+\hypertarget{static__variant_8hpp}{}\label{static__variant_8hpp}\index{libraries/fc/include/fc/static\_variant.hpp@{libraries/fc/include/fc/static\_variant.hpp}}
+{\ttfamily \#include $<$stdexcept$>$}\newline
+{\ttfamily \#include $<$typeinfo$>$}\newline
+{\ttfamily \#include $<$type\+\_\+traits$>$}\newline
+{\ttfamily \#include $<$fc/exception/exception.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/core/typeinfo.\+hpp$>$}\newline
+{\ttfamily \#include $<$variant$>$}\newline
+Include dependency graph for static\+\_\+variant.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{static__variant_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{static__variant_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structfc_1_1visitor}{fc\+::visitor$<$ Result $>$}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1from__static__variant}{fc\+::from\+\_\+static\+\_\+variant}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1to__static__variant}{fc\+::to\+\_\+static\+\_\+variant}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1get__typename}{fc\+::get\+\_\+typename$<$ T $>$}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacefc}{fc}}
+\begin{DoxyCompactList}\small\item\em namespace \doxylink{namespacesysio_1_1chain}{sysio\+::chain} \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classfc_1_1variant}{variant}} , \mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\+\_\+t}} i = 0$>$ }\\void \mbox{\hyperlink{namespacefc_afc8acfd464a85f8a41ec497039c22934}{fc\+::from\+\_\+index}} (\mbox{\hyperlink{classfc_1_1variant}{variant}} \&v, int index)
+\item 
+{\footnotesize template$<$typename Variant\+Type , typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t index = 0$>$ }\\constexpr std\+::size\+\_\+t \mbox{\hyperlink{namespacefc_ae009b19d1fecf5979996e9f326cd98c3}{fc\+::get\+\_\+index}} ()
+\item 
+{\footnotesize template$<$typename... T$>$ }\\void \mbox{\hyperlink{namespacefc_a61bd2f687994eff826299cb88bdb692e}{fc\+::to\+\_\+variant}} (const std\+::variant$<$ T... $>$ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&v)
+\item 
+{\footnotesize template$<$typename... T$>$ }\\void \mbox{\hyperlink{namespacefc_a26fa0bf98a0dc288fe6d9ff149b314c1}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&v, std\+::variant$<$ T... $>$ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\end{DoxyCompactItemize}

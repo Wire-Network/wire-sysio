@@ -1,0 +1,129 @@
+\doxysection{backend\+\_\+functions Struct Reference}
+\hypertarget{structbackend__functions}{}\label{structbackend__functions}\index{backend\_functions@{backend\_functions}}
+
+
+{\ttfamily \#include $<$internal.\+h$>$}
+
+
+
+Collaboration diagram for backend\+\_\+functions\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=309pt]{structbackend__functions__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366}{yh\+\_\+rc}}(\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structbackend__functions_a03c30bcb44f976314d67a350a2a99cac}{backend\+\_\+init}} )(\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} verbosity, FILE \texorpdfstring{$\ast$}{*}output)
+\item 
+\mbox{\hyperlink{lib_2internal_8h_af0b8c5ac57556b935ae71249ec6cc388}{yh\+\_\+backend}} \texorpdfstring{$\ast$}{*}(\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structbackend__functions_acb0b044bf4469ddb3dd72d328d4eb42a}{backend\+\_\+create}} )(void)
+\item 
+\mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366}{yh\+\_\+rc}}(\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structbackend__functions_af35c8e28b31a803b1e9490ddfa99829d}{backend\+\_\+connect}} )(\mbox{\hyperlink{structyh__connector}{yh\+\_\+connector}} \texorpdfstring{$\ast$}{*}connector, int timeout)
+\item 
+void(\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structbackend__functions_a468ea679f6da120b5268455b786bff06}{backend\+\_\+disconnect}} )(\mbox{\hyperlink{lib_2internal_8h_af0b8c5ac57556b935ae71249ec6cc388}{yh\+\_\+backend}} \texorpdfstring{$\ast$}{*}connection)
+\item 
+\mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366}{yh\+\_\+rc}}(\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structbackend__functions_a4dad210af1fab02bdb7719679725a84d}{backend\+\_\+send\+\_\+msg}} )(\mbox{\hyperlink{lib_2internal_8h_af0b8c5ac57556b935ae71249ec6cc388}{yh\+\_\+backend}} \texorpdfstring{$\ast$}{*}connection, \mbox{\hyperlink{scp_8h_a2026a4fe4ea2811a4929044067ea1718}{Msg}} \texorpdfstring{$\ast$}{*}msg, \mbox{\hyperlink{scp_8h_a2026a4fe4ea2811a4929044067ea1718}{Msg}} \texorpdfstring{$\ast$}{*}response)
+\item 
+void(\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structbackend__functions_ae80d1fa885b4446fe751c54b749a04ae}{backend\+\_\+cleanup}} )(void)
+\item 
+\mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366}{yh\+\_\+rc}}(\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structbackend__functions_abbec50b32eb89bc1f481ed99585e3968}{backend\+\_\+option}} )(\mbox{\hyperlink{lib_2internal_8h_af0b8c5ac57556b935ae71249ec6cc388}{yh\+\_\+backend}} \texorpdfstring{$\ast$}{*}connection, \mbox{\hyperlink{yubihsm_8h_a59400bce0478b88e048d5e62b2b0b015}{yh\+\_\+connector\+\_\+option}} opt, const void \texorpdfstring{$\ast$}{*}val)
+\item 
+void(\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structbackend__functions_a43145be40370fc6e1547a6e1c869d77b}{backend\+\_\+set\+\_\+verbosity}} )(\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} verbosity, FILE \texorpdfstring{$\ast$}{*}output)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{lib_2internal_8h_source_l00065}{65}} of file \mbox{\hyperlink{lib_2internal_8h_source}{internal.\+h}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structbackend__functions_ae80d1fa885b4446fe751c54b749a04ae}\index{backend\_functions@{backend\_functions}!backend\_cleanup@{backend\_cleanup}}
+\index{backend\_cleanup@{backend\_cleanup}!backend\_functions@{backend\_functions}}
+\doxysubsubsection{\texorpdfstring{backend\_cleanup}{backend\_cleanup}}
+{\footnotesize\ttfamily \label{structbackend__functions_ae80d1fa885b4446fe751c54b749a04ae} 
+void(\texorpdfstring{$\ast$}{*} backend\+\_\+functions\+::backend\+\_\+cleanup) (void)}
+
+
+
+Definition at line \mbox{\hyperlink{lib_2internal_8h_source_l00071}{71}} of file \mbox{\hyperlink{lib_2internal_8h_source}{internal.\+h}}.
+
+\Hypertarget{structbackend__functions_af35c8e28b31a803b1e9490ddfa99829d}\index{backend\_functions@{backend\_functions}!backend\_connect@{backend\_connect}}
+\index{backend\_connect@{backend\_connect}!backend\_functions@{backend\_functions}}
+\doxysubsubsection{\texorpdfstring{backend\_connect}{backend\_connect}}
+{\footnotesize\ttfamily \label{structbackend__functions_af35c8e28b31a803b1e9490ddfa99829d} 
+\mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366}{yh\+\_\+rc}}(\texorpdfstring{$\ast$}{*} backend\+\_\+functions\+::backend\+\_\+connect) (\mbox{\hyperlink{structyh__connector}{yh\+\_\+connector}} \texorpdfstring{$\ast$}{*}connector, int timeout)}
+
+
+
+Definition at line \mbox{\hyperlink{lib_2internal_8h_source_l00068}{68}} of file \mbox{\hyperlink{lib_2internal_8h_source}{internal.\+h}}.
+
+\Hypertarget{structbackend__functions_acb0b044bf4469ddb3dd72d328d4eb42a}\index{backend\_functions@{backend\_functions}!backend\_create@{backend\_create}}
+\index{backend\_create@{backend\_create}!backend\_functions@{backend\_functions}}
+\doxysubsubsection{\texorpdfstring{backend\_create}{backend\_create}}
+{\footnotesize\ttfamily \label{structbackend__functions_acb0b044bf4469ddb3dd72d328d4eb42a} 
+\mbox{\hyperlink{lib_2internal_8h_af0b8c5ac57556b935ae71249ec6cc388}{yh\+\_\+backend}} \texorpdfstring{$\ast$}{*}(\texorpdfstring{$\ast$}{*} backend\+\_\+functions\+::backend\+\_\+create) (void)}
+
+
+
+Definition at line \mbox{\hyperlink{lib_2internal_8h_source_l00067}{67}} of file \mbox{\hyperlink{lib_2internal_8h_source}{internal.\+h}}.
+
+\Hypertarget{structbackend__functions_a468ea679f6da120b5268455b786bff06}\index{backend\_functions@{backend\_functions}!backend\_disconnect@{backend\_disconnect}}
+\index{backend\_disconnect@{backend\_disconnect}!backend\_functions@{backend\_functions}}
+\doxysubsubsection{\texorpdfstring{backend\_disconnect}{backend\_disconnect}}
+{\footnotesize\ttfamily \label{structbackend__functions_a468ea679f6da120b5268455b786bff06} 
+void(\texorpdfstring{$\ast$}{*} backend\+\_\+functions\+::backend\+\_\+disconnect) (\mbox{\hyperlink{lib_2internal_8h_af0b8c5ac57556b935ae71249ec6cc388}{yh\+\_\+backend}} \texorpdfstring{$\ast$}{*}connection)}
+
+
+
+Definition at line \mbox{\hyperlink{lib_2internal_8h_source_l00069}{69}} of file \mbox{\hyperlink{lib_2internal_8h_source}{internal.\+h}}.
+
+\Hypertarget{structbackend__functions_a03c30bcb44f976314d67a350a2a99cac}\index{backend\_functions@{backend\_functions}!backend\_init@{backend\_init}}
+\index{backend\_init@{backend\_init}!backend\_functions@{backend\_functions}}
+\doxysubsubsection{\texorpdfstring{backend\_init}{backend\_init}}
+{\footnotesize\ttfamily \label{structbackend__functions_a03c30bcb44f976314d67a350a2a99cac} 
+\mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366}{yh\+\_\+rc}}(\texorpdfstring{$\ast$}{*} backend\+\_\+functions\+::backend\+\_\+init) (\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} verbosity, FILE \texorpdfstring{$\ast$}{*}output)}
+
+
+
+Definition at line \mbox{\hyperlink{lib_2internal_8h_source_l00066}{66}} of file \mbox{\hyperlink{lib_2internal_8h_source}{internal.\+h}}.
+
+\Hypertarget{structbackend__functions_abbec50b32eb89bc1f481ed99585e3968}\index{backend\_functions@{backend\_functions}!backend\_option@{backend\_option}}
+\index{backend\_option@{backend\_option}!backend\_functions@{backend\_functions}}
+\doxysubsubsection{\texorpdfstring{backend\_option}{backend\_option}}
+{\footnotesize\ttfamily \label{structbackend__functions_abbec50b32eb89bc1f481ed99585e3968} 
+\mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366}{yh\+\_\+rc}}(\texorpdfstring{$\ast$}{*} backend\+\_\+functions\+::backend\+\_\+option) (\mbox{\hyperlink{lib_2internal_8h_af0b8c5ac57556b935ae71249ec6cc388}{yh\+\_\+backend}} \texorpdfstring{$\ast$}{*}connection, \mbox{\hyperlink{yubihsm_8h_a59400bce0478b88e048d5e62b2b0b015}{yh\+\_\+connector\+\_\+option}} opt, const void \texorpdfstring{$\ast$}{*}val)}
+
+
+
+Definition at line \mbox{\hyperlink{lib_2internal_8h_source_l00072}{72}} of file \mbox{\hyperlink{lib_2internal_8h_source}{internal.\+h}}.
+
+\Hypertarget{structbackend__functions_a4dad210af1fab02bdb7719679725a84d}\index{backend\_functions@{backend\_functions}!backend\_send\_msg@{backend\_send\_msg}}
+\index{backend\_send\_msg@{backend\_send\_msg}!backend\_functions@{backend\_functions}}
+\doxysubsubsection{\texorpdfstring{backend\_send\_msg}{backend\_send\_msg}}
+{\footnotesize\ttfamily \label{structbackend__functions_a4dad210af1fab02bdb7719679725a84d} 
+\mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366}{yh\+\_\+rc}}(\texorpdfstring{$\ast$}{*} backend\+\_\+functions\+::backend\+\_\+send\+\_\+msg) (\mbox{\hyperlink{lib_2internal_8h_af0b8c5ac57556b935ae71249ec6cc388}{yh\+\_\+backend}} \texorpdfstring{$\ast$}{*}connection, \mbox{\hyperlink{scp_8h_a2026a4fe4ea2811a4929044067ea1718}{Msg}} \texorpdfstring{$\ast$}{*}msg, \mbox{\hyperlink{scp_8h_a2026a4fe4ea2811a4929044067ea1718}{Msg}} \texorpdfstring{$\ast$}{*}response)}
+
+
+
+Definition at line \mbox{\hyperlink{lib_2internal_8h_source_l00070}{70}} of file \mbox{\hyperlink{lib_2internal_8h_source}{internal.\+h}}.
+
+\Hypertarget{structbackend__functions_a43145be40370fc6e1547a6e1c869d77b}\index{backend\_functions@{backend\_functions}!backend\_set\_verbosity@{backend\_set\_verbosity}}
+\index{backend\_set\_verbosity@{backend\_set\_verbosity}!backend\_functions@{backend\_functions}}
+\doxysubsubsection{\texorpdfstring{backend\_set\_verbosity}{backend\_set\_verbosity}}
+{\footnotesize\ttfamily \label{structbackend__functions_a43145be40370fc6e1547a6e1c869d77b} 
+void(\texorpdfstring{$\ast$}{*} backend\+\_\+functions\+::backend\+\_\+set\+\_\+verbosity) (\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} verbosity, FILE \texorpdfstring{$\ast$}{*}output)}
+
+
+
+Definition at line \mbox{\hyperlink{lib_2internal_8h_source_l00074}{74}} of file \mbox{\hyperlink{lib_2internal_8h_source}{internal.\+h}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/yubihsm/lib/\mbox{\hyperlink{lib_2internal_8h}{internal.\+h}}\end{DoxyCompactItemize}

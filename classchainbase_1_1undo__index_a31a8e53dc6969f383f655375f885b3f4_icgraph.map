@@ -1,0 +1,31 @@
+<map id="chainbase::undo_index::modify" name="chainbase::undo_index::modify">
+<area shape="rect" id="Node000001" title=" " alt="" coords="238,319,392,360"/>
+<area shape="rect" id="Node000002" href="$undo__index_8cpp.html#a1126d3f6309e1cfc2422b3ffe469b51e" title=" " alt="" coords="5,5,190,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="306,304,295,247,273,176,257,140,238,105,215,72,188,44,172,34,175,29,191,40,219,69,243,102,262,138,278,174,300,245,311,303"/>
+<area shape="rect" id="Node000003" href="$undo__index_8cpp.html#acb0bc2f5ed31de013ef5759cfd5193bf" title=" " alt="" coords="5,55,190,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="303,304,289,256,266,199,232,142,212,116,188,94,171,83,174,79,191,89,216,113,237,139,270,197,294,255,308,303"/>
+<area shape="rect" id="Node000004" href="$undo__index_8cpp.html#a5bdceaa986df664988e19fa18b37e459" title=" " alt="" coords="5,104,190,130"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="299,306,282,268,258,224,227,180,188,143,169,133,172,128,191,139,231,176,263,221,287,265,304,304"/>
+<area shape="rect" id="Node000005" href="$undo__index_8cpp.html#ade06c047298c551422cfe3fd33ad1ca0" title=" " alt="" coords="5,153,190,179"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="292,307,249,248,221,218,188,192,167,182,169,177,191,188,224,214,253,244,296,304"/>
+<area shape="rect" id="Node000006" href="$undo__index_8cpp.html#a5f6f2f5e97f312c11b1acd2d55a9a7e1" title=" " alt="" coords="5,203,190,228"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="281,311,239,275,188,242,162,231,164,226,191,237,242,270,285,306"/>
+<area shape="rect" id="Node000007" href="$undo__index_8cpp.html#a3f205022b7d0d63e828c8e5d68a133d3" title=" " alt="" coords="5,252,190,278"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="252,315,189,291,154,281,155,276,191,286,253,310"/>
+<area shape="rect" id="Node000008" href="$undo__index_8cpp.html#aca764e359678c5ec9eeb19647299297e" title=" " alt="" coords="5,301,190,327"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="222,331,190,328,191,322,222,326"/>
+<area shape="rect" id="Node000009" href="$undo__index_8cpp.html#ab9c902ca2f9b11f45ebac16840d11c1b" title=" " alt="" coords="5,351,190,376"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="222,352,191,356,190,351,222,347"/>
+<area shape="rect" id="Node000010" href="$undo__index_8cpp.html#ad8cec93200fdc4d4dcd219a56a9c9c03" title=" " alt="" coords="5,400,190,426"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="252,368,191,391,155,402,153,397,189,386,250,363"/>
+<area shape="rect" id="Node000011" href="$undo__index_8cpp.html#a34160b481dabf97ef426c3e0dc2aec28" title=" " alt="" coords="5,449,190,475"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="284,372,242,408,191,441,164,451,162,446,188,436,239,404,281,368"/>
+<area shape="rect" id="Node000012" href="$undo__index_8cpp.html#a57d440011f63bde88372008127105d7c" title=" " alt="" coords="5,499,190,524"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="296,375,253,434,224,464,191,490,169,500,167,496,188,485,220,460,249,430,292,372"/>
+<area shape="rect" id="Node000013" href="$undo__index_8cpp.html#a5edf87a5d1775d0edcda10adcd72cb89" title=" " alt="" coords="5,548,190,574"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="304,375,287,414,262,458,231,502,191,539,172,550,169,545,188,535,227,498,258,455,282,411,299,373"/>
+<area shape="rect" id="Node000014" href="$undo__index_8cpp.html#ae9edcfd8e52175384b424bc555cc96f5" title=" " alt="" coords="5,597,190,623"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="308,376,294,424,270,481,237,539,216,565,191,588,174,599,171,594,188,584,212,562,232,536,265,479,289,422,303,374"/>
+<area shape="rect" id="Node000015" href="$undo__index_8cpp.html#a5b6cc8baab9875dd6ddd8c66394ec8a6" title=" " alt="" coords="5,647,190,672"/>
+<area shape="poly" id="edge14_Node000001_Node000015" title=" " alt="" coords="311,376,300,433,278,504,262,540,243,576,219,609,191,638,175,648,172,644,188,633,215,605,238,573,257,538,273,502,295,432,306,375"/>
+</map>

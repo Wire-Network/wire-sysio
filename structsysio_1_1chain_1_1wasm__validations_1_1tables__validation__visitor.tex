@@ -1,0 +1,46 @@
+\doxysection{sysio\+::chain\+::wasm\+\_\+validations\+::tables\+\_\+validation\+\_\+visitor Struct Reference}
+\hypertarget{structsysio_1_1chain_1_1wasm__validations_1_1tables__validation__visitor}{}\label{structsysio_1_1chain_1_1wasm__validations_1_1tables__validation__visitor}\index{sysio::chain::wasm\_validations::tables\_validation\_visitor@{sysio::chain::wasm\_validations::tables\_validation\_visitor}}
+
+
+{\ttfamily \#include $<$wasm\+\_\+sysio\+\_\+validation.\+hpp$>$}
+
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static void \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__validations_1_1tables__validation__visitor_a7e31685172851e7cb3a219408f078cce}{validate}} (const \mbox{\hyperlink{struct_i_r_1_1_module}{IR\+::\+Module}} \&m)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__validation_8hpp_source_l00030}{30}} of file \mbox{\hyperlink{wasm__sysio__validation_8hpp_source}{wasm\+\_\+sysio\+\_\+validation.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1chain_1_1wasm__validations_1_1tables__validation__visitor_a7e31685172851e7cb3a219408f078cce}\index{sysio::chain::wasm\_validations::tables\_validation\_visitor@{sysio::chain::wasm\_validations::tables\_validation\_visitor}!validate@{validate}}
+\index{validate@{validate}!sysio::chain::wasm\_validations::tables\_validation\_visitor@{sysio::chain::wasm\_validations::tables\_validation\_visitor}}
+\doxysubsubsection{\texorpdfstring{validate()}{validate()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__validations_1_1tables__validation__visitor_a7e31685172851e7cb3a219408f078cce} 
+void sysio\+::chain\+::wasm\+\_\+validations\+::tables\+\_\+validation\+\_\+visitor\+::validate (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct_i_r_1_1_module}{IR\+::\+Module}} \&}]{m}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__validation_8cpp_source_l00034}{34}} of file \mbox{\hyperlink{wasm__sysio__validation_8cpp_source}{wasm\+\_\+sysio\+\_\+validation.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00035\ \ \ \ \textcolor{keywordflow}{if}\ (\ m.\mbox{\hyperlink{struct_i_r_1_1_module_a3093728dba0995da777601adf56082d1}{tables}}.defs.size()\ \&\&\ m.\mbox{\hyperlink{struct_i_r_1_1_module_a3093728dba0995da777601adf56082d1}{tables}}.defs[0].type.size.min\ >\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__constraints_a5b3cafcc3f7db0bb1161d9fd9528841a}{wasm\_constraints::maximum\_table\_elements}}\ )}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(wasm\_execution\_error,\ \textcolor{stringliteral}{"{}Smart\ contract\ table\ limited\ to\ \$\{t\}\ elements"{}},\ }
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}t"{}},\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__constraints_a5b3cafcc3f7db0bb1161d9fd9528841a}{wasm\_constraints::maximum\_table\_elements}}));}
+\DoxyCodeLine{00038\ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{wasm__sysio__validation_8hpp}{wasm\+\_\+sysio\+\_\+validation.\+hpp}}\item 
+libraries/chain/\mbox{\hyperlink{wasm__sysio__validation_8cpp}{wasm\+\_\+sysio\+\_\+validation.\+cpp}}\end{DoxyCompactItemize}

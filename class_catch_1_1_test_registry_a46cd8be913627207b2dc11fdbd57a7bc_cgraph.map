@@ -1,0 +1,12 @@
+<map id="Catch::TestRegistry::getAllTestsSorted" name="Catch::TestRegistry::getAllTestsSorted">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,35,144,75"/>
+<area shape="rect" id="Node000002" href="$namespace_catch.html#a71e3432f494f89c9e406cbd6e3baab38" title=" " alt="" coords="192,5,371,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="143,43,176,38,177,43,144,48"/>
+<area shape="rect" id="Node000003" href="$namespace_catch.html#aa94535d4e961ebfefc7f95cf25f949c4" title=" " alt="" coords="222,70,340,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="144,62,207,70,207,76,143,67"/>
+<area shape="rect" id="Node000004" href="$namespace_catch.html#adf13e77187ae9bc5d7cd1bb29c1ba7e9" title=" " alt="" coords="583,70,666,96"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="341,80,568,80,568,86,341,86"/>
+<area shape="rect" id="Node000005" href="$namespace_catch.html#a161400810eb0995394d6d8d3cae821ad" title=" " alt="" coords="419,96,535,121"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="341,88,404,96,404,102,341,93"/>
+<area shape="poly" id="edge5_Node000005_Node000004" title=" " alt="" coords="535,96,567,90,568,95,536,101"/>
+</map>

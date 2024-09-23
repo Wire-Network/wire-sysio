@@ -1,0 +1,6 @@
+<map id="PrettyWriter::String" name="PrettyWriter::String">
+<area shape="rect" id="Node000001" title="Simpler but slower overload." alt="" coords="5,29,138,55"/>
+<area shape="poly" id="edge1_Node000001_Node000001" title=" " alt="" coords="43,30,37,21,41,11,52,5,72,3,92,5,103,12,100,16,90,10,71,8,54,10,45,15,43,20,47,28"/>
+<area shape="rect" id="Node000002" href="$namespaceinternal.html#a86326fb0c9d7c7ea8edd7deedbb2b26e" title="Custom strlen() which works on different character types." alt="" coords="186,29,295,55"/>
+<area shape="poly" id="edge2_Node000001_Node000002" title=" " alt="" coords="138,40,170,40,170,45,138,45"/>
+</map>

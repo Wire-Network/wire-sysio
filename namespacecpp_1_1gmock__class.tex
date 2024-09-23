@@ -1,0 +1,327 @@
+\doxysection{cpp.\+gmock\+\_\+class Namespace Reference}
+\hypertarget{namespacecpp_1_1gmock__class}{}\label{namespacecpp_1_1gmock__class}\index{cpp.gmock\_class@{cpp.gmock\_class}}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacecpp_1_1gmock__class_ab7951ac071cce54c62f7eca4262820a1}{\+\_\+\+Generate\+Methods}} (output\+\_\+lines, \mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}}, class\+\_\+node)
+\item 
+\mbox{\hyperlink{namespacecpp_1_1gmock__class_aab4e7f3244efb6cead21f4a51fc9ca5e}{\+\_\+\+Generate\+Mocks}} (filename, \mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}}, ast\+\_\+list, desired\+\_\+class\+\_\+names)
+\item 
+\mbox{\hyperlink{namespacecpp_1_1gmock__class_a3d6f1153474842c967c17ff866e1af88}{main}} (\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}=sys.\+argv)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacecpp_1_1gmock__class_ab4128a969856897356b7956c5ba4fc01}{\+\_\+dummy}} = \mbox{\hyperlink{namespacecpp_1_1gmock__class_a2157e96eee0b4bf9ca6d195ab76f59c2}{set}}
+\item 
+\mbox{\hyperlink{namespacecpp_1_1gmock__class_a2157e96eee0b4bf9ca6d195ab76f59c2}{set}} = sets.\+Set
+\item 
+tuple \mbox{\hyperlink{namespacecpp_1_1gmock__class_ae5d7185c5f485142460e91de1394283c}{\+\_\+\+VERSION}} = (1, 0, 1)
+\item 
+int \mbox{\hyperlink{namespacecpp_1_1gmock__class_aa09d38d618dd2e76366852c660a832e8}{\+\_\+\+INDENT}} = 2
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\begin{DoxyVerb}Generate Google Mock classes from base classes.
+
+This program will read in a C++ source file and output the Google Mock
+classes for the specified classes.  If no class is specified, all
+classes in the source file are emitted.
+
+Usage:
+  gmock_class.py header-file.h [ClassName]...
+
+Output is sent to stdout.
+\end{DoxyVerb}
+ 
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacecpp_1_1gmock__class_ab7951ac071cce54c62f7eca4262820a1}\index{cpp.gmock\_class@{cpp.gmock\_class}!\_GenerateMethods@{\_GenerateMethods}}
+\index{\_GenerateMethods@{\_GenerateMethods}!cpp.gmock\_class@{cpp.gmock\_class}}
+\doxysubsubsection{\texorpdfstring{\_GenerateMethods()}{\_GenerateMethods()}}
+{\footnotesize\ttfamily \label{namespacecpp_1_1gmock__class_ab7951ac071cce54c62f7eca4262820a1} 
+cpp.\+gmock\+\_\+class.\+\_\+\+Generate\+Methods (\begin{DoxyParamCaption}\item[{}]{output\+\_\+lines}{, }\item[{}]{source}{, }\item[{}]{class\+\_\+node}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock__class_8py_source_l00051}{51}} of file \mbox{\hyperlink{gmock__class_8py_source}{gmock\+\_\+class.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00051\ \textcolor{keyword}{def\ }\_GenerateMethods(output\_lines,\ source,\ class\_node):}
+\DoxyCodeLine{00052\ \ \ function\_type\ =\ (ast.FUNCTION\_VIRTUAL\ |\ ast.FUNCTION\_PURE\_VIRTUAL\ |}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ast.FUNCTION\_OVERRIDE)}
+\DoxyCodeLine{00054\ \ \ ctor\_or\_dtor\ =\ ast.FUNCTION\_CTOR\ |\ ast.FUNCTION\_DTOR}
+\DoxyCodeLine{00055\ \ \ indent\ =\ \textcolor{stringliteral}{'\ '}\ *\ \_INDENT}
+\DoxyCodeLine{00056\ }
+\DoxyCodeLine{00057\ \ \ \textcolor{keywordflow}{for}\ node\ \textcolor{keywordflow}{in}\ class\_node.body:}
+\DoxyCodeLine{00058\ \ \ \ \ \textcolor{comment}{\#\ We\ only\ care\ about\ virtual\ functions.}}
+\DoxyCodeLine{00059\ \ \ \ \ \textcolor{keywordflow}{if}\ (isinstance(node,\ ast.Function)\ \textcolor{keywordflow}{and}}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ node.modifiers\ \&\ function\_type\ \textcolor{keywordflow}{and}}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{not}\ node.modifiers\ \&\ ctor\_or\_dtor):}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \textcolor{comment}{\#\ Pick\ out\ all\ the\ elements\ we\ need\ from\ the\ original\ function.}}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ const\ =\ \textcolor{stringliteral}{''}}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ node.modifiers\ \&\ ast.FUNCTION\_CONST:}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ const\ =\ \textcolor{stringliteral}{'CONST\_'}}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ return\_type\ =\ \textcolor{stringliteral}{'void'}}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ node.return\_type:}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Add\ modifiers\ like\ 'const'.}}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ modifiers\ =\ \textcolor{stringliteral}{''}}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ node.return\_type.modifiers:}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \ modifiers\ =\ \textcolor{stringliteral}{'\ '}.join(node.return\_type.modifiers)\ +\ \textcolor{stringliteral}{'\ '}}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ return\_type\ =\ modifiers\ +\ node.return\_type.name}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ template\_args\ =\ [arg.name\ \textcolor{keywordflow}{for}\ arg\ \textcolor{keywordflow}{in}\ node.return\_type.templated\_types]}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ template\_args:}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \ return\_type\ +=\ \textcolor{stringliteral}{'<'}\ +\ \textcolor{stringliteral}{',\ '}.join(template\_args)\ +\ \textcolor{stringliteral}{'>'}}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}(template\_args)\ >\ 1:}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ line\ \textcolor{keywordflow}{in}\ [}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'//\ The\ following\ line\ won\(\backslash\)'t\ really\ compile,\ as\ the\ return'},}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'//\ type\ has\ multiple\ template\ arguments.\ \ To\ fix\ it,\ use\ a'},}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'//\ typedef\ for\ the\ return\ type.'}]:}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ output\_lines.append(indent\ +\ line)}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ node.return\_type.pointer:}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \ return\_type\ +=\ \textcolor{stringliteral}{'*'}}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ node.return\_type.reference:}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \ \ return\_type\ +=\ \textcolor{stringliteral}{'\&'}}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ num\_parameters\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}(node.parameters)}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}(node.parameters)\ ==\ 1:}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \ first\_param\ =\ node.parameters[0]}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ source[first\_param.start:first\_param.end].strip()\ ==\ \textcolor{stringliteral}{'void'}:}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ We\ must\ treat\ T(void)\ as\ a\ function\ with\ no\ parameters.}}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ \ \ num\_parameters\ =\ 0}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ tmpl\ =\ \textcolor{stringliteral}{''}}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ class\_node.templated\_types:}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ tmpl\ =\ \textcolor{stringliteral}{'\_T'}}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ mock\_method\_macro\ =\ \textcolor{stringliteral}{'MOCK\_\%sMETHOD\%d\%s'}\ \%\ (const,\ num\_parameters,\ tmpl)}
+\DoxyCodeLine{00096\ }
+\DoxyCodeLine{00097\ \ \ \ \ \ \ args\ =\ \textcolor{stringliteral}{''}}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ node.parameters:}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Due\ to\ the\ parser\ limitations,\ it\ is\ impossible\ to\ keep\ comments}}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ while\ stripping\ the\ default\ parameters.\ \ When\ defaults\ are}}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ present,\ we\ choose\ to\ strip\ them\ and\ comments\ (and\ produce}}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ compilable\ code).}}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ TODO(nnorwitz@google.com):\ Investigate\ whether\ it\ is\ possible\ to}}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ preserve\ parameter\ name\ when\ reconstructing\ parameter\ text\ from}}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ the\ AST.}}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}([param\ \textcolor{keywordflow}{for}\ param\ \textcolor{keywordflow}{in}\ node.parameters\ \textcolor{keywordflow}{if}\ param.default])\ >\ 0:}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \ \ args\ =\ \textcolor{stringliteral}{',\ '}.join(param.type.name\ \textcolor{keywordflow}{for}\ param\ \textcolor{keywordflow}{in}\ node.parameters)}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Get\ the\ full\ text\ of\ the\ parameters\ from\ the\ start}}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ of\ the\ first\ parameter\ to\ the\ end\ of\ the\ last\ parameter.}}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \ \ start\ =\ node.parameters[0].start}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \ \ end\ =\ node.parameters[-\/1].end}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Remove\ //\ comments.}}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \ \ args\_strings\ =\ re.sub(\textcolor{stringliteral}{r'//.*'},\ \textcolor{stringliteral}{''},\ source[start:end])}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Condense\ multiple\ spaces\ and\ eliminate\ newlines\ putting\ the}}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ parameters\ together\ on\ a\ single\ line.\ \ Ensure\ there\ is\ a}}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ space\ in\ an\ argument\ which\ is\ split\ by\ a\ newline\ without}}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ intervening\ whitespace,\ e.g.:\ int\(\backslash\)nBar}}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ \ args\ =\ re.sub(\textcolor{stringliteral}{'\ \ +'},\ \textcolor{stringliteral}{'\ '},\ args\_strings.replace(\textcolor{stringliteral}{'\(\backslash\)n'},\ \textcolor{stringliteral}{'\ '}))}
+\DoxyCodeLine{00120\ }
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \textcolor{comment}{\#\ Create\ the\ mock\ method\ definition.}}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ output\_lines.extend([\textcolor{stringliteral}{'\%s\%s(\%s,'}\ \%\ (indent,\ mock\_method\_macro,\ node.name),}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'\%s\%s(\%s));'}\ \%\ (indent*3,\ return\_type,\ args)])}
+\DoxyCodeLine{00124\ }
+\DoxyCodeLine{00125\ }
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacecpp_1_1gmock__class_ab7951ac071cce54c62f7eca4262820a1_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacecpp_1_1gmock__class_aab4e7f3244efb6cead21f4a51fc9ca5e}\index{cpp.gmock\_class@{cpp.gmock\_class}!\_GenerateMocks@{\_GenerateMocks}}
+\index{\_GenerateMocks@{\_GenerateMocks}!cpp.gmock\_class@{cpp.gmock\_class}}
+\doxysubsubsection{\texorpdfstring{\_GenerateMocks()}{\_GenerateMocks()}}
+{\footnotesize\ttfamily \label{namespacecpp_1_1gmock__class_aab4e7f3244efb6cead21f4a51fc9ca5e} 
+cpp.\+gmock\+\_\+class.\+\_\+\+Generate\+Mocks (\begin{DoxyParamCaption}\item[{}]{filename}{, }\item[{}]{source}{, }\item[{}]{ast\+\_\+list}{, }\item[{}]{desired\+\_\+class\+\_\+names}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock__class_8py_source_l00126}{126}} of file \mbox{\hyperlink{gmock__class_8py_source}{gmock\+\_\+class.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00126\ \textcolor{keyword}{def\ }\_GenerateMocks(filename,\ source,\ ast\_list,\ desired\_class\_names):}
+\DoxyCodeLine{00127\ \ \ processed\_class\_names\ =\ set()}
+\DoxyCodeLine{00128\ \ \ lines\ =\ []}
+\DoxyCodeLine{00129\ \ \ \textcolor{keywordflow}{for}\ node\ \textcolor{keywordflow}{in}\ ast\_list:}
+\DoxyCodeLine{00130\ \ \ \ \ \textcolor{keywordflow}{if}\ (isinstance(node,\ ast.Class)\ \textcolor{keywordflow}{and}\ node.body\ \textcolor{keywordflow}{and}}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ desired\_class\_names\ being\ None\ means\ that\ all\ classes\ are\ selected.}}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ (\textcolor{keywordflow}{not}\ desired\_class\_names\ \textcolor{keywordflow}{or}\ node.name\ \textcolor{keywordflow}{in}\ desired\_class\_names)):}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ class\_name\ =\ node.name}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ parent\_name\ =\ class\_name}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ processed\_class\_names.add(class\_name)}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ class\_node\ =\ node}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \textcolor{comment}{\#\ Add\ namespace\ before\ the\ class.}}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ class\_node.namespace:}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ lines.extend([\textcolor{stringliteral}{'namespace\ \%s\ \{'}\ \%\ n\ \textcolor{keywordflow}{for}\ n\ \textcolor{keywordflow}{in}\ class\_node.namespace])\ \ \textcolor{comment}{\#\ \}}}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ lines.append(\textcolor{stringliteral}{''})}
+\DoxyCodeLine{00141\ }
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \textcolor{comment}{\#\ Add\ template\ args\ for\ templated\ classes.}}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ class\_node.templated\_types:}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ TODO(paulchang):\ The\ AST\ doesn't\ preserve\ template\ argument\ order,}}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ so\ we\ have\ to\ make\ up\ names\ here.}}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ TODO(paulchang):\ Handle\ non-\/type\ template\ arguments\ (e.g.}}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ template<typename\ T,\ int\ N>).}}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ template\_arg\_count\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}(class\_node.templated\_types.keys())}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ template\_args\ =\ [\textcolor{stringliteral}{'T\%d'}\ \%\ n\ \textcolor{keywordflow}{for}\ n\ \textcolor{keywordflow}{in}\ range(template\_arg\_count)]}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ template\_decls\ =\ [\textcolor{stringliteral}{'typename\ '}\ +\ arg\ \textcolor{keywordflow}{for}\ arg\ \textcolor{keywordflow}{in}\ template\_args]}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ lines.append(\textcolor{stringliteral}{'template\ <'}\ +\ \textcolor{stringliteral}{',\ '}.join(template\_decls)\ +\ \textcolor{stringliteral}{'>'})}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ parent\_name\ +=\ \textcolor{stringliteral}{'<'}\ +\ \textcolor{stringliteral}{',\ '}.join(template\_args)\ +\ \textcolor{stringliteral}{'>'}}
+\DoxyCodeLine{00153\ }
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \textcolor{comment}{\#\ Add\ the\ class\ prolog.}}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ lines.append(\textcolor{stringliteral}{'class\ Mock\%s\ :\ public\ \%s\ \{'}\ \ \textcolor{comment}{\#\ \}}}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \%\ (class\_name,\ parent\_name))}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ lines.append(\textcolor{stringliteral}{'\%spublic:'}\ \%\ (\textcolor{stringliteral}{'\ '}\ *\ (\_INDENT\ //\ 2)))}
+\DoxyCodeLine{00158\ }
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \textcolor{comment}{\#\ Add\ all\ the\ methods.}}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \_GenerateMethods(lines,\ source,\ class\_node)}
+\DoxyCodeLine{00161\ }
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \textcolor{comment}{\#\ Close\ the\ class.}}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ lines:}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ If\ there\ are\ no\ virtual\ methods,\ no\ need\ for\ a\ public\ label.}}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}(lines)\ ==\ 2:}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \ \ del\ lines[-\/1]}
+\DoxyCodeLine{00167\ }
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Only\ close\ the\ class\ if\ there\ really\ is\ a\ class.}}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ lines.append(\textcolor{stringliteral}{'\};'})}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ lines.append(\textcolor{stringliteral}{''})\ \ \textcolor{comment}{\#\ Add\ an\ extra\ newline.}}
+\DoxyCodeLine{00171\ }
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \textcolor{comment}{\#\ Close\ the\ namespace.}}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ class\_node.namespace:}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ i\ \textcolor{keywordflow}{in}\ range(\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}(class\_node.namespace)-\/1,\ -\/1,\ -\/1):}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \ \ lines.append(\textcolor{stringliteral}{'\}\ \ //\ namespace\ \%s'}\ \%\ class\_node.namespace[i])}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ lines.append(\textcolor{stringliteral}{''})\ \ \textcolor{comment}{\#\ Add\ an\ extra\ newline.}}
+\DoxyCodeLine{00177\ }
+\DoxyCodeLine{00178\ \ \ \textcolor{keywordflow}{if}\ desired\_class\_names:}
+\DoxyCodeLine{00179\ \ \ \ \ missing\_class\_name\_list\ =\ list(desired\_class\_names\ -\/\ processed\_class\_names)}
+\DoxyCodeLine{00180\ \ \ \ \ \textcolor{keywordflow}{if}\ missing\_class\_name\_list:}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ missing\_class\_name\_list.sort()}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ sys.stderr.write(\textcolor{stringliteral}{'Class(es)\ not\ found\ in\ \%s:\ \%s\(\backslash\)n'}\ \%}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (filename,\ \textcolor{stringliteral}{',\ '}.join(missing\_class\_name\_list)))}
+\DoxyCodeLine{00184\ \ \ \textcolor{keywordflow}{elif}\ \textcolor{keywordflow}{not}\ processed\_class\_names:}
+\DoxyCodeLine{00185\ \ \ \ \ sys.stderr.write(\textcolor{stringliteral}{'No\ class\ found\ in\ \%s\(\backslash\)n'}\ \%\ filename)}
+\DoxyCodeLine{00186\ }
+\DoxyCodeLine{00187\ \ \ \textcolor{keywordflow}{return}\ lines}
+\DoxyCodeLine{00188\ }
+\DoxyCodeLine{00189\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacecpp_1_1gmock__class_aab4e7f3244efb6cead21f4a51fc9ca5e_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacecpp_1_1gmock__class_aab4e7f3244efb6cead21f4a51fc9ca5e_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacecpp_1_1gmock__class_a3d6f1153474842c967c17ff866e1af88}\index{cpp.gmock\_class@{cpp.gmock\_class}!main@{main}}
+\index{main@{main}!cpp.gmock\_class@{cpp.gmock\_class}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{namespacecpp_1_1gmock__class_a3d6f1153474842c967c17ff866e1af88} 
+cpp.\+gmock\+\_\+class.\+main (\begin{DoxyParamCaption}\item[{}]{argv}{ = {\ttfamily sys.argv}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gmock__class_8py_source_l00190}{190}} of file \mbox{\hyperlink{gmock__class_8py_source}{gmock\+\_\+class.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00190\ \textcolor{keyword}{def\ }\mbox{\hyperlink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}(argv=sys.argv):}
+\DoxyCodeLine{00191\ \ \ \textcolor{keywordflow}{if}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}(argv)\ <\ 2:}
+\DoxyCodeLine{00192\ \ \ \ \ sys.stderr.write(\textcolor{stringliteral}{'Google\ Mock\ Class\ Generator\ v\%s\(\backslash\)n\(\backslash\)n'}\ \%}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'.'}.join(map(str,\ \_VERSION)))}
+\DoxyCodeLine{00194\ \ \ \ \ sys.stderr.write(\_\_doc\_\_)}
+\DoxyCodeLine{00195\ \ \ \ \ \textcolor{keywordflow}{return}\ 1}
+\DoxyCodeLine{00196\ }
+\DoxyCodeLine{00197\ \ \ \textcolor{keyword}{global}\ \_INDENT}
+\DoxyCodeLine{00198\ \ \ \textcolor{keywordflow}{try}:}
+\DoxyCodeLine{00199\ \ \ \ \ \_INDENT\ =\ int(os.environ[\textcolor{stringliteral}{'INDENT'}])}
+\DoxyCodeLine{00200\ \ \ \textcolor{keywordflow}{except}\ KeyError:}
+\DoxyCodeLine{00201\ \ \ \ \ \textcolor{keywordflow}{pass}}
+\DoxyCodeLine{00202\ \ \ \textcolor{keywordflow}{except}:}
+\DoxyCodeLine{00203\ \ \ \ \ sys.stderr.write(\textcolor{stringliteral}{'Unable\ to\ use\ indent\ of\ \%s\(\backslash\)n'}\ \%\ os.environ.get(\textcolor{stringliteral}{'INDENT'}))}
+\DoxyCodeLine{00204\ }
+\DoxyCodeLine{00205\ \ \ filename\ =\ argv[1]}
+\DoxyCodeLine{00206\ \ \ desired\_class\_names\ =\ \textcolor{keywordtype}{None}\ \ \textcolor{comment}{\#\ None\ means\ all\ classes\ in\ the\ source\ file.}}
+\DoxyCodeLine{00207\ \ \ \textcolor{keywordflow}{if}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}(argv)\ >=\ 3:}
+\DoxyCodeLine{00208\ \ \ \ \ desired\_class\_names\ =\ set(argv[2:])}
+\DoxyCodeLine{00209\ \ \ source\ =\ utils.ReadFile(filename)}
+\DoxyCodeLine{00210\ \ \ \textcolor{keywordflow}{if}\ source\ \textcolor{keywordflow}{is}\ \textcolor{keywordtype}{None}:}
+\DoxyCodeLine{00211\ \ \ \ \ \textcolor{keywordflow}{return}\ 1}
+\DoxyCodeLine{00212\ }
+\DoxyCodeLine{00213\ \ \ builder\ =\ ast.BuilderFromSource(source,\ filename)}
+\DoxyCodeLine{00214\ \ \ \textcolor{keywordflow}{try}:}
+\DoxyCodeLine{00215\ \ \ \ \ entire\_ast\ =\ filter(\textcolor{keywordtype}{None},\ builder.Generate())}
+\DoxyCodeLine{00216\ \ \ \textcolor{keywordflow}{except}\ KeyboardInterrupt:}
+\DoxyCodeLine{00217\ \ \ \ \ \textcolor{keywordflow}{return}}
+\DoxyCodeLine{00218\ \ \ \textcolor{keywordflow}{except}:}
+\DoxyCodeLine{00219\ \ \ \ \ \textcolor{comment}{\#\ An\ error\ message\ was\ already\ printed\ since\ we\ couldn't\ parse.}}
+\DoxyCodeLine{00220\ \ \ \ \ sys.exit(1)}
+\DoxyCodeLine{00221\ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{00222\ \ \ \ \ lines\ =\ \_GenerateMocks(filename,\ source,\ entire\_ast,\ desired\_class\_names)}
+\DoxyCodeLine{00223\ \ \ \ \ sys.stdout.write(\textcolor{stringliteral}{'\(\backslash\)n'}.join(lines))}
+\DoxyCodeLine{00224\ }
+\DoxyCodeLine{00225\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacecpp_1_1gmock__class_a3d6f1153474842c967c17ff866e1af88_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{namespacecpp_1_1gmock__class_ab4128a969856897356b7956c5ba4fc01}\index{cpp.gmock\_class@{cpp.gmock\_class}!\_dummy@{\_dummy}}
+\index{\_dummy@{\_dummy}!cpp.gmock\_class@{cpp.gmock\_class}}
+\doxysubsubsection{\texorpdfstring{\_dummy}{\_dummy}}
+{\footnotesize\ttfamily \label{namespacecpp_1_1gmock__class_ab4128a969856897356b7956c5ba4fc01} 
+cpp.\+gmock\+\_\+class.\+\_\+dummy = \mbox{\hyperlink{namespacecpp_1_1gmock__class_a2157e96eee0b4bf9ca6d195ab76f59c2}{set}}\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock__class_8py_source_l00041}{41}} of file \mbox{\hyperlink{gmock__class_8py_source}{gmock\+\_\+class.\+py}}.
+
+\Hypertarget{namespacecpp_1_1gmock__class_aa09d38d618dd2e76366852c660a832e8}\index{cpp.gmock\_class@{cpp.gmock\_class}!\_INDENT@{\_INDENT}}
+\index{\_INDENT@{\_INDENT}!cpp.gmock\_class@{cpp.gmock\_class}}
+\doxysubsubsection{\texorpdfstring{\_INDENT}{\_INDENT}}
+{\footnotesize\ttfamily \label{namespacecpp_1_1gmock__class_aa09d38d618dd2e76366852c660a832e8} 
+int cpp.\+gmock\+\_\+class.\+\_\+\+INDENT = 2\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock__class_8py_source_l00048}{48}} of file \mbox{\hyperlink{gmock__class_8py_source}{gmock\+\_\+class.\+py}}.
+
+\Hypertarget{namespacecpp_1_1gmock__class_ae5d7185c5f485142460e91de1394283c}\index{cpp.gmock\_class@{cpp.gmock\_class}!\_VERSION@{\_VERSION}}
+\index{\_VERSION@{\_VERSION}!cpp.gmock\_class@{cpp.gmock\_class}}
+\doxysubsubsection{\texorpdfstring{\_VERSION}{\_VERSION}}
+{\footnotesize\ttfamily \label{namespacecpp_1_1gmock__class_ae5d7185c5f485142460e91de1394283c} 
+tuple cpp.\+gmock\+\_\+class.\+\_\+\+VERSION = (1, 0, 1)\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock__class_8py_source_l00046}{46}} of file \mbox{\hyperlink{gmock__class_8py_source}{gmock\+\_\+class.\+py}}.
+
+\Hypertarget{namespacecpp_1_1gmock__class_a2157e96eee0b4bf9ca6d195ab76f59c2}\index{cpp.gmock\_class@{cpp.gmock\_class}!set@{set}}
+\index{set@{set}!cpp.gmock\_class@{cpp.gmock\_class}}
+\doxysubsubsection{\texorpdfstring{set}{set}}
+{\footnotesize\ttfamily \label{namespacecpp_1_1gmock__class_a2157e96eee0b4bf9ca6d195ab76f59c2} 
+cpp.\+gmock\+\_\+class.\+set = sets.\+Set}
+
+
+
+Definition at line \mbox{\hyperlink{gmock__class_8py_source_l00044}{44}} of file \mbox{\hyperlink{gmock__class_8py_source}{gmock\+\_\+class.\+py}}.
+

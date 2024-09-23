@@ -1,0 +1,633 @@
+\chapter{Tutorial}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial}{}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial}\index{Tutorial@{Tutorial}}
+This tutorial introduces the basics of the Document Object Model(\+DOM) API.
+
+As shown in \doxysectlink{index}{Usage at a glance}{0}, JSON can be parsed into a DOM, and then the DOM can be queried and modified easily, and finally be converted back to JSON.\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_ValueDocument}{}\doxysection{\texorpdfstring{Value \& Document}{Value \& Document}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_ValueDocument}
+Each JSON value is stored in a type called {\ttfamily Value}. \doxylink{struct_a}{A} {\ttfamily Document}, representing the DOM, contains the root {\ttfamily Value} of the DOM tree. All public types and functions of Rapid\+JSON are defined in the {\ttfamily rapidjson} namespace.\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_QueryValue}{}\doxysection{\texorpdfstring{Query Value}{Query Value}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_QueryValue}
+In this section, we will use excerpt of {\ttfamily \doxylink{tutorial_8cpp}{example/tutorial/tutorial.\+cpp}}.
+
+Assume we have the following JSON stored in a C string ({\ttfamily const char\texorpdfstring{$\ast$}{*} json})\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\{}
+\DoxyCodeLine{\ \ \ \ "{}hello"{}:\ "{}world"{},}
+\DoxyCodeLine{\ \ \ \ "{}t"{}:\ true\ ,}
+\DoxyCodeLine{\ \ \ \ "{}f"{}:\ false,}
+\DoxyCodeLine{\ \ \ \ "{}n"{}:\ null,}
+\DoxyCodeLine{\ \ \ \ "{}i"{}:\ 123,}
+\DoxyCodeLine{\ \ \ \ "{}pi"{}:\ 3.1416,}
+\DoxyCodeLine{\ \ \ \ "{}a"{}:\ [1,\ 2,\ 3,\ 4]}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+Parse it into a {\ttfamily Document}\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{document_8h}{rapidjson/document.h}}"{}}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacerapidjson}{rapidjson}};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ ...}}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_document}{Document}}\ document;}
+\DoxyCodeLine{document.\mbox{\hyperlink{class_generic_document_a901db1678f99a1b550003eed75bc380a}{Parse}}(json);}
+
+\end{DoxyCode}
+
+
+The JSON is now parsed into {\ttfamily document} as a {\itshape DOM tree}\+:
+
+
+
+Since the update to RFC 7159, the root of a conforming JSON document can be any JSON value. In earlier RFC 4627, only objects or arrays were allowed as root values. In this case, the root is an object. 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assert(document.IsObject());}
+
+\end{DoxyCode}
+
+
+Let\textquotesingle{}s query whether a {\ttfamily "{}hello"{}} member exists in the root object. Since a {\ttfamily Value} can contain different types of value, we may need to verify its type and use suitable API to obtain the value. In this example, {\ttfamily "{}hello"{}} member associates with a JSON string. 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assert(document.HasMember(\textcolor{stringliteral}{"{}hello"{}}));}
+\DoxyCodeLine{assert(document[\textcolor{stringliteral}{"{}hello"{}}].IsString());}
+\DoxyCodeLine{\mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}hello\ =\ \%s\(\backslash\)n"{}},\ document[\textcolor{stringliteral}{"{}hello"{}}].GetString());}
+
+\end{DoxyCode}
+
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{hello\ =\ world}
+
+\end{DoxyCode}
+
+
+JSON true/false values are represented as {\ttfamily bool}. 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assert(document[\textcolor{stringliteral}{"{}t"{}}].IsBool());}
+\DoxyCodeLine{\mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}t\ =\ \%s\(\backslash\)n"{}},\ document[\textcolor{stringliteral}{"{}t"{}}].GetBool()\ ?\ \textcolor{stringliteral}{"{}true"{}}\ :\ \textcolor{stringliteral}{"{}false"{}});}
+
+\end{DoxyCode}
+
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{t\ =\ true}
+
+\end{DoxyCode}
+
+
+JSON null can be queried with {\ttfamily Is\+Null()}. 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}n\ =\ \%s\(\backslash\)n"{}},\ document[\textcolor{stringliteral}{"{}n"{}}].IsNull()\ ?\ \textcolor{stringliteral}{"{}null"{}}\ :\ \textcolor{stringliteral}{"{}?"{}});}
+
+\end{DoxyCode}
+
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{n\ =\ null}
+
+\end{DoxyCode}
+
+
+JSON number type represents all numeric values. However, C++ needs more specific type for manipulation.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assert(document[\textcolor{stringliteral}{"{}i"{}}].IsNumber());}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ In\ this\ case,\ IsUint()/IsInt64()/IsUInt64()\ also\ return\ true.}}
+\DoxyCodeLine{assert(document[\textcolor{stringliteral}{"{}i"{}}].IsInt());\ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}i\ =\ \%d\(\backslash\)n"{}},\ document[\textcolor{stringliteral}{"{}i"{}}].GetInt());}
+\DoxyCodeLine{\textcolor{comment}{//\ Alternative\ (int)document["{}i"{}]}}
+\DoxyCodeLine{}
+\DoxyCodeLine{assert(document[\textcolor{stringliteral}{"{}pi"{}}].IsNumber());}
+\DoxyCodeLine{assert(document[\textcolor{stringliteral}{"{}pi"{}}].IsDouble());}
+\DoxyCodeLine{\mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}pi\ =\ \%g\(\backslash\)n"{}},\ document[\textcolor{stringliteral}{"{}pi"{}}].GetDouble());}
+
+\end{DoxyCode}
+
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{i\ =\ 123}
+\DoxyCodeLine{pi\ =\ 3.1416}
+
+\end{DoxyCode}
+
+
+JSON array contains a number of elements. 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{comment}{//\ Using\ a\ reference\ for\ consecutive\ access\ is\ handy\ and\ faster.}}
+\DoxyCodeLine{\textcolor{keyword}{const}\ \mbox{\hyperlink{class_generic_value}{Value}}\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ =\ document[\textcolor{stringliteral}{"{}a"{}}];}
+\DoxyCodeLine{assert(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.IsArray());}
+\DoxyCodeLine{\textcolor{keywordflow}{for}\ (\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.Size();\ i++)\ \textcolor{comment}{//\ Uses\ SizeType\ instead\ of\ size\_t}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}a[\%d]\ =\ \%d\(\backslash\)n"{}},\ i,\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}[i].GetInt());}
+
+\end{DoxyCode}
+
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{a[0]\ =\ 1}
+\DoxyCodeLine{a[1]\ =\ 2}
+\DoxyCodeLine{a[2]\ =\ 3}
+\DoxyCodeLine{a[3]\ =\ 4}
+
+\end{DoxyCode}
+
+
+Note that, Rapid\+JSON does not automatically convert values between JSON types. If a value is a string, it is invalid to call {\ttfamily Get\+Int()}, for example. In debug mode it will fail an assertion. In release mode, the behavior is undefined.
+
+In the following sections we discuss details about querying individual types.\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_QueryArray}{}\doxysubsection{\texorpdfstring{Query Array}{Query Array}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_QueryArray}
+By default, {\ttfamily Size\+Type} is typedef of {\ttfamily unsigned}. In most systems, an array is limited to store up to 2\texorpdfstring{$^\wedge$}{\string^}32-\/1 elements.
+
+You may access the elements in an array by integer literal, for example, {\ttfamily a\mbox{[}0\mbox{]}}, {\ttfamily a\mbox{[}1\mbox{]}}, {\ttfamily a\mbox{[}2\mbox{]}}.
+
+Array is similar to {\ttfamily std\+::vector}\+: instead of using indices, you may also use iterator to access all the elements. 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordflow}{for}\ (\mbox{\hyperlink{class_generic_value}{Value::ConstValueIterator}}\ itr\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.Begin();\ itr\ !=\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.End();\ ++itr)}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\%d\ "{}},\ itr-\/>GetInt());}
+
+\end{DoxyCode}
+
+
+And other familiar query functions\+:
+\begin{DoxyItemize}
+\item {\ttfamily Size\+Type Capacity() const}
+\item {\ttfamily bool Empty() const}
+\end{DoxyItemize}
+
+\doxysubsubsection*{Range-\/based For Loop (New in v1.\+1.\+0)}
+
+When C++11 is enabled, you can use range-\/based for loop to access all elements in an array.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\&\ v\ :\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.GetArray())}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\%d\ "{}},\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.GetInt());}
+
+\end{DoxyCode}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_QueryObject}{}\doxysubsection{\texorpdfstring{Query Object}{Query Object}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_QueryObject}
+Similar to Array, we can access all object members by iterator\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ kTypeNames[]\ =\ }
+\DoxyCodeLine{\ \ \ \ \{\ \textcolor{stringliteral}{"{}Null"{}},\ \textcolor{stringliteral}{"{}False"{}},\ \textcolor{stringliteral}{"{}True"{}},\ \textcolor{stringliteral}{"{}Object"{}},\ \textcolor{stringliteral}{"{}Array"{}},\ \textcolor{stringliteral}{"{}String"{}},\ \textcolor{stringliteral}{"{}Number"{}}\ \};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keywordflow}{for}\ (\mbox{\hyperlink{class_generic_member_iterator}{Value::ConstMemberIterator}}\ itr\ =\ document.MemberBegin();}
+\DoxyCodeLine{\ \ \ \ itr\ !=\ document.MemberEnd();\ ++itr)}
+\DoxyCodeLine{\{}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Type\ of\ member\ \%s\ is\ \%s\(\backslash\)n"{}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ itr-\/>name.GetString(),\ kTypeNames[itr-\/>value.GetType()]);}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{Type\ of\ member\ hello\ is\ String}
+\DoxyCodeLine{Type\ of\ member\ t\ is\ True}
+\DoxyCodeLine{Type\ of\ member\ f\ is\ False}
+\DoxyCodeLine{Type\ of\ member\ n\ is\ Null}
+\DoxyCodeLine{Type\ of\ member\ i\ is\ Number}
+\DoxyCodeLine{Type\ of\ member\ pi\ is\ Number}
+\DoxyCodeLine{Type\ of\ member\ a\ is\ Array}
+
+\end{DoxyCode}
+
+
+Note that, when {\ttfamily operator\mbox{[}$\,$\mbox{]}(const char\texorpdfstring{$\ast$}{*})} cannot find the member, it will fail an assertion.
+
+If we are unsure whether a member exists, we need to call {\ttfamily Has\+Member()} before calling {\ttfamily operator\mbox{[}$\,$\mbox{]}(const char\texorpdfstring{$\ast$}{*})}. However, this incurs two lookup. \doxylink{struct_a}{A} better way is to call {\ttfamily Find\+Member()}, which can check the existence of member and obtain its value at once\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_member_iterator}{Value::ConstMemberIterator}}\ itr\ =\ document.FindMember(\textcolor{stringliteral}{"{}hello"{}});}
+\DoxyCodeLine{\textcolor{keywordflow}{if}\ (itr\ !=\ document.MemberEnd())}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\%s\(\backslash\)n"{}},\ itr-\/>value.GetString());}
+
+\end{DoxyCode}
+
+
+\doxysubsubsection*{Range-\/based For Loop (New in v1.\+1.\+0)}
+
+When C++11 is enabled, you can use range-\/based for loop to access all members in an object.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\&\ m\ :\ document.GetObject())}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Type\ of\ member\ \%s\ is\ \%s\(\backslash\)n"{}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ m.name.GetString(),\ kTypeNames[m.value.GetType()]);}
+
+\end{DoxyCode}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_QueryNumber}{}\doxysubsection{\texorpdfstring{Querying Number}{Querying Number}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_QueryNumber}
+JSON provides a single numerical type called Number. Number can be an integer or a real number. RFC 4627 says the range of Number is specified by the parser implementation.
+
+As C++ provides several integer and floating point number types, the DOM tries to handle these with the widest possible range and good performance.
+
+When a Number is parsed, it is stored in the DOM as one of the following types\+:
+
+\tabulinesep=1mm
+\begin{longtabu}spread 0pt [c]{*{2}{|X[-1]}|}
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Type   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Description    }\\\cline{1-2}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Type   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Description    }\\\cline{1-2}
+\endhead
+{\ttfamily unsigned}   &32-\/bit unsigned integer    \\\cline{1-2}
+{\ttfamily int}   &32-\/bit signed integer    \\\cline{1-2}
+{\ttfamily uint64\+\_\+t}   &64-\/bit unsigned integer    \\\cline{1-2}
+{\ttfamily int64\+\_\+t}   &64-\/bit signed integer    \\\cline{1-2}
+{\ttfamily double}   &64-\/bit double precision floating point   \\\cline{1-2}
+\end{longtabu}
+
+
+When querying a number, you can check whether the number can be obtained as the target type\+:
+
+\tabulinesep=1mm
+\begin{longtabu}spread 0pt [c]{*{2}{|X[-1]}|}
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Checking   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Obtaining    }\\\cline{1-2}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Checking   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Obtaining    }\\\cline{1-2}
+\endhead
+{\ttfamily bool Is\+Number()}   &N/A    \\\cline{1-2}
+{\ttfamily bool Is\+Uint()}   &{\ttfamily unsigned Get\+Uint()}    \\\cline{1-2}
+{\ttfamily bool Is\+Int()}   &{\ttfamily int Get\+Int()}    \\\cline{1-2}
+{\ttfamily bool Is\+Uint64()}   &{\ttfamily uint64\+\_\+t Get\+Uint64()}    \\\cline{1-2}
+{\ttfamily bool Is\+Int64()}   &{\ttfamily int64\+\_\+t Get\+Int64()}    \\\cline{1-2}
+{\ttfamily bool Is\+Double()}   &{\ttfamily double Get\+Double()}   \\\cline{1-2}
+\end{longtabu}
+
+
+Note that, an integer value may be obtained in various ways without conversion. For example, \doxylink{struct_a}{A} value {\ttfamily x} containing 123 will make {\ttfamily x.\+Is\+Int() == x.\+Is\+Uint() == x.\+Is\+Int64() == x.\+Is\+Uint64() == true}. But a value {\ttfamily y} containing -\/3000000000 will only make {\ttfamily x.\+Is\+Int64() == true}.
+
+When obtaining the numeric values, {\ttfamily Get\+Double()} will convert internal integer representation to a {\ttfamily double}. Note that, {\ttfamily int} and {\ttfamily unsigned} can be safely converted to {\ttfamily double}, but {\ttfamily int64\+\_\+t} and {\ttfamily uint64\+\_\+t} may lose precision (since mantissa of {\ttfamily double} is only 52-\/bits).\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_QueryString}{}\doxysubsection{\texorpdfstring{Query String}{Query String}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_QueryString}
+In addition to {\ttfamily Get\+String()}, the {\ttfamily Value} class also contains {\ttfamily Get\+String\+Length()}. Here explains why.
+
+According to RFC 4627, JSON strings can contain Unicode character {\ttfamily U+0000}, which must be escaped as {\ttfamily "{}\textbackslash{}u0000"{}}. The problem is that, C/\+C++ often uses null-\/terminated string, which treats \`{}`\textbackslash{}0'\`{} as the terminator symbol.
+
+To conform RFC 4627, Rapid\+JSON supports string containing {\ttfamily U+0000}. If you need to handle this, you can use {\ttfamily Get\+String\+Length()} to obtain the correct string length.
+
+For example, after parsing a the following JSON to {\ttfamily Document d}\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\{\ "{}s"{}\ :\ \ "{}a\(\backslash\)u0000b"{}\ \}}
+
+\end{DoxyCode}
+ The correct length of the value {\ttfamily "{}a\textbackslash{}u0000b"{}} is 3. But {\ttfamily strlen()} returns 1.
+
+{\ttfamily Get\+String\+Length()} can also improve performance, as user may often need to call {\ttfamily strlen()} for allocating buffer.
+
+Besides, {\ttfamily std\+::string} also support a constructor\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{string(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}});}
+
+\end{DoxyCode}
+
+
+which accepts the length of string as parameter. This constructor supports storing null character within the string, and should also provide better performance.
+
+\doxysubsection*{Comparing values}
+
+You can use {\ttfamily ==} and {\ttfamily !=} to compare values. Two values are equal if and only if they are have same type and contents. You can also compare values with primitive types. Here is an example.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordflow}{if}\ (document[\textcolor{stringliteral}{"{}hello"{}}]\ ==\ document[\textcolor{stringliteral}{"{}n"{}}])\ \textcolor{comment}{/*...*/};\ \ \ \ \textcolor{comment}{//\ Compare\ values}}
+\DoxyCodeLine{\textcolor{keywordflow}{if}\ (document[\textcolor{stringliteral}{"{}hello"{}}]\ ==\ \textcolor{stringliteral}{"{}world"{}})\ \textcolor{comment}{/*...*/};\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Compare\ value\ with\ literal\ string}}
+\DoxyCodeLine{\textcolor{keywordflow}{if}\ (document[\textcolor{stringliteral}{"{}i"{}}]\ !=\ 123)\ \textcolor{comment}{/*...*/};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Compare\ with\ integers}}
+\DoxyCodeLine{\textcolor{keywordflow}{if}\ (document[\textcolor{stringliteral}{"{}pi"{}}]\ !=\ 3.14)\ \textcolor{comment}{/*...*/};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Compare\ with\ double.}}
+
+\end{DoxyCode}
+
+
+Array/object compares their elements/members in order. They are equal if and only if their whole subtrees are equal.
+
+Note that, currently if an object contains duplicated named member, comparing equality with any object is always {\ttfamily false}.\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_CreateModifyValues}{}\doxysection{\texorpdfstring{Create/\+Modify Values}{Create/\+Modify Values}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_CreateModifyValues}
+There are several ways to create values. After a DOM tree is created and/or modified, it can be saved as JSON again using {\ttfamily \doxylink{class_writer}{Writer}}.\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_ChangeValueType}{}\doxysubsection{\texorpdfstring{Change Value Type}{Change Value Type}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_ChangeValueType}
+When creating a Value or Document by default constructor, its type is Null. To change its type, call {\ttfamily Set\+XXX()} or assignment operator, for example\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_document}{Document}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}};\ \textcolor{comment}{//\ Null}}
+\DoxyCodeLine{\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.SetObject();}
+\DoxyCodeLine{}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_value}{Value}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};\ \ \ \ \textcolor{comment}{//\ Null}}
+\DoxyCodeLine{\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.SetInt(10);}
+\DoxyCodeLine{\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ =\ 10;\ \ \ \ \ \textcolor{comment}{//\ Shortcut,\ same\ as\ above}}
+
+\end{DoxyCode}
+
+
+\doxysubsubsection*{Overloaded Constructors}
+
+There are also overloaded constructors for several types\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_value}{Value}}\ b(\textcolor{keyword}{true});\ \ \ \ \textcolor{comment}{//\ calls\ Value(bool)}}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_value}{Value}}\ i(-\/123);\ \ \ \ \textcolor{comment}{//\ calls\ Value(int)}}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_value}{Value}}\ u(123u);\ \ \ \ \textcolor{comment}{//\ calls\ Value(unsigned)}}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_value}{Value}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}(1.5);\ \ \ \ \ \textcolor{comment}{//\ calls\ Value(double)}}
+
+\end{DoxyCode}
+
+
+To create empty object or array, you may use {\ttfamily Set\+Object()}/{\ttfamily Set\+Array()} after default constructor, or using the {\ttfamily \doxylink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value(\+Type)}} in one shot\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_value}{Value}}\ o(\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7a146f46700e905e8df96a6a90b5c7640f}{kObjectType}});}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_value}{Value}}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}(\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7af41527d6925efa3c5c3dadb23dfef7c8}{kArrayType}});}
+
+\end{DoxyCode}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_MoveSemantics}{}\doxysubsection{\texorpdfstring{Move Semantics}{Move Semantics}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_MoveSemantics}
+\doxylink{struct_a}{A} very special decision during design of Rapid\+JSON is that, assignment of value does not copy the source value to destination value. Instead, the value from source is moved to the destination. For example,
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_value}{Value}}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}(123);}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_value}{Value}}\ b(456);}
+\DoxyCodeLine{b\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}};\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ a\ becomes\ a\ Null\ value,\ b\ becomes\ number\ 123.}}
+
+\end{DoxyCode}
+
+
+
+
+Why? What is the advantage of this semantics?
+
+The simple answer is performance. For fixed size JSON types (Number, True, False, Null), copying them is fast and easy. However, For variable size JSON types (String, Array, Object), copying them will incur a lot of overheads. And these overheads are often unnoticed. Especially when we need to create temporary object, copy it to another variable, and then destruct it.
+
+For example, if normal {\itshape copy} semantics was used\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_document}{Document}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}};}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_value}{Value}}\ o(\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7a146f46700e905e8df96a6a90b5c7640f}{kObjectType}});}
+\DoxyCodeLine{\{}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{class_generic_value}{Value}}\ contacts(\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7af41527d6925efa3c5c3dadb23dfef7c8}{kArrayType}});}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ adding\ elements\ to\ contacts\ array.}}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ ...}}
+\DoxyCodeLine{\ \ \ \ o.AddMember(\textcolor{stringliteral}{"{}contacts"{}},\ contacts,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.GetAllocator());\ \ \textcolor{comment}{//\ deep\ clone\ contacts\ (may\ be\ with\ lots\ of\ allocations)}}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ destruct\ contacts.}}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+
+
+The object {\ttfamily o} needs to allocate a buffer of same size as contacts, makes a deep clone of it, and then finally contacts is destructed. This will incur a lot of unnecessary allocations/deallocations and memory copying.
+
+There are solutions to prevent actual copying these data, such as reference counting and garbage collection(\+GC).
+
+To make Rapid\+JSON simple and fast, we chose to use {\itshape move} semantics for assignment. It is similar to {\ttfamily std\+::auto\+\_\+ptr} which transfer ownership during assignment. Move is much faster and simpler, it just destructs the original value, {\ttfamily \doxylink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy()}} the source to destination, and finally sets the source as Null type.
+
+So, with move semantics, the above example becomes\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_document}{Document}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}};}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_value}{Value}}\ o(\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7a146f46700e905e8df96a6a90b5c7640f}{kObjectType}});}
+\DoxyCodeLine{\{}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{class_generic_value}{Value}}\ contacts(\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7af41527d6925efa3c5c3dadb23dfef7c8}{kArrayType}});}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ adding\ elements\ to\ contacts\ array.}}
+\DoxyCodeLine{\ \ \ \ o.AddMember(\textcolor{stringliteral}{"{}contacts"{}},\ contacts,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.GetAllocator());\ \ \textcolor{comment}{//\ just\ memcpy()\ of\ contacts\ itself\ to\ the\ value\ of\ new\ member\ (16\ bytes)}}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ contacts\ became\ Null\ here.\ Its\ destruction\ is\ trivial.}}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+
+
+This is called move assignment operator in C++11. As Rapid\+JSON supports C++03, it adopts move semantics using assignment operator, and all other modifying function like {\ttfamily Add\+Member()}, {\ttfamily Push\+Back()}.\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_TemporaryValues}{}\doxysubsubsection{\texorpdfstring{Move semantics and temporary values}{Move semantics and temporary values}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_TemporaryValues}
+Sometimes, it is convenient to construct a Value in place, before passing it to one of the "{}moving"{} functions, like {\ttfamily Push\+Back()} or {\ttfamily Add\+Member()}. As temporary objects can\textquotesingle{}t be converted to proper Value references, the convenience function {\ttfamily Move()} is available\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_value}{Value}}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}(\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7af41527d6925efa3c5c3dadb23dfef7c8}{kArrayType}});}
+\DoxyCodeLine{\mbox{\hyperlink{class_memory_pool_allocator}{Document::AllocatorType}}\&\ \mbox{\hyperlink{namespacechainbase_add7d4cf66ab3f2808fe613e6b0343b89}{allocator}}\ =\ document.\mbox{\hyperlink{class_generic_document_a1362cbdcce6ca37356744a3a0dbb11d6}{GetAllocator}}();}
+\DoxyCodeLine{\textcolor{comment}{//\ a.PushBack(Value(42),\ allocator);\ \ \ \ \ \ \ //\ will\ not\ compile}}
+\DoxyCodeLine{\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.PushBack(\mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}}().SetInt(42),\ allocator);\ \textcolor{comment}{//\ fluent\ API}}
+\DoxyCodeLine{\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.PushBack(\mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}}(42).Move(),\ allocator);\ \ \ \textcolor{comment}{//\ same\ as\ above}}
+
+\end{DoxyCode}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_CreateString}{}\doxysubsection{\texorpdfstring{Create String}{Create String}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_CreateString}
+Rapid\+JSON provides two strategies for storing string.
+
+
+\begin{DoxyEnumerate}
+\item copy-\/string\+: allocates a buffer, and then copy the source data into it.
+\item const-\/string\+: simply store a pointer of string.
+\end{DoxyEnumerate}
+
+Copy-\/string is always safe because it owns a copy of the data. Const-\/string can be used for storing a string literal, and for in-\/situ parsing which will be mentioned in the DOM section.
+
+To make memory allocation customizable, Rapid\+JSON requires users to pass an instance of allocator, whenever an operation may require allocation. This design is needed to prevent storing a allocator (or Document) pointer per Value.
+
+Therefore, when we assign a copy-\/string, we call this overloaded {\ttfamily Set\+String()} with allocator\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_document}{Document}}\ document;}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_value}{Value}}\ author;}
+\DoxyCodeLine{\textcolor{keywordtype}{char}\ buffer[10];}
+\DoxyCodeLine{\textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ =\ sprintf(buffer,\ \textcolor{stringliteral}{"{}\%s\ \%s"{}},\ \textcolor{stringliteral}{"{}Milo"{}},\ \textcolor{stringliteral}{"{}Yip"{}});\ \textcolor{comment}{//\ dynamically\ created\ string.}}
+\DoxyCodeLine{author.SetString(buffer,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ document.\mbox{\hyperlink{class_generic_document_a1362cbdcce6ca37356744a3a0dbb11d6}{GetAllocator}}());}
+\DoxyCodeLine{\mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(buffer,\ 0,\ \textcolor{keyword}{sizeof}(buffer));}
+\DoxyCodeLine{\textcolor{comment}{//\ author.GetString()\ still\ contains\ "{}Milo\ Yip"{}\ after\ buffer\ is\ destroyed}}
+
+\end{DoxyCode}
+
+
+In this example, we get the allocator from a {\ttfamily Document} instance. This is a common idiom when using Rapid\+JSON. But you may use other instances of allocator.
+
+Besides, the above {\ttfamily Set\+String()} requires length. This can handle null characters within a string. There is another {\ttfamily Set\+String()} overloaded function without the length parameter. And it assumes the input is null-\/terminated and calls a {\ttfamily strlen()}-\/like function to obtain the length.
+
+Finally, for a string literal or string with a safe life-\/cycle one can use the const-\/string version of {\ttfamily Set\+String()}, which lacks an allocator parameter. For string literals (or constant character arrays), simply passing the literal as parameter is safe and efficient\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_value}{Value}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.SetString(\textcolor{stringliteral}{"{}rapidjson"{}});\ \ \ \ \textcolor{comment}{//\ can\ contain\ null\ character,\ length\ derived\ at\ compile\ time}}
+\DoxyCodeLine{\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ =\ \textcolor{stringliteral}{"{}rapidjson"{}};\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ shortcut,\ same\ as\ above}}
+
+\end{DoxyCode}
+
+
+For a character pointer, Rapid\+JSON requires it to be marked as safe before using it without copying. This can be achieved by using the {\ttfamily String\+Ref} function\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\ cstr\ =\ getenv(\textcolor{stringliteral}{"{}USER"{}});}
+\DoxyCodeLine{\textcolor{keywordtype}{size\_t}\ cstr\_len\ =\ ...;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ in\ case\ length\ is\ available}}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_value}{Value}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{\textcolor{comment}{//\ s.SetString(cstr);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ //\ will\ not\ compile}}
+\DoxyCodeLine{\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.SetString(\mbox{\hyperlink{document_8h_aa6b9fd9f6aa49405a574c362ba9af6b5}{StringRef}}(cstr));\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ ok,\ assume\ safe\ lifetime,\ null-\/terminated}}
+\DoxyCodeLine{\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ =\ \mbox{\hyperlink{document_8h_aa6b9fd9f6aa49405a574c362ba9af6b5}{StringRef}}(cstr);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ shortcut,\ same\ as\ above}}
+\DoxyCodeLine{\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.SetString(\mbox{\hyperlink{document_8h_aa6b9fd9f6aa49405a574c362ba9af6b5}{StringRef}}(cstr,cstr\_len));\ \textcolor{comment}{//\ faster,\ can\ contain\ null\ character}}
+\DoxyCodeLine{\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ =\ \mbox{\hyperlink{document_8h_aa6b9fd9f6aa49405a574c362ba9af6b5}{StringRef}}(cstr,cstr\_len);\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ shortcut,\ same\ as\ above}}
+
+\end{DoxyCode}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_ModifyArray}{}\doxysubsection{\texorpdfstring{Modify Array}{Modify Array}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_ModifyArray}
+Value with array type provides an API similar to {\ttfamily std\+::vector}.
+
+
+\begin{DoxyItemize}
+\item {\ttfamily Clear()}
+\item {\ttfamily Reserve(Size\+Type, Allocator\&)}
+\item {\ttfamily Value\& Push\+Back(Value\&, Allocator\&)}
+\item {\ttfamily template \texorpdfstring{$<$}{<}typename T\texorpdfstring{$>$}{>} \doxylink{class_generic_value}{Generic\+Value}\& Push\+Back(T, Allocator\&)}
+\item {\ttfamily Value\& Pop\+Back()}
+\item {\ttfamily Value\+Iterator Erase(\+Const\+Value\+Iterator pos)}
+\item {\ttfamily Value\+Iterator Erase(\+Const\+Value\+Iterator first, Const\+Value\+Iterator last)}
+\end{DoxyItemize}
+
+Note that, {\ttfamily Reserve(...)} and {\ttfamily Push\+Back(...)} may allocate memory for the array elements, therefore requiring an allocator.
+
+Here is an example of {\ttfamily Push\+Back()}\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_value}{Value}}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}(\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7af41527d6925efa3c5c3dadb23dfef7c8}{kArrayType}});}
+\DoxyCodeLine{\mbox{\hyperlink{class_memory_pool_allocator}{Document::AllocatorType}}\&\ \mbox{\hyperlink{namespacechainbase_add7d4cf66ab3f2808fe613e6b0343b89}{allocator}}\ =\ document.\mbox{\hyperlink{class_generic_document_a1362cbdcce6ca37356744a3a0dbb11d6}{GetAllocator}}();}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 5;\ i\ <=\ 10;\ i++)}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.PushBack(i,\ allocator);\ \ \ \textcolor{comment}{//\ allocator\ is\ needed\ for\ potential\ realloc().}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ Fluent\ interface}}
+\DoxyCodeLine{\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.PushBack(\textcolor{stringliteral}{"{}Lua"{}},\ allocator).PushBack(\textcolor{stringliteral}{"{}Mio"{}},\ allocator);}
+
+\end{DoxyCode}
+
+
+This API differs from STL in that {\ttfamily Push\+Back()}/{\ttfamily Pop\+Back()} return the array reference itself. This is called {\itshape fluent interface}.
+
+If you want to add a non-\/constant string or a string without sufficient lifetime (see \doxysectlink{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_CreateString}{Create String}{2}) to the array, you need to create a string Value by using the copy-\/string API. To avoid the need for an intermediate variable, you can use a \doxysectlink{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_TemporaryValues}{temporary value}{3} in place\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{comment}{//\ in-\/place\ Value\ parameter}}
+\DoxyCodeLine{contact.PushBack(\mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}}(\textcolor{stringliteral}{"{}copy"{}},\ document.\mbox{\hyperlink{class_generic_document_a1362cbdcce6ca37356744a3a0dbb11d6}{GetAllocator}}()).Move(),\ \textcolor{comment}{//\ copy\ string}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ document.\mbox{\hyperlink{class_generic_document_a1362cbdcce6ca37356744a3a0dbb11d6}{GetAllocator}}());}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ explicit\ parameters}}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_value}{Value}}\ val(\textcolor{stringliteral}{"{}key"{}},\ document.\mbox{\hyperlink{class_generic_document_a1362cbdcce6ca37356744a3a0dbb11d6}{GetAllocator}}());\ \textcolor{comment}{//\ copy\ string}}
+\DoxyCodeLine{contact.PushBack(val,\ document.\mbox{\hyperlink{class_generic_document_a1362cbdcce6ca37356744a3a0dbb11d6}{GetAllocator}}());}
+
+\end{DoxyCode}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_ModifyObject}{}\doxysubsection{\texorpdfstring{Modify Object}{Modify Object}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_ModifyObject}
+The Object class is a collection of key-\/value pairs (members). Each key must be a string value. To modify an object, either add or remove members. The following API is for adding members\+:
+
+
+\begin{DoxyItemize}
+\item {\ttfamily Value\& Add\+Member(Value\&, Value\&, Allocator\& allocator)}
+\item {\ttfamily Value\& Add\+Member(String\+Ref\+Type, Value\&, Allocator\&)}
+\item {\ttfamily template \texorpdfstring{$<$}{<}typename T\texorpdfstring{$>$}{>} Value\& Add\+Member(String\+Ref\+Type, T value, Allocator\&)}
+\end{DoxyItemize}
+
+Here is an example.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_value}{Value}}\ contact(kObject);}
+\DoxyCodeLine{contact.AddMember(\textcolor{stringliteral}{"{}name"{}},\ \textcolor{stringliteral}{"{}Milo"{}},\ document.\mbox{\hyperlink{class_generic_document_a1362cbdcce6ca37356744a3a0dbb11d6}{GetAllocator}}());}
+\DoxyCodeLine{contact.AddMember(\textcolor{stringliteral}{"{}married"{}},\ \textcolor{keyword}{true},\ document.\mbox{\hyperlink{class_generic_document_a1362cbdcce6ca37356744a3a0dbb11d6}{GetAllocator}}());}
+
+\end{DoxyCode}
+
+
+The name parameter with {\ttfamily String\+Ref\+Type} is similar to the interface of the {\ttfamily Set\+String} function for string values. These overloads are used to avoid the need for copying the {\ttfamily name} string, since constant key names are very common in JSON objects.
+
+If you need to create a name from a non-\/constant string or a string without sufficient lifetime (see \doxysectlink{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_CreateString}{Create String}{2}), you need to create a string Value by using the copy-\/string API. To avoid the need for an intermediate variable, you can use a \doxysectlink{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_TemporaryValues}{temporary value}{3} in place\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{comment}{//\ in-\/place\ Value\ parameter}}
+\DoxyCodeLine{contact.AddMember(\mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}}(\textcolor{stringliteral}{"{}copy"{}},\ document.\mbox{\hyperlink{class_generic_document_a1362cbdcce6ca37356744a3a0dbb11d6}{GetAllocator}}()).Move(),\ \textcolor{comment}{//\ copy\ string}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value}{Value}}().Move(),\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ null\ value}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ document.\mbox{\hyperlink{class_generic_document_a1362cbdcce6ca37356744a3a0dbb11d6}{GetAllocator}}());}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ explicit\ parameters}}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_value}{Value}}\ \mbox{\hyperlink{yubico__otp_8c_a9246c20bb98ad2b4c60313c053c70f08}{key}}(\textcolor{stringliteral}{"{}key"{}},\ document.\mbox{\hyperlink{class_generic_document_a1362cbdcce6ca37356744a3a0dbb11d6}{GetAllocator}}());\ \textcolor{comment}{//\ copy\ string\ name}}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_value}{Value}}\ val(42);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ some\ value}}
+\DoxyCodeLine{contact.AddMember(key,\ val,\ document.\mbox{\hyperlink{class_generic_document_a1362cbdcce6ca37356744a3a0dbb11d6}{GetAllocator}}());}
+
+\end{DoxyCode}
+
+
+For removing members, there are several choices\+:
+
+
+\begin{DoxyItemize}
+\item {\ttfamily bool Remove\+Member(const Ch\texorpdfstring{$\ast$}{*} name)}\+: Remove a member by search its name (linear time complexity).
+\item {\ttfamily bool Remove\+Member(const Value\& name)}\+: same as above but {\ttfamily name} is a Value.
+\item {\ttfamily Member\+Iterator Remove\+Member(\+Member\+Iterator)}\+: Remove a member by iterator ({\itshape constant} time complexity).
+\item {\ttfamily Member\+Iterator Erase\+Member(\+Member\+Iterator)}\+: similar to the above but it preserves order of members (linear time complexity).
+\item {\ttfamily Member\+Iterator Erase\+Member(\+Member\+Iterator first, Member\+Iterator last)}\+: remove a range of members, preserves order (linear time complexity).
+\end{DoxyItemize}
+
+{\ttfamily Member\+Iterator Remove\+Member(\+Member\+Iterator)} uses a "{}move-\/last"{} trick to achieve constant time complexity. Basically the member at iterator is destructed, and then the last element is moved to that position. So the order of the remaining members are changed.\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_DeepCopyValue}{}\doxysubsection{\texorpdfstring{Deep Copy Value}{Deep Copy Value}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_DeepCopyValue}
+If we really need to copy a DOM tree, we can use two APIs for deep copy\+: constructor with allocator, and {\ttfamily Copy\+From()}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_document}{Document}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}};}
+\DoxyCodeLine{\mbox{\hyperlink{class_memory_pool_allocator}{Document::AllocatorType}}\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.GetAllocator();}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_value}{Value}}\ v1(\textcolor{stringliteral}{"{}foo"{}});}
+\DoxyCodeLine{\textcolor{comment}{//\ Value\ v2(v1);\ //\ not\ allowed}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_value}{Value}}\ v2(v1,\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ make\ a\ copy}}
+\DoxyCodeLine{assert(v1.IsString());\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ v1\ untouched}}
+\DoxyCodeLine{\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.SetArray().PushBack(v1,\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}).PushBack(v2,\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{assert(v1.IsNull()\ \&\&\ v2.IsNull());\ \ \ \textcolor{comment}{//\ both\ moved\ to\ d}}
+\DoxyCodeLine{}
+\DoxyCodeLine{v2.CopyFrom(d,\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ copy\ whole\ document\ to\ v2}}
+\DoxyCodeLine{assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.IsArray()\ \&\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.Size()\ ==\ 2);\ \textcolor{comment}{//\ d\ untouched}}
+\DoxyCodeLine{v1.SetObject().AddMember(\textcolor{stringliteral}{"{}array"{}},\ v2,\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.PushBack(v1,\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+
+\end{DoxyCode}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_SwapValues}{}\doxysubsection{\texorpdfstring{Swap Values}{Swap Values}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_SwapValues}
+{\ttfamily Swap()} is also provided.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_value}{Value}}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}(123);}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_value}{Value}}\ b(\textcolor{stringliteral}{"{}Hello"{}});}
+\DoxyCodeLine{\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.Swap(b);}
+\DoxyCodeLine{assert(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.IsString());}
+\DoxyCodeLine{assert(b.IsInt());}
+
+\end{DoxyCode}
+
+
+Swapping two DOM trees is fast (constant time), despite the complexity of the trees.\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_WhatsNext}{}\doxysection{\texorpdfstring{What\textquotesingle{}s next}{What\textquotesingle{}s next}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_WhatsNext}
+This tutorial shows the basics of DOM tree query and manipulation. There are several important concepts in Rapid\+JSON\+:
+
+
+\begin{DoxyEnumerate}
+\item \doxylink{stream_8md}{Streams} are channels for reading/writing JSON, which can be a in-\/memory string, or file stream, etc. User can also create their streams.
+\item \doxylink{encoding_8md}{Encoding} defines which character encoding is used in streams and memory. Rapid\+JSON also provide Unicode conversion/validation internally.
+\item \doxylink{dom_8md}{DOM}\textquotesingle{}s basics are already covered in this tutorial. Uncover more advanced features such as {\itshape in situ} parsing, other parsing options and advanced usages.
+\item \doxylink{sax_8md}{SAX} is the foundation of parsing/generating facility in Rapid\+JSON. Learn how to use {\ttfamily Reader}/{\ttfamily \doxylink{class_writer}{Writer}} to implement even faster applications. Also try {\ttfamily \doxylink{class_pretty_writer}{Pretty\+Writer}} to format the JSON.
+\item \doxylink{performance_8md}{Performance} shows some in-\/house and third-\/party benchmarks.
+\item \doxylink{internals_8md}{Internals} describes some internal designs and techniques of Rapid\+JSON.
+\end{DoxyEnumerate}
+
+You may also refer to the \doxylink{doc_2faq_8md}{FAQ}, API documentation, examples and unit tests. 

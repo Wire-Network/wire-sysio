@@ -1,0 +1,12 @@
+<map id="stub_config" name="stub_config">
+<area shape="rect" id="Node000001" title=" " alt="" coords="169,229,258,255"/>
+<area shape="rect" id="Node000002" href="$structwebsocketpp_1_1config_1_1core.html" title="Server config with iostream transport." alt="" coords="143,139,284,180"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="198,195,203,228,197,229,193,195"/>
+<area shape="poly" id="edge4_Node000001_Node000002" title=" " alt="" coords="216,195,216,229,211,229,211,195"/>
+<area shape="poly" id="edge5_Node000001_Node000002" title=" " alt="" coords="234,195,229,229,224,228,229,195"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,5,51,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="27,46,29,81,35,98,44,113,59,123,83,132,143,146,142,151,81,137,57,128,40,117,30,101,24,82,22,46"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="264,5,320,31"/>
+<area shape="poly" id="edge6_Node000001_Node000004" title=" " alt="" coords="336,34,356,53,363,70,365,85,356,116,333,155,302,187,269,213,239,231,236,226,266,208,299,183,329,152,351,114,359,84,358,71,351,57,332,38"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="250,32,231,42,217,56,208,76,206,98,210,138,205,139,200,98,203,75,212,54,228,37,248,27"/>
+</map>

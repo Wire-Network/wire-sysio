@@ -1,0 +1,15 @@
+<map id="libraries/yubihsm/common/parsing.c" name="libraries/yubihsm/common/parsing.c">
+<area shape="rect" id="Node000001" title=" " alt="" coords="89,5,262,46"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,94,66,120"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="142,49,71,88,69,84,139,44"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="90,94,154,120"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="165,48,141,83,137,80,160,45"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="179,94,281,120"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="191,45,215,79,211,83,187,48"/>
+<area shape="rect" id="Node000005" href="$parsing_8h.html" title=" " alt="" coords="305,94,379,120"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="218,44,304,85,302,89,216,49"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="258,168,333,193"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="337,121,314,156,309,153,332,118"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="357,168,420,193"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="352,118,375,153,370,156,348,121"/>
+</map>

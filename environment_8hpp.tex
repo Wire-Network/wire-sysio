@@ -1,0 +1,336 @@
+\doxysection{libraries/chainbase/include/chainbase/environment.hpp File Reference}
+\hypertarget{environment_8hpp}{}\label{environment_8hpp}\index{libraries/chainbase/include/chainbase/environment.hpp@{libraries/chainbase/include/chainbase/environment.hpp}}
+{\ttfamily \#include $<$chainbase/pinnable\+\_\+mapped\+\_\+file.\+hpp$>$}\newline
+{\ttfamily \#include $<$iomanip$>$}\newline
+Include dependency graph for environment.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{environment_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=314pt]{environment_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structchainbase_1_1environment}{chainbase\+::environment}}
+\item 
+struct \mbox{\hyperlink{structchainbase_1_1db__header}{chainbase\+::db\+\_\+header}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacechainbase}{chainbase}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{environment_8hpp_a5e55ee7dabe1ec807ab569fc11babbb0}{os\+\_\+t}} \+: unsigned char \{ \mbox{\hyperlink{environment_8hpp_a5e55ee7dabe1ec807ab569fc11babbb0ac3724e0358f391346c785d3450532797}{OS\+\_\+\+LINUX}}
+, \mbox{\hyperlink{environment_8hpp_a5e55ee7dabe1ec807ab569fc11babbb0af1b08c91685e3bc4d30e56dfd468e735}{OS\+\_\+\+MACOS}}
+, \mbox{\hyperlink{environment_8hpp_a5e55ee7dabe1ec807ab569fc11babbb0a8780f81c6157f670aaa1d4a0f7c15467}{OS\+\_\+\+WINDOWS}}
+, \mbox{\hyperlink{environment_8hpp_a5e55ee7dabe1ec807ab569fc11babbb0a3d3a12d1d170260bc66459e6437d06cb}{OS\+\_\+\+OTHER}}
+ \}
+\item 
+enum \mbox{\hyperlink{environment_8hpp_aa8554335c865509d8d68f600b3d97442}{arch\+\_\+t}} \+: unsigned char \{ \mbox{\hyperlink{environment_8hpp_aa8554335c865509d8d68f600b3d97442a0089eec22100f4609dad74f6be4ec601}{ARCH\+\_\+\+X86\+\_\+64}}
+, \mbox{\hyperlink{environment_8hpp_aa8554335c865509d8d68f600b3d97442aa9fb1533dda1c8184bd7fa0a3f8e88f7}{ARCH\+\_\+\+ARM}}
+, \mbox{\hyperlink{environment_8hpp_aa8554335c865509d8d68f600b3d97442af63fb533173014b205e107cdd13fce75}{ARCH\+\_\+\+RISCV}}
+, \mbox{\hyperlink{environment_8hpp_aa8554335c865509d8d68f600b3d97442a112b29402ecb654f7f960772b5be24e8}{ARCH\+\_\+\+OTHER}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structchainbase_1_1environment}{chainbase\+::environment}} \mbox{\hyperlink{namespacechainbase_ae035193195fb0b2f1d8c652f21df45ff}{chainbase\+::\+\_\+\+\_\+attribute\+\_\+\+\_\+}} ((packed))
+\item 
+\mbox{\hyperlink{environment_8hpp_a962d8de627af2d0ded4f7f8ec45bd6b1}{environment}} ()
+\item 
+bool \mbox{\hyperlink{environment_8hpp_ac70f6c217754a8581540f9d3f5b1c1ed}{operator==}} (const \mbox{\hyperlink{environment_8hpp_a962d8de627af2d0ded4f7f8ec45bd6b1}{environment}} \&other)
+\item 
+bool \mbox{\hyperlink{environment_8hpp_a1f4c4c464184ccd8c78b240bcb2017c8}{operator!=}} (const \mbox{\hyperlink{environment_8hpp_a962d8de627af2d0ded4f7f8ec45bd6b1}{environment}} \&other)
+\item 
+std\+::ostream \& \mbox{\hyperlink{namespacechainbase_a95429aafa8b5bf2fda83a052e67d71c7}{chainbase\+::operator$<$$<$}} (std\+::ostream \&os, const \mbox{\hyperlink{structchainbase_1_1environment}{chainbase\+::environment}} \&dt)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+constexpr size\+\_\+t \mbox{\hyperlink{namespacechainbase_a3553db3334a3279bf83b5951ab9be322}{chainbase\+::header\+\_\+size}} = 1024
+\item 
+constexpr \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{namespacechainbase_a390fbf5c3ed14d5389ea5ee4f92eb1b6}{chainbase\+::header\+\_\+id}} = 0x3242444f49534f45\+ULL
+\item 
+bool \mbox{\hyperlink{environment_8hpp_a398527b3e9e358c345c5047b16871957}{debug}}
+\item 
+\mbox{\hyperlink{environment_8hpp_a5e55ee7dabe1ec807ab569fc11babbb0}{os\+\_\+t}} \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}
+\item 
+\mbox{\hyperlink{environment_8hpp_aa8554335c865509d8d68f600b3d97442}{arch\+\_\+t}} \mbox{\hyperlink{environment_8hpp_aa0e431d4d0a75d1ecbdf0c31893c77aa}{arch}}
+\item 
+unsigned \mbox{\hyperlink{environment_8hpp_aa822d32e7e9853a2388d30a80d4449da}{boost\+\_\+version}} = BOOST\+\_\+\+VERSION
+\item 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{environment_8hpp_a83b194e731d2cf63d2812367744b0ed6}{reserved}} \mbox{[}512\mbox{]} = \{\}
+\item 
+char \mbox{\hyperlink{environment_8hpp_ada194dda0ebbfb422d370043a4bec4cf}{compiler}} \mbox{[}256\mbox{]} = \{\}
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{environment_8hpp_a7e290573ef1be67b92a2c745e3b00d1d}{id}} = header\+\_\+id
+\item 
+bool \mbox{\hyperlink{environment_8hpp_ad25edacba00e4d0666a9959053b7cc10}{dirty}} = false
+\item 
+\mbox{\hyperlink{environment_8hpp_a962d8de627af2d0ded4f7f8ec45bd6b1}{environment}} \mbox{\hyperlink{environment_8hpp_aba05f3389d9d85333033226e7faad614}{dbenviron}}
+\item 
+constexpr size\+\_\+t \mbox{\hyperlink{namespacechainbase_a281dadbe1ae02170ae8922387c134875}{chainbase\+::header\+\_\+dirty\+\_\+bit\+\_\+offset}} = offsetof(\mbox{\hyperlink{structchainbase_1_1db__header}{db\+\_\+header}}, \mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3a8251c5ee6c4498d42adb2b1a0aa286af}{dirty}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{environment_8hpp_aa8554335c865509d8d68f600b3d97442}\index{environment.hpp@{environment.hpp}!arch\_t@{arch\_t}}
+\index{arch\_t@{arch\_t}!environment.hpp@{environment.hpp}}
+\doxysubsubsection{\texorpdfstring{arch\_t}{arch\_t}}
+{\footnotesize\ttfamily \label{environment_8hpp_aa8554335c865509d8d68f600b3d97442} 
+enum \mbox{\hyperlink{environment_8hpp_aa8554335c865509d8d68f600b3d97442}{arch\+\_\+t}} \+: unsigned char}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ARCH\_X86\_64@{ARCH\_X86\_64}!environment.hpp@{environment.hpp}}\index{environment.hpp@{environment.hpp}!ARCH\_X86\_64@{ARCH\_X86\_64}}}\Hypertarget{environment_8hpp_aa8554335c865509d8d68f600b3d97442a0089eec22100f4609dad74f6be4ec601}\label{environment_8hpp_aa8554335c865509d8d68f600b3d97442} 
+ARCH\+\_\+\+X86\+\_\+64&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ARCH\_ARM@{ARCH\_ARM}!environment.hpp@{environment.hpp}}\index{environment.hpp@{environment.hpp}!ARCH\_ARM@{ARCH\_ARM}}}\Hypertarget{environment_8hpp_aa8554335c865509d8d68f600b3d97442aa9fb1533dda1c8184bd7fa0a3f8e88f7}\label{environment_8hpp_aa8554335c865509d8d68f600b3d97442} 
+ARCH\+\_\+\+ARM&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ARCH\_RISCV@{ARCH\_RISCV}!environment.hpp@{environment.hpp}}\index{environment.hpp@{environment.hpp}!ARCH\_RISCV@{ARCH\_RISCV}}}\Hypertarget{environment_8hpp_aa8554335c865509d8d68f600b3d97442af63fb533173014b205e107cdd13fce75}\label{environment_8hpp_aa8554335c865509d8d68f600b3d97442} 
+ARCH\+\_\+\+RISCV&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ARCH\_OTHER@{ARCH\_OTHER}!environment.hpp@{environment.hpp}}\index{environment.hpp@{environment.hpp}!ARCH\_OTHER@{ARCH\_OTHER}}}\Hypertarget{environment_8hpp_aa8554335c865509d8d68f600b3d97442a112b29402ecb654f7f960772b5be24e8}\label{environment_8hpp_aa8554335c865509d8d68f600b3d97442} 
+ARCH\+\_\+\+OTHER&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{environment_8hpp_source_l00010}{10}} of file \mbox{\hyperlink{environment_8hpp_source}{environment.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00010\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00011\ \ \ \ \mbox{\hyperlink{environment_8hpp_a962d8de627af2d0ded4f7f8ec45bd6b1}{environment}}()\ \{}
+\DoxyCodeLine{00012\ \ \ \ \ \ \ strncpy(\mbox{\hyperlink{environment_8hpp_ada194dda0ebbfb422d370043a4bec4cf}{compiler}},\ \_\_VERSION\_\_,\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{environment_8hpp_ada194dda0ebbfb422d370043a4bec4cf}{compiler}})-\/1);}
+\DoxyCodeLine{00013\ \ \ \ \}}
+\DoxyCodeLine{00014\ }
+\DoxyCodeLine{00015\ \ \ \ \textcolor{keyword}{enum}\ \mbox{\hyperlink{environment_8hpp_a5e55ee7dabe1ec807ab569fc11babbb0}{os\_t}}\ :\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ \{}
+
+\end{DoxyCode}
+\Hypertarget{environment_8hpp_a5e55ee7dabe1ec807ab569fc11babbb0}\index{environment.hpp@{environment.hpp}!os\_t@{os\_t}}
+\index{os\_t@{os\_t}!environment.hpp@{environment.hpp}}
+\doxysubsubsection{\texorpdfstring{os\_t}{os\_t}}
+{\footnotesize\ttfamily \label{environment_8hpp_a5e55ee7dabe1ec807ab569fc11babbb0} 
+enum \mbox{\hyperlink{environment_8hpp_a5e55ee7dabe1ec807ab569fc11babbb0}{os\+\_\+t}} \+: unsigned char}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{OS\_LINUX@{OS\_LINUX}!environment.hpp@{environment.hpp}}\index{environment.hpp@{environment.hpp}!OS\_LINUX@{OS\_LINUX}}}\Hypertarget{environment_8hpp_a5e55ee7dabe1ec807ab569fc11babbb0ac3724e0358f391346c785d3450532797}\label{environment_8hpp_a5e55ee7dabe1ec807ab569fc11babbb0} 
+OS\+\_\+\+LINUX&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{OS\_MACOS@{OS\_MACOS}!environment.hpp@{environment.hpp}}\index{environment.hpp@{environment.hpp}!OS\_MACOS@{OS\_MACOS}}}\Hypertarget{environment_8hpp_a5e55ee7dabe1ec807ab569fc11babbb0af1b08c91685e3bc4d30e56dfd468e735}\label{environment_8hpp_a5e55ee7dabe1ec807ab569fc11babbb0} 
+OS\+\_\+\+MACOS&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{OS\_WINDOWS@{OS\_WINDOWS}!environment.hpp@{environment.hpp}}\index{environment.hpp@{environment.hpp}!OS\_WINDOWS@{OS\_WINDOWS}}}\Hypertarget{environment_8hpp_a5e55ee7dabe1ec807ab569fc11babbb0a8780f81c6157f670aaa1d4a0f7c15467}\label{environment_8hpp_a5e55ee7dabe1ec807ab569fc11babbb0} 
+OS\+\_\+\+WINDOWS&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{OS\_OTHER@{OS\_OTHER}!environment.hpp@{environment.hpp}}\index{environment.hpp@{environment.hpp}!OS\_OTHER@{OS\_OTHER}}}\Hypertarget{environment_8hpp_a5e55ee7dabe1ec807ab569fc11babbb0a3d3a12d1d170260bc66459e6437d06cb}\label{environment_8hpp_a5e55ee7dabe1ec807ab569fc11babbb0} 
+OS\+\_\+\+OTHER&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{environment_8hpp_source_l00004}{4}} of file \mbox{\hyperlink{environment_8hpp_source}{environment.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00005\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00006\ }
+\DoxyCodeLine{00007\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{namespacechainbase_a3553db3334a3279bf83b5951ab9be322}{header\_size}}\ =\ 1024;}
+\DoxyCodeLine{00008\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{namespacechainbase_a390fbf5c3ed14d5389ea5ee4f92eb1b6}{header\_id}}\ =\ 0x3242444f49534f45ULL;\ \textcolor{comment}{//"{}SYSIODB2"{}\ little\ endian}}
+\DoxyCodeLine{00009\ }
+
+\end{DoxyCode}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{environment_8hpp_a962d8de627af2d0ded4f7f8ec45bd6b1}\index{environment.hpp@{environment.hpp}!environment@{environment}}
+\index{environment@{environment}!environment.hpp@{environment.hpp}}
+\doxysubsubsection{\texorpdfstring{environment()}{environment()}}
+{\footnotesize\ttfamily \label{environment_8hpp_a962d8de627af2d0ded4f7f8ec45bd6b1} 
+\+\_\+\+\_\+attribute\+\_\+\+\_\+\+::environment (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{environment_8hpp_source_l00000}{0}} of file \mbox{\hyperlink{environment_8hpp_source}{environment.\+hpp}}.
+
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=301pt]{environment_8hpp_a962d8de627af2d0ded4f7f8ec45bd6b1_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{environment_8hpp_a1f4c4c464184ccd8c78b240bcb2017c8}\index{environment.hpp@{environment.hpp}!operator"!=@{operator"!=}}
+\index{operator"!=@{operator"!=}!environment.hpp@{environment.hpp}}
+\doxysubsubsection{\texorpdfstring{operator"!=()}{operator!=()}}
+{\footnotesize\ttfamily \label{environment_8hpp_a1f4c4c464184ccd8c78b240bcb2017c8} 
+bool \+\_\+\+\_\+attribute\+\_\+\+\_\+\+::operator!= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{environment_8hpp_a962d8de627af2d0ded4f7f8ec45bd6b1}{environment}} \&}]{other}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{environment_8hpp_source_l00051}{51}} of file \mbox{\hyperlink{environment_8hpp_source}{environment.\+hpp}}.
+
+\Hypertarget{environment_8hpp_ac70f6c217754a8581540f9d3f5b1c1ed}\index{environment.hpp@{environment.hpp}!operator==@{operator==}}
+\index{operator==@{operator==}!environment.hpp@{environment.hpp}}
+\doxysubsubsection{\texorpdfstring{operator==()}{operator==()}}
+{\footnotesize\ttfamily \label{environment_8hpp_ac70f6c217754a8581540f9d3f5b1c1ed} 
+bool \+\_\+\+\_\+attribute\+\_\+\+\_\+\+::operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{environment_8hpp_a962d8de627af2d0ded4f7f8ec45bd6b1}{environment}} \&}]{other}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{environment_8hpp_source_l00048}{48}} of file \mbox{\hyperlink{environment_8hpp_source}{environment.\+hpp}}.
+
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=319pt]{environment_8hpp_ac70f6c217754a8581540f9d3f5b1c1ed_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{environment_8hpp_aa0e431d4d0a75d1ecbdf0c31893c77aa}\index{environment.hpp@{environment.hpp}!arch@{arch}}
+\index{arch@{arch}!environment.hpp@{environment.hpp}}
+\doxysubsubsection{\texorpdfstring{arch}{arch}}
+{\footnotesize\ttfamily \label{environment_8hpp_aa0e431d4d0a75d1ecbdf0c31893c77aa} 
+\mbox{\hyperlink{environment_8hpp_aa8554335c865509d8d68f600b3d97442}{arch\+\_\+t}} arch}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=}
+\DoxyCodeLine{}
+\DoxyCodeLine{}
+\DoxyCodeLine{}
+\DoxyCodeLine{}
+\DoxyCodeLine{}
+\DoxyCodeLine{}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_aa8554335c865509d8d68f600b3d97442a112b29402ecb654f7f960772b5be24e8}{ARCH\_OTHER}}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{environment_8hpp_source_l00033}{33}} of file \mbox{\hyperlink{environment_8hpp_source}{environment.\+hpp}}.
+
+\Hypertarget{environment_8hpp_aa822d32e7e9853a2388d30a80d4449da}\index{environment.hpp@{environment.hpp}!boost\_version@{boost\_version}}
+\index{boost\_version@{boost\_version}!environment.hpp@{environment.hpp}}
+\doxysubsubsection{\texorpdfstring{boost\_version}{boost\_version}}
+{\footnotesize\ttfamily \label{environment_8hpp_aa822d32e7e9853a2388d30a80d4449da} 
+unsigned boost\+\_\+version = BOOST\+\_\+\+VERSION}
+
+
+
+Definition at line \mbox{\hyperlink{environment_8hpp_source_l00044}{44}} of file \mbox{\hyperlink{environment_8hpp_source}{environment.\+hpp}}.
+
+\Hypertarget{environment_8hpp_ada194dda0ebbfb422d370043a4bec4cf}\index{environment.hpp@{environment.hpp}!compiler@{compiler}}
+\index{compiler@{compiler}!environment.hpp@{environment.hpp}}
+\doxysubsubsection{\texorpdfstring{compiler}{compiler}}
+{\footnotesize\ttfamily \label{environment_8hpp_ada194dda0ebbfb422d370043a4bec4cf} 
+char compiler\mbox{[}256\mbox{]} = \{\}}
+
+
+
+Definition at line \mbox{\hyperlink{environment_8hpp_source_l00046}{46}} of file \mbox{\hyperlink{environment_8hpp_source}{environment.\+hpp}}.
+
+\Hypertarget{environment_8hpp_aba05f3389d9d85333033226e7faad614}\index{environment.hpp@{environment.hpp}!dbenviron@{dbenviron}}
+\index{dbenviron@{dbenviron}!environment.hpp@{environment.hpp}}
+\doxysubsubsection{\texorpdfstring{dbenviron}{dbenviron}}
+{\footnotesize\ttfamily \label{environment_8hpp_aba05f3389d9d85333033226e7faad614} 
+\mbox{\hyperlink{environment_8hpp_a962d8de627af2d0ded4f7f8ec45bd6b1}{environment}} dbenviron}
+
+
+
+Definition at line \mbox{\hyperlink{environment_8hpp_source_l00002}{2}} of file \mbox{\hyperlink{environment_8hpp_source}{environment.\+hpp}}.
+
+\Hypertarget{environment_8hpp_a398527b3e9e358c345c5047b16871957}\index{environment.hpp@{environment.hpp}!debug@{debug}}
+\index{debug@{debug}!environment.hpp@{environment.hpp}}
+\doxysubsubsection{\texorpdfstring{debug}{debug}}
+{\footnotesize\ttfamily \label{environment_8hpp_a398527b3e9e358c345c5047b16871957} 
+bool debug}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keyword}{true}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{environment_8hpp_source_l00017}{17}} of file \mbox{\hyperlink{environment_8hpp_source}{environment.\+hpp}}.
+
+\Hypertarget{environment_8hpp_ad25edacba00e4d0666a9959053b7cc10}\index{environment.hpp@{environment.hpp}!dirty@{dirty}}
+\index{dirty@{dirty}!environment.hpp@{environment.hpp}}
+\doxysubsubsection{\texorpdfstring{dirty}{dirty}}
+{\footnotesize\ttfamily \label{environment_8hpp_ad25edacba00e4d0666a9959053b7cc10} 
+bool dirty = false}
+
+
+
+Definition at line \mbox{\hyperlink{environment_8hpp_source_l00001}{1}} of file \mbox{\hyperlink{environment_8hpp_source}{environment.\+hpp}}.
+
+\Hypertarget{environment_8hpp_a7e290573ef1be67b92a2c745e3b00d1d}\index{environment.hpp@{environment.hpp}!id@{id}}
+\index{id@{id}!environment.hpp@{environment.hpp}}
+\doxysubsubsection{\texorpdfstring{id}{id}}
+{\footnotesize\ttfamily \label{environment_8hpp_a7e290573ef1be67b92a2c745e3b00d1d} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} id = header\+\_\+id}
+
+
+
+Definition at line \mbox{\hyperlink{environment_8hpp_source_l00000}{0}} of file \mbox{\hyperlink{environment_8hpp_source}{environment.\+hpp}}.
+
+\Hypertarget{environment_8hpp_a3951483d0b31c29ca95336206cd35238}\index{environment.hpp@{environment.hpp}!os@{os}}
+\index{os@{os}!environment.hpp@{environment.hpp}}
+\doxysubsubsection{\texorpdfstring{os}{os}}
+{\footnotesize\ttfamily \label{environment_8hpp_a3951483d0b31c29ca95336206cd35238} 
+\mbox{\hyperlink{environment_8hpp_a5e55ee7dabe1ec807ab569fc11babbb0}{os\+\_\+t}} os}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=}
+\DoxyCodeLine{}
+\DoxyCodeLine{}
+\DoxyCodeLine{}
+\DoxyCodeLine{}
+\DoxyCodeLine{}
+\DoxyCodeLine{}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a5e55ee7dabe1ec807ab569fc11babbb0a3d3a12d1d170260bc66459e6437d06cb}{OS\_OTHER}}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{environment_8hpp_source_l00023}{23}} of file \mbox{\hyperlink{environment_8hpp_source}{environment.\+hpp}}.
+
+\Hypertarget{environment_8hpp_a83b194e731d2cf63d2812367744b0ed6}\index{environment.hpp@{environment.hpp}!reserved@{reserved}}
+\index{reserved@{reserved}!environment.hpp@{environment.hpp}}
+\doxysubsubsection{\texorpdfstring{reserved}{reserved}}
+{\footnotesize\ttfamily \label{environment_8hpp_a83b194e731d2cf63d2812367744b0ed6} 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} reserved\mbox{[}512\mbox{]} = \{\}}
+
+
+
+Definition at line \mbox{\hyperlink{environment_8hpp_source_l00045}{45}} of file \mbox{\hyperlink{environment_8hpp_source}{environment.\+hpp}}.
+

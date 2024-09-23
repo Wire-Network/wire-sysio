@@ -1,0 +1,95 @@
+\doxysection{memory.\+hpp}
+\hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source}{}\label{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source}\index{libraries/fc/vendor/websocketpp/websocketpp/common/memory.hpp@{libraries/fc/vendor/websocketpp/websocketpp/common/memory.hpp}}
+\mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2014,\ Peter\ Thorson.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00004}00004\ \textcolor{comment}{\ *\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00005}00005\ \textcolor{comment}{\ *\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are\ met:}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00006}00006\ \textcolor{comment}{\ *\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00007}00007\ \textcolor{comment}{\ *\ \ \ \ \ \ \ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00008}00008\ \textcolor{comment}{\ *\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00009}00009\ \textcolor{comment}{\ *\ \ \ \ \ \ \ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer\ in\ the}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00010}00010\ \textcolor{comment}{\ *\ \ \ \ \ \ \ documentation\ and/or\ other\ materials\ provided\ with\ the\ distribution.}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00011}00011\ \textcolor{comment}{\ *\ \ \ \ \ *\ Neither\ the\ name\ of\ the\ WebSocket++\ Project\ nor\ the}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00012}00012\ \textcolor{comment}{\ *\ \ \ \ \ \ \ names\ of\ its\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00013}00013\ \textcolor{comment}{\ *\ \ \ \ \ \ \ derived\ from\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00014}00014\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00015}00015\ \textcolor{comment}{\ *\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS\ "{}AS\ IS"{}}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00016}00016\ \textcolor{comment}{\ *\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ THE}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00017}00017\ \textcolor{comment}{\ *\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR\ A\ PARTICULAR\ PURPOSE}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00018}00018\ \textcolor{comment}{\ *\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ PETER\ THORSON\ BE\ LIABLE\ FOR\ ANY}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00019}00019\ \textcolor{comment}{\ *\ DIRECT,\ INDIRECT,\ INCIDENTAL,\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00020}00020\ \textcolor{comment}{\ *\ (INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00021}00021\ \textcolor{comment}{\ *\ LOSS\ OF\ USE,\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00022}00022\ \textcolor{comment}{\ *\ ON\ ANY\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00023}00023\ \textcolor{comment}{\ *\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE\ OF\ THIS}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00024}00024\ \textcolor{comment}{\ *\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00025}00025\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00026}00026\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00028}00028\ \textcolor{preprocessor}{\#ifndef\ WEBSOCKETPP\_COMMON\_MEMORY\_HPP}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00029}00029\ \textcolor{preprocessor}{\#define\ WEBSOCKETPP\_COMMON\_MEMORY\_HPP}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00031}00031\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{cpp11_8hpp}{websocketpp/common/cpp11.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00033}00033\ \textcolor{comment}{//\ If\ we've\ determined\ that\ we're\ in\ full\ C++11\ mode\ and\ the\ user\ hasn't}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00034}00034\ \textcolor{comment}{//\ explicitly\ disabled\ the\ use\ of\ C++11\ memory\ header,\ then\ prefer\ it\ to}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00035}00035\ \textcolor{comment}{//\ boost.}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00036}00036\ \textcolor{preprocessor}{\#if\ defined\ \_WEBSOCKETPP\_CPP11\_INTERNAL\_\ \&\&\ !defined\ \_WEBSOCKETPP\_NO\_CPP11\_MEMORY\_}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00037}00037\ \textcolor{preprocessor}{\ \ \ \ \#ifndef\ \_WEBSOCKETPP\_CPP11\_MEMORY\_}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00038}00038\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#define\ \_WEBSOCKETPP\_CPP11\_MEMORY\_}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00039}00039\ \textcolor{preprocessor}{\ \ \ \ \#endif}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00040}00040\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00042}00042\ \textcolor{comment}{//\ If\ we're\ on\ Visual\ Studio\ 2010\ or\ higher\ and\ haven't\ explicitly\ disabled}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00043}00043\ \textcolor{comment}{//\ the\ use\ of\ C++11\ functional\ header\ then\ prefer\ it\ to\ boost.}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00044}00044\ \textcolor{preprocessor}{\#if\ defined(\_MSC\_VER)\ \&\&\ \_MSC\_VER\ >=\ 1600\ \&\&\ !defined\ \_WEBSOCKETPP\_NO\_CPP11\_MEMORY\_}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00045}00045\ \textcolor{preprocessor}{\ \ \ \ \#ifndef\ \_WEBSOCKETPP\_CPP11\_MEMORY\_}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00046}00046\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#define\ \_WEBSOCKETPP\_CPP11\_MEMORY\_}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00047}00047\ \textcolor{preprocessor}{\ \ \ \ \#endif}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00048}00048\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00052}00052\ \textcolor{preprocessor}{\#ifdef\ \_WEBSOCKETPP\_CPP11\_MEMORY\_}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00053}00053\ \textcolor{preprocessor}{\ \ \ \ \#include\ <memory>}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00054}00054\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00055}00055\ \textcolor{preprocessor}{\ \ \ \ \#include\ <boost/shared\_ptr.hpp>}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00056}00056\ \textcolor{preprocessor}{\ \ \ \ \#include\ <boost/make\_shared.hpp>}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00057}00057\ \textcolor{preprocessor}{\ \ \ \ \#include\ <boost/scoped\_array.hpp>}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00058}00058\ \textcolor{preprocessor}{\ \ \ \ \#include\ <boost/enable\_shared\_from\_this.hpp>}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00059}00059\ \textcolor{preprocessor}{\ \ \ \ \#include\ <boost/pointer\_cast.hpp>}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00060}00060\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00062}00062\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacewebsocketpp}{websocketpp}}\ \{}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00063}00063\ \textcolor{keyword}{namespace\ }lib\ \{}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00065}00065\ \textcolor{preprocessor}{\#ifdef\ \_WEBSOCKETPP\_CPP11\_MEMORY\_}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00066}00066\ \ \ \ \ \textcolor{keyword}{using\ }std::shared\_ptr;}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00067}00067\ \ \ \ \ \textcolor{keyword}{using\ }std::weak\_ptr;}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00068}00068\ \ \ \ \ \textcolor{keyword}{using\ }std::unique\_ptr;}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00069}00069\ \ \ \ \ \textcolor{keyword}{using\ }std::enable\_shared\_from\_this;}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00070}00070\ \ \ \ \ \textcolor{keyword}{using\ }std::static\_pointer\_cast;}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00071}00071\ \ \ \ \ \textcolor{keyword}{using\ }std::make\_shared;}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00072}00072\ \ \ \ \ \textcolor{keyword}{using\ }std::unique\_ptr;}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00073}00073\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00074}00074\ \ \ \ \ \textcolor{keyword}{typedef}\ std::unique\_ptr<unsigned\ char[]>\ \mbox{\hyperlink{namespacewebsocketpp_1_1lib_a0021504e0fcd9438c7531506ccd95d94}{unique\_ptr\_uchar\_array}};}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00075}00075\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00076}00076\ \ \ \ \ \textcolor{keyword}{using\ }boost::shared\_ptr;}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00077}00077\ \ \ \ \ \textcolor{keyword}{using\ }boost::weak\_ptr;}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00078}00078\ \ \ \ \ \textcolor{keyword}{using\ }std::auto\_ptr;}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00079}00079\ \ \ \ \ \textcolor{keyword}{using\ }boost::enable\_shared\_from\_this;}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00080}00080\ \ \ \ \ \textcolor{keyword}{using\ }boost::static\_pointer\_cast;}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00081}00081\ \ \ \ \ \textcolor{keyword}{using\ }boost::make\_shared;}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00083}\mbox{\hyperlink{namespacewebsocketpp_1_1lib_a0021504e0fcd9438c7531506ccd95d94}{00083}}\ \ \ \ \ \textcolor{keyword}{typedef}\ boost::scoped\_array<unsigned\ char>\ \mbox{\hyperlink{namespacewebsocketpp_1_1lib_a0021504e0fcd9438c7531506ccd95d94}{unique\_ptr\_uchar\_array}};}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00084}00084\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00085}00085\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00086}00086\ \}\ \textcolor{comment}{//\ namespace\ lib}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00087}00087\ \}\ \textcolor{comment}{//\ namespace\ websocketpp}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00088}00088\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00089}00089\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ WEBSOCKETPP\_COMMON\_MEMORY\_HPP}}
+
+\end{DoxyCode}

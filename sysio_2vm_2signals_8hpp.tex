@@ -1,0 +1,44 @@
+\doxysection{libraries/sys-\/vm/include/sysio/sysio/vm/signals.hpp File Reference}
+\hypertarget{sysio_2vm_2signals_8hpp}{}\label{sysio_2vm_2signals_8hpp}\index{libraries/sys-\/vm/include/sysio/sysio/vm/signals.hpp@{libraries/sys-\/vm/include/sysio/sysio/vm/signals.hpp}}
+{\ttfamily \#include $<$sysio/vm/exceptions.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/vm/utils.\+hpp$>$}\newline
+{\ttfamily \#include $<$atomic$>$}\newline
+{\ttfamily \#include $<$cstdlib$>$}\newline
+{\ttfamily \#include $<$exception$>$}\newline
+{\ttfamily \#include $<$utility$>$}\newline
+{\ttfamily \#include $<$signal.\+h$>$}\newline
+{\ttfamily \#include $<$setjmp.\+h$>$}\newline
+Include dependency graph for signals.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sysio_2vm_2signals_8hpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1vm}{sysio\+::vm}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{namespacesysio_1_1vm_aa2e30fac0f99c3450ef6d78aa934490f}{sysio\+::vm\+::signal\+\_\+handler}} (int sig, siginfo\+\_\+t \texorpdfstring{$\ast$}{*}info, void \texorpdfstring{$\ast$}{*}uap)
+\item 
+{\footnotesize template$<$typename F $>$ }\\void \mbox{\hyperlink{namespacesysio_1_1vm_a5b253eea784c976ab7c0d82d43c77fd0}{sysio\+::vm\+::longjmp\+\_\+on\+\_\+exception}} (F \&\&\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})
+\item 
+{\footnotesize template$<$typename E $>$ }\\void \mbox{\hyperlink{namespacesysio_1_1vm_a96dfdf06dbb657c55b510cd09ee321e6}{sysio\+::vm\+::throw\+\_\+}} (const char \texorpdfstring{$\ast$}{*}msg)
+\item 
+void \mbox{\hyperlink{namespacesysio_1_1vm_a3b729c87be5c09baca1dec359fad785b}{sysio\+::vm\+::setup\+\_\+signal\+\_\+handler\+\_\+impl}} ()
+\item 
+void \mbox{\hyperlink{namespacesysio_1_1vm_a2bf040912c32fbb2ea68f5338bb304fe}{sysio\+::vm\+::setup\+\_\+signal\+\_\+handler}} ()
+\item 
+{\footnotesize template$<$typename F , typename E $>$ }\\auto \mbox{\hyperlink{namespacesysio_1_1vm_a071298ad9404d4cd62434edde161b767}{sysio\+::vm\+::invoke\+\_\+with\+\_\+signal\+\_\+handler}} (F \&\&\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}, E \&\&e)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$int Sig$>$ }\\\mbox{\hyperlink{namespacefc_a29e4073676ce58527d300f75b017791d}{\+\_\+\+\_\+attribute\+\_\+\+\_\+}}((visibility("{}default"{}))) inline thread\+\_\+local std \mbox{\hyperlink{namespacefc_a29e4073676ce58527d300f75b017791d}{\+\_\+\+\_\+attribute\+\_\+\+\_\+}}((visibility("{}default"{}))) inline thread\+\_\+local std struct sigaction \mbox{\hyperlink{namespacesysio_1_1vm_a1066b30cdd1da122a6405a37fd63f75a}{sysio\+::vm\+::prev\+\_\+signal\+\_\+handler}}
+\end{DoxyCompactItemize}

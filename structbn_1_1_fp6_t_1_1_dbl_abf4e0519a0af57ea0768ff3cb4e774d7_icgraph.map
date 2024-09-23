@@ -1,0 +1,12 @@
+<map id="bn::Fp6T::Dbl::addNC" name="bn::Fp6T::Dbl::addNC">
+<area shape="rect" id="Node000001" title=" " alt="" coords="425,31,574,56"/>
+<area shape="rect" id="Node000002" href="$structbn_1_1_fp12_t_1_1_dbl.html#a62545e53bcf237feca656dcf1b36e746" title=" " alt="" coords="222,5,377,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="409,35,377,31,378,25,410,30"/>
+<area shape="rect" id="Node000003" href="$bn_8cpp.html#a306f64b0ee9aabdcdde61ed5270447d6" title=" " alt="" coords="250,55,349,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="410,57,350,64,349,59,409,52"/>
+<area shape="rect" id="Node000004" href="$bn_8cpp.html#a40f2351c00194125aea1e53e4f691989" title=" " alt="" coords="103,55,174,80"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="235,70,174,70,174,65,235,65"/>
+<area shape="poly" id="edge4_Node000004_Node000004" title=" " alt="" coords="156,41,150,35,138,33,128,35,122,40,121,46,124,53,119,55,115,46,118,37,125,30,138,28,152,31,159,38"/>
+<area shape="rect" id="Node000005" href="$bn_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97" title=" " alt="" coords="5,55,55,80"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="87,70,55,70,55,65,87,65"/>
+</map>

@@ -1,0 +1,47 @@
+\doxysection{hash.\+h}
+\hypertarget{fc_2secp256k1_2secp256k1_2src_2hash_8h_source}{}\label{fc_2secp256k1_2secp256k1_2src_2hash_8h_source}\index{libraries/fc/secp256k1/secp256k1/src/hash.h@{libraries/fc/secp256k1/secp256k1/src/hash.h}}
+\mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2hash_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{fc_2secp256k1_2secp256k1_2src_2hash_8h_source_l00001}00001\ \textcolor{comment}{/***********************************************************************}}
+\DoxyCodeLine{\Hypertarget{fc_2secp256k1_2secp256k1_2src_2hash_8h_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2014\ Pieter\ Wuille\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{fc_2secp256k1_2secp256k1_2src_2hash_8h_source_l00003}00003\ \textcolor{comment}{\ *\ Distributed\ under\ the\ MIT\ software\ license,\ see\ the\ accompanying\ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{fc_2secp256k1_2secp256k1_2src_2hash_8h_source_l00004}00004\ \textcolor{comment}{\ *\ file\ COPYING\ or\ https://www.opensource.org/licenses/mit-\/license.php.*}}
+\DoxyCodeLine{\Hypertarget{fc_2secp256k1_2secp256k1_2src_2hash_8h_source_l00005}00005\ \textcolor{comment}{\ ***********************************************************************/}}
+\DoxyCodeLine{\Hypertarget{fc_2secp256k1_2secp256k1_2src_2hash_8h_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{fc_2secp256k1_2secp256k1_2src_2hash_8h_source_l00007}00007\ \textcolor{preprocessor}{\#ifndef\ SECP256K1\_HASH\_H}}
+\DoxyCodeLine{\Hypertarget{fc_2secp256k1_2secp256k1_2src_2hash_8h_source_l00008}00008\ \textcolor{preprocessor}{\#define\ SECP256K1\_HASH\_H}}
+\DoxyCodeLine{\Hypertarget{fc_2secp256k1_2secp256k1_2src_2hash_8h_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{fc_2secp256k1_2secp256k1_2src_2hash_8h_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <stdlib.h>}}
+\DoxyCodeLine{\Hypertarget{fc_2secp256k1_2secp256k1_2src_2hash_8h_source_l00011}00011\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{stdint_8h}{stdint.h}}>}}
+\DoxyCodeLine{\Hypertarget{fc_2secp256k1_2secp256k1_2src_2hash_8h_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{fc_2secp256k1_2secp256k1_2src_2hash_8h_source_l00013}\mbox{\hyperlink{structsecp256k1__sha256}{00013}}\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{\Hypertarget{fc_2secp256k1_2secp256k1_2src_2hash_8h_source_l00014}\mbox{\hyperlink{structsecp256k1__sha256_af69b4b763180b87d2fd9e0f5d1a7bfe7}{00014}}\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}[8];}
+\DoxyCodeLine{\Hypertarget{fc_2secp256k1_2secp256k1_2src_2hash_8h_source_l00015}\mbox{\hyperlink{structsecp256k1__sha256_af4d449abcea30070d41da774eafdd0ae}{00015}}\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}[64];}
+\DoxyCodeLine{\Hypertarget{fc_2secp256k1_2secp256k1_2src_2hash_8h_source_l00016}\mbox{\hyperlink{structsecp256k1__sha256_adb24d3786865016d889feb4ec618e1e8}{00016}}\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{structsecp256k1__sha256_adb24d3786865016d889feb4ec618e1e8}{bytes}};}
+\DoxyCodeLine{\Hypertarget{fc_2secp256k1_2secp256k1_2src_2hash_8h_source_l00017}00017\ \}\ \mbox{\hyperlink{structsecp256k1__sha256}{secp256k1\_sha256}};}
+\DoxyCodeLine{\Hypertarget{fc_2secp256k1_2secp256k1_2src_2hash_8h_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{fc_2secp256k1_2secp256k1_2src_2hash_8h_source_l00019}00019\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_sha256\_initialize(\mbox{\hyperlink{structsecp256k1__sha256}{secp256k1\_sha256}}\ *hash);}
+\DoxyCodeLine{\Hypertarget{fc_2secp256k1_2secp256k1_2src_2hash_8h_source_l00020}00020\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_sha256\_write(\mbox{\hyperlink{structsecp256k1__sha256}{secp256k1\_sha256}}\ *hash,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *data,\ \textcolor{keywordtype}{size\_t}\ size);}
+\DoxyCodeLine{\Hypertarget{fc_2secp256k1_2secp256k1_2src_2hash_8h_source_l00021}00021\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_sha256\_finalize(\mbox{\hyperlink{structsecp256k1__sha256}{secp256k1\_sha256}}\ *hash,\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *out32);}
+\DoxyCodeLine{\Hypertarget{fc_2secp256k1_2secp256k1_2src_2hash_8h_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{fc_2secp256k1_2secp256k1_2src_2hash_8h_source_l00023}\mbox{\hyperlink{structsecp256k1__hmac__sha256}{00023}}\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{\Hypertarget{fc_2secp256k1_2secp256k1_2src_2hash_8h_source_l00024}\mbox{\hyperlink{structsecp256k1__hmac__sha256_ade2bc8fbef3c3f23d533ee99b2848025}{00024}}\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__sha256}{secp256k1\_sha256}}\ \mbox{\hyperlink{structsecp256k1__hmac__sha256_ade2bc8fbef3c3f23d533ee99b2848025}{inner}},\ outer;}
+\DoxyCodeLine{\Hypertarget{fc_2secp256k1_2secp256k1_2src_2hash_8h_source_l00025}00025\ \}\ \mbox{\hyperlink{structsecp256k1__hmac__sha256}{secp256k1\_hmac\_sha256}};}
+\DoxyCodeLine{\Hypertarget{fc_2secp256k1_2secp256k1_2src_2hash_8h_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{fc_2secp256k1_2secp256k1_2src_2hash_8h_source_l00027}00027\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_hmac\_sha256\_initialize(\mbox{\hyperlink{structsecp256k1__hmac__sha256}{secp256k1\_hmac\_sha256}}\ *hash,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *key,\ \textcolor{keywordtype}{size\_t}\ size);}
+\DoxyCodeLine{\Hypertarget{fc_2secp256k1_2secp256k1_2src_2hash_8h_source_l00028}00028\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_hmac\_sha256\_write(\mbox{\hyperlink{structsecp256k1__hmac__sha256}{secp256k1\_hmac\_sha256}}\ *hash,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *data,\ \textcolor{keywordtype}{size\_t}\ size);}
+\DoxyCodeLine{\Hypertarget{fc_2secp256k1_2secp256k1_2src_2hash_8h_source_l00029}00029\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_hmac\_sha256\_finalize(\mbox{\hyperlink{structsecp256k1__hmac__sha256}{secp256k1\_hmac\_sha256}}\ *hash,\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *out32);}
+\DoxyCodeLine{\Hypertarget{fc_2secp256k1_2secp256k1_2src_2hash_8h_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{fc_2secp256k1_2secp256k1_2src_2hash_8h_source_l00031}\mbox{\hyperlink{structsecp256k1__rfc6979__hmac__sha256}{00031}}\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{\Hypertarget{fc_2secp256k1_2secp256k1_2src_2hash_8h_source_l00032}\mbox{\hyperlink{structsecp256k1__rfc6979__hmac__sha256_ada36277caacc4ad470a4a1c230ec5b41}{00032}}\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ v[32];}
+\DoxyCodeLine{\Hypertarget{fc_2secp256k1_2secp256k1_2src_2hash_8h_source_l00033}\mbox{\hyperlink{structsecp256k1__rfc6979__hmac__sha256_a9a22f1d66d76ace5a6d6f58efb71117f}{00033}}\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ k[32];}
+\DoxyCodeLine{\Hypertarget{fc_2secp256k1_2secp256k1_2src_2hash_8h_source_l00034}\mbox{\hyperlink{structsecp256k1__rfc6979__hmac__sha256_a87be29d99b937a03619b9d8fcc921a4a}{00034}}\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{structsecp256k1__rfc6979__hmac__sha256_a87be29d99b937a03619b9d8fcc921a4a}{retry}};}
+\DoxyCodeLine{\Hypertarget{fc_2secp256k1_2secp256k1_2src_2hash_8h_source_l00035}00035\ \}\ \mbox{\hyperlink{structsecp256k1__rfc6979__hmac__sha256}{secp256k1\_rfc6979\_hmac\_sha256}};}
+\DoxyCodeLine{\Hypertarget{fc_2secp256k1_2secp256k1_2src_2hash_8h_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{fc_2secp256k1_2secp256k1_2src_2hash_8h_source_l00037}00037\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_rfc6979\_hmac\_sha256\_initialize(\mbox{\hyperlink{structsecp256k1__rfc6979__hmac__sha256}{secp256k1\_rfc6979\_hmac\_sha256}}\ *rng,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *key,\ \textcolor{keywordtype}{size\_t}\ keylen);}
+\DoxyCodeLine{\Hypertarget{fc_2secp256k1_2secp256k1_2src_2hash_8h_source_l00038}00038\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_rfc6979\_hmac\_sha256\_generate(\mbox{\hyperlink{structsecp256k1__rfc6979__hmac__sha256}{secp256k1\_rfc6979\_hmac\_sha256}}\ *rng,\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *out,\ \textcolor{keywordtype}{size\_t}\ outlen);}
+\DoxyCodeLine{\Hypertarget{fc_2secp256k1_2secp256k1_2src_2hash_8h_source_l00039}00039\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_rfc6979\_hmac\_sha256\_finalize(\mbox{\hyperlink{structsecp256k1__rfc6979__hmac__sha256}{secp256k1\_rfc6979\_hmac\_sha256}}\ *rng);}
+\DoxyCodeLine{\Hypertarget{fc_2secp256k1_2secp256k1_2src_2hash_8h_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{fc_2secp256k1_2secp256k1_2src_2hash_8h_source_l00041}00041\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{/*\ SECP256K1\_HASH\_H\ */}\textcolor{preprocessor}{}}
+
+\end{DoxyCode}

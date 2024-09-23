@@ -1,0 +1,15 @@
+<map id="deflate_config" name="deflate_config">
+<area shape="rect" id="Node000001" title=" " alt="" coords="204,319,306,345"/>
+<area shape="rect" id="Node000002" href="$structwebsocketpp_1_1config_1_1debug__core.html" title="Client/Server debug config with iostream transport." alt="" coords="140,139,282,180"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="222,194,254,318,249,319,217,195"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="87,5,132,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="73,26,43,37,30,45,20,57,11,72,8,85,11,99,19,113,37,126,67,136,141,149,140,154,66,141,35,130,15,117,6,101,3,85,6,70,15,53,26,41,41,32,71,21"/>
+<area shape="rect" id="Node000006" href="$structwebsocketpp_1_1config_1_1core__client.html" title="Client config with iostream transport." alt="" coords="306,139,447,180"/>
+<area shape="poly" id="edge6_Node000006_Node000003" title=" " alt="" coords="148,33,174,53,184,70,186,86,189,100,199,113,306,139,305,144,196,117,184,102,181,87,179,72,170,57,144,37"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="443,5,499,31"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="429,32,405,42,385,57,376,71,373,86,370,101,359,117,331,129,283,143,281,138,330,124,356,113,365,99,368,85,371,69,381,53,403,37,427,27"/>
+<area shape="poly" id="edge7_Node000006_Node000004" title=" " alt="" coords="514,37,529,54,537,70,541,86,538,101,529,117,513,133,492,145,448,158,447,153,490,140,509,129,525,113,533,99,535,86,532,72,525,56,510,40"/>
+<area shape="rect" id="Node000005" href="$structwebsocketpp_1_1config_1_1asio__client.html" title="Client config with asio transport and TLS disabled." alt="" coords="291,229,432,270"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="325,281,273,321,269,316,322,277"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="373,195,368,229,362,228,368,194"/>
+</map>

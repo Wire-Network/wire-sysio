@@ -1,0 +1,71 @@
+\doxysection{testing\+::internal\+::Set\+Argument\+Pointee\+Action\texorpdfstring{$<$}{<} N, Proto, true \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classtesting_1_1internal_1_1_set_argument_pointee_action_3_01_n_00_01_proto_00_01true_01_4}{}\label{classtesting_1_1internal_1_1_set_argument_pointee_action_3_01_n_00_01_proto_00_01true_01_4}\index{testing::internal::SetArgumentPointeeAction$<$ N, Proto, true $>$@{testing::internal::SetArgumentPointeeAction$<$ N, Proto, true $>$}}
+
+
+{\ttfamily \#include $<$gmock-\/actions.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_set_argument_pointee_action_3_01_n_00_01_proto_00_01true_01_4_af08b3a61e483f704e93872987d30ade0}{Set\+Argument\+Pointee\+Action}} (const Proto \&proto)
+\item 
+{\footnotesize template$<$typename Result , typename Argument\+Tuple $>$ }\\void \mbox{\hyperlink{classtesting_1_1internal_1_1_set_argument_pointee_action_3_01_n_00_01_proto_00_01true_01_4_ac89fa5dde5d2683206a77d29630917cd}{Perform}} (const Argument\+Tuple \&args) const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$size\+\_\+t N, typename Proto$>$\newline
+class testing\+::internal\+::\+Set\+Argument\+Pointee\+Action$<$ N, Proto, true $>$}
+
+
+Definition at line \mbox{\hyperlink{gmock-actions_8h_source_l00852}{852}} of file \mbox{\hyperlink{gmock-actions_8h_source}{gmock-\/actions.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_set_argument_pointee_action_3_01_n_00_01_proto_00_01true_01_4_af08b3a61e483f704e93872987d30ade0}\index{testing::internal::SetArgumentPointeeAction$<$ N, Proto, true $>$@{testing::internal::SetArgumentPointeeAction$<$ N, Proto, true $>$}!SetArgumentPointeeAction@{SetArgumentPointeeAction}}
+\index{SetArgumentPointeeAction@{SetArgumentPointeeAction}!testing::internal::SetArgumentPointeeAction$<$ N, Proto, true $>$@{testing::internal::SetArgumentPointeeAction$<$ N, Proto, true $>$}}
+\doxysubsubsection{\texorpdfstring{SetArgumentPointeeAction()}{SetArgumentPointeeAction()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_set_argument_pointee_action_3_01_n_00_01_proto_00_01true_01_4_af08b3a61e483f704e93872987d30ade0} 
+template$<$size\+\_\+t N, typename Proto $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_set_argument_pointee_action}{testing\+::internal\+::\+Set\+Argument\+Pointee\+Action}}$<$ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}, Proto, true $>$\+::\+Set\+Argument\+Pointee\+Action (\begin{DoxyParamCaption}\item[{const Proto \&}]{proto}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-actions_8h_source_l00858}{858}} of file \mbox{\hyperlink{gmock-actions_8h_source}{gmock-\/actions.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00858\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ proto\_(\textcolor{keyword}{new}\ Proto)\ \{}
+\DoxyCodeLine{00859\ \ \ \ \ proto\_-\/>CopyFrom(proto);}
+\DoxyCodeLine{00860\ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_set_argument_pointee_action_3_01_n_00_01_proto_00_01true_01_4_ac89fa5dde5d2683206a77d29630917cd}\index{testing::internal::SetArgumentPointeeAction$<$ N, Proto, true $>$@{testing::internal::SetArgumentPointeeAction$<$ N, Proto, true $>$}!Perform@{Perform}}
+\index{Perform@{Perform}!testing::internal::SetArgumentPointeeAction$<$ N, Proto, true $>$@{testing::internal::SetArgumentPointeeAction$<$ N, Proto, true $>$}}
+\doxysubsubsection{\texorpdfstring{Perform()}{Perform()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_set_argument_pointee_action_3_01_n_00_01_proto_00_01true_01_4_ac89fa5dde5d2683206a77d29630917cd} 
+template$<$size\+\_\+t N, typename Proto $>$ \\
+template$<$typename Result , typename Argument\+Tuple $>$ \\
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_set_argument_pointee_action}{testing\+::internal\+::\+Set\+Argument\+Pointee\+Action}}$<$ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}, Proto, true $>$\+::\+Perform (\begin{DoxyParamCaption}\item[{const Argument\+Tuple \&}]{args}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-actions_8h_source_l00863}{863}} of file \mbox{\hyperlink{gmock-actions_8h_source}{gmock-\/actions.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00863\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00864\ \ \ \ \ CompileAssertTypesEqual<void,\ Result>();}
+\DoxyCodeLine{00865\ \ \ \ \ ::testing::get<N>(args)-\/>CopyFrom(*proto\_);}
+\DoxyCodeLine{00866\ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/include/gmock/\mbox{\hyperlink{gmock-actions_8h}{gmock-\/actions.\+h}}\end{DoxyCompactItemize}

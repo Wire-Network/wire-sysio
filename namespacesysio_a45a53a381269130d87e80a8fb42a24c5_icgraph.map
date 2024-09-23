@@ -1,0 +1,7 @@
+<map id="sysio::read_builtin_protocol_feature" name="sysio::read_builtin_protocol_feature">
+<area shape="rect" id="Node000001" title=" " alt="" coords="394,5,520,46"/>
+<area shape="rect" id="Node000002" href="$namespacesysio.html#a42c982ab5630888ec8df71785a9a226c" title=" " alt="" coords="186,5,346,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="378,28,347,28,347,23,378,23"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1chain__plugin.html#a0192ac61f3f59d4fdf2dcbbd2c7104ca" title=" " alt="" coords="5,5,138,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="170,28,138,28,138,23,170,23"/>
+</map>

@@ -1,0 +1,32 @@
+\doxysection{libraries/fc/src/uint128.cpp File Reference}
+\hypertarget{uint128_8cpp}{}\label{uint128_8cpp}\index{libraries/fc/src/uint128.cpp@{libraries/fc/src/uint128.cpp}}
+{\ttfamily \#include $<$fc/uint128.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/variant.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/crypto/bigint.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/multiprecision/cpp\+\_\+int.\+hpp$>$}\newline
+{\ttfamily \#include $<$stdexcept$>$}\newline
+{\ttfamily \#include "{}byteswap.\+hpp"{}}\newline
+Include dependency graph for uint128.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{uint128_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacefc}{fc}}
+\begin{DoxyCompactList}\small\item\em namespace \doxylink{namespacesysio_1_1chain}{sysio\+::chain} \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef boost\+::multiprecision\+::uint128\+\_\+t \mbox{\hyperlink{namespacefc_a57627745fd3d6ca438159d665bea591e}{fc\+::m128}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{namespacefc_a86fa82fcad5c60028f11ea3cc43d4c1b}{fc\+::to\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1uint128}{uint128}} \&var, \mbox{\hyperlink{classfc_1_1variant}{variant}} \&vo)
+\item 
+void \mbox{\hyperlink{namespacefc_ab19f8cf3cfd181b14116a365a73e5ebd}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{variant}} \&var, \mbox{\hyperlink{classfc_1_1uint128}{uint128}} \&vo)
+\end{DoxyCompactItemize}

@@ -1,0 +1,332 @@
+\doxysection{libraries/wasm-\/jit/\+Include/\+Runtime/\+Intrinsics.h File Reference}
+\hypertarget{_intrinsics_8h}{}\label{_intrinsics_8h}\index{libraries/wasm-\/jit/Include/Runtime/Intrinsics.h@{libraries/wasm-\/jit/Include/Runtime/Intrinsics.h}}
+{\ttfamily \#include "{}Inline/\+Basic\+Types.\+h"{}}\newline
+{\ttfamily \#include "{}IR/\+IR.\+h"{}}\newline
+{\ttfamily \#include "{}Runtime.\+h"{}}\newline
+Include dependency graph for Intrinsics.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{_intrinsics_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{_intrinsics_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_intrinsics_1_1_function}{Intrinsics\+::\+Function}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespace_intrinsics}{Intrinsics}}
+\item 
+namespace \mbox{\hyperlink{namespace_native_types}{Native\+Types}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{_intrinsics_8h_aef80d0dfcdecc0626216443a33d1398a}{DEFINE\+\_\+\+INTRINSIC\+\_\+\+FUNCTION0}}(module,  c\+Name,  \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  return\+Type)
+\item 
+\#define \mbox{\hyperlink{_intrinsics_8h_a3bba10c3ce327d870e63b55e95163e7c}{DEFINE\+\_\+\+INTRINSIC\+\_\+\+FUNCTION1}}(module,  c\+Name,  \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  return\+Type,  arg0\+Type,  arg0\+Name)
+\item 
+\#define \mbox{\hyperlink{_intrinsics_8h_a405a5ac6f31ce501aad32e0884b61fef}{DEFINE\+\_\+\+INTRINSIC\+\_\+\+FUNCTION2}}(module,  c\+Name,  \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  return\+Type,  arg0\+Type,  arg0\+Name,  arg1\+Type,  arg1\+Name)
+\item 
+\#define \mbox{\hyperlink{_intrinsics_8h_a98a9ae3b64824584835a19dfad421232}{DEFINE\+\_\+\+INTRINSIC\+\_\+\+FUNCTION3}}(module,  c\+Name,  \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  return\+Type,  arg0\+Type,  arg0\+Name,  arg1\+Type,  arg1\+Name,  arg2\+Type,  arg2\+Name)
+\item 
+\#define \mbox{\hyperlink{_intrinsics_8h_a6271f12b629660f4b2fbf0a0b37f6fa2}{DEFINE\+\_\+\+INTRINSIC\+\_\+\+FUNCTION4}}(module,  c\+Name,  \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  return\+Type,  arg0\+Type,  arg0\+Name,  arg1\+Type,  arg1\+Name,  arg2\+Type,  arg2\+Name,  arg3\+Type,  arg3\+Name)
+\item 
+\#define \mbox{\hyperlink{_intrinsics_8h_a3cc0dd2afb6daa6103b86973601a5ea1}{DEFINE\+\_\+\+INTRINSIC\+\_\+\+FUNCTION5}}(module,  c\+Name,  \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  return\+Type,  arg0\+Type,  arg0\+Name,  arg1\+Type,  arg1\+Name,  arg2\+Type,  arg2\+Name,  arg3\+Type,  arg3\+Name,  arg4\+Type,  arg4\+Name)
+\item 
+\#define \mbox{\hyperlink{_intrinsics_8h_a3fee636d52bfd666fc9e6efbcbc5b05f}{DEFINE\+\_\+\+INTRINSIC\+\_\+\+FUNCTION6}}(module,  c\+Name,  \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  return\+Type,  arg0\+Type,  arg0\+Name,  arg1\+Type,  arg1\+Name,  arg2\+Type,  arg2\+Name,  arg3\+Type,  arg3\+Name,  arg4\+Type,  arg4\+Name,  arg5\+Type,  arg5\+Name)
+\item 
+\#define \mbox{\hyperlink{_intrinsics_8h_ae76a88703e924d121bc2a2b106e1f0f5}{DEFINE\+\_\+\+INTRINSIC\+\_\+\+FUNCTION7}}(module,  c\+Name,  \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  return\+Type,  arg0\+Type,  arg0\+Name,  arg1\+Type,  arg1\+Name,  arg2\+Type,  arg2\+Name,  arg3\+Type,  arg3\+Name,  arg4\+Type,  arg4\+Name,  arg5\+Type,  arg5\+Name,  arg6\+Type,  arg6\+Name)
+\item 
+\#define \mbox{\hyperlink{_intrinsics_8h_ab9a58ee558d6137204bc71e84f6efbb1}{DEFINE\+\_\+\+INTRINSIC\+\_\+\+GLOBAL}}(module,  c\+Name,  \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  value\+Type,  is\+Mutable,  initializer)
+\item 
+\#define \mbox{\hyperlink{_intrinsics_8h_a57730ea80fc6386a62051d3f24e03b6b}{DEFINE\+\_\+\+INTRINSIC\+\_\+\+MEMORY}}(module,  c\+Name,  \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  type)
+\item 
+\#define \mbox{\hyperlink{_intrinsics_8h_a7a1b009bd0734c4fffd877af85cf0603}{DEFINE\+\_\+\+INTRINSIC\+\_\+\+TABLE}}(module,  c\+Name,  \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  type)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{_basic_types_8h_a2f1a62071dd7dc3f6ef85c1b7612dc35}{I32}} \mbox{\hyperlink{namespace_native_types_a311886d455d2ab8a224f354d068152e4}{Native\+Types\+::i32}}
+\item 
+typedef \mbox{\hyperlink{_basic_types_8h_a416b74ff5b1dc365af5713a3f48fb8b9}{I64}} \mbox{\hyperlink{namespace_native_types_afdf3569bb6d1de98f5165a3078f88fab}{Native\+Types\+::i64}}
+\item 
+typedef \mbox{\hyperlink{_basic_types_8h_a841d3674577a1e86afdc2f4845f46c4b}{F32}} \mbox{\hyperlink{namespace_native_types_a23011aa347dea57b6464532524a4c27a}{Native\+Types\+::f32}}
+\item 
+typedef \mbox{\hyperlink{_basic_types_8h_adc9896ee12db3bb116fc63b3464c72c7}{F64}} \mbox{\hyperlink{namespace_native_types_acc49687873d8ecf0740b2d8ec4e19ca4}{Native\+Types\+::f64}}
+\item 
+typedef void \mbox{\hyperlink{namespace_native_types_a56927845fa87e6f37216943792d64073}{Native\+Types\+::none}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{_runtime_8h_aae02bf1df7927dd0f69c6412fce40fc4}{RUNTIME\+\_\+\+API}} \mbox{\hyperlink{struct_runtime_1_1_object_instance}{Runtime\+::\+Object\+Instance}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_intrinsics_a7b30616029cc015f330ebf338c3fb454}{Intrinsics\+::find}} (const std\+::string \&\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}, const \mbox{\hyperlink{struct_i_r_1_1_object_type}{IR\+::\+Object\+Type}} \&type)
+\item 
+\mbox{\hyperlink{_runtime_8h_aae02bf1df7927dd0f69c6412fce40fc4}{RUNTIME\+\_\+\+API}} std\+::vector$<$ \mbox{\hyperlink{struct_runtime_1_1_object_instance}{Runtime\+::\+Object\+Instance}} \texorpdfstring{$\ast$}{*} $>$ \mbox{\hyperlink{namespace_intrinsics_a0234c55bf4d16a610b8e079f71f4dbde}{Intrinsics\+::get\+All\+Intrinsic\+Objects}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{_intrinsics_8h_aef80d0dfcdecc0626216443a33d1398a}\index{Intrinsics.h@{Intrinsics.h}!DEFINE\_INTRINSIC\_FUNCTION0@{DEFINE\_INTRINSIC\_FUNCTION0}}
+\index{DEFINE\_INTRINSIC\_FUNCTION0@{DEFINE\_INTRINSIC\_FUNCTION0}!Intrinsics.h@{Intrinsics.h}}
+\doxysubsubsection{\texorpdfstring{DEFINE\_INTRINSIC\_FUNCTION0}{DEFINE\_INTRINSIC\_FUNCTION0}}
+{\footnotesize\ttfamily \label{_intrinsics_8h_aef80d0dfcdecc0626216443a33d1398a} 
+\#define DEFINE\+\_\+\+INTRINSIC\+\_\+\+FUNCTION0(\begin{DoxyParamCaption}\item[{}]{module}{, }\item[{}]{c\+Name}{, }\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{return\+Type}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ NativeTypes::returnType\ cName\#\#returnType();\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{struct_intrinsics_1_1_function}{Intrinsics::Function}}\ cName\#\#returnType\#\#Function(\#module\ \textcolor{stringliteral}{"{}."{}}\ \#\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\mbox{\hyperlink{struct_i_r_1_1_function_type_a97cbdf384d97c3a5203a1310c9af0822}{IR::FunctionType::get}}(IR::ResultType::returnType),(\textcolor{keywordtype}{void}*)\&cName\#\#returnType);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ NativeTypes::returnType\ cName\#\#returnType()}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{_intrinsics_8h_source_l00045}{45}} of file \mbox{\hyperlink{_intrinsics_8h_source}{Intrinsics.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00045\ \textcolor{preprocessor}{\#define\ DEFINE\_INTRINSIC\_FUNCTION0(module,cName,name,returnType)\ \(\backslash\)}}
+\DoxyCodeLine{00046\ \textcolor{preprocessor}{\ \ \ \ NativeTypes::returnType\ cName\#\#returnType();\ \(\backslash\)}}
+\DoxyCodeLine{00047\ \textcolor{preprocessor}{\ \ \ \ static\ Intrinsics::Function\ cName\#\#returnType\#\#Function(\#module\ "{}."{}\ \#name,IR::FunctionType::get(IR::ResultType::returnType),(void*)\&cName\#\#returnType);\ \(\backslash\)}}
+\DoxyCodeLine{00048\ \textcolor{preprocessor}{\ \ \ \ NativeTypes::returnType\ cName\#\#returnType()}}
+
+\end{DoxyCode}
+\Hypertarget{_intrinsics_8h_a3bba10c3ce327d870e63b55e95163e7c}\index{Intrinsics.h@{Intrinsics.h}!DEFINE\_INTRINSIC\_FUNCTION1@{DEFINE\_INTRINSIC\_FUNCTION1}}
+\index{DEFINE\_INTRINSIC\_FUNCTION1@{DEFINE\_INTRINSIC\_FUNCTION1}!Intrinsics.h@{Intrinsics.h}}
+\doxysubsubsection{\texorpdfstring{DEFINE\_INTRINSIC\_FUNCTION1}{DEFINE\_INTRINSIC\_FUNCTION1}}
+{\footnotesize\ttfamily \label{_intrinsics_8h_a3bba10c3ce327d870e63b55e95163e7c} 
+\#define DEFINE\+\_\+\+INTRINSIC\+\_\+\+FUNCTION1(\begin{DoxyParamCaption}\item[{}]{module}{, }\item[{}]{c\+Name}{, }\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{return\+Type}{, }\item[{}]{arg0\+Type}{, }\item[{}]{arg0\+Name}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ NativeTypes::returnType\ cName\#\#returnType\#\#arg0Type(NativeTypes::arg0Type);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{struct_intrinsics_1_1_function}{Intrinsics::Function}}\ cName\#\#returnType\#\#arg0Type\#\#Function(\#module\ \textcolor{stringliteral}{"{}."{}}\ \#\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\mbox{\hyperlink{struct_i_r_1_1_function_type_a97cbdf384d97c3a5203a1310c9af0822}{IR::FunctionType::get}}(IR::ResultType::returnType,\{IR::ValueType::arg0Type\}),(\textcolor{keywordtype}{void}*)\&cName\#\#returnType\#\#arg0Type);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ NativeTypes::returnType\ cName\#\#returnType\#\#arg0Type(NativeTypes::arg0Type\ arg0Name)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{_intrinsics_8h_source_l00050}{50}} of file \mbox{\hyperlink{_intrinsics_8h_source}{Intrinsics.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00050\ \textcolor{preprocessor}{\#define\ DEFINE\_INTRINSIC\_FUNCTION1(module,cName,name,returnType,arg0Type,arg0Name)\ \(\backslash\)}}
+\DoxyCodeLine{00051\ \textcolor{preprocessor}{\ \ \ \ NativeTypes::returnType\ cName\#\#returnType\#\#arg0Type(NativeTypes::arg0Type);\ \(\backslash\)}}
+\DoxyCodeLine{00052\ \textcolor{preprocessor}{\ \ \ \ static\ Intrinsics::Function\ cName\#\#returnType\#\#arg0Type\#\#Function(\#module\ "{}."{}\ \#name,IR::FunctionType::get(IR::ResultType::returnType,\{IR::ValueType::arg0Type\}),(void*)\&cName\#\#returnType\#\#arg0Type);\ \(\backslash\)}}
+\DoxyCodeLine{00053\ \textcolor{preprocessor}{\ \ \ \ NativeTypes::returnType\ cName\#\#returnType\#\#arg0Type(NativeTypes::arg0Type\ arg0Name)}}
+
+\end{DoxyCode}
+\Hypertarget{_intrinsics_8h_a405a5ac6f31ce501aad32e0884b61fef}\index{Intrinsics.h@{Intrinsics.h}!DEFINE\_INTRINSIC\_FUNCTION2@{DEFINE\_INTRINSIC\_FUNCTION2}}
+\index{DEFINE\_INTRINSIC\_FUNCTION2@{DEFINE\_INTRINSIC\_FUNCTION2}!Intrinsics.h@{Intrinsics.h}}
+\doxysubsubsection{\texorpdfstring{DEFINE\_INTRINSIC\_FUNCTION2}{DEFINE\_INTRINSIC\_FUNCTION2}}
+{\footnotesize\ttfamily \label{_intrinsics_8h_a405a5ac6f31ce501aad32e0884b61fef} 
+\#define DEFINE\+\_\+\+INTRINSIC\+\_\+\+FUNCTION2(\begin{DoxyParamCaption}\item[{}]{module}{, }\item[{}]{c\+Name}{, }\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{return\+Type}{, }\item[{}]{arg0\+Type}{, }\item[{}]{arg0\+Name}{, }\item[{}]{arg1\+Type}{, }\item[{}]{arg1\+Name}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ NativeTypes::returnType\ cName\#\#returnType\#\#arg0Type\#\#arg1Type(NativeTypes::arg0Type,NativeTypes::arg1Type);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{struct_intrinsics_1_1_function}{Intrinsics::Function}}\ cName\#\#returnType\#\#arg0Type\#\#arg1Type\#\#Function(\#module\ \textcolor{stringliteral}{"{}."{}}\ \#\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\mbox{\hyperlink{struct_i_r_1_1_function_type_a97cbdf384d97c3a5203a1310c9af0822}{IR::FunctionType::get}}(IR::ResultType::returnType,\{IR::ValueType::arg0Type,IR::ValueType::arg1Type\}),(\textcolor{keywordtype}{void}*)\&cName\#\#returnType\#\#arg0Type\#\#arg1Type);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ NativeTypes::returnType\ cName\#\#returnType\#\#arg0Type\#\#arg1Type(NativeTypes::arg0Type\ arg0Name,NativeTypes::arg1Type\ arg1Name)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{_intrinsics_8h_source_l00055}{55}} of file \mbox{\hyperlink{_intrinsics_8h_source}{Intrinsics.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00055\ \textcolor{preprocessor}{\#define\ DEFINE\_INTRINSIC\_FUNCTION2(module,cName,name,returnType,arg0Type,arg0Name,arg1Type,arg1Name)\ \(\backslash\)}}
+\DoxyCodeLine{00056\ \textcolor{preprocessor}{\ \ \ \ NativeTypes::returnType\ cName\#\#returnType\#\#arg0Type\#\#arg1Type(NativeTypes::arg0Type,NativeTypes::arg1Type);\ \(\backslash\)}}
+\DoxyCodeLine{00057\ \textcolor{preprocessor}{\ \ \ \ static\ Intrinsics::Function\ cName\#\#returnType\#\#arg0Type\#\#arg1Type\#\#Function(\#module\ "{}."{}\ \#name,IR::FunctionType::get(IR::ResultType::returnType,\{IR::ValueType::arg0Type,IR::ValueType::arg1Type\}),(void*)\&cName\#\#returnType\#\#arg0Type\#\#arg1Type);\ \(\backslash\)}}
+\DoxyCodeLine{00058\ \textcolor{preprocessor}{\ \ \ \ NativeTypes::returnType\ cName\#\#returnType\#\#arg0Type\#\#arg1Type(NativeTypes::arg0Type\ arg0Name,NativeTypes::arg1Type\ arg1Name)}}
+
+\end{DoxyCode}
+\Hypertarget{_intrinsics_8h_a98a9ae3b64824584835a19dfad421232}\index{Intrinsics.h@{Intrinsics.h}!DEFINE\_INTRINSIC\_FUNCTION3@{DEFINE\_INTRINSIC\_FUNCTION3}}
+\index{DEFINE\_INTRINSIC\_FUNCTION3@{DEFINE\_INTRINSIC\_FUNCTION3}!Intrinsics.h@{Intrinsics.h}}
+\doxysubsubsection{\texorpdfstring{DEFINE\_INTRINSIC\_FUNCTION3}{DEFINE\_INTRINSIC\_FUNCTION3}}
+{\footnotesize\ttfamily \label{_intrinsics_8h_a98a9ae3b64824584835a19dfad421232} 
+\#define DEFINE\+\_\+\+INTRINSIC\+\_\+\+FUNCTION3(\begin{DoxyParamCaption}\item[{}]{module}{, }\item[{}]{c\+Name}{, }\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{return\+Type}{, }\item[{}]{arg0\+Type}{, }\item[{}]{arg0\+Name}{, }\item[{}]{arg1\+Type}{, }\item[{}]{arg1\+Name}{, }\item[{}]{arg2\+Type}{, }\item[{}]{arg2\+Name}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ NativeTypes::returnType\ cName\#\#returnType\#\#arg0Type\#\#arg1Type\#\#arg2Type(NativeTypes::arg0Type,NativeTypes::arg1Type,NativeTypes::arg2Type);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{struct_intrinsics_1_1_function}{Intrinsics::Function}}\ cName\#\#returnType\#\#arg0Type\#\#arg1Type\#\#arg2Type\#\#Function(\#module\ \textcolor{stringliteral}{"{}."{}}\ \#\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\mbox{\hyperlink{struct_i_r_1_1_function_type_a97cbdf384d97c3a5203a1310c9af0822}{IR::FunctionType::get}}(IR::ResultType::returnType,\{IR::ValueType::arg0Type,IR::ValueType::arg1Type,IR::ValueType::arg2Type\}),(\textcolor{keywordtype}{void}*)\&cName\#\#returnType\#\#arg0Type\#\#arg1Type\#\#arg2Type);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ NativeTypes::returnType\ cName\#\#returnType\#\#arg0Type\#\#arg1Type\#\#arg2Type(NativeTypes::arg0Type\ arg0Name,NativeTypes::arg1Type\ arg1Name,NativeTypes::arg2Type\ arg2Name)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{_intrinsics_8h_source_l00060}{60}} of file \mbox{\hyperlink{_intrinsics_8h_source}{Intrinsics.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00060\ \textcolor{preprocessor}{\#define\ DEFINE\_INTRINSIC\_FUNCTION3(module,cName,name,returnType,arg0Type,arg0Name,arg1Type,arg1Name,arg2Type,arg2Name)\ \(\backslash\)}}
+\DoxyCodeLine{00061\ \textcolor{preprocessor}{\ \ \ \ NativeTypes::returnType\ cName\#\#returnType\#\#arg0Type\#\#arg1Type\#\#arg2Type(NativeTypes::arg0Type,NativeTypes::arg1Type,NativeTypes::arg2Type);\ \(\backslash\)}}
+\DoxyCodeLine{00062\ \textcolor{preprocessor}{\ \ \ \ static\ Intrinsics::Function\ cName\#\#returnType\#\#arg0Type\#\#arg1Type\#\#arg2Type\#\#Function(\#module\ "{}."{}\ \#name,IR::FunctionType::get(IR::ResultType::returnType,\{IR::ValueType::arg0Type,IR::ValueType::arg1Type,IR::ValueType::arg2Type\}),(void*)\&cName\#\#returnType\#\#arg0Type\#\#arg1Type\#\#arg2Type);\ \(\backslash\)}}
+\DoxyCodeLine{00063\ \textcolor{preprocessor}{\ \ \ \ NativeTypes::returnType\ cName\#\#returnType\#\#arg0Type\#\#arg1Type\#\#arg2Type(NativeTypes::arg0Type\ arg0Name,NativeTypes::arg1Type\ arg1Name,NativeTypes::arg2Type\ arg2Name)}}
+
+\end{DoxyCode}
+\Hypertarget{_intrinsics_8h_a6271f12b629660f4b2fbf0a0b37f6fa2}\index{Intrinsics.h@{Intrinsics.h}!DEFINE\_INTRINSIC\_FUNCTION4@{DEFINE\_INTRINSIC\_FUNCTION4}}
+\index{DEFINE\_INTRINSIC\_FUNCTION4@{DEFINE\_INTRINSIC\_FUNCTION4}!Intrinsics.h@{Intrinsics.h}}
+\doxysubsubsection{\texorpdfstring{DEFINE\_INTRINSIC\_FUNCTION4}{DEFINE\_INTRINSIC\_FUNCTION4}}
+{\footnotesize\ttfamily \label{_intrinsics_8h_a6271f12b629660f4b2fbf0a0b37f6fa2} 
+\#define DEFINE\+\_\+\+INTRINSIC\+\_\+\+FUNCTION4(\begin{DoxyParamCaption}\item[{}]{module}{, }\item[{}]{c\+Name}{, }\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{return\+Type}{, }\item[{}]{arg0\+Type}{, }\item[{}]{arg0\+Name}{, }\item[{}]{arg1\+Type}{, }\item[{}]{arg1\+Name}{, }\item[{}]{arg2\+Type}{, }\item[{}]{arg2\+Name}{, }\item[{}]{arg3\+Type}{, }\item[{}]{arg3\+Name}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ NativeTypes::returnType\ cName\#\#returnType\#\#arg0Type\#\#arg1Type\#\#arg2Type\#\#arg3Type(NativeTypes::arg0Type,NativeTypes::arg1Type,NativeTypes::arg2Type,NativeTypes::arg3Type);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{struct_intrinsics_1_1_function}{Intrinsics::Function}}\ cName\#\#returnType\#\#arg0Type\#\#arg1Type\#\#arg2Type\#\#arg3Type\#\#Function(\#module\ \textcolor{stringliteral}{"{}."{}}\ \#\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\mbox{\hyperlink{struct_i_r_1_1_function_type_a97cbdf384d97c3a5203a1310c9af0822}{IR::FunctionType::get}}(IR::ResultType::returnType,\{IR::ValueType::arg0Type,IR::ValueType::arg1Type,IR::ValueType::arg2Type,IR::ValueType::arg3Type\}),(\textcolor{keywordtype}{void}*)\&cName\#\#returnType\#\#arg0Type\#\#arg1Type\#\#arg2Type\#\#arg3Type);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ NativeTypes::returnType\ cName\#\#returnType\#\#arg0Type\#\#arg1Type\#\#arg2Type\#\#arg3Type(NativeTypes::arg0Type\ arg0Name,NativeTypes::arg1Type\ arg1Name,NativeTypes::arg2Type\ arg2Name,NativeTypes::arg3Type\ arg3Name)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{_intrinsics_8h_source_l00065}{65}} of file \mbox{\hyperlink{_intrinsics_8h_source}{Intrinsics.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00065\ \textcolor{preprocessor}{\#define\ DEFINE\_INTRINSIC\_FUNCTION4(module,cName,name,returnType,arg0Type,arg0Name,arg1Type,arg1Name,arg2Type,arg2Name,arg3Type,arg3Name)\ \(\backslash\)}}
+\DoxyCodeLine{00066\ \textcolor{preprocessor}{\ \ \ \ NativeTypes::returnType\ cName\#\#returnType\#\#arg0Type\#\#arg1Type\#\#arg2Type\#\#arg3Type(NativeTypes::arg0Type,NativeTypes::arg1Type,NativeTypes::arg2Type,NativeTypes::arg3Type);\ \(\backslash\)}}
+\DoxyCodeLine{00067\ \textcolor{preprocessor}{\ \ \ \ static\ Intrinsics::Function\ cName\#\#returnType\#\#arg0Type\#\#arg1Type\#\#arg2Type\#\#arg3Type\#\#Function(\#module\ "{}."{}\ \#name,IR::FunctionType::get(IR::ResultType::returnType,\{IR::ValueType::arg0Type,IR::ValueType::arg1Type,IR::ValueType::arg2Type,IR::ValueType::arg3Type\}),(void*)\&cName\#\#returnType\#\#arg0Type\#\#arg1Type\#\#arg2Type\#\#arg3Type);\ \(\backslash\)}}
+\DoxyCodeLine{00068\ \textcolor{preprocessor}{\ \ \ \ NativeTypes::returnType\ cName\#\#returnType\#\#arg0Type\#\#arg1Type\#\#arg2Type\#\#arg3Type(NativeTypes::arg0Type\ arg0Name,NativeTypes::arg1Type\ arg1Name,NativeTypes::arg2Type\ arg2Name,NativeTypes::arg3Type\ arg3Name)}}
+
+\end{DoxyCode}
+\Hypertarget{_intrinsics_8h_a3cc0dd2afb6daa6103b86973601a5ea1}\index{Intrinsics.h@{Intrinsics.h}!DEFINE\_INTRINSIC\_FUNCTION5@{DEFINE\_INTRINSIC\_FUNCTION5}}
+\index{DEFINE\_INTRINSIC\_FUNCTION5@{DEFINE\_INTRINSIC\_FUNCTION5}!Intrinsics.h@{Intrinsics.h}}
+\doxysubsubsection{\texorpdfstring{DEFINE\_INTRINSIC\_FUNCTION5}{DEFINE\_INTRINSIC\_FUNCTION5}}
+{\footnotesize\ttfamily \label{_intrinsics_8h_a3cc0dd2afb6daa6103b86973601a5ea1} 
+\#define DEFINE\+\_\+\+INTRINSIC\+\_\+\+FUNCTION5(\begin{DoxyParamCaption}\item[{}]{module}{, }\item[{}]{c\+Name}{, }\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{return\+Type}{, }\item[{}]{arg0\+Type}{, }\item[{}]{arg0\+Name}{, }\item[{}]{arg1\+Type}{, }\item[{}]{arg1\+Name}{, }\item[{}]{arg2\+Type}{, }\item[{}]{arg2\+Name}{, }\item[{}]{arg3\+Type}{, }\item[{}]{arg3\+Name}{, }\item[{}]{arg4\+Type}{, }\item[{}]{arg4\+Name}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ NativeTypes::returnType\ cName\#\#returnType\#\#arg0Type\#\#arg1Type\#\#arg2Type\#\#arg3Type\#\#arg4Type(NativeTypes::arg0Type,NativeTypes::arg1Type,NativeTypes::arg2Type,NativeTypes::arg3Type,NativeTypes::arg4Type);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{struct_intrinsics_1_1_function}{Intrinsics::Function}}\ cName\#\#returnType\#\#arg0Type\#\#arg1Type\#\#arg2Type\#\#arg3Type\#\#arg4Type\#\#Function(\#module\ \textcolor{stringliteral}{"{}."{}}\ \#\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\mbox{\hyperlink{struct_i_r_1_1_function_type_a97cbdf384d97c3a5203a1310c9af0822}{IR::FunctionType::get}}(IR::ResultType::returnType,\{IR::ValueType::arg0Type,IR::ValueType::arg1Type,IR::ValueType::arg2Type,IR::ValueType::arg3Type,IR::ValueType::arg4Type\}),(\textcolor{keywordtype}{void}*)\&cName\#\#returnType\#\#arg0Type\#\#arg1Type\#\#arg2Type\#\#arg3Type\#\#arg4Type);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ NativeTypes::returnType\ cName\#\#returnType\#\#arg0Type\#\#arg1Type\#\#arg2Type\#\#arg3Type\#\#arg4Type(NativeTypes::arg0Type\ arg0Name,NativeTypes::arg1Type\ arg1Name,NativeTypes::arg2Type\ arg2Name,NativeTypes::arg3Type\ arg3Name,NativeTypes::arg4Type\ arg4Name)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{_intrinsics_8h_source_l00070}{70}} of file \mbox{\hyperlink{_intrinsics_8h_source}{Intrinsics.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00070\ \textcolor{preprocessor}{\#define\ DEFINE\_INTRINSIC\_FUNCTION5(module,cName,name,returnType,arg0Type,arg0Name,arg1Type,arg1Name,arg2Type,arg2Name,arg3Type,arg3Name,arg4Type,arg4Name)\ \(\backslash\)}}
+\DoxyCodeLine{00071\ \textcolor{preprocessor}{\ \ \ \ NativeTypes::returnType\ cName\#\#returnType\#\#arg0Type\#\#arg1Type\#\#arg2Type\#\#arg3Type\#\#arg4Type(NativeTypes::arg0Type,NativeTypes::arg1Type,NativeTypes::arg2Type,NativeTypes::arg3Type,NativeTypes::arg4Type);\ \(\backslash\)}}
+\DoxyCodeLine{00072\ \textcolor{preprocessor}{\ \ \ \ static\ Intrinsics::Function\ cName\#\#returnType\#\#arg0Type\#\#arg1Type\#\#arg2Type\#\#arg3Type\#\#arg4Type\#\#Function(\#module\ "{}."{}\ \#name,IR::FunctionType::get(IR::ResultType::returnType,\{IR::ValueType::arg0Type,IR::ValueType::arg1Type,IR::ValueType::arg2Type,IR::ValueType::arg3Type,IR::ValueType::arg4Type\}),(void*)\&cName\#\#returnType\#\#arg0Type\#\#arg1Type\#\#arg2Type\#\#arg3Type\#\#arg4Type);\ \(\backslash\)}}
+\DoxyCodeLine{00073\ \textcolor{preprocessor}{\ \ \ \ NativeTypes::returnType\ cName\#\#returnType\#\#arg0Type\#\#arg1Type\#\#arg2Type\#\#arg3Type\#\#arg4Type(NativeTypes::arg0Type\ arg0Name,NativeTypes::arg1Type\ arg1Name,NativeTypes::arg2Type\ arg2Name,NativeTypes::arg3Type\ arg3Name,NativeTypes::arg4Type\ arg4Name)}}
+
+\end{DoxyCode}
+\Hypertarget{_intrinsics_8h_a3fee636d52bfd666fc9e6efbcbc5b05f}\index{Intrinsics.h@{Intrinsics.h}!DEFINE\_INTRINSIC\_FUNCTION6@{DEFINE\_INTRINSIC\_FUNCTION6}}
+\index{DEFINE\_INTRINSIC\_FUNCTION6@{DEFINE\_INTRINSIC\_FUNCTION6}!Intrinsics.h@{Intrinsics.h}}
+\doxysubsubsection{\texorpdfstring{DEFINE\_INTRINSIC\_FUNCTION6}{DEFINE\_INTRINSIC\_FUNCTION6}}
+{\footnotesize\ttfamily \label{_intrinsics_8h_a3fee636d52bfd666fc9e6efbcbc5b05f} 
+\#define DEFINE\+\_\+\+INTRINSIC\+\_\+\+FUNCTION6(\begin{DoxyParamCaption}\item[{}]{module}{, }\item[{}]{c\+Name}{, }\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{return\+Type}{, }\item[{}]{arg0\+Type}{, }\item[{}]{arg0\+Name}{, }\item[{}]{arg1\+Type}{, }\item[{}]{arg1\+Name}{, }\item[{}]{arg2\+Type}{, }\item[{}]{arg2\+Name}{, }\item[{}]{arg3\+Type}{, }\item[{}]{arg3\+Name}{, }\item[{}]{arg4\+Type}{, }\item[{}]{arg4\+Name}{, }\item[{}]{arg5\+Type}{, }\item[{}]{arg5\+Name}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ NativeTypes::returnType\ cName\#\#returnType\#\#arg0Type\#\#arg1Type\#\#arg2Type\#\#arg3Type\#\#arg4Type\#\#arg5Type(NativeTypes::arg0Type,NativeTypes::arg1Type,NativeTypes::arg2Type,NativeTypes::arg3Type,NativeTypes::arg4Type,NativeTypes::arg5Type);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{struct_intrinsics_1_1_function}{Intrinsics::Function}}\ cName\#\#returnType\#\#arg0Type\#\#arg1Type\#\#arg2Type\#\#arg3Type\#\#arg4Type\#\#arg5Type\#\#Function(\#module\ \textcolor{stringliteral}{"{}."{}}\ \#\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\mbox{\hyperlink{struct_i_r_1_1_function_type_a97cbdf384d97c3a5203a1310c9af0822}{IR::FunctionType::get}}(IR::ResultType::returnType,\{IR::ValueType::arg0Type,IR::ValueType::arg1Type,IR::ValueType::arg2Type,IR::ValueType::arg3Type,IR::ValueType::arg4Type,IR::ValueType::arg5Type\}),(\textcolor{keywordtype}{void}*)\&cName\#\#returnType\#\#arg0Type\#\#arg1Type\#\#arg2Type\#\#arg3Type\#\#arg4Type\#\#arg5Type);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ NativeTypes::returnType\ cName\#\#returnType\#\#arg0Type\#\#arg1Type\#\#arg2Type\#\#arg3Type\#\#arg4Type\#\#arg5Type(NativeTypes::arg0Type\ arg0Name,NativeTypes::arg1Type\ arg1Name,NativeTypes::arg2Type\ arg2Name,NativeTypes::arg3Type\ arg3Name,NativeTypes::arg4Type\ arg4Name,NativeTypes::arg5Type\ arg5Name\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{_intrinsics_8h_source_l00075}{75}} of file \mbox{\hyperlink{_intrinsics_8h_source}{Intrinsics.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00075\ \textcolor{preprocessor}{\#define\ DEFINE\_INTRINSIC\_FUNCTION6(module,cName,name,returnType,arg0Type,arg0Name,arg1Type,arg1Name,arg2Type,arg2Name,arg3Type,arg3Name,arg4Type,arg4Name,arg5Type,arg5Name)\ \(\backslash\)}}
+\DoxyCodeLine{00076\ \textcolor{preprocessor}{\ \ \ \ NativeTypes::returnType\ cName\#\#returnType\#\#arg0Type\#\#arg1Type\#\#arg2Type\#\#arg3Type\#\#arg4Type\#\#arg5Type(NativeTypes::arg0Type,NativeTypes::arg1Type,NativeTypes::arg2Type,NativeTypes::arg3Type,NativeTypes::arg4Type,NativeTypes::arg5Type);\ \(\backslash\)}}
+\DoxyCodeLine{00077\ \textcolor{preprocessor}{\ \ \ \ static\ Intrinsics::Function\ cName\#\#returnType\#\#arg0Type\#\#arg1Type\#\#arg2Type\#\#arg3Type\#\#arg4Type\#\#arg5Type\#\#Function(\#module\ "{}."{}\ \#name,IR::FunctionType::get(IR::ResultType::returnType,\{IR::ValueType::arg0Type,IR::ValueType::arg1Type,IR::ValueType::arg2Type,IR::ValueType::arg3Type,IR::ValueType::arg4Type,IR::ValueType::arg5Type\}),(void*)\&cName\#\#returnType\#\#arg0Type\#\#arg1Type\#\#arg2Type\#\#arg3Type\#\#arg4Type\#\#arg5Type);\ \(\backslash\)}}
+\DoxyCodeLine{00078\ \textcolor{preprocessor}{\ \ \ \ NativeTypes::returnType\ cName\#\#returnType\#\#arg0Type\#\#arg1Type\#\#arg2Type\#\#arg3Type\#\#arg4Type\#\#arg5Type(NativeTypes::arg0Type\ arg0Name,NativeTypes::arg1Type\ arg1Name,NativeTypes::arg2Type\ arg2Name,NativeTypes::arg3Type\ arg3Name,NativeTypes::arg4Type\ arg4Name,NativeTypes::arg5Type\ arg5Name\ )}}
+
+\end{DoxyCode}
+\Hypertarget{_intrinsics_8h_ae76a88703e924d121bc2a2b106e1f0f5}\index{Intrinsics.h@{Intrinsics.h}!DEFINE\_INTRINSIC\_FUNCTION7@{DEFINE\_INTRINSIC\_FUNCTION7}}
+\index{DEFINE\_INTRINSIC\_FUNCTION7@{DEFINE\_INTRINSIC\_FUNCTION7}!Intrinsics.h@{Intrinsics.h}}
+\doxysubsubsection{\texorpdfstring{DEFINE\_INTRINSIC\_FUNCTION7}{DEFINE\_INTRINSIC\_FUNCTION7}}
+{\footnotesize\ttfamily \label{_intrinsics_8h_ae76a88703e924d121bc2a2b106e1f0f5} 
+\#define DEFINE\+\_\+\+INTRINSIC\+\_\+\+FUNCTION7(\begin{DoxyParamCaption}\item[{}]{module}{, }\item[{}]{c\+Name}{, }\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{return\+Type}{, }\item[{}]{arg0\+Type}{, }\item[{}]{arg0\+Name}{, }\item[{}]{arg1\+Type}{, }\item[{}]{arg1\+Name}{, }\item[{}]{arg2\+Type}{, }\item[{}]{arg2\+Name}{, }\item[{}]{arg3\+Type}{, }\item[{}]{arg3\+Name}{, }\item[{}]{arg4\+Type}{, }\item[{}]{arg4\+Name}{, }\item[{}]{arg5\+Type}{, }\item[{}]{arg5\+Name}{, }\item[{}]{arg6\+Type}{, }\item[{}]{arg6\+Name}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ NativeTypes::returnType\ cName\#\#returnType\#\#arg0Type\#\#arg1Type\#\#arg2Type\#\#arg3Type\#\#arg4Type\#\#arg5Type\#\#arg6Type(NativeTypes::arg0Type,NativeTypes::arg1Type,NativeTypes::arg2Type,NativeTypes::arg3Type,NativeTypes::arg4Type,NativeTypes::arg5Type,NativeTypes::arg6Type);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{struct_intrinsics_1_1_function}{Intrinsics::Function}}\ cName\#\#returnType\#\#arg0Type\#\#arg1Type\#\#arg2Type\#\#arg3Type\#\#arg4Type\#\#arg5Type\#\#arg6Type\#\#Function(\#module\ \textcolor{stringliteral}{"{}."{}}\ \#\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\mbox{\hyperlink{struct_i_r_1_1_function_type_a97cbdf384d97c3a5203a1310c9af0822}{IR::FunctionType::get}}(IR::ResultType::returnType,\{IR::ValueType::arg0Type,IR::ValueType::arg1Type,IR::ValueType::arg2Type,IR::ValueType::arg3Type,IR::ValueType::arg4Type,IR::ValueType::arg5Type,IR::ValueType::arg6Type\}),(\textcolor{keywordtype}{void}*)\&cName\#\#returnType\#\#arg0Type\#\#arg1Type\#\#arg2Type\#\#arg3Type\#\#arg4Type\#\#arg5Type\#\#arg6Type);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ NativeTypes::returnType\ cName\#\#returnType\#\#arg0Type\#\#arg1Type\#\#arg2Type\#\#arg3Type\#\#arg4Type\#\#arg5Type\#\#arg6Type(NativeTypes::arg0Type\ arg0Name,NativeTypes::arg1Type\ arg1Name,NativeTypes::arg2Type\ arg2Name,NativeTypes::arg3Type\ arg3Name,NativeTypes::arg4Type\ arg4Name,NativeTypes::arg5Type\ arg5Name,NativeTypes::arg6Type\ arg6Name\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{_intrinsics_8h_source_l00080}{80}} of file \mbox{\hyperlink{_intrinsics_8h_source}{Intrinsics.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00080\ \textcolor{preprocessor}{\#define\ DEFINE\_INTRINSIC\_FUNCTION7(module,cName,name,returnType,arg0Type,arg0Name,arg1Type,arg1Name,arg2Type,arg2Name,arg3Type,arg3Name,arg4Type,arg4Name,arg5Type,arg5Name,arg6Type,arg6Name)\ \(\backslash\)}}
+\DoxyCodeLine{00081\ \textcolor{preprocessor}{\ \ \ \ NativeTypes::returnType\ cName\#\#returnType\#\#arg0Type\#\#arg1Type\#\#arg2Type\#\#arg3Type\#\#arg4Type\#\#arg5Type\#\#arg6Type(NativeTypes::arg0Type,NativeTypes::arg1Type,NativeTypes::arg2Type,NativeTypes::arg3Type,NativeTypes::arg4Type,NativeTypes::arg5Type,NativeTypes::arg6Type);\ \(\backslash\)}}
+\DoxyCodeLine{00082\ \textcolor{preprocessor}{\ \ \ \ static\ Intrinsics::Function\ cName\#\#returnType\#\#arg0Type\#\#arg1Type\#\#arg2Type\#\#arg3Type\#\#arg4Type\#\#arg5Type\#\#arg6Type\#\#Function(\#module\ "{}."{}\ \#name,IR::FunctionType::get(IR::ResultType::returnType,\{IR::ValueType::arg0Type,IR::ValueType::arg1Type,IR::ValueType::arg2Type,IR::ValueType::arg3Type,IR::ValueType::arg4Type,IR::ValueType::arg5Type,IR::ValueType::arg6Type\}),(void*)\&cName\#\#returnType\#\#arg0Type\#\#arg1Type\#\#arg2Type\#\#arg3Type\#\#arg4Type\#\#arg5Type\#\#arg6Type);\ \(\backslash\)}}
+\DoxyCodeLine{00083\ \textcolor{preprocessor}{\ \ \ \ NativeTypes::returnType\ cName\#\#returnType\#\#arg0Type\#\#arg1Type\#\#arg2Type\#\#arg3Type\#\#arg4Type\#\#arg5Type\#\#arg6Type(NativeTypes::arg0Type\ arg0Name,NativeTypes::arg1Type\ arg1Name,NativeTypes::arg2Type\ arg2Name,NativeTypes::arg3Type\ arg3Name,NativeTypes::arg4Type\ arg4Name,NativeTypes::arg5Type\ arg5Name,NativeTypes::arg6Type\ arg6Name\ )}}
+
+\end{DoxyCode}
+\Hypertarget{_intrinsics_8h_ab9a58ee558d6137204bc71e84f6efbb1}\index{Intrinsics.h@{Intrinsics.h}!DEFINE\_INTRINSIC\_GLOBAL@{DEFINE\_INTRINSIC\_GLOBAL}}
+\index{DEFINE\_INTRINSIC\_GLOBAL@{DEFINE\_INTRINSIC\_GLOBAL}!Intrinsics.h@{Intrinsics.h}}
+\doxysubsubsection{\texorpdfstring{DEFINE\_INTRINSIC\_GLOBAL}{DEFINE\_INTRINSIC\_GLOBAL}}
+{\footnotesize\ttfamily \label{_intrinsics_8h_ab9a58ee558d6137204bc71e84f6efbb1} 
+\#define DEFINE\+\_\+\+INTRINSIC\+\_\+\+GLOBAL(\begin{DoxyParamCaption}\item[{}]{module}{, }\item[{}]{c\+Name}{, }\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{value\+Type}{, }\item[{}]{is\+Mutable}{, }\item[{}]{initializer}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{static}\ Intrinsics::GenericGlobal<IR::ValueType::valueType,isMutable>\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ cName(\#module\ \textcolor{stringliteral}{"{}."{}}\ \#\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},initializer);}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{_intrinsics_8h_source_l00086}{86}} of file \mbox{\hyperlink{_intrinsics_8h_source}{Intrinsics.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00086\ \textcolor{preprocessor}{\#define\ DEFINE\_INTRINSIC\_GLOBAL(module,cName,name,valueType,isMutable,initializer)\ \(\backslash\)}}
+\DoxyCodeLine{00087\ \textcolor{preprocessor}{\ \ \ \ static\ Intrinsics::GenericGlobal<IR::ValueType::valueType,isMutable>\ \(\backslash\)}}
+\DoxyCodeLine{00088\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ cName(\#module\ "{}."{}\ \#name,initializer);}}
+
+\end{DoxyCode}
+\Hypertarget{_intrinsics_8h_a57730ea80fc6386a62051d3f24e03b6b}\index{Intrinsics.h@{Intrinsics.h}!DEFINE\_INTRINSIC\_MEMORY@{DEFINE\_INTRINSIC\_MEMORY}}
+\index{DEFINE\_INTRINSIC\_MEMORY@{DEFINE\_INTRINSIC\_MEMORY}!Intrinsics.h@{Intrinsics.h}}
+\doxysubsubsection{\texorpdfstring{DEFINE\_INTRINSIC\_MEMORY}{DEFINE\_INTRINSIC\_MEMORY}}
+{\footnotesize\ttfamily \label{_intrinsics_8h_a57730ea80fc6386a62051d3f24e03b6b} 
+\#define DEFINE\+\_\+\+INTRINSIC\+\_\+\+MEMORY(\begin{DoxyParamCaption}\item[{}]{module}{, }\item[{}]{c\+Name}{, }\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{type}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{static}\ Intrinsics::Memory\ cName(\#module\ \textcolor{stringliteral}{"{}."{}}\ \#\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},type);}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{_intrinsics_8h_source_l00090}{90}} of file \mbox{\hyperlink{_intrinsics_8h_source}{Intrinsics.\+h}}.
+
+\Hypertarget{_intrinsics_8h_a7a1b009bd0734c4fffd877af85cf0603}\index{Intrinsics.h@{Intrinsics.h}!DEFINE\_INTRINSIC\_TABLE@{DEFINE\_INTRINSIC\_TABLE}}
+\index{DEFINE\_INTRINSIC\_TABLE@{DEFINE\_INTRINSIC\_TABLE}!Intrinsics.h@{Intrinsics.h}}
+\doxysubsubsection{\texorpdfstring{DEFINE\_INTRINSIC\_TABLE}{DEFINE\_INTRINSIC\_TABLE}}
+{\footnotesize\ttfamily \label{_intrinsics_8h_a7a1b009bd0734c4fffd877af85cf0603} 
+\#define DEFINE\+\_\+\+INTRINSIC\+\_\+\+TABLE(\begin{DoxyParamCaption}\item[{}]{module}{, }\item[{}]{c\+Name}{, }\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{type}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{static}\ Intrinsics::Table\ cName(\#module\ \textcolor{stringliteral}{"{}."{}}\ \#\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},type);}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{_intrinsics_8h_source_l00091}{91}} of file \mbox{\hyperlink{_intrinsics_8h_source}{Intrinsics.\+h}}.
+

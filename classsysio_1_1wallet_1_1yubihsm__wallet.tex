@@ -1,0 +1,453 @@
+\doxysection{sysio\+::wallet\+::yubihsm\+\_\+wallet Class Reference}
+\hypertarget{classsysio_1_1wallet_1_1yubihsm__wallet}{}\label{classsysio_1_1wallet_1_1yubihsm__wallet}\index{sysio::wallet::yubihsm\_wallet@{sysio::wallet::yubihsm\_wallet}}
+
+
+{\ttfamily \#include $<$yubihsm\+\_\+wallet.\+hpp$>$}
+
+
+
+Inheritance diagram for sysio\+::wallet\+::yubihsm\+\_\+wallet\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=200pt]{classsysio_1_1wallet_1_1yubihsm__wallet__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for sysio\+::wallet\+::yubihsm\+\_\+wallet\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=200pt]{classsysio_1_1wallet_1_1yubihsm__wallet__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classsysio_1_1wallet_1_1yubihsm__wallet_a673025e3abbd9372315a713c329f1333}{yubihsm\+\_\+wallet}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&connector, const \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} authkey)
+\item 
+\mbox{\hyperlink{classsysio_1_1wallet_1_1yubihsm__wallet_a679b501556534e34e06ebe54c5721998}{\texorpdfstring{$\sim$}{\string~}yubihsm\+\_\+wallet}} ()
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_ac31c0e1bc25b7e5fcf2b3c7f41a23fd6}{private\+\_\+key\+\_\+type}} \mbox{\hyperlink{classsysio_1_1wallet_1_1yubihsm__wallet_aedf5834c5b703dfdea01d20c73456e23}{get\+\_\+private\+\_\+key}} (\mbox{\hyperlink{namespacesysio_1_1chain_a0628a11f388cd2e43b1ccc1260a1042f}{public\+\_\+key\+\_\+type}} \mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}}) const override
+\item 
+bool \mbox{\hyperlink{classsysio_1_1wallet_1_1yubihsm__wallet_aadb41176f808cb5918236a14a47943c3}{is\+\_\+locked}} () const override
+\item 
+void \mbox{\hyperlink{classsysio_1_1wallet_1_1yubihsm__wallet_add449d4c47024ff03ddf8dc50507caf8}{lock}} () override
+\item 
+void \mbox{\hyperlink{classsysio_1_1wallet_1_1yubihsm__wallet_a32626226becf373892a2f9174b5a5b7f}{unlock}} (\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} password) override
+\item 
+void \mbox{\hyperlink{classsysio_1_1wallet_1_1yubihsm__wallet_a2900f5eb84ae3320276ca6452a66f213}{check\+\_\+password}} (\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} password) override
+\item 
+void \mbox{\hyperlink{classsysio_1_1wallet_1_1yubihsm__wallet_a3b84a6691260db0632c6972a5e46b110}{set\+\_\+password}} (\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} password) override
+\item 
+map$<$ \mbox{\hyperlink{namespacesysio_1_1chain_a0628a11f388cd2e43b1ccc1260a1042f}{public\+\_\+key\+\_\+type}}, \mbox{\hyperlink{namespacesysio_1_1chain_ac31c0e1bc25b7e5fcf2b3c7f41a23fd6}{private\+\_\+key\+\_\+type}} $>$ \mbox{\hyperlink{classsysio_1_1wallet_1_1yubihsm__wallet_a2dae8187d77d09dc4ff04d0f49a3287a}{list\+\_\+keys}} () override
+\item 
+flat\+\_\+set$<$ \mbox{\hyperlink{namespacesysio_1_1chain_a0628a11f388cd2e43b1ccc1260a1042f}{public\+\_\+key\+\_\+type}} $>$ \mbox{\hyperlink{classsysio_1_1wallet_1_1yubihsm__wallet_a84f99523df39cd73a37eea5a747a96c4}{list\+\_\+public\+\_\+keys}} () override
+\item 
+bool \mbox{\hyperlink{classsysio_1_1wallet_1_1yubihsm__wallet_a93a658f97b4e05e35fe86f83f6b7344a}{import\+\_\+key}} (\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} wif\+\_\+key) override
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{classsysio_1_1wallet_1_1yubihsm__wallet_ab72c9defbbae7026dece7fea74fa5fff}{create\+\_\+key}} (\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{yubihsm__pkcs11_8c_afa4592d59d085cf06cad9000120eba84}{key\+\_\+type}}) override
+\item 
+bool \mbox{\hyperlink{classsysio_1_1wallet_1_1yubihsm__wallet_a27f0c21f29c43cfa497f097dd65d4892}{remove\+\_\+key}} (\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} key) override
+\item 
+std\+::optional$<$ \mbox{\hyperlink{namespacesysio_1_1chain_af141a69eb789b86fa0eb93c2d263f0df}{signature\+\_\+type}} $>$ \mbox{\hyperlink{classsysio_1_1wallet_1_1yubihsm__wallet_a83f6a573368deda82829e73e124b3d03}{try\+\_\+sign\+\_\+digest}} (const \mbox{\hyperlink{namespacesysio_1_1chain_a357fd9478475457e5bb386a3143079b6}{digest\+\_\+type}} \mbox{\hyperlink{namespacefc_a150ca4cd9c0318ca45dc0dc7df5d58b9}{digest}}, const \mbox{\hyperlink{namespacesysio_1_1chain_a0628a11f388cd2e43b1ccc1260a1042f}{public\+\_\+key\+\_\+type}} \mbox{\hyperlink{classfc_1_1crypto_1_1r1_1_1public__key}{public\+\_\+key}}) override
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classsysio_1_1wallet_1_1wallet__api}{sysio\+::wallet\+::wallet\+\_\+api}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{classsysio_1_1wallet_1_1wallet__api_a1f80381bea74b56f3c9379c72994cfe7}{\texorpdfstring{$\sim$}{\string~}wallet\+\_\+api}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{yubihsm__wallet_8hpp_source_l00015}{15}} of file \mbox{\hyperlink{yubihsm__wallet_8hpp_source}{yubihsm\+\_\+wallet.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classsysio_1_1wallet_1_1yubihsm__wallet_a673025e3abbd9372315a713c329f1333}\index{sysio::wallet::yubihsm\_wallet@{sysio::wallet::yubihsm\_wallet}!yubihsm\_wallet@{yubihsm\_wallet}}
+\index{yubihsm\_wallet@{yubihsm\_wallet}!sysio::wallet::yubihsm\_wallet@{sysio::wallet::yubihsm\_wallet}}
+\doxysubsubsection{\texorpdfstring{yubihsm\_wallet()}{yubihsm\_wallet()}}
+{\footnotesize\ttfamily \label{classsysio_1_1wallet_1_1yubihsm__wallet_a673025e3abbd9372315a713c329f1333} 
+sysio\+::wallet\+::yubihsm\+\_\+wallet\+::yubihsm\+\_\+wallet (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&}]{connector}{, }\item[{const \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}}}]{authkey}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__wallet_8cpp_source_l00212}{212}} of file \mbox{\hyperlink{yubihsm__wallet_8cpp_source}{yubihsm\+\_\+wallet.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ my(\textcolor{keyword}{new}\ detail::yubihsm\_wallet\_impl(connector,\ authkey))\ \{}
+\DoxyCodeLine{00213\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1wallet_1_1yubihsm__wallet_a679b501556534e34e06ebe54c5721998}\index{sysio::wallet::yubihsm\_wallet@{sysio::wallet::yubihsm\_wallet}!````~yubihsm\_wallet@{\texorpdfstring{$\sim$}{\string~}yubihsm\_wallet}}
+\index{````~yubihsm\_wallet@{\texorpdfstring{$\sim$}{\string~}yubihsm\_wallet}!sysio::wallet::yubihsm\_wallet@{sysio::wallet::yubihsm\_wallet}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}yubihsm\_wallet()}{\string~yubihsm\_wallet()}}
+{\footnotesize\ttfamily \label{classsysio_1_1wallet_1_1yubihsm__wallet_a679b501556534e34e06ebe54c5721998} 
+sysio\+::wallet\+::yubihsm\+\_\+wallet\+::\texorpdfstring{$\sim$}{\string~}yubihsm\+\_\+wallet (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__wallet_8cpp_source_l00215}{215}} of file \mbox{\hyperlink{yubihsm__wallet_8cpp_source}{yubihsm\+\_\+wallet.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00216\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1wallet_1_1yubihsm__wallet_a2900f5eb84ae3320276ca6452a66f213}\index{sysio::wallet::yubihsm\_wallet@{sysio::wallet::yubihsm\_wallet}!check\_password@{check\_password}}
+\index{check\_password@{check\_password}!sysio::wallet::yubihsm\_wallet@{sysio::wallet::yubihsm\_wallet}}
+\doxysubsubsection{\texorpdfstring{check\_password()}{check\_password()}}
+{\footnotesize\ttfamily \label{classsysio_1_1wallet_1_1yubihsm__wallet_a2900f5eb84ae3320276ca6452a66f213} 
+void sysio\+::wallet\+::yubihsm\+\_\+wallet\+::check\+\_\+password (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}}}]{password}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+Checks the password of the wallet
+
+Validates the password on a wallet even if the wallet is already unlocked, throws if bad password given. 
+\begin{DoxyParams}{Parameters}
+{\em password} & the password previously set with {\ttfamily \doxylink{classsysio_1_1wallet_1_1yubihsm__wallet_a3b84a6691260db0632c6972a5e46b110}{set\+\_\+password()}} \\
+\hline
+\end{DoxyParams}
+
+
+Implements \mbox{\hyperlink{classsysio_1_1wallet_1_1wallet__api_a259cc27092492df43005dc1b5376307f}{sysio\+::wallet\+::wallet\+\_\+api}}.
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__wallet_8cpp_source_l00233}{233}} of file \mbox{\hyperlink{yubihsm__wallet_8cpp_source}{yubihsm\+\_\+wallet.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00233\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00234\ \ \ \ \textcolor{comment}{//just\ leave\ this\ as\ a\ noop\ for\ now;\ remove\_key\ from\ wallet\_mgr\ calls\ through\ here}}
+\DoxyCodeLine{00235\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1wallet_1_1yubihsm__wallet_ab72c9defbbae7026dece7fea74fa5fff}\index{sysio::wallet::yubihsm\_wallet@{sysio::wallet::yubihsm\_wallet}!create\_key@{create\_key}}
+\index{create\_key@{create\_key}!sysio::wallet::yubihsm\_wallet@{sysio::wallet::yubihsm\_wallet}}
+\doxysubsubsection{\texorpdfstring{create\_key()}{create\_key()}}
+{\footnotesize\ttfamily \label{classsysio_1_1wallet_1_1yubihsm__wallet_ab72c9defbbae7026dece7fea74fa5fff} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::wallet\+::yubihsm\+\_\+wallet\+::create\+\_\+key (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}}}]{key\+\_\+type}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+Creates a key within the wallet to be used to sign transactions by an account.
+
+example\+: create\+\_\+key K1
+
+
+\begin{DoxyParams}{Parameters}
+{\em key\+\_\+type} & the key type to create. May be empty to allow wallet to pick appropriate/"{}best"{} key type \\
+\hline
+\end{DoxyParams}
+
+
+Implements \mbox{\hyperlink{classsysio_1_1wallet_1_1wallet__api_ad508020e38640e6de95b82ca6ca03ae3}{sysio\+::wallet\+::wallet\+\_\+api}}.
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__wallet_8cpp_source_l00253}{253}} of file \mbox{\hyperlink{yubihsm__wallet_8cpp_source}{yubihsm\+\_\+wallet.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00253\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00254\ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_afa4592d59d085cf06cad9000120eba84}{key\_type}}.empty()\ ||\ \mbox{\hyperlink{yubihsm__pkcs11_8c_afa4592d59d085cf06cad9000120eba84}{key\_type}}\ ==\ \textcolor{stringliteral}{"{}R1"{}},\ chain::unsupported\_key\_type\_exception,\ \textcolor{stringliteral}{"{}YubiHSM\ wallet\ only\ supports\ R1\ keys"{}});}
+\DoxyCodeLine{00255\ \ \ \ \textcolor{keywordflow}{return}\ my-\/>create().to\_string();}
+\DoxyCodeLine{00256\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1wallet_1_1yubihsm__wallet_aedf5834c5b703dfdea01d20c73456e23}\index{sysio::wallet::yubihsm\_wallet@{sysio::wallet::yubihsm\_wallet}!get\_private\_key@{get\_private\_key}}
+\index{get\_private\_key@{get\_private\_key}!sysio::wallet::yubihsm\_wallet@{sysio::wallet::yubihsm\_wallet}}
+\doxysubsubsection{\texorpdfstring{get\_private\_key()}{get\_private\_key()}}
+{\footnotesize\ttfamily \label{classsysio_1_1wallet_1_1yubihsm__wallet_aedf5834c5b703dfdea01d20c73456e23} 
+\mbox{\hyperlink{namespacesysio_1_1chain_ac31c0e1bc25b7e5fcf2b3c7f41a23fd6}{private\+\_\+key\+\_\+type}} sysio\+::wallet\+::yubihsm\+\_\+wallet\+::get\+\_\+private\+\_\+key (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacesysio_1_1chain_a0628a11f388cd2e43b1ccc1260a1042f}{public\+\_\+key\+\_\+type}}}]{pubkey}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+Get the private key corresponding to a public key. The private key must already be in the wallet. 
+
+Implements \mbox{\hyperlink{classsysio_1_1wallet_1_1wallet__api_a9a5034400cb9a860e9a12a9239c0f0c2}{sysio\+::wallet\+::wallet\+\_\+api}}.
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__wallet_8cpp_source_l00218}{218}} of file \mbox{\hyperlink{yubihsm__wallet_8cpp_source}{yubihsm\+\_\+wallet.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00218\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00219\ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(chain::wallet\_exception,\ \textcolor{stringliteral}{"{}Obtaining\ private\ key\ for\ a\ key\ stored\ in\ YubiHSM\ is\ impossible"{}});}
+\DoxyCodeLine{00220\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1wallet_1_1yubihsm__wallet_a93a658f97b4e05e35fe86f83f6b7344a}\index{sysio::wallet::yubihsm\_wallet@{sysio::wallet::yubihsm\_wallet}!import\_key@{import\_key}}
+\index{import\_key@{import\_key}!sysio::wallet::yubihsm\_wallet@{sysio::wallet::yubihsm\_wallet}}
+\doxysubsubsection{\texorpdfstring{import\_key()}{import\_key()}}
+{\footnotesize\ttfamily \label{classsysio_1_1wallet_1_1yubihsm__wallet_a93a658f97b4e05e35fe86f83f6b7344a} 
+bool sysio\+::wallet\+::yubihsm\+\_\+wallet\+::import\+\_\+key (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}}}]{wif\+\_\+key}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+Imports a WIF Private Key into the wallet to be used to sign transactions by an account.
+
+example\+: import\+\_\+key 5KQwr\+Pbwd\+L6\+Ph\+Xujx\+W37\+FSSQZ1\+Jiws\+ST4cq\+Qz\+Dey\+Xt\+P79zkv\+FD3
+
+
+\begin{DoxyParams}{Parameters}
+{\em wif\+\_\+key} & the WIF Private Key to import \\
+\hline
+\end{DoxyParams}
+
+
+Implements \mbox{\hyperlink{classsysio_1_1wallet_1_1wallet__api_a3127c70848da7b16b6b77ffb845b6d20}{sysio\+::wallet\+::wallet\+\_\+api}}.
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__wallet_8cpp_source_l00249}{249}} of file \mbox{\hyperlink{yubihsm__wallet_8cpp_source}{yubihsm\+\_\+wallet.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00249\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00250\ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(chain::wallet\_exception,\ \textcolor{stringliteral}{"{}It\ is\ not\ possible\ to\ import\ a\ key\ in\ to\ the\ YubiHSM\ wallet"{}});}
+\DoxyCodeLine{00251\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1wallet_1_1yubihsm__wallet_aadb41176f808cb5918236a14a47943c3}\index{sysio::wallet::yubihsm\_wallet@{sysio::wallet::yubihsm\_wallet}!is\_locked@{is\_locked}}
+\index{is\_locked@{is\_locked}!sysio::wallet::yubihsm\_wallet@{sysio::wallet::yubihsm\_wallet}}
+\doxysubsubsection{\texorpdfstring{is\_locked()}{is\_locked()}}
+{\footnotesize\ttfamily \label{classsysio_1_1wallet_1_1yubihsm__wallet_aadb41176f808cb5918236a14a47943c3} 
+bool sysio\+::wallet\+::yubihsm\+\_\+wallet\+::is\+\_\+locked (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+Checks whether the wallet is locked (is unable to use its private keys).
+
+This state can be changed by calling {\ttfamily \doxylink{classsysio_1_1wallet_1_1yubihsm__wallet_add449d4c47024ff03ddf8dc50507caf8}{lock()}} or {\ttfamily \doxylink{classsysio_1_1wallet_1_1yubihsm__wallet_a32626226becf373892a2f9174b5a5b7f}{unlock()}}. \begin{DoxyReturn}{Returns}
+true if the wallet is locked 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{classsysio_1_1wallet_1_1wallet__api_a710201e5042763c1994db74094c00a6a}{sysio\+::wallet\+::wallet\+\_\+api}}.
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__wallet_8cpp_source_l00222}{222}} of file \mbox{\hyperlink{yubihsm__wallet_8cpp_source}{yubihsm\+\_\+wallet.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00223\ \ \ \ \textcolor{keywordflow}{return}\ my-\/>is\_locked();}
+\DoxyCodeLine{00224\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=343pt]{classsysio_1_1wallet_1_1yubihsm__wallet_aadb41176f808cb5918236a14a47943c3_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1wallet_1_1yubihsm__wallet_a2dae8187d77d09dc4ff04d0f49a3287a}\index{sysio::wallet::yubihsm\_wallet@{sysio::wallet::yubihsm\_wallet}!list\_keys@{list\_keys}}
+\index{list\_keys@{list\_keys}!sysio::wallet::yubihsm\_wallet@{sysio::wallet::yubihsm\_wallet}}
+\doxysubsubsection{\texorpdfstring{list\_keys()}{list\_keys()}}
+{\footnotesize\ttfamily \label{classsysio_1_1wallet_1_1yubihsm__wallet_a2dae8187d77d09dc4ff04d0f49a3287a} 
+map$<$ \mbox{\hyperlink{namespacesysio_1_1chain_a0628a11f388cd2e43b1ccc1260a1042f}{public\+\_\+key\+\_\+type}}, \mbox{\hyperlink{namespacesysio_1_1chain_ac31c0e1bc25b7e5fcf2b3c7f41a23fd6}{private\+\_\+key\+\_\+type}} $>$ sysio\+::wallet\+::yubihsm\+\_\+wallet\+::list\+\_\+keys (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+Dumps all private keys owned by the wallet.
+
+The keys are printed in WIF format. You can import these keys into another wallet using {\ttfamily \doxylink{classsysio_1_1wallet_1_1yubihsm__wallet_a93a658f97b4e05e35fe86f83f6b7344a}{import\+\_\+key()}} \begin{DoxyReturn}{Returns}
+a map containing the private keys, indexed by their public key 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{classsysio_1_1wallet_1_1wallet__api_a6fc986ad2364276698af19c3ba570fd4}{sysio\+::wallet\+::wallet\+\_\+api}}.
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__wallet_8cpp_source_l00240}{240}} of file \mbox{\hyperlink{yubihsm__wallet_8cpp_source}{yubihsm\+\_\+wallet.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00241\ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(chain::wallet\_exception,\ \textcolor{stringliteral}{"{}Getting\ the\ private\ keys\ from\ the\ YubiHSM\ wallet\ is\ impossible"{}});}
+\DoxyCodeLine{00242\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1wallet_1_1yubihsm__wallet_a84f99523df39cd73a37eea5a747a96c4}\index{sysio::wallet::yubihsm\_wallet@{sysio::wallet::yubihsm\_wallet}!list\_public\_keys@{list\_public\_keys}}
+\index{list\_public\_keys@{list\_public\_keys}!sysio::wallet::yubihsm\_wallet@{sysio::wallet::yubihsm\_wallet}}
+\doxysubsubsection{\texorpdfstring{list\_public\_keys()}{list\_public\_keys()}}
+{\footnotesize\ttfamily \label{classsysio_1_1wallet_1_1yubihsm__wallet_a84f99523df39cd73a37eea5a747a96c4} 
+flat\+\_\+set$<$ \mbox{\hyperlink{namespacesysio_1_1chain_a0628a11f388cd2e43b1ccc1260a1042f}{public\+\_\+key\+\_\+type}} $>$ sysio\+::wallet\+::yubihsm\+\_\+wallet\+::list\+\_\+public\+\_\+keys (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+Dumps all public keys owned by the wallet. \begin{DoxyReturn}{Returns}
+a vector containing the public keys 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{classsysio_1_1wallet_1_1wallet__api_ad72522af02989c3d6cd836b4b0b20f77}{sysio\+::wallet\+::wallet\+\_\+api}}.
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__wallet_8cpp_source_l00243}{243}} of file \mbox{\hyperlink{yubihsm__wallet_8cpp_source}{yubihsm\+\_\+wallet.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00243\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00244\ \ \ \ flat\_set<public\_key\_type>\ keys;}
+\DoxyCodeLine{00245\ \ \ \ boost::copy(my-\/>\_keys\ |\ boost::adaptors::map\_keys,\ std::inserter(keys,\ keys.end()));}
+\DoxyCodeLine{00246\ \ \ \ \textcolor{keywordflow}{return}\ keys;}
+\DoxyCodeLine{00247\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1wallet_1_1yubihsm__wallet_add449d4c47024ff03ddf8dc50507caf8}\index{sysio::wallet::yubihsm\_wallet@{sysio::wallet::yubihsm\_wallet}!lock@{lock}}
+\index{lock@{lock}!sysio::wallet::yubihsm\_wallet@{sysio::wallet::yubihsm\_wallet}}
+\doxysubsubsection{\texorpdfstring{lock()}{lock()}}
+{\footnotesize\ttfamily \label{classsysio_1_1wallet_1_1yubihsm__wallet_add449d4c47024ff03ddf8dc50507caf8} 
+void sysio\+::wallet\+::yubihsm\+\_\+wallet\+::lock (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+Locks the wallet immediately 
+
+Implements \mbox{\hyperlink{classsysio_1_1wallet_1_1wallet__api_a22f62e8ae4e6e5ef51993c549214080d}{sysio\+::wallet\+::wallet\+\_\+api}}.
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__wallet_8cpp_source_l00225}{225}} of file \mbox{\hyperlink{yubihsm__wallet_8cpp_source}{yubihsm\+\_\+wallet.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00226\ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(!\mbox{\hyperlink{classsysio_1_1wallet_1_1yubihsm__wallet_aadb41176f808cb5918236a14a47943c3}{is\_locked}}());}
+\DoxyCodeLine{00227\ \ \ \ my-\/>lock();}
+\DoxyCodeLine{00228\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=343pt]{classsysio_1_1wallet_1_1yubihsm__wallet_add449d4c47024ff03ddf8dc50507caf8_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1wallet_1_1yubihsm__wallet_a27f0c21f29c43cfa497f097dd65d4892}\index{sysio::wallet::yubihsm\_wallet@{sysio::wallet::yubihsm\_wallet}!remove\_key@{remove\_key}}
+\index{remove\_key@{remove\_key}!sysio::wallet::yubihsm\_wallet@{sysio::wallet::yubihsm\_wallet}}
+\doxysubsubsection{\texorpdfstring{remove\_key()}{remove\_key()}}
+{\footnotesize\ttfamily \label{classsysio_1_1wallet_1_1yubihsm__wallet_a27f0c21f29c43cfa497f097dd65d4892} 
+bool sysio\+::wallet\+::yubihsm\+\_\+wallet\+::remove\+\_\+key (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}}}]{key}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+Removes a key from the wallet.
+
+example\+: remove\+\_\+key SYS6\+MRy\+Aj\+Qq8ud7h\+VNYcfn\+VPJqc\+Vpsc\+N5\+So8\+Bht\+Hu\+GYq\+ET5\+GDW5\+CV
+
+
+\begin{DoxyParams}{Parameters}
+{\em key} & the Public Key to remove \\
+\hline
+\end{DoxyParams}
+
+
+Implements \mbox{\hyperlink{classsysio_1_1wallet_1_1wallet__api_a78a510745bd055db07b7a17ee0f88aa6}{sysio\+::wallet\+::wallet\+\_\+api}}.
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__wallet_8cpp_source_l00258}{258}} of file \mbox{\hyperlink{yubihsm__wallet_8cpp_source}{yubihsm\+\_\+wallet.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00258\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00259\ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(!\mbox{\hyperlink{classsysio_1_1wallet_1_1yubihsm__wallet_aadb41176f808cb5918236a14a47943c3}{is\_locked}}());}
+\DoxyCodeLine{00260\ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(chain::wallet\_exception,\ \textcolor{stringliteral}{"{}YubiHSM\ wallet\ does\ not\ currently\ support\ removal\ of\ keys"{}});}
+\DoxyCodeLine{00261\ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00262\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=343pt]{classsysio_1_1wallet_1_1yubihsm__wallet_a27f0c21f29c43cfa497f097dd65d4892_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1wallet_1_1yubihsm__wallet_a3b84a6691260db0632c6972a5e46b110}\index{sysio::wallet::yubihsm\_wallet@{sysio::wallet::yubihsm\_wallet}!set\_password@{set\_password}}
+\index{set\_password@{set\_password}!sysio::wallet::yubihsm\_wallet@{sysio::wallet::yubihsm\_wallet}}
+\doxysubsubsection{\texorpdfstring{set\_password()}{set\_password()}}
+{\footnotesize\ttfamily \label{classsysio_1_1wallet_1_1yubihsm__wallet_a3b84a6691260db0632c6972a5e46b110} 
+void sysio\+::wallet\+::yubihsm\+\_\+wallet\+::set\+\_\+password (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}}}]{password}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+Sets a new password on the wallet.
+
+The wallet must be either \textquotesingle{}new\textquotesingle{} or \textquotesingle{}unlocked\textquotesingle{} to execute this command. 
+
+Implements \mbox{\hyperlink{classsysio_1_1wallet_1_1wallet__api_a917888bc3f85c9893f9b43ce0eb91ea5}{sysio\+::wallet\+::wallet\+\_\+api}}.
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__wallet_8cpp_source_l00236}{236}} of file \mbox{\hyperlink{yubihsm__wallet_8cpp_source}{yubihsm\+\_\+wallet.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00237\ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(chain::wallet\_exception,\ \textcolor{stringliteral}{"{}YubiHSM\ wallet\ cannot\ have\ a\ password\ set"{}});}
+\DoxyCodeLine{00238\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1wallet_1_1yubihsm__wallet_a83f6a573368deda82829e73e124b3d03}\index{sysio::wallet::yubihsm\_wallet@{sysio::wallet::yubihsm\_wallet}!try\_sign\_digest@{try\_sign\_digest}}
+\index{try\_sign\_digest@{try\_sign\_digest}!sysio::wallet::yubihsm\_wallet@{sysio::wallet::yubihsm\_wallet}}
+\doxysubsubsection{\texorpdfstring{try\_sign\_digest()}{try\_sign\_digest()}}
+{\footnotesize\ttfamily \label{classsysio_1_1wallet_1_1yubihsm__wallet_a83f6a573368deda82829e73e124b3d03} 
+std\+::optional$<$ \mbox{\hyperlink{namespacesysio_1_1chain_af141a69eb789b86fa0eb93c2d263f0df}{signature\+\_\+type}} $>$ sysio\+::wallet\+::yubihsm\+\_\+wallet\+::try\+\_\+sign\+\_\+digest (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_a357fd9478475457e5bb386a3143079b6}{digest\+\_\+type}}}]{digest}{, }\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_a0628a11f388cd2e43b1ccc1260a1042f}{public\+\_\+key\+\_\+type}}}]{public\+\_\+key}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+Returns a signature given the digest and public\+\_\+key, if this wallet can sign via that public key 
+
+Implements \mbox{\hyperlink{classsysio_1_1wallet_1_1wallet__api_a4032a14f7ed5483c1d6c620496f8f168}{sysio\+::wallet\+::wallet\+\_\+api}}.
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__wallet_8cpp_source_l00264}{264}} of file \mbox{\hyperlink{yubihsm__wallet_8cpp_source}{yubihsm\+\_\+wallet.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00264\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00265\ \ \ \ \textcolor{keywordflow}{return}\ my-\/>try\_sign\_digest(\mbox{\hyperlink{namespacefc_a150ca4cd9c0318ca45dc0dc7df5d58b9}{digest}},\ \mbox{\hyperlink{classfc_1_1public__key}{public\_key}});}
+\DoxyCodeLine{00266\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1wallet_1_1yubihsm__wallet_a83f6a573368deda82829e73e124b3d03_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1wallet_1_1yubihsm__wallet_a32626226becf373892a2f9174b5a5b7f}\index{sysio::wallet::yubihsm\_wallet@{sysio::wallet::yubihsm\_wallet}!unlock@{unlock}}
+\index{unlock@{unlock}!sysio::wallet::yubihsm\_wallet@{sysio::wallet::yubihsm\_wallet}}
+\doxysubsubsection{\texorpdfstring{unlock()}{unlock()}}
+{\footnotesize\ttfamily \label{classsysio_1_1wallet_1_1yubihsm__wallet_a32626226becf373892a2f9174b5a5b7f} 
+void sysio\+::wallet\+::yubihsm\+\_\+wallet\+::unlock (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}}}]{password}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+Unlocks the wallet.
+
+The wallet remain unlocked until the {\ttfamily lock} is called or the program exits. 
+\begin{DoxyParams}{Parameters}
+{\em password} & the password previously set with {\ttfamily \doxylink{classsysio_1_1wallet_1_1yubihsm__wallet_a3b84a6691260db0632c6972a5e46b110}{set\+\_\+password()}} \\
+\hline
+\end{DoxyParams}
+
+
+Implements \mbox{\hyperlink{classsysio_1_1wallet_1_1wallet__api_a6d197a3f54c1075f27cf046d591cc28b}{sysio\+::wallet\+::wallet\+\_\+api}}.
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__wallet_8cpp_source_l00230}{230}} of file \mbox{\hyperlink{yubihsm__wallet_8cpp_source}{yubihsm\+\_\+wallet.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00230\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00231\ \ \ \ my-\/>unlock(password);}
+\DoxyCodeLine{00232\ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+plugins/wallet\+\_\+plugin/include/sysio/wallet\+\_\+plugin/\mbox{\hyperlink{yubihsm__wallet_8hpp}{yubihsm\+\_\+wallet.\+hpp}}\item 
+plugins/wallet\+\_\+plugin/\mbox{\hyperlink{yubihsm__wallet_8cpp}{yubihsm\+\_\+wallet.\+cpp}}\end{DoxyCompactItemize}

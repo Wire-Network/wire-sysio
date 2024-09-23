@@ -1,0 +1,113 @@
+\doxysection{CLI\+::Config\+TOML Class Reference}
+\hypertarget{class_c_l_i_1_1_config_t_o_m_l}{}\label{class_c_l_i_1_1_config_t_o_m_l}\index{CLI::ConfigTOML@{CLI::ConfigTOML}}
+
+
+\doxylink{class_c_l_i_1_1_config_t_o_m_l}{Config\+TOML} generates a TOML compliant output.  
+
+
+
+
+{\ttfamily \#include $<$CLI11.\+hpp$>$}
+
+
+
+Inheritance diagram for CLI\+::Config\+TOML\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=173pt]{class_c_l_i_1_1_config_t_o_m_l__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for CLI\+::Config\+TOML\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=173pt]{class_c_l_i_1_1_config_t_o_m_l__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_c_l_i_1_1_config_t_o_m_l_a054e19684f5f42f2bbd77204e361b199}{Config\+TOML}} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{class_c_l_i_1_1_config_base}{CLI\+::\+Config\+Base}}}
+\begin{DoxyCompactItemize}
+\item 
+std\+::string \mbox{\hyperlink{class_c_l_i_1_1_config_base_a5832f6f03212648fa08a8ff83bc9bc08}{to\+\_\+config}} (const \mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \texorpdfstring{$\ast$}{*}, bool default\+\_\+also, bool write\+\_\+description, std\+::string prefix) const override
+\begin{DoxyCompactList}\small\item\em Convert an app into a configuration. \end{DoxyCompactList}\item 
+std\+::vector$<$ \mbox{\hyperlink{struct_c_l_i_1_1_config_item}{Config\+Item}} $>$ \mbox{\hyperlink{class_c_l_i_1_1_config_base_a1395eecde5af65b73e3670529df0e17b}{from\+\_\+config}} (std\+::istream \&input) const override
+\begin{DoxyCompactList}\small\item\em Convert a configuration into an app. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_c_l_i_1_1_config_base}{Config\+Base}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_c_l_i_1_1_config_base_a24d5cb8e03e62690652e22b96185669d}{comment}} (char cchar)
+\begin{DoxyCompactList}\small\item\em Specify the configuration for comment characters. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_c_l_i_1_1_config_base}{Config\+Base}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_c_l_i_1_1_config_base_a4575f1aa08e6cc896aacd05dab782514}{array\+Bounds}} (char a\+Start, char a\+End)
+\begin{DoxyCompactList}\small\item\em Specify the start and end characters for an array. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_c_l_i_1_1_config_base}{Config\+Base}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_c_l_i_1_1_config_base_a25de5280cc70375e845454f9ef124b2d}{array\+Delimiter}} (char a\+Sep)
+\begin{DoxyCompactList}\small\item\em Specify the delimiter character for an array. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_c_l_i_1_1_config_base}{Config\+Base}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_c_l_i_1_1_config_base_aabc033545dea919028ae5997e59866fc}{value\+Separator}} (char v\+Sep)
+\begin{DoxyCompactList}\small\item\em Specify the delimiter between a name and value. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{class_c_l_i_1_1_config}{CLI\+::\+Config}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual std\+::string \mbox{\hyperlink{class_c_l_i_1_1_config_affac2102274c1a09c0e08b2c9410b57f}{to\+\_\+flag}} (const \mbox{\hyperlink{struct_c_l_i_1_1_config_item}{Config\+Item}} \&item) const
+\begin{DoxyCompactList}\small\item\em Get a flag value. \end{DoxyCompactList}\item 
+std\+::vector$<$ \mbox{\hyperlink{struct_c_l_i_1_1_config_item}{Config\+Item}} $>$ \mbox{\hyperlink{class_c_l_i_1_1_config_a2581bc51c6f5bba2f07d0d696c1170c4}{from\+\_\+file}} (const std\+::string \&\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})
+\begin{DoxyCompactList}\small\item\em Parse a config file, throw an error (\doxylink{class_c_l_i_1_1_parse_error}{Parse\+Error}\+:Config\+Parse\+Error or \doxylink{class_c_l_i_1_1_file_error}{File\+Error}) on failure. \end{DoxyCompactList}\item 
+virtual \mbox{\hyperlink{class_c_l_i_1_1_config_adf504285455f78fb1595d2ddad1cb626}{\texorpdfstring{$\sim$}{\string~}\+Config}} ()=default
+\begin{DoxyCompactList}\small\item\em Virtual destructor. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Protected Attributes inherited from \mbox{\hyperlink{class_c_l_i_1_1_config_base}{CLI\+::\+Config\+Base}}}
+\begin{DoxyCompactItemize}
+\item 
+char \mbox{\hyperlink{class_c_l_i_1_1_config_base_afd989253b3c1ec6731f0ce21e0343137}{comment\+Char}} = \textquotesingle{};\textquotesingle{}
+\begin{DoxyCompactList}\small\item\em the character used for comments \end{DoxyCompactList}\item 
+char \mbox{\hyperlink{class_c_l_i_1_1_config_base_ab55dde43f4fbad4a03d91dd8babd21cb}{array\+Start}} = \textquotesingle{}\textbackslash{}0\textquotesingle{}
+\begin{DoxyCompactList}\small\item\em the character used to start an array \textquotesingle{}\textbackslash{}0\textquotesingle{} is a default to not use \end{DoxyCompactList}\item 
+char \mbox{\hyperlink{class_c_l_i_1_1_config_base_ae850866c93a17184acb903fe928a3e6a}{array\+End}} = \textquotesingle{}\textbackslash{}0\textquotesingle{}
+\begin{DoxyCompactList}\small\item\em the character used to end an array \textquotesingle{}\textbackslash{}0\textquotesingle{} is a default to not use \end{DoxyCompactList}\item 
+char \mbox{\hyperlink{class_c_l_i_1_1_config_base_a37d610e93986226f2262f1e774402248}{array\+Separator}} = \textquotesingle{} \textquotesingle{}
+\begin{DoxyCompactList}\small\item\em the character used to separate elements in an array \end{DoxyCompactList}\item 
+char \mbox{\hyperlink{class_c_l_i_1_1_config_base_aae7e270d0354d4c6540c26da250dc001}{value\+Delimiter}} = \textquotesingle{}=\textquotesingle{}
+\begin{DoxyCompactList}\small\item\em the character used separate the name from the value \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Protected Attributes inherited from \mbox{\hyperlink{class_c_l_i_1_1_config}{CLI\+::\+Config}}}
+\begin{DoxyCompactItemize}
+\item 
+std\+::vector$<$ \mbox{\hyperlink{struct_c_l_i_1_1_config_item}{Config\+Item}} $>$ \mbox{\hyperlink{class_c_l_i_1_1_config_a44be58c62906c58a118d8a3bf0f2a312}{items}} \{\}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l02060}{2060}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_c_l_i_1_1_config_t_o_m_l_a054e19684f5f42f2bbd77204e361b199}\index{CLI::ConfigTOML@{CLI::ConfigTOML}!ConfigTOML@{ConfigTOML}}
+\index{ConfigTOML@{ConfigTOML}!CLI::ConfigTOML@{CLI::ConfigTOML}}
+\doxysubsubsection{\texorpdfstring{ConfigTOML()}{ConfigTOML()}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_config_t_o_m_l_a054e19684f5f42f2bbd77204e361b199} 
+CLI\+::\+Config\+TOML\+::\+Config\+TOML (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l02063}{2063}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02064\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_c_l_i_1_1_config_base_afd989253b3c1ec6731f0ce21e0343137}{commentChar}}\ =\ \textcolor{charliteral}{'\#'};}
+\DoxyCodeLine{02065\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_c_l_i_1_1_config_base_ab55dde43f4fbad4a03d91dd8babd21cb}{arrayStart}}\ =\ \textcolor{charliteral}{'['};}
+\DoxyCodeLine{02066\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_c_l_i_1_1_config_base_ae850866c93a17184acb903fe928a3e6a}{arrayEnd}}\ =\ \textcolor{charliteral}{']'};}
+\DoxyCodeLine{02067\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_c_l_i_1_1_config_base_a37d610e93986226f2262f1e774402248}{arraySeparator}}\ =\ \textcolor{charliteral}{','};}
+\DoxyCodeLine{02068\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_c_l_i_1_1_config_base_aae7e270d0354d4c6540c26da250dc001}{valueDelimiter}}\ =\ \textcolor{charliteral}{'='};}
+\DoxyCodeLine{02069\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+programs/clio/\mbox{\hyperlink{_c_l_i11_8hpp}{CLI11.\+hpp}}\end{DoxyCompactItemize}

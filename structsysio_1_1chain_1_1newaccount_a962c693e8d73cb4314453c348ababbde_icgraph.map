@@ -1,0 +1,7 @@
+<map id="sysio::chain::newaccount::get_name" name="sysio::chain::newaccount::get_name">
+<area shape="rect" id="Node000001" title=" " alt="" coords="419,13,588,54"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain__apis_1_1account__query__db__impl.html#aa224e5ba2c6565d1626adbd9cc9d997a" title=" " alt="" coords="212,5,371,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="404,36,371,36,371,30,404,30"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1chain__apis_1_1account__query__db__impl.html#aa184af1bc686f0c89bb5837f05ef30fb" title=" " alt="" coords="5,5,164,61"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="196,36,164,36,164,30,196,30"/>
+</map>

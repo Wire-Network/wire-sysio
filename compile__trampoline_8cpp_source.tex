@@ -1,0 +1,195 @@
+\doxysection{compile\+\_\+trampoline.\+cpp}
+\hypertarget{compile__trampoline_8cpp_source}{}\label{compile__trampoline_8cpp_source}\index{libraries/chain/webassembly/runtimes/sys-\/vm-\/oc/compile\_trampoline.cpp@{libraries/chain/webassembly/runtimes/sys-\/vm-\/oc/compile\_trampoline.cpp}}
+\mbox{\hyperlink{compile__trampoline_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{ipc__helpers_8hpp}{sysio/chain/webassembly/sys-\/vm-\/oc/ipc\_helpers.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{ipc__protocol_8hpp}{sysio/chain/webassembly/sys-\/vm-\/oc/ipc\_protocol.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{chain_2include_2sysio_2chain_2webassembly_2sys-vm-oc_2memory_8hpp}{sysio/chain/webassembly/sys-\/vm-\/oc/memory.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{intrinsic_8hpp}{sysio/chain/webassembly/sys-\/vm-\/oc/intrinsic.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{wasm__sysio__injection_8hpp}{sysio/chain/wasm\_sysio\_injection.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <sys/prctl.h>}}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <signal.h>}}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ <sys/resource.h>}}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00011}00011\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_module_8h}{IR/Module.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00012}00012\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_validate_8h}{IR/Validate.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00013}00013\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_w_a_s_m_8h}{WASM/WASM.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00014}00014\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{chain_2webassembly_2runtimes_2sys-vm-oc_2_l_l_v_m_j_i_t_8h}{LLVMJIT.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00016}00016\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespace_i_r}{IR}};}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00018}00018\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{\ \textcolor{keyword}{namespace\ }chain\ \{\ \textcolor{keyword}{namespace\ }eosvmoc\ \{}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00020}\mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a356ff87ec1b70511eecbf910c40be3da}{00020}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a356ff87ec1b70511eecbf910c40be3da}{run\_compile}}(\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1wrapped__fd}{wrapped\_fd}}\&\&\ response\_sock,\ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1wrapped__fd}{wrapped\_fd}}\&\&\ wasm\_code)\ \textcolor{keyword}{noexcept}\ \{\ \ \textcolor{comment}{//noexcept;\ we'll\ just\ blow\ up\ if\ anything\ tries\ to\ cross\ this\ boundry}}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00021}00021\ \ \ \ std::vector<uint8\_t>\ wasm\ =\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a86ba861037da0aa52199df744c8270e5}{vector\_for\_memfd}}(wasm\_code);}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00023}00023\ \ \ \ \textcolor{comment}{//ideally\ we\ catch\ exceptions\ and\ sent\ them\ upstream\ as\ strings\ for\ easier\ reporting}}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00025}00025\ \ \ \ \mbox{\hyperlink{struct_i_r_1_1_module}{Module}}\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}};}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00026}00026\ \ \ \ \mbox{\hyperlink{struct_serialization_1_1_memory_input_stream}{Serialization::MemoryInputStream}}\ stream(wasm.data(),\ wasm.size());}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00027}00027\ \ \ \ \mbox{\hyperlink{struct_w_a_s_m_1_1scoped__skip__checks}{WASM::scoped\_skip\_checks}}\ no\_check;}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00028}00028\ \ \ \ \mbox{\hyperlink{namespace_serialization_a2a05c5aff4847073ca0fb887d20ac485}{WASM::serialize}}(stream,\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}});}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00029}00029\ \ \ \ \textcolor{keyword}{module}.userSections.clear();}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00030}00030\ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1wasm__injections_1_1wasm__binary__injection}{wasm\_injections::wasm\_binary\_injection}}\ injector(\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}});}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00031}00031\ \ \ \ injector.\mbox{\hyperlink{classsysio_1_1chain_1_1wasm__injections_1_1wasm__binary__injection_a70e5db847f672811ffae1c36194fa8e4}{inject}}();}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00033}00033\ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1instantiated__code}{instantiated\_code}}\ code\ =\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a5bd12a2d92a270ecd02902006bc53f59}{LLVMJIT::instantiateModule}}(\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}});}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00035}00035\ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1code__compilation__result__message}{code\_compilation\_result\_message}}\ result\_message;}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00037}00037\ \ \ \ \textcolor{keyword}{const}\ std::map<unsigned,\ uintptr\_t>\&\ function\_to\_offsets\ =\ code.function\_offsets;}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00039}00039\ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.startFunctionIndex\ ==\ \mbox{\hyperlink{stdint_8h_ab2355300ea19395357e62d780f4dd073}{UINTPTR\_MAX}})}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00040}00040\ \ \ \ \ \ \ result\_message.\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1code__compilation__result__message_a9552625a0bbf37cb1aa27bf534c36e21}{start}}\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1no__offset}{no\_offset}}\{\};}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00041}00041\ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.startFunctionIndex\ <\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.functions.imports.size())\ \{}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00042}00042\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}\ =\ \textcolor{keyword}{module}.functions.imports[module.startFunctionIndex];}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00043}00043\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1intrinsic__entry}{intrinsic\_entry}}\&\ ie\ =\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_abe43c1d3ddfb344db0cd7dd5ab25f48c}{get\_intrinsic\_map}}().at(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}.moduleName\ +\ \textcolor{stringliteral}{"{}."{}}\ +\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}.exportName);}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00044}00044\ \ \ \ \ \ \ result\_message.\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1code__compilation__result__message_a9552625a0bbf37cb1aa27bf534c36e21}{start}}\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1intrinsic__ordinal}{intrinsic\_ordinal}}\{ie.\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1intrinsic__entry_acc5e84fd17bee32a2f7e20709b2c62f5}{ordinal}}\};}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00045}00045\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00046}00046\ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00047}00047\ \ \ \ \ \ \ result\_message.\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1code__compilation__result__message_a9552625a0bbf37cb1aa27bf534c36e21}{start}}\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1code__offset}{code\_offset}}\{function\_to\_offsets.at(\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.startFunctionIndex-\/\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.functions.imports.size())\};}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00049}00049\ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_i_r_1_1_export}{Export}}\&\ exprt\ :\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.exports)\ \{}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00050}00050\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(exprt.\mbox{\hyperlink{struct_i_r_1_1_export_acf1a148f2b0a0f855b772f014137c359}{name}}\ ==\ \textcolor{stringliteral}{"{}apply"{}})}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00051}00051\ \ \ \ \ \ \ \ \ \ result\_message.\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1code__compilation__result__message_ad0d75c276269dc20426a2c02fd659ba8}{apply\_offset}}\ =\ function\_to\_offsets.at(exprt.\mbox{\hyperlink{struct_i_r_1_1_export_ae452b6cb1b65bd904f3b2b9949f246ea}{index}}-\/\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.functions.imports.size());}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00052}00052\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00054}00054\ \ \ \ result\_message.\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1code__compilation__result__message_a5c8f71a2abdfb8ea9df36cec547ab302}{starting\_memory\_pages}}\ =\ -\/1;}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00055}00055\ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.memories.size())}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00056}00056\ \ \ \ \ \ \ result\_message.\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1code__compilation__result__message_a5c8f71a2abdfb8ea9df36cec547ab302}{starting\_memory\_pages}}\ =\ \textcolor{keyword}{module}.memories.defs.at(0).type.size.min;}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00058}00058\ \ \ \ std::vector<uint8\_t>\ prologue(\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.globals.defs.size()\ *\ 8);\ \textcolor{comment}{//\ Large\ enough\ to\ handle\ all\ mutable\ globals}}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00059}00059\ \ \ \ std::vector<uint8\_t>::iterator\ prologue\_it\ =\ prologue.end();}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00061}00061\ \ \ \ \textcolor{comment}{//set\ up\ mutable\ globals}}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00062}00062\ \ \ \ \textcolor{keyword}{union\ }global\_union\ \{}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00063}00063\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6add1d26230d15c93e8fbdba07b0299a44}{i64}};}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00064}00064\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}}\ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6af89edb52b075b8bd95989bd3d0a04c0a}{i32}};}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00065}00065\ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6a512dc597be7ae761876315165dc8bd2e}{f32}};}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00066}00066\ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6a714b98e0a797e8f119f257a4ab802f86}{f64}};}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00067}00067\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00069}00069\ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_i_r_1_1_global_def}{GlobalDef}}\&\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a9c70933aff6b2a6d08c687a6cbb6b765}{global}}\ :\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.globals.defs)\ \{}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00070}00070\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a9c70933aff6b2a6d08c687a6cbb6b765}{global}}.type.isMutable)}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00071}00071\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00072}00072\ \ \ \ \ \ \ prologue\_it\ -\/=\ 8;}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00073}00073\ \ \ \ \ \ \ global\_union*\ \textcolor{keyword}{const}\ u\ =\ (global\_union*\ \textcolor{keyword}{const})\&*prologue\_it;}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00074}00074\ }
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00075}00075\ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a9c70933aff6b2a6d08c687a6cbb6b765}{global}}.initializer.type)\ \{}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ InitializerExpression::Type::i32\_const:\ u-\/>i32\ =\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a9c70933aff6b2a6d08c687a6cbb6b765}{global}}.initializer.i32;\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ InitializerExpression::Type::i64\_const:\ u-\/>i64\ =\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a9c70933aff6b2a6d08c687a6cbb6b765}{global}}.initializer.i64;\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00078}00078\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ InitializerExpression::Type::f32\_const:\ u-\/>f32\ =\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a9c70933aff6b2a6d08c687a6cbb6b765}{global}}.initializer.f32;\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ InitializerExpression::Type::f64\_const:\ u-\/>f64\ =\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a9c70933aff6b2a6d08c687a6cbb6b765}{global}}.initializer.f64;\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00080}00080\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:\ \textcolor{keywordflow}{break};\ \textcolor{comment}{//impossible}}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00081}00081\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00082}00082\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00083}00083\ }
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00084}00084\ \ \ \ \textcolor{keyword}{struct\ }table\_entry\ \{}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00085}00085\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a31b85deecb45924320becd11d3ee16ce}{uintptr\_t}}\ \mbox{\hyperlink{yubihsm_8h_a1d127017fb298b889f4ba24752d08b8e}{type}};}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00086}00086\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ func;\ \ \ \ \textcolor{comment}{//>=\ 0\ means\ offset\ to\ code\ in\ wasm;\ <\ 0\ means\ intrinsic\ call\ at\ offset\ address}}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00087}00087\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00088}00088\ }
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00089}00089\ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_i_r_1_1_table_segment}{TableSegment}}\&\ table\_segment\ :\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.tableSegments)\ \{}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00090}00090\ \ \ \ \ \ \ \textcolor{keyword}{struct\ }table\_entry*\ table\_index\_0\ =\ (\textcolor{keyword}{struct\ }table\_entry*)(code.code.data()\ +\ code.table\_offset);}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00091}00091\ }
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00092}00092\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\textcolor{keyword}{>}(table\_segment.\mbox{\hyperlink{struct_i_r_1_1_table_segment_aa3665479e20f35435cf111f04a5f7a28}{baseOffset}}.\mbox{\hyperlink{struct_i_r_1_1_initializer_expression_ae39054471f85529a9a641962618bab7e}{i32}})\ >\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.tables.defs[0].type.size.min)}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00093}00093\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00094}00094\ }
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00095}00095\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\textcolor{keyword}{>}(table\_segment.\mbox{\hyperlink{struct_i_r_1_1_table_segment_aa3665479e20f35435cf111f04a5f7a28}{baseOffset}}.\mbox{\hyperlink{struct_i_r_1_1_initializer_expression_ae39054471f85529a9a641962618bab7e}{i32}})\ >\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.tables.defs[0].type.size.min)}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00096}00096\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00097}00097\ }
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00098}00098\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ i\ =\ 0;\ i\ <\ table\_segment.\mbox{\hyperlink{struct_i_r_1_1_table_segment_a7ef544bc423b39282171f3af24ea8ff4}{indices}}.size();\ ++i)\ \{}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00099}00099\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ function\_index\ =\ table\_segment.\mbox{\hyperlink{struct_i_r_1_1_table_segment_a7ef544bc423b39282171f3af24ea8ff4}{indices}}[i];}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00100}00100\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ effective\_table\_index\ =\ table\_segment.\mbox{\hyperlink{struct_i_r_1_1_table_segment_aa3665479e20f35435cf111f04a5f7a28}{baseOffset}}.\mbox{\hyperlink{struct_i_r_1_1_initializer_expression_ae39054471f85529a9a641962618bab7e}{i32}}\ +\ i;}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00101}00101\ }
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00102}00102\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(effective\_table\_index\ >=\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.tables.defs[0].type.size.min)}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00103}00103\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00104}00104\ }
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00105}00105\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(function\_index\ <\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.functions.imports.size())\ \{}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00106}00106\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}\ =\ \textcolor{keyword}{module}.functions.imports[function\_index];}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00107}00107\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1intrinsic__entry}{intrinsic\_entry}}\&\ ie\ =\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_abe43c1d3ddfb344db0cd7dd5ab25f48c}{get\_intrinsic\_map}}().at(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}.moduleName\ +\ \textcolor{stringliteral}{"{}."{}}\ +\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}.exportName);}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00108}00108\ \ \ \ \ \ \ \ \ \ \ \ \ table\_index\_0[effective\_table\_index].func\ =\ ie.\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1intrinsic__entry_acc5e84fd17bee32a2f7e20709b2c62f5}{ordinal}}*-\/8;}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00109}00109\ \ \ \ \ \ \ \ \ \ \ \ \ table\_index\_0[effective\_table\_index].type\ =\ (\mbox{\hyperlink{stdint_8h_a31b85deecb45924320becd11d3ee16ce}{uintptr\_t}})\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.types[\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.functions.imports[function\_index].type.index];}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00110}00110\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00111}00111\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00112}00112\ \ \ \ \ \ \ \ \ \ \ \ \ table\_index\_0[effective\_table\_index].func\ =\ function\_to\_offsets.at(function\_index\ -\/\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.functions.imports.size());}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00113}00113\ \ \ \ \ \ \ \ \ \ \ \ \ table\_index\_0[effective\_table\_index].type\ =\ (\mbox{\hyperlink{stdint_8h_a31b85deecb45924320becd11d3ee16ce}{uintptr\_t}})\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.types[\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.functions.defs[function\_index\ -\/\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.functions.imports.size()].type.index];}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00114}00114\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00115}00115\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00116}00116\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00117}00117\ }
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00118}00118\ \ \ \ \textcolor{comment}{//this\ is\ somewhat\ copy\ pasta\ from\ wasm\_interface\_private,\ with\ the\ asserts\ removed}}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00119}00119\ \ \ \ std::vector<uint8\_t>\ initial\_mem;}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00120}00120\ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_i_r_1_1_data_segment}{DataSegment}}\&\ data\_segment\ :\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.dataSegments)\ \{}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00121}00121\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}\ base\_offset\ =\ data\_segment.\mbox{\hyperlink{struct_i_r_1_1_data_segment_a4426062ee993d970dfa7b9e33dd7da6b}{baseOffset}}.\mbox{\hyperlink{struct_i_r_1_1_initializer_expression_ae39054471f85529a9a641962618bab7e}{i32}};}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00122}00122\ }
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00123}00123\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(base\_offset\ +\ data\_segment.\mbox{\hyperlink{struct_i_r_1_1_data_segment_a32f58a06f3c2dfff7094c92f63ed1d23}{data}}.size()\ >\ initial\_mem.size())}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00124}00124\ \ \ \ \ \ \ \ \ \ initial\_mem.resize(base\_offset\ +\ data\_segment.\mbox{\hyperlink{struct_i_r_1_1_data_segment_a32f58a06f3c2dfff7094c92f63ed1d23}{data}}.size(),\ 0x00);}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00125}00125\ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(initial\_mem.data()\ +\ base\_offset,\ data\_segment.\mbox{\hyperlink{struct_i_r_1_1_data_segment_a32f58a06f3c2dfff7094c92f63ed1d23}{data}}.data(),\ data\_segment.\mbox{\hyperlink{struct_i_r_1_1_data_segment_a32f58a06f3c2dfff7094c92f63ed1d23}{data}}.size());}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00126}00126\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00127}00127\ }
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00128}00128\ \ \ \ result\_message.\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1code__compilation__result__message_a9b8a4bb1abee7f132aa48e2ddc0f6c9f}{initdata\_prologue\_size}}\ =\ prologue.end()\ -\/\ prologue\_it;}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00129}00129\ \ \ \ std::vector<uint8\_t>\ initdata\_prep;}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00130}00130\ \ \ \ std::move(prologue\_it,\ prologue.end(),\ std::back\_inserter(initdata\_prep));}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00131}00131\ \ \ \ std::move(initial\_mem.begin(),\ initial\_mem.end(),\ std::back\_inserter(initdata\_prep));}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00132}00132\ }
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00133}00133\ \ \ \ std::vector<wrapped\_fd>\ fds\_to\_send;}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00134}00134\ \ \ \ fds\_to\_send.emplace\_back(\mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_afe4909c18643f64d0c67a83885aefd90}{memfd\_for\_bytearray}}(code.code));}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00135}00135\ \ \ \ fds\_to\_send.emplace\_back(\mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_afe4909c18643f64d0c67a83885aefd90}{memfd\_for\_bytearray}}(initdata\_prep));}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00136}00136\ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a8715d32fd2e6a4a668578ca0d946b58b}{write\_message\_with\_fds}}(response\_sock,\ result\_message,\ fds\_to\_send);}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00137}00137\ \}}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00138}00138\ }
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00139}\mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a2e87b8655afafc1e4d272347fa5afabd}{00139}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a2e87b8655afafc1e4d272347fa5afabd}{run\_compile\_trampoline}}(\textcolor{keywordtype}{int}\ fd)\ \{}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00140}00140\ \ \ \ prctl(PR\_SET\_NAME,\ \textcolor{stringliteral}{"{}oc-\/trampoline"{}});}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00141}00141\ \ \ \ prctl(PR\_SET\_PDEATHSIG,\ SIGKILL);}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00142}00142\ }
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00143}00143\ \ \ \ \textcolor{comment}{//squelching\ this\ for\ now,\ but\ it\ means\ we\ won't\ have\ ability\ to\ get\ compile\ metrics}}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00144}00144\ \ \ \ \textcolor{keyword}{struct\ }sigaction\ act;}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00145}00145\ \ \ \ sigset\_t\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a893468abdce45d586a5b659094a25e6c}{set}};}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00146}00146\ \ \ \ sigemptyset(\&set);}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00147}00147\ \ \ \ act.sa\_handler\ =\ SIG\_IGN;}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00148}00148\ \ \ \ act.sa\_mask\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a893468abdce45d586a5b659094a25e6c}{set}};}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00149}00149\ \ \ \ act.sa\_flags\ =\ SA\_NOCLDWAIT;}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00150}00150\ \ \ \ act.sa\_sigaction\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00151}00151\ \ \ \ sigaction(SIGCHLD,\ \&act,\ \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00152}00152\ }
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00153}00153\ \ \ \ \textcolor{keywordflow}{while}(\textcolor{keyword}{true})\ \{}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00154}00154\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ [success,\ message,\ fds]\ =\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_aa65c4d6c02a0823262c6627a86cc74bc}{read\_message\_with\_fds}}(fd);}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00155}00155\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!success)}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00156}00156\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00157}00157\ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00158}00158\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!std::holds\_alternative<compile\_wasm\_message>(message)\ ||\ fds.size()\ !=\ 2)\ \{}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00159}00159\ \ \ \ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}SYS\ VM\ OC\ compile\ trampoline\ got\ unexpected\ message;\ ignoring"{}}\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00160}00160\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00161}00161\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00162}00162\ }
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00163}00163\ \ \ \ \ \ \ pid\_t\ pid\ =\ fork();}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00164}00164\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(pid\ ==\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00165}00165\ \ \ \ \ \ \ \ \ \ prctl(PR\_SET\_NAME,\ \textcolor{stringliteral}{"{}oc-\/compile"{}});}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00166}00166\ \ \ \ \ \ \ \ \ \ prctl(PR\_SET\_PDEATHSIG,\ SIGKILL);}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00167}00167\ }
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00168}00168\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{struct\ }rlimit\ cpu\_limits\ =\ \{20u,\ 20u\};}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00169}00169\ \ \ \ \ \ \ \ \ \ setrlimit(RLIMIT\_CPU,\ \&cpu\_limits);}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00170}00170\ }
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00171}00171\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{struct\ }rlimit\ vm\_limits\ =\ \{512u*1024u*1024u,\ 512u*1024u*1024u\};}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00172}00172\ \ \ \ \ \ \ \ \ \ setrlimit(RLIMIT\_AS,\ \&vm\_limits);}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00173}00173\ }
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00174}00174\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{struct\ }rlimit\ core\_limits\ =\ \{0u,\ 0u\};}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00175}00175\ \ \ \ \ \ \ \ \ \ setrlimit(RLIMIT\_CORE,\ \&core\_limits);}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00176}00176\ }
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00177}00177\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a356ff87ec1b70511eecbf910c40be3da}{run\_compile}}(std::move(fds[0]),\ std::move(fds[1]));}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00178}00178\ \ \ \ \ \ \ \ \ \ \_exit(0);}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00179}00179\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00180}00180\ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(pid\ ==\ -\/1)}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00181}00181\ \ \ \ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}SYS\ VM\ OC\ compile\ trampoline\ failed\ to\ spawn\ compile\ task"{}}\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00182}00182\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00183}00183\ }
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00184}00184\ \ \ \ \_exit(0);}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00185}00185\ \}}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00186}00186\ }
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00187}00187\ \}\}\}}
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00188}00188\ }
+\DoxyCodeLine{\Hypertarget{compile__trampoline_8cpp_source_l00189}00189\ }
+
+\end{DoxyCode}

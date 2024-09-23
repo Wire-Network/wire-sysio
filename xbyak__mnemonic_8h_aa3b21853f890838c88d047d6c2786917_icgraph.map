@@ -1,0 +1,9 @@
+<map id="wait" name="wait">
+<area shape="rect" id="Node000001" title=" " alt="" coords="544,5,590,31"/>
+<area shape="rect" id="Node000002" href="$classtelemetry__client.html#acc925f9ef40b46fdfb040b9325c67ae2" title=" " alt="" coords="290,5,496,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="529,21,497,21,497,16,529,16"/>
+<area shape="rect" id="Node000003" href="$classtelemetry__client.html#aa5765b95b628b04bbe403cf022d0f014" title=" " alt="" coords="103,5,242,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="275,21,243,21,243,16,275,16"/>
+<area shape="rect" id="Node000004" href="$telemetry__client_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97" title=" " alt="" coords="5,5,55,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="87,21,55,21,55,16,87,16"/>
+</map>

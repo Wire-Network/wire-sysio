@@ -1,0 +1,19 @@
+<map id="websocketpp::http::parser::parser::process_header" name="websocketpp::http::parser::parser::process_header">
+<area shape="rect" id="Node000001" title="Process a header line." alt="" coords="5,109,161,165"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1http_1_1parser_1_1parser.html#abd39762de5ec467a29a537d79602b603" title="Append a value to an existing HTTP header." alt="" coords="209,73,360,129"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="161,121,193,115,194,120,162,126"/>
+<area shape="rect" id="Node000005" href="$namespacewebsocketpp_1_1http_1_1parser.html#ae656f7130716b25fb2a34cee77a0444e" title=" " alt="" coords="216,153,352,194"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="162,148,202,156,201,161,161,154"/>
+<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1http_1_1parser_1_1parser.html#ae8a8f833c3fb01f1553a26e77f380367" title="Get the value of an HTTP header." alt="" coords="416,5,552,61"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="359,73,401,59,403,64,361,78"/>
+<area shape="rect" id="Node000004" href="$namespacewebsocketpp_1_1http.html#a45a9b60b72b68de7b32fb75d89ad4c04" title="Is the character a non&#45;token." alt="" coords="416,85,552,126"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="360,100,401,101,401,106,360,105"/>
+<area shape="rect" id="Node000006" href="$namespacewebsocketpp_1_1http_1_1parser.html#a263c7c466bbed56948d5877b9c33c354" title="Read and discard linear whitespace." alt="" coords="408,153,560,194"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="353,170,392,170,392,176,353,176"/>
+<area shape="rect" id="Node000007" href="$namespacewebsocketpp_1_1http_1_1parser.html#a1dacef9abccd8e5b6c572447d9f5a3ab" title="Read and discard one unit of linear whitespace." alt="" coords="608,153,745,194"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="560,170,593,170,593,176,560,176"/>
+<area shape="rect" id="Node000008" href="$namespacewebsocketpp_1_1http.html#a95df9e609616688298d34fee9ec34945" title="Is the character non&#45;whitespace." alt="" coords="793,120,954,160"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="745,159,777,154,777,159,746,164"/>
+<area shape="rect" id="Node000009" href="$namespacewebsocketpp_1_1http.html#a8ff7039dd19159bdbce3b98159c66ae2" title="Is the character whitespace." alt="" coords="805,185,942,226"/>
+<area shape="poly" id="edge8_Node000007_Node000009" title=" " alt="" coords="746,182,790,189,790,194,745,187"/>
+</map>

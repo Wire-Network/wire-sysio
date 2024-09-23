@@ -1,0 +1,145 @@
+\doxysection{Catch\+::clara\+::detail\+::Parser\+Base Class Reference}
+\hypertarget{class_catch_1_1clara_1_1detail_1_1_parser_base}{}\label{class_catch_1_1clara_1_1detail_1_1_parser_base}\index{Catch::clara::detail::ParserBase@{Catch::clara::detail::ParserBase}}
+
+
+{\ttfamily \#include $<$clara.\+hpp$>$}
+
+
+
+Inheritance diagram for Catch\+::clara\+::detail\+::Parser\+Base\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1clara_1_1detail_1_1_parser_base__inherit__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_parser_base_a86ebb5e7c46f1805a1513e3eb22b0680}{\texorpdfstring{$\sim$}{\string~}\+Parser\+Base}} ()=default
+\item 
+virtual auto \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_parser_base_a6f649e38d0d320834809f904fbba762d}{validate}} () const -\/$>$ \mbox{\hyperlink{namespace_catch_1_1clara_1_1detail_a25b44e9ea5705a24c870fe79c4e47948}{Result}}
+\item 
+virtual auto \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_parser_base_a7d42474913ab67e0a243c393f84c9379}{parse}} (std\+::string const \&exe\+Name, \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_token_stream}{Token\+Stream}} const \&tokens) const -\/$>$ \mbox{\hyperlink{namespace_catch_1_1clara_1_1detail_a439ec6956020b8db640a48f119f215c4}{Internal\+Parse\+Result}}=0
+\item 
+virtual auto \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_parser_base_a89fba963ea2b35ce52631a0a8c4c0edd}{cardinality}} () const -\/$>$ size\+\_\+t
+\item 
+auto \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_parser_base_a1c575337e4b4b68fb1413164c1d9ae16}{parse}} (\mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_args}{Args}} const \&args) const -\/$>$ \mbox{\hyperlink{namespace_catch_1_1clara_1_1detail_a439ec6956020b8db640a48f119f215c4}{Internal\+Parse\+Result}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{include_2external_2clara_8hpp_source_l00809}{809}} of file \mbox{\hyperlink{include_2external_2clara_8hpp_source}{clara.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_catch_1_1clara_1_1detail_1_1_parser_base_a86ebb5e7c46f1805a1513e3eb22b0680}\index{Catch::clara::detail::ParserBase@{Catch::clara::detail::ParserBase}!````~ParserBase@{\texorpdfstring{$\sim$}{\string~}ParserBase}}
+\index{````~ParserBase@{\texorpdfstring{$\sim$}{\string~}ParserBase}!Catch::clara::detail::ParserBase@{Catch::clara::detail::ParserBase}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}ParserBase()}{\string~ParserBase()}}
+{\footnotesize\ttfamily \label{class_catch_1_1clara_1_1detail_1_1_parser_base_a86ebb5e7c46f1805a1513e3eb22b0680} 
+virtual Catch\+::clara\+::detail\+::\+Parser\+Base\+::\texorpdfstring{$\sim$}{\string~}\+Parser\+Base (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}, {\ttfamily [default]}}
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_catch_1_1clara_1_1detail_1_1_parser_base_a89fba963ea2b35ce52631a0a8c4c0edd}\index{Catch::clara::detail::ParserBase@{Catch::clara::detail::ParserBase}!cardinality@{cardinality}}
+\index{cardinality@{cardinality}!Catch::clara::detail::ParserBase@{Catch::clara::detail::ParserBase}}
+\doxysubsubsection{\texorpdfstring{cardinality()}{cardinality()}}
+{\footnotesize\ttfamily \label{class_catch_1_1clara_1_1detail_1_1_parser_base_a89fba963ea2b35ce52631a0a8c4c0edd} 
+virtual auto Catch\+::clara\+::detail\+::\+Parser\+Base\+::cardinality (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const -\/$>$ size\+\_\+t \hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_parser_ref_impl_a467112fbc31cb74fe34b903a4278cb42}{Catch\+::clara\+::detail\+::\+Parser\+Ref\+Impl$<$ Derived\+T $>$}}, \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_parser_ref_impl_a467112fbc31cb74fe34b903a4278cb42}{Catch\+::clara\+::detail\+::\+Parser\+Ref\+Impl$<$ Arg $>$}}, and \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_parser_ref_impl_a467112fbc31cb74fe34b903a4278cb42}{Catch\+::clara\+::detail\+::\+Parser\+Ref\+Impl$<$ Opt $>$}}.
+
+
+
+Definition at line \mbox{\hyperlink{include_2external_2clara_8hpp_source_l00814}{814}} of file \mbox{\hyperlink{include_2external_2clara_8hpp_source}{clara.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00814\ \{\ \textcolor{keywordflow}{return}\ 1;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1clara_1_1detail_1_1_parser_base_a1c575337e4b4b68fb1413164c1d9ae16}\index{Catch::clara::detail::ParserBase@{Catch::clara::detail::ParserBase}!parse@{parse}}
+\index{parse@{parse}!Catch::clara::detail::ParserBase@{Catch::clara::detail::ParserBase}}
+\doxysubsubsection{\texorpdfstring{parse()}{parse()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1clara_1_1detail_1_1_parser_base_a1c575337e4b4b68fb1413164c1d9ae16} 
+auto Catch\+::clara\+::detail\+::\+Parser\+Base\+::parse (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_args}{Args}} const \&}]{args}{}\end{DoxyParamCaption}) const -\/$>$ \mbox{\hyperlink{namespace_catch_1_1clara_1_1detail_a439ec6956020b8db640a48f119f215c4}{Internal\+Parse\+Result}} \hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{include_2external_2clara_8hpp_source_l00816}{816}} of file \mbox{\hyperlink{include_2external_2clara_8hpp_source}{clara.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00816\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00817\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_parser_base_a7d42474913ab67e0a243c393f84c9379}{parse}}(\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.exeName(),\ TokenStream(\ args\ )\ );}
+\DoxyCodeLine{00818\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=322pt]{class_catch_1_1clara_1_1detail_1_1_parser_base_a1c575337e4b4b68fb1413164c1d9ae16_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1clara_1_1detail_1_1_parser_base_a7d42474913ab67e0a243c393f84c9379}\index{Catch::clara::detail::ParserBase@{Catch::clara::detail::ParserBase}!parse@{parse}}
+\index{parse@{parse}!Catch::clara::detail::ParserBase@{Catch::clara::detail::ParserBase}}
+\doxysubsubsection{\texorpdfstring{parse()}{parse()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1clara_1_1detail_1_1_parser_base_a7d42474913ab67e0a243c393f84c9379} 
+virtual auto Catch\+::clara\+::detail\+::\+Parser\+Base\+::parse (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{exe\+Name}{, }\item[{\mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_token_stream}{Token\+Stream}} const \&}]{tokens}{}\end{DoxyParamCaption}) const -\/$>$  \mbox{\hyperlink{namespace_catch_1_1clara_1_1detail_a439ec6956020b8db640a48f119f215c4}{Internal\+Parse\+Result}}\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_arg_a485c592c4a730601568ac97ab4025512}{Catch\+::clara\+::detail\+::\+Arg}}, \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_exe_name_aa8d0a636bd615845d23ade493ddb767c}{Catch\+::clara\+::detail\+::\+Exe\+Name}}, \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_opt_a6b98bc0562d43b4321783374abf80ef2}{Catch\+::clara\+::detail\+::\+Opt}}, and \mbox{\hyperlink{struct_catch_1_1clara_1_1detail_1_1_parser_ac5acd3e8bbd2445ac48b1d12b67a78f1}{Catch\+::clara\+::detail\+::\+Parser}}.
+
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=322pt]{class_catch_1_1clara_1_1detail_1_1_parser_base_a7d42474913ab67e0a243c393f84c9379_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1clara_1_1detail_1_1_parser_base_a6f649e38d0d320834809f904fbba762d}\index{Catch::clara::detail::ParserBase@{Catch::clara::detail::ParserBase}!validate@{validate}}
+\index{validate@{validate}!Catch::clara::detail::ParserBase@{Catch::clara::detail::ParserBase}}
+\doxysubsubsection{\texorpdfstring{validate()}{validate()}}
+{\footnotesize\ttfamily \label{class_catch_1_1clara_1_1detail_1_1_parser_base_a6f649e38d0d320834809f904fbba762d} 
+virtual auto Catch\+::clara\+::detail\+::\+Parser\+Base\+::validate (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const -\/$>$ \mbox{\hyperlink{namespace_catch_1_1clara_1_1detail_a25b44e9ea5705a24c870fe79c4e47948}{Result}} \hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_opt_aff9c008fe44ec3ab07f62ef2a3a3aa7c}{Catch\+::clara\+::detail\+::\+Opt}}, and \mbox{\hyperlink{struct_catch_1_1clara_1_1detail_1_1_parser_a15576e27bbb813ccac45387ea6a4decc}{Catch\+::clara\+::detail\+::\+Parser}}.
+
+
+
+Definition at line \mbox{\hyperlink{include_2external_2clara_8hpp_source_l00812}{812}} of file \mbox{\hyperlink{include_2external_2clara_8hpp_source}{clara.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00812\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_basic_result_ac48a1cb282f89218d149c021cbd32eb6}{Result::ok}}();\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=327pt]{class_catch_1_1clara_1_1detail_1_1_parser_base_a6f649e38d0d320834809f904fbba762d_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1clara_1_1detail_1_1_parser_base_a6f649e38d0d320834809f904fbba762d_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/include/external/\mbox{\hyperlink{include_2external_2clara_8hpp}{clara.\+hpp}}\end{DoxyCompactItemize}

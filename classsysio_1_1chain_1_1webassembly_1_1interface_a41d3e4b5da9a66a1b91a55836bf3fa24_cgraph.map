@@ -1,0 +1,7 @@
+<map id="sysio::chain::webassembly::interface::__floatditf" name="sysio::chain::webassembly::interface::__floatditf">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,185,46"/>
+<area shape="rect" id="Node000002" href="$softfloat_2source_2i64__to__f128_8c.html#a3f53f349ff0fcc0d50709e9f0a12ec74" title=" " alt="" coords="233,13,321,38"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="185,23,217,23,217,28,185,28"/>
+<area shape="rect" id="Node000003" href="$softfloat_2source_2s__short_shift_left128_8c.html#a5813c1cdc091451e4bcbf3227ebc0632" title=" " alt="" coords="369,13,543,38"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="321,23,353,23,353,28,321,28"/>
+</map>

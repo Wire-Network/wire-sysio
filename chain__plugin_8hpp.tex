@@ -1,0 +1,234 @@
+\doxysection{plugins/chain\+\_\+plugin/include/sysio/chain\+\_\+plugin/chain\+\_\+plugin.hpp File Reference}
+\hypertarget{chain__plugin_8hpp}{}\label{chain__plugin_8hpp}\index{plugins/chain\_plugin/include/sysio/chain\_plugin/chain\_plugin.hpp@{plugins/chain\_plugin/include/sysio/chain\_plugin/chain\_plugin.hpp}}
+{\ttfamily \#include $<$appbase/application.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/asset.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/authority.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/account\+\_\+object.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/block.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/controller.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/contract\+\_\+table\+\_\+objects.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/resource\+\_\+limits.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/transaction.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/abi\+\_\+serializer.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/plugin\+\_\+interface.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/types.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/fixed\+\_\+bytes.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/container/flat\+\_\+set.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/multiprecision/cpp\+\_\+int.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain\+\_\+plugin/account\+\_\+query\+\_\+db.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain\+\_\+plugin/trx\+\_\+retry\+\_\+db.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain\+\_\+plugin/trx\+\_\+finality\+\_\+status\+\_\+processing.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/static\+\_\+variant.\+hpp$>$}\newline
+Include dependency graph for chain\+\_\+plugin.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{chain__plugin_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{chain__plugin_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain__apis_1_1empty}{sysio\+::chain\+\_\+apis\+::empty}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain__apis_1_1linked__action}{sysio\+::chain\+\_\+apis\+::linked\+\_\+action}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain__apis_1_1permission}{sysio\+::chain\+\_\+apis\+::permission}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1chain__apis_1_1read__only}{sysio\+::chain\+\_\+apis\+::read\+\_\+only}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1get__info__results}{sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::get\+\_\+info\+\_\+results}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1get__transaction__status__params}{sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::get\+\_\+transaction\+\_\+status\+\_\+params}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1get__transaction__status__results}{sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::get\+\_\+transaction\+\_\+status\+\_\+results}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1get__activated__protocol__features__params}{sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::get\+\_\+activated\+\_\+protocol\+\_\+features\+\_\+params}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1get__activated__protocol__features__results}{sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::get\+\_\+activated\+\_\+protocol\+\_\+features\+\_\+results}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1producer__info}{sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::producer\+\_\+info}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1get__account__results}{sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::get\+\_\+account\+\_\+results}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1get__account__params}{sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::get\+\_\+account\+\_\+params}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1get__code__results}{sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::get\+\_\+code\+\_\+results}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1get__code__params}{sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::get\+\_\+code\+\_\+params}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1get__code__hash__results}{sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::get\+\_\+code\+\_\+hash\+\_\+results}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1get__code__hash__params}{sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::get\+\_\+code\+\_\+hash\+\_\+params}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1get__abi__results}{sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::get\+\_\+abi\+\_\+results}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1get__abi__params}{sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::get\+\_\+abi\+\_\+params}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1get__raw__code__and__abi__results}{sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::get\+\_\+raw\+\_\+code\+\_\+and\+\_\+abi\+\_\+results}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1get__raw__code__and__abi__params}{sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::get\+\_\+raw\+\_\+code\+\_\+and\+\_\+abi\+\_\+params}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1get__raw__abi__params}{sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::get\+\_\+raw\+\_\+abi\+\_\+params}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1get__raw__abi__results}{sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::get\+\_\+raw\+\_\+abi\+\_\+results}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1abi__json__to__bin__params}{sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::abi\+\_\+json\+\_\+to\+\_\+bin\+\_\+params}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1abi__json__to__bin__result}{sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::abi\+\_\+json\+\_\+to\+\_\+bin\+\_\+result}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1abi__bin__to__json__params}{sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::abi\+\_\+bin\+\_\+to\+\_\+json\+\_\+params}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1abi__bin__to__json__result}{sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::abi\+\_\+bin\+\_\+to\+\_\+json\+\_\+result}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1get__required__keys__params}{sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::get\+\_\+required\+\_\+keys\+\_\+params}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1get__required__keys__result}{sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::get\+\_\+required\+\_\+keys\+\_\+result}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1get__block__params}{sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::get\+\_\+block\+\_\+params}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1get__block__info__params}{sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::get\+\_\+block\+\_\+info\+\_\+params}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1get__block__header__state__params}{sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::get\+\_\+block\+\_\+header\+\_\+state\+\_\+params}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1get__table__rows__params}{sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::get\+\_\+table\+\_\+rows\+\_\+params}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1get__table__rows__result}{sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::get\+\_\+table\+\_\+rows\+\_\+result}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1get__table__by__scope__params}{sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::get\+\_\+table\+\_\+by\+\_\+scope\+\_\+params}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1get__table__by__scope__result__row}{sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::get\+\_\+table\+\_\+by\+\_\+scope\+\_\+result\+\_\+row}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1get__table__by__scope__result}{sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::get\+\_\+table\+\_\+by\+\_\+scope\+\_\+result}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1get__currency__balance__params}{sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::get\+\_\+currency\+\_\+balance\+\_\+params}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1get__currency__stats__params}{sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::get\+\_\+currency\+\_\+stats\+\_\+params}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1get__currency__stats__result}{sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::get\+\_\+currency\+\_\+stats\+\_\+result}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1get__producers__params}{sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::get\+\_\+producers\+\_\+params}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1get__producers__result}{sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::get\+\_\+producers\+\_\+result}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1get__producer__schedule__params}{sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::get\+\_\+producer\+\_\+schedule\+\_\+params}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1get__producer__schedule__result}{sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::get\+\_\+producer\+\_\+schedule\+\_\+result}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1get__scheduled__transactions__params}{sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::get\+\_\+scheduled\+\_\+transactions\+\_\+params}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1get__scheduled__transactions__result}{sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::get\+\_\+scheduled\+\_\+transactions\+\_\+result}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1compute__transaction__results}{sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::compute\+\_\+transaction\+\_\+results}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1compute__transaction__params}{sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::compute\+\_\+transaction\+\_\+params}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1chain__apis_1_1read__write}{sysio\+::chain\+\_\+apis\+::read\+\_\+write}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__write_1_1push__transaction__results}{sysio\+::chain\+\_\+apis\+::read\+\_\+write\+::push\+\_\+transaction\+\_\+results}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__write_1_1send__transaction2__params}{sysio\+::chain\+\_\+apis\+::read\+\_\+write\+::send\+\_\+transaction2\+\_\+params}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain__apis_1_1keytype__converter_3_01chain__apis_1_1sha256_00_01chain__apis_1_1hex_01_4}{sysio\+::chain\+\_\+apis\+::keytype\+\_\+converter$<$ chain\+\_\+apis\+::sha256, chain\+\_\+apis\+::hex $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain__apis_1_1keytype__converter_3_01chain__apis_1_1ripemd160_00_01chain__apis_1_1hex_01_4}{sysio\+::chain\+\_\+apis\+::keytype\+\_\+converter$<$ chain\+\_\+apis\+::ripemd160, chain\+\_\+apis\+::hex $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain__apis_1_1keytype__converter_3_01chain__apis_1_1i256_01_4}{sysio\+::chain\+\_\+apis\+::keytype\+\_\+converter$<$ chain\+\_\+apis\+::i256 $>$}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1chain__plugin}{sysio\+::chain\+\_\+plugin}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacefc}{fc}}
+\begin{DoxyCompactList}\small\item\em namespace \doxylink{namespacesysio_1_1chain}{sysio\+::chain} \end{DoxyCompactList}\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain__apis}{sysio\+::chain\+\_\+apis}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}} $>$ }\\\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}} \mbox{\hyperlink{namespacesysio_1_1chain__apis_a9f6bd41c84620731d2bd7388f8fd110e}{sysio\+::chain\+\_\+apis\+::convert\+\_\+to\+\_\+type}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&str, const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&desc)
+\item 
+template$<$$>$ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{namespacesysio_1_1chain__apis_a836b04c2028748eb9cb50c3d9fb8f473}{sysio\+::chain\+\_\+apis\+::convert\+\_\+to\+\_\+type}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&str, const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&desc)
+\item 
+template$<$$>$ double \mbox{\hyperlink{namespacesysio_1_1chain__apis_a881bf8817ff7863c88e2ce590e465d94}{sysio\+::chain\+\_\+apis\+::convert\+\_\+to\+\_\+type}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&str, const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&desc)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}} $>$ }\\\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1chain__apis_a0dc2b6941bd899b78a443fedb25354cc}{sysio\+::chain\+\_\+apis\+::convert\+\_\+to\+\_\+string}} (const \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}} \&\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}}, const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_afa4592d59d085cf06cad9000120eba84}{key\+\_\+type}}, const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&encode\+\_\+type, const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&desc)
+\item 
+template$<$$>$ \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1chain__apis_a3992489d9f3dd0cb2178f78d8b31374b}{sysio\+::chain\+\_\+apis\+::convert\+\_\+to\+\_\+string}} (const \mbox{\hyperlink{namespacesysio_1_1chain_a4404f0f28252f82bd7b98d70d1605e4f}{chain\+::key256\+\_\+t}} \&\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}}, const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_afa4592d59d085cf06cad9000120eba84}{key\+\_\+type}}, const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&encode\+\_\+type, const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&desc)
+\item 
+template$<$$>$ \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1chain__apis_aacb780a423bcb09110881970e8fac186}{sysio\+::chain\+\_\+apis\+::convert\+\_\+to\+\_\+string}} (const \mbox{\hyperlink{structfloat128__t}{float128\+\_\+t}} \&\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}}, const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_afa4592d59d085cf06cad9000120eba84}{key\+\_\+type}}, const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&encode\+\_\+type, const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&desc)
+\item 
+FC\+\_\+\+REFLECT(\mbox{\hyperlink{structsysio_1_1chain__apis_1_1linked__action}{sysio\+::chain\+\_\+apis\+::linked\+\_\+action}},(account)(\mbox{\hyperlink{structaction}{action}})) FC\+\_\+\+REFLECT(sysio FC\+\_\+\+REFLECT(\mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1get__table__by__scope__params}{sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::get\+\_\+table\+\_\+by\+\_\+scope\+\_\+params}},(code)(table)(lower\+\_\+bound)(upper\+\_\+bound)(limit)(reverse)) FC\+\_\+\+REFLECT(sysio \mbox{\hyperlink{chain__plugin_8hpp_a0b81982e669caae045ea3e445b7524d3}{FC\+\_\+\+REFLECT}} (\mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1get__table__by__scope__result}{sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::get\+\_\+table\+\_\+by\+\_\+scope\+\_\+result}},(rows)(more))
+\item 
+\mbox{\hyperlink{chain__plugin_8hpp_ae4fef1384d55ce15f8fc1ef83eb73514}{FC\+\_\+\+REFLECT}} (\mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1get__currency__balance__params}{sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::get\+\_\+currency\+\_\+balance\+\_\+params}},(code)(account)(symbol))
+\item 
+\mbox{\hyperlink{chain__plugin_8hpp_a2642ddfd12585d2f4d0cd70edca71fa1}{FC\+\_\+\+REFLECT}} (\mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1get__currency__stats__params}{sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::get\+\_\+currency\+\_\+stats\+\_\+params}},(code)(symbol))
+\item 
+\mbox{\hyperlink{chain__plugin_8hpp_a79a1ba96b4620774894ebca775422177}{FC\+\_\+\+REFLECT}} (\mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1get__currency__stats__result}{sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::get\+\_\+currency\+\_\+stats\+\_\+result}},(supply)(max\+\_\+supply)(issuer))
+\item 
+FC\+\_\+\+REFLECT(\mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1get__producers__params}{sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::get\+\_\+producers\+\_\+params}},(json)(lower\+\_\+bound)(limit)) FC\+\_\+\+REFLECT(sysio \mbox{\hyperlink{chain__plugin_8hpp_a7f3951f59d8966f629c3c199767bc09b}{FC\+\_\+\+REFLECT}} (\mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1get__producer__schedule__result}{sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::get\+\_\+producer\+\_\+schedule\+\_\+result}},(active)(pending)(proposed))
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+constexpr const char \mbox{\hyperlink{namespacesysio_1_1chain__apis_a76dbd5fabc41f219dd5d05678c75ac6a}{sysio\+::chain\+\_\+apis\+::i64}} \mbox{[}$\,$\mbox{]} = "{}i64"{}
+\item 
+constexpr const char \mbox{\hyperlink{namespacesysio_1_1chain__apis_aae3060a772fefcb696b08e348643d70e}{sysio\+::chain\+\_\+apis\+::i128}} \mbox{[}$\,$\mbox{]} = "{}i128"{}
+\item 
+constexpr const char \mbox{\hyperlink{namespacesysio_1_1chain__apis_a14def9e0f14e5d29b1f88384b1dd4815}{sysio\+::chain\+\_\+apis\+::i256}} \mbox{[}$\,$\mbox{]} = "{}i256"{}
+\item 
+constexpr const char \mbox{\hyperlink{namespacesysio_1_1chain__apis_a37ffa45c3ddfc272519f233a1bdb8241}{sysio\+::chain\+\_\+apis\+::float64}} \mbox{[}$\,$\mbox{]} = "{}float64"{}
+\item 
+constexpr const char \mbox{\hyperlink{namespacesysio_1_1chain__apis_aefbe3cb595b76f82ca74c684c6d31b3b}{sysio\+::chain\+\_\+apis\+::float128}} \mbox{[}$\,$\mbox{]} = "{}float128"{}
+\item 
+constexpr const char \mbox{\hyperlink{namespacesysio_1_1chain__apis_aec57a2129d91283b7cf3b735009cb546}{sysio\+::chain\+\_\+apis\+::sha256}} \mbox{[}$\,$\mbox{]} = "{}sha256"{}
+\item 
+constexpr const char \mbox{\hyperlink{namespacesysio_1_1chain__apis_ac78dd757cd6cb873652b7a9a224722f8}{sysio\+::chain\+\_\+apis\+::ripemd160}} \mbox{[}$\,$\mbox{]} = "{}ripemd160"{}
+\item 
+constexpr const char \mbox{\hyperlink{namespacesysio_1_1chain__apis_a9da883a06f38f13b4a26c3f22e4dfc1d}{sysio\+::chain\+\_\+apis\+::dec}} \mbox{[}$\,$\mbox{]} = "{}dec"{}
+\item 
+constexpr const char \mbox{\hyperlink{namespacesysio_1_1chain__apis_a14107dc373dfcfea6980bc2f5fa80a83}{sysio\+::chain\+\_\+apis\+::hex}} \mbox{[}$\,$\mbox{]} = "{}hex"{}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{chain__plugin_8hpp_ae4fef1384d55ce15f8fc1ef83eb73514}\index{chain\_plugin.hpp@{chain\_plugin.hpp}!FC\_REFLECT@{FC\_REFLECT}}
+\index{FC\_REFLECT@{FC\_REFLECT}!chain\_plugin.hpp@{chain\_plugin.hpp}}
+\doxysubsubsection{\texorpdfstring{FC\_REFLECT()}{FC\_REFLECT()}\hspace{0.1cm}{\footnotesize\ttfamily [1/5]}}
+{\footnotesize\ttfamily \label{chain__plugin_8hpp_ae4fef1384d55ce15f8fc1ef83eb73514} 
+FC\+\_\+\+REFLECT (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1get__currency__balance__params}{sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::get\+\_\+currency\+\_\+balance\+\_\+params}}}]{}{, }\item[{(code)(account)(symbol)}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{chain__plugin_8hpp_a2642ddfd12585d2f4d0cd70edca71fa1}\index{chain\_plugin.hpp@{chain\_plugin.hpp}!FC\_REFLECT@{FC\_REFLECT}}
+\index{FC\_REFLECT@{FC\_REFLECT}!chain\_plugin.hpp@{chain\_plugin.hpp}}
+\doxysubsubsection{\texorpdfstring{FC\_REFLECT()}{FC\_REFLECT()}\hspace{0.1cm}{\footnotesize\ttfamily [2/5]}}
+{\footnotesize\ttfamily \label{chain__plugin_8hpp_a2642ddfd12585d2f4d0cd70edca71fa1} 
+FC\+\_\+\+REFLECT (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1get__currency__stats__params}{sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::get\+\_\+currency\+\_\+stats\+\_\+params}}}]{}{, }\item[{(code)(symbol)}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{chain__plugin_8hpp_a79a1ba96b4620774894ebca775422177}\index{chain\_plugin.hpp@{chain\_plugin.hpp}!FC\_REFLECT@{FC\_REFLECT}}
+\index{FC\_REFLECT@{FC\_REFLECT}!chain\_plugin.hpp@{chain\_plugin.hpp}}
+\doxysubsubsection{\texorpdfstring{FC\_REFLECT()}{FC\_REFLECT()}\hspace{0.1cm}{\footnotesize\ttfamily [3/5]}}
+{\footnotesize\ttfamily \label{chain__plugin_8hpp_a79a1ba96b4620774894ebca775422177} 
+FC\+\_\+\+REFLECT (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1get__currency__stats__result}{sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::get\+\_\+currency\+\_\+stats\+\_\+result}}}]{}{, }\item[{(supply)(max\+\_\+supply)(issuer)}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{chain__plugin_8hpp_a7f3951f59d8966f629c3c199767bc09b}\index{chain\_plugin.hpp@{chain\_plugin.hpp}!FC\_REFLECT@{FC\_REFLECT}}
+\index{FC\_REFLECT@{FC\_REFLECT}!chain\_plugin.hpp@{chain\_plugin.hpp}}
+\doxysubsubsection{\texorpdfstring{FC\_REFLECT()}{FC\_REFLECT()}\hspace{0.1cm}{\footnotesize\ttfamily [4/5]}}
+{\footnotesize\ttfamily \label{chain__plugin_8hpp_a7f3951f59d8966f629c3c199767bc09b} 
+FC\+\_\+\+REFLECT(\mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1get__producers__params}{sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::get\+\_\+producers\+\_\+params}},(json)(lower\+\_\+bound)(limit)) FC\+\_\+\+REFLECT(sysio FC\+\_\+\+REFLECT (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1get__producer__schedule__result}{sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::get\+\_\+producer\+\_\+schedule\+\_\+result}}}]{}{, }\item[{(active)(pending)(proposed)}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{chain__plugin_8hpp_a0b81982e669caae045ea3e445b7524d3}\index{chain\_plugin.hpp@{chain\_plugin.hpp}!FC\_REFLECT@{FC\_REFLECT}}
+\index{FC\_REFLECT@{FC\_REFLECT}!chain\_plugin.hpp@{chain\_plugin.hpp}}
+\doxysubsubsection{\texorpdfstring{FC\_REFLECT()}{FC\_REFLECT()}\hspace{0.1cm}{\footnotesize\ttfamily [5/5]}}
+{\footnotesize\ttfamily \label{chain__plugin_8hpp_a0b81982e669caae045ea3e445b7524d3} 
+FC\+\_\+\+REFLECT(\mbox{\hyperlink{structsysio_1_1chain__apis_1_1linked__action}{sysio\+::chain\+\_\+apis\+::linked\+\_\+action}},(account)(\mbox{\hyperlink{structaction}{action}})) FC\+\_\+\+REFLECT(sysio FC\+\_\+\+REFLECT(\mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1get__table__by__scope__params}{sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::get\+\_\+table\+\_\+by\+\_\+scope\+\_\+params}},(code)(table)(lower\+\_\+bound)(upper\+\_\+bound)(limit)(reverse)) FC\+\_\+\+REFLECT(sysio FC\+\_\+\+REFLECT (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1get__table__by__scope__result}{sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::get\+\_\+table\+\_\+by\+\_\+scope\+\_\+result}}}]{}{, }\item[{(rows)(more)}]{}{}\end{DoxyParamCaption})}
+

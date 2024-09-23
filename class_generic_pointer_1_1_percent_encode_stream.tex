@@ -1,0 +1,79 @@
+\doxysection{Generic\+Pointer\texorpdfstring{$<$}{<} Value\+Type, Allocator \texorpdfstring{$>$}{>}\+::Percent\+Encode\+Stream\texorpdfstring{$<$}{<} Output\+Stream \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{class_generic_pointer_1_1_percent_encode_stream}{}\label{class_generic_pointer_1_1_percent_encode_stream}\index{GenericPointer$<$ ValueType, Allocator $>$::PercentEncodeStream$<$ OutputStream $>$@{GenericPointer$<$ ValueType, Allocator $>$::PercentEncodeStream$<$ OutputStream $>$}}
+
+
+\doxylink{struct_a}{A} helper stream to encode character (UTF-\/8 code unit) into percent-\/encoded sequence.  
+
+
+
+
+{\ttfamily \#include $<$pointer.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_generic_pointer_1_1_percent_encode_stream_a8e16af18669e49d0ab528ba0066475d2}{Percent\+Encode\+Stream}} (Output\+Stream \&os)
+\item 
+void \mbox{\hyperlink{class_generic_pointer_1_1_percent_encode_stream_ab932ed9ab00c9e0672755133fc8d8c11}{Put}} (char c)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Value\+Type, typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} = Crt\+Allocator$>$\newline
+template$<$typename Output\+Stream$>$\newline
+class Generic\+Pointer$<$ Value\+Type, Allocator $>$\+::\+Percent\+Encode\+Stream$<$ Output\+Stream $>$}
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l01085}{1085}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_generic_pointer_1_1_percent_encode_stream_a8e16af18669e49d0ab528ba0066475d2}\index{GenericPointer$<$ ValueType, Allocator $>$::PercentEncodeStream$<$ OutputStream $>$@{GenericPointer$<$ ValueType, Allocator $>$::PercentEncodeStream$<$ OutputStream $>$}!PercentEncodeStream@{PercentEncodeStream}}
+\index{PercentEncodeStream@{PercentEncodeStream}!GenericPointer$<$ ValueType, Allocator $>$::PercentEncodeStream$<$ OutputStream $>$@{GenericPointer$<$ ValueType, Allocator $>$::PercentEncodeStream$<$ OutputStream $>$}}
+\doxysubsubsection{\texorpdfstring{PercentEncodeStream()}{PercentEncodeStream()}}
+{\footnotesize\ttfamily \label{class_generic_pointer_1_1_percent_encode_stream_a8e16af18669e49d0ab528ba0066475d2} 
+template$<$typename Value\+Type , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Crt\+Allocator$>$ \\
+template$<$typename Output\+Stream $>$ \\
+\mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ Value\+Type, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Percent\+Encode\+Stream$<$ Output\+Stream $>$\+::\+Percent\+Encode\+Stream (\begin{DoxyParamCaption}\item[{Output\+Stream \&}]{os}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l01087}{1087}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01087\ :\ os\_(os)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_generic_pointer_1_1_percent_encode_stream_ab932ed9ab00c9e0672755133fc8d8c11}\index{GenericPointer$<$ ValueType, Allocator $>$::PercentEncodeStream$<$ OutputStream $>$@{GenericPointer$<$ ValueType, Allocator $>$::PercentEncodeStream$<$ OutputStream $>$}!Put@{Put}}
+\index{Put@{Put}!GenericPointer$<$ ValueType, Allocator $>$::PercentEncodeStream$<$ OutputStream $>$@{GenericPointer$<$ ValueType, Allocator $>$::PercentEncodeStream$<$ OutputStream $>$}}
+\doxysubsubsection{\texorpdfstring{Put()}{Put()}}
+{\footnotesize\ttfamily \label{class_generic_pointer_1_1_percent_encode_stream_ab932ed9ab00c9e0672755133fc8d8c11} 
+template$<$typename Value\+Type , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Crt\+Allocator$>$ \\
+template$<$typename Output\+Stream $>$ \\
+void \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ Value\+Type, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\mbox{\hyperlink{class_generic_pointer_1_1_percent_encode_stream_a8e16af18669e49d0ab528ba0066475d2}{\+::\+Percent\+Encode\+Stream}}$<$ Output\+Stream $>$\+::\+Put (\begin{DoxyParamCaption}\item[{char}]{c}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l01088}{1088}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01088\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ \textcolor{comment}{//\ UTF-\/8\ must\ be\ byte}}
+\DoxyCodeLine{01089\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ u\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\textcolor{keyword}{>}(c);}
+\DoxyCodeLine{01090\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ hexDigits[16]\ =\ \{\ \textcolor{charliteral}{'0'},\ \textcolor{charliteral}{'1'},\ \textcolor{charliteral}{'2'},\ \textcolor{charliteral}{'3'},\ \textcolor{charliteral}{'4'},\ \textcolor{charliteral}{'5'},\ \textcolor{charliteral}{'6'},\ \textcolor{charliteral}{'7'},\ \textcolor{charliteral}{'8'},\ \textcolor{charliteral}{'9'},\ \textcolor{charliteral}{'A'},\ \textcolor{charliteral}{'B'},\ \textcolor{charliteral}{'C'},\ \textcolor{charliteral}{'D'},\ \textcolor{charliteral}{'E'},\ \textcolor{charliteral}{'F'}\ \};}
+\DoxyCodeLine{01091\ \ \ \ \ \ \ \ \ \ \ \ \ os\_.Put(\textcolor{charliteral}{'\%'});}
+\DoxyCodeLine{01092\ \ \ \ \ \ \ \ \ \ \ \ \ os\_.Put(\textcolor{keyword}{static\_cast<}typename\ OutputStream::Ch\textcolor{keyword}{>}(hexDigits[u\ >>\ 4]));}
+\DoxyCodeLine{01093\ \ \ \ \ \ \ \ \ \ \ \ \ os\_.Put(\textcolor{keyword}{static\_cast<}typename\ OutputStream::Ch\textcolor{keyword}{>}(hexDigits[u\ \&\ 15]));}
+\DoxyCodeLine{01094\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/\mbox{\hyperlink{pointer_8h}{pointer.\+h}}\end{DoxyCompactItemize}

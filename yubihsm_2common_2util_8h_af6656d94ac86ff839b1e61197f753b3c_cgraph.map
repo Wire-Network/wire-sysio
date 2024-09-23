@@ -1,0 +1,17 @@
+<map id="read_private_key" name="read_private_key">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,104,126,130"/>
+<area shape="rect" id="Node000002" href="$util_8c.html#a7b6341d8eb3648b8fd1c33f74deddff7" title=" " alt="" coords="185,5,316,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="81,101,121,71,172,40,184,34,187,39,175,45,124,75,84,106"/>
+<area shape="rect" id="Node000004" href="$openssl-compat_8c.html#a4f4b9ece6db658890011cfcf730d18f1" title=" " alt="" coords="174,55,327,80"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="116,101,184,82,186,87,117,106"/>
+<area shape="rect" id="Node000005" href="$openssl-compat_8c.html#ad0eaa8f2e87045d4abd7b3fc94ab4694" title=" " alt="" coords="186,104,314,130"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="126,114,170,114,170,120,126,120"/>
+<area shape="rect" id="Node000006" href="$openssl-compat_8c.html#a96e6deebb87bafb81f7bde3df63e59f3" title=" " alt="" coords="196,153,305,179"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="117,128,186,146,184,151,116,133"/>
+<area shape="rect" id="Node000007" href="$util_8c.html#ab5b6fbe2bcd184aaefd83f06e0eb022a" title=" " alt="" coords="195,203,306,228"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="84,128,124,158,175,189,187,194,184,199,172,194,121,163,81,132"/>
+<area shape="rect" id="Node000003" href="$yubihsm__pkcs11_8c.html#ae785d5badbf1f08b491af31f32a135a1" title=" " alt="" coords="375,5,446,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="316,16,360,16,360,21,316,21"/>
+<area shape="rect" id="Node000008" href="$yubihsm__pkcs11_8c.html#adc4bd59a60361844aa0e852efa210105" title=" " alt="" coords="376,203,445,228"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="306,213,361,213,361,218,306,218"/>
+</map>

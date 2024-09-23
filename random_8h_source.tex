@@ -1,0 +1,79 @@
+\doxysection{random.\+h}
+\hypertarget{random_8h_source}{}\label{random_8h_source}\index{libraries/fc/secp256k1/secp256k1/examples/random.h@{libraries/fc/secp256k1/secp256k1/examples/random.h}}
+\mbox{\hyperlink{random_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00001}00001\ \textcolor{comment}{/*************************************************************************}}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2020-\/2021\ Elichai\ Turkel\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00003}00003\ \textcolor{comment}{\ *\ Distributed\ under\ the\ CC0\ software\ license,\ see\ the\ accompanying\ file\ *}}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00004}00004\ \textcolor{comment}{\ *\ EXAMPLES\_COPYING\ or\ https://creativecommons.org/publicdomain/zero/1.0\ *}}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00005}00005\ \textcolor{comment}{\ *************************************************************************/}}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00007}00007\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00008}00008\ \textcolor{comment}{\ *\ This\ file\ is\ an\ attempt\ at\ collecting\ best\ practice\ methods\ for\ obtaining\ randomness\ with\ different\ operating\ systems.}}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00009}00009\ \textcolor{comment}{\ *\ It\ may\ be\ out-\/of-\/date.\ Consult\ the\ documentation\ of\ the\ operating\ system\ before\ considering\ to\ use\ the\ methods\ below.}}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00010}00010\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00011}00011\ \textcolor{comment}{\ *\ Platform\ randomness\ sources:}}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00012}00012\ \textcolor{comment}{\ *\ Linux\ \ \ -\/>\ \`{}getrandom(2)`(`sys/random.h`),\ if\ not\ available\ \`{}/dev/urandom`\ should\ be\ used.\ http://man7.org/linux/man-\/pages/man2/getrandom.2.html,\ https://linux.die.net/man/4/urandom}}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00013}00013\ \textcolor{comment}{\ *\ macOS\ \ \ -\/>\ \`{}getentropy(2)`(`sys/random.h`),\ if\ not\ available\ \`{}/dev/urandom`\ should\ be\ used.\ https://www.unix.com/man-\/page/mojave/2/getentropy,\ https://opensource.apple.com/source/xnu/xnu-\/517.12.7/bsd/man/man4/random.4.auto.html}}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00014}00014\ \textcolor{comment}{\ *\ FreeBSD\ -\/>\ \`{}getrandom(2)`(`sys/random.h`),\ if\ not\ available\ \`{}kern.arandom`\ should\ be\ used.\ https://www.freebsd.org/cgi/man.cgi?query=getrandom,\ https://www.freebsd.org/cgi/man.cgi?query=random\&sektion=4}}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00015}00015\ \textcolor{comment}{\ *\ OpenBSD\ -\/>\ \`{}getentropy(2)`(`unistd.h`),\ if\ not\ available\ \`{}/dev/urandom`\ should\ be\ used.\ https://man.openbsd.org/getentropy,\ https://man.openbsd.org/urandom}}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00016}00016\ \textcolor{comment}{\ *\ Windows\ -\/>\ \`{}BCryptGenRandom`(`bcrypt.h`).\ https://docs.microsoft.com/en-\/us/windows/win32/api/bcrypt/nf-\/bcrypt-\/bcryptgenrandom}}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00017}00017\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00019}00019\ \textcolor{preprocessor}{\#if\ defined(\_WIN32)}}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00020}00020\ \textcolor{preprocessor}{\#include\ <windows.h>}}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00021}00021\ \textcolor{preprocessor}{\#include\ <ntstatus.h>}}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00022}00022\ \textcolor{preprocessor}{\#include\ <bcrypt.h>}}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00023}00023\ \textcolor{preprocessor}{\#elif\ defined(\_\_linux\_\_)\ ||\ defined(\_\_APPLE\_\_)\ ||\ defined(\_\_FreeBSD\_\_)}}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00024}00024\ \textcolor{preprocessor}{\#include\ <sys/random.h>}}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00025}00025\ \textcolor{preprocessor}{\#elif\ defined(\_\_OpenBSD\_\_)}}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00026}00026\ \textcolor{preprocessor}{\#include\ <unistd.h>}}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00027}00027\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00028}00028\ \textcolor{preprocessor}{\#error\ "{}Couldn't\ identify\ the\ OS"{}}}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00029}00029\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00031}00031\ \textcolor{preprocessor}{\#include\ <stddef.h>}}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00032}00032\ \textcolor{preprocessor}{\#include\ <limits.h>}}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00033}00033\ \textcolor{preprocessor}{\#include\ <stdio.h>}}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00036}00036\ \textcolor{comment}{/*\ Returns\ 1\ on\ success,\ and\ 0\ on\ failure.\ */}}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00037}00037\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ fill\_random(\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*\ data,\ \textcolor{keywordtype}{size\_t}\ size)\ \{}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00038}00038\ \textcolor{preprocessor}{\#if\ defined(\_WIN32)}}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00039}00039\ \ \ \ \ NTSTATUS\ res\ =\ BCryptGenRandom(NULL,\ data,\ size,\ BCRYPT\_USE\_SYSTEM\_PREFERRED\_RNG);}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00040}00040\ \ \ \ \ \textcolor{keywordflow}{if}\ (res\ !=\ STATUS\_SUCCESS\ ||\ size\ >\ ULONG\_MAX)\ \{}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00041}00041\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00042}00042\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00043}00043\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00044}00044\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00045}00045\ \textcolor{preprocessor}{\#elif\ defined(\_\_linux\_\_)\ ||\ defined(\_\_FreeBSD\_\_)}}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00046}00046\ \ \ \ \ \textcolor{comment}{/*\ If\ \`{}getrandom(2)`\ is\ not\ available\ you\ should\ fallback\ to\ /dev/urandom\ */}}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00047}00047\ \ \ \ \ ssize\_t\ res\ =\ getrandom(data,\ size,\ 0);}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00048}00048\ \ \ \ \ \textcolor{keywordflow}{if}\ (res\ <\ 0\ ||\ (\textcolor{keywordtype}{size\_t})res\ !=\ size\ )\ \{}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00049}00049\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00050}00050\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00051}00051\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00052}00052\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00053}00053\ \textcolor{preprocessor}{\#elif\ defined(\_\_APPLE\_\_)\ ||\ defined(\_\_OpenBSD\_\_)}}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00054}00054\ \ \ \ \ \textcolor{comment}{/*\ If\ \`{}getentropy(2)`\ is\ not\ available\ you\ should\ fallback\ to\ either}}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00055}00055\ \textcolor{comment}{\ \ \ \ \ *\ \`{}SecRandomCopyBytes`\ or\ /dev/urandom\ */}}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00056}00056\ \ \ \ \ \textcolor{keywordtype}{int}\ res\ =\ getentropy(data,\ size);}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00057}00057\ \ \ \ \ \textcolor{keywordflow}{if}\ (res\ ==\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00058}00058\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00059}00059\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00060}00060\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00061}00061\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00062}00062\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00063}00063\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00064}00064\ \}}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00066}00066\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ print\_hex(\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*\ data,\ \textcolor{keywordtype}{size\_t}\ size)\ \{}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00067}00067\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ i;}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00068}00068\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}0x"{}});}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00069}00069\ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ size;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00070}00070\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\%02x"{}},\ data[i]);}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00071}00071\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00072}00072\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{random_8h_source_l00073}00073\ \}}
+
+\end{DoxyCode}

@@ -1,0 +1,9 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,49,180,74"/>
+<area shape="rect" id="Node000001" href="$classwebsocketpp_1_1transport_1_1asio_1_1endpoint.html" title="Asio based endpoint transport component." alt="" coords="228,5,397,46"/>
+<area shape="poly" id="edge199_Node000000_Node000001" title=" " alt="" coords="189,43,227,37,228,42,190,48"/>
+<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1transport_1_1asio_1_1local__endpoint.html" title="Asio based endpoint transport component." alt="" coords="234,70,391,126"/>
+<area shape="poly" id="edge201_Node000000_Node000003" title=" " alt="" coords="190,75,234,82,233,87,189,80"/>
+<area shape="rect" id="Node000002" href="$structmock__endpoint.html" title=" " alt="" coords="445,13,554,38"/>
+<area shape="poly" id="edge200_Node000001_Node000002" title=" " alt="" coords="412,23,445,23,445,28,412,28"/>
+</map>

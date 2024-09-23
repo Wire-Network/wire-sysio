@@ -1,0 +1,464 @@
+\doxysection{gmock-\/generated-\/nice-\/strict.h}
+\hypertarget{gmock-generated-nice-strict_8h_source}{}\label{gmock-generated-nice-strict_8h_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googlemock/include/gmock/gmock-\/generated-\/nice-\/strict.h@{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googlemock/include/gmock/gmock-\/generated-\/nice-\/strict.h}}
+\mbox{\hyperlink{gmock-generated-nice-strict_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00001}00001\ \textcolor{comment}{//\ This\ file\ was\ GENERATED\ by\ command:}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00002}00002\ \textcolor{comment}{//\ \ \ \ \ pump.py\ gmock-\/generated-\/nice-\/strict.h.pump}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00003}00003\ \textcolor{comment}{//\ DO\ NOT\ EDIT\ BY\ HAND!!!}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00005}00005\ \textcolor{comment}{//\ Copyright\ 2008,\ Google\ Inc.}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00006}00006\ \textcolor{comment}{//\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00007}00007\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00008}00008\ \textcolor{comment}{//\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00009}00009\ \textcolor{comment}{//\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00010}00010\ \textcolor{comment}{//\ met:}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00011}00011\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00012}00012\ \textcolor{comment}{//\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00013}00013\ \textcolor{comment}{//\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00014}00014\ \textcolor{comment}{//\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00015}00015\ \textcolor{comment}{//\ copyright\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00016}00016\ \textcolor{comment}{//\ in\ the\ documentation\ and/or\ other\ materials\ provided\ with\ the}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00017}00017\ \textcolor{comment}{//\ distribution.}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00018}00018\ \textcolor{comment}{//\ \ \ \ \ *\ Neither\ the\ name\ of\ Google\ Inc.\ nor\ the\ names\ of\ its}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00019}00019\ \textcolor{comment}{//\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products\ derived\ from}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00020}00020\ \textcolor{comment}{//\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00021}00021\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00022}00022\ \textcolor{comment}{//\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00023}00023\ \textcolor{comment}{//\ "{}AS\ IS"{}\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00024}00024\ \textcolor{comment}{//\ LIMITED\ TO,\ THE\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00025}00025\ \textcolor{comment}{//\ A\ PARTICULAR\ PURPOSE\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ THE\ COPYRIGHT}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00026}00026\ \textcolor{comment}{//\ OWNER\ OR\ CONTRIBUTORS\ BE\ LIABLE\ FOR\ ANY\ DIRECT,\ INDIRECT,\ INCIDENTAL,}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00027}00027\ \textcolor{comment}{//\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES\ (INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00028}00028\ \textcolor{comment}{//\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;\ LOSS\ OF\ USE,}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00029}00029\ \textcolor{comment}{//\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND\ ON\ ANY}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00030}00030\ \textcolor{comment}{//\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00031}00031\ \textcolor{comment}{//\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00032}00032\ \textcolor{comment}{//\ OF\ THIS\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00033}00033\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00034}00034\ \textcolor{comment}{//\ Author:\ wan@google.com\ (Zhanyong\ Wan)}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00036}00036\ \textcolor{comment}{//\ Implements\ class\ templates\ NiceMock,\ NaggyMock,\ and\ StrictMock.}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00037}00037\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00038}00038\ \textcolor{comment}{//\ Given\ a\ mock\ class\ MockFoo\ that\ is\ created\ using\ Google\ Mock,}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00039}00039\ \textcolor{comment}{//\ NiceMock<MockFoo>\ is\ a\ subclass\ of\ MockFoo\ that\ allows}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00040}00040\ \textcolor{comment}{//\ uninteresting\ calls\ (i.e.\ calls\ to\ mock\ methods\ that\ have\ no}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00041}00041\ \textcolor{comment}{//\ EXPECT\_CALL\ specs),\ NaggyMock<MockFoo>\ is\ a\ subclass\ of\ MockFoo}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00042}00042\ \textcolor{comment}{//\ that\ prints\ a\ warning\ when\ an\ uninteresting\ call\ occurs,\ and}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00043}00043\ \textcolor{comment}{//\ StrictMock<MockFoo>\ is\ a\ subclass\ of\ MockFoo\ that\ treats\ all}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00044}00044\ \textcolor{comment}{//\ uninteresting\ calls\ as\ errors.}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00045}00045\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00046}00046\ \textcolor{comment}{//\ Currently\ a\ mock\ is\ naggy\ by\ default,\ so\ MockFoo\ and}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00047}00047\ \textcolor{comment}{//\ NaggyMock<MockFoo>\ behave\ like\ the\ same.\ \ However,\ we\ will\ soon}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00048}00048\ \textcolor{comment}{//\ switch\ the\ default\ behavior\ of\ mocks\ to\ be\ nice,\ as\ that\ in\ general}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00049}00049\ \textcolor{comment}{//\ leads\ to\ more\ maintainable\ tests.\ \ When\ that\ happens,\ MockFoo\ will}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00050}00050\ \textcolor{comment}{//\ stop\ behaving\ like\ NaggyMock<MockFoo>\ and\ start\ behaving\ like}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00051}00051\ \textcolor{comment}{//\ NiceMock<MockFoo>.}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00052}00052\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00053}00053\ \textcolor{comment}{//\ NiceMock,\ NaggyMock,\ and\ StrictMock\ "{}inherit"{}\ the\ constructors\ of}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00054}00054\ \textcolor{comment}{//\ their\ respective\ base\ class.\ \ Therefore\ you\ can\ write}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00055}00055\ \textcolor{comment}{//\ NiceMock<MockFoo>(5,\ "{}a"{})\ to\ construct\ a\ nice\ mock\ where\ MockFoo}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00056}00056\ \textcolor{comment}{//\ has\ a\ constructor\ that\ accepts\ (int,\ const\ char*),\ for\ example.}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00057}00057\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00058}00058\ \textcolor{comment}{//\ A\ known\ limitation\ is\ that\ NiceMock<MockFoo>,\ NaggyMock<MockFoo>,}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00059}00059\ \textcolor{comment}{//\ and\ StrictMock<MockFoo>\ only\ works\ for\ mock\ methods\ defined\ using}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00060}00060\ \textcolor{comment}{//\ the\ MOCK\_METHOD*\ family\ of\ macros\ DIRECTLY\ in\ the\ MockFoo\ class.}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00061}00061\ \textcolor{comment}{//\ If\ a\ mock\ method\ is\ defined\ in\ a\ base\ class\ of\ MockFoo,\ the\ "{}nice"{}}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00062}00062\ \textcolor{comment}{//\ or\ "{}strict"{}\ modifier\ may\ not\ affect\ it,\ depending\ on\ the\ compiler.}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00063}00063\ \textcolor{comment}{//\ In\ particular,\ nesting\ NiceMock,\ NaggyMock,\ and\ StrictMock\ is\ NOT}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00064}00064\ \textcolor{comment}{//\ supported.}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00066}00066\ \textcolor{preprocessor}{\#ifndef\ GMOCK\_INCLUDE\_GMOCK\_GMOCK\_GENERATED\_NICE\_STRICT\_H\_}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00067}00067\ \textcolor{preprocessor}{\#define\ GMOCK\_INCLUDE\_GMOCK\_GMOCK\_GENERATED\_NICE\_STRICT\_H\_}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00069}00069\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{gmock-spec-builders_8h}{gmock/gmock-\/spec-\/builders.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00070}00070\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{gmock-port_8h}{gmock/internal/gmock-\/port.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00072}00072\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetesting}{testing}}\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00073}00073\ }
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00074}00074\ \textcolor{keyword}{template}\ <\textcolor{keyword}{class}\ MockClass>}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00075}\mbox{\hyperlink{classtesting_1_1_nice_mock}{00075}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classtesting_1_1_nice_mock}{NiceMock}}\ :\ \textcolor{keyword}{public}\ MockClass\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00076}00076\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00077}\mbox{\hyperlink{classtesting_1_1_nice_mock_a10bbd6ebe779ac8ab1f9f3ae2dee9310}{00077}}\ \ \ \mbox{\hyperlink{classtesting_1_1_nice_mock_a10bbd6ebe779ac8ab1f9f3ae2dee9310}{NiceMock}}()\ :\ MockClass()\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00078}00078\ \ \ \ \ ::testing::Mock::AllowUninterestingCalls(}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00079}00079\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a982df3f369643b175f79cda4048bc3b9}{internal::ImplicitCast\_<MockClass*>}}(\textcolor{keyword}{this}));}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00080}00080\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00081}00081\ }
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00082}00082\ \textcolor{preprocessor}{\#if\ GTEST\_LANG\_CXX11}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00083}00083\ \ \ \textcolor{comment}{//\ Ideally,\ we\ would\ inherit\ base\ class's\ constructors\ through\ a\ using}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00084}00084\ \ \ \textcolor{comment}{//\ declaration,\ which\ would\ preserve\ their\ visibility.\ However,\ many\ existing}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00085}00085\ \ \ \textcolor{comment}{//\ tests\ rely\ on\ the\ fact\ that\ current\ implementation\ reexports\ protected}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00086}00086\ \ \ \textcolor{comment}{//\ constructors\ as\ public.\ These\ tests\ would\ need\ to\ be\ cleaned\ up\ first.}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00087}00087\ }
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00088}00088\ \ \ \textcolor{comment}{//\ Single\ argument\ constructor\ is\ special-\/cased\ so\ that\ it\ can\ be}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00089}00089\ \ \ \textcolor{comment}{//\ made\ explicit.}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00090}00090\ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ A>}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00091}00091\ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classtesting_1_1_nice_mock_a10bbd6ebe779ac8ab1f9f3ae2dee9310}{NiceMock}}(\mbox{\hyperlink{namespace_a}{A}}\&\&\ arg)\ :\ MockClass(\mbox{\hyperlink{namespacestd}{std}}::forward<\mbox{\hyperlink{namespace_a}{A}}>(arg))\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00092}00092\ \ \ \ \ ::testing::Mock::AllowUninterestingCalls(}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00093}00093\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a982df3f369643b175f79cda4048bc3b9}{internal::ImplicitCast\_<MockClass*>}}(\textcolor{keyword}{this}));}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00094}00094\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00095}00095\ }
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00096}00096\ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ A1,\ \textcolor{keyword}{typename}\ A2,\ \textcolor{keyword}{typename}...\ An>}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00097}00097\ \ \ \mbox{\hyperlink{classtesting_1_1_nice_mock_a10bbd6ebe779ac8ab1f9f3ae2dee9310}{NiceMock}}(A1\&\&\ arg1,\ A2\&\&\ arg2,\ An\&\&...\ args)}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00098}00098\ \ \ \ \ \ \ :\ MockClass(\mbox{\hyperlink{namespacestd}{std}}::forward<A1>(arg1),\ \mbox{\hyperlink{namespacestd}{std}}::forward<A2>(arg2),}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00099}00099\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacestd}{std}}::forward<An>(args)...)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00100}00100\ \ \ \ \ ::testing::Mock::AllowUninterestingCalls(}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00101}00101\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a982df3f369643b175f79cda4048bc3b9}{internal::ImplicitCast\_<MockClass*>}}(\textcolor{keyword}{this}));}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00102}00102\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00103}00103\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00104}00104\ \ \ \textcolor{comment}{//\ C++98\ doesn't\ have\ variadic\ templates,\ so\ we\ have\ to\ define\ one}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00105}00105\ \ \ \textcolor{comment}{//\ for\ each\ arity.}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00106}00106\ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ A1>}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00107}\mbox{\hyperlink{classtesting_1_1_nice_mock_a2d6b9cb9d929d1af4532b69c7ef19df6}{00107}}\ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classtesting_1_1_nice_mock_a2d6b9cb9d929d1af4532b69c7ef19df6}{NiceMock}}(\textcolor{keyword}{const}\ A1\&\ a1)\ :\ MockClass(a1)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00108}00108\ \ \ \ \ ::testing::Mock::AllowUninterestingCalls(}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00109}00109\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a982df3f369643b175f79cda4048bc3b9}{internal::ImplicitCast\_<MockClass*>}}(\textcolor{keyword}{this}));}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00110}00110\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00111}00111\ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ A1,\ \textcolor{keyword}{typename}\ A2>}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00112}\mbox{\hyperlink{classtesting_1_1_nice_mock_a150837476e88f52772c8f85180b889a1}{00112}}\ \ \ \mbox{\hyperlink{classtesting_1_1_nice_mock_a150837476e88f52772c8f85180b889a1}{NiceMock}}(\textcolor{keyword}{const}\ A1\&\ a1,\ \textcolor{keyword}{const}\ A2\&\ a2)\ :\ MockClass(a1,\ a2)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00113}00113\ \ \ \ \ ::testing::Mock::AllowUninterestingCalls(}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00114}00114\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a982df3f369643b175f79cda4048bc3b9}{internal::ImplicitCast\_<MockClass*>}}(\textcolor{keyword}{this}));}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00115}00115\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00116}00116\ }
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00117}00117\ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ A1,\ \textcolor{keyword}{typename}\ A2,\ \textcolor{keyword}{typename}\ A3>}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00118}\mbox{\hyperlink{classtesting_1_1_nice_mock_a0b91bd74b497626bb81d07c3d4b59d22}{00118}}\ \ \ \mbox{\hyperlink{classtesting_1_1_nice_mock_a0b91bd74b497626bb81d07c3d4b59d22}{NiceMock}}(\textcolor{keyword}{const}\ A1\&\ a1,\ \textcolor{keyword}{const}\ A2\&\ a2,\ \textcolor{keyword}{const}\ A3\&\ a3)\ :\ MockClass(a1,\ a2,\ a3)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00119}00119\ \ \ \ \ ::testing::Mock::AllowUninterestingCalls(}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00120}00120\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a982df3f369643b175f79cda4048bc3b9}{internal::ImplicitCast\_<MockClass*>}}(\textcolor{keyword}{this}));}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00121}00121\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00122}00122\ }
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00123}00123\ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ A1,\ \textcolor{keyword}{typename}\ A2,\ \textcolor{keyword}{typename}\ A3,\ \textcolor{keyword}{typename}\ A4>}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00124}\mbox{\hyperlink{classtesting_1_1_nice_mock_a5ffbe1a648f16612266d4e67a2d063d1}{00124}}\ \ \ \mbox{\hyperlink{classtesting_1_1_nice_mock_a5ffbe1a648f16612266d4e67a2d063d1}{NiceMock}}(\textcolor{keyword}{const}\ A1\&\ a1,\ \textcolor{keyword}{const}\ A2\&\ a2,\ \textcolor{keyword}{const}\ A3\&\ a3,}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00125}00125\ \ \ \ \ \ \ \textcolor{keyword}{const}\ A4\&\ a4)\ :\ MockClass(a1,\ a2,\ a3,\ a4)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00126}00126\ \ \ \ \ ::testing::Mock::AllowUninterestingCalls(}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00127}00127\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a982df3f369643b175f79cda4048bc3b9}{internal::ImplicitCast\_<MockClass*>}}(\textcolor{keyword}{this}));}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00128}00128\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00129}00129\ }
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00130}00130\ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ A1,\ \textcolor{keyword}{typename}\ A2,\ \textcolor{keyword}{typename}\ A3,\ \textcolor{keyword}{typename}\ A4,\ \textcolor{keyword}{typename}\ A5>}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00131}\mbox{\hyperlink{classtesting_1_1_nice_mock_a3812c0ba0d743f9a0c3d276dfc076f4c}{00131}}\ \ \ \mbox{\hyperlink{classtesting_1_1_nice_mock_a3812c0ba0d743f9a0c3d276dfc076f4c}{NiceMock}}(\textcolor{keyword}{const}\ A1\&\ a1,\ \textcolor{keyword}{const}\ A2\&\ a2,\ \textcolor{keyword}{const}\ A3\&\ a3,\ \textcolor{keyword}{const}\ A4\&\ a4,}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00132}00132\ \ \ \ \ \ \ \textcolor{keyword}{const}\ A5\&\ a5)\ :\ MockClass(a1,\ a2,\ a3,\ a4,\ a5)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00133}00133\ \ \ \ \ ::testing::Mock::AllowUninterestingCalls(}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00134}00134\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a982df3f369643b175f79cda4048bc3b9}{internal::ImplicitCast\_<MockClass*>}}(\textcolor{keyword}{this}));}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00135}00135\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00136}00136\ }
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00137}00137\ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ A1,\ \textcolor{keyword}{typename}\ A2,\ \textcolor{keyword}{typename}\ A3,\ \textcolor{keyword}{typename}\ A4,\ \textcolor{keyword}{typename}\ A5,}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00138}00138\ \ \ \ \ \ \ \textcolor{keyword}{typename}\ A6>}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00139}\mbox{\hyperlink{classtesting_1_1_nice_mock_a156d0fce85ac08abffdf4aa0c3975f81}{00139}}\ \ \ \mbox{\hyperlink{classtesting_1_1_nice_mock_a156d0fce85ac08abffdf4aa0c3975f81}{NiceMock}}(\textcolor{keyword}{const}\ A1\&\ a1,\ \textcolor{keyword}{const}\ A2\&\ a2,\ \textcolor{keyword}{const}\ A3\&\ a3,\ \textcolor{keyword}{const}\ A4\&\ a4,}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00140}00140\ \ \ \ \ \ \ \textcolor{keyword}{const}\ A5\&\ a5,\ \textcolor{keyword}{const}\ A6\&\ a6)\ :\ MockClass(a1,\ a2,\ a3,\ a4,\ a5,\ a6)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00141}00141\ \ \ \ \ ::testing::Mock::AllowUninterestingCalls(}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00142}00142\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a982df3f369643b175f79cda4048bc3b9}{internal::ImplicitCast\_<MockClass*>}}(\textcolor{keyword}{this}));}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00143}00143\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00144}00144\ }
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00145}00145\ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ A1,\ \textcolor{keyword}{typename}\ A2,\ \textcolor{keyword}{typename}\ A3,\ \textcolor{keyword}{typename}\ A4,\ \textcolor{keyword}{typename}\ A5,}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00146}00146\ \ \ \ \ \ \ \textcolor{keyword}{typename}\ A6,\ \textcolor{keyword}{typename}\ A7>}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00147}\mbox{\hyperlink{classtesting_1_1_nice_mock_a946d75ece1fa3a066b7d9d6ab7828c55}{00147}}\ \ \ \mbox{\hyperlink{classtesting_1_1_nice_mock_a946d75ece1fa3a066b7d9d6ab7828c55}{NiceMock}}(\textcolor{keyword}{const}\ A1\&\ a1,\ \textcolor{keyword}{const}\ A2\&\ a2,\ \textcolor{keyword}{const}\ A3\&\ a3,\ \textcolor{keyword}{const}\ A4\&\ a4,}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00148}00148\ \ \ \ \ \ \ \textcolor{keyword}{const}\ A5\&\ a5,\ \textcolor{keyword}{const}\ A6\&\ a6,\ \textcolor{keyword}{const}\ A7\&\ a7)\ :\ MockClass(a1,\ a2,\ a3,\ a4,\ a5,}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00149}00149\ \ \ \ \ \ \ a6,\ a7)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00150}00150\ \ \ \ \ ::testing::Mock::AllowUninterestingCalls(}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00151}00151\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a982df3f369643b175f79cda4048bc3b9}{internal::ImplicitCast\_<MockClass*>}}(\textcolor{keyword}{this}));}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00152}00152\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00153}00153\ }
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00154}00154\ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ A1,\ \textcolor{keyword}{typename}\ A2,\ \textcolor{keyword}{typename}\ A3,\ \textcolor{keyword}{typename}\ A4,\ \textcolor{keyword}{typename}\ A5,}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00155}00155\ \ \ \ \ \ \ \textcolor{keyword}{typename}\ A6,\ \textcolor{keyword}{typename}\ A7,\ \textcolor{keyword}{typename}\ A8>}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00156}\mbox{\hyperlink{classtesting_1_1_nice_mock_ae8792aab6c024a50886856bf1093eedc}{00156}}\ \ \ \mbox{\hyperlink{classtesting_1_1_nice_mock_ae8792aab6c024a50886856bf1093eedc}{NiceMock}}(\textcolor{keyword}{const}\ A1\&\ a1,\ \textcolor{keyword}{const}\ A2\&\ a2,\ \textcolor{keyword}{const}\ A3\&\ a3,\ \textcolor{keyword}{const}\ A4\&\ a4,}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00157}00157\ \ \ \ \ \ \ \textcolor{keyword}{const}\ A5\&\ a5,\ \textcolor{keyword}{const}\ A6\&\ a6,\ \textcolor{keyword}{const}\ A7\&\ a7,\ \textcolor{keyword}{const}\ A8\&\ a8)\ :\ MockClass(a1,}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00158}00158\ \ \ \ \ \ \ a2,\ a3,\ a4,\ a5,\ a6,\ a7,\ a8)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00159}00159\ \ \ \ \ ::testing::Mock::AllowUninterestingCalls(}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00160}00160\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a982df3f369643b175f79cda4048bc3b9}{internal::ImplicitCast\_<MockClass*>}}(\textcolor{keyword}{this}));}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00161}00161\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00162}00162\ }
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00163}00163\ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ A1,\ \textcolor{keyword}{typename}\ A2,\ \textcolor{keyword}{typename}\ A3,\ \textcolor{keyword}{typename}\ A4,\ \textcolor{keyword}{typename}\ A5,}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00164}00164\ \ \ \ \ \ \ \textcolor{keyword}{typename}\ A6,\ \textcolor{keyword}{typename}\ A7,\ \textcolor{keyword}{typename}\ A8,\ \textcolor{keyword}{typename}\ A9>}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00165}\mbox{\hyperlink{classtesting_1_1_nice_mock_a61cfc9282222928590bcdaf851a806c6}{00165}}\ \ \ \mbox{\hyperlink{classtesting_1_1_nice_mock_a61cfc9282222928590bcdaf851a806c6}{NiceMock}}(\textcolor{keyword}{const}\ A1\&\ a1,\ \textcolor{keyword}{const}\ A2\&\ a2,\ \textcolor{keyword}{const}\ A3\&\ a3,\ \textcolor{keyword}{const}\ A4\&\ a4,}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00166}00166\ \ \ \ \ \ \ \textcolor{keyword}{const}\ A5\&\ a5,\ \textcolor{keyword}{const}\ A6\&\ a6,\ \textcolor{keyword}{const}\ A7\&\ a7,\ \textcolor{keyword}{const}\ A8\&\ a8,}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00167}00167\ \ \ \ \ \ \ \textcolor{keyword}{const}\ A9\&\ a9)\ :\ MockClass(a1,\ a2,\ a3,\ a4,\ a5,\ a6,\ a7,\ a8,\ a9)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00168}00168\ \ \ \ \ ::testing::Mock::AllowUninterestingCalls(}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00169}00169\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a982df3f369643b175f79cda4048bc3b9}{internal::ImplicitCast\_<MockClass*>}}(\textcolor{keyword}{this}));}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00170}00170\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00171}00171\ }
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00172}00172\ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ A1,\ \textcolor{keyword}{typename}\ A2,\ \textcolor{keyword}{typename}\ A3,\ \textcolor{keyword}{typename}\ A4,\ \textcolor{keyword}{typename}\ A5,}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00173}00173\ \ \ \ \ \ \ \textcolor{keyword}{typename}\ A6,\ \textcolor{keyword}{typename}\ A7,\ \textcolor{keyword}{typename}\ A8,\ \textcolor{keyword}{typename}\ A9,\ \textcolor{keyword}{typename}\ A10>}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00174}\mbox{\hyperlink{classtesting_1_1_nice_mock_a4baf1da52f4c892fc02f6ba10c0b8c02}{00174}}\ \ \ \mbox{\hyperlink{classtesting_1_1_nice_mock_a4baf1da52f4c892fc02f6ba10c0b8c02}{NiceMock}}(\textcolor{keyword}{const}\ A1\&\ a1,\ \textcolor{keyword}{const}\ A2\&\ a2,\ \textcolor{keyword}{const}\ A3\&\ a3,\ \textcolor{keyword}{const}\ A4\&\ a4,}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00175}00175\ \ \ \ \ \ \ \textcolor{keyword}{const}\ A5\&\ a5,\ \textcolor{keyword}{const}\ A6\&\ a6,\ \textcolor{keyword}{const}\ A7\&\ a7,\ \textcolor{keyword}{const}\ A8\&\ a8,\ \textcolor{keyword}{const}\ A9\&\ a9,}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00176}00176\ \ \ \ \ \ \ \textcolor{keyword}{const}\ A10\&\ a10)\ :\ MockClass(a1,\ a2,\ a3,\ a4,\ a5,\ a6,\ a7,\ a8,\ a9,\ a10)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00177}00177\ \ \ \ \ ::testing::Mock::AllowUninterestingCalls(}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00178}00178\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a982df3f369643b175f79cda4048bc3b9}{internal::ImplicitCast\_<MockClass*>}}(\textcolor{keyword}{this}));}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00179}00179\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00180}00180\ }
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00181}00181\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_LANG\_CXX11}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00182}00182\ }
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00183}\mbox{\hyperlink{classtesting_1_1_nice_mock_a30be5e5e20248f31c8390cd88fa74d7f}{00183}}\ \ \ \mbox{\hyperlink{classtesting_1_1_nice_mock_a30be5e5e20248f31c8390cd88fa74d7f}{\string~NiceMock}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00184}00184\ \ \ \ \ ::testing::Mock::UnregisterCallReaction(}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00185}00185\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a982df3f369643b175f79cda4048bc3b9}{internal::ImplicitCast\_<MockClass*>}}(\textcolor{keyword}{this}));}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00186}00186\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00187}00187\ }
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00188}00188\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00189}00189\ \ \ \mbox{\hyperlink{gtest-port_8h_aed8c1888c32b588b0681e88b95031e29}{GTEST\_DISALLOW\_COPY\_AND\_ASSIGN\_}}(\mbox{\hyperlink{classtesting_1_1_nice_mock}{NiceMock}});}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00190}00190\ \};}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00191}00191\ }
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00192}00192\ \textcolor{keyword}{template}\ <\textcolor{keyword}{class}\ MockClass>}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00193}\mbox{\hyperlink{classtesting_1_1_naggy_mock}{00193}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classtesting_1_1_naggy_mock}{NaggyMock}}\ :\ \textcolor{keyword}{public}\ MockClass\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00194}00194\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00195}\mbox{\hyperlink{classtesting_1_1_naggy_mock_acb769f78b93eb60b04db21250f416f70}{00195}}\ \ \ \mbox{\hyperlink{classtesting_1_1_naggy_mock_acb769f78b93eb60b04db21250f416f70}{NaggyMock}}()\ :\ MockClass()\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00196}00196\ \ \ \ \ ::testing::Mock::WarnUninterestingCalls(}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00197}00197\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a982df3f369643b175f79cda4048bc3b9}{internal::ImplicitCast\_<MockClass*>}}(\textcolor{keyword}{this}));}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00198}00198\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00199}00199\ }
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00200}00200\ \textcolor{preprocessor}{\#if\ GTEST\_LANG\_CXX11}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00201}00201\ \ \ \textcolor{comment}{//\ Ideally,\ we\ would\ inherit\ base\ class's\ constructors\ through\ a\ using}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00202}00202\ \ \ \textcolor{comment}{//\ declaration,\ which\ would\ preserve\ their\ visibility.\ However,\ many\ existing}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00203}00203\ \ \ \textcolor{comment}{//\ tests\ rely\ on\ the\ fact\ that\ current\ implementation\ reexports\ protected}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00204}00204\ \ \ \textcolor{comment}{//\ constructors\ as\ public.\ These\ tests\ would\ need\ to\ be\ cleaned\ up\ first.}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00205}00205\ }
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00206}00206\ \ \ \textcolor{comment}{//\ Single\ argument\ constructor\ is\ special-\/cased\ so\ that\ it\ can\ be}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00207}00207\ \ \ \textcolor{comment}{//\ made\ explicit.}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00208}00208\ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ A>}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00209}00209\ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classtesting_1_1_naggy_mock_acb769f78b93eb60b04db21250f416f70}{NaggyMock}}(\mbox{\hyperlink{namespace_a}{A}}\&\&\ arg)\ :\ MockClass(\mbox{\hyperlink{namespacestd}{std}}::forward<\mbox{\hyperlink{namespace_a}{A}}>(arg))\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00210}00210\ \ \ \ \ ::testing::Mock::WarnUninterestingCalls(}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00211}00211\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a982df3f369643b175f79cda4048bc3b9}{internal::ImplicitCast\_<MockClass*>}}(\textcolor{keyword}{this}));}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00212}00212\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00213}00213\ }
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00214}00214\ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ A1,\ \textcolor{keyword}{typename}\ A2,\ \textcolor{keyword}{typename}...\ An>}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00215}00215\ \ \ \mbox{\hyperlink{classtesting_1_1_naggy_mock_acb769f78b93eb60b04db21250f416f70}{NaggyMock}}(A1\&\&\ arg1,\ A2\&\&\ arg2,\ An\&\&...\ args)}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00216}00216\ \ \ \ \ \ \ :\ MockClass(\mbox{\hyperlink{namespacestd}{std}}::forward<A1>(arg1),\ \mbox{\hyperlink{namespacestd}{std}}::forward<A2>(arg2),}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00217}00217\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacestd}{std}}::forward<An>(args)...)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00218}00218\ \ \ \ \ ::testing::Mock::WarnUninterestingCalls(}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00219}00219\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a982df3f369643b175f79cda4048bc3b9}{internal::ImplicitCast\_<MockClass*>}}(\textcolor{keyword}{this}));}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00220}00220\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00221}00221\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00222}00222\ \ \ \textcolor{comment}{//\ C++98\ doesn't\ have\ variadic\ templates,\ so\ we\ have\ to\ define\ one}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00223}00223\ \ \ \textcolor{comment}{//\ for\ each\ arity.}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00224}00224\ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ A1>}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00225}\mbox{\hyperlink{classtesting_1_1_naggy_mock_ae43ea6c6a6b66fe31cb14f93e0be5718}{00225}}\ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classtesting_1_1_naggy_mock_ae43ea6c6a6b66fe31cb14f93e0be5718}{NaggyMock}}(\textcolor{keyword}{const}\ A1\&\ a1)\ :\ MockClass(a1)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00226}00226\ \ \ \ \ ::testing::Mock::WarnUninterestingCalls(}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00227}00227\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a982df3f369643b175f79cda4048bc3b9}{internal::ImplicitCast\_<MockClass*>}}(\textcolor{keyword}{this}));}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00228}00228\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00229}00229\ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ A1,\ \textcolor{keyword}{typename}\ A2>}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00230}\mbox{\hyperlink{classtesting_1_1_naggy_mock_a4241363ab2ca3a2e7baa5ead980175e6}{00230}}\ \ \ \mbox{\hyperlink{classtesting_1_1_naggy_mock_a4241363ab2ca3a2e7baa5ead980175e6}{NaggyMock}}(\textcolor{keyword}{const}\ A1\&\ a1,\ \textcolor{keyword}{const}\ A2\&\ a2)\ :\ MockClass(a1,\ a2)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00231}00231\ \ \ \ \ ::testing::Mock::WarnUninterestingCalls(}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00232}00232\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a982df3f369643b175f79cda4048bc3b9}{internal::ImplicitCast\_<MockClass*>}}(\textcolor{keyword}{this}));}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00233}00233\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00234}00234\ }
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00235}00235\ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ A1,\ \textcolor{keyword}{typename}\ A2,\ \textcolor{keyword}{typename}\ A3>}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00236}\mbox{\hyperlink{classtesting_1_1_naggy_mock_abd9eea0573bf39f4b41504b2d1df5311}{00236}}\ \ \ \mbox{\hyperlink{classtesting_1_1_naggy_mock_abd9eea0573bf39f4b41504b2d1df5311}{NaggyMock}}(\textcolor{keyword}{const}\ A1\&\ a1,\ \textcolor{keyword}{const}\ A2\&\ a2,\ \textcolor{keyword}{const}\ A3\&\ a3)\ :\ MockClass(a1,\ a2,\ a3)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00237}00237\ \ \ \ \ ::testing::Mock::WarnUninterestingCalls(}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00238}00238\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a982df3f369643b175f79cda4048bc3b9}{internal::ImplicitCast\_<MockClass*>}}(\textcolor{keyword}{this}));}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00239}00239\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00240}00240\ }
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00241}00241\ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ A1,\ \textcolor{keyword}{typename}\ A2,\ \textcolor{keyword}{typename}\ A3,\ \textcolor{keyword}{typename}\ A4>}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00242}\mbox{\hyperlink{classtesting_1_1_naggy_mock_aa7d63f62600171db931c6bbb4c2a6d52}{00242}}\ \ \ \mbox{\hyperlink{classtesting_1_1_naggy_mock_aa7d63f62600171db931c6bbb4c2a6d52}{NaggyMock}}(\textcolor{keyword}{const}\ A1\&\ a1,\ \textcolor{keyword}{const}\ A2\&\ a2,\ \textcolor{keyword}{const}\ A3\&\ a3,}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00243}00243\ \ \ \ \ \ \ \textcolor{keyword}{const}\ A4\&\ a4)\ :\ MockClass(a1,\ a2,\ a3,\ a4)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00244}00244\ \ \ \ \ ::testing::Mock::WarnUninterestingCalls(}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00245}00245\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a982df3f369643b175f79cda4048bc3b9}{internal::ImplicitCast\_<MockClass*>}}(\textcolor{keyword}{this}));}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00246}00246\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00247}00247\ }
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00248}00248\ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ A1,\ \textcolor{keyword}{typename}\ A2,\ \textcolor{keyword}{typename}\ A3,\ \textcolor{keyword}{typename}\ A4,\ \textcolor{keyword}{typename}\ A5>}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00249}\mbox{\hyperlink{classtesting_1_1_naggy_mock_ac751c8a708935bd8558c9665160f7144}{00249}}\ \ \ \mbox{\hyperlink{classtesting_1_1_naggy_mock_ac751c8a708935bd8558c9665160f7144}{NaggyMock}}(\textcolor{keyword}{const}\ A1\&\ a1,\ \textcolor{keyword}{const}\ A2\&\ a2,\ \textcolor{keyword}{const}\ A3\&\ a3,\ \textcolor{keyword}{const}\ A4\&\ a4,}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00250}00250\ \ \ \ \ \ \ \textcolor{keyword}{const}\ A5\&\ a5)\ :\ MockClass(a1,\ a2,\ a3,\ a4,\ a5)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00251}00251\ \ \ \ \ ::testing::Mock::WarnUninterestingCalls(}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00252}00252\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a982df3f369643b175f79cda4048bc3b9}{internal::ImplicitCast\_<MockClass*>}}(\textcolor{keyword}{this}));}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00253}00253\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00254}00254\ }
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00255}00255\ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ A1,\ \textcolor{keyword}{typename}\ A2,\ \textcolor{keyword}{typename}\ A3,\ \textcolor{keyword}{typename}\ A4,\ \textcolor{keyword}{typename}\ A5,}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00256}00256\ \ \ \ \ \ \ \textcolor{keyword}{typename}\ A6>}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00257}\mbox{\hyperlink{classtesting_1_1_naggy_mock_aac4c0986e917a5d6e515f8dc0e7bf644}{00257}}\ \ \ \mbox{\hyperlink{classtesting_1_1_naggy_mock_aac4c0986e917a5d6e515f8dc0e7bf644}{NaggyMock}}(\textcolor{keyword}{const}\ A1\&\ a1,\ \textcolor{keyword}{const}\ A2\&\ a2,\ \textcolor{keyword}{const}\ A3\&\ a3,\ \textcolor{keyword}{const}\ A4\&\ a4,}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00258}00258\ \ \ \ \ \ \ \textcolor{keyword}{const}\ A5\&\ a5,\ \textcolor{keyword}{const}\ A6\&\ a6)\ :\ MockClass(a1,\ a2,\ a3,\ a4,\ a5,\ a6)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00259}00259\ \ \ \ \ ::testing::Mock::WarnUninterestingCalls(}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00260}00260\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a982df3f369643b175f79cda4048bc3b9}{internal::ImplicitCast\_<MockClass*>}}(\textcolor{keyword}{this}));}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00261}00261\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00262}00262\ }
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00263}00263\ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ A1,\ \textcolor{keyword}{typename}\ A2,\ \textcolor{keyword}{typename}\ A3,\ \textcolor{keyword}{typename}\ A4,\ \textcolor{keyword}{typename}\ A5,}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00264}00264\ \ \ \ \ \ \ \textcolor{keyword}{typename}\ A6,\ \textcolor{keyword}{typename}\ A7>}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00265}\mbox{\hyperlink{classtesting_1_1_naggy_mock_ad1edac1991dd20514e822c90d6896c74}{00265}}\ \ \ \mbox{\hyperlink{classtesting_1_1_naggy_mock_ad1edac1991dd20514e822c90d6896c74}{NaggyMock}}(\textcolor{keyword}{const}\ A1\&\ a1,\ \textcolor{keyword}{const}\ A2\&\ a2,\ \textcolor{keyword}{const}\ A3\&\ a3,\ \textcolor{keyword}{const}\ A4\&\ a4,}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00266}00266\ \ \ \ \ \ \ \textcolor{keyword}{const}\ A5\&\ a5,\ \textcolor{keyword}{const}\ A6\&\ a6,\ \textcolor{keyword}{const}\ A7\&\ a7)\ :\ MockClass(a1,\ a2,\ a3,\ a4,\ a5,}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00267}00267\ \ \ \ \ \ \ a6,\ a7)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00268}00268\ \ \ \ \ ::testing::Mock::WarnUninterestingCalls(}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00269}00269\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a982df3f369643b175f79cda4048bc3b9}{internal::ImplicitCast\_<MockClass*>}}(\textcolor{keyword}{this}));}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00270}00270\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00271}00271\ }
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00272}00272\ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ A1,\ \textcolor{keyword}{typename}\ A2,\ \textcolor{keyword}{typename}\ A3,\ \textcolor{keyword}{typename}\ A4,\ \textcolor{keyword}{typename}\ A5,}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00273}00273\ \ \ \ \ \ \ \textcolor{keyword}{typename}\ A6,\ \textcolor{keyword}{typename}\ A7,\ \textcolor{keyword}{typename}\ A8>}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00274}\mbox{\hyperlink{classtesting_1_1_naggy_mock_a63b30506f56b792ffbdc5792a9630d5e}{00274}}\ \ \ \mbox{\hyperlink{classtesting_1_1_naggy_mock_a63b30506f56b792ffbdc5792a9630d5e}{NaggyMock}}(\textcolor{keyword}{const}\ A1\&\ a1,\ \textcolor{keyword}{const}\ A2\&\ a2,\ \textcolor{keyword}{const}\ A3\&\ a3,\ \textcolor{keyword}{const}\ A4\&\ a4,}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00275}00275\ \ \ \ \ \ \ \textcolor{keyword}{const}\ A5\&\ a5,\ \textcolor{keyword}{const}\ A6\&\ a6,\ \textcolor{keyword}{const}\ A7\&\ a7,\ \textcolor{keyword}{const}\ A8\&\ a8)\ :\ MockClass(a1,}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00276}00276\ \ \ \ \ \ \ a2,\ a3,\ a4,\ a5,\ a6,\ a7,\ a8)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00277}00277\ \ \ \ \ ::testing::Mock::WarnUninterestingCalls(}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00278}00278\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a982df3f369643b175f79cda4048bc3b9}{internal::ImplicitCast\_<MockClass*>}}(\textcolor{keyword}{this}));}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00279}00279\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00280}00280\ }
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00281}00281\ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ A1,\ \textcolor{keyword}{typename}\ A2,\ \textcolor{keyword}{typename}\ A3,\ \textcolor{keyword}{typename}\ A4,\ \textcolor{keyword}{typename}\ A5,}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00282}00282\ \ \ \ \ \ \ \textcolor{keyword}{typename}\ A6,\ \textcolor{keyword}{typename}\ A7,\ \textcolor{keyword}{typename}\ A8,\ \textcolor{keyword}{typename}\ A9>}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00283}\mbox{\hyperlink{classtesting_1_1_naggy_mock_a786f31ade7b8b9f6e78e07f51cc0e14b}{00283}}\ \ \ \mbox{\hyperlink{classtesting_1_1_naggy_mock_a786f31ade7b8b9f6e78e07f51cc0e14b}{NaggyMock}}(\textcolor{keyword}{const}\ A1\&\ a1,\ \textcolor{keyword}{const}\ A2\&\ a2,\ \textcolor{keyword}{const}\ A3\&\ a3,\ \textcolor{keyword}{const}\ A4\&\ a4,}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00284}00284\ \ \ \ \ \ \ \textcolor{keyword}{const}\ A5\&\ a5,\ \textcolor{keyword}{const}\ A6\&\ a6,\ \textcolor{keyword}{const}\ A7\&\ a7,\ \textcolor{keyword}{const}\ A8\&\ a8,}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00285}00285\ \ \ \ \ \ \ \textcolor{keyword}{const}\ A9\&\ a9)\ :\ MockClass(a1,\ a2,\ a3,\ a4,\ a5,\ a6,\ a7,\ a8,\ a9)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00286}00286\ \ \ \ \ ::testing::Mock::WarnUninterestingCalls(}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00287}00287\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a982df3f369643b175f79cda4048bc3b9}{internal::ImplicitCast\_<MockClass*>}}(\textcolor{keyword}{this}));}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00288}00288\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00289}00289\ }
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00290}00290\ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ A1,\ \textcolor{keyword}{typename}\ A2,\ \textcolor{keyword}{typename}\ A3,\ \textcolor{keyword}{typename}\ A4,\ \textcolor{keyword}{typename}\ A5,}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00291}00291\ \ \ \ \ \ \ \textcolor{keyword}{typename}\ A6,\ \textcolor{keyword}{typename}\ A7,\ \textcolor{keyword}{typename}\ A8,\ \textcolor{keyword}{typename}\ A9,\ \textcolor{keyword}{typename}\ A10>}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00292}\mbox{\hyperlink{classtesting_1_1_naggy_mock_aa40a39806b939f423696f9380de3172b}{00292}}\ \ \ \mbox{\hyperlink{classtesting_1_1_naggy_mock_aa40a39806b939f423696f9380de3172b}{NaggyMock}}(\textcolor{keyword}{const}\ A1\&\ a1,\ \textcolor{keyword}{const}\ A2\&\ a2,\ \textcolor{keyword}{const}\ A3\&\ a3,\ \textcolor{keyword}{const}\ A4\&\ a4,}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00293}00293\ \ \ \ \ \ \ \textcolor{keyword}{const}\ A5\&\ a5,\ \textcolor{keyword}{const}\ A6\&\ a6,\ \textcolor{keyword}{const}\ A7\&\ a7,\ \textcolor{keyword}{const}\ A8\&\ a8,\ \textcolor{keyword}{const}\ A9\&\ a9,}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00294}00294\ \ \ \ \ \ \ \textcolor{keyword}{const}\ A10\&\ a10)\ :\ MockClass(a1,\ a2,\ a3,\ a4,\ a5,\ a6,\ a7,\ a8,\ a9,\ a10)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00295}00295\ \ \ \ \ ::testing::Mock::WarnUninterestingCalls(}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00296}00296\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a982df3f369643b175f79cda4048bc3b9}{internal::ImplicitCast\_<MockClass*>}}(\textcolor{keyword}{this}));}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00297}00297\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00298}00298\ }
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00299}00299\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_LANG\_CXX11}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00300}00300\ }
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00301}\mbox{\hyperlink{classtesting_1_1_naggy_mock_a9d00e4811942489b4c3cdd8e8c658518}{00301}}\ \ \ \mbox{\hyperlink{classtesting_1_1_naggy_mock_a9d00e4811942489b4c3cdd8e8c658518}{\string~NaggyMock}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00302}00302\ \ \ \ \ ::testing::Mock::UnregisterCallReaction(}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00303}00303\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a982df3f369643b175f79cda4048bc3b9}{internal::ImplicitCast\_<MockClass*>}}(\textcolor{keyword}{this}));}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00304}00304\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00305}00305\ }
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00306}00306\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00307}00307\ \ \ \mbox{\hyperlink{gtest-port_8h_aed8c1888c32b588b0681e88b95031e29}{GTEST\_DISALLOW\_COPY\_AND\_ASSIGN\_}}(\mbox{\hyperlink{classtesting_1_1_naggy_mock}{NaggyMock}});}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00308}00308\ \};}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00309}00309\ }
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00310}00310\ \textcolor{keyword}{template}\ <\textcolor{keyword}{class}\ MockClass>}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00311}\mbox{\hyperlink{classtesting_1_1_strict_mock}{00311}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classtesting_1_1_strict_mock}{StrictMock}}\ :\ \textcolor{keyword}{public}\ MockClass\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00312}00312\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00313}\mbox{\hyperlink{classtesting_1_1_strict_mock_ad609d745db75306dd3b360b5410923fe}{00313}}\ \ \ \mbox{\hyperlink{classtesting_1_1_strict_mock_ad609d745db75306dd3b360b5410923fe}{StrictMock}}()\ :\ MockClass()\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00314}00314\ \ \ \ \ ::testing::Mock::FailUninterestingCalls(}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00315}00315\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a982df3f369643b175f79cda4048bc3b9}{internal::ImplicitCast\_<MockClass*>}}(\textcolor{keyword}{this}));}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00316}00316\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00317}00317\ }
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00318}00318\ \textcolor{preprocessor}{\#if\ GTEST\_LANG\_CXX11}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00319}00319\ \ \ \textcolor{comment}{//\ Ideally,\ we\ would\ inherit\ base\ class's\ constructors\ through\ a\ using}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00320}00320\ \ \ \textcolor{comment}{//\ declaration,\ which\ would\ preserve\ their\ visibility.\ However,\ many\ existing}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00321}00321\ \ \ \textcolor{comment}{//\ tests\ rely\ on\ the\ fact\ that\ current\ implementation\ reexports\ protected}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00322}00322\ \ \ \textcolor{comment}{//\ constructors\ as\ public.\ These\ tests\ would\ need\ to\ be\ cleaned\ up\ first.}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00323}00323\ }
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00324}00324\ \ \ \textcolor{comment}{//\ Single\ argument\ constructor\ is\ special-\/cased\ so\ that\ it\ can\ be}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00325}00325\ \ \ \textcolor{comment}{//\ made\ explicit.}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00326}00326\ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ A>}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00327}00327\ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classtesting_1_1_strict_mock_ad609d745db75306dd3b360b5410923fe}{StrictMock}}(\mbox{\hyperlink{namespace_a}{A}}\&\&\ arg)\ :\ MockClass(\mbox{\hyperlink{namespacestd}{std}}::forward<\mbox{\hyperlink{namespace_a}{A}}>(arg))\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00328}00328\ \ \ \ \ ::testing::Mock::FailUninterestingCalls(}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00329}00329\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a982df3f369643b175f79cda4048bc3b9}{internal::ImplicitCast\_<MockClass*>}}(\textcolor{keyword}{this}));}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00330}00330\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00331}00331\ }
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00332}00332\ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ A1,\ \textcolor{keyword}{typename}\ A2,\ \textcolor{keyword}{typename}...\ An>}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00333}00333\ \ \ \mbox{\hyperlink{classtesting_1_1_strict_mock_ad609d745db75306dd3b360b5410923fe}{StrictMock}}(A1\&\&\ arg1,\ A2\&\&\ arg2,\ An\&\&...\ args)}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00334}00334\ \ \ \ \ \ \ :\ MockClass(\mbox{\hyperlink{namespacestd}{std}}::forward<A1>(arg1),\ \mbox{\hyperlink{namespacestd}{std}}::forward<A2>(arg2),}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00335}00335\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacestd}{std}}::forward<An>(args)...)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00336}00336\ \ \ \ \ ::testing::Mock::FailUninterestingCalls(}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00337}00337\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a982df3f369643b175f79cda4048bc3b9}{internal::ImplicitCast\_<MockClass*>}}(\textcolor{keyword}{this}));}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00338}00338\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00339}00339\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00340}00340\ \ \ \textcolor{comment}{//\ C++98\ doesn't\ have\ variadic\ templates,\ so\ we\ have\ to\ define\ one}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00341}00341\ \ \ \textcolor{comment}{//\ for\ each\ arity.}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00342}00342\ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ A1>}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00343}\mbox{\hyperlink{classtesting_1_1_strict_mock_a42db27ba0af29804db8589676817aff8}{00343}}\ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classtesting_1_1_strict_mock_a42db27ba0af29804db8589676817aff8}{StrictMock}}(\textcolor{keyword}{const}\ A1\&\ a1)\ :\ MockClass(a1)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00344}00344\ \ \ \ \ ::testing::Mock::FailUninterestingCalls(}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00345}00345\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a982df3f369643b175f79cda4048bc3b9}{internal::ImplicitCast\_<MockClass*>}}(\textcolor{keyword}{this}));}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00346}00346\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00347}00347\ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ A1,\ \textcolor{keyword}{typename}\ A2>}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00348}\mbox{\hyperlink{classtesting_1_1_strict_mock_a345933f3f1a10de381a508f93e680c6b}{00348}}\ \ \ \mbox{\hyperlink{classtesting_1_1_strict_mock_a345933f3f1a10de381a508f93e680c6b}{StrictMock}}(\textcolor{keyword}{const}\ A1\&\ a1,\ \textcolor{keyword}{const}\ A2\&\ a2)\ :\ MockClass(a1,\ a2)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00349}00349\ \ \ \ \ ::testing::Mock::FailUninterestingCalls(}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00350}00350\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a982df3f369643b175f79cda4048bc3b9}{internal::ImplicitCast\_<MockClass*>}}(\textcolor{keyword}{this}));}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00351}00351\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00352}00352\ }
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00353}00353\ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ A1,\ \textcolor{keyword}{typename}\ A2,\ \textcolor{keyword}{typename}\ A3>}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00354}\mbox{\hyperlink{classtesting_1_1_strict_mock_acc25729cd85a3a412106863894a30fe7}{00354}}\ \ \ \mbox{\hyperlink{classtesting_1_1_strict_mock_acc25729cd85a3a412106863894a30fe7}{StrictMock}}(\textcolor{keyword}{const}\ A1\&\ a1,\ \textcolor{keyword}{const}\ A2\&\ a2,\ \textcolor{keyword}{const}\ A3\&\ a3)\ :\ MockClass(a1,\ a2,\ a3)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00355}00355\ \ \ \ \ ::testing::Mock::FailUninterestingCalls(}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00356}00356\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a982df3f369643b175f79cda4048bc3b9}{internal::ImplicitCast\_<MockClass*>}}(\textcolor{keyword}{this}));}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00357}00357\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00358}00358\ }
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00359}00359\ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ A1,\ \textcolor{keyword}{typename}\ A2,\ \textcolor{keyword}{typename}\ A3,\ \textcolor{keyword}{typename}\ A4>}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00360}\mbox{\hyperlink{classtesting_1_1_strict_mock_a6b42ef1460901ea91a2a09f44ae8fba2}{00360}}\ \ \ \mbox{\hyperlink{classtesting_1_1_strict_mock_a6b42ef1460901ea91a2a09f44ae8fba2}{StrictMock}}(\textcolor{keyword}{const}\ A1\&\ a1,\ \textcolor{keyword}{const}\ A2\&\ a2,\ \textcolor{keyword}{const}\ A3\&\ a3,}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00361}00361\ \ \ \ \ \ \ \textcolor{keyword}{const}\ A4\&\ a4)\ :\ MockClass(a1,\ a2,\ a3,\ a4)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00362}00362\ \ \ \ \ ::testing::Mock::FailUninterestingCalls(}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00363}00363\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a982df3f369643b175f79cda4048bc3b9}{internal::ImplicitCast\_<MockClass*>}}(\textcolor{keyword}{this}));}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00364}00364\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00365}00365\ }
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00366}00366\ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ A1,\ \textcolor{keyword}{typename}\ A2,\ \textcolor{keyword}{typename}\ A3,\ \textcolor{keyword}{typename}\ A4,\ \textcolor{keyword}{typename}\ A5>}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00367}\mbox{\hyperlink{classtesting_1_1_strict_mock_a2019f4e86224b2adbb9e9326bc175c50}{00367}}\ \ \ \mbox{\hyperlink{classtesting_1_1_strict_mock_a2019f4e86224b2adbb9e9326bc175c50}{StrictMock}}(\textcolor{keyword}{const}\ A1\&\ a1,\ \textcolor{keyword}{const}\ A2\&\ a2,\ \textcolor{keyword}{const}\ A3\&\ a3,\ \textcolor{keyword}{const}\ A4\&\ a4,}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00368}00368\ \ \ \ \ \ \ \textcolor{keyword}{const}\ A5\&\ a5)\ :\ MockClass(a1,\ a2,\ a3,\ a4,\ a5)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00369}00369\ \ \ \ \ ::testing::Mock::FailUninterestingCalls(}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00370}00370\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a982df3f369643b175f79cda4048bc3b9}{internal::ImplicitCast\_<MockClass*>}}(\textcolor{keyword}{this}));}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00371}00371\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00372}00372\ }
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00373}00373\ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ A1,\ \textcolor{keyword}{typename}\ A2,\ \textcolor{keyword}{typename}\ A3,\ \textcolor{keyword}{typename}\ A4,\ \textcolor{keyword}{typename}\ A5,}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00374}00374\ \ \ \ \ \ \ \textcolor{keyword}{typename}\ A6>}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00375}\mbox{\hyperlink{classtesting_1_1_strict_mock_a17b452e1e2f57d7d10f7209587376eef}{00375}}\ \ \ \mbox{\hyperlink{classtesting_1_1_strict_mock_a17b452e1e2f57d7d10f7209587376eef}{StrictMock}}(\textcolor{keyword}{const}\ A1\&\ a1,\ \textcolor{keyword}{const}\ A2\&\ a2,\ \textcolor{keyword}{const}\ A3\&\ a3,\ \textcolor{keyword}{const}\ A4\&\ a4,}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00376}00376\ \ \ \ \ \ \ \textcolor{keyword}{const}\ A5\&\ a5,\ \textcolor{keyword}{const}\ A6\&\ a6)\ :\ MockClass(a1,\ a2,\ a3,\ a4,\ a5,\ a6)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00377}00377\ \ \ \ \ ::testing::Mock::FailUninterestingCalls(}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00378}00378\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a982df3f369643b175f79cda4048bc3b9}{internal::ImplicitCast\_<MockClass*>}}(\textcolor{keyword}{this}));}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00379}00379\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00380}00380\ }
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00381}00381\ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ A1,\ \textcolor{keyword}{typename}\ A2,\ \textcolor{keyword}{typename}\ A3,\ \textcolor{keyword}{typename}\ A4,\ \textcolor{keyword}{typename}\ A5,}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00382}00382\ \ \ \ \ \ \ \textcolor{keyword}{typename}\ A6,\ \textcolor{keyword}{typename}\ A7>}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00383}\mbox{\hyperlink{classtesting_1_1_strict_mock_a4af48752fc22815250369292b9c064bc}{00383}}\ \ \ \mbox{\hyperlink{classtesting_1_1_strict_mock_a4af48752fc22815250369292b9c064bc}{StrictMock}}(\textcolor{keyword}{const}\ A1\&\ a1,\ \textcolor{keyword}{const}\ A2\&\ a2,\ \textcolor{keyword}{const}\ A3\&\ a3,\ \textcolor{keyword}{const}\ A4\&\ a4,}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00384}00384\ \ \ \ \ \ \ \textcolor{keyword}{const}\ A5\&\ a5,\ \textcolor{keyword}{const}\ A6\&\ a6,\ \textcolor{keyword}{const}\ A7\&\ a7)\ :\ MockClass(a1,\ a2,\ a3,\ a4,\ a5,}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00385}00385\ \ \ \ \ \ \ a6,\ a7)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00386}00386\ \ \ \ \ ::testing::Mock::FailUninterestingCalls(}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00387}00387\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a982df3f369643b175f79cda4048bc3b9}{internal::ImplicitCast\_<MockClass*>}}(\textcolor{keyword}{this}));}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00388}00388\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00389}00389\ }
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00390}00390\ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ A1,\ \textcolor{keyword}{typename}\ A2,\ \textcolor{keyword}{typename}\ A3,\ \textcolor{keyword}{typename}\ A4,\ \textcolor{keyword}{typename}\ A5,}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00391}00391\ \ \ \ \ \ \ \textcolor{keyword}{typename}\ A6,\ \textcolor{keyword}{typename}\ A7,\ \textcolor{keyword}{typename}\ A8>}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00392}\mbox{\hyperlink{classtesting_1_1_strict_mock_aac6eaaad3e94491ada7bb43ee6149775}{00392}}\ \ \ \mbox{\hyperlink{classtesting_1_1_strict_mock_aac6eaaad3e94491ada7bb43ee6149775}{StrictMock}}(\textcolor{keyword}{const}\ A1\&\ a1,\ \textcolor{keyword}{const}\ A2\&\ a2,\ \textcolor{keyword}{const}\ A3\&\ a3,\ \textcolor{keyword}{const}\ A4\&\ a4,}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00393}00393\ \ \ \ \ \ \ \textcolor{keyword}{const}\ A5\&\ a5,\ \textcolor{keyword}{const}\ A6\&\ a6,\ \textcolor{keyword}{const}\ A7\&\ a7,\ \textcolor{keyword}{const}\ A8\&\ a8)\ :\ MockClass(a1,}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00394}00394\ \ \ \ \ \ \ a2,\ a3,\ a4,\ a5,\ a6,\ a7,\ a8)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00395}00395\ \ \ \ \ ::testing::Mock::FailUninterestingCalls(}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00396}00396\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a982df3f369643b175f79cda4048bc3b9}{internal::ImplicitCast\_<MockClass*>}}(\textcolor{keyword}{this}));}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00397}00397\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00398}00398\ }
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00399}00399\ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ A1,\ \textcolor{keyword}{typename}\ A2,\ \textcolor{keyword}{typename}\ A3,\ \textcolor{keyword}{typename}\ A4,\ \textcolor{keyword}{typename}\ A5,}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00400}00400\ \ \ \ \ \ \ \textcolor{keyword}{typename}\ A6,\ \textcolor{keyword}{typename}\ A7,\ \textcolor{keyword}{typename}\ A8,\ \textcolor{keyword}{typename}\ A9>}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00401}\mbox{\hyperlink{classtesting_1_1_strict_mock_a4129f247ae087d586fdb04f450422d3e}{00401}}\ \ \ \mbox{\hyperlink{classtesting_1_1_strict_mock_a4129f247ae087d586fdb04f450422d3e}{StrictMock}}(\textcolor{keyword}{const}\ A1\&\ a1,\ \textcolor{keyword}{const}\ A2\&\ a2,\ \textcolor{keyword}{const}\ A3\&\ a3,\ \textcolor{keyword}{const}\ A4\&\ a4,}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00402}00402\ \ \ \ \ \ \ \textcolor{keyword}{const}\ A5\&\ a5,\ \textcolor{keyword}{const}\ A6\&\ a6,\ \textcolor{keyword}{const}\ A7\&\ a7,\ \textcolor{keyword}{const}\ A8\&\ a8,}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00403}00403\ \ \ \ \ \ \ \textcolor{keyword}{const}\ A9\&\ a9)\ :\ MockClass(a1,\ a2,\ a3,\ a4,\ a5,\ a6,\ a7,\ a8,\ a9)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00404}00404\ \ \ \ \ ::testing::Mock::FailUninterestingCalls(}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00405}00405\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a982df3f369643b175f79cda4048bc3b9}{internal::ImplicitCast\_<MockClass*>}}(\textcolor{keyword}{this}));}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00406}00406\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00407}00407\ }
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00408}00408\ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ A1,\ \textcolor{keyword}{typename}\ A2,\ \textcolor{keyword}{typename}\ A3,\ \textcolor{keyword}{typename}\ A4,\ \textcolor{keyword}{typename}\ A5,}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00409}00409\ \ \ \ \ \ \ \textcolor{keyword}{typename}\ A6,\ \textcolor{keyword}{typename}\ A7,\ \textcolor{keyword}{typename}\ A8,\ \textcolor{keyword}{typename}\ A9,\ \textcolor{keyword}{typename}\ A10>}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00410}\mbox{\hyperlink{classtesting_1_1_strict_mock_a4936b0a5622b39e974deae12ecb1430b}{00410}}\ \ \ \mbox{\hyperlink{classtesting_1_1_strict_mock_a4936b0a5622b39e974deae12ecb1430b}{StrictMock}}(\textcolor{keyword}{const}\ A1\&\ a1,\ \textcolor{keyword}{const}\ A2\&\ a2,\ \textcolor{keyword}{const}\ A3\&\ a3,\ \textcolor{keyword}{const}\ A4\&\ a4,}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00411}00411\ \ \ \ \ \ \ \textcolor{keyword}{const}\ A5\&\ a5,\ \textcolor{keyword}{const}\ A6\&\ a6,\ \textcolor{keyword}{const}\ A7\&\ a7,\ \textcolor{keyword}{const}\ A8\&\ a8,\ \textcolor{keyword}{const}\ A9\&\ a9,}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00412}00412\ \ \ \ \ \ \ \textcolor{keyword}{const}\ A10\&\ a10)\ :\ MockClass(a1,\ a2,\ a3,\ a4,\ a5,\ a6,\ a7,\ a8,\ a9,\ a10)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00413}00413\ \ \ \ \ ::testing::Mock::FailUninterestingCalls(}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00414}00414\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a982df3f369643b175f79cda4048bc3b9}{internal::ImplicitCast\_<MockClass*>}}(\textcolor{keyword}{this}));}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00415}00415\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00416}00416\ }
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00417}00417\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_LANG\_CXX11}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00418}00418\ }
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00419}\mbox{\hyperlink{classtesting_1_1_strict_mock_a1c7ec10ea86747bb23037380a7353bd1}{00419}}\ \ \ \mbox{\hyperlink{classtesting_1_1_strict_mock_a1c7ec10ea86747bb23037380a7353bd1}{\string~StrictMock}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00420}00420\ \ \ \ \ ::testing::Mock::UnregisterCallReaction(}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00421}00421\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a982df3f369643b175f79cda4048bc3b9}{internal::ImplicitCast\_<MockClass*>}}(\textcolor{keyword}{this}));}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00422}00422\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00423}00423\ }
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00424}00424\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00425}00425\ \ \ \mbox{\hyperlink{gtest-port_8h_aed8c1888c32b588b0681e88b95031e29}{GTEST\_DISALLOW\_COPY\_AND\_ASSIGN\_}}(\mbox{\hyperlink{classtesting_1_1_strict_mock}{StrictMock}});}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00426}00426\ \};}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00427}00427\ }
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00428}00428\ \textcolor{comment}{//\ The\ following\ specializations\ catch\ some\ (relatively\ more\ common)}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00429}00429\ \textcolor{comment}{//\ user\ errors\ of\ nesting\ nice\ and\ strict\ mocks.\ \ They\ do\ NOT\ catch}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00430}00430\ \textcolor{comment}{//\ all\ possible\ errors.}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00431}00431\ }
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00432}00432\ \textcolor{comment}{//\ These\ specializations\ are\ declared\ but\ not\ defined,\ as\ NiceMock,}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00433}00433\ \textcolor{comment}{//\ NaggyMock,\ and\ StrictMock\ cannot\ be\ nested.}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00434}00434\ }
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00435}00435\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ MockClass>}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00436}00436\ \textcolor{keyword}{class\ }NiceMock<NiceMock<MockClass>\ >;}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00437}00437\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ MockClass>}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00438}00438\ \textcolor{keyword}{class\ }NiceMock<NaggyMock<MockClass>\ >;}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00439}00439\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ MockClass>}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00440}00440\ \textcolor{keyword}{class\ }NiceMock<StrictMock<MockClass>\ >;}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00441}00441\ }
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00442}00442\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ MockClass>}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00443}00443\ \textcolor{keyword}{class\ }NaggyMock<NiceMock<MockClass>\ >;}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00444}00444\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ MockClass>}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00445}00445\ \textcolor{keyword}{class\ }NaggyMock<NaggyMock<MockClass>\ >;}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00446}00446\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ MockClass>}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00447}00447\ \textcolor{keyword}{class\ }NaggyMock<StrictMock<MockClass>\ >;}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00448}00448\ }
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00449}00449\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ MockClass>}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00450}00450\ \textcolor{keyword}{class\ }StrictMock<NiceMock<MockClass>\ >;}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00451}00451\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ MockClass>}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00452}00452\ \textcolor{keyword}{class\ }StrictMock<NaggyMock<MockClass>\ >;}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00453}00453\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ MockClass>}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00454}00454\ \textcolor{keyword}{class\ }StrictMock<StrictMock<MockClass>\ >;}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00455}00455\ }
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00456}00456\ \}\ \ \textcolor{comment}{//\ namespace\ testing}}
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00457}00457\ }
+\DoxyCodeLine{\Hypertarget{gmock-generated-nice-strict_8h_source_l00458}00458\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GMOCK\_INCLUDE\_GMOCK\_GMOCK\_GENERATED\_NICE\_STRICT\_H\_}}
+
+\end{DoxyCode}

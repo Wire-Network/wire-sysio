@@ -1,0 +1,52 @@
+\doxysection{libraries/sys-\/vm/external/softfloat/source/8086-\/\+SSE/s\+\_\+ext\+F80\+UITo\+Common\+NaN.c File Reference}
+\hypertarget{sys-vm_2external_2softfloat_2source_28086-_s_s_e_2s__ext_f80_u_i_to_common_na_n_8c}{}\label{sys-vm_2external_2softfloat_2source_28086-_s_s_e_2s__ext_f80_u_i_to_common_na_n_8c}\index{libraries/sys-\/vm/external/softfloat/source/8086-\/SSE/s\_extF80UIToCommonNaN.c@{libraries/sys-\/vm/external/softfloat/source/8086-\/SSE/s\_extF80UIToCommonNaN.c}}
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include "{}platform.\+h"{}}\newline
+{\ttfamily \#include "{}specialize.\+h"{}}\newline
+{\ttfamily \#include "{}softfloat.\+h"{}}\newline
+Include dependency graph for s\+\_\+ext\+F80\+UITo\+Common\+Na\+N.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sys-vm_2external_2softfloat_2source_28086-_s_s_e_2s__ext_f80_u_i_to_common_na_n_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_28086-_s_s_e_2s__ext_f80_u_i_to_common_na_n_8c_abdfaa3d9cf59a75e789365fd8aa60132}{softfloat\+\_\+ext\+F80\+UITo\+Common\+NaN}} (\mbox{\hyperlink{stdint_8h_a6ed085329b153773ff76afa0702cf897}{uint\+\_\+fast16\+\_\+t}} ui\+A64, \mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\+\_\+fast64\+\_\+t}} ui\+A0, struct \mbox{\hyperlink{structcommon_na_n}{common\+NaN}} \texorpdfstring{$\ast$}{*}z\+Ptr)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{sys-vm_2external_2softfloat_2source_28086-_s_s_e_2s__ext_f80_u_i_to_common_na_n_8c_abdfaa3d9cf59a75e789365fd8aa60132}\index{s\_extF80UIToCommonNaN.c@{s\_extF80UIToCommonNaN.c}!softfloat\_extF80UIToCommonNaN@{softfloat\_extF80UIToCommonNaN}}
+\index{softfloat\_extF80UIToCommonNaN@{softfloat\_extF80UIToCommonNaN}!s\_extF80UIToCommonNaN.c@{s\_extF80UIToCommonNaN.c}}
+\doxysubsubsection{\texorpdfstring{softfloat\_extF80UIToCommonNaN()}{softfloat\_extF80UIToCommonNaN()}}
+{\footnotesize\ttfamily \label{sys-vm_2external_2softfloat_2source_28086-_s_s_e_2s__ext_f80_u_i_to_common_na_n_8c_abdfaa3d9cf59a75e789365fd8aa60132} 
+void softfloat\+\_\+ext\+F80\+UITo\+Common\+NaN (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a6ed085329b153773ff76afa0702cf897}{uint\+\_\+fast16\+\_\+t}}}]{ui\+A64}{, }\item[{\mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\+\_\+fast64\+\_\+t}}}]{ui\+A0}{, }\item[{struct \mbox{\hyperlink{structcommon_na_n}{common\+NaN}} \texorpdfstring{$\ast$}{*}}]{z\+Ptr}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_28086-_s_s_e_2s__ext_f80_u_i_to_common_na_n_8c_source_l00050}{50}} of file \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_28086-_s_s_e_2s__ext_f80_u_i_to_common_na_n_8c_source}{s\+\_\+ext\+F80\+UITo\+Common\+Na\+N.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00052\ \{}
+\DoxyCodeLine{00053\ }
+\DoxyCodeLine{00054\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2specialize_8h_a472371a22c79d4419e301c26ebd347e3}{softfloat\_isSigNaNExtF80UI}}(\ uiA64,\ uiA0\ )\ )\ \{}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2softfloat__raise_flags_8c_ac16bbf09eca0fe8ff91301d82c5a667f}{softfloat\_raiseFlags}}(\ \mbox{\hyperlink{softfloat_2source_2include_2softfloat_8h_a56a0f36da7f9eaaf54bd05cc2bf49173a191f069090c3d33752fb728272d9a4a9}{softfloat\_flag\_invalid}}\ );}
+\DoxyCodeLine{00056\ \ \ \ \ \}}
+\DoxyCodeLine{00057\ \ \ \ \ zPtr-\/>\mbox{\hyperlink{structcommon_na_n_a32e90937a4ec3878d2620fbafd31a16f}{sign}}\ =\ uiA64>>15;}
+\DoxyCodeLine{00058\ \ \ \ \ zPtr-\/>\mbox{\hyperlink{structcommon_na_n_a05124b0293f6d395ce047744b12deff6}{v64}}\ \ =\ uiA0<<1;}
+\DoxyCodeLine{00059\ \ \ \ \ zPtr-\/>\mbox{\hyperlink{structcommon_na_n_ad6c4c9c79bcfd2dc2656b599fa5f75a5}{v0}}\ \ \ =\ 0;}
+\DoxyCodeLine{00060\ }
+\DoxyCodeLine{00061\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sys-vm_2external_2softfloat_2source_28086-_s_s_e_2s__ext_f80_u_i_to_common_na_n_8c_abdfaa3d9cf59a75e789365fd8aa60132_cgraph}
+\end{center}
+\end{figure}

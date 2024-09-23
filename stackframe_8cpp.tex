@@ -1,0 +1,72 @@
+\doxysection{libraries/fc/libraries/ff/depends/xbyak/sample/stackframe.cpp File Reference}
+\hypertarget{stackframe_8cpp}{}\label{stackframe_8cpp}\index{libraries/fc/libraries/ff/depends/xbyak/sample/stackframe.cpp@{libraries/fc/libraries/ff/depends/xbyak/sample/stackframe.cpp}}
+{\ttfamily \#include $<$xbyak/xbyak\+\_\+util.\+h$>$}\newline
+Include dependency graph for stackframe.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{stackframe_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_code}{Code}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{stackframe_8cpp_a3ede98665532cce0e33f614fac5150f9}{XBYAK\+\_\+\+NO\+\_\+\+OP\+\_\+\+NAMES}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{stackframe_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{stackframe_8cpp_a3ede98665532cce0e33f614fac5150f9}\index{stackframe.cpp@{stackframe.cpp}!XBYAK\_NO\_OP\_NAMES@{XBYAK\_NO\_OP\_NAMES}}
+\index{XBYAK\_NO\_OP\_NAMES@{XBYAK\_NO\_OP\_NAMES}!stackframe.cpp@{stackframe.cpp}}
+\doxysubsubsection{\texorpdfstring{XBYAK\_NO\_OP\_NAMES}{XBYAK\_NO\_OP\_NAMES}}
+{\footnotesize\ttfamily \label{stackframe_8cpp_a3ede98665532cce0e33f614fac5150f9} 
+\#define XBYAK\+\_\+\+NO\+\_\+\+OP\+\_\+\+NAMES}
+
+
+
+Definition at line \mbox{\hyperlink{stackframe_8cpp_source_l00001}{1}} of file \mbox{\hyperlink{stackframe_8cpp_source}{stackframe.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{stackframe_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}\index{stackframe.cpp@{stackframe.cpp}!main@{main}}
+\index{main@{main}!stackframe.cpp@{stackframe.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{stackframe_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4} 
+int main (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{stackframe_8cpp_source_l00019}{19}} of file \mbox{\hyperlink{stackframe_8cpp_source}{stackframe.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00020\ \{}
+\DoxyCodeLine{00021\ \ \ \ \ \mbox{\hyperlink{struct_code}{Code}}\ c;}
+\DoxyCodeLine{00022\ \ \ \ \ int\ (*\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})(int,\ int,\ int)\ =\ c.\mbox{\hyperlink{class_xbyak_1_1_code_array_a9ad8a38842d1e0de9045338e460f58ce}{getCode}}<\textcolor{keywordtype}{int}(*)\ (int,\ int,\ int)>();}
+\DoxyCodeLine{00023\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}(3,\ 5,\ 2);}
+\DoxyCodeLine{00024\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ ==\ 3\ +\ 5\ +\ 2)\ \{}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ puts(\textcolor{stringliteral}{"{}ok"{}});}
+\DoxyCodeLine{00026\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ puts(\textcolor{stringliteral}{"{}ng"{}});}
+\DoxyCodeLine{00028\ \ \ \ \ \}}
+\DoxyCodeLine{00029\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=292pt]{stackframe_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4_cgraph}
+\end{center}
+\end{figure}

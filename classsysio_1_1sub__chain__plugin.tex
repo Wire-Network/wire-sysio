@@ -1,0 +1,557 @@
+\doxysection{sysio\+::sub\+\_\+chain\+\_\+plugin Class Reference}
+\hypertarget{classsysio_1_1sub__chain__plugin}{}\label{classsysio_1_1sub__chain__plugin}\index{sysio::sub\_chain\_plugin@{sysio::sub\_chain\_plugin}}
+
+
+{\ttfamily \#include $<$sub\+\_\+chain\+\_\+plugin.\+hpp$>$}
+
+
+
+Inheritance diagram for sysio\+::sub\+\_\+chain\+\_\+plugin\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=205pt]{classsysio_1_1sub__chain__plugin__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for sysio\+::sub\+\_\+chain\+\_\+plugin\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=205pt]{classsysio_1_1sub__chain__plugin__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classsysio_1_1sub__chain__plugin_ab89f5e58a8ba29b2da7fd8f3f1f9580f}{sub\+\_\+chain\+\_\+plugin}} ()
+\item 
+virtual \mbox{\hyperlink{classsysio_1_1sub__chain__plugin_a76ed451659f2eb0125e51f0cb0d1b87b}{\texorpdfstring{$\sim$}{\string~}sub\+\_\+chain\+\_\+plugin}} ()
+\item 
+virtual void \mbox{\hyperlink{classsysio_1_1sub__chain__plugin_a6e2741ccffb9b3d1c62642e8d01469c2}{set\+\_\+program\+\_\+options}} (options\+\_\+description \&, options\+\_\+description \&cfg) override
+\item 
+void \mbox{\hyperlink{classsysio_1_1sub__chain__plugin_a6dd5ccc3932d3f377871be7f3405999a}{plugin\+\_\+initialize}} (const variables\+\_\+map \&options)
+\item 
+void \mbox{\hyperlink{classsysio_1_1sub__chain__plugin_a9f4bb7aed179e23b6a4fd82f1f5abecf}{plugin\+\_\+startup}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1sub__chain__plugin_a3874baf0a8be3ff358ecf00fb64c239f}{plugin\+\_\+shutdown}} ()
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{sysio\+::chain\+::account\+\_\+name}} \& \mbox{\hyperlink{classsysio_1_1sub__chain__plugin_a336cfd3a895443141f1df5d6578b8afe}{get\+\_\+contract\+\_\+name}} () const
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_a9c3cb5131331ed8d52a589437ccfb03e}{sysio\+::chain\+::checksum256\+\_\+type}} \& \mbox{\hyperlink{classsysio_1_1sub__chain__plugin_a859210844da256487c6ca3b93cfc028c}{get\+\_\+prev\+\_\+s\+\_\+id}} () const
+\item 
+void \mbox{\hyperlink{classsysio_1_1sub__chain__plugin_a9a8596ad0ebba9548494df94c00e0a99}{update\+\_\+prev\+\_\+s\+\_\+id}} (const \mbox{\hyperlink{namespacesysio_1_1chain_a9c3cb5131331ed8d52a589437ccfb03e}{sysio\+::chain\+::checksum256\+\_\+type}} \&new\+\_\+s\+\_\+id)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_a9c3cb5131331ed8d52a589437ccfb03e}{sysio\+::chain\+::checksum256\+\_\+type}} \mbox{\hyperlink{classsysio_1_1sub__chain__plugin_ae0ac286e18b19c360cd78c244967994d}{calculate\+\_\+s\+\_\+root}} (const std\+::vector$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1transaction}{sysio\+::chain\+::transaction}} $>$ \&transactions)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_a9c3cb5131331ed8d52a589437ccfb03e}{sysio\+::chain\+::checksum256\+\_\+type}} \mbox{\hyperlink{classsysio_1_1sub__chain__plugin_aa4668706e102033c7b63c08be2b834ef}{compute\+\_\+curr\+\_\+s\+\_\+id}} (const \mbox{\hyperlink{namespacesysio_1_1chain_a9c3cb5131331ed8d52a589437ccfb03e}{sysio\+::chain\+::checksum256\+\_\+type}} \&curr\+\_\+s\+\_\+root)
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classsysio_1_1sub__chain__plugin_aa1aadd4174d2f23fd38bc235d14dc413}{extract\+\_\+s\+\_\+block\+\_\+number}} (const \mbox{\hyperlink{namespacesysio_1_1chain_a9c3cb5131331ed8d52a589437ccfb03e}{sysio\+::chain\+::checksum256\+\_\+type}} \&s\+\_\+id)
+\item 
+std\+::vector$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1transaction}{sysio\+::chain\+::transaction}} $>$ \mbox{\hyperlink{classsysio_1_1sub__chain__plugin_aaac3c80301ede51c90d925992bc14c7c}{find\+\_\+relevant\+\_\+transactions}} (\mbox{\hyperlink{classsysio_1_1chain_1_1controller}{sysio\+::chain\+::controller}} \&curr\+\_\+chain)
+\item 
+bool \mbox{\hyperlink{classsysio_1_1sub__chain__plugin_a797b6336604834b7adcec0c1d865dc4f}{is\+\_\+relevant\+\_\+s\+\_\+root\+\_\+transaction}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1transaction}{sysio\+::chain\+::transaction}} \&trx)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classappbase_1_1plugin}{appbase\+::plugin$<$ sub\+\_\+chain\+\_\+plugin $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classappbase_1_1plugin_a3cf5509f2854ffb274018dca8606c50a}{plugin}} ()
+\item 
+virtual \mbox{\hyperlink{classappbase_1_1plugin_a6c83bcf2c8ee3de87593824da807e4ba}{\texorpdfstring{$\sim$}{\string~}plugin}} ()
+\item 
+virtual \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408}{state}} \mbox{\hyperlink{classappbase_1_1plugin_a857288c2424b57a898c0579d25dacbb0}{get\+\_\+state}} () const override
+\item 
+virtual const std\+::string \& \mbox{\hyperlink{classappbase_1_1plugin_a274f072d2f7f37d43ae74e01edd0ba62}{name}} () const override
+\item 
+virtual void \mbox{\hyperlink{classappbase_1_1plugin_a6a0cd7ccc873527ebb5e6716b249ea17}{register\+\_\+dependencies}} ()
+\item 
+virtual void \mbox{\hyperlink{classappbase_1_1plugin_ac28755a82831d41e5d0ef0ce56b10fa9}{initialize}} (const variables\+\_\+map \&options) override
+\item 
+virtual void \mbox{\hyperlink{classappbase_1_1plugin_ab314bd778e71a91de584cd9b8a999867}{handle\+\_\+sighup}} () override
+\item 
+virtual void \mbox{\hyperlink{classappbase_1_1plugin_a10e4e1c582bfadf67f510df76d87abfd}{startup}} () override
+\item 
+virtual void \mbox{\hyperlink{classappbase_1_1plugin_a21e5be5587fca41fbc91367d449b8f27}{shutdown}} () override
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classappbase_1_1abstract__plugin}{appbase\+::abstract\+\_\+plugin}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4643a2618ac94aa2ef56e59fe363f828}{\texorpdfstring{$\sim$}{\string~}abstract\+\_\+plugin}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Public Types inherited from \mbox{\hyperlink{classappbase_1_1abstract__plugin}{appbase\+::abstract\+\_\+plugin}}}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408}{state}} \{ \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408ac712ce3482a78b8bf87080aefd77cf7d}{registered}}
+, \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408a9ae208bba76e9c0eab1cac52953f947b}{initialized}}
+, \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408a808ebbf475942017567644697eca3224}{started}}
+, \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408a320c2eebb5306f385aebfca07336d29e}{stopped}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Member Functions inherited from \mbox{\hyperlink{classappbase_1_1plugin}{appbase\+::plugin$<$ sub\+\_\+chain\+\_\+plugin $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classappbase_1_1plugin_a51f43c3c64ab8524928698a72a186822}{plugin}} (const string \&\mbox{\hyperlink{classappbase_1_1plugin_a274f072d2f7f37d43ae74e01edd0ba62}{name}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{sub__chain__plugin_8hpp_source_l00022}{22}} of file \mbox{\hyperlink{sub__chain__plugin_8hpp_source}{sub\+\_\+chain\+\_\+plugin.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classsysio_1_1sub__chain__plugin_ab89f5e58a8ba29b2da7fd8f3f1f9580f}\index{sysio::sub\_chain\_plugin@{sysio::sub\_chain\_plugin}!sub\_chain\_plugin@{sub\_chain\_plugin}}
+\index{sub\_chain\_plugin@{sub\_chain\_plugin}!sysio::sub\_chain\_plugin@{sysio::sub\_chain\_plugin}}
+\doxysubsubsection{\texorpdfstring{sub\_chain\_plugin()}{sub\_chain\_plugin()}}
+{\footnotesize\ttfamily \label{classsysio_1_1sub__chain__plugin_ab89f5e58a8ba29b2da7fd8f3f1f9580f} 
+sysio\+::sub\+\_\+chain\+\_\+plugin\+::sub\+\_\+chain\+\_\+plugin (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sub__chain__plugin_8cpp_source_l00015}{15}} of file \mbox{\hyperlink{sub__chain__plugin_8cpp_source}{sub\+\_\+chain\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00015\ :\ my(\textcolor{keyword}{new}\ sub\_chain\_plugin\_impl())\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1sub__chain__plugin_a76ed451659f2eb0125e51f0cb0d1b87b}\index{sysio::sub\_chain\_plugin@{sysio::sub\_chain\_plugin}!````~sub\_chain\_plugin@{\texorpdfstring{$\sim$}{\string~}sub\_chain\_plugin}}
+\index{````~sub\_chain\_plugin@{\texorpdfstring{$\sim$}{\string~}sub\_chain\_plugin}!sysio::sub\_chain\_plugin@{sysio::sub\_chain\_plugin}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}sub\_chain\_plugin()}{\string~sub\_chain\_plugin()}}
+{\footnotesize\ttfamily \label{classsysio_1_1sub__chain__plugin_a76ed451659f2eb0125e51f0cb0d1b87b} 
+sysio\+::sub\+\_\+chain\+\_\+plugin\+::\texorpdfstring{$\sim$}{\string~}sub\+\_\+chain\+\_\+plugin (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{sub__chain__plugin_8cpp_source_l00016}{16}} of file \mbox{\hyperlink{sub__chain__plugin_8cpp_source}{sub\+\_\+chain\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00016\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1sub__chain__plugin_ae0ac286e18b19c360cd78c244967994d}\index{sysio::sub\_chain\_plugin@{sysio::sub\_chain\_plugin}!calculate\_s\_root@{calculate\_s\_root}}
+\index{calculate\_s\_root@{calculate\_s\_root}!sysio::sub\_chain\_plugin@{sysio::sub\_chain\_plugin}}
+\doxysubsubsection{\texorpdfstring{calculate\_s\_root()}{calculate\_s\_root()}}
+{\footnotesize\ttfamily \label{classsysio_1_1sub__chain__plugin_ae0ac286e18b19c360cd78c244967994d} 
+\mbox{\hyperlink{namespacesysio_1_1chain_a9c3cb5131331ed8d52a589437ccfb03e}{checksum256\+\_\+type}} sysio\+::sub\+\_\+chain\+\_\+plugin\+::calculate\+\_\+s\+\_\+root (\begin{DoxyParamCaption}\item[{const std\+::vector$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1transaction}{sysio\+::chain\+::transaction}} $>$ \&}]{transactions}{}\end{DoxyParamCaption})}
+
+Calculate the S-\/\+Root from a vector of relevant s-\/transactions.
+
+S-\/\+Root Fields (according to doc)
+\begin{DoxyItemize}
+\item Previous Block S-\/\+ID
+\item Current Block S-\/\+Root
+\end{DoxyItemize}
+
+
+\begin{DoxyParams}{Parameters}
+{\em transactions} & a vector of relevant s-\/transactions \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the merkle S-\/\+Root calculated from the orderd s-\/leaves 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{sub__chain__plugin_8cpp_source_l00084}{84}} of file \mbox{\hyperlink{sub__chain__plugin_8cpp_source}{sub\+\_\+chain\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00085\ \ \ \ \textcolor{comment}{//\ Build\ s-\/leaves\ from\ relevant\ s-\/transactions}}
+\DoxyCodeLine{00086\ \ \ \ vector<digest\_type>\ s\_leaves;}
+\DoxyCodeLine{00087\ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ trx\ :\ transactions\ )\{}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ s\_leaves.emplace\_back(\ trx.id()\ );}
+\DoxyCodeLine{00089\ \ \ \ \}}
+\DoxyCodeLine{00090\ \ \ \ \textcolor{comment}{//\ Create\ and\ return\ the\ merkle\ S-\/Root\ }}
+\DoxyCodeLine{00091\ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacesysio_1_1chain_a80d7ea5476f97bf51a25149b55469c40}{merkle}}(\ move(s\_leaves)\ );}
+\DoxyCodeLine{00092\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1sub__chain__plugin_ae0ac286e18b19c360cd78c244967994d_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1sub__chain__plugin_aa4668706e102033c7b63c08be2b834ef}\index{sysio::sub\_chain\_plugin@{sysio::sub\_chain\_plugin}!compute\_curr\_s\_id@{compute\_curr\_s\_id}}
+\index{compute\_curr\_s\_id@{compute\_curr\_s\_id}!sysio::sub\_chain\_plugin@{sysio::sub\_chain\_plugin}}
+\doxysubsubsection{\texorpdfstring{compute\_curr\_s\_id()}{compute\_curr\_s\_id()}}
+{\footnotesize\ttfamily \label{classsysio_1_1sub__chain__plugin_aa4668706e102033c7b63c08be2b834ef} 
+\mbox{\hyperlink{namespacesysio_1_1chain_a9c3cb5131331ed8d52a589437ccfb03e}{checksum256\+\_\+type}} sysio\+::sub\+\_\+chain\+\_\+plugin\+::compute\+\_\+curr\+\_\+s\+\_\+id (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_a9c3cb5131331ed8d52a589437ccfb03e}{sysio\+::chain\+::checksum256\+\_\+type}} \&}]{curr\+\_\+s\+\_\+root}{}\end{DoxyParamCaption})}
+
+Compute the new S-\/\+ID from the previous S-\/\+ID and the current S-\/\+Root.
+
+
+\begin{DoxyParams}{Parameters}
+{\em curr\+\_\+s\+\_\+root} & the current S-\/\+Root \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the new S-\/\+ID 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{sub__chain__plugin_8cpp_source_l00127}{127}} of file \mbox{\hyperlink{sub__chain__plugin_8cpp_source}{sub\+\_\+chain\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00128\ \ \ \ \ \textcolor{comment}{//\ ilog("{}Computing\ new\ S-\/ID\ from\ \(\backslash\)n\(\backslash\)tcurr\_s\_root:\ \$\{curr\_s\_root\}\(\backslash\)n\(\backslash\)t\$\{prev\_s\_id\}"{},\ ("{}curr\_s\_root"{},\ curr\_s\_root)("{}prev\_s\_id"{},\ my-\/>prev\_s\_id));}}
+\DoxyCodeLine{00129\ }
+\DoxyCodeLine{00130\ \ \ \ \ \textcolor{comment}{//\ Serialize\ both\ the\ previous\ S-\/ID\ and\ the\ current\ S-\/Root}}
+\DoxyCodeLine{00131\ \ \ \ \ \textcolor{keyword}{auto}\ data\ =\ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(std::make\_pair(my-\/>prev\_s\_id,\ curr\_s\_root));}
+\DoxyCodeLine{00132\ \ \ \ \ \textcolor{comment}{//\ Hash\ the\ serialized\ data\ to\ generate\ the\ new\ S-\/ID}}
+\DoxyCodeLine{00133\ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_a9c3cb5131331ed8d52a589437ccfb03e}{checksum256\_type}}\ curr\_s\_id\ =\ \mbox{\hyperlink{classfc_1_1sha256_a474784de7d6213b855abd7e952df5e36}{checksum256\_type::hash}}(data);}
+\DoxyCodeLine{00134\ }
+\DoxyCodeLine{00135\ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\textcolor{stringliteral}{"{}Computed\ interim\ S-\/ID:\ \$\{curr\_s\_id\}"{}},\ (\textcolor{stringliteral}{"{}curr\_s\_id"{}},\ curr\_s\_id));}
+\DoxyCodeLine{00136\ \ \ \ \ \textcolor{comment}{//\ Extract\ the\ block\ number\ from\ the\ previous\ S-\/ID\ and\ increment\ it\ by\ 1}}
+\DoxyCodeLine{00137\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ prev\_s\_block\_number\ =\ \mbox{\hyperlink{classsysio_1_1sub__chain__plugin_aa1aadd4174d2f23fd38bc235d14dc413}{sub\_chain\_plugin::extract\_s\_block\_number}}(my-\/>prev\_s\_id);}
+\DoxyCodeLine{00138\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ next\_s\_block\_number\ =\ prev\_s\_block\_number\ +\ 1;}
+\DoxyCodeLine{00139\ }
+\DoxyCodeLine{00140\ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\textcolor{stringliteral}{"{}Extracted\ prev\_s\_block\_number\ from\ prev\_s\_id:\ \$\{prev\_s\_block\_number\},\ next:\ \$\{next\_s\_block\_number\}"{}},\ }
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}prev\_s\_block\_number"{}},\ prev\_s\_block\_number)(\textcolor{stringliteral}{"{}next\_s\_block\_number"{}},\ next\_s\_block\_number));}
+\DoxyCodeLine{00142\ }
+\DoxyCodeLine{00143\ \ \ \ \ \textcolor{comment}{//\ Modify\ the\ first\ 4\ bytes\ directly}}
+\DoxyCodeLine{00144\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ next\_s\_block\_number\_reversed\ =\ \mbox{\hyperlink{namespacefc_afb668c55fd6ee73e1fcd67e77d8f6009}{fc::endian\_reverse\_u32}}(next\_s\_block\_number);}
+\DoxyCodeLine{00145\ \ \ \ \ std::memcpy(curr\_s\_id.data(),\ \&next\_s\_block\_number\_reversed,\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}));\ \textcolor{comment}{//\ Modify\ the\ first\ 4\ bytes}}
+\DoxyCodeLine{00146\ }
+\DoxyCodeLine{00147\ \ \ \ \ \textcolor{comment}{//\ ilog("{}Computed\ curr\_s\_id\ with\ block\ number\ embedded:\ \$\{c\}"{},\ ("{}c"{},\ curr\_s\_id.str()));}}
+\DoxyCodeLine{00148\ \ \ \ \ \textcolor{keywordflow}{return}\ curr\_s\_id;}
+\DoxyCodeLine{00149\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1sub__chain__plugin_aa4668706e102033c7b63c08be2b834ef_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1sub__chain__plugin_aa1aadd4174d2f23fd38bc235d14dc413}\index{sysio::sub\_chain\_plugin@{sysio::sub\_chain\_plugin}!extract\_s\_block\_number@{extract\_s\_block\_number}}
+\index{extract\_s\_block\_number@{extract\_s\_block\_number}!sysio::sub\_chain\_plugin@{sysio::sub\_chain\_plugin}}
+\doxysubsubsection{\texorpdfstring{extract\_s\_block\_number()}{extract\_s\_block\_number()}}
+{\footnotesize\ttfamily \label{classsysio_1_1sub__chain__plugin_aa1aadd4174d2f23fd38bc235d14dc413} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::sub\+\_\+chain\+\_\+plugin\+::extract\+\_\+s\+\_\+block\+\_\+number (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_a9c3cb5131331ed8d52a589437ccfb03e}{sysio\+::chain\+::checksum256\+\_\+type}} \&}]{s\+\_\+id}{}\end{DoxyParamCaption})}
+
+Extract the block number from an S-\/\+ID. Takes the 32 least-\/significant bits from the previous S-\/\+ID to get the previous S-\/\+Block number 
+\begin{DoxyParams}{Parameters}
+{\em s\+\_\+id} & the S-\/\+ID to extract the block number from \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the previous block number 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{sub__chain__plugin_8cpp_source_l00100}{100}} of file \mbox{\hyperlink{sub__chain__plugin_8cpp_source}{sub\+\_\+chain\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00101\ \textcolor{comment}{//\ \ \ \ auto\ s\_id\_data\ =\ s\_id.data();}}
+\DoxyCodeLine{00102\ \textcolor{comment}{//\ \ \ \ return\ fc::endian\_reverse\_u32(s\_id\_data[0]);}}
+\DoxyCodeLine{00103\ }
+\DoxyCodeLine{00104\ \ \ \ \ \textcolor{comment}{//\ Extract\ the\ pointer\ to\ the\ data\ from\ the\ checksum.}}
+\DoxyCodeLine{00105\ \ \ \ \ \textcolor{keyword}{auto}\ s\_id\_data\ =\ s\_id.\mbox{\hyperlink{classfc_1_1sha256_ab897537f6c524085b28049be51ed370d}{data}}();}
+\DoxyCodeLine{00106\ \ \ \ \ }
+\DoxyCodeLine{00107\ \ \ \ \ \textcolor{comment}{//\ Since\ we\ are\ dealing\ with\ a\ checksum256\_type,\ which\ is\ typically\ an\ array\ of\ bytes,}}
+\DoxyCodeLine{00108\ \ \ \ \ \textcolor{comment}{//\ we\ need\ to\ correctly\ handle\ the\ conversion\ to\ uint32\_t\ considering\ endianess.}}
+\DoxyCodeLine{00109\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ s\_block\_number;}
+\DoxyCodeLine{00110\ \ \ \ \ }
+\DoxyCodeLine{00111\ \ \ \ \ \textcolor{comment}{//\ Copy\ the\ first\ 4\ bytes\ of\ the\ data\ into\ a\ uint32\_t\ variable.}}
+\DoxyCodeLine{00112\ \ \ \ \ \textcolor{comment}{//\ memcpy\ ensures\ that\ we\ handle\ any\ alignment\ issues.}}
+\DoxyCodeLine{00113\ \ \ \ \ std::memcpy(\&s\_block\_number,\ s\_id\_data,\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}));}
+\DoxyCodeLine{00114\ }
+\DoxyCodeLine{00115\ \ \ \ \ \textcolor{comment}{//\ Reverse\ the\ endianess\ if\ necessary.}}
+\DoxyCodeLine{00116\ \ \ \ \ \textcolor{comment}{//\ You\ might\ need\ to\ adjust\ this\ based\ on\ how\ the\ data\ is\ stored\ (big-\/endian\ vs\ little-\/endian).}}
+\DoxyCodeLine{00117\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_afb668c55fd6ee73e1fcd67e77d8f6009}{fc::endian\_reverse\_u32}}(s\_block\_number);}
+\DoxyCodeLine{00118\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1sub__chain__plugin_aa1aadd4174d2f23fd38bc235d14dc413_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1sub__chain__plugin_aa1aadd4174d2f23fd38bc235d14dc413_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1sub__chain__plugin_aaac3c80301ede51c90d925992bc14c7c}\index{sysio::sub\_chain\_plugin@{sysio::sub\_chain\_plugin}!find\_relevant\_transactions@{find\_relevant\_transactions}}
+\index{find\_relevant\_transactions@{find\_relevant\_transactions}!sysio::sub\_chain\_plugin@{sysio::sub\_chain\_plugin}}
+\doxysubsubsection{\texorpdfstring{find\_relevant\_transactions()}{find\_relevant\_transactions()}}
+{\footnotesize\ttfamily \label{classsysio_1_1sub__chain__plugin_aaac3c80301ede51c90d925992bc14c7c} 
+std\+::vector$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1transaction}{sysio\+::chain\+::transaction}} $>$ sysio\+::sub\+\_\+chain\+\_\+plugin\+::find\+\_\+relevant\+\_\+transactions (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classsysio_1_1chain_1_1controller}{sysio\+::chain\+::controller}} \&}]{curr\+\_\+chain}{}\end{DoxyParamCaption})}
+
+Find transactions that are relevant for the S-\/\+Root calculation. 
+\begin{DoxyParams}{Parameters}
+{\em chain} & the active chain controller \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a vector of transactions deemed relevant 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{sub__chain__plugin_8cpp_source_l00156}{156}} of file \mbox{\hyperlink{sub__chain__plugin_8cpp_source}{sub\+\_\+chain\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00157\ \ \ \ \ std::vector<sysio::chain::transaction>\ relevant\_transactions;}
+\DoxyCodeLine{00158\ \ \ \ \ \textcolor{keyword}{auto}\&\ pending\_trx\_receipts\ =\ curr\_chain.\mbox{\hyperlink{classsysio_1_1chain_1_1controller_ad6f4e938fb4b051c1d6b6c5cede09c76}{get\_pending\_trx\_receipts}}();\ \textcolor{comment}{//\ Access\ pending\ transactions\ directly}}
+\DoxyCodeLine{00159\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ trx\_receipt\ :\ pending\_trx\_receipts)\ \{}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (std::holds\_alternative<sysio::chain::packed\_transaction>(trx\_receipt.trx))\ \{}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ packed\_trx\ =\ std::get<sysio::chain::packed\_transaction>(trx\_receipt.trx);}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ trx\ =\ packed\_trx.get\_transaction();}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classsysio_1_1sub__chain__plugin_a797b6336604834b7adcec0c1d865dc4f}{is\_relevant\_s\_root\_transaction}}(trx))\ \{}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ relevant\_transactions.push\_back(trx);}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00167\ \ \ \ \ \}}
+\DoxyCodeLine{00168\ \ \ \ \ \textcolor{keywordflow}{return}\ relevant\_transactions;}
+\DoxyCodeLine{00169\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1sub__chain__plugin_aaac3c80301ede51c90d925992bc14c7c_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1sub__chain__plugin_aaac3c80301ede51c90d925992bc14c7c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1sub__chain__plugin_a336cfd3a895443141f1df5d6578b8afe}\index{sysio::sub\_chain\_plugin@{sysio::sub\_chain\_plugin}!get\_contract\_name@{get\_contract\_name}}
+\index{get\_contract\_name@{get\_contract\_name}!sysio::sub\_chain\_plugin@{sysio::sub\_chain\_plugin}}
+\doxysubsubsection{\texorpdfstring{get\_contract\_name()}{get\_contract\_name()}}
+{\footnotesize\ttfamily \label{classsysio_1_1sub__chain__plugin_a336cfd3a895443141f1df5d6578b8afe} 
+\mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} \& sysio\+::sub\+\_\+chain\+\_\+plugin\+::get\+\_\+contract\+\_\+name (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{sub__chain__plugin_8cpp_source_l00062}{62}} of file \mbox{\hyperlink{sub__chain__plugin_8cpp_source}{sub\+\_\+chain\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00063\ \ \ \ \textcolor{keywordflow}{return}\ my-\/>contract\_name;}
+\DoxyCodeLine{00064\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1sub__chain__plugin_a859210844da256487c6ca3b93cfc028c}\index{sysio::sub\_chain\_plugin@{sysio::sub\_chain\_plugin}!get\_prev\_s\_id@{get\_prev\_s\_id}}
+\index{get\_prev\_s\_id@{get\_prev\_s\_id}!sysio::sub\_chain\_plugin@{sysio::sub\_chain\_plugin}}
+\doxysubsubsection{\texorpdfstring{get\_prev\_s\_id()}{get\_prev\_s\_id()}}
+{\footnotesize\ttfamily \label{classsysio_1_1sub__chain__plugin_a859210844da256487c6ca3b93cfc028c} 
+\mbox{\hyperlink{namespacesysio_1_1chain_a9c3cb5131331ed8d52a589437ccfb03e}{checksum256\+\_\+type}} \& sysio\+::sub\+\_\+chain\+\_\+plugin\+::get\+\_\+prev\+\_\+s\+\_\+id (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{sub__chain__plugin_8cpp_source_l00065}{65}} of file \mbox{\hyperlink{sub__chain__plugin_8cpp_source}{sub\+\_\+chain\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00066\ \ \ \ \textcolor{keywordflow}{return}\ my-\/>prev\_s\_id;}
+\DoxyCodeLine{00067\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1sub__chain__plugin_a859210844da256487c6ca3b93cfc028c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1sub__chain__plugin_a797b6336604834b7adcec0c1d865dc4f}\index{sysio::sub\_chain\_plugin@{sysio::sub\_chain\_plugin}!is\_relevant\_s\_root\_transaction@{is\_relevant\_s\_root\_transaction}}
+\index{is\_relevant\_s\_root\_transaction@{is\_relevant\_s\_root\_transaction}!sysio::sub\_chain\_plugin@{sysio::sub\_chain\_plugin}}
+\doxysubsubsection{\texorpdfstring{is\_relevant\_s\_root\_transaction()}{is\_relevant\_s\_root\_transaction()}}
+{\footnotesize\ttfamily \label{classsysio_1_1sub__chain__plugin_a797b6336604834b7adcec0c1d865dc4f} 
+bool sysio\+::sub\+\_\+chain\+\_\+plugin\+::is\+\_\+relevant\+\_\+s\+\_\+root\+\_\+transaction (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1transaction}{sysio\+::chain\+::transaction}} \&}]{trx}{}\end{DoxyParamCaption})}
+
+Determine if a transaction is relevant to the S-\/\+Root process. 
+\begin{DoxyParams}{Parameters}
+{\em trx} & the transaction to check \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true if relevant, false otherwise 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{sub__chain__plugin_8cpp_source_l00176}{176}} of file \mbox{\hyperlink{sub__chain__plugin_8cpp_source}{sub\+\_\+chain\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00177\ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{structaction}{action}}\ :\ trx.\mbox{\hyperlink{structsysio_1_1chain_1_1transaction_a407fcf1868b81bb30b85f80d388bbac2}{actions}})\ \{}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structaction}{action}}.account\ ==\ my-\/>contract\_name\ \&\&\ std::find(my-\/>action\_names.begin(),\ my-\/>action\_names.end(),\ \mbox{\hyperlink{structaction}{action}}.name)\ !=\ my-\/>action\_names.end())\{}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00181\ \ \ \ \}}
+\DoxyCodeLine{00182\ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00183\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1sub__chain__plugin_a797b6336604834b7adcec0c1d865dc4f_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1sub__chain__plugin_a6dd5ccc3932d3f377871be7f3405999a}\index{sysio::sub\_chain\_plugin@{sysio::sub\_chain\_plugin}!plugin\_initialize@{plugin\_initialize}}
+\index{plugin\_initialize@{plugin\_initialize}!sysio::sub\_chain\_plugin@{sysio::sub\_chain\_plugin}}
+\doxysubsubsection{\texorpdfstring{plugin\_initialize()}{plugin\_initialize()}}
+{\footnotesize\ttfamily \label{classsysio_1_1sub__chain__plugin_a6dd5ccc3932d3f377871be7f3405999a} 
+void sysio\+::sub\+\_\+chain\+\_\+plugin\+::plugin\+\_\+initialize (\begin{DoxyParamCaption}\item[{const variables\+\_\+map \&}]{options}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sub__chain__plugin_8cpp_source_l00023}{23}} of file \mbox{\hyperlink{sub__chain__plugin_8cpp_source}{sub\+\_\+chain\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00024\ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.count(\textcolor{stringliteral}{"{}s-\/chain-\/contract"{}})\ ||\ !\mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.count(\textcolor{stringliteral}{"{}s-\/chain-\/actions"{}}))\ \{}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\textcolor{keyword}{false},\ plugin\_config\_exception,\ \textcolor{stringliteral}{"{}sub\_chain\_plugin\ requires\ both\ -\/-\/s-\/chain-\/contract\ and\ -\/-\/s-\/chain-\/actions\ to\ be\ set"{}});}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ std::string\ contract\_name\_str\ =\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.at(\textcolor{stringliteral}{"{}s-\/chain-\/contract"{}}).as<std::string>();}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ my-\/>contract\_name\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{sysio::chain::name}}(contract\_name\_str);\ \ \textcolor{comment}{//\ Convert\ std::string\ to\ sysio::chain::name}}
+\DoxyCodeLine{00031\ }
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ std::vector<std::string>\ actions\ =\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.at(\textcolor{stringliteral}{"{}s-\/chain-\/actions"{}}).as<std::vector<std::string>>();}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ my-\/>action\_names.clear();}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ std::string\&\ \mbox{\hyperlink{namespacesysio_1_1chain_a7a1685bcc352cda9e45f055932069428}{action\_name}}\ :\ actions)\ \{}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \ \ \ my-\/>action\_names.push\_back(\mbox{\hyperlink{structsysio_1_1chain_1_1name}{sysio::chain::name}}(\mbox{\hyperlink{namespacesysio_1_1chain_a7a1685bcc352cda9e45f055932069428}{action\_name}}));\ \ \textcolor{comment}{//\ Convert\ std::string\ to\ action\_name}}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \textcolor{comment}{//\ my-\/>chain\_plug\ =\ app().find\_plugin<chain\_plugin>();}}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \textcolor{comment}{//\ SYS\_ASSERT(\ my-\/>chain\_plug,\ chain::missing\_chain\_plugin\_exception,\ "{}"{}\ \ );}}
+\DoxyCodeLine{00040\ }
+\DoxyCodeLine{00041\ \ \ \ \}\ \mbox{\hyperlink{exception_8hpp_ae70bfa24f5a3bc0917382b3c17fc033c}{FC\_LOG\_AND\_RETHROW}}()}
+\DoxyCodeLine{00042\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1sub__chain__plugin_a3874baf0a8be3ff358ecf00fb64c239f}\index{sysio::sub\_chain\_plugin@{sysio::sub\_chain\_plugin}!plugin\_shutdown@{plugin\_shutdown}}
+\index{plugin\_shutdown@{plugin\_shutdown}!sysio::sub\_chain\_plugin@{sysio::sub\_chain\_plugin}}
+\doxysubsubsection{\texorpdfstring{plugin\_shutdown()}{plugin\_shutdown()}}
+{\footnotesize\ttfamily \label{classsysio_1_1sub__chain__plugin_a3874baf0a8be3ff358ecf00fb64c239f} 
+void sysio\+::sub\+\_\+chain\+\_\+plugin\+::plugin\+\_\+shutdown (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sub__chain__plugin_8cpp_source_l00057}{57}} of file \mbox{\hyperlink{sub__chain__plugin_8cpp_source}{sub\+\_\+chain\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00058\ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\textcolor{stringliteral}{"{}sub\_chain\_plugin\ shutting\ down"{}});}
+\DoxyCodeLine{00059\ \ \ \ \ \textcolor{comment}{//\ Cleanup\ code}}
+\DoxyCodeLine{00060\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1sub__chain__plugin_a9f4bb7aed179e23b6a4fd82f1f5abecf}\index{sysio::sub\_chain\_plugin@{sysio::sub\_chain\_plugin}!plugin\_startup@{plugin\_startup}}
+\index{plugin\_startup@{plugin\_startup}!sysio::sub\_chain\_plugin@{sysio::sub\_chain\_plugin}}
+\doxysubsubsection{\texorpdfstring{plugin\_startup()}{plugin\_startup()}}
+{\footnotesize\ttfamily \label{classsysio_1_1sub__chain__plugin_a9f4bb7aed179e23b6a4fd82f1f5abecf} 
+void sysio\+::sub\+\_\+chain\+\_\+plugin\+::plugin\+\_\+startup (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sub__chain__plugin_8cpp_source_l00043}{43}} of file \mbox{\hyperlink{sub__chain__plugin_8cpp_source}{sub\+\_\+chain\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00044\ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\textcolor{stringliteral}{"{}sub\_chain\_plugin\ starting\ up,\ adding\ /v3/sub\_chain/get\_last\_s\_id"{}});}
+\DoxyCodeLine{00045\ }
+\DoxyCodeLine{00046\ \ \ \ \ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_a3c4b68a0667942b58f1369f454ce0ce3}{get\_plugin}}<http\_plugin>().add\_api(\{}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \{\textcolor{stringliteral}{"{}/v3/sub\_chain/get\_last\_s\_id"{}},\ [\textcolor{keyword}{this}](\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}},\ \textcolor{keywordtype}{string}\ body,\ \textcolor{keyword}{auto}\ cb)\ \{\ \textcolor{comment}{//\ Ensure\ correct\ use\ of\ auto\ for\ callback\ type\ inference}}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_a9c3cb5131331ed8d52a589437ccfb03e}{checksum256\_type}}\ last\_s\_id\ =\ \mbox{\hyperlink{classsysio_1_1sub__chain__plugin_a859210844da256487c6ca3b93cfc028c}{get\_prev\_s\_id}}();}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ cb(200,\ last\_s\_id.str());\ }
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\mbox{\hyperlink{classfc_1_1exception}{fc::exception}}\&\ e)\ \{}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ cb(500,\ \textcolor{stringliteral}{"{}\{\(\backslash\)"{}error\(\backslash\)"{}:\ \(\backslash\)"{}internal\_error\(\backslash\)"{},\ \(\backslash\)"{}details\(\backslash\)"{}:\ \(\backslash\)"{}"{}}\ +\ e.\mbox{\hyperlink{classfc_1_1exception_a7611ea8fbe25dde56649b685c2298a37}{to\_detail\_string}}()\ +\ \textcolor{stringliteral}{"{}\(\backslash\)"{}\}"{}});}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \}\}}
+\DoxyCodeLine{00055\ \ \ \ \ \});}
+\DoxyCodeLine{00056\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1sub__chain__plugin_a9f4bb7aed179e23b6a4fd82f1f5abecf_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1sub__chain__plugin_a6e2741ccffb9b3d1c62642e8d01469c2}\index{sysio::sub\_chain\_plugin@{sysio::sub\_chain\_plugin}!set\_program\_options@{set\_program\_options}}
+\index{set\_program\_options@{set\_program\_options}!sysio::sub\_chain\_plugin@{sysio::sub\_chain\_plugin}}
+\doxysubsubsection{\texorpdfstring{set\_program\_options()}{set\_program\_options()}}
+{\footnotesize\ttfamily \label{classsysio_1_1sub__chain__plugin_a6e2741ccffb9b3d1c62642e8d01469c2} 
+void sysio\+::sub\+\_\+chain\+\_\+plugin\+::set\+\_\+program\+\_\+options (\begin{DoxyParamCaption}\item[{options\+\_\+description \&}]{}{, }\item[{options\+\_\+description \&}]{cfg}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classappbase_1_1abstract__plugin_a274a3c7462de3c699a8eb23741ed7655}{appbase\+::abstract\+\_\+plugin}}.
+
+
+
+Definition at line \mbox{\hyperlink{sub__chain__plugin_8cpp_source_l00018}{18}} of file \mbox{\hyperlink{sub__chain__plugin_8cpp_source}{sub\+\_\+chain\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00019\ \ \ \ \ cfg.add\_options()}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}s-\/chain-\/contract"{}},\ bpo::value<std::string>()-\/>default\_value(\textcolor{stringliteral}{"{}settle.wns"{}}),\ \textcolor{stringliteral}{"{}Contract\ name\ for\ identifying\ relevant\ S-\/transactions."{}})}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}s-\/chain-\/actions"{}},\ bpo::value<std::vector<std::string>>()-\/>composing(),\ \textcolor{stringliteral}{"{}List\ of\ action\ names\ for\ relevant\ S-\/transactions\ for\ a\ given\ s-\/chain-\/contract"{}});}
+\DoxyCodeLine{00022\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1sub__chain__plugin_a9a8596ad0ebba9548494df94c00e0a99}\index{sysio::sub\_chain\_plugin@{sysio::sub\_chain\_plugin}!update\_prev\_s\_id@{update\_prev\_s\_id}}
+\index{update\_prev\_s\_id@{update\_prev\_s\_id}!sysio::sub\_chain\_plugin@{sysio::sub\_chain\_plugin}}
+\doxysubsubsection{\texorpdfstring{update\_prev\_s\_id()}{update\_prev\_s\_id()}}
+{\footnotesize\ttfamily \label{classsysio_1_1sub__chain__plugin_a9a8596ad0ebba9548494df94c00e0a99} 
+void sysio\+::sub\+\_\+chain\+\_\+plugin\+::update\+\_\+prev\+\_\+s\+\_\+id (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_a9c3cb5131331ed8d52a589437ccfb03e}{sysio\+::chain\+::checksum256\+\_\+type}} \&}]{new\+\_\+s\+\_\+id}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sub__chain__plugin_8cpp_source_l00068}{68}} of file \mbox{\hyperlink{sub__chain__plugin_8cpp_source}{sub\+\_\+chain\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00069\ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\textcolor{stringliteral}{"{}Updating\ OLD\ prev\_s\_id:\ \(\backslash\)t\$\{prev\_s\_id\}"{}},\ (\textcolor{stringliteral}{"{}prev\_s\_id"{}},\ my-\/>prev\_s\_id));}
+\DoxyCodeLine{00070\ \ \ \ my-\/>prev\_s\_id\ =\ new\_s\_id;}
+\DoxyCodeLine{00071\ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\textcolor{stringliteral}{"{}Updated\ \ NEW\ prev\_s\_id:\ \(\backslash\)t\$\{prev\_s\_id\}"{}},\ (\textcolor{stringliteral}{"{}prev\_s\_id"{}},\ my-\/>prev\_s\_id));}
+\DoxyCodeLine{00072\ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+plugins/sub\+\_\+chain\+\_\+plugin/include/sysio/sub\+\_\+chain\+\_\+plugin/\mbox{\hyperlink{sub__chain__plugin_8hpp}{sub\+\_\+chain\+\_\+plugin.\+hpp}}\item 
+plugins/sub\+\_\+chain\+\_\+plugin/\mbox{\hyperlink{sub__chain__plugin_8cpp}{sub\+\_\+chain\+\_\+plugin.\+cpp}}\end{DoxyCompactItemize}

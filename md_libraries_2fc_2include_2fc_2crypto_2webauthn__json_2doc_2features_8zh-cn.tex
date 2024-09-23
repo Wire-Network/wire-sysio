@@ -1,0 +1,173 @@
+\chapter{特点}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2features_8zh-cn}{}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2features_8zh-cn}\index{特点@{特点}}
+\doxysection*{总体}
+
+
+\begin{DoxyItemize}
+\item 跨平台
+\begin{DoxyItemize}
+\item 编译器：\+Visual Studio、gcc、clang 等
+\item 架构：x86、x64、\+ARM 等
+\item 操作系统：\+Windows、\+Mac OS X、\+Linux、i\+OS、\+Android 等
+\end{DoxyItemize}
+\item 容易安装
+\begin{DoxyItemize}
+\item 只有头文件的库。只需把头文件复制至你的项目中。
+\end{DoxyItemize}
+\item 独立、最小依赖
+\begin{DoxyItemize}
+\item 不需依赖 STL、\+BOOST 等。
+\item 只包含 {\ttfamily \texorpdfstring{$<$}{<}cstdio\texorpdfstring{$>$}{>}}, {\ttfamily \texorpdfstring{$<$}{<}cstdlib\texorpdfstring{$>$}{>}}, {\ttfamily \texorpdfstring{$<$}{<}cstring\texorpdfstring{$>$}{>}}, {\ttfamily \texorpdfstring{$<$}{<}\doxylink{inttypes_8h}{inttypes.\+h}\texorpdfstring{$>$}{>}}, {\ttfamily \texorpdfstring{$<$}{<}new\texorpdfstring{$>$}{>}}, {\ttfamily \texorpdfstring{$<$}{<}\doxylink{stdint_8h}{stdint.\+h}\texorpdfstring{$>$}{>}}。
+\end{DoxyItemize}
+\item 没使用 C++ 异常、\+RTTI
+\item 高性能
+\begin{DoxyItemize}
+\item 使用模版及内联函数去降低函数调用开销。
+\item 内部经优化的 Grisu2 及浮点数解析实现。
+\item 可选的 SSE2/\+SSE4.\+2 支持。
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+\doxysection*{符合标准}
+
+
+\begin{DoxyItemize}
+\item Rapid\+JSON 应完全符合 RFC4627/\+ECMA-\/404 标准。
+\item 支持 JSON Pointer (RFC6901).
+\item 支持 JSON \doxylink{class_schema}{Schema} Draft v4.
+\item 支持 Unicode 代理对（surrogate pair）。
+\item 支持空字符（{\ttfamily "{}\textbackslash{}u0000"{}}）。
+\begin{DoxyItemize}
+\item 例如，可以优雅地解析及处理 {\ttfamily \mbox{[}"{}\+Hello\textbackslash{}u0000\+World"{}\mbox{]}}。含读写字符串长度的 API。
+\end{DoxyItemize}
+\item 支持可选的放宽语法
+\begin{DoxyItemize}
+\item 单行（{\ttfamily // ...}）及多行（{\ttfamily /\texorpdfstring{$\ast$}{*} ... \texorpdfstring{$\ast$}{*}/}） 注释 ({\ttfamily k\+Parse\+Comments\+Flag})。
+\item 在对象和数组结束前含逗号 ({\ttfamily k\+Parse\+Trailing\+Commas\+Flag})。
+\item {\ttfamily NaN}、{\ttfamily Inf}、{\ttfamily Infinity}、{\ttfamily -\/Inf} 及 {\ttfamily -\/Infinity} 作为 {\ttfamily double} 值 ({\ttfamily k\+Parse\+Nan\+And\+Inf\+Flag})
+\end{DoxyItemize}
+\item \href{https://github.com/Tencent/rapidjson/blob/master/doc/npm.md}{\texttt{ NPM 兼容}}.
+\end{DoxyItemize}
+
+\doxysection*{Unicode}
+
+
+\begin{DoxyItemize}
+\item 支持 UTF-\/8、\+UTF-\/16、\+UTF-\/32 编码，包括小端序和大端序。
+\begin{DoxyItemize}
+\item 这些编码用于输入输出流，以及内存中的表示。
+\end{DoxyItemize}
+\item 支持从输入流自动检测编码。
+\item 内部支持编码的转换。
+\begin{DoxyItemize}
+\item 例如，你可以读取一个 UTF-\/8 文件，让 Rapid\+JSON 把 JSON 字符串转换至 UTF-\/16 的 DOM。
+\end{DoxyItemize}
+\item 内部支持编码校验。
+\begin{DoxyItemize}
+\item 例如，你可以读取一个 UTF-\/8 文件，让 Rapid\+JSON 检查是否所有 JSON 字符串是合法的 UTF-\/8 字节序列。
+\end{DoxyItemize}
+\item 支持自定义的字符类型。
+\begin{DoxyItemize}
+\item 预设的字符类型是：\+UTF-\/8 为 {\ttfamily char}，\+UTF-\/16 为 {\ttfamily wchar\+\_\+t}，\+UTF32 为 {\ttfamily uint32\+\_\+t}。
+\end{DoxyItemize}
+\item 支持自定义的编码。
+\end{DoxyItemize}
+
+\doxysection*{API 风格}
+
+
+\begin{DoxyItemize}
+\item SAX（\+Simple API for XML）风格 API
+\begin{DoxyItemize}
+\item 类似于 \href{http://en.wikipedia.org/wiki/Simple_API_for_XML}{\texttt{ SAX}}, Rapid\+JSON 提供一个事件循序访问的解析器 API（{\ttfamily rapidjson\+::\+Generic\+Reader}）。\+Rapid\+JSON 也提供一个生成器 API（{\ttfamily rapidjson\+::\+Writer}），可以处理相同的事件集合。
+\end{DoxyItemize}
+\item DOM（\+Document Object Model）风格 API
+\begin{DoxyItemize}
+\item 类似于 HTML／\+XML 的 \href{http://en.wikipedia.org/wiki/Document_Object_Model}{\texttt{ DOM}}，\+Rapid\+JSON 可把 JSON 解析至一个 DOM 表示方式（{\ttfamily rapidjson\+::\+Generic\+Document}），以方便操作。如有需要，可把 DOM 转换（stringify）回 JSON。
+\item DOM 风格 API（{\ttfamily rapidjson\+::\+Generic\+Document}）实际上是由 SAX 风格 API（{\ttfamily rapidjson\+::\+Generic\+Reader}）实现的。\+SAX 更快，但有时 DOM 更易用。用户可根据情况作出选择。
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+\doxysection*{解析}
+
+
+\begin{DoxyItemize}
+\item 递归式（预设）及迭代式解析器
+\begin{DoxyItemize}
+\item 递归式解析器较快，但在极端情况下可出现堆栈溢出。
+\item 迭代式解析器使用自定义的堆栈去维持解析状态。
+\end{DoxyItemize}
+\item 支持原位（\texorpdfstring{$\ast$}{*}in situ\texorpdfstring{$\ast$}{*}）解析。
+\begin{DoxyItemize}
+\item 把 JSON 字符串的值解析至原 JSON 之中，然后让 DOM 指向那些字符串。
+\item 比常规分析更快：不需字符串的内存分配、不需复制（如字符串不含转义符）、缓存友好。
+\end{DoxyItemize}
+\item 对于 JSON 数字类型，支持 32-\/bit/64-\/bit 的有号／无号整数，以及 {\ttfamily double}。
+\item 错误处理
+\begin{DoxyItemize}
+\item 支持详尽的解析错误代号。
+\item 支持本地化错误信息。
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+\doxysection*{DOM (Document)}
+
+
+\begin{DoxyItemize}
+\item Rapid\+JSON 在类型转换时会检查数值的范围。
+\item 字符串字面量的优化
+\begin{DoxyItemize}
+\item 只储存指针，不作复制
+\end{DoxyItemize}
+\item 优化“短”字符串
+\begin{DoxyItemize}
+\item 在 {\ttfamily Value} 内储存短字符串，无需额外分配。
+\item 对 UTF-\/8 字符串来说，32 位架构下可存储最多 11 字符，64 位下 21 字符（x86-\/64 下 13 字符）。
+\end{DoxyItemize}
+\item 可选地支持 {\ttfamily std\+::string}（定义 {\ttfamily RAPIDJSON\+\_\+\+HAS\+\_\+\+STDSTRING=1}）
+\end{DoxyItemize}
+
+\doxysection*{生成}
+
+
+\begin{DoxyItemize}
+\item 支持 {\ttfamily rapidjson\+::\+Pretty\+Writer} 去加入换行及缩进。
+\end{DoxyItemize}
+
+\doxysection*{输入输出流}
+
+
+\begin{DoxyItemize}
+\item 支持 {\ttfamily rapidjson\+::\+Generic\+String\+Buffer}，把输出的 JSON 储存于字符串内。
+\item 支持 {\ttfamily rapidjson\+::\+File\+Read\+Stream} 及 {\ttfamily rapidjson\+::\+File\+Write\+Stream}，使用 {\ttfamily FILE} 对象作输入输出。
+\item 支持自定义输入输出流。
+\end{DoxyItemize}
+
+\doxysection*{内存}
+
+
+\begin{DoxyItemize}
+\item 最小化 DOM 的内存开销。
+\begin{DoxyItemize}
+\item 对大部分 32／64 位机器而言，每个 JSON 值只占 16 或 20 字节（不包含字符串）。
+\end{DoxyItemize}
+\item 支持快速的预设分配器。
+\begin{DoxyItemize}
+\item 它是一个堆栈形式的分配器（顺序分配，不容许单独释放，适合解析过程之用）。
+\item 使用者也可提供一个预分配的缓冲区。（有可能达至无需 CRT 分配就能解析多个 JSON）
+\end{DoxyItemize}
+\item 支持标准 CRT（\+C-\/runtime）分配器。
+\item 支持自定义分配器。
+\end{DoxyItemize}
+
+\doxysection*{其他}
+
+
+\begin{DoxyItemize}
+\item 一些 C++11 的支持（可选）
+\begin{DoxyItemize}
+\item 右值引用（rvalue reference）
+\item {\ttfamily noexcept} 修饰符
+\item 范围 for 循环 
+\end{DoxyItemize}
+\end{DoxyItemize}

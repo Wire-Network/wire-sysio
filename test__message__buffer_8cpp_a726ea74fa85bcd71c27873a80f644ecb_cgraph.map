@@ -1,0 +1,18 @@
+<map id="BOOST_AUTO_TEST_CASE" name="BOOST_AUTO_TEST_CASE">
+<area shape="rect" id="Node000001" title="Test default construction and buffer sequence generation." alt="" coords="5,169,202,194"/>
+<area shape="rect" id="Node000002" href="$classfc_1_1message__buffer.html#a22920e143abfb93de992f9a14607dea9" title=" " alt="" coords="261,5,394,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="116,166,171,115,208,85,248,57,258,51,260,56,251,61,212,89,174,119,120,170"/>
+<area shape="rect" id="Node000004" href="$classfc_1_1message__buffer.html#af4540535b3ef876e42631178c997e59b" title=" " alt="" coords="261,71,394,111"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="137,166,261,115,263,120,139,171"/>
+<area shape="rect" id="Node000005" href="$classfc_1_1message__buffer.html#ae7bf97576095b33852c68dbc3cd7737e" title=" " alt="" coords="478,99,612,139"/>
+<area shape="poly" id="edge7_Node000001_Node000005" title=" " alt="" coords="199,166,463,128,464,133,199,171"/>
+<area shape="rect" id="Node000006" href="$classfc_1_1message__buffer.html#a7d14c84a452f14a0616f90cc3771efa9" title=" " alt="" coords="250,186,406,242"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="199,193,235,198,234,203,198,198"/>
+<area shape="rect" id="Node000007" href="$classfc_1_1message__buffer.html#afa923dc3e69fb4409903c141e2e35a62" title=" " alt="" coords="261,265,394,306"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="131,193,251,251,262,256,260,261,249,256,129,197"/>
+<area shape="rect" id="Node000008" href="$classfc_1_1message__buffer.html#a379d7b684cb512d44740c1e8731348d4" title=" " alt="" coords="261,331,394,371"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="118,193,172,250,210,285,251,315,260,321,257,325,248,320,207,289,168,254,114,197"/>
+<area shape="rect" id="Node000003" href="$classfc_1_1message__buffer.html#a00128a76bfce283e52ceebd61c30a544" title=" " alt="" coords="454,5,636,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="395,23,438,23,438,28,395,28"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="395,97,464,106,463,111,394,102"/>
+</map>

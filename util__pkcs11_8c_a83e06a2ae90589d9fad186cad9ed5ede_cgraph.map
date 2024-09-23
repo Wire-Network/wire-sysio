@@ -1,0 +1,15 @@
+<map id="check_wrap_mechanism" name="check_wrap_mechanism">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,171,31"/>
+<area shape="rect" id="Node000002" href="$util__pkcs11_8c.html#a064731f36eb972f687b4059dc5f340db" title=" " alt="" coords="219,5,356,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="171,16,204,16,204,21,171,21"/>
+<area shape="rect" id="Node000003" href="$yubihsm__pkcs11_8c.html#ae785d5badbf1f08b491af31f32a135a1" title=" " alt="" coords="800,7,871,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="356,15,746,16,784,16,784,21,746,21,356,21"/>
+<area shape="rect" id="Node000004" href="$yubihsm_8c.html#a6ab558e1426359cc78e7a362f8b3acd9" title=" " alt="" coords="404,31,561,56"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="357,24,389,29,388,34,356,30"/>
+<area shape="rect" id="Node000005" href="$yubihsm_8c.html#a799e299be8d4c13dfa2112a60d05480d" title=" " alt="" coords="609,31,746,56"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="562,41,593,41,593,46,562,46"/>
+<area shape="rect" id="Node000006" href="$lib_2error_8c.html#a238eedb1e27dbff2a0ab9a3932eb3f8b" title=" " alt="" coords="794,56,877,82"/>
+<area shape="poly" id="edge7_Node000004_Node000006" title=" " alt="" coords="539,54,610,66,698,71,778,69,778,75,698,76,609,71,538,60"/>
+<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="746,30,784,25,785,30,746,36"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="746,52,779,57,778,62,746,57"/>
+</map>

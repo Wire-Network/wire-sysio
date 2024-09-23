@@ -1,0 +1,226 @@
+\doxysection{sysio\+::resource\+\_\+monitor\+\_\+plugin\+\_\+impl Class Reference}
+\hypertarget{classsysio_1_1resource__monitor__plugin__impl}{}\label{classsysio_1_1resource__monitor__plugin__impl}\index{sysio::resource\_monitor\_plugin\_impl@{sysio::resource\_monitor\_plugin\_impl}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classsysio_1_1resource__monitor__plugin__impl_ac0bf91535f24c4fdfbfe55e1dbd13139}{resource\+\_\+monitor\+\_\+plugin\+\_\+impl}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1resource__monitor__plugin__impl_a72bffc3828b3c596d680d57271dccdea}{set\+\_\+program\+\_\+options}} (options\+\_\+description \&, options\+\_\+description \&cfg)
+\item 
+void \mbox{\hyperlink{classsysio_1_1resource__monitor__plugin__impl_a0660c265b1bb7600e647c61087be62da}{plugin\+\_\+initialize}} (const appbase\+::variables\+\_\+map \&options)
+\item 
+void \mbox{\hyperlink{classsysio_1_1resource__monitor__plugin__impl_ae06c885da6f082b29ca5b5ff8c5724e4}{plugin\+\_\+startup}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1resource__monitor__plugin__impl_afb3fda25f6f91bb22d539fd8df00d8e2}{plugin\+\_\+shutdown}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1resource__monitor__plugin__impl_a8f86e65106c603d0afa743a2114d96ef}{monitor\+\_\+directory}} (const bfs\+::path \&\mbox{\hyperlink{classfc_1_1path}{path}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{resource__monitor__plugin_8cpp_source_l00040}{40}} of file \mbox{\hyperlink{resource__monitor__plugin_8cpp_source}{resource\+\_\+monitor\+\_\+plugin.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classsysio_1_1resource__monitor__plugin__impl_ac0bf91535f24c4fdfbfe55e1dbd13139}\index{sysio::resource\_monitor\_plugin\_impl@{sysio::resource\_monitor\_plugin\_impl}!resource\_monitor\_plugin\_impl@{resource\_monitor\_plugin\_impl}}
+\index{resource\_monitor\_plugin\_impl@{resource\_monitor\_plugin\_impl}!sysio::resource\_monitor\_plugin\_impl@{sysio::resource\_monitor\_plugin\_impl}}
+\doxysubsubsection{\texorpdfstring{resource\_monitor\_plugin\_impl()}{resource\_monitor\_plugin\_impl()}}
+{\footnotesize\ttfamily \label{classsysio_1_1resource__monitor__plugin__impl_ac0bf91535f24c4fdfbfe55e1dbd13139} 
+sysio\+::resource\+\_\+monitor\+\_\+plugin\+\_\+impl\+::resource\+\_\+monitor\+\_\+plugin\+\_\+impl (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{resource__monitor__plugin_8cpp_source_l00042}{42}} of file \mbox{\hyperlink{resource__monitor__plugin_8cpp_source}{resource\+\_\+monitor\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ :space\_handler(\mbox{\hyperlink{classsysio_1_1resource__monitor_1_1system__file__space__provider}{system\_file\_space\_provider}}(),\ ctx)}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1resource__monitor__plugin__impl_a8f86e65106c603d0afa743a2114d96ef}\index{sysio::resource\_monitor\_plugin\_impl@{sysio::resource\_monitor\_plugin\_impl}!monitor\_directory@{monitor\_directory}}
+\index{monitor\_directory@{monitor\_directory}!sysio::resource\_monitor\_plugin\_impl@{sysio::resource\_monitor\_plugin\_impl}}
+\doxysubsubsection{\texorpdfstring{monitor\_directory()}{monitor\_directory()}}
+{\footnotesize\ttfamily \label{classsysio_1_1resource__monitor__plugin__impl_a8f86e65106c603d0afa743a2114d96ef} 
+void sysio\+::resource\+\_\+monitor\+\_\+plugin\+\_\+impl\+::monitor\+\_\+directory (\begin{DoxyParamCaption}\item[{const bfs\+::path \&}]{path}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{resource__monitor__plugin_8cpp_source_l00132}{132}} of file \mbox{\hyperlink{resource__monitor__plugin_8cpp_source}{resource\+\_\+monitor\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a3da1571bad6ca6c94df9a3660b2115ee}{dlog}}(\textcolor{stringliteral}{"{}\$\{path\}\ registered\ to\ be\ monitored"{}},\ (\textcolor{stringliteral}{"{}path"{}},\ path.string()));}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ directories\_registered.push\_back(path);}
+\DoxyCodeLine{00135\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=315pt]{classsysio_1_1resource__monitor__plugin__impl_a8f86e65106c603d0afa743a2114d96ef_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1resource__monitor__plugin__impl_a0660c265b1bb7600e647c61087be62da}\index{sysio::resource\_monitor\_plugin\_impl@{sysio::resource\_monitor\_plugin\_impl}!plugin\_initialize@{plugin\_initialize}}
+\index{plugin\_initialize@{plugin\_initialize}!sysio::resource\_monitor\_plugin\_impl@{sysio::resource\_monitor\_plugin\_impl}}
+\doxysubsubsection{\texorpdfstring{plugin\_initialize()}{plugin\_initialize()}}
+{\footnotesize\ttfamily \label{classsysio_1_1resource__monitor__plugin__impl_a0660c265b1bb7600e647c61087be62da} 
+void sysio\+::resource\+\_\+monitor\+\_\+plugin\+\_\+impl\+::plugin\+\_\+initialize (\begin{DoxyParamCaption}\item[{const appbase\+::variables\+\_\+map \&}]{options}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{resource__monitor__plugin_8cpp_source_l00060}{60}} of file \mbox{\hyperlink{resource__monitor__plugin_8cpp_source}{resource\+\_\+monitor\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a3da1571bad6ca6c94df9a3660b2115ee}{dlog}}(\textcolor{stringliteral}{"{}plugin\_initialize"{}});}
+\DoxyCodeLine{00062\ \ \ \ }
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ interval\ =\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.at(\textcolor{stringliteral}{"{}resource-\/monitor-\/interval-\/seconds"{}}).as<\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}>();}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(interval\ >=\ monitor\_interval\_min\ \&\&\ interval\ <=\ monitor\_interval\_max,\ chain::plugin\_config\_exception,}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)"{}resource-\/monitor-\/interval-\/seconds\(\backslash\)"{}\ must\ be\ between\ \$\{monitor\_interval\_min\}\ and\ \$\{monitor\_interval\_max\}"{}},\ (\textcolor{stringliteral}{"{}monitor\_interval\_min"{}},\ monitor\_interval\_min)\ (\textcolor{stringliteral}{"{}monitor\_interval\_max"{}},\ monitor\_interval\_max));}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ space\_handler.\mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler_af1ad683111aac7f94733e3866db0149e}{set\_sleep\_time}}(interval);}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\textcolor{stringliteral}{"{}Monitoring\ interval\ set\ to\ \$\{interval\}"{}},\ (\textcolor{stringliteral}{"{}interval"{}},\ interval));}
+\DoxyCodeLine{00068\ \ \ \ }
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ threshold\ =\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.at(\textcolor{stringliteral}{"{}resource-\/monitor-\/space-\/threshold"{}}).as<\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}>();}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(threshold\ >=\ space\_threshold\_min\ \ \&\&\ threshold\ <=\ space\_threshold\_max,\ chain::plugin\_config\_exception,}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)"{}resource-\/monitor-\/space-\/threshold\(\backslash\)"{}\ must\ be\ between\ \$\{space\_threshold\_min\}\ and\ \$\{space\_threshold\_max\}"{}},\ (\textcolor{stringliteral}{"{}space\_threshold\_min"{}},\ space\_threshold\_min)\ (\textcolor{stringliteral}{"{}space\_threshold\_max"{}},\ space\_threshold\_max));}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ space\_handler.\mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler_a51eaff9443b1a88e06cbbd1344a78071}{set\_threshold}}(threshold,\ threshold\ -\/\ space\_threshold\_warning\_diff);}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\textcolor{stringliteral}{"{}Space\ usage\ threshold\ set\ to\ \$\{threshold\}"{}},\ (\textcolor{stringliteral}{"{}threshold"{}},\ threshold));}
+\DoxyCodeLine{00074\ \ \ \ }
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.count(\textcolor{stringliteral}{"{}resource-\/monitor-\/not-\/shutdown-\/on-\/threshold-\/exceeded"{}}))\ \{}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ set,\ not\ shutdown}}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ space\_handler.\mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler_ac0f510cb0298b9cefe68102772fc5db7}{set\_shutdown\_on\_exceeded}}(\textcolor{keyword}{false});}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\textcolor{stringliteral}{"{}Shutdown\ flag\ when\ threshold\ exceeded\ set\ to\ false"{}});}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Default\ will\ shut\ down}}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ space\_handler.\mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler_ac0f510cb0298b9cefe68102772fc5db7}{set\_shutdown\_on\_exceeded}}(\textcolor{keyword}{true});}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\textcolor{stringliteral}{"{}Shutdown\ flag\ when\ threshold\ exceeded\ set\ to\ true"{}});}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00084\ }
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ warning\_interval\ =\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.at(\textcolor{stringliteral}{"{}resource-\/monitor-\/warning-\/interval"{}}).as<\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}>();}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(warning\_interval\ >=\ warning\_interval\_min\ \&\&\ warning\_interval\ <=\ warning\_interval\_max,\ chain::plugin\_config\_exception,}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)"{}resource-\/monitor-\/warning-\/interval\(\backslash\)"{}\ must\ be\ between\ \$\{warning\_interval\_min\}\ and\ \$\{warning\_interval\_max\}"{}},\ (\textcolor{stringliteral}{"{}warning\_interval\_min"{}},\ warning\_interval\_min)\ (\textcolor{stringliteral}{"{}warning\_interval\_max"{}},\ warning\_interval\_max));}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ space\_handler.\mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler_a5465fcb7ca6562cdb3622c5ef09b29a9}{set\_warning\_interval}}(warning\_interval);}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\textcolor{stringliteral}{"{}Warning\ interval\ set\ to\ \$\{warning\_interval\}"{}},\ (\textcolor{stringliteral}{"{}warning\_interval"{}},\ warning\_interval));}
+\DoxyCodeLine{00090\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1resource__monitor__plugin__impl_a0660c265b1bb7600e647c61087be62da_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1resource__monitor__plugin__impl_afb3fda25f6f91bb22d539fd8df00d8e2}\index{sysio::resource\_monitor\_plugin\_impl@{sysio::resource\_monitor\_plugin\_impl}!plugin\_shutdown@{plugin\_shutdown}}
+\index{plugin\_shutdown@{plugin\_shutdown}!sysio::resource\_monitor\_plugin\_impl@{sysio::resource\_monitor\_plugin\_impl}}
+\doxysubsubsection{\texorpdfstring{plugin\_shutdown()}{plugin\_shutdown()}}
+{\footnotesize\ttfamily \label{classsysio_1_1resource__monitor__plugin__impl_afb3fda25f6f91bb22d539fd8df00d8e2} 
+void sysio\+::resource\+\_\+monitor\+\_\+plugin\+\_\+impl\+::plugin\+\_\+shutdown (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{resource__monitor__plugin_8cpp_source_l00121}{121}} of file \mbox{\hyperlink{resource__monitor__plugin_8cpp_source}{resource\+\_\+monitor\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\textcolor{stringliteral}{"{}shutdown..."{}});}
+\DoxyCodeLine{00123\ \ \ \ }
+\DoxyCodeLine{00124\ \ \ \ \ \ \ ctx.stop();}
+\DoxyCodeLine{00125\ \ \ \ }
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \textcolor{comment}{//\ Wait\ for\ the\ thread\ to\ end}}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ monitor\_thread.join();}
+\DoxyCodeLine{00128\ \ \ \ }
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\textcolor{stringliteral}{"{}exit\ shutdown"{}});}
+\DoxyCodeLine{00130\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1resource__monitor__plugin__impl_ae06c885da6f082b29ca5b5ff8c5724e4}\index{sysio::resource\_monitor\_plugin\_impl@{sysio::resource\_monitor\_plugin\_impl}!plugin\_startup@{plugin\_startup}}
+\index{plugin\_startup@{plugin\_startup}!sysio::resource\_monitor\_plugin\_impl@{sysio::resource\_monitor\_plugin\_impl}}
+\doxysubsubsection{\texorpdfstring{plugin\_startup()}{plugin\_startup()}}
+{\footnotesize\ttfamily \label{classsysio_1_1resource__monitor__plugin__impl_ae06c885da6f082b29ca5b5ff8c5724e4} 
+void sysio\+::resource\+\_\+monitor\+\_\+plugin\+\_\+impl\+::plugin\+\_\+startup (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{resource__monitor__plugin_8cpp_source_l00093}{93}} of file \mbox{\hyperlink{resource__monitor__plugin_8cpp_source}{resource\+\_\+monitor\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\textcolor{stringliteral}{"{}Creating\ and\ starting\ monitor\ thread"{}});}
+\DoxyCodeLine{00095\ \ \ \ }
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \textcolor{comment}{//\ By\ now\ all\ plugins\ are\ initialized.}}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \textcolor{comment}{//\ Find\ out\ filesystems\ containing\ the\ directories\ requested}}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \textcolor{comment}{//\ so\ far.}}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\ \textcolor{keyword}{auto}\&\ dir:\ directories\_registered\ )\ \{}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ space\_handler.\mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler_a6a5e01f3f35cab4c846640e060b91b63}{add\_file\_system}}(\ dir\ );}
+\DoxyCodeLine{00101\ \ \ \ }
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ A\ directory\ like\ "{}data"{}\ contains\ subdirectories\ like}}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ "{}block"{}.\ Those\ subdirectories\ can\ mount\ on\ different}}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ file\ systems.\ Make\ sure\ they\ are\ taken\ care\ of.}}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (bfs::directory\_iterator\ itr(dir);\ itr\ !=\ bfs::directory\_iterator();\ ++itr)\ \{}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacefc_ab123bfeadf918cc293ecad88bca7c499}{fc::is\_directory}}(itr-\/>path()))\ \{}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ space\_handler.\mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler_a6a5e01f3f35cab4c846640e060b91b63}{add\_file\_system}}(\ itr-\/>path()\ );}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00111\ \ \ \ }
+\DoxyCodeLine{00112\ \ \ \ \ \ \ monitor\_thread\ =\ std::thread(\ [\textcolor{keyword}{this}]\ \{}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_ab58a7f71e88d7d4d5761bbd24837c595}{fc::set\_os\_thread\_name}}(\ \textcolor{stringliteral}{"{}resmon"{}}\ );\ \textcolor{comment}{//\ console\_appender\ uses\ 9\ chars\ for\ thread\ name\ reporting.\ }}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \ space\_handler.\mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler_a6faa30d2db31020b3db4886a554e147a}{space\_monitor\_loop}}();}
+\DoxyCodeLine{00115\ \ \ \ }
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ ctx.run();}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \}\ );}
+\DoxyCodeLine{00118\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1resource__monitor__plugin__impl_ae06c885da6f082b29ca5b5ff8c5724e4_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1resource__monitor__plugin__impl_a72bffc3828b3c596d680d57271dccdea}\index{sysio::resource\_monitor\_plugin\_impl@{sysio::resource\_monitor\_plugin\_impl}!set\_program\_options@{set\_program\_options}}
+\index{set\_program\_options@{set\_program\_options}!sysio::resource\_monitor\_plugin\_impl@{sysio::resource\_monitor\_plugin\_impl}}
+\doxysubsubsection{\texorpdfstring{set\_program\_options()}{set\_program\_options()}}
+{\footnotesize\ttfamily \label{classsysio_1_1resource__monitor__plugin__impl_a72bffc3828b3c596d680d57271dccdea} 
+void sysio\+::resource\+\_\+monitor\+\_\+plugin\+\_\+impl\+::set\+\_\+program\+\_\+options (\begin{DoxyParamCaption}\item[{options\+\_\+description \&}]{}{, }\item[{options\+\_\+description \&}]{cfg}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{resource__monitor__plugin_8cpp_source_l00047}{47}} of file \mbox{\hyperlink{resource__monitor__plugin_8cpp_source}{resource\+\_\+monitor\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ cfg.add\_options()}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \ (\ \textcolor{stringliteral}{"{}resource-\/monitor-\/interval-\/seconds"{}},\ bpo::value<uint32\_t>()-\/>default\_value(def\_interval\_in\_secs),}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Time\ in\ seconds\ between\ two\ consecutive\ checks\ of\ resource\ usage.\ Should\ be\ between\ 1\ and\ 300"{}}\ )}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ (\ \textcolor{stringliteral}{"{}resource-\/monitor-\/space-\/threshold"{}},\ bpo::value<uint32\_t>()-\/>default\_value(def\_space\_threshold),}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Threshold\ in\ terms\ of\ percentage\ of\ used\ space\ vs\ total\ space.\ If\ used\ space\ is\ above\ (threshold\ -\/\ 5\%),\ a\ warning\ is\ generated.\ \ Unless\ resource-\/monitor-\/not-\/shutdown-\/on-\/threshold-\/exceeded\ is\ enabled,\ a\ graceful\ shutdown\ is\ initiated\ if\ used\ space\ is\ above\ the\ threshold.\ The\ value\ should\ be\ between\ 6\ and\ 99"{}}\ )}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ (\ \textcolor{stringliteral}{"{}resource-\/monitor-\/not-\/shutdown-\/on-\/threshold-\/exceeded"{}},}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Used\ to\ indicate\ nodeop\ will\ not\ shutdown\ when\ threshold\ is\ exceeded."{}}\ )}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ (\ \textcolor{stringliteral}{"{}resource-\/monitor-\/warning-\/interval"{}},\ bpo::value<uint32\_t>()-\/>default\_value(def\_monitor\_warning\_interval),}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Number\ of\ resource\ monitor\ intervals\ between\ two\ consecutive\ warnings\ when\ the\ threshold\ is\ hit.\ Should\ be\ between\ 1\ and\ 450"{}}\ )}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{00058\ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+plugins/resource\+\_\+monitor\+\_\+plugin/\mbox{\hyperlink{resource__monitor__plugin_8cpp}{resource\+\_\+monitor\+\_\+plugin.\+cpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,11 @@
+<map id="CLI::detail::get_names" name="CLI::detail::get_names">
+<area shape="rect" id="Node000001" title="Get a vector of short names, one of long names, and a single name." alt="" coords="5,5,159,31"/>
+<area shape="rect" id="Node000002" href="$namespace_c_l_i_1_1detail.html#a3a05d1129df69e88135e178137b1fd89" title="Verify the first character of an option." alt="" coords="535,19,652,60"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="159,12,311,11,400,14,488,21,521,25,520,30,487,26,399,19,311,17,159,18"/>
+<area shape="rect" id="Node000003" href="$namespace_c_l_i_1_1detail.html#a4274628d24f9e3fbc719284f1db263b8" title="Verify an option name." alt="" coords="207,26,323,66"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="160,27,192,32,191,38,159,33"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="323,42,520,38,520,44,323,48"/>
+<area shape="rect" id="Node000004" href="$namespace_c_l_i_1_1detail.html#a841371d5dbb0a52f453de4cc1d00cc51" title="Verify following characters of an option." alt="" coords="371,76,487,117"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="324,62,357,72,355,77,323,67"/>
+<area shape="poly" id="edge5_Node000004_Node000002" title=" " alt="" coords="487,74,520,62,522,67,489,79"/>
+</map>

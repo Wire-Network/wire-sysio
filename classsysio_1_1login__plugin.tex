@@ -1,0 +1,409 @@
+\doxysection{sysio\+::login\+\_\+plugin Class Reference}
+\hypertarget{classsysio_1_1login__plugin}{}\label{classsysio_1_1login__plugin}\index{sysio::login\_plugin@{sysio::login\_plugin}}
+
+
+{\ttfamily \#include $<$login\+\_\+plugin.\+hpp$>$}
+
+
+
+Inheritance diagram for sysio\+::login\+\_\+plugin\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=205pt]{classsysio_1_1login__plugin__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for sysio\+::login\+\_\+plugin\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=205pt]{classsysio_1_1login__plugin__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1login__plugin_1_1do__not__use__gen__r1__key__params}{do\+\_\+not\+\_\+use\+\_\+gen\+\_\+r1\+\_\+key\+\_\+params}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1login__plugin_1_1do__not__use__gen__r1__key__results}{do\+\_\+not\+\_\+use\+\_\+gen\+\_\+r1\+\_\+key\+\_\+results}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1login__plugin_1_1do__not__use__get__secret__params}{do\+\_\+not\+\_\+use\+\_\+get\+\_\+secret\+\_\+params}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1login__plugin_1_1do__not__use__get__secret__results}{do\+\_\+not\+\_\+use\+\_\+get\+\_\+secret\+\_\+results}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1login__plugin_1_1do__not__use__sign__params}{do\+\_\+not\+\_\+use\+\_\+sign\+\_\+params}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1login__plugin_1_1do__not__use__sign__results}{do\+\_\+not\+\_\+use\+\_\+sign\+\_\+results}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1login__plugin_1_1finalize__login__request__params}{finalize\+\_\+login\+\_\+request\+\_\+params}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1login__plugin_1_1finalize__login__request__results}{finalize\+\_\+login\+\_\+request\+\_\+results}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1login__plugin_1_1start__login__request__params}{start\+\_\+login\+\_\+request\+\_\+params}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1login__plugin_1_1start__login__request__results}{start\+\_\+login\+\_\+request\+\_\+results}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classsysio_1_1login__plugin_aa1c3c6a21e689a955729d76307721535}{APPBASE\+\_\+\+PLUGIN\+\_\+\+REQUIRES}} ((\mbox{\hyperlink{classsysio_1_1chain__plugin}{chain\+\_\+plugin}})(\mbox{\hyperlink{classsysio_1_1http__plugin}{http\+\_\+plugin}})) \mbox{\hyperlink{classsysio_1_1login__plugin}{login\+\_\+plugin}}()
+\item 
+virtual \mbox{\hyperlink{classsysio_1_1login__plugin_a6ea616c983e6ea1ec142043ed9af40b7}{\texorpdfstring{$\sim$}{\string~}login\+\_\+plugin}} ()
+\item 
+virtual void \mbox{\hyperlink{classsysio_1_1login__plugin_a8375881090226b8c6574ff8a3af13d00}{set\+\_\+program\+\_\+options}} (options\+\_\+description \&, options\+\_\+description \&) override
+\item 
+void \mbox{\hyperlink{classsysio_1_1login__plugin_a05d443b12015468e46c302f5b9245899}{plugin\+\_\+initialize}} (const variables\+\_\+map \&)
+\item 
+void \mbox{\hyperlink{classsysio_1_1login__plugin_a4b26614f4ddaf2c0333d07314422f955}{plugin\+\_\+startup}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1login__plugin_a431356fdad20fc6c4fe8031bf494efcc}{plugin\+\_\+shutdown}} ()
+\item 
+\mbox{\hyperlink{structsysio_1_1login__plugin_1_1start__login__request__results}{start\+\_\+login\+\_\+request\+\_\+results}} \mbox{\hyperlink{classsysio_1_1login__plugin_a48b449ac6a0aacba41cde01292a0f8df}{start\+\_\+login\+\_\+request}} (const \mbox{\hyperlink{structsysio_1_1login__plugin_1_1start__login__request__params}{start\+\_\+login\+\_\+request\+\_\+params}} \&)
+\item 
+\mbox{\hyperlink{structsysio_1_1login__plugin_1_1finalize__login__request__results}{finalize\+\_\+login\+\_\+request\+\_\+results}} \mbox{\hyperlink{classsysio_1_1login__plugin_ad73eeba9f345e59ac8b3b88f6e996464}{finalize\+\_\+login\+\_\+request}} (const \mbox{\hyperlink{structsysio_1_1login__plugin_1_1finalize__login__request__params}{finalize\+\_\+login\+\_\+request\+\_\+params}} \&)
+\item 
+\mbox{\hyperlink{structsysio_1_1login__plugin_1_1do__not__use__gen__r1__key__results}{do\+\_\+not\+\_\+use\+\_\+gen\+\_\+r1\+\_\+key\+\_\+results}} \mbox{\hyperlink{classsysio_1_1login__plugin_a27be8dcf11f5098a4fb3758b44c90bc0}{do\+\_\+not\+\_\+use\+\_\+gen\+\_\+r1\+\_\+key}} (const \mbox{\hyperlink{structsysio_1_1login__plugin_1_1do__not__use__gen__r1__key__params}{do\+\_\+not\+\_\+use\+\_\+gen\+\_\+r1\+\_\+key\+\_\+params}} \&)
+\item 
+\mbox{\hyperlink{structsysio_1_1login__plugin_1_1do__not__use__sign__results}{do\+\_\+not\+\_\+use\+\_\+sign\+\_\+results}} \mbox{\hyperlink{classsysio_1_1login__plugin_a586b0bf9e77aacfb9c0eac7c2adee19f}{do\+\_\+not\+\_\+use\+\_\+sign}} (const \mbox{\hyperlink{structsysio_1_1login__plugin_1_1do__not__use__sign__params}{do\+\_\+not\+\_\+use\+\_\+sign\+\_\+params}} \&)
+\item 
+\mbox{\hyperlink{structsysio_1_1login__plugin_1_1do__not__use__get__secret__results}{do\+\_\+not\+\_\+use\+\_\+get\+\_\+secret\+\_\+results}} \mbox{\hyperlink{classsysio_1_1login__plugin_a6309b00c1b232d162de788bf07169394}{do\+\_\+not\+\_\+use\+\_\+get\+\_\+secret}} (const \mbox{\hyperlink{structsysio_1_1login__plugin_1_1do__not__use__get__secret__params}{do\+\_\+not\+\_\+use\+\_\+get\+\_\+secret\+\_\+params}} \&)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classappbase_1_1plugin}{appbase\+::plugin$<$ login\+\_\+plugin $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classappbase_1_1plugin_a3cf5509f2854ffb274018dca8606c50a}{plugin}} ()
+\item 
+virtual \mbox{\hyperlink{classappbase_1_1plugin_a6c83bcf2c8ee3de87593824da807e4ba}{\texorpdfstring{$\sim$}{\string~}plugin}} ()
+\item 
+virtual \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408}{state}} \mbox{\hyperlink{classappbase_1_1plugin_a857288c2424b57a898c0579d25dacbb0}{get\+\_\+state}} () const override
+\item 
+virtual const std\+::string \& \mbox{\hyperlink{classappbase_1_1plugin_a274f072d2f7f37d43ae74e01edd0ba62}{name}} () const override
+\item 
+virtual void \mbox{\hyperlink{classappbase_1_1plugin_a6a0cd7ccc873527ebb5e6716b249ea17}{register\+\_\+dependencies}} ()
+\item 
+virtual void \mbox{\hyperlink{classappbase_1_1plugin_ac28755a82831d41e5d0ef0ce56b10fa9}{initialize}} (const variables\+\_\+map \&options) override
+\item 
+virtual void \mbox{\hyperlink{classappbase_1_1plugin_ab314bd778e71a91de584cd9b8a999867}{handle\+\_\+sighup}} () override
+\item 
+virtual void \mbox{\hyperlink{classappbase_1_1plugin_a10e4e1c582bfadf67f510df76d87abfd}{startup}} () override
+\item 
+virtual void \mbox{\hyperlink{classappbase_1_1plugin_a21e5be5587fca41fbc91367d449b8f27}{shutdown}} () override
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classappbase_1_1abstract__plugin}{appbase\+::abstract\+\_\+plugin}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4643a2618ac94aa2ef56e59fe363f828}{\texorpdfstring{$\sim$}{\string~}abstract\+\_\+plugin}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Public Types inherited from \mbox{\hyperlink{classappbase_1_1abstract__plugin}{appbase\+::abstract\+\_\+plugin}}}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408}{state}} \{ \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408ac712ce3482a78b8bf87080aefd77cf7d}{registered}}
+, \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408a9ae208bba76e9c0eab1cac52953f947b}{initialized}}
+, \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408a808ebbf475942017567644697eca3224}{started}}
+, \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408a320c2eebb5306f385aebfca07336d29e}{stopped}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Member Functions inherited from \mbox{\hyperlink{classappbase_1_1plugin}{appbase\+::plugin$<$ login\+\_\+plugin $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classappbase_1_1plugin_a51f43c3c64ab8524928698a72a186822}{plugin}} (const string \&\mbox{\hyperlink{classappbase_1_1plugin_a274f072d2f7f37d43ae74e01edd0ba62}{name}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{login__plugin_8hpp_source_l00010}{10}} of file \mbox{\hyperlink{login__plugin_8hpp_source}{login\+\_\+plugin.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classsysio_1_1login__plugin_a6ea616c983e6ea1ec142043ed9af40b7}\index{sysio::login\_plugin@{sysio::login\_plugin}!````~login\_plugin@{\texorpdfstring{$\sim$}{\string~}login\_plugin}}
+\index{````~login\_plugin@{\texorpdfstring{$\sim$}{\string~}login\_plugin}!sysio::login\_plugin@{sysio::login\_plugin}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}login\_plugin()}{\string~login\_plugin()}}
+{\footnotesize\ttfamily \label{classsysio_1_1login__plugin_a6ea616c983e6ea1ec142043ed9af40b7} 
+sysio\+::login\+\_\+plugin\+::\texorpdfstring{$\sim$}{\string~}login\+\_\+plugin (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{login__plugin_8cpp_source_l00046}{46}} of file \mbox{\hyperlink{login__plugin_8cpp_source}{login\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00046\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1login__plugin_aa1c3c6a21e689a955729d76307721535}\index{sysio::login\_plugin@{sysio::login\_plugin}!APPBASE\_PLUGIN\_REQUIRES@{APPBASE\_PLUGIN\_REQUIRES}}
+\index{APPBASE\_PLUGIN\_REQUIRES@{APPBASE\_PLUGIN\_REQUIRES}!sysio::login\_plugin@{sysio::login\_plugin}}
+\doxysubsubsection{\texorpdfstring{APPBASE\_PLUGIN\_REQUIRES()}{APPBASE\_PLUGIN\_REQUIRES()}}
+{\footnotesize\ttfamily \label{classsysio_1_1login__plugin_aa1c3c6a21e689a955729d76307721535} 
+sysio\+::login\+\_\+plugin\+::\+APPBASE\+\_\+\+PLUGIN\+\_\+\+REQUIRES (\begin{DoxyParamCaption}\item[{(\mbox{\hyperlink{classsysio_1_1chain__plugin}{chain\+\_\+plugin}})(\mbox{\hyperlink{classsysio_1_1http__plugin}{http\+\_\+plugin}})}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{classsysio_1_1login__plugin_a27be8dcf11f5098a4fb3758b44c90bc0}\index{sysio::login\_plugin@{sysio::login\_plugin}!do\_not\_use\_gen\_r1\_key@{do\_not\_use\_gen\_r1\_key}}
+\index{do\_not\_use\_gen\_r1\_key@{do\_not\_use\_gen\_r1\_key}!sysio::login\_plugin@{sysio::login\_plugin}}
+\doxysubsubsection{\texorpdfstring{do\_not\_use\_gen\_r1\_key()}{do\_not\_use\_gen\_r1\_key()}}
+{\footnotesize\ttfamily \label{classsysio_1_1login__plugin_a27be8dcf11f5098a4fb3758b44c90bc0} 
+\mbox{\hyperlink{structsysio_1_1login__plugin_1_1do__not__use__gen__r1__key__results}{login\+\_\+plugin\+::do\+\_\+not\+\_\+use\+\_\+gen\+\_\+r1\+\_\+key\+\_\+results}} sysio\+::login\+\_\+plugin\+::do\+\_\+not\+\_\+use\+\_\+gen\+\_\+r1\+\_\+key (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1login__plugin_1_1do__not__use__gen__r1__key__params}{do\+\_\+not\+\_\+use\+\_\+gen\+\_\+r1\+\_\+key\+\_\+params}} \&}]{params}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{login__plugin_8cpp_source_l00145}{145}} of file \mbox{\hyperlink{login__plugin_8cpp_source}{login\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00146\ \ \ \ \textcolor{keyword}{auto}\ priv\ =\ \mbox{\hyperlink{classfc_1_1crypto_1_1private__key_ac5c6c2f7b6fb39c74ce662997f91b4f3}{chain::private\_key\_type::generate\_r1}}();}
+\DoxyCodeLine{00147\ \ \ \ \textcolor{keywordflow}{return}\ \{priv.get\_public\_key(),\ priv\};}
+\DoxyCodeLine{00148\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1login__plugin_a27be8dcf11f5098a4fb3758b44c90bc0_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1login__plugin_a6309b00c1b232d162de788bf07169394}\index{sysio::login\_plugin@{sysio::login\_plugin}!do\_not\_use\_get\_secret@{do\_not\_use\_get\_secret}}
+\index{do\_not\_use\_get\_secret@{do\_not\_use\_get\_secret}!sysio::login\_plugin@{sysio::login\_plugin}}
+\doxysubsubsection{\texorpdfstring{do\_not\_use\_get\_secret()}{do\_not\_use\_get\_secret()}}
+{\footnotesize\ttfamily \label{classsysio_1_1login__plugin_a6309b00c1b232d162de788bf07169394} 
+\mbox{\hyperlink{structsysio_1_1login__plugin_1_1do__not__use__get__secret__results}{login\+\_\+plugin\+::do\+\_\+not\+\_\+use\+\_\+get\+\_\+secret\+\_\+results}} sysio\+::login\+\_\+plugin\+::do\+\_\+not\+\_\+use\+\_\+get\+\_\+secret (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1login__plugin_1_1do__not__use__get__secret__params}{do\+\_\+not\+\_\+use\+\_\+get\+\_\+secret\+\_\+params}} \&}]{params}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{login__plugin_8cpp_source_l00156}{156}} of file \mbox{\hyperlink{login__plugin_8cpp_source}{login\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00157\ \ \ \ \textcolor{keywordflow}{return}\ \{\mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}}.priv\_key.generate\_shared\_secret(\mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}}.pub\_key)\};}
+\DoxyCodeLine{00158\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1login__plugin_a586b0bf9e77aacfb9c0eac7c2adee19f}\index{sysio::login\_plugin@{sysio::login\_plugin}!do\_not\_use\_sign@{do\_not\_use\_sign}}
+\index{do\_not\_use\_sign@{do\_not\_use\_sign}!sysio::login\_plugin@{sysio::login\_plugin}}
+\doxysubsubsection{\texorpdfstring{do\_not\_use\_sign()}{do\_not\_use\_sign()}}
+{\footnotesize\ttfamily \label{classsysio_1_1login__plugin_a586b0bf9e77aacfb9c0eac7c2adee19f} 
+\mbox{\hyperlink{structsysio_1_1login__plugin_1_1do__not__use__sign__results}{login\+\_\+plugin\+::do\+\_\+not\+\_\+use\+\_\+sign\+\_\+results}} sysio\+::login\+\_\+plugin\+::do\+\_\+not\+\_\+use\+\_\+sign (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1login__plugin_1_1do__not__use__sign__params}{do\+\_\+not\+\_\+use\+\_\+sign\+\_\+params}} \&}]{params}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{login__plugin_8cpp_source_l00151}{151}} of file \mbox{\hyperlink{login__plugin_8cpp_source}{login\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00152\ \ \ \ \textcolor{keywordflow}{return}\ \{\mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}}.priv\_key.sign(chain::sha256::hash(\mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}}.data))\};}
+\DoxyCodeLine{00153\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1login__plugin_ad73eeba9f345e59ac8b3b88f6e996464}\index{sysio::login\_plugin@{sysio::login\_plugin}!finalize\_login\_request@{finalize\_login\_request}}
+\index{finalize\_login\_request@{finalize\_login\_request}!sysio::login\_plugin@{sysio::login\_plugin}}
+\doxysubsubsection{\texorpdfstring{finalize\_login\_request()}{finalize\_login\_request()}}
+{\footnotesize\ttfamily \label{classsysio_1_1login__plugin_ad73eeba9f345e59ac8b3b88f6e996464} 
+\mbox{\hyperlink{structsysio_1_1login__plugin_1_1finalize__login__request__results}{login\+\_\+plugin\+::finalize\+\_\+login\+\_\+request\+\_\+results}} sysio\+::login\+\_\+plugin\+::finalize\+\_\+login\+\_\+request (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1login__plugin_1_1finalize__login__request__params}{finalize\+\_\+login\+\_\+request\+\_\+params}} \&}]{params}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{login__plugin_8cpp_source_l00105}{105}} of file \mbox{\hyperlink{login__plugin_8cpp_source}{login\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00106\ \ \ \ finalize\_login\_request\_results\ result;}
+\DoxyCodeLine{00107\ \ \ \ my-\/>expire\_requests();}
+\DoxyCodeLine{00108\ \ \ \ \textcolor{keyword}{auto}\&\ index\ =\ my-\/>requests.get<login\_request\_pub\_key\_index>();}
+\DoxyCodeLine{00109\ \ \ \ \textcolor{keyword}{auto}\ it\ =\ index.find(\mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}}.server\_ephemeral\_pub\_key);}
+\DoxyCodeLine{00110\ \ \ \ \textcolor{keywordflow}{if}\ (it\ ==\ index.end())\ \{}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ result.error\ =\ \textcolor{stringliteral}{"{}server\_ephemeral\_pub\_key\ expired\ or\ not\ found"{}};}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00113\ \ \ \ \}}
+\DoxyCodeLine{00114\ \ \ \ \textcolor{keyword}{auto}\ request\ =\ *it;}
+\DoxyCodeLine{00115\ \ \ \ index.erase(it);}
+\DoxyCodeLine{00116\ }
+\DoxyCodeLine{00117\ \ \ \ \textcolor{keyword}{auto}\ shared\_secret\ =\ request.server\_ephemeral\_priv\_key.generate\_shared\_secret(\mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}}.client\_ephemeral\_pub\_key);}
+\DoxyCodeLine{00118\ }
+\DoxyCodeLine{00119\ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_ac6f5a1f1e061f000983f5d5f3ac25dfa}{chain::bytes}}\ combined\_data(1024\ *\ 1024);}
+\DoxyCodeLine{00120\ \ \ \ chain::datastream<char*>\ sig\_data\_ds\{combined\_data.data(),\ combined\_data.size()\};}
+\DoxyCodeLine{00121\ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(sig\_data\_ds,\ \mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}}.permission);}
+\DoxyCodeLine{00122\ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(sig\_data\_ds,\ shared\_secret);}
+\DoxyCodeLine{00123\ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(sig\_data\_ds,\ \mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}}.data);}
+\DoxyCodeLine{00124\ \ \ \ combined\_data.resize(sig\_data\_ds.tellp());}
+\DoxyCodeLine{00125\ }
+\DoxyCodeLine{00126\ \ \ \ result.digest\ =\ chain::sha256::hash(combined\_data);}
+\DoxyCodeLine{00127\ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\&\ sig\ :\ \mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}}.signatures)}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ result.recovered\_keys.insert(\mbox{\hyperlink{namespacesysio_1_1chain_a0628a11f388cd2e43b1ccc1260a1042f}{chain::public\_key\_type}}\{sig,\ result.digest\});}
+\DoxyCodeLine{00129\ }
+\DoxyCodeLine{00130\ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacesysio_1_1chain_a057ec53a1f8d23b2fb89de6c19b41c32}{noop\_checktime}}\ =\ []\ \{\};}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ chain\ =\ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_a3c4b68a0667942b58f1369f454ce0ce3}{get\_plugin}}<\mbox{\hyperlink{classchain__plugin}{chain\_plugin}}>().chain();}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ chain.get\_authorization\_manager().check\_authorization(\ \textcolor{comment}{//}}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}}.permission.actor,\ \mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}}.permission.permission,\ result.recovered\_keys,\ \{\},\ \mbox{\hyperlink{classfc_1_1microseconds}{fc::microseconds}}(0),}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_a057ec53a1f8d23b2fb89de6c19b41c32}{noop\_checktime}},\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ result.permission\_satisfied\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00137\ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ result.error\ =\ \textcolor{stringliteral}{"{}keys\ do\ not\ satisfy\ permission"{}};}
+\DoxyCodeLine{00139\ \ \ \ \}}
+\DoxyCodeLine{00140\ }
+\DoxyCodeLine{00141\ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00142\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1login__plugin_ad73eeba9f345e59ac8b3b88f6e996464_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=328pt]{classsysio_1_1login__plugin_ad73eeba9f345e59ac8b3b88f6e996464_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1login__plugin_a05d443b12015468e46c302f5b9245899}\index{sysio::login\_plugin@{sysio::login\_plugin}!plugin\_initialize@{plugin\_initialize}}
+\index{plugin\_initialize@{plugin\_initialize}!sysio::login\_plugin@{sysio::login\_plugin}}
+\doxysubsubsection{\texorpdfstring{plugin\_initialize()}{plugin\_initialize()}}
+{\footnotesize\ttfamily \label{classsysio_1_1login__plugin_a05d443b12015468e46c302f5b9245899} 
+void sysio\+::login\+\_\+plugin\+::plugin\+\_\+initialize (\begin{DoxyParamCaption}\item[{const variables\+\_\+map \&}]{options}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{login__plugin_8cpp_source_l00056}{56}} of file \mbox{\hyperlink{login__plugin_8cpp_source}{login\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00057\ \ \ \ my-\/>max\_login\_requests\ =\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.at(\textcolor{stringliteral}{"{}max-\/login-\/requests"{}}).as<\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}>();}
+\DoxyCodeLine{00058\ \ \ \ my-\/>max\_login\_timeout\ =\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.at(\textcolor{stringliteral}{"{}max-\/login-\/timeout"{}}).as<\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}>();}
+\DoxyCodeLine{00059\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1login__plugin_a431356fdad20fc6c4fe8031bf494efcc}\index{sysio::login\_plugin@{sysio::login\_plugin}!plugin\_shutdown@{plugin\_shutdown}}
+\index{plugin\_shutdown@{plugin\_shutdown}!sysio::login\_plugin@{sysio::login\_plugin}}
+\doxysubsubsection{\texorpdfstring{plugin\_shutdown()}{plugin\_shutdown()}}
+{\footnotesize\ttfamily \label{classsysio_1_1login__plugin_a431356fdad20fc6c4fe8031bf494efcc} 
+void sysio\+::login\+\_\+plugin\+::plugin\+\_\+shutdown (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{login__plugin_8cpp_source_l00086}{86}} of file \mbox{\hyperlink{login__plugin_8cpp_source}{login\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00086\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1login__plugin_a4b26614f4ddaf2c0333d07314422f955}\index{sysio::login\_plugin@{sysio::login\_plugin}!plugin\_startup@{plugin\_startup}}
+\index{plugin\_startup@{plugin\_startup}!sysio::login\_plugin@{sysio::login\_plugin}}
+\doxysubsubsection{\texorpdfstring{plugin\_startup()}{plugin\_startup()}}
+{\footnotesize\ttfamily \label{classsysio_1_1login__plugin_a4b26614f4ddaf2c0333d07314422f955} 
+void sysio\+::login\+\_\+plugin\+::plugin\+\_\+startup (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{login__plugin_8cpp_source_l00075}{75}} of file \mbox{\hyperlink{login__plugin_8cpp_source}{login\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00076\ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\textcolor{stringliteral}{"{}starting\ login\_plugin"{}});}
+\DoxyCodeLine{00077\ \ \ \ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_a3c4b68a0667942b58f1369f454ce0ce3}{get\_plugin}}<http\_plugin>().add\_api(\{}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \mbox{\hyperlink{login__plugin_8cpp_a6172887c892c48caf5f2a424ae44de37}{CALL}}(\mbox{\hyperlink{classsysio_1_1login__plugin_a48b449ac6a0aacba41cde01292a0f8df}{start\_login\_request}},\ 200),\ \textcolor{comment}{//}}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \mbox{\hyperlink{login__plugin_8cpp_a6172887c892c48caf5f2a424ae44de37}{CALL}}(\mbox{\hyperlink{classsysio_1_1login__plugin_ad73eeba9f345e59ac8b3b88f6e996464}{finalize\_login\_request}},\ 200),}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \textcolor{comment}{//\ CALL(do\_not\_use\_gen\_r1\_key,\ 200),\ \ //}}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \textcolor{comment}{//\ CALL(do\_not\_use\_sign,\ 200),\ \ \ \ \ \ \ \ //}}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \textcolor{comment}{//\ CALL(do\_not\_use\_get\_secret,\ 200),\ \ //}}
+\DoxyCodeLine{00083\ \ \ \ \});}
+\DoxyCodeLine{00084\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1login__plugin_a4b26614f4ddaf2c0333d07314422f955_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1login__plugin_a8375881090226b8c6574ff8a3af13d00}\index{sysio::login\_plugin@{sysio::login\_plugin}!set\_program\_options@{set\_program\_options}}
+\index{set\_program\_options@{set\_program\_options}!sysio::login\_plugin@{sysio::login\_plugin}}
+\doxysubsubsection{\texorpdfstring{set\_program\_options()}{set\_program\_options()}}
+{\footnotesize\ttfamily \label{classsysio_1_1login__plugin_a8375881090226b8c6574ff8a3af13d00} 
+void sysio\+::login\+\_\+plugin\+::set\+\_\+program\+\_\+options (\begin{DoxyParamCaption}\item[{options\+\_\+description \&}]{}{, }\item[{options\+\_\+description \&}]{cfg}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classappbase_1_1abstract__plugin_a274a3c7462de3c699a8eb23741ed7655}{appbase\+::abstract\+\_\+plugin}}.
+
+
+
+Definition at line \mbox{\hyperlink{login__plugin_8cpp_source_l00048}{48}} of file \mbox{\hyperlink{login__plugin_8cpp_source}{login\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00049\ \ \ \ cfg.add\_options()\ \textcolor{comment}{//}}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}max-\/login-\/requests"{}},\ bpo::value<uint32\_t>()-\/>default\_value(1000000),}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}The\ maximum\ number\ of\ pending\ login\ requests"{}})\ \textcolor{comment}{//}}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}max-\/login-\/timeout"{}},\ bpo::value<uint32\_t>()-\/>default\_value(60),}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}The\ maximum\ timeout\ for\ pending\ login\ requests\ (in\ seconds)"{}});}
+\DoxyCodeLine{00054\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1login__plugin_a48b449ac6a0aacba41cde01292a0f8df}\index{sysio::login\_plugin@{sysio::login\_plugin}!start\_login\_request@{start\_login\_request}}
+\index{start\_login\_request@{start\_login\_request}!sysio::login\_plugin@{sysio::login\_plugin}}
+\doxysubsubsection{\texorpdfstring{start\_login\_request()}{start\_login\_request()}}
+{\footnotesize\ttfamily \label{classsysio_1_1login__plugin_a48b449ac6a0aacba41cde01292a0f8df} 
+\mbox{\hyperlink{structsysio_1_1login__plugin_1_1start__login__request__results}{login\+\_\+plugin\+::start\+\_\+login\+\_\+request\+\_\+results}} sysio\+::login\+\_\+plugin\+::start\+\_\+login\+\_\+request (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1login__plugin_1_1start__login__request__params}{start\+\_\+login\+\_\+request\+\_\+params}} \&}]{params}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{login__plugin_8cpp_source_l00089}{89}} of file \mbox{\hyperlink{login__plugin_8cpp_source}{login\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00090\ \ \ \ my-\/>expire\_requests();}
+\DoxyCodeLine{00091\ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}}.expiration\_time\ >\ \mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{fc::time\_point::now}}(),\ fc::timeout\_exception,}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Requested\ expiration\ time\ \$\{expiration\_time\}\ is\ in\ the\ past"{}},}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}expiration\_time"{}},\ \mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}}.expiration\_time));}
+\DoxyCodeLine{00094\ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(my-\/>requests.size()\ <\ my-\/>max\_login\_requests,\ fc::timeout\_exception,\ \textcolor{stringliteral}{"{}Too\ many\ pending\ login\ requests"{}});}
+\DoxyCodeLine{00095\ \ \ \ login\_request\ request;}
+\DoxyCodeLine{00096\ \ \ \ request.server\_ephemeral\_priv\_key\ =\ \mbox{\hyperlink{classfc_1_1crypto_1_1private__key_ac5c6c2f7b6fb39c74ce662997f91b4f3}{chain::private\_key\_type::generate\_r1}}();}
+\DoxyCodeLine{00097\ \ \ \ request.server\_ephemeral\_pub\_key\ =\ request.server\_ephemeral\_priv\_key.get\_public\_key();}
+\DoxyCodeLine{00098\ \ \ \ request.expiration\_time\ =}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ std::min(\mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}}.expiration\_time,\ \mbox{\hyperlink{classfc_1_1time__point__sec}{fc::time\_point\_sec}}\{fc::time\_point::now()\}\ +\ my-\/>max\_login\_timeout);}
+\DoxyCodeLine{00100\ \ \ \ my-\/>requests.insert(request);}
+\DoxyCodeLine{00101\ \ \ \ \textcolor{keywordflow}{return}\ \{request.server\_ephemeral\_pub\_key\};}
+\DoxyCodeLine{00102\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1login__plugin_a48b449ac6a0aacba41cde01292a0f8df_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=317pt]{classsysio_1_1login__plugin_a48b449ac6a0aacba41cde01292a0f8df_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+plugins/login\+\_\+plugin/include/sysio/login\+\_\+plugin/\mbox{\hyperlink{login__plugin_8hpp}{login\+\_\+plugin.\+hpp}}\item 
+plugins/login\+\_\+plugin/\mbox{\hyperlink{login__plugin_8cpp}{login\+\_\+plugin.\+cpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,5 @@
+<map id="CLI::Option::matching_name" name="CLI::Option::matching_name">
+<area shape="rect" id="Node000001" title="If options share any of the same names, find it." alt="" coords="213,5,401,31"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_option.html#ae72ff0b89bebb2987d548c186c577e50" title="If options share any of the same names, they are equal (not counting positional)" alt="" coords="5,5,165,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="197,21,165,21,165,16,197,16"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="testing::BeginEndDistanceIs" name="testing::BeginEndDistanceIs">
+<area shape="rect" id="Node000001" title=" " alt="" coords="222,78,409,104"/>
+<area shape="rect" id="Node000002" href="$namespacetesting_1_1gmock__matchers__test.html#aa4ef2a94a7d75aa6116e8537deaa5f56" title=" " alt="" coords="5,5,174,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="253,76,162,49,163,44,254,71"/>
+<area shape="rect" id="Node000003" href="$namespacetesting_1_1gmock__matchers__test.html#a89445da783c74dfa09c9c09531646f5b" title=" " alt="" coords="5,71,174,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="206,94,174,94,174,88,206,88"/>
+<area shape="rect" id="Node000004" href="$namespacetesting_1_1gmock__matchers__test.html#add74820690e798ae8a365d08b68ddf71" title=" " alt="" coords="5,136,174,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="254,111,163,138,162,133,253,106"/>
+</map>

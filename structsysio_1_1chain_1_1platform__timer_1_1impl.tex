@@ -1,0 +1,100 @@
+\doxysection{sysio\+::chain\+::platform\+\_\+timer\+::impl Struct Reference}
+\hypertarget{structsysio_1_1chain_1_1platform__timer_1_1impl}{}\label{structsysio_1_1chain_1_1platform__timer_1_1impl}\index{sysio::chain::platform\_timer::impl@{sysio::chain::platform\_timer::impl}}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static void \mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_1_1impl_ab8595c05cd8f1d4b66f68d83c0ff715a}{sig\+\_\+handler}} (int, siginfo\+\_\+t \texorpdfstring{$\ast$}{*}si, void \texorpdfstring{$\ast$}{*})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::unique\+\_\+ptr$<$ boost\+::asio\+::high\+\_\+resolution\+\_\+timer $>$ \mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_1_1impl_afa759b0d1dcbb82167c4bea0cfe192c4}{timer}}
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_1_1impl_ab5d270960f7b1dc8b529c6bfb836b144}{timerid}}
+\item 
+timer\+\_\+t \mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_1_1impl_a86e2fb4a06f086482286ed3085b373d1}{timerid}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static constexpr \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_1_1impl_a420aaf55b414f2d93ead85f38b113bb9}{quit\+\_\+event\+\_\+id}} = 1
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{platform__timer__posix_8cpp_source_l00017}{17}} of file \mbox{\hyperlink{platform__timer__posix_8cpp_source}{platform\+\_\+timer\+\_\+posix.\+cpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1chain_1_1platform__timer_1_1impl_ab8595c05cd8f1d4b66f68d83c0ff715a}\index{sysio::chain::platform\_timer::impl@{sysio::chain::platform\_timer::impl}!sig\_handler@{sig\_handler}}
+\index{sig\_handler@{sig\_handler}!sysio::chain::platform\_timer::impl@{sysio::chain::platform\_timer::impl}}
+\doxysubsubsection{\texorpdfstring{sig\_handler()}{sig\_handler()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1platform__timer_1_1impl_ab8595c05cd8f1d4b66f68d83c0ff715a} 
+static void sysio\+::chain\+::platform\+\_\+timer\+::impl\+::sig\+\_\+handler (\begin{DoxyParamCaption}\item[{int}]{}{, }\item[{siginfo\+\_\+t \texorpdfstring{$\ast$}{*}}]{si}{, }\item[{void \texorpdfstring{$\ast$}{*}}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{platform__timer__posix_8cpp_source_l00020}{20}} of file \mbox{\hyperlink{platform__timer__posix_8cpp_source}{platform\+\_\+timer\+\_\+posix.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_a73955c69921017b77b595476e8de4eea}{platform\_timer}}*\ \mbox{\hyperlink{namespacesysio_a5c18cd9d34b8c5d3af8e2de75577673fa1f42b089b0bc1105b38f19140a65cc2a}{self}}\ =\ (\mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_a73955c69921017b77b595476e8de4eea}{platform\_timer}}*)\mbox{\hyperlink{namespace_xbyak_1_1util_a88ef5e8c539d624fe3082867208a05dc}{si}}-\/>si\_value.sival\_ptr;}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_a5c18cd9d34b8c5d3af8e2de75577673fa1f42b089b0bc1105b38f19140a65cc2a}{self}}-\/>expired\ =\ 1;}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_a5c18cd9d34b8c5d3af8e2de75577673fa1f42b089b0bc1105b38f19140a65cc2a}{self}}-\/>call\_expiration\_callback();}
+\DoxyCodeLine{00024\ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1chain_1_1platform__timer_1_1impl_a420aaf55b414f2d93ead85f38b113bb9}\index{sysio::chain::platform\_timer::impl@{sysio::chain::platform\_timer::impl}!quit\_event\_id@{quit\_event\_id}}
+\index{quit\_event\_id@{quit\_event\_id}!sysio::chain::platform\_timer::impl@{sysio::chain::platform\_timer::impl}}
+\doxysubsubsection{\texorpdfstring{quit\_event\_id}{quit\_event\_id}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1platform__timer_1_1impl_a420aaf55b414f2d93ead85f38b113bb9} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} sysio\+::chain\+::platform\+\_\+timer\+::impl\+::quit\+\_\+event\+\_\+id = 1\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{platform__timer__macos_8cpp_source_l00026}{26}} of file \mbox{\hyperlink{platform__timer__macos_8cpp_source}{platform\+\_\+timer\+\_\+macos.\+cpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1platform__timer_1_1impl_afa759b0d1dcbb82167c4bea0cfe192c4}\index{sysio::chain::platform\_timer::impl@{sysio::chain::platform\_timer::impl}!timer@{timer}}
+\index{timer@{timer}!sysio::chain::platform\_timer::impl@{sysio::chain::platform\_timer::impl}}
+\doxysubsubsection{\texorpdfstring{timer}{timer}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1platform__timer_1_1impl_afa759b0d1dcbb82167c4bea0cfe192c4} 
+std\+::unique\+\_\+ptr$<$boost\+::asio\+::high\+\_\+resolution\+\_\+timer$>$ sysio\+::chain\+::platform\+\_\+timer\+::impl\+::timer}
+
+
+
+Definition at line \mbox{\hyperlink{platform__timer__asio__fallback_8cpp_source_l00021}{21}} of file \mbox{\hyperlink{platform__timer__asio__fallback_8cpp_source}{platform\+\_\+timer\+\_\+asio\+\_\+fallback.\+cpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1platform__timer_1_1impl_ab5d270960f7b1dc8b529c6bfb836b144}\index{sysio::chain::platform\_timer::impl@{sysio::chain::platform\_timer::impl}!timerid@{timerid}}
+\index{timerid@{timerid}!sysio::chain::platform\_timer::impl@{sysio::chain::platform\_timer::impl}}
+\doxysubsubsection{\texorpdfstring{timerid}{timerid}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1platform__timer_1_1impl_ab5d270960f7b1dc8b529c6bfb836b144} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} sysio\+::chain\+::platform\+\_\+timer\+::impl\+::timerid}
+
+
+
+Definition at line \mbox{\hyperlink{platform__timer__macos_8cpp_source_l00024}{24}} of file \mbox{\hyperlink{platform__timer__macos_8cpp_source}{platform\+\_\+timer\+\_\+macos.\+cpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1platform__timer_1_1impl_a86e2fb4a06f086482286ed3085b373d1}\index{sysio::chain::platform\_timer::impl@{sysio::chain::platform\_timer::impl}!timerid@{timerid}}
+\index{timerid@{timerid}!sysio::chain::platform\_timer::impl@{sysio::chain::platform\_timer::impl}}
+\doxysubsubsection{\texorpdfstring{timerid}{timerid}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1platform__timer_1_1impl_a86e2fb4a06f086482286ed3085b373d1} 
+timer\+\_\+t sysio\+::chain\+::platform\+\_\+timer\+::impl\+::timerid}
+
+
+
+Definition at line \mbox{\hyperlink{platform__timer__posix_8cpp_source_l00018}{18}} of file \mbox{\hyperlink{platform__timer__posix_8cpp_source}{platform\+\_\+timer\+\_\+posix.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/\mbox{\hyperlink{platform__timer__asio__fallback_8cpp}{platform\+\_\+timer\+\_\+asio\+\_\+fallback.\+cpp}}\item 
+libraries/chain/\mbox{\hyperlink{platform__timer__macos_8cpp}{platform\+\_\+timer\+\_\+macos.\+cpp}}\item 
+libraries/chain/\mbox{\hyperlink{platform__timer__posix_8cpp}{platform\+\_\+timer\+\_\+posix.\+cpp}}\end{DoxyCompactItemize}

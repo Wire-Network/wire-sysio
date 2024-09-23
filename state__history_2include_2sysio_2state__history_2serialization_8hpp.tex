@@ -1,0 +1,208 @@
+\doxysection{libraries/state\+\_\+history/include/sysio/state\+\_\+history/serialization.hpp File Reference}
+\hypertarget{state__history_2include_2sysio_2state__history_2serialization_8hpp}{}\label{state__history_2include_2sysio_2state__history_2serialization_8hpp}\index{libraries/state\_history/include/sysio/state\_history/serialization.hpp@{libraries/state\_history/include/sysio/state\_history/serialization.hpp}}
+{\ttfamily \#include $<$sysio/chain/account\+\_\+object.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/contract\+\_\+table\+\_\+objects.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/controller.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/exceptions.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/generated\+\_\+transaction\+\_\+object.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/global\+\_\+property\+\_\+object.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/permission\+\_\+link\+\_\+object.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/permission\+\_\+object.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/protocol\+\_\+state\+\_\+object.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/resource\+\_\+limits.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/resource\+\_\+limits\+\_\+private.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/trace.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/state\+\_\+history/types.\+hpp$>$}\newline
+{\ttfamily \#include $<$type\+\_\+traits$>$}\newline
+Include dependency graph for serialization.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{state__history_2include_2sysio_2state__history_2serialization_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{state__history_2include_2sysio_2state__history_2serialization_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structhistory__serial__wrapper}{history\+\_\+serial\+\_\+wrapper$<$ T $>$}}
+\item 
+struct \mbox{\hyperlink{structhistory__context__wrapper}{history\+\_\+context\+\_\+wrapper$<$ P, T $>$}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacefc}{fc}}
+\begin{DoxyCompactList}\small\item\em namespace \doxylink{namespacesysio_1_1chain}{sysio\+::chain} \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{structhistory__serial__wrapper}{history\+\_\+serial\+\_\+wrapper}}$<$ std\+::decay\+\_\+t$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ $>$ \mbox{\hyperlink{state__history_2include_2sysio_2state__history_2serialization_8hpp_aeef58505371e2c7f9376d471c9719fa1}{make\+\_\+history\+\_\+serial\+\_\+wrapper}} (const \mbox{\hyperlink{classchainbase_1_1database}{chainbase\+::database}} \&db, const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&obj)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}} , typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{structhistory__context__wrapper}{history\+\_\+context\+\_\+wrapper}}$<$ std\+::decay\+\_\+t$<$ \mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}} $>$, std\+::decay\+\_\+t$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ $>$ \mbox{\hyperlink{state__history_2include_2sysio_2state__history_2serialization_8hpp_a8919e19ccc221814a4ea1632ee94d0fc}{make\+\_\+history\+\_\+context\+\_\+wrapper}} (const \mbox{\hyperlink{classchainbase_1_1database}{chainbase\+::database}} \&db, const \mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}} \&\mbox{\hyperlink{structcontext}{context}}, const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&obj)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{namespacefc_a42b1696c4e992ddebdf4b1a9921e4dac}{fc\+::as\+\_\+type}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&x)
+\item 
+{\footnotesize template$<$typename ST , typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_abdb624c8068beb9d8e81ead5e58ff81e}{fc\+::history\+\_\+serialize\+\_\+container}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, const \mbox{\hyperlink{classchainbase_1_1database}{chainbase\+::database}} \&db, const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&v)
+\item 
+{\footnotesize template$<$typename ST , typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_afc286cafa279f0b31dd6153bcc4b2964}{fc\+::history\+\_\+serialize\+\_\+container}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, const \mbox{\hyperlink{classchainbase_1_1database}{chainbase\+::database}} \&db, const std\+::vector$<$ std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ $>$ \&v)
+\item 
+{\footnotesize template$<$typename ST , typename \mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}} , typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_a18657197854994f8d6096163cd4711d9}{fc\+::history\+\_\+context\+\_\+serialize\+\_\+container}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, const \mbox{\hyperlink{classchainbase_1_1database}{chainbase\+::database}} \&db, const \mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}} \&\mbox{\hyperlink{structcontext}{context}}, const std\+::vector$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&v)
+\item 
+{\footnotesize template$<$typename ST , typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_affba236143d9705fefe28092a6fb0b93}{fc\+::operator$<$$<$}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, const \mbox{\hyperlink{structsysio_1_1state__history_1_1big__vector__wrapper}{sysio\+::state\+\_\+history\+::big\+\_\+vector\+\_\+wrapper}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&obj)
+\item 
+{\footnotesize template$<$typename ST $>$ }\\void \mbox{\hyperlink{namespacefc_a38fec6a2c7d19bdea7f66f54ef6e9278}{fc\+::history\+\_\+pack\+\_\+varuint64}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} val)
+\item 
+{\footnotesize template$<$typename ST $>$ }\\void \mbox{\hyperlink{namespacefc_a6ca734ff8ef5c085c67d6a849835a4fc}{fc\+::history\+\_\+pack\+\_\+big\+\_\+bytes}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, const \mbox{\hyperlink{namespacesysio_1_1chain_ac6f5a1f1e061f000983f5d5f3ac25dfa}{sysio\+::chain\+::bytes}} \&v)
+\item 
+{\footnotesize template$<$typename ST $>$ }\\void \mbox{\hyperlink{namespacefc_af77a6f5e09f519d5ec04bcac94f4cb2f}{fc\+::history\+\_\+pack\+\_\+big\+\_\+bytes}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, const std\+::optional$<$ \mbox{\hyperlink{namespacesysio_1_1chain_ac6f5a1f1e061f000983f5d5f3ac25dfa}{sysio\+::chain\+::bytes}} $>$ \&v)
+\item 
+{\footnotesize template$<$typename ST , typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_a9615c781737227f8bcce7750018e47b7}{fc\+::operator$<$$<$}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, const \mbox{\hyperlink{structhistory__serial__wrapper}{history\+\_\+serial\+\_\+wrapper}}$<$ std\+::vector$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ $>$ \&obj)
+\item 
+{\footnotesize template$<$typename ST , typename \mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}} , typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_ab119506a0f95db6e9d13259d243ff12c}{fc\+::operator$<$$<$}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, const \mbox{\hyperlink{structhistory__context__wrapper}{history\+\_\+context\+\_\+wrapper}}$<$ \mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}}, std\+::vector$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ $>$ \&obj)
+\item 
+{\footnotesize template$<$typename ST , typename First , typename Second $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_a7bc76b060c27a6f67e98b2d3da0c4c86}{fc\+::operator$<$$<$}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, const \mbox{\hyperlink{structhistory__serial__wrapper}{history\+\_\+serial\+\_\+wrapper}}$<$ std\+::pair$<$ First, Second $>$ $>$ \&obj)
+\item 
+{\footnotesize template$<$typename ST $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_a4f53bfd83bcbc9cf8e35b9818ec1b196}{fc\+::operator$<$$<$}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, const \mbox{\hyperlink{structhistory__serial__wrapper}{history\+\_\+serial\+\_\+wrapper}}$<$ \mbox{\hyperlink{classsysio_1_1chain_1_1account__object}{sysio\+::chain\+::account\+\_\+object}} $>$ \&obj)
+\item 
+{\footnotesize template$<$typename ST $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_a2cb1f05c389790c96230ff04ed7d846d}{fc\+::operator$<$$<$}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, const \mbox{\hyperlink{structhistory__serial__wrapper}{history\+\_\+serial\+\_\+wrapper}}$<$ \mbox{\hyperlink{classsysio_1_1chain_1_1account__metadata__object}{sysio\+::chain\+::account\+\_\+metadata\+\_\+object}} $>$ \&obj)
+\item 
+{\footnotesize template$<$typename ST $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_adab27b61f0a56d5becab899455b13eca}{fc\+::operator$<$$<$}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, const \mbox{\hyperlink{structhistory__serial__wrapper}{history\+\_\+serial\+\_\+wrapper}}$<$ \mbox{\hyperlink{classsysio_1_1chain_1_1code__object}{sysio\+::chain\+::code\+\_\+object}} $>$ \&obj)
+\item 
+{\footnotesize template$<$typename ST $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_abd75acab9fe461af3c516f4396cd63af}{fc\+::operator$<$$<$}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, const \mbox{\hyperlink{structhistory__serial__wrapper}{history\+\_\+serial\+\_\+wrapper}}$<$ \mbox{\hyperlink{classsysio_1_1chain_1_1table__id__object}{sysio\+::chain\+::table\+\_\+id\+\_\+object}} $>$ \&obj)
+\item 
+{\footnotesize template$<$typename ST $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_a7a8fa84f983ccbfb573069462e5c8606}{fc\+::operator$<$$<$}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, const \mbox{\hyperlink{structhistory__context__wrapper}{history\+\_\+context\+\_\+wrapper}}$<$ \mbox{\hyperlink{classsysio_1_1chain_1_1table__id__object}{sysio\+::chain\+::table\+\_\+id\+\_\+object}}, \mbox{\hyperlink{structsysio_1_1chain_1_1key__value__object}{sysio\+::chain\+::key\+\_\+value\+\_\+object}} $>$ \&obj)
+\item 
+{\footnotesize template$<$typename ST , typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{namespacefc_ad098da55cd644807b2108acdf9df70a5}{fc\+::serialize\+\_\+secondary\+\_\+index\+\_\+data}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&obj)
+\item 
+{\footnotesize template$<$typename ST $>$ }\\void \mbox{\hyperlink{namespacefc_ab7fc72c19e7ab11f40f8ae1f5096d8f7}{fc\+::serialize\+\_\+secondary\+\_\+index\+\_\+data}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, const \mbox{\hyperlink{structfloat64__t}{float64\+\_\+t}} \&obj)
+\item 
+{\footnotesize template$<$typename ST $>$ }\\void \mbox{\hyperlink{namespacefc_ae24a69b263f5d54e3919274ad9816802}{fc\+::serialize\+\_\+secondary\+\_\+index\+\_\+data}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, const \mbox{\hyperlink{structfloat128__t}{float128\+\_\+t}} \&obj)
+\item 
+{\footnotesize template$<$typename ST $>$ }\\void \mbox{\hyperlink{namespacefc_a4ac1f4da43d33fb230f777984075e9ae}{fc\+::serialize\+\_\+secondary\+\_\+index\+\_\+data}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, const \mbox{\hyperlink{namespacesysio_1_1chain_a4404f0f28252f82bd7b98d70d1605e4f}{sysio\+::chain\+::key256\+\_\+t}} \&obj)
+\item 
+{\footnotesize template$<$typename ST , typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_ad49f37a0b0f13495e108dbf05fae84d8}{fc\+::serialize\+\_\+secondary\+\_\+index}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, const \mbox{\hyperlink{classsysio_1_1chain_1_1table__id__object}{sysio\+::chain\+::table\+\_\+id\+\_\+object}} \&\mbox{\hyperlink{structcontext}{context}}, const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&obj)
+\item 
+{\footnotesize template$<$typename ST $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_a9491b305be02b362c1c95d99032dc186}{fc\+::operator$<$$<$}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, const \mbox{\hyperlink{structhistory__context__wrapper}{history\+\_\+context\+\_\+wrapper}}$<$ \mbox{\hyperlink{classsysio_1_1chain_1_1table__id__object}{sysio\+::chain\+::table\+\_\+id\+\_\+object}}, \mbox{\hyperlink{namespacesysio_1_1chain_a42c00d654b5b7f86a0e48b817a2cf76f}{sysio\+::chain\+::index64\+\_\+object}} $>$ \&obj)
+\item 
+{\footnotesize template$<$typename ST $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_a258a235ff45a23d0a13438421e96ced0}{fc\+::operator$<$$<$}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, const \mbox{\hyperlink{structhistory__serial__wrapper}{history\+\_\+serial\+\_\+wrapper}}$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1shared__block__signing__authority__v0}{sysio\+::chain\+::shared\+\_\+block\+\_\+signing\+\_\+authority\+\_\+v0}} $>$ \&obj)
+\item 
+{\footnotesize template$<$typename ST $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_a75f45a254932226e1ab19d2bc3dad2a8}{fc\+::operator$<$$<$}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, const \mbox{\hyperlink{structhistory__serial__wrapper}{history\+\_\+serial\+\_\+wrapper}}$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1shared__producer__authority}{sysio\+::chain\+::shared\+\_\+producer\+\_\+authority}} $>$ \&obj)
+\item 
+{\footnotesize template$<$typename ST $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_ade5b7746bc8764170bd15244583402f5}{fc\+::operator$<$$<$}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, const \mbox{\hyperlink{structhistory__serial__wrapper}{history\+\_\+serial\+\_\+wrapper}}$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1shared__producer__authority__schedule}{sysio\+::chain\+::shared\+\_\+producer\+\_\+authority\+\_\+schedule}} $>$ \&obj)
+\item 
+{\footnotesize template$<$typename ST $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_a1a08d89ec5da5fa1a4f6200ea99ca62c}{fc\+::operator$<$$<$}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, const \mbox{\hyperlink{structhistory__serial__wrapper}{history\+\_\+serial\+\_\+wrapper}}$<$ \mbox{\hyperlink{namespacesysio_1_1chain_a99c6aa941a16bc629e8051a0a656dea7}{sysio\+::chain\+::chain\+\_\+config}} $>$ \&obj)
+\item 
+{\footnotesize template$<$typename ST $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_afb759970ebc987bfb2d3a3c09b959be3}{fc\+::operator$<$$<$}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, const \mbox{\hyperlink{structhistory__serial__wrapper}{history\+\_\+serial\+\_\+wrapper}}$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config}{sysio\+::chain\+::wasm\+\_\+config}} $>$ \&obj)
+\item 
+{\footnotesize template$<$typename ST $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_aec2453044d030b1b3e9c05a017d90dcc}{fc\+::operator$<$$<$}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, const \mbox{\hyperlink{structhistory__serial__wrapper}{history\+\_\+serial\+\_\+wrapper}}$<$ \mbox{\hyperlink{classsysio_1_1chain_1_1global__property__object}{sysio\+::chain\+::global\+\_\+property\+\_\+object}} $>$ \&obj)
+\item 
+{\footnotesize template$<$typename ST $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_acf6f9dd5a6604664e603303d8ce49fcf}{fc\+::operator$<$$<$}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, const \mbox{\hyperlink{structhistory__serial__wrapper}{history\+\_\+serial\+\_\+wrapper}}$<$ \mbox{\hyperlink{classsysio_1_1chain_1_1generated__transaction__object}{sysio\+::chain\+::generated\+\_\+transaction\+\_\+object}} $>$ \&obj)
+\item 
+{\footnotesize template$<$typename ST $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_af7457ca78221c7d66ff2d8c4d2854793}{fc\+::operator$<$$<$}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, const \mbox{\hyperlink{structhistory__serial__wrapper}{history\+\_\+serial\+\_\+wrapper}}$<$ sysio\+::chain\+::protocol\+\_\+state\+\_\+object\+::activated\+\_\+protocol\+\_\+feature $>$ \&obj)
+\item 
+{\footnotesize template$<$typename ST $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_a59641c34494ec5ba37c05a40ef476bc8}{fc\+::operator$<$$<$}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, const \mbox{\hyperlink{structhistory__serial__wrapper}{history\+\_\+serial\+\_\+wrapper}}$<$ \mbox{\hyperlink{classsysio_1_1chain_1_1protocol__state__object}{sysio\+::chain\+::protocol\+\_\+state\+\_\+object}} $>$ \&obj)
+\item 
+{\footnotesize template$<$typename ST $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_a82bf491d09900b6cb4bf9a3e80b7d64b}{fc\+::operator$<$$<$}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, const \mbox{\hyperlink{structhistory__serial__wrapper}{history\+\_\+serial\+\_\+wrapper}}$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1shared__key__weight}{sysio\+::chain\+::shared\+\_\+key\+\_\+weight}} $>$ \&obj)
+\item 
+{\footnotesize template$<$typename ST $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_a719451ce52dce38adefb0057c2f60aae}{fc\+::operator$<$$<$}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, const \mbox{\hyperlink{structhistory__serial__wrapper}{history\+\_\+serial\+\_\+wrapper}}$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1permission__level}{sysio\+::chain\+::permission\+\_\+level}} $>$ \&obj)
+\item 
+{\footnotesize template$<$typename ST $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_a82cc84df7222aff9a54f7c3aaf3740b7}{fc\+::operator$<$$<$}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, const \mbox{\hyperlink{structhistory__serial__wrapper}{history\+\_\+serial\+\_\+wrapper}}$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1permission__level__weight}{sysio\+::chain\+::permission\+\_\+level\+\_\+weight}} $>$ \&obj)
+\item 
+{\footnotesize template$<$typename ST $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_a3417a800cdc0c621ecc54e059aad03da}{fc\+::operator$<$$<$}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, const \mbox{\hyperlink{structhistory__serial__wrapper}{history\+\_\+serial\+\_\+wrapper}}$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1wait__weight}{sysio\+::chain\+::wait\+\_\+weight}} $>$ \&obj)
+\item 
+{\footnotesize template$<$typename ST $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_acd5eeb618f3f9f4e9081310a77486c63}{fc\+::operator$<$$<$}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, const \mbox{\hyperlink{structhistory__serial__wrapper}{history\+\_\+serial\+\_\+wrapper}}$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1shared__authority}{sysio\+::chain\+::shared\+\_\+authority}} $>$ \&obj)
+\item 
+{\footnotesize template$<$typename ST $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_ab249c544c54a9384ed3b4c76f6dc0d54}{fc\+::operator$<$$<$}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, const \mbox{\hyperlink{structhistory__serial__wrapper}{history\+\_\+serial\+\_\+wrapper}}$<$ \mbox{\hyperlink{classsysio_1_1chain_1_1permission__object}{sysio\+::chain\+::permission\+\_\+object}} $>$ \&obj)
+\item 
+{\footnotesize template$<$typename ST $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_a39c951528624b8bcdff3e6f1cf6624fb}{fc\+::operator$<$$<$}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, const \mbox{\hyperlink{structhistory__serial__wrapper}{history\+\_\+serial\+\_\+wrapper}}$<$ \mbox{\hyperlink{classsysio_1_1chain_1_1permission__link__object}{sysio\+::chain\+::permission\+\_\+link\+\_\+object}} $>$ \&obj)
+\item 
+{\footnotesize template$<$typename ST $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_a5c55fbbb70ecda4320347f78981fffd8}{fc\+::operator$<$$<$}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, const \mbox{\hyperlink{structhistory__serial__wrapper}{history\+\_\+serial\+\_\+wrapper}}$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1resource__limits__object}{sysio\+::chain\+::resource\+\_\+limits\+::resource\+\_\+limits\+\_\+object}} $>$ \&obj)
+\item 
+{\footnotesize template$<$typename ST $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_a5797ae18fc80df170ffac7c574d8dd4d}{fc\+::operator$<$$<$}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, const \mbox{\hyperlink{structhistory__serial__wrapper}{history\+\_\+serial\+\_\+wrapper}}$<$ \mbox{\hyperlink{namespacesysio_1_1chain_1_1resource__limits_a52b51399935db8e58d8757c7b51b3f3d}{sysio\+::chain\+::resource\+\_\+limits\+::usage\+\_\+accumulator}} $>$ \&obj)
+\item 
+{\footnotesize template$<$typename ST $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_a504c14b0e6222c3f7f34e407801a407d}{fc\+::operator$<$$<$}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, const \mbox{\hyperlink{structhistory__serial__wrapper}{history\+\_\+serial\+\_\+wrapper}}$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1resource__usage__object}{sysio\+::chain\+::resource\+\_\+limits\+::resource\+\_\+usage\+\_\+object}} $>$ \&obj)
+\item 
+{\footnotesize template$<$typename ST $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_a78b7fc3ab8e1e62f1bf6c0a750fad5c0}{fc\+::operator$<$$<$}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, const \mbox{\hyperlink{structhistory__serial__wrapper}{history\+\_\+serial\+\_\+wrapper}}$<$ \mbox{\hyperlink{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__state__object}{sysio\+::chain\+::resource\+\_\+limits\+::resource\+\_\+limits\+\_\+state\+\_\+object}} $>$ \&obj)
+\item 
+{\footnotesize template$<$typename ST $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_ad06b207613c1be0078082d0ea3aa20bc}{fc\+::operator$<$$<$}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, const \mbox{\hyperlink{structhistory__serial__wrapper}{history\+\_\+serial\+\_\+wrapper}}$<$ \mbox{\hyperlink{namespacesysio_1_1chain_1_1resource__limits_acbeb3d309e353ed8190a55b47d484868}{sysio\+::chain\+::resource\+\_\+limits\+::ratio}} $>$ \&obj)
+\item 
+{\footnotesize template$<$typename ST $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_aba9f93f97c50354c6edbe3c4eabbd592}{fc\+::operator$<$$<$}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, const \mbox{\hyperlink{structhistory__serial__wrapper}{history\+\_\+serial\+\_\+wrapper}}$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1elastic__limit__parameters}{sysio\+::chain\+::resource\+\_\+limits\+::elastic\+\_\+limit\+\_\+parameters}} $>$ \&obj)
+\item 
+{\footnotesize template$<$typename ST $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_af3e95e146b2ce2eae874673666204c7c}{fc\+::operator$<$$<$}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, const \mbox{\hyperlink{structhistory__serial__wrapper}{history\+\_\+serial\+\_\+wrapper}}$<$ \mbox{\hyperlink{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__config__object}{sysio\+::chain\+::resource\+\_\+limits\+::resource\+\_\+limits\+\_\+config\+\_\+object}} $>$ \&obj)
+\item 
+{\footnotesize template$<$typename ST $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_afadb775ed0ca648c937fbf0d36fe6ba8}{fc\+::operator$<$$<$}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, const \mbox{\hyperlink{structhistory__serial__wrapper}{history\+\_\+serial\+\_\+wrapper}}$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1action}{sysio\+::chain\+::action}} $>$ \&obj)
+\item 
+{\footnotesize template$<$typename ST $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_aacedffc4d82da71e08857f24cf04d3d4}{fc\+::operator$<$$<$}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, const \mbox{\hyperlink{structhistory__serial__wrapper}{history\+\_\+serial\+\_\+wrapper}}$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1action__receipt}{sysio\+::chain\+::action\+\_\+receipt}} $>$ \&obj)
+\item 
+{\footnotesize template$<$typename ST $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_a3faf81f77d214e003c8521675ea795f6}{fc\+::operator$<$$<$}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, const \mbox{\hyperlink{structhistory__serial__wrapper}{history\+\_\+serial\+\_\+wrapper}}$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1account__delta}{sysio\+::chain\+::account\+\_\+delta}} $>$ \&obj)
+\item 
+std\+::optional$<$ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} $>$ \mbox{\hyperlink{namespacefc_a4563de3ea3a8e385db15a4a1a988be8e}{fc\+::cap\+\_\+error\+\_\+code}} (const std\+::optional$<$ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} $>$ \&error\+\_\+code)
+\item 
+{\footnotesize template$<$typename ST $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_a40ba3bfa319445ff5f792026e0c9ce53}{fc\+::operator$<$$<$}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, const \mbox{\hyperlink{structhistory__context__wrapper}{history\+\_\+context\+\_\+wrapper}}$<$ bool, \mbox{\hyperlink{structsysio_1_1chain_1_1action__trace}{sysio\+::chain\+::action\+\_\+trace}} $>$ \&obj)
+\item 
+{\footnotesize template$<$typename ST $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_adca5070d4d6e9fd220e40c13f595ce33}{fc\+::operator$<$$<$}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, const \mbox{\hyperlink{structhistory__context__wrapper}{history\+\_\+context\+\_\+wrapper}}$<$ std\+::pair$<$ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}}, bool $>$, \mbox{\hyperlink{structsysio_1_1state__history_1_1augmented__transaction__trace}{sysio\+::state\+\_\+history\+::augmented\+\_\+transaction\+\_\+trace}} $>$ \&obj)
+\item 
+{\footnotesize template$<$typename ST $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_a4d9f5a8fe145e7df60ded132e5a0ed5b}{fc\+::operator$<$$<$}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, const \mbox{\hyperlink{structhistory__context__wrapper}{history\+\_\+context\+\_\+wrapper}}$<$ bool, \mbox{\hyperlink{structsysio_1_1state__history_1_1augmented__transaction__trace}{sysio\+::state\+\_\+history\+::augmented\+\_\+transaction\+\_\+trace}} $>$ \&obj)
+\item 
+{\footnotesize template$<$typename ST $>$ }\\\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \& \mbox{\hyperlink{namespacefc_abd0cefa1c12ba2594065eb970c11839a}{fc\+::operator$<$$<$}} (\mbox{\hyperlink{classfc_1_1datastream}{datastream}}$<$ ST $>$ \&ds, const \mbox{\hyperlink{structsysio_1_1state__history_1_1get__blocks__result__v0}{sysio\+::state\+\_\+history\+::get\+\_\+blocks\+\_\+result\+\_\+v0}} \&obj)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{state__history_2include_2sysio_2state__history_2serialization_8hpp_a8919e19ccc221814a4ea1632ee94d0fc}\index{serialization.hpp@{serialization.hpp}!make\_history\_context\_wrapper@{make\_history\_context\_wrapper}}
+\index{make\_history\_context\_wrapper@{make\_history\_context\_wrapper}!serialization.hpp@{serialization.hpp}}
+\doxysubsubsection{\texorpdfstring{make\_history\_context\_wrapper()}{make\_history\_context\_wrapper()}}
+{\footnotesize\ttfamily \label{state__history_2include_2sysio_2state__history_2serialization_8hpp_a8919e19ccc221814a4ea1632ee94d0fc} 
+template$<$typename \mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}} , typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{structhistory__context__wrapper}{history\+\_\+context\+\_\+wrapper}}$<$ std\+::decay\+\_\+t$<$ \mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}} $>$, std\+::decay\+\_\+t$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ $>$ make\+\_\+history\+\_\+context\+\_\+wrapper (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classchainbase_1_1database}{chainbase\+::database}} \&}]{db}{, }\item[{const \mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}} \&}]{context}{, }\item[{const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{state__history_2include_2sysio_2state__history_2serialization_8hpp_source_l00038}{38}} of file \mbox{\hyperlink{state__history_2include_2sysio_2state__history_2serialization_8hpp_source}{serialization.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00040\ \ \ \ \textcolor{keywordflow}{return}\ \{db,\ \mbox{\hyperlink{programs_2clio_2main_8cpp_a7e8fab42307e75bda555628c7381f239}{context}},\ obj\};}
+\DoxyCodeLine{00041\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{state__history_2include_2sysio_2state__history_2serialization_8hpp_a8919e19ccc221814a4ea1632ee94d0fc_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{state__history_2include_2sysio_2state__history_2serialization_8hpp_aeef58505371e2c7f9376d471c9719fa1}\index{serialization.hpp@{serialization.hpp}!make\_history\_serial\_wrapper@{make\_history\_serial\_wrapper}}
+\index{make\_history\_serial\_wrapper@{make\_history\_serial\_wrapper}!serialization.hpp@{serialization.hpp}}
+\doxysubsubsection{\texorpdfstring{make\_history\_serial\_wrapper()}{make\_history\_serial\_wrapper()}}
+{\footnotesize\ttfamily \label{state__history_2include_2sysio_2state__history_2serialization_8hpp_aeef58505371e2c7f9376d471c9719fa1} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{structhistory__serial__wrapper}{history\+\_\+serial\+\_\+wrapper}}$<$ std\+::decay\+\_\+t$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ $>$ make\+\_\+history\+\_\+serial\+\_\+wrapper (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classchainbase_1_1database}{chainbase\+::database}} \&}]{db}{, }\item[{const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{state__history_2include_2sysio_2state__history_2serialization_8hpp_source_l00026}{26}} of file \mbox{\hyperlink{state__history_2include_2sysio_2state__history_2serialization_8hpp_source}{serialization.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00027\ \ \ \ \textcolor{keywordflow}{return}\ \{db,\ obj\};}
+\DoxyCodeLine{00028\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{state__history_2include_2sysio_2state__history_2serialization_8hpp_aeef58505371e2c7f9376d471c9719fa1_icgraph}
+\end{center}
+\end{figure}

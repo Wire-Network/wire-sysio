@@ -1,0 +1,184 @@
+\doxysection{libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/test/gtest\+\_\+assert\+\_\+by\+\_\+exception\+\_\+test.cc File Reference}
+\hypertarget{gtest__assert__by__exception__test_8cc}{}\label{gtest__assert__by__exception__test_8cc}\index{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/test/gtest\_assert\_by\_exception\_test.cc@{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/test/gtest\_assert\_by\_exception\_test.cc}}
+{\ttfamily \#include "{}gtest/gtest.\+h"{}}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include $<$stdexcept$>$}\newline
+Include dependency graph for gtest\+\_\+assert\+\_\+by\+\_\+exception\+\_\+test.\+cc\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{gtest__assert__by__exception__test_8cc__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{class_throw_listener}{Throw\+Listener}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{gtest__assert__by__exception__test_8cc_a78ecbe7682643ac0413d57d0b9f27fa6}{Fail}} (const char \texorpdfstring{$\ast$}{*}msg)
+\item 
+\mbox{\hyperlink{gtest__assert__by__exception__test_8cc_abd54dc4a1b6e0bcd993f8acfabe13400}{TEST}} (\mbox{\hyperlink{class_test}{Test}}, \mbox{\hyperlink{class_test}{Test}})
+\item 
+\mbox{\hyperlink{gtest__assert__by__exception__test_8cc_a5a30210f18c6e07037bb61edc36ffc6c}{TEST}} (\mbox{\hyperlink{class_test}{Test}}, Test2)
+\item 
+int \mbox{\hyperlink{gtest__assert__by__exception__test_8cc_a3c04138a5bfe5d72780bb7e82a18e627}{main}} (int argc, char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{gtest__assert__by__exception__test_8cc_a15a43eb038fcf068645cbfdba87565e2}{k\+Test\+For\+Continuing\+Test}} = 0
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{gtest__assert__by__exception__test_8cc_a78ecbe7682643ac0413d57d0b9f27fa6}\index{gtest\_assert\_by\_exception\_test.cc@{gtest\_assert\_by\_exception\_test.cc}!Fail@{Fail}}
+\index{Fail@{Fail}!gtest\_assert\_by\_exception\_test.cc@{gtest\_assert\_by\_exception\_test.cc}}
+\doxysubsubsection{\texorpdfstring{Fail()}{Fail()}}
+{\footnotesize\ttfamily \label{gtest__assert__by__exception__test_8cc_a78ecbe7682643ac0413d57d0b9f27fa6} 
+void Fail (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{msg}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest__assert__by__exception__test_8cc_source_l00053}{53}} of file \mbox{\hyperlink{gtest__assert__by__exception__test_8cc_source}{gtest\+\_\+assert\+\_\+by\+\_\+exception\+\_\+test.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00054\ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}FAILURE:\ \%s\(\backslash\)n"{}},\ msg);}
+\DoxyCodeLine{00055\ \ \ fflush(stdout);}
+\DoxyCodeLine{00056\ \ \ exit(1);}
+\DoxyCodeLine{00057\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=189pt]{gtest__assert__by__exception__test_8cc_a78ecbe7682643ac0413d57d0b9f27fa6_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{gtest__assert__by__exception__test_8cc_a3c04138a5bfe5d72780bb7e82a18e627}\index{gtest\_assert\_by\_exception\_test.cc@{gtest\_assert\_by\_exception\_test.cc}!main@{main}}
+\index{main@{main}!gtest\_assert\_by\_exception\_test.cc@{gtest\_assert\_by\_exception\_test.cc}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{gtest__assert__by__exception__test_8cc_a3c04138a5bfe5d72780bb7e82a18e627} 
+int main (\begin{DoxyParamCaption}\item[{int}]{argc}{, }\item[{char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{argv}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest__assert__by__exception__test_8cc_source_l00105}{105}} of file \mbox{\hyperlink{gtest__assert__by__exception__test_8cc_source}{gtest\+\_\+assert\+\_\+by\+\_\+exception\+\_\+test.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00106\ \ \ \mbox{\hyperlink{namespacetesting_afd726ae08c9bd16dc52f78c822d9946b}{testing::InitGoogleTest}}(\&argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}});}
+\DoxyCodeLine{00107\ \ \ \mbox{\hyperlink{classtesting_1_1_unit_test_a24192400b70b3b946746954e9574fb8e}{testing::UnitTest::GetInstance}}()-\/>\mbox{\hyperlink{classtesting_1_1_unit_test_aac10085cf7c0d1751306db10cdd953cb}{listeners}}().\mbox{\hyperlink{classtesting_1_1_test_event_listeners_a1207dce74d64c1c39ffa6105560536a0}{Append}}(\textcolor{keyword}{new}\ \mbox{\hyperlink{class_throw_listener}{ThrowListener}});}
+\DoxyCodeLine{00108\ }
+\DoxyCodeLine{00109\ \ \ \textcolor{keywordtype}{int}\ result\ =\ \mbox{\hyperlink{gtest_8h_a853a3792807489591d3d4a2f2ff9359f}{RUN\_ALL\_TESTS}}();}
+\DoxyCodeLine{00110\ \ \ \textcolor{keywordflow}{if}\ (result\ ==\ 0)\ \{}
+\DoxyCodeLine{00111\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}RUN\_ALL\_TESTS\ returned\ \%d\(\backslash\)n"{}},\ result);}
+\DoxyCodeLine{00112\ \ \ \ \ \mbox{\hyperlink{gtest__assert__by__exception__test_8cc_a78ecbe7682643ac0413d57d0b9f27fa6}{Fail}}(\textcolor{stringliteral}{"{}Expected\ failure\ instead."{}});}
+\DoxyCodeLine{00113\ \ \ \}}
+\DoxyCodeLine{00114\ }
+\DoxyCodeLine{00115\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{gtest__assert__by__exception__test_8cc_a15a43eb038fcf068645cbfdba87565e2}{kTestForContinuingTest}}\ ==\ 0)\ \{}
+\DoxyCodeLine{00116\ \ \ \ \ \mbox{\hyperlink{gtest__assert__by__exception__test_8cc_a78ecbe7682643ac0413d57d0b9f27fa6}{Fail}}(\textcolor{stringliteral}{"{}Should\ have\ continued\ with\ other\ tests,\ but\ did\ not."{}});}
+\DoxyCodeLine{00117\ \ \ \}}
+\DoxyCodeLine{00118\ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00119\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{gtest__assert__by__exception__test_8cc_a3c04138a5bfe5d72780bb7e82a18e627_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{gtest__assert__by__exception__test_8cc_abd54dc4a1b6e0bcd993f8acfabe13400}\index{gtest\_assert\_by\_exception\_test.cc@{gtest\_assert\_by\_exception\_test.cc}!TEST@{TEST}}
+\index{TEST@{TEST}!gtest\_assert\_by\_exception\_test.cc@{gtest\_assert\_by\_exception\_test.cc}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{gtest__assert__by__exception__test_8cc_abd54dc4a1b6e0bcd993f8acfabe13400} 
+TEST (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_test}{Test}}}]{}{, }\item[{\mbox{\hyperlink{class_test}{Test}}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest__assert__by__exception__test_8cc_source_l00065}{65}} of file \mbox{\hyperlink{gtest__assert__by__exception__test_8cc_source}{gtest\+\_\+assert\+\_\+by\+\_\+exception\+\_\+test.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00066\ \ \ \textcolor{comment}{//\ A\ successful\ assertion\ shouldn't\ throw.}}
+\DoxyCodeLine{00067\ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00068\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(3,\ 3);}
+\DoxyCodeLine{00069\ \ \ \}\ \textcolor{keywordflow}{catch}(...)\ \{}
+\DoxyCodeLine{00070\ \ \ \ \ \mbox{\hyperlink{gtest__assert__by__exception__test_8cc_a78ecbe7682643ac0413d57d0b9f27fa6}{Fail}}(\textcolor{stringliteral}{"{}A\ successful\ assertion\ wrongfully\ threw."{}});}
+\DoxyCodeLine{00071\ \ \ \}}
+\DoxyCodeLine{00072\ }
+\DoxyCodeLine{00073\ \ \ \textcolor{comment}{//\ A\ successful\ assertion\ shouldn't\ throw.}}
+\DoxyCodeLine{00074\ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00075\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(3,\ 4);}
+\DoxyCodeLine{00076\ \ \ \}\ \textcolor{keywordflow}{catch}(...)\ \{}
+\DoxyCodeLine{00077\ \ \ \ \ \mbox{\hyperlink{gtest__assert__by__exception__test_8cc_a78ecbe7682643ac0413d57d0b9f27fa6}{Fail}}(\textcolor{stringliteral}{"{}A\ failed\ non-\/fatal\ assertion\ wrongfully\ threw."{}});}
+\DoxyCodeLine{00078\ \ \ \}}
+\DoxyCodeLine{00079\ }
+\DoxyCodeLine{00080\ \ \ \textcolor{comment}{//\ A\ failed\ assertion\ should\ throw.}}
+\DoxyCodeLine{00081\ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00082\ \ \ \ \ AssertFalse();}
+\DoxyCodeLine{00083\ \ \ \}\ \textcolor{keywordflow}{catch}(\textcolor{keyword}{const}\ testing::AssertionException\&\ e)\ \{}
+\DoxyCodeLine{00084\ \ \ \ \ \textcolor{keywordflow}{if}\ (strstr(e.what(),\ \textcolor{stringliteral}{"{}Expected\ failure"{}})\ !=\ NULL)}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \textcolor{keywordflow}{throw};}
+\DoxyCodeLine{00086\ }
+\DoxyCodeLine{00087\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\%s"{}},}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}A\ failed\ assertion\ did\ throw\ an\ exception\ of\ the\ right\ type,\ "{}}}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}but\ the\ message\ is\ incorrect.\ \ Instead\ of\ containing\ \(\backslash\)"{}Expected\ "{}}}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}failure\(\backslash\)"{},\ it\ is:\(\backslash\)n"{}});}
+\DoxyCodeLine{00091\ \ \ \ \ \mbox{\hyperlink{gtest__assert__by__exception__test_8cc_a78ecbe7682643ac0413d57d0b9f27fa6}{Fail}}(e.what());}
+\DoxyCodeLine{00092\ \ \ \}\ \textcolor{keywordflow}{catch}(...)\ \{}
+\DoxyCodeLine{00093\ \ \ \ \ \mbox{\hyperlink{gtest__assert__by__exception__test_8cc_a78ecbe7682643ac0413d57d0b9f27fa6}{Fail}}(\textcolor{stringliteral}{"{}A\ failed\ assertion\ threw\ the\ wrong\ type\ of\ exception."{}});}
+\DoxyCodeLine{00094\ \ \ \}}
+\DoxyCodeLine{00095\ \ \ \mbox{\hyperlink{gtest__assert__by__exception__test_8cc_a78ecbe7682643ac0413d57d0b9f27fa6}{Fail}}(\textcolor{stringliteral}{"{}A\ failed\ assertion\ should've\ thrown\ but\ didn't."{}});}
+\DoxyCodeLine{00096\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=189pt]{gtest__assert__by__exception__test_8cc_abd54dc4a1b6e0bcd993f8acfabe13400_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{gtest__assert__by__exception__test_8cc_a5a30210f18c6e07037bb61edc36ffc6c}\index{gtest\_assert\_by\_exception\_test.cc@{gtest\_assert\_by\_exception\_test.cc}!TEST@{TEST}}
+\index{TEST@{TEST}!gtest\_assert\_by\_exception\_test.cc@{gtest\_assert\_by\_exception\_test.cc}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{gtest__assert__by__exception__test_8cc_a5a30210f18c6e07037bb61edc36ffc6c} 
+TEST (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_test}{Test}}}]{}{, }\item[{Test2}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest__assert__by__exception__test_8cc_source_l00100}{100}} of file \mbox{\hyperlink{gtest__assert__by__exception__test_8cc_source}{gtest\+\_\+assert\+\_\+by\+\_\+exception\+\_\+test.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00101\ \ \ \textcolor{comment}{//\ FIXME(sokolov):\ how\ to\ force\ Test2\ to\ be\ after\ Test?}}
+\DoxyCodeLine{00102\ \ \ \mbox{\hyperlink{gtest__assert__by__exception__test_8cc_a15a43eb038fcf068645cbfdba87565e2}{kTestForContinuingTest}}\ =\ 1;}
+\DoxyCodeLine{00103\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{gtest__assert__by__exception__test_8cc_a15a43eb038fcf068645cbfdba87565e2}\index{gtest\_assert\_by\_exception\_test.cc@{gtest\_assert\_by\_exception\_test.cc}!kTestForContinuingTest@{kTestForContinuingTest}}
+\index{kTestForContinuingTest@{kTestForContinuingTest}!gtest\_assert\_by\_exception\_test.cc@{gtest\_assert\_by\_exception\_test.cc}}
+\doxysubsubsection{\texorpdfstring{kTestForContinuingTest}{kTestForContinuingTest}}
+{\footnotesize\ttfamily \label{gtest__assert__by__exception__test_8cc_a15a43eb038fcf068645cbfdba87565e2} 
+int k\+Test\+For\+Continuing\+Test = 0}
+
+
+
+Definition at line \mbox{\hyperlink{gtest__assert__by__exception__test_8cc_source_l00098}{98}} of file \mbox{\hyperlink{gtest__assert__by__exception__test_8cc_source}{gtest\+\_\+assert\+\_\+by\+\_\+exception\+\_\+test.\+cc}}.
+

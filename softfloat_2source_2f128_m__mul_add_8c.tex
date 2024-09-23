@@ -1,0 +1,53 @@
+\doxysection{libraries/softfloat/source/f128\+M\+\_\+mul\+Add.c File Reference}
+\hypertarget{softfloat_2source_2f128_m__mul_add_8c}{}\label{softfloat_2source_2f128_m__mul_add_8c}\index{libraries/softfloat/source/f128M\_mulAdd.c@{libraries/softfloat/source/f128M\_mulAdd.c}}
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include "{}platform.\+h"{}}\newline
+{\ttfamily \#include "{}internals.\+h"{}}\newline
+{\ttfamily \#include "{}softfloat.\+h"{}}\newline
+Include dependency graph for f128\+M\+\_\+mul\+Add.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{softfloat_2source_2f128_m__mul_add_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{softfloat_2source_2f128_m__mul_add_8c_aec42ddbe3766a610e7f2380f079f28ff}{f128\+M\+\_\+mul\+Add}} (const \mbox{\hyperlink{structfloat128__t}{float128\+\_\+t}} \texorpdfstring{$\ast$}{*}a\+Ptr, const \mbox{\hyperlink{structfloat128__t}{float128\+\_\+t}} \texorpdfstring{$\ast$}{*}b\+Ptr, const \mbox{\hyperlink{structfloat128__t}{float128\+\_\+t}} \texorpdfstring{$\ast$}{*}c\+Ptr, \mbox{\hyperlink{structfloat128__t}{float128\+\_\+t}} \texorpdfstring{$\ast$}{*}z\+Ptr)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{softfloat_2source_2f128_m__mul_add_8c_aec42ddbe3766a610e7f2380f079f28ff}\index{f128M\_mulAdd.c@{f128M\_mulAdd.c}!f128M\_mulAdd@{f128M\_mulAdd}}
+\index{f128M\_mulAdd@{f128M\_mulAdd}!f128M\_mulAdd.c@{f128M\_mulAdd.c}}
+\doxysubsubsection{\texorpdfstring{f128M\_mulAdd()}{f128M\_mulAdd()}}
+{\footnotesize\ttfamily \label{softfloat_2source_2f128_m__mul_add_8c_aec42ddbe3766a610e7f2380f079f28ff} 
+void f128\+M\+\_\+mul\+Add (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structfloat128__t}{float128\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{a\+Ptr}{, }\item[{const \mbox{\hyperlink{structfloat128__t}{float128\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{b\+Ptr}{, }\item[{const \mbox{\hyperlink{structfloat128__t}{float128\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{c\+Ptr}{, }\item[{\mbox{\hyperlink{structfloat128__t}{float128\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{z\+Ptr}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2f128_m__mul_add_8c_source_l00073}{73}} of file \mbox{\hyperlink{softfloat_2source_2f128_m__mul_add_8c_source}{f128\+M\+\_\+mul\+Add.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00079\ \{}
+\DoxyCodeLine{00080\ }
+\DoxyCodeLine{00081\ \ \ \ \ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a341019155c910f1b11794379ef24f42a}{softfloat\_mulAddF128M}}(}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ (\textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ *)\ aPtr,}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ (\textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ *)\ bPtr,}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ (\textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ *)\ cPtr,}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ *)\ zPtr,}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ 0}
+\DoxyCodeLine{00087\ \ \ \ \ );}
+\DoxyCodeLine{00088\ }
+\DoxyCodeLine{00089\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{softfloat_2source_2f128_m__mul_add_8c_aec42ddbe3766a610e7f2380f079f28ff_cgraph}
+\end{center}
+\end{figure}

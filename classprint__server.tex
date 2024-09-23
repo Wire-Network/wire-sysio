@@ -1,0 +1,386 @@
+\doxysection{print\+\_\+server Class Reference}
+\hypertarget{classprint__server}{}\label{classprint__server}\index{print\_server@{print\_server}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classprint__server_ab1b7c0e33a8466b329b8fc56af302ff0}{print\+\_\+server}} ()
+\item 
+void \mbox{\hyperlink{classprint__server_adc26c2f38649bdbbe97531dde369ad74}{on\+\_\+open}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}} hdl)
+\item 
+void \mbox{\hyperlink{classprint__server_abb31736075d42768a36f1d953866b1c6}{on\+\_\+close}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}} hdl)
+\item 
+void \mbox{\hyperlink{classprint__server_a08d4b374fa69846cb78ecf54b40cfd70}{on\+\_\+message}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}} hdl, \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a8097edab4feb0c36a69601c3786f0062}{server\+::message\+\_\+ptr}} msg)
+\item 
+\mbox{\hyperlink{structconnection__data}{connection\+\_\+data}} \& \mbox{\hyperlink{classprint__server_a401dd533514c3d75134f63364d4e6c37}{get\+\_\+data\+\_\+from\+\_\+hdl}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}} hdl)
+\item 
+void \mbox{\hyperlink{classprint__server_a724db97a6c441b5db090f6274c6112d8}{run}} (\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} port)
+\item 
+\mbox{\hyperlink{classprint__server_ab1b7c0e33a8466b329b8fc56af302ff0}{print\+\_\+server}} ()
+\item 
+void \mbox{\hyperlink{classprint__server_adc26c2f38649bdbbe97531dde369ad74}{on\+\_\+open}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}} hdl)
+\item 
+void \mbox{\hyperlink{classprint__server_abb31736075d42768a36f1d953866b1c6}{on\+\_\+close}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}} hdl)
+\item 
+void \mbox{\hyperlink{classprint__server_a08d4b374fa69846cb78ecf54b40cfd70}{on\+\_\+message}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}} hdl, \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a8097edab4feb0c36a69601c3786f0062}{server\+::message\+\_\+ptr}} msg)
+\item 
+void \mbox{\hyperlink{classprint__server_a724db97a6c441b5db090f6274c6112d8}{run}} (\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} port)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{associative__storage_8cpp_source_l00019}{19}} of file \mbox{\hyperlink{associative__storage_8cpp_source}{associative\+\_\+storage.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classprint__server_ab1b7c0e33a8466b329b8fc56af302ff0}\index{print\_server@{print\_server}!print\_server@{print\_server}}
+\index{print\_server@{print\_server}!print\_server@{print\_server}}
+\doxysubsubsection{\texorpdfstring{print\_server()}{print\_server()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classprint__server_ab1b7c0e33a8466b329b8fc56af302ff0} 
+print\+\_\+server\+::print\+\_\+server (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{associative__storage_8cpp_source_l00021}{21}} of file \mbox{\hyperlink{associative__storage_8cpp_source}{associative\+\_\+storage.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ m\_next\_sessionid(1)\ \{}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ m\_server.init\_asio();}
+\DoxyCodeLine{00023\ }
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ m\_server.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a5753d9848aefc04ee91da401c0cc65b8}{set\_open\_handler}}(bind(\&\mbox{\hyperlink{classprint__server_adc26c2f38649bdbbe97531dde369ad74}{print\_server::on\_open}},\textcolor{keyword}{this},::\_1));}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ m\_server.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a8d7d95bebc154879655211e2b0b5e069}{set\_close\_handler}}(bind(\&\mbox{\hyperlink{classprint__server_abb31736075d42768a36f1d953866b1c6}{print\_server::on\_close}},\textcolor{keyword}{this},::\_1));}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ m\_server.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a34a3a8351bff65ba878975be471cab85}{set\_message\_handler}}(bind(\&\mbox{\hyperlink{classprint__server_a08d4b374fa69846cb78ecf54b40cfd70}{print\_server::on\_message}},\textcolor{keyword}{this},::\_1,::\_2));}
+\DoxyCodeLine{00027\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classprint__server_ab1b7c0e33a8466b329b8fc56af302ff0_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classprint__server_ab1b7c0e33a8466b329b8fc56af302ff0}\index{print\_server@{print\_server}!print\_server@{print\_server}}
+\index{print\_server@{print\_server}!print\_server@{print\_server}}
+\doxysubsubsection{\texorpdfstring{print\_server()}{print\_server()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classprint__server_ab1b7c0e33a8466b329b8fc56af302ff0} 
+print\+\_\+server\+::print\+\_\+server (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{enriched__storage_8cpp_source_l00040}{40}} of file \mbox{\hyperlink{enriched__storage_8cpp_source}{enriched\+\_\+storage.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ m\_next\_sessionid(1)\ \{}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ m\_server.init\_asio();}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ m\_server.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a5753d9848aefc04ee91da401c0cc65b8}{set\_open\_handler}}(bind(\&\mbox{\hyperlink{classprint__server_adc26c2f38649bdbbe97531dde369ad74}{print\_server::on\_open}},\textcolor{keyword}{this},::\_1));}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ m\_server.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a8d7d95bebc154879655211e2b0b5e069}{set\_close\_handler}}(bind(\&\mbox{\hyperlink{classprint__server_abb31736075d42768a36f1d953866b1c6}{print\_server::on\_close}},\textcolor{keyword}{this},::\_1));}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ m\_server.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a34a3a8351bff65ba878975be471cab85}{set\_message\_handler}}(bind(\&\mbox{\hyperlink{classprint__server_a08d4b374fa69846cb78ecf54b40cfd70}{print\_server::on\_message}},\textcolor{keyword}{this},::\_1,::\_2));}
+\DoxyCodeLine{00046\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classprint__server_ab1b7c0e33a8466b329b8fc56af302ff0_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classprint__server_a401dd533514c3d75134f63364d4e6c37}\index{print\_server@{print\_server}!get\_data\_from\_hdl@{get\_data\_from\_hdl}}
+\index{get\_data\_from\_hdl@{get\_data\_from\_hdl}!print\_server@{print\_server}}
+\doxysubsubsection{\texorpdfstring{get\_data\_from\_hdl()}{get\_data\_from\_hdl()}}
+{\footnotesize\ttfamily \label{classprint__server_a401dd533514c3d75134f63364d4e6c37} 
+\mbox{\hyperlink{structconnection__data}{connection\+\_\+data}} \& print\+\_\+server\+::get\+\_\+data\+\_\+from\+\_\+hdl (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}}}]{hdl}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{associative__storage_8cpp_source_l00060}{60}} of file \mbox{\hyperlink{associative__storage_8cpp_source}{associative\+\_\+storage.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ it\ =\ m\_connections.find(hdl);}
+\DoxyCodeLine{00062\ }
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (it\ ==\ m\_connections.end())\ \{}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ this\ connection\ is\ not\ in\ the\ list.\ This\ really\ shouldn't\ happen}}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ and\ probably\ means\ something\ else\ is\ wrong.}}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::invalid\_argument(\textcolor{stringliteral}{"{}No\ data\ available\ for\ session"{}});}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00068\ }
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ it-\/>second;}
+\DoxyCodeLine{00070\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classprint__server_a401dd533514c3d75134f63364d4e6c37_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classprint__server_abb31736075d42768a36f1d953866b1c6}\index{print\_server@{print\_server}!on\_close@{on\_close}}
+\index{on\_close@{on\_close}!print\_server@{print\_server}}
+\doxysubsubsection{\texorpdfstring{on\_close()}{on\_close()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classprint__server_abb31736075d42768a36f1d953866b1c6} 
+void print\+\_\+server\+::on\+\_\+close (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}}}]{hdl}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{associative__storage_8cpp_source_l00038}{38}} of file \mbox{\hyperlink{associative__storage_8cpp_source}{associative\+\_\+storage.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structconnection__data}{connection\_data}}\&\ data\ =\ \mbox{\hyperlink{classprint__server_a401dd533514c3d75134f63364d4e6c37}{get\_data\_from\_hdl}}(hdl);}
+\DoxyCodeLine{00040\ }
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}Closing\ connection\ "{}}\ <<\ data.name}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\ with\ sessionid\ "{}}\ <<\ data.sessionid\ <<\ std::endl;}
+\DoxyCodeLine{00043\ }
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ m\_connections.erase(hdl);}
+\DoxyCodeLine{00045\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classprint__server_abb31736075d42768a36f1d953866b1c6_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=320pt]{classprint__server_abb31736075d42768a36f1d953866b1c6_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classprint__server_abb31736075d42768a36f1d953866b1c6}\index{print\_server@{print\_server}!on\_close@{on\_close}}
+\index{on\_close@{on\_close}!print\_server@{print\_server}}
+\doxysubsubsection{\texorpdfstring{on\_close()}{on\_close()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classprint__server_abb31736075d42768a36f1d953866b1c6} 
+void print\+\_\+server\+::on\+\_\+close (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}}}]{hdl}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{enriched__storage_8cpp_source_l00054}{54}} of file \mbox{\hyperlink{enriched__storage_8cpp_source}{enriched\+\_\+storage.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{debug__client_8cpp_ae9c9779aea742ab80689add7e553df0d}{connection\_ptr}}\ con\ =\ m\_server.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a0fe4457427d4124abe7ca022ba7afbb4}{get\_con\_from\_hdl}}(hdl);}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}Closing\ connection\ "{}}\ <<\ con-\/>name\ }
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\ with\ sessionid\ "{}}\ <<\ con-\/>sessionid\ <<\ std::endl;}
+\DoxyCodeLine{00059\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classprint__server_abb31736075d42768a36f1d953866b1c6_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classprint__server_a08d4b374fa69846cb78ecf54b40cfd70}\index{print\_server@{print\_server}!on\_message@{on\_message}}
+\index{on\_message@{on\_message}!print\_server@{print\_server}}
+\doxysubsubsection{\texorpdfstring{on\_message()}{on\_message()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classprint__server_a08d4b374fa69846cb78ecf54b40cfd70} 
+void print\+\_\+server\+::on\+\_\+message (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}}}]{hdl}{, }\item[{\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a8097edab4feb0c36a69601c3786f0062}{server\+::message\+\_\+ptr}}}]{msg}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{associative__storage_8cpp_source_l00047}{47}} of file \mbox{\hyperlink{associative__storage_8cpp_source}{associative\+\_\+storage.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structconnection__data}{connection\_data}}\&\ data\ =\ \mbox{\hyperlink{classprint__server_a401dd533514c3d75134f63364d4e6c37}{get\_data\_from\_hdl}}(hdl);}
+\DoxyCodeLine{00049\ }
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (data.name.empty())\ \{}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ data.name\ =\ msg-\/>get\_payload();}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}Setting\ name\ of\ connection\ with\ sessionid\ "{}}}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ data.sessionid\ <<\ \textcolor{stringliteral}{"{}\ to\ "{}}\ <<\ data.name\ <<\ std::endl;}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}Got\ a\ message\ from\ connection\ "{}}\ <<\ data.name}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\ with\ sessionid\ "{}}\ <<\ data.sessionid\ <<\ std::endl;}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00058\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classprint__server_a08d4b374fa69846cb78ecf54b40cfd70_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=336pt]{classprint__server_a08d4b374fa69846cb78ecf54b40cfd70_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classprint__server_a08d4b374fa69846cb78ecf54b40cfd70}\index{print\_server@{print\_server}!on\_message@{on\_message}}
+\index{on\_message@{on\_message}!print\_server@{print\_server}}
+\doxysubsubsection{\texorpdfstring{on\_message()}{on\_message()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classprint__server_a08d4b374fa69846cb78ecf54b40cfd70} 
+void print\+\_\+server\+::on\+\_\+message (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}}}]{hdl}{, }\item[{\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a8097edab4feb0c36a69601c3786f0062}{server\+::message\+\_\+ptr}}}]{msg}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{enriched__storage_8cpp_source_l00061}{61}} of file \mbox{\hyperlink{enriched__storage_8cpp_source}{enriched\+\_\+storage.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{debug__client_8cpp_ae9c9779aea742ab80689add7e553df0d}{connection\_ptr}}\ con\ =\ m\_server.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a0fe4457427d4124abe7ca022ba7afbb4}{get\_con\_from\_hdl}}(hdl);}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (con-\/>name.empty())\ \{}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ con-\/>name\ =\ msg-\/>get\_payload();}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}Setting\ name\ of\ connection\ with\ sessionid\ "{}}\ }
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ con-\/>sessionid\ <<\ \textcolor{stringliteral}{"{}\ to\ "{}}\ <<\ con-\/>name\ <<\ std::endl;}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}Got\ a\ message\ from\ connection\ "{}}\ <<\ con-\/>name\ }
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\ with\ sessionid\ "{}}\ <<\ con-\/>sessionid\ <<\ std::endl;}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00072\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classprint__server_a08d4b374fa69846cb78ecf54b40cfd70_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classprint__server_adc26c2f38649bdbbe97531dde369ad74}\index{print\_server@{print\_server}!on\_open@{on\_open}}
+\index{on\_open@{on\_open}!print\_server@{print\_server}}
+\doxysubsubsection{\texorpdfstring{on\_open()}{on\_open()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classprint__server_adc26c2f38649bdbbe97531dde369ad74} 
+void print\+\_\+server\+::on\+\_\+open (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}}}]{hdl}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{associative__storage_8cpp_source_l00029}{29}} of file \mbox{\hyperlink{associative__storage_8cpp_source}{associative\+\_\+storage.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structconnection__data}{connection\_data}}\ data;}
+\DoxyCodeLine{00031\ }
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ data.\mbox{\hyperlink{structconnection__data_aaa7435f644ad456b84123dedd50a2faa}{sessionid}}\ =\ m\_next\_sessionid++;}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ data.name.clear();}
+\DoxyCodeLine{00034\ }
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ m\_connections[hdl]\ =\ data;}
+\DoxyCodeLine{00036\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=318pt]{classprint__server_adc26c2f38649bdbbe97531dde369ad74_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classprint__server_adc26c2f38649bdbbe97531dde369ad74}\index{print\_server@{print\_server}!on\_open@{on\_open}}
+\index{on\_open@{on\_open}!print\_server@{print\_server}}
+\doxysubsubsection{\texorpdfstring{on\_open()}{on\_open()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classprint__server_adc26c2f38649bdbbe97531dde369ad74} 
+void print\+\_\+server\+::on\+\_\+open (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}}}]{hdl}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{enriched__storage_8cpp_source_l00048}{48}} of file \mbox{\hyperlink{enriched__storage_8cpp_source}{enriched\+\_\+storage.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{debug__client_8cpp_ae9c9779aea742ab80689add7e553df0d}{connection\_ptr}}\ con\ =\ m\_server.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a0fe4457427d4124abe7ca022ba7afbb4}{get\_con\_from\_hdl}}(hdl);}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ con-\/>sessionid\ =\ m\_next\_sessionid++;}
+\DoxyCodeLine{00052\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classprint__server_adc26c2f38649bdbbe97531dde369ad74_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classprint__server_a724db97a6c441b5db090f6274c6112d8}\index{print\_server@{print\_server}!run@{run}}
+\index{run@{run}!print\_server@{print\_server}}
+\doxysubsubsection{\texorpdfstring{run()}{run()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classprint__server_a724db97a6c441b5db090f6274c6112d8} 
+void print\+\_\+server\+::run (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}}}]{port}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{associative__storage_8cpp_source_l00072}{72}} of file \mbox{\hyperlink{associative__storage_8cpp_source}{associative\+\_\+storage.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ m\_server.listen(port);}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ m\_server.\mbox{\hyperlink{classwebsocketpp_1_1server_a0204a7d444144f7ea5b8bbcf14689fc1}{start\_accept}}();}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ m\_server.run();}
+\DoxyCodeLine{00076\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classprint__server_a724db97a6c441b5db090f6274c6112d8_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=240pt]{classprint__server_a724db97a6c441b5db090f6274c6112d8_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classprint__server_a724db97a6c441b5db090f6274c6112d8}\index{print\_server@{print\_server}!run@{run}}
+\index{run@{run}!print\_server@{print\_server}}
+\doxysubsubsection{\texorpdfstring{run()}{run()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classprint__server_a724db97a6c441b5db090f6274c6112d8} 
+void print\+\_\+server\+::run (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}}}]{port}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{enriched__storage_8cpp_source_l00074}{74}} of file \mbox{\hyperlink{enriched__storage_8cpp_source}{enriched\+\_\+storage.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ m\_server.listen(port);}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ m\_server.\mbox{\hyperlink{classwebsocketpp_1_1server_a0204a7d444144f7ea5b8bbcf14689fc1}{start\_accept}}();}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ m\_server.run();}
+\DoxyCodeLine{00078\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classprint__server_a724db97a6c441b5db090f6274c6112d8_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/vendor/websocketpp/examples/associative\+\_\+storage/\mbox{\hyperlink{associative__storage_8cpp}{associative\+\_\+storage.\+cpp}}\item 
+libraries/fc/vendor/websocketpp/examples/enriched\+\_\+storage/\mbox{\hyperlink{enriched__storage_8cpp}{enriched\+\_\+storage.\+cpp}}\end{DoxyCompactItemize}

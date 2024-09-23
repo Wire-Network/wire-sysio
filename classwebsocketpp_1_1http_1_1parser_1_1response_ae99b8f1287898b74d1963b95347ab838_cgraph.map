@@ -1,0 +1,22 @@
+<map id="websocketpp::http::parser::response::consume" name="websocketpp::http::parser::response::consume">
+<area shape="rect" id="Node000001" title="Process bytes in the input buffer." alt="" coords="5,46,185,87"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1http_1_1parser_1_1parser.html#ae8a8f833c3fb01f1553a26e77f380367" title="Get the value of an HTTP header." alt="" coords="643,5,780,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="185,59,233,56,628,35,628,40,233,61,185,64"/>
+<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1http_1_1parser_1_1parser.html#a4dbb443fd916f8b4306e7afdb2e8ff45" title="Process a header line." alt="" coords="233,71,388,126"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="186,77,218,82,217,87,185,83"/>
+<area shape="rect" id="Node000004" href="$classwebsocketpp_1_1http_1_1parser_1_1parser.html#abd39762de5ec467a29a537d79602b603" title="Append a value to an existing HTTP header." alt="" coords="436,71,587,126"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="388,96,421,96,421,101,388,101"/>
+<area shape="rect" id="Node000006" href="$namespacewebsocketpp_1_1http_1_1parser.html#ae656f7130716b25fb2a34cee77a0444e" title=" " alt="" coords="444,150,580,191"/>
+<area shape="poly" id="edge6_Node000003_Node000006" title=" " alt="" coords="389,124,440,142,438,147,388,129"/>
+<area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="587,71,628,58,630,63,588,76"/>
+<area shape="rect" id="Node000005" href="$namespacewebsocketpp_1_1http.html#a45a9b60b72b68de7b32fb75d89ad4c04" title="Is the character a non&#45;token." alt="" coords="643,85,780,126"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="588,98,628,100,628,105,587,104"/>
+<area shape="rect" id="Node000007" href="$namespacewebsocketpp_1_1http_1_1parser.html#a263c7c466bbed56948d5877b9c33c354" title="Read and discard linear whitespace." alt="" coords="635,150,788,191"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="580,168,619,168,619,173,580,173"/>
+<area shape="rect" id="Node000008" href="$namespacewebsocketpp_1_1http_1_1parser.html#a1dacef9abccd8e5b6c572447d9f5a3ab" title="Read and discard one unit of linear whitespace." alt="" coords="836,150,972,191"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="788,168,820,168,820,173,788,173"/>
+<area shape="rect" id="Node000009" href="$namespacewebsocketpp_1_1http.html#a95df9e609616688298d34fee9ec34945" title="Is the character non&#45;whitespace." alt="" coords="1020,117,1181,158"/>
+<area shape="poly" id="edge9_Node000008_Node000009" title=" " alt="" coords="972,156,1004,151,1005,156,973,162"/>
+<area shape="rect" id="Node000010" href="$namespacewebsocketpp_1_1http.html#a8ff7039dd19159bdbce3b98159c66ae2" title="Is the character whitespace." alt="" coords="1032,182,1169,223"/>
+<area shape="poly" id="edge10_Node000008_Node000010" title=" " alt="" coords="973,179,1018,186,1017,192,972,184"/>
+</map>

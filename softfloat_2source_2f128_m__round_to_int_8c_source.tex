@@ -1,0 +1,229 @@
+\doxysection{f128\+M\+\_\+round\+To\+Int.\+c}
+\hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source}{}\label{softfloat_2source_2f128_m__round_to_int_8c_source}\index{libraries/softfloat/source/f128M\_roundToInt.c@{libraries/softfloat/source/f128M\_roundToInt.c}}
+\mbox{\hyperlink{softfloat_2source_2f128_m__round_to_int_8c}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00001}00001\ }
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00002}00002\ \textcolor{comment}{/*============================================================================}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00003}00003\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00004}00004\ \textcolor{comment}{This\ C\ source\ file\ is\ part\ of\ the\ SoftFloat\ IEEE\ Floating-\/Point\ Arithmetic}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00005}00005\ \textcolor{comment}{Package,\ Release\ 3e,\ by\ John\ R.\ Hauser.}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00006}00006\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00007}00007\ \textcolor{comment}{Copyright\ 2011,\ 2012,\ 2013,\ 2014,\ 2017\ The\ Regents\ of\ the\ University\ of}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00008}00008\ \textcolor{comment}{California.\ \ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00009}00009\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00010}00010\ \textcolor{comment}{Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00011}00011\ \textcolor{comment}{modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are\ met:}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00012}00012\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00013}00013\ \textcolor{comment}{\ 1.\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright\ notice,}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00014}00014\ \textcolor{comment}{\ \ \ \ this\ list\ of\ conditions,\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00015}00015\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00016}00016\ \textcolor{comment}{\ 2.\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above\ copyright\ notice,}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00017}00017\ \textcolor{comment}{\ \ \ \ this\ list\ of\ conditions,\ and\ the\ following\ disclaimer\ in\ the\ documentation}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00018}00018\ \textcolor{comment}{\ \ \ \ and/or\ other\ materials\ provided\ with\ the\ distribution.}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00019}00019\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00020}00020\ \textcolor{comment}{\ 3.\ Neither\ the\ name\ of\ the\ University\ nor\ the\ names\ of\ its\ contributors\ may}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00021}00021\ \textcolor{comment}{\ \ \ \ be\ used\ to\ endorse\ or\ promote\ products\ derived\ from\ this\ software\ without}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00022}00022\ \textcolor{comment}{\ \ \ \ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00023}00023\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00024}00024\ \textcolor{comment}{THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ REGENTS\ AND\ CONTRIBUTORS\ "{}AS\ IS"{},\ AND\ ANY}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00025}00025\ \textcolor{comment}{EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ THE\ IMPLIED}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00026}00026\ \textcolor{comment}{WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR\ A\ PARTICULAR\ PURPOSE,\ ARE}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00027}00027\ \textcolor{comment}{DISCLAIMED.\ \ IN\ NO\ EVENT\ SHALL\ THE\ REGENTS\ OR\ CONTRIBUTORS\ BE\ LIABLE\ FOR\ ANY}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00028}00028\ \textcolor{comment}{DIRECT,\ INDIRECT,\ INCIDENTAL,\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00029}00029\ \textcolor{comment}{(INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00030}00030\ \textcolor{comment}{LOSS\ OF\ USE,\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00031}00031\ \textcolor{comment}{ON\ ANY\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00032}00032\ \textcolor{comment}{(INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE\ OF\ THIS}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00033}00033\ \textcolor{comment}{SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00034}00034\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00035}00035\ \textcolor{comment}{=============================================================================*/}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00037}00037\ \textcolor{preprocessor}{\#include\ <stdbool.h>}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00038}00038\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{stdint_8h}{stdint.h}}>}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00039}00039\ \textcolor{preprocessor}{\#include\ "{}platform.h"{}}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00040}00040\ \textcolor{preprocessor}{\#include\ "{}internals.h"{}}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00041}00041\ \textcolor{preprocessor}{\#include\ "{}specialize.h"{}}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00042}00042\ \textcolor{preprocessor}{\#include\ "{}softfloat.h"{}}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00044}00044\ \textcolor{preprocessor}{\#ifdef\ SOFTFLOAT\_FAST\_INT64}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00046}00046\ \textcolor{keywordtype}{void}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00047}00047\ \ \mbox{\hyperlink{softfloat_2source_2f128_m__round_to_int_8c_a5aa0fd37211dd41c74c5098dd0e54020}{f128M\_roundToInt}}(}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00048}00048\ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structfloat128__t}{float128\_t}}\ *aPtr,}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00049}00049\ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_ad0fca8b15c218d2c687f8c373a71d228}{uint\_fast8\_t}}\ roundingMode,}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00050}00050\ \ \ \ \ \ \textcolor{keywordtype}{bool}\ exact,}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00051}00051\ \ \ \ \ \ \mbox{\hyperlink{structfloat128__t}{float128\_t}}\ *zPtr}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00052}00052\ \ )}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00053}00053\ \{}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00054}00054\ }
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00055}00055\ \ \ \ \ *zPtr\ =\ \mbox{\hyperlink{softfloat_2source_2f128__round_to_int_8c_aaec08520f647e25a29e1b59564e7bdaa}{f128\_roundToInt}}(\ *aPtr,\ roundingMode,\ exact\ );}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00057}00057\ \}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00059}00059\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00061}00061\ \textcolor{keywordtype}{void}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00062}\mbox{\hyperlink{softfloat_2source_2f128_m__round_to_int_8c_a5aa0fd37211dd41c74c5098dd0e54020}{00062}}\ \ \mbox{\hyperlink{softfloat_2source_2f128_m__round_to_int_8c_a5aa0fd37211dd41c74c5098dd0e54020}{f128M\_roundToInt}}(}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00063}00063\ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structfloat128__t}{float128\_t}}\ *aPtr,}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00064}00064\ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_ad0fca8b15c218d2c687f8c373a71d228}{uint\_fast8\_t}}\ roundingMode,}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00065}00065\ \ \ \ \ \ \textcolor{keywordtype}{bool}\ exact,}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00066}00066\ \ \ \ \ \ \mbox{\hyperlink{structfloat128__t}{float128\_t}}\ *zPtr}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00067}00067\ \ )}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00068}00068\ \{}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00069}00069\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ *aWPtr;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00070}00070\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ *zWPtr;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00071}00071\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ ui96;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00072}00072\ \ \ \ \ \mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}}\ exp;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00073}00073\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ sigExtra;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00074}00074\ \ \ \ \ \textcolor{keywordtype}{bool}\ sign;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00075}00075\ \ \ \ \ \mbox{\hyperlink{stdint_8h_ad0fca8b15c218d2c687f8c373a71d228}{uint\_fast8\_t}}\ bitPos;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00076}00076\ \ \ \ \ \textcolor{keywordtype}{bool}\ roundNear;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00077}00077\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ index,\ lastIndex;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00078}00078\ \ \ \ \ \textcolor{keywordtype}{bool}\ extra;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00079}00079\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ wordA,\ \mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}},\ wordZ;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00080}00080\ \ \ \ \ \mbox{\hyperlink{stdint_8h_ad0fca8b15c218d2c687f8c373a71d228}{uint\_fast8\_t}}\ carry;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00081}00081\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ extrasMask;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00083}00083\ \ \ \ \ \textcolor{comment}{/*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00084}00084\ \textcolor{comment}{\ \ \ \ *-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*/}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00085}00085\ \ \ \ \ aWPtr\ =\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ *)\ aPtr;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00086}00086\ \ \ \ \ zWPtr\ =\ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ *)\ zPtr;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00087}00087\ \ \ \ \ \textcolor{comment}{/*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00088}00088\ \textcolor{comment}{\ \ \ \ *-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*/}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00089}00089\ \ \ \ \ ui96\ =\ aWPtr[\mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_aa3af452dd34ad7a607f4ad31c234fda7}{indexWordHi}}(\ 4\ )];}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00090}00090\ \ \ \ \ exp\ =\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_af545f72b30b31f06ad174ed787030fc2}{expF128UI96}}(\ ui96\ );}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00091}00091\ \ \ \ \ \textcolor{comment}{/*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00092}00092\ \textcolor{comment}{\ \ \ \ *-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*/}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00093}00093\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ exp\ <\ 0x3FFF\ )\ \{}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00094}00094\ \ \ \ \ \ \ \ \ zWPtr[\mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a49446dd1193996f92b1e5bb62eaa4689}{indexWord}}(\ 4,\ 2\ )]\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00095}00095\ \ \ \ \ \ \ \ \ zWPtr[\mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a49446dd1193996f92b1e5bb62eaa4689}{indexWord}}(\ 4,\ 1\ )]\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00096}00096\ \ \ \ \ \ \ \ \ zWPtr[\mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a49446dd1193996f92b1e5bb62eaa4689}{indexWord}}(\ 4,\ 0\ )]\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00097}00097\ \ \ \ \ \ \ \ \ sigExtra\ =\ aWPtr[\mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a49446dd1193996f92b1e5bb62eaa4689}{indexWord}}(\ 4,\ 2\ )];}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00098}00098\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ !sigExtra\ )\ \{}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00099}00099\ \ \ \ \ \ \ \ \ \ \ \ \ sigExtra\ =\ aWPtr[\mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a49446dd1193996f92b1e5bb62eaa4689}{indexWord}}(\ 4,\ 1\ )]\ |\ aWPtr[\mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a49446dd1193996f92b1e5bb62eaa4689}{indexWord}}(\ 4,\ 0\ )];}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00100}00100\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00101}00101\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ !sigExtra\ \&\&\ !(ui96\ \&\ 0x7FFFFFFF)\ )\ \textcolor{keywordflow}{goto}\ ui96;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00102}00102\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ exact\ )\ \mbox{\hyperlink{softfloat_2source_2include_2softfloat_8h_a85766d49cdf41a4451e770c60e8f7a28}{softfloat\_exceptionFlags}}\ |=\ \mbox{\hyperlink{softfloat_2source_2include_2softfloat_8h_a56a0f36da7f9eaaf54bd05cc2bf49173a2167fe5b6620c5563c2e3220eb1b1f7e}{softfloat\_flag\_inexact}};}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00103}00103\ \ \ \ \ \ \ \ \ sign\ =\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_acea291c1278df6284bc5a84e095f0841}{signF128UI96}}(\ ui96\ );}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00104}00104\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (\ roundingMode\ )\ \{}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00105}00105\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{softfloat_2source_2include_2softfloat_8h_ae6dceca96ec2c7a1b4aa211264a87ef6ac7142048287cdd0ae5e97c5caa8c8c0e}{softfloat\_round\_near\_even}}:}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00106}00106\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ !\mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a12170785eb5e3688a34546e8e8406424}{fracF128UI96}}(\ ui96\ )\ \&\&\ !sigExtra\ )\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00107}00107\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{softfloat_2source_2include_2softfloat_8h_ae6dceca96ec2c7a1b4aa211264a87ef6ae594661ae645409eb2104b964d2b1ecc}{softfloat\_round\_near\_maxMag}}:}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00108}00108\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ exp\ ==\ 0x3FFE\ )\ \textcolor{keywordflow}{goto}\ mag1;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00109}00109\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00110}00110\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{softfloat_2source_2include_2softfloat_8h_ae6dceca96ec2c7a1b4aa211264a87ef6aa5cb3c97c3d950851f9b38c98e22737e}{softfloat\_round\_min}}:}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00111}00111\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ sign\ )\ \textcolor{keywordflow}{goto}\ mag1;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00112}00112\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00113}00113\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{softfloat_2source_2include_2softfloat_8h_ae6dceca96ec2c7a1b4aa211264a87ef6a1674a0ca8eb6779ceea4e6a3859cbaa2}{softfloat\_round\_max}}:}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00114}00114\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ !sign\ )\ \textcolor{keywordflow}{goto}\ mag1;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00115}00115\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00116}00116\ \textcolor{preprocessor}{\#ifdef\ SOFTFLOAT\_ROUND\_ODD}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00117}00117\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{softfloat_2source_2include_2softfloat_8h_ae6dceca96ec2c7a1b4aa211264a87ef6a1473a4a1017c6c1ade1c706bf31fc905}{softfloat\_round\_odd}}:}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00118}00118\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ mag1;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00119}00119\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00120}00120\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00121}00121\ \ \ \ \ \ \ \ \ ui96\ =\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a31e45a00b5b281fb1e035d07b00bc049}{packToF128UI96}}(\ sign,\ 0,\ 0\ );}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00122}00122\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ ui96;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00123}00123\ \ \ \ \ \ mag1:}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00124}00124\ \ \ \ \ \ \ \ \ ui96\ =\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a31e45a00b5b281fb1e035d07b00bc049}{packToF128UI96}}(\ sign,\ 0x3FFF,\ 0\ );}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00125}00125\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ ui96;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00126}00126\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00127}00127\ \ \ \ \ \textcolor{comment}{/*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00128}00128\ \textcolor{comment}{\ \ \ \ *-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*/}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00129}00129\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ 0x406F\ <=\ exp\ )\ \{}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00130}00130\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00131}00131\ \ \ \ \ \ \ \ \ \ \ \ \ (exp\ ==\ 0x7FFF)}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00132}00132\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\&\ (\mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a12170785eb5e3688a34546e8e8406424}{fracF128UI96}}(\ ui96\ )}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00133}00133\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ||\ (aWPtr[\mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a49446dd1193996f92b1e5bb62eaa4689}{indexWord}}(\ 4,\ 2\ )]\ |\ aWPtr[\mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a49446dd1193996f92b1e5bb62eaa4689}{indexWord}}(\ 4,\ 1\ )]}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00134}00134\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ aWPtr[\mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a49446dd1193996f92b1e5bb62eaa4689}{indexWord}}(\ 4,\ 0\ )]))}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00135}00135\ \ \ \ \ \ \ \ \ )\ \{}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00136}00136\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2s__propagate_na_n_f128_m_8c_a04b5d25277cae924dd506c491f0af1ec}{softfloat\_propagateNaNF128M}}(\ aWPtr,\ 0,\ zWPtr\ );}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00137}00137\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00138}00138\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00139}00139\ \ \ \ \ \ \ \ \ zWPtr[\mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a49446dd1193996f92b1e5bb62eaa4689}{indexWord}}(\ 4,\ 2\ )]\ =\ aWPtr[\mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a49446dd1193996f92b1e5bb62eaa4689}{indexWord}}(\ 4,\ 2\ )];}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00140}00140\ \ \ \ \ \ \ \ \ zWPtr[\mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a49446dd1193996f92b1e5bb62eaa4689}{indexWord}}(\ 4,\ 1\ )]\ =\ aWPtr[\mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a49446dd1193996f92b1e5bb62eaa4689}{indexWord}}(\ 4,\ 1\ )];}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00141}00141\ \ \ \ \ \ \ \ \ zWPtr[\mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a49446dd1193996f92b1e5bb62eaa4689}{indexWord}}(\ 4,\ 0\ )]\ =\ aWPtr[\mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a49446dd1193996f92b1e5bb62eaa4689}{indexWord}}(\ 4,\ 0\ )];}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00142}00142\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ ui96;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00143}00143\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00144}00144\ \ \ \ \ \textcolor{comment}{/*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00145}00145\ \textcolor{comment}{\ \ \ \ *-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*/}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00146}00146\ \ \ \ \ bitPos\ =\ 0x406F\ -\/\ exp;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00147}00147\ \ \ \ \ roundNear\ =}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00148}00148\ \ \ \ \ \ \ \ \ \ \ \ (roundingMode\ ==\ \mbox{\hyperlink{softfloat_2source_2include_2softfloat_8h_ae6dceca96ec2c7a1b4aa211264a87ef6ae594661ae645409eb2104b964d2b1ecc}{softfloat\_round\_near\_maxMag}})}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00149}00149\ \ \ \ \ \ \ \ \ ||\ (roundingMode\ ==\ \mbox{\hyperlink{softfloat_2source_2include_2softfloat_8h_ae6dceca96ec2c7a1b4aa211264a87ef6ac7142048287cdd0ae5e97c5caa8c8c0e}{softfloat\_round\_near\_even}});}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00150}00150\ \ \ \ \ bitPos\ -\/=\ roundNear;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00151}00151\ \ \ \ \ index\ =\ \mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a28a8ad1b8455a20d428c59cf01e36a66}{indexWordLo}}(\ 4\ );}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00152}00152\ \ \ \ \ lastIndex\ =\ \mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_aa3af452dd34ad7a607f4ad31c234fda7}{indexWordHi}}(\ 4\ );}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00153}00153\ \ \ \ \ extra\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00154}00154\ \ \ \ \ \textcolor{keywordflow}{for}\ (;;)\ \{}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00155}00155\ \ \ \ \ \ \ \ \ wordA\ =\ aWPtr[index];}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00156}00156\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ bitPos\ <\ 32\ )\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00157}00157\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ wordA\ )\ extra\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00158}00158\ \ \ \ \ \ \ \ \ zWPtr[index]\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00159}00159\ \ \ \ \ \ \ \ \ index\ +=\ \mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a22ffd10aefa829eef57da03cff970e45}{wordIncr}};}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00160}00160\ \ \ \ \ \ \ \ \ bitPos\ -\/=\ 32;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00161}00161\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00162}00162\ \ \ \ \ \mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}}\ =\ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})\ 1<<bitPos;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00163}00163\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ roundNear\ )\ \{}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00164}00164\ \ \ \ \ \ \ \ \ wordZ\ =\ wordA\ +\ \mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}};}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00165}00165\ \ \ \ \ \ \ \ \ carry\ =\ (wordZ\ <\ wordA);}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00166}00166\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}}\ <<=\ 1;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00167}00167\ \ \ \ \ \ \ \ \ extrasMask\ =\ \mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}}\ -\/\ 1;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00168}00168\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ exact\ \&\&\ (extra\ ||\ (wordA\ \&\ extrasMask))\ )\ \{}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00169}00169\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{softfloat_2source_2include_2softfloat_8h_a85766d49cdf41a4451e770c60e8f7a28}{softfloat\_exceptionFlags}}\ |=\ \mbox{\hyperlink{softfloat_2source_2include_2softfloat_8h_a56a0f36da7f9eaaf54bd05cc2bf49173a2167fe5b6620c5563c2e3220eb1b1f7e}{softfloat\_flag\_inexact}};}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00170}00170\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00171}00171\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00172}00172\ \ \ \ \ \ \ \ \ \ \ \ \ (roundingMode\ ==\ \mbox{\hyperlink{softfloat_2source_2include_2softfloat_8h_ae6dceca96ec2c7a1b4aa211264a87ef6ac7142048287cdd0ae5e97c5caa8c8c0e}{softfloat\_round\_near\_even}})}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00173}00173\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\&\ !extra\ \&\&\ !(wordZ\ \&\ extrasMask)}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00174}00174\ \ \ \ \ \ \ \ \ )\ \{}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00175}00175\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ !\mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00176}00176\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ zWPtr[index]\ =\ wordZ;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00177}00177\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ index\ +=\ \mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a22ffd10aefa829eef57da03cff970e45}{wordIncr}};}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00178}00178\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ wordZ\ =\ aWPtr[index]\ +\ carry;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00179}00179\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ carry\ \&=\ !wordZ;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00180}00180\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ zWPtr[index]\ =\ wordZ\ \&\ \string~1;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00181}00181\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ propagateCarry;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00182}00182\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00183}00183\ \ \ \ \ \ \ \ \ \ \ \ \ wordZ\ \&=\ \string~bit;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00184}00184\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00185}00185\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00186}00186\ \ \ \ \ \ \ \ \ wordZ\ =\ wordA;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00187}00187\ \ \ \ \ \ \ \ \ carry\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00188}00188\ \ \ \ \ \ \ \ \ extrasMask\ =\ \mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}}\ -\/\ 1;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00189}00189\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ extra\ ||\ (wordA\ \&\ extrasMask)\ )\ \{}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00190}00190\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ exact\ )\ \mbox{\hyperlink{softfloat_2source_2include_2softfloat_8h_a85766d49cdf41a4451e770c60e8f7a28}{softfloat\_exceptionFlags}}\ |=\ \mbox{\hyperlink{softfloat_2source_2include_2softfloat_8h_a56a0f36da7f9eaaf54bd05cc2bf49173a2167fe5b6620c5563c2e3220eb1b1f7e}{softfloat\_flag\_inexact}};}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00191}00191\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00192}00192\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ roundingMode}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00193}00193\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ==\ (\mbox{\hyperlink{softfloat_2source_2include_2internals_8h_acea291c1278df6284bc5a84e095f0841}{signF128UI96}}(\ ui96\ )\ ?\ \mbox{\hyperlink{softfloat_2source_2include_2softfloat_8h_ae6dceca96ec2c7a1b4aa211264a87ef6aa5cb3c97c3d950851f9b38c98e22737e}{softfloat\_round\_min}}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00194}00194\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{softfloat_2source_2include_2softfloat_8h_ae6dceca96ec2c7a1b4aa211264a87ef6a1674a0ca8eb6779ceea4e6a3859cbaa2}{softfloat\_round\_max}})}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00195}00195\ \ \ \ \ \ \ \ \ \ \ \ \ )\ \{}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00196}00196\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ wordZ\ +=\ \mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}};}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00197}00197\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ carry\ =\ (wordZ\ <\ wordA);}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00198}00198\ \textcolor{preprocessor}{\#ifdef\ SOFTFLOAT\_ROUND\_ODD}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00199}00199\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\ roundingMode\ ==\ \mbox{\hyperlink{softfloat_2source_2include_2softfloat_8h_ae6dceca96ec2c7a1b4aa211264a87ef6a1473a4a1017c6c1ade1c706bf31fc905}{softfloat\_round\_odd}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00200}00200\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ wordZ\ |=\ \mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}};}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00201}00201\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00202}00202\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00203}00203\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00204}00204\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00205}00205\ \ \ \ \ wordZ\ \&=\ \string~extrasMask;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00206}00206\ \ \ \ \ zWPtr[index]\ =\ wordZ;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00207}00207\ \ propagateCarry:}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00208}00208\ \ \ \ \ \textcolor{keywordflow}{while}\ (\ index\ !=\ lastIndex\ )\ \{}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00209}00209\ \ \ \ \ \ \ \ \ index\ +=\ \mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a22ffd10aefa829eef57da03cff970e45}{wordIncr}};}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00210}00210\ \ \ \ \ \ \ \ \ wordZ\ =\ aWPtr[index]\ +\ carry;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00211}00211\ \ \ \ \ \ \ \ \ zWPtr[index]\ =\ wordZ;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00212}00212\ \ \ \ \ \ \ \ \ carry\ \&=\ !wordZ;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00213}00213\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00214}00214\ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00215}00215\ \ \ \ \ \textcolor{comment}{/*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00216}00216\ \textcolor{comment}{\ \ \ \ *-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*/}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00217}00217\ \ ui96:}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00218}00218\ \ \ \ \ zWPtr[\mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_aa3af452dd34ad7a607f4ad31c234fda7}{indexWordHi}}(\ 4\ )]\ =\ ui96;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00219}00219\ }
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00220}00220\ \}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00221}00221\ }
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00222}00222\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f128_m__round_to_int_8c_source_l00223}00223\ }
+
+\end{DoxyCode}

@@ -1,0 +1,129 @@
+\doxysection{platform\+\_\+root\+\_\+ca.\+cpp}
+\hypertarget{platform__root__ca_8cpp_source}{}\label{platform__root__ca_8cpp_source}\index{libraries/fc/src/network/platform\_root\_ca.cpp@{libraries/fc/src/network/platform\_root\_ca.cpp}}
+\mbox{\hyperlink{platform__root__ca_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00001}00001\ }
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{platform__root__ca_8hpp}{fc/network/platform\_root\_ca.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{exception_8hpp}{fc/exception/exception.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <boost/container/flat\_set.hpp>}}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00012}00012\ \textcolor{preprocessor}{\#if\ defined(\_\_APPLE\_\_)}}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00013}00013\ \textcolor{preprocessor}{\#include\ <CoreFoundation/CoreFoundation.h>}}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00014}00014\ \textcolor{preprocessor}{\#include\ <Security/Security.h>}}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00015}00015\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00017}00017\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}\ \{}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00019}00019\ \textcolor{preprocessor}{\#if\ defined(\_\_APPLE\_\_)}}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00020}00020\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ add\_macos\_root\_cas(boost::asio::ssl::context\&\ ctx)\ \{}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00021}00021\ \ \ \ boost::container::flat\_set<std::string>\ trusted\_certs;}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00022}00022\ \ \ \ boost::container::flat\_set<std::string>\ untrusted\_certs;}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00024}00024\ \ \ \ SecTrustSettingsDomain\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a5420fd4d2f76428942c2716b1cb7e863}{domains}}[]\ =\ \{\ kSecTrustSettingsDomainSystem,}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00025}00025\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ kSecTrustSettingsDomainAdmin,}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00026}00026\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ kSecTrustSettingsDomainUser\ \};}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00028}00028\ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ number\_domains\ =\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a5420fd4d2f76428942c2716b1cb7e863}{domains}})/\textcolor{keyword}{sizeof}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a5420fd4d2f76428942c2716b1cb7e863}{domains}}[0]);}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00030}00030\ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ number\_domains;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00031}00031\ \ \ \ \ \ \ CFArrayRef\ certs;}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00032}00032\ \ \ \ \ \ \ OSStatus\ err\ =\ SecTrustSettingsCopyCertificates(\mbox{\hyperlink{yubihsm__pkcs11_8c_a5420fd4d2f76428942c2716b1cb7e863}{domains}}[i],\ \&certs);}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00033}00033\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(err\ !=\ noErr)}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00034}00034\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00036}00036\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(CFIndex\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ =\ 0;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ <\ CFArrayGetCount(certs);\ ++\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}})\ \{}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00037}00037\ \ \ \ \ \ \ \ \ \ CFArrayRef\ trustSettings\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00038}00038\ \ \ \ \ \ \ \ \ \ SecCertificateRef\ cert\ =\ (SecCertificateRef)CFArrayGetValueAtIndex(certs,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}});}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00039}00039\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(cert\ ==\ \textcolor{keyword}{nullptr})}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00040}00040\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00042}00042\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ untrusted\{\textcolor{keyword}{false}\},\ trust\_as\_root\{i\ ==\ 0\},\ trust\_root\{\textcolor{keyword}{false}\};}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00043}00043\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(i\ !=\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00044}00044\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ k\ =\ i;\ k\ <\ number\_domains;\ k++)\ \{}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00045}00045\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ CFArrayRef\ domainTrustSettings\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00046}00046\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ err\ =\ SecTrustSettingsCopyTrustSettings(cert,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a5420fd4d2f76428942c2716b1cb7e863}{domains}}[k],\ \&domainTrustSettings);}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00047}00047\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (err\ ==\ errSecSuccess\ \&\&\ domainTrustSettings\ !=\ \textcolor{keyword}{nullptr})\ \{}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(trustSettings)}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ CFRelease(trustSettings);}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00050}00050\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ trustSettings\ =\ domainTrustSettings;}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00051}00051\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(trustSettings\ ==\ \textcolor{keyword}{nullptr})}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(CFArrayGetCount(trustSettings)\ ==\ 0)}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ trust\_as\_root\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{for}(CFIndex\ k\ =\ 0;\ k\ <\ CFArrayGetCount(trustSettings);\ k++)\ \{}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ CFNumberRef\ cfNum;}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00059}00059\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ CFDictionaryRef\ tSetting\ =\ (CFDictionaryRef)CFArrayGetValueAtIndex(trustSettings,\ k);}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(CFDictionaryGetValueIfPresent(tSetting,\ kSecTrustSettingsResult,\ (\textcolor{keyword}{const}\ \textcolor{keywordtype}{void}**)\&cfNum))\{}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00061}00061\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ SInt32\ result\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00062}00062\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ CFNumberGetValue(cfNum,\ kCFNumberSInt32Type,\ \&result);}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(result\ ==\ kSecTrustSettingsResultDeny)}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00064}00064\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ untrusted\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00065}00065\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (result\ ==\ kSecTrustSettingsResultTrustAsRoot)}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00066}00066\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ trust\_as\_root\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00067}00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (result\ ==\ kSecTrustSettingsResultTrustRoot)}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ trust\_root\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00071}00071\ \ \ \ \ \ \ \ \ \ \ \ \ CFRelease(trustSettings);}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00073}00073\ }
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00074}00074\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//double\ check\ that\ these\ manually\ trusted\ ones\ are\ actually\ CAs}}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00075}00075\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(trust\_root)\ \{}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \ \ \ CFErrorRef\ errRef\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ CFDataRef\ subjectName\ =\ SecCertificateCopyNormalizedSubjectContent(cert,\ \&errRef);}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00078}00078\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(errRef\ !=\ \textcolor{keyword}{nullptr})\ \{}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ CFRelease(errRef);}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00080}00080\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00081}00081\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00082}00082\ \ \ \ \ \ \ \ \ \ \ \ \ CFDataRef\ issuerName\ =\ SecCertificateCopyNormalizedIssuerContent(cert,\ \&errRef);}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00083}00083\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(errRef\ !=\ \textcolor{keyword}{nullptr})\ \{}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00084}00084\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ CFRelease(subjectName);}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00085}00085\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ CFRelease(errRef);}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00086}00086\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00087}00087\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00088}00088\ \ \ \ \ \ \ \ \ \ \ \ \ Boolean\ equal\ =\ CFEqual(subjectName,\ issuerName);}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00089}00089\ \ \ \ \ \ \ \ \ \ \ \ \ CFRelease(subjectName);}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00090}00090\ \ \ \ \ \ \ \ \ \ \ \ \ CFRelease(issuerName);}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00091}00091\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!equal)}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00092}00092\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00093}00093\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00094}00094\ }
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00095}00095\ \ \ \ \ \ \ \ \ \ CFDataRef\ certAsPEM;}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00096}00096\ \ \ \ \ \ \ \ \ \ err\ =\ SecKeychainItemExport(cert,\ kSecFormatX509Cert,\ kSecItemPemArmour,\ \textcolor{keyword}{nullptr},\ \&certAsPEM);}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00097}00097\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(err\ !=\ noErr)}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00098}00098\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00099}00099\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(certAsPEM)\ \{}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00100}00100\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!trust\_root\ \&\&\ !trust\_as\_root)}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00101}00101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ untrusted\_certs.emplace((\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*)CFDataGetBytePtr(certAsPEM),\ CFDataGetLength(certAsPEM));}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00102}00102\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00103}00103\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ trusted\_certs.emplace((\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*)CFDataGetBytePtr(certAsPEM),\ CFDataGetLength(certAsPEM));}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00104}00104\ \ \ \ \ \ \ \ \ \ \ \ \ CFRelease(certAsPEM);}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00105}00105\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00106}00106\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00107}00107\ \ \ \ \ \ \ CFRelease(certs);}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00108}00108\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00109}00109\ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ untrusted\ :\ untrusted\_certs)}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00110}00110\ \ \ \ \ \ \ trusted\_certs.erase(untrusted);}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00111}00111\ \ \ \ boost::system::error\_code\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_a01c35a876e2917ffdc1ee618e0c06619}{dummy}};}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00112}00112\ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ trusted\ :\ trusted\_certs)}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00113}00113\ \ \ \ \ \ \ ctx.add\_certificate\_authority(boost::asio::const\_buffer(trusted.data(),\ trusted.size()),\ dummy);}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00114}00114\ \}}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00115}00115\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00116}00116\ }
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00117}\mbox{\hyperlink{namespacefc_af7aa87352b9164f6299f4300a2c85b05}{00117}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefc_af7aa87352b9164f6299f4300a2c85b05}{add\_platform\_root\_cas\_to\_context}}(boost::asio::ssl::context\&\ ctx)\ \{}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00118}00118\ \textcolor{preprocessor}{\#if\ defined(\ \_\_APPLE\_\_\ )}}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00119}00119\ \ \ \ \ \ \ add\_macos\_root\_cas(ctx);}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00120}00120\ \textcolor{preprocessor}{\#elif\ defined(\ \_WIN32\ )}}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00121}00121\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a3a1fa84768603c99866fe61af96c9f36}{FC\_THROW}}(\textcolor{stringliteral}{"{}HTTPS\ on\ Windows\ not\ supported"{}});}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00122}00122\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00123}00123\ \ \ \ \ \ \ ctx.set\_default\_verify\_paths();}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00124}00124\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00125}00125\ \}}
+\DoxyCodeLine{\Hypertarget{platform__root__ca_8cpp_source_l00126}00126\ \}}
+
+\end{DoxyCode}

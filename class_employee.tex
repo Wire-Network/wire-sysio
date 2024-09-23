@@ -1,0 +1,191 @@
+\doxysection{Employee Class Reference}
+\hypertarget{class_employee}{}\label{class_employee}\index{Employee@{Employee}}
+
+
+Inheritance diagram for Employee\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=140pt]{class_employee__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Employee\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=140pt]{class_employee__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_employee_a524a0a5d4f27c51b76a64dda44c6e328}{Employee}} (const std\+::string \&\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}, unsigned age, bool married)
+\item 
+\mbox{\hyperlink{class_employee_a85388b3b212aa92334c787811348cc8a}{Employee}} (const \mbox{\hyperlink{class_employee}{Employee}} \&rhs)
+\item 
+virtual \mbox{\hyperlink{class_employee_abed56e9c007fff2bfe27ca87251baaf2}{\texorpdfstring{$\sim$}{\string~}\+Employee}} ()
+\item 
+\mbox{\hyperlink{class_employee}{Employee}} \& \mbox{\hyperlink{class_employee_a5f34edd226568fe72b64b64274102ff5}{operator=}} (const \mbox{\hyperlink{class_employee}{Employee}} \&rhs)
+\item 
+void \mbox{\hyperlink{class_employee_ad83c2ff92351c61994a3f597afa1f60f}{Add\+Dependent}} (const \mbox{\hyperlink{class_dependent}{Dependent}} \&dependent)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{class_writer}{Writer}} $>$ }\\void \mbox{\hyperlink{class_employee_a9679fb699a96d2a4d570568ab472d696}{Serialize}} (\mbox{\hyperlink{class_writer}{Writer}} \&writer) const
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{class_person}{Person}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_person_a5e10221f201605ad323d5518e5436bd3}{Person}} (const std\+::string \&\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}, unsigned age)
+\item 
+\mbox{\hyperlink{class_person_a3379ad4403098272609da06570c6df1a}{Person}} (const \mbox{\hyperlink{class_person}{Person}} \&rhs)
+\item 
+virtual \mbox{\hyperlink{class_person_a700ffd693321c5fe6880262acf43d4da}{\texorpdfstring{$\sim$}{\string~}\+Person}} ()
+\item 
+\mbox{\hyperlink{class_person}{Person}} \& \mbox{\hyperlink{class_person_a045de2557ddbba75164088f90cb701d5}{operator=}} (const \mbox{\hyperlink{class_person}{Person}} \&rhs)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Protected Member Functions inherited from \mbox{\hyperlink{class_person}{Person}}}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{class_writer}{Writer}} $>$ }\\void \mbox{\hyperlink{class_person_a2365a4a101fa1f89b6e74f7c40a21b69}{Serialize}} (\mbox{\hyperlink{class_writer}{Writer}} \&writer) const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{serialize_8cpp_source_l00110}{110}} of file \mbox{\hyperlink{serialize_8cpp_source}{serialize.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_employee_a524a0a5d4f27c51b76a64dda44c6e328}\index{Employee@{Employee}!Employee@{Employee}}
+\index{Employee@{Employee}!Employee@{Employee}}
+\doxysubsubsection{\texorpdfstring{Employee()}{Employee()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_employee_a524a0a5d4f27c51b76a64dda44c6e328} 
+Employee\+::\+Employee (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{name}{, }\item[{unsigned}]{age}{, }\item[{bool}]{married}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{serialize_8cpp_source_l00112}{112}} of file \mbox{\hyperlink{serialize_8cpp_source}{serialize.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00112\ :\ \mbox{\hyperlink{class_person_a5e10221f201605ad323d5518e5436bd3}{Person}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ age),\ dependents\_(),\ married\_(married)\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{class_employee_a85388b3b212aa92334c787811348cc8a}\index{Employee@{Employee}!Employee@{Employee}}
+\index{Employee@{Employee}!Employee@{Employee}}
+\doxysubsubsection{\texorpdfstring{Employee()}{Employee()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_employee_a85388b3b212aa92334c787811348cc8a} 
+Employee\+::\+Employee (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_employee}{Employee}} \&}]{rhs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{serialize_8cpp_source_l00113}{113}} of file \mbox{\hyperlink{serialize_8cpp_source}{serialize.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00113\ :\ \mbox{\hyperlink{class_person_a5e10221f201605ad323d5518e5436bd3}{Person}}(rhs),\ dependents\_(rhs.dependents\_),\ married\_(rhs.married\_)\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{class_employee_abed56e9c007fff2bfe27ca87251baaf2}\index{Employee@{Employee}!````~Employee@{\texorpdfstring{$\sim$}{\string~}Employee}}
+\index{````~Employee@{\texorpdfstring{$\sim$}{\string~}Employee}!Employee@{Employee}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}Employee()}{\string~Employee()}}
+{\footnotesize\ttfamily \label{class_employee_abed56e9c007fff2bfe27ca87251baaf2} 
+Employee\+::\texorpdfstring{$\sim$}{\string~}\+Employee (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{serialize_8cpp_source_l00150}{150}} of file \mbox{\hyperlink{serialize_8cpp_source}{serialize.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00151\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_employee_ad83c2ff92351c61994a3f597afa1f60f}\index{Employee@{Employee}!AddDependent@{AddDependent}}
+\index{AddDependent@{AddDependent}!Employee@{Employee}}
+\doxysubsubsection{\texorpdfstring{AddDependent()}{AddDependent()}}
+{\footnotesize\ttfamily \label{class_employee_ad83c2ff92351c61994a3f597afa1f60f} 
+void Employee\+::\+Add\+Dependent (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_dependent}{Dependent}} \&}]{dependent}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{serialize_8cpp_source_l00123}{123}} of file \mbox{\hyperlink{serialize_8cpp_source}{serialize.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ dependents\_.push\_back(dependent);}
+\DoxyCodeLine{00125\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_employee_a5f34edd226568fe72b64b64274102ff5}\index{Employee@{Employee}!operator=@{operator=}}
+\index{operator=@{operator=}!Employee@{Employee}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}}
+{\footnotesize\ttfamily \label{class_employee_a5f34edd226568fe72b64b64274102ff5} 
+\mbox{\hyperlink{class_employee}{Employee}} \& Employee\+::operator= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_employee}{Employee}} \&}]{rhs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{serialize_8cpp_source_l00116}{116}} of file \mbox{\hyperlink{serialize_8cpp_source}{serialize.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{class_person}{Person}}\&\textcolor{keyword}{>}(*this)\ =\ rhs;}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ dependents\_\ =\ rhs.dependents\_;}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ married\_\ =\ rhs.married\_;}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00121\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_employee_a9679fb699a96d2a4d570568ab472d696}\index{Employee@{Employee}!Serialize@{Serialize}}
+\index{Serialize@{Serialize}!Employee@{Employee}}
+\doxysubsubsection{\texorpdfstring{Serialize()}{Serialize()}}
+{\footnotesize\ttfamily \label{class_employee_a9679fb699a96d2a4d570568ab472d696} 
+template$<$typename \mbox{\hyperlink{class_writer}{Writer}} $>$ \\
+void Employee\+::\+Serialize (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_writer}{Writer}} \&}]{writer}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{serialize_8cpp_source_l00128}{128}} of file \mbox{\hyperlink{serialize_8cpp_source}{serialize.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ writer.\mbox{\hyperlink{class_writer_aec3200b2fc80ec87d1c37f775256b2e1}{StartObject}}();}
+\DoxyCodeLine{00130\ }
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_person_a2365a4a101fa1f89b6e74f7c40a21b69}{Person::Serialize}}(writer);}
+\DoxyCodeLine{00132\ }
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ writer.\mbox{\hyperlink{class_writer_a8b4dc44f471403a83c9959575796ceab}{String}}(\textcolor{stringliteral}{"{}married"{}});}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ writer.\mbox{\hyperlink{class_writer_ad7491f4dedb02e7456b240b23ef8c1ad}{Bool}}(married\_);}
+\DoxyCodeLine{00135\ }
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ writer.\mbox{\hyperlink{class_writer_a8b4dc44f471403a83c9959575796ceab}{String}}((\textcolor{stringliteral}{"{}dependents"{}}));}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ writer.\mbox{\hyperlink{class_writer_a38715785194b42cd67ba5dd52bf7967e}{StartArray}}();}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (std::vector<Dependent>::const\_iterator\ dependentItr\ =\ dependents\_.begin();\ dependentItr\ !=\ dependents\_.end();\ ++dependentItr)}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \ \ \ \ dependentItr-\/>Serialize(writer);}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ writer.\mbox{\hyperlink{class_writer_ac88d533095591a878500b63b351d4013}{EndArray}}();}
+\DoxyCodeLine{00141\ }
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ writer.\mbox{\hyperlink{class_writer_a0771a565261564c27676b7300b11f2b5}{EndObject}}();}
+\DoxyCodeLine{00143\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_employee_a9679fb699a96d2a4d570568ab472d696_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/example/serialize/\mbox{\hyperlink{serialize_8cpp}{serialize.\+cpp}}\end{DoxyCompactItemize}

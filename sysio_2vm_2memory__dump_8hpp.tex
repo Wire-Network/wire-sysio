@@ -1,0 +1,239 @@
+\doxysection{libraries/sys-\/vm/include/sysio/sysio/vm/memory\+\_\+dump.hpp File Reference}
+\hypertarget{sysio_2vm_2memory__dump_8hpp}{}\label{sysio_2vm_2memory__dump_8hpp}\index{libraries/sys-\/vm/include/sysio/sysio/vm/memory\_dump.hpp@{libraries/sys-\/vm/include/sysio/sysio/vm/memory\_dump.hpp}}
+{\ttfamily \#include $<$sysio/vm/opcodes.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/vm/variant.\+hpp$>$}\newline
+{\ttfamily \#include $<$cstddef$>$}\newline
+{\ttfamily \#include $<$cstdint$>$}\newline
+{\ttfamily \#include $<$utility$>$}\newline
+Include dependency graph for memory\+\_\+dump.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sysio_2vm_2memory__dump_8hpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1memory__dump__visitor}{sysio\+::vm\+::memory\+\_\+dump\+\_\+visitor$<$ Stream $>$}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1vm_1_1memory__dump}{sysio\+::vm\+::memory\+\_\+dump$<$ Opcode $>$}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1vm}{sysio\+::vm}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{sysio_2vm_2memory__dump_8hpp_ad811dd241b84912fbd87572c717658ae}{MEMORY\+\_\+\+DUMP\+\_\+\+OP\+\_\+\+VISIT}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  code)
+\item 
+\#define \mbox{\hyperlink{sysio_2vm_2memory__dump_8hpp_ac5ebf6d44099e6073c1c2cc60709101c}{MEMORY\+\_\+\+DUMP\+\_\+\+CONTROL\+\_\+\+FLOW\+\_\+\+VISIT}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  code)
+\item 
+\#define \mbox{\hyperlink{sysio_2vm_2memory__dump_8hpp_ab724b33ff4287b1d831975b78d972a10}{MEMORY\+\_\+\+DUMP\+\_\+\+BR\+\_\+\+TABLE\+\_\+\+VISIT}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  code)
+\item 
+\#define \mbox{\hyperlink{sysio_2vm_2memory__dump_8hpp_a6209c5fdf661db48f23edb931aba2633}{MEMORY\+\_\+\+DUMP\+\_\+\+CALL\+\_\+\+VISIT}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  code)
+\item 
+\#define \mbox{\hyperlink{sysio_2vm_2memory__dump_8hpp_a91cb99e72d248a8463a0a0dd69cc1683}{MEMORY\+\_\+\+DUMP\+\_\+\+VARIABLE\+\_\+\+ACCESS\+\_\+\+VISIT}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  code)
+\item 
+\#define \mbox{\hyperlink{sysio_2vm_2memory__dump_8hpp_ae686a2e2175122e99e6de92d61b0e482}{MEMORY\+\_\+\+DUMP\+\_\+\+MEMORY\+\_\+\+VISIT}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  code)
+\item 
+\#define \mbox{\hyperlink{sysio_2vm_2memory__dump_8hpp_a21f3214a1cf5473324bfe4330f0ee897}{MEMORY\+\_\+\+DUMP\+\_\+\+CONST\+\_\+\+VISIT}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  code)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{sysio_2vm_2memory__dump_8hpp_ab724b33ff4287b1d831975b78d972a10}\index{memory\_dump.hpp@{memory\_dump.hpp}!MEMORY\_DUMP\_BR\_TABLE\_VISIT@{MEMORY\_DUMP\_BR\_TABLE\_VISIT}}
+\index{MEMORY\_DUMP\_BR\_TABLE\_VISIT@{MEMORY\_DUMP\_BR\_TABLE\_VISIT}!memory\_dump.hpp@{memory\_dump.hpp}}
+\doxysubsubsection{\texorpdfstring{MEMORY\_DUMP\_BR\_TABLE\_VISIT}{MEMORY\_DUMP\_BR\_TABLE\_VISIT}}
+{\footnotesize\ttfamily \label{sysio_2vm_2memory__dump_8hpp_ab724b33ff4287b1d831975b78d972a10} 
+\#define MEMORY\+\_\+\+DUMP\+\_\+\+BR\+\_\+\+TABLE\+\_\+\+VISIT(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{code}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \textcolor{keywordtype}{void}\ operator()(\textcolor{keyword}{const}\ \mbox{\hyperlink{sysio_2vm_2opcodes__def_8hpp_a01adfe88e6a9fb9241c97eb1fb4fdb14}{SYS\_VM\_OPCODE\_T}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})\&\ \mbox{\hyperlink{unionop}{op}})\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ stream\ <<\ \#\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ <<\ \textcolor{stringliteral}{"{}\ :\ \{\ [\ "{}};\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ for\ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ i=0;\ i\ <\ \mbox{\hyperlink{unionop}{op}}.size;\ i++)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ stream\ <<\ \mbox{\hyperlink{unionop}{op}}.table[i].pc;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ if\ (i\ <\ \mbox{\hyperlink{unionop}{op}}.size-\/1)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ stream\ <<\ \textcolor{stringliteral}{"{},\ "{}};\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ stream\ <<\ \textcolor{stringliteral}{"{}\ ]\ \}\(\backslash\)n"{}};\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ index\ +=\ \mbox{\hyperlink{unionop}{op}}.offset;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2memory__dump_8hpp_source_l00022}{22}} of file \mbox{\hyperlink{sysio_2vm_2memory__dump_8hpp_source}{memory\+\_\+dump.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#define\ MEMORY\_DUMP\_BR\_TABLE\_VISIT(name,\ code)\ \(\backslash\)}}
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\ \ \ void\ operator()(const\ SYS\_VM\_OPCODE\_T(name)\&\ op)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\ \ \ \ \ \ stream\ <<\ \#name\ <<\ "{}\ :\ \{\ [\ "{};\ \(\backslash\)}}
+\DoxyCodeLine{00025\ \textcolor{preprocessor}{\ \ \ \ \ \ for\ (uint32\_t\ i=0;\ i\ <\ op.size;\ i++)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00026\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ stream\ <<\ op.table[i].pc;\ \(\backslash\)}}
+\DoxyCodeLine{00027\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ if\ (i\ <\ op.size-\/1)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00028\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ stream\ <<\ "{},\ "{};\ \(\backslash\)}}
+\DoxyCodeLine{00029\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00030\ \textcolor{preprocessor}{\ \ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00031\ \textcolor{preprocessor}{\ \ \ \ \ \ stream\ <<\ "{}\ ]\ \}\(\backslash\)n"{};\ \(\backslash\)}}
+\DoxyCodeLine{00032\ \textcolor{preprocessor}{\ \ \ \ \ \ index\ +=\ op.offset;\ \(\backslash\)}}
+\DoxyCodeLine{00033\ \textcolor{preprocessor}{\ \ \ \}}}
+
+\end{DoxyCode}
+\Hypertarget{sysio_2vm_2memory__dump_8hpp_a6209c5fdf661db48f23edb931aba2633}\index{memory\_dump.hpp@{memory\_dump.hpp}!MEMORY\_DUMP\_CALL\_VISIT@{MEMORY\_DUMP\_CALL\_VISIT}}
+\index{MEMORY\_DUMP\_CALL\_VISIT@{MEMORY\_DUMP\_CALL\_VISIT}!memory\_dump.hpp@{memory\_dump.hpp}}
+\doxysubsubsection{\texorpdfstring{MEMORY\_DUMP\_CALL\_VISIT}{MEMORY\_DUMP\_CALL\_VISIT}}
+{\footnotesize\ttfamily \label{sysio_2vm_2memory__dump_8hpp_a6209c5fdf661db48f23edb931aba2633} 
+\#define MEMORY\+\_\+\+DUMP\+\_\+\+CALL\+\_\+\+VISIT(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{code}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \textcolor{keywordtype}{void}\ operator()(\textcolor{keyword}{const}\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\#\#\_t\&\ \mbox{\hyperlink{unionop}{op}})\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ stream\ <<\ \#\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ <<\ \textcolor{stringliteral}{"{}\ :\ \{\ "{}}\ <<\ \mbox{\hyperlink{unionop}{op}}.index\ <<\ \textcolor{stringliteral}{"{}\ \}\(\backslash\)n"{}};\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2memory__dump_8hpp_source_l00035}{35}} of file \mbox{\hyperlink{sysio_2vm_2memory__dump_8hpp_source}{memory\+\_\+dump.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00035\ \textcolor{preprocessor}{\#define\ MEMORY\_DUMP\_CALL\_VISIT(name,\ code)\ \(\backslash\)}}
+\DoxyCodeLine{00036\ \textcolor{preprocessor}{\ \ \ void\ operator()(const\ name\#\#\_t\&\ op)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00037\ \textcolor{preprocessor}{\ \ \ \ \ \ stream\ <<\ \#name\ <<\ "{}\ :\ \{\ "{}\ <<\ op.index\ <<\ "{}\ \}\(\backslash\)n"{};\ \(\backslash\)}}
+\DoxyCodeLine{00038\ \textcolor{preprocessor}{\ \ \ \}}}
+
+\end{DoxyCode}
+\Hypertarget{sysio_2vm_2memory__dump_8hpp_a21f3214a1cf5473324bfe4330f0ee897}\index{memory\_dump.hpp@{memory\_dump.hpp}!MEMORY\_DUMP\_CONST\_VISIT@{MEMORY\_DUMP\_CONST\_VISIT}}
+\index{MEMORY\_DUMP\_CONST\_VISIT@{MEMORY\_DUMP\_CONST\_VISIT}!memory\_dump.hpp@{memory\_dump.hpp}}
+\doxysubsubsection{\texorpdfstring{MEMORY\_DUMP\_CONST\_VISIT}{MEMORY\_DUMP\_CONST\_VISIT}}
+{\footnotesize\ttfamily \label{sysio_2vm_2memory__dump_8hpp_a21f3214a1cf5473324bfe4330f0ee897} 
+\#define MEMORY\+\_\+\+DUMP\+\_\+\+CONST\+\_\+\+VISIT(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{code}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \textcolor{keywordtype}{void}\ operator()(\textcolor{keyword}{const}\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\#\#\_t\&\ \mbox{\hyperlink{unionop}{op}})\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ stream\ <<\ \#\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ <<\ \textcolor{stringliteral}{"{}\ :\ \{\ "{}}\ <<\ \mbox{\hyperlink{unionop}{op}}.data.ui\ <<\ \textcolor{stringliteral}{"{}\ \}\(\backslash\)n"{}};\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2memory__dump_8hpp_source_l00050}{50}} of file \mbox{\hyperlink{sysio_2vm_2memory__dump_8hpp_source}{memory\+\_\+dump.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00050\ \textcolor{preprocessor}{\#define\ MEMORY\_DUMP\_CONST\_VISIT(name,\ code)\ \(\backslash\)}}
+\DoxyCodeLine{00051\ \textcolor{preprocessor}{\ \ \ void\ operator()(const\ name\#\#\_t\&\ op)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00052\ \textcolor{preprocessor}{\ \ \ \ \ \ stream\ <<\ \#name\ <<\ "{}\ :\ \{\ "{}\ <<\ op.data.ui\ <<\ "{}\ \}\(\backslash\)n"{};\ \(\backslash\)}}
+\DoxyCodeLine{00053\ \textcolor{preprocessor}{\ \ \ \}}}
+
+\end{DoxyCode}
+\Hypertarget{sysio_2vm_2memory__dump_8hpp_ac5ebf6d44099e6073c1c2cc60709101c}\index{memory\_dump.hpp@{memory\_dump.hpp}!MEMORY\_DUMP\_CONTROL\_FLOW\_VISIT@{MEMORY\_DUMP\_CONTROL\_FLOW\_VISIT}}
+\index{MEMORY\_DUMP\_CONTROL\_FLOW\_VISIT@{MEMORY\_DUMP\_CONTROL\_FLOW\_VISIT}!memory\_dump.hpp@{memory\_dump.hpp}}
+\doxysubsubsection{\texorpdfstring{MEMORY\_DUMP\_CONTROL\_FLOW\_VISIT}{MEMORY\_DUMP\_CONTROL\_FLOW\_VISIT}}
+{\footnotesize\ttfamily \label{sysio_2vm_2memory__dump_8hpp_ac5ebf6d44099e6073c1c2cc60709101c} 
+\#define MEMORY\+\_\+\+DUMP\+\_\+\+CONTROL\+\_\+\+FLOW\+\_\+\+VISIT(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{code}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \textcolor{keywordtype}{void}\ operator()(\textcolor{keyword}{const}\ \mbox{\hyperlink{sysio_2vm_2opcodes__def_8hpp_a01adfe88e6a9fb9241c97eb1fb4fdb14}{SYS\_VM\_OPCODE\_T}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})\&\ \mbox{\hyperlink{unionop}{op}})\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ stream\ <<\ \#\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ <<\ \textcolor{stringliteral}{"{}\ :\ \{\ "{}}\ <<\ \mbox{\hyperlink{unionop}{op}}.data\ <<\ \textcolor{stringliteral}{"{},\ "{}}\ <<\ \mbox{\hyperlink{unionop}{op}}.pc\ <<\ \textcolor{stringliteral}{"{},\ "{}}\ <<\ \mbox{\hyperlink{unionop}{op}}.index\ <<\ \textcolor{stringliteral}{"{},\ "{}}\ <<\ \mbox{\hyperlink{unionop}{op}}.op\_index\ <<\ \textcolor{stringliteral}{"{}\ \}\(\backslash\)n"{}};\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2memory__dump_8hpp_source_l00017}{17}} of file \mbox{\hyperlink{sysio_2vm_2memory__dump_8hpp_source}{memory\+\_\+dump.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\#define\ MEMORY\_DUMP\_CONTROL\_FLOW\_VISIT(name,\ code)\ \(\backslash\)}}
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\ \ \ void\ operator()(const\ SYS\_VM\_OPCODE\_T(name)\&\ op)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\ \ \ \ \ \ stream\ <<\ \#name\ <<\ "{}\ :\ \{\ "{}\ <<\ op.data\ <<\ "{},\ "{}\ <<\ op.pc\ <<\ "{},\ "{}\ <<\ op.index\ <<\ "{},\ "{}\ <<\ op.op\_index\ <<\ "{}\ \}\(\backslash\)n"{};\ \(\backslash\)}}
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\ \ \ \}}}
+
+\end{DoxyCode}
+\Hypertarget{sysio_2vm_2memory__dump_8hpp_ae686a2e2175122e99e6de92d61b0e482}\index{memory\_dump.hpp@{memory\_dump.hpp}!MEMORY\_DUMP\_MEMORY\_VISIT@{MEMORY\_DUMP\_MEMORY\_VISIT}}
+\index{MEMORY\_DUMP\_MEMORY\_VISIT@{MEMORY\_DUMP\_MEMORY\_VISIT}!memory\_dump.hpp@{memory\_dump.hpp}}
+\doxysubsubsection{\texorpdfstring{MEMORY\_DUMP\_MEMORY\_VISIT}{MEMORY\_DUMP\_MEMORY\_VISIT}}
+{\footnotesize\ttfamily \label{sysio_2vm_2memory__dump_8hpp_ae686a2e2175122e99e6de92d61b0e482} 
+\#define MEMORY\+\_\+\+DUMP\+\_\+\+MEMORY\+\_\+\+VISIT(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{code}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \textcolor{keywordtype}{void}\ operator()(\textcolor{keyword}{const}\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\#\#\_t\&\ \mbox{\hyperlink{unionop}{op}})\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ stream\ <<\ \#\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ <<\ \textcolor{stringliteral}{"{}\ :\ \{\ "{}}\ <<\ \mbox{\hyperlink{unionop}{op}}.flags\_align\ <<\ \textcolor{stringliteral}{"{},\ "{}}\ <<\ \mbox{\hyperlink{unionop}{op}}.offset\ <<\ \textcolor{stringliteral}{"{}\ \}\(\backslash\)n"{}};\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2memory__dump_8hpp_source_l00045}{45}} of file \mbox{\hyperlink{sysio_2vm_2memory__dump_8hpp_source}{memory\+\_\+dump.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00045\ \textcolor{preprocessor}{\#define\ MEMORY\_DUMP\_MEMORY\_VISIT(name,\ code)\ \(\backslash\)}}
+\DoxyCodeLine{00046\ \textcolor{preprocessor}{\ \ \ void\ operator()(const\ name\#\#\_t\&\ op)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00047\ \textcolor{preprocessor}{\ \ \ \ \ \ stream\ <<\ \#name\ <<\ "{}\ :\ \{\ "{}\ <<\ op.flags\_align\ <<\ "{},\ "{}\ <<\ op.offset\ <<\ "{}\ \}\(\backslash\)n"{};\ \(\backslash\)}}
+\DoxyCodeLine{00048\ \textcolor{preprocessor}{\ \ \ \}}}
+
+\end{DoxyCode}
+\Hypertarget{sysio_2vm_2memory__dump_8hpp_ad811dd241b84912fbd87572c717658ae}\index{memory\_dump.hpp@{memory\_dump.hpp}!MEMORY\_DUMP\_OP\_VISIT@{MEMORY\_DUMP\_OP\_VISIT}}
+\index{MEMORY\_DUMP\_OP\_VISIT@{MEMORY\_DUMP\_OP\_VISIT}!memory\_dump.hpp@{memory\_dump.hpp}}
+\doxysubsubsection{\texorpdfstring{MEMORY\_DUMP\_OP\_VISIT}{MEMORY\_DUMP\_OP\_VISIT}}
+{\footnotesize\ttfamily \label{sysio_2vm_2memory__dump_8hpp_ad811dd241b84912fbd87572c717658ae} 
+\#define MEMORY\+\_\+\+DUMP\+\_\+\+OP\+\_\+\+VISIT(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{code}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \textcolor{keywordtype}{void}\ operator()(\textcolor{keyword}{const}\ \mbox{\hyperlink{sysio_2vm_2opcodes__def_8hpp_a01adfe88e6a9fb9241c97eb1fb4fdb14}{SYS\_VM\_OPCODE\_T}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})\&\ \mbox{\hyperlink{unionop}{op}})\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ stream\ <<\ \#\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2memory__dump_8hpp_source_l00012}{12}} of file \mbox{\hyperlink{sysio_2vm_2memory__dump_8hpp_source}{memory\+\_\+dump.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00012\ \textcolor{preprocessor}{\#define\ MEMORY\_DUMP\_OP\_VISIT(name,\ code)\ \(\backslash\)}}
+\DoxyCodeLine{00013\ \textcolor{preprocessor}{\ \ \ void\ operator()(const\ SYS\_VM\_OPCODE\_T(name)\&\ op)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00014\ \textcolor{preprocessor}{\ \ \ \ \ \ stream\ <<\ \#name\ <<\ "{}\(\backslash\)n"{};\ \(\backslash\)}}
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\ \ \ \}}}
+
+\end{DoxyCode}
+\Hypertarget{sysio_2vm_2memory__dump_8hpp_a91cb99e72d248a8463a0a0dd69cc1683}\index{memory\_dump.hpp@{memory\_dump.hpp}!MEMORY\_DUMP\_VARIABLE\_ACCESS\_VISIT@{MEMORY\_DUMP\_VARIABLE\_ACCESS\_VISIT}}
+\index{MEMORY\_DUMP\_VARIABLE\_ACCESS\_VISIT@{MEMORY\_DUMP\_VARIABLE\_ACCESS\_VISIT}!memory\_dump.hpp@{memory\_dump.hpp}}
+\doxysubsubsection{\texorpdfstring{MEMORY\_DUMP\_VARIABLE\_ACCESS\_VISIT}{MEMORY\_DUMP\_VARIABLE\_ACCESS\_VISIT}}
+{\footnotesize\ttfamily \label{sysio_2vm_2memory__dump_8hpp_a91cb99e72d248a8463a0a0dd69cc1683} 
+\#define MEMORY\+\_\+\+DUMP\+\_\+\+VARIABLE\+\_\+\+ACCESS\+\_\+\+VISIT(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{code}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \textcolor{keywordtype}{void}\ operator()(\textcolor{keyword}{const}\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\#\#\_t\&\ \mbox{\hyperlink{unionop}{op}})\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ stream\ <<\ \#\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ <<\ \textcolor{stringliteral}{"{}\ :\ \{\ "{}}\ <<\ \mbox{\hyperlink{unionop}{op}}.index\ <<\ \textcolor{stringliteral}{"{}\ \}\(\backslash\)n"{}};\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2memory__dump_8hpp_source_l00040}{40}} of file \mbox{\hyperlink{sysio_2vm_2memory__dump_8hpp_source}{memory\+\_\+dump.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00040\ \textcolor{preprocessor}{\#define\ MEMORY\_DUMP\_VARIABLE\_ACCESS\_VISIT(name,\ code)\ \(\backslash\)}}
+\DoxyCodeLine{00041\ \textcolor{preprocessor}{\ \ \ void\ operator()(const\ name\#\#\_t\&\ op)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00042\ \textcolor{preprocessor}{\ \ \ \ \ \ stream\ <<\ \#name\ <<\ "{}\ :\ \{\ "{}\ <<\ op.index\ <<\ "{}\ \}\(\backslash\)n"{};\ \(\backslash\)}}
+\DoxyCodeLine{00043\ \textcolor{preprocessor}{\ \ \ \}}}
+
+\end{DoxyCode}

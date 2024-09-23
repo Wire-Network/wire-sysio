@@ -1,0 +1,17 @@
+<map id="Catch::XmlReporter::testRunEnded" name="Catch::XmlReporter::testRunEnded">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,88,143,129"/>
+<area shape="rect" id="Node000002" href="$class_catch_1_1_xml_writer.html#a8fcaa0821b6c2c1750c654af0b33c823" title=" " alt="" coords="191,5,389,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="106,86,145,63,190,41,211,33,213,38,192,46,147,67,108,90"/>
+<area shape="rect" id="Node000003" href="$class_catch_1_1_xml_writer.html#a48f1a53e3255938813ff91f9fec9b690" title=" " alt="" coords="204,55,376,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="142,96,189,88,189,94,143,101"/>
+<area shape="rect" id="Node000006" href="$struct_catch_1_1_streaming_reporter_base.html#a8cfd2e27ce7746966cf145b818254fd1" title=" " alt="" coords="203,120,376,161"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="143,116,188,123,187,128,142,122"/>
+<area shape="rect" id="Node000007" href="$class_catch_1_1_xml_writer_1_1_scoped_element.html#a33b1fe4123c56d644abe8f4cab3edb45" title=" " alt="" coords="203,186,376,226"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="111,127,192,170,209,178,207,183,190,175,108,132"/>
+<area shape="rect" id="Node000004" href="$class_catch_1_1_xml_writer.html#a6114b9d8038cd4f159ccd016f12d4992" title=" " alt="" coords="438,63,642,88"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="376,73,423,73,423,78,376,78"/>
+<area shape="rect" id="Node000005" href="$class_catch_1_1_xml_writer.html#aba98703d9852416e237de82aed4a9c4f" title=" " alt="" coords="691,55,860,96"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="642,73,676,73,676,78,642,78"/>
+<area shape="rect" id="Node000008" href="$class_catch_1_1_xml_writer.html#ad433310b59d30e0fedc7130dc11c563b" title=" " alt="" coords="437,193,643,219"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="377,204,422,204,422,209,377,209"/>
+</map>

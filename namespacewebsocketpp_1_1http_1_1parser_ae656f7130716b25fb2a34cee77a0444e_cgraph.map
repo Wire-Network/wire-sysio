@@ -1,0 +1,11 @@
+<map id="websocketpp::http::parser::strip_lws" name="websocketpp::http::parser::strip_lws">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,39,142,79"/>
+<area shape="rect" id="Node000002" href="$namespacewebsocketpp_1_1http_1_1parser.html#a263c7c466bbed56948d5877b9c33c354" title="Read and discard linear whitespace." alt="" coords="190,39,342,79"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="142,56,174,56,174,62,142,62"/>
+<area shape="rect" id="Node000003" href="$namespacewebsocketpp_1_1http_1_1parser.html#a1dacef9abccd8e5b6c572447d9f5a3ab" title="Read and discard one unit of linear whitespace." alt="" coords="390,39,526,79"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="342,56,375,56,375,62,342,62"/>
+<area shape="rect" id="Node000004" href="$namespacewebsocketpp_1_1http.html#a95df9e609616688298d34fee9ec34945" title="Is the character non&#45;whitespace." alt="" coords="574,5,736,46"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="526,45,558,39,559,45,527,50"/>
+<area shape="rect" id="Node000005" href="$namespacewebsocketpp_1_1http.html#a8ff7039dd19159bdbce3b98159c66ae2" title="Is the character whitespace." alt="" coords="587,71,723,111"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="527,67,572,75,571,80,526,73"/>
+</map>

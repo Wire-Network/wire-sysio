@@ -1,0 +1,9 @@
+<map id="sysio::chain::producer_confirmation" name="sysio::chain::producer_confirmation">
+<area shape="rect" id="Node000001" title=" " alt="" coords="102,109,252,150"/>
+<area shape="rect" id="Node000002" href="$classfc_1_1sha256.html" title=" " alt="" coords="5,5,88,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="63,43,78,64,97,83,132,106,129,111,93,87,74,67,59,46"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1chain_1_1name.html" title="Immutable except for fc::from_variant." alt="" coords="112,5,243,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="180,47,180,109,174,109,174,47"/>
+<area shape="rect" id="Node000004" href="$classfc_1_1crypto_1_1signature.html" title=" " alt="" coords="267,5,404,31"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="307,42,207,111,204,106,304,38"/>
+</map>

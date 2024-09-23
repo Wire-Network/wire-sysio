@@ -1,0 +1,564 @@
+\doxysection{fc\+::detail\+::ntp\+\_\+impl Class Reference}
+\hypertarget{classfc_1_1detail_1_1ntp__impl}{}\label{classfc_1_1detail_1_1ntp__impl}\index{fc::detail::ntp\_impl@{fc::detail::ntp\_impl}}
+
+
+Collaboration diagram for fc\+::detail\+::ntp\+\_\+impl\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1detail_1_1ntp__impl__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a9ca5c9b4750236fb58d3c07640515d1b}{ntp\+\_\+impl}} ()
+\item 
+\mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_aaaf544e45298bd043067424a81e28ea1}{\texorpdfstring{$\sim$}{\string~}ntp\+\_\+impl}} ()
+\item 
+\mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}} \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a4109156bd9378f4234f3d5601577086f}{ntp\+\_\+timestamp\+\_\+to\+\_\+fc\+\_\+time\+\_\+point}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} ntp\+\_\+timestamp\+\_\+net\+\_\+order)
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_ab9d9f99d97d36f87dca4c0444d395502}{fc\+\_\+time\+\_\+point\+\_\+to\+\_\+ntp\+\_\+timestamp}} (const \mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}} \&fc\+\_\+timestamp)
+\item 
+void \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_aabb55b1b1ca4de17db3d2b7f3f3ab56a}{request\+\_\+now}} ()
+\item 
+void \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_ab2beecf0f92d0bad2bdd8047f45ab599}{request\+\_\+time\+\_\+task}} ()
+\item 
+void \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a70d5cd30257c17171bc81e7dba288664}{start\+\_\+read\+\_\+loop}} ()
+\item 
+void \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a5b3a58d9010e8ca23ee3e287595b8967}{read\+\_\+loop}} ()
+\item 
+void \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a3ee1de6f11e03bf63ac439e5bddec0b7}{reschedule}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+fc\+::thread \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_ad6bd75c34d45ab832c5bf5ab7aab0cca}{\+\_\+ntp\+\_\+thread}}
+\item 
+std\+::vector$<$ std\+::pair$<$ std\+::string, \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} $>$ $>$ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a492fb7af84f8442b90b4f73901adbe61}{\+\_\+ntp\+\_\+hosts}}
+\item 
+future$<$ void $>$ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a75bfd3d5ce6037a7bfae89da0a9f73ba}{\+\_\+read\+\_\+loop\+\_\+done}}
+\item 
+\mbox{\hyperlink{classfc_1_1udp__socket}{udp\+\_\+socket}} \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a3192be9a4c6cb1b17c692a0e1d7ef61c}{\+\_\+sock}}
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a0154039055094fd24c5f156b4252cc6b}{\+\_\+request\+\_\+interval\+\_\+sec}}
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_aab50f7060faf962cfc6967d4089f0381}{\+\_\+retry\+\_\+failed\+\_\+request\+\_\+interval\+\_\+sec}}
+\item 
+\mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}} \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a4f00346f22b4b815bf4c3c6cdb9ab3ed}{\+\_\+last\+\_\+valid\+\_\+ntp\+\_\+reply\+\_\+received\+\_\+time}}
+\item 
+std\+::atomic\+\_\+bool \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a6e0753611dff46a52e93a1d5a0566347}{\+\_\+last\+\_\+ntp\+\_\+delta\+\_\+initialized}}
+\item 
+std\+::atomic$<$ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} $>$ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a0fb88b0eac88e8a384236d3e54f8e71c}{\+\_\+last\+\_\+ntp\+\_\+delta\+\_\+microseconds}}
+\item 
+future$<$ void $>$ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a2dfc9c9e2546e2674577e26be8cc98a5}{\+\_\+request\+\_\+time\+\_\+task\+\_\+done}}
+\item 
+std\+::shared\+\_\+ptr$<$ scheduled\+\_\+task\+\_\+impl$<$ void $>$ $>$ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_ae84a47c5d0b6670eec22cef7e3095f1c}{\+\_\+scheduled\+\_\+request\+\_\+time}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{ntp_8cpp_source_l00018}{18}} of file \mbox{\hyperlink{ntp_8cpp_source}{ntp.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1detail_1_1ntp__impl_a9ca5c9b4750236fb58d3c07640515d1b}\index{fc::detail::ntp\_impl@{fc::detail::ntp\_impl}!ntp\_impl@{ntp\_impl}}
+\index{ntp\_impl@{ntp\_impl}!fc::detail::ntp\_impl@{fc::detail::ntp\_impl}}
+\doxysubsubsection{\texorpdfstring{ntp\_impl()}{ntp\_impl()}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1ntp__impl_a9ca5c9b4750236fb58d3c07640515d1b} 
+fc\+::detail\+::ntp\+\_\+impl\+::ntp\+\_\+impl (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{ntp_8cpp_source_l00037}{37}} of file \mbox{\hyperlink{ntp_8cpp_source}{ntp.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_ad6bd75c34d45ab832c5bf5ab7aab0cca}{\_ntp\_thread}}(\textcolor{stringliteral}{"{}ntp"{}}),}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a0154039055094fd24c5f156b4252cc6b}{\_request\_interval\_sec}}(\ 60*60\ \textcolor{comment}{/*\ 1\ hr\ */}),}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_aab50f7060faf962cfc6967d4089f0381}{\_retry\_failed\_request\_interval\_sec}}(60\ *\ 5),}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a0fb88b0eac88e8a384236d3e54f8e71c}{\_last\_ntp\_delta\_microseconds}}(0)}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a6e0753611dff46a52e93a1d5a0566347}{\_last\_ntp\_delta\_initialized}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a492fb7af84f8442b90b4f73901adbe61}{\_ntp\_hosts}}.push\_back(\ std::make\_pair(\ \textcolor{stringliteral}{"{}pool.ntp.org"{}},123\ )\ );}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1detail_1_1ntp__impl_aaaf544e45298bd043067424a81e28ea1}\index{fc::detail::ntp\_impl@{fc::detail::ntp\_impl}!````~ntp\_impl@{\texorpdfstring{$\sim$}{\string~}ntp\_impl}}
+\index{````~ntp\_impl@{\texorpdfstring{$\sim$}{\string~}ntp\_impl}!fc::detail::ntp\_impl@{fc::detail::ntp\_impl}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}ntp\_impl()}{\string~ntp\_impl()}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1ntp__impl_aaaf544e45298bd043067424a81e28ea1} 
+fc\+::detail\+::ntp\+\_\+impl\+::\texorpdfstring{$\sim$}{\string~}ntp\+\_\+impl (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{ntp_8cpp_source_l00047}{47}} of file \mbox{\hyperlink{ntp_8cpp_source}{ntp.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a3192be9a4c6cb1b17c692a0e1d7ef61c}{\_sock}}.\mbox{\hyperlink{classfc_1_1udp__socket_a7be64e6fda2524b07192ca354559bbcd}{close}}();}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_ae84a47c5d0b6670eec22cef7e3095f1c}{\_scheduled\_request\_time}}\ )\ \{}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_ae84a47c5d0b6670eec22cef7e3095f1c}{\_scheduled\_request\_time}}-\/>cancel();}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_ae84a47c5d0b6670eec22cef7e3095f1c}{\_scheduled\_request\_time}}-\/>get\_future().wait();}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_ae84a47c5d0b6670eec22cef7e3095f1c}{\_scheduled\_request\_time}}.reset();}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=322pt]{classfc_1_1detail_1_1ntp__impl_aaaf544e45298bd043067424a81e28ea1_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1detail_1_1ntp__impl_ab9d9f99d97d36f87dca4c0444d395502}\index{fc::detail::ntp\_impl@{fc::detail::ntp\_impl}!fc\_time\_point\_to\_ntp\_timestamp@{fc\_time\_point\_to\_ntp\_timestamp}}
+\index{fc\_time\_point\_to\_ntp\_timestamp@{fc\_time\_point\_to\_ntp\_timestamp}!fc::detail::ntp\_impl@{fc::detail::ntp\_impl}}
+\doxysubsubsection{\texorpdfstring{fc\_time\_point\_to\_ntp\_timestamp()}{fc\_time\_point\_to\_ntp\_timestamp()}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1ntp__impl_ab9d9f99d97d36f87dca4c0444d395502} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} fc\+::detail\+::ntp\+\_\+impl\+::fc\+\_\+time\+\_\+point\+\_\+to\+\_\+ntp\+\_\+timestamp (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}} \&}]{fc\+\_\+timestamp}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{ntp_8cpp_source_l00067}{67}} of file \mbox{\hyperlink{ntp_8cpp_source}{ntp.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ microseconds\_since\_epoch\ =\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})fc\_timestamp.\mbox{\hyperlink{classfc_1_1time__point_abfea5efbe9ef58024cda814395ee9945}{time\_since\_epoch}}().\mbox{\hyperlink{classfc_1_1microseconds_a20fba59ec7e1f50c6b8f2c9443cc9b92}{count}}();}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ seconds\_since\_epoch\ =\ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})(microseconds\_since\_epoch\ /\ 1000000);}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ seconds\_since\_1900\ =\ seconds\_since\_epoch\ +\ 2208988800;}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ microseconds\ =\ microseconds\_since\_epoch\ \%\ 1000000;}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ fractional\_seconds\ =\ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})((((\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})microseconds\ <<\ 32)\ +\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}(1)\ <<\ 31))\ /\ 1000000);}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ ntp\_timestamp\_net\_order\ =\ ((\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})seconds\_since\_1900\ <<\ 32)\ +\ fractional\_seconds;}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ bswap\_64(ntp\_timestamp\_net\_order);}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1detail_1_1ntp__impl_ab9d9f99d97d36f87dca4c0444d395502_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1detail_1_1ntp__impl_ab9d9f99d97d36f87dca4c0444d395502_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1detail_1_1ntp__impl_a4109156bd9378f4234f3d5601577086f}\index{fc::detail::ntp\_impl@{fc::detail::ntp\_impl}!ntp\_timestamp\_to\_fc\_time\_point@{ntp\_timestamp\_to\_fc\_time\_point}}
+\index{ntp\_timestamp\_to\_fc\_time\_point@{ntp\_timestamp\_to\_fc\_time\_point}!fc::detail::ntp\_impl@{fc::detail::ntp\_impl}}
+\doxysubsubsection{\texorpdfstring{ntp\_timestamp\_to\_fc\_time\_point()}{ntp\_timestamp\_to\_fc\_time\_point()}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1ntp__impl_a4109156bd9378f4234f3d5601577086f} 
+\mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}} fc\+::detail\+::ntp\+\_\+impl\+::ntp\+\_\+timestamp\+\_\+to\+\_\+fc\+\_\+time\+\_\+point (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{ntp\+\_\+timestamp\+\_\+net\+\_\+order}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{ntp_8cpp_source_l00057}{57}} of file \mbox{\hyperlink{ntp_8cpp_source}{ntp.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ ntp\_timestamp\_host\ =\ bswap\_64(ntp\_timestamp\_net\_order);}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ fractional\_seconds\ =\ ntp\_timestamp\_host\ \&\ 0xffffffff;}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ microseconds\ =\ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})((((\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})fractional\_seconds\ *\ 1000000)\ +\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}(1)\ <<\ 31))\ >>\ 32);}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ seconds\_since\_1900\ =\ ntp\_timestamp\_host\ >>\ 32;}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ seconds\_since\_epoch\ =\ seconds\_since\_1900\ -\/\ 2208988800;}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1time__point}{fc::time\_point}}()\ +\ \mbox{\hyperlink{namespacefc_a9623b8cae3f48bbed6aa1fc2afe9b174}{fc::seconds}}(seconds\_since\_epoch)\ +\ \mbox{\hyperlink{classfc_1_1microseconds}{fc::microseconds}}(microseconds);}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=297pt]{classfc_1_1detail_1_1ntp__impl_a4109156bd9378f4234f3d5601577086f_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1detail_1_1ntp__impl_a4109156bd9378f4234f3d5601577086f_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1detail_1_1ntp__impl_a5b3a58d9010e8ca23ee3e287595b8967}\index{fc::detail::ntp\_impl@{fc::detail::ntp\_impl}!read\_loop@{read\_loop}}
+\index{read\_loop@{read\_loop}!fc::detail::ntp\_impl@{fc::detail::ntp\_impl}}
+\doxysubsubsection{\texorpdfstring{read\_loop()}{read\_loop()}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1ntp__impl_a5b3a58d9010e8ca23ee3e287595b8967} 
+void fc\+::detail\+::ntp\+\_\+impl\+::read\+\_\+loop (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{ntp_8cpp_source_l00137}{137}} of file \mbox{\hyperlink{ntp_8cpp_source}{ntp.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_ad6bd75c34d45ab832c5bf5ab7aab0cca}{\_ntp\_thread}}.is\_current());}
+\DoxyCodeLine{00140\ }
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ receive\_buffer\_size\ =\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})\ *\ 1024;}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ std::shared\_ptr<char>\ receive\_buffer(\textcolor{keyword}{new}\ \textcolor{keywordtype}{char}[receive\_buffer\_size],\ [](\textcolor{keywordtype}{char}*\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})\{\ \textcolor{keyword}{delete}[]\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}};\ \});}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}*\ recv\_buf\ =\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}*)receive\_buffer.get();}
+\DoxyCodeLine{00144\ }
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ if\ you\ start\ the\ read\ while\ loop\ here,\ the\ recieve\_from\ call\ will\ throw\ "{}invalid\ argument"{}\ on\ win32,}}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ so\ instead\ we\ start\ the\ loop\ after\ making\ our\ first\ request}}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a3192be9a4c6cb1b17c692a0e1d7ef61c}{\_sock}}.\mbox{\hyperlink{classfc_1_1udp__socket_ae38731361b74a2841f4691066ac31d86}{open}}();}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a2dfc9c9e2546e2674577e26be8cc98a5}{\_request\_time\_task\_done}}\ =\ fc::async(\ [\&]()\{\ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_ab2beecf0f92d0bad2bdd8047f45ab599}{request\_time\_task}}();\ \}\ );}
+\DoxyCodeLine{00149\ }
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\ \textcolor{keyword}{true}\ )}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1ip_1_1endpoint}{fc::ip::endpoint}}\ from;}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a3192be9a4c6cb1b17c692a0e1d7ef61c}{\_sock}}.receive\_from(\ receive\_buffer,\ receive\_buffer\_size,\ from\ );}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ \ wlog("{}received\ ntp\ reply\ from\ \$\{from\}"{},("{}from"{},from)\ );}}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \ \ \}\ \mbox{\hyperlink{exception_8hpp_af3731d6e3beb140d9e652adf7a18113b}{FC\_RETHROW\_EXCEPTIONS}}(error,\ \textcolor{stringliteral}{"{}Error\ reading\ from\ NTP\ socket"{}});}
+\DoxyCodeLine{00158\ }
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1time__point}{fc::time\_point}}\ receive\_time\ =\ \mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{fc::time\_point::now}}();}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1time__point}{fc::time\_point}}\ origin\_time\ =\ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a4109156bd9378f4234f3d5601577086f}{ntp\_timestamp\_to\_fc\_time\_point}}(recv\_buf[3]);}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1time__point}{fc::time\_point}}\ server\_receive\_time\ =\ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a4109156bd9378f4234f3d5601577086f}{ntp\_timestamp\_to\_fc\_time\_point}}(recv\_buf[4]);}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1time__point}{fc::time\_point}}\ server\_transmit\_time\ =\ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a4109156bd9378f4234f3d5601577086f}{ntp\_timestamp\_to\_fc\_time\_point}}(recv\_buf[5]);}
+\DoxyCodeLine{00163\ }
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1microseconds}{fc::microseconds}}\ offset(((server\_receive\_time\ -\/\ origin\_time)\ +}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (server\_transmit\_time\ -\/\ receive\_time)).\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}()\ /\ 2);}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1microseconds}{fc::microseconds}}\ round\_trip\_delay((receive\_time\ -\/\ origin\_time)\ -\/}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (server\_transmit\_time\ -\/\ server\_receive\_time));}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//wlog("{}origin\_time\ =\ \$\{origin\_time\},\ server\_receive\_time\ =\ \$\{server\_receive\_time\},\ server\_transmit\_time\ =\ \$\{server\_transmit\_time\},\ receive\_time\ =\ \$\{receive\_time\}"{},}}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ \ \ \ \ ("{}origin\_time"{},\ origin\_time)("{}server\_receive\_time"{},\ server\_receive\_time)("{}server\_transmit\_time"{},\ server\_transmit\_time)("{}receive\_time"{},\ receive\_time));}}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ wlog("{}ntp\ offset:\ \$\{offset\},\ round\_trip\_delay\ \$\{delay\}"{},\ ("{}offset"{},\ offset)("{}delay"{},\ round\_trip\_delay));}}
+\DoxyCodeLine{00171\ }
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//if\ the\ reply\ we\ just\ received\ has\ occurred\ more\ than\ a\ second\ after\ our\ last\ time\ request\ (it\ was\ more\ than\ a\ second\ ago\ since\ our\ last\ request)}}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ round\_trip\_delay\ >\ \mbox{\hyperlink{classfc_1_1microseconds}{fc::microseconds}}(300000)\ )}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a1759e5c9691d8ad754bdf5eff8bb23ac}{wlog}}(\textcolor{stringliteral}{"{}received\ stale\ ntp\ reply\ requested\ at\ \$\{request\_time\},\ send\ a\ new\ time\ request"{}},\ (\textcolor{stringliteral}{"{}request\_time"{}},\ origin\_time));}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_aabb55b1b1ca4de17db3d2b7f3f3ab56a}{request\_now}}();\ \textcolor{comment}{//request\ another\ reply\ and\ ignore\ this\ one}}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{comment}{//we\ think\ we\ have\ a\ timely\ reply,\ process\ it}}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ offset\ <\ \mbox{\hyperlink{namespacefc_a9623b8cae3f48bbed6aa1fc2afe9b174}{fc::seconds}}(60*60*24)\ \&\&\ offset\ >\ \mbox{\hyperlink{namespacefc_a9623b8cae3f48bbed6aa1fc2afe9b174}{fc::seconds}}(-\/60*60*24)\ )}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a0fb88b0eac88e8a384236d3e54f8e71c}{\_last\_ntp\_delta\_microseconds}}\ =\ offset.count();}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a6e0753611dff46a52e93a1d5a0566347}{\_last\_ntp\_delta\_initialized}}\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1microseconds}{fc::microseconds}}\ ntp\_delta\_time\ =\ \mbox{\hyperlink{classfc_1_1microseconds}{fc::microseconds}}(\mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a0fb88b0eac88e8a384236d3e54f8e71c}{\_last\_ntp\_delta\_microseconds}});}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a4f00346f22b4b815bf4c3c6cdb9ab3ed}{\_last\_valid\_ntp\_reply\_received\_time}}\ =\ receive\_time;}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a1759e5c9691d8ad754bdf5eff8bb23ac}{wlog}}(\textcolor{stringliteral}{"{}ntp\_delta\_time\ updated\ to\ \$\{delta\_time\}\ us"{}},\ (\textcolor{stringliteral}{"{}delta\_time"{}},ntp\_delta\_time)\ );}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}}(\ \textcolor{stringliteral}{"{}NTP\ time\ and\ local\ time\ vary\ by\ more\ than\ a\ day!\ ntp:\$\{ntp\_time\}\ local:\$\{local\}"{}},}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}ntp\_time"{}},\ receive\_time\ +\ offset)(\textcolor{stringliteral}{"{}local"{}},\ \mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{fc::time\_point::now}}())\ );}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a1759e5c9691d8ad754bdf5eff8bb23ac}{wlog}}(\textcolor{stringliteral}{"{}exiting\ ntp\ read\_loop"{}});}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \}\ \textcolor{comment}{//end\ read\_loop()}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1detail_1_1ntp__impl_a5b3a58d9010e8ca23ee3e287595b8967_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=309pt]{classfc_1_1detail_1_1ntp__impl_a5b3a58d9010e8ca23ee3e287595b8967_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1detail_1_1ntp__impl_aabb55b1b1ca4de17db3d2b7f3f3ab56a}\index{fc::detail::ntp\_impl@{fc::detail::ntp\_impl}!request\_now@{request\_now}}
+\index{request\_now@{request\_now}!fc::detail::ntp\_impl@{fc::detail::ntp\_impl}}
+\doxysubsubsection{\texorpdfstring{request\_now()}{request\_now()}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1ntp__impl_aabb55b1b1ca4de17db3d2b7f3f3ab56a} 
+void fc\+::detail\+::ntp\+\_\+impl\+::request\+\_\+now (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{ntp_8cpp_source_l00078}{78}} of file \mbox{\hyperlink{ntp_8cpp_source}{ntp.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_ad6bd75c34d45ab832c5bf5ab7aab0cca}{\_ntp\_thread}}.is\_current());}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\ item\ :\ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a492fb7af84f8442b90b4f73901adbe61}{\_ntp\_hosts}}\ )}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a1759e5c9691d8ad754bdf5eff8bb23ac}{wlog}}(\ \textcolor{stringliteral}{"{}resolving...\ \$\{r\}"{}},\ (\textcolor{stringliteral}{"{}r"{}},\ item)\ );}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ eps\ =\ \mbox{\hyperlink{namespacefc_ab306ee2beea98abbf390068aa881ca42}{resolve}}(\ item.first,\ item.second\ );}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\ ep\ :\ eps\ )}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a1759e5c9691d8ad754bdf5eff8bb23ac}{wlog}}(\ \textcolor{stringliteral}{"{}sending\ request\ to\ \$\{ep\}"{}},\ (\textcolor{stringliteral}{"{}ep"{}},ep)\ );}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::shared\_ptr<char>\ send\_buffer(\textcolor{keyword}{new}\ \textcolor{keywordtype}{char}[48],\ [](\textcolor{keywordtype}{char}*\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})\{\ \textcolor{keyword}{delete}[]\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}};\ \});}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::array<unsigned\ char,\ 48>\ packet\_to\_send\ \{\ \{010,0,0,0,0,0,0,0,0\}\ \};}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(send\_buffer.get(),\ packet\_to\_send.data(),\ packet\_to\_send.size());}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}*\ send\_buf\_as\_64\_array\ =\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}*)send\_buffer.get();}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ send\_buf\_as\_64\_array[5]\ =\ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_ab9d9f99d97d36f87dca4c0444d395502}{fc\_time\_point\_to\_ntp\_timestamp}}(\mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{fc::time\_point::now}}());\ \textcolor{comment}{//\ 5\ =\ Transmit\ Timestamp}}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a3192be9a4c6cb1b17c692a0e1d7ef61c}{\_sock}}.\mbox{\hyperlink{classfc_1_1udp__socket_a99f7b46a3566de47d7977ce10b674fe1}{send\_to}}(send\_buffer,\ packet\_to\_send.size(),\ ep);}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{catch}\ (\textcolor{keyword}{const}\ fc::canceled\_exception\&)}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw};}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{catch}\ (\ \textcolor{keyword}{const}\ std::bad\_alloc\&\ )\ }
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw};}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \ \ \}\ }
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{catch}\ (\ \textcolor{keyword}{const}\ boost::interprocess::bad\_alloc\&\ )\ }
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw};}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \ \ \}\ }
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ this\ could\ fail\ to\ resolve\ but\ we\ want\ to\ go\ on\ to\ other\ hosts..}}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{catch}\ (\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1exception}{fc::exception}}\&\ e\ )}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}}(\ \textcolor{stringliteral}{"{}\$\{e\}"{}},\ (\textcolor{stringliteral}{"{}e"{}},e.\mbox{\hyperlink{classfc_1_1exception_a7611ea8fbe25dde56649b685c2298a37}{to\_detail\_string}}()\ )\ );}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{catch}\ (\ \textcolor{keyword}{const}\ std::exception\&\ e\ )}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}}(\ \textcolor{stringliteral}{"{}\$\{e\}"{}},\ (\textcolor{stringliteral}{"{}e"{}},e.what()\ )\ );}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \}\ \textcolor{comment}{//\ request\_now}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1detail_1_1ntp__impl_aabb55b1b1ca4de17db3d2b7f3f3ab56a_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1detail_1_1ntp__impl_aabb55b1b1ca4de17db3d2b7f3f3ab56a_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1detail_1_1ntp__impl_ab2beecf0f92d0bad2bdd8047f45ab599}\index{fc::detail::ntp\_impl@{fc::detail::ntp\_impl}!request\_time\_task@{request\_time\_task}}
+\index{request\_time\_task@{request\_time\_task}!fc::detail::ntp\_impl@{fc::detail::ntp\_impl}}
+\doxysubsubsection{\texorpdfstring{request\_time\_task()}{request\_time\_task()}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1ntp__impl_ab2beecf0f92d0bad2bdd8047f45ab599} 
+void fc\+::detail\+::ntp\+\_\+impl\+::request\+\_\+time\+\_\+task (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{ntp_8cpp_source_l00127}{127}} of file \mbox{\hyperlink{ntp_8cpp_source}{ntp.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_aabb55b1b1ca4de17db3d2b7f3f3ab56a}{request\_now}}();}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \}\ \textcolor{comment}{//\ request\_loop}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1detail_1_1ntp__impl_ab2beecf0f92d0bad2bdd8047f45ab599_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1detail_1_1ntp__impl_ab2beecf0f92d0bad2bdd8047f45ab599_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1detail_1_1ntp__impl_a3ee1de6f11e03bf63ac439e5bddec0b7}\index{fc::detail::ntp\_impl@{fc::detail::ntp\_impl}!reschedule@{reschedule}}
+\index{reschedule@{reschedule}!fc::detail::ntp\_impl@{fc::detail::ntp\_impl}}
+\doxysubsubsection{\texorpdfstring{reschedule()}{reschedule()}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1ntp__impl_a3ee1de6f11e03bf63ac439e5bddec0b7} 
+void fc\+::detail\+::ntp\+\_\+impl\+::reschedule (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{ntp_8cpp_source_l00196}{196}} of file \mbox{\hyperlink{ntp_8cpp_source}{ntp.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_ae84a47c5d0b6670eec22cef7e3095f1c}{\_scheduled\_request\_time}}\ )}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_ae84a47c5d0b6670eec22cef7e3095f1c}{\_scheduled\_request\_time}}-\/>cancel();}
+\DoxyCodeLine{00199\ }
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_ae84a47c5d0b6670eec22cef7e3095f1c}{\_scheduled\_request\_time}}\ =\ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_ad6bd75c34d45ab832c5bf5ab7aab0cca}{\_ntp\_thread}}.schedule(}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \ \ \ \ \ \ [\&]()\{}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_aabb55b1b1ca4de17db3d2b7f3f3ab56a}{request\_now}}();}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a3ee1de6f11e03bf63ac439e5bddec0b7}{reschedule}}();}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{fc::time\_point::now}}()\ +\ \mbox{\hyperlink{namespacefc_a9623b8cae3f48bbed6aa1fc2afe9b174}{fc::seconds}}(\mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a0154039055094fd24c5f156b4252cc6b}{\_request\_interval\_sec}})\ );}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1detail_1_1ntp__impl_a3ee1de6f11e03bf63ac439e5bddec0b7_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=176pt]{classfc_1_1detail_1_1ntp__impl_a3ee1de6f11e03bf63ac439e5bddec0b7_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1detail_1_1ntp__impl_a70d5cd30257c17171bc81e7dba288664}\index{fc::detail::ntp\_impl@{fc::detail::ntp\_impl}!start\_read\_loop@{start\_read\_loop}}
+\index{start\_read\_loop@{start\_read\_loop}!fc::detail::ntp\_impl@{fc::detail::ntp\_impl}}
+\doxysubsubsection{\texorpdfstring{start\_read\_loop()}{start\_read\_loop()}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1ntp__impl_a70d5cd30257c17171bc81e7dba288664} 
+void fc\+::detail\+::ntp\+\_\+impl\+::start\+\_\+read\+\_\+loop (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{ntp_8cpp_source_l00132}{132}} of file \mbox{\hyperlink{ntp_8cpp_source}{ntp.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a75bfd3d5ce6037a7bfae89da0a9f73ba}{\_read\_loop\_done}}\ =\ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_ad6bd75c34d45ab832c5bf5ab7aab0cca}{\_ntp\_thread}}.async(\ [\textcolor{keyword}{this}]()\{\ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a5b3a58d9010e8ca23ee3e287595b8967}{read\_loop}}();\ \}\ );}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1detail_1_1ntp__impl_a70d5cd30257c17171bc81e7dba288664_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classfc_1_1detail_1_1ntp__impl_a6e0753611dff46a52e93a1d5a0566347}\index{fc::detail::ntp\_impl@{fc::detail::ntp\_impl}!\_last\_ntp\_delta\_initialized@{\_last\_ntp\_delta\_initialized}}
+\index{\_last\_ntp\_delta\_initialized@{\_last\_ntp\_delta\_initialized}!fc::detail::ntp\_impl@{fc::detail::ntp\_impl}}
+\doxysubsubsection{\texorpdfstring{\_last\_ntp\_delta\_initialized}{\_last\_ntp\_delta\_initialized}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1ntp__impl_a6e0753611dff46a52e93a1d5a0566347} 
+std\+::atomic\+\_\+bool fc\+::detail\+::ntp\+\_\+impl\+::\+\_\+last\+\_\+ntp\+\_\+delta\+\_\+initialized}
+
+
+
+Definition at line \mbox{\hyperlink{ntp_8cpp_source_l00030}{30}} of file \mbox{\hyperlink{ntp_8cpp_source}{ntp.\+cpp}}.
+
+\Hypertarget{classfc_1_1detail_1_1ntp__impl_a0fb88b0eac88e8a384236d3e54f8e71c}\index{fc::detail::ntp\_impl@{fc::detail::ntp\_impl}!\_last\_ntp\_delta\_microseconds@{\_last\_ntp\_delta\_microseconds}}
+\index{\_last\_ntp\_delta\_microseconds@{\_last\_ntp\_delta\_microseconds}!fc::detail::ntp\_impl@{fc::detail::ntp\_impl}}
+\doxysubsubsection{\texorpdfstring{\_last\_ntp\_delta\_microseconds}{\_last\_ntp\_delta\_microseconds}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1ntp__impl_a0fb88b0eac88e8a384236d3e54f8e71c} 
+std\+::atomic$<$\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}$>$ fc\+::detail\+::ntp\+\_\+impl\+::\+\_\+last\+\_\+ntp\+\_\+delta\+\_\+microseconds}
+
+
+
+Definition at line \mbox{\hyperlink{ntp_8cpp_source_l00031}{31}} of file \mbox{\hyperlink{ntp_8cpp_source}{ntp.\+cpp}}.
+
+\Hypertarget{classfc_1_1detail_1_1ntp__impl_a4f00346f22b4b815bf4c3c6cdb9ab3ed}\index{fc::detail::ntp\_impl@{fc::detail::ntp\_impl}!\_last\_valid\_ntp\_reply\_received\_time@{\_last\_valid\_ntp\_reply\_received\_time}}
+\index{\_last\_valid\_ntp\_reply\_received\_time@{\_last\_valid\_ntp\_reply\_received\_time}!fc::detail::ntp\_impl@{fc::detail::ntp\_impl}}
+\doxysubsubsection{\texorpdfstring{\_last\_valid\_ntp\_reply\_received\_time}{\_last\_valid\_ntp\_reply\_received\_time}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1ntp__impl_a4f00346f22b4b815bf4c3c6cdb9ab3ed} 
+\mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}} fc\+::detail\+::ntp\+\_\+impl\+::\+\_\+last\+\_\+valid\+\_\+ntp\+\_\+reply\+\_\+received\+\_\+time}
+
+
+
+Definition at line \mbox{\hyperlink{ntp_8cpp_source_l00028}{28}} of file \mbox{\hyperlink{ntp_8cpp_source}{ntp.\+cpp}}.
+
+\Hypertarget{classfc_1_1detail_1_1ntp__impl_a492fb7af84f8442b90b4f73901adbe61}\index{fc::detail::ntp\_impl@{fc::detail::ntp\_impl}!\_ntp\_hosts@{\_ntp\_hosts}}
+\index{\_ntp\_hosts@{\_ntp\_hosts}!fc::detail::ntp\_impl@{fc::detail::ntp\_impl}}
+\doxysubsubsection{\texorpdfstring{\_ntp\_hosts}{\_ntp\_hosts}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1ntp__impl_a492fb7af84f8442b90b4f73901adbe61} 
+std\+::vector$<$ std\+::pair$<$ std\+::string, \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}}$>$ $>$ fc\+::detail\+::ntp\+\_\+impl\+::\+\_\+ntp\+\_\+hosts}
+
+
+
+Definition at line \mbox{\hyperlink{ntp_8cpp_source_l00023}{23}} of file \mbox{\hyperlink{ntp_8cpp_source}{ntp.\+cpp}}.
+
+\Hypertarget{classfc_1_1detail_1_1ntp__impl_ad6bd75c34d45ab832c5bf5ab7aab0cca}\index{fc::detail::ntp\_impl@{fc::detail::ntp\_impl}!\_ntp\_thread@{\_ntp\_thread}}
+\index{\_ntp\_thread@{\_ntp\_thread}!fc::detail::ntp\_impl@{fc::detail::ntp\_impl}}
+\doxysubsubsection{\texorpdfstring{\_ntp\_thread}{\_ntp\_thread}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1ntp__impl_ad6bd75c34d45ab832c5bf5ab7aab0cca} 
+fc\+::thread fc\+::detail\+::ntp\+\_\+impl\+::\+\_\+ntp\+\_\+thread}
+
+vector \texorpdfstring{$<$}{<} host, port \texorpdfstring{$>$}{>} ~\newline
+ 
+
+Definition at line \mbox{\hyperlink{ntp_8cpp_source_l00022}{22}} of file \mbox{\hyperlink{ntp_8cpp_source}{ntp.\+cpp}}.
+
+\Hypertarget{classfc_1_1detail_1_1ntp__impl_a75bfd3d5ce6037a7bfae89da0a9f73ba}\index{fc::detail::ntp\_impl@{fc::detail::ntp\_impl}!\_read\_loop\_done@{\_read\_loop\_done}}
+\index{\_read\_loop\_done@{\_read\_loop\_done}!fc::detail::ntp\_impl@{fc::detail::ntp\_impl}}
+\doxysubsubsection{\texorpdfstring{\_read\_loop\_done}{\_read\_loop\_done}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1ntp__impl_a75bfd3d5ce6037a7bfae89da0a9f73ba} 
+future$<$void$>$ fc\+::detail\+::ntp\+\_\+impl\+::\+\_\+read\+\_\+loop\+\_\+done}
+
+
+
+Definition at line \mbox{\hyperlink{ntp_8cpp_source_l00024}{24}} of file \mbox{\hyperlink{ntp_8cpp_source}{ntp.\+cpp}}.
+
+\Hypertarget{classfc_1_1detail_1_1ntp__impl_a0154039055094fd24c5f156b4252cc6b}\index{fc::detail::ntp\_impl@{fc::detail::ntp\_impl}!\_request\_interval\_sec@{\_request\_interval\_sec}}
+\index{\_request\_interval\_sec@{\_request\_interval\_sec}!fc::detail::ntp\_impl@{fc::detail::ntp\_impl}}
+\doxysubsubsection{\texorpdfstring{\_request\_interval\_sec}{\_request\_interval\_sec}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1ntp__impl_a0154039055094fd24c5f156b4252cc6b} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} fc\+::detail\+::ntp\+\_\+impl\+::\+\_\+request\+\_\+interval\+\_\+sec}
+
+
+
+Definition at line \mbox{\hyperlink{ntp_8cpp_source_l00026}{26}} of file \mbox{\hyperlink{ntp_8cpp_source}{ntp.\+cpp}}.
+
+\Hypertarget{classfc_1_1detail_1_1ntp__impl_a2dfc9c9e2546e2674577e26be8cc98a5}\index{fc::detail::ntp\_impl@{fc::detail::ntp\_impl}!\_request\_time\_task\_done@{\_request\_time\_task\_done}}
+\index{\_request\_time\_task\_done@{\_request\_time\_task\_done}!fc::detail::ntp\_impl@{fc::detail::ntp\_impl}}
+\doxysubsubsection{\texorpdfstring{\_request\_time\_task\_done}{\_request\_time\_task\_done}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1ntp__impl_a2dfc9c9e2546e2674577e26be8cc98a5} 
+future$<$void$>$ fc\+::detail\+::ntp\+\_\+impl\+::\+\_\+request\+\_\+time\+\_\+task\+\_\+done}
+
+
+
+Definition at line \mbox{\hyperlink{ntp_8cpp_source_l00033}{33}} of file \mbox{\hyperlink{ntp_8cpp_source}{ntp.\+cpp}}.
+
+\Hypertarget{classfc_1_1detail_1_1ntp__impl_aab50f7060faf962cfc6967d4089f0381}\index{fc::detail::ntp\_impl@{fc::detail::ntp\_impl}!\_retry\_failed\_request\_interval\_sec@{\_retry\_failed\_request\_interval\_sec}}
+\index{\_retry\_failed\_request\_interval\_sec@{\_retry\_failed\_request\_interval\_sec}!fc::detail::ntp\_impl@{fc::detail::ntp\_impl}}
+\doxysubsubsection{\texorpdfstring{\_retry\_failed\_request\_interval\_sec}{\_retry\_failed\_request\_interval\_sec}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1ntp__impl_aab50f7060faf962cfc6967d4089f0381} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} fc\+::detail\+::ntp\+\_\+impl\+::\+\_\+retry\+\_\+failed\+\_\+request\+\_\+interval\+\_\+sec}
+
+
+
+Definition at line \mbox{\hyperlink{ntp_8cpp_source_l00027}{27}} of file \mbox{\hyperlink{ntp_8cpp_source}{ntp.\+cpp}}.
+
+\Hypertarget{classfc_1_1detail_1_1ntp__impl_ae84a47c5d0b6670eec22cef7e3095f1c}\index{fc::detail::ntp\_impl@{fc::detail::ntp\_impl}!\_scheduled\_request\_time@{\_scheduled\_request\_time}}
+\index{\_scheduled\_request\_time@{\_scheduled\_request\_time}!fc::detail::ntp\_impl@{fc::detail::ntp\_impl}}
+\doxysubsubsection{\texorpdfstring{\_scheduled\_request\_time}{\_scheduled\_request\_time}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1ntp__impl_ae84a47c5d0b6670eec22cef7e3095f1c} 
+std\+::shared\+\_\+ptr$<$scheduled\+\_\+task\+\_\+impl$<$void$>$ $>$ fc\+::detail\+::ntp\+\_\+impl\+::\+\_\+scheduled\+\_\+request\+\_\+time}
+
+
+
+Definition at line \mbox{\hyperlink{ntp_8cpp_source_l00035}{35}} of file \mbox{\hyperlink{ntp_8cpp_source}{ntp.\+cpp}}.
+
+\Hypertarget{classfc_1_1detail_1_1ntp__impl_a3192be9a4c6cb1b17c692a0e1d7ef61c}\index{fc::detail::ntp\_impl@{fc::detail::ntp\_impl}!\_sock@{\_sock}}
+\index{\_sock@{\_sock}!fc::detail::ntp\_impl@{fc::detail::ntp\_impl}}
+\doxysubsubsection{\texorpdfstring{\_sock}{\_sock}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1ntp__impl_a3192be9a4c6cb1b17c692a0e1d7ef61c} 
+\mbox{\hyperlink{classfc_1_1udp__socket}{udp\+\_\+socket}} fc\+::detail\+::ntp\+\_\+impl\+::\+\_\+sock}
+
+
+
+Definition at line \mbox{\hyperlink{ntp_8cpp_source_l00025}{25}} of file \mbox{\hyperlink{ntp_8cpp_source}{ntp.\+cpp}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/src/network/\mbox{\hyperlink{ntp_8cpp}{ntp.\+cpp}}\end{DoxyCompactItemize}

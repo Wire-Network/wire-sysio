@@ -1,0 +1,55 @@
+\doxysection{libraries/state\+\_\+history/include/sysio/state\+\_\+history/log.hpp File Reference}
+\hypertarget{log_8hpp}{}\label{log_8hpp}\index{libraries/state\_history/include/sysio/state\_history/log.hpp@{libraries/state\_history/include/sysio/state\_history/log.hpp}}
+{\ttfamily \#include $<$boost/filesystem.\+hpp$>$}\newline
+{\ttfamily \#include $<$fstream$>$}\newline
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include $<$sysio/chain/block\+\_\+header.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/exceptions.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/types.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/io/cfile.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/log/logger.\+hpp$>$}\newline
+Include dependency graph for log.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{log_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=215pt]{log_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1state__history__log__header}{sysio\+::state\+\_\+history\+\_\+log\+\_\+header}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1state__history__log__prune__config}{sysio\+::state\+\_\+history\+\_\+log\+\_\+prune\+\_\+config}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1state__history__log}{sysio\+::state\+\_\+history\+\_\+log}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{namespacesysio_adcbaf3936df79b161164e2cd54530f9c}{sysio\+::ship\+\_\+magic}} (\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} version, \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} features=0)
+\item 
+bool \mbox{\hyperlink{namespacesysio_aa035ebab1a4243e9ea978e0c77c22db2}{sysio\+::is\+\_\+ship}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} magic)
+\item 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{namespacesysio_a40e4963425695bd282c6dc9a7d53cc3e}{sysio\+::get\+\_\+ship\+\_\+version}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} magic)
+\item 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{namespacesysio_a222e606a43962114b27f5ba7ba308be9}{sysio\+::get\+\_\+ship\+\_\+features}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} magic)
+\item 
+bool \mbox{\hyperlink{namespacesysio_a7e66082bb7477dd8ee41a5145d604ee2}{sysio\+::is\+\_\+ship\+\_\+supported\+\_\+version}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} magic)
+\item 
+bool \mbox{\hyperlink{namespacesysio_a967f7bd318ee315bed33e22f2abb1bc2}{sysio\+::is\+\_\+ship\+\_\+log\+\_\+pruned}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} magic)
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{namespacesysio_a18132f8f1084f1195249e432f1d9329e}{sysio\+::clear\+\_\+ship\+\_\+log\+\_\+pruned\+\_\+feature}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} magic)
+\end{DoxyCompactItemize}

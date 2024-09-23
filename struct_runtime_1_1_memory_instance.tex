@@ -1,0 +1,179 @@
+\doxysection{Runtime\+::Memory\+Instance Struct Reference}
+\hypertarget{struct_runtime_1_1_memory_instance}{}\label{struct_runtime_1_1_memory_instance}\index{Runtime::MemoryInstance@{Runtime::MemoryInstance}}
+
+
+{\ttfamily \#include $<$Runtime\+Private.\+h$>$}
+
+
+
+Inheritance diagram for Runtime\+::Memory\+Instance\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=212pt]{struct_runtime_1_1_memory_instance__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Runtime\+::Memory\+Instance\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_runtime_1_1_memory_instance__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_runtime_1_1_memory_instance_a7feb7d2add6de802c26d19aa79ebc35f}{Memory\+Instance}} (const \mbox{\hyperlink{struct_i_r_1_1_memory_type}{Memory\+Type}} \&in\+Type)
+\item 
+\mbox{\hyperlink{struct_runtime_1_1_memory_instance_a4d87e87ad86c0f629bf1874842c33be9}{\texorpdfstring{$\sim$}{\string~}\+Memory\+Instance}} () override
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{struct_runtime_1_1_g_c_object}{Runtime\+::\+GCObject}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_runtime_1_1_g_c_object_ad61fa15a80d09b18aa1e8f80b1338467}{GCObject}} (\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908}{Object\+Kind}} in\+Kind)
+\item 
+\mbox{\hyperlink{struct_runtime_1_1_g_c_object_a87fe6580879c9e158d151219dfe6999e}{\texorpdfstring{$\sim$}{\string~}\+GCObject}} () override
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{struct_runtime_1_1_object_instance}{Runtime\+::\+Object\+Instance}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_runtime_1_1_object_instance_af7231f91092e2c8d8f65491f648504b5}{Object\+Instance}} (\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908}{IR\+::\+Object\+Kind}} in\+Kind)
+\item 
+virtual \mbox{\hyperlink{struct_runtime_1_1_object_instance_a67bf2d4a743aff39354b04a65108f383}{\texorpdfstring{$\sim$}{\string~}\+Object\+Instance}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_i_r_1_1_memory_type}{Memory\+Type}} \mbox{\hyperlink{struct_runtime_1_1_memory_instance_a5cf279001f7209f2b7be6b7c13abe01a}{type}}
+\item 
+\mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{struct_runtime_1_1_memory_instance_ad803e69957989e4087929b8a12f25440}{base\+Address}}
+\item 
+std\+::atomic$<$ \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} $>$ \mbox{\hyperlink{struct_runtime_1_1_memory_instance_aea69f8ac1642263f4580fcc56ff9833f}{num\+Pages}}
+\item 
+\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} \mbox{\hyperlink{struct_runtime_1_1_memory_instance_a58d518883da46e9fa78c228b4ffac918}{end\+Offset}}
+\item 
+\mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{struct_runtime_1_1_memory_instance_a1f6050dbc41669dbc56d6f02acdd15a6}{reserved\+Base\+Address}}
+\item 
+\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} \mbox{\hyperlink{struct_runtime_1_1_memory_instance_ada6632cfe01689c3720adae35964e449}{reserved\+Num\+Platform\+Pages}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes inherited from \mbox{\hyperlink{struct_runtime_1_1_object_instance}{Runtime\+::\+Object\+Instance}}}
+\begin{DoxyCompactItemize}
+\item 
+const \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908}{IR\+::\+Object\+Kind}} \mbox{\hyperlink{struct_runtime_1_1_object_instance_a0d77f442a8f7418381f356c31795d8db}{kind}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static \mbox{\hyperlink{struct_runtime_1_1_memory_instance}{Memory\+Instance}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{struct_runtime_1_1_memory_instance_a397f41ff248111bdcd9796990c4c1f1f}{the\+Memory\+Instance}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{_runtime_private_8h_source_l00080}{80}} of file \mbox{\hyperlink{_runtime_private_8h_source}{Runtime\+Private.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{struct_runtime_1_1_memory_instance_a7feb7d2add6de802c26d19aa79ebc35f}\index{Runtime::MemoryInstance@{Runtime::MemoryInstance}!MemoryInstance@{MemoryInstance}}
+\index{MemoryInstance@{MemoryInstance}!Runtime::MemoryInstance@{Runtime::MemoryInstance}}
+\doxysubsubsection{\texorpdfstring{MemoryInstance()}{MemoryInstance()}}
+{\footnotesize\ttfamily \label{struct_runtime_1_1_memory_instance_a7feb7d2add6de802c26d19aa79ebc35f} 
+Runtime\+::\+Memory\+Instance\+::\+Memory\+Instance (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct_i_r_1_1_memory_type}{Memory\+Type}} \&}]{in\+Type}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_runtime_private_8h_source_l00091}{91}} of file \mbox{\hyperlink{_runtime_private_8h_source}{Runtime\+Private.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00091\ :\ \mbox{\hyperlink{struct_runtime_1_1_g_c_object_ad61fa15a80d09b18aa1e8f80b1338467}{GCObject}}(ObjectKind::memory),\ \mbox{\hyperlink{struct_runtime_1_1_memory_instance_a5cf279001f7209f2b7be6b7c13abe01a}{type}}(inType),\ \mbox{\hyperlink{struct_runtime_1_1_memory_instance_ad803e69957989e4087929b8a12f25440}{baseAddress}}(\textcolor{keyword}{nullptr}),\ \mbox{\hyperlink{struct_runtime_1_1_memory_instance_aea69f8ac1642263f4580fcc56ff9833f}{numPages}}(0),\ \mbox{\hyperlink{struct_runtime_1_1_memory_instance_a58d518883da46e9fa78c228b4ffac918}{endOffset}}(0),\ \mbox{\hyperlink{struct_runtime_1_1_memory_instance_a1f6050dbc41669dbc56d6f02acdd15a6}{reservedBaseAddress}}(\textcolor{keyword}{nullptr}),\ \mbox{\hyperlink{struct_runtime_1_1_memory_instance_ada6632cfe01689c3720adae35964e449}{reservedNumPlatformPages}}(0)\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{struct_runtime_1_1_memory_instance_a4d87e87ad86c0f629bf1874842c33be9}\index{Runtime::MemoryInstance@{Runtime::MemoryInstance}!````~MemoryInstance@{\texorpdfstring{$\sim$}{\string~}MemoryInstance}}
+\index{````~MemoryInstance@{\texorpdfstring{$\sim$}{\string~}MemoryInstance}!Runtime::MemoryInstance@{Runtime::MemoryInstance}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}MemoryInstance()}{\string~MemoryInstance()}}
+{\footnotesize\ttfamily \label{struct_runtime_1_1_memory_instance_a4d87e87ad86c0f629bf1874842c33be9} 
+Runtime\+::\+Memory\+Instance\+::\texorpdfstring{$\sim$}{\string~}\+Memory\+Instance (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_runtime_1_1_memory_instance_ad803e69957989e4087929b8a12f25440}\index{Runtime::MemoryInstance@{Runtime::MemoryInstance}!baseAddress@{baseAddress}}
+\index{baseAddress@{baseAddress}!Runtime::MemoryInstance@{Runtime::MemoryInstance}}
+\doxysubsubsection{\texorpdfstring{baseAddress}{baseAddress}}
+{\footnotesize\ttfamily \label{struct_runtime_1_1_memory_instance_ad803e69957989e4087929b8a12f25440} 
+\mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}\texorpdfstring{$\ast$}{*} Runtime\+::\+Memory\+Instance\+::base\+Address}
+
+
+
+Definition at line \mbox{\hyperlink{_runtime_private_8h_source_l00084}{84}} of file \mbox{\hyperlink{_runtime_private_8h_source}{Runtime\+Private.\+h}}.
+
+\Hypertarget{struct_runtime_1_1_memory_instance_a58d518883da46e9fa78c228b4ffac918}\index{Runtime::MemoryInstance@{Runtime::MemoryInstance}!endOffset@{endOffset}}
+\index{endOffset@{endOffset}!Runtime::MemoryInstance@{Runtime::MemoryInstance}}
+\doxysubsubsection{\texorpdfstring{endOffset}{endOffset}}
+{\footnotesize\ttfamily \label{struct_runtime_1_1_memory_instance_a58d518883da46e9fa78c228b4ffac918} 
+\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} Runtime\+::\+Memory\+Instance\+::end\+Offset}
+
+
+
+Definition at line \mbox{\hyperlink{_runtime_private_8h_source_l00086}{86}} of file \mbox{\hyperlink{_runtime_private_8h_source}{Runtime\+Private.\+h}}.
+
+\Hypertarget{struct_runtime_1_1_memory_instance_aea69f8ac1642263f4580fcc56ff9833f}\index{Runtime::MemoryInstance@{Runtime::MemoryInstance}!numPages@{numPages}}
+\index{numPages@{numPages}!Runtime::MemoryInstance@{Runtime::MemoryInstance}}
+\doxysubsubsection{\texorpdfstring{numPages}{numPages}}
+{\footnotesize\ttfamily \label{struct_runtime_1_1_memory_instance_aea69f8ac1642263f4580fcc56ff9833f} 
+std\+::atomic$<$\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}$>$ Runtime\+::\+Memory\+Instance\+::num\+Pages}
+
+
+
+Definition at line \mbox{\hyperlink{_runtime_private_8h_source_l00085}{85}} of file \mbox{\hyperlink{_runtime_private_8h_source}{Runtime\+Private.\+h}}.
+
+\Hypertarget{struct_runtime_1_1_memory_instance_a1f6050dbc41669dbc56d6f02acdd15a6}\index{Runtime::MemoryInstance@{Runtime::MemoryInstance}!reservedBaseAddress@{reservedBaseAddress}}
+\index{reservedBaseAddress@{reservedBaseAddress}!Runtime::MemoryInstance@{Runtime::MemoryInstance}}
+\doxysubsubsection{\texorpdfstring{reservedBaseAddress}{reservedBaseAddress}}
+{\footnotesize\ttfamily \label{struct_runtime_1_1_memory_instance_a1f6050dbc41669dbc56d6f02acdd15a6} 
+\mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}\texorpdfstring{$\ast$}{*} Runtime\+::\+Memory\+Instance\+::reserved\+Base\+Address}
+
+
+
+Definition at line \mbox{\hyperlink{_runtime_private_8h_source_l00088}{88}} of file \mbox{\hyperlink{_runtime_private_8h_source}{Runtime\+Private.\+h}}.
+
+\Hypertarget{struct_runtime_1_1_memory_instance_ada6632cfe01689c3720adae35964e449}\index{Runtime::MemoryInstance@{Runtime::MemoryInstance}!reservedNumPlatformPages@{reservedNumPlatformPages}}
+\index{reservedNumPlatformPages@{reservedNumPlatformPages}!Runtime::MemoryInstance@{Runtime::MemoryInstance}}
+\doxysubsubsection{\texorpdfstring{reservedNumPlatformPages}{reservedNumPlatformPages}}
+{\footnotesize\ttfamily \label{struct_runtime_1_1_memory_instance_ada6632cfe01689c3720adae35964e449} 
+\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} Runtime\+::\+Memory\+Instance\+::reserved\+Num\+Platform\+Pages}
+
+
+
+Definition at line \mbox{\hyperlink{_runtime_private_8h_source_l00089}{89}} of file \mbox{\hyperlink{_runtime_private_8h_source}{Runtime\+Private.\+h}}.
+
+\Hypertarget{struct_runtime_1_1_memory_instance_a397f41ff248111bdcd9796990c4c1f1f}\index{Runtime::MemoryInstance@{Runtime::MemoryInstance}!theMemoryInstance@{theMemoryInstance}}
+\index{theMemoryInstance@{theMemoryInstance}!Runtime::MemoryInstance@{Runtime::MemoryInstance}}
+\doxysubsubsection{\texorpdfstring{theMemoryInstance}{theMemoryInstance}}
+{\footnotesize\ttfamily \label{struct_runtime_1_1_memory_instance_a397f41ff248111bdcd9796990c4c1f1f} 
+\mbox{\hyperlink{struct_runtime_1_1_memory_instance}{Memory\+Instance}}\texorpdfstring{$\ast$}{*} Runtime\+::\+Memory\+Instance\+::the\+Memory\+Instance\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{_runtime_private_8h_source_l00094}{94}} of file \mbox{\hyperlink{_runtime_private_8h_source}{Runtime\+Private.\+h}}.
+
+\Hypertarget{struct_runtime_1_1_memory_instance_a5cf279001f7209f2b7be6b7c13abe01a}\index{Runtime::MemoryInstance@{Runtime::MemoryInstance}!type@{type}}
+\index{type@{type}!Runtime::MemoryInstance@{Runtime::MemoryInstance}}
+\doxysubsubsection{\texorpdfstring{type}{type}}
+{\footnotesize\ttfamily \label{struct_runtime_1_1_memory_instance_a5cf279001f7209f2b7be6b7c13abe01a} 
+\mbox{\hyperlink{struct_i_r_1_1_memory_type}{Memory\+Type}} Runtime\+::\+Memory\+Instance\+::type}
+
+
+
+Definition at line \mbox{\hyperlink{_runtime_private_8h_source_l00082}{82}} of file \mbox{\hyperlink{_runtime_private_8h_source}{Runtime\+Private.\+h}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/wasm-\/jit/\+Source/\+Runtime/\mbox{\hyperlink{_runtime_private_8h}{Runtime\+Private.\+h}}\end{DoxyCompactItemize}

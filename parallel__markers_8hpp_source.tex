@@ -1,0 +1,30 @@
+\doxysection{parallel\+\_\+markers.\+hpp}
+\hypertarget{parallel__markers_8hpp_source}{}\label{parallel__markers_8hpp_source}\index{libraries/chain/include/sysio/chain/parallel\_markers.hpp@{libraries/chain/include/sysio/chain/parallel\_markers.hpp}}
+\mbox{\hyperlink{parallel__markers_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{parallel__markers_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{parallel__markers_8hpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{parallel__markers_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <boost/range/combine.hpp>}}
+\DoxyCodeLine{\Hypertarget{parallel__markers_8hpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <boost/range/adaptor/filtered.hpp>}}
+\DoxyCodeLine{\Hypertarget{parallel__markers_8hpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <boost/range/adaptor/transformed.hpp>}}
+\DoxyCodeLine{\Hypertarget{parallel__markers_8hpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{parallel__markers_8hpp_source_l00007}00007\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{\ \textcolor{keyword}{namespace\ }chain\ \{}
+\DoxyCodeLine{\Hypertarget{parallel__markers_8hpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{parallel__markers_8hpp_source_l00024}00024\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ DataRange,\ \textcolor{keyword}{typename}\ MarkerRange,\ \textcolor{keyword}{typename}\ Marker>}
+\DoxyCodeLine{\Hypertarget{parallel__markers_8hpp_source_l00025}\mbox{\hyperlink{namespacesysio_1_1chain_a673425e013b1d45337e8e10cdde4e0c5}{00025}}\ DataRange\ \mbox{\hyperlink{namespacesysio_1_1chain_a673425e013b1d45337e8e10cdde4e0c5}{filter\_data\_by\_marker}}(DataRange\ data,\ MarkerRange\ markers,\ \textcolor{keyword}{const}\ Marker\&\ markerValue)\ \{}
+\DoxyCodeLine{\Hypertarget{parallel__markers_8hpp_source_l00026}00026\ \ \ \ \textcolor{keyword}{auto}\ remove\_mismatched\_markers\ =\ boost::adaptors::filtered([\&markerValue](\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{structfc_1_1tuple}{tuple}})\ \{}
+\DoxyCodeLine{\Hypertarget{parallel__markers_8hpp_source_l00027}00027\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ boost::get<0>(\mbox{\hyperlink{structfc_1_1tuple}{tuple}})\ ==\ markerValue;}
+\DoxyCodeLine{\Hypertarget{parallel__markers_8hpp_source_l00028}00028\ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{parallel__markers_8hpp_source_l00029}00029\ \ \ \ \textcolor{keyword}{auto}\ ToData\ =\ boost::adaptors::transformed([](\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{structfc_1_1tuple}{tuple}})\ \{}
+\DoxyCodeLine{\Hypertarget{parallel__markers_8hpp_source_l00030}00030\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ boost::get<1>(\mbox{\hyperlink{structfc_1_1tuple}{tuple}});}
+\DoxyCodeLine{\Hypertarget{parallel__markers_8hpp_source_l00031}00031\ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{parallel__markers_8hpp_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{parallel__markers_8hpp_source_l00033}00033\ \ \ \ \textcolor{comment}{//\ Zip\ the\ ranges\ together,\ filter\ out\ data\ with\ markers\ that\ don't\ match,\ and\ return\ the\ data\ without\ the\ markers}}
+\DoxyCodeLine{\Hypertarget{parallel__markers_8hpp_source_l00034}00034\ \ \ \ \textcolor{keyword}{auto}\ range\ =\ boost::combine(markers,\ data)\ |\ remove\_mismatched\_markers\ |\ ToData;}
+\DoxyCodeLine{\Hypertarget{parallel__markers_8hpp_source_l00035}00035\ \ \ \ \textcolor{keywordflow}{return}\ \{range.begin(),\ range.end()\};}
+\DoxyCodeLine{\Hypertarget{parallel__markers_8hpp_source_l00036}00036\ \}}
+\DoxyCodeLine{\Hypertarget{parallel__markers_8hpp_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{parallel__markers_8hpp_source_l00038}00038\ \}\}\ \textcolor{comment}{//\ namespace\ sysio::chain}}
+\DoxyCodeLine{\Hypertarget{parallel__markers_8hpp_source_l00039}00039\ }
+
+\end{DoxyCode}

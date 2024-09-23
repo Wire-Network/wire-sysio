@@ -1,0 +1,12 @@
+<map id="BOOST_AUTO_TEST_CASE" name="BOOST_AUTO_TEST_CASE">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,50,202,76"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1client.html#aa95cec974921e32bc37a61c683ae240d" title="Get a new connection." alt="" coords="250,13,387,54"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="202,47,234,42,235,48,203,52"/>
+<area shape="rect" id="Node000004" href="$namespacewebsocketpp_1_1error.html#a3344622df8c36e8ae03c59164e7b5e89" title=" " alt="" coords="446,71,579,111"/>
+<area shape="poly" id="edge5_Node000001_Node000004" title=" " alt="" coords="202,67,431,83,430,88,202,72"/>
+<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1endpoint.html#abfbee4cb244700560ef80594a913cd95" title=" " alt="" coords="435,5,590,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="387,28,419,27,419,32,387,34"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="388,51,433,65,431,70,386,56"/>
+<area shape="rect" id="Node000005" href="$namespacewebsocketpp_1_1error.html#ac1acac2bfb24bbd2b1791db80993b0c2" title=" " alt="" coords="638,71,771,111"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="579,88,623,88,623,94,579,94"/>
+</map>

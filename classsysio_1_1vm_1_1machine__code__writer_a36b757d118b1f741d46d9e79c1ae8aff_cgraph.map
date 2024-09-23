@@ -1,0 +1,19 @@
+<map id="sysio::vm::machine_code_writer::machine_code_writer" name="sysio::vm::machine_code_writer::machine_code_writer">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,112,158,168"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1vm_1_1growable__allocator.html#a5fc8b2ef9ef1ef157d18ec40cf9310ee" title=" " alt="" coords="230,5,368,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="124,110,204,62,229,50,231,55,207,67,126,114"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1vm_1_1machine__code__writer.html#ae982131aa8566244c45f448cece2a097" title=" " alt="" coords="441,185,604,226"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="158,113,211,101,270,93,333,93,394,106,423,118,449,135,493,172,490,176,446,140,420,123,392,111,332,99,271,98,211,106,159,118"/>
+<area shape="rect" id="Node000006" href="$structsysio_1_1vm_1_1module.html#a67b6373270a1985597a83e5427091e9a" title=" " alt="" coords="206,120,393,161"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="158,138,190,138,190,143,158,143"/>
+<area shape="rect" id="Node000007" href="$classsysio_1_1vm_1_1machine__code__writer.html#ad4edccf3a0d1b17f517ae8f92b12b9a5" title=" " alt="" coords="213,185,386,226"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="159,161,215,178,214,183,157,166"/>
+<area shape="rect" id="Node000008" href="$classsysio_1_1vm_1_1machine__code__writer.html#aaf62e76004a871e34ebd97590142e28e" title=" " alt="" coords="232,250,367,306"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="116,167,158,201,207,235,219,242,217,247,204,240,155,206,112,171"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1vm_1_1growable__allocator.html#a864b318420afb03072753423044548b8" title=" " alt="" coords="446,5,599,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="369,23,431,23,431,28,369,28"/>
+<area shape="rect" id="Node000005" href="$yubihsm__pkcs11_8c.html#ae785d5badbf1f08b491af31f32a135a1" title=" " alt="" coords="652,193,724,218"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="605,203,637,203,637,208,605,208"/>
+<area shape="poly" id="edge7_Node000007_Node000004" title=" " alt="" coords="387,203,426,203,426,208,387,208"/>
+<area shape="poly" id="edge9_Node000008_Node000004" title=" " alt="" coords="367,253,442,229,443,234,368,258"/>
+</map>

@@ -1,0 +1,147 @@
+\doxysection{sysio\+::chain\+::detail\+::fileptr\+\_\+datastream Class Reference}
+\hypertarget{classsysio_1_1chain_1_1detail_1_1fileptr__datastream}{}\label{classsysio_1_1chain_1_1detail_1_1fileptr__datastream}\index{sysio::chain::detail::fileptr\_datastream@{sysio::chain::detail::fileptr\_datastream}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classsysio_1_1chain_1_1detail_1_1fileptr__datastream_a02fab1a7a0aeac29d13bddbd50688d6d}{fileptr\+\_\+datastream}} (FILE \texorpdfstring{$\ast$}{*}file, const std\+::string \&filename)
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1detail_1_1fileptr__datastream_a35e35cd1099ad458a3e424063422ab55}{skip}} (size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\item 
+bool \mbox{\hyperlink{classsysio_1_1chain_1_1detail_1_1fileptr__datastream_a3c59689632099f83a97f622df49c218f}{read}} (char \texorpdfstring{$\ast$}{*}d, size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\item 
+bool \mbox{\hyperlink{classsysio_1_1chain_1_1detail_1_1fileptr__datastream_ae283df03305d28aae7cf7957f5885441}{get}} (unsigned char \&c)
+\item 
+bool \mbox{\hyperlink{classsysio_1_1chain_1_1detail_1_1fileptr__datastream_a8844c2ed546ba86c0be1701cf483bb7b}{get}} (char \&c)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{block__log_8cpp_source_l00193}{193}} of file \mbox{\hyperlink{block__log_8cpp_source}{block\+\_\+log.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classsysio_1_1chain_1_1detail_1_1fileptr__datastream_a02fab1a7a0aeac29d13bddbd50688d6d}\index{sysio::chain::detail::fileptr\_datastream@{sysio::chain::detail::fileptr\_datastream}!fileptr\_datastream@{fileptr\_datastream}}
+\index{fileptr\_datastream@{fileptr\_datastream}!sysio::chain::detail::fileptr\_datastream@{sysio::chain::detail::fileptr\_datastream}}
+\doxysubsubsection{\texorpdfstring{fileptr\_datastream()}{fileptr\_datastream()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1detail_1_1fileptr__datastream_a02fab1a7a0aeac29d13bddbd50688d6d} 
+sysio\+::chain\+::detail\+::fileptr\+\_\+datastream\+::fileptr\+\_\+datastream (\begin{DoxyParamCaption}\item[{FILE \texorpdfstring{$\ast$}{*}}]{file}{, }\item[{const std\+::string \&}]{filename}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{block__log_8cpp_source_l00195}{195}} of file \mbox{\hyperlink{block__log_8cpp_source}{block\+\_\+log.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00195\ :\ \_file(file),\ \_filename(filename)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1chain_1_1detail_1_1fileptr__datastream_a8844c2ed546ba86c0be1701cf483bb7b}\index{sysio::chain::detail::fileptr\_datastream@{sysio::chain::detail::fileptr\_datastream}!get@{get}}
+\index{get@{get}!sysio::chain::detail::fileptr\_datastream@{sysio::chain::detail::fileptr\_datastream}}
+\doxysubsubsection{\texorpdfstring{get()}{get()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1detail_1_1fileptr__datastream_a8844c2ed546ba86c0be1701cf483bb7b} 
+bool sysio\+::chain\+::detail\+::fileptr\+\_\+datastream\+::get (\begin{DoxyParamCaption}\item[{char \&}]{c}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{block__log_8cpp_source_l00214}{214}} of file \mbox{\hyperlink{block__log_8cpp_source}{block\+\_\+log.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00214\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1chain_1_1detail_1_1fileptr__datastream_a3c59689632099f83a97f622df49c218f}{read}}(\&c,\ 1);\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1detail_1_1fileptr__datastream_a8844c2ed546ba86c0be1701cf483bb7b_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1detail_1_1fileptr__datastream_ae283df03305d28aae7cf7957f5885441}\index{sysio::chain::detail::fileptr\_datastream@{sysio::chain::detail::fileptr\_datastream}!get@{get}}
+\index{get@{get}!sysio::chain::detail::fileptr\_datastream@{sysio::chain::detail::fileptr\_datastream}}
+\doxysubsubsection{\texorpdfstring{get()}{get()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1detail_1_1fileptr__datastream_ae283df03305d28aae7cf7957f5885441} 
+bool sysio\+::chain\+::detail\+::fileptr\+\_\+datastream\+::get (\begin{DoxyParamCaption}\item[{unsigned char \&}]{c}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{block__log_8cpp_source_l00212}{212}} of file \mbox{\hyperlink{block__log_8cpp_source}{block\+\_\+log.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00212\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1chain_1_1detail_1_1fileptr__datastream_ae283df03305d28aae7cf7957f5885441}{get}}(\ *(\textcolor{keywordtype}{char}*)\&c\ );\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=200pt]{classsysio_1_1chain_1_1detail_1_1fileptr__datastream_ae283df03305d28aae7cf7957f5885441_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=200pt]{classsysio_1_1chain_1_1detail_1_1fileptr__datastream_ae283df03305d28aae7cf7957f5885441_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1detail_1_1fileptr__datastream_a3c59689632099f83a97f622df49c218f}\index{sysio::chain::detail::fileptr\_datastream@{sysio::chain::detail::fileptr\_datastream}!read@{read}}
+\index{read@{read}!sysio::chain::detail::fileptr\_datastream@{sysio::chain::detail::fileptr\_datastream}}
+\doxysubsubsection{\texorpdfstring{read()}{read()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1detail_1_1fileptr__datastream_a3c59689632099f83a97f622df49c218f} 
+bool sysio\+::chain\+::detail\+::fileptr\+\_\+datastream\+::read (\begin{DoxyParamCaption}\item[{char \texorpdfstring{$\ast$}{*}}]{d}{, }\item[{size\+\_\+t}]{s}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{block__log_8cpp_source_l00204}{204}} of file \mbox{\hyperlink{block__log_8cpp_source}{block\+\_\+log.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ result\ =\ fread(\ d,\ 1,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ \_file\ );}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ result\ ==\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ block\_log\_exception,}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}only\ able\ to\ read\ \$\{act\}\ bytes\ of\ the\ expected\ \$\{exp\}\ bytes\ in\ file:\ \$\{file\}"{}},}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}act"{}},result)(\textcolor{stringliteral}{"{}exp"{}},\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})(\textcolor{stringliteral}{"{}file"{}},\ \_filename)\ );}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1detail_1_1fileptr__datastream_a3c59689632099f83a97f622df49c218f_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1detail_1_1fileptr__datastream_a35e35cd1099ad458a3e424063422ab55}\index{sysio::chain::detail::fileptr\_datastream@{sysio::chain::detail::fileptr\_datastream}!skip@{skip}}
+\index{skip@{skip}!sysio::chain::detail::fileptr\_datastream@{sysio::chain::detail::fileptr\_datastream}}
+\doxysubsubsection{\texorpdfstring{skip()}{skip()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1detail_1_1fileptr__datastream_a35e35cd1099ad458a3e424063422ab55} 
+void sysio\+::chain\+::detail\+::fileptr\+\_\+datastream\+::skip (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{s}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{block__log_8cpp_source_l00197}{197}} of file \mbox{\hyperlink{block__log_8cpp_source}{block\+\_\+log.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ status\ =\ fseek(\_file,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ SEEK\_CUR);}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ status\ ==\ 0,\ block\_log\_exception,}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Could\ not\ seek\ past\ \$\{bytes\}\ bytes\ in\ Block\ log\ file\ at\ '\$\{blocks\_log\}'.\ Returned\ status:\ \$\{status\}"{}},}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}bytes"{}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})(\textcolor{stringliteral}{"{}blocks\_log"{}},\ \_filename)(\textcolor{stringliteral}{"{}status"{}},\ status)\ );}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/\mbox{\hyperlink{block__log_8cpp}{block\+\_\+log.\+cpp}}\end{DoxyCompactItemize}

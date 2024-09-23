@@ -1,0 +1,192 @@
+\doxysection{chain\+\_\+plugin Class Reference}
+\hypertarget{classchain__plugin}{}\label{classchain__plugin}\index{chain\_plugin@{chain\_plugin}}
+
+
+Inheritance diagram for chain\+\_\+plugin\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=205pt]{classchain__plugin__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for chain\+\_\+plugin\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=205pt]{classchain__plugin__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classchain__plugin_a3df251841b594a6e555f40f3caa6a986}{APPBASE\+\_\+\+PLUGIN\+\_\+\+REQUIRES}} ()
+\item 
+virtual void \mbox{\hyperlink{classchain__plugin_a23f5f088e302e535ccf74747ec7993d4}{set\+\_\+program\+\_\+options}} (options\+\_\+description \&\mbox{\hyperlink{xbyak__mnemonic_8h_a4229a9b84f8b8673326f12bd41acd27c}{cli}}, options\+\_\+description \&cfg) override
+\item 
+void \mbox{\hyperlink{classchain__plugin_a0192ac61f3f59d4fdf2dcbbd2c7104ca}{plugin\+\_\+initialize}} (const variables\+\_\+map \&options)
+\item 
+void \mbox{\hyperlink{classchain__plugin_affe5ea83d9db4d721af39fd7568c5875}{plugin\+\_\+startup}} ()
+\item 
+void \mbox{\hyperlink{classchain__plugin_a3ed4600a8200efd4cbad0e547a3ffbde}{plugin\+\_\+shutdown}} ()
+\item 
+\mbox{\hyperlink{structdatabase}{database}} \& \mbox{\hyperlink{classchain__plugin_ae490ca01000e820cbae95dc27bb90009}{db}} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classappbase_1_1plugin}{appbase\+::plugin$<$ chain\+\_\+plugin $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classappbase_1_1plugin_a3cf5509f2854ffb274018dca8606c50a}{plugin}} ()
+\item 
+virtual \mbox{\hyperlink{classappbase_1_1plugin_a6c83bcf2c8ee3de87593824da807e4ba}{\texorpdfstring{$\sim$}{\string~}plugin}} ()
+\item 
+virtual \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408}{state}} \mbox{\hyperlink{classappbase_1_1plugin_a857288c2424b57a898c0579d25dacbb0}{get\+\_\+state}} () const override
+\item 
+virtual const std\+::string \& \mbox{\hyperlink{classappbase_1_1plugin_a274f072d2f7f37d43ae74e01edd0ba62}{name}} () const override
+\item 
+virtual void \mbox{\hyperlink{classappbase_1_1plugin_a6a0cd7ccc873527ebb5e6716b249ea17}{register\+\_\+dependencies}} ()
+\item 
+virtual void \mbox{\hyperlink{classappbase_1_1plugin_ac28755a82831d41e5d0ef0ce56b10fa9}{initialize}} (const variables\+\_\+map \&options) override
+\item 
+virtual void \mbox{\hyperlink{classappbase_1_1plugin_ab314bd778e71a91de584cd9b8a999867}{handle\+\_\+sighup}} () override
+\item 
+virtual void \mbox{\hyperlink{classappbase_1_1plugin_a10e4e1c582bfadf67f510df76d87abfd}{startup}} () override
+\item 
+virtual void \mbox{\hyperlink{classappbase_1_1plugin_a21e5be5587fca41fbc91367d449b8f27}{shutdown}} () override
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classappbase_1_1abstract__plugin}{appbase\+::abstract\+\_\+plugin}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4643a2618ac94aa2ef56e59fe363f828}{\texorpdfstring{$\sim$}{\string~}abstract\+\_\+plugin}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Public Types inherited from \mbox{\hyperlink{classappbase_1_1abstract__plugin}{appbase\+::abstract\+\_\+plugin}}}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408}{state}} \{ \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408ac712ce3482a78b8bf87080aefd77cf7d}{registered}}
+, \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408a9ae208bba76e9c0eab1cac52953f947b}{initialized}}
+, \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408a808ebbf475942017567644697eca3224}{started}}
+, \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408a320c2eebb5306f385aebfca07336d29e}{stopped}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Member Functions inherited from \mbox{\hyperlink{classappbase_1_1plugin}{appbase\+::plugin$<$ chain\+\_\+plugin $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classappbase_1_1plugin_a51f43c3c64ab8524928698a72a186822}{plugin}} (const string \&\mbox{\hyperlink{classappbase_1_1plugin_a274f072d2f7f37d43ae74e01edd0ba62}{name}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{libraries_2appbase_2examples_2main_8cpp_source_l00014}{14}} of file \mbox{\hyperlink{libraries_2appbase_2examples_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classchain__plugin_a3df251841b594a6e555f40f3caa6a986}\index{chain\_plugin@{chain\_plugin}!APPBASE\_PLUGIN\_REQUIRES@{APPBASE\_PLUGIN\_REQUIRES}}
+\index{APPBASE\_PLUGIN\_REQUIRES@{APPBASE\_PLUGIN\_REQUIRES}!chain\_plugin@{chain\_plugin}}
+\doxysubsubsection{\texorpdfstring{APPBASE\_PLUGIN\_REQUIRES()}{APPBASE\_PLUGIN\_REQUIRES()}}
+{\footnotesize\ttfamily \label{classchain__plugin_a3df251841b594a6e555f40f3caa6a986} 
+chain\+\_\+plugin\+::\+APPBASE\+\_\+\+PLUGIN\+\_\+\+REQUIRES (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{classchain__plugin_ae490ca01000e820cbae95dc27bb90009}\index{chain\_plugin@{chain\_plugin}!db@{db}}
+\index{db@{db}!chain\_plugin@{chain\_plugin}}
+\doxysubsubsection{\texorpdfstring{db()}{db()}}
+{\footnotesize\ttfamily \label{classchain__plugin_ae490ca01000e820cbae95dc27bb90009} 
+\mbox{\hyperlink{structdatabase}{database}} \& chain\+\_\+plugin\+::db (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{libraries_2appbase_2examples_2main_8cpp_source_l00035}{35}} of file \mbox{\hyperlink{libraries_2appbase_2examples_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00035\ \{\ \textcolor{keywordflow}{return}\ \_db;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classchain__plugin_a0192ac61f3f59d4fdf2dcbbd2c7104ca}\index{chain\_plugin@{chain\_plugin}!plugin\_initialize@{plugin\_initialize}}
+\index{plugin\_initialize@{plugin\_initialize}!chain\_plugin@{chain\_plugin}}
+\doxysubsubsection{\texorpdfstring{plugin\_initialize()}{plugin\_initialize()}}
+{\footnotesize\ttfamily \label{classchain__plugin_a0192ac61f3f59d4fdf2dcbbd2c7104ca} 
+void chain\+\_\+plugin\+::plugin\+\_\+initialize (\begin{DoxyParamCaption}\item[{const variables\+\_\+map \&}]{options}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{libraries_2appbase_2examples_2main_8cpp_source_l00031}{31}} of file \mbox{\hyperlink{libraries_2appbase_2examples_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00031\ \{\ std::cout\ <<\ \textcolor{stringliteral}{"{}initialize\ chain\ plugin\(\backslash\)n"{}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classchain__plugin_a3ed4600a8200efd4cbad0e547a3ffbde}\index{chain\_plugin@{chain\_plugin}!plugin\_shutdown@{plugin\_shutdown}}
+\index{plugin\_shutdown@{plugin\_shutdown}!chain\_plugin@{chain\_plugin}}
+\doxysubsubsection{\texorpdfstring{plugin\_shutdown()}{plugin\_shutdown()}}
+{\footnotesize\ttfamily \label{classchain__plugin_a3ed4600a8200efd4cbad0e547a3ffbde} 
+void chain\+\_\+plugin\+::plugin\+\_\+shutdown (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{libraries_2appbase_2examples_2main_8cpp_source_l00033}{33}} of file \mbox{\hyperlink{libraries_2appbase_2examples_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00033\ \{\ std::cout\ <<\ \textcolor{stringliteral}{"{}shutdown\ chain\ plugin\ \(\backslash\)n"{}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classchain__plugin_affe5ea83d9db4d721af39fd7568c5875}\index{chain\_plugin@{chain\_plugin}!plugin\_startup@{plugin\_startup}}
+\index{plugin\_startup@{plugin\_startup}!chain\_plugin@{chain\_plugin}}
+\doxysubsubsection{\texorpdfstring{plugin\_startup()}{plugin\_startup()}}
+{\footnotesize\ttfamily \label{classchain__plugin_affe5ea83d9db4d721af39fd7568c5875} 
+void chain\+\_\+plugin\+::plugin\+\_\+startup (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{libraries_2appbase_2examples_2main_8cpp_source_l00032}{32}} of file \mbox{\hyperlink{libraries_2appbase_2examples_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00032\ \{\ std::cout\ <<\ \textcolor{stringliteral}{"{}starting\ chain\ plugin\ \(\backslash\)n"{}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classchain__plugin_a23f5f088e302e535ccf74747ec7993d4}\index{chain\_plugin@{chain\_plugin}!set\_program\_options@{set\_program\_options}}
+\index{set\_program\_options@{set\_program\_options}!chain\_plugin@{chain\_plugin}}
+\doxysubsubsection{\texorpdfstring{set\_program\_options()}{set\_program\_options()}}
+{\footnotesize\ttfamily \label{classchain__plugin_a23f5f088e302e535ccf74747ec7993d4} 
+virtual void chain\+\_\+plugin\+::set\+\_\+program\+\_\+options (\begin{DoxyParamCaption}\item[{options\+\_\+description \&}]{cli}{, }\item[{options\+\_\+description \&}]{cfg}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classappbase_1_1abstract__plugin_a274a3c7462de3c699a8eb23741ed7655}{appbase\+::abstract\+\_\+plugin}}.
+
+
+
+Definition at line \mbox{\hyperlink{libraries_2appbase_2examples_2main_8cpp_source_l00019}{19}} of file \mbox{\hyperlink{libraries_2appbase_2examples_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00020\ \ \ \ \ \ \{}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \ cfg.add\_options()}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}readonly"{}},\ \textcolor{stringliteral}{"{}open\ the\ database\ in\ read\ only\ mode"{}})}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}dbsize"{}},\ bpo::value<uint64\_t>()-\/>default\_value(\ 8*1024\ ),\ \textcolor{stringliteral}{"{}Minimum\ size\ MB\ of\ database\ shared\ memory\ file"{}})}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{xbyak__mnemonic_8h_a4229a9b84f8b8673326f12bd41acd27c}{cli}}.add\_options()}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}replay"{}},\ \textcolor{stringliteral}{"{}clear\ chain\ database\ and\ replay\ all\ blocks"{}}\ )}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}reset"{}},\ \textcolor{stringliteral}{"{}clear\ chain\ database\ and\ block\ log"{}}\ )}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{00029\ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=275pt]{classchain__plugin_a23f5f088e302e535ccf74747ec7993d4_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/appbase/examples/\mbox{\hyperlink{libraries_2appbase_2examples_2main_8cpp}{main.\+cpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,7 @@
+<map id="PrettyWriter::WriteIndent" name="PrettyWriter::WriteIndent">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,170,56"/>
+<area shape="rect" id="Node000002" href="$classinternal_1_1_stack.html#ac484468a2791bd3e9ba609bd1600ab48" title=" " alt="" coords="218,5,378,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="170,31,202,27,203,32,171,36"/>
+<area shape="rect" id="Node000003" href="$filewritestream_8h.html#a5c9b0f0e6249be2acf7f3505c295c132" title="Implement specialized version of PutN() with memset() for better performance." alt="" coords="272,55,324,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="171,50,257,60,256,66,170,56"/>
+</map>

@@ -1,0 +1,11 @@
+<map id="Catch::IRegistryHub::getTagAliasRegistry" name="Catch::IRegistryHub::getTagAliasRegistry">
+<area shape="rect" id="Node000001" title=" " alt="" coords="593,23,740,64"/>
+<area shape="rect" id="Node000002" href="$struct_catch_1_1_i_tag_alias_registry.html#a7c4bf6e2fc52de95fb2596ba19b3bf76" title=" " alt="" coords="352,31,545,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="578,46,546,46,546,41,578,41"/>
+<area shape="rect" id="Node000003" href="$class_catch_1_1_config.html#a25ad0360a8386e7bc068c9c1ac5320bf" title=" " alt="" coords="154,5,302,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="336,33,303,29,303,24,337,28"/>
+<area shape="rect" id="Node000004" href="$namespace_catch.html#a30373cc449e9c2fb629ef8a0df323cdd" title=" " alt="" coords="153,55,304,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="337,58,304,62,304,57,337,53"/>
+<area shape="rect" id="Node000005" href="$_cmd_line_8tests_8cpp.html#a0fd69e25bdfb62c4f72014ad241bb8c3" title=" " alt="" coords="5,55,105,80"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="137,70,105,70,105,65,137,65"/>
+</map>

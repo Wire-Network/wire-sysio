@@ -1,0 +1,83 @@
+\doxysection{libraries/fc/include/fc/crypto/webauthn\+\_\+json/example/prettyauto/prettyauto.cpp File Reference}
+\hypertarget{prettyauto_8cpp}{}\label{prettyauto_8cpp}\index{libraries/fc/include/fc/crypto/webauthn\_json/example/prettyauto/prettyauto.cpp@{libraries/fc/include/fc/crypto/webauthn\_json/example/prettyauto/prettyauto.cpp}}
+{\ttfamily \#include "{}rapidjson/reader.\+h"{}}\newline
+{\ttfamily \#include "{}rapidjson/prettywriter.\+h"{}}\newline
+{\ttfamily \#include "{}rapidjson/filereadstream.\+h"{}}\newline
+{\ttfamily \#include "{}rapidjson/filewritestream.\+h"{}}\newline
+{\ttfamily \#include "{}rapidjson/encodedstream.\+h"{}}\newline
+{\ttfamily \#include "{}rapidjson/error/en.\+h"{}}\newline
+Include dependency graph for prettyauto.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{prettyauto_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{prettyauto_8cpp_a81ce304348a420752ee080480d2b3095}{main}} (int, char \texorpdfstring{$\ast$}{*}\mbox{[}$\,$\mbox{]})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{prettyauto_8cpp_a81ce304348a420752ee080480d2b3095}\index{prettyauto.cpp@{prettyauto.cpp}!main@{main}}
+\index{main@{main}!prettyauto.cpp@{prettyauto.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{prettyauto_8cpp_a81ce304348a420752ee080480d2b3095} 
+int main (\begin{DoxyParamCaption}\item[{int}]{}{, }\item[{char \texorpdfstring{$\ast$}{*}}]{}{\mbox{[}$\,$\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{prettyauto_8cpp_source_l00018}{18}} of file \mbox{\hyperlink{prettyauto_8cpp_source}{prettyauto.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#ifdef\ \_WIN32}}
+\DoxyCodeLine{00020\ \ \ \ \ \textcolor{comment}{//\ Prevent\ Windows\ converting\ between\ CR+LF\ and\ LF}}
+\DoxyCodeLine{00021\ \ \ \ \ \_setmode(\_fileno(stdin),\ \_O\_BINARY);\ \ \ \ \textcolor{comment}{//\ NEW}}
+\DoxyCodeLine{00022\ \ \ \ \ \_setmode(\_fileno(stdout),\ \_O\_BINARY);\ \ \ \textcolor{comment}{//\ NEW}}
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00024\ }
+\DoxyCodeLine{00025\ \ \ \ \ \textcolor{comment}{//\ Prepare\ reader\ and\ input\ stream.}}
+\DoxyCodeLine{00026\ \ \ \ \ \textcolor{comment}{//Reader\ reader;}}
+\DoxyCodeLine{00027\ \ \ \ \ \mbox{\hyperlink{class_generic_reader}{GenericReader<AutoUTF<unsigned>}},\ \mbox{\hyperlink{struct_u_t_f8}{UTF8<>}}\ >\ reader;\ \ \ \ \ \ \ \textcolor{comment}{//\ CHANGED}}
+\DoxyCodeLine{00028\ \ \ \ \ \textcolor{keywordtype}{char}\ readBuffer[65536];}
+\DoxyCodeLine{00029\ \ \ \ \ \mbox{\hyperlink{class_file_read_stream}{FileReadStream}}\ is(stdin,\ readBuffer,\ \textcolor{keyword}{sizeof}(readBuffer));}
+\DoxyCodeLine{00030\ \ \ \ \ \mbox{\hyperlink{class_auto_u_t_f_input_stream}{AutoUTFInputStream<unsigned,\ FileReadStream>}}\ eis(is);\ \ \ \textcolor{comment}{//\ NEW}}
+\DoxyCodeLine{00031\ }
+\DoxyCodeLine{00032\ \ \ \ \ \textcolor{comment}{//\ Prepare\ writer\ and\ output\ stream.}}
+\DoxyCodeLine{00033\ \ \ \ \ \textcolor{keywordtype}{char}\ writeBuffer[65536];}
+\DoxyCodeLine{00034\ \ \ \ \ \mbox{\hyperlink{class_file_write_stream}{FileWriteStream}}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}(stdout,\ writeBuffer,\ \textcolor{keyword}{sizeof}(writeBuffer));}
+\DoxyCodeLine{00035\ }
+\DoxyCodeLine{00036\ \textcolor{preprocessor}{\#if\ 1}}
+\DoxyCodeLine{00037\ \ \ \ \ \textcolor{comment}{//\ Use\ the\ same\ Encoding\ of\ the\ input.\ Also\ use\ BOM\ according\ to\ input.}}
+\DoxyCodeLine{00038\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{class_auto_u_t_f_output_stream}{AutoUTFOutputStream<unsigned,\ FileWriteStream>}}\ OutputStream;\ \ \ \ \textcolor{comment}{//\ NEW}}
+\DoxyCodeLine{00039\ \ \ \ \ OutputStream\ eos(os,\ eis.GetType(),\ eis.HasBOM());\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ NEW}}
+\DoxyCodeLine{00040\ \ \ \ \ \mbox{\hyperlink{class_pretty_writer}{PrettyWriter<OutputStream,\ UTF8<>}},\ \mbox{\hyperlink{struct_auto_u_t_f}{AutoUTF<unsigned>}}\ >\ writer(eos);\ \ \ \ \ \textcolor{comment}{//\ CHANGED}}
+\DoxyCodeLine{00041\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00042\ \ \ \ \ \textcolor{comment}{//\ You\ may\ also\ use\ static\ bound\ encoding\ type,\ such\ as\ output\ to\ UTF-\/16LE\ with\ BOM}}
+\DoxyCodeLine{00043\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{class_encoded_output_stream}{EncodedOutputStream<UTF16LE<>}},\mbox{\hyperlink{class_file_write_stream}{FileWriteStream}}>\ OutputStream;\ \ \ \ \textcolor{comment}{//\ NEW}}
+\DoxyCodeLine{00044\ \ \ \ \ OutputStream\ eos(os,\ \textcolor{keyword}{true});\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ NEW}}
+\DoxyCodeLine{00045\ \ \ \ \ \mbox{\hyperlink{class_pretty_writer}{PrettyWriter<OutputStream,\ UTF8<>}},\ \mbox{\hyperlink{struct_u_t_f16_l_e}{UTF16LE<>}}\ >\ writer(eos);\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ CHANGED}}
+\DoxyCodeLine{00046\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00047\ }
+\DoxyCodeLine{00048\ \ \ \ \ \textcolor{comment}{//\ JSON\ reader\ parse\ from\ the\ input\ stream\ and\ let\ writer\ generate\ the\ output.}}
+\DoxyCodeLine{00049\ \ \ \ \ \textcolor{comment}{//if\ (!reader.Parse<kParseValidateEncodingFlag>(is,\ writer))\ \{}}
+\DoxyCodeLine{00050\ \ \ \ \ \textcolor{keywordflow}{if}\ (!reader.\mbox{\hyperlink{class_generic_reader_a0c450620d14ff1824e58bb7bd9b42099}{Parse}}<\mbox{\hyperlink{reader_8h_ab7be7dabe6ffcba60fad441505583450a9b3baa16346575d2dc072b23a88e1928}{kParseValidateEncodingFlag}}>(eis,\ writer))\ \{\ \ \ \textcolor{comment}{//\ CHANGED}}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}\(\backslash\)nError(\%u):\ \%s\(\backslash\)n"{}},\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\textcolor{keyword}{>}(reader.\mbox{\hyperlink{class_generic_reader_ae9008523ccd06d839a57335835cb4091}{GetErrorOffset}}()),\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_ga28835eb93d2c3c07bbea13515eb31415}{GetParseError\_En}}(reader.\mbox{\hyperlink{class_generic_reader_a937bf90919f50e1c370b312cee5833e8}{GetParseErrorCode}}()));}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{00053\ \ \ \ \ \}}
+\DoxyCodeLine{00054\ }
+\DoxyCodeLine{00055\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00056\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{prettyauto_8cpp_a81ce304348a420752ee080480d2b3095_cgraph}
+\end{center}
+\end{figure}

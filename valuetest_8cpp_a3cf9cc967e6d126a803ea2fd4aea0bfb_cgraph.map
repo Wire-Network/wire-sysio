@@ -1,0 +1,9 @@
+<map id="TEST" name="TEST">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,55,61,80"/>
+<area shape="rect" id="Node000002" href="$class_generic_document.html#a1362cbdcce6ca37356744a3a0dbb11d6" title="Get the allocator of this document." alt="" coords="109,5,315,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="60,55,108,40,134,33,135,38,109,45,62,60"/>
+<area shape="rect" id="Node000003" href="$valuetest_8cpp.html#a7215f0e515c63ea0fb6ebea7072b4784" title=" " alt="" coords="172,55,252,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="61,65,156,65,156,70,61,70"/>
+<area shape="rect" id="Node000004" href="$valuetest_8cpp.html#aa7e66eb49840df8036ff9555dd60f3dd" title=" " alt="" coords="165,104,259,130"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="62,75,109,90,150,101,149,106,108,95,60,80"/>
+</map>

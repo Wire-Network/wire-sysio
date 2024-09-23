@@ -1,0 +1,106 @@
+\doxysection{Operator\+Printer.\+h}
+\hypertarget{_operator_printer_8h_source}{}\label{_operator_printer_8h_source}\index{libraries/wasm-\/jit/Include/IR/OperatorPrinter.h@{libraries/wasm-\/jit/Include/IR/OperatorPrinter.h}}
+\mbox{\hyperlink{_operator_printer_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00003}00003\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_basic_types_8h}{Inline/BasicTypes.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00004}00004\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_serialization_8h}{Inline/Serialization.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00005}00005\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_i_r_8h}{IR.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00006}00006\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_module_8h}{Module.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00007}00007\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_operators_8h}{Operators.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00009}00009\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_i_r}{IR}}}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00010}00010\ \{}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00011}\mbox{\hyperlink{struct_i_r_1_1_operator_printer}{00011}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_i_r_1_1_operator_printer}{OperatorPrinter}}}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00012}00012\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00013}\mbox{\hyperlink{struct_i_r_1_1_operator_printer_a09c93218a6e710797e5905aed83743af}{00013}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ std::string\ \mbox{\hyperlink{struct_i_r_1_1_operator_printer_a09c93218a6e710797e5905aed83743af}{Result}};}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00015}\mbox{\hyperlink{struct_i_r_1_1_operator_printer_a070f8560b53be013d9c1d0c942063ffb}{00015}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_i_r_1_1_operator_printer_a070f8560b53be013d9c1d0c942063ffb}{OperatorPrinter}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_i_r_1_1_module}{Module}}\&\ inModule,\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_i_r_1_1_function_def}{FunctionDef}}\&\ inFunctionDef)}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00016}00016\ \ \ \ \ \ \ \ \ :\ module(inModule),\ functionDef(inFunctionDef)\ \{\}}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00018}\mbox{\hyperlink{_operator_printer_8h_a0c71ee5bcdb73fd61e4b983a6120c861}{00018}}\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#define\ VISIT\_OPCODE(encoding,name,nameString,Imm,...)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00019}00019\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ std::string\ name(Imm\ imm\ =\ \{\})\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00020}00020\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00021}00021\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ return\ std::string(nameString)\ +\ describeImm(imm);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00022}00022\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \}}}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00023}00023\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_operators_8h_a8b6ca1413466de9d4478329c481520a4}{ENUM\_OPERATORS}}(\mbox{\hyperlink{namespace_i_r_a59653fd60bb296de971e5f945c66933aa275346406ff338dd8adf063f9a066141}{VISIT\_OPCODE}})}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00024}00024\ \ \ \ \ \ \ \ \ \textcolor{preprocessor}{\#undef\ VISIT\_OPCODE}}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00026}\mbox{\hyperlink{struct_i_r_1_1_operator_printer_a4cb3aa62f40cb458a67127836911298f}{00026}}\ \ \ \ \ \ \ \ \ std::string\ \mbox{\hyperlink{struct_i_r_1_1_operator_printer_a4cb3aa62f40cb458a67127836911298f}{unknown}}(\mbox{\hyperlink{namespace_i_r_a59653fd60bb296de971e5f945c66933a}{Opcode}}\ opcode)}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00027}00027\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00028}00028\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}<unknown\ opcode\ "{}}\ +\ std::to\_string((\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}})opcode)\ +\ \textcolor{stringliteral}{"{}>"{}};}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00029}00029\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00030}00030\ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00031}00031\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_i_r_1_1_module}{Module}}\&\ module;}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00032}00032\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_i_r_1_1_function_def}{FunctionDef}}\&\ functionDef;}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00034}00034\ \ \ \ \ \ \ \ \ std::string\ describeImm(\mbox{\hyperlink{struct_i_r_1_1_no_imm}{NoImm}})\ \{\ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}"{}};\ \}}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00035}00035\ \ \ \ \ \ \ \ \ std::string\ describeImm(ControlStructureImm\ imm)\ \{\ \textcolor{keywordflow}{return}\ std::string(\textcolor{stringliteral}{"{}\ :\ "{}})\ +\ \mbox{\hyperlink{namespace_i_r_a85d4203bbc1c989c8351490c711537f5}{asString}}(imm.resultType);\ \}}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00036}00036\ \ \ \ \ \ \ \ \ std::string\ describeImm(BranchImm\ imm)\ \{\ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}\ "{}}\ +\ std::to\_string(imm.targetDepth);\ \}}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00037}00037\ \ \ \ \ \ \ \ \ std::string\ describeImm(BranchTableImm\ imm)}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00038}00038\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00039}00039\ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ result\ =\ \textcolor{stringliteral}{"{}\ "{}}\ +\ std::to\_string(imm.defaultTargetDepth);}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00040}00040\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ prefix\ =\ \textcolor{stringliteral}{"{}\ ["{}};}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00041}00041\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_errors_8h_a03bec6af3af0dd492e348b40cbe40a46}{WAVM\_ASSERT\_THROW}}(imm.branchTableIndex\ <\ functionDef.\mbox{\hyperlink{struct_i_r_1_1_function_def_a937cbae37b04e6dd4686bea442c2099b}{branchTables}}.size());}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00042}00042\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\ depth\ :\ functionDef.\mbox{\hyperlink{struct_i_r_1_1_function_def_a937cbae37b04e6dd4686bea442c2099b}{branchTables}}[imm.branchTableIndex])\ \{\ result\ +=\ prefix\ +\ std::to\_string(depth);\ prefix\ =\ \textcolor{stringliteral}{"{},"{}};\ \}}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00043}00043\ \ \ \ \ \ \ \ \ \ \ \ \ result\ +=\ \textcolor{stringliteral}{"{}]"{}};}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00044}00044\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00045}00045\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00046}00046\ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ NativeValue>}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00047}00047\ \ \ \ \ \ \ \ \ std::string\ describeImm(LiteralImm<NativeValue>\ imm)\ \{\ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}\ "{}}\ +\ \mbox{\hyperlink{namespace_i_r_a85d4203bbc1c989c8351490c711537f5}{asString}}(imm.value);\ \}}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00048}00048\ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keywordtype}{bool}\ isGlobal>}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00049}00049\ \ \ \ \ \ \ \ \ std::string\ describeImm(GetOrSetVariableImm<isGlobal>\ imm)\ \{\ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}\ "{}}\ +\ std::to\_string(imm.variableIndex);\ \}}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00050}00050\ \ \ \ \ \ \ \ \ std::string\ describeImm(CallImm\ imm)}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00051}00051\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::string\ typeString\ =\ imm.functionIndex\ >=\ \textcolor{keyword}{module}.functions.size()}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ?\ "{}<invalid\ function\ index>"{}}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ asString(module.types[module.functions.getType(imm.functionIndex).index]);}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}\ "{}}\ +\ std::to\_string(imm.functionIndex)\ +\ \textcolor{stringliteral}{"{}\ "{}}\ +\ typeString;}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00056}00056\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00057}00057\ \ \ \ \ \ \ \ \ std::string\ describeImm(CallIndirectImm\ imm)}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00058}00058\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00059}00059\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::string\ typeString\ =\ imm.type.index\ >=\ \textcolor{keyword}{module}.types.size()}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ?\ "{}<invalid\ type\ index>"{}}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00061}00061\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ asString(module.types[imm.type.index]);}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00062}00062\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}\ "{}}\ +\ typeString;}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00063}00063\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00064}00064\ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}<Uptr\ naturalAlignmentLog2>}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00065}00065\ \ \ \ \ \ \ \ \ std::string\ describeImm(LoadOrStoreImm<naturalAlignmentLog2>\ imm)}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00066}00066\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00067}00067\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}\ align="{}}\ +\ std::to\_string(1<<imm.alignmentLog2)\ +\ \textcolor{stringliteral}{"{}\ offset="{}}\ +\ std::to\_string(imm.offset);}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00068}00068\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00069}00069\ \ \ \ \ \ \ \ \ std::string\ describeImm(MemoryImm)\ \{\ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}"{}};\ \}}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00071}00071\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#if\ ENABLE\_SIMD\_PROTOTYPE}}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00072}00072\ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}<Uptr\ numLanes>}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00073}00073\ \ \ \ \ \ \ \ \ std::string\ describeImm(LaneIndexImm<numLanes>\ imm)\ \{\ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}\ "{}}\ +\ std::to\_string(imm.laneIndex);\ \}}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00074}00074\ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}<Uptr\ numLanes>}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00075}00075\ \ \ \ \ \ \ \ \ std::string\ describeImm(ShuffleImm<numLanes>\ imm)}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00076}00076\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ result\ =\ \textcolor{stringliteral}{"{}\ ["{}};}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00078}00078\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ prefix\ =\ \textcolor{stringliteral}{"{}"{}};}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ laneIndex\ =\ 0;laneIndex\ <\ numLanes;++laneIndex)}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00080}00080\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00081}00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ result\ +=\ prefix}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00082}00082\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ +\ (imm.laneIndices[laneIndex]\ <\ numLanes\ ?\ \textcolor{charliteral}{'a'}\ :\ \textcolor{charliteral}{'b'})}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00083}00083\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ +\ std::to\_string(imm.laneIndices[laneIndex]);}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00084}00084\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ prefix\ =\ \textcolor{stringliteral}{"{},"{}};}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00085}00085\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00086}00086\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00087}00087\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00088}00088\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#endif}}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00089}00089\ }
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00090}00090\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#if\ ENABLE\_THREADING\_PROTOTYPE}}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00091}00091\ \ \ \ \ \ \ \ \ std::string\ describeImm(LaunchThreadImm)\ \{\ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}"{}};\ \}}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00092}00092\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00093}00093\ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}<Uptr\ naturalAlignmentLog2>}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00094}00094\ \ \ \ \ \ \ \ \ std::string\ describeImm(AtomicLoadOrStoreImm<naturalAlignmentLog2>\ imm)}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00095}00095\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00096}00096\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}\ align="{}}\ +\ std::to\_string(1<<imm.alignmentLog2)\ +\ \textcolor{stringliteral}{"{}\ offset="{}}\ +\ std::to\_string(imm.offset);}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00097}00097\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00098}00098\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#endif}}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00099}00099\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_operator_printer_8h_source_l00100}00100\ \}}
+
+\end{DoxyCode}

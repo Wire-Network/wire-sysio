@@ -1,0 +1,15 @@
+<map id="CLI::App::run_callback" name="CLI::App::run_callback">
+<area shape="rect" id="Node000001" title="Internal function to run (App) callback, bottom up." alt="" coords="5,104,160,130"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_app.html#a4933a7e5603ab5eaa9705d4027e6cb12" title=" " alt="" coords="237,55,370,80"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="143,101,227,82,228,87,144,106"/>
+<area shape="rect" id="Node000006" href="$class_c_l_i_1_1_app.html#a6b4b0c02d0c3d08b534fb93737056751" title=" " alt="" coords="208,104,399,130"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="160,114,192,114,192,120,160,120"/>
+<area shape="rect" id="Node000007" href="$class_c_l_i_1_1_app.html#a5d74be8e210e779874584a3336aaf506" title=" " alt="" coords="226,153,380,179"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="144,128,228,147,227,152,143,133"/>
+<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_option.html#a154543609c45d9c59c69991a08ca272b" title="Count the total number of times an option was passed." alt="" coords="452,5,580,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="361,51,442,32,443,38,363,57"/>
+<area shape="rect" id="Node000004" href="$class_c_l_i_1_1_app.html#adeac41bd40859dfbff9817244c09c989" title="Get the name of the current app." alt="" coords="447,55,585,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="371,65,431,65,431,70,371,70"/>
+<area shape="rect" id="Node000005" href="$xbyak__mnemonic_8h.html#ad8856ea517c970ed0584a251c3fdc94f" title=" " alt="" coords="495,104,537,130"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="363,78,480,106,479,111,361,84"/>
+</map>

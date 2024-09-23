@@ -1,0 +1,123 @@
+\doxysection{sysio\+::testing\+::chainbase\+\_\+fixture\texorpdfstring{$<$}{<} MAX\+\_\+\+SIZE \texorpdfstring{$>$}{>} Struct Template Reference}
+\hypertarget{structsysio_1_1testing_1_1chainbase__fixture}{}\label{structsysio_1_1testing_1_1chainbase__fixture}\index{sysio::testing::chainbase\_fixture$<$ MAX\_SIZE $>$@{sysio::testing::chainbase\_fixture$<$ MAX\_SIZE $>$}}
+
+
+{\ttfamily \#include $<$chainbase\+\_\+fixture.\+hpp$>$}
+
+
+
+Collaboration diagram for sysio\+::testing\+::chainbase\+\_\+fixture\texorpdfstring{$<$}{<} MAX\+\_\+\+SIZE \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=205pt]{structsysio_1_1testing_1_1chainbase__fixture__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1testing_1_1chainbase__fixture_a6f3a1ed5ae6c98b0a54d4d9f3bab5732}{chainbase\+\_\+fixture}} ()
+\item 
+\mbox{\hyperlink{structsysio_1_1testing_1_1chainbase__fixture_a89b1ea0732726542b71ac9ba7f906b42}{\texorpdfstring{$\sim$}{\string~}chainbase\+\_\+fixture}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1temp__directory}{fc\+::temp\+\_\+directory}} \mbox{\hyperlink{structsysio_1_1testing_1_1chainbase__fixture_aa5a9bbfcab50c77b5154ee8ea07899b9}{\+\_\+tempdir}}
+\item 
+std\+::unique\+\_\+ptr$<$ \mbox{\hyperlink{classchainbase_1_1database}{chainbase\+::database}} $>$ \mbox{\hyperlink{structsysio_1_1testing_1_1chainbase__fixture_ad265b0df832ed5fed55ffb0131c18d78}{\+\_\+db}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} MAX\+\_\+\+SIZE$>$\newline
+struct sysio\+::testing\+::chainbase\+\_\+fixture$<$ MAX\+\_\+\+SIZE $>$}
+Utility class to create and tear down a temporary \doxylink{classchainbase_1_1database}{chainbase\+::database} using RAII
+
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em MAX\+\_\+\+SIZE} & -\/ the maximum size of the \doxylink{classchainbase_1_1database}{chainbase\+::database} \\
+\hline
+\end{DoxyTemplParams}
+
+
+Definition at line \mbox{\hyperlink{chainbase__fixture_8hpp_source_l00014}{14}} of file \mbox{\hyperlink{chainbase__fixture_8hpp_source}{chainbase\+\_\+fixture.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structsysio_1_1testing_1_1chainbase__fixture_a6f3a1ed5ae6c98b0a54d4d9f3bab5732}\index{sysio::testing::chainbase\_fixture$<$ MAX\_SIZE $>$@{sysio::testing::chainbase\_fixture$<$ MAX\_SIZE $>$}!chainbase\_fixture@{chainbase\_fixture}}
+\index{chainbase\_fixture@{chainbase\_fixture}!sysio::testing::chainbase\_fixture$<$ MAX\_SIZE $>$@{sysio::testing::chainbase\_fixture$<$ MAX\_SIZE $>$}}
+\doxysubsubsection{\texorpdfstring{chainbase\_fixture()}{chainbase\_fixture()}}
+{\footnotesize\ttfamily \label{structsysio_1_1testing_1_1chainbase__fixture_a6f3a1ed5ae6c98b0a54d4d9f3bab5732} 
+template$<$\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} MAX\+\_\+\+SIZE$>$ \\
+\mbox{\hyperlink{structsysio_1_1testing_1_1chainbase__fixture}{sysio\+::testing\+::chainbase\+\_\+fixture}}$<$ MAX\+\_\+\+SIZE $>$\+::chainbase\+\_\+fixture (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase__fixture_8hpp_source_l00015}{15}} of file \mbox{\hyperlink{chainbase__fixture_8hpp_source}{chainbase\+\_\+fixture.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00016\ \ \ \ :\ \mbox{\hyperlink{structsysio_1_1testing_1_1chainbase__fixture_aa5a9bbfcab50c77b5154ee8ea07899b9}{\_tempdir}}()}
+\DoxyCodeLine{00017\ \ \ \ ,\ \mbox{\hyperlink{structsysio_1_1testing_1_1chainbase__fixture_ad265b0df832ed5fed55ffb0131c18d78}{\_db}}(std::make\_unique<chainbase::database>(\mbox{\hyperlink{structsysio_1_1testing_1_1chainbase__fixture_aa5a9bbfcab50c77b5154ee8ea07899b9}{\_tempdir}}.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}(),\ \mbox{\hyperlink{classchainbase_1_1database_a3d0148ef1d3bf633f3d0bfab420250eea3ed40e30ae731cdc45c9dc5b782d88f4}{chainbase::database::read\_write}},\ MAX\_SIZE))}
+\DoxyCodeLine{00018\ \ \ \ \{}
+\DoxyCodeLine{00019\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1testing_1_1chainbase__fixture_a89b1ea0732726542b71ac9ba7f906b42}\index{sysio::testing::chainbase\_fixture$<$ MAX\_SIZE $>$@{sysio::testing::chainbase\_fixture$<$ MAX\_SIZE $>$}!````~chainbase\_fixture@{\texorpdfstring{$\sim$}{\string~}chainbase\_fixture}}
+\index{````~chainbase\_fixture@{\texorpdfstring{$\sim$}{\string~}chainbase\_fixture}!sysio::testing::chainbase\_fixture$<$ MAX\_SIZE $>$@{sysio::testing::chainbase\_fixture$<$ MAX\_SIZE $>$}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}chainbase\_fixture()}{\string~chainbase\_fixture()}}
+{\footnotesize\ttfamily \label{structsysio_1_1testing_1_1chainbase__fixture_a89b1ea0732726542b71ac9ba7f906b42} 
+template$<$\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} MAX\+\_\+\+SIZE$>$ \\
+\mbox{\hyperlink{structsysio_1_1testing_1_1chainbase__fixture}{sysio\+::testing\+::chainbase\+\_\+fixture}}$<$ MAX\+\_\+\+SIZE $>$\+::\texorpdfstring{$\sim$}{\string~}\mbox{\hyperlink{structsysio_1_1testing_1_1chainbase__fixture}{chainbase\+\_\+fixture}} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase__fixture_8hpp_source_l00021}{21}} of file \mbox{\hyperlink{chainbase__fixture_8hpp_source}{chainbase\+\_\+fixture.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00022\ \ \ \ \{}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1testing_1_1chainbase__fixture_ad265b0df832ed5fed55ffb0131c18d78}{\_db}}.reset();}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1testing_1_1chainbase__fixture_aa5a9bbfcab50c77b5154ee8ea07899b9}{\_tempdir}}.\mbox{\hyperlink{classfc_1_1temp__file__base_a11fa97c029408fca1d14dfc5ca81be26}{remove}}();}
+\DoxyCodeLine{00025\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1testing_1_1chainbase__fixture_a89b1ea0732726542b71ac9ba7f906b42_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1testing_1_1chainbase__fixture_ad265b0df832ed5fed55ffb0131c18d78}\index{sysio::testing::chainbase\_fixture$<$ MAX\_SIZE $>$@{sysio::testing::chainbase\_fixture$<$ MAX\_SIZE $>$}!\_db@{\_db}}
+\index{\_db@{\_db}!sysio::testing::chainbase\_fixture$<$ MAX\_SIZE $>$@{sysio::testing::chainbase\_fixture$<$ MAX\_SIZE $>$}}
+\doxysubsubsection{\texorpdfstring{\_db}{\_db}}
+{\footnotesize\ttfamily \label{structsysio_1_1testing_1_1chainbase__fixture_ad265b0df832ed5fed55ffb0131c18d78} 
+template$<$\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} MAX\+\_\+\+SIZE$>$ \\
+std\+::unique\+\_\+ptr$<$\mbox{\hyperlink{classchainbase_1_1database}{chainbase\+::database}}$>$ \mbox{\hyperlink{structsysio_1_1testing_1_1chainbase__fixture}{sysio\+::testing\+::chainbase\+\_\+fixture}}$<$ MAX\+\_\+\+SIZE $>$\+::\+\_\+db}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase__fixture_8hpp_source_l00028}{28}} of file \mbox{\hyperlink{chainbase__fixture_8hpp_source}{chainbase\+\_\+fixture.\+hpp}}.
+
+\Hypertarget{structsysio_1_1testing_1_1chainbase__fixture_aa5a9bbfcab50c77b5154ee8ea07899b9}\index{sysio::testing::chainbase\_fixture$<$ MAX\_SIZE $>$@{sysio::testing::chainbase\_fixture$<$ MAX\_SIZE $>$}!\_tempdir@{\_tempdir}}
+\index{\_tempdir@{\_tempdir}!sysio::testing::chainbase\_fixture$<$ MAX\_SIZE $>$@{sysio::testing::chainbase\_fixture$<$ MAX\_SIZE $>$}}
+\doxysubsubsection{\texorpdfstring{\_tempdir}{\_tempdir}}
+{\footnotesize\ttfamily \label{structsysio_1_1testing_1_1chainbase__fixture_aa5a9bbfcab50c77b5154ee8ea07899b9} 
+template$<$\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} MAX\+\_\+\+SIZE$>$ \\
+\mbox{\hyperlink{classfc_1_1temp__directory}{fc\+::temp\+\_\+directory}} \mbox{\hyperlink{structsysio_1_1testing_1_1chainbase__fixture}{sysio\+::testing\+::chainbase\+\_\+fixture}}$<$ MAX\+\_\+\+SIZE $>$\+::\+\_\+tempdir}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase__fixture_8hpp_source_l00027}{27}} of file \mbox{\hyperlink{chainbase__fixture_8hpp_source}{chainbase\+\_\+fixture.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/testing/include/sysio/testing/\mbox{\hyperlink{chainbase__fixture_8hpp}{chainbase\+\_\+fixture.\+hpp}}\end{DoxyCompactItemize}

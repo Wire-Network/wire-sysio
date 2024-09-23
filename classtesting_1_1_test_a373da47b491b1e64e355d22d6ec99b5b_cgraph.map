@@ -1,0 +1,13 @@
+<map id="testing::Test::RecordProperty" name="testing::Test::RecordProperty">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,112,198,137"/>
+<area shape="rect" id="Node000002" href="$classtesting_1_1_message.html#a2cdc4df62bdcc9df37651a1cf527704e" title=" " alt="" coords="250,78,434,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="198,108,234,103,234,109,199,114"/>
+<area shape="rect" id="Node000005" href="$classtesting_1_1_test.html#a1559ce1c83f56993b582650c091535a7" title=" " alt="" coords="246,136,438,161"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="198,131,230,135,230,140,198,137"/>
+<area shape="rect" id="Node000003" href="$classtesting_1_1internal_1_1scoped__ptr.html#a5a78280b6a59ff4b63aae444efc61e3f" title=" " alt="" coords="500,5,618,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="386,75,484,45,485,50,388,80"/>
+<area shape="rect" id="Node000004" href="$namespacetesting_1_1internal.html#ac0a2b7f69fc829d80a39e925b6417e39" title=" " alt="" coords="486,71,631,111"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="435,88,470,88,470,94,435,94"/>
+<area shape="rect" id="Node000006" href="$classtesting_1_1_unit_test.html#a24192400b70b3b946746954e9574fb8e" title=" " alt="" coords="496,136,621,177"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="438,149,481,151,480,156,438,155"/>
+</map>

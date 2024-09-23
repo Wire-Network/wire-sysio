@@ -1,0 +1,327 @@
+\doxysection{Mpz Class Reference}
+\hypertarget{class_mpz}{}\label{class_mpz}\index{Mpz@{Mpz}}
+
+
+{\ttfamily \#include $<$bn254\+\_\+if.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_mpz_a858eb3e0ed1d6fa50bff0b7a016e38fb}{Mpz}} ()
+\item 
+\mbox{\hyperlink{class_mpz_a891e081e16838466ed75fb5e571529fc}{Mpz}} (const \mbox{\hyperlink{class_mpz}{Mpz}} \&x)
+\item 
+\mbox{\hyperlink{class_mpz_af90c68c7b04475a83f3d7c57b535d1f2}{Mpz}} (int x)  throw (std\+::exception)
+\item 
+\mbox{\hyperlink{class_mpz_a541ba572df080c1322524c80d0a3a573}{Mpz}} (const std\+::string \&str)  throw (std\+::exception)
+\item 
+void \mbox{\hyperlink{class_mpz_a79bf2528561f740fc726dd734010a4e3}{set}} (int x)  throw (std\+::exception)
+\item 
+void \mbox{\hyperlink{class_mpz_abcaabbf571ded8f315a0670baeb64a40}{set}} (const std\+::string \&str)  throw (std\+::exception)
+\item 
+std\+::string \mbox{\hyperlink{class_mpz_a13bc724003650e675f45ef9503035e8a}{to\+String}} () const  throw (std\+::exception)
+\item 
+bool \mbox{\hyperlink{class_mpz_aff51abac43971240c790fbc9a67a01ef}{equals}} (const \mbox{\hyperlink{class_mpz}{Mpz}} \&rhs) const
+\item 
+int \mbox{\hyperlink{class_mpz_a7e53b3d668d26883db9aea374750e153}{compare\+To}} (const \mbox{\hyperlink{class_mpz}{Mpz}} \&rhs) const
+\item 
+void \mbox{\hyperlink{class_mpz_a61ae3a1cc67fbbd44c7db909689c49bc}{add}} (const \mbox{\hyperlink{class_mpz}{Mpz}} \&rhs)  throw (std\+::exception)
+\item 
+void \mbox{\hyperlink{class_mpz_a23b4f60bf0e49304628fc88b480d38d5}{sub}} (const \mbox{\hyperlink{class_mpz}{Mpz}} \&rhs)  throw (std\+::exception)
+\item 
+void \mbox{\hyperlink{class_mpz_a867535208de5e401d69baf1e5e80ca7c}{mul}} (const \mbox{\hyperlink{class_mpz}{Mpz}} \&rhs)  throw (std\+::exception)
+\item 
+void \mbox{\hyperlink{class_mpz_a5b0a3c5aefd0b16c4bc82ffba4953911}{mod}} (const \mbox{\hyperlink{class_mpz}{Mpz}} \&rhs)  throw (std\+::exception)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{class_mpz_a01a14be7c79c90f40dc131bb65ca7308}{Fp}}
+\item 
+\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{class_mpz_a9db3bd43f27929d61216038900fc7b78}{Fp2}}
+\item 
+\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{class_mpz_a7483dba502586f341465adc97709aced}{Fp12}}
+\item 
+\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{class_mpz_aa59322aea2eff57d57b505b4b858fc3a}{Ec1}}
+\item 
+\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{class_mpz_a2f67b0419e9a2312fb95b8fb974a3950}{Ec2}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{bn254__if_8hpp_source_l00024}{24}} of file \mbox{\hyperlink{bn254__if_8hpp_source}{bn254\+\_\+if.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_mpz_a858eb3e0ed1d6fa50bff0b7a016e38fb}\index{Mpz@{Mpz}!Mpz@{Mpz}}
+\index{Mpz@{Mpz}!Mpz@{Mpz}}
+\doxysubsubsection{\texorpdfstring{Mpz()}{Mpz()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{class_mpz_a858eb3e0ed1d6fa50bff0b7a016e38fb} 
+Mpz\+::\+Mpz (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn254__if_8hpp_source_l00032}{32}} of file \mbox{\hyperlink{bn254__if_8hpp_source}{bn254\+\_\+if.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00032\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{class_mpz_a891e081e16838466ed75fb5e571529fc}\index{Mpz@{Mpz}!Mpz@{Mpz}}
+\index{Mpz@{Mpz}!Mpz@{Mpz}}
+\doxysubsubsection{\texorpdfstring{Mpz()}{Mpz()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{class_mpz_a891e081e16838466ed75fb5e571529fc} 
+Mpz\+::\+Mpz (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_mpz}{Mpz}} \&}]{x}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn254__if_8hpp_source_l00033}{33}} of file \mbox{\hyperlink{bn254__if_8hpp_source}{bn254\+\_\+if.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00033\ :\ self\_(x.self\_)\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{class_mpz_af90c68c7b04475a83f3d7c57b535d1f2}\index{Mpz@{Mpz}!Mpz@{Mpz}}
+\index{Mpz@{Mpz}!Mpz@{Mpz}}
+\doxysubsubsection{\texorpdfstring{Mpz()}{Mpz()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{class_mpz_af90c68c7b04475a83f3d7c57b535d1f2} 
+Mpz\+::\+Mpz (\begin{DoxyParamCaption}\item[{int}]{x}{}\end{DoxyParamCaption}) throw ( std\+::exception) \hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn254__if_8hpp_source_l00034}{34}} of file \mbox{\hyperlink{bn254__if_8hpp_source}{bn254\+\_\+if.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00034\ :\ self\_(x)\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{class_mpz_a541ba572df080c1322524c80d0a3a573}\index{Mpz@{Mpz}!Mpz@{Mpz}}
+\index{Mpz@{Mpz}!Mpz@{Mpz}}
+\doxysubsubsection{\texorpdfstring{Mpz()}{Mpz()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{class_mpz_a541ba572df080c1322524c80d0a3a573} 
+Mpz\+::\+Mpz (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{str}{}\end{DoxyParamCaption}) throw ( std\+::exception) \hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn254__if_8hpp_source_l00035}{35}} of file \mbox{\hyperlink{bn254__if_8hpp_source}{bn254\+\_\+if.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00036\ \ \ \ \ \{}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a893468abdce45d586a5b659094a25e6c}{set}}(str);}
+\DoxyCodeLine{00038\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_mpz_a61ae3a1cc67fbbd44c7db909689c49bc}\index{Mpz@{Mpz}!add@{add}}
+\index{add@{add}!Mpz@{Mpz}}
+\doxysubsubsection{\texorpdfstring{add()}{add()}}
+{\footnotesize\ttfamily \label{class_mpz_a61ae3a1cc67fbbd44c7db909689c49bc} 
+void Mpz\+::add (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_mpz}{Mpz}} \&}]{rhs}{}\end{DoxyParamCaption}) throw ( std\+::exception) \hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn254__if_8hpp_source_l00050}{50}} of file \mbox{\hyperlink{bn254__if_8hpp_source}{bn254\+\_\+if.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00050\ \{\ self\_\ +=\ rhs.self\_;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=299pt]{class_mpz_a61ae3a1cc67fbbd44c7db909689c49bc_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_mpz_a7e53b3d668d26883db9aea374750e153}\index{Mpz@{Mpz}!compareTo@{compareTo}}
+\index{compareTo@{compareTo}!Mpz@{Mpz}}
+\doxysubsubsection{\texorpdfstring{compareTo()}{compareTo()}}
+{\footnotesize\ttfamily \label{class_mpz_a7e53b3d668d26883db9aea374750e153} 
+int Mpz\+::compare\+To (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_mpz}{Mpz}} \&}]{rhs}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn254__if_8hpp_source_l00049}{49}} of file \mbox{\hyperlink{bn254__if_8hpp_source}{bn254\+\_\+if.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00049\ \{\ \textcolor{keywordflow}{return}\ mpz\_cmp(self\_.get\_mpz\_t(),\ rhs.self\_.get\_mpz\_t());\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_mpz_aff51abac43971240c790fbc9a67a01ef}\index{Mpz@{Mpz}!equals@{equals}}
+\index{equals@{equals}!Mpz@{Mpz}}
+\doxysubsubsection{\texorpdfstring{equals()}{equals()}}
+{\footnotesize\ttfamily \label{class_mpz_aff51abac43971240c790fbc9a67a01ef} 
+bool Mpz\+::equals (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_mpz}{Mpz}} \&}]{rhs}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn254__if_8hpp_source_l00048}{48}} of file \mbox{\hyperlink{bn254__if_8hpp_source}{bn254\+\_\+if.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00048\ \{\ \textcolor{keywordflow}{return}\ self\_\ ==\ rhs.self\_;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_mpz_a5b0a3c5aefd0b16c4bc82ffba4953911}\index{Mpz@{Mpz}!mod@{mod}}
+\index{mod@{mod}!Mpz@{Mpz}}
+\doxysubsubsection{\texorpdfstring{mod()}{mod()}}
+{\footnotesize\ttfamily \label{class_mpz_a5b0a3c5aefd0b16c4bc82ffba4953911} 
+void Mpz\+::mod (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_mpz}{Mpz}} \&}]{rhs}{}\end{DoxyParamCaption}) throw ( std\+::exception) \hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn254__if_8hpp_source_l00053}{53}} of file \mbox{\hyperlink{bn254__if_8hpp_source}{bn254\+\_\+if.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00053\ \{\ self\_\ \%=\ rhs.self\_;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_mpz_a867535208de5e401d69baf1e5e80ca7c}\index{Mpz@{Mpz}!mul@{mul}}
+\index{mul@{mul}!Mpz@{Mpz}}
+\doxysubsubsection{\texorpdfstring{mul()}{mul()}}
+{\footnotesize\ttfamily \label{class_mpz_a867535208de5e401d69baf1e5e80ca7c} 
+void Mpz\+::mul (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_mpz}{Mpz}} \&}]{rhs}{}\end{DoxyParamCaption}) throw ( std\+::exception) \hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn254__if_8hpp_source_l00052}{52}} of file \mbox{\hyperlink{bn254__if_8hpp_source}{bn254\+\_\+if.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00052\ \{\ self\_\ *=\ rhs.self\_;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_mpz_abcaabbf571ded8f315a0670baeb64a40}\index{Mpz@{Mpz}!set@{set}}
+\index{set@{set}!Mpz@{Mpz}}
+\doxysubsubsection{\texorpdfstring{set()}{set()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_mpz_abcaabbf571ded8f315a0670baeb64a40} 
+void Mpz\+::set (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{str}{}\end{DoxyParamCaption}) throw ( std\+::exception) \hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn254__if_8hpp_source_l00040}{40}} of file \mbox{\hyperlink{bn254__if_8hpp_source}{bn254\+\_\+if.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00041\ \ \ \ \ \{}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ self\_.set\_str(str,\ 0);}
+\DoxyCodeLine{00043\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_mpz_a79bf2528561f740fc726dd734010a4e3}\index{Mpz@{Mpz}!set@{set}}
+\index{set@{set}!Mpz@{Mpz}}
+\doxysubsubsection{\texorpdfstring{set()}{set()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_mpz_a79bf2528561f740fc726dd734010a4e3} 
+void Mpz\+::set (\begin{DoxyParamCaption}\item[{int}]{x}{}\end{DoxyParamCaption}) throw ( std\+::exception) \hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn254__if_8hpp_source_l00039}{39}} of file \mbox{\hyperlink{bn254__if_8hpp_source}{bn254\+\_\+if.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00039\ \{\ self\_\ =\ x;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_mpz_a23b4f60bf0e49304628fc88b480d38d5}\index{Mpz@{Mpz}!sub@{sub}}
+\index{sub@{sub}!Mpz@{Mpz}}
+\doxysubsubsection{\texorpdfstring{sub()}{sub()}}
+{\footnotesize\ttfamily \label{class_mpz_a23b4f60bf0e49304628fc88b480d38d5} 
+void Mpz\+::sub (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_mpz}{Mpz}} \&}]{rhs}{}\end{DoxyParamCaption}) throw ( std\+::exception) \hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn254__if_8hpp_source_l00051}{51}} of file \mbox{\hyperlink{bn254__if_8hpp_source}{bn254\+\_\+if.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00051\ \{\ self\_\ -\/=\ rhs.self\_;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_mpz_a13bc724003650e675f45ef9503035e8a}\index{Mpz@{Mpz}!toString@{toString}}
+\index{toString@{toString}!Mpz@{Mpz}}
+\doxysubsubsection{\texorpdfstring{toString()}{toString()}}
+{\footnotesize\ttfamily \label{class_mpz_a13bc724003650e675f45ef9503035e8a} 
+std\+::string Mpz\+::to\+String (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const throw ( std\+::exception) \hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn254__if_8hpp_source_l00044}{44}} of file \mbox{\hyperlink{bn254__if_8hpp_source}{bn254\+\_\+if.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00045\ \ \ \ \ \{}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ self\_.get\_str();}
+\DoxyCodeLine{00047\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{class_mpz_aa59322aea2eff57d57b505b4b858fc3a}\index{Mpz@{Mpz}!Ec1@{Ec1}}
+\index{Ec1@{Ec1}!Mpz@{Mpz}}
+\doxysubsubsection{\texorpdfstring{Ec1}{Ec1}}
+{\footnotesize\ttfamily \label{class_mpz_aa59322aea2eff57d57b505b4b858fc3a} 
+friend \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{class_ec1}{Ec1}}\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn254__if_8hpp_source_l00029}{29}} of file \mbox{\hyperlink{bn254__if_8hpp_source}{bn254\+\_\+if.\+hpp}}.
+
+\Hypertarget{class_mpz_a2f67b0419e9a2312fb95b8fb974a3950}\index{Mpz@{Mpz}!Ec2@{Ec2}}
+\index{Ec2@{Ec2}!Mpz@{Mpz}}
+\doxysubsubsection{\texorpdfstring{Ec2}{Ec2}}
+{\footnotesize\ttfamily \label{class_mpz_a2f67b0419e9a2312fb95b8fb974a3950} 
+friend \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{class_ec2}{Ec2}}\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn254__if_8hpp_source_l00030}{30}} of file \mbox{\hyperlink{bn254__if_8hpp_source}{bn254\+\_\+if.\+hpp}}.
+
+\Hypertarget{class_mpz_a01a14be7c79c90f40dc131bb65ca7308}\index{Mpz@{Mpz}!Fp@{Fp}}
+\index{Fp@{Fp}!Mpz@{Mpz}}
+\doxysubsubsection{\texorpdfstring{Fp}{Fp}}
+{\footnotesize\ttfamily \label{class_mpz_a01a14be7c79c90f40dc131bb65ca7308} 
+friend \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{class_fp}{Fp}}\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn254__if_8hpp_source_l00026}{26}} of file \mbox{\hyperlink{bn254__if_8hpp_source}{bn254\+\_\+if.\+hpp}}.
+
+\Hypertarget{class_mpz_a7483dba502586f341465adc97709aced}\index{Mpz@{Mpz}!Fp12@{Fp12}}
+\index{Fp12@{Fp12}!Mpz@{Mpz}}
+\doxysubsubsection{\texorpdfstring{Fp12}{Fp12}}
+{\footnotesize\ttfamily \label{class_mpz_a7483dba502586f341465adc97709aced} 
+friend \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{class_fp12}{Fp12}}\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn254__if_8hpp_source_l00028}{28}} of file \mbox{\hyperlink{bn254__if_8hpp_source}{bn254\+\_\+if.\+hpp}}.
+
+\Hypertarget{class_mpz_a9db3bd43f27929d61216038900fc7b78}\index{Mpz@{Mpz}!Fp2@{Fp2}}
+\index{Fp2@{Fp2}!Mpz@{Mpz}}
+\doxysubsubsection{\texorpdfstring{Fp2}{Fp2}}
+{\footnotesize\ttfamily \label{class_mpz_a9db3bd43f27929d61216038900fc7b78} 
+friend \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{class_fp2}{Fp2}}\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn254__if_8hpp_source_l00027}{27}} of file \mbox{\hyperlink{bn254__if_8hpp_source}{bn254\+\_\+if.\+hpp}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/libraries/ff/depends/ate-\/pairing/java/\mbox{\hyperlink{bn254__if_8hpp}{bn254\+\_\+if.\+hpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,111 @@
+\doxysection{messagereader.\+cpp}
+\hypertarget{messagereader_8cpp_source}{}\label{messagereader_8cpp_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/example/messagereader/messagereader.cpp@{libraries/fc/include/fc/crypto/webauthn\_json/example/messagereader/messagereader.cpp}}
+\mbox{\hyperlink{messagereader_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00001}00001\ \textcolor{comment}{//\ Reading\ a\ message\ JSON\ with\ Reader\ (SAX-\/style\ API).}}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00002}00002\ \textcolor{comment}{//\ The\ JSON\ should\ be\ an\ object\ with\ key-\/string\ pairs.}}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{reader_8h}{rapidjson/reader.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{en_8h}{rapidjson/error/en.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <iostream>}}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <map>}}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00010}00010\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacestd}{std}};}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00011}00011\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacerapidjson}{rapidjson}};}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00013}\mbox{\hyperlink{messagereader_8cpp_ae2c5980b5eb04369faa7f72447e6d664}{00013}}\ \textcolor{keyword}{typedef}\ map<string,\ string>\ \mbox{\hyperlink{messagereader_8cpp_ae2c5980b5eb04369faa7f72447e6d664}{MessageMap}};}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00015}00015\ \textcolor{preprocessor}{\#if\ defined(\_\_GNUC\_\_)}}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00016}00016\ RAPIDJSON\_DIAG\_PUSH}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00017}00017\ RAPIDJSON\_DIAG\_OFF(effc++)}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00018}00018\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00020}00020\ \textcolor{preprocessor}{\#ifdef\ \_\_clang\_\_}}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00021}00021\ RAPIDJSON\_DIAG\_PUSH}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00022}00022\ RAPIDJSON\_DIAG\_OFF(\textcolor{keywordflow}{switch}-\/\textcolor{keyword}{enum})}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00023}00023\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00025}\mbox{\hyperlink{struct_message_handler}{00025}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_message_handler}{MessageHandler}}}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00026}00026\ \ \ \ \ :\ \textcolor{keyword}{public}\ BaseReaderHandler<UTF8<>,\ MessageHandler>\ \{}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00027}\mbox{\hyperlink{struct_message_handler_a4f6165a34fa3a4de7021e7e5cd7fd4f6}{00027}}\ \ \ \ \ \mbox{\hyperlink{struct_message_handler_a4f6165a34fa3a4de7021e7e5cd7fd4f6}{MessageHandler}}()\ :\ \mbox{\hyperlink{struct_message_handler_a628b5a49349a2027c84ffb4f6249fa51}{messages\_}}(),\ \mbox{\hyperlink{struct_message_handler_a927d3ae4618ed37e3904ff673fdd3768}{state\_}}(\mbox{\hyperlink{struct_message_handler_a704e2a1bc5f7a4644998112cba61db2ca43d4b1361a039d9a3223b2407ed5b506}{kExpectObjectStart}}),\ \mbox{\hyperlink{struct_message_handler_a7a61cf6c752b8829eb9c058341617c69}{name\_}}()\ \{\}}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00029}\mbox{\hyperlink{struct_message_handler_a3d7e691831748287252e10ced02061f5}{00029}}\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_message_handler_a3d7e691831748287252e10ced02061f5}{StartObject}}()\ \{}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00030}00030\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (\mbox{\hyperlink{struct_message_handler_a927d3ae4618ed37e3904ff673fdd3768}{state\_}})\ \{}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00031}00031\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{struct_message_handler_a704e2a1bc5f7a4644998112cba61db2ca43d4b1361a039d9a3223b2407ed5b506}{kExpectObjectStart}}:}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00032}00032\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_message_handler_a927d3ae4618ed37e3904ff673fdd3768}{state\_}}\ =\ \mbox{\hyperlink{struct_message_handler_a704e2a1bc5f7a4644998112cba61db2ca70008d18048772c50a2226a6e592c7db}{kExpectNameOrObjectEnd}};}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00033}00033\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00034}00034\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00035}00035\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00036}00036\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00037}00037\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00039}\mbox{\hyperlink{struct_message_handler_ab9de0f0bd0666b805563cb3f86ef3fc0}{00039}}\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_message_handler_ab9de0f0bd0666b805563cb3f86ef3fc0}{String}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ str,\ \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\ length,\ \textcolor{keywordtype}{bool})\ \{}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00040}00040\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (\mbox{\hyperlink{struct_message_handler_a927d3ae4618ed37e3904ff673fdd3768}{state\_}})\ \{}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00041}00041\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{struct_message_handler_a704e2a1bc5f7a4644998112cba61db2ca70008d18048772c50a2226a6e592c7db}{kExpectNameOrObjectEnd}}:}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00042}00042\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_message_handler_a7a61cf6c752b8829eb9c058341617c69}{name\_}}\ =\ string(str,\ length);}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00043}00043\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_message_handler_a927d3ae4618ed37e3904ff673fdd3768}{state\_}}\ =\ \mbox{\hyperlink{struct_message_handler_a704e2a1bc5f7a4644998112cba61db2ca6f46eb7d062c953ecb1a28a471908568}{kExpectValue}};}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00044}00044\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00045}00045\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{struct_message_handler_a704e2a1bc5f7a4644998112cba61db2ca6f46eb7d062c953ecb1a28a471908568}{kExpectValue}}:}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00046}00046\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_message_handler_a628b5a49349a2027c84ffb4f6249fa51}{messages\_}}.insert(MessageMap::value\_type(\mbox{\hyperlink{struct_message_handler_a7a61cf6c752b8829eb9c058341617c69}{name\_}},\ \textcolor{keywordtype}{string}(str,\ length)));}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00047}00047\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_message_handler_a927d3ae4618ed37e3904ff673fdd3768}{state\_}}\ =\ \mbox{\hyperlink{struct_message_handler_a704e2a1bc5f7a4644998112cba61db2ca70008d18048772c50a2226a6e592c7db}{kExpectNameOrObjectEnd}};}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00050}00050\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00051}00051\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00052}00052\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00054}\mbox{\hyperlink{struct_message_handler_ab423864fd5ca806d4211c03acbdad67b}{00054}}\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_message_handler_ab423864fd5ca806d4211c03acbdad67b}{EndObject}}(\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}})\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_message_handler_a927d3ae4618ed37e3904ff673fdd3768}{state\_}}\ ==\ \mbox{\hyperlink{struct_message_handler_a704e2a1bc5f7a4644998112cba61db2ca70008d18048772c50a2226a6e592c7db}{kExpectNameOrObjectEnd}};\ \}}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00056}\mbox{\hyperlink{struct_message_handler_a3ab79ae50d26d5b3fb62a9bab58c21bb}{00056}}\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_message_handler_a3ab79ae50d26d5b3fb62a9bab58c21bb}{Default}}()\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};\ \}\ \textcolor{comment}{//\ All\ other\ events\ are\ invalid.}}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00058}\mbox{\hyperlink{struct_message_handler_a628b5a49349a2027c84ffb4f6249fa51}{00058}}\ \ \ \ \ \mbox{\hyperlink{messagereader_8cpp_ae2c5980b5eb04369faa7f72447e6d664}{MessageMap}}\ \mbox{\hyperlink{struct_message_handler_a628b5a49349a2027c84ffb4f6249fa51}{messages\_}};}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00059}\mbox{\hyperlink{struct_message_handler_a704e2a1bc5f7a4644998112cba61db2c}{00059}}\ \ \ \ \ \textcolor{keyword}{enum}\ \mbox{\hyperlink{struct_message_handler_a704e2a1bc5f7a4644998112cba61db2c}{State}}\ \{}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00060}\mbox{\hyperlink{struct_message_handler_a704e2a1bc5f7a4644998112cba61db2ca43d4b1361a039d9a3223b2407ed5b506}{00060}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_message_handler_a704e2a1bc5f7a4644998112cba61db2ca43d4b1361a039d9a3223b2407ed5b506}{kExpectObjectStart}},}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00061}\mbox{\hyperlink{struct_message_handler_a704e2a1bc5f7a4644998112cba61db2ca70008d18048772c50a2226a6e592c7db}{00061}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_message_handler_a704e2a1bc5f7a4644998112cba61db2ca70008d18048772c50a2226a6e592c7db}{kExpectNameOrObjectEnd}},}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00062}00062\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_message_handler_a704e2a1bc5f7a4644998112cba61db2ca6f46eb7d062c953ecb1a28a471908568}{kExpectValue}}}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00063}\mbox{\hyperlink{struct_message_handler_a704e2a1bc5f7a4644998112cba61db2ca6f46eb7d062c953ecb1a28a471908568}{00063}}\ \ \ \ \ \}\mbox{\hyperlink{struct_message_handler_a927d3ae4618ed37e3904ff673fdd3768}{state\_}};}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00064}\mbox{\hyperlink{struct_message_handler_a7a61cf6c752b8829eb9c058341617c69}{00064}}\ \ \ \ \ std::string\ \mbox{\hyperlink{struct_message_handler_a7a61cf6c752b8829eb9c058341617c69}{name\_}};}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00065}00065\ \};}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00067}00067\ \textcolor{preprocessor}{\#if\ defined(\_\_GNUC\_\_)}}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00068}00068\ RAPIDJSON\_DIAG\_POP}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00069}00069\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00071}00071\ \textcolor{preprocessor}{\#ifdef\ \_\_clang\_\_}}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00072}00072\ RAPIDJSON\_DIAG\_POP}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00073}00073\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00074}00074\ }
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00075}00075\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ ParseMessages(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ json,\ \mbox{\hyperlink{messagereader_8cpp_ae2c5980b5eb04369faa7f72447e6d664}{MessageMap}}\&\ messages)\ \{}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00076}00076\ \ \ \ \ \mbox{\hyperlink{class_generic_reader}{Reader}}\ reader;}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00077}00077\ \ \ \ \ \mbox{\hyperlink{struct_message_handler}{MessageHandler}}\ handler;}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00078}00078\ \ \ \ \ \mbox{\hyperlink{struct_generic_string_stream}{StringStream}}\ ss(json);}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00079}00079\ \ \ \ \ \textcolor{keywordflow}{if}\ (reader.\mbox{\hyperlink{class_generic_reader_a0c450620d14ff1824e58bb7bd9b42099}{Parse}}(ss,\ handler))}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00080}00080\ \ \ \ \ \ \ \ \ messages.swap(handler.\mbox{\hyperlink{struct_message_handler_a628b5a49349a2027c84ffb4f6249fa51}{messages\_}});\ \ \ \textcolor{comment}{//\ Only\ change\ it\ if\ success.}}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00081}00081\ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00082}00082\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_ga8d4b32dfc45840bca189ade2bbcb6ba7}{ParseErrorCode}}\ e\ =\ reader.\mbox{\hyperlink{class_generic_reader_a937bf90919f50e1c370b312cee5833e8}{GetParseErrorCode}}();}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00083}00083\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ o\ =\ reader.\mbox{\hyperlink{class_generic_reader_ae9008523ccd06d839a57335835cb4091}{GetErrorOffset}}();}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00084}00084\ \ \ \ \ \ \ \ \ cout\ <<\ \textcolor{stringliteral}{"{}Error:\ "{}}\ <<\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_ga28835eb93d2c3c07bbea13515eb31415}{GetParseError\_En}}(e)\ <<\ endl;;}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00085}00085\ \ \ \ \ \ \ \ \ cout\ <<\ \textcolor{stringliteral}{"{}\ at\ offset\ "{}}\ <<\ o\ <<\ \textcolor{stringliteral}{"{}\ near\ '"{}}\ <<\ string(json).substr(o,\ 10)\ <<\ \textcolor{stringliteral}{"{}...'"{}}\ <<\ endl;}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00086}00086\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00087}00087\ \}}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00088}00088\ }
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00089}\mbox{\hyperlink{messagereader_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{00089}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{messagereader_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}()\ \{}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00090}00090\ \ \ \ \ \mbox{\hyperlink{messagereader_8cpp_ae2c5980b5eb04369faa7f72447e6d664}{MessageMap}}\ messages;}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00091}00091\ }
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00092}00092\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ json1\ =\ \textcolor{stringliteral}{"{}\{\ \(\backslash\)"{}greeting\(\backslash\)"{}\ :\ \(\backslash\)"{}Hello!\(\backslash\)"{},\ \(\backslash\)"{}farewell\(\backslash\)"{}\ :\ \(\backslash\)"{}bye-\/bye!\(\backslash\)"{}\ \}"{}};}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00093}00093\ \ \ \ \ cout\ <<\ json1\ <<\ endl;}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00094}00094\ \ \ \ \ ParseMessages(json1,\ messages);}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00095}00095\ }
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00096}00096\ \ \ \ \ \textcolor{keywordflow}{for}\ (MessageMap::const\_iterator\ itr\ =\ messages.begin();\ itr\ !=\ messages.end();\ ++itr)}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00097}00097\ \ \ \ \ \ \ \ \ cout\ <<\ itr-\/>first\ <<\ \textcolor{stringliteral}{"{}:\ "{}}\ <<\ itr-\/>second\ <<\ endl;}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00098}00098\ }
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00099}00099\ \ \ \ \ cout\ <<\ endl\ <<\ \textcolor{stringliteral}{"{}Parse\ a\ JSON\ with\ invalid\ schema."{}}\ <<\ endl;}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00100}00100\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ json2\ =\ \textcolor{stringliteral}{"{}\{\ \(\backslash\)"{}greeting\(\backslash\)"{}\ :\ \(\backslash\)"{}Hello!\(\backslash\)"{},\ \(\backslash\)"{}farewell\(\backslash\)"{}\ :\ \(\backslash\)"{}bye-\/bye!\(\backslash\)"{},\ \(\backslash\)"{}foo\(\backslash\)"{}\ :\ \{\}\ \}"{}};}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00101}00101\ \ \ \ \ cout\ <<\ json2\ <<\ endl;}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00102}00102\ \ \ \ \ ParseMessages(json2,\ messages);}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00103}00103\ }
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00104}00104\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{messagereader_8cpp_source_l00105}00105\ \}}
+
+\end{DoxyCode}

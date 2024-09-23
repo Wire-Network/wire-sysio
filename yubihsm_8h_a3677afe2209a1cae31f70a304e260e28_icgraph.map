@@ -1,0 +1,14 @@
+<map id="yh_util_decrypt_otp" name="yh_util_decrypt_otp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="486,55,621,80"/>
+<area shape="rect" id="Node000002" href="$yubico__otp_8c.html#a840291bc02cba5474a4cb46a9b9566fe" title=" " alt="" coords="342,5,392,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="487,53,392,27,393,22,488,47"/>
+<area shape="rect" id="Node000003" href="$commands_8c.html#ae2e50929acc6085cd395d0bd4ddb02db" title=" " alt="" coords="298,55,436,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="471,70,437,70,437,65,471,65"/>
+<area shape="rect" id="Node000006" href="$commands_8c.html#ad676312a3ed43f6a3ece63851780aeff" title=" " alt="" coords="296,104,438,130"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="488,87,419,106,418,101,487,82"/>
+<area shape="rect" id="Node000004" href="$src_2main_8c.html#a34a9e8c400dcf19e771e884636316060" title=" " alt="" coords="103,80,248,106"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="283,81,248,86,248,81,282,76"/>
+<area shape="rect" id="Node000005" href="$src_2main_8c.html#a0ddf1224851353fc92bfbff6f499fa97" title=" " alt="" coords="5,80,55,106"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="87,96,55,96,55,90,87,90"/>
+<area shape="poly" id="edge6_Node000006_Node000004" title=" " alt="" coords="280,109,248,105,249,99,281,103"/>
+</map>

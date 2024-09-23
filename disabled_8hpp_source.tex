@@ -1,0 +1,95 @@
+\doxysection{disabled.\+hpp}
+\hypertarget{disabled_8hpp_source}{}\label{disabled_8hpp_source}\index{libraries/fc/vendor/websocketpp/websocketpp/extensions/permessage\_deflate/disabled.hpp@{libraries/fc/vendor/websocketpp/websocketpp/extensions/permessage\_deflate/disabled.hpp}}
+\mbox{\hyperlink{disabled_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2014,\ Peter\ Thorson.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00004}00004\ \textcolor{comment}{\ *\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00005}00005\ \textcolor{comment}{\ *\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are\ met:}}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00006}00006\ \textcolor{comment}{\ *\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00007}00007\ \textcolor{comment}{\ *\ \ \ \ \ \ \ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00008}00008\ \textcolor{comment}{\ *\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00009}00009\ \textcolor{comment}{\ *\ \ \ \ \ \ \ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer\ in\ the}}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00010}00010\ \textcolor{comment}{\ *\ \ \ \ \ \ \ documentation\ and/or\ other\ materials\ provided\ with\ the\ distribution.}}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00011}00011\ \textcolor{comment}{\ *\ \ \ \ \ *\ Neither\ the\ name\ of\ the\ WebSocket++\ Project\ nor\ the}}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00012}00012\ \textcolor{comment}{\ *\ \ \ \ \ \ \ names\ of\ its\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products}}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00013}00013\ \textcolor{comment}{\ *\ \ \ \ \ \ \ derived\ from\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00014}00014\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00015}00015\ \textcolor{comment}{\ *\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS\ "{}AS\ IS"{}}}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00016}00016\ \textcolor{comment}{\ *\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ THE}}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00017}00017\ \textcolor{comment}{\ *\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR\ A\ PARTICULAR\ PURPOSE}}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00018}00018\ \textcolor{comment}{\ *\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ PETER\ THORSON\ BE\ LIABLE\ FOR\ ANY}}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00019}00019\ \textcolor{comment}{\ *\ DIRECT,\ INDIRECT,\ INCIDENTAL,\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES}}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00020}00020\ \textcolor{comment}{\ *\ (INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;}}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00021}00021\ \textcolor{comment}{\ *\ LOSS\ OF\ USE,\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND}}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00022}00022\ \textcolor{comment}{\ *\ ON\ ANY\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00023}00023\ \textcolor{comment}{\ *\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE\ OF\ THIS}}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00024}00024\ \textcolor{comment}{\ *\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00025}00025\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00026}00026\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00028}00028\ \textcolor{preprocessor}{\#ifndef\ WEBSOCKETPP\_EXTENSION\_PERMESSAGE\_DEFLATE\_DISABLED\_HPP}}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00029}00029\ \textcolor{preprocessor}{\#define\ WEBSOCKETPP\_EXTENSION\_PERMESSAGE\_DEFLATE\_DISABLED\_HPP}}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00031}00031\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{cpp11_8hpp}{websocketpp/common/cpp11.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00032}00032\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{system__error_8hpp}{websocketpp/common/system\_error.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00034}00034\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2constants_8hpp}{websocketpp/http/constants.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00035}00035\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{extension_8hpp}{websocketpp/extensions/extension.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00037}00037\ \textcolor{preprocessor}{\#include\ <map>}}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00038}00038\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00039}00039\ \textcolor{preprocessor}{\#include\ <utility>}}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00041}00041\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacewebsocketpp}{websocketpp}}\ \{}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00042}00042\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacevalidate__reflection_aa4072b2f53a71a49c523efac187644cd}{extensions}}\ \{}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00043}\mbox{\hyperlink{namespacewebsocketpp_1_1extensions_1_1permessage__deflate}{00043}}\ \textcolor{keyword}{namespace\ }permessage\_deflate\ \{}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00051}00051\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ config>}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00052}\mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1disabled}{00052}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1disabled}{disabled}}\ \{}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00053}00053\ \ \ \ \ \textcolor{keyword}{typedef}\ std::pair<lib::error\_code,std::string>\ err\_str\_pair;}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00054}00054\ }
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00055}00055\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00064}\mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1disabled_a3de3aad5ffeef60e3713cc29dec7b140}{00064}}\ \ \ \ \ err\_str\_pair\ \mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1disabled_a3de3aad5ffeef60e3713cc29dec7b140}{negotiate}}(http::attribute\_list\ \textcolor{keyword}{const}\ \&)\ \{}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00065}00065\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ make\_pair(make\_error\_code(\mbox{\hyperlink{namespacewebsocketpp_1_1extensions_1_1error_a18c17e561b5a8e2dfc0d98437039f7bfa7e91bee498e79963a6fd48aac73bba5c}{error::disabled}}),std::string());}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00066}00066\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00067}00067\ }
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00069}00069\ }
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00075}\mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1disabled_afe11662b31612191d72558fa7db5c114}{00075}}\ \ \ \ \ lib::error\_code\ \mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1disabled_afe11662b31612191d72558fa7db5c114}{init}}(\textcolor{keywordtype}{bool})\ \{}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00076}00076\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ lib::error\_code();}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00077}00077\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00081}\mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1disabled_a2471ea045dfff17b36effd61319fc87a}{00081}}\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1disabled_a2471ea045dfff17b36effd61319fc87a}{is\_implemented}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00082}00082\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00083}00083\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00084}00084\ }
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00087}\mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1disabled_a821b1f5929e8330e24e792e0d3ac98a9}{00087}}\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1disabled_a821b1f5929e8330e24e792e0d3ac98a9}{is\_enabled}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00088}00088\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00089}00089\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00090}00090\ }
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00092}00092\ }
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00098}\mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1disabled_a9ae74e6614ee441b535df1c729312817}{00098}}\ \ \ \ \ std::string\ \mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1disabled_a9ae74e6614ee441b535df1c729312817}{generate\_offer}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00099}00099\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}"{}};}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00100}00100\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00101}00101\ }
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00103}00103\ }
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00108}\mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1disabled_a3ef2c3020ea3b8d531d3cee03bf8eadf}{00108}}\ \ \ \ \ lib::error\_code\ \mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1disabled_a3ef2c3020ea3b8d531d3cee03bf8eadf}{compress}}(std::string\ \textcolor{keyword}{const}\ \&,\ std::string\ \&)\ \{}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00109}00109\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ make\_error\_code(\mbox{\hyperlink{namespacewebsocketpp_1_1extensions_1_1error_a18c17e561b5a8e2dfc0d98437039f7bfa7e91bee498e79963a6fd48aac73bba5c}{error::disabled}});}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00110}00110\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00111}00111\ }
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00113}00113\ }
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00119}\mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1disabled_ad72b694d8ce4c7e39c055ee2008810b6}{00119}}\ \ \ \ \ lib::error\_code\ \mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1disabled_ad72b694d8ce4c7e39c055ee2008810b6}{decompress}}(\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \textcolor{keyword}{const}\ *,\ \textcolor{keywordtype}{size\_t},\ std::string\ \&)\ \{}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00120}00120\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ make\_error\_code(\mbox{\hyperlink{namespacewebsocketpp_1_1extensions_1_1error_a18c17e561b5a8e2dfc0d98437039f7bfa7e91bee498e79963a6fd48aac73bba5c}{error::disabled}});}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00121}00121\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00122}00122\ \};}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00123}00123\ }
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00124}00124\ \}\ \textcolor{comment}{//\ namespace\ permessage\_deflate}}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00125}00125\ \}\ \textcolor{comment}{//\ namespace\ extensions}}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00126}00126\ \}\ \textcolor{comment}{//\ namespace\ websocketpp}}
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00127}00127\ }
+\DoxyCodeLine{\Hypertarget{disabled_8hpp_source_l00128}00128\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ WEBSOCKETPP\_EXTENSION\_PERMESSAGE\_DEFLATE\_DISABLED\_HPP}}
+
+\end{DoxyCode}

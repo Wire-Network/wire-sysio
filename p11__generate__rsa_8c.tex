@@ -1,0 +1,127 @@
+\doxysection{libraries/yubihsm/examples/p11\+\_\+generate\+\_\+rsa.c File Reference}
+\hypertarget{p11__generate__rsa_8c}{}\label{p11__generate__rsa_8c}\index{libraries/yubihsm/examples/p11\_generate\_rsa.c@{libraries/yubihsm/examples/p11\_generate\_rsa.c}}
+{\ttfamily \#include $<$assert.\+h$>$}\newline
+{\ttfamily \#include $<$dlfcn.\+h$>$}\newline
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include $<$pkcs11.\+h$>$}\newline
+Include dependency graph for p11\+\_\+generate\+\_\+rsa.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{p11__generate__rsa_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{p11__generate__rsa_8c_a0ddf1224851353fc92bfbff6f499fa97}{main}} (int argc, char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}\mbox{[}$\,$\mbox{]})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{p11__generate__rsa_8c_a0ddf1224851353fc92bfbff6f499fa97}\index{p11\_generate\_rsa.c@{p11\_generate\_rsa.c}!main@{main}}
+\index{main@{main}!p11\_generate\_rsa.c@{p11\_generate\_rsa.c}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{p11__generate__rsa_8c_a0ddf1224851353fc92bfbff6f499fa97} 
+int main (\begin{DoxyParamCaption}\item[{int}]{argc}{, }\item[{char \texorpdfstring{$\ast$}{*}}]{argv}{\mbox{[}$\,$\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{p11__generate__rsa_8c_source_l00028}{28}} of file \mbox{\hyperlink{p11__generate__rsa_8c_source}{p11\+\_\+generate\+\_\+rsa.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00029\ \ \ \textcolor{keywordflow}{if}\ (argc\ !=\ 2)\ \{}
+\DoxyCodeLine{00030\ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}usage:\ p11\ /path/to/yubihsm\_pkcs11/module\(\backslash\)n"{}});}
+\DoxyCodeLine{00031\ \ \ \ \ exit(EXIT\_FAILURE);}
+\DoxyCodeLine{00032\ \ \ \}}
+\DoxyCodeLine{00033\ }
+\DoxyCodeLine{00034\ \ \ CK\_C\_GetFunctionList\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_1_1eosvmoc_ac6593044ffde3f1589b705c6e21f342d}{fn}};}
+\DoxyCodeLine{00035\ \ \ \textcolor{keywordtype}{void}\ *handle\ =\ dlopen(\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[1],\ RTLD\_NOW\ |\ RTLD\_GLOBAL);}
+\DoxyCodeLine{00036\ \ \ assert(handle\ !=\ NULL);}
+\DoxyCodeLine{00037\ }
+\DoxyCodeLine{00038\ \ \ *(\textcolor{keywordtype}{void}\ **)\ (\&fn)\ =\ dlsym(handle,\ \textcolor{stringliteral}{"{}C\_GetFunctionList"{}});}
+\DoxyCodeLine{00039\ \ \ assert(fn\ !=\ NULL);}
+\DoxyCodeLine{00040\ }
+\DoxyCodeLine{00041\ \ \ \mbox{\hyperlink{structck__function__list}{CK\_FUNCTION\_LIST\_PTR}}\ \mbox{\hyperlink{ecdh__derive__test_8c_ae257f08ea2453d2bdf88f8466c8abed3}{p11}};}
+\DoxyCodeLine{00042\ \ \ CK\_RV\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9dbb22e3510dddb1ebb576404a972e7d}{rv}}\ =\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_1_1eosvmoc_ac6593044ffde3f1589b705c6e21f342d}{fn}}(\&\mbox{\hyperlink{ecdh__derive__test_8c_ae257f08ea2453d2bdf88f8466c8abed3}{p11}});}
+\DoxyCodeLine{00043\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9dbb22e3510dddb1ebb576404a972e7d}{rv}}\ ==\ \mbox{\hyperlink{pkcs11_8h_a41f4ccf8d6aeae2795be204b4f91c076}{CKR\_OK}});}
+\DoxyCodeLine{00044\ }
+\DoxyCodeLine{00045\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9dbb22e3510dddb1ebb576404a972e7d}{rv}}\ =\ \mbox{\hyperlink{ecdh__derive__test_8c_ae257f08ea2453d2bdf88f8466c8abed3}{p11}}-\/>\mbox{\hyperlink{structck__function__list_aa4ef3b01ad464e36a97e3aa6ae0dcf16}{C\_Initialize}}(\mbox{\hyperlink{pkcs11_8h_a530f11a96e508d171d28564c8dc20942}{NULL\_PTR}});}
+\DoxyCodeLine{00046\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9dbb22e3510dddb1ebb576404a972e7d}{rv}}\ ==\ \mbox{\hyperlink{pkcs11_8h_a41f4ccf8d6aeae2795be204b4f91c076}{CKR\_OK}});}
+\DoxyCodeLine{00047\ }
+\DoxyCodeLine{00048\ \ \ CK\_SESSION\_HANDLE\ \mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}};}
+\DoxyCodeLine{00049\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9dbb22e3510dddb1ebb576404a972e7d}{rv}}\ =\ \mbox{\hyperlink{ecdh__derive__test_8c_ae257f08ea2453d2bdf88f8466c8abed3}{p11}}-\/>\mbox{\hyperlink{structck__function__list_a030193a606c75034a060b73bd21facdb}{C\_OpenSession}}(0,\ \mbox{\hyperlink{pkcs11_8h_a910c33108d07cc3aee7c22d65b83d2ee}{CKF\_SERIAL\_SESSION}}\ |\ \mbox{\hyperlink{pkcs11_8h_a49615820fe3b72c616fb71cfbe6957a4}{CKF\_RW\_SESSION}},\ NULL,\ NULL,}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}});}
+\DoxyCodeLine{00051\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9dbb22e3510dddb1ebb576404a972e7d}{rv}}\ ==\ \mbox{\hyperlink{pkcs11_8h_a41f4ccf8d6aeae2795be204b4f91c076}{CKR\_OK}});}
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *password\ =\ \textcolor{stringliteral}{"{}0001password"{}};}
+\DoxyCodeLine{00054\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9dbb22e3510dddb1ebb576404a972e7d}{rv}}\ =\ \mbox{\hyperlink{ecdh__derive__test_8c_ae257f08ea2453d2bdf88f8466c8abed3}{p11}}-\/>\mbox{\hyperlink{structck__function__list_a263cb125f36f7ffb588fc15d37a7a8ca}{C\_Login}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}},\ \mbox{\hyperlink{pkcs11_8h_a500f51010fbd16496f3e62add2aff700}{CKU\_USER}},\ (\mbox{\hyperlink{pkcs11_8h_aee7068a12537d85d824edb4249e7ca4e}{CK\_UTF8CHAR\_PTR}})\ password,}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{pkcs11_8h_a35181858a3b7a0a81f49d180d8f446ef}{CK\_ULONG}})\ strlen(password));}
+\DoxyCodeLine{00056\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9dbb22e3510dddb1ebb576404a972e7d}{rv}}\ ==\ \mbox{\hyperlink{pkcs11_8h_a41f4ccf8d6aeae2795be204b4f91c076}{CKR\_OK}});}
+\DoxyCodeLine{00057\ }
+\DoxyCodeLine{00058\ \ \ \mbox{\hyperlink{structck__mechanism}{CK\_MECHANISM}}\ \mbox{\hyperlink{structmechanism}{mechanism}}\ =\ \{\mbox{\hyperlink{pkcs11_8h_a3afa7970e62cb983de2f2b46af9ac43f}{CKM\_RSA\_PKCS\_KEY\_PAIR\_GEN}},\ \mbox{\hyperlink{pkcs11_8h_a530f11a96e508d171d28564c8dc20942}{NULL\_PTR}},\ 0\};}
+\DoxyCodeLine{00059\ \ \ \mbox{\hyperlink{pkcs11_8h_a35181858a3b7a0a81f49d180d8f446ef}{CK\_ULONG}}\ modulus\ =\ 2048;}
+\DoxyCodeLine{00060\ \ \ \mbox{\hyperlink{pkcs11_8h_a51e605f881c86838bf12d70707b57b85}{CK\_BYTE}}\ exponent[]\ =\ \{0x00,\ 0x1,\ 0x0,\ 0x1\};\ \textcolor{comment}{//\ 65537}}
+\DoxyCodeLine{00061\ \ \ \mbox{\hyperlink{pkcs11_8h_a51e605f881c86838bf12d70707b57b85}{CK\_BYTE}}\ \textcolor{keywordtype}{id}[]\ =\ \{0\};}
+\DoxyCodeLine{00062\ \ \ \mbox{\hyperlink{pkcs11_8h_a9dc289e62be691f41a9c6b875789b1f2}{CK\_BBOOL}}\ ck\_true\ =\ \mbox{\hyperlink{pkcs11_8h_a76edf786ed8cccb1b3d2cf9e9f0800cd}{CK\_TRUE}};}
+\DoxyCodeLine{00063\ \ \ \mbox{\hyperlink{pkcs11_8h_a9dc289e62be691f41a9c6b875789b1f2}{CK\_BBOOL}}\ ck\_false\ =\ \mbox{\hyperlink{pkcs11_8h_a1df8841072c48f0b511ccad3bbb25812}{CK\_FALSE}};}
+\DoxyCodeLine{00064\ }
+\DoxyCodeLine{00065\ \ \ \mbox{\hyperlink{structck__attribute}{CK\_ATTRIBUTE}}\ publicKeyTemplate[]\ =\ \{}
+\DoxyCodeLine{00066\ \ \ \ \ \{\mbox{\hyperlink{pkcs11_8h_ad427016a08d7b8f0d8fe910b907e9b44}{CKA\_ENCRYPT}},\ \&ck\_true,\ \textcolor{keyword}{sizeof}(ck\_true)\},}
+\DoxyCodeLine{00067\ \ \ \ \ \{\mbox{\hyperlink{pkcs11_8h_aa26224c75961163975e3de4347940401}{CKA\_DECRYPT}},\ \&ck\_false,\ \textcolor{keyword}{sizeof}(ck\_false)\},}
+\DoxyCodeLine{00068\ \ \ \ \ \{\mbox{\hyperlink{pkcs11_8h_a6ffd14ad7386d9aa7178e841a964a87e}{CKA\_SIGN}},\ \&ck\_false,\ \textcolor{keyword}{sizeof}(ck\_false)\},}
+\DoxyCodeLine{00069\ \ \ \ \ \{\mbox{\hyperlink{pkcs11_8h_a84c89cd9def639cb4a58145063b7bd42}{CKA\_VERIFY}},\ \&ck\_true,\ \textcolor{keyword}{sizeof}(ck\_true)\},}
+\DoxyCodeLine{00070\ \ \ \ \ \{\mbox{\hyperlink{pkcs11_8h_af7a34bb656aa7e2b7e813dab0a6ac7b7}{CKA\_WRAP}},\ \&ck\_true,\ \textcolor{keyword}{sizeof}(ck\_true)\},}
+\DoxyCodeLine{00071\ \ \ \ \ \{\mbox{\hyperlink{pkcs11_8h_a9a9a988131e4e93d0758e43c555bdc97}{CKA\_UNWRAP}},\ \&ck\_false,\ \textcolor{keyword}{sizeof}(ck\_false)\},}
+\DoxyCodeLine{00072\ \ \ \ \ \{\mbox{\hyperlink{pkcs11_8h_a05c1c460160443a739c6e0ce47ae3fc8}{CKA\_TOKEN}},\ \&ck\_true,\ \textcolor{keyword}{sizeof}(ck\_true)\},}
+\DoxyCodeLine{00073\ \ \ \ \ \{\mbox{\hyperlink{pkcs11_8h_a5244a0b0719c79614044460bdcf34d11}{CKA\_PRIVATE}},\ \&ck\_true,\ \textcolor{keyword}{sizeof}(ck\_true)\},}
+\DoxyCodeLine{00074\ \ \ \ \ \{\mbox{\hyperlink{pkcs11_8h_acf37955a2a229d208289962c6f1183b8}{CKA\_EXTRACTABLE}},\ \&ck\_true,\ \textcolor{keyword}{sizeof}(ck\_true)\},}
+\DoxyCodeLine{00075\ \ \ \ \ \{\mbox{\hyperlink{pkcs11_8h_a39688e3f665848ca7868f2ca37aa1aed}{CKA\_MODIFIABLE}},\ \&ck\_false,\ \textcolor{keyword}{sizeof}(ck\_false)\},}
+\DoxyCodeLine{00076\ \ \ \ \ \{\mbox{\hyperlink{pkcs11_8h_a92925cbe2a1b3d50dd56f8af0f770a69}{CKA\_COPYABLE}},\ \&ck\_false,\ \textcolor{keyword}{sizeof}(ck\_false)\},}
+\DoxyCodeLine{00077\ \ \ \ \ \{\mbox{\hyperlink{pkcs11_8h_ab495c20657f01d79e1a6ca49d2c8472e}{CKA\_DESTROYABLE}},\ \&ck\_true,\ \textcolor{keyword}{sizeof}(ck\_true)\},}
+\DoxyCodeLine{00078\ \ \ \ \ \{\mbox{\hyperlink{pkcs11_8h_a2846a5a41835defa47716ccc3bcc4913}{CKA\_ID}},\ \mbox{\hyperlink{code__cache_8cpp_aa0efefe21f4700d78692edc823e763be}{id}},\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{code__cache_8cpp_aa0efefe21f4700d78692edc823e763be}{id}})\},}
+\DoxyCodeLine{00079\ \ \ \ \ \{\mbox{\hyperlink{pkcs11_8h_ace277af7e7da877d65a25411a22a6b39}{CKA\_MODULUS\_BITS}},\ \&modulus,\ \textcolor{keyword}{sizeof}(modulus)\},}
+\DoxyCodeLine{00080\ \ \ \ \ \{\mbox{\hyperlink{pkcs11_8h_a3560a0897e67ea3584c5e5d6b49997a9}{CKA\_PUBLIC\_EXPONENT}},\ exponent,\ \textcolor{keyword}{sizeof}(exponent)\},}
+\DoxyCodeLine{00081\ \ \ \};}
+\DoxyCodeLine{00082\ \ \ \mbox{\hyperlink{pkcs11_8h_a35181858a3b7a0a81f49d180d8f446ef}{CK\_ULONG}}\ publicKeyAttributeCount\ =}
+\DoxyCodeLine{00083\ \ \ \ \ \textcolor{keyword}{sizeof}(publicKeyTemplate)\ /\ \textcolor{keyword}{sizeof}(publicKeyTemplate[0]);}
+\DoxyCodeLine{00084\ }
+\DoxyCodeLine{00085\ \ \ \mbox{\hyperlink{structck__attribute}{CK\_ATTRIBUTE}}\ privateKeyTemplate[]\ =\ \{}
+\DoxyCodeLine{00086\ \ \ \ \ \{\mbox{\hyperlink{pkcs11_8h_ad427016a08d7b8f0d8fe910b907e9b44}{CKA\_ENCRYPT}},\ \&ck\_false,\ \textcolor{keyword}{sizeof}(ck\_false)\},}
+\DoxyCodeLine{00087\ \ \ \ \ \{\mbox{\hyperlink{pkcs11_8h_aa26224c75961163975e3de4347940401}{CKA\_DECRYPT}},\ \&ck\_true,\ \textcolor{keyword}{sizeof}(ck\_true)\},}
+\DoxyCodeLine{00088\ \ \ \ \ \{\mbox{\hyperlink{pkcs11_8h_a6ffd14ad7386d9aa7178e841a964a87e}{CKA\_SIGN}},\ \&ck\_true,\ \textcolor{keyword}{sizeof}(ck\_true)\},}
+\DoxyCodeLine{00089\ \ \ \ \ \{\mbox{\hyperlink{pkcs11_8h_a84c89cd9def639cb4a58145063b7bd42}{CKA\_VERIFY}},\ \&ck\_false,\ \textcolor{keyword}{sizeof}(ck\_false)\},}
+\DoxyCodeLine{00090\ \ \ \ \ \{\mbox{\hyperlink{pkcs11_8h_af7a34bb656aa7e2b7e813dab0a6ac7b7}{CKA\_WRAP}},\ \&ck\_false,\ \textcolor{keyword}{sizeof}(ck\_false)\},}
+\DoxyCodeLine{00091\ \ \ \ \ \{\mbox{\hyperlink{pkcs11_8h_a9a9a988131e4e93d0758e43c555bdc97}{CKA\_UNWRAP}},\ \&ck\_true,\ \textcolor{keyword}{sizeof}(ck\_true)\},}
+\DoxyCodeLine{00092\ \ \ \ \ \{\mbox{\hyperlink{pkcs11_8h_a05c1c460160443a739c6e0ce47ae3fc8}{CKA\_TOKEN}},\ \&ck\_true,\ \textcolor{keyword}{sizeof}(ck\_true)\},}
+\DoxyCodeLine{00093\ \ \ \ \ \{\mbox{\hyperlink{pkcs11_8h_a5244a0b0719c79614044460bdcf34d11}{CKA\_PRIVATE}},\ \&ck\_true,\ \textcolor{keyword}{sizeof}(ck\_true)\},}
+\DoxyCodeLine{00094\ \ \ \ \ \{\mbox{\hyperlink{pkcs11_8h_acf37955a2a229d208289962c6f1183b8}{CKA\_EXTRACTABLE}},\ \&ck\_true,\ \textcolor{keyword}{sizeof}(ck\_true)\},}
+\DoxyCodeLine{00095\ \ \ \ \ \{\mbox{\hyperlink{pkcs11_8h_a39688e3f665848ca7868f2ca37aa1aed}{CKA\_MODIFIABLE}},\ \&ck\_false,\ \textcolor{keyword}{sizeof}(ck\_false)\},}
+\DoxyCodeLine{00096\ \ \ \ \ \{\mbox{\hyperlink{pkcs11_8h_a92925cbe2a1b3d50dd56f8af0f770a69}{CKA\_COPYABLE}},\ \&ck\_false,\ \textcolor{keyword}{sizeof}(ck\_false)\},}
+\DoxyCodeLine{00097\ \ \ \ \ \{\mbox{\hyperlink{pkcs11_8h_ab495c20657f01d79e1a6ca49d2c8472e}{CKA\_DESTROYABLE}},\ \&ck\_true,\ \textcolor{keyword}{sizeof}(ck\_true)\},}
+\DoxyCodeLine{00098\ \ \ \ \ \{\mbox{\hyperlink{pkcs11_8h_a2846a5a41835defa47716ccc3bcc4913}{CKA\_ID}},\ \mbox{\hyperlink{code__cache_8cpp_aa0efefe21f4700d78692edc823e763be}{id}},\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{code__cache_8cpp_aa0efefe21f4700d78692edc823e763be}{id}})\},}
+\DoxyCodeLine{00099\ \ \ \};}
+\DoxyCodeLine{00100\ \ \ \mbox{\hyperlink{pkcs11_8h_a35181858a3b7a0a81f49d180d8f446ef}{CK\_ULONG}}\ privateKeyAttributeCount\ =}
+\DoxyCodeLine{00101\ \ \ \ \ \textcolor{keyword}{sizeof}(privateKeyTemplate)\ /\ \textcolor{keyword}{sizeof}(privateKeyTemplate[0]);}
+\DoxyCodeLine{00102\ }
+\DoxyCodeLine{00103\ \ \ CK\_OBJECT\_HANDLE\ publicKey,\ privateKey;}
+\DoxyCodeLine{00104\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9dbb22e3510dddb1ebb576404a972e7d}{rv}}\ =}
+\DoxyCodeLine{00105\ \ \ \ \ \mbox{\hyperlink{ecdh__derive__test_8c_ae257f08ea2453d2bdf88f8466c8abed3}{p11}}-\/>\mbox{\hyperlink{structck__function__list_a2f09ffe3f31a75396ccf9f633a0014d5}{C\_GenerateKeyPair}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}},\ \&\mbox{\hyperlink{structmechanism}{mechanism}},\ publicKeyTemplate,}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ publicKeyAttributeCount,\ privateKeyTemplate,}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ privateKeyAttributeCount,\ \&publicKey,\ \&privateKey);}
+\DoxyCodeLine{00108\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9dbb22e3510dddb1ebb576404a972e7d}{rv}}\ ==\ \mbox{\hyperlink{pkcs11_8h_a41f4ccf8d6aeae2795be204b4f91c076}{CKR\_OK}});}
+\DoxyCodeLine{00109\ }
+\DoxyCodeLine{00110\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9dbb22e3510dddb1ebb576404a972e7d}{rv}}\ =\ \mbox{\hyperlink{ecdh__derive__test_8c_ae257f08ea2453d2bdf88f8466c8abed3}{p11}}-\/>\mbox{\hyperlink{structck__function__list_aab127b12c6fd9b0d30ea5f0997d8a516}{C\_Logout}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}});}
+\DoxyCodeLine{00111\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9dbb22e3510dddb1ebb576404a972e7d}{rv}}\ ==\ \mbox{\hyperlink{pkcs11_8h_a41f4ccf8d6aeae2795be204b4f91c076}{CKR\_OK}});}
+\DoxyCodeLine{00112\ }
+\DoxyCodeLine{00113\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9dbb22e3510dddb1ebb576404a972e7d}{rv}}\ =\ \mbox{\hyperlink{ecdh__derive__test_8c_ae257f08ea2453d2bdf88f8466c8abed3}{p11}}-\/>\mbox{\hyperlink{structck__function__list_ae597c8329727b35c6d46d3c50b05a5ad}{C\_Finalize}}(NULL);}
+\DoxyCodeLine{00114\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9dbb22e3510dddb1ebb576404a972e7d}{rv}}\ ==\ \mbox{\hyperlink{pkcs11_8h_a41f4ccf8d6aeae2795be204b4f91c076}{CKR\_OK}});}
+\DoxyCodeLine{00115\ }
+\DoxyCodeLine{00116\ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00117\ \}}
+
+\end{DoxyCode}

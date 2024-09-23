@@ -1,0 +1,81 @@
+\doxysection{multiexp.\+hpp}
+\hypertarget{multiexp_8hpp_source}{}\label{multiexp_8hpp_source}\index{libraries/fc/libraries/ff/libff/algebra/scalar\_multiplication/multiexp.hpp@{libraries/fc/libraries/ff/libff/algebra/scalar\_multiplication/multiexp.hpp}}
+\mbox{\hyperlink{multiexp_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00001}00001\ }
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00012}00012\ \textcolor{preprocessor}{\#ifndef\ MULTIEXP\_HPP\_}}
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00013}00013\ \textcolor{preprocessor}{\#define\ MULTIEXP\_HPP\_}}
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00015}00015\ \textcolor{preprocessor}{\#include\ <cstddef>}}
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00016}00016\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00018}00018\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacelibff}{libff}}\ \{}
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00020}\mbox{\hyperlink{namespacelibff_a8b13cbb28debbfc9b15e779d932e6709}{00020}}\ \textcolor{keyword}{enum}\ \mbox{\hyperlink{namespacelibff_a8b13cbb28debbfc9b15e779d932e6709}{multi\_exp\_method}}\ \{}
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00027}\mbox{\hyperlink{namespacelibff_a8b13cbb28debbfc9b15e779d932e6709a5d2a4bc1e1ab45b4ffa5c6a20d58aa00}{00027}}\ \ \mbox{\hyperlink{namespacelibff_a8b13cbb28debbfc9b15e779d932e6709a5d2a4bc1e1ab45b4ffa5c6a20d58aa00}{multi\_exp\_method\_naive}},}
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00028}\mbox{\hyperlink{namespacelibff_a8b13cbb28debbfc9b15e779d932e6709a4c2c60a6b4df4c8f25b6e52ea14d6af7}{00028}}\ \ \mbox{\hyperlink{namespacelibff_a8b13cbb28debbfc9b15e779d932e6709a4c2c60a6b4df4c8f25b6e52ea14d6af7}{multi\_exp\_method\_naive\_plain}},}
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00036}\mbox{\hyperlink{namespacelibff_a8b13cbb28debbfc9b15e779d932e6709a75e268760f0d304913ac248cc9140b99}{00036}}\ \ \mbox{\hyperlink{namespacelibff_a8b13cbb28debbfc9b15e779d932e6709a75e268760f0d304913ac248cc9140b99}{multi\_exp\_method\_bos\_coster}},}
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00046}00046\ \ \mbox{\hyperlink{namespacelibff_a8b13cbb28debbfc9b15e779d932e6709a6e49f3c8c08e9f085c84e965193e2678}{multi\_exp\_method\_BDLO12}}}
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00047}\mbox{\hyperlink{namespacelibff_a8b13cbb28debbfc9b15e779d932e6709a6e49f3c8c08e9f085c84e965193e2678}{00047}}\ \};}
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00056}00056\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T,\ \textcolor{keyword}{typename}\ FieldT,\ multi\_exp\_method\ Method>}
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00057}\mbox{\hyperlink{namespacelibff_a909c5131f90d7c9c35b61ca332f08f3a}{00057}}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \mbox{\hyperlink{namespacelibff_a909c5131f90d7c9c35b61ca332f08f3a}{multi\_exp}}(\textcolor{keyword}{typename}\ std::vector<T>::const\_iterator\ vec\_start,}
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typename}\ std::vector<T>::const\_iterator\ vec\_end,}
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00059}00059\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typename}\ std::vector<FieldT>::const\_iterator\ scalar\_start,}
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typename}\ std::vector<FieldT>::const\_iterator\ scalar\_end,}
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00061}00061\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ chunks);}
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00062}00062\ }
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00070}00070\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T,\ \textcolor{keyword}{typename}\ FieldT,\ multi\_exp\_method\ Method>}
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00071}\mbox{\hyperlink{namespacelibff_a59cfa5c66864b8df6629463fa3204ad9}{00071}}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \mbox{\hyperlink{namespacelibff_a59cfa5c66864b8df6629463fa3204ad9}{multi\_exp\_with\_mixed\_addition}}(\textcolor{keyword}{typename}\ std::vector<T>::const\_iterator\ vec\_start,}
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typename}\ std::vector<T>::const\_iterator\ vec\_end,}
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00073}00073\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typename}\ std::vector<FieldT>::const\_iterator\ scalar\_start,}
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00074}00074\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typename}\ std::vector<FieldT>::const\_iterator\ scalar\_end,}
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00075}00075\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ chunks);}
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00076}00076\ }
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00081}00081\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00082}\mbox{\hyperlink{namespacelibff_acc3b299d0acfbd0b749d384653d038ca}{00082}}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \mbox{\hyperlink{namespacelibff_acc3b299d0acfbd0b749d384653d038ca}{inner\_product}}(\textcolor{keyword}{typename}\ std::vector<T>::const\_iterator\ a\_start,}
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00083}00083\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typename}\ std::vector<T>::const\_iterator\ a\_end,}
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00084}00084\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typename}\ std::vector<T>::const\_iterator\ b\_start,}
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00085}00085\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typename}\ std::vector<T>::const\_iterator\ b\_end);}
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00086}00086\ }
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00090}00090\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00091}\mbox{\hyperlink{namespacelibff_ae2da5078a791e479288d45840951d2c1}{00091}}\ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacelibff_ae2da5078a791e479288d45840951d2c1}{window\_table}}\ =\ std::vector<std::vector<T>\ >;}
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00092}00092\ }
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00096}00096\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00097}\mbox{\hyperlink{namespacelibff_a6ef00b911649f5afe44043edb12bbcc5}{00097}}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{namespacelibff_a6ef00b911649f5afe44043edb12bbcc5}{get\_exp\_window\_size}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ num\_scalars);}
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00098}00098\ }
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00102}00102\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00103}\mbox{\hyperlink{namespacelibff_ab6cfc931e0f4fc09167d495fcec13fc1}{00103}}\ \mbox{\hyperlink{namespacelibff_ae2da5078a791e479288d45840951d2c1}{window\_table<T>}}\ \mbox{\hyperlink{namespacelibff_ab6cfc931e0f4fc09167d495fcec13fc1}{get\_window\_table}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ scalar\_size,}
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00104}00104\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ window,}
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00105}00105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \&g);}
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00106}00106\ }
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00107}00107\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T,\ \textcolor{keyword}{typename}\ FieldT>}
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00108}\mbox{\hyperlink{namespacelibff_aca693a14a7bfc9ca7aecb07b1eca191e}{00108}}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \mbox{\hyperlink{namespacelibff_aca693a14a7bfc9ca7aecb07b1eca191e}{windowed\_exp}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ scalar\_size,}
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00109}00109\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ window,}
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00110}00110\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacelibff_ae2da5078a791e479288d45840951d2c1}{window\_table<T>}}\ \&powers\_of\_g,}
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00111}00111\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ FieldT\ \&pow);}
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00112}00112\ }
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00113}00113\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T,\ \textcolor{keyword}{typename}\ FieldT>}
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00114}\mbox{\hyperlink{namespacelibff_a10b991f0b9a5a182c3406da710152edf}{00114}}\ std::vector<T>\ \mbox{\hyperlink{namespacelibff_a10b991f0b9a5a182c3406da710152edf}{batch\_exp}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ scalar\_size,}
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00115}00115\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ window,}
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00116}00116\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacelibff_ae2da5078a791e479288d45840951d2c1}{window\_table<T>}}\ \&table,}
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00117}00117\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::vector<FieldT>\ \&v);}
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00118}00118\ }
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00119}00119\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T,\ \textcolor{keyword}{typename}\ FieldT>}
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00120}\mbox{\hyperlink{namespacelibff_a44c6faf7a967b6b4acf6fe3f8d9242e5}{00120}}\ std::vector<T>\ \mbox{\hyperlink{namespacelibff_a44c6faf7a967b6b4acf6fe3f8d9242e5}{batch\_exp\_with\_coeff}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ scalar\_size,}
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00121}00121\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ window,}
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00122}00122\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacelibff_ae2da5078a791e479288d45840951d2c1}{window\_table<T>}}\ \&table,}
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00123}00123\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ FieldT\ \&coeff,}
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00124}00124\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::vector<FieldT>\ \&v);}
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00125}00125\ }
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00126}00126\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00127}\mbox{\hyperlink{namespacelibff_ad81731c8656ecf3757bddb5be46ef979}{00127}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacelibff_ad81731c8656ecf3757bddb5be46ef979}{batch\_to\_special}}(std::vector<T>\ \&vec);}
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00128}00128\ }
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00129}00129\ \}\ \textcolor{comment}{//\ libff}}
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00130}00130\ }
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00131}00131\ \textcolor{preprocessor}{\#include\ <libff/algebra/scalar\_multiplication/multiexp.tcc>}}
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00132}00132\ }
+\DoxyCodeLine{\Hypertarget{multiexp_8hpp_source_l00133}00133\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ MULTIEXP\_HPP\_}}
+
+\end{DoxyCode}

@@ -1,0 +1,68 @@
+\doxysection{testing\+::internal\+::Invoke\+Method\+Without\+Args\+Action\texorpdfstring{$<$}{<} Class, Method\+Ptr \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classtesting_1_1internal_1_1_invoke_method_without_args_action}{}\label{classtesting_1_1internal_1_1_invoke_method_without_args_action}\index{testing::internal::InvokeMethodWithoutArgsAction$<$ Class, MethodPtr $>$@{testing::internal::InvokeMethodWithoutArgsAction$<$ Class, MethodPtr $>$}}
+
+
+{\ttfamily \#include $<$gmock-\/actions.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_invoke_method_without_args_action_ac4d655e386f47a96c7a6e1670b20e991}{Invoke\+Method\+Without\+Args\+Action}} (Class \texorpdfstring{$\ast$}{*}obj\+\_\+ptr, Method\+Ptr method\+\_\+ptr)
+\item 
+{\footnotesize template$<$typename Result , typename Argument\+Tuple $>$ }\\Result \mbox{\hyperlink{classtesting_1_1internal_1_1_invoke_method_without_args_action_a9915e4f7a064e00b7798216644670b52}{Perform}} (const Argument\+Tuple \&) const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} Class, typename Method\+Ptr$>$\newline
+class testing\+::internal\+::\+Invoke\+Method\+Without\+Args\+Action$<$ Class, Method\+Ptr $>$}
+
+
+Definition at line \mbox{\hyperlink{gmock-actions_8h_source_l00900}{900}} of file \mbox{\hyperlink{gmock-actions_8h_source}{gmock-\/actions.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_invoke_method_without_args_action_ac4d655e386f47a96c7a6e1670b20e991}\index{testing::internal::InvokeMethodWithoutArgsAction$<$ Class, MethodPtr $>$@{testing::internal::InvokeMethodWithoutArgsAction$<$ Class, MethodPtr $>$}!InvokeMethodWithoutArgsAction@{InvokeMethodWithoutArgsAction}}
+\index{InvokeMethodWithoutArgsAction@{InvokeMethodWithoutArgsAction}!testing::internal::InvokeMethodWithoutArgsAction$<$ Class, MethodPtr $>$@{testing::internal::InvokeMethodWithoutArgsAction$<$ Class, MethodPtr $>$}}
+\doxysubsubsection{\texorpdfstring{InvokeMethodWithoutArgsAction()}{InvokeMethodWithoutArgsAction()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_invoke_method_without_args_action_ac4d655e386f47a96c7a6e1670b20e991} 
+template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} Class , typename Method\+Ptr $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_invoke_method_without_args_action}{testing\+::internal\+::\+Invoke\+Method\+Without\+Args\+Action}}$<$ Class, Method\+Ptr $>$\+::\+Invoke\+Method\+Without\+Args\+Action (\begin{DoxyParamCaption}\item[{Class \texorpdfstring{$\ast$}{*}}]{obj\+\_\+ptr}{, }\item[{Method\+Ptr}]{method\+\_\+ptr}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-actions_8h_source_l00902}{902}} of file \mbox{\hyperlink{gmock-actions_8h_source}{gmock-\/actions.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00903\ \ \ \ \ \ \ :\ obj\_ptr\_(obj\_ptr),\ method\_ptr\_(method\_ptr)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_invoke_method_without_args_action_a9915e4f7a064e00b7798216644670b52}\index{testing::internal::InvokeMethodWithoutArgsAction$<$ Class, MethodPtr $>$@{testing::internal::InvokeMethodWithoutArgsAction$<$ Class, MethodPtr $>$}!Perform@{Perform}}
+\index{Perform@{Perform}!testing::internal::InvokeMethodWithoutArgsAction$<$ Class, MethodPtr $>$@{testing::internal::InvokeMethodWithoutArgsAction$<$ Class, MethodPtr $>$}}
+\doxysubsubsection{\texorpdfstring{Perform()}{Perform()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_invoke_method_without_args_action_a9915e4f7a064e00b7798216644670b52} 
+template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} Class , typename Method\+Ptr $>$ \\
+template$<$typename Result , typename Argument\+Tuple $>$ \\
+Result \mbox{\hyperlink{classtesting_1_1internal_1_1_invoke_method_without_args_action}{testing\+::internal\+::\+Invoke\+Method\+Without\+Args\+Action}}$<$ Class, Method\+Ptr $>$\+::\+Perform (\begin{DoxyParamCaption}\item[{const Argument\+Tuple \&}]{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-actions_8h_source_l00906}{906}} of file \mbox{\hyperlink{gmock-actions_8h_source}{gmock-\/actions.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00906\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00907\ \ \ \ \ \textcolor{keywordflow}{return}\ (obj\_ptr\_-\/>*method\_ptr\_)();}
+\DoxyCodeLine{00908\ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/include/gmock/\mbox{\hyperlink{gmock-actions_8h}{gmock-\/actions.\+h}}\end{DoxyCompactItemize}

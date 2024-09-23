@@ -1,0 +1,7 @@
+<map id="f32_roundToInt" name="f32_roundToInt">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,113,31"/>
+<area shape="rect" id="Node000002" href="$softfloat_2source_28086-_s_s_e_2s__propagate_na_n_f32_u_i_8c.html#ab7ccb9ad1e4fd7bb7f009c32a03248f3" title=" " alt="" coords="161,5,356,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="113,16,145,16,145,21,113,21"/>
+<area shape="rect" id="Node000003" href="$softfloat_2source_28086-_s_s_e_2softfloat__raise_flags_8c.html#ac16bbf09eca0fe8ff91301d82c5a667f" title=" " alt="" coords="404,5,539,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="356,16,389,16,389,21,356,21"/>
+</map>

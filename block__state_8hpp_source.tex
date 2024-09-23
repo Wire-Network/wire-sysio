@@ -1,0 +1,76 @@
+\doxysection{block\+\_\+state.\+hpp}
+\hypertarget{block__state_8hpp_source}{}\label{block__state_8hpp_source}\index{libraries/chain/include/sysio/chain/block\_state.hpp@{libraries/chain/include/sysio/chain/block\_state.hpp}}
+\mbox{\hyperlink{block__state_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{block__header__state_8hpp}{sysio/chain/block\_header\_state.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{block_8hpp}{sysio/chain/block.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{transaction__metadata_8hpp}{sysio/chain/transaction\_metadata.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{action__receipt_8hpp}{sysio/chain/action\_receipt.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00008}00008\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{\ \textcolor{keyword}{namespace\ }chain\ \{}
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00010}\mbox{\hyperlink{structsysio_1_1chain_1_1block__state}{00010}}\ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structsysio_1_1chain_1_1block__state}{block\_state}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{structsysio_1_1chain_1_1block__header__state}{block\_header\_state}}\ \{}
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00011}00011\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1block__state_adda90ba2fcd3cef50e560b2871d97dc4}{block\_state}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1block__header__state}{block\_header\_state}}\&\ \mbox{\hyperlink{structsysio_1_1chain_1_1block__header__state_aa04eb1de498c4f32522020819d039eee}{prev}},}
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00012}00012\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_aa10ee348c57604b615bc8570f6685102}{signed\_block\_ptr}}\ b,}
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00013}00013\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1chain_1_1protocol__feature__set}{protocol\_feature\_set}}\&\ pfs,}
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00014}00014\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::function<\textcolor{keywordtype}{void}(\ \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{block\_timestamp\_type}},}
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00015}00015\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ flat\_set<digest\_type>\&,}
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00016}00016\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1vector}{vector<digest\_type>}}\&\ )>\&\ validator,}
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00017}00017\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ skip\_validate\_signee}
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00018}00018\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00020}00020\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1block__state_adda90ba2fcd3cef50e560b2871d97dc4}{block\_state}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1pending__block__header__state}{pending\_block\_header\_state}}\&\&\ cur,}
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00021}00021\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_aa10ee348c57604b615bc8570f6685102}{signed\_block\_ptr}}\&\&\ b,\ \textcolor{comment}{//\ unsigned\ block}}
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00022}00022\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1vector}{vector<transaction\_metadata\_ptr>}}\&\&\ trx\_metas,}
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00023}00023\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1chain_1_1protocol__feature__set}{protocol\_feature\_set}}\&\ pfs,}
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00024}00024\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::function<\textcolor{keywordtype}{void}(\ \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{block\_timestamp\_type}},}
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00025}00025\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ flat\_set<digest\_type>\&,}
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00026}00026\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1vector}{vector<digest\_type>}}\&\ )>\&\ validator,}
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00027}00027\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_a2cfc12be90aaa9b98843b120fecc71b0}{signer\_callback\_type}}\&\ signer}
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00028}00028\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00030}\mbox{\hyperlink{structsysio_1_1chain_1_1block__state_adda90ba2fcd3cef50e560b2871d97dc4}{00030}}\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1block__state_adda90ba2fcd3cef50e560b2871d97dc4}{block\_state}}()\ =\ \textcolor{keywordflow}{default};}
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00033}\mbox{\hyperlink{structsysio_1_1chain_1_1block__state_ad8990c23fb472651541b5e19ec27bc59}{00033}}\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_aa10ee348c57604b615bc8570f6685102}{signed\_block\_ptr}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1block__state_ad8990c23fb472651541b5e19ec27bc59}{block}};}
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00035}00035\ \ \ \ \textcolor{keyword}{private}:\ \textcolor{comment}{//\ internal\ use\ only,\ not\ thread\ safe}}
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00036}00036\ \ \ \ \ \ \ \textcolor{keyword}{friend}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structfc_1_1reflector}{fc::reflector}}<\mbox{\hyperlink{structsysio_1_1chain_1_1block__state}{block\_state}}>;}
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00037}00037\ \ \ \ \ \ \ \textcolor{keyword}{friend}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{structsysio_1_1chain_1_1block__state_a2bdaf0dc4427a3ebfb592021005f3ab0}{block\_state\_is\_valid}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1block__state}{block\_state}}\&\ );\ \textcolor{comment}{//\ work-\/around\ for\ multi-\/index\ access}}
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00038}\mbox{\hyperlink{structsysio_1_1chain_1_1block__state_afacea5f421e7b989103659e2e5fa3353}{00038}}\ \ \ \ \ \ \ \textcolor{keyword}{friend}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structsysio_1_1chain_1_1controller__impl}{controller\_impl}};}
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00039}\mbox{\hyperlink{structsysio_1_1chain_1_1block__state_aaa38e361bb81abe78ee9fe3bc534be22}{00039}}\ \ \ \ \ \ \ \textcolor{keyword}{friend}\ \textcolor{keyword}{class\ \ }\mbox{\hyperlink{classsysio_1_1chain_1_1fork__database}{fork\_database}};}
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00040}\mbox{\hyperlink{structsysio_1_1chain_1_1block__state_a5b3dca45ddaff523477818f42ee53027}{00040}}\ \ \ \ \ \ \ \textcolor{keyword}{friend}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl}{fork\_database\_impl}};}
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00041}\mbox{\hyperlink{structsysio_1_1chain_1_1block__state_a7e14a979703f2b90178bef9bb977235c}{00041}}\ \ \ \ \ \ \ \textcolor{keyword}{friend}\ \textcolor{keyword}{class\ \ }\mbox{\hyperlink{classsysio_1_1chain_1_1unapplied__transaction__queue}{unapplied\_transaction\_queue}};}
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00042}\mbox{\hyperlink{structsysio_1_1chain_1_1block__state_a006807c6f5dfd5ea56d87ce4497c0816}{00042}}\ \ \ \ \ \ \ \textcolor{keyword}{friend}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structsysio_1_1chain_1_1pending__state}{pending\_state}};}
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00044}00044\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ is\_valid()\textcolor{keyword}{const\ }\{\ \textcolor{keywordflow}{return}\ validated;\ \}}
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00045}00045\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ is\_pub\_keys\_recovered()\textcolor{keyword}{const\ }\{\ \textcolor{keywordflow}{return}\ \_pub\_keys\_recovered;\ \}}
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00047}00047\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1vector}{vector<transaction\_metadata\_ptr>}}\ extract\_trxs\_metas()\ \{}
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \_pub\_keys\_recovered\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ result\ =\ std::move(\ \_cached\_trxs\ );}
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00050}00050\ \ \ \ \ \ \ \ \ \ \_cached\_trxs.clear();}
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00051}00051\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00052}00052\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00053}00053\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ set\_trxs\_metas(\ vector<transaction\_metadata\_ptr>\&\&\ trxs\_metas,\ \textcolor{keywordtype}{bool}\ keys\_recovered\ )\ \{}
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \_pub\_keys\_recovered\ =\ keys\_recovered;}
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \_cached\_trxs\ =\ std::move(\ trxs\_metas\ );}
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00056}00056\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00057}00057\ \ \ \ \ \ \ \textcolor{keyword}{const}\ vector<transaction\_metadata\_ptr>\&\ trxs\_metas()\textcolor{keyword}{const\ }\{\ \textcolor{keywordflow}{return}\ \_cached\_trxs;\ \}}
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00059}00059\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ validated\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00061}00061\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_pub\_keys\_recovered\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00064}00064\ \ \ \ \ \ \ vector<transaction\_metadata\_ptr>\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_cached\_trxs;}
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00065}00065\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00067}\mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{00067}}\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\_state\_ptr}}\ =\ std::shared\_ptr<block\_state>;}
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00068}\mbox{\hyperlink{namespacesysio_1_1chain_a3b287e6c2d3717609273c999ef660dea}{00068}}\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacesysio_1_1chain_a3b287e6c2d3717609273c999ef660dea}{branch\_type}}\ =\ deque<block\_state\_ptr>;}
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00069}00069\ }
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00070}00070\ \}\ \}\ }
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{block__state_8hpp_source_l00072}00072\ \mbox{\hyperlink{reflect_8hpp_abd9da6cfee7b98ef83fac107d13275c7}{FC\_REFLECT\_DERIVED}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1block__state}{sysio::chain::block\_state}},\ (\mbox{\hyperlink{structsysio_1_1chain_1_1block__header__state}{sysio::chain::block\_header\_state}}),\ (block)(validated)\ )}
+
+\end{DoxyCode}

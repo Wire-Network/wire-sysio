@@ -1,0 +1,154 @@
+\doxysection{fc\+::mapped\+\_\+region Class Reference}
+\hypertarget{classfc_1_1mapped__region}{}\label{classfc_1_1mapped__region}\index{fc::mapped\_region@{fc::mapped\_region}}
+
+
+{\ttfamily \#include $<$file\+\_\+mapping.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1mapped__region_a8f87bf8cb960123feef9b013a623715a}{mapped\+\_\+region}} (const \mbox{\hyperlink{classfc_1_1file__mapping}{file\+\_\+mapping}} \&fm, \mbox{\hyperlink{namespacefc_a3d8a2be677709cc41f09aa7925f2d55f}{mode\+\_\+t}} m, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} start, size\+\_\+t size)
+\item 
+\mbox{\hyperlink{classfc_1_1mapped__region_ad43d7360fca04ea8b119fead81d3affc}{mapped\+\_\+region}} (const \mbox{\hyperlink{classfc_1_1file__mapping}{file\+\_\+mapping}} \&fm, \mbox{\hyperlink{namespacefc_a3d8a2be677709cc41f09aa7925f2d55f}{mode\+\_\+t}} m)
+\item 
+\mbox{\hyperlink{classfc_1_1mapped__region_a279003a5dda2cec5510342756bfba272}{\texorpdfstring{$\sim$}{\string~}mapped\+\_\+region}} ()
+\item 
+void \mbox{\hyperlink{classfc_1_1mapped__region_a12ba94b8e57ff75abbf7cfd1ade01a84}{flush}} ()
+\item 
+void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classfc_1_1mapped__region_ae4c454063de929a27170d91e8c332ac6}{get\+\_\+address}} () const
+\item 
+size\+\_\+t \mbox{\hyperlink{classfc_1_1mapped__region_acecc565e9417b87b1ad8577b02b428cc}{get\+\_\+size}} () const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{file__mapping_8hpp_source_l00031}{31}} of file \mbox{\hyperlink{file__mapping_8hpp_source}{file\+\_\+mapping.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1mapped__region_a8f87bf8cb960123feef9b013a623715a}\index{fc::mapped\_region@{fc::mapped\_region}!mapped\_region@{mapped\_region}}
+\index{mapped\_region@{mapped\_region}!fc::mapped\_region@{fc::mapped\_region}}
+\doxysubsubsection{\texorpdfstring{mapped\_region()}{mapped\_region()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1mapped__region_a8f87bf8cb960123feef9b013a623715a} 
+fc\+::mapped\+\_\+region\+::mapped\+\_\+region (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1file__mapping}{file\+\_\+mapping}} \&}]{fm}{, }\item[{\mbox{\hyperlink{namespacefc_a3d8a2be677709cc41f09aa7925f2d55f}{mode\+\_\+t}}}]{m}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{start}{, }\item[{size\+\_\+t}]{size}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{file__mapping_8cpp_source_l00017}{17}} of file \mbox{\hyperlink{file__mapping_8cpp_source}{file\+\_\+mapping.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00017\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :}
+\DoxyCodeLine{00018\ \ \ \ \ my(\ *fm.my,\ m\ ==\ \mbox{\hyperlink{namespacefc_a3d8a2be677709cc41f09aa7925f2d55fad6bcd1364809e1b881bb22334d14cd56}{read\_only}}\ ?\ boost::interprocess::read\_only\ :\ boost::interprocess::read\_write\ \ ,start,\ size)\ }
+\DoxyCodeLine{00019\ \ \ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1mapped__region_ad43d7360fca04ea8b119fead81d3affc}\index{fc::mapped\_region@{fc::mapped\_region}!mapped\_region@{mapped\_region}}
+\index{mapped\_region@{mapped\_region}!fc::mapped\_region@{fc::mapped\_region}}
+\doxysubsubsection{\texorpdfstring{mapped\_region()}{mapped\_region()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1mapped__region_ad43d7360fca04ea8b119fead81d3affc} 
+fc\+::mapped\+\_\+region\+::mapped\+\_\+region (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1file__mapping}{file\+\_\+mapping}} \&}]{fm}{, }\item[{\mbox{\hyperlink{namespacefc_a3d8a2be677709cc41f09aa7925f2d55f}{mode\+\_\+t}}}]{m}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{file__mapping_8cpp_source_l00021}{21}} of file \mbox{\hyperlink{file__mapping_8cpp_source}{file\+\_\+mapping.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :}
+\DoxyCodeLine{00022\ \ \ \ \ my(\ *fm.my,\ m\ ==\ \mbox{\hyperlink{namespacefc_a3d8a2be677709cc41f09aa7925f2d55fad6bcd1364809e1b881bb22334d14cd56}{read\_only}}\ ?\ boost::interprocess::read\_only\ :\ boost::interprocess::read\_write)\ }
+\DoxyCodeLine{00023\ \ \ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1mapped__region_a279003a5dda2cec5510342756bfba272}\index{fc::mapped\_region@{fc::mapped\_region}!````~mapped\_region@{\texorpdfstring{$\sim$}{\string~}mapped\_region}}
+\index{````~mapped\_region@{\texorpdfstring{$\sim$}{\string~}mapped\_region}!fc::mapped\_region@{fc::mapped\_region}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}mapped\_region()}{\string~mapped\_region()}}
+{\footnotesize\ttfamily \label{classfc_1_1mapped__region_a279003a5dda2cec5510342756bfba272} 
+fc\+::mapped\+\_\+region\+::\texorpdfstring{$\sim$}{\string~}mapped\+\_\+region (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{file__mapping_8cpp_source_l00025}{25}} of file \mbox{\hyperlink{file__mapping_8cpp_source}{file\+\_\+mapping.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00025\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1mapped__region_a12ba94b8e57ff75abbf7cfd1ade01a84}\index{fc::mapped\_region@{fc::mapped\_region}!flush@{flush}}
+\index{flush@{flush}!fc::mapped\_region@{fc::mapped\_region}}
+\doxysubsubsection{\texorpdfstring{flush()}{flush()}}
+{\footnotesize\ttfamily \label{classfc_1_1mapped__region_a12ba94b8e57ff75abbf7cfd1ade01a84} 
+void fc\+::mapped\+\_\+region\+::flush (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{file__mapping_8cpp_source_l00032}{32}} of file \mbox{\hyperlink{file__mapping_8cpp_source}{file\+\_\+mapping.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00033\ \ \ \{}
+\DoxyCodeLine{00034\ \ \ \ \ my-\/>flush();\ }
+\DoxyCodeLine{00035\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1mapped__region_ae4c454063de929a27170d91e8c332ac6}\index{fc::mapped\_region@{fc::mapped\_region}!get\_address@{get\_address}}
+\index{get\_address@{get\_address}!fc::mapped\_region@{fc::mapped\_region}}
+\doxysubsubsection{\texorpdfstring{get\_address()}{get\_address()}}
+{\footnotesize\ttfamily \label{classfc_1_1mapped__region_ae4c454063de929a27170d91e8c332ac6} 
+void \texorpdfstring{$\ast$}{*} fc\+::mapped\+\_\+region\+::get\+\_\+address (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{file__mapping_8cpp_source_l00027}{27}} of file \mbox{\hyperlink{file__mapping_8cpp_source}{file\+\_\+mapping.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00028\ \ \ \{}
+\DoxyCodeLine{00029\ \ \ \ \ \textcolor{keywordflow}{return}\ my-\/>get\_address();\ }
+\DoxyCodeLine{00030\ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=320pt]{classfc_1_1mapped__region_ae4c454063de929a27170d91e8c332ac6_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1mapped__region_acecc565e9417b87b1ad8577b02b428cc}\index{fc::mapped\_region@{fc::mapped\_region}!get\_size@{get\_size}}
+\index{get\_size@{get\_size}!fc::mapped\_region@{fc::mapped\_region}}
+\doxysubsubsection{\texorpdfstring{get\_size()}{get\_size()}}
+{\footnotesize\ttfamily \label{classfc_1_1mapped__region_acecc565e9417b87b1ad8577b02b428cc} 
+size\+\_\+t fc\+::mapped\+\_\+region\+::get\+\_\+size (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{file__mapping_8cpp_source_l00037}{37}} of file \mbox{\hyperlink{file__mapping_8cpp_source}{file\+\_\+mapping.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00038\ \ \ \{}
+\DoxyCodeLine{00039\ \ \ \ \ \textcolor{keywordflow}{return}\ my-\/>get\_size();}
+\DoxyCodeLine{00040\ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=320pt]{classfc_1_1mapped__region_acecc565e9417b87b1ad8577b02b428cc_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/interprocess/\mbox{\hyperlink{file__mapping_8hpp}{file\+\_\+mapping.\+hpp}}\item 
+libraries/fc/src/interprocess/\mbox{\hyperlink{file__mapping_8cpp}{file\+\_\+mapping.\+cpp}}\end{DoxyCompactItemize}

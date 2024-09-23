@@ -1,0 +1,483 @@
+\doxysection{fc\+::private\+\_\+key Class Reference}
+\hypertarget{classfc_1_1private__key}{}\label{classfc_1_1private__key}\index{fc::private\_key@{fc::private\_key}}
+
+
+{\ttfamily \#include $<$pke.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1private__key_aae75011abdc1bf4104f5ec8ab9d7f7d7}{private\+\_\+key}} ()
+\item 
+\mbox{\hyperlink{classfc_1_1private__key_a73053212a56464289eec33ae300b90b2}{private\+\_\+key}} (const \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}} \&d)
+\item 
+\mbox{\hyperlink{classfc_1_1private__key_a1ac0c2ac5fc20041916d37e0b2b0e1d2}{private\+\_\+key}} (const \mbox{\hyperlink{classfc_1_1private__key}{private\+\_\+key}} \&k)
+\item 
+\mbox{\hyperlink{classfc_1_1private__key_a7a72ade3f1127774d958843137a3f88e}{private\+\_\+key}} (\mbox{\hyperlink{classfc_1_1private__key}{private\+\_\+key}} \&\&k)
+\item 
+\mbox{\hyperlink{classfc_1_1private__key_ac0a2410d726a44dc6ece76ed4e9862c7}{\texorpdfstring{$\sim$}{\string~}private\+\_\+key}} ()
+\item 
+\mbox{\hyperlink{classfc_1_1private__key_a8e21d7e6d20803393d559c7a96a7ec38}{operator bool}} () const
+\item 
+\mbox{\hyperlink{classfc_1_1private__key}{private\+\_\+key}} \& \mbox{\hyperlink{classfc_1_1private__key_ae564ed11a0160d4ba2db19ae4beb8dae}{operator=}} (const \mbox{\hyperlink{classfc_1_1private__key}{private\+\_\+key}} \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})
+\item 
+\mbox{\hyperlink{classfc_1_1private__key}{private\+\_\+key}} \& \mbox{\hyperlink{classfc_1_1private__key_a7a5b884a0f9b73a323959494a0740cf9}{operator=}} (\mbox{\hyperlink{classfc_1_1private__key}{private\+\_\+key}} \&\&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})
+\item 
+void \mbox{\hyperlink{classfc_1_1private__key_abbbae8a17dcaae3e1239757227c00f69}{sign}} (const \mbox{\hyperlink{classfc_1_1sha1}{sha1}} \&\mbox{\hyperlink{namespacefc_a150ca4cd9c0318ca45dc0dc7df5d58b9}{digest}}, \mbox{\hyperlink{classfc_1_1array}{array}}$<$ char, 2048/8 $>$ \&sig) const
+\item 
+\mbox{\hyperlink{namespacefc_a50190ee8a24af6929033b058b16158c4}{signature}} \mbox{\hyperlink{classfc_1_1private__key_a7bbd7a1629fa75b0b34ebb8200edf0b3}{sign}} (const \mbox{\hyperlink{classfc_1_1sha1}{sha1}} \&\mbox{\hyperlink{namespacefc_a150ca4cd9c0318ca45dc0dc7df5d58b9}{digest}}) const
+\item 
+\mbox{\hyperlink{namespacefc_a50190ee8a24af6929033b058b16158c4}{signature}} \mbox{\hyperlink{classfc_1_1private__key_afb1ea01c2e5c0aa49e77560990587beb}{sign}} (const \mbox{\hyperlink{classfc_1_1sha256}{sha256}} \&\mbox{\hyperlink{namespacefc_a150ca4cd9c0318ca45dc0dc7df5d58b9}{digest}}) const
+\item 
+\mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}} \mbox{\hyperlink{classfc_1_1private__key_ada59c770d72d17e7b4883ab89579ee19}{decrypt}} (const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}}, size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}) const
+\item 
+\mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}} \mbox{\hyperlink{classfc_1_1private__key_a059a5103607735c220dbf05c260d9853}{decrypt}} (const \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}} \&) const
+\item 
+\mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}} \mbox{\hyperlink{classfc_1_1private__key_a6cf05d185a0b760ed850aa4b691efa25}{encrypt}} (const \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}} \&) const
+\item 
+\mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}} \mbox{\hyperlink{classfc_1_1private__key_af58c4fd2b237e43ff6a28c70bb082ee7}{serialize}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{classfc_1_1private__key_a9659f81764e36396e82e65892e53c615}{generate\+\_\+key\+\_\+pair}} (\mbox{\hyperlink{classfc_1_1public__key}{public\+\_\+key}} \&pub, \mbox{\hyperlink{classfc_1_1private__key}{private\+\_\+key}} \&priv)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{pke_8hpp_source_l00046}{46}} of file \mbox{\hyperlink{pke_8hpp_source}{pke.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1private__key_aae75011abdc1bf4104f5ec8ab9d7f7d7}\index{fc::private\_key@{fc::private\_key}!private\_key@{private\_key}}
+\index{private\_key@{private\_key}!fc::private\_key@{fc::private\_key}}
+\doxysubsubsection{\texorpdfstring{private\_key()}{private\_key()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{classfc_1_1private__key_aae75011abdc1bf4104f5ec8ab9d7f7d7} 
+fc\+::private\+\_\+key\+::private\+\_\+key (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pke_8cpp_source_l00165}{165}} of file \mbox{\hyperlink{pke_8cpp_source}{pke.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00166\ \ \ \ \ \{}
+\DoxyCodeLine{00167\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1private__key_a73053212a56464289eec33ae300b90b2}\index{fc::private\_key@{fc::private\_key}!private\_key@{private\_key}}
+\index{private\_key@{private\_key}!fc::private\_key@{fc::private\_key}}
+\doxysubsubsection{\texorpdfstring{private\_key()}{private\_key()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{classfc_1_1private__key_a73053212a56464289eec33ae300b90b2} 
+fc\+::private\+\_\+key\+::private\+\_\+key (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}} \&}]{d}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{pke_8cpp_source_l00168}{168}} of file \mbox{\hyperlink{pke_8cpp_source}{pke.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00169\ \ \ \ \ :my(\ std::make\_shared<detail::pke\_impl>()\ )}
+\DoxyCodeLine{00170\ \ \ \ \ \{}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ }
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ pem\ =\ \textcolor{stringliteral}{"{}-\/-\/-\/-\/-\/BEGIN\ RSA\ PRIVATE\ KEY-\/-\/-\/-\/-\/\(\backslash\)n"{}};}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ b64\ =\ \mbox{\hyperlink{namespacefc_a3668095306e6c6c4c53de5d7701e4dde}{fc::base64\_encode}}(\ (\textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.data(),\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.size()\ );}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ b64.size();\ i\ +=\ 64\ )}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \ \ \ pem\ +=\ b64.substr(\ i,\ 64\ )\ +\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ pem\ +=\ \textcolor{stringliteral}{"{}-\/-\/-\/-\/-\/END\ RSA\ PRIVATE\ KEY-\/-\/-\/-\/-\/\(\backslash\)n"{}};}
+\DoxyCodeLine{00177\ \ \ \ \textcolor{comment}{//\ \ \ \ fc::cerr<<pem;}}
+\DoxyCodeLine{00178\ }
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ BIO*\ mem\ =\ (BIO*)BIO\_new\_mem\_buf(\ (\textcolor{keywordtype}{void}*)pem.c\_str(),\ pem.size()\ );}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ my-\/>rsa\ =\ PEM\_read\_bio\_RSAPrivateKey(mem,\ NULL,\ NULL,\ NULL\ );}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ BIO\_free(mem);}
+\DoxyCodeLine{00182\ }
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ my-\/>rsa,\ \textcolor{stringliteral}{"{}read\ private\ key"{}}\ );}
+\DoxyCodeLine{00184\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1private__key_a73053212a56464289eec33ae300b90b2_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1private__key_a1ac0c2ac5fc20041916d37e0b2b0e1d2}\index{fc::private\_key@{fc::private\_key}!private\_key@{private\_key}}
+\index{private\_key@{private\_key}!fc::private\_key@{fc::private\_key}}
+\doxysubsubsection{\texorpdfstring{private\_key()}{private\_key()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{classfc_1_1private__key_a1ac0c2ac5fc20041916d37e0b2b0e1d2} 
+fc\+::private\+\_\+key\+::private\+\_\+key (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1private__key}{private\+\_\+key}} \&}]{k}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pke_8cpp_source_l00186}{186}} of file \mbox{\hyperlink{pke_8cpp_source}{pke.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00187\ \ \ \ \ :my(k.my)}
+\DoxyCodeLine{00188\ \ \ \ \ \{}
+\DoxyCodeLine{00189\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1private__key_a7a72ade3f1127774d958843137a3f88e}\index{fc::private\_key@{fc::private\_key}!private\_key@{private\_key}}
+\index{private\_key@{private\_key}!fc::private\_key@{fc::private\_key}}
+\doxysubsubsection{\texorpdfstring{private\_key()}{private\_key()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{classfc_1_1private__key_a7a72ade3f1127774d958843137a3f88e} 
+fc\+::private\+\_\+key\+::private\+\_\+key (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1private__key}{private\+\_\+key}} \&\&}]{k}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pke_8cpp_source_l00190}{190}} of file \mbox{\hyperlink{pke_8cpp_source}{pke.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00191\ \ \ \ \ :my(std::move(k.my)\ )}
+\DoxyCodeLine{00192\ \ \ \ \ \{}
+\DoxyCodeLine{00193\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1private__key_ac0a2410d726a44dc6ece76ed4e9862c7}\index{fc::private\_key@{fc::private\_key}!````~private\_key@{\texorpdfstring{$\sim$}{\string~}private\_key}}
+\index{````~private\_key@{\texorpdfstring{$\sim$}{\string~}private\_key}!fc::private\_key@{fc::private\_key}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}private\_key()}{\string~private\_key()}}
+{\footnotesize\ttfamily \label{classfc_1_1private__key_ac0a2410d726a44dc6ece76ed4e9862c7} 
+fc\+::private\+\_\+key\+::\texorpdfstring{$\sim$}{\string~}private\+\_\+key (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pke_8cpp_source_l00194}{194}} of file \mbox{\hyperlink{pke_8cpp_source}{pke.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00194\ \{\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1private__key_a059a5103607735c220dbf05c260d9853}\index{fc::private\_key@{fc::private\_key}!decrypt@{decrypt}}
+\index{decrypt@{decrypt}!fc::private\_key@{fc::private\_key}}
+\doxysubsubsection{\texorpdfstring{decrypt()}{decrypt()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1private__key_a059a5103607735c220dbf05c260d9853} 
+\mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}} fc\+::private\+\_\+key\+::decrypt (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}} \&}]{in}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{pke_8cpp_source_l00278}{278}} of file \mbox{\hyperlink{pke_8cpp_source}{pke.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00279\ \ \ \ \ \{}
+\DoxyCodeLine{00280\ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !my\ )\ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ assert\_exception,\ \textcolor{stringliteral}{"{}!null"{}}\ );}
+\DoxyCodeLine{00281\ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}}\ out;}
+\DoxyCodeLine{00282\ \ \ \ \ \ \ \ out.resize(\ RSA\_size(my-\/>rsa)\ );}
+\DoxyCodeLine{00283\ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ rtn\ =\ RSA\_private\_decrypt(\ in.size(),}
+\DoxyCodeLine{00284\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)in.data(),}
+\DoxyCodeLine{00285\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)out.data(),}
+\DoxyCodeLine{00286\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ my-\/>rsa,\ RSA\_PKCS1\_OAEP\_PADDING\ );}
+\DoxyCodeLine{00287\ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ rtn\ >=\ 0\ )\ \{}
+\DoxyCodeLine{00288\ \ \ \ \ \ \ \ \ \ \ out.resize(rtn);}
+\DoxyCodeLine{00289\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ out;}
+\DoxyCodeLine{00290\ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00291\ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ exception,\ \textcolor{stringliteral}{"{}decrypt\ failed"{}}\ );}
+\DoxyCodeLine{00292\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1private__key_ada59c770d72d17e7b4883ab89579ee19}\index{fc::private\_key@{fc::private\_key}!decrypt@{decrypt}}
+\index{decrypt@{decrypt}!fc::private\_key@{fc::private\_key}}
+\doxysubsubsection{\texorpdfstring{decrypt()}{decrypt()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1private__key_ada59c770d72d17e7b4883ab89579ee19} 
+\mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}} fc\+::private\+\_\+key\+::decrypt (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{bytes}{, }\item[{size\+\_\+t}]{len}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{pke_8cpp_source_l00263}{263}} of file \mbox{\hyperlink{pke_8cpp_source}{pke.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00264\ \ \ \ \ \{}
+\DoxyCodeLine{00265\ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !my\ )\ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ assert\_exception,\ \textcolor{stringliteral}{"{}!null"{}}\ );}
+\DoxyCodeLine{00266\ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}}\ out;}
+\DoxyCodeLine{00267\ \ \ \ \ \ \ \ out.resize(\ RSA\_size(my-\/>rsa)\ );}
+\DoxyCodeLine{00268\ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ rtn\ =\ RSA\_private\_decrypt(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}},}
+\DoxyCodeLine{00269\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)in,}
+\DoxyCodeLine{00270\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)out.data(),}
+\DoxyCodeLine{00271\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ my-\/>rsa,\ RSA\_PKCS1\_OAEP\_PADDING\ );}
+\DoxyCodeLine{00272\ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ rtn\ >=\ 0\ )\ \{}
+\DoxyCodeLine{00273\ \ \ \ \ \ \ \ \ \ \ out.resize(rtn);}
+\DoxyCodeLine{00274\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ out;}
+\DoxyCodeLine{00275\ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00276\ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ exception,\ \textcolor{stringliteral}{"{}decrypt\ failed"{}}\ );}
+\DoxyCodeLine{00277\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1private__key_a6cf05d185a0b760ed850aa4b691efa25}\index{fc::private\_key@{fc::private\_key}!encrypt@{encrypt}}
+\index{encrypt@{encrypt}!fc::private\_key@{fc::private\_key}}
+\doxysubsubsection{\texorpdfstring{encrypt()}{encrypt()}}
+{\footnotesize\ttfamily \label{classfc_1_1private__key_a6cf05d185a0b760ed850aa4b691efa25} 
+\mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}} fc\+::private\+\_\+key\+::encrypt (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}} \&}]{in}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{pke_8cpp_source_l00246}{246}} of file \mbox{\hyperlink{pke_8cpp_source}{pke.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00247\ \ \ \ \ \{}
+\DoxyCodeLine{00248\ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !my\ )\ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ assert\_exception,\ \textcolor{stringliteral}{"{}!null"{}}\ );}
+\DoxyCodeLine{00249\ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}}\ out;}
+\DoxyCodeLine{00250\ \ \ \ \ \ \ \ out.resize(\ RSA\_size(my-\/>rsa)\ );}
+\DoxyCodeLine{00251\ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ rtn\ =\ RSA\_private\_encrypt(\ in.size(),}
+\DoxyCodeLine{00252\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)in.data(),}
+\DoxyCodeLine{00253\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)out.data(),}
+\DoxyCodeLine{00254\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ my-\/>rsa,\ RSA\_PKCS1\_OAEP\_PADDING\ );}
+\DoxyCodeLine{00255\ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ rtn\ >=\ 0\ )\ \{}
+\DoxyCodeLine{00256\ \ \ \ \ \ \ \ \ \ \ out.resize(rtn);}
+\DoxyCodeLine{00257\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ out;}
+\DoxyCodeLine{00258\ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00259\ }
+\DoxyCodeLine{00260\ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ exception,\ \textcolor{stringliteral}{"{}encrypt\ failed"{}}\ );}
+\DoxyCodeLine{00261\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1private__key_a8e21d7e6d20803393d559c7a96a7ec38}\index{fc::private\_key@{fc::private\_key}!operator bool@{operator bool}}
+\index{operator bool@{operator bool}!fc::private\_key@{fc::private\_key}}
+\doxysubsubsection{\texorpdfstring{operator bool()}{operator bool()}}
+{\footnotesize\ttfamily \label{classfc_1_1private__key_a8e21d7e6d20803393d559c7a96a7ec38} 
+fc\+::private\+\_\+key\+::operator bool (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{pke_8cpp_source_l00030}{30}} of file \mbox{\hyperlink{pke_8cpp_source}{pke.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00030\ \{\ \textcolor{keywordflow}{return}\ !!my;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1private__key_ae564ed11a0160d4ba2db19ae4beb8dae}\index{fc::private\_key@{fc::private\_key}!operator=@{operator=}}
+\index{operator=@{operator=}!fc::private\_key@{fc::private\_key}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1private__key_ae564ed11a0160d4ba2db19ae4beb8dae} 
+\mbox{\hyperlink{classfc_1_1private__key}{private\+\_\+key}} \& fc\+::private\+\_\+key\+::operator= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1private__key}{private\+\_\+key}} \&}]{p}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pke_8cpp_source_l00196}{196}} of file \mbox{\hyperlink{pke_8cpp_source}{pke.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00197\ \ \ \ \ \{}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ my\ =\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.my;\ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00199\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1private__key_a7a5b884a0f9b73a323959494a0740cf9}\index{fc::private\_key@{fc::private\_key}!operator=@{operator=}}
+\index{operator=@{operator=}!fc::private\_key@{fc::private\_key}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1private__key_a7a5b884a0f9b73a323959494a0740cf9} 
+\mbox{\hyperlink{classfc_1_1private__key}{private\+\_\+key}} \& fc\+::private\+\_\+key\+::operator= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1private__key}{private\+\_\+key}} \&\&}]{p}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pke_8cpp_source_l00200}{200}} of file \mbox{\hyperlink{pke_8cpp_source}{pke.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00201\ \ \ \ \ \{}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \ my\ =\ std::move(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.my);\ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00203\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1private__key_af58c4fd2b237e43ff6a28c70bb082ee7}\index{fc::private\_key@{fc::private\_key}!serialize@{serialize}}
+\index{serialize@{serialize}!fc::private\_key@{fc::private\_key}}
+\doxysubsubsection{\texorpdfstring{serialize()}{serialize()}}
+{\footnotesize\ttfamily \label{classfc_1_1private__key_af58c4fd2b237e43ff6a28c70bb082ee7} 
+\mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}} fc\+::private\+\_\+key\+::serialize (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{pke_8cpp_source_l00294}{294}} of file \mbox{\hyperlink{pke_8cpp_source}{pke.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00295\ \ \ \ \ \{}
+\DoxyCodeLine{00296\ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}}\ ba;}
+\DoxyCodeLine{00297\ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !my\ )\ \{\ \textcolor{keywordflow}{return}\ ba;\ \}}
+\DoxyCodeLine{00298\ }
+\DoxyCodeLine{00299\ \ \ \ \ \ \ \ BIO\ *mem\ =\ BIO\_new(BIO\_s\_mem());}
+\DoxyCodeLine{00300\ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ e\ =\ PEM\_write\_bio\_RSAPrivateKey(\ mem,\ my-\/>rsa,\ NULL,\ NULL,\ 0,\ NULL,\ NULL\ );}
+\DoxyCodeLine{00301\ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ e\ !=\ 1\ )}
+\DoxyCodeLine{00302\ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00303\ \ \ \ \ \ \ \ \ \ \ \ BIO\_free(mem);}
+\DoxyCodeLine{00304\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ exception,\ \textcolor{stringliteral}{"{}Error\ writing\ private\ key,\ \$\{message\}"{}},\ (\textcolor{stringliteral}{"{}message"{}},\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc::string}}(ERR\_error\_string(\ ERR\_get\_error(),NULL)))\ );}
+\DoxyCodeLine{00305\ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00306\ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}*\ dat;}
+\DoxyCodeLine{00307\ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}\ =\ BIO\_get\_mem\_data(\ mem,\ \&dat\ );}
+\DoxyCodeLine{00308\ \ \ \ \ \textcolor{comment}{//\ \ \ return\ bytes(\ dat,\ dat\ +\ l\ );}}
+\DoxyCodeLine{00309\ }
+\DoxyCodeLine{00310\ \ \ \ \ \ \ \ stringstream\ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}(\ \textcolor{keywordtype}{string}(\ dat,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}\ )\ );}
+\DoxyCodeLine{00311\ \ \ \ \ \ \ \ stringstream\ \mbox{\hyperlink{yubico__otp_8c_a9246c20bb98ad2b4c60313c053c70f08}{key}};}
+\DoxyCodeLine{00312\ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ tmp;}
+\DoxyCodeLine{00313\ \ \ \ \ \ \ \ fc::getline(\ ss,\ tmp\ );}
+\DoxyCodeLine{00314\ \ \ \ \ \ \ \ fc::getline(\ ss,\ tmp\ );}
+\DoxyCodeLine{00315\ }
+\DoxyCodeLine{00316\ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\ tmp.size()\ \&\&\ tmp[0]\ !=\ \textcolor{charliteral}{'-\/'}\ )}
+\DoxyCodeLine{00317\ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00318\ \ \ \ \ \ \ \ \ \ key\ <<\ tmp;\ }
+\DoxyCodeLine{00319\ \ \ \ \ \ \ \ \ \ fc::getline(\ ss,\ tmp\ );}
+\DoxyCodeLine{00320\ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00321\ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}\ =\ key.str();}
+\DoxyCodeLine{00322\ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}\ =\ \mbox{\hyperlink{namespacefc_ae8deb03ba4f32aa68c5dcc62578ea2de}{fc::base64\_decode}}(\ str\ );}
+\DoxyCodeLine{00323\ \ \ \ \ \ \ \ ba\ =\ \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}}(\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}.begin(),\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}.end()\ );}
+\DoxyCodeLine{00324\ \ \ \ \ \textcolor{comment}{//\ \ \ ba\ =\ bytes(\ dat,\ dat\ +\ l\ );}}
+\DoxyCodeLine{00325\ \ \ \ \ \ \ \ BIO\_free(mem);}
+\DoxyCodeLine{00326\ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ba;}
+\DoxyCodeLine{00327\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1private__key_af58c4fd2b237e43ff6a28c70bb082ee7_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=312pt]{classfc_1_1private__key_af58c4fd2b237e43ff6a28c70bb082ee7_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1private__key_a7bbd7a1629fa75b0b34ebb8200edf0b3}\index{fc::private\_key@{fc::private\_key}!sign@{sign}}
+\index{sign@{sign}!fc::private\_key@{fc::private\_key}}
+\doxysubsubsection{\texorpdfstring{sign()}{sign()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{classfc_1_1private__key_a7bbd7a1629fa75b0b34ebb8200edf0b3} 
+\mbox{\hyperlink{namespacefc_a50190ee8a24af6929033b058b16158c4}{signature}} fc\+::private\+\_\+key\+::sign (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1sha1}{sha1}} \&}]{digest}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{pke_8cpp_source_l00216}{216}} of file \mbox{\hyperlink{pke_8cpp_source}{pke.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00217\ \ \ \ \ \{}
+\DoxyCodeLine{00218\ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !my\ )\ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ assert\_exception,\ \textcolor{stringliteral}{"{}!null"{}}\ );}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a50190ee8a24af6929033b058b16158c4}{signature}}\ sig;}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \ sig.resize(\ RSA\_size(my-\/>rsa)\ );}
+\DoxyCodeLine{00221\ }
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ slen\ =\ 0;}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ 1\ !=\ RSA\_sign(\ NID\_sha1,\ (\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}*)\mbox{\hyperlink{namespacefc_a150ca4cd9c0318ca45dc0dc7df5d58b9}{digest}}.\mbox{\hyperlink{classfc_1_1sha256_ab897537f6c524085b28049be51ed370d}{data}}(),}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 20,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)sig.data(),\ \&slen,\ my-\/>rsa\ )\ )}
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00226\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ exception,\ \textcolor{stringliteral}{"{}rsa\ sign\ failed\ with\ \$\{message\}"{}},\ (\textcolor{stringliteral}{"{}message"{}},\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc::string}}(ERR\_error\_string(\ ERR\_get\_error(),NULL)))\ );}
+\DoxyCodeLine{00227\ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00228\ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ sig;}
+\DoxyCodeLine{00229\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1private__key_a7bbd7a1629fa75b0b34ebb8200edf0b3_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1private__key_abbbae8a17dcaae3e1239757227c00f69}\index{fc::private\_key@{fc::private\_key}!sign@{sign}}
+\index{sign@{sign}!fc::private\_key@{fc::private\_key}}
+\doxysubsubsection{\texorpdfstring{sign()}{sign()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{classfc_1_1private__key_abbbae8a17dcaae3e1239757227c00f69} 
+void fc\+::private\+\_\+key\+::sign (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1sha1}{sha1}} \&}]{digest}{, }\item[{\mbox{\hyperlink{classfc_1_1array}{array}}$<$ char, 2048/8 $>$ \&}]{sig}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{pke_8cpp_source_l00205}{205}} of file \mbox{\hyperlink{pke_8cpp_source}{pke.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00206\ \ \ \ \ \{}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ (\textcolor{keywordtype}{size\_t}(RSA\_size(my-\/>rsa))\ <=\ \textcolor{keyword}{sizeof}(sig)),\ \textcolor{stringliteral}{"{}Invalid\ RSA\ size"{}}\ );\ }
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ slen\ =\ 0;}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ 1\ !=\ RSA\_sign(\ NID\_sha1,\ (\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}*)\&\mbox{\hyperlink{namespacefc_a150ca4cd9c0318ca45dc0dc7df5d58b9}{digest}},}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 20,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)\&sig,\ \&slen,\ my-\/>rsa\ )\ )}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ exception,\ \textcolor{stringliteral}{"{}rsa\ sign\ failed\ with\ \$\{message\}"{}},\ (\textcolor{stringliteral}{"{}message"{}},\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc::string}}(ERR\_error\_string(\ ERR\_get\_error(),NULL)))\ );}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00214\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1private__key_abbbae8a17dcaae3e1239757227c00f69_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1private__key_afb1ea01c2e5c0aa49e77560990587beb}\index{fc::private\_key@{fc::private\_key}!sign@{sign}}
+\index{sign@{sign}!fc::private\_key@{fc::private\_key}}
+\doxysubsubsection{\texorpdfstring{sign()}{sign()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{classfc_1_1private__key_afb1ea01c2e5c0aa49e77560990587beb} 
+\mbox{\hyperlink{namespacefc_a50190ee8a24af6929033b058b16158c4}{signature}} fc\+::private\+\_\+key\+::sign (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1sha256}{sha256}} \&}]{digest}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{pke_8cpp_source_l00230}{230}} of file \mbox{\hyperlink{pke_8cpp_source}{pke.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00231\ \ \ \ \ \{}
+\DoxyCodeLine{00232\ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !my\ )\ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ assert\_exception,\ \textcolor{stringliteral}{"{}!null"{}}\ );}
+\DoxyCodeLine{00233\ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a50190ee8a24af6929033b058b16158c4}{signature}}\ sig;}
+\DoxyCodeLine{00234\ \ \ \ \ \ \ \ sig.resize(\ RSA\_size(my-\/>rsa)\ );}
+\DoxyCodeLine{00235\ }
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ slen\ =\ 0;}
+\DoxyCodeLine{00237\ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ 1\ !=\ RSA\_sign(\ NID\_sha256,\ (\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}*)\mbox{\hyperlink{namespacefc_a150ca4cd9c0318ca45dc0dc7df5d58b9}{digest}}.\mbox{\hyperlink{classfc_1_1sha256_ab897537f6c524085b28049be51ed370d}{data}}(),}
+\DoxyCodeLine{00238\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 32,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)sig.data(),\ \&slen,\ my-\/>rsa\ )\ )}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ exception,\ \textcolor{stringliteral}{"{}rsa\ sign\ failed\ with\ \$\{message\}"{}},\ (\textcolor{stringliteral}{"{}message"{}},\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc::string}}(ERR\_error\_string(\ ERR\_get\_error(),NULL)))\ );}
+\DoxyCodeLine{00241\ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00242\ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ sig;}
+\DoxyCodeLine{00243\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1private__key_afb1ea01c2e5c0aa49e77560990587beb_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{classfc_1_1private__key_a9659f81764e36396e82e65892e53c615}\index{fc::private\_key@{fc::private\_key}!generate\_key\_pair@{generate\_key\_pair}}
+\index{generate\_key\_pair@{generate\_key\_pair}!fc::private\_key@{fc::private\_key}}
+\doxysubsubsection{\texorpdfstring{generate\_key\_pair}{generate\_key\_pair}}
+{\footnotesize\ttfamily \label{classfc_1_1private__key_a9659f81764e36396e82e65892e53c615} 
+void generate\+\_\+key\+\_\+pair (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1public__key}{public\+\_\+key}} \&}]{pub}{, }\item[{\mbox{\hyperlink{classfc_1_1private__key}{private\+\_\+key}} \&}]{priv}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{pke_8cpp_source_l00329}{329}} of file \mbox{\hyperlink{pke_8cpp_source}{pke.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00330\ \ \ \ \ \{}
+\DoxyCodeLine{00331\ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{lib_8h_a02fd73d861ef2e4aabb38c0c9ff82947}{init}}\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00332\ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{lib_8h_a02fd73d861ef2e4aabb38c0c9ff82947}{init}}\ )\ \{\ ERR\_load\_crypto\_strings();\ \mbox{\hyperlink{lib_8h_a02fd73d861ef2e4aabb38c0c9ff82947}{init}}\ =\ \textcolor{keyword}{false};\ \}}
+\DoxyCodeLine{00333\ }
+\DoxyCodeLine{00334\ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3037ff69dd24c6e34aee6fdd45269f13}{pub}}.my\ =\ std::make\_shared<detail::pke\_impl>();}
+\DoxyCodeLine{00335\ \ \ \ \ \ \ \ priv.my\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3037ff69dd24c6e34aee6fdd45269f13}{pub}}.my;}
+\DoxyCodeLine{00336\ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3037ff69dd24c6e34aee6fdd45269f13}{pub}}.my-\/>rsa\ =\ RSA\_generate\_key(\ 2048,\ 65537,\ NULL,\ NULL\ );}
+\DoxyCodeLine{00337\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/\mbox{\hyperlink{pke_8hpp}{pke.\+hpp}}\item 
+libraries/fc/src/crypto/\mbox{\hyperlink{pke_8cpp}{pke.\+cpp}}\end{DoxyCompactItemize}

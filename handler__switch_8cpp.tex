@@ -1,0 +1,139 @@
+\doxysection{libraries/fc/vendor/websocketpp/examples/handler\+\_\+switch/handler\+\_\+switch.cpp File Reference}
+\hypertarget{handler__switch_8cpp}{}\label{handler__switch_8cpp}\index{libraries/fc/vendor/websocketpp/examples/handler\_switch/handler\_switch.cpp@{libraries/fc/vendor/websocketpp/examples/handler\_switch/handler\_switch.cpp}}
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$websocketpp/config/asio\+\_\+no\+\_\+tls.\+hpp$>$}\newline
+{\ttfamily \#include $<$websocketpp/server.\+hpp$>$}\newline
+Include dependency graph for handler\+\_\+switch.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{handler__switch_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1server}{websocketpp\+::server}}$<$ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio}{websocketpp\+::config\+::asio}} $>$ \mbox{\hyperlink{handler__switch_8cpp_afc38239e3eef2a4200e324bff14d91d1}{server}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{handler__switch_8cpp_aa81df315f4822ef645ece28a64078243}{custom\+\_\+on\+\_\+msg}} (\mbox{\hyperlink{docs_2simple__broadcast__server_8cpp_afc38239e3eef2a4200e324bff14d91d1}{server}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, \mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}} hdl, \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a8097edab4feb0c36a69601c3786f0062}{server\+::message\+\_\+ptr}} msg)
+\item 
+void \mbox{\hyperlink{handler__switch_8cpp_a66234a1fbcdc53905337d6f7641a4bac}{default\+\_\+on\+\_\+msg}} (\mbox{\hyperlink{docs_2simple__broadcast__server_8cpp_afc38239e3eef2a4200e324bff14d91d1}{server}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, \mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}} hdl, \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a8097edab4feb0c36a69601c3786f0062}{server\+::message\+\_\+ptr}} msg)
+\item 
+int \mbox{\hyperlink{handler__switch_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{handler__switch_8cpp_afc38239e3eef2a4200e324bff14d91d1}\index{handler\_switch.cpp@{handler\_switch.cpp}!server@{server}}
+\index{server@{server}!handler\_switch.cpp@{handler\_switch.cpp}}
+\doxysubsubsection{\texorpdfstring{server}{server}}
+{\footnotesize\ttfamily \label{handler__switch_8cpp_afc38239e3eef2a4200e324bff14d91d1} 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1server}{websocketpp\+::server}}$<$\mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio}{websocketpp\+::config\+::asio}}$>$ \mbox{\hyperlink{docs_2simple__broadcast__server_8cpp_afc38239e3eef2a4200e324bff14d91d1}{server}}}
+
+
+
+Definition at line \mbox{\hyperlink{handler__switch_8cpp_source_l00006}{6}} of file \mbox{\hyperlink{handler__switch_8cpp_source}{handler\+\_\+switch.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{handler__switch_8cpp_aa81df315f4822ef645ece28a64078243}\index{handler\_switch.cpp@{handler\_switch.cpp}!custom\_on\_msg@{custom\_on\_msg}}
+\index{custom\_on\_msg@{custom\_on\_msg}!handler\_switch.cpp@{handler\_switch.cpp}}
+\doxysubsubsection{\texorpdfstring{custom\_on\_msg()}{custom\_on\_msg()}}
+{\footnotesize\ttfamily \label{handler__switch_8cpp_aa81df315f4822ef645ece28a64078243} 
+void custom\+\_\+on\+\_\+msg (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{docs_2simple__broadcast__server_8cpp_afc38239e3eef2a4200e324bff14d91d1}{server}} \&}]{s}{, }\item[{\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}}}]{hdl}{, }\item[{\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a8097edab4feb0c36a69601c3786f0062}{server\+::message\+\_\+ptr}}}]{msg}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{handler__switch_8cpp_source_l00014}{14}} of file \mbox{\hyperlink{handler__switch_8cpp_source}{handler\+\_\+switch.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00014\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}Message\ sent\ to\ custom\ handler"{}}\ <<\ std::endl;}
+\DoxyCodeLine{00016\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{handler__switch_8cpp_aa81df315f4822ef645ece28a64078243_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{handler__switch_8cpp_a66234a1fbcdc53905337d6f7641a4bac}\index{handler\_switch.cpp@{handler\_switch.cpp}!default\_on\_msg@{default\_on\_msg}}
+\index{default\_on\_msg@{default\_on\_msg}!handler\_switch.cpp@{handler\_switch.cpp}}
+\doxysubsubsection{\texorpdfstring{default\_on\_msg()}{default\_on\_msg()}}
+{\footnotesize\ttfamily \label{handler__switch_8cpp_a66234a1fbcdc53905337d6f7641a4bac} 
+void default\+\_\+on\+\_\+msg (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{docs_2simple__broadcast__server_8cpp_afc38239e3eef2a4200e324bff14d91d1}{server}} \&}]{s}{, }\item[{\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}}}]{hdl}{, }\item[{\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a8097edab4feb0c36a69601c3786f0062}{server\+::message\+\_\+ptr}}}]{msg}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{handler__switch_8cpp_source_l00018}{18}} of file \mbox{\hyperlink{handler__switch_8cpp_source}{handler\+\_\+switch.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00019\ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}Message\ sent\ to\ default\ handler"{}}\ <<\ std::endl;}
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00021\ \ \ \ \ \textcolor{keywordflow}{if}\ (msg-\/>get\_payload()\ ==\ \textcolor{stringliteral}{"{}upgrade"{}})\ \{}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Upgrade\ our\ connection\_hdl\ to\ a\ full\ connection\_ptr}}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1server_abb895563dddafdc1426997d245cbd7cb}{server::connection\_ptr}}\ con\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.get\_con\_from\_hdl(hdl);}
+\DoxyCodeLine{00024\ }
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Change\ the\ on\ message\ handler\ for\ this\ connection\ only\ to}}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ custom\_on\_mesage}}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ con-\/>set\_message\_handler(bind(\&\mbox{\hyperlink{handler__switch_8cpp_aa81df315f4822ef645ece28a64078243}{custom\_on\_msg}},ref(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}),::\_1,::\_2));}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}Upgrading\ connection\ to\ custom\ handler"{}}\ <<\ std::endl;}
+\DoxyCodeLine{00029\ \ \ \ \ \}}
+\DoxyCodeLine{00030\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=289pt]{handler__switch_8cpp_a66234a1fbcdc53905337d6f7641a4bac_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=238pt]{handler__switch_8cpp_a66234a1fbcdc53905337d6f7641a4bac_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{handler__switch_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}\index{handler\_switch.cpp@{handler\_switch.cpp}!main@{main}}
+\index{main@{main}!handler\_switch.cpp@{handler\_switch.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{handler__switch_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4} 
+int main (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{handler__switch_8cpp_source_l00032}{32}} of file \mbox{\hyperlink{handler__switch_8cpp_source}{handler\+\_\+switch.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00033\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1server}{server}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{00034\ }
+\DoxyCodeLine{00035\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a34a3a8351bff65ba878975be471cab85}{set\_message\_handler}}(bind(\&\mbox{\hyperlink{handler__switch_8cpp_a66234a1fbcdc53905337d6f7641a4bac}{default\_on\_msg}},ref(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}),::\_1,::\_2));}
+\DoxyCodeLine{00036\ }
+\DoxyCodeLine{00037\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.init\_asio();}
+\DoxyCodeLine{00038\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.listen(9002);}
+\DoxyCodeLine{00039\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.start\_accept();}
+\DoxyCodeLine{00040\ }
+\DoxyCodeLine{00041\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.run();}
+\DoxyCodeLine{00042\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{handler__switch_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4_cgraph}
+\end{center}
+\end{figure}

@@ -1,0 +1,13 @@
+<map id="CLI::detail::split_program_name" name="CLI::detail::split_program_name">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,74,120,114"/>
+<area shape="rect" id="Node000002" href="$namespace_c_l_i_1_1detail.html#a197be0b62b4d4deef0f5cac600a6b759" title="get the type of the path from a file name" alt="" coords="168,5,324,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="112,71,167,48,197,35,200,40,169,53,114,76"/>
+<area shape="rect" id="Node000003" href="$namespace_c_l_i_1_1detail.html#aa06bf54cb3fb347d68d23d31384af42f" title="Trim whitespace from left of string." alt="" coords="372,83,487,108"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="120,91,324,92,357,92,357,97,324,97,120,97"/>
+<area shape="rect" id="Node000004" href="$namespace_c_l_i_1_1detail.html#a32d84ce1a65de779e88fdf4aa3b54ea6" title="Trim whitespace from right of string." alt="" coords="372,132,487,158"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="98,113,131,130,168,142,216,150,266,153,356,151,357,156,266,159,216,156,167,147,129,134,96,118"/>
+<area shape="rect" id="Node000005" href="$namespace_c_l_i_1_1detail.html#a621323632158048f6168deacc432b838" title="Trim whitespace from string." alt="" coords="190,107,302,132"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="120,99,175,107,174,112,120,105"/>
+<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="302,110,357,102,358,108,302,115"/>
+<area shape="poly" id="edge6_Node000005_Node000004" title=" " alt="" coords="302,125,357,132,356,137,302,130"/>
+</map>

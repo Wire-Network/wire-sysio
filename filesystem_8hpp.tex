@@ -1,0 +1,120 @@
+\doxysection{libraries/fc/include/fc/filesystem.hpp File Reference}
+\hypertarget{filesystem_8hpp}{}\label{filesystem_8hpp}\index{libraries/fc/include/fc/filesystem.hpp@{libraries/fc/include/fc/filesystem.hpp}}
+{\ttfamily \#include $<$utility$>$}\newline
+{\ttfamily \#include $<$memory$>$}\newline
+{\ttfamily \#include $<$fc/string.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/reflect/typename.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/fwd.\+hpp$>$}\newline
+Include dependency graph for filesystem.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{filesystem_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{filesystem_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classfc_1_1path}{fc\+::path}}
+\begin{DoxyCompactList}\small\item\em wraps boost\+::filesystem\+::path to provide platform independent path manipulation. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{classfc_1_1detail_1_1path__wrapper}{fc\+::detail\+::path\+\_\+wrapper}}
+\item 
+class \mbox{\hyperlink{classfc_1_1directory__iterator}{fc\+::directory\+\_\+iterator}}
+\item 
+class \mbox{\hyperlink{classfc_1_1recursive__directory__iterator}{fc\+::recursive\+\_\+directory\+\_\+iterator}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1get__typename_3_01path_01_4}{fc\+::get\+\_\+typename$<$ path $>$}}
+\item 
+class \mbox{\hyperlink{classfc_1_1temp__file__base}{fc\+::temp\+\_\+file\+\_\+base}}
+\item 
+class \mbox{\hyperlink{classfc_1_1temp__file}{fc\+::temp\+\_\+file}}
+\item 
+class \mbox{\hyperlink{classfc_1_1temp__directory}{fc\+::temp\+\_\+directory}}
+\item 
+class \mbox{\hyperlink{classfc_1_1simple__lock__file}{fc\+::simple\+\_\+lock\+\_\+file}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespaceboost}{boost}}
+\item 
+namespace \mbox{\hyperlink{namespaceboost_1_1filesystem}{boost\+::filesystem}}
+\item 
+namespace \mbox{\hyperlink{namespacefc}{fc}}
+\begin{DoxyCompactList}\small\item\em namespace \doxylink{namespacesysio_1_1chain}{sysio\+::chain} \end{DoxyCompactList}\item 
+namespace \mbox{\hyperlink{namespacefc_1_1detail}{fc\+::detail}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{filesystem_8hpp_a1f984a9df2aac18d51892d1352bf8cc8}{FC\+\_\+\+HAS\+\_\+\+SIMPLE\+\_\+\+FILE\+\_\+\+LOCK}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{namespacefc_a3fcf0d920aea28014aacae50a51d8485}{fc\+::exists}} (const \mbox{\hyperlink{classfc_1_1path}{path}} \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})
+\item 
+bool \mbox{\hyperlink{namespacefc_ab123bfeadf918cc293ecad88bca7c499}{fc\+::is\+\_\+directory}} (const \mbox{\hyperlink{classfc_1_1path}{path}} \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})
+\item 
+bool \mbox{\hyperlink{namespacefc_a6855142912d4cfb89281ba0c7f4938a2}{fc\+::is\+\_\+regular\+\_\+file}} (const \mbox{\hyperlink{classfc_1_1path}{path}} \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})
+\item 
+void \mbox{\hyperlink{namespacefc_a76b0787468a9f403087b71a894c07ce2}{fc\+::create\+\_\+directories}} (const \mbox{\hyperlink{classfc_1_1path}{path}} \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})
+\item 
+void \mbox{\hyperlink{namespacefc_a50ad24e0099358d167967f9df2e368fc}{fc\+::remove\+\_\+all}} (const \mbox{\hyperlink{classfc_1_1path}{path}} \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})
+\item 
+\mbox{\hyperlink{classfc_1_1path}{path}} \mbox{\hyperlink{namespacefc_ab76ad94ec93db365293a67053393fbb4}{fc\+::absolute}} (const \mbox{\hyperlink{classfc_1_1path}{path}} \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})
+\item 
+\mbox{\hyperlink{classfc_1_1path}{path}} \mbox{\hyperlink{namespacefc_a9fcdf886a023ef71441fd2f02ef3dc04}{fc\+::make\+\_\+relative}} (const \mbox{\hyperlink{classfc_1_1path}{path}} \&from, const \mbox{\hyperlink{classfc_1_1path}{path}} \&to)
+\item 
+\mbox{\hyperlink{classfc_1_1path}{path}} \mbox{\hyperlink{namespacefc_ac7ca5987762ad2fba3d278b956067171}{fc\+::canonical}} (const \mbox{\hyperlink{classfc_1_1path}{path}} \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{namespacefc_aae3e907b120751591ca6919ac66c384b}{fc\+::file\+\_\+size}} (const \mbox{\hyperlink{classfc_1_1path}{path}} \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{namespacefc_ab533ebf0126ab57947f79946c342acec}{fc\+::directory\+\_\+size}} (const \mbox{\hyperlink{classfc_1_1path}{path}} \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})
+\item 
+bool \mbox{\hyperlink{namespacefc_a0db76f35dc060918029b16de918b1e84}{fc\+::remove}} (const \mbox{\hyperlink{classfc_1_1path}{path}} \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})
+\item 
+void \mbox{\hyperlink{namespacefc_a79771837fffd80fcc4bc658ee2fc4b2b}{fc\+::copy}} (const \mbox{\hyperlink{classfc_1_1path}{path}} \&from, const \mbox{\hyperlink{classfc_1_1path}{path}} \&to)
+\item 
+void \mbox{\hyperlink{namespacefc_a067b275100894b82b6cf3aa85e804ea5}{fc\+::rename}} (const \mbox{\hyperlink{classfc_1_1path}{path}} \&from, const \mbox{\hyperlink{classfc_1_1path}{path}} \&to)
+\item 
+void \mbox{\hyperlink{namespacefc_ab25ea24552f2c490047c335a102f12fc}{fc\+::resize\+\_\+file}} (const \mbox{\hyperlink{classfc_1_1path}{path}} \&file, size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\item 
+void \mbox{\hyperlink{namespacefc_ad02fa8571ca999725dfcaa871b672230}{fc\+::chmod}} (const \mbox{\hyperlink{classfc_1_1path}{path}} \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}, int perm)
+\item 
+void \mbox{\hyperlink{namespacefc_a9bc83475f555620274c3b776ea38af2b}{fc\+::create\+\_\+hard\+\_\+link}} (const \mbox{\hyperlink{classfc_1_1path}{path}} \&from, const \mbox{\hyperlink{classfc_1_1path}{path}} \&to)
+\item 
+\mbox{\hyperlink{classfc_1_1path}{path}} \mbox{\hyperlink{namespacefc_a887060cd05d29b1ed9dec83ec97ee8e5}{fc\+::unique\+\_\+path}} ()
+\item 
+\mbox{\hyperlink{classfc_1_1path}{path}} \mbox{\hyperlink{namespacefc_afe3ee0e7b733d87469a967ac456302dc}{fc\+::temp\+\_\+directory\+\_\+path}} ()
+\item 
+const \mbox{\hyperlink{classfc_1_1path}{path}} \& \mbox{\hyperlink{namespacefc_a638386a755d79377ef4c5c779c731e43}{fc\+::home\+\_\+path}} ()
+\item 
+const \mbox{\hyperlink{classfc_1_1path}{path}} \& \mbox{\hyperlink{namespacefc_a3e2cb20721f4d3404ec07ff31694153e}{fc\+::app\+\_\+path}} ()
+\item 
+const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \& \mbox{\hyperlink{namespacefc_a6e83f7c8488e348511224442f4591d33}{fc\+::current\+\_\+path}} ()
+\item 
+void \mbox{\hyperlink{namespacefc_ab3f1824164e169cf6697c22db22e1065}{fc\+::to\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&, \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&)
+\item 
+void \mbox{\hyperlink{namespacefc_a77f02042bd60e2889251c4ffd5cda0be}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&, \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{filesystem_8hpp_a1f984a9df2aac18d51892d1352bf8cc8}\index{filesystem.hpp@{filesystem.hpp}!FC\_HAS\_SIMPLE\_FILE\_LOCK@{FC\_HAS\_SIMPLE\_FILE\_LOCK}}
+\index{FC\_HAS\_SIMPLE\_FILE\_LOCK@{FC\_HAS\_SIMPLE\_FILE\_LOCK}!filesystem.hpp@{filesystem.hpp}}
+\doxysubsubsection{\texorpdfstring{FC\_HAS\_SIMPLE\_FILE\_LOCK}{FC\_HAS\_SIMPLE\_FILE\_LOCK}}
+{\footnotesize\ttfamily \label{filesystem_8hpp_a1f984a9df2aac18d51892d1352bf8cc8} 
+\#define FC\+\_\+\+HAS\+\_\+\+SIMPLE\+\_\+\+FILE\+\_\+\+LOCK}
+
+
+
+Definition at line \mbox{\hyperlink{filesystem_8hpp_source_l00236}{236}} of file \mbox{\hyperlink{filesystem_8hpp_source}{filesystem.\+hpp}}.
+

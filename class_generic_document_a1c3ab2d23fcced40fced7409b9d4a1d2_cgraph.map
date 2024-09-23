@@ -1,0 +1,8 @@
+<map id="GenericDocument::Swap" name="GenericDocument::Swap">
+<area shape="rect" id="Node000001" title="Exchange the contents of this document with those of another." alt="" coords="5,31,173,56"/>
+<area shape="rect" id="Node000002" href="$classinternal_1_1_stack.html#a5e601199a21d84b1ac612f558be0f2c3" title=" " alt="" coords="221,5,367,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="173,30,205,26,206,32,173,36"/>
+<area shape="rect" id="Node000003" href="$namespaceinternal.html#a72b2c71d36273b9691487f58c671ce04" title="Custom swap() to avoid dependency on C++ &lt;algorithm&gt; header." alt="" coords="415,31,519,56"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="173,41,399,41,399,46,173,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="368,26,400,31,399,36,367,32"/>
+</map>

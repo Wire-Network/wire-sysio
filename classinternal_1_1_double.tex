@@ -1,0 +1,504 @@
+\doxysection{internal\+::Double Class Reference}
+\hypertarget{classinternal_1_1_double}{}\label{classinternal_1_1_double}\index{internal::Double@{internal::Double}}
+
+
+{\ttfamily \#include $<$ieee754.\+h$>$}
+
+
+
+Collaboration diagram for internal\+::Double\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=164pt]{classinternal_1_1_double__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classinternal_1_1_double_a98e2cff9880cd032d174e9721ae40ddd}{Double}} ()
+\item 
+\mbox{\hyperlink{classinternal_1_1_double_ad66f3b914570ce62e9f16083117f3e4f}{Double}} (double d)
+\item 
+\mbox{\hyperlink{classinternal_1_1_double_a293a7ca841d847ea3e83ffa28b68601f}{Double}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} u)
+\item 
+double \mbox{\hyperlink{classinternal_1_1_double_a665c64824d1046528cbc4066a9ed0ef8}{Value}} () const
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{classinternal_1_1_double_a1a35be6344c886f159cb36a1498a62ac}{Uint64\+Value}} () const
+\item 
+double \mbox{\hyperlink{classinternal_1_1_double_a6ffee23d82d9c606b1a53ed87e393e90}{Next\+Positive\+Double}} () const
+\item 
+bool \mbox{\hyperlink{classinternal_1_1_double_ab09c26873ca4c3e471a97c4559bf317d}{Sign}} () const
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{classinternal_1_1_double_ade5d3e893dd6884ccd37632109dae1a6}{Significand}} () const
+\item 
+int \mbox{\hyperlink{classinternal_1_1_double_ae091055d96d8730f654170613f2cf265}{Exponent}} () const
+\item 
+bool \mbox{\hyperlink{classinternal_1_1_double_a312312ab2798ee85cbd0e739fcefa386}{Is\+Nan}} () const
+\item 
+bool \mbox{\hyperlink{classinternal_1_1_double_afe1ce48f7fb9797e1a2044c58a6b226c}{Is\+Inf}} () const
+\item 
+bool \mbox{\hyperlink{classinternal_1_1_double_a8b9a82e8b99783b7e98b5307756021c0}{Is\+Nan\+Or\+Inf}} () const
+\item 
+bool \mbox{\hyperlink{classinternal_1_1_double_a8a39cd42010c69681da35d87f1331381}{Is\+Normal}} () const
+\item 
+bool \mbox{\hyperlink{classinternal_1_1_double_a90a3a1ca614b377b59576955ce987ce2}{Is\+Zero}} () const
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{classinternal_1_1_double_a1bf89d77be843f69facec9f2bc4dbc72}{Integer\+Significand}} () const
+\item 
+int \mbox{\hyperlink{classinternal_1_1_double_a9721e0fdedef4d0fe6c7b411492a88fb}{Integer\+Exponent}} () const
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{classinternal_1_1_double_ab3d3a81274e4f4b9b415db7c664d3ac9}{To\+Bias}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static int \mbox{\hyperlink{classinternal_1_1_double_aa710fa4f5e06b0ff4348a13475688f13}{Effective\+Significand\+Size}} (int order)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{ieee754_8h_source_l00023}{23}} of file \mbox{\hyperlink{ieee754_8h_source}{ieee754.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classinternal_1_1_double_a98e2cff9880cd032d174e9721ae40ddd}\index{internal::Double@{internal::Double}!Double@{Double}}
+\index{Double@{Double}!internal::Double@{internal::Double}}
+\doxysubsubsection{\texorpdfstring{Double()}{Double()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{classinternal_1_1_double_a98e2cff9880cd032d174e9721ae40ddd} 
+internal\+::\+Double\+::\+Double (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{ieee754_8h_source_l00025}{25}} of file \mbox{\hyperlink{ieee754_8h_source}{ieee754.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00025\ \{\}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classinternal_1_1_double_a98e2cff9880cd032d174e9721ae40ddd_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classinternal_1_1_double_ad66f3b914570ce62e9f16083117f3e4f}\index{internal::Double@{internal::Double}!Double@{Double}}
+\index{Double@{Double}!internal::Double@{internal::Double}}
+\doxysubsubsection{\texorpdfstring{Double()}{Double()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{classinternal_1_1_double_ad66f3b914570ce62e9f16083117f3e4f} 
+internal\+::\+Double\+::\+Double (\begin{DoxyParamCaption}\item[{double}]{d}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{ieee754_8h_source_l00026}{26}} of file \mbox{\hyperlink{ieee754_8h_source}{ieee754.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00026\ :\ \mbox{\hyperlink{classinternal_1_1_double_a9ed5b5245664da8abe6cdeefaed6452e}{d\_}}(d)\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classinternal_1_1_double_a293a7ca841d847ea3e83ffa28b68601f}\index{internal::Double@{internal::Double}!Double@{Double}}
+\index{Double@{Double}!internal::Double@{internal::Double}}
+\doxysubsubsection{\texorpdfstring{Double()}{Double()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{classinternal_1_1_double_a293a7ca841d847ea3e83ffa28b68601f} 
+internal\+::\+Double\+::\+Double (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{u}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{ieee754_8h_source_l00027}{27}} of file \mbox{\hyperlink{ieee754_8h_source}{ieee754.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00027\ :\ \mbox{\hyperlink{classinternal_1_1_double_ad7523f7fe0c47d6aabe34f68b00a3250}{u\_}}(u)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classinternal_1_1_double_aa710fa4f5e06b0ff4348a13475688f13}\index{internal::Double@{internal::Double}!EffectiveSignificandSize@{EffectiveSignificandSize}}
+\index{EffectiveSignificandSize@{EffectiveSignificandSize}!internal::Double@{internal::Double}}
+\doxysubsubsection{\texorpdfstring{EffectiveSignificandSize()}{EffectiveSignificandSize()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_double_aa710fa4f5e06b0ff4348a13475688f13} 
+static int internal\+::\+Double\+::\+Effective\+Significand\+Size (\begin{DoxyParamCaption}\item[{int}]{order}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{ieee754_8h_source_l00051}{51}} of file \mbox{\hyperlink{ieee754_8h_source}{ieee754.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (order\ >=\ -\/1021)}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 53;}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (order\ <=\ -\/1074)}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ order\ +\ 1074;}
+\DoxyCodeLine{00058\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classinternal_1_1_double_aa710fa4f5e06b0ff4348a13475688f13_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classinternal_1_1_double_ae091055d96d8730f654170613f2cf265}\index{internal::Double@{internal::Double}!Exponent@{Exponent}}
+\index{Exponent@{Exponent}!internal::Double@{internal::Double}}
+\doxysubsubsection{\texorpdfstring{Exponent()}{Exponent()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_double_ae091055d96d8730f654170613f2cf265} 
+int internal\+::\+Double\+::\+Exponent (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{ieee754_8h_source_l00039}{39}} of file \mbox{\hyperlink{ieee754_8h_source}{ieee754.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00039\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(((\mbox{\hyperlink{classinternal_1_1_double_ad7523f7fe0c47d6aabe34f68b00a3250}{u\_}}\ \&\ kExponentMask)\ >>\ kSignificandSize)\ -\/\ kExponentBias);\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classinternal_1_1_double_ae091055d96d8730f654170613f2cf265_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classinternal_1_1_double_a9721e0fdedef4d0fe6c7b411492a88fb}\index{internal::Double@{internal::Double}!IntegerExponent@{IntegerExponent}}
+\index{IntegerExponent@{IntegerExponent}!internal::Double@{internal::Double}}
+\doxysubsubsection{\texorpdfstring{IntegerExponent()}{IntegerExponent()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_double_a9721e0fdedef4d0fe6c7b411492a88fb} 
+int internal\+::\+Double\+::\+Integer\+Exponent (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{ieee754_8h_source_l00048}{48}} of file \mbox{\hyperlink{ieee754_8h_source}{ieee754.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00048\ \{\ \textcolor{keywordflow}{return}\ (\mbox{\hyperlink{classinternal_1_1_double_a8a39cd42010c69681da35d87f1331381}{IsNormal}}()\ ?\ \mbox{\hyperlink{classinternal_1_1_double_ae091055d96d8730f654170613f2cf265}{Exponent}}()\ :\ kDenormalExponent)\ -\/\ kSignificandSize;\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classinternal_1_1_double_a9721e0fdedef4d0fe6c7b411492a88fb_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classinternal_1_1_double_a9721e0fdedef4d0fe6c7b411492a88fb_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classinternal_1_1_double_a1bf89d77be843f69facec9f2bc4dbc72}\index{internal::Double@{internal::Double}!IntegerSignificand@{IntegerSignificand}}
+\index{IntegerSignificand@{IntegerSignificand}!internal::Double@{internal::Double}}
+\doxysubsubsection{\texorpdfstring{IntegerSignificand()}{IntegerSignificand()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_double_a1bf89d77be843f69facec9f2bc4dbc72} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} internal\+::\+Double\+::\+Integer\+Significand (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{ieee754_8h_source_l00047}{47}} of file \mbox{\hyperlink{ieee754_8h_source}{ieee754.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00047\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classinternal_1_1_double_a8a39cd42010c69681da35d87f1331381}{IsNormal}}()\ ?\ \mbox{\hyperlink{classinternal_1_1_double_ade5d3e893dd6884ccd37632109dae1a6}{Significand}}()\ |\ kHiddenBit\ :\ \mbox{\hyperlink{classinternal_1_1_double_ade5d3e893dd6884ccd37632109dae1a6}{Significand}}();\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classinternal_1_1_double_a1bf89d77be843f69facec9f2bc4dbc72_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classinternal_1_1_double_a1bf89d77be843f69facec9f2bc4dbc72_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classinternal_1_1_double_afe1ce48f7fb9797e1a2044c58a6b226c}\index{internal::Double@{internal::Double}!IsInf@{IsInf}}
+\index{IsInf@{IsInf}!internal::Double@{internal::Double}}
+\doxysubsubsection{\texorpdfstring{IsInf()}{IsInf()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_double_afe1ce48f7fb9797e1a2044c58a6b226c} 
+bool internal\+::\+Double\+::\+Is\+Inf (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{ieee754_8h_source_l00042}{42}} of file \mbox{\hyperlink{ieee754_8h_source}{ieee754.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00042\ \{\ \textcolor{keywordflow}{return}\ (\mbox{\hyperlink{classinternal_1_1_double_ad7523f7fe0c47d6aabe34f68b00a3250}{u\_}}\ \&\ kExponentMask)\ ==\ kExponentMask\ \&\&\ \mbox{\hyperlink{classinternal_1_1_double_ade5d3e893dd6884ccd37632109dae1a6}{Significand}}()\ ==\ 0;\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classinternal_1_1_double_afe1ce48f7fb9797e1a2044c58a6b226c_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=267pt]{classinternal_1_1_double_afe1ce48f7fb9797e1a2044c58a6b226c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classinternal_1_1_double_a312312ab2798ee85cbd0e739fcefa386}\index{internal::Double@{internal::Double}!IsNan@{IsNan}}
+\index{IsNan@{IsNan}!internal::Double@{internal::Double}}
+\doxysubsubsection{\texorpdfstring{IsNan()}{IsNan()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_double_a312312ab2798ee85cbd0e739fcefa386} 
+bool internal\+::\+Double\+::\+Is\+Nan (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{ieee754_8h_source_l00041}{41}} of file \mbox{\hyperlink{ieee754_8h_source}{ieee754.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00041\ \{\ \textcolor{keywordflow}{return}\ (\mbox{\hyperlink{classinternal_1_1_double_ad7523f7fe0c47d6aabe34f68b00a3250}{u\_}}\ \&\ kExponentMask)\ ==\ kExponentMask\ \&\&\ \mbox{\hyperlink{classinternal_1_1_double_ade5d3e893dd6884ccd37632109dae1a6}{Significand}}()\ !=\ 0;\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classinternal_1_1_double_a312312ab2798ee85cbd0e739fcefa386_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=274pt]{classinternal_1_1_double_a312312ab2798ee85cbd0e739fcefa386_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classinternal_1_1_double_a8b9a82e8b99783b7e98b5307756021c0}\index{internal::Double@{internal::Double}!IsNanOrInf@{IsNanOrInf}}
+\index{IsNanOrInf@{IsNanOrInf}!internal::Double@{internal::Double}}
+\doxysubsubsection{\texorpdfstring{IsNanOrInf()}{IsNanOrInf()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_double_a8b9a82e8b99783b7e98b5307756021c0} 
+bool internal\+::\+Double\+::\+Is\+Nan\+Or\+Inf (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{ieee754_8h_source_l00043}{43}} of file \mbox{\hyperlink{ieee754_8h_source}{ieee754.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00043\ \{\ \textcolor{keywordflow}{return}\ (\mbox{\hyperlink{classinternal_1_1_double_ad7523f7fe0c47d6aabe34f68b00a3250}{u\_}}\ \&\ kExponentMask)\ ==\ kExponentMask;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classinternal_1_1_double_a8a39cd42010c69681da35d87f1331381}\index{internal::Double@{internal::Double}!IsNormal@{IsNormal}}
+\index{IsNormal@{IsNormal}!internal::Double@{internal::Double}}
+\doxysubsubsection{\texorpdfstring{IsNormal()}{IsNormal()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_double_a8a39cd42010c69681da35d87f1331381} 
+bool internal\+::\+Double\+::\+Is\+Normal (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{ieee754_8h_source_l00044}{44}} of file \mbox{\hyperlink{ieee754_8h_source}{ieee754.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00044\ \{\ \textcolor{keywordflow}{return}\ (\mbox{\hyperlink{classinternal_1_1_double_ad7523f7fe0c47d6aabe34f68b00a3250}{u\_}}\ \&\ kExponentMask)\ !=\ 0\ ||\ \mbox{\hyperlink{classinternal_1_1_double_ade5d3e893dd6884ccd37632109dae1a6}{Significand}}()\ ==\ 0;\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classinternal_1_1_double_a8a39cd42010c69681da35d87f1331381_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classinternal_1_1_double_a8a39cd42010c69681da35d87f1331381_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classinternal_1_1_double_a90a3a1ca614b377b59576955ce987ce2}\index{internal::Double@{internal::Double}!IsZero@{IsZero}}
+\index{IsZero@{IsZero}!internal::Double@{internal::Double}}
+\doxysubsubsection{\texorpdfstring{IsZero()}{IsZero()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_double_a90a3a1ca614b377b59576955ce987ce2} 
+bool internal\+::\+Double\+::\+Is\+Zero (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{ieee754_8h_source_l00045}{45}} of file \mbox{\hyperlink{ieee754_8h_source}{ieee754.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00045\ \{\ \textcolor{keywordflow}{return}\ (\mbox{\hyperlink{classinternal_1_1_double_ad7523f7fe0c47d6aabe34f68b00a3250}{u\_}}\ \&\ (kExponentMask\ |\ kSignificandMask))\ ==\ 0;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classinternal_1_1_double_a6ffee23d82d9c606b1a53ed87e393e90}\index{internal::Double@{internal::Double}!NextPositiveDouble@{NextPositiveDouble}}
+\index{NextPositiveDouble@{NextPositiveDouble}!internal::Double@{internal::Double}}
+\doxysubsubsection{\texorpdfstring{NextPositiveDouble()}{NextPositiveDouble()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_double_a6ffee23d82d9c606b1a53ed87e393e90} 
+double internal\+::\+Double\+::\+Next\+Positive\+Double (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{ieee754_8h_source_l00032}{32}} of file \mbox{\hyperlink{ieee754_8h_source}{ieee754.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(!\mbox{\hyperlink{classinternal_1_1_double_ab09c26873ca4c3e471a97c4559bf317d}{Sign}}());}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classinternal_1_1_double_a98e2cff9880cd032d174e9721ae40ddd}{Double}}(\mbox{\hyperlink{classinternal_1_1_double_ad7523f7fe0c47d6aabe34f68b00a3250}{u\_}}\ +\ 1).Value();}
+\DoxyCodeLine{00035\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classinternal_1_1_double_a6ffee23d82d9c606b1a53ed87e393e90_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classinternal_1_1_double_ab09c26873ca4c3e471a97c4559bf317d}\index{internal::Double@{internal::Double}!Sign@{Sign}}
+\index{Sign@{Sign}!internal::Double@{internal::Double}}
+\doxysubsubsection{\texorpdfstring{Sign()}{Sign()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_double_ab09c26873ca4c3e471a97c4559bf317d} 
+bool internal\+::\+Double\+::\+Sign (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{ieee754_8h_source_l00037}{37}} of file \mbox{\hyperlink{ieee754_8h_source}{ieee754.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00037\ \{\ \textcolor{keywordflow}{return}\ (\mbox{\hyperlink{classinternal_1_1_double_ad7523f7fe0c47d6aabe34f68b00a3250}{u\_}}\ \&\ kSignMask)\ !=\ 0;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classinternal_1_1_double_ab09c26873ca4c3e471a97c4559bf317d_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classinternal_1_1_double_ade5d3e893dd6884ccd37632109dae1a6}\index{internal::Double@{internal::Double}!Significand@{Significand}}
+\index{Significand@{Significand}!internal::Double@{internal::Double}}
+\doxysubsubsection{\texorpdfstring{Significand()}{Significand()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_double_ade5d3e893dd6884ccd37632109dae1a6} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} internal\+::\+Double\+::\+Significand (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{ieee754_8h_source_l00038}{38}} of file \mbox{\hyperlink{ieee754_8h_source}{ieee754.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00038\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classinternal_1_1_double_ad7523f7fe0c47d6aabe34f68b00a3250}{u\_}}\ \&\ kSignificandMask;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classinternal_1_1_double_ade5d3e893dd6884ccd37632109dae1a6_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classinternal_1_1_double_ab3d3a81274e4f4b9b415db7c664d3ac9}\index{internal::Double@{internal::Double}!ToBias@{ToBias}}
+\index{ToBias@{ToBias}!internal::Double@{internal::Double}}
+\doxysubsubsection{\texorpdfstring{ToBias()}{ToBias()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_double_ab3d3a81274e4f4b9b415db7c664d3ac9} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} internal\+::\+Double\+::\+To\+Bias (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{ieee754_8h_source_l00049}{49}} of file \mbox{\hyperlink{ieee754_8h_source}{ieee754.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00049\ \{\ \textcolor{keywordflow}{return}\ (\mbox{\hyperlink{classinternal_1_1_double_ad7523f7fe0c47d6aabe34f68b00a3250}{u\_}}\ \&\ kSignMask)\ ?\ \string~u\_\ +\ 1\ :\ \mbox{\hyperlink{classinternal_1_1_double_ad7523f7fe0c47d6aabe34f68b00a3250}{u\_}}\ |\ kSignMask;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=278pt]{classinternal_1_1_double_ab3d3a81274e4f4b9b415db7c664d3ac9_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classinternal_1_1_double_a1a35be6344c886f159cb36a1498a62ac}\index{internal::Double@{internal::Double}!Uint64Value@{Uint64Value}}
+\index{Uint64Value@{Uint64Value}!internal::Double@{internal::Double}}
+\doxysubsubsection{\texorpdfstring{Uint64Value()}{Uint64Value()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_double_a1a35be6344c886f159cb36a1498a62ac} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} internal\+::\+Double\+::\+Uint64\+Value (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{ieee754_8h_source_l00030}{30}} of file \mbox{\hyperlink{ieee754_8h_source}{ieee754.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00030\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classinternal_1_1_double_ad7523f7fe0c47d6aabe34f68b00a3250}{u\_}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classinternal_1_1_double_a665c64824d1046528cbc4066a9ed0ef8}\index{internal::Double@{internal::Double}!Value@{Value}}
+\index{Value@{Value}!internal::Double@{internal::Double}}
+\doxysubsubsection{\texorpdfstring{Value()}{Value()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_double_a665c64824d1046528cbc4066a9ed0ef8} 
+double internal\+::\+Double\+::\+Value (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{ieee754_8h_source_l00029}{29}} of file \mbox{\hyperlink{ieee754_8h_source}{ieee754.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00029\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classinternal_1_1_double_a9ed5b5245664da8abe6cdeefaed6452e}{d\_}};\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=272pt]{classinternal_1_1_double_a665c64824d1046528cbc4066a9ed0ef8_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classinternal_1_1_double_a9ed5b5245664da8abe6cdeefaed6452e}\index{internal::Double@{internal::Double}!d\_@{d\_}}
+\index{d\_@{d\_}!internal::Double@{internal::Double}}
+\doxysubsubsection{\texorpdfstring{d\_}{d\_}}
+{\footnotesize\ttfamily \label{classinternal_1_1_double_a9ed5b5245664da8abe6cdeefaed6452e} 
+double internal\+::\+Double\+::d\+\_\+}
+
+
+
+Definition at line \mbox{\hyperlink{ieee754_8h_source_l00070}{70}} of file \mbox{\hyperlink{ieee754_8h_source}{ieee754.\+h}}.
+
+\Hypertarget{classinternal_1_1_double_ad7523f7fe0c47d6aabe34f68b00a3250}\index{internal::Double@{internal::Double}!u\_@{u\_}}
+\index{u\_@{u\_}!internal::Double@{internal::Double}}
+\doxysubsubsection{\texorpdfstring{u\_}{u\_}}
+{\footnotesize\ttfamily \label{classinternal_1_1_double_ad7523f7fe0c47d6aabe34f68b00a3250} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} internal\+::\+Double\+::u\+\_\+}
+
+
+
+Definition at line \mbox{\hyperlink{ieee754_8h_source_l00071}{71}} of file \mbox{\hyperlink{ieee754_8h_source}{ieee754.\+h}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/internal/\mbox{\hyperlink{ieee754_8h}{ieee754.\+h}}\end{DoxyCompactItemize}

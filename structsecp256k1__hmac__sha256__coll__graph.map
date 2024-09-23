@@ -1,0 +1,5 @@
+<map id="secp256k1_hmac_sha256" name="secp256k1_hmac_sha256">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,109,178,135"/>
+<area shape="rect" id="Node000002" href="$structsecp256k1__sha256.html" title=" " alt="" coords="25,5,158,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="94,47,94,109,89,109,89,47"/>
+</map>

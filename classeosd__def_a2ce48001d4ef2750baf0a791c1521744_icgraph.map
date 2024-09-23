@@ -1,0 +1,15 @@
+<map id="eosd_def::get_node_num" name="eosd_def::get_node_num">
+<area shape="rect" id="Node000001" title=" " alt="" coords="489,56,657,82"/>
+<area shape="rect" id="Node000002" href="$structlauncher__def.html#a500893d4e0bbd09b4c33bca41fd07790" title=" " alt="" coords="105,5,250,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="494,55,441,46,250,26,251,21,442,41,494,50"/>
+<area shape="rect" id="Node000004" href="$structlauncher__def.html#a0508d513aecd0e758140675d33e65054" title=" " alt="" coords="304,56,438,82"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="474,72,438,72,438,66,474,66"/>
+<area shape="rect" id="Node000005" href="$structlauncher__def.html#aaaa837073fe41f15fab1cbced9f3d8d1" title=" " alt="" coords="300,105,441,131"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="503,89,427,107,426,102,502,83"/>
+<area shape="rect" id="Node000003" href="$programs_2sysio-launcher_2main_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97" title=" " alt="" coords="5,56,55,82"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="124,39,56,63,54,58,123,34"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="288,72,55,72,55,66,288,66"/>
+<area shape="rect" id="Node000006" href="$structlauncher__def.html#a94d21163ede9d4d2dd2d4b0638a7b4f8" title=" " alt="" coords="103,107,252,132"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="284,121,252,122,252,116,284,116"/>
+<area shape="poly" id="edge7_Node000006_Node000003" title=" " alt="" coords="123,104,54,80,56,75,124,99"/>
+</map>

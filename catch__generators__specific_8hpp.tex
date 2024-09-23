@@ -1,0 +1,47 @@
+\doxysection{libraries/sys-\/vm/external/\+Catch2/include/internal/catch\+\_\+generators\+\_\+specific.hpp File Reference}
+\hypertarget{catch__generators__specific_8hpp}{}\label{catch__generators__specific_8hpp}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_generators\_specific.hpp@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_generators\_specific.hpp}}
+{\ttfamily \#include "{}catch\+\_\+context.\+h"{}}\newline
+{\ttfamily \#include "{}catch\+\_\+generators.\+hpp"{}}\newline
+{\ttfamily \#include "{}catch\+\_\+interfaces\+\_\+config.\+h"{}}\newline
+{\ttfamily \#include $<$random$>$}\newline
+Include dependency graph for catch\+\_\+generators\+\_\+specific.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{catch__generators__specific_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=232pt]{catch__generators__specific_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{class_catch_1_1_generators_1_1_random_floating_generator}{Catch\+::\+Generators\+::\+Random\+Floating\+Generator$<$ Float $>$}}
+\item 
+class \mbox{\hyperlink{class_catch_1_1_generators_1_1_random_integer_generator}{Catch\+::\+Generators\+::\+Random\+Integer\+Generator$<$ Integer $>$}}
+\item 
+class \mbox{\hyperlink{class_catch_1_1_generators_1_1_range_generator}{Catch\+::\+Generators\+::\+Range\+Generator$<$ T $>$}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespace_catch}{Catch}}
+\item 
+namespace \mbox{\hyperlink{namespace_catch_1_1_generators}{Catch\+::\+Generators}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\std\+::enable\+\_\+if$<$ std\+::is\+\_\+integral$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\mbox{\hyperlink{namespace_catch_1_1_generators_a3b2efc97978cf37951b75394aae1a3fb}{\+::value}} \&\&!std\+::is\+\_\+same$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, bool $>$\mbox{\hyperlink{namespace_catch_1_1_generators_a3b2efc97978cf37951b75394aae1a3fb}{\+::value}}, \mbox{\hyperlink{class_catch_1_1_generators_1_1_generator_wrapper}{Generator\+Wrapper}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ $>$\+::type \mbox{\hyperlink{namespace_catch_1_1_generators_a079a48b510a5f171707e87f351328e52}{Catch\+::\+Generators\+::random}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} b)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\std\+::enable\+\_\+if$<$ std\+::is\+\_\+floating\+\_\+point$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\mbox{\hyperlink{namespace_catch_1_1_generators_a3b2efc97978cf37951b75394aae1a3fb}{\+::value}}, \mbox{\hyperlink{class_catch_1_1_generators_1_1_generator_wrapper}{Generator\+Wrapper}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ $>$\+::type \mbox{\hyperlink{namespace_catch_1_1_generators_a4dd41578e2ccba6d255d7f850ef211bf}{Catch\+::\+Generators\+::random}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} b)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{class_catch_1_1_generators_1_1_generator_wrapper}{Generator\+Wrapper}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \mbox{\hyperlink{namespace_catch_1_1_generators_a6e53e65dfedc4d39febcb7b2b862afd9}{Catch\+::\+Generators\+::range}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const \&start, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const \&end, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const \&step)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{class_catch_1_1_generators_1_1_generator_wrapper}{Generator\+Wrapper}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \mbox{\hyperlink{namespace_catch_1_1_generators_a758d34927bfde268b60ea6b7dc4be6bd}{Catch\+::\+Generators\+::range}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const \&start, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const \&end)
+\end{DoxyCompactItemize}

@@ -1,0 +1,15 @@
+<map id="Catch::matchTest" name="Catch::matchTest">
+<area shape="rect" id="Node000001" title=" " alt="" coords="534,55,660,80"/>
+<area shape="rect" id="Node000002" href="$namespace_catch.html#a105d5acdec8a6b401e12a592557c9dd1" title=" " alt="" coords="365,55,486,80"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="519,70,487,70,487,65,519,65"/>
+<area shape="rect" id="Node000003" href="$namespace_catch.html#a2226866b4114853fb3ff63dbecc8b0c9" title=" " alt="" coords="171,5,280,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="355,53,280,34,282,29,356,48"/>
+<area shape="rect" id="Node000005" href="$namespace_catch.html#ac2542a1569e5b9dc72206347368a921e" title=" " alt="" coords="169,55,282,80"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="350,70,283,70,283,65,350,65"/>
+<area shape="rect" id="Node000006" href="$namespace_catch.html#a7f2d0f82056a4b9adc4204b9a1fbd117" title=" " alt="" coords="135,104,317,130"/>
+<area shape="poly" id="edge6_Node000002_Node000006" title=" " alt="" coords="356,87,282,106,280,101,355,82"/>
+<area shape="rect" id="Node000004" href="$namespace_catch.html#a8267f077fd7ddf88bb182e8b9ead85d3" title=" " alt="" coords="5,55,87,80"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="160,38,135,45,88,58,87,53,134,40,158,33"/>
+<area shape="poly" id="edge5_Node000005_Node000004" title=" " alt="" coords="154,70,87,70,87,65,154,65"/>
+<area shape="poly" id="edge7_Node000006_Node000004" title=" " alt="" coords="158,102,134,95,87,82,88,77,135,90,160,97"/>
+</map>

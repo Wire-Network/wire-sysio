@@ -1,0 +1,21 @@
+<map id="sysio::producer_plugin::handle_sighup" name="sysio::producer_plugin::handle_sighup">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,154,157,194"/>
+<area shape="rect" id="Node000002" href="$namespacesysio.html#ad66b67a8dd0a897a0a5b89f954fd3ade" title=" " alt="" coords="242,5,376,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="93,152,137,96,168,65,203,40,226,29,228,34,206,44,172,69,141,99,98,155"/>
+<area shape="rect" id="Node000003" href="$producer__plugin_8cpp.html#a621f886a258aed68a24a53ffb3b0c36d" title=" " alt="" coords="214,55,405,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="105,151,149,119,204,89,220,83,222,88,206,94,152,124,109,156"/>
+<area shape="rect" id="Node000004" href="$producer__plugin_8cpp.html#af25e4084ac685ca1a7777524a948d81f" title=" " alt="" coords="251,104,368,130"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="156,152,204,140,237,131,238,136,205,145,157,157"/>
+<area shape="rect" id="Node000005" href="$producer__plugin_8cpp.html#ada404895f53490702144cecc3a82b6d4" title=" " alt="" coords="238,154,380,194"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="157,172,223,172,223,177,157,177"/>
+<area shape="rect" id="Node000006" href="$producer__plugin_8cpp.html#a54d7146c8088d64735b0cfbbea3ecae8" title=" " alt="" coords="212,219,407,244"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="157,191,205,204,238,212,237,217,204,209,156,196"/>
+<area shape="rect" id="Node000007" href="$producer__plugin_8cpp.html#ae546cf0f5f4ee210f917a432e3c1bc42" title=" " alt="" coords="205,268,414,294"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="109,193,152,225,206,254,222,260,220,265,204,259,149,229,105,197"/>
+<area shape="rect" id="Node000008" href="$classfc_1_1logger.html#a2214632598874a4e52a5500a6346515e" title=" " alt="" coords="248,317,370,343"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="98,193,141,249,172,279,206,304,234,316,232,321,203,308,168,283,137,253,93,196"/>
+<area shape="rect" id="Node000009" href="$classfc_1_1logger.html#ad8267d78496b4a3241148afd11fa2e03" title=" " alt="" coords="478,288,593,314"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="371,320,462,308,462,313,371,325"/>
+<area shape="rect" id="Node000010" href="$structfc_1_1log__config.html#ad7c05723f767652011149945ae0308e1" title=" " alt="" coords="462,338,608,378"/>
+<area shape="poly" id="edge9_Node000008_Node000010" title=" " alt="" coords="371,335,447,345,446,350,371,340"/>
+</map>

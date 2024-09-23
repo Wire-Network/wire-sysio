@@ -1,0 +1,33 @@
+\doxysection{LLVMJIT.\+h}
+\hypertarget{chain_2webassembly_2runtimes_2sys-vm-oc_2_l_l_v_m_j_i_t_8h_source}{}\label{chain_2webassembly_2runtimes_2sys-vm-oc_2_l_l_v_m_j_i_t_8h_source}\index{libraries/chain/webassembly/runtimes/sys-\/vm-\/oc/LLVMJIT.h@{libraries/chain/webassembly/runtimes/sys-\/vm-\/oc/LLVMJIT.h}}
+\mbox{\hyperlink{chain_2webassembly_2runtimes_2sys-vm-oc_2_l_l_v_m_j_i_t_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2runtimes_2sys-vm-oc_2_l_l_v_m_j_i_t_8h_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2runtimes_2sys-vm-oc_2_l_l_v_m_j_i_t_8h_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2runtimes_2sys-vm-oc_2_l_l_v_m_j_i_t_8h_source_l00003}00003\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_basic_types_8h}{Inline/BasicTypes.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2runtimes_2sys-vm-oc_2_l_l_v_m_j_i_t_8h_source_l00004}00004\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_module_8h}{IR/Module.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2runtimes_2sys-vm-oc_2_l_l_v_m_j_i_t_8h_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2runtimes_2sys-vm-oc_2_l_l_v_m_j_i_t_8h_source_l00006}00006\ \textcolor{preprocessor}{\#pragma\ push\_macro("{}N"{})}}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2runtimes_2sys-vm-oc_2_l_l_v_m_j_i_t_8h_source_l00007}00007\ \textcolor{preprocessor}{\#undef\ N}}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2runtimes_2sys-vm-oc_2_l_l_v_m_j_i_t_8h_source_l00008}00008\ \textcolor{preprocessor}{\#include\ "{}llvm/IR/Module.h"{}}}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2runtimes_2sys-vm-oc_2_l_l_v_m_j_i_t_8h_source_l00009}00009\ \textcolor{preprocessor}{\#pragma\ pop\_macro("{}N"{})}}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2runtimes_2sys-vm-oc_2_l_l_v_m_j_i_t_8h_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2runtimes_2sys-vm-oc_2_l_l_v_m_j_i_t_8h_source_l00011}00011\ \textcolor{preprocessor}{\#include\ <map>}}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2runtimes_2sys-vm-oc_2_l_l_v_m_j_i_t_8h_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2runtimes_2sys-vm-oc_2_l_l_v_m_j_i_t_8h_source_l00013}00013\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{\ \textcolor{keyword}{namespace\ }chain\ \{\ \textcolor{keyword}{namespace\ }eosvmoc\ \{}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2runtimes_2sys-vm-oc_2_l_l_v_m_j_i_t_8h_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2runtimes_2sys-vm-oc_2_l_l_v_m_j_i_t_8h_source_l00015}\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1instantiated__code}{00015}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1instantiated__code}{instantiated\_code}}\ \{}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2runtimes_2sys-vm-oc_2_l_l_v_m_j_i_t_8h_source_l00016}\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1instantiated__code_a2e421c7dd25bd2e007277247b8facea9}{00016}}\ \ \ \ std::vector<uint8\_t>\ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1instantiated__code_a2e421c7dd25bd2e007277247b8facea9}{code}};}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2runtimes_2sys-vm-oc_2_l_l_v_m_j_i_t_8h_source_l00017}\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1instantiated__code_a79295063a1562edf79bb2a3f47a7d2bc}{00017}}\ \ \ \ std::map<unsigned,\ uintptr\_t>\ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1instantiated__code_a79295063a1562edf79bb2a3f47a7d2bc}{function\_offsets}};}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2runtimes_2sys-vm-oc_2_l_l_v_m_j_i_t_8h_source_l00018}\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1instantiated__code_a8405b09c68adbb5a68819c361bb5b524}{00018}}\ \ \ \ \mbox{\hyperlink{stdint_8h_a31b85deecb45924320becd11d3ee16ce}{uintptr\_t}}\ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1instantiated__code_a8405b09c68adbb5a68819c361bb5b524}{table\_offset}};}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2runtimes_2sys-vm-oc_2_l_l_v_m_j_i_t_8h_source_l00019}00019\ \};}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2runtimes_2sys-vm-oc_2_l_l_v_m_j_i_t_8h_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2runtimes_2sys-vm-oc_2_l_l_v_m_j_i_t_8h_source_l00021}00021\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_l_l_v_m_j_i_t}{LLVMJIT}}\ \{}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2runtimes_2sys-vm-oc_2_l_l_v_m_j_i_t_8h_source_l00022}00022\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a6a845a4c43fc6bf05d5f301aef56ff77}{getFunctionIndexFromExternalName}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ externalName,\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\&\ outFunctionDefIndex);}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2runtimes_2sys-vm-oc_2_l_l_v_m_j_i_t_8h_source_l00023}00023\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_ad225d9ff7b3c8d52e2e7128b937ca42e}{getTableSymbolName}}();}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2runtimes_2sys-vm-oc_2_l_l_v_m_j_i_t_8h_source_l00024}00024\ \ \ \ llvm::Module*\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a988f69eb1e3c3722b9b899034d86d146}{emitModule}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_i_r_1_1_module}{IR::Module}}\&\ module);}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2runtimes_2sys-vm-oc_2_l_l_v_m_j_i_t_8h_source_l00025}00025\ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1instantiated__code}{instantiated\_code}}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a5bd12a2d92a270ecd02902006bc53f59}{instantiateModule}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_i_r_1_1_module}{IR::Module}}\&\ module);}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2runtimes_2sys-vm-oc_2_l_l_v_m_j_i_t_8h_source_l00026}00026\ \}}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2runtimes_2sys-vm-oc_2_l_l_v_m_j_i_t_8h_source_l00027}00027\ \}\}\}}
+
+\end{DoxyCode}

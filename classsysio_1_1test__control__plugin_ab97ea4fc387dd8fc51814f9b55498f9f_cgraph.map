@@ -1,0 +1,7 @@
+<map id="sysio::test_control_plugin::plugin_startup" name="sysio::test_control_plugin::plugin_startup">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,157,46"/>
+<area shape="rect" id="Node000002" href="$namespaceappbase.html#a99374dc23934f008a09f2f79be9eae40" title=" " alt="" coords="205,13,304,38"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="157,23,189,23,189,28,157,28"/>
+<area shape="rect" id="Node000003" href="$classappbase_1_1application.html#ac874b2659b400fe254f1ae4260d06ecf" title=" " alt="" coords="352,5,492,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="304,23,337,23,337,28,304,28"/>
+</map>

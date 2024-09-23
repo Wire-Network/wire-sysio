@@ -1,0 +1,11 @@
+<map id="Catch::RedirectedStreams::~RedirectedStreams" name="Catch::RedirectedStreams::~RedirectedStreams">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,23,182,64"/>
+<area shape="rect" id="Node000002" href="$class_catch_1_1_redirected_std_err.html#a35176680e723b9b4cb0f5e1290bd75e2" title=" " alt="" coords="232,5,419,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="182,31,216,27,217,33,182,37"/>
+<area shape="rect" id="Node000004" href="$class_catch_1_1_redirected_std_out.html#afd46da9836223d033c031fb08a9efb1c" title=" " alt="" coords="230,55,421,80"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="182,50,214,53,214,59,182,55"/>
+<area shape="rect" id="Node000003" href="$class_catch_1_1_reusable_string_stream.html#a0e9ecf260b2a5d35f4886ef0d51f6270" title=" " alt="" coords="469,31,687,56"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="420,25,454,28,453,34,419,30"/>
+<area shape="poly" id="edge3_Node000003_Node000003" title=" " alt="" coords="537,32,528,22,533,12,550,6,578,4,610,7,625,14,623,19,608,12,578,9,551,11,537,16,534,21,541,28"/>
+<area shape="poly" id="edge5_Node000004_Node000003" title=" " alt="" coords="421,56,453,53,454,58,422,61"/>
+</map>

@@ -1,0 +1,74 @@
+\doxysection{libraries/softfloat/source/ext\+F80\+\_\+to\+\_\+f128.c File Reference}
+\hypertarget{softfloat_2source_2ext_f80__to__f128_8c}{}\label{softfloat_2source_2ext_f80__to__f128_8c}\index{libraries/softfloat/source/extF80\_to\_f128.c@{libraries/softfloat/source/extF80\_to\_f128.c}}
+{\ttfamily \#include $<$stdbool.\+h$>$}\newline
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include "{}platform.\+h"{}}\newline
+{\ttfamily \#include "{}internals.\+h"{}}\newline
+{\ttfamily \#include "{}specialize.\+h"{}}\newline
+{\ttfamily \#include "{}softfloat.\+h"{}}\newline
+Include dependency graph for ext\+F80\+\_\+to\+\_\+f128.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{softfloat_2source_2ext_f80__to__f128_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structfloat128__t}{float128\+\_\+t}} \mbox{\hyperlink{softfloat_2source_2ext_f80__to__f128_8c_ae00dcc21b25424efeb3794c6633c8bc2}{ext\+F80\+\_\+to\+\_\+f128}} (\mbox{\hyperlink{softfloat_2source_2include_2softfloat__types_8h_ae6c67a307cbc8664adc4f1966a3e71f6}{ext\+Float80\+\_\+t}} \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{softfloat_2source_2ext_f80__to__f128_8c_ae00dcc21b25424efeb3794c6633c8bc2}\index{extF80\_to\_f128.c@{extF80\_to\_f128.c}!extF80\_to\_f128@{extF80\_to\_f128}}
+\index{extF80\_to\_f128@{extF80\_to\_f128}!extF80\_to\_f128.c@{extF80\_to\_f128.c}}
+\doxysubsubsection{\texorpdfstring{extF80\_to\_f128()}{extF80\_to\_f128()}}
+{\footnotesize\ttfamily \label{softfloat_2source_2ext_f80__to__f128_8c_ae00dcc21b25424efeb3794c6633c8bc2} 
+\mbox{\hyperlink{structfloat128__t}{float128\+\_\+t}} ext\+F80\+\_\+to\+\_\+f128 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{softfloat_2source_2include_2softfloat__types_8h_ae6c67a307cbc8664adc4f1966a3e71f6}{ext\+Float80\+\_\+t}}}]{a}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2ext_f80__to__f128_8c_source_l00044}{44}} of file \mbox{\hyperlink{softfloat_2source_2ext_f80__to__f128_8c_source}{ext\+F80\+\_\+to\+\_\+f128.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00045\ \{}
+\DoxyCodeLine{00046\ \ \ \ \ \textcolor{keyword}{union\ }\{\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structext_float80_m}{extFloat80M}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};\ \mbox{\hyperlink{structext_float80_m}{extFloat80\_t}}\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}};\ \}\ uA;}
+\DoxyCodeLine{00047\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a6ed085329b153773ff76afa0702cf897}{uint\_fast16\_t}}\ uiA64;}
+\DoxyCodeLine{00048\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\_fast64\_t}}\ uiA0;}
+\DoxyCodeLine{00049\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a6ed085329b153773ff76afa0702cf897}{uint\_fast16\_t}}\ exp;}
+\DoxyCodeLine{00050\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\_fast64\_t}}\ frac;}
+\DoxyCodeLine{00051\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structcommon_na_n}{commonNaN}}\ \mbox{\hyperlink{structcommon_na_n}{commonNaN}};}
+\DoxyCodeLine{00052\ \ \ \ \ \textcolor{keyword}{struct\ }uint128\ uiZ;}
+\DoxyCodeLine{00053\ \ \ \ \ \textcolor{keywordtype}{bool}\ sign;}
+\DoxyCodeLine{00054\ \ \ \ \ \textcolor{keyword}{struct\ }uint128\ frac128;}
+\DoxyCodeLine{00055\ \ \ \ \ \textcolor{keyword}{union\ }ui128\_f128\ uZ;}
+\DoxyCodeLine{00056\ }
+\DoxyCodeLine{00057\ \ \ \ \ uA.f\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}};}
+\DoxyCodeLine{00058\ \ \ \ \ uiA64\ =\ uA.s.signExp;}
+\DoxyCodeLine{00059\ \ \ \ \ uiA0\ \ =\ uA.s.signif;}
+\DoxyCodeLine{00060\ \ \ \ \ exp\ =\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a74b34b4c558d52bf4f1b11804aa0647a}{expExtF80UI64}}(\ uiA64\ );}
+\DoxyCodeLine{00061\ \ \ \ \ frac\ =\ uiA0\ \&\ \mbox{\hyperlink{stdint_8h_a8da5373e041921aa34c2b6172ac3babc}{UINT64\_C}}(\ 0x7FFFFFFFFFFFFFFF\ );}
+\DoxyCodeLine{00062\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ (exp\ ==\ 0x7FFF)\ \&\&\ frac\ )\ \{}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2s__ext_f80_u_i_to_common_na_n_8c_abdfaa3d9cf59a75e789365fd8aa60132}{softfloat\_extF80UIToCommonNaN}}(\ uiA64,\ uiA0,\ \&\mbox{\hyperlink{structcommon_na_n}{commonNaN}}\ );}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ uiZ\ =\ \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2s__common_na_n_to_f128_u_i_8c_a96be321344ceceae3d7af1f27a14b06d}{softfloat\_commonNaNToF128UI}}(\ \&\mbox{\hyperlink{structcommon_na_n}{commonNaN}}\ );}
+\DoxyCodeLine{00065\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ sign\ =\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a968b7cb3059e072eb9872a51ae3490a9}{signExtF80UI64}}(\ uiA64\ );}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ frac128\ =\ \mbox{\hyperlink{softfloat_2source_2s__short_shift_left128_8c_a5813c1cdc091451e4bcbf3227ebc0632}{softfloat\_shortShiftLeft128}}(\ 0,\ frac,\ 49\ );}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ uiZ.v64\ =\ packToF128UI64(\ sign,\ exp,\ frac128.v64\ );}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ uiZ.v0\ \ =\ frac128.v0;}
+\DoxyCodeLine{00070\ \ \ \ \ \}}
+\DoxyCodeLine{00071\ \ \ \ \ uZ.ui\ =\ uiZ;}
+\DoxyCodeLine{00072\ \ \ \ \ \textcolor{keywordflow}{return}\ uZ.f;}
+\DoxyCodeLine{00073\ }
+\DoxyCodeLine{00074\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{softfloat_2source_2ext_f80__to__f128_8c_ae00dcc21b25424efeb3794c6633c8bc2_cgraph}
+\end{center}
+\end{figure}

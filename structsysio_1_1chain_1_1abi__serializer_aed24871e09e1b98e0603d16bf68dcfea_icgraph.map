@@ -1,0 +1,13 @@
+<map id="sysio::chain::abi_serializer::resolve_type" name="sysio::chain::abi_serializer::resolve_type">
+<area shape="rect" id="Node000001" title=" " alt="" coords="440,71,615,111"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1abi__serializer.html#a4bdf95cebc38d163406aef3aa78d0ac9" title=" " alt="" coords="217,5,392,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="441,68,376,49,377,44,442,63"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1chain_1_1abi__serializer.html#ad00f57adb82a67d6bd47c4560a3a3248" title=" " alt="" coords="217,71,392,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="425,94,392,94,392,88,425,88"/>
+<area shape="rect" id="Node000004" href="$structsysio_1_1chain_1_1impl_1_1abi__traverse__context__with__path.html#a628be1cef65fa845dc10592575a9b48c" title=" " alt="" coords="219,135,390,191"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="449,119,391,138,389,133,448,114"/>
+<area shape="rect" id="Node000005" href="$structsysio_1_1chain_1_1impl_1_1abi__traverse__context__with__path.html#a10786d4865d5c60aa1990a2bb22c710a" title=" " alt="" coords="5,80,169,150"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="203,143,168,136,170,130,204,138"/>
+<area shape="rect" id="Node000006" href="$structsysio_1_1chain_1_1impl_1_1abi__traverse__context__with__path.html#afbdd54cd4dca2e928dfa32a09b9e4a12" title=" " alt="" coords="5,174,169,245"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="204,187,170,195,168,190,203,182"/>
+</map>

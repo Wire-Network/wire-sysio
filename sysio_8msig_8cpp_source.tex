@@ -1,0 +1,213 @@
+\doxysection{sysio.\+msig.\+cpp}
+\hypertarget{sysio_8msig_8cpp_source}{}\label{sysio_8msig_8cpp_source}\index{/Users/svetlasyrimis/Desktop/wire-\/network/WN-\/org/wire-\/system-\/contracts/contracts/sysio.msig/src/sysio.msig.cpp@{/Users/svetlasyrimis/Desktop/wire-\/network/WN-\/org/wire-\/system-\/contracts/contracts/sysio.msig/src/sysio.msig.cpp}}
+\mbox{\hyperlink{sysio_8msig_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <sysio/action.hpp>}}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <sysio/crypto.hpp>}}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <sysio/permission.hpp>}}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{sysio_8msig_8hpp}{sysio.msig/sysio.msig.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00007}00007\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00009}\mbox{\hyperlink{classsysio_1_1multisig_ad6138d276fcc71f34449be4ab723711a}{00009}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1multisig_ad6138d276fcc71f34449be4ab723711a}{multisig::propose}}(\ ignore<name>\ proposer,}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00010}00010\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ignore<name>\ proposal\_name,}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00011}00011\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ignore<std::vector<permission\_level>>\ requested,}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00012}00012\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ignore<transaction>\ trx\ )}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00013}00013\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00014}00014\ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\ \_proposer;}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00015}00015\ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\ \_proposal\_name;}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00016}00016\ \ \ \ std::vector<permission\_level>\ \_requested;}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00017}00017\ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__header}{transaction\_header}}\ \_trx\_header;}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00019}00019\ \ \ \ \_ds\ >>\ \_proposer\ >>\ \_proposal\_name\ >>\ \_requested;}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00021}00021\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ trx\_pos\ =\ \_ds.pos();}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00022}00022\ \ \ \ \textcolor{keywordtype}{size\_t}\ size\ \ \ \ =\ \_ds.remaining();}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00023}00023\ \ \ \ \_ds\ >>\ \_trx\_header;}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00025}00025\ \ \ \ require\_auth(\ \_proposer\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00026}00026\ \ \ \ check(\ \_trx\_header.\mbox{\hyperlink{structsysio_1_1chain_1_1transaction__header_ad1ed2586e8ace769fdb9a54d09a752ce}{expiration}}\ >=\ \mbox{\hyperlink{classfc_1_1time__point__sec}{sysio::time\_point\_sec}}(current\_time\_point()),\ \textcolor{stringliteral}{"{}transaction\ expired"{}}\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00027}00027\ \ \ \ \textcolor{comment}{//check(\ trx\_header.actions.size()\ >\ 0,\ "{}transaction\ must\ have\ at\ least\ one\ action"{}\ );}}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00029}00029\ \ \ \ proposals\ proptable(\ get\_self(),\ \_proposer.value\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00030}00030\ \ \ \ check(\ proptable.find(\ \_proposal\_name.value\ )\ ==\ proptable.end(),\ \textcolor{stringliteral}{"{}proposal\ with\ the\ same\ name\ exists"{}}\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00032}00032\ \ \ \ \textcolor{keyword}{auto}\ packed\_requested\ =\ pack(\_requested);}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00033}00033\ \ \ \ \textcolor{keyword}{auto}\ res\ =\ \ check\_transaction\_authorization(}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00034}00034\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ trx\_pos,\ size,}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00035}00035\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*)0,\ 0,}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00036}00036\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ packed\_requested.data(),\ packed\_requested.size()}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00037}00037\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00039}00039\ \ \ \ check(\ res\ >\ 0,\ \textcolor{stringliteral}{"{}transaction\ authorization\ failed"{}}\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00041}00041\ \ \ \ std::vector<char>\ pkd\_trans;}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00042}00042\ \ \ \ pkd\_trans.resize(size);}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00043}00043\ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}((\textcolor{keywordtype}{char}*)pkd\_trans.data(),\ trx\_pos,\ size);}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00044}00044\ \ \ \ proptable.emplace(\ \_proposer,\ [\&](\ \textcolor{keyword}{auto}\&\ prop\ )\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00045}00045\ \ \ \ \ \ \ prop.proposal\_name\ \ \ \ \ \ \ =\ \_proposal\_name;}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00046}00046\ \ \ \ \ \ \ prop.packed\_transaction\ \ =\ pkd\_trans;}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00047}00047\ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00049}00049\ \ \ \ approvals\ apptable(\ get\_self(),\ \_proposer.value\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00050}00050\ \ \ \ apptable.emplace(\ \_proposer,\ [\&](\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00051}00051\ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.proposal\_name\ \ \ \ \ \ \ =\ \_proposal\_name;}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00052}00052\ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.requested\_approvals.reserve(\ \_requested.size()\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00053}00053\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\ \textcolor{keyword}{auto}\&\ level\ :\ \_requested\ )\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.requested\_approvals.push\_back(\ approval\{\ level,\ \mbox{\hyperlink{classfc_1_1time__point}{time\_point}}\{\ \mbox{\hyperlink{classfc_1_1microseconds}{microseconds}}\{0\}\ \}\ \}\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00055}00055\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00056}00056\ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00057}00057\ \}}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00059}\mbox{\hyperlink{classsysio_1_1multisig_aa8c9dc60263edc40d44ad70d4f494eab}{00059}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1multisig_aa8c9dc60263edc40d44ad70d4f494eab}{multisig::approve}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\ proposer,\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\ proposal\_name,\ \mbox{\hyperlink{structsysio_1_1chain_1_1permission__level}{permission\_level}}\ level,}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ sysio::binary\_extension<sysio::checksum256>\&\ proposal\_hash\ )}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00061}00061\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00062}00062\ \ \ \ require\_auth(\ level\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00064}00064\ \ \ \ \textcolor{keywordflow}{if}(\ proposal\_hash\ )\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00065}00065\ \ \ \ \ \ \ proposals\ proptable(\ get\_self(),\ proposer.value\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00066}00066\ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ prop\ =\ proptable.get(\ proposal\_name.value,\ \textcolor{stringliteral}{"{}proposal\ not\ found"{}}\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00067}00067\ \ \ \ \ \ \ assert\_sha256(\ prop.packed\_transaction.data(),\ prop.packed\_transaction.size(),\ *proposal\_hash\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00068}00068\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00069}00069\ }
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00070}00070\ \ \ \ approvals\ apptable(\ get\_self(),\ proposer.value\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00071}00071\ \ \ \ \textcolor{keyword}{auto}\ apps\_it\ =\ apptable.find(\ proposal\_name.value\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00072}00072\ \ \ \ \textcolor{keywordflow}{if}\ (\ apps\_it\ !=\ apptable.end()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00073}00073\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ std::find\_if(\ apps\_it-\/>requested\_approvals.begin(),\ apps\_it-\/>requested\_approvals.end(),\ [\&](\textcolor{keyword}{const}\ approval\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})\ \{\ return\ a.level\ ==\ level;\ \}\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00074}00074\ \ \ \ \ \ \ check(\ itr\ !=\ apps\_it-\/>requested\_approvals.end(),\ \textcolor{stringliteral}{"{}approval\ is\ not\ on\ the\ list\ of\ requested\ approvals"{}}\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00075}00075\ }
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00076}00076\ \ \ \ \ \ \ apptable.modify(\ apps\_it,\ proposer,\ [\&](\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.provided\_approvals.push\_back(\ approval\{\ level,\ current\_time\_point()\ \}\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00078}00078\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.requested\_approvals.erase(\ itr\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00080}00080\ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00081}00081\ \ \ \ \ \ \ old\_approvals\ old\_apptable(\ get\_self(),\ proposer.value\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00082}00082\ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ apps\ =\ old\_apptable.get(\ proposal\_name.value,\ \textcolor{stringliteral}{"{}proposal\ not\ found"{}}\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00083}00083\ }
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00084}00084\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ std::find(\ apps.requested\_approvals.begin(),\ apps.requested\_approvals.end(),\ level\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00085}00085\ \ \ \ \ \ \ check(\ itr\ !=\ apps.requested\_approvals.end(),\ \textcolor{stringliteral}{"{}approval\ is\ not\ on\ the\ list\ of\ requested\ approvals"{}}\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00086}00086\ }
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00087}00087\ \ \ \ \ \ \ old\_apptable.modify(\ apps,\ proposer,\ [\&](\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00088}00088\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.provided\_approvals.push\_back(\ level\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00089}00089\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.requested\_approvals.erase(\ itr\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00090}00090\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00091}00091\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00092}00092\ \}}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00093}00093\ }
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00094}\mbox{\hyperlink{classsysio_1_1multisig_a3eb227d61f157715952d5edd8473a2ee}{00094}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1multisig_a3eb227d61f157715952d5edd8473a2ee}{multisig::unapprove}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\ proposer,\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\ proposal\_name,\ \mbox{\hyperlink{structsysio_1_1chain_1_1permission__level}{permission\_level}}\ level\ )\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00095}00095\ \ \ \ require\_auth(\ level\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00096}00096\ }
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00097}00097\ \ \ \ approvals\ apptable(\ get\_self(),\ proposer.value\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00098}00098\ \ \ \ \textcolor{keyword}{auto}\ apps\_it\ =\ apptable.find(\ proposal\_name.value\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00099}00099\ \ \ \ \textcolor{keywordflow}{if}\ (\ apps\_it\ !=\ apptable.end()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00100}00100\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ std::find\_if(\ apps\_it-\/>provided\_approvals.begin(),\ apps\_it-\/>provided\_approvals.end(),\ [\&](\textcolor{keyword}{const}\ approval\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})\ \{\ return\ a.level\ ==\ level;\ \}\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00101}00101\ \ \ \ \ \ \ check(\ itr\ !=\ apps\_it-\/>provided\_approvals.end(),\ \textcolor{stringliteral}{"{}no\ approval\ previously\ granted"{}}\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00102}00102\ \ \ \ \ \ \ apptable.modify(\ apps\_it,\ proposer,\ [\&](\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00103}00103\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.requested\_approvals.push\_back(\ approval\{\ level,\ current\_time\_point()\ \}\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00104}00104\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.provided\_approvals.erase(\ itr\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00105}00105\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00106}00106\ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00107}00107\ \ \ \ \ \ \ old\_approvals\ old\_apptable(\ get\_self(),\ proposer.value\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00108}00108\ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ apps\ =\ old\_apptable.get(\ proposal\_name.value,\ \textcolor{stringliteral}{"{}proposal\ not\ found"{}}\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00109}00109\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ std::find(\ apps.provided\_approvals.begin(),\ apps.provided\_approvals.end(),\ level\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00110}00110\ \ \ \ \ \ \ check(\ itr\ !=\ apps.provided\_approvals.end(),\ \textcolor{stringliteral}{"{}no\ approval\ previously\ granted"{}}\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00111}00111\ \ \ \ \ \ \ old\_apptable.modify(\ apps,\ proposer,\ [\&](\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00112}00112\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.requested\_approvals.push\_back(\ level\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00113}00113\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.provided\_approvals.erase(\ itr\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00114}00114\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00115}00115\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00116}00116\ \}}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00117}00117\ }
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00118}\mbox{\hyperlink{classsysio_1_1multisig_a559913d8d1defde0a28de43889988f54}{00118}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1multisig_a559913d8d1defde0a28de43889988f54}{multisig::cancel}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\ proposer,\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\ proposal\_name,\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\ canceler\ )\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00119}00119\ \ \ \ require\_auth(\ canceler\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00120}00120\ }
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00121}00121\ \ \ \ proposals\ proptable(\ get\_self(),\ proposer.value\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00122}00122\ \ \ \ \textcolor{keyword}{auto}\&\ prop\ =\ proptable.get(\ proposal\_name.value,\ \textcolor{stringliteral}{"{}proposal\ not\ found"{}}\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00123}00123\ }
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00124}00124\ \ \ \ \textcolor{keywordflow}{if}(\ canceler\ !=\ proposer\ )\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00125}00125\ \ \ \ \ \ \ check(\ unpack<transaction\_header>(\ prop.packed\_transaction\ ).expiration\ <\ \mbox{\hyperlink{classfc_1_1time__point__sec}{sysio::time\_point\_sec}}(current\_time\_point()),\ \textcolor{stringliteral}{"{}cannot\ cancel\ until\ expiration"{}}\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00126}00126\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00127}00127\ \ \ \ proptable.erase(prop);}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00128}00128\ }
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00129}00129\ \ \ \ \textcolor{comment}{//remove\ from\ new\ table}}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00130}00130\ \ \ \ approvals\ apptable(\ get\_self(),\ proposer.value\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00131}00131\ \ \ \ \textcolor{keyword}{auto}\ apps\_it\ =\ apptable.find(\ proposal\_name.value\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00132}00132\ \ \ \ \textcolor{keywordflow}{if}\ (\ apps\_it\ !=\ apptable.end()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00133}00133\ \ \ \ \ \ \ apptable.erase(apps\_it);}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00134}00134\ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00135}00135\ \ \ \ \ \ \ old\_approvals\ old\_apptable(\ get\_self(),\ proposer.value\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00136}00136\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ apps\_it\ =\ old\_apptable.find(\ proposal\_name.value\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00137}00137\ \ \ \ \ \ \ check(\ apps\_it\ !=\ old\_apptable.end(),\ \textcolor{stringliteral}{"{}proposal\ not\ found"{}}\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00138}00138\ \ \ \ \ \ \ old\_apptable.erase(apps\_it);}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00139}00139\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00140}00140\ \}}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00141}00141\ }
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00142}\mbox{\hyperlink{classsysio_1_1multisig_a90749d39af4ad1b1bf6385317731d96c}{00142}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1multisig_a90749d39af4ad1b1bf6385317731d96c}{multisig::exec}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\ proposer,\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\ proposal\_name,\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\ executer\ )\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00143}00143\ \ \ \ require\_auth(\ executer\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00144}00144\ }
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00145}00145\ \ \ \ proposals\ proptable(\ get\_self(),\ proposer.value\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00146}00146\ \ \ \ \textcolor{keyword}{auto}\&\ prop\ =\ proptable.get(\ proposal\_name.value,\ \textcolor{stringliteral}{"{}proposal\ not\ found"{}}\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00147}00147\ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__header}{transaction\_header}}\ trx\_header;}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00148}00148\ \ \ \ \mbox{\hyperlink{classfc_1_1datastream}{datastream<const\ char*>}}\ ds(\ prop.packed\_transaction.data(),\ prop.packed\_transaction.size()\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00149}00149\ \ \ \ ds\ >>\ trx\_header;}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00150}00150\ \ \ \ check(\ trx\_header.\mbox{\hyperlink{structsysio_1_1chain_1_1transaction__header_ad1ed2586e8ace769fdb9a54d09a752ce}{expiration}}\ >=\ \mbox{\hyperlink{classfc_1_1time__point__sec}{sysio::time\_point\_sec}}(current\_time\_point()),\ \textcolor{stringliteral}{"{}transaction\ expired"{}}\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00151}00151\ }
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00152}00152\ \ \ \ approvals\ apptable(\ get\_self(),\ proposer.value\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00153}00153\ \ \ \ \textcolor{keyword}{auto}\ apps\_it\ =\ apptable.find(\ proposal\_name.value\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00154}00154\ \ \ \ std::vector<permission\_level>\ approvals;}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00155}00155\ \ \ \ invalidations\ inv\_table(\ get\_self(),\ get\_self().\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00156}00156\ \ \ \ \textcolor{keywordflow}{if}\ (\ apps\_it\ !=\ apptable.end()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00157}00157\ \ \ \ \ \ \ approvals.reserve(\ apps\_it-\/>provided\_approvals.size()\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00158}00158\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ :\ apps\_it-\/>provided\_approvals\ )\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00159}00159\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ it\ =\ inv\_table.find(\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.level.actor.value\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00160}00160\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ it\ ==\ inv\_table.end()\ ||\ it-\/>last\_invalidation\_time\ <\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.time\ )\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00161}00161\ \ \ \ \ \ \ \ \ \ \ \ \ approvals.push\_back(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.level);}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00162}00162\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00163}00163\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00164}00164\ \ \ \ \ \ \ apptable.erase(apps\_it);}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00165}00165\ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00166}00166\ \ \ \ \ \ \ old\_approvals\ old\_apptable(\ get\_self(),\ proposer.value\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00167}00167\ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ apps\ =\ old\_apptable.get(\ proposal\_name.value,\ \textcolor{stringliteral}{"{}proposal\ not\ found"{}}\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00168}00168\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\ \textcolor{keyword}{auto}\&\ level\ :\ apps.provided\_approvals\ )\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00169}00169\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ it\ =\ inv\_table.find(\ level.actor.value\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00170}00170\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ it\ ==\ inv\_table.end()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00171}00171\ \ \ \ \ \ \ \ \ \ \ \ \ approvals.push\_back(\ level\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00172}00172\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00173}00173\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00174}00174\ \ \ \ \ \ \ old\_apptable.erase(apps);}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00175}00175\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00176}00176\ \ \ \ \textcolor{keyword}{auto}\ packed\_provided\_approvals\ =\ pack(approvals);}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00177}00177\ \ \ \ \textcolor{keyword}{auto}\ res\ =\ \ check\_transaction\_authorization(}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00178}00178\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ prop.packed\_transaction.data(),\ prop.packed\_transaction.size(),}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00179}00179\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*)0,\ 0,}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00180}00180\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ packed\_provided\_approvals.data(),\ packed\_provided\_approvals.size()}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00181}00181\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00182}00182\ }
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00183}00183\ \ \ \ check(\ res\ >\ 0,\ \textcolor{stringliteral}{"{}transaction\ authorization\ failed"{}}\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00184}00184\ }
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00185}00185\ \ \ \ send\_deferred(\ (\mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a376f631fcb770bd4b2e8349a33e52f8a}{uint128\_t}}(proposer.value)\ <<\ 64)\ |\ proposal\_name.value,\ executer,}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00186}00186\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ prop.packed\_transaction.data(),\ prop.packed\_transaction.size()\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00187}00187\ }
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00188}00188\ \ \ \ proptable.erase(prop);}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00189}00189\ \}}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00190}00190\ }
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00191}\mbox{\hyperlink{classsysio_1_1multisig_a385e7e7f0fe5559e9d88ac6b70a5ffe8}{00191}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1multisig_a385e7e7f0fe5559e9d88ac6b70a5ffe8}{multisig::invalidate}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\ account\ )\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00192}00192\ \ \ \ require\_auth(\ account\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00193}00193\ \ \ \ invalidations\ inv\_table(\ get\_self(),\ get\_self().\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00194}00194\ \ \ \ \textcolor{keyword}{auto}\ it\ =\ inv\_table.find(\ account.value\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00195}00195\ \ \ \ \textcolor{keywordflow}{if}\ (\ it\ ==\ inv\_table.end()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00196}00196\ \ \ \ \ \ \ inv\_table.emplace(\ account,\ [\&](\textcolor{keyword}{auto}\&\ i)\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00197}00197\ \ \ \ \ \ \ \ \ \ \ \ \ i.account\ =\ account;}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00198}00198\ \ \ \ \ \ \ \ \ \ \ \ \ i.last\_invalidation\_time\ =\ current\_time\_point();}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00199}00199\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00200}00200\ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00201}00201\ \ \ \ \ \ \ inv\_table.modify(\ it,\ account,\ [\&](\textcolor{keyword}{auto}\&\ i)\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00202}00202\ \ \ \ \ \ \ \ \ \ \ \ \ i.last\_invalidation\_time\ =\ current\_time\_point();}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00203}00203\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00204}00204\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00205}00205\ \}}
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00206}00206\ }
+\DoxyCodeLine{\Hypertarget{sysio_8msig_8cpp_source_l00207}00207\ \}\ }
+
+\end{DoxyCode}

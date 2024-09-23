@@ -1,0 +1,53 @@
+\doxysection{libraries/sys-\/vm/external/softfloat/source/ui32\+\_\+to\+\_\+ext\+F80M.c File Reference}
+\hypertarget{sys-vm_2external_2softfloat_2source_2ui32__to__ext_f80_m_8c}{}\label{sys-vm_2external_2softfloat_2source_2ui32__to__ext_f80_m_8c}\index{libraries/sys-\/vm/external/softfloat/source/ui32\_to\_extF80M.c@{libraries/sys-\/vm/external/softfloat/source/ui32\_to\_extF80M.c}}
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include "{}platform.\+h"{}}\newline
+{\ttfamily \#include "{}internals.\+h"{}}\newline
+{\ttfamily \#include "{}softfloat.\+h"{}}\newline
+Include dependency graph for ui32\+\_\+to\+\_\+ext\+F80\+M.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sys-vm_2external_2softfloat_2source_2ui32__to__ext_f80_m_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2ui32__to__ext_f80_m_8c_a1de9d2d1503189ec6a8bbd007702a5ca}{ui32\+\_\+to\+\_\+ext\+F80M}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, \mbox{\hyperlink{softfloat_2source_2include_2softfloat__types_8h_ae6c67a307cbc8664adc4f1966a3e71f6}{ext\+Float80\+\_\+t}} \texorpdfstring{$\ast$}{*}z\+Ptr)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{sys-vm_2external_2softfloat_2source_2ui32__to__ext_f80_m_8c_a1de9d2d1503189ec6a8bbd007702a5ca}\index{ui32\_to\_extF80M.c@{ui32\_to\_extF80M.c}!ui32\_to\_extF80M@{ui32\_to\_extF80M}}
+\index{ui32\_to\_extF80M@{ui32\_to\_extF80M}!ui32\_to\_extF80M.c@{ui32\_to\_extF80M.c}}
+\doxysubsubsection{\texorpdfstring{ui32\_to\_extF80M()}{ui32\_to\_extF80M()}}
+{\footnotesize\ttfamily \label{sys-vm_2external_2softfloat_2source_2ui32__to__ext_f80_m_8c_a1de9d2d1503189ec6a8bbd007702a5ca} 
+void ui32\+\_\+to\+\_\+ext\+F80M (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{a}{, }\item[{\mbox{\hyperlink{softfloat_2source_2include_2softfloat__types_8h_ae6c67a307cbc8664adc4f1966a3e71f6}{ext\+Float80\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{z\+Ptr}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2ui32__to__ext_f80_m_8c_source_l00053}{53}} of file \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2ui32__to__ext_f80_m_8c_source}{ui32\+\_\+to\+\_\+ext\+F80\+M.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00054\ \{}
+\DoxyCodeLine{00055\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structext_float80_m}{extFloat80M}}\ *zSPtr;}
+\DoxyCodeLine{00056\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a6ed085329b153773ff76afa0702cf897}{uint\_fast16\_t}}\ uiZ64;}
+\DoxyCodeLine{00057\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ sigZ;}
+\DoxyCodeLine{00058\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a880ed9ceb8621521452c81d03bd08cfb}{int\_fast8\_t}}\ shiftDist;}
+\DoxyCodeLine{00059\ }
+\DoxyCodeLine{00060\ \ \ \ \ zSPtr\ =\ (\textcolor{keyword}{struct\ }\mbox{\hyperlink{structext_float80_m}{extFloat80M}}\ *)\ zPtr;}
+\DoxyCodeLine{00061\ \ \ \ \ uiZ64\ =\ 0;}
+\DoxyCodeLine{00062\ \ \ \ \ sigZ\ =\ 0;}
+\DoxyCodeLine{00063\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ )\ \{}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ shiftDist\ =\ \mbox{\hyperlink{softfloat_2source_2s__count_leading_zeros32_8c_a20e06c2785548bfc8a5351e7e241e351}{softfloat\_countLeadingZeros32}}(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ );}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ uiZ64\ =\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a5e62ae06b6c2a91feb5b6e8175082250}{packToExtF80UI64}}(\ 0,\ 0x401E\ -\/\ shiftDist\ );}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ sigZ\ =\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})\ (\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}<<shiftDist)<<32;}
+\DoxyCodeLine{00067\ \ \ \ \ \}}
+\DoxyCodeLine{00068\ \ \ \ \ zSPtr-\/>\mbox{\hyperlink{structext_float80_m_afcc87c4645279344c5365a291766afe2}{signExp}}\ =\ uiZ64;}
+\DoxyCodeLine{00069\ \ \ \ \ zSPtr-\/>\mbox{\hyperlink{structext_float80_m_ac0c736880d01d0abd0a818e658755b3b}{signif}}\ =\ sigZ;}
+\DoxyCodeLine{00070\ }
+\DoxyCodeLine{00071\ \}}
+
+\end{DoxyCode}

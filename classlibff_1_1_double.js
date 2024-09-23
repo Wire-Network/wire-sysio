@@ -1,0 +1,25 @@
+var classlibff_1_1_double =
+[
+    [ "Double", "classlibff_1_1_double.html#abd00e1a8ec89ea642fe6170233f2dcd2", null ],
+    [ "Double", "classlibff_1_1_double.html#a7a367595435a70ebcc251361a1e75e93", null ],
+    [ "Double", "classlibff_1_1_double.html#af3855a6c426f6dc881d1559b094b39d0", null ],
+    [ "Double", "classlibff_1_1_double.html#a960adcd447b2c9705fa9ebbca25aa2fe", null ],
+    [ "as_bigint", "classlibff_1_1_double.html#a78c36653f87336ccb60f23ee125340e5", null ],
+    [ "as_ulong", "classlibff_1_1_double.html#adb9e039b49e97f98c3926cda03ba66ab", null ],
+    [ "inverse", "classlibff_1_1_double.html#a02f3381aa6c10fab4d6c01fb6d4a01e1", null ],
+    [ "operator!=", "classlibff_1_1_double.html#ad9478cbddba9ec53ae21c02bf386db3f", null ],
+    [ "operator*", "classlibff_1_1_double.html#aaf5becfde8b072d2d7a8bbe76fad00a0", null ],
+    [ "operator*=", "classlibff_1_1_double.html#a1216738d13ef22f67993e24328000d92", null ],
+    [ "operator+", "classlibff_1_1_double.html#a6185e5303b3df7bb8b2895b38fa37171", null ],
+    [ "operator+=", "classlibff_1_1_double.html#a36a5825956cd041095fa0557b74864be", null ],
+    [ "operator-", "classlibff_1_1_double.html#af082015ed86bcdd5ff5c1c568a84ef12", null ],
+    [ "operator-", "classlibff_1_1_double.html#a72e5f4745e50cb780d70c4f1f8e48f18", null ],
+    [ "operator-=", "classlibff_1_1_double.html#addfac91291ee803e3b4a296ef88c9971", null ],
+    [ "operator<", "classlibff_1_1_double.html#a3a14b14dabfc5f7229cbcd535e269b5b", null ],
+    [ "operator==", "classlibff_1_1_double.html#adc650a98832da65cb06f37c1fdf7e40d", null ],
+    [ "operator>", "classlibff_1_1_double.html#a7e6f4551b0befea841e90e7b50352042", null ],
+    [ "operator^", "classlibff_1_1_double.html#a31ced223f2586e9a7ea7693ddf4b556a", null ],
+    [ "operator^", "classlibff_1_1_double.html#ae40b464e56a347c37c5bd548b7ff0196", null ],
+    [ "squared", "classlibff_1_1_double.html#aa705c9742c6cbe8c62b448e36d7edae6", null ],
+    [ "val", "classlibff_1_1_double.html#a5d5c25379e48cb23f5580c745270095d", null ]
+];

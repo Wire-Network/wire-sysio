@@ -1,0 +1,93 @@
+\doxysection{libraries/fc/libraries/ff/depends/xbyak/test/bad\+\_\+address.cpp File Reference}
+\hypertarget{bad__address_8cpp}{}\label{bad__address_8cpp}\index{libraries/fc/libraries/ff/depends/xbyak/test/bad\_address.cpp@{libraries/fc/libraries/ff/depends/xbyak/test/bad\_address.cpp}}
+{\ttfamily \#include $<$xbyak/xbyak.\+h$>$}\newline
+Include dependency graph for bad\+\_\+address.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{bad__address_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_code}{Code}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{bad__address_8cpp_aff48fdfb5a4f1bde2a0a8837938ffdfe}{TEST\+\_\+\+EXCEPTION}}(\mbox{\hyperlink{structstate}{state}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{bad__address_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{bad__address_8cpp_aff48fdfb5a4f1bde2a0a8837938ffdfe}\index{bad\_address.cpp@{bad\_address.cpp}!TEST\_EXCEPTION@{TEST\_EXCEPTION}}
+\index{TEST\_EXCEPTION@{TEST\_EXCEPTION}!bad\_address.cpp@{bad\_address.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_EXCEPTION}{TEST\_EXCEPTION}}
+{\footnotesize\ttfamily \label{bad__address_8cpp_aff48fdfb5a4f1bde2a0a8837938ffdfe} 
+\#define TEST\+\_\+\+EXCEPTION(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{structstate}{state}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ num++;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{bool}\ exception\ =\ \textcolor{keyword}{false};\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{try}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}};\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ exception\ =\ \textcolor{keyword}{true};\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ if\ (!exception)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ printf(\textcolor{stringliteral}{"{}exception\ should\ arise\ for\ \%s\(\backslash\)n"{}},\ \#\mbox{\hyperlink{structstate}{state}});\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ err++;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{bad__address_8cpp_source_l00003}{3}} of file \mbox{\hyperlink{bad__address_8cpp_source}{bad\+\_\+address.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00003\ \textcolor{preprocessor}{\#define\ TEST\_EXCEPTION(state)\ \(\backslash\)}}
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\{\ \(\backslash\)}}
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\ \ \ \ num++;\ \(\backslash\)}}
+\DoxyCodeLine{00006\ \textcolor{preprocessor}{\ \ \ \ bool\ exception\ =\ false;\ \(\backslash\)}}
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\ \ \ \ try\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00008\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ state;\ \(\backslash\)}}
+\DoxyCodeLine{00009\ \textcolor{preprocessor}{\ \ \ \ \}\ catch\ (...)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00010\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ exception\ =\ true;\ \(\backslash\)}}
+\DoxyCodeLine{00011\ \textcolor{preprocessor}{\ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00012\ \textcolor{preprocessor}{\ \ \ \ if\ (!exception)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00013\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ printf("{}exception\ should\ arise\ for\ \%s\(\backslash\)n"{},\ \#state);\ \(\backslash\)}}
+\DoxyCodeLine{00014\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ err++;\ \(\backslash\)}}
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\}}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{bad__address_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}\index{bad\_address.cpp@{bad\_address.cpp}!main@{main}}
+\index{main@{main}!bad\_address.cpp@{bad\_address.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{bad__address_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4} 
+int main (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bad__address_8cpp_source_l00042}{42}} of file \mbox{\hyperlink{bad__address_8cpp_source}{bad\+\_\+address.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00043\ \{}
+\DoxyCodeLine{00044\ \ \ \ \ \mbox{\hyperlink{struct_code}{Code}}\ c;}
+\DoxyCodeLine{00045\ \}}
+
+\end{DoxyCode}

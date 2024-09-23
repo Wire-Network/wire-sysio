@@ -1,0 +1,11 @@
+<map id="websocketpp::utf8_validator::decode" name="websocketpp::utf8_validator::decode">
+<area shape="rect" id="Node000001" title="Decode the next byte of a UTF8 sequence." alt="" coords="709,39,894,79"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1utf8__validator_1_1validator.html#ada7f6cdd4261d848d51d7ba0bd9d28b4" title="Advance the state of the validator with the next input byte." alt="" coords="477,5,661,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="693,46,662,42,662,36,694,41"/>
+<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1utf8__validator_1_1validator.html#a2cde6cad6f1a0f66674010848ec80fba" title="Advance validator state with input from an iterator pair." alt="" coords="477,71,661,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="694,76,662,81,662,76,693,71"/>
+<area shape="rect" id="Node000004" href="$classwebsocketpp_1_1processor_1_1hybi13.html#aa7eece3f48840535f41b625061fa7867" title="Reads bytes from buf into message payload." alt="" coords="217,71,429,111"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="461,94,430,94,430,88,461,88"/>
+<area shape="rect" id="Node000005" href="$classwebsocketpp_1_1processor_1_1hybi13.html#a5c5e3234a0067c7f14fe0ceb4e647659" title="Process new websocket connection bytes." alt="" coords="5,71,169,111"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="201,94,169,94,169,88,201,88"/>
+</map>

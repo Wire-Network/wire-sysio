@@ -1,0 +1,30 @@
+\doxysection{wnaf.\+hpp}
+\hypertarget{wnaf_8hpp_source}{}\label{wnaf_8hpp_source}\index{libraries/fc/libraries/ff/libff/algebra/scalar\_multiplication/wnaf.hpp@{libraries/fc/libraries/ff/libff/algebra/scalar\_multiplication/wnaf.hpp}}
+\mbox{\hyperlink{wnaf_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{wnaf_8hpp_source_l00001}00001\ }
+\DoxyCodeLine{\Hypertarget{wnaf_8hpp_source_l00012}00012\ \textcolor{preprocessor}{\#ifndef\ WNAF\_HPP\_}}
+\DoxyCodeLine{\Hypertarget{wnaf_8hpp_source_l00013}00013\ \textcolor{preprocessor}{\#define\ WNAF\_HPP\_}}
+\DoxyCodeLine{\Hypertarget{wnaf_8hpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{wnaf_8hpp_source_l00015}00015\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{\Hypertarget{wnaf_8hpp_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{wnaf_8hpp_source_l00017}00017\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{libraries_2ff_2libff_2algebra_2fields_2bigint_8hpp}{libff/algebra/fields/bigint.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{wnaf_8hpp_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{wnaf_8hpp_source_l00019}00019\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacelibff}{libff}}\ \{}
+\DoxyCodeLine{\Hypertarget{wnaf_8hpp_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{wnaf_8hpp_source_l00024}00024\ \textcolor{keyword}{template}<mp\_\textcolor{keywordtype}{size\_t}\ n>}
+\DoxyCodeLine{\Hypertarget{wnaf_8hpp_source_l00025}\mbox{\hyperlink{namespacelibff_aad4268b05dd7f4fa841fce242db396bd}{00025}}\ std::vector<long>\ \mbox{\hyperlink{namespacelibff_aad4268b05dd7f4fa841fce242db396bd}{find\_wnaf}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ window\_size,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classlibff_1_1bigint}{bigint<n>}}\ \&scalar);}
+\DoxyCodeLine{\Hypertarget{wnaf_8hpp_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{wnaf_8hpp_source_l00030}00030\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T,\ mp\_\textcolor{keywordtype}{size\_t}\ n>}
+\DoxyCodeLine{\Hypertarget{wnaf_8hpp_source_l00031}\mbox{\hyperlink{namespacelibff_a5b0d51c8c4cd9505a3c4bcc34eecb84b}{00031}}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \mbox{\hyperlink{namespacelibff_a5b0d51c8c4cd9505a3c4bcc34eecb84b}{fixed\_window\_wnaf\_exp}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ window\_size,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \&base,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classlibff_1_1bigint}{bigint<n>}}\ \&scalar);}
+\DoxyCodeLine{\Hypertarget{wnaf_8hpp_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{wnaf_8hpp_source_l00036}00036\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T,\ mp\_\textcolor{keywordtype}{size\_t}\ n>}
+\DoxyCodeLine{\Hypertarget{wnaf_8hpp_source_l00037}\mbox{\hyperlink{namespacelibff_a7e41f4b65faa599ab97a386b9840b0eb}{00037}}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \mbox{\hyperlink{namespacelibff_a7e41f4b65faa599ab97a386b9840b0eb}{opt\_window\_wnaf\_exp}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \&base,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classlibff_1_1bigint}{bigint<n>}}\ \&scalar,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ scalar\_bits);}
+\DoxyCodeLine{\Hypertarget{wnaf_8hpp_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{wnaf_8hpp_source_l00039}00039\ \}\ \textcolor{comment}{//\ libff}}
+\DoxyCodeLine{\Hypertarget{wnaf_8hpp_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{wnaf_8hpp_source_l00041}00041\ \textcolor{preprocessor}{\#include\ <libff/algebra/scalar\_multiplication/wnaf.tcc>}}
+\DoxyCodeLine{\Hypertarget{wnaf_8hpp_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{wnaf_8hpp_source_l00043}00043\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ WNAF\_HPP\_}}
+
+\end{DoxyCode}

@@ -1,0 +1,26 @@
+var structsysio_1_1chain_1_1chain__config__v0 =
+[
+    [ "log", "structsysio_1_1chain_1_1chain__config__v0.html#a840d8c6785472f77182425c924ecbd6a", null ],
+    [ "v0", "structsysio_1_1chain_1_1chain__config__v0.html#a0043dd2e7395c5354b77e0b66d704fa0", null ],
+    [ "validate", "structsysio_1_1chain_1_1chain__config__v0.html#ae96e3222e7161e113ef4182829823595", null ],
+    [ "operator!=", "structsysio_1_1chain_1_1chain__config__v0.html#a0642e994c9b599cc7c482a9232ba80a7", null ],
+    [ "operator<<", "structsysio_1_1chain_1_1chain__config__v0.html#a98a230667333069cbfaeece779105302", null ],
+    [ "operator==", "structsysio_1_1chain_1_1chain__config__v0.html#a748ac32641f6de762984813f5c8d0c98", null ],
+    [ "base_per_transaction_net_usage", "structsysio_1_1chain_1_1chain__config__v0.html#ad96077f2371a87e736383b1ae63a2942", null ],
+    [ "context_free_discount_net_usage_den", "structsysio_1_1chain_1_1chain__config__v0.html#ab6eca0d78bfbc7a23b250ce38a527d43", null ],
+    [ "context_free_discount_net_usage_num", "structsysio_1_1chain_1_1chain__config__v0.html#a216d6c8dad55925ff3eebde858a30fef", null ],
+    [ "deferred_trx_expiration_window", "structsysio_1_1chain_1_1chain__config__v0.html#a6ab303c6326dc33d1280e0b8d13eed68", null ],
+    [ "max_authority_depth", "structsysio_1_1chain_1_1chain__config__v0.html#ab919615c14dd47bfb30dea47443e8f6a", null ],
+    [ "max_block_cpu_usage", "structsysio_1_1chain_1_1chain__config__v0.html#a292759d9e893bccf78a5d22279fb5752", null ],
+    [ "max_block_net_usage", "structsysio_1_1chain_1_1chain__config__v0.html#a796dada63527fcff40f838efc42a04ec", null ],
+    [ "max_inline_action_depth", "structsysio_1_1chain_1_1chain__config__v0.html#a007444fa5297c0950b749d4ca2b64e2c", null ],
+    [ "max_inline_action_size", "structsysio_1_1chain_1_1chain__config__v0.html#afb8514589814c9672abd5d0f9c7297cb", null ],
+    [ "max_transaction_cpu_usage", "structsysio_1_1chain_1_1chain__config__v0.html#a27ec75a65de87237c8f7ed2728db3ba5", null ],
+    [ "max_transaction_delay", "structsysio_1_1chain_1_1chain__config__v0.html#ad98015ab0842f0258be2df72e7ace5e3", null ],
+    [ "max_transaction_lifetime", "structsysio_1_1chain_1_1chain__config__v0.html#a05237a51dab031f2c76ec9c3a42fec5d", null ],
+    [ "max_transaction_net_usage", "structsysio_1_1chain_1_1chain__config__v0.html#ab817deae6ddf13840297eae4fe6f8345", null ],
+    [ "min_transaction_cpu_usage", "structsysio_1_1chain_1_1chain__config__v0.html#a460f6b269c9da35d40b1cc5927c2205a", null ],
+    [ "net_usage_leeway", "structsysio_1_1chain_1_1chain__config__v0.html#a964d9d4fe4d9a1bb658e3dc840b62ca8", null ],
+    [ "target_block_cpu_usage_pct", "structsysio_1_1chain_1_1chain__config__v0.html#af2b14c2153bc64969ca85c8df8fbb7f9", null ],
+    [ "target_block_net_usage_pct", "structsysio_1_1chain_1_1chain__config__v0.html#a216d150c1c6ad9ea64aaf82d86926d19", null ]
+];

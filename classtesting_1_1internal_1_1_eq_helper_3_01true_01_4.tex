@@ -1,0 +1,80 @@
+\doxysection{testing\+::internal\+::Eq\+Helper\texorpdfstring{$<$}{<} true \texorpdfstring{$>$}{>} Class Reference}
+\hypertarget{classtesting_1_1internal_1_1_eq_helper_3_01true_01_4}{}\label{classtesting_1_1internal_1_1_eq_helper_3_01true_01_4}\index{testing::internal::EqHelper$<$ true $>$@{testing::internal::EqHelper$<$ true $>$}}
+
+
+{\ttfamily \#include $<$gtest.\+h$>$}
+
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename T1 , typename T2 $>$ }\\static \mbox{\hyperlink{classtesting_1_1_assertion_result}{Assertion\+Result}} \mbox{\hyperlink{classtesting_1_1internal_1_1_eq_helper_3_01true_01_4_a12c7194b2a210b61f06c912eef484ca6}{Compare}} (const char \texorpdfstring{$\ast$}{*}lhs\+\_\+expression, const char \texorpdfstring{$\ast$}{*}rhs\+\_\+expression, const T1 \&lhs, const T2 \&rhs, typename \mbox{\hyperlink{structtesting_1_1internal_1_1_enable_if}{Enable\+If}}$<$!\mbox{\hyperlink{structtesting_1_1internal_1_1is__pointer}{is\+\_\+pointer}}$<$ T2 $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}} $>$\+::type \texorpdfstring{$\ast$}{*}=0)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\static \mbox{\hyperlink{classtesting_1_1_assertion_result}{Assertion\+Result}} \mbox{\hyperlink{classtesting_1_1internal_1_1_eq_helper_3_01true_01_4_a6f292601a68c8f0d49e6d48bd309b900}{Compare}} (const char \texorpdfstring{$\ast$}{*}lhs\+\_\+expression, const char \texorpdfstring{$\ast$}{*}rhs\+\_\+expression, Secret \texorpdfstring{$\ast$}{*}, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*}rhs)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{gtest_8h_source_l01480}{1480}} of file \mbox{\hyperlink{gtest_8h_source}{gtest.\+h}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_eq_helper_3_01true_01_4_a12c7194b2a210b61f06c912eef484ca6}\index{testing::internal::EqHelper$<$ true $>$@{testing::internal::EqHelper$<$ true $>$}!Compare@{Compare}}
+\index{Compare@{Compare}!testing::internal::EqHelper$<$ true $>$@{testing::internal::EqHelper$<$ true $>$}}
+\doxysubsubsection{\texorpdfstring{Compare()}{Compare()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_eq_helper_3_01true_01_4_a12c7194b2a210b61f06c912eef484ca6} 
+template$<$typename T1 , typename T2 $>$ \\
+static \mbox{\hyperlink{classtesting_1_1_assertion_result}{Assertion\+Result}} \mbox{\hyperlink{classtesting_1_1internal_1_1_eq_helper}{testing\+::internal\+::\+Eq\+Helper}}$<$ true $>$\+::\+Compare (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{lhs\+\_\+expression}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{rhs\+\_\+expression}{, }\item[{const T1 \&}]{lhs}{, }\item[{const T2 \&}]{rhs}{, }\item[{typename \mbox{\hyperlink{structtesting_1_1internal_1_1_enable_if}{Enable\+If}}$<$!\mbox{\hyperlink{structtesting_1_1internal_1_1is__pointer}{is\+\_\+pointer}}$<$ T2 $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}} $>$\+::type \texorpdfstring{$\ast$}{*}}]{}{ = {\ttfamily 0}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8h_source_l01487}{1487}} of file \mbox{\hyperlink{gtest_8h_source}{gtest.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01497\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01498\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetesting_1_1internal_a4638c74d9b32e971f9b321af6fafc2f1}{CmpHelperEQ}}(lhs\_expression,\ rhs\_expression,\ lhs,\ rhs);}
+\DoxyCodeLine{01499\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_eq_helper_3_01true_01_4_a12c7194b2a210b61f06c912eef484ca6_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_eq_helper_3_01true_01_4_a6f292601a68c8f0d49e6d48bd309b900}\index{testing::internal::EqHelper$<$ true $>$@{testing::internal::EqHelper$<$ true $>$}!Compare@{Compare}}
+\index{Compare@{Compare}!testing::internal::EqHelper$<$ true $>$@{testing::internal::EqHelper$<$ true $>$}}
+\doxysubsubsection{\texorpdfstring{Compare()}{Compare()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_eq_helper_3_01true_01_4_a6f292601a68c8f0d49e6d48bd309b900} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+static \mbox{\hyperlink{classtesting_1_1_assertion_result}{Assertion\+Result}} \mbox{\hyperlink{classtesting_1_1internal_1_1_eq_helper}{testing\+::internal\+::\+Eq\+Helper}}$<$ true $>$\+::\+Compare (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{lhs\+\_\+expression}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{rhs\+\_\+expression}{, }\item[{Secret \texorpdfstring{$\ast$}{*}}]{}{, }\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*}}]{rhs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8h_source_l01504}{1504}} of file \mbox{\hyperlink{gtest_8h_source}{gtest.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01514\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01515\ \ \ \ \ \textcolor{comment}{//\ We\ already\ know\ that\ 'lhs'\ is\ a\ null\ pointer.}}
+\DoxyCodeLine{01516\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetesting_1_1internal_a4638c74d9b32e971f9b321af6fafc2f1}{CmpHelperEQ}}(lhs\_expression,\ rhs\_expression,}
+\DoxyCodeLine{01517\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\textcolor{keyword}{>}(NULL),\ rhs);}
+\DoxyCodeLine{01518\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_eq_helper_3_01true_01_4_a6f292601a68c8f0d49e6d48bd309b900_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/include/gtest/\mbox{\hyperlink{gtest_8h}{gtest.\+h}}\end{DoxyCompactItemize}

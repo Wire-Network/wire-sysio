@@ -1,0 +1,1090 @@
+\doxysection{sysio\+::chain\+::deep\+\_\+mind\+\_\+handler Class Reference}
+\hypertarget{classsysio_1_1chain_1_1deep__mind__handler}{}\label{classsysio_1_1chain_1_1deep__mind__handler}\index{sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}}
+
+
+{\ttfamily \#include $<$deep\+\_\+mind.\+hpp$>$}
+
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1deep__mind__handler_1_1deep__mind__config}{deep\+\_\+mind\+\_\+config}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum class \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a78bf0c79493a90c71cb28aa761f44fd2}{operation\+\_\+qualifier}} \{ \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a78bf0c79493a90c71cb28aa761f44fd2a334c4a4c42fdb79d7ebc3e73b517e6f8}{none}}
+, \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a78bf0c79493a90c71cb28aa761f44fd2a8f45a2644508b5282f57fe129f62d19a}{modify}}
+, \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a78bf0c79493a90c71cb28aa761f44fd2a21a361d96e3e13f5f109748c2a9d2434}{push}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a65bb14e922ee5ead3f33ca19ba84fa08}{update\+\_\+config}} (\mbox{\hyperlink{structsysio_1_1chain_1_1deep__mind__handler_1_1deep__mind__config}{deep\+\_\+mind\+\_\+config}} \mbox{\hyperlink{classconfig}{config}})
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a992e2ea098b7b2288a3be6aa3eeb56e8}{update\+\_\+logger}} (const std\+::string \&\mbox{\hyperlink{namespacesysio_ad66b67a8dd0a897a0a5b89f954fd3ade}{logger\+\_\+name}})
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a2899afc0c347e454d3918b95c9df6d77}{on\+\_\+startup}} (\mbox{\hyperlink{classchainbase_1_1database}{chainbase\+::database}} \&db, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} head\+\_\+block\+\_\+num)
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a8c5f1a77e4f1d4391532dcc823b9b8e2}{on\+\_\+start\+\_\+block}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} block\+\_\+num)
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a58e87646e6814d112d7913a5101bd6c4}{on\+\_\+accepted\+\_\+block}} (const std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1block__state}{block\+\_\+state}} $>$ \&bsp)
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a76d1fe0ab283b95b71b0374e50a074fe}{on\+\_\+switch\+\_\+forks}} (const \mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{block\+\_\+id\+\_\+type}} \&old\+\_\+head, const \mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{block\+\_\+id\+\_\+type}} \&new\+\_\+head)
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a66b4adf2043576b0824e49a191266e6a}{on\+\_\+onerror}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1signed__transaction}{signed\+\_\+transaction}} \&etrx)
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_ae52a137a99c78957f649905f587c9172}{on\+\_\+onblock}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1signed__transaction}{signed\+\_\+transaction}} \&trx)
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a37eea3e55a641b8a916c353f557a58ae}{on\+\_\+start\+\_\+transaction}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a4d8195c2ed558e0b450a8499dadf0fd3}{on\+\_\+end\+\_\+transaction}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_afe5ffbb0673d54aa20b08a109d1b09b5}{on\+\_\+applied\+\_\+transaction}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} block\+\_\+num, const std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__trace}{transaction\+\_\+trace}} $>$ \&trace)
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_ab52c3cb0a649f4a70f4e1b6717901e7e}{on\+\_\+add\+\_\+ram\+\_\+correction}} (const \mbox{\hyperlink{classsysio_1_1chain_1_1account__ram__correction__object}{account\+\_\+ram\+\_\+correction\+\_\+object}} \&rco, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} delta)
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a2cc8d78603f10399c56441b7d36857ff}{on\+\_\+preactivate\+\_\+feature}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature}{protocol\+\_\+feature}} \&feature)
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a19066f9082b753020de72c7365a3e645}{on\+\_\+activate\+\_\+feature}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature}{protocol\+\_\+feature}} \&feature)
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_ae83a7be061d2f00f7caa103e8f8ec2dd}{on\+\_\+input\+\_\+action}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a40ba18f5c95f0a7f1951d62440cb8eee}{on\+\_\+end\+\_\+action}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a7f5a039386bd06d780a0c6f4b642b73c}{on\+\_\+require\+\_\+recipient}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_acbad203a99f983d1a3c425ecf7835146}{on\+\_\+send\+\_\+inline}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a5ba4f6cac45df2de3efba3fd5d62df48}{on\+\_\+send\+\_\+context\+\_\+free\+\_\+inline}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a188b2591fe50c48f3f193a820c98aed6}{on\+\_\+cancel\+\_\+deferred}} (\mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a78bf0c79493a90c71cb28aa761f44fd2}{operation\+\_\+qualifier}} qual, const \mbox{\hyperlink{classsysio_1_1chain_1_1generated__transaction__object}{generated\+\_\+transaction\+\_\+object}} \&gto)
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a952ca0e6d83fd569e03cb492db5f2c43}{on\+\_\+send\+\_\+deferred}} (\mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a78bf0c79493a90c71cb28aa761f44fd2}{operation\+\_\+qualifier}} qual, const \mbox{\hyperlink{classsysio_1_1chain_1_1generated__transaction__object}{generated\+\_\+transaction\+\_\+object}} \&gto)
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a40b9a2c20e4a3fddfea8411b9101e99d}{on\+\_\+create\+\_\+deferred}} (\mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a78bf0c79493a90c71cb28aa761f44fd2}{operation\+\_\+qualifier}} qual, const \mbox{\hyperlink{classsysio_1_1chain_1_1generated__transaction__object}{generated\+\_\+transaction\+\_\+object}} \&gto, const \mbox{\hyperlink{structsysio_1_1chain_1_1packed__transaction}{packed\+\_\+transaction}} \&packed\+\_\+trx)
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_aff92ebea4734e68cf7ddabd3d021c52c}{on\+\_\+fail\+\_\+deferred}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_ac6521f76f263b32eef6d88b0f0ad392f}{on\+\_\+create\+\_\+table}} (const \mbox{\hyperlink{classsysio_1_1chain_1_1table__id__object}{table\+\_\+id\+\_\+object}} \&tid)
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a84efdefe0df98208a328c1d558947333}{on\+\_\+remove\+\_\+table}} (const \mbox{\hyperlink{classsysio_1_1chain_1_1table__id__object}{table\+\_\+id\+\_\+object}} \&tid)
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a67ecfda86da0eb31c40716503e9e354e}{on\+\_\+db\+\_\+store\+\_\+i64}} (const \mbox{\hyperlink{classsysio_1_1chain_1_1table__id__object}{table\+\_\+id\+\_\+object}} \&tid, const \mbox{\hyperlink{structsysio_1_1chain_1_1key__value__object}{key\+\_\+value\+\_\+object}} \&kvo)
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a9556913335dd3112eb9597c0f093aed4}{on\+\_\+db\+\_\+update\+\_\+i64}} (const \mbox{\hyperlink{classsysio_1_1chain_1_1table__id__object}{table\+\_\+id\+\_\+object}} \&tid, const \mbox{\hyperlink{structsysio_1_1chain_1_1key__value__object}{key\+\_\+value\+\_\+object}} \&kvo, \mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} payer, const char \texorpdfstring{$\ast$}{*}buffer, std\+::size\+\_\+t buffer\+\_\+size)
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a41f0d36ff43d5a49cc8f3daab1486cf7}{on\+\_\+db\+\_\+remove\+\_\+i64}} (const \mbox{\hyperlink{classsysio_1_1chain_1_1table__id__object}{table\+\_\+id\+\_\+object}} \&tid, const \mbox{\hyperlink{structsysio_1_1chain_1_1key__value__object}{key\+\_\+value\+\_\+object}} \&kvo)
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_af937b8a3add1750021eb59ebaf4ce920}{on\+\_\+init\+\_\+resource\+\_\+limits}} (const \mbox{\hyperlink{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__config__object}{resource\+\_\+limits\+::resource\+\_\+limits\+\_\+config\+\_\+object}} \&\mbox{\hyperlink{classconfig}{config}}, const \mbox{\hyperlink{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__state__object}{resource\+\_\+limits\+::resource\+\_\+limits\+\_\+state\+\_\+object}} \&\mbox{\hyperlink{structstate}{state}})
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a6229d7dbf649b7d843212646e84b03b5}{on\+\_\+update\+\_\+resource\+\_\+limits\+\_\+config}} (const \mbox{\hyperlink{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__config__object}{resource\+\_\+limits\+::resource\+\_\+limits\+\_\+config\+\_\+object}} \&\mbox{\hyperlink{classconfig}{config}})
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a4e3f1380a28e01e17fa2eb8c81f5bfc9}{on\+\_\+update\+\_\+resource\+\_\+limits\+\_\+state}} (const \mbox{\hyperlink{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__state__object}{resource\+\_\+limits\+::resource\+\_\+limits\+\_\+state\+\_\+object}} \&\mbox{\hyperlink{structstate}{state}})
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a2869257ca6d9f943ccdfdf75628f62a7}{on\+\_\+newaccount\+\_\+resource\+\_\+limits}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1resource__limits__object}{resource\+\_\+limits\+::resource\+\_\+limits\+\_\+object}} \&limits, const \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1resource__usage__object}{resource\+\_\+limits\+::resource\+\_\+usage\+\_\+object}} \&usage)
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a85da2df1af87a5116d6a384cdd4be6b9}{on\+\_\+update\+\_\+account\+\_\+usage}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1resource__usage__object}{resource\+\_\+limits\+::resource\+\_\+usage\+\_\+object}} \&usage)
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_ab7181993f2c17d4519857c9fd09a5bc3}{on\+\_\+set\+\_\+account\+\_\+limits}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1resource__limits__object}{resource\+\_\+limits\+::resource\+\_\+limits\+\_\+object}} \&limits)
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_af17c45c11dd650242a9eb80c161322db}{on\+\_\+ram\+\_\+trace}} (std\+::string \&\&event\+\_\+id, const char \texorpdfstring{$\ast$}{*}family, const char \texorpdfstring{$\ast$}{*}operation, const char \texorpdfstring{$\ast$}{*}legacy\+\_\+tag)
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_aeeffed2d8ca9af3d83e75352304b8122}{on\+\_\+ram\+\_\+event}} (\mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} account, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} new\+\_\+usage, \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} delta)
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a9cfd94c9162ccbe0c791ef43ee19cd76}{on\+\_\+create\+\_\+permission}} (const \mbox{\hyperlink{classsysio_1_1chain_1_1permission__object}{permission\+\_\+object}} \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a19405a59ff824f3e6b8fab6d530d47ac}{on\+\_\+modify\+\_\+permission}} (const \mbox{\hyperlink{classsysio_1_1chain_1_1permission__object}{permission\+\_\+object}} \&old\+\_\+permission, const \mbox{\hyperlink{classsysio_1_1chain_1_1permission__object}{permission\+\_\+object}} \&new\+\_\+permission)
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_ae93ff782f23642a922b65ae895c76255}{on\+\_\+remove\+\_\+permission}} (const \mbox{\hyperlink{classsysio_1_1chain_1_1permission__object}{permission\+\_\+object}} \&permission)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{deep__mind_8hpp_source_l00045}{45}} of file \mbox{\hyperlink{deep__mind_8hpp_source}{deep\+\_\+mind.\+hpp}}.
+
+
+
+\doxysubsection{Member Enumeration Documentation}
+\Hypertarget{classsysio_1_1chain_1_1deep__mind__handler_a78bf0c79493a90c71cb28aa761f44fd2}\index{sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}!operation\_qualifier@{operation\_qualifier}}
+\index{operation\_qualifier@{operation\_qualifier}!sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}}
+\doxysubsubsection{\texorpdfstring{operation\_qualifier}{operation\_qualifier}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1deep__mind__handler_a78bf0c79493a90c71cb28aa761f44fd2} 
+enum \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a78bf0c79493a90c71cb28aa761f44fd2}{sysio\+::chain\+::deep\+\_\+mind\+\_\+handler\+::operation\+\_\+qualifier}}\hspace{0.3cm}{\ttfamily [strong]}}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{none@{none}!sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}}\index{sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}!none@{none}}}\Hypertarget{classsysio_1_1chain_1_1deep__mind__handler_a78bf0c79493a90c71cb28aa761f44fd2a334c4a4c42fdb79d7ebc3e73b517e6f8}\label{classsysio_1_1chain_1_1deep__mind__handler_a78bf0c79493a90c71cb28aa761f44fd2} 
+none&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{modify@{modify}!sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}}\index{sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}!modify@{modify}}}\Hypertarget{classsysio_1_1chain_1_1deep__mind__handler_a78bf0c79493a90c71cb28aa761f44fd2a8f45a2644508b5282f57fe129f62d19a}\label{classsysio_1_1chain_1_1deep__mind__handler_a78bf0c79493a90c71cb28aa761f44fd2} 
+modify&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{push@{push}!sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}}\index{sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}!push@{push}}}\Hypertarget{classsysio_1_1chain_1_1deep__mind__handler_a78bf0c79493a90c71cb28aa761f44fd2a21a361d96e3e13f5f109748c2a9d2434}\label{classsysio_1_1chain_1_1deep__mind__handler_a78bf0c79493a90c71cb28aa761f44fd2} 
+push&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{deep__mind_8hpp_source_l00055}{55}} of file \mbox{\hyperlink{deep__mind_8hpp_source}{deep\+\_\+mind.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00055\ \{\ \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a78bf0c79493a90c71cb28aa761f44fd2a334c4a4c42fdb79d7ebc3e73b517e6f8}{none}},\ \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a78bf0c79493a90c71cb28aa761f44fd2a8f45a2644508b5282f57fe129f62d19a}{modify}},\ \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a78bf0c79493a90c71cb28aa761f44fd2a21a361d96e3e13f5f109748c2a9d2434}{push}}\ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1chain_1_1deep__mind__handler_a58e87646e6814d112d7913a5101bd6c4}\index{sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}!on\_accepted\_block@{on\_accepted\_block}}
+\index{on\_accepted\_block@{on\_accepted\_block}!sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}}
+\doxysubsubsection{\texorpdfstring{on\_accepted\_block()}{on\_accepted\_block()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1deep__mind__handler_a58e87646e6814d112d7913a5101bd6c4} 
+void sysio\+::chain\+::deep\+\_\+mind\+\_\+handler\+::on\+\_\+accepted\+\_\+block (\begin{DoxyParamCaption}\item[{const std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1block__state}{block\+\_\+state}} $>$ \&}]{bsp}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{deep__mind_8cpp_source_l00074}{74}} of file \mbox{\hyperlink{deep__mind_8cpp_source}{deep\+\_\+mind.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00075\ \ \ \ \{}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ packed\_blk\ =\ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(*bsp);}
+\DoxyCodeLine{00077\ }
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}ACCEPTED\_BLOCK\ \$\{num\}\ \$\{blk\}"{}},}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}num"{}},\ bsp-\/>block\_num)}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}blk"{}},\ \mbox{\hyperlink{namespacefc_aab567c89004d329f560014d9943afcd6}{fc::to\_hex}}(packed\_blk))}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ );}
+\DoxyCodeLine{00082\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1deep__mind__handler_a58e87646e6814d112d7913a5101bd6c4_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1deep__mind__handler_a19066f9082b753020de72c7365a3e645}\index{sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}!on\_activate\_feature@{on\_activate\_feature}}
+\index{on\_activate\_feature@{on\_activate\_feature}!sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}}
+\doxysubsubsection{\texorpdfstring{on\_activate\_feature()}{on\_activate\_feature()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1deep__mind__handler_a19066f9082b753020de72c7365a3e645} 
+void sysio\+::chain\+::deep\+\_\+mind\+\_\+handler\+::on\+\_\+activate\+\_\+feature (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature}{protocol\+\_\+feature}} \&}]{feature}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{deep__mind_8cpp_source_l00162}{162}} of file \mbox{\hyperlink{deep__mind_8cpp_source}{deep\+\_\+mind.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00163\ \ \ \ \{}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}FEATURE\_OP\ ACTIVATE\ \$\{feature\_digest\}\ \$\{feature\}"{}},}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}feature\_digest"{}},\ feature.feature\_digest)}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}feature"{}},\ feature.to\_variant())}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ );}
+\DoxyCodeLine{00168\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1deep__mind__handler_ab52c3cb0a649f4a70f4e1b6717901e7e}\index{sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}!on\_add\_ram\_correction@{on\_add\_ram\_correction}}
+\index{on\_add\_ram\_correction@{on\_add\_ram\_correction}!sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}}
+\doxysubsubsection{\texorpdfstring{on\_add\_ram\_correction()}{on\_add\_ram\_correction()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1deep__mind__handler_ab52c3cb0a649f4a70f4e1b6717901e7e} 
+void sysio\+::chain\+::deep\+\_\+mind\+\_\+handler\+::on\+\_\+add\+\_\+ram\+\_\+correction (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classsysio_1_1chain_1_1account__ram__correction__object}{account\+\_\+ram\+\_\+correction\+\_\+object}} \&}]{rco}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{delta}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{deep__mind_8cpp_source_l00141}{141}} of file \mbox{\hyperlink{deep__mind_8cpp_source}{deep\+\_\+mind.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00142\ \ \ \ \{}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}RAM\_CORRECTION\_OP\ \$\{action\_id\}\ \$\{correction\_id\}\ \$\{event\_id\}\ \$\{payer\}\ \$\{delta\}"{}},}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}action\_id"{}},\ \_action\_id)}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}correction\_id"{}},\ rco.id.\_id)}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}event\_id"{}},\ \_ram\_trace.\mbox{\hyperlink{structsysio_1_1chain_1_1ram__trace_a168f13047b195cd83845bdfe40f636d2}{event\_id}})}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}payer"{}},\ rco.name)}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}delta"{}},\ delta)}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ );}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \_ram\_trace\ =\ ram\_trace();}
+\DoxyCodeLine{00151\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1deep__mind__handler_afe5ffbb0673d54aa20b08a109d1b09b5}\index{sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}!on\_applied\_transaction@{on\_applied\_transaction}}
+\index{on\_applied\_transaction@{on\_applied\_transaction}!sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}}
+\doxysubsubsection{\texorpdfstring{on\_applied\_transaction()}{on\_applied\_transaction()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1deep__mind__handler_afe5ffbb0673d54aa20b08a109d1b09b5} 
+void sysio\+::chain\+::deep\+\_\+mind\+\_\+handler\+::on\+\_\+applied\+\_\+transaction (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{block\+\_\+num}{, }\item[{const std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__trace}{transaction\+\_\+trace}} $>$ \&}]{trace}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{deep__mind_8cpp_source_l00122}{122}} of file \mbox{\hyperlink{deep__mind_8cpp_source}{deep\+\_\+mind.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00123\ \ \ \ \{}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ std::vector<char>\ packed\_trace;}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ }
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\_config.\mbox{\hyperlink{structsysio_1_1chain_1_1deep__mind__handler_1_1deep__mind__config_a5d360f0648ee6b27bac5dd10a98ee0dc}{zero\_elapsed}})\ \{}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \ transaction\_trace\ trace\_copy\ =\ *trace;}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \ set\_trace\_elapsed\_to\_zero(trace\_copy);}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ packed\_trace\ =\ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(trace\_copy);}
+\DoxyCodeLine{00130\ }
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ packed\_trace\ =\ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(*trace);}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00134\ }
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}APPLIED\_TRANSACTION\ \$\{block\}\ \$\{traces\}"{}},}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}block"{}},\ block\_num)}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}traces"{}},\ \mbox{\hyperlink{namespacefc_aab567c89004d329f560014d9943afcd6}{fc::to\_hex}}(packed\_trace))}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ );}
+\DoxyCodeLine{00139\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=321pt]{classsysio_1_1chain_1_1deep__mind__handler_afe5ffbb0673d54aa20b08a109d1b09b5_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1deep__mind__handler_a188b2591fe50c48f3f193a820c98aed6}\index{sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}!on\_cancel\_deferred@{on\_cancel\_deferred}}
+\index{on\_cancel\_deferred@{on\_cancel\_deferred}!sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}}
+\doxysubsubsection{\texorpdfstring{on\_cancel\_deferred()}{on\_cancel\_deferred()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1deep__mind__handler_a188b2591fe50c48f3f193a820c98aed6} 
+void sysio\+::chain\+::deep\+\_\+mind\+\_\+handler\+::on\+\_\+cancel\+\_\+deferred (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a78bf0c79493a90c71cb28aa761f44fd2}{operation\+\_\+qualifier}}}]{qual}{, }\item[{const \mbox{\hyperlink{classsysio_1_1chain_1_1generated__transaction__object}{generated\+\_\+transaction\+\_\+object}} \&}]{gto}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{deep__mind_8cpp_source_l00198}{198}} of file \mbox{\hyperlink{deep__mind_8cpp_source}{deep\+\_\+mind.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00199\ \ \ \ \{}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}DTRX\_OP\ \$\{qual\}CANCEL\ \$\{action\_id\}\ \$\{sender\}\ \$\{sender\_id\}\ \$\{payer\}\ \$\{published\}\ \$\{delay\}\ \$\{expiration\}\ \$\{trx\_id\}\ \$\{trx\}"{}},}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}qual"{}},\ prefix(qual))}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}action\_id"{}},\ \_action\_id)}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}sender"{}},\ gto.sender)}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}sender\_id"{}},\ gto.sender\_id)}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}payer"{}},\ gto.payer)}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}published"{}},\ gto.published)}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}delay"{}},\ gto.delay\_until)}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}expiration"{}},\ gto.expiration)}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}trx\_id"{}},\ gto.trx\_id)}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}trx"{}},\ \mbox{\hyperlink{namespacefc_aab567c89004d329f560014d9943afcd6}{fc::to\_hex}}(gto.packed\_trx.data(),\ gto.packed\_trx.size()))}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ );}
+\DoxyCodeLine{00212\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1deep__mind__handler_a188b2591fe50c48f3f193a820c98aed6_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1deep__mind__handler_a40b9a2c20e4a3fddfea8411b9101e99d}\index{sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}!on\_create\_deferred@{on\_create\_deferred}}
+\index{on\_create\_deferred@{on\_create\_deferred}!sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}}
+\doxysubsubsection{\texorpdfstring{on\_create\_deferred()}{on\_create\_deferred()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1deep__mind__handler_a40b9a2c20e4a3fddfea8411b9101e99d} 
+void sysio\+::chain\+::deep\+\_\+mind\+\_\+handler\+::on\+\_\+create\+\_\+deferred (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a78bf0c79493a90c71cb28aa761f44fd2}{operation\+\_\+qualifier}}}]{qual}{, }\item[{const \mbox{\hyperlink{classsysio_1_1chain_1_1generated__transaction__object}{generated\+\_\+transaction\+\_\+object}} \&}]{gto}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1packed__transaction}{packed\+\_\+transaction}} \&}]{packed\+\_\+trx}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{deep__mind_8cpp_source_l00228}{228}} of file \mbox{\hyperlink{deep__mind_8cpp_source}{deep\+\_\+mind.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00229\ \ \ \ \{}
+\DoxyCodeLine{00230\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ packed\_signed\_trx\ =\ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(packed\_trx.get\_signed\_transaction());}
+\DoxyCodeLine{00231\ }
+\DoxyCodeLine{00232\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}DTRX\_OP\ \$\{qual\}CREATE\ \$\{action\_id\}\ \$\{sender\}\ \$\{sender\_id\}\ \$\{payer\}\ \$\{published\}\ \$\{delay\}\ \$\{expiration\}\ \$\{trx\_id\}\ \$\{trx\}"{}},}
+\DoxyCodeLine{00233\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}qual"{}},\ prefix(qual))}
+\DoxyCodeLine{00234\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}action\_id"{}},\ \_action\_id)}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}sender"{}},\ gto.sender)}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}sender\_id"{}},\ gto.sender\_id)}
+\DoxyCodeLine{00237\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}payer"{}},\ gto.payer)}
+\DoxyCodeLine{00238\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}published"{}},\ gto.published)}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}delay"{}},\ gto.delay\_until)}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}expiration"{}},\ gto.expiration)}
+\DoxyCodeLine{00241\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}trx\_id"{}},\ gto.trx\_id)}
+\DoxyCodeLine{00242\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}trx"{}},\ \mbox{\hyperlink{namespacefc_aab567c89004d329f560014d9943afcd6}{fc::to\_hex}}(packed\_signed\_trx.data(),\ packed\_signed\_trx.size()))}
+\DoxyCodeLine{00243\ \ \ \ \ \ \ );}
+\DoxyCodeLine{00244\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1deep__mind__handler_a40b9a2c20e4a3fddfea8411b9101e99d_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1deep__mind__handler_a9cfd94c9162ccbe0c791ef43ee19cd76}\index{sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}!on\_create\_permission@{on\_create\_permission}}
+\index{on\_create\_permission@{on\_create\_permission}!sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}}
+\doxysubsubsection{\texorpdfstring{on\_create\_permission()}{on\_create\_permission()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1deep__mind__handler_a9cfd94c9162ccbe0c791ef43ee19cd76} 
+void sysio\+::chain\+::deep\+\_\+mind\+\_\+handler\+::on\+\_\+create\+\_\+permission (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classsysio_1_1chain_1_1permission__object}{permission\+\_\+object}} \&}]{p}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{deep__mind_8cpp_source_l00370}{370}} of file \mbox{\hyperlink{deep__mind_8cpp_source}{deep\+\_\+mind.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00371\ \ \ \ \{}
+\DoxyCodeLine{00372\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}PERM\_OP\ INS\ \$\{action\_id\}\ \$\{permission\_id\}\ \$\{data\}"{}},}
+\DoxyCodeLine{00373\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}action\_id"{}},\ \_action\_id)}
+\DoxyCodeLine{00374\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}permission\_id"{}},\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.id)}
+\DoxyCodeLine{00375\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}data"{}},\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})}
+\DoxyCodeLine{00376\ \ \ \ \ \ \ );}
+\DoxyCodeLine{00377\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1deep__mind__handler_ac6521f76f263b32eef6d88b0f0ad392f}\index{sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}!on\_create\_table@{on\_create\_table}}
+\index{on\_create\_table@{on\_create\_table}!sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}}
+\doxysubsubsection{\texorpdfstring{on\_create\_table()}{on\_create\_table()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1deep__mind__handler_ac6521f76f263b32eef6d88b0f0ad392f} 
+void sysio\+::chain\+::deep\+\_\+mind\+\_\+handler\+::on\+\_\+create\+\_\+table (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classsysio_1_1chain_1_1table__id__object}{table\+\_\+id\+\_\+object}} \&}]{tid}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{deep__mind_8cpp_source_l00251}{251}} of file \mbox{\hyperlink{deep__mind_8cpp_source}{deep\+\_\+mind.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00252\ \ \ \ \{}
+\DoxyCodeLine{00253\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}TBL\_OP\ INS\ \$\{action\_id\}\ \$\{code\}\ \$\{scope\}\ \$\{table\}\ \$\{payer\}"{}},}
+\DoxyCodeLine{00254\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}action\_id"{}},\ \_action\_id)}
+\DoxyCodeLine{00255\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}code"{}},\ tid.code)}
+\DoxyCodeLine{00256\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}scope"{}},\ tid.scope)}
+\DoxyCodeLine{00257\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}table"{}},\ tid.table)}
+\DoxyCodeLine{00258\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}payer"{}},\ tid.payer)}
+\DoxyCodeLine{00259\ \ \ \ \ \ \ );}
+\DoxyCodeLine{00260\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1deep__mind__handler_a41f0d36ff43d5a49cc8f3daab1486cf7}\index{sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}!on\_db\_remove\_i64@{on\_db\_remove\_i64}}
+\index{on\_db\_remove\_i64@{on\_db\_remove\_i64}!sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}}
+\doxysubsubsection{\texorpdfstring{on\_db\_remove\_i64()}{on\_db\_remove\_i64()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1deep__mind__handler_a41f0d36ff43d5a49cc8f3daab1486cf7} 
+void sysio\+::chain\+::deep\+\_\+mind\+\_\+handler\+::on\+\_\+db\+\_\+remove\+\_\+i64 (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classsysio_1_1chain_1_1table__id__object}{table\+\_\+id\+\_\+object}} \&}]{tid}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1key__value__object}{key\+\_\+value\+\_\+object}} \&}]{kvo}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{deep__mind_8cpp_source_l00297}{297}} of file \mbox{\hyperlink{deep__mind_8cpp_source}{deep\+\_\+mind.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00298\ \ \ \ \{}
+\DoxyCodeLine{00299\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}DB\_OP\ REM\ \$\{action\_id\}\ \$\{payer\}\ \$\{table\_code\}\ \$\{scope\}\ \$\{table\_name\}\ \$\{primkey\}\ \$\{odata\}"{}},}
+\DoxyCodeLine{00300\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}action\_id"{}},\ \_action\_id)}
+\DoxyCodeLine{00301\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}payer"{}},\ kvo.payer)}
+\DoxyCodeLine{00302\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}table\_code"{}},\ tid.code)}
+\DoxyCodeLine{00303\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}scope"{}},\ tid.scope)}
+\DoxyCodeLine{00304\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}table\_name"{}},\ tid.table)}
+\DoxyCodeLine{00305\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}primkey"{}},\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(kvo.primary\_key))}
+\DoxyCodeLine{00306\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}odata"{}},\ \mbox{\hyperlink{namespacefc_aab567c89004d329f560014d9943afcd6}{fc::to\_hex}}(kvo.value.data(),\ kvo.value.size()))}
+\DoxyCodeLine{00307\ \ \ \ \ \ \ );}
+\DoxyCodeLine{00308\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=346pt]{classsysio_1_1chain_1_1deep__mind__handler_a41f0d36ff43d5a49cc8f3daab1486cf7_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1deep__mind__handler_a67ecfda86da0eb31c40716503e9e354e}\index{sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}!on\_db\_store\_i64@{on\_db\_store\_i64}}
+\index{on\_db\_store\_i64@{on\_db\_store\_i64}!sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}}
+\doxysubsubsection{\texorpdfstring{on\_db\_store\_i64()}{on\_db\_store\_i64()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1deep__mind__handler_a67ecfda86da0eb31c40716503e9e354e} 
+void sysio\+::chain\+::deep\+\_\+mind\+\_\+handler\+::on\+\_\+db\+\_\+store\+\_\+i64 (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classsysio_1_1chain_1_1table__id__object}{table\+\_\+id\+\_\+object}} \&}]{tid}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1key__value__object}{key\+\_\+value\+\_\+object}} \&}]{kvo}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{deep__mind_8cpp_source_l00271}{271}} of file \mbox{\hyperlink{deep__mind_8cpp_source}{deep\+\_\+mind.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00272\ \ \ \ \{}
+\DoxyCodeLine{00273\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}DB\_OP\ INS\ \$\{action\_id\}\ \$\{payer\}\ \$\{table\_code\}\ \$\{scope\}\ \$\{table\_name\}\ \$\{primkey\}\ \$\{ndata\}"{}},}
+\DoxyCodeLine{00274\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}action\_id"{}},\ \_action\_id)}
+\DoxyCodeLine{00275\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}payer"{}},\ kvo.payer)}
+\DoxyCodeLine{00276\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}table\_code"{}},\ tid.code)}
+\DoxyCodeLine{00277\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}scope"{}},\ tid.scope)}
+\DoxyCodeLine{00278\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}table\_name"{}},\ tid.table)}
+\DoxyCodeLine{00279\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}primkey"{}},\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(kvo.primary\_key))}
+\DoxyCodeLine{00280\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}ndata"{}},\ \mbox{\hyperlink{namespacefc_aab567c89004d329f560014d9943afcd6}{fc::to\_hex}}(kvo.value.data(),\ kvo.value.size()))}
+\DoxyCodeLine{00281\ \ \ \ \ \ \ );}
+\DoxyCodeLine{00282\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=346pt]{classsysio_1_1chain_1_1deep__mind__handler_a67ecfda86da0eb31c40716503e9e354e_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1deep__mind__handler_a9556913335dd3112eb9597c0f093aed4}\index{sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}!on\_db\_update\_i64@{on\_db\_update\_i64}}
+\index{on\_db\_update\_i64@{on\_db\_update\_i64}!sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}}
+\doxysubsubsection{\texorpdfstring{on\_db\_update\_i64()}{on\_db\_update\_i64()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1deep__mind__handler_a9556913335dd3112eb9597c0f093aed4} 
+void sysio\+::chain\+::deep\+\_\+mind\+\_\+handler\+::on\+\_\+db\+\_\+update\+\_\+i64 (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classsysio_1_1chain_1_1table__id__object}{table\+\_\+id\+\_\+object}} \&}]{tid}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1key__value__object}{key\+\_\+value\+\_\+object}} \&}]{kvo}{, }\item[{\mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}}}]{payer}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{buffer}{, }\item[{std\+::size\+\_\+t}]{buffer\+\_\+size}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{deep__mind_8cpp_source_l00283}{283}} of file \mbox{\hyperlink{deep__mind_8cpp_source}{deep\+\_\+mind.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00284\ \ \ \ \{}
+\DoxyCodeLine{00285\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}DB\_OP\ UPD\ \$\{action\_id\}\ \$\{opayer\}:\$\{npayer\}\ \$\{table\_code\}\ \$\{scope\}\ \$\{table\_name\}\ \$\{primkey\}\ \$\{odata\}:\$\{ndata\}"{}},}
+\DoxyCodeLine{00286\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}action\_id"{}},\ \_action\_id)}
+\DoxyCodeLine{00287\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}opayer"{}},\ kvo.payer)}
+\DoxyCodeLine{00288\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}npayer"{}},\ payer)}
+\DoxyCodeLine{00289\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}table\_code"{}},\ tid.code)}
+\DoxyCodeLine{00290\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}scope"{}},\ tid.scope)}
+\DoxyCodeLine{00291\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}table\_name"{}},\ tid.table)}
+\DoxyCodeLine{00292\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}primkey"{}},\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(kvo.primary\_key))}
+\DoxyCodeLine{00293\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}odata"{}},\ \mbox{\hyperlink{namespacefc_aab567c89004d329f560014d9943afcd6}{fc::to\_hex}}(kvo.value.data(),kvo.value.size()))}
+\DoxyCodeLine{00294\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}ndata"{}},\ \mbox{\hyperlink{namespacefc_aab567c89004d329f560014d9943afcd6}{fc::to\_hex}}(buffer,\ buffer\_size))}
+\DoxyCodeLine{00295\ \ \ \ \ \ \ );}
+\DoxyCodeLine{00296\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=346pt]{classsysio_1_1chain_1_1deep__mind__handler_a9556913335dd3112eb9597c0f093aed4_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1deep__mind__handler_a40ba18f5c95f0a7f1951d62440cb8eee}\index{sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}!on\_end\_action@{on\_end\_action}}
+\index{on\_end\_action@{on\_end\_action}!sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}}
+\doxysubsubsection{\texorpdfstring{on\_end\_action()}{on\_end\_action()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1deep__mind__handler_a40ba18f5c95f0a7f1951d62440cb8eee} 
+void sysio\+::chain\+::deep\+\_\+mind\+\_\+handler\+::on\+\_\+end\+\_\+action (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{deep__mind_8cpp_source_l00176}{176}} of file \mbox{\hyperlink{deep__mind_8cpp_source}{deep\+\_\+mind.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00177\ \ \ \ \{}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ ++\_action\_id;}
+\DoxyCodeLine{00179\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1deep__mind__handler_a4d8195c2ed558e0b450a8499dadf0fd3}\index{sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}!on\_end\_transaction@{on\_end\_transaction}}
+\index{on\_end\_transaction@{on\_end\_transaction}!sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}}
+\doxysubsubsection{\texorpdfstring{on\_end\_transaction()}{on\_end\_transaction()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1deep__mind__handler_a4d8195c2ed558e0b450a8499dadf0fd3} 
+void sysio\+::chain\+::deep\+\_\+mind\+\_\+handler\+::on\+\_\+end\+\_\+transaction (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{deep__mind_8cpp_source_l00117}{117}} of file \mbox{\hyperlink{deep__mind_8cpp_source}{deep\+\_\+mind.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00118\ \ \ \ \{}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \_action\_id\ =\ 0;}
+\DoxyCodeLine{00120\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1deep__mind__handler_aff92ebea4734e68cf7ddabd3d021c52c}\index{sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}!on\_fail\_deferred@{on\_fail\_deferred}}
+\index{on\_fail\_deferred@{on\_fail\_deferred}!sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}}
+\doxysubsubsection{\texorpdfstring{on\_fail\_deferred()}{on\_fail\_deferred()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1deep__mind__handler_aff92ebea4734e68cf7ddabd3d021c52c} 
+void sysio\+::chain\+::deep\+\_\+mind\+\_\+handler\+::on\+\_\+fail\+\_\+deferred (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{deep__mind_8cpp_source_l00245}{245}} of file \mbox{\hyperlink{deep__mind_8cpp_source}{deep\+\_\+mind.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00246\ \ \ \ \{}
+\DoxyCodeLine{00247\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}DTRX\_OP\ FAILED\ \$\{action\_id\}"{}},}
+\DoxyCodeLine{00248\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}action\_id"{}},\ \_action\_id)}
+\DoxyCodeLine{00249\ \ \ \ \ \ \ );}
+\DoxyCodeLine{00250\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1deep__mind__handler_af937b8a3add1750021eb59ebaf4ce920}\index{sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}!on\_init\_resource\_limits@{on\_init\_resource\_limits}}
+\index{on\_init\_resource\_limits@{on\_init\_resource\_limits}!sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}}
+\doxysubsubsection{\texorpdfstring{on\_init\_resource\_limits()}{on\_init\_resource\_limits()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1deep__mind__handler_af937b8a3add1750021eb59ebaf4ce920} 
+void sysio\+::chain\+::deep\+\_\+mind\+\_\+handler\+::on\+\_\+init\+\_\+resource\+\_\+limits (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__config__object}{resource\+\_\+limits\+::resource\+\_\+limits\+\_\+config\+\_\+object}} \&}]{config}{, }\item[{const \mbox{\hyperlink{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__state__object}{resource\+\_\+limits\+::resource\+\_\+limits\+\_\+state\+\_\+object}} \&}]{state}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{deep__mind_8cpp_source_l00309}{309}} of file \mbox{\hyperlink{deep__mind_8cpp_source}{deep\+\_\+mind.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00310\ \ \ \ \{}
+\DoxyCodeLine{00311\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}RLIMIT\_OP\ CONFIG\ INS\ \$\{data\}"{}},}
+\DoxyCodeLine{00312\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}data"{}},\ \mbox{\hyperlink{classconfig}{config}})}
+\DoxyCodeLine{00313\ \ \ \ \ \ \ );}
+\DoxyCodeLine{00314\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}RLIMIT\_OP\ STATE\ INS\ \$\{data\}"{}},}
+\DoxyCodeLine{00315\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}data"{}},\ \mbox{\hyperlink{structstate}{state}})}
+\DoxyCodeLine{00316\ \ \ \ \ \ \ );}
+\DoxyCodeLine{00317\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1deep__mind__handler_ae83a7be061d2f00f7caa103e8f8ec2dd}\index{sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}!on\_input\_action@{on\_input\_action}}
+\index{on\_input\_action@{on\_input\_action}!sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}}
+\doxysubsubsection{\texorpdfstring{on\_input\_action()}{on\_input\_action()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1deep__mind__handler_ae83a7be061d2f00f7caa103e8f8ec2dd} 
+void sysio\+::chain\+::deep\+\_\+mind\+\_\+handler\+::on\+\_\+input\+\_\+action (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{deep__mind_8cpp_source_l00170}{170}} of file \mbox{\hyperlink{deep__mind_8cpp_source}{deep\+\_\+mind.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00171\ \ \ \ \{}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}CREATION\_OP\ ROOT\ \$\{action\_id\}"{}},}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}action\_id"{}},\ \_action\_id)}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ );}
+\DoxyCodeLine{00175\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1deep__mind__handler_a19405a59ff824f3e6b8fab6d530d47ac}\index{sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}!on\_modify\_permission@{on\_modify\_permission}}
+\index{on\_modify\_permission@{on\_modify\_permission}!sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}}
+\doxysubsubsection{\texorpdfstring{on\_modify\_permission()}{on\_modify\_permission()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1deep__mind__handler_a19405a59ff824f3e6b8fab6d530d47ac} 
+void sysio\+::chain\+::deep\+\_\+mind\+\_\+handler\+::on\+\_\+modify\+\_\+permission (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classsysio_1_1chain_1_1permission__object}{permission\+\_\+object}} \&}]{old\+\_\+permission}{, }\item[{const \mbox{\hyperlink{classsysio_1_1chain_1_1permission__object}{permission\+\_\+object}} \&}]{new\+\_\+permission}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{deep__mind_8cpp_source_l00378}{378}} of file \mbox{\hyperlink{deep__mind_8cpp_source}{deep\+\_\+mind.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00379\ \ \ \ \{}
+\DoxyCodeLine{00380\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}PERM\_OP\ UPD\ \$\{action\_id\}\ \$\{permission\_id\}\ \$\{data\}"{}},}
+\DoxyCodeLine{00381\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}action\_id"{}},\ \_action\_id)}
+\DoxyCodeLine{00382\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}permission\_id"{}},\ new\_permission.id)}
+\DoxyCodeLine{00383\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}data"{}},\ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}()}
+\DoxyCodeLine{00384\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}old"{}},\ old\_permission)}
+\DoxyCodeLine{00385\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}new"{}},\ new\_permission)}
+\DoxyCodeLine{00386\ \ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{00387\ \ \ \ \ \ \ );}
+\DoxyCodeLine{00388\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1deep__mind__handler_a2869257ca6d9f943ccdfdf75628f62a7}\index{sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}!on\_newaccount\_resource\_limits@{on\_newaccount\_resource\_limits}}
+\index{on\_newaccount\_resource\_limits@{on\_newaccount\_resource\_limits}!sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}}
+\doxysubsubsection{\texorpdfstring{on\_newaccount\_resource\_limits()}{on\_newaccount\_resource\_limits()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1deep__mind__handler_a2869257ca6d9f943ccdfdf75628f62a7} 
+void sysio\+::chain\+::deep\+\_\+mind\+\_\+handler\+::on\+\_\+newaccount\+\_\+resource\+\_\+limits (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1resource__limits__object}{resource\+\_\+limits\+::resource\+\_\+limits\+\_\+object}} \&}]{limits}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1resource__usage__object}{resource\+\_\+limits\+::resource\+\_\+usage\+\_\+object}} \&}]{usage}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{deep__mind_8cpp_source_l00330}{330}} of file \mbox{\hyperlink{deep__mind_8cpp_source}{deep\+\_\+mind.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00331\ \ \ \ \{}
+\DoxyCodeLine{00332\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}RLIMIT\_OP\ ACCOUNT\_LIMITS\ INS\ \$\{data\}"{}},}
+\DoxyCodeLine{00333\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}data"{}},\ limits)}
+\DoxyCodeLine{00334\ \ \ \ \ \ \ );}
+\DoxyCodeLine{00335\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}RLIMIT\_OP\ ACCOUNT\_USAGE\ INS\ \$\{data\}"{}},}
+\DoxyCodeLine{00336\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}data"{}},\ usage)}
+\DoxyCodeLine{00337\ \ \ \ \ \ \ );}
+\DoxyCodeLine{00338\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1deep__mind__handler_ae52a137a99c78957f649905f587c9172}\index{sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}!on\_onblock@{on\_onblock}}
+\index{on\_onblock@{on\_onblock}!sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}}
+\doxysubsubsection{\texorpdfstring{on\_onblock()}{on\_onblock()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1deep__mind__handler_ae52a137a99c78957f649905f587c9172} 
+void sysio\+::chain\+::deep\+\_\+mind\+\_\+handler\+::on\+\_\+onblock (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1signed__transaction}{signed\+\_\+transaction}} \&}]{trx}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{deep__mind_8cpp_source_l00102}{102}} of file \mbox{\hyperlink{deep__mind_8cpp_source}{deep\+\_\+mind.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00103\ \ \ \ \{}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ packed\_trx\ =\ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(trx);}
+\DoxyCodeLine{00105\ }
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}TRX\_OP\ CREATE\ onblock\ \$\{id\}\ \$\{trx\}"{}},}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}id"{}},\ trx.id())}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}trx"{}},\ \mbox{\hyperlink{namespacefc_aab567c89004d329f560014d9943afcd6}{fc::to\_hex}}(packed\_trx))}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ );}
+\DoxyCodeLine{00110\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1deep__mind__handler_ae52a137a99c78957f649905f587c9172_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1deep__mind__handler_a66b4adf2043576b0824e49a191266e6a}\index{sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}!on\_onerror@{on\_onerror}}
+\index{on\_onerror@{on\_onerror}!sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}}
+\doxysubsubsection{\texorpdfstring{on\_onerror()}{on\_onerror()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1deep__mind__handler_a66b4adf2043576b0824e49a191266e6a} 
+void sysio\+::chain\+::deep\+\_\+mind\+\_\+handler\+::on\+\_\+onerror (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1signed__transaction}{signed\+\_\+transaction}} \&}]{etrx}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{deep__mind_8cpp_source_l00092}{92}} of file \mbox{\hyperlink{deep__mind_8cpp_source}{deep\+\_\+mind.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00093\ \ \ \ \{}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ packed\_trx\ =\ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(etrx);}
+\DoxyCodeLine{00095\ }
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}TRX\_OP\ CREATE\ onerror\ \$\{id\}\ \$\{trx\}"{}},}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}id"{}},\ etrx.id())}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}trx"{}},\ \mbox{\hyperlink{namespacefc_aab567c89004d329f560014d9943afcd6}{fc::to\_hex}}(packed\_trx))}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ );}
+\DoxyCodeLine{00100\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1deep__mind__handler_a66b4adf2043576b0824e49a191266e6a_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1deep__mind__handler_a2cc8d78603f10399c56441b7d36857ff}\index{sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}!on\_preactivate\_feature@{on\_preactivate\_feature}}
+\index{on\_preactivate\_feature@{on\_preactivate\_feature}!sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}}
+\doxysubsubsection{\texorpdfstring{on\_preactivate\_feature()}{on\_preactivate\_feature()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1deep__mind__handler_a2cc8d78603f10399c56441b7d36857ff} 
+void sysio\+::chain\+::deep\+\_\+mind\+\_\+handler\+::on\+\_\+preactivate\+\_\+feature (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature}{protocol\+\_\+feature}} \&}]{feature}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{deep__mind_8cpp_source_l00153}{153}} of file \mbox{\hyperlink{deep__mind_8cpp_source}{deep\+\_\+mind.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00154\ \ \ \ \{}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}FEATURE\_OP\ PRE\_ACTIVATE\ \$\{action\_id\}\ \$\{feature\_digest\}\ \$\{feature\}"{}},}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}action\_id"{}},\ \_action\_id)}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}feature\_digest"{}},\ feature.feature\_digest)}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}feature"{}},\ feature.to\_variant())}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ );}
+\DoxyCodeLine{00160\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1deep__mind__handler_aeeffed2d8ca9af3d83e75352304b8122}\index{sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}!on\_ram\_event@{on\_ram\_event}}
+\index{on\_ram\_event@{on\_ram\_event}!sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}}
+\doxysubsubsection{\texorpdfstring{on\_ram\_event()}{on\_ram\_event()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1deep__mind__handler_aeeffed2d8ca9af3d83e75352304b8122} 
+void sysio\+::chain\+::deep\+\_\+mind\+\_\+handler\+::on\+\_\+ram\+\_\+event (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}}}]{account}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{new\+\_\+usage}{, }\item[{\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}}]{delta}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{deep__mind_8cpp_source_l00355}{355}} of file \mbox{\hyperlink{deep__mind_8cpp_source}{deep\+\_\+mind.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00356\ \ \ \ \{}
+\DoxyCodeLine{00357\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}RAM\_OP\ \$\{action\_id\}\ \$\{event\_id\}\ \$\{family\}\ \$\{operation\}\ \$\{legacy\_tag\}\ \$\{payer\}\ \$\{new\_usage\}\ \$\{delta\}"{}},}
+\DoxyCodeLine{00358\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}action\_id"{}},\ \_action\_id)}
+\DoxyCodeLine{00359\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}event\_id"{}},\ \_ram\_trace.\mbox{\hyperlink{structsysio_1_1chain_1_1ram__trace_a168f13047b195cd83845bdfe40f636d2}{event\_id}})}
+\DoxyCodeLine{00360\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}family"{}},\ \_ram\_trace.\mbox{\hyperlink{structsysio_1_1chain_1_1ram__trace_a49af7075f4385dcb98c9c9c36dc88dcc}{family}})}
+\DoxyCodeLine{00361\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}operation"{}},\ \_ram\_trace.\mbox{\hyperlink{structsysio_1_1chain_1_1ram__trace_a50404f4b616df834542eed676913ec1c}{operation}})}
+\DoxyCodeLine{00362\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}legacy\_tag"{}},\ \_ram\_trace.\mbox{\hyperlink{structsysio_1_1chain_1_1ram__trace_a08b18da6966d3cd2ef974bb8e1eaaefb}{legacy\_tag}})}
+\DoxyCodeLine{00363\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}payer"{}},\ account)}
+\DoxyCodeLine{00364\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}new\_usage"{}},\ new\_usage)}
+\DoxyCodeLine{00365\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}delta"{}},\ delta)}
+\DoxyCodeLine{00366\ \ \ \ \ \ \ );}
+\DoxyCodeLine{00367\ \ \ \ \ \ \ \_ram\_trace\ =\ ram\_trace();}
+\DoxyCodeLine{00368\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1deep__mind__handler_af17c45c11dd650242a9eb80c161322db}\index{sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}!on\_ram\_trace@{on\_ram\_trace}}
+\index{on\_ram\_trace@{on\_ram\_trace}!sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}}
+\doxysubsubsection{\texorpdfstring{on\_ram\_trace()}{on\_ram\_trace()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1deep__mind__handler_af17c45c11dd650242a9eb80c161322db} 
+void sysio\+::chain\+::deep\+\_\+mind\+\_\+handler\+::on\+\_\+ram\+\_\+trace (\begin{DoxyParamCaption}\item[{std\+::string \&\&}]{event\+\_\+id}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{family}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{operation}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{legacy\+\_\+tag}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{deep__mind_8cpp_source_l00351}{351}} of file \mbox{\hyperlink{deep__mind_8cpp_source}{deep\+\_\+mind.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00352\ \ \ \ \{}
+\DoxyCodeLine{00353\ \ \ \ \ \ \ \_ram\_trace\ =\ ram\_trace(std::move(event\_id),\ family,\ operation,\ legacy\_tag);}
+\DoxyCodeLine{00354\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1deep__mind__handler_ae93ff782f23642a922b65ae895c76255}\index{sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}!on\_remove\_permission@{on\_remove\_permission}}
+\index{on\_remove\_permission@{on\_remove\_permission}!sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}}
+\doxysubsubsection{\texorpdfstring{on\_remove\_permission()}{on\_remove\_permission()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1deep__mind__handler_ae93ff782f23642a922b65ae895c76255} 
+void sysio\+::chain\+::deep\+\_\+mind\+\_\+handler\+::on\+\_\+remove\+\_\+permission (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classsysio_1_1chain_1_1permission__object}{permission\+\_\+object}} \&}]{permission}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{deep__mind_8cpp_source_l00389}{389}} of file \mbox{\hyperlink{deep__mind_8cpp_source}{deep\+\_\+mind.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00390\ \ \ \ \{}
+\DoxyCodeLine{00391\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}PERM\_OP\ REM\ \$\{action\_id\}\ \$\{permission\_id\}\ \$\{data\}"{}},}
+\DoxyCodeLine{00392\ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}action\_id"{}},\ \_action\_id)}
+\DoxyCodeLine{00393\ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}permission\_id"{}},\ permission.id)}
+\DoxyCodeLine{00394\ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}data"{}},\ permission)}
+\DoxyCodeLine{00395\ \ \ \ \ \ \ );}
+\DoxyCodeLine{00396\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1deep__mind__handler_a84efdefe0df98208a328c1d558947333}\index{sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}!on\_remove\_table@{on\_remove\_table}}
+\index{on\_remove\_table@{on\_remove\_table}!sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}}
+\doxysubsubsection{\texorpdfstring{on\_remove\_table()}{on\_remove\_table()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1deep__mind__handler_a84efdefe0df98208a328c1d558947333} 
+void sysio\+::chain\+::deep\+\_\+mind\+\_\+handler\+::on\+\_\+remove\+\_\+table (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classsysio_1_1chain_1_1table__id__object}{table\+\_\+id\+\_\+object}} \&}]{tid}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{deep__mind_8cpp_source_l00261}{261}} of file \mbox{\hyperlink{deep__mind_8cpp_source}{deep\+\_\+mind.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00262\ \ \ \ \{}
+\DoxyCodeLine{00263\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}TBL\_OP\ REM\ \$\{action\_id\}\ \$\{code\}\ \$\{scope\}\ \$\{table\}\ \$\{payer\}"{}},}
+\DoxyCodeLine{00264\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}action\_id"{}},\ \_action\_id)}
+\DoxyCodeLine{00265\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}code"{}},\ tid.code)}
+\DoxyCodeLine{00266\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}scope"{}},\ tid.scope)}
+\DoxyCodeLine{00267\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}table"{}},\ tid.table)}
+\DoxyCodeLine{00268\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}payer"{}},\ tid.payer)}
+\DoxyCodeLine{00269\ \ \ \ \ \ \ );}
+\DoxyCodeLine{00270\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1deep__mind__handler_a7f5a039386bd06d780a0c6f4b642b73c}\index{sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}!on\_require\_recipient@{on\_require\_recipient}}
+\index{on\_require\_recipient@{on\_require\_recipient}!sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}}
+\doxysubsubsection{\texorpdfstring{on\_require\_recipient()}{on\_require\_recipient()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1deep__mind__handler_a7f5a039386bd06d780a0c6f4b642b73c} 
+void sysio\+::chain\+::deep\+\_\+mind\+\_\+handler\+::on\+\_\+require\+\_\+recipient (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{deep__mind_8cpp_source_l00180}{180}} of file \mbox{\hyperlink{deep__mind_8cpp_source}{deep\+\_\+mind.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00181\ \ \ \ \{}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}CREATION\_OP\ NOTIFY\ \$\{action\_id\}"{}},}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}action\_id"{}},\ \_action\_id)}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ );}
+\DoxyCodeLine{00185\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1deep__mind__handler_a5ba4f6cac45df2de3efba3fd5d62df48}\index{sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}!on\_send\_context\_free\_inline@{on\_send\_context\_free\_inline}}
+\index{on\_send\_context\_free\_inline@{on\_send\_context\_free\_inline}!sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}}
+\doxysubsubsection{\texorpdfstring{on\_send\_context\_free\_inline()}{on\_send\_context\_free\_inline()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1deep__mind__handler_a5ba4f6cac45df2de3efba3fd5d62df48} 
+void sysio\+::chain\+::deep\+\_\+mind\+\_\+handler\+::on\+\_\+send\+\_\+context\+\_\+free\+\_\+inline (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{deep__mind_8cpp_source_l00192}{192}} of file \mbox{\hyperlink{deep__mind_8cpp_source}{deep\+\_\+mind.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00193\ \ \ \ \{}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}CREATION\_OP\ CFA\_INLINE\ \$\{action\_id\}"{}},}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}action\_id"{}},\ \_action\_id)}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ );}
+\DoxyCodeLine{00197\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1deep__mind__handler_a952ca0e6d83fd569e03cb492db5f2c43}\index{sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}!on\_send\_deferred@{on\_send\_deferred}}
+\index{on\_send\_deferred@{on\_send\_deferred}!sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}}
+\doxysubsubsection{\texorpdfstring{on\_send\_deferred()}{on\_send\_deferred()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1deep__mind__handler_a952ca0e6d83fd569e03cb492db5f2c43} 
+void sysio\+::chain\+::deep\+\_\+mind\+\_\+handler\+::on\+\_\+send\+\_\+deferred (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a78bf0c79493a90c71cb28aa761f44fd2}{operation\+\_\+qualifier}}}]{qual}{, }\item[{const \mbox{\hyperlink{classsysio_1_1chain_1_1generated__transaction__object}{generated\+\_\+transaction\+\_\+object}} \&}]{gto}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{deep__mind_8cpp_source_l00213}{213}} of file \mbox{\hyperlink{deep__mind_8cpp_source}{deep\+\_\+mind.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00214\ \ \ \ \{}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}DTRX\_OP\ \$\{qual\}CREATE\ \$\{action\_id\}\ \$\{sender\}\ \$\{sender\_id\}\ \$\{payer\}\ \$\{published\}\ \$\{delay\}\ \$\{expiration\}\ \$\{trx\_id\}\ \$\{trx\}"{}},}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}qual"{}},\ prefix(qual))}
+\DoxyCodeLine{00217\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}action\_id"{}},\ \_action\_id)}
+\DoxyCodeLine{00218\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}sender"{}},\ gto.sender)}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}sender\_id"{}},\ gto.sender\_id)}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}payer"{}},\ gto.payer)}
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}published"{}},\ gto.published)}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}delay"{}},\ gto.delay\_until)}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}expiration"{}},\ gto.expiration)}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}trx\_id"{}},\ gto.trx\_id)}
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}trx"{}},\ \mbox{\hyperlink{namespacefc_aab567c89004d329f560014d9943afcd6}{fc::to\_hex}}(gto.packed\_trx.data(),\ gto.packed\_trx.size()))}
+\DoxyCodeLine{00226\ \ \ \ \ \ \ );}
+\DoxyCodeLine{00227\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1deep__mind__handler_a952ca0e6d83fd569e03cb492db5f2c43_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1deep__mind__handler_acbad203a99f983d1a3c425ecf7835146}\index{sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}!on\_send\_inline@{on\_send\_inline}}
+\index{on\_send\_inline@{on\_send\_inline}!sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}}
+\doxysubsubsection{\texorpdfstring{on\_send\_inline()}{on\_send\_inline()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1deep__mind__handler_acbad203a99f983d1a3c425ecf7835146} 
+void sysio\+::chain\+::deep\+\_\+mind\+\_\+handler\+::on\+\_\+send\+\_\+inline (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{deep__mind_8cpp_source_l00186}{186}} of file \mbox{\hyperlink{deep__mind_8cpp_source}{deep\+\_\+mind.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00187\ \ \ \ \{}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}CREATION\_OP\ INLINE\ \$\{action\_id\}"{}},}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}action\_id"{}},\ \_action\_id)}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ );}
+\DoxyCodeLine{00191\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1deep__mind__handler_ab7181993f2c17d4519857c9fd09a5bc3}\index{sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}!on\_set\_account\_limits@{on\_set\_account\_limits}}
+\index{on\_set\_account\_limits@{on\_set\_account\_limits}!sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}}
+\doxysubsubsection{\texorpdfstring{on\_set\_account\_limits()}{on\_set\_account\_limits()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1deep__mind__handler_ab7181993f2c17d4519857c9fd09a5bc3} 
+void sysio\+::chain\+::deep\+\_\+mind\+\_\+handler\+::on\+\_\+set\+\_\+account\+\_\+limits (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1resource__limits__object}{resource\+\_\+limits\+::resource\+\_\+limits\+\_\+object}} \&}]{limits}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{deep__mind_8cpp_source_l00345}{345}} of file \mbox{\hyperlink{deep__mind_8cpp_source}{deep\+\_\+mind.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00346\ \ \ \ \{}
+\DoxyCodeLine{00347\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}RLIMIT\_OP\ ACCOUNT\_LIMITS\ UPD\ \$\{data\}"{}},}
+\DoxyCodeLine{00348\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}data"{}},\ limits)}
+\DoxyCodeLine{00349\ \ \ \ \ \ \ );}
+\DoxyCodeLine{00350\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1deep__mind__handler_a8c5f1a77e4f1d4391532dcc823b9b8e2}\index{sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}!on\_start\_block@{on\_start\_block}}
+\index{on\_start\_block@{on\_start\_block}!sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}}
+\doxysubsubsection{\texorpdfstring{on\_start\_block()}{on\_start\_block()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1deep__mind__handler_a8c5f1a77e4f1d4391532dcc823b9b8e2} 
+void sysio\+::chain\+::deep\+\_\+mind\+\_\+handler\+::on\+\_\+start\+\_\+block (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{block\+\_\+num}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{deep__mind_8cpp_source_l00069}{69}} of file \mbox{\hyperlink{deep__mind_8cpp_source}{deep\+\_\+mind.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00070\ \ \ \ \{}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}START\_BLOCK\ \$\{block\_num\}"{}},\ (\textcolor{stringliteral}{"{}block\_num"{}},\ block\_num));}
+\DoxyCodeLine{00072\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1deep__mind__handler_a37eea3e55a641b8a916c353f557a58ae}\index{sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}!on\_start\_transaction@{on\_start\_transaction}}
+\index{on\_start\_transaction@{on\_start\_transaction}!sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}}
+\doxysubsubsection{\texorpdfstring{on\_start\_transaction()}{on\_start\_transaction()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1deep__mind__handler_a37eea3e55a641b8a916c353f557a58ae} 
+void sysio\+::chain\+::deep\+\_\+mind\+\_\+handler\+::on\+\_\+start\+\_\+transaction (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{deep__mind_8cpp_source_l00112}{112}} of file \mbox{\hyperlink{deep__mind_8cpp_source}{deep\+\_\+mind.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00113\ \ \ \ \{}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \_action\_id\ =\ 0;}
+\DoxyCodeLine{00115\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1deep__mind__handler_a2899afc0c347e454d3918b95c9df6d77}\index{sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}!on\_startup@{on\_startup}}
+\index{on\_startup@{on\_startup}!sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}}
+\doxysubsubsection{\texorpdfstring{on\_startup()}{on\_startup()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1deep__mind__handler_a2899afc0c347e454d3918b95c9df6d77} 
+void sysio\+::chain\+::deep\+\_\+mind\+\_\+handler\+::on\+\_\+startup (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classchainbase_1_1database}{chainbase\+::database}} \&}]{db}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{head\+\_\+block\+\_\+num}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{deep__mind_8cpp_source_l00048}{48}} of file \mbox{\hyperlink{deep__mind_8cpp_source}{deep\+\_\+mind.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00049\ \ \ \ \{}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \textcolor{comment}{//\ FIXME:\ We\ should\ probably\ feed\ that\ from\ CMake\ directly\ somehow\ ...}}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}DEEP\_MIND\_VERSION\ wire\_sysio\ 13\ 0"{}});}
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}ABIDUMP\ START\ \$\{block\_num\}\ \$\{global\_sequence\_num\}"{}},}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}block\_num"{}},\ head\_block\_num)}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}global\_sequence\_num"{}},\ db.\mbox{\hyperlink{classchainbase_1_1database_afcfe00f81a526c1376d4f51197dd3a9a}{get}}<dynamic\_global\_property\_object>().global\_action\_sequence)}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ );}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ =\ db.\mbox{\hyperlink{classchainbase_1_1database_a4d5297635dcf70be481d9b600da9bc13}{get\_index}}<\mbox{\hyperlink{namespacesysio_1_1chain_a1736163b16f1771314cd01a1208621c7}{account\_index}}>();}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\&\ row\ :\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.indices())\ \{}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (row.abi.size()\ !=\ 0)\ \{}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}ABIDUMP\ ABI\ \$\{contract\}\ \$\{abi\}"{}},}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}contract"{}},\ row.name)}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}abi"{}},\ row.abi)}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}ABIDUMP\ END"{}});}
+\DoxyCodeLine{00067\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1deep__mind__handler_a2899afc0c347e454d3918b95c9df6d77_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1deep__mind__handler_a76d1fe0ab283b95b71b0374e50a074fe}\index{sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}!on\_switch\_forks@{on\_switch\_forks}}
+\index{on\_switch\_forks@{on\_switch\_forks}!sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}}
+\doxysubsubsection{\texorpdfstring{on\_switch\_forks()}{on\_switch\_forks()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1deep__mind__handler_a76d1fe0ab283b95b71b0374e50a074fe} 
+void sysio\+::chain\+::deep\+\_\+mind\+\_\+handler\+::on\+\_\+switch\+\_\+forks (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{block\+\_\+id\+\_\+type}} \&}]{old\+\_\+head}{, }\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{block\+\_\+id\+\_\+type}} \&}]{new\+\_\+head}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{deep__mind_8cpp_source_l00084}{84}} of file \mbox{\hyperlink{deep__mind_8cpp_source}{deep\+\_\+mind.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00085\ \ \ \ \{}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}SWITCH\_FORK\ \$\{from\_id\}\ \$\{to\_id\}"{}},}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}from\_id"{}},\ old\_head)}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}to\_id"{}},\ new\_head)}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ );}
+\DoxyCodeLine{00090\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1deep__mind__handler_a85da2df1af87a5116d6a384cdd4be6b9}\index{sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}!on\_update\_account\_usage@{on\_update\_account\_usage}}
+\index{on\_update\_account\_usage@{on\_update\_account\_usage}!sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}}
+\doxysubsubsection{\texorpdfstring{on\_update\_account\_usage()}{on\_update\_account\_usage()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1deep__mind__handler_a85da2df1af87a5116d6a384cdd4be6b9} 
+void sysio\+::chain\+::deep\+\_\+mind\+\_\+handler\+::on\+\_\+update\+\_\+account\+\_\+usage (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1resource__usage__object}{resource\+\_\+limits\+::resource\+\_\+usage\+\_\+object}} \&}]{usage}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{deep__mind_8cpp_source_l00339}{339}} of file \mbox{\hyperlink{deep__mind_8cpp_source}{deep\+\_\+mind.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00340\ \ \ \ \{}
+\DoxyCodeLine{00341\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}RLIMIT\_OP\ ACCOUNT\_USAGE\ UPD\ \$\{data\}"{}},}
+\DoxyCodeLine{00342\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}data"{}},\ usage)}
+\DoxyCodeLine{00343\ \ \ \ \ \ \ );}
+\DoxyCodeLine{00344\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1deep__mind__handler_a6229d7dbf649b7d843212646e84b03b5}\index{sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}!on\_update\_resource\_limits\_config@{on\_update\_resource\_limits\_config}}
+\index{on\_update\_resource\_limits\_config@{on\_update\_resource\_limits\_config}!sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}}
+\doxysubsubsection{\texorpdfstring{on\_update\_resource\_limits\_config()}{on\_update\_resource\_limits\_config()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1deep__mind__handler_a6229d7dbf649b7d843212646e84b03b5} 
+void sysio\+::chain\+::deep\+\_\+mind\+\_\+handler\+::on\+\_\+update\+\_\+resource\+\_\+limits\+\_\+config (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__config__object}{resource\+\_\+limits\+::resource\+\_\+limits\+\_\+config\+\_\+object}} \&}]{config}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{deep__mind_8cpp_source_l00318}{318}} of file \mbox{\hyperlink{deep__mind_8cpp_source}{deep\+\_\+mind.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00319\ \ \ \ \{}
+\DoxyCodeLine{00320\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}RLIMIT\_OP\ CONFIG\ UPD\ \$\{data\}"{}},}
+\DoxyCodeLine{00321\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}data"{}},\ \mbox{\hyperlink{classconfig}{config}})}
+\DoxyCodeLine{00322\ \ \ \ \ \ \ );}
+\DoxyCodeLine{00323\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1deep__mind__handler_a4e3f1380a28e01e17fa2eb8c81f5bfc9}\index{sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}!on\_update\_resource\_limits\_state@{on\_update\_resource\_limits\_state}}
+\index{on\_update\_resource\_limits\_state@{on\_update\_resource\_limits\_state}!sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}}
+\doxysubsubsection{\texorpdfstring{on\_update\_resource\_limits\_state()}{on\_update\_resource\_limits\_state()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1deep__mind__handler_a4e3f1380a28e01e17fa2eb8c81f5bfc9} 
+void sysio\+::chain\+::deep\+\_\+mind\+\_\+handler\+::on\+\_\+update\+\_\+resource\+\_\+limits\+\_\+state (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__state__object}{resource\+\_\+limits\+::resource\+\_\+limits\+\_\+state\+\_\+object}} \&}]{state}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{deep__mind_8cpp_source_l00324}{324}} of file \mbox{\hyperlink{deep__mind_8cpp_source}{deep\+\_\+mind.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00325\ \ \ \ \{}
+\DoxyCodeLine{00326\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}RLIMIT\_OP\ STATE\ UPD\ \$\{data\}"{}},}
+\DoxyCodeLine{00327\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}data"{}},\ \mbox{\hyperlink{structstate}{state}})}
+\DoxyCodeLine{00328\ \ \ \ \ \ \ );}
+\DoxyCodeLine{00329\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1deep__mind__handler_a65bb14e922ee5ead3f33ca19ba84fa08}\index{sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}!update\_config@{update\_config}}
+\index{update\_config@{update\_config}!sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}}
+\doxysubsubsection{\texorpdfstring{update\_config()}{update\_config()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1deep__mind__handler_a65bb14e922ee5ead3f33ca19ba84fa08} 
+void sysio\+::chain\+::deep\+\_\+mind\+\_\+handler\+::update\+\_\+config (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1deep__mind__handler_1_1deep__mind__config}{deep\+\_\+mind\+\_\+config}}}]{config}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{deep__mind_8cpp_source_l00029}{29}} of file \mbox{\hyperlink{deep__mind_8cpp_source}{deep\+\_\+mind.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00030\ \ \ \ \{}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \_config\ =\ std::move(\mbox{\hyperlink{classconfig}{config}});}
+\DoxyCodeLine{00032\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1deep__mind__handler_a992e2ea098b7b2288a3be6aa3eeb56e8}\index{sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}!update\_logger@{update\_logger}}
+\index{update\_logger@{update\_logger}!sysio::chain::deep\_mind\_handler@{sysio::chain::deep\_mind\_handler}}
+\doxysubsubsection{\texorpdfstring{update\_logger()}{update\_logger()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1deep__mind__handler_a992e2ea098b7b2288a3be6aa3eeb56e8} 
+void sysio\+::chain\+::deep\+\_\+mind\+\_\+handler\+::update\+\_\+logger (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{logger\+\_\+name}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{deep__mind_8cpp_source_l00034}{34}} of file \mbox{\hyperlink{deep__mind_8cpp_source}{deep\+\_\+mind.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00035\ \ \ \ \{}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1logger_a2214632598874a4e52a5500a6346515e}{fc::logger::update}}(\ \mbox{\hyperlink{namespacesysio_ad66b67a8dd0a897a0a5b89f954fd3ade}{logger\_name}},\ \_logger\ );}
+\DoxyCodeLine{00037\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1deep__mind__handler_a992e2ea098b7b2288a3be6aa3eeb56e8_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1deep__mind__handler_a992e2ea098b7b2288a3be6aa3eeb56e8_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{deep__mind_8hpp}{deep\+\_\+mind.\+hpp}}\item 
+libraries/chain/\mbox{\hyperlink{deep__mind_8cpp}{deep\+\_\+mind.\+cpp}}\end{DoxyCompactItemize}

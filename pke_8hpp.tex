@@ -1,0 +1,66 @@
+\doxysection{libraries/fc/include/fc/crypto/pke.hpp File Reference}
+\hypertarget{pke_8hpp}{}\label{pke_8hpp}\index{libraries/fc/include/fc/crypto/pke.hpp@{libraries/fc/include/fc/crypto/pke.hpp}}
+{\ttfamily \#include $<$memory$>$}\newline
+{\ttfamily \#include $<$vector$>$}\newline
+{\ttfamily \#include $<$fc/crypto/sha1.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/crypto/sha256.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/io/raw\+\_\+fwd.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/array.\+hpp$>$}\newline
+Include dependency graph for pke.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{pke_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=188pt]{pke_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classfc_1_1public__key}{fc\+::public\+\_\+key}}
+\item 
+class \mbox{\hyperlink{classfc_1_1private__key}{fc\+::private\+\_\+key}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacefc}{fc}}
+\begin{DoxyCompactList}\small\item\em namespace \doxylink{namespacesysio_1_1chain}{sysio\+::chain} \end{DoxyCompactList}\item 
+namespace \mbox{\hyperlink{namespacefc_1_1detail}{fc\+::detail}}
+\item 
+namespace \mbox{\hyperlink{namespacefc_1_1raw}{fc\+::raw}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}} \mbox{\hyperlink{namespacefc_a50190ee8a24af6929033b058b16158c4}{fc\+::signature}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{namespacefc_a8bf76c8a3acfda16057a75456fe1b88d}{fc\+::generate\+\_\+key\+\_\+pair}} (\mbox{\hyperlink{classfc_1_1public__key}{public\+\_\+key}} \&pub, \mbox{\hyperlink{classfc_1_1private__key}{private\+\_\+key}} \&priv)
+\item 
+bool \mbox{\hyperlink{namespacefc_a7ccc0c376d8c3e4872ceea8b1e79ee23}{fc\+::operator==}} (const \mbox{\hyperlink{classfc_1_1private__key}{private\+\_\+key}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, const \mbox{\hyperlink{classfc_1_1private__key}{private\+\_\+key}} \&b)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_a0fe6fa531031326e9f6dbfdd08e06bd5}{fc\+::raw\+::unpack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, \mbox{\hyperlink{classfc_1_1public__key}{fc\+::public\+\_\+key}} \&pk)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_ae4d9360970406b2603f7595b0b2a658a}{fc\+::raw\+::pack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, const \mbox{\hyperlink{classfc_1_1public__key}{fc\+::public\+\_\+key}} \&pk)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_a32121452b49e67600af01cbd487c9436}{fc\+::raw\+::unpack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, \mbox{\hyperlink{classfc_1_1private__key}{fc\+::private\+\_\+key}} \&pk)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_aaf024a15456163a6f87e91a6fd9d79eb}{fc\+::raw\+::pack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, const \mbox{\hyperlink{classfc_1_1private__key}{fc\+::private\+\_\+key}} \&pk)
+\item 
+void \mbox{\hyperlink{namespacefc_a25119a8943ec18e6a5b0e0f47b62a94c}{fc\+::to\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1public__key}{public\+\_\+key}} \&bi, \mbox{\hyperlink{classfc_1_1variant}{variant}} \&v)
+\item 
+void \mbox{\hyperlink{namespacefc_a24f4bac64e6b14a6c3fd1a9bbd714508}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{variant}} \&v, \mbox{\hyperlink{classfc_1_1public__key}{public\+\_\+key}} \&bi)
+\item 
+void \mbox{\hyperlink{namespacefc_a7e0370298d2b97fba3993cb772749c6a}{fc\+::to\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1private__key}{private\+\_\+key}} \&bi, \mbox{\hyperlink{classfc_1_1variant}{variant}} \&v)
+\item 
+void \mbox{\hyperlink{namespacefc_a535eb59ca95c338b156a7ede0dea3e98}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{variant}} \&v, \mbox{\hyperlink{classfc_1_1private__key}{private\+\_\+key}} \&bi)
+\end{DoxyCompactItemize}

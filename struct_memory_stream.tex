@@ -1,0 +1,294 @@
+\doxysection{Memory\+Stream Struct Reference}
+\hypertarget{struct_memory_stream}{}\label{struct_memory_stream}\index{MemoryStream@{MemoryStream}}
+
+
+Represents an in-\/memory input byte stream.  
+
+
+
+
+{\ttfamily \#include $<$memorystream.\+h$>$}
+
+
+
+Collaboration diagram for Memory\+Stream\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=163pt]{struct_memory_stream__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef char \mbox{\hyperlink{struct_memory_stream_aa4c5ce865bbaafcbeca64e5036b7d979}{Ch}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_memory_stream_a2472317ef00fcd44e5cc209e04c49756}{Memory\+Stream}} (const \mbox{\hyperlink{struct_memory_stream_aa4c5ce865bbaafcbeca64e5036b7d979}{Ch}} \texorpdfstring{$\ast$}{*}src, size\+\_\+t size)
+\item 
+\mbox{\hyperlink{struct_memory_stream_aa4c5ce865bbaafcbeca64e5036b7d979}{Ch}} \mbox{\hyperlink{struct_memory_stream_a707014bbfd303838b6a7b90be24f6adc}{Peek}} () const
+\item 
+\mbox{\hyperlink{struct_memory_stream_aa4c5ce865bbaafcbeca64e5036b7d979}{Ch}} \mbox{\hyperlink{struct_memory_stream_a14ff92deda5d39c9b166aaa07e82a0ee}{Take}} ()
+\item 
+size\+\_\+t \mbox{\hyperlink{struct_memory_stream_a2de1486742f0d44decda90a56bc43268}{Tell}} () const
+\item 
+\mbox{\hyperlink{struct_memory_stream_aa4c5ce865bbaafcbeca64e5036b7d979}{Ch}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{struct_memory_stream_a4fd6e7a293bd3ec76e649d8e853dd38f}{Put\+Begin}} ()
+\item 
+void \mbox{\hyperlink{struct_memory_stream_ac445f93c23c9e85f1f5381911c4ed870}{Put}} (\mbox{\hyperlink{struct_memory_stream_aa4c5ce865bbaafcbeca64e5036b7d979}{Ch}})
+\item 
+void \mbox{\hyperlink{struct_memory_stream_a305e141314ae0e3afacb04aaf2d8bcc6}{Flush}} ()
+\item 
+size\+\_\+t \mbox{\hyperlink{struct_memory_stream_a74fb36c1f6f95d189502cf7a6be79135}{Put\+End}} (\mbox{\hyperlink{struct_memory_stream_aa4c5ce865bbaafcbeca64e5036b7d979}{Ch}} \texorpdfstring{$\ast$}{*})
+\item 
+const \mbox{\hyperlink{struct_memory_stream_aa4c5ce865bbaafcbeca64e5036b7d979}{Ch}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{struct_memory_stream_a81dd4a86148b0af9527083cdef3d31d8}{Peek4}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+const \mbox{\hyperlink{struct_memory_stream_aa4c5ce865bbaafcbeca64e5036b7d979}{Ch}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{struct_memory_stream_a57cf6cb5766e931a62928b9f92507443}{src\+\_\+}}
+\begin{DoxyCompactList}\small\item\em Current read position. \end{DoxyCompactList}\item 
+const \mbox{\hyperlink{struct_memory_stream_aa4c5ce865bbaafcbeca64e5036b7d979}{Ch}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{struct_memory_stream_a91f0767b4f0ed2476d835e8344848a2f}{begin\+\_\+}}
+\begin{DoxyCompactList}\small\item\em Original head of the string. \end{DoxyCompactList}\item 
+const \mbox{\hyperlink{struct_memory_stream_aa4c5ce865bbaafcbeca64e5036b7d979}{Ch}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{struct_memory_stream_a55fb302ba0492419757e3ba318c8c654}{end\+\_\+}}
+\begin{DoxyCompactList}\small\item\em End of stream. \end{DoxyCompactList}\item 
+size\+\_\+t \mbox{\hyperlink{struct_memory_stream_ab26a1b5c6d5e8f52c0f6982feba47f36}{size\+\_\+}}
+\begin{DoxyCompactList}\small\item\em Size of the stream. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+This class is mainly for being wrapped by \doxylink{class_encoded_input_stream}{Encoded\+Input\+Stream} or \doxylink{class_auto_u_t_f_input_stream}{Auto\+UTFInput\+Stream}.
+
+It is similar to File\+Read\+Buffer but the source is an in-\/memory buffer instead of a file.
+
+Differences between \doxylink{struct_memory_stream}{Memory\+Stream} and String\+Stream\+:
+\begin{DoxyEnumerate}
+\item String\+Stream has encoding but \doxylink{struct_memory_stream}{Memory\+Stream} is a byte stream.
+\item \doxylink{struct_memory_stream}{Memory\+Stream} needs size of the source buffer and the buffer don\textquotesingle{}t need to be null terminated. String\+Stream assume null-\/terminated string as source.
+\item \doxylink{struct_memory_stream}{Memory\+Stream} supports \doxylink{struct_memory_stream_a81dd4a86148b0af9527083cdef3d31d8}{Peek4()} for encoding detection. String\+Stream is specified with an encoding so it should not have \doxylink{struct_memory_stream_a81dd4a86148b0af9527083cdef3d31d8}{Peek4()}. \begin{DoxyNote}{Note}
+implements Stream concept 
+\end{DoxyNote}
+
+\end{DoxyEnumerate}
+
+Definition at line \mbox{\hyperlink{memorystream_8h_source_l00040}{40}} of file \mbox{\hyperlink{memorystream_8h_source}{memorystream.\+h}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{struct_memory_stream_aa4c5ce865bbaafcbeca64e5036b7d979}\index{MemoryStream@{MemoryStream}!Ch@{Ch}}
+\index{Ch@{Ch}!MemoryStream@{MemoryStream}}
+\doxysubsubsection{\texorpdfstring{Ch}{Ch}}
+{\footnotesize\ttfamily \label{struct_memory_stream_aa4c5ce865bbaafcbeca64e5036b7d979} 
+char \mbox{\hyperlink{struct_memory_stream_aa4c5ce865bbaafcbeca64e5036b7d979}{Memory\+Stream\+::\+Ch}}}
+
+
+
+Definition at line \mbox{\hyperlink{memorystream_8h_source_l00041}{41}} of file \mbox{\hyperlink{memorystream_8h_source}{memorystream.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{struct_memory_stream_a2472317ef00fcd44e5cc209e04c49756}\index{MemoryStream@{MemoryStream}!MemoryStream@{MemoryStream}}
+\index{MemoryStream@{MemoryStream}!MemoryStream@{MemoryStream}}
+\doxysubsubsection{\texorpdfstring{MemoryStream()}{MemoryStream()}}
+{\footnotesize\ttfamily \label{struct_memory_stream_a2472317ef00fcd44e5cc209e04c49756} 
+Memory\+Stream\+::\+Memory\+Stream (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct_memory_stream_aa4c5ce865bbaafcbeca64e5036b7d979}{Ch}} \texorpdfstring{$\ast$}{*}}]{src}{, }\item[{size\+\_\+t}]{size}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{memorystream_8h_source_l00043}{43}} of file \mbox{\hyperlink{memorystream_8h_source}{memorystream.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00043\ :\ \mbox{\hyperlink{struct_memory_stream_a57cf6cb5766e931a62928b9f92507443}{src\_}}(src),\ \mbox{\hyperlink{struct_memory_stream_a91f0767b4f0ed2476d835e8344848a2f}{begin\_}}(src),\ \mbox{\hyperlink{struct_memory_stream_a55fb302ba0492419757e3ba318c8c654}{end\_}}(src\ +\ size),\ \mbox{\hyperlink{struct_memory_stream_ab26a1b5c6d5e8f52c0f6982feba47f36}{size\_}}(size)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_memory_stream_a305e141314ae0e3afacb04aaf2d8bcc6}\index{MemoryStream@{MemoryStream}!Flush@{Flush}}
+\index{Flush@{Flush}!MemoryStream@{MemoryStream}}
+\doxysubsubsection{\texorpdfstring{Flush()}{Flush()}}
+{\footnotesize\ttfamily \label{struct_memory_stream_a305e141314ae0e3afacb04aaf2d8bcc6} 
+void Memory\+Stream\+::\+Flush (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{memorystream_8h_source_l00051}{51}} of file \mbox{\hyperlink{memorystream_8h_source}{memorystream.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00051\ \{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\textcolor{keyword}{false});\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_memory_stream_a707014bbfd303838b6a7b90be24f6adc}\index{MemoryStream@{MemoryStream}!Peek@{Peek}}
+\index{Peek@{Peek}!MemoryStream@{MemoryStream}}
+\doxysubsubsection{\texorpdfstring{Peek()}{Peek()}}
+{\footnotesize\ttfamily \label{struct_memory_stream_a707014bbfd303838b6a7b90be24f6adc} 
+\mbox{\hyperlink{struct_memory_stream_aa4c5ce865bbaafcbeca64e5036b7d979}{Ch}} Memory\+Stream\+::\+Peek (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{memorystream_8h_source_l00045}{45}} of file \mbox{\hyperlink{memorystream_8h_source}{memorystream.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00045\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_ga6a2b1695c13e77ae425e3cbac980ccb5}{RAPIDJSON\_UNLIKELY}}(\mbox{\hyperlink{struct_memory_stream_a57cf6cb5766e931a62928b9f92507443}{src\_}}\ ==\ \mbox{\hyperlink{struct_memory_stream_a55fb302ba0492419757e3ba318c8c654}{end\_}})\ ?\ \textcolor{charliteral}{'\(\backslash\)0'}\ :\ *\mbox{\hyperlink{struct_memory_stream_a57cf6cb5766e931a62928b9f92507443}{src\_}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_memory_stream_a81dd4a86148b0af9527083cdef3d31d8}\index{MemoryStream@{MemoryStream}!Peek4@{Peek4}}
+\index{Peek4@{Peek4}!MemoryStream@{MemoryStream}}
+\doxysubsubsection{\texorpdfstring{Peek4()}{Peek4()}}
+{\footnotesize\ttfamily \label{struct_memory_stream_a81dd4a86148b0af9527083cdef3d31d8} 
+const \mbox{\hyperlink{struct_memory_stream_aa4c5ce865bbaafcbeca64e5036b7d979}{Ch}} \texorpdfstring{$\ast$}{*} Memory\+Stream\+::\+Peek4 (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{memorystream_8h_source_l00055}{55}} of file \mbox{\hyperlink{memorystream_8h_source}{memorystream.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_memory_stream_a2de1486742f0d44decda90a56bc43268}{Tell}}()\ +\ 4\ <=\ \mbox{\hyperlink{struct_memory_stream_ab26a1b5c6d5e8f52c0f6982feba47f36}{size\_}}\ ?\ \mbox{\hyperlink{struct_memory_stream_a57cf6cb5766e931a62928b9f92507443}{src\_}}\ :\ 0;}
+\DoxyCodeLine{00057\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=336pt]{struct_memory_stream_a81dd4a86148b0af9527083cdef3d31d8_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_memory_stream_ac445f93c23c9e85f1f5381911c4ed870}\index{MemoryStream@{MemoryStream}!Put@{Put}}
+\index{Put@{Put}!MemoryStream@{MemoryStream}}
+\doxysubsubsection{\texorpdfstring{Put()}{Put()}}
+{\footnotesize\ttfamily \label{struct_memory_stream_ac445f93c23c9e85f1f5381911c4ed870} 
+void Memory\+Stream\+::\+Put (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_memory_stream_aa4c5ce865bbaafcbeca64e5036b7d979}{Ch}}}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{memorystream_8h_source_l00050}{50}} of file \mbox{\hyperlink{memorystream_8h_source}{memorystream.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00050\ \{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\textcolor{keyword}{false});\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_memory_stream_a4fd6e7a293bd3ec76e649d8e853dd38f}\index{MemoryStream@{MemoryStream}!PutBegin@{PutBegin}}
+\index{PutBegin@{PutBegin}!MemoryStream@{MemoryStream}}
+\doxysubsubsection{\texorpdfstring{PutBegin()}{PutBegin()}}
+{\footnotesize\ttfamily \label{struct_memory_stream_a4fd6e7a293bd3ec76e649d8e853dd38f} 
+\mbox{\hyperlink{struct_memory_stream_aa4c5ce865bbaafcbeca64e5036b7d979}{Ch}} \texorpdfstring{$\ast$}{*} Memory\+Stream\+::\+Put\+Begin (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{memorystream_8h_source_l00049}{49}} of file \mbox{\hyperlink{memorystream_8h_source}{memorystream.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00049\ \{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\textcolor{keyword}{false});\ \textcolor{keywordflow}{return}\ 0;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_memory_stream_a74fb36c1f6f95d189502cf7a6be79135}\index{MemoryStream@{MemoryStream}!PutEnd@{PutEnd}}
+\index{PutEnd@{PutEnd}!MemoryStream@{MemoryStream}}
+\doxysubsubsection{\texorpdfstring{PutEnd()}{PutEnd()}}
+{\footnotesize\ttfamily \label{struct_memory_stream_a74fb36c1f6f95d189502cf7a6be79135} 
+size\+\_\+t Memory\+Stream\+::\+Put\+End (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_memory_stream_aa4c5ce865bbaafcbeca64e5036b7d979}{Ch}} \texorpdfstring{$\ast$}{*}}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{memorystream_8h_source_l00052}{52}} of file \mbox{\hyperlink{memorystream_8h_source}{memorystream.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00052\ \{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\textcolor{keyword}{false});\ \textcolor{keywordflow}{return}\ 0;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_memory_stream_a14ff92deda5d39c9b166aaa07e82a0ee}\index{MemoryStream@{MemoryStream}!Take@{Take}}
+\index{Take@{Take}!MemoryStream@{MemoryStream}}
+\doxysubsubsection{\texorpdfstring{Take()}{Take()}}
+{\footnotesize\ttfamily \label{struct_memory_stream_a14ff92deda5d39c9b166aaa07e82a0ee} 
+\mbox{\hyperlink{struct_memory_stream_aa4c5ce865bbaafcbeca64e5036b7d979}{Ch}} Memory\+Stream\+::\+Take (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{memorystream_8h_source_l00046}{46}} of file \mbox{\hyperlink{memorystream_8h_source}{memorystream.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00046\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_ga6a2b1695c13e77ae425e3cbac980ccb5}{RAPIDJSON\_UNLIKELY}}(\mbox{\hyperlink{struct_memory_stream_a57cf6cb5766e931a62928b9f92507443}{src\_}}\ ==\ \mbox{\hyperlink{struct_memory_stream_a55fb302ba0492419757e3ba318c8c654}{end\_}})\ ?\ \textcolor{charliteral}{'\(\backslash\)0'}\ :\ *\mbox{\hyperlink{struct_memory_stream_a57cf6cb5766e931a62928b9f92507443}{src\_}}++;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_memory_stream_a2de1486742f0d44decda90a56bc43268}\index{MemoryStream@{MemoryStream}!Tell@{Tell}}
+\index{Tell@{Tell}!MemoryStream@{MemoryStream}}
+\doxysubsubsection{\texorpdfstring{Tell()}{Tell()}}
+{\footnotesize\ttfamily \label{struct_memory_stream_a2de1486742f0d44decda90a56bc43268} 
+size\+\_\+t Memory\+Stream\+::\+Tell (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{memorystream_8h_source_l00047}{47}} of file \mbox{\hyperlink{memorystream_8h_source}{memorystream.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00047\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(\mbox{\hyperlink{struct_memory_stream_a57cf6cb5766e931a62928b9f92507443}{src\_}}\ -\/\ \mbox{\hyperlink{struct_memory_stream_a91f0767b4f0ed2476d835e8344848a2f}{begin\_}});\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=336pt]{struct_memory_stream_a2de1486742f0d44decda90a56bc43268_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_memory_stream_a91f0767b4f0ed2476d835e8344848a2f}\index{MemoryStream@{MemoryStream}!begin\_@{begin\_}}
+\index{begin\_@{begin\_}!MemoryStream@{MemoryStream}}
+\doxysubsubsection{\texorpdfstring{begin\_}{begin\_}}
+{\footnotesize\ttfamily \label{struct_memory_stream_a91f0767b4f0ed2476d835e8344848a2f} 
+const \mbox{\hyperlink{struct_memory_stream_aa4c5ce865bbaafcbeca64e5036b7d979}{Ch}}\texorpdfstring{$\ast$}{*} Memory\+Stream\+::begin\+\_\+}
+
+
+
+Definition at line \mbox{\hyperlink{memorystream_8h_source_l00060}{60}} of file \mbox{\hyperlink{memorystream_8h_source}{memorystream.\+h}}.
+
+\Hypertarget{struct_memory_stream_a55fb302ba0492419757e3ba318c8c654}\index{MemoryStream@{MemoryStream}!end\_@{end\_}}
+\index{end\_@{end\_}!MemoryStream@{MemoryStream}}
+\doxysubsubsection{\texorpdfstring{end\_}{end\_}}
+{\footnotesize\ttfamily \label{struct_memory_stream_a55fb302ba0492419757e3ba318c8c654} 
+const \mbox{\hyperlink{struct_memory_stream_aa4c5ce865bbaafcbeca64e5036b7d979}{Ch}}\texorpdfstring{$\ast$}{*} Memory\+Stream\+::end\+\_\+}
+
+
+
+Definition at line \mbox{\hyperlink{memorystream_8h_source_l00061}{61}} of file \mbox{\hyperlink{memorystream_8h_source}{memorystream.\+h}}.
+
+\Hypertarget{struct_memory_stream_ab26a1b5c6d5e8f52c0f6982feba47f36}\index{MemoryStream@{MemoryStream}!size\_@{size\_}}
+\index{size\_@{size\_}!MemoryStream@{MemoryStream}}
+\doxysubsubsection{\texorpdfstring{size\_}{size\_}}
+{\footnotesize\ttfamily \label{struct_memory_stream_ab26a1b5c6d5e8f52c0f6982feba47f36} 
+size\+\_\+t Memory\+Stream\+::size\+\_\+}
+
+
+
+Definition at line \mbox{\hyperlink{memorystream_8h_source_l00062}{62}} of file \mbox{\hyperlink{memorystream_8h_source}{memorystream.\+h}}.
+
+\Hypertarget{struct_memory_stream_a57cf6cb5766e931a62928b9f92507443}\index{MemoryStream@{MemoryStream}!src\_@{src\_}}
+\index{src\_@{src\_}!MemoryStream@{MemoryStream}}
+\doxysubsubsection{\texorpdfstring{src\_}{src\_}}
+{\footnotesize\ttfamily \label{struct_memory_stream_a57cf6cb5766e931a62928b9f92507443} 
+const \mbox{\hyperlink{struct_memory_stream_aa4c5ce865bbaafcbeca64e5036b7d979}{Ch}}\texorpdfstring{$\ast$}{*} Memory\+Stream\+::src\+\_\+}
+
+
+
+Definition at line \mbox{\hyperlink{memorystream_8h_source_l00059}{59}} of file \mbox{\hyperlink{memorystream_8h_source}{memorystream.\+h}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/\mbox{\hyperlink{memorystream_8h}{memorystream.\+h}}\end{DoxyCompactItemize}

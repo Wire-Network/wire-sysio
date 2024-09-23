@@ -1,0 +1,65 @@
+\doxysection{testing\+::internal\+::Reference\+Wrapper\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classtesting_1_1internal_1_1_reference_wrapper}{}\label{classtesting_1_1internal_1_1_reference_wrapper}\index{testing::internal::ReferenceWrapper$<$ T $>$@{testing::internal::ReferenceWrapper$<$ T $>$}}
+
+
+{\ttfamily \#include $<$gmock-\/actions.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_reference_wrapper_ad33597ffc478c3af9190d1a288a76d39}{Reference\+Wrapper}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&l\+\_\+value)
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_reference_wrapper_ac58ddddd6888be6c6560c2c88458dc02}{operator T\&}} () const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$\newline
+class testing\+::internal\+::\+Reference\+Wrapper$<$ T $>$}
+
+
+Definition at line \mbox{\hyperlink{gmock-actions_8h_source_l01001}{1001}} of file \mbox{\hyperlink{gmock-actions_8h_source}{gmock-\/actions.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_reference_wrapper_ad33597ffc478c3af9190d1a288a76d39}\index{testing::internal::ReferenceWrapper$<$ T $>$@{testing::internal::ReferenceWrapper$<$ T $>$}!ReferenceWrapper@{ReferenceWrapper}}
+\index{ReferenceWrapper@{ReferenceWrapper}!testing::internal::ReferenceWrapper$<$ T $>$@{testing::internal::ReferenceWrapper$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{ReferenceWrapper()}{ReferenceWrapper()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_reference_wrapper_ad33597ffc478c3af9190d1a288a76d39} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_reference_wrapper}{testing\+::internal\+::\+Reference\+Wrapper}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::\+Reference\+Wrapper (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{l\+\_\+value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-actions_8h_source_l01004}{1004}} of file \mbox{\hyperlink{gmock-actions_8h_source}{gmock-\/actions.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01004\ :\ pointer\_(\&l\_value)\ \{\}\ \ \textcolor{comment}{//\ NOLINT}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_reference_wrapper_ac58ddddd6888be6c6560c2c88458dc02}\index{testing::internal::ReferenceWrapper$<$ T $>$@{testing::internal::ReferenceWrapper$<$ T $>$}!operator T\&@{operator T\&}}
+\index{operator T\&@{operator T\&}!testing::internal::ReferenceWrapper$<$ T $>$@{testing::internal::ReferenceWrapper$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{operator T\&()}{operator T\&()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_reference_wrapper_ac58ddddd6888be6c6560c2c88458dc02} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_reference_wrapper}{testing\+::internal\+::\+Reference\+Wrapper}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::operator \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\& (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-actions_8h_source_l01008}{1008}} of file \mbox{\hyperlink{gmock-actions_8h_source}{gmock-\/actions.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01008\ \{\ \textcolor{keywordflow}{return}\ *pointer\_;\ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/include/gmock/\mbox{\hyperlink{gmock-actions_8h}{gmock-\/actions.\+h}}\end{DoxyCompactItemize}

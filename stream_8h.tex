@@ -1,0 +1,153 @@
+\doxysection{libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/stream.h File Reference}
+\hypertarget{stream_8h}{}\label{stream_8h}\index{libraries/fc/include/fc/crypto/webauthn\_json/include/rapidjson/stream.h@{libraries/fc/include/fc/crypto/webauthn\_json/include/rapidjson/stream.h}}
+{\ttfamily \#include "{}rapidjson.\+h"{}}\newline
+{\ttfamily \#include "{}encodings.\+h"{}}\newline
+Include dependency graph for stream.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=254pt]{stream_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{stream_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_stream_traits}{Stream\+Traits$<$ Stream $>$}}
+\begin{DoxyCompactList}\small\item\em Provides additional information for stream. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_generic_stream_wrapper}{Generic\+Stream\+Wrapper$<$ Input\+Stream, Encoding $>$}}
+\begin{DoxyCompactList}\small\item\em \doxylink{struct_a}{A} Stream Wrapper. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_generic_string_stream}{Generic\+String\+Stream$<$ Encoding $>$}}
+\begin{DoxyCompactList}\small\item\em Read-\/only string stream. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_stream_traits_3_01_generic_string_stream_3_01_encoding_01_4_01_4}{Stream\+Traits$<$ Generic\+String\+Stream$<$ Encoding $>$ $>$}}
+\item 
+struct \mbox{\hyperlink{struct_generic_insitu_string_stream}{Generic\+Insitu\+String\+Stream$<$ Encoding $>$}}
+\begin{DoxyCompactList}\small\item\em \doxylink{struct_a}{A} read-\/write string stream. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_stream_traits_3_01_generic_insitu_string_stream_3_01_encoding_01_4_01_4}{Stream\+Traits$<$ Generic\+Insitu\+String\+Stream$<$ Encoding $>$ $>$}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{struct_generic_string_stream}{Generic\+String\+Stream}}$<$ \mbox{\hyperlink{struct_u_t_f8}{UTF8}}$<$$>$ $>$ \mbox{\hyperlink{stream_8h_a269d93f9d27c2dd91bfacac05c478122}{String\+Stream}}
+\begin{DoxyCompactList}\small\item\em String stream with \doxylink{struct_u_t_f8}{UTF8} encoding. \end{DoxyCompactList}\item 
+typedef \mbox{\hyperlink{struct_generic_insitu_string_stream}{Generic\+Insitu\+String\+Stream}}$<$ \mbox{\hyperlink{struct_u_t_f8}{UTF8}}$<$$>$ $>$ \mbox{\hyperlink{stream_8h_a8e02982f60e5b8f697b71640ddaa144c}{Insitu\+String\+Stream}}
+\begin{DoxyCompactList}\small\item\em Insitu string stream with \doxylink{struct_u_t_f8}{UTF8} encoding. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{stream_8h_aa817b00a466bb84d96c5de1616436c95}{Put\+Reserve}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, size\+\_\+t \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}})
+\begin{DoxyCompactList}\small\item\em Reserve n characters for writing to a stream. \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{stream_8h_ad57ba7f2912c5509924b69dec7db4396}{Put\+Unsafe}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, typename \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Stream\+::\+Ch}} c)
+\begin{DoxyCompactList}\small\item\em Write character to a stream, presuming buffer is reserved. \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}} $>$ }\\void \mbox{\hyperlink{stream_8h_aacdd569be6f98c9d7d9ef71f79ef0fc0}{PutN}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}} c, size\+\_\+t n)
+\begin{DoxyCompactList}\small\item\em Put N copies of a character to a stream. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{stream_8h_a8e02982f60e5b8f697b71640ddaa144c}\index{stream.h@{stream.h}!InsituStringStream@{InsituStringStream}}
+\index{InsituStringStream@{InsituStringStream}!stream.h@{stream.h}}
+\doxysubsubsection{\texorpdfstring{InsituStringStream}{InsituStringStream}}
+{\footnotesize\ttfamily \label{stream_8h_a8e02982f60e5b8f697b71640ddaa144c} 
+typedef \mbox{\hyperlink{struct_generic_insitu_string_stream}{Generic\+Insitu\+String\+Stream}}$<$\mbox{\hyperlink{struct_u_t_f8}{UTF8}}$<$$>$ $>$ \mbox{\hyperlink{fwd_8h_a87256fd77e335ea15cd195ed8c55e312}{Insitu\+String\+Stream}}}
+
+
+
+Definition at line \mbox{\hyperlink{stream_8h_source_l00219}{219}} of file \mbox{\hyperlink{stream_8h_source}{stream.\+h}}.
+
+\Hypertarget{stream_8h_a269d93f9d27c2dd91bfacac05c478122}\index{stream.h@{stream.h}!StringStream@{StringStream}}
+\index{StringStream@{StringStream}!stream.h@{stream.h}}
+\doxysubsubsection{\texorpdfstring{StringStream}{StringStream}}
+{\footnotesize\ttfamily \label{stream_8h_a269d93f9d27c2dd91bfacac05c478122} 
+typedef \mbox{\hyperlink{struct_generic_string_stream}{Generic\+String\+Stream}}$<$\mbox{\hyperlink{struct_u_t_f8}{UTF8}}$<$$>$ $>$ \mbox{\hyperlink{fwd_8h_a2d1473c3dd9ab6c975589b45436fe55e}{String\+Stream}}}
+
+
+
+Definition at line \mbox{\hyperlink{stream_8h_source_l00178}{178}} of file \mbox{\hyperlink{stream_8h_source}{stream.\+h}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{stream_8h_aacdd569be6f98c9d7d9ef71f79ef0fc0}\index{stream.h@{stream.h}!PutN@{PutN}}
+\index{PutN@{PutN}!stream.h@{stream.h}}
+\doxysubsubsection{\texorpdfstring{PutN()}{PutN()}}
+{\footnotesize\ttfamily \label{stream_8h_aacdd569be6f98c9d7d9ef71f79ef0fc0} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}} $>$ \\
+void PutN (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&}]{stream}{, }\item[{\mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}}]{c}{, }\item[{size\+\_\+t}]{n}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{stream_8h_source_l00097}{97}} of file \mbox{\hyperlink{stream_8h_source}{stream.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00098\ \ \ \ \ \mbox{\hyperlink{stream_8h_aa817b00a466bb84d96c5de1616436c95}{PutReserve}}(stream,\ n);}
+\DoxyCodeLine{00099\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ n;\ i++)}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stream_8h_ad57ba7f2912c5509924b69dec7db4396}{PutUnsafe}}(stream,\ c);}
+\DoxyCodeLine{00101\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=222pt]{stream_8h_aacdd569be6f98c9d7d9ef71f79ef0fc0_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{stream_8h_aa817b00a466bb84d96c5de1616436c95}\index{stream.h@{stream.h}!PutReserve@{PutReserve}}
+\index{PutReserve@{PutReserve}!stream.h@{stream.h}}
+\doxysubsubsection{\texorpdfstring{PutReserve()}{PutReserve()}}
+{\footnotesize\ttfamily \label{stream_8h_aa817b00a466bb84d96c5de1616436c95} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ \\
+void Put\+Reserve (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&}]{stream}{, }\item[{size\+\_\+t}]{count}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{stream_8h_source_l00084}{84}} of file \mbox{\hyperlink{stream_8h_source}{stream.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00085\ \ \ \ \ (void)stream;}
+\DoxyCodeLine{00086\ \ \ \ \ (void)\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}};}
+\DoxyCodeLine{00087\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{stream_8h_aa817b00a466bb84d96c5de1616436c95_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{stream_8h_ad57ba7f2912c5509924b69dec7db4396}\index{stream.h@{stream.h}!PutUnsafe@{PutUnsafe}}
+\index{PutUnsafe@{PutUnsafe}!stream.h@{stream.h}}
+\doxysubsubsection{\texorpdfstring{PutUnsafe()}{PutUnsafe()}}
+{\footnotesize\ttfamily \label{stream_8h_ad57ba7f2912c5509924b69dec7db4396} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ \\
+void Put\+Unsafe (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&}]{stream}{, }\item[{typename \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Stream\+::\+Ch}}}]{c}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{stream_8h_source_l00091}{91}} of file \mbox{\hyperlink{stream_8h_source}{stream.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00092\ \ \ \ \ stream.Put(c);}
+\DoxyCodeLine{00093\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{stream_8h_ad57ba7f2912c5509924b69dec7db4396_icgraph}
+\end{center}
+\end{figure}

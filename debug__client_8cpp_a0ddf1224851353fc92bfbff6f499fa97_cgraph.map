@@ -1,0 +1,17 @@
+<map id="main" name="main">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,78,55,104"/>
+<area shape="rect" id="Node000002" href="$classperftest.html#afa86f15f51139add01d21a1cc1b42d8a" title=" " alt="" coords="103,78,202,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="55,88,87,88,87,94,55,94"/>
+<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1client.html#a818c30343180123bf1fee6dc21524bae" title="Begin the connection process for the given connection." alt="" coords="259,5,396,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="188,75,256,49,258,54,190,80"/>
+<area shape="rect" id="Node000004" href="$classwebsocketpp_1_1endpoint.html#a1d9163813aa02ed32100f443b4ddbd8e" title="Get reference to access logger." alt="" coords="250,71,405,111"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="202,88,235,88,235,94,202,94"/>
+<area shape="rect" id="Node000005" href="$classwebsocketpp_1_1client.html#aa95cec974921e32bc37a61c683ae240d" title="Get a new connection." alt="" coords="259,136,396,177"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="190,102,258,128,256,133,188,107"/>
+<area shape="rect" id="Node000006" href="$classwebsocketpp_1_1endpoint.html#abfbee4cb244700560ef80594a913cd95" title=" " alt="" coords="453,103,609,143"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="396,142,438,136,438,141,397,148"/>
+<area shape="rect" id="Node000007" href="$namespacewebsocketpp_1_1error.html#a3344622df8c36e8ae03c59164e7b5e89" title=" " alt="" coords="465,168,597,209"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="397,165,450,173,449,178,397,170"/>
+<area shape="rect" id="Node000008" href="$namespacewebsocketpp_1_1error.html#ac1acac2bfb24bbd2b1791db80993b0c2" title=" " alt="" coords="657,168,789,209"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="597,186,641,186,641,191,597,191"/>
+</map>

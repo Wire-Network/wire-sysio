@@ -1,0 +1,7 @@
+<map id="Platform::ceilLogTwo" name="Platform::ceilLogTwo">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,149,31"/>
+<area shape="rect" id="Node000002" href="$namespace_platform.html#aa618d555db82f8b59b0eeeac8d9a946a" title=" " alt="" coords="197,5,345,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="149,16,181,16,181,21,149,21"/>
+<area shape="rect" id="Node000003" href="$namespace_platform.html#a881d22a3f51a7e519908f07f22b0d45b" title=" " alt="" coords="393,5,588,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="345,16,378,16,378,21,345,21"/>
+</map>

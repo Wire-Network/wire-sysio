@@ -1,0 +1,144 @@
+\doxysection{coverage-\/helper.cpp}
+\hypertarget{coverage-helper_8cpp_source}{}\label{coverage-helper_8cpp_source}\index{libraries/sys-\/vm/external/Catch2/misc/coverage-\/helper.cpp@{libraries/sys-\/vm/external/Catch2/misc/coverage-\/helper.cpp}}
+\mbox{\hyperlink{coverage-helper_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <algorithm>}}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <array>}}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <cassert>}}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <fstream>}}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <iostream>}}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <memory>}}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <numeric>}}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <regex>}}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00012}\mbox{\hyperlink{coverage-helper_8cpp_a6ddcf5def188b35811ca4d6b15567ed6}{00012}}\ std::string\ \mbox{\hyperlink{coverage-helper_8cpp_a6ddcf5def188b35811ca4d6b15567ed6}{escape\_arg}}(\textcolor{keyword}{const}\ std::string\&\ arg)\ \{}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00013}00013\ \ \ \ \ \textcolor{keywordflow}{if}\ (arg.empty()\ ==\ \textcolor{keyword}{false}\ \&\&}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00014}00014\ \ \ \ \ \ \ \ \ arg.find\_first\_of(\textcolor{stringliteral}{"{}\ \(\backslash\)t\(\backslash\)n\(\backslash\)v\(\backslash\)"{}"{}})\ ==\ arg.npos)\ \{}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00015}00015\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ arg;}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00016}00016\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00018}00018\ \ \ \ \ std::string\ escaped;}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00019}00019\ \ \ \ \ escaped.push\_back(\textcolor{charliteral}{'"{}'});}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00020}00020\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\ it\ =\ arg.begin();\ ;\ ++it)\ \{}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00021}00021\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ num\_backslashes\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00023}00023\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (it\ !=\ arg.end()\ \&\&\ *it\ ==\ \textcolor{charliteral}{'\(\backslash\)\(\backslash\)'})\ \{}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00024}00024\ \ \ \ \ \ \ \ \ \ \ \ \ ++it;}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00025}00025\ \ \ \ \ \ \ \ \ \ \ \ \ ++num\_backslashes;}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00026}00026\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00028}00028\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (it\ ==\ arg.end())\ \{}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00029}00029\ \ \ \ \ \ \ \ \ \ \ \ \ escaped.append(num\_backslashes\ *\ 2,\ \textcolor{charliteral}{'\(\backslash\)\(\backslash\)'});}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00030}00030\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00031}00031\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (*it\ ==\ \textcolor{charliteral}{'"{}'})\ \{}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00032}00032\ \ \ \ \ \ \ \ \ \ \ \ \ escaped.append(num\_backslashes\ *\ 2\ +\ 1,\ \textcolor{charliteral}{'\(\backslash\)\(\backslash\)'});}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00033}00033\ \ \ \ \ \ \ \ \ \ \ \ \ escaped.push\_back(*it);}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00034}00034\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00035}00035\ \ \ \ \ \ \ \ \ \ \ \ \ escaped.append(num\_backslashes,\ \textcolor{charliteral}{'\(\backslash\)\(\backslash\)'});}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00036}00036\ \ \ \ \ \ \ \ \ \ \ \ \ escaped.push\_back(*it);}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00037}00037\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00038}00038\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00039}00039\ \ \ \ \ escaped.push\_back(\textcolor{charliteral}{'"{}'});}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00041}00041\ \ \ \ \ \textcolor{keywordflow}{return}\ escaped;}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00042}00042\ \}}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00045}\mbox{\hyperlink{coverage-helper_8cpp_a9147e75274cac79757e4f95a13910faa}{00045}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{coverage-helper_8cpp_a9147e75274cac79757e4f95a13910faa}{create\_empty\_file}}(std::string\ \textcolor{keyword}{const}\&\ path)\ \{}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00046}00046\ \ \ \ \ std::ofstream\ ofs(path);}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00047}00047\ \ \ \ \ ofs\ <<\ \textcolor{charliteral}{'\(\backslash\)n'};}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00048}00048\ \}}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00050}\mbox{\hyperlink{coverage-helper_8cpp_aab06e721d3449b3d6815d538f22520c8}{00050}}\ \textcolor{keyword}{const}\ std::string\ \mbox{\hyperlink{coverage-helper_8cpp_aab06e721d3449b3d6815d538f22520c8}{separator}}\ =\ \textcolor{stringliteral}{"{}-\/-\/sep-\/-\/"{}};}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00051}\mbox{\hyperlink{coverage-helper_8cpp_ad861555025dda02ff5b77f8e59241028}{00051}}\ \textcolor{keyword}{const}\ std::string\ \mbox{\hyperlink{coverage-helper_8cpp_ad861555025dda02ff5b77f8e59241028}{logfile\_prefix}}\ =\ \textcolor{stringliteral}{"{}-\/-\/log-\/file="{}};}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00052}00052\ }
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00053}\mbox{\hyperlink{coverage-helper_8cpp_acf4803e8473417fc0a4ec061a7260106}{00053}}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{coverage-helper_8cpp_acf4803e8473417fc0a4ec061a7260106}{starts\_with}}(std::string\ \textcolor{keyword}{const}\&\ str,\ std::string\ \textcolor{keyword}{const}\&\ pref)\ \{}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00054}00054\ \ \ \ \ \textcolor{keywordflow}{return}\ str.find(pref)\ ==\ 0;}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00055}00055\ \}}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00057}\mbox{\hyperlink{coverage-helper_8cpp_ac7219d6c8bed061556e207e21c0b9a75}{00057}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{coverage-helper_8cpp_ac7219d6c8bed061556e207e21c0b9a75}{parse\_log\_file\_arg}}(std::string\ \textcolor{keyword}{const}\&\ arg)\ \{}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00058}00058\ \ \ \ \ assert(\mbox{\hyperlink{coverage-helper_8cpp_acf4803e8473417fc0a4ec061a7260106}{starts\_with}}(arg,\ \mbox{\hyperlink{coverage-helper_8cpp_ad861555025dda02ff5b77f8e59241028}{logfile\_prefix}})\ \&\&\ \textcolor{stringliteral}{"{}Attempting\ to\ parse\ incorrect\ arg!"{}});}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00059}00059\ \ \ \ \ \textcolor{keyword}{auto}\ fname\ =\ arg.substr(\mbox{\hyperlink{coverage-helper_8cpp_ad861555025dda02ff5b77f8e59241028}{logfile\_prefix}}.size());}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00060}00060\ \ \ \ \ \mbox{\hyperlink{coverage-helper_8cpp_a9147e75274cac79757e4f95a13910faa}{create\_empty\_file}}(fname);}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00061}00061\ \ \ \ \ std::regex\ regex(\textcolor{stringliteral}{"{}MemoryChecker\(\backslash\)\(\backslash\).(\(\backslash\)\(\backslash\)d+)\(\backslash\)\(\backslash\).log"{}},\ std::regex::icase);}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00062}00062\ \ \ \ \ std::smatch\ match;}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00063}00063\ \ \ \ \ \textcolor{keywordflow}{if}\ (std::regex\_search(fname,\ match,\ regex))\ \{}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00064}00064\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::stoi(match[1]);}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00065}00065\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00066}00066\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::domain\_error(\textcolor{stringliteral}{"{}Couldn't\ find\ desired\ expression\ in\ string:\ "{}}\ +\ fname);}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00067}00067\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00068}00068\ \}}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00069}00069\ }
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00070}\mbox{\hyperlink{coverage-helper_8cpp_a52d2aa50aaf085c1f89c4adf04e2178c}{00070}}\ std::string\ \mbox{\hyperlink{coverage-helper_8cpp_a52d2aa50aaf085c1f89c4adf04e2178c}{catch\_path}}(std::string\ path)\ \{}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00071}00071\ \ \ \ \ \textcolor{keyword}{auto}\ start\ =\ path.find(\textcolor{stringliteral}{"{}catch"{}});}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00072}00072\ \ \ \ \ \textcolor{comment}{//\ try\ capitalized\ instead}}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00073}00073\ \ \ \ \ \textcolor{keywordflow}{if}\ (start\ ==\ std::string::npos)\ \{}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00074}00074\ \ \ \ \ \ \ \ \ start\ =\ path.find(\textcolor{stringliteral}{"{}Catch"{}});}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00075}00075\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00076}00076\ \ \ \ \ \textcolor{keywordflow}{if}\ (start\ ==\ std::string::npos)\ \{}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00077}00077\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::domain\_error(\textcolor{stringliteral}{"{}Couldn't\ find\ Catch's\ base\ path"{}});}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00078}00078\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00079}00079\ \ \ \ \ \textcolor{keyword}{auto}\ end\ =\ path.find\_first\_of(\textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)/"{}},\ start);}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00080}00080\ \ \ \ \ \textcolor{keywordflow}{return}\ path.substr(0,\ end);}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00081}00081\ \}}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00083}\mbox{\hyperlink{coverage-helper_8cpp_aeb84b89496214640e0a6ef1d3ecb175b}{00083}}\ std::string\ \mbox{\hyperlink{coverage-helper_8cpp_aeb84b89496214640e0a6ef1d3ecb175b}{windowsify\_path}}(std::string\ path)\ \{}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00084}00084\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\&\ c\ :\ path)\ \{}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00085}00085\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (c\ ==\ \textcolor{charliteral}{'/'})\ \{}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00086}00086\ \ \ \ \ \ \ \ \ \ \ \ \ c\ =\ \textcolor{charliteral}{'\(\backslash\)\(\backslash\)'};}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00087}00087\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00088}00088\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00089}00089\ \ \ \ \ \textcolor{keywordflow}{return}\ path;}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00090}00090\ \}}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00091}00091\ }
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00092}\mbox{\hyperlink{coverage-helper_8cpp_ad6f25130060acce9682d43c4a26e7be6}{00092}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{coverage-helper_8cpp_ad6f25130060acce9682d43c4a26e7be6}{exec\_cmd}}(std::string\ \textcolor{keyword}{const}\&\ cmd,\ \textcolor{keywordtype}{int}\ log\_num,\ std::string\ \textcolor{keyword}{const}\&\ path)\ \{}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00093}00093\ \ \ \ \ std::array<char,\ 128>\ buffer;}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00094}00094\ \textcolor{preprocessor}{\#if\ defined(\_WIN32)}}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00095}00095\ \ \ \ \ \textcolor{comment}{//\ cmd\ has\ already\ been\ escaped\ outside\ this\ function.}}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00096}00096\ \ \ \ \ \textcolor{keyword}{auto}\ real\_cmd\ =\ \textcolor{stringliteral}{"{}OpenCppCoverage\ -\/-\/export\_type\ binary:cov-\/report"{}}\ +\ std::to\_string(log\_num)}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00097}00097\ \ \ \ \ \ \ \ \ +\ \textcolor{stringliteral}{"{}.bin\ -\/-\/quiet\ "{}}\ +\ \textcolor{stringliteral}{"{}-\/-\/sources\ "{}}\ +\ \mbox{\hyperlink{coverage-helper_8cpp_a6ddcf5def188b35811ca4d6b15567ed6}{escape\_arg}}(path)\ +\ \textcolor{stringliteral}{"{}\ -\/-\/cover\_children\ -\/-\/\ "{}}\ +\ cmd;}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00098}00098\ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}===\ Marker\ ===:\ Cmd:\ "{}}\ <<\ real\_cmd\ <<\ \textcolor{charliteral}{'\(\backslash\)n'};}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00099}00099\ \ \ \ \ std::shared\_ptr<FILE>\ pipe(\_popen(real\_cmd.c\_str(),\ \textcolor{stringliteral}{"{}r"{}}),\ \_pclose);}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00100}00100\ \textcolor{preprocessor}{\#else\ }\textcolor{comment}{//\ Just\ for\ testing,\ in\ the\ real\ world\ we\ will\ always\ work\ under\ WIN32}}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00101}00101\ \ \ \ \ (void)log\_num;\ (void)path;}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00102}00102\ \ \ \ \ std::shared\_ptr<FILE>\ pipe(popen(cmd.c\_str(),\ \textcolor{stringliteral}{"{}r"{}}),\ pclose);}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00103}00103\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00104}00104\ }
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00105}00105\ \ \ \ \ \textcolor{keywordflow}{if}\ (!pipe)\ \{}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00106}00106\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}popen()\ failed!"{}});}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00107}00107\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00108}00108\ \ \ \ \ \textcolor{keywordflow}{while}\ (!feof(pipe.get()))\ \{}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00109}00109\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (fgets(buffer.data(),\ 128,\ pipe.get())\ !=\ \textcolor{keyword}{nullptr})\ \{}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00110}00110\ \ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ buffer.data();}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00111}00111\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00112}00112\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00113}00113\ \}}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00114}00114\ }
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00115}00115\ \textcolor{comment}{//\ argv\ should\ be:}}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00116}00116\ \textcolor{comment}{//\ [0]:\ our\ path}}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00117}00117\ \textcolor{comment}{//\ [1]:\ "{}-\/-\/log-\/file=<path>"{}}}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00118}00118\ \textcolor{comment}{//\ [2]:\ "{}-\/-\/sep-\/-\/"{}}}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00119}00119\ \textcolor{comment}{//\ [3]+:\ the\ actual\ command}}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00120}00120\ }
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00121}\mbox{\hyperlink{coverage-helper_8cpp_a3c04138a5bfe5d72780bb7e82a18e627}{00121}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}(\textcolor{keywordtype}{int}\ argc,\ \textcolor{keywordtype}{char}**\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}})\ \{}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00122}00122\ \ \ \ \ std::vector<std::string>\ args(\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}\ +\ argc);}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00123}00123\ \ \ \ \ \textcolor{keyword}{auto}\ sep\ =\ std::find(begin(args),\ end(args),\ \mbox{\hyperlink{coverage-helper_8cpp_aab06e721d3449b3d6815d538f22520c8}{separator}});}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00124}00124\ \ \ \ \ assert(sep\ -\/\ begin(args)\ ==\ 2\ \&\&\ \textcolor{stringliteral}{"{}Structure\ differs\ from\ expected!"{}});}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00125}00125\ }
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00126}00126\ \ \ \ \ \textcolor{keyword}{auto}\ num\ =\ \mbox{\hyperlink{coverage-helper_8cpp_ac7219d6c8bed061556e207e21c0b9a75}{parse\_log\_file\_arg}}(args[1]);}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00127}00127\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00128}00128\ \ \ \ \ \textcolor{keyword}{auto}\ cmdline\ =\ std::accumulate(++sep,\ end(args),\ std::string\{\},\ []\ (\textcolor{keyword}{const}\ std::string\&\ lhs,\ \textcolor{keyword}{const}\ std::string\&\ rhs)\ \{}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00129}00129\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ lhs\ +\ \textcolor{charliteral}{'\ '}\ +\ \mbox{\hyperlink{coverage-helper_8cpp_a6ddcf5def188b35811ca4d6b15567ed6}{escape\_arg}}(rhs);}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00130}00130\ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00131}00131\ }
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00132}00132\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00133}00133\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{coverage-helper_8cpp_ad6f25130060acce9682d43c4a26e7be6}{exec\_cmd}}(cmdline,\ num,\ \mbox{\hyperlink{coverage-helper_8cpp_aeb84b89496214640e0a6ef1d3ecb175b}{windowsify\_path}}(\mbox{\hyperlink{coverage-helper_8cpp_a52d2aa50aaf085c1f89c4adf04e2178c}{catch\_path}}(args[0])));}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00134}00134\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (std::exception\ \textcolor{keyword}{const}\&\ ex)\ \{}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00135}00135\ \ \ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}Helper\ failed\ with:\ '"{}}\ <<\ ex.what()\ <<\ \textcolor{stringliteral}{"{}'\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00136}00136\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 12;}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00137}00137\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{coverage-helper_8cpp_source_l00138}00138\ \}}
+
+\end{DoxyCode}

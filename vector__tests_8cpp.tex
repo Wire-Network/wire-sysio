@@ -1,0 +1,120 @@
+\doxysection{libraries/sys-\/vm/tests/vector\+\_\+tests.cpp File Reference}
+\hypertarget{vector__tests_8cpp}{}\label{vector__tests_8cpp}\index{libraries/sys-\/vm/tests/vector\_tests.cpp@{libraries/sys-\/vm/tests/vector\_tests.cpp}}
+{\ttfamily \#include $<$algorithm$>$}\newline
+{\ttfamily \#include $<$vector$>$}\newline
+{\ttfamily \#include $<$iterator$>$}\newline
+{\ttfamily \#include $<$cstdlib$>$}\newline
+{\ttfamily \#include $<$fstream$>$}\newline
+{\ttfamily \#include $<$string$>$}\newline
+{\ttfamily \#include $<$catch2/catch.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/vm/vector.\+hpp$>$}\newline
+Include dependency graph for vector\+\_\+tests.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{vector__tests_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{vector__tests_8cpp_abe21146fed6506ba5ca25ebcb6a365b9}{TEST\+\_\+\+CASE}} ("{}unmanaged\+\_\+vector tests"{}, "{}\mbox{[}unmanaged\+\_\+vector\+\_\+tests\mbox{]}"{})
+\item 
+\mbox{\hyperlink{vector__tests_8cpp_a2fb187e0f026cf062cb36d11ca6598eb}{TEST\+\_\+\+CASE}} ("{}managed\+\_\+vector tests"{}, "{}\mbox{[}managed\+\_\+vector\+\_\+tests\mbox{]}"{})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{vector__tests_8cpp_a2fb187e0f026cf062cb36d11ca6598eb}\index{vector\_tests.cpp@{vector\_tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!vector\_tests.cpp@{vector\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{vector__tests_8cpp_a2fb187e0f026cf062cb36d11ca6598eb} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}managed\+\_\+vector tests"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}managed\+\_\+vector\+\_\+tests\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{vector__tests_8cpp_source_l00053}{53}} of file \mbox{\hyperlink{vector__tests_8cpp_source}{vector\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00054\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1bounded__allocator}{bounded\_allocator}}\ ba(20);}
+\DoxyCodeLine{00055\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1managed__vector}{managed\_vector<char,\ bounded\_allocator>}}\ v0(ba,\ 10);}
+\DoxyCodeLine{00056\ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ v0.size();\ i++)}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ v0[i]\ =\ \textcolor{charliteral}{'a'};}
+\DoxyCodeLine{00058\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}([\&]()\{\ v0[10]\ =\ \textcolor{charliteral}{'a'};\ \}(),\ std::exception);}
+\DoxyCodeLine{00059\ \ \ \ v0.resize(10);}
+\DoxyCodeLine{00060\ \ \ \ v0[9]\ =\ \textcolor{charliteral}{'a'};}
+\DoxyCodeLine{00061\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}([\&]()\{\ v0[10]\ =\ \textcolor{charliteral}{'a'};\ \}(),\ std::exception);}
+\DoxyCodeLine{00062\ \ \ \ v0.resize(8);}
+\DoxyCodeLine{00063\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}([\&]()\{\ v0[8]\ =\ \textcolor{charliteral}{'a'};\ \}(),\ std::exception);}
+\DoxyCodeLine{00064\ \ \ \ \textcolor{keywordtype}{size\_t}\ v0\_size\ =\ v0.size();}
+\DoxyCodeLine{00065\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1managed__vector}{managed\_vector<char,\ bounded\_allocator>}}\ v1(std::move(v0));}
+\DoxyCodeLine{00066\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ v0\_size\ ==\ v1.size()\ );}
+\DoxyCodeLine{00067\ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i=0;\ i\ <\ v1.size();\ i++)}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ v1[i]\ =\ \textcolor{charliteral}{'b'};}
+\DoxyCodeLine{00069\ \ \ \ v1.emplace\_back(\textcolor{charliteral}{'b'});}
+\DoxyCodeLine{00070\ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i=0;\ i\ <\ 7;\ i++)}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ v1.emplace\_back(\textcolor{charliteral}{'c'});}
+\DoxyCodeLine{00072\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}([\&]()\ \{v1.emplace\_back(\textcolor{charliteral}{'c'});\}(),\ std::exception);}
+\DoxyCodeLine{00073\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{vector__tests_8cpp_a2fb187e0f026cf062cb36d11ca6598eb_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{vector__tests_8cpp_abe21146fed6506ba5ca25ebcb6a365b9}\index{vector\_tests.cpp@{vector\_tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!vector\_tests.cpp@{vector\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{vector__tests_8cpp_abe21146fed6506ba5ca25ebcb6a365b9} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}unmanaged\+\_\+vector tests"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}unmanaged\+\_\+vector\+\_\+tests\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{vector__tests_8cpp_source_l00015}{15}} of file \mbox{\hyperlink{vector__tests_8cpp_source}{vector\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00016\ \ \ \ \{}
+\DoxyCodeLine{00017\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1vm_ab7f3476af3409887ab60e8b853a5f271}{unmanaged\_vector<char>}}\ uv0(10);}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ uv0.size();\ i++)}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ \ uv0[i]\ =\ \textcolor{charliteral}{'a'};}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}([\&]()\{\ uv0.at(10)\ =\ \textcolor{charliteral}{'a'};\ \}(),\ std::exception);}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ uv0.resize(11);}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ uv0[10]\ =\ \textcolor{charliteral}{'a'};}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}([\&]()\{\ uv0.at(11)\ =\ \textcolor{charliteral}{'a'};\ \}(),\ std::exception);}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ uv0.resize(8);}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}([\&]()\{\ uv0.at(8)\ =\ \textcolor{charliteral}{'a'};\ \}(),\ std::exception);}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ uv0\_size\ =\ uv0.size();}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1vm_ab7f3476af3409887ab60e8b853a5f271}{unmanaged\_vector<char>}}\ uv1(std::move(uv0));}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ uv0\_size\ ==\ uv1.size()\ );}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i=0;\ i\ <\ uv1.size();\ i++)}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ uv1[i]\ =\ \textcolor{charliteral}{'b'};}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ uv1.emplace\_back(\textcolor{charliteral}{'b'});}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i=0;\ i\ <\ 8;\ i++)}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ uv1.emplace\_back(\textcolor{charliteral}{'c'});}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ uv1.emplace\_back(\textcolor{charliteral}{'c'});}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i=0;\ i\ <\ 16;\ i++)}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ uv1.emplace\_back(\textcolor{charliteral}{'d'});}
+\DoxyCodeLine{00037\ \ \ \ \}}
+\DoxyCodeLine{00038\ }
+\DoxyCodeLine{00039\ \ \ \ \{}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1vm_ab7f3476af3409887ab60e8b853a5f271}{unmanaged\_vector<char>}}\ uv0(10);}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i=0;\ i\ <\ uv0.size();\ i++)}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ uv0[i]\ =\ \textcolor{charliteral}{'b'};}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ uv0.push\_back(\textcolor{charliteral}{'b'});}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ uv0.push\_back(\textcolor{charliteral}{'b'});}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i=0;\ i\ <\ 8;\ i++)}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ uv0.push\_back(\textcolor{charliteral}{'c'});}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ uv0.push\_back(\textcolor{charliteral}{'c'});}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i=0;\ i\ <\ 16;\ i++)}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \ uv0.push\_back(\textcolor{charliteral}{'d'});}
+\DoxyCodeLine{00050\ \ \ \ \}}
+\DoxyCodeLine{00051\ \}}
+
+\end{DoxyCode}

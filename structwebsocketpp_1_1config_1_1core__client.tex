@@ -1,0 +1,416 @@
+\doxysection{websocketpp\+::config\+::core\+\_\+client Struct Reference}
+\hypertarget{structwebsocketpp_1_1config_1_1core__client}{}\label{structwebsocketpp_1_1config_1_1core__client}\index{websocketpp::config::core\_client@{websocketpp::config::core\_client}}
+
+
+Client config with iostream transport.  
+
+
+
+
+{\ttfamily \#include $<$core\+\_\+client.\+hpp$>$}
+
+
+
+Inheritance diagram for websocketpp\+::config\+::core\+\_\+client\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=336pt]{structwebsocketpp_1_1config_1_1core__client__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for websocketpp\+::config\+::core\+\_\+client\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=336pt]{structwebsocketpp_1_1config_1_1core__client__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structwebsocketpp_1_1config_1_1core__client_1_1permessage__deflate__config}{permessage\+\_\+deflate\+\_\+config}}
+\begin{DoxyCompactList}\small\item\em Extension specific settings\+: \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{structwebsocketpp_1_1config_1_1core__client_1_1transport__config}{transport\+\_\+config}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{structwebsocketpp_1_1config_1_1core__client}{core\+\_\+client}} \mbox{\hyperlink{structwebsocketpp_1_1config_1_1core__client_a218be5e4ec27b825d61f77960dca24d9}{type}}
+\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1concurrency_1_1basic}{websocketpp\+::concurrency\+::basic}} \mbox{\hyperlink{structwebsocketpp_1_1config_1_1core__client_a4f60a0c5a8aecb1d07e04591dc246395}{concurrency\+\_\+type}}
+\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1request}{http\+::parser\+::request}} \mbox{\hyperlink{structwebsocketpp_1_1config_1_1core__client_a36488bec634128ca5c67583697bdfc42}{request\+\_\+type}}
+\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1response}{http\+::parser\+::response}} \mbox{\hyperlink{structwebsocketpp_1_1config_1_1core__client_a1c8f5112e042de46ce4a5b669fbc3935}{response\+\_\+type}}
+\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message}{message\+\_\+buffer\+::message}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1alloc_1_1con__msg__manager}{message\+\_\+buffer\+::alloc\+::con\+\_\+msg\+\_\+manager}} $>$ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1core__client_aa941b2d0bed856946278259efcdfda5c}{message\+\_\+type}}
+\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1alloc_1_1con__msg__manager}{message\+\_\+buffer\+::alloc\+::con\+\_\+msg\+\_\+manager}}$<$ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1core__client_aa941b2d0bed856946278259efcdfda5c}{message\+\_\+type}} $>$ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1core__client_a05bc6c8f2e0abd52f5ec9e792f105a5b}{con\+\_\+msg\+\_\+manager\+\_\+type}}
+\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1alloc_1_1endpoint__msg__manager}{message\+\_\+buffer\+::alloc\+::endpoint\+\_\+msg\+\_\+manager}}$<$ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1core__client_a05bc6c8f2e0abd52f5ec9e792f105a5b}{con\+\_\+msg\+\_\+manager\+\_\+type}} $>$ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1core__client_a08be21d83b32d9ba6f241dc723cd336a}{endpoint\+\_\+msg\+\_\+manager\+\_\+type}}
+\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic}{websocketpp\+::log\+::basic}}$<$ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1core__client_a4f60a0c5a8aecb1d07e04591dc246395}{concurrency\+\_\+type}}, \mbox{\hyperlink{structwebsocketpp_1_1log_1_1elevel}{websocketpp\+::log\+::elevel}} $>$ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1core__client_a4170a375fcce206a7e18ebf0150f6406}{elog\+\_\+type}}
+\begin{DoxyCompactList}\small\item\em Logging policies. \end{DoxyCompactList}\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic}{websocketpp\+::log\+::basic}}$<$ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1core__client_a4f60a0c5a8aecb1d07e04591dc246395}{concurrency\+\_\+type}}, \mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel}{websocketpp\+::log\+::alevel}} $>$ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1core__client_ac79bf1b6891ba0ba9d5fdce0c4b10fd8}{alog\+\_\+type}}
+\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1random_1_1random__device_1_1int__generator}{websocketpp\+::random\+::random\+\_\+device\+::int\+\_\+generator}}$<$ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}, \mbox{\hyperlink{structwebsocketpp_1_1config_1_1core__client_a4f60a0c5a8aecb1d07e04591dc246395}{concurrency\+\_\+type}} $>$ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1core__client_a5f169db7796cb6da2ab8bfe0538dc9ca}{rng\+\_\+type}}
+\begin{DoxyCompactList}\small\item\em RNG policies. \end{DoxyCompactList}\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint}{websocketpp\+::transport\+::iostream\+::endpoint}}$<$ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1core__client_1_1transport__config}{transport\+\_\+config}} $>$ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1core__client_aa0c0c2995d8e5d258f1feb32c8ded611}{transport\+\_\+type}}
+\begin{DoxyCompactList}\small\item\em Transport Endpoint Component. \end{DoxyCompactList}\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1endpoint__base}{websocketpp\+::endpoint\+\_\+base}} \mbox{\hyperlink{structwebsocketpp_1_1config_1_1core__client_acfb312c784e1949ca3b3df7803719fcc}{endpoint\+\_\+base}}
+\begin{DoxyCompactList}\small\item\em User overridable Endpoint base class. \end{DoxyCompactList}\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1connection__base}{websocketpp\+::connection\+\_\+base}} \mbox{\hyperlink{structwebsocketpp_1_1config_1_1core__client_af260cb8b6b024eed2431b22f30ab2e1d}{connection\+\_\+base}}
+\begin{DoxyCompactList}\small\item\em User overridable Connection base class. \end{DoxyCompactList}\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1disabled}{websocketpp\+::extensions\+::permessage\+\_\+deflate\+::disabled}}$<$ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1core__client_1_1permessage__deflate__config}{permessage\+\_\+deflate\+\_\+config}} $>$ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1core__client_a94cfbaf9e10e7cf137a6ac3640bd7c7c}{permessage\+\_\+deflate\+\_\+type}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static bool const \mbox{\hyperlink{structwebsocketpp_1_1config_1_1core__client_a20e354b545c8af8bd55ed076f42cb1d7}{enable\+\_\+multithreading}} = true
+\item 
+static const long \mbox{\hyperlink{structwebsocketpp_1_1config_1_1core__client_aad4057440517a8586c2dfebdbca0936c}{timeout\+\_\+open\+\_\+handshake}} = 5000
+\begin{DoxyCompactList}\small\item\em Default timer values (in ms) \end{DoxyCompactList}\item 
+static const long \mbox{\hyperlink{structwebsocketpp_1_1config_1_1core__client_aa9c3092633bdd220e4a8d9f9ce1581ef}{timeout\+\_\+close\+\_\+handshake}} = 5000
+\begin{DoxyCompactList}\small\item\em Length of time before a closing handshake is aborted. \end{DoxyCompactList}\item 
+static const long \mbox{\hyperlink{structwebsocketpp_1_1config_1_1core__client_aecd2b27b526691e483d986711f655065}{timeout\+\_\+pong}} = 5000
+\begin{DoxyCompactList}\small\item\em Length of time to wait for a pong after a ping. \end{DoxyCompactList}\item 
+static const int \mbox{\hyperlink{structwebsocketpp_1_1config_1_1core__client_afa438e9269e4bd4bc3815979e0de0083}{client\+\_\+version}} = 13
+\begin{DoxyCompactList}\small\item\em Web\+Socket Protocol version to use as a client. \end{DoxyCompactList}\item 
+static const \mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{websocketpp\+::log\+::level}} \mbox{\hyperlink{structwebsocketpp_1_1config_1_1core__client_a653fda222bcedbaff664e60a517d0fa9}{elog\+\_\+level}}
+\begin{DoxyCompactList}\small\item\em Default static error logging channels. \end{DoxyCompactList}\item 
+static const \mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{websocketpp\+::log\+::level}} \mbox{\hyperlink{structwebsocketpp_1_1config_1_1core__client_a286f74bd1d4f4a7c363866ef92284992}{alog\+\_\+level}}
+\begin{DoxyCompactList}\small\item\em Default static access logging channels. \end{DoxyCompactList}\item 
+static const size\+\_\+t \mbox{\hyperlink{structwebsocketpp_1_1config_1_1core__client_a74305a56f9b85b51caa9efce0de1766e}{connection\+\_\+read\+\_\+buffer\+\_\+size}} = 16384
+\item 
+static const bool \mbox{\hyperlink{structwebsocketpp_1_1config_1_1core__client_aa43f6d2b983e0d8feb5e0bc1d9ad1be9}{drop\+\_\+on\+\_\+protocol\+\_\+error}} = false
+\begin{DoxyCompactList}\small\item\em Drop connections immediately on protocol error. \end{DoxyCompactList}\item 
+static const bool \mbox{\hyperlink{structwebsocketpp_1_1config_1_1core__client_affc0279e7717d68fbe5d2bb874f8d4d1}{silent\+\_\+close}} = false
+\begin{DoxyCompactList}\small\item\em Suppresses the return of detailed connection close information. \end{DoxyCompactList}\item 
+static const size\+\_\+t \mbox{\hyperlink{structwebsocketpp_1_1config_1_1core__client_a84c86d78867a89e10d24866deb931807}{max\+\_\+message\+\_\+size}} = 32000000
+\begin{DoxyCompactList}\small\item\em Default maximum message size. \end{DoxyCompactList}\item 
+static const size\+\_\+t \mbox{\hyperlink{structwebsocketpp_1_1config_1_1core__client_a4b68db9b245ec097555f7e99842d96b3}{max\+\_\+http\+\_\+body\+\_\+size}} = 32000000
+\begin{DoxyCompactList}\small\item\em Default maximum http body size. \end{DoxyCompactList}\item 
+static const bool \mbox{\hyperlink{structwebsocketpp_1_1config_1_1core__client_a21b1a53d292be873c1fffa7222cb3804}{enable\+\_\+extensions}} = true
+\begin{DoxyCompactList}\small\item\em Global flag for enabling/disabling extensions. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{core__client_8hpp_source_l00071}{71}} of file \mbox{\hyperlink{core__client_8hpp_source}{core\+\_\+client.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{structwebsocketpp_1_1config_1_1core__client_ac79bf1b6891ba0ba9d5fdce0c4b10fd8}\index{websocketpp::config::core\_client@{websocketpp::config::core\_client}!alog\_type@{alog\_type}}
+\index{alog\_type@{alog\_type}!websocketpp::config::core\_client@{websocketpp::config::core\_client}}
+\doxysubsubsection{\texorpdfstring{alog\_type}{alog\_type}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1config_1_1core__client_ac79bf1b6891ba0ba9d5fdce0c4b10fd8} 
+\mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic}{websocketpp\+::log\+::basic}}$<$\mbox{\hyperlink{structwebsocketpp_1_1config_1_1core__client_a4f60a0c5a8aecb1d07e04591dc246395}{concurrency\+\_\+type}}, \mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel}{websocketpp\+::log\+::alevel}}$>$ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1core__client_ac79bf1b6891ba0ba9d5fdce0c4b10fd8}{websocketpp\+::config\+::core\+\_\+client\+::alog\+\_\+type}}}
+
+
+
+Definition at line \mbox{\hyperlink{core__client_8hpp_source_l00097}{97}} of file \mbox{\hyperlink{core__client_8hpp_source}{core\+\_\+client.\+hpp}}.
+
+\Hypertarget{structwebsocketpp_1_1config_1_1core__client_a05bc6c8f2e0abd52f5ec9e792f105a5b}\index{websocketpp::config::core\_client@{websocketpp::config::core\_client}!con\_msg\_manager\_type@{con\_msg\_manager\_type}}
+\index{con\_msg\_manager\_type@{con\_msg\_manager\_type}!websocketpp::config::core\_client@{websocketpp::config::core\_client}}
+\doxysubsubsection{\texorpdfstring{con\_msg\_manager\_type}{con\_msg\_manager\_type}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1config_1_1core__client_a05bc6c8f2e0abd52f5ec9e792f105a5b} 
+\mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1alloc_1_1con__msg__manager}{message\+\_\+buffer\+::alloc\+::con\+\_\+msg\+\_\+manager}}$<$\mbox{\hyperlink{structwebsocketpp_1_1config_1_1core__client_aa941b2d0bed856946278259efcdfda5c}{message\+\_\+type}}$>$ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1core__client_a05bc6c8f2e0abd52f5ec9e792f105a5b}{websocketpp\+::config\+::core\+\_\+client\+::con\+\_\+msg\+\_\+manager\+\_\+type}}}
+
+
+
+Definition at line \mbox{\hyperlink{core__client_8hpp_source_l00089}{89}} of file \mbox{\hyperlink{core__client_8hpp_source}{core\+\_\+client.\+hpp}}.
+
+\Hypertarget{structwebsocketpp_1_1config_1_1core__client_a4f60a0c5a8aecb1d07e04591dc246395}\index{websocketpp::config::core\_client@{websocketpp::config::core\_client}!concurrency\_type@{concurrency\_type}}
+\index{concurrency\_type@{concurrency\_type}!websocketpp::config::core\_client@{websocketpp::config::core\_client}}
+\doxysubsubsection{\texorpdfstring{concurrency\_type}{concurrency\_type}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1config_1_1core__client_a4f60a0c5a8aecb1d07e04591dc246395} 
+\mbox{\hyperlink{classwebsocketpp_1_1concurrency_1_1basic}{websocketpp\+::concurrency\+::basic}} \mbox{\hyperlink{structwebsocketpp_1_1config_1_1core__client_a4f60a0c5a8aecb1d07e04591dc246395}{websocketpp\+::config\+::core\+\_\+client\+::concurrency\+\_\+type}}}
+
+
+
+Definition at line \mbox{\hyperlink{core__client_8hpp_source_l00076}{76}} of file \mbox{\hyperlink{core__client_8hpp_source}{core\+\_\+client.\+hpp}}.
+
+\Hypertarget{structwebsocketpp_1_1config_1_1core__client_af260cb8b6b024eed2431b22f30ab2e1d}\index{websocketpp::config::core\_client@{websocketpp::config::core\_client}!connection\_base@{connection\_base}}
+\index{connection\_base@{connection\_base}!websocketpp::config::core\_client@{websocketpp::config::core\_client}}
+\doxysubsubsection{\texorpdfstring{connection\_base}{connection\_base}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1config_1_1core__client_af260cb8b6b024eed2431b22f30ab2e1d} 
+\mbox{\hyperlink{classwebsocketpp_1_1connection__base}{websocketpp\+::connection\+\_\+base}} \mbox{\hyperlink{structwebsocketpp_1_1config_1_1core__client_af260cb8b6b024eed2431b22f30ab2e1d}{websocketpp\+::config\+::core\+\_\+client\+::connection\+\_\+base}}}
+
+
+
+Definition at line \mbox{\hyperlink{core__client_8hpp_source_l00155}{155}} of file \mbox{\hyperlink{core__client_8hpp_source}{core\+\_\+client.\+hpp}}.
+
+\Hypertarget{structwebsocketpp_1_1config_1_1core__client_a4170a375fcce206a7e18ebf0150f6406}\index{websocketpp::config::core\_client@{websocketpp::config::core\_client}!elog\_type@{elog\_type}}
+\index{elog\_type@{elog\_type}!websocketpp::config::core\_client@{websocketpp::config::core\_client}}
+\doxysubsubsection{\texorpdfstring{elog\_type}{elog\_type}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1config_1_1core__client_a4170a375fcce206a7e18ebf0150f6406} 
+\mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic}{websocketpp\+::log\+::basic}}$<$\mbox{\hyperlink{structwebsocketpp_1_1config_1_1core__client_a4f60a0c5a8aecb1d07e04591dc246395}{concurrency\+\_\+type}}, \mbox{\hyperlink{structwebsocketpp_1_1log_1_1elevel}{websocketpp\+::log\+::elevel}}$>$ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1core__client_a4170a375fcce206a7e18ebf0150f6406}{websocketpp\+::config\+::core\+\_\+client\+::elog\+\_\+type}}}
+
+
+
+Definition at line \mbox{\hyperlink{core__client_8hpp_source_l00095}{95}} of file \mbox{\hyperlink{core__client_8hpp_source}{core\+\_\+client.\+hpp}}.
+
+\Hypertarget{structwebsocketpp_1_1config_1_1core__client_acfb312c784e1949ca3b3df7803719fcc}\index{websocketpp::config::core\_client@{websocketpp::config::core\_client}!endpoint\_base@{endpoint\_base}}
+\index{endpoint\_base@{endpoint\_base}!websocketpp::config::core\_client@{websocketpp::config::core\_client}}
+\doxysubsubsection{\texorpdfstring{endpoint\_base}{endpoint\_base}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1config_1_1core__client_acfb312c784e1949ca3b3df7803719fcc} 
+\mbox{\hyperlink{classwebsocketpp_1_1endpoint__base}{websocketpp\+::endpoint\+\_\+base}} \mbox{\hyperlink{structwebsocketpp_1_1config_1_1core__client_acfb312c784e1949ca3b3df7803719fcc}{websocketpp\+::config\+::core\+\_\+client\+::endpoint\+\_\+base}}}
+
+
+
+Definition at line \mbox{\hyperlink{core__client_8hpp_source_l00153}{153}} of file \mbox{\hyperlink{core__client_8hpp_source}{core\+\_\+client.\+hpp}}.
+
+\Hypertarget{structwebsocketpp_1_1config_1_1core__client_a08be21d83b32d9ba6f241dc723cd336a}\index{websocketpp::config::core\_client@{websocketpp::config::core\_client}!endpoint\_msg\_manager\_type@{endpoint\_msg\_manager\_type}}
+\index{endpoint\_msg\_manager\_type@{endpoint\_msg\_manager\_type}!websocketpp::config::core\_client@{websocketpp::config::core\_client}}
+\doxysubsubsection{\texorpdfstring{endpoint\_msg\_manager\_type}{endpoint\_msg\_manager\_type}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1config_1_1core__client_a08be21d83b32d9ba6f241dc723cd336a} 
+\mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1alloc_1_1endpoint__msg__manager}{message\+\_\+buffer\+::alloc\+::endpoint\+\_\+msg\+\_\+manager}}$<$\mbox{\hyperlink{structwebsocketpp_1_1config_1_1core__client_a05bc6c8f2e0abd52f5ec9e792f105a5b}{con\+\_\+msg\+\_\+manager\+\_\+type}}$>$ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1core__client_a08be21d83b32d9ba6f241dc723cd336a}{websocketpp\+::config\+::core\+\_\+client\+::endpoint\+\_\+msg\+\_\+manager\+\_\+type}}}
+
+
+
+Definition at line \mbox{\hyperlink{core__client_8hpp_source_l00091}{91}} of file \mbox{\hyperlink{core__client_8hpp_source}{core\+\_\+client.\+hpp}}.
+
+\Hypertarget{structwebsocketpp_1_1config_1_1core__client_aa941b2d0bed856946278259efcdfda5c}\index{websocketpp::config::core\_client@{websocketpp::config::core\_client}!message\_type@{message\_type}}
+\index{message\_type@{message\_type}!websocketpp::config::core\_client@{websocketpp::config::core\_client}}
+\doxysubsubsection{\texorpdfstring{message\_type}{message\_type}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1config_1_1core__client_aa941b2d0bed856946278259efcdfda5c} 
+\mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message}{message\+\_\+buffer\+::message}}$<$\mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1alloc_1_1con__msg__manager}{message\+\_\+buffer\+::alloc\+::con\+\_\+msg\+\_\+manager}}$>$ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1core__client_aa941b2d0bed856946278259efcdfda5c}{websocketpp\+::config\+::core\+\_\+client\+::message\+\_\+type}}}
+
+
+
+Definition at line \mbox{\hyperlink{core__client_8hpp_source_l00087}{87}} of file \mbox{\hyperlink{core__client_8hpp_source}{core\+\_\+client.\+hpp}}.
+
+\Hypertarget{structwebsocketpp_1_1config_1_1core__client_a94cfbaf9e10e7cf137a6ac3640bd7c7c}\index{websocketpp::config::core\_client@{websocketpp::config::core\_client}!permessage\_deflate\_type@{permessage\_deflate\_type}}
+\index{permessage\_deflate\_type@{permessage\_deflate\_type}!websocketpp::config::core\_client@{websocketpp::config::core\_client}}
+\doxysubsubsection{\texorpdfstring{permessage\_deflate\_type}{permessage\_deflate\_type}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1config_1_1core__client_a94cfbaf9e10e7cf137a6ac3640bd7c7c} 
+\mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1disabled}{websocketpp\+::extensions\+::permessage\+\_\+deflate\+::disabled}}$<$\mbox{\hyperlink{structwebsocketpp_1_1config_1_1core__client_1_1permessage__deflate__config}{permessage\+\_\+deflate\+\_\+config}}$>$ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1core__client_a94cfbaf9e10e7cf137a6ac3640bd7c7c}{websocketpp\+::config\+::core\+\_\+client\+::permessage\+\_\+deflate\+\_\+type}}}
+
+
+
+Definition at line \mbox{\hyperlink{core__client_8hpp_source_l00273}{273}} of file \mbox{\hyperlink{core__client_8hpp_source}{core\+\_\+client.\+hpp}}.
+
+\Hypertarget{structwebsocketpp_1_1config_1_1core__client_a36488bec634128ca5c67583697bdfc42}\index{websocketpp::config::core\_client@{websocketpp::config::core\_client}!request\_type@{request\_type}}
+\index{request\_type@{request\_type}!websocketpp::config::core\_client@{websocketpp::config::core\_client}}
+\doxysubsubsection{\texorpdfstring{request\_type}{request\_type}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1config_1_1core__client_a36488bec634128ca5c67583697bdfc42} 
+\mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1request}{http\+::parser\+::request}} \mbox{\hyperlink{structwebsocketpp_1_1config_1_1core__client_a36488bec634128ca5c67583697bdfc42}{websocketpp\+::config\+::core\+\_\+client\+::request\+\_\+type}}}
+
+
+
+Definition at line \mbox{\hyperlink{core__client_8hpp_source_l00082}{82}} of file \mbox{\hyperlink{core__client_8hpp_source}{core\+\_\+client.\+hpp}}.
+
+\Hypertarget{structwebsocketpp_1_1config_1_1core__client_a1c8f5112e042de46ce4a5b669fbc3935}\index{websocketpp::config::core\_client@{websocketpp::config::core\_client}!response\_type@{response\_type}}
+\index{response\_type@{response\_type}!websocketpp::config::core\_client@{websocketpp::config::core\_client}}
+\doxysubsubsection{\texorpdfstring{response\_type}{response\_type}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1config_1_1core__client_a1c8f5112e042de46ce4a5b669fbc3935} 
+\mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1response}{http\+::parser\+::response}} \mbox{\hyperlink{structwebsocketpp_1_1config_1_1core__client_a1c8f5112e042de46ce4a5b669fbc3935}{websocketpp\+::config\+::core\+\_\+client\+::response\+\_\+type}}}
+
+
+
+Definition at line \mbox{\hyperlink{core__client_8hpp_source_l00083}{83}} of file \mbox{\hyperlink{core__client_8hpp_source}{core\+\_\+client.\+hpp}}.
+
+\Hypertarget{structwebsocketpp_1_1config_1_1core__client_a5f169db7796cb6da2ab8bfe0538dc9ca}\index{websocketpp::config::core\_client@{websocketpp::config::core\_client}!rng\_type@{rng\_type}}
+\index{rng\_type@{rng\_type}!websocketpp::config::core\_client@{websocketpp::config::core\_client}}
+\doxysubsubsection{\texorpdfstring{rng\_type}{rng\_type}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1config_1_1core__client_a5f169db7796cb6da2ab8bfe0538dc9ca} 
+\mbox{\hyperlink{classwebsocketpp_1_1random_1_1random__device_1_1int__generator}{websocketpp\+::random\+::random\+\_\+device\+::int\+\_\+generator}}$<$\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}, \mbox{\hyperlink{structwebsocketpp_1_1config_1_1core__client_a4f60a0c5a8aecb1d07e04591dc246395}{concurrency\+\_\+type}}$>$ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1core__client_a5f169db7796cb6da2ab8bfe0538dc9ca}{websocketpp\+::config\+::core\+\_\+client\+::rng\+\_\+type}}}
+
+
+
+Definition at line \mbox{\hyperlink{core__client_8hpp_source_l00101}{101}} of file \mbox{\hyperlink{core__client_8hpp_source}{core\+\_\+client.\+hpp}}.
+
+\Hypertarget{structwebsocketpp_1_1config_1_1core__client_aa0c0c2995d8e5d258f1feb32c8ded611}\index{websocketpp::config::core\_client@{websocketpp::config::core\_client}!transport\_type@{transport\_type}}
+\index{transport\_type@{transport\_type}!websocketpp::config::core\_client@{websocketpp::config::core\_client}}
+\doxysubsubsection{\texorpdfstring{transport\_type}{transport\_type}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1config_1_1core__client_aa0c0c2995d8e5d258f1feb32c8ded611} 
+\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint}{websocketpp\+::transport\+::iostream\+::endpoint}}$<$\mbox{\hyperlink{structwebsocketpp_1_1config_1_1core__client_1_1transport__config}{transport\+\_\+config}}$>$ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1core__client_aa0c0c2995d8e5d258f1feb32c8ded611}{websocketpp\+::config\+::core\+\_\+client\+::transport\+\_\+type}}}
+
+
+
+Definition at line \mbox{\hyperlink{core__client_8hpp_source_l00150}{150}} of file \mbox{\hyperlink{core__client_8hpp_source}{core\+\_\+client.\+hpp}}.
+
+\Hypertarget{structwebsocketpp_1_1config_1_1core__client_a218be5e4ec27b825d61f77960dca24d9}\index{websocketpp::config::core\_client@{websocketpp::config::core\_client}!type@{type}}
+\index{type@{type}!websocketpp::config::core\_client@{websocketpp::config::core\_client}}
+\doxysubsubsection{\texorpdfstring{type}{type}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1config_1_1core__client_a218be5e4ec27b825d61f77960dca24d9} 
+\mbox{\hyperlink{structwebsocketpp_1_1config_1_1core__client}{core\+\_\+client}} \mbox{\hyperlink{structwebsocketpp_1_1config_1_1core__client_a218be5e4ec27b825d61f77960dca24d9}{websocketpp\+::config\+::core\+\_\+client\+::type}}}
+
+
+
+Definition at line \mbox{\hyperlink{core__client_8hpp_source_l00072}{72}} of file \mbox{\hyperlink{core__client_8hpp_source}{core\+\_\+client.\+hpp}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structwebsocketpp_1_1config_1_1core__client_a286f74bd1d4f4a7c363866ef92284992}\index{websocketpp::config::core\_client@{websocketpp::config::core\_client}!alog\_level@{alog\_level}}
+\index{alog\_level@{alog\_level}!websocketpp::config::core\_client@{websocketpp::config::core\_client}}
+\doxysubsubsection{\texorpdfstring{alog\_level}{alog\_level}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1config_1_1core__client_a286f74bd1d4f4a7c363866ef92284992} 
+const \mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{websocketpp\+::log\+::level}} websocketpp\+::config\+::core\+\_\+client\+::alog\+\_\+level\hspace{0.3cm}{\ttfamily [static]}}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a853aa0b8976e53f3181af3bc398d493e}{websocketpp::log::alevel::all}}\ \string^\ \mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}{websocketpp::log::alevel::devel}}}
+
+\end{DoxyCode}
+Which access logging channels to enable at compile time. Channels not enabled here will be unable to be selected by programs using the library. This option gives an optimizing compiler the ability to remove entirely code to test whether or not to print out log messages on a certain channel
+
+Default is all except for development/debug level access messages 
+
+Definition at line \mbox{\hyperlink{core__client_8hpp_source_l00197}{197}} of file \mbox{\hyperlink{core__client_8hpp_source}{core\+\_\+client.\+hpp}}.
+
+\Hypertarget{structwebsocketpp_1_1config_1_1core__client_afa438e9269e4bd4bc3815979e0de0083}\index{websocketpp::config::core\_client@{websocketpp::config::core\_client}!client\_version@{client\_version}}
+\index{client\_version@{client\_version}!websocketpp::config::core\_client@{websocketpp::config::core\_client}}
+\doxysubsubsection{\texorpdfstring{client\_version}{client\_version}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1config_1_1core__client_afa438e9269e4bd4bc3815979e0de0083} 
+const int websocketpp\+::config\+::core\+\_\+client\+::client\+\_\+version = 13\hspace{0.3cm}{\ttfamily [static]}}
+
+What version of the Web\+Socket Protocol to use for outgoing client connections. Setting this to a value other than 13 (RFC6455) is not recommended. 
+
+Definition at line \mbox{\hyperlink{core__client_8hpp_source_l00172}{172}} of file \mbox{\hyperlink{core__client_8hpp_source}{core\+\_\+client.\+hpp}}.
+
+\Hypertarget{structwebsocketpp_1_1config_1_1core__client_a74305a56f9b85b51caa9efce0de1766e}\index{websocketpp::config::core\_client@{websocketpp::config::core\_client}!connection\_read\_buffer\_size@{connection\_read\_buffer\_size}}
+\index{connection\_read\_buffer\_size@{connection\_read\_buffer\_size}!websocketpp::config::core\_client@{websocketpp::config::core\_client}}
+\doxysubsubsection{\texorpdfstring{connection\_read\_buffer\_size}{connection\_read\_buffer\_size}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1config_1_1core__client_a74305a56f9b85b51caa9efce0de1766e} 
+const size\+\_\+t websocketpp\+::config\+::core\+\_\+client\+::connection\+\_\+read\+\_\+buffer\+\_\+size = 16384\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{core__client_8hpp_source_l00201}{201}} of file \mbox{\hyperlink{core__client_8hpp_source}{core\+\_\+client.\+hpp}}.
+
+\Hypertarget{structwebsocketpp_1_1config_1_1core__client_aa43f6d2b983e0d8feb5e0bc1d9ad1be9}\index{websocketpp::config::core\_client@{websocketpp::config::core\_client}!drop\_on\_protocol\_error@{drop\_on\_protocol\_error}}
+\index{drop\_on\_protocol\_error@{drop\_on\_protocol\_error}!websocketpp::config::core\_client@{websocketpp::config::core\_client}}
+\doxysubsubsection{\texorpdfstring{drop\_on\_protocol\_error}{drop\_on\_protocol\_error}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1config_1_1core__client_aa43f6d2b983e0d8feb5e0bc1d9ad1be9} 
+const bool websocketpp\+::config\+::core\+\_\+client\+::drop\+\_\+on\+\_\+protocol\+\_\+error = false\hspace{0.3cm}{\ttfamily [static]}}
+
+Drop connections on protocol error rather than sending a close frame. Off by default. This may result in legit messages near the error being dropped as well. It may free up resources otherwise spent dealing with misbehaving clients. 
+
+Definition at line \mbox{\hyperlink{core__client_8hpp_source_l00210}{210}} of file \mbox{\hyperlink{core__client_8hpp_source}{core\+\_\+client.\+hpp}}.
+
+\Hypertarget{structwebsocketpp_1_1config_1_1core__client_a653fda222bcedbaff664e60a517d0fa9}\index{websocketpp::config::core\_client@{websocketpp::config::core\_client}!elog\_level@{elog\_level}}
+\index{elog\_level@{elog\_level}!websocketpp::config::core\_client@{websocketpp::config::core\_client}}
+\doxysubsubsection{\texorpdfstring{elog\_level}{elog\_level}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1config_1_1core__client_a653fda222bcedbaff664e60a517d0fa9} 
+const \mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{websocketpp\+::log\+::level}} websocketpp\+::config\+::core\+\_\+client\+::elog\+\_\+level\hspace{0.3cm}{\ttfamily [static]}}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{structwebsocketpp_1_1log_1_1elevel_a9b31ff708c221d314f9f4eb3ff2b1ad7}{websocketpp::log::elevel::all}}\ \string^\ \mbox{\hyperlink{structwebsocketpp_1_1log_1_1elevel_a0b1dbc650c6f2711522c096496423726}{websocketpp::log::elevel::devel}}}
+
+\end{DoxyCode}
+Which error logging channels to enable at compile time. Channels not enabled here will be unable to be selected by programs using the library. This option gives an optimizing compiler the ability to remove entirely code to test whether or not to print out log messages on a certain channel
+
+Default is all except for development/debug level errors 
+
+Definition at line \mbox{\hyperlink{core__client_8hpp_source_l00184}{184}} of file \mbox{\hyperlink{core__client_8hpp_source}{core\+\_\+client.\+hpp}}.
+
+\Hypertarget{structwebsocketpp_1_1config_1_1core__client_a21b1a53d292be873c1fffa7222cb3804}\index{websocketpp::config::core\_client@{websocketpp::config::core\_client}!enable\_extensions@{enable\_extensions}}
+\index{enable\_extensions@{enable\_extensions}!websocketpp::config::core\_client@{websocketpp::config::core\_client}}
+\doxysubsubsection{\texorpdfstring{enable\_extensions}{enable\_extensions}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1config_1_1core__client_a21b1a53d292be873c1fffa7222cb3804} 
+const bool websocketpp\+::config\+::core\+\_\+client\+::enable\+\_\+extensions = true\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{core__client_8hpp_source_l00252}{252}} of file \mbox{\hyperlink{core__client_8hpp_source}{core\+\_\+client.\+hpp}}.
+
+\Hypertarget{structwebsocketpp_1_1config_1_1core__client_a20e354b545c8af8bd55ed076f42cb1d7}\index{websocketpp::config::core\_client@{websocketpp::config::core\_client}!enable\_multithreading@{enable\_multithreading}}
+\index{enable\_multithreading@{enable\_multithreading}!websocketpp::config::core\_client@{websocketpp::config::core\_client}}
+\doxysubsubsection{\texorpdfstring{enable\_multithreading}{enable\_multithreading}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1config_1_1core__client_a20e354b545c8af8bd55ed076f42cb1d7} 
+bool const websocketpp\+::config\+::core\+\_\+client\+::enable\+\_\+multithreading = true\hspace{0.3cm}{\ttfamily [static]}}
+
+Controls compile time enabling/disabling of thread syncronization code Disabling can provide a minor performance improvement to single threaded applications 
+
+Definition at line \mbox{\hyperlink{core__client_8hpp_source_l00106}{106}} of file \mbox{\hyperlink{core__client_8hpp_source}{core\+\_\+client.\+hpp}}.
+
+\Hypertarget{structwebsocketpp_1_1config_1_1core__client_a4b68db9b245ec097555f7e99842d96b3}\index{websocketpp::config::core\_client@{websocketpp::config::core\_client}!max\_http\_body\_size@{max\_http\_body\_size}}
+\index{max\_http\_body\_size@{max\_http\_body\_size}!websocketpp::config::core\_client@{websocketpp::config::core\_client}}
+\doxysubsubsection{\texorpdfstring{max\_http\_body\_size}{max\_http\_body\_size}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1config_1_1core__client_a4b68db9b245ec097555f7e99842d96b3} 
+const size\+\_\+t websocketpp\+::config\+::core\+\_\+client\+::max\+\_\+http\+\_\+body\+\_\+size = 32000000\hspace{0.3cm}{\ttfamily [static]}}
+
+Default value for the http parser\textquotesingle{}s maximum body size. Maximum body size determines the point at which the library will abort reading an HTTP connection with the 413/request entity too large error.
+
+The default is 32MB
+
+\begin{DoxySince}{Since}
+0.\+5.\+0 
+\end{DoxySince}
+
+
+Definition at line \mbox{\hyperlink{core__client_8hpp_source_l00249}{249}} of file \mbox{\hyperlink{core__client_8hpp_source}{core\+\_\+client.\+hpp}}.
+
+\Hypertarget{structwebsocketpp_1_1config_1_1core__client_a84c86d78867a89e10d24866deb931807}\index{websocketpp::config::core\_client@{websocketpp::config::core\_client}!max\_message\_size@{max\_message\_size}}
+\index{max\_message\_size@{max\_message\_size}!websocketpp::config::core\_client@{websocketpp::config::core\_client}}
+\doxysubsubsection{\texorpdfstring{max\_message\_size}{max\_message\_size}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1config_1_1core__client_a84c86d78867a89e10d24866deb931807} 
+const size\+\_\+t websocketpp\+::config\+::core\+\_\+client\+::max\+\_\+message\+\_\+size = 32000000\hspace{0.3cm}{\ttfamily [static]}}
+
+Default value for the processor\textquotesingle{}s maximum message size. Maximum message size determines the point at which the library will fail a connection with the message\+\_\+too\+\_\+big protocol error.
+
+The default is 32MB
+
+\begin{DoxySince}{Since}
+0.\+3.\+0 
+\end{DoxySince}
+
+
+Definition at line \mbox{\hyperlink{core__client_8hpp_source_l00237}{237}} of file \mbox{\hyperlink{core__client_8hpp_source}{core\+\_\+client.\+hpp}}.
+
+\Hypertarget{structwebsocketpp_1_1config_1_1core__client_affc0279e7717d68fbe5d2bb874f8d4d1}\index{websocketpp::config::core\_client@{websocketpp::config::core\_client}!silent\_close@{silent\_close}}
+\index{silent\_close@{silent\_close}!websocketpp::config::core\_client@{websocketpp::config::core\_client}}
+\doxysubsubsection{\texorpdfstring{silent\_close}{silent\_close}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1config_1_1core__client_affc0279e7717d68fbe5d2bb874f8d4d1} 
+const bool websocketpp\+::config\+::core\+\_\+client\+::silent\+\_\+close = false\hspace{0.3cm}{\ttfamily [static]}}
+
+Silence close suppresses the return of detailed connection close information during the closing handshake. This information is useful for debugging and presenting useful errors to end users but may be undesirable for security reasons in some production environments. Close reasons could be used by an attacker to confirm that the endpoint is out of resources or be used to identify the Web\+Socket implementation in use.
+
+Note\+: this will suppress {\itshape all} close codes, including those explicitly sent by local applications. 
+
+Definition at line \mbox{\hyperlink{core__client_8hpp_source_l00225}{225}} of file \mbox{\hyperlink{core__client_8hpp_source}{core\+\_\+client.\+hpp}}.
+
+\Hypertarget{structwebsocketpp_1_1config_1_1core__client_aa9c3092633bdd220e4a8d9f9ce1581ef}\index{websocketpp::config::core\_client@{websocketpp::config::core\_client}!timeout\_close\_handshake@{timeout\_close\_handshake}}
+\index{timeout\_close\_handshake@{timeout\_close\_handshake}!websocketpp::config::core\_client@{websocketpp::config::core\_client}}
+\doxysubsubsection{\texorpdfstring{timeout\_close\_handshake}{timeout\_close\_handshake}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1config_1_1core__client_aa9c3092633bdd220e4a8d9f9ce1581ef} 
+const long websocketpp\+::config\+::core\+\_\+client\+::timeout\+\_\+close\+\_\+handshake = 5000\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{core__client_8hpp_source_l00162}{162}} of file \mbox{\hyperlink{core__client_8hpp_source}{core\+\_\+client.\+hpp}}.
+
+\Hypertarget{structwebsocketpp_1_1config_1_1core__client_aad4057440517a8586c2dfebdbca0936c}\index{websocketpp::config::core\_client@{websocketpp::config::core\_client}!timeout\_open\_handshake@{timeout\_open\_handshake}}
+\index{timeout\_open\_handshake@{timeout\_open\_handshake}!websocketpp::config::core\_client@{websocketpp::config::core\_client}}
+\doxysubsubsection{\texorpdfstring{timeout\_open\_handshake}{timeout\_open\_handshake}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1config_1_1core__client_aad4057440517a8586c2dfebdbca0936c} 
+const long websocketpp\+::config\+::core\+\_\+client\+::timeout\+\_\+open\+\_\+handshake = 5000\hspace{0.3cm}{\ttfamily [static]}}
+
+Length of time before an opening handshake is aborted 
+
+Definition at line \mbox{\hyperlink{core__client_8hpp_source_l00160}{160}} of file \mbox{\hyperlink{core__client_8hpp_source}{core\+\_\+client.\+hpp}}.
+
+\Hypertarget{structwebsocketpp_1_1config_1_1core__client_aecd2b27b526691e483d986711f655065}\index{websocketpp::config::core\_client@{websocketpp::config::core\_client}!timeout\_pong@{timeout\_pong}}
+\index{timeout\_pong@{timeout\_pong}!websocketpp::config::core\_client@{websocketpp::config::core\_client}}
+\doxysubsubsection{\texorpdfstring{timeout\_pong}{timeout\_pong}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1config_1_1core__client_aecd2b27b526691e483d986711f655065} 
+const long websocketpp\+::config\+::core\+\_\+client\+::timeout\+\_\+pong = 5000\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{core__client_8hpp_source_l00164}{164}} of file \mbox{\hyperlink{core__client_8hpp_source}{core\+\_\+client.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/vendor/websocketpp/websocketpp/config/\mbox{\hyperlink{core__client_8hpp}{core\+\_\+client.\+hpp}}\end{DoxyCompactItemize}

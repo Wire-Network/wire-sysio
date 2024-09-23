@@ -1,0 +1,168 @@
+\doxysection{Disassembly\+Names.\+cpp}
+\hypertarget{_disassembly_names_8cpp_source}{}\label{_disassembly_names_8cpp_source}\index{libraries/wasm-\/jit/Source/IR/DisassemblyNames.cpp@{libraries/wasm-\/jit/Source/IR/DisassemblyNames.cpp}}
+\mbox{\hyperlink{_disassembly_names_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_basic_types_8h}{Inline/BasicTypes.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_serialization_8h}{Inline/Serialization.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_logging_8h}{Logging/Logging.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_i_r_8h}{IR.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_module_8h}{Module.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00007}00007\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespace_serialization}{Serialization}};}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00009}00009\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_i_r}{IR}}}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00010}00010\ \{}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00011}\mbox{\hyperlink{namespace_i_r_ae36055728f4542ad9b363e04021674ba}{00011}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespace_i_r_ae36055728f4542ad9b363e04021674ba}{getDisassemblyNames}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_i_r_1_1_module}{Module}}\&\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}},\mbox{\hyperlink{struct_i_r_1_1_disassembly_names}{DisassemblyNames}}\&\ outNames)}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00012}00012\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00013}00013\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Fill\ in\ the\ output\ with\ the\ correct\ number\ of\ blank\ names.}}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00014}00014\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ functionImport\ :\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.functions.imports)}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00015}00015\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00016}00016\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_i_r_1_1_disassembly_names_1_1_function}{DisassemblyNames::Function}}\ functionNames;}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00017}00017\ \ \ \ \ \ \ \ \ \ \ \ \ functionNames.\mbox{\hyperlink{struct_i_r_1_1_disassembly_names_1_1_function_afc977d5b7c5be316e5590db5d7387f4c}{locals}}.resize(\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.types[functionImport.type.index]-\/>parameters.size());}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00018}00018\ \ \ \ \ \ \ \ \ \ \ \ \ outNames.\mbox{\hyperlink{struct_i_r_1_1_disassembly_names_ae7545a8574581eb0cc0ee946516db404}{functions}}.push\_back(std::move(functionNames));}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00019}00019\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00020}00020\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ functionDefIndex\ =\ 0;functionDefIndex\ <\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.functions.defs.size();++functionDefIndex)}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00021}00021\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00022}00022\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_i_r_1_1_function_def}{FunctionDef}}\&\ functionDef\ =\ \textcolor{keyword}{module}.functions.defs[functionDefIndex];}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00023}00023\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_i_r_1_1_disassembly_names_1_1_function}{DisassemblyNames::Function}}\ functionNames;}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00024}00024\ \ \ \ \ \ \ \ \ \ \ \ \ functionNames.\mbox{\hyperlink{struct_i_r_1_1_disassembly_names_1_1_function_afc977d5b7c5be316e5590db5d7387f4c}{locals}}.insert(functionNames.\mbox{\hyperlink{struct_i_r_1_1_disassembly_names_1_1_function_afc977d5b7c5be316e5590db5d7387f4c}{locals}}.begin(),\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.types[functionDef.\mbox{\hyperlink{struct_i_r_1_1_function_def_a7a9ece54e2500f826e8db353002a0590}{type}}.\mbox{\hyperlink{struct_i_r_1_1_indexed_function_type_ad76a69c366f186a0e17305099ea15aba}{index}}]-\/>parameters.size()\ +\ functionDef.\mbox{\hyperlink{struct_i_r_1_1_function_def_a34738d2b2fa494ebf86433b872fee943}{nonParameterLocalTypes}}.size(),\textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00025}00025\ \ \ \ \ \ \ \ \ \ \ \ \ outNames.\mbox{\hyperlink{struct_i_r_1_1_disassembly_names_ae7545a8574581eb0cc0ee946516db404}{functions}}.push\_back(std::move(functionNames));}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00026}00026\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00027}00027\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00028}00028\ \ \ \ \ \ \ \ \ outNames.\mbox{\hyperlink{struct_i_r_1_1_disassembly_names_ab055b4c06d151f507db3183beddebbe1}{types}}.insert(outNames.\mbox{\hyperlink{struct_i_r_1_1_disassembly_names_ab055b4c06d151f507db3183beddebbe1}{types}}.end(),\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.types.size(),\textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00029}00029\ \ \ \ \ \ \ \ \ outNames.\mbox{\hyperlink{struct_i_r_1_1_disassembly_names_a7741fd4de1b8e40f08d769230384d2c8}{tables}}.insert(outNames.\mbox{\hyperlink{struct_i_r_1_1_disassembly_names_a7741fd4de1b8e40f08d769230384d2c8}{tables}}.end(),\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.tables.defs.size()\ +\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.tables.imports.size(),\textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00030}00030\ \ \ \ \ \ \ \ \ outNames.\mbox{\hyperlink{struct_i_r_1_1_disassembly_names_a15e70ee713e6ddf2c9c3105c733a392a}{memories}}.insert(outNames.\mbox{\hyperlink{struct_i_r_1_1_disassembly_names_a15e70ee713e6ddf2c9c3105c733a392a}{memories}}.end(),\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.memories.defs.size()\ +\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.memories.imports.size(),\textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00031}00031\ \ \ \ \ \ \ \ \ outNames.\mbox{\hyperlink{struct_i_r_1_1_disassembly_names_a4516c9cf9ae1e817ff4be289d30d9b43}{globals}}.insert(outNames.\mbox{\hyperlink{struct_i_r_1_1_disassembly_names_a4516c9cf9ae1e817ff4be289d30d9b43}{globals}}.end(),\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.globals.defs.size()\ +\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.globals.imports.size(),\textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00033}00033\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Deserialize\ the\ name\ section,\ if\ it\ is\ present.}}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00034}00034\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ userSectionIndex\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00035}00035\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{namespace_i_r_a40d3c46d577c46a69b0d8da4d2ecd681}{findUserSection}}(\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}},\textcolor{stringliteral}{"{}name"{}},userSectionIndex))}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00036}00036\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00037}00037\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00038}00038\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00039}00039\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_i_r_1_1_user_section}{UserSection}}\&\ nameSection\ =\ \textcolor{keyword}{module}.userSections[userSectionIndex];}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00040}00040\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_serialization_1_1_memory_input_stream}{MemoryInputStream}}\ stream(nameSection.\mbox{\hyperlink{struct_i_r_1_1_user_section_abefb00e1d63458c59e741d7e05bd1c38}{data}}.data(),nameSection.\mbox{\hyperlink{struct_i_r_1_1_user_section_abefb00e1d63458c59e741d7e05bd1c38}{data}}.size());}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00041}00041\ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00042}00042\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \#if\ 0}}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00043}00043\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(stream.capacity())}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00044}00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00045}00045\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}\ substreamType\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00046}00046\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_serialization_af14a3f6c258b4253ad4d75a57827d41e}{serializeVarUInt7}}(stream,substreamType);}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}\ numSubstreamBytes\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_serialization_a1ea6ecb2f4de00340f936648398f4f66}{serializeVarUInt32}}(stream,numSubstreamBytes);}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00050}00050\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00051}00051\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_serialization_1_1_memory_input_stream}{MemoryInputStream}}\ substream(stream.advance(numSubstreamBytes),numSubstreamBytes);}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(substreamType)}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ 0:\ \textcolor{comment}{//\ function\ names}}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}\ numFunctionNames\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_serialization_a1ea6ecb2f4de00340f936648398f4f66}{serializeVarUInt32}}(substream,numFunctionNames);}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ functionNameIndex\ =\ 0;functionNameIndex\ <\ numFunctionNames;++functionNameIndex)}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00059}00059\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}\ functionIndex\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00061}00061\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_serialization_a1ea6ecb2f4de00340f936648398f4f66}{serializeVarUInt32}}(substream,functionIndex);}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00062}00062\ }
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ functionName;}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00064}00064\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_i_r_afac891781684998f67dfba2c45bfed39}{serialize}}(substream,functionName);}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00066}00066\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(functionIndex\ <\ outNames.\mbox{\hyperlink{struct_i_r_1_1_disassembly_names_ae7545a8574581eb0cc0ee946516db404}{functions}}.size())\ \{\ outNames.\mbox{\hyperlink{struct_i_r_1_1_disassembly_names_ae7545a8574581eb0cc0ee946516db404}{functions}}[functionIndex].name\ =\ std::move(functionName);\ \}}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00067}00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ 1:\ \textcolor{comment}{//\ local\ names}}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00071}00071\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}\ numFunctionLocalNameMaps\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00073}00073\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_serialization_a1ea6ecb2f4de00340f936648398f4f66}{serializeVarUInt32}}(substream,numFunctionLocalNameMaps);}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00074}00074\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ functionNameIndex\ =\ 0;functionNameIndex\ <\ numFunctionLocalNameMaps;++functionNameIndex)}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00075}00075\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}\ functionIndex\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_serialization_a1ea6ecb2f4de00340f936648398f4f66}{serializeVarUInt32}}(substream,functionIndex);}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}\ numLocalNames\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00080}00080\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_serialization_a1ea6ecb2f4de00340f936648398f4f66}{serializeVarUInt32}}(substream,numLocalNames);}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00081}00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00082}00082\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ localNameIndex\ =\ \ 0;localNameIndex\ <\ numLocalNames;++numLocalNames)}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00083}00083\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00084}00084\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}\ localIndex\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00085}00085\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_serialization_a1ea6ecb2f4de00340f936648398f4f66}{serializeVarUInt32}}(substream,localIndex);}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00086}00086\ }
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00087}00087\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ localName;}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00088}00088\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_i_r_afac891781684998f67dfba2c45bfed39}{serialize}}(substream,localName);}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00089}00089\ }
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00090}00090\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(functionIndex\ <\ outNames.\mbox{\hyperlink{struct_i_r_1_1_disassembly_names_ae7545a8574581eb0cc0ee946516db404}{functions}}.size()\ \&\&\ localIndex\ <\ outNames.\mbox{\hyperlink{struct_i_r_1_1_disassembly_names_ae7545a8574581eb0cc0ee946516db404}{functions}}[functionIndex].locals.size())}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00091}00091\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00092}00092\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ outNames.\mbox{\hyperlink{struct_i_r_1_1_disassembly_names_ae7545a8574581eb0cc0ee946516db404}{functions}}[functionIndex].locals[localIndex]\ =\ std::move(localName);}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00093}00093\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00094}00094\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00095}00095\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00096}00096\ }
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00097}00097\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00098}00098\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00099}00099\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00100}00100\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00101}00101\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \#endif}}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00102}00102\ }
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00103}00103\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ numFunctionNames\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00104}00104\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_serialization_a1ea6ecb2f4de00340f936648398f4f66}{serializeVarUInt32}}(stream,numFunctionNames);}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00105}00105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ numFunctionNames\ =\ std::min(numFunctionNames,(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}})outNames.\mbox{\hyperlink{struct_i_r_1_1_disassembly_names_ae7545a8574581eb0cc0ee946516db404}{functions}}.size());}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00106}00106\ }
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00107}00107\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ functionIndex\ =\ 0;functionIndex\ <\ numFunctionNames;++functionIndex)}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00108}00108\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00109}00109\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_i_r_1_1_disassembly_names_1_1_function}{DisassemblyNames::Function}}\&\ functionNames\ =\ outNames.\mbox{\hyperlink{struct_i_r_1_1_disassembly_names_ae7545a8574581eb0cc0ee946516db404}{functions}}[functionIndex];}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00110}00110\ }
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00111}00111\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_i_r_afac891781684998f67dfba2c45bfed39}{serialize}}(stream,outNames.\mbox{\hyperlink{struct_i_r_1_1_disassembly_names_ae7545a8574581eb0cc0ee946516db404}{functions}}[functionIndex].name);}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00112}00112\ }
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00113}00113\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ numLocalNames\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00114}00114\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_serialization_a1ea6ecb2f4de00340f936648398f4f66}{serializeVarUInt32}}(stream,numLocalNames);}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00115}00115\ }
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00116}00116\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ localIndex\ =\ 0;localIndex\ <\ numLocalNames;++localIndex)}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00117}00117\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00118}00118\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ localName;}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00119}00119\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_i_r_afac891781684998f67dfba2c45bfed39}{serialize}}(stream,localName);}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00120}00120\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(localIndex\ <\ functionNames.\mbox{\hyperlink{struct_i_r_1_1_disassembly_names_1_1_function_afc977d5b7c5be316e5590db5d7387f4c}{locals}}.size())\ \{\ functionNames.\mbox{\hyperlink{struct_i_r_1_1_disassembly_names_1_1_function_afc977d5b7c5be316e5590db5d7387f4c}{locals}}[localIndex]\ =\ std::move(localName);\ \}}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00121}00121\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00122}00122\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00123}00123\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00124}00124\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{catch}(\mbox{\hyperlink{struct_serialization_1_1_fatal_serialization_exception}{FatalSerializationException}}\ exception)}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00125}00125\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00126}00126\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{Log::printf}}(\mbox{\hyperlink{namespace_log_a1f055cc08a2ed074aa74f9d99c8a0901aad42f6697b035b7580e4fef93be20b4d}{Log::Category::debug}},\textcolor{stringliteral}{"{}FatalSerializationException\ while\ deserializing\ WASM\ user\ name\ section:\ \%s\(\backslash\)n"{}},exception.\mbox{\hyperlink{struct_serialization_1_1_fatal_serialization_exception_ae65cd23b2cf7b4f0c9a062d3584bbdde}{message}}.c\_str());}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00127}00127\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00128}00128\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00129}00129\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00130}00130\ }
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00131}\mbox{\hyperlink{namespace_i_r_ac643afa4254e978e5e09895166b8bdb8}{00131}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespace_i_r_ac643afa4254e978e5e09895166b8bdb8}{setDisassemblyNames}}(\mbox{\hyperlink{struct_i_r_1_1_module}{Module}}\&\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}},\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_i_r_1_1_disassembly_names}{DisassemblyNames}}\&\ names)}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00132}00132\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00133}00133\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Replace\ an\ existing\ name\ section\ if\ one\ is\ present,\ or\ create\ a\ new\ section.}}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00134}00134\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ userSectionIndex\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00135}00135\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!\mbox{\hyperlink{namespace_i_r_a40d3c46d577c46a69b0d8da4d2ecd681}{findUserSection}}(\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}},\textcolor{stringliteral}{"{}name"{}},userSectionIndex))}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00136}00136\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00137}00137\ \ \ \ \ \ \ \ \ \ \ \ \ userSectionIndex\ =\ \textcolor{keyword}{module}.userSections.size();}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00138}00138\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{module}.userSections.push\_back(\{"{}name"{},\{\}\});}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00139}00139\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00140}00140\ }
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00141}00141\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_serialization_1_1_array_output_stream}{ArrayOutputStream}}\ stream;}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00142}00142\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00143}00143\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ numFunctionNames\ =\ names.\mbox{\hyperlink{struct_i_r_1_1_disassembly_names_ae7545a8574581eb0cc0ee946516db404}{functions}}.size();}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00144}00144\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_serialization_a1ea6ecb2f4de00340f936648398f4f66}{serializeVarUInt32}}(stream,numFunctionNames);}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00145}00145\ }
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00146}00146\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ functionIndex\ =\ 0;functionIndex\ <\ names.\mbox{\hyperlink{struct_i_r_1_1_disassembly_names_ae7545a8574581eb0cc0ee946516db404}{functions}}.size();++functionIndex)}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00147}00147\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00148}00148\ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ functionName\ =\ names.\mbox{\hyperlink{struct_i_r_1_1_disassembly_names_ae7545a8574581eb0cc0ee946516db404}{functions}}[functionIndex].name;}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00149}00149\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_i_r_afac891781684998f67dfba2c45bfed39}{serialize}}(stream,functionName);}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00150}00150\ }
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00151}00151\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ numLocalNames\ =\ names.\mbox{\hyperlink{struct_i_r_1_1_disassembly_names_ae7545a8574581eb0cc0ee946516db404}{functions}}[functionIndex].locals.size();}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00152}00152\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_serialization_a1ea6ecb2f4de00340f936648398f4f66}{serializeVarUInt32}}(stream,numLocalNames);}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00153}00153\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ localIndex\ =\ 0;localIndex\ <\ numLocalNames;++localIndex)}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00154}00154\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00155}00155\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ localName\ =\ names.\mbox{\hyperlink{struct_i_r_1_1_disassembly_names_ae7545a8574581eb0cc0ee946516db404}{functions}}[functionIndex].locals[localIndex];}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00156}00156\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_i_r_afac891781684998f67dfba2c45bfed39}{serialize}}(stream,localName);}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00157}00157\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00158}00158\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00159}00159\ }
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00160}00160\ \ \ \ \ \ \ \ \ \textcolor{keyword}{module}.userSections[userSectionIndex].data\ =\ stream.getBytes();}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00161}00161\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_disassembly_names_8cpp_source_l00162}00162\ \}}
+
+\end{DoxyCode}

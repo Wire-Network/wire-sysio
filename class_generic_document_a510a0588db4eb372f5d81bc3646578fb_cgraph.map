@@ -1,0 +1,5 @@
+<map id="GenericDocument::HasParseError" name="GenericDocument::HasParseError">
+<area shape="rect" id="Node000001" title="Whether a parse error has occurred in the last parsing." alt="" coords="5,5,198,46"/>
+<area shape="rect" id="Node000002" href="$struct_parse_result.html#adfe0ef5b994e82f8aa9ebf0b30c924b1" title="Whether the result is an error." alt="" coords="246,13,386,38"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="198,23,230,23,230,28,198,28"/>
+</map>

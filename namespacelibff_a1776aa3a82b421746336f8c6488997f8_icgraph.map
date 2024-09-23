@@ -1,0 +1,15 @@
+<map id="libff::edwards_final_exponentiation_first_chunk" name="libff::edwards_final_exponentiation_first_chunk">
+<area shape="rect" id="Node000001" title=" " alt="" coords="745,71,928,111"/>
+<area shape="rect" id="Node000002" href="$namespacelibff.html#a85284345b22dbc9f312fa9ff3422879c" title=" " alt="" coords="566,71,697,111"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="730,94,697,94,697,88,730,88"/>
+<area shape="rect" id="Node000003" href="$namespacelibff.html#a457b556111bdae0f9e425b6339b126ec" title=" " alt="" coords="388,5,512,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="558,67,508,49,510,44,560,62"/>
+<area shape="rect" id="Node000006" href="$namespacelibff.html#a5829ad3615475ac4408c731f7e98e99a" title=" " alt="" coords="386,71,514,111"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="551,94,514,94,514,88,551,88"/>
+<area shape="rect" id="Node000007" href="$classlibff_1_1edwards__pp.html#ac85feaa100b797417e0e55f62a75fe53" title=" " alt="" coords="382,136,518,177"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="560,120,510,138,508,133,558,115"/>
+<area shape="rect" id="Node000004" href="$namespacelibff.html#abc470ab32b6db3ec5b31fdccb691dcdd" title=" " alt="" coords="182,5,334,46"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="373,28,334,28,334,23,373,23"/>
+<area shape="rect" id="Node000005" href="$classlibff_1_1edwards__pp.html#a2fbbd269921f0854413b184720ff31bb" title=" " alt="" coords="5,5,134,46"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="166,28,134,28,134,23,166,23"/>
+</map>

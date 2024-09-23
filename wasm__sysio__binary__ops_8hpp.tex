@@ -1,0 +1,748 @@
+\doxysection{libraries/chain/include/sysio/chain/wasm\+\_\+sysio\+\_\+binary\+\_\+ops.hpp File Reference}
+\hypertarget{wasm__sysio__binary__ops_8hpp}{}\label{wasm__sysio__binary__ops_8hpp}\index{libraries/chain/include/sysio/chain/wasm\_sysio\_binary\_ops.hpp@{libraries/chain/include/sysio/chain/wasm\_sysio\_binary\_ops.hpp}}
+{\ttfamily \#include $<$boost/preprocessor/seq/for\+\_\+each.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/preprocessor/seq/subseq.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/preprocessor/seq/remove.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/preprocessor/seq/push\+\_\+back.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/reflect/reflect.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/exceptions.\+hpp$>$}\newline
+{\ttfamily \#include $<$cstdint$>$}\newline
+{\ttfamily \#include $<$functional$>$}\newline
+{\ttfamily \#include $<$iterator$>$}\newline
+{\ttfamily \#include $<$memory$>$}\newline
+{\ttfamily \#include $<$fc/exception/exception.\+hpp$>$}\newline
+{\ttfamily \#include $<$string$>$}\newline
+{\ttfamily \#include $<$unordered\+\_\+map$>$}\newline
+{\ttfamily \#include $<$utility$>$}\newline
+{\ttfamily \#include $<$vector$>$}\newline
+{\ttfamily \#include "{}IR/\+Operators.\+h"{}}\newline
+{\ttfamily \#include "{}IR/\+Module.\+h"{}}\newline
+Include dependency graph for wasm\+\_\+sysio\+\_\+binary\+\_\+ops.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{wasm__sysio__binary__ops_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{wasm__sysio__binary__ops_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classsysio_1_1chain_1_1wasm__ops_1_1instruction__stream}{sysio\+::chain\+::wasm\+\_\+ops\+::instruction\+\_\+stream}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1memarg}{sysio\+::chain\+::wasm\+\_\+ops\+::memarg}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1blocktype}{sysio\+::chain\+::wasm\+\_\+ops\+::blocktype}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1memoryoptype}{sysio\+::chain\+::wasm\+\_\+ops\+::memoryoptype}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1branchtabletype}{sysio\+::chain\+::wasm\+\_\+ops\+::branchtabletype}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1voidtype}{sysio\+::chain\+::wasm\+\_\+ops\+::voidtype}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1field__specific__params}{sysio\+::chain\+::wasm\+\_\+ops\+::field\+\_\+specific\+\_\+params$<$ Field $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1field__specific__params_3_01voidtype_01_4}{sysio\+::chain\+::wasm\+\_\+ops\+::field\+\_\+specific\+\_\+params$<$ voidtype $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1visitor__arg}{sysio\+::chain\+::wasm\+\_\+ops\+::visitor\+\_\+arg}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1instr}{sysio\+::chain\+::wasm\+\_\+ops\+::instr}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1propagate__should__kill}{sysio\+::chain\+::wasm\+\_\+ops\+::propagate\+\_\+should\+\_\+kill$<$ Mutator, Mutators $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1propagate__should__kill_3_01_mutator_01_4}{sysio\+::chain\+::wasm\+\_\+ops\+::propagate\+\_\+should\+\_\+kill$<$ Mutator $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1propagate__post__injection}{sysio\+::chain\+::wasm\+\_\+ops\+::propagate\+\_\+post\+\_\+injection$<$ Mutator, Mutators $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1propagate__post__injection_3_01_mutator_01_4}{sysio\+::chain\+::wasm\+\_\+ops\+::propagate\+\_\+post\+\_\+injection$<$ Mutator $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1instr__base}{sysio\+::chain\+::wasm\+\_\+ops\+::instr\+\_\+base$<$ Mutators $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1nop__mutator}{sysio\+::chain\+::wasm\+\_\+ops\+::nop\+\_\+mutator}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1op__types}{sysio\+::chain\+::wasm\+\_\+ops\+::op\+\_\+types$<$ Mutator, Mutators $>$}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1chain_1_1wasm__ops_1_1cached__ops}{sysio\+::chain\+::wasm\+\_\+ops\+::cached\+\_\+ops$<$ Op\+\_\+\+Types $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1_s_y_s_i_o___operator_decoder_stream}{sysio\+::chain\+::wasm\+\_\+ops\+::\+SYSIO\+\_\+\+Operator\+Decoder\+Stream$<$ Op\+\_\+\+Types $>$}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain}{sysio\+::chain}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops}{sysio\+::chain\+::wasm\+\_\+ops}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_a4ab4cd8e890185fe82c66686f0823517}{CONSTRUCT\+\_\+\+OP\+\_\+\+HAS\+\_\+\+DATA}}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},  DATA,  \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_a95c6de750b0756fab562e81ef6306c2b}{OP}})
+\item 
+\#define \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_ae23c9979dd845f756f3c8bf4a8de5667}{WASM\+\_\+\+OP\+\_\+\+SEQ}}
+\item 
+\#define \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_ae820e3849533a81b93b16ef88d9756e5}{GEN\+\_\+\+TYPE}}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},  \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}},  \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_a95c6de750b0756fab562e81ef6306c2b}{OP}})
+\item 
+\#define \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_a7cc4ee01d7f0663c000ef54733dc0921}{GEN\+\_\+\+FIELD}}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},  \mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}},  \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_a95c6de750b0756fab562e81ef6306c2b}{OP}})
+\item 
+\#define \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_a9936aac19603a83aab91c9272452de8b}{PUSH\+\_\+\+BACK\+\_\+\+OP}}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},  \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}},  \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_a95c6de750b0756fab562e81ef6306c2b}{OP}})
+\item 
+\#define \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_a4fa27900a0f1708699850c0c9f667990}{INIT\+\_\+\+FIELD}}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},  \mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}},  \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_a95c6de750b0756fab562e81ef6306c2b}{OP}})
+\item 
+\#define \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_a7cc4ee01d7f0663c000ef54733dc0921}{GEN\+\_\+\+FIELD}}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},  \mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}},  \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_a95c6de750b0756fab562e81ef6306c2b}{OP}})
+\item 
+\#define \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_a9936aac19603a83aab91c9272452de8b}{PUSH\+\_\+\+BACK\+\_\+\+OP}}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},  \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}},  \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_a95c6de750b0756fab562e81ef6306c2b}{OP}})
+\item 
+\#define \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_a69267315ea900d048f7ebee262796726}{VISIT\+\_\+\+OPCODE}}(opcode,  \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  name\+String,  Imm, ...)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_a1436295c595fe26a73aefd3a7b4e9e9c}{sysio\+::chain\+::wasm\+\_\+ops\+::wasm\+\_\+op\+\_\+ptr}} = std\+::unique\+\_\+ptr$<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1instr}{instr}}$>$
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_aa7f247f35f17c88dc3143b8911e4ba97}{sysio\+::chain\+::wasm\+\_\+ops\+::wasm\+\_\+instr\+\_\+ptr}} = std\+::shared\+\_\+ptr$<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1instr}{instr}}$>$
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_abe7e3562f55df0b428bd0d90068df044}{sysio\+::chain\+::wasm\+\_\+ops\+::wasm\+\_\+return\+\_\+t}} = std\+::vector$<$\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}}$>$
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_a53ce8c396c2a487dd385ee2f1e8d92a6}{sysio\+::chain\+::wasm\+\_\+ops\+::wasm\+\_\+instr\+\_\+callback}} = std\+::function$<$std\+::vector$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_aa7f247f35f17c88dc3143b8911e4ba97}{wasm\+\_\+instr\+\_\+ptr}}$>$(\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}})$>$
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ab8657b3b9a4219c34614779d99f49c3e}{sysio\+::chain\+::wasm\+\_\+ops\+::code\+\_\+vector}} = std\+::vector$<$\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}}$>$
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_a2a418b4d40d911cd84b610077b11eaa1}{sysio\+::chain\+::wasm\+\_\+ops\+::code\+\_\+iterator}} = std\+::vector$<$\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}}$>$\+::iterator
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_a96cf99afa853de1504778c4961bb52d0}{sysio\+::chain\+::wasm\+\_\+ops\+::wasm\+\_\+op\+\_\+generator}} = std\+::function$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_aa7f247f35f17c88dc3143b8911e4ba97}{wasm\+\_\+instr\+\_\+ptr}}(std\+::vector$<$\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}}$>$, size\+\_\+t)$>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2}{sysio\+::chain\+::wasm\+\_\+ops\+::code}} \{ \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a071d228aff16b63fd7f3e30ddda9e1bf}{sysio\+::chain\+::wasm\+\_\+ops\+::unreachable\+\_\+code}} = 0x00
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a46126d54bf18354a376d1f45ec22cff8}{sysio\+::chain\+::wasm\+\_\+ops\+::nop\+\_\+code}} = 0x01
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a79a5c791b154d5449ed1d794d39b7e3e}{sysio\+::chain\+::wasm\+\_\+ops\+::block\+\_\+code}} = 0x02
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2aa89cf2007b177c2395ff49dea276eb36}{sysio\+::chain\+::wasm\+\_\+ops\+::loop\+\_\+code}} = 0x03
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ab2e30595a520385941ab5aadc2d50dc4}{sysio\+::chain\+::wasm\+\_\+ops\+::if\+\_\+\+\_\+code}} = 0x04
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a4d1819bded2c1ea78b5ee4338736725b}{sysio\+::chain\+::wasm\+\_\+ops\+::else\+\_\+\+\_\+code}} = 0x05
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ad951b3ebb4c8884270ad419e2b9c537c}{sysio\+::chain\+::wasm\+\_\+ops\+::end\+\_\+code}} = 0x0B
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a26bc66faa3b391caa56d2d59bf2783ab}{sysio\+::chain\+::wasm\+\_\+ops\+::br\+\_\+code}} = 0x0C
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a02dcfa2b601aac00c9b72d8fc383924e}{sysio\+::chain\+::wasm\+\_\+ops\+::br\+\_\+if\+\_\+code}} = 0x0D
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ae4b61b619c4fb9aad32f37750b062b11}{sysio\+::chain\+::wasm\+\_\+ops\+::br\+\_\+table\+\_\+code}} = 0x0E
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a60f44a4a0719bc7b21cb9ed451427607}{sysio\+::chain\+::wasm\+\_\+ops\+::return\+\_\+\+\_\+code}} = 0x0F
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a729c704a241ddf908c5a812d6bba25c8}{sysio\+::chain\+::wasm\+\_\+ops\+::call\+\_\+code}} = 0x10
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a49063d39df6aa0191301bae3c32eec09}{sysio\+::chain\+::wasm\+\_\+ops\+::call\+\_\+indirect\+\_\+code}} = 0x11
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a183630ba1884ab24ec24b5e147c51292}{sysio\+::chain\+::wasm\+\_\+ops\+::drop\+\_\+code}} = 0x1A
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a8d95a5468aebf8fa8ef1b682d1a1a7d5}{sysio\+::chain\+::wasm\+\_\+ops\+::select\+\_\+code}} = 0x1B
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2af9f0982dc2a4bc851c05b7557386c34f}{sysio\+::chain\+::wasm\+\_\+ops\+::get\+\_\+local\+\_\+code}} = 0x20
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a47f00b17a850608111edf9c6ba86be7b}{sysio\+::chain\+::wasm\+\_\+ops\+::set\+\_\+local\+\_\+code}} = 0x21
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ad199847a72d6b27e39e184b33194fcab}{sysio\+::chain\+::wasm\+\_\+ops\+::tee\+\_\+local\+\_\+code}} = 0x22
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2afcc8d051885732102c176a7bebaf9639}{sysio\+::chain\+::wasm\+\_\+ops\+::get\+\_\+global\+\_\+code}} = 0x23
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a7e18dbf1d47329c2a5b048d063df2b73}{sysio\+::chain\+::wasm\+\_\+ops\+::set\+\_\+global\+\_\+code}} = 0x24
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a44466f63661203d39064d31320607930}{sysio\+::chain\+::wasm\+\_\+ops\+::i32\+\_\+load\+\_\+code}} = 0x28
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a0e449de2ab013ad291cf630c551ee4a9}{sysio\+::chain\+::wasm\+\_\+ops\+::i64\+\_\+load\+\_\+code}} = 0x29
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a05f1522823cc8e5d6fb8744e6bf22476}{sysio\+::chain\+::wasm\+\_\+ops\+::f32\+\_\+load\+\_\+code}} = 0x2A
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a3881ad337a2dacbe926feeba6754d4ea}{sysio\+::chain\+::wasm\+\_\+ops\+::f64\+\_\+load\+\_\+code}} = 0x2B
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2aff0b36eae151600d8e2351ef6520ec6d}{sysio\+::chain\+::wasm\+\_\+ops\+::i32\+\_\+load8\+\_\+s\+\_\+code}} = 0x2C
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2affc555f396dbf82f838aadce7e5e93ba}{sysio\+::chain\+::wasm\+\_\+ops\+::i32\+\_\+load8\+\_\+u\+\_\+code}} = 0x2D
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a94708e927e7c24f470668832fed7d6d2}{sysio\+::chain\+::wasm\+\_\+ops\+::i32\+\_\+load16\+\_\+s\+\_\+code}} = 0x2E
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2aac81945eef7662f29a580dfc2c8ee926}{sysio\+::chain\+::wasm\+\_\+ops\+::i32\+\_\+load16\+\_\+u\+\_\+code}} = 0x2F
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a3c0b8b925e6636457f5fb37e8ed17c45}{sysio\+::chain\+::wasm\+\_\+ops\+::i64\+\_\+load8\+\_\+s\+\_\+code}} = 0x30
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2adb8632c1d4339d0e662601465933360d}{sysio\+::chain\+::wasm\+\_\+ops\+::i64\+\_\+load8\+\_\+u\+\_\+code}} = 0x31
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a2dfc1cd62a5a6364150ea17ba5a2abdb}{sysio\+::chain\+::wasm\+\_\+ops\+::i64\+\_\+load16\+\_\+s\+\_\+code}} = 0x32
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2aed23ed81d3b5bb29a4133d2ea657b710}{sysio\+::chain\+::wasm\+\_\+ops\+::i64\+\_\+load16\+\_\+u\+\_\+code}} = 0x33
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a9db9c12562eb76a838796c91eacab302}{sysio\+::chain\+::wasm\+\_\+ops\+::i64\+\_\+load32\+\_\+s\+\_\+code}} = 0x34
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a70aa56c82e56be3ba83550258875fe89}{sysio\+::chain\+::wasm\+\_\+ops\+::i64\+\_\+load32\+\_\+u\+\_\+code}} = 0x35
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ab14648ad1d092239e2620c728f4bcf52}{sysio\+::chain\+::wasm\+\_\+ops\+::i32\+\_\+store\+\_\+code}} = 0x36
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2af8556f5a9a10ecf0951378fea5aa2f1b}{sysio\+::chain\+::wasm\+\_\+ops\+::i64\+\_\+store\+\_\+code}} = 0x37
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ac371768260f30afbae0e9e09705b8c2a}{sysio\+::chain\+::wasm\+\_\+ops\+::f32\+\_\+store\+\_\+code}} = 0x38
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2aa09fe02c14b12f9f87e3c91e4f33170f}{sysio\+::chain\+::wasm\+\_\+ops\+::f64\+\_\+store\+\_\+code}} = 0x39
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ac11581010336df1faca4a06a7ee62237}{sysio\+::chain\+::wasm\+\_\+ops\+::i32\+\_\+store8\+\_\+code}} = 0x3A
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a03f4af4f224d616769500f8df1dda84c}{sysio\+::chain\+::wasm\+\_\+ops\+::i32\+\_\+store16\+\_\+code}} = 0x3B
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2adb52f97a2d8b1599955039c4d535c866}{sysio\+::chain\+::wasm\+\_\+ops\+::i64\+\_\+store8\+\_\+code}} = 0x3C
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ab22f23947d9a7e416f46aa2b365a9713}{sysio\+::chain\+::wasm\+\_\+ops\+::i64\+\_\+store16\+\_\+code}} = 0x3D
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a14e0525bcd1ffb1cb3331b26650abbe7}{sysio\+::chain\+::wasm\+\_\+ops\+::i64\+\_\+store32\+\_\+code}} = 0x3E
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a6259812bd216db3f547629b84969227e}{sysio\+::chain\+::wasm\+\_\+ops\+::current\+\_\+memory\+\_\+code}} = 0x3F
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a116806e9ca1d1a72e53837673ded389f}{sysio\+::chain\+::wasm\+\_\+ops\+::grow\+\_\+memory\+\_\+code}} = 0x40
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2aa740ff071c0cbe9964c9e2c7cfe2948e}{sysio\+::chain\+::wasm\+\_\+ops\+::i32\+\_\+const\+\_\+code}} = 0x41
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2aefafd794dfda035cb7e4aba4d7f91fd1}{sysio\+::chain\+::wasm\+\_\+ops\+::i64\+\_\+const\+\_\+code}} = 0x42
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a538e501b591400be85692b86e2d3b9f1}{sysio\+::chain\+::wasm\+\_\+ops\+::f32\+\_\+const\+\_\+code}} = 0x43
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a9e12822abe6ef584a07bcc64cbac7734}{sysio\+::chain\+::wasm\+\_\+ops\+::f64\+\_\+const\+\_\+code}} = 0x44
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ab866eee67d09d554efb32ca1b22b29e2}{sysio\+::chain\+::wasm\+\_\+ops\+::i32\+\_\+eqz\+\_\+code}} = 0x45
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2aa66935638c6fa60e71cec1546244d60c}{sysio\+::chain\+::wasm\+\_\+ops\+::i32\+\_\+eq\+\_\+code}} = 0x46
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a6b6734c519fe00f942a82ad6fc499ee4}{sysio\+::chain\+::wasm\+\_\+ops\+::i32\+\_\+ne\+\_\+code}} = 0x47
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2acc22945c8a679f0ce4eb6295b105c8aa}{sysio\+::chain\+::wasm\+\_\+ops\+::i32\+\_\+lt\+\_\+s\+\_\+code}} = 0x48
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ab71ecf2c7d1e37dcc1417511581ff31e}{sysio\+::chain\+::wasm\+\_\+ops\+::i32\+\_\+lt\+\_\+u\+\_\+code}} = 0x49
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a0179245c04a84bfb3c354f862b5e73c8}{sysio\+::chain\+::wasm\+\_\+ops\+::i32\+\_\+gt\+\_\+s\+\_\+code}} = 0x4A
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a01e05b6bfee7470eba0f10c4c4b3b5eb}{sysio\+::chain\+::wasm\+\_\+ops\+::i32\+\_\+gt\+\_\+u\+\_\+code}} = 0x4B
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a6aedc8189fd35b20e84b4cda758cb61c}{sysio\+::chain\+::wasm\+\_\+ops\+::i32\+\_\+le\+\_\+s\+\_\+code}} = 0x4C
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a24e8626778c5e85f06b7f99ba6623ecf}{sysio\+::chain\+::wasm\+\_\+ops\+::i32\+\_\+le\+\_\+u\+\_\+code}} = 0x4D
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ac8f5aeead0b8e4e74a3795b52a7036a0}{sysio\+::chain\+::wasm\+\_\+ops\+::i32\+\_\+ge\+\_\+s\+\_\+code}} = 0x4E
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a40c39e7bfa657c2d7865a39e5e480efd}{sysio\+::chain\+::wasm\+\_\+ops\+::i32\+\_\+ge\+\_\+u\+\_\+code}} = 0x4F
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2abed8c1a91e42f04cca4a993e0e1262ca}{sysio\+::chain\+::wasm\+\_\+ops\+::i64\+\_\+eqz\+\_\+code}} = 0x50
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a3029e00d559980a1e20cd3091bb2d5f3}{sysio\+::chain\+::wasm\+\_\+ops\+::i64\+\_\+eq\+\_\+code}} = 0x51
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a979f31fe84588c80ef61fca6dc086048}{sysio\+::chain\+::wasm\+\_\+ops\+::i64\+\_\+ne\+\_\+code}} = 0x52
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a3976eba48178f778d100d057be5bb21b}{sysio\+::chain\+::wasm\+\_\+ops\+::i64\+\_\+lt\+\_\+s\+\_\+code}} = 0x53
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a4d661f907f8925da95a1a3a164ff3b8f}{sysio\+::chain\+::wasm\+\_\+ops\+::i64\+\_\+lt\+\_\+u\+\_\+code}} = 0x54
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ad9d9955f50776953d22a27fd986246fa}{sysio\+::chain\+::wasm\+\_\+ops\+::i64\+\_\+gt\+\_\+s\+\_\+code}} = 0x55
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a0f447be4cc0caab82d0092785660a4fd}{sysio\+::chain\+::wasm\+\_\+ops\+::i64\+\_\+gt\+\_\+u\+\_\+code}} = 0x56
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a01ea4ff91c6a89ffb80d25ba011bf125}{sysio\+::chain\+::wasm\+\_\+ops\+::i64\+\_\+le\+\_\+s\+\_\+code}} = 0x57
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a52b1e13a11a99e63120dd1da9e1bac0b}{sysio\+::chain\+::wasm\+\_\+ops\+::i64\+\_\+le\+\_\+u\+\_\+code}} = 0x58
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a47ee4b1f024b08343bbecf6a993415c4}{sysio\+::chain\+::wasm\+\_\+ops\+::i64\+\_\+ge\+\_\+s\+\_\+code}} = 0x59
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2acf720d7d73519be56489008ebd5fdce9}{sysio\+::chain\+::wasm\+\_\+ops\+::i64\+\_\+ge\+\_\+u\+\_\+code}} = 0x5A
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a1755202368e0ccf9321cd33617b1373a}{sysio\+::chain\+::wasm\+\_\+ops\+::f32\+\_\+eq\+\_\+code}} = 0x5B
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a57f63d14ccf1cb1e2d066b3fc6ab8aaa}{sysio\+::chain\+::wasm\+\_\+ops\+::f32\+\_\+ne\+\_\+code}} = 0x5C
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a7e169432cfca88910bc390640596d13a}{sysio\+::chain\+::wasm\+\_\+ops\+::f32\+\_\+lt\+\_\+code}} = 0x5D
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a48f2eeab19372d33d75a0f5791add447}{sysio\+::chain\+::wasm\+\_\+ops\+::f32\+\_\+gt\+\_\+code}} = 0x5E
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2aae9ccff65a2e5883a17005ff6e77b050}{sysio\+::chain\+::wasm\+\_\+ops\+::f32\+\_\+le\+\_\+code}} = 0x5F
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a6a03e1be5800fd54b1b002145ca6156c}{sysio\+::chain\+::wasm\+\_\+ops\+::f32\+\_\+ge\+\_\+code}} = 0x60
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2aa27d3025e48045f47c84e367ea400d1f}{sysio\+::chain\+::wasm\+\_\+ops\+::f64\+\_\+eq\+\_\+code}} = 0x61
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ab482bff312f7a1f0d238ea6595d91f79}{sysio\+::chain\+::wasm\+\_\+ops\+::f64\+\_\+ne\+\_\+code}} = 0x62
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ac043932cbb6c0bebddaebf843c7497ad}{sysio\+::chain\+::wasm\+\_\+ops\+::f64\+\_\+lt\+\_\+code}} = 0x63
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a7ed90365c9a80d360ae4db1497bac015}{sysio\+::chain\+::wasm\+\_\+ops\+::f64\+\_\+gt\+\_\+code}} = 0x64
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a85043e9ce5f70a3d4e40b2e4c16ec3f4}{sysio\+::chain\+::wasm\+\_\+ops\+::f64\+\_\+le\+\_\+code}} = 0x65
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a1bbeaffa9fa9073c52ec9e985f2192ac}{sysio\+::chain\+::wasm\+\_\+ops\+::f64\+\_\+ge\+\_\+code}} = 0x66
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ad3ea95519e30463851d5437333331db9}{sysio\+::chain\+::wasm\+\_\+ops\+::i32\+\_\+clz\+\_\+code}} = 0x67
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a503cdaa7893fd7bfb05f3140e8a963aa}{sysio\+::chain\+::wasm\+\_\+ops\+::i32\+\_\+ctz\+\_\+code}} = 0x68
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a54ac091d31d93a521bd72e77fd08e0ae}{sysio\+::chain\+::wasm\+\_\+ops\+::i32\+\_\+popcnt\+\_\+code}} = 0x69
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ab2d3750cc03f4ec805f40766b0be190f}{sysio\+::chain\+::wasm\+\_\+ops\+::i32\+\_\+add\+\_\+code}} = 0x6A
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a56cacad8fd9d71b39a95df94cb5f6cf4}{sysio\+::chain\+::wasm\+\_\+ops\+::i32\+\_\+sub\+\_\+code}} = 0x6B
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a2301ee7c8750bc669354c2d5b2e50b1c}{sysio\+::chain\+::wasm\+\_\+ops\+::i32\+\_\+mul\+\_\+code}} = 0x6C
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2acaf59499f8e12b098addb80bda3e60d6}{sysio\+::chain\+::wasm\+\_\+ops\+::i32\+\_\+div\+\_\+s\+\_\+code}} = 0x6D
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a7645365b904f523b752de77bbb35679e}{sysio\+::chain\+::wasm\+\_\+ops\+::i32\+\_\+div\+\_\+u\+\_\+code}} = 0x6E
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ac74529a866a987c6b2f3e4aa73e84198}{sysio\+::chain\+::wasm\+\_\+ops\+::i32\+\_\+rem\+\_\+s\+\_\+code}} = 0x6F
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2aa9e86ca6fcaf47267a214a8b1710d843}{sysio\+::chain\+::wasm\+\_\+ops\+::i32\+\_\+rem\+\_\+u\+\_\+code}} = 0x70
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ae5408c3b35029571375bc910c135a7f2}{sysio\+::chain\+::wasm\+\_\+ops\+::i32\+\_\+and\+\_\+code}} = 0x71
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2af666751022515f62526e533af6916153}{sysio\+::chain\+::wasm\+\_\+ops\+::i32\+\_\+or\+\_\+code}} = 0x72
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2adb398e46235a929610c1b9274d5a5cd1}{sysio\+::chain\+::wasm\+\_\+ops\+::i32\+\_\+xor\+\_\+code}} = 0x73
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a15f54355936150911ae22eac3393fbc9}{sysio\+::chain\+::wasm\+\_\+ops\+::i32\+\_\+shl\+\_\+code}} = 0x74
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a85bea5c5725021ec4ebd7adc1e7cd371}{sysio\+::chain\+::wasm\+\_\+ops\+::i32\+\_\+shr\+\_\+s\+\_\+code}} = 0x75
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2afad6f680969dfa9866360970d9a3c271}{sysio\+::chain\+::wasm\+\_\+ops\+::i32\+\_\+shr\+\_\+u\+\_\+code}} = 0x76
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ade9eeb439f205127da3a4ba6e4c0f06a}{sysio\+::chain\+::wasm\+\_\+ops\+::i32\+\_\+rotl\+\_\+code}} = 0x77
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2aaf8bdac6f7854876d302c5e1b686be2d}{sysio\+::chain\+::wasm\+\_\+ops\+::i32\+\_\+rotr\+\_\+code}} = 0x78
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ad838f27b7d44903fce89c9e3f9e3365b}{sysio\+::chain\+::wasm\+\_\+ops\+::i64\+\_\+clz\+\_\+code}} = 0x79
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a96c0d5f7740a2869b4a8a5a5ed4fc8d0}{sysio\+::chain\+::wasm\+\_\+ops\+::i64\+\_\+ctz\+\_\+code}} = 0x7A
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2aeca455f6dcb726c9023c1d9f2f9b7946}{sysio\+::chain\+::wasm\+\_\+ops\+::i64\+\_\+popcnt\+\_\+code}} = 0x7B
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a1007283139c4ab7975cf56b2e1084e71}{sysio\+::chain\+::wasm\+\_\+ops\+::i64\+\_\+add\+\_\+code}} = 0x7C
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a9b92937504940b52dcfaeb084d5fd79a}{sysio\+::chain\+::wasm\+\_\+ops\+::i64\+\_\+sub\+\_\+code}} = 0x7D
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a9cae0b82ce1d6ff3f5fb2f006928c9d7}{sysio\+::chain\+::wasm\+\_\+ops\+::i64\+\_\+mul\+\_\+code}} = 0x7E
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a68756cb8b31b9bb6116a52e6f96afc6d}{sysio\+::chain\+::wasm\+\_\+ops\+::i64\+\_\+div\+\_\+s\+\_\+code}} = 0x7F
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a75e0499f9e5fbe2449441687ee00fbf1}{sysio\+::chain\+::wasm\+\_\+ops\+::i64\+\_\+div\+\_\+u\+\_\+code}} = 0x80
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ad181542ef7637c21f44b9672c6a75ea2}{sysio\+::chain\+::wasm\+\_\+ops\+::i64\+\_\+rem\+\_\+s\+\_\+code}} = 0x81
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2afd3615ffa39163ded618f307b218b324}{sysio\+::chain\+::wasm\+\_\+ops\+::i64\+\_\+rem\+\_\+u\+\_\+code}} = 0x82
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a056cd203ac4c5c6d78854b5e1311dbda}{sysio\+::chain\+::wasm\+\_\+ops\+::i64\+\_\+and\+\_\+code}} = 0x83
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2afb73d0edd080ae2232c3a7ece3af6a3f}{sysio\+::chain\+::wasm\+\_\+ops\+::i64\+\_\+or\+\_\+code}} = 0x84
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ad3a300e968e734e8f639488886a9933e}{sysio\+::chain\+::wasm\+\_\+ops\+::i64\+\_\+xor\+\_\+code}} = 0x85
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a09ab6c20da1f76fb31cda613d97ce459}{sysio\+::chain\+::wasm\+\_\+ops\+::i64\+\_\+shl\+\_\+code}} = 0x86
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a7f3112b3a59b1703950559a32c9cac0f}{sysio\+::chain\+::wasm\+\_\+ops\+::i64\+\_\+shr\+\_\+s\+\_\+code}} = 0x87
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a16e09c54ef8fde08e51f41015be850e6}{sysio\+::chain\+::wasm\+\_\+ops\+::i64\+\_\+shr\+\_\+u\+\_\+code}} = 0x88
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a6ee9ec75a8ecac9a94c17c252e19433a}{sysio\+::chain\+::wasm\+\_\+ops\+::i64\+\_\+rotl\+\_\+code}} = 0x89
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a8589577ec16757a971f0cc692be5a1d3}{sysio\+::chain\+::wasm\+\_\+ops\+::i64\+\_\+rotr\+\_\+code}} = 0x8A
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a2c7ab35c301ffce31e84dca081ca2e98}{sysio\+::chain\+::wasm\+\_\+ops\+::f32\+\_\+abs\+\_\+code}} = 0x8B
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a58043ab2fd65198211758e65f69c8900}{sysio\+::chain\+::wasm\+\_\+ops\+::f32\+\_\+neg\+\_\+code}} = 0x8C
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a6814632b862e6f42c8751da2671a23a4}{sysio\+::chain\+::wasm\+\_\+ops\+::f32\+\_\+ceil\+\_\+code}} = 0x8D
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a57010399e615d37ed8e2de58f724493f}{sysio\+::chain\+::wasm\+\_\+ops\+::f32\+\_\+floor\+\_\+code}} = 0x8E
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a480c2ea082dce458745a8625f9d07f39}{sysio\+::chain\+::wasm\+\_\+ops\+::f32\+\_\+trunc\+\_\+code}} = 0x8F
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a81cb2b46381952bfe0d2d1b76558c84b}{sysio\+::chain\+::wasm\+\_\+ops\+::f32\+\_\+nearest\+\_\+code}} = 0x90
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a85da4ccc298e31bd99fbc9e09d6e5fcc}{sysio\+::chain\+::wasm\+\_\+ops\+::f32\+\_\+sqrt\+\_\+code}} = 0x91
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a36d8a57b6e32409bfb66f27abae59fd0}{sysio\+::chain\+::wasm\+\_\+ops\+::f32\+\_\+add\+\_\+code}} = 0x92
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a7db243b76e442bfdd691b0cdc9fb84db}{sysio\+::chain\+::wasm\+\_\+ops\+::f32\+\_\+sub\+\_\+code}} = 0x93
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a346ce7f6ac871213bd5fed7c94dba6d3}{sysio\+::chain\+::wasm\+\_\+ops\+::f32\+\_\+mul\+\_\+code}} = 0x94
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a145f15f0f36eedcc258ba228cbd96223}{sysio\+::chain\+::wasm\+\_\+ops\+::f32\+\_\+div\+\_\+code}} = 0x95
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2af32f4e12e4d4325fefc3fb8f4e41b924}{sysio\+::chain\+::wasm\+\_\+ops\+::f32\+\_\+min\+\_\+code}} = 0x96
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2afd075e9dd5333303329b10d4a3fc4ad8}{sysio\+::chain\+::wasm\+\_\+ops\+::f32\+\_\+max\+\_\+code}} = 0x97
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2aa54b9b7cfb141e39dfd1f92627d2f303}{sysio\+::chain\+::wasm\+\_\+ops\+::f32\+\_\+copysign\+\_\+code}} = 0x98
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a17ad1701f5470ca4b67efca4dccdcc99}{sysio\+::chain\+::wasm\+\_\+ops\+::f64\+\_\+abs\+\_\+code}} = 0x99
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2afc6003b06a46d398e624f92cb6c531f0}{sysio\+::chain\+::wasm\+\_\+ops\+::f64\+\_\+neg\+\_\+code}} = 0x9A
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a5db143e4c2992501305fe7047d666908}{sysio\+::chain\+::wasm\+\_\+ops\+::f64\+\_\+ceil\+\_\+code}} = 0x9B
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a00e0d3e5805624370dab6c4e06fa2e87}{sysio\+::chain\+::wasm\+\_\+ops\+::f64\+\_\+floor\+\_\+code}} = 0x9C
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2aabf90e63f13f55f23374b5a6c7ee7a85}{sysio\+::chain\+::wasm\+\_\+ops\+::f64\+\_\+trunc\+\_\+code}} = 0x9D
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a9c9d6cc68686641f7867578528f709fd}{sysio\+::chain\+::wasm\+\_\+ops\+::f64\+\_\+nearest\+\_\+code}} = 0x9E
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ae09ca188b551a0d5b07ab0786e4b59b9}{sysio\+::chain\+::wasm\+\_\+ops\+::f64\+\_\+sqrt\+\_\+code}} = 0x9F
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ac90fb4ee2864982176f75fcbd2065af6}{sysio\+::chain\+::wasm\+\_\+ops\+::f64\+\_\+add\+\_\+code}} = 0x\+A0
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a2175aeb1a7dcd62d78e59c4568024b8c}{sysio\+::chain\+::wasm\+\_\+ops\+::f64\+\_\+sub\+\_\+code}} = 0x\+A1
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a015dac69744823da739e2ae325f2f18e}{sysio\+::chain\+::wasm\+\_\+ops\+::f64\+\_\+mul\+\_\+code}} = 0x\+A2
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ae3a86c7e76e2711cccedbf59d0869041}{sysio\+::chain\+::wasm\+\_\+ops\+::f64\+\_\+div\+\_\+code}} = 0x\+A3
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2abddd4861de225cfa70a3a483a2ff217e}{sysio\+::chain\+::wasm\+\_\+ops\+::f64\+\_\+min\+\_\+code}} = 0x\+A4
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a7adbe48197d0721ebc1e20bedfd24ed8}{sysio\+::chain\+::wasm\+\_\+ops\+::f64\+\_\+max\+\_\+code}} = 0x\+A5
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ada89fecbc938ab79cdf8b5cc277915eb}{sysio\+::chain\+::wasm\+\_\+ops\+::f64\+\_\+copysign\+\_\+code}} = 0x\+A6
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a631a0ce6cf07f964ad8b649e69e4642d}{sysio\+::chain\+::wasm\+\_\+ops\+::i32\+\_\+wrap\+\_\+i64\+\_\+code}} = 0x\+A7
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2aba26bc6e3960c56289fb96fc73792338}{sysio\+::chain\+::wasm\+\_\+ops\+::i32\+\_\+trunc\+\_\+s\+\_\+f32\+\_\+code}} = 0x\+A8
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ae10d1e8d76f4259c753e43f43848e6af}{sysio\+::chain\+::wasm\+\_\+ops\+::i32\+\_\+trunc\+\_\+u\+\_\+f32\+\_\+code}} = 0x\+A9
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a85948ac850d8543f4905a37c157d7bce}{sysio\+::chain\+::wasm\+\_\+ops\+::i32\+\_\+trunc\+\_\+s\+\_\+f64\+\_\+code}} = 0x\+AA
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a2898dba6ca29d65f88998c84ad48a6a3}{sysio\+::chain\+::wasm\+\_\+ops\+::i32\+\_\+trunc\+\_\+u\+\_\+f64\+\_\+code}} = 0x\+AB
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ac52b4806a1217ac878e6ca7153266633}{sysio\+::chain\+::wasm\+\_\+ops\+::i64\+\_\+extend\+\_\+s\+\_\+i32\+\_\+code}} = 0x\+AC
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ab7a2f834f2da70a5eeb5e7f13fd0b1bb}{sysio\+::chain\+::wasm\+\_\+ops\+::i64\+\_\+extend\+\_\+u\+\_\+i32\+\_\+code}} = 0x\+AD
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ad58616186657ec8202889ca0a1a92831}{sysio\+::chain\+::wasm\+\_\+ops\+::i64\+\_\+trunc\+\_\+s\+\_\+f32\+\_\+code}} = 0x\+AE
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a873422f377066ad8aa806262ce0e7710}{sysio\+::chain\+::wasm\+\_\+ops\+::i64\+\_\+trunc\+\_\+u\+\_\+f32\+\_\+code}} = 0x\+AF
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a911864e636a6dadbb852ff8ab6f86ccd}{sysio\+::chain\+::wasm\+\_\+ops\+::i64\+\_\+trunc\+\_\+s\+\_\+f64\+\_\+code}} = 0x\+B0
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a913ea6ed0f4325e7a2c6422a0e5773b9}{sysio\+::chain\+::wasm\+\_\+ops\+::i64\+\_\+trunc\+\_\+u\+\_\+f64\+\_\+code}} = 0x\+B1
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ad96b8a40656d543fd7987729aad89c0a}{sysio\+::chain\+::wasm\+\_\+ops\+::f32\+\_\+convert\+\_\+s\+\_\+i32\+\_\+code}} = 0x\+B2
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ac9b50b6940b6948c8b1412ba6f018d46}{sysio\+::chain\+::wasm\+\_\+ops\+::f32\+\_\+convert\+\_\+u\+\_\+i32\+\_\+code}} = 0x\+B3
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ac175b84f2f10b7ff4bc8a3360b383c21}{sysio\+::chain\+::wasm\+\_\+ops\+::f32\+\_\+convert\+\_\+s\+\_\+i64\+\_\+code}} = 0x\+B4
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a3739e53d655412234cb77b79904ec158}{sysio\+::chain\+::wasm\+\_\+ops\+::f32\+\_\+convert\+\_\+u\+\_\+i64\+\_\+code}} = 0x\+B5
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2aedb486e1197238bddaa48ec9d56418f4}{sysio\+::chain\+::wasm\+\_\+ops\+::f32\+\_\+demote\+\_\+f64\+\_\+code}} = 0x\+B6
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a7bb00604a28e8e8010cece3cd5886adc}{sysio\+::chain\+::wasm\+\_\+ops\+::f64\+\_\+convert\+\_\+s\+\_\+i32\+\_\+code}} = 0x\+B7
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a373a2f3bb01b4b1ac6ca907c85a81971}{sysio\+::chain\+::wasm\+\_\+ops\+::f64\+\_\+convert\+\_\+u\+\_\+i32\+\_\+code}} = 0x\+B8
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a84423fc735bd22561d9ed03608364c3e}{sysio\+::chain\+::wasm\+\_\+ops\+::f64\+\_\+convert\+\_\+s\+\_\+i64\+\_\+code}} = 0x\+B9
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ae9b8e51ba6388f7437d56844b01c8811}{sysio\+::chain\+::wasm\+\_\+ops\+::f64\+\_\+convert\+\_\+u\+\_\+i64\+\_\+code}} = 0x\+BA
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a8bf45ec067d3f4b90a0ac643b24a7958}{sysio\+::chain\+::wasm\+\_\+ops\+::f64\+\_\+promote\+\_\+f32\+\_\+code}} = 0x\+BB
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ae87f596d0808fcb0900ed3e5f22801f8}{sysio\+::chain\+::wasm\+\_\+ops\+::i32\+\_\+reinterpret\+\_\+f32\+\_\+code}} = 0x\+BC
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ae7cc8965a178a896b3872d92644e727b}{sysio\+::chain\+::wasm\+\_\+ops\+::i64\+\_\+reinterpret\+\_\+f64\+\_\+code}} = 0x\+BD
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a19c794a93204272a7f97c4c0d8c1441e}{sysio\+::chain\+::wasm\+\_\+ops\+::f32\+\_\+reinterpret\+\_\+i32\+\_\+code}} = 0x\+BE
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a144fc5d9be23407a53dabaf8e323e083}{sysio\+::chain\+::wasm\+\_\+ops\+::f64\+\_\+reinterpret\+\_\+i64\+\_\+code}} = 0x\+BF
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a32f45f33f05025fc1152626c838896e8}{sysio\+::chain\+::wasm\+\_\+ops\+::error\+\_\+code}} = 0x\+FF
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+std\+::string \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_a7f5043d86d9d203459eb0c8e4071e9d8}{sysio\+::chain\+::wasm\+\_\+ops\+::to\+\_\+string}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{hello__driver_8cpp_a0b6f424d9a532680c6b2ca5c119c938b}{field}})
+\item 
+std\+::string \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_a3655843e5c29f71e2672732f50505da4}{sysio\+::chain\+::wasm\+\_\+ops\+::to\+\_\+string}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{hello__driver_8cpp_a0b6f424d9a532680c6b2ca5c119c938b}{field}})
+\item 
+std\+::string \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_a673fe0122b0c814d5f0b67c7cad2a6a5}{sysio\+::chain\+::wasm\+\_\+ops\+::to\+\_\+string}} (\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1blocktype}{blocktype}} \mbox{\hyperlink{hello__driver_8cpp_a0b6f424d9a532680c6b2ca5c119c938b}{field}})
+\item 
+std\+::string \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_adb975509e5dd2e74b71684ee7a8d599f}{sysio\+::chain\+::wasm\+\_\+ops\+::to\+\_\+string}} (\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1memoryoptype}{memoryoptype}} \mbox{\hyperlink{hello__driver_8cpp_a0b6f424d9a532680c6b2ca5c119c938b}{field}})
+\item 
+std\+::string \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_a941fecf1c7caa6628f4d3518cffda917}{sysio\+::chain\+::wasm\+\_\+ops\+::to\+\_\+string}} (\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1memarg}{memarg}} \mbox{\hyperlink{hello__driver_8cpp_a0b6f424d9a532680c6b2ca5c119c938b}{field}})
+\item 
+std\+::string \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_a00edca1135edaafa6401ad137f7e5efe}{sysio\+::chain\+::wasm\+\_\+ops\+::to\+\_\+string}} (\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1branchtabletype}{branchtabletype}} \mbox{\hyperlink{hello__driver_8cpp_a0b6f424d9a532680c6b2ca5c119c938b}{field}})
+\item 
+void \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_a2037777efc75e528d703850afeff8cd4}{sysio\+::chain\+::wasm\+\_\+ops\+::pack}} (\mbox{\hyperlink{classsysio_1_1chain_1_1wasm__ops_1_1instruction__stream}{instruction\+\_\+stream}} \texorpdfstring{$\ast$}{*}stream, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{hello__driver_8cpp_a0b6f424d9a532680c6b2ca5c119c938b}{field}})
+\item 
+void \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ab2931878b2ea8d60f80af4a687458900}{sysio\+::chain\+::wasm\+\_\+ops\+::pack}} (\mbox{\hyperlink{classsysio_1_1chain_1_1wasm__ops_1_1instruction__stream}{instruction\+\_\+stream}} \texorpdfstring{$\ast$}{*}stream, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{hello__driver_8cpp_a0b6f424d9a532680c6b2ca5c119c938b}{field}})
+\item 
+void \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_a0c7787e43ad3ea5a80d3300352e2741e}{sysio\+::chain\+::wasm\+\_\+ops\+::pack}} (\mbox{\hyperlink{classsysio_1_1chain_1_1wasm__ops_1_1instruction__stream}{instruction\+\_\+stream}} \texorpdfstring{$\ast$}{*}stream, \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1blocktype}{blocktype}} \mbox{\hyperlink{hello__driver_8cpp_a0b6f424d9a532680c6b2ca5c119c938b}{field}})
+\item 
+void \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_a992ec822d84da5a36344d2c6b8d2b82e}{sysio\+::chain\+::wasm\+\_\+ops\+::pack}} (\mbox{\hyperlink{classsysio_1_1chain_1_1wasm__ops_1_1instruction__stream}{instruction\+\_\+stream}} \texorpdfstring{$\ast$}{*}stream, \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1memoryoptype}{memoryoptype}} \mbox{\hyperlink{hello__driver_8cpp_a0b6f424d9a532680c6b2ca5c119c938b}{field}})
+\item 
+void \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_a5c8f98b49d5f3a56fa0c9bd9fceccea6}{sysio\+::chain\+::wasm\+\_\+ops\+::pack}} (\mbox{\hyperlink{classsysio_1_1chain_1_1wasm__ops_1_1instruction__stream}{instruction\+\_\+stream}} \texorpdfstring{$\ast$}{*}stream, \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1memarg}{memarg}} \mbox{\hyperlink{hello__driver_8cpp_a0b6f424d9a532680c6b2ca5c119c938b}{field}})
+\item 
+void \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_a5af3bfde55fb89424fc9bb68b4e62364}{sysio\+::chain\+::wasm\+\_\+ops\+::pack}} (\mbox{\hyperlink{classsysio_1_1chain_1_1wasm__ops_1_1instruction__stream}{instruction\+\_\+stream}} \texorpdfstring{$\ast$}{*}stream, \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1branchtabletype}{branchtabletype}} \mbox{\hyperlink{hello__driver_8cpp_a0b6f424d9a532680c6b2ca5c119c938b}{field}})
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} Op\+\_\+\+Types $>$ }\\std\+::vector$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1instr}{instr}} \texorpdfstring{$\ast$}{*} $>$ \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_a87e969499bb1a62a6736432576a5853f}{sysio\+::chain\+::wasm\+\_\+ops\+::get\+\_\+cached\+\_\+ops\+\_\+vec}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{wasm__sysio__binary__ops_8hpp_a4ab4cd8e890185fe82c66686f0823517}\index{wasm\_sysio\_binary\_ops.hpp@{wasm\_sysio\_binary\_ops.hpp}!CONSTRUCT\_OP\_HAS\_DATA@{CONSTRUCT\_OP\_HAS\_DATA}}
+\index{CONSTRUCT\_OP\_HAS\_DATA@{CONSTRUCT\_OP\_HAS\_DATA}!wasm\_sysio\_binary\_ops.hpp@{wasm\_sysio\_binary\_ops.hpp}}
+\doxysubsubsection{\texorpdfstring{CONSTRUCT\_OP\_HAS\_DATA}{CONSTRUCT\_OP\_HAS\_DATA}}
+{\footnotesize\ttfamily \label{wasm__sysio__binary__ops_8hpp_a4ab4cd8e890185fe82c66686f0823517} 
+\#define CONSTRUCT\+\_\+\+OP\+\_\+\+HAS\+\_\+\+DATA(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}}{, }\item[{}]{DATA}{, }\item[{}]{\mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_a95c6de750b0756fab562e81ef6306c2b}{OP}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ ...\ Mutators>\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\textcolor{keyword}{struct\ }\mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_a95c6de750b0756fab562e81ef6306c2b}{OP}}\ final\ :\ instr\_base<Mutators...>\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ code\ =\ BOOST\_PP\_CAT(\mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_a95c6de750b0756fab562e81ef6306c2b}{OP}},\_code);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ DATA\ \mbox{\hyperlink{hello__driver_8cpp_a0b6f424d9a532680c6b2ca5c119c938b}{field}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ get\_code()\textcolor{keyword}{\ override\ }\{\ \textcolor{keywordflow}{return}\ BOOST\_PP\_CAT(\mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_a95c6de750b0756fab562e81ef6306c2b}{OP}},\_code);\ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \textcolor{keywordtype}{int}\ skip\_ahead()\textcolor{keyword}{\ override\ }\{\ \textcolor{keywordflow}{return}\ field\_specific\_params<DATA>::skip\_ahead;\ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefc_1_1raw_a0b442d98ceb22dd5a6ae84745e43ffab}{unpack}}(\ \textcolor{keywordtype}{char}*\ opcode\ )\textcolor{keyword}{\ override\ }\{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ field\_specific\_params<DATA>::unpack(\ opcode,\ \mbox{\hyperlink{hello__driver_8cpp_a0b6f424d9a532680c6b2ca5c119c938b}{field}}\ );\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_a2037777efc75e528d703850afeff8cd4}{pack}}(instruction\_stream*\ stream)\textcolor{keyword}{\ override\ }\{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ stream-\/>set(2,\ (\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*)\&code);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ field\_specific\_params<DATA>::pack(\ stream,\ \mbox{\hyperlink{hello__driver_8cpp_a0b6f424d9a532680c6b2ca5c119c938b}{field}}\ );\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ std::string\ to\_string()\textcolor{keyword}{\ override\ }\{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::string(BOOST\_PP\_STRINGIZE(\mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_a95c6de750b0756fab562e81ef6306c2b}{OP}}))+field\_specific\_params<DATA>::to\_string(\ \mbox{\hyperlink{hello__driver_8cpp_a0b6f424d9a532680c6b2ca5c119c938b}{field}}\ );\ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\};}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_source_l00151}{151}} of file \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_source}{wasm\+\_\+sysio\+\_\+binary\+\_\+ops.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00151\ \textcolor{preprocessor}{\#define\ CONSTRUCT\_OP\_HAS\_DATA(\ r,\ DATA,\ OP\ )\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00152\ \textcolor{preprocessor}{template\ <typename\ ...\ Mutators>\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00153\ \textcolor{preprocessor}{struct\ OP\ final\ :\ instr\_base<Mutators...>\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00154\ \textcolor{preprocessor}{\ \ \ uint16\_t\ code\ =\ BOOST\_PP\_CAT(OP,\_code);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00155\ \textcolor{preprocessor}{\ \ \ DATA\ field;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00156\ \textcolor{preprocessor}{\ \ \ uint16\_t\ get\_code()\ override\ \{\ return\ BOOST\_PP\_CAT(OP,\_code);\ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00157\ \textcolor{preprocessor}{\ \ \ int\ skip\_ahead()\ override\ \{\ return\ field\_specific\_params<DATA>::skip\_ahead;\ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00158\ \textcolor{preprocessor}{\ \ \ void\ unpack(\ char*\ opcode\ )\ override\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00159\ \textcolor{preprocessor}{\ \ \ \ \ \ field\_specific\_params<DATA>::unpack(\ opcode,\ field\ );\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00160\ \textcolor{preprocessor}{\ \ \ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00161\ \textcolor{preprocessor}{\ \ \ void\ pack(instruction\_stream*\ stream)\ override\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00162\ \textcolor{preprocessor}{\ \ \ \ \ \ stream-\/>set(2,\ (const\ char*)\&code);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00163\ \textcolor{preprocessor}{\ \ \ \ \ \ field\_specific\_params<DATA>::pack(\ stream,\ field\ );\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00164\ \textcolor{preprocessor}{\ \ \ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00165\ \textcolor{preprocessor}{\ \ \ std::string\ to\_string()\ override\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00166\ \textcolor{preprocessor}{\ \ \ \ \ \ return\ std::string(BOOST\_PP\_STRINGIZE(OP))+field\_specific\_params<DATA>::to\_string(\ field\ );\ \ \ \(\backslash\)}}
+\DoxyCodeLine{00167\ \textcolor{preprocessor}{\ \ \ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00168\ \textcolor{preprocessor}{\};}}
+
+\end{DoxyCode}
+\Hypertarget{wasm__sysio__binary__ops_8hpp_a7cc4ee01d7f0663c000ef54733dc0921}\index{wasm\_sysio\_binary\_ops.hpp@{wasm\_sysio\_binary\_ops.hpp}!GEN\_FIELD@{GEN\_FIELD}}
+\index{GEN\_FIELD@{GEN\_FIELD}!wasm\_sysio\_binary\_ops.hpp@{wasm\_sysio\_binary\_ops.hpp}}
+\doxysubsubsection{\texorpdfstring{GEN\_FIELD}{GEN\_FIELD}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{wasm__sysio__binary__ops_8hpp_a7cc4ee01d7f0663c000ef54733dc0921} 
+\#define GEN\+\_\+\+FIELD(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}}{, }\item[{}]{\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}}}{, }\item[{}]{\mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_a95c6de750b0756fab562e81ef6306c2b}{OP}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \textcolor{keyword}{static}\ std::unique\_ptr<\textcolor{keyword}{typename}\ Op\_Types::BOOST\_PP\_CAT(\mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_a95c6de750b0756fab562e81ef6306c2b}{OP}},\_t)>\ BOOST\_PP\_CAT(\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}},\ \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_a95c6de750b0756fab562e81ef6306c2b}{OP}});}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_source_l00603}{603}} of file \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_source}{wasm\+\_\+sysio\+\_\+binary\+\_\+ops.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00603\ \textcolor{preprocessor}{\#define\ GEN\_FIELD(\ r,\ P,\ OP\ )\ \(\backslash\)}}
+\DoxyCodeLine{00604\ \textcolor{preprocessor}{\ \ \ static\ std::unique\_ptr<typename\ Op\_Types::BOOST\_PP\_CAT(OP,\_t)>\ BOOST\_PP\_CAT(P,\ OP);}}
+
+\end{DoxyCode}
+\Hypertarget{wasm__sysio__binary__ops_8hpp_a7cc4ee01d7f0663c000ef54733dc0921}\index{wasm\_sysio\_binary\_ops.hpp@{wasm\_sysio\_binary\_ops.hpp}!GEN\_FIELD@{GEN\_FIELD}}
+\index{GEN\_FIELD@{GEN\_FIELD}!wasm\_sysio\_binary\_ops.hpp@{wasm\_sysio\_binary\_ops.hpp}}
+\doxysubsubsection{\texorpdfstring{GEN\_FIELD}{GEN\_FIELD}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{wasm__sysio__binary__ops_8hpp_a7cc4ee01d7f0663c000ef54733dc0921} 
+\#define GEN\+\_\+\+FIELD(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}}{, }\item[{}]{\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}}}{, }\item[{}]{\mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_a95c6de750b0756fab562e81ef6306c2b}{OP}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \textcolor{keyword}{static}\ std::unique\_ptr<\textcolor{keyword}{typename}\ Op\_Types::BOOST\_PP\_CAT(\mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_a95c6de750b0756fab562e81ef6306c2b}{OP}},\_t)>\ BOOST\_PP\_CAT(\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}},\ \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_a95c6de750b0756fab562e81ef6306c2b}{OP}})\ =\ std::make\_unique<typename\ Op\_Types::BOOST\_PP\_CAT(OP,\_t)>();}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_source_l00603}{603}} of file \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_source}{wasm\+\_\+sysio\+\_\+binary\+\_\+ops.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00603\ \textcolor{preprocessor}{\#define\ GEN\_FIELD(\ r,\ P,\ OP\ )\ \(\backslash\)}}
+\DoxyCodeLine{00604\ \textcolor{preprocessor}{\ \ \ static\ std::unique\_ptr<typename\ Op\_Types::BOOST\_PP\_CAT(OP,\_t)>\ BOOST\_PP\_CAT(P,\ OP);}}
+
+\end{DoxyCode}
+\Hypertarget{wasm__sysio__binary__ops_8hpp_ae820e3849533a81b93b16ef88d9756e5}\index{wasm\_sysio\_binary\_ops.hpp@{wasm\_sysio\_binary\_ops.hpp}!GEN\_TYPE@{GEN\_TYPE}}
+\index{GEN\_TYPE@{GEN\_TYPE}!wasm\_sysio\_binary\_ops.hpp@{wasm\_sysio\_binary\_ops.hpp}}
+\doxysubsubsection{\texorpdfstring{GEN\_TYPE}{GEN\_TYPE}}
+{\footnotesize\ttfamily \label{wasm__sysio__binary__ops_8hpp_ae820e3849533a81b93b16ef88d9756e5} 
+\#define GEN\+\_\+\+TYPE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}}{, }\item[{}]{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}}{, }\item[{}]{\mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_a95c6de750b0756fab562e81ef6306c2b}{OP}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \textcolor{keyword}{using\ }BOOST\_PP\_CAT(\ \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_a95c6de750b0756fab562e81ef6306c2b}{OP}},\ \_t\ )\ =\ \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_a95c6de750b0756fab562e81ef6306c2b}{OP}}\ <\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ ,\ BOOST\_PP\_CAT(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})\ ...>;}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_source_l00591}{591}} of file \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_source}{wasm\+\_\+sysio\+\_\+binary\+\_\+ops.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00591\ \textcolor{preprocessor}{\#define\ GEN\_TYPE(\ r,\ T,\ OP\ )\ \(\backslash\)}}
+\DoxyCodeLine{00592\ \textcolor{preprocessor}{\ \ \ using\ BOOST\_PP\_CAT(\ OP,\ \_t\ )\ =\ OP\ <\ T\ ,\ BOOST\_PP\_CAT(T,\ s)\ ...>;}}
+
+\end{DoxyCode}
+\Hypertarget{wasm__sysio__binary__ops_8hpp_a4fa27900a0f1708699850c0c9f667990}\index{wasm\_sysio\_binary\_ops.hpp@{wasm\_sysio\_binary\_ops.hpp}!INIT\_FIELD@{INIT\_FIELD}}
+\index{INIT\_FIELD@{INIT\_FIELD}!wasm\_sysio\_binary\_ops.hpp@{wasm\_sysio\_binary\_ops.hpp}}
+\doxysubsubsection{\texorpdfstring{INIT\_FIELD}{INIT\_FIELD}}
+{\footnotesize\ttfamily \label{wasm__sysio__binary__ops_8hpp_a4fa27900a0f1708699850c0c9f667990} 
+\#define INIT\+\_\+\+FIELD(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}}{, }\item[{}]{\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}}}{, }\item[{}]{\mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_a95c6de750b0756fab562e81ef6306c2b}{OP}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{class}\ Op\_Types>\ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ std::unique\_ptr<\textcolor{keyword}{typename}\ Op\_Types::BOOST\_PP\_CAT(\mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_a95c6de750b0756fab562e81ef6306c2b}{OP}},\_t)>\ cached\_ops<Op\_Types>::BOOST\_PP\_CAT(\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}},\ \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_a95c6de750b0756fab562e81ef6306c2b}{OP}})\ =\ std::make\_unique<typename\ Op\_Types::BOOST\_PP\_CAT(OP,\_t)>();}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_source_l00626}{626}} of file \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_source}{wasm\+\_\+sysio\+\_\+binary\+\_\+ops.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00626\ \textcolor{preprocessor}{\#define\ INIT\_FIELD(\ r,\ P,\ OP\ )\ \(\backslash\)}}
+\DoxyCodeLine{00627\ \textcolor{preprocessor}{\ \ \ template\ <class\ Op\_Types>\ \ \ \(\backslash\)}}
+\DoxyCodeLine{00628\ \textcolor{preprocessor}{\ \ \ std::unique\_ptr<typename\ Op\_Types::BOOST\_PP\_CAT(OP,\_t)>\ cached\_ops<Op\_Types>::BOOST\_PP\_CAT(P,\ OP)\ =\ std::make\_unique<typename\ Op\_Types::BOOST\_PP\_CAT(OP,\_t)>();}}
+
+\end{DoxyCode}
+\Hypertarget{wasm__sysio__binary__ops_8hpp_a9936aac19603a83aab91c9272452de8b}\index{wasm\_sysio\_binary\_ops.hpp@{wasm\_sysio\_binary\_ops.hpp}!PUSH\_BACK\_OP@{PUSH\_BACK\_OP}}
+\index{PUSH\_BACK\_OP@{PUSH\_BACK\_OP}!wasm\_sysio\_binary\_ops.hpp@{wasm\_sysio\_binary\_ops.hpp}}
+\doxysubsubsection{\texorpdfstring{PUSH\_BACK\_OP}{PUSH\_BACK\_OP}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{wasm__sysio__binary__ops_8hpp_a9936aac19603a83aab91c9272452de8b} 
+\#define PUSH\+\_\+\+BACK\+\_\+\+OP(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}}{, }\item[{}]{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}}{, }\item[{}]{\mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_a95c6de750b0756fab562e81ef6306c2b}{OP}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \_cached\_ops[BOOST\_PP\_CAT(\mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_a95c6de750b0756fab562e81ef6306c2b}{OP}},\_code)]\ =\ BOOST\_PP\_CAT(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}},\ \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_a95c6de750b0756fab562e81ef6306c2b}{OP}}).get();}
+
+\end{DoxyCode}
+\Hypertarget{wasm__sysio__binary__ops_8hpp_a9936aac19603a83aab91c9272452de8b}\index{wasm\_sysio\_binary\_ops.hpp@{wasm\_sysio\_binary\_ops.hpp}!PUSH\_BACK\_OP@{PUSH\_BACK\_OP}}
+\index{PUSH\_BACK\_OP@{PUSH\_BACK\_OP}!wasm\_sysio\_binary\_ops.hpp@{wasm\_sysio\_binary\_ops.hpp}}
+\doxysubsubsection{\texorpdfstring{PUSH\_BACK\_OP}{PUSH\_BACK\_OP}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{wasm__sysio__binary__ops_8hpp_a9936aac19603a83aab91c9272452de8b} 
+\#define PUSH\+\_\+\+BACK\+\_\+\+OP(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}}{, }\item[{}]{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}}{, }\item[{}]{\mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_a95c6de750b0756fab562e81ef6306c2b}{OP}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \_cached\_ops[BOOST\_PP\_CAT(\mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_a95c6de750b0756fab562e81ef6306c2b}{OP}},\_code)]\ =\ BOOST\_PP\_CAT(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}},\ \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_a95c6de750b0756fab562e81ef6306c2b}{OP}}).get();}
+
+\end{DoxyCode}
+\Hypertarget{wasm__sysio__binary__ops_8hpp_a69267315ea900d048f7ebee262796726}\index{wasm\_sysio\_binary\_ops.hpp@{wasm\_sysio\_binary\_ops.hpp}!VISIT\_OPCODE@{VISIT\_OPCODE}}
+\index{VISIT\_OPCODE@{VISIT\_OPCODE}!wasm\_sysio\_binary\_ops.hpp@{wasm\_sysio\_binary\_ops.hpp}}
+\doxysubsubsection{\texorpdfstring{VISIT\_OPCODE}{VISIT\_OPCODE}}
+{\footnotesize\ttfamily \label{wasm__sysio__binary__ops_8hpp_a69267315ea900d048f7ebee262796726} 
+\#define VISIT\+\_\+\+OPCODE(\begin{DoxyParamCaption}\item[{}]{opcode}{, }\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{name\+String}{, }\item[{}]{Imm}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ IR::Opcode::name:\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ SYS\_ASSERT(nextByte\ +\ \textcolor{keyword}{sizeof}(IR::OpcodeAndImm<IR::Imm>)\ <=\ end,\ wasm\_exception,\ \textcolor{stringliteral}{"{}"{}});\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ IR::OpcodeAndImm<IR::Imm>*\ encodedOperator\ =\ (IR::OpcodeAndImm<IR::Imm>*)nextByte;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ nextByte\ +=\ \textcolor{keyword}{sizeof}(IR::OpcodeAndImm<IR::Imm>);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{unionop}{op}}\ =\ \_cached\_ops-\/>at(BOOST\_PP\_CAT(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ \_code));\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{unionop}{op}}-\/>unpack(\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(\&(encodedOperator-\/>imm))\ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{unionop}{op}};\ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{wasm__sysio__binary__ops_8hpp_ae23c9979dd845f756f3c8bf4a8de5667}\index{wasm\_sysio\_binary\_ops.hpp@{wasm\_sysio\_binary\_ops.hpp}!WASM\_OP\_SEQ@{WASM\_OP\_SEQ}}
+\index{WASM\_OP\_SEQ@{WASM\_OP\_SEQ}!wasm\_sysio\_binary\_ops.hpp@{wasm\_sysio\_binary\_ops.hpp}}
+\doxysubsubsection{\texorpdfstring{WASM\_OP\_SEQ}{WASM\_OP\_SEQ}}
+{\footnotesize\ttfamily \label{wasm__sysio__binary__ops_8hpp_ae23c9979dd845f756f3c8bf4a8de5667} 
+\#define WASM\+\_\+\+OP\+\_\+\+SEQ}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_source_l00170}{170}} of file \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_source}{wasm\+\_\+sysio\+\_\+binary\+\_\+ops.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00170\ \textcolor{preprocessor}{\#define\ WASM\_OP\_SEQ\ \ (error)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00171\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (end)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00172\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (unreachable)\ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00173\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (nop)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00174\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (else\_)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00175\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (return\_)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00176\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (drop)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00177\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (select)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00178\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i32\_eqz)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00179\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i32\_eq)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00180\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i32\_ne)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00181\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i32\_lt\_s)\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00182\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i32\_lt\_u)\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00183\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i32\_gt\_s)\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00184\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i32\_gt\_u)\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00185\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i32\_le\_s)\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00186\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i32\_le\_u)\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00187\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i32\_ge\_s)\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00188\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i32\_ge\_u)\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00189\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i64\_eqz)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00190\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i64\_eq)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00191\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i64\_ne)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00192\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i64\_lt\_s)\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00193\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i64\_lt\_u)\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00194\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i64\_gt\_s)\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00195\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i64\_gt\_u)\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00196\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i64\_le\_s)\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00197\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i64\_le\_u)\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00198\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i64\_ge\_s)\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00199\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i64\_ge\_u)\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00200\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f32\_eq)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00201\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f32\_ne)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00202\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f32\_lt)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00203\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f32\_gt)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00204\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f32\_le)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00205\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f32\_ge)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00206\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f64\_eq)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00207\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f64\_ne)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00208\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f64\_lt)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00209\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f64\_gt)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00210\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f64\_le)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00211\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f64\_ge)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00212\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i32\_clz)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00213\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i32\_ctz)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00214\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i32\_popcnt)\ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00215\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i32\_add)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00216\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i32\_sub)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00217\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i32\_mul)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00218\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i32\_div\_s)\ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00219\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i32\_div\_u)\ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00220\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i32\_rem\_s)\ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00221\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i32\_rem\_u)\ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00222\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i32\_and)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00223\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i32\_or)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00224\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i32\_xor)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00225\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i32\_shl)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00226\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i32\_shr\_s)\ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00227\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i32\_shr\_u)\ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00228\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i32\_rotl)\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00229\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i32\_rotr)\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00230\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i64\_clz)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00231\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i64\_ctz)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00232\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i64\_popcnt)\ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00233\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i64\_add)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00234\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i64\_sub)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00235\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i64\_mul)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00236\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i64\_div\_s)\ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00237\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i64\_div\_u)\ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00238\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i64\_rem\_s)\ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00239\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i64\_rem\_u)\ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00240\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i64\_and)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00241\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i64\_or)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00242\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i64\_xor)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00243\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i64\_shl)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00244\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i64\_shr\_s)\ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00245\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i64\_shr\_u)\ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00246\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i64\_rotl)\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00247\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i64\_rotr)\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00248\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f32\_abs)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00249\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f32\_neg)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00250\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f32\_ceil)\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00251\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f32\_floor)\ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00252\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f32\_trunc)\ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00253\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f32\_nearest)\ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00254\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f32\_sqrt)\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00255\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f32\_add)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00256\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f32\_sub)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00257\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f32\_mul)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00258\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f32\_div)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00259\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f32\_min)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00260\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f32\_max)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00261\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f32\_copysign)\ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00262\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f64\_abs)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00263\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f64\_neg)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00264\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f64\_ceil)\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00265\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f64\_floor)\ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00266\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f64\_trunc)\ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00267\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f64\_nearest)\ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00268\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f64\_sqrt)\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00269\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f64\_add)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00270\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f64\_sub)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00271\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f64\_mul)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00272\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f64\_div)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00273\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f64\_min)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00274\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f64\_max)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00275\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f64\_copysign)\ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00276\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i32\_wrap\_i64)\ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00277\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i32\_trunc\_s\_f32)\ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00278\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i32\_trunc\_u\_f32)\ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00279\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i32\_trunc\_s\_f64)\ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00280\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i32\_trunc\_u\_f64)\ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00281\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i64\_extend\_s\_i32)\ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00282\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i64\_extend\_u\_i32)\ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00283\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i64\_trunc\_s\_f32)\ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00284\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i64\_trunc\_u\_f32)\ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00285\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i64\_trunc\_s\_f64)\ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00286\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i64\_trunc\_u\_f64)\ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00287\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f32\_convert\_s\_i32)\ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00288\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f32\_convert\_u\_i32)\ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00289\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f32\_convert\_s\_i64)\ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00290\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f32\_convert\_u\_i64)\ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00291\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f32\_demote\_f64)\ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00292\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f64\_convert\_s\_i32)\ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00293\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f64\_convert\_u\_i32)\ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00294\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f64\_convert\_s\_i64)\ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00295\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f64\_convert\_u\_i64)\ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00296\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f64\_promote\_f32)\ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00297\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i32\_reinterpret\_f32)\ \ \(\backslash\)}}
+\DoxyCodeLine{00298\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i64\_reinterpret\_f64)\ \ \(\backslash\)}}
+\DoxyCodeLine{00299\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f32\_reinterpret\_i32)\ \ \(\backslash\)}}
+\DoxyCodeLine{00300\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f64\_reinterpret\_i64)\ \ \(\backslash\)}}
+\DoxyCodeLine{00301\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (grow\_memory)\ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00302\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (current\_memory)\ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00303\ \textcolor{preprocessor}{}\textcolor{comment}{/*\ BLOCK\ TYPE\ OPS\ */}\textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00304\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (block)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00305\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00306\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if\_)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00307\ \textcolor{preprocessor}{}\textcolor{comment}{/*\ 32bit\ OPS\ */}\textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00308\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (br)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00309\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (br\_if)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00310\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (call)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00311\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (call\_indirect)\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00312\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (get\_local)\ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00313\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (set\_local)\ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00314\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (tee\_local)\ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00315\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (get\_global)\ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00316\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (set\_global)\ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00317\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i32\_const)\ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00318\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f32\_const)\ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00319\ \textcolor{preprocessor}{}\textcolor{comment}{/*\ memarg\ OPS\ */}\textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00320\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i32\_load)\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00321\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i64\_load)\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00322\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f32\_load)\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00323\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f64\_load)\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00324\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i32\_load8\_s)\ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00325\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i32\_load8\_u)\ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00326\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i32\_load16\_s)\ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00327\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i32\_load16\_u)\ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00328\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i64\_load8\_s)\ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00329\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i64\_load8\_u)\ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00330\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i64\_load16\_s)\ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00331\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i64\_load16\_u)\ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00332\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i64\_load32\_s)\ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00333\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i64\_load32\_u)\ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00334\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i32\_store)\ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00335\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i64\_store)\ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00336\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f32\_store)\ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00337\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f64\_store)\ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00338\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i32\_store8)\ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00339\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i32\_store16)\ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00340\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i64\_store8)\ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00341\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i64\_store16)\ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00342\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i64\_store32)\ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00343\ \textcolor{preprocessor}{}\textcolor{comment}{/*\ 64bit\ OPS\ */}\textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00344\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i64\_const)\ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00345\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f64\_const)\ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00346\ \textcolor{preprocessor}{}\textcolor{comment}{/*\ branchtable\ op\ */}\textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00347\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (br\_table)\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00348\ \textcolor{preprocessor}{}}
+
+\end{DoxyCode}

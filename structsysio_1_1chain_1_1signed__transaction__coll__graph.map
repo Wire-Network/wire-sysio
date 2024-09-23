@@ -1,0 +1,19 @@
+<map id="sysio::chain::signed_transaction" name="sysio::chain::signed_transaction">
+<area shape="rect" id="Node000001" title=" " alt="" coords="1017,151,1155,192"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1transaction.html" title=" " alt="" coords="698,101,861,127"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="877,127,994,149,1017,154,1016,159,993,154,876,133"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1chain_1_1transaction__header.html" title=" " alt="" coords="332,28,496,69"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="511,52,591,61,675,76,746,98,745,103,673,81,590,66,510,57"/>
+<area shape="rect" id="Node000004" href="$classfc_1_1time__point__sec.html" title=" " alt="" coords="5,5,134,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="150,23,332,39,332,44,149,28"/>
+<area shape="rect" id="Node000005" href="$structfc_1_1unsigned__int.html" title=" " alt="" coords="13,67,126,92"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="142,77,214,75,291,70,331,64,332,69,292,75,215,81,142,83"/>
+<area shape="rect" id="Node000006" href="$classfc_1_1vector.html" title=" " alt="" coords="350,94,478,134"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="493,112,698,112,698,117,493,117"/>
+<area shape="rect" id="Node000007" href="$classfc_1_1vector.html" title=" " alt="" coords="316,159,512,200"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="526,158,674,132,710,125,711,130,674,137,527,163"/>
+<area shape="rect" id="Node000008" href="$classfc_1_1vector.html" title=" " alt="" coords="708,151,851,192"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="867,169,1017,169,1017,174,867,174"/>
+<area shape="rect" id="Node000009" href="$classfc_1_1vector.html" title=" " alt="" coords="702,216,857,242"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="872,211,993,189,1016,184,1017,190,994,194,873,216"/>
+</map>

@@ -1,0 +1,1494 @@
+\doxysection{Generic\+Value\texorpdfstring{$<$}{<} Encoding, Allocator \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{class_generic_value}{}\label{class_generic_value}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}
+
+
+Represents a JSON value. Use Value for \doxylink{struct_u_t_f8}{UTF8} encoding and default allocator.  
+
+
+
+
+{\ttfamily \#include $<$document.\+h$>$}
+
+
+
+Collaboration diagram for Generic\+Value\texorpdfstring{$<$}{<} Encoding, Allocator \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_generic_value__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_generic_value_1_1_array_data}{Array\+Data}}
+\item 
+union \mbox{\hyperlink{union_generic_value_1_1_data}{Data}}
+\item 
+struct \mbox{\hyperlink{struct_generic_value_1_1_flag}{Flag}}
+\item 
+union \mbox{\hyperlink{union_generic_value_1_1_number}{Number}}
+\item 
+struct \mbox{\hyperlink{struct_generic_value_1_1_object_data}{Object\+Data}}
+\item 
+struct \mbox{\hyperlink{struct_generic_value_1_1_short_string}{Short\+String}}
+\item 
+struct \mbox{\hyperlink{struct_generic_value_1_1_string}{String}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{struct_generic_member}{Generic\+Member}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \mbox{\hyperlink{class_generic_value_a41fba065b6f19c64ff8313939f981f4c}{Member}}
+\begin{DoxyCompactList}\small\item\em Name-\/value pair in an object. \end{DoxyCompactList}\item 
+typedef \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} \mbox{\hyperlink{class_generic_value_a05831d3636472842aad2e3c4665eca5b}{Encoding\+Type}}
+\begin{DoxyCompactList}\small\item\em Encoding type from template parameter. \end{DoxyCompactList}\item 
+typedef \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} \mbox{\hyperlink{class_generic_value_a7b74c6500592eebb4484222962f39d40}{Allocator\+Type}}
+\begin{DoxyCompactList}\small\item\em Allocator type from template parameter. \end{DoxyCompactList}\item 
+typedef Encoding\+::\+Ch \mbox{\hyperlink{class_generic_value_a4541cc8138f2fac80d69836cc1e07116}{Ch}}
+\begin{DoxyCompactList}\small\item\em Character type derived from Encoding. \end{DoxyCompactList}\item 
+typedef \mbox{\hyperlink{struct_generic_string_ref}{Generic\+String\+Ref}}$<$ \mbox{\hyperlink{class_generic_value_a4541cc8138f2fac80d69836cc1e07116}{Ch}} $>$ \mbox{\hyperlink{class_generic_value_a5b089cb5ea5f149e48178ac7fe141491}{String\+Ref\+Type}}
+\begin{DoxyCompactList}\small\item\em Reference to a constant string. \end{DoxyCompactList}\item 
+typedef \mbox{\hyperlink{class_generic_member_iterator}{Generic\+Member\+Iterator}}$<$ false, \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Iterator \mbox{\hyperlink{class_generic_value_aa4d7b58bf0dc8826e4d8d14fd1045052}{Member\+Iterator}}
+\begin{DoxyCompactList}\small\item\em Member iterator for iterating in object. \end{DoxyCompactList}\item 
+typedef \mbox{\hyperlink{class_generic_member_iterator}{Generic\+Member\+Iterator}}$<$ true, \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Iterator \mbox{\hyperlink{class_generic_value_ae6f99e13359b465411b68aac684d4fa5}{Const\+Member\+Iterator}}
+\begin{DoxyCompactList}\small\item\em Constant member iterator for iterating in object. \end{DoxyCompactList}\item 
+typedef \mbox{\hyperlink{class_generic_value}{Generic\+Value}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_generic_value_a52492545400d31104a1c26fd7fbbc978}{Value\+Iterator}}
+\begin{DoxyCompactList}\small\item\em Value iterator for iterating in array. \end{DoxyCompactList}\item 
+typedef const \mbox{\hyperlink{class_generic_value}{Generic\+Value}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_generic_value_aed976453a89affff47c7c924600c6bf3}{Const\+Value\+Iterator}}
+\begin{DoxyCompactList}\small\item\em Constant value iterator for iterating in array. \end{DoxyCompactList}\item 
+typedef \mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \mbox{\hyperlink{class_generic_value_add78d9d629022b7be7532c8e8d6ce44d}{Value\+Type}}
+\begin{DoxyCompactList}\small\item\em Value type of itself. \end{DoxyCompactList}\item 
+typedef \mbox{\hyperlink{class_generic_array}{Generic\+Array}}$<$ false, \mbox{\hyperlink{class_generic_value_add78d9d629022b7be7532c8e8d6ce44d}{Value\+Type}} $>$ \mbox{\hyperlink{class_generic_value_a0579f19054b3e305c8510d5d4f0fb1f0}{Array}}
+\item 
+typedef \mbox{\hyperlink{class_generic_array}{Generic\+Array}}$<$ true, \mbox{\hyperlink{class_generic_value_add78d9d629022b7be7532c8e8d6ce44d}{Value\+Type}} $>$ \mbox{\hyperlink{class_generic_value_a23b90af7b22290c804ee76be2f0945a4}{Const\+Array}}
+\item 
+typedef \mbox{\hyperlink{class_generic_object}{Generic\+Object}}$<$ false, \mbox{\hyperlink{class_generic_value_add78d9d629022b7be7532c8e8d6ce44d}{Value\+Type}} $>$ \mbox{\hyperlink{class_generic_value_aedad41324ad8798ecd4039e66c3e3f05}{Object}}
+\item 
+typedef \mbox{\hyperlink{class_generic_object}{Generic\+Object}}$<$ true, \mbox{\hyperlink{class_generic_value_add78d9d629022b7be7532c8e8d6ce44d}{Value\+Type}} $>$ \mbox{\hyperlink{class_generic_value_a7300fe21ccf0124fa39fdb453beb0029}{Const\+Object}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Assignment operators}
+\begin{DoxyCompactItemize}
+\item 
+enum \{ \newline
+\mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbac48966386b231124da7c3fb870e237ee}{k\+Bool\+Flag}} = 0x0008
+, \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbaa4776df2584fe4f341b183cdf3e00a79}{k\+Number\+Flag}} = 0x0010
+, \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbae3fb211193e0067efaddeb5a067120fb}{k\+Int\+Flag}} = 0x0020
+, \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba7eba561e6cc6dcd704f907c5a005f3ce}{k\+Uint\+Flag}} = 0x0040
+, \newline
+\mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba87c567a71dfa5a63363d82d32346884a}{k\+Int64\+Flag}} = 0x0080
+, \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbac9200c78f749b6efaae640167a370c94}{k\+Uint64\+Flag}} = 0x0100
+, \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba70c741e7c488835892aa857f50090d7c}{k\+Double\+Flag}} = 0x0200
+, \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbaf3bf3661275a38c86addba900c52dccb}{k\+String\+Flag}} = 0x0400
+, \newline
+\mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba10ef921aef1773bc1f88796bf1828f92}{k\+Copy\+Flag}} = 0x0800
+, \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbae58a76d504c6a67566aebfa4a6bd2e55}{k\+Inline\+Str\+Flag}} = 0x1000
+, \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba8c5507cf143edac6e50abec2d89cc40d}{k\+Null\+Flag}} = k\+Null\+Type
+, \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba75dbcdbacc82f9379c602f0b6c41cf07}{k\+True\+Flag}} = k\+True\+Type \texorpdfstring{$\vert$}{|} k\+Bool\+Flag
+, \newline
+\mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba66d3877b074bb1a0455a6f6d3f7f91a3}{k\+False\+Flag}} = k\+False\+Type \texorpdfstring{$\vert$}{|} k\+Bool\+Flag
+, \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbacfe8b720220d0a2e378683367386cbaf}{k\+Number\+Int\+Flag}} = k\+Number\+Type \texorpdfstring{$\vert$}{|} k\+Number\+Flag \texorpdfstring{$\vert$}{|} k\+Int\+Flag \texorpdfstring{$\vert$}{|} k\+Int64\+Flag
+, \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbae8c6c6286edf9c309e77af0ea0cf039c}{k\+Number\+Uint\+Flag}} = k\+Number\+Type \texorpdfstring{$\vert$}{|} k\+Number\+Flag \texorpdfstring{$\vert$}{|} k\+Uint\+Flag \texorpdfstring{$\vert$}{|} k\+Uint64\+Flag \texorpdfstring{$\vert$}{|} k\+Int64\+Flag
+, \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbad117eb41bb8015a76aadf6149bbd8ce5}{k\+Number\+Int64\+Flag}} = k\+Number\+Type \texorpdfstring{$\vert$}{|} k\+Number\+Flag \texorpdfstring{$\vert$}{|} k\+Int64\+Flag
+, \newline
+\mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbaaa1ee6a546d4db67f4bdef41d1f54f02}{k\+Number\+Uint64\+Flag}} = k\+Number\+Type \texorpdfstring{$\vert$}{|} k\+Number\+Flag \texorpdfstring{$\vert$}{|} k\+Uint64\+Flag
+, \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba29bc91c155577923abd8f19aa050058b}{k\+Number\+Double\+Flag}} = k\+Number\+Type \texorpdfstring{$\vert$}{|} k\+Number\+Flag \texorpdfstring{$\vert$}{|} k\+Double\+Flag
+, \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbab7805b1908fd181afc8d70fe07b17e18}{k\+Number\+Any\+Flag}} = k\+Number\+Type \texorpdfstring{$\vert$}{|} k\+Number\+Flag \texorpdfstring{$\vert$}{|} k\+Int\+Flag \texorpdfstring{$\vert$}{|} k\+Int64\+Flag \texorpdfstring{$\vert$}{|} k\+Uint\+Flag \texorpdfstring{$\vert$}{|} k\+Uint64\+Flag \texorpdfstring{$\vert$}{|} k\+Double\+Flag
+, \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba5d26a84f26833eafd0028c0102a388a9}{k\+Const\+String\+Flag}} = k\+String\+Type \texorpdfstring{$\vert$}{|} k\+String\+Flag
+, \newline
+\mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba10c83f7f191dce81bb0273adc0d838de}{k\+Copy\+String\+Flag}} = k\+String\+Type \texorpdfstring{$\vert$}{|} k\+String\+Flag \texorpdfstring{$\vert$}{|} k\+Copy\+Flag
+, \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbaca24fa09485fa10b17071509a985ff01}{k\+Short\+String\+Flag}} = k\+String\+Type \texorpdfstring{$\vert$}{|} k\+String\+Flag \texorpdfstring{$\vert$}{|} k\+Copy\+Flag \texorpdfstring{$\vert$}{|} k\+Inline\+Str\+Flag
+, \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbaba5811d4baeb56dc793a6510fe28748c}{k\+Object\+Flag}} = k\+Object\+Type
+, \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbaf7d99965ba807c718b482a9a7fb28b47}{k\+Array\+Flag}} = k\+Array\+Type
+, \newline
+\mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba793e0bc40e0abe1ed8bcb3e6fbba65c2}{k\+Type\+Mask}} = 0x07
+ \}
+\item 
+{\footnotesize template$<$typename , typename , typename $>$ }\\\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{class_generic_value_ab05bc9e52e201a2867ea5bac141ee1ae}{Generic\+Document}}
+\item 
+static const \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} \mbox{\hyperlink{class_generic_value_a188f57bdb1923c1fefe74baa995871a3}{k\+Default\+Array\+Capacity}} = 16
+\item 
+static const \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} \mbox{\hyperlink{class_generic_value_a284d018914629aed9a4bd97fe2dc5899}{k\+Default\+Object\+Capacity}} = 16
+\item 
+\mbox{\hyperlink{union_generic_value_1_1_data}{Data}} \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\+\_\+}}
+\item 
+\mbox{\hyperlink{class_generic_value}{Generic\+Value}} \& \mbox{\hyperlink{class_generic_value_ad7502bbfcd0c14f7ece07243d56e2b90}{operator=}} (\mbox{\hyperlink{class_generic_value}{Generic\+Value}} \&rhs) RAPIDJSON\+\_\+\+NOEXCEPT
+\begin{DoxyCompactList}\small\item\em Assignment with move semantics. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_generic_value}{Generic\+Value}} \& \mbox{\hyperlink{class_generic_value_a2b7837d3adb6c0ad184269826ea78e97}{operator=}} (\mbox{\hyperlink{class_generic_value_a5b089cb5ea5f149e48178ac7fe141491}{String\+Ref\+Type}} str) RAPIDJSON\+\_\+\+NOEXCEPT
+\begin{DoxyCompactList}\small\item\em Assignment of constant string reference (no copy) \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{class_generic_value_a4a4418a93777942e1fb7ea71f8aaf680}{RAPIDJSON\+\_\+\+DISABLEIF\+\_\+\+RETURN}} ((internal\+::\+Is\+Pointer$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$),(\mbox{\hyperlink{class_generic_value}{Generic\+Value}} \&)) operator
+\begin{DoxyCompactList}\small\item\em Assignment with primitive types. \end{DoxyCompactList}\item 
+RAPIDJSON\+\_\+\+FORCEINLINE const \mbox{\hyperlink{class_generic_value_a4541cc8138f2fac80d69836cc1e07116}{Ch}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_generic_value_af182f2ccbcd962d2a28f92407622e9a9}{Get\+String\+Pointer}} () const
+\item 
+RAPIDJSON\+\_\+\+FORCEINLINE const \mbox{\hyperlink{class_generic_value_a4541cc8138f2fac80d69836cc1e07116}{Ch}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_generic_value_ab3e8833927fb1454585e8692200dbb93}{Set\+String\+Pointer}} (const \mbox{\hyperlink{class_generic_value_a4541cc8138f2fac80d69836cc1e07116}{Ch}} \texorpdfstring{$\ast$}{*}str)
+\item 
+RAPIDJSON\+\_\+\+FORCEINLINE \mbox{\hyperlink{class_generic_value}{Generic\+Value}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_generic_value_a40f567bae6fabbb07822ebac5fe00bfc}{Get\+Elements\+Pointer}} () const
+\item 
+RAPIDJSON\+\_\+\+FORCEINLINE \mbox{\hyperlink{class_generic_value}{Generic\+Value}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_generic_value_a1ccc6e15fa49f0c30eab8e8f7f9418f2}{Set\+Elements\+Pointer}} (\mbox{\hyperlink{class_generic_value}{Generic\+Value}} \texorpdfstring{$\ast$}{*}elements)
+\item 
+RAPIDJSON\+\_\+\+FORCEINLINE \mbox{\hyperlink{class_generic_value_a41fba065b6f19c64ff8313939f981f4c}{Member}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_generic_value_a8c39af1a639eae1b59db66e2cbb537c9}{Get\+Members\+Pointer}} () const
+\item 
+RAPIDJSON\+\_\+\+FORCEINLINE \mbox{\hyperlink{class_generic_value_a41fba065b6f19c64ff8313939f981f4c}{Member}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_generic_value_a634a87972649943604153708ca9aefb7}{Set\+Members\+Pointer}} (\mbox{\hyperlink{class_generic_value_a41fba065b6f19c64ff8313939f981f4c}{Member}} \texorpdfstring{$\ast$}{*}members)
+\item 
+void \mbox{\hyperlink{class_generic_value_a8f5f309065479de40a16cf28a340da65}{Set\+Array\+Raw}} (\mbox{\hyperlink{class_generic_value}{Generic\+Value}} \texorpdfstring{$\ast$}{*}values, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} \&allocator)
+\item 
+void \mbox{\hyperlink{class_generic_value_a26c8ec7d68858df1038506df7fcff22d}{Set\+Object\+Raw}} (\mbox{\hyperlink{class_generic_value_a41fba065b6f19c64ff8313939f981f4c}{Member}} \texorpdfstring{$\ast$}{*}members, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} \&allocator)
+\begin{DoxyCompactList}\small\item\em Initialize this value as object with initial data, without calling destructor. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_generic_value_a1451603922dcdf34976f125dc60f70ee}{Set\+String\+Raw}} (\mbox{\hyperlink{class_generic_value_a5b089cb5ea5f149e48178ac7fe141491}{String\+Ref\+Type}} \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}) RAPIDJSON\+\_\+\+NOEXCEPT
+\begin{DoxyCompactList}\small\item\em Initialize this value as constant string, without calling destructor. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_generic_value_ad3d91db36dfdbfc1af40a79aae07723c}{Set\+String\+Raw}} (\mbox{\hyperlink{class_generic_value_a5b089cb5ea5f149e48178ac7fe141491}{String\+Ref\+Type}} \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} \&allocator)
+\begin{DoxyCompactList}\small\item\em Initialize this value as copy string with initial data, without calling destructor. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_generic_value_abb8ea2dfbe74ff4ee7dac6be31317f81}{Raw\+Assign}} (\mbox{\hyperlink{class_generic_value}{Generic\+Value}} \&rhs) RAPIDJSON\+\_\+\+NOEXCEPT
+\begin{DoxyCompactList}\small\item\em Assignment without calling destructor. \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename Source\+Allocator $>$ }\\bool \mbox{\hyperlink{class_generic_value_ad4d088dc601d99fea9d16300a7ec7ee1}{String\+Equal}} (const \mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, Source\+Allocator $>$ \&rhs) const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Constructors and destructor.}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_generic_value_ab0205d57176d83814ea4e4598c596fe8}{Generic\+Value}} () RAPIDJSON\+\_\+\+NOEXCEPT
+\begin{DoxyCompactList}\small\item\em Default constructor creates a null value. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_generic_value_a83c8f84b8e61f2f40414b703b75aea61}{Generic\+Value}} (\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}} type) RAPIDJSON\+\_\+\+NOEXCEPT
+\begin{DoxyCompactList}\small\item\em Constructor with JSON value type. \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename Source\+Allocator $>$ }\\\mbox{\hyperlink{class_generic_value_a76c68b72723a06045776dbd425f9e8b6}{Generic\+Value}} (const \mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, Source\+Allocator $>$ \&rhs, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} \&allocator, bool copy\+Const\+Strings=false)
+\begin{DoxyCompactList}\small\item\em Explicit copy constructor (with allocator) \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{class_generic_value_a0f6a0394bfffaedde88e433b2265194c}{Generic\+Value}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} b, RAPIDJSON\+\_\+\+ENABLEIF((internal\+::\+Is\+Same$<$ bool, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$))) RAPIDJSON\+\_\+\+NOEXCEPT
+\begin{DoxyCompactList}\small\item\em Constructor for boolean value. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_generic_value_aafc754ade38421c179f5c8933ecbaf45}{Generic\+Value}} (int i) RAPIDJSON\+\_\+\+NOEXCEPT
+\begin{DoxyCompactList}\small\item\em Constructor for int value. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_generic_value_a972bff6c56ac3d04622ff7fad8d98331}{Generic\+Value}} (unsigned u) RAPIDJSON\+\_\+\+NOEXCEPT
+\begin{DoxyCompactList}\small\item\em Constructor for unsigned value. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_generic_value_a964b69f1d2596f75ded5421b6db01a14}{Generic\+Value}} (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} i64) RAPIDJSON\+\_\+\+NOEXCEPT
+\begin{DoxyCompactList}\small\item\em Constructor for int64\+\_\+t value. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_generic_value_ad04805a57f5050c8e04be469ba64d6f3}{Generic\+Value}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} u64) RAPIDJSON\+\_\+\+NOEXCEPT
+\begin{DoxyCompactList}\small\item\em Constructor for uint64\+\_\+t value. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_generic_value_a267d05b7e98c3507908eaf085fe41155}{Generic\+Value}} (double d) RAPIDJSON\+\_\+\+NOEXCEPT
+\begin{DoxyCompactList}\small\item\em Constructor for double value. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_generic_value_acad11ab781251634a3c079aa64a6d283}{Generic\+Value}} (float \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}) RAPIDJSON\+\_\+\+NOEXCEPT
+\begin{DoxyCompactList}\small\item\em Constructor for float value. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_generic_value_a4d9af98141360cd801daab4ed1ca2c91}{Generic\+Value}} (const \mbox{\hyperlink{class_generic_value_a4541cc8138f2fac80d69836cc1e07116}{Ch}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} length) RAPIDJSON\+\_\+\+NOEXCEPT
+\begin{DoxyCompactList}\small\item\em Constructor for constant string (i.\+e. do not make a copy of string) \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_generic_value_abb2887958974fef1b2b5c8e32cc72ddb}{Generic\+Value}} (\mbox{\hyperlink{class_generic_value_a5b089cb5ea5f149e48178ac7fe141491}{String\+Ref\+Type}} \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}) RAPIDJSON\+\_\+\+NOEXCEPT
+\begin{DoxyCompactList}\small\item\em Constructor for constant string (i.\+e. do not make a copy of string) \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_generic_value_a9ec2c7cda8c8845acfa3565c6b1b4e10}{Generic\+Value}} (const \mbox{\hyperlink{class_generic_value_a4541cc8138f2fac80d69836cc1e07116}{Ch}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} length, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} \&allocator)
+\begin{DoxyCompactList}\small\item\em Constructor for copy-\/string (i.\+e. do make a copy of string) \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_generic_value_a9b72b2e3347d4cd77b16c3b45e8decf1}{Generic\+Value}} (const \mbox{\hyperlink{class_generic_value_a4541cc8138f2fac80d69836cc1e07116}{Ch}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} \&allocator)
+\begin{DoxyCompactList}\small\item\em Constructor for copy-\/string (i.\+e. do make a copy of string) \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_generic_value_a953052ef91e54aabe9bdb9f9eaebf6cc}{Generic\+Value}} (\mbox{\hyperlink{class_generic_value_a0579f19054b3e305c8510d5d4f0fb1f0}{Array}} \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}) RAPIDJSON\+\_\+\+NOEXCEPT
+\begin{DoxyCompactList}\small\item\em Constructor for Array. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_generic_value_a9c294e56f4ab940f845f7c171b183483}{Generic\+Value}} (\mbox{\hyperlink{class_generic_value_aedad41324ad8798ecd4039e66c3e3f05}{Object}} o) RAPIDJSON\+\_\+\+NOEXCEPT
+\begin{DoxyCompactList}\small\item\em Constructor for Object. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_generic_value_a213ba89ef5ef961a5e655bd8c78ac9f4}{\texorpdfstring{$\sim$}{\string~}\+Generic\+Value}} ()
+\begin{DoxyCompactList}\small\item\em Destructor. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} = Memory\+Pool\+Allocator$<$$>$$>$\newline
+class Generic\+Value$<$ Encoding, Allocator $>$}
+\doxylink{struct_a}{A} JSON value can be one of 7 types. This class is a variant type supporting these types.
+
+Use the Value if \doxylink{struct_u_t_f8}{UTF8} and default allocator
+
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em Encoding} & Encoding of the value. (Even non-\/string values need to have the same encoding in a document) \\
+\hline
+{\em Allocator} & Allocator type for allocating memory of object, array and string. \\
+\hline
+\end{DoxyTemplParams}
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l00578}{578}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{class_generic_value_a7b74c6500592eebb4484222962f39d40}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!AllocatorType@{AllocatorType}}
+\index{AllocatorType@{AllocatorType}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{AllocatorType}{AllocatorType}}
+{\footnotesize\ttfamily \label{class_generic_value_a7b74c6500592eebb4484222962f39d40} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Memory\+Pool\+Allocator$<$$>$$>$ \\
+\mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} \mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Allocator\+Type}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l00583}{583}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+\Hypertarget{class_generic_value_a0579f19054b3e305c8510d5d4f0fb1f0}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!Array@{Array}}
+\index{Array@{Array}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{Array}{Array}}
+{\footnotesize\ttfamily \label{class_generic_value_a0579f19054b3e305c8510d5d4f0fb1f0} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Memory\+Pool\+Allocator$<$$>$$>$ \\
+\mbox{\hyperlink{class_generic_array}{Generic\+Array}}$<$false, \mbox{\hyperlink{class_generic_value_add78d9d629022b7be7532c8e8d6ce44d}{Value\+Type}}$>$ \mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Array}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l00591}{591}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+\Hypertarget{class_generic_value_a4541cc8138f2fac80d69836cc1e07116}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!Ch@{Ch}}
+\index{Ch@{Ch}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{Ch}{Ch}}
+{\footnotesize\ttfamily \label{class_generic_value_a4541cc8138f2fac80d69836cc1e07116} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Memory\+Pool\+Allocator$<$$>$$>$ \\
+Encoding\+::\+Ch \mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Ch}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l00584}{584}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+\Hypertarget{class_generic_value_a23b90af7b22290c804ee76be2f0945a4}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!ConstArray@{ConstArray}}
+\index{ConstArray@{ConstArray}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{ConstArray}{ConstArray}}
+{\footnotesize\ttfamily \label{class_generic_value_a23b90af7b22290c804ee76be2f0945a4} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Memory\+Pool\+Allocator$<$$>$$>$ \\
+\mbox{\hyperlink{class_generic_array}{Generic\+Array}}$<$true, \mbox{\hyperlink{class_generic_value_add78d9d629022b7be7532c8e8d6ce44d}{Value\+Type}}$>$ \mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Const\+Array}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l00592}{592}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+\Hypertarget{class_generic_value_ae6f99e13359b465411b68aac684d4fa5}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!ConstMemberIterator@{ConstMemberIterator}}
+\index{ConstMemberIterator@{ConstMemberIterator}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{ConstMemberIterator}{ConstMemberIterator}}
+{\footnotesize\ttfamily \label{class_generic_value_ae6f99e13359b465411b68aac684d4fa5} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Memory\+Pool\+Allocator$<$$>$$>$ \\
+\mbox{\hyperlink{class_generic_member_iterator}{Generic\+Member\+Iterator}}$<$true,\mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}},\mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}$>$\+::\+Iterator \mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Const\+Member\+Iterator}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l00587}{587}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+\Hypertarget{class_generic_value_a7300fe21ccf0124fa39fdb453beb0029}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!ConstObject@{ConstObject}}
+\index{ConstObject@{ConstObject}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{ConstObject}{ConstObject}}
+{\footnotesize\ttfamily \label{class_generic_value_a7300fe21ccf0124fa39fdb453beb0029} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Memory\+Pool\+Allocator$<$$>$$>$ \\
+\mbox{\hyperlink{class_generic_object}{Generic\+Object}}$<$true, \mbox{\hyperlink{class_generic_value_add78d9d629022b7be7532c8e8d6ce44d}{Value\+Type}}$>$ \mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Const\+Object}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l00594}{594}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+\Hypertarget{class_generic_value_aed976453a89affff47c7c924600c6bf3}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!ConstValueIterator@{ConstValueIterator}}
+\index{ConstValueIterator@{ConstValueIterator}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{ConstValueIterator}{ConstValueIterator}}
+{\footnotesize\ttfamily \label{class_generic_value_aed976453a89affff47c7c924600c6bf3} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Memory\+Pool\+Allocator$<$$>$$>$ \\
+const \mbox{\hyperlink{class_generic_value}{Generic\+Value}}\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Const\+Value\+Iterator}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l00589}{589}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+\Hypertarget{class_generic_value_a05831d3636472842aad2e3c4665eca5b}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!EncodingType@{EncodingType}}
+\index{EncodingType@{EncodingType}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{EncodingType}{EncodingType}}
+{\footnotesize\ttfamily \label{class_generic_value_a05831d3636472842aad2e3c4665eca5b} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Memory\+Pool\+Allocator$<$$>$$>$ \\
+\mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} \mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Encoding\+Type}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l00582}{582}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+\Hypertarget{class_generic_value_a41fba065b6f19c64ff8313939f981f4c}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!Member@{Member}}
+\index{Member@{Member}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{Member}{Member}}
+{\footnotesize\ttfamily \label{class_generic_value_a41fba065b6f19c64ff8313939f981f4c} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Memory\+Pool\+Allocator$<$$>$$>$ \\
+\mbox{\hyperlink{struct_generic_member}{Generic\+Member}}$<$\mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}$>$ \mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Member}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l00581}{581}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+\Hypertarget{class_generic_value_aa4d7b58bf0dc8826e4d8d14fd1045052}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!MemberIterator@{MemberIterator}}
+\index{MemberIterator@{MemberIterator}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{MemberIterator}{MemberIterator}}
+{\footnotesize\ttfamily \label{class_generic_value_aa4d7b58bf0dc8826e4d8d14fd1045052} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Memory\+Pool\+Allocator$<$$>$$>$ \\
+\mbox{\hyperlink{class_generic_member_iterator}{Generic\+Member\+Iterator}}$<$false,\mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}},\mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}$>$\+::\+Iterator \mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Member\+Iterator}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l00586}{586}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+\Hypertarget{class_generic_value_aedad41324ad8798ecd4039e66c3e3f05}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!Object@{Object}}
+\index{Object@{Object}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{Object}{Object}}
+{\footnotesize\ttfamily \label{class_generic_value_aedad41324ad8798ecd4039e66c3e3f05} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Memory\+Pool\+Allocator$<$$>$$>$ \\
+\mbox{\hyperlink{class_generic_object}{Generic\+Object}}$<$false, \mbox{\hyperlink{class_generic_value_add78d9d629022b7be7532c8e8d6ce44d}{Value\+Type}}$>$ \mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Object}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l00593}{593}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+\Hypertarget{class_generic_value_a5b089cb5ea5f149e48178ac7fe141491}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!StringRefType@{StringRefType}}
+\index{StringRefType@{StringRefType}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{StringRefType}{StringRefType}}
+{\footnotesize\ttfamily \label{class_generic_value_a5b089cb5ea5f149e48178ac7fe141491} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Memory\+Pool\+Allocator$<$$>$$>$ \\
+\mbox{\hyperlink{struct_generic_string_ref}{Generic\+String\+Ref}}$<$\mbox{\hyperlink{class_generic_value_a4541cc8138f2fac80d69836cc1e07116}{Ch}}$>$ \mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+String\+Ref\+Type}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l00585}{585}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+\Hypertarget{class_generic_value_a52492545400d31104a1c26fd7fbbc978}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!ValueIterator@{ValueIterator}}
+\index{ValueIterator@{ValueIterator}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{ValueIterator}{ValueIterator}}
+{\footnotesize\ttfamily \label{class_generic_value_a52492545400d31104a1c26fd7fbbc978} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Memory\+Pool\+Allocator$<$$>$$>$ \\
+\mbox{\hyperlink{class_generic_value}{Generic\+Value}}\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Value\+Iterator}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l00588}{588}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+\Hypertarget{class_generic_value_add78d9d629022b7be7532c8e8d6ce44d}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!ValueType@{ValueType}}
+\index{ValueType@{ValueType}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{ValueType}{ValueType}}
+{\footnotesize\ttfamily \label{class_generic_value_add78d9d629022b7be7532c8e8d6ce44d} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Memory\+Pool\+Allocator$<$$>$$>$ \\
+\mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$\mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}$>$ \mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Value\+Type}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l00590}{590}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+
+\doxysubsection{Member Enumeration Documentation}
+\Hypertarget{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4db}\doxysubsubsection{\texorpdfstring{anonymous enum}{anonymous enum}}
+{\footnotesize\ttfamily \label{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4db} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Memory\+Pool\+Allocator$<$$>$$>$ \\
+anonymous enum}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kBoolFlag@{kBoolFlag}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!kBoolFlag@{kBoolFlag}}}\Hypertarget{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbac48966386b231124da7c3fb870e237ee}\label{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4db} 
+k\+Bool\+Flag&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kNumberFlag@{kNumberFlag}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!kNumberFlag@{kNumberFlag}}}\Hypertarget{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbaa4776df2584fe4f341b183cdf3e00a79}\label{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4db} 
+k\+Number\+Flag&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kIntFlag@{kIntFlag}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!kIntFlag@{kIntFlag}}}\Hypertarget{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbae3fb211193e0067efaddeb5a067120fb}\label{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4db} 
+k\+Int\+Flag&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kUintFlag@{kUintFlag}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!kUintFlag@{kUintFlag}}}\Hypertarget{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba7eba561e6cc6dcd704f907c5a005f3ce}\label{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4db} 
+k\+Uint\+Flag&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kInt64Flag@{kInt64Flag}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!kInt64Flag@{kInt64Flag}}}\Hypertarget{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba87c567a71dfa5a63363d82d32346884a}\label{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4db} 
+k\+Int64\+Flag&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kUint64Flag@{kUint64Flag}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!kUint64Flag@{kUint64Flag}}}\Hypertarget{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbac9200c78f749b6efaae640167a370c94}\label{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4db} 
+k\+Uint64\+Flag&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kDoubleFlag@{kDoubleFlag}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!kDoubleFlag@{kDoubleFlag}}}\Hypertarget{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba70c741e7c488835892aa857f50090d7c}\label{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4db} 
+k\+Double\+Flag&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kStringFlag@{kStringFlag}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!kStringFlag@{kStringFlag}}}\Hypertarget{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbaf3bf3661275a38c86addba900c52dccb}\label{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4db} 
+k\+String\+Flag&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kCopyFlag@{kCopyFlag}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!kCopyFlag@{kCopyFlag}}}\Hypertarget{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba10ef921aef1773bc1f88796bf1828f92}\label{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4db} 
+k\+Copy\+Flag&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kInlineStrFlag@{kInlineStrFlag}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!kInlineStrFlag@{kInlineStrFlag}}}\Hypertarget{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbae58a76d504c6a67566aebfa4a6bd2e55}\label{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4db} 
+k\+Inline\+Str\+Flag&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kNullFlag@{kNullFlag}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!kNullFlag@{kNullFlag}}}\Hypertarget{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba8c5507cf143edac6e50abec2d89cc40d}\label{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4db} 
+k\+Null\+Flag&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kTrueFlag@{kTrueFlag}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!kTrueFlag@{kTrueFlag}}}\Hypertarget{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba75dbcdbacc82f9379c602f0b6c41cf07}\label{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4db} 
+k\+True\+Flag&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kFalseFlag@{kFalseFlag}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!kFalseFlag@{kFalseFlag}}}\Hypertarget{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba66d3877b074bb1a0455a6f6d3f7f91a3}\label{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4db} 
+k\+False\+Flag&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kNumberIntFlag@{kNumberIntFlag}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!kNumberIntFlag@{kNumberIntFlag}}}\Hypertarget{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbacfe8b720220d0a2e378683367386cbaf}\label{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4db} 
+k\+Number\+Int\+Flag&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kNumberUintFlag@{kNumberUintFlag}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!kNumberUintFlag@{kNumberUintFlag}}}\Hypertarget{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbae8c6c6286edf9c309e77af0ea0cf039c}\label{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4db} 
+k\+Number\+Uint\+Flag&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kNumberInt64Flag@{kNumberInt64Flag}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!kNumberInt64Flag@{kNumberInt64Flag}}}\Hypertarget{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbad117eb41bb8015a76aadf6149bbd8ce5}\label{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4db} 
+k\+Number\+Int64\+Flag&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kNumberUint64Flag@{kNumberUint64Flag}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!kNumberUint64Flag@{kNumberUint64Flag}}}\Hypertarget{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbaaa1ee6a546d4db67f4bdef41d1f54f02}\label{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4db} 
+k\+Number\+Uint64\+Flag&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kNumberDoubleFlag@{kNumberDoubleFlag}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!kNumberDoubleFlag@{kNumberDoubleFlag}}}\Hypertarget{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba29bc91c155577923abd8f19aa050058b}\label{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4db} 
+k\+Number\+Double\+Flag&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kNumberAnyFlag@{kNumberAnyFlag}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!kNumberAnyFlag@{kNumberAnyFlag}}}\Hypertarget{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbab7805b1908fd181afc8d70fe07b17e18}\label{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4db} 
+k\+Number\+Any\+Flag&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kConstStringFlag@{kConstStringFlag}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!kConstStringFlag@{kConstStringFlag}}}\Hypertarget{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba5d26a84f26833eafd0028c0102a388a9}\label{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4db} 
+k\+Const\+String\+Flag&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kCopyStringFlag@{kCopyStringFlag}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!kCopyStringFlag@{kCopyStringFlag}}}\Hypertarget{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba10c83f7f191dce81bb0273adc0d838de}\label{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4db} 
+k\+Copy\+String\+Flag&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kShortStringFlag@{kShortStringFlag}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!kShortStringFlag@{kShortStringFlag}}}\Hypertarget{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbaca24fa09485fa10b17071509a985ff01}\label{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4db} 
+k\+Short\+String\+Flag&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kObjectFlag@{kObjectFlag}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!kObjectFlag@{kObjectFlag}}}\Hypertarget{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbaba5811d4baeb56dc793a6510fe28748c}\label{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4db} 
+k\+Object\+Flag&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kArrayFlag@{kArrayFlag}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!kArrayFlag@{kArrayFlag}}}\Hypertarget{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbaf7d99965ba807c718b482a9a7fb28b47}\label{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4db} 
+k\+Array\+Flag&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kTypeMask@{kTypeMask}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!kTypeMask@{kTypeMask}}}\Hypertarget{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba793e0bc40e0abe1ed8bcb3e6fbba65c2}\label{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4db} 
+k\+Type\+Mask&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l01911}{1911}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01911\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01912\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbac48966386b231124da7c3fb870e237ee}{kBoolFlag}}\ \ \ \ \ \ \ =\ 0x0008,}
+\DoxyCodeLine{01913\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbaa4776df2584fe4f341b183cdf3e00a79}{kNumberFlag}}\ \ \ \ \ =\ 0x0010,}
+\DoxyCodeLine{01914\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbae3fb211193e0067efaddeb5a067120fb}{kIntFlag}}\ \ \ \ \ \ \ \ =\ 0x0020,}
+\DoxyCodeLine{01915\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba7eba561e6cc6dcd704f907c5a005f3ce}{kUintFlag}}\ \ \ \ \ \ \ =\ 0x0040,}
+\DoxyCodeLine{01916\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba87c567a71dfa5a63363d82d32346884a}{kInt64Flag}}\ \ \ \ \ \ =\ 0x0080,}
+\DoxyCodeLine{01917\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbac9200c78f749b6efaae640167a370c94}{kUint64Flag}}\ \ \ \ \ =\ 0x0100,}
+\DoxyCodeLine{01918\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba70c741e7c488835892aa857f50090d7c}{kDoubleFlag}}\ \ \ \ \ =\ 0x0200,}
+\DoxyCodeLine{01919\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbaf3bf3661275a38c86addba900c52dccb}{kStringFlag}}\ \ \ \ \ =\ 0x0400,}
+\DoxyCodeLine{01920\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba10ef921aef1773bc1f88796bf1828f92}{kCopyFlag}}\ \ \ \ \ \ \ =\ 0x0800,}
+\DoxyCodeLine{01921\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbae58a76d504c6a67566aebfa4a6bd2e55}{kInlineStrFlag}}\ \ =\ 0x1000,}
+\DoxyCodeLine{01922\ }
+\DoxyCodeLine{01923\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Initial\ flags\ of\ different\ types.}}
+\DoxyCodeLine{01924\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba8c5507cf143edac6e50abec2d89cc40d}{kNullFlag}}\ =\ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7aa09befbfb4f2e1409f237817979d8087}{kNullType}},}
+\DoxyCodeLine{01925\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba75dbcdbacc82f9379c602f0b6c41cf07}{kTrueFlag}}\ =\ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7a209434e5edd66630011ca19d710d7cd6}{kTrueType}}\ |\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbac48966386b231124da7c3fb870e237ee}{kBoolFlag}},}
+\DoxyCodeLine{01926\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba66d3877b074bb1a0455a6f6d3f7f91a3}{kFalseFlag}}\ =\ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7a062b8296274a258acf0e142868684c54}{kFalseType}}\ |\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbac48966386b231124da7c3fb870e237ee}{kBoolFlag}},}
+\DoxyCodeLine{01927\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbacfe8b720220d0a2e378683367386cbaf}{kNumberIntFlag}}\ =\ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7afc9f813b7aaf71911bdae20a86b2702d}{kNumberType}}\ |\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbaa4776df2584fe4f341b183cdf3e00a79}{kNumberFlag}}\ |\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbae3fb211193e0067efaddeb5a067120fb}{kIntFlag}}\ |\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba87c567a71dfa5a63363d82d32346884a}{kInt64Flag}},}
+\DoxyCodeLine{01928\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbae8c6c6286edf9c309e77af0ea0cf039c}{kNumberUintFlag}}\ =\ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7afc9f813b7aaf71911bdae20a86b2702d}{kNumberType}}\ |\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbaa4776df2584fe4f341b183cdf3e00a79}{kNumberFlag}}\ |\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba7eba561e6cc6dcd704f907c5a005f3ce}{kUintFlag}}\ |\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbac9200c78f749b6efaae640167a370c94}{kUint64Flag}}\ |\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba87c567a71dfa5a63363d82d32346884a}{kInt64Flag}},}
+\DoxyCodeLine{01929\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbad117eb41bb8015a76aadf6149bbd8ce5}{kNumberInt64Flag}}\ =\ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7afc9f813b7aaf71911bdae20a86b2702d}{kNumberType}}\ |\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbaa4776df2584fe4f341b183cdf3e00a79}{kNumberFlag}}\ |\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba87c567a71dfa5a63363d82d32346884a}{kInt64Flag}},}
+\DoxyCodeLine{01930\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbaaa1ee6a546d4db67f4bdef41d1f54f02}{kNumberUint64Flag}}\ =\ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7afc9f813b7aaf71911bdae20a86b2702d}{kNumberType}}\ |\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbaa4776df2584fe4f341b183cdf3e00a79}{kNumberFlag}}\ |\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbac9200c78f749b6efaae640167a370c94}{kUint64Flag}},}
+\DoxyCodeLine{01931\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba29bc91c155577923abd8f19aa050058b}{kNumberDoubleFlag}}\ =\ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7afc9f813b7aaf71911bdae20a86b2702d}{kNumberType}}\ |\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbaa4776df2584fe4f341b183cdf3e00a79}{kNumberFlag}}\ |\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba70c741e7c488835892aa857f50090d7c}{kDoubleFlag}},}
+\DoxyCodeLine{01932\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbab7805b1908fd181afc8d70fe07b17e18}{kNumberAnyFlag}}\ =\ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7afc9f813b7aaf71911bdae20a86b2702d}{kNumberType}}\ |\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbaa4776df2584fe4f341b183cdf3e00a79}{kNumberFlag}}\ |\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbae3fb211193e0067efaddeb5a067120fb}{kIntFlag}}\ |\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba87c567a71dfa5a63363d82d32346884a}{kInt64Flag}}\ |\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba7eba561e6cc6dcd704f907c5a005f3ce}{kUintFlag}}\ |\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbac9200c78f749b6efaae640167a370c94}{kUint64Flag}}\ |\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba70c741e7c488835892aa857f50090d7c}{kDoubleFlag}},}
+\DoxyCodeLine{01933\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba5d26a84f26833eafd0028c0102a388a9}{kConstStringFlag}}\ =\ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7a2d823b89b055bc743d05c03183d3f338}{kStringType}}\ |\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbaf3bf3661275a38c86addba900c52dccb}{kStringFlag}},}
+\DoxyCodeLine{01934\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba10c83f7f191dce81bb0273adc0d838de}{kCopyStringFlag}}\ =\ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7a2d823b89b055bc743d05c03183d3f338}{kStringType}}\ |\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbaf3bf3661275a38c86addba900c52dccb}{kStringFlag}}\ |\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba10ef921aef1773bc1f88796bf1828f92}{kCopyFlag}},}
+\DoxyCodeLine{01935\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbaca24fa09485fa10b17071509a985ff01}{kShortStringFlag}}\ =\ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7a2d823b89b055bc743d05c03183d3f338}{kStringType}}\ |\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbaf3bf3661275a38c86addba900c52dccb}{kStringFlag}}\ |\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba10ef921aef1773bc1f88796bf1828f92}{kCopyFlag}}\ |\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbae58a76d504c6a67566aebfa4a6bd2e55}{kInlineStrFlag}},}
+\DoxyCodeLine{01936\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbaba5811d4baeb56dc793a6510fe28748c}{kObjectFlag}}\ =\ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7a146f46700e905e8df96a6a90b5c7640f}{kObjectType}},}
+\DoxyCodeLine{01937\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbaf7d99965ba807c718b482a9a7fb28b47}{kArrayFlag}}\ =\ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7af41527d6925efa3c5c3dadb23dfef7c8}{kArrayType}},}
+\DoxyCodeLine{01938\ }
+\DoxyCodeLine{01939\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba793e0bc40e0abe1ed8bcb3e6fbba65c2}{kTypeMask}}\ =\ 0x07}
+\DoxyCodeLine{01940\ \ \ \ \ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_generic_value_ab0205d57176d83814ea4e4598c596fe8}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!GenericValue@{GenericValue}}
+\index{GenericValue@{GenericValue}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{GenericValue()}{GenericValue()}\hspace{0.1cm}{\footnotesize\ttfamily [1/16]}}
+{\footnotesize\ttfamily \label{class_generic_value_ab0205d57176d83814ea4e4598c596fe8} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Memory\+Pool\+Allocator$<$$>$$>$ \\
+\mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\mbox{\hyperlink{class_generic_value}{\+::\+Generic\+Value}} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l00600}{600}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00600\ :\ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}()\ \{\ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}.\mbox{\hyperlink{union_generic_value_1_1_data_ad8572112da083c775ce21bcbca96b2ab}{f}}.\mbox{\hyperlink{struct_generic_value_1_1_flag_ac91f08067dcc0003fc78e870ca9b2d5d}{flags}}\ =\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba8c5507cf143edac6e50abec2d89cc40d}{kNullFlag}};\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_generic_value_ab0205d57176d83814ea4e4598c596fe8_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_value_a83c8f84b8e61f2f40414b703b75aea61}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!GenericValue@{GenericValue}}
+\index{GenericValue@{GenericValue}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{GenericValue()}{GenericValue()}\hspace{0.1cm}{\footnotesize\ttfamily [2/16]}}
+{\footnotesize\ttfamily \label{class_generic_value_a83c8f84b8e61f2f40414b703b75aea61} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Memory\+Pool\+Allocator$<$$>$$>$ \\
+\mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\mbox{\hyperlink{class_generic_value}{\+::\+Generic\+Value}} (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}}}]{type}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+This creates a Value of specified type with default content. 
+\begin{DoxyParams}{Parameters}
+{\em type} & Type of the value. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyNote}{Note}
+Default content for number is zero. 
+\end{DoxyNote}
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l00630}{630}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00630\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}()\ \{}
+\DoxyCodeLine{00631\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ defaultFlags[]\ =\ \{}
+\DoxyCodeLine{00632\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba8c5507cf143edac6e50abec2d89cc40d}{kNullFlag}},\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba66d3877b074bb1a0455a6f6d3f7f91a3}{kFalseFlag}},\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba75dbcdbacc82f9379c602f0b6c41cf07}{kTrueFlag}},\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbaba5811d4baeb56dc793a6510fe28748c}{kObjectFlag}},\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbaf7d99965ba807c718b482a9a7fb28b47}{kArrayFlag}},\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbaca24fa09485fa10b17071509a985ff01}{kShortStringFlag}},}
+\DoxyCodeLine{00633\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbab7805b1908fd181afc8d70fe07b17e18}{kNumberAnyFlag}}}
+\DoxyCodeLine{00634\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00635\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_ga2b2a0d9143aa4fb31205a85b34c43952}{RAPIDJSON\_NOEXCEPT\_ASSERT}}(type\ >=\ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7aa09befbfb4f2e1409f237817979d8087}{kNullType}}\ \&\&\ type\ <=\ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7afc9f813b7aaf71911bdae20a86b2702d}{kNumberType}});}
+\DoxyCodeLine{00636\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}.\mbox{\hyperlink{union_generic_value_1_1_data_ad8572112da083c775ce21bcbca96b2ab}{f}}.\mbox{\hyperlink{struct_generic_value_1_1_flag_ac91f08067dcc0003fc78e870ca9b2d5d}{flags}}\ =\ defaultFlags[\mbox{\hyperlink{yubihsm_8h_a1d127017fb298b889f4ba24752d08b8e}{type}}];}
+\DoxyCodeLine{00637\ }
+\DoxyCodeLine{00638\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Use\ ShortString\ to\ store\ empty\ string.}}
+\DoxyCodeLine{00639\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (type\ ==\ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7a2d823b89b055bc743d05c03183d3f338}{kStringType}})}
+\DoxyCodeLine{00640\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}.\mbox{\hyperlink{union_generic_value_1_1_data_a410e39a5dc296eb3b152b54193740e4c}{ss}}.\mbox{\hyperlink{struct_generic_value_1_1_short_string_adbfe8461e0cb0ccb2cb3825489e743c2}{SetLength}}(0);}
+\DoxyCodeLine{00641\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_generic_value_a83c8f84b8e61f2f40414b703b75aea61_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_value_a76c68b72723a06045776dbd425f9e8b6}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!GenericValue@{GenericValue}}
+\index{GenericValue@{GenericValue}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{GenericValue()}{GenericValue()}\hspace{0.1cm}{\footnotesize\ttfamily [3/16]}}
+{\footnotesize\ttfamily \label{class_generic_value_a76c68b72723a06045776dbd425f9e8b6} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Memory\+Pool\+Allocator$<$$>$$>$ \\
+template$<$typename Source\+Allocator $>$ \\
+\mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\mbox{\hyperlink{class_generic_value}{\+::\+Generic\+Value}} (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, Source\+Allocator $>$ \&}]{rhs}{, }\item[{\mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} \&}]{allocator}{, }\item[{bool}]{copy\+Const\+Strings}{ = {\ttfamily false}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Creates a copy of a Value by using the given Allocator 
+\begin{DoxyTemplParams}{Template Parameters}
+{\em Source\+Allocator} & allocator of {\ttfamily rhs} \\
+\hline
+\end{DoxyTemplParams}
+
+\begin{DoxyParams}{Parameters}
+{\em rhs} & Value to copy from (read-\/only) \\
+\hline
+{\em allocator} & Allocator for allocating copied elements and buffers. Commonly use \doxylink{class_generic_document_a1362cbdcce6ca37356744a3a0dbb11d6}{Generic\+Document\+::\+Get\+Allocator()}. \\
+\hline
+{\em copy\+Const\+Strings} & Force copying of constant strings (e.\+g. referencing an in-\/situ buffer) \\
+\hline
+\end{DoxyParams}
+\begin{DoxySeeAlso}{See also}
+Copy\+From() 
+\end{DoxySeeAlso}
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l00652}{652}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00652\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00653\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (rhs.GetType())\ \{}
+\DoxyCodeLine{00654\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7a146f46700e905e8df96a6a90b5c7640f}{kObjectType}}:\ \{}
+\DoxyCodeLine{00655\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ =\ rhs.\mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}.\mbox{\hyperlink{union_generic_value_1_1_data_af6417eca530fba0d8bd65d309628eb11}{o}}.\mbox{\hyperlink{struct_generic_value_1_1_object_data_a8aa09c430b245b9bb0745a1ab38201d5}{size}};}
+\DoxyCodeLine{00656\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_a41fba065b6f19c64ff8313939f981f4c}{Member}}*\ lm\ =\ \textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{class_generic_value_a41fba065b6f19c64ff8313939f981f4c}{Member}}*\textcolor{keyword}{>}(\mbox{\hyperlink{namespacechainbase_add7d4cf66ab3f2808fe613e6b0343b89}{allocator}}.Malloc(\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ *\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{class_generic_value_a41fba065b6f19c64ff8313939f981f4c}{Member}})));}
+\DoxyCodeLine{00657\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{typename}\ \mbox{\hyperlink{struct_generic_member}{GenericValue<Encoding,SourceAllocator>::Member}}*\ rm\ =\ rhs.\mbox{\hyperlink{class_generic_value_a8c39af1a639eae1b59db66e2cbb537c9}{GetMembersPointer}}();}
+\DoxyCodeLine{00658\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}};\ i++)\ \{}
+\DoxyCodeLine{00659\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ (\&lm[i].name)\ \mbox{\hyperlink{class_generic_value_ab0205d57176d83814ea4e4598c596fe8}{GenericValue}}(rm[i].\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ allocator,\ copyConstStrings);}
+\DoxyCodeLine{00660\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ (\&lm[i].value)\ \mbox{\hyperlink{class_generic_value_ab0205d57176d83814ea4e4598c596fe8}{GenericValue}}(rm[i].\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\ allocator,\ copyConstStrings);}
+\DoxyCodeLine{00661\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00662\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}.\mbox{\hyperlink{union_generic_value_1_1_data_ad8572112da083c775ce21bcbca96b2ab}{f}}.\mbox{\hyperlink{struct_generic_value_1_1_flag_ac91f08067dcc0003fc78e870ca9b2d5d}{flags}}\ =\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbaba5811d4baeb56dc793a6510fe28748c}{kObjectFlag}};}
+\DoxyCodeLine{00663\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}.\mbox{\hyperlink{union_generic_value_1_1_data_af6417eca530fba0d8bd65d309628eb11}{o}}.\mbox{\hyperlink{struct_generic_value_1_1_object_data_a8aa09c430b245b9bb0745a1ab38201d5}{size}}\ =\ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}.\mbox{\hyperlink{union_generic_value_1_1_data_af6417eca530fba0d8bd65d309628eb11}{o}}.\mbox{\hyperlink{struct_generic_value_1_1_object_data_a22b8d8b01d52db71471f0d4c990cb93b}{capacity}}\ =\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}};}
+\DoxyCodeLine{00664\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_a634a87972649943604153708ca9aefb7}{SetMembersPointer}}(lm);}
+\DoxyCodeLine{00665\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00666\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00667\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7af41527d6925efa3c5c3dadb23dfef7c8}{kArrayType}}:\ \{}
+\DoxyCodeLine{00668\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ =\ rhs.\mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}.\mbox{\hyperlink{union_generic_value_1_1_data_aeac31cf55bf5a024cead5ecb63e4fd48}{a}}.\mbox{\hyperlink{struct_generic_value_1_1_array_data_a5306856f64aea8ec53abf263ed2a35e2}{size}};}
+\DoxyCodeLine{00669\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value}{GenericValue}}*\ le\ =\ \textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{class_generic_value}{GenericValue}}*\textcolor{keyword}{>}(\mbox{\hyperlink{namespacechainbase_add7d4cf66ab3f2808fe613e6b0343b89}{allocator}}.Malloc(\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ *\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{class_generic_value}{GenericValue}})));}
+\DoxyCodeLine{00670\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_generic_value}{GenericValue<Encoding,SourceAllocator>}}*\ re\ =\ rhs.\mbox{\hyperlink{class_generic_value_a40f567bae6fabbb07822ebac5fe00bfc}{GetElementsPointer}}();}
+\DoxyCodeLine{00671\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}};\ i++)}
+\DoxyCodeLine{00672\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ (\&le[i])\ \mbox{\hyperlink{class_generic_value_ab0205d57176d83814ea4e4598c596fe8}{GenericValue}}(re[i],\ allocator,\ copyConstStrings);}
+\DoxyCodeLine{00673\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}.\mbox{\hyperlink{union_generic_value_1_1_data_ad8572112da083c775ce21bcbca96b2ab}{f}}.\mbox{\hyperlink{struct_generic_value_1_1_flag_ac91f08067dcc0003fc78e870ca9b2d5d}{flags}}\ =\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbaf7d99965ba807c718b482a9a7fb28b47}{kArrayFlag}};}
+\DoxyCodeLine{00674\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}.\mbox{\hyperlink{union_generic_value_1_1_data_aeac31cf55bf5a024cead5ecb63e4fd48}{a}}.\mbox{\hyperlink{struct_generic_value_1_1_array_data_a5306856f64aea8ec53abf263ed2a35e2}{size}}\ =\ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}.\mbox{\hyperlink{union_generic_value_1_1_data_aeac31cf55bf5a024cead5ecb63e4fd48}{a}}.\mbox{\hyperlink{struct_generic_value_1_1_array_data_a0c6fe03c00e13d14b95abd31048aa1f5}{capacity}}\ =\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}};}
+\DoxyCodeLine{00675\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_a1ccc6e15fa49f0c30eab8e8f7f9418f2}{SetElementsPointer}}(le);}
+\DoxyCodeLine{00676\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00677\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00678\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7a2d823b89b055bc743d05c03183d3f338}{kStringType}}:}
+\DoxyCodeLine{00679\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (rhs.\mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}.\mbox{\hyperlink{union_generic_value_1_1_data_ad8572112da083c775ce21bcbca96b2ab}{f}}.\mbox{\hyperlink{struct_generic_value_1_1_flag_ac91f08067dcc0003fc78e870ca9b2d5d}{flags}}\ ==\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba5d26a84f26833eafd0028c0102a388a9}{kConstStringFlag}}\ \&\&\ !copyConstStrings)\ \{}
+\DoxyCodeLine{00680\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}.\mbox{\hyperlink{union_generic_value_1_1_data_ad8572112da083c775ce21bcbca96b2ab}{f}}.\mbox{\hyperlink{struct_generic_value_1_1_flag_ac91f08067dcc0003fc78e870ca9b2d5d}{flags}}\ =\ rhs.\mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}.\mbox{\hyperlink{union_generic_value_1_1_data_ad8572112da083c775ce21bcbca96b2ab}{f}}.\mbox{\hyperlink{struct_generic_value_1_1_flag_ac91f08067dcc0003fc78e870ca9b2d5d}{flags}};}
+\DoxyCodeLine{00681\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}\ \ =\ *\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\mbox{\hyperlink{struct_data}{Data}}*\textcolor{keyword}{>}(\&rhs.\mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}});}
+\DoxyCodeLine{00682\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00683\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00684\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_a1451603922dcdf34976f125dc60f70ee}{SetStringRaw}}(\mbox{\hyperlink{document_8h_aa6b9fd9f6aa49405a574c362ba9af6b5}{StringRef}}(rhs.GetString(),\ rhs.GetStringLength()),\ allocator);}
+\DoxyCodeLine{00685\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00686\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00687\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}.\mbox{\hyperlink{union_generic_value_1_1_data_ad8572112da083c775ce21bcbca96b2ab}{f}}.\mbox{\hyperlink{struct_generic_value_1_1_flag_ac91f08067dcc0003fc78e870ca9b2d5d}{flags}}\ =\ rhs.\mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}.\mbox{\hyperlink{union_generic_value_1_1_data_ad8572112da083c775ce21bcbca96b2ab}{f}}.\mbox{\hyperlink{struct_generic_value_1_1_flag_ac91f08067dcc0003fc78e870ca9b2d5d}{flags}};}
+\DoxyCodeLine{00688\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}\ \ =\ *\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\mbox{\hyperlink{struct_data}{Data}}*\textcolor{keyword}{>}(\&rhs.\mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}});}
+\DoxyCodeLine{00689\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00690\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00691\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_generic_value_a76c68b72723a06045776dbd425f9e8b6_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_value_a0f6a0394bfffaedde88e433b2265194c}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!GenericValue@{GenericValue}}
+\index{GenericValue@{GenericValue}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{GenericValue()}{GenericValue()}\hspace{0.1cm}{\footnotesize\ttfamily [4/16]}}
+{\footnotesize\ttfamily \label{class_generic_value_a0f6a0394bfffaedde88e433b2265194c} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Memory\+Pool\+Allocator$<$$>$$>$ \\
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\mbox{\hyperlink{class_generic_value}{\+::\+Generic\+Value}} (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}}]{b}{, }\item[{RAPIDJSON\+\_\+\+ENABLEIF((internal\+::\+Is\+Same$<$ bool, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$))}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+\begin{DoxyParams}{Parameters}
+{\em b} & Boolean value \\
+\hline
+\end{DoxyParams}
+\begin{DoxyNote}{Note}
+This constructor is limited to {\itshape real} boolean values and rejects implicitly converted types like arbitrary pointers. Use an explicit cast to {\ttfamily bool}, if you want to construct a boolean JSON value in such cases. 
+\end{DoxyNote}
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l00701}{701}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00705\ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}()\ \{}
+\DoxyCodeLine{00706\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ safe-\/guard\ against\ failing\ SFINAE}}
+\DoxyCodeLine{00707\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_af95188da1d8eb6d4b148fe9ce71cd7c4}{RAPIDJSON\_STATIC\_ASSERT}}((internal::IsSame<bool,T>::Value));}
+\DoxyCodeLine{00708\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}.\mbox{\hyperlink{union_generic_value_1_1_data_ad8572112da083c775ce21bcbca96b2ab}{f}}.\mbox{\hyperlink{struct_generic_value_1_1_flag_ac91f08067dcc0003fc78e870ca9b2d5d}{flags}}\ =\ b\ ?\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba75dbcdbacc82f9379c602f0b6c41cf07}{kTrueFlag}}\ :\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba66d3877b074bb1a0455a6f6d3f7f91a3}{kFalseFlag}};}
+\DoxyCodeLine{00709\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_value_aafc754ade38421c179f5c8933ecbaf45}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!GenericValue@{GenericValue}}
+\index{GenericValue@{GenericValue}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{GenericValue()}{GenericValue()}\hspace{0.1cm}{\footnotesize\ttfamily [5/16]}}
+{\footnotesize\ttfamily \label{class_generic_value_aafc754ade38421c179f5c8933ecbaf45} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Memory\+Pool\+Allocator$<$$>$$>$ \\
+\mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\mbox{\hyperlink{class_generic_value}{\+::\+Generic\+Value}} (\begin{DoxyParamCaption}\item[{int}]{i}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l00712}{712}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00712\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}()\ \{}
+\DoxyCodeLine{00713\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}.\mbox{\hyperlink{union_generic_value_1_1_data_a243007cce2f4b75bea3e3c1ee4c3c239}{n}}.\mbox{\hyperlink{union_generic_value_1_1_number_ae53d96a8ead92099541da3b71633b77b}{i64}}\ =\ i;}
+\DoxyCodeLine{00714\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}.\mbox{\hyperlink{union_generic_value_1_1_data_ad8572112da083c775ce21bcbca96b2ab}{f}}.\mbox{\hyperlink{struct_generic_value_1_1_flag_ac91f08067dcc0003fc78e870ca9b2d5d}{flags}}\ =\ (i\ >=\ 0)\ ?\ (\mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbacfe8b720220d0a2e378683367386cbaf}{kNumberIntFlag}}\ |\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba7eba561e6cc6dcd704f907c5a005f3ce}{kUintFlag}}\ |\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbac9200c78f749b6efaae640167a370c94}{kUint64Flag}})\ :\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbacfe8b720220d0a2e378683367386cbaf}{kNumberIntFlag}};}
+\DoxyCodeLine{00715\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_value_a972bff6c56ac3d04622ff7fad8d98331}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!GenericValue@{GenericValue}}
+\index{GenericValue@{GenericValue}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{GenericValue()}{GenericValue()}\hspace{0.1cm}{\footnotesize\ttfamily [6/16]}}
+{\footnotesize\ttfamily \label{class_generic_value_a972bff6c56ac3d04622ff7fad8d98331} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Memory\+Pool\+Allocator$<$$>$$>$ \\
+\mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\mbox{\hyperlink{class_generic_value}{\+::\+Generic\+Value}} (\begin{DoxyParamCaption}\item[{unsigned}]{u}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l00718}{718}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00718\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}()\ \{}
+\DoxyCodeLine{00719\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}.\mbox{\hyperlink{union_generic_value_1_1_data_a243007cce2f4b75bea3e3c1ee4c3c239}{n}}.\mbox{\hyperlink{union_generic_value_1_1_number_a1c8d3c6d226cf74315e233b30b622430}{u64}}\ =\ u;\ }
+\DoxyCodeLine{00720\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}.\mbox{\hyperlink{union_generic_value_1_1_data_ad8572112da083c775ce21bcbca96b2ab}{f}}.\mbox{\hyperlink{struct_generic_value_1_1_flag_ac91f08067dcc0003fc78e870ca9b2d5d}{flags}}\ =\ (u\ \&\ 0x80000000)\ ?\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbae8c6c6286edf9c309e77af0ea0cf039c}{kNumberUintFlag}}\ :\ (\mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbae8c6c6286edf9c309e77af0ea0cf039c}{kNumberUintFlag}}\ |\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbae3fb211193e0067efaddeb5a067120fb}{kIntFlag}}\ |\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba87c567a71dfa5a63363d82d32346884a}{kInt64Flag}});}
+\DoxyCodeLine{00721\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_value_a964b69f1d2596f75ded5421b6db01a14}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!GenericValue@{GenericValue}}
+\index{GenericValue@{GenericValue}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{GenericValue()}{GenericValue()}\hspace{0.1cm}{\footnotesize\ttfamily [7/16]}}
+{\footnotesize\ttfamily \label{class_generic_value_a964b69f1d2596f75ded5421b6db01a14} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Memory\+Pool\+Allocator$<$$>$$>$ \\
+\mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\mbox{\hyperlink{class_generic_value}{\+::\+Generic\+Value}} (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}}]{i64}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l00724}{724}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00724\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}()\ \{}
+\DoxyCodeLine{00725\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}.\mbox{\hyperlink{union_generic_value_1_1_data_a243007cce2f4b75bea3e3c1ee4c3c239}{n}}.\mbox{\hyperlink{union_generic_value_1_1_number_ae53d96a8ead92099541da3b71633b77b}{i64}}\ =\ \mbox{\hyperlink{namespace_native_types_afdf3569bb6d1de98f5165a3078f88fab}{i64}};}
+\DoxyCodeLine{00726\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}.\mbox{\hyperlink{union_generic_value_1_1_data_ad8572112da083c775ce21bcbca96b2ab}{f}}.\mbox{\hyperlink{struct_generic_value_1_1_flag_ac91f08067dcc0003fc78e870ca9b2d5d}{flags}}\ =\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbad117eb41bb8015a76aadf6149bbd8ce5}{kNumberInt64Flag}};}
+\DoxyCodeLine{00727\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (i64\ >=\ 0)\ \{}
+\DoxyCodeLine{00728\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}.\mbox{\hyperlink{union_generic_value_1_1_data_ad8572112da083c775ce21bcbca96b2ab}{f}}.\mbox{\hyperlink{struct_generic_value_1_1_flag_ac91f08067dcc0003fc78e870ca9b2d5d}{flags}}\ |=\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbaaa1ee6a546d4db67f4bdef41d1f54f02}{kNumberUint64Flag}};}
+\DoxyCodeLine{00729\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!(\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\textcolor{keyword}{>}(i64)\ \&\ \mbox{\hyperlink{rapidjson_8h_aaee1245f375a71be1ac9b8a07ba5fb8f}{RAPIDJSON\_UINT64\_C2}}(0xFFFFFFFF,\ 0x00000000)))}
+\DoxyCodeLine{00730\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}.\mbox{\hyperlink{union_generic_value_1_1_data_ad8572112da083c775ce21bcbca96b2ab}{f}}.\mbox{\hyperlink{struct_generic_value_1_1_flag_ac91f08067dcc0003fc78e870ca9b2d5d}{flags}}\ |=\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba7eba561e6cc6dcd704f907c5a005f3ce}{kUintFlag}};}
+\DoxyCodeLine{00731\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!(\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\textcolor{keyword}{>}(i64)\ \&\ \mbox{\hyperlink{rapidjson_8h_aaee1245f375a71be1ac9b8a07ba5fb8f}{RAPIDJSON\_UINT64\_C2}}(0xFFFFFFFF,\ 0x80000000)))}
+\DoxyCodeLine{00732\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}.\mbox{\hyperlink{union_generic_value_1_1_data_ad8572112da083c775ce21bcbca96b2ab}{f}}.\mbox{\hyperlink{struct_generic_value_1_1_flag_ac91f08067dcc0003fc78e870ca9b2d5d}{flags}}\ |=\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbae3fb211193e0067efaddeb5a067120fb}{kIntFlag}};}
+\DoxyCodeLine{00733\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00734\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (i64\ >=\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\textcolor{keyword}{>}(\mbox{\hyperlink{rapidjson_8h_aaee1245f375a71be1ac9b8a07ba5fb8f}{RAPIDJSON\_UINT64\_C2}}(0xFFFFFFFF,\ 0x80000000)))}
+\DoxyCodeLine{00735\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}.\mbox{\hyperlink{union_generic_value_1_1_data_ad8572112da083c775ce21bcbca96b2ab}{f}}.\mbox{\hyperlink{struct_generic_value_1_1_flag_ac91f08067dcc0003fc78e870ca9b2d5d}{flags}}\ |=\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbae3fb211193e0067efaddeb5a067120fb}{kIntFlag}};}
+\DoxyCodeLine{00736\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_value_ad04805a57f5050c8e04be469ba64d6f3}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!GenericValue@{GenericValue}}
+\index{GenericValue@{GenericValue}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{GenericValue()}{GenericValue()}\hspace{0.1cm}{\footnotesize\ttfamily [8/16]}}
+{\footnotesize\ttfamily \label{class_generic_value_ad04805a57f5050c8e04be469ba64d6f3} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Memory\+Pool\+Allocator$<$$>$$>$ \\
+\mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\mbox{\hyperlink{class_generic_value}{\+::\+Generic\+Value}} (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{u64}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l00739}{739}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00739\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}()\ \{}
+\DoxyCodeLine{00740\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}.\mbox{\hyperlink{union_generic_value_1_1_data_a243007cce2f4b75bea3e3c1ee4c3c239}{n}}.\mbox{\hyperlink{union_generic_value_1_1_number_a1c8d3c6d226cf74315e233b30b622430}{u64}}\ =\ u64;}
+\DoxyCodeLine{00741\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}.\mbox{\hyperlink{union_generic_value_1_1_data_ad8572112da083c775ce21bcbca96b2ab}{f}}.\mbox{\hyperlink{struct_generic_value_1_1_flag_ac91f08067dcc0003fc78e870ca9b2d5d}{flags}}\ =\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbaaa1ee6a546d4db67f4bdef41d1f54f02}{kNumberUint64Flag}};}
+\DoxyCodeLine{00742\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!(u64\ \&\ \mbox{\hyperlink{rapidjson_8h_aaee1245f375a71be1ac9b8a07ba5fb8f}{RAPIDJSON\_UINT64\_C2}}(0x80000000,\ 0x00000000)))}
+\DoxyCodeLine{00743\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}.\mbox{\hyperlink{union_generic_value_1_1_data_ad8572112da083c775ce21bcbca96b2ab}{f}}.\mbox{\hyperlink{struct_generic_value_1_1_flag_ac91f08067dcc0003fc78e870ca9b2d5d}{flags}}\ |=\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba87c567a71dfa5a63363d82d32346884a}{kInt64Flag}};}
+\DoxyCodeLine{00744\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!(u64\ \&\ \mbox{\hyperlink{rapidjson_8h_aaee1245f375a71be1ac9b8a07ba5fb8f}{RAPIDJSON\_UINT64\_C2}}(0xFFFFFFFF,\ 0x00000000)))}
+\DoxyCodeLine{00745\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}.\mbox{\hyperlink{union_generic_value_1_1_data_ad8572112da083c775ce21bcbca96b2ab}{f}}.\mbox{\hyperlink{struct_generic_value_1_1_flag_ac91f08067dcc0003fc78e870ca9b2d5d}{flags}}\ |=\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba7eba561e6cc6dcd704f907c5a005f3ce}{kUintFlag}};}
+\DoxyCodeLine{00746\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!(u64\ \&\ \mbox{\hyperlink{rapidjson_8h_aaee1245f375a71be1ac9b8a07ba5fb8f}{RAPIDJSON\_UINT64\_C2}}(0xFFFFFFFF,\ 0x80000000)))}
+\DoxyCodeLine{00747\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}.\mbox{\hyperlink{union_generic_value_1_1_data_ad8572112da083c775ce21bcbca96b2ab}{f}}.\mbox{\hyperlink{struct_generic_value_1_1_flag_ac91f08067dcc0003fc78e870ca9b2d5d}{flags}}\ |=\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbae3fb211193e0067efaddeb5a067120fb}{kIntFlag}};}
+\DoxyCodeLine{00748\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_value_a267d05b7e98c3507908eaf085fe41155}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!GenericValue@{GenericValue}}
+\index{GenericValue@{GenericValue}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{GenericValue()}{GenericValue()}\hspace{0.1cm}{\footnotesize\ttfamily [9/16]}}
+{\footnotesize\ttfamily \label{class_generic_value_a267d05b7e98c3507908eaf085fe41155} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Memory\+Pool\+Allocator$<$$>$$>$ \\
+\mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\mbox{\hyperlink{class_generic_value}{\+::\+Generic\+Value}} (\begin{DoxyParamCaption}\item[{double}]{d}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l00751}{751}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00751\ :\ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}()\ \{\ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}.\mbox{\hyperlink{union_generic_value_1_1_data_a243007cce2f4b75bea3e3c1ee4c3c239}{n}}.\mbox{\hyperlink{union_generic_value_1_1_number_a7ca3ad492fff303586d241eb0d17c242}{d}}\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}};\ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}.\mbox{\hyperlink{union_generic_value_1_1_data_ad8572112da083c775ce21bcbca96b2ab}{f}}.\mbox{\hyperlink{struct_generic_value_1_1_flag_ac91f08067dcc0003fc78e870ca9b2d5d}{flags}}\ =\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba29bc91c155577923abd8f19aa050058b}{kNumberDoubleFlag}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_value_acad11ab781251634a3c079aa64a6d283}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!GenericValue@{GenericValue}}
+\index{GenericValue@{GenericValue}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{GenericValue()}{GenericValue()}\hspace{0.1cm}{\footnotesize\ttfamily [10/16]}}
+{\footnotesize\ttfamily \label{class_generic_value_acad11ab781251634a3c079aa64a6d283} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Memory\+Pool\+Allocator$<$$>$$>$ \\
+\mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\mbox{\hyperlink{class_generic_value}{\+::\+Generic\+Value}} (\begin{DoxyParamCaption}\item[{float}]{f}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l00754}{754}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00754\ :\ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}()\ \{\ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}.\mbox{\hyperlink{union_generic_value_1_1_data_a243007cce2f4b75bea3e3c1ee4c3c239}{n}}.\mbox{\hyperlink{union_generic_value_1_1_number_a7ca3ad492fff303586d241eb0d17c242}{d}}\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{double}\textcolor{keyword}{>}(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}});\ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}.\mbox{\hyperlink{union_generic_value_1_1_data_ad8572112da083c775ce21bcbca96b2ab}{f}}.\mbox{\hyperlink{struct_generic_value_1_1_flag_ac91f08067dcc0003fc78e870ca9b2d5d}{flags}}\ =\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba29bc91c155577923abd8f19aa050058b}{kNumberDoubleFlag}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_value_a4d9af98141360cd801daab4ed1ca2c91}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!GenericValue@{GenericValue}}
+\index{GenericValue@{GenericValue}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{GenericValue()}{GenericValue()}\hspace{0.1cm}{\footnotesize\ttfamily [11/16]}}
+{\footnotesize\ttfamily \label{class_generic_value_a4d9af98141360cd801daab4ed1ca2c91} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Memory\+Pool\+Allocator$<$$>$$>$ \\
+\mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\mbox{\hyperlink{class_generic_value}{\+::\+Generic\+Value}} (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_generic_value_a4541cc8138f2fac80d69836cc1e07116}{Ch}} \texorpdfstring{$\ast$}{*}}]{s}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{length}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l00757}{757}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00757\ :\ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}()\ \{\ \mbox{\hyperlink{class_generic_value_a1451603922dcdf34976f125dc60f70ee}{SetStringRaw}}(\mbox{\hyperlink{document_8h_aa6b9fd9f6aa49405a574c362ba9af6b5}{StringRef}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ length));\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_generic_value_a4d9af98141360cd801daab4ed1ca2c91_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_value_abb2887958974fef1b2b5c8e32cc72ddb}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!GenericValue@{GenericValue}}
+\index{GenericValue@{GenericValue}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{GenericValue()}{GenericValue()}\hspace{0.1cm}{\footnotesize\ttfamily [12/16]}}
+{\footnotesize\ttfamily \label{class_generic_value_abb2887958974fef1b2b5c8e32cc72ddb} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Memory\+Pool\+Allocator$<$$>$$>$ \\
+\mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\mbox{\hyperlink{class_generic_value}{\+::\+Generic\+Value}} (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_generic_value_a5b089cb5ea5f149e48178ac7fe141491}{String\+Ref\+Type}}}]{s}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l00760}{760}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00760\ :\ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}()\ \{\ \mbox{\hyperlink{class_generic_value_a1451603922dcdf34976f125dc60f70ee}{SetStringRaw}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_generic_value_abb2887958974fef1b2b5c8e32cc72ddb_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_value_a9ec2c7cda8c8845acfa3565c6b1b4e10}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!GenericValue@{GenericValue}}
+\index{GenericValue@{GenericValue}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{GenericValue()}{GenericValue()}\hspace{0.1cm}{\footnotesize\ttfamily [13/16]}}
+{\footnotesize\ttfamily \label{class_generic_value_a9ec2c7cda8c8845acfa3565c6b1b4e10} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Memory\+Pool\+Allocator$<$$>$$>$ \\
+\mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\mbox{\hyperlink{class_generic_value}{\+::\+Generic\+Value}} (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_generic_value_a4541cc8138f2fac80d69836cc1e07116}{Ch}} \texorpdfstring{$\ast$}{*}}]{s}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{length}{, }\item[{\mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} \&}]{allocator}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l00763}{763}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00763\ :\ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}()\ \{\ \mbox{\hyperlink{class_generic_value_a1451603922dcdf34976f125dc60f70ee}{SetStringRaw}}(\mbox{\hyperlink{document_8h_aa6b9fd9f6aa49405a574c362ba9af6b5}{StringRef}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ length),\ allocator);\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_generic_value_a9ec2c7cda8c8845acfa3565c6b1b4e10_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_value_a9b72b2e3347d4cd77b16c3b45e8decf1}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!GenericValue@{GenericValue}}
+\index{GenericValue@{GenericValue}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{GenericValue()}{GenericValue()}\hspace{0.1cm}{\footnotesize\ttfamily [14/16]}}
+{\footnotesize\ttfamily \label{class_generic_value_a9b72b2e3347d4cd77b16c3b45e8decf1} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Memory\+Pool\+Allocator$<$$>$$>$ \\
+\mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\mbox{\hyperlink{class_generic_value}{\+::\+Generic\+Value}} (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_generic_value_a4541cc8138f2fac80d69836cc1e07116}{Ch}} \texorpdfstring{$\ast$}{*}}]{s}{, }\item[{\mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} \&}]{allocator}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l00766}{766}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00766\ :\ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}()\ \{\ \mbox{\hyperlink{class_generic_value_a1451603922dcdf34976f125dc60f70ee}{SetStringRaw}}(\mbox{\hyperlink{document_8h_aa6b9fd9f6aa49405a574c362ba9af6b5}{StringRef}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}),\ allocator);\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_generic_value_a9b72b2e3347d4cd77b16c3b45e8decf1_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_value_a953052ef91e54aabe9bdb9f9eaebf6cc}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!GenericValue@{GenericValue}}
+\index{GenericValue@{GenericValue}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{GenericValue()}{GenericValue()}\hspace{0.1cm}{\footnotesize\ttfamily [15/16]}}
+{\footnotesize\ttfamily \label{class_generic_value_a953052ef91e54aabe9bdb9f9eaebf6cc} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Memory\+Pool\+Allocator$<$$>$$>$ \\
+\mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\mbox{\hyperlink{class_generic_value}{\+::\+Generic\+Value}} (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_generic_value_a0579f19054b3e305c8510d5d4f0fb1f0}{Array}}}]{a}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+\begin{DoxyParams}{Parameters}
+{\em a} & An array obtained by {\ttfamily Get\+Array()}. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyNote}{Note}
+{\ttfamily Array} is always pass-\/by-\/value. 
+
+the source array is moved into this value and the sourec array becomes empty. 
+\end{DoxyNote}
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l00781}{781}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00781\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.value\_.data\_)\ \{}
+\DoxyCodeLine{00782\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.value\_.data\_\ =\ \mbox{\hyperlink{struct_data}{Data}}();}
+\DoxyCodeLine{00783\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.value\_.data\_.f.flags\ =\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbaf7d99965ba807c718b482a9a7fb28b47}{kArrayFlag}};}
+\DoxyCodeLine{00784\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_value_a9c294e56f4ab940f845f7c171b183483}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!GenericValue@{GenericValue}}
+\index{GenericValue@{GenericValue}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{GenericValue()}{GenericValue()}\hspace{0.1cm}{\footnotesize\ttfamily [16/16]}}
+{\footnotesize\ttfamily \label{class_generic_value_a9c294e56f4ab940f845f7c171b183483} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Memory\+Pool\+Allocator$<$$>$$>$ \\
+\mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\mbox{\hyperlink{class_generic_value}{\+::\+Generic\+Value}} (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_generic_value_aedad41324ad8798ecd4039e66c3e3f05}{Object}}}]{o}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+\begin{DoxyParams}{Parameters}
+{\em o} & An object obtained by {\ttfamily Get\+Object()}. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyNote}{Note}
+{\ttfamily Object} is always pass-\/by-\/value. 
+
+the source object is moved into this value and the sourec object becomes empty. 
+\end{DoxyNote}
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l00792}{792}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00792\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}(o.value\_.data\_)\ \{}
+\DoxyCodeLine{00793\ \ \ \ \ \ \ \ \ o.value\_.data\_\ =\ \mbox{\hyperlink{struct_data}{Data}}();}
+\DoxyCodeLine{00794\ \ \ \ \ \ \ \ \ o.value\_.data\_.f.flags\ =\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbaba5811d4baeb56dc793a6510fe28748c}{kObjectFlag}};}
+\DoxyCodeLine{00795\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_value_a213ba89ef5ef961a5e655bd8c78ac9f4}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!````~GenericValue@{\texorpdfstring{$\sim$}{\string~}GenericValue}}
+\index{````~GenericValue@{\texorpdfstring{$\sim$}{\string~}GenericValue}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}GenericValue()}{\string~GenericValue()}}
+{\footnotesize\ttfamily \label{class_generic_value_a213ba89ef5ef961a5e655bd8c78ac9f4} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Memory\+Pool\+Allocator$<$$>$$>$ \\
+\mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\texorpdfstring{$\sim$}{\string~}\mbox{\hyperlink{class_generic_value}{Generic\+Value}} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Need to destruct elements of array, members of object, or copy-\/string. 
+
+Definition at line \mbox{\hyperlink{document_8h_source_l00800}{800}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00800\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00801\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (Allocator::kNeedFree)\ \{\ \textcolor{comment}{//\ Shortcut\ by\ Allocator's\ trait}}
+\DoxyCodeLine{00802\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(\mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}.\mbox{\hyperlink{union_generic_value_1_1_data_ad8572112da083c775ce21bcbca96b2ab}{f}}.\mbox{\hyperlink{struct_generic_value_1_1_flag_ac91f08067dcc0003fc78e870ca9b2d5d}{flags}})\ \{}
+\DoxyCodeLine{00803\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbaf7d99965ba807c718b482a9a7fb28b47}{kArrayFlag}}:}
+\DoxyCodeLine{00804\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00805\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value}{GenericValue}}*\ e\ =\ \mbox{\hyperlink{class_generic_value_a40f567bae6fabbb07822ebac5fe00bfc}{GetElementsPointer}}();}
+\DoxyCodeLine{00806\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{class_generic_value}{GenericValue}}*\ v\ =\ e;\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ !=\ e\ +\ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}.\mbox{\hyperlink{union_generic_value_1_1_data_aeac31cf55bf5a024cead5ecb63e4fd48}{a}}.\mbox{\hyperlink{struct_generic_value_1_1_array_data_a5306856f64aea8ec53abf263ed2a35e2}{size}};\ ++\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}})}
+\DoxyCodeLine{00807\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>\string~GenericValue();}
+\DoxyCodeLine{00808\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Allocator::Free(e);}
+\DoxyCodeLine{00809\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00810\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00811\ }
+\DoxyCodeLine{00812\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbaba5811d4baeb56dc793a6510fe28748c}{kObjectFlag}}:}
+\DoxyCodeLine{00813\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{class_generic_value_aa4d7b58bf0dc8826e4d8d14fd1045052}{MemberIterator}}\ m\ =\ MemberBegin();\ m\ !=\ MemberEnd();\ ++m)}
+\DoxyCodeLine{00814\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m-\/>\string~Member();}
+\DoxyCodeLine{00815\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Allocator::Free(\mbox{\hyperlink{class_generic_value_a8c39af1a639eae1b59db66e2cbb537c9}{GetMembersPointer}}());}
+\DoxyCodeLine{00816\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00817\ }
+\DoxyCodeLine{00818\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba10c83f7f191dce81bb0273adc0d838de}{kCopyStringFlag}}:}
+\DoxyCodeLine{00819\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Allocator::Free(\textcolor{keyword}{const\_cast<}\mbox{\hyperlink{class_generic_value_a4541cc8138f2fac80d69836cc1e07116}{Ch}}*\textcolor{keyword}{>}(\mbox{\hyperlink{class_generic_value_af182f2ccbcd962d2a28f92407622e9a9}{GetStringPointer}}()));}
+\DoxyCodeLine{00820\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00821\ }
+\DoxyCodeLine{00822\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00823\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};\ \ \textcolor{comment}{//\ Do\ nothing\ for\ other\ types.}}
+\DoxyCodeLine{00824\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00825\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00826\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_generic_value_a213ba89ef5ef961a5e655bd8c78ac9f4_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{class_generic_value_a213ba89ef5ef961a5e655bd8c78ac9f4_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_generic_value_a40f567bae6fabbb07822ebac5fe00bfc}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!GetElementsPointer@{GetElementsPointer}}
+\index{GetElementsPointer@{GetElementsPointer}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{GetElementsPointer()}{GetElementsPointer()}}
+{\footnotesize\ttfamily \label{class_generic_value_a40f567bae6fabbb07822ebac5fe00bfc} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Memory\+Pool\+Allocator$<$$>$$>$ \\
+RAPIDJSON\+\_\+\+FORCEINLINE \mbox{\hyperlink{class_generic_value}{Generic\+Value}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Get\+Elements\+Pointer (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l02028}{2028}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02028\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{rapidjson_8h_ab67ad54afdd78883907fd1ecd007573a}{RAPIDJSON\_GETPOINTER}}(\mbox{\hyperlink{class_generic_value}{GenericValue}},\ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}.\mbox{\hyperlink{union_generic_value_1_1_data_aeac31cf55bf5a024cead5ecb63e4fd48}{a}}.\mbox{\hyperlink{struct_generic_value_1_1_array_data_a86df976cb6f65924aca20eb9bd35553e}{elements}});\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_generic_value_a40f567bae6fabbb07822ebac5fe00bfc_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_value_a8c39af1a639eae1b59db66e2cbb537c9}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!GetMembersPointer@{GetMembersPointer}}
+\index{GetMembersPointer@{GetMembersPointer}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{GetMembersPointer()}{GetMembersPointer()}}
+{\footnotesize\ttfamily \label{class_generic_value_a8c39af1a639eae1b59db66e2cbb537c9} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Memory\+Pool\+Allocator$<$$>$$>$ \\
+RAPIDJSON\+\_\+\+FORCEINLINE \mbox{\hyperlink{class_generic_value_a41fba065b6f19c64ff8313939f981f4c}{Member}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Get\+Members\+Pointer (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l02030}{2030}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02030\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{rapidjson_8h_ab67ad54afdd78883907fd1ecd007573a}{RAPIDJSON\_GETPOINTER}}(\mbox{\hyperlink{class_generic_value_a41fba065b6f19c64ff8313939f981f4c}{Member}},\ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}.\mbox{\hyperlink{union_generic_value_1_1_data_af6417eca530fba0d8bd65d309628eb11}{o}}.\mbox{\hyperlink{struct_generic_value_1_1_object_data_a108be865f16e4c028f2354b1474a1ec8}{members}});\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_generic_value_a8c39af1a639eae1b59db66e2cbb537c9_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_value_af182f2ccbcd962d2a28f92407622e9a9}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!GetStringPointer@{GetStringPointer}}
+\index{GetStringPointer@{GetStringPointer}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{GetStringPointer()}{GetStringPointer()}}
+{\footnotesize\ttfamily \label{class_generic_value_af182f2ccbcd962d2a28f92407622e9a9} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Memory\+Pool\+Allocator$<$$>$$>$ \\
+RAPIDJSON\+\_\+\+FORCEINLINE const \mbox{\hyperlink{class_generic_value_a4541cc8138f2fac80d69836cc1e07116}{Ch}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Get\+String\+Pointer (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l02026}{2026}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02026\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{rapidjson_8h_ab67ad54afdd78883907fd1ecd007573a}{RAPIDJSON\_GETPOINTER}}(\mbox{\hyperlink{class_generic_value_a4541cc8138f2fac80d69836cc1e07116}{Ch}},\ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}.\mbox{\hyperlink{union_generic_value_1_1_data_a6872a4b93763944063b425e6c001ed2b}{s}}.\mbox{\hyperlink{struct_generic_value_1_1_string_a4eebc5acf3f93ab833efd82abf3ba84d}{str}});\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_generic_value_af182f2ccbcd962d2a28f92407622e9a9_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_value_ad7502bbfcd0c14f7ece07243d56e2b90}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!operator=@{operator=}}
+\index{operator=@{operator=}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_generic_value_ad7502bbfcd0c14f7ece07243d56e2b90} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Memory\+Pool\+Allocator$<$$>$$>$ \\
+\mbox{\hyperlink{class_generic_value}{Generic\+Value}} \& \mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::operator= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \&}]{rhs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+\begin{DoxyParams}{Parameters}
+{\em rhs} & Source of the assignment. It will become a null value after assignment. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l00836}{836}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00836\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00837\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_ga5dc14176a9e71ace282404b0bcda57a1}{RAPIDJSON\_LIKELY}}(\textcolor{keyword}{this}\ !=\ \&rhs))\ \{}
+\DoxyCodeLine{00838\ \ \ \ \ \ \ \ \ \ \ \ \ this-\/>\mbox{\hyperlink{class_generic_value_a213ba89ef5ef961a5e655bd8c78ac9f4}{\string~GenericValue}}();}
+\DoxyCodeLine{00839\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_abb8ea2dfbe74ff4ee7dac6be31317f81}{RawAssign}}(rhs);}
+\DoxyCodeLine{00840\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00841\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00842\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_generic_value_ad7502bbfcd0c14f7ece07243d56e2b90_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{class_generic_value_ad7502bbfcd0c14f7ece07243d56e2b90_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_value_a2b7837d3adb6c0ad184269826ea78e97}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!operator=@{operator=}}
+\index{operator=@{operator=}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_generic_value_a2b7837d3adb6c0ad184269826ea78e97} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Memory\+Pool\+Allocator$<$$>$$>$ \\
+\mbox{\hyperlink{class_generic_value}{Generic\+Value}} \& \mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::operator= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_generic_value_a5b089cb5ea5f149e48178ac7fe141491}{String\+Ref\+Type}}}]{str}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+\begin{DoxyParams}{Parameters}
+{\em str} & Constant string reference to be assigned \\
+\hline
+\end{DoxyParams}
+\begin{DoxyNote}{Note}
+This overload is needed to avoid clashes with the generic primitive type assignment overload below. 
+\end{DoxyNote}
+\begin{DoxySeeAlso}{See also}
+\doxylink{struct_generic_string_ref}{Generic\+String\+Ref}, operator=(\+T) 
+\end{DoxySeeAlso}
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l00856}{856}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00856\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00857\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value}{GenericValue}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}(str);}
+\DoxyCodeLine{00858\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this}\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{00859\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_value_a4a4418a93777942e1fb7ea71f8aaf680}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!RAPIDJSON\_DISABLEIF\_RETURN@{RAPIDJSON\_DISABLEIF\_RETURN}}
+\index{RAPIDJSON\_DISABLEIF\_RETURN@{RAPIDJSON\_DISABLEIF\_RETURN}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{RAPIDJSON\_DISABLEIF\_RETURN()}{RAPIDJSON\_DISABLEIF\_RETURN()}}
+{\footnotesize\ttfamily \label{class_generic_value_a4a4418a93777942e1fb7ea71f8aaf680} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Memory\+Pool\+Allocator$<$$>$$>$ \\
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+RAPIDJSON\+\_\+\+DISABLEIF\+\_\+\+RETURN (\begin{DoxyParamCaption}\item[{(internal\+::\+Is\+Pointer$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$)}]{}{, }\item[{(\mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \&)}]{}{}\end{DoxyParamCaption})}
+
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em T} & Either \doxylink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}, {\ttfamily int}, {\ttfamily unsigned}, {\ttfamily int64\+\_\+t}, {\ttfamily uint64\+\_\+t} \\
+\hline
+\end{DoxyTemplParams}
+
+\begin{DoxyParams}{Parameters}
+{\em value} & The value to be assigned.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyNote}{Note}
+The source type {\ttfamily T} explicitly disallows all pointer types, especially ({\ttfamily const}) \doxylink{class_generic_value_a4541cc8138f2fac80d69836cc1e07116}{Ch}\texorpdfstring{$\ast$}{*}. This helps avoiding implicitly referencing character strings with insufficient lifetime, use Set\+String(const Ch\texorpdfstring{$\ast$}{*}, Allocator\&) (for copying) or \doxylink{document_8h_aa6b9fd9f6aa49405a574c362ba9af6b5}{String\+Ref()} (to explicitly mark the pointer as constant) instead. All other pointer types would implicitly convert to {\ttfamily bool}, use Set\+Bool() instead. Set boolean value 
+\end{DoxyNote}
+\Hypertarget{class_generic_value_abb8ea2dfbe74ff4ee7dac6be31317f81}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!RawAssign@{RawAssign}}
+\index{RawAssign@{RawAssign}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{RawAssign()}{RawAssign()}}
+{\footnotesize\ttfamily \label{class_generic_value_abb8ea2dfbe74ff4ee7dac6be31317f81} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Memory\+Pool\+Allocator$<$$>$$>$ \\
+void \mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Raw\+Assign (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \&}]{rhs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l02084}{2084}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02084\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02085\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}\ =\ rhs.\mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}};}
+\DoxyCodeLine{02086\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ data\_.f.flags\ =\ rhs.data\_.f.flags;}}
+\DoxyCodeLine{02087\ \ \ \ \ \ \ \ \ rhs.\mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}.\mbox{\hyperlink{union_generic_value_1_1_data_ad8572112da083c775ce21bcbca96b2ab}{f}}.\mbox{\hyperlink{struct_generic_value_1_1_flag_ac91f08067dcc0003fc78e870ca9b2d5d}{flags}}\ =\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba8c5507cf143edac6e50abec2d89cc40d}{kNullFlag}};}
+\DoxyCodeLine{02088\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{class_generic_value_abb8ea2dfbe74ff4ee7dac6be31317f81_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_value_a8f5f309065479de40a16cf28a340da65}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!SetArrayRaw@{SetArrayRaw}}
+\index{SetArrayRaw@{SetArrayRaw}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{SetArrayRaw()}{SetArrayRaw()}}
+{\footnotesize\ttfamily \label{class_generic_value_a8f5f309065479de40a16cf28a340da65} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Memory\+Pool\+Allocator$<$$>$$>$ \\
+void \mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Set\+Array\+Raw (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \texorpdfstring{$\ast$}{*}}]{values}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{count}{, }\item[{\mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} \&}]{allocator}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l02034}{2034}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02034\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02035\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}.\mbox{\hyperlink{union_generic_value_1_1_data_ad8572112da083c775ce21bcbca96b2ab}{f}}.\mbox{\hyperlink{struct_generic_value_1_1_flag_ac91f08067dcc0003fc78e870ca9b2d5d}{flags}}\ =\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbaf7d99965ba807c718b482a9a7fb28b47}{kArrayFlag}};}
+\DoxyCodeLine{02036\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}})\ \{}
+\DoxyCodeLine{02037\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value}{GenericValue}}*\ e\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{class_generic_value}{GenericValue}}*\textcolor{keyword}{>}(\mbox{\hyperlink{namespacechainbase_add7d4cf66ab3f2808fe613e6b0343b89}{allocator}}.Malloc(\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ *\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{class_generic_value}{GenericValue}})));}
+\DoxyCodeLine{02038\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_a1ccc6e15fa49f0c30eab8e8f7f9418f2}{SetElementsPointer}}(e);}
+\DoxyCodeLine{02039\ \ \ \ \ \ \ \ \ \ \ \ \ std::memcpy(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{void}*\textcolor{keyword}{>}(e),\ values,\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ *\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{class_generic_value}{GenericValue}}));}
+\DoxyCodeLine{02040\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{02041\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{02042\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_a1ccc6e15fa49f0c30eab8e8f7f9418f2}{SetElementsPointer}}(0);}
+\DoxyCodeLine{02043\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}.\mbox{\hyperlink{union_generic_value_1_1_data_aeac31cf55bf5a024cead5ecb63e4fd48}{a}}.\mbox{\hyperlink{struct_generic_value_1_1_array_data_a5306856f64aea8ec53abf263ed2a35e2}{size}}\ =\ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}.\mbox{\hyperlink{union_generic_value_1_1_data_aeac31cf55bf5a024cead5ecb63e4fd48}{a}}.\mbox{\hyperlink{struct_generic_value_1_1_array_data_a0c6fe03c00e13d14b95abd31048aa1f5}{capacity}}\ =\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}};}
+\DoxyCodeLine{02044\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_generic_value_a8f5f309065479de40a16cf28a340da65_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_value_a1ccc6e15fa49f0c30eab8e8f7f9418f2}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!SetElementsPointer@{SetElementsPointer}}
+\index{SetElementsPointer@{SetElementsPointer}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{SetElementsPointer()}{SetElementsPointer()}}
+{\footnotesize\ttfamily \label{class_generic_value_a1ccc6e15fa49f0c30eab8e8f7f9418f2} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Memory\+Pool\+Allocator$<$$>$$>$ \\
+RAPIDJSON\+\_\+\+FORCEINLINE \mbox{\hyperlink{class_generic_value}{Generic\+Value}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Set\+Elements\+Pointer (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \texorpdfstring{$\ast$}{*}}]{elements}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l02029}{2029}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02029\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{rapidjson_8h_a113598c4750b3aab4de2782ff1865ed4}{RAPIDJSON\_SETPOINTER}}(\mbox{\hyperlink{class_generic_value}{GenericValue}},\ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}.\mbox{\hyperlink{union_generic_value_1_1_data_aeac31cf55bf5a024cead5ecb63e4fd48}{a}}.\mbox{\hyperlink{struct_generic_value_1_1_array_data_a86df976cb6f65924aca20eb9bd35553e}{elements}},\ elements);\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_generic_value_a1ccc6e15fa49f0c30eab8e8f7f9418f2_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_value_a634a87972649943604153708ca9aefb7}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!SetMembersPointer@{SetMembersPointer}}
+\index{SetMembersPointer@{SetMembersPointer}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{SetMembersPointer()}{SetMembersPointer()}}
+{\footnotesize\ttfamily \label{class_generic_value_a634a87972649943604153708ca9aefb7} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Memory\+Pool\+Allocator$<$$>$$>$ \\
+RAPIDJSON\+\_\+\+FORCEINLINE \mbox{\hyperlink{class_generic_value_a41fba065b6f19c64ff8313939f981f4c}{Member}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Set\+Members\+Pointer (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_generic_value_a41fba065b6f19c64ff8313939f981f4c}{Member}} \texorpdfstring{$\ast$}{*}}]{members}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l02031}{2031}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02031\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{rapidjson_8h_a113598c4750b3aab4de2782ff1865ed4}{RAPIDJSON\_SETPOINTER}}(\mbox{\hyperlink{class_generic_value_a41fba065b6f19c64ff8313939f981f4c}{Member}},\ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}.\mbox{\hyperlink{union_generic_value_1_1_data_af6417eca530fba0d8bd65d309628eb11}{o}}.\mbox{\hyperlink{struct_generic_value_1_1_object_data_a108be865f16e4c028f2354b1474a1ec8}{members}},\ members);\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_generic_value_a634a87972649943604153708ca9aefb7_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_value_a26c8ec7d68858df1038506df7fcff22d}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!SetObjectRaw@{SetObjectRaw}}
+\index{SetObjectRaw@{SetObjectRaw}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{SetObjectRaw()}{SetObjectRaw()}}
+{\footnotesize\ttfamily \label{class_generic_value_a26c8ec7d68858df1038506df7fcff22d} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Memory\+Pool\+Allocator$<$$>$$>$ \\
+void \mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Set\+Object\+Raw (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_generic_value_a41fba065b6f19c64ff8313939f981f4c}{Member}} \texorpdfstring{$\ast$}{*}}]{members}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{count}{, }\item[{\mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} \&}]{allocator}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l02047}{2047}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02047\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02048\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}.\mbox{\hyperlink{union_generic_value_1_1_data_ad8572112da083c775ce21bcbca96b2ab}{f}}.\mbox{\hyperlink{struct_generic_value_1_1_flag_ac91f08067dcc0003fc78e870ca9b2d5d}{flags}}\ =\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbaba5811d4baeb56dc793a6510fe28748c}{kObjectFlag}};}
+\DoxyCodeLine{02049\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}})\ \{}
+\DoxyCodeLine{02050\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_a41fba065b6f19c64ff8313939f981f4c}{Member}}*\ m\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{class_generic_value_a41fba065b6f19c64ff8313939f981f4c}{Member}}*\textcolor{keyword}{>}(\mbox{\hyperlink{namespacechainbase_add7d4cf66ab3f2808fe613e6b0343b89}{allocator}}.Malloc(\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ *\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{class_generic_value_a41fba065b6f19c64ff8313939f981f4c}{Member}})));}
+\DoxyCodeLine{02051\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_a634a87972649943604153708ca9aefb7}{SetMembersPointer}}(m);}
+\DoxyCodeLine{02052\ \ \ \ \ \ \ \ \ \ \ \ \ std::memcpy(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{void}*\textcolor{keyword}{>}(m),\ members,\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ *\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{class_generic_value_a41fba065b6f19c64ff8313939f981f4c}{Member}}));}
+\DoxyCodeLine{02053\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{02054\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{02055\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_a634a87972649943604153708ca9aefb7}{SetMembersPointer}}(0);}
+\DoxyCodeLine{02056\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}.\mbox{\hyperlink{union_generic_value_1_1_data_af6417eca530fba0d8bd65d309628eb11}{o}}.\mbox{\hyperlink{struct_generic_value_1_1_object_data_a8aa09c430b245b9bb0745a1ab38201d5}{size}}\ =\ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}.\mbox{\hyperlink{union_generic_value_1_1_data_af6417eca530fba0d8bd65d309628eb11}{o}}.\mbox{\hyperlink{struct_generic_value_1_1_object_data_a22b8d8b01d52db71471f0d4c990cb93b}{capacity}}\ =\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}};}
+\DoxyCodeLine{02057\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_generic_value_a26c8ec7d68858df1038506df7fcff22d_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_value_ab3e8833927fb1454585e8692200dbb93}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!SetStringPointer@{SetStringPointer}}
+\index{SetStringPointer@{SetStringPointer}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{SetStringPointer()}{SetStringPointer()}}
+{\footnotesize\ttfamily \label{class_generic_value_ab3e8833927fb1454585e8692200dbb93} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Memory\+Pool\+Allocator$<$$>$$>$ \\
+RAPIDJSON\+\_\+\+FORCEINLINE const \mbox{\hyperlink{class_generic_value_a4541cc8138f2fac80d69836cc1e07116}{Ch}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Set\+String\+Pointer (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_generic_value_a4541cc8138f2fac80d69836cc1e07116}{Ch}} \texorpdfstring{$\ast$}{*}}]{str}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l02027}{2027}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02027\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{rapidjson_8h_a113598c4750b3aab4de2782ff1865ed4}{RAPIDJSON\_SETPOINTER}}(\mbox{\hyperlink{class_generic_value_a4541cc8138f2fac80d69836cc1e07116}{Ch}},\ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}.\mbox{\hyperlink{union_generic_value_1_1_data_a6872a4b93763944063b425e6c001ed2b}{s}}.\mbox{\hyperlink{struct_generic_value_1_1_string_a4eebc5acf3f93ab833efd82abf3ba84d}{str}},\ str);\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_generic_value_ab3e8833927fb1454585e8692200dbb93_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_value_a1451603922dcdf34976f125dc60f70ee}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!SetStringRaw@{SetStringRaw}}
+\index{SetStringRaw@{SetStringRaw}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{SetStringRaw()}{SetStringRaw()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_generic_value_a1451603922dcdf34976f125dc60f70ee} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Memory\+Pool\+Allocator$<$$>$$>$ \\
+void \mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Set\+String\+Raw (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_generic_value_a5b089cb5ea5f149e48178ac7fe141491}{String\+Ref\+Type}}}]{s}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l02060}{2060}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02060\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02061\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}.\mbox{\hyperlink{union_generic_value_1_1_data_ad8572112da083c775ce21bcbca96b2ab}{f}}.\mbox{\hyperlink{struct_generic_value_1_1_flag_ac91f08067dcc0003fc78e870ca9b2d5d}{flags}}\ =\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba5d26a84f26833eafd0028c0102a388a9}{kConstStringFlag}};}
+\DoxyCodeLine{02062\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_ab3e8833927fb1454585e8692200dbb93}{SetStringPointer}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{02063\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}.\mbox{\hyperlink{union_generic_value_1_1_data_a6872a4b93763944063b425e6c001ed2b}{s}}.\mbox{\hyperlink{struct_generic_value_1_1_string_ad6ffab0e093aa8db6e415812ff6443bf}{length}}\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.length;}
+\DoxyCodeLine{02064\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_generic_value_a1451603922dcdf34976f125dc60f70ee_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_generic_value_a1451603922dcdf34976f125dc60f70ee_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_value_ad3d91db36dfdbfc1af40a79aae07723c}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!SetStringRaw@{SetStringRaw}}
+\index{SetStringRaw@{SetStringRaw}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{SetStringRaw()}{SetStringRaw()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_generic_value_ad3d91db36dfdbfc1af40a79aae07723c} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Memory\+Pool\+Allocator$<$$>$$>$ \\
+void \mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Set\+String\+Raw (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_generic_value_a5b089cb5ea5f149e48178ac7fe141491}{String\+Ref\+Type}}}]{s}{, }\item[{\mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} \&}]{allocator}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l02067}{2067}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02068\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_a4541cc8138f2fac80d69836cc1e07116}{Ch}}*\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}\ =\ 0;}
+\DoxyCodeLine{02069\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{struct_generic_value_1_1_short_string_a73e40f625c1abbd84f95ac7fff8365f7}{ShortString::Usable}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.length))\ \{}
+\DoxyCodeLine{02070\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}.\mbox{\hyperlink{union_generic_value_1_1_data_ad8572112da083c775ce21bcbca96b2ab}{f}}.\mbox{\hyperlink{struct_generic_value_1_1_flag_ac91f08067dcc0003fc78e870ca9b2d5d}{flags}}\ =\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dbaca24fa09485fa10b17071509a985ff01}{kShortStringFlag}};}
+\DoxyCodeLine{02071\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}.\mbox{\hyperlink{union_generic_value_1_1_data_a410e39a5dc296eb3b152b54193740e4c}{ss}}.\mbox{\hyperlink{struct_generic_value_1_1_short_string_adbfe8461e0cb0ccb2cb3825489e743c2}{SetLength}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.length);}
+\DoxyCodeLine{02072\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}\ =\ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}.\mbox{\hyperlink{union_generic_value_1_1_data_a410e39a5dc296eb3b152b54193740e4c}{ss}}.\mbox{\hyperlink{struct_generic_value_1_1_short_string_a444e24523d4cc33830d18a2cfcfd333b}{str}};}
+\DoxyCodeLine{02073\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{02074\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}.\mbox{\hyperlink{union_generic_value_1_1_data_ad8572112da083c775ce21bcbca96b2ab}{f}}.\mbox{\hyperlink{struct_generic_value_1_1_flag_ac91f08067dcc0003fc78e870ca9b2d5d}{flags}}\ =\ \mbox{\hyperlink{class_generic_value_a6c1f0b9b094a5ba9db46252cdf7ac4dba10c83f7f191dce81bb0273adc0d838de}{kCopyStringFlag}};}
+\DoxyCodeLine{02075\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}{data\_}}.\mbox{\hyperlink{union_generic_value_1_1_data_a6872a4b93763944063b425e6c001ed2b}{s}}.\mbox{\hyperlink{struct_generic_value_1_1_string_ad6ffab0e093aa8db6e415812ff6443bf}{length}}\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.length;}
+\DoxyCodeLine{02076\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{class_generic_value_a4541cc8138f2fac80d69836cc1e07116}{Ch}}\ *\textcolor{keyword}{>}(\mbox{\hyperlink{namespacechainbase_add7d4cf66ab3f2808fe613e6b0343b89}{allocator}}.Malloc((\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.length\ +\ 1)\ *\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{class_generic_value_a4541cc8138f2fac80d69836cc1e07116}{Ch}})));}
+\DoxyCodeLine{02077\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value_ab3e8833927fb1454585e8692200dbb93}{SetStringPointer}}(str);}
+\DoxyCodeLine{02078\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{02079\ \ \ \ \ \ \ \ \ std::memcpy(str,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.length\ *\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{class_generic_value_a4541cc8138f2fac80d69836cc1e07116}{Ch}}));}
+\DoxyCodeLine{02080\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}[\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.length]\ =\ \textcolor{charliteral}{'\(\backslash\)0'};}
+\DoxyCodeLine{02081\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_generic_value_ad3d91db36dfdbfc1af40a79aae07723c_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_value_ad4d088dc601d99fea9d16300a7ec7ee1}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!StringEqual@{StringEqual}}
+\index{StringEqual@{StringEqual}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{StringEqual()}{StringEqual()}}
+{\footnotesize\ttfamily \label{class_generic_value_ad4d088dc601d99fea9d16300a7ec7ee1} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Memory\+Pool\+Allocator$<$$>$$>$ \\
+template$<$typename Source\+Allocator $>$ \\
+bool \mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+String\+Equal (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, Source\+Allocator $>$ \&}]{rhs}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l02091}{2091}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02091\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02092\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(IsString());}
+\DoxyCodeLine{02093\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(rhs.IsString());}
+\DoxyCodeLine{02094\ }
+\DoxyCodeLine{02095\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\ len1\ =\ GetStringLength();}
+\DoxyCodeLine{02096\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\ len2\ =\ rhs.GetStringLength();}
+\DoxyCodeLine{02097\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(len1\ !=\ len2)\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};\ \}}
+\DoxyCodeLine{02098\ }
+\DoxyCodeLine{02099\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_generic_value_a4541cc8138f2fac80d69836cc1e07116}{Ch}}*\ \textcolor{keyword}{const}\ str1\ =\ GetString();}
+\DoxyCodeLine{02100\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_generic_value_a4541cc8138f2fac80d69836cc1e07116}{Ch}}*\ \textcolor{keyword}{const}\ str2\ =\ rhs.GetString();}
+\DoxyCodeLine{02101\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(str1\ ==\ str2)\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \}\ \textcolor{comment}{//\ fast\ path\ for\ constant\ string}}
+\DoxyCodeLine{02102\ }
+\DoxyCodeLine{02103\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (std::memcmp(str1,\ str2,\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{class_generic_value_a4541cc8138f2fac80d69836cc1e07116}{Ch}})\ *\ len1)\ ==\ 0);}
+\DoxyCodeLine{02104\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{class_generic_value_ab05bc9e52e201a2867ea5bac141ee1ae}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!GenericDocument@{GenericDocument}}
+\index{GenericDocument@{GenericDocument}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{GenericDocument}{GenericDocument}}
+{\footnotesize\ttfamily \label{class_generic_value_ab05bc9e52e201a2867ea5bac141ee1ae} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Memory\+Pool\+Allocator$<$$>$$>$ \\
+template$<$typename , typename , typename $>$ \\
+friend \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{class_generic_document}{Generic\+Document}}\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l01909}{1909}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!data\_@{data\_}}
+\index{data\_@{data\_}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{data\_}{data\_}}
+{\footnotesize\ttfamily \label{class_generic_value_aaf80f2c91d26fdde60b9edeeecd3509f} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Memory\+Pool\+Allocator$<$$>$$>$ \\
+\mbox{\hyperlink{union_generic_value_1_1_data}{Data}} \mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::data\+\_\+}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l02106}{2106}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+\Hypertarget{class_generic_value_a188f57bdb1923c1fefe74baa995871a3}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!kDefaultArrayCapacity@{kDefaultArrayCapacity}}
+\index{kDefaultArrayCapacity@{kDefaultArrayCapacity}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{kDefaultArrayCapacity}{kDefaultArrayCapacity}}
+{\footnotesize\ttfamily \label{class_generic_value_a188f57bdb1923c1fefe74baa995871a3} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Memory\+Pool\+Allocator$<$$>$$>$ \\
+const \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} \mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::k\+Default\+Array\+Capacity = 16\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l01942}{1942}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+\Hypertarget{class_generic_value_a284d018914629aed9a4bd97fe2dc5899}\index{GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}!kDefaultObjectCapacity@{kDefaultObjectCapacity}}
+\index{kDefaultObjectCapacity@{kDefaultObjectCapacity}!GenericValue$<$ Encoding, Allocator $>$@{GenericValue$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{kDefaultObjectCapacity}{kDefaultObjectCapacity}}
+{\footnotesize\ttfamily \label{class_generic_value_a284d018914629aed9a4bd97fe2dc5899} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Memory\+Pool\+Allocator$<$$>$$>$ \\
+const \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} \mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::k\+Default\+Object\+Capacity = 16\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l01943}{1943}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/\mbox{\hyperlink{document_8h}{document.\+h}}\end{DoxyCompactItemize}

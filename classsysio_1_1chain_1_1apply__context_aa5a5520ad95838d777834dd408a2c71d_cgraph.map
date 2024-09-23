@@ -1,0 +1,16 @@
+<map id="sysio::chain::apply_context::next_auth_sequence" name="sysio::chain::apply_context::next_auth_sequence">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,142,61"/>
+<area shape="rect" id="Node000002" href="$classchainbase_1_1database.html#afcfe00f81a526c1376d4f51197dd3a9a" title=" " alt="" coords="568,20,736,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="142,28,190,27,520,27,553,27,553,33,520,32,190,32,142,33"/>
+<area shape="rect" id="Node000005" href="$classchainbase_1_1database.html#a9ebc006075e8fc2e84357a0e068b58d4" title=" " alt="" coords="190,41,331,82"/>
+<area shape="poly" id="edge6_Node000001_Node000005" title=" " alt="" coords="142,41,175,46,174,51,141,46"/>
+<area shape="rect" id="Node000003" href="$classchainbase_1_1database.html#aa5a2ca0da0092693ac49b36b7ec6817a" title=" " alt="" coords="784,13,925,54"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="736,39,768,39,768,45,736,45"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="783,27,751,27,751,22,783,22"/>
+<area shape="rect" id="Node000004" href="$classchainbase_1_1database.html#a4d5297635dcf70be481d9b600da9bc13" title=" " alt="" coords="973,42,1114,83"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="926,41,958,47,958,52,925,47"/>
+<area shape="poly" id="edge5_Node000004_Node000002" title=" " alt="" coords="973,67,925,68,854,71,783,68,711,53,712,48,784,63,854,66,925,63,973,62"/>
+<area shape="rect" id="Node000006" href="$classchainbase_1_1database.html#afaea057692a8bbbf3f506b64c60308b6" title=" " alt="" coords="379,41,520,82"/>
+<area shape="poly" id="edge7_Node000005_Node000006" title=" " alt="" coords="331,58,364,58,364,64,331,64"/>
+<area shape="poly" id="edge8_Node000006_Node000002" title=" " alt="" coords="520,49,552,44,553,50,521,54"/>
+</map>

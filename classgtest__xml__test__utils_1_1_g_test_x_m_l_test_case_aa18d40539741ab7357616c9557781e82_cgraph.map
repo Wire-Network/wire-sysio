@@ -1,0 +1,14 @@
+<map id="gtest_xml_test_utils.GTestXMLTestCase.AssertEquivalentNodes" name="gtest_xml_test_utils.GTestXMLTestCase.AssertEquivalentNodes">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,39,251,79"/>
+<area shape="poly" id="edge6_Node000001_Node000001" title=" " alt="" coords="79,39,76,29,85,20,102,14,128,12,156,14,173,21,171,26,155,20,128,17,103,19,87,24,82,30,84,37"/>
+<area shape="rect" id="Node000002" href="$classgtest__xml__test__utils_1_1_g_test_x_m_l_test_case.html#a2359b446aa283a582efe48d1e2f3f75a" title=" " alt="" coords="299,39,483,79"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="251,56,283,56,283,62,251,62"/>
+<area shape="rect" id="Node000003" href="$struct_catch_1_1_test_case_tracking_1_1_i_tracker.html#acc828c861cdc9df217bc585f6bd55f1d" title=" " alt="" coords="531,5,701,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="483,43,515,38,516,43,484,48"/>
+<area shape="rect" id="Node000004" href="$class_catch_1_1_test_case_tracking_1_1_tracker_base.html#a9d3b83917defd2bebd987aac85ad253c" title=" " alt="" coords="531,71,701,111"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="484,69,516,74,515,79,483,75"/>
+<area shape="rect" id="Node000005" href="$class_catch_1_1_test_case_tracking_1_1_tracker_context.html#a37cd0cd086c5e87f5a60b5fc834d7482" title=" " alt="" coords="766,37,980,78"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="701,77,750,71,751,76,702,83"/>
+<area shape="rect" id="Node000006" href="$struct_catch_1_1_test_case_tracking_1_1_i_tracker.html#a1b472c5c2e9941734f53fd1897020bbc" title=" " alt="" coords="749,103,997,143"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="702,99,734,103,734,108,701,104"/>
+</map>

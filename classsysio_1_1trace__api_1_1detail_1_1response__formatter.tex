@@ -1,0 +1,78 @@
+\doxysection{sysio\+::trace\+\_\+api\+::detail\+::response\+\_\+formatter Class Reference}
+\hypertarget{classsysio_1_1trace__api_1_1detail_1_1response__formatter}{}\label{classsysio_1_1trace__api_1_1detail_1_1response__formatter}\index{sysio::trace\_api::detail::response\_formatter@{sysio::trace\_api::detail::response\_formatter}}
+
+
+{\ttfamily \#include $<$request\+\_\+handler.\+hpp$>$}
+
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \mbox{\hyperlink{classsysio_1_1trace__api_1_1detail_1_1response__formatter_a0d5fa7307ab3dfca56f3892da858ccef}{process\+\_\+block}} (const \mbox{\hyperlink{namespacesysio_1_1trace__api_a98bdcc53a9d9aa6aff851a743516c3b9}{data\+\_\+log\+\_\+entry}} \&trace, bool irreversible, const \mbox{\hyperlink{namespacesysio_1_1trace__api_ae306675da343477bc1ebdf6512c76066}{data\+\_\+handler\+\_\+function}} \&data\+\_\+handler, const \mbox{\hyperlink{namespacesysio_1_1trace__api_a24d1d2b642518b3d627011e7ef39ae9a}{yield\+\_\+function}} \&yield)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{request__handler_8hpp_source_l00012}{12}} of file \mbox{\hyperlink{request__handler_8hpp_source}{request\+\_\+handler.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1trace__api_1_1detail_1_1response__formatter_a0d5fa7307ab3dfca56f3892da858ccef}\index{sysio::trace\_api::detail::response\_formatter@{sysio::trace\_api::detail::response\_formatter}!process\_block@{process\_block}}
+\index{process\_block@{process\_block}!sysio::trace\_api::detail::response\_formatter@{sysio::trace\_api::detail::response\_formatter}}
+\doxysubsubsection{\texorpdfstring{process\_block()}{process\_block()}}
+{\footnotesize\ttfamily \label{classsysio_1_1trace__api_1_1detail_1_1response__formatter_a0d5fa7307ab3dfca56f3892da858ccef} 
+\mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} sysio\+::trace\+\_\+api\+::detail\+::response\+\_\+formatter\+::process\+\_\+block (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1trace__api_a98bdcc53a9d9aa6aff851a743516c3b9}{data\+\_\+log\+\_\+entry}} \&}]{trace}{, }\item[{bool}]{irreversible}{, }\item[{const \mbox{\hyperlink{namespacesysio_1_1trace__api_ae306675da343477bc1ebdf6512c76066}{data\+\_\+handler\+\_\+function}} \&}]{data\+\_\+handler}{, }\item[{const \mbox{\hyperlink{namespacesysio_1_1trace__api_a24d1d2b642518b3d627011e7ef39ae9a}{yield\+\_\+function}} \&}]{yield}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{request__handler_8cpp_source_l00129}{129}} of file \mbox{\hyperlink{request__handler_8cpp_source}{request\+\_\+handler.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ common\_mvo\ \ =\ std::visit([\&](\textcolor{keyword}{auto}\&\&\ arg)\ -\/>\ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}\ \{}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}()}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}id"{}},\ arg.id.str())}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}number"{}},\ arg.number\ )}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}previous\_id"{}},\ arg.previous\_id.str())}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}status"{}},\ irreversible\ ?\ \textcolor{stringliteral}{"{}irreversible"{}}\ :\ \textcolor{stringliteral}{"{}pending"{}}\ )}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}timestamp"{}},\ to\_iso8601\_datetime(arg.timestamp))}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}producer"{}},\ arg.producer.to\_string());\},\ trace);}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \ (std::holds\_alternative<block\_trace\_v0>\ (trace))\{}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ block\_trace\ =\ std::get<block\_trace\_v0>(trace);}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}()}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (std::move(common\_mvo))}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}transactions"{}},\ process\_transactions<transaction\_trace\_v0>(block\_trace.transactions,\ data\_handler,\ yield\ ));}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \}\textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(std::holds\_alternative<block\_trace\_v1>(trace))\{}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ block\_trace\ =\ std::get<block\_trace\_v1>(trace);}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \ \ \ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}()}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (std::move(common\_mvo))}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}transaction\_mroot"{}},\ block\_trace.transaction\_mroot)}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}action\_mroot"{}},\ block\_trace.action\_mroot)}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}schedule\_version"{}},\ block\_trace.schedule\_version)}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}transactions"{}},\ process\_transactions<transaction\_trace\_v1>(\ block\_trace.transactions\_v1,\ data\_handler,\ yield\ ))\ ;}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \}\textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(std::holds\_alternative<block\_trace\_v2>(trace))\{}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ block\_trace\ =\ std::get<block\_trace\_v2>(trace);}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ transactions\ =\ std::visit([\&](\textcolor{keyword}{auto}\&\&\ arg)\{}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ process\_transactions(arg,\ data\_handler,\ yield);}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \ \ \},\ block\_trace.transactions);}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \ \ \ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}()}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (std::move(common\_mvo))}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}transaction\_mroot"{}},\ block\_trace.transaction\_mroot)}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}action\_mroot"{}},\ block\_trace.action\_mroot)}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}schedule\_version"{}},\ block\_trace.schedule\_version)}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}transactions"{}},\ transactions)\ ;}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \ \}\textcolor{keywordflow}{else}\{}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}();}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00165\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+plugins/trace\+\_\+api\+\_\+plugin/include/sysio/trace\+\_\+api/\mbox{\hyperlink{request__handler_8hpp}{request\+\_\+handler.\+hpp}}\item 
+plugins/trace\+\_\+api\+\_\+plugin/\mbox{\hyperlink{request__handler_8cpp}{request\+\_\+handler.\+cpp}}\end{DoxyCompactItemize}

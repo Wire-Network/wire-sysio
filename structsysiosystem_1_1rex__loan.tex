@@ -1,0 +1,193 @@
+\doxysection{sysiosystem\+::rex\+\_\+loan Struct Reference}
+\hypertarget{structsysiosystem_1_1rex__loan}{}\label{structsysiosystem_1_1rex__loan}\index{sysiosystem::rex\_loan@{sysiosystem::rex\_loan}}
+
+
+{\ttfamily \#include $<$sysio.\+system.\+hpp$>$}
+
+
+
+Collaboration diagram for sysiosystem\+::rex\+\_\+loan\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysiosystem_1_1rex__loan__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1rex__loan_a71d3421094f34632b064ec03e7447282}{primary\+\_\+key}} () const
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1rex__loan_ac841a18bfaf9c6470a333d6a5820df4b}{by\+\_\+expr}} () const
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1rex__loan_acb8eb05f8eec790d86c77d26bee48866}{by\+\_\+owner}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1rex__loan_a3fcb0a77da4f4b948d5de9585ac71e31}{version}} = 0
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \mbox{\hyperlink{structsysiosystem_1_1rex__loan_a59bf0f3eaa5ce5e7039c2baf85511d0e}{from}}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \mbox{\hyperlink{structsysiosystem_1_1rex__loan_aed5bb4b82c5d4753316152bd6aaf3205}{receiver}}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \mbox{\hyperlink{structsysiosystem_1_1rex__loan_a9de8301c3bd4126c5c34212f526fc238}{payment}}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \mbox{\hyperlink{structsysiosystem_1_1rex__loan_a2cd39e4875b8db2bcea0e9ef56c0109f}{balance}}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \mbox{\hyperlink{structsysiosystem_1_1rex__loan_acd60036aa11e192c855ec42b0d5edc2d}{total\+\_\+staked}}
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1rex__loan_a9a7879e1f477152a6ce24603f9d21ef2}{loan\+\_\+num}}
+\item 
+\mbox{\hyperlink{classfc_1_1time__point}{sysio\+::time\+\_\+point}} \mbox{\hyperlink{structsysiosystem_1_1rex__loan_a2fb176549078cd44e28c40b7c8f8cc00}{expiration}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00500}{500}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysiosystem_1_1rex__loan_ac841a18bfaf9c6470a333d6a5820df4b}\index{sysiosystem::rex\_loan@{sysiosystem::rex\_loan}!by\_expr@{by\_expr}}
+\index{by\_expr@{by\_expr}!sysiosystem::rex\_loan@{sysiosystem::rex\_loan}}
+\doxysubsubsection{\texorpdfstring{by\_expr()}{by\_expr()}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1rex__loan_ac841a18bfaf9c6470a333d6a5820df4b} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} sysiosystem\+::rex\+\_\+loan\+::by\+\_\+expr (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00511}{511}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00511\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysiosystem_1_1rex__loan_a2fb176549078cd44e28c40b7c8f8cc00}{expiration}}.elapsed.\mbox{\hyperlink{classfc_1_1microseconds_a20fba59ec7e1f50c6b8f2c9443cc9b92}{count}}();\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysiosystem_1_1rex__loan_ac841a18bfaf9c6470a333d6a5820df4b_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysiosystem_1_1rex__loan_acb8eb05f8eec790d86c77d26bee48866}\index{sysiosystem::rex\_loan@{sysiosystem::rex\_loan}!by\_owner@{by\_owner}}
+\index{by\_owner@{by\_owner}!sysiosystem::rex\_loan@{sysiosystem::rex\_loan}}
+\doxysubsubsection{\texorpdfstring{by\_owner()}{by\_owner()}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1rex__loan_acb8eb05f8eec790d86c77d26bee48866} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} sysiosystem\+::rex\+\_\+loan\+::by\+\_\+owner (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00512}{512}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00512\ \{\ \textcolor{keywordflow}{return}\ from.value;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysiosystem_1_1rex__loan_a71d3421094f34632b064ec03e7447282}\index{sysiosystem::rex\_loan@{sysiosystem::rex\_loan}!primary\_key@{primary\_key}}
+\index{primary\_key@{primary\_key}!sysiosystem::rex\_loan@{sysiosystem::rex\_loan}}
+\doxysubsubsection{\texorpdfstring{primary\_key()}{primary\_key()}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1rex__loan_a71d3421094f34632b064ec03e7447282} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} sysiosystem\+::rex\+\_\+loan\+::primary\+\_\+key (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00510}{510}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00510\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysiosystem_1_1rex__loan_a9a7879e1f477152a6ce24603f9d21ef2}{loan\_num}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysiosystem_1_1rex__loan_a2cd39e4875b8db2bcea0e9ef56c0109f}\index{sysiosystem::rex\_loan@{sysiosystem::rex\_loan}!balance@{balance}}
+\index{balance@{balance}!sysiosystem::rex\_loan@{sysiosystem::rex\_loan}}
+\doxysubsubsection{\texorpdfstring{balance}{balance}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1rex__loan_a2cd39e4875b8db2bcea0e9ef56c0109f} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} sysiosystem\+::rex\+\_\+loan\+::balance}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00505}{505}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1rex__loan_a2fb176549078cd44e28c40b7c8f8cc00}\index{sysiosystem::rex\_loan@{sysiosystem::rex\_loan}!expiration@{expiration}}
+\index{expiration@{expiration}!sysiosystem::rex\_loan@{sysiosystem::rex\_loan}}
+\doxysubsubsection{\texorpdfstring{expiration}{expiration}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1rex__loan_a2fb176549078cd44e28c40b7c8f8cc00} 
+\mbox{\hyperlink{classfc_1_1time__point}{sysio\+::time\+\_\+point}} sysiosystem\+::rex\+\_\+loan\+::expiration}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00508}{508}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1rex__loan_a59bf0f3eaa5ce5e7039c2baf85511d0e}\index{sysiosystem::rex\_loan@{sysiosystem::rex\_loan}!from@{from}}
+\index{from@{from}!sysiosystem::rex\_loan@{sysiosystem::rex\_loan}}
+\doxysubsubsection{\texorpdfstring{from}{from}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1rex__loan_a59bf0f3eaa5ce5e7039c2baf85511d0e} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} sysiosystem\+::rex\+\_\+loan\+::from}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00502}{502}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1rex__loan_a9a7879e1f477152a6ce24603f9d21ef2}\index{sysiosystem::rex\_loan@{sysiosystem::rex\_loan}!loan\_num@{loan\_num}}
+\index{loan\_num@{loan\_num}!sysiosystem::rex\_loan@{sysiosystem::rex\_loan}}
+\doxysubsubsection{\texorpdfstring{loan\_num}{loan\_num}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1rex__loan_a9a7879e1f477152a6ce24603f9d21ef2} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} sysiosystem\+::rex\+\_\+loan\+::loan\+\_\+num}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00507}{507}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1rex__loan_a9de8301c3bd4126c5c34212f526fc238}\index{sysiosystem::rex\_loan@{sysiosystem::rex\_loan}!payment@{payment}}
+\index{payment@{payment}!sysiosystem::rex\_loan@{sysiosystem::rex\_loan}}
+\doxysubsubsection{\texorpdfstring{payment}{payment}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1rex__loan_a9de8301c3bd4126c5c34212f526fc238} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} sysiosystem\+::rex\+\_\+loan\+::payment}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00504}{504}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1rex__loan_aed5bb4b82c5d4753316152bd6aaf3205}\index{sysiosystem::rex\_loan@{sysiosystem::rex\_loan}!receiver@{receiver}}
+\index{receiver@{receiver}!sysiosystem::rex\_loan@{sysiosystem::rex\_loan}}
+\doxysubsubsection{\texorpdfstring{receiver}{receiver}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1rex__loan_aed5bb4b82c5d4753316152bd6aaf3205} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} sysiosystem\+::rex\+\_\+loan\+::receiver}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00503}{503}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1rex__loan_acd60036aa11e192c855ec42b0d5edc2d}\index{sysiosystem::rex\_loan@{sysiosystem::rex\_loan}!total\_staked@{total\_staked}}
+\index{total\_staked@{total\_staked}!sysiosystem::rex\_loan@{sysiosystem::rex\_loan}}
+\doxysubsubsection{\texorpdfstring{total\_staked}{total\_staked}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1rex__loan_acd60036aa11e192c855ec42b0d5edc2d} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} sysiosystem\+::rex\+\_\+loan\+::total\+\_\+staked}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00506}{506}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1rex__loan_a3fcb0a77da4f4b948d5de9585ac71e31}\index{sysiosystem::rex\_loan@{sysiosystem::rex\_loan}!version@{version}}
+\index{version@{version}!sysiosystem::rex\_loan@{sysiosystem::rex\_loan}}
+\doxysubsubsection{\texorpdfstring{version}{version}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1rex__loan_a3fcb0a77da4f4b948d5de9585ac71e31} 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} sysiosystem\+::rex\+\_\+loan\+::version = 0}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00501}{501}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/svetlasyrimis/\+Desktop/wire-\/network/\+WN-\/org/wire-\/system-\/contracts/contracts/sysio.\+system/include/sysio.\+system/\mbox{\hyperlink{sysio_8system_8hpp}{sysio.\+system.\+hpp}}\end{DoxyCompactItemize}

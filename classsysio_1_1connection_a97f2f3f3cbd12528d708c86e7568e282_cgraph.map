@@ -1,0 +1,19 @@
+<map id="sysio::connection::blk_send_branch_impl" name="sysio::connection::blk_send_branch_impl">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,96,156,137"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1connection.html#a099523d62bc60e4a13deda1fe15845ad" title=" " alt="" coords="204,96,347,137"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="156,114,188,114,188,119,156,119"/>
+<area shape="rect" id="Node000003" href="$namespaceappbase.html#a99374dc23934f008a09f2f79be9eae40" title=" " alt="" coords="429,13,528,38"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="309,93,394,49,413,41,415,46,396,53,311,98"/>
+<area shape="rect" id="Node000005" href="$classsysio_1_1chain__plugin.html#a14a5e77b31ecf267c8062267d03440ae" title=" " alt="" coords="412,63,545,103"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="347,102,397,94,398,99,348,107"/>
+<area shape="rect" id="Node000006" href="$classsysio_1_1chain_1_1controller.html#a1379e43325b7e517a058bddce15571eb" title=" " alt="" coords="395,128,562,169"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="348,125,380,130,379,135,347,130"/>
+<area shape="rect" id="Node000008" href="$classappbase_1_1application.html#a77aff91b861010fd61a616c59b310dcc" title=" " alt="" coords="408,193,549,234"/>
+<area shape="poly" id="edge7_Node000002_Node000008" title=" " alt="" coords="314,135,396,178,411,184,408,189,394,183,312,140"/>
+<area shape="rect" id="Node000004" href="$classappbase_1_1application.html#ac874b2659b400fe254f1ae4260d06ecf" title=" " alt="" coords="642,5,782,46"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="529,23,626,23,626,28,529,28"/>
+<area shape="rect" id="Node000007" href="$classsysio_1_1chain_1_1controller.html#a04f3c55da09b359224510af99502490f" title=" " alt="" coords="610,128,814,169"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="563,146,595,146,595,151,563,151"/>
+<area shape="rect" id="Node000009" href="$classappbase_1_1execution__priority__queue.html#acfa0c68e913a02f179e52ed758451a69" title=" " alt="" coords="639,193,785,234"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="549,211,624,211,624,216,549,216"/>
+</map>

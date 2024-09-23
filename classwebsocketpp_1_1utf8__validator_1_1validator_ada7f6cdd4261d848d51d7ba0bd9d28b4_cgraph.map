@@ -1,0 +1,5 @@
+<map id="websocketpp::utf8_validator::validator::consume" name="websocketpp::utf8_validator::validator::consume">
+<area shape="rect" id="Node000001" title="Advance the state of the validator with the next input byte." alt="" coords="5,5,190,46"/>
+<area shape="rect" id="Node000002" href="$namespacewebsocketpp_1_1utf8__validator.html#ae6dab1acad72af0396e2448394a07d98" title="Decode the next byte of a UTF8 sequence." alt="" coords="238,5,422,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="190,23,222,23,222,28,190,28"/>
+</map>

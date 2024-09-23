@@ -1,0 +1,73 @@
+\doxysection{libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/test/gtest\+\_\+color\+\_\+test\+\_\+.cc File Reference}
+\hypertarget{gtest__color__test___8cc}{}\label{gtest__color__test___8cc}\index{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/test/gtest\_color\_test\_.cc@{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/test/gtest\_color\_test\_.cc}}
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include "{}gtest/gtest.\+h"{}}\newline
+{\ttfamily \#include "{}src/gtest-\/internal-\/inl.\+h"{}}\newline
+Include dependency graph for gtest\+\_\+color\+\_\+test\+\_\+.\+cc\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{gtest__color__test___8cc__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{gtest__color__test___8cc_a78903f80b07f944e7aa466ebdff1d644}{TEST}} (GTest\+Color\+Test, Dummy)
+\item 
+int \mbox{\hyperlink{gtest__color__test___8cc_a3c04138a5bfe5d72780bb7e82a18e627}{main}} (int argc, char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{gtest__color__test___8cc_a3c04138a5bfe5d72780bb7e82a18e627}\index{gtest\_color\_test\_.cc@{gtest\_color\_test\_.cc}!main@{main}}
+\index{main@{main}!gtest\_color\_test\_.cc@{gtest\_color\_test\_.cc}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{gtest__color__test___8cc_a3c04138a5bfe5d72780bb7e82a18e627} 
+int main (\begin{DoxyParamCaption}\item[{int}]{argc}{, }\item[{char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{argv}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest__color__test___8cc_source_l00050}{50}} of file \mbox{\hyperlink{gtest__color__test___8cc_source}{gtest\+\_\+color\+\_\+test\+\_\+.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00051\ \ \ \mbox{\hyperlink{namespacetesting_afd726ae08c9bd16dc52f78c822d9946b}{testing::InitGoogleTest}}(\&argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}});}
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ \ \ \textcolor{keywordflow}{if}\ (ShouldUseColor(\textcolor{keyword}{true}))\ \{}
+\DoxyCodeLine{00054\ \ \ \ \ \textcolor{comment}{//\ Google\ Test\ decides\ to\ use\ colors\ in\ the\ output\ (assuming\ it}}
+\DoxyCodeLine{00055\ \ \ \ \ \textcolor{comment}{//\ goes\ to\ a\ TTY).}}
+\DoxyCodeLine{00056\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}YES\(\backslash\)n"{}});}
+\DoxyCodeLine{00057\ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{00058\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00059\ \ \ \ \ \textcolor{comment}{//\ Google\ Test\ decides\ not\ to\ use\ colors\ in\ the\ output.}}
+\DoxyCodeLine{00060\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}NO\(\backslash\)n"{}});}
+\DoxyCodeLine{00061\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00062\ \ \ \}}
+\DoxyCodeLine{00063\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{gtest__color__test___8cc_a3c04138a5bfe5d72780bb7e82a18e627_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{gtest__color__test___8cc_a78903f80b07f944e7aa466ebdff1d644}\index{gtest\_color\_test\_.cc@{gtest\_color\_test\_.cc}!TEST@{TEST}}
+\index{TEST@{TEST}!gtest\_color\_test\_.cc@{gtest\_color\_test\_.cc}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}}
+{\footnotesize\ttfamily \label{gtest__color__test___8cc_a78903f80b07f944e7aa466ebdff1d644} 
+TEST (\begin{DoxyParamCaption}\item[{GTest\+Color\+Test}]{}{, }\item[{Dummy}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest__color__test___8cc_source_l00047}{47}} of file \mbox{\hyperlink{gtest__color__test___8cc_source}{gtest\+\_\+color\+\_\+test\+\_\+.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00048\ \}}
+
+\end{DoxyCode}

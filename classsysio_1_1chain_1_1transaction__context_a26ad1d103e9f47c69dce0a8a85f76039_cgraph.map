@@ -1,0 +1,19 @@
+<map id="sysio::chain::transaction_context::pause_billing_timer" name="sysio::chain::transaction_context::pause_billing_timer">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,201,196,242"/>
+<area shape="rect" id="Node000002" href="$classfc_1_1time__point.html#aa164ff1268a16d4b32afcff181f6100e" title=" " alt="" coords="259,144,392,169"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="172,198,263,172,264,177,173,203"/>
+<area shape="rect" id="Node000008" href="$structsysio_1_1chain_1_1transaction__checktime__timer.html#ad84002d0816f8b4b6aa3c2dd3772d1fe" title=" " alt="" coords="244,229,407,270"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="196,231,229,235,228,240,196,236"/>
+<area shape="rect" id="Node000003" href="$classfc_1_1mock__time__traits.html#a0bed781012a73b8c15882648397b56be" title=" " alt="" coords="458,5,598,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="340,141,389,101,454,57,463,51,466,56,456,61,393,105,344,145"/>
+<area shape="rect" id="Node000005" href="$classfc_1_1mock__time__traits.html#adddeebdf472c33f927827c111ddbf0b1" title=" " alt="" coords="458,71,598,111"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="367,140,447,114,449,119,368,145"/>
+<area shape="rect" id="Node000006" href="$classfc_1_1time__point.html#ab46781dcaab4880902bc136f36e39e5e" title=" " alt="" coords="462,136,595,177"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="392,154,446,154,446,159,392,159"/>
+<area shape="rect" id="Node000007" href="$classfc_1_1time__point.html#abfea5efbe9ef58024cda814395ee9945" title=" " alt="" coords="462,201,595,242"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="368,167,449,193,447,198,367,172"/>
+<area shape="rect" id="Node000004" href="$classfc_1_1mock__time__traits.html#a0d7245b32fd62b3bc712f658250cc4db" title=" " alt="" coords="649,13,822,38"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="599,23,634,23,634,28,599,28"/>
+<area shape="rect" id="Node000009" href="$structsysio_1_1chain_1_1platform__timer.html#a5cb70a095755d00bf02d37d31b6e46af" title=" " alt="" coords="455,267,601,307"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="408,262,440,268,439,273,407,267"/>
+</map>

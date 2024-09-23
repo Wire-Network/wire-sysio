@@ -1,0 +1,12 @@
+<map id="fc::crypto::private_key::get_public_key" name="fc::crypto::private_key::get_public_key">
+<area shape="rect" id="Node000001" title=" " alt="" coords="492,74,636,114"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl.html#ac0bb6e717959f085c38a2c165b7ed8f8" title=" " alt="" coords="5,42,201,82"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="526,66,488,40,443,20,406,12,368,9,291,13,220,26,161,43,159,38,219,21,291,8,368,4,407,7,445,15,490,35,529,62"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1txn__test__gen__plugin__impl.html#af33aa3cab64842d1dbe29d9b5a3cd86f" title=" " alt="" coords="278,30,415,86"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="477,82,415,72,416,67,478,77"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl.html#a209e66b1b230dc9ff609f55e6d2fc8d0" title=" " alt="" coords="249,110,444,150"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="477,111,445,116,444,111,476,106"/>
+<area shape="rect" id="Node000005" href="$programs_2clio_2main_8cpp.html#a3c04138a5bfe5d72780bb7e82a18e627" title=" " alt="" coords="322,174,371,200"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="520,125,445,164,407,177,372,185,371,180,406,172,443,159,518,120"/>
+<area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="256,107,178,85,179,80,257,102"/>
+</map>

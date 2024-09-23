@@ -1,0 +1,6 @@
+<map id="CLI::App::_valid_subcommand" name="CLI::App::_valid_subcommand">
+<area shape="rect" id="Node000001" title="Check to see if a subcommand is valid. Give up immediately if subcommand max has been reached." alt="" coords="5,29,206,55"/>
+<area shape="poly" id="edge2_Node000001_Node000001" title=" " alt="" coords="65,31,57,21,62,11,78,5,106,3,136,5,151,13,149,17,135,11,105,8,79,10,65,15,62,20,69,27"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_app.html#a70bf7b1ed5b4f823746dba84ec3d9927" title=" " alt="" coords="254,29,448,55"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="206,40,238,40,238,45,206,45"/>
+</map>

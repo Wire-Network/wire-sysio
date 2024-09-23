@@ -1,0 +1,397 @@
+\doxysection{websocketpp\+::transport\+::iostream\+::endpoint\texorpdfstring{$<$}{<} config \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint}{}\label{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint}\index{websocketpp::transport::iostream::endpoint$<$ config $>$@{websocketpp::transport::iostream::endpoint$<$ config $>$}}
+
+
+{\ttfamily \#include $<$endpoint.\+hpp$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint}{endpoint}} \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint_aac814c971c17af7c9f2b922dd90beb92}{type}}
+\begin{DoxyCompactList}\small\item\em Type of this endpoint transport component. \end{DoxyCompactList}\item 
+typedef lib\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint_aac814c971c17af7c9f2b922dd90beb92}{type}} $>$ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint_af5b4aa670012069efe379ac09697b9bc}{ptr}}
+\begin{DoxyCompactList}\small\item\em Type of a pointer to this endpoint transport component. \end{DoxyCompactList}\item 
+typedef config\+::concurrency\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint_a1f3792306a667febbd6bc17cb449d8d9}{concurrency\+\_\+type}}
+\begin{DoxyCompactList}\small\item\em Type of this endpoint\textquotesingle{}s concurrency policy. \end{DoxyCompactList}\item 
+typedef config\+::elog\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint_ae801ac74cd2b54ac0a45343a25171a65}{elog\+\_\+type}}
+\begin{DoxyCompactList}\small\item\em Type of this endpoint\textquotesingle{}s error logging policy. \end{DoxyCompactList}\item 
+typedef config\+::alog\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint_a82e251ee9a189b476540063fa1c4feba}{alog\+\_\+type}}
+\begin{DoxyCompactList}\small\item\em Type of this endpoint\textquotesingle{}s access logging policy. \end{DoxyCompactList}\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection}{iostream\+::connection}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint_ab9477669d3c662ca2ce33c90f34003b0}{transport\+\_\+con\+\_\+type}}
+\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a5edb16646621ff775f2529c2a6910c82}{transport\+\_\+con\+\_\+type\+::ptr}} \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint_a11451d6805a11c617fa64663824ef788}{transport\+\_\+con\+\_\+ptr}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint_a411c3b6ac387cef649e0925a7747c9d3}{endpoint}} ()
+\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint_ad6db3b10406e568befba8e00ae8b6ac4}{register\+\_\+ostream}} (std\+::ostream \texorpdfstring{$\ast$}{*}o)
+\begin{DoxyCompactList}\small\item\em Register a default output stream. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint_ae6488ca0ead1ce09a60e16a896162ad5}{set\+\_\+secure}} (bool \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\begin{DoxyCompactList}\small\item\em Set whether or not endpoint can create secure connections. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint_a42cfc1af42cd261b471bab53b85a2e2f}{is\+\_\+secure}} () const
+\begin{DoxyCompactList}\small\item\em Tests whether or not the underlying transport is secure. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint_a1db266dab8c73f4aa2e8a3bdb95ec5a3}{set\+\_\+write\+\_\+handler}} (\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1iostream_abc22b834c2d0c698d6c87e51d5bfad2c}{write\+\_\+handler}} h)
+\begin{DoxyCompactList}\small\item\em Sets the write handler. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint_a2ba3290fe7688190c2e85143f52d88cc}{set\+\_\+shutdown\+\_\+handler}} (\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1iostream_a3563ce2cca06b1466f7d76ecb8eb4a0b}{shutdown\+\_\+handler}} h)
+\begin{DoxyCompactList}\small\item\em Sets the shutdown handler. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint_a0c3fbf85313521d6d3a9a53faa2084ae}{init\+\_\+logging}} (\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint_a82e251ee9a189b476540063fa1c4feba}{alog\+\_\+type}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint_ae801ac74cd2b54ac0a45343a25171a65}{elog\+\_\+type}} \texorpdfstring{$\ast$}{*}e)
+\begin{DoxyCompactList}\small\item\em Initialize logging. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint_a72e24fecb98d0445eb7df64d6b94a6a8}{async\+\_\+connect}} (\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint_a11451d6805a11c617fa64663824ef788}{transport\+\_\+con\+\_\+ptr}}, \mbox{\hyperlink{namespacewebsocketpp_aae370ea5ac83a8ece7712cb39fc23f5b}{uri\+\_\+ptr}}, \mbox{\hyperlink{namespacewebsocketpp_1_1transport_ac392fca34e946b48414278c0c3addfa5}{connect\+\_\+handler}} cb)
+\begin{DoxyCompactList}\small\item\em Initiate a new connection. \end{DoxyCompactList}\item 
+lib\+::error\+\_\+code \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint_a9e169a6551db86bd1147b314924bd353}{init}} (\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint_a11451d6805a11c617fa64663824ef788}{transport\+\_\+con\+\_\+ptr}} tcon)
+\begin{DoxyCompactList}\small\item\em Initialize a connection. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{classconfig}{config}}$>$\newline
+class websocketpp\+::transport\+::iostream\+::endpoint$<$ config $>$}
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2endpoint_8hpp_source_l00046}{46}} of file \mbox{\hyperlink{transport_2iostream_2endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint_a82e251ee9a189b476540063fa1c4feba}\index{websocketpp::transport::iostream::endpoint$<$ config $>$@{websocketpp::transport::iostream::endpoint$<$ config $>$}!alog\_type@{alog\_type}}
+\index{alog\_type@{alog\_type}!websocketpp::transport::iostream::endpoint$<$ config $>$@{websocketpp::transport::iostream::endpoint$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{alog\_type}{alog\_type}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint_a82e251ee9a189b476540063fa1c4feba} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+config\+::alog\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint}{websocketpp\+::transport\+::iostream\+::endpoint}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::alog\+\_\+type}
+
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2endpoint_8hpp_source_l00058}{58}} of file \mbox{\hyperlink{transport_2iostream_2endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+\Hypertarget{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint_a1f3792306a667febbd6bc17cb449d8d9}\index{websocketpp::transport::iostream::endpoint$<$ config $>$@{websocketpp::transport::iostream::endpoint$<$ config $>$}!concurrency\_type@{concurrency\_type}}
+\index{concurrency\_type@{concurrency\_type}!websocketpp::transport::iostream::endpoint$<$ config $>$@{websocketpp::transport::iostream::endpoint$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{concurrency\_type}{concurrency\_type}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint_a1f3792306a667febbd6bc17cb449d8d9} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+config\+::concurrency\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint}{websocketpp\+::transport\+::iostream\+::endpoint}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::concurrency\+\_\+type}
+
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2endpoint_8hpp_source_l00054}{54}} of file \mbox{\hyperlink{transport_2iostream_2endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+\Hypertarget{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint_ae801ac74cd2b54ac0a45343a25171a65}\index{websocketpp::transport::iostream::endpoint$<$ config $>$@{websocketpp::transport::iostream::endpoint$<$ config $>$}!elog\_type@{elog\_type}}
+\index{elog\_type@{elog\_type}!websocketpp::transport::iostream::endpoint$<$ config $>$@{websocketpp::transport::iostream::endpoint$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{elog\_type}{elog\_type}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint_ae801ac74cd2b54ac0a45343a25171a65} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+config\+::elog\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint}{websocketpp\+::transport\+::iostream\+::endpoint}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::elog\+\_\+type}
+
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2endpoint_8hpp_source_l00056}{56}} of file \mbox{\hyperlink{transport_2iostream_2endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+\Hypertarget{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint_af5b4aa670012069efe379ac09697b9bc}\index{websocketpp::transport::iostream::endpoint$<$ config $>$@{websocketpp::transport::iostream::endpoint$<$ config $>$}!ptr@{ptr}}
+\index{ptr@{ptr}!websocketpp::transport::iostream::endpoint$<$ config $>$@{websocketpp::transport::iostream::endpoint$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{ptr}{ptr}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint_af5b4aa670012069efe379ac09697b9bc} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+lib\+::shared\+\_\+ptr$<$\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint_aac814c971c17af7c9f2b922dd90beb92}{type}}$>$ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint}{websocketpp\+::transport\+::iostream\+::endpoint}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::ptr}
+
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2endpoint_8hpp_source_l00051}{51}} of file \mbox{\hyperlink{transport_2iostream_2endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+\Hypertarget{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint_a11451d6805a11c617fa64663824ef788}\index{websocketpp::transport::iostream::endpoint$<$ config $>$@{websocketpp::transport::iostream::endpoint$<$ config $>$}!transport\_con\_ptr@{transport\_con\_ptr}}
+\index{transport\_con\_ptr@{transport\_con\_ptr}!websocketpp::transport::iostream::endpoint$<$ config $>$@{websocketpp::transport::iostream::endpoint$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{transport\_con\_ptr}{transport\_con\_ptr}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint_a11451d6805a11c617fa64663824ef788} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a5edb16646621ff775f2529c2a6910c82}{transport\+\_\+con\+\_\+type\+::ptr}} \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint}{websocketpp\+::transport\+::iostream\+::endpoint}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::transport\+\_\+con\+\_\+ptr}
+
+Type of a shared pointer to this endpoint transport component\textquotesingle{}s associated connection transport component 
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2endpoint_8hpp_source_l00065}{65}} of file \mbox{\hyperlink{transport_2iostream_2endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+\Hypertarget{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint_ab9477669d3c662ca2ce33c90f34003b0}\index{websocketpp::transport::iostream::endpoint$<$ config $>$@{websocketpp::transport::iostream::endpoint$<$ config $>$}!transport\_con\_type@{transport\_con\_type}}
+\index{transport\_con\_type@{transport\_con\_type}!websocketpp::transport::iostream::endpoint$<$ config $>$@{websocketpp::transport::iostream::endpoint$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{transport\_con\_type}{transport\_con\_type}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint_ab9477669d3c662ca2ce33c90f34003b0} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection}{iostream\+::connection}}$<$\mbox{\hyperlink{classconfig}{config}}$>$ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint}{websocketpp\+::transport\+::iostream\+::endpoint}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::transport\+\_\+con\+\_\+type}
+
+Type of this endpoint transport component\textquotesingle{}s associated connection transport component. 
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2endpoint_8hpp_source_l00062}{62}} of file \mbox{\hyperlink{transport_2iostream_2endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+\Hypertarget{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint_aac814c971c17af7c9f2b922dd90beb92}\index{websocketpp::transport::iostream::endpoint$<$ config $>$@{websocketpp::transport::iostream::endpoint$<$ config $>$}!type@{type}}
+\index{type@{type}!websocketpp::transport::iostream::endpoint$<$ config $>$@{websocketpp::transport::iostream::endpoint$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{type}{type}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint_aac814c971c17af7c9f2b922dd90beb92} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint}{endpoint}} \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint}{websocketpp\+::transport\+::iostream\+::endpoint}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::type}
+
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2endpoint_8hpp_source_l00049}{49}} of file \mbox{\hyperlink{transport_2iostream_2endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint_a411c3b6ac387cef649e0925a7747c9d3}\index{websocketpp::transport::iostream::endpoint$<$ config $>$@{websocketpp::transport::iostream::endpoint$<$ config $>$}!endpoint@{endpoint}}
+\index{endpoint@{endpoint}!websocketpp::transport::iostream::endpoint$<$ config $>$@{websocketpp::transport::iostream::endpoint$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{endpoint()}{endpoint()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint_a411c3b6ac387cef649e0925a7747c9d3} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint}{websocketpp\+::transport\+::iostream\+::endpoint}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::endpoint (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2endpoint_8hpp_source_l00068}{68}} of file \mbox{\hyperlink{transport_2iostream_2endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ m\_output\_stream(NULL),\ m\_is\_secure(\textcolor{keyword}{false})}
+\DoxyCodeLine{00069\ \ \ \ \ \{}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \textcolor{comment}{//std::cout\ <<\ "{}transport::iostream::endpoint\ constructor"{}\ <<\ std::endl;}}
+\DoxyCodeLine{00071\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint_a72e24fecb98d0445eb7df64d6b94a6a8}\index{websocketpp::transport::iostream::endpoint$<$ config $>$@{websocketpp::transport::iostream::endpoint$<$ config $>$}!async\_connect@{async\_connect}}
+\index{async\_connect@{async\_connect}!websocketpp::transport::iostream::endpoint$<$ config $>$@{websocketpp::transport::iostream::endpoint$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{async\_connect()}{async\_connect()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint_a72e24fecb98d0445eb7df64d6b94a6a8} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint}{websocketpp\+::transport\+::iostream\+::endpoint}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::async\+\_\+connect (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint_a11451d6805a11c617fa64663824ef788}{transport\+\_\+con\+\_\+ptr}}}]{}{, }\item[{\mbox{\hyperlink{namespacewebsocketpp_aae370ea5ac83a8ece7712cb39fc23f5b}{uri\+\_\+ptr}}}]{}{, }\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1transport_ac392fca34e946b48414278c0c3addfa5}{connect\+\_\+handler}}}]{cb}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+
+\begin{DoxyParams}{Parameters}
+{\em tcon} & \doxylink{struct_a}{A} pointer to the transport connection component of the connection to connect. \\
+\hline
+{\em u} & \doxylink{struct_a}{A} URI pointer to the URI to connect to. \\
+\hline
+{\em cb} & The function to call back with the results when complete. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2endpoint_8hpp_source_l00183}{183}} of file \mbox{\hyperlink{transport_2iostream_2endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ cb(lib::error\_code());}
+\DoxyCodeLine{00185\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint_a9e169a6551db86bd1147b314924bd353}\index{websocketpp::transport::iostream::endpoint$<$ config $>$@{websocketpp::transport::iostream::endpoint$<$ config $>$}!init@{init}}
+\index{init@{init}!websocketpp::transport::iostream::endpoint$<$ config $>$@{websocketpp::transport::iostream::endpoint$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{init()}{init()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint_a9e169a6551db86bd1147b314924bd353} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+lib\+::error\+\_\+code \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint}{websocketpp\+::transport\+::iostream\+::endpoint}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::init (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint_a11451d6805a11c617fa64663824ef788}{transport\+\_\+con\+\_\+ptr}}}]{tcon}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+\doxylink{struct_init}{Init} is called by an endpoint once for each newly created connection. It\textquotesingle{}s purpose is to give the transport policy the chance to perform any transport specific initialization that couldn\textquotesingle{}t be done via the default constructor.
+
+
+\begin{DoxyParams}{Parameters}
+{\em tcon} & \doxylink{struct_a}{A} pointer to the transport portion of the connection. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\doxylink{struct_a}{A} status code indicating the success or failure of the operation 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2endpoint_8hpp_source_l00197}{197}} of file \mbox{\hyperlink{transport_2iostream_2endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ tcon-\/>register\_ostream(m\_output\_stream);}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (m\_shutdown\_handler)\ \{}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \ \ \ \ tcon-\/>set\_shutdown\_handler(m\_shutdown\_handler);}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (m\_write\_handler)\ \{}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ \ \ \ \ \ \ tcon-\/>set\_write\_handler(m\_write\_handler);}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ lib::error\_code();}
+\DoxyCodeLine{00206\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint_a0c3fbf85313521d6d3a9a53faa2084ae}\index{websocketpp::transport::iostream::endpoint$<$ config $>$@{websocketpp::transport::iostream::endpoint$<$ config $>$}!init\_logging@{init\_logging}}
+\index{init\_logging@{init\_logging}!websocketpp::transport::iostream::endpoint$<$ config $>$@{websocketpp::transport::iostream::endpoint$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{init\_logging()}{init\_logging()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint_a0c3fbf85313521d6d3a9a53faa2084ae} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint}{websocketpp\+::transport\+::iostream\+::endpoint}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::init\+\_\+logging (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint_a82e251ee9a189b476540063fa1c4feba}{alog\+\_\+type}} \texorpdfstring{$\ast$}{*}}]{a}{, }\item[{\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint_ae801ac74cd2b54ac0a45343a25171a65}{elog\+\_\+type}} \texorpdfstring{$\ast$}{*}}]{e}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+The loggers are located in the main endpoint class. As such, the transport doesn\textquotesingle{}t have direct access to them. This method is called by the endpoint constructor to allow shared logging from the transport component. These are raw pointers to member variables of the endpoint. In particular, they cannot be used in the transport constructor as they haven\textquotesingle{}t been constructed yet, and cannot be used in the transport destructor as they will have been destroyed by then.
+
+
+\begin{DoxyParams}{Parameters}
+{\em a} & \doxylink{struct_a}{A} pointer to the access logger to use. \\
+\hline
+{\em e} & \doxylink{struct_a}{A} pointer to the error logger to use. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2endpoint_8hpp_source_l00171}{171}} of file \mbox{\hyperlink{transport_2iostream_2endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ m\_elog\ =\ e;}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ m\_alog\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}};}
+\DoxyCodeLine{00174\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint_a42cfc1af42cd261b471bab53b85a2e2f}\index{websocketpp::transport::iostream::endpoint$<$ config $>$@{websocketpp::transport::iostream::endpoint$<$ config $>$}!is\_secure@{is\_secure}}
+\index{is\_secure@{is\_secure}!websocketpp::transport::iostream::endpoint$<$ config $>$@{websocketpp::transport::iostream::endpoint$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{is\_secure()}{is\_secure()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint_a42cfc1af42cd261b471bab53b85a2e2f} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+bool \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint}{websocketpp\+::transport\+::iostream\+::endpoint}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::is\+\_\+secure (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+iostream transport will return false by default because it has no information about the ultimate remote endpoint. This may or may not be accurate depending on the real source of bytes being input. {\ttfamily set\+\_\+secure} may be used by a wrapper API to correct the return value in the case that secure connections are in fact possible.
+
+\begin{DoxyReturn}{Returns}
+Whether or not the underlying transport is secure 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2endpoint_8hpp_source_l00116}{116}} of file \mbox{\hyperlink{transport_2iostream_2endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_is\_secure;}
+\DoxyCodeLine{00118\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint_ad6db3b10406e568befba8e00ae8b6ac4}\index{websocketpp::transport::iostream::endpoint$<$ config $>$@{websocketpp::transport::iostream::endpoint$<$ config $>$}!register\_ostream@{register\_ostream}}
+\index{register\_ostream@{register\_ostream}!websocketpp::transport::iostream::endpoint$<$ config $>$@{websocketpp::transport::iostream::endpoint$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{register\_ostream()}{register\_ostream()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint_ad6db3b10406e568befba8e00ae8b6ac4} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint}{websocketpp\+::transport\+::iostream\+::endpoint}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::register\+\_\+ostream (\begin{DoxyParamCaption}\item[{std\+::ostream \texorpdfstring{$\ast$}{*}}]{o}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+The specified output stream will be assigned to future connections as the default output stream.
+
+
+\begin{DoxyParams}{Parameters}
+{\em o} & The ostream to use as the default output stream. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2endpoint_8hpp_source_l00080}{80}} of file \mbox{\hyperlink{transport_2iostream_2endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ m\_alog-\/>write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}{log::alevel::devel}},\textcolor{stringliteral}{"{}register\_ostream"{}});}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ m\_output\_stream\ =\ o;}
+\DoxyCodeLine{00083\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint_ae6488ca0ead1ce09a60e16a896162ad5}\index{websocketpp::transport::iostream::endpoint$<$ config $>$@{websocketpp::transport::iostream::endpoint$<$ config $>$}!set\_secure@{set\_secure}}
+\index{set\_secure@{set\_secure}!websocketpp::transport::iostream::endpoint$<$ config $>$@{websocketpp::transport::iostream::endpoint$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{set\_secure()}{set\_secure()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint_ae6488ca0ead1ce09a60e16a896162ad5} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint}{websocketpp\+::transport\+::iostream\+::endpoint}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::set\+\_\+secure (\begin{DoxyParamCaption}\item[{bool}]{value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+The iostream transport does not provide any security features. As such it defaults to returning false when {\ttfamily is\+\_\+secure} is called. However, the iostream transport may be used to wrap an external socket API that may provide secure transport. This method allows that external API to flag whether or not it can create secure connections so that users of the Web\+Socket++ API will get more accurate information.
+
+Setting this value only indicates whether or not the endpoint is capable of producing and managing secure connections. Connections produced by this endpoint must also be individually flagged as secure if they are.
+
+\begin{DoxySince}{Since}
+0.\+3.\+0-\/alpha4
+\end{DoxySince}
+
+\begin{DoxyParams}{Parameters}
+{\em value} & Whether or not the endpoint can create secure connections. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2endpoint_8hpp_source_l00102}{102}} of file \mbox{\hyperlink{transport_2iostream_2endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ m\_is\_secure\ =\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}};}
+\DoxyCodeLine{00104\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint_a2ba3290fe7688190c2e85143f52d88cc}\index{websocketpp::transport::iostream::endpoint$<$ config $>$@{websocketpp::transport::iostream::endpoint$<$ config $>$}!set\_shutdown\_handler@{set\_shutdown\_handler}}
+\index{set\_shutdown\_handler@{set\_shutdown\_handler}!websocketpp::transport::iostream::endpoint$<$ config $>$@{websocketpp::transport::iostream::endpoint$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{set\_shutdown\_handler()}{set\_shutdown\_handler()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint_a2ba3290fe7688190c2e85143f52d88cc} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint}{websocketpp\+::transport\+::iostream\+::endpoint}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::set\+\_\+shutdown\+\_\+handler (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1iostream_a3563ce2cca06b1466f7d76ecb8eb4a0b}{shutdown\+\_\+handler}}}]{h}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+The shutdown handler is called when the iostream transport receives a notification from the core library that it is finished with all read and write operations and that the underlying transport can be cleaned up.
+
+If you are using iostream transport with another socket library, this is a good time to close/shutdown the socket for this connection.
+
+The signature of the handler is lib\+::error\+\_\+code (connection\+\_\+hdl). The code returned will be reported and logged by the core library.
+
+\begin{DoxySince}{Since}
+0.\+5.\+0
+\end{DoxySince}
+
+\begin{DoxyParams}{Parameters}
+{\em h} & The handler to call on connection shutdown. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2endpoint_8hpp_source_l00154}{154}} of file \mbox{\hyperlink{transport_2iostream_2endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ m\_shutdown\_handler\ =\ h;}
+\DoxyCodeLine{00156\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint_a1db266dab8c73f4aa2e8a3bdb95ec5a3}\index{websocketpp::transport::iostream::endpoint$<$ config $>$@{websocketpp::transport::iostream::endpoint$<$ config $>$}!set\_write\_handler@{set\_write\_handler}}
+\index{set\_write\_handler@{set\_write\_handler}!websocketpp::transport::iostream::endpoint$<$ config $>$@{websocketpp::transport::iostream::endpoint$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{set\_write\_handler()}{set\_write\_handler()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint_a1db266dab8c73f4aa2e8a3bdb95ec5a3} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint}{websocketpp\+::transport\+::iostream\+::endpoint}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::set\+\_\+write\+\_\+handler (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1iostream_abc22b834c2d0c698d6c87e51d5bfad2c}{write\+\_\+handler}}}]{h}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+The write handler is called when the iostream transport receives data that needs to be written to the appropriate output location. This handler can be used in place of registering an ostream for output.
+
+The signature of the handler is {\ttfamily lib\+::error\+\_\+code (connection\+\_\+hdl, char const \texorpdfstring{$\ast$}{*}, size\+\_\+t)} The code returned will be reported and logged by the core library.
+
+\begin{DoxySince}{Since}
+0.\+5.\+0
+\end{DoxySince}
+
+\begin{DoxyParams}{Parameters}
+{\em h} & The handler to call on connection shutdown. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2endpoint_8hpp_source_l00134}{134}} of file \mbox{\hyperlink{transport_2iostream_2endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ m\_write\_handler\ =\ h;}
+\DoxyCodeLine{00136\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/vendor/websocketpp/websocketpp/transport/iostream/\mbox{\hyperlink{transport_2iostream_2endpoint_8hpp}{endpoint.\+hpp}}\end{DoxyCompactItemize}

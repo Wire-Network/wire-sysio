@@ -1,0 +1,220 @@
+\doxysection{decrypt\+\_\+ec.\+c}
+\hypertarget{decrypt__ec_8c_source}{}\label{decrypt__ec_8c_source}\index{libraries/yubihsm/examples/decrypt\_ec.c@{libraries/yubihsm/examples/decrypt\_ec.c}}
+\mbox{\hyperlink{decrypt__ec_8c}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ 2015-\/2018\ Yubico\ AB}}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00004}00004\ \textcolor{comment}{\ *\ Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00005}00005\ \textcolor{comment}{\ *\ you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00006}00006\ \textcolor{comment}{\ *\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00008}00008\ \textcolor{comment}{\ *\ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00009}00009\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00010}00010\ \textcolor{comment}{\ *\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00011}00011\ \textcolor{comment}{\ *\ distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00012}00012\ \textcolor{comment}{\ *\ WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00013}00013\ \textcolor{comment}{\ *\ See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00014}00014\ \textcolor{comment}{\ *\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00015}00015\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00017}00017\ \textcolor{preprocessor}{\#ifdef\ NDEBUG}}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00018}00018\ \textcolor{preprocessor}{\#undef\ NDEBUG}}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00019}00019\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00020}00020\ \textcolor{preprocessor}{\#include\ <assert.h>}}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00021}00021\ \textcolor{preprocessor}{\#include\ <stdbool.h>}}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00022}00022\ \textcolor{preprocessor}{\#include\ <stdio.h>}}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00023}00023\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{stdint_8h}{stdint.h}}>}}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00024}00024\ \textcolor{preprocessor}{\#include\ <stdlib.h>}}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00025}00025\ \textcolor{preprocessor}{\#include\ <string.h>}}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00027}00027\ \textcolor{preprocessor}{\#include\ <openssl/ec.h>}}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00028}00028\ \textcolor{preprocessor}{\#include\ <openssl/evp.h>}}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00030}00030\ \textcolor{preprocessor}{\#include\ "{}util.h"{}}}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00032}00032\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{yubihsm_8h}{yubihsm.h}}>}}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00034}00034\ \textcolor{preprocessor}{\#ifndef\ DEFAULT\_CONNECTOR\_URL}}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00035}\mbox{\hyperlink{decrypt__ec_8c_a377ec96b1eb26c7b26b84bb5b0c9a928}{00035}}\ \textcolor{preprocessor}{\#define\ DEFAULT\_CONNECTOR\_URL\ "{}http://127.0.0.1:12345"{}}}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00036}00036\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00038}\mbox{\hyperlink{decrypt__ec_8c_a870e61ded67e4529500d708a5f1af286}{00038}}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{decrypt__ec_8c_a870e61ded67e4529500d708a5f1af286}{key\_label}}\ =\ \textcolor{stringliteral}{"{}label"{}};}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00039}\mbox{\hyperlink{decrypt__ec_8c_abd7f8a696584d8ab4b9f4d1e1970be37}{00039}}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ password[]\ =\ \textcolor{stringliteral}{"{}password"{}};}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00041}\mbox{\hyperlink{decrypt__ec_8c_a840291bc02cba5474a4cb46a9b9566fe}{00041}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{decrypt__ec_8c_a840291bc02cba5474a4cb46a9b9566fe}{main}}(\textcolor{keywordtype}{void})\ \{}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00042}00042\ \ \ \mbox{\hyperlink{structyh__connector}{yh\_connector}}\ *connector\ =\ NULL;}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00043}00043\ \ \ \mbox{\hyperlink{structyh__session}{yh\_session}}\ *\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}}\ =\ NULL;}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00044}00044\ \ \ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366}{yh\_rc}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a39fbc5bce29b178582419ae9d31ad252}{YHR\_GENERIC\_ERROR}};}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00046}00046\ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ authkey\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00048}00048\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *connector\_url;}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00050}00050\ \ \ connector\_url\ =\ getenv(\textcolor{stringliteral}{"{}DEFAULT\_CONNECTOR\_URL"{}});}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00051}00051\ \ \ \textcolor{keywordflow}{if}\ (connector\_url\ ==\ NULL)\ \{}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00052}00052\ \ \ \ \ connector\_url\ =\ \mbox{\hyperlink{decrypt__ec_8c_a377ec96b1eb26c7b26b84bb5b0c9a928}{DEFAULT\_CONNECTOR\_URL}};}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00053}00053\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00054}00054\ }
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00055}00055\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a5392844a98c6220c69fe08d3dcf8f1bc}{yh\_init}}();}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00056}00056\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00058}00058\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a9c700747902a722d6c1d2073277de294}{yh\_init\_connector}}(connector\_url,\ \&connector);}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00059}00059\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00061}00061\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_aa19be6ac70a2a5d1cef8d7e6902fe05f}{yh\_connect}}(connector,\ 0);}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00062}00062\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00064}00064\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a3be331dcf8907ff3569e4dc230e1c615}{yh\_create\_session\_derived}}(connector,\ authkey,\ password,}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00065}00065\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{sizeof}(password),\ \textcolor{keyword}{false},\ \&\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}});}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00066}00066\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00067}00067\ }
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00068}00068\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a77870209747d5ccd90f9da3aae2bdfa8}{yh\_authenticate\_session}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}});}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00069}00069\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00071}00071\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ session\_id;}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00072}00072\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_aeabf472faf1ba8d963b39866e04df6b0}{yh\_get\_session\_id}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}},\ \&session\_id);}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00073}00073\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00074}00074\ }
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00075}00075\ \ \ printf(\textcolor{stringliteral}{"{}Successfully\ established\ session\ \%02d\(\backslash\)n"{}},\ session\_id);}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00076}00076\ }
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00077}00077\ \ \ \mbox{\hyperlink{structyh__capabilities}{yh\_capabilities}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a08393519edfd7c59fb01fb8db97514b5}{capabilities}}\ =\ \{\{0\}\};}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00078}00078\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_aab440e1cb671d9ba7a2e7d1243960e42}{yh\_string\_to\_capabilities}}(\textcolor{stringliteral}{"{}derive-\/ecdh"{}},\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a08393519edfd7c59fb01fb8db97514b5}{capabilities}});}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00079}00079\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00080}00080\ }
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00081}00081\ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ domain\_five\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00082}00082\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a96a4c751a281515d5610adb8fd779438}{yh\_string\_to\_domains}}(\textcolor{stringliteral}{"{}5"{}},\ \&domain\_five);}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00083}00083\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00084}00084\ }
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00085}00085\ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_ada12860f8f9f5f3cac5b179ef352434c}{key\_id}}\ =\ 0;\ \textcolor{comment}{//\ ID\ 0\ lets\ the\ device\ generate\ an\ ID}}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00086}00086\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a2db9bbd57a908c5c454fc6254f57dcff}{yh\_util\_generate\_ec\_key}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}},\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_ada12860f8f9f5f3cac5b179ef352434c}{key\_id}},\ \mbox{\hyperlink{decrypt__ec_8c_a870e61ded67e4529500d708a5f1af286}{key\_label}},\ domain\_five,}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00087}00087\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a08393519edfd7c59fb01fb8db97514b5}{capabilities}},\ \mbox{\hyperlink{yubihsm_8h_a498937b5a72accbb0ef21bb1dcdd55caae4b191baf5c65f9234120080264d129b}{YH\_ALGO\_EC\_P256}});}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00088}00088\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00089}00089\ }
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00090}00090\ \ \ printf(\textcolor{stringliteral}{"{}Generated\ key\ with\ ID\ \%04x\(\backslash\)n"{}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_ada12860f8f9f5f3cac5b179ef352434c}{key\_id}});}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00091}00091\ }
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00092}00092\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ public\_key[512];}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00093}00093\ \ \ \textcolor{keywordtype}{size\_t}\ public\_key\_len\ =\ \textcolor{keyword}{sizeof}(public\_key);}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00094}00094\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00095}00095\ \ \ \ \ \mbox{\hyperlink{yubihsm_8c_aa7b8b42156c4bdaf41d8b9758a2fd73f}{yh\_util\_get\_public\_key}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_ada12860f8f9f5f3cac5b179ef352434c}{key\_id}},\ public\_key,\ \&public\_key\_len,\ NULL);}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00096}00096\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00097}00097\ }
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00098}00098\ \ \ printf(\textcolor{stringliteral}{"{}Public\ key\ (\%zd\ bytes)\ is:"{}},\ public\_key\_len);}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00099}00099\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ public\_key\_len;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00100}00100\ \ \ \ \ printf(\textcolor{stringliteral}{"{}\ \%02x"{}},\ public\_key[i]);}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00101}00101\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00102}00102\ \ \ printf(\textcolor{stringliteral}{"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00103}00103\ }
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00104}00104\ \ \ EC\_KEY\ *eckey\ =\ EC\_KEY\_new();}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00105}00105\ \ \ \textcolor{keywordtype}{int}\ nid\ =\ \mbox{\hyperlink{util_8c_a4e9f3e93eb6ebbc74d142d6a490de752}{algo2nid}}(\mbox{\hyperlink{yubihsm_8h_a498937b5a72accbb0ef21bb1dcdd55caae4b191baf5c65f9234120080264d129b}{YH\_ALGO\_EC\_P256}});}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00106}00106\ \ \ EC\_POINT\ *\mbox{\hyperlink{structpoint}{point}};}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00107}00107\ \ \ EC\_GROUP\ *group\ =\ EC\_GROUP\_new\_by\_curve\_name(nid);}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00108}00108\ }
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00109}00109\ \ \ EC\_GROUP\_set\_asn1\_flag(group,\ nid);}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00110}00110\ \ \ EC\_KEY\_set\_group(eckey,\ group);}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00111}00111\ \ \ \mbox{\hyperlink{structpoint}{point}}\ =\ EC\_POINT\_new(group);}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00112}00112\ }
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00113}00113\ \ \ memmove(public\_key\ +\ 1,\ public\_key,\ public\_key\_len);}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00114}00114\ \ \ public\_key[0]\ =\ 0x04;\ \textcolor{comment}{//\ hack\ to\ make\ it\ a\ valid\ ec\ pubkey..}}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00115}00115\ \ \ public\_key\_len++;}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00116}00116\ }
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00117}00117\ \ \ EC\_POINT\_oct2point(group,\ \mbox{\hyperlink{structpoint}{point}},\ public\_key,\ public\_key\_len,\ NULL);}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00118}00118\ }
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00119}00119\ \ \ EC\_KEY\_set\_public\_key(eckey,\ \mbox{\hyperlink{structpoint}{point}});}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00120}00120\ }
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00121}00121\ \ \ \textcolor{comment}{//\ Create\ the\ context\ for\ parameter\ generation}}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00122}00122\ \ \ EVP\_PKEY\_CTX\ *pctx\ =\ EVP\_PKEY\_CTX\_new\_id(EVP\_PKEY\_EC,\ NULL);}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00123}00123\ \ \ assert(pctx\ !=\ NULL);}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00124}00124\ }
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00125}00125\ \ \ \textcolor{comment}{//\ Initialise\ the\ parameter\ generation}}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00126}00126\ \ \ assert(EVP\_PKEY\_paramgen\_init(pctx)\ ==\ 1);}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00127}00127\ }
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00128}00128\ \ \ \textcolor{comment}{//\ We're\ going\ to\ use\ the\ ANSI\ X9.62\ Prime\ 256v1\ curve}}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00129}00129\ \ \ assert(EVP\_PKEY\_CTX\_set\_ec\_paramgen\_curve\_nid(pctx,\ NID\_X9\_62\_prime256v1)\ ==}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00130}00130\ \ \ \ \ \ \ \ \ \ 1);}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00131}00131\ }
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00132}00132\ \ \ \textcolor{comment}{//\ Create\ the\ parameter\ object\ params}}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00133}00133\ \ \ EVP\_PKEY\ *\mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}}\ =\ NULL;}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00134}00134\ \ \ assert(EVP\_PKEY\_paramgen(pctx,\ \&\mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}})\ ==\ 1);}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00135}00135\ }
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00136}00136\ \ \ \textcolor{comment}{//\ Create\ the\ context\ for\ the\ key\ generation}}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00137}00137\ \ \ EVP\_PKEY\_CTX\ *kctx\ =\ EVP\_PKEY\_CTX\_new(\mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}},\ NULL);}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00138}00138\ \ \ assert(kctx\ !=\ NULL);}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00139}00139\ }
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00140}00140\ \ \ \textcolor{comment}{//\ Generate\ the\ key}}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00141}00141\ \ \ EVP\_PKEY\ *pkey\ =\ NULL;}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00142}00142\ \ \ assert(EVP\_PKEY\_keygen\_init(kctx)\ ==\ 1);}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00143}00143\ \ \ assert(EVP\_PKEY\_keygen(kctx,\ \&pkey)\ ==\ 1);}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00144}00144\ }
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00145}00145\ \ \ \textcolor{comment}{//\ Get\ the\ peer's\ public\ key,\ and\ provide\ the\ peer\ with\ our\ public\ key}}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00146}00146\ \ \ EVP\_PKEY\ *peerkey\ =\ EVP\_PKEY\_new();}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00147}00147\ \ \ assert(peerkey\ !=\ NULL);}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00148}00148\ \ \ assert(EVP\_PKEY\_set1\_EC\_KEY(peerkey,\ eckey)\ ==\ 1);}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00149}00149\ }
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00150}00150\ \ \ \textcolor{comment}{//\ Create\ the\ context\ for\ the\ shared\ secret\ derivation}}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00151}00151\ \ \ EVP\_PKEY\_CTX\ *ctx\ =\ EVP\_PKEY\_CTX\_new(pkey,\ NULL);}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00152}00152\ \ \ assert(ctx\ !=\ NULL);}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00153}00153\ }
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00154}00154\ \ \ \textcolor{comment}{//\ Initialise}}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00155}00155\ \ \ assert(EVP\_PKEY\_derive\_init(ctx)\ ==\ 1);}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00156}00156\ }
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00157}00157\ \ \ \textcolor{comment}{//\ Provide\ the\ peer\ public\ key}}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00158}00158\ \ \ assert(EVP\_PKEY\_derive\_set\_peer(ctx,\ peerkey)\ ==\ 1);}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00159}00159\ }
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00160}00160\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ secret[64];}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00161}00161\ \ \ \textcolor{keywordtype}{size\_t}\ secret\_len\ =\ \textcolor{keyword}{sizeof}(secret\_len);}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00162}00162\ }
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00163}00163\ \ \ \textcolor{comment}{//\ Determine\ buffer\ length\ for\ shared\ secret}}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00164}00164\ \ \ assert(EVP\_PKEY\_derive(ctx,\ NULL,\ \&secret\_len));}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00165}00165\ }
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00166}00166\ \ \ \textcolor{comment}{//\ Derive\ the\ shared\ secret}}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00167}00167\ \ \ assert(EVP\_PKEY\_derive(ctx,\ secret,\ \&secret\_len)\ ==\ 1);}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00168}00168\ }
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00169}00169\ \ \ EC\_KEY\ *eckey2\ =\ EVP\_PKEY\_get1\_EC\_KEY(pkey);}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00170}00170\ \ \ \textcolor{keyword}{const}\ EC\_POINT\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a3037ff69dd24c6e34aee6fdd45269f13}{pub}}\ =\ EC\_KEY\_get0\_public\_key(eckey2);}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00171}00171\ }
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00172}00172\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}}[128];}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00173}00173\ \ \ \textcolor{keywordtype}{size\_t}\ pubkey\_len\ =\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}});}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00174}00174\ }
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00175}00175\ \ \ pubkey\_len\ =\ EC\_POINT\_point2oct(group,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3037ff69dd24c6e34aee6fdd45269f13}{pub}},\ POINT\_CONVERSION\_UNCOMPRESSED,}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00176}00176\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}},\ pubkey\_len,\ NULL);}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00177}00177\ \ \ assert(pubkey\_len\ ==\ 65);}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00178}00178\ }
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00179}00179\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ computed\_secret[128];}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00180}00180\ \ \ \textcolor{keywordtype}{size\_t}\ computed\_secret\_len\ =\ \textcolor{keyword}{sizeof}(computed\_secret);}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00181}00181\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a2900aee87732f9ec017bd1662bcef7e9}{yh\_util\_derive\_ecdh}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_ada12860f8f9f5f3cac5b179ef352434c}{key\_id}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}},\ pubkey\_len,}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00182}00182\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ computed\_secret,\ \&computed\_secret\_len);}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00183}00183\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00184}00184\ }
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00185}00185\ \ \ assert(computed\_secret\_len\ ==\ secret\_len);}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00186}00186\ \ \ assert(memcmp(secret,\ computed\_secret,\ computed\_secret\_len)\ ==\ 0);}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00187}00187\ }
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00188}00188\ \ \ printf(\textcolor{stringliteral}{"{}Secrets\ match\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00189}00189\ }
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00190}00190\ \ \ EVP\_PKEY\_CTX\_free(ctx);}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00191}00191\ \ \ EVP\_PKEY\_free(peerkey);}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00192}00192\ \ \ EVP\_PKEY\_free(pkey);}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00193}00193\ \ \ EVP\_PKEY\_CTX\_free(kctx);}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00194}00194\ \ \ EVP\_PKEY\_free(\mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}});}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00195}00195\ \ \ EVP\_PKEY\_CTX\_free(pctx);}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00196}00196\ \ \ EC\_POINT\_free(\mbox{\hyperlink{structpoint}{point}});}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00197}00197\ \ \ EC\_KEY\_free(eckey);}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00198}00198\ \ \ EC\_KEY\_free(eckey2);}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00199}00199\ \ \ EC\_GROUP\_free(group);}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00200}00200\ }
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00201}00201\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a61ab8dbab67b1cceb49cd306f8c3f4b1}{yh\_util\_close\_session}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}});}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00202}00202\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00203}00203\ }
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00204}00204\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a1a35f8ae5a739848408633a514e41b2d}{yh\_destroy\_session}}(\&\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}});}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00205}00205\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00206}00206\ }
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00207}00207\ \ \ \mbox{\hyperlink{yubihsm_8c_ab12d5a42d2219741bd3630b99ed1c7d2}{yh\_disconnect}}(connector);}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00208}00208\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00209}00209\ }
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00210}00210\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a36e3d9a07c6689e14a9339ca1ebb7259}{yh\_exit}}();}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00211}00211\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00212}00212\ }
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00213}00213\ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{decrypt__ec_8c_source_l00214}00214\ \}}
+
+\end{DoxyCode}

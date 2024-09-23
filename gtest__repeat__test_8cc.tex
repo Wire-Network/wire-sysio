@@ -1,0 +1,128 @@
+\doxysection{libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/test/gtest\+\_\+repeat\+\_\+test.cc File Reference}
+\hypertarget{gtest__repeat__test_8cc}{}\label{gtest__repeat__test_8cc}\index{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/test/gtest\_repeat\_test.cc@{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/test/gtest\_repeat\_test.cc}}
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include "{}gtest/gtest.\+h"{}}\newline
+{\ttfamily \#include "{}src/gtest-\/internal-\/inl.\+h"{}}\newline
+Include dependency graph for gtest\+\_\+repeat\+\_\+test.\+cc\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{gtest__repeat__test_8cc__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacetesting}{testing}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{gtest__repeat__test_8cc_a7e5ba7c523079f679398b4c730184de3}{GTEST\+\_\+\+CHECK\+\_\+\+INT\+\_\+\+EQ\+\_\+}}(expected,  actual)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacetesting_a37b7e87f0a5f502c6918f37d1768c1f3}{testing\+::\+GTEST\+\_\+\+DECLARE\+\_\+string\+\_\+}} (death\+\_\+test\+\_\+style)
+\item 
+\mbox{\hyperlink{namespacetesting_a20d69860ce843142c7f740262e6b0c9a}{testing\+::\+GTEST\+\_\+\+DECLARE\+\_\+string\+\_\+}} (filter)
+\item 
+\mbox{\hyperlink{namespacetesting_a315ef0647e4f2795bf1705de8e9c9659}{testing\+::\+GTEST\+\_\+\+DECLARE\+\_\+int32\+\_\+}} (repeat)
+\item 
+int \mbox{\hyperlink{gtest__repeat__test_8cc_a3c04138a5bfe5d72780bb7e82a18e627}{main}} (int argc, char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{gtest__repeat__test_8cc_a7e5ba7c523079f679398b4c730184de3}\index{gtest\_repeat\_test.cc@{gtest\_repeat\_test.cc}!GTEST\_CHECK\_INT\_EQ\_@{GTEST\_CHECK\_INT\_EQ\_}}
+\index{GTEST\_CHECK\_INT\_EQ\_@{GTEST\_CHECK\_INT\_EQ\_}!gtest\_repeat\_test.cc@{gtest\_repeat\_test.cc}}
+\doxysubsubsection{\texorpdfstring{GTEST\_CHECK\_INT\_EQ\_}{GTEST\_CHECK\_INT\_EQ\_}}
+{\footnotesize\ttfamily \label{gtest__repeat__test_8cc_a7e5ba7c523079f679398b4c730184de3} 
+\#define GTEST\+\_\+\+CHECK\+\_\+\+INT\+\_\+\+EQ\+\_\+(\begin{DoxyParamCaption}\item[{}]{expected}{, }\item[{}]{actual}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \textcolor{keywordflow}{do}\ \{\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ expected\_val\ =\ (expected);\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ actual\_val\ =\ (actual);\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ if\ (\mbox{\hyperlink{namespacetesting_1_1internal_a527b9bcc13669b9a16400c8514266254}{::testing::internal::IsTrue}}(expected\_val\ !=\ actual\_val))\ \{\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ ::std::cout\ <<\ \textcolor{stringliteral}{"{}Value\ of:\ "{}}\ \#actual\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\ \ Actual:\ "{}}\ <<\ actual\_val\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}Expected:\ "{}}\ \#expected\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}Which\ is:\ "{}}\ <<\ expected\_val\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ ::testing::internal::posix::Abort();\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\(\backslash\)}
+\DoxyCodeLine{\ \ \}\ \textcolor{keywordflow}{while}\ (\mbox{\hyperlink{namespacetesting_1_1internal_a4b24c851ab13569b1b15b3d259b60d2e}{::testing::internal::AlwaysFalse}}())}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{gtest__repeat__test_8cc_source_l00055}{55}} of file \mbox{\hyperlink{gtest__repeat__test_8cc_source}{gtest\+\_\+repeat\+\_\+test.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00055\ \textcolor{preprocessor}{\#define\ GTEST\_CHECK\_INT\_EQ\_(expected,\ actual)\ \(\backslash\)}}
+\DoxyCodeLine{00056\ \textcolor{preprocessor}{\ \ do\ \{\(\backslash\)}}
+\DoxyCodeLine{00057\ \textcolor{preprocessor}{\ \ \ \ const\ int\ expected\_val\ =\ (expected);\(\backslash\)}}
+\DoxyCodeLine{00058\ \textcolor{preprocessor}{\ \ \ \ const\ int\ actual\_val\ =\ (actual);\(\backslash\)}}
+\DoxyCodeLine{00059\ \textcolor{preprocessor}{\ \ \ \ if\ (::testing::internal::IsTrue(expected\_val\ !=\ actual\_val))\ \{\(\backslash\)}}
+\DoxyCodeLine{00060\ \textcolor{preprocessor}{\ \ \ \ \ \ ::std::cout\ <<\ "{}Value\ of:\ "{}\ \#actual\ "{}\(\backslash\)n"{}\(\backslash\)}}
+\DoxyCodeLine{00061\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ "{}\ \ Actual:\ "{}\ <<\ actual\_val\ <<\ "{}\(\backslash\)n"{}\(\backslash\)}}
+\DoxyCodeLine{00062\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ "{}Expected:\ "{}\ \#expected\ "{}\(\backslash\)n"{}\(\backslash\)}}
+\DoxyCodeLine{00063\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ "{}Which\ is:\ "{}\ <<\ expected\_val\ <<\ "{}\(\backslash\)n"{};\(\backslash\)}}
+\DoxyCodeLine{00064\ \textcolor{preprocessor}{\ \ \ \ \ \ ::testing::internal::posix::Abort();\(\backslash\)}}
+\DoxyCodeLine{00065\ \textcolor{preprocessor}{\ \ \ \ \}\(\backslash\)}}
+\DoxyCodeLine{00066\ \textcolor{preprocessor}{\ \ \}\ while\ (::testing::internal::AlwaysFalse())}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{gtest__repeat__test_8cc_a3c04138a5bfe5d72780bb7e82a18e627}\index{gtest\_repeat\_test.cc@{gtest\_repeat\_test.cc}!main@{main}}
+\index{main@{main}!gtest\_repeat\_test.cc@{gtest\_repeat\_test.cc}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{gtest__repeat__test_8cc_a3c04138a5bfe5d72780bb7e82a18e627} 
+int main (\begin{DoxyParamCaption}\item[{int}]{argc}{, }\item[{char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{argv}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest__repeat__test_8cc_source_l00211}{211}} of file \mbox{\hyperlink{gtest__repeat__test_8cc_source}{gtest\+\_\+repeat\+\_\+test.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00212\ \ \ \mbox{\hyperlink{namespacetesting_afd726ae08c9bd16dc52f78c822d9946b}{testing::InitGoogleTest}}(\&argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}});}
+\DoxyCodeLine{00213\ }
+\DoxyCodeLine{00214\ \ \ \mbox{\hyperlink{namespacetesting_a224caeebdb6586b728d204367fea1087}{testing::AddGlobalTestEnvironment}}(\textcolor{keyword}{new}\ MyEnvironment);}
+\DoxyCodeLine{00215\ }
+\DoxyCodeLine{00216\ \ \ TestRepeatUnspecified();}
+\DoxyCodeLine{00217\ \ \ TestRepeat(0);}
+\DoxyCodeLine{00218\ \ \ TestRepeat(1);}
+\DoxyCodeLine{00219\ \ \ TestRepeat(5);}
+\DoxyCodeLine{00220\ }
+\DoxyCodeLine{00221\ \ \ TestRepeatWithEmptyFilter(2);}
+\DoxyCodeLine{00222\ \ \ TestRepeatWithEmptyFilter(3);}
+\DoxyCodeLine{00223\ }
+\DoxyCodeLine{00224\ \ \ TestRepeatWithFilterForSuccessfulTests(3);}
+\DoxyCodeLine{00225\ }
+\DoxyCodeLine{00226\ \ \ TestRepeatWithFilterForFailedTests(4);}
+\DoxyCodeLine{00227\ }
+\DoxyCodeLine{00228\ \ \ \textcolor{comment}{//\ It\ would\ be\ nice\ to\ verify\ that\ the\ tests\ indeed\ loop\ forever}}
+\DoxyCodeLine{00229\ \ \ \textcolor{comment}{//\ when\ GTEST\_FLAG(repeat)\ is\ negative,\ but\ this\ test\ will\ be\ quite}}
+\DoxyCodeLine{00230\ \ \ \textcolor{comment}{//\ complicated\ to\ write.\ \ Since\ this\ flag\ is\ for\ interactive}}
+\DoxyCodeLine{00231\ \ \ \textcolor{comment}{//\ debugging\ only\ and\ doesn't\ affect\ the\ normal\ test\ result,\ such\ a}}
+\DoxyCodeLine{00232\ \ \ \textcolor{comment}{//\ test\ would\ be\ an\ overkill.}}
+\DoxyCodeLine{00233\ }
+\DoxyCodeLine{00234\ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}PASS\(\backslash\)n"{}});}
+\DoxyCodeLine{00235\ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00236\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{gtest__repeat__test_8cc_a3c04138a5bfe5d72780bb7e82a18e627_cgraph}
+\end{center}
+\end{figure}

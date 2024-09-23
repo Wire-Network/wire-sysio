@@ -1,0 +1,91 @@
+\doxysection{testing\+::internal\+::Is\+Null\+Matcher Class Reference}
+\hypertarget{classtesting_1_1internal_1_1_is_null_matcher}{}\label{classtesting_1_1internal_1_1_is_null_matcher}\index{testing::internal::IsNullMatcher@{testing::internal::IsNullMatcher}}
+
+
+{\ttfamily \#include $<$gmock-\/matchers.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{fwd_8h_a0e5c49dba7ec654cdda5735347c00397}{Pointer}} $>$ }\\bool \mbox{\hyperlink{classtesting_1_1internal_1_1_is_null_matcher_ab8a96a4389c9c352e367ba2edff6e87d}{Match\+And\+Explain}} (const \mbox{\hyperlink{fwd_8h_a0e5c49dba7ec654cdda5735347c00397}{Pointer}} \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}, \mbox{\hyperlink{classtesting_1_1_match_result_listener}{Match\+Result\+Listener}} \texorpdfstring{$\ast$}{*}) const
+\item 
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_is_null_matcher_a81c0b31d64bc65b5573bb56bbc3f4af8}{Describe\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}os) const
+\item 
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_is_null_matcher_a8349e2d6cef08303be7f2471f330a7c0}{Describe\+Negation\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}os) const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l01146}{1146}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_is_null_matcher_a8349e2d6cef08303be7f2471f330a7c0}\index{testing::internal::IsNullMatcher@{testing::internal::IsNullMatcher}!DescribeNegationTo@{DescribeNegationTo}}
+\index{DescribeNegationTo@{DescribeNegationTo}!testing::internal::IsNullMatcher@{testing::internal::IsNullMatcher}}
+\doxysubsubsection{\texorpdfstring{DescribeNegationTo()}{DescribeNegationTo()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_is_null_matcher_a8349e2d6cef08303be7f2471f330a7c0} 
+void testing\+::internal\+::\+Is\+Null\+Matcher\+::\+Describe\+Negation\+To (\begin{DoxyParamCaption}\item[{\+::std\+::ostream \texorpdfstring{$\ast$}{*}}]{os}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l01159}{1159}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01159\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01160\ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}isn't\ NULL"{}};}
+\DoxyCodeLine{01161\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1internal_1_1_is_null_matcher_a81c0b31d64bc65b5573bb56bbc3f4af8}\index{testing::internal::IsNullMatcher@{testing::internal::IsNullMatcher}!DescribeTo@{DescribeTo}}
+\index{DescribeTo@{DescribeTo}!testing::internal::IsNullMatcher@{testing::internal::IsNullMatcher}}
+\doxysubsubsection{\texorpdfstring{DescribeTo()}{DescribeTo()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_is_null_matcher_a81c0b31d64bc65b5573bb56bbc3f4af8} 
+void testing\+::internal\+::\+Is\+Null\+Matcher\+::\+Describe\+To (\begin{DoxyParamCaption}\item[{\+::std\+::ostream \texorpdfstring{$\ast$}{*}}]{os}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l01158}{1158}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01158\ \{\ *os\ <<\ \textcolor{stringliteral}{"{}is\ NULL"{}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1internal_1_1_is_null_matcher_ab8a96a4389c9c352e367ba2edff6e87d}\index{testing::internal::IsNullMatcher@{testing::internal::IsNullMatcher}!MatchAndExplain@{MatchAndExplain}}
+\index{MatchAndExplain@{MatchAndExplain}!testing::internal::IsNullMatcher@{testing::internal::IsNullMatcher}}
+\doxysubsubsection{\texorpdfstring{MatchAndExplain()}{MatchAndExplain()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_is_null_matcher_ab8a96a4389c9c352e367ba2edff6e87d} 
+template$<$typename \mbox{\hyperlink{fwd_8h_a0e5c49dba7ec654cdda5735347c00397}{Pointer}} $>$ \\
+bool testing\+::internal\+::\+Is\+Null\+Matcher\+::\+Match\+And\+Explain (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{fwd_8h_a0e5c49dba7ec654cdda5735347c00397}{Pointer}} \&}]{p}{, }\item[{\mbox{\hyperlink{classtesting_1_1_match_result_listener}{Match\+Result\+Listener}} \texorpdfstring{$\ast$}{*}}]{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l01149}{1149}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01150\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01151\ \textcolor{preprocessor}{\#if\ GTEST\_LANG\_CXX11}}
+\DoxyCodeLine{01152\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ ==\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{01153\ \textcolor{preprocessor}{\#else\ \ }\textcolor{comment}{//\ GTEST\_LANG\_CXX11}}
+\DoxyCodeLine{01154\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetesting_1_1internal_ad5e7c706ea3ebdffa1429cf3677062bd}{GetRawPointer}}(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})\ ==\ NULL;}
+\DoxyCodeLine{01155\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_LANG\_CXX11}}
+\DoxyCodeLine{01156\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_is_null_matcher_ab8a96a4389c9c352e367ba2edff6e87d_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/include/gmock/\mbox{\hyperlink{gmock-matchers_8h}{gmock-\/matchers.\+h}}\end{DoxyCompactItemize}

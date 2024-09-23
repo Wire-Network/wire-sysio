@@ -1,0 +1,13 @@
+<map id="bn::ecop::isOnTwistECHom2" name="bn::ecop::isOnTwistECHom2">
+<area shape="rect" id="Node000001" title=" " alt="" coords="312,55,503,80"/>
+<area shape="rect" id="Node000002" href="$bn_8cpp.html#a8f8247d87a38b94d62952819ee8a7b1d" title=" " alt="" coords="103,5,264,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="330,53,245,34,246,29,332,48"/>
+<area shape="rect" id="Node000004" href="$bn_8cpp.html#a421e9d76b5d00e6dad1e7577934cb43e" title=" " alt="" coords="103,55,264,80"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="296,70,264,70,264,65,296,65"/>
+<area shape="rect" id="Node000005" href="$bn_8cpp.html#a054e3408ad8c487637164aaa0a221c97" title=" " alt="" coords="142,104,225,130"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="332,87,226,110,225,105,330,82"/>
+<area shape="rect" id="Node000003" href="$bn_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97" title=" " alt="" coords="5,55,55,80"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="123,39,104,45,56,61,54,56,102,40,121,33"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="87,70,55,70,55,65,87,65"/>
+<area shape="poly" id="edge6_Node000005_Node000003" title=" " alt="" coords="126,103,102,95,54,79,56,74,104,90,128,98"/>
+</map>

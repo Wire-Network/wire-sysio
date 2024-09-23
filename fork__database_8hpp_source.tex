@@ -1,0 +1,65 @@
+\doxysection{fork\+\_\+database.\+hpp}
+\hypertarget{fork__database_8hpp_source}{}\label{fork__database_8hpp_source}\index{libraries/chain/include/sysio/chain/fork\_database.hpp@{libraries/chain/include/sysio/chain/fork\_database.hpp}}
+\mbox{\hyperlink{fork__database_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{fork__database_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{fork__database_8hpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{block__state_8hpp}{sysio/chain/block\_state.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{fork__database_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <boost/signals2/signal.hpp>}}
+\DoxyCodeLine{\Hypertarget{fork__database_8hpp_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8hpp_source_l00005}00005\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{\ \textcolor{keyword}{namespace\ }chain\ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8hpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8hpp_source_l00007}00007\ \ \ \ \textcolor{keyword}{using\ }boost::signals2::signal;}
+\DoxyCodeLine{\Hypertarget{fork__database_8hpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8hpp_source_l00009}00009\ \ \ \ \textcolor{keyword}{struct\ }fork\_database\_impl;}
+\DoxyCodeLine{\Hypertarget{fork__database_8hpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8hpp_source_l00022}\mbox{\hyperlink{classsysio_1_1chain_1_1fork__database}{00022}}\ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1chain_1_1fork__database}{fork\_database}}\ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8hpp_source_l00023}00023\ \ \ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{fork__database_8hpp_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8hpp_source_l00025}00025\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_acdd97cb223a90aac537ce1cd5684d388}{fork\_database}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1path}{fc::path}}\&\ data\_dir\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8hpp_source_l00026}00026\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a5eb28c8778610f360516341594997fc7}{\string~fork\_database}}();}
+\DoxyCodeLine{\Hypertarget{fork__database_8hpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8hpp_source_l00028}00028\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a378b089fe1ff7ac016ee51058ff52cb2}{open}}(\ \textcolor{keyword}{const}\ std::function<\textcolor{keywordtype}{void}(\ \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{block\_timestamp\_type}},}
+\DoxyCodeLine{\Hypertarget{fork__database_8hpp_source_l00029}00029\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ flat\_set<digest\_type>\&,}
+\DoxyCodeLine{\Hypertarget{fork__database_8hpp_source_l00030}00030\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1vector}{vector<digest\_type>}}\&\ )>\&\ validator\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8hpp_source_l00031}00031\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a8d84a8db51ed89315f80a7b251a38b8e}{close}}();}
+\DoxyCodeLine{\Hypertarget{fork__database_8hpp_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8hpp_source_l00033}00033\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_a918963c39fa6317556dca73276274e64}{block\_header\_state\_ptr}}\ \ \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a681f9146e0afd70a0e8c0421efb0a41f}{get\_block\_header}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha256}{block\_id\_type}}\&\ \textcolor{keywordtype}{id}\ )\textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{fork__database_8hpp_source_l00034}00034\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\_state\_ptr}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_aee9daa00e2698a868ad36853e58d3908}{get\_block}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha256}{block\_id\_type}}\&\ \textcolor{keywordtype}{id}\ )\textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{fork__database_8hpp_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8hpp_source_l00040}00040\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a7dd3012e6d7e68e24b2f223d5be09c02}{reset}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1block__header__state}{block\_header\_state}}\&\ root\_bhs\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8hpp_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8hpp_source_l00045}00045\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a611cc70b13dee823c43ffe99df5522d4}{rollback\_head\_to\_root}}();}
+\DoxyCodeLine{\Hypertarget{fork__database_8hpp_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8hpp_source_l00050}00050\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_ae911acbc996994cb6dfd21fddfb89a45}{advance\_root}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha256}{block\_id\_type}}\&\ \textcolor{keywordtype}{id}\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8hpp_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8hpp_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a97cf1402b71020048ae0054e4d7c8079}{add}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\_state\_ptr}}\&\ next\_block,\ \textcolor{keywordtype}{bool}\ ignore\_duplicate\ =\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8hpp_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8hpp_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a193f10ce12656c580b023d36193a5cdc}{remove}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha256}{block\_id\_type}}\&\ \textcolor{keywordtype}{id}\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8hpp_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8hpp_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\_state\_ptr}}\ \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a31db3526cc966f5db1046cebcfc45219}{root}}()\textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{fork__database_8hpp_source_l00061}00061\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\_state\_ptr}}\ \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a3b128a7d57c262ef6351d83c16cffae3}{head}}()\textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{fork__database_8hpp_source_l00062}00062\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\_state\_ptr}}\ \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a16e619525d86741f3e5344b39ab91868}{pending\_head}}()\textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{fork__database_8hpp_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8hpp_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_a3b287e6c2d3717609273c999ef660dea}{branch\_type}}\ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a18e51b748469f97473d120ef69e1da22}{fetch\_branch}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha256}{block\_id\_type}}\&\ h,\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ trim\_after\_block\_num\ =\ std::numeric\_limits<uint32\_t>::max()\ )\textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{fork__database_8hpp_source_l00073}00073\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8hpp_source_l00074}00074\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8hpp_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\_state\_ptr}}\ \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a17185d8543965b7cd40066019bbf5740}{search\_on\_branch}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha256}{block\_id\_type}}\&\ h,\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ block\_num\ )\textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{fork__database_8hpp_source_l00080}00080\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8hpp_source_l00085}00085\ \ \ \ \ \ \ \ \ \ pair<\ branch\_type,\ branch\_type\ >\ \ \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a77f152572f2703a40e9c198456fad748}{fetch\_branch\_from}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha256}{block\_id\_type}}\&\ first,}
+\DoxyCodeLine{\Hypertarget{fork__database_8hpp_source_l00086}00086\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha256}{block\_id\_type}}\&\ second\ )\textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{fork__database_8hpp_source_l00087}00087\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8hpp_source_l00088}00088\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8hpp_source_l00089}00089\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a764fc46000bb93901ba6440fec07b5f9}{mark\_valid}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\_state\_ptr}}\&\ h\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8hpp_source_l00090}00090\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8hpp_source_l00091}\mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a6649b0d3a5a88f5cea9d2f467601fe24}{00091}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a6649b0d3a5a88f5cea9d2f467601fe24}{magic\_number}};}
+\DoxyCodeLine{\Hypertarget{fork__database_8hpp_source_l00092}00092\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8hpp_source_l00093}\mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a849a1eb423d310b17ec5d899b48b80d7}{00093}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a849a1eb423d310b17ec5d899b48b80d7}{min\_supported\_version}};}
+\DoxyCodeLine{\Hypertarget{fork__database_8hpp_source_l00094}\mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a04a97bab59df6c56c06101d431f06e84}{00094}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a04a97bab59df6c56c06101d431f06e84}{max\_supported\_version}};}
+\DoxyCodeLine{\Hypertarget{fork__database_8hpp_source_l00095}00095\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8hpp_source_l00096}00096\ \ \ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{fork__database_8hpp_source_l00097}00097\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1unique__ptr}{unique\_ptr<fork\_database\_impl>}}\ my;}
+\DoxyCodeLine{\Hypertarget{fork__database_8hpp_source_l00098}00098\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{fork__database_8hpp_source_l00099}00099\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8hpp_source_l00100}00100\ \}\ \}\ }
+
+\end{DoxyCode}

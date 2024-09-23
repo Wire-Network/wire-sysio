@@ -1,0 +1,7 @@
+<map id="sysio::chain::validate_authority_precondition" name="sysio::chain::validate_authority_precondition">
+<area shape="rect" id="Node000001" title=" " alt="" coords="190,39,345,79"/>
+<area shape="rect" id="Node000002" href="$group__native__action__handlers.html#gaf831ab656e697ba23f2f2a1b73647caf" title=" " alt="" coords="5,5,142,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="174,46,142,40,143,35,175,40"/>
+<area shape="rect" id="Node000003" href="$group__native__action__handlers.html#gacf5d6409205a5734a97033904741fc29" title=" " alt="" coords="8,71,139,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="175,77,140,83,139,78,174,72"/>
+</map>

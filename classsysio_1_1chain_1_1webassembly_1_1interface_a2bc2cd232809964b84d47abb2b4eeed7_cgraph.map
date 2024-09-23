@@ -1,0 +1,12 @@
+<map id="sysio::chain::webassembly::interface::__fixtfsi" name="sysio::chain::webassembly::interface::__fixtfsi">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,23,185,64"/>
+<area shape="rect" id="Node000002" href="$softfloat_2source_2f128__to__i32_8c.html#ad8fce3ea4c7a3b8ec548d37fc65c29a1" title=" " alt="" coords="233,31,321,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="185,41,217,41,217,46,185,46"/>
+<area shape="rect" id="Node000003" href="$softfloat_2source_28086-_s_s_e_2softfloat__raise_flags_8c.html#ac16bbf09eca0fe8ff91301d82c5a667f" title=" " alt="" coords="587,5,723,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="317,27,369,16,474,8,572,10,572,15,475,13,369,21,318,33"/>
+<area shape="rect" id="Node000004" href="$sys-vm_2external_2softfloat_2source_2s__round_to_i32_8c.html#a0d8a3ccfbde74acd538db516ad0b4fe3" title=" " alt="" coords="384,31,524,56"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="321,41,369,41,369,46,321,46"/>
+<area shape="rect" id="Node000005" href="$sys-vm_2external_2softfloat_2source_2s__shift_right_jam64_8c.html#ae2ed4d70d1f8a6da983a01ecc027280f" title=" " alt="" coords="369,80,539,106"/>
+<area shape="poly" id="edge5_Node000002_Node000005" title=" " alt="" coords="322,53,391,73,390,78,321,58"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="524,32,571,26,572,31,525,37"/>
+</map>

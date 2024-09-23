@@ -1,0 +1,119 @@
+\doxysection{libraries/sys-\/vm/external/\+Catch2/include/internal/catch\+\_\+objc\+\_\+arc.hpp File Reference}
+\hypertarget{catch__objc__arc_8hpp}{}\label{catch__objc__arc_8hpp}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_objc\_arc.hpp@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_objc\_arc.hpp}}
+{\ttfamily import $<$Foundation/\+Foundation.\+h$>$}\newline
+Include dependency graph for catch\+\_\+objc\+\_\+arc.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=203pt]{catch__objc__arc_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=203pt]{catch__objc__arc_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{catch__objc__arc_8hpp_a04f2c4556b57f38d4b655ca7dd35fe18}{CATCH\+\_\+\+ARC\+\_\+\+ENABLED}}~0
+\item 
+\#define \mbox{\hyperlink{catch__objc__arc_8hpp_a3bfdd9cdf2e8542c663597fb0f10d2ed}{CATCH\+\_\+\+UNSAFE\+\_\+\+UNRETAINED}}
+\item 
+\#define \mbox{\hyperlink{catch__objc__arc_8hpp_af4814a31b8af1a86e69765ddb909ade5}{CATCH\+\_\+\+ARC\+\_\+\+STRONG}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{catch__objc__arc_8hpp_a1f6b4a44e1eaaa87534d1f28669897dc}{arc\+Safe\+Release}} (NSObject \texorpdfstring{$\ast$}{*}obj)
+\item 
+\mbox{\hyperlink{code__cache_8cpp_aa0efefe21f4700d78692edc823e763be}{id}} \mbox{\hyperlink{catch__objc__arc_8hpp_a2e982f858537aef4c41489fee41bdd91}{perform\+Optional\+Selector}} (\mbox{\hyperlink{code__cache_8cpp_aa0efefe21f4700d78692edc823e763be}{id}} obj, SEL sel)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{catch__objc__arc_8hpp_a04f2c4556b57f38d4b655ca7dd35fe18}\index{catch\_objc\_arc.hpp@{catch\_objc\_arc.hpp}!CATCH\_ARC\_ENABLED@{CATCH\_ARC\_ENABLED}}
+\index{CATCH\_ARC\_ENABLED@{CATCH\_ARC\_ENABLED}!catch\_objc\_arc.hpp@{catch\_objc\_arc.hpp}}
+\doxysubsubsection{\texorpdfstring{CATCH\_ARC\_ENABLED}{CATCH\_ARC\_ENABLED}}
+{\footnotesize\ttfamily \label{catch__objc__arc_8hpp_a04f2c4556b57f38d4b655ca7dd35fe18} 
+\#define CATCH\+\_\+\+ARC\+\_\+\+ENABLED~0}
+
+
+
+Definition at line \mbox{\hyperlink{catch__objc__arc_8hpp_source_l00016}{16}} of file \mbox{\hyperlink{catch__objc__arc_8hpp_source}{catch\+\_\+objc\+\_\+arc.\+hpp}}.
+
+\Hypertarget{catch__objc__arc_8hpp_af4814a31b8af1a86e69765ddb909ade5}\index{catch\_objc\_arc.hpp@{catch\_objc\_arc.hpp}!CATCH\_ARC\_STRONG@{CATCH\_ARC\_STRONG}}
+\index{CATCH\_ARC\_STRONG@{CATCH\_ARC\_STRONG}!catch\_objc\_arc.hpp@{catch\_objc\_arc.hpp}}
+\doxysubsubsection{\texorpdfstring{CATCH\_ARC\_STRONG}{CATCH\_ARC\_STRONG}}
+{\footnotesize\ttfamily \label{catch__objc__arc_8hpp_af4814a31b8af1a86e69765ddb909ade5} 
+\#define CATCH\+\_\+\+ARC\+\_\+\+STRONG}
+
+
+
+Definition at line \mbox{\hyperlink{catch__objc__arc_8hpp_source_l00032}{32}} of file \mbox{\hyperlink{catch__objc__arc_8hpp_source}{catch\+\_\+objc\+\_\+arc.\+hpp}}.
+
+\Hypertarget{catch__objc__arc_8hpp_a3bfdd9cdf2e8542c663597fb0f10d2ed}\index{catch\_objc\_arc.hpp@{catch\_objc\_arc.hpp}!CATCH\_UNSAFE\_UNRETAINED@{CATCH\_UNSAFE\_UNRETAINED}}
+\index{CATCH\_UNSAFE\_UNRETAINED@{CATCH\_UNSAFE\_UNRETAINED}!catch\_objc\_arc.hpp@{catch\_objc\_arc.hpp}}
+\doxysubsubsection{\texorpdfstring{CATCH\_UNSAFE\_UNRETAINED}{CATCH\_UNSAFE\_UNRETAINED}}
+{\footnotesize\ttfamily \label{catch__objc__arc_8hpp_a3bfdd9cdf2e8542c663597fb0f10d2ed} 
+\#define CATCH\+\_\+\+UNSAFE\+\_\+\+UNRETAINED}
+
+
+
+Definition at line \mbox{\hyperlink{catch__objc__arc_8hpp_source_l00031}{31}} of file \mbox{\hyperlink{catch__objc__arc_8hpp_source}{catch\+\_\+objc\+\_\+arc.\+hpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{catch__objc__arc_8hpp_a1f6b4a44e1eaaa87534d1f28669897dc}\index{catch\_objc\_arc.hpp@{catch\_objc\_arc.hpp}!arcSafeRelease@{arcSafeRelease}}
+\index{arcSafeRelease@{arcSafeRelease}!catch\_objc\_arc.hpp@{catch\_objc\_arc.hpp}}
+\doxysubsubsection{\texorpdfstring{arcSafeRelease()}{arcSafeRelease()}}
+{\footnotesize\ttfamily \label{catch__objc__arc_8hpp_a1f6b4a44e1eaaa87534d1f28669897dc} 
+void arc\+Safe\+Release (\begin{DoxyParamCaption}\item[{NSObject \texorpdfstring{$\ast$}{*}}]{obj}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__objc__arc_8hpp_source_l00023}{23}} of file \mbox{\hyperlink{catch__objc__arc_8hpp_source}{catch\+\_\+objc\+\_\+arc.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00024\ \ \ \ \ [obj\ release];}
+\DoxyCodeLine{00025\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{catch__objc__arc_8hpp_a1f6b4a44e1eaaa87534d1f28669897dc_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{catch__objc__arc_8hpp_a2e982f858537aef4c41489fee41bdd91}\index{catch\_objc\_arc.hpp@{catch\_objc\_arc.hpp}!performOptionalSelector@{performOptionalSelector}}
+\index{performOptionalSelector@{performOptionalSelector}!catch\_objc\_arc.hpp@{catch\_objc\_arc.hpp}}
+\doxysubsubsection{\texorpdfstring{performOptionalSelector()}{performOptionalSelector()}}
+{\footnotesize\ttfamily \label{catch__objc__arc_8hpp_a2e982f858537aef4c41489fee41bdd91} 
+\mbox{\hyperlink{code__cache_8cpp_aa0efefe21f4700d78692edc823e763be}{id}} perform\+Optional\+Selector (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{code__cache_8cpp_aa0efefe21f4700d78692edc823e763be}{id}}}]{obj}{, }\item[{SEL}]{sel}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__objc__arc_8hpp_source_l00026}{26}} of file \mbox{\hyperlink{catch__objc__arc_8hpp_source}{catch\+\_\+objc\+\_\+arc.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00027\ \ \ \ \ \textcolor{keywordflow}{if}(\ [obj\ respondsToSelector:\ sel]\ )}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [obj\ performSelector:\ sel];}
+\DoxyCodeLine{00029\ \ \ \ \ \textcolor{keywordflow}{return}\ nil;}
+\DoxyCodeLine{00030\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{catch__objc__arc_8hpp_a2e982f858537aef4c41489fee41bdd91_icgraph}
+\end{center}
+\end{figure}

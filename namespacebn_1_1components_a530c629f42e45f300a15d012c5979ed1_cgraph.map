@@ -1,0 +1,9 @@
+<map id="bn::components::millerLoop2" name="bn::components::millerLoop2">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,42,194,68"/>
+<area shape="rect" id="Node000002" href="$structbn_1_1_fp6_t.html#a0267dcb6fc196b27cc8abb5b0d9fd491" title=" " alt="" coords="242,5,385,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="194,39,226,35,227,40,194,45"/>
+<area shape="rect" id="Node000003" href="$structbn_1_1_fp6_t.html#a8cb897dcd4f6427ed9858bb30ce21402" title=" " alt="" coords="263,70,364,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="194,65,248,72,247,77,194,70"/>
+<area shape="rect" id="Node000004" href="$structbn_1_1_fp2_t.html#a486698952735cda99a54294541373aac" title=" " alt="" coords="433,70,533,96"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="364,80,417,80,417,86,364,86"/>
+</map>

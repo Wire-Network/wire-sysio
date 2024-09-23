@@ -1,0 +1,123 @@
+\doxysection{testing\+::String\+Match\+Result\+Listener Class Reference}
+\hypertarget{classtesting_1_1_string_match_result_listener}{}\label{classtesting_1_1_string_match_result_listener}\index{testing::StringMatchResultListener@{testing::StringMatchResultListener}}
+
+
+{\ttfamily \#include $<$gmock-\/matchers.\+h$>$}
+
+
+
+Inheritance diagram for testing\+::String\+Match\+Result\+Listener\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=221pt]{classtesting_1_1_string_match_result_listener__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for testing\+::String\+Match\+Result\+Listener\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=221pt]{classtesting_1_1_string_match_result_listener__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1_string_match_result_listener_a3894c8adca960a2f20a3db6a02b09238}{String\+Match\+Result\+Listener}} ()
+\item 
+std\+::string \mbox{\hyperlink{classtesting_1_1_string_match_result_listener_a77e501016fa53b76e7eee1739d25dde9}{str}} () const
+\item 
+void \mbox{\hyperlink{classtesting_1_1_string_match_result_listener_afd6e59e768516386a3908e7f5cc135d3}{Clear}} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classtesting_1_1_match_result_listener}{testing\+::\+Match\+Result\+Listener}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1_match_result_listener_a245c360286cd0496d22a4d2fde80eb0b}{Match\+Result\+Listener}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}os)
+\item 
+virtual \mbox{\hyperlink{classtesting_1_1_match_result_listener_aa29f43f7b2ffd850c721a8a33ccbba92}{\texorpdfstring{$\sim$}{\string~}\+Match\+Result\+Listener}} ()=0
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{classtesting_1_1_match_result_listener}{Match\+Result\+Listener}} \& \mbox{\hyperlink{classtesting_1_1_match_result_listener_a928c89c85da05cb484b2abd3aa1a9d29}{operator$<$$<$}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&x)
+\item 
+\+::std\+::ostream \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classtesting_1_1_match_result_listener_a7f0e5cffd6983499e99546c759aee2f8}{stream}} ()
+\item 
+bool \mbox{\hyperlink{classtesting_1_1_match_result_listener_ac34f9771f2ba6128cd6a1348b3aebda3}{Is\+Interested}} () const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l00212}{212}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1_string_match_result_listener_a3894c8adca960a2f20a3db6a02b09238}\index{testing::StringMatchResultListener@{testing::StringMatchResultListener}!StringMatchResultListener@{StringMatchResultListener}}
+\index{StringMatchResultListener@{StringMatchResultListener}!testing::StringMatchResultListener@{testing::StringMatchResultListener}}
+\doxysubsubsection{\texorpdfstring{StringMatchResultListener()}{StringMatchResultListener()}}
+{\footnotesize\ttfamily \label{classtesting_1_1_string_match_result_listener_a3894c8adca960a2f20a3db6a02b09238} 
+testing\+::\+String\+Match\+Result\+Listener\+::\+String\+Match\+Result\+Listener (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l00214}{214}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00214\ :\ \mbox{\hyperlink{classtesting_1_1_match_result_listener_a245c360286cd0496d22a4d2fde80eb0b}{MatchResultListener}}(\&ss\_)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1_string_match_result_listener_afd6e59e768516386a3908e7f5cc135d3}\index{testing::StringMatchResultListener@{testing::StringMatchResultListener}!Clear@{Clear}}
+\index{Clear@{Clear}!testing::StringMatchResultListener@{testing::StringMatchResultListener}}
+\doxysubsubsection{\texorpdfstring{Clear()}{Clear()}}
+{\footnotesize\ttfamily \label{classtesting_1_1_string_match_result_listener_afd6e59e768516386a3908e7f5cc135d3} 
+void testing\+::\+String\+Match\+Result\+Listener\+::\+Clear (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l00220}{220}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00220\ \{\ ss\_.str(\textcolor{stringliteral}{"{}"{}});\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1_string_match_result_listener_afd6e59e768516386a3908e7f5cc135d3_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1_string_match_result_listener_a77e501016fa53b76e7eee1739d25dde9}\index{testing::StringMatchResultListener@{testing::StringMatchResultListener}!str@{str}}
+\index{str@{str}!testing::StringMatchResultListener@{testing::StringMatchResultListener}}
+\doxysubsubsection{\texorpdfstring{str()}{str()}}
+{\footnotesize\ttfamily \label{classtesting_1_1_string_match_result_listener_a77e501016fa53b76e7eee1739d25dde9} 
+std\+::string testing\+::\+String\+Match\+Result\+Listener\+::str (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l00217}{217}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00217\ \{\ \textcolor{keywordflow}{return}\ ss\_.str();\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{classtesting_1_1_string_match_result_listener_a77e501016fa53b76e7eee1739d25dde9_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/include/gmock/\mbox{\hyperlink{gmock-matchers_8h}{gmock-\/matchers.\+h}}\end{DoxyCompactItemize}

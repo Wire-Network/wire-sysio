@@ -1,0 +1,553 @@
+\doxysection{rate\+\_\+limiting.\+cpp}
+\hypertarget{rate__limiting_8cpp_source}{}\label{rate__limiting_8cpp_source}\index{libraries/fc/src/network/rate\_limiting.cpp@{libraries/fc/src/network/rate\_limiting.cpp}}
+\mbox{\hyperlink{rate__limiting_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <fc/network/rate\_limiting.hpp>}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <fc/network/tcp\_socket\_io\_hooks.hpp>}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <fc/network/tcp\_socket.hpp>}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <list>}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <algorithm>}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{ip_8hpp}{fc/network/ip.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{fwd__impl_8hpp}{fc/fwd\_impl.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <fc/asio.hpp>}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{logger_8hpp}{fc/log/logger.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <fc/io/stdio.hpp>}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00011}00011\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{exception_8hpp}{fc/exception/exception.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00012}00012\ \textcolor{preprocessor}{\#include\ <fc/thread/thread.hpp>}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00014}00014\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00015}00015\ \{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00017}00017\ \ \ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacedetail}{detail}}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00018}00018\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00019}00019\ \ \ \ \ \textcolor{comment}{//\ data\ about\ a\ read\ or\ write\ we're\ managing}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00020}\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation}{00020}}\ \ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation}{rate\_limited\_operation}}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00021}00021\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00022}00022\ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00023}\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ae8457a63170710103e077ec951c26564}{00023}}\ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ae8457a63170710103e077ec951c26564}{length}};}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00024}\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_a6ba877d2a0fdcb8b029af48feb07421f}{00024}}\ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_a6ba877d2a0fdcb8b029af48feb07421f}{offset}};}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00025}\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ae0ebd3357543b80e348bf68b75b796ad}{00025}}\ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ae0ebd3357543b80e348bf68b75b796ad}{permitted\_length}};}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00026}\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ac8b6e31c5908b626e58252fe8048f8b9}{00026}}\ \ \ \ \ \ \ promise<size\_t>::ptr\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ac8b6e31c5908b626e58252fe8048f8b9}{completion\_promise}};}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00028}\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_aa04333ce2124f5041df4d4c29edf6c43}{00028}}\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_aa04333ce2124f5041df4d4c29edf6c43}{rate\_limited\_operation}}(\textcolor{keywordtype}{size\_t}\ length,}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00029}00029\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_a6ba877d2a0fdcb8b029af48feb07421f}{offset}},}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00030}00030\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ promise<size\_t>::ptr\&\&\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ac8b6e31c5908b626e58252fe8048f8b9}{completion\_promise}})\ :}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00031}00031\ \ \ \ \ \ \ \ \ length(length),}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00032}00032\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_a6ba877d2a0fdcb8b029af48feb07421f}{offset}}(\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_a6ba877d2a0fdcb8b029af48feb07421f}{offset}}),}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00033}00033\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ae0ebd3357543b80e348bf68b75b796ad}{permitted\_length}}(0),}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00034}00034\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ac8b6e31c5908b626e58252fe8048f8b9}{completion\_promise}}(\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ac8b6e31c5908b626e58252fe8048f8b9}{completion\_promise}})}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00035}00035\ \ \ \ \ \ \ \{\}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00037}\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_a7090878b9387f70e1718021b5fc596cb}{00037}}\ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_a7090878b9387f70e1718021b5fc596cb}{perform\_operation}}()\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00038}00038\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00040}\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__write__operation}{00040}}\ \ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__write__operation}{rate\_limited\_tcp\_write\_operation}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation}{rate\_limited\_operation}}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00041}00041\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00042}00042\ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00043}\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__write__operation_a1b36ac1191e9d7317cc51d57dd4c5f6f}{00043}}\ \ \ \ \ \ \ boost::asio::ip::tcp::socket\&\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__write__operation_a1b36ac1191e9d7317cc51d57dd4c5f6f}{socket}};}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00044}\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__write__operation_ab5343397e7574c37408274dbe835eb07}{00044}}\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__write__operation_ab5343397e7574c37408274dbe835eb07}{raw\_buffer}};}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00045}\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__write__operation_a8eecc0c17095acd1c5062ffcaed266e5}{00045}}\ \ \ \ \ \ \ std::shared\_ptr<const\ char>\ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__write__operation_a8eecc0c17095acd1c5062ffcaed266e5}{shared\_buffer}};}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00047}00047\ \ \ \ \ \ \ \textcolor{comment}{//\ QUESTION:\ Why\ would\ this\ version\ of\ the\ constructor\ ever\ be\ called\ if\ it\ will\ abort\ the\ program\ if\ built\ as\ DEBUG?}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00048}00048\ \ \ \ \ \ \ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ \ Commenting\ out\ for\ now\ since\ this\ file\ is\ not\ even\ included\ in\ the\ fc\ library\ build.}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00049}00049\ \ \ \ \ \ \ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00050}00050\ \textcolor{comment}{\ \ \ \ \ \ rate\_limited\_tcp\_write\_operation(boost::asio::ip::tcp::socket\&\ socket,}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00051}00051\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ const\ char*\ buffer,}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00052}00052\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ size\_t\ length,}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00053}00053\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ size\_t\ offset,}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00054}00054\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ promise<size\_t>::ptr\ completion\_promise)\ :}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00055}00055\ \textcolor{comment}{\ \ \ \ \ \ \ \ rate\_limited\_operation(length,\ offset,\ std::move(completion\_promise)),}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00056}00056\ \textcolor{comment}{\ \ \ \ \ \ \ \ socket(socket),}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00057}00057\ \textcolor{comment}{\ \ \ \ \ \ \ \ raw\_buffer(buffer)}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00058}00058\ \textcolor{comment}{\ \ \ \ \ \ \{}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00059}00059\ \textcolor{comment}{\ \ \ \ \ \ \ \ assert(false);}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00060}00060\ \textcolor{comment}{\ \ \ \ \ \ \}}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00061}00061\ \textcolor{comment}{\ \ \ \ \ \ */}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00062}\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__write__operation_a35409a17cddfb784f7665afbe1ed2494}{00062}}\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__write__operation_a35409a17cddfb784f7665afbe1ed2494}{rate\_limited\_tcp\_write\_operation}}(boost::asio::ip::tcp::socket\&\ socket,}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::shared\_ptr<const\ char>\&\ buffer,}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00064}00064\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ length,}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00065}00065\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_a6ba877d2a0fdcb8b029af48feb07421f}{offset}},}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00066}00066\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ promise<size\_t>::ptr\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ac8b6e31c5908b626e58252fe8048f8b9}{completion\_promise}})\ :}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00067}00067\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation}{rate\_limited\_operation}}(length,\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_a6ba877d2a0fdcb8b029af48feb07421f}{offset}},\ \mbox{\hyperlink{namespacestd}{std}}::move(\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ac8b6e31c5908b626e58252fe8048f8b9}{completion\_promise}})),}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00068}00068\ \ \ \ \ \ \ \ \ socket(socket),}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00069}00069\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__write__operation_ab5343397e7574c37408274dbe835eb07}{raw\_buffer}}(nullptr),}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00070}00070\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__write__operation_a8eecc0c17095acd1c5062ffcaed266e5}{shared\_buffer}}(buffer)}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00071}00071\ \ \ \ \ \ \ \{\}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00072}\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__write__operation_a333fa348b1497124ff27733ab0d5e3d8}{00072}}\ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__write__operation_a333fa348b1497124ff27733ab0d5e3d8}{perform\_operation}}()\textcolor{keyword}{\ override}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00073}00073\ \textcolor{keyword}{\ \ \ \ \ \ }\{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00074}00074\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__write__operation_ab5343397e7574c37408274dbe835eb07}{raw\_buffer}})}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00075}00075\ \ \ \ \ \ \ \ \ \ \ asio::async\_write\_some(socket,}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__write__operation_ab5343397e7574c37408274dbe835eb07}{raw\_buffer}},\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ae0ebd3357543b80e348bf68b75b796ad}{permitted\_length}},}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ac8b6e31c5908b626e58252fe8048f8b9}{completion\_promise}});}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00078}00078\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \ asio::async\_write\_some(socket,}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00080}00080\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__write__operation_a8eecc0c17095acd1c5062ffcaed266e5}{shared\_buffer}},\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ae0ebd3357543b80e348bf68b75b796ad}{permitted\_length}},\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_a6ba877d2a0fdcb8b029af48feb07421f}{offset}},}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00081}00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ac8b6e31c5908b626e58252fe8048f8b9}{completion\_promise}});}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00082}00082\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00083}00083\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00084}00084\ }
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00085}\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__read__operation}{00085}}\ \ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__read__operation}{rate\_limited\_tcp\_read\_operation}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation}{rate\_limited\_operation}}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00086}00086\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00087}00087\ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00088}\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__read__operation_a4c916b88d155e708d9a1962b360b723e}{00088}}\ \ \ \ \ \ \ boost::asio::ip::tcp::socket\&\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__read__operation_a4c916b88d155e708d9a1962b360b723e}{socket}};}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00089}\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__read__operation_a13d0bf1fee25d9e43e8dadc16ed3e0f1}{00089}}\ \ \ \ \ \ \ \textcolor{keywordtype}{char}*\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__read__operation_a13d0bf1fee25d9e43e8dadc16ed3e0f1}{raw\_buffer}};}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00090}\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__read__operation_a0828f567076e86c02d32596215fa9fb6}{00090}}\ \ \ \ \ \ \ std::shared\_ptr<char>\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__read__operation_a0828f567076e86c02d32596215fa9fb6}{shared\_buffer}};}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00091}00091\ }
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00092}\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__read__operation_a73b436865498dde61f65d6f5c2480ed1}{00092}}\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__read__operation_a73b436865498dde61f65d6f5c2480ed1}{rate\_limited\_tcp\_read\_operation}}(boost::asio::ip::tcp::socket\&\ socket,}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00093}00093\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}*\ buffer,}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00094}00094\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ length,}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00095}00095\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_a6ba877d2a0fdcb8b029af48feb07421f}{offset}},}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00096}00096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ promise<size\_t>::ptr\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ac8b6e31c5908b626e58252fe8048f8b9}{completion\_promise}})\ :}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00097}00097\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation}{rate\_limited\_operation}}(length,\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_a6ba877d2a0fdcb8b029af48feb07421f}{offset}},\ \mbox{\hyperlink{namespacestd}{std}}::move(\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ac8b6e31c5908b626e58252fe8048f8b9}{completion\_promise}})),}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00098}00098\ \ \ \ \ \ \ \ \ socket(socket),}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00099}00099\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__read__operation_a13d0bf1fee25d9e43e8dadc16ed3e0f1}{raw\_buffer}}(buffer)}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00100}00100\ \ \ \ \ \ \ \{\}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00101}\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__read__operation_a1249ab1b3f073593278b421f9739630b}{00101}}\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__read__operation_a1249ab1b3f073593278b421f9739630b}{rate\_limited\_tcp\_read\_operation}}(boost::asio::ip::tcp::socket\&\ socket,}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00102}00102\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::shared\_ptr<char>\&\ buffer,}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00103}00103\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ length,}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00104}00104\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_a6ba877d2a0fdcb8b029af48feb07421f}{offset}},}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00105}00105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ promise<size\_t>::ptr\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ac8b6e31c5908b626e58252fe8048f8b9}{completion\_promise}})\ :}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00106}00106\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation}{rate\_limited\_operation}}(length,\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_a6ba877d2a0fdcb8b029af48feb07421f}{offset}},\ \mbox{\hyperlink{namespacestd}{std}}::move(\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ac8b6e31c5908b626e58252fe8048f8b9}{completion\_promise}})),}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00107}00107\ \ \ \ \ \ \ \ \ socket(socket),}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00108}00108\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__read__operation_a13d0bf1fee25d9e43e8dadc16ed3e0f1}{raw\_buffer}}(nullptr),}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00109}00109\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__read__operation_a0828f567076e86c02d32596215fa9fb6}{shared\_buffer}}(buffer)}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00110}00110\ \ \ \ \ \ \ \{\}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00111}\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__read__operation_a2a3b725337858366df8ba839db3e4b4b}{00111}}\ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__read__operation_a2a3b725337858366df8ba839db3e4b4b}{perform\_operation}}()\textcolor{keyword}{\ override}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00112}00112\ \textcolor{keyword}{\ \ \ \ \ \ }\{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00113}00113\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__read__operation_a13d0bf1fee25d9e43e8dadc16ed3e0f1}{raw\_buffer}})}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00114}00114\ \ \ \ \ \ \ \ \ \ \ asio::async\_read\_some(socket,}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00115}00115\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__read__operation_a13d0bf1fee25d9e43e8dadc16ed3e0f1}{raw\_buffer}},\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ae0ebd3357543b80e348bf68b75b796ad}{permitted\_length}},}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00116}00116\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ac8b6e31c5908b626e58252fe8048f8b9}{completion\_promise}});}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00117}00117\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00118}00118\ \ \ \ \ \ \ \ \ \ \ asio::async\_read\_some(socket,}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00119}00119\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__read__operation_a0828f567076e86c02d32596215fa9fb6}{shared\_buffer}},\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ae0ebd3357543b80e348bf68b75b796ad}{permitted\_length}},\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_a6ba877d2a0fdcb8b029af48feb07421f}{offset}},}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00120}00120\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ac8b6e31c5908b626e58252fe8048f8b9}{completion\_promise}});}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00121}00121\ }
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00122}00122\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00123}00123\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00124}00124\ }
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00125}\mbox{\hyperlink{structfc_1_1detail_1_1is__operation__shorter}{00125}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structfc_1_1detail_1_1is__operation__shorter}{is\_operation\_shorter}}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00126}00126\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00127}00127\ \ \ \ \ \ \ \textcolor{comment}{//\ less\ than\ operator\ designed\ to\ bring\ the\ shortest\ operations\ to\ the\ end}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00128}\mbox{\hyperlink{structfc_1_1detail_1_1is__operation__shorter_a627302d610ca6e526f14f56462b27aa0}{00128}}\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{structfc_1_1detail_1_1is__operation__shorter_a627302d610ca6e526f14f56462b27aa0}{operator()}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation}{rate\_limited\_operation}}*\ lhs,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation}{rate\_limited\_operation}}*\ rhs)}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00129}00129\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00130}00130\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ lhs-\/>\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ae8457a63170710103e077ec951c26564}{length}}\ >\ rhs-\/>\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ae8457a63170710103e077ec951c26564}{length}};}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00131}00131\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00132}00132\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00133}00133\ }
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00134}\mbox{\hyperlink{classfc_1_1detail_1_1average__rate__meter}{00134}}\ \ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classfc_1_1detail_1_1average__rate__meter}{average\_rate\_meter}}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00135}00135\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00136}00136\ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00137}00137\ \ \ \ \ \ \ \textcolor{keyword}{mutable}\ \textcolor{keywordtype}{double}\ \ \ \ \ \ \ \ \ \_average\_rate;}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00138}00138\ \ \ \ \ \ \ \textcolor{keyword}{mutable}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \ \ \ \ \ \ \_unaccounted\_bytes;}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00139}00139\ \ \ \ \ \ \ \textcolor{keyword}{mutable}\ \mbox{\hyperlink{classfc_1_1time__point}{time\_point}}\ \ \ \ \ \_last\_update\_time;}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00140}00140\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1microseconds}{microseconds}}\ \ \ \ \ \ \ \ \ \ \ \_time\_constant;}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00141}00141\ }
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00142}00142\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ update\_const(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ bytes\_transferred\ =\ 0)\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00143}00143\ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00144}00144\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1average__rate__meter_a2c2e91656d9daa3ba382ca11251bb1c4}{average\_rate\_meter}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1microseconds}{microseconds}}\&\ time\_constant\ =\ \mbox{\hyperlink{namespacefc_a9623b8cae3f48bbed6aa1fc2afe9b174}{seconds}}(10));}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00145}00145\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1detail_1_1average__rate__meter_aacdc090efdf58910f9b4626000ff23f3}{set\_time\_constant}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1microseconds}{microseconds}}\&\ time\_constant);}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00146}00146\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1detail_1_1average__rate__meter_ada9b561ff55964f5c3dd3f56a68858dc}{update}}(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ bytes\_transferred\ =\ 0);}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00147}00147\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{classfc_1_1detail_1_1average__rate__meter_abb72c81fbcef39cf923a9e9071b40ef7}{get\_average\_rate}}()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00148}00148\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00149}\mbox{\hyperlink{classfc_1_1detail_1_1average__rate__meter_a2c2e91656d9daa3ba382ca11251bb1c4}{00149}}\ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1average__rate__meter_a2c2e91656d9daa3ba382ca11251bb1c4}{average\_rate\_meter::average\_rate\_meter}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1microseconds}{microseconds}}\&\ time\_constant)\ :}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00150}00150\ \ \ \ \ \ \ \_average\_rate(0.),}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00151}00151\ \ \ \ \ \ \ \_unaccounted\_bytes(0),}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00152}00152\ \ \ \ \ \ \ \_last\_update\_time(\mbox{\hyperlink{classfc_1_1time__point__sec}{time\_point\_sec}}::\mbox{\hyperlink{namespacefc_aa3ea11c18de71ec23b19c3cc571fb8ff}{min}}()),}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00153}00153\ \ \ \ \ \ \ \_time\_constant(time\_constant)}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00154}00154\ \ \ \ \ \{\}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00155}\mbox{\hyperlink{classfc_1_1detail_1_1average__rate__meter_aacdc090efdf58910f9b4626000ff23f3}{00155}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1detail_1_1average__rate__meter_aacdc090efdf58910f9b4626000ff23f3}{average\_rate\_meter::set\_time\_constant}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1microseconds}{microseconds}}\&\ time\_constant)}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00156}00156\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00157}00157\ \ \ \ \ \ \ \_time\_constant\ =\ time\_constant;}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00158}00158\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00159}\mbox{\hyperlink{classfc_1_1detail_1_1average__rate__meter_ada9b561ff55964f5c3dd3f56a68858dc}{00159}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1detail_1_1average__rate__meter_ada9b561ff55964f5c3dd3f56a68858dc}{average\_rate\_meter::update}}(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ bytes\_transferred\ \textcolor{comment}{/*\ =\ 0\ */})}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00160}00160\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00161}00161\ \ \ \ \ \ \ update\_const(bytes\_transferred);}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00162}00162\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00163}00163\ \ \ \ \ \textcolor{keywordtype}{void}\ average\_rate\_meter::update\_const(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ bytes\_transferred\ \textcolor{comment}{/*\ =\ 0\ */})\textcolor{keyword}{\ const}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00164}00164\ \textcolor{keyword}{\ \ \ \ }\{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00165}00165\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1time__point}{time\_point}}\ now\ =\ \mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{time\_point::now}}();}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00166}00166\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (now\ <=\ \_last\_update\_time)}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00167}00167\ \ \ \ \ \ \ \ \ \_unaccounted\_bytes\ +=\ bytes\_transferred;}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00168}00168\ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00169}00169\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00170}00170\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1microseconds}{microseconds}}\ time\_since\_last\_update\ =\ now\ -\/\ \_last\_update\_time;}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00171}00171\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (time\_since\_last\_update\ >\ \_time\_constant)}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00172}00172\ \ \ \ \ \ \ \ \ \ \ \_average\_rate\ =\ bytes\_transferred\ /\ (\_time\_constant.\mbox{\hyperlink{classfc_1_1microseconds_a20fba59ec7e1f50c6b8f2c9443cc9b92}{count}}()\ /\ (\textcolor{keywordtype}{double})\mbox{\hyperlink{namespacefc_a9623b8cae3f48bbed6aa1fc2afe9b174}{seconds}}(1).\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}());}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00173}00173\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00174}00174\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00175}00175\ \ \ \ \ \ \ \ \ \ \ bytes\_transferred\ +=\ \_unaccounted\_bytes;}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00176}00176\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ seconds\_since\_last\_update\ =\ time\_since\_last\_update.\mbox{\hyperlink{classfc_1_1microseconds_a20fba59ec7e1f50c6b8f2c9443cc9b92}{count}}()\ /\ (double)\mbox{\hyperlink{namespacefc_a9623b8cae3f48bbed6aa1fc2afe9b174}{seconds}}(1).\mbox{\hyperlink{classfc_1_1microseconds_a20fba59ec7e1f50c6b8f2c9443cc9b92}{count}}();}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00177}00177\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ rate\_since\_last\_update\ =\ bytes\_transferred\ /\ seconds\_since\_last\_update;}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00178}00178\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ alpha\ =\ time\_since\_last\_update.\mbox{\hyperlink{classfc_1_1microseconds_a20fba59ec7e1f50c6b8f2c9443cc9b92}{count}}()\ /\ (double)\_time\_constant.\mbox{\hyperlink{classfc_1_1microseconds_a20fba59ec7e1f50c6b8f2c9443cc9b92}{count}}();}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00179}00179\ \ \ \ \ \ \ \ \ \ \ \_average\_rate\ =\ rate\_since\_last\_update\ *\ alpha\ +\ \_average\_rate\ *\ (1.0\ -\/\ alpha);}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00180}00180\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00181}00181\ \ \ \ \ \ \ \ \ \_last\_update\_time\ =\ now;}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00182}00182\ \ \ \ \ \ \ \ \ \_unaccounted\_bytes\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00183}00183\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00184}00184\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00185}\mbox{\hyperlink{classfc_1_1detail_1_1average__rate__meter_abb72c81fbcef39cf923a9e9071b40ef7}{00185}}\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{classfc_1_1detail_1_1average__rate__meter_abb72c81fbcef39cf923a9e9071b40ef7}{average\_rate\_meter::get\_average\_rate}}()\textcolor{keyword}{\ const}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00186}00186\ \textcolor{keyword}{\ \ \ \ }\{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00187}00187\ \ \ \ \ \ \ update\_const();}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00188}00188\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})\_average\_rate;}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00189}00189\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00190}00190\ }
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00191}\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl}{00191}}\ \ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl}{rate\_limiting\_group\_impl}}\ :\ \textcolor{keyword}{public}\ tcp\_socket\_io\_hooks}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00192}00192\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00193}00193\ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00194}\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_aea464c799c11ea096400b885d642bba4}{00194}}\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_aea464c799c11ea096400b885d642bba4}{\_upload\_bytes\_per\_second}};}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00195}\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ab36bd64432521d513445cefc3e303eb6}{00195}}\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ab36bd64432521d513445cefc3e303eb6}{\_download\_bytes\_per\_second}};}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00196}\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a88a841d35cba76a6704c868c4183a3b7}{00196}}\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a88a841d35cba76a6704c868c4183a3b7}{\_burstiness\_in\_seconds}};}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00197}00197\ }
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00198}\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a40589128811002a815b3ae26244c60a9}{00198}}\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1microseconds}{microseconds}}\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a40589128811002a815b3ae26244c60a9}{\_granularity}};\ \textcolor{comment}{//\ how\ often\ to\ add\ tokens\ to\ the\ bucket}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00199}\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a0dcb6b1c8dfd386197232a21fb7f73a7}{00199}}\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a0dcb6b1c8dfd386197232a21fb7f73a7}{\_read\_tokens}};}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00200}\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a9376b5505587791a43adeb43b05f8056}{00200}}\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a9376b5505587791a43adeb43b05f8056}{\_unused\_read\_tokens}};\ \textcolor{comment}{//\ gets\ filled\ with\ tokens\ for\ unused\ bytes\ (if\ I'm\ allowed\ to\ read\ 200\ bytes\ and\ I\ try\ to\ read\ 200\ bytes,\ but\ can\ only\ read\ 50,\ tokens\ for\ the\ other\ 150\ get\ returned\ here)}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00201}\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a7a35d9108ae23c5a99a73693dc7a1c54}{00201}}\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a7a35d9108ae23c5a99a73693dc7a1c54}{\_write\_tokens}};}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00202}\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a966cf125ef17beef029f5c8352302758}{00202}}\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a966cf125ef17beef029f5c8352302758}{\_unused\_write\_tokens}};}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00203}00203\ }
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00204}\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ab3c3730e5022917856d1976c90c8ed35}{00204}}\ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ std::list<rate\_limited\_operation*>\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ab3c3730e5022917856d1976c90c8ed35}{rate\_limited\_operation\_list}};}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00205}\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_aa02fce050432e868fa63a1817d639b20}{00205}}\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ab3c3730e5022917856d1976c90c8ed35}{rate\_limited\_operation\_list}}\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_aa02fce050432e868fa63a1817d639b20}{\_read\_operations\_in\_progress}};}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00206}\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ac6c58ba1dce6c246b610978efaa953f5}{00206}}\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ab3c3730e5022917856d1976c90c8ed35}{rate\_limited\_operation\_list}}\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ac6c58ba1dce6c246b610978efaa953f5}{\_read\_operations\_for\_next\_iteration}};}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00207}\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a3fedce7e9ee44f57af077391af013cd4}{00207}}\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ab3c3730e5022917856d1976c90c8ed35}{rate\_limited\_operation\_list}}\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a3fedce7e9ee44f57af077391af013cd4}{\_write\_operations\_in\_progress}};}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00208}\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a4eab5449ce828620059a63481584b914}{00208}}\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ab3c3730e5022917856d1976c90c8ed35}{rate\_limited\_operation\_list}}\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a4eab5449ce828620059a63481584b914}{\_write\_operations\_for\_next\_iteration}};}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00209}00209\ }
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00210}\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ab27d2289d9b796a3ad2eb6948d17f752}{00210}}\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1time__point}{time\_point}}\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ab27d2289d9b796a3ad2eb6948d17f752}{\_last\_read\_iteration\_time}};}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00211}\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a66e7e14cddeacf23b2cc907f2b75cd05}{00211}}\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1time__point}{time\_point}}\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a66e7e14cddeacf23b2cc907f2b75cd05}{\_last\_write\_iteration\_time}};}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00212}00212\ }
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00213}\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ac9074d5e5c064707c52bcb8973639519}{00213}}\ \ \ \ \ \ \ future<void>\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ac9074d5e5c064707c52bcb8973639519}{\_process\_pending\_reads\_loop\_complete}};}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00214}\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ac27a30522117cbf377c837a1e21fefdb}{00214}}\ \ \ \ \ \ \ promise<void>::ptr\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ac27a30522117cbf377c837a1e21fefdb}{\_new\_read\_operation\_available\_promise}};}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00215}\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a2dfe2dbb88f981587d9fab0be48cccc4}{00215}}\ \ \ \ \ \ \ future<void>\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a2dfe2dbb88f981587d9fab0be48cccc4}{\_process\_pending\_writes\_loop\_complete}};}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00216}\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a0eb2b117fe73fe9b58ba6a4d7dfc7ed4}{00216}}\ \ \ \ \ \ \ promise<void>::ptr\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a0eb2b117fe73fe9b58ba6a4d7dfc7ed4}{\_new\_write\_operation\_available\_promise}};}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00217}00217\ }
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00218}\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_aac40eb765de719da6eadf2074fbe6e17}{00218}}\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1average__rate__meter}{average\_rate\_meter}}\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_aac40eb765de719da6eadf2074fbe6e17}{\_actual\_upload\_rate}};}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00219}\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a866c9c96a0ad6aa3c5b867b0289ac9bc}{00219}}\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1average__rate__meter}{average\_rate\_meter}}\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a866c9c96a0ad6aa3c5b867b0289ac9bc}{\_actual\_download\_rate}};}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00220}00220\ }
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00221}00221\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a863869f673130316f4f8af14f83bbbf5}{rate\_limiting\_group\_impl}}(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ upload\_bytes\_per\_second,\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ download\_bytes\_per\_second,}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00222}00222\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ burstiness\_in\_seconds\ =\ 1);}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00223}00223\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a68364005cee1ff5e92fd6582000e5439}{\string~rate\_limiting\_group\_impl}}();}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00224}00224\ }
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00225}00225\ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a8fe749da93ec7a60083d03c8a82a5091}{readsome}}(boost::asio::ip::tcp::socket\&\ socket,\ \textcolor{keywordtype}{char}*\ buffer,\ \textcolor{keywordtype}{size\_t}\ length)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00226}00226\ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a8fe749da93ec7a60083d03c8a82a5091}{readsome}}(boost::asio::ip::tcp::socket\&\ socket,\ \textcolor{keyword}{const}\ std::shared\_ptr<char>\&\ buffer,\ \textcolor{keywordtype}{size\_t}\ length,\ \textcolor{keywordtype}{size\_t}\ offset)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00227}00227\ \ \ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ BufferType>}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00228}00228\ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ac9c0f88e27254463a65975d5cc8484cd}{readsome\_impl}}(boost::asio::ip::tcp::socket\&\ socket,\ \textcolor{keyword}{const}\ BufferType\&\ buffer,\ \textcolor{keywordtype}{size\_t}\ length,\ \textcolor{keywordtype}{size\_t}\ offset);}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00229}00229\ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a50b7ec22b99f4ff67d71e44f2e2bdc88}{writesome}}(boost::asio::ip::tcp::socket\&\ socket,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ buffer,\ \textcolor{keywordtype}{size\_t}\ length)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00230}00230\ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a50b7ec22b99f4ff67d71e44f2e2bdc88}{writesome}}(boost::asio::ip::tcp::socket\&\ socket,\ \textcolor{keyword}{const}\ std::shared\_ptr<const\ char>\&\ buffer,\ \textcolor{keywordtype}{size\_t}\ length,\ \textcolor{keywordtype}{size\_t}\ offset)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00231}00231\ \ \ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ BufferType>}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00232}00232\ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_aee2678c053a998c49ad7c671c77fe4dd}{writesome\_impl}}(boost::asio::ip::tcp::socket\&\ socket,\ \textcolor{keyword}{const}\ BufferType\&\ buffer,\ \textcolor{keywordtype}{size\_t}\ length,\ \textcolor{keywordtype}{size\_t}\ offset);}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00233}00233\ }
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00234}00234\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a30e2a1f703fcd1983c5e2afb2dcd1ef7}{process\_pending\_reads}}();}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00235}00235\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_acea1501bba905857cdda6347631eb05b}{process\_pending\_writes}}();}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00236}00236\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ab87ad5f4ec8adcf3702745b30cd822ad}{process\_pending\_operations}}(\mbox{\hyperlink{classfc_1_1time__point}{time\_point}}\&\ last\_iteration\_start\_time,}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00237}00237\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\&\ limit\_bytes\_per\_second,}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00238}00238\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ab3c3730e5022917856d1976c90c8ed35}{rate\_limited\_operation\_list}}\&\ operations\_in\_progress,}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00239}00239\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ab3c3730e5022917856d1976c90c8ed35}{rate\_limited\_operation\_list}}\&\ operations\_for\_next\_iteration,}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00240}00240\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\&\ tokens,}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00241}00241\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\&\ unused\_tokens);}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00242}00242\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00243}00243\ }
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00244}\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a863869f673130316f4f8af14f83bbbf5}{00244}}\ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a863869f673130316f4f8af14f83bbbf5}{rate\_limiting\_group\_impl::rate\_limiting\_group\_impl}}(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ upload\_bytes\_per\_second,\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ download\_bytes\_per\_second,}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00245}00245\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ burstiness\_in\_seconds)\ :}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00246}00246\ \ \ \ \ \ \ \_upload\_bytes\_per\_second(upload\_bytes\_per\_second),}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00247}00247\ \ \ \ \ \ \ \_download\_bytes\_per\_second(download\_bytes\_per\_second),}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00248}00248\ \ \ \ \ \ \ \_burstiness\_in\_seconds(burstiness\_in\_seconds),}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00249}00249\ \ \ \ \ \ \ \_granularity(\mbox{\hyperlink{namespacefc_a76ae235ec7e9b8862e70740058d7eb1b}{milliseconds}}(50)),}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00250}00250\ \ \ \ \ \ \ \_read\_tokens(\_download\_bytes\_per\_second),}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00251}00251\ \ \ \ \ \ \ \_unused\_read\_tokens(0),}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00252}00252\ \ \ \ \ \ \ \_write\_tokens(\_upload\_bytes\_per\_second),}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00253}00253\ \ \ \ \ \ \ \_unused\_write\_tokens(0)}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00254}00254\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00255}00255\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00256}00256\ }
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00257}\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a68364005cee1ff5e92fd6582000e5439}{00257}}\ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a68364005cee1ff5e92fd6582000e5439}{rate\_limiting\_group\_impl::\string~rate\_limiting\_group\_impl}}()}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00258}00258\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00259}00259\ \ \ \ \ \ \ \textcolor{keywordflow}{try}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00260}00260\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00261}00261\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ac9074d5e5c064707c52bcb8973639519}{\_process\_pending\_reads\_loop\_complete}}.cancel\_and\_wait();}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00262}00262\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00263}00263\ \ \ \ \ \ \ \textcolor{keywordflow}{catch}\ (...)}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00264}00264\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00265}00265\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00266}00266\ \ \ \ \ \ \ \textcolor{keywordflow}{try}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00267}00267\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00268}00268\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a2dfe2dbb88f981587d9fab0be48cccc4}{\_process\_pending\_writes\_loop\_complete}}.cancel\_and\_wait();}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00269}00269\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00270}00270\ \ \ \ \ \ \ \textcolor{keywordflow}{catch}\ (...)}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00271}00271\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00272}00272\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00273}00273\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00274}00274\ }
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00275}\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a77951eaab9932d076e231fabdbfde61e}{00275}}\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a8fe749da93ec7a60083d03c8a82a5091}{rate\_limiting\_group\_impl::readsome}}(boost::asio::ip::tcp::socket\&\ socket,\ \textcolor{keyword}{const}\ std::shared\_ptr<char>\&\ buffer,\ \textcolor{keywordtype}{size\_t}\ length,\ \textcolor{keywordtype}{size\_t}\ offset)}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00276}00276\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00277}00277\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ac9c0f88e27254463a65975d5cc8484cd}{readsome\_impl}}(socket,\ buffer,\ length,\ offset);}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00278}00278\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00279}00279\ }
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00280}\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a8fe749da93ec7a60083d03c8a82a5091}{00280}}\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a8fe749da93ec7a60083d03c8a82a5091}{rate\_limiting\_group\_impl::readsome}}(boost::asio::ip::tcp::socket\&\ socket,\ \textcolor{keywordtype}{char}*\ buffer,\ \textcolor{keywordtype}{size\_t}\ length)}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00281}00281\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00282}00282\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ac9c0f88e27254463a65975d5cc8484cd}{readsome\_impl}}(socket,\ buffer,\ length,\ 0);}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00283}00283\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00284}00284\ }
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00285}00285\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ BufferType>}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00286}\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ac9c0f88e27254463a65975d5cc8484cd}{00286}}\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ac9c0f88e27254463a65975d5cc8484cd}{rate\_limiting\_group\_impl::readsome\_impl}}(boost::asio::ip::tcp::socket\&\ socket,\ \textcolor{keyword}{const}\ BufferType\&\ buffer,\ \textcolor{keywordtype}{size\_t}\ length,\ \textcolor{keywordtype}{size\_t}\ offset)}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00287}00287\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00288}00288\ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ bytes\_read;}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00289}00289\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ab36bd64432521d513445cefc3e303eb6}{\_download\_bytes\_per\_second}})}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00290}00290\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00291}00291\ \ \ \ \ \ \ \ \ promise<size\_t>::ptr\ completion\_promise(\textcolor{keyword}{new}\ promise<size\_t>(\textcolor{stringliteral}{"{}rate\_limiting\_group\_impl::readsome"{}}));}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00292}00292\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__read__operation}{rate\_limited\_tcp\_read\_operation}}\ read\_operation(socket,\ buffer,\ length,\ offset,\ completion\_promise);}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00293}00293\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ac6c58ba1dce6c246b610978efaa953f5}{\_read\_operations\_for\_next\_iteration}}.push\_back(\&read\_operation);}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00294}00294\ }
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00295}00295\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ launch\ the\ read\ processing\ loop\ it\ if\ isn't\ running,\ or\ signal\ it\ to\ resume\ if\ it's\ paused.}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00296}00296\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ac9074d5e5c064707c52bcb8973639519}{\_process\_pending\_reads\_loop\_complete}}.valid()\ ||\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ac9074d5e5c064707c52bcb8973639519}{\_process\_pending\_reads\_loop\_complete}}.ready())}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00297}00297\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ac9074d5e5c064707c52bcb8973639519}{\_process\_pending\_reads\_loop\_complete}}\ =\ async([=]()\{\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a30e2a1f703fcd1983c5e2afb2dcd1ef7}{process\_pending\_reads}}();\ \},\ \textcolor{stringliteral}{"{}process\_pending\_reads"{}}\ );}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00298}00298\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ac27a30522117cbf377c837a1e21fefdb}{\_new\_read\_operation\_available\_promise}})}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00299}00299\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ac27a30522117cbf377c837a1e21fefdb}{\_new\_read\_operation\_available\_promise}}-\/>set\_value();}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00300}00300\ }
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00301}00301\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00302}00302\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00303}00303\ \ \ \ \ \ \ \ \ \ \ bytes\_read\ =\ completion\_promise-\/>wait();}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00304}00304\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00305}00305\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{catch}\ (...)}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00306}00306\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00307}00307\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ac6c58ba1dce6c246b610978efaa953f5}{\_read\_operations\_for\_next\_iteration}}.remove(\&read\_operation);}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00308}00308\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_aa02fce050432e868fa63a1817d639b20}{\_read\_operations\_in\_progress}}.remove(\&read\_operation);}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00309}00309\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw};}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00310}00310\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00311}00311\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a9376b5505587791a43adeb43b05f8056}{\_unused\_read\_tokens}}\ +=\ read\_operation.\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ae0ebd3357543b80e348bf68b75b796ad}{permitted\_length}}\ -\/\ bytes\_read;}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00312}00312\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00313}00313\ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00314}00314\ \ \ \ \ \ \ \ \ bytes\_read\ =\ asio::read\_some(socket,\ buffer,\ length,\ offset);}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00315}00315\ }
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00316}00316\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a866c9c96a0ad6aa3c5b867b0289ac9bc}{\_actual\_download\_rate}}.\mbox{\hyperlink{classfc_1_1detail_1_1average__rate__meter_ada9b561ff55964f5c3dd3f56a68858dc}{update}}(bytes\_read);}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00317}00317\ }
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00318}00318\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ bytes\_read;}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00319}00319\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00320}00320\ }
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00321}\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a50b7ec22b99f4ff67d71e44f2e2bdc88}{00321}}\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a50b7ec22b99f4ff67d71e44f2e2bdc88}{rate\_limiting\_group\_impl::writesome}}(boost::asio::ip::tcp::socket\&\ socket,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ buffer,\ \textcolor{keywordtype}{size\_t}\ length)}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00322}00322\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00323}00323\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_aee2678c053a998c49ad7c671c77fe4dd}{writesome\_impl}}(socket,\ buffer,\ length,\ 0);}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00324}00324\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00325}00325\ }
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00326}\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ab6a53d6b835cb2d3ada56c834dc0bbe5}{00326}}\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a50b7ec22b99f4ff67d71e44f2e2bdc88}{rate\_limiting\_group\_impl::writesome}}(boost::asio::ip::tcp::socket\&\ socket,\ \textcolor{keyword}{const}\ std::shared\_ptr<const\ char>\&\ buffer,\ \textcolor{keywordtype}{size\_t}\ length,\ \textcolor{keywordtype}{size\_t}\ offset)}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00327}00327\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00328}00328\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_aee2678c053a998c49ad7c671c77fe4dd}{writesome\_impl}}(socket,\ buffer,\ length,\ offset);}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00329}00329\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00330}00330\ }
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00331}00331\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ BufferType>}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00332}\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_aee2678c053a998c49ad7c671c77fe4dd}{00332}}\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_aee2678c053a998c49ad7c671c77fe4dd}{rate\_limiting\_group\_impl::writesome\_impl}}(boost::asio::ip::tcp::socket\&\ socket,\ \textcolor{keyword}{const}\ BufferType\&\ buffer,\ \textcolor{keywordtype}{size\_t}\ length,\ \textcolor{keywordtype}{size\_t}\ offset)}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00333}00333\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00334}00334\ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ bytes\_written;}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00335}00335\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_aea464c799c11ea096400b885d642bba4}{\_upload\_bytes\_per\_second}})}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00336}00336\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00337}00337\ \ \ \ \ \ \ \ \ promise<size\_t>::ptr\ completion\_promise(\textcolor{keyword}{new}\ promise<size\_t>(\textcolor{stringliteral}{"{}rate\_limiting\_group\_impl::writesome"{}}));}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00338}00338\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__write__operation}{rate\_limited\_tcp\_write\_operation}}\ write\_operation(socket,\ buffer,\ length,\ offset,\ completion\_promise);}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00339}00339\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a4eab5449ce828620059a63481584b914}{\_write\_operations\_for\_next\_iteration}}.push\_back(\&write\_operation);}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00340}00340\ }
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00341}00341\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ launch\ the\ write\ processing\ loop\ it\ if\ isn't\ running,\ or\ signal\ it\ to\ resume\ if\ it's\ paused.}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00342}00342\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a2dfe2dbb88f981587d9fab0be48cccc4}{\_process\_pending\_writes\_loop\_complete}}.valid()\ ||\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a2dfe2dbb88f981587d9fab0be48cccc4}{\_process\_pending\_writes\_loop\_complete}}.ready())}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00343}00343\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a2dfe2dbb88f981587d9fab0be48cccc4}{\_process\_pending\_writes\_loop\_complete}}\ =\ async([=]()\{\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_acea1501bba905857cdda6347631eb05b}{process\_pending\_writes}}();\ \},\ \textcolor{stringliteral}{"{}process\_pending\_writes"{}});}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00344}00344\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a0eb2b117fe73fe9b58ba6a4d7dfc7ed4}{\_new\_write\_operation\_available\_promise}})}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00345}00345\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a0eb2b117fe73fe9b58ba6a4d7dfc7ed4}{\_new\_write\_operation\_available\_promise}}-\/>set\_value();}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00346}00346\ }
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00347}00347\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00348}00348\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00349}00349\ \ \ \ \ \ \ \ \ \ \ bytes\_written\ =\ completion\_promise-\/>wait();}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00350}00350\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00351}00351\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{catch}\ (...)}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00352}00352\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00353}00353\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a4eab5449ce828620059a63481584b914}{\_write\_operations\_for\_next\_iteration}}.remove(\&write\_operation);}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00354}00354\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a3fedce7e9ee44f57af077391af013cd4}{\_write\_operations\_in\_progress}}.remove(\&write\_operation);}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00355}00355\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw};}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00356}00356\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00357}00357\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a966cf125ef17beef029f5c8352302758}{\_unused\_write\_tokens}}\ +=\ write\_operation.\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ae0ebd3357543b80e348bf68b75b796ad}{permitted\_length}}\ -\/\ bytes\_written;}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00358}00358\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00359}00359\ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00360}00360\ \ \ \ \ \ \ \ \ bytes\_written\ =\ asio::write\_some(socket,\ buffer,\ length,\ offset);}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00361}00361\ }
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00362}00362\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_aac40eb765de719da6eadf2074fbe6e17}{\_actual\_upload\_rate}}.\mbox{\hyperlink{classfc_1_1detail_1_1average__rate__meter_ada9b561ff55964f5c3dd3f56a68858dc}{update}}(bytes\_written);}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00363}00363\ }
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00364}00364\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ bytes\_written;}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00365}00365\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00366}00366\ }
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00367}\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a30e2a1f703fcd1983c5e2afb2dcd1ef7}{00367}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a30e2a1f703fcd1983c5e2afb2dcd1ef7}{rate\_limiting\_group\_impl::process\_pending\_reads}}()}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00368}00368\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00369}00369\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (;;)}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00370}00370\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00371}00371\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ab87ad5f4ec8adcf3702745b30cd822ad}{process\_pending\_operations}}(\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ab27d2289d9b796a3ad2eb6948d17f752}{\_last\_read\_iteration\_time}},\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ab36bd64432521d513445cefc3e303eb6}{\_download\_bytes\_per\_second}},}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00372}00372\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_aa02fce050432e868fa63a1817d639b20}{\_read\_operations\_in\_progress}},\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ac6c58ba1dce6c246b610978efaa953f5}{\_read\_operations\_for\_next\_iteration}},\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a0dcb6b1c8dfd386197232a21fb7f73a7}{\_read\_tokens}},\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a9376b5505587791a43adeb43b05f8056}{\_unused\_read\_tokens}});}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00373}00373\ }
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00374}00374\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ac27a30522117cbf377c837a1e21fefdb}{\_new\_read\_operation\_available\_promise}}\ =\ \textcolor{keyword}{new}\ promise<void>(\textcolor{stringliteral}{"{}rate\_limiting\_group\_impl::process\_pending\_reads"{}});}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00375}00375\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00376}00376\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00377}00377\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_aa02fce050432e868fa63a1817d639b20}{\_read\_operations\_in\_progress}}.empty())}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00378}00378\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ac27a30522117cbf377c837a1e21fefdb}{\_new\_read\_operation\_available\_promise}}-\/>wait();}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00379}00379\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00380}00380\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ac27a30522117cbf377c837a1e21fefdb}{\_new\_read\_operation\_available\_promise}}-\/>wait(\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a40589128811002a815b3ae26244c60a9}{\_granularity}});}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00381}00381\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00382}00382\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{catch}\ (\textcolor{keyword}{const}\ timeout\_exception\&)}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00383}00383\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00384}00384\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00385}00385\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ac27a30522117cbf377c837a1e21fefdb}{\_new\_read\_operation\_available\_promise}}.reset();}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00386}00386\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00387}00387\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00388}\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_acea1501bba905857cdda6347631eb05b}{00388}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_acea1501bba905857cdda6347631eb05b}{rate\_limiting\_group\_impl::process\_pending\_writes}}()}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00389}00389\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00390}00390\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (;;)}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00391}00391\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00392}00392\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ab87ad5f4ec8adcf3702745b30cd822ad}{process\_pending\_operations}}(\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a66e7e14cddeacf23b2cc907f2b75cd05}{\_last\_write\_iteration\_time}},\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_aea464c799c11ea096400b885d642bba4}{\_upload\_bytes\_per\_second}},}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00393}00393\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a3fedce7e9ee44f57af077391af013cd4}{\_write\_operations\_in\_progress}},\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a4eab5449ce828620059a63481584b914}{\_write\_operations\_for\_next\_iteration}},\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a7a35d9108ae23c5a99a73693dc7a1c54}{\_write\_tokens}},\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a966cf125ef17beef029f5c8352302758}{\_unused\_write\_tokens}});}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00394}00394\ }
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00395}00395\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a0eb2b117fe73fe9b58ba6a4d7dfc7ed4}{\_new\_write\_operation\_available\_promise}}\ =\ \textcolor{keyword}{new}\ promise<void>(\textcolor{stringliteral}{"{}rate\_limiting\_group\_impl::process\_pending\_writes"{}});}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00396}00396\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00397}00397\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00398}00398\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a3fedce7e9ee44f57af077391af013cd4}{\_write\_operations\_in\_progress}}.empty())}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00399}00399\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a0eb2b117fe73fe9b58ba6a4d7dfc7ed4}{\_new\_write\_operation\_available\_promise}}-\/>wait();}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00400}00400\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00401}00401\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a0eb2b117fe73fe9b58ba6a4d7dfc7ed4}{\_new\_write\_operation\_available\_promise}}-\/>wait(\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a40589128811002a815b3ae26244c60a9}{\_granularity}});}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00402}00402\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00403}00403\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{catch}\ (\textcolor{keyword}{const}\ timeout\_exception\&)}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00404}00404\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00405}00405\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00406}00406\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a0eb2b117fe73fe9b58ba6a4d7dfc7ed4}{\_new\_write\_operation\_available\_promise}}.reset();}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00407}00407\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00408}00408\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00409}\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ab87ad5f4ec8adcf3702745b30cd822ad}{00409}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ab87ad5f4ec8adcf3702745b30cd822ad}{rate\_limiting\_group\_impl::process\_pending\_operations}}(\mbox{\hyperlink{classfc_1_1time__point}{time\_point}}\&\ last\_iteration\_start\_time,}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00410}00410\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\&\ limit\_bytes\_per\_second,}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00411}00411\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ab3c3730e5022917856d1976c90c8ed35}{rate\_limited\_operation\_list}}\&\ operations\_in\_progress,}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00412}00412\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ab3c3730e5022917856d1976c90c8ed35}{rate\_limited\_operation\_list}}\&\ operations\_for\_next\_iteration,}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00413}00413\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\&\ tokens,}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00414}00414\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\&\ unused\_tokens)}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00415}00415\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00416}00416\ \ \ \ \ \ \ \textcolor{comment}{//\ lock\ here\ for\ multithreaded}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00417}00417\ \ \ \ \ \ \ std::copy(operations\_for\_next\_iteration.begin(),}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00418}00418\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ operations\_for\_next\_iteration.end(),}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00419}00419\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::back\_inserter(operations\_in\_progress));}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00420}00420\ \ \ \ \ \ \ operations\_for\_next\_iteration.clear();}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00421}00421\ }
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00422}00422\ \ \ \ \ \ \ \textcolor{comment}{//\ find\ out\ how\ much\ time\ since\ our\ last\ read/write}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00423}00423\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1time__point}{time\_point}}\ this\_iteration\_start\_time\ =\ \mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{time\_point::now}}();}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00424}00424\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (limit\_bytes\_per\_second)\ \textcolor{comment}{//\ the\ we\ are\ limiting\ up/download\ speed}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00425}00425\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00426}00426\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1microseconds}{microseconds}}\ time\_since\_last\_iteration\ =\ this\_iteration\_start\_time\ -\/\ last\_iteration\_start\_time;}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00427}00427\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (time\_since\_last\_iteration\ >\ \mbox{\hyperlink{namespacefc_a9623b8cae3f48bbed6aa1fc2afe9b174}{seconds}}(1))}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00428}00428\ \ \ \ \ \ \ \ \ \ \ time\_since\_last\_iteration\ =\ \mbox{\hyperlink{namespacefc_a9623b8cae3f48bbed6aa1fc2afe9b174}{seconds}}(1);}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00429}00429\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (time\_since\_last\_iteration\ <\ \mbox{\hyperlink{classfc_1_1microseconds}{microseconds}}(0))}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00430}00430\ \ \ \ \ \ \ \ \ \ \ time\_since\_last\_iteration\ =\ \mbox{\hyperlink{classfc_1_1microseconds}{microseconds}}(0);}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00431}00431\ }
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00432}00432\ \ \ \ \ \ \ \ \ tokens\ +=\ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})((limit\_bytes\_per\_second\ *\ time\_since\_last\_iteration.\mbox{\hyperlink{classfc_1_1microseconds_a20fba59ec7e1f50c6b8f2c9443cc9b92}{count}}())\ /\ 1000000);}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00433}00433\ \ \ \ \ \ \ \ \ tokens\ +=\ unused\_tokens;}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00434}00434\ \ \ \ \ \ \ \ \ unused\_tokens\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00435}00435\ \ \ \ \ \ \ \ \ tokens\ =\ std::min(tokens,\ limit\_bytes\_per\_second\ *\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a88a841d35cba76a6704c868c4183a3b7}{\_burstiness\_in\_seconds}});}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00436}00436\ }
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00437}00437\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (tokens)}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00438}00438\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00439}00439\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ sort\ the\ pending\ reads/writes\ in\ order\ of\ the\ number\ of\ bytes\ they\ need\ to\ write,\ smallest\ first}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00440}00440\ \ \ \ \ \ \ \ \ \ \ std::vector<rate\_limited\_operation*>\ operations\_sorted\_by\_length;}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00441}00441\ \ \ \ \ \ \ \ \ \ \ operations\_sorted\_by\_length.reserve(operations\_in\_progress.size());}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00442}00442\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation}{rate\_limited\_operation}}*\ operation\_data\ :\ operations\_in\_progress)}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00443}00443\ \ \ \ \ \ \ \ \ \ \ \ \ operations\_sorted\_by\_length.push\_back(operation\_data);}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00444}00444\ \ \ \ \ \ \ \ \ \ \ std::sort(operations\_sorted\_by\_length.begin(),\ operations\_sorted\_by\_length.end(),\ \mbox{\hyperlink{structfc_1_1detail_1_1is__operation__shorter}{is\_operation\_shorter}}());}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00445}00445\ }
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00446}00446\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ figure\ out\ how\ many\ bytes\ each\ reader/writer\ is\ allowed\ to\ read/write}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00447}00447\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ bytes\_remaining\_to\_allocate\ =\ tokens;}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00448}00448\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (!operations\_sorted\_by\_length.empty())}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00449}00449\ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00450}00450\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ bytes\_permitted\_for\_this\_operation\ =\ bytes\_remaining\_to\_allocate\ /\ operations\_sorted\_by\_length.size();}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00451}00451\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ bytes\_allocated\_for\_this\_operation\ =\ std::min<size\_t>(operations\_sorted\_by\_length.back()-\/>length,\ bytes\_permitted\_for\_this\_operation);}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00452}00452\ \ \ \ \ \ \ \ \ \ \ \ \ operations\_sorted\_by\_length.back()-\/>permitted\_length\ =\ bytes\_allocated\_for\_this\_operation;}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00453}00453\ \ \ \ \ \ \ \ \ \ \ \ \ bytes\_remaining\_to\_allocate\ -\/=\ bytes\_allocated\_for\_this\_operation;}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00454}00454\ \ \ \ \ \ \ \ \ \ \ \ \ operations\_sorted\_by\_length.pop\_back();}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00455}00455\ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00456}00456\ \ \ \ \ \ \ \ \ \ \ tokens\ =\ bytes\_remaining\_to\_allocate;}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00457}00457\ }
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00458}00458\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ kick\ off\ the\ reads/writes\ in\ first-\/come\ order}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00459}00459\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\ iter\ =\ operations\_in\_progress.begin();\ iter\ !=\ operations\_in\_progress.end();)}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00460}00460\ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00461}00461\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((*iter)-\/>permitted\_length\ >\ 0)}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00462}00462\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00463}00463\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation}{rate\_limited\_operation}}*\ operation\_to\_perform\ =\ *iter;}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00464}00464\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ iter\ =\ operations\_in\_progress.erase(iter);}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00465}00465\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ operation\_to\_perform-\/>\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_a7090878b9387f70e1718021b5fc596cb}{perform\_operation}}();}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00466}00466\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00467}00467\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00468}00468\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++iter;}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00469}00469\ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00470}00470\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00471}00471\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00472}00472\ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{comment}{//\ down/upload\ speed\ is\ unlimited}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00473}00473\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00474}00474\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ we\ shouldn't\ end\ up\ here\ often.\ \ If\ the\ rate\ is\ unlimited,\ we\ should\ just\ execute}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00475}00475\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ the\ operation\ immediately\ without\ being\ queued\ up.\ \ This\ should\ only\ be\ hit\ if}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00476}00476\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ we\ change\ from\ a\ limited\ rate\ to\ unlimited}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00477}00477\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\ iter\ =\ operations\_in\_progress.begin();}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00478}00478\ \ \ \ \ \ \ \ \ \ \ \ \ \ iter\ !=\ operations\_in\_progress.end();)}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00479}00479\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00480}00480\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation}{rate\_limited\_operation}}*\ operation\_to\_perform\ =\ *iter;}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00481}00481\ \ \ \ \ \ \ \ \ \ \ iter\ =\ operations\_in\_progress.erase(iter);}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00482}00482\ \ \ \ \ \ \ \ \ \ \ operation\_to\_perform-\/>\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ae0ebd3357543b80e348bf68b75b796ad}{permitted\_length}}\ =\ operation\_to\_perform-\/>\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ae8457a63170710103e077ec951c26564}{length}};}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00483}00483\ \ \ \ \ \ \ \ \ \ \ operation\_to\_perform-\/>\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_a7090878b9387f70e1718021b5fc596cb}{perform\_operation}}();}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00484}00484\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00485}00485\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00486}00486\ \ \ \ \ \ \ last\_iteration\_start\_time\ =\ this\_iteration\_start\_time;}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00487}00487\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00488}00488\ }
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00489}00489\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00490}00490\ }
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00491}00491\ \ \ rate\_limiting\_group::rate\_limiting\_group(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ upload\_bytes\_per\_second,\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ download\_bytes\_per\_second,\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ burstiness\_in\_seconds\ \textcolor{comment}{/*\ =\ 1\ */})\ :}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00492}00492\ \ \ \ \ my(new\ \mbox{\hyperlink{namespacedetail}{detail}}::rate\_limiting\_group\_impl(upload\_bytes\_per\_second,\ download\_bytes\_per\_second,\ burstiness\_in\_seconds))}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00493}00493\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00494}00494\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00495}00495\ }
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00496}00496\ \ \ rate\_limiting\_group::\string~rate\_limiting\_group()}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00497}00497\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00498}00498\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00499}00499\ }
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00500}00500\ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ rate\_limiting\_group::get\_actual\_upload\_rate()\textcolor{keyword}{\ const}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00501}00501\ \textcolor{keyword}{\ \ }\{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00502}00502\ \ \ \ \ \textcolor{keywordflow}{return}\ my-\/>\_actual\_upload\_rate.get\_average\_rate();}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00503}00503\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00504}00504\ }
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00505}00505\ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ rate\_limiting\_group::get\_actual\_download\_rate()\textcolor{keyword}{\ const}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00506}00506\ \textcolor{keyword}{\ \ }\{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00507}00507\ \ \ \ \ \textcolor{keywordflow}{return}\ my-\/>\_actual\_download\_rate.get\_average\_rate();}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00508}00508\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00509}00509\ }
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00510}00510\ \ \ \textcolor{keywordtype}{void}\ rate\_limiting\_group::set\_actual\_rate\_time\_constant(microseconds\ time\_constant)}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00511}00511\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00512}00512\ \ \ \ \ my-\/>\_actual\_upload\_rate.set\_time\_constant(time\_constant);}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00513}00513\ \ \ \ \ my-\/>\_actual\_download\_rate.set\_time\_constant(time\_constant);}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00514}00514\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00515}00515\ }
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00516}00516\ \ \ \textcolor{keywordtype}{void}\ rate\_limiting\_group::set\_upload\_limit(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ upload\_bytes\_per\_second)}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00517}00517\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00518}00518\ \ \ \ \ my-\/>\_upload\_bytes\_per\_second\ =\ upload\_bytes\_per\_second;}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00519}00519\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00520}00520\ }
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00521}00521\ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ rate\_limiting\_group::get\_upload\_limit()\textcolor{keyword}{\ const}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00522}00522\ \textcolor{keyword}{\ \ }\{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00523}00523\ \ \ \ \ \textcolor{keywordflow}{return}\ my-\/>\_upload\_bytes\_per\_second;}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00524}00524\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00525}00525\ }
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00526}00526\ \ \ \textcolor{keywordtype}{void}\ rate\_limiting\_group::set\_download\_limit(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ download\_bytes\_per\_second)}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00527}00527\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00528}00528\ \ \ \ \ my-\/>\_download\_bytes\_per\_second\ =\ download\_bytes\_per\_second;}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00529}00529\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00530}00530\ }
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00531}00531\ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ rate\_limiting\_group::get\_download\_limit()\textcolor{keyword}{\ const}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00532}00532\ \textcolor{keyword}{\ \ }\{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00533}00533\ \ \ \ \ \textcolor{keywordflow}{return}\ my-\/>\_download\_bytes\_per\_second;}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00534}00534\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00535}00535\ }
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00536}00536\ \ \ \textcolor{keywordtype}{void}\ rate\_limiting\_group::add\_tcp\_socket(tcp\_socket*\ tcp\_socket\_to\_limit)}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00537}00537\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00538}00538\ \ \ \ \ tcp\_socket\_to\_limit-\/>set\_io\_hooks(my.get());}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00539}00539\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00540}00540\ }
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00541}00541\ \ \ \textcolor{keywordtype}{void}\ rate\_limiting\_group::remove\_tcp\_socket(tcp\_socket*\ tcp\_socket\_to\_stop\_limiting)}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00542}00542\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00543}00543\ \ \ \ \ tcp\_socket\_to\_stop\_limiting-\/>set\_io\_hooks(NULL);}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00544}00544\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00545}00545\ }
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00546}00546\ }
+\DoxyCodeLine{\Hypertarget{rate__limiting_8cpp_source_l00547}00547\ \}\ \textcolor{comment}{//\ namespace\ fc}}
+
+\end{DoxyCode}

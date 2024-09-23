@@ -1,0 +1,22 @@
+<map id="Catch::XmlReporter::assertionEnded" name="Catch::XmlReporter::assertionEnded">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,163,143,204"/>
+<area shape="rect" id="Node000002" href="$class_catch_1_1_xml_writer.html#a8fcaa0821b6c2c1750c654af0b33c823" title=" " alt="" coords="191,5,389,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="84,161,125,102,155,69,189,41,200,35,203,40,192,46,158,73,129,105,89,164"/>
+<area shape="rect" id="Node000003" href="$class_catch_1_1_xml_writer.html#a48f1a53e3255938813ff91f9fec9b690" title=" " alt="" coords="204,55,376,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="106,160,189,112,216,100,218,105,192,117,108,165"/>
+<area shape="rect" id="Node000004" href="$class_catch_1_1_xml_writer.html#a6114b9d8038cd4f159ccd016f12d4992" title=" " alt="" coords="438,120,642,146"/>
+<area shape="poly" id="edge5_Node000001_Node000004" title=" " alt="" coords="143,173,423,143,424,148,144,179"/>
+<area shape="rect" id="Node000006" href="$class_catch_1_1_xml_writer.html#ad433310b59d30e0fedc7130dc11c563b" title=" " alt="" coords="437,200,643,226"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="143,185,422,203,421,208,143,190"/>
+<area shape="rect" id="Node000007" href="$class_catch_1_1_xml_reporter.html#a190d2ae83de78e06273fa476d3729771" title=" " alt="" coords="221,220,358,261"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="143,199,207,216,206,221,142,204"/>
+<area shape="rect" id="Node000008" href="$class_catch_1_1_xml_writer_1_1_scoped_element.html#a189c87f530ce85304ce4e1075609d2f5" title=" " alt="" coords="203,286,376,326"/>
+<area shape="poly" id="edge9_Node000001_Node000008" title=" " alt="" coords="99,202,141,237,192,271,205,277,203,282,189,275,138,241,96,206"/>
+<area shape="rect" id="Node000009" href="$class_catch_1_1_xml_writer.html#a4c49775bdf7b5bd870b34ab22af62a9c" title=" " alt="" coords="449,285,631,311"/>
+<area shape="poly" id="edge10_Node000001_Node000009" title=" " alt="" coords="86,203,101,235,124,272,154,308,192,336,231,350,272,357,314,358,355,355,433,337,496,315,497,320,435,342,356,360,314,364,271,363,229,355,189,341,150,312,119,276,96,238,81,206"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="377,93,466,113,465,119,375,98"/>
+<area shape="rect" id="Node000005" href="$class_catch_1_1_xml_writer.html#aba98703d9852416e237de82aed4a9c4f" title=" " alt="" coords="691,199,860,240"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="578,144,705,191,703,196,576,149"/>
+<area shape="poly" id="edge8_Node000007_Node000006" title=" " alt="" coords="359,231,421,223,422,229,359,236"/>
+<area shape="poly" id="edge11_Node000009_Node000005" title=" " alt="" coords="580,282,697,243,699,248,582,287"/>
+</map>

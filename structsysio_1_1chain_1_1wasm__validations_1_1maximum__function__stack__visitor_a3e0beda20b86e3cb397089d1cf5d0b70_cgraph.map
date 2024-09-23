@@ -1,0 +1,9 @@
+<map id="sysio::chain::wasm_validations::maximum_function_stack_visitor::validate" name="sysio::chain::wasm_validations::maximum_function_stack_visitor::validate">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,161,76"/>
+<area shape="rect" id="Node000002" href="$namespace_i_r.html#ad46dd77836957c118907d69d239826bb" title=" " alt="" coords="209,28,348,54"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="161,38,193,38,193,43,161,43"/>
+<area shape="rect" id="Node000003" href="$namespace_errors.html#a6959930ad6159fe3eb2e04ebf87c1b84" title=" " alt="" coords="396,28,530,54"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="349,38,381,38,381,43,349,43"/>
+<area shape="rect" id="Node000004" href="$namespace_errors.html#a719a329951edb01e45afe1443dfa2a92" title=" " alt="" coords="578,28,672,54"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="531,38,563,38,563,43,531,43"/>
+</map>

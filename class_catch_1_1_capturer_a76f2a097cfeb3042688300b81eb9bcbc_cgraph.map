@@ -1,0 +1,13 @@
+<map id="Catch::Capturer::captureValues" name="Catch::Capturer::captureValues">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,48,171,89"/>
+<area shape="rect" id="Node000002" href="$class_catch_1_1_capturer.html#a0695ebf77f7cdcb344c73bcb3d9131e4" title=" " alt="" coords="432,5,597,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="162,45,218,34,320,24,417,21,417,27,321,30,219,39,163,50"/>
+<area shape="rect" id="Node000004" href="$class_catch_1_1_capturer.html#a60d08e6db2e54740bb2298bbbec3bc0b" title=" " alt="" coords="219,48,384,89"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="171,66,203,66,203,71,171,71"/>
+<area shape="rect" id="Node000005" href="$namespace_catch_1_1_detail.html#af0ad48344ffd3f92f3568465248a9880" title=" " alt="" coords="438,85,591,110"/>
+<area shape="poly" id="edge6_Node000001_Node000005" title=" " alt="" coords="161,87,219,98,324,104,423,102,423,107,324,109,218,103,160,92"/>
+<area shape="rect" id="Node000003" href="$struct_catch_1_1_i_result_capture.html#a91d154c1e087e383dcde5aad95cb6a05" title=" " alt="" coords="645,5,800,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="598,23,630,23,630,28,598,28"/>
+<area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="384,49,416,43,417,48,385,54"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="384,77,423,82,423,88,384,82"/>
+</map>

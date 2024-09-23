@@ -1,0 +1,29 @@
+<map id="BOOST_AUTO_TEST_CASE" name="BOOST_AUTO_TEST_CASE">
+<area shape="rect" id="Node000001" title="Test buffer growth and shrinking." alt="" coords="5,274,202,300"/>
+<area shape="rect" id="Node000002" href="$classfc_1_1message__buffer.html#af82cffc17abe2a14429b1d0b8c319f9a" title=" " alt="" coords="255,5,401,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="107,273,125,232,155,175,196,113,221,83,248,57,254,52,257,56,251,61,225,87,201,116,160,177,130,234,112,275"/>
+<area shape="rect" id="Node000003" href="$classfc_1_1message__buffer.html#aaf26c3308fd006fad3860f4f2c4111aa" title=" " alt="" coords="261,136,394,177"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="121,271,177,232,248,187,260,181,262,186,251,192,179,236,124,276"/>
+<area shape="rect" id="Node000006" href="$classfc_1_1message__buffer.html#a5c055debbcd5603bce13c26364836226" title=" " alt="" coords="260,71,396,111"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="111,272,164,203,203,160,248,122,256,117,259,122,251,126,207,164,168,206,116,275"/>
+<area shape="rect" id="Node000007" href="$classfc_1_1message__buffer.html#a22920e143abfb93de992f9a14607dea9" title=" " alt="" coords="261,201,394,242"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="149,271,245,243,247,248,151,276"/>
+<area shape="rect" id="Node000009" href="$classfc_1_1message__buffer.html#af4540535b3ef876e42631178c997e59b" title=" " alt="" coords="261,267,394,307"/>
+<area shape="poly" id="edge9_Node000001_Node000009" title=" " alt="" coords="202,284,246,284,246,290,202,290"/>
+<area shape="rect" id="Node000010" href="$classfc_1_1message__buffer.html#ae7bf97576095b33852c68dbc3cd7737e" title=" " alt="" coords="478,295,612,335"/>
+<area shape="poly" id="edge13_Node000001_Node000010" title=" " alt="" coords="154,298,250,316,361,322,463,319,463,324,361,327,249,322,153,303"/>
+<area shape="rect" id="Node000011" href="$classfc_1_1message__buffer.html#a7d14c84a452f14a0616f90cc3771efa9" title=" " alt="" coords="250,382,406,438"/>
+<area shape="poly" id="edge11_Node000001_Node000011" title=" " alt="" coords="130,298,263,372,261,376,128,303"/>
+<area shape="rect" id="Node000012" href="$classfc_1_1message__buffer.html#afa923dc3e69fb4409903c141e2e35a62" title=" " alt="" coords="261,461,394,502"/>
+<area shape="poly" id="edge12_Node000001_Node000012" title=" " alt="" coords="116,299,168,368,207,410,251,448,257,451,254,456,248,452,203,414,164,371,111,302"/>
+<area shape="rect" id="Node000013" href="$classfc_1_1message__buffer.html#a379d7b684cb512d44740c1e8731348d4" title=" " alt="" coords="261,527,394,567"/>
+<area shape="poly" id="edge14_Node000001_Node000013" title=" " alt="" coords="112,299,130,340,160,396,201,457,225,486,251,512,257,516,254,520,248,516,221,490,196,460,155,399,125,342,108,301"/>
+<area shape="rect" id="Node000004" href="$classfc_1_1message__buffer.html#a79e090da87bf9c39df42c98ee72c4917" title=" " alt="" coords="478,71,612,111"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="394,134,463,113,464,118,396,139"/>
+<area shape="rect" id="Node000005" href="$classfc_1_1message__buffer.html#a49d9f621f19529a42cbfa0de7b9266dd" title=" " alt="" coords="478,136,612,177"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="395,154,463,154,463,159,395,159"/>
+<area shape="poly" id="edge6_Node000006_Node000004" title=" " alt="" coords="396,88,463,88,463,94,396,94"/>
+<area shape="rect" id="Node000008" href="$classfc_1_1message__buffer.html#a00128a76bfce283e52ceebd61c30a544" title=" " alt="" coords="454,201,636,242"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="395,219,438,219,438,224,395,224"/>
+<area shape="poly" id="edge10_Node000009_Node000010" title=" " alt="" coords="395,293,464,302,463,307,394,298"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="fc::message_buffer::read_index" name="fc::message_buffer::read_index">
+<area shape="rect" id="Node000001" title=" " alt="" coords="250,23,383,64"/>
+<area shape="rect" id="Node000002" href="$test__message__buffer_8cpp.html#ae9f66dfac041e0941e63b810d0cb5315" title="Test peek and read across multiple buffers." alt="" coords="5,5,202,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="234,36,202,33,202,27,234,31"/>
+<area shape="rect" id="Node000003" href="$test__message__buffer_8cpp.html#a51213da5fa9bc94beae58bc546fe060c" title="Test automatic allocation when advancing the read_ptr to the end." alt="" coords="5,55,202,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="234,55,202,59,202,54,234,50"/>
+</map>

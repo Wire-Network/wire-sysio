@@ -1,0 +1,48 @@
+\doxysection{libraries/sys-\/vm/tests/fuzz/fuzz\+\_\+driver.cpp File Reference}
+\hypertarget{fuzz__driver_8cpp}{}\label{fuzz__driver_8cpp}\index{libraries/sys-\/vm/tests/fuzz/fuzz\_driver.cpp@{libraries/sys-\/vm/tests/fuzz/fuzz\_driver.cpp}}
+{\ttfamily \#include $<$sysio/wasm\+\_\+backend/backend.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/vm/watchdog.\+hpp$>$}\newline
+Include dependency graph for fuzz\+\_\+driver.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=328pt]{fuzz__driver_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{fuzz__driver_8cpp_a91ce7c16e9840492202299da2b451e60}{LLVMFuzzer\+Test\+One\+Input}} (const \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}data, size\+\_\+t size)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{fuzz__driver_8cpp_a91ce7c16e9840492202299da2b451e60}\index{fuzz\_driver.cpp@{fuzz\_driver.cpp}!LLVMFuzzerTestOneInput@{LLVMFuzzerTestOneInput}}
+\index{LLVMFuzzerTestOneInput@{LLVMFuzzerTestOneInput}!fuzz\_driver.cpp@{fuzz\_driver.cpp}}
+\doxysubsubsection{\texorpdfstring{LLVMFuzzerTestOneInput()}{LLVMFuzzerTestOneInput()}}
+{\footnotesize\ttfamily \label{fuzz__driver_8cpp_a91ce7c16e9840492202299da2b451e60} 
+int LLVMFuzzer\+Test\+One\+Input (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{data}{, }\item[{size\+\_\+t}]{size}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{fuzz__driver_8cpp_source_l00007}{7}} of file \mbox{\hyperlink{fuzz__driver_8cpp_source}{fuzz\+\_\+driver.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00007\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00008\ \ \ \ wasm\_allocator\ \mbox{\hyperlink{allow__code__after__function__end__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}};}
+\DoxyCodeLine{00009\ \ \ \ \mbox{\hyperlink{namespacesysio_1_1vm_a6ffa5796148f0f779a3d44799c3f0cce}{wasm\_code}}\ wc;\ }
+\DoxyCodeLine{00010\ \ \ \ wc.resize(size);}
+\DoxyCodeLine{00011\ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}((\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}*)wc.data(),\ data,\ size);}
+\DoxyCodeLine{00012\ \ \ \ backend<std::nullptr\_t>\ \mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}(\ wc\ );}
+\DoxyCodeLine{00013\ \ \ \ \mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_a6a3fbbc16a719762e15001d75ed3a6d0}{execute\_all}}(null\_watchdog());}
+\DoxyCodeLine{00014\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{fuzz__driver_8cpp_a91ce7c16e9840492202299da2b451e60_cgraph}
+\end{center}
+\end{figure}

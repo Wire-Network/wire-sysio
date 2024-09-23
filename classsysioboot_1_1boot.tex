@@ -1,0 +1,502 @@
+\doxysection{sysioboot\+::boot Class Reference}
+\hypertarget{classsysioboot_1_1boot}{}\label{classsysioboot_1_1boot}\index{sysioboot::boot@{sysioboot::boot}}
+
+
+{\ttfamily \#include $<$sysio.\+boot.\+hpp$>$}
+
+
+
+Inheritance diagram for sysioboot\+::boot\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=163pt]{classsysioboot_1_1boot__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for sysioboot\+::boot\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=163pt]{classsysioboot_1_1boot__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{classsysioboot_1_1boot_aed2433e778f1f1a8ba068ea09acf3985}{newaccount\+\_\+action}} = action\+\_\+wrapper$<$"{}newaccount"{}\+\_\+n, \&\mbox{\hyperlink{classsysioboot_1_1boot_a3748cb076f803976abb10a0068ca6493}{boot\+::newaccount}}$>$
+\item 
+using \mbox{\hyperlink{classsysioboot_1_1boot_a11ee1942a1ce985fd489e80d1d643caa}{updateauth\+\_\+action}} = action\+\_\+wrapper$<$"{}updateauth"{}\+\_\+n, \&\mbox{\hyperlink{classsysioboot_1_1boot_affc23ef03b3fd06e92401e7628cda51d}{boot\+::updateauth}}$>$
+\item 
+using \mbox{\hyperlink{classsysioboot_1_1boot_aae659e63c4ab9ff310de8ea4ac1abbac}{deleteauth\+\_\+action}} = action\+\_\+wrapper$<$"{}deleteauth"{}\+\_\+n, \&\mbox{\hyperlink{classsysioboot_1_1boot_ae3e3a3dc0c7cfa5a3acf85bebc9f267a}{boot\+::deleteauth}}$>$
+\item 
+using \mbox{\hyperlink{classsysioboot_1_1boot_aa642ca46c8b2ca08ae3aa8985be0644c}{linkauth\+\_\+action}} = action\+\_\+wrapper$<$"{}linkauth"{}\+\_\+n, \&\mbox{\hyperlink{classsysioboot_1_1boot_ad12a094f7d04032eb4473afc484857fc}{boot\+::linkauth}}$>$
+\item 
+using \mbox{\hyperlink{classsysioboot_1_1boot_aeca0b35e4b4b6844c6623b2bbe93f2c1}{unlinkauth\+\_\+action}} = action\+\_\+wrapper$<$"{}unlinkauth"{}\+\_\+n, \&\mbox{\hyperlink{classsysioboot_1_1boot_adf7eeda25283fecc268159dcfd2e828f}{boot\+::unlinkauth}}$>$
+\item 
+using \mbox{\hyperlink{classsysioboot_1_1boot_a0ae866cd38506ea81185ce137ca68cc7}{canceldelay\+\_\+action}} = action\+\_\+wrapper$<$"{}canceldelay"{}\+\_\+n, \&\mbox{\hyperlink{classsysioboot_1_1boot_a2aa6af795940c18936985a5e987e4012}{boot\+::canceldelay}}$>$
+\item 
+using \mbox{\hyperlink{classsysioboot_1_1boot_a942a421d7e8d40ba200cc00f9597a2f7}{setcode\+\_\+action}} = action\+\_\+wrapper$<$"{}setcode"{}\+\_\+n, \&\mbox{\hyperlink{classsysioboot_1_1boot_a7e5311dab77b11c2e214489392de3481}{boot\+::setcode}}$>$
+\item 
+using \mbox{\hyperlink{classsysioboot_1_1boot_a1063b5152beedd652e8e5adf5c90583f}{setabi\+\_\+action}} = action\+\_\+wrapper$<$"{}setabi"{}\+\_\+n, \&\mbox{\hyperlink{classsysioboot_1_1boot_a93c1e31ab9867b298a81903bcec03059}{boot\+::setabi}}$>$
+\item 
+using \mbox{\hyperlink{classsysioboot_1_1boot_adf742388ea5f761635f21e3b4be273bf}{activate\+\_\+action}} = action\+\_\+wrapper$<$"{}activate"{}\+\_\+n, \&\mbox{\hyperlink{classsysioboot_1_1boot_ad421471f43af54fd2fdceda6e554a558}{boot\+::activate}}$>$
+\item 
+using \mbox{\hyperlink{classsysioboot_1_1boot_a1595ab21f2642fafe0cc0fcea588c26d}{reqactivated\+\_\+action}} = action\+\_\+wrapper$<$"{}reqactivated"{}\+\_\+n, \&\mbox{\hyperlink{classsysioboot_1_1boot_ab74f7feaa2a574ba29552586d8b0c81d}{boot\+::reqactivated}}$>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{classsysioboot_1_1boot_a03c7c4d1c7add2cafdf7a8154dd34e5c}{onerror}} (ignore$<$ uint128\+\_\+t $>$ sender\+\_\+id, ignore$<$ std\+::vector$<$ char $>$ $>$ sent\+\_\+trx)
+\item 
+void \mbox{\hyperlink{classsysioboot_1_1boot_ad421471f43af54fd2fdceda6e554a558}{activate}} (const sysio\+::checksum256 \&feature\+\_\+digest)
+\item 
+void \mbox{\hyperlink{classsysioboot_1_1boot_ab74f7feaa2a574ba29552586d8b0c81d}{reqactivated}} (const sysio\+::checksum256 \&feature\+\_\+digest)
+\end{DoxyCompactItemize}
+\textbf{ }\par
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{classsysioboot_1_1boot_a3748cb076f803976abb10a0068ca6493}{newaccount}} (\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} creator, \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}, ignore$<$ \mbox{\hyperlink{structsysioboot_1_1authority}{authority}} $>$ owner, ignore$<$ \mbox{\hyperlink{structsysioboot_1_1authority}{authority}} $>$ active)
+\item 
+void \mbox{\hyperlink{classsysioboot_1_1boot_affc23ef03b3fd06e92401e7628cda51d}{updateauth}} (ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$ account, ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$ permission, ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$ parent, ignore$<$ \mbox{\hyperlink{structsysioboot_1_1authority}{authority}} $>$ auth)
+\item 
+void \mbox{\hyperlink{classsysioboot_1_1boot_ae3e3a3dc0c7cfa5a3acf85bebc9f267a}{deleteauth}} (ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$ account, ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$ permission)
+\item 
+void \mbox{\hyperlink{classsysioboot_1_1boot_ad12a094f7d04032eb4473afc484857fc}{linkauth}} (ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$ account, ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$ code, ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$ type, ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$ requirement)
+\item 
+void \mbox{\hyperlink{classsysioboot_1_1boot_adf7eeda25283fecc268159dcfd2e828f}{unlinkauth}} (ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$ account, ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$ code, ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$ type)
+\item 
+void \mbox{\hyperlink{classsysioboot_1_1boot_a2aa6af795940c18936985a5e987e4012}{canceldelay}} (ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1permission__level}{permission\+\_\+level}} $>$ canceling\+\_\+auth, ignore$<$ checksum256 $>$ trx\+\_\+id)
+\item 
+void \mbox{\hyperlink{classsysioboot_1_1boot_a7e5311dab77b11c2e214489392de3481}{setcode}} (\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} account, \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} vmtype, \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} vmversion, const std\+::vector$<$ char $>$ \&code)
+\item 
+void \mbox{\hyperlink{classsysioboot_1_1boot_a93c1e31ab9867b298a81903bcec03059}{setabi}} (\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} account, const std\+::vector$<$ char $>$ \&abi)
+\end{DoxyCompactItemize}
+
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{sysio_8boot_8hpp_source_l00087}{87}} of file \mbox{\hyperlink{sysio_8boot_8hpp_source}{sysio.\+boot.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classsysioboot_1_1boot_adf742388ea5f761635f21e3b4be273bf}\index{sysioboot::boot@{sysioboot::boot}!activate\_action@{activate\_action}}
+\index{activate\_action@{activate\_action}!sysioboot::boot@{sysioboot::boot}}
+\doxysubsubsection{\texorpdfstring{activate\_action}{activate\_action}}
+{\footnotesize\ttfamily \label{classsysioboot_1_1boot_adf742388ea5f761635f21e3b4be273bf} 
+using \mbox{\hyperlink{classsysioboot_1_1boot_adf742388ea5f761635f21e3b4be273bf}{sysioboot\+::boot\+::activate\+\_\+action}} = action\+\_\+wrapper$<$"{}activate"{}\+\_\+n, \&\mbox{\hyperlink{classsysioboot_1_1boot_ad421471f43af54fd2fdceda6e554a558}{boot\+::activate}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8boot_8hpp_source_l00256}{256}} of file \mbox{\hyperlink{sysio_8boot_8hpp_source}{sysio.\+boot.\+hpp}}.
+
+\Hypertarget{classsysioboot_1_1boot_a0ae866cd38506ea81185ce137ca68cc7}\index{sysioboot::boot@{sysioboot::boot}!canceldelay\_action@{canceldelay\_action}}
+\index{canceldelay\_action@{canceldelay\_action}!sysioboot::boot@{sysioboot::boot}}
+\doxysubsubsection{\texorpdfstring{canceldelay\_action}{canceldelay\_action}}
+{\footnotesize\ttfamily \label{classsysioboot_1_1boot_a0ae866cd38506ea81185ce137ca68cc7} 
+using \mbox{\hyperlink{classsysioboot_1_1boot_a0ae866cd38506ea81185ce137ca68cc7}{sysioboot\+::boot\+::canceldelay\+\_\+action}} = action\+\_\+wrapper$<$"{}canceldelay"{}\+\_\+n, \&\mbox{\hyperlink{classsysioboot_1_1boot_a2aa6af795940c18936985a5e987e4012}{boot\+::canceldelay}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8boot_8hpp_source_l00253}{253}} of file \mbox{\hyperlink{sysio_8boot_8hpp_source}{sysio.\+boot.\+hpp}}.
+
+\Hypertarget{classsysioboot_1_1boot_aae659e63c4ab9ff310de8ea4ac1abbac}\index{sysioboot::boot@{sysioboot::boot}!deleteauth\_action@{deleteauth\_action}}
+\index{deleteauth\_action@{deleteauth\_action}!sysioboot::boot@{sysioboot::boot}}
+\doxysubsubsection{\texorpdfstring{deleteauth\_action}{deleteauth\_action}}
+{\footnotesize\ttfamily \label{classsysioboot_1_1boot_aae659e63c4ab9ff310de8ea4ac1abbac} 
+using \mbox{\hyperlink{classsysioboot_1_1boot_aae659e63c4ab9ff310de8ea4ac1abbac}{sysioboot\+::boot\+::deleteauth\+\_\+action}} = action\+\_\+wrapper$<$"{}deleteauth"{}\+\_\+n, \&\mbox{\hyperlink{classsysioboot_1_1boot_ae3e3a3dc0c7cfa5a3acf85bebc9f267a}{boot\+::deleteauth}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8boot_8hpp_source_l00250}{250}} of file \mbox{\hyperlink{sysio_8boot_8hpp_source}{sysio.\+boot.\+hpp}}.
+
+\Hypertarget{classsysioboot_1_1boot_aa642ca46c8b2ca08ae3aa8985be0644c}\index{sysioboot::boot@{sysioboot::boot}!linkauth\_action@{linkauth\_action}}
+\index{linkauth\_action@{linkauth\_action}!sysioboot::boot@{sysioboot::boot}}
+\doxysubsubsection{\texorpdfstring{linkauth\_action}{linkauth\_action}}
+{\footnotesize\ttfamily \label{classsysioboot_1_1boot_aa642ca46c8b2ca08ae3aa8985be0644c} 
+using \mbox{\hyperlink{classsysioboot_1_1boot_aa642ca46c8b2ca08ae3aa8985be0644c}{sysioboot\+::boot\+::linkauth\+\_\+action}} = action\+\_\+wrapper$<$"{}linkauth"{}\+\_\+n, \&\mbox{\hyperlink{classsysioboot_1_1boot_ad12a094f7d04032eb4473afc484857fc}{boot\+::linkauth}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8boot_8hpp_source_l00251}{251}} of file \mbox{\hyperlink{sysio_8boot_8hpp_source}{sysio.\+boot.\+hpp}}.
+
+\Hypertarget{classsysioboot_1_1boot_aed2433e778f1f1a8ba068ea09acf3985}\index{sysioboot::boot@{sysioboot::boot}!newaccount\_action@{newaccount\_action}}
+\index{newaccount\_action@{newaccount\_action}!sysioboot::boot@{sysioboot::boot}}
+\doxysubsubsection{\texorpdfstring{newaccount\_action}{newaccount\_action}}
+{\footnotesize\ttfamily \label{classsysioboot_1_1boot_aed2433e778f1f1a8ba068ea09acf3985} 
+using \mbox{\hyperlink{classsysioboot_1_1boot_aed2433e778f1f1a8ba068ea09acf3985}{sysioboot\+::boot\+::newaccount\+\_\+action}} = action\+\_\+wrapper$<$"{}newaccount"{}\+\_\+n, \&\mbox{\hyperlink{classsysioboot_1_1boot_a3748cb076f803976abb10a0068ca6493}{boot\+::newaccount}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8boot_8hpp_source_l00248}{248}} of file \mbox{\hyperlink{sysio_8boot_8hpp_source}{sysio.\+boot.\+hpp}}.
+
+\Hypertarget{classsysioboot_1_1boot_a1595ab21f2642fafe0cc0fcea588c26d}\index{sysioboot::boot@{sysioboot::boot}!reqactivated\_action@{reqactivated\_action}}
+\index{reqactivated\_action@{reqactivated\_action}!sysioboot::boot@{sysioboot::boot}}
+\doxysubsubsection{\texorpdfstring{reqactivated\_action}{reqactivated\_action}}
+{\footnotesize\ttfamily \label{classsysioboot_1_1boot_a1595ab21f2642fafe0cc0fcea588c26d} 
+using \mbox{\hyperlink{classsysioboot_1_1boot_a1595ab21f2642fafe0cc0fcea588c26d}{sysioboot\+::boot\+::reqactivated\+\_\+action}} = action\+\_\+wrapper$<$"{}reqactivated"{}\+\_\+n, \&\mbox{\hyperlink{classsysioboot_1_1boot_ab74f7feaa2a574ba29552586d8b0c81d}{boot\+::reqactivated}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8boot_8hpp_source_l00257}{257}} of file \mbox{\hyperlink{sysio_8boot_8hpp_source}{sysio.\+boot.\+hpp}}.
+
+\Hypertarget{classsysioboot_1_1boot_a1063b5152beedd652e8e5adf5c90583f}\index{sysioboot::boot@{sysioboot::boot}!setabi\_action@{setabi\_action}}
+\index{setabi\_action@{setabi\_action}!sysioboot::boot@{sysioboot::boot}}
+\doxysubsubsection{\texorpdfstring{setabi\_action}{setabi\_action}}
+{\footnotesize\ttfamily \label{classsysioboot_1_1boot_a1063b5152beedd652e8e5adf5c90583f} 
+using \mbox{\hyperlink{classsysioboot_1_1boot_a1063b5152beedd652e8e5adf5c90583f}{sysioboot\+::boot\+::setabi\+\_\+action}} = action\+\_\+wrapper$<$"{}setabi"{}\+\_\+n, \&\mbox{\hyperlink{classsysioboot_1_1boot_a93c1e31ab9867b298a81903bcec03059}{boot\+::setabi}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8boot_8hpp_source_l00255}{255}} of file \mbox{\hyperlink{sysio_8boot_8hpp_source}{sysio.\+boot.\+hpp}}.
+
+\Hypertarget{classsysioboot_1_1boot_a942a421d7e8d40ba200cc00f9597a2f7}\index{sysioboot::boot@{sysioboot::boot}!setcode\_action@{setcode\_action}}
+\index{setcode\_action@{setcode\_action}!sysioboot::boot@{sysioboot::boot}}
+\doxysubsubsection{\texorpdfstring{setcode\_action}{setcode\_action}}
+{\footnotesize\ttfamily \label{classsysioboot_1_1boot_a942a421d7e8d40ba200cc00f9597a2f7} 
+using \mbox{\hyperlink{classsysioboot_1_1boot_a942a421d7e8d40ba200cc00f9597a2f7}{sysioboot\+::boot\+::setcode\+\_\+action}} = action\+\_\+wrapper$<$"{}setcode"{}\+\_\+n, \&\mbox{\hyperlink{classsysioboot_1_1boot_a7e5311dab77b11c2e214489392de3481}{boot\+::setcode}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8boot_8hpp_source_l00254}{254}} of file \mbox{\hyperlink{sysio_8boot_8hpp_source}{sysio.\+boot.\+hpp}}.
+
+\Hypertarget{classsysioboot_1_1boot_aeca0b35e4b4b6844c6623b2bbe93f2c1}\index{sysioboot::boot@{sysioboot::boot}!unlinkauth\_action@{unlinkauth\_action}}
+\index{unlinkauth\_action@{unlinkauth\_action}!sysioboot::boot@{sysioboot::boot}}
+\doxysubsubsection{\texorpdfstring{unlinkauth\_action}{unlinkauth\_action}}
+{\footnotesize\ttfamily \label{classsysioboot_1_1boot_aeca0b35e4b4b6844c6623b2bbe93f2c1} 
+using \mbox{\hyperlink{classsysioboot_1_1boot_aeca0b35e4b4b6844c6623b2bbe93f2c1}{sysioboot\+::boot\+::unlinkauth\+\_\+action}} = action\+\_\+wrapper$<$"{}unlinkauth"{}\+\_\+n, \&\mbox{\hyperlink{classsysioboot_1_1boot_adf7eeda25283fecc268159dcfd2e828f}{boot\+::unlinkauth}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8boot_8hpp_source_l00252}{252}} of file \mbox{\hyperlink{sysio_8boot_8hpp_source}{sysio.\+boot.\+hpp}}.
+
+\Hypertarget{classsysioboot_1_1boot_a11ee1942a1ce985fd489e80d1d643caa}\index{sysioboot::boot@{sysioboot::boot}!updateauth\_action@{updateauth\_action}}
+\index{updateauth\_action@{updateauth\_action}!sysioboot::boot@{sysioboot::boot}}
+\doxysubsubsection{\texorpdfstring{updateauth\_action}{updateauth\_action}}
+{\footnotesize\ttfamily \label{classsysioboot_1_1boot_a11ee1942a1ce985fd489e80d1d643caa} 
+using \mbox{\hyperlink{classsysioboot_1_1boot_a11ee1942a1ce985fd489e80d1d643caa}{sysioboot\+::boot\+::updateauth\+\_\+action}} = action\+\_\+wrapper$<$"{}updateauth"{}\+\_\+n, \&\mbox{\hyperlink{classsysioboot_1_1boot_affc23ef03b3fd06e92401e7628cda51d}{boot\+::updateauth}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8boot_8hpp_source_l00249}{249}} of file \mbox{\hyperlink{sysio_8boot_8hpp_source}{sysio.\+boot.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysioboot_1_1boot_ad421471f43af54fd2fdceda6e554a558}\index{sysioboot::boot@{sysioboot::boot}!activate@{activate}}
+\index{activate@{activate}!sysioboot::boot@{sysioboot::boot}}
+\doxysubsubsection{\texorpdfstring{activate()}{activate()}}
+{\footnotesize\ttfamily \label{classsysioboot_1_1boot_ad421471f43af54fd2fdceda6e554a558} 
+void sysioboot\+::boot\+::activate (\begin{DoxyParamCaption}\item[{const sysio\+::checksum256 \&}]{feature\+\_\+digest}{}\end{DoxyParamCaption})}
+
+Activates a protocol feature.
+
+Activates a protocol feature
+
+
+\begin{DoxyParams}{Parameters}
+{\em feature\+\_\+digest} & -\/ hash of the protocol feature to activate. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{sysio_8boot_8cpp_source_l00010}{10}} of file \mbox{\hyperlink{sysio_8boot_8cpp_source}{sysio.\+boot.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00010\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00011\ \ \ \ require\_auth(\ get\_self()\ );}
+\DoxyCodeLine{00012\ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_a406d45a184cdba0af316b5bf34bf56cfa26c81486f55acca0e2de7ec342d97105}{sysio::preactivate\_feature}}(\ feature\_digest\ );}
+\DoxyCodeLine{00013\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysioboot_1_1boot_a2aa6af795940c18936985a5e987e4012}\index{sysioboot::boot@{sysioboot::boot}!canceldelay@{canceldelay}}
+\index{canceldelay@{canceldelay}!sysioboot::boot@{sysioboot::boot}}
+\doxysubsubsection{\texorpdfstring{canceldelay()}{canceldelay()}}
+{\footnotesize\ttfamily \label{classsysioboot_1_1boot_a2aa6af795940c18936985a5e987e4012} 
+void sysioboot\+::boot\+::canceldelay (\begin{DoxyParamCaption}\item[{ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1permission__level}{permission\+\_\+level}} $>$}]{canceling\+\_\+auth}{, }\item[{ignore$<$ checksum256 $>$}]{trx\+\_\+id}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Cancel delay action.
+
+Cancels a deferred transaction.
+
+
+\begin{DoxyParams}{Parameters}
+{\em canceling\+\_\+auth} & -\/ the permission that authorizes this action, \\
+\hline
+{\em trx\+\_\+id} & -\/ the deferred transaction id to be cancelled. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{sysio_8boot_8hpp_source_l00187}{187}} of file \mbox{\hyperlink{sysio_8boot_8hpp_source}{sysio.\+boot.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00187\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classsysioboot_1_1boot_ae3e3a3dc0c7cfa5a3acf85bebc9f267a}\index{sysioboot::boot@{sysioboot::boot}!deleteauth@{deleteauth}}
+\index{deleteauth@{deleteauth}!sysioboot::boot@{sysioboot::boot}}
+\doxysubsubsection{\texorpdfstring{deleteauth()}{deleteauth()}}
+{\footnotesize\ttfamily \label{classsysioboot_1_1boot_ae3e3a3dc0c7cfa5a3acf85bebc9f267a} 
+void sysioboot\+::boot\+::deleteauth (\begin{DoxyParamCaption}\item[{ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$}]{account}{, }\item[{ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$}]{permission}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Delete authorization action.
+
+Deletes the authorization for an account\textquotesingle{}s permision.
+
+
+\begin{DoxyParams}{Parameters}
+{\em account} & -\/ the account for which the permission authorization is deleted, \\
+\hline
+{\em permission} & -\/ the permission name been deleted. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{sysio_8boot_8hpp_source_l00138}{138}} of file \mbox{\hyperlink{sysio_8boot_8hpp_source}{sysio.\+boot.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classsysioboot_1_1boot_ad12a094f7d04032eb4473afc484857fc}\index{sysioboot::boot@{sysioboot::boot}!linkauth@{linkauth}}
+\index{linkauth@{linkauth}!sysioboot::boot@{sysioboot::boot}}
+\doxysubsubsection{\texorpdfstring{linkauth()}{linkauth()}}
+{\footnotesize\ttfamily \label{classsysioboot_1_1boot_ad12a094f7d04032eb4473afc484857fc} 
+void sysioboot\+::boot\+::linkauth (\begin{DoxyParamCaption}\item[{ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$}]{account}{, }\item[{ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$}]{code}{, }\item[{ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$}]{type}{, }\item[{ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$}]{requirement}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Link authorization action.
+
+Assigns a specific action from a contract to a permission you have created. Five system actions can not be linked {\ttfamily updateauth}, {\ttfamily deleteauth}, {\ttfamily linkauth}, {\ttfamily unlinkauth}, and {\ttfamily canceldelay}. This is useful because when doing authorization checks, the EOSIO based blockchain starts with the action needed to be authorized (and the contract belonging to), and looks up which permission is needed to pass authorization validation. If a link is set, that permission is used for authoraization validation otherwise then active is the default, with the exception of {\ttfamily \doxylink{namespacefc_a8b03fb95276f683bde05b7715d9f0014}{sysio.\+any}}. {\ttfamily \doxylink{namespacefc_a8b03fb95276f683bde05b7715d9f0014}{sysio.\+any}} is an implicit permission which exists on every account; you can link actions to {\ttfamily \doxylink{namespacefc_a8b03fb95276f683bde05b7715d9f0014}{sysio.\+any}} and that will make it so linked actions are accessible to any permissions defined for the account.
+
+
+\begin{DoxyParams}{Parameters}
+{\em account} & -\/ the permission\textquotesingle{}s owner to be linked and the payer of the RAM needed to store this link, \\
+\hline
+{\em code} & -\/ the owner of the action to be linked, \\
+\hline
+{\em type} & -\/ the action to be linked, \\
+\hline
+{\em requirement} & -\/ the permission to be linked. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{sysio_8boot_8hpp_source_l00159}{159}} of file \mbox{\hyperlink{sysio_8boot_8hpp_source}{sysio.\+boot.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classsysioboot_1_1boot_a3748cb076f803976abb10a0068ca6493}\index{sysioboot::boot@{sysioboot::boot}!newaccount@{newaccount}}
+\index{newaccount@{newaccount}!sysioboot::boot@{sysioboot::boot}}
+\doxysubsubsection{\texorpdfstring{newaccount()}{newaccount()}}
+{\footnotesize\ttfamily \label{classsysioboot_1_1boot_a3748cb076f803976abb10a0068ca6493} 
+void sysioboot\+::boot\+::newaccount (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}}]{creator}{, }\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}}]{name}{, }\item[{ignore$<$ \mbox{\hyperlink{structsysioboot_1_1authority}{authority}} $>$}]{owner}{, }\item[{ignore$<$ \mbox{\hyperlink{structsysioboot_1_1authority}{authority}} $>$}]{active}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+These actions map one-\/on-\/one with the ones defined in \doxylink{group__native__action__handlers}{Native Action Handlers} section. They are present here so they can show up in the abi file and thus user can send them to this contract, but they have no specific implementation at this contract level, they will execute the implementation at the core level and nothing else. New account action
+
+Creates a new account.
+
+
+\begin{DoxyParams}{Parameters}
+{\em creator} & -\/ the creator of the account \\
+\hline
+{\em name} & -\/ the name of the new account \\
+\hline
+{\em owner} & -\/ the authority for the owner permission of the new account \\
+\hline
+{\em active} & -\/ the authority for the active permission of the new account \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{sysio_8boot_8hpp_source_l00109}{109}} of file \mbox{\hyperlink{sysio_8boot_8hpp_source}{sysio.\+boot.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classsysioboot_1_1boot_a03c7c4d1c7add2cafdf7a8154dd34e5c}\index{sysioboot::boot@{sysioboot::boot}!onerror@{onerror}}
+\index{onerror@{onerror}!sysioboot::boot@{sysioboot::boot}}
+\doxysubsubsection{\texorpdfstring{onerror()}{onerror()}}
+{\footnotesize\ttfamily \label{classsysioboot_1_1boot_a03c7c4d1c7add2cafdf7a8154dd34e5c} 
+void sysioboot\+::boot\+::onerror (\begin{DoxyParamCaption}\item[{ignore$<$ uint128\+\_\+t $>$}]{sender\+\_\+id}{, }\item[{ignore$<$ std\+::vector$<$ char $>$ $>$}]{sent\+\_\+trx}{}\end{DoxyParamCaption})}
+
+On error action.
+
+Notification of this action is delivered to the sender of a deferred transaction when an objective error occurs while executing the deferred transaction. This action is not meant to be called directly.
+
+
+\begin{DoxyParams}{Parameters}
+{\em sender\+\_\+id} & -\/ the id for the deferred transaction chosen by the sender, \\
+\hline
+{\em sent\+\_\+trx} & -\/ the deferred transaction that failed. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{sysio_8boot_8cpp_source_l00006}{6}} of file \mbox{\hyperlink{sysio_8boot_8cpp_source}{sysio.\+boot.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00006\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00007\ \ \ \ check(\ \textcolor{keyword}{false},\ \textcolor{stringliteral}{"{}the\ onerror\ action\ cannot\ be\ called\ directly"{}}\ );}
+\DoxyCodeLine{00008\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysioboot_1_1boot_ab74f7feaa2a574ba29552586d8b0c81d}\index{sysioboot::boot@{sysioboot::boot}!reqactivated@{reqactivated}}
+\index{reqactivated@{reqactivated}!sysioboot::boot@{sysioboot::boot}}
+\doxysubsubsection{\texorpdfstring{reqactivated()}{reqactivated()}}
+{\footnotesize\ttfamily \label{classsysioboot_1_1boot_ab74f7feaa2a574ba29552586d8b0c81d} 
+void sysioboot\+::boot\+::reqactivated (\begin{DoxyParamCaption}\item[{const sysio\+::checksum256 \&}]{feature\+\_\+digest}{}\end{DoxyParamCaption})}
+
+Asserts that a protocol feature has been activated.
+
+Asserts that a protocol feature has been activated
+
+
+\begin{DoxyParams}{Parameters}
+{\em feature\+\_\+digest} & -\/ hash of the protocol feature to check for activation. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{sysio_8boot_8cpp_source_l00015}{15}} of file \mbox{\hyperlink{sysio_8boot_8cpp_source}{sysio.\+boot.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00016\ \ \ \ check(\ sysio::is\_feature\_activated(\ feature\_digest\ ),\ \textcolor{stringliteral}{"{}protocol\ feature\ is\ not\ activated"{}}\ );}
+\DoxyCodeLine{00017\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysioboot_1_1boot_a93c1e31ab9867b298a81903bcec03059}\index{sysioboot::boot@{sysioboot::boot}!setabi@{setabi}}
+\index{setabi@{setabi}!sysioboot::boot@{sysioboot::boot}}
+\doxysubsubsection{\texorpdfstring{setabi()}{setabi()}}
+{\footnotesize\ttfamily \label{classsysioboot_1_1boot_a93c1e31ab9867b298a81903bcec03059} 
+void sysioboot\+::boot\+::setabi (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}}]{account}{, }\item[{const std\+::vector$<$ char $>$ \&}]{abi}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Set abi for contract.
+
+Set the abi for contract identified by {\ttfamily account} name.
+
+
+\begin{DoxyParams}{Parameters}
+{\em account} & -\/ the name of the account to set the abi for \\
+\hline
+{\em abi} & -\/ the abi hash represented as a vector of characters \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{sysio_8boot_8hpp_source_l00211}{211}} of file \mbox{\hyperlink{sysio_8boot_8hpp_source}{sysio.\+boot.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00211\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classsysioboot_1_1boot_a7e5311dab77b11c2e214489392de3481}\index{sysioboot::boot@{sysioboot::boot}!setcode@{setcode}}
+\index{setcode@{setcode}!sysioboot::boot@{sysioboot::boot}}
+\doxysubsubsection{\texorpdfstring{setcode()}{setcode()}}
+{\footnotesize\ttfamily \label{classsysioboot_1_1boot_a7e5311dab77b11c2e214489392de3481} 
+void sysioboot\+::boot\+::setcode (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}}]{account}{, }\item[{\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}}}]{vmtype}{, }\item[{\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}}}]{vmversion}{, }\item[{const std\+::vector$<$ char $>$ \&}]{code}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Set code action.
+
+Sets the contract code for an account.
+
+
+\begin{DoxyParams}{Parameters}
+{\em account} & -\/ the account for which to set the contract code. \\
+\hline
+{\em vmtype} & -\/ reserved, set it to zero. \\
+\hline
+{\em vmversion} & -\/ reserved, set it to zero. \\
+\hline
+{\em code} & -\/ the code content to be set, in the form of a blob binary.. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{sysio_8boot_8hpp_source_l00200}{200}} of file \mbox{\hyperlink{sysio_8boot_8hpp_source}{sysio.\+boot.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00200\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classsysioboot_1_1boot_adf7eeda25283fecc268159dcfd2e828f}\index{sysioboot::boot@{sysioboot::boot}!unlinkauth@{unlinkauth}}
+\index{unlinkauth@{unlinkauth}!sysioboot::boot@{sysioboot::boot}}
+\doxysubsubsection{\texorpdfstring{unlinkauth()}{unlinkauth()}}
+{\footnotesize\ttfamily \label{classsysioboot_1_1boot_adf7eeda25283fecc268159dcfd2e828f} 
+void sysioboot\+::boot\+::unlinkauth (\begin{DoxyParamCaption}\item[{ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$}]{account}{, }\item[{ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$}]{code}{, }\item[{ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$}]{type}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Unlink authorization action.
+
+It\textquotesingle{}s doing the reverse of linkauth action, by unlinking the given action.
+
+
+\begin{DoxyParams}{Parameters}
+{\em account} & -\/ the owner of the permission to be unlinked and the receiver of the freed RAM, \\
+\hline
+{\em code} & -\/ the owner of the action to be unlinked, \\
+\hline
+{\em type} & -\/ the action to be unlinked. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{sysio_8boot_8hpp_source_l00174}{174}} of file \mbox{\hyperlink{sysio_8boot_8hpp_source}{sysio.\+boot.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classsysioboot_1_1boot_affc23ef03b3fd06e92401e7628cda51d}\index{sysioboot::boot@{sysioboot::boot}!updateauth@{updateauth}}
+\index{updateauth@{updateauth}!sysioboot::boot@{sysioboot::boot}}
+\doxysubsubsection{\texorpdfstring{updateauth()}{updateauth()}}
+{\footnotesize\ttfamily \label{classsysioboot_1_1boot_affc23ef03b3fd06e92401e7628cda51d} 
+void sysioboot\+::boot\+::updateauth (\begin{DoxyParamCaption}\item[{ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$}]{account}{, }\item[{ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$}]{permission}{, }\item[{ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$}]{parent}{, }\item[{ignore$<$ \mbox{\hyperlink{structsysioboot_1_1authority}{authority}} $>$}]{auth}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Update authorization action.
+
+Updates pemission for an account.
+
+
+\begin{DoxyParams}{Parameters}
+{\em account} & -\/ the account for which the permission is updated, \\
+\hline
+{\em pemission} & -\/ the permission name which is updated, \\
+\hline
+{\em parem} & -\/ the parent of the permission which is updated, \\
+\hline
+{\em aut} & -\/ the json describing the permission authorization. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{sysio_8boot_8hpp_source_l00124}{124}} of file \mbox{\hyperlink{sysio_8boot_8hpp_source}{sysio.\+boot.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/svetlasyrimis/\+Desktop/wire-\/network/\+WN-\/org/wire-\/system-\/contracts/contracts/sysio.\+boot/include/sysio.\+boot/\mbox{\hyperlink{sysio_8boot_8hpp}{sysio.\+boot.\+hpp}}\item 
+/\+Users/svetlasyrimis/\+Desktop/wire-\/network/\+WN-\/org/wire-\/system-\/contracts/contracts/sysio.\+boot/src/\mbox{\hyperlink{sysio_8boot_8cpp}{sysio.\+boot.\+cpp}}\end{DoxyCompactItemize}

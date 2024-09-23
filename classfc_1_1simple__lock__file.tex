@@ -1,0 +1,59 @@
+\doxysection{fc\+::simple\+\_\+lock\+\_\+file Class Reference}
+\hypertarget{classfc_1_1simple__lock__file}{}\label{classfc_1_1simple__lock__file}\index{fc::simple\_lock\_file@{fc::simple\_lock\_file}}
+
+
+{\ttfamily \#include $<$filesystem.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1simple__lock__file_ad909cb5e23a7b7dcf13678262913d995}{simple\+\_\+lock\+\_\+file}} (const \mbox{\hyperlink{classfc_1_1path}{path}} \&lock\+\_\+file\+\_\+path)
+\item 
+\mbox{\hyperlink{classfc_1_1simple__lock__file_a683f62b2a9bdb400fd618a04005bf672}{\texorpdfstring{$\sim$}{\string~}simple\+\_\+lock\+\_\+file}} ()
+\item 
+bool \mbox{\hyperlink{classfc_1_1simple__lock__file_aefd985474fef8c05f6eb9b1577112cbe}{try\+\_\+lock}} ()
+\item 
+void \mbox{\hyperlink{classfc_1_1simple__lock__file_a0201df0839b69d4c37d61e0e74c1e767}{unlock}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+simple class which only allows one process to open any given file. approximate usage\+: int \doxylink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main()} \{ fc\+::simple\+\_\+file\+\_\+lock instance\+\_\+lock("{}\texorpdfstring{$\sim$}{\string~}/.\+my\+\_\+app/.\+lock"{}); if (!instance\+\_\+lock.\doxylink{classfc_1_1simple__lock__file_aefd985474fef8c05f6eb9b1577112cbe}{try\+\_\+lock()}) \{ elog("{}my\+\_\+app is already running"{}); return 1; \} // do stuff here, file will be unlocked when instance\+\_\+lock goes out of scope \} 
+
+Definition at line \mbox{\hyperlink{filesystem_8hpp_source_l00250}{250}} of file \mbox{\hyperlink{filesystem_8hpp_source}{filesystem.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1simple__lock__file_ad909cb5e23a7b7dcf13678262913d995}\index{fc::simple\_lock\_file@{fc::simple\_lock\_file}!simple\_lock\_file@{simple\_lock\_file}}
+\index{simple\_lock\_file@{simple\_lock\_file}!fc::simple\_lock\_file@{fc::simple\_lock\_file}}
+\doxysubsubsection{\texorpdfstring{simple\_lock\_file()}{simple\_lock\_file()}}
+{\footnotesize\ttfamily \label{classfc_1_1simple__lock__file_ad909cb5e23a7b7dcf13678262913d995} 
+fc\+::simple\+\_\+lock\+\_\+file\+::simple\+\_\+lock\+\_\+file (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1path}{path}} \&}]{lock\+\_\+file\+\_\+path}{}\end{DoxyParamCaption})}
+
+\Hypertarget{classfc_1_1simple__lock__file_a683f62b2a9bdb400fd618a04005bf672}\index{fc::simple\_lock\_file@{fc::simple\_lock\_file}!````~simple\_lock\_file@{\texorpdfstring{$\sim$}{\string~}simple\_lock\_file}}
+\index{````~simple\_lock\_file@{\texorpdfstring{$\sim$}{\string~}simple\_lock\_file}!fc::simple\_lock\_file@{fc::simple\_lock\_file}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}simple\_lock\_file()}{\string~simple\_lock\_file()}}
+{\footnotesize\ttfamily \label{classfc_1_1simple__lock__file_a683f62b2a9bdb400fd618a04005bf672} 
+fc\+::simple\+\_\+lock\+\_\+file\+::\texorpdfstring{$\sim$}{\string~}simple\+\_\+lock\+\_\+file (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1simple__lock__file_aefd985474fef8c05f6eb9b1577112cbe}\index{fc::simple\_lock\_file@{fc::simple\_lock\_file}!try\_lock@{try\_lock}}
+\index{try\_lock@{try\_lock}!fc::simple\_lock\_file@{fc::simple\_lock\_file}}
+\doxysubsubsection{\texorpdfstring{try\_lock()}{try\_lock()}}
+{\footnotesize\ttfamily \label{classfc_1_1simple__lock__file_aefd985474fef8c05f6eb9b1577112cbe} 
+bool fc\+::simple\+\_\+lock\+\_\+file\+::try\+\_\+lock (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{classfc_1_1simple__lock__file_a0201df0839b69d4c37d61e0e74c1e767}\index{fc::simple\_lock\_file@{fc::simple\_lock\_file}!unlock@{unlock}}
+\index{unlock@{unlock}!fc::simple\_lock\_file@{fc::simple\_lock\_file}}
+\doxysubsubsection{\texorpdfstring{unlock()}{unlock()}}
+{\footnotesize\ttfamily \label{classfc_1_1simple__lock__file_a0201df0839b69d4c37d61e0e74c1e767} 
+void fc\+::simple\+\_\+lock\+\_\+file\+::unlock (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/\mbox{\hyperlink{filesystem_8hpp}{filesystem.\+hpp}}\end{DoxyCompactItemize}

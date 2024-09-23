@@ -1,0 +1,127 @@
+\doxysection{sysio\+::chain\+::wasm\+\_\+ops\+::instr\+\_\+base\texorpdfstring{$<$}{<} Mutators \texorpdfstring{$>$}{>} Struct Template Reference}
+\hypertarget{structsysio_1_1chain_1_1wasm__ops_1_1instr__base}{}\label{structsysio_1_1chain_1_1wasm__ops_1_1instr__base}\index{sysio::chain::wasm\_ops::instr\_base$<$ Mutators $>$@{sysio::chain::wasm\_ops::instr\_base$<$ Mutators $>$}}
+
+
+{\ttfamily \#include $<$wasm\+\_\+sysio\+\_\+binary\+\_\+ops.\+hpp$>$}
+
+
+
+Inheritance diagram for sysio\+::chain\+::wasm\+\_\+ops\+::instr\+\_\+base\texorpdfstring{$<$}{<} Mutators \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=224pt]{structsysio_1_1chain_1_1wasm__ops_1_1instr__base__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for sysio\+::chain\+::wasm\+\_\+ops\+::instr\+\_\+base\texorpdfstring{$<$}{<} Mutators \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=224pt]{structsysio_1_1chain_1_1wasm__ops_1_1instr__base__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1instr__base_ac2494d1de5ac3466bb829472772bf662}{is\+\_\+post}} () override
+\item 
+bool \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1instr__base_a82b4ed099da7ef9704cba64432872942}{is\+\_\+kill}} () override
+\item 
+virtual void \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1instr__base_a79ef303b36577f3a2f0b7b4650532bb5}{visit}} (\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1visitor__arg}{visitor\+\_\+arg}} \&\&arg) override
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1instr}{sysio\+::chain\+::wasm\+\_\+ops\+::instr}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual std\+::string \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1instr_a0a55a4b7e64093dbff81fc9e31b18b81}{to\+\_\+string}} ()
+\item 
+virtual \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1instr_aa819b4496619269b505c9e03fb1b71c4}{get\+\_\+code}} ()=0
+\item 
+virtual int \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1instr_ace7547e2df9c16b877fc032a87b8cf69}{skip\+\_\+ahead}} ()=0
+\item 
+virtual void \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1instr_ad94788a34343a9be1e674908f1e3b020}{unpack}} (char \texorpdfstring{$\ast$}{*}opcode)=0
+\item 
+virtual void \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1instr_a6f9d8bd069054ad9a78fae0d2220102c}{pack}} (\mbox{\hyperlink{classsysio_1_1chain_1_1wasm__ops_1_1instruction__stream}{instruction\+\_\+stream}} \texorpdfstring{$\ast$}{*}stream)=0
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename ... Mutators$>$\newline
+struct sysio\+::chain\+::wasm\+\_\+ops\+::instr\+\_\+base$<$ Mutators $>$}
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_source_l00561}{561}} of file \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_source}{wasm\+\_\+sysio\+\_\+binary\+\_\+ops.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1chain_1_1wasm__ops_1_1instr__base_a82b4ed099da7ef9704cba64432872942}\index{sysio::chain::wasm\_ops::instr\_base$<$ Mutators $>$@{sysio::chain::wasm\_ops::instr\_base$<$ Mutators $>$}!is\_kill@{is\_kill}}
+\index{is\_kill@{is\_kill}!sysio::chain::wasm\_ops::instr\_base$<$ Mutators $>$@{sysio::chain::wasm\_ops::instr\_base$<$ Mutators $>$}}
+\doxysubsubsection{\texorpdfstring{is\_kill()}{is\_kill()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__ops_1_1instr__base_a82b4ed099da7ef9704cba64432872942} 
+template$<$typename ... Mutators$>$ \\
+bool \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1instr__base}{sysio\+::chain\+::wasm\+\_\+ops\+::instr\+\_\+base}}$<$ Mutators $>$\+::is\+\_\+kill (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1instr_a41b09599f11d2f54099e3fa8639cb2ed}{sysio\+::chain\+::wasm\+\_\+ops\+::instr}}.
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_source_l00563}{563}} of file \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_source}{wasm\+\_\+sysio\+\_\+binary\+\_\+ops.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00563\ \{\ \textcolor{keywordflow}{return}\ propagate\_should\_kill<Mutators...>\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{::value}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1wasm__ops_1_1instr__base_ac2494d1de5ac3466bb829472772bf662}\index{sysio::chain::wasm\_ops::instr\_base$<$ Mutators $>$@{sysio::chain::wasm\_ops::instr\_base$<$ Mutators $>$}!is\_post@{is\_post}}
+\index{is\_post@{is\_post}!sysio::chain::wasm\_ops::instr\_base$<$ Mutators $>$@{sysio::chain::wasm\_ops::instr\_base$<$ Mutators $>$}}
+\doxysubsubsection{\texorpdfstring{is\_post()}{is\_post()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__ops_1_1instr__base_ac2494d1de5ac3466bb829472772bf662} 
+template$<$typename ... Mutators$>$ \\
+bool \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1instr__base}{sysio\+::chain\+::wasm\+\_\+ops\+::instr\+\_\+base}}$<$ Mutators $>$\+::is\+\_\+post (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1instr_a6047b46921f90d2cb904be19394c2ec8}{sysio\+::chain\+::wasm\+\_\+ops\+::instr}}.
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_source_l00562}{562}} of file \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_source}{wasm\+\_\+sysio\+\_\+binary\+\_\+ops.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00562\ \{\ \textcolor{keywordflow}{return}\ propagate\_post\_injection<Mutators...>\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{::value}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1wasm__ops_1_1instr__base_a79ef303b36577f3a2f0b7b4650532bb5}\index{sysio::chain::wasm\_ops::instr\_base$<$ Mutators $>$@{sysio::chain::wasm\_ops::instr\_base$<$ Mutators $>$}!visit@{visit}}
+\index{visit@{visit}!sysio::chain::wasm\_ops::instr\_base$<$ Mutators $>$@{sysio::chain::wasm\_ops::instr\_base$<$ Mutators $>$}}
+\doxysubsubsection{\texorpdfstring{visit()}{visit()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__ops_1_1instr__base_a79ef303b36577f3a2f0b7b4650532bb5} 
+template$<$typename ... Mutators$>$ \\
+virtual void \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1instr__base}{sysio\+::chain\+::wasm\+\_\+ops\+::instr\+\_\+base}}$<$ Mutators $>$\+::visit (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1visitor__arg}{visitor\+\_\+arg}} \&\&}]{arg}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1instr_a70d791209d1bc021f5eeca023f8cd124}{sysio\+::chain\+::wasm\+\_\+ops\+::instr}}.
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_source_l00564}{564}} of file \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_source}{wasm\+\_\+sysio\+\_\+binary\+\_\+ops.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00564\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00565\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\ \textcolor{keyword}{auto}\ m\ :\ \{\ Mutators::accept...\ \}\ )\ \{}
+\DoxyCodeLine{00566\ \ \ \ \ \ \ \ \ \ m(\textcolor{keyword}{this},\ arg);}
+\DoxyCodeLine{00567\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00568\ \ \ \ \}\ }
+
+\end{DoxyCode}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{wasm__sysio__binary__ops_8hpp}{wasm\+\_\+sysio\+\_\+binary\+\_\+ops.\+hpp}}\end{DoxyCompactItemize}

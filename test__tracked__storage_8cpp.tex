@@ -1,0 +1,341 @@
+\doxysection{libraries/fc/test/io/test\+\_\+tracked\+\_\+storage.cpp File Reference}
+\hypertarget{test__tracked__storage_8cpp}{}\label{test__tracked__storage_8cpp}\index{libraries/fc/test/io/test\_tracked\_storage.cpp@{libraries/fc/test/io/test\_tracked\_storage.cpp}}
+{\ttfamily \#include $<$boost/test/included/unit\+\_\+test.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/container/tracked\+\_\+storage.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/io/persistence\+\_\+util.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/multi\+\_\+index\+\_\+container.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/multi\+\_\+index/member.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/multi\+\_\+index/ordered\+\_\+index.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/multi\+\_\+index/hashed\+\_\+index.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/multi\+\_\+index/mem\+\_\+fun.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/multi\+\_\+index/global\+\_\+fun.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/multi\+\_\+index/composite\+\_\+key.\+hpp$>$}\newline
+{\ttfamily \#include $<$sstream$>$}\newline
+Include dependency graph for test\+\_\+tracked\+\_\+storage.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__tracked__storage_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structtest__size}{test\+\_\+size}}
+\item 
+struct \mbox{\hyperlink{structtest__size2}{test\+\_\+size2}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{test__tracked__storage_8cpp_a6b2a3852db8bb19ab6909bac01859985}{BOOST\+\_\+\+TEST\+\_\+\+MODULE}}~tracked\+\_\+storage
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef multi\+\_\+index\+\_\+container$<$ \mbox{\hyperlink{structtest__size}{test\+\_\+size}}, indexed\+\_\+by$<$ hashed\+\_\+unique$<$ tag$<$ by\+\_\+key $>$, member$<$ \mbox{\hyperlink{structtest__size}{test\+\_\+size}}, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}, \&\mbox{\hyperlink{structtest__size_af47c53149245654736dcb9590f38a18d}{test\+\_\+size\+::key}} $>$, std\+::hash$<$ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} $>$ $>$ $>$ $>$ \mbox{\hyperlink{test__tracked__storage_8cpp_a3c44d63aa032f1f6ae96ccfdf106a1bb}{test\+\_\+size\+\_\+container}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{test__tracked__storage_8cpp_a7d6eb9916f2d8aadc2e9578fbd59a12c}{FC\+\_\+\+REFLECT}} (\mbox{\hyperlink{structtest__size}{test\+\_\+size}},(key)(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})) struct by\+\_\+key
+\item 
+\mbox{\hyperlink{test__tracked__storage_8cpp_af37857ac724d215d77e5b1d997541e5f}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (track\+\_\+storage\+\_\+test)
+\item 
+\mbox{\hyperlink{test__tracked__storage_8cpp_adfb04efb31115458885eba06df3b09c0}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (simple\+\_\+write\+\_\+read\+\_\+file\+\_\+storage\+\_\+test)
+\item 
+\mbox{\hyperlink{test__tracked__storage_8cpp_abc731f03446e1326e0fb8c6679c22633}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (single\+\_\+write\+\_\+read\+\_\+file\+\_\+storage\+\_\+test)
+\item 
+\mbox{\hyperlink{test__tracked__storage_8cpp_a1cec43de11edd9d3d2154a95e9dd878b}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (write\+\_\+read\+\_\+file\+\_\+storage\+\_\+test)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{reflect_8hpp_a2ace850e636b1ca0b18fe3177e413d99}{FC\+\_\+\+REFLECT}}(\mbox{\hyperlink{structtest__size2}{test\+\_\+size2}},(key)(time)(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})) namespace fc typedef multi\+\_\+index\+\_\+container$<$ \mbox{\hyperlink{structtest__size2}{test\+\_\+size2}}, indexed\+\_\+by$<$ hashed\+\_\+unique$<$ tag$<$ by\+\_\+key $>$, member$<$ \mbox{\hyperlink{structtest__size2}{test\+\_\+size2}}, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}, \&\mbox{\hyperlink{structtest__size2_aad166e380b8976377e0baa8ecaf052c3}{test\+\_\+size2\+::key}} $>$, std\+::hash$<$ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} $>$ $>$, ordered\+\_\+non\+\_\+unique$<$ tag$<$ by\+\_\+time $>$, member$<$ \mbox{\hyperlink{structtest__size2}{test\+\_\+size2}}, \mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}}, \&\mbox{\hyperlink{structtest__size2_a48c9aa6ff212c791dac48937d22a8275}{test\+\_\+size2\+::time}} $>$ $>$ $>$ $>$ \mbox{\hyperlink{test__tracked__storage_8cpp_a9e5b4e882ecc8843642f76d55b55333b}{test\+\_\+size2\+\_\+container}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{test__tracked__storage_8cpp_a6b2a3852db8bb19ab6909bac01859985}\index{test\_tracked\_storage.cpp@{test\_tracked\_storage.cpp}!BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}}
+\index{BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}!test\_tracked\_storage.cpp@{test\_tracked\_storage.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_TEST\_MODULE}{BOOST\_TEST\_MODULE}}
+{\footnotesize\ttfamily \label{test__tracked__storage_8cpp_a6b2a3852db8bb19ab6909bac01859985} 
+\#define BOOST\+\_\+\+TEST\+\_\+\+MODULE~tracked\+\_\+storage}
+
+
+
+Definition at line \mbox{\hyperlink{test__tracked__storage_8cpp_source_l00001}{1}} of file \mbox{\hyperlink{test__tracked__storage_8cpp_source}{test\+\_\+tracked\+\_\+storage.\+cpp}}.
+
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{test__tracked__storage_8cpp_a3c44d63aa032f1f6ae96ccfdf106a1bb}\index{test\_tracked\_storage.cpp@{test\_tracked\_storage.cpp}!test\_size\_container@{test\_size\_container}}
+\index{test\_size\_container@{test\_size\_container}!test\_tracked\_storage.cpp@{test\_tracked\_storage.cpp}}
+\doxysubsubsection{\texorpdfstring{test\_size\_container}{test\_size\_container}}
+{\footnotesize\ttfamily \label{test__tracked__storage_8cpp_a3c44d63aa032f1f6ae96ccfdf106a1bb} 
+typedef multi\+\_\+index\+\_\+container$<$ \mbox{\hyperlink{structtest__size}{test\+\_\+size}}, indexed\+\_\+by$<$ hashed\+\_\+unique$<$ tag$<$by\+\_\+key$>$, member$<$\mbox{\hyperlink{structtest__size}{test\+\_\+size}}, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}, \&\mbox{\hyperlink{structtest__size_af47c53149245654736dcb9590f38a18d}{test\+\_\+size\+::key}}$>$, std\+::hash$<$\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}$>$ $>$ $>$$>$ \mbox{\hyperlink{test__tracked__storage_8cpp_a3c44d63aa032f1f6ae96ccfdf106a1bb}{test\+\_\+size\+\_\+container}}}
+
+
+
+Definition at line \mbox{\hyperlink{test__tracked__storage_8cpp_source_l00030}{30}} of file \mbox{\hyperlink{test__tracked__storage_8cpp_source}{test\+\_\+tracked\+\_\+storage.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{test__tracked__storage_8cpp_adfb04efb31115458885eba06df3b09c0}\index{test\_tracked\_storage.cpp@{test\_tracked\_storage.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!test\_tracked\_storage.cpp@{test\_tracked\_storage.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{test__tracked__storage_8cpp_adfb04efb31115458885eba06df3b09c0} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{simple\+\_\+write\+\_\+read\+\_\+file\+\_\+storage\+\_\+test}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__tracked__storage_8cpp_source_l00092}{92}} of file \mbox{\hyperlink{test__tracked__storage_8cpp_source}{test\+\_\+tracked\+\_\+storage.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00093\ \ \ \ \textcolor{keyword}{using\ }tracked\_storage1\ =\ \mbox{\hyperlink{classfc_1_1tracked__storage}{fc::tracked\_storage<test\_size\_container>}};}
+\DoxyCodeLine{00094\ \ \ \ tracked\_storage1\ storage1\_1;}
+\DoxyCodeLine{00095\ \ \ \ BOOST\_CHECK\_EQUAL(\ storage1\_1.memory\_size(),\ 0);}
+\DoxyCodeLine{00096\ \ \ \ BOOST\_CHECK\_EQUAL(\ storage1\_1.index().size(),\ 0);}
+\DoxyCodeLine{00097\ }
+\DoxyCodeLine{00098\ \ \ \ \mbox{\hyperlink{classfc_1_1temp__directory}{fc::temp\_directory}}\ td;}
+\DoxyCodeLine{00099\ \ \ \ \textcolor{keyword}{auto}\ out\ =\ \mbox{\hyperlink{namespacefc_1_1persistence__util_a794e9ae3b32ccdc322b436cf97ea0b9e}{fc::persistence\_util::open\_cfile\_for\_write}}(td.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}(),\ \textcolor{stringliteral}{"{}temp.dat"{}});}
+\DoxyCodeLine{00100\ \ \ \ \mbox{\hyperlink{namespacefc_1_1persistence__util_a979e339f3c85c4e3a0ca7fdffd526dc8}{fc::persistence\_util::write\_persistence\_header}}(out,\ 0x12345678,\ 5);}
+\DoxyCodeLine{00101\ \ \ \ storage1\_1.write(out);}
+\DoxyCodeLine{00102\ \ \ \ out.flush();}
+\DoxyCodeLine{00103\ \ \ \ out.close();}
+\DoxyCodeLine{00104\ }
+\DoxyCodeLine{00105\ \ \ \ \textcolor{keyword}{auto}\ content\ =\ \mbox{\hyperlink{namespacefc_1_1persistence__util_ae4c6e4c1f79832e4471d9c01057bdc8c}{fc::persistence\_util::open\_cfile\_for\_read}}(td.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}(),\ \textcolor{stringliteral}{"{}temp.dat"{}});}
+\DoxyCodeLine{00106\ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1state_a12f378e0c6dbf373781e7988ee4a0853a08c88a938bc459c7997b48f74248752f}{version}}\ =\ \mbox{\hyperlink{namespacefc_1_1persistence__util_abe5388b79b2e70ad07e183f45bf76901}{fc::persistence\_util::read\_persistence\_header}}(content,\ 0x12345678,\ 5,\ 5);}
+\DoxyCodeLine{00107\ \ \ \ BOOST\_CHECK\_EQUAL(\ version,\ 5\ );}
+\DoxyCodeLine{00108\ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespace_xbyak_1_1util_a4b2aef26182d21706896022467868f7c}{ds}}\ =\ content.create\_datastream();}
+\DoxyCodeLine{00109\ \ \ \ tracked\_storage1\ storage1\_2;}
+\DoxyCodeLine{00110\ \ \ \ BOOST\_CHECK(storage1\_2.read(ds,\ 500));}
+\DoxyCodeLine{00111\ \ \ \ BOOST\_CHECK\_EQUAL(\ storage1\_2.index().size(),\ 0);}
+\DoxyCodeLine{00112\ \ \ \ BOOST\_CHECK\_EQUAL(\ storage1\_2.memory\_size(),\ 0);}
+\DoxyCodeLine{00113\ }
+\DoxyCodeLine{00114\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ tellp\ =\ content.tellp();}
+\DoxyCodeLine{00115\ \ \ \ content.seek\_end(0);}
+\DoxyCodeLine{00116\ \ \ \ BOOST\_CHECK\_EQUAL(\ content.tellp(),\ tellp\ );}
+\DoxyCodeLine{00117\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__tracked__storage_8cpp_adfb04efb31115458885eba06df3b09c0_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__tracked__storage_8cpp_abc731f03446e1326e0fb8c6679c22633}\index{test\_tracked\_storage.cpp@{test\_tracked\_storage.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!test\_tracked\_storage.cpp@{test\_tracked\_storage.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{test__tracked__storage_8cpp_abc731f03446e1326e0fb8c6679c22633} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{single\+\_\+write\+\_\+read\+\_\+file\+\_\+storage\+\_\+test}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__tracked__storage_8cpp_source_l00119}{119}} of file \mbox{\hyperlink{test__tracked__storage_8cpp_source}{test\+\_\+tracked\+\_\+storage.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00120\ \ \ \ \textcolor{keyword}{using\ }tracked\_storage1\ =\ \mbox{\hyperlink{classfc_1_1tracked__storage}{fc::tracked\_storage<test\_size\_container>}};}
+\DoxyCodeLine{00121\ \ \ \ tracked\_storage1\ storage1\_1;}
+\DoxyCodeLine{00122\ \ \ \ storage1\_1.\mbox{\hyperlink{classfc_1_1tracked__storage_a6d24a6bf4512b48a846d88a1bf44b5b8}{insert}}(\mbox{\hyperlink{structtest__size}{test\_size}}\{\ 0,\ 6\ \});}
+\DoxyCodeLine{00123\ \ \ \ BOOST\_CHECK\_EQUAL(\ storage1\_1.memory\_size(),\ 6);}
+\DoxyCodeLine{00124\ \ \ \ BOOST\_CHECK\_EQUAL(\ storage1\_1.index().size(),\ 1);}
+\DoxyCodeLine{00125\ \ \ \ \mbox{\hyperlink{classfc_1_1temp__directory}{fc::temp\_directory}}\ td;}
+\DoxyCodeLine{00126\ \ \ \ \textcolor{keyword}{auto}\ out\ =\ \mbox{\hyperlink{namespacefc_1_1persistence__util_a794e9ae3b32ccdc322b436cf97ea0b9e}{fc::persistence\_util::open\_cfile\_for\_write}}(td.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}(),\ \textcolor{stringliteral}{"{}temp.dat"{}});}
+\DoxyCodeLine{00127\ \ \ \ \mbox{\hyperlink{namespacefc_1_1persistence__util_a979e339f3c85c4e3a0ca7fdffd526dc8}{fc::persistence\_util::write\_persistence\_header}}(out,\ 0x12345678,\ 5);}
+\DoxyCodeLine{00128\ \ \ \ storage1\_1.write(out);}
+\DoxyCodeLine{00129\ \ \ \ out.flush();}
+\DoxyCodeLine{00130\ \ \ \ out.close();}
+\DoxyCodeLine{00131\ }
+\DoxyCodeLine{00132\ \ \ \ \textcolor{keyword}{auto}\ content\ =\ \mbox{\hyperlink{namespacefc_1_1persistence__util_ae4c6e4c1f79832e4471d9c01057bdc8c}{fc::persistence\_util::open\_cfile\_for\_read}}(td.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}(),\ \textcolor{stringliteral}{"{}temp.dat"{}});}
+\DoxyCodeLine{00133\ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1state_a12f378e0c6dbf373781e7988ee4a0853a08c88a938bc459c7997b48f74248752f}{version}}\ =\ \mbox{\hyperlink{namespacefc_1_1persistence__util_abe5388b79b2e70ad07e183f45bf76901}{fc::persistence\_util::read\_persistence\_header}}(content,\ 0x12345678,\ 5,\ 5);}
+\DoxyCodeLine{00134\ \ \ \ BOOST\_CHECK\_EQUAL(\ version,\ 5\ );}
+\DoxyCodeLine{00135\ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespace_xbyak_1_1util_a4b2aef26182d21706896022467868f7c}{ds}}\ =\ content.create\_datastream();}
+\DoxyCodeLine{00136\ \ \ \ tracked\_storage1\ storage1\_2;}
+\DoxyCodeLine{00137\ \ \ \ BOOST\_CHECK(storage1\_2.read(ds,\ 500));}
+\DoxyCodeLine{00138\ \ \ \ BOOST\_CHECK\_EQUAL(\ storage1\_2.index().size(),\ 1);}
+\DoxyCodeLine{00139\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ primary\_idx2\ =\ storage1\_2.index().get<by\_key>();}
+\DoxyCodeLine{00140\ \ \ \ \textcolor{keyword}{auto}\ itr2\ =\ primary\_idx2.cbegin();}
+\DoxyCodeLine{00141\ \ \ \ BOOST\_CHECK\_EQUAL(\ itr2-\/>key,\ 0);}
+\DoxyCodeLine{00142\ \ \ \ BOOST\_CHECK\_EQUAL(\ itr2-\/>s,\ 6);}
+\DoxyCodeLine{00143\ \ \ \ BOOST\_CHECK\_EQUAL(\ storage1\_2.memory\_size(),\ 6);}
+\DoxyCodeLine{00144\ }
+\DoxyCodeLine{00145\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ tellp\ =\ content.tellp();}
+\DoxyCodeLine{00146\ \ \ \ content.seek\_end(0);}
+\DoxyCodeLine{00147\ \ \ \ BOOST\_CHECK\_EQUAL(\ content.tellp(),\ tellp\ );}
+\DoxyCodeLine{00148\ \}\ \mbox{\hyperlink{exception_8hpp_ae70bfa24f5a3bc0917382b3c17fc033c}{FC\_LOG\_AND\_RETHROW}}()\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__tracked__storage_8cpp_abc731f03446e1326e0fb8c6679c22633_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__tracked__storage_8cpp_af37857ac724d215d77e5b1d997541e5f}\index{test\_tracked\_storage.cpp@{test\_tracked\_storage.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!test\_tracked\_storage.cpp@{test\_tracked\_storage.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{test__tracked__storage_8cpp_af37857ac724d215d77e5b1d997541e5f} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{track\+\_\+storage\+\_\+test}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__tracked__storage_8cpp_source_l00064}{64}} of file \mbox{\hyperlink{test__tracked__storage_8cpp_source}{test\+\_\+tracked\+\_\+storage.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00065\ \ \ \ \mbox{\hyperlink{classfc_1_1tracked__storage}{fc::tracked\_storage<test\_size\_container>}}\ storage;}
+\DoxyCodeLine{00066\ \ \ \ BOOST\_CHECK(storage.\mbox{\hyperlink{classfc_1_1tracked__storage_a6d24a6bf4512b48a846d88a1bf44b5b8}{insert}}(\mbox{\hyperlink{structtest__size}{test\_size}}\{\ 0,\ 5\ \}).second);}
+\DoxyCodeLine{00067\ \ \ \ BOOST\_CHECK\_EQUAL(\ storage.\mbox{\hyperlink{classfc_1_1tracked__storage_a5bd678ec2e09568df574c8ecaa184962}{memory\_size}}(),\ 5);}
+\DoxyCodeLine{00068\ \ \ \ BOOST\_CHECK\_EQUAL(\ storage.\mbox{\hyperlink{classfc_1_1tracked__storage_ab578f3765c80c8cee1d758d440c99e90}{index}}().size(),\ 1);}
+\DoxyCodeLine{00069\ \ \ \ BOOST\_CHECK(storage.\mbox{\hyperlink{classfc_1_1tracked__storage_a6d24a6bf4512b48a846d88a1bf44b5b8}{insert}}(\mbox{\hyperlink{structtest__size}{test\_size}}\{\ 1,\ 4\ \}).second);}
+\DoxyCodeLine{00070\ \ \ \ BOOST\_CHECK\_EQUAL(\ storage.\mbox{\hyperlink{classfc_1_1tracked__storage_a5bd678ec2e09568df574c8ecaa184962}{memory\_size}}(),\ 9);}
+\DoxyCodeLine{00071\ \ \ \ BOOST\_CHECK\_EQUAL(\ storage.\mbox{\hyperlink{classfc_1_1tracked__storage_ab578f3765c80c8cee1d758d440c99e90}{index}}().size(),\ 2);}
+\DoxyCodeLine{00072\ \ \ \ BOOST\_CHECK(storage.\mbox{\hyperlink{classfc_1_1tracked__storage_a6d24a6bf4512b48a846d88a1bf44b5b8}{insert}}(\mbox{\hyperlink{structtest__size}{test\_size}}\{\ 2,\ 15\ \}).second);}
+\DoxyCodeLine{00073\ \ \ \ BOOST\_CHECK\_EQUAL(\ storage.\mbox{\hyperlink{classfc_1_1tracked__storage_a5bd678ec2e09568df574c8ecaa184962}{memory\_size}}(),\ 24);}
+\DoxyCodeLine{00074\ \ \ \ BOOST\_CHECK\_EQUAL(\ storage.\mbox{\hyperlink{classfc_1_1tracked__storage_ab578f3765c80c8cee1d758d440c99e90}{index}}().size(),\ 3);}
+\DoxyCodeLine{00075\ \ \ \ \textcolor{keyword}{auto}\ to\_mod\ =\ storage.\mbox{\hyperlink{classfc_1_1tracked__storage_adc1778619d5a0ef17222e82bfce775e8}{find}}(1);}
+\DoxyCodeLine{00076\ \ \ \ storage.\mbox{\hyperlink{classfc_1_1tracked__storage_a857cf0f6d4ca31111b633b9d4c923ffe}{modify}}(to\_mod,\ [](\mbox{\hyperlink{structtest__size}{test\_size}}\&\ ts)\ \{\ ts.\mbox{\hyperlink{structtest__size_a1d85741fba1d4d47aa1807369ec86d0a}{s}}\ =\ 14;\ \});}
+\DoxyCodeLine{00077\ \ \ \ BOOST\_CHECK\_EQUAL(\ storage.\mbox{\hyperlink{classfc_1_1tracked__storage_a5bd678ec2e09568df574c8ecaa184962}{memory\_size}}(),\ 34);}
+\DoxyCodeLine{00078\ \ \ \ BOOST\_CHECK\_EQUAL(\ storage.\mbox{\hyperlink{classfc_1_1tracked__storage_ab578f3765c80c8cee1d758d440c99e90}{index}}().size(),\ 3);}
+\DoxyCodeLine{00079\ \ \ \ storage.\mbox{\hyperlink{classfc_1_1tracked__storage_a857cf0f6d4ca31111b633b9d4c923ffe}{modify}}(to\_mod,\ [](\mbox{\hyperlink{structtest__size}{test\_size}}\&\ ts)\ \{\ ts.\mbox{\hyperlink{structtest__size_a1d85741fba1d4d47aa1807369ec86d0a}{s}}\ =\ 0;\ \});}
+\DoxyCodeLine{00080\ \ \ \ BOOST\_CHECK\_EQUAL(\ storage.\mbox{\hyperlink{classfc_1_1tracked__storage_a5bd678ec2e09568df574c8ecaa184962}{memory\_size}}(),\ 20);}
+\DoxyCodeLine{00081\ \ \ \ BOOST\_CHECK(!storage.\mbox{\hyperlink{classfc_1_1tracked__storage_a6d24a6bf4512b48a846d88a1bf44b5b8}{insert}}(\mbox{\hyperlink{structtest__size}{test\_size}}\{\ 1,\ 100\ \}).second);}
+\DoxyCodeLine{00082\ \ \ \ BOOST\_CHECK\_EQUAL(\ storage.\mbox{\hyperlink{classfc_1_1tracked__storage_a5bd678ec2e09568df574c8ecaa184962}{memory\_size}}(),\ 20);}
+\DoxyCodeLine{00083\ \ \ \ BOOST\_CHECK\_EQUAL(\ storage.\mbox{\hyperlink{classfc_1_1tracked__storage_ab578f3765c80c8cee1d758d440c99e90}{index}}().size(),\ 3);}
+\DoxyCodeLine{00084\ \ \ \ storage.\mbox{\hyperlink{classfc_1_1tracked__storage_a51396073d7aa4bd1a431e318f5557924}{erase}}(2);}
+\DoxyCodeLine{00085\ \ \ \ BOOST\_CHECK\_EQUAL(\ storage.\mbox{\hyperlink{classfc_1_1tracked__storage_a5bd678ec2e09568df574c8ecaa184962}{memory\_size}}(),\ 5);}
+\DoxyCodeLine{00086\ \ \ \ BOOST\_CHECK\_NO\_THROW(storage.\mbox{\hyperlink{classfc_1_1tracked__storage_a51396073d7aa4bd1a431e318f5557924}{erase}}(2));}
+\DoxyCodeLine{00087\ \ \ \ BOOST\_CHECK\_EQUAL(\ storage.\mbox{\hyperlink{classfc_1_1tracked__storage_a5bd678ec2e09568df574c8ecaa184962}{memory\_size}}(),\ 5);}
+\DoxyCodeLine{00088\ \ \ \ storage.\mbox{\hyperlink{classfc_1_1tracked__storage_a51396073d7aa4bd1a431e318f5557924}{erase}}(\ storage.\mbox{\hyperlink{classfc_1_1tracked__storage_ab578f3765c80c8cee1d758d440c99e90}{index}}().find(0)\ );}
+\DoxyCodeLine{00089\ \ \ \ BOOST\_CHECK\_EQUAL(\ storage.\mbox{\hyperlink{classfc_1_1tracked__storage_a5bd678ec2e09568df574c8ecaa184962}{memory\_size}}(),\ 0);}
+\DoxyCodeLine{00090\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__tracked__storage_8cpp_af37857ac724d215d77e5b1d997541e5f_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__tracked__storage_8cpp_a1cec43de11edd9d3d2154a95e9dd878b}\index{test\_tracked\_storage.cpp@{test\_tracked\_storage.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!test\_tracked\_storage.cpp@{test\_tracked\_storage.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{test__tracked__storage_8cpp_a1cec43de11edd9d3d2154a95e9dd878b} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{write\+\_\+read\+\_\+file\+\_\+storage\+\_\+test}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__tracked__storage_8cpp_source_l00150}{150}} of file \mbox{\hyperlink{test__tracked__storage_8cpp_source}{test\+\_\+tracked\+\_\+storage.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00151\ \ \ \ \textcolor{keyword}{using\ }tracked\_storage1\ =\ \mbox{\hyperlink{classfc_1_1tracked__storage}{fc::tracked\_storage<test\_size\_container>}};}
+\DoxyCodeLine{00152\ \ \ \ tracked\_storage1\ storage1\_1;}
+\DoxyCodeLine{00153\ \ \ \ storage1\_1.\mbox{\hyperlink{classfc_1_1tracked__storage_a6d24a6bf4512b48a846d88a1bf44b5b8}{insert}}(\mbox{\hyperlink{structtest__size}{test\_size}}\{\ 0,\ 6\ \});}
+\DoxyCodeLine{00154\ \ \ \ storage1\_1.insert(\mbox{\hyperlink{structtest__size}{test\_size}}\{\ 3,\ 7\ \});}
+\DoxyCodeLine{00155\ \ \ \ storage1\_1.insert(\mbox{\hyperlink{structtest__size}{test\_size}}\{\ 5,\ 3\ \});}
+\DoxyCodeLine{00156\ \ \ \ storage1\_1.insert(\mbox{\hyperlink{structtest__size}{test\_size}}\{\ 9,\ 4\ \});}
+\DoxyCodeLine{00157\ \ \ \ storage1\_1.insert(\mbox{\hyperlink{structtest__size}{test\_size}}\{\ 15,\ 6\ \});}
+\DoxyCodeLine{00158\ \ \ \ storage1\_1.insert(\mbox{\hyperlink{structtest__size}{test\_size}}\{\ 16,\ 4\ \});}
+\DoxyCodeLine{00159\ \ \ \ storage1\_1.insert(\mbox{\hyperlink{structtest__size}{test\_size}}\{\ 19,\ 3\ \});}
+\DoxyCodeLine{00160\ \ \ \ storage1\_1.insert(\mbox{\hyperlink{structtest__size}{test\_size}}\{\ 25,\ 7\ \});}
+\DoxyCodeLine{00161\ \ \ \ BOOST\_CHECK\_EQUAL(\ storage1\_1.memory\_size(),\ 40);}
+\DoxyCodeLine{00162\ \ \ \ BOOST\_CHECK\_EQUAL(\ storage1\_1.index().size(),\ 8);}
+\DoxyCodeLine{00163\ }
+\DoxyCodeLine{00164\ \ \ \ \mbox{\hyperlink{classfc_1_1temp__directory}{fc::temp\_directory}}\ td;}
+\DoxyCodeLine{00165\ \ \ \ \textcolor{keyword}{auto}\ out\ =\ \mbox{\hyperlink{namespacefc_1_1persistence__util_a794e9ae3b32ccdc322b436cf97ea0b9e}{fc::persistence\_util::open\_cfile\_for\_write}}(td.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}(),\ \textcolor{stringliteral}{"{}temp.dat"{}});}
+\DoxyCodeLine{00166\ \ \ \ \mbox{\hyperlink{namespacefc_1_1persistence__util_a979e339f3c85c4e3a0ca7fdffd526dc8}{fc::persistence\_util::write\_persistence\_header}}(out,\ 0x12345678,\ 5);}
+\DoxyCodeLine{00167\ \ \ \ storage1\_1.write(out);}
+\DoxyCodeLine{00168\ }
+\DoxyCodeLine{00169\ \ \ \ \textcolor{keyword}{using\ }tracked\_storage2\ =\ \mbox{\hyperlink{classfc_1_1tracked__storage}{fc::tracked\_storage<test\_size2\_container>}};}
+\DoxyCodeLine{00170\ \ \ \ tracked\_storage2\ storage2\_1;}
+\DoxyCodeLine{00171\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ now\ =\ \mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{fc::time\_point::now}}();}
+\DoxyCodeLine{00172\ \ \ \ storage2\_1.insert(\mbox{\hyperlink{structtest__size2}{test\_size2}}\{\ 3,\ now,\ 7\ \});}
+\DoxyCodeLine{00173\ \ \ \ BOOST\_CHECK\_EQUAL(\ storage2\_1.memory\_size(),\ 7);}
+\DoxyCodeLine{00174\ \ \ \ BOOST\_CHECK\_EQUAL(\ storage2\_1.index().size(),\ 1);}
+\DoxyCodeLine{00175\ }
+\DoxyCodeLine{00176\ \ \ \ storage2\_1.write(out);}
+\DoxyCodeLine{00177\ }
+\DoxyCodeLine{00178\ \ \ \ out.flush();}
+\DoxyCodeLine{00179\ \ \ \ out.close();}
+\DoxyCodeLine{00180\ }
+\DoxyCodeLine{00181\ \ \ \ \textcolor{keyword}{auto}\ content\ =\ \mbox{\hyperlink{namespacefc_1_1persistence__util_ae4c6e4c1f79832e4471d9c01057bdc8c}{fc::persistence\_util::open\_cfile\_for\_read}}(td.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}(),\ \textcolor{stringliteral}{"{}temp.dat"{}});}
+\DoxyCodeLine{00182\ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1state_a12f378e0c6dbf373781e7988ee4a0853a08c88a938bc459c7997b48f74248752f}{version}}\ =\ \mbox{\hyperlink{namespacefc_1_1persistence__util_abe5388b79b2e70ad07e183f45bf76901}{fc::persistence\_util::read\_persistence\_header}}(content,\ 0x12345678,\ 5,\ 5);}
+\DoxyCodeLine{00183\ \ \ \ BOOST\_CHECK\_EQUAL(\ version,\ 5\ );}
+\DoxyCodeLine{00184\ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespace_xbyak_1_1util_a4b2aef26182d21706896022467868f7c}{ds}}\ =\ content.create\_datastream();}
+\DoxyCodeLine{00185\ \ \ \ tracked\_storage1\ storage1\_2;}
+\DoxyCodeLine{00186\ \ \ \ BOOST\_CHECK(storage1\_2.read(ds,\ 500));}
+\DoxyCodeLine{00187\ \ \ \ BOOST\_CHECK\_EQUAL(\ storage1\_2.index().size(),\ 8);}
+\DoxyCodeLine{00188\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ primary\_idx1\_2\ =\ storage1\_2.index().get<by\_key>();}
+\DoxyCodeLine{00189\ \ \ \ \textcolor{keyword}{auto}\ itr2\ =\ primary\_idx1\_2.cbegin();}
+\DoxyCodeLine{00190\ \ \ \ BOOST\_CHECK\_EQUAL(\ itr2-\/>key,\ 0);}
+\DoxyCodeLine{00191\ \ \ \ BOOST\_CHECK\_EQUAL(\ itr2-\/>s,\ 6);}
+\DoxyCodeLine{00192\ \ \ \ BOOST\_CHECK\_EQUAL(\ (++itr2)-\/>key,\ 3);}
+\DoxyCodeLine{00193\ \ \ \ BOOST\_CHECK\_EQUAL(\ itr2-\/>s,\ 7);}
+\DoxyCodeLine{00194\ \ \ \ BOOST\_CHECK\_EQUAL(\ (++itr2)-\/>key,\ 5);}
+\DoxyCodeLine{00195\ \ \ \ BOOST\_CHECK\_EQUAL(\ itr2-\/>s,\ 3);}
+\DoxyCodeLine{00196\ \ \ \ BOOST\_CHECK\_EQUAL(\ (++itr2)-\/>key,\ 9);}
+\DoxyCodeLine{00197\ \ \ \ BOOST\_CHECK\_EQUAL(\ itr2-\/>s,\ 4);}
+\DoxyCodeLine{00198\ \ \ \ BOOST\_CHECK\_EQUAL(\ (++itr2)-\/>key,\ 15);}
+\DoxyCodeLine{00199\ \ \ \ BOOST\_CHECK\_EQUAL(\ itr2-\/>s,\ 6);}
+\DoxyCodeLine{00200\ \ \ \ BOOST\_CHECK\_EQUAL(\ (++itr2)-\/>key,\ 16);}
+\DoxyCodeLine{00201\ \ \ \ BOOST\_CHECK\_EQUAL(\ itr2-\/>s,\ 4);}
+\DoxyCodeLine{00202\ \ \ \ BOOST\_CHECK\_EQUAL(\ (++itr2)-\/>key,\ 19);}
+\DoxyCodeLine{00203\ \ \ \ BOOST\_CHECK\_EQUAL(\ itr2-\/>s,\ 3);}
+\DoxyCodeLine{00204\ \ \ \ BOOST\_CHECK\_EQUAL(\ (++itr2)-\/>key,\ 25);}
+\DoxyCodeLine{00205\ \ \ \ BOOST\_CHECK\_EQUAL(\ itr2-\/>s,\ 7);}
+\DoxyCodeLine{00206\ \ \ \ BOOST\_CHECK\_EQUAL(\ storage1\_2.memory\_size(),\ 40);}
+\DoxyCodeLine{00207\ }
+\DoxyCodeLine{00208\ \ \ \ tracked\_storage2\ storage2\_2;}
+\DoxyCodeLine{00209\ \ \ \ BOOST\_CHECK(storage2\_2.read(ds,\ 500));}
+\DoxyCodeLine{00210\ \ \ \ BOOST\_CHECK\_EQUAL(\ storage2\_2.index().size(),\ 1);}
+\DoxyCodeLine{00211\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ primary\_idx2\_2\ =\ storage2\_2.index().get<by\_key>();}
+\DoxyCodeLine{00212\ \ \ \ \textcolor{keyword}{auto}\ itr3\ =\ primary\_idx2\_2.cbegin();}
+\DoxyCodeLine{00213\ \ \ \ BOOST\_CHECK\_EQUAL(\ itr3-\/>key,\ 3);}
+\DoxyCodeLine{00214\ \ \ \ BOOST\_CHECK(\ itr3-\/>time\ ==\ now);}
+\DoxyCodeLine{00215\ \ \ \ BOOST\_CHECK\_EQUAL(\ itr3-\/>s,\ 7);}
+\DoxyCodeLine{00216\ }
+\DoxyCodeLine{00217\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ tellp\ =\ content.tellp();}
+\DoxyCodeLine{00218\ \ \ \ content.seek\_end(0);}
+\DoxyCodeLine{00219\ \ \ \ BOOST\_CHECK\_EQUAL(\ content.tellp(),\ tellp\ );}
+\DoxyCodeLine{00220\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__tracked__storage_8cpp_a1cec43de11edd9d3d2154a95e9dd878b_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__tracked__storage_8cpp_a7d6eb9916f2d8aadc2e9578fbd59a12c}\index{test\_tracked\_storage.cpp@{test\_tracked\_storage.cpp}!FC\_REFLECT@{FC\_REFLECT}}
+\index{FC\_REFLECT@{FC\_REFLECT}!test\_tracked\_storage.cpp@{test\_tracked\_storage.cpp}}
+\doxysubsubsection{\texorpdfstring{FC\_REFLECT()}{FC\_REFLECT()}}
+{\footnotesize\ttfamily \label{test__tracked__storage_8cpp_a7d6eb9916f2d8aadc2e9578fbd59a12c} 
+FC\+\_\+\+REFLECT (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structtest__size}{test\+\_\+size}}}]{}{, }\item[{(key)(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})}]{}{}\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{test__tracked__storage_8cpp_a9e5b4e882ecc8843642f76d55b55333b}\index{test\_tracked\_storage.cpp@{test\_tracked\_storage.cpp}!test\_size2\_container@{test\_size2\_container}}
+\index{test\_size2\_container@{test\_size2\_container}!test\_tracked\_storage.cpp@{test\_tracked\_storage.cpp}}
+\doxysubsubsection{\texorpdfstring{test\_size2\_container}{test\_size2\_container}}
+{\footnotesize\ttfamily \label{test__tracked__storage_8cpp_a9e5b4e882ecc8843642f76d55b55333b} 
+\mbox{\hyperlink{reflect_8hpp_a2ace850e636b1ca0b18fe3177e413d99}{FC\+\_\+\+REFLECT}} ( \mbox{\hyperlink{structtest__size2}{test\+\_\+size2}}, (key)(time)(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}) ) namespace fc typedef multi\+\_\+index\+\_\+container$<$ \mbox{\hyperlink{structtest__size2}{test\+\_\+size2}}, indexed\+\_\+by$<$ hashed\+\_\+unique$<$ tag$<$by\+\_\+key$>$, member$<$\mbox{\hyperlink{structtest__size2}{test\+\_\+size2}}, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}, \&\mbox{\hyperlink{structtest__size2_aad166e380b8976377e0baa8ecaf052c3}{test\+\_\+size2\+::key}}$>$, std\+::hash$<$\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}$>$ $>$, ordered\+\_\+non\+\_\+unique$<$ tag$<$by\+\_\+time$>$, member$<$\mbox{\hyperlink{structtest__size2}{test\+\_\+size2}}, \mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}}, \&\mbox{\hyperlink{structtest__size2_a48c9aa6ff212c791dac48937d22a8275}{test\+\_\+size2\+::time}}$>$ $>$ $>$$>$ test\+\_\+size2\+\_\+container}
+
+
+
+Definition at line \mbox{\hyperlink{test__tracked__storage_8cpp_source_l00059}{59}} of file \mbox{\hyperlink{test__tracked__storage_8cpp_source}{test\+\_\+tracked\+\_\+storage.\+cpp}}.
+

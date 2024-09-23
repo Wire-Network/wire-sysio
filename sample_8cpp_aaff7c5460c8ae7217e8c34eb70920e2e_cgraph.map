@@ -1,0 +1,7 @@
+<map id="sample1" name="sample1">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,76,56"/>
+<area shape="rect" id="Node000002" href="$test__point_8hpp.html#ae46abcc83c05232be0ecaf52ed4a3f76" title=" " alt="" coords="124,5,210,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="76,34,108,27,109,32,77,39"/>
+<area shape="rect" id="Node000003" href="$sample_8cpp.html#a61de80d82d023076dac637b6a50f0a6e" title=" " alt="" coords="140,55,194,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="77,48,126,57,124,62,76,53"/>
+</map>

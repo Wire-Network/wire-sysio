@@ -1,0 +1,296 @@
+\doxysection{fc\+::udp\+\_\+socket Class Reference}
+\hypertarget{classfc_1_1udp__socket}{}\label{classfc_1_1udp__socket}\index{fc::udp\_socket@{fc::udp\_socket}}
+
+
+{\ttfamily \#include $<$udp\+\_\+socket.\+hpp$>$}
+
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classfc_1_1udp__socket_1_1impl}{impl}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1udp__socket_a2df5a8406c77e5e10e102b47eff97038}{udp\+\_\+socket}} ()
+\item 
+\mbox{\hyperlink{classfc_1_1udp__socket_a9ff80cf2ec65a3c887f8e00e79cf8f98}{udp\+\_\+socket}} (const \mbox{\hyperlink{classfc_1_1udp__socket}{udp\+\_\+socket}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\item 
+\mbox{\hyperlink{classfc_1_1udp__socket_af8942060d2c3b249d63c93d56ba7d6d8}{\texorpdfstring{$\sim$}{\string~}udp\+\_\+socket}} ()
+\item 
+void \mbox{\hyperlink{classfc_1_1udp__socket_ad9f0cf8cf36cf5948be0fc7f3664fd28}{initialize}} (boost\+::asio\+::io\+\_\+service \&)
+\item 
+void \mbox{\hyperlink{classfc_1_1udp__socket_ae38731361b74a2841f4691066ac31d86}{open}} ()
+\item 
+void \mbox{\hyperlink{classfc_1_1udp__socket_a99f7b46a3566de47d7977ce10b674fe1}{send\+\_\+to}} (const char \texorpdfstring{$\ast$}{*}b, size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}, boost\+::asio\+::ip\+::udp\+::endpoint \&to)
+\item 
+void \mbox{\hyperlink{classfc_1_1udp__socket_a0f8d1dde4527e6e5c128601586160a53}{send\+\_\+to}} (const std\+::shared\+\_\+ptr$<$ const char $>$ \&b, size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}, boost\+::asio\+::ip\+::udp\+::endpoint \&to)
+\item 
+void \mbox{\hyperlink{classfc_1_1udp__socket_a7be64e6fda2524b07192ca354559bbcd}{close}} ()
+\item 
+void \mbox{\hyperlink{classfc_1_1udp__socket_a65856d35d2beda8da40ab9f916705f21}{set\+\_\+reuse\+\_\+address}} (bool)
+\item 
+void \mbox{\hyperlink{classfc_1_1udp__socket_acd2fec7ae0595eb52ec1241998ac90ed}{connect}} (const boost\+::asio\+::ip\+::udp\+::endpoint \&e)
+\item 
+const boost\+::asio\+::ip\+::udp\+::endpoint \mbox{\hyperlink{classfc_1_1udp__socket_a315ceb1d2edbec581dbffe676784ff05}{local\+\_\+endpoint}} () const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+The \doxylink{classfc_1_1udp__socket}{udp\+\_\+socket} class has reference semantics, all copies will refer to the same underlying socket. 
+
+Definition at line \mbox{\hyperlink{udp__socket_8hpp_source_l00017}{17}} of file \mbox{\hyperlink{udp__socket_8hpp_source}{udp\+\_\+socket.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1udp__socket_a2df5a8406c77e5e10e102b47eff97038}\index{fc::udp\_socket@{fc::udp\_socket}!udp\_socket@{udp\_socket}}
+\index{udp\_socket@{udp\_socket}!fc::udp\_socket@{fc::udp\_socket}}
+\doxysubsubsection{\texorpdfstring{udp\_socket()}{udp\_socket()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1udp__socket_a2df5a8406c77e5e10e102b47eff97038} 
+fc\+::udp\+\_\+socket\+::udp\+\_\+socket (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{udp__socket_8cpp_source_l00016}{16}} of file \mbox{\hyperlink{udp__socket_8cpp_source}{udp\+\_\+socket.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00017\ \ \ \ \ :\ my(\textcolor{keyword}{new}\ impl())}
+\DoxyCodeLine{00018\ \ \ \{}
+\DoxyCodeLine{00019\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1udp__socket_a9ff80cf2ec65a3c887f8e00e79cf8f98}\index{fc::udp\_socket@{fc::udp\_socket}!udp\_socket@{udp\_socket}}
+\index{udp\_socket@{udp\_socket}!fc::udp\_socket@{fc::udp\_socket}}
+\doxysubsubsection{\texorpdfstring{udp\_socket()}{udp\_socket()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1udp__socket_a9ff80cf2ec65a3c887f8e00e79cf8f98} 
+fc\+::udp\+\_\+socket\+::udp\+\_\+socket (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1udp__socket}{udp\+\_\+socket}} \&}]{s}{}\end{DoxyParamCaption})}
+
+\Hypertarget{classfc_1_1udp__socket_af8942060d2c3b249d63c93d56ba7d6d8}\index{fc::udp\_socket@{fc::udp\_socket}!````~udp\_socket@{\texorpdfstring{$\sim$}{\string~}udp\_socket}}
+\index{````~udp\_socket@{\texorpdfstring{$\sim$}{\string~}udp\_socket}!fc::udp\_socket@{fc::udp\_socket}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}udp\_socket()}{\string~udp\_socket()}}
+{\footnotesize\ttfamily \label{classfc_1_1udp__socket_af8942060d2c3b249d63c93d56ba7d6d8} 
+fc\+::udp\+\_\+socket\+::\texorpdfstring{$\sim$}{\string~}udp\+\_\+socket (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{udp__socket_8cpp_source_l00026}{26}} of file \mbox{\hyperlink{udp__socket_8cpp_source}{udp\+\_\+socket.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00027\ \ \ \{}
+\DoxyCodeLine{00028\ \ \ \ \ \textcolor{keywordflow}{try}\ }
+\DoxyCodeLine{00029\ \ \ \ \ \{}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(my-\/>\_sock)}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ my-\/>\_sock-\/>close();\ \textcolor{comment}{//close\ boost\ socket\ to\ make\ any\ pending\ reads\ run\ their\ completion\ handler}}
+\DoxyCodeLine{00032\ \ \ \ \ \}}
+\DoxyCodeLine{00033\ \ \ \ \ \textcolor{keywordflow}{catch}\ (...)\ \textcolor{comment}{//avoid\ destructor\ throw\ and\ likely\ this\ is\ just\ happening\ because\ socket\ wasn't\ open.}}
+\DoxyCodeLine{00034\ \ \ \ \ \{}
+\DoxyCodeLine{00035\ \ \ \ \ \}}
+\DoxyCodeLine{00036\ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1udp__socket_a7be64e6fda2524b07192ca354559bbcd}\index{fc::udp\_socket@{fc::udp\_socket}!close@{close}}
+\index{close@{close}!fc::udp\_socket@{fc::udp\_socket}}
+\doxysubsubsection{\texorpdfstring{close()}{close()}}
+{\footnotesize\ttfamily \label{classfc_1_1udp__socket_a7be64e6fda2524b07192ca354559bbcd} 
+void fc\+::udp\+\_\+socket\+::close (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{udp__socket_8cpp_source_l00091}{91}} of file \mbox{\hyperlink{udp__socket_8cpp_source}{udp\+\_\+socket.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00092\ \ \ \{}
+\DoxyCodeLine{00093\ \ \ \ \ my-\/>\_sock-\/>close();}
+\DoxyCodeLine{00094\ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=322pt]{classfc_1_1udp__socket_a7be64e6fda2524b07192ca354559bbcd_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1udp__socket_acd2fec7ae0595eb52ec1241998ac90ed}\index{fc::udp\_socket@{fc::udp\_socket}!connect@{connect}}
+\index{connect@{connect}!fc::udp\_socket@{fc::udp\_socket}}
+\doxysubsubsection{\texorpdfstring{connect()}{connect()}}
+{\footnotesize\ttfamily \label{classfc_1_1udp__socket_acd2fec7ae0595eb52ec1241998ac90ed} 
+void fc\+::udp\+\_\+socket\+::connect (\begin{DoxyParamCaption}\item[{const boost\+::asio\+::ip\+::udp\+::endpoint \&}]{e}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{udp__socket_8cpp_source_l00101}{101}} of file \mbox{\hyperlink{udp__socket_8cpp_source}{udp\+\_\+socket.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00102\ \ \ \{}
+\DoxyCodeLine{00103\ \ \ \ \ my-\/>\_sock-\/>connect(e);}
+\DoxyCodeLine{00104\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1udp__socket_ad9f0cf8cf36cf5948be0fc7f3664fd28}\index{fc::udp\_socket@{fc::udp\_socket}!initialize@{initialize}}
+\index{initialize@{initialize}!fc::udp\_socket@{fc::udp\_socket}}
+\doxysubsubsection{\texorpdfstring{initialize()}{initialize()}}
+{\footnotesize\ttfamily \label{classfc_1_1udp__socket_ad9f0cf8cf36cf5948be0fc7f3664fd28} 
+void fc\+::udp\+\_\+socket\+::initialize (\begin{DoxyParamCaption}\item[{boost\+::asio\+::io\+\_\+service \&}]{service}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{udp__socket_8cpp_source_l00021}{21}} of file \mbox{\hyperlink{udp__socket_8cpp_source}{udp\+\_\+socket.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00022\ \ \ \{}
+\DoxyCodeLine{00023\ \ \ \ \ my-\/>\_sock.reset(\textcolor{keyword}{new}\ boost::asio::ip::udp::socket(service));}
+\DoxyCodeLine{00024\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1udp__socket_a315ceb1d2edbec581dbffe676784ff05}\index{fc::udp\_socket@{fc::udp\_socket}!local\_endpoint@{local\_endpoint}}
+\index{local\_endpoint@{local\_endpoint}!fc::udp\_socket@{fc::udp\_socket}}
+\doxysubsubsection{\texorpdfstring{local\_endpoint()}{local\_endpoint()}}
+{\footnotesize\ttfamily \label{classfc_1_1udp__socket_a315ceb1d2edbec581dbffe676784ff05} 
+const boost\+::asio\+::ip\+::udp\+::endpoint fc\+::udp\+\_\+socket\+::local\+\_\+endpoint (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{udp__socket_8cpp_source_l00096}{96}} of file \mbox{\hyperlink{udp__socket_8cpp_source}{udp\+\_\+socket.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00097\ \ \ \{}
+\DoxyCodeLine{00098\ \ \ \ \ \textcolor{keywordflow}{return}\ my-\/>\_sock-\/>local\_endpoint();}
+\DoxyCodeLine{00099\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1udp__socket_ae38731361b74a2841f4691066ac31d86}\index{fc::udp\_socket@{fc::udp\_socket}!open@{open}}
+\index{open@{open}!fc::udp\_socket@{fc::udp\_socket}}
+\doxysubsubsection{\texorpdfstring{open()}{open()}}
+{\footnotesize\ttfamily \label{classfc_1_1udp__socket_ae38731361b74a2841f4691066ac31d86} 
+void fc\+::udp\+\_\+socket\+::open (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{udp__socket_8cpp_source_l00085}{85}} of file \mbox{\hyperlink{udp__socket_8cpp_source}{udp\+\_\+socket.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00086\ \ \ \{}
+\DoxyCodeLine{00087\ \ \ \ \ my-\/>\_sock-\/>open(boost::asio::ip::udp::v4());}
+\DoxyCodeLine{00088\ \ \ \ \ my-\/>\_sock-\/>non\_blocking(\textcolor{keyword}{true});}
+\DoxyCodeLine{00089\ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1udp__socket_ae38731361b74a2841f4691066ac31d86_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1udp__socket_a99f7b46a3566de47d7977ce10b674fe1}\index{fc::udp\_socket@{fc::udp\_socket}!send\_to@{send\_to}}
+\index{send\_to@{send\_to}!fc::udp\_socket@{fc::udp\_socket}}
+\doxysubsubsection{\texorpdfstring{send\_to()}{send\_to()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1udp__socket_a99f7b46a3566de47d7977ce10b674fe1} 
+void fc\+::udp\+\_\+socket\+::send\+\_\+to (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{b}{, }\item[{size\+\_\+t}]{l}{, }\item[{boost\+::asio\+::ip\+::udp\+::endpoint \&}]{to}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{udp__socket_8cpp_source_l00038}{38}} of file \mbox{\hyperlink{udp__socket_8cpp_source}{udp\+\_\+socket.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00039\ \ \ \{}
+\DoxyCodeLine{00040\ \ \ \ \ \textcolor{keywordflow}{try}\ }
+\DoxyCodeLine{00041\ \ \ \ \ \{}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ my-\/>\_sock-\/>send\_to(boost::asio::buffer(buffer,\ length),\ to);}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00044\ \ \ \ \ \}\ }
+\DoxyCodeLine{00045\ \ \ \ \ \textcolor{keywordflow}{catch}(\textcolor{keyword}{const}\ boost::system::system\_error\&\ e)}
+\DoxyCodeLine{00046\ \ \ \ \ \{}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(e.code()\ ==\ boost::asio::error::would\_block)}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ send\_buffer\_ptr\ =\ std::make\_shared<std::vector<char>>(buffer,\ buffer+length);}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \ my-\/>\_sock-\/>async\_send\_to(boost::asio::buffer(send\_buffer\_ptr.get(),\ length),\ to,}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [send\_buffer\_ptr](\textcolor{keyword}{const}\ boost::system::error\_code\&\ \textcolor{comment}{/*ec*/},\ std::size\_t\ \textcolor{comment}{/*bytes\_transferred*/})}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Swallow\ errors.\ \ Currently\ only\ used\ for\ GELF\ logging,\ so\ depend\ on\ local}}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ log\ to\ catch\ anything\ that\ doesn't\ make\ it\ across\ the\ network.}}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \textcolor{comment}{//\ All\ other\ exceptions\ ignored.}}
+\DoxyCodeLine{00058\ \ \ \ \ \}}
+\DoxyCodeLine{00059\ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1udp__socket_a99f7b46a3566de47d7977ce10b674fe1_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1udp__socket_a0f8d1dde4527e6e5c128601586160a53}\index{fc::udp\_socket@{fc::udp\_socket}!send\_to@{send\_to}}
+\index{send\_to@{send\_to}!fc::udp\_socket@{fc::udp\_socket}}
+\doxysubsubsection{\texorpdfstring{send\_to()}{send\_to()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1udp__socket_a0f8d1dde4527e6e5c128601586160a53} 
+void fc\+::udp\+\_\+socket\+::send\+\_\+to (\begin{DoxyParamCaption}\item[{const std\+::shared\+\_\+ptr$<$ const char $>$ \&}]{b}{, }\item[{size\+\_\+t}]{l}{, }\item[{boost\+::asio\+::ip\+::udp\+::endpoint \&}]{to}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{udp__socket_8cpp_source_l00061}{61}} of file \mbox{\hyperlink{udp__socket_8cpp_source}{udp\+\_\+socket.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00063\ \ \ \{}
+\DoxyCodeLine{00064\ \ \ \ \ \textcolor{keywordflow}{try}}
+\DoxyCodeLine{00065\ \ \ \ \ \{}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ my-\/>\_sock-\/>send\_to(boost::asio::buffer(buffer.get(),\ length),\ to);}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00068\ \ \ \ \ \}\ }
+\DoxyCodeLine{00069\ \ \ \ \ \textcolor{keywordflow}{catch}(\textcolor{keyword}{const}\ boost::system::system\_error\&\ e)}
+\DoxyCodeLine{00070\ \ \ \ \ \{}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(e.code()\ ==\ boost::asio::error::would\_block)}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ preserved\_buffer\_ptr\ =\ buffer;}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \ my-\/>\_sock-\/>async\_send\_to(boost::asio::buffer(preserved\_buffer\_ptr.get(),\ length),\ to,}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [preserved\_buffer\_ptr](\textcolor{keyword}{const}\ boost::system::error\_code\&\ \textcolor{comment}{/*ec*/},\ std::size\_t\ \textcolor{comment}{/*bytes\_transferred*/})}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Swallow\ errors.\ \ Currently\ only\ used\ for\ GELF\ logging,\ so\ depend\ on\ local}}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ log\ to\ catch\ anything\ that\ doesn't\ make\ it\ across\ the\ network.}}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \textcolor{comment}{//\ All\ other\ exceptions\ ignored.}}
+\DoxyCodeLine{00082\ \ \ \ \ \}}
+\DoxyCodeLine{00083\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1udp__socket_a65856d35d2beda8da40ab9f916705f21}\index{fc::udp\_socket@{fc::udp\_socket}!set\_reuse\_address@{set\_reuse\_address}}
+\index{set\_reuse\_address@{set\_reuse\_address}!fc::udp\_socket@{fc::udp\_socket}}
+\doxysubsubsection{\texorpdfstring{set\_reuse\_address()}{set\_reuse\_address()}}
+{\footnotesize\ttfamily \label{classfc_1_1udp__socket_a65856d35d2beda8da40ab9f916705f21} 
+void fc\+::udp\+\_\+socket\+::set\+\_\+reuse\+\_\+address (\begin{DoxyParamCaption}\item[{bool}]{s}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{udp__socket_8cpp_source_l00106}{106}} of file \mbox{\hyperlink{udp__socket_8cpp_source}{udp\+\_\+socket.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00107\ \ \ \{}
+\DoxyCodeLine{00108\ \ \ \ \ my-\/>\_sock-\/>set\_option(\ boost::asio::ip::udp::socket::reuse\_address(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})\ );}
+\DoxyCodeLine{00109\ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/network/\mbox{\hyperlink{udp__socket_8hpp}{udp\+\_\+socket.\+hpp}}\item 
+libraries/fc/src/network/\mbox{\hyperlink{udp__socket_8cpp}{udp\+\_\+socket.\+cpp}}\end{DoxyCompactItemize}

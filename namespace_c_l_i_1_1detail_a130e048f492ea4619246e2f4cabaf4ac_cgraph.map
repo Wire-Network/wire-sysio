@@ -1,0 +1,5 @@
+<map id="CLI::detail::value_string" name="CLI::detail::value_string">
+<area shape="rect" id="Node000001" title="for other types just use the regular to_string function" alt="" coords="5,5,126,46"/>
+<area shape="rect" id="Node000002" href="$namespace_c_l_i_1_1detail.html#a0e94052d485636fc9f18c21009026577" title="Convert an object to a string (directly forward if this can become a string)" alt="" coords="174,13,313,38"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="126,23,158,23,158,28,126,28"/>
+</map>

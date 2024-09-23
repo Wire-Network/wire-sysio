@@ -1,0 +1,13 @@
+<map id="Catch::TeamCityReporter::testCaseStarting" name="Catch::TeamCityReporter::testCaseStarting">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,63,176,103"/>
+<area shape="rect" id="Node000002" href="$struct_catch_1_1_team_city_reporter.html#a53d48a56761e2143718317d28680250b" title=" " alt="" coords="225,5,396,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="170,60,214,48,216,53,172,65"/>
+<area shape="rect" id="Node000004" href="$class_catch_1_1_timer.html#a0a56e879e43f36c102bf9ea8b5fc8b72" title=" " alt="" coords="245,70,376,96"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="176,80,229,80,229,86,176,86"/>
+<area shape="rect" id="Node000006" href="$struct_catch_1_1_streaming_reporter_base.html#ad8a773ceb481c17f3cedee3bf65b9820" title=" " alt="" coords="224,120,397,161"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="172,101,216,113,214,118,170,106"/>
+<area shape="rect" id="Node000003" href="$namespace_catch.html#afe4e6770da547e43e9e4eeaa05f946ea" title=" " alt="" coords="472,13,623,38"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="396,23,457,23,457,28,396,28"/>
+<area shape="rect" id="Node000005" href="$namespace_catch.html#a98d058468488c486a9cb5c8463f3ba29" title=" " alt="" coords="445,63,650,103"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="376,80,429,80,429,86,376,86"/>
+</map>

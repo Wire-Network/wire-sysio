@@ -1,0 +1,9 @@
+<map id="nonce_function_bip340_bitflip" name="nonce_function_bip340_bitflip">
+<area shape="rect" id="Node000001" title=" " alt="" coords="475,5,630,46"/>
+<area shape="rect" id="Node000002" href="$schnorrsig_2tests__impl_8h.html#a2ecc08a50eb957a118ff4988f65cf87f" title=" " alt="" coords="293,5,427,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="460,28,428,28,428,23,460,23"/>
+<area shape="rect" id="Node000003" href="$schnorrsig_2tests__impl_8h.html#ac157ab3450c7cca7e46cdc65e8019392" title=" " alt="" coords="103,13,245,38"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="277,28,245,28,245,23,277,23"/>
+<area shape="rect" id="Node000004" href="$tests_8c.html#a3c04138a5bfe5d72780bb7e82a18e627" title=" " alt="" coords="5,13,55,38"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="87,28,55,28,55,23,87,23"/>
+</map>

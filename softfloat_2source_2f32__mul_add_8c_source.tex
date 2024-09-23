@@ -1,0 +1,66 @@
+\doxysection{f32\+\_\+mul\+Add.\+c}
+\hypertarget{softfloat_2source_2f32__mul_add_8c_source}{}\label{softfloat_2source_2f32__mul_add_8c_source}\index{libraries/softfloat/source/f32\_mulAdd.c@{libraries/softfloat/source/f32\_mulAdd.c}}
+\mbox{\hyperlink{softfloat_2source_2f32__mul_add_8c}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f32__mul_add_8c_source_l00001}00001\ }
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f32__mul_add_8c_source_l00002}00002\ \textcolor{comment}{/*============================================================================}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f32__mul_add_8c_source_l00003}00003\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f32__mul_add_8c_source_l00004}00004\ \textcolor{comment}{This\ C\ source\ file\ is\ part\ of\ the\ SoftFloat\ IEEE\ Floating-\/Point\ Arithmetic}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f32__mul_add_8c_source_l00005}00005\ \textcolor{comment}{Package,\ Release\ 3e,\ by\ John\ R.\ Hauser.}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f32__mul_add_8c_source_l00006}00006\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f32__mul_add_8c_source_l00007}00007\ \textcolor{comment}{Copyright\ 2011,\ 2012,\ 2013,\ 2014\ The\ Regents\ of\ the\ University\ of\ California.}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f32__mul_add_8c_source_l00008}00008\ \textcolor{comment}{All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f32__mul_add_8c_source_l00009}00009\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f32__mul_add_8c_source_l00010}00010\ \textcolor{comment}{Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f32__mul_add_8c_source_l00011}00011\ \textcolor{comment}{modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are\ met:}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f32__mul_add_8c_source_l00012}00012\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f32__mul_add_8c_source_l00013}00013\ \textcolor{comment}{\ 1.\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright\ notice,}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f32__mul_add_8c_source_l00014}00014\ \textcolor{comment}{\ \ \ \ this\ list\ of\ conditions,\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f32__mul_add_8c_source_l00015}00015\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f32__mul_add_8c_source_l00016}00016\ \textcolor{comment}{\ 2.\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above\ copyright\ notice,}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f32__mul_add_8c_source_l00017}00017\ \textcolor{comment}{\ \ \ \ this\ list\ of\ conditions,\ and\ the\ following\ disclaimer\ in\ the\ documentation}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f32__mul_add_8c_source_l00018}00018\ \textcolor{comment}{\ \ \ \ and/or\ other\ materials\ provided\ with\ the\ distribution.}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f32__mul_add_8c_source_l00019}00019\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f32__mul_add_8c_source_l00020}00020\ \textcolor{comment}{\ 3.\ Neither\ the\ name\ of\ the\ University\ nor\ the\ names\ of\ its\ contributors\ may}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f32__mul_add_8c_source_l00021}00021\ \textcolor{comment}{\ \ \ \ be\ used\ to\ endorse\ or\ promote\ products\ derived\ from\ this\ software\ without}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f32__mul_add_8c_source_l00022}00022\ \textcolor{comment}{\ \ \ \ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f32__mul_add_8c_source_l00023}00023\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f32__mul_add_8c_source_l00024}00024\ \textcolor{comment}{THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ REGENTS\ AND\ CONTRIBUTORS\ "{}AS\ IS"{},\ AND\ ANY}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f32__mul_add_8c_source_l00025}00025\ \textcolor{comment}{EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ THE\ IMPLIED}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f32__mul_add_8c_source_l00026}00026\ \textcolor{comment}{WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR\ A\ PARTICULAR\ PURPOSE,\ ARE}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f32__mul_add_8c_source_l00027}00027\ \textcolor{comment}{DISCLAIMED.\ \ IN\ NO\ EVENT\ SHALL\ THE\ REGENTS\ OR\ CONTRIBUTORS\ BE\ LIABLE\ FOR\ ANY}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f32__mul_add_8c_source_l00028}00028\ \textcolor{comment}{DIRECT,\ INDIRECT,\ INCIDENTAL,\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f32__mul_add_8c_source_l00029}00029\ \textcolor{comment}{(INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f32__mul_add_8c_source_l00030}00030\ \textcolor{comment}{LOSS\ OF\ USE,\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f32__mul_add_8c_source_l00031}00031\ \textcolor{comment}{ON\ ANY\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f32__mul_add_8c_source_l00032}00032\ \textcolor{comment}{(INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE\ OF\ THIS}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f32__mul_add_8c_source_l00033}00033\ \textcolor{comment}{SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f32__mul_add_8c_source_l00034}00034\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f32__mul_add_8c_source_l00035}00035\ \textcolor{comment}{=============================================================================*/}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f32__mul_add_8c_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f32__mul_add_8c_source_l00037}00037\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{stdint_8h}{stdint.h}}>}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f32__mul_add_8c_source_l00038}00038\ \textcolor{preprocessor}{\#include\ "{}platform.h"{}}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f32__mul_add_8c_source_l00039}00039\ \textcolor{preprocessor}{\#include\ "{}internals.h"{}}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f32__mul_add_8c_source_l00040}00040\ \textcolor{preprocessor}{\#include\ "{}softfloat.h"{}}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f32__mul_add_8c_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f32__mul_add_8c_source_l00042}\mbox{\hyperlink{softfloat_2source_2f32__mul_add_8c_a4ebab08cdac9dbea99a972aca73d9a58}{00042}}\ \mbox{\hyperlink{structfloat32__t}{float32\_t}}\ \mbox{\hyperlink{softfloat_2source_2f32__mul_add_8c_a4ebab08cdac9dbea99a972aca73d9a58}{f32\_mulAdd}}(\ \mbox{\hyperlink{structfloat32__t}{float32\_t}}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \mbox{\hyperlink{structfloat32__t}{float32\_t}}\ b,\ \mbox{\hyperlink{structfloat32__t}{float32\_t}}\ c\ )}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f32__mul_add_8c_source_l00043}00043\ \{}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f32__mul_add_8c_source_l00044}00044\ \ \ \ \ \textcolor{keyword}{union\ }\mbox{\hyperlink{unionui32__f32}{ui32\_f32}}\ uA;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f32__mul_add_8c_source_l00045}00045\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a8f075c759c74e109e8184306c663809d}{uint\_fast32\_t}}\ uiA;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f32__mul_add_8c_source_l00046}00046\ \ \ \ \ \textcolor{keyword}{union\ }\mbox{\hyperlink{unionui32__f32}{ui32\_f32}}\ uB;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f32__mul_add_8c_source_l00047}00047\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a8f075c759c74e109e8184306c663809d}{uint\_fast32\_t}}\ uiB;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f32__mul_add_8c_source_l00048}00048\ \ \ \ \ \textcolor{keyword}{union\ }\mbox{\hyperlink{unionui32__f32}{ui32\_f32}}\ uC;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f32__mul_add_8c_source_l00049}00049\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a8f075c759c74e109e8184306c663809d}{uint\_fast32\_t}}\ uiC;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f32__mul_add_8c_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f32__mul_add_8c_source_l00051}00051\ \ \ \ \ uA.\mbox{\hyperlink{unionui32__f32_a8623a30ee66833362a71aafeb4ad94d0}{f}}\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}};}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f32__mul_add_8c_source_l00052}00052\ \ \ \ \ uiA\ =\ uA.\mbox{\hyperlink{unionui32__f32_a5cb9efb220bdfbf15f278762f0a5a152}{ui}};}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f32__mul_add_8c_source_l00053}00053\ \ \ \ \ uB.\mbox{\hyperlink{unionui32__f32_a8623a30ee66833362a71aafeb4ad94d0}{f}}\ =\ b;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f32__mul_add_8c_source_l00054}00054\ \ \ \ \ uiB\ =\ uB.\mbox{\hyperlink{unionui32__f32_a5cb9efb220bdfbf15f278762f0a5a152}{ui}};}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f32__mul_add_8c_source_l00055}00055\ \ \ \ \ uC.\mbox{\hyperlink{unionui32__f32_a8623a30ee66833362a71aafeb4ad94d0}{f}}\ =\ c;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f32__mul_add_8c_source_l00056}00056\ \ \ \ \ uiC\ =\ uC.\mbox{\hyperlink{unionui32__f32_a5cb9efb220bdfbf15f278762f0a5a152}{ui}};}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f32__mul_add_8c_source_l00057}00057\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a52747e11cdb84e22368603ecd501cb4f}{softfloat\_mulAddF32}}(\ uiA,\ uiB,\ uiC,\ 0\ );}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f32__mul_add_8c_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f32__mul_add_8c_source_l00059}00059\ \}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f32__mul_add_8c_source_l00060}00060\ }
+
+\end{DoxyCode}

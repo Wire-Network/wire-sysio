@@ -1,0 +1,5 @@
+<map id="websocketpp::transport::iostream::error::make_error_code" name="websocketpp::transport::iostream::error::make_error_code">
+<area shape="rect" id="Node000001" title="Get an error code with the given value and the iostream transport category." alt="" coords="5,5,163,61"/>
+<area shape="rect" id="Node000002" href="$namespacewebsocketpp_1_1transport_1_1iostream_1_1error.html#aa502cd242c13ee0710f7ac980e7ac499" title="Get a reference to a static copy of the iostream transport error category." alt="" coords="211,5,368,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="163,30,195,30,195,36,163,36"/>
+</map>

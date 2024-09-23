@@ -1,0 +1,91 @@
+\doxysection{compressed\+\_\+file.\+hpp}
+\hypertarget{compressed__file_8hpp_source}{}\label{compressed__file_8hpp_source}\index{plugins/trace\_api\_plugin/include/sysio/trace\_api/compressed\_file.hpp@{plugins/trace\_api\_plugin/include/sysio/trace\_api/compressed\_file.hpp}}
+\mbox{\hyperlink{compressed__file_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <ios>}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{cfile_8hpp}{fc/io/cfile.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00006}00006\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio_1_1trace__api}{sysio::trace\_api}}\ \{}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00008}00008\ \ \ \ \textcolor{keyword}{class\ }compressed\_file\_datastream;}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00009}00009\ \ \ \ \textcolor{keyword}{struct\ }compressed\_file\_impl;}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00045}\mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file}{00045}}\ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file}{compressed\_file}}\ \{}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00046}00046\ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00047}00047\ \ \ \ \ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file_a5fdfe332d7e3eb5172cae470b4f3a79d}{compressed\_file}}(\ \mbox{\hyperlink{classfc_1_1path}{fc::path}}\ file\_path\ );}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00048}00048\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file_a2026b9b0fe2df13b11dfaaf40aedd35a}{\string~compressed\_file}}();}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00053}\mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file_aa43d25bfaa1a30c6ef22cc360f62b63e}{00053}}\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file_aa43d25bfaa1a30c6ef22cc360f62b63e}{compressed\_file}}(\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file}{compressed\_file}}\&\&\ );}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00054}\mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file_a5941ad2a4c3d0d7266066dbef9da3ac0}{00054}}\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file}{compressed\_file}}\&\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file_a5941ad2a4c3d0d7266066dbef9da3ac0}{operator=\ }}(\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file}{compressed\_file}}\&\&\ );}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00060}\mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file_a60bbc15f410f26e006eb0784274d3153}{00060}}\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file_a60bbc15f410f26e006eb0784274d3153}{open}}()\ \{}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00061}00061\ \ \ \ \ \ \ \ \ \ file\_ptr\ =\ std::make\_unique<fc::cfile>();}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00062}00062\ \ \ \ \ \ \ \ \ \ file\_ptr-\/>set\_file\_path(file\_path);}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00063}00063\ \ \ \ \ \ \ \ \ \ file\_ptr-\/>open(\textcolor{stringliteral}{"{}rb"{}});}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00064}00064\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00071}\mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file_ad349cd587ff22a33f1506dd9dc128469}{00071}}\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file_ad349cd587ff22a33f1506dd9dc128469}{is\_open}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ (\textcolor{keywordtype}{bool})file\_ptr;\ \}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00079}00079\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file_abe66c8be1c43c60b6ec0b6e6e428a519}{seek}}(\ \textcolor{keywordtype}{long}\ loc\ );}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00080}00080\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00091}00091\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file_ace042e7a3a61ed1d44a78e4b379fd961}{read}}(\ \textcolor{keywordtype}{char}*\ d,\ \textcolor{keywordtype}{size\_t}\ n\ );}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00092}00092\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00096}\mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file_a52668007d25517d2e509717fbfe7ad7e}{00096}}\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file_a52668007d25517d2e509717fbfe7ad7e}{close}}()\ \{}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00097}00097\ \ \ \ \ \ \ \ \ \ file\_ptr.reset();}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00098}00098\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00099}00099\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00104}\mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file_aaef7114db1937a1ea544e5a2bec03fdd}{00104}}\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file_aaef7114db1937a1ea544e5a2bec03fdd}{get\_file\_path}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00105}00105\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ file\_path;}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00106}00106\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00107}00107\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00108}00108\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file__datastream}{compressed\_file\_datastream}}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file_a13af09462f7b08bc4e4f0a3e486dff8d}{create\_datastream}}();}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00109}00109\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00120}00120\ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file_ab13021e139e2ee1be1e38e84499810e2}{process}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1path}{fc::path}}\&\ input\_path,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1path}{fc::path}}\&\ output\_path,\ \textcolor{keywordtype}{size\_t}\ seek\_point\_stride\ );}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00121}00121\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00122}00122\ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00123}00123\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1path}{fc::path}}\ file\_path;}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00124}00124\ \ \ \ \ \ \ std::unique\_ptr<fc::cfile>\ file\_ptr;}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00125}00125\ \ \ \ \ \ \ std::unique\_ptr<compressed\_file\_impl>\ impl;}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00126}00126\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00127}00127\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00128}00128\ \ \ \ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00129}00129\ \textcolor{comment}{\ \ \ \ *\ \ @brief\ datastream\ adapter\ that\ adapts\ cfile\ for\ use\ with\ fc\ unpack}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00130}00130\ \textcolor{comment}{\ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00131}00131\ \textcolor{comment}{\ \ \ \ *\ \ This\ class\ supports\ unpack\ functionality\ but\ not\ pack.}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00132}00132\ \textcolor{comment}{\ \ \ \ */}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00133}\mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file__datastream}{00133}}\ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file__datastream}{compressed\_file\_datastream}}\ \{}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00134}00134\ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00135}\mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file__datastream_a3e3ef371ef84daba4206f34f9c284a82}{00135}}\ \ \ \ \ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file__datastream_a3e3ef371ef84daba4206f34f9c284a82}{compressed\_file\_datastream}}(\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file}{compressed\_file}}\&\ cf\ )\ :\ cf(cf)\ \{\}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00136}00136\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00137}\mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file__datastream_a238358d8e084ea494c83da72393ff107}{00137}}\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file__datastream_a238358d8e084ea494c83da72393ff107}{skip}}(\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00138}00138\ \ \ \ \ \ \ \ \ \ std::vector<char>\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ );}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00139}00139\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file__datastream_a55bd3c1d338283533a68326e380c85d4}{read}}(\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}[0],\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ );}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00140}00140\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00141}00141\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00142}\mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file__datastream_a55bd3c1d338283533a68326e380c85d4}{00142}}\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file__datastream_a55bd3c1d338283533a68326e380c85d4}{read}}(\ \textcolor{keywordtype}{char}*\ d,\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00143}00143\ \ \ \ \ \ \ \ \ \ cf.\mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file_ace042e7a3a61ed1d44a78e4b379fd961}{read}}(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ );}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00144}00144\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00145}00145\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00146}00146\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00147}\mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file__datastream_ad3c1a5566f4f6d79ee51bf3bc3eb6539}{00147}}\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file__datastream_ad3c1a5566f4f6d79ee51bf3bc3eb6539}{get}}(\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\&\ c\ )\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file__datastream_ad3c1a5566f4f6d79ee51bf3bc3eb6539}{get}}(\ *(\textcolor{keywordtype}{char}*)\&c\ );\ \}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00148}00148\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00149}\mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file__datastream_a1c0d56b1c688f6e0aa79aa59d9f78833}{00149}}\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file__datastream_a1c0d56b1c688f6e0aa79aa59d9f78833}{get}}(\ \textcolor{keywordtype}{char}\&\ c\ )\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file__datastream_a55bd3c1d338283533a68326e380c85d4}{read}}(\&c,\ 1);\ \}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00150}00150\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00151}00151\ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00152}00152\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file}{compressed\_file}}\&\ cf;}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00153}00153\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00154}00154\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00155}\mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file_a13af09462f7b08bc4e4f0a3e486dff8d}{00155}}\ \ \ \ \textcolor{keyword}{inline}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file__datastream}{compressed\_file\_datastream}}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file_a13af09462f7b08bc4e4f0a3e486dff8d}{compressed\_file::create\_datastream}}()\ \{}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00156}00156\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file__datastream}{compressed\_file\_datastream}}(*\textcolor{keyword}{this});}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00157}00157\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00158}00158\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00163}\mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file__error}{00163}}\ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file__error}{compressed\_file\_error}}\ :\ \textcolor{keyword}{public}\ std::runtime\_error\ \{}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00164}00164\ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00165}00165\ \ \ \ \ \ \ \textcolor{keyword}{using\ }std::runtime\_error::runtime\_error;}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00166}00166\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00167}00167\ }
+\DoxyCodeLine{\Hypertarget{compressed__file_8hpp_source_l00168}00168\ \}}
+
+\end{DoxyCode}

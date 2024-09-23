@@ -1,0 +1,26 @@
+<map id="internal::Swap" name="internal::Swap">
+<area shape="rect" id="Node000001" title="Custom swap() to avoid dependency on C++ &lt;algorithm&gt; header." alt="" coords="520,56,625,82"/>
+<area shape="rect" id="Node000002" href="$class_generic_document.html#a1c3ab2d23fcced40fced7409b9d4a1d2" title="Exchange the contents of this document with those of another." alt="" coords="109,5,276,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="510,54,472,46,370,33,276,25,277,20,371,27,473,41,511,49"/>
+<area shape="rect" id="Node000004" href="$class_generic_pointer.html#af148818f7c2b10243221953d887044c6" title="Swap the content of this pointer with an other." alt="" coords="324,129,472,155"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="527,91,432,131,430,126,525,86"/>
+<area shape="rect" id="Node000012" href="$classinternal_1_1_stack.html#a5e601199a21d84b1ac612f558be0f2c3" title=" " alt="" coords="325,56,471,82"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="505,72,472,72,472,66,505,66"/>
+<area shape="rect" id="Node000003" href="$documenttest_8cpp.html#a4a57d7460a1292e90944832a90aa7070" title=" " alt="" coords="5,5,61,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="93,21,61,21,61,16,93,16"/>
+<area shape="rect" id="Node000005" href="$pointer_8h.html#a33c56cdd1034a750112e81df6c4e653a" title=" " alt="" coords="121,55,264,80"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="353,125,275,94,242,83,244,78,277,89,355,120"/>
+<area shape="rect" id="Node000006" href="$pointer_8h.html#abd25c9d96f8e5002f93f998cf11905a3" title=" " alt="" coords="121,104,264,130"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="308,134,264,128,265,123,309,128"/>
+<area shape="rect" id="Node000007" href="$pointer_8h.html#a8f368fc6d5e55f6f0a5ea5e2af7ea23f" title=" " alt="" coords="121,153,264,179"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="309,155,265,160,264,155,308,150"/>
+<area shape="rect" id="Node000008" href="$pointer_8h.html#a542981a8bdcf3bc3c701c7eff39648ac" title=" " alt="" coords="121,203,264,228"/>
+<area shape="poly" id="edge7_Node000004_Node000008" title=" " alt="" coords="353,164,277,194,244,205,242,200,275,189,351,159"/>
+<area shape="rect" id="Node000011" href="$pointertest_8cpp.html#a850b5ef6bb119da1eaec4bfb06bd3a83" title=" " alt="" coords="165,252,220,278"/>
+<area shape="poly" id="edge10_Node000004_Node000011" title=" " alt="" coords="375,168,332,206,277,243,249,255,221,262,220,257,247,250,275,238,329,202,372,164"/>
+<area shape="rect" id="Node000009" href="$pointertest_8cpp.html#afeb479140b7555fae2822585794ffc9f" title=" " alt="" coords="5,179,61,204"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="105,205,61,198,62,193,106,200"/>
+<area shape="rect" id="Node000010" href="$pointertest_8cpp.html#ae77ef998f1d9c1e2fad3bd688faa422f" title=" " alt="" coords="5,228,61,254"/>
+<area shape="poly" id="edge9_Node000008_Node000010" title=" " alt="" coords="106,232,62,239,61,234,105,227"/>
+<area shape="poly" id="edge12_Node000012_Node000002" title=" " alt="" coords="328,54,247,34,248,29,329,49"/>
+</map>

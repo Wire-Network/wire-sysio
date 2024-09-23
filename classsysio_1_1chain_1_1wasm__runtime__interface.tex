@@ -1,0 +1,78 @@
+\doxysection{sysio\+::chain\+::wasm\+\_\+runtime\+\_\+interface Class Reference}
+\hypertarget{classsysio_1_1chain_1_1wasm__runtime__interface}{}\label{classsysio_1_1chain_1_1wasm__runtime__interface}\index{sysio::chain::wasm\_runtime\_interface@{sysio::chain::wasm\_runtime\_interface}}
+
+
+{\ttfamily \#include $<$runtime\+\_\+interface.\+hpp$>$}
+
+
+
+Inheritance diagram for sysio\+::chain\+::wasm\+\_\+runtime\+\_\+interface\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1wasm__runtime__interface__inherit__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual std\+::unique\+\_\+ptr$<$ \mbox{\hyperlink{classsysio_1_1chain_1_1wasm__instantiated__module__interface}{wasm\+\_\+instantiated\+\_\+module\+\_\+interface}} $>$ \mbox{\hyperlink{classsysio_1_1chain_1_1wasm__runtime__interface_a79e2ff303be06eb3029125857756e441}{instantiate\+\_\+module}} (const char \texorpdfstring{$\ast$}{*}code\+\_\+bytes, size\+\_\+t code\+\_\+size, std\+::vector$<$ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} $>$ initial\+\_\+memory, const \mbox{\hyperlink{namespacesysio_1_1chain_a357fd9478475457e5bb386a3143079b6}{digest\+\_\+type}} \&code\+\_\+hash, const \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \&\mbox{\hyperlink{classsysio_1_1chain_1_1wasm__interface_a9053d9e65167e5f241f1f3f27b175f9c}{vm\+\_\+type}}, const \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \&vm\+\_\+version)=0
+\item 
+virtual void \mbox{\hyperlink{classsysio_1_1chain_1_1wasm__runtime__interface_aea114b41a2997e44fef7adb0a1877740}{immediately\+\_\+exit\+\_\+currently\+\_\+running\+\_\+module}} ()=0
+\item 
+virtual \mbox{\hyperlink{classsysio_1_1chain_1_1wasm__runtime__interface_ab9681628db17cab5fd9c9f878f17bf52}{\texorpdfstring{$\sim$}{\string~}wasm\+\_\+runtime\+\_\+interface}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{runtime__interface_8hpp_source_l00021}{21}} of file \mbox{\hyperlink{runtime__interface_8hpp_source}{runtime\+\_\+interface.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classsysio_1_1chain_1_1wasm__runtime__interface_ab9681628db17cab5fd9c9f878f17bf52}\index{sysio::chain::wasm\_runtime\_interface@{sysio::chain::wasm\_runtime\_interface}!````~wasm\_runtime\_interface@{\texorpdfstring{$\sim$}{\string~}wasm\_runtime\_interface}}
+\index{````~wasm\_runtime\_interface@{\texorpdfstring{$\sim$}{\string~}wasm\_runtime\_interface}!sysio::chain::wasm\_runtime\_interface@{sysio::chain::wasm\_runtime\_interface}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}wasm\_runtime\_interface()}{\string~wasm\_runtime\_interface()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1wasm__runtime__interface_ab9681628db17cab5fd9c9f878f17bf52} 
+sysio\+::chain\+::wasm\+\_\+runtime\+\_\+interface\+::\texorpdfstring{$\sim$}{\string~}wasm\+\_\+runtime\+\_\+interface (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__interface_8cpp_source_l00112}{112}} of file \mbox{\hyperlink{wasm__interface_8cpp_source}{wasm\+\_\+interface.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00112\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1chain_1_1wasm__runtime__interface_aea114b41a2997e44fef7adb0a1877740}\index{sysio::chain::wasm\_runtime\_interface@{sysio::chain::wasm\_runtime\_interface}!immediately\_exit\_currently\_running\_module@{immediately\_exit\_currently\_running\_module}}
+\index{immediately\_exit\_currently\_running\_module@{immediately\_exit\_currently\_running\_module}!sysio::chain::wasm\_runtime\_interface@{sysio::chain::wasm\_runtime\_interface}}
+\doxysubsubsection{\texorpdfstring{immediately\_exit\_currently\_running\_module()}{immediately\_exit\_currently\_running\_module()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1wasm__runtime__interface_aea114b41a2997e44fef7adb0a1877740} 
+virtual void sysio\+::chain\+::wasm\+\_\+runtime\+\_\+interface\+::immediately\+\_\+exit\+\_\+currently\+\_\+running\+\_\+module (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1eos__vm__profile__runtime_a9f720e2a8f2a9331939425ff2dc3e12a}{sysio\+::chain\+::webassembly\+::eos\+\_\+vm\+\_\+runtime\+::eos\+\_\+vm\+\_\+profile\+\_\+runtime}}, \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1eos__vm__runtime_afdcfba1cdfc2fced68f0ecd2b9355546}{sysio\+::chain\+::webassembly\+::eos\+\_\+vm\+\_\+runtime\+::eos\+\_\+vm\+\_\+runtime$<$ Backend $>$}}, \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1eos__vm__runtime_afdcfba1cdfc2fced68f0ecd2b9355546}{sysio\+::chain\+::webassembly\+::eos\+\_\+vm\+\_\+runtime\+::eos\+\_\+vm\+\_\+runtime$<$ Impl $>$}}, and \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1eosvmoc_1_1eosvmoc__runtime_a59eb72e85d6a99e0d1afcfa6d624425f}{sysio\+::chain\+::webassembly\+::eosvmoc\+::eosvmoc\+\_\+runtime}}.
+
+\Hypertarget{classsysio_1_1chain_1_1wasm__runtime__interface_a79e2ff303be06eb3029125857756e441}\index{sysio::chain::wasm\_runtime\_interface@{sysio::chain::wasm\_runtime\_interface}!instantiate\_module@{instantiate\_module}}
+\index{instantiate\_module@{instantiate\_module}!sysio::chain::wasm\_runtime\_interface@{sysio::chain::wasm\_runtime\_interface}}
+\doxysubsubsection{\texorpdfstring{instantiate\_module()}{instantiate\_module()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1wasm__runtime__interface_a79e2ff303be06eb3029125857756e441} 
+virtual std\+::unique\+\_\+ptr$<$ \mbox{\hyperlink{classsysio_1_1chain_1_1wasm__instantiated__module__interface}{wasm\+\_\+instantiated\+\_\+module\+\_\+interface}} $>$ sysio\+::chain\+::wasm\+\_\+runtime\+\_\+interface\+::instantiate\+\_\+module (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{code\+\_\+bytes}{, }\item[{size\+\_\+t}]{code\+\_\+size}{, }\item[{std\+::vector$<$ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} $>$}]{initial\+\_\+memory}{, }\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_a357fd9478475457e5bb386a3143079b6}{digest\+\_\+type}} \&}]{code\+\_\+hash}{, }\item[{const \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \&}]{vm\+\_\+type}{, }\item[{const \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \&}]{vm\+\_\+version}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1eos__vm__profile__runtime_af853b4e270fb9c3149372f382bdd1965}{sysio\+::chain\+::webassembly\+::eos\+\_\+vm\+\_\+runtime\+::eos\+\_\+vm\+\_\+profile\+\_\+runtime}}, \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1eos__vm__runtime_abd9f9c14ce5a8ffc2dc66457bd3f2d39}{sysio\+::chain\+::webassembly\+::eos\+\_\+vm\+\_\+runtime\+::eos\+\_\+vm\+\_\+runtime$<$ Backend $>$}}, \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1eos__vm__runtime_abd9f9c14ce5a8ffc2dc66457bd3f2d39}{sysio\+::chain\+::webassembly\+::eos\+\_\+vm\+\_\+runtime\+::eos\+\_\+vm\+\_\+runtime$<$ Impl $>$}}, and \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1eosvmoc_1_1eosvmoc__runtime_af7460702c0379d0cb629890b6eaec9b6}{sysio\+::chain\+::webassembly\+::eosvmoc\+::eosvmoc\+\_\+runtime}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/webassembly/\mbox{\hyperlink{runtime__interface_8hpp}{runtime\+\_\+interface.\+hpp}}\item 
+libraries/chain/\mbox{\hyperlink{wasm__interface_8cpp}{wasm\+\_\+interface.\+cpp}}\end{DoxyCompactItemize}

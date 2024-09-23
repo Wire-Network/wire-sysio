@@ -1,0 +1,5 @@
+<map id="websocketpp::frame::get_masking_key_offset" name="websocketpp::frame::get_masking_key_offset">
+<area shape="rect" id="Node000001" title="Calculate the offset location of the masking key within the extended header." alt="" coords="5,5,177,46"/>
+<area shape="rect" id="Node000002" href="$namespacewebsocketpp_1_1frame.html#a2ceb63e6a2fe19964d13363ba2bb9e15" title="Extracts the raw payload length specified in the basic header." alt="" coords="225,5,364,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="177,23,209,23,209,28,177,28"/>
+</map>

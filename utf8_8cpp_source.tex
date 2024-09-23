@@ -1,0 +1,91 @@
+\doxysection{utf8.\+cpp}
+\hypertarget{utf8_8cpp_source}{}\label{utf8_8cpp_source}\index{libraries/fc/src/utf8.cpp@{libraries/fc/src/utf8.cpp}}
+\mbox{\hyperlink{utf8_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{utf8_8hpp}{fc/utf8.hpp}}"{}}}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{checked_8h}{utf8/checked.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{core_8h}{utf8/core.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{logger_8hpp}{fc/log/logger.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{exception_8hpp}{fc/exception/exception.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00009}00009\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}\ \{}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00011}\mbox{\hyperlink{namespacefc_aee9c37dc6335ffdecd0fc7fc200320d8}{00011}}\ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{namespacefc_aee9c37dc6335ffdecd0fc7fc200320d8}{hex\_digits}}[]\ =\ \textcolor{stringliteral}{"{}0123456789abcdef"{}};}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00013}\mbox{\hyperlink{namespacefc_aaf4d63bbbb10975bd89ddfd661733f5f}{00013}}\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacefc_aaf4d63bbbb10975bd89ddfd661733f5f}{is\_utf8}}(\ \textcolor{keyword}{const}\ std::string\&\ str\ )}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00014}00014\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00015}00015\ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespaceutf8_add2dbec3d058aa66500ec4f97cc8174b}{utf8::is\_valid}}(\ str.begin(),\ str.end()\ );}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00016}00016\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00018}00018\ \ \ \ \textcolor{comment}{//\ tweaked\ utf8::find\_invalid\ that\ also\ considers\ provided\ range\ as\ invalid}}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00019}00019\ \ \ \ \textcolor{comment}{//\ @param\ invalid\_range,\ indicates\ additional\ invalid\ values}}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00020}00020\ \ \ \ \textcolor{comment}{//\ @return\ [iterator\ to\ found\ invalid\ char,\ the\ value\ found\ if\ in\ range\ of\ provided\ pair\ invalid\_range\ otherwise\ UINT32\_MAX]}}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00021}00021\ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ octet\_iterator>}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00022}\mbox{\hyperlink{namespacefc_afdd13a1463953f18fde2fa891cb5231e}{00022}}\ \ \ \ std::pair<octet\_iterator,\ uint32\_t>\ \mbox{\hyperlink{namespacefc_afdd13a1463953f18fde2fa891cb5231e}{find\_invalid}}(octet\_iterator\ start,\ octet\_iterator\ end,}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00023}00023\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::pair<uint32\_t,\ uint32\_t>\&\ invalid\_range)}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00024}00024\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00025}00025\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ invalid\_range.first\ <=\ invalid\_range.second\ );}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00026}00026\ \ \ \ \ \ \ octet\_iterator\ result\ =\ start;}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00027}00027\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ =\ \mbox{\hyperlink{stdint_8h_ab5eb23180f7cc12b7d6c04a8ec067fdd}{UINT32\_MAX}};}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00028}00028\ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\ result\ !=\ end\ )\ \{}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00029}00029\ \ \ \ \ \ \ \ \ \ octet\_iterator\ itr\ =\ result;}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00030}00030\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceutf8_1_1internal_a9e96c2bc98b37e336b787a281090392c}{utf8::internal::utf\_error}}\ err\_code\ =\ \mbox{\hyperlink{namespaceutf8_1_1internal_abe95547575fcc81911e381df03f8ebfe}{utf8::internal::validate\_next}}(\ result,\ end,\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ );}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00031}00031\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ err\_code\ !=\ \mbox{\hyperlink{namespaceutf8_1_1internal_a9e96c2bc98b37e336b787a281090392cac4d854b29be6992e66c957cf4b957cca}{utf8::internal::UTF8\_OK}}\ )}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00032}00032\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{result,\ \mbox{\hyperlink{stdint_8h_ab5eb23180f7cc12b7d6c04a8ec067fdd}{UINT32\_MAX}}\};}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00033}00033\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ >=\ invalid\_range.first\ \&\&\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ <=\ invalid\_range.second\ )}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00034}00034\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{itr,\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\};}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00035}00035\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00036}00036\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{result,\ \mbox{\hyperlink{stdint_8h_ab5eb23180f7cc12b7d6c04a8ec067fdd}{UINT32\_MAX}}\};}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00037}00037\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00040}\mbox{\hyperlink{namespacefc_a47ce6fdd4f18f7f06601e820866d54ec}{00040}}\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacefc_a47ce6fdd4f18f7f06601e820866d54ec}{is\_valid\_utf8}}(\ \textcolor{keyword}{const}\ std::string\_view\&\ str\ )\ \{}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00041}00041\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ invalid\_range\ =\ std::make\_pair<uint32\_t,\ uint32\_t>(0x80,\ 0x9F);}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00042}00042\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ [itr,\ v]\ =\ \mbox{\hyperlink{namespacefc_afdd13a1463953f18fde2fa891cb5231e}{find\_invalid}}(\ str.begin(),\ str.end(),\ invalid\_range\ );}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00043}00043\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ itr\ ==\ str.end();}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00044}00044\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00046}00046\ \ \ \ \textcolor{comment}{//\ escape\ 0x80-\/0x9F\ C1\ control\ characters}}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00047}\mbox{\hyperlink{namespacefc_afdef7bae8756a2c4ba14524f5913d485}{00047}}\ \ \ \ \textcolor{keywordtype}{string}\ \mbox{\hyperlink{namespacefc_afdef7bae8756a2c4ba14524f5913d485}{prune\_invalid\_utf8}}(\ \textcolor{keyword}{const}\ std::string\_view\&\ str\ )\ \{}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00048}00048\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ invalid\_range\ =\ std::make\_pair<uint32\_t,\ uint32\_t>(0x80,\ 0x9F);}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00049}00049\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ [itr,\ v]\ =\ \mbox{\hyperlink{namespacefc_afdd13a1463953f18fde2fa891cb5231e}{find\_invalid}}(\ str.begin(),\ str.end(),\ invalid\_range\ );}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00050}00050\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr\ ==\ str.end()\ )\ \textcolor{keywordflow}{return}\ std::string(\ str\ );}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00052}00052\ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ result;}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00053}00053\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ escape\ =\ [\&result](\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ v)\ \{\ \textcolor{comment}{//\ v\ is\ [0x80-\/0x9F]}}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00054}00054\ \ \ \ \ \ \ \ \ \ result\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)u00"{}};}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00055}00055\ \ \ \ \ \ \ \ \ \ result\ +=\ \mbox{\hyperlink{namespacefc_aee9c37dc6335ffdecd0fc7fc200320d8}{hex\_digits}}[v\ >>\ 4u];}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00056}00056\ \ \ \ \ \ \ \ \ \ result\ +=\ \mbox{\hyperlink{namespacefc_aee9c37dc6335ffdecd0fc7fc200320d8}{hex\_digits}}[v\ \&\ 15u];}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00057}00057\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00059}00059\ \ \ \ \ \ \ result\ =\ \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}}(\ str.begin(),\ itr\ );}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00060}00060\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ v\ !=\ \mbox{\hyperlink{stdint_8h_ab5eb23180f7cc12b7d6c04a8ec067fdd}{UINT32\_MAX}}\ )\ escape(v);}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00061}00061\ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\ itr\ !=\ str.end()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00062}00062\ \ \ \ \ \ \ \ \ \ ++itr;}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ start\ =\ itr;}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00064}00064\ \ \ \ \ \ \ \ \ \ std::tie(itr,\ v)\ =\ \mbox{\hyperlink{namespacefc_afdd13a1463953f18fde2fa891cb5231e}{find\_invalid}}(\ start,\ str.end(),\ invalid\_range\ );}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00065}00065\ \ \ \ \ \ \ \ \ \ result\ +=\ \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}}(\ start,\ itr\ );}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00066}00066\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ v\ !=\ \mbox{\hyperlink{stdint_8h_ab5eb23180f7cc12b7d6c04a8ec067fdd}{UINT32\_MAX}}\ )\ escape(v);}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00067}00067\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00068}00068\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00069}00069\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00071}\mbox{\hyperlink{namespacefc_a440b80d7907f475f1380eb76f054ed05}{00071}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefc_a440b80d7907f475f1380eb76f054ed05}{decodeUtf8}}(\textcolor{keyword}{const}\ std::string\&\ input,\ std::wstring*\ storage)}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00072}00072\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00073}00073\ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(storage\ !=\ \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00074}00074\ }
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00075}00075\ \ \ \ \ \ \mbox{\hyperlink{namespaceutf8_a8020ed399788dca779663adf061ed718}{utf8::utf8to32}}(input.begin(),\ input.end(),\ std::back\_inserter(*storage));}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00076}00076\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00077}00077\ }
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00078}\mbox{\hyperlink{namespacefc_a929646b3a8b7feb5688409ddef1897c9}{00078}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefc_a929646b3a8b7feb5688409ddef1897c9}{encodeUtf8}}(\textcolor{keyword}{const}\ std::wstring\&\ input,\ std::string*\ storage)}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00079}00079\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00080}00080\ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(storage\ !=\ \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00081}00081\ }
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00082}00082\ \ \ \ \ \ \mbox{\hyperlink{namespaceutf8_a4a1157ef2f85d4bc8366dbbea20dcb48}{utf8::utf32to8}}(input.begin(),\ input.end(),\ std::back\_inserter(*storage));}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00083}00083\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00084}00084\ }
+\DoxyCodeLine{\Hypertarget{utf8_8cpp_source_l00085}00085\ \}\ }
+
+\end{DoxyCode}

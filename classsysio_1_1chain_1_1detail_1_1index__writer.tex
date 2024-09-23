@@ -1,0 +1,91 @@
+\doxysection{sysio\+::chain\+::detail\+::index\+\_\+writer Class Reference}
+\hypertarget{classsysio_1_1chain_1_1detail_1_1index__writer}{}\label{classsysio_1_1chain_1_1detail_1_1index__writer}\index{sysio::chain::detail::index\_writer@{sysio::chain::detail::index\_writer}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classsysio_1_1chain_1_1detail_1_1index__writer_ade0ac8ad46ae1d6a4632f4d31d4e7227}{index\+\_\+writer}} (const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&block\+\_\+index\+\_\+name, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} blocks\+\_\+expected)
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1detail_1_1index__writer_ad6abf27e905b98a467d19c81782e521e}{write}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} pos)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{block__log_8cpp_source_l00177}{177}} of file \mbox{\hyperlink{block__log_8cpp_source}{block\+\_\+log.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classsysio_1_1chain_1_1detail_1_1index__writer_ade0ac8ad46ae1d6a4632f4d31d4e7227}\index{sysio::chain::detail::index\_writer@{sysio::chain::detail::index\_writer}!index\_writer@{index\_writer}}
+\index{index\_writer@{index\_writer}!sysio::chain::detail::index\_writer@{sysio::chain::detail::index\_writer}}
+\doxysubsubsection{\texorpdfstring{index\_writer()}{index\_writer()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1detail_1_1index__writer_ade0ac8ad46ae1d6a4632f4d31d4e7227} 
+sysio\+::chain\+::detail\+::index\+\_\+writer\+::index\+\_\+writer (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&}]{block\+\_\+index\+\_\+name}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{blocks\+\_\+expected}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{block__log_8cpp_source_l01139}{1139}} of file \mbox{\hyperlink{block__log_8cpp_source}{block\+\_\+log.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01140\ \ \ \ :\ \_blocks\_remaining(blocks\_expected)\ \{}
+\DoxyCodeLine{01141\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ file\_sz\ =\ blocks\_expected*\textcolor{keyword}{sizeof}(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}});}
+\DoxyCodeLine{01142\ }
+\DoxyCodeLine{01143\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1cfile}{fc::cfile}}\ file;}
+\DoxyCodeLine{01144\ \ \ \ \ \ \ file.\mbox{\hyperlink{classfc_1_1cfile_ac4a0191d7846c07a907d3c7eb35e848d}{set\_file\_path}}(block\_index\_name);}
+\DoxyCodeLine{01145\ \ \ \ \ \ \ file.open(\mbox{\hyperlink{block__log_8cpp_ac45b3ac31205498f15768648d162af9c}{LOG\_WRITE\_C}});}
+\DoxyCodeLine{01146\ \ \ \ \ \ \ file.close();}
+\DoxyCodeLine{01147\ }
+\DoxyCodeLine{01148\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_ab25ea24552f2c490047c335a102f12fc}{fc::resize\_file}}(block\_index\_name,\ file\_sz);}
+\DoxyCodeLine{01149\ \ \ \ \ \ \ \_file.emplace(block\_index\_name.\mbox{\hyperlink{classfc_1_1path_aaf0107e4a41f9977032b2a604161cf85}{string}}().c\_str(),\ boost::interprocess::read\_write);}
+\DoxyCodeLine{01150\ \ \ \ \ \ \ \_mapped\_file\_region.emplace(*\_file,\ boost::interprocess::read\_write);}
+\DoxyCodeLine{01151\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1detail_1_1index__writer_ade0ac8ad46ae1d6a4632f4d31d4e7227_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1chain_1_1detail_1_1index__writer_ad6abf27e905b98a467d19c81782e521e}\index{sysio::chain::detail::index\_writer@{sysio::chain::detail::index\_writer}!write@{write}}
+\index{write@{write}!sysio::chain::detail::index\_writer@{sysio::chain::detail::index\_writer}}
+\doxysubsubsection{\texorpdfstring{write()}{write()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1detail_1_1index__writer_ad6abf27e905b98a467d19c81782e521e} 
+void sysio\+::chain\+::detail\+::index\+\_\+writer\+::write (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{pos}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{block__log_8cpp_source_l01153}{1153}} of file \mbox{\hyperlink{block__log_8cpp_source}{block\+\_\+log.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01153\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01154\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ \_blocks\_remaining,\ block\_log\_exception,\ \textcolor{stringliteral}{"{}No\ more\ blocks\ were\ expected\ for\ the\ block\ log\ index"{}}\ );}
+\DoxyCodeLine{01155\ }
+\DoxyCodeLine{01156\ \ \ \ \ \ \ \textcolor{keywordtype}{char}*\ base\ =\ (\textcolor{keywordtype}{char}*)\_mapped\_file\_region-\/>get\_address();}
+\DoxyCodeLine{01157\ \ \ \ \ \ \ base\ +=\ -\/-\/\_blocks\_remaining*\textcolor{keyword}{sizeof}(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}});}
+\DoxyCodeLine{01158\ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(base,\ \&pos,\ \textcolor{keyword}{sizeof}(pos));}
+\DoxyCodeLine{01159\ }
+\DoxyCodeLine{01160\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((\_blocks\_remaining\ \&\ 0xfffff)\ ==\ 0)}
+\DoxyCodeLine{01161\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\textcolor{stringliteral}{"{}blocks\ remaining\ to\ index:\ \$\{blocks\_left\}\ \ \ \ \ \ position\ in\ log\ file:\ \$\{pos\}"{}},\ (\textcolor{stringliteral}{"{}blocks\_left"{}},\ \_blocks\_remaining)(\textcolor{stringliteral}{"{}pos"{}},pos));}
+\DoxyCodeLine{01162\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=271pt]{classsysio_1_1chain_1_1detail_1_1index__writer_ad6abf27e905b98a467d19c81782e521e_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/\mbox{\hyperlink{block__log_8cpp}{block\+\_\+log.\+cpp}}\end{DoxyCompactItemize}

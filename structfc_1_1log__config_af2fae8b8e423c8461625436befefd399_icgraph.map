@@ -1,0 +1,8 @@
+<map id="fc::log_config::register_appender" name="fc::log_config::register_appender">
+<area shape="rect" id="Node000001" title=" " alt="" coords="403,29,553,70"/>
+<area shape="poly" id="edge3_Node000001_Node000001" title=" " alt="" coords="511,16,499,10,478,8,459,10,447,15,443,20,445,28,440,29,438,19,444,10,458,5,478,3,500,5,513,11"/>
+<area shape="rect" id="Node000002" href="$structfc_1_1log__config.html#ab138cc4a9407572e229398244e976a90" title=" " alt="" coords="195,29,355,70"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="388,52,355,52,355,47,388,47"/>
+<area shape="rect" id="Node000003" href="$namespacefc.html#ace3814ab7420ae02c6ed8876e7c5c570" title=" " alt="" coords="5,37,147,62"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="179,52,147,52,147,47,179,47"/>
+</map>

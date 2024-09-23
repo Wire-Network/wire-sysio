@@ -1,0 +1,168 @@
+\doxysection{libraries/sys-\/vm/include/sysio/sysio/vm/variant.hpp File Reference}
+\hypertarget{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp}{}\label{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp}\index{libraries/sys-\/vm/include/sysio/sysio/vm/variant.hpp@{libraries/sys-\/vm/include/sysio/sysio/vm/variant.hpp}}
+{\ttfamily \#include $<$sysio/vm/exceptions.\+hpp$>$}\newline
+{\ttfamily \#include $<$cstddef$>$}\newline
+{\ttfamily \#include $<$cstdint$>$}\newline
+{\ttfamily \#include $<$algorithm$>$}\newline
+{\ttfamily \#include $<$limits$>$}\newline
+{\ttfamily \#include $<$tuple$>$}\newline
+{\ttfamily \#include $<$type\+\_\+traits$>$}\newline
+{\ttfamily \#include $<$variant$>$}\newline
+{\ttfamily \#include $<$utility$>$}\newline
+Include dependency graph for variant.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1dispatcher_3_01false_00_01_ret_01_4}{sysio\+::vm\+::detail\+::dispatcher$<$ false, Ret $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1dispatcher_3_01true_00_01_ret_01_4}{sysio\+::vm\+::detail\+::dispatcher$<$ true, Ret $>$}}
+\item 
+union \mbox{\hyperlink{unionsysio_1_1vm_1_1detail_1_1variant__storage_3_01_t0_00_01_t1_00_01_t2_00_01_t3_00_01_t_8_8_8_01_4}{sysio\+::vm\+::detail\+::variant\+\_\+storage$<$ T0, T1, T2, T3, T... $>$}}
+\item 
+union \mbox{\hyperlink{unionsysio_1_1vm_1_1detail_1_1variant__storage_3_01_t0_01_4}{sysio\+::vm\+::detail\+::variant\+\_\+storage$<$ T0 $>$}}
+\item 
+union \mbox{\hyperlink{unionsysio_1_1vm_1_1detail_1_1variant__storage_3_01_t0_00_01_t1_01_4}{sysio\+::vm\+::detail\+::variant\+\_\+storage$<$ T0, T1 $>$}}
+\item 
+union \mbox{\hyperlink{unionsysio_1_1vm_1_1detail_1_1variant__storage_3_01_t0_00_01_t1_00_01_t2_01_4}{sysio\+::vm\+::detail\+::variant\+\_\+storage$<$ T0, T1, T2 $>$}}
+\item 
+union \mbox{\hyperlink{unionsysio_1_1vm_1_1detail_1_1variant__storage_3_01_t0_00_01_t1_00_01_t2_00_01_t3_01_4}{sysio\+::vm\+::detail\+::variant\+\_\+storage$<$ T0, T1, T2, T3 $>$}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1vm_1_1variant}{sysio\+::vm\+::variant$<$ Alternatives $>$}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1vm}{sysio\+::vm}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail}{sysio\+::vm\+::detail}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_a02172ffe3edf80728a9dabe83d72f83e}{V\+\_\+\+ELEM}}(\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}})
+\item 
+\#define \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_a2074b9a2c1c6a3190319241fd96ebdd5}{V0}}~variant\+\_\+storage() = default;
+\item 
+\#define \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_ae21a9518b4dd62d2baeab430c89a657a}{V1}}~\mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_a2074b9a2c1c6a3190319241fd96ebdd5}{V0}} \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_a02172ffe3edf80728a9dabe83d72f83e}{V\+\_\+\+ELEM}}(0)
+\item 
+\#define \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_a9173468f90b474471bfff59f8487cbc1}{V2}}~\mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_ae21a9518b4dd62d2baeab430c89a657a}{V1}} \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_a02172ffe3edf80728a9dabe83d72f83e}{V\+\_\+\+ELEM}}(1)
+\item 
+\#define \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_ae9d1b8ccb8498c1a9f5de1702017cefc}{V3}}~\mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_a9173468f90b474471bfff59f8487cbc1}{V2}} \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_a02172ffe3edf80728a9dabe83d72f83e}{V\+\_\+\+ELEM}}(2)
+\item 
+\#define \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_af119c39c6d0d1bc78dc7aeef443e81a9}{V4}}~\mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_ae9d1b8ccb8498c1a9f5de1702017cefc}{V3}} \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_a02172ffe3edf80728a9dabe83d72f83e}{V\+\_\+\+ELEM}}(3)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$std\+::size\+\_\+t I, typename... Alternatives$>$ }\\using \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a14841d410c40ea2495efabbccceeba8d}{sysio\+::vm\+::detail\+::get\+\_\+alternative\+\_\+t}} = std\+::tuple\+\_\+element\+\_\+t$<$I, std\+::tuple$<$Alternatives...$>$$>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$int I, typename Storage $>$ }\\constexpr decltype(auto) \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a40bec98a962ef909354fcecae263abe9}{sysio\+::vm\+::detail\+::variant\+\_\+storage\+\_\+get}} (Storage \&\&val)
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} Visitor , typename Variant $>$ }\\constexpr auto \mbox{\hyperlink{namespacesysio_1_1vm_a1419a3e0b38f21f92401fe8acde2ef0e}{sysio\+::vm\+::visit}} (Visitor \&\&vis, Variant \&\&var)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename... Ts$>$ }\\constexpr std\+::size\+\_\+t \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a4133bf98e8921a9c0a6946008534930d}{sysio\+::vm\+::detail\+::max\+\_\+layout\+\_\+size\+\_\+v}} = std\+::max(\{\mbox{\hyperlink{yubihsm__pkcs11_8c_af82555d15fc1c126f72a5c0566b5389a}{sizeof}}(Ts)...\})
+\item 
+{\footnotesize template$<$typename... Ts$>$ }\\constexpr std\+::size\+\_\+t \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a44c3f37c744706f0ee02c92ef07d3d8d}{sysio\+::vm\+::detail\+::max\+\_\+alignof\+\_\+v}} = std\+::max(\{alignof(Ts)...\})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename... Alternatives$>$ }\\constexpr bool \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_aba313a98ae2ba813d6f47aba8f73794c}{sysio\+::vm\+::detail\+::is\+\_\+valid\+\_\+alternative\+\_\+v}} = (... + (std\+::is\+\_\+same\+\_\+v$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Alternatives$>$?1\+:0)) != 0
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename Alternative , typename... Alternatives$>$ }\\constexpr std\+::size\+\_\+t \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_abfb1fa37c13a32caf781c1e10139ac28}{sysio\+::vm\+::detail\+::get\+\_\+alternatives\+\_\+index\+\_\+v}}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename Alternative $>$ }\\constexpr std\+::size\+\_\+t \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_ab5374c9951baff4a60f988a3b1186be8}{sysio\+::vm\+::detail\+::get\+\_\+alternatives\+\_\+index\+\_\+v$<$ T, Alternative $>$}} = 0
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_a2074b9a2c1c6a3190319241fd96ebdd5}\index{variant.hpp@{variant.hpp}!V0@{V0}}
+\index{V0@{V0}!variant.hpp@{variant.hpp}}
+\doxysubsubsection{\texorpdfstring{V0}{V0}}
+{\footnotesize\ttfamily \label{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_a2074b9a2c1c6a3190319241fd96ebdd5} 
+\#define V0~variant\+\_\+storage() = default;}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_source_l00100}{100}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_source}{variant.\+hpp}}.
+
+\Hypertarget{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_ae21a9518b4dd62d2baeab430c89a657a}\index{variant.hpp@{variant.hpp}!V1@{V1}}
+\index{V1@{V1}!variant.hpp@{variant.hpp}}
+\doxysubsubsection{\texorpdfstring{V1}{V1}}
+{\footnotesize\ttfamily \label{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_ae21a9518b4dd62d2baeab430c89a657a} 
+\#define V1~\mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_a2074b9a2c1c6a3190319241fd96ebdd5}{V0}} \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_a02172ffe3edf80728a9dabe83d72f83e}{V\+\_\+\+ELEM}}(0)}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_source_l00101}{101}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_source}{variant.\+hpp}}.
+
+\Hypertarget{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_a9173468f90b474471bfff59f8487cbc1}\index{variant.hpp@{variant.hpp}!V2@{V2}}
+\index{V2@{V2}!variant.hpp@{variant.hpp}}
+\doxysubsubsection{\texorpdfstring{V2}{V2}}
+{\footnotesize\ttfamily \label{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_a9173468f90b474471bfff59f8487cbc1} 
+\#define V2~\mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_ae21a9518b4dd62d2baeab430c89a657a}{V1}} \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_a02172ffe3edf80728a9dabe83d72f83e}{V\+\_\+\+ELEM}}(1)}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_source_l00102}{102}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_source}{variant.\+hpp}}.
+
+\Hypertarget{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_ae9d1b8ccb8498c1a9f5de1702017cefc}\index{variant.hpp@{variant.hpp}!V3@{V3}}
+\index{V3@{V3}!variant.hpp@{variant.hpp}}
+\doxysubsubsection{\texorpdfstring{V3}{V3}}
+{\footnotesize\ttfamily \label{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_ae9d1b8ccb8498c1a9f5de1702017cefc} 
+\#define V3~\mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_a9173468f90b474471bfff59f8487cbc1}{V2}} \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_a02172ffe3edf80728a9dabe83d72f83e}{V\+\_\+\+ELEM}}(2)}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_source_l00103}{103}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_source}{variant.\+hpp}}.
+
+\Hypertarget{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_af119c39c6d0d1bc78dc7aeef443e81a9}\index{variant.hpp@{variant.hpp}!V4@{V4}}
+\index{V4@{V4}!variant.hpp@{variant.hpp}}
+\doxysubsubsection{\texorpdfstring{V4}{V4}}
+{\footnotesize\ttfamily \label{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_af119c39c6d0d1bc78dc7aeef443e81a9} 
+\#define V4~\mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_ae9d1b8ccb8498c1a9f5de1702017cefc}{V3}} \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_a02172ffe3edf80728a9dabe83d72f83e}{V\+\_\+\+ELEM}}(3)}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_source_l00104}{104}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_source}{variant.\+hpp}}.
+
+\Hypertarget{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_a02172ffe3edf80728a9dabe83d72f83e}\index{variant.hpp@{variant.hpp}!V\_ELEM@{V\_ELEM}}
+\index{V\_ELEM@{V\_ELEM}!variant.hpp@{variant.hpp}}
+\doxysubsubsection{\texorpdfstring{V\_ELEM}{V\_ELEM}}
+{\footnotesize\ttfamily \label{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_a02172ffe3edf80728a9dabe83d72f83e} 
+\#define V\+\_\+\+ELEM(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\#\#\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\ \_t\#\#\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keyword}{constexpr}\ variant\_storage(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\#\#\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\&\ arg)\ :\ \_t\#\#\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}(arg)\ \{\}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keyword}{constexpr}\ variant\_storage(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\#\#\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\&\&\ arg)\ :\ \_t\#\#\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}(\mbox{\hyperlink{namespacestd}{std}}::move(arg))\ \{\}\ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keyword}{constexpr}\ variant\_storage(\textcolor{keyword}{const}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\#\#\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\&\ arg)\ :\ \_t\#\#\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}(arg)\ \{\}\ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keyword}{constexpr}\ variant\_storage(\textcolor{keyword}{const}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\#\#\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\&\&\ arg)\ :\ \_t\#\#\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}(\mbox{\hyperlink{namespacestd}{std}}::move(arg))\ \{\}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_source_l00093}{93}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_source}{variant.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00093\ \textcolor{preprocessor}{\#define\ V\_ELEM(N)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00094\ \textcolor{preprocessor}{\ \ \ \ \ \ T\#\#N\ \_t\#\#N;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00095\ \textcolor{preprocessor}{\ \ \ \ \ \ constexpr\ variant\_storage(T\#\#N\&\ arg)\ :\ \_t\#\#N(arg)\ \{\}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00096\ \textcolor{preprocessor}{\ \ \ \ \ \ constexpr\ variant\_storage(T\#\#N\&\&\ arg)\ :\ \_t\#\#N(std::move(arg))\ \{\}\ \ \(\backslash\)}}
+\DoxyCodeLine{00097\ \textcolor{preprocessor}{\ \ \ \ \ \ constexpr\ variant\_storage(const\ T\#\#N\&\ arg)\ :\ \_t\#\#N(arg)\ \{\}\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00098\ \textcolor{preprocessor}{\ \ \ \ \ \ constexpr\ variant\_storage(const\ T\#\#N\&\&\ arg)\ :\ \_t\#\#N(std::move(arg))\ \{\}}}
+
+\end{DoxyCode}

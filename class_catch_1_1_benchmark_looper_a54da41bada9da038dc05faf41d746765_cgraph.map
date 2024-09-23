@@ -1,0 +1,14 @@
+<map id="Catch::BenchmarkLooper::operator bool" name="Catch::BenchmarkLooper::operator bool">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,47,175,87"/>
+<area shape="rect" id="Node000002" href="$class_catch_1_1_benchmark_looper.html#a97bd944521f519b1593a5d1d2f9998fa" title=" " alt="" coords="223,47,392,87"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="175,64,207,64,207,70,175,70"/>
+<area shape="rect" id="Node000003" href="$struct_catch_1_1_i_result_capture.html#a6e5e64f9d94211a888249012ab6cc7fb" title=" " alt="" coords="447,5,599,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="392,48,431,41,432,46,393,53"/>
+<area shape="rect" id="Node000004" href="$namespace_catch.html#af718eeab870712f292ed8dc6ee3f6488" title=" " alt="" coords="440,94,606,120"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="393,80,436,88,435,93,392,85"/>
+<area shape="poly" id="edge6_Node000004_Node000004" title=" " alt="" coords="487,95,480,86,484,76,499,70,523,68,550,70,563,77,561,82,548,75,523,73,500,75,488,80,485,85,491,92"/>
+<area shape="rect" id="Node000005" href="$namespace_catch.html#a228a625318bb6183842e394eeba17d50" title=" " alt="" coords="654,94,826,120"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="607,104,639,104,639,110,607,110"/>
+<area shape="rect" id="Node000006" href="$namespace_catch.html#a710841d4732b86c06f816bd4822bd425" title=" " alt="" coords="874,87,1045,127"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="826,104,858,104,858,110,826,110"/>
+</map>

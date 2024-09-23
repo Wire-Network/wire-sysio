@@ -1,0 +1,146 @@
+\chapter{Using Google\+Test from various build systems}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2thirdparty_2gtest_2googletest_2docs_2_pkgconfig}{}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2thirdparty_2gtest_2googletest_2docs_2_pkgconfig}\index{Using GoogleTest from various build systems@{Using GoogleTest from various build systems}}
+Google\+Test comes with pkg-\/config files that can be used to determine all necessary flags for compiling and linking to Google\+Test (and Google\+Mock). Pkg-\/config is a standardised plain-\/text format containing
+
+
+\begin{DoxyItemize}
+\item the includedir (-\/I) path
+\item necessary macro (-\/D) definitions
+\item further required flags (-\/pthread)
+\item the library (-\/L) path
+\item the library (-\/l) to link to
+\end{DoxyItemize}
+
+All current build systems support pkg-\/config in one way or another. For all examples here we assume you want to compile the sample {\ttfamily \doxylink{sample3__unittest_8cc}{samples/sample3\+\_\+unittest.\+cc}}.
+
+\doxysubsection*{CMake}
+
+Using {\ttfamily pkg-\/config} in CMake is fairly easy\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{cmake\_minimum\_required(VERSION\ 3.0)}
+\DoxyCodeLine{}
+\DoxyCodeLine{cmake\_policy(SET\ CMP0048\ NEW)}
+\DoxyCodeLine{project(my\_gtest\_pkgconfig\ VERSION\ 0.0.1\ LANGUAGES\ CXX)}
+\DoxyCodeLine{}
+\DoxyCodeLine{find\_package(PkgConfig)}
+\DoxyCodeLine{pkg\_search\_module(GTEST\ REQUIRED\ gtest\_main)}
+\DoxyCodeLine{}
+\DoxyCodeLine{add\_executable(testapp\ samples/sample3\_unittest.cc)}
+\DoxyCodeLine{target\_link\_libraries(testapp\ \$\{GTEST\_LDFLAGS\})}
+\DoxyCodeLine{target\_compile\_options(testapp\ PUBLIC\ \$\{GTEST\_CFLAGS\})}
+\DoxyCodeLine{}
+\DoxyCodeLine{include(CTest)}
+\DoxyCodeLine{add\_test(first\_and\_only\_test\ testapp)}
+
+\end{DoxyCode}
+
+
+It is generally recommended that you use {\ttfamily target\+\_\+compile\+\_\+options} + {\ttfamily \+\_\+\+CFLAGS} over {\ttfamily target\+\_\+include\+\_\+directories} + {\ttfamily \+\_\+\+INCLUDE\+\_\+\+DIRS} as the former includes not just -\/I flags (Google\+Test might require a macro indicating to internal headers that all libraries have been compiled with threading enabled. In addition, Google\+Test might also require {\ttfamily -\/pthread} in the compiling step, and as such splitting the pkg-\/config {\ttfamily Cflags} variable into include dirs and macros for {\ttfamily target\+\_\+compile\+\_\+definitions()} might still miss this). The same recommendation goes for using {\ttfamily \+\_\+\+LDFLAGS} over the more commonplace {\ttfamily \+\_\+\+LIBRARIES}, which happens to discard {\ttfamily -\/L} flags and {\ttfamily -\/pthread}.
+
+\doxysubsection*{Autotools}
+
+Finding Google\+Test in Autoconf and using it from Automake is also fairly easy\+:
+
+In your {\ttfamily configure.\+ac}\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{AC\_PREREQ([2.69])}
+\DoxyCodeLine{AC\_INIT([my\_gtest\_pkgconfig],\ [0.0.1])}
+\DoxyCodeLine{AC\_CONFIG\_SRCDIR([samples/sample3\_unittest.cc])}
+\DoxyCodeLine{AC\_PROG\_CXX}
+\DoxyCodeLine{}
+\DoxyCodeLine{PKG\_CHECK\_MODULES([GTEST],\ [gtest\_main])}
+\DoxyCodeLine{}
+\DoxyCodeLine{AM\_INIT\_AUTOMAKE([foreign\ subdir-\/objects])}
+\DoxyCodeLine{AC\_CONFIG\_FILES([Makefile])}
+\DoxyCodeLine{AC\_OUTPUT}
+
+\end{DoxyCode}
+
+
+and in your {\ttfamily Makefile.\+am}\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{check\_PROGRAMS\ =\ testapp}
+\DoxyCodeLine{TESTS\ =\ \$(check\_PROGRAMS)}
+\DoxyCodeLine{}
+\DoxyCodeLine{testapp\_SOURCES\ =\ samples/sample3\_unittest.cc}
+\DoxyCodeLine{testapp\_CXXFLAGS\ =\ \$(GTEST\_CFLAGS)}
+\DoxyCodeLine{testapp\_LDADD\ =\ \$(GTEST\_LIBS)}
+
+\end{DoxyCode}
+
+
+\doxysubsection*{Meson}
+
+Meson natively uses pkgconfig to query dependencies\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{project('my\_gtest\_pkgconfig',\ 'cpp',\ version\ :\ '0.0.1')}
+\DoxyCodeLine{}
+\DoxyCodeLine{gtest\_dep\ =\ dependency('gtest\_main')}
+\DoxyCodeLine{}
+\DoxyCodeLine{testapp\ =\ executable(}
+\DoxyCodeLine{\ \ 'testapp',}
+\DoxyCodeLine{\ \ files(['samples/sample3\_unittest.cc']),}
+\DoxyCodeLine{\ \ dependencies\ :\ gtest\_dep,}
+\DoxyCodeLine{\ \ install\ :\ false)}
+\DoxyCodeLine{}
+\DoxyCodeLine{test('first\_and\_only\_test',\ testapp)}
+
+\end{DoxyCode}
+
+
+\doxysubsection*{Plain Makefiles}
+
+Since {\ttfamily pkg-\/config} is a small Unix command-\/line utility, it can be used in handwritten {\ttfamily Makefile}s too\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{GTEST\_CFLAGS\ =\ \`{}pkg-\/config\ -\/-\/cflags\ gtest\_main`}
+\DoxyCodeLine{GTEST\_LIBS\ =\ \`{}pkg-\/config\ -\/-\/libs\ gtest\_main`}
+\DoxyCodeLine{}
+\DoxyCodeLine{.PHONY:\ tests\ all}
+\DoxyCodeLine{}
+\DoxyCodeLine{tests:\ all}
+\DoxyCodeLine{\ \ \ \ ./testapp}
+\DoxyCodeLine{}
+\DoxyCodeLine{all:\ testapp}
+\DoxyCodeLine{}
+\DoxyCodeLine{testapp:\ testapp.o}
+\DoxyCodeLine{\ \ \ \ \$(CXX)\ \$(CXXFLAGS)\ \$(LDFLAGS)\ \$<\ -\/o\ \$@\ \$(GTEST\_LIBS)}
+\DoxyCodeLine{}
+\DoxyCodeLine{testapp.o:\ samples/sample3\_unittest.cc}
+\DoxyCodeLine{\ \ \ \ \$(CXX)\ \$(CPPFLAGS)\ \$(CXXFLAGS)\ \$<\ -\/c\ -\/o\ \$@\ \$(GTEST\_CFLAGS)}
+
+\end{DoxyCode}
+
+
+\doxysubsection*{Help! pkg-\/config can\textquotesingle{}t find Google\+Test!}
+
+Let\textquotesingle{}s say you have a {\ttfamily CMake\+Lists.\+txt} along the lines of the one in this tutorial and you try to run {\ttfamily cmake}. It is very possible that you get a failure along the lines of\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{-\/-\/\ Checking\ for\ one\ of\ the\ modules\ 'gtest\_main'}
+\DoxyCodeLine{CMake\ Error\ at\ /usr/share/cmake/Modules/FindPkgConfig.cmake:640\ (message):}
+\DoxyCodeLine{\ \ None\ of\ the\ required\ 'gtest\_main'\ found}
+
+\end{DoxyCode}
+
+
+These failures are common if you installed Google\+Test yourself and have not sourced it from a distro or other package manager. If so, you need to tell pkg-\/config where it can find the {\ttfamily .pc} files containing the information. Say you installed Google\+Test to {\ttfamily /usr/local}, then it might be that the {\ttfamily .pc} files are installed under {\ttfamily /usr/local/lib64/pkgconfig}. If you set
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{export\ PKG\_CONFIG\_PATH=/usr/local/lib64/pkgconfig}
+
+\end{DoxyCode}
+
+
+pkg-\/config will also try to look in {\ttfamily PKG\+\_\+\+CONFIG\+\_\+\+PATH} to find {\ttfamily gtest\+\_\+main.\+pc}. 

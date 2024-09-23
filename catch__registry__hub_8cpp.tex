@@ -1,0 +1,46 @@
+\doxysection{libraries/sys-\/vm/external/\+Catch2/include/internal/catch\+\_\+registry\+\_\+hub.cpp File Reference}
+\hypertarget{catch__registry__hub_8cpp}{}\label{catch__registry__hub_8cpp}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_registry\_hub.cpp@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_registry\_hub.cpp}}
+{\ttfamily \#include "{}catch\+\_\+interfaces\+\_\+registry\+\_\+hub.\+h"{}}\newline
+{\ttfamily \#include "{}catch\+\_\+context.\+h"{}}\newline
+{\ttfamily \#include "{}catch\+\_\+test\+\_\+case\+\_\+registry\+\_\+impl.\+h"{}}\newline
+{\ttfamily \#include "{}catch\+\_\+reporter\+\_\+registry.\+h"{}}\newline
+{\ttfamily \#include "{}catch\+\_\+exception\+\_\+translator\+\_\+registry.\+h"{}}\newline
+{\ttfamily \#include "{}catch\+\_\+tag\+\_\+alias\+\_\+registry.\+h"{}}\newline
+{\ttfamily \#include "{}catch\+\_\+startup\+\_\+exception\+\_\+registry.\+h"{}}\newline
+{\ttfamily \#include "{}catch\+\_\+singletons.\+hpp"{}}\newline
+{\ttfamily \#include "{}catch\+\_\+enum\+\_\+values\+\_\+registry.\+h"{}}\newline
+Include dependency graph for catch\+\_\+registry\+\_\+hub.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{catch__registry__hub_8cpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=226pt]{catch__registry__hub_8cpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespace_catch}{Catch}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{namespace_catch_aa5d4bbf2380d3781343c4eefcb3456b9}{Catch\+::\+Registry\+Hub\+Singleton}} = \mbox{\hyperlink{class_catch_1_1_singleton}{Singleton}}$<$Registry\+Hub, \mbox{\hyperlink{struct_catch_1_1_i_registry_hub}{IRegistry\+Hub}}, \mbox{\hyperlink{struct_catch_1_1_i_mutable_registry_hub}{IMutable\+Registry\+Hub}}$>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_catch_1_1_i_registry_hub}{IRegistry\+Hub}} const \& \mbox{\hyperlink{namespace_catch_a5d328566cb8da87b48f1fac3f319ac7a}{Catch\+::get\+Registry\+Hub}} ()
+\item 
+\mbox{\hyperlink{struct_catch_1_1_i_mutable_registry_hub}{IMutable\+Registry\+Hub}} \& \mbox{\hyperlink{namespace_catch_a585459763f2c7610e57de2dd22dd1ad8}{Catch\+::get\+Mutable\+Registry\+Hub}} ()
+\item 
+void \mbox{\hyperlink{namespace_catch_a0f78e9afdebc6d4512d18e76fbf54b8c}{Catch\+::clean\+Up}} ()
+\item 
+std\+::string \mbox{\hyperlink{namespace_catch_adafff91485eeeeb9e9333f317cc0e3b1}{Catch\+::translate\+Active\+Exception}} ()
+\end{DoxyCompactItemize}

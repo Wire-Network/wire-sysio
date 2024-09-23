@@ -1,0 +1,96 @@
+\doxysection{libraries/fc/secp256k1/secp256k1/src/ecmult\+\_\+const\+\_\+impl.h File Reference}
+\hypertarget{ecmult__const__impl_8h}{}\label{ecmult__const__impl_8h}\index{libraries/fc/secp256k1/secp256k1/src/ecmult\_const\_impl.h@{libraries/fc/secp256k1/secp256k1/src/ecmult\_const\_impl.h}}
+{\ttfamily \#include "{}scalar.\+h"{}}\newline
+{\ttfamily \#include "{}group.\+h"{}}\newline
+{\ttfamily \#include "{}ecmult\+\_\+const.\+h"{}}\newline
+{\ttfamily \#include "{}ecmult\+\_\+impl.\+h"{}}\newline
+Include dependency graph for ecmult\+\_\+const\+\_\+impl.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{ecmult__const__impl_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{ecmult__const__impl_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{ecmult__const__impl_8h_a541e7c0e2d2f68e2b1b03729d93b4ca7}{ECMULT\+\_\+\+CONST\+\_\+\+TABLE\+\_\+\+GET\+\_\+\+GE}}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},  pre,  n,  w)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{ecmult__const__impl_8h_a541e7c0e2d2f68e2b1b03729d93b4ca7}\index{ecmult\_const\_impl.h@{ecmult\_const\_impl.h}!ECMULT\_CONST\_TABLE\_GET\_GE@{ECMULT\_CONST\_TABLE\_GET\_GE}}
+\index{ECMULT\_CONST\_TABLE\_GET\_GE@{ECMULT\_CONST\_TABLE\_GET\_GE}!ecmult\_const\_impl.h@{ecmult\_const\_impl.h}}
+\doxysubsubsection{\texorpdfstring{ECMULT\_CONST\_TABLE\_GET\_GE}{ECMULT\_CONST\_TABLE\_GET\_GE}}
+{\footnotesize\ttfamily \label{ecmult__const__impl_8h_a541e7c0e2d2f68e2b1b03729d93b4ca7} 
+\#define ECMULT\+\_\+\+CONST\+\_\+\+TABLE\+\_\+\+GET\+\_\+\+GE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}}{, }\item[{}]{pre}{, }\item[{}]{n}{, }\item[{}]{w}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{int}\ m\ =\ 0;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{/*\ Extract\ the\ sign-\/bit\ for\ a\ constant\ time\ absolute-\/value.\ */}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{int}\ mask\ =\ (n)\ >>\ (\textcolor{keyword}{sizeof}(n)\ *\ CHAR\_BIT\ -\/\ 1);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{int}\ abs\_n\ =\ ((n)\ +\ mask)\ \string^\ mask;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{int}\ idx\_n\ =\ abs\_n\ >>\ 1;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{structsecp256k1__fe}{secp256k1\_fe}}\ neg\_y;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ VERIFY\_CHECK(((n)\ \&\ 1)\ ==\ 1);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ VERIFY\_CHECK((n)\ >=\ -\/((1\ <<\ ((w)-\/1))\ -\/\ 1));\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ VERIFY\_CHECK((n)\ <=\ \ ((1\ <<\ ((w)-\/1))\ -\/\ 1));\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ VERIFY\_SETUP(secp256k1\_fe\_clear(\&(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}})-\/>x));\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ VERIFY\_SETUP(secp256k1\_fe\_clear(\&(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}})-\/>y));\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{/*\ Unconditionally\ set\ r-\/>x\ =\ (pre)[m].x.\ r-\/>y\ =\ (pre)[m].y.\ because\ it's\ either\ the\ correct\ one\ \(\backslash\)}}
+\DoxyCodeLine{\textcolor{comment}{\ \ \ \ \ *\ or\ will\ get\ replaced\ in\ the\ later\ iterations,\ this\ is\ needed\ to\ make\ sure\ \`{}r`\ is\ initialized.\ */}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ (\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}})-\/>x\ =\ (pre)[m].x;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ (\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}})-\/>y\ =\ (pre)[m].y;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ for\ (m\ =\ 1;\ m\ <\ \mbox{\hyperlink{ecmult_8h_a97c6c6e5aa98f202eec77c4c931e02f1}{ECMULT\_TABLE\_SIZE}}(w);\ m++)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{comment}{/*\ This\ loop\ is\ used\ to\ avoid\ secret\ data\ in\ array\ indices.\ See}}
+\DoxyCodeLine{\textcolor{comment}{\ \ \ \ \ \ \ \ \ *\ the\ comment\ in\ ecmult\_gen\_impl.h\ for\ rationale.\ */}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ secp256k1\_fe\_cmov(\&(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}})-\/>x,\ \&(pre)[m].x,\ m\ ==\ idx\_n);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ secp256k1\_fe\_cmov(\&(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}})-\/>y,\ \&(pre)[m].y,\ m\ ==\ idx\_n);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ (\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}})-\/>infinity\ =\ 0;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ secp256k1\_fe\_negate(\&neg\_y,\ \&(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}})-\/>y,\ 1);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ secp256k1\_fe\_cmov(\&(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}})-\/>y,\ \&neg\_y,\ (n)\ !=\ abs\_n);\ \(\backslash\)}
+\DoxyCodeLine{\}\ \textcolor{keywordflow}{while}(0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{ecmult__const__impl_8h_source_l00029}{29}} of file \mbox{\hyperlink{ecmult__const__impl_8h_source}{ecmult\+\_\+const\+\_\+impl.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00029\ \textcolor{preprocessor}{\#define\ ECMULT\_CONST\_TABLE\_GET\_GE(r,pre,n,w)\ do\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00030\ \textcolor{preprocessor}{\ \ \ \ int\ m\ =\ 0;\ \(\backslash\)}}
+\DoxyCodeLine{00031\ \textcolor{preprocessor}{\ \ \ \ }\textcolor{comment}{/*\ Extract\ the\ sign-\/bit\ for\ a\ constant\ time\ absolute-\/value.\ */}\textcolor{preprocessor}{\ \(\backslash\)}}
+\DoxyCodeLine{00032\ \textcolor{preprocessor}{\ \ \ \ int\ mask\ =\ (n)\ >>\ (sizeof(n)\ *\ CHAR\_BIT\ -\/\ 1);\ \(\backslash\)}}
+\DoxyCodeLine{00033\ \textcolor{preprocessor}{\ \ \ \ int\ abs\_n\ =\ ((n)\ +\ mask)\ \string^\ mask;\ \(\backslash\)}}
+\DoxyCodeLine{00034\ \textcolor{preprocessor}{\ \ \ \ int\ idx\_n\ =\ abs\_n\ >>\ 1;\ \(\backslash\)}}
+\DoxyCodeLine{00035\ \textcolor{preprocessor}{\ \ \ \ secp256k1\_fe\ neg\_y;\ \(\backslash\)}}
+\DoxyCodeLine{00036\ \textcolor{preprocessor}{\ \ \ \ VERIFY\_CHECK(((n)\ \&\ 1)\ ==\ 1);\ \(\backslash\)}}
+\DoxyCodeLine{00037\ \textcolor{preprocessor}{\ \ \ \ VERIFY\_CHECK((n)\ >=\ -\/((1\ <<\ ((w)-\/1))\ -\/\ 1));\ \(\backslash\)}}
+\DoxyCodeLine{00038\ \textcolor{preprocessor}{\ \ \ \ VERIFY\_CHECK((n)\ <=\ \ ((1\ <<\ ((w)-\/1))\ -\/\ 1));\ \(\backslash\)}}
+\DoxyCodeLine{00039\ \textcolor{preprocessor}{\ \ \ \ VERIFY\_SETUP(secp256k1\_fe\_clear(\&(r)-\/>x));\ \(\backslash\)}}
+\DoxyCodeLine{00040\ \textcolor{preprocessor}{\ \ \ \ VERIFY\_SETUP(secp256k1\_fe\_clear(\&(r)-\/>y));\ \(\backslash\)}}
+\DoxyCodeLine{00041\ \textcolor{preprocessor}{\ \ \ \ }\textcolor{comment}{/*\ Unconditionally\ set\ r-\/>x\ =\ (pre)[m].x.\ r-\/>y\ =\ (pre)[m].y.\ because\ it's\ either\ the\ correct\ one\ \(\backslash\)}}
+\DoxyCodeLine{00042\ \textcolor{comment}{\ \ \ \ \ *\ or\ will\ get\ replaced\ in\ the\ later\ iterations,\ this\ is\ needed\ to\ make\ sure\ \`{}r`\ is\ initialized.\ */}\textcolor{preprocessor}{\ \(\backslash\)}}
+\DoxyCodeLine{00043\ \textcolor{preprocessor}{\ \ \ \ (r)-\/>x\ =\ (pre)[m].x;\ \(\backslash\)}}
+\DoxyCodeLine{00044\ \textcolor{preprocessor}{\ \ \ \ (r)-\/>y\ =\ (pre)[m].y;\ \(\backslash\)}}
+\DoxyCodeLine{00045\ \textcolor{preprocessor}{\ \ \ \ for\ (m\ =\ 1;\ m\ <\ ECMULT\_TABLE\_SIZE(w);\ m++)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00046\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ }\textcolor{comment}{/*\ This\ loop\ is\ used\ to\ avoid\ secret\ data\ in\ array\ indices.\ See}}
+\DoxyCodeLine{00047\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ *\ the\ comment\ in\ ecmult\_gen\_impl.h\ for\ rationale.\ */}\textcolor{preprocessor}{\ \(\backslash\)}}
+\DoxyCodeLine{00048\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ secp256k1\_fe\_cmov(\&(r)-\/>x,\ \&(pre)[m].x,\ m\ ==\ idx\_n);\ \(\backslash\)}}
+\DoxyCodeLine{00049\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ secp256k1\_fe\_cmov(\&(r)-\/>y,\ \&(pre)[m].y,\ m\ ==\ idx\_n);\ \(\backslash\)}}
+\DoxyCodeLine{00050\ \textcolor{preprocessor}{\ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00051\ \textcolor{preprocessor}{\ \ \ \ (r)-\/>infinity\ =\ 0;\ \(\backslash\)}}
+\DoxyCodeLine{00052\ \textcolor{preprocessor}{\ \ \ \ secp256k1\_fe\_negate(\&neg\_y,\ \&(r)-\/>y,\ 1);\ \(\backslash\)}}
+
+\end{DoxyCode}

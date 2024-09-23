@@ -1,0 +1,142 @@
+\doxysection{sysio\+::chain\+::named\+\_\+thread\+\_\+pool Class Reference}
+\hypertarget{classsysio_1_1chain_1_1named__thread__pool}{}\label{classsysio_1_1chain_1_1named__thread__pool}\index{sysio::chain::named\_thread\_pool@{sysio::chain::named\_thread\_pool}}
+
+
+{\ttfamily \#include $<$thread\+\_\+utils.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classsysio_1_1chain_1_1named__thread__pool_a0f1e730d72e86361eb8edfa66c9e3cfb}{named\+\_\+thread\+\_\+pool}} (std\+::string name\+\_\+prefix, size\+\_\+t num\+\_\+threads)
+\item 
+\mbox{\hyperlink{classsysio_1_1chain_1_1named__thread__pool_a403565b5e9112c939999a0bc2fb366e2}{\texorpdfstring{$\sim$}{\string~}named\+\_\+thread\+\_\+pool}} ()
+\item 
+boost\+::asio\+::io\+\_\+context \& \mbox{\hyperlink{classsysio_1_1chain_1_1named__thread__pool_ae2f5fa4611193d13bb40e34708d897ea}{get\+\_\+executor}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1named__thread__pool_a2cf9d662cfa57de6d29cd900f8375208}{stop}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Wrapper class for boost asio thread pool and io\+\_\+context run. Also names threads so that tools like htop can see thread name. 
+
+Definition at line \mbox{\hyperlink{thread__utils_8hpp_source_l00016}{16}} of file \mbox{\hyperlink{thread__utils_8hpp_source}{thread\+\_\+utils.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classsysio_1_1chain_1_1named__thread__pool_a0f1e730d72e86361eb8edfa66c9e3cfb}\index{sysio::chain::named\_thread\_pool@{sysio::chain::named\_thread\_pool}!named\_thread\_pool@{named\_thread\_pool}}
+\index{named\_thread\_pool@{named\_thread\_pool}!sysio::chain::named\_thread\_pool@{sysio::chain::named\_thread\_pool}}
+\doxysubsubsection{\texorpdfstring{named\_thread\_pool()}{named\_thread\_pool()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1named__thread__pool_a0f1e730d72e86361eb8edfa66c9e3cfb} 
+sysio\+::chain\+::named\+\_\+thread\+\_\+pool\+::named\+\_\+thread\+\_\+pool (\begin{DoxyParamCaption}\item[{std\+::string}]{name\+\_\+prefix}{, }\item[{size\+\_\+t}]{num\+\_\+threads}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{thread__utils_8cpp_source_l00010}{10}} of file \mbox{\hyperlink{thread__utils_8cpp_source}{thread\+\_\+utils.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00011\ :\ \_thread\_pool(\ num\_threads\ )}
+\DoxyCodeLine{00012\ ,\ \_ioc(\ num\_threads\ )}
+\DoxyCodeLine{00013\ \{}
+\DoxyCodeLine{00014\ \ \ \ \_ioc\_work.emplace(\ boost::asio::make\_work\_guard(\ \_ioc\ )\ );}
+\DoxyCodeLine{00015\ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ num\_threads;\ ++i\ )\ \{}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ boost::asio::post(\ \_thread\_pool,\ [\&ioc\ =\ \_ioc,\ name\_prefix,\ i]()\ \{}
+\DoxyCodeLine{00017\ \ \ \ \ \ \ \ \ \ std::string\ tn\ =\ name\_prefix\ +\ \textcolor{stringliteral}{"{}-\/"{}}\ +\ std::to\_string(\ i\ );}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_ab58a7f71e88d7d4d5761bbd24837c595}{fc::set\_os\_thread\_name}}(\ tn\ );}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ \ ioc.run();}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \}\ );}
+\DoxyCodeLine{00021\ \ \ \ \}}
+\DoxyCodeLine{00022\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=344pt]{classsysio_1_1chain_1_1named__thread__pool_a0f1e730d72e86361eb8edfa66c9e3cfb_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1named__thread__pool_a403565b5e9112c939999a0bc2fb366e2}\index{sysio::chain::named\_thread\_pool@{sysio::chain::named\_thread\_pool}!````~named\_thread\_pool@{\texorpdfstring{$\sim$}{\string~}named\_thread\_pool}}
+\index{````~named\_thread\_pool@{\texorpdfstring{$\sim$}{\string~}named\_thread\_pool}!sysio::chain::named\_thread\_pool@{sysio::chain::named\_thread\_pool}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}named\_thread\_pool()}{\string~named\_thread\_pool()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1named__thread__pool_a403565b5e9112c939999a0bc2fb366e2} 
+sysio\+::chain\+::named\+\_\+thread\+\_\+pool\+::\texorpdfstring{$\sim$}{\string~}named\+\_\+thread\+\_\+pool (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{thread__utils_8cpp_source_l00024}{24}} of file \mbox{\hyperlink{thread__utils_8cpp_source}{thread\+\_\+utils.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00025\ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1named__thread__pool_a2cf9d662cfa57de6d29cd900f8375208}{stop}}();}
+\DoxyCodeLine{00026\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=333pt]{classsysio_1_1chain_1_1named__thread__pool_a403565b5e9112c939999a0bc2fb366e2_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1chain_1_1named__thread__pool_ae2f5fa4611193d13bb40e34708d897ea}\index{sysio::chain::named\_thread\_pool@{sysio::chain::named\_thread\_pool}!get\_executor@{get\_executor}}
+\index{get\_executor@{get\_executor}!sysio::chain::named\_thread\_pool@{sysio::chain::named\_thread\_pool}}
+\doxysubsubsection{\texorpdfstring{get\_executor()}{get\_executor()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1named__thread__pool_ae2f5fa4611193d13bb40e34708d897ea} 
+boost\+::asio\+::io\+\_\+context \& sysio\+::chain\+::named\+\_\+thread\+\_\+pool\+::get\+\_\+executor (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{thread__utils_8hpp_source_l00025}{25}} of file \mbox{\hyperlink{thread__utils_8hpp_source}{thread\+\_\+utils.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00025\ \{\ \textcolor{keywordflow}{return}\ \_ioc;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1named__thread__pool_ae2f5fa4611193d13bb40e34708d897ea_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1named__thread__pool_a2cf9d662cfa57de6d29cd900f8375208}\index{sysio::chain::named\_thread\_pool@{sysio::chain::named\_thread\_pool}!stop@{stop}}
+\index{stop@{stop}!sysio::chain::named\_thread\_pool@{sysio::chain::named\_thread\_pool}}
+\doxysubsubsection{\texorpdfstring{stop()}{stop()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1named__thread__pool_a2cf9d662cfa57de6d29cd900f8375208} 
+void sysio\+::chain\+::named\+\_\+thread\+\_\+pool\+::stop (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{thread__utils_8cpp_source_l00028}{28}} of file \mbox{\hyperlink{thread__utils_8cpp_source}{thread\+\_\+utils.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00029\ \ \ \ \_ioc\_work.reset();}
+\DoxyCodeLine{00030\ \ \ \ \_ioc.stop();}
+\DoxyCodeLine{00031\ \ \ \ \_thread\_pool.join();}
+\DoxyCodeLine{00032\ \ \ \ \_thread\_pool.stop();}
+\DoxyCodeLine{00033\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=334pt]{classsysio_1_1chain_1_1named__thread__pool_a2cf9d662cfa57de6d29cd900f8375208_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{thread__utils_8hpp}{thread\+\_\+utils.\+hpp}}\item 
+libraries/chain/\mbox{\hyperlink{thread__utils_8cpp}{thread\+\_\+utils.\+cpp}}\end{DoxyCompactItemize}

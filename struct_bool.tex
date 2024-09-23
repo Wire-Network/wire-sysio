@@ -1,0 +1,130 @@
+\doxysection{Bool Struct Reference}
+\hypertarget{struct_bool}{}\label{struct_bool}\index{Bool@{Bool}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_bool_a03dfd4851b13abb29414887fcada7fca}{Bool}} (int val)
+\item 
+bool \mbox{\hyperlink{struct_bool_a7baecbc58992eb06157fbbbaa560be0b}{operator$>$}} (int n) const
+\item 
+\mbox{\hyperlink{struct_bool}{Bool}} \mbox{\hyperlink{struct_bool_a6f4ecdec19082e896cffce66e6b6e7cc}{operator+}} (const \mbox{\hyperlink{struct_bool}{Bool}} \&rhs) const
+\item 
+bool \mbox{\hyperlink{struct_bool_afe799a4977c5ebe4c215d5d4ebd77adb}{operator==}} (const \mbox{\hyperlink{struct_bool}{Bool}} \&rhs) const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{struct_bool_a16be863c269f988cdcbe59f9d846a141}{value}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{gtest__pred__impl__unittest_8cc_source_l00056}{56}} of file \mbox{\hyperlink{gtest__pred__impl__unittest_8cc_source}{gtest\+\_\+pred\+\_\+impl\+\_\+unittest.\+cc}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{struct_bool_a03dfd4851b13abb29414887fcada7fca}\index{Bool@{Bool}!Bool@{Bool}}
+\index{Bool@{Bool}!Bool@{Bool}}
+\doxysubsubsection{\texorpdfstring{Bool()}{Bool()}}
+{\footnotesize\ttfamily \label{struct_bool_a03dfd4851b13abb29414887fcada7fca} 
+Bool\+::\+Bool (\begin{DoxyParamCaption}\item[{int}]{val}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest__pred__impl__unittest_8cc_source_l00057}{57}} of file \mbox{\hyperlink{gtest__pred__impl__unittest_8cc_source}{gtest\+\_\+pred\+\_\+impl\+\_\+unittest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00057\ :\ \mbox{\hyperlink{struct_bool_a16be863c269f988cdcbe59f9d846a141}{value}}(val\ !=\ 0)\ \{\}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=260pt]{struct_bool_a03dfd4851b13abb29414887fcada7fca_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_bool_a6f4ecdec19082e896cffce66e6b6e7cc}\index{Bool@{Bool}!operator+@{operator+}}
+\index{operator+@{operator+}!Bool@{Bool}}
+\doxysubsubsection{\texorpdfstring{operator+()}{operator+()}}
+{\footnotesize\ttfamily \label{struct_bool_a6f4ecdec19082e896cffce66e6b6e7cc} 
+\mbox{\hyperlink{struct_bool}{Bool}} Bool\+::operator+ (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct_bool}{Bool}} \&}]{rhs}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest__pred__impl__unittest_8cc_source_l00061}{61}} of file \mbox{\hyperlink{gtest__pred__impl__unittest_8cc_source}{gtest\+\_\+pred\+\_\+impl\+\_\+unittest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00061\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_bool_a03dfd4851b13abb29414887fcada7fca}{Bool}}(\mbox{\hyperlink{struct_bool_a16be863c269f988cdcbe59f9d846a141}{value}}\ +\ rhs.\mbox{\hyperlink{struct_bool_a16be863c269f988cdcbe59f9d846a141}{value}});\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=260pt]{struct_bool_a6f4ecdec19082e896cffce66e6b6e7cc_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_bool_afe799a4977c5ebe4c215d5d4ebd77adb}\index{Bool@{Bool}!operator==@{operator==}}
+\index{operator==@{operator==}!Bool@{Bool}}
+\doxysubsubsection{\texorpdfstring{operator==()}{operator==()}}
+{\footnotesize\ttfamily \label{struct_bool_afe799a4977c5ebe4c215d5d4ebd77adb} 
+bool Bool\+::operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct_bool}{Bool}} \&}]{rhs}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest__pred__impl__unittest_8cc_source_l00063}{63}} of file \mbox{\hyperlink{gtest__pred__impl__unittest_8cc_source}{gtest\+\_\+pred\+\_\+impl\+\_\+unittest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00063\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_bool_a16be863c269f988cdcbe59f9d846a141}{value}}\ ==\ rhs.\mbox{\hyperlink{struct_bool_a16be863c269f988cdcbe59f9d846a141}{value}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_bool_a7baecbc58992eb06157fbbbaa560be0b}\index{Bool@{Bool}!operator$>$@{operator$>$}}
+\index{operator$>$@{operator$>$}!Bool@{Bool}}
+\doxysubsubsection{\texorpdfstring{operator$>$()}{operator>()}}
+{\footnotesize\ttfamily \label{struct_bool_a7baecbc58992eb06157fbbbaa560be0b} 
+bool Bool\+::operator$>$ (\begin{DoxyParamCaption}\item[{int}]{n}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest__pred__impl__unittest_8cc_source_l00059}{59}} of file \mbox{\hyperlink{gtest__pred__impl__unittest_8cc_source}{gtest\+\_\+pred\+\_\+impl\+\_\+unittest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00059\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_bool_a16be863c269f988cdcbe59f9d846a141}{value}}\ >\ \mbox{\hyperlink{struct_bool_a03dfd4851b13abb29414887fcada7fca}{Bool}}(n).value;\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=260pt]{struct_bool_a7baecbc58992eb06157fbbbaa560be0b_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_bool_a16be863c269f988cdcbe59f9d846a141}\index{Bool@{Bool}!value@{value}}
+\index{value@{value}!Bool@{Bool}}
+\doxysubsubsection{\texorpdfstring{value}{value}}
+{\footnotesize\ttfamily \label{struct_bool_a16be863c269f988cdcbe59f9d846a141} 
+bool Bool\+::value}
+
+
+
+Definition at line \mbox{\hyperlink{gtest__pred__impl__unittest_8cc_source_l00065}{65}} of file \mbox{\hyperlink{gtest__pred__impl__unittest_8cc_source}{gtest\+\_\+pred\+\_\+impl\+\_\+unittest.\+cc}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/test/\mbox{\hyperlink{gtest__pred__impl__unittest_8cc}{gtest\+\_\+pred\+\_\+impl\+\_\+unittest.\+cc}}\end{DoxyCompactItemize}

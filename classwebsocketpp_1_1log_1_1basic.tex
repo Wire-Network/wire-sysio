@@ -1,0 +1,440 @@
+\doxysection{websocketpp\+::log\+::basic\texorpdfstring{$<$}{<} concurrency, names \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classwebsocketpp_1_1log_1_1basic}{}\label{classwebsocketpp_1_1log_1_1basic}\index{websocketpp::log::basic$<$ concurrency, names $>$@{websocketpp::log::basic$<$ concurrency, names $>$}}
+
+
+Basic logger that outputs to an ostream.  
+
+
+
+
+{\ttfamily \#include $<$basic.\+hpp$>$}
+
+
+
+Inheritance diagram for websocketpp\+::log\+::basic\texorpdfstring{$<$}{<} concurrency, names \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=207pt]{classwebsocketpp_1_1log_1_1basic__inherit__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic_a161725427aab2220743211512156810e}{basic}} (\mbox{\hyperlink{structwebsocketpp_1_1log_1_1channel__type__hint_a4c2533ba2359d8269a9c4b1ead19a080}{channel\+\_\+type\+\_\+hint\+::value}} h=\mbox{\hyperlink{structwebsocketpp_1_1log_1_1channel__type__hint_a8c38587fffbffbfcfc35577734b0d653}{channel\+\_\+type\+\_\+hint\+::access}})
+\item 
+\mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic_ad1ba9e1e73f035b527f7cbcde6ceb709}{basic}} (std\+::ostream \texorpdfstring{$\ast$}{*}out)
+\item 
+\mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic_aa38b56b9985927e20e54ff618b23409f}{basic}} (\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}} c, \mbox{\hyperlink{structwebsocketpp_1_1log_1_1channel__type__hint_a4c2533ba2359d8269a9c4b1ead19a080}{channel\+\_\+type\+\_\+hint\+::value}} h=\mbox{\hyperlink{structwebsocketpp_1_1log_1_1channel__type__hint_a8c38587fffbffbfcfc35577734b0d653}{channel\+\_\+type\+\_\+hint\+::access}})
+\item 
+\mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic_a43ccea903a0da548beace831b8629a1a}{basic}} (\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}} c, std\+::ostream \texorpdfstring{$\ast$}{*}out)
+\item 
+\mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic_ae2070dee0da9ae3ccf0833b59e51eca8}{\texorpdfstring{$\sim$}{\string~}basic}} ()
+\begin{DoxyCompactList}\small\item\em Destructor. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic_ace381224e7990da5f3ec7505109fa541}{basic}} (\mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic}{basic}}$<$ concurrency, names $>$ const \&other)
+\begin{DoxyCompactList}\small\item\em Copy constructor. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic_ad35f40223f3a5a1e5650600f00938047}{set\+\_\+ostream}} (std\+::ostream \texorpdfstring{$\ast$}{*}out=\&std\+::cout)
+\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic_a35e70935ce8b7a30c6eafea45181907a}{set\+\_\+channels}} (\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}} channels)
+\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic_a46bedf7f2bca8e28b39d0b6a4816a8d1}{clear\+\_\+channels}} (\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}} channels)
+\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic_a9f87a8c3e5d8e25e5f014756827a587a}{write}} (\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}} channel, std\+::string const \&msg)
+\begin{DoxyCompactList}\small\item\em Write a string message to the given channel. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic_a693e6a522f654fd131a0c6f8d084c921}{write}} (\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}} channel, char const \texorpdfstring{$\ast$}{*}msg)
+\begin{DoxyCompactList}\small\item\em Write a cstring message to the given channel. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{cpp11_8hpp_a3dc3ece336a6149d2fe208a9daf66043}{\+\_\+\+WEBSOCKETPP\+\_\+\+CONSTEXPR\+\_\+\+TOKEN\+\_\+}} bool \mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic_a735d9aa5c0776140c092bc3e5d58341d}{static\+\_\+test}} (\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}} channel) const
+\item 
+bool \mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic_a8f443b4ff286da803a114897a8f97105}{dynamic\+\_\+test}} (\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}} channel)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef concurrency\+::scoped\+\_\+lock\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic_a9da5fb9b1ac47522ce8d44b0f90a9fbb}{scoped\+\_\+lock\+\_\+type}}
+\item 
+typedef concurrency\+::mutex\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic_a251fcad2a65b7a05b21d3479b970940d}{mutex\+\_\+type}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic_a251fcad2a65b7a05b21d3479b970940d}{mutex\+\_\+type}} \mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic_ad837b993a6e1070fbd3c1dc59b15a0eb}{m\+\_\+lock}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename concurrency, typename names$>$\newline
+class websocketpp\+::log\+::basic$<$ concurrency, names $>$}
+
+
+Definition at line \mbox{\hyperlink{logger_2basic_8hpp_source_l00059}{59}} of file \mbox{\hyperlink{logger_2basic_8hpp_source}{basic.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classwebsocketpp_1_1log_1_1basic_a251fcad2a65b7a05b21d3479b970940d}\index{websocketpp::log::basic$<$ concurrency, names $>$@{websocketpp::log::basic$<$ concurrency, names $>$}!mutex\_type@{mutex\_type}}
+\index{mutex\_type@{mutex\_type}!websocketpp::log::basic$<$ concurrency, names $>$@{websocketpp::log::basic$<$ concurrency, names $>$}}
+\doxysubsubsection{\texorpdfstring{mutex\_type}{mutex\_type}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1log_1_1basic_a251fcad2a65b7a05b21d3479b970940d} 
+template$<$typename concurrency , typename names $>$ \\
+concurrency\+::mutex\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic}{websocketpp\+::log\+::basic}}$<$ concurrency, names $>$\+::mutex\+\_\+type\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{logger_2basic_8hpp_source_l00170}{170}} of file \mbox{\hyperlink{logger_2basic_8hpp_source}{basic.\+hpp}}.
+
+\Hypertarget{classwebsocketpp_1_1log_1_1basic_a9da5fb9b1ac47522ce8d44b0f90a9fbb}\index{websocketpp::log::basic$<$ concurrency, names $>$@{websocketpp::log::basic$<$ concurrency, names $>$}!scoped\_lock\_type@{scoped\_lock\_type}}
+\index{scoped\_lock\_type@{scoped\_lock\_type}!websocketpp::log::basic$<$ concurrency, names $>$@{websocketpp::log::basic$<$ concurrency, names $>$}}
+\doxysubsubsection{\texorpdfstring{scoped\_lock\_type}{scoped\_lock\_type}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1log_1_1basic_a9da5fb9b1ac47522ce8d44b0f90a9fbb} 
+template$<$typename concurrency , typename names $>$ \\
+concurrency\+::scoped\+\_\+lock\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic}{websocketpp\+::log\+::basic}}$<$ concurrency, names $>$\+::scoped\+\_\+lock\+\_\+type\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{logger_2basic_8hpp_source_l00169}{169}} of file \mbox{\hyperlink{logger_2basic_8hpp_source}{basic.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classwebsocketpp_1_1log_1_1basic_a161725427aab2220743211512156810e}\index{websocketpp::log::basic$<$ concurrency, names $>$@{websocketpp::log::basic$<$ concurrency, names $>$}!basic@{basic}}
+\index{basic@{basic}!websocketpp::log::basic$<$ concurrency, names $>$@{websocketpp::log::basic$<$ concurrency, names $>$}}
+\doxysubsubsection{\texorpdfstring{basic()}{basic()}\hspace{0.1cm}{\footnotesize\ttfamily [1/5]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1log_1_1basic_a161725427aab2220743211512156810e} 
+template$<$typename concurrency , typename names $>$ \\
+\mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic}{websocketpp\+::log\+::basic}}$<$ concurrency, names $>$\+::basic (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structwebsocketpp_1_1log_1_1channel__type__hint_a4c2533ba2359d8269a9c4b1ead19a080}{channel\+\_\+type\+\_\+hint\+::value}}}]{h}{ = {\ttfamily \mbox{\hyperlink{structwebsocketpp_1_1log_1_1channel__type__hint_a8c38587fffbffbfcfc35577734b0d653}{channel\+\_\+type\+\_\+hint\+::access}}}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{logger_2basic_8hpp_source_l00001}{1}} of file \mbox{\hyperlink{logger_2basic_8hpp_source}{basic.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ :\ m\_static\_channels(0xffffffff)}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ ,\ m\_dynamic\_channels(0)}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ ,\ m\_out(h\ ==\ \mbox{\hyperlink{structwebsocketpp_1_1log_1_1channel__type__hint_a91473ac49fba696549da438483a6fe31}{channel\_type\_hint::error}}\ ?\ \&std::cerr\ :\ \&std::cout)\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1log_1_1basic_ad1ba9e1e73f035b527f7cbcde6ceb709}\index{websocketpp::log::basic$<$ concurrency, names $>$@{websocketpp::log::basic$<$ concurrency, names $>$}!basic@{basic}}
+\index{basic@{basic}!websocketpp::log::basic$<$ concurrency, names $>$@{websocketpp::log::basic$<$ concurrency, names $>$}}
+\doxysubsubsection{\texorpdfstring{basic()}{basic()}\hspace{0.1cm}{\footnotesize\ttfamily [2/5]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1log_1_1basic_ad1ba9e1e73f035b527f7cbcde6ceb709} 
+template$<$typename concurrency , typename names $>$ \\
+\mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic}{websocketpp\+::log\+::basic}}$<$ concurrency, names $>$\+::basic (\begin{DoxyParamCaption}\item[{std\+::ostream \texorpdfstring{$\ast$}{*}}]{out}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{logger_2basic_8hpp_source_l00001}{1}} of file \mbox{\hyperlink{logger_2basic_8hpp_source}{basic.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ :\ m\_static\_channels(0xffffffff)}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ ,\ m\_dynamic\_channels(0)}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ ,\ m\_out(out)\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1log_1_1basic_aa38b56b9985927e20e54ff618b23409f}\index{websocketpp::log::basic$<$ concurrency, names $>$@{websocketpp::log::basic$<$ concurrency, names $>$}!basic@{basic}}
+\index{basic@{basic}!websocketpp::log::basic$<$ concurrency, names $>$@{websocketpp::log::basic$<$ concurrency, names $>$}}
+\doxysubsubsection{\texorpdfstring{basic()}{basic()}\hspace{0.1cm}{\footnotesize\ttfamily [3/5]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1log_1_1basic_aa38b56b9985927e20e54ff618b23409f} 
+template$<$typename concurrency , typename names $>$ \\
+\mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic}{websocketpp\+::log\+::basic}}$<$ concurrency, names $>$\+::basic (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}}}]{c}{, }\item[{\mbox{\hyperlink{structwebsocketpp_1_1log_1_1channel__type__hint_a4c2533ba2359d8269a9c4b1ead19a080}{channel\+\_\+type\+\_\+hint\+::value}}}]{h}{ = {\ttfamily \mbox{\hyperlink{structwebsocketpp_1_1log_1_1channel__type__hint_a8c38587fffbffbfcfc35577734b0d653}{channel\+\_\+type\+\_\+hint\+::access}}}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{logger_2basic_8hpp_source_l00001}{1}} of file \mbox{\hyperlink{logger_2basic_8hpp_source}{basic.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ :\ m\_static\_channels(c)}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ ,\ m\_dynamic\_channels(0)}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ ,\ m\_out(h\ ==\ \mbox{\hyperlink{structwebsocketpp_1_1log_1_1channel__type__hint_a91473ac49fba696549da438483a6fe31}{channel\_type\_hint::error}}\ ?\ \&std::cerr\ :\ \&std::cout)\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1log_1_1basic_a43ccea903a0da548beace831b8629a1a}\index{websocketpp::log::basic$<$ concurrency, names $>$@{websocketpp::log::basic$<$ concurrency, names $>$}!basic@{basic}}
+\index{basic@{basic}!websocketpp::log::basic$<$ concurrency, names $>$@{websocketpp::log::basic$<$ concurrency, names $>$}}
+\doxysubsubsection{\texorpdfstring{basic()}{basic()}\hspace{0.1cm}{\footnotesize\ttfamily [4/5]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1log_1_1basic_a43ccea903a0da548beace831b8629a1a} 
+template$<$typename concurrency , typename names $>$ \\
+\mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic}{websocketpp\+::log\+::basic}}$<$ concurrency, names $>$\+::basic (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}}}]{c}{, }\item[{std\+::ostream \texorpdfstring{$\ast$}{*}}]{out}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{logger_2basic_8hpp_source_l00001}{1}} of file \mbox{\hyperlink{logger_2basic_8hpp_source}{basic.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ :\ m\_static\_channels(c)}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ ,\ m\_dynamic\_channels(0)}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ ,\ m\_out(out)\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1log_1_1basic_ae2070dee0da9ae3ccf0833b59e51eca8}\index{websocketpp::log::basic$<$ concurrency, names $>$@{websocketpp::log::basic$<$ concurrency, names $>$}!````~basic@{\texorpdfstring{$\sim$}{\string~}basic}}
+\index{````~basic@{\texorpdfstring{$\sim$}{\string~}basic}!websocketpp::log::basic$<$ concurrency, names $>$@{websocketpp::log::basic$<$ concurrency, names $>$}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}basic()}{\string~basic()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1log_1_1basic_ae2070dee0da9ae3ccf0833b59e51eca8} 
+template$<$typename concurrency , typename names $>$ \\
+\mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic}{websocketpp\+::log\+::basic}}$<$ concurrency, names $>$\+::\texorpdfstring{$\sim$}{\string~}\mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic}{basic}} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{logger_2basic_8hpp_source_l00001}{1}} of file \mbox{\hyperlink{logger_2basic_8hpp_source}{basic.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00084\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1log_1_1basic_ace381224e7990da5f3ec7505109fa541}\index{websocketpp::log::basic$<$ concurrency, names $>$@{websocketpp::log::basic$<$ concurrency, names $>$}!basic@{basic}}
+\index{basic@{basic}!websocketpp::log::basic$<$ concurrency, names $>$@{websocketpp::log::basic$<$ concurrency, names $>$}}
+\doxysubsubsection{\texorpdfstring{basic()}{basic()}\hspace{0.1cm}{\footnotesize\ttfamily [5/5]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1log_1_1basic_ace381224e7990da5f3ec7505109fa541} 
+template$<$typename concurrency , typename names $>$ \\
+\mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic}{websocketpp\+::log\+::basic}}$<$ concurrency, names $>$\+::basic (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic}{basic}}$<$ concurrency, names $>$ const \&}]{other}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{logger_2basic_8hpp_source_l00001}{1}} of file \mbox{\hyperlink{logger_2basic_8hpp_source}{basic.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00088\ \ \ \ \ \ :\ m\_static\_channels(\mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.m\_static\_channels)}
+\DoxyCodeLine{00089\ \ \ \ \ \ ,\ m\_dynamic\_channels(\mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.m\_dynamic\_channels)}
+\DoxyCodeLine{00090\ \ \ \ \ \ ,\ m\_out(\mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.m\_out)}
+\DoxyCodeLine{00091\ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classwebsocketpp_1_1log_1_1basic_a46bedf7f2bca8e28b39d0b6a4816a8d1}\index{websocketpp::log::basic$<$ concurrency, names $>$@{websocketpp::log::basic$<$ concurrency, names $>$}!clear\_channels@{clear\_channels}}
+\index{clear\_channels@{clear\_channels}!websocketpp::log::basic$<$ concurrency, names $>$@{websocketpp::log::basic$<$ concurrency, names $>$}}
+\doxysubsubsection{\texorpdfstring{clear\_channels()}{clear\_channels()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1log_1_1basic_a46bedf7f2bca8e28b39d0b6a4816a8d1} 
+template$<$typename concurrency , typename names $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic}{websocketpp\+::log\+::basic}}$<$ concurrency, names $>$\+::clear\+\_\+channels (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}}}]{channels}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{logger_2basic_8hpp_source_l00127}{127}} of file \mbox{\hyperlink{logger_2basic_8hpp_source}{basic.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic_a9da5fb9b1ac47522ce8d44b0f90a9fbb}{scoped\_lock\_type}}\ \mbox{\hyperlink{xbyak__mnemonic_8h_aa81aed607133209dade63a226818224d}{lock}}(\mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic_ad837b993a6e1070fbd3c1dc59b15a0eb}{m\_lock}});}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ m\_dynamic\_channels\ \&=\ \string~channels;}
+\DoxyCodeLine{00130\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=272pt]{classwebsocketpp_1_1log_1_1basic_a46bedf7f2bca8e28b39d0b6a4816a8d1_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1log_1_1basic_a46bedf7f2bca8e28b39d0b6a4816a8d1_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1log_1_1basic_a8f443b4ff286da803a114897a8f97105}\index{websocketpp::log::basic$<$ concurrency, names $>$@{websocketpp::log::basic$<$ concurrency, names $>$}!dynamic\_test@{dynamic\_test}}
+\index{dynamic\_test@{dynamic\_test}!websocketpp::log::basic$<$ concurrency, names $>$@{websocketpp::log::basic$<$ concurrency, names $>$}}
+\doxysubsubsection{\texorpdfstring{dynamic\_test()}{dynamic\_test()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1log_1_1basic_a8f443b4ff286da803a114897a8f97105} 
+template$<$typename concurrency , typename names $>$ \\
+bool \mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic}{websocketpp\+::log\+::basic}}$<$ concurrency, names $>$\+::dynamic\+\_\+test (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}}}]{channel}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{logger_2basic_8hpp_source_l00164}{164}} of file \mbox{\hyperlink{logger_2basic_8hpp_source}{basic.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ((channel\ \&\ m\_dynamic\_channels)\ !=\ 0);}
+\DoxyCodeLine{00166\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1log_1_1basic_a8f443b4ff286da803a114897a8f97105_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1log_1_1basic_a35e70935ce8b7a30c6eafea45181907a}\index{websocketpp::log::basic$<$ concurrency, names $>$@{websocketpp::log::basic$<$ concurrency, names $>$}!set\_channels@{set\_channels}}
+\index{set\_channels@{set\_channels}!websocketpp::log::basic$<$ concurrency, names $>$@{websocketpp::log::basic$<$ concurrency, names $>$}}
+\doxysubsubsection{\texorpdfstring{set\_channels()}{set\_channels()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1log_1_1basic_a35e70935ce8b7a30c6eafea45181907a} 
+template$<$typename concurrency , typename names $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic}{websocketpp\+::log\+::basic}}$<$ concurrency, names $>$\+::set\+\_\+channels (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}}}]{channels}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{logger_2basic_8hpp_source_l00117}{117}} of file \mbox{\hyperlink{logger_2basic_8hpp_source}{basic.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (channels\ ==\ names::none)\ \{}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic_a46bedf7f2bca8e28b39d0b6a4816a8d1}{clear\_channels}}(names::all);}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00122\ }
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic_a9da5fb9b1ac47522ce8d44b0f90a9fbb}{scoped\_lock\_type}}\ \mbox{\hyperlink{xbyak__mnemonic_8h_aa81aed607133209dade63a226818224d}{lock}}(\mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic_ad837b993a6e1070fbd3c1dc59b15a0eb}{m\_lock}});}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ m\_dynamic\_channels\ |=\ (channels\ \&\ m\_static\_channels);}
+\DoxyCodeLine{00125\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1log_1_1basic_a35e70935ce8b7a30c6eafea45181907a_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1log_1_1basic_a35e70935ce8b7a30c6eafea45181907a_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1log_1_1basic_ad35f40223f3a5a1e5650600f00938047}\index{websocketpp::log::basic$<$ concurrency, names $>$@{websocketpp::log::basic$<$ concurrency, names $>$}!set\_ostream@{set\_ostream}}
+\index{set\_ostream@{set\_ostream}!websocketpp::log::basic$<$ concurrency, names $>$@{websocketpp::log::basic$<$ concurrency, names $>$}}
+\doxysubsubsection{\texorpdfstring{set\_ostream()}{set\_ostream()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1log_1_1basic_ad35f40223f3a5a1e5650600f00938047} 
+template$<$typename concurrency , typename names $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic}{websocketpp\+::log\+::basic}}$<$ concurrency, names $>$\+::set\+\_\+ostream (\begin{DoxyParamCaption}\item[{std\+::ostream \texorpdfstring{$\ast$}{*}}]{out}{ = {\ttfamily \&std\+:\+:cout}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{logger_2basic_8hpp_source_l00113}{113}} of file \mbox{\hyperlink{logger_2basic_8hpp_source}{basic.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ m\_out\ =\ out;}
+\DoxyCodeLine{00115\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1log_1_1basic_a735d9aa5c0776140c092bc3e5d58341d}\index{websocketpp::log::basic$<$ concurrency, names $>$@{websocketpp::log::basic$<$ concurrency, names $>$}!static\_test@{static\_test}}
+\index{static\_test@{static\_test}!websocketpp::log::basic$<$ concurrency, names $>$@{websocketpp::log::basic$<$ concurrency, names $>$}}
+\doxysubsubsection{\texorpdfstring{static\_test()}{static\_test()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1log_1_1basic_a735d9aa5c0776140c092bc3e5d58341d} 
+template$<$typename concurrency , typename names $>$ \\
+\mbox{\hyperlink{cpp11_8hpp_a3dc3ece336a6149d2fe208a9daf66043}{\+\_\+\+WEBSOCKETPP\+\_\+\+CONSTEXPR\+\_\+\+TOKEN\+\_\+}} bool \mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic}{websocketpp\+::log\+::basic}}$<$ concurrency, names $>$\+::static\+\_\+test (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}}}]{channel}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{logger_2basic_8hpp_source_l00160}{160}} of file \mbox{\hyperlink{logger_2basic_8hpp_source}{basic.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ((channel\ \&\ m\_static\_channels)\ !=\ 0);}
+\DoxyCodeLine{00162\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1log_1_1basic_a693e6a522f654fd131a0c6f8d084c921}\index{websocketpp::log::basic$<$ concurrency, names $>$@{websocketpp::log::basic$<$ concurrency, names $>$}!write@{write}}
+\index{write@{write}!websocketpp::log::basic$<$ concurrency, names $>$@{websocketpp::log::basic$<$ concurrency, names $>$}}
+\doxysubsubsection{\texorpdfstring{write()}{write()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1log_1_1basic_a693e6a522f654fd131a0c6f8d084c921} 
+template$<$typename concurrency , typename names $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic}{websocketpp\+::log\+::basic}}$<$ concurrency, names $>$\+::write (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}}}]{channel}{, }\item[{char const \texorpdfstring{$\ast$}{*}}]{msg}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+\begin{DoxyParams}{Parameters}
+{\em channel} & The channel to write to \\
+\hline
+{\em msg} & The message to write \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{logger_2basic_8hpp_source_l00151}{151}} of file \mbox{\hyperlink{logger_2basic_8hpp_source}{basic.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic_a9da5fb9b1ac47522ce8d44b0f90a9fbb}{scoped\_lock\_type}}\ \mbox{\hyperlink{xbyak__mnemonic_8h_aa81aed607133209dade63a226818224d}{lock}}(\mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic_ad837b993a6e1070fbd3c1dc59b15a0eb}{m\_lock}});}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!this-\/>\mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic_a8f443b4ff286da803a114897a8f97105}{dynamic\_test}}(channel))\ \{\ \textcolor{keywordflow}{return};\ \}}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ *m\_out\ <<\ \textcolor{stringliteral}{"{}["{}}\ <<\ timestamp\ <<\ \textcolor{stringliteral}{"{}]\ "{}}}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}["{}}\ <<\ names::channel\_name(channel)\ <<\ \textcolor{stringliteral}{"{}]\ "{}}}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ msg\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ m\_out-\/>flush();}
+\DoxyCodeLine{00158\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1log_1_1basic_a693e6a522f654fd131a0c6f8d084c921_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1log_1_1basic_a9f87a8c3e5d8e25e5f014756827a587a}\index{websocketpp::log::basic$<$ concurrency, names $>$@{websocketpp::log::basic$<$ concurrency, names $>$}!write@{write}}
+\index{write@{write}!websocketpp::log::basic$<$ concurrency, names $>$@{websocketpp::log::basic$<$ concurrency, names $>$}}
+\doxysubsubsection{\texorpdfstring{write()}{write()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1log_1_1basic_a9f87a8c3e5d8e25e5f014756827a587a} 
+template$<$typename concurrency , typename names $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic}{websocketpp\+::log\+::basic}}$<$ concurrency, names $>$\+::write (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}}}]{channel}{, }\item[{std\+::string const \&}]{msg}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+\begin{DoxyParams}{Parameters}
+{\em channel} & The channel to write to \\
+\hline
+{\em msg} & The message to write \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{logger_2basic_8hpp_source_l00137}{137}} of file \mbox{\hyperlink{logger_2basic_8hpp_source}{basic.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic_a9da5fb9b1ac47522ce8d44b0f90a9fbb}{scoped\_lock\_type}}\ \mbox{\hyperlink{xbyak__mnemonic_8h_aa81aed607133209dade63a226818224d}{lock}}(\mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic_ad837b993a6e1070fbd3c1dc59b15a0eb}{m\_lock}});}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!this-\/>\mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic_a8f443b4ff286da803a114897a8f97105}{dynamic\_test}}(channel))\ \{\ \textcolor{keywordflow}{return};\ \}}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ *m\_out\ <<\ \textcolor{stringliteral}{"{}["{}}\ <<\ timestamp\ <<\ \textcolor{stringliteral}{"{}]\ "{}}}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}["{}}\ <<\ names::channel\_name(channel)\ <<\ \textcolor{stringliteral}{"{}]\ "{}}}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ msg\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ m\_out-\/>flush();}
+\DoxyCodeLine{00144\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1log_1_1basic_a9f87a8c3e5d8e25e5f014756827a587a_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1log_1_1basic_a9f87a8c3e5d8e25e5f014756827a587a_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classwebsocketpp_1_1log_1_1basic_ad837b993a6e1070fbd3c1dc59b15a0eb}\index{websocketpp::log::basic$<$ concurrency, names $>$@{websocketpp::log::basic$<$ concurrency, names $>$}!m\_lock@{m\_lock}}
+\index{m\_lock@{m\_lock}!websocketpp::log::basic$<$ concurrency, names $>$@{websocketpp::log::basic$<$ concurrency, names $>$}}
+\doxysubsubsection{\texorpdfstring{m\_lock}{m\_lock}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1log_1_1basic_ad837b993a6e1070fbd3c1dc59b15a0eb} 
+template$<$typename concurrency , typename names $>$ \\
+\mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic_a251fcad2a65b7a05b21d3479b970940d}{mutex\+\_\+type}} \mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic}{websocketpp\+::log\+::basic}}$<$ concurrency, names $>$\+::m\+\_\+lock\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{logger_2basic_8hpp_source_l00171}{171}} of file \mbox{\hyperlink{logger_2basic_8hpp_source}{basic.\+hpp}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/vendor/websocketpp/websocketpp/logger/\mbox{\hyperlink{logger_2basic_8hpp}{basic.\+hpp}}\end{DoxyCompactItemize}

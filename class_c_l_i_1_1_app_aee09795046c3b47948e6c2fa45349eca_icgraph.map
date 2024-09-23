@@ -1,0 +1,15 @@
+<map id="CLI::App::_parse_config" name="CLI::App::_parse_config">
+<area shape="rect" id="Node000001" title=" " alt="" coords="700,31,862,56"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_app.html#a7a15e5743d4a8eccac57955ed5a6a3b6" title="Read and process a configuration file (main app only)" alt="" coords="517,23,652,64"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="684,46,652,46,652,41,684,41"/>
+<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_app.html#a0fec24c804daf5b458bb5762e4e75a73" title="Process callbacks and such." alt="" coords="335,31,469,56"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="502,46,470,46,470,41,502,41"/>
+<area shape="rect" id="Node000004" href="$class_c_l_i_1_1_app.html#a26a92886a7d7f10a9afbd39b6535f42b" title="Internal parse function." alt="" coords="167,5,287,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="319,34,287,29,288,24,320,29"/>
+<area shape="rect" id="Node000005" href="$class_c_l_i_1_1_app.html#a241ba75a6c98b36349ae2f71a9137291" title="Internal parse function." alt="" coords="167,55,287,80"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="320,57,288,62,287,57,319,52"/>
+<area shape="rect" id="Node000006" href="$class_c_l_i_1_1_app.html#a8ffb155a1153ee23d442c5bfed21225c" title="The real work is done here. Expects a reversed vector." alt="" coords="5,29,119,55"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="151,58,119,54,119,48,151,53"/>
+<area shape="rect" id="Node000007" href="$class_c_l_i_1_1_app.html#a878c1067ade7145aa11478d64f5173ed" title=" " alt="" coords="5,79,119,104"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="151,81,119,86,119,81,151,76"/>
+</map>

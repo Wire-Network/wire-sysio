@@ -1,0 +1,150 @@
+\doxysection{Catch\+::Section Class Reference}
+\hypertarget{class_catch_1_1_section}{}\label{class_catch_1_1_section}\index{Catch::Section@{Catch::Section}}
+
+
+{\ttfamily \#include $<$catch\+\_\+section.\+h$>$}
+
+
+
+Inheritance diagram for Catch\+::Section\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=188pt]{class_catch_1_1_section__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Catch\+::Section\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=188pt]{class_catch_1_1_section__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_catch_1_1_section_a68fd4e51e8981aaa7ddb00d8a6abd099}{Section}} (\mbox{\hyperlink{struct_catch_1_1_section_info}{Section\+Info}} const \&info)
+\item 
+\mbox{\hyperlink{class_catch_1_1_section_aa1422edd68a77aa578b5cc6b8b69f86f}{\texorpdfstring{$\sim$}{\string~}\+Section}} ()
+\item 
+\mbox{\hyperlink{class_catch_1_1_section_a0632b804dcea1417a2970620a9742eb3}{operator bool}} () const
+\item 
+\mbox{\hyperlink{class_catch_1_1_section_a68fd4e51e8981aaa7ddb00d8a6abd099}{Section}} (\mbox{\hyperlink{struct_catch_1_1_section_info}{Section\+Info}} const \&info)
+\item 
+\mbox{\hyperlink{class_catch_1_1_section_aa1422edd68a77aa578b5cc6b8b69f86f}{\texorpdfstring{$\sim$}{\string~}\+Section}} ()
+\item 
+\mbox{\hyperlink{class_catch_1_1_section_a0632b804dcea1417a2970620a9742eb3}{operator bool}} () const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source_l02535}{2535}} of file \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source}{catch.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_catch_1_1_section_a68fd4e51e8981aaa7ddb00d8a6abd099}\index{Catch::Section@{Catch::Section}!Section@{Section}}
+\index{Section@{Section}!Catch::Section@{Catch::Section}}
+\doxysubsubsection{\texorpdfstring{Section()}{Section()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_section_a68fd4e51e8981aaa7ddb00d8a6abd099} 
+Catch\+::\+Section\+::\+Section (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_section_info}{Section\+Info}} const \&}]{info}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__section_8cpp_source_l00015}{15}} of file \mbox{\hyperlink{catch__section_8cpp_source}{catch\+\_\+section.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00016\ \ \ \ \ :\ \ \ m\_info(\ info\ ),}
+\DoxyCodeLine{00017\ \ \ \ \ \ \ \ \ m\_sectionIncluded(\ \mbox{\hyperlink{namespace_catch_af718eeab870712f292ed8dc6ee3f6488}{getResultCapture}}().sectionStarted(\ m\_info,\ m\_assertions\ )\ )}
+\DoxyCodeLine{00018\ \ \ \ \ \{}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ m\_timer.\mbox{\hyperlink{class_catch_1_1_timer_a0a56e879e43f36c102bf9ea8b5fc8b72}{start}}();}
+\DoxyCodeLine{00020\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_section_a68fd4e51e8981aaa7ddb00d8a6abd099_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_section_aa1422edd68a77aa578b5cc6b8b69f86f}\index{Catch::Section@{Catch::Section}!````~Section@{\texorpdfstring{$\sim$}{\string~}Section}}
+\index{````~Section@{\texorpdfstring{$\sim$}{\string~}Section}!Catch::Section@{Catch::Section}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}Section()}{\string~Section()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_section_aa1422edd68a77aa578b5cc6b8b69f86f} 
+Catch\+::\+Section\+::\texorpdfstring{$\sim$}{\string~}\+Section (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__section_8cpp_source_l00022}{22}} of file \mbox{\hyperlink{catch__section_8cpp_source}{catch\+\_\+section.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ m\_sectionIncluded\ )\ \{}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \ \ \ \ SectionEndInfo\ endInfo\{\ m\_info,\ m\_assertions,\ m\_timer.\mbox{\hyperlink{class_catch_1_1_timer_a065e37e3c9eb16bd4dcf41971d8deedc}{getElapsedSeconds}}()\ \};}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{namespace_catch_a4b5a2b34a00e65b753185bbc6a4962be}{uncaught\_exceptions}}()\ )}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_catch_af718eeab870712f292ed8dc6ee3f6488}{getResultCapture}}().\mbox{\hyperlink{struct_catch_1_1_i_result_capture_afcc71eef8ca821ae132cced4a2be6988}{sectionEndedEarly}}(\ endInfo\ );}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_catch_af718eeab870712f292ed8dc6ee3f6488}{getResultCapture}}().\mbox{\hyperlink{struct_catch_1_1_i_result_capture_a4e152bc43dc0933684e31fa67a58195d}{sectionEnded}}(\ endInfo\ );}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00030\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_section_aa1422edd68a77aa578b5cc6b8b69f86f_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_section_a68fd4e51e8981aaa7ddb00d8a6abd099}\index{Catch::Section@{Catch::Section}!Section@{Section}}
+\index{Section@{Section}!Catch::Section@{Catch::Section}}
+\doxysubsubsection{\texorpdfstring{Section()}{Section()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_section_a68fd4e51e8981aaa7ddb00d8a6abd099} 
+Catch\+::\+Section\+::\+Section (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_section_info}{Section\+Info}} const \&}]{info}{}\end{DoxyParamCaption})}
+
+\Hypertarget{class_catch_1_1_section_aa1422edd68a77aa578b5cc6b8b69f86f}\index{Catch::Section@{Catch::Section}!````~Section@{\texorpdfstring{$\sim$}{\string~}Section}}
+\index{````~Section@{\texorpdfstring{$\sim$}{\string~}Section}!Catch::Section@{Catch::Section}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}Section()}{\string~Section()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_section_aa1422edd68a77aa578b5cc6b8b69f86f} 
+Catch\+::\+Section\+::\texorpdfstring{$\sim$}{\string~}\+Section (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_catch_1_1_section_a0632b804dcea1417a2970620a9742eb3}\index{Catch::Section@{Catch::Section}!operator bool@{operator bool}}
+\index{operator bool@{operator bool}!Catch::Section@{Catch::Section}}
+\doxysubsubsection{\texorpdfstring{operator bool()}{operator bool()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_section_a0632b804dcea1417a2970620a9742eb3} 
+Catch\+::\+Section\+::operator bool (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__section_8cpp_source_l00033}{33}} of file \mbox{\hyperlink{catch__section_8cpp_source}{catch\+\_\+section.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_sectionIncluded;}
+\DoxyCodeLine{00035\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_section_a0632b804dcea1417a2970620a9742eb3}\index{Catch::Section@{Catch::Section}!operator bool@{operator bool}}
+\index{operator bool@{operator bool}!Catch::Section@{Catch::Section}}
+\doxysubsubsection{\texorpdfstring{operator bool()}{operator bool()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_section_a0632b804dcea1417a2970620a9742eb3} 
+Catch\+::\+Section\+::operator bool (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [explicit]}}
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__section_8h}{catch\+\_\+section.\+h}}\item 
+libraries/sys-\/vm/external/\+Catch2/single\+\_\+include/catch2/\mbox{\hyperlink{single__include_2catch2_2catch_8hpp}{catch.\+hpp}}\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__section_8cpp}{catch\+\_\+section.\+cpp}}\end{DoxyCompactItemize}

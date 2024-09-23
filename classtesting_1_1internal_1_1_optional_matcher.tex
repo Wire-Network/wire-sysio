@@ -1,0 +1,80 @@
+\doxysection{testing\+::internal\+::Optional\+Matcher\texorpdfstring{$<$}{<} Value\+Matcher \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classtesting_1_1internal_1_1_optional_matcher}{}\label{classtesting_1_1internal_1_1_optional_matcher}\index{testing::internal::OptionalMatcher$<$ ValueMatcher $>$@{testing::internal::OptionalMatcher$<$ ValueMatcher $>$}}
+
+
+{\ttfamily \#include $<$gmock-\/matchers.\+h$>$}
+
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classtesting_1_1internal_1_1_optional_matcher_1_1_impl}{Impl}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_optional_matcher_a0c40287dc70d612f6820915e79f3bc18}{Optional\+Matcher}} (const Value\+Matcher \&value\+\_\+matcher)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{_regexp_8cpp_a14e38f4a8adc8f3150baff82db66dbdd}{Optional}} $>$ }\\\mbox{\hyperlink{classtesting_1_1internal_1_1_optional_matcher_a890a63811b56640e08114500a1dee752}{operator Matcher$<$ Optional $>$}} () const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Value\+Matcher$>$\newline
+class testing\+::internal\+::\+Optional\+Matcher$<$ Value\+Matcher $>$}
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l04001}{4001}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_optional_matcher_a0c40287dc70d612f6820915e79f3bc18}\index{testing::internal::OptionalMatcher$<$ ValueMatcher $>$@{testing::internal::OptionalMatcher$<$ ValueMatcher $>$}!OptionalMatcher@{OptionalMatcher}}
+\index{OptionalMatcher@{OptionalMatcher}!testing::internal::OptionalMatcher$<$ ValueMatcher $>$@{testing::internal::OptionalMatcher$<$ ValueMatcher $>$}}
+\doxysubsubsection{\texorpdfstring{OptionalMatcher()}{OptionalMatcher()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_optional_matcher_a0c40287dc70d612f6820915e79f3bc18} 
+template$<$typename Value\+Matcher $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_optional_matcher}{testing\+::internal\+::\+Optional\+Matcher}}$<$ Value\+Matcher $>$\+::\+Optional\+Matcher (\begin{DoxyParamCaption}\item[{const Value\+Matcher \&}]{value\+\_\+matcher}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l04003}{4003}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{04004\ \ \ \ \ \ \ :\ value\_matcher\_(value\_matcher)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_optional_matcher_a890a63811b56640e08114500a1dee752}\index{testing::internal::OptionalMatcher$<$ ValueMatcher $>$@{testing::internal::OptionalMatcher$<$ ValueMatcher $>$}!operator Matcher$<$ Optional $>$@{operator Matcher$<$ Optional $>$}}
+\index{operator Matcher$<$ Optional $>$@{operator Matcher$<$ Optional $>$}!testing::internal::OptionalMatcher$<$ ValueMatcher $>$@{testing::internal::OptionalMatcher$<$ ValueMatcher $>$}}
+\doxysubsubsection{\texorpdfstring{operator Matcher$<$ Optional $>$()}{operator Matcher< Optional >()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_optional_matcher_a890a63811b56640e08114500a1dee752} 
+template$<$typename Value\+Matcher $>$ \\
+template$<$typename \mbox{\hyperlink{_regexp_8cpp_a14e38f4a8adc8f3150baff82db66dbdd}{Optional}} $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_optional_matcher}{testing\+::internal\+::\+Optional\+Matcher}}$<$ Value\+Matcher $>$\+::operator \mbox{\hyperlink{classtesting_1_1_matcher}{Matcher}}$<$ \mbox{\hyperlink{_regexp_8cpp_a14e38f4a8adc8f3150baff82db66dbdd}{Optional}} $>$ (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l04007}{4007}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{04007\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{04008\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetesting_aca6c4c4fdf7fb7257ea4fc76971cb82c}{MakeMatcher}}(\textcolor{keyword}{new}\ Impl<Optional>(value\_matcher\_));}
+\DoxyCodeLine{04009\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_optional_matcher_a890a63811b56640e08114500a1dee752_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/include/gmock/\mbox{\hyperlink{gmock-matchers_8h}{gmock-\/matchers.\+h}}\end{DoxyCompactItemize}

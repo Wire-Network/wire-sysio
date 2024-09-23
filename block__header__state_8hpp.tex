@@ -1,0 +1,60 @@
+\doxysection{libraries/chain/include/sysio/chain/block\+\_\+header\+\_\+state.hpp File Reference}
+\hypertarget{block__header__state_8hpp}{}\label{block__header__state_8hpp}\index{libraries/chain/include/sysio/chain/block\_header\_state.hpp@{libraries/chain/include/sysio/chain/block\_header\_state.hpp}}
+{\ttfamily \#include $<$sysio/chain/block\+\_\+header.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/incremental\+\_\+merkle.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/protocol\+\_\+feature\+\_\+manager.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/chain\+\_\+snapshot.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/s\+\_\+root\+\_\+extension.\+hpp$>$}\newline
+{\ttfamily \#include $<$future$>$}\newline
+Include dependency graph for block\+\_\+header\+\_\+state.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{block__header__state_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{block__header__state_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1legacy_1_1snapshot__block__header__state__v2}{sysio\+::chain\+::legacy\+::snapshot\+\_\+block\+\_\+header\+\_\+state\+\_\+v2}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1legacy_1_1snapshot__block__header__state__v2_1_1schedule__info}{sysio\+::chain\+::legacy\+::snapshot\+\_\+block\+\_\+header\+\_\+state\+\_\+v2\+::schedule\+\_\+info}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1detail_1_1block__header__state__common}{sysio\+::chain\+::detail\+::block\+\_\+header\+\_\+state\+\_\+common}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1detail_1_1schedule__info}{sysio\+::chain\+::detail\+::schedule\+\_\+info}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1pending__block__header__state}{sysio\+::chain\+::pending\+\_\+block\+\_\+header\+\_\+state}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1block__header__state}{sysio\+::chain\+::block\+\_\+header\+\_\+state}}
+\begin{DoxyCompactList}\small\item\em defines the minimum state necessary to validate transaction headers \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain}{sysio\+::chain}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain_1_1legacy}{sysio\+::chain\+::legacy}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain_1_1detail}{sysio\+::chain\+::detail}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_a2cfc12be90aaa9b98843b120fecc71b0}{sysio\+::chain\+::signer\+\_\+callback\+\_\+type}} = std\+::function$<$std\+::vector$<$\mbox{\hyperlink{namespacesysio_1_1chain_af141a69eb789b86fa0eb93c2d263f0df}{signature\+\_\+type}}$>$(const \mbox{\hyperlink{namespacesysio_1_1chain_a357fd9478475457e5bb386a3143079b6}{digest\+\_\+type}}\&)$>$
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_a918963c39fa6317556dca73276274e64}{sysio\+::chain\+::block\+\_\+header\+\_\+state\+\_\+ptr}} = std\+::shared\+\_\+ptr$<$\mbox{\hyperlink{structsysio_1_1chain_1_1block__header__state}{block\+\_\+header\+\_\+state}}$>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{namespacesysio_1_1chain_1_1detail_ad7f3ac7b970f7c5d559e3f176461a579}{sysio\+::chain\+::detail\+::is\+\_\+builtin\+\_\+activated}} (const \mbox{\hyperlink{namespacesysio_1_1chain_ac8b5d89808934345baf62f978b6b7a63}{protocol\+\_\+feature\+\_\+activation\+\_\+set\+\_\+ptr}} \&pfa, const \mbox{\hyperlink{classsysio_1_1chain_1_1protocol__feature__set}{protocol\+\_\+feature\+\_\+set}} \&pfs, \mbox{\hyperlink{namespacesysio_1_1chain_a406d45a184cdba0af316b5bf34bf56cf}{builtin\+\_\+protocol\+\_\+feature\+\_\+t}} feature\+\_\+codename)
+\end{DoxyCompactItemize}

@@ -1,0 +1,222 @@
+\doxysection{sysio\+::chain\+::impl\+::abi\+\_\+traverse\+\_\+context Struct Reference}
+\hypertarget{structsysio_1_1chain_1_1impl_1_1abi__traverse__context}{}\label{structsysio_1_1chain_1_1impl_1_1abi__traverse__context}\index{sysio::chain::impl::abi\_traverse\_context@{sysio::chain::impl::abi\_traverse\_context}}
+
+
+{\ttfamily \#include $<$abi\+\_\+serializer.\+hpp$>$}
+
+
+
+Inheritance diagram for sysio\+::chain\+::impl\+::abi\+\_\+traverse\+\_\+context\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1impl_1_1abi__traverse__context__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for sysio\+::chain\+::impl\+::abi\+\_\+traverse\+\_\+context\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=277pt]{structsysio_1_1chain_1_1impl_1_1abi__traverse__context__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1abi__traverse__context_a0c3cf4d08ce7fba0c3b9d52450a81cc9}{abi\+\_\+traverse\+\_\+context}} (\mbox{\hyperlink{structsysio_1_1chain_1_1abi__serializer_ac81c8efe132df6ebffcfa61fb2a6959e}{abi\+\_\+serializer\+::yield\+\_\+function\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1abi__traverse__context_a37566cb79428f061ca3e395bb42d0786}{yield}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1abi__traverse__context_a1da31a9de3c382eb57c046774c9cc00e}{logging}} ()
+\item 
+bool \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1abi__traverse__context_a67577173dee66292b915086399c288c1}{is\+\_\+logging}} () const
+\item 
+void \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1abi__traverse__context_a5a836b627a5769039f1ce5fa96f9074c}{check\+\_\+deadline}} () const
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1abi__serializer_ac81c8efe132df6ebffcfa61fb2a6959e}{abi\+\_\+serializer\+::yield\+\_\+function\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1abi__traverse__context_a5ed31dd2ba1cea8d7934cc1c670b9888}{get\+\_\+yield\+\_\+function}} ()
+\item 
+\mbox{\hyperlink{classfc_1_1scoped__exit}{fc\+::scoped\+\_\+exit}}$<$ std\+::function$<$ void()$>$ $>$ \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1abi__traverse__context_aa59879bd83e287e7174d4d0ba248d3ea}{enter\+\_\+scope}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1abi__serializer_ac81c8efe132df6ebffcfa61fb2a6959e}{abi\+\_\+serializer\+::yield\+\_\+function\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1abi__traverse__context_a37566cb79428f061ca3e395bb42d0786}{yield}}
+\item 
+size\+\_\+t \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1abi__traverse__context_a7cb77b1d7ae0e715ba8e23571e24bf2e}{recursion\+\_\+depth}} = 0
+\item 
+bool \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1abi__traverse__context_a55075818d7a3b4281173e53f98cd1018}{log}} = false
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{abi__serializer_8hpp_source_l00173}{173}} of file \mbox{\hyperlink{abi__serializer_8hpp_source}{abi\+\_\+serializer.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structsysio_1_1chain_1_1impl_1_1abi__traverse__context_a0c3cf4d08ce7fba0c3b9d52450a81cc9}\index{sysio::chain::impl::abi\_traverse\_context@{sysio::chain::impl::abi\_traverse\_context}!abi\_traverse\_context@{abi\_traverse\_context}}
+\index{abi\_traverse\_context@{abi\_traverse\_context}!sysio::chain::impl::abi\_traverse\_context@{sysio::chain::impl::abi\_traverse\_context}}
+\doxysubsubsection{\texorpdfstring{abi\_traverse\_context()}{abi\_traverse\_context()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1impl_1_1abi__traverse__context_a0c3cf4d08ce7fba0c3b9d52450a81cc9} 
+sysio\+::chain\+::impl\+::abi\+\_\+traverse\+\_\+context\+::abi\+\_\+traverse\+\_\+context (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1abi__serializer_ac81c8efe132df6ebffcfa61fb2a6959e}{abi\+\_\+serializer\+::yield\+\_\+function\+\_\+t}}}]{yield}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{abi__serializer_8hpp_source_l00174}{174}} of file \mbox{\hyperlink{abi__serializer_8hpp_source}{abi\+\_\+serializer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ :\ \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1abi__traverse__context_a37566cb79428f061ca3e395bb42d0786}{yield}}(std::move(\ \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1abi__traverse__context_a37566cb79428f061ca3e395bb42d0786}{yield}}\ ))}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1chain_1_1impl_1_1abi__traverse__context_a5a836b627a5769039f1ce5fa96f9074c}\index{sysio::chain::impl::abi\_traverse\_context@{sysio::chain::impl::abi\_traverse\_context}!check\_deadline@{check\_deadline}}
+\index{check\_deadline@{check\_deadline}!sysio::chain::impl::abi\_traverse\_context@{sysio::chain::impl::abi\_traverse\_context}}
+\doxysubsubsection{\texorpdfstring{check\_deadline()}{check\_deadline()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1impl_1_1abi__traverse__context_a5a836b627a5769039f1ce5fa96f9074c} 
+void sysio\+::chain\+::impl\+::abi\+\_\+traverse\+\_\+context\+::check\+\_\+deadline (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{abi__serializer_8hpp_source_l00182}{182}} of file \mbox{\hyperlink{abi__serializer_8hpp_source}{abi\+\_\+serializer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00182\ \{\ \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1abi__traverse__context_a37566cb79428f061ca3e395bb42d0786}{yield}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1abi__traverse__context_a7cb77b1d7ae0e715ba8e23571e24bf2e}{recursion\_depth}}\ );\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1impl_1_1abi__traverse__context_aa59879bd83e287e7174d4d0ba248d3ea}\index{sysio::chain::impl::abi\_traverse\_context@{sysio::chain::impl::abi\_traverse\_context}!enter\_scope@{enter\_scope}}
+\index{enter\_scope@{enter\_scope}!sysio::chain::impl::abi\_traverse\_context@{sysio::chain::impl::abi\_traverse\_context}}
+\doxysubsubsection{\texorpdfstring{enter\_scope()}{enter\_scope()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1impl_1_1abi__traverse__context_aa59879bd83e287e7174d4d0ba248d3ea} 
+\mbox{\hyperlink{classfc_1_1scoped__exit}{fc\+::scoped\+\_\+exit}}$<$ std\+::function$<$ void()$>$ $>$ sysio\+::chain\+::impl\+::abi\+\_\+traverse\+\_\+context\+::enter\+\_\+scope (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{abi__serializer_8cpp_source_l00631}{631}} of file \mbox{\hyperlink{abi__serializer_8cpp_source}{abi\+\_\+serializer.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00631\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00632\ \ \ \ \ \ \ \ \ \ std::function<void()>\ callback\ =\ [old\_recursion\_depth=\mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1abi__traverse__context_a7cb77b1d7ae0e715ba8e23571e24bf2e}{recursion\_depth}},\ \textcolor{keyword}{this}]()\{}
+\DoxyCodeLine{00633\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1abi__traverse__context_a7cb77b1d7ae0e715ba8e23571e24bf2e}{recursion\_depth}}\ =\ old\_recursion\_depth;}
+\DoxyCodeLine{00634\ \ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00635\ }
+\DoxyCodeLine{00636\ \ \ \ \ \ \ \ \ \ ++\mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1abi__traverse__context_a7cb77b1d7ae0e715ba8e23571e24bf2e}{recursion\_depth}};}
+\DoxyCodeLine{00637\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1abi__traverse__context_a37566cb79428f061ca3e395bb42d0786}{yield}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1abi__traverse__context_a7cb77b1d7ae0e715ba8e23571e24bf2e}{recursion\_depth}}\ );}
+\DoxyCodeLine{00638\ }
+\DoxyCodeLine{00639\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{std::move(callback)\};}
+\DoxyCodeLine{00640\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1impl_1_1abi__traverse__context_aa59879bd83e287e7174d4d0ba248d3ea_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1impl_1_1abi__traverse__context_a5ed31dd2ba1cea8d7934cc1c670b9888}\index{sysio::chain::impl::abi\_traverse\_context@{sysio::chain::impl::abi\_traverse\_context}!get\_yield\_function@{get\_yield\_function}}
+\index{get\_yield\_function@{get\_yield\_function}!sysio::chain::impl::abi\_traverse\_context@{sysio::chain::impl::abi\_traverse\_context}}
+\doxysubsubsection{\texorpdfstring{get\_yield\_function()}{get\_yield\_function()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1impl_1_1abi__traverse__context_a5ed31dd2ba1cea8d7934cc1c670b9888} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1abi__serializer_ac81c8efe132df6ebffcfa61fb2a6959e}{abi\+\_\+serializer\+::yield\+\_\+function\+\_\+t}} sysio\+::chain\+::impl\+::abi\+\_\+traverse\+\_\+context\+::get\+\_\+yield\+\_\+function (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{abi__serializer_8hpp_source_l00183}{183}} of file \mbox{\hyperlink{abi__serializer_8hpp_source}{abi\+\_\+serializer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00183\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1abi__traverse__context_a37566cb79428f061ca3e395bb42d0786}{yield}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1impl_1_1abi__traverse__context_a67577173dee66292b915086399c288c1}\index{sysio::chain::impl::abi\_traverse\_context@{sysio::chain::impl::abi\_traverse\_context}!is\_logging@{is\_logging}}
+\index{is\_logging@{is\_logging}!sysio::chain::impl::abi\_traverse\_context@{sysio::chain::impl::abi\_traverse\_context}}
+\doxysubsubsection{\texorpdfstring{is\_logging()}{is\_logging()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1impl_1_1abi__traverse__context_a67577173dee66292b915086399c288c1} 
+bool sysio\+::chain\+::impl\+::abi\+\_\+traverse\+\_\+context\+::is\+\_\+logging (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{abi__serializer_8hpp_source_l00180}{180}} of file \mbox{\hyperlink{abi__serializer_8hpp_source}{abi\+\_\+serializer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00180\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1abi__traverse__context_a55075818d7a3b4281173e53f98cd1018}{log}};\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1impl_1_1abi__traverse__context_a67577173dee66292b915086399c288c1_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1impl_1_1abi__traverse__context_a1da31a9de3c382eb57c046774c9cc00e}\index{sysio::chain::impl::abi\_traverse\_context@{sysio::chain::impl::abi\_traverse\_context}!logging@{logging}}
+\index{logging@{logging}!sysio::chain::impl::abi\_traverse\_context@{sysio::chain::impl::abi\_traverse\_context}}
+\doxysubsubsection{\texorpdfstring{logging()}{logging()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1impl_1_1abi__traverse__context_a1da31a9de3c382eb57c046774c9cc00e} 
+void sysio\+::chain\+::impl\+::abi\+\_\+traverse\+\_\+context\+::logging (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{abi__serializer_8hpp_source_l00179}{179}} of file \mbox{\hyperlink{abi__serializer_8hpp_source}{abi\+\_\+serializer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00179\ \{\ log\ =\ \textcolor{keyword}{true};\ \}\ \textcolor{comment}{//\ generate\ variant\ for\ logging}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1impl_1_1abi__traverse__context_a1da31a9de3c382eb57c046774c9cc00e_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1chain_1_1impl_1_1abi__traverse__context_a55075818d7a3b4281173e53f98cd1018}\index{sysio::chain::impl::abi\_traverse\_context@{sysio::chain::impl::abi\_traverse\_context}!log@{log}}
+\index{log@{log}!sysio::chain::impl::abi\_traverse\_context@{sysio::chain::impl::abi\_traverse\_context}}
+\doxysubsubsection{\texorpdfstring{log}{log}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1impl_1_1abi__traverse__context_a55075818d7a3b4281173e53f98cd1018} 
+bool sysio\+::chain\+::impl\+::abi\+\_\+traverse\+\_\+context\+::log = false\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{abi__serializer_8hpp_source_l00190}{190}} of file \mbox{\hyperlink{abi__serializer_8hpp_source}{abi\+\_\+serializer.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1impl_1_1abi__traverse__context_a7cb77b1d7ae0e715ba8e23571e24bf2e}\index{sysio::chain::impl::abi\_traverse\_context@{sysio::chain::impl::abi\_traverse\_context}!recursion\_depth@{recursion\_depth}}
+\index{recursion\_depth@{recursion\_depth}!sysio::chain::impl::abi\_traverse\_context@{sysio::chain::impl::abi\_traverse\_context}}
+\doxysubsubsection{\texorpdfstring{recursion\_depth}{recursion\_depth}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1impl_1_1abi__traverse__context_a7cb77b1d7ae0e715ba8e23571e24bf2e} 
+size\+\_\+t sysio\+::chain\+::impl\+::abi\+\_\+traverse\+\_\+context\+::recursion\+\_\+depth = 0\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{abi__serializer_8hpp_source_l00189}{189}} of file \mbox{\hyperlink{abi__serializer_8hpp_source}{abi\+\_\+serializer.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1impl_1_1abi__traverse__context_a37566cb79428f061ca3e395bb42d0786}\index{sysio::chain::impl::abi\_traverse\_context@{sysio::chain::impl::abi\_traverse\_context}!yield@{yield}}
+\index{yield@{yield}!sysio::chain::impl::abi\_traverse\_context@{sysio::chain::impl::abi\_traverse\_context}}
+\doxysubsubsection{\texorpdfstring{yield}{yield}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1impl_1_1abi__traverse__context_a37566cb79428f061ca3e395bb42d0786} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1abi__serializer_ac81c8efe132df6ebffcfa61fb2a6959e}{abi\+\_\+serializer\+::yield\+\_\+function\+\_\+t}} sysio\+::chain\+::impl\+::abi\+\_\+traverse\+\_\+context\+::yield\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{abi__serializer_8hpp_source_l00188}{188}} of file \mbox{\hyperlink{abi__serializer_8hpp_source}{abi\+\_\+serializer.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{abi__serializer_8hpp}{abi\+\_\+serializer.\+hpp}}\item 
+libraries/chain/\mbox{\hyperlink{abi__serializer_8cpp}{abi\+\_\+serializer.\+cpp}}\end{DoxyCompactItemize}

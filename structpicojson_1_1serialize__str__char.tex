@@ -1,0 +1,89 @@
+\doxysection{picojson\+::serialize\+\_\+str\+\_\+char\texorpdfstring{$<$}{<} Iter \texorpdfstring{$>$}{>} Struct Template Reference}
+\hypertarget{structpicojson_1_1serialize__str__char}{}\label{structpicojson_1_1serialize__str__char}\index{picojson::serialize\_str\_char$<$ Iter $>$@{picojson::serialize\_str\_char$<$ Iter $>$}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{structpicojson_1_1serialize__str__char_acea559bf2510abf0c3735b02e080308f}{operator()}} (char c)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+Iter \mbox{\hyperlink{structpicojson_1_1serialize__str__char_a1abb88801c571a903ef9e3a21388b944}{oi}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Iter$>$\newline
+struct picojson\+::serialize\+\_\+str\+\_\+char$<$ Iter $>$}
+
+
+Definition at line \mbox{\hyperlink{spec__test__generator_8cpp_source_l00503}{503}} of file \mbox{\hyperlink{spec__test__generator_8cpp_source}{spec\+\_\+test\+\_\+generator.\+cpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structpicojson_1_1serialize__str__char_acea559bf2510abf0c3735b02e080308f}\index{picojson::serialize\_str\_char$<$ Iter $>$@{picojson::serialize\_str\_char$<$ Iter $>$}!operator()@{operator()}}
+\index{operator()@{operator()}!picojson::serialize\_str\_char$<$ Iter $>$@{picojson::serialize\_str\_char$<$ Iter $>$}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}}
+{\footnotesize\ttfamily \label{structpicojson_1_1serialize__str__char_acea559bf2510abf0c3735b02e080308f} 
+template$<$typename Iter $>$ \\
+void \mbox{\hyperlink{structpicojson_1_1serialize__str__char}{picojson\+::serialize\+\_\+str\+\_\+char}}$<$ Iter $>$\+::operator() (\begin{DoxyParamCaption}\item[{char}]{c}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{spec__test__generator_8cpp_source_l00505}{505}} of file \mbox{\hyperlink{spec__test__generator_8cpp_source}{spec\+\_\+test\+\_\+generator.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00505\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00506\ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (c)\ \{}
+\DoxyCodeLine{00507\ \textcolor{preprocessor}{\#\ \ \ define\ MAP(val,\ sym)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00508\ \textcolor{preprocessor}{\ \ \ \ \ \ case\ val:\ copy(sym,\ oi);\ break}}
+\DoxyCodeLine{00509\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{spec__test__generator_8cpp_a339491d48190a5857a36d35499b14c3e}{MAP}}(\textcolor{charliteral}{'"{}'},\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)\(\backslash\)"{}"{}});}
+\DoxyCodeLine{00510\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{spec__test__generator_8cpp_a339491d48190a5857a36d35499b14c3e}{MAP}}(\textcolor{charliteral}{'\(\backslash\)\(\backslash\)'},\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)\(\backslash\)\(\backslash\)"{}});}
+\DoxyCodeLine{00511\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{spec__test__generator_8cpp_a339491d48190a5857a36d35499b14c3e}{MAP}}(\textcolor{charliteral}{'/'},\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)/"{}});}
+\DoxyCodeLine{00512\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{spec__test__generator_8cpp_a339491d48190a5857a36d35499b14c3e}{MAP}}(\textcolor{charliteral}{'\(\backslash\)b'},\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)b"{}});}
+\DoxyCodeLine{00513\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{spec__test__generator_8cpp_a339491d48190a5857a36d35499b14c3e}{MAP}}(\textcolor{charliteral}{'\(\backslash\)f'},\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)f"{}});}
+\DoxyCodeLine{00514\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{spec__test__generator_8cpp_a339491d48190a5857a36d35499b14c3e}{MAP}}(\textcolor{charliteral}{'\(\backslash\)n'},\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)n"{}});}
+\DoxyCodeLine{00515\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{spec__test__generator_8cpp_a339491d48190a5857a36d35499b14c3e}{MAP}}(\textcolor{charliteral}{'\(\backslash\)r'},\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)r"{}});}
+\DoxyCodeLine{00516\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{spec__test__generator_8cpp_a339491d48190a5857a36d35499b14c3e}{MAP}}(\textcolor{charliteral}{'\(\backslash\)t'},\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)t"{}});}
+\DoxyCodeLine{00517\ \textcolor{preprocessor}{\#\ \ \ undef\ MAP}}
+\DoxyCodeLine{00518\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00519\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\textcolor{keyword}{>}(c)\ <\ 0x20\ ||\ c\ ==\ 0x7f)\ \{}
+\DoxyCodeLine{00520\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}[7];}
+\DoxyCodeLine{00521\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{spec__test__generator_8cpp_a770571e12ff9370899184528f4b4626d}{SNPRINTF}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}),\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)u\%04x"{}},\ c\ \&\ 0xff);}
+\DoxyCodeLine{00522\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacepicojson_abc2111aa71797805957a4296fdf9c66d}{copy}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}\ +\ 6,\ \mbox{\hyperlink{structpicojson_1_1serialize__str__char_a1abb88801c571a903ef9e3a21388b944}{oi}});}
+\DoxyCodeLine{00523\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00524\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *\mbox{\hyperlink{structpicojson_1_1serialize__str__char_a1abb88801c571a903ef9e3a21388b944}{oi}}++\ =\ c;}
+\DoxyCodeLine{00525\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00526\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00527\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00528\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=299pt]{structpicojson_1_1serialize__str__char_acea559bf2510abf0c3735b02e080308f_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structpicojson_1_1serialize__str__char_a1abb88801c571a903ef9e3a21388b944}\index{picojson::serialize\_str\_char$<$ Iter $>$@{picojson::serialize\_str\_char$<$ Iter $>$}!oi@{oi}}
+\index{oi@{oi}!picojson::serialize\_str\_char$<$ Iter $>$@{picojson::serialize\_str\_char$<$ Iter $>$}}
+\doxysubsubsection{\texorpdfstring{oi}{oi}}
+{\footnotesize\ttfamily \label{structpicojson_1_1serialize__str__char_a1abb88801c571a903ef9e3a21388b944} 
+template$<$typename Iter $>$ \\
+Iter \mbox{\hyperlink{structpicojson_1_1serialize__str__char}{picojson\+::serialize\+\_\+str\+\_\+char}}$<$ Iter $>$\+::oi}
+
+
+
+Definition at line \mbox{\hyperlink{spec__test__generator_8cpp_source_l00504}{504}} of file \mbox{\hyperlink{spec__test__generator_8cpp_source}{spec\+\_\+test\+\_\+generator.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/tests/spec\+\_\+test\+\_\+generator/\mbox{\hyperlink{spec__test__generator_8cpp}{spec\+\_\+test\+\_\+generator.\+cpp}}\end{DoxyCompactItemize}

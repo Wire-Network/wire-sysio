@@ -1,0 +1,48 @@
+\doxysection{exchange\+\_\+state.\+hpp}
+\hypertarget{exchange__state_8hpp_source}{}\label{exchange__state_8hpp_source}\index{/Users/svetlasyrimis/Desktop/wire-\/network/WN-\/org/wire-\/system-\/contracts/contracts/sysio.system/include/sysio.system/exchange\_state.hpp@{/Users/svetlasyrimis/Desktop/wire-\/network/WN-\/org/wire-\/system-\/contracts/contracts/sysio.system/include/sysio.system/exchange\_state.hpp}}
+\mbox{\hyperlink{exchange__state_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{exchange__state_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{exchange__state_8hpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{exchange__state_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <sysio/asset.hpp>}}
+\DoxyCodeLine{\Hypertarget{exchange__state_8hpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <sysio/multi\_index.hpp>}}
+\DoxyCodeLine{\Hypertarget{exchange__state_8hpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{exchange__state_8hpp_source_l00006}00006\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysiosystem}{sysiosystem}}\ \{}
+\DoxyCodeLine{\Hypertarget{exchange__state_8hpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{exchange__state_8hpp_source_l00008}00008\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{structsysio_1_1chain_1_1asset}{sysio::asset}};}
+\DoxyCodeLine{\Hypertarget{exchange__state_8hpp_source_l00009}00009\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1chain_1_1symbol}{sysio::symbol}};}
+\DoxyCodeLine{\Hypertarget{exchange__state_8hpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{exchange__state_8hpp_source_l00017}\mbox{\hyperlink{structsysiosystem_1_1exchange__state}{00017}}\ \ \ \ \textcolor{keyword}{struct\ }[[sysio::table,\ \mbox{\hyperlink{namespacesysio}{sysio}}::contract("{}sysio.system"{})]]\ \mbox{\hyperlink{structsysiosystem_1_1exchange__state}{exchange\_state}}\ \{}
+\DoxyCodeLine{\Hypertarget{exchange__state_8hpp_source_l00018}\mbox{\hyperlink{structsysiosystem_1_1exchange__state_a03e4901a1aaacc59b78d85d440972f51}{00018}}\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\ \ \ \ \mbox{\hyperlink{structsysiosystem_1_1exchange__state_a03e4901a1aaacc59b78d85d440972f51}{supply}};}
+\DoxyCodeLine{\Hypertarget{exchange__state_8hpp_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{exchange__state_8hpp_source_l00020}\mbox{\hyperlink{structsysiosystem_1_1exchange__state_1_1connector}{00020}}\ \ \ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structsysiosystem_1_1exchange__state_1_1connector}{connector}}\ \{}
+\DoxyCodeLine{\Hypertarget{exchange__state_8hpp_source_l00021}\mbox{\hyperlink{structsysiosystem_1_1exchange__state_1_1connector_a4222c96ec26bb4d033bef4220b28301b}{00021}}\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\ \mbox{\hyperlink{structsysiosystem_1_1exchange__state_1_1connector_a4222c96ec26bb4d033bef4220b28301b}{balance}};}
+\DoxyCodeLine{\Hypertarget{exchange__state_8hpp_source_l00022}\mbox{\hyperlink{structsysiosystem_1_1exchange__state_1_1connector_ad9847c21610017106b022faafcd1f9a0}{00022}}\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ weight\ =\ .5;}
+\DoxyCodeLine{\Hypertarget{exchange__state_8hpp_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{exchange__state_8hpp_source_l00024}00024\ \ \ \ \ \ \ \ \ \ SYSLIB\_SERIALIZE(\ \mbox{\hyperlink{structsysiosystem_1_1exchange__state_1_1connector}{connector}},\ (balance)(weight)\ )}
+\DoxyCodeLine{\Hypertarget{exchange__state_8hpp_source_l00025}00025\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{exchange__state_8hpp_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{exchange__state_8hpp_source_l00027}\mbox{\hyperlink{structsysiosystem_1_1exchange__state_ae2c340ecb97fbfe30c640a522cc1894e}{00027}}\ \ \ \ \ \ \ \mbox{\hyperlink{structsysiosystem_1_1exchange__state_1_1connector}{connector}}\ \mbox{\hyperlink{structsysiosystem_1_1exchange__state_ae2c340ecb97fbfe30c640a522cc1894e}{base}};}
+\DoxyCodeLine{\Hypertarget{exchange__state_8hpp_source_l00028}\mbox{\hyperlink{structsysiosystem_1_1exchange__state_ad25c6801bcc1707b6dbd780b70b95bc2}{00028}}\ \ \ \ \ \ \ \mbox{\hyperlink{structsysiosystem_1_1exchange__state_1_1connector}{connector}}\ \mbox{\hyperlink{structsysiosystem_1_1exchange__state_ad25c6801bcc1707b6dbd780b70b95bc2}{quote}};}
+\DoxyCodeLine{\Hypertarget{exchange__state_8hpp_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{exchange__state_8hpp_source_l00030}\mbox{\hyperlink{structsysiosystem_1_1exchange__state_aea576406feefe9951dc9b04af1db2be2}{00030}}\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{structsysiosystem_1_1exchange__state_aea576406feefe9951dc9b04af1db2be2}{primary\_key}}()\textcolor{keyword}{const\ }\{\ \textcolor{keywordflow}{return}\ supply.symbol.raw();\ \}}
+\DoxyCodeLine{\Hypertarget{exchange__state_8hpp_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{exchange__state_8hpp_source_l00032}00032\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\ convert\_to\_exchange(\ connector\&\ reserve,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\&\ payment\ );}
+\DoxyCodeLine{\Hypertarget{exchange__state_8hpp_source_l00033}00033\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\ convert\_from\_exchange(\ connector\&\ reserve,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\&\ tokens\ );}
+\DoxyCodeLine{\Hypertarget{exchange__state_8hpp_source_l00034}00034\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\ convert(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\&\ from,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1chain_1_1symbol}{symbol}}\&\ to\ );}
+\DoxyCodeLine{\Hypertarget{exchange__state_8hpp_source_l00035}00035\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\ direct\_convert(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\&\ from,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1chain_1_1symbol}{symbol}}\&\ to\ );}
+\DoxyCodeLine{\Hypertarget{exchange__state_8hpp_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{exchange__state_8hpp_source_l00037}00037\ \ \ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ get\_bancor\_output(\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ inp\_reserve,}
+\DoxyCodeLine{\Hypertarget{exchange__state_8hpp_source_l00038}00038\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ out\_reserve,}
+\DoxyCodeLine{\Hypertarget{exchange__state_8hpp_source_l00039}00039\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ inp\ );}
+\DoxyCodeLine{\Hypertarget{exchange__state_8hpp_source_l00040}00040\ \ \ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ get\_bancor\_input(\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ out\_reserve,}
+\DoxyCodeLine{\Hypertarget{exchange__state_8hpp_source_l00041}00041\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ inp\_reserve,}
+\DoxyCodeLine{\Hypertarget{exchange__state_8hpp_source_l00042}00042\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ out\ );}
+\DoxyCodeLine{\Hypertarget{exchange__state_8hpp_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{exchange__state_8hpp_source_l00044}00044\ \ \ \ \ \ \ SYSLIB\_SERIALIZE(\ \mbox{\hyperlink{structsysiosystem_1_1exchange__state}{exchange\_state}},\ (supply)(base)(quote)\ )}
+\DoxyCodeLine{\Hypertarget{exchange__state_8hpp_source_l00045}00045\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{exchange__state_8hpp_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{exchange__state_8hpp_source_l00047}\mbox{\hyperlink{namespacesysiosystem_a108f99be51774f766e631351a23c5ae9}{00047}}\ \ \ \ \textcolor{keyword}{typedef}\ sysio::multi\_index<\ \textcolor{stringliteral}{"{}rammarket"{}}\_n,\ \mbox{\hyperlink{structsysiosystem_1_1exchange__state}{exchange\_state}}\ >\ \mbox{\hyperlink{namespacesysiosystem_a108f99be51774f766e631351a23c5ae9}{rammarket}};}
+\DoxyCodeLine{\Hypertarget{exchange__state_8hpp_source_l00048}00048\ \}\ }
+
+\end{DoxyCode}

@@ -1,0 +1,29 @@
+<map id="f128M_rem" name="f128M_rem">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,143,92,168"/>
+<area shape="rect" id="Node000002" href="$sys-vm_2external_2softfloat_2source_2s__approx_recip32__1_8c.html#ab7bc940e25571ca395a242b7d66a84d1" title=" " alt="" coords="150,5,326,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="56,141,88,96,111,70,138,48,164,34,166,39,141,52,115,74,92,99,60,144"/>
+<area shape="rect" id="Node000003" href="$sys-vm_2external_2softfloat_2source_2s__compare128_m_8c.html#a16a509bdb461e25d475f665cdd8e3c93" title=" " alt="" coords="635,85,793,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="62,140,95,114,139,92,204,75,271,65,338,60,405,59,529,66,630,80,629,85,528,72,405,65,339,65,271,71,205,81,141,97,98,118,65,144"/>
+<area shape="rect" id="Node000004" href="$sys-vm_2external_2softfloat_2source_2s__invalid_f128_m_8c.html#a70d737f0849838fad9c8aa4ce4b8d629" title=" " alt="" coords="410,171,562,196"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="92,156,395,175,394,180,92,161"/>
+<area shape="rect" id="Node000006" href="$sys-vm_2external_2softfloat_2source_2s__norm_round_pack_m_to_f128_m_8c.html#a10d3b2f6d92806d8e7353b9688ecce82" title=" " alt="" coords="140,106,337,146"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="92,146,124,141,125,146,93,151"/>
+<area shape="rect" id="Node000008" href="$sys-vm_2external_2softfloat_2source_2s__shift_norm_sig_f128_m_8c.html#a6c1c50fdf440115e2670e2d17a4e7deb" title=" " alt="" coords="143,221,334,247"/>
+<area shape="poly" id="edge9_Node000001_Node000008" title=" " alt="" coords="74,166,141,200,178,214,176,219,139,205,72,171"/>
+<area shape="rect" id="Node000009" href="$sys-vm_2external_2softfloat_2source_2s__try_propagate_na_n_f128_m_8c.html#abeccac6ac029cf15470d8b565f757bc4" title=" " alt="" coords="155,271,322,312"/>
+<area shape="poly" id="edge10_Node000001_Node000009" title=" " alt="" coords="60,167,92,211,115,236,141,257,148,262,146,266,138,262,111,240,88,215,56,170"/>
+<area shape="rect" id="Node000005" href="$softfloat_2source_28086-_s_s_e_2softfloat__raise_flags_8c.html#ac16bbf09eca0fe8ff91301d82c5a667f" title=" " alt="" coords="646,171,782,196"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="562,181,631,181,631,186,562,186"/>
+<area shape="rect" id="Node000007" href="$sys-vm_2external_2softfloat_2source_2s__round_pack_m_to_f128_m_8c.html#a98bd08f824cb039c0488ad93ca6b5d17" title=" " alt="" coords="385,113,587,139"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="338,124,370,124,370,129,338,129"/>
+<area shape="poly" id="edge7_Node000007_Node000003" title=" " alt="" coords="587,111,620,107,620,112,588,116"/>
+<area shape="poly" id="edge8_Node000007_Node000005" title=" " alt="" coords="541,137,646,164,645,169,540,142"/>
+<area shape="rect" id="Node000010" href="$sys-vm_2external_2softfloat_2source_2s__is_na_n_f128_m_8c.html#a4bf25f16220253df375ce35a1f49cddb" title=" " alt="" coords="638,277,790,303"/>
+<area shape="poly" id="edge11_Node000009_Node000010" title=" " alt="" coords="322,289,622,288,622,293,322,294"/>
+<area shape="rect" id="Node000011" href="$softfloat_2source_28086-_s_s_e_2s__propagate_na_n_f128_m_8c.html#a04b5d25277cae924dd506c491f0af1ec" title=" " alt="" coords="386,228,586,254"/>
+<area shape="poly" id="edge12_Node000009_Node000011" title=" " alt="" coords="321,272,404,255,405,260,323,277"/>
+<area shape="poly" id="edge15_Node000011_Node000005" title=" " alt="" coords="540,225,645,198,646,203,541,230"/>
+<area shape="poly" id="edge14_Node000011_Node000010" title=" " alt="" coords="550,252,637,271,636,276,548,257"/>
+<area shape="rect" id="Node000012" href="$softfloat_2source_28086-_s_s_e_2f128_m__is_signaling_na_n_8c.html#a641033e2d5605286e9cdd3e0bf651cb9" title=" " alt="" coords="637,228,791,254"/>
+<area shape="poly" id="edge13_Node000011_Node000012" title=" " alt="" coords="586,238,621,238,621,244,586,244"/>
+</map>

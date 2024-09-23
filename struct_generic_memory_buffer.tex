@@ -1,0 +1,329 @@
+\doxysection{Generic\+Memory\+Buffer\texorpdfstring{$<$}{<} Allocator \texorpdfstring{$>$}{>} Struct Template Reference}
+\hypertarget{struct_generic_memory_buffer}{}\label{struct_generic_memory_buffer}\index{GenericMemoryBuffer$<$ Allocator $>$@{GenericMemoryBuffer$<$ Allocator $>$}}
+
+
+Represents an in-\/memory output byte stream.  
+
+
+
+
+{\ttfamily \#include $<$memorybuffer.\+h$>$}
+
+
+
+Collaboration diagram for Generic\+Memory\+Buffer\texorpdfstring{$<$}{<} Allocator \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=268pt]{struct_generic_memory_buffer__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef char \mbox{\hyperlink{struct_generic_memory_buffer_a83cd3a166572414fb8d73356f17d78f2}{Ch}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_generic_memory_buffer_ad08f7da47bca43fcdb0c3b10e22dfa1d}{Generic\+Memory\+Buffer}} (\mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} \texorpdfstring{$\ast$}{*}allocator=0, size\+\_\+t capacity=\mbox{\hyperlink{struct_generic_memory_buffer_af6ecdbdbb8d3aa53cdef6e788e4980be}{k\+Default\+Capacity}})
+\item 
+void \mbox{\hyperlink{struct_generic_memory_buffer_a9dfb477983e211893601f8ab637b42d8}{Put}} (\mbox{\hyperlink{struct_generic_memory_buffer_a83cd3a166572414fb8d73356f17d78f2}{Ch}} c)
+\item 
+void \mbox{\hyperlink{struct_generic_memory_buffer_a9861181cab6f5bec2ec08b601aa53575}{Flush}} ()
+\item 
+void \mbox{\hyperlink{struct_generic_memory_buffer_a036cbe2556778e1edc525602a9821df2}{Clear}} ()
+\item 
+void \mbox{\hyperlink{struct_generic_memory_buffer_a3b87deb9bf34c394c8fb262ab53c0c4b}{Shrink\+To\+Fit}} ()
+\item 
+\mbox{\hyperlink{struct_generic_memory_buffer_a83cd3a166572414fb8d73356f17d78f2}{Ch}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{struct_generic_memory_buffer_a1455475eba731dc0ce2816c70c775359}{Push}} (size\+\_\+t \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}})
+\item 
+void \mbox{\hyperlink{struct_generic_memory_buffer_a82a6706286f1356e1769282f5d496005}{Pop}} (size\+\_\+t \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}})
+\item 
+const \mbox{\hyperlink{struct_generic_memory_buffer_a83cd3a166572414fb8d73356f17d78f2}{Ch}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{struct_generic_memory_buffer_a65217e77ae6d4c249c16360c24854411}{Get\+Buffer}} () const
+\item 
+size\+\_\+t \mbox{\hyperlink{struct_generic_memory_buffer_aaab1f18d03109ab01213d3e3d8368ff9}{Get\+Size}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classinternal_1_1_stack}{internal\+::\+Stack}}$<$ \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \mbox{\hyperlink{struct_generic_memory_buffer_a977b479180bebe8ae14ca1c11d52a486}{stack\+\_\+}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static const size\+\_\+t \mbox{\hyperlink{struct_generic_memory_buffer_af6ecdbdbb8d3aa53cdef6e788e4980be}{k\+Default\+Capacity}} = 256
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} = Crt\+Allocator$>$\newline
+struct Generic\+Memory\+Buffer$<$ Allocator $>$}
+This class is mainly for being wrapped by \doxylink{class_encoded_output_stream}{Encoded\+Output\+Stream} or \doxylink{class_auto_u_t_f_output_stream}{Auto\+UTFOutput\+Stream}.
+
+It is similar to File\+Write\+Buffer but the destination is an in-\/memory buffer instead of a file.
+
+Differences between Memory\+Buffer and String\+Buffer\+:
+\begin{DoxyEnumerate}
+\item String\+Buffer has Encoding but Memory\+Buffer is only a byte buffer.
+\item \doxylink{class_generic_string_buffer_a42079865bab1deb930c6cff7d491c719}{String\+Buffer\+::\+Get\+String()} returns a null-\/terminated string. \doxylink{struct_generic_memory_buffer_a65217e77ae6d4c249c16360c24854411}{Memory\+Buffer\+::\+Get\+Buffer()} returns a buffer without terminator.
+\end{DoxyEnumerate}
+
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em Allocator} & type for allocating memory buffer. \\
+\hline
+\end{DoxyTemplParams}
+\begin{DoxyNote}{Note}
+implements Stream concept 
+\end{DoxyNote}
+
+
+Definition at line \mbox{\hyperlink{memorybuffer_8h_source_l00037}{37}} of file \mbox{\hyperlink{memorybuffer_8h_source}{memorybuffer.\+h}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{struct_generic_memory_buffer_a83cd3a166572414fb8d73356f17d78f2}\index{GenericMemoryBuffer$<$ Allocator $>$@{GenericMemoryBuffer$<$ Allocator $>$}!Ch@{Ch}}
+\index{Ch@{Ch}!GenericMemoryBuffer$<$ Allocator $>$@{GenericMemoryBuffer$<$ Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{Ch}{Ch}}
+{\footnotesize\ttfamily \label{struct_generic_memory_buffer_a83cd3a166572414fb8d73356f17d78f2} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Crt\+Allocator$>$ \\
+char \mbox{\hyperlink{struct_generic_memory_buffer}{Generic\+Memory\+Buffer}}$<$ \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Ch}
+
+
+
+Definition at line \mbox{\hyperlink{memorybuffer_8h_source_l00038}{38}} of file \mbox{\hyperlink{memorybuffer_8h_source}{memorybuffer.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{struct_generic_memory_buffer_ad08f7da47bca43fcdb0c3b10e22dfa1d}\index{GenericMemoryBuffer$<$ Allocator $>$@{GenericMemoryBuffer$<$ Allocator $>$}!GenericMemoryBuffer@{GenericMemoryBuffer}}
+\index{GenericMemoryBuffer@{GenericMemoryBuffer}!GenericMemoryBuffer$<$ Allocator $>$@{GenericMemoryBuffer$<$ Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{GenericMemoryBuffer()}{GenericMemoryBuffer()}}
+{\footnotesize\ttfamily \label{struct_generic_memory_buffer_ad08f7da47bca43fcdb0c3b10e22dfa1d} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Crt\+Allocator$>$ \\
+\mbox{\hyperlink{struct_generic_memory_buffer}{Generic\+Memory\+Buffer}}$<$ \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\mbox{\hyperlink{struct_generic_memory_buffer}{\+::\+Generic\+Memory\+Buffer}} (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} \texorpdfstring{$\ast$}{*}}]{allocator}{ = {\ttfamily 0}, }\item[{size\+\_\+t}]{capacity}{ = {\ttfamily \mbox{\hyperlink{struct_generic_memory_buffer_af6ecdbdbb8d3aa53cdef6e788e4980be}{k\+Default\+Capacity}}}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{memorybuffer_8h_source_l00040}{40}} of file \mbox{\hyperlink{memorybuffer_8h_source}{memorybuffer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00040\ :\ \mbox{\hyperlink{struct_generic_memory_buffer_a977b479180bebe8ae14ca1c11d52a486}{stack\_}}(allocator,\ capacity)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_generic_memory_buffer_a036cbe2556778e1edc525602a9821df2}\index{GenericMemoryBuffer$<$ Allocator $>$@{GenericMemoryBuffer$<$ Allocator $>$}!Clear@{Clear}}
+\index{Clear@{Clear}!GenericMemoryBuffer$<$ Allocator $>$@{GenericMemoryBuffer$<$ Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{Clear()}{Clear()}}
+{\footnotesize\ttfamily \label{struct_generic_memory_buffer_a036cbe2556778e1edc525602a9821df2} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Crt\+Allocator$>$ \\
+void \mbox{\hyperlink{struct_generic_memory_buffer}{Generic\+Memory\+Buffer}}$<$ \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Clear (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{memorybuffer_8h_source_l00045}{45}} of file \mbox{\hyperlink{memorybuffer_8h_source}{memorybuffer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00045\ \{\ \mbox{\hyperlink{struct_generic_memory_buffer_a977b479180bebe8ae14ca1c11d52a486}{stack\_}}.Clear();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_generic_memory_buffer_a9861181cab6f5bec2ec08b601aa53575}\index{GenericMemoryBuffer$<$ Allocator $>$@{GenericMemoryBuffer$<$ Allocator $>$}!Flush@{Flush}}
+\index{Flush@{Flush}!GenericMemoryBuffer$<$ Allocator $>$@{GenericMemoryBuffer$<$ Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{Flush()}{Flush()}}
+{\footnotesize\ttfamily \label{struct_generic_memory_buffer_a9861181cab6f5bec2ec08b601aa53575} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Crt\+Allocator$>$ \\
+void \mbox{\hyperlink{struct_generic_memory_buffer}{Generic\+Memory\+Buffer}}$<$ \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Flush (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{memorybuffer_8h_source_l00043}{43}} of file \mbox{\hyperlink{memorybuffer_8h_source}{memorybuffer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00043\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{struct_generic_memory_buffer_a65217e77ae6d4c249c16360c24854411}\index{GenericMemoryBuffer$<$ Allocator $>$@{GenericMemoryBuffer$<$ Allocator $>$}!GetBuffer@{GetBuffer}}
+\index{GetBuffer@{GetBuffer}!GenericMemoryBuffer$<$ Allocator $>$@{GenericMemoryBuffer$<$ Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{GetBuffer()}{GetBuffer()}}
+{\footnotesize\ttfamily \label{struct_generic_memory_buffer_a65217e77ae6d4c249c16360c24854411} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Crt\+Allocator$>$ \\
+const \mbox{\hyperlink{struct_generic_memory_buffer_a83cd3a166572414fb8d73356f17d78f2}{Ch}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{struct_generic_memory_buffer}{Generic\+Memory\+Buffer}}$<$ \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Get\+Buffer (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{memorybuffer_8h_source_l00050}{50}} of file \mbox{\hyperlink{memorybuffer_8h_source}{memorybuffer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_generic_memory_buffer_a977b479180bebe8ae14ca1c11d52a486}{stack\_}}.template\ Bottom<Ch>();}
+\DoxyCodeLine{00052\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_generic_memory_buffer_a65217e77ae6d4c249c16360c24854411_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_generic_memory_buffer_aaab1f18d03109ab01213d3e3d8368ff9}\index{GenericMemoryBuffer$<$ Allocator $>$@{GenericMemoryBuffer$<$ Allocator $>$}!GetSize@{GetSize}}
+\index{GetSize@{GetSize}!GenericMemoryBuffer$<$ Allocator $>$@{GenericMemoryBuffer$<$ Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{GetSize()}{GetSize()}}
+{\footnotesize\ttfamily \label{struct_generic_memory_buffer_aaab1f18d03109ab01213d3e3d8368ff9} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Crt\+Allocator$>$ \\
+size\+\_\+t \mbox{\hyperlink{struct_generic_memory_buffer}{Generic\+Memory\+Buffer}}$<$ \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Get\+Size (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{memorybuffer_8h_source_l00054}{54}} of file \mbox{\hyperlink{memorybuffer_8h_source}{memorybuffer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00054\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_generic_memory_buffer_a977b479180bebe8ae14ca1c11d52a486}{stack\_}}.GetSize();\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_generic_memory_buffer_aaab1f18d03109ab01213d3e3d8368ff9_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_generic_memory_buffer_a82a6706286f1356e1769282f5d496005}\index{GenericMemoryBuffer$<$ Allocator $>$@{GenericMemoryBuffer$<$ Allocator $>$}!Pop@{Pop}}
+\index{Pop@{Pop}!GenericMemoryBuffer$<$ Allocator $>$@{GenericMemoryBuffer$<$ Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{Pop()}{Pop()}}
+{\footnotesize\ttfamily \label{struct_generic_memory_buffer_a82a6706286f1356e1769282f5d496005} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Crt\+Allocator$>$ \\
+void \mbox{\hyperlink{struct_generic_memory_buffer}{Generic\+Memory\+Buffer}}$<$ \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Pop (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{count}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{memorybuffer_8h_source_l00048}{48}} of file \mbox{\hyperlink{memorybuffer_8h_source}{memorybuffer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00048\ \{\ \mbox{\hyperlink{struct_generic_memory_buffer_a977b479180bebe8ae14ca1c11d52a486}{stack\_}}.template\ \mbox{\hyperlink{struct_generic_memory_buffer_a82a6706286f1356e1769282f5d496005}{Pop<Ch>}}(\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}});\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=215pt]{struct_generic_memory_buffer_a82a6706286f1356e1769282f5d496005_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=215pt]{struct_generic_memory_buffer_a82a6706286f1356e1769282f5d496005_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_generic_memory_buffer_a1455475eba731dc0ce2816c70c775359}\index{GenericMemoryBuffer$<$ Allocator $>$@{GenericMemoryBuffer$<$ Allocator $>$}!Push@{Push}}
+\index{Push@{Push}!GenericMemoryBuffer$<$ Allocator $>$@{GenericMemoryBuffer$<$ Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{Push()}{Push()}}
+{\footnotesize\ttfamily \label{struct_generic_memory_buffer_a1455475eba731dc0ce2816c70c775359} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Crt\+Allocator$>$ \\
+\mbox{\hyperlink{struct_generic_memory_buffer_a83cd3a166572414fb8d73356f17d78f2}{Ch}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{struct_generic_memory_buffer}{Generic\+Memory\+Buffer}}$<$ \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Push (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{count}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{memorybuffer_8h_source_l00047}{47}} of file \mbox{\hyperlink{memorybuffer_8h_source}{memorybuffer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00047\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_generic_memory_buffer_a977b479180bebe8ae14ca1c11d52a486}{stack\_}}.template\ \mbox{\hyperlink{struct_generic_memory_buffer_a1455475eba731dc0ce2816c70c775359}{Push<Ch>}}(\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}});\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=191pt]{struct_generic_memory_buffer_a1455475eba731dc0ce2816c70c775359_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_generic_memory_buffer_a1455475eba731dc0ce2816c70c775359_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_generic_memory_buffer_a9dfb477983e211893601f8ab637b42d8}\index{GenericMemoryBuffer$<$ Allocator $>$@{GenericMemoryBuffer$<$ Allocator $>$}!Put@{Put}}
+\index{Put@{Put}!GenericMemoryBuffer$<$ Allocator $>$@{GenericMemoryBuffer$<$ Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{Put()}{Put()}}
+{\footnotesize\ttfamily \label{struct_generic_memory_buffer_a9dfb477983e211893601f8ab637b42d8} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Crt\+Allocator$>$ \\
+void \mbox{\hyperlink{struct_generic_memory_buffer}{Generic\+Memory\+Buffer}}$<$ \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Put (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_generic_memory_buffer_a83cd3a166572414fb8d73356f17d78f2}{Ch}}}]{c}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{memorybuffer_8h_source_l00042}{42}} of file \mbox{\hyperlink{memorybuffer_8h_source}{memorybuffer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00042\ \{\ *\mbox{\hyperlink{struct_generic_memory_buffer_a977b479180bebe8ae14ca1c11d52a486}{stack\_}}.template\ \mbox{\hyperlink{struct_generic_memory_buffer_a1455475eba731dc0ce2816c70c775359}{Push<Ch>}}()\ =\ c;\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_generic_memory_buffer_a9dfb477983e211893601f8ab637b42d8_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_generic_memory_buffer_a3b87deb9bf34c394c8fb262ab53c0c4b}\index{GenericMemoryBuffer$<$ Allocator $>$@{GenericMemoryBuffer$<$ Allocator $>$}!ShrinkToFit@{ShrinkToFit}}
+\index{ShrinkToFit@{ShrinkToFit}!GenericMemoryBuffer$<$ Allocator $>$@{GenericMemoryBuffer$<$ Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{ShrinkToFit()}{ShrinkToFit()}}
+{\footnotesize\ttfamily \label{struct_generic_memory_buffer_a3b87deb9bf34c394c8fb262ab53c0c4b} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Crt\+Allocator$>$ \\
+void \mbox{\hyperlink{struct_generic_memory_buffer}{Generic\+Memory\+Buffer}}$<$ \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Shrink\+To\+Fit (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{memorybuffer_8h_source_l00046}{46}} of file \mbox{\hyperlink{memorybuffer_8h_source}{memorybuffer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00046\ \{\ \mbox{\hyperlink{struct_generic_memory_buffer_a977b479180bebe8ae14ca1c11d52a486}{stack\_}}.ShrinkToFit();\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_generic_memory_buffer_af6ecdbdbb8d3aa53cdef6e788e4980be}\index{GenericMemoryBuffer$<$ Allocator $>$@{GenericMemoryBuffer$<$ Allocator $>$}!kDefaultCapacity@{kDefaultCapacity}}
+\index{kDefaultCapacity@{kDefaultCapacity}!GenericMemoryBuffer$<$ Allocator $>$@{GenericMemoryBuffer$<$ Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{kDefaultCapacity}{kDefaultCapacity}}
+{\footnotesize\ttfamily \label{struct_generic_memory_buffer_af6ecdbdbb8d3aa53cdef6e788e4980be} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Crt\+Allocator$>$ \\
+const size\+\_\+t \mbox{\hyperlink{struct_generic_memory_buffer}{Generic\+Memory\+Buffer}}$<$ \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::k\+Default\+Capacity = 256\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{memorybuffer_8h_source_l00056}{56}} of file \mbox{\hyperlink{memorybuffer_8h_source}{memorybuffer.\+h}}.
+
+\Hypertarget{struct_generic_memory_buffer_a977b479180bebe8ae14ca1c11d52a486}\index{GenericMemoryBuffer$<$ Allocator $>$@{GenericMemoryBuffer$<$ Allocator $>$}!stack\_@{stack\_}}
+\index{stack\_@{stack\_}!GenericMemoryBuffer$<$ Allocator $>$@{GenericMemoryBuffer$<$ Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{stack\_}{stack\_}}
+{\footnotesize\ttfamily \label{struct_generic_memory_buffer_a977b479180bebe8ae14ca1c11d52a486} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Crt\+Allocator$>$ \\
+\mbox{\hyperlink{classinternal_1_1_stack}{internal\+::\+Stack}}$<$\mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}$>$ \mbox{\hyperlink{struct_generic_memory_buffer}{Generic\+Memory\+Buffer}}$<$ \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::stack\+\_\+\hspace{0.3cm}{\ttfamily [mutable]}}
+
+
+
+Definition at line \mbox{\hyperlink{memorybuffer_8h_source_l00057}{57}} of file \mbox{\hyperlink{memorybuffer_8h_source}{memorybuffer.\+h}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/\mbox{\hyperlink{fwd_8h}{fwd.\+h}}\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/\mbox{\hyperlink{memorybuffer_8h}{memorybuffer.\+h}}\end{DoxyCompactItemize}

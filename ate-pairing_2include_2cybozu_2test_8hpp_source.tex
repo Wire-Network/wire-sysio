@@ -1,0 +1,327 @@
+\doxysection{test.\+hpp}
+\hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source}{}\label{ate-pairing_2include_2cybozu_2test_8hpp_source}\index{libraries/fc/libraries/ff/depends/ate-\/pairing/include/cybozu/test.hpp@{libraries/fc/libraries/ff/depends/ate-\/pairing/include/cybozu/test.hpp}}
+\mbox{\hyperlink{ate-pairing_2include_2cybozu_2test_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ <stdio.h>}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <string.h>}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00011}00011\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00012}00012\ \textcolor{preprocessor}{\#include\ <list>}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00013}00013\ \textcolor{preprocessor}{\#include\ <iostream>}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00014}00014\ \textcolor{preprocessor}{\#include\ <utility>}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00015}00015\ \textcolor{preprocessor}{\#if\ defined(\_MSC\_VER)\ \&\&\ (MSC\_VER\ <=\ 1500)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00016}00016\ \textcolor{preprocessor}{\ \ \ \ \#include\ <cybozu/inttype.hpp>}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00017}00017\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00018}00018\ \textcolor{preprocessor}{\ \ \ \ \#include\ <\mbox{\hyperlink{stdint_8h}{stdint.h}}>}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00019}00019\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00021}\mbox{\hyperlink{namespacecybozu_1_1test}{00021}}\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacecybozu}{cybozu}}\ \{\ \textcolor{keyword}{namespace\ }test\ \{}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00023}00023\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classcybozu_1_1test_1_1_auto_run}{AutoRun}}\ \{}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00024}00024\ \ \ \ \ \textcolor{keyword}{typedef}\ void\ (*Func)();}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00025}00025\ \ \ \ \ \textcolor{keyword}{typedef}\ std::list<std::pair<const\ char*,\ Func>\ >\ UnitTestList;}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00026}00026\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00027}\mbox{\hyperlink{classcybozu_1_1test_1_1_auto_run_ad2914dc0921bea65055786f7a29b4c64}{00027}}\ \ \ \ \ \mbox{\hyperlink{classcybozu_1_1test_1_1_auto_run_ad2914dc0921bea65055786f7a29b4c64}{AutoRun}}()}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00028}00028\ \ \ \ \ \ \ \ \ :\ init\_(0)}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00029}00029\ \ \ \ \ \ \ \ \ ,\ term\_(0)}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00030}00030\ \ \ \ \ \ \ \ \ ,\ okCount\_(0)}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00031}00031\ \ \ \ \ \ \ \ \ ,\ ngCount\_(0)}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00032}00032\ \ \ \ \ \ \ \ \ ,\ exceptionCount\_(0)}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00033}00033\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00034}00034\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00035}\mbox{\hyperlink{classcybozu_1_1test_1_1_auto_run_ab1f326148f5ca9d113acbe80a53d1366}{00035}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classcybozu_1_1test_1_1_auto_run_ab1f326148f5ca9d113acbe80a53d1366}{setup}}(Func\ \mbox{\hyperlink{lib_8h_a02fd73d861ef2e4aabb38c0c9ff82947}{init}},\ Func\ term)}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00036}00036\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00037}00037\ \ \ \ \ \ \ \ \ init\_\ =\ \mbox{\hyperlink{lib_8h_a02fd73d861ef2e4aabb38c0c9ff82947}{init}};}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00038}00038\ \ \ \ \ \ \ \ \ term\_\ =\ term;}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00039}00039\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00040}\mbox{\hyperlink{classcybozu_1_1test_1_1_auto_run_a4d9c1c2226d3313f5c3a6288e73836b8}{00040}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classcybozu_1_1test_1_1_auto_run_a4d9c1c2226d3313f5c3a6288e73836b8}{append}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ Func\ func)}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00041}00041\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00042}00042\ \ \ \ \ \ \ \ \ list\_.push\_back(std::make\_pair(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ func));}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00043}00043\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00044}\mbox{\hyperlink{classcybozu_1_1test_1_1_auto_run_ace4237a002b2a2849a4bce661cfc0e56}{00044}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classcybozu_1_1test_1_1_auto_run_ace4237a002b2a2849a4bce661cfc0e56}{set}}(\textcolor{keywordtype}{bool}\ isOK)}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00045}00045\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00046}00046\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isOK)\ \{}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00047}00047\ \ \ \ \ \ \ \ \ \ \ \ \ okCount\_++;}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \ \ \ \ ngCount\_++;}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00050}00050\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00051}00051\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00052}\mbox{\hyperlink{classcybozu_1_1test_1_1_auto_run_a8c22970c8e0a5bfe7e7c8a522f19973d}{00052}}\ \ \ \ \ std::string\ \mbox{\hyperlink{classcybozu_1_1test_1_1_auto_run_a8c22970c8e0a5bfe7e7c8a522f19973d}{getBaseName}}(\textcolor{keyword}{const}\ std::string\&\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})\textcolor{keyword}{\ const}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00053}00053\ \textcolor{keyword}{\ \ \ \ }\{}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00054}00054\ \textcolor{preprocessor}{\#ifdef\ \_WIN32}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00055}00055\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ sep\ =\ \textcolor{charliteral}{'\(\backslash\)\(\backslash\)'};}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00056}00056\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00057}00057\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ sep\ =\ \textcolor{charliteral}{'/'};}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00058}00058\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00059}00059\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ pos\ =\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}.find\_last\_of(sep);}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00060}00060\ \ \ \ \ \ \ \ \ std::string\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}.substr(pos\ +\ 1);}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00061}00061\ \ \ \ \ \ \ \ \ pos\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.find(\textcolor{charliteral}{'.'});}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00062}00062\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.substr(0,\ pos);}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00063}00063\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00064}\mbox{\hyperlink{classcybozu_1_1test_1_1_auto_run_aba95d366f0f81f5ee59d32b710da397a}{00064}}\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classcybozu_1_1test_1_1_auto_run_aba95d366f0f81f5ee59d32b710da397a}{run}}(\textcolor{keywordtype}{int},\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[])}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00065}00065\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00066}00066\ \ \ \ \ \ \ \ \ std::string\ msg;}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00067}00067\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (init\_)\ init\_();}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (UnitTestList::const\_iterator\ i\ =\ list\_.begin(),\ ie\ =\ list\_.end();\ i\ !=\ ie;\ ++i)\ \{}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}ctest:module="{}}\ <<\ i-\/>first\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00071}00071\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i-\/>second)();}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00073}00073\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (std::exception\&\ e)\ \{}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00074}00074\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ exceptionCount\_++;}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00075}00075\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}ctest:\ \ "{}}\ <<\ i-\/>first\ <<\ \textcolor{stringliteral}{"{}\ is\ stopped\ by\ exception\ "{}}\ <<\ e.what()\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ exceptionCount\_++;}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00078}00078\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}ctest:\ \ "{}}\ <<\ i-\/>first\ <<\ \textcolor{stringliteral}{"{}\ is\ stopped\ by\ unknown\ exception"{}}\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00080}00080\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00081}00081\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (term\_)\ term\_();}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00082}00082\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (std::exception\&\ e)\ \{}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00083}00083\ \ \ \ \ \ \ \ \ \ \ \ \ msg\ =\ std::string(\textcolor{stringliteral}{"{}ctest:err:"{}})\ +\ e.what();}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00084}00084\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00085}00085\ \ \ \ \ \ \ \ \ \ \ \ \ msg\ =\ \textcolor{stringliteral}{"{}ctest:err:\ catch\ unknown\ exception"{}};}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00086}00086\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00087}00087\ \ \ \ \ \ \ \ \ fflush(stdout);}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00088}00088\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (msg.empty())\ \{}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00089}00089\ \ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}ctest:name="{}}\ <<\ \mbox{\hyperlink{classcybozu_1_1test_1_1_auto_run_a8c22970c8e0a5bfe7e7c8a522f19973d}{getBaseName}}(*\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}})}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00090}00090\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{},\ module="{}}\ <<\ list\_.size()}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00091}00091\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{},\ total="{}}\ <<\ (okCount\_\ +\ ngCount\_\ +\ exceptionCount\_)}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00092}00092\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{},\ ok="{}}\ <<\ okCount\_}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00093}00093\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{},\ ng="{}}\ <<\ ngCount\_}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00094}00094\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{},\ exception="{}}\ <<\ exceptionCount\_\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00095}00095\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00096}00096\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00097}00097\ \ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ msg\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00098}00098\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00099}00099\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00100}00100\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00101}\mbox{\hyperlink{classcybozu_1_1test_1_1_auto_run_ab73dc59a83da2ac825a713d76e761a21}{00101}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{inline}\ \mbox{\hyperlink{classcybozu_1_1test_1_1_auto_run}{AutoRun}}\&\ \mbox{\hyperlink{classcybozu_1_1test_1_1_auto_run_ab73dc59a83da2ac825a713d76e761a21}{getInstance}}()}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00102}00102\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00103}00103\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classcybozu_1_1test_1_1_auto_run}{AutoRun}}\ instance;}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00104}00104\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ instance;}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00105}00105\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00106}00106\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00107}00107\ \ \ \ \ Func\ init\_;}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00108}00108\ \ \ \ \ Func\ term\_;}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00109}00109\ \ \ \ \ \textcolor{keywordtype}{int}\ okCount\_;}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00110}00110\ \ \ \ \ \textcolor{keywordtype}{int}\ ngCount\_;}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00111}00111\ \ \ \ \ \textcolor{keywordtype}{int}\ exceptionCount\_;}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00112}00112\ \ \ \ \ UnitTestList\ list\_;}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00113}00113\ \};}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00114}00114\ }
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00115}00115\ \textcolor{keyword}{static}\ AutoRun\&\ autoRun\ =\ \mbox{\hyperlink{classcybozu_1_1test_1_1_auto_run_ab73dc59a83da2ac825a713d76e761a21}{AutoRun::getInstance}}();}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00116}00116\ }
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00117}\mbox{\hyperlink{namespacecybozu_1_1test_aea14f09ded7f8a0f840c5cb6e3a0a417}{00117}}\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ test(\textcolor{keywordtype}{bool}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}},\ \textcolor{keyword}{const}\ std::string\&\ msg,\ \textcolor{keyword}{const}\ std::string\&\ param,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *file,\ \textcolor{keywordtype}{int}\ line)}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00118}00118\ \{}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00119}00119\ \ \ \ \ autoRun.\mbox{\hyperlink{classcybozu_1_1test_1_1_auto_run_ace4237a002b2a2849a4bce661cfc0e56}{set}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}});}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00120}00120\ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}})\ \{}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00121}00121\ \ \ \ \ \ \ \ \ printf(\textcolor{stringliteral}{"{}\%s(\%d):ctest:\%s(\%s);\(\backslash\)n"{}},\ file,\ line,\ msg.c\_str(),\ param.c\_str());}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00122}00122\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00123}00123\ \}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00124}00124\ }
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00125}00125\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T,\ \textcolor{keyword}{typename}\ U>}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00126}\mbox{\hyperlink{namespacecybozu_1_1test_a282fede0a619c22d30a4bee3e33d90bc}{00126}}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacecybozu_1_1test_a282fede0a619c22d30a4bee3e33d90bc}{isEqual}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ lhs,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{union_u}{U}}\&\ rhs)}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00127}00127\ \{}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00128}00128\ \ \ \ \ \textcolor{keywordflow}{return}\ lhs\ ==\ rhs;}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00129}00129\ \}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00130}00130\ }
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00131}00131\ \textcolor{comment}{//\ avoid\ warning\ of\ comparision\ of\ integers\ of\ different\ signs}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00132}\mbox{\hyperlink{namespacecybozu_1_1test_a6d357202b26c157c0a1c119fb456ea66}{00132}}\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacecybozu_1_1test_a282fede0a619c22d30a4bee3e33d90bc}{isEqual}}(\textcolor{keywordtype}{size\_t}\ lhs,\ \textcolor{keywordtype}{int}\ rhs)}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00133}00133\ \{}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00134}00134\ \ \ \ \ \textcolor{keywordflow}{return}\ lhs\ ==\ size\_t(rhs);}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00135}00135\ \}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00136}\mbox{\hyperlink{namespacecybozu_1_1test_a6ed827ec3427d5a352b77d88f1740b4f}{00136}}\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacecybozu_1_1test_a282fede0a619c22d30a4bee3e33d90bc}{isEqual}}(\textcolor{keywordtype}{int}\ lhs,\ \textcolor{keywordtype}{size\_t}\ rhs)}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00137}00137\ \{}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00138}00138\ \ \ \ \ \textcolor{keywordflow}{return}\ size\_t(lhs)\ ==\ rhs;}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00139}00139\ \}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00140}\mbox{\hyperlink{namespacecybozu_1_1test_aa03830a68d851357ad0c0c51bac5ce25}{00140}}\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacecybozu_1_1test_a282fede0a619c22d30a4bee3e33d90bc}{isEqual}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *lhs,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *rhs)}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00141}00141\ \{}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00142}00142\ \ \ \ \ \textcolor{keywordflow}{return}\ strcmp(lhs,\ rhs)\ ==\ 0;}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00143}00143\ \}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00144}\mbox{\hyperlink{namespacecybozu_1_1test_a42818c084db26c2526589e9e7b050287}{00144}}\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacecybozu_1_1test_a282fede0a619c22d30a4bee3e33d90bc}{isEqual}}(\textcolor{keywordtype}{char}\ *lhs,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *rhs)}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00145}00145\ \{}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00146}00146\ \ \ \ \ \textcolor{keywordflow}{return}\ strcmp(lhs,\ rhs)\ ==\ 0;}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00147}00147\ \}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00148}\mbox{\hyperlink{namespacecybozu_1_1test_a6fb548da7d681e154f40c71ff7b5ab2e}{00148}}\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacecybozu_1_1test_a282fede0a619c22d30a4bee3e33d90bc}{isEqual}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *lhs,\ \textcolor{keywordtype}{char}\ *rhs)}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00149}00149\ \{}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00150}00150\ \ \ \ \ \textcolor{keywordflow}{return}\ strcmp(lhs,\ rhs)\ ==\ 0;}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00151}00151\ \}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00152}\mbox{\hyperlink{namespacecybozu_1_1test_a71c9f6a4187eae924c86b95f9092086e}{00152}}\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacecybozu_1_1test_a282fede0a619c22d30a4bee3e33d90bc}{isEqual}}(\textcolor{keywordtype}{char}\ *lhs,\ \textcolor{keywordtype}{char}\ *rhs)}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00153}00153\ \{}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00154}00154\ \ \ \ \ \textcolor{keywordflow}{return}\ strcmp(lhs,\ rhs)\ ==\ 0;}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00155}00155\ \}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00156}00156\ \textcolor{comment}{//\ avoid\ to\ compare\ float\ directly}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00157}\mbox{\hyperlink{namespacecybozu_1_1test_ab05c765e80de3e5e521733bce4350e15}{00157}}\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacecybozu_1_1test_a282fede0a619c22d30a4bee3e33d90bc}{isEqual}}(\textcolor{keywordtype}{float}\ lhs,\ \textcolor{keywordtype}{float}\ rhs)}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00158}00158\ \{}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00159}00159\ \ \ \ \ \textcolor{keyword}{union\ }fi\ \{}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00160}00160\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}};}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00161}00161\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ i;}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00162}00162\ \ \ \ \ \}\ lfi,\ rfi;}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00163}00163\ \ \ \ \ lfi.f\ =\ lhs;}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00164}00164\ \ \ \ \ rfi.f\ =\ rhs;}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00165}00165\ \ \ \ \ \textcolor{keywordflow}{return}\ lfi.i\ ==\ rfi.i;}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00166}00166\ \}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00167}00167\ \textcolor{comment}{//\ avoid\ to\ compare\ double\ directly}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00168}\mbox{\hyperlink{namespacecybozu_1_1test_a43bfb4921f5ee7c1186438e7924f1f50}{00168}}\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacecybozu_1_1test_a282fede0a619c22d30a4bee3e33d90bc}{isEqual}}(\textcolor{keywordtype}{double}\ lhs,\ \textcolor{keywordtype}{double}\ rhs)}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00169}00169\ \{}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00170}00170\ \ \ \ \ \textcolor{keyword}{union\ }di\ \{}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00171}00171\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}};}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00172}00172\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ i;}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00173}00173\ \ \ \ \ \}\ ldi,\ rdi;}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00174}00174\ \ \ \ \ ldi.d\ =\ lhs;}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00175}00175\ \ \ \ \ rdi.d\ =\ rhs;}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00176}00176\ \ \ \ \ \textcolor{keywordflow}{return}\ ldi.i\ ==\ rdi.i;}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00177}00177\ \}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00178}00178\ }
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00179}00179\ \}\ \}\ \textcolor{comment}{//\ cybozu::test}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00180}00180\ }
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00181}00181\ \textcolor{preprocessor}{\#ifndef\ CYBOZU\_TEST\_DISABLE\_AUTO\_RUN}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00182}\mbox{\hyperlink{ate-pairing_2include_2cybozu_2test_8hpp_a0ddf1224851353fc92bfbff6f499fa97}{00182}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}(\textcolor{keywordtype}{int}\ argc,\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[])}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00183}00183\ \{}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00184}00184\ \ \ \ \ \textcolor{keywordflow}{return}\ cybozu::test::autoRun.\mbox{\hyperlink{classcybozu_1_1test_1_1_auto_run_aba95d366f0f81f5ee59d32b710da397a}{run}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}});}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00185}00185\ \}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00186}00186\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00187}00187\ }
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00192}\mbox{\hyperlink{ate-pairing_2include_2cybozu_2test_8hpp_a275b40cea38ee703709b5b981e4df6ac}{00192}}\ \textcolor{preprocessor}{\#define\ CYBOZU\_TEST\_ASSERT(x)\ cybozu::test::test(!!(x),\ "{}CYBOZU\_TEST\_ASSERT"{},\ \#x,\ \_\_FILE\_\_,\ \_\_LINE\_\_)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00193}00193\ }
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00199}\mbox{\hyperlink{ate-pairing_2include_2cybozu_2test_8hpp_adf4139512121fff5a626af6d06b528ad}{00199}}\ \textcolor{preprocessor}{\#define\ CYBOZU\_TEST\_EQUAL(x,\ y)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00200}00200\ \textcolor{preprocessor}{\ \ \ \ bool\ eq\ =\ cybozu::test::isEqual(x,\ y);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00201}00201\ \textcolor{preprocessor}{\ \ \ \ cybozu::test::test(eq,\ "{}CYBOZU\_TEST\_EQUAL"{},\ \#x\ "{},\ "{}\ \#y,\ \_\_FILE\_\_,\ \_\_LINE\_\_);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00202}00202\ \textcolor{preprocessor}{\ \ \ \ if\ (!eq)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00203}00203\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ std::cout\ <<\ "{}ctest:\ \ lhs="{}\ <<\ (x)\ <<\ std::endl;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00204}00204\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ std::cout\ <<\ "{}ctest:\ \ rhs="{}\ <<\ (y)\ <<\ std::endl;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00205}00205\ \textcolor{preprocessor}{\ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00206}00206\ \textcolor{preprocessor}{\}}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00212}\mbox{\hyperlink{ate-pairing_2include_2cybozu_2test_8hpp_a3991e3f3e5ee2da1dd32aca74509fb49}{00212}}\ \textcolor{preprocessor}{\#define\ CYBOZU\_TEST\_NEAR(x,\ y,\ eps)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00213}00213\ \textcolor{preprocessor}{\ \ \ \ bool\ isNear\ =\ fabs((x)\ -\/\ (y))\ <\ eps;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00214}00214\ \textcolor{preprocessor}{\ \ \ \ cybozu::test::test(isNear,\ "{}CYBOZU\_TEST\_NEAR"{},\ \#x\ "{},\ "{}\ \#y,\ \_\_FILE\_\_,\ \_\_LINE\_\_);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00215}00215\ \textcolor{preprocessor}{\ \ \ \ if\ (!isNear)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00216}00216\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ std::cout\ <<\ "{}ctest:\ \ lhs="{}\ <<\ (x)\ <<\ std::endl;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00217}00217\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ std::cout\ <<\ "{}ctest:\ \ rhs="{}\ <<\ (y)\ <<\ std::endl;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00218}00218\ \textcolor{preprocessor}{\ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00219}00219\ \textcolor{preprocessor}{\}}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00220}00220\ }
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00221}\mbox{\hyperlink{ate-pairing_2include_2cybozu_2test_8hpp_a7dab074dddf6faa52749d6ecdf19d753}{00221}}\ \textcolor{preprocessor}{\#define\ CYBOZU\_TEST\_EQUAL\_POINTER(x,\ y)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00222}00222\ \textcolor{preprocessor}{\ \ \ \ bool\ eq\ =\ x\ ==\ y;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00223}00223\ \textcolor{preprocessor}{\ \ \ \ cybozu::test::test(eq,\ "{}CYBOZU\_TEST\_EQUAL\_POINTER"{},\ \#x\ "{},\ "{}\ \#y,\ \_\_FILE\_\_,\ \_\_LINE\_\_);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00224}00224\ \textcolor{preprocessor}{\ \ \ \ if\ (!eq)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00225}00225\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ std::cout\ <<\ "{}ctest:\ \ lhs="{}\ <<\ static\_cast<const\ void*>(x)\ <<\ std::endl;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00226}00226\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ std::cout\ <<\ "{}ctest:\ \ rhs="{}\ <<\ static\_cast<const\ void*>(y)\ <<\ std::endl;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00227}00227\ \textcolor{preprocessor}{\ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00228}00228\ \textcolor{preprocessor}{\}}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00235}\mbox{\hyperlink{ate-pairing_2include_2cybozu_2test_8hpp_a92f39fde95bc92a21c55ec4017c6b026}{00235}}\ \textcolor{preprocessor}{\#define\ CYBOZU\_TEST\_EQUAL\_ARRAY(x,\ y,\ n)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00236}00236\ \textcolor{preprocessor}{\ \ \ \ for\ (size\_t\ i\ =\ 0,\ ie\ =\ (size\_t)(n);\ i\ <\ ie;\ i++)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00237}00237\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ bool\ eq\ =\ cybozu::test::isEqual(x,\ y);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00238}00238\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ cybozu::test::test(eq,\ "{}CYBOZU\_TEST\_EQUAL\_ARRAY"{},\ \#x\ "{},\ "{}\ \#y,\ \_\_FILE\_\_,\ \_\_LINE\_\_);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00239}00239\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ if\ (!eq)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00240}00240\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ "{}ctest:\ \ i="{}\ <<\ i\ <<\ std::endl;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00241}00241\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ "{}ctest:\ \ lhs="{}\ <<\ (x)\ <<\ std::endl;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00242}00242\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ "{}ctest:\ \ rhs="{}\ <<\ (y)\ <<\ std::endl;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00243}00243\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00244}00244\ \textcolor{preprocessor}{\ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00245}00245\ \textcolor{preprocessor}{\}}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00246}00246\ }
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00251}\mbox{\hyperlink{ate-pairing_2include_2cybozu_2test_8hpp_aff1dee14ebf6d4ac83a4f25c07133301}{00251}}\ \textcolor{preprocessor}{\#define\ CYBOZU\_TEST\_FAIL(msg)\ cybozu::test::test(false,\ "{}CYBOZU\_TEST\_FAIL"{},\ msg,\ \_\_FILE\_\_,\ \_\_LINE\_\_)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00252}00252\ }
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00256}\mbox{\hyperlink{ate-pairing_2include_2cybozu_2test_8hpp_a2812e559523c1b784c4334ba06fbe63a}{00256}}\ \textcolor{preprocessor}{\#define\ CYBOZU\_TEST\_EXCEPTION\_MESSAGE(statement,\ Exception,\ msg)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00257}00257\ \textcolor{preprocessor}{\{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00258}00258\ \textcolor{preprocessor}{\ \ \ \ int\ ret\ =\ 0;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00259}00259\ \textcolor{preprocessor}{\ \ \ \ std::string\ errMsg;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00260}00260\ \textcolor{preprocessor}{\ \ \ \ try\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00261}00261\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ statement;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00262}00262\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ ret\ =\ 1;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00263}00263\ \textcolor{preprocessor}{\ \ \ \ \}\ catch\ (const\ Exception\&\ e)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00264}00264\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ errMsg\ =\ e.what();\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00265}00265\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ if\ (errMsg.find(msg)\ ==\ std::string::npos)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00266}00266\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ ret\ =\ 2;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00267}00267\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00268}00268\ \textcolor{preprocessor}{\ \ \ \ \}\ catch\ (...)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00269}00269\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ ret\ =\ 3;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00270}00270\ \textcolor{preprocessor}{\ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00271}00271\ \textcolor{preprocessor}{\ \ \ \ if\ (ret)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00272}00272\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ cybozu::test::test(false,\ "{}CYBOZU\_TEST\_EXCEPTION\_MESSAGE"{},\ \#statement\ "{},\ "{}\ \#Exception\ "{},\ "{}\ \#msg,\ \_\_FILE\_\_,\ \_\_LINE\_\_);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00273}00273\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ if\ (ret\ ==\ 1)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00274}00274\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ "{}ctest:\ \ no\ exception"{}\ <<\ std::endl;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00275}00275\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \}\ else\ if\ (ret\ ==\ 2)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00276}00276\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ "{}ctest:\ \ bad\ exception\ msg:"{}\ <<\ errMsg\ <<\ std::endl;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00277}00277\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \}\ else\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00278}00278\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ "{}ctest:\ \ unexpected\ exception"{}\ <<\ std::endl;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00279}00279\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00280}00280\ \textcolor{preprocessor}{\ \ \ \ \}\ else\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00281}00281\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ cybozu::test::autoRun.set(true);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00282}00282\ \textcolor{preprocessor}{\ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00283}00283\ \textcolor{preprocessor}{\}}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00284}00284\ }
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00285}\mbox{\hyperlink{ate-pairing_2include_2cybozu_2test_8hpp_a55d417cd6a01e7709f468f27f1de0309}{00285}}\ \textcolor{preprocessor}{\#define\ CYBOZU\_TEST\_EXCEPTION(statement,\ Exception)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00286}00286\ \textcolor{preprocessor}{\{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00287}00287\ \textcolor{preprocessor}{\ \ \ \ int\ ret\ =\ 0;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00288}00288\ \textcolor{preprocessor}{\ \ \ \ try\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00289}00289\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ statement;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00290}00290\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ ret\ =\ 1;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00291}00291\ \textcolor{preprocessor}{\ \ \ \ \}\ catch\ (const\ Exception\&)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00292}00292\ \textcolor{preprocessor}{\ \ \ \ \}\ catch\ (...)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00293}00293\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ ret\ =\ 2;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00294}00294\ \textcolor{preprocessor}{\ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00295}00295\ \textcolor{preprocessor}{\ \ \ \ if\ (ret)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00296}00296\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ cybozu::test::test(false,\ "{}CYBOZU\_TEST\_EXCEPTION"{},\ \#statement\ "{},\ "{}\ \#Exception,\ \_\_FILE\_\_,\ \_\_LINE\_\_);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00297}00297\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ if\ (ret\ ==\ 1)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00298}00298\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ "{}ctest:\ \ no\ exception"{}\ <<\ std::endl;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00299}00299\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \}\ else\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00300}00300\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ "{}ctest:\ \ unexpected\ exception"{}\ <<\ std::endl;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00301}00301\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00302}00302\ \textcolor{preprocessor}{\ \ \ \ \}\ else\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00303}00303\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ cybozu::test::autoRun.set(true);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00304}00304\ \textcolor{preprocessor}{\ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00305}00305\ \textcolor{preprocessor}{\}}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00306}00306\ }
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00310}\mbox{\hyperlink{ate-pairing_2include_2cybozu_2test_8hpp_aa2797929b9474d118ec22c945aa8b244}{00310}}\ \textcolor{preprocessor}{\#define\ CYBOZU\_TEST\_NO\_EXCEPTION(statement)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00311}00311\ \textcolor{preprocessor}{try\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00312}00312\ \textcolor{preprocessor}{\ \ \ \ statement;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00313}00313\ \textcolor{preprocessor}{\ \ \ \ cybozu::test::autoRun.set(true);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00314}00314\ \textcolor{preprocessor}{\}\ catch\ (...)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00315}00315\ \textcolor{preprocessor}{\ \ \ \ cybozu::test::test(false,\ "{}CYBOZU\_TEST\_NO\_EXCEPTION"{},\ \#statement,\ \_\_FILE\_\_,\ \_\_LINE\_\_);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00316}00316\ \textcolor{preprocessor}{\}}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00317}00317\ }
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00322}\mbox{\hyperlink{ate-pairing_2include_2cybozu_2test_8hpp_ae6af8da76a2ce1a6132c96b49c20923c}{00322}}\ \textcolor{preprocessor}{\#define\ CYBOZU\_TEST\_AUTO(name)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00323}00323\ \textcolor{preprocessor}{void\ cybozu\_test\_\ \#\#\ name();\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00324}00324\ \textcolor{preprocessor}{struct\ cybozu\_test\_local\_\ \#\#\ name\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00325}00325\ \textcolor{preprocessor}{\ \ \ \ cybozu\_test\_local\_\ \#\#\ name()\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00326}00326\ \textcolor{preprocessor}{\ \ \ \ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00327}00327\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ cybozu::test::autoRun.append(\#name,\ cybozu\_test\_\ \#\#\ name);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00328}00328\ \textcolor{preprocessor}{\ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00329}00329\ \textcolor{preprocessor}{\}\ cybozu\_test\_local\_instance\_\ \#\#\ name;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00330}00330\ \textcolor{preprocessor}{void\ cybozu\_test\_\ \#\#\ name()}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00331}00331\ }
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00336}\mbox{\hyperlink{ate-pairing_2include_2cybozu_2test_8hpp_abe70b825e63f61c0396efda329895603}{00336}}\ \textcolor{preprocessor}{\#define\ CYBOZU\_TEST\_AUTO\_WITH\_FIXTURE(name,\ Fixture)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00337}00337\ \textcolor{preprocessor}{void\ cybozu\_test\_\ \#\#\ name();\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00338}00338\ \textcolor{preprocessor}{void\ cybozu\_test\_real\_\ \#\#\ name()\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00339}00339\ \textcolor{preprocessor}{\{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00340}00340\ \textcolor{preprocessor}{\ \ \ \ Fixture\ f;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00341}00341\ \textcolor{preprocessor}{\ \ \ \ cybozu\_test\_\ \#\#\ name();\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00342}00342\ \textcolor{preprocessor}{\}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00343}00343\ \textcolor{preprocessor}{struct\ cybozu\_test\_local\_\ \#\#\ name\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00344}00344\ \textcolor{preprocessor}{\ \ \ \ cybozu\_test\_local\_\ \#\#\ name()\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00345}00345\ \textcolor{preprocessor}{\ \ \ \ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00346}00346\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ cybozu::test::autoRun.append(\#name,\ cybozu\_test\_real\_\ \#\#\ name);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00347}00347\ \textcolor{preprocessor}{\ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00348}00348\ \textcolor{preprocessor}{\}\ cybozu\_test\_local\_instance\_\ \#\#\ name;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00349}00349\ \textcolor{preprocessor}{void\ cybozu\_test\_\ \#\#\ name()}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00350}00350\ }
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00356}\mbox{\hyperlink{ate-pairing_2include_2cybozu_2test_8hpp_ae5e258e17a55fafb5cfe20dfc47960b0}{00356}}\ \textcolor{preprocessor}{\#define\ CYBOZU\_TEST\_SETUP\_FIXTURE(Fixture)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00357}00357\ \textcolor{preprocessor}{Fixture\ *cybozu\_test\_local\_fixture;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00358}00358\ \textcolor{preprocessor}{void\ cybozu\_test\_local\_init()\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00359}00359\ \textcolor{preprocessor}{\{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00360}00360\ \textcolor{preprocessor}{\ \ \ \ cybozu\_test\_local\_fixture\ =\ new\ Fixture();\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00361}00361\ \textcolor{preprocessor}{\}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00362}00362\ \textcolor{preprocessor}{void\ cybozu\_test\_local\_term()\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00363}00363\ \textcolor{preprocessor}{\{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00364}00364\ \textcolor{preprocessor}{\ \ \ \ delete\ cybozu\_test\_local\_fixture;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00365}00365\ \textcolor{preprocessor}{\}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00366}00366\ \textcolor{preprocessor}{struct\ cybozu\_test\_local\_fixture\_setup\_\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00367}00367\ \textcolor{preprocessor}{\ \ \ \ cybozu\_test\_local\_fixture\_setup\_()\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00368}00368\ \textcolor{preprocessor}{\ \ \ \ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00369}00369\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ cybozu::test::autoRun.setup(cybozu\_test\_local\_init,\ cybozu\_test\_local\_term);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00370}00370\ \textcolor{preprocessor}{\ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ate-pairing_2include_2cybozu_2test_8hpp_source_l00371}00371\ \textcolor{preprocessor}{\}\ cybozu\_test\_local\_fixture\_setup\_instance\_;}}
+
+\end{DoxyCode}

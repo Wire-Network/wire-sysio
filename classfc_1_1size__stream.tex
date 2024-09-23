@@ -1,0 +1,150 @@
+\doxysection{fc\+::size\+\_\+stream Class Reference}
+\hypertarget{classfc_1_1size__stream}{}\label{classfc_1_1size__stream}\index{fc::size\_stream@{fc::size\_stream}}
+
+
+{\ttfamily \#include $<$iobuffer.\+hpp$>$}
+
+
+
+Inheritance diagram for fc\+::size\+\_\+stream\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=164pt]{classfc_1_1size__stream__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for fc\+::size\+\_\+stream\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=164pt]{classfc_1_1size__stream__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1size__stream_a9de774e0d1138fbf37858df22ccfab6a}{size\+\_\+stream}} (size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}=0)
+\item 
+size\+\_\+t \mbox{\hyperlink{classfc_1_1size__stream_a4cef807709eaea1f08fac02fadd83c46}{size}} () const
+\item 
+size\+\_\+t \mbox{\hyperlink{classfc_1_1size__stream_aa41e5c058fb0a5be325a7a2cd0bb638f}{seek}} (size\+\_\+t pos)
+\item 
+virtual size\+\_\+t \mbox{\hyperlink{classfc_1_1size__stream_a9966959de560c1a06c9efc2652880a1f}{writesome}} (const char \texorpdfstring{$\ast$}{*}, size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})
+\item 
+virtual void \mbox{\hyperlink{classfc_1_1size__stream_a33a80c79228026c08315a1f66a857ae2}{close}} ()
+\item 
+virtual void \mbox{\hyperlink{classfc_1_1size__stream_ad7b0f923baf1511eabfa0856661299b2}{flush}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Records the size, but discards the data. 
+
+Definition at line \mbox{\hyperlink{iobuffer_8hpp_source_l00010}{10}} of file \mbox{\hyperlink{iobuffer_8hpp_source}{iobuffer.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1size__stream_a9de774e0d1138fbf37858df22ccfab6a}\index{fc::size\_stream@{fc::size\_stream}!size\_stream@{size\_stream}}
+\index{size\_stream@{size\_stream}!fc::size\_stream@{fc::size\_stream}}
+\doxysubsubsection{\texorpdfstring{size\_stream()}{size\_stream()}}
+{\footnotesize\ttfamily \label{classfc_1_1size__stream_a9de774e0d1138fbf37858df22ccfab6a} 
+fc\+::size\+\_\+stream\+::size\+\_\+stream (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{s}{ = {\ttfamily 0}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{iobuffer_8hpp_source_l00013}{13}} of file \mbox{\hyperlink{iobuffer_8hpp_source}{iobuffer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00013\ :\_size(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})\{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1size__stream_a33a80c79228026c08315a1f66a857ae2}\index{fc::size\_stream@{fc::size\_stream}!close@{close}}
+\index{close@{close}!fc::size\_stream@{fc::size\_stream}}
+\doxysubsubsection{\texorpdfstring{close()}{close()}}
+{\footnotesize\ttfamily \label{classfc_1_1size__stream_a33a80c79228026c08315a1f66a857ae2} 
+virtual void fc\+::size\+\_\+stream\+::close (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{iobuffer_8hpp_source_l00024}{24}} of file \mbox{\hyperlink{iobuffer_8hpp_source}{iobuffer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00024\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1size__stream_ad7b0f923baf1511eabfa0856661299b2}\index{fc::size\_stream@{fc::size\_stream}!flush@{flush}}
+\index{flush@{flush}!fc::size\_stream@{fc::size\_stream}}
+\doxysubsubsection{\texorpdfstring{flush()}{flush()}}
+{\footnotesize\ttfamily \label{classfc_1_1size__stream_ad7b0f923baf1511eabfa0856661299b2} 
+virtual void fc\+::size\+\_\+stream\+::flush (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{iobuffer_8hpp_source_l00025}{25}} of file \mbox{\hyperlink{iobuffer_8hpp_source}{iobuffer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00025\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1size__stream_aa41e5c058fb0a5be325a7a2cd0bb638f}\index{fc::size\_stream@{fc::size\_stream}!seek@{seek}}
+\index{seek@{seek}!fc::size\_stream@{fc::size\_stream}}
+\doxysubsubsection{\texorpdfstring{seek()}{seek()}}
+{\footnotesize\ttfamily \label{classfc_1_1size__stream_aa41e5c058fb0a5be325a7a2cd0bb638f} 
+size\+\_\+t fc\+::size\+\_\+stream\+::seek (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{pos}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{iobuffer_8hpp_source_l00016}{16}} of file \mbox{\hyperlink{iobuffer_8hpp_source}{iobuffer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00016\ \{\ \textcolor{keywordflow}{return}\ \_size\ =\ pos;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1size__stream_a4cef807709eaea1f08fac02fadd83c46}\index{fc::size\_stream@{fc::size\_stream}!size@{size}}
+\index{size@{size}!fc::size\_stream@{fc::size\_stream}}
+\doxysubsubsection{\texorpdfstring{size()}{size()}}
+{\footnotesize\ttfamily \label{classfc_1_1size__stream_a4cef807709eaea1f08fac02fadd83c46} 
+size\+\_\+t fc\+::size\+\_\+stream\+::size (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{iobuffer_8hpp_source_l00015}{15}} of file \mbox{\hyperlink{iobuffer_8hpp_source}{iobuffer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00015\ \{\ \textcolor{keywordflow}{return}\ \_size;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1size__stream_a9966959de560c1a06c9efc2652880a1f}\index{fc::size\_stream@{fc::size\_stream}!writesome@{writesome}}
+\index{writesome@{writesome}!fc::size\_stream@{fc::size\_stream}}
+\doxysubsubsection{\texorpdfstring{writesome()}{writesome()}}
+{\footnotesize\ttfamily \label{classfc_1_1size__stream_a9966959de560c1a06c9efc2652880a1f} 
+virtual size\+\_\+t fc\+::size\+\_\+stream\+::writesome (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{}{, }\item[{size\+\_\+t}]{len}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{iobuffer_8hpp_source_l00018}{18}} of file \mbox{\hyperlink{iobuffer_8hpp_source}{iobuffer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \ \_size\ +=\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}};}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}};}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/io/\mbox{\hyperlink{iobuffer_8hpp}{iobuffer.\+hpp}}\end{DoxyCompactItemize}

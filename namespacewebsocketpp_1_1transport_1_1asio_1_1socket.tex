@@ -1,0 +1,108 @@
+\doxysection{websocketpp\+::transport\+::asio\+::socket Namespace Reference}
+\hypertarget{namespacewebsocketpp_1_1transport_1_1asio_1_1socket}{}\label{namespacewebsocketpp_1_1transport_1_1asio_1_1socket}\index{websocketpp::transport::asio::socket@{websocketpp::transport::asio::socket}}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1asio_1_1socket_1_1error}{error}}
+\begin{DoxyCompactList}\small\item\em \doxylink{namespace_errors}{Errors} related to asio transport sockets. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1socket_1_1socket__category}{socket\+\_\+category}}
+\begin{DoxyCompactList}\small\item\em Error category related to asio transport socket policies. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef lib\+::function$<$ void(lib\+::asio\+::error\+\_\+code const \&)$>$ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1asio_1_1socket_a864ed8b0d8fa1a92a5f016c112efc4ad}{shutdown\+\_\+handler}}
+\item 
+typedef lib\+::function$<$ void(const lib\+::error\+\_\+code \&)$>$ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1asio_1_1socket_a2eda0fed502e748230883016b3fb3e82}{init\+\_\+handler}}
+\begin{DoxyCompactList}\small\item\em Type of asio transport socket policy initialization handlers. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+lib\+::error\+\_\+category const \& \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1asio_1_1socket_aa1a18c040d8b74e53230fb9e3eb649d4}{get\+\_\+socket\+\_\+category}} ()
+\item 
+lib\+::error\+\_\+code \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1asio_1_1socket_a9e5cb8d54b6d0d1376168955a99fe458}{make\+\_\+error\+\_\+code}} (\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1asio_1_1socket_1_1error_a828ddaa5ed63a761e1b557465a35f05a}{error\+::value}} e)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{namespacewebsocketpp_1_1transport_1_1asio_1_1socket_a2eda0fed502e748230883016b3fb3e82}\index{websocketpp::transport::asio::socket@{websocketpp::transport::asio::socket}!init\_handler@{init\_handler}}
+\index{init\_handler@{init\_handler}!websocketpp::transport::asio::socket@{websocketpp::transport::asio::socket}}
+\doxysubsubsection{\texorpdfstring{init\_handler}{init\_handler}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1transport_1_1asio_1_1socket_a2eda0fed502e748230883016b3fb3e82} 
+typedef lib\+::function$<$void(const lib\+::error\+\_\+code\&)$>$ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1asio_1_1socket_a2eda0fed502e748230883016b3fb3e82}{websocketpp\+::transport\+::asio\+::socket\+::init\+\_\+handler}}}
+
+
+
+Definition at line \mbox{\hyperlink{transport_2asio_2security_2base_8hpp_source_l00152}{152}} of file \mbox{\hyperlink{transport_2asio_2security_2base_8hpp_source}{base.\+hpp}}.
+
+\Hypertarget{namespacewebsocketpp_1_1transport_1_1asio_1_1socket_a864ed8b0d8fa1a92a5f016c112efc4ad}\index{websocketpp::transport::asio::socket@{websocketpp::transport::asio::socket}!shutdown\_handler@{shutdown\_handler}}
+\index{shutdown\_handler@{shutdown\_handler}!websocketpp::transport::asio::socket@{websocketpp::transport::asio::socket}}
+\doxysubsubsection{\texorpdfstring{shutdown\_handler}{shutdown\_handler}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1transport_1_1asio_1_1socket_a864ed8b0d8fa1a92a5f016c112efc4ad} 
+typedef lib\+::function$<$void(lib\+::asio\+::error\+\_\+code const \&)$>$ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1asio_1_1socket_a864ed8b0d8fa1a92a5f016c112efc4ad}{websocketpp\+::transport\+::asio\+::socket\+::shutdown\+\_\+handler}}}
+
+
+
+Definition at line \mbox{\hyperlink{transport_2asio_2security_2base_8hpp_source_l00067}{67}} of file \mbox{\hyperlink{transport_2asio_2security_2base_8hpp_source}{base.\+hpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacewebsocketpp_1_1transport_1_1asio_1_1socket_aa1a18c040d8b74e53230fb9e3eb649d4}\index{websocketpp::transport::asio::socket@{websocketpp::transport::asio::socket}!get\_socket\_category@{get\_socket\_category}}
+\index{get\_socket\_category@{get\_socket\_category}!websocketpp::transport::asio::socket@{websocketpp::transport::asio::socket}}
+\doxysubsubsection{\texorpdfstring{get\_socket\_category()}{get\_socket\_category()}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1transport_1_1asio_1_1socket_aa1a18c040d8b74e53230fb9e3eb649d4} 
+lib\+::error\+\_\+category const  \& websocketpp\+::transport\+::asio\+::socket\+::get\+\_\+socket\+\_\+category (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{transport_2asio_2security_2base_8hpp_source_l00142}{142}} of file \mbox{\hyperlink{transport_2asio_2security_2base_8hpp_source}{base.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00143\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1socket_1_1socket__category}{socket\_category}}\ instance;}
+\DoxyCodeLine{00144\ \ \ \ \ \textcolor{keywordflow}{return}\ instance;}
+\DoxyCodeLine{00145\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacewebsocketpp_1_1transport_1_1asio_1_1socket_aa1a18c040d8b74e53230fb9e3eb649d4_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacewebsocketpp_1_1transport_1_1asio_1_1socket_a9e5cb8d54b6d0d1376168955a99fe458}\index{websocketpp::transport::asio::socket@{websocketpp::transport::asio::socket}!make\_error\_code@{make\_error\_code}}
+\index{make\_error\_code@{make\_error\_code}!websocketpp::transport::asio::socket@{websocketpp::transport::asio::socket}}
+\doxysubsubsection{\texorpdfstring{make\_error\_code()}{make\_error\_code()}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1transport_1_1asio_1_1socket_a9e5cb8d54b6d0d1376168955a99fe458} 
+lib\+::error\+\_\+code websocketpp\+::transport\+::asio\+::socket\+::make\+\_\+error\+\_\+code (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1asio_1_1socket_1_1error_a828ddaa5ed63a761e1b557465a35f05a}{error\+::value}}}]{e}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{transport_2asio_2security_2base_8hpp_source_l00147}{147}} of file \mbox{\hyperlink{transport_2asio_2security_2base_8hpp_source}{base.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00148\ \ \ \ \ \textcolor{keywordflow}{return}\ lib::error\_code(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(e),\ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1asio_1_1socket_aa1a18c040d8b74e53230fb9e3eb649d4}{get\_socket\_category}}());}
+\DoxyCodeLine{00149\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacewebsocketpp_1_1transport_1_1asio_1_1socket_a9e5cb8d54b6d0d1376168955a99fe458_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacewebsocketpp_1_1transport_1_1asio_1_1socket_a9e5cb8d54b6d0d1376168955a99fe458_icgraph}
+\end{center}
+\end{figure}

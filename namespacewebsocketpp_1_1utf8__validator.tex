@@ -1,0 +1,88 @@
+\doxysection{websocketpp\+::utf8\+\_\+validator Namespace Reference}
+\hypertarget{namespacewebsocketpp_1_1utf8__validator}{}\label{namespacewebsocketpp_1_1utf8__validator}\index{websocketpp::utf8\_validator@{websocketpp::utf8\_validator}}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classwebsocketpp_1_1utf8__validator_1_1validator}{validator}}
+\begin{DoxyCompactList}\small\item\em Provides streaming \doxylink{struct_u_t_f8}{UTF8} validation functionality. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{namespacewebsocketpp_1_1utf8__validator_ae6dab1acad72af0396e2448394a07d98}{decode}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{structstate}{state}}, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*}codep, \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} byte)
+\begin{DoxyCompactList}\small\item\em Decode the next byte of a \doxylink{struct_u_t_f8}{UTF8} sequence. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{namespacewebsocketpp_1_1utf8__validator_ad088137c6f18e6844e20496d8782c835}{validate}} (std\+::string const \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\begin{DoxyCompactList}\small\item\em Validate a \doxylink{struct_u_t_f8}{UTF8} string. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacewebsocketpp_1_1utf8__validator_ae6dab1acad72af0396e2448394a07d98}\index{websocketpp::utf8\_validator@{websocketpp::utf8\_validator}!decode@{decode}}
+\index{decode@{decode}!websocketpp::utf8\_validator@{websocketpp::utf8\_validator}}
+\doxysubsubsection{\texorpdfstring{decode()}{decode()}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1utf8__validator_ae6dab1acad72af0396e2448394a07d98} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} websocketpp\+::utf8\+\_\+validator\+::decode (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{state}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{codep}{, }\item[{\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}}}]{byte}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ out}}  & {\em state} & The decoder state to advance \\
+\hline
+\mbox{\texttt{ out}}  & {\em codep} & The codepoint to fill in \\
+\hline
+\mbox{\texttt{ in}}  & {\em byte} & The byte to input \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The ending state of the decode operation 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{utf8__validator_8hpp_source_l00069}{69}} of file \mbox{\hyperlink{utf8__validator_8hpp_source}{utf8\+\_\+validator.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00070\ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ type\ =\ utf8d[byte];}
+\DoxyCodeLine{00071\ }
+\DoxyCodeLine{00072\ \ \ *codep\ =\ (*\mbox{\hyperlink{structstate}{state}}\ !=\ utf8\_accept)\ ?}
+\DoxyCodeLine{00073\ \ \ \ \ (\textcolor{keywordtype}{byte}\ \&\ 0x3fu)\ |\ (*codep\ <<\ 6)\ :}
+\DoxyCodeLine{00074\ \ \ \ \ (0xff\ >>\ type)\ \&\ (byte);}
+\DoxyCodeLine{00075\ }
+\DoxyCodeLine{00076\ \ \ *\mbox{\hyperlink{structstate}{state}}\ =\ utf8d[256\ +\ *\mbox{\hyperlink{structstate}{state}}*16\ +\ \mbox{\hyperlink{yubihsm_8h_a1d127017fb298b889f4ba24752d08b8e}{type}}];}
+\DoxyCodeLine{00077\ \ \ \textcolor{keywordflow}{return}\ *\mbox{\hyperlink{structstate}{state}};}
+\DoxyCodeLine{00078\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacewebsocketpp_1_1utf8__validator_ae6dab1acad72af0396e2448394a07d98_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacewebsocketpp_1_1utf8__validator_ad088137c6f18e6844e20496d8782c835}\index{websocketpp::utf8\_validator@{websocketpp::utf8\_validator}!validate@{validate}}
+\index{validate@{validate}!websocketpp::utf8\_validator@{websocketpp::utf8\_validator}}
+\doxysubsubsection{\texorpdfstring{validate()}{validate()}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1utf8__validator_ad088137c6f18e6844e20496d8782c835} 
+bool websocketpp\+::utf8\+\_\+validator\+::validate (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{s}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+convenience function that creates a validator, validates a complete string and returns the result. 
+
+Definition at line \mbox{\hyperlink{utf8__validator_8hpp_source_l00143}{143}} of file \mbox{\hyperlink{utf8__validator_8hpp_source}{utf8\+\_\+validator.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00144\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1utf8__validator_1_1validator}{validator}}\ v;}
+\DoxyCodeLine{00145\ \ \ \ \ \textcolor{keywordflow}{if}\ (!v.decode(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.begin(),\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.end()))\ \{}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00147\ \ \ \ \ \}}
+\DoxyCodeLine{00148\ \ \ \ \ \textcolor{keywordflow}{return}\ v.complete();}
+\DoxyCodeLine{00149\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacewebsocketpp_1_1utf8__validator_ad088137c6f18e6844e20496d8782c835_icgraph}
+\end{center}
+\end{figure}

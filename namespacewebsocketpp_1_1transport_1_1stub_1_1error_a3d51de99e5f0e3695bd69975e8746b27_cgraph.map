@@ -1,0 +1,5 @@
+<map id="websocketpp::transport::stub::error::make_error_code" name="websocketpp::transport::stub::error::make_error_code">
+<area shape="rect" id="Node000001" title="Get an error code with the given value and the stub transport category." alt="" coords="5,5,202,46"/>
+<area shape="rect" id="Node000002" href="$namespacewebsocketpp_1_1transport_1_1stub_1_1error.html#a49bb92564f5a8a929752c65cd5ae7abd" title="Get a reference to a static copy of the stub transport error category." alt="" coords="250,5,421,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="202,23,234,23,234,28,202,28"/>
+</map>

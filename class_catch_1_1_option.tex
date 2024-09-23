@@ -1,0 +1,405 @@
+\doxysection{Catch\+::Option\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{class_catch_1_1_option}{}\label{class_catch_1_1_option}\index{Catch::Option$<$ T $>$@{Catch::Option$<$ T $>$}}
+
+
+{\ttfamily \#include $<$catch\+\_\+option.\+hpp$>$}
+
+
+
+Inheritance diagram for Catch\+::Option\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=191pt]{class_catch_1_1_option__inherit__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_catch_1_1_option_a8efb01b593d798decc80cbbdf311f2a3}{Option}} ()
+\item 
+\mbox{\hyperlink{class_catch_1_1_option_a5aeb9c22d48a6882bdf5fb4730b06c86}{Option}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const \&\+\_\+value)
+\item 
+\mbox{\hyperlink{class_catch_1_1_option_af02f2e4559f06384baec0def8c68c5fd}{Option}} (\mbox{\hyperlink{class_catch_1_1_option}{Option}} const \&\+\_\+other)
+\item 
+\mbox{\hyperlink{class_catch_1_1_option_a37fe90bb47bb909f150a5ad6be25581a}{\texorpdfstring{$\sim$}{\string~}\+Option}} ()
+\item 
+\mbox{\hyperlink{class_catch_1_1_option}{Option}} \& \mbox{\hyperlink{class_catch_1_1_option_a960fd629f3048995038d58fcf9c018b0}{operator=}} (\mbox{\hyperlink{class_catch_1_1_option}{Option}} const \&\+\_\+other)
+\item 
+\mbox{\hyperlink{class_catch_1_1_option}{Option}} \& \mbox{\hyperlink{class_catch_1_1_option_a32af4018dd8aaf071944f79fc1af520a}{operator=}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const \&\+\_\+value)
+\item 
+void \mbox{\hyperlink{class_catch_1_1_option_a37b4e0e5d4d56296adacd267a616f4e0}{reset}} ()
+\item 
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{class_catch_1_1_option_ac250ca96c9af3bf5f94f253f4c0ec336}{operator\texorpdfstring{$\ast$}{*}}} ()
+\item 
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const \& \mbox{\hyperlink{class_catch_1_1_option_a873a00ed8844b137287f25c811cfd330}{operator\texorpdfstring{$\ast$}{*}}} () const
+\item 
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_catch_1_1_option_a04da75b6b0946cc38b4bbd51c8d407e0}{operator-\/$>$}} ()
+\item 
+const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_catch_1_1_option_acb3ec06778a8761e5f0014543d8f898e}{operator-\/$>$}} () const
+\item 
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{class_catch_1_1_option_a8d9ae2e30b0eb76fe134a6fbc8423124}{value\+Or}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const \&\mbox{\hyperlink{pointer_8h_a3db30c1795eb39d4452f8698f4a67f05}{default\+Value}}) const
+\item 
+bool \mbox{\hyperlink{class_catch_1_1_option_a97c95829afbe92f2bcc5fd75b32c0825}{some}} () const
+\item 
+bool \mbox{\hyperlink{class_catch_1_1_option_a821753afdc3fac947a13a01fbe0d248e}{none}} () const
+\item 
+bool \mbox{\hyperlink{class_catch_1_1_option_a96dccb86bdf45ee0c08e122b6133bef3}{operator!}} () const
+\item 
+\mbox{\hyperlink{class_catch_1_1_option_aba0def0bd9cd45d4e00fe47a604b0270}{operator bool}} () const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$\newline
+class Catch\+::\+Option$<$ T $>$}
+
+
+Definition at line \mbox{\hyperlink{catch__option_8hpp_source_l00015}{15}} of file \mbox{\hyperlink{catch__option_8hpp_source}{catch\+\_\+option.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_catch_1_1_option_a8efb01b593d798decc80cbbdf311f2a3}\index{Catch::Option$<$ T $>$@{Catch::Option$<$ T $>$}!Option@{Option}}
+\index{Option@{Option}!Catch::Option$<$ T $>$@{Catch::Option$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{Option()}{Option()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_option_a8efb01b593d798decc80cbbdf311f2a3} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{class_catch_1_1_option}{Catch\+::\+Option}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::\+Option (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__option_8hpp_source_l00017}{17}} of file \mbox{\hyperlink{catch__option_8hpp_source}{catch\+\_\+option.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00017\ :\ nullableValue(\ \textcolor{keyword}{nullptr}\ )\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_option_a5aeb9c22d48a6882bdf5fb4730b06c86}\index{Catch::Option$<$ T $>$@{Catch::Option$<$ T $>$}!Option@{Option}}
+\index{Option@{Option}!Catch::Option$<$ T $>$@{Catch::Option$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{Option()}{Option()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_option_a5aeb9c22d48a6882bdf5fb4730b06c86} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{class_catch_1_1_option}{Catch\+::\+Option}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::\+Option (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const \&}]{\+\_\+value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__option_8hpp_source_l00018}{18}} of file \mbox{\hyperlink{catch__option_8hpp_source}{catch\+\_\+option.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ :\ nullableValue(\ \textcolor{keyword}{new}(\ storage\ )\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}(\ \_value\ )\ )}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_option_af02f2e4559f06384baec0def8c68c5fd}\index{Catch::Option$<$ T $>$@{Catch::Option$<$ T $>$}!Option@{Option}}
+\index{Option@{Option}!Catch::Option$<$ T $>$@{Catch::Option$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{Option()}{Option()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_option_af02f2e4559f06384baec0def8c68c5fd} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{class_catch_1_1_option}{Catch\+::\+Option}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::\+Option (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_catch_1_1_option}{Option}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ const \&}]{\+\_\+other}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__option_8hpp_source_l00021}{21}} of file \mbox{\hyperlink{catch__option_8hpp_source}{catch\+\_\+option.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ :\ nullableValue(\ \_other\ ?\ \textcolor{keyword}{new}(\ storage\ )\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}(\ *\_other\ )\ :\ \textcolor{keyword}{nullptr}\ )}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_option_a37fe90bb47bb909f150a5ad6be25581a}\index{Catch::Option$<$ T $>$@{Catch::Option$<$ T $>$}!````~Option@{\texorpdfstring{$\sim$}{\string~}Option}}
+\index{````~Option@{\texorpdfstring{$\sim$}{\string~}Option}!Catch::Option$<$ T $>$@{Catch::Option$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}Option()}{\string~Option()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_option_a37fe90bb47bb909f150a5ad6be25581a} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{class_catch_1_1_option}{Catch\+::\+Option}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::\texorpdfstring{$\sim$}{\string~}\mbox{\hyperlink{class_catch_1_1_option}{Option}} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__option_8hpp_source_l00025}{25}} of file \mbox{\hyperlink{catch__option_8hpp_source}{catch\+\_\+option.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_option_a37b4e0e5d4d56296adacd267a616f4e0}{reset}}();}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=338pt]{class_catch_1_1_option_a37fe90bb47bb909f150a5ad6be25581a_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_catch_1_1_option_a821753afdc3fac947a13a01fbe0d248e}\index{Catch::Option$<$ T $>$@{Catch::Option$<$ T $>$}!none@{none}}
+\index{none@{none}!Catch::Option$<$ T $>$@{Catch::Option$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{none()}{none()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_option_a821753afdc3fac947a13a01fbe0d248e} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+bool \mbox{\hyperlink{class_catch_1_1_option}{Catch\+::\+Option}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::none (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__option_8hpp_source_l00059}{59}} of file \mbox{\hyperlink{catch__option_8hpp_source}{catch\+\_\+option.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00059\ \{\ \textcolor{keywordflow}{return}\ nullableValue\ ==\ \textcolor{keyword}{nullptr};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_option_aba0def0bd9cd45d4e00fe47a604b0270}\index{Catch::Option$<$ T $>$@{Catch::Option$<$ T $>$}!operator bool@{operator bool}}
+\index{operator bool@{operator bool}!Catch::Option$<$ T $>$@{Catch::Option$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{operator bool()}{operator bool()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_option_aba0def0bd9cd45d4e00fe47a604b0270} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{class_catch_1_1_option}{Catch\+::\+Option}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::operator bool (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__option_8hpp_source_l00062}{62}} of file \mbox{\hyperlink{catch__option_8hpp_source}{catch\+\_\+option.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_catch_1_1_option_a97c95829afbe92f2bcc5fd75b32c0825}{some}}();}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_option_aba0def0bd9cd45d4e00fe47a604b0270_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_option_a96dccb86bdf45ee0c08e122b6133bef3}\index{Catch::Option$<$ T $>$@{Catch::Option$<$ T $>$}!operator"!@{operator"!}}
+\index{operator"!@{operator"!}!Catch::Option$<$ T $>$@{Catch::Option$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{operator"!()}{operator!()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_option_a96dccb86bdf45ee0c08e122b6133bef3} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+bool \mbox{\hyperlink{class_catch_1_1_option}{Catch\+::\+Option}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::operator! (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__option_8hpp_source_l00061}{61}} of file \mbox{\hyperlink{catch__option_8hpp_source}{catch\+\_\+option.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00061\ \{\ \textcolor{keywordflow}{return}\ nullableValue\ ==\ \textcolor{keyword}{nullptr};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_option_ac250ca96c9af3bf5f94f253f4c0ec336}\index{Catch::Option$<$ T $>$@{Catch::Option$<$ T $>$}!operator\texorpdfstring{$\ast$}{*}@{operator\texorpdfstring{$\ast$}{*}}}
+\index{operator\texorpdfstring{$\ast$}{*}@{operator\texorpdfstring{$\ast$}{*}}!Catch::Option$<$ T $>$@{Catch::Option$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{operator\texorpdfstring{$\ast$}{*}()}{operator*()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_option_ac250ca96c9af3bf5f94f253f4c0ec336} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{class_catch_1_1_option}{Catch\+::\+Option}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::operator\texorpdfstring{$\ast$}{*} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__option_8hpp_source_l00049}{49}} of file \mbox{\hyperlink{catch__option_8hpp_source}{catch\+\_\+option.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00049\ \{\ \textcolor{keywordflow}{return}\ *nullableValue;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_option_a873a00ed8844b137287f25c811cfd330}\index{Catch::Option$<$ T $>$@{Catch::Option$<$ T $>$}!operator\texorpdfstring{$\ast$}{*}@{operator\texorpdfstring{$\ast$}{*}}}
+\index{operator\texorpdfstring{$\ast$}{*}@{operator\texorpdfstring{$\ast$}{*}}!Catch::Option$<$ T $>$@{Catch::Option$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{operator\texorpdfstring{$\ast$}{*}()}{operator*()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_option_a873a00ed8844b137287f25c811cfd330} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const  \& \mbox{\hyperlink{class_catch_1_1_option}{Catch\+::\+Option}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::operator\texorpdfstring{$\ast$}{*} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__option_8hpp_source_l00050}{50}} of file \mbox{\hyperlink{catch__option_8hpp_source}{catch\+\_\+option.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00050\ \{\ \textcolor{keywordflow}{return}\ *nullableValue;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_option_a04da75b6b0946cc38b4bbd51c8d407e0}\index{Catch::Option$<$ T $>$@{Catch::Option$<$ T $>$}!operator-\/$>$@{operator-\/$>$}}
+\index{operator-\/$>$@{operator-\/$>$}!Catch::Option$<$ T $>$@{Catch::Option$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{operator-\/$>$()}{operator->()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_option_a04da75b6b0946cc38b4bbd51c8d407e0} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_catch_1_1_option}{Catch\+::\+Option}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::operator-\/$>$ (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__option_8hpp_source_l00051}{51}} of file \mbox{\hyperlink{catch__option_8hpp_source}{catch\+\_\+option.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00051\ \{\ \textcolor{keywordflow}{return}\ nullableValue;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_option_acb3ec06778a8761e5f0014543d8f898e}\index{Catch::Option$<$ T $>$@{Catch::Option$<$ T $>$}!operator-\/$>$@{operator-\/$>$}}
+\index{operator-\/$>$@{operator-\/$>$}!Catch::Option$<$ T $>$@{Catch::Option$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{operator-\/$>$()}{operator->()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_option_acb3ec06778a8761e5f0014543d8f898e} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_catch_1_1_option}{Catch\+::\+Option}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::operator-\/$>$ (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__option_8hpp_source_l00052}{52}} of file \mbox{\hyperlink{catch__option_8hpp_source}{catch\+\_\+option.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00052\ \{\ \textcolor{keywordflow}{return}\ nullableValue;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_option_a960fd629f3048995038d58fcf9c018b0}\index{Catch::Option$<$ T $>$@{Catch::Option$<$ T $>$}!operator=@{operator=}}
+\index{operator=@{operator=}!Catch::Option$<$ T $>$@{Catch::Option$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_option_a960fd629f3048995038d58fcf9c018b0} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{class_catch_1_1_option}{Option}} \& \mbox{\hyperlink{class_catch_1_1_option}{Catch\+::\+Option}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::operator= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_catch_1_1_option}{Option}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ const \&}]{\+\_\+other}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__option_8hpp_source_l00029}{29}} of file \mbox{\hyperlink{catch__option_8hpp_source}{catch\+\_\+option.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \&\_other\ !=\ \textcolor{keyword}{this}\ )\ \{}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_option_a37b4e0e5d4d56296adacd267a616f4e0}{reset}}();}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \_other\ )}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ nullableValue\ =\ \textcolor{keyword}{new}(\ storage\ )\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}(\ *\_other\ );}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=345pt]{class_catch_1_1_option_a960fd629f3048995038d58fcf9c018b0_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_option_a960fd629f3048995038d58fcf9c018b0_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_option_a32af4018dd8aaf071944f79fc1af520a}\index{Catch::Option$<$ T $>$@{Catch::Option$<$ T $>$}!operator=@{operator=}}
+\index{operator=@{operator=}!Catch::Option$<$ T $>$@{Catch::Option$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_option_a32af4018dd8aaf071944f79fc1af520a} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{class_catch_1_1_option}{Option}} \& \mbox{\hyperlink{class_catch_1_1_option}{Catch\+::\+Option}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::operator= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const \&}]{\+\_\+value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__option_8hpp_source_l00037}{37}} of file \mbox{\hyperlink{catch__option_8hpp_source}{catch\+\_\+option.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_option_a37b4e0e5d4d56296adacd267a616f4e0}{reset}}();}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ nullableValue\ =\ \textcolor{keyword}{new}(\ storage\ )\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}(\ \_value\ );}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=345pt]{class_catch_1_1_option_a32af4018dd8aaf071944f79fc1af520a_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_option_a37b4e0e5d4d56296adacd267a616f4e0}\index{Catch::Option$<$ T $>$@{Catch::Option$<$ T $>$}!reset@{reset}}
+\index{reset@{reset}!Catch::Option$<$ T $>$@{Catch::Option$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{reset()}{reset()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_option_a37b4e0e5d4d56296adacd267a616f4e0} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+void \mbox{\hyperlink{class_catch_1_1_option}{Catch\+::\+Option}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::reset (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__option_8hpp_source_l00043}{43}} of file \mbox{\hyperlink{catch__option_8hpp_source}{catch\+\_\+option.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ nullableValue\ )}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ nullableValue-\/>\string~T();}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \ \ \ nullableValue\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_option_a37b4e0e5d4d56296adacd267a616f4e0_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_option_a97c95829afbe92f2bcc5fd75b32c0825}\index{Catch::Option$<$ T $>$@{Catch::Option$<$ T $>$}!some@{some}}
+\index{some@{some}!Catch::Option$<$ T $>$@{Catch::Option$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{some()}{some()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_option_a97c95829afbe92f2bcc5fd75b32c0825} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+bool \mbox{\hyperlink{class_catch_1_1_option}{Catch\+::\+Option}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::some (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__option_8hpp_source_l00058}{58}} of file \mbox{\hyperlink{catch__option_8hpp_source}{catch\+\_\+option.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00058\ \{\ \textcolor{keywordflow}{return}\ nullableValue\ !=\ \textcolor{keyword}{nullptr};\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_option_a97c95829afbe92f2bcc5fd75b32c0825_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_option_a8d9ae2e30b0eb76fe134a6fbc8423124}\index{Catch::Option$<$ T $>$@{Catch::Option$<$ T $>$}!valueOr@{valueOr}}
+\index{valueOr@{valueOr}!Catch::Option$<$ T $>$@{Catch::Option$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{valueOr()}{valueOr()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_option_a8d9ae2e30b0eb76fe134a6fbc8423124} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{class_catch_1_1_option}{Catch\+::\+Option}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::value\+Or (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const \&}]{default\+Value}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__option_8hpp_source_l00054}{54}} of file \mbox{\hyperlink{catch__option_8hpp_source}{catch\+\_\+option.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ nullableValue\ ?\ *nullableValue\ :\ \mbox{\hyperlink{pointer_8h_a3db30c1795eb39d4452f8698f4a67f05}{defaultValue}};}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=294pt]{class_catch_1_1_option_a8d9ae2e30b0eb76fe134a6fbc8423124_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__option_8hpp}{catch\+\_\+option.\+hpp}}\end{DoxyCompactItemize}

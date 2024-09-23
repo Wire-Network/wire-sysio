@@ -1,0 +1,6 @@
+<map id="CLI::detail::ini_join" name="CLI::detail::ini_join">
+<area shape="rect" id="Node000001" title="Comma separated join, adds quotes if needed." alt="" coords="191,37,320,62"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_config_base.html#a5832f6f03212648fa08a8ff83bc9bc08" title="Convert an app into a configuration." alt="" coords="5,29,143,70"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="175,52,143,52,143,47,175,47"/>
+<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="103,16,92,10,74,8,57,10,47,14,43,20,44,28,39,29,38,19,43,10,56,5,74,3,94,5,106,11"/>
+</map>

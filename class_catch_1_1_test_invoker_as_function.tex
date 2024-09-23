@@ -1,0 +1,93 @@
+\doxysection{Catch\+::Test\+Invoker\+As\+Function Class Reference}
+\hypertarget{class_catch_1_1_test_invoker_as_function}{}\label{class_catch_1_1_test_invoker_as_function}\index{Catch::TestInvokerAsFunction@{Catch::TestInvokerAsFunction}}
+
+
+{\ttfamily \#include $<$catch\+\_\+test\+\_\+case\+\_\+registry\+\_\+impl.\+h$>$}
+
+
+
+Inheritance diagram for Catch\+::Test\+Invoker\+As\+Function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=229pt]{class_catch_1_1_test_invoker_as_function__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Catch\+::Test\+Invoker\+As\+Function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=229pt]{class_catch_1_1_test_invoker_as_function__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_catch_1_1_test_invoker_as_function_a62fab15fdbbf55e45b8ab9c78b06027b}{Test\+Invoker\+As\+Function}} (void(\texorpdfstring{$\ast$}{*}test\+As\+Function)()) noexcept
+\item 
+void \mbox{\hyperlink{class_catch_1_1_test_invoker_as_function_ad71cb89f9b3ce57309ddda808e940e54}{invoke}} () const override
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{struct_catch_1_1_i_test_invoker}{Catch\+::\+ITest\+Invoker}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{struct_catch_1_1_i_test_invoker_a99f1c750e08df86e117995ea75b5dd9d}{\texorpdfstring{$\sim$}{\string~}\+ITest\+Invoker}} ()
+\item 
+virtual \mbox{\hyperlink{struct_catch_1_1_i_test_invoker_a2c89f3eece5b1b677243766e409bd831}{\texorpdfstring{$\sim$}{\string~}\+ITest\+Invoker}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{catch__test__case__registry__impl_8h_source_l00052}{52}} of file \mbox{\hyperlink{catch__test__case__registry__impl_8h_source}{catch\+\_\+test\+\_\+case\+\_\+registry\+\_\+impl.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_catch_1_1_test_invoker_as_function_a62fab15fdbbf55e45b8ab9c78b06027b}\index{Catch::TestInvokerAsFunction@{Catch::TestInvokerAsFunction}!TestInvokerAsFunction@{TestInvokerAsFunction}}
+\index{TestInvokerAsFunction@{TestInvokerAsFunction}!Catch::TestInvokerAsFunction@{Catch::TestInvokerAsFunction}}
+\doxysubsubsection{\texorpdfstring{TestInvokerAsFunction()}{TestInvokerAsFunction()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_test_invoker_as_function_a62fab15fdbbf55e45b8ab9c78b06027b} 
+Catch\+::\+Test\+Invoker\+As\+Function\+::\+Test\+Invoker\+As\+Function (\begin{DoxyParamCaption}\item[{void(\texorpdfstring{$\ast$}{*}}]{test\+As\+Function~}{)()}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__test__case__registry__impl_8cpp_source_l00096}{96}} of file \mbox{\hyperlink{catch__test__case__registry__impl_8cpp_source}{catch\+\_\+test\+\_\+case\+\_\+registry\+\_\+impl.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00096\ :\ m\_testAsFunction(\ testAsFunction\ )\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_catch_1_1_test_invoker_as_function_ad71cb89f9b3ce57309ddda808e940e54}\index{Catch::TestInvokerAsFunction@{Catch::TestInvokerAsFunction}!invoke@{invoke}}
+\index{invoke@{invoke}!Catch::TestInvokerAsFunction@{Catch::TestInvokerAsFunction}}
+\doxysubsubsection{\texorpdfstring{invoke()}{invoke()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_test_invoker_as_function_ad71cb89f9b3ce57309ddda808e940e54} 
+void Catch\+::\+Test\+Invoker\+As\+Function\+::invoke (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_i_test_invoker_a6fcd5c5b67d6d5ade6491ff33411ca7f}{Catch\+::\+ITest\+Invoker}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__test__case__registry__impl_8cpp_source_l00098}{98}} of file \mbox{\hyperlink{catch__test__case__registry__impl_8cpp_source}{catch\+\_\+test\+\_\+case\+\_\+registry\+\_\+impl.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ m\_testAsFunction();}
+\DoxyCodeLine{00100\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__test__case__registry__impl_8h}{catch\+\_\+test\+\_\+case\+\_\+registry\+\_\+impl.\+h}}\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__test__case__registry__impl_8cpp}{catch\+\_\+test\+\_\+case\+\_\+registry\+\_\+impl.\+cpp}}\end{DoxyCompactItemize}

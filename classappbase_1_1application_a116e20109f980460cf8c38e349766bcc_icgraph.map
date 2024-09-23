@@ -1,0 +1,17 @@
+<map id="appbase::application::shutdown" name="appbase::application::shutdown">
+<area shape="rect" id="Node000001" title=" " alt="" coords="438,71,578,111"/>
+<area shape="rect" id="Node000002" href="$classappbase_1_1application.html#a39286b0b034b97f6940568a00f44edaf" title=" " alt="" coords="250,71,390,111"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="423,94,390,94,390,88,423,88"/>
+<area shape="rect" id="Node000006" href="$classsysio_1_1http__plugin.html#ac1a2d5844cede3082aade8a1aeb798a2" title=" " alt="" coords="258,136,382,177"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="434,119,381,138,380,133,432,114"/>
+<area shape="rect" id="Node000007" href="$classappbase_1_1application.html#a3b77bd811744da79c9d8ba0d078e7668" title=" " alt="" coords="250,5,390,46"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="432,68,380,49,381,44,434,63"/>
+<area shape="rect" id="Node000003" href="$test__trx__full_8cpp.html#afdace07785a80c02d7fbb1d13154c2c4" title=" " alt="" coords="5,62,202,88"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="234,87,202,85,202,80,234,82"/>
+<area shape="rect" id="Node000004" href="$test__trx__retry__db_8cpp.html#a253cc0c74fd06c934d9c7d4ee67ccf87" title=" " alt="" coords="5,112,202,137"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="234,107,191,114,191,108,234,102"/>
+<area shape="rect" id="Node000005" href="$libraries_2appbase_2examples_2main_8cpp.html#a3c04138a5bfe5d72780bb7e82a18e627" title=" " alt="" coords="79,13,128,38"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="248,68,201,52,128,33,129,28,202,47,249,62"/>
+<area shape="poly" id="edge7_Node000007_Node000003" title=" " alt="" coords="235,48,164,64,163,59,234,42"/>
+<area shape="poly" id="edge8_Node000007_Node000005" title=" " alt="" coords="234,28,129,28,129,23,234,23"/>
+</map>

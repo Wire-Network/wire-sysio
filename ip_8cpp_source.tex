@@ -1,0 +1,151 @@
+\doxysection{ip.\+cpp}
+\hypertarget{ip_8cpp_source}{}\label{ip_8cpp_source}\index{libraries/fc/src/network/ip.cpp@{libraries/fc/src/network/ip.cpp}}
+\mbox{\hyperlink{ip_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{ip_8hpp}{fc/network/ip.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{fc_2include_2fc_2variant_8hpp}{fc/variant.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{exception_8hpp}{fc/exception/exception.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <boost/asio.hpp>}}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <boost/lexical\_cast.hpp>}}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00008}00008\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}\ \{\ \textcolor{keyword}{namespace\ }ip\ \{}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00010}\mbox{\hyperlink{classfc_1_1ip_1_1address_aebc2d2f9bc831e6ad04399c9bd8406db}{00010}}\ \ \ \mbox{\hyperlink{classfc_1_1ip_1_1address_aebc2d2f9bc831e6ad04399c9bd8406db}{address::address}}(\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ ip\ )}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00011}00011\ \ \ :\_ip(ip)\{\}}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00013}\mbox{\hyperlink{classfc_1_1ip_1_1address_a0992b23a0e958965171d03bccccedd3b}{00013}}\ \ \ \mbox{\hyperlink{classfc_1_1ip_1_1address_aebc2d2f9bc831e6ad04399c9bd8406db}{address::address}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc::string}}\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ )\ }
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00014}00014\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00015}00015\ \ \ \ \ \textcolor{keywordflow}{try}}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00016}00016\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00017}00017\ \ \ \ \ \ \ \_ip\ =\ boost::asio::ip::address\_v4::from\_string(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.c\_str()).to\_ulong();}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00018}00018\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00019}00019\ \ \ \ \ \mbox{\hyperlink{exception_8hpp_af3731d6e3beb140d9e652adf7a18113b}{FC\_RETHROW\_EXCEPTIONS}}(error,\ \textcolor{stringliteral}{"{}Error\ parsing\ IP\ address\ \$\{address\}"{}},\ (\textcolor{stringliteral}{"{}address"{}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}))}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00020}00020\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00022}\mbox{\hyperlink{classfc_1_1ip_1_1address_aa0feacee1993c1338d13ea41f236d660}{00022}}\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacefc_1_1ip_abb2c9cbc965c39c391c42959a2edf172}{operator==}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1ip_1_1address}{address}}\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1ip_1_1address}{address}}\&\ b\ )\ \{}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00023}00023\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})\ ==\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}(b);}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00024}00024\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00025}\mbox{\hyperlink{classfc_1_1ip_1_1address_a259e8078e0b2dc8015bf497b96c2a1a2}{00025}}\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacefc_1_1ip_a94f7db7a44c15848c126ae870d551e25}{operator!=}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1ip_1_1address}{address}}\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1ip_1_1address}{address}}\&\ b\ )\ \{}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00026}00026\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})\ !=\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}(b);}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00027}00027\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00029}\mbox{\hyperlink{classfc_1_1ip_1_1address_a0560e2011b284ee0ae6d3f8b3b98cba8}{00029}}\ \ \ \mbox{\hyperlink{classfc_1_1ip_1_1address}{address}}\&\ \mbox{\hyperlink{classfc_1_1ip_1_1address_a0560e2011b284ee0ae6d3f8b3b98cba8}{address::operator=}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc::string}}\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ )\ }
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00030}00030\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00031}00031\ \ \ \ \ \textcolor{keywordflow}{try}}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00032}00032\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00033}00033\ \ \ \ \ \ \ \_ip\ =\ boost::asio::ip::address\_v4::from\_string(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.c\_str()).to\_ulong();}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00034}00034\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00035}00035\ \ \ \ \ \mbox{\hyperlink{exception_8hpp_af3731d6e3beb140d9e652adf7a18113b}{FC\_RETHROW\_EXCEPTIONS}}(error,\ \textcolor{stringliteral}{"{}Error\ parsing\ IP\ address\ \$\{address\}"{}},\ (\textcolor{stringliteral}{"{}address"{}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}))}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00036}00036\ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00037}00037\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00039}\mbox{\hyperlink{classfc_1_1ip_1_1address_a5f8c78759a8f7ce9a02215ebeb71d24c}{00039}}\ \ \ address::operator\ \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc::string}}()\textcolor{keyword}{const\ }}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00040}00040\ \textcolor{keyword}{\ \ }\{}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00041}00041\ \ \ \ \ \textcolor{keywordflow}{try}}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00042}00042\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00043}00043\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ boost::asio::ip::address\_v4(\_ip).to\_string().c\_str();}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00044}00044\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00045}00045\ \ \ \ \ \mbox{\hyperlink{exception_8hpp_af3731d6e3beb140d9e652adf7a18113b}{FC\_RETHROW\_EXCEPTIONS}}(error,\ \textcolor{stringliteral}{"{}Error\ parsing\ IP\ address\ to\ string"{}})}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00046}00046\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00047}\mbox{\hyperlink{classfc_1_1ip_1_1address_a705d307a09a6f079579933fa1cf54cdb}{00047}}\ \ \ address::operator\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}()\textcolor{keyword}{const\ }\{}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00048}00048\ \ \ \ \ \textcolor{keywordflow}{return}\ \_ip;}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00049}00049\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00052}\mbox{\hyperlink{classfc_1_1ip_1_1endpoint_ad3a1ad38684ecd7c145ab3d4142645f6}{00052}}\ \ \ \mbox{\hyperlink{classfc_1_1ip_1_1endpoint_ad3a1ad38684ecd7c145ab3d4142645f6}{endpoint::endpoint}}()}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00053}00053\ \ \ :\_port(0)\{\ \ \}}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00054}\mbox{\hyperlink{classfc_1_1ip_1_1endpoint_a5105c2971d5a5d76a2ce87422d855233}{00054}}\ \ \ \mbox{\hyperlink{classfc_1_1ip_1_1endpoint_ad3a1ad38684ecd7c145ab3d4142645f6}{endpoint::endpoint}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1ip_1_1address}{address}}\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00055}00055\ \ \ :\_port(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}),\_ip(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})\{\}}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00057}\mbox{\hyperlink{classfc_1_1ip_1_1endpoint_abbc398434e10da844dfb35060c472a25}{00057}}\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacefc_1_1ip_abb2c9cbc965c39c391c42959a2edf172}{operator==}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1ip_1_1endpoint}{endpoint}}\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1ip_1_1endpoint}{endpoint}}\&\ b\ )\ \{}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00058}00058\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.\_port\ ==\ b.\_port\ \ \&\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.\_ip\ ==\ b.\_ip;}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00059}00059\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00060}\mbox{\hyperlink{classfc_1_1ip_1_1endpoint_a0cdcb0047f3ae66889d3a8d2d01a1a9e}{00060}}\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacefc_1_1ip_a94f7db7a44c15848c126ae870d551e25}{operator!=}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1ip_1_1endpoint}{endpoint}}\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1ip_1_1endpoint}{endpoint}}\&\ b\ )\ \{}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00061}00061\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.\_port\ !=\ b.\_port\ ||\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.\_ip\ !=\ b.\_ip;}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00062}00062\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00064}\mbox{\hyperlink{classfc_1_1ip_1_1endpoint_aa0defbdcb5d502ecbdfb035009e24f75}{00064}}\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacefc_1_1ip_a7d0cdc2b9447bd02b8689ee7ad601f4c}{operator<\ }}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1ip_1_1endpoint}{endpoint}}\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1ip_1_1endpoint}{endpoint}}\&\ b\ )}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00065}00065\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00066}00066\ \ \ \ \ \ \textcolor{keywordflow}{return}\ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.get\_address())\ <\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}(b.\mbox{\hyperlink{classfc_1_1ip_1_1endpoint_a61b2902b0e0e02172a60f3a17469f780}{get\_address}}())\ ||}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00067}00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.get\_address())\ ==\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}(b.\mbox{\hyperlink{classfc_1_1ip_1_1endpoint_a61b2902b0e0e02172a60f3a17469f780}{get\_address}}())\ \&\&}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.port())\ <\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}(b.\mbox{\hyperlink{classfc_1_1ip_1_1endpoint_ab243ed508cf8f9d34a32b2ece708466b}{port}}()));}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00069}00069\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00071}\mbox{\hyperlink{classfc_1_1ip_1_1endpoint_ab243ed508cf8f9d34a32b2ece708466b}{00071}}\ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1ip_1_1endpoint_ab243ed508cf8f9d34a32b2ece708466b}{endpoint::port}}()\textcolor{keyword}{const\ \ \ \ }\{\ \textcolor{keywordflow}{return}\ \_port;\ \}}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00072}\mbox{\hyperlink{classfc_1_1ip_1_1endpoint_a61b2902b0e0e02172a60f3a17469f780}{00072}}\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1ip_1_1address}{address}}\&\ \mbox{\hyperlink{classfc_1_1ip_1_1endpoint_a61b2902b0e0e02172a60f3a17469f780}{endpoint::get\_address}}()\textcolor{keyword}{const\ }\{\ \textcolor{keywordflow}{return}\ \_ip;\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00073}00073\ }
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00074}\mbox{\hyperlink{classfc_1_1ip_1_1endpoint_a80c154405619b208c9d057d2c91958c9}{00074}}\ \ \ \mbox{\hyperlink{classfc_1_1ip_1_1endpoint}{endpoint}}\ \mbox{\hyperlink{classfc_1_1ip_1_1endpoint_a80c154405619b208c9d057d2c91958c9}{endpoint::from\_string}}(\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\&\ endpoint\_string\ )}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00075}00075\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00076}00076\ \ \ \ \ \textcolor{keywordflow}{try}}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00077}00077\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00078}00078\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1ip_1_1endpoint}{endpoint}}\ ep;}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00079}00079\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ pos\ =\ endpoint\_string.find(\textcolor{charliteral}{':'});}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00080}00080\ \ \ \ \ \ \ ep.\_ip\ \ \ =\ boost::asio::ip::address\_v4::from\_string(endpoint\_string.substr(\ 0,\ pos\ )\ ).to\_ulong();}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00081}00081\ \ \ \ \ \ \ ep.\_port\ =\ boost::lexical\_cast<uint16\_t>(\ endpoint\_string.substr(\ pos+1,\ endpoint\_string.size()\ )\ );}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00082}00082\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ep;}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00083}00083\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00084}00084\ \ \ \ \ \mbox{\hyperlink{exception_8hpp_af3731d6e3beb140d9e652adf7a18113b}{FC\_RETHROW\_EXCEPTIONS}}(warn,\ \textcolor{stringliteral}{"{}error\ converting\ string\ to\ IP\ endpoint"{}})}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00085}00085\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00086}00086\ }
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00087}\mbox{\hyperlink{classfc_1_1ip_1_1endpoint_a8a44fd8cffdec158ae2a548db5d64a56}{00087}}\ \ \ endpoint::operator\ \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}}()\textcolor{keyword}{const\ }}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00088}00088\ \textcolor{keyword}{\ \ }\{}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00089}00089\ \ \ \ \ \textcolor{keywordflow}{try}}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00090}00090\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00091}00091\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}}(\_ip)\ +\ \textcolor{charliteral}{':'}\ +\ \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc::string}}(boost::lexical\_cast<std::string>(\_port).c\_str());}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00092}00092\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00093}00093\ \ \ \ \ \mbox{\hyperlink{exception_8hpp_af3731d6e3beb140d9e652adf7a18113b}{FC\_RETHROW\_EXCEPTIONS}}(warn,\ \textcolor{stringliteral}{"{}error\ converting\ IP\ endpoint\ to\ string"{}})}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00094}00094\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00095}00095\ }
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00105}\mbox{\hyperlink{classfc_1_1ip_1_1address_a0fd7da64e9de2fc54b5dc537dad7aee2}{00105}}\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classfc_1_1ip_1_1address_a0fd7da64e9de2fc54b5dc537dad7aee2}{address::is\_private\_address}}()\textcolor{keyword}{const}}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00106}00106\ \textcolor{keyword}{\ \ }\{}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00107}00107\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classfc_1_1ip_1_1address}{address}}\ min10\_ip(\textcolor{stringliteral}{"{}10.0.0.0"{}});}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00108}00108\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classfc_1_1ip_1_1address}{address}}\ max10\_ip(\textcolor{stringliteral}{"{}10.255.255.255"{}});}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00109}00109\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classfc_1_1ip_1_1address}{address}}\ min172\_ip(\textcolor{stringliteral}{"{}172.16.0.0"{}});}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00110}00110\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classfc_1_1ip_1_1address}{address}}\ max172\_ip(\textcolor{stringliteral}{"{}172.31.255.255"{}});}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00111}00111\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classfc_1_1ip_1_1address}{address}}\ min192\_ip(\textcolor{stringliteral}{"{}192.168.0.0"{}});}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00112}00112\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classfc_1_1ip_1_1address}{address}}\ max192\_ip(\textcolor{stringliteral}{"{}192.168.255.255"{}});}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00113}00113\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classfc_1_1ip_1_1address}{address}}\ min169\_ip(\textcolor{stringliteral}{"{}169.254.0.0"{}});}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00114}00114\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classfc_1_1ip_1_1address}{address}}\ max169\_ip(\textcolor{stringliteral}{"{}169.254.255.255"{}});}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00115}00115\ \ \ \ \ \textcolor{keywordflow}{if}(\ \_ip\ >=\ min10\_ip.\_ip\ \&\&\ \_ip\ <=\ max10\_ip.\_ip\ )\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00116}00116\ \ \ \ \ \textcolor{keywordflow}{if}(\ \_ip\ >=\ min172\_ip.\_ip\ \&\&\ \_ip\ <=\ max172\_ip.\_ip\ )\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00117}00117\ \ \ \ \ \textcolor{keywordflow}{if}(\ \_ip\ >=\ min192\_ip.\_ip\ \&\&\ \_ip\ <=\ max192\_ip.\_ip\ )\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00118}00118\ \ \ \ \ \textcolor{keywordflow}{if}(\ \_ip\ >=\ min169\_ip.\_ip\ \&\&\ \_ip\ <=\ max169\_ip.\_ip\ )\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00119}00119\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00120}00120\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00121}00121\ }
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00125}\mbox{\hyperlink{classfc_1_1ip_1_1address_a7365faef59d2df42310b3d68f62f61e4}{00125}}\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classfc_1_1ip_1_1address_a7365faef59d2df42310b3d68f62f61e4}{address::is\_multicast\_address}}()\textcolor{keyword}{const}}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00126}00126\ \textcolor{keyword}{\ \ }\{}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00127}00127\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classfc_1_1ip_1_1address}{address}}\ min\_ip(\textcolor{stringliteral}{"{}224.0.0.0"{}});}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00128}00128\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classfc_1_1ip_1_1address}{address}}\ max\_ip(\textcolor{stringliteral}{"{}239.255.255.255"{}});}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00129}00129\ \ \ \ \ \textcolor{keywordflow}{return}\ \ \_ip\ >=\ min\_ip.\_ip\ \ \&\&\ \_ip\ <=\ max\_ip.\_ip;}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00130}00130\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00131}00131\ }
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00133}\mbox{\hyperlink{classfc_1_1ip_1_1address_a1481a21df38961dfc3c7eea41b1f79a7}{00133}}\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classfc_1_1ip_1_1address_a1481a21df38961dfc3c7eea41b1f79a7}{address::is\_public\_address}}()\textcolor{keyword}{const}}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00134}00134\ \textcolor{keyword}{\ \ }\{}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00135}00135\ \ \ \ \ \textcolor{keywordflow}{return}\ !(\ \mbox{\hyperlink{classfc_1_1ip_1_1address_a0fd7da64e9de2fc54b5dc537dad7aee2}{is\_private\_address}}()\ ||\ \mbox{\hyperlink{classfc_1_1ip_1_1address_a7365faef59d2df42310b3d68f62f61e4}{is\_multicast\_address}}()\ );}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00136}00136\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00137}00137\ }
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00138}00138\ \}\ \ \textcolor{comment}{//\ namespace\ ip}}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00139}00139\ }
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00140}\mbox{\hyperlink{namespacefc_a89592346d5b5cc41d0b6859f4b5ae8a3}{00140}}\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefc_adea61f2343de94d0fbcb920a32332ad9}{to\_variant}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1ip_1_1endpoint}{ip::endpoint}}\&\ var,\ \ \mbox{\hyperlink{classfc_1_1variant}{variant}}\&\ vo\ )}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00141}00141\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00142}00142\ \ \ \ \ \ \ vo\ =\ \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc::string}}(var);}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00143}00143\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00144}\mbox{\hyperlink{namespacefc_ad22dd021d6ffe639b96d6b6728635853}{00144}}\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefc_accef08adf4ee05c36ccc550d8101b08f}{from\_variant}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1variant}{variant}}\&\ var,\ \ \mbox{\hyperlink{classfc_1_1ip_1_1endpoint}{ip::endpoint}}\&\ vo\ )}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00145}00145\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00146}00146\ \ \ \ \ \ vo\ =\ \mbox{\hyperlink{classfc_1_1ip_1_1endpoint_a80c154405619b208c9d057d2c91958c9}{ip::endpoint::from\_string}}(var.\mbox{\hyperlink{classfc_1_1variant_acbd70a93184e4277631f2a261acb707c}{as\_string}}());}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00147}00147\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00148}00148\ }
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00149}\mbox{\hyperlink{namespacefc_a684c6aa122ee9aaf804e6b4945dd61b1}{00149}}\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefc_adea61f2343de94d0fbcb920a32332ad9}{to\_variant}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1ip_1_1address}{ip::address}}\&\ var,\ \ \mbox{\hyperlink{classfc_1_1variant}{variant}}\&\ vo\ )}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00150}00150\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00151}00151\ \ \ \ \ vo\ =\ \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc::string}}(var);}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00152}00152\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00153}\mbox{\hyperlink{namespacefc_a175d05886e7e58b4fd32f6673e81cb68}{00153}}\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefc_accef08adf4ee05c36ccc550d8101b08f}{from\_variant}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1variant}{variant}}\&\ var,\ \ \mbox{\hyperlink{classfc_1_1ip_1_1address}{ip::address}}\&\ vo\ )}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00154}00154\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00155}00155\ \ \ \ \ vo\ =\ \mbox{\hyperlink{classfc_1_1ip_1_1address}{ip::address}}(var.\mbox{\hyperlink{classfc_1_1variant_acbd70a93184e4277631f2a261acb707c}{as\_string}}());}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00156}00156\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00157}00157\ }
+\DoxyCodeLine{\Hypertarget{ip_8cpp_source_l00158}00158\ \}\ }
+
+\end{DoxyCode}

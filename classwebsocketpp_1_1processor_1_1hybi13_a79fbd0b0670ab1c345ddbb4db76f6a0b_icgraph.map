@@ -1,0 +1,5 @@
+<map id="websocketpp::processor::hybi13::copy_extended_header_bytes" name="websocketpp::processor::hybi13::copy_extended_header_bytes">
+<area shape="rect" id="Node000001" title="Reads bytes from buf into m_extended_header." alt="" coords="217,5,380,61"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1processor_1_1hybi13.html#a5c5e3234a0067c7f14fe0ceb4e647659" title="Process new websocket connection bytes." alt="" coords="5,13,169,54"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="201,36,169,36,169,30,201,30"/>
+</map>

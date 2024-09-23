@@ -1,0 +1,51 @@
+\doxysection{libraries/sys-\/vm/external/\+Catch2/examples/310-\/\+Gen-\/\+Variables\+In\+Generators.cpp File Reference}
+\hypertarget{310-_gen-_variables_in_generators_8cpp}{}\label{310-_gen-_variables_in_generators_8cpp}\index{libraries/sys-\/vm/external/Catch2/examples/310-\/Gen-\/VariablesInGenerators.cpp@{libraries/sys-\/vm/external/Catch2/examples/310-\/Gen-\/VariablesInGenerators.cpp}}
+{\ttfamily \#include $<$catch2/catch.\+hpp$>$}\newline
+Include dependency graph for 310-\/Gen-\/\+Variables\+In\+Generators.cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{310-_gen-_variables_in_generators_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{310-_gen-_variables_in_generators_8cpp_ad15ab98094325b13ef69551880d32d08}{TEST\+\_\+\+CASE}} ("{}Generate \mbox{\hyperlink{yubico__otp_8c_a7ba1784f91d04c32f9b3139bc6fd8137}{random}} doubles across different ranges"{}, "{}\mbox{[}generator\mbox{]}\mbox{[}example\mbox{]}\mbox{[}advanced\mbox{]}"{})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{310-_gen-_variables_in_generators_8cpp_ad15ab98094325b13ef69551880d32d08}\index{310-\/Gen-\/VariablesInGenerators.cpp@{310-\/Gen-\/VariablesInGenerators.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!310-\/Gen-\/VariablesInGenerators.cpp@{310-\/Gen-\/VariablesInGenerators.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}}
+{\footnotesize\ttfamily \label{310-_gen-_variables_in_generators_8cpp_ad15ab98094325b13ef69551880d32d08} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Generate \mbox{\hyperlink{yubico__otp_8c_a7ba1784f91d04c32f9b3139bc6fd8137}{random}} doubles across different ranges"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}generator\mbox{]}\mbox{[}example\mbox{]}\mbox{[}advanced\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{310-_gen-_variables_in_generators_8cpp_source_l00011}{11}} of file \mbox{\hyperlink{310-_gen-_variables_in_generators_8cpp_source}{310-\/\+Gen-\/\+Variables\+In\+Generators.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00012\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00013\ \ \ \ \ \textcolor{comment}{//\ Workaround\ for\ old\ libstdc++}}
+\DoxyCodeLine{00014\ \ \ \ \ \textcolor{keyword}{using\ }record\ =\ std::tuple<double,\ double>;}
+\DoxyCodeLine{00015\ \ \ \ \ \textcolor{comment}{//\ Set\ up\ 3\ ranges\ to\ generate\ numbers\ from}}
+\DoxyCodeLine{00016\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ =\ \mbox{\hyperlink{catch__generators_8hpp_a4941c6427cfa36ee7c52d734e460f9df}{GENERATE}}(table<double,\ double>(\{}
+\DoxyCodeLine{00017\ \ \ \ \ \ \ \ \ record\{3,\ 4\},}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ record\{-\/4,\ -\/3\},}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ record\{10,\ 1000\}}
+\DoxyCodeLine{00020\ \ \ \ \ \}));}
+\DoxyCodeLine{00021\ }
+\DoxyCodeLine{00022\ \ \ \ \ \textcolor{comment}{//\ This\ will\ not\ compile\ (intentionally),\ because\ it\ accesses\ a\ variable}}
+\DoxyCodeLine{00023\ \ \ \ \ \textcolor{comment}{//\ auto\ number\ =\ GENERATE(take(50,\ random(std::get<0>(r),\ std::get<1>(r))));}}
+\DoxyCodeLine{00024\ }
+\DoxyCodeLine{00025\ \ \ \ \textcolor{comment}{//\ GENERATE\_COPY\ copies\ all\ variables\ mentioned\ inside\ the\ expression}}
+\DoxyCodeLine{00026\ \ \ \ \textcolor{comment}{//\ thus\ this\ will\ work.}}
+\DoxyCodeLine{00027\ \ \ \ \ \textcolor{keyword}{auto}\ number\ =\ \mbox{\hyperlink{catch__generators_8hpp_a44e2fff00253a218f0a392ad6abac624}{GENERATE\_COPY}}(\mbox{\hyperlink{namespace_catch_1_1_generators_adedfdb318219078ce9107690745d2f2f}{take}}(50,\ \mbox{\hyperlink{yubico__otp_8c_a7ba1784f91d04c32f9b3139bc6fd8137}{random}}(std::get<0>(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}),\ std::get<1>(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}))));}
+\DoxyCodeLine{00028\ }
+\DoxyCodeLine{00029\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(std::abs(number)\ >\ 0);}
+\DoxyCodeLine{00030\ \}}
+
+\end{DoxyCode}

@@ -1,0 +1,371 @@
+\doxysection{WAST\+::Module\+Print\+Context Struct Reference}
+\hypertarget{struct_w_a_s_t_1_1_module_print_context}{}\label{struct_w_a_s_t_1_1_module_print_context}\index{WAST::ModulePrintContext@{WAST::ModulePrintContext}}
+
+
+Collaboration diagram for WAST\+::Module\+Print\+Context\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_w_a_s_t_1_1_module_print_context__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_w_a_s_t_1_1_module_print_context_af74738583b60f290a11ebfcd97aa59f8}{Module\+Print\+Context}} (const \mbox{\hyperlink{struct_i_r_1_1_module}{Module}} \&in\+Module, std\+::string \&in\+String)
+\item 
+void \mbox{\hyperlink{struct_w_a_s_t_1_1_module_print_context_ab75276391887f1a04fe297e96d2e2bbd}{print\+Module}} ()
+\item 
+void \mbox{\hyperlink{struct_w_a_s_t_1_1_module_print_context_a1b9eb83a801691692967eb02fdf17893}{print\+Initializer\+Expression}} (const \mbox{\hyperlink{struct_i_r_1_1_initializer_expression}{Initializer\+Expression}} \&expression)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+const \mbox{\hyperlink{struct_i_r_1_1_module}{Module}} \& \mbox{\hyperlink{struct_w_a_s_t_1_1_module_print_context_a25c5a4b70a1e7c2481995985d5d87c3c}{module}}
+\item 
+std\+::string \& \mbox{\hyperlink{struct_w_a_s_t_1_1_module_print_context_aa08b8c5c3fd81ab5f926e12687387653}{string}}
+\item 
+\mbox{\hyperlink{struct_i_r_1_1_disassembly_names}{Disassembly\+Names}} \mbox{\hyperlink{struct_w_a_s_t_1_1_module_print_context_aad231941cfac78cfbf964f73a66a5b2c}{names}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{_print_8cpp_source_l00160}{160}} of file \mbox{\hyperlink{_print_8cpp_source}{Print.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{struct_w_a_s_t_1_1_module_print_context_af74738583b60f290a11ebfcd97aa59f8}\index{WAST::ModulePrintContext@{WAST::ModulePrintContext}!ModulePrintContext@{ModulePrintContext}}
+\index{ModulePrintContext@{ModulePrintContext}!WAST::ModulePrintContext@{WAST::ModulePrintContext}}
+\doxysubsubsection{\texorpdfstring{ModulePrintContext()}{ModulePrintContext()}}
+{\footnotesize\ttfamily \label{struct_w_a_s_t_1_1_module_print_context_af74738583b60f290a11ebfcd97aa59f8} 
+WAST\+::\+Module\+Print\+Context\+::\+Module\+Print\+Context (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct_i_r_1_1_module}{Module}} \&}]{in\+Module}{, }\item[{std\+::string \&}]{in\+String}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_print_8cpp_source_l00167}{167}} of file \mbox{\hyperlink{_print_8cpp_source}{Print.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{struct_w_a_s_t_1_1_module_print_context_a25c5a4b70a1e7c2481995985d5d87c3c}{module}}(inModule),\ \mbox{\hyperlink{struct_w_a_s_t_1_1_module_print_context_aa08b8c5c3fd81ab5f926e12687387653}{string}}(inString)}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Start\ with\ the\ names\ from\ the\ module's\ user\ name\ section,\ but\ make\ sure\ they\ are\ unique,\ and\ add\ the\ "{}\$"{}\ sigil.}}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_i_r_ae36055728f4542ad9b363e04021674ba}{IR::getDisassemblyNames}}(\mbox{\hyperlink{struct_w_a_s_t_1_1_module_print_context_a25c5a4b70a1e7c2481995985d5d87c3c}{module}},\mbox{\hyperlink{struct_w_a_s_t_1_1_module_print_context_aad231941cfac78cfbf964f73a66a5b2c}{names}});}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \ \ \ \ NameScope\ globalNameScope(\textcolor{charliteral}{'\$'});}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\&\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ :\ \mbox{\hyperlink{struct_w_a_s_t_1_1_module_print_context_aad231941cfac78cfbf964f73a66a5b2c}{names}}.\mbox{\hyperlink{struct_i_r_1_1_disassembly_names_ab055b4c06d151f507db3183beddebbe1}{types}})\ \{\ globalNameScope.map(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}});\ \}}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\&\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ :\ \mbox{\hyperlink{struct_w_a_s_t_1_1_module_print_context_aad231941cfac78cfbf964f73a66a5b2c}{names}}.\mbox{\hyperlink{struct_i_r_1_1_disassembly_names_a7741fd4de1b8e40f08d769230384d2c8}{tables}})\ \{\ globalNameScope.map(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}});\ \}}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\&\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ :\ \mbox{\hyperlink{struct_w_a_s_t_1_1_module_print_context_aad231941cfac78cfbf964f73a66a5b2c}{names}}.\mbox{\hyperlink{struct_i_r_1_1_disassembly_names_a15e70ee713e6ddf2c9c3105c733a392a}{memories}})\ \{\ globalNameScope.map(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}});\ \}}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\&\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ :\ \mbox{\hyperlink{struct_w_a_s_t_1_1_module_print_context_aad231941cfac78cfbf964f73a66a5b2c}{names}}.\mbox{\hyperlink{struct_i_r_1_1_disassembly_names_a4516c9cf9ae1e817ff4be289d30d9b43}{globals}})\ \{\ globalNameScope.map(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}});\ \}}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\&\ function\ :\ \mbox{\hyperlink{struct_w_a_s_t_1_1_module_print_context_aad231941cfac78cfbf964f73a66a5b2c}{names}}.\mbox{\hyperlink{struct_i_r_1_1_disassembly_names_ae7545a8574581eb0cc0ee946516db404}{functions}})}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ globalNameScope.map(function.name);}
+\DoxyCodeLine{00180\ }
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ NameScope\ localNameScope(\textcolor{charliteral}{'\$'});}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\&\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ :\ function.locals)\ \{\ localNameScope.map(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}});\ \}}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_w_a_s_t_1_1_module_print_context_af74738583b60f290a11ebfcd97aa59f8_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_w_a_s_t_1_1_module_print_context_a1b9eb83a801691692967eb02fdf17893}\index{WAST::ModulePrintContext@{WAST::ModulePrintContext}!printInitializerExpression@{printInitializerExpression}}
+\index{printInitializerExpression@{printInitializerExpression}!WAST::ModulePrintContext@{WAST::ModulePrintContext}}
+\doxysubsubsection{\texorpdfstring{printInitializerExpression()}{printInitializerExpression()}}
+{\footnotesize\ttfamily \label{struct_w_a_s_t_1_1_module_print_context_a1b9eb83a801691692967eb02fdf17893} 
+void WAST\+::\+Module\+Print\+Context\+::print\+Initializer\+Expression (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct_i_r_1_1_initializer_expression}{Initializer\+Expression}} \&}]{expression}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_print_8cpp_source_l00188}{188}} of file \mbox{\hyperlink{_print_8cpp_source}{Print.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(expression.\mbox{\hyperlink{struct_i_r_1_1_initializer_expression_a66f8d262d27a9bd6536f0268974c7dd5}{type}})}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ InitializerExpression::Type::i32\_const:\ \textcolor{keywordtype}{string}\ +=\ \textcolor{stringliteral}{"{}(i32.const\ "{}}\ +\ std::to\_string(expression.\mbox{\hyperlink{struct_i_r_1_1_initializer_expression_ae39054471f85529a9a641962618bab7e}{i32}})\ +\ \textcolor{charliteral}{')'};\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ InitializerExpression::Type::i64\_const:\ \textcolor{keywordtype}{string}\ +=\ \textcolor{stringliteral}{"{}(i64.const\ "{}}\ +\ std::to\_string(expression.\mbox{\hyperlink{struct_i_r_1_1_initializer_expression_ab777bb0a665bfc21bde59f2bc3ae4c77}{i64}})\ +\ \textcolor{charliteral}{')'};\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ InitializerExpression::Type::f32\_const:\ \textcolor{keywordtype}{string}\ +=\ \textcolor{stringliteral}{"{}(f32.const\ "{}}\ +\ \mbox{\hyperlink{namespace_floats_a910e7e5ea7e4d10bf994fc3fcd2fe52b}{Floats::asString}}(expression.\mbox{\hyperlink{struct_i_r_1_1_initializer_expression_a5411cbab9a351c570a65440b14175765}{f32}})\ +\ \textcolor{charliteral}{')'};\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ InitializerExpression::Type::f64\_const:\ \textcolor{keywordtype}{string}\ +=\ \textcolor{stringliteral}{"{}(f64.const\ "{}}\ +\ \mbox{\hyperlink{namespace_floats_a910e7e5ea7e4d10bf994fc3fcd2fe52b}{Floats::asString}}(expression.\mbox{\hyperlink{struct_i_r_1_1_initializer_expression_ab35ab53209a2a771973719a934f1fd23}{f64}})\ +\ \textcolor{charliteral}{')'};\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ InitializerExpression::Type::get\_global:\ \textcolor{keywordtype}{string}\ +=\ \textcolor{stringliteral}{"{}(get\_global\ "{}}\ +\ \mbox{\hyperlink{struct_w_a_s_t_1_1_module_print_context_aad231941cfac78cfbf964f73a66a5b2c}{names}}.\mbox{\hyperlink{struct_i_r_1_1_disassembly_names_a4516c9cf9ae1e817ff4be289d30d9b43}{globals}}[expression.\mbox{\hyperlink{struct_i_r_1_1_initializer_expression_a00cd4a62f249390a3e6b504161d6cb16}{globalIndex}}]\ +\ \textcolor{charliteral}{')'};\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:\ \mbox{\hyperlink{namespace_errors_a6959930ad6159fe3eb2e04ebf87c1b84}{Errors::unreachable}}();}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_w_a_s_t_1_1_module_print_context_a1b9eb83a801691692967eb02fdf17893_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_w_a_s_t_1_1_module_print_context_a1b9eb83a801691692967eb02fdf17893_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_w_a_s_t_1_1_module_print_context_ab75276391887f1a04fe297e96d2e2bbd}\index{WAST::ModulePrintContext@{WAST::ModulePrintContext}!printModule@{printModule}}
+\index{printModule@{printModule}!WAST::ModulePrintContext@{WAST::ModulePrintContext}}
+\doxysubsubsection{\texorpdfstring{printModule()}{printModule()}}
+{\footnotesize\ttfamily \label{struct_w_a_s_t_1_1_module_print_context_ab75276391887f1a04fe297e96d2e2bbd} 
+void WAST\+::\+Module\+Print\+Context\+::print\+Module (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_print_8cpp_source_l00477}{477}} of file \mbox{\hyperlink{_print_8cpp_source}{Print.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00478\ \ \ \ \ \{}
+\DoxyCodeLine{00479\ \ \ \ \ \ \ \ \ ScopedTagPrinter\ moduleTag(\textcolor{keywordtype}{string},\textcolor{stringliteral}{"{}module"{}});}
+\DoxyCodeLine{00480\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00481\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Print\ the\ types.}}
+\DoxyCodeLine{00482\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ typeIndex\ =\ 0;typeIndex\ <\ \mbox{\hyperlink{struct_w_a_s_t_1_1_module_print_context_a25c5a4b70a1e7c2481995985d5d87c3c}{module}}.\mbox{\hyperlink{struct_i_r_1_1_module_a682c9e762448410a20c98ea062a50308}{types}}.size();++typeIndex)}
+\DoxyCodeLine{00483\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00484\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \textcolor{charliteral}{'\(\backslash\)n'};}
+\DoxyCodeLine{00485\ \ \ \ \ \ \ \ \ \ \ \ \ ScopedTagPrinter\ typeTag(\textcolor{keywordtype}{string},\textcolor{stringliteral}{"{}type"{}});}
+\DoxyCodeLine{00486\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \textcolor{charliteral}{'\ '};}
+\DoxyCodeLine{00487\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \mbox{\hyperlink{struct_w_a_s_t_1_1_module_print_context_aad231941cfac78cfbf964f73a66a5b2c}{names}}.\mbox{\hyperlink{struct_i_r_1_1_disassembly_names_ab055b4c06d151f507db3183beddebbe1}{types}}[typeIndex];}
+\DoxyCodeLine{00488\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \textcolor{stringliteral}{"{}\ (func\ "{}};}
+\DoxyCodeLine{00489\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_aa6c1fd4b6c7ec43ba7e25dc6138d4899}{print}}(\textcolor{keywordtype}{string},\mbox{\hyperlink{struct_w_a_s_t_1_1_module_print_context_a25c5a4b70a1e7c2481995985d5d87c3c}{module}}.\mbox{\hyperlink{struct_i_r_1_1_module_a682c9e762448410a20c98ea062a50308}{types}}[typeIndex]);}
+\DoxyCodeLine{00490\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \textcolor{charliteral}{')'};}
+\DoxyCodeLine{00491\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00492\ }
+\DoxyCodeLine{00493\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Print\ the\ module\ imports.}}
+\DoxyCodeLine{00494\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ importIndex\ =\ 0;importIndex\ <\ \mbox{\hyperlink{struct_w_a_s_t_1_1_module_print_context_a25c5a4b70a1e7c2481995985d5d87c3c}{module}}.\mbox{\hyperlink{struct_i_r_1_1_module_a439e1f32fa3fa9bf47f58ac309bfc50a}{functions}}.imports.size();++importIndex)}
+\DoxyCodeLine{00495\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00496\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_acfea461e9d1989e37b963a730a903140}{printImport}}(\textcolor{keywordtype}{string},\mbox{\hyperlink{struct_w_a_s_t_1_1_module_print_context_a25c5a4b70a1e7c2481995985d5d87c3c}{module}},\mbox{\hyperlink{struct_w_a_s_t_1_1_module_print_context_a25c5a4b70a1e7c2481995985d5d87c3c}{module}}.\mbox{\hyperlink{struct_i_r_1_1_module_a439e1f32fa3fa9bf47f58ac309bfc50a}{functions}}.imports[importIndex],importIndex,\mbox{\hyperlink{struct_w_a_s_t_1_1_module_print_context_aad231941cfac78cfbf964f73a66a5b2c}{names}}.\mbox{\hyperlink{struct_i_r_1_1_disassembly_names_ae7545a8574581eb0cc0ee946516db404}{functions}}[importIndex].name.c\_str(),\textcolor{stringliteral}{"{}func"{}});}
+\DoxyCodeLine{00497\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00498\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ importIndex\ =\ 0;importIndex\ <\ \mbox{\hyperlink{struct_w_a_s_t_1_1_module_print_context_a25c5a4b70a1e7c2481995985d5d87c3c}{module}}.\mbox{\hyperlink{struct_i_r_1_1_module_a3093728dba0995da777601adf56082d1}{tables}}.imports.size();++importIndex)}
+\DoxyCodeLine{00499\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00500\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_acfea461e9d1989e37b963a730a903140}{printImport}}(\textcolor{keywordtype}{string},\mbox{\hyperlink{struct_w_a_s_t_1_1_module_print_context_a25c5a4b70a1e7c2481995985d5d87c3c}{module}},\mbox{\hyperlink{struct_w_a_s_t_1_1_module_print_context_a25c5a4b70a1e7c2481995985d5d87c3c}{module}}.\mbox{\hyperlink{struct_i_r_1_1_module_a3093728dba0995da777601adf56082d1}{tables}}.imports[importIndex],importIndex,\mbox{\hyperlink{struct_w_a_s_t_1_1_module_print_context_aad231941cfac78cfbf964f73a66a5b2c}{names}}.\mbox{\hyperlink{struct_i_r_1_1_disassembly_names_a7741fd4de1b8e40f08d769230384d2c8}{tables}}[importIndex].c\_str(),\textcolor{stringliteral}{"{}table"{}});}
+\DoxyCodeLine{00501\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00502\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ importIndex\ =\ 0;importIndex\ <\ \mbox{\hyperlink{struct_w_a_s_t_1_1_module_print_context_a25c5a4b70a1e7c2481995985d5d87c3c}{module}}.\mbox{\hyperlink{struct_i_r_1_1_module_a27e85034ab34b4db4321603722d3917c}{memories}}.imports.size();++importIndex)}
+\DoxyCodeLine{00503\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00504\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_acfea461e9d1989e37b963a730a903140}{printImport}}(\textcolor{keywordtype}{string},\mbox{\hyperlink{struct_w_a_s_t_1_1_module_print_context_a25c5a4b70a1e7c2481995985d5d87c3c}{module}},\mbox{\hyperlink{struct_w_a_s_t_1_1_module_print_context_a25c5a4b70a1e7c2481995985d5d87c3c}{module}}.\mbox{\hyperlink{struct_i_r_1_1_module_a27e85034ab34b4db4321603722d3917c}{memories}}.imports[importIndex],importIndex,\mbox{\hyperlink{struct_w_a_s_t_1_1_module_print_context_aad231941cfac78cfbf964f73a66a5b2c}{names}}.\mbox{\hyperlink{struct_i_r_1_1_disassembly_names_a15e70ee713e6ddf2c9c3105c733a392a}{memories}}[importIndex].c\_str(),\textcolor{stringliteral}{"{}memory"{}});}
+\DoxyCodeLine{00505\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00506\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ importIndex\ =\ 0;importIndex\ <\ \mbox{\hyperlink{struct_w_a_s_t_1_1_module_print_context_a25c5a4b70a1e7c2481995985d5d87c3c}{module}}.\mbox{\hyperlink{struct_i_r_1_1_module_ab1340b21e56875a7f1163d1afcf4d7fd}{globals}}.imports.size();++importIndex)}
+\DoxyCodeLine{00507\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00508\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_acfea461e9d1989e37b963a730a903140}{printImport}}(\textcolor{keywordtype}{string},\mbox{\hyperlink{struct_w_a_s_t_1_1_module_print_context_a25c5a4b70a1e7c2481995985d5d87c3c}{module}},\mbox{\hyperlink{struct_w_a_s_t_1_1_module_print_context_a25c5a4b70a1e7c2481995985d5d87c3c}{module}}.\mbox{\hyperlink{struct_i_r_1_1_module_ab1340b21e56875a7f1163d1afcf4d7fd}{globals}}.imports[importIndex],importIndex,\mbox{\hyperlink{struct_w_a_s_t_1_1_module_print_context_aad231941cfac78cfbf964f73a66a5b2c}{names}}.\mbox{\hyperlink{struct_i_r_1_1_disassembly_names_a4516c9cf9ae1e817ff4be289d30d9b43}{globals}}[importIndex].c\_str(),\textcolor{stringliteral}{"{}global"{}});}
+\DoxyCodeLine{00509\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00510\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Print\ the\ module\ exports.}}
+\DoxyCodeLine{00511\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\ export\_\ :\ \mbox{\hyperlink{struct_w_a_s_t_1_1_module_print_context_a25c5a4b70a1e7c2481995985d5d87c3c}{module}}.\mbox{\hyperlink{struct_i_r_1_1_module_afcc776ae7fc46f6202700f3540b500d9}{exports}})}
+\DoxyCodeLine{00512\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00513\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \textcolor{charliteral}{'\(\backslash\)n'};}
+\DoxyCodeLine{00514\ \ \ \ \ \ \ \ \ \ \ \ \ ScopedTagPrinter\ exportTag(\textcolor{keywordtype}{string},\textcolor{stringliteral}{"{}export"{}});}
+\DoxyCodeLine{00515\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \textcolor{stringliteral}{"{}\ \(\backslash\)"{}"{}};}
+\DoxyCodeLine{00516\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \mbox{\hyperlink{namespace_w_a_s_t_a5289ca10863a134a961943f0e2089979}{escapeString}}(\mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a0583300c259450db57fd2307fc84a673}{export\_}}.name.c\_str(),\mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a0583300c259450db57fd2307fc84a673}{export\_}}.name.length());}
+\DoxyCodeLine{00517\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)"{}\ ("{}};}
+\DoxyCodeLine{00518\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(\mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a0583300c259450db57fd2307fc84a673}{export\_}}.kind)}
+\DoxyCodeLine{00519\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00520\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ ObjectKind::function:\ \textcolor{keywordtype}{string}\ +=\ \textcolor{stringliteral}{"{}func\ "{}}\ +\ \mbox{\hyperlink{struct_w_a_s_t_1_1_module_print_context_aad231941cfac78cfbf964f73a66a5b2c}{names}}.\mbox{\hyperlink{struct_i_r_1_1_disassembly_names_ae7545a8574581eb0cc0ee946516db404}{functions}}[\mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a0583300c259450db57fd2307fc84a673}{export\_}}.index].name;\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00521\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ ObjectKind::table:\ \textcolor{keywordtype}{string}\ +=\ \textcolor{stringliteral}{"{}table\ "{}}\ +\ \mbox{\hyperlink{struct_w_a_s_t_1_1_module_print_context_aad231941cfac78cfbf964f73a66a5b2c}{names}}.\mbox{\hyperlink{struct_i_r_1_1_disassembly_names_a7741fd4de1b8e40f08d769230384d2c8}{tables}}[\mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a0583300c259450db57fd2307fc84a673}{export\_}}.index];\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00522\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ ObjectKind::memory:\ \textcolor{keywordtype}{string}\ +=\ \textcolor{stringliteral}{"{}memory\ "{}}\ +\ \mbox{\hyperlink{struct_w_a_s_t_1_1_module_print_context_aad231941cfac78cfbf964f73a66a5b2c}{names}}.\mbox{\hyperlink{struct_i_r_1_1_disassembly_names_a15e70ee713e6ddf2c9c3105c733a392a}{memories}}[\mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a0583300c259450db57fd2307fc84a673}{export\_}}.index];\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00523\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ ObjectKind::global:\ \textcolor{keywordtype}{string}\ +=\ \textcolor{stringliteral}{"{}global\ "{}}\ +\ \mbox{\hyperlink{struct_w_a_s_t_1_1_module_print_context_aad231941cfac78cfbf964f73a66a5b2c}{names}}.\mbox{\hyperlink{struct_i_r_1_1_disassembly_names_a4516c9cf9ae1e817ff4be289d30d9b43}{globals}}[\mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a0583300c259450db57fd2307fc84a673}{export\_}}.index];\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00524\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:\ \mbox{\hyperlink{namespace_errors_a6959930ad6159fe3eb2e04ebf87c1b84}{Errors::unreachable}}();}
+\DoxyCodeLine{00525\ \ \ \ \ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00526\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \textcolor{charliteral}{')'};}
+\DoxyCodeLine{00527\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00528\ }
+\DoxyCodeLine{00529\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Print\ the\ module\ memory\ definitions.}}
+\DoxyCodeLine{00530\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ memoryDefIndex\ =\ 0;memoryDefIndex\ <\ \mbox{\hyperlink{struct_w_a_s_t_1_1_module_print_context_a25c5a4b70a1e7c2481995985d5d87c3c}{module}}.\mbox{\hyperlink{struct_i_r_1_1_module_a27e85034ab34b4db4321603722d3917c}{memories}}.defs.size();++memoryDefIndex)}
+\DoxyCodeLine{00531\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00532\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_i_r_1_1_memory_def}{MemoryDef}}\&\ memoryDef\ =\ \textcolor{keyword}{module}.memories.defs[memoryDefIndex];}
+\DoxyCodeLine{00533\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \textcolor{charliteral}{'\(\backslash\)n'};}
+\DoxyCodeLine{00534\ \ \ \ \ \ \ \ \ \ \ \ \ ScopedTagPrinter\ memoryTag(\textcolor{keywordtype}{string},\textcolor{stringliteral}{"{}memory"{}});}
+\DoxyCodeLine{00535\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \textcolor{charliteral}{'\ '};}
+\DoxyCodeLine{00536\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \mbox{\hyperlink{struct_w_a_s_t_1_1_module_print_context_aad231941cfac78cfbf964f73a66a5b2c}{names}}.\mbox{\hyperlink{struct_i_r_1_1_disassembly_names_a15e70ee713e6ddf2c9c3105c733a392a}{memories}}[\textcolor{keyword}{module}.memories.imports.size()\ +\ memoryDefIndex];}
+\DoxyCodeLine{00537\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \textcolor{charliteral}{'\ '};}
+\DoxyCodeLine{00538\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_aa6c1fd4b6c7ec43ba7e25dc6138d4899}{print}}(\textcolor{keywordtype}{string},memoryDef.\mbox{\hyperlink{struct_i_r_1_1_memory_def_a1697fa07da31cdab48727191708922c4}{type}});}
+\DoxyCodeLine{00539\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00540\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00541\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Print\ the\ module\ table\ definitions\ and\ elem\ segments.}}
+\DoxyCodeLine{00542\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ tableDefIndex\ =\ 0;tableDefIndex\ <\ \mbox{\hyperlink{struct_w_a_s_t_1_1_module_print_context_a25c5a4b70a1e7c2481995985d5d87c3c}{module}}.\mbox{\hyperlink{struct_i_r_1_1_module_a3093728dba0995da777601adf56082d1}{tables}}.defs.size();++tableDefIndex)}
+\DoxyCodeLine{00543\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00544\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_i_r_1_1_table_def}{TableDef}}\&\ tableDef\ =\ \textcolor{keyword}{module}.tables.defs[tableDefIndex];}
+\DoxyCodeLine{00545\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \textcolor{charliteral}{'\(\backslash\)n'};}
+\DoxyCodeLine{00546\ \ \ \ \ \ \ \ \ \ \ \ \ ScopedTagPrinter\ memoryTag(\textcolor{keywordtype}{string},\textcolor{stringliteral}{"{}table"{}});}
+\DoxyCodeLine{00547\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \textcolor{charliteral}{'\ '};}
+\DoxyCodeLine{00548\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \mbox{\hyperlink{struct_w_a_s_t_1_1_module_print_context_aad231941cfac78cfbf964f73a66a5b2c}{names}}.\mbox{\hyperlink{struct_i_r_1_1_disassembly_names_a7741fd4de1b8e40f08d769230384d2c8}{tables}}[\textcolor{keyword}{module}.tables.imports.size()\ +\ tableDefIndex];}
+\DoxyCodeLine{00549\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \textcolor{charliteral}{'\ '};}
+\DoxyCodeLine{00550\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_aa6c1fd4b6c7ec43ba7e25dc6138d4899}{print}}(\textcolor{keywordtype}{string},tableDef.\mbox{\hyperlink{struct_i_r_1_1_table_def_a04586a2ec874f32848ba8ff562862711}{type}});}
+\DoxyCodeLine{00551\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00552\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00553\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Print\ the\ module\ global\ definitions.}}
+\DoxyCodeLine{00554\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ globalDefIndex\ =\ 0;globalDefIndex\ <\ \mbox{\hyperlink{struct_w_a_s_t_1_1_module_print_context_a25c5a4b70a1e7c2481995985d5d87c3c}{module}}.\mbox{\hyperlink{struct_i_r_1_1_module_ab1340b21e56875a7f1163d1afcf4d7fd}{globals}}.defs.size();++globalDefIndex)}
+\DoxyCodeLine{00555\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00556\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_i_r_1_1_global_def}{GlobalDef}}\&\ globalDef\ =\ \textcolor{keyword}{module}.globals.defs[globalDefIndex];}
+\DoxyCodeLine{00557\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \textcolor{charliteral}{'\(\backslash\)n'};}
+\DoxyCodeLine{00558\ \ \ \ \ \ \ \ \ \ \ \ \ ScopedTagPrinter\ memoryTag(\textcolor{keywordtype}{string},\textcolor{stringliteral}{"{}global"{}});}
+\DoxyCodeLine{00559\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \textcolor{charliteral}{'\ '};}
+\DoxyCodeLine{00560\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \mbox{\hyperlink{struct_w_a_s_t_1_1_module_print_context_aad231941cfac78cfbf964f73a66a5b2c}{names}}.\mbox{\hyperlink{struct_i_r_1_1_disassembly_names_a4516c9cf9ae1e817ff4be289d30d9b43}{globals}}[\textcolor{keyword}{module}.globals.imports.size()\ +\ globalDefIndex];}
+\DoxyCodeLine{00561\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \textcolor{charliteral}{'\ '};}
+\DoxyCodeLine{00562\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_aa6c1fd4b6c7ec43ba7e25dc6138d4899}{print}}(\textcolor{keywordtype}{string},globalDef.\mbox{\hyperlink{struct_i_r_1_1_global_def_a28256cfc197746f5e4cbb737882f95cc}{type}});}
+\DoxyCodeLine{00563\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \textcolor{charliteral}{'\ '};}
+\DoxyCodeLine{00564\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_w_a_s_t_1_1_module_print_context_a1b9eb83a801691692967eb02fdf17893}{printInitializerExpression}}(globalDef.\mbox{\hyperlink{struct_i_r_1_1_global_def_aab92ad5bed304451c71026d9e2712aca}{initializer}});}
+\DoxyCodeLine{00565\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00566\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00567\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Print\ the\ data\ and\ table\ segment\ definitions.}}
+\DoxyCodeLine{00568\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\ tableSegment\ :\ \mbox{\hyperlink{struct_w_a_s_t_1_1_module_print_context_a25c5a4b70a1e7c2481995985d5d87c3c}{module}}.\mbox{\hyperlink{struct_i_r_1_1_module_a79205d5c2b09c7a2464f99e82f94be75}{tableSegments}})}
+\DoxyCodeLine{00569\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00570\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \textcolor{charliteral}{'\(\backslash\)n'};}
+\DoxyCodeLine{00571\ \ \ \ \ \ \ \ \ \ \ \ \ ScopedTagPrinter\ dataTag(\textcolor{keywordtype}{string},\textcolor{stringliteral}{"{}elem"{}});}
+\DoxyCodeLine{00572\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \textcolor{charliteral}{'\ '};}
+\DoxyCodeLine{00573\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \mbox{\hyperlink{struct_w_a_s_t_1_1_module_print_context_aad231941cfac78cfbf964f73a66a5b2c}{names}}.\mbox{\hyperlink{struct_i_r_1_1_disassembly_names_a7741fd4de1b8e40f08d769230384d2c8}{tables}}[tableSegment.tableIndex];}
+\DoxyCodeLine{00574\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \textcolor{charliteral}{'\ '};}
+\DoxyCodeLine{00575\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_w_a_s_t_1_1_module_print_context_a1b9eb83a801691692967eb02fdf17893}{printInitializerExpression}}(tableSegment.baseOffset);}
+\DoxyCodeLine{00576\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{enum}\ \{\ numElemsPerLine\ =\ 8\ \};}
+\DoxyCodeLine{00577\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ elementIndex\ =\ 0;elementIndex\ <\ tableSegment.indices.size();++elementIndex)}
+\DoxyCodeLine{00578\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00579\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(elementIndex\ \%\ numElemsPerLine\ ==\ 0)\ \{\ \textcolor{keywordtype}{string}\ +=\ \textcolor{charliteral}{'\(\backslash\)n'};\ \}}
+\DoxyCodeLine{00580\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{\ \textcolor{keywordtype}{string}\ +=\ \textcolor{charliteral}{'\ '};\ \}}
+\DoxyCodeLine{00581\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \mbox{\hyperlink{struct_w_a_s_t_1_1_module_print_context_aad231941cfac78cfbf964f73a66a5b2c}{names}}.\mbox{\hyperlink{struct_i_r_1_1_disassembly_names_ae7545a8574581eb0cc0ee946516db404}{functions}}[tableSegment.indices[elementIndex]].name;}
+\DoxyCodeLine{00582\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00583\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00584\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\ dataSegment\ :\ \mbox{\hyperlink{struct_w_a_s_t_1_1_module_print_context_a25c5a4b70a1e7c2481995985d5d87c3c}{module}}.\mbox{\hyperlink{struct_i_r_1_1_module_af7d4ea2e86159b15bbe1a3c5ea57c69e}{dataSegments}})}
+\DoxyCodeLine{00585\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00586\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \textcolor{charliteral}{'\(\backslash\)n'};}
+\DoxyCodeLine{00587\ \ \ \ \ \ \ \ \ \ \ \ \ ScopedTagPrinter\ dataTag(\textcolor{keywordtype}{string},\textcolor{stringliteral}{"{}data"{}});}
+\DoxyCodeLine{00588\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \textcolor{charliteral}{'\ '};}
+\DoxyCodeLine{00589\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \mbox{\hyperlink{struct_w_a_s_t_1_1_module_print_context_aad231941cfac78cfbf964f73a66a5b2c}{names}}.\mbox{\hyperlink{struct_i_r_1_1_disassembly_names_a15e70ee713e6ddf2c9c3105c733a392a}{memories}}[dataSegment.memoryIndex];}
+\DoxyCodeLine{00590\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \textcolor{charliteral}{'\ '};}
+\DoxyCodeLine{00591\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_w_a_s_t_1_1_module_print_context_a1b9eb83a801691692967eb02fdf17893}{printInitializerExpression}}(dataSegment.baseOffset);}
+\DoxyCodeLine{00592\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{enum}\ \{\ numBytesPerLine\ =\ 64\ \};}
+\DoxyCodeLine{00593\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ offset\ =\ 0;offset\ <\ dataSegment.data.size();offset\ +=\ numBytesPerLine)}
+\DoxyCodeLine{00594\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00595\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)n\(\backslash\)"{}"{}};}
+\DoxyCodeLine{00596\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \mbox{\hyperlink{namespace_w_a_s_t_a5289ca10863a134a961943f0e2089979}{escapeString}}((\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*)dataSegment.data.data()\ +\ offset,std::min(dataSegment.data.size()\ -\/\ offset,(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}})numBytesPerLine));}
+\DoxyCodeLine{00597\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)"{}"{}};}
+\DoxyCodeLine{00598\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00599\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00600\ }
+\DoxyCodeLine{00601\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ functionDefIndex\ =\ 0;functionDefIndex\ <\ \mbox{\hyperlink{struct_w_a_s_t_1_1_module_print_context_a25c5a4b70a1e7c2481995985d5d87c3c}{module}}.\mbox{\hyperlink{struct_i_r_1_1_module_a439e1f32fa3fa9bf47f58ac309bfc50a}{functions}}.defs.size();++functionDefIndex)}
+\DoxyCodeLine{00602\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00603\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ functionIndex\ =\ \textcolor{keyword}{module}.functions.imports.size()\ +\ functionDefIndex;}
+\DoxyCodeLine{00604\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_i_r_1_1_function_def}{FunctionDef}}\&\ functionDef\ =\ \textcolor{keyword}{module}.functions.defs[functionDefIndex];}
+\DoxyCodeLine{00605\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_i_r_1_1_function_type}{FunctionType}}*\ functionType\ =\ \textcolor{keyword}{module}.types[functionDef.type.index];}
+\DoxyCodeLine{00606\ \ \ \ \ \ \ \ \ \ \ \ \ FunctionPrintContext\ functionContext(*\textcolor{keyword}{this},functionDefIndex);}
+\DoxyCodeLine{00607\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00608\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)n\(\backslash\)n"{}};}
+\DoxyCodeLine{00609\ \ \ \ \ \ \ \ \ \ \ \ \ ScopedTagPrinter\ funcTag(\textcolor{keywordtype}{string},\textcolor{stringliteral}{"{}func"{}});}
+\DoxyCodeLine{00610\ }
+\DoxyCodeLine{00611\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \textcolor{charliteral}{'\ '};}
+\DoxyCodeLine{00612\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \mbox{\hyperlink{struct_w_a_s_t_1_1_module_print_context_aad231941cfac78cfbf964f73a66a5b2c}{names}}.\mbox{\hyperlink{struct_i_r_1_1_disassembly_names_ae7545a8574581eb0cc0ee946516db404}{functions}}[functionIndex].name;}
+\DoxyCodeLine{00613\ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00614\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Print\ the\ function\ parameters.}}
+\DoxyCodeLine{00615\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(functionType-\/>\mbox{\hyperlink{struct_i_r_1_1_function_type_a92e17c58f6cd40ee5392dba1bdc2e822}{parameters}}.size())}
+\DoxyCodeLine{00616\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00617\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ parameterIndex\ =\ 0;parameterIndex\ <\ functionType-\/>\mbox{\hyperlink{struct_i_r_1_1_function_type_a92e17c58f6cd40ee5392dba1bdc2e822}{parameters}}.size();++parameterIndex)}
+\DoxyCodeLine{00618\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00619\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \textcolor{charliteral}{'\(\backslash\)n'};}
+\DoxyCodeLine{00620\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ScopedTagPrinter\ paramTag(\textcolor{keywordtype}{string},\textcolor{stringliteral}{"{}param"{}});}
+\DoxyCodeLine{00621\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \textcolor{charliteral}{'\ '};}
+\DoxyCodeLine{00622\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ functionContext.localNames[parameterIndex];}
+\DoxyCodeLine{00623\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \textcolor{charliteral}{'\ '};}
+\DoxyCodeLine{00624\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_aa6c1fd4b6c7ec43ba7e25dc6138d4899}{print}}(\textcolor{keywordtype}{string},functionType-\/>\mbox{\hyperlink{struct_i_r_1_1_function_type_a92e17c58f6cd40ee5392dba1bdc2e822}{parameters}}[parameterIndex]);}
+\DoxyCodeLine{00625\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00626\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00627\ }
+\DoxyCodeLine{00628\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Print\ the\ function\ return\ type.}}
+\DoxyCodeLine{00629\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(functionType-\/>\mbox{\hyperlink{struct_i_r_1_1_function_type_a6f6a20ea31fb2218bcdba1bc4d6a1103}{ret}}\ !=\ ResultType::none)}
+\DoxyCodeLine{00630\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00631\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \textcolor{charliteral}{'\(\backslash\)n'};}
+\DoxyCodeLine{00632\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ScopedTagPrinter\ resultTag(\textcolor{keywordtype}{string},\textcolor{stringliteral}{"{}result"{}});}
+\DoxyCodeLine{00633\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \textcolor{charliteral}{'\ '};}
+\DoxyCodeLine{00634\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_aa6c1fd4b6c7ec43ba7e25dc6138d4899}{print}}(\textcolor{keywordtype}{string},functionType-\/>\mbox{\hyperlink{struct_i_r_1_1_function_type_a6f6a20ea31fb2218bcdba1bc4d6a1103}{ret}});}
+\DoxyCodeLine{00635\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00636\ }
+\DoxyCodeLine{00637\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Print\ the\ function's\ locals.}}
+\DoxyCodeLine{00638\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ localIndex\ =\ 0;localIndex\ <\ functionDef.\mbox{\hyperlink{struct_i_r_1_1_function_def_a34738d2b2fa494ebf86433b872fee943}{nonParameterLocalTypes}}.size();++localIndex)}
+\DoxyCodeLine{00639\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00640\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \textcolor{charliteral}{'\(\backslash\)n'};}
+\DoxyCodeLine{00641\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ScopedTagPrinter\ localTag(\textcolor{keywordtype}{string},\textcolor{stringliteral}{"{}local"{}});}
+\DoxyCodeLine{00642\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \textcolor{charliteral}{'\ '};}
+\DoxyCodeLine{00643\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ functionContext.localNames[functionType-\/>\mbox{\hyperlink{struct_i_r_1_1_function_type_a92e17c58f6cd40ee5392dba1bdc2e822}{parameters}}.size()\ +\ localIndex];}
+\DoxyCodeLine{00644\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \textcolor{charliteral}{'\ '};}
+\DoxyCodeLine{00645\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_aa6c1fd4b6c7ec43ba7e25dc6138d4899}{print}}(\textcolor{keywordtype}{string},functionDef.\mbox{\hyperlink{struct_i_r_1_1_function_def_a34738d2b2fa494ebf86433b872fee943}{nonParameterLocalTypes}}[localIndex]);}
+\DoxyCodeLine{00646\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00647\ }
+\DoxyCodeLine{00648\ \ \ \ \ \ \ \ \ \ \ \ \ functionContext.printFunctionBody();}
+\DoxyCodeLine{00649\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00650\ }
+\DoxyCodeLine{00651\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Print\ user\ sections\ (other\ than\ the\ name\ section).}}
+\DoxyCodeLine{00652\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ userSection\ :\ \mbox{\hyperlink{struct_w_a_s_t_1_1_module_print_context_a25c5a4b70a1e7c2481995985d5d87c3c}{module}}.\mbox{\hyperlink{struct_i_r_1_1_module_a1e31553725937946ccd34c2a0a7411fa}{userSections}})}
+\DoxyCodeLine{00653\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00654\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(userSection.name\ !=\ \textcolor{stringliteral}{"{}name"{}})}
+\DoxyCodeLine{00655\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00656\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \textcolor{charliteral}{'\(\backslash\)n'};}
+\DoxyCodeLine{00657\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ScopedTagPrinter\ dataTag(\textcolor{keywordtype}{string},\textcolor{stringliteral}{"{}user\_section"{}});}
+\DoxyCodeLine{00658\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \textcolor{stringliteral}{"{}\ \(\backslash\)"{}"{}};}
+\DoxyCodeLine{00659\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \mbox{\hyperlink{namespace_w_a_s_t_a5289ca10863a134a961943f0e2089979}{escapeString}}(userSection.name.c\_str(),userSection.name.length());}
+\DoxyCodeLine{00660\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)"{}\ "{}};}
+\DoxyCodeLine{00661\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{enum}\ \{\ numBytesPerLine\ =\ 64\ \};}
+\DoxyCodeLine{00662\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ offset\ =\ 0;offset\ <\ userSection.data.size();offset\ +=\ numBytesPerLine)}
+\DoxyCodeLine{00663\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00664\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)n\(\backslash\)"{}"{}};}
+\DoxyCodeLine{00665\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \mbox{\hyperlink{namespace_w_a_s_t_a5289ca10863a134a961943f0e2089979}{escapeString}}((\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*)userSection.data.data()\ +\ offset,std::min(userSection.data.size()\ -\/\ offset,(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}})numBytesPerLine));}
+\DoxyCodeLine{00666\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)"{}"{}};}
+\DoxyCodeLine{00667\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00668\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00669\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00670\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_w_a_s_t_1_1_module_print_context_ab75276391887f1a04fe297e96d2e2bbd_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_w_a_s_t_1_1_module_print_context_a25c5a4b70a1e7c2481995985d5d87c3c}\index{WAST::ModulePrintContext@{WAST::ModulePrintContext}!module@{module}}
+\index{module@{module}!WAST::ModulePrintContext@{WAST::ModulePrintContext}}
+\doxysubsubsection{\texorpdfstring{module}{module}}
+{\footnotesize\ttfamily \label{struct_w_a_s_t_1_1_module_print_context_a25c5a4b70a1e7c2481995985d5d87c3c} 
+const \mbox{\hyperlink{struct_i_r_1_1_module}{Module}}\& WAST\+::\+Module\+Print\+Context\+::module}
+
+
+
+Definition at line \mbox{\hyperlink{_print_8cpp_source_l00162}{162}} of file \mbox{\hyperlink{_print_8cpp_source}{Print.\+cpp}}.
+
+\Hypertarget{struct_w_a_s_t_1_1_module_print_context_aad231941cfac78cfbf964f73a66a5b2c}\index{WAST::ModulePrintContext@{WAST::ModulePrintContext}!names@{names}}
+\index{names@{names}!WAST::ModulePrintContext@{WAST::ModulePrintContext}}
+\doxysubsubsection{\texorpdfstring{names}{names}}
+{\footnotesize\ttfamily \label{struct_w_a_s_t_1_1_module_print_context_aad231941cfac78cfbf964f73a66a5b2c} 
+\mbox{\hyperlink{struct_i_r_1_1_disassembly_names}{Disassembly\+Names}} WAST\+::\+Module\+Print\+Context\+::names}
+
+
+
+Definition at line \mbox{\hyperlink{_print_8cpp_source_l00165}{165}} of file \mbox{\hyperlink{_print_8cpp_source}{Print.\+cpp}}.
+
+\Hypertarget{struct_w_a_s_t_1_1_module_print_context_aa08b8c5c3fd81ab5f926e12687387653}\index{WAST::ModulePrintContext@{WAST::ModulePrintContext}!string@{string}}
+\index{string@{string}!WAST::ModulePrintContext@{WAST::ModulePrintContext}}
+\doxysubsubsection{\texorpdfstring{string}{string}}
+{\footnotesize\ttfamily \label{struct_w_a_s_t_1_1_module_print_context_aa08b8c5c3fd81ab5f926e12687387653} 
+std\+::string\& WAST\+::\+Module\+Print\+Context\+::string}
+
+
+
+Definition at line \mbox{\hyperlink{_print_8cpp_source_l00163}{163}} of file \mbox{\hyperlink{_print_8cpp_source}{Print.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/wasm-\/jit/\+Source/\+WAST/\mbox{\hyperlink{_print_8cpp}{Print.\+cpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,145 @@
+\doxysection{libraries/fc/secp256k1/secp256k1/src/modules/recovery/bench\+\_\+impl.h File Reference}
+\hypertarget{recovery_2bench__impl_8h}{}\label{recovery_2bench__impl_8h}\index{libraries/fc/secp256k1/secp256k1/src/modules/recovery/bench\_impl.h@{libraries/fc/secp256k1/secp256k1/src/modules/recovery/bench\_impl.h}}
+{\ttfamily \#include "{}../include/secp256k1\+\_\+recovery.\+h"{}}\newline
+Include dependency graph for bench\+\_\+impl.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=203pt]{recovery_2bench__impl_8h__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structbench__recover__data}{bench\+\_\+recover\+\_\+data}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{recovery_2bench__impl_8h_a73bb1ad59423406f6397596e6021c60e}{bench\+\_\+recover}} (void \texorpdfstring{$\ast$}{*}arg, int iters)
+\item 
+void \mbox{\hyperlink{recovery_2bench__impl_8h_a15af8ec3a7685ac66f3d2b1addc91099}{bench\+\_\+recover\+\_\+setup}} (void \texorpdfstring{$\ast$}{*}arg)
+\item 
+void \mbox{\hyperlink{recovery_2bench__impl_8h_afdec90f8eb6e571e672bdbca7a4b4e89}{run\+\_\+recovery\+\_\+bench}} (int iters, int argc, char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{recovery_2bench__impl_8h_a73bb1ad59423406f6397596e6021c60e}\index{bench\_impl.h@{bench\_impl.h}!bench\_recover@{bench\_recover}}
+\index{bench\_recover@{bench\_recover}!bench\_impl.h@{bench\_impl.h}}
+\doxysubsubsection{\texorpdfstring{bench\_recover()}{bench\_recover()}}
+{\footnotesize\ttfamily \label{recovery_2bench__impl_8h_a73bb1ad59423406f6397596e6021c60e} 
+void bench\+\_\+recover (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{arg}{, }\item[{int}]{iters}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{recovery_2bench__impl_8h_source_l00018}{18}} of file \mbox{\hyperlink{recovery_2bench__impl_8h_source}{bench\+\_\+impl.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00019\ \ \ \ \ \textcolor{keywordtype}{int}\ i;}
+\DoxyCodeLine{00020\ \ \ \ \ \mbox{\hyperlink{structbench__recover__data}{bench\_recover\_data}}\ *data\ =\ (\mbox{\hyperlink{structbench__recover__data}{bench\_recover\_data}}*)arg;}
+\DoxyCodeLine{00021\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__pubkey}{secp256k1\_pubkey}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}};}
+\DoxyCodeLine{00022\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ pubkeyc[33];}
+\DoxyCodeLine{00023\ }
+\DoxyCodeLine{00024\ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ iters;\ i++)\ \{}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}};}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ pubkeylen\ =\ 33;}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsecp256k1__ecdsa__recoverable__signature}{secp256k1\_ecdsa\_recoverable\_signature}}\ sig;}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{secp256k1__recovery_8h_a6699b45dc75be70f028ac7d8ffaba46e}{secp256k1\_ecdsa\_recoverable\_signature\_parse\_compact}}(data-\/>ctx,\ \&sig,\ data-\/>sig,\ i\ \%\ 2));}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{secp256k1__recovery_8h_af9f2082776bf8ebdb4c38161a211a02b}{secp256k1\_ecdsa\_recover}}(data-\/>ctx,\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}},\ \&sig,\ data-\/>msg));}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{secp256k1_8h_a34977bf00322e510e881160c421836d7}{secp256k1\_ec\_pubkey\_serialize}}(data-\/>ctx,\ pubkeyc,\ \&pubkeylen,\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}},\ \mbox{\hyperlink{secp256k1_8h_a7b8f642c65e8b5c81fa4421b7c42ab57}{SECP256K1\_EC\_COMPRESSED}}));}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ =\ 0;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ <\ 32;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}++)\ \{}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \ \ \ data-\/>sig[\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ +\ 32]\ =\ data-\/>msg[\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}];\ \ \ \ \textcolor{comment}{/*\ Move\ former\ message\ to\ S.\ */}}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \ \ \ data-\/>msg[\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}]\ =\ data-\/>sig[\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}];\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ Move\ former\ R\ to\ message.\ */}}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \ \ \ data-\/>sig[\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}]\ =\ pubkeyc[\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ +\ 1];\ \ \ \ \ \ \ \textcolor{comment}{/*\ Move\ recovered\ pubkey\ X\ coordinate\ to\ R\ (which\ must\ be\ a\ valid\ X\ coordinate).\ */}}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00036\ \ \ \ \ \}}
+\DoxyCodeLine{00037\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{recovery_2bench__impl_8h_a73bb1ad59423406f6397596e6021c60e_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{recovery_2bench__impl_8h_a73bb1ad59423406f6397596e6021c60e_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{recovery_2bench__impl_8h_a15af8ec3a7685ac66f3d2b1addc91099}\index{bench\_impl.h@{bench\_impl.h}!bench\_recover\_setup@{bench\_recover\_setup}}
+\index{bench\_recover\_setup@{bench\_recover\_setup}!bench\_impl.h@{bench\_impl.h}}
+\doxysubsubsection{\texorpdfstring{bench\_recover\_setup()}{bench\_recover\_setup()}}
+{\footnotesize\ttfamily \label{recovery_2bench__impl_8h_a15af8ec3a7685ac66f3d2b1addc91099} 
+void bench\+\_\+recover\+\_\+setup (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{arg}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{recovery_2bench__impl_8h_source_l00039}{39}} of file \mbox{\hyperlink{recovery_2bench__impl_8h_source}{bench\+\_\+impl.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00040\ \ \ \ \ \textcolor{keywordtype}{int}\ i;}
+\DoxyCodeLine{00041\ \ \ \ \ \mbox{\hyperlink{structbench__recover__data}{bench\_recover\_data}}\ *data\ =\ (\mbox{\hyperlink{structbench__recover__data}{bench\_recover\_data}}*)arg;}
+\DoxyCodeLine{00042\ }
+\DoxyCodeLine{00043\ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ 32;\ i++)\ \{}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ data-\/>msg[i]\ =\ 1\ +\ i;}
+\DoxyCodeLine{00045\ \ \ \ \ \}}
+\DoxyCodeLine{00046\ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ 64;\ i++)\ \{}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ data-\/>sig[i]\ =\ 65\ +\ i;}
+\DoxyCodeLine{00048\ \ \ \ \ \}}
+\DoxyCodeLine{00049\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{recovery_2bench__impl_8h_a15af8ec3a7685ac66f3d2b1addc91099_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{recovery_2bench__impl_8h_afdec90f8eb6e571e672bdbca7a4b4e89}\index{bench\_impl.h@{bench\_impl.h}!run\_recovery\_bench@{run\_recovery\_bench}}
+\index{run\_recovery\_bench@{run\_recovery\_bench}!bench\_impl.h@{bench\_impl.h}}
+\doxysubsubsection{\texorpdfstring{run\_recovery\_bench()}{run\_recovery\_bench()}}
+{\footnotesize\ttfamily \label{recovery_2bench__impl_8h_afdec90f8eb6e571e672bdbca7a4b4e89} 
+void run\+\_\+recovery\+\_\+bench (\begin{DoxyParamCaption}\item[{int}]{iters}{, }\item[{int}]{argc}{, }\item[{char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{argv}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{recovery_2bench__impl_8h_source_l00051}{51}} of file \mbox{\hyperlink{recovery_2bench__impl_8h_source}{bench\+\_\+impl.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00052\ \ \ \ \ \mbox{\hyperlink{structbench__recover__data}{bench\_recover\_data}}\ data;}
+\DoxyCodeLine{00053\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ =\ argc\ ==\ 1;}
+\DoxyCodeLine{00054\ }
+\DoxyCodeLine{00055\ \ \ \ \ data.ctx\ =\ \mbox{\hyperlink{secp256k1_8h_a3aaa9fcc3ab67bc8f841779a049069c5}{secp256k1\_context\_create}}(\mbox{\hyperlink{secp256k1_8h_add20a6c320e247ca7bd524cbc4259d64}{SECP256K1\_CONTEXT\_VERIFY}});}
+\DoxyCodeLine{00056\ }
+\DoxyCodeLine{00057\ \ \ \ \ \textcolor{keywordflow}{if}\ (d\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}ecdsa"{}})\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}recover"{}})\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}ecdsa\_recover"{}}))\ \mbox{\hyperlink{bench_8h_aabcd2ce2b43c96bd396b30f8ecb79a17}{run\_benchmark}}(\textcolor{stringliteral}{"{}ecdsa\_recover"{}},\ \mbox{\hyperlink{recovery_2bench__impl_8h_a73bb1ad59423406f6397596e6021c60e}{bench\_recover}},\ \mbox{\hyperlink{recovery_2bench__impl_8h_a15af8ec3a7685ac66f3d2b1addc91099}{bench\_recover\_setup}},\ NULL,\ \&data,\ 10,\ iters);}
+\DoxyCodeLine{00058\ }
+\DoxyCodeLine{00059\ \ \ \ \ \mbox{\hyperlink{secp256k1_8h_a026db914e3723531825ecf25a0cbd699}{secp256k1\_context\_destroy}}(data.ctx);}
+\DoxyCodeLine{00060\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{recovery_2bench__impl_8h_afdec90f8eb6e571e672bdbca7a4b4e89_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=257pt]{recovery_2bench__impl_8h_afdec90f8eb6e571e672bdbca7a4b4e89_icgraph}
+\end{center}
+\end{figure}

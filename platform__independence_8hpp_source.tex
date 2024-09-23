@@ -1,0 +1,21 @@
+\doxysection{platform\+\_\+independence.\+hpp}
+\hypertarget{platform__independence_8hpp_source}{}\label{platform__independence_8hpp_source}\index{libraries/fc/include/fc/platform\_independence.hpp@{libraries/fc/include/fc/platform\_independence.hpp}}
+\mbox{\hyperlink{platform__independence_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{platform__independence_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#ifdef\ \_MSC\_VER}}
+\DoxyCodeLine{\Hypertarget{platform__independence_8hpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <intrin.h>}}
+\DoxyCodeLine{\Hypertarget{platform__independence_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\ \ \ \ \#ifdef\ \_M\_X64}}
+\DoxyCodeLine{\Hypertarget{platform__independence_8hpp_source_l00004}00004\ \textcolor{preprocessor}{\ \ \ \ \#define\ \_\_builtin\_popcountll\ \_\_popcnt64}}
+\DoxyCodeLine{\Hypertarget{platform__independence_8hpp_source_l00005}00005\ \textcolor{preprocessor}{\ \ \ \ \#else}}
+\DoxyCodeLine{\Hypertarget{platform__independence_8hpp_source_l00006}00006\ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{int}\ \_\_builtin\_popcountll(\textcolor{keywordtype}{unsigned}\ \_\_int64\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})}
+\DoxyCodeLine{\Hypertarget{platform__independence_8hpp_source_l00007}00007\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{platform__independence_8hpp_source_l00008}00008\ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ lowBits\ =\ (\textcolor{keywordtype}{unsigned}\ int)\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}};}
+\DoxyCodeLine{\Hypertarget{platform__independence_8hpp_source_l00009}00009\ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ =\ \_\_popcnt(lowBits);}
+\DoxyCodeLine{\Hypertarget{platform__independence_8hpp_source_l00010}00010\ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ highBits\ =\ (\textcolor{keywordtype}{unsigned}\ int)(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ >>\ 32);}
+\DoxyCodeLine{\Hypertarget{platform__independence_8hpp_source_l00011}00011\ \ \ \ \ \ \ \ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ +=\ \_\_popcnt(highBits);}
+\DoxyCodeLine{\Hypertarget{platform__independence_8hpp_source_l00012}00012\ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}};}
+\DoxyCodeLine{\Hypertarget{platform__independence_8hpp_source_l00013}00013\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{platform__independence_8hpp_source_l00014}00014\ \textcolor{preprocessor}{\ \ \ \ \#endif}}
+\DoxyCodeLine{\Hypertarget{platform__independence_8hpp_source_l00015}00015\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

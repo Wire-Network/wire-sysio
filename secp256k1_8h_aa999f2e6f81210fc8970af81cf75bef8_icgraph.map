@@ -1,0 +1,22 @@
+<map id="secp256k1_context_clone" name="secp256k1_context_clone">
+<area shape="rect" id="Node000001" title=" " alt="" coords="507,80,680,106"/>
+<area shape="rect" id="Node000002" href="$tests_8c.html#af55ae25ed3b9557cf2c08ffd454eef43" title=" " alt="" coords="111,5,236,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="549,76,506,59,459,45,401,34,341,27,237,21,237,16,342,22,401,29,460,40,508,54,551,71"/>
+<area shape="rect" id="Node000004" href="$recovery_2tests__impl_8h.html#a0966a428c1c43743711ce59cb9da75b3" title=" " alt="" coords="293,55,459,80"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="491,84,460,80,460,75,492,78"/>
+<area shape="rect" id="Node000006" href="$extrakeys_2tests__impl_8h.html#ae6ec43bf5586b4e1a78c673c813b50e3" title=" " alt="" coords="330,104,422,130"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="492,107,423,114,422,109,491,101"/>
+<area shape="rect" id="Node000008" href="$schnorrsig_2tests__impl_8h.html#afbcc12169b7558d9bd9cbbad8174ac06" title=" " alt="" coords="309,153,443,179"/>
+<area shape="poly" id="edge9_Node000001_Node000008" title=" " alt="" coords="545,114,460,145,426,155,424,150,458,140,543,109"/>
+<area shape="rect" id="Node000003" href="$tests_8c.html#a3c04138a5bfe5d72780bb7e82a18e627" title=" " alt="" coords="5,80,55,106"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="114,40,104,45,74,63,49,82,45,78,71,59,101,40,112,35"/>
+<area shape="rect" id="Node000005" href="$recovery_2tests__impl_8h.html#a3a06f71955483e9502f3c408857407f2" title=" " alt="" coords="108,55,240,80"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="277,70,240,70,240,65,277,65"/>
+<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="93,85,55,91,54,86,92,79"/>
+<area shape="rect" id="Node000007" href="$extrakeys_2tests__impl_8h.html#a23e13b477b0c4bd0014036322e61f36f" title=" " alt="" coords="104,104,244,130"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="315,120,244,120,244,114,315,114"/>
+<area shape="poly" id="edge8_Node000007_Node000003" title=" " alt="" coords="88,105,55,100,56,94,89,100"/>
+<area shape="rect" id="Node000009" href="$schnorrsig_2tests__impl_8h.html#ac157ab3450c7cca7e46cdc65e8019392" title=" " alt="" coords="103,153,245,179"/>
+<area shape="poly" id="edge10_Node000008_Node000009" title=" " alt="" coords="293,169,245,169,245,164,293,164"/>
+<area shape="poly" id="edge11_Node000009_Node000003" title=" " alt="" coords="112,150,101,144,46,108,49,104,104,140,114,145"/>
+</map>

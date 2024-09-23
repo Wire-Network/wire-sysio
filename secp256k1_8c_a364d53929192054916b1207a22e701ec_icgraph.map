@@ -1,0 +1,9 @@
+<map id="secp256k1_tagged_sha256" name="secp256k1_tagged_sha256">
+<area shape="rect" id="Node000001" title=" " alt="" coords="321,31,500,56"/>
+<area shape="rect" id="Node000002" href="$schnorr_8c.html#a840291bc02cba5474a4cb46a9b9566fe" title=" " alt="" coords="163,5,212,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="305,34,213,24,213,18,306,29"/>
+<area shape="rect" id="Node000003" href="$tests_8c.html#ae7c0fa16636a863743dd81647c80d27b" title=" " alt="" coords="103,55,273,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="306,57,274,61,273,56,305,52"/>
+<area shape="rect" id="Node000004" href="$tests_8c.html#a3c04138a5bfe5d72780bb7e82a18e627" title=" " alt="" coords="5,55,55,80"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="87,70,55,70,55,65,87,65"/>
+</map>

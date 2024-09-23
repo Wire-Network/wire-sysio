@@ -1,0 +1,62 @@
+\doxysection{sysio\+::chain\+::wasm\+\_\+validations\+::globals\+\_\+validation\+\_\+visitor Struct Reference}
+\hypertarget{structsysio_1_1chain_1_1wasm__validations_1_1globals__validation__visitor}{}\label{structsysio_1_1chain_1_1wasm__validations_1_1globals__validation__visitor}\index{sysio::chain::wasm\_validations::globals\_validation\_visitor@{sysio::chain::wasm\_validations::globals\_validation\_visitor}}
+
+
+{\ttfamily \#include $<$wasm\+\_\+sysio\+\_\+validation.\+hpp$>$}
+
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static void \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__validations_1_1globals__validation__visitor_ad94e32f9434a0e3e9240de675266407e}{validate}} (const \mbox{\hyperlink{struct_i_r_1_1_module}{IR\+::\+Module}} \&m)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__validation_8hpp_source_l00034}{34}} of file \mbox{\hyperlink{wasm__sysio__validation_8hpp_source}{wasm\+\_\+sysio\+\_\+validation.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1chain_1_1wasm__validations_1_1globals__validation__visitor_ad94e32f9434a0e3e9240de675266407e}\index{sysio::chain::wasm\_validations::globals\_validation\_visitor@{sysio::chain::wasm\_validations::globals\_validation\_visitor}!validate@{validate}}
+\index{validate@{validate}!sysio::chain::wasm\_validations::globals\_validation\_visitor@{sysio::chain::wasm\_validations::globals\_validation\_visitor}}
+\doxysubsubsection{\texorpdfstring{validate()}{validate()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__validations_1_1globals__validation__visitor_ad94e32f9434a0e3e9240de675266407e} 
+void sysio\+::chain\+::wasm\+\_\+validations\+::globals\+\_\+validation\+\_\+visitor\+::validate (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct_i_r_1_1_module}{IR\+::\+Module}} \&}]{m}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__validation_8cpp_source_l00040}{40}} of file \mbox{\hyperlink{wasm__sysio__validation_8cpp_source}{wasm\+\_\+sysio\+\_\+validation.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00041\ \ \ \ \textcolor{keywordtype}{unsigned}\ mutable\_globals\_total\_size\ =\ 0;}
+\DoxyCodeLine{00042\ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ GlobalDef\&\ global\_def\ :\ m.\mbox{\hyperlink{struct_i_r_1_1_module_ab1340b21e56875a7f1163d1afcf4d7fd}{globals}}.defs)\ \{}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!global\_def.type.isMutable)}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(global\_def.type.valueType)\ \{}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ ValueType::any:}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ ValueType::num:}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(wasm\_execution\_error,\ \textcolor{stringliteral}{"{}Smart\ contract\ has\ unexpected\ global\ definition\ value\ type"{}});}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ ValueType::i64:}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ ValueType::f64:}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ mutable\_globals\_total\_size\ +=\ 4;}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ ValueType::i32:}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ ValueType::f32:}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \ \ \ mutable\_globals\_total\_size\ +=\ 4;}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00056\ \ \ \ \}}
+\DoxyCodeLine{00057\ \ \ \ \textcolor{keywordflow}{if}(mutable\_globals\_total\_size\ >\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__constraints_a89196fe638ca348da034d144ac753c6a}{wasm\_constraints::maximum\_mutable\_globals}})}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(wasm\_execution\_error,\ \textcolor{stringliteral}{"{}Smart\ contract\ has\ more\ than\ \$\{k\}\ bytes\ of\ mutable\ globals"{}},}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}k"{}},\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__constraints_a89196fe638ca348da034d144ac753c6a}{wasm\_constraints::maximum\_mutable\_globals}}));}
+\DoxyCodeLine{00060\ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{wasm__sysio__validation_8hpp}{wasm\+\_\+sysio\+\_\+validation.\+hpp}}\item 
+libraries/chain/\mbox{\hyperlink{wasm__sysio__validation_8cpp}{wasm\+\_\+sysio\+\_\+validation.\+cpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,59 @@
+\doxysection{libraries/softfloat/source/f64\+\_\+mul\+Add.c File Reference}
+\hypertarget{softfloat_2source_2f64__mul_add_8c}{}\label{softfloat_2source_2f64__mul_add_8c}\index{libraries/softfloat/source/f64\_mulAdd.c@{libraries/softfloat/source/f64\_mulAdd.c}}
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include "{}platform.\+h"{}}\newline
+{\ttfamily \#include "{}internals.\+h"{}}\newline
+{\ttfamily \#include "{}softfloat.\+h"{}}\newline
+Include dependency graph for f64\+\_\+mul\+Add.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{softfloat_2source_2f64__mul_add_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structfloat64__t}{float64\+\_\+t}} \mbox{\hyperlink{softfloat_2source_2f64__mul_add_8c_a4cdf291a9a9672b1acbfd1856d5c3769}{f64\+\_\+mul\+Add}} (\mbox{\hyperlink{structfloat64__t}{float64\+\_\+t}} \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, \mbox{\hyperlink{structfloat64__t}{float64\+\_\+t}} b, \mbox{\hyperlink{structfloat64__t}{float64\+\_\+t}} c)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{softfloat_2source_2f64__mul_add_8c_a4cdf291a9a9672b1acbfd1856d5c3769}\index{f64\_mulAdd.c@{f64\_mulAdd.c}!f64\_mulAdd@{f64\_mulAdd}}
+\index{f64\_mulAdd@{f64\_mulAdd}!f64\_mulAdd.c@{f64\_mulAdd.c}}
+\doxysubsubsection{\texorpdfstring{f64\_mulAdd()}{f64\_mulAdd()}}
+{\footnotesize\ttfamily \label{softfloat_2source_2f64__mul_add_8c_a4cdf291a9a9672b1acbfd1856d5c3769} 
+\mbox{\hyperlink{structfloat64__t}{float64\+\_\+t}} f64\+\_\+mul\+Add (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structfloat64__t}{float64\+\_\+t}}}]{a}{, }\item[{\mbox{\hyperlink{structfloat64__t}{float64\+\_\+t}}}]{b}{, }\item[{\mbox{\hyperlink{structfloat64__t}{float64\+\_\+t}}}]{c}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2f64__mul_add_8c_source_l00042}{42}} of file \mbox{\hyperlink{softfloat_2source_2f64__mul_add_8c_source}{f64\+\_\+mul\+Add.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00043\ \{}
+\DoxyCodeLine{00044\ \ \ \ \ \textcolor{keyword}{union\ }\mbox{\hyperlink{unionui64__f64}{ui64\_f64}}\ uA;}
+\DoxyCodeLine{00045\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\_fast64\_t}}\ uiA;}
+\DoxyCodeLine{00046\ \ \ \ \ \textcolor{keyword}{union\ }\mbox{\hyperlink{unionui64__f64}{ui64\_f64}}\ uB;}
+\DoxyCodeLine{00047\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\_fast64\_t}}\ uiB;}
+\DoxyCodeLine{00048\ \ \ \ \ \textcolor{keyword}{union\ }\mbox{\hyperlink{unionui64__f64}{ui64\_f64}}\ uC;}
+\DoxyCodeLine{00049\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\_fast64\_t}}\ uiC;}
+\DoxyCodeLine{00050\ }
+\DoxyCodeLine{00051\ \ \ \ \ uA.\mbox{\hyperlink{unionui64__f64_a6c3253c08850759ca3c64dd956c6b4dd}{f}}\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}};}
+\DoxyCodeLine{00052\ \ \ \ \ uiA\ =\ uA.ui;}
+\DoxyCodeLine{00053\ \ \ \ \ uB.f\ =\ b;}
+\DoxyCodeLine{00054\ \ \ \ \ uiB\ =\ uB.ui;}
+\DoxyCodeLine{00055\ \ \ \ \ uC.f\ =\ c;}
+\DoxyCodeLine{00056\ \ \ \ \ uiC\ =\ uC.ui;}
+\DoxyCodeLine{00057\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a1453a4c66c8d8d22ec27874f4e735e91}{softfloat\_mulAddF64}}(\ uiA,\ uiB,\ uiC,\ 0\ );}
+\DoxyCodeLine{00058\ }
+\DoxyCodeLine{00059\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{softfloat_2source_2f64__mul_add_8c_a4cdf291a9a9672b1acbfd1856d5c3769_cgraph}
+\end{center}
+\end{figure}

@@ -1,0 +1,106 @@
+<map id="websocketpp::error::make_error_code" name="websocketpp::error::make_error_code">
+<area shape="rect" id="Node000001" title=" " alt="" coords="500,1184,632,1225"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1connection.html#a36462b406f973e16d3107e786c6b9172" title="Adds the given subprotocol string to the request list (exception free)" alt="" coords="266,5,436,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="561,1169,551,930,529,578,514,401,496,244,474,125,462,85,450,61,434,47,437,43,454,57,467,83,479,124,501,244,519,400,535,578,556,930,566,1168"/>
+<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1connection.html#af8cb78acc61b8a3d59f6162cdba6318b" title="Append a header." alt="" coords="266,71,436,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="561,1168,550,942,528,610,512,443,494,297,473,185,462,147,450,125,434,111,438,107,454,121,467,145,478,184,499,296,518,443,533,610,555,941,566,1168"/>
+<area shape="rect" id="Node000004" href="$classwebsocketpp_1_1transport_1_1asio_1_1endpoint.html#ae24b2ea11e8ce90b6101c1ab56d7fe48" title="Accept the next connection attempt and assign it to con (exception free)" alt="" coords="272,135,430,191"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="560,1169,547,957,524,652,508,498,491,363,471,261,461,226,450,205,428,186,432,182,454,201,465,224,476,259,496,363,514,498,529,651,553,957,566,1168"/>
+<area shape="rect" id="Node000006" href="$classwebsocketpp_1_1transport_1_1asio_1_1local__endpoint.html#afa52b09b8ff6137cf44e5bc9ae31a90c" title="Accept the next connection attempt and assign it to con (exception free)" alt="" coords="272,215,430,271"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="562,1168,559,987,545,726,531,591,511,467,484,363,468,323,450,291,428,271,432,267,454,288,473,320,489,362,516,466,536,591,550,726,564,987,568,1168"/>
+<area shape="rect" id="Node000008" href="$client_8cpp.html#a2ffad6e98e1c94bc63b85ca8b350500d" title=" " alt="" coords="5,298,202,324"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="560,1169,548,982,524,717,509,586,491,472,471,386,461,357,450,341,418,317,382,301,343,291,302,286,223,289,156,300,155,295,222,284,302,281,344,286,384,296,421,313,454,337,466,355,477,384,496,471,514,586,530,717,553,981,565,1168"/>
+<area shape="rect" id="Node000009" href="$error_8cpp.html#a1e877f3c5b3112d62902a23e6c054c38" title=" " alt="" coords="253,613,449,638"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="560,1169,549,1052,528,897,514,819,496,749,475,692,450,653,435,641,438,637,454,649,479,689,501,747,519,818,534,896,554,1051,565,1168"/>
+<area shape="rect" id="Node000010" href="$client_8cpp.html#ad0d95e161d21844a1b153f32bb7c8b25" title=" " alt="" coords="5,350,202,376"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="560,1169,547,990,523,740,507,617,490,509,471,428,460,402,450,386,417,363,380,347,340,338,298,334,218,339,151,352,150,347,217,334,298,329,340,332,381,342,420,358,454,382,465,399,476,427,495,508,513,616,528,740,552,990,565,1168"/>
+<area shape="rect" id="Node000011" href="$client_8cpp.html#ad9891a26e22f7c311043357d8cbb15b5" title=" " alt="" coords="5,404,202,429"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="561,1169,555,1025,537,828,523,727,504,636,480,561,466,532,450,510,415,497,339,476,161,432,163,427,340,471,417,492,454,506,470,529,485,559,509,635,528,726,543,827,560,1025,567,1168"/>
+<area shape="rect" id="Node000012" href="$client_8cpp.html#a41e311e12e084d8674be2797f3c46584" title=" " alt="" coords="5,453,202,478"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="561,1169,553,1034,535,851,520,758,501,674,478,605,465,578,450,558,413,541,340,520,171,482,172,477,341,515,415,536,454,554,469,575,483,603,507,672,525,757,540,850,558,1034,566,1168"/>
+<area shape="rect" id="Node000013" href="$classwebsocketpp_1_1connection.html#a436058fe88b1ba31080cec2a464634ae" title="exception free variant of close" alt="" coords="266,663,436,703"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="558,1169,545,1065,523,930,508,863,491,802,471,752,450,718,434,705,438,701,454,715,476,750,496,800,513,862,528,929,551,1064,564,1168"/>
+<area shape="rect" id="Node000014" href="$classwebsocketpp_1_1endpoint.html#a0fe4457427d4124abe7ca022ba7afbb4" title="Retrieves a connection_ptr from a connection_hdl (exception free)" alt="" coords="273,728,428,769"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="563,1169,561,1090,546,986,532,931,512,877,485,827,450,782,427,766,430,762,454,778,489,824,517,875,537,930,551,985,566,1089,569,1168"/>
+<area shape="rect" id="Node000034" href="$classwebsocketpp_1_1client.html#a1197f043c8c6c03398e4f07be4bdf135" title="Get a new connection (string version)" alt="" coords="35,503,172,543"/>
+<area shape="poly" id="edge23_Node000001_Node000034" title=" " alt="" coords="561,1169,552,1042,532,872,518,786,500,708,477,645,464,620,450,602,437,595,413,586,340,568,172,537,173,531,341,563,414,581,439,590,454,598,469,618,482,643,505,707,523,785,538,871,557,1042,566,1168"/>
+<area shape="rect" id="Node000035" href="$classwebsocketpp_1_1client.html#aa95cec974921e32bc37a61c683ae240d" title="Get a new connection." alt="" coords="282,396,420,437"/>
+<area shape="poly" id="edge24_Node000001_Node000035" title=" " alt="" coords="561,1168,555,1016,538,804,523,695,504,596,480,513,466,481,450,457,436,443,418,434,421,429,439,439,454,453,470,479,485,511,510,594,529,694,543,803,560,1016,567,1168"/>
+<area shape="rect" id="Node000066" href="$classwebsocketpp_1_1connection.html#a542dd013907c3aeb2dbb01d1d631a492" title=" " alt="" coords="257,792,445,848"/>
+<area shape="poly" id="edge30_Node000001_Node000066" title=" " alt="" coords="560,1169,552,1104,534,1022,520,979,501,937,478,898,450,862,437,851,440,847,454,858,483,895,506,935,524,978,539,1021,557,1103,565,1168"/>
+<area shape="rect" id="Node000067" href="$classwebsocketpp_1_1connection.html#a588af194b5c2a13fe692452c207e0cba" title=" " alt="" coords="250,872,452,928"/>
+<area shape="poly" id="edge31_Node000001_Node000067" title=" " alt="" coords="556,1169,544,1119,523,1059,492,996,473,968,450,942,436,931,439,927,454,938,477,965,497,994,528,1056,549,1118,561,1168"/>
+<area shape="rect" id="Node000068" href="$classwebsocketpp_1_1connection.html#abd6866c41c2ae86c3372cf428392a190" title=" " alt="" coords="266,952,436,993"/>
+<area shape="poly" id="edge32_Node000001_Node000068" title=" " alt="" coords="551,1170,536,1132,515,1089,486,1045,450,1008,431,996,434,991,454,1004,490,1042,519,1086,541,1130,556,1168"/>
+<area shape="rect" id="Node000069" href="$classwebsocketpp_1_1connection.html#a261ca392f8b31cd0f5a1b2ccc11c3037" title=" " alt="" coords="257,1017,445,1058"/>
+<area shape="poly" id="edge33_Node000001_Node000069" title=" " alt="" coords="542,1173,503,1121,478,1095,451,1073,428,1061,431,1056,453,1069,482,1092,507,1118,546,1169"/>
+<area shape="rect" id="Node000070" href="$classwebsocketpp_1_1connection.html#af37addaf4d89de32d3d8f4da668313c5" title=" " alt="" coords="260,1083,442,1123"/>
+<area shape="poly" id="edge34_Node000001_Node000070" title=" " alt="" coords="520,1177,451,1139,420,1126,422,1121,453,1134,523,1173"/>
+<area shape="rect" id="Node000071" href="$classwebsocketpp_1_1transport_1_1asio_1_1endpoint.html#a67da637106d3cfb40078b477e2579a13" title="initialize asio transport with external io_service (exception free)" alt="" coords="268,1148,434,1189"/>
+<area shape="poly" id="edge35_Node000001_Node000071" title=" " alt="" coords="485,1193,434,1185,435,1180,485,1188"/>
+<area shape="rect" id="Node000072" href="$classwebsocketpp_1_1transport_1_1asio_1_1local__endpoint.html#a58bfa733391b26291767ee8e4f0abc79" title="initialize asio transport with external io_service (exception free)" alt="" coords="272,1212,430,1268"/>
+<area shape="poly" id="edge36_Node000001_Node000072" title=" " alt="" coords="485,1220,430,1230,429,1225,485,1215"/>
+<area shape="rect" id="Node000074" href="$classwebsocketpp_1_1transport_1_1asio_1_1endpoint.html#ac36c2b22a7c2550663792472a728f615" title="Set up endpoint for listening manually (exception free)" alt="" coords="272,1292,430,1333"/>
+<area shape="poly" id="edge37_Node000001_Node000074" title=" " alt="" coords="528,1236,493,1260,453,1283,427,1294,425,1289,451,1278,490,1256,525,1232"/>
+<area shape="rect" id="Node000082" href="$classwebsocketpp_1_1transport_1_1asio_1_1local__endpoint.html#aeeaa782aa3ad6c49361d9665298f07c2" title="Set up endpoint for listening manually (exception free)" alt="" coords="272,1356,430,1412"/>
+<area shape="poly" id="edge38_Node000001_Node000082" title=" " alt="" coords="547,1240,508,1294,482,1322,454,1346,431,1360,429,1356,450,1342,478,1318,504,1290,543,1236"/>
+<area shape="rect" id="Node000084" href="$classwebsocketpp_1_1connection.html#a6766e2f31adc6843a983551b21683b73" title="exception free variant of ping" alt="" coords="266,1436,436,1477"/>
+<area shape="poly" id="edge39_Node000001_Node000084" title=" " alt="" coords="558,1240,544,1283,523,1333,493,1383,454,1426,437,1438,434,1433,450,1422,489,1380,518,1330,540,1281,553,1239"/>
+<area shape="rect" id="Node000085" href="$classwebsocketpp_1_1connection.html#a837dcb8f1214f08b92e7ae7489bfa180" title="exception free variant of pong" alt="" coords="266,1501,436,1542"/>
+<area shape="poly" id="edge40_Node000001_Node000085" title=" " alt="" coords="563,1241,552,1295,532,1362,500,1431,479,1462,454,1490,437,1503,434,1499,450,1486,475,1459,496,1428,527,1360,547,1294,558,1240"/>
+<area shape="rect" id="Node000086" href="$classwebsocketpp_1_1connection.html#a569483c7dcf542f500f6e9f49d803010" title=" " alt="" coords="253,1567,448,1607"/>
+<area shape="poly" id="edge41_Node000001_Node000086" title=" " alt="" coords="566,1241,559,1307,541,1391,527,1435,508,1479,484,1519,454,1556,438,1568,434,1564,450,1552,479,1516,503,1476,522,1434,536,1390,554,1306,561,1240"/>
+<area shape="rect" id="Node000087" href="$classwebsocketpp_1_1transport_1_1asio_1_1connection.html#a2397c24d0ab9b344d70328788de721d4" title="initialize the proxy buffers and http parsers" alt="" coords="257,1632,445,1673"/>
+<area shape="poly" id="edge42_Node000001_Node000087" title=" " alt="" coords="568,1241,565,1318,550,1419,535,1473,515,1527,488,1576,454,1621,438,1633,435,1629,450,1617,484,1574,510,1524,530,1472,545,1418,560,1318,563,1240"/>
+<area shape="rect" id="Node000088" href="$classwebsocketpp_1_1connection.html#a63094895d9dcfb4d10974ae97ea319a1" title="Remove a header." alt="" coords="266,1697,436,1738"/>
+<area shape="poly" id="edge43_Node000001_Node000088" title=" " alt="" coords="564,1240,550,1342,527,1475,513,1541,495,1602,476,1652,454,1686,438,1700,434,1695,450,1683,471,1649,490,1600,507,1540,522,1474,545,1341,558,1239"/>
+<area shape="rect" id="Node000089" href="$classwebsocketpp_1_1connection.html#a96e4adcdb9b3473ca96e2aac27ff7147" title="Replace a header." alt="" coords="266,1763,436,1803"/>
+<area shape="poly" id="edge44_Node000001_Node000089" title=" " alt="" coords="565,1240,553,1355,532,1507,517,1584,499,1654,478,1711,454,1751,438,1765,434,1761,450,1748,473,1709,494,1652,512,1583,526,1507,548,1355,559,1240"/>
+<area shape="rect" id="Node000090" href="$classwebsocketpp_1_1connection.html#a53e9587a711e543ed353e8ecec13d44c" title="Select a subprotocol to use (exception free)" alt="" coords="266,1828,436,1869"/>
+<area shape="poly" id="edge45_Node000001_Node000090" title=" " alt="" coords="566,1240,556,1367,536,1539,521,1626,503,1706,481,1771,468,1797,454,1817,438,1830,434,1826,450,1813,463,1794,476,1769,498,1704,516,1625,531,1538,551,1367,560,1240"/>
+<area shape="rect" id="Node000091" href="$classwebsocketpp_1_1connection.html#a6c192eb26aa8be9afed7ff9e85990ea8" title="Send deferred HTTP Response (exception free)" alt="" coords="266,1893,436,1934"/>
+<area shape="poly" id="edge46_Node000001_Node000091" title=" " alt="" coords="566,1240,558,1380,540,1571,525,1668,507,1757,483,1831,469,1860,454,1882,438,1896,434,1892,450,1879,465,1857,478,1829,501,1756,520,1667,535,1570,553,1379,561,1240"/>
+<area shape="rect" id="Node000092" href="$classwebsocketpp_1_1connection.html#aabc8c4f01bb9fd6336e536d992ae1a4f" title=" " alt="" coords="266,1958,436,2014"/>
+<area shape="poly" id="edge47_Node000001_Node000092" title=" " alt="" coords="567,1241,560,1391,542,1601,528,1709,509,1808,485,1890,470,1922,454,1947,438,1962,434,1959,450,1944,465,1920,480,1888,504,1807,523,1708,537,1601,555,1391,561,1240"/>
+<area shape="rect" id="Node000093" href="$classwebsocketpp_1_1connection.html#ac11c93ff0060eaf24c16764c5ff906c9" title=" " alt="" coords="266,2037,436,2078"/>
+<area shape="poly" id="edge48_Node000001_Node000093" title=" " alt="" coords="567,1240,564,1406,549,1641,535,1762,515,1872,489,1964,472,2000,454,2027,438,2041,434,2037,450,2024,468,1997,484,1962,510,1871,530,1761,544,1641,559,1406,562,1240"/>
+<area shape="rect" id="Node000094" href="$classwebsocketpp_1_1connection.html#a40bb318c3b9294018d217d0271a7b3da" title="Set response body content." alt="" coords="266,2103,436,2143"/>
+<area shape="poly" id="edge49_Node000001_Node000094" title=" " alt="" coords="568,1240,566,1417,561,1539,552,1671,539,1802,518,1922,491,2022,474,2061,454,2091,438,2106,434,2102,450,2088,469,2059,486,2020,513,1921,533,1801,547,1671,556,1539,560,1417,563,1240"/>
+<area shape="rect" id="Node000095" href="$classwebsocketpp_1_1connection.html#a96d445ff0cc75b854c4500e93a054acb" title="Set response status code and message." alt="" coords="266,2168,436,2209"/>
+<area shape="poly" id="edge50_Node000001_Node000095" title=" " alt="" coords="568,1240,568,1429,564,1560,556,1702,543,1844,522,1974,509,2031,493,2082,475,2124,454,2157,438,2171,434,2167,450,2153,470,2121,488,2080,504,2030,517,1973,537,1843,551,1702,559,1560,563,1429,563,1240"/>
+<area shape="rect" id="Node000096" href="$classwebsocketpp_1_1connection.html#a97b4513339167df8653a11ef3ccc65b1" title="Set response status code and message." alt="" coords="266,2233,436,2274"/>
+<area shape="poly" id="edge51_Node000001_Node000096" title=" " alt="" coords="566,1240,554,1455,531,1766,515,1922,497,2059,477,2164,466,2199,454,2222,438,2236,434,2232,450,2219,461,2197,472,2162,492,2058,510,1921,525,1765,548,1455,560,1240"/>
+<area shape="rect" id="Node000097" href="$classwebsocketpp_1_1server.html#a0204a7d444144f7ea5b8bbcf14689fc1" title="Starts the server&#39;s async connection acceptance loop (exception free)" alt="" coords="280,2299,422,2339"/>
+<area shape="poly" id="edge52_Node000001_Node000097" title=" " alt="" coords="566,1240,555,1467,533,1799,517,1966,499,2113,478,2225,467,2263,454,2287,440,2300,424,2309,421,2305,437,2296,450,2284,462,2261,473,2223,494,2112,512,1965,527,1798,550,1467,561,1240"/>
+<area shape="rect" id="Node000108" href="$classwebsocketpp_1_1transport_1_1asio_1_1endpoint.html#a0da87d3a3e8ee8279fe59eb0385d81e3" title="Stop listening (exception free)" alt="" coords="272,2363,430,2419"/>
+<area shape="poly" id="edge53_Node000001_Node000108" title=" " alt="" coords="566,1240,555,1479,533,1831,518,2008,500,2165,479,2285,467,2326,454,2353,431,2372,428,2368,450,2349,462,2325,474,2284,495,2165,513,2008,528,1830,550,1478,561,1240"/>
+<area shape="rect" id="Node000109" href="$classwebsocketpp_1_1transport_1_1asio_1_1local__endpoint.html#ac4d7e265a7e337917c6647e6411a4003" title="Stop listening (exception free)" alt="" coords="272,2443,430,2499"/>
+<area shape="poly" id="edge54_Node000001_Node000109" title=" " alt="" coords="566,1240,557,1493,536,1871,520,2062,502,2231,480,2360,468,2405,454,2433,432,2452,428,2448,450,2429,463,2403,475,2359,497,2230,515,2061,530,1871,551,1493,561,1240"/>
+<area shape="rect" id="Node000005" href="$classwebsocketpp_1_1transport_1_1asio_1_1endpoint.html#a7e559e38bf344d60706f106db8b15d50" title="Accept the next connection attempt and assign it to con." alt="" coords="25,135,182,191"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="256,166,183,166,183,160,256,160"/>
+<area shape="rect" id="Node000007" href="$classwebsocketpp_1_1transport_1_1asio_1_1local__endpoint.html#a89ab2d698352863f2e37b813079faa09" title="Accept the next connection attempt and assign it to con." alt="" coords="25,215,182,271"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="256,246,183,246,183,240,256,240"/>
+<area shape="rect" id="Node000015" href="$classwebsocketpp_1_1endpoint.html#a7be6f2e7dc3901dd577eae33dfd2df24" title="Retrieves a connection_ptr from a connection_hdl (exception version)" alt="" coords="26,716,181,757"/>
+<area shape="poly" id="edge14_Node000014_Node000015" title=" " alt="" coords="257,746,182,743,182,737,258,741"/>
+<area shape="rect" id="Node000016" href="$classconnection__metadata.html#ac297cf7710d8d510ef383b7395222ce5" title=" " alt="" coords="31,781,176,822"/>
+<area shape="poly" id="edge15_Node000014_Node000016" title=" " alt="" coords="259,771,177,789,176,783,258,766"/>
+<area shape="rect" id="Node000019" href="$classprint__server.html#abb31736075d42768a36f1d953866b1c6" title=" " alt="" coords="29,846,178,872"/>
+<area shape="poly" id="edge16_Node000014_Node000019" title=" " alt="" coords="260,777,251,782,237,795,228,809,219,823,203,836,177,848,175,843,200,831,215,819,224,806,233,792,248,778,258,772"/>
+<area shape="rect" id="Node000020" href="$classconnection__metadata.html#a1c2e652001b8306207beafe17b1a52ed" title=" " alt="" coords="31,896,176,937"/>
+<area shape="poly" id="edge17_Node000014_Node000020" title=" " alt="" coords="261,775,251,782,240,795,234,807,228,833,222,859,215,873,203,886,178,902,175,898,200,882,211,870,217,858,223,832,229,805,236,792,248,778,258,771"/>
+<area shape="rect" id="Node000021" href="$classperftest.html#aa3802566f897c99564008e301a56fc99" title=" " alt="" coords="48,961,159,986"/>
+<area shape="poly" id="edge18_Node000014_Node000021" title=" " alt="" coords="262,774,252,782,237,803,230,823,229,865,228,908,220,929,203,950,183,964,160,972,159,967,181,959,200,946,215,927,222,907,224,865,225,822,232,800,248,779,258,770"/>
+<area shape="rect" id="Node000023" href="$debug__server_8cpp.html#aff7dbd699b23a5b8bc3389dd4480c49a" title=" " alt="" coords="71,1010,136,1036"/>
+<area shape="poly" id="edge19_Node000014_Node000023" title=" " alt="" coords="262,773,252,782,234,809,226,836,226,863,229,890,232,918,232,946,223,973,204,1001,189,1012,171,1020,137,1026,136,1021,170,1015,186,1008,200,997,219,971,226,945,227,918,224,891,221,863,221,835,229,807,248,779,258,769"/>
+<area shape="rect" id="Node000025" href="$classtelemetry__server.html#abab5c8572db5f87e745b862e59867bc8" title=" " alt="" coords="19,568,188,593"/>
+<area shape="poly" id="edge20_Node000014_Node000025" title=" " alt="" coords="258,725,248,717,236,703,229,688,224,660,218,632,212,619,200,606,184,596,186,591,203,602,216,616,223,630,229,659,234,686,240,700,252,713,261,721"/>
+<area shape="rect" id="Node000027" href="$sip__client_8cpp.html#a8c13595a4801a15825ae3f8c8bb37ed4" title=" " alt="" coords="56,617,151,642"/>
+<area shape="poly" id="edge21_Node000014_Node000027" title=" " alt="" coords="257,723,248,717,232,701,224,685,215,670,200,656,176,644,151,637,152,632,178,639,203,651,220,667,228,683,236,698,251,713,260,719"/>
+<area shape="rect" id="Node000029" href="$classprint__server.html#a08d4b374fa69846cb78ecf54b40cfd70" title=" " alt="" coords="18,666,189,692"/>
+<area shape="poly" id="edge22_Node000014_Node000029" title=" " alt="" coords="266,726,201,707,157,695,158,690,202,702,267,721"/>
+<area shape="poly" id="edge25_Node000035_Node000008" title=" " alt="" coords="301,390,253,364,201,340,161,327,163,322,203,335,255,359,303,385"/>
+<area shape="poly" id="edge26_Node000035_Node000010" title=" " alt="" coords="267,401,166,379,167,374,268,396"/>
+<area shape="poly" id="edge27_Node000035_Node000011" title=" " alt="" coords="267,419,202,419,202,414,267,414"/>
+<area shape="poly" id="edge28_Node000035_Node000012" title=" " alt="" coords="268,436,172,455,171,450,267,430"/>
+<area shape="poly" id="edge29_Node000035_Node000034" title=" " alt="" coords="300,447,203,493,173,505,172,500,201,489,297,442"/>
+</map>

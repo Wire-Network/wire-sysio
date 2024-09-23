@@ -1,0 +1,10 @@
+<map id="bn::ecop::isOnECHom3" name="bn::ecop::isOnECHom3">
+<area shape="rect" id="Node000001" title=" " alt="" coords="302,31,462,56"/>
+<area shape="rect" id="Node000002" href="$bn_8cpp.html#a3b024c6ef1c8eb6911594b80cd8c33db" title=" " alt="" coords="103,5,254,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="286,34,254,30,255,25,287,29"/>
+<area shape="rect" id="Node000004" href="$bn_8cpp.html#a3c907c155228651284416e4ca37393b7" title=" " alt="" coords="104,55,252,80"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="287,57,253,61,253,56,286,52"/>
+<area shape="rect" id="Node000003" href="$bn_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97" title=" " alt="" coords="5,31,55,56"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="87,36,56,42,55,37,87,31"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="88,56,55,50,56,45,89,50"/>
+</map>

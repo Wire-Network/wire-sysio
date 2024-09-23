@@ -1,0 +1,1419 @@
+\chapter{release-\/notes}
+\hypertarget{md_libraries_2sys-vm_2external_2_catch2_2docs_2release-notes}{}\label{md_libraries_2sys-vm_2external_2_catch2_2docs_2release-notes}\index{release-\/notes@{release-\/notes}}
+\label{_top}%
+
+
+\doxysection*{Release notes}
+
+{\bfseries{Contents}}~\newline
+ 2.7.2~\newline
+ 2.7.1~\newline
+ 2.7.0~\newline
+ 2.6.1~\newline
+ 2.6.0~\newline
+ 2.5.0~\newline
+ 2.4.2~\newline
+ 2.4.1~\newline
+ 2.4.0~\newline
+ 2.3.0~\newline
+ 2.2.3~\newline
+ 2.2.2~\newline
+ 2.2.1~\newline
+ 2.2.0~\newline
+ 2.1.2~\newline
+ 2.1.1~\newline
+ 2.1.0~\newline
+ 2.0.1~\newline
+ Older versions~\newline
+ Even Older versions~\newline
+
+
+\doxysubsection*{2.\+7.\+2}
+
+\doxysubsubsection*{Improvements}
+
+
+\begin{DoxyItemize}
+\item Added an approximate vector matcher (\#1499)
+\end{DoxyItemize}
+
+\doxysubsubsection*{Fixes}
+
+
+\begin{DoxyItemize}
+\item Filters will no longer be shown if there were none
+\item Fixed compilation error when using Homebrew GCC on OS X (\#1588, \#1589)
+\item Fixed the console reporter not showing messages that start with a newline (\#1455, \#1470)
+\item Modified JUnit reporter\textquotesingle{}s output so that rng seed and filters are reported according to the JUnit schema (\#1598)
+\item Fixed some obscure warnings and static analysis passes
+\end{DoxyItemize}
+
+\doxysubsubsection*{Miscellaneous}
+
+
+\begin{DoxyItemize}
+\item Various improvements to {\ttfamily Parse\+And\+Add\+Catch\+Tests} (\#1559, \#1601)
+\begin{DoxyItemize}
+\item When a target is parsed, it receives {\ttfamily Parse\+And\+Add\+Catch\+Tests\+\_\+\+TESTS} property which summarizes found tests
+\item Fixed problem with tests not being found if the {\ttfamily Optional\+Catch\+Test\+Launcher} variables is used
+\item Including the script will no longer forcefully modify {\ttfamily CMAKE\+\_\+\+MINIMUM\+\_\+\+REQUIRED\+\_\+\+VERSION}
+\item CMake object libraries are ignored when parsing to avoid needless warnings
+\end{DoxyItemize}
+\item {\ttfamily Catch\+Add\+Tests} now adds test\textquotesingle{}s tags to their CTest labels (\#1600)
+\item Added basic CPack support to our build
+\end{DoxyItemize}
+
+\doxysubsection*{2.\+7.\+1}
+
+\doxysubsubsection*{Improvements}
+
+
+\begin{DoxyItemize}
+\item Reporters now print out the filters applied to test cases (\#1550, \#1585)
+\item Added {\ttfamily GENERATE\+\_\+\+COPY} and {\ttfamily GENERATE\+\_\+\+VAR} macros that can use variables inside the generator expression
+\begin{DoxyItemize}
+\item Because of the significant danger of lifetime issues, the default {\ttfamily GENERATE} macro still does not allow variables
+\end{DoxyItemize}
+\item The {\ttfamily map} generator helper now deduces the mapped return type (\#1576)
+\end{DoxyItemize}
+
+\doxysubsubsection*{Fixes}
+
+
+\begin{DoxyItemize}
+\item Fixed Obj\+C++ compilation (\#1571)
+\item Fixed test tag parsing so that {\ttfamily \mbox{[}.foo\mbox{]}} is now parsed as {\ttfamily \mbox{[}.\mbox{]}\mbox{[}foo\mbox{]}}.
+\item Suppressed warning caused by the Windows headers defining SE codes in different manners (\#1575)
+\end{DoxyItemize}
+
+\doxysubsection*{2.\+7.\+0}
+
+\doxysubsubsection*{Improvements}
+
+
+\begin{DoxyItemize}
+\item {\ttfamily TEMPLATE\+\_\+\+PRODUCT\+\_\+\+TEST\+\_\+\+CASE} now uses the resulting type in the name, instead of the serial number (\#1544)
+\item Catch2\textquotesingle{}s single header is now strictly \doxylink{struct_a_s_c_i_i}{ASCII} (\#1542)
+\item Added generator for random integral/floating point types
+\begin{DoxyItemize}
+\item The types are inferred within the {\ttfamily random} helper
+\end{DoxyItemize}
+\item Added back Range\+Generator (\#1526)
+\begin{DoxyItemize}
+\item Range\+Generator returns elements within a certain range
+\end{DoxyItemize}
+\item Added Chunk\+Generator generic transform (\#1538)
+\begin{DoxyItemize}
+\item \doxylink{struct_a}{A} Chunk\+Generator returns the elements from different generator in chunks of n elements
+\end{DoxyItemize}
+\item Added {\ttfamily UNSCOPED\+\_\+\+INFO} (\#415, \#983, \#1522)
+\begin{DoxyItemize}
+\item This is a variant of {\ttfamily INFO} that lives until next assertion/end of the test case.
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+\doxysubsubsection*{Fixes}
+
+
+\begin{DoxyItemize}
+\item All calls to C stdlib functions are now {\ttfamily std\+:\+:} qualified (\#1541)
+\begin{DoxyItemize}
+\item \doxylink{struct_code}{Code} brought in from Clara was also updated.
+\end{DoxyItemize}
+\item Running tests will no longer open the specified output file twice (\#1545)
+\begin{DoxyItemize}
+\item This would cause trouble when the file was not a file, but rather a named pipe
+\item Fixes the CLion/\+Resharper integration with \doxylink{namespace_catch}{Catch}
+\end{DoxyItemize}
+\item Fixed {\ttfamily -\/Wunreachable-\/code} occurring with (old) ccache+cmake+clang combination (\#1540)
+\item Fixed {\ttfamily -\/Wdefaulted-\/function-\/deleted} warning with Clang 8 (\#1537)
+\item Catch2\textquotesingle{}s type traits and helpers are now properly namespaced inside {\ttfamily \doxylink{namespace_catch}{Catch}\+:\+:} (\#1548)
+\item Fixed std\{out,err\} redirection for failing test (\#1514, \#1525)
+\begin{DoxyItemize}
+\item Somehow, this bug has been present for well over a year before it was reported
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+\doxysubsubsection*{Contrib}
+
+
+\begin{DoxyItemize}
+\item {\ttfamily Parse\+And\+Add\+Catch\+Tests} now properly escapes commas in the test name
+\end{DoxyItemize}
+
+\doxysubsection*{2.\+6.\+1}
+
+\doxysubsubsection*{Improvements}
+
+
+\begin{DoxyItemize}
+\item The JUnit reporter now also reports random seed (\#1520, \#1521)
+\end{DoxyItemize}
+
+\doxysubsubsection*{Fixes}
+
+
+\begin{DoxyItemize}
+\item The TAP reporter now formats comments with test name properly (\#1529)
+\item {\ttfamily CATCH\+\_\+\+REQUIRE\+\_\+\+THROWS}\textquotesingle{}s internals were unified with {\ttfamily REQUIRE\+\_\+\+THROWS} (\#1536)
+\begin{DoxyItemize}
+\item This fixes a potential {\ttfamily -\/Wunused-\/value} warning when used
+\end{DoxyItemize}
+\item Fixed a potential segfault when using any of the {\ttfamily -\/-\/list-\/\texorpdfstring{$\ast$}{*}} options (\#1533, \#1534)
+\end{DoxyItemize}
+
+\doxysubsection*{2.\+6.\+0}
+
+{\bfseries{With this release the data generator feature is now fully supported.}}
+
+\doxysubsubsection*{Improvements}
+
+
+\begin{DoxyItemize}
+\item Added {\ttfamily TEMPLATE\+\_\+\+PRODUCT\+\_\+\+TEST\+\_\+\+CASE} (\#1454, \#1468)
+\begin{DoxyItemize}
+\item This allows you to easily test various type combinations, see documentation for details
+\end{DoxyItemize}
+\item The error message for {\ttfamily \&\&} and {\ttfamily \texorpdfstring{$\vert$}{|}\texorpdfstring{$\vert$}{|}} inside assertions has been improved (\#1273, \#1480)
+\item The error message for chained comparisons inside assertions has been improved (\#1481)
+\item Added {\ttfamily String\+Maker} specialization for {\ttfamily std\+::optional} (\#1510)
+\item The generator interface has been redone once again (\#1516)
+\begin{DoxyItemize}
+\item It is no longer considered experimental and is fully supported
+\item The new interface supports "{}\+Input"{} generators
+\item The generator documentation has been fully updated
+\item We also added 2 generator examples
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+\doxysubsubsection*{Fixes}
+
+
+\begin{DoxyItemize}
+\item Fixed {\ttfamily -\/Wredundant-\/move} on newer Clang (\#1474)
+\item Removed unreachable mentions {\ttfamily std\+::current\+\_\+exception}, {\ttfamily std\+::rethrow\+\_\+exception} in no-\/exceptions mode (\#1462)
+\begin{DoxyItemize}
+\item This should fix compilation with IAR
+\end{DoxyItemize}
+\item Fixed missing {\ttfamily \texorpdfstring{$<$}{<}type\+\_\+traits\texorpdfstring{$>$}{>}} include (\#1494)
+\item Fixed various static analysis warnings
+\begin{DoxyItemize}
+\item Unrestored stream state in {\ttfamily Xml\+Writer} (\#1489)
+\item Potential division by zero in {\ttfamily estimate\+Clock\+Resolution} (\#1490)
+\item Uninitialized member in {\ttfamily Run\+Context} (\#1491)
+\item {\ttfamily Source\+Line\+Info} move ops are now marked {\ttfamily noexcept}
+\item {\ttfamily CATCH\+\_\+\+BREAK\+\_\+\+INTO\+\_\+\+DEBUGGER} is now always a function
+\end{DoxyItemize}
+\item Fix double run of a test case if user asks for a specific section (\#1394, \#1492)
+\item ANSI colour code output now respects {\ttfamily -\/o} flag and writes to the file as well (\#1502)
+\item Fixed detection of {\ttfamily std\+::variant} support for compilers other than Clang (\#1511)
+\end{DoxyItemize}
+
+\doxysubsubsection*{Contrib}
+
+
+\begin{DoxyItemize}
+\item {\ttfamily Parse\+And\+Add\+Catch\+Tests} has learned how to use {\ttfamily DISABLED} CTest property (\#1452)
+\item {\ttfamily Parse\+And\+Add\+Catch\+Tests} now works when there is a whitspace before the test name (\#1493)
+\end{DoxyItemize}
+
+\doxysubsubsection*{Miscellaneous}
+
+
+\begin{DoxyItemize}
+\item We added new issue templates for reporting issues on Git\+Hub
+\item {\ttfamily contributing.\+md} has been updated to reflect the current test status (\#1484)
+\end{DoxyItemize}
+
+\doxysubsection*{2.\+5.\+0}
+
+\doxysubsubsection*{Improvements}
+
+
+\begin{DoxyItemize}
+\item Added support for templated tests via {\ttfamily TEMPLATE\+\_\+\+TEST\+\_\+\+CASE} (\#1437)
+\end{DoxyItemize}
+
+\doxysubsubsection*{Fixes}
+
+
+\begin{DoxyItemize}
+\item Fixed compilation of {\ttfamily Predicate\+Matcher\texorpdfstring{$<$}{<}const char\texorpdfstring{$\ast$}{*}\texorpdfstring{$>$}{>}} by removing partial specialization of {\ttfamily Matcher\+Method\texorpdfstring{$<$}{<}T\texorpdfstring{$\ast$}{*}\texorpdfstring{$>$}{>}}
+\item Listeners now implicitly support any verbosity (\#1426)
+\item Fixed compilation with Embarcadero builder by introducing {\ttfamily \doxylink{namespace_catch_aff37796f0f578c2816f74267e641c5f7}{Catch\+::isnan}} polyfill (\#1438)
+\item Fixed {\ttfamily CAPTURE} asserting for non-\/trivial captures (\#1436, \#1448)
+\end{DoxyItemize}
+
+\doxysubsubsection*{Miscellaneous}
+
+
+\begin{DoxyItemize}
+\item We should now be providing first party Conan support via \href{https://bintray.com/catchorg/Catch2}{\texttt{ https\+://bintray.\+com/catchorg/\+Catch2}} (\#1443)
+\item Added new section "{}deprecations and planned changes"{} to the documentation
+\begin{DoxyItemize}
+\item It contains summary of what is deprecated and might change with next major version
+\end{DoxyItemize}
+\item From this release forward, the released headers should be pgp signed (\#430)
+\begin{DoxyItemize}
+\item Key\+ID {\ttfamily E29C 46F3 B8\+A7 5028 6079 3B7D ECC9 C20E 314\doxylink{namespace_b}{B} 2360}
+\item or \href{https://codingnest.com/files/horenmar-publickey.asc}{\texttt{ https\+://codingnest.\+com/files/horenmar-\/publickey.\+asc}}
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+\doxysubsection*{2.\+4.\+2}
+
+\doxysubsubsection*{Improvements}
+
+
+\begin{DoxyItemize}
+\item Xml\+Reporter now also outputs the RNG seed that was used in a run (\#1404)
+\item {\ttfamily \doxylink{class_catch_1_1_session_af890db02c69e36356ac9f8be4084c464}{Catch\+::\+Session\+::apply\+Command\+Line}} now also accepts {\ttfamily wchar\+\_\+t} arguments.
+\begin{DoxyItemize}
+\item However, Catch2 still does not support unicode.
+\end{DoxyItemize}
+\item Added {\ttfamily STATIC\+\_\+\+REQUIRE} macro (\#1356, \#1362)
+\item Catch2\textquotesingle{}s singleton\textquotesingle{}s are now cleaned up even if tests are run (\#1411)
+\begin{DoxyItemize}
+\item This is mostly useful as a FP prevention for users who define their own main.
+\end{DoxyItemize}
+\item Specifying an invalid reporter via {\ttfamily -\/r} is now reported sooner (\#1351, \#1422)
+\end{DoxyItemize}
+
+\doxysubsubsection*{Fixes}
+
+
+\begin{DoxyItemize}
+\item Stringification no longer assumes that {\ttfamily char} is signed (\#1399, \#1407)
+\begin{DoxyItemize}
+\item This caused a {\ttfamily Wtautological-\/compare} warning.
+\end{DoxyItemize}
+\item SFINAE for {\ttfamily operator\texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<}} no longer sees different overload set than the actual insertion (\#1403)
+\end{DoxyItemize}
+
+\doxysubsubsection*{Contrib}
+
+
+\begin{DoxyItemize}
+\item {\ttfamily catch\+\_\+discover\+\_\+tests} correctly adds tests with comma in name (\#1327, \#1409)
+\item Added a new customization point in how the tests are launched to {\ttfamily catch\+\_\+discover\+\_\+tests}
+\end{DoxyItemize}
+
+\doxysubsection*{2.\+4.\+1}
+
+\doxysubsubsection*{Improvements}
+
+
+\begin{DoxyItemize}
+\item Added a String\+Maker for {\ttfamily std\+:\+:(w)string\+\_\+view} (\#1375, \#1376)
+\item Added a String\+Maker for {\ttfamily std\+::variant} (\#1380)
+\begin{DoxyItemize}
+\item This one is disabled by default to avoid increased compile-\/time drag
+\end{DoxyItemize}
+\item Added detection for cygwin environment without {\ttfamily std\+::to\+\_\+string} (\#1396, \#1397)
+\end{DoxyItemize}
+
+\doxysubsubsection*{Fixes}
+
+
+\begin{DoxyItemize}
+\item {\ttfamily Unordered\+Equals\+Matcher} will no longer accept erroneously accept vectors that share suffix, but are not permutation of the desired vector
+\item Abort after ({\ttfamily -\/x N}) can no longer be overshot by nested {\ttfamily REQUIRES} and subsequently ignored (\#1391, \#1392)
+\end{DoxyItemize}
+
+\doxysubsection*{2.\+4.\+0}
+
+{\bfseries{This release brings two new experimental features, generator support and a {\ttfamily -\/fno-\/exceptions} support. Being experimental means that they will not be subject to the usual stability guarantees provided by semver.}}
+
+\doxysubsubsection*{Improvements}
+
+
+\begin{DoxyItemize}
+\item Various small runtime performance improvements
+\item {\ttfamily CAPTURE} macro is now variadic
+\item Added {\ttfamily AND\+\_\+\+GIVEN} macro (\#1360)
+\item Added experimental support for data generators
+\begin{DoxyItemize}
+\item See \doxysectlink{md_libraries_2sys-vm_2external_2_catch2_2docs_2generators}{their documentation}{0} for details
+\end{DoxyItemize}
+\item Added support for compiling and running \doxylink{namespace_catch}{Catch} without exceptions
+\begin{DoxyItemize}
+\item Doing so limits the functionality somewhat
+\item Look \href{configuration.md\#disablingexceptions}{\texttt{ into the documentation}} for details
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+\doxysubsubsection*{Fixes}
+
+
+\begin{DoxyItemize}
+\item Suppressed {\ttfamily -\/Wnon-\/virtual-\/dtor} warnings in Matchers (\#1357)
+\item Suppressed {\ttfamily -\/Wunreachable-\/code} warnings in floating point matchers (\#1350)
+\end{DoxyItemize}
+
+\doxysubsubsection*{CMake}
+
+
+\begin{DoxyItemize}
+\item It is now possible to override which Python is used to run \doxylink{namespace_catch}{Catch}\textquotesingle{}s tests (\#1365)
+\item \doxylink{namespace_catch}{Catch} now provides infrastructure for adding tests that check compile-\/time configuration
+\item \doxylink{namespace_catch}{Catch} no longer tries to install itself when used as a subproject (\#1373)
+\item Catch2\+Config\+Version.\+cmake is now generated as arch-\/independent (\#1368)
+\begin{DoxyItemize}
+\item This means that installing \doxylink{namespace_catch}{Catch} from 32-\/bit machine and copying it to 64-\/bit one works
+\item This fixes conan installation of \doxylink{namespace_catch}{Catch}
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+\doxysubsection*{2.\+3.\+0}
+
+{\bfseries{This release changes the include paths provided by our CMake and pkg-\/config integration. The proper include path for the single-\/header when using one of the above is now {\ttfamily \texorpdfstring{$<$}{<}\doxylink{single__include_2catch2_2catch_8hpp}{catch2/catch.\+hpp}\texorpdfstring{$>$}{>}}. This change also necessitated changes to paths inside the repository, so that the single-\/header version is now at {\ttfamily \doxylink{single__include_2catch2_2catch_8hpp}{single\+\_\+include/catch2/catch.\+hpp}}, rather than {\ttfamily single\+\_\+include/catch.\+hpp}.}}
+
+\doxysubsubsection*{Fixes}
+
+
+\begin{DoxyItemize}
+\item Fixed Objective-\/\+C++ build
+\item {\ttfamily -\/Wunused-\/variable} suppression no longer leaks from \doxylink{namespace_catch}{Catch}\textquotesingle{}s header under Clang
+\item Implementation of the experimental new output capture can now be disabled (\#1335)
+\begin{DoxyItemize}
+\item This allows building Catch2 on platforms that do not provide things like {\ttfamily dup} or {\ttfamily tmpfile}.
+\end{DoxyItemize}
+\item The JUnit and XML reporters will no longer skip over successful tests when running without {\ttfamily -\/s} (\#1264, \#1267, \#1310)
+\begin{DoxyItemize}
+\item See improvements for more details
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+\doxysubsubsection*{Improvements}
+
+
+\begin{DoxyItemize}
+\item pkg-\/config and CMake integration has been rewritten
+\begin{DoxyItemize}
+\item If you use them, the new include path is {\ttfamily \#include \texorpdfstring{$<$}{<}\doxylink{single__include_2catch2_2catch_8hpp}{catch2/catch.\+hpp}\texorpdfstring{$>$}{>}}
+\item CMake installation now also installs scripts from {\ttfamily contrib/}
+\item For details see the \href{cmake-integration.md\#top}{\texttt{ new documentation}}
+\end{DoxyItemize}
+\item Reporters now have a new customization point, {\ttfamily Reporter\+Preferences\+::should\+Report\+All\+Assertions}
+\begin{DoxyItemize}
+\item When this is set to {\ttfamily false} and the tests are run without {\ttfamily -\/s}, passing assertions are not sent to the reporter.
+\item Defaults to {\ttfamily false}.
+\end{DoxyItemize}
+\item Added {\ttfamily DYNAMIC\+\_\+\+SECTION}, a section variant that constructs its name using stream
+\begin{DoxyItemize}
+\item This means that you can do {\ttfamily DYNAMIC\+\_\+\+SECTION("{}\+For X \+:= "{} \texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<} x)}.
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+\doxysubsection*{2.\+2.\+3}
+
+{\bfseries{To fix some of the bugs, some behavior had to change in potentially breaking manner.}} {\bfseries{This means that even though this is a patch release, it might not be a drop-\/in replacement.}}
+
+\doxysubsubsection*{Fixes}
+
+
+\begin{DoxyItemize}
+\item Listeners are now called before reporter
+\begin{DoxyItemize}
+\item This was always documented to be the case, now it actually works that way
+\end{DoxyItemize}
+\item \doxylink{namespace_catch}{Catch}\textquotesingle{}s commandline will no longer accept multiple reporters
+\begin{DoxyItemize}
+\item This was done because multiple reporters never worked properly and broke things in non-\/obvious ways
+\item {\bfseries{This has potential to be a breaking change}}
+\end{DoxyItemize}
+\item Min\+GW is now detected as Windows platform w/o SEH support (\#1257)
+\begin{DoxyItemize}
+\item This means that Catch2 no longer tries to use POSIX signal handling when compiled with Min\+GW
+\end{DoxyItemize}
+\item Fixed potential UB in parsing tags using non-\/\+ASCII characters (\#1266)
+\begin{DoxyItemize}
+\item Note that Catch2 still supports only \doxylink{struct_a_s_c_i_i}{ASCII} test names/tags/etc
+\end{DoxyItemize}
+\item {\ttfamily TEST\+\_\+\+CASE\+\_\+\+METHOD} can now be used on classnames containing commas (\#1245)
+\begin{DoxyItemize}
+\item You have to enclose the classname in extra set of parentheses
+\end{DoxyItemize}
+\item Fixed insufficient alt stack size for POSIX signal handling (\#1225)
+\item Fixed compilation error on Android due to missing {\ttfamily std\+::to\+\_\+string} in C++11 mode (\#1280)
+\item Fixed the order of user-\/provided {\ttfamily FALLBACK\+\_\+\+STRINGIFIER} in stringification machinery (\#1024)
+\begin{DoxyItemize}
+\item It was intended to be replacement for built-\/in fallbacks, but it was used {\itshape after} them.
+\item {\bfseries{This has potential to be a breaking change}}
+\end{DoxyItemize}
+\item Fixed compilation error when a type has an {\ttfamily operator\texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<}} with templated lhs (\#1285, \#1306)
+\end{DoxyItemize}
+
+\doxysubsubsection*{Improvements}
+
+
+\begin{DoxyItemize}
+\item Added a new, experimental, output capture (\#1243)
+\begin{DoxyItemize}
+\item This capture can also redirect output written via C apis, e.\+g. {\ttfamily printf}
+\item To opt-\/in, define {\ttfamily CATCH\+\_\+\+CONFIG\+\_\+\+EXPERIMENTAL\+\_\+\+REDIRECT} in the implementation file
+\end{DoxyItemize}
+\item Added a new fallback stringifier for classes derived from {\ttfamily std\+::exception}
+\begin{DoxyItemize}
+\item Both {\ttfamily String\+Maker} specialization and {\ttfamily operator\texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<}} overload are given priority
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+\doxysubsubsection*{Miscellaneous}
+
+
+\begin{DoxyItemize}
+\item {\ttfamily contrib/} now contains dbg scripts that skip over \doxylink{namespace_catch}{Catch}\textquotesingle{}s internals (\#904, \#1283)
+\begin{DoxyItemize}
+\item {\ttfamily gdbinit} for gdb {\ttfamily lldbinit} for lldb
+\end{DoxyItemize}
+\item {\ttfamily Catch\+Add\+Tests.\+cmake} no longer strips whitespace from tests (\#1265, \#1281)
+\item Online documentation now describes {\ttfamily -\/-\/use-\/colour} option (\#1263)
+\end{DoxyItemize}
+
+\doxysubsection*{2.\+2.\+2}
+
+\doxysubsubsection*{Fixes}
+
+
+\begin{DoxyItemize}
+\item Fixed bug in {\ttfamily Within\+Abs\+::match()} failing spuriously (\#1228)
+\item Fixed clang-\/tidy diagnostic about virtual call in destructor (\#1226)
+\item Reduced the number of GCC warnings suppression leaking out of the header (\#1090, \#1091)
+\begin{DoxyItemize}
+\item Only {\ttfamily -\/Wparentheses} should be leaking now
+\end{DoxyItemize}
+\item Added upper bound on the time benchmark timer calibration is allowed to take (\#1237)
+\begin{DoxyItemize}
+\item On platforms where {\ttfamily std\+::chrono\+::high\+\_\+resolution\+\_\+clock}\textquotesingle{}s resolution is low, the calibration would appear stuck
+\end{DoxyItemize}
+\item Fixed compilation error when stringifying static arrays of {\ttfamily unsigned char}s (\#1238)
+\end{DoxyItemize}
+
+\doxysubsubsection*{Improvements}
+
+
+\begin{DoxyItemize}
+\item XML encoder now hex-\/encodes invalid UTF-\/8 sequences (\#1207)
+\begin{DoxyItemize}
+\item This affects xml and junit reporters
+\item Some invalid UTF-\/8 parts are left as is, e.\+g. surrogate pairs. This is because certain extensions of UTF-\/8 allow them, such as WTF-\/8.
+\end{DoxyItemize}
+\item CLR objects ({\ttfamily T\texorpdfstring{$^\wedge$}{\string^}}) can now be stringified (\#1216)
+\begin{DoxyItemize}
+\item This affects code compiled as C++/\+CLI
+\end{DoxyItemize}
+\item Added {\ttfamily Predicate\+Matcher}, a matcher that takes an arbitrary predicate function (\#1236)
+\begin{DoxyItemize}
+\item See \href{https://github.com/catchorg/Catch2/blob/master/docs/matchers.md}{\texttt{ documentation for details}}
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+\doxysubsubsection*{Others}
+
+
+\begin{DoxyItemize}
+\item Modified CMake-\/installed pkg-\/config to allow {\ttfamily \#include \texorpdfstring{$<$}{<}catch.\+hpp\texorpdfstring{$>$}{>}}(\#1239)
+\begin{DoxyItemize}
+\item The plans to standardize on {\ttfamily \#include \texorpdfstring{$<$}{<}\doxylink{single__include_2catch2_2catch_8hpp}{catch2/catch.\+hpp}\texorpdfstring{$>$}{>}} are still in effect
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+\doxysubsection*{2.\+2.\+1}
+
+\doxysubsubsection*{Fixes}
+
+
+\begin{DoxyItemize}
+\item Fixed compilation error when compiling Catch2 with {\ttfamily std=c++17} against libc++ (\#1214)
+\begin{DoxyItemize}
+\item Clara (Catch2\textquotesingle{}s \doxylink{namespace_c_l_i}{CLI} parsing library) used {\ttfamily std\+::optional} without including it explicitly
+\end{DoxyItemize}
+\item Fixed Catch2 return code always being 0 (\#1215)
+\begin{DoxyItemize}
+\item In the words of STL, "{}\+We feel superbad about letting this in"{}
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+\doxysubsection*{2.\+2.\+0}
+
+\doxysubsubsection*{Fixes}
+
+
+\begin{DoxyItemize}
+\item \doxylink{struct_hidden}{Hidden} tests are not listed by default when listing tests (\#1175)
+\begin{DoxyItemize}
+\item This makes {\ttfamily catch\+\_\+discover\+\_\+tests} CMake script work better
+\end{DoxyItemize}
+\item Fixed regression that meant {\ttfamily \texorpdfstring{$<$}{<}windows.\+h\texorpdfstring{$>$}{>}} could potentially not be included properly (\#1197)
+\item Fixed installing {\ttfamily Catch2\+Config\+Version.\+cmake} when Catch2 is a subproject.
+\end{DoxyItemize}
+
+\doxysubsubsection*{Improvements}
+
+
+\begin{DoxyItemize}
+\item Added an option to warn (+ exit with error) when no tests were ran (\#1158)
+\begin{DoxyItemize}
+\item Use as {\ttfamily -\/w No\+Tests}
+\end{DoxyItemize}
+\item Added provisional support for \doxylink{namespace_emscripten}{Emscripten} (\#1114)
+\item \href{https://github.com/catchorg/Catch2/blob/master/docs/configuration.md\#fallback-stringifier}{\texttt{ Added a way to override the fallback stringifier}} (\#1024)
+\begin{DoxyItemize}
+\item This allows project\textquotesingle{}s own stringification machinery to be easily reused for \doxylink{namespace_catch}{Catch}
+\end{DoxyItemize}
+\item {\ttfamily \doxylink{class_catch_1_1_session_a0232a6c37ad5b5064a2462eedf13a9be}{Catch\+::\+Session\+::run()}} now accepts {\ttfamily char const \texorpdfstring{$\ast$}{*} const \texorpdfstring{$\ast$}{*}}, allowing it to accept array of string literals (\#1031, \#1178)
+\begin{DoxyItemize}
+\item The embedded version of Clara was bumped to v1.\+1.\+3
+\end{DoxyItemize}
+\item Various minor performance improvements
+\item Added support for DJGPP DOS crosscompiler (\#1206)
+\end{DoxyItemize}
+
+\doxysubsection*{2.\+1.\+2}
+
+\doxysubsubsection*{Fixes}
+
+
+\begin{DoxyItemize}
+\item Fixed compilation error with {\ttfamily -\/fno-\/rtti} (\#1165)
+\item Fixed No\+Assertion warnings
+\item {\ttfamily operator\texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<}} is used before range-\/based stringification (\#1172)
+\item Fixed {\ttfamily -\/Wpedantic} warnings (extra semicolons and binary literals) (\#1173)
+\end{DoxyItemize}
+
+\doxysubsubsection*{Improvements}
+
+
+\begin{DoxyItemize}
+\item Added {\ttfamily CATCH\+\_\+\+VERSION\+\_\+\{MAJOR,MINOR,PATCH\}} macros (\#1131)
+\item Added {\ttfamily Bright\+Yellow} colour for use in reporters (\#979)
+\begin{DoxyItemize}
+\item It is also used by Console\+Reporter for reconstructed expressions
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+\doxysubsubsection*{Other changes}
+
+
+\begin{DoxyItemize}
+\item \doxylink{namespace_catch}{Catch} is now exported as a CMake package and linkable target (\#1170)
+\end{DoxyItemize}
+
+\doxysubsection*{2.\+1.\+1}
+
+\doxysubsubsection*{Improvements}
+
+
+\begin{DoxyItemize}
+\item Static arrays are now properly stringified like ranges across MSVC/\+GCC/\+Clang
+\item Embedded newer version of Clara -- v1.\+1.\+1
+\begin{DoxyItemize}
+\item This should fix some warnings dragged in from Clara
+\end{DoxyItemize}
+\item MSVC\textquotesingle{}s CLR exceptions are supported
+\end{DoxyItemize}
+
+\doxysubsubsection*{Fixes}
+
+
+\begin{DoxyItemize}
+\item Fixed compilation when comparison operators do not return bool (\#1147)
+\item Fixed CLR exceptions blowing up the executable during translation (\#1138)
+\end{DoxyItemize}
+
+\doxysubsubsection*{Other changes}
+
+
+\begin{DoxyItemize}
+\item Many CMake changes
+\begin{DoxyItemize}
+\item {\ttfamily NO\+\_\+\+SELFTEST} option is deprecated, use {\ttfamily BUILD\+\_\+\+TESTING} instead.
+\item \doxylink{namespace_catch}{Catch} specific CMake options were prefixed with {\ttfamily CATCH\+\_\+} for namespacing purposes
+\item Other changes to simplify Catch2\textquotesingle{}s packaging
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+\doxysubsection*{2.\+1.\+0}
+
+\doxysubsubsection*{Improvements}
+
+
+\begin{DoxyItemize}
+\item Various performance improvements
+\begin{DoxyItemize}
+\item On top of the performance regression fixes
+\end{DoxyItemize}
+\item Experimental support for PCH was added (\#1061)
+\item {\ttfamily CATCH\+\_\+\+CONFIG\+\_\+\+EXTERNAL\+\_\+\+INTERFACES} now brings in declarations of Console, Compact, XML and JUnit reporters
+\item {\ttfamily Matcher\+Base} no longer has a pointless second template argument
+\item Reduced the number of warning suppressions that leak into user\textquotesingle{}s code
+\begin{DoxyItemize}
+\item Bugs in g++ 4.\+x and 5.\+x mean that some of them have to be left in
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+\doxysubsubsection*{Fixes}
+
+
+\begin{DoxyItemize}
+\item Fixed performance regression from \doxylink{namespace_catch}{Catch} classic
+\begin{DoxyItemize}
+\item One of the performance improvement patches for \doxylink{namespace_catch}{Catch} classic was not applied to Catch2
+\end{DoxyItemize}
+\item Fixed platform detection for i\+OS (\#1084)
+\item Fixed compilation when {\ttfamily g++} is used together with {\ttfamily libc++} (\#1110)
+\item Fixed Team\+City reporter compilation with the single header version
+\begin{DoxyItemize}
+\item To fix the underlying issue we will be versioning reporters in single\+\_\+include folder per release
+\end{DoxyItemize}
+\item The XML reporter will now report {\ttfamily WARN} messages even when not used with {\ttfamily -\/s}
+\item Fixed compilation when {\ttfamily Vector\+Contains} matcher was combined using {\ttfamily \&\&} (\#1092)
+\item Fixed test duration overflowing after 10 seconds (\#1125, \#1129)
+\item Fixed {\ttfamily std\+::uncaught\+\_\+exception} deprecation warning (\#1124)
+\end{DoxyItemize}
+
+\doxysubsubsection*{New features}
+
+
+\begin{DoxyItemize}
+\item New Matchers
+\begin{DoxyItemize}
+\item Regex matcher for strings, {\ttfamily Matches}.
+\item Set-\/equal matcher for vectors, {\ttfamily Unordered\+Equals}
+\item Floating point matchers, {\ttfamily Within\+Abs} and {\ttfamily Within\+ULP}.
+\end{DoxyItemize}
+\item Stringification now attempts to decompose all containers (\#606)
+\begin{DoxyItemize}
+\item Containers are objects that respond to ADL {\ttfamily begin(\+T)} and {\ttfamily end(\+T)}.
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+\doxysubsubsection*{Other changes}
+
+
+\begin{DoxyItemize}
+\item Reporters will now be versioned in the {\ttfamily single\+\_\+include} folder to ensure their compatibility with the last released version
+\end{DoxyItemize}
+
+\doxysubsection*{2.\+0.\+1}
+
+\doxysubsubsection*{Breaking changes}
+
+
+\begin{DoxyItemize}
+\item Removed C++98 support
+\item Removed legacy reporter support
+\item Removed legacy generator support
+\begin{DoxyItemize}
+\item Generator support will come back later, reworked
+\end{DoxyItemize}
+\item Removed {\ttfamily Catch\+::to\+String} support
+\begin{DoxyItemize}
+\item The new stringification machinery uses {\ttfamily \doxylink{struct_catch_1_1_string_maker}{Catch\+::\+String\+Maker}} specializations first and {\ttfamily operator\texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<}} overloads second.
+\end{DoxyItemize}
+\item Removed legacy {\ttfamily SCOPED\+\_\+\+MSG} and {\ttfamily SCOPED\+\_\+\+INFO} macros
+\item Removed {\ttfamily INTERNAL\+\_\+\+CATCH\+\_\+\+REGISTER\+\_\+\+REPORTER}
+\begin{DoxyItemize}
+\item {\ttfamily CATCH\+\_\+\+REGISTER\+\_\+\+REPORTER} should be used to register reporters
+\end{DoxyItemize}
+\item Removed legacy {\ttfamily \mbox{[}hide\mbox{]}} tag
+\begin{DoxyItemize}
+\item {\ttfamily \mbox{[}.\mbox{]}}, {\ttfamily \mbox{[}.foo\mbox{]}} and {\ttfamily \mbox{[}!hide\mbox{]}} are still supported
+\end{DoxyItemize}
+\item Output into debugger is now colourized
+\item {\ttfamily \texorpdfstring{$\ast$}{*}\+\_\+\+THROWS\+\_\+\+AS(expr, exception\+\_\+type)} now unconditionally appends {\ttfamily const\&} to the exception type.
+\item {\ttfamily CATCH\+\_\+\+CONFIG\+\_\+\+FAST\+\_\+\+COMPILE} now affects the {\ttfamily CHECK\+\_\+} family of assertions as well as {\ttfamily REQUIRE\+\_\+} family of assertions
+\begin{DoxyItemize}
+\item This is most noticeable in {\ttfamily \doxylink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK(throws())}}, which would previously report failure, properly stringify the exception and continue. Now it will report failure and stop executing current section.
+\end{DoxyItemize}
+\item Removed deprecated matcher utility functions {\ttfamily Not}, {\ttfamily All\+Of} and {\ttfamily Any\+Of}.
+\begin{DoxyItemize}
+\item They are superseded by operators {\ttfamily !}, {\ttfamily \&\&} and {\ttfamily \texorpdfstring{$\vert$}{|}\texorpdfstring{$\vert$}{|}}, which are natural and do not have limited arity
+\end{DoxyItemize}
+\item Removed support for non-\/const comparison operators
+\begin{DoxyItemize}
+\item Non-\/const comparison operators are an abomination that should not exist
+\item They were breaking support for comparing function to function pointer
+\end{DoxyItemize}
+\item {\ttfamily std\+::pair} and {\ttfamily std\+::tuple} are no longer stringified by default
+\begin{DoxyItemize}
+\item This is done to avoid dragging in {\ttfamily \texorpdfstring{$<$}{<}tuple\texorpdfstring{$>$}{>}} and {\ttfamily \texorpdfstring{$<$}{<}utility\texorpdfstring{$>$}{>}} headers in common path
+\item Their stringification can be enabled per-\/file via new configuration macros
+\end{DoxyItemize}
+\item {\ttfamily Approx} is subtly different and hopefully behaves more as users would expect
+\begin{DoxyItemize}
+\item {\ttfamily Approx\+::scale} defaults to {\ttfamily 0.\+0}
+\item {\ttfamily Approx\+::epsilon} no longer applies to the larger of the two compared values, but only to the {\ttfamily Approx}\textquotesingle{}s value
+\item {\ttfamily INFINITY == Approx(\+INFINITY)} returns true
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+\doxysubsubsection*{Improvements}
+
+
+\begin{DoxyItemize}
+\item Reporters and Listeners can be defined in files different from the main file
+\begin{DoxyItemize}
+\item The file has to define {\ttfamily CATCH\+\_\+\+CONFIG\+\_\+\+EXTERNAL\+\_\+\+INTERFACES} before including catch.\+hpp.
+\end{DoxyItemize}
+\item \doxylink{namespace_errors}{Errors} that happen during set up before main are now caught and properly reported once main is entered
+\begin{DoxyItemize}
+\item If you are providing your own main, you can access and use these as well.
+\end{DoxyItemize}
+\item New assertion macros, \texorpdfstring{$\ast$}{*}\+\_\+\+THROWS\+\_\+\+MATCHES(expr, exception\+\_\+type, matcher) are provided
+\begin{DoxyItemize}
+\item As the arguments suggest, these allow you to assert that an expression throws desired type of exception and pass the exception to a matcher.
+\end{DoxyItemize}
+\item JUnit reporter no longer has significantly different output for test cases with and without sections
+\item Most assertions now support expressions containing commas (ie {\ttfamily REQUIRE(\doxylink{structfoo}{foo()} == std\+::vector\texorpdfstring{$<$}{<}int\texorpdfstring{$>$}{>}\{1, 2, 3\});})
+\item \doxylink{namespace_catch}{Catch} now contains experimental micro benchmarking support
+\begin{DoxyItemize}
+\item See {\ttfamily projects/\+Self\+Test/\+Benchmark.\+tests.\+cpp} for examples
+\item The support being experiment means that it can be changed without prior notice
+\end{DoxyItemize}
+\item \doxylink{namespace_catch}{Catch} uses new \doxylink{namespace_c_l_i}{CLI} parsing library (Clara)
+\begin{DoxyItemize}
+\item Users can now easily add new command line options to the final executable
+\item This also leads to some changes in {\ttfamily \doxylink{class_catch_1_1_session}{Catch\+::\+Session}} interface
+\end{DoxyItemize}
+\item All parts of matchers can be removed from a TU by defining {\ttfamily CATCH\+\_\+\+CONFIG\+\_\+\+DISABLE\+\_\+\+MATCHERS}
+\begin{DoxyItemize}
+\item This can be used to somewhat speed up compilation times
+\end{DoxyItemize}
+\item An experimental implementation of {\ttfamily CATCH\+\_\+\+CONFIG\+\_\+\+DISABLE} has been added
+\begin{DoxyItemize}
+\item Inspired by Doctest\textquotesingle{}s {\ttfamily DOCTEST\+\_\+\+CONFIG\+\_\+\+DISABLE}
+\item Useful for implementing tests in source files
+\begin{DoxyItemize}
+\item ie for functions in anonymous namespaces
+\end{DoxyItemize}
+\item Removes all assertions
+\item Prevents {\ttfamily TEST\+\_\+\+CASE} registrations
+\item Exception translators are not registered
+\item Reporters are not registered
+\item Listeners are not registered
+\end{DoxyItemize}
+\item Reporters/\+Listeners are now notified of fatal errors
+\begin{DoxyItemize}
+\item This means specific signals or structured exceptions
+\item The Reporter/\+Listener interface provides default, empty, implementation to preserve backward compatibility
+\end{DoxyItemize}
+\item Stringification of {\ttfamily std\+::chrono\+::duration} and {\ttfamily std\+::chrono\+::time\+\_\+point} is now supported
+\begin{DoxyItemize}
+\item Needs to be enabled by a per-\/file compile time configuration option
+\end{DoxyItemize}
+\item Add {\ttfamily pkg-\/config} support to CMake install command
+\end{DoxyItemize}
+
+\doxysubsubsection*{Fixes}
+
+
+\begin{DoxyItemize}
+\item Don\textquotesingle{}t use console colour if running in XCode
+\item Explicit constructor in reporter base class
+\item Swept out {\ttfamily -\/Wweak-\/vtables}, {\ttfamily -\/Wexit-\/time-\/destructors}, {\ttfamily -\/Wglobal-\/constructors} warnings
+\item Compilation for Universal Windows \doxylink{namespace_platform}{Platform} (UWP) is supported
+\begin{DoxyItemize}
+\item SEH handling and colorized output are disabled when compiling for UWP
+\end{DoxyItemize}
+\item Implemented a workaround for {\ttfamily std\+::uncaught\+\_\+exception} issues in libcxxrt
+\begin{DoxyItemize}
+\item These issues caused incorrect section traversals
+\item The workaround is only partial, user\textquotesingle{}s test can still trigger the issue by using {\ttfamily throw;} to rethrow an exception
+\end{DoxyItemize}
+\item Suppressed C4061 warning under MSVC
+\end{DoxyItemize}
+
+\doxysubsubsection*{Internal changes}
+
+
+\begin{DoxyItemize}
+\item The development version now uses .cpp files instead of header files containing implementation.
+\begin{DoxyItemize}
+\item This makes partial rebuilds much faster during development
+\end{DoxyItemize}
+\item The expression decomposition layer has been rewritten
+\item The evaluation layer has been rewritten
+\item New library (Text\+Flow) is used for formatting text to output
+\end{DoxyItemize}
+
+\doxysubsection*{Older versions}
+
+\doxysubsubsection*{1.\+12.\+x}
+
+\doxysubsubsubsection*{1.\+12.\+2}
+
+\doxysubsubsubsubsection*{Fixes}
+
+
+\begin{DoxyItemize}
+\item Fixed missing $<$cassert$>$ include
+\end{DoxyItemize}
+
+\doxysubsubsubsection*{1.\+12.\+1}
+
+\doxysubsubsubsubsection*{Fixes}
+
+
+\begin{DoxyItemize}
+\item Fixed deprecation warning in {\ttfamily Scoped\+Message\+::\texorpdfstring{$\sim$}{\string~}\+Scoped\+Message}
+\item All uses of {\ttfamily min} or {\ttfamily max} identifiers are now wrapped in parentheses
+\begin{DoxyItemize}
+\item This avoids problems when Windows headers define {\ttfamily min} and {\ttfamily max} macros
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+\doxysubsubsubsection*{1.\+12.\+0}
+
+\doxysubsubsubsubsection*{Fixes}
+
+
+\begin{DoxyItemize}
+\item Fixed compilation for strict C++98 mode (ie not gnu++98) and older compilers (\#1103)
+\item {\ttfamily INFO} messages are included in the {\ttfamily xml} reporter output even without {\ttfamily -\/s} specified.
+\end{DoxyItemize}
+
+\doxysubsubsection*{1.\+11.\+x}
+
+\doxysubsubsubsection*{1.\+11.\+0}
+
+\doxysubsubsubsubsection*{Fixes}
+
+
+\begin{DoxyItemize}
+\item The original expression in {\ttfamily \doxylink{include_2catch_8hpp_ada5065594bafc152162761ace47c1dcb}{REQUIRE\+\_\+\+FALSE( expr )}} is now reporter properly as {\ttfamily !( expr )} (\#1051)
+\begin{DoxyItemize}
+\item Previously the parentheses were missing and {\ttfamily x != y} would be expanded as {\ttfamily !x != x}
+\end{DoxyItemize}
+\item {\ttfamily Approx\+::\+Margin} is now inclusive (\#952)
+\begin{DoxyItemize}
+\item Previously it was meant and documented as inclusive, but the check itself wasn\textquotesingle{}t
+\item This means that {\ttfamily REQUIRE( 0.\+25f == Approx( 0.\+0f ).margin( 0.\+25f ) )} passes, instead of fails
+\end{DoxyItemize}
+\item {\ttfamily Random\+Number\+Generator\+::result\+\_\+type} is now unsigned (\#1050)
+\end{DoxyItemize}
+
+\doxysubsubsubsubsection*{Improvements}
+
+
+\begin{DoxyItemize}
+\item {\ttfamily \+\_\+\+\_\+\+JETBRAINS\+\_\+\+IDE\+\_\+\+\_\+} macro handling is now CLion version specific (\#1017)
+\begin{DoxyItemize}
+\item When CLion 2017.\+3 or newer is detected, {\ttfamily \+\_\+\+\_\+\+COUNTER\+\_\+\+\_\+} is used instead of
+\end{DoxyItemize}
+\item Team\+City reporter now explicitly flushes output stream after each report (\#1057)
+\begin{DoxyItemize}
+\item On some platforms, output from redirected streams would show up only after the tests finished running
+\end{DoxyItemize}
+\item {\ttfamily Parse\+And\+Add\+Catch\+Tests} now can add test files as dependency to CMake configuration
+\begin{DoxyItemize}
+\item This means you do not have to manually rerun CMake configuration step to detect new tests
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+\doxysubsubsection*{1.\+10.\+x}
+
+\doxysubsubsubsection*{1.\+10.\+0}
+
+\doxysubsubsubsubsection*{Fixes}
+
+
+\begin{DoxyItemize}
+\item Evaluation layer has been rewritten (backported from \doxylink{namespace_catch}{Catch} 2)
+\begin{DoxyItemize}
+\item The new layer is much simpler and fixes some issues (\#981)
+\end{DoxyItemize}
+\item Implemented workaround for VS 2017 raw string literal stringification bug (\#995)
+\item Fixed interaction between {\ttfamily \mbox{[}!shouldfail\mbox{]}} and {\ttfamily \mbox{[}!mayfail\mbox{]}} tags and sections
+\begin{DoxyItemize}
+\item Previously sections with failing assertions would be marked as failed, not failed-\/but-\/ok
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+\doxysubsubsubsubsection*{Improvements}
+
+
+\begin{DoxyItemize}
+\item Added \href{https://github.com/janwilmans/LibIdentify}{\texttt{ libidentify}} support
+\item Added "{}wait-\/for-\/keypress"{} option
+\end{DoxyItemize}
+
+\doxysubsubsection*{1.\+9.\+x}
+
+\doxysubsubsubsection*{1.\+9.\+6}
+
+\doxysubsubsubsubsection*{Improvements}
+
+
+\begin{DoxyItemize}
+\item \doxylink{namespace_catch}{Catch}\textquotesingle{}s runtime overhead has been significantly decreased (\#937, \#939)
+\item Added {\ttfamily -\/-\/list-\/extra-\/info} cli option (\#934).
+\begin{DoxyItemize}
+\item It lists all tests together with extra information, ie filename, line number and description.
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+\doxysubsubsubsection*{1.\+9.\+5}
+
+\doxysubsubsubsubsection*{Fixes}
+
+
+\begin{DoxyItemize}
+\item Truthy expressions are now reconstructed properly, not as booleans (\#914)
+\item Various warnings are no longer erroneously suppressed in test files (files that include {\ttfamily catch.\+hpp}, but do not define {\ttfamily CATCH\+\_\+\+CONFIG\+\_\+\+MAIN} or {\ttfamily CATCH\+\_\+\+CONFIG\+\_\+\+RUNNER}) (\#871)
+\item \doxylink{namespace_catch}{Catch} no longer fails to link when main is compiled as C++, but linked against Objective-\/C (\#855)
+\item Fixed incorrect gcc version detection when deciding to use {\ttfamily \+\_\+\+\_\+\+COUNTER\+\_\+\+\_\+} (\#928)
+\begin{DoxyItemize}
+\item Previously any GCC with minor version less than 3 would be incorrectly classified as not supporting {\ttfamily \+\_\+\+\_\+\+COUNTER\+\_\+\+\_\+}.
+\end{DoxyItemize}
+\item Suppressed C4996 warning caused by upcoming updated to MSVC 2017, marking {\ttfamily std\+::uncaught\+\_\+exception} as deprecated. (\#927)
+\end{DoxyItemize}
+
+\doxysubsubsubsubsection*{Improvements}
+
+
+\begin{DoxyItemize}
+\item CMake integration script now incorporates debug messages and registers tests in an improved way (\#911)
+\item Various documentation improvements
+\end{DoxyItemize}
+
+\doxysubsubsubsection*{1.\+9.\+4}
+
+\doxysubsubsubsubsection*{Fixes}
+
+
+\begin{DoxyItemize}
+\item {\ttfamily CATCH\+\_\+\+FAIL} macro no longer causes compilation error without variadic macro support
+\item {\ttfamily INFO} messages are no longer cleared after being reported once
+\end{DoxyItemize}
+
+\doxysubsubsubsubsection*{Improvements and minor changes}
+
+
+\begin{DoxyItemize}
+\item \doxylink{namespace_catch}{Catch} now uses {\ttfamily wmain} when compiled under Windows and {\ttfamily UNICODE} is defined.
+\begin{DoxyItemize}
+\item Note that \doxylink{namespace_catch}{Catch} still officially supports only \doxylink{struct_a_s_c_i_i}{ASCII}
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+\doxysubsubsubsection*{1.\+9.\+3}
+
+\doxysubsubsubsubsection*{Fixes}
+
+
+\begin{DoxyItemize}
+\item Completed the fix for (lack of) uint64\+\_\+t in earlier Visual Studios
+\end{DoxyItemize}
+
+\doxysubsubsubsection*{1.\+9.\+2}
+
+\doxysubsubsubsubsection*{Improvements and minor changes}
+
+
+\begin{DoxyItemize}
+\item All of {\ttfamily Approx}\textquotesingle{}s member functions now accept strong typedefs in C++11 mode (\#888)
+\begin{DoxyItemize}
+\item Previously {\ttfamily Approx\+::scale}, {\ttfamily Approx\+::epsilon}, {\ttfamily Approx\+::margin} and {\ttfamily Approx\+::operator()} didn\textquotesingle{}t.
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+\doxysubsubsubsubsection*{Fixes}
+
+
+\begin{DoxyItemize}
+\item POSIX signals are now disabled by default under QNX (\#889)
+\begin{DoxyItemize}
+\item QNX does not support current enough (2001) POSIX specification
+\end{DoxyItemize}
+\item JUnit no longer counts exceptions as failures if given test case is marked as ok to fail.
+\item {\ttfamily \doxylink{class_catch_1_1_option}{Catch\+::\+Option}} should now have its storage properly aligned.
+\item \doxylink{namespace_catch}{Catch} no longer attempts to define {\ttfamily uint64\+\_\+t} on windows (\#862)
+\begin{DoxyItemize}
+\item This was causing trouble when compiled under Cygwin
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+\doxysubsubsubsubsection*{Other}
+
+
+\begin{DoxyItemize}
+\item \doxylink{namespace_catch}{Catch} is now compiled under MSVC 2017 using {\ttfamily std\+:c++latest} (C++17 mode) in CI
+\item We now provide cmake script that autoregisters \doxylink{namespace_catch}{Catch} tests into ctest.
+\begin{DoxyItemize}
+\item See {\ttfamily contrib} folder.
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+\doxysubsubsubsection*{1.\+9.\+1}
+
+\doxysubsubsubsubsection*{Fixes}
+
+
+\begin{DoxyItemize}
+\item Unexpected exceptions are no longer ignored by default (\#885, \#887)
+\end{DoxyItemize}
+
+\doxysubsubsubsection*{1.\+9.\+0}
+
+\doxysubsubsubsubsection*{Improvements and minor changes}
+
+
+\begin{DoxyItemize}
+\item \doxylink{namespace_catch}{Catch} no longer attempts to ensure the exception type passed by user in {\ttfamily REQUIRE\+\_\+\+THROWS\+\_\+\+AS} is a constant reference.
+\begin{DoxyItemize}
+\item It was causing trouble when {\ttfamily REQUIRE\+\_\+\+THROWS\+\_\+\+AS} was used inside templated functions
+\item This actually reverts changes made in v1.\+7.\+2
+\end{DoxyItemize}
+\item \doxylink{namespace_catch}{Catch}\textquotesingle{}s {\ttfamily Version} struct should no longer be double freed when multiple instances of \doxylink{namespace_catch}{Catch} tests are loaded into single program (\#858)
+\begin{DoxyItemize}
+\item It is now a static variable in an inline function instead of being an {\ttfamily extern}ed struct.
+\end{DoxyItemize}
+\item Attempt to register invalid tag or tag alias now throws instead of calling {\ttfamily exit()}.
+\begin{DoxyItemize}
+\item Because this happen before entering main, it still aborts execution
+\item Further improvements to this are coming
+\end{DoxyItemize}
+\item {\ttfamily CATCH\+\_\+\+CONFIG\+\_\+\+FAST\+\_\+\+COMPILE} now speeds-\/up compilation of {\ttfamily REQUIRE\texorpdfstring{$\ast$}{*}} assertions by further \texorpdfstring{$\sim$}{\string~}15\%.
+\begin{DoxyItemize}
+\item The trade-\/off is disabling translation of unexpected exceptions into text.
+\end{DoxyItemize}
+\item When \doxylink{namespace_catch}{Catch} is compiled using C++11, {\ttfamily Approx} is now constructible with anything that can be explicitly converted to {\ttfamily double}.
+\item Captured messages are now printed on unexpected exceptions
+\end{DoxyItemize}
+
+\doxysubsubsubsubsection*{Fixes\+:}
+
+
+\begin{DoxyItemize}
+\item Clang\textquotesingle{}s {\ttfamily -\/Wexit-\/time-\/destructors} should be suppressed for \doxylink{namespace_catch}{Catch}\textquotesingle{}s internals
+\item GCC\textquotesingle{}s {\ttfamily -\/Wparentheses} is now suppressed for all TU\textquotesingle{}s that include {\ttfamily catch.\+hpp}.
+\begin{DoxyItemize}
+\item This is functionally a revert of changes made in 1.\+8.\+0, where we tried using {\ttfamily \+\_\+\+Pragma} based suppression. This should have kept the suppression local to \doxylink{namespace_catch}{Catch}\textquotesingle{}s assertions, but bugs in GCC\textquotesingle{}s handling of {\ttfamily \+\_\+\+Pragma}s in C++ mode meant that it did not always work.
+\end{DoxyItemize}
+\item You can now tell \doxylink{namespace_catch}{Catch} to use C++11-\/based check when checking whether a type can be streamed to output.
+\begin{DoxyItemize}
+\item This fixes cases when an unstreamable type has streamable private base (\#877)
+\item \href{configuration.md\#catch_config_cpp11_stream_insertable_check}{\texttt{ Details can be found in documentation}}
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+\doxysubsubsubsubsection*{Other notes\+:}
+
+
+\begin{DoxyItemize}
+\item We have added VS 2017 to our CI
+\item Work on \doxylink{namespace_catch}{Catch} 2 should start soon
+\end{DoxyItemize}
+
+\doxysubsubsection*{1.\+8.\+x}
+
+\doxysubsubsubsection*{1.\+8.\+2}
+
+\doxysubsubsubsubsection*{Improvements and minor changes}
+
+
+\begin{DoxyItemize}
+\item TAP reporter now behaves as if {\ttfamily -\/s} was always set
+\begin{DoxyItemize}
+\item This should be more consistent with the protocol desired behaviour.
+\end{DoxyItemize}
+\item Compact reporter now obeys {\ttfamily -\/d yes} argument (\#780)
+\begin{DoxyItemize}
+\item The format is "{}\+XXX.\+123 s\+: $<$section-\/name$>$"{} (3 decimal places are always present).
+\item Before it did not report the durations at all.
+\end{DoxyItemize}
+\item XML reporter now behaves the same way as Console reporter in regards to {\ttfamily INFO}
+\begin{DoxyItemize}
+\item This means it reports {\ttfamily INFO} messages on success, if output on success ({\ttfamily -\/s}) is enabled.
+\item Previously it only reported {\ttfamily INFO} messages on failure.
+\end{DoxyItemize}
+\item {\ttfamily \doxylink{include_2catch_8hpp_aaf9fe43c53965ff8d94bbd522fd1fd7a}{CAPTURE(expr)}} now stringifies {\ttfamily expr} in the same way assertion macros do (\#639)
+\item Listeners are now finally \href{event-listeners.md\#top}{\texttt{ documented}}.
+\begin{DoxyItemize}
+\item Listeners provide a way to hook into events generated by running your tests, including start and end of run, every test case, every section and every assertion.
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+\doxysubsubsubsubsection*{Fixes\+:}
+
+
+\begin{DoxyItemize}
+\item \doxylink{namespace_catch}{Catch} no longer attempts to reconstruct expression that led to a fatal error (\#810)
+\begin{DoxyItemize}
+\item This fixes possible signal/\+SEH loop when processing expressions, where the signal was triggered by expression decomposition.
+\end{DoxyItemize}
+\item Fixed (C4265) missing virtual destructor warning in Matchers (\#844)
+\item {\ttfamily std\+::string}s are now taken by {\ttfamily const\&} everywhere (\#842).
+\begin{DoxyItemize}
+\item Previously some places were taking them by-\/value.
+\end{DoxyItemize}
+\item \doxylink{namespace_catch}{Catch} should no longer change errno (\#835).
+\begin{DoxyItemize}
+\item This was caused by libstdc++ bug that we now work around.
+\end{DoxyItemize}
+\item \doxylink{namespace_catch}{Catch} now provides {\ttfamily \doxylink{include_2catch_8hpp_a3c2341a3238242fdc02d33a1968bd1d2}{FAIL\+\_\+\+CHECK( ... )}} macro (\#765).
+\begin{DoxyItemize}
+\item Same as {\ttfamily \doxylink{gtest_8h_a3e26a8d27caa386ed0ea7ce9d5b7c4ed}{FAIL( ... )}}, but does not abort the test.
+\end{DoxyItemize}
+\item Functions like {\ttfamily fabs}, {\ttfamily tolower}, {\ttfamily memset}, {\ttfamily isalnum} are now used with {\ttfamily std\+:\+:} qualification (\#543).
+\item Clara no longer assumes first argument (binary name) is always present (\#729)
+\begin{DoxyItemize}
+\item If it is missing, empty string is used as default.
+\end{DoxyItemize}
+\item Clara no longer reads 1 character past argument string (\#830)
+\item Regression in Objective-\/C bindings (Matchers) fixed (\#854)
+\end{DoxyItemize}
+
+\doxysubsubsubsubsection*{Other notes\+:}
+
+
+\begin{DoxyItemize}
+\item We have added VS 2013 and 2015 to our CI
+\item \doxylink{namespace_catch}{Catch} Classic (1.\+x.\+x) now contains its own, forked, version of Clara (the argument parser).
+\end{DoxyItemize}
+
+\doxysubsubsubsection*{1.\+8.\+1}
+
+\doxysubsubsubsubsection*{Fixes}
+
+Cygwin issue with {\ttfamily gettimeofday} -\/ {\ttfamily \#define} was not early enough
+
+\doxysubsubsubsection*{1.\+8.\+0}
+
+\doxysubsubsubsubsection*{New features/ minor changes}
+
+
+\begin{DoxyItemize}
+\item Matchers have new, simpler (and documented) interface.
+\begin{DoxyItemize}
+\item \doxylink{namespace_catch}{Catch} provides string and vector matchers.
+\item For details see \href{matchers.md\#top}{\texttt{ Matchers documentation}}.
+\end{DoxyItemize}
+\item Changed console reporter test duration reporting format (\#322)
+\begin{DoxyItemize}
+\item Old format\+: {\ttfamily Some simple comparisons between doubles completed in 0.\+000123s}
+\item New format\+: {\ttfamily xxx.\+123s\+: Some simple comparisons between doubles} {\itshape (There will always be exactly 3 decimal places)}
+\end{DoxyItemize}
+\item Added opt-\/in leak detection under MSVC + Windows (\#439)
+\begin{DoxyItemize}
+\item Enable it by compiling \doxylink{namespace_catch}{Catch}\textquotesingle{}s main with {\ttfamily CATCH\+\_\+\+CONFIG\+\_\+\+WINDOWS\+\_\+\+CRTDBG}
+\end{DoxyItemize}
+\item Introduced new compile-\/time flag, {\ttfamily CATCH\+\_\+\+CONFIG\+\_\+\+FAST\+\_\+\+COMPILE}, trading features for compilation speed.
+\begin{DoxyItemize}
+\item Moves debug breaks out of tests and into implementation, speeding up test compilation time (\texorpdfstring{$\sim$}{\string~}10\% on linux).
+\item {\itshape More changes are coming}
+\end{DoxyItemize}
+\item Added \href{https://testanything.org/}{\texttt{ TAP (Test Anything Protocol)}} and \href{https://www.gnu.org/software/automake/manual/html_node/Log-files-generation-and-test-results-recording.html\#Log-files-generation-and-test-results-recording}{\texttt{ Automake}} reporters.
+\begin{DoxyItemize}
+\item These are not present in the default single-\/include header and need to be downloaded from Git\+Hub separately.
+\item For details see \href{build-systems.md\#top}{\texttt{ documentation about integrating with build systems}}.
+\end{DoxyItemize}
+\item XML reporter now reports filename as part of the {\ttfamily Section} and {\ttfamily Test\+Case} tags.
+\item {\ttfamily Approx} now supports an optional margin of absolute error
+\begin{DoxyItemize}
+\item It has also received \href{assertions.md\#top}{\texttt{ new documentation}}.
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+\doxysubsubsubsubsection*{Fixes}
+
+
+\begin{DoxyItemize}
+\item Silenced C4312 ("{}conversion from int to \textquotesingle{}\+Class\+Name \texorpdfstring{$\ast$}{*}"{}) warnings in the evaluate layer.
+\item Fixed C4512 ("{}assignment operator could not be generated"{}) warnings under VS2013.
+\item Cygwin compatibility fixes
+\begin{DoxyItemize}
+\item Signal handling is no longer compiled by default.
+\item Usage of {\ttfamily gettimeofday} inside \doxylink{namespace_catch}{Catch} should no longer cause compilation errors.
+\end{DoxyItemize}
+\item Improved {\ttfamily -\/Wparentheses} suppression for gcc (\#674)
+\begin{DoxyItemize}
+\item When compiled with gcc 4.\+8 or newer, the suppression is localized to assertions only
+\item Otherwise it is suppressed for the whole TU
+\end{DoxyItemize}
+\item Fixed test spec parser issue (with escapes in multiple names)
+\end{DoxyItemize}
+
+\doxysubsubsubsubsection*{Other}
+
+
+\begin{DoxyItemize}
+\item Various documentation fixes and improvements
+\end{DoxyItemize}
+
+\doxysubsubsection*{1.\+7.\+x}
+
+\doxysubsubsubsection*{1.\+7.\+2}
+
+\doxysubsubsubsubsection*{Fixes and minor improvements}
+
+Xml\+:
+
+(technically the first two are breaking changes but are also fixes and arguably break few if any people)
+\begin{DoxyItemize}
+\item C-\/escape control characters instead of XML encoding them (which requires XML 1.\+1)
+\item Revert XML output to XML 1.\+0
+\item Can provide stylesheet references by extending the XML reporter
+\item Added description and tags attributes to XML Reporter
+\item Tags are closed and the stream flushed more eagerly to avoid stdout interpolation
+\end{DoxyItemize}
+
+Other\+:
+\begin{DoxyItemize}
+\item {\ttfamily REQUIRE\+\_\+\+THROWS\+\_\+\+AS} now catches exception by {\ttfamily const\&} and reports expected type
+\item In {\ttfamily SECTION}s the file/ line is now of the {\ttfamily SECTION}. not the {\ttfamily TEST\+\_\+\+CASE}
+\item Added std\+:\+: qualification to some functions from C stdlib
+\item Removed use of RTTI ({\ttfamily dynamic\+\_\+cast}) that had crept back in
+\item Silenced a few more warnings in different circumstances
+\item Travis improvements
+\end{DoxyItemize}
+
+\doxysubsubsubsection*{1.\+7.\+1}
+
+\doxysubsubsubsubsection*{Fixes\+:}
+
+
+\begin{DoxyItemize}
+\item Fixed inconsistency in defining {\ttfamily NOMINMAX} and {\ttfamily WIN32\+\_\+\+LEAN\+\_\+\+AND\+\_\+\+MEAN} inside {\ttfamily catch.\+hpp}.
+\item Fixed SEH-\/related compilation error under older Min\+GW compilers, by making Windows SEH handling opt-\/in for compilers other than MSVC.
+\begin{DoxyItemize}
+\item For specifics, look into the \href{configuration.md\#top}{\texttt{ documentation}}.
+\end{DoxyItemize}
+\item Fixed compilation error under Min\+GW caused by improper compiler detection.
+\item Fixed XML reporter sometimes leaving an empty output file when a test ends with signal/structured exception.
+\item Fixed XML reporter not reporting captured stdout/stderr.
+\item Fixed possible infinite recursion in Windows SEH.
+\item Fixed possible compilation error caused by \doxylink{namespace_catch}{Catch}\textquotesingle{}s operator overloads being ambiguous in regards to user-\/defined templated operators.
+\end{DoxyItemize}
+
+\doxysubsubsubsection*{1.\+7.\+0}
+
+\doxysubsubsubsubsection*{Features/ Changes\+:}
+
+
+\begin{DoxyItemize}
+\item \doxylink{namespace_catch}{Catch} now runs significantly faster for passing tests
+\begin{DoxyItemize}
+\item Microbenchmark focused on \doxylink{namespace_catch}{Catch}\textquotesingle{}s overhead went from \texorpdfstring{$\sim$}{\string~}3.4s to \texorpdfstring{$\sim$}{\string~}0.7s.
+\item Real world test using \href{https://github.com/nlohmann/json}{\texttt{ JSON for Modern C++}}\textquotesingle{}s test suite went from \texorpdfstring{$\sim$}{\string~}6m 25s to \texorpdfstring{$\sim$}{\string~}4m 14s.
+\end{DoxyItemize}
+\item \doxylink{namespace_catch}{Catch} can now run specific sections within test cases.
+\begin{DoxyItemize}
+\item For now the support is only basic (no wildcards or tags), for details see the \href{command-line.md\#top}{\texttt{ documentation}}.
+\end{DoxyItemize}
+\item \doxylink{namespace_catch}{Catch} now supports SEH on Windows as well as signals on Linux.
+\begin{DoxyItemize}
+\item After receiving a signal, \doxylink{namespace_catch}{Catch} reports failing assertion and then passes the signal onto the previous handler.
+\end{DoxyItemize}
+\item Approx can be used to compare values against strong typedefs (available in C++11 mode only).
+\begin{DoxyItemize}
+\item Strong typedefs mean types that are explicitly convertible to double.
+\end{DoxyItemize}
+\item CHECK macro no longer stops executing section if an exception happens.
+\item Certain characters (space, tab, etc) are now pretty printed.
+\begin{DoxyItemize}
+\item This means that a `char c = ' \textquotesingle{}; REQUIRE(c == \textquotesingle{}\textbackslash{}t\textquotesingle{});{\ttfamily would be printed as}\textquotesingle{} \textquotesingle{} == \textquotesingle{}\textbackslash{}t\textquotesingle{}{\ttfamily , instead of} == 9\`{}.
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+\doxysubsubsubsubsection*{Fixes\+:}
+
+
+\begin{DoxyItemize}
+\item Text formatting no longer attempts to access out-\/of-\/bounds characters under certain conditions.
+\item THROW family of assertions no longer trigger {\ttfamily -\/Wunused-\/value} on expressions containing explicit cast.
+\item Breaking into debugger under OS X works again and no longer required {\ttfamily DEBUG} to be defined.
+\item Compilation no longer breaks under certain compiler if a lambda is used inside assertion macro.
+\end{DoxyItemize}
+
+\doxysubsubsubsubsection*{Other\+:}
+
+
+\begin{DoxyItemize}
+\item \doxylink{namespace_catch}{Catch}\textquotesingle{}s CMake\+Lists now defines install command.
+\item \doxylink{namespace_catch}{Catch}\textquotesingle{}s CMake\+Lists now generates projects with warnings enabled.
+\end{DoxyItemize}
+
+\doxysubsubsection*{1.\+6.\+x}
+
+\doxysubsubsubsection*{1.\+6.\+1}
+
+\doxysubsubsubsubsection*{Features/ Changes\+:}
+
+
+\begin{DoxyItemize}
+\item \doxylink{namespace_catch}{Catch} now supports breaking into debugger on Linux
+\end{DoxyItemize}
+
+\doxysubsubsubsubsection*{Fixes\+:}
+
+
+\begin{DoxyItemize}
+\item Generators no longer leak memory (generators are still unsupported in general)
+\item JUnit reporter now reports UTC timestamps, instead of "{}tbd"{}
+\item {\ttfamily CHECK\+\_\+\+THAT} macro is now properly defined as {\ttfamily CATCH\+\_\+\+CHECK\+\_\+\+THAT} when using {\ttfamily CATCH\+\_\+} prefixed macros
+\end{DoxyItemize}
+
+\doxysubsubsubsubsection*{Other\+:}
+
+
+\begin{DoxyItemize}
+\item Types with overloaded {\ttfamily \&\&} operator are no longer evaluated twice when used in an assertion macro.
+\item The use of {\ttfamily \+\_\+\+\_\+\+COUNTER\+\_\+\+\_\+} is suppressed when \doxylink{namespace_catch}{Catch} is parsed by CLion
+\begin{DoxyItemize}
+\item This change is not active when compiling a binary
+\end{DoxyItemize}
+\item Approval tests can now be run on Windows
+\item CMake will now warn if a file is present in the {\ttfamily include} folder but not is not enumerated as part of the project
+\item \doxylink{namespace_catch}{Catch} now defines {\ttfamily NOMINMAX} and {\ttfamily WIN32\+\_\+\+LEAN\+\_\+\+AND\+\_\+\+MEAN} before including {\ttfamily windows.\+h}
+\begin{DoxyItemize}
+\item This can be disabled if needed, see \href{configuration.md\#top}{\texttt{ documentation}} for details.
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+\doxysubsubsubsection*{1.\+6.\+0}
+
+\doxysubsubsubsubsection*{Cmake/ projects\+:}
+
+
+\begin{DoxyItemize}
+\item Moved CMake\+Lists.\+txt to root, made it friendlier for CLion and generating XCode and VS projects, and removed the manually maintained XCode and VS projects.
+\end{DoxyItemize}
+
+\doxysubsubsubsubsection*{Features/ Changes\+:}
+
+
+\begin{DoxyItemize}
+\item Approx now supports {\ttfamily \texorpdfstring{$>$}{>}=} and {\ttfamily \texorpdfstring{$<$}{<}=}
+\item Can now use {\ttfamily \textbackslash{}} to escape chars in test names on command line
+\item Standardize C++11 feature toggles
+\end{DoxyItemize}
+
+\doxysubsubsubsubsection*{Fixes\+:}
+
+
+\begin{DoxyItemize}
+\item Blue shell colour
+\item Missing argument to {\ttfamily CATCH\+\_\+\+CHECK\+\_\+\+THROWS}
+\item Don\textquotesingle{}t encode extended \doxylink{struct_a_s_c_i_i}{ASCII} in XML
+\item use {\ttfamily std\+::shuffle} on more compilers (fixes deprecation warning/error)
+\item Use {\ttfamily \+\_\+\+\_\+\+COUNTER\+\_\+\+\_\+} more consistently (where available)
+\end{DoxyItemize}
+
+\doxysubsubsubsubsection*{Other\+:}
+
+
+\begin{DoxyItemize}
+\item Tweaks and changes to scripts -\/ particularly for Approval test -\/ to make them more portable
+\end{DoxyItemize}
+
+\doxysubsection*{Even Older versions}
+
+Release notes were not maintained prior to v1.\+6.\+0, but you should be able to work them out from the Git history
+
+\DoxyHorRuler{0}
+
+
+\href{Readme.md\#top}{\texttt{ Home}} 

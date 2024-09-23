@@ -1,0 +1,74 @@
+\doxysection{unregproxy\+\_\+subcommand Struct Reference}
+\hypertarget{structunregproxy__subcommand}{}\label{structunregproxy__subcommand}\index{unregproxy\_subcommand@{unregproxy\_subcommand}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structunregproxy__subcommand_a377c1391b9536c1371dd13426e99d25d}{unregproxy\+\_\+subcommand}} (\mbox{\hyperlink{class_c_l_i_1_1_app}{CLI\+::\+App}} \texorpdfstring{$\ast$}{*}action\+Root)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structunregproxy__subcommand_a3302649df13486dd8226c98cd9faa2fc}{proxy}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01771}{1771}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structunregproxy__subcommand_a377c1391b9536c1371dd13426e99d25d}\index{unregproxy\_subcommand@{unregproxy\_subcommand}!unregproxy\_subcommand@{unregproxy\_subcommand}}
+\index{unregproxy\_subcommand@{unregproxy\_subcommand}!unregproxy\_subcommand@{unregproxy\_subcommand}}
+\doxysubsubsection{\texorpdfstring{unregproxy\_subcommand()}{unregproxy\_subcommand()}}
+{\footnotesize\ttfamily \label{structunregproxy__subcommand_a377c1391b9536c1371dd13426e99d25d} 
+unregproxy\+\_\+subcommand\+::unregproxy\+\_\+subcommand (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_c_l_i_1_1_app}{CLI\+::\+App}} \texorpdfstring{$\ast$}{*}}]{action\+Root}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01774}{1774}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01774\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01775\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ unregister\_proxy\ =\ actionRoot-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_a8b461d2233ec4121259011b5ed24b336}{add\_subcommand}}(\textcolor{stringliteral}{"{}unregproxy"{}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}Unregister\ an\ account\ as\ a\ proxy\ (for\ voting)"{}}));}
+\DoxyCodeLine{01776\ \ \ \ \ \ \ unregister\_proxy-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_a8c812d42c7720ecb5cd0aec41b5aa941}{add\_option}}(\textcolor{stringliteral}{"{}proxy"{}},\ \mbox{\hyperlink{structunregproxy__subcommand_a3302649df13486dd8226c98cd9faa2fc}{proxy}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}The\ proxy\ account\ to\ unregister"{}}))-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a}{required}}();}
+\DoxyCodeLine{01777\ \ \ \ \ \ \ \mbox{\hyperlink{programs_2clio_2main_8cpp_aa5d53f41b83b5323c73622fbbb15e9cd}{add\_standard\_transaction\_options}}(unregister\_proxy,\ \textcolor{stringliteral}{"{}proxy@active"{}});}
+\DoxyCodeLine{01778\ }
+\DoxyCodeLine{01779\ \ \ \ \ \ \ unregister\_proxy-\/>callback([\textcolor{keyword}{this}]\ \{}
+\DoxyCodeLine{01780\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}\ act\_payload\ =\ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}()}
+\DoxyCodeLine{01781\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}proxy"{}},\ \mbox{\hyperlink{structunregproxy__subcommand_a3302649df13486dd8226c98cd9faa2fc}{proxy}})}
+\DoxyCodeLine{01782\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}isproxy"{}},\ \textcolor{keyword}{false});}
+\DoxyCodeLine{01783\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ accountPermissions\ =\ \mbox{\hyperlink{programs_2clio_2main_8cpp_a2b91ca5dbe7cc4ab287d0e44c3037552}{get\_account\_permissions}}(\mbox{\hyperlink{programs_2clio_2main_8cpp_ad552924cb151dcd5b60c73856d1ff706}{tx\_permission}},\ \{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(\mbox{\hyperlink{structunregproxy__subcommand_a3302649df13486dd8226c98cd9faa2fc}{proxy}}),\ config::active\_name\});}
+\DoxyCodeLine{01784\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{programs_2clio_2main_8cpp_aaf784434864a29e4835be7465173d1ab}{send\_actions}}(\{\mbox{\hyperlink{programs_2clio_2main_8cpp_a067e20df5f65333b0c3cf5840bc37dea}{create\_action}}(accountPermissions,\ config::system\_account\_name,\ \textcolor{stringliteral}{"{}regproxy"{}}\_n,\ act\_payload)\});}
+\DoxyCodeLine{01785\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{01786\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structunregproxy__subcommand_a377c1391b9536c1371dd13426e99d25d_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structunregproxy__subcommand_a3302649df13486dd8226c98cd9faa2fc}\index{unregproxy\_subcommand@{unregproxy\_subcommand}!proxy@{proxy}}
+\index{proxy@{proxy}!unregproxy\_subcommand@{unregproxy\_subcommand}}
+\doxysubsubsection{\texorpdfstring{proxy}{proxy}}
+{\footnotesize\ttfamily \label{structunregproxy__subcommand_a3302649df13486dd8226c98cd9faa2fc} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} unregproxy\+\_\+subcommand\+::proxy}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01772}{1772}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+programs/clio/\mbox{\hyperlink{programs_2clio_2main_8cpp}{main.\+cpp}}\end{DoxyCompactItemize}

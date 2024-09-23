@@ -1,0 +1,69 @@
+\doxysection{hmac.\+hpp}
+\hypertarget{hmac_8hpp_source}{}\label{hmac_8hpp_source}\index{libraries/fc/include/fc/crypto/hmac.hpp@{libraries/fc/include/fc/crypto/hmac.hpp}}
+\mbox{\hyperlink{hmac_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00001}00001\ \textcolor{comment}{/*\ }}
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00002}00002\ \textcolor{comment}{\ *\ File:\ \ \ hmac.hpp}}
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00003}00003\ \textcolor{comment}{\ *\ Author:\ Peter\ Conrad}}
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00004}00004\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00005}00005\ \textcolor{comment}{\ *\ Created\ on\ 1.\ Juli\ 2015,\ 21:48}}
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00006}00006\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00008}00008\ \textcolor{preprocessor}{\#ifndef\ HMAC\_HPP}}
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00009}00009\ \textcolor{preprocessor}{\#define\ HMAC\_HPP}}
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00011}00011\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{sha224_8hpp}{fc/crypto/sha224.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00012}00012\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{sha256_8hpp}{fc/crypto/sha256.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00013}00013\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{sha512_8hpp}{fc/crypto/sha512.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00015}00015\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}\ \{}
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00017}00017\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ H>}
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00018}\mbox{\hyperlink{classfc_1_1hmac}{00018}}\ \ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classfc_1_1hmac}{hmac}}}
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00019}00019\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00020}00020\ \ \ \ \ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00021}\mbox{\hyperlink{classfc_1_1hmac_ad05dc89e24eabf7bbf8f8d076c95c744}{00021}}\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1hmac_ad05dc89e24eabf7bbf8f8d076c95c744}{hmac}}()\ \{\}}
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00023}\mbox{\hyperlink{classfc_1_1hmac_ae7f854720f2cbd191888ab47b0fe9983}{00023}}\ \ \ \ \ \ \ \ \ \ \ \ \ H\ \mbox{\hyperlink{classfc_1_1hmac_ae7f854720f2cbd191888ab47b0fe9983}{digest}}(\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ c,\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ c\_len,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ d,\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ d\_len\ )}
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00024}00024\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00025}00025\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ encoder.reset();}
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00026}00026\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ add\_key(c,\ c\_len,\ 0x36);}
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00027}00027\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ encoder.write(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}},\ d\_len\ );}
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00028}00028\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ H\ intermediate\ =\ encoder.result();}
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00030}00030\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ encoder.reset();}
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00031}00031\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ add\_key(c,\ c\_len,\ 0x5c);}
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00032}00032\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ encoder.write(\ intermediate.data(),\ intermediate.data\_size()\ );}
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00033}00033\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ encoder.result();}
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00034}00034\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00036}00036\ \ \ \ \ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00037}00037\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ add\_key(\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ c,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ c\_len,\ \textcolor{keywordtype}{char}\ pad\ )}
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00038}00038\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00039}00039\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ c\_len\ >\ internal\_block\_size()\ )}
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00040}00040\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00041}00041\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ H\ hash\ =\ H::hash(\ c,\ c\_len\ );}
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00042}00042\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ add\_key(\ hash.data(),\ hash.data\_size(),\ pad\ );}
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00043}00043\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00044}00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00045}00045\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ internal\_block\_size();\ i++\ )}
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00046}00046\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00047}00047\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ encoder.put(\ pad\ \string^\ ((i\ <\ c\_len)\ ?\ *c++\ :\ 0)\ );}
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00051}00051\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ internal\_block\_size()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00052}00052\ }
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \ \ \ H\ dummy;}
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typename}\ H::encoder\ encoder;}
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00055}00055\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00057}\mbox{\hyperlink{namespacefc_a9613d15e9a53e421a260a92769c1acfb}{00057}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classfc_1_1hmac}{hmac<fc::sha224>}}\ \mbox{\hyperlink{namespacefc_a9613d15e9a53e421a260a92769c1acfb}{hmac\_sha224}};}
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00058}\mbox{\hyperlink{namespacefc_a9b621124067e1f4c8f3dcdce8afa150d}{00058}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classfc_1_1hmac}{hmac<fc::sha256>}}\ \mbox{\hyperlink{namespacefc_a9b621124067e1f4c8f3dcdce8afa150d}{hmac\_sha256}};}
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00059}\mbox{\hyperlink{namespacefc_a4faeb3fdc0252035fbd10ea94b230f35}{00059}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classfc_1_1hmac}{hmac<fc::sha512>}}\ \mbox{\hyperlink{namespacefc_a4faeb3fdc0252035fbd10ea94b230f35}{hmac\_sha512}};}
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00060}00060\ \}}
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00062}00062\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{/*\ HMAC\_HPP\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{\Hypertarget{hmac_8hpp_source_l00063}00063\ }
+
+\end{DoxyCode}

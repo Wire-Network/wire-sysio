@@ -1,0 +1,16 @@
+<map id="websocketpp::processor::hybi13::validate_incoming_extended_header" name="websocketpp::processor::hybi13::validate_incoming_extended_header">
+<area shape="rect" id="Node000001" title="Validate an incoming extended header." alt="" coords="5,31,185,87"/>
+<area shape="rect" id="Node000002" href="$namespacewebsocketpp_1_1frame.html#a2ceb63e6a2fe19964d13363ba2bb9e15" title="Extracts the raw payload length specified in the basic header." alt="" coords="420,5,559,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="185,49,405,30,405,35,186,54"/>
+<area shape="rect" id="Node000003" href="$namespacewebsocketpp_1_1frame.html#a2ca0b9ba6077f201997da543d45b067f" title="Extract the full payload size field from a WebSocket header." alt="" coords="233,67,372,107"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="185,68,217,73,216,78,185,74"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="366,64,410,49,412,54,368,69"/>
+<area shape="rect" id="Node000004" href="$namespacewebsocketpp_1_1frame.html#a5ae0cc87ac44bb78c5dc41983c43a0c4" title="Extract the extended size field from an extended header." alt="" coords="420,71,559,111"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="372,86,405,87,404,92,372,91"/>
+<area shape="rect" id="Node000005" href="$namespacewebsocketpp_1_1frame.html#ac55b672bcd3baf4c5a074816f6eb035b" title="Extract the jumbo size field from an extended header." alt="" coords="420,136,559,177"/>
+<area shape="poly" id="edge5_Node000003_Node000005" title=" " alt="" coords="361,105,420,128,418,133,359,110"/>
+<area shape="rect" id="Node000006" href="$namespacewebsocketpp_1_1lib_1_1net.html#ae2011914840da1dcbcac7266213a8709" title="Convert 64 bit value to host byte order." alt="" coords="607,136,753,177"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="560,154,592,154,592,159,560,159"/>
+<area shape="rect" id="Node000007" href="$namespacewebsocketpp_1_1lib_1_1net.html#ab3e62ef8d23c6e35b1d726fa1fa1c537" title="Convert 64 bit value to network byte order." alt="" coords="801,136,946,177"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="753,154,785,154,785,159,753,159"/>
+</map>

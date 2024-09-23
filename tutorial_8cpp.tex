@@ -1,0 +1,178 @@
+\doxysection{libraries/fc/include/fc/crypto/webauthn\+\_\+json/example/tutorial/tutorial.cpp File Reference}
+\hypertarget{tutorial_8cpp}{}\label{tutorial_8cpp}\index{libraries/fc/include/fc/crypto/webauthn\_json/example/tutorial/tutorial.cpp@{libraries/fc/include/fc/crypto/webauthn\_json/example/tutorial/tutorial.cpp}}
+{\ttfamily \#include "{}rapidjson/document.\+h"{}}\newline
+{\ttfamily \#include "{}rapidjson/prettywriter.\+h"{}}\newline
+{\ttfamily \#include $<$cstdio$>$}\newline
+Include dependency graph for tutorial.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{tutorial_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{tutorial_8cpp_a81ce304348a420752ee080480d2b3095}{main}} (int, char \texorpdfstring{$\ast$}{*}\mbox{[}$\,$\mbox{]})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{tutorial_8cpp_a81ce304348a420752ee080480d2b3095}\index{tutorial.cpp@{tutorial.cpp}!main@{main}}
+\index{main@{main}!tutorial.cpp@{tutorial.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{tutorial_8cpp_a81ce304348a420752ee080480d2b3095} 
+int main (\begin{DoxyParamCaption}\item[{int}]{}{, }\item[{char \texorpdfstring{$\ast$}{*}}]{}{\mbox{[}$\,$\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{tutorial_8cpp_source_l00011}{11}} of file \mbox{\hyperlink{tutorial_8cpp_source}{tutorial.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00011\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00013\ \ \ \ \ \textcolor{comment}{//\ 1.\ Parse\ a\ JSON\ text\ string\ to\ a\ document.}}
+\DoxyCodeLine{00014\ }
+\DoxyCodeLine{00015\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ json[]\ =\ \textcolor{stringliteral}{"{}\ \{\ \(\backslash\)"{}hello\(\backslash\)"{}\ :\ \(\backslash\)"{}world\(\backslash\)"{},\ \(\backslash\)"{}t\(\backslash\)"{}\ :\ true\ ,\ \(\backslash\)"{}f\(\backslash\)"{}\ :\ false,\ \(\backslash\)"{}n\(\backslash\)"{}:\ null,\ \(\backslash\)"{}i\(\backslash\)"{}:123,\ \(\backslash\)"{}pi\(\backslash\)"{}:\ 3.1416,\ \(\backslash\)"{}a\(\backslash\)"{}:[1,\ 2,\ 3,\ 4]\ \}\ "{}};}
+\DoxyCodeLine{00016\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Original\ JSON:\(\backslash\)n\ \%s\(\backslash\)n"{}},\ json);}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \ \ \ \ \mbox{\hyperlink{class_generic_document}{Document}}\ document;\ \ \textcolor{comment}{//\ Default\ template\ parameter\ uses\ UTF8\ and\ MemoryPoolAllocator.}}
+\DoxyCodeLine{00019\ }
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#if\ 0}}
+\DoxyCodeLine{00021\ \ \ \ \ \textcolor{comment}{//\ "{}normal"{}\ parsing,\ decode\ strings\ to\ new\ buffers.\ Can\ use\ other\ input\ stream\ via\ ParseStream().}}
+\DoxyCodeLine{00022\ \ \ \ \ \textcolor{keywordflow}{if}\ (document.\mbox{\hyperlink{class_generic_document_a901db1678f99a1b550003eed75bc380a}{Parse}}(json).\mbox{\hyperlink{class_generic_document_a510a0588db4eb372f5d81bc3646578fb}{HasParseError}}())}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00025\ \ \ \ \ \textcolor{comment}{//\ In-\/situ\ parsing,\ decode\ strings\ directly\ in\ the\ source\ string.\ Source\ must\ be\ string.}}
+\DoxyCodeLine{00026\ \ \ \ \ \textcolor{keywordtype}{char}\ buffer[\textcolor{keyword}{sizeof}(json)];}
+\DoxyCodeLine{00027\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(buffer,\ json,\ \textcolor{keyword}{sizeof}(json));}
+\DoxyCodeLine{00028\ \ \ \ \ \textcolor{keywordflow}{if}\ (document.\mbox{\hyperlink{class_generic_document_a13f68b1896a24eea4cdbc03a3916225f}{ParseInsitu}}(buffer).\mbox{\hyperlink{class_generic_document_a510a0588db4eb372f5d81bc3646578fb}{HasParseError}}())}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{00030\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00031\ }
+\DoxyCodeLine{00032\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\(\backslash\)nParsing\ to\ document\ succeeded.\(\backslash\)n"{}});}
+\DoxyCodeLine{00033\ }
+\DoxyCodeLine{00035\ \ \ \ \ \textcolor{comment}{//\ 2.\ Access\ values\ in\ document.\ }}
+\DoxyCodeLine{00036\ }
+\DoxyCodeLine{00037\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\(\backslash\)nAccess\ values\ in\ document:\(\backslash\)n"{}});}
+\DoxyCodeLine{00038\ \ \ \ \ assert(document.IsObject());\ \ \ \ \textcolor{comment}{//\ Document\ is\ a\ JSON\ value\ represents\ the\ root\ of\ DOM.\ Root\ can\ be\ either\ an\ object\ or\ array.}}
+\DoxyCodeLine{00039\ }
+\DoxyCodeLine{00040\ \ \ \ \ assert(document.HasMember(\textcolor{stringliteral}{"{}hello"{}}));}
+\DoxyCodeLine{00041\ \ \ \ \ assert(document[\textcolor{stringliteral}{"{}hello"{}}].IsString());}
+\DoxyCodeLine{00042\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}hello\ =\ \%s\(\backslash\)n"{}},\ document[\textcolor{stringliteral}{"{}hello"{}}].GetString());}
+\DoxyCodeLine{00043\ }
+\DoxyCodeLine{00044\ \ \ \ \ \textcolor{comment}{//\ Since\ version\ 0.2,\ you\ can\ use\ single\ lookup\ to\ check\ the\ existing\ of\ member\ and\ its\ value:}}
+\DoxyCodeLine{00045\ \ \ \ \ \mbox{\hyperlink{class_generic_member_iterator}{Value::MemberIterator}}\ hello\ =\ document.FindMember(\textcolor{stringliteral}{"{}hello"{}});}
+\DoxyCodeLine{00046\ \ \ \ \ assert(hello\ !=\ document.MemberEnd());}
+\DoxyCodeLine{00047\ \ \ \ \ assert(hello-\/>value.IsString());}
+\DoxyCodeLine{00048\ \ \ \ \ assert(strcmp(\textcolor{stringliteral}{"{}world"{}},\ hello-\/>value.GetString())\ ==\ 0);}
+\DoxyCodeLine{00049\ \ \ \ \ (void)hello;}
+\DoxyCodeLine{00050\ }
+\DoxyCodeLine{00051\ \ \ \ \ assert(document[\textcolor{stringliteral}{"{}t"{}}].IsBool());\ \ \ \ \ \textcolor{comment}{//\ JSON\ true/false\ are\ bool.\ Can\ also\ uses\ more\ specific\ function\ IsTrue().}}
+\DoxyCodeLine{00052\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}t\ =\ \%s\(\backslash\)n"{}},\ document[\textcolor{stringliteral}{"{}t"{}}].GetBool()\ ?\ \textcolor{stringliteral}{"{}true"{}}\ :\ \textcolor{stringliteral}{"{}false"{}});}
+\DoxyCodeLine{00053\ }
+\DoxyCodeLine{00054\ \ \ \ \ assert(document[\textcolor{stringliteral}{"{}f"{}}].IsBool());}
+\DoxyCodeLine{00055\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}f\ =\ \%s\(\backslash\)n"{}},\ document[\textcolor{stringliteral}{"{}f"{}}].GetBool()\ ?\ \textcolor{stringliteral}{"{}true"{}}\ :\ \textcolor{stringliteral}{"{}false"{}});}
+\DoxyCodeLine{00056\ }
+\DoxyCodeLine{00057\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}n\ =\ \%s\(\backslash\)n"{}},\ document[\textcolor{stringliteral}{"{}n"{}}].IsNull()\ ?\ \textcolor{stringliteral}{"{}null"{}}\ :\ \textcolor{stringliteral}{"{}?"{}});}
+\DoxyCodeLine{00058\ }
+\DoxyCodeLine{00059\ \ \ \ \ assert(document[\textcolor{stringliteral}{"{}i"{}}].IsNumber());\ \ \ \textcolor{comment}{//\ Number\ is\ a\ JSON\ type,\ but\ C++\ needs\ more\ specific\ type.}}
+\DoxyCodeLine{00060\ \ \ \ \ assert(document[\textcolor{stringliteral}{"{}i"{}}].IsInt());\ \ \ \ \ \ \textcolor{comment}{//\ In\ this\ case,\ IsUint()/IsInt64()/IsUInt64()\ also\ return\ true.}}
+\DoxyCodeLine{00061\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}i\ =\ \%d\(\backslash\)n"{}},\ document[\textcolor{stringliteral}{"{}i"{}}].GetInt());\ \textcolor{comment}{//\ Alternative\ (int)document["{}i"{}]}}
+\DoxyCodeLine{00062\ }
+\DoxyCodeLine{00063\ \ \ \ \ assert(document[\textcolor{stringliteral}{"{}pi"{}}].IsNumber());}
+\DoxyCodeLine{00064\ \ \ \ \ assert(document[\textcolor{stringliteral}{"{}pi"{}}].IsDouble());}
+\DoxyCodeLine{00065\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}pi\ =\ \%g\(\backslash\)n"{}},\ document[\textcolor{stringliteral}{"{}pi"{}}].GetDouble());}
+\DoxyCodeLine{00066\ }
+\DoxyCodeLine{00067\ \ \ \ \ \{}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_generic_value}{Value}}\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ =\ document[\textcolor{stringliteral}{"{}a"{}}];\ \textcolor{comment}{//\ Using\ a\ reference\ for\ consecutive\ access\ is\ handy\ and\ faster.}}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ assert(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.IsArray());}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.Size();\ i++)\ \textcolor{comment}{//\ rapidjson\ uses\ SizeType\ instead\ of\ size\_t.}}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}a[\%d]\ =\ \%d\(\backslash\)n"{}},\ i,\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}[i].GetInt());}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacefc_ab199a7c94624123911206db59ebe45da}{y}}\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}[0].GetInt();}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ (void)y;}
+\DoxyCodeLine{00075\ }
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Iterating\ array\ with\ iterators}}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}a\ =\ "{}});}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{class_generic_value}{Value::ConstValueIterator}}\ itr\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.Begin();\ itr\ !=\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.End();\ ++itr)}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\%d\ "{}},\ itr-\/>GetInt());}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{00081\ \ \ \ \ \}}
+\DoxyCodeLine{00082\ }
+\DoxyCodeLine{00083\ \ \ \ \ \textcolor{comment}{//\ Iterating\ object\ members}}
+\DoxyCodeLine{00084\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ kTypeNames[]\ =\ \{\ \textcolor{stringliteral}{"{}Null"{}},\ \textcolor{stringliteral}{"{}False"{}},\ \textcolor{stringliteral}{"{}True"{}},\ \textcolor{stringliteral}{"{}Object"{}},\ \textcolor{stringliteral}{"{}Array"{}},\ \textcolor{stringliteral}{"{}String"{}},\ \textcolor{stringliteral}{"{}Number"{}}\ \};}
+\DoxyCodeLine{00085\ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{class_generic_member_iterator}{Value::ConstMemberIterator}}\ itr\ =\ document.MemberBegin();\ itr\ !=\ document.MemberEnd();\ ++itr)}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Type\ of\ member\ \%s\ is\ \%s\(\backslash\)n"{}},\ itr-\/>name.GetString(),\ kTypeNames[itr-\/>value.GetType()]);}
+\DoxyCodeLine{00087\ }
+\DoxyCodeLine{00089\ \ \ \ \ \textcolor{comment}{//\ 3.\ Modify\ values\ in\ document.}}
+\DoxyCodeLine{00090\ }
+\DoxyCodeLine{00091\ \ \ \ \ \textcolor{comment}{//\ Change\ i\ to\ a\ bigger\ number}}
+\DoxyCodeLine{00092\ \ \ \ \ \{}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ f20\ =\ 1;\ \ \ \textcolor{comment}{//\ compute\ factorial\ of\ 20}}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ =\ 1;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ <=\ 20;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}++)}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \ \ \ f20\ *=\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}};}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ document[\textcolor{stringliteral}{"{}i"{}}]\ =\ f20;\ \ \ \ \textcolor{comment}{//\ Alternate\ form:\ document["{}i"{}].SetUint64(f20)}}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ assert(!document[\textcolor{stringliteral}{"{}i"{}}].IsInt());\ \textcolor{comment}{//\ No\ longer\ can\ be\ cast\ as\ int\ or\ uint.}}
+\DoxyCodeLine{00098\ \ \ \ \ \}}
+\DoxyCodeLine{00099\ }
+\DoxyCodeLine{00100\ \ \ \ \ \textcolor{comment}{//\ Adding\ values\ to\ array.}}
+\DoxyCodeLine{00101\ \ \ \ \ \{}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value}{Value}}\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ =\ document[\textcolor{stringliteral}{"{}a"{}}];\ \ \ \textcolor{comment}{//\ This\ time\ we\ uses\ non-\/const\ reference.}}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_memory_pool_allocator}{Document::AllocatorType}}\&\ \mbox{\hyperlink{namespacechainbase_add7d4cf66ab3f2808fe613e6b0343b89}{allocator}}\ =\ document.\mbox{\hyperlink{class_generic_document_a1362cbdcce6ca37356744a3a0dbb11d6}{GetAllocator}}();}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 5;\ i\ <=\ 10;\ i++)}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.PushBack(i,\ allocator);\ \ \ \textcolor{comment}{//\ May\ look\ a\ bit\ strange,\ allocator\ is\ needed\ for\ potentially\ realloc.\ We\ normally\ uses\ the\ document's.}}
+\DoxyCodeLine{00106\ }
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Fluent\ API}}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.PushBack(\textcolor{stringliteral}{"{}Lua"{}},\ allocator).PushBack(\textcolor{stringliteral}{"{}Mio"{}},\ allocator);}
+\DoxyCodeLine{00109\ \ \ \ \ \}}
+\DoxyCodeLine{00110\ }
+\DoxyCodeLine{00111\ \ \ \ \ \textcolor{comment}{//\ Making\ string\ values.}}
+\DoxyCodeLine{00112\ }
+\DoxyCodeLine{00113\ \ \ \ \ \textcolor{comment}{//\ This\ version\ of\ SetString()\ just\ store\ the\ pointer\ to\ the\ string.}}
+\DoxyCodeLine{00114\ \ \ \ \ \textcolor{comment}{//\ So\ it\ is\ for\ literal\ and\ string\ that\ exists\ within\ value's\ life-\/cycle.}}
+\DoxyCodeLine{00115\ \ \ \ \ \{}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ document[\textcolor{stringliteral}{"{}hello"{}}]\ =\ \textcolor{stringliteral}{"{}rapidjson"{}};\ \ \ \ \textcolor{comment}{//\ This\ will\ invoke\ strlen()}}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Faster\ version:}}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ document["{}hello"{}].SetString("{}rapidjson"{},\ 9);}}
+\DoxyCodeLine{00119\ \ \ \ \ \}}
+\DoxyCodeLine{00120\ }
+\DoxyCodeLine{00121\ \ \ \ \ \textcolor{comment}{//\ This\ version\ of\ SetString()\ needs\ an\ allocator,\ which\ means\ it\ will\ allocate\ a\ new\ buffer\ and\ copy\ the\ the\ string\ into\ the\ buffer.}}
+\DoxyCodeLine{00122\ \ \ \ \ \mbox{\hyperlink{class_generic_value}{Value}}\ author;}
+\DoxyCodeLine{00123\ \ \ \ \ \{}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ buffer2[10];}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ =\ sprintf(buffer2,\ \textcolor{stringliteral}{"{}\%s\ \%s"{}},\ \textcolor{stringliteral}{"{}Milo"{}},\ \textcolor{stringliteral}{"{}Yip"{}});\ \ \textcolor{comment}{//\ synthetic\ example\ of\ dynamically\ created\ string.}}
+\DoxyCodeLine{00126\ }
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ author.SetString(buffer2,\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\textcolor{keyword}{>}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}),\ document.\mbox{\hyperlink{class_generic_document_a1362cbdcce6ca37356744a3a0dbb11d6}{GetAllocator}}());}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Shorter\ but\ slower\ version:}}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ document["{}hello"{}].SetString(buffer,\ document.GetAllocator());}}
+\DoxyCodeLine{00130\ }
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Constructor\ version:\ }}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Value\ author(buffer,\ len,\ document.GetAllocator());}}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Value\ author(buffer,\ document.GetAllocator());}}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(buffer2,\ 0,\ \textcolor{keyword}{sizeof}(buffer2));\ \textcolor{comment}{//\ For\ demonstration\ purpose.}}
+\DoxyCodeLine{00135\ \ \ \ \ \}}
+\DoxyCodeLine{00136\ \ \ \ \ \textcolor{comment}{//\ Variable\ 'buffer'\ is\ unusable\ now\ but\ 'author'\ has\ already\ made\ a\ copy.}}
+\DoxyCodeLine{00137\ \ \ \ \ document.AddMember(\textcolor{stringliteral}{"{}author"{}},\ author,\ document.\mbox{\hyperlink{class_generic_document_a1362cbdcce6ca37356744a3a0dbb11d6}{GetAllocator}}());}
+\DoxyCodeLine{00138\ }
+\DoxyCodeLine{00139\ \ \ \ \ assert(author.IsNull());\ \ \ \ \ \ \ \ \textcolor{comment}{//\ Move\ semantic\ for\ assignment.\ After\ this\ variable\ is\ assigned\ as\ a\ member,\ the\ variable\ becomes\ null.}}
+\DoxyCodeLine{00140\ }
+\DoxyCodeLine{00142\ \ \ \ \ \textcolor{comment}{//\ 4.\ Stringify\ JSON}}
+\DoxyCodeLine{00143\ }
+\DoxyCodeLine{00144\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\(\backslash\)nModified\ JSON\ with\ reformatting:\(\backslash\)n"{}});}
+\DoxyCodeLine{00145\ \ \ \ \ \mbox{\hyperlink{class_generic_string_buffer}{StringBuffer}}\ sb;}
+\DoxyCodeLine{00146\ \ \ \ \ \mbox{\hyperlink{class_pretty_writer}{PrettyWriter<StringBuffer>}}\ writer(sb);}
+\DoxyCodeLine{00147\ \ \ \ \ document.Accept(writer);\ \ \ \ \textcolor{comment}{//\ Accept()\ traverses\ the\ DOM\ and\ generates\ Handler\ events.}}
+\DoxyCodeLine{00148\ \ \ \ \ puts(sb.\mbox{\hyperlink{class_generic_string_buffer_a42079865bab1deb930c6cff7d491c719}{GetString}}());}
+\DoxyCodeLine{00149\ }
+\DoxyCodeLine{00150\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00151\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{tutorial_8cpp_a81ce304348a420752ee080480d2b3095_cgraph}
+\end{center}
+\end{figure}

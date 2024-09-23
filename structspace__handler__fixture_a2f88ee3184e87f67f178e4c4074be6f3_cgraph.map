@@ -1,0 +1,32 @@
+<map id="space_handler_fixture::test_loop_common" name="space_handler_fixture::test_loop_common">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,173,154,214"/>
+<area shape="rect" id="Node000002" href="$structspace__handler__fixture.html#a6ca65640a8148ac9e60879dd2dc356e6" title=" " alt="" coords="225,25,373,66"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="99,170,144,130,200,87,230,70,232,75,203,91,147,134,103,174"/>
+<area shape="rect" id="Node000004" href="$structspace__handler__fixture.html#a4be39f2c915543cb5eba815e01201bbf" title=" " alt="" coords="202,101,396,142"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="143,170,219,144,221,149,144,175"/>
+<area shape="rect" id="Node000006" href="$structspace__handler__fixture.html#a307c90555c5d6ece20697d3a3347e4e9" title=" " alt="" coords="225,173,373,214"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="154,190,209,190,209,196,154,196"/>
+<area shape="rect" id="Node000008" href="$structspace__handler__fixture.html#a261e57182e180fe87777a52c6d657e0d" title=" " alt="" coords="225,246,373,287"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="143,211,222,238,220,243,141,217"/>
+<area shape="rect" id="Node000010" href="$structspace__handler__fixture.html#acdb08c8ee2a829f47b5b992ab73f5364" title=" " alt="" coords="225,330,373,371"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="104,212,148,253,203,296,242,320,239,325,200,301,145,257,100,216"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1resource__monitor_1_1file__space__handler.html#a6a5e01f3f35cab4c846640e060b91b63" title=" " alt="" coords="457,5,617,61"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="373,39,442,35,442,41,374,44"/>
+<area shape="rect" id="Node000005" href="$classsysio_1_1resource__monitor_1_1file__space__handler.html#ac0f510cb0298b9cefe68102772fc5db7" title=" " alt="" coords="444,85,630,141"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="396,115,428,114,428,119,396,121"/>
+<area shape="rect" id="Node000007" href="$classsysio_1_1resource__monitor_1_1file__space__handler.html#af1ad683111aac7f94733e3866db0149e" title=" " alt="" coords="457,165,617,221"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="373,190,442,190,442,196,373,196"/>
+<area shape="rect" id="Node000009" href="$classsysio_1_1resource__monitor_1_1file__space__handler.html#a51eaff9443b1a88e06cbbd1344a78071" title=" " alt="" coords="457,245,617,301"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="374,266,442,268,442,273,373,271"/>
+<area shape="rect" id="Node000011" href="$classsysio_1_1resource__monitor_1_1file__space__handler.html#a6faa30d2db31020b3db4886a554e147a" title=" " alt="" coords="457,349,617,405"/>
+<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="374,356,442,364,441,369,373,361"/>
+<area shape="poly" id="edge15_Node000011_Node000011" title=" " alt="" coords="494,349,494,339,502,330,516,325,537,323,561,325,575,332,572,337,559,330,537,328,518,330,505,335,499,341,499,349"/>
+<area shape="rect" id="Node000012" href="$namespaceappbase.html#a99374dc23934f008a09f2f79be9eae40" title=" " alt="" coords="709,299,808,325"/>
+<area shape="poly" id="edge11_Node000011_Node000012" title=" " alt="" coords="617,351,697,327,698,332,618,356"/>
+<area shape="rect" id="Node000014" href="$classsysio_1_1resource__monitor_1_1file__space__handler.html#a3571fc8484a45f62857dcbe29d73aa28" title=" " alt="" coords="678,349,839,405"/>
+<area shape="poly" id="edge13_Node000011_Node000014" title=" " alt="" coords="617,374,663,374,663,380,617,380"/>
+<area shape="rect" id="Node000015" href="$classappbase_1_1application.html#a81aa58d3f94570b7976145039155fc46" title=" " alt="" coords="688,429,829,470"/>
+<area shape="poly" id="edge14_Node000011_Node000015" title=" " alt="" coords="618,401,680,421,678,426,617,406"/>
+<area shape="rect" id="Node000013" href="$classappbase_1_1application.html#ac874b2659b400fe254f1ae4260d06ecf" title=" " alt="" coords="887,292,1027,332"/>
+<area shape="poly" id="edge12_Node000012_Node000013" title=" " alt="" coords="809,309,871,309,871,314,809,314"/>
+</map>

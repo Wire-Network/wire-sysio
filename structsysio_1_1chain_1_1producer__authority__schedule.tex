@@ -1,0 +1,255 @@
+\doxysection{sysio\+::chain\+::producer\+\_\+authority\+\_\+schedule Struct Reference}
+\hypertarget{structsysio_1_1chain_1_1producer__authority__schedule}{}\label{structsysio_1_1chain_1_1producer__authority__schedule}\index{sysio::chain::producer\_authority\_schedule@{sysio::chain::producer\_authority\_schedule}}
+
+
+{\ttfamily \#include $<$producer\+\_\+schedule.\+hpp$>$}
+
+
+
+Inheritance diagram for sysio\+::chain\+::producer\+\_\+authority\+\_\+schedule\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=224pt]{structsysio_1_1chain_1_1producer__authority__schedule__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for sysio\+::chain\+::producer\+\_\+authority\+\_\+schedule\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=215pt]{structsysio_1_1chain_1_1producer__authority__schedule__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority__schedule_a872da665f7d9783dee4faf9ff61ef9ca}{producer\+\_\+authority\+\_\+schedule}} ()=default
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority__schedule_a0b0235ce946dc5cc299678ba4eede4c0}{producer\+\_\+authority\+\_\+schedule}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1legacy_1_1producer__schedule__type}{legacy\+::producer\+\_\+schedule\+\_\+type}} \&old)
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority__schedule_a8ab07ea8242f823e811aa522110054c4}{producer\+\_\+authority\+\_\+schedule}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority__schedule_a477f957323b97c0af6700ef384326b83}{version}}, std\+::initializer\+\_\+list$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority}{producer\+\_\+authority}} $>$ \mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority__schedule_afb0f1bdb282b3d8e1a60ee37c70657d4}{producers}})
+\item 
+auto \mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority__schedule_aca17ff9b0f16d16b6f04d4e47bd0d522}{to\+\_\+shared}} (\mbox{\hyperlink{namespacechainbase_add7d4cf66ab3f2808fe613e6b0343b89}{chainbase\+::allocator}}$<$ char $>$ alloc) const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static auto \mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority__schedule_a4b0d95b22a8be15ac06dc3b105638c54}{from\+\_\+shared}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1shared__producer__authority__schedule}{shared\+\_\+producer\+\_\+authority\+\_\+schedule}} \&src)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority__schedule_a477f957323b97c0af6700ef384326b83}{version}} = 0
+\begin{DoxyCompactList}\small\item\em sequentially incrementing version number \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classfc_1_1vector}{vector}}$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority}{producer\+\_\+authority}} $>$ \mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority__schedule_afb0f1bdb282b3d8e1a60ee37c70657d4}{producers}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority__schedule_afddd08c57dbdaf5c66557db655d74284}{operator==}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority__schedule}{producer\+\_\+authority\+\_\+schedule}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, const \mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority__schedule}{producer\+\_\+authority\+\_\+schedule}} \&b)
+\item 
+bool \mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority__schedule_aca915f20bb38f33df4465f07390fa354}{operator!=}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority__schedule}{producer\+\_\+authority\+\_\+schedule}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, const \mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority__schedule}{producer\+\_\+authority\+\_\+schedule}} \&b)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{producer__schedule_8hpp_source_l00231}{231}} of file \mbox{\hyperlink{producer__schedule_8hpp_source}{producer\+\_\+schedule.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structsysio_1_1chain_1_1producer__authority__schedule_a872da665f7d9783dee4faf9ff61ef9ca}\index{sysio::chain::producer\_authority\_schedule@{sysio::chain::producer\_authority\_schedule}!producer\_authority\_schedule@{producer\_authority\_schedule}}
+\index{producer\_authority\_schedule@{producer\_authority\_schedule}!sysio::chain::producer\_authority\_schedule@{sysio::chain::producer\_authority\_schedule}}
+\doxysubsubsection{\texorpdfstring{producer\_authority\_schedule()}{producer\_authority\_schedule()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1producer__authority__schedule_a872da665f7d9783dee4faf9ff61ef9ca} 
+sysio\+::chain\+::producer\+\_\+authority\+\_\+schedule\+::producer\+\_\+authority\+\_\+schedule (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [default]}}
+
+\Hypertarget{structsysio_1_1chain_1_1producer__authority__schedule_a0b0235ce946dc5cc299678ba4eede4c0}\index{sysio::chain::producer\_authority\_schedule@{sysio::chain::producer\_authority\_schedule}!producer\_authority\_schedule@{producer\_authority\_schedule}}
+\index{producer\_authority\_schedule@{producer\_authority\_schedule}!sysio::chain::producer\_authority\_schedule@{sysio::chain::producer\_authority\_schedule}}
+\doxysubsubsection{\texorpdfstring{producer\_authority\_schedule()}{producer\_authority\_schedule()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1producer__authority__schedule_a0b0235ce946dc5cc299678ba4eede4c0} 
+sysio\+::chain\+::producer\+\_\+authority\+\_\+schedule\+::producer\+\_\+authority\+\_\+schedule (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1legacy_1_1producer__schedule__type}{legacy\+::producer\+\_\+schedule\+\_\+type}} \&}]{old}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+Up-\/convert a legacy producer schedule 
+
+Definition at line \mbox{\hyperlink{producer__schedule_8hpp_source_l00237}{237}} of file \mbox{\hyperlink{producer__schedule_8hpp_source}{producer\+\_\+schedule.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00238\ \ \ \ \ \ \ :\mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority__schedule_a477f957323b97c0af6700ef384326b83}{version}}(old.version)}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority__schedule_afb0f1bdb282b3d8e1a60ee37c70657d4}{producers}}.reserve(\ old.producers.size()\ );}
+\DoxyCodeLine{00241\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ :\ old.producers\ )}
+\DoxyCodeLine{00242\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority__schedule_afb0f1bdb282b3d8e1a60ee37c70657d4}{producers}}.emplace\_back(producer\_authority\{\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.producer\_name,\ block\_signing\_authority\_v0\{\ 1,\ \{\{\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.block\_signing\_key,\ 1\}\}\ \}\ \});}
+\DoxyCodeLine{00243\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1producer__authority__schedule_a8ab07ea8242f823e811aa522110054c4}\index{sysio::chain::producer\_authority\_schedule@{sysio::chain::producer\_authority\_schedule}!producer\_authority\_schedule@{producer\_authority\_schedule}}
+\index{producer\_authority\_schedule@{producer\_authority\_schedule}!sysio::chain::producer\_authority\_schedule@{sysio::chain::producer\_authority\_schedule}}
+\doxysubsubsection{\texorpdfstring{producer\_authority\_schedule()}{producer\_authority\_schedule()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1producer__authority__schedule_a8ab07ea8242f823e811aa522110054c4} 
+sysio\+::chain\+::producer\+\_\+authority\+\_\+schedule\+::producer\+\_\+authority\+\_\+schedule (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{version}{, }\item[{std\+::initializer\+\_\+list$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority}{producer\+\_\+authority}} $>$}]{producers}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{producer__schedule_8hpp_source_l00245}{245}} of file \mbox{\hyperlink{producer__schedule_8hpp_source}{producer\+\_\+schedule.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00246\ \ \ \ \ \ \ :\mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority__schedule_a477f957323b97c0af6700ef384326b83}{version}}(\mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority__schedule_a477f957323b97c0af6700ef384326b83}{version}})}
+\DoxyCodeLine{00247\ \ \ \ \ \ \ ,\mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority__schedule_afb0f1bdb282b3d8e1a60ee37c70657d4}{producers}}(\mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority__schedule_afb0f1bdb282b3d8e1a60ee37c70657d4}{producers}})}
+\DoxyCodeLine{00248\ \ \ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1chain_1_1producer__authority__schedule_a4b0d95b22a8be15ac06dc3b105638c54}\index{sysio::chain::producer\_authority\_schedule@{sysio::chain::producer\_authority\_schedule}!from\_shared@{from\_shared}}
+\index{from\_shared@{from\_shared}!sysio::chain::producer\_authority\_schedule@{sysio::chain::producer\_authority\_schedule}}
+\doxysubsubsection{\texorpdfstring{from\_shared()}{from\_shared()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1producer__authority__schedule_a4b0d95b22a8be15ac06dc3b105638c54} 
+static auto sysio\+::chain\+::producer\+\_\+authority\+\_\+schedule\+::from\+\_\+shared (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1shared__producer__authority__schedule}{shared\+\_\+producer\+\_\+authority\+\_\+schedule}} \&}]{src}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{producer__schedule_8hpp_source_l00261}{261}} of file \mbox{\hyperlink{producer__schedule_8hpp_source}{producer\+\_\+schedule.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00261\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00262\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority__schedule_a872da665f7d9783dee4faf9ff61ef9ca}{producer\_authority\_schedule}}\ result;}
+\DoxyCodeLine{00263\ \ \ \ \ \ \ \ \ \ result.version\ =\ src.version;}
+\DoxyCodeLine{00264\ \ \ \ \ \ \ \ \ \ result.producers.reserve(src.producers.size());}
+\DoxyCodeLine{00265\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ :\ src.producers\ )\ \{}
+\DoxyCodeLine{00266\ \ \ \ \ \ \ \ \ \ \ \ \ result.producers.emplace\_back(\mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority_a1861665169e509d0bcf56bbf6064a1f9}{producer\_authority::from\_shared}}(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}));}
+\DoxyCodeLine{00267\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00268\ }
+\DoxyCodeLine{00269\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00270\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1producer__authority__schedule_a4b0d95b22a8be15ac06dc3b105638c54_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1producer__authority__schedule_a4b0d95b22a8be15ac06dc3b105638c54_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1producer__authority__schedule_aca17ff9b0f16d16b6f04d4e47bd0d522}\index{sysio::chain::producer\_authority\_schedule@{sysio::chain::producer\_authority\_schedule}!to\_shared@{to\_shared}}
+\index{to\_shared@{to\_shared}!sysio::chain::producer\_authority\_schedule@{sysio::chain::producer\_authority\_schedule}}
+\doxysubsubsection{\texorpdfstring{to\_shared()}{to\_shared()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1producer__authority__schedule_aca17ff9b0f16d16b6f04d4e47bd0d522} 
+auto sysio\+::chain\+::producer\+\_\+authority\+\_\+schedule\+::to\+\_\+shared (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacechainbase_add7d4cf66ab3f2808fe613e6b0343b89}{chainbase\+::allocator}}$<$ char $>$}]{alloc}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{producer__schedule_8hpp_source_l00250}{250}} of file \mbox{\hyperlink{producer__schedule_8hpp_source}{producer\+\_\+schedule.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00250\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00251\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ result\ =\ shared\_producer\_authority\_schedule(alloc);}
+\DoxyCodeLine{00252\ \ \ \ \ \ \ \ \ \ result.version\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority__schedule_a477f957323b97c0af6700ef384326b83}{version}};}
+\DoxyCodeLine{00253\ \ \ \ \ \ \ \ \ \ result.producers.clear();}
+\DoxyCodeLine{00254\ \ \ \ \ \ \ \ \ \ result.producers.reserve(\ \mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority__schedule_afb0f1bdb282b3d8e1a60ee37c70657d4}{producers}}.size()\ );}
+\DoxyCodeLine{00255\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ :\ \mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority__schedule_afb0f1bdb282b3d8e1a60ee37c70657d4}{producers}}\ )\ \{}
+\DoxyCodeLine{00256\ \ \ \ \ \ \ \ \ \ \ \ \ result.producers.emplace\_back(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.to\_shared(alloc));}
+\DoxyCodeLine{00257\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00258\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00259\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=292pt]{structsysio_1_1chain_1_1producer__authority__schedule_aca17ff9b0f16d16b6f04d4e47bd0d522_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1producer__authority__schedule_aca17ff9b0f16d16b6f04d4e47bd0d522_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{structsysio_1_1chain_1_1producer__authority__schedule_aca915f20bb38f33df4465f07390fa354}\index{sysio::chain::producer\_authority\_schedule@{sysio::chain::producer\_authority\_schedule}!operator"!=@{operator"!=}}
+\index{operator"!=@{operator"!=}!sysio::chain::producer\_authority\_schedule@{sysio::chain::producer\_authority\_schedule}}
+\doxysubsubsection{\texorpdfstring{operator"!=}{operator!=}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1producer__authority__schedule_aca915f20bb38f33df4465f07390fa354} 
+bool \mbox{\hyperlink{namespacefc_a40c368ac88294ae47b064cad937fdbf6}{operator!}}= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority__schedule}{producer\+\_\+authority\+\_\+schedule}} \&}]{a}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority__schedule}{producer\+\_\+authority\+\_\+schedule}} \&}]{b}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{producer__schedule_8hpp_source_l00284}{284}} of file \mbox{\hyperlink{producer__schedule_8hpp_source}{producer\+\_\+schedule.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00285\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00286\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}==b);}
+\DoxyCodeLine{00287\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1producer__authority__schedule_afddd08c57dbdaf5c66557db655d74284}\index{sysio::chain::producer\_authority\_schedule@{sysio::chain::producer\_authority\_schedule}!operator==@{operator==}}
+\index{operator==@{operator==}!sysio::chain::producer\_authority\_schedule@{sysio::chain::producer\_authority\_schedule}}
+\doxysubsubsection{\texorpdfstring{operator==}{operator==}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1producer__authority__schedule_afddd08c57dbdaf5c66557db655d74284} 
+bool operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority__schedule}{producer\+\_\+authority\+\_\+schedule}} \&}]{a}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority__schedule}{producer\+\_\+authority\+\_\+schedule}} \&}]{b}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{producer__schedule_8hpp_source_l00275}{275}} of file \mbox{\hyperlink{producer__schedule_8hpp_source}{producer\+\_\+schedule.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00276\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00277\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.version\ !=\ b.version\ )\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00278\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.producers.size()\ !=\ b.producers.size()\ )\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00279\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.producers.size();\ ++i\ )}
+\DoxyCodeLine{00280\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !\ (\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.producers[i]\ ==\ b.producers[i])\ )\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00281\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00282\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1chain_1_1producer__authority__schedule_afb0f1bdb282b3d8e1a60ee37c70657d4}\index{sysio::chain::producer\_authority\_schedule@{sysio::chain::producer\_authority\_schedule}!producers@{producers}}
+\index{producers@{producers}!sysio::chain::producer\_authority\_schedule@{sysio::chain::producer\_authority\_schedule}}
+\doxysubsubsection{\texorpdfstring{producers}{producers}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1producer__authority__schedule_afb0f1bdb282b3d8e1a60ee37c70657d4} 
+\mbox{\hyperlink{classfc_1_1vector}{vector}}$<$\mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority}{producer\+\_\+authority}}$>$ sysio\+::chain\+::producer\+\_\+authority\+\_\+schedule\+::producers}
+
+
+
+Definition at line \mbox{\hyperlink{producer__schedule_8hpp_source_l00273}{273}} of file \mbox{\hyperlink{producer__schedule_8hpp_source}{producer\+\_\+schedule.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1producer__authority__schedule_a477f957323b97c0af6700ef384326b83}\index{sysio::chain::producer\_authority\_schedule@{sysio::chain::producer\_authority\_schedule}!version@{version}}
+\index{version@{version}!sysio::chain::producer\_authority\_schedule@{sysio::chain::producer\_authority\_schedule}}
+\doxysubsubsection{\texorpdfstring{version}{version}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1producer__authority__schedule_a477f957323b97c0af6700ef384326b83} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::chain\+::producer\+\_\+authority\+\_\+schedule\+::version = 0}
+
+
+
+Definition at line \mbox{\hyperlink{producer__schedule_8hpp_source_l00272}{272}} of file \mbox{\hyperlink{producer__schedule_8hpp_source}{producer\+\_\+schedule.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{producer__schedule_8hpp}{producer\+\_\+schedule.\+hpp}}\end{DoxyCompactItemize}

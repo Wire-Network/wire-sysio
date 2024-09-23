@@ -1,0 +1,47 @@
+\doxysection{static\+\_\+buf.\+cpp}
+\hypertarget{static__buf_8cpp_source}{}\label{static__buf_8cpp_source}\index{libraries/fc/libraries/ff/depends/xbyak/sample/static\_buf.cpp@{libraries/fc/libraries/ff/depends/xbyak/sample/static\_buf.cpp}}
+\mbox{\hyperlink{static__buf_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{static__buf_8cpp_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{static__buf_8cpp_source_l00002}00002\ \textcolor{comment}{\ \ \ \ sample\ to\ use\ static\ memory}}
+\DoxyCodeLine{\Hypertarget{static__buf_8cpp_source_l00003}00003\ \textcolor{comment}{*/}}
+\DoxyCodeLine{\Hypertarget{static__buf_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <stdio.h>}}
+\DoxyCodeLine{\Hypertarget{static__buf_8cpp_source_l00005}\mbox{\hyperlink{static__buf_8cpp_a3ede98665532cce0e33f614fac5150f9}{00005}}\ \textcolor{preprocessor}{\#define\ XBYAK\_NO\_OP\_NAMES}}
+\DoxyCodeLine{\Hypertarget{static__buf_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{xbyak_8h}{xbyak/xbyak.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{static__buf_8cpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{static__buf_8cpp_source_l00008}\mbox{\hyperlink{static__buf_8cpp_af8e61ef95c83b5fc94be87e7fefd3eca}{00008}}\ \mbox{\hyperlink{zm_8h_a5cef5f7b5efee59e24361929a7257baf}{MIE\_ALIGN}}(4096)\ char\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}[4096];}
+\DoxyCodeLine{\Hypertarget{static__buf_8cpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{static__buf_8cpp_source_l00010}00010\ struct\ \mbox{\hyperlink{struct_code}{Code}}\ :\ \mbox{\hyperlink{namespace_xbyak}{Xbyak}}::CodeGenerator\ \{}
+\DoxyCodeLine{\Hypertarget{static__buf_8cpp_source_l00011}\mbox{\hyperlink{struct_code_a3605683bd8fd54691437ff05ba4431b9}{00011}}\ \ \ \ \ \mbox{\hyperlink{struct_code_a3605683bd8fd54691437ff05ba4431b9}{Code}}()}
+\DoxyCodeLine{\Hypertarget{static__buf_8cpp_source_l00012}00012\ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{namespace_xbyak}{Xbyak}}::CodeGenerator(\mbox{\hyperlink{yubihsm__pkcs11_8c_af82555d15fc1c126f72a5c0566b5389a}{sizeof}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}),\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}})}
+\DoxyCodeLine{\Hypertarget{static__buf_8cpp_source_l00013}00013\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{static__buf_8cpp_source_l00014}00014\ \ \ \ \ \ \ \ \ puts(\textcolor{stringliteral}{"{}generate"{}});}
+\DoxyCodeLine{\Hypertarget{static__buf_8cpp_source_l00015}00015\ \ \ \ \ \ \ \ \ printf(\textcolor{stringliteral}{"{}ptr=\%p,\ \%p\(\backslash\)n"{}},\ getCode(),\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}});}
+\DoxyCodeLine{\Hypertarget{static__buf_8cpp_source_l00016}00016\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_code_array_aeabe84fe014e9d4f4065608ec3c29e5a}{Xbyak::CodeArray::protect}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}),\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{static__buf_8cpp_source_l00017}00017\ \textcolor{preprocessor}{\#ifdef\ XBYAK32}}
+\DoxyCodeLine{\Hypertarget{static__buf_8cpp_source_l00018}00018\ \ \ \ \ \ \ \ \ mov(eax,\ ptr\ [\mbox{\hyperlink{namespace_xbyak_1_1util_a4737b53696965bcf85f05d7f2149970c}{esp}}\ +\ 4]);}
+\DoxyCodeLine{\Hypertarget{static__buf_8cpp_source_l00019}00019\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{static__buf_8cpp_aa99823a0fc8313c9c32541ce768fb801}{add}}(eax,\ ptr\ [\mbox{\hyperlink{namespace_xbyak_1_1util_a4737b53696965bcf85f05d7f2149970c}{esp}}\ +\ 8]);}
+\DoxyCodeLine{\Hypertarget{static__buf_8cpp_source_l00020}00020\ \textcolor{preprocessor}{\#elif\ defined(XBYAK64\_WIN)}}
+\DoxyCodeLine{\Hypertarget{static__buf_8cpp_source_l00021}00021\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{xbyak__mnemonic_8h_a04b25fd38ab37ffaccd7c3fbf355923c}{lea}}(rax,\ ptr\ [rcx\ +\ rdx]);}
+\DoxyCodeLine{\Hypertarget{static__buf_8cpp_source_l00022}00022\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{static__buf_8cpp_source_l00023}00023\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{xbyak__mnemonic_8h_a04b25fd38ab37ffaccd7c3fbf355923c}{lea}}(rax,\ ptr\ [rdi\ +\ rsi]);}
+\DoxyCodeLine{\Hypertarget{static__buf_8cpp_source_l00024}00024\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{static__buf_8cpp_source_l00025}00025\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}();}
+\DoxyCodeLine{\Hypertarget{static__buf_8cpp_source_l00026}00026\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{static__buf_8cpp_source_l00027}\mbox{\hyperlink{static__buf_8cpp_a3295db9ef9f6c1c8878b4da5eedaaf39}{00027}}\ \}\ \mbox{\hyperlink{static__buf_8cpp_a3295db9ef9f6c1c8878b4da5eedaaf39}{s\_code}};}
+\DoxyCodeLine{\Hypertarget{static__buf_8cpp_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{static__buf_8cpp_source_l00029}\mbox{\hyperlink{static__buf_8cpp_aa99823a0fc8313c9c32541ce768fb801}{00029}}\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{static__buf_8cpp_aa99823a0fc8313c9c32541ce768fb801}{add}}(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \textcolor{keywordtype}{int}\ b)}
+\DoxyCodeLine{\Hypertarget{static__buf_8cpp_source_l00030}00030\ \{}
+\DoxyCodeLine{\Hypertarget{static__buf_8cpp_source_l00031}00031\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_xbyak_ad60ea5f6215534109ed45a19f413a6f0}{Xbyak::CastTo<int\ (*)(int,int)>}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}})(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ b);}
+\DoxyCodeLine{\Hypertarget{static__buf_8cpp_source_l00032}00032\ \}}
+\DoxyCodeLine{\Hypertarget{static__buf_8cpp_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{static__buf_8cpp_source_l00034}\mbox{\hyperlink{static__buf_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{00034}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{static__buf_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}()}
+\DoxyCodeLine{\Hypertarget{static__buf_8cpp_source_l00035}00035\ \{}
+\DoxyCodeLine{\Hypertarget{static__buf_8cpp_source_l00036}00036\ \ \ \ \ \textcolor{keywordtype}{int}\ sum\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{static__buf_8cpp_source_l00037}00037\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ 10;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{static__buf_8cpp_source_l00038}00038\ \ \ \ \ \ \ \ \ sum\ +=\ \mbox{\hyperlink{static__buf_8cpp_aa99823a0fc8313c9c32541ce768fb801}{add}}(i,\ 5);}
+\DoxyCodeLine{\Hypertarget{static__buf_8cpp_source_l00039}00039\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{static__buf_8cpp_source_l00040}00040\ \ \ \ \ printf(\textcolor{stringliteral}{"{}sum=\%d\(\backslash\)n"{}},\ sum);}
+\DoxyCodeLine{\Hypertarget{static__buf_8cpp_source_l00041}00041\ \}}
+
+\end{DoxyCode}

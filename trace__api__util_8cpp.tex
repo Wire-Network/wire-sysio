@@ -1,0 +1,88 @@
+\doxysection{plugins/trace\+\_\+api\+\_\+plugin/utils/trace\+\_\+api\+\_\+util.cpp File Reference}
+\hypertarget{trace__api__util_8cpp}{}\label{trace__api__util_8cpp}\index{plugins/trace\_api\_plugin/utils/trace\_api\_util.cpp@{plugins/trace\_api\_plugin/utils/trace\_api\_util.cpp}}
+{\ttfamily \#include $<$sysio/trace\+\_\+api/cmd\+\_\+registration.\+hpp$>$}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$boost/program\+\_\+options.\+hpp$>$}\newline
+Include dependency graph for trace\+\_\+api\+\_\+util.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{trace__api__util_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{trace__api__util_8cpp_a3c04138a5bfe5d72780bb7e82a18e627}{main}} (int argc, char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{trace__api__util_8cpp_a3c04138a5bfe5d72780bb7e82a18e627}\index{trace\_api\_util.cpp@{trace\_api\_util.cpp}!main@{main}}
+\index{main@{main}!trace\_api\_util.cpp@{trace\_api\_util.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{trace__api__util_8cpp_a3c04138a5bfe5d72780bb7e82a18e627} 
+int main (\begin{DoxyParamCaption}\item[{int}]{argc}{, }\item[{char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{argv}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{trace__api__util_8cpp_source_l00029}{29}} of file \mbox{\hyperlink{trace__api__util_8cpp_source}{trace\+\_\+api\+\_\+util.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00030\ \ \ \ \textcolor{keyword}{auto}\ command\_map\ =\ create\_command\_map();}
+\DoxyCodeLine{00031\ }
+\DoxyCodeLine{00032\ \ \ \ bpo::options\_description\ vis\_desc(\textcolor{stringliteral}{"{}Options"{}});}
+\DoxyCodeLine{00033\ \ \ \ \textcolor{keyword}{auto}\ vis\_opts\ =\ vis\_desc.add\_options();}
+\DoxyCodeLine{00034\ \ \ \ vis\_opts(\textcolor{stringliteral}{"{}help,h"{}},\ \textcolor{stringliteral}{"{}show\ usage\ help\ message"{}});}
+\DoxyCodeLine{00035\ }
+\DoxyCodeLine{00036\ \ \ \ bpo::options\_description\ hidden\_desc;}
+\DoxyCodeLine{00037\ \ \ \ \textcolor{keyword}{auto}\ hidden\_opts\ =\ hidden\_desc.add\_options();}
+\DoxyCodeLine{00038\ \ \ \ hidden\_opts(\textcolor{stringliteral}{"{}subargs"{}},\ bpo::value<std::vector<std::string>>(),\ \textcolor{stringliteral}{"{}args"{}});}
+\DoxyCodeLine{00039\ }
+\DoxyCodeLine{00040\ \ \ \ bpo::positional\_options\_description\ pos\_desc;}
+\DoxyCodeLine{00041\ \ \ \ pos\_desc.add(\textcolor{stringliteral}{"{}subargs"{}},\ -\/1);}
+\DoxyCodeLine{00042\ }
+\DoxyCodeLine{00043\ \ \ \ bpo::options\_description\ cmdline\_options;}
+\DoxyCodeLine{00044\ \ \ \ cmdline\_options.add(vis\_desc).add(hidden\_desc);}
+\DoxyCodeLine{00045\ }
+\DoxyCodeLine{00046\ \ \ \ bpo::variables\_map\ vm;}
+\DoxyCodeLine{00047\ \ \ \ \textcolor{keyword}{auto}\ parsed\_args\ =\ bpo::command\_line\_parser(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}).options(cmdline\_options).positional(pos\_desc).allow\_unregistered().run();}
+\DoxyCodeLine{00048\ \ \ \ bpo::store(parsed\_args,\ vm);}
+\DoxyCodeLine{00049\ }
+\DoxyCodeLine{00050\ \ \ \ std::vector<std::string>\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}\ =\ bpo::collect\_unrecognized(parsed\_args.options,\ bpo::include\_positional);}
+\DoxyCodeLine{00051\ }
+\DoxyCodeLine{00052\ \ \ \ \textcolor{keyword}{auto}\ show\_help\ =\ [\&](std::ostream\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\ \{}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ os\ <<}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Usage:\ trace\_api\_util\ <options>\ command\ ...\(\backslash\)n"{}}}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Commands:\(\backslash\)n"{}};}
+\DoxyCodeLine{00057\ }
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ e:\ command\_map)\ \{}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}\ \ "{}}\ <<\ e.second-\/>name\ <<\ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ \ \ \ \ \ \ \ "{}}\ <<\ e.second-\/>slug\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00061\ }
+\DoxyCodeLine{00062\ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}\ <<\ vis\_desc\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{00063\ \ \ \ \};}
+\DoxyCodeLine{00064\ }
+\DoxyCodeLine{00065\ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.size()\ <\ 1)\ \{}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (vm.count(\textcolor{stringliteral}{"{}help"{}})\ >\ 0)\ \{}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ show\_help(std::cout);}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00070\ }
+\DoxyCodeLine{00071\ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}Error:\ No\ command\ provided\(\backslash\)n\(\backslash\)n"{}};}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ show\_help(std::cerr);}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{00074\ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (command\_map.count(\mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.at(0))\ ==\ 0)\ \{}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}Error:\ unknown\ command\ \(\backslash\)"{}"{}}\ <<\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.at(0)\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)"{}\(\backslash\)n\(\backslash\)n"{}};}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ show\_help(std::cerr);}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{00078\ \ \ \ \}}
+\DoxyCodeLine{00079\ }
+\DoxyCodeLine{00080\ \ \ \ \textcolor{comment}{//\ trim\ the\ command\ name\ and\ pass\ the\ rest\ of\ the\ args\ to\ the\ defined\ command}}
+\DoxyCodeLine{00081\ \ \ \ \textcolor{keywordflow}{return}\ command\_map.at(\mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.at(0))-\/>func(vm,\ std::vector<std::string>(\mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.begin()\ +\ 1,\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.end()));}
+\DoxyCodeLine{00082\ \}}
+
+\end{DoxyCode}

@@ -1,0 +1,69 @@
+\doxysection{libraries/fc/vendor/websocketpp/websocketpp/transport/iostream/base.hpp File Reference}
+\hypertarget{transport_2iostream_2base_8hpp}{}\label{transport_2iostream_2base_8hpp}\index{libraries/fc/vendor/websocketpp/websocketpp/transport/iostream/base.hpp@{libraries/fc/vendor/websocketpp/websocketpp/transport/iostream/base.hpp}}
+{\ttfamily \#include $<$websocketpp/common/system\+\_\+error.\+hpp$>$}\newline
+{\ttfamily \#include $<$websocketpp/common/cpp11.\+hpp$>$}\newline
+{\ttfamily \#include $<$websocketpp/common/functional.\+hpp$>$}\newline
+{\ttfamily \#include $<$websocketpp/common/connection\+\_\+hdl.\+hpp$>$}\newline
+{\ttfamily \#include $<$websocketpp/transport/base/connection.\+hpp$>$}\newline
+{\ttfamily \#include $<$string$>$}\newline
+{\ttfamily \#include $<$vector$>$}\newline
+Include dependency graph for base.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{transport_2iostream_2base_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{transport_2iostream_2base_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1error_1_1category}{websocketpp\+::transport\+::iostream\+::error\+::category}}
+\begin{DoxyCompactList}\small\item\em iostream transport error category \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{structis__error__code__enum_3_01websocketpp_1_1transport_1_1iostream_1_1error_1_1value_01_4}{is\+\_\+error\+\_\+code\+\_\+enum$<$ websocketpp\+::transport\+::iostream\+::error\+::value $>$}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacewebsocketpp}{websocketpp}}
+\begin{DoxyCompactList}\small\item\em Namespace for the Web\+Socket++ project. \end{DoxyCompactList}\item 
+namespace \mbox{\hyperlink{namespacewebsocketpp_1_1transport}{websocketpp\+::transport}}
+\begin{DoxyCompactList}\small\item\em Transport policies provide network connectivity and timers. \end{DoxyCompactList}\item 
+namespace \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1iostream}{websocketpp\+::transport\+::iostream}}
+\begin{DoxyCompactList}\small\item\em Transport policy that uses STL iostream for I/O and does not support timers. \end{DoxyCompactList}\item 
+namespace \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1iostream_1_1error}{websocketpp\+::transport\+::iostream\+::error}}
+\begin{DoxyCompactList}\small\item\em iostream transport errors \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef lib\+::function$<$ lib\+::error\+\_\+code(\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}}, char const \texorpdfstring{$\ast$}{*}, size\+\_\+t)$>$ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1iostream_abc22b834c2d0c698d6c87e51d5bfad2c}{websocketpp\+::transport\+::iostream\+::write\+\_\+handler}}
+\begin{DoxyCompactList}\small\item\em The type and signature of the callback used by iostream transport to write. \end{DoxyCompactList}\item 
+typedef lib\+::function$<$ lib\+::error\+\_\+code(\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}}, std\+::vector$<$ \mbox{\hyperlink{structwebsocketpp_1_1transport_1_1buffer}{transport\+::buffer}} $>$ const \&bufs)$>$ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1iostream_a21982146513c0b5580786c3af5dd2878}{websocketpp\+::transport\+::iostream\+::vector\+\_\+write\+\_\+handler}}
+\item 
+typedef lib\+::function$<$ lib\+::error\+\_\+code(\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}})$>$ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1iostream_a3563ce2cca06b1466f7d76ecb8eb4a0b}{websocketpp\+::transport\+::iostream\+::shutdown\+\_\+handler}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1iostream_1_1error_a647b428e260748d7606c92255e1e9737}{websocketpp\+::transport\+::iostream\+::error\+::value}} \{ \newline
+\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1iostream_1_1error_a647b428e260748d7606c92255e1e9737a509b29b678dabf2fa2776636b3ba3c98}{websocketpp\+::transport\+::iostream\+::error\+::general}} = 1
+, \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1iostream_1_1error_a647b428e260748d7606c92255e1e9737aa185b313b5353e821c3fce4bf62f50a6}{websocketpp\+::transport\+::iostream\+::error\+::invalid\+\_\+num\+\_\+bytes}}
+, \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1iostream_1_1error_a647b428e260748d7606c92255e1e9737ac1ae213118c53b4d7eceb10876d88266}{websocketpp\+::transport\+::iostream\+::error\+::double\+\_\+read}}
+, \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1iostream_1_1error_a647b428e260748d7606c92255e1e9737a92341254bd27c7cb97fb5e1aca5310f3}{websocketpp\+::transport\+::iostream\+::error\+::output\+\_\+stream\+\_\+required}}
+, \newline
+\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1iostream_1_1error_a647b428e260748d7606c92255e1e9737ad46c640654d1d96c517444d95d24da45}{websocketpp\+::transport\+::iostream\+::error\+::bad\+\_\+stream}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+lib\+::error\+\_\+category const \& \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1iostream_1_1error_aa502cd242c13ee0710f7ac980e7ac499}{websocketpp\+::transport\+::iostream\+::error\+::get\+\_\+category}} ()
+\begin{DoxyCompactList}\small\item\em Get a reference to a static copy of the iostream transport error category. \end{DoxyCompactList}\item 
+lib\+::error\+\_\+code \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1iostream_1_1error_a6b208c9eb4b1b76090e564e6e462fbcf}{websocketpp\+::transport\+::iostream\+::error\+::make\+\_\+error\+\_\+code}} (\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1iostream_1_1error_a647b428e260748d7606c92255e1e9737}{error\+::value}} e)
+\begin{DoxyCompactList}\small\item\em Get an error code with the given value and the iostream transport category. \end{DoxyCompactList}\end{DoxyCompactItemize}

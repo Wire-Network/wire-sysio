@@ -1,0 +1,536 @@
+\doxysection{Catch\+::Console\+Reporter Struct Reference}
+\hypertarget{struct_catch_1_1_console_reporter}{}\label{struct_catch_1_1_console_reporter}\index{Catch::ConsoleReporter@{Catch::ConsoleReporter}}
+
+
+{\ttfamily \#include $<$catch\+\_\+reporter\+\_\+console.\+h$>$}
+
+
+
+Inheritance diagram for Catch\+::Console\+Reporter\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=213pt]{struct_catch_1_1_console_reporter__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Catch\+::Console\+Reporter\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_catch_1_1_console_reporter__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_catch_1_1_console_reporter_a0ec39703fe1c27af4fed6eff0c192a6e}{Console\+Reporter}} (\mbox{\hyperlink{struct_catch_1_1_reporter_config}{Reporter\+Config}} const \&\mbox{\hyperlink{classconfig}{config}})
+\item 
+\mbox{\hyperlink{struct_catch_1_1_console_reporter_afe3cfc570a9f8728b2e2db32a0e878e8}{\texorpdfstring{$\sim$}{\string~}\+Console\+Reporter}} () override
+\item 
+void \mbox{\hyperlink{struct_catch_1_1_console_reporter_a73955f7470015a6164966a6626e21343}{no\+Matching\+Test\+Cases}} (std\+::string const \&spec) override
+\item 
+void \mbox{\hyperlink{struct_catch_1_1_console_reporter_a91b1289a9bc2ff2f8128fd6cbc258665}{assertion\+Starting}} (\mbox{\hyperlink{struct_catch_1_1_assertion_info}{Assertion\+Info}} const \&) override
+\item 
+bool \mbox{\hyperlink{struct_catch_1_1_console_reporter_a8b122bcaadf50ad6dca012d1b2916aef}{assertion\+Ended}} (\mbox{\hyperlink{struct_catch_1_1_assertion_stats}{Assertion\+Stats}} const \&\+\_\+assertion\+Stats) override
+\item 
+void \mbox{\hyperlink{struct_catch_1_1_console_reporter_a4827fca3e5921e571fc03e38d3cf59c9}{section\+Starting}} (\mbox{\hyperlink{struct_catch_1_1_section_info}{Section\+Info}} const \&\+\_\+section\+Info) override
+\item 
+void \mbox{\hyperlink{struct_catch_1_1_console_reporter_a7ba7b75fa4a7e88d71782a1800523d78}{section\+Ended}} (\mbox{\hyperlink{struct_catch_1_1_section_stats}{Section\+Stats}} const \&\+\_\+section\+Stats) override
+\item 
+void \mbox{\hyperlink{struct_catch_1_1_console_reporter_a6caa775343962a467d9ebbc3403fc3d3}{benchmark\+Starting}} (\mbox{\hyperlink{struct_catch_1_1_benchmark_info}{Benchmark\+Info}} const \&info) override
+\item 
+void \mbox{\hyperlink{struct_catch_1_1_console_reporter_af97510a0cfbd0ac07161c9642b996315}{benchmark\+Ended}} (\mbox{\hyperlink{struct_catch_1_1_benchmark_stats}{Benchmark\+Stats}} const \&stats) override
+\item 
+void \mbox{\hyperlink{struct_catch_1_1_console_reporter_a20bdc16be273420c9649138272546132}{test\+Case\+Ended}} (\mbox{\hyperlink{struct_catch_1_1_test_case_stats}{Test\+Case\+Stats}} const \&\+\_\+test\+Case\+Stats) override
+\item 
+void \mbox{\hyperlink{struct_catch_1_1_console_reporter_ad27c37a218bb32d8aa968ed08f5f1177}{test\+Group\+Ended}} (\mbox{\hyperlink{struct_catch_1_1_test_group_stats}{Test\+Group\+Stats}} const \&\+\_\+test\+Group\+Stats) override
+\item 
+void \mbox{\hyperlink{struct_catch_1_1_console_reporter_a665c8005050d0f1745935e0dde76e280}{test\+Run\+Ended}} (\mbox{\hyperlink{struct_catch_1_1_test_run_stats}{Test\+Run\+Stats}} const \&\+\_\+test\+Run\+Stats) override
+\item 
+void \mbox{\hyperlink{struct_catch_1_1_console_reporter_a89d08018bf29583341bdfe7422007011}{test\+Run\+Starting}} (\mbox{\hyperlink{struct_catch_1_1_test_run_info}{Test\+Run\+Info}} const \&\+\_\+test\+Run\+Info) override
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base}{Catch\+::\+Streaming\+Reporter\+Base$<$ Console\+Reporter $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_aa92dc1c46e7ec51639bedac214dba74a}{Streaming\+Reporter\+Base}} (\mbox{\hyperlink{struct_catch_1_1_reporter_config}{Reporter\+Config}} const \&\+\_\+config)
+\item 
+\mbox{\hyperlink{struct_catch_1_1_reporter_preferences}{Reporter\+Preferences}} \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a83390b98f9a6ac5dab1165d6eb1a7f62}{get\+Preferences}} () const override
+\item 
+\mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ae70b64581a4fcaf024073b9619737826}{\texorpdfstring{$\sim$}{\string~}\+Streaming\+Reporter\+Base}} () override=default
+\item 
+void \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a3576d7fca326a345fd3aff03efa4fbc8}{no\+Matching\+Test\+Cases}} (std\+::string const \&) override
+\item 
+void \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a510b201b48fb7d0ebd11d0c8c65a43ba}{test\+Run\+Starting}} (\mbox{\hyperlink{struct_catch_1_1_test_run_info}{Test\+Run\+Info}} const \&\+\_\+test\+Run\+Info) override
+\item 
+void \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a6961a1cbf0d4bffed14cb04f80aaf318}{test\+Group\+Starting}} (\mbox{\hyperlink{struct_catch_1_1_group_info}{Group\+Info}} const \&\+\_\+group\+Info) override
+\item 
+void \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ad8a773ceb481c17f3cedee3bf65b9820}{test\+Case\+Starting}} (\mbox{\hyperlink{struct_catch_1_1_test_case_info}{Test\+Case\+Info}} const \&\+\_\+test\+Info) override
+\item 
+void \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a249cfe647a373a77d118e4c564422e49}{section\+Starting}} (\mbox{\hyperlink{struct_catch_1_1_section_info}{Section\+Info}} const \&\+\_\+section\+Info) override
+\item 
+void \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ab889c47d829ddb5a2b96b46e1e09d207}{section\+Ended}} (\mbox{\hyperlink{struct_catch_1_1_section_stats}{Section\+Stats}} const \&) override
+\item 
+void \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ae9e916b4aeb5e9080f3b77a10d69c5f6}{test\+Case\+Ended}} (\mbox{\hyperlink{struct_catch_1_1_test_case_stats}{Test\+Case\+Stats}} const \&) override
+\item 
+void \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_aebb3f5242058ff945527079b85964bbe}{test\+Group\+Ended}} (\mbox{\hyperlink{struct_catch_1_1_test_group_stats}{Test\+Group\+Stats}} const \&) override
+\item 
+void \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a8cfd2e27ce7746966cf145b818254fd1}{test\+Run\+Ended}} (\mbox{\hyperlink{struct_catch_1_1_test_run_stats}{Test\+Run\+Stats}} const \&) override
+\item 
+void \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ae9debeac49a31342ffa6844de5346cbf}{skip\+Test}} (\mbox{\hyperlink{struct_catch_1_1_test_case_info}{Test\+Case\+Info}} const \&) override
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter}{Catch\+::\+IStreaming\+Reporter}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_a7edcaeb7bb35258b4faa4b79a20320e1}{\texorpdfstring{$\sim$}{\string~}\+IStreaming\+Reporter}} ()=default
+\item 
+virtual void \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_ad5001d7247cc94e5fec26b0e702f134f}{fatal\+Error\+Encountered}} (\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})
+\item 
+virtual bool \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_a6ca0329f20ad8b8ec7b3d1958f1fa73f}{is\+Multi}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static std\+::string \mbox{\hyperlink{struct_catch_1_1_console_reporter_a3ca548cc9cb3fff18c000400afa3ff00}{get\+Description}} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Static Public Member Functions inherited from \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base}{Catch\+::\+Streaming\+Reporter\+Base$<$ Console\+Reporter $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+static std\+::set$<$ \mbox{\hyperlink{namespace_catch_af85c0d46dfe687d923a157362fd07737}{Verbosity}} $>$ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ac6bcd1df9a5cd22abc781c919bed010e}{get\+Supported\+Verbosities}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::unique\+\_\+ptr$<$ \mbox{\hyperlink{class_catch_1_1_table_printer}{Table\+Printer}} $>$ \mbox{\hyperlink{struct_catch_1_1_console_reporter_a763962e72c225e53523fd6a86371a4f0}{m\+\_\+table\+Printer}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes inherited from \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base}{Catch\+::\+Streaming\+Reporter\+Base$<$ Console\+Reporter $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespace_catch_a961f6f5f07e265684c220a8ae014d7d6}{IConfig\+Ptr}} \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_aea2fd5c5f7cbfa78d96e15485a1b8ff7}{m\+\_\+config}}
+\item 
+std\+::ostream \& \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a8ad7526bce08333b7d9414cc157e1f6d}{stream}}
+\item 
+\mbox{\hyperlink{struct_catch_1_1_lazy_stat}{Lazy\+Stat}}$<$ \mbox{\hyperlink{struct_catch_1_1_test_run_info}{Test\+Run\+Info}} $>$ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ad6fcc15e73e91f3cd19a0c8324783bd7}{current\+Test\+Run\+Info}}
+\item 
+\mbox{\hyperlink{struct_catch_1_1_lazy_stat}{Lazy\+Stat}}$<$ \mbox{\hyperlink{struct_catch_1_1_group_info}{Group\+Info}} $>$ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a1b3f99eb83f649f90be2e3a2a296f76f}{current\+Group\+Info}}
+\item 
+\mbox{\hyperlink{struct_catch_1_1_lazy_stat}{Lazy\+Stat}}$<$ \mbox{\hyperlink{struct_catch_1_1_test_case_info}{Test\+Case\+Info}} $>$ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a974c80ec3ab579eeafe899d9f0a97405}{current\+Test\+Case\+Info}}
+\item 
+std\+::vector$<$ \mbox{\hyperlink{struct_catch_1_1_section_info}{Section\+Info}} $>$ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a5358f16b9cc5afa0633519bf2c3a642b}{m\+\_\+section\+Stack}}
+\item 
+\mbox{\hyperlink{struct_catch_1_1_reporter_preferences}{Reporter\+Preferences}} \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ab3c0202658a530cb0a384fef4fbd0baf}{m\+\_\+reporter\+Prefs}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__console_8h_source_l00026}{26}} of file \mbox{\hyperlink{catch__reporter__console_8h_source}{catch\+\_\+reporter\+\_\+console.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{struct_catch_1_1_console_reporter_a0ec39703fe1c27af4fed6eff0c192a6e}\index{Catch::ConsoleReporter@{Catch::ConsoleReporter}!ConsoleReporter@{ConsoleReporter}}
+\index{ConsoleReporter@{ConsoleReporter}!Catch::ConsoleReporter@{Catch::ConsoleReporter}}
+\doxysubsubsection{\texorpdfstring{ConsoleReporter()}{ConsoleReporter()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_console_reporter_a0ec39703fe1c27af4fed6eff0c192a6e} 
+Catch\+::\+Console\+Reporter\+::\+Console\+Reporter (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_reporter_config}{Reporter\+Config}} const \&}]{config}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__console_8cpp_source_l00338}{338}} of file \mbox{\hyperlink{catch__reporter__console_8cpp_source}{catch\+\_\+reporter\+\_\+console.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00339\ \ \ \ \ :\ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_aa92dc1c46e7ec51639bedac214dba74a}{StreamingReporterBase}}(\mbox{\hyperlink{classconfig}{config}}),}
+\DoxyCodeLine{00340\ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_console_reporter_a763962e72c225e53523fd6a86371a4f0}{m\_tablePrinter}}(\textcolor{keyword}{new}\ TablePrinter(\mbox{\hyperlink{classconfig}{config}}.stream(),}
+\DoxyCodeLine{00341\ \ \ \ \ \{}
+\DoxyCodeLine{00342\ \ \ \ \ \ \ \ \ \{\ \textcolor{stringliteral}{"{}benchmark\ name"{}},\ CATCH\_CONFIG\_CONSOLE\_WIDTH\ -\/\ 32,\ ColumnInfo::Left\ \},}
+\DoxyCodeLine{00343\ \ \ \ \ \ \ \ \ \{\ \textcolor{stringliteral}{"{}iters"{}},\ 8,\ ColumnInfo::Right\ \},}
+\DoxyCodeLine{00344\ \ \ \ \ \ \ \ \ \{\ \textcolor{stringliteral}{"{}elapsed\ ns"{}},\ 14,\ ColumnInfo::Right\ \},}
+\DoxyCodeLine{00345\ \ \ \ \ \ \ \ \ \{\ \textcolor{stringliteral}{"{}average"{}},\ 14,\ ColumnInfo::Right\ \}}
+\DoxyCodeLine{00346\ \ \ \ \ \}))\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{struct_catch_1_1_console_reporter_afe3cfc570a9f8728b2e2db32a0e878e8}\index{Catch::ConsoleReporter@{Catch::ConsoleReporter}!````~ConsoleReporter@{\texorpdfstring{$\sim$}{\string~}ConsoleReporter}}
+\index{````~ConsoleReporter@{\texorpdfstring{$\sim$}{\string~}ConsoleReporter}!Catch::ConsoleReporter@{Catch::ConsoleReporter}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}ConsoleReporter()}{\string~ConsoleReporter()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_console_reporter_afe3cfc570a9f8728b2e2db32a0e878e8} 
+Catch\+::\+Console\+Reporter\+::\texorpdfstring{$\sim$}{\string~}\+Console\+Reporter (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [default]}}
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_catch_1_1_console_reporter_a8b122bcaadf50ad6dca012d1b2916aef}\index{Catch::ConsoleReporter@{Catch::ConsoleReporter}!assertionEnded@{assertionEnded}}
+\index{assertionEnded@{assertionEnded}!Catch::ConsoleReporter@{Catch::ConsoleReporter}}
+\doxysubsubsection{\texorpdfstring{assertionEnded()}{assertionEnded()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_console_reporter_a8b122bcaadf50ad6dca012d1b2916aef} 
+bool Catch\+::\+Console\+Reporter\+::assertion\+Ended (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_assertion_stats}{Assertion\+Stats}} const \&}]{\+\_\+assertion\+Stats}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_a5248ab87149e0f1abe2de96c387ff5e3}{Catch\+::\+IStreaming\+Reporter}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__console_8cpp_source_l00359}{359}} of file \mbox{\hyperlink{catch__reporter__console_8cpp_source}{catch\+\_\+reporter\+\_\+console.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00359\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00360\ \ \ \ \ AssertionResult\ \textcolor{keyword}{const}\&\ result\ =\ \_assertionStats.assertionResult;}
+\DoxyCodeLine{00361\ }
+\DoxyCodeLine{00362\ \ \ \ \ \textcolor{keywordtype}{bool}\ includeResults\ =\ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_aea2fd5c5f7cbfa78d96e15485a1b8ff7}{m\_config}}-\/>includeSuccessfulResults()\ ||\ !result.isOk();}
+\DoxyCodeLine{00363\ }
+\DoxyCodeLine{00364\ \ \ \ \ \textcolor{comment}{//\ Drop\ out\ if\ result\ was\ successful\ but\ we're\ not\ printing\ them.}}
+\DoxyCodeLine{00365\ \ \ \ \ \textcolor{keywordflow}{if}\ (!includeResults\ \&\&\ result.getResultType()\ !=\ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa22806493991ee90456cfbd973ae8d1ab}{ResultWas::Warning}})}
+\DoxyCodeLine{00366\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00367\ }
+\DoxyCodeLine{00368\ \ \ \ \ lazyPrint();}
+\DoxyCodeLine{00369\ }
+\DoxyCodeLine{00370\ \ \ \ \ ConsoleAssertionPrinter\ printer(\mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a8ad7526bce08333b7d9414cc157e1f6d}{stream}},\ \_assertionStats,\ includeResults);}
+\DoxyCodeLine{00371\ \ \ \ \ printer.print();}
+\DoxyCodeLine{00372\ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a8ad7526bce08333b7d9414cc157e1f6d}{stream}}\ <<\ std::endl;}
+\DoxyCodeLine{00373\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00374\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_catch_1_1_console_reporter_a91b1289a9bc2ff2f8128fd6cbc258665}\index{Catch::ConsoleReporter@{Catch::ConsoleReporter}!assertionStarting@{assertionStarting}}
+\index{assertionStarting@{assertionStarting}!Catch::ConsoleReporter@{Catch::ConsoleReporter}}
+\doxysubsubsection{\texorpdfstring{assertionStarting()}{assertionStarting()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_console_reporter_a91b1289a9bc2ff2f8128fd6cbc258665} 
+void Catch\+::\+Console\+Reporter\+::assertion\+Starting (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_assertion_info}{Assertion\+Info}} const \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_ae1c3becff20f4a940c9f01d2c4114a17}{Catch\+::\+IStreaming\+Reporter}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__console_8cpp_source_l00357}{357}} of file \mbox{\hyperlink{catch__reporter__console_8cpp_source}{catch\+\_\+reporter\+\_\+console.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00357\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{struct_catch_1_1_console_reporter_af97510a0cfbd0ac07161c9642b996315}\index{Catch::ConsoleReporter@{Catch::ConsoleReporter}!benchmarkEnded@{benchmarkEnded}}
+\index{benchmarkEnded@{benchmarkEnded}!Catch::ConsoleReporter@{Catch::ConsoleReporter}}
+\doxysubsubsection{\texorpdfstring{benchmarkEnded()}{benchmarkEnded()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_console_reporter_af97510a0cfbd0ac07161c9642b996315} 
+void Catch\+::\+Console\+Reporter\+::benchmark\+Ended (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_benchmark_stats}{Benchmark\+Stats}} const \&}]{stats}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_aed607b9cde8193cc470c2749f106b4fa}{Catch\+::\+IStreaming\+Reporter}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__console_8cpp_source_l00416}{416}} of file \mbox{\hyperlink{catch__reporter__console_8cpp_source}{catch\+\_\+reporter\+\_\+console.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00416\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00417\ \ \ \ \ Duration\ average(stats.elapsedTimeInNanoseconds\ /\ stats.iterations);}
+\DoxyCodeLine{00418\ \ \ \ \ (*m\_tablePrinter)}
+\DoxyCodeLine{00419\ \ \ \ \ \ \ \ \ <<\ stats.iterations\ <<\ ColumnBreak()}
+\DoxyCodeLine{00420\ \ \ \ \ \ \ \ \ <<\ stats.elapsedTimeInNanoseconds\ <<\ ColumnBreak()}
+\DoxyCodeLine{00421\ \ \ \ \ \ \ \ \ <<\ average\ <<\ ColumnBreak();}
+\DoxyCodeLine{00422\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_catch_1_1_console_reporter_a6caa775343962a467d9ebbc3403fc3d3}\index{Catch::ConsoleReporter@{Catch::ConsoleReporter}!benchmarkStarting@{benchmarkStarting}}
+\index{benchmarkStarting@{benchmarkStarting}!Catch::ConsoleReporter@{Catch::ConsoleReporter}}
+\doxysubsubsection{\texorpdfstring{benchmarkStarting()}{benchmarkStarting()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_console_reporter_a6caa775343962a467d9ebbc3403fc3d3} 
+void Catch\+::\+Console\+Reporter\+::benchmark\+Starting (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_benchmark_info}{Benchmark\+Info}} const \&}]{info}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_ac0b61a3ef04ee287937751c043a7013a}{Catch\+::\+IStreaming\+Reporter}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__console_8cpp_source_l00401}{401}} of file \mbox{\hyperlink{catch__reporter__console_8cpp_source}{catch\+\_\+reporter\+\_\+console.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00401\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00402\ \ \ \ \ lazyPrintWithoutClosingBenchmarkTable();}
+\DoxyCodeLine{00403\ }
+\DoxyCodeLine{00404\ \ \ \ \ \textcolor{keyword}{auto}\ nameCol\ =\ Column(\ info.name\ ).width(\ \textcolor{keyword}{static\_cast<}std::size\_t\textcolor{keyword}{>}(\ \mbox{\hyperlink{struct_catch_1_1_console_reporter_a763962e72c225e53523fd6a86371a4f0}{m\_tablePrinter}}-\/>columnInfos()[0].width\ -\/\ 2\ )\ );}
+\DoxyCodeLine{00405\ }
+\DoxyCodeLine{00406\ \ \ \ \ \textcolor{keywordtype}{bool}\ firstLine\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00407\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\ line\ :\ nameCol)\ \{}
+\DoxyCodeLine{00408\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!firstLine)}
+\DoxyCodeLine{00409\ \ \ \ \ \ \ \ \ \ \ \ \ (*m\_tablePrinter)\ <<\ ColumnBreak()\ <<\ ColumnBreak()\ <<\ ColumnBreak();}
+\DoxyCodeLine{00410\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00411\ \ \ \ \ \ \ \ \ \ \ \ \ firstLine\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00412\ }
+\DoxyCodeLine{00413\ \ \ \ \ \ \ \ \ (*m\_tablePrinter)\ <<\ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}\ <<\ ColumnBreak();}
+\DoxyCodeLine{00414\ \ \ \ \ \}}
+\DoxyCodeLine{00415\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_catch_1_1_console_reporter_a6caa775343962a467d9ebbc3403fc3d3_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_catch_1_1_console_reporter_a3ca548cc9cb3fff18c000400afa3ff00}\index{Catch::ConsoleReporter@{Catch::ConsoleReporter}!getDescription@{getDescription}}
+\index{getDescription@{getDescription}!Catch::ConsoleReporter@{Catch::ConsoleReporter}}
+\doxysubsubsection{\texorpdfstring{getDescription()}{getDescription()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_console_reporter_a3ca548cc9cb3fff18c000400afa3ff00} 
+std\+::string Catch\+::\+Console\+Reporter\+::get\+Description (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__console_8cpp_source_l00349}{349}} of file \mbox{\hyperlink{catch__reporter__console_8cpp_source}{catch\+\_\+reporter\+\_\+console.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00349\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00350\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Reports\ test\ results\ as\ plain\ lines\ of\ text"{}};}
+\DoxyCodeLine{00351\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_catch_1_1_console_reporter_a73955f7470015a6164966a6626e21343}\index{Catch::ConsoleReporter@{Catch::ConsoleReporter}!noMatchingTestCases@{noMatchingTestCases}}
+\index{noMatchingTestCases@{noMatchingTestCases}!Catch::ConsoleReporter@{Catch::ConsoleReporter}}
+\doxysubsubsection{\texorpdfstring{noMatchingTestCases()}{noMatchingTestCases()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_console_reporter_a73955f7470015a6164966a6626e21343} 
+void Catch\+::\+Console\+Reporter\+::no\+Matching\+Test\+Cases (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{spec}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_aaa0ea1d8250b48fafc8d36f86e6d1d80}{Catch\+::\+IStreaming\+Reporter}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__console_8cpp_source_l00353}{353}} of file \mbox{\hyperlink{catch__reporter__console_8cpp_source}{catch\+\_\+reporter\+\_\+console.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00353\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00354\ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a8ad7526bce08333b7d9414cc157e1f6d}{stream}}\ <<\ \textcolor{stringliteral}{"{}No\ test\ cases\ matched\ '"{}}\ <<\ spec\ <<\ \textcolor{charliteral}{'\(\backslash\)''}\ <<\ std::endl;}
+\DoxyCodeLine{00355\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_catch_1_1_console_reporter_a7ba7b75fa4a7e88d71782a1800523d78}\index{Catch::ConsoleReporter@{Catch::ConsoleReporter}!sectionEnded@{sectionEnded}}
+\index{sectionEnded@{sectionEnded}!Catch::ConsoleReporter@{Catch::ConsoleReporter}}
+\doxysubsubsection{\texorpdfstring{sectionEnded()}{sectionEnded()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_console_reporter_a7ba7b75fa4a7e88d71782a1800523d78} 
+void Catch\+::\+Console\+Reporter\+::section\+Ended (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_section_stats}{Section\+Stats}} const \&}]{\+\_\+section\+Stats}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_aba7a6ce1f315da47b8017b5ca6d1d008}{Catch\+::\+IStreaming\+Reporter}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__console_8cpp_source_l00380}{380}} of file \mbox{\hyperlink{catch__reporter__console_8cpp_source}{catch\+\_\+reporter\+\_\+console.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00380\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00381\ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_console_reporter_a763962e72c225e53523fd6a86371a4f0}{m\_tablePrinter}}-\/>close();}
+\DoxyCodeLine{00382\ \ \ \ \ \textcolor{keywordflow}{if}\ (\_sectionStats.missingAssertions)\ \{}
+\DoxyCodeLine{00383\ \ \ \ \ \ \ \ \ lazyPrint();}
+\DoxyCodeLine{00384\ \ \ \ \ \ \ \ \ Colour\ colour(\mbox{\hyperlink{struct_catch_1_1_colour_a987a596fd001bd80db06b3ba7d53231ea2db97a1f0d8607af13061097fa4cdc8d}{Colour::ResultError}});}
+\DoxyCodeLine{00385\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a5358f16b9cc5afa0633519bf2c3a642b}{m\_sectionStack}}.size()\ >\ 1)}
+\DoxyCodeLine{00386\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a8ad7526bce08333b7d9414cc157e1f6d}{stream}}\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)nNo\ assertions\ in\ section"{}};}
+\DoxyCodeLine{00387\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00388\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a8ad7526bce08333b7d9414cc157e1f6d}{stream}}\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)nNo\ assertions\ in\ test\ case"{}};}
+\DoxyCodeLine{00389\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a8ad7526bce08333b7d9414cc157e1f6d}{stream}}\ <<\ \textcolor{stringliteral}{"{}\ '"{}}\ <<\ \_sectionStats.sectionInfo.name\ <<\ \textcolor{stringliteral}{"{}'\(\backslash\)n"{}}\ <<\ std::endl;}
+\DoxyCodeLine{00390\ \ \ \ \ \}}
+\DoxyCodeLine{00391\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_aea2fd5c5f7cbfa78d96e15485a1b8ff7}{m\_config}}-\/>showDurations()\ ==\ \mbox{\hyperlink{struct_catch_1_1_show_durations_a82fa0174554187220c1eda175f122ee1ac9dcaeb20b4d9ca94227ab3f6878ae0a}{ShowDurations::Always}})\ \{}
+\DoxyCodeLine{00392\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a8ad7526bce08333b7d9414cc157e1f6d}{stream}}\ <<\ \mbox{\hyperlink{namespace_catch_af65507889895c5c4b04fb831eeab2972}{getFormattedDuration}}(\_sectionStats.durationInSeconds)\ <<\ \textcolor{stringliteral}{"{}\ s:\ "{}}\ <<\ \_sectionStats.sectionInfo.name\ <<\ std::endl;}
+\DoxyCodeLine{00393\ \ \ \ \ \}}
+\DoxyCodeLine{00394\ \ \ \ \ \textcolor{keywordflow}{if}\ (m\_headerPrinted)\ \{}
+\DoxyCodeLine{00395\ \ \ \ \ \ \ \ \ m\_headerPrinted\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00396\ \ \ \ \ \}}
+\DoxyCodeLine{00397\ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ab889c47d829ddb5a2b96b46e1e09d207}{StreamingReporterBase::sectionEnded}}(\_sectionStats);}
+\DoxyCodeLine{00398\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_catch_1_1_console_reporter_a7ba7b75fa4a7e88d71782a1800523d78_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_catch_1_1_console_reporter_a4827fca3e5921e571fc03e38d3cf59c9}\index{Catch::ConsoleReporter@{Catch::ConsoleReporter}!sectionStarting@{sectionStarting}}
+\index{sectionStarting@{sectionStarting}!Catch::ConsoleReporter@{Catch::ConsoleReporter}}
+\doxysubsubsection{\texorpdfstring{sectionStarting()}{sectionStarting()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_console_reporter_a4827fca3e5921e571fc03e38d3cf59c9} 
+void Catch\+::\+Console\+Reporter\+::section\+Starting (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_section_info}{Section\+Info}} const \&}]{\+\_\+section\+Info}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_aa6236178937a43c2d7665729fcb79521}{Catch\+::\+IStreaming\+Reporter}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__console_8cpp_source_l00376}{376}} of file \mbox{\hyperlink{catch__reporter__console_8cpp_source}{catch\+\_\+reporter\+\_\+console.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00376\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00377\ \ \ \ \ m\_headerPrinted\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00378\ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a249cfe647a373a77d118e4c564422e49}{StreamingReporterBase::sectionStarting}}(\_sectionInfo);}
+\DoxyCodeLine{00379\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_catch_1_1_console_reporter_a4827fca3e5921e571fc03e38d3cf59c9_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_catch_1_1_console_reporter_a20bdc16be273420c9649138272546132}\index{Catch::ConsoleReporter@{Catch::ConsoleReporter}!testCaseEnded@{testCaseEnded}}
+\index{testCaseEnded@{testCaseEnded}!Catch::ConsoleReporter@{Catch::ConsoleReporter}}
+\doxysubsubsection{\texorpdfstring{testCaseEnded()}{testCaseEnded()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_console_reporter_a20bdc16be273420c9649138272546132} 
+void Catch\+::\+Console\+Reporter\+::test\+Case\+Ended (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_test_case_stats}{Test\+Case\+Stats}} const \&}]{\+\_\+test\+Case\+Stats}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_ae295b98b77bab527be53ea9d35dfe66f}{Catch\+::\+IStreaming\+Reporter}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__console_8cpp_source_l00424}{424}} of file \mbox{\hyperlink{catch__reporter__console_8cpp_source}{catch\+\_\+reporter\+\_\+console.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00424\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00425\ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_console_reporter_a763962e72c225e53523fd6a86371a4f0}{m\_tablePrinter}}-\/>close();}
+\DoxyCodeLine{00426\ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ae9e916b4aeb5e9080f3b77a10d69c5f6}{StreamingReporterBase::testCaseEnded}}(\_testCaseStats);}
+\DoxyCodeLine{00427\ \ \ \ \ m\_headerPrinted\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00428\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_catch_1_1_console_reporter_a20bdc16be273420c9649138272546132_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_catch_1_1_console_reporter_ad27c37a218bb32d8aa968ed08f5f1177}\index{Catch::ConsoleReporter@{Catch::ConsoleReporter}!testGroupEnded@{testGroupEnded}}
+\index{testGroupEnded@{testGroupEnded}!Catch::ConsoleReporter@{Catch::ConsoleReporter}}
+\doxysubsubsection{\texorpdfstring{testGroupEnded()}{testGroupEnded()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_console_reporter_ad27c37a218bb32d8aa968ed08f5f1177} 
+void Catch\+::\+Console\+Reporter\+::test\+Group\+Ended (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_test_group_stats}{Test\+Group\+Stats}} const \&}]{\+\_\+test\+Group\+Stats}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_abf668bf347eda4ba94fa2b3483ca4dd3}{Catch\+::\+IStreaming\+Reporter}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__console_8cpp_source_l00429}{429}} of file \mbox{\hyperlink{catch__reporter__console_8cpp_source}{catch\+\_\+reporter\+\_\+console.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00429\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00430\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a1b3f99eb83f649f90be2e3a2a296f76f}{currentGroupInfo}}.used)\ \{}
+\DoxyCodeLine{00431\ \ \ \ \ \ \ \ \ printSummaryDivider();}
+\DoxyCodeLine{00432\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a8ad7526bce08333b7d9414cc157e1f6d}{stream}}\ <<\ \textcolor{stringliteral}{"{}Summary\ for\ group\ '"{}}\ <<\ \_testGroupStats.groupInfo.name\ <<\ \textcolor{stringliteral}{"{}':\(\backslash\)n"{}};}
+\DoxyCodeLine{00433\ \ \ \ \ \ \ \ \ printTotals(\_testGroupStats.totals);}
+\DoxyCodeLine{00434\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a8ad7526bce08333b7d9414cc157e1f6d}{stream}}\ <<\ \textcolor{charliteral}{'\(\backslash\)n'}\ <<\ std::endl;}
+\DoxyCodeLine{00435\ \ \ \ \ \}}
+\DoxyCodeLine{00436\ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_aebb3f5242058ff945527079b85964bbe}{StreamingReporterBase::testGroupEnded}}(\_testGroupStats);}
+\DoxyCodeLine{00437\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_catch_1_1_console_reporter_ad27c37a218bb32d8aa968ed08f5f1177_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_catch_1_1_console_reporter_a665c8005050d0f1745935e0dde76e280}\index{Catch::ConsoleReporter@{Catch::ConsoleReporter}!testRunEnded@{testRunEnded}}
+\index{testRunEnded@{testRunEnded}!Catch::ConsoleReporter@{Catch::ConsoleReporter}}
+\doxysubsubsection{\texorpdfstring{testRunEnded()}{testRunEnded()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_console_reporter_a665c8005050d0f1745935e0dde76e280} 
+void Catch\+::\+Console\+Reporter\+::test\+Run\+Ended (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_test_run_stats}{Test\+Run\+Stats}} const \&}]{\+\_\+test\+Run\+Stats}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_a1ac383df84242bc55578e32ebca13e88}{Catch\+::\+IStreaming\+Reporter}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__console_8cpp_source_l00438}{438}} of file \mbox{\hyperlink{catch__reporter__console_8cpp_source}{catch\+\_\+reporter\+\_\+console.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00438\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00439\ \ \ \ \ printTotalsDivider(\_testRunStats.totals);}
+\DoxyCodeLine{00440\ \ \ \ \ printTotals(\_testRunStats.totals);}
+\DoxyCodeLine{00441\ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a8ad7526bce08333b7d9414cc157e1f6d}{stream}}\ <<\ std::endl;}
+\DoxyCodeLine{00442\ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a8cfd2e27ce7746966cf145b818254fd1}{StreamingReporterBase::testRunEnded}}(\_testRunStats);}
+\DoxyCodeLine{00443\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_catch_1_1_console_reporter_a665c8005050d0f1745935e0dde76e280_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_catch_1_1_console_reporter_a89d08018bf29583341bdfe7422007011}\index{Catch::ConsoleReporter@{Catch::ConsoleReporter}!testRunStarting@{testRunStarting}}
+\index{testRunStarting@{testRunStarting}!Catch::ConsoleReporter@{Catch::ConsoleReporter}}
+\doxysubsubsection{\texorpdfstring{testRunStarting()}{testRunStarting()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_console_reporter_a89d08018bf29583341bdfe7422007011} 
+void Catch\+::\+Console\+Reporter\+::test\+Run\+Starting (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_test_run_info}{Test\+Run\+Info}} const \&}]{\+\_\+test\+Run\+Info}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_a8c7b304d9563992a611dc7d68dc0c1ce}{Catch\+::\+IStreaming\+Reporter}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__console_8cpp_source_l00444}{444}} of file \mbox{\hyperlink{catch__reporter__console_8cpp_source}{catch\+\_\+reporter\+\_\+console.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00444\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00445\ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a510b201b48fb7d0ebd11d0c8c65a43ba}{StreamingReporterBase::testRunStarting}}(\_testInfo);}
+\DoxyCodeLine{00446\ \ \ \ \ printTestFilters();}
+\DoxyCodeLine{00447\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_catch_1_1_console_reporter_a89d08018bf29583341bdfe7422007011_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_catch_1_1_console_reporter_a763962e72c225e53523fd6a86371a4f0}\index{Catch::ConsoleReporter@{Catch::ConsoleReporter}!m\_tablePrinter@{m\_tablePrinter}}
+\index{m\_tablePrinter@{m\_tablePrinter}!Catch::ConsoleReporter@{Catch::ConsoleReporter}}
+\doxysubsubsection{\texorpdfstring{m\_tablePrinter}{m\_tablePrinter}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_console_reporter_a763962e72c225e53523fd6a86371a4f0} 
+std\+::unique\+\_\+ptr$<$\mbox{\hyperlink{class_catch_1_1_table_printer}{Table\+Printer}}$>$ Catch\+::\+Console\+Reporter\+::m\+\_\+table\+Printer}
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__console_8h_source_l00027}{27}} of file \mbox{\hyperlink{catch__reporter__console_8h_source}{catch\+\_\+reporter\+\_\+console.\+h}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/include/reporters/\mbox{\hyperlink{catch__reporter__console_8h}{catch\+\_\+reporter\+\_\+console.\+h}}\item 
+libraries/sys-\/vm/external/\+Catch2/include/reporters/\mbox{\hyperlink{catch__reporter__console_8cpp}{catch\+\_\+reporter\+\_\+console.\+cpp}}\end{DoxyCompactItemize}

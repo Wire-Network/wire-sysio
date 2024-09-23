@@ -1,0 +1,178 @@
+\doxysection{libraries/fc/secp256k1/secp256k1/examples/schnorr.c File Reference}
+\hypertarget{schnorr_8c}{}\label{schnorr_8c}\index{libraries/fc/secp256k1/secp256k1/examples/schnorr.c@{libraries/fc/secp256k1/secp256k1/examples/schnorr.c}}
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$assert.\+h$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include $<$secp256k1.\+h$>$}\newline
+{\ttfamily \#include $<$secp256k1\+\_\+extrakeys.\+h$>$}\newline
+{\ttfamily \#include $<$secp256k1\+\_\+schnorrsig.\+h$>$}\newline
+{\ttfamily \#include "{}random.\+h"{}}\newline
+Include dependency graph for schnorr.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{schnorr_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{schnorr_8c_a840291bc02cba5474a4cb46a9b9566fe}{main}} (void)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{schnorr_8c_a840291bc02cba5474a4cb46a9b9566fe}\index{schnorr.c@{schnorr.c}!main@{main}}
+\index{main@{main}!schnorr.c@{schnorr.c}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{schnorr_8c_a840291bc02cba5474a4cb46a9b9566fe} 
+int main (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{schnorr_8c_source_l00020}{20}} of file \mbox{\hyperlink{schnorr_8c_source}{schnorr.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00021\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ msg[12]\ =\ \textcolor{stringliteral}{"{}Hello\ World!"{}};}
+\DoxyCodeLine{00022\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ msg\_hash[32];}
+\DoxyCodeLine{00023\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ tag[17]\ =\ \textcolor{stringliteral}{"{}my\_fancy\_protocol"{}};}
+\DoxyCodeLine{00024\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ seckey[32];}
+\DoxyCodeLine{00025\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ randomize[32];}
+\DoxyCodeLine{00026\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ auxiliary\_rand[32];}
+\DoxyCodeLine{00027\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ serialized\_pubkey[32];}
+\DoxyCodeLine{00028\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{namespacefc_1_1ecc_a7c10bdf37d2fad7c122133f284e47f3e}{signature}}[64];}
+\DoxyCodeLine{00029\ \ \ \ \ \textcolor{keywordtype}{int}\ is\_signature\_valid;}
+\DoxyCodeLine{00030\ \ \ \ \ \textcolor{keywordtype}{int}\ return\_val;}
+\DoxyCodeLine{00031\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__xonly__pubkey}{secp256k1\_xonly\_pubkey}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}};}
+\DoxyCodeLine{00032\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__keypair}{secp256k1\_keypair}}\ keypair;}
+\DoxyCodeLine{00033\ \ \ \ \ \textcolor{comment}{/*\ The\ specification\ in\ secp256k1\_extrakeys.h\ states\ that\ \`{}secp256k1\_keypair\_create`}}
+\DoxyCodeLine{00034\ \textcolor{comment}{\ \ \ \ \ *\ needs\ a\ context\ object\ initialized\ for\ signing.\ And\ in\ secp256k1\_schnorrsig.h}}
+\DoxyCodeLine{00035\ \textcolor{comment}{\ \ \ \ \ *\ they\ state\ that\ \`{}secp256k1\_schnorrsig\_verify`\ needs\ a\ context\ initialized\ for}}
+\DoxyCodeLine{00036\ \textcolor{comment}{\ \ \ \ \ *\ verification,\ which\ is\ why\ we\ create\ a\ context\ for\ both\ signing\ and\ verification}}
+\DoxyCodeLine{00037\ \textcolor{comment}{\ \ \ \ \ *\ with\ the\ SECP256K1\_CONTEXT\_SIGN\ and\ SECP256K1\_CONTEXT\_VERIFY\ flags.\ */}}
+\DoxyCodeLine{00038\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__context__struct}{secp256k1\_context}}*\ ctx\ =\ \mbox{\hyperlink{secp256k1_8h_a3aaa9fcc3ab67bc8f841779a049069c5}{secp256k1\_context\_create}}(\mbox{\hyperlink{secp256k1_8h_a0d34fe6baa73d3145f2e376e43de0b15}{SECP256K1\_CONTEXT\_SIGN}}\ |\ \mbox{\hyperlink{secp256k1_8h_add20a6c320e247ca7bd524cbc4259d64}{SECP256K1\_CONTEXT\_VERIFY}});}
+\DoxyCodeLine{00039\ \ \ \ \ \textcolor{keywordflow}{if}\ (!fill\_random(randomize,\ \textcolor{keyword}{sizeof}(randomize)))\ \{}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Failed\ to\ generate\ randomness\(\backslash\)n"{}});}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{00042\ \ \ \ \ \}}
+\DoxyCodeLine{00043\ \ \ \ \ \textcolor{comment}{/*\ Randomizing\ the\ context\ is\ recommended\ to\ protect\ against\ side-\/channel}}
+\DoxyCodeLine{00044\ \textcolor{comment}{\ \ \ \ \ *\ leakage\ See\ \`{}secp256k1\_context\_randomize`\ in\ secp256k1.h\ for\ more}}
+\DoxyCodeLine{00045\ \textcolor{comment}{\ \ \ \ \ *\ information\ about\ it.\ This\ should\ never\ fail.\ */}}
+\DoxyCodeLine{00046\ \ \ \ \ return\_val\ =\ \mbox{\hyperlink{secp256k1_8h_a1b81d70feb6ed24dc902cbbd5ba569e7}{secp256k1\_context\_randomize}}(ctx,\ randomize);}
+\DoxyCodeLine{00047\ \ \ \ \ assert(return\_val);}
+\DoxyCodeLine{00048\ }
+\DoxyCodeLine{00049\ \textcolor{comment}{\ \ \ \ /***\ Key\ Generation\ ***/}}
+\DoxyCodeLine{00050\ }
+\DoxyCodeLine{00051\ \ \ \ \ \textcolor{comment}{/*\ If\ the\ secret\ key\ is\ zero\ or\ out\ of\ range\ (bigger\ than\ secp256k1's}}
+\DoxyCodeLine{00052\ \textcolor{comment}{\ \ \ \ \ *\ order),\ we\ try\ to\ sample\ a\ new\ key.\ Note\ that\ the\ probability\ of\ this}}
+\DoxyCodeLine{00053\ \textcolor{comment}{\ \ \ \ \ *\ happening\ is\ negligible.\ */}}
+\DoxyCodeLine{00054\ \ \ \ \ \textcolor{keywordflow}{while}\ (1)\ \{}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!fill\_random(seckey,\ \textcolor{keyword}{sizeof}(seckey)))\ \{}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Failed\ to\ generate\ randomness\(\backslash\)n"{}});}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ Try\ to\ create\ a\ keypair\ with\ a\ valid\ context,\ it\ should\ only\ fail\ if}}
+\DoxyCodeLine{00060\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ *\ the\ secret\ key\ is\ zero\ or\ out\ of\ range.\ */}}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{secp256k1__extrakeys_8h_a61b1362ada2435ab10240e52ff738476}{secp256k1\_keypair\_create}}(ctx,\ \&keypair,\ seckey))\ \{}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00064\ \ \ \ \ \}}
+\DoxyCodeLine{00065\ }
+\DoxyCodeLine{00066\ \ \ \ \ \textcolor{comment}{/*\ Extract\ the\ X-\/only\ public\ key\ from\ the\ keypair.\ We\ pass\ NULL\ for}}
+\DoxyCodeLine{00067\ \textcolor{comment}{\ \ \ \ \ *\ \`{}pk\_parity`\ as\ the\ parity\ isn't\ needed\ for\ signing\ or\ verification.}}
+\DoxyCodeLine{00068\ \textcolor{comment}{\ \ \ \ \ *\ \`{}secp256k1\_keypair\_xonly\_pub`\ supports\ returning\ the\ parity\ for}}
+\DoxyCodeLine{00069\ \textcolor{comment}{\ \ \ \ \ *\ other\ use\ cases\ such\ as\ tests\ or\ verifying\ Taproot\ tweaks.}}
+\DoxyCodeLine{00070\ \textcolor{comment}{\ \ \ \ \ *\ This\ should\ never\ fail\ with\ a\ valid\ context\ and\ public\ key.\ */}}
+\DoxyCodeLine{00071\ \ \ \ \ return\_val\ =\ \mbox{\hyperlink{secp256k1__extrakeys_8h_ab0383c461b3790fdcfcaef0f89deb709}{secp256k1\_keypair\_xonly\_pub}}(ctx,\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}},\ NULL,\ \&keypair);}
+\DoxyCodeLine{00072\ \ \ \ \ assert(return\_val);}
+\DoxyCodeLine{00073\ }
+\DoxyCodeLine{00074\ \ \ \ \ \textcolor{comment}{/*\ Serialize\ the\ public\ key.\ Should\ always\ return\ 1\ for\ a\ valid\ public\ key.\ */}}
+\DoxyCodeLine{00075\ \ \ \ \ return\_val\ =\ \mbox{\hyperlink{secp256k1__extrakeys_8h_a455e86be0f18f4313ba8ea73e34a25a6}{secp256k1\_xonly\_pubkey\_serialize}}(ctx,\ serialized\_pubkey,\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}});}
+\DoxyCodeLine{00076\ \ \ \ \ assert(return\_val);}
+\DoxyCodeLine{00077\ }
+\DoxyCodeLine{00078\ \textcolor{comment}{\ \ \ \ /***\ Signing\ ***/}}
+\DoxyCodeLine{00079\ }
+\DoxyCodeLine{00080\ \ \ \ \ \textcolor{comment}{/*\ Instead\ of\ signing\ (possibly\ very\ long)\ messages\ directly,\ we\ sign\ a}}
+\DoxyCodeLine{00081\ \textcolor{comment}{\ \ \ \ \ *\ 32-\/byte\ hash\ of\ the\ message\ in\ this\ example.}}
+\DoxyCodeLine{00082\ \textcolor{comment}{\ \ \ \ \ *}}
+\DoxyCodeLine{00083\ \textcolor{comment}{\ \ \ \ \ *\ We\ use\ secp256k1\_tagged\_sha256\ to\ create\ this\ hash.\ This\ function\ expects}}
+\DoxyCodeLine{00084\ \textcolor{comment}{\ \ \ \ \ *\ a\ context-\/specific\ "{}tag"{},\ which\ restricts\ the\ context\ in\ which\ the\ signed}}
+\DoxyCodeLine{00085\ \textcolor{comment}{\ \ \ \ \ *\ messages\ should\ be\ considered\ valid.\ For\ example,\ if\ protocol\ A\ mandates}}
+\DoxyCodeLine{00086\ \textcolor{comment}{\ \ \ \ \ *\ to\ use\ the\ tag\ "{}my\_fancy\_protocol"{}\ and\ protocol\ B\ mandates\ to\ use\ the\ tag}}
+\DoxyCodeLine{00087\ \textcolor{comment}{\ \ \ \ \ *\ "{}my\_boring\_protocol"{},\ then\ signed\ messages\ from\ protocol\ A\ will\ never\ be}}
+\DoxyCodeLine{00088\ \textcolor{comment}{\ \ \ \ \ *\ valid\ in\ protocol\ B\ (and\ vice\ versa),\ even\ if\ keys\ are\ reused\ across}}
+\DoxyCodeLine{00089\ \textcolor{comment}{\ \ \ \ \ *\ protocols.\ This\ implements\ "{}domain\ separation"{},\ which\ is\ considered\ good}}
+\DoxyCodeLine{00090\ \textcolor{comment}{\ \ \ \ \ *\ practice.\ It\ avoids\ attacks\ in\ which\ users\ are\ tricked\ into\ signing\ a}}
+\DoxyCodeLine{00091\ \textcolor{comment}{\ \ \ \ \ *\ message\ that\ has\ intended\ consequences\ in\ the\ intended\ context\ (e.g.,}}
+\DoxyCodeLine{00092\ \textcolor{comment}{\ \ \ \ \ *\ protocol\ A)\ but\ would\ have\ unintended\ consequences\ if\ it\ were\ valid\ in}}
+\DoxyCodeLine{00093\ \textcolor{comment}{\ \ \ \ \ *\ some\ other\ context\ (e.g.,\ protocol\ B).\ */}}
+\DoxyCodeLine{00094\ \ \ \ \ return\_val\ =\ \mbox{\hyperlink{secp256k1_8h_a797aef211241f7f6edbb60dcc81c6036}{secp256k1\_tagged\_sha256}}(ctx,\ msg\_hash,\ tag,\ \textcolor{keyword}{sizeof}(tag),\ msg,\ \textcolor{keyword}{sizeof}(msg));}
+\DoxyCodeLine{00095\ \ \ \ \ assert(return\_val);}
+\DoxyCodeLine{00096\ }
+\DoxyCodeLine{00097\ \ \ \ \ \textcolor{comment}{/*\ Generate\ 32\ bytes\ of\ randomness\ to\ use\ with\ BIP-\/340\ schnorr\ signing.\ */}}
+\DoxyCodeLine{00098\ \ \ \ \ \textcolor{keywordflow}{if}\ (!fill\_random(auxiliary\_rand,\ \textcolor{keyword}{sizeof}(auxiliary\_rand)))\ \{}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Failed\ to\ generate\ randomness\(\backslash\)n"{}});}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{00101\ \ \ \ \ \}}
+\DoxyCodeLine{00102\ }
+\DoxyCodeLine{00103\ \ \ \ \ \textcolor{comment}{/*\ Generate\ a\ Schnorr\ signature.}}
+\DoxyCodeLine{00104\ \textcolor{comment}{\ \ \ \ \ *}}
+\DoxyCodeLine{00105\ \textcolor{comment}{\ \ \ \ \ *\ We\ use\ the\ secp256k1\_schnorrsig\_sign32\ function\ that\ provides\ a\ simple}}
+\DoxyCodeLine{00106\ \textcolor{comment}{\ \ \ \ \ *\ interface\ for\ signing\ 32-\/byte\ messages\ (which\ in\ our\ case\ is\ a\ hash\ of}}
+\DoxyCodeLine{00107\ \textcolor{comment}{\ \ \ \ \ *\ the\ actual\ message).\ BIP-\/340\ recommends\ passing\ 32\ bytes\ of\ randomness}}
+\DoxyCodeLine{00108\ \textcolor{comment}{\ \ \ \ \ *\ to\ the\ signing\ function\ to\ improve\ security\ against\ side-\/channel\ attacks.}}
+\DoxyCodeLine{00109\ \textcolor{comment}{\ \ \ \ \ *\ Signing\ with\ a\ valid\ context,\ a\ 32-\/byte\ message,\ a\ verified\ keypair,\ and}}
+\DoxyCodeLine{00110\ \textcolor{comment}{\ \ \ \ \ *\ any\ 32\ bytes\ of\ auxiliary\ random\ data\ should\ never\ fail.\ */}}
+\DoxyCodeLine{00111\ \ \ \ \ return\_val\ =\ \mbox{\hyperlink{secp256k1__schnorrsig_8h_a562fe7745d3c285d64ef8b88ab70d7e1}{secp256k1\_schnorrsig\_sign32}}(ctx,\ signature,\ msg\_hash,\ \&keypair,\ auxiliary\_rand);}
+\DoxyCodeLine{00112\ \ \ \ \ assert(return\_val);}
+\DoxyCodeLine{00113\ }
+\DoxyCodeLine{00114\ \textcolor{comment}{\ \ \ \ /***\ Verification\ ***/}}
+\DoxyCodeLine{00115\ }
+\DoxyCodeLine{00116\ \ \ \ \ \textcolor{comment}{/*\ Deserialize\ the\ public\ key.\ This\ will\ return\ 0\ if\ the\ public\ key\ can't}}
+\DoxyCodeLine{00117\ \textcolor{comment}{\ \ \ \ \ *\ be\ parsed\ correctly\ */}}
+\DoxyCodeLine{00118\ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{secp256k1__extrakeys_8h_ad9e5f1dae6a1e3e03d0093aa17e6c21c}{secp256k1\_xonly\_pubkey\_parse}}(ctx,\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}},\ serialized\_pubkey))\ \{}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Failed\ parsing\ the\ public\ key\(\backslash\)n"{}});}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{00121\ \ \ \ \ \}}
+\DoxyCodeLine{00122\ }
+\DoxyCodeLine{00123\ \ \ \ \ \textcolor{comment}{/*\ Compute\ the\ tagged\ hash\ on\ the\ received\ messages\ using\ the\ same\ tag\ as\ the\ signer.\ */}}
+\DoxyCodeLine{00124\ \ \ \ \ return\_val\ =\ \mbox{\hyperlink{secp256k1_8h_a797aef211241f7f6edbb60dcc81c6036}{secp256k1\_tagged\_sha256}}(ctx,\ msg\_hash,\ tag,\ \textcolor{keyword}{sizeof}(tag),\ msg,\ \textcolor{keyword}{sizeof}(msg));}
+\DoxyCodeLine{00125\ \ \ \ \ assert(return\_val);}
+\DoxyCodeLine{00126\ }
+\DoxyCodeLine{00127\ \ \ \ \ \textcolor{comment}{/*\ Verify\ a\ signature.\ This\ will\ return\ 1\ if\ it's\ valid\ and\ 0\ if\ it's\ not.\ */}}
+\DoxyCodeLine{00128\ \ \ \ \ is\_signature\_valid\ =\ \mbox{\hyperlink{secp256k1__schnorrsig_8h_ad8c9ecde1b1b561bb0a864ef307a48cb}{secp256k1\_schnorrsig\_verify}}(ctx,\ signature,\ msg\_hash,\ 32,\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}});}
+\DoxyCodeLine{00129\ }
+\DoxyCodeLine{00130\ }
+\DoxyCodeLine{00131\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Is\ the\ signature\ valid?\ \%s\(\backslash\)n"{}},\ is\_signature\_valid\ ?\ \textcolor{stringliteral}{"{}true"{}}\ :\ \textcolor{stringliteral}{"{}false"{}});}
+\DoxyCodeLine{00132\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Secret\ Key:\ "{}});}
+\DoxyCodeLine{00133\ \ \ \ \ print\_hex(seckey,\ \textcolor{keyword}{sizeof}(seckey));}
+\DoxyCodeLine{00134\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Public\ Key:\ "{}});}
+\DoxyCodeLine{00135\ \ \ \ \ print\_hex(serialized\_pubkey,\ \textcolor{keyword}{sizeof}(serialized\_pubkey));}
+\DoxyCodeLine{00136\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Signature:\ "{}});}
+\DoxyCodeLine{00137\ \ \ \ \ print\_hex(signature,\ \textcolor{keyword}{sizeof}(signature));}
+\DoxyCodeLine{00138\ }
+\DoxyCodeLine{00139\ \ \ \ \ \textcolor{comment}{/*\ This\ will\ clear\ everything\ from\ the\ context\ and\ free\ the\ memory\ */}}
+\DoxyCodeLine{00140\ \ \ \ \ \mbox{\hyperlink{secp256k1_8h_a026db914e3723531825ecf25a0cbd699}{secp256k1\_context\_destroy}}(ctx);}
+\DoxyCodeLine{00141\ }
+\DoxyCodeLine{00142\ \ \ \ \ \textcolor{comment}{/*\ It's\ best\ practice\ to\ try\ to\ clear\ secrets\ from\ memory\ after\ using\ them.}}
+\DoxyCodeLine{00143\ \textcolor{comment}{\ \ \ \ \ *\ This\ is\ done\ because\ some\ bugs\ can\ allow\ an\ attacker\ to\ leak\ memory,\ for}}
+\DoxyCodeLine{00144\ \textcolor{comment}{\ \ \ \ \ *\ example\ through\ "{}out\ of\ bounds"{}\ array\ access\ (see\ Heartbleed),\ Or\ the\ OS}}
+\DoxyCodeLine{00145\ \textcolor{comment}{\ \ \ \ \ *\ swapping\ them\ to\ disk.\ Hence,\ we\ overwrite\ the\ secret\ key\ buffer\ with\ zeros.}}
+\DoxyCodeLine{00146\ \textcolor{comment}{\ \ \ \ \ *}}
+\DoxyCodeLine{00147\ \textcolor{comment}{\ \ \ \ \ *\ TODO:\ Prevent\ these\ writes\ from\ being\ optimized\ out,\ as\ any\ good\ compiler}}
+\DoxyCodeLine{00148\ \textcolor{comment}{\ \ \ \ \ *\ will\ remove\ any\ writes\ that\ aren't\ used.\ */}}
+\DoxyCodeLine{00149\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(seckey,\ 0,\ \textcolor{keyword}{sizeof}(seckey));}
+\DoxyCodeLine{00150\ }
+\DoxyCodeLine{00151\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00152\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{schnorr_8c_a840291bc02cba5474a4cb46a9b9566fe_cgraph}
+\end{center}
+\end{figure}

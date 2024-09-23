@@ -1,0 +1,99 @@
+\doxysection{sellram\+\_\+subcommand Struct Reference}
+\hypertarget{structsellram__subcommand}{}\label{structsellram__subcommand}\index{sellram\_subcommand@{sellram\_subcommand}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsellram__subcommand_a9b98e3bf09fcf2f35466274f7ae099ac}{sellram\+\_\+subcommand}} (\mbox{\hyperlink{class_c_l_i_1_1_app}{CLI\+::\+App}} \texorpdfstring{$\ast$}{*}action\+Root)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structsellram__subcommand_ace7959fb30f9a92f91a16b08535d8e2f}{from\+\_\+str}}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structsellram__subcommand_a419f905564d0a34824ddd67c28d98754}{receiver\+\_\+str}}
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structsellram__subcommand_acb0b6a836b5d1047d16fd500b4ae581b}{amount}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01715}{1715}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structsellram__subcommand_a9b98e3bf09fcf2f35466274f7ae099ac}\index{sellram\_subcommand@{sellram\_subcommand}!sellram\_subcommand@{sellram\_subcommand}}
+\index{sellram\_subcommand@{sellram\_subcommand}!sellram\_subcommand@{sellram\_subcommand}}
+\doxysubsubsection{\texorpdfstring{sellram\_subcommand()}{sellram\_subcommand()}}
+{\footnotesize\ttfamily \label{structsellram__subcommand_a9b98e3bf09fcf2f35466274f7ae099ac} 
+sellram\+\_\+subcommand\+::sellram\+\_\+subcommand (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_c_l_i_1_1_app}{CLI\+::\+App}} \texorpdfstring{$\ast$}{*}}]{action\+Root}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01720}{1720}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01720\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01721\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ sellram\ =\ actionRoot-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_a8b461d2233ec4121259011b5ed24b336}{add\_subcommand}}(\textcolor{stringliteral}{"{}sellram"{}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}Sell\ RAM"{}}));}
+\DoxyCodeLine{01722\ \ \ \ \ \ \ sellram-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_a8c812d42c7720ecb5cd0aec41b5aa941}{add\_option}}(\textcolor{stringliteral}{"{}account"{}},\ \mbox{\hyperlink{structsellram__subcommand_a419f905564d0a34824ddd67c28d98754}{receiver\_str}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}The\ account\ to\ receive\ tokens\ for\ sold\ RAM"{}}))-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a}{required}}();}
+\DoxyCodeLine{01723\ \ \ \ \ \ \ sellram-\/>add\_option(\textcolor{stringliteral}{"{}bytes"{}},\ \mbox{\hyperlink{structsellram__subcommand_acb0b6a836b5d1047d16fd500b4ae581b}{amount}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}The\ amount\ of\ RAM\ bytes\ to\ sell"{}}))-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a}{required}}();}
+\DoxyCodeLine{01724\ \ \ \ \ \ \ \mbox{\hyperlink{programs_2clio_2main_8cpp_aa5d53f41b83b5323c73622fbbb15e9cd}{add\_standard\_transaction\_options}}(sellram,\ \textcolor{stringliteral}{"{}account@active"{}});}
+\DoxyCodeLine{01725\ }
+\DoxyCodeLine{01726\ \ \ \ \ \ \ sellram-\/>callback([\textcolor{keyword}{this}]\ \{}
+\DoxyCodeLine{01727\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}\ act\_payload\ =\ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}()}
+\DoxyCodeLine{01728\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}account"{}},\ \mbox{\hyperlink{structsellram__subcommand_a419f905564d0a34824ddd67c28d98754}{receiver\_str}})}
+\DoxyCodeLine{01729\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}bytes"{}},\ \mbox{\hyperlink{structsellram__subcommand_acb0b6a836b5d1047d16fd500b4ae581b}{amount}});}
+\DoxyCodeLine{01730\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ accountPermissions\ =\ \mbox{\hyperlink{programs_2clio_2main_8cpp_a2b91ca5dbe7cc4ab287d0e44c3037552}{get\_account\_permissions}}(\mbox{\hyperlink{programs_2clio_2main_8cpp_ad552924cb151dcd5b60c73856d1ff706}{tx\_permission}},\ \{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(\mbox{\hyperlink{structsellram__subcommand_a419f905564d0a34824ddd67c28d98754}{receiver\_str}}),\ config::active\_name\});}
+\DoxyCodeLine{01731\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{programs_2clio_2main_8cpp_aaf784434864a29e4835be7465173d1ab}{send\_actions}}(\{\mbox{\hyperlink{programs_2clio_2main_8cpp_a067e20df5f65333b0c3cf5840bc37dea}{create\_action}}(accountPermissions,\ config::system\_account\_name,\ \textcolor{stringliteral}{"{}sellram"{}}\_n,\ act\_payload)\});}
+\DoxyCodeLine{01732\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{01733\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsellram__subcommand_a9b98e3bf09fcf2f35466274f7ae099ac_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsellram__subcommand_acb0b6a836b5d1047d16fd500b4ae581b}\index{sellram\_subcommand@{sellram\_subcommand}!amount@{amount}}
+\index{amount@{amount}!sellram\_subcommand@{sellram\_subcommand}}
+\doxysubsubsection{\texorpdfstring{amount}{amount}}
+{\footnotesize\ttfamily \label{structsellram__subcommand_acb0b6a836b5d1047d16fd500b4ae581b} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} sellram\+\_\+subcommand\+::amount}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01718}{1718}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{structsellram__subcommand_ace7959fb30f9a92f91a16b08535d8e2f}\index{sellram\_subcommand@{sellram\_subcommand}!from\_str@{from\_str}}
+\index{from\_str@{from\_str}!sellram\_subcommand@{sellram\_subcommand}}
+\doxysubsubsection{\texorpdfstring{from\_str}{from\_str}}
+{\footnotesize\ttfamily \label{structsellram__subcommand_ace7959fb30f9a92f91a16b08535d8e2f} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sellram\+\_\+subcommand\+::from\+\_\+str}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01716}{1716}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{structsellram__subcommand_a419f905564d0a34824ddd67c28d98754}\index{sellram\_subcommand@{sellram\_subcommand}!receiver\_str@{receiver\_str}}
+\index{receiver\_str@{receiver\_str}!sellram\_subcommand@{sellram\_subcommand}}
+\doxysubsubsection{\texorpdfstring{receiver\_str}{receiver\_str}}
+{\footnotesize\ttfamily \label{structsellram__subcommand_a419f905564d0a34824ddd67c28d98754} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sellram\+\_\+subcommand\+::receiver\+\_\+str}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01717}{1717}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+programs/clio/\mbox{\hyperlink{programs_2clio_2main_8cpp}{main.\+cpp}}\end{DoxyCompactItemize}

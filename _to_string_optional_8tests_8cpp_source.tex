@@ -1,0 +1,29 @@
+\doxysection{To\+String\+Optional.\+tests.\+cpp}
+\hypertarget{_to_string_optional_8tests_8cpp_source}{}\label{_to_string_optional_8tests_8cpp_source}\index{libraries/sys-\/vm/external/Catch2/projects/SelfTest/UsageTests/ToStringOptional.tests.cpp@{libraries/sys-\/vm/external/Catch2/projects/SelfTest/UsageTests/ToStringOptional.tests.cpp}}
+\mbox{\hyperlink{_to_string_optional_8tests_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_to_string_optional_8tests_8cpp_source_l00001}\mbox{\hyperlink{_to_string_optional_8tests_8cpp_ad6762415cf3f7adbf0ca21badc695fff}{00001}}\ \textcolor{preprocessor}{\#define\ CATCH\_CONFIG\_ENABLE\_OPTIONAL\_STRINGMAKER}}
+\DoxyCodeLine{\Hypertarget{_to_string_optional_8tests_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ "{}catch.hpp"{}}}
+\DoxyCodeLine{\Hypertarget{_to_string_optional_8tests_8cpp_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{_to_string_optional_8tests_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#if\ defined(CATCH\_CONFIG\_CPP17\_OPTIONAL)}}
+\DoxyCodeLine{\Hypertarget{_to_string_optional_8tests_8cpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{_to_string_optional_8tests_8cpp_source_l00006}00006\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\ \textcolor{stringliteral}{"{}std::optional<int>\ -\/>\ toString"{}},\ \textcolor{stringliteral}{"{}[toString][optional][approvals]"{}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{_to_string_optional_8tests_8cpp_source_l00007}00007\ \ \ \ \ \textcolor{keyword}{using\ }type\ =\ std::optional<int>;}
+\DoxyCodeLine{\Hypertarget{_to_string_optional_8tests_8cpp_source_l00008}00008\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \textcolor{stringliteral}{"{}\{\ \}"{}}\ ==\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(\ type\{\}\ )\ );}
+\DoxyCodeLine{\Hypertarget{_to_string_optional_8tests_8cpp_source_l00009}00009\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \textcolor{stringliteral}{"{}0"{}}\ ==\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(\ type\{\ 0\ \}\ )\ );}
+\DoxyCodeLine{\Hypertarget{_to_string_optional_8tests_8cpp_source_l00010}00010\ \}}
+\DoxyCodeLine{\Hypertarget{_to_string_optional_8tests_8cpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{_to_string_optional_8tests_8cpp_source_l00012}00012\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\ \textcolor{stringliteral}{"{}std::optional<std::string>\ -\/>\ toString"{}},\ \textcolor{stringliteral}{"{}[toString][optional][approvals]"{}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{_to_string_optional_8tests_8cpp_source_l00013}00013\ \ \ \ \ \textcolor{keyword}{using\ }type\ =\ std::optional<std::string>;}
+\DoxyCodeLine{\Hypertarget{_to_string_optional_8tests_8cpp_source_l00014}00014\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \textcolor{stringliteral}{"{}\{\ \}"{}}\ ==\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(\ type\{\}\ )\ );}
+\DoxyCodeLine{\Hypertarget{_to_string_optional_8tests_8cpp_source_l00015}00015\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \textcolor{stringliteral}{"{}\(\backslash\)"{}abc\(\backslash\)"{}"{}}\ ==\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(\ type\{\ \textcolor{stringliteral}{"{}abc"{}}\ \}\ )\ );}
+\DoxyCodeLine{\Hypertarget{_to_string_optional_8tests_8cpp_source_l00016}00016\ \}}
+\DoxyCodeLine{\Hypertarget{_to_string_optional_8tests_8cpp_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{_to_string_optional_8tests_8cpp_source_l00018}00018\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\ \textcolor{stringliteral}{"{}std::vector<std::optional<int>\ >\ -\/>\ toString"{}},\ \textcolor{stringliteral}{"{}[toString][optional][approvals]"{}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{_to_string_optional_8tests_8cpp_source_l00019}00019\ \ \ \ \ \textcolor{keyword}{using\ }type\ =\ std::vector<std::optional<int>\ >;}
+\DoxyCodeLine{\Hypertarget{_to_string_optional_8tests_8cpp_source_l00020}00020\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \textcolor{stringliteral}{"{}\{\ 0,\ \{\ \},\ 2\ \}"{}}\ ==\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(\ type\{\ 0,\ \{\},\ 2\ \}\ )\ );}
+\DoxyCodeLine{\Hypertarget{_to_string_optional_8tests_8cpp_source_l00021}00021\ \}}
+\DoxyCodeLine{\Hypertarget{_to_string_optional_8tests_8cpp_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{_to_string_optional_8tests_8cpp_source_l00023}00023\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ CATCH\_INTERNAL\_CONFIG\_CPP17\_OPTIONAL}}
+
+\end{DoxyCode}

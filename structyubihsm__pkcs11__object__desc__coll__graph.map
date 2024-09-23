@@ -1,0 +1,9 @@
+<map id="yubihsm_pkcs11_object_desc" name="yubihsm_pkcs11_object_desc">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,198,202,223"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="35,109,89,135"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="77,147,100,196,95,198,72,150"/>
+<area shape="rect" id="Node000003" href="$structyh__object__descriptor.html" title=" " alt="" coords="113,109,254,135"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="164,148,116,199,113,195,160,144"/>
+<area shape="rect" id="Node000004" href="$structyh__capabilities.html" title="Capabilities representation." alt="" coords="130,5,237,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="186,47,186,109,181,109,181,47"/>
+</map>

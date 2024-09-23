@@ -1,0 +1,20 @@
+<map id="sysio::connection::close" name="sysio::connection::close">
+<area shape="rect" id="Node000001" title=" " alt="" coords="392,235,523,275"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1connection.html#ad02fe050af3c833e156bea91308d6c1b" title="Check heartbeat time and send Time_message." alt="" coords="199,5,330,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="442,222,427,185,405,142,377,99,342,61,325,49,328,44,346,57,381,96,409,139,431,182,447,219"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1connection.html#ace5604a0cfadaf357cee46c842a9a54e" title=" " alt="" coords="199,71,330,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="432,224,393,174,369,149,342,127,322,114,325,110,346,122,373,145,398,171,437,220"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1connection.html#a5334d7cde64019b2ab84f3930bb54de9" title=" " alt="" coords="199,136,330,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="409,229,343,192,316,180,319,175,345,187,411,224"/>
+<area shape="rect" id="Node000005" href="$classsysio_1_1connection.html#a7ec6bfca8f639dbced53570e5a41ce36" title=" " alt="" coords="199,201,330,242"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="377,244,330,236,331,230,378,239"/>
+<area shape="rect" id="Node000006" href="$classsysio_1_1connection.html#a27f41e41ebd6b4570bc19a31b4bb1fef" title="Process the next message from the pending message buffer." alt="" coords="185,267,344,307"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="377,271,345,276,344,271,376,266"/>
+<area shape="rect" id="Node000007" href="$classsysio_1_1connection.html#ae85a6909e1a531d6c27c0d22f12e61c9" title=" " alt="" coords="199,332,330,373"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="410,286,345,321,318,334,316,329,343,317,408,281"/>
+<area shape="rect" id="Node000008" href="$classsysio_1_1connection.html#a5b1658474d4667bfca0ee4e1e2c605a8" title=" " alt="" coords="195,397,334,438"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="436,290,397,339,372,364,346,387,325,399,322,394,342,382,369,360,393,335,432,287"/>
+<area shape="rect" id="Node000009" href="$classsysio_1_1connection.html#a4267b7b591fb8051841cf1d11228e0e1" title=" " alt="" coords="5,427,137,467"/>
+<area shape="poly" id="edge9_Node000001_Node000009" title=" " alt="" coords="450,291,437,331,415,376,385,418,367,437,345,452,320,464,294,472,239,478,185,476,136,468,137,462,185,470,238,473,293,467,318,459,343,447,363,433,381,415,411,373,432,329,445,289"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="180,433,138,440,137,434,179,428"/>
+</map>

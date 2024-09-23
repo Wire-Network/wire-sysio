@@ -1,0 +1,761 @@
+\doxysection{Generic\+Object\texorpdfstring{$<$}{<} Const, ValueT \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{class_generic_object}{}\label{class_generic_object}\index{GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}}
+
+
+Helper class for accessing Value of object type.  
+
+
+
+
+{\ttfamily \#include $<$document.\+h$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{class_generic_object}{Generic\+Object}}$<$ true, ValueT $>$ \mbox{\hyperlink{class_generic_object_acf30de0de0b162d0dee93ce91d4b5e3e}{Const\+Object}}
+\item 
+typedef \mbox{\hyperlink{class_generic_object}{Generic\+Object}}$<$ false, ValueT $>$ \mbox{\hyperlink{class_generic_object_ac900174d46ce2e64943c402fd833a7cf}{Object}}
+\item 
+typedef ValueT \mbox{\hyperlink{class_generic_object_a28a809fb1524dbe5f0dff3a79cded656}{Plain\+Type}}
+\item 
+typedef internal\+::\+Maybe\+Add\+Const$<$ Const, \mbox{\hyperlink{class_generic_object_a28a809fb1524dbe5f0dff3a79cded656}{Plain\+Type}} $>$\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{\+::\+Type}} \mbox{\hyperlink{class_generic_object_a6346f4bbeb7076161513c6b95ea7c672}{Value\+Type}}
+\item 
+typedef \mbox{\hyperlink{class_generic_member_iterator}{Generic\+Member\+Iterator}}$<$ Const, typename Value\+T\+::\+Encoding\+Type, typename Value\+T\+::\+Allocator\+Type $>$ \mbox{\hyperlink{class_generic_object_aa07c5c19cd1dc220e211c20b477ff071}{Member\+Iterator}}
+\item 
+typedef \mbox{\hyperlink{class_generic_member_iterator}{Generic\+Member\+Iterator}}$<$ true, typename Value\+T\+::\+Encoding\+Type, typename Value\+T\+::\+Allocator\+Type $>$ \mbox{\hyperlink{class_generic_object_aa1360449b3ef696f4d9eebb355f52a11}{Const\+Member\+Iterator}}
+\item 
+typedef Value\+Type\+::\+Allocator\+Type \mbox{\hyperlink{class_generic_object_ab9f0e2190b752ed6cfb92539c4fd374e}{Allocator\+Type}}
+\item 
+typedef Value\+Type\+::\+String\+Ref\+Type \mbox{\hyperlink{class_generic_object_ad7a8db9559b1450048f225469d58a1d4}{String\+Ref\+Type}}
+\item 
+typedef Value\+Type\+::\+Encoding\+Type \mbox{\hyperlink{class_generic_object_a51b1f176390bfa0b4d8a0d3e7e8c94be}{Encoding\+Type}}
+\item 
+typedef Value\+Type\+::\+Ch \mbox{\hyperlink{class_generic_object_a27b2949e6791caca3545ed6968832bd8}{Ch}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_generic_object_a10173c42d0e8a71ca0e3ae75d800887a}{Generic\+Object}} (\mbox{\hyperlink{class_generic_object_af70c9646b5e422306c33e98b3d8783a7}{const}} \mbox{\hyperlink{class_generic_object}{Generic\+Object}} \&rhs)
+\item 
+\mbox{\hyperlink{class_generic_object}{Generic\+Object}} \& \mbox{\hyperlink{class_generic_object_a995b0e01b59efd7e268f837b8127e0bc}{operator=}} (\mbox{\hyperlink{class_generic_object_af70c9646b5e422306c33e98b3d8783a7}{const}} \mbox{\hyperlink{class_generic_object}{Generic\+Object}} \&rhs)
+\item 
+\mbox{\hyperlink{class_generic_object_a8ac79abb76ac4d2c647681a37fc4ab46}{\texorpdfstring{$\sim$}{\string~}\+Generic\+Object}} ()
+\item 
+\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} \mbox{\hyperlink{class_generic_object_a15326564c82f2b545811f753534563e4}{Member\+Count}} () \mbox{\hyperlink{class_generic_object_af70c9646b5e422306c33e98b3d8783a7}{const}}
+\item 
+\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} \mbox{\hyperlink{class_generic_object_a0389754cbdb435d732bad6edf4f8cdb2}{Member\+Capacity}} () \mbox{\hyperlink{class_generic_object_af70c9646b5e422306c33e98b3d8783a7}{const}}
+\item 
+bool \mbox{\hyperlink{class_generic_object_a9cc10bfeeb6a5eb95ba1ae587b6e6ad8}{Object\+Empty}} () \mbox{\hyperlink{class_generic_object_af70c9646b5e422306c33e98b3d8783a7}{const}}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{class_generic_object_a6346f4bbeb7076161513c6b95ea7c672}{Value\+Type}} \& \mbox{\hyperlink{class_generic_object_a2bd0d4a75b18ae78c8a1e1051e8ec9ac}{operator\mbox{[}$\,$\mbox{]}}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}) \mbox{\hyperlink{class_generic_object_af70c9646b5e422306c33e98b3d8783a7}{const}}
+\item 
+{\footnotesize template$<$typename Source\+Allocator $>$ }\\\mbox{\hyperlink{class_generic_object_a6346f4bbeb7076161513c6b95ea7c672}{Value\+Type}} \& \mbox{\hyperlink{class_generic_object_a21c677e997d4dfe4e0692cdb75067428}{operator\mbox{[}$\,$\mbox{]}}} (\mbox{\hyperlink{class_generic_object_af70c9646b5e422306c33e98b3d8783a7}{const}} \mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{class_generic_object_a51b1f176390bfa0b4d8a0d3e7e8c94be}{Encoding\+Type}}, Source\+Allocator $>$ \&\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}) \mbox{\hyperlink{class_generic_object_af70c9646b5e422306c33e98b3d8783a7}{const}}
+\item 
+\mbox{\hyperlink{class_generic_object_aa07c5c19cd1dc220e211c20b477ff071}{Member\+Iterator}} \mbox{\hyperlink{class_generic_object_af1e80a8a521f05530f9b6a448242ff2d}{Member\+Begin}} () \mbox{\hyperlink{class_generic_object_af70c9646b5e422306c33e98b3d8783a7}{const}}
+\item 
+\mbox{\hyperlink{class_generic_object_aa07c5c19cd1dc220e211c20b477ff071}{Member\+Iterator}} \mbox{\hyperlink{class_generic_object_a75873786614f67796bfb190008e004dc}{Member\+End}} () \mbox{\hyperlink{class_generic_object_af70c9646b5e422306c33e98b3d8783a7}{const}}
+\item 
+\mbox{\hyperlink{class_generic_object}{Generic\+Object}} \mbox{\hyperlink{class_generic_object_af750abd40d05136da98705899b4575c2}{Member\+Reserve}} (\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} new\+Capacity, \mbox{\hyperlink{class_generic_object_ab9f0e2190b752ed6cfb92539c4fd374e}{Allocator\+Type}} \&allocator) \mbox{\hyperlink{class_generic_object_af70c9646b5e422306c33e98b3d8783a7}{const}}
+\item 
+bool \mbox{\hyperlink{class_generic_object_a996d775e52cc7c5cf2aa308cf5a2b2cf}{Has\+Member}} (\mbox{\hyperlink{class_generic_object_af70c9646b5e422306c33e98b3d8783a7}{const}} \mbox{\hyperlink{class_generic_object_a27b2949e6791caca3545ed6968832bd8}{Ch}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}) \mbox{\hyperlink{class_generic_object_af70c9646b5e422306c33e98b3d8783a7}{const}}
+\item 
+{\footnotesize template$<$typename Source\+Allocator $>$ }\\bool \mbox{\hyperlink{class_generic_object_a0b63666ca05c86f9d719350f2302a3f7}{Has\+Member}} (\mbox{\hyperlink{class_generic_object_af70c9646b5e422306c33e98b3d8783a7}{const}} \mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{class_generic_object_a51b1f176390bfa0b4d8a0d3e7e8c94be}{Encoding\+Type}}, Source\+Allocator $>$ \&\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}) \mbox{\hyperlink{class_generic_object_af70c9646b5e422306c33e98b3d8783a7}{const}}
+\item 
+\mbox{\hyperlink{class_generic_object_aa07c5c19cd1dc220e211c20b477ff071}{Member\+Iterator}} \mbox{\hyperlink{class_generic_object_a979890ccb3b116af19f9e3e77d3d286f}{Find\+Member}} (\mbox{\hyperlink{class_generic_object_af70c9646b5e422306c33e98b3d8783a7}{const}} \mbox{\hyperlink{class_generic_object_a27b2949e6791caca3545ed6968832bd8}{Ch}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}) \mbox{\hyperlink{class_generic_object_af70c9646b5e422306c33e98b3d8783a7}{const}}
+\item 
+{\footnotesize template$<$typename Source\+Allocator $>$ }\\\mbox{\hyperlink{class_generic_object_aa07c5c19cd1dc220e211c20b477ff071}{Member\+Iterator}} \mbox{\hyperlink{class_generic_object_a12a4fbbf2219d6bb43c3d61923830ab4}{Find\+Member}} (\mbox{\hyperlink{class_generic_object_af70c9646b5e422306c33e98b3d8783a7}{const}} \mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{class_generic_object_a51b1f176390bfa0b4d8a0d3e7e8c94be}{Encoding\+Type}}, Source\+Allocator $>$ \&\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}) \mbox{\hyperlink{class_generic_object_af70c9646b5e422306c33e98b3d8783a7}{const}}
+\item 
+\mbox{\hyperlink{class_generic_object}{Generic\+Object}} \mbox{\hyperlink{class_generic_object_a3668524c8566c46cbae97d938064f5fa}{Add\+Member}} (\mbox{\hyperlink{class_generic_object_a6346f4bbeb7076161513c6b95ea7c672}{Value\+Type}} \&\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}, \mbox{\hyperlink{class_generic_object_a6346f4bbeb7076161513c6b95ea7c672}{Value\+Type}} \&\mbox{\hyperlink{class_generic_object_a131538fbbacbc0a3a5ad15dbea66394f}{value}}, \mbox{\hyperlink{class_generic_object_ab9f0e2190b752ed6cfb92539c4fd374e}{Allocator\+Type}} \&allocator) \mbox{\hyperlink{class_generic_object_af70c9646b5e422306c33e98b3d8783a7}{const}}
+\item 
+\mbox{\hyperlink{class_generic_object}{Generic\+Object}} \mbox{\hyperlink{class_generic_object_ae871adc8c906a72878b7cf5df279ed1f}{Add\+Member}} (\mbox{\hyperlink{class_generic_object_a6346f4bbeb7076161513c6b95ea7c672}{Value\+Type}} \&\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}, \mbox{\hyperlink{class_generic_object_ad7a8db9559b1450048f225469d58a1d4}{String\+Ref\+Type}} \mbox{\hyperlink{class_generic_object_a131538fbbacbc0a3a5ad15dbea66394f}{value}}, \mbox{\hyperlink{class_generic_object_ab9f0e2190b752ed6cfb92539c4fd374e}{Allocator\+Type}} \&allocator) \mbox{\hyperlink{class_generic_object_af70c9646b5e422306c33e98b3d8783a7}{const}}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{class_generic_object_a98ebcec632c41442d89cd8634b7ecc47}{RAPIDJSON\+\_\+\+DISABLEIF\+\_\+\+RETURN}} ((internal\+::\+Or\+Expr$<$ internal\+::\+Is\+Pointer$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$, \mbox{\hyperlink{structinternal_1_1_is_generic_value}{internal\+::\+Is\+Generic\+Value}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ $>$),(\mbox{\hyperlink{class_generic_object_a6346f4bbeb7076161513c6b95ea7c672}{Value\+Type}} \&)) \mbox{\hyperlink{class_generic_object_a3668524c8566c46cbae97d938064f5fa}{Add\+Member}}(\mbox{\hyperlink{class_generic_object_a6346f4bbeb7076161513c6b95ea7c672}{Value\+Type}} \&\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}
+\item 
+\mbox{\hyperlink{class_generic_object}{Generic\+Object}} \mbox{\hyperlink{class_generic_object_a011a0dd06baf841e3f6e21a3c95db3c1}{Add\+Member}} (\mbox{\hyperlink{class_generic_object_ad7a8db9559b1450048f225469d58a1d4}{String\+Ref\+Type}} \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}, \mbox{\hyperlink{class_generic_object_a6346f4bbeb7076161513c6b95ea7c672}{Value\+Type}} \&\mbox{\hyperlink{class_generic_object_a131538fbbacbc0a3a5ad15dbea66394f}{value}}, \mbox{\hyperlink{class_generic_object_ab9f0e2190b752ed6cfb92539c4fd374e}{Allocator\+Type}} \&allocator) \mbox{\hyperlink{class_generic_object_af70c9646b5e422306c33e98b3d8783a7}{const}}
+\item 
+\mbox{\hyperlink{class_generic_object}{Generic\+Object}} \mbox{\hyperlink{class_generic_object_a3af43681aea03c4313d689bcbf5e3363}{Add\+Member}} (\mbox{\hyperlink{class_generic_object_ad7a8db9559b1450048f225469d58a1d4}{String\+Ref\+Type}} \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}, \mbox{\hyperlink{class_generic_object_ad7a8db9559b1450048f225469d58a1d4}{String\+Ref\+Type}} \mbox{\hyperlink{class_generic_object_a131538fbbacbc0a3a5ad15dbea66394f}{value}}, \mbox{\hyperlink{class_generic_object_ab9f0e2190b752ed6cfb92539c4fd374e}{Allocator\+Type}} \&allocator) \mbox{\hyperlink{class_generic_object_af70c9646b5e422306c33e98b3d8783a7}{const}}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{class_generic_object_af361a4b677882964789201fc605541d0}{RAPIDJSON\+\_\+\+DISABLEIF\+\_\+\+RETURN}} ((internal\+::\+Or\+Expr$<$ internal\+::\+Is\+Pointer$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$, \mbox{\hyperlink{structinternal_1_1_is_generic_value}{internal\+::\+Is\+Generic\+Value}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ $>$),(\mbox{\hyperlink{class_generic_object}{Generic\+Object}})) \mbox{\hyperlink{class_generic_object_a3668524c8566c46cbae97d938064f5fa}{Add\+Member}}(\mbox{\hyperlink{class_generic_object_ad7a8db9559b1450048f225469d58a1d4}{String\+Ref\+Type}} \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}
+\item 
+void \mbox{\hyperlink{class_generic_object_a129ce3843a6658e620a7f740d9f44ee1}{Remove\+All\+Members}} ()
+\item 
+bool \mbox{\hyperlink{class_generic_object_aebeda9c2cac6afd56dda55caaf2c4a0c}{Remove\+Member}} (\mbox{\hyperlink{class_generic_object_af70c9646b5e422306c33e98b3d8783a7}{const}} \mbox{\hyperlink{class_generic_object_a27b2949e6791caca3545ed6968832bd8}{Ch}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}) \mbox{\hyperlink{class_generic_object_af70c9646b5e422306c33e98b3d8783a7}{const}}
+\item 
+{\footnotesize template$<$typename Source\+Allocator $>$ }\\bool \mbox{\hyperlink{class_generic_object_a8e29dc07b992e71e35dd93a57f95842c}{Remove\+Member}} (\mbox{\hyperlink{class_generic_object_af70c9646b5e422306c33e98b3d8783a7}{const}} \mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{class_generic_object_a51b1f176390bfa0b4d8a0d3e7e8c94be}{Encoding\+Type}}, Source\+Allocator $>$ \&\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}) \mbox{\hyperlink{class_generic_object_af70c9646b5e422306c33e98b3d8783a7}{const}}
+\item 
+\mbox{\hyperlink{class_generic_object_aa07c5c19cd1dc220e211c20b477ff071}{Member\+Iterator}} \mbox{\hyperlink{class_generic_object_a006f76a33dada85c9d13e069cc43623d}{Remove\+Member}} (\mbox{\hyperlink{class_generic_object_aa07c5c19cd1dc220e211c20b477ff071}{Member\+Iterator}} m) \mbox{\hyperlink{class_generic_object_af70c9646b5e422306c33e98b3d8783a7}{const}}
+\item 
+\mbox{\hyperlink{class_generic_object_aa07c5c19cd1dc220e211c20b477ff071}{Member\+Iterator}} \mbox{\hyperlink{class_generic_object_a29ad0490a4a088d57df7a9884f979a82}{Erase\+Member}} (\mbox{\hyperlink{class_generic_object_aa1360449b3ef696f4d9eebb355f52a11}{Const\+Member\+Iterator}} pos) \mbox{\hyperlink{class_generic_object_af70c9646b5e422306c33e98b3d8783a7}{const}}
+\item 
+\mbox{\hyperlink{class_generic_object_aa07c5c19cd1dc220e211c20b477ff071}{Member\+Iterator}} \mbox{\hyperlink{class_generic_object_a67f85d2da462287dead8e35f2ac974b5}{Erase\+Member}} (\mbox{\hyperlink{class_generic_object_aa1360449b3ef696f4d9eebb355f52a11}{Const\+Member\+Iterator}} first, \mbox{\hyperlink{class_generic_object_aa1360449b3ef696f4d9eebb355f52a11}{Const\+Member\+Iterator}} last) \mbox{\hyperlink{class_generic_object_af70c9646b5e422306c33e98b3d8783a7}{const}}
+\item 
+bool \mbox{\hyperlink{class_generic_object_af0d31a8547051624449494a339b20107}{Erase\+Member}} (\mbox{\hyperlink{class_generic_object_af70c9646b5e422306c33e98b3d8783a7}{const}} \mbox{\hyperlink{class_generic_object_a27b2949e6791caca3545ed6968832bd8}{Ch}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}) \mbox{\hyperlink{class_generic_object_af70c9646b5e422306c33e98b3d8783a7}{const}}
+\item 
+{\footnotesize template$<$typename Source\+Allocator $>$ }\\bool \mbox{\hyperlink{class_generic_object_a4cd6f90444f20cc9d5577747d3968da4}{Erase\+Member}} (\mbox{\hyperlink{class_generic_object_af70c9646b5e422306c33e98b3d8783a7}{const}} \mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{class_generic_object_a51b1f176390bfa0b4d8a0d3e7e8c94be}{Encoding\+Type}}, Source\+Allocator $>$ \&\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}) \mbox{\hyperlink{class_generic_object_af70c9646b5e422306c33e98b3d8783a7}{const}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{class_generic_object_a131538fbbacbc0a3a5ad15dbea66394f}{value}}
+\item 
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{class_generic_object_ab9f0e2190b752ed6cfb92539c4fd374e}{Allocator\+Type}} \&allocator \mbox{\hyperlink{class_generic_object_af70c9646b5e422306c33e98b3d8783a7}{const}} \{ value\+\_\+.\+Add\+Member(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}, \mbox{\hyperlink{class_generic_object_a131538fbbacbc0a3a5ad15dbea66394f}{value}}, allocator)
+\item 
+\mbox{\hyperlink{hello__driver_8cpp_a9717e7bbecb906637e86cef6da3d83c2}{return}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_generic_object_a719a0e5501da825e6f86ce12b46446cb}{this}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename , typename $>$ }\\\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{class_generic_object_a899449e1a645b5e377af059fb61113d8}{Generic\+Value}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$bool Const, typename ValueT$>$\newline
+class Generic\+Object$<$ Const, Value\+T $>$}
+Instance of this helper class is obtained by {\ttfamily Generic\+Value\+::\+Get\+Object()}. In addition to all APIs for array type, it provides range-\/based for loop if {\ttfamily RAPIDJSON\+\_\+\+HAS\+\_\+\+CXX11\+\_\+\+RANGE\+\_\+\+FOR=1}. 
+
+Definition at line \mbox{\hyperlink{document_8h_source_l02567}{2567}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{class_generic_object_ab9f0e2190b752ed6cfb92539c4fd374e}\index{GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}!AllocatorType@{AllocatorType}}
+\index{AllocatorType@{AllocatorType}!GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}}
+\doxysubsubsection{\texorpdfstring{AllocatorType}{AllocatorType}}
+{\footnotesize\ttfamily \label{class_generic_object_ab9f0e2190b752ed6cfb92539c4fd374e} 
+template$<$bool Const, typename ValueT $>$ \\
+Value\+Type\+::\+Allocator\+Type \mbox{\hyperlink{class_generic_object}{Generic\+Object}}$<$ Const, ValueT $>$\+::\+Allocator\+Type}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l02575}{2575}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+\Hypertarget{class_generic_object_a27b2949e6791caca3545ed6968832bd8}\index{GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}!Ch@{Ch}}
+\index{Ch@{Ch}!GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}}
+\doxysubsubsection{\texorpdfstring{Ch}{Ch}}
+{\footnotesize\ttfamily \label{class_generic_object_a27b2949e6791caca3545ed6968832bd8} 
+template$<$bool Const, typename ValueT $>$ \\
+Value\+Type\+::\+Ch \mbox{\hyperlink{class_generic_object}{Generic\+Object}}$<$ Const, ValueT $>$\+::\+Ch}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l02578}{2578}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+\Hypertarget{class_generic_object_aa1360449b3ef696f4d9eebb355f52a11}\index{GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}!ConstMemberIterator@{ConstMemberIterator}}
+\index{ConstMemberIterator@{ConstMemberIterator}!GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}}
+\doxysubsubsection{\texorpdfstring{ConstMemberIterator}{ConstMemberIterator}}
+{\footnotesize\ttfamily \label{class_generic_object_aa1360449b3ef696f4d9eebb355f52a11} 
+template$<$bool Const, typename ValueT $>$ \\
+\mbox{\hyperlink{class_generic_member_iterator}{Generic\+Member\+Iterator}}$<$true, typename Value\+T\+::\+Encoding\+Type, typename Value\+T\+::\+Allocator\+Type$>$ \mbox{\hyperlink{class_generic_object}{Generic\+Object}}$<$ Const, ValueT $>$\+::\+Const\+Member\+Iterator}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l02574}{2574}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+\Hypertarget{class_generic_object_acf30de0de0b162d0dee93ce91d4b5e3e}\index{GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}!ConstObject@{ConstObject}}
+\index{ConstObject@{ConstObject}!GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}}
+\doxysubsubsection{\texorpdfstring{ConstObject}{ConstObject}}
+{\footnotesize\ttfamily \label{class_generic_object_acf30de0de0b162d0dee93ce91d4b5e3e} 
+template$<$bool Const, typename ValueT $>$ \\
+\mbox{\hyperlink{class_generic_object}{Generic\+Object}}$<$true, ValueT$>$ \mbox{\hyperlink{class_generic_object}{Generic\+Object}}$<$ Const, ValueT $>$\+::\+Const\+Object}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l02569}{2569}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+\Hypertarget{class_generic_object_a51b1f176390bfa0b4d8a0d3e7e8c94be}\index{GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}!EncodingType@{EncodingType}}
+\index{EncodingType@{EncodingType}!GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}}
+\doxysubsubsection{\texorpdfstring{EncodingType}{EncodingType}}
+{\footnotesize\ttfamily \label{class_generic_object_a51b1f176390bfa0b4d8a0d3e7e8c94be} 
+template$<$bool Const, typename ValueT $>$ \\
+Value\+Type\+::\+Encoding\+Type \mbox{\hyperlink{class_generic_object}{Generic\+Object}}$<$ Const, ValueT $>$\+::\+Encoding\+Type}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l02577}{2577}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+\Hypertarget{class_generic_object_aa07c5c19cd1dc220e211c20b477ff071}\index{GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}!MemberIterator@{MemberIterator}}
+\index{MemberIterator@{MemberIterator}!GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}}
+\doxysubsubsection{\texorpdfstring{MemberIterator}{MemberIterator}}
+{\footnotesize\ttfamily \label{class_generic_object_aa07c5c19cd1dc220e211c20b477ff071} 
+template$<$bool Const, typename ValueT $>$ \\
+\mbox{\hyperlink{class_generic_member_iterator}{Generic\+Member\+Iterator}}$<$Const, typename Value\+T\+::\+Encoding\+Type, typename Value\+T\+::\+Allocator\+Type$>$ \mbox{\hyperlink{class_generic_object}{Generic\+Object}}$<$ Const, ValueT $>$\+::\+Member\+Iterator}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l02573}{2573}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+\Hypertarget{class_generic_object_ac900174d46ce2e64943c402fd833a7cf}\index{GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}!Object@{Object}}
+\index{Object@{Object}!GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}}
+\doxysubsubsection{\texorpdfstring{Object}{Object}}
+{\footnotesize\ttfamily \label{class_generic_object_ac900174d46ce2e64943c402fd833a7cf} 
+template$<$bool Const, typename ValueT $>$ \\
+\mbox{\hyperlink{class_generic_object}{Generic\+Object}}$<$false, ValueT$>$ \mbox{\hyperlink{class_generic_object}{Generic\+Object}}$<$ Const, ValueT $>$\+::\+Object}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l02570}{2570}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+\Hypertarget{class_generic_object_a28a809fb1524dbe5f0dff3a79cded656}\index{GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}!PlainType@{PlainType}}
+\index{PlainType@{PlainType}!GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}}
+\doxysubsubsection{\texorpdfstring{PlainType}{PlainType}}
+{\footnotesize\ttfamily \label{class_generic_object_a28a809fb1524dbe5f0dff3a79cded656} 
+template$<$bool Const, typename ValueT $>$ \\
+ValueT \mbox{\hyperlink{class_generic_object}{Generic\+Object}}$<$ Const, ValueT $>$\+::\+Plain\+Type}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l02571}{2571}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+\Hypertarget{class_generic_object_ad7a8db9559b1450048f225469d58a1d4}\index{GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}!StringRefType@{StringRefType}}
+\index{StringRefType@{StringRefType}!GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}}
+\doxysubsubsection{\texorpdfstring{StringRefType}{StringRefType}}
+{\footnotesize\ttfamily \label{class_generic_object_ad7a8db9559b1450048f225469d58a1d4} 
+template$<$bool Const, typename ValueT $>$ \\
+Value\+Type\+::\+String\+Ref\+Type \mbox{\hyperlink{class_generic_object}{Generic\+Object}}$<$ Const, ValueT $>$\+::\+String\+Ref\+Type}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l02576}{2576}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+\Hypertarget{class_generic_object_a6346f4bbeb7076161513c6b95ea7c672}\index{GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}!ValueType@{ValueType}}
+\index{ValueType@{ValueType}!GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}}
+\doxysubsubsection{\texorpdfstring{ValueType}{ValueType}}
+{\footnotesize\ttfamily \label{class_generic_object_a6346f4bbeb7076161513c6b95ea7c672} 
+template$<$bool Const, typename ValueT $>$ \\
+internal\+::\+Maybe\+Add\+Const$<$Const,\mbox{\hyperlink{class_generic_object_a28a809fb1524dbe5f0dff3a79cded656}{Plain\+Type}}$>$\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{\+::\+Type}} \mbox{\hyperlink{class_generic_object}{Generic\+Object}}$<$ Const, ValueT $>$\+::\+Value\+Type}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l02572}{2572}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_generic_object_a10173c42d0e8a71ca0e3ae75d800887a}\index{GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}!GenericObject@{GenericObject}}
+\index{GenericObject@{GenericObject}!GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}}
+\doxysubsubsection{\texorpdfstring{GenericObject()}{GenericObject()}}
+{\footnotesize\ttfamily \label{class_generic_object_a10173c42d0e8a71ca0e3ae75d800887a} 
+template$<$bool Const, typename ValueT $>$ \\
+\mbox{\hyperlink{class_generic_object}{Generic\+Object}}$<$ Const, ValueT $>$\mbox{\hyperlink{class_generic_object}{\+::\+Generic\+Object}} (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_generic_object_af70c9646b5e422306c33e98b3d8783a7}{const}} \mbox{\hyperlink{class_generic_object}{Generic\+Object}}$<$ Const, ValueT $>$ \&}]{rhs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l02583}{2583}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02583\ :\ value\_(rhs.value\_)\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_object_a8ac79abb76ac4d2c647681a37fc4ab46}\index{GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}!````~GenericObject@{\texorpdfstring{$\sim$}{\string~}GenericObject}}
+\index{````~GenericObject@{\texorpdfstring{$\sim$}{\string~}GenericObject}!GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}GenericObject()}{\string~GenericObject()}}
+{\footnotesize\ttfamily \label{class_generic_object_a8ac79abb76ac4d2c647681a37fc4ab46} 
+template$<$bool Const, typename ValueT $>$ \\
+\mbox{\hyperlink{class_generic_object}{Generic\+Object}}$<$ Const, ValueT $>$\+::\texorpdfstring{$\sim$}{\string~}\mbox{\hyperlink{class_generic_object}{Generic\+Object}} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l02585}{2585}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02585\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_generic_object_a3af43681aea03c4313d689bcbf5e3363}\index{GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}!AddMember@{AddMember}}
+\index{AddMember@{AddMember}!GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}}
+\doxysubsubsection{\texorpdfstring{AddMember()}{AddMember()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{class_generic_object_a3af43681aea03c4313d689bcbf5e3363} 
+template$<$bool Const, typename ValueT $>$ \\
+\mbox{\hyperlink{class_generic_object}{Generic\+Object}} \mbox{\hyperlink{class_generic_object}{Generic\+Object}}$<$ Const, ValueT $>$\+::\+Add\+Member (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_generic_object_ad7a8db9559b1450048f225469d58a1d4}{String\+Ref\+Type}}}]{name}{, }\item[{\mbox{\hyperlink{class_generic_object_ad7a8db9559b1450048f225469d58a1d4}{String\+Ref\+Type}}}]{value}{, }\item[{\mbox{\hyperlink{class_generic_object_ab9f0e2190b752ed6cfb92539c4fd374e}{Allocator\+Type}} \&}]{allocator}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l02621}{2621}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02621\ \{\ value\_.AddMember(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ \mbox{\hyperlink{class_generic_object_a131538fbbacbc0a3a5ad15dbea66394f}{value}},\ allocator);\ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_object_a011a0dd06baf841e3f6e21a3c95db3c1}\index{GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}!AddMember@{AddMember}}
+\index{AddMember@{AddMember}!GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}}
+\doxysubsubsection{\texorpdfstring{AddMember()}{AddMember()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{class_generic_object_a011a0dd06baf841e3f6e21a3c95db3c1} 
+template$<$bool Const, typename ValueT $>$ \\
+\mbox{\hyperlink{class_generic_object}{Generic\+Object}} \mbox{\hyperlink{class_generic_object}{Generic\+Object}}$<$ Const, ValueT $>$\+::\+Add\+Member (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_generic_object_ad7a8db9559b1450048f225469d58a1d4}{String\+Ref\+Type}}}]{name}{, }\item[{\mbox{\hyperlink{class_generic_object_a6346f4bbeb7076161513c6b95ea7c672}{Value\+Type}} \&}]{value}{, }\item[{\mbox{\hyperlink{class_generic_object_ab9f0e2190b752ed6cfb92539c4fd374e}{Allocator\+Type}} \&}]{allocator}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l02620}{2620}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02620\ \{\ value\_.AddMember(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ \mbox{\hyperlink{class_generic_object_a131538fbbacbc0a3a5ad15dbea66394f}{value}},\ allocator);\ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_object_ae871adc8c906a72878b7cf5df279ed1f}\index{GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}!AddMember@{AddMember}}
+\index{AddMember@{AddMember}!GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}}
+\doxysubsubsection{\texorpdfstring{AddMember()}{AddMember()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{class_generic_object_ae871adc8c906a72878b7cf5df279ed1f} 
+template$<$bool Const, typename ValueT $>$ \\
+\mbox{\hyperlink{class_generic_object}{Generic\+Object}} \mbox{\hyperlink{class_generic_object}{Generic\+Object}}$<$ Const, ValueT $>$\+::\+Add\+Member (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_generic_object_a6346f4bbeb7076161513c6b95ea7c672}{Value\+Type}} \&}]{name}{, }\item[{\mbox{\hyperlink{class_generic_object_ad7a8db9559b1450048f225469d58a1d4}{String\+Ref\+Type}}}]{value}{, }\item[{\mbox{\hyperlink{class_generic_object_ab9f0e2190b752ed6cfb92539c4fd374e}{Allocator\+Type}} \&}]{allocator}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l02609}{2609}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02609\ \{\ value\_.AddMember(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ \mbox{\hyperlink{class_generic_object_a131538fbbacbc0a3a5ad15dbea66394f}{value}},\ allocator);\ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_object_a3668524c8566c46cbae97d938064f5fa}\index{GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}!AddMember@{AddMember}}
+\index{AddMember@{AddMember}!GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}}
+\doxysubsubsection{\texorpdfstring{AddMember()}{AddMember()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{class_generic_object_a3668524c8566c46cbae97d938064f5fa} 
+template$<$bool Const, typename ValueT $>$ \\
+\mbox{\hyperlink{class_generic_object}{Generic\+Object}} \mbox{\hyperlink{class_generic_object}{Generic\+Object}}$<$ Const, ValueT $>$\+::\+Add\+Member (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_generic_object_a6346f4bbeb7076161513c6b95ea7c672}{Value\+Type}} \&}]{name}{, }\item[{\mbox{\hyperlink{class_generic_object_a6346f4bbeb7076161513c6b95ea7c672}{Value\+Type}} \&}]{value}{, }\item[{\mbox{\hyperlink{class_generic_object_ab9f0e2190b752ed6cfb92539c4fd374e}{Allocator\+Type}} \&}]{allocator}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l02608}{2608}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02608\ \{\ value\_.AddMember(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ \mbox{\hyperlink{class_generic_object_a131538fbbacbc0a3a5ad15dbea66394f}{value}},\ allocator);\ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=294pt]{class_generic_object_a3668524c8566c46cbae97d938064f5fa_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_object_af0d31a8547051624449494a339b20107}\index{GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}!EraseMember@{EraseMember}}
+\index{EraseMember@{EraseMember}!GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}}
+\doxysubsubsection{\texorpdfstring{EraseMember()}{EraseMember()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{class_generic_object_af0d31a8547051624449494a339b20107} 
+template$<$bool Const, typename ValueT $>$ \\
+bool \mbox{\hyperlink{class_generic_object}{Generic\+Object}}$<$ Const, ValueT $>$\+::\+Erase\+Member (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_generic_object_af70c9646b5e422306c33e98b3d8783a7}{const}} \mbox{\hyperlink{class_generic_object_a27b2949e6791caca3545ed6968832bd8}{Ch}} \texorpdfstring{$\ast$}{*}}]{name}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l02632}{2632}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02632\ \{\ \textcolor{keywordflow}{return}\ value\_.EraseMember(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}});\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_object_a4cd6f90444f20cc9d5577747d3968da4}\index{GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}!EraseMember@{EraseMember}}
+\index{EraseMember@{EraseMember}!GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}}
+\doxysubsubsection{\texorpdfstring{EraseMember()}{EraseMember()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{class_generic_object_a4cd6f90444f20cc9d5577747d3968da4} 
+template$<$bool Const, typename ValueT $>$ \\
+template$<$typename Source\+Allocator $>$ \\
+bool \mbox{\hyperlink{class_generic_object}{Generic\+Object}}$<$ Const, ValueT $>$\+::\+Erase\+Member (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_generic_object_af70c9646b5e422306c33e98b3d8783a7}{const}} \mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{class_generic_object_a51b1f176390bfa0b4d8a0d3e7e8c94be}{Encoding\+Type}}, Source\+Allocator $>$ \&}]{name}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l02636}{2636}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02636\ \{\ \textcolor{keywordflow}{return}\ value\_.EraseMember(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}});\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_object_a67f85d2da462287dead8e35f2ac974b5}\index{GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}!EraseMember@{EraseMember}}
+\index{EraseMember@{EraseMember}!GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}}
+\doxysubsubsection{\texorpdfstring{EraseMember()}{EraseMember()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{class_generic_object_a67f85d2da462287dead8e35f2ac974b5} 
+template$<$bool Const, typename ValueT $>$ \\
+\mbox{\hyperlink{class_generic_object_aa07c5c19cd1dc220e211c20b477ff071}{Member\+Iterator}} \mbox{\hyperlink{class_generic_object}{Generic\+Object}}$<$ Const, ValueT $>$\+::\+Erase\+Member (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_generic_object_aa1360449b3ef696f4d9eebb355f52a11}{Const\+Member\+Iterator}}}]{first}{, }\item[{\mbox{\hyperlink{class_generic_object_aa1360449b3ef696f4d9eebb355f52a11}{Const\+Member\+Iterator}}}]{last}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l02631}{2631}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02631\ \{\ \textcolor{keywordflow}{return}\ value\_.EraseMember(first,\ last);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_object_a29ad0490a4a088d57df7a9884f979a82}\index{GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}!EraseMember@{EraseMember}}
+\index{EraseMember@{EraseMember}!GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}}
+\doxysubsubsection{\texorpdfstring{EraseMember()}{EraseMember()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{class_generic_object_a29ad0490a4a088d57df7a9884f979a82} 
+template$<$bool Const, typename ValueT $>$ \\
+\mbox{\hyperlink{class_generic_object_aa07c5c19cd1dc220e211c20b477ff071}{Member\+Iterator}} \mbox{\hyperlink{class_generic_object}{Generic\+Object}}$<$ Const, ValueT $>$\+::\+Erase\+Member (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_generic_object_aa1360449b3ef696f4d9eebb355f52a11}{Const\+Member\+Iterator}}}]{pos}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l02630}{2630}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02630\ \{\ \textcolor{keywordflow}{return}\ value\_.EraseMember(pos);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_object_a979890ccb3b116af19f9e3e77d3d286f}\index{GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}!FindMember@{FindMember}}
+\index{FindMember@{FindMember}!GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}}
+\doxysubsubsection{\texorpdfstring{FindMember()}{FindMember()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_generic_object_a979890ccb3b116af19f9e3e77d3d286f} 
+template$<$bool Const, typename ValueT $>$ \\
+\mbox{\hyperlink{class_generic_object_aa07c5c19cd1dc220e211c20b477ff071}{Member\+Iterator}} \mbox{\hyperlink{class_generic_object}{Generic\+Object}}$<$ Const, ValueT $>$\+::\+Find\+Member (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_generic_object_af70c9646b5e422306c33e98b3d8783a7}{const}} \mbox{\hyperlink{class_generic_object_a27b2949e6791caca3545ed6968832bd8}{Ch}} \texorpdfstring{$\ast$}{*}}]{name}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l02603}{2603}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02603\ \{\ \textcolor{keywordflow}{return}\ value\_.FindMember(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}});\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_object_a12a4fbbf2219d6bb43c3d61923830ab4}\index{GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}!FindMember@{FindMember}}
+\index{FindMember@{FindMember}!GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}}
+\doxysubsubsection{\texorpdfstring{FindMember()}{FindMember()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_generic_object_a12a4fbbf2219d6bb43c3d61923830ab4} 
+template$<$bool Const, typename ValueT $>$ \\
+template$<$typename Source\+Allocator $>$ \\
+\mbox{\hyperlink{class_generic_object_aa07c5c19cd1dc220e211c20b477ff071}{Member\+Iterator}} \mbox{\hyperlink{class_generic_object}{Generic\+Object}}$<$ Const, ValueT $>$\+::\+Find\+Member (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_generic_object_af70c9646b5e422306c33e98b3d8783a7}{const}} \mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{class_generic_object_a51b1f176390bfa0b4d8a0d3e7e8c94be}{Encoding\+Type}}, Source\+Allocator $>$ \&}]{name}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l02604}{2604}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02604\ \{\ \textcolor{keywordflow}{return}\ value\_.FindMember(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}});\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_object_a996d775e52cc7c5cf2aa308cf5a2b2cf}\index{GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}!HasMember@{HasMember}}
+\index{HasMember@{HasMember}!GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}}
+\doxysubsubsection{\texorpdfstring{HasMember()}{HasMember()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_generic_object_a996d775e52cc7c5cf2aa308cf5a2b2cf} 
+template$<$bool Const, typename ValueT $>$ \\
+bool \mbox{\hyperlink{class_generic_object}{Generic\+Object}}$<$ Const, ValueT $>$\+::\+Has\+Member (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_generic_object_af70c9646b5e422306c33e98b3d8783a7}{const}} \mbox{\hyperlink{class_generic_object_a27b2949e6791caca3545ed6968832bd8}{Ch}} \texorpdfstring{$\ast$}{*}}]{name}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l02598}{2598}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02598\ \{\ \textcolor{keywordflow}{return}\ value\_.HasMember(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}});\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_object_a0b63666ca05c86f9d719350f2302a3f7}\index{GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}!HasMember@{HasMember}}
+\index{HasMember@{HasMember}!GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}}
+\doxysubsubsection{\texorpdfstring{HasMember()}{HasMember()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_generic_object_a0b63666ca05c86f9d719350f2302a3f7} 
+template$<$bool Const, typename ValueT $>$ \\
+template$<$typename Source\+Allocator $>$ \\
+bool \mbox{\hyperlink{class_generic_object}{Generic\+Object}}$<$ Const, ValueT $>$\+::\+Has\+Member (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_generic_object_af70c9646b5e422306c33e98b3d8783a7}{const}} \mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{class_generic_object_a51b1f176390bfa0b4d8a0d3e7e8c94be}{Encoding\+Type}}, Source\+Allocator $>$ \&}]{name}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l02602}{2602}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02602\ \{\ \textcolor{keywordflow}{return}\ value\_.HasMember(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}});\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_object_af1e80a8a521f05530f9b6a448242ff2d}\index{GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}!MemberBegin@{MemberBegin}}
+\index{MemberBegin@{MemberBegin}!GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}}
+\doxysubsubsection{\texorpdfstring{MemberBegin()}{MemberBegin()}}
+{\footnotesize\ttfamily \label{class_generic_object_af1e80a8a521f05530f9b6a448242ff2d} 
+template$<$bool Const, typename ValueT $>$ \\
+\mbox{\hyperlink{class_generic_object_aa07c5c19cd1dc220e211c20b477ff071}{Member\+Iterator}} \mbox{\hyperlink{class_generic_object}{Generic\+Object}}$<$ Const, ValueT $>$\+::\+Member\+Begin (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l02595}{2595}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02595\ \{\ \textcolor{keywordflow}{return}\ value\_.MemberBegin();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_object_a0389754cbdb435d732bad6edf4f8cdb2}\index{GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}!MemberCapacity@{MemberCapacity}}
+\index{MemberCapacity@{MemberCapacity}!GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}}
+\doxysubsubsection{\texorpdfstring{MemberCapacity()}{MemberCapacity()}}
+{\footnotesize\ttfamily \label{class_generic_object_a0389754cbdb435d732bad6edf4f8cdb2} 
+template$<$bool Const, typename ValueT $>$ \\
+\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} \mbox{\hyperlink{class_generic_object}{Generic\+Object}}$<$ Const, ValueT $>$\+::\+Member\+Capacity (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l02588}{2588}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02588\ \{\ \textcolor{keywordflow}{return}\ value\_.MemberCapacity();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_object_a15326564c82f2b545811f753534563e4}\index{GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}!MemberCount@{MemberCount}}
+\index{MemberCount@{MemberCount}!GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}}
+\doxysubsubsection{\texorpdfstring{MemberCount()}{MemberCount()}}
+{\footnotesize\ttfamily \label{class_generic_object_a15326564c82f2b545811f753534563e4} 
+template$<$bool Const, typename ValueT $>$ \\
+\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} \mbox{\hyperlink{class_generic_object}{Generic\+Object}}$<$ Const, ValueT $>$\+::\+Member\+Count (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l02587}{2587}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02587\ \{\ \textcolor{keywordflow}{return}\ value\_.MemberCount();\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=303pt]{class_generic_object_a15326564c82f2b545811f753534563e4_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_object_a75873786614f67796bfb190008e004dc}\index{GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}!MemberEnd@{MemberEnd}}
+\index{MemberEnd@{MemberEnd}!GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}}
+\doxysubsubsection{\texorpdfstring{MemberEnd()}{MemberEnd()}}
+{\footnotesize\ttfamily \label{class_generic_object_a75873786614f67796bfb190008e004dc} 
+template$<$bool Const, typename ValueT $>$ \\
+\mbox{\hyperlink{class_generic_object_aa07c5c19cd1dc220e211c20b477ff071}{Member\+Iterator}} \mbox{\hyperlink{class_generic_object}{Generic\+Object}}$<$ Const, ValueT $>$\+::\+Member\+End (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l02596}{2596}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02596\ \{\ \textcolor{keywordflow}{return}\ value\_.MemberEnd();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_object_af750abd40d05136da98705899b4575c2}\index{GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}!MemberReserve@{MemberReserve}}
+\index{MemberReserve@{MemberReserve}!GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}}
+\doxysubsubsection{\texorpdfstring{MemberReserve()}{MemberReserve()}}
+{\footnotesize\ttfamily \label{class_generic_object_af750abd40d05136da98705899b4575c2} 
+template$<$bool Const, typename ValueT $>$ \\
+\mbox{\hyperlink{class_generic_object}{Generic\+Object}} \mbox{\hyperlink{class_generic_object}{Generic\+Object}}$<$ Const, ValueT $>$\+::\+Member\+Reserve (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{new\+Capacity}{, }\item[{\mbox{\hyperlink{class_generic_object_ab9f0e2190b752ed6cfb92539c4fd374e}{Allocator\+Type}} \&}]{allocator}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l02597}{2597}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02597\ \{\ value\_.MemberReserve(newCapacity,\ allocator);\ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_object_a9cc10bfeeb6a5eb95ba1ae587b6e6ad8}\index{GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}!ObjectEmpty@{ObjectEmpty}}
+\index{ObjectEmpty@{ObjectEmpty}!GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}}
+\doxysubsubsection{\texorpdfstring{ObjectEmpty()}{ObjectEmpty()}}
+{\footnotesize\ttfamily \label{class_generic_object_a9cc10bfeeb6a5eb95ba1ae587b6e6ad8} 
+template$<$bool Const, typename ValueT $>$ \\
+bool \mbox{\hyperlink{class_generic_object}{Generic\+Object}}$<$ Const, ValueT $>$\+::\+Object\+Empty (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l02589}{2589}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02589\ \{\ \textcolor{keywordflow}{return}\ value\_.ObjectEmpty();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_object_a995b0e01b59efd7e268f837b8127e0bc}\index{GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}!operator=@{operator=}}
+\index{operator=@{operator=}!GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}}
+{\footnotesize\ttfamily \label{class_generic_object_a995b0e01b59efd7e268f837b8127e0bc} 
+template$<$bool Const, typename ValueT $>$ \\
+\mbox{\hyperlink{class_generic_object}{Generic\+Object}} \& \mbox{\hyperlink{class_generic_object}{Generic\+Object}}$<$ Const, ValueT $>$\+::operator= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_generic_object_af70c9646b5e422306c33e98b3d8783a7}{const}} \mbox{\hyperlink{class_generic_object}{Generic\+Object}}$<$ Const, ValueT $>$ \&}]{rhs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l02584}{2584}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02584\ \{\ value\_\ =\ rhs.value\_;\ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_object_a21c677e997d4dfe4e0692cdb75067428}\index{GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}!operator\mbox{[}\mbox{]}@{operator[]}}
+\index{operator\mbox{[}\mbox{]}@{operator[]}!GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}}
+\doxysubsubsection{\texorpdfstring{operator[]()}{operator[]()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_generic_object_a21c677e997d4dfe4e0692cdb75067428} 
+template$<$bool Const, typename ValueT $>$ \\
+template$<$typename Source\+Allocator $>$ \\
+\mbox{\hyperlink{class_generic_object_a6346f4bbeb7076161513c6b95ea7c672}{Value\+Type}} \& \mbox{\hyperlink{class_generic_object}{Generic\+Object}}$<$ Const, ValueT $>$\+::operator\mbox{[}$\,$\mbox{]} (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_generic_object_af70c9646b5e422306c33e98b3d8783a7}{const}} \mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{class_generic_object_a51b1f176390bfa0b4d8a0d3e7e8c94be}{Encoding\+Type}}, Source\+Allocator $>$ \&}]{name}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l02591}{2591}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02591\ \{\ \textcolor{keywordflow}{return}\ value\_[\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}];\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_object_a2bd0d4a75b18ae78c8a1e1051e8ec9ac}\index{GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}!operator\mbox{[}\mbox{]}@{operator[]}}
+\index{operator\mbox{[}\mbox{]}@{operator[]}!GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}}
+\doxysubsubsection{\texorpdfstring{operator[]()}{operator[]()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_generic_object_a2bd0d4a75b18ae78c8a1e1051e8ec9ac} 
+template$<$bool Const, typename ValueT $>$ \\
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{class_generic_object_a6346f4bbeb7076161513c6b95ea7c672}{Value\+Type}} \& \mbox{\hyperlink{class_generic_object}{Generic\+Object}}$<$ Const, ValueT $>$\+::operator\mbox{[}$\,$\mbox{]} (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*}}]{name}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l02590}{2590}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02590\ \{\ \textcolor{keywordflow}{return}\ value\_[\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}];\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_object_af361a4b677882964789201fc605541d0}\index{GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}!RAPIDJSON\_DISABLEIF\_RETURN@{RAPIDJSON\_DISABLEIF\_RETURN}}
+\index{RAPIDJSON\_DISABLEIF\_RETURN@{RAPIDJSON\_DISABLEIF\_RETURN}!GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}}
+\doxysubsubsection{\texorpdfstring{RAPIDJSON\_DISABLEIF\_RETURN()}{RAPIDJSON\_DISABLEIF\_RETURN()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_generic_object_af361a4b677882964789201fc605541d0} 
+template$<$bool Const, typename ValueT $>$ \\
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{class_generic_object}{Generic\+Object}}$<$ Const, ValueT $>$\+::\+RAPIDJSON\+\_\+\+DISABLEIF\+\_\+\+RETURN (\begin{DoxyParamCaption}\item[{(internal\+::\+Or\+Expr$<$ internal\+::\+Is\+Pointer$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$, \mbox{\hyperlink{structinternal_1_1_is_generic_value}{internal\+::\+Is\+Generic\+Value}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ $>$)}]{}{, }\item[{(\mbox{\hyperlink{class_generic_object}{Generic\+Object}}$<$ Const, ValueT $>$)}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{class_generic_object_a98ebcec632c41442d89cd8634b7ecc47}\index{GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}!RAPIDJSON\_DISABLEIF\_RETURN@{RAPIDJSON\_DISABLEIF\_RETURN}}
+\index{RAPIDJSON\_DISABLEIF\_RETURN@{RAPIDJSON\_DISABLEIF\_RETURN}!GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}}
+\doxysubsubsection{\texorpdfstring{RAPIDJSON\_DISABLEIF\_RETURN()}{RAPIDJSON\_DISABLEIF\_RETURN()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_generic_object_a98ebcec632c41442d89cd8634b7ecc47} 
+template$<$bool Const, typename ValueT $>$ \\
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{class_generic_object}{Generic\+Object}}$<$ Const, ValueT $>$\+::\+RAPIDJSON\+\_\+\+DISABLEIF\+\_\+\+RETURN (\begin{DoxyParamCaption}\item[{(internal\+::\+Or\+Expr$<$ internal\+::\+Is\+Pointer$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$, \mbox{\hyperlink{structinternal_1_1_is_generic_value}{internal\+::\+Is\+Generic\+Value}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ $>$)}]{}{, }\item[{(\mbox{\hyperlink{class_generic_object_a6346f4bbeb7076161513c6b95ea7c672}{Value\+Type}} \&)}]{}{}\end{DoxyParamCaption}) \&}
+
+\Hypertarget{class_generic_object_a129ce3843a6658e620a7f740d9f44ee1}\index{GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}!RemoveAllMembers@{RemoveAllMembers}}
+\index{RemoveAllMembers@{RemoveAllMembers}!GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}}
+\doxysubsubsection{\texorpdfstring{RemoveAllMembers()}{RemoveAllMembers()}}
+{\footnotesize\ttfamily \label{class_generic_object_a129ce3843a6658e620a7f740d9f44ee1} 
+template$<$bool Const, typename ValueT $>$ \\
+void \mbox{\hyperlink{class_generic_object}{Generic\+Object}}$<$ Const, ValueT $>$\+::\+Remove\+All\+Members (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l02623}{2623}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02623\ \{\ value\_.RemoveAllMembers();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_object_aebeda9c2cac6afd56dda55caaf2c4a0c}\index{GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}!RemoveMember@{RemoveMember}}
+\index{RemoveMember@{RemoveMember}!GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}}
+\doxysubsubsection{\texorpdfstring{RemoveMember()}{RemoveMember()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{class_generic_object_aebeda9c2cac6afd56dda55caaf2c4a0c} 
+template$<$bool Const, typename ValueT $>$ \\
+bool \mbox{\hyperlink{class_generic_object}{Generic\+Object}}$<$ Const, ValueT $>$\+::\+Remove\+Member (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_generic_object_af70c9646b5e422306c33e98b3d8783a7}{const}} \mbox{\hyperlink{class_generic_object_a27b2949e6791caca3545ed6968832bd8}{Ch}} \texorpdfstring{$\ast$}{*}}]{name}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l02624}{2624}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02624\ \{\ \textcolor{keywordflow}{return}\ value\_.RemoveMember(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}});\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_object_a8e29dc07b992e71e35dd93a57f95842c}\index{GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}!RemoveMember@{RemoveMember}}
+\index{RemoveMember@{RemoveMember}!GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}}
+\doxysubsubsection{\texorpdfstring{RemoveMember()}{RemoveMember()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{class_generic_object_a8e29dc07b992e71e35dd93a57f95842c} 
+template$<$bool Const, typename ValueT $>$ \\
+template$<$typename Source\+Allocator $>$ \\
+bool \mbox{\hyperlink{class_generic_object}{Generic\+Object}}$<$ Const, ValueT $>$\+::\+Remove\+Member (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_generic_object_af70c9646b5e422306c33e98b3d8783a7}{const}} \mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{class_generic_object_a51b1f176390bfa0b4d8a0d3e7e8c94be}{Encoding\+Type}}, Source\+Allocator $>$ \&}]{name}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l02628}{2628}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02628\ \{\ \textcolor{keywordflow}{return}\ value\_.RemoveMember(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}});\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_object_a006f76a33dada85c9d13e069cc43623d}\index{GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}!RemoveMember@{RemoveMember}}
+\index{RemoveMember@{RemoveMember}!GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}}
+\doxysubsubsection{\texorpdfstring{RemoveMember()}{RemoveMember()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{class_generic_object_a006f76a33dada85c9d13e069cc43623d} 
+template$<$bool Const, typename ValueT $>$ \\
+\mbox{\hyperlink{class_generic_object_aa07c5c19cd1dc220e211c20b477ff071}{Member\+Iterator}} \mbox{\hyperlink{class_generic_object}{Generic\+Object}}$<$ Const, ValueT $>$\+::\+Remove\+Member (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_generic_object_aa07c5c19cd1dc220e211c20b477ff071}{Member\+Iterator}}}]{m}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l02629}{2629}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02629\ \{\ \textcolor{keywordflow}{return}\ value\_.RemoveMember(m);\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{class_generic_object_a899449e1a645b5e377af059fb61113d8}\index{GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}!GenericValue@{GenericValue}}
+\index{GenericValue@{GenericValue}!GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}}
+\doxysubsubsection{\texorpdfstring{GenericValue}{GenericValue}}
+{\footnotesize\ttfamily \label{class_generic_object_a899449e1a645b5e377af059fb61113d8} 
+template$<$bool Const, typename ValueT $>$ \\
+template$<$typename , typename $>$ \\
+friend \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{class_generic_value}{Generic\+Value}}\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l02581}{2581}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{class_generic_object_af70c9646b5e422306c33e98b3d8783a7}\index{GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}!const@{const}}
+\index{const@{const}!GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}}
+\doxysubsubsection{\texorpdfstring{const}{const}}
+{\footnotesize\ttfamily \label{class_generic_object_af70c9646b5e422306c33e98b3d8783a7} 
+template$<$bool Const, typename ValueT $>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{class_generic_object_ab9f0e2190b752ed6cfb92539c4fd374e}{Allocator\+Type}} \&allocator \mbox{\hyperlink{class_generic_object}{Generic\+Object}}$<$ Const, ValueT $>$\+::const \{ value\+\_\+.\+Add\+Member(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}, \mbox{\hyperlink{class_generic_object_a131538fbbacbc0a3a5ad15dbea66394f}{value}}, allocator)}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l02613}{2613}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+\Hypertarget{class_generic_object_a719a0e5501da825e6f86ce12b46446cb}\index{GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}!this@{this}}
+\index{this@{this}!GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}}
+\doxysubsubsection{\texorpdfstring{this}{this}}
+{\footnotesize\ttfamily \label{class_generic_object_a719a0e5501da825e6f86ce12b46446cb} 
+template$<$bool Const, typename ValueT $>$ \\
+\mbox{\hyperlink{hello__driver_8cpp_a9717e7bbecb906637e86cef6da3d83c2}{return}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_generic_object}{Generic\+Object}}$<$ Const, ValueT $>$\+::this}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l02613}{2613}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+\Hypertarget{class_generic_object_a131538fbbacbc0a3a5ad15dbea66394f}\index{GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}!value@{value}}
+\index{value@{value}!GenericObject$<$ Const, ValueT $>$@{GenericObject$<$ Const, ValueT $>$}}
+\doxysubsubsection{\texorpdfstring{value}{value}}
+{\footnotesize\ttfamily \label{class_generic_object_a131538fbbacbc0a3a5ad15dbea66394f} 
+template$<$bool Const, typename ValueT $>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{class_generic_object}{Generic\+Object}}$<$ Const, ValueT $>$\+::value}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l02613}{2613}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/\mbox{\hyperlink{document_8h}{document.\+h}}\end{DoxyCompactItemize}

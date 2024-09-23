@@ -1,0 +1,74 @@
+\doxysection{websocketpp\+::utility\+::ci\+\_\+less Struct Reference}
+\hypertarget{structwebsocketpp_1_1utility_1_1ci__less}{}\label{structwebsocketpp_1_1utility_1_1ci__less}\index{websocketpp::utility::ci\_less@{websocketpp::utility::ci\_less}}
+
+
+Helper less than functor for case insensitive find.  
+
+
+
+
+{\ttfamily \#include $<$utilities.\+hpp$>$}
+
+
+
+Inheritance diagram for websocketpp\+::utility\+::ci\+\_\+less\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=201pt]{structwebsocketpp_1_1utility_1_1ci__less__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for websocketpp\+::utility\+::ci\+\_\+less\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=201pt]{structwebsocketpp_1_1utility_1_1ci__less__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structwebsocketpp_1_1utility_1_1ci__less_1_1nocase__compare}{nocase\+\_\+compare}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{structwebsocketpp_1_1utility_1_1ci__less_a6b5354059eb2da0ecb7eb11afa6d8b54}{operator()}} (std\+::string const \&s1, std\+::string const \&s2) const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Based on code from \href{http://stackoverflow.com/questions/3152241/case-insensitive-stdstring-find}{\texttt{ http\+://stackoverflow.\+com/questions/3152241/case-\/insensitive-\/stdstring-\/find}} 
+
+Definition at line \mbox{\hyperlink{utilities_8hpp_source_l00075}{75}} of file \mbox{\hyperlink{utilities_8hpp_source}{utilities.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structwebsocketpp_1_1utility_1_1ci__less_a6b5354059eb2da0ecb7eb11afa6d8b54}\index{websocketpp::utility::ci\_less@{websocketpp::utility::ci\_less}!operator()@{operator()}}
+\index{operator()@{operator()}!websocketpp::utility::ci\_less@{websocketpp::utility::ci\_less}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1utility_1_1ci__less_a6b5354059eb2da0ecb7eb11afa6d8b54} 
+bool websocketpp\+::utility\+::ci\+\_\+less\+::operator() (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{s1}{, }\item[{std\+::string const \&}]{s2}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{utilities_8hpp_source_l00084}{84}} of file \mbox{\hyperlink{utilities_8hpp_source}{utilities.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::lexicographical\_compare}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \ \ \ \ (s1.begin\ (),\ s1.end\ (),\ \ \ \textcolor{comment}{//\ source\ range}}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \ \ \ \ s2.begin\ (),\ s2.end\ (),\ \ \ \textcolor{comment}{//\ dest\ range}}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \ \ \ nocase\_compare\ ());\ \ \textcolor{comment}{//\ comparison}}
+\DoxyCodeLine{00089\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/vendor/websocketpp/websocketpp/\mbox{\hyperlink{utilities_8hpp}{utilities.\+hpp}}\end{DoxyCompactItemize}

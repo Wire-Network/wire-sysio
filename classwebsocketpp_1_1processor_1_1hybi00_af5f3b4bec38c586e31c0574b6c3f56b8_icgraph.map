@@ -1,0 +1,31 @@
+<map id="websocketpp::processor::hybi00::get_message" name="websocketpp::processor::hybi00::get_message">
+<area shape="rect" id="Node000001" title="Retrieves the most recently processed message." alt="" coords="250,319,413,360"/>
+<area shape="rect" id="Node000002" href="$hybi13_8cpp.html#aaf22086af2985d51e7145f7e2550d3bc" title=" " alt="" coords="5,5,202,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="322,304,310,247,287,176,271,140,251,105,228,72,200,44,184,34,186,29,203,40,232,69,256,102,276,137,292,174,315,245,328,303"/>
+<area shape="rect" id="Node000003" href="$hybi00_8cpp.html#adb5f73d2a8ef976a1d75779e82be4e0d" title=" " alt="" coords="5,55,202,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="319,305,304,257,280,199,246,142,224,116,200,94,183,83,186,79,203,89,228,112,250,139,285,197,309,255,324,303"/>
+<area shape="rect" id="Node000004" href="$hybi13_8cpp.html#a077364265adab9f60e0867c52422ada4" title=" " alt="" coords="5,104,202,130"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="315,306,297,268,272,223,240,180,200,143,181,133,184,128,203,139,244,176,277,220,302,265,320,304"/>
+<area shape="rect" id="Node000005" href="$hybi13_8cpp.html#a4bd9cadd955a49f8d9a6056fe5575733" title=" " alt="" coords="5,153,202,179"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="308,308,263,248,234,218,200,192,178,182,180,177,203,188,237,214,267,244,312,304"/>
+<area shape="rect" id="Node000006" href="$hybi13_8cpp.html#a5e257b35cd71cfa41dc16b922ecf2cf2" title=" " alt="" coords="5,203,202,228"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="296,310,253,274,200,242,173,231,175,226,203,237,256,270,300,306"/>
+<area shape="rect" id="Node000007" href="$hybi13_8cpp.html#a221896aacbeefffb43c267b86d1304d0" title=" " alt="" coords="5,252,202,278"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="267,316,201,291,164,281,165,276,202,286,269,311"/>
+<area shape="rect" id="Node000008" href="$hybi13_8cpp.html#a016cd17ca5f4e28f9b47f12f6edcf834" title=" " alt="" coords="5,301,202,327"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="234,331,202,328,203,322,235,326"/>
+<area shape="rect" id="Node000009" href="$hybi13_8cpp.html#a860efb27551433186fc10d94e75c2d5a" title=" " alt="" coords="5,351,202,376"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="234,352,203,356,202,350,234,347"/>
+<area shape="rect" id="Node000010" href="$hybi13_8cpp.html#ade472e80cc874ab76924ed5159c84260" title=" " alt="" coords="5,400,202,426"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="267,368,202,391,165,402,163,397,201,386,265,363"/>
+<area shape="rect" id="Node000011" href="$hybi13_8cpp.html#ab3384e2ab804d8733c8546fea5e9b14a" title=" " alt="" coords="5,449,202,475"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="299,373,255,408,203,441,175,451,173,446,200,436,252,404,296,368"/>
+<area shape="rect" id="Node000012" href="$hybi13_8cpp.html#a31a9d568e92330aa57198fa5eee0d7e2" title=" " alt="" coords="5,499,202,524"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="312,374,267,434,237,464,203,490,180,501,178,496,200,485,234,460,263,430,308,371"/>
+<area shape="rect" id="Node000013" href="$hybi13_8cpp.html#a384ee45473a807f2266c43a2ef165b9c" title=" " alt="" coords="5,548,202,574"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="320,375,302,413,277,458,244,502,203,539,184,550,181,545,200,535,240,498,272,455,297,411,315,373"/>
+<area shape="rect" id="Node000014" href="$hybi00_8cpp.html#ad28fc3426bdff30fdf98e846ac594e41" title=" " alt="" coords="5,597,202,623"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="324,376,309,424,284,482,250,539,228,566,203,588,186,599,183,594,200,584,224,562,245,536,280,479,304,423,319,374"/>
+<area shape="rect" id="Node000015" href="$hybi13_8cpp.html#aa30431a442a5c72d8e0de601cc033a37" title=" " alt="" coords="5,647,202,672"/>
+<area shape="poly" id="edge14_Node000001_Node000015" title=" " alt="" coords="327,376,315,434,292,504,276,541,256,576,232,609,203,638,186,648,184,644,200,633,228,606,251,573,271,539,287,502,310,432,322,375"/>
+</map>

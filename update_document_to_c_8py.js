@@ -1,0 +1,27 @@
+var update_document_to_c_8py =
+[
+    [ "buildMarkdown", "update_document_to_c_8py.html#a1566d86d9cdc1117fd80943cdb930657", null ],
+    [ "createToc", "update_document_to_c_8py.html#ad26cf1a1b5d68cf7da1a74be0785fb2a", null ],
+    [ "dashifyHeadline", "update_document_to_c_8py.html#af38642b93ed79a7fe506130cb9982821", null ],
+    [ "excludeHeadingsFor", "update_document_to_c_8py.html#a559625dc5895694d073fe7212d3518fd", null ],
+    [ "isReleaseNotes", "update_document_to_c_8py.html#ae150ed6f49002f2cab78320a557fcf07", null ],
+    [ "markdownToclify", "update_document_to_c_8py.html#a900bff3833fec6bc2822c913f9aa995f", null ],
+    [ "outputMarkdown", "update_document_to_c_8py.html#afd4641a9d9d99406e943ace3c4ea6f9d", null ],
+    [ "positioningHeadlines", "update_document_to_c_8py.html#aa2d70f62cb8c00fd686d81409add66d1", null ],
+    [ "readLines", "update_document_to_c_8py.html#a4462885a5fe9180245ae84f73913ab7d", null ],
+    [ "removeLines", "update_document_to_c_8py.html#a0cb71b1b13bc08409e02c4334df1be98", null ],
+    [ "removeToC", "update_document_to_c_8py.html#ab7bf369c78a71f5da4bdb3d2468e8dc4", null ],
+    [ "tagAndCollect", "update_document_to_c_8py.html#ae0cb8ee4b87a3942831891811fff1a2c", null ],
+    [ "updateDocumentToC", "update_document_to_c_8py.html#a30cf95195fa4e4410cf66e9c044502f7", null ],
+    [ "updateDocumentToCMain", "update_document_to_c_8py.html#a4f38c2e80ad0d12157a0d2448c321aba", null ],
+    [ "updateSingleDocumentToC", "update_document_to_c_8py.html#af53a8ea4027117b041347bbd389f0873", null ],
+    [ "contentLineNdx", "update_document_to_c_8py.html#a60af4515c50887729c603e280285ddb9", null ],
+    [ "contentLineNo", "update_document_to_c_8py.html#a6f9e7842d60e8591f5e2ea661524d958", null ],
+    [ "contentTitle", "update_document_to_c_8py.html#af60da6a600cbc4c8c71135c80c9ffb0a", null ],
+    [ "documentsDefault", "update_document_to_c_8py.html#ab4e93f6823a0c4c2d3b5f61743ae7bf7", null ],
+    [ "headingExcludeDefault", "update_document_to_c_8py.html#aebce9528c8a9fc097a8172af5f99e36c", null ],
+    [ "headingExcludeRelease", "update_document_to_c_8py.html#af15ec4d2c679e7e6c12afa9f95c21f83", null ],
+    [ "minTocEntries", "update_document_to_c_8py.html#a273e54caf766fd79622a1fbf1bd108d9", null ],
+    [ "releaseNotesName", "update_document_to_c_8py.html#a293d05c453a2b6586f81f202909c606c", null ],
+    [ "VALIDS", "update_document_to_c_8py.html#aa3b1d5b5c00bbfc87af71719ff3df41c", null ]
+];

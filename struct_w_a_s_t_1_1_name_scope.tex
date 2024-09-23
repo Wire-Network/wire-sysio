@@ -1,0 +1,69 @@
+\doxysection{WAST\+::Name\+Scope Struct Reference}
+\hypertarget{struct_w_a_s_t_1_1_name_scope}{}\label{struct_w_a_s_t_1_1_name_scope}\index{WAST::NameScope@{WAST::NameScope}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_w_a_s_t_1_1_name_scope_a176f1590d90b4f1895ea471ecfca3492}{Name\+Scope}} (const char in\+Sigil)
+\item 
+void \mbox{\hyperlink{struct_w_a_s_t_1_1_name_scope_ab219e8195e1c1651618e417a4d684bec}{map}} (std\+::string \&\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{_print_8cpp_source_l00142}{142}} of file \mbox{\hyperlink{_print_8cpp_source}{Print.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{struct_w_a_s_t_1_1_name_scope_a176f1590d90b4f1895ea471ecfca3492}\index{WAST::NameScope@{WAST::NameScope}!NameScope@{NameScope}}
+\index{NameScope@{NameScope}!WAST::NameScope@{WAST::NameScope}}
+\doxysubsubsection{\texorpdfstring{NameScope()}{NameScope()}}
+{\footnotesize\ttfamily \label{struct_w_a_s_t_1_1_name_scope_a176f1590d90b4f1895ea471ecfca3492} 
+WAST\+::\+Name\+Scope\+::\+Name\+Scope (\begin{DoxyParamCaption}\item[{const char}]{in\+Sigil}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_print_8cpp_source_l00144}{144}} of file \mbox{\hyperlink{_print_8cpp_source}{Print.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00144\ :\ sigil(inSigil)\ \{\ nameToCountMap[\textcolor{stringliteral}{"{}"{}}]\ =\ 0;\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_w_a_s_t_1_1_name_scope_ab219e8195e1c1651618e417a4d684bec}\index{WAST::NameScope@{WAST::NameScope}!map@{map}}
+\index{map@{map}!WAST::NameScope@{WAST::NameScope}}
+\doxysubsubsection{\texorpdfstring{map()}{map()}}
+{\footnotesize\ttfamily \label{struct_w_a_s_t_1_1_name_scope_ab219e8195e1c1651618e417a4d684bec} 
+void WAST\+::\+Name\+Scope\+::map (\begin{DoxyParamCaption}\item[{std\+::string \&}]{name}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_print_8cpp_source_l00146}{146}} of file \mbox{\hyperlink{_print_8cpp_source}{Print.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ mapIt\ =\ nameToCountMap.find(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}});}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(mapIt\ ==\ nameToCountMap.end())\ \{\ nameToCountMap[\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}]\ =\ 1;\ \}}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ =\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ +\ std::to\_string(mapIt-\/>second++);\ \}}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ =\ sigil\ +\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}};}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_w_a_s_t_1_1_name_scope_ab219e8195e1c1651618e417a4d684bec_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/wasm-\/jit/\+Source/\+WAST/\mbox{\hyperlink{_print_8cpp}{Print.\+cpp}}\end{DoxyCompactItemize}

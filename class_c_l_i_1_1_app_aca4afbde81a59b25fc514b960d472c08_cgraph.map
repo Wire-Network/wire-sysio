@@ -1,0 +1,16 @@
+<map id="CLI::App::ignore_underscore" name="CLI::App::ignore_underscore">
+<area shape="rect" id="Node000001" title="Ignore underscore. Subcommands inherit value." alt="" coords="5,98,193,124"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_app.html#aade2ac30d86141da0d55d9181ac8b710" title="Helper function to run through all possible comparisons of subcommand names to check there is no over..." alt="" coords="251,57,404,98"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="191,95,235,88,236,94,192,100"/>
+<area shape="rect" id="Node000007" href="$class_c_l_i_1_1_app.html#a0e00bdc00c5bca05d52d98833f77a3b5" title="Get the appropriate parent to fallthrough to which is the first one that has a name or the main app." alt="" coords="241,123,414,163"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="193,121,226,126,225,131,192,127"/>
+<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="287,57,285,47,292,38,306,33,327,31,350,33,364,39,362,44,349,38,327,36,307,38,295,43,290,48,292,56"/>
+<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_app.html#a3ba6eb33f3ee9cd1a126385fa44f2c16" title="Check the name, case insensitive and underscore insensitive if set." alt="" coords="462,41,617,66"/>
+<area shape="poly" id="edge3_Node000002_Node000003" title=" " alt="" coords="403,66,447,61,447,67,404,72"/>
+<area shape="rect" id="Node000006" href="$class_c_l_i_1_1_app.html#adeac41bd40859dfbff9817244c09c989" title="Get the name of the current app." alt="" coords="470,90,609,116"/>
+<area shape="poly" id="edge6_Node000002_Node000006" title=" " alt="" coords="404,84,455,90,454,96,403,89"/>
+<area shape="rect" id="Node000004" href="$namespace_c_l_i_1_1detail.html#a5359a7a0e33366a12e15523b100f591a" title="remove underscores from a string" alt="" coords="668,5,801,46"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="617,40,653,35,653,40,618,45"/>
+<area shape="rect" id="Node000005" href="$namespace_c_l_i_1_1detail.html#ae83709ec148057ec53df4383645727e9" title="Return a lower case version of a string." alt="" coords="665,70,804,96"/>
+<area shape="poly" id="edge5_Node000003_Node000005" title=" " alt="" coords="618,63,650,68,650,73,617,68"/>
+</map>

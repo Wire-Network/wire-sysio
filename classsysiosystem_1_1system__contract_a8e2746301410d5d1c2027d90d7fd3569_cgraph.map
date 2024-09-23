@@ -1,0 +1,17 @@
+<map id="sysiosystem::system_contract::init" name="sysiosystem::system_contract::init">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,63,152,103"/>
+<area shape="rect" id="Node000002" href="$structsysiosystem_1_1sysio__global__state.html#a10ce64e61a12658d73355f79d9b90241" title=" " alt="" coords="203,5,360,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="151,60,192,48,193,53,153,65"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1token.html#a39b1dd52a6510808e8692ca6d6d0f636" title=" " alt="" coords="200,70,363,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="152,80,184,80,184,86,152,86"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1chain_1_1symbol.html#ab949c7fc3d0abdbd0cfc52903ff776b0" title=" " alt="" coords="211,120,352,161"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="153,101,197,114,195,119,151,106"/>
+<area shape="rect" id="Node000005" href="$classsysio_1_1chain_1_1symbol.html#a31f998c4cfde2fa9148ac3232b11a25d" title=" " alt="" coords="411,120,552,161"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="352,138,395,138,395,143,352,143"/>
+<area shape="rect" id="Node000006" href="$classsysio_1_1chain_1_1symbol.html#a8e41beda74e6823bf4efe4d478440e88" title=" " alt="" coords="600,55,742,95"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="542,117,595,98,596,103,543,122"/>
+<area shape="rect" id="Node000007" href="$classsysio_1_1chain_1_1symbol.html#a067cd53c6a32da32671b1302a0c1909a" title=" " alt="" coords="600,120,742,161"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="553,138,585,138,585,143,553,143"/>
+<area shape="rect" id="Node000008" href="$classsysio_1_1chain_1_1symbol.html#a8f3fcd97b82083e359f91943b0674fc3" title=" " alt="" coords="600,185,742,226"/>
+<area shape="poly" id="edge7_Node000005_Node000008" title=" " alt="" coords="543,159,596,177,595,182,542,164"/>
+</map>

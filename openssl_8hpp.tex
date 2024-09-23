@@ -1,0 +1,92 @@
+\doxysection{libraries/fc/include/fc/crypto/openssl.hpp File Reference}
+\hypertarget{openssl_8hpp}{}\label{openssl_8hpp}\index{libraries/fc/include/fc/crypto/openssl.hpp@{libraries/fc/include/fc/crypto/openssl.hpp}}
+{\ttfamily \#include $<$openssl/ec.\+h$>$}\newline
+{\ttfamily \#include $<$openssl/crypto.\+h$>$}\newline
+{\ttfamily \#include $<$openssl/evp.\+h$>$}\newline
+{\ttfamily \#include $<$openssl/conf.\+h$>$}\newline
+{\ttfamily \#include $<$openssl/err.\+h$>$}\newline
+{\ttfamily \#include $<$openssl/ecdsa.\+h$>$}\newline
+{\ttfamily \#include $<$openssl/ecdh.\+h$>$}\newline
+{\ttfamily \#include $<$openssl/sha.\+h$>$}\newline
+{\ttfamily \#include $<$openssl/obj\+\_\+mac.\+h$>$}\newline
+{\ttfamily \#include $<$openssl/bn.\+h$>$}\newline
+Include dependency graph for openssl.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{openssl_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{openssl_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structfc_1_1ssl__wrapper}{fc\+::ssl\+\_\+wrapper$<$ ssl\+\_\+type $>$}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1ssl__bignum}{fc\+::ssl\+\_\+bignum}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacefc}{fc}}
+\begin{DoxyCompactList}\small\item\em namespace \doxylink{namespacesysio_1_1chain}{sysio\+::chain} \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{openssl_8hpp_a7ff07a79931053a908fa84977a272350}{SSL\+\_\+\+TYPE}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  ssl\+\_\+type,  free\+\_\+func)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Provides common utility calls for wrapping openssl c api. 
+
+Definition in file \mbox{\hyperlink{openssl_8hpp_source}{openssl.\+hpp}}.
+
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{openssl_8hpp_a7ff07a79931053a908fa84977a272350}\index{openssl.hpp@{openssl.hpp}!SSL\_TYPE@{SSL\_TYPE}}
+\index{SSL\_TYPE@{SSL\_TYPE}!openssl.hpp@{openssl.hpp}}
+\doxysubsubsection{\texorpdfstring{SSL\_TYPE}{SSL\_TYPE}}
+{\footnotesize\ttfamily \label{openssl_8hpp_a7ff07a79931053a908fa84977a272350} 
+\#define SSL\+\_\+\+TYPE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{ssl\+\_\+type}{, }\item[{}]{free\+\_\+func}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ \ :\ \textcolor{keyword}{public}\ ssl\_wrapper<ssl\_type>\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ name(ssl\_type*\ obj=\textcolor{keyword}{nullptr})\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ ssl\_wrapper(obj)\ \{\}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \string~name()\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if(\ obj\ !=\ \textcolor{keyword}{nullptr}\ )\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ free\_func(obj);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \};}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{openssl_8hpp_source_l00034}{34}} of file \mbox{\hyperlink{openssl_8hpp_source}{openssl.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00034\ \textcolor{preprocessor}{\ \ \ \ \#define\ SSL\_TYPE(name,\ ssl\_type,\ free\_func)\ \(\backslash\)}}
+\DoxyCodeLine{00035\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ struct\ name\ \ :\ public\ ssl\_wrapper<ssl\_type>\ \(\backslash\)}}
+\DoxyCodeLine{00036\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \{\ \(\backslash\)}}
+\DoxyCodeLine{00037\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ name(ssl\_type*\ obj=nullptr)\ \(\backslash\)}}
+\DoxyCodeLine{00038\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ ssl\_wrapper(obj)\ \{\}\ \(\backslash\)}}
+\DoxyCodeLine{00039\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \string~name()\ \(\backslash\)}}
+\DoxyCodeLine{00040\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \{\ \(\backslash\)}}
+\DoxyCodeLine{00041\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if(\ obj\ !=\ nullptr\ )\ \(\backslash\)}}
+\DoxyCodeLine{00042\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ free\_func(obj);\ \(\backslash\)}}
+\DoxyCodeLine{00043\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00044\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \};}}
+
+\end{DoxyCode}

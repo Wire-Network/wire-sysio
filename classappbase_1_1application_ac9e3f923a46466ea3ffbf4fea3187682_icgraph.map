@@ -1,0 +1,9 @@
+<map id="appbase::application::get_channel" name="appbase::application::get_channel">
+<area shape="rect" id="Node000001" title=" " alt="" coords="250,55,390,96"/>
+<area shape="rect" id="Node000002" href="$test__trx__retry__db_8cpp.html#a253cc0c74fd06c934d9c7d4ee67ccf87" title=" " alt="" coords="5,5,202,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="234,55,201,46,156,34,157,29,202,41,236,50"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1producer__plugin__impl.html#a9ce89d0c80f40aeb7df69c5a49beff5a" title=" " alt="" coords="18,55,189,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="234,78,190,78,190,73,234,73"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1net__plugin.html#a2ac6db4551f2fbacf42b72d71f9bcbb2" title=" " alt="" coords="40,120,167,161"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="236,103,168,124,167,119,235,98"/>
+</map>

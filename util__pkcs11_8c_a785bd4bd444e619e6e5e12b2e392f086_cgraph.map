@@ -1,0 +1,11 @@
+<map id="apply_sign_mechanism_finalize" name="apply_sign_mechanism_finalize">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,72,163,113"/>
+<area shape="rect" id="Node000002" href="$util__pkcs11_8c.html#a03746a942ba1eaafbec20b675463ee00" title=" " alt="" coords="211,5,401,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="131,70,210,40,232,33,234,38,212,45,133,75"/>
+<area shape="rect" id="Node000003" href="$util__pkcs11_8c.html#a3f1010425d5308dfa15d696b4853c68c" title=" " alt="" coords="229,55,383,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="163,81,213,75,214,81,164,86"/>
+<area shape="rect" id="Node000004" href="$structmechanism.html#afeb8198b0f33f94f4520c0ffbc584a9a" title=" " alt="" coords="224,104,388,130"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="164,99,209,104,208,109,163,104"/>
+<area shape="rect" id="Node000005" href="$yubihsm__pkcs11_8c.html#adc4bd59a60361844aa0e852efa210105" title=" " alt="" coords="272,153,340,179"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="135,111,211,140,257,153,256,158,210,145,133,116"/>
+</map>

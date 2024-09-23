@@ -1,0 +1,70 @@
+\doxysection{mie\+::local Namespace Reference}
+\hypertarget{namespacemie_1_1local}{}\label{namespacemie_1_1local}\index{mie::local@{mie::local}}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structmie_1_1local_1_1addsubmul}{addsubmul}}
+\item 
+struct \mbox{\hyperlink{structmie_1_1local_1_1comparable}{comparable}}
+\item 
+struct \mbox{\hyperlink{structmie_1_1local_1_1dividable}{dividable}}
+\item 
+struct \mbox{\hyperlink{structmie_1_1local_1_1_empty}{Empty}}
+\item 
+class \mbox{\hyperlink{classmie_1_1local_1_1_fixed_buffer}{Fixed\+Buffer}}
+\item 
+struct \mbox{\hyperlink{structmie_1_1local_1_1has_negative}{has\+Negative}}
+\item 
+struct \mbox{\hyperlink{structmie_1_1local_1_1inversible}{inversible}}
+\item 
+struct \mbox{\hyperlink{structmie_1_1local_1_1_primitive_function}{Primitive\+Function}}
+\item 
+struct \mbox{\hyperlink{structmie_1_1local_1_1shiftable}{shiftable}}
+\item 
+class \mbox{\hyperlink{classmie_1_1local_1_1_variable_buffer}{Variable\+Buffer}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+std\+::istream \& \mbox{\hyperlink{namespacemie_1_1local_a847047e2eed379879763d334f64e2811}{get\+Digits}} (std\+::istream \&is, std\+::string \&str, bool allow\+Negative=false)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacemie_1_1local_a847047e2eed379879763d334f64e2811}\index{mie::local@{mie::local}!getDigits@{getDigits}}
+\index{getDigits@{getDigits}!mie::local@{mie::local}}
+\doxysubsubsection{\texorpdfstring{getDigits()}{getDigits()}}
+{\footnotesize\ttfamily \label{namespacemie_1_1local_a847047e2eed379879763d334f64e2811} 
+std\+::istream \& mie\+::local\+::get\+Digits (\begin{DoxyParamCaption}\item[{std\+::istream \&}]{is}{, }\item[{std\+::string \&}]{str}{, }\item[{bool}]{allow\+Negative}{ = {\ttfamily false}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zm_8h_source_l00084}{84}} of file \mbox{\hyperlink{zm_8h_source}{zm.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00085\ \{}
+\DoxyCodeLine{00086\ \ \ \ \ std::ios\_base::fmtflags\ keep\ =\ is.flags();}
+\DoxyCodeLine{00087\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ pos\ =\ 0;}
+\DoxyCodeLine{00088\ \ \ \ \ \textcolor{keywordtype}{char}\ c;}
+\DoxyCodeLine{00089\ \ \ \ \ \textcolor{keywordflow}{while}\ (is\ >>\ c)\ \{}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((\textcolor{charliteral}{'0'}\ <=\ c\ \&\&\ c\ <=\ \textcolor{charliteral}{'9'})\ \textcolor{comment}{/*\ digits\ */}}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ ||\ (pos\ ==\ 1\ \&\&\ (str[0]\ ==\ \textcolor{charliteral}{'0'}\ \&\&\ c\ ==\ \textcolor{charliteral}{'x'}))\ \textcolor{comment}{/*\ 0x..\ */}}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ \ ||\ (\textcolor{charliteral}{'a'}\ <=\ c\ \&\&\ c\ <=\ \textcolor{charliteral}{'f'})\ \textcolor{comment}{/*\ lowercase\ hex\ */}}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ ||\ (\textcolor{charliteral}{'A'}\ <=\ c\ \&\&\ c\ <=\ \textcolor{charliteral}{'F'})\ \textcolor{comment}{/*\ uppercase\ hex\ */}}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \ ||\ (allowNegative\ \&\&\ pos\ ==\ 0\ \&\&\ c\ ==\ \textcolor{charliteral}{'-\/'}))\ \{\ \textcolor{comment}{/*\ -\/digits\ */}}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \ \ \ str.push\_back(c);}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (pos\ ==\ 0)\ \{}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ is\ >>\ std::noskipws;}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ \ \ \ pos++;}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \ \ \ is.unget();}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00104\ \ \ \ \ \}}
+\DoxyCodeLine{00105\ \ \ \ \ is.flags(keep);}
+\DoxyCodeLine{00106\ \ \ \ \ \textcolor{keywordflow}{return}\ is;}
+\DoxyCodeLine{00107\ \}}
+
+\end{DoxyCode}

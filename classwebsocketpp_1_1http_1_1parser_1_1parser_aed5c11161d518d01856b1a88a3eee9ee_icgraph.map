@@ -1,0 +1,9 @@
+<map id="websocketpp::http::parser::parser::get_version" name="websocketpp::http::parser::parser::get_version">
+<area shape="rect" id="Node000001" title="Get the HTTP version string." alt="" coords="226,63,362,119"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1http_1_1parser_1_1request.html#a27fbcad6aae2a98c9cc0efc4fdd7da8c" title="Returns the full raw request (including the body)" alt="" coords="23,5,160,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="210,67,156,49,158,44,212,62"/>
+<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1http_1_1parser_1_1response.html#a46ebda97244f3235eaaccb1bcbdc5666" title="Returns the full raw response." alt="" coords="18,71,165,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="210,94,166,94,166,88,210,88"/>
+<area shape="rect" id="Node000004" href="$classwebsocketpp_1_1http_1_1parser_1_1request.html#afb77b09be8112bb60dd80cf21d032eff" title="Returns the raw request headers only (similar to an HTTP HEAD request)" alt="" coords="5,136,178,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="212,120,158,138,156,133,210,115"/>
+</map>

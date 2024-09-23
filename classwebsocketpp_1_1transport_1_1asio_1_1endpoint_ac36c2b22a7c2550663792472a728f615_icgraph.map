@@ -1,0 +1,17 @@
+<map id="websocketpp::transport::asio::endpoint::listen" name="websocketpp::transport::asio::endpoint::listen">
+<area shape="rect" id="Node000001" title="Set up endpoint for listening manually (exception free)" alt="" coords="211,201,368,242"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1transport_1_1asio_1_1endpoint.html#ad08b16daae1fac46679245ec7d0c8952" title="Set up endpoint for listening with protocol and port." alt="" coords="5,5,163,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="267,189,223,125,194,91,161,61,142,49,144,44,164,57,198,87,227,122,271,186"/>
+<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1transport_1_1asio_1_1endpoint.html#ae6813b9ecda67a13a78967f72e77b061" title="Set up endpoint for listening with protocol and port (exception free)" alt="" coords="5,71,163,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="252,193,210,159,161,127,137,114,140,109,164,122,213,155,255,189"/>
+<area shape="rect" id="Node000004" href="$classwebsocketpp_1_1transport_1_1asio_1_1endpoint.html#ab3d7708b939531c5c803e3b148a9b009" title="Set up endpoint for listening manually." alt="" coords="5,136,163,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="208,199,150,180,151,175,210,194"/>
+<area shape="rect" id="Node000005" href="$classwebsocketpp_1_1transport_1_1asio_1_1endpoint.html#ad69ca2f648f48c7616ad1df614d88d67" title="Set up endpoint for listening on a host and service." alt="" coords="5,201,163,242"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="195,224,163,224,163,219,195,219"/>
+<area shape="rect" id="Node000006" href="$classwebsocketpp_1_1transport_1_1asio_1_1endpoint.html#a85606665cc9c948194076c2377cb61c0" title="Set up endpoint for listening on a host and service (exception free)" alt="" coords="5,267,163,307"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="210,250,151,269,150,263,208,245"/>
+<area shape="rect" id="Node000007" href="$classwebsocketpp_1_1transport_1_1asio_1_1endpoint.html#a80c1e2bb6edbfbfc46d387015e528117" title="Set up endpoint for listening on a port." alt="" coords="5,332,163,373"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="255,254,213,288,164,321,140,334,137,329,161,317,210,284,252,250"/>
+<area shape="rect" id="Node000008" href="$classwebsocketpp_1_1transport_1_1asio_1_1endpoint.html#ae7da6e2c944c3e1a087495b9d998dc8b" title="Set up endpoint for listening on a port (exception free)" alt="" coords="5,397,163,438"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="271,257,227,322,198,356,164,386,144,399,142,395,161,382,194,352,223,318,267,254"/>
+</map>

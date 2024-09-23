@@ -1,0 +1,198 @@
+\doxysection{versiongenerate Namespace Reference}
+\hypertarget{namespaceversiongenerate}{}\label{namespaceversiongenerate}\index{versiongenerate@{versiongenerate}}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespaceversiongenerate_a68af424183a162a61507cdc378cf255e}{input\+\_\+dir}} = sys.\+argv\mbox{[}1\mbox{]}
+\item 
+\mbox{\hyperlink{namespaceversiongenerate_aab714e0aa9036025ba7c83eb7422c567}{output\+\_\+dir}} = sys.\+argv\mbox{[}2\mbox{]}
+\item 
+\mbox{\hyperlink{namespaceversiongenerate_afdfd8d6de9b62e742923b2b3326798e6}{config\+\_\+file}} = open("{}\%s/configure.\+ac"{} \% \mbox{\hyperlink{namespaceversiongenerate_a68af424183a162a61507cdc378cf255e}{input\+\_\+dir}}, \textquotesingle{}\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\textquotesingle{})
+\item 
+int \mbox{\hyperlink{namespaceversiongenerate_a5656c48d43f7e869041b6a30c124702e}{buffer\+\_\+size}} = 1024
+\item 
+\mbox{\hyperlink{namespaceversiongenerate_a88cc36d80d757546e04817490ebb0640}{opening\+\_\+string}} = config\+\_\+file.\+read(\mbox{\hyperlink{namespaceversiongenerate_a5656c48d43f7e869041b6a30c124702e}{buffer\+\_\+size}})
+\item 
+\mbox{\hyperlink{namespaceversiongenerate_a83861e707250395976fdfee3396a0fff}{version\+\_\+expression}}
+\item 
+\mbox{\hyperlink{namespaceversiongenerate_a0ce22d4ba772e519b000413a3bf5445c}{version\+\_\+values}} = version\+\_\+expression.\+search(\mbox{\hyperlink{namespaceversiongenerate_a88cc36d80d757546e04817490ebb0640}{opening\+\_\+string}})
+\item 
+\mbox{\hyperlink{namespaceversiongenerate_a4b536109523f1bc805806f8d76ca34ac}{major\+\_\+version}} = version\+\_\+values.\+group(1)
+\item 
+\mbox{\hyperlink{namespaceversiongenerate_af8027cbccfcda6a243f0544cc3c08b28}{minor\+\_\+version}} = version\+\_\+values.\+group(2)
+\item 
+\mbox{\hyperlink{namespaceversiongenerate_aa92fb32c5f03f516f3b6224c620b66e4}{fix\+\_\+version}} = version\+\_\+values.\+group(3)
+\item 
+str \mbox{\hyperlink{namespaceversiongenerate_a5d8719954de1ba55d7f1e92f8e98f57f}{file\+\_\+data}}
+\item 
+\mbox{\hyperlink{namespaceversiongenerate_a3cb3deeb1538014cd32e4253fe298e27}{version\+\_\+file}} = open("{}\%s/Version.\+h"{} \% \mbox{\hyperlink{namespaceversiongenerate_aab714e0aa9036025ba7c83eb7422c567}{output\+\_\+dir}}, \textquotesingle{}w\textquotesingle{})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\begin{DoxyVerb}A script to prepare version information for use the gtest Info.plist file.
+
+  This script extracts the version information from the configure.ac file and
+  uses it to generate a header file containing the same information. The
+  #defines in this header file will be included in during the generation of
+  the Info.plist of the framework, giving the correct value to the version
+  shown in the Finder.
+
+  This script makes the following assumptions (these are faults of the script,
+  not problems with the Autoconf):
+    1. The AC_INIT macro will be contained within the first 1024 characters
+       of configure.ac
+    2. The version string will be 3 integers separated by periods and will be
+       surrounded by square brackets, "[" and "]" (e.g. [1.0.1]). The first
+       segment represents the major version, the second represents the minor
+       version and the third represents the fix version.
+    3. No ")" character exists between the opening "(" and closing ")" of
+       AC_INIT, including in comments and character strings.
+\end{DoxyVerb}
+ 
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{namespaceversiongenerate_a5656c48d43f7e869041b6a30c124702e}\index{versiongenerate@{versiongenerate}!buffer\_size@{buffer\_size}}
+\index{buffer\_size@{buffer\_size}!versiongenerate@{versiongenerate}}
+\doxysubsubsection{\texorpdfstring{buffer\_size}{buffer\_size}}
+{\footnotesize\ttfamily \label{namespaceversiongenerate_a5656c48d43f7e869041b6a30c124702e} 
+int versiongenerate.\+buffer\+\_\+size = 1024}
+
+
+
+Definition at line \mbox{\hyperlink{versiongenerate_8py_source_l00065}{65}} of file \mbox{\hyperlink{versiongenerate_8py_source}{versiongenerate.\+py}}.
+
+\Hypertarget{namespaceversiongenerate_afdfd8d6de9b62e742923b2b3326798e6}\index{versiongenerate@{versiongenerate}!config\_file@{config\_file}}
+\index{config\_file@{config\_file}!versiongenerate@{versiongenerate}}
+\doxysubsubsection{\texorpdfstring{config\_file}{config\_file}}
+{\footnotesize\ttfamily \label{namespaceversiongenerate_afdfd8d6de9b62e742923b2b3326798e6} 
+versiongenerate.\+config\+\_\+file = open("{}\%s/configure.\+ac"{} \% \mbox{\hyperlink{namespaceversiongenerate_a68af424183a162a61507cdc378cf255e}{input\+\_\+dir}}, \textquotesingle{}\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\textquotesingle{})}
+
+
+
+Definition at line \mbox{\hyperlink{versiongenerate_8py_source_l00064}{64}} of file \mbox{\hyperlink{versiongenerate_8py_source}{versiongenerate.\+py}}.
+
+\Hypertarget{namespaceversiongenerate_a5d8719954de1ba55d7f1e92f8e98f57f}\index{versiongenerate@{versiongenerate}!file\_data@{file\_data}}
+\index{file\_data@{file\_data}!versiongenerate@{versiongenerate}}
+\doxysubsubsection{\texorpdfstring{file\_data}{file\_data}}
+{\footnotesize\ttfamily \label{namespaceversiongenerate_a5d8719954de1ba55d7f1e92f8e98f57f} 
+str versiongenerate.\+file\+\_\+data}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ =\ \ \textcolor{stringliteral}{"{}"{}"{}//}}
+\DoxyCodeLine{00002\ \textcolor{stringliteral}{//\ DO\ NOT\ MODIFY\ THIS\ FILE\ (but\ you\ can\ delete\ it)}}
+\DoxyCodeLine{00003\ \textcolor{stringliteral}{//}}
+\DoxyCodeLine{00004\ \textcolor{stringliteral}{//\ This\ file\ is\ autogenerated\ by\ the\ versiongenerate.py\ script.\ This\ script}}
+\DoxyCodeLine{00005\ \textcolor{stringliteral}{//\ is\ executed\ in\ a\ "{}Run\ Script"{}\ build\ phase\ when\ creating\ gtest.framework.\ This}}
+\DoxyCodeLine{00006\ \textcolor{stringliteral}{//\ header\ file\ is\ not\ used\ during\ compilation\ of\ C-\/source.\ Rather,\ it\ simply}}
+\DoxyCodeLine{00007\ \textcolor{stringliteral}{//\ defines\ some\ version\ strings\ for\ substitution\ in\ the\ Info.plist.\ Because\ of}}
+\DoxyCodeLine{00008\ \textcolor{stringliteral}{//\ this,\ we\ are\ not\ restricted\ to\ C-\/syntax\ nor\ are\ we\ using\ include\ guards.}}
+\DoxyCodeLine{00009\ \textcolor{stringliteral}{//}}
+\DoxyCodeLine{00010\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00011\ \textcolor{stringliteral}{\#define\ GTEST\_VERSIONINFO\_SHORT\ \%s.\%s}}
+\DoxyCodeLine{00012\ \textcolor{stringliteral}{\#define\ GTEST\_VERSIONINFO\_LONG\ \%s.\%s.\%s}}
+\DoxyCodeLine{00013\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00014\ \textcolor{stringliteral}{"{}"{}"{}}\ \%\ (major\_version,\ minor\_version,\ major\_version,\ minor\_version,\ fix\_version)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{versiongenerate_8py_source_l00084}{84}} of file \mbox{\hyperlink{versiongenerate_8py_source}{versiongenerate.\+py}}.
+
+\Hypertarget{namespaceversiongenerate_aa92fb32c5f03f516f3b6224c620b66e4}\index{versiongenerate@{versiongenerate}!fix\_version@{fix\_version}}
+\index{fix\_version@{fix\_version}!versiongenerate@{versiongenerate}}
+\doxysubsubsection{\texorpdfstring{fix\_version}{fix\_version}}
+{\footnotesize\ttfamily \label{namespaceversiongenerate_aa92fb32c5f03f516f3b6224c620b66e4} 
+versiongenerate.\+fix\+\_\+version = version\+\_\+values.\+group(3)}
+
+
+
+Definition at line \mbox{\hyperlink{versiongenerate_8py_source_l00080}{80}} of file \mbox{\hyperlink{versiongenerate_8py_source}{versiongenerate.\+py}}.
+
+\Hypertarget{namespaceversiongenerate_a68af424183a162a61507cdc378cf255e}\index{versiongenerate@{versiongenerate}!input\_dir@{input\_dir}}
+\index{input\_dir@{input\_dir}!versiongenerate@{versiongenerate}}
+\doxysubsubsection{\texorpdfstring{input\_dir}{input\_dir}}
+{\footnotesize\ttfamily \label{namespaceversiongenerate_a68af424183a162a61507cdc378cf255e} 
+versiongenerate.\+input\+\_\+dir = sys.\+argv\mbox{[}1\mbox{]}}
+
+
+
+Definition at line \mbox{\hyperlink{versiongenerate_8py_source_l00060}{60}} of file \mbox{\hyperlink{versiongenerate_8py_source}{versiongenerate.\+py}}.
+
+\Hypertarget{namespaceversiongenerate_a4b536109523f1bc805806f8d76ca34ac}\index{versiongenerate@{versiongenerate}!major\_version@{major\_version}}
+\index{major\_version@{major\_version}!versiongenerate@{versiongenerate}}
+\doxysubsubsection{\texorpdfstring{major\_version}{major\_version}}
+{\footnotesize\ttfamily \label{namespaceversiongenerate_a4b536109523f1bc805806f8d76ca34ac} 
+versiongenerate.\+major\+\_\+version = version\+\_\+values.\+group(1)}
+
+
+
+Definition at line \mbox{\hyperlink{versiongenerate_8py_source_l00078}{78}} of file \mbox{\hyperlink{versiongenerate_8py_source}{versiongenerate.\+py}}.
+
+\Hypertarget{namespaceversiongenerate_af8027cbccfcda6a243f0544cc3c08b28}\index{versiongenerate@{versiongenerate}!minor\_version@{minor\_version}}
+\index{minor\_version@{minor\_version}!versiongenerate@{versiongenerate}}
+\doxysubsubsection{\texorpdfstring{minor\_version}{minor\_version}}
+{\footnotesize\ttfamily \label{namespaceversiongenerate_af8027cbccfcda6a243f0544cc3c08b28} 
+versiongenerate.\+minor\+\_\+version = version\+\_\+values.\+group(2)}
+
+
+
+Definition at line \mbox{\hyperlink{versiongenerate_8py_source_l00079}{79}} of file \mbox{\hyperlink{versiongenerate_8py_source}{versiongenerate.\+py}}.
+
+\Hypertarget{namespaceversiongenerate_a88cc36d80d757546e04817490ebb0640}\index{versiongenerate@{versiongenerate}!opening\_string@{opening\_string}}
+\index{opening\_string@{opening\_string}!versiongenerate@{versiongenerate}}
+\doxysubsubsection{\texorpdfstring{opening\_string}{opening\_string}}
+{\footnotesize\ttfamily \label{namespaceversiongenerate_a88cc36d80d757546e04817490ebb0640} 
+versiongenerate.\+opening\+\_\+string = config\+\_\+file.\+read(\mbox{\hyperlink{namespaceversiongenerate_a5656c48d43f7e869041b6a30c124702e}{buffer\+\_\+size}})}
+
+
+
+Definition at line \mbox{\hyperlink{versiongenerate_8py_source_l00066}{66}} of file \mbox{\hyperlink{versiongenerate_8py_source}{versiongenerate.\+py}}.
+
+\Hypertarget{namespaceversiongenerate_aab714e0aa9036025ba7c83eb7422c567}\index{versiongenerate@{versiongenerate}!output\_dir@{output\_dir}}
+\index{output\_dir@{output\_dir}!versiongenerate@{versiongenerate}}
+\doxysubsubsection{\texorpdfstring{output\_dir}{output\_dir}}
+{\footnotesize\ttfamily \label{namespaceversiongenerate_aab714e0aa9036025ba7c83eb7422c567} 
+versiongenerate.\+output\+\_\+dir = sys.\+argv\mbox{[}2\mbox{]}}
+
+
+
+Definition at line \mbox{\hyperlink{versiongenerate_8py_source_l00061}{61}} of file \mbox{\hyperlink{versiongenerate_8py_source}{versiongenerate.\+py}}.
+
+\Hypertarget{namespaceversiongenerate_a83861e707250395976fdfee3396a0fff}\index{versiongenerate@{versiongenerate}!version\_expression@{version\_expression}}
+\index{version\_expression@{version\_expression}!versiongenerate@{versiongenerate}}
+\doxysubsubsection{\texorpdfstring{version\_expression}{version\_expression}}
+{\footnotesize\ttfamily \label{namespaceversiongenerate_a83861e707250395976fdfee3396a0fff} 
+versiongenerate.\+version\+\_\+expression}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ =\ \ re.compile(\textcolor{stringliteral}{r"{}AC\_INIT\(\backslash\)(.*?\(\backslash\)[(\(\backslash\)d+)\(\backslash\).(\(\backslash\)d+)\(\backslash\).(\(\backslash\)d+)\(\backslash\)].*?\(\backslash\))"{}},}
+\DoxyCodeLine{00002\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ re.DOTALL)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{versiongenerate_8py_source_l00075}{75}} of file \mbox{\hyperlink{versiongenerate_8py_source}{versiongenerate.\+py}}.
+
+\Hypertarget{namespaceversiongenerate_a3cb3deeb1538014cd32e4253fe298e27}\index{versiongenerate@{versiongenerate}!version\_file@{version\_file}}
+\index{version\_file@{version\_file}!versiongenerate@{versiongenerate}}
+\doxysubsubsection{\texorpdfstring{version\_file}{version\_file}}
+{\footnotesize\ttfamily \label{namespaceversiongenerate_a3cb3deeb1538014cd32e4253fe298e27} 
+versiongenerate.\+version\+\_\+file = open("{}\%s/Version.\+h"{} \% \mbox{\hyperlink{namespaceversiongenerate_aab714e0aa9036025ba7c83eb7422c567}{output\+\_\+dir}}, \textquotesingle{}w\textquotesingle{})}
+
+
+
+Definition at line \mbox{\hyperlink{versiongenerate_8py_source_l00098}{98}} of file \mbox{\hyperlink{versiongenerate_8py_source}{versiongenerate.\+py}}.
+
+\Hypertarget{namespaceversiongenerate_a0ce22d4ba772e519b000413a3bf5445c}\index{versiongenerate@{versiongenerate}!version\_values@{version\_values}}
+\index{version\_values@{version\_values}!versiongenerate@{versiongenerate}}
+\doxysubsubsection{\texorpdfstring{version\_values}{version\_values}}
+{\footnotesize\ttfamily \label{namespaceversiongenerate_a0ce22d4ba772e519b000413a3bf5445c} 
+versiongenerate.\+version\+\_\+values = version\+\_\+expression.\+search(\mbox{\hyperlink{namespaceversiongenerate_a88cc36d80d757546e04817490ebb0640}{opening\+\_\+string}})}
+
+
+
+Definition at line \mbox{\hyperlink{versiongenerate_8py_source_l00077}{77}} of file \mbox{\hyperlink{versiongenerate_8py_source}{versiongenerate.\+py}}.
+

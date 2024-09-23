@@ -1,0 +1,19 @@
+<map id="CLI::Validator::non_modifying" name="CLI::Validator::non_modifying">
+<area shape="rect" id="Node000001" title="Specify whether the Validator can be modifying or not." alt="" coords="610,96,740,137"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_option.html#ae94ff5bfc6549f9c86aff629be829353" title="Adds a Validator with a built in type name." alt="" coords="431,104,562,130"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="594,120,563,120,563,114,594,114"/>
+<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_app.html#af5c81d9b35b386fb07c43db9df3fc958" title="Add set of options (with default, set can be changed afterwards &#45; do not destroy the set) DEPRECATED." alt="" coords="203,5,383,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="466,97,427,70,382,45,353,34,355,29,384,40,430,65,469,92"/>
+<area shape="rect" id="Node000004" href="$class_c_l_i_1_1_app.html#a25a06eb9b7b65d34cf92cc84cccfeeef" title="Add set of options (No default, set can be changed afterwards &#45; do not destroy the set) DEPRECATED." alt="" coords="203,55,383,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="425,102,348,84,350,78,426,97"/>
+<area shape="rect" id="Node000005" href="$class_c_l_i_1_1_app.html#a128d9994f3bd1d884abad7d4802dd9c7" title="Add set of options (with default, static set, such as an inline set) DEPRECATED." alt="" coords="229,104,356,130"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="415,120,357,120,357,114,415,114"/>
+<area shape="rect" id="Node000006" href="$class_c_l_i_1_1_app.html#a7edb5c2efdd04bfbbb49ee666a375dde" title="Add set of options (No default, temp reference, such as an inline set) DEPRECATED." alt="" coords="229,153,356,179"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="426,137,350,155,348,150,425,131"/>
+<area shape="rect" id="Node000007" href="$namespace_c_l_i.html#a6cb6f8bfff8c49385fb24f6f23a23c21" title="Helper function to mark an option as deprecated." alt="" coords="218,203,368,228"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="469,141,430,169,384,194,355,205,353,200,382,189,427,164,466,137"/>
+<area shape="rect" id="Node000008" href="$namespace_c_l_i.html#a5e83d92a6ec271c2439141feaede1136" title="Helper function to mark an option as deprecated." alt="" coords="5,177,155,203"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="203,207,155,202,155,196,203,202"/>
+<area shape="rect" id="Node000009" href="$namespace_c_l_i.html#ad6d89b5d1aba2ebdca5f94534d658cab" title="Helper function to mark an option as deprecated." alt="" coords="5,227,155,252"/>
+<area shape="poly" id="edge8_Node000007_Node000009" title=" " alt="" coords="203,228,155,234,155,228,203,223"/>
+</map>

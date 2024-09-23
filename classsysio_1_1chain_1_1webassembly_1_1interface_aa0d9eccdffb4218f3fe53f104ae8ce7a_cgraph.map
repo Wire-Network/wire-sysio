@@ -1,0 +1,13 @@
+<map id="sysio::chain::webassembly::interface::blake2_f" name="sysio::chain::webassembly::interface::blake2_f">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,83,185,123"/>
+<area shape="rect" id="Node000002" href="$namespacefc.html#a3bcfede4e3ebdbd08006e020492dc7ce" title=" " alt="" coords="264,41,349,66"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="184,79,248,64,250,69,185,85"/>
+<area shape="rect" id="Node000005" href="$classsysio_1_1vm_1_1span.html#a65d9e2641d763c860ae175a9a936a309" title=" " alt="" coords="233,90,380,116"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="185,100,217,100,217,106,185,106"/>
+<area shape="rect" id="Node000006" href="$classsysio_1_1vm_1_1span.html#a584ee0404e01edf225142e86d23d6d7d" title=" " alt="" coords="233,140,380,165"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="185,121,234,133,233,138,184,127"/>
+<area shape="rect" id="Node000003" href="$classfc_1_1blake2b__wrapper.html#aa207b9c4cb00bfca265163a11a1fc9de" title=" " alt="" coords="428,5,566,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="349,45,412,35,413,41,350,50"/>
+<area shape="rect" id="Node000004" href="$yubihsm__pkcs11_8c.html#ae785d5badbf1f08b491af31f32a135a1" title=" " alt="" coords="462,70,533,96"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="350,58,447,73,446,78,349,63"/>
+</map>

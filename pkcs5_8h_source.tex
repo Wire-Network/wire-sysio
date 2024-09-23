@@ -1,0 +1,56 @@
+\doxysection{pkcs5.\+h}
+\hypertarget{pkcs5_8h_source}{}\label{pkcs5_8h_source}\index{libraries/yubihsm/common/pkcs5.h@{libraries/yubihsm/common/pkcs5.h}}
+\mbox{\hyperlink{pkcs5_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{pkcs5_8h_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8h_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ 2015-\/2018\ Yubico\ AB}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8h_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8h_source_l00004}00004\ \textcolor{comment}{\ *\ Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8h_source_l00005}00005\ \textcolor{comment}{\ *\ you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8h_source_l00006}00006\ \textcolor{comment}{\ *\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8h_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8h_source_l00008}00008\ \textcolor{comment}{\ *\ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8h_source_l00009}00009\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8h_source_l00010}00010\ \textcolor{comment}{\ *\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8h_source_l00011}00011\ \textcolor{comment}{\ *\ distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8h_source_l00012}00012\ \textcolor{comment}{\ *\ WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8h_source_l00013}00013\ \textcolor{comment}{\ *\ See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8h_source_l00014}00014\ \textcolor{comment}{\ *\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8h_source_l00015}00015\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8h_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{pkcs5_8h_source_l00017}00017\ \textcolor{comment}{/*\ pkcs5.h}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8h_source_l00018}00018\ \textcolor{comment}{**}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8h_source_l00019}00019\ \textcolor{comment}{**\ Implements\ platform\ specific\ PKCS5\ operations}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8h_source_l00020}00020\ \textcolor{comment}{*/}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8h_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{pkcs5_8h_source_l00022}00022\ \textcolor{preprocessor}{\#ifndef\ \_YUBICOM\_PKCS5\_H\_}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8h_source_l00023}00023\ \textcolor{preprocessor}{\#define\ \_YUBICOM\_PKCS5\_H\_}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8h_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{pkcs5_8h_source_l00025}00025\ \textcolor{preprocessor}{\#include\ <stdbool.h>}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8h_source_l00026}00026\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{stdint_8h}{stdint.h}}>}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8h_source_l00027}00027\ \textcolor{preprocessor}{\#include\ <stddef.h>}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8h_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{pkcs5_8h_source_l00029}00029\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{yubihsm_2common_2hash_8h}{hash.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8h_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{pkcs5_8h_source_l00031}00031\ \textcolor{preprocessor}{\#ifdef\ \_\_cplusplus}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8h_source_l00032}00032\ \textcolor{keyword}{extern}\ \textcolor{stringliteral}{"{}C"{}}\ \{}
+\DoxyCodeLine{\Hypertarget{pkcs5_8h_source_l00033}00033\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8h_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{pkcs5_8h_source_l00035}00035\ \textcolor{preprocessor}{\#ifndef\ \_\_WIN32}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8h_source_l00036}\mbox{\hyperlink{pkcs5_8h_aa1c48ca7b894657e01905d3074b38b8c}{00036}}\ \textcolor{preprocessor}{\#define\ YH\_INTERNAL\ \_\_attribute\_\_((visibility("{}hidden"{})))}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8h_source_l00037}00037\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8h_source_l00038}00038\ \textcolor{preprocessor}{\#define\ YH\_INTERNAL}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8h_source_l00039}00039\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8h_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{pkcs5_8h_source_l00041}00041\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{pkcs5_8h_aa1c48ca7b894657e01905d3074b38b8c}{YH\_INTERNAL}}\ \mbox{\hyperlink{pkcs5_8h_a8a496b686586700e24c266736adc75eb}{pkcs5\_pbkdf2\_hmac}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *password,\ \textcolor{keywordtype}{size\_t}\ cb\_password,}
+\DoxyCodeLine{\Hypertarget{pkcs5_8h_source_l00042}00042\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *salt,\ \textcolor{keywordtype}{size\_t}\ cb\_salt,}
+\DoxyCodeLine{\Hypertarget{pkcs5_8h_source_l00043}00043\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ iterations,\ \mbox{\hyperlink{yubihsm_2common_2hash_8h_a488906826f8aaf7e850c35889d560089}{hash\_t}}\ hash,}
+\DoxyCodeLine{\Hypertarget{pkcs5_8h_source_l00044}00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *key,\ \textcolor{keywordtype}{size\_t}\ cb\_key);}
+\DoxyCodeLine{\Hypertarget{pkcs5_8h_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{pkcs5_8h_source_l00046}00046\ \textcolor{preprocessor}{\#ifdef\ \_\_cplusplus}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8h_source_l00047}00047\ \}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8h_source_l00048}00048\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8h_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{pkcs5_8h_source_l00050}00050\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{/*\ \_YUBICOM\_PKCS5\_H\_\ */}\textcolor{preprocessor}{}}
+
+\end{DoxyCode}

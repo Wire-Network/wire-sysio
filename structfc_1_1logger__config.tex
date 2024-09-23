@@ -1,0 +1,128 @@
+\doxysection{fc\+::logger\+\_\+config Struct Reference}
+\hypertarget{structfc_1_1logger__config}{}\label{structfc_1_1logger__config}\index{fc::logger\_config@{fc::logger\_config}}
+
+
+{\ttfamily \#include $<$logger\+\_\+config.\+hpp$>$}
+
+
+
+Collaboration diagram for fc\+::logger\+\_\+config\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=168pt]{structfc_1_1logger__config__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structfc_1_1logger__config_aeeaf40acd71179026b3917c3499dd956}{logger\+\_\+config}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} \&\mbox{\hyperlink{structfc_1_1logger__config_a2300ca629d573fdfcb81f9031fb1b09d}{name}}="{}"{})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structfc_1_1logger__config_a2300ca629d573fdfcb81f9031fb1b09d}{name}}
+\item 
+\mbox{\hyperlink{namespacefc_a219cf01fcfa97b5eac3acb755e8177e0}{ostring}} \mbox{\hyperlink{structfc_1_1logger__config_a598eeedd1126521aff7776c021d096e4}{parent}}
+\item 
+std\+::optional$<$ \mbox{\hyperlink{classfc_1_1log__level}{log\+\_\+level}} $>$ \mbox{\hyperlink{structfc_1_1logger__config_aea5ff2cbde269be19fa4c2d7b6cdda8b}{level}}
+\begin{DoxyCompactList}\small\item\em if not set, then parents level is used. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{structfc_1_1logger__config_a1279327c0d6062c6d863da1e8b1b0dca}{enabled}}
+\item 
+bool \mbox{\hyperlink{structfc_1_1logger__config_afb73a18e65093ba8416fe855421ad553}{additivity}}
+\begin{DoxyCompactList}\small\item\em if any appenders are sepecified, then parent\textquotesingle{}s appenders are not set. \end{DoxyCompactList}\item 
+std\+::vector$<$ \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} $>$ \mbox{\hyperlink{structfc_1_1logger__config_a7133e5fedacf584ae96416dc5659e8c7}{appenders}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{logger__config_8hpp_source_l00026}{26}} of file \mbox{\hyperlink{logger__config_8hpp_source}{logger\+\_\+config.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structfc_1_1logger__config_aeeaf40acd71179026b3917c3499dd956}\index{fc::logger\_config@{fc::logger\_config}!logger\_config@{logger\_config}}
+\index{logger\_config@{logger\_config}!fc::logger\_config@{fc::logger\_config}}
+\doxysubsubsection{\texorpdfstring{logger\_config()}{logger\_config()}}
+{\footnotesize\ttfamily \label{structfc_1_1logger__config_aeeaf40acd71179026b3917c3499dd956} 
+fc\+::logger\+\_\+config\+::logger\+\_\+config (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} \&}]{name}{ = {\ttfamily "{}"{}}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{logger__config_8hpp_source_l00027}{27}} of file \mbox{\hyperlink{logger__config_8hpp_source}{logger\+\_\+config.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00027\ :\mbox{\hyperlink{structfc_1_1logger__config_a2300ca629d573fdfcb81f9031fb1b09d}{name}}(\mbox{\hyperlink{structfc_1_1logger__config_a2300ca629d573fdfcb81f9031fb1b09d}{name}}),\mbox{\hyperlink{structfc_1_1logger__config_a1279327c0d6062c6d863da1e8b1b0dca}{enabled}}(\textcolor{keyword}{true}),\mbox{\hyperlink{structfc_1_1logger__config_afb73a18e65093ba8416fe855421ad553}{additivity}}(\textcolor{keyword}{false})\{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structfc_1_1logger__config_afb73a18e65093ba8416fe855421ad553}\index{fc::logger\_config@{fc::logger\_config}!additivity@{additivity}}
+\index{additivity@{additivity}!fc::logger\_config@{fc::logger\_config}}
+\doxysubsubsection{\texorpdfstring{additivity}{additivity}}
+{\footnotesize\ttfamily \label{structfc_1_1logger__config_afb73a18e65093ba8416fe855421ad553} 
+bool fc\+::logger\+\_\+config\+::additivity}
+
+
+
+Definition at line \mbox{\hyperlink{logger__config_8hpp_source_l00034}{34}} of file \mbox{\hyperlink{logger__config_8hpp_source}{logger\+\_\+config.\+hpp}}.
+
+\Hypertarget{structfc_1_1logger__config_a7133e5fedacf584ae96416dc5659e8c7}\index{fc::logger\_config@{fc::logger\_config}!appenders@{appenders}}
+\index{appenders@{appenders}!fc::logger\_config@{fc::logger\_config}}
+\doxysubsubsection{\texorpdfstring{appenders}{appenders}}
+{\footnotesize\ttfamily \label{structfc_1_1logger__config_a7133e5fedacf584ae96416dc5659e8c7} 
+std\+::vector$<$\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}}$>$ fc\+::logger\+\_\+config\+::appenders}
+
+
+
+Definition at line \mbox{\hyperlink{logger__config_8hpp_source_l00035}{35}} of file \mbox{\hyperlink{logger__config_8hpp_source}{logger\+\_\+config.\+hpp}}.
+
+\Hypertarget{structfc_1_1logger__config_a1279327c0d6062c6d863da1e8b1b0dca}\index{fc::logger\_config@{fc::logger\_config}!enabled@{enabled}}
+\index{enabled@{enabled}!fc::logger\_config@{fc::logger\_config}}
+\doxysubsubsection{\texorpdfstring{enabled}{enabled}}
+{\footnotesize\ttfamily \label{structfc_1_1logger__config_a1279327c0d6062c6d863da1e8b1b0dca} 
+bool fc\+::logger\+\_\+config\+::enabled}
+
+
+
+Definition at line \mbox{\hyperlink{logger__config_8hpp_source_l00032}{32}} of file \mbox{\hyperlink{logger__config_8hpp_source}{logger\+\_\+config.\+hpp}}.
+
+\Hypertarget{structfc_1_1logger__config_aea5ff2cbde269be19fa4c2d7b6cdda8b}\index{fc::logger\_config@{fc::logger\_config}!level@{level}}
+\index{level@{level}!fc::logger\_config@{fc::logger\_config}}
+\doxysubsubsection{\texorpdfstring{level}{level}}
+{\footnotesize\ttfamily \label{structfc_1_1logger__config_aea5ff2cbde269be19fa4c2d7b6cdda8b} 
+std\+::optional$<$\mbox{\hyperlink{classfc_1_1log__level}{log\+\_\+level}}$>$ fc\+::logger\+\_\+config\+::level}
+
+
+
+Definition at line \mbox{\hyperlink{logger__config_8hpp_source_l00031}{31}} of file \mbox{\hyperlink{logger__config_8hpp_source}{logger\+\_\+config.\+hpp}}.
+
+\Hypertarget{structfc_1_1logger__config_a2300ca629d573fdfcb81f9031fb1b09d}\index{fc::logger\_config@{fc::logger\_config}!name@{name}}
+\index{name@{name}!fc::logger\_config@{fc::logger\_config}}
+\doxysubsubsection{\texorpdfstring{name}{name}}
+{\footnotesize\ttfamily \label{structfc_1_1logger__config_a2300ca629d573fdfcb81f9031fb1b09d} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} fc\+::logger\+\_\+config\+::name}
+
+
+
+Definition at line \mbox{\hyperlink{logger__config_8hpp_source_l00028}{28}} of file \mbox{\hyperlink{logger__config_8hpp_source}{logger\+\_\+config.\+hpp}}.
+
+\Hypertarget{structfc_1_1logger__config_a598eeedd1126521aff7776c021d096e4}\index{fc::logger\_config@{fc::logger\_config}!parent@{parent}}
+\index{parent@{parent}!fc::logger\_config@{fc::logger\_config}}
+\doxysubsubsection{\texorpdfstring{parent}{parent}}
+{\footnotesize\ttfamily \label{structfc_1_1logger__config_a598eeedd1126521aff7776c021d096e4} 
+\mbox{\hyperlink{namespacefc_a219cf01fcfa97b5eac3acb755e8177e0}{ostring}} fc\+::logger\+\_\+config\+::parent}
+
+
+
+Definition at line \mbox{\hyperlink{logger__config_8hpp_source_l00029}{29}} of file \mbox{\hyperlink{logger__config_8hpp_source}{logger\+\_\+config.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/log/\mbox{\hyperlink{logger__config_8hpp}{logger\+\_\+config.\+hpp}}\end{DoxyCompactItemize}

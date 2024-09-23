@@ -1,0 +1,183 @@
+\doxysection{websocketpp\+::transport\+::error Namespace Reference}
+\hypertarget{namespacewebsocketpp_1_1transport_1_1error}{}\label{namespacewebsocketpp_1_1transport_1_1error}\index{websocketpp::transport::error@{websocketpp::transport::error}}
+
+
+Generic transport related errors.  
+
+
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1error_1_1category}{category}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0}{value}} \{ \newline
+\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0a161bc0c8148996271f7126aea2c24416}{general}} = 1
+, \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0a6a7cb8ef776c9eabe2324a529e991732}{pass\+\_\+through}}
+, \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0ab91204a395d7377d5eed5a789641a0ea}{invalid\+\_\+num\+\_\+bytes}}
+, \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0af77cb7d0fde9597a2f022a5eca0bdf61}{double\+\_\+read}}
+, \newline
+\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0a887436887a8732e48f7c67bd85bb6f64}{operation\+\_\+aborted}}
+, \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0a7c3708669e1de6d4986d1db769fe214e}{operation\+\_\+not\+\_\+supported}}
+, \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0a73dd0d0f22cd67b7bcc031cd6bdef743}{eof}}
+, \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0af716728e7a91dafb4439a15e7c638112}{tls\+\_\+short\+\_\+read}}
+, \newline
+\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0a0e2f0627b4105746429d747f6137b37e}{timeout}}
+, \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0acabe9e6ae399d59c020c9f78930f01f6}{action\+\_\+after\+\_\+shutdown}}
+, \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0a8e68893bc224f55aae654318734dcd40}{tls\+\_\+error}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+lib\+::error\+\_\+category const \& \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1error_aa10335b7f28268d45092a21de92c7fd1}{get\+\_\+category}} ()
+\item 
+lib\+::error\+\_\+code \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1error_a7e7e335d77a9007c14af4d941a2baa93}{make\+\_\+error\+\_\+code}} (\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0}{error\+::value}} e)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0}\index{websocketpp::transport::error@{websocketpp::transport::error}!value@{value}}
+\index{value@{value}!websocketpp::transport::error@{websocketpp::transport::error}}
+\doxysubsubsection{\texorpdfstring{value}{value}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0} 
+enum \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0}{websocketpp\+::transport\+::error\+::value}}}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{general@{general}!websocketpp::transport::error@{websocketpp::transport::error}}\index{websocketpp::transport::error@{websocketpp::transport::error}!general@{general}}}\Hypertarget{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0a161bc0c8148996271f7126aea2c24416}\label{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0} 
+general&Catch-\/all error for transport policy errors that don\textquotesingle{}t fit in other categories \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{pass\_through@{pass\_through}!websocketpp::transport::error@{websocketpp::transport::error}}\index{websocketpp::transport::error@{websocketpp::transport::error}!pass\_through@{pass\_through}}}\Hypertarget{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0a6a7cb8ef776c9eabe2324a529e991732}\label{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0} 
+pass\+\_\+through&underlying transport pass through \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{invalid\_num\_bytes@{invalid\_num\_bytes}!websocketpp::transport::error@{websocketpp::transport::error}}\index{websocketpp::transport::error@{websocketpp::transport::error}!invalid\_num\_bytes@{invalid\_num\_bytes}}}\Hypertarget{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0ab91204a395d7377d5eed5a789641a0ea}\label{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0} 
+invalid\+\_\+num\+\_\+bytes&async\+\_\+read\+\_\+at\+\_\+least call requested more bytes than buffer can store \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{double\_read@{double\_read}!websocketpp::transport::error@{websocketpp::transport::error}}\index{websocketpp::transport::error@{websocketpp::transport::error}!double\_read@{double\_read}}}\Hypertarget{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0af77cb7d0fde9597a2f022a5eca0bdf61}\label{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0} 
+double\+\_\+read&async\+\_\+read called while another async\+\_\+read was in progress \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{operation\_aborted@{operation\_aborted}!websocketpp::transport::error@{websocketpp::transport::error}}\index{websocketpp::transport::error@{websocketpp::transport::error}!operation\_aborted@{operation\_aborted}}}\Hypertarget{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0a887436887a8732e48f7c67bd85bb6f64}\label{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0} 
+operation\+\_\+aborted&Operation aborted. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{operation\_not\_supported@{operation\_not\_supported}!websocketpp::transport::error@{websocketpp::transport::error}}\index{websocketpp::transport::error@{websocketpp::transport::error}!operation\_not\_supported@{operation\_not\_supported}}}\Hypertarget{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0a7c3708669e1de6d4986d1db769fe214e}\label{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0} 
+operation\+\_\+not\+\_\+supported&Operation not supported. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{eof@{eof}!websocketpp::transport::error@{websocketpp::transport::error}}\index{websocketpp::transport::error@{websocketpp::transport::error}!eof@{eof}}}\Hypertarget{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0a73dd0d0f22cd67b7bcc031cd6bdef743}\label{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0} 
+eof&End of file. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{tls\_short\_read@{tls\_short\_read}!websocketpp::transport::error@{websocketpp::transport::error}}\index{websocketpp::transport::error@{websocketpp::transport::error}!tls\_short\_read@{tls\_short\_read}}}\Hypertarget{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0af716728e7a91dafb4439a15e7c638112}\label{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0} 
+tls\+\_\+short\+\_\+read&TLS short read. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{timeout@{timeout}!websocketpp::transport::error@{websocketpp::transport::error}}\index{websocketpp::transport::error@{websocketpp::transport::error}!timeout@{timeout}}}\Hypertarget{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0a0e2f0627b4105746429d747f6137b37e}\label{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0} 
+timeout&Timer expired. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{action\_after\_shutdown@{action\_after\_shutdown}!websocketpp::transport::error@{websocketpp::transport::error}}\index{websocketpp::transport::error@{websocketpp::transport::error}!action\_after\_shutdown@{action\_after\_shutdown}}}\Hypertarget{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0acabe9e6ae399d59c020c9f78930f01f6}\label{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0} 
+action\+\_\+after\+\_\+shutdown&read or write after shutdown \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{tls\_error@{tls\_error}!websocketpp::transport::error@{websocketpp::transport::error}}\index{websocketpp::transport::error@{websocketpp::transport::error}!tls\_error@{tls\_error}}}\Hypertarget{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0a8e68893bc224f55aae654318734dcd40}\label{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0} 
+tls\+\_\+error&Other TLS error. \\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{transport_2base_2connection_8hpp_source_l00147}{147}} of file \mbox{\hyperlink{transport_2base_2connection_8hpp_source}{connection.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00150\ \ \ \ \ general\ =\ 1,}
+\DoxyCodeLine{00151\ }
+\DoxyCodeLine{00153\ \ \ \ \ pass\_through,}
+\DoxyCodeLine{00154\ }
+\DoxyCodeLine{00156\ \ \ \ \ invalid\_num\_bytes,}
+\DoxyCodeLine{00157\ }
+\DoxyCodeLine{00159\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0af77cb7d0fde9597a2f022a5eca0bdf61}{double\_read}},}
+\DoxyCodeLine{00160\ }
+\DoxyCodeLine{00162\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0a887436887a8732e48f7c67bd85bb6f64}{operation\_aborted}},}
+\DoxyCodeLine{00163\ }
+\DoxyCodeLine{00165\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0a7c3708669e1de6d4986d1db769fe214e}{operation\_not\_supported}},}
+\DoxyCodeLine{00166\ }
+\DoxyCodeLine{00168\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0a73dd0d0f22cd67b7bcc031cd6bdef743}{eof}},}
+\DoxyCodeLine{00169\ }
+\DoxyCodeLine{00171\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0af716728e7a91dafb4439a15e7c638112}{tls\_short\_read}},}
+\DoxyCodeLine{00172\ }
+\DoxyCodeLine{00174\ \ \ \ \ timeout,}
+\DoxyCodeLine{00175\ }
+\DoxyCodeLine{00177\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0acabe9e6ae399d59c020c9f78930f01f6}{action\_after\_shutdown}},}
+\DoxyCodeLine{00178\ }
+\DoxyCodeLine{00180\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0a8e68893bc224f55aae654318734dcd40}{tls\_error}}}
+\DoxyCodeLine{00181\ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacewebsocketpp_1_1transport_1_1error_aa10335b7f28268d45092a21de92c7fd1}\index{websocketpp::transport::error@{websocketpp::transport::error}!get\_category@{get\_category}}
+\index{get\_category@{get\_category}!websocketpp::transport::error@{websocketpp::transport::error}}
+\doxysubsubsection{\texorpdfstring{get\_category()}{get\_category()}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1transport_1_1error_aa10335b7f28268d45092a21de92c7fd1} 
+lib\+::error\+\_\+category const  \& websocketpp\+::transport\+::error\+::get\+\_\+category (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{transport_2base_2connection_8hpp_source_l00219}{219}} of file \mbox{\hyperlink{transport_2base_2connection_8hpp_source}{connection.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00220\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1error_1_1category}{category}}\ instance;}
+\DoxyCodeLine{00221\ \ \ \ \ \textcolor{keywordflow}{return}\ instance;}
+\DoxyCodeLine{00222\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacewebsocketpp_1_1transport_1_1error_aa10335b7f28268d45092a21de92c7fd1_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacewebsocketpp_1_1transport_1_1error_a7e7e335d77a9007c14af4d941a2baa93}\index{websocketpp::transport::error@{websocketpp::transport::error}!make\_error\_code@{make\_error\_code}}
+\index{make\_error\_code@{make\_error\_code}!websocketpp::transport::error@{websocketpp::transport::error}}
+\doxysubsubsection{\texorpdfstring{make\_error\_code()}{make\_error\_code()}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1transport_1_1error_a7e7e335d77a9007c14af4d941a2baa93} 
+lib\+::error\+\_\+code websocketpp\+::transport\+::error\+::make\+\_\+error\+\_\+code (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0}{error\+::value}}}]{e}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{transport_2base_2connection_8hpp_source_l00224}{224}} of file \mbox{\hyperlink{transport_2base_2connection_8hpp_source}{connection.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00225\ \ \ \ \ \textcolor{keywordflow}{return}\ lib::error\_code(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(e),\ get\_category());}
+\DoxyCodeLine{00226\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacewebsocketpp_1_1transport_1_1error_a7e7e335d77a9007c14af4d941a2baa93_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacewebsocketpp_1_1transport_1_1error_a7e7e335d77a9007c14af4d941a2baa93_icgraph}
+\end{center}
+\end{figure}

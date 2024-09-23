@@ -1,0 +1,15 @@
+<map id="softfloat_roundMToI64" name="softfloat_roundMToI64">
+<area shape="rect" id="Node000001" title=" " alt="" coords="395,80,545,106"/>
+<area shape="rect" id="Node000002" href="$softfloat_2source_2ext_f80_m__to__i64_8c.html#a6eef125c82a7874b444e40afc62ef7a6" title=" " alt="" coords="233,5,347,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="422,76,322,34,324,29,424,71"/>
+<area shape="rect" id="Node000003" href="$softfloat_2source_2f128_m__to__i64_8c.html#a316c311b1d12e1328d17735db01bdc98" title=" " alt="" coords="240,55,340,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="379,83,340,77,340,72,380,77"/>
+<area shape="rect" id="Node000004" href="$softfloat_2source_2f32__to__i64_8c.html#a66fd3a5d8d2cf7dedd62dc94d4d5270c" title=" " alt="" coords="249,104,330,130"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="380,108,331,114,330,109,379,102"/>
+<area shape="rect" id="Node000006" href="$softfloat_2source_2f64__to__i64_8c.html#a375448433a8b049ba605b725e5c1accd" title=" " alt="" coords="249,161,330,187"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="427,115,322,163,319,158,425,110"/>
+<area shape="rect" id="Node000005" href="$classsysio_1_1chain_1_1webassembly_1_1interface.html#aa92527ac38efcfc016d861455f043a30" title=" " alt="" coords="5,81,185,137"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="234,117,185,115,185,110,234,112"/>
+<area shape="rect" id="Node000007" href="$classsysio_1_1chain_1_1webassembly_1_1interface.html#a0d8a4e0427fb5b72c6caab294eb550fe" title=" " alt="" coords="5,161,185,217"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="234,181,185,185,185,179,233,176"/>
+</map>

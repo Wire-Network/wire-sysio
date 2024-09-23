@@ -1,0 +1,11 @@
+<map id="connection_setup" name="connection_setup">
+<area shape="rect" id="Node000001" title=" " alt="" coords="9,199,132,225"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,103,88,128"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="56,143,70,198,65,199,51,144"/>
+<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1connection.html" title=" " alt="" coords="111,95,280,136"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="160,147,88,201,85,196,156,143"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="6,5,178,46"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="128,54,174,93,171,97,125,58"/>
+<area shape="rect" id="Node000005" href="$structconnection__extension.html" title=" " alt="" coords="203,13,397,38"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="275,51,221,97,217,93,272,47"/>
+</map>

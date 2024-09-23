@@ -1,0 +1,9 @@
+<map id="websocketpp::close::status::invalid" name="websocketpp::close::status::invalid">
+<area shape="rect" id="Node000001" title="Test whether a close code is invalid on the wire." alt="" coords="250,55,387,96"/>
+<area shape="rect" id="Node000002" href="$close_8cpp.html#a439ae40187810966d77671d8aee06927" title=" " alt="" coords="5,5,202,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="234,55,201,46,156,34,157,29,202,41,236,50"/>
+<area shape="rect" id="Node000003" href="$namespacewebsocketpp_1_1close.html#aa47dacf7d2e13705d1f68d9ab5b9dad0" title="Extract a close code value from a close payload." alt="" coords="35,55,172,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="234,78,173,78,173,73,234,73"/>
+<area shape="rect" id="Node000004" href="$classwebsocketpp_1_1processor_1_1hybi13.html#a8cbb98af828463c5ef80429a7ade715d" title=" " alt="" coords="22,120,185,161"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="235,103,174,122,172,117,234,98"/>
+</map>

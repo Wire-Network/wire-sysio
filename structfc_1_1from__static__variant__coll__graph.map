@@ -1,0 +1,5 @@
+<map id="fc::from_static_variant" name="fc::from_static_variant">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,94,157,120"/>
+<area shape="rect" id="Node000002" href="$classfc_1_1variant.html" title="stores null, int64, uint64, double, bool, string, std::vector&lt;variant&gt;, and variant_object&#39;s." alt="" coords="41,5,121,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="84,47,84,94,78,94,78,47"/>
+</map>

@@ -1,0 +1,10 @@
+<map id="sysio::chain::eosvmoc::get_connection_to_compile_monitor" name="sysio::chain::eosvmoc::get_connection_to_compile_monitor">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,67,193,123"/>
+<area shape="poly" id="edge1_Node000001_Node000001" title=" " alt="" coords="54,67,55,57,63,48,78,42,99,41,123,43,138,50,135,55,122,48,99,46,79,48,66,52,60,59,60,67"/>
+<area shape="rect" id="Node000002" href="$namespacesysio_1_1chain_1_1eosvmoc.html#aa65c4d6c02a0823262c6627a86cc74bc" title=" " alt="" coords="242,29,412,70"/>
+<area shape="poly" id="edge2_Node000001_Node000002" title=" " alt="" coords="192,74,226,67,227,72,193,79"/>
+<area shape="rect" id="Node000003" href="$namespacesysio_1_1chain_1_1eosvmoc.html#a8715d32fd2e6a4a668578ca0d946b58b" title=" " alt="" coords="241,119,414,159"/>
+<area shape="poly" id="edge4_Node000001_Node000003" title=" " alt="" coords="193,110,226,117,225,122,192,116"/>
+<area shape="poly" id="edge3_Node000002_Node000002" title=" " alt="" coords="284,29,282,19,289,10,304,5,327,3,352,5,367,11,365,16,351,10,327,8,306,10,292,15,287,21,289,28"/>
+<area shape="poly" id="edge5_Node000003_Node000003" title=" " alt="" coords="284,119,282,109,289,100,304,94,327,92,352,94,367,101,365,106,351,100,327,97,306,99,292,104,287,110,289,117"/>
+</map>

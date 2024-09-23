@@ -1,0 +1,272 @@
+\doxysection{testing\+::internal\+::Unit\+Test\+Options Class Reference}
+\hypertarget{classtesting_1_1internal_1_1_unit_test_options}{}\label{classtesting_1_1internal_1_1_unit_test_options}\index{testing::internal::UnitTestOptions@{testing::internal::UnitTestOptions}}
+
+
+{\ttfamily \#include $<$gtest-\/internal-\/inl.\+h$>$}
+
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static std\+::string \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_options_ae7413a21296d885c6924650b51ac4f6d}{Get\+Output\+Format}} ()
+\item 
+static std\+::string \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_options_a993fb30ad66104158c8c0ac508daca3f}{Get\+Absolute\+Path\+To\+Output\+File}} ()
+\item 
+static bool \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_options_af0235a2ee26dd6db21305e11d2358e4f}{Pattern\+Matches\+String}} (const char \texorpdfstring{$\ast$}{*}pattern, const char \texorpdfstring{$\ast$}{*}str)
+\item 
+static bool \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_options_a9975b59cece94874b303421697e3bca6}{Filter\+Matches\+Test}} (const std\+::string \&test\+\_\+case\+\_\+name, const std\+::string \&test\+\_\+name)
+\item 
+static bool \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_options_a67fc0adaffbb8d320b92e42e05017e4e}{Matches\+Filter}} (const std\+::string \&\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}, const char \texorpdfstring{$\ast$}{*}filter)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{gtest-internal-inl_8h_source_l00369}{369}} of file \mbox{\hyperlink{gtest-internal-inl_8h_source}{gtest-\/internal-\/inl.\+h}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_unit_test_options_a9975b59cece94874b303421697e3bca6}\index{testing::internal::UnitTestOptions@{testing::internal::UnitTestOptions}!FilterMatchesTest@{FilterMatchesTest}}
+\index{FilterMatchesTest@{FilterMatchesTest}!testing::internal::UnitTestOptions@{testing::internal::UnitTestOptions}}
+\doxysubsubsection{\texorpdfstring{FilterMatchesTest()}{FilterMatchesTest()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_unit_test_options_a9975b59cece94874b303421697e3bca6} 
+bool testing\+::internal\+::\+Unit\+Test\+Options\+::\+Filter\+Matches\+Test (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{test\+\_\+case\+\_\+name}{, }\item[{const std\+::string \&}]{test\+\_\+name}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8cc_source_l00519}{519}} of file \mbox{\hyperlink{gtest_8cc_source}{gtest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00520\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00521\ \ \ \textcolor{keyword}{const}\ std::string\&\ full\_name\ =\ test\_case\_name\ +\ \textcolor{stringliteral}{"{}."{}}\ +\ test\_name.c\_str();}
+\DoxyCodeLine{00522\ }
+\DoxyCodeLine{00523\ \ \ \textcolor{comment}{//\ Split\ -\/-\/gtest\_filter\ at\ '-\/',\ if\ there\ is\ one,\ to\ separate\ into}}
+\DoxyCodeLine{00524\ \ \ \textcolor{comment}{//\ positive\ filter\ and\ negative\ filter\ portions}}
+\DoxyCodeLine{00525\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \textcolor{keyword}{const}\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(filter).c\_str();}
+\DoxyCodeLine{00526\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \textcolor{keyword}{const}\ dash\ =\ strchr(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\ \textcolor{charliteral}{'-\/'});}
+\DoxyCodeLine{00527\ \ \ std::string\ positive;}
+\DoxyCodeLine{00528\ \ \ std::string\ negative;}
+\DoxyCodeLine{00529\ \ \ \textcolor{keywordflow}{if}\ (dash\ ==\ NULL)\ \{}
+\DoxyCodeLine{00530\ \ \ \ \ positive\ =\ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(filter).c\_str();\ \ \textcolor{comment}{//\ Whole\ string\ is\ a\ positive\ filter}}
+\DoxyCodeLine{00531\ \ \ \ \ negative\ =\ \textcolor{stringliteral}{"{}"{}};}
+\DoxyCodeLine{00532\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00533\ \ \ \ \ positive\ =\ std::string(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\ dash);\ \ \ \textcolor{comment}{//\ Everything\ up\ to\ the\ dash}}
+\DoxyCodeLine{00534\ \ \ \ \ negative\ =\ std::string(dash\ +\ 1);\ \ \textcolor{comment}{//\ Everything\ after\ the\ dash}}
+\DoxyCodeLine{00535\ \ \ \ \ \textcolor{keywordflow}{if}\ (positive.empty())\ \{}
+\DoxyCodeLine{00536\ \ \ \ \ \ \ \textcolor{comment}{//\ Treat\ '-\/test1'\ as\ the\ same\ as\ '*-\/test1'}}
+\DoxyCodeLine{00537\ \ \ \ \ \ \ positive\ =\ kUniversalFilter;}
+\DoxyCodeLine{00538\ \ \ \ \ \}}
+\DoxyCodeLine{00539\ \ \ \}}
+\DoxyCodeLine{00540\ }
+\DoxyCodeLine{00541\ \ \ \textcolor{comment}{//\ A\ filter\ is\ a\ colon-\/separated\ list\ of\ patterns.\ \ It\ matches\ a}}
+\DoxyCodeLine{00542\ \ \ \textcolor{comment}{//\ test\ if\ any\ pattern\ in\ it\ matches\ the\ test.}}
+\DoxyCodeLine{00543\ \ \ \textcolor{keywordflow}{return}\ (\mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_options_a67fc0adaffbb8d320b92e42e05017e4e}{MatchesFilter}}(full\_name,\ positive.c\_str())\ \&\&}
+\DoxyCodeLine{00544\ \ \ \ \ \ \ \ \ \ \ !\mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_options_a67fc0adaffbb8d320b92e42e05017e4e}{MatchesFilter}}(full\_name,\ negative.c\_str()));}
+\DoxyCodeLine{00545\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_unit_test_options_a9975b59cece94874b303421697e3bca6_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_unit_test_options_a9975b59cece94874b303421697e3bca6_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_unit_test_options_a993fb30ad66104158c8c0ac508daca3f}\index{testing::internal::UnitTestOptions@{testing::internal::UnitTestOptions}!GetAbsolutePathToOutputFile@{GetAbsolutePathToOutputFile}}
+\index{GetAbsolutePathToOutputFile@{GetAbsolutePathToOutputFile}!testing::internal::UnitTestOptions@{testing::internal::UnitTestOptions}}
+\doxysubsubsection{\texorpdfstring{GetAbsolutePathToOutputFile()}{GetAbsolutePathToOutputFile()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_unit_test_options_a993fb30ad66104158c8c0ac508daca3f} 
+std\+::string testing\+::internal\+::\+Unit\+Test\+Options\+::\+Get\+Absolute\+Path\+To\+Output\+File (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8cc_source_l00438}{438}} of file \mbox{\hyperlink{gtest_8cc_source}{gtest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00438\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00439\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \textcolor{keyword}{const}\ gtest\_output\_flag\ =\ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(output).c\_str();}
+\DoxyCodeLine{00440\ \ \ \textcolor{keywordflow}{if}\ (gtest\_output\_flag\ ==\ NULL)}
+\DoxyCodeLine{00441\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}"{}};}
+\DoxyCodeLine{00442\ }
+\DoxyCodeLine{00443\ \ \ std::string\ \mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}\ =\ \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_options_ae7413a21296d885c6924650b51ac4f6d}{GetOutputFormat}}();}
+\DoxyCodeLine{00444\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}.empty())}
+\DoxyCodeLine{00445\ \ \ \ \ \mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}\ =\ std::string(kDefaultOutputFormat);}
+\DoxyCodeLine{00446\ }
+\DoxyCodeLine{00447\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \textcolor{keyword}{const}\ colon\ =\ strchr(gtest\_output\_flag,\ \textcolor{charliteral}{':'});}
+\DoxyCodeLine{00448\ \ \ \textcolor{keywordflow}{if}\ (colon\ ==\ NULL)}
+\DoxyCodeLine{00449\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_aa8c102da670261eb4fa8e2f2481df139}{internal::FilePath::MakeFileName}}(}
+\DoxyCodeLine{00450\ \ \ \ \ \ \ \ \ internal::FilePath(}
+\DoxyCodeLine{00451\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1_unit_test_a24192400b70b3b946746954e9574fb8e}{UnitTest::GetInstance}}()-\/>original\_working\_dir()),}
+\DoxyCodeLine{00452\ \ \ \ \ \ \ \ \ internal::FilePath(kDefaultOutputFile),\ 0,}
+\DoxyCodeLine{00453\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}.c\_str()).\mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a44649e2fb65454648a9494a89a970d85}{string}}();}
+\DoxyCodeLine{00454\ }
+\DoxyCodeLine{00455\ \ \ internal::FilePath\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1impl_a0ff60b42e045adb210fcfb9e00f7a3af}{output\_name}}(colon\ +\ 1);}
+\DoxyCodeLine{00456\ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{namespacesysio_1_1chain_1_1impl_a0ff60b42e045adb210fcfb9e00f7a3af}{output\_name}}.IsAbsolutePath())}
+\DoxyCodeLine{00457\ \ \ \ \ \textcolor{comment}{//\ TODO(wan@google.com):\ on\ Windows\ \(\backslash\)some\(\backslash\)path\ is\ not\ an\ absolute}}
+\DoxyCodeLine{00458\ \ \ \ \ \textcolor{comment}{//\ path\ (as\ its\ meaning\ depends\ on\ the\ current\ drive),\ yet\ the}}
+\DoxyCodeLine{00459\ \ \ \ \ \textcolor{comment}{//\ following\ logic\ for\ turning\ it\ into\ an\ absolute\ path\ is\ wrong.}}
+\DoxyCodeLine{00460\ \ \ \ \ \textcolor{comment}{//\ Fix\ it.}}
+\DoxyCodeLine{00461\ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1impl_a0ff60b42e045adb210fcfb9e00f7a3af}{output\_name}}\ =\ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_ac9d57987f60ac43f0c57b89e333e531e}{internal::FilePath::ConcatPaths}}(}
+\DoxyCodeLine{00462\ \ \ \ \ \ \ \ \ internal::FilePath(\mbox{\hyperlink{classtesting_1_1_unit_test_a24192400b70b3b946746954e9574fb8e}{UnitTest::GetInstance}}()-\/>original\_working\_dir()),}
+\DoxyCodeLine{00463\ \ \ \ \ \ \ \ \ internal::FilePath(colon\ +\ 1));}
+\DoxyCodeLine{00464\ }
+\DoxyCodeLine{00465\ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{namespacesysio_1_1chain_1_1impl_a0ff60b42e045adb210fcfb9e00f7a3af}{output\_name}}.IsDirectory())}
+\DoxyCodeLine{00466\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1impl_a0ff60b42e045adb210fcfb9e00f7a3af}{output\_name}}.string();}
+\DoxyCodeLine{00467\ }
+\DoxyCodeLine{00468\ \ \ internal::FilePath\ result(\mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a2280a77adb394cf80bb5f73fc292e8c8}{internal::FilePath::GenerateUniqueFileName}}(}
+\DoxyCodeLine{00469\ \ \ \ \ \ \ output\_name,\ \mbox{\hyperlink{namespacetesting_1_1internal_a7a2bbf069f75bc99873976ad6fc356ad}{internal::GetCurrentExecutableName}}(),}
+\DoxyCodeLine{00470\ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_options_ae7413a21296d885c6924650b51ac4f6d}{GetOutputFormat}}().c\_str()));}
+\DoxyCodeLine{00471\ \ \ \textcolor{keywordflow}{return}\ result.string();}
+\DoxyCodeLine{00472\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_unit_test_options_a993fb30ad66104158c8c0ac508daca3f_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_unit_test_options_a993fb30ad66104158c8c0ac508daca3f_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_unit_test_options_ae7413a21296d885c6924650b51ac4f6d}\index{testing::internal::UnitTestOptions@{testing::internal::UnitTestOptions}!GetOutputFormat@{GetOutputFormat}}
+\index{GetOutputFormat@{GetOutputFormat}!testing::internal::UnitTestOptions@{testing::internal::UnitTestOptions}}
+\doxysubsubsection{\texorpdfstring{GetOutputFormat()}{GetOutputFormat()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_unit_test_options_ae7413a21296d885c6924650b51ac4f6d} 
+std\+::string testing\+::internal\+::\+Unit\+Test\+Options\+::\+Get\+Output\+Format (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8cc_source_l00426}{426}} of file \mbox{\hyperlink{gtest_8cc_source}{gtest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00426\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00427\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \textcolor{keyword}{const}\ gtest\_output\_flag\ =\ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(output).c\_str();}
+\DoxyCodeLine{00428\ \ \ \textcolor{keywordflow}{if}\ (gtest\_output\_flag\ ==\ NULL)\ \textcolor{keywordflow}{return}\ std::string(\textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{00429\ }
+\DoxyCodeLine{00430\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \textcolor{keyword}{const}\ colon\ =\ strchr(gtest\_output\_flag,\ \textcolor{charliteral}{':'});}
+\DoxyCodeLine{00431\ \ \ \textcolor{keywordflow}{return}\ (colon\ ==\ NULL)\ ?}
+\DoxyCodeLine{00432\ \ \ \ \ \ \ std::string(gtest\_output\_flag)\ :}
+\DoxyCodeLine{00433\ \ \ \ \ \ \ \mbox{\hyperlink{namespacestd}{std}}::string(gtest\_output\_flag,\ colon\ -\/\ gtest\_output\_flag);}
+\DoxyCodeLine{00434\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_unit_test_options_ae7413a21296d885c6924650b51ac4f6d_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_unit_test_options_a67fc0adaffbb8d320b92e42e05017e4e}\index{testing::internal::UnitTestOptions@{testing::internal::UnitTestOptions}!MatchesFilter@{MatchesFilter}}
+\index{MatchesFilter@{MatchesFilter}!testing::internal::UnitTestOptions@{testing::internal::UnitTestOptions}}
+\doxysubsubsection{\texorpdfstring{MatchesFilter()}{MatchesFilter()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_unit_test_options_a67fc0adaffbb8d320b92e42e05017e4e} 
+bool testing\+::internal\+::\+Unit\+Test\+Options\+::\+Matches\+Filter (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{name}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{filter}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8cc_source_l00496}{496}} of file \mbox{\hyperlink{gtest_8cc_source}{gtest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00497\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00498\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *cur\_pattern\ =\ filter;}
+\DoxyCodeLine{00499\ \ \ \textcolor{keywordflow}{for}\ (;;)\ \{}
+\DoxyCodeLine{00500\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_options_af0235a2ee26dd6db21305e11d2358e4f}{PatternMatchesString}}(cur\_pattern,\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}.c\_str()))\ \{}
+\DoxyCodeLine{00501\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00502\ \ \ \ \ \}}
+\DoxyCodeLine{00503\ }
+\DoxyCodeLine{00504\ \ \ \ \ \textcolor{comment}{//\ Finds\ the\ next\ pattern\ in\ the\ filter.}}
+\DoxyCodeLine{00505\ \ \ \ \ cur\_pattern\ =\ strchr(cur\_pattern,\ \textcolor{charliteral}{':'});}
+\DoxyCodeLine{00506\ }
+\DoxyCodeLine{00507\ \ \ \ \ \textcolor{comment}{//\ Returns\ if\ no\ more\ pattern\ can\ be\ found.}}
+\DoxyCodeLine{00508\ \ \ \ \ \textcolor{keywordflow}{if}\ (cur\_pattern\ ==\ NULL)\ \{}
+\DoxyCodeLine{00509\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00510\ \ \ \ \ \}}
+\DoxyCodeLine{00511\ }
+\DoxyCodeLine{00512\ \ \ \ \ \textcolor{comment}{//\ Skips\ the\ pattern\ separater\ (the\ ':'\ character).}}
+\DoxyCodeLine{00513\ \ \ \ \ cur\_pattern++;}
+\DoxyCodeLine{00514\ \ \ \}}
+\DoxyCodeLine{00515\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_unit_test_options_a67fc0adaffbb8d320b92e42e05017e4e_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_unit_test_options_a67fc0adaffbb8d320b92e42e05017e4e_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_unit_test_options_af0235a2ee26dd6db21305e11d2358e4f}\index{testing::internal::UnitTestOptions@{testing::internal::UnitTestOptions}!PatternMatchesString@{PatternMatchesString}}
+\index{PatternMatchesString@{PatternMatchesString}!testing::internal::UnitTestOptions@{testing::internal::UnitTestOptions}}
+\doxysubsubsection{\texorpdfstring{PatternMatchesString()}{PatternMatchesString()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_unit_test_options_af0235a2ee26dd6db21305e11d2358e4f} 
+bool testing\+::internal\+::\+Unit\+Test\+Options\+::\+Pattern\+Matches\+String (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{pattern}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{str}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8cc_source_l00479}{479}} of file \mbox{\hyperlink{gtest_8cc_source}{gtest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00480\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00481\ \ \ \textcolor{keywordflow}{switch}\ (*pattern)\ \{}
+\DoxyCodeLine{00482\ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)0'}:}
+\DoxyCodeLine{00483\ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{':'}:\ \ \textcolor{comment}{//\ Either\ ':'\ or\ '\(\backslash\)0'\ marks\ the\ end\ of\ the\ pattern.}}
+\DoxyCodeLine{00484\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}\ ==\ \textcolor{charliteral}{'\(\backslash\)0'};}
+\DoxyCodeLine{00485\ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'?'}:\ \ \textcolor{comment}{//\ Matches\ any\ single\ character.}}
+\DoxyCodeLine{00486\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}\ !=\ \textcolor{charliteral}{'\(\backslash\)0'}\ \&\&\ \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_options_af0235a2ee26dd6db21305e11d2358e4f}{PatternMatchesString}}(pattern\ +\ 1,\ str\ +\ 1);}
+\DoxyCodeLine{00487\ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'*'}:\ \ \textcolor{comment}{//\ Matches\ any\ string\ (possibly\ empty)\ of\ characters.}}
+\DoxyCodeLine{00488\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (*str\ !=\ \textcolor{charliteral}{'\(\backslash\)0'}\ \&\&\ \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_options_af0235a2ee26dd6db21305e11d2358e4f}{PatternMatchesString}}(pattern,\ str\ +\ 1))\ ||}
+\DoxyCodeLine{00489\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_options_af0235a2ee26dd6db21305e11d2358e4f}{PatternMatchesString}}(pattern\ +\ 1,\ str);}
+\DoxyCodeLine{00490\ \ \ \ \ \textcolor{keywordflow}{default}:\ \ \textcolor{comment}{//\ Non-\/special\ character.\ \ Matches\ itself.}}
+\DoxyCodeLine{00491\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *pattern\ ==\ *\mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}\ \&\&}
+\DoxyCodeLine{00492\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_options_af0235a2ee26dd6db21305e11d2358e4f}{PatternMatchesString}}(pattern\ +\ 1,\ str\ +\ 1);}
+\DoxyCodeLine{00493\ \ \ \}}
+\DoxyCodeLine{00494\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=242pt]{classtesting_1_1internal_1_1_unit_test_options_af0235a2ee26dd6db21305e11d2358e4f_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_unit_test_options_af0235a2ee26dd6db21305e11d2358e4f_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/src/\mbox{\hyperlink{gtest-internal-inl_8h}{gtest-\/internal-\/inl.\+h}}\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/src/\mbox{\hyperlink{gtest_8cc}{gtest.\+cc}}\end{DoxyCompactItemize}

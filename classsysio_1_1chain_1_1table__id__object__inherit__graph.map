@@ -1,0 +1,5 @@
+<map id="sysio::chain::table_id_object" name="sysio::chain::table_id_object">
+<area shape="rect" id="Node000001" title="The table_id_object class tracks the mapping of (scope, code, table) to an opaque identifier." alt="" coords="16,109,143,150"/>
+<area shape="rect" id="Node000002" href="$structchainbase_1_1object.html" title=" " alt="" coords="5,5,154,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="82,77,82,109,77,109,77,77"/>
+</map>

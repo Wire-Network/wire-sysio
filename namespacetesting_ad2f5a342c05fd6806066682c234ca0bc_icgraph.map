@@ -1,0 +1,35 @@
+<map id="testing::MatcherCast" name="testing::MatcherCast">
+<area shape="rect" id="Node000001" title=" " alt="" coords="229,561,372,586"/>
+<area shape="rect" id="Node000002" href="$classtesting_1_1_safe_matcher_cast_impl.html#a953c5830cbd8370360b9ca07c3f70bd4" title=" " alt="" coords="8,5,178,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="293,546,280,439,256,294,241,220,222,153,202,97,179,59,166,49,170,45,183,56,206,95,227,151,246,219,262,293,285,438,299,545"/>
+<area shape="rect" id="Node000003" href="$structtesting_1_1internal_1_1_cast_and_append_transform.html#a01bcb9d103ea66654c5a76d5d70cfd34" title=" " alt="" coords="5,70,181,126"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="296,546,292,468,276,360,261,302,241,244,213,189,179,139,167,128,170,124,183,136,218,186,246,242,266,301,281,359,298,467,302,545"/>
+<area shape="rect" id="Node000004" href="$classtesting_1_1internal_1_1_matcher_as_predicate.html#ab4594a16ff5cdfd07acb5017b7aa54f3" title=" " alt="" coords="19,150,167,206"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="294,545,286,480,267,394,252,348,232,302,208,259,179,219,165,208,169,204,183,216,213,256,237,300,257,346,272,393,291,479,300,545"/>
+<area shape="rect" id="Node000005" href="$namespacetesting_1_1gmock__matchers__test_1_1convertible__from__any.html#af5ebdc7f68d7e1e48c6dacfaffd6f58a" title=" " alt="" coords="9,230,177,286"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="291,546,279,494,257,429,224,361,203,328,179,300,165,288,169,284,183,296,207,325,229,358,262,427,284,493,296,545"/>
+<area shape="rect" id="Node000006" href="$namespacetesting_1_1gmock__matchers__test_1_1convertible__from__any.html#a72a4c336022bdea69ce15ba085f0e58e" title=" " alt="" coords="9,310,177,366"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="286,548,246,466,216,420,179,380,163,368,167,364,182,376,220,417,251,463,291,545"/>
+<area shape="rect" id="Node000007" href="$namespacetesting_1_1gmock__matchers__test.html#af7fee66e5f72e05ba28bcf122b127a95" title=" " alt="" coords="9,389,177,430"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="279,550,237,497,210,470,179,445,157,433,160,428,182,441,213,466,241,494,284,546"/>
+<area shape="rect" id="Node000008" href="$namespacetesting_1_1gmock__matchers__test.html#a9dfc74e2f4c110e33bd7863c8bfd4532" title=" " alt="" coords="9,455,177,495"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="263,555,180,511,151,498,153,494,182,506,265,550"/>
+<area shape="rect" id="Node000009" href="$namespacetesting_1_1gmock__matchers__test.html#aa7a28536a6c59d56bbbbdb4fa5ba9e4d" title=" " alt="" coords="9,520,177,561"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="213,562,177,557,178,551,214,557"/>
+<area shape="rect" id="Node000010" href="$namespacetesting_1_1gmock__matchers__test.html#a9d25aac0defd9296bf207cacd342aff0" title=" " alt="" coords="9,585,177,626"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="214,590,178,595,177,590,213,584"/>
+<area shape="rect" id="Node000011" href="$namespacetesting_1_1gmock__matchers__test.html#a6fd48b8275f96d9d4ee840f0ec590fb1" title=" " alt="" coords="9,651,177,691"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="264,597,182,640,152,653,150,648,180,635,262,592"/>
+<area shape="rect" id="Node000012" href="$namespacetesting_1_1gmock__matchers__test.html#ab8d3174b8f1ab799906938ed9984643b" title=" " alt="" coords="9,716,177,757"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="284,601,241,653,213,681,182,705,160,718,157,713,179,701,209,677,237,649,279,597"/>
+<area shape="rect" id="Node000013" href="$namespacetesting_1_1gmock__matchers__test.html#afffaa6f2c436edb7c46e7a16ed2de825" title=" " alt="" coords="9,781,177,822"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="292,602,275,639,252,684,221,730,182,770,163,783,160,779,179,766,217,727,247,682,271,637,287,600"/>
+<area shape="rect" id="Node000014" href="$namespacetesting_1_1gmock__matchers__test.html#a4bb3955a1e0b603c0156c98a2dc49eea" title=" " alt="" coords="9,847,177,887"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="296,603,283,652,261,714,228,779,207,809,182,836,165,848,162,844,179,832,203,805,224,776,256,712,278,650,291,601"/>
+<area shape="rect" id="Node000015" href="$namespacetesting_1_1gmock__matchers__test.html#a8f845dd5b1bcdc660926d67dce32b5d2" title=" " alt="" coords="9,912,177,953"/>
+<area shape="poly" id="edge14_Node000001_Node000015" title=" " alt="" coords="299,602,290,663,270,742,255,785,236,826,212,866,183,901,166,914,163,909,179,897,207,863,231,824,250,783,265,741,285,662,294,602"/>
+<area shape="rect" id="Node000016" href="$namespacetesting_1_1gmock__matchers__test.html#a37953ae898b7426bce3104d95c098cba" title=" " alt="" coords="9,977,177,1018"/>
+<area shape="poly" id="edge15_Node000001_Node000016" title=" " alt="" coords="301,602,295,674,278,771,263,823,243,874,216,923,183,966,167,979,164,975,179,962,212,920,238,872,258,821,273,769,290,673,296,602"/>
+<area shape="rect" id="Node000017" href="$namespacetesting_1_1gmock__matchers__test.html#ae99c08c8a815964b61f98a4785cf79b5" title=" " alt="" coords="9,1043,177,1083"/>
+<area shape="poly" id="edge16_Node000001_Node000017" title=" " alt="" coords="303,602,300,684,295,739,286,798,271,860,250,921,221,979,183,1031,168,1044,164,1040,179,1028,216,977,245,919,266,858,281,797,290,738,295,684,297,602"/>
+</map>

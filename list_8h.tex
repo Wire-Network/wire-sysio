@@ -1,0 +1,403 @@
+\doxysection{libraries/yubihsm/pkcs11/list.h File Reference}
+\hypertarget{list_8h}{}\label{list_8h}\index{libraries/yubihsm/pkcs11/list.h@{libraries/yubihsm/pkcs11/list.h}}
+{\ttfamily \#include $<$stdbool.\+h$>$}\newline
+Include dependency graph for list.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=204pt]{list_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{list_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_list_item}{List\+Item}}
+\item 
+struct \mbox{\hyperlink{struct_list}{List}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef void(\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{list_8h_ae856885a41f62731ba0e1132eb3f4f4e}{Free\+Item\+Fn}}) (void \texorpdfstring{$\ast$}{*})
+\item 
+typedef bool(\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{list_8h_a6cea168a41c3aeb28ea306a576af3fd2}{Compare\+Item\+Fn}}) (void \texorpdfstring{$\ast$}{*}, void \texorpdfstring{$\ast$}{*})
+\item 
+typedef void(\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{list_8h_a98ef66a6f61018b20bd706b19f4d9be6}{Iterator\+Fn}}) (void \texorpdfstring{$\ast$}{*})
+\item 
+typedef struct List\+Item \mbox{\hyperlink{list_8h_a02e13bf283b917663439262e144cff2b}{List\+Item}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{list_8h_ac6c8b33b4100dfc73c933f3e936f86a1}{list\+\_\+create}} (\mbox{\hyperlink{struct_list}{List}} \texorpdfstring{$\ast$}{*}list, int item\+\_\+size, \mbox{\hyperlink{list_8h_ae856885a41f62731ba0e1132eb3f4f4e}{Free\+Item\+Fn}} free\+\_\+item\+\_\+fn)
+\item 
+void \mbox{\hyperlink{list_8h_ad720671a4abc61ed689060cacc592565}{list\+\_\+destroy}} (\mbox{\hyperlink{struct_list}{List}} \texorpdfstring{$\ast$}{*}list)
+\item 
+bool \mbox{\hyperlink{list_8h_a0f0e6235cbec8ae662d493095ed66db3}{list\+\_\+prepend}} (\mbox{\hyperlink{struct_list}{List}} \texorpdfstring{$\ast$}{*}list, void \texorpdfstring{$\ast$}{*}item)
+\item 
+bool \mbox{\hyperlink{list_8h_a06a2b45f704182a7d152c88d0507700c}{list\+\_\+append}} (\mbox{\hyperlink{struct_list}{List}} \texorpdfstring{$\ast$}{*}list, void \texorpdfstring{$\ast$}{*}item)
+\item 
+\mbox{\hyperlink{struct_list_item}{List\+Item}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{list_8h_ac048645b0cd40b78c89aad9e770d4aab}{list\+\_\+get}} (\mbox{\hyperlink{struct_list}{List}} \texorpdfstring{$\ast$}{*}list, void \texorpdfstring{$\ast$}{*}data, \mbox{\hyperlink{list_8h_a6cea168a41c3aeb28ea306a576af3fd2}{Compare\+Item\+Fn}} compare\+\_\+item\+\_\+fn)
+\item 
+void \mbox{\hyperlink{list_8h_a2c9f1765436e9a3631f048b71f17f33c}{list\+\_\+delete}} (\mbox{\hyperlink{struct_list}{List}} \texorpdfstring{$\ast$}{*}list, \mbox{\hyperlink{struct_list_item}{List\+Item}} \texorpdfstring{$\ast$}{*}item)
+\item 
+void \mbox{\hyperlink{list_8h_a9e35506bfe9666bbce134a4131254172}{list\+\_\+iterate}} (\mbox{\hyperlink{struct_list}{List}} \texorpdfstring{$\ast$}{*}list, \mbox{\hyperlink{list_8h_a98ef66a6f61018b20bd706b19f4d9be6}{Iterator\+Fn}} iterator\+\_\+fn)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{list_8h_a6cea168a41c3aeb28ea306a576af3fd2}\index{list.h@{list.h}!CompareItemFn@{CompareItemFn}}
+\index{CompareItemFn@{CompareItemFn}!list.h@{list.h}}
+\doxysubsubsection{\texorpdfstring{CompareItemFn}{CompareItemFn}}
+{\footnotesize\ttfamily \label{list_8h_a6cea168a41c3aeb28ea306a576af3fd2} 
+typedef bool(\texorpdfstring{$\ast$}{*} Compare\+Item\+Fn) (void \texorpdfstring{$\ast$}{*}, void \texorpdfstring{$\ast$}{*})}
+
+
+
+Definition at line \mbox{\hyperlink{list_8h_source_l00024}{24}} of file \mbox{\hyperlink{list_8h_source}{list.\+h}}.
+
+\Hypertarget{list_8h_ae856885a41f62731ba0e1132eb3f4f4e}\index{list.h@{list.h}!FreeItemFn@{FreeItemFn}}
+\index{FreeItemFn@{FreeItemFn}!list.h@{list.h}}
+\doxysubsubsection{\texorpdfstring{FreeItemFn}{FreeItemFn}}
+{\footnotesize\ttfamily \label{list_8h_ae856885a41f62731ba0e1132eb3f4f4e} 
+typedef void(\texorpdfstring{$\ast$}{*} Free\+Item\+Fn) (void \texorpdfstring{$\ast$}{*})}
+
+
+
+Definition at line \mbox{\hyperlink{list_8h_source_l00022}{22}} of file \mbox{\hyperlink{list_8h_source}{list.\+h}}.
+
+\Hypertarget{list_8h_a98ef66a6f61018b20bd706b19f4d9be6}\index{list.h@{list.h}!IteratorFn@{IteratorFn}}
+\index{IteratorFn@{IteratorFn}!list.h@{list.h}}
+\doxysubsubsection{\texorpdfstring{IteratorFn}{IteratorFn}}
+{\footnotesize\ttfamily \label{list_8h_a98ef66a6f61018b20bd706b19f4d9be6} 
+typedef void(\texorpdfstring{$\ast$}{*} Iterator\+Fn) (void \texorpdfstring{$\ast$}{*})}
+
+
+
+Definition at line \mbox{\hyperlink{list_8h_source_l00026}{26}} of file \mbox{\hyperlink{list_8h_source}{list.\+h}}.
+
+\Hypertarget{list_8h_a02e13bf283b917663439262e144cff2b}\index{list.h@{list.h}!ListItem@{ListItem}}
+\index{ListItem@{ListItem}!list.h@{list.h}}
+\doxysubsubsection{\texorpdfstring{ListItem}{ListItem}}
+{\footnotesize\ttfamily \label{list_8h_a02e13bf283b917663439262e144cff2b} 
+typedef struct List\+Item List\+Item}
+
+
+
+Definition at line \mbox{\hyperlink{list_8h_source_l00028}{28}} of file \mbox{\hyperlink{list_8h_source}{list.\+h}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{list_8h_a06a2b45f704182a7d152c88d0507700c}\index{list.h@{list.h}!list\_append@{list\_append}}
+\index{list\_append@{list\_append}!list.h@{list.h}}
+\doxysubsubsection{\texorpdfstring{list\_append()}{list\_append()}}
+{\footnotesize\ttfamily \label{list_8h_a06a2b45f704182a7d152c88d0507700c} 
+bool list\+\_\+append (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_list}{List}} \texorpdfstring{$\ast$}{*}}]{list}{, }\item[{void \texorpdfstring{$\ast$}{*}}]{item}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{list_8c_source_l00078}{78}} of file \mbox{\hyperlink{list_8c_source}{list.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00079\ }
+\DoxyCodeLine{00080\ \ \ \mbox{\hyperlink{struct_list_item}{ListItem}}\ *node\ =\ calloc(1,\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{struct_list_item}{ListItem}}));}
+\DoxyCodeLine{00081\ \ \ \textcolor{keywordflow}{if}\ (node\ ==\ NULL)\ \{}
+\DoxyCodeLine{00082\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00083\ \ \ \}}
+\DoxyCodeLine{00084\ }
+\DoxyCodeLine{00085\ \ \ node-\/>\mbox{\hyperlink{struct_list_item_a788104e1ae9d59a384497766e5203f20}{data}}\ =\ calloc(1,\ list-\/>item\_size);}
+\DoxyCodeLine{00086\ \ \ \textcolor{keywordflow}{if}\ (node-\/>\mbox{\hyperlink{struct_list_item_a788104e1ae9d59a384497766e5203f20}{data}}\ ==\ NULL)\ \{}
+\DoxyCodeLine{00087\ \ \ \ \ free(node);}
+\DoxyCodeLine{00088\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00089\ \ \ \}}
+\DoxyCodeLine{00090\ }
+\DoxyCodeLine{00091\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(node-\/>\mbox{\hyperlink{struct_list_item_a788104e1ae9d59a384497766e5203f20}{data}},\ item,\ list-\/>item\_size);}
+\DoxyCodeLine{00092\ }
+\DoxyCodeLine{00093\ \ \ \textcolor{keywordflow}{if}\ (list-\/>length\ ==\ 0)\ \{}
+\DoxyCodeLine{00094\ \ \ \ \ list-\/>head\ =\ node;}
+\DoxyCodeLine{00095\ \ \ \ \ list-\/>tail\ =\ node;}
+\DoxyCodeLine{00096\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00097\ \ \ \ \ list-\/>tail-\/>next\ =\ node;}
+\DoxyCodeLine{00098\ \ \ \ \ list-\/>tail\ =\ node;}
+\DoxyCodeLine{00099\ \ \ \}}
+\DoxyCodeLine{00100\ }
+\DoxyCodeLine{00101\ \ \ list-\/>length++;}
+\DoxyCodeLine{00102\ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00103\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=235pt]{list_8h_a06a2b45f704182a7d152c88d0507700c_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{list_8h_a06a2b45f704182a7d152c88d0507700c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{list_8h_ac6c8b33b4100dfc73c933f3e936f86a1}\index{list.h@{list.h}!list\_create@{list\_create}}
+\index{list\_create@{list\_create}!list.h@{list.h}}
+\doxysubsubsection{\texorpdfstring{list\_create()}{list\_create()}}
+{\footnotesize\ttfamily \label{list_8h_ac6c8b33b4100dfc73c933f3e936f86a1} 
+void list\+\_\+create (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_list}{List}} \texorpdfstring{$\ast$}{*}}]{list}{, }\item[{int}]{item\+\_\+size}{, }\item[{\mbox{\hyperlink{list_8h_ae856885a41f62731ba0e1132eb3f4f4e}{Free\+Item\+Fn}}}]{free\+\_\+item\+\_\+fn}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{list_8c_source_l00024}{24}} of file \mbox{\hyperlink{list_8c_source}{list.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \ \ list-\/>length\ =\ 0;}
+\DoxyCodeLine{00027\ \ \ list-\/>item\_size\ =\ item\_size;}
+\DoxyCodeLine{00028\ \ \ list-\/>head\ =\ NULL;}
+\DoxyCodeLine{00029\ \ \ list-\/>tail\ =\ NULL;}
+\DoxyCodeLine{00030\ \ \ list-\/>free\_item\_fn\ =\ free\_item\_fn;}
+\DoxyCodeLine{00031\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{list_8h_ac6c8b33b4100dfc73c933f3e936f86a1_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{list_8h_a2c9f1765436e9a3631f048b71f17f33c}\index{list.h@{list.h}!list\_delete@{list\_delete}}
+\index{list\_delete@{list\_delete}!list.h@{list.h}}
+\doxysubsubsection{\texorpdfstring{list\_delete()}{list\_delete()}}
+{\footnotesize\ttfamily \label{list_8h_a2c9f1765436e9a3631f048b71f17f33c} 
+void list\+\_\+delete (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_list}{List}} \texorpdfstring{$\ast$}{*}}]{list}{, }\item[{\mbox{\hyperlink{struct_list_item}{List\+Item}} \texorpdfstring{$\ast$}{*}}]{item}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{list_8c_source_l00117}{117}} of file \mbox{\hyperlink{list_8c_source}{list.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00118\ }
+\DoxyCodeLine{00119\ \ \ \textcolor{keywordflow}{if}\ (item\ ==\ NULL)\ \{}
+\DoxyCodeLine{00120\ }
+\DoxyCodeLine{00121\ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00122\ \ \ \}}
+\DoxyCodeLine{00123\ }
+\DoxyCodeLine{00124\ \ \ \textcolor{keywordflow}{if}\ (item\ ==\ list-\/>head)\ \{}
+\DoxyCodeLine{00125\ \ \ \ \ \textcolor{keywordflow}{if}\ (list-\/>head\ ==\ list-\/>tail)\ \{}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ list-\/>head\ =\ NULL;}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ list-\/>tail\ =\ NULL;}
+\DoxyCodeLine{00128\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ list-\/>head\ =\ list-\/>head-\/>next;}
+\DoxyCodeLine{00130\ \ \ \ \ \}}
+\DoxyCodeLine{00131\ }
+\DoxyCodeLine{00132\ \ \ \ \ \textcolor{keywordflow}{if}\ (list-\/>free\_item\_fn)\ \{}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ list-\/>free\_item\_fn(item-\/>\mbox{\hyperlink{struct_list_item_a788104e1ae9d59a384497766e5203f20}{data}});}
+\DoxyCodeLine{00134\ \ \ \ \ \}}
+\DoxyCodeLine{00135\ \ \ \ \ \mbox{\hyperlink{insecure__memzero_8h_a0794f9275fd1036ecba6ff0a901a320b}{insecure\_memzero}}(item-\/>\mbox{\hyperlink{struct_list_item_a788104e1ae9d59a384497766e5203f20}{data}},\ list-\/>item\_size);}
+\DoxyCodeLine{00136\ \ \ \ \ free(item-\/>\mbox{\hyperlink{struct_list_item_a788104e1ae9d59a384497766e5203f20}{data}});}
+\DoxyCodeLine{00137\ \ \ \ \ free(item);}
+\DoxyCodeLine{00138\ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (item\ ==\ list-\/>tail)\ \{}
+\DoxyCodeLine{00139\ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{struct_list_item}{ListItem}}\ *i\ =\ list-\/>head;\ i\ !=\ NULL;\ i\ =\ i-\/>\mbox{\hyperlink{struct_list_item_aa282658801fc98fce55976f17c5903ca}{next}})\ \{}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (i-\/>next\ ==\ list-\/>tail)\ \{}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ list-\/>tail\ =\ i;}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ i-\/>next\ =\ NULL;}
+\DoxyCodeLine{00143\ }
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (list-\/>free\_item\_fn)\ \{}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \ \ list-\/>free\_item\_fn(item-\/>\mbox{\hyperlink{struct_list_item_a788104e1ae9d59a384497766e5203f20}{data}});}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{insecure__memzero_8h_a0794f9275fd1036ecba6ff0a901a320b}{insecure\_memzero}}(item-\/>\mbox{\hyperlink{struct_list_item_a788104e1ae9d59a384497766e5203f20}{data}},\ list-\/>item\_size);}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ free(item-\/>\mbox{\hyperlink{struct_list_item_a788104e1ae9d59a384497766e5203f20}{data}});}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ free(item);}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00151\ \ \ \ \ \}}
+\DoxyCodeLine{00152\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00153\ \ \ \ \ \textcolor{keywordflow}{if}\ (list-\/>free\_item\_fn)\ \{}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ list-\/>free\_item\_fn(item-\/>\mbox{\hyperlink{struct_list_item_a788104e1ae9d59a384497766e5203f20}{data}});}
+\DoxyCodeLine{00155\ \ \ \ \ \}}
+\DoxyCodeLine{00156\ }
+\DoxyCodeLine{00157\ \ \ \ \ \mbox{\hyperlink{struct_list_item}{ListItem}}\ *tmp\ =\ item-\/>\mbox{\hyperlink{struct_list_item_aa282658801fc98fce55976f17c5903ca}{next}};}
+\DoxyCodeLine{00158\ }
+\DoxyCodeLine{00159\ \ \ \ \ \mbox{\hyperlink{insecure__memzero_8h_a0794f9275fd1036ecba6ff0a901a320b}{insecure\_memzero}}(item-\/>\mbox{\hyperlink{struct_list_item_a788104e1ae9d59a384497766e5203f20}{data}},\ list-\/>item\_size);}
+\DoxyCodeLine{00160\ \ \ \ \ free(item-\/>\mbox{\hyperlink{struct_list_item_a788104e1ae9d59a384497766e5203f20}{data}});}
+\DoxyCodeLine{00161\ }
+\DoxyCodeLine{00162\ \ \ \ \ item-\/>\mbox{\hyperlink{struct_list_item_a788104e1ae9d59a384497766e5203f20}{data}}\ =\ item-\/>\mbox{\hyperlink{struct_list_item_aa282658801fc98fce55976f17c5903ca}{next}}-\/>\mbox{\hyperlink{struct_list_item_a788104e1ae9d59a384497766e5203f20}{data}};}
+\DoxyCodeLine{00163\ \ \ \ \ item-\/>\mbox{\hyperlink{struct_list_item_aa282658801fc98fce55976f17c5903ca}{next}}\ =\ item-\/>\mbox{\hyperlink{struct_list_item_aa282658801fc98fce55976f17c5903ca}{next}}-\/>\mbox{\hyperlink{struct_list_item_aa282658801fc98fce55976f17c5903ca}{next}};}
+\DoxyCodeLine{00164\ }
+\DoxyCodeLine{00165\ \ \ \ \ \textcolor{keywordflow}{if}\ (tmp\ ==\ list-\/>tail)\ \{}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ list-\/>tail\ =\ item;}
+\DoxyCodeLine{00167\ \ \ \ \ \}}
+\DoxyCodeLine{00168\ }
+\DoxyCodeLine{00169\ \ \ \ \ free(tmp);}
+\DoxyCodeLine{00170\ \ \ \}}
+\DoxyCodeLine{00171\ }
+\DoxyCodeLine{00172\ \ \ list-\/>length-\/-\/;}
+\DoxyCodeLine{00173\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{list_8h_a2c9f1765436e9a3631f048b71f17f33c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{list_8h_ad720671a4abc61ed689060cacc592565}\index{list.h@{list.h}!list\_destroy@{list\_destroy}}
+\index{list\_destroy@{list\_destroy}!list.h@{list.h}}
+\doxysubsubsection{\texorpdfstring{list\_destroy()}{list\_destroy()}}
+{\footnotesize\ttfamily \label{list_8h_ad720671a4abc61ed689060cacc592565} 
+void list\+\_\+destroy (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_list}{List}} \texorpdfstring{$\ast$}{*}}]{list}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{list_8c_source_l00033}{33}} of file \mbox{\hyperlink{list_8c_source}{list.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00034\ }
+\DoxyCodeLine{00035\ \ \ \mbox{\hyperlink{struct_list_item}{ListItem}}\ *current;}
+\DoxyCodeLine{00036\ }
+\DoxyCodeLine{00037\ \ \ \textcolor{keywordflow}{while}\ (list-\/>head\ !=\ NULL)\ \{}
+\DoxyCodeLine{00038\ \ \ \ \ current\ =\ list-\/>head;}
+\DoxyCodeLine{00039\ \ \ \ \ list-\/>head\ =\ current-\/>next;}
+\DoxyCodeLine{00040\ }
+\DoxyCodeLine{00041\ \ \ \ \ \textcolor{keywordflow}{if}\ (list-\/>free\_item\_fn)\ \{}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ list-\/>free\_item\_fn(current-\/>data);}
+\DoxyCodeLine{00043\ \ \ \ \ \}}
+\DoxyCodeLine{00044\ }
+\DoxyCodeLine{00045\ \ \ \ \ \mbox{\hyperlink{insecure__memzero_8h_a0794f9275fd1036ecba6ff0a901a320b}{insecure\_memzero}}(current-\/>data,\ list-\/>item\_size);}
+\DoxyCodeLine{00046\ \ \ \ \ free(current-\/>data);}
+\DoxyCodeLine{00047\ \ \ \ \ free(current);}
+\DoxyCodeLine{00048\ \ \ \}}
+\DoxyCodeLine{00049\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=313pt]{list_8h_ad720671a4abc61ed689060cacc592565_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{list_8h_ac048645b0cd40b78c89aad9e770d4aab}\index{list.h@{list.h}!list\_get@{list\_get}}
+\index{list\_get@{list\_get}!list.h@{list.h}}
+\doxysubsubsection{\texorpdfstring{list\_get()}{list\_get()}}
+{\footnotesize\ttfamily \label{list_8h_ac048645b0cd40b78c89aad9e770d4aab} 
+\mbox{\hyperlink{struct_list_item}{List\+Item}} \texorpdfstring{$\ast$}{*} list\+\_\+get (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_list}{List}} \texorpdfstring{$\ast$}{*}}]{list}{, }\item[{void \texorpdfstring{$\ast$}{*}}]{data}{, }\item[{\mbox{\hyperlink{list_8h_a6cea168a41c3aeb28ea306a576af3fd2}{Compare\+Item\+Fn}}}]{compare\+\_\+item\+\_\+fn}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{list_8c_source_l00105}{105}} of file \mbox{\hyperlink{list_8c_source}{list.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00106\ }
+\DoxyCodeLine{00107\ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{struct_list_item}{ListItem}}\ *item\ =\ list-\/>head;\ item\ !=\ NULL;\ item\ =\ item-\/>\mbox{\hyperlink{struct_list_item_aa282658801fc98fce55976f17c5903ca}{next}})\ \{}
+\DoxyCodeLine{00108\ \ \ \ \ \textcolor{keywordflow}{if}\ (compare\_item\_fn(data,\ item-\/>data)\ ==\ \textcolor{keyword}{true})\ \{}
+\DoxyCodeLine{00109\ }
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ item;}
+\DoxyCodeLine{00111\ \ \ \ \ \}}
+\DoxyCodeLine{00112\ \ \ \}}
+\DoxyCodeLine{00113\ }
+\DoxyCodeLine{00114\ \ \ \textcolor{keywordflow}{return}\ NULL;}
+\DoxyCodeLine{00115\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{list_8h_ac048645b0cd40b78c89aad9e770d4aab_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{list_8h_a9e35506bfe9666bbce134a4131254172}\index{list.h@{list.h}!list\_iterate@{list\_iterate}}
+\index{list\_iterate@{list\_iterate}!list.h@{list.h}}
+\doxysubsubsection{\texorpdfstring{list\_iterate()}{list\_iterate()}}
+{\footnotesize\ttfamily \label{list_8h_a9e35506bfe9666bbce134a4131254172} 
+void list\+\_\+iterate (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_list}{List}} \texorpdfstring{$\ast$}{*}}]{list}{, }\item[{\mbox{\hyperlink{list_8h_a98ef66a6f61018b20bd706b19f4d9be6}{Iterator\+Fn}}}]{iterator\+\_\+fn}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{list_8c_source_l00175}{175}} of file \mbox{\hyperlink{list_8c_source}{list.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00176\ }
+\DoxyCodeLine{00177\ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{struct_list_item}{ListItem}}\ *item\ =\ list-\/>head;\ item\ !=\ NULL;\ item\ =\ item-\/>\mbox{\hyperlink{struct_list_item_aa282658801fc98fce55976f17c5903ca}{next}})\ \{}
+\DoxyCodeLine{00178\ \ \ \ \ iterator\_fn(item-\/>data);}
+\DoxyCodeLine{00179\ \ \ \}}
+\DoxyCodeLine{00180\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=308pt]{list_8h_a9e35506bfe9666bbce134a4131254172_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{list_8h_a0f0e6235cbec8ae662d493095ed66db3}\index{list.h@{list.h}!list\_prepend@{list\_prepend}}
+\index{list\_prepend@{list\_prepend}!list.h@{list.h}}
+\doxysubsubsection{\texorpdfstring{list\_prepend()}{list\_prepend()}}
+{\footnotesize\ttfamily \label{list_8h_a0f0e6235cbec8ae662d493095ed66db3} 
+bool list\+\_\+prepend (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_list}{List}} \texorpdfstring{$\ast$}{*}}]{list}{, }\item[{void \texorpdfstring{$\ast$}{*}}]{item}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{list_8c_source_l00051}{51}} of file \mbox{\hyperlink{list_8c_source}{list.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ \ \ \mbox{\hyperlink{struct_list_item}{ListItem}}\ *node\ =\ calloc(1,\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{struct_list_item}{ListItem}}));}
+\DoxyCodeLine{00054\ \ \ \textcolor{keywordflow}{if}\ (node\ ==\ NULL)\ \{}
+\DoxyCodeLine{00055\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00056\ \ \ \}}
+\DoxyCodeLine{00057\ }
+\DoxyCodeLine{00058\ \ \ node-\/>\mbox{\hyperlink{struct_list_item_a788104e1ae9d59a384497766e5203f20}{data}}\ =\ calloc(1,\ list-\/>item\_size);}
+\DoxyCodeLine{00059\ }
+\DoxyCodeLine{00060\ \ \ \textcolor{keywordflow}{if}\ (node-\/>\mbox{\hyperlink{struct_list_item_a788104e1ae9d59a384497766e5203f20}{data}}\ ==\ NULL)\ \{}
+\DoxyCodeLine{00061\ \ \ \ \ free(node);}
+\DoxyCodeLine{00062\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00063\ \ \ \}}
+\DoxyCodeLine{00064\ }
+\DoxyCodeLine{00065\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(node-\/>\mbox{\hyperlink{struct_list_item_a788104e1ae9d59a384497766e5203f20}{data}},\ item,\ list-\/>item\_size);}
+\DoxyCodeLine{00066\ }
+\DoxyCodeLine{00067\ \ \ node-\/>\mbox{\hyperlink{struct_list_item_aa282658801fc98fce55976f17c5903ca}{next}}\ =\ list-\/>head;}
+\DoxyCodeLine{00068\ \ \ list-\/>head\ =\ node;}
+\DoxyCodeLine{00069\ }
+\DoxyCodeLine{00070\ \ \ \textcolor{keywordflow}{if}\ (list-\/>tail\ ==\ NULL)\ \{}
+\DoxyCodeLine{00071\ \ \ \ \ list-\/>tail\ =\ list-\/>head;}
+\DoxyCodeLine{00072\ \ \ \}}
+\DoxyCodeLine{00073\ }
+\DoxyCodeLine{00074\ \ \ list-\/>length++;}
+\DoxyCodeLine{00075\ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00076\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=238pt]{list_8h_a0f0e6235cbec8ae662d493095ed66db3_cgraph}
+\end{center}
+\end{figure}

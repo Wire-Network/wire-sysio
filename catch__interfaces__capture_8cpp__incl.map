@@ -1,0 +1,16 @@
+<map id="libraries/sys&#45;vm/external/Catch2/include/internal/catch_interfaces_capture.cpp" name="libraries/sys&#45;vm/external/Catch2/include/internal/catch_interfaces_capture.cpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="23,5,220,61"/>
+<area shape="rect" id="Node000002" href="$catch__interfaces__capture_8h.html" title=" " alt="" coords="32,109,210,135"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="124,61,124,93,119,93,119,61"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,256,59,282"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="102,137,76,157,53,184,41,213,36,241,31,241,36,211,48,181,72,153,99,133"/>
+<area shape="rect" id="Node000004" href="$catch__stringref_8h.html" title=" " alt="" coords="62,183,180,208"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="124,135,124,167,119,167,119,135"/>
+<area shape="rect" id="Node000007" href="$catch__result__type_8h.html" title=" " alt="" coords="204,183,340,208"/>
+<area shape="poly" id="edge7_Node000002_Node000007" title=" " alt="" coords="148,133,234,173,231,178,146,138"/>
+<area shape="poly" id="edge5_Node000004_Node000003" title=" " alt="" coords="108,211,61,249,57,244,105,207"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="85,256,150,282"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="123,209,122,241,116,241,118,208"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="173,256,232,282"/>
+<area shape="poly" id="edge6_Node000004_Node000006" title=" " alt="" coords="137,207,179,244,176,248,133,211"/>
+</map>

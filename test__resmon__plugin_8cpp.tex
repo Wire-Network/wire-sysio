@@ -1,0 +1,443 @@
+\doxysection{plugins/resource\+\_\+monitor\+\_\+plugin/test/test\+\_\+resmon\+\_\+plugin.cpp File Reference}
+\hypertarget{test__resmon__plugin_8cpp}{}\label{test__resmon__plugin_8cpp}\index{plugins/resource\_monitor\_plugin/test/test\_resmon\_plugin.cpp@{plugins/resource\_monitor\_plugin/test/test\_resmon\_plugin.cpp}}
+{\ttfamily \#include $<$boost/test/included/unit\+\_\+test.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/variant\+\_\+object.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/resource\+\_\+monitor\+\_\+plugin/resource\+\_\+monitor\+\_\+plugin.\+hpp$>$}\newline
+{\ttfamily \#include $<$thread$>$}\newline
+Include dependency graph for test\+\_\+resmon\+\_\+plugin.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__resmon__plugin_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structresmon__fixture}{resmon\+\_\+fixture}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{test__resmon__plugin_8cpp_a6b2a3852db8bb19ab6909bac01859985}{BOOST\+\_\+\+TEST\+\_\+\+MODULE}}~test\+\_\+resmom\+\_\+plugin
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{test__resmon__plugin_8cpp_a5bab595fc9809eeb580e8ae3178b5157}{BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE}} (interval\+Too\+Big, \mbox{\hyperlink{structresmon__fixture}{resmon\+\_\+fixture}})
+\item 
+\mbox{\hyperlink{test__resmon__plugin_8cpp_a931326fb254c1f3e563d0cb67a4eaa94}{BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE}} (interval\+Too\+Small, \mbox{\hyperlink{structresmon__fixture}{resmon\+\_\+fixture}})
+\item 
+\mbox{\hyperlink{test__resmon__plugin_8cpp_ae001c6d855551e5214b79402fdc3cb66}{BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE}} (interval\+Low\+Bound, \mbox{\hyperlink{structresmon__fixture}{resmon\+\_\+fixture}})
+\item 
+\mbox{\hyperlink{test__resmon__plugin_8cpp_a47183db0492b1bc1c648084b4ead5db5}{BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE}} (interval\+Middle, \mbox{\hyperlink{structresmon__fixture}{resmon\+\_\+fixture}})
+\item 
+\mbox{\hyperlink{test__resmon__plugin_8cpp_aa7a41233fb3d541ac49b2a8fbf009d44}{BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE}} (interval\+High\+Bound, \mbox{\hyperlink{structresmon__fixture}{resmon\+\_\+fixture}})
+\item 
+\mbox{\hyperlink{test__resmon__plugin_8cpp_a0696aff6ed74e9ffc6982d868ac41d61}{BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE}} (threshold\+Too\+Big, \mbox{\hyperlink{structresmon__fixture}{resmon\+\_\+fixture}})
+\item 
+\mbox{\hyperlink{test__resmon__plugin_8cpp_a72aa2115725a3b668f5807b5c1aa2600}{BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE}} (threshold\+Too\+Small, \mbox{\hyperlink{structresmon__fixture}{resmon\+\_\+fixture}})
+\item 
+\mbox{\hyperlink{test__resmon__plugin_8cpp_a05b49a0fcaf5d1d3bc506082372e879f}{BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE}} (threshold\+Low\+Bound, \mbox{\hyperlink{structresmon__fixture}{resmon\+\_\+fixture}})
+\item 
+\mbox{\hyperlink{test__resmon__plugin_8cpp_a3561912b373c48d89f45a753910b4ac3}{BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE}} (threshold\+Middle, \mbox{\hyperlink{structresmon__fixture}{resmon\+\_\+fixture}})
+\item 
+\mbox{\hyperlink{test__resmon__plugin_8cpp_ab529cfb5f945cddfd6fdf6f51f8d63c9}{BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE}} (threshold\+High\+Bound, \mbox{\hyperlink{structresmon__fixture}{resmon\+\_\+fixture}})
+\item 
+\mbox{\hyperlink{test__resmon__plugin_8cpp_a0a1d8b3d4a0dae3da9d258c70bc5d2a6}{BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE}} (no\+Shutdown, \mbox{\hyperlink{structresmon__fixture}{resmon\+\_\+fixture}})
+\item 
+\mbox{\hyperlink{test__resmon__plugin_8cpp_aa5fb9d9229324ef19888ac04ac8bb18b}{BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE}} (startup\+Normal, \mbox{\hyperlink{structresmon__fixture}{resmon\+\_\+fixture}})
+\item 
+\mbox{\hyperlink{test__resmon__plugin_8cpp_a1c09b621e90ca6a83ec810541b886274}{BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE}} (startup\+Duplicate\+Dirs, \mbox{\hyperlink{structresmon__fixture}{resmon\+\_\+fixture}})
+\item 
+\mbox{\hyperlink{test__resmon__plugin_8cpp_a950550d0894840fa0ee246296ee5aef7}{BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE}} (startup\+Mult\+Dirs, \mbox{\hyperlink{structresmon__fixture}{resmon\+\_\+fixture}})
+\item 
+\mbox{\hyperlink{test__resmon__plugin_8cpp_ae4fab4fd51f35dd971e727869118cf03}{BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE}} (startup\+No\+Existing\+Dirs, \mbox{\hyperlink{structresmon__fixture}{resmon\+\_\+fixture}})
+\item 
+\mbox{\hyperlink{test__resmon__plugin_8cpp_ab2edc5f7400661184c7400c6db7aea5d}{BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE}} (startup\+Long\+Run, \mbox{\hyperlink{structresmon__fixture}{resmon\+\_\+fixture}})
+\item 
+\mbox{\hyperlink{test__resmon__plugin_8cpp_a7073ad4e00cb2bf216498017d6485e18}{BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE}} (warning\+Interval\+Too\+Big, \mbox{\hyperlink{structresmon__fixture}{resmon\+\_\+fixture}})
+\item 
+\mbox{\hyperlink{test__resmon__plugin_8cpp_ae09fd8bcdd739c5bd4d46dfc23eff72e}{BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE}} (warning\+Interval\+Too\+Small, \mbox{\hyperlink{structresmon__fixture}{resmon\+\_\+fixture}})
+\item 
+\mbox{\hyperlink{test__resmon__plugin_8cpp_a4d039edfa7e1b2937c1d5e8baaf31ad5}{BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE}} (warning\+Interval\+Low\+Bound, \mbox{\hyperlink{structresmon__fixture}{resmon\+\_\+fixture}})
+\item 
+\mbox{\hyperlink{test__resmon__plugin_8cpp_a60f2131dd73b228f27e789cad7a50c83}{BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE}} (warning\+Interval\+Middle, \mbox{\hyperlink{structresmon__fixture}{resmon\+\_\+fixture}})
+\item 
+\mbox{\hyperlink{test__resmon__plugin_8cpp_a7ee7252427cb0e8944418250987a11f3}{BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE}} (warning\+Interval\+High\+Bound, \mbox{\hyperlink{structresmon__fixture}{resmon\+\_\+fixture}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{test__resmon__plugin_8cpp_a6b2a3852db8bb19ab6909bac01859985}\index{test\_resmon\_plugin.cpp@{test\_resmon\_plugin.cpp}!BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}}
+\index{BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}!test\_resmon\_plugin.cpp@{test\_resmon\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_TEST\_MODULE}{BOOST\_TEST\_MODULE}}
+{\footnotesize\ttfamily \label{test__resmon__plugin_8cpp_a6b2a3852db8bb19ab6909bac01859985} 
+\#define BOOST\+\_\+\+TEST\+\_\+\+MODULE~test\+\_\+resmom\+\_\+plugin}
+
+
+
+Definition at line \mbox{\hyperlink{test__resmon__plugin_8cpp_source_l00001}{1}} of file \mbox{\hyperlink{test__resmon__plugin_8cpp_source}{test\+\_\+resmon\+\_\+plugin.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{test__resmon__plugin_8cpp_aa7a41233fb3d541ac49b2a8fbf009d44}\index{test\_resmon\_plugin.cpp@{test\_resmon\_plugin.cpp}!BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}}
+\index{BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}!test\_resmon\_plugin.cpp@{test\_resmon\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_FIXTURE\_TEST\_CASE()}{BOOST\_FIXTURE\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/21]}}
+{\footnotesize\ttfamily \label{test__resmon__plugin_8cpp_aa7a41233fb3d541ac49b2a8fbf009d44} 
+BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{interval\+High\+Bound}]{}{, }\item[{\mbox{\hyperlink{structresmon__fixture}{resmon\+\_\+fixture}}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__resmon__plugin_8cpp_source_l00086}{86}} of file \mbox{\hyperlink{test__resmon__plugin_8cpp_source}{test\+\_\+resmon\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00087\ \ \ \ \{}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ BOOST\_REQUIRE\_NO\_THROW(set\_options(\{\textcolor{stringliteral}{"{}-\/-\/resource-\/monitor-\/interval-\/seconds=300"{}}\}));}
+\DoxyCodeLine{00089\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{test__resmon__plugin_8cpp_ae001c6d855551e5214b79402fdc3cb66}\index{test\_resmon\_plugin.cpp@{test\_resmon\_plugin.cpp}!BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}}
+\index{BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}!test\_resmon\_plugin.cpp@{test\_resmon\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_FIXTURE\_TEST\_CASE()}{BOOST\_FIXTURE\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/21]}}
+{\footnotesize\ttfamily \label{test__resmon__plugin_8cpp_ae001c6d855551e5214b79402fdc3cb66} 
+BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{interval\+Low\+Bound}]{}{, }\item[{\mbox{\hyperlink{structresmon__fixture}{resmon\+\_\+fixture}}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__resmon__plugin_8cpp_source_l00076}{76}} of file \mbox{\hyperlink{test__resmon__plugin_8cpp_source}{test\+\_\+resmon\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00077\ \ \ \ \{}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ BOOST\_REQUIRE\_NO\_THROW(set\_options(\{\textcolor{stringliteral}{"{}-\/-\/resource-\/monitor-\/interval-\/seconds=1"{}}\}));}
+\DoxyCodeLine{00079\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{test__resmon__plugin_8cpp_a47183db0492b1bc1c648084b4ead5db5}\index{test\_resmon\_plugin.cpp@{test\_resmon\_plugin.cpp}!BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}}
+\index{BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}!test\_resmon\_plugin.cpp@{test\_resmon\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_FIXTURE\_TEST\_CASE()}{BOOST\_FIXTURE\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [3/21]}}
+{\footnotesize\ttfamily \label{test__resmon__plugin_8cpp_a47183db0492b1bc1c648084b4ead5db5} 
+BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{interval\+Middle}]{}{, }\item[{\mbox{\hyperlink{structresmon__fixture}{resmon\+\_\+fixture}}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__resmon__plugin_8cpp_source_l00081}{81}} of file \mbox{\hyperlink{test__resmon__plugin_8cpp_source}{test\+\_\+resmon\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00082\ \ \ \ \{}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ BOOST\_REQUIRE\_NO\_THROW(set\_options(\{\textcolor{stringliteral}{"{}-\/-\/resource-\/monitor-\/interval-\/seconds=150"{}}\}));}
+\DoxyCodeLine{00084\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{test__resmon__plugin_8cpp_a5bab595fc9809eeb580e8ae3178b5157}\index{test\_resmon\_plugin.cpp@{test\_resmon\_plugin.cpp}!BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}}
+\index{BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}!test\_resmon\_plugin.cpp@{test\_resmon\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_FIXTURE\_TEST\_CASE()}{BOOST\_FIXTURE\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [4/21]}}
+{\footnotesize\ttfamily \label{test__resmon__plugin_8cpp_a5bab595fc9809eeb580e8ae3178b5157} 
+BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{interval\+Too\+Big}]{}{, }\item[{\mbox{\hyperlink{structresmon__fixture}{resmon\+\_\+fixture}}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__resmon__plugin_8cpp_source_l00066}{66}} of file \mbox{\hyperlink{test__resmon__plugin_8cpp_source}{test\+\_\+resmon\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00067\ \ \ \ \{}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ BOOST\_REQUIRE\_THROW(set\_options(\{\textcolor{stringliteral}{"{}-\/-\/resource-\/monitor-\/interval-\/seconds=301"{}}\}),\ chain::plugin\_config\_exception);}
+\DoxyCodeLine{00069\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{test__resmon__plugin_8cpp_a931326fb254c1f3e563d0cb67a4eaa94}\index{test\_resmon\_plugin.cpp@{test\_resmon\_plugin.cpp}!BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}}
+\index{BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}!test\_resmon\_plugin.cpp@{test\_resmon\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_FIXTURE\_TEST\_CASE()}{BOOST\_FIXTURE\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [5/21]}}
+{\footnotesize\ttfamily \label{test__resmon__plugin_8cpp_a931326fb254c1f3e563d0cb67a4eaa94} 
+BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{interval\+Too\+Small}]{}{, }\item[{\mbox{\hyperlink{structresmon__fixture}{resmon\+\_\+fixture}}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__resmon__plugin_8cpp_source_l00071}{71}} of file \mbox{\hyperlink{test__resmon__plugin_8cpp_source}{test\+\_\+resmon\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00072\ \ \ \ \{}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ BOOST\_REQUIRE\_THROW(set\_options(\{\textcolor{stringliteral}{"{}-\/-\/resource-\/monitor-\/interval-\/seconds=0"{}}\}),\ chain::plugin\_config\_exception);}
+\DoxyCodeLine{00074\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{test__resmon__plugin_8cpp_a0a1d8b3d4a0dae3da9d258c70bc5d2a6}\index{test\_resmon\_plugin.cpp@{test\_resmon\_plugin.cpp}!BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}}
+\index{BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}!test\_resmon\_plugin.cpp@{test\_resmon\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_FIXTURE\_TEST\_CASE()}{BOOST\_FIXTURE\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [6/21]}}
+{\footnotesize\ttfamily \label{test__resmon__plugin_8cpp_a0a1d8b3d4a0dae3da9d258c70bc5d2a6} 
+BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{no\+Shutdown}]{}{, }\item[{\mbox{\hyperlink{structresmon__fixture}{resmon\+\_\+fixture}}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__resmon__plugin_8cpp_source_l00116}{116}} of file \mbox{\hyperlink{test__resmon__plugin_8cpp_source}{test\+\_\+resmon\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00117\ \ \ \ \{}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ BOOST\_REQUIRE\_NO\_THROW(set\_options(\{\textcolor{stringliteral}{"{}-\/-\/resource-\/monitor-\/not-\/shutdown-\/on-\/threshold-\/exceeded"{}}\}));}
+\DoxyCodeLine{00119\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{test__resmon__plugin_8cpp_a1c09b621e90ca6a83ec810541b886274}\index{test\_resmon\_plugin.cpp@{test\_resmon\_plugin.cpp}!BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}}
+\index{BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}!test\_resmon\_plugin.cpp@{test\_resmon\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_FIXTURE\_TEST\_CASE()}{BOOST\_FIXTURE\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [7/21]}}
+{\footnotesize\ttfamily \label{test__resmon__plugin_8cpp_a1c09b621e90ca6a83ec810541b886274} 
+BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{startup\+Duplicate\+Dirs}]{}{, }\item[{\mbox{\hyperlink{structresmon__fixture}{resmon\+\_\+fixture}}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__resmon__plugin_8cpp_source_l00126}{126}} of file \mbox{\hyperlink{test__resmon__plugin_8cpp_source}{test\+\_\+resmon\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00127\ \ \ \ \{}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ BOOST\_REQUIRE\_NO\_THROW(\ plugin\_startup(\{\textcolor{stringliteral}{"{}/tmp"{}},\ \textcolor{stringliteral}{"{}/tmp"{}}\}));}
+\DoxyCodeLine{00129\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{test__resmon__plugin_8cpp_ab2edc5f7400661184c7400c6db7aea5d}\index{test\_resmon\_plugin.cpp@{test\_resmon\_plugin.cpp}!BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}}
+\index{BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}!test\_resmon\_plugin.cpp@{test\_resmon\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_FIXTURE\_TEST\_CASE()}{BOOST\_FIXTURE\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [8/21]}}
+{\footnotesize\ttfamily \label{test__resmon__plugin_8cpp_ab2edc5f7400661184c7400c6db7aea5d} 
+BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{startup\+Long\+Run}]{}{, }\item[{\mbox{\hyperlink{structresmon__fixture}{resmon\+\_\+fixture}}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__resmon__plugin_8cpp_source_l00143}{143}} of file \mbox{\hyperlink{test__resmon__plugin_8cpp_source}{test\+\_\+resmon\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00144\ \ \ \ \{}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ BOOST\_REQUIRE\_NO\_THROW(\ plugin\_startup(\{\textcolor{stringliteral}{"{}/tmp"{}}\},\ 120));}
+\DoxyCodeLine{00146\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{test__resmon__plugin_8cpp_a950550d0894840fa0ee246296ee5aef7}\index{test\_resmon\_plugin.cpp@{test\_resmon\_plugin.cpp}!BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}}
+\index{BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}!test\_resmon\_plugin.cpp@{test\_resmon\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_FIXTURE\_TEST\_CASE()}{BOOST\_FIXTURE\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [9/21]}}
+{\footnotesize\ttfamily \label{test__resmon__plugin_8cpp_a950550d0894840fa0ee246296ee5aef7} 
+BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{startup\+Mult\+Dirs}]{}{, }\item[{\mbox{\hyperlink{structresmon__fixture}{resmon\+\_\+fixture}}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__resmon__plugin_8cpp_source_l00131}{131}} of file \mbox{\hyperlink{test__resmon__plugin_8cpp_source}{test\+\_\+resmon\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00132\ \ \ \ \{}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \textcolor{comment}{//\ Under\ "{}/"{}\ are\ multiple\ file\ systems}}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ BOOST\_REQUIRE\_NO\_THROW(\ plugin\_startup(\{\textcolor{stringliteral}{"{}/"{}},\ \textcolor{stringliteral}{"{}/tmp"{}}\}));}
+\DoxyCodeLine{00135\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{test__resmon__plugin_8cpp_ae4fab4fd51f35dd971e727869118cf03}\index{test\_resmon\_plugin.cpp@{test\_resmon\_plugin.cpp}!BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}}
+\index{BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}!test\_resmon\_plugin.cpp@{test\_resmon\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_FIXTURE\_TEST\_CASE()}{BOOST\_FIXTURE\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [10/21]}}
+{\footnotesize\ttfamily \label{test__resmon__plugin_8cpp_ae4fab4fd51f35dd971e727869118cf03} 
+BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{startup\+No\+Existing\+Dirs}]{}{, }\item[{\mbox{\hyperlink{structresmon__fixture}{resmon\+\_\+fixture}}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__resmon__plugin_8cpp_source_l00137}{137}} of file \mbox{\hyperlink{test__resmon__plugin_8cpp_source}{test\+\_\+resmon\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00138\ \ \ \ \{}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \textcolor{comment}{//\ "{}hsdfgd983"{}\ a\ random\ file\ and\ not\ existing}}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ BOOST\_REQUIRE\_THROW(\ plugin\_startup(\{\textcolor{stringliteral}{"{}/tmp"{}},\ \textcolor{stringliteral}{"{}hsdfgd983"{}}\}),\ chain::plugin\_config\_exception);}
+\DoxyCodeLine{00141\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{test__resmon__plugin_8cpp_aa5fb9d9229324ef19888ac04ac8bb18b}\index{test\_resmon\_plugin.cpp@{test\_resmon\_plugin.cpp}!BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}}
+\index{BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}!test\_resmon\_plugin.cpp@{test\_resmon\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_FIXTURE\_TEST\_CASE()}{BOOST\_FIXTURE\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [11/21]}}
+{\footnotesize\ttfamily \label{test__resmon__plugin_8cpp_aa5fb9d9229324ef19888ac04ac8bb18b} 
+BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{startup\+Normal}]{}{, }\item[{\mbox{\hyperlink{structresmon__fixture}{resmon\+\_\+fixture}}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__resmon__plugin_8cpp_source_l00121}{121}} of file \mbox{\hyperlink{test__resmon__plugin_8cpp_source}{test\+\_\+resmon\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00122\ \ \ \ \{}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ BOOST\_REQUIRE\_NO\_THROW(\ plugin\_startup(\{\textcolor{stringliteral}{"{}/tmp"{}}\}));}
+\DoxyCodeLine{00124\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{test__resmon__plugin_8cpp_ab529cfb5f945cddfd6fdf6f51f8d63c9}\index{test\_resmon\_plugin.cpp@{test\_resmon\_plugin.cpp}!BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}}
+\index{BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}!test\_resmon\_plugin.cpp@{test\_resmon\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_FIXTURE\_TEST\_CASE()}{BOOST\_FIXTURE\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [12/21]}}
+{\footnotesize\ttfamily \label{test__resmon__plugin_8cpp_ab529cfb5f945cddfd6fdf6f51f8d63c9} 
+BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{threshold\+High\+Bound}]{}{, }\item[{\mbox{\hyperlink{structresmon__fixture}{resmon\+\_\+fixture}}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__resmon__plugin_8cpp_source_l00111}{111}} of file \mbox{\hyperlink{test__resmon__plugin_8cpp_source}{test\+\_\+resmon\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00112\ \ \ \ \{}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ BOOST\_REQUIRE\_NO\_THROW(set\_options(\{\textcolor{stringliteral}{"{}-\/-\/resource-\/monitor-\/space-\/threshold=99"{}}\}));}
+\DoxyCodeLine{00114\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{test__resmon__plugin_8cpp_a05b49a0fcaf5d1d3bc506082372e879f}\index{test\_resmon\_plugin.cpp@{test\_resmon\_plugin.cpp}!BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}}
+\index{BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}!test\_resmon\_plugin.cpp@{test\_resmon\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_FIXTURE\_TEST\_CASE()}{BOOST\_FIXTURE\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [13/21]}}
+{\footnotesize\ttfamily \label{test__resmon__plugin_8cpp_a05b49a0fcaf5d1d3bc506082372e879f} 
+BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{threshold\+Low\+Bound}]{}{, }\item[{\mbox{\hyperlink{structresmon__fixture}{resmon\+\_\+fixture}}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__resmon__plugin_8cpp_source_l00101}{101}} of file \mbox{\hyperlink{test__resmon__plugin_8cpp_source}{test\+\_\+resmon\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00102\ \ \ \ \{}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ BOOST\_REQUIRE\_NO\_THROW(set\_options(\{\textcolor{stringliteral}{"{}-\/-\/resource-\/monitor-\/space-\/threshold=6"{}}\}));}
+\DoxyCodeLine{00104\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{test__resmon__plugin_8cpp_a3561912b373c48d89f45a753910b4ac3}\index{test\_resmon\_plugin.cpp@{test\_resmon\_plugin.cpp}!BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}}
+\index{BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}!test\_resmon\_plugin.cpp@{test\_resmon\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_FIXTURE\_TEST\_CASE()}{BOOST\_FIXTURE\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [14/21]}}
+{\footnotesize\ttfamily \label{test__resmon__plugin_8cpp_a3561912b373c48d89f45a753910b4ac3} 
+BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{threshold\+Middle}]{}{, }\item[{\mbox{\hyperlink{structresmon__fixture}{resmon\+\_\+fixture}}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__resmon__plugin_8cpp_source_l00106}{106}} of file \mbox{\hyperlink{test__resmon__plugin_8cpp_source}{test\+\_\+resmon\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00107\ \ \ \ \{}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ BOOST\_REQUIRE\_NO\_THROW(set\_options(\{\textcolor{stringliteral}{"{}-\/-\/resource-\/monitor-\/space-\/threshold=60"{}}\}));}
+\DoxyCodeLine{00109\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{test__resmon__plugin_8cpp_a0696aff6ed74e9ffc6982d868ac41d61}\index{test\_resmon\_plugin.cpp@{test\_resmon\_plugin.cpp}!BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}}
+\index{BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}!test\_resmon\_plugin.cpp@{test\_resmon\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_FIXTURE\_TEST\_CASE()}{BOOST\_FIXTURE\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [15/21]}}
+{\footnotesize\ttfamily \label{test__resmon__plugin_8cpp_a0696aff6ed74e9ffc6982d868ac41d61} 
+BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{threshold\+Too\+Big}]{}{, }\item[{\mbox{\hyperlink{structresmon__fixture}{resmon\+\_\+fixture}}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__resmon__plugin_8cpp_source_l00091}{91}} of file \mbox{\hyperlink{test__resmon__plugin_8cpp_source}{test\+\_\+resmon\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00092\ \ \ \ \{}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ BOOST\_REQUIRE\_THROW(set\_options(\{\textcolor{stringliteral}{"{}-\/-\/resource-\/monitor-\/space-\/threshold=100"{}}\}),\ chain::plugin\_config\_exception);}
+\DoxyCodeLine{00094\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{test__resmon__plugin_8cpp_a72aa2115725a3b668f5807b5c1aa2600}\index{test\_resmon\_plugin.cpp@{test\_resmon\_plugin.cpp}!BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}}
+\index{BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}!test\_resmon\_plugin.cpp@{test\_resmon\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_FIXTURE\_TEST\_CASE()}{BOOST\_FIXTURE\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [16/21]}}
+{\footnotesize\ttfamily \label{test__resmon__plugin_8cpp_a72aa2115725a3b668f5807b5c1aa2600} 
+BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{threshold\+Too\+Small}]{}{, }\item[{\mbox{\hyperlink{structresmon__fixture}{resmon\+\_\+fixture}}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__resmon__plugin_8cpp_source_l00096}{96}} of file \mbox{\hyperlink{test__resmon__plugin_8cpp_source}{test\+\_\+resmon\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00097\ \ \ \ \{}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ BOOST\_REQUIRE\_THROW(set\_options(\{\textcolor{stringliteral}{"{}-\/-\/resource-\/monitor-\/space-\/threshold=5"{}}\}),\ chain::plugin\_config\_exception);}
+\DoxyCodeLine{00099\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{test__resmon__plugin_8cpp_a7ee7252427cb0e8944418250987a11f3}\index{test\_resmon\_plugin.cpp@{test\_resmon\_plugin.cpp}!BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}}
+\index{BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}!test\_resmon\_plugin.cpp@{test\_resmon\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_FIXTURE\_TEST\_CASE()}{BOOST\_FIXTURE\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [17/21]}}
+{\footnotesize\ttfamily \label{test__resmon__plugin_8cpp_a7ee7252427cb0e8944418250987a11f3} 
+BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{warning\+Interval\+High\+Bound}]{}{, }\item[{\mbox{\hyperlink{structresmon__fixture}{resmon\+\_\+fixture}}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__resmon__plugin_8cpp_source_l00168}{168}} of file \mbox{\hyperlink{test__resmon__plugin_8cpp_source}{test\+\_\+resmon\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00169\ \ \ \ \{}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ BOOST\_REQUIRE\_NO\_THROW(set\_options(\{\textcolor{stringliteral}{"{}-\/-\/resource-\/monitor-\/warning-\/interval=450"{}}\}));}
+\DoxyCodeLine{00171\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{test__resmon__plugin_8cpp_a4d039edfa7e1b2937c1d5e8baaf31ad5}\index{test\_resmon\_plugin.cpp@{test\_resmon\_plugin.cpp}!BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}}
+\index{BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}!test\_resmon\_plugin.cpp@{test\_resmon\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_FIXTURE\_TEST\_CASE()}{BOOST\_FIXTURE\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [18/21]}}
+{\footnotesize\ttfamily \label{test__resmon__plugin_8cpp_a4d039edfa7e1b2937c1d5e8baaf31ad5} 
+BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{warning\+Interval\+Low\+Bound}]{}{, }\item[{\mbox{\hyperlink{structresmon__fixture}{resmon\+\_\+fixture}}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__resmon__plugin_8cpp_source_l00158}{158}} of file \mbox{\hyperlink{test__resmon__plugin_8cpp_source}{test\+\_\+resmon\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00159\ \ \ \ \{}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ BOOST\_REQUIRE\_NO\_THROW(set\_options(\{\textcolor{stringliteral}{"{}-\/-\/resource-\/monitor-\/warning-\/interval=1"{}}\}));}
+\DoxyCodeLine{00161\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{test__resmon__plugin_8cpp_a60f2131dd73b228f27e789cad7a50c83}\index{test\_resmon\_plugin.cpp@{test\_resmon\_plugin.cpp}!BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}}
+\index{BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}!test\_resmon\_plugin.cpp@{test\_resmon\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_FIXTURE\_TEST\_CASE()}{BOOST\_FIXTURE\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [19/21]}}
+{\footnotesize\ttfamily \label{test__resmon__plugin_8cpp_a60f2131dd73b228f27e789cad7a50c83} 
+BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{warning\+Interval\+Middle}]{}{, }\item[{\mbox{\hyperlink{structresmon__fixture}{resmon\+\_\+fixture}}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__resmon__plugin_8cpp_source_l00163}{163}} of file \mbox{\hyperlink{test__resmon__plugin_8cpp_source}{test\+\_\+resmon\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00164\ \ \ \ \{}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ BOOST\_REQUIRE\_NO\_THROW(set\_options(\{\textcolor{stringliteral}{"{}-\/-\/resource-\/monitor-\/warning-\/interval=225"{}}\}));}
+\DoxyCodeLine{00166\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{test__resmon__plugin_8cpp_a7073ad4e00cb2bf216498017d6485e18}\index{test\_resmon\_plugin.cpp@{test\_resmon\_plugin.cpp}!BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}}
+\index{BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}!test\_resmon\_plugin.cpp@{test\_resmon\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_FIXTURE\_TEST\_CASE()}{BOOST\_FIXTURE\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [20/21]}}
+{\footnotesize\ttfamily \label{test__resmon__plugin_8cpp_a7073ad4e00cb2bf216498017d6485e18} 
+BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{warning\+Interval\+Too\+Big}]{}{, }\item[{\mbox{\hyperlink{structresmon__fixture}{resmon\+\_\+fixture}}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__resmon__plugin_8cpp_source_l00148}{148}} of file \mbox{\hyperlink{test__resmon__plugin_8cpp_source}{test\+\_\+resmon\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00149\ \ \ \ \{}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ BOOST\_REQUIRE\_THROW(set\_options(\{\textcolor{stringliteral}{"{}-\/-\/resource-\/monitor-\/warning-\/interval=451"{}}\}),\ chain::plugin\_config\_exception);}
+\DoxyCodeLine{00151\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{test__resmon__plugin_8cpp_ae09fd8bcdd739c5bd4d46dfc23eff72e}\index{test\_resmon\_plugin.cpp@{test\_resmon\_plugin.cpp}!BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}}
+\index{BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}!test\_resmon\_plugin.cpp@{test\_resmon\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_FIXTURE\_TEST\_CASE()}{BOOST\_FIXTURE\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [21/21]}}
+{\footnotesize\ttfamily \label{test__resmon__plugin_8cpp_ae09fd8bcdd739c5bd4d46dfc23eff72e} 
+BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{warning\+Interval\+Too\+Small}]{}{, }\item[{\mbox{\hyperlink{structresmon__fixture}{resmon\+\_\+fixture}}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__resmon__plugin_8cpp_source_l00153}{153}} of file \mbox{\hyperlink{test__resmon__plugin_8cpp_source}{test\+\_\+resmon\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00154\ \ \ \ \{}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ BOOST\_REQUIRE\_THROW(set\_options(\{\textcolor{stringliteral}{"{}-\/-\/resource-\/monitor-\/warning-\/interval=0"{}}\}),\ chain::plugin\_config\_exception);}
+\DoxyCodeLine{00156\ \ \ \ \}}
+
+\end{DoxyCode}

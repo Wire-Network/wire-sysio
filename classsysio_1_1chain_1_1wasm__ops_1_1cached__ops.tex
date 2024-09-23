@@ -1,0 +1,54 @@
+\doxysection{sysio\+::chain\+::wasm\+\_\+ops\+::cached\+\_\+ops\texorpdfstring{$<$}{<} Op\+\_\+\+Types \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classsysio_1_1chain_1_1wasm__ops_1_1cached__ops}{}\label{classsysio_1_1chain_1_1wasm__ops_1_1cached__ops}\index{sysio::chain::wasm\_ops::cached\_ops$<$ Op\_Types $>$@{sysio::chain::wasm\_ops::cached\_ops$<$ Op\_Types $>$}}
+
+
+{\ttfamily \#include $<$wasm\+\_\+sysio\+\_\+binary\+\_\+ops.\+hpp$>$}
+
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static std\+::vector$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1instr}{instr}} \texorpdfstring{$\ast$}{*} $>$ \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classsysio_1_1chain_1_1wasm__ops_1_1cached__ops_a98fce1bc6d26a31ead0269f1d0294a55}{get\+\_\+cached\+\_\+ops}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} Op\+\_\+\+Types$>$\newline
+class sysio\+::chain\+::wasm\+\_\+ops\+::cached\+\_\+ops$<$ Op\+\_\+\+Types $>$}
+Section for cached ops 
+
+Definition at line \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_source_l00602}{602}} of file \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_source}{wasm\+\_\+sysio\+\_\+binary\+\_\+ops.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1chain_1_1wasm__ops_1_1cached__ops_a98fce1bc6d26a31ead0269f1d0294a55}\index{sysio::chain::wasm\_ops::cached\_ops$<$ Op\_Types $>$@{sysio::chain::wasm\_ops::cached\_ops$<$ Op\_Types $>$}!get\_cached\_ops@{get\_cached\_ops}}
+\index{get\_cached\_ops@{get\_cached\_ops}!sysio::chain::wasm\_ops::cached\_ops$<$ Op\_Types $>$@{sysio::chain::wasm\_ops::cached\_ops$<$ Op\_Types $>$}}
+\doxysubsubsection{\texorpdfstring{get\_cached\_ops()}{get\_cached\_ops()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1wasm__ops_1_1cached__ops_a98fce1bc6d26a31ead0269f1d0294a55} 
+template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} Op\+\_\+\+Types $>$ \\
+static std\+::vector$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1instr}{instr}} \texorpdfstring{$\ast$}{*} $>$ \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classsysio_1_1chain_1_1wasm__ops_1_1cached__ops}{sysio\+::chain\+::wasm\+\_\+ops\+::cached\+\_\+ops}}$<$ Op\+\_\+\+Types $>$\+::get\+\_\+cached\+\_\+ops (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_source_l00610}{610}} of file \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_source}{wasm\+\_\+sysio\+\_\+binary\+\_\+ops.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00610\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00611\ \textcolor{preprocessor}{\#define\ PUSH\_BACK\_OP(\ r,\ T,\ OP\ )\ \(\backslash\)}}
+\DoxyCodeLine{00612\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \_cached\_ops[BOOST\_PP\_CAT(OP,\_code)]\ =\ BOOST\_PP\_CAT(T,\ OP).get();}}
+\DoxyCodeLine{00613\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ \_cached\_ops.empty()\ )\ \{}
+\DoxyCodeLine{00614\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ prefill\ with\ error}}
+\DoxyCodeLine{00615\ \ \ \ \ \ \ \ \ \ \_cached\_ops.resize(\ 256,\ cached\_error.get()\ );}
+\DoxyCodeLine{00616\ \ \ \ \ \ \ \ \ \ BOOST\_PP\_SEQ\_FOR\_EACH(\ \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_a9936aac19603a83aab91c9272452de8b}{PUSH\_BACK\_OP}},\ cached\_\ ,\ \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_ae23c9979dd845f756f3c8bf4a8de5667}{WASM\_OP\_SEQ}}\ )}
+\DoxyCodeLine{00617\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00618\ \textcolor{preprocessor}{\#undef\ PUSH\_BACK\_OP}}
+\DoxyCodeLine{00619\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \&\_cached\_ops;}
+\DoxyCodeLine{00620\ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{wasm__sysio__binary__ops_8hpp}{wasm\+\_\+sysio\+\_\+binary\+\_\+ops.\+hpp}}\end{DoxyCompactItemize}

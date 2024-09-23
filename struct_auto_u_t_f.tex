@@ -1,0 +1,227 @@
+\doxysection{Auto\+UTF\texorpdfstring{$<$}{<} Char\+Type \texorpdfstring{$>$}{>} Struct Template Reference}
+\hypertarget{struct_auto_u_t_f}{}\label{struct_auto_u_t_f}\index{AutoUTF$<$ CharType $>$@{AutoUTF$<$ CharType $>$}}
+
+
+Dynamically select encoding according to stream\textquotesingle{}s runtime-\/specified UTF encoding type.  
+
+
+
+
+{\ttfamily \#include $<$encodings.\+h$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \{ \mbox{\hyperlink{struct_auto_u_t_f_ab0630ebb4330775acf381c27eb2ba00cadc86ae046cd64f591495ac635a5c04c2}{support\+Unicode}} = 1
+ \}
+\item 
+typedef Char\+Type \mbox{\hyperlink{struct_auto_u_t_f_a1dcd687806dff36d9e831023809da97e}{Ch}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename Output\+Stream $>$ }\\static RAPIDJSON\+\_\+\+FORCEINLINE void \mbox{\hyperlink{struct_auto_u_t_f_a414946115261f886e74dd42cb4b98781}{Encode}} (Output\+Stream \&os, unsigned codepoint)
+\item 
+{\footnotesize template$<$typename Output\+Stream $>$ }\\static RAPIDJSON\+\_\+\+FORCEINLINE void \mbox{\hyperlink{struct_auto_u_t_f_a05f5dcd1f153b61b763e44ed452de251}{Encode\+Unsafe}} (Output\+Stream \&os, unsigned codepoint)
+\item 
+{\footnotesize template$<$typename Input\+Stream $>$ }\\static RAPIDJSON\+\_\+\+FORCEINLINE bool \mbox{\hyperlink{struct_auto_u_t_f_aa5e3c1dc23dbb75f6442ff69500a35b0}{Decode}} (Input\+Stream \&is, unsigned \texorpdfstring{$\ast$}{*}codepoint)
+\item 
+{\footnotesize template$<$typename Input\+Stream , typename Output\+Stream $>$ }\\static RAPIDJSON\+\_\+\+FORCEINLINE bool \mbox{\hyperlink{struct_auto_u_t_f_a36dd6f226d6a07c12161e21c0aff20b1}{Validate}} (Input\+Stream \&is, Output\+Stream \&os)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Char\+Type$>$\newline
+struct Auto\+UTF$<$ Char\+Type $>$}
+\begin{DoxyNote}{Note}
+This class can be used with Auto\+UTFInputt\+Stream and \doxylink{class_auto_u_t_f_output_stream}{Auto\+UTFOutput\+Stream}, which provides Get\+Type(). 
+\end{DoxyNote}
+
+
+Definition at line \mbox{\hyperlink{encodings_8h_source_l00615}{615}} of file \mbox{\hyperlink{encodings_8h_source}{encodings.\+h}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{struct_auto_u_t_f_a1dcd687806dff36d9e831023809da97e}\index{AutoUTF$<$ CharType $>$@{AutoUTF$<$ CharType $>$}!Ch@{Ch}}
+\index{Ch@{Ch}!AutoUTF$<$ CharType $>$@{AutoUTF$<$ CharType $>$}}
+\doxysubsubsection{\texorpdfstring{Ch}{Ch}}
+{\footnotesize\ttfamily \label{struct_auto_u_t_f_a1dcd687806dff36d9e831023809da97e} 
+template$<$typename Char\+Type $>$ \\
+Char\+Type \mbox{\hyperlink{struct_auto_u_t_f}{Auto\+UTF}}$<$ Char\+Type $>$\+::\+Ch}
+
+
+
+Definition at line \mbox{\hyperlink{encodings_8h_source_l00616}{616}} of file \mbox{\hyperlink{encodings_8h_source}{encodings.\+h}}.
+
+
+
+\doxysubsection{Member Enumeration Documentation}
+\Hypertarget{struct_auto_u_t_f_ab0630ebb4330775acf381c27eb2ba00c}\doxysubsubsection{\texorpdfstring{anonymous enum}{anonymous enum}}
+{\footnotesize\ttfamily \label{struct_auto_u_t_f_ab0630ebb4330775acf381c27eb2ba00c} 
+template$<$typename Char\+Type $>$ \\
+anonymous enum}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{supportUnicode@{supportUnicode}!AutoUTF$<$ CharType $>$@{AutoUTF$<$ CharType $>$}}\index{AutoUTF$<$ CharType $>$@{AutoUTF$<$ CharType $>$}!supportUnicode@{supportUnicode}}}\Hypertarget{struct_auto_u_t_f_ab0630ebb4330775acf381c27eb2ba00cadc86ae046cd64f591495ac635a5c04c2}\label{struct_auto_u_t_f_ab0630ebb4330775acf381c27eb2ba00c} 
+support\+Unicode&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{encodings_8h_source_l00618}{618}} of file \mbox{\hyperlink{encodings_8h_source}{encodings.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00618\ \{\ \mbox{\hyperlink{struct_auto_u_t_f_ab0630ebb4330775acf381c27eb2ba00cadc86ae046cd64f591495ac635a5c04c2}{supportUnicode}}\ =\ 1\ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_auto_u_t_f_aa5e3c1dc23dbb75f6442ff69500a35b0}\index{AutoUTF$<$ CharType $>$@{AutoUTF$<$ CharType $>$}!Decode@{Decode}}
+\index{Decode@{Decode}!AutoUTF$<$ CharType $>$@{AutoUTF$<$ CharType $>$}}
+\doxysubsubsection{\texorpdfstring{Decode()}{Decode()}}
+{\footnotesize\ttfamily \label{struct_auto_u_t_f_aa5e3c1dc23dbb75f6442ff69500a35b0} 
+template$<$typename Char\+Type $>$ \\
+template$<$typename Input\+Stream $>$ \\
+static RAPIDJSON\+\_\+\+FORCEINLINE bool \mbox{\hyperlink{struct_auto_u_t_f}{Auto\+UTF}}$<$ Char\+Type $>$\+::\+Decode (\begin{DoxyParamCaption}\item[{Input\+Stream \&}]{is}{, }\item[{unsigned \texorpdfstring{$\ast$}{*}}]{codepoint}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{encodings_8h_source_l00637}{637}} of file \mbox{\hyperlink{encodings_8h_source}{encodings.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00637\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00638\ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ bool\ (*DecodeFunc)(InputStream\&,\ \textcolor{keywordtype}{unsigned}*);}
+\DoxyCodeLine{00639\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ DecodeFunc\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}[]\ =\ \{\ \mbox{\hyperlink{encodings_8h_a6530c8834a049a0ff230b56072df6c24}{RAPIDJSON\_ENCODINGS\_FUNC}}(\mbox{\hyperlink{struct_auto_u_t_f_aa5e3c1dc23dbb75f6442ff69500a35b0}{Decode}})\ \};}
+\DoxyCodeLine{00640\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (*\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}[is.GetType()])(is,\ codepoint);}
+\DoxyCodeLine{00641\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=176pt]{struct_auto_u_t_f_aa5e3c1dc23dbb75f6442ff69500a35b0_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=176pt]{struct_auto_u_t_f_aa5e3c1dc23dbb75f6442ff69500a35b0_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_auto_u_t_f_a414946115261f886e74dd42cb4b98781}\index{AutoUTF$<$ CharType $>$@{AutoUTF$<$ CharType $>$}!Encode@{Encode}}
+\index{Encode@{Encode}!AutoUTF$<$ CharType $>$@{AutoUTF$<$ CharType $>$}}
+\doxysubsubsection{\texorpdfstring{Encode()}{Encode()}}
+{\footnotesize\ttfamily \label{struct_auto_u_t_f_a414946115261f886e74dd42cb4b98781} 
+template$<$typename Char\+Type $>$ \\
+template$<$typename Output\+Stream $>$ \\
+static RAPIDJSON\+\_\+\+FORCEINLINE void \mbox{\hyperlink{struct_auto_u_t_f}{Auto\+UTF}}$<$ Char\+Type $>$\+::\+Encode (\begin{DoxyParamCaption}\item[{Output\+Stream \&}]{os}{, }\item[{unsigned}]{codepoint}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{encodings_8h_source_l00623}{623}} of file \mbox{\hyperlink{encodings_8h_source}{encodings.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00623\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00624\ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ void\ (*EncodeFunc)(OutputStream\&,\ unsigned);}
+\DoxyCodeLine{00625\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ EncodeFunc\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}[]\ =\ \{\ \mbox{\hyperlink{encodings_8h_a6530c8834a049a0ff230b56072df6c24}{RAPIDJSON\_ENCODINGS\_FUNC}}(\mbox{\hyperlink{struct_auto_u_t_f_a414946115261f886e74dd42cb4b98781}{Encode}})\ \};}
+\DoxyCodeLine{00626\ \ \ \ \ \ \ \ \ (*\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}[os.GetType()])(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ codepoint);}
+\DoxyCodeLine{00627\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=175pt]{struct_auto_u_t_f_a414946115261f886e74dd42cb4b98781_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=175pt]{struct_auto_u_t_f_a414946115261f886e74dd42cb4b98781_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_auto_u_t_f_a05f5dcd1f153b61b763e44ed452de251}\index{AutoUTF$<$ CharType $>$@{AutoUTF$<$ CharType $>$}!EncodeUnsafe@{EncodeUnsafe}}
+\index{EncodeUnsafe@{EncodeUnsafe}!AutoUTF$<$ CharType $>$@{AutoUTF$<$ CharType $>$}}
+\doxysubsubsection{\texorpdfstring{EncodeUnsafe()}{EncodeUnsafe()}}
+{\footnotesize\ttfamily \label{struct_auto_u_t_f_a05f5dcd1f153b61b763e44ed452de251} 
+template$<$typename Char\+Type $>$ \\
+template$<$typename Output\+Stream $>$ \\
+static RAPIDJSON\+\_\+\+FORCEINLINE void \mbox{\hyperlink{struct_auto_u_t_f}{Auto\+UTF}}$<$ Char\+Type $>$\+::\+Encode\+Unsafe (\begin{DoxyParamCaption}\item[{Output\+Stream \&}]{os}{, }\item[{unsigned}]{codepoint}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{encodings_8h_source_l00630}{630}} of file \mbox{\hyperlink{encodings_8h_source}{encodings.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00630\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00631\ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ void\ (*EncodeFunc)(OutputStream\&,\ unsigned);}
+\DoxyCodeLine{00632\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ EncodeFunc\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}[]\ =\ \{\ \mbox{\hyperlink{encodings_8h_a6530c8834a049a0ff230b56072df6c24}{RAPIDJSON\_ENCODINGS\_FUNC}}(\mbox{\hyperlink{struct_auto_u_t_f_a05f5dcd1f153b61b763e44ed452de251}{EncodeUnsafe}})\ \};}
+\DoxyCodeLine{00633\ \ \ \ \ \ \ \ \ (*\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}[os.GetType()])(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ codepoint);}
+\DoxyCodeLine{00634\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=206pt]{struct_auto_u_t_f_a05f5dcd1f153b61b763e44ed452de251_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=206pt]{struct_auto_u_t_f_a05f5dcd1f153b61b763e44ed452de251_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_auto_u_t_f_a36dd6f226d6a07c12161e21c0aff20b1}\index{AutoUTF$<$ CharType $>$@{AutoUTF$<$ CharType $>$}!Validate@{Validate}}
+\index{Validate@{Validate}!AutoUTF$<$ CharType $>$@{AutoUTF$<$ CharType $>$}}
+\doxysubsubsection{\texorpdfstring{Validate()}{Validate()}}
+{\footnotesize\ttfamily \label{struct_auto_u_t_f_a36dd6f226d6a07c12161e21c0aff20b1} 
+template$<$typename Char\+Type $>$ \\
+template$<$typename Input\+Stream , typename Output\+Stream $>$ \\
+static RAPIDJSON\+\_\+\+FORCEINLINE bool \mbox{\hyperlink{struct_auto_u_t_f}{Auto\+UTF}}$<$ Char\+Type $>$\+::\+Validate (\begin{DoxyParamCaption}\item[{Input\+Stream \&}]{is}{, }\item[{Output\+Stream \&}]{os}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{encodings_8h_source_l00644}{644}} of file \mbox{\hyperlink{encodings_8h_source}{encodings.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00644\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00645\ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ bool\ (*ValidateFunc)(InputStream\&,\ OutputStream\&);}
+\DoxyCodeLine{00646\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ ValidateFunc\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}[]\ =\ \{\ \mbox{\hyperlink{encodings_8h_a6530c8834a049a0ff230b56072df6c24}{RAPIDJSON\_ENCODINGS\_FUNC}}(\mbox{\hyperlink{struct_auto_u_t_f_a36dd6f226d6a07c12161e21c0aff20b1}{Validate}})\ \};}
+\DoxyCodeLine{00647\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (*\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}[is.GetType()])(is,\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
+\DoxyCodeLine{00648\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=176pt]{struct_auto_u_t_f_a36dd6f226d6a07c12161e21c0aff20b1_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=176pt]{struct_auto_u_t_f_a36dd6f226d6a07c12161e21c0aff20b1_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/\mbox{\hyperlink{encodings_8h}{encodings.\+h}}\end{DoxyCompactItemize}

@@ -1,0 +1,71 @@
+\doxysection{fc\+::if\+\_\+enum\texorpdfstring{$<$}{<} Is\+Reflected \texorpdfstring{$>$}{>} Struct Template Reference}
+\hypertarget{structfc_1_1if__enum}{}\label{structfc_1_1if__enum}\index{fc::if\_enum$<$ IsReflected $>$@{fc::if\_enum$<$ IsReflected $>$}}
+
+
+{\ttfamily \#include $<$variant.\+hpp$>$}
+
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\static void \mbox{\hyperlink{structfc_1_1if__enum_a887c2ae7615074bf40b293aeabb748a3}{to\+\_\+variant}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&v, \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&vo)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\static void \mbox{\hyperlink{structfc_1_1if__enum_a515a22cd66ac2c9020fa6407a130c697}{from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&v, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&o)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Is\+Reflected = fc\+::false\+\_\+type$>$\newline
+struct fc\+::if\+\_\+enum$<$ Is\+Reflected $>$}
+
+
+Definition at line \mbox{\hyperlink{fc_2include_2fc_2reflect_2variant_8hpp_source_l00061}{61}} of file \mbox{\hyperlink{fc_2include_2fc_2reflect_2variant_8hpp_source}{variant.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structfc_1_1if__enum_a515a22cd66ac2c9020fa6407a130c697}\index{fc::if\_enum$<$ IsReflected $>$@{fc::if\_enum$<$ IsReflected $>$}!from\_variant@{from\_variant}}
+\index{from\_variant@{from\_variant}!fc::if\_enum$<$ IsReflected $>$@{fc::if\_enum$<$ IsReflected $>$}}
+\doxysubsubsection{\texorpdfstring{from\_variant()}{from\_variant()}}
+{\footnotesize\ttfamily \label{structfc_1_1if__enum_a515a22cd66ac2c9020fa6407a130c697} 
+template$<$typename Is\+Reflected  = fc\+::false\+\_\+type$>$ \\
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+static void \mbox{\hyperlink{structfc_1_1if__enum}{fc\+::if\+\_\+enum}}$<$ Is\+Reflected $>$\+::from\+\_\+variant (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&}]{v}{, }\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{o}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{fc_2include_2fc_2reflect_2variant_8hpp_source_l00071}{71}} of file \mbox{\hyperlink{fc_2include_2fc_2reflect_2variant_8hpp_source}{variant.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00072\ \ \ \ \ \ \{\ }
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ variant\_object\&\ vo\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.get\_object();}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1reflector}{fc::reflector<T>::visit}}(\ from\_variant\_visitor<T>(\ vo,\ o\ )\ );}
+\DoxyCodeLine{00075\ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structfc_1_1if__enum_a887c2ae7615074bf40b293aeabb748a3}\index{fc::if\_enum$<$ IsReflected $>$@{fc::if\_enum$<$ IsReflected $>$}!to\_variant@{to\_variant}}
+\index{to\_variant@{to\_variant}!fc::if\_enum$<$ IsReflected $>$@{fc::if\_enum$<$ IsReflected $>$}}
+\doxysubsubsection{\texorpdfstring{to\_variant()}{to\_variant()}}
+{\footnotesize\ttfamily \label{structfc_1_1if__enum_a887c2ae7615074bf40b293aeabb748a3} 
+template$<$typename Is\+Reflected  = fc\+::false\+\_\+type$>$ \\
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+static void \mbox{\hyperlink{structfc_1_1if__enum}{fc\+::if\+\_\+enum}}$<$ Is\+Reflected $>$\+::to\+\_\+variant (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{v}{, }\item[{\mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&}]{vo}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{fc_2include_2fc_2reflect_2variant_8hpp_source_l00064}{64}} of file \mbox{\hyperlink{fc_2include_2fc_2reflect_2variant_8hpp_source}{variant.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00065\ \ \ \ \ \ \{\ }
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ mutable\_variant\_object\ mvo;}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1reflector}{fc::reflector<T>::visit}}(\ to\_variant\_visitor<T>(\ mvo,\ v\ )\ );}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ vo\ =\ fc::move(mvo);}
+\DoxyCodeLine{00069\ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/reflect/\mbox{\hyperlink{fc_2include_2fc_2reflect_2variant_8hpp}{variant.\+hpp}}\end{DoxyCompactItemize}

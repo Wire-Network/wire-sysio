@@ -1,0 +1,255 @@
+\doxysection{sysio\+::trace\+\_\+api\+\_\+plugin Class Reference}
+\hypertarget{classsysio_1_1trace__api__plugin}{}\label{classsysio_1_1trace__api__plugin}\index{sysio::trace\_api\_plugin@{sysio::trace\_api\_plugin}}
+
+
+{\ttfamily \#include $<$trace\+\_\+api\+\_\+plugin.\+hpp$>$}
+
+
+
+Inheritance diagram for sysio\+::trace\+\_\+api\+\_\+plugin\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=205pt]{classsysio_1_1trace__api__plugin__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for sysio\+::trace\+\_\+api\+\_\+plugin\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=205pt]{classsysio_1_1trace__api__plugin__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classsysio_1_1trace__api__plugin_ae9ad0efa3662acf28762e1546a834b8a}{APPBASE\+\_\+\+PLUGIN\+\_\+\+REQUIRES}} ((\mbox{\hyperlink{classsysio_1_1chain__plugin}{chain\+\_\+plugin}})(\mbox{\hyperlink{classsysio_1_1http__plugin}{http\+\_\+plugin}})) \mbox{\hyperlink{classsysio_1_1trace__api__plugin}{trace\+\_\+api\+\_\+plugin}}()
+\item 
+virtual \mbox{\hyperlink{classsysio_1_1trace__api__plugin_ac7dba36c1849dd6ef2219df6d500c455}{\texorpdfstring{$\sim$}{\string~}trace\+\_\+api\+\_\+plugin}} ()
+\item 
+virtual void \mbox{\hyperlink{classsysio_1_1trace__api__plugin_a5a0e7ac1e000477c233406a4dc391083}{set\+\_\+program\+\_\+options}} (appbase\+::options\+\_\+description \&\mbox{\hyperlink{xbyak__mnemonic_8h_a4229a9b84f8b8673326f12bd41acd27c}{cli}}, appbase\+::options\+\_\+description \&cfg) override
+\item 
+void \mbox{\hyperlink{classsysio_1_1trace__api__plugin_a4a053fadb8db3ada0d5af210db43a7af}{plugin\+\_\+initialize}} (const appbase\+::variables\+\_\+map \&options)
+\item 
+void \mbox{\hyperlink{classsysio_1_1trace__api__plugin_a8ddefbdbaf9cb575550afd516985b429}{plugin\+\_\+startup}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1trace__api__plugin_a6d2466cca98939954a9d47c6e8f42caf}{plugin\+\_\+shutdown}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1trace__api__plugin_aca24a14fa319b5bed80374e065c4302f}{handle\+\_\+sighup}} () override
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classappbase_1_1plugin}{appbase\+::plugin$<$ trace\+\_\+api\+\_\+plugin $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classappbase_1_1plugin_a3cf5509f2854ffb274018dca8606c50a}{plugin}} ()
+\item 
+virtual \mbox{\hyperlink{classappbase_1_1plugin_a6c83bcf2c8ee3de87593824da807e4ba}{\texorpdfstring{$\sim$}{\string~}plugin}} ()
+\item 
+virtual \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408}{state}} \mbox{\hyperlink{classappbase_1_1plugin_a857288c2424b57a898c0579d25dacbb0}{get\+\_\+state}} () const override
+\item 
+virtual const std\+::string \& \mbox{\hyperlink{classappbase_1_1plugin_a274f072d2f7f37d43ae74e01edd0ba62}{name}} () const override
+\item 
+virtual void \mbox{\hyperlink{classappbase_1_1plugin_a6a0cd7ccc873527ebb5e6716b249ea17}{register\+\_\+dependencies}} ()
+\item 
+virtual void \mbox{\hyperlink{classappbase_1_1plugin_ac28755a82831d41e5d0ef0ce56b10fa9}{initialize}} (const variables\+\_\+map \&options) override
+\item 
+virtual void \mbox{\hyperlink{classappbase_1_1plugin_a10e4e1c582bfadf67f510df76d87abfd}{startup}} () override
+\item 
+virtual void \mbox{\hyperlink{classappbase_1_1plugin_a21e5be5587fca41fbc91367d449b8f27}{shutdown}} () override
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classappbase_1_1abstract__plugin}{appbase\+::abstract\+\_\+plugin}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4643a2618ac94aa2ef56e59fe363f828}{\texorpdfstring{$\sim$}{\string~}abstract\+\_\+plugin}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Public Types inherited from \mbox{\hyperlink{classappbase_1_1abstract__plugin}{appbase\+::abstract\+\_\+plugin}}}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408}{state}} \{ \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408ac712ce3482a78b8bf87080aefd77cf7d}{registered}}
+, \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408a9ae208bba76e9c0eab1cac52953f947b}{initialized}}
+, \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408a808ebbf475942017567644697eca3224}{started}}
+, \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408a320c2eebb5306f385aebfca07336d29e}{stopped}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Member Functions inherited from \mbox{\hyperlink{classappbase_1_1plugin}{appbase\+::plugin$<$ trace\+\_\+api\+\_\+plugin $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classappbase_1_1plugin_a51f43c3c64ab8524928698a72a186822}{plugin}} (const string \&\mbox{\hyperlink{classappbase_1_1plugin_a274f072d2f7f37d43ae74e01edd0ba62}{name}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Plugin that runs both a data extraction and the HTTP RPC in the same application 
+
+Definition at line \mbox{\hyperlink{trace__api__plugin_8hpp_source_l00010}{10}} of file \mbox{\hyperlink{trace__api__plugin_8hpp_source}{trace\+\_\+api\+\_\+plugin.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classsysio_1_1trace__api__plugin_ac7dba36c1849dd6ef2219df6d500c455}\index{sysio::trace\_api\_plugin@{sysio::trace\_api\_plugin}!````~trace\_api\_plugin@{\texorpdfstring{$\sim$}{\string~}trace\_api\_plugin}}
+\index{````~trace\_api\_plugin@{\texorpdfstring{$\sim$}{\string~}trace\_api\_plugin}!sysio::trace\_api\_plugin@{sysio::trace\_api\_plugin}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}trace\_api\_plugin()}{\string~trace\_api\_plugin()}}
+{\footnotesize\ttfamily \label{classsysio_1_1trace__api__plugin_ac7dba36c1849dd6ef2219df6d500c455} 
+sysio\+::trace\+\_\+api\+\_\+plugin\+::\texorpdfstring{$\sim$}{\string~}trace\+\_\+api\+\_\+plugin (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{trace__api__plugin_8cpp_source_l00428}{428}} of file \mbox{\hyperlink{trace__api__plugin_8cpp_source}{trace\+\_\+api\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00429\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1trace__api__plugin_ae9ad0efa3662acf28762e1546a834b8a}\index{sysio::trace\_api\_plugin@{sysio::trace\_api\_plugin}!APPBASE\_PLUGIN\_REQUIRES@{APPBASE\_PLUGIN\_REQUIRES}}
+\index{APPBASE\_PLUGIN\_REQUIRES@{APPBASE\_PLUGIN\_REQUIRES}!sysio::trace\_api\_plugin@{sysio::trace\_api\_plugin}}
+\doxysubsubsection{\texorpdfstring{APPBASE\_PLUGIN\_REQUIRES()}{APPBASE\_PLUGIN\_REQUIRES()}}
+{\footnotesize\ttfamily \label{classsysio_1_1trace__api__plugin_ae9ad0efa3662acf28762e1546a834b8a} 
+sysio\+::trace\+\_\+api\+\_\+plugin\+::\+APPBASE\+\_\+\+PLUGIN\+\_\+\+REQUIRES (\begin{DoxyParamCaption}\item[{(\mbox{\hyperlink{classsysio_1_1chain__plugin}{chain\+\_\+plugin}})(\mbox{\hyperlink{classsysio_1_1http__plugin}{http\+\_\+plugin}})}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{classsysio_1_1trace__api__plugin_aca24a14fa319b5bed80374e065c4302f}\index{sysio::trace\_api\_plugin@{sysio::trace\_api\_plugin}!handle\_sighup@{handle\_sighup}}
+\index{handle\_sighup@{handle\_sighup}!sysio::trace\_api\_plugin@{sysio::trace\_api\_plugin}}
+\doxysubsubsection{\texorpdfstring{handle\_sighup()}{handle\_sighup()}}
+{\footnotesize\ttfamily \label{classsysio_1_1trace__api__plugin_aca24a14fa319b5bed80374e065c4302f} 
+void sysio\+::trace\+\_\+api\+\_\+plugin\+::handle\+\_\+sighup (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classappbase_1_1plugin_ab314bd778e71a91de584cd9b8a999867}{appbase\+::plugin$<$ trace\+\_\+api\+\_\+plugin $>$}}.
+
+
+
+Definition at line \mbox{\hyperlink{trace__api__plugin_8cpp_source_l00461}{461}} of file \mbox{\hyperlink{trace__api__plugin_8cpp_source}{trace\+\_\+api\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00461\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00462\ \ \ \ \mbox{\hyperlink{classfc_1_1logger_a2214632598874a4e52a5500a6346515e}{fc::logger::update}}(\ \mbox{\hyperlink{namespacesysio_ad66b67a8dd0a897a0a5b89f954fd3ade}{logger\_name}},\ \mbox{\hyperlink{producer__plugin_8cpp_adff615e9fbe43b3e6443687be568cffd}{\_log}}\ );}
+\DoxyCodeLine{00463\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1trace__api__plugin_aca24a14fa319b5bed80374e065c4302f_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=348pt]{classsysio_1_1trace__api__plugin_aca24a14fa319b5bed80374e065c4302f_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1trace__api__plugin_a4a053fadb8db3ada0d5af210db43a7af}\index{sysio::trace\_api\_plugin@{sysio::trace\_api\_plugin}!plugin\_initialize@{plugin\_initialize}}
+\index{plugin\_initialize@{plugin\_initialize}!sysio::trace\_api\_plugin@{sysio::trace\_api\_plugin}}
+\doxysubsubsection{\texorpdfstring{plugin\_initialize()}{plugin\_initialize()}}
+{\footnotesize\ttfamily \label{classsysio_1_1trace__api__plugin_a4a053fadb8db3ada0d5af210db43a7af} 
+void sysio\+::trace\+\_\+api\+\_\+plugin\+::plugin\+\_\+initialize (\begin{DoxyParamCaption}\item[{const appbase\+::variables\+\_\+map \&}]{options}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{trace__api__plugin_8cpp_source_l00437}{437}} of file \mbox{\hyperlink{trace__api__plugin_8cpp_source}{trace\+\_\+api\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00437\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00438\ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacecommon}{common}}\ =\ std::make\_shared<trace\_api\_common\_impl>();}
+\DoxyCodeLine{00439\ \ \ \ \mbox{\hyperlink{namespacecommon}{common}}-\/>plugin\_initialize(options);}
+\DoxyCodeLine{00440\ }
+\DoxyCodeLine{00441\ \ \ \ my\ =\ std::make\_shared<trace\_api\_plugin\_impl>(\mbox{\hyperlink{namespacecommon}{common}});}
+\DoxyCodeLine{00442\ \ \ \ my-\/>plugin\_initialize(options);}
+\DoxyCodeLine{00443\ }
+\DoxyCodeLine{00444\ \ \ \ rpc\ =\ std::make\_shared<trace\_api\_rpc\_plugin\_impl>(\mbox{\hyperlink{namespacecommon}{common}});}
+\DoxyCodeLine{00445\ \ \ \ rpc-\/>plugin\_initialize(options);}
+\DoxyCodeLine{00446\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1trace__api__plugin_a6d2466cca98939954a9d47c6e8f42caf}\index{sysio::trace\_api\_plugin@{sysio::trace\_api\_plugin}!plugin\_shutdown@{plugin\_shutdown}}
+\index{plugin\_shutdown@{plugin\_shutdown}!sysio::trace\_api\_plugin@{sysio::trace\_api\_plugin}}
+\doxysubsubsection{\texorpdfstring{plugin\_shutdown()}{plugin\_shutdown()}}
+{\footnotesize\ttfamily \label{classsysio_1_1trace__api__plugin_a6d2466cca98939954a9d47c6e8f42caf} 
+void sysio\+::trace\+\_\+api\+\_\+plugin\+::plugin\+\_\+shutdown (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{trace__api__plugin_8cpp_source_l00455}{455}} of file \mbox{\hyperlink{trace__api__plugin_8cpp_source}{trace\+\_\+api\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00455\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00456\ \ \ \ my-\/>plugin\_shutdown();}
+\DoxyCodeLine{00457\ \ \ \ rpc-\/>plugin\_shutdown();}
+\DoxyCodeLine{00458\ \ \ \ \mbox{\hyperlink{logger_8hpp_a067e87b091ade3787bcdda5775354654}{fc\_ilog}}(\ \mbox{\hyperlink{producer__plugin_8cpp_adff615e9fbe43b3e6443687be568cffd}{\_log}},\ \textcolor{stringliteral}{"{}exit\ shutdown"{}});}
+\DoxyCodeLine{00459\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1trace__api__plugin_a8ddefbdbaf9cb575550afd516985b429}\index{sysio::trace\_api\_plugin@{sysio::trace\_api\_plugin}!plugin\_startup@{plugin\_startup}}
+\index{plugin\_startup@{plugin\_startup}!sysio::trace\_api\_plugin@{sysio::trace\_api\_plugin}}
+\doxysubsubsection{\texorpdfstring{plugin\_startup()}{plugin\_startup()}}
+{\footnotesize\ttfamily \label{classsysio_1_1trace__api__plugin_a8ddefbdbaf9cb575550afd516985b429} 
+void sysio\+::trace\+\_\+api\+\_\+plugin\+::plugin\+\_\+startup (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{trace__api__plugin_8cpp_source_l00448}{448}} of file \mbox{\hyperlink{trace__api__plugin_8cpp_source}{trace\+\_\+api\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00448\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00449\ \ \ \ \mbox{\hyperlink{classsysio_1_1trace__api__plugin_aca24a14fa319b5bed80374e065c4302f}{handle\_sighup}}();\ \textcolor{comment}{//\ setup\ logging}}
+\DoxyCodeLine{00450\ }
+\DoxyCodeLine{00451\ \ \ \ my-\/>plugin\_startup();}
+\DoxyCodeLine{00452\ \ \ \ rpc-\/>plugin\_startup();}
+\DoxyCodeLine{00453\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1trace__api__plugin_a8ddefbdbaf9cb575550afd516985b429_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1trace__api__plugin_a5a0e7ac1e000477c233406a4dc391083}\index{sysio::trace\_api\_plugin@{sysio::trace\_api\_plugin}!set\_program\_options@{set\_program\_options}}
+\index{set\_program\_options@{set\_program\_options}!sysio::trace\_api\_plugin@{sysio::trace\_api\_plugin}}
+\doxysubsubsection{\texorpdfstring{set\_program\_options()}{set\_program\_options()}}
+{\footnotesize\ttfamily \label{classsysio_1_1trace__api__plugin_a5a0e7ac1e000477c233406a4dc391083} 
+void sysio\+::trace\+\_\+api\+\_\+plugin\+::set\+\_\+program\+\_\+options (\begin{DoxyParamCaption}\item[{appbase\+::options\+\_\+description \&}]{cli}{, }\item[{appbase\+::options\+\_\+description \&}]{cfg}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classappbase_1_1abstract__plugin_a274a3c7462de3c699a8eb23741ed7655}{appbase\+::abstract\+\_\+plugin}}.
+
+
+
+Definition at line \mbox{\hyperlink{trace__api__plugin_8cpp_source_l00431}{431}} of file \mbox{\hyperlink{trace__api__plugin_8cpp_source}{trace\+\_\+api\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00431\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00432\ \ \ \ \mbox{\hyperlink{structsysio_1_1trace__api__common__impl_a84ce804ca16e921b4448537fd0d2e0b7}{trace\_api\_common\_impl::set\_program\_options}}(\mbox{\hyperlink{xbyak__mnemonic_8h_a4229a9b84f8b8673326f12bd41acd27c}{cli}},\ cfg);}
+\DoxyCodeLine{00433\ \ \ \ \mbox{\hyperlink{structsysio_1_1trace__api__plugin__impl_a7d8787f635f0dcf2b2824199f8171903}{trace\_api\_plugin\_impl::set\_program\_options}}(\mbox{\hyperlink{xbyak__mnemonic_8h_a4229a9b84f8b8673326f12bd41acd27c}{cli}},\ cfg);}
+\DoxyCodeLine{00434\ \ \ \ \mbox{\hyperlink{structsysio_1_1trace__api__rpc__plugin__impl_a47813f526ec1792c77fba7bba237c231}{trace\_api\_rpc\_plugin\_impl::set\_program\_options}}(\mbox{\hyperlink{xbyak__mnemonic_8h_a4229a9b84f8b8673326f12bd41acd27c}{cli}},\ cfg);}
+\DoxyCodeLine{00435\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1trace__api__plugin_a5a0e7ac1e000477c233406a4dc391083_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+plugins/trace\+\_\+api\+\_\+plugin/include/sysio/trace\+\_\+api/\mbox{\hyperlink{trace__api__plugin_8hpp}{trace\+\_\+api\+\_\+plugin.\+hpp}}\item 
+plugins/trace\+\_\+api\+\_\+plugin/\mbox{\hyperlink{trace__api__plugin_8cpp}{trace\+\_\+api\+\_\+plugin.\+cpp}}\end{DoxyCompactItemize}

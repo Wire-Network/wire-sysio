@@ -1,0 +1,73 @@
+\doxysection{chain\+\_\+id\+\_\+type.\+hpp}
+\hypertarget{chain__id__type_8hpp_source}{}\label{chain__id__type_8hpp_source}\index{libraries/chain/include/sysio/chain/chain\_id\_type.hpp@{libraries/chain/include/sysio/chain/chain\_id\_type.hpp}}
+\mbox{\hyperlink{chain__id__type_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{sha256_8hpp}{fc/crypto/sha256.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00005}00005\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{}
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00007}00007\ \ \ \ \textcolor{keyword}{class\ }net\_plugin\_impl;}
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00008}00008\ \ \ \ \textcolor{keyword}{struct\ }handshake\_message;}
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00010}\mbox{\hyperlink{namespacesysio_1_1chain__apis}{00010}}\ \ \ \ \textcolor{keyword}{namespace\ }chain\_apis\ \{}
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00011}00011\ \ \ \ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1chain__apis_1_1read__only}{read\_only}};}
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00012}00012\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00014}00014\ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1chain__plugin}{chain\_plugin}};}
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00016}00016\ \textcolor{keyword}{namespace\ }chain\ \{}
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00018}00018\ \ \ \ \textcolor{keyword}{namespace\ }legacy\ \{}
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00019}00019\ \ \ \ \ \ \ \textcolor{keyword}{struct\ }snapshot\_global\_property\_object\_v3;}
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00020}00020\ \ \ \ \ \ \ \textcolor{keyword}{struct\ }snapshot\_global\_property\_object\_v4;}
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00021}00021\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00023}\mbox{\hyperlink{structsysio_1_1chain_1_1chain__id__type}{00023}}\ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structsysio_1_1chain_1_1chain__id__type}{chain\_id\_type}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classfc_1_1sha256}{fc::sha256}}\ \{}
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00024}00024\ \ \ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classfc_1_1sha256_a487dc3d04d546dc25c1470451775c160}{fc::sha256::sha256}};}
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00026}00026\ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00027}\mbox{\hyperlink{structsysio_1_1chain_1_1chain__id__type_aef08495400fd517a9c14b244fea4a63e}{00027}}\ \ \ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{friend}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__id__type_aef08495400fd517a9c14b244fea4a63e}{operator<<}}(\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ ds,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__id__type}{chain\_id\_type}}\&\ cid\ )\ \{}
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00028}00028\ \ \ \ \ \ \ \ \ ds.write(\ cid.\mbox{\hyperlink{classfc_1_1sha256_ab897537f6c524085b28049be51ed370d}{data}}(),\ cid.\mbox{\hyperlink{classfc_1_1sha256_ac7722b7428b1db345f1b7fab7f4d5774}{data\_size}}()\ );}
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00029}00029\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ds;}
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00030}00030\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00032}00032\ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00033}\mbox{\hyperlink{structsysio_1_1chain_1_1chain__id__type_a79db552cc126400311f5df577b127a83}{00033}}\ \ \ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{friend}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__id__type_a79db552cc126400311f5df577b127a83}{operator>>}}(\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ ds,\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__id__type}{chain\_id\_type}}\&\ cid\ )\ \{}
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00034}00034\ \ \ \ \ \ \ \ \ ds.read(\ cid.\mbox{\hyperlink{classfc_1_1sha256_ab897537f6c524085b28049be51ed370d}{data}}(),\ cid.\mbox{\hyperlink{classfc_1_1sha256_ac7722b7428b1db345f1b7fab7f4d5774}{data\_size}}()\ );}
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00035}00035\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ds;}
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00036}00036\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00038}00038\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__id__type_a27ec5d206e83569e9548340a544c8f7e}{reflector\_init}}()\textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00040}00040\ \ \ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00041}00041\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__id__type}{chain\_id\_type}}()\ =\ \textcolor{keywordflow}{default};}
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00043}00043\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Some\ exceptions\ are\ unfortunately\ necessary:}}
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00044}00044\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00045}\mbox{\hyperlink{structsysio_1_1chain_1_1chain__id__type_ab741def6cc11d62ae862e5f77aec5f1c}{00045}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{friend}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \mbox{\hyperlink{classfc_1_1variant_a82edd1f33199355d3a1f19bbb92909cc}{fc::variant::as}}()\textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00047}\mbox{\hyperlink{structsysio_1_1chain_1_1chain__id__type_adab47581e754ab2933729d9ccd85b833}{00047}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{friend}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1chain__apis_1_1read__only}{sysio::chain\_apis::read\_only}};}
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00049}\mbox{\hyperlink{structsysio_1_1chain_1_1chain__id__type_a743ed765a552efd77ed337ab23029580}{00049}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{friend}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1net__plugin__impl}{sysio::net\_plugin\_impl}};}
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00050}\mbox{\hyperlink{structsysio_1_1chain_1_1chain__id__type_a53c35aba3d373ffadb419d78c090dc71}{00050}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{friend}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structsysio_1_1handshake__message}{sysio::handshake\_message}};}
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00051}\mbox{\hyperlink{structsysio_1_1chain_1_1chain__id__type_ab473c25ec78ec17292a831721a5874bb}{00051}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{friend}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1chain_1_1block__log}{block\_log}};}
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00052}\mbox{\hyperlink{structsysio_1_1chain_1_1chain__id__type_a1bb0acbfc5b2d0f1155986f581c825e7}{00052}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{friend}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structsysio_1_1chain_1_1trim__data}{trim\_data}};}
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00053}\mbox{\hyperlink{structsysio_1_1chain_1_1chain__id__type_a2da7e42f84f5b49f4acb40f35a15f91e}{00053}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{friend}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1chain_1_1controller}{controller}};}
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00054}\mbox{\hyperlink{structsysio_1_1chain_1_1chain__id__type_afacea5f421e7b989103659e2e5fa3353}{00054}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{friend}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structsysio_1_1chain_1_1controller__impl}{controller\_impl}};}
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00055}\mbox{\hyperlink{structsysio_1_1chain_1_1chain__id__type_a069cff8e55a00a3b03bfc5207aebc2af}{00055}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{friend}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1chain_1_1global__property__object}{global\_property\_object}};}
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00056}\mbox{\hyperlink{structsysio_1_1chain_1_1chain__id__type_adf6b71843895b97e56777c457173d315}{00056}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{friend}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structsysio_1_1chain_1_1snapshot__global__property__object}{snapshot\_global\_property\_object}};}
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00057}\mbox{\hyperlink{structsysio_1_1chain_1_1chain__id__type_a1a090f027f19754da838f620fd5e1823}{00057}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{friend}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structsysio_1_1chain_1_1legacy_1_1snapshot__global__property__object__v3}{legacy::snapshot\_global\_property\_object\_v3}};}
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00058}\mbox{\hyperlink{structsysio_1_1chain_1_1chain__id__type_a849ce63150148aabaec7178d87285124}{00058}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{friend}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structsysio_1_1chain_1_1legacy_1_1snapshot__global__property__object__v4}{legacy::snapshot\_global\_property\_object\_v4}};}
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00059}00059\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00061}00061\ \}\ \}\ \ \textcolor{comment}{//\ namespace\ sysio::chain}}
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00062}00062\ }
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00063}00063\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}\ \{}
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00064}00064\ \ \ \textcolor{keyword}{class\ }variant;}
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00065}00065\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefc_adea61f2343de94d0fbcb920a32332ad9}{to\_variant}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__id__type}{sysio::chain::chain\_id\_type}}\&\ cid,\ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}\&\ v);}
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00066}00066\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefc_accef08adf4ee05c36ccc550d8101b08f}{from\_variant}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}\&\ v,\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__id__type}{sysio::chain::chain\_id\_type}}\&\ cid);}
+\DoxyCodeLine{\Hypertarget{chain__id__type_8hpp_source_l00067}00067\ \}\ \textcolor{comment}{//\ fc}}
+
+\end{DoxyCode}

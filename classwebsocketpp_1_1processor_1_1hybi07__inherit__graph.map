@@ -1,0 +1,9 @@
+<map id="websocketpp::processor::hybi07&lt; config &gt;" name="websocketpp::processor::hybi07&lt; config &gt;">
+<area shape="rect" id="Node000001" title="Processor for Hybi Draft version 07." alt="" coords="5,271,169,312"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1processor_1_1hybi08.html" title="Processor for Hybi Draft version 08." alt="" coords="5,183,169,223"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="90,239,90,271,84,271,84,239"/>
+<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1processor_1_1hybi13.html" title="Processor for Hybi version 13 (RFC6455)" alt="" coords="5,94,169,135"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="90,150,90,182,84,182,84,150"/>
+<area shape="rect" id="Node000004" href="$classwebsocketpp_1_1processor_1_1processor.html" title="WebSocket protocol processor abstract base class." alt="" coords="5,5,169,46"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="90,62,90,94,84,94,84,62"/>
+</map>

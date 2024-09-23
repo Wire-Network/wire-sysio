@@ -1,0 +1,11 @@
+<map id="sysio::chain::detail::snapshot_row_writer::to_variant" name="sysio::chain::detail::snapshot_row_writer::to_variant">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,155,61"/>
+<area shape="rect" id="Node000002" href="$namespacefc.html#adea61f2343de94d0fbcb920a32332ad9" title=" " alt="" coords="203,20,300,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="155,30,187,30,187,36,155,36"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1chain_1_1shared__public__key.html#a328e4a70940629953f9087100c46b207" title=" " alt="" coords="348,13,496,54"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="300,30,333,30,333,36,300,36"/>
+<area shape="rect" id="Node000004" href="$classfc_1_1crypto_1_1public__key.html#ada5158a385e0d407268feb4790ba8646" title=" " alt="" coords="544,13,663,54"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="497,30,529,30,529,36,497,36"/>
+<area shape="rect" id="Node000005" href="$classfc_1_1crypto_1_1public__key.html#aa96a2da856cbba914572aa8629c06c09" title=" " alt="" coords="711,13,829,54"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="663,30,695,30,695,36,663,36"/>
+</map>

@@ -1,0 +1,17 @@
+<map id="sysio::connection_status" name="sysio::connection_status">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,337,172,363"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="63,105,116,131"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="91,146,90,179,91,337,85,337,85,179,86,146"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1handshake__message.html" title=" " alt="" coords="173,248,356,274"/>
+<area shape="poly" id="edge8_Node000003_Node000002" title=" " alt="" coords="91,146,96,186,103,206,115,222,140,235,179,245,178,250,138,240,111,226,98,208,91,187,86,147"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="227,284,114,339,112,334,225,279"/>
+<area shape="rect" id="Node000004" href="$structsysio_1_1chain_1_1chain__id__type.html" title=" " alt="" coords="321,98,451,138"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="361,152,277,250,273,246,357,148"/>
+<area shape="rect" id="Node000005" href="$classfc_1_1sha256.html" title=" " alt="" coords="181,5,263,31"/>
+<area shape="poly" id="edge5_Node000003_Node000005" title=" " alt="" coords="220,46,216,97,220,155,239,207,260,247,255,249,234,209,215,156,210,97,215,46"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="256,37,354,95,351,99,254,41"/>
+<area shape="rect" id="Node000006" href="$classfc_1_1crypto_1_1public__key.html" title=" " alt="" coords="475,105,622,131"/>
+<area shape="poly" id="edge6_Node000003_Node000006" title=" " alt="" coords="523,143,464,185,391,227,322,250,320,245,389,222,462,181,520,139"/>
+<area shape="rect" id="Node000007" href="$classfc_1_1crypto_1_1signature.html" title=" " alt="" coords="645,105,782,131"/>
+<area shape="poly" id="edge7_Node000003_Node000007" title=" " alt="" coords="683,141,601,185,550,208,497,227,426,244,357,255,356,249,425,239,496,222,548,203,598,180,680,136"/>
+</map>

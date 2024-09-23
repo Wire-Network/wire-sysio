@@ -1,0 +1,214 @@
+\doxysection{sysio\+::vm\+::registered\+\_\+host\+\_\+functions\texorpdfstring{$<$}{<} Cls, Execution\+\_\+\+Interface, Type\+\_\+\+Converter \texorpdfstring{$>$}{>}\+::mappings Struct Reference}
+\hypertarget{structsysio_1_1vm_1_1registered__host__functions_1_1mappings}{}\label{structsysio_1_1vm_1_1registered__host__functions_1_1mappings}\index{sysio::vm::registered\_host\_functions$<$ Cls, Execution\_Interface, Type\_Converter $>$::mappings@{sysio::vm::registered\_host\_functions$<$ Cls, Execution\_Interface, Type\_Converter $>$::mappings}}
+
+
+{\ttfamily \#include $<$host\+\_\+function.\+hpp$>$}
+
+
+
+Collaboration diagram for sysio\+::vm\+::registered\+\_\+host\+\_\+functions\texorpdfstring{$<$}{<} Cls, Execution\+\_\+\+Interface, Type\+\_\+\+Converter \texorpdfstring{$>$}{>}\+::mappings\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=225pt]{structsysio_1_1vm_1_1registered__host__functions_1_1mappings__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$auto F, typename \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}} , typename Args , typename Preconditions $>$ }\\void \mbox{\hyperlink{structsysio_1_1vm_1_1registered__host__functions_1_1mappings_af26f42cea5b288ea5ab591e8ac05e2b7}{add\+\_\+mapping}} (const std\+::string \&mod, const std\+::string \&\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}})
+\item 
+{\footnotesize template$<$auto F, typename \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}} , typename Args , typename Preconditions $>$ }\\void \mbox{\hyperlink{structsysio_1_1vm_1_1registered__host__functions_1_1mappings_af26f42cea5b288ea5ab591e8ac05e2b7}{add\+\_\+mapping}} (const std\+::string \&mod, const std\+::string \&\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static \mbox{\hyperlink{structsysio_1_1vm_1_1registered__host__functions_1_1mappings}{mappings}} \& \mbox{\hyperlink{structsysio_1_1vm_1_1registered__host__functions_1_1mappings_a99a30645a5be92083d777a00c79e4dad}{get}} ()
+\item 
+static \mbox{\hyperlink{structsysio_1_1vm_1_1registered__host__functions_1_1mappings}{mappings}} \& \mbox{\hyperlink{structsysio_1_1vm_1_1registered__host__functions_1_1mappings_a99a30645a5be92083d777a00c79e4dad}{get}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::unordered\+\_\+map$<$ \mbox{\hyperlink{namespacesysio_1_1vm_ad1184117bc161301bdbb67b52288e889}{host\+\_\+func\+\_\+pair}}, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}, \mbox{\hyperlink{structsysio_1_1vm_1_1host__func__pair__hash}{host\+\_\+func\+\_\+pair\+\_\+hash}} $>$ \mbox{\hyperlink{structsysio_1_1vm_1_1registered__host__functions_1_1mappings_ad3b4995c0f7410db591f79c4043ad47a}{named\+\_\+mapping}}
+\item 
+std\+::vector$<$ std\+::function$<$ void(Cls \texorpdfstring{$\ast$}{*}, Type\+\_\+\+Converter \&)$>$ $>$ \mbox{\hyperlink{structsysio_1_1vm_1_1registered__host__functions_1_1mappings_a865841ca1593aac36fe63fedd8a365a4}{functions}}
+\item 
+std\+::vector$<$ \mbox{\hyperlink{structsysio_1_1vm_1_1host__function}{host\+\_\+function}} $>$ \mbox{\hyperlink{structsysio_1_1vm_1_1registered__host__functions_1_1mappings_a7488551fcf8c99a4af139c23a8424b92}{host\+\_\+functions}}
+\item 
+size\+\_\+t \mbox{\hyperlink{structsysio_1_1vm_1_1registered__host__functions_1_1mappings_aaa98f1dccef4d7245f93f965f0eee4f6}{current\+\_\+index}} = 0
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Cls, typename Execution\+\_\+\+Interface = execution\+\_\+interface, typename Type\+\_\+\+Converter = type\+\_\+converter$<$\+Cls, Execution\+\_\+\+Interface$>$$>$\newline
+struct sysio\+::vm\+::registered\+\_\+host\+\_\+functions$<$ Cls, Execution\+\_\+\+Interface, Type\+\_\+\+Converter $>$\+::mappings}
+
+
+Definition at line \mbox{\hyperlink{vm_2host__function_8hpp_source_l00424}{424}} of file \mbox{\hyperlink{vm_2host__function_8hpp_source}{host\+\_\+function.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1vm_1_1registered__host__functions_1_1mappings_af26f42cea5b288ea5ab591e8ac05e2b7}\index{sysio::vm::registered\_host\_functions$<$ Cls, Execution\_Interface, Type\_Converter $>$::mappings@{sysio::vm::registered\_host\_functions$<$ Cls, Execution\_Interface, Type\_Converter $>$::mappings}!add\_mapping@{add\_mapping}}
+\index{add\_mapping@{add\_mapping}!sysio::vm::registered\_host\_functions$<$ Cls, Execution\_Interface, Type\_Converter $>$::mappings@{sysio::vm::registered\_host\_functions$<$ Cls, Execution\_Interface, Type\_Converter $>$::mappings}}
+\doxysubsubsection{\texorpdfstring{add\_mapping()}{add\_mapping()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1registered__host__functions_1_1mappings_af26f42cea5b288ea5ab591e8ac05e2b7} 
+template$<$typename Cls , typename Execution\+\_\+\+Interface  = execution\+\_\+interface, typename Type\+\_\+\+Converter  = type\+\_\+converter$<$\+Cls, Execution\+\_\+\+Interface$>$$>$ \\
+template$<$auto F, typename \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}} , typename Args , typename Preconditions $>$ \\
+void \mbox{\hyperlink{structsysio_1_1vm_1_1registered__host__functions}{sysio\+::vm\+::registered\+\_\+host\+\_\+functions}}$<$ Cls, Execution\+\_\+\+Interface, Type\+\_\+\+Converter $>$\+::mappings\+::add\+\_\+mapping (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{mod}{, }\item[{const std\+::string \&}]{name}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_source_l00431}{431}} of file \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_source}{host\+\_\+function.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00431\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00432\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1registered__host__functions_1_1mappings_ad3b4995c0f7410db591f79c4043ad47a}{named\_mapping}}[\{mod,\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\}]\ =\ \mbox{\hyperlink{structsysio_1_1vm_1_1registered__host__functions_1_1mappings_aaa98f1dccef4d7245f93f965f0eee4f6}{current\_index}}++;}
+\DoxyCodeLine{00433\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1registered__host__functions_1_1mappings_a865841ca1593aac36fe63fedd8a365a4}{functions}}.push\_back(}
+\DoxyCodeLine{00434\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1vm_aade1d3d5329b64aae3f2dab5c018e49f}{create\_function<Cls,\ F,\ Preconditions,\ R,\ Args,\ Type\_Converter>}}(}
+\DoxyCodeLine{00435\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::make\_index\_sequence<std::tuple\_size\_v<Args>>()));}
+\DoxyCodeLine{00436\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1registered__host__functions_1_1mappings_a7488551fcf8c99a4af139c23a8424b92}{host\_functions}}.push\_back(}
+\DoxyCodeLine{00437\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1vm_a2fecbacf97e92b3ad5dfa629b97207e5}{function\_types\_provider<Type\_Converter,\ R,\ Args>}}(}
+\DoxyCodeLine{00438\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::make\_index\_sequence<std::tuple\_size\_v<Args>>()));}
+\DoxyCodeLine{00439\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1vm_1_1registered__host__functions_1_1mappings_af26f42cea5b288ea5ab591e8ac05e2b7_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1vm_1_1registered__host__functions_1_1mappings_af26f42cea5b288ea5ab591e8ac05e2b7}\index{sysio::vm::registered\_host\_functions$<$ Cls, Execution\_Interface, Type\_Converter $>$::mappings@{sysio::vm::registered\_host\_functions$<$ Cls, Execution\_Interface, Type\_Converter $>$::mappings}!add\_mapping@{add\_mapping}}
+\index{add\_mapping@{add\_mapping}!sysio::vm::registered\_host\_functions$<$ Cls, Execution\_Interface, Type\_Converter $>$::mappings@{sysio::vm::registered\_host\_functions$<$ Cls, Execution\_Interface, Type\_Converter $>$::mappings}}
+\doxysubsubsection{\texorpdfstring{add\_mapping()}{add\_mapping()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1registered__host__functions_1_1mappings_af26f42cea5b288ea5ab591e8ac05e2b7} 
+template$<$typename Cls , typename Execution\+\_\+\+Interface  = execution\+\_\+interface, typename Type\+\_\+\+Converter  = type\+\_\+converter$<$\+Cls, Execution\+\_\+\+Interface$>$$>$ \\
+template$<$auto F, typename \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}} , typename Args , typename Preconditions $>$ \\
+void \mbox{\hyperlink{structsysio_1_1vm_1_1registered__host__functions}{sysio\+::vm\+::registered\+\_\+host\+\_\+functions}}$<$ Cls, Execution\+\_\+\+Interface, Type\+\_\+\+Converter $>$\+::mappings\+::add\+\_\+mapping (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{mod}{, }\item[{const std\+::string \&}]{name}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2host__function_8hpp_source_l00431}{431}} of file \mbox{\hyperlink{vm_2host__function_8hpp_source}{host\+\_\+function.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00431\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00432\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1registered__host__functions_1_1mappings_ad3b4995c0f7410db591f79c4043ad47a}{named\_mapping}}[\{mod,\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\}]\ =\ \mbox{\hyperlink{structsysio_1_1vm_1_1registered__host__functions_1_1mappings_aaa98f1dccef4d7245f93f965f0eee4f6}{current\_index}}++;}
+\DoxyCodeLine{00433\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1registered__host__functions_1_1mappings_a865841ca1593aac36fe63fedd8a365a4}{functions}}.push\_back(}
+\DoxyCodeLine{00434\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1vm_aade1d3d5329b64aae3f2dab5c018e49f}{create\_function<Cls,\ F,\ Preconditions,\ R,\ Args,\ Type\_Converter>}}(}
+\DoxyCodeLine{00435\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::make\_index\_sequence<std::tuple\_size\_v<Args>>()));}
+\DoxyCodeLine{00436\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1registered__host__functions_1_1mappings_a7488551fcf8c99a4af139c23a8424b92}{host\_functions}}.push\_back(}
+\DoxyCodeLine{00437\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1vm_a2fecbacf97e92b3ad5dfa629b97207e5}{function\_types\_provider<Type\_Converter,\ R,\ Args>}}(}
+\DoxyCodeLine{00438\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::make\_index\_sequence<std::tuple\_size\_v<Args>>()));}
+\DoxyCodeLine{00439\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1vm_1_1registered__host__functions_1_1mappings_af26f42cea5b288ea5ab591e8ac05e2b7_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1vm_1_1registered__host__functions_1_1mappings_a99a30645a5be92083d777a00c79e4dad}\index{sysio::vm::registered\_host\_functions$<$ Cls, Execution\_Interface, Type\_Converter $>$::mappings@{sysio::vm::registered\_host\_functions$<$ Cls, Execution\_Interface, Type\_Converter $>$::mappings}!get@{get}}
+\index{get@{get}!sysio::vm::registered\_host\_functions$<$ Cls, Execution\_Interface, Type\_Converter $>$::mappings@{sysio::vm::registered\_host\_functions$<$ Cls, Execution\_Interface, Type\_Converter $>$::mappings}}
+\doxysubsubsection{\texorpdfstring{get()}{get()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1registered__host__functions_1_1mappings_a99a30645a5be92083d777a00c79e4dad} 
+template$<$typename Cls , typename Execution\+\_\+\+Interface  = execution\+\_\+interface, typename Type\+\_\+\+Converter  = type\+\_\+converter$<$\+Cls, Execution\+\_\+\+Interface$>$$>$ \\
+static \mbox{\hyperlink{structsysio_1_1vm_1_1registered__host__functions_1_1mappings}{mappings}} \& \mbox{\hyperlink{structsysio_1_1vm_1_1registered__host__functions}{sysio\+::vm\+::registered\+\_\+host\+\_\+functions}}$<$ Cls, Execution\+\_\+\+Interface, Type\+\_\+\+Converter $>$\+::mappings\+::get (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_source_l00441}{441}} of file \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_source}{host\+\_\+function.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00441\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00442\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ mappings\ instance;}
+\DoxyCodeLine{00443\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ instance;}
+\DoxyCodeLine{00444\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1vm_1_1registered__host__functions_1_1mappings_a99a30645a5be92083d777a00c79e4dad_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1vm_1_1registered__host__functions_1_1mappings_a99a30645a5be92083d777a00c79e4dad}\index{sysio::vm::registered\_host\_functions$<$ Cls, Execution\_Interface, Type\_Converter $>$::mappings@{sysio::vm::registered\_host\_functions$<$ Cls, Execution\_Interface, Type\_Converter $>$::mappings}!get@{get}}
+\index{get@{get}!sysio::vm::registered\_host\_functions$<$ Cls, Execution\_Interface, Type\_Converter $>$::mappings@{sysio::vm::registered\_host\_functions$<$ Cls, Execution\_Interface, Type\_Converter $>$::mappings}}
+\doxysubsubsection{\texorpdfstring{get()}{get()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1registered__host__functions_1_1mappings_a99a30645a5be92083d777a00c79e4dad} 
+template$<$typename Cls , typename Execution\+\_\+\+Interface  = execution\+\_\+interface, typename Type\+\_\+\+Converter  = type\+\_\+converter$<$\+Cls, Execution\+\_\+\+Interface$>$$>$ \\
+static \mbox{\hyperlink{structsysio_1_1vm_1_1registered__host__functions_1_1mappings}{mappings}} \& \mbox{\hyperlink{structsysio_1_1vm_1_1registered__host__functions}{sysio\+::vm\+::registered\+\_\+host\+\_\+functions}}$<$ Cls, Execution\+\_\+\+Interface, Type\+\_\+\+Converter $>$\+::mappings\+::get (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2host__function_8hpp_source_l00441}{441}} of file \mbox{\hyperlink{vm_2host__function_8hpp_source}{host\+\_\+function.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00441\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00442\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ mappings\ instance;}
+\DoxyCodeLine{00443\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ instance;}
+\DoxyCodeLine{00444\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1vm_1_1registered__host__functions_1_1mappings_aaa98f1dccef4d7245f93f965f0eee4f6}\index{sysio::vm::registered\_host\_functions$<$ Cls, Execution\_Interface, Type\_Converter $>$::mappings@{sysio::vm::registered\_host\_functions$<$ Cls, Execution\_Interface, Type\_Converter $>$::mappings}!current\_index@{current\_index}}
+\index{current\_index@{current\_index}!sysio::vm::registered\_host\_functions$<$ Cls, Execution\_Interface, Type\_Converter $>$::mappings@{sysio::vm::registered\_host\_functions$<$ Cls, Execution\_Interface, Type\_Converter $>$::mappings}}
+\doxysubsubsection{\texorpdfstring{current\_index}{current\_index}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1registered__host__functions_1_1mappings_aaa98f1dccef4d7245f93f965f0eee4f6} 
+template$<$typename Cls , typename Execution\+\_\+\+Interface  = execution\+\_\+interface, typename Type\+\_\+\+Converter  = type\+\_\+converter$<$\+Cls, Execution\+\_\+\+Interface$>$$>$ \\
+size\+\_\+t \mbox{\hyperlink{structsysio_1_1vm_1_1registered__host__functions}{sysio\+::vm\+::registered\+\_\+host\+\_\+functions}}$<$ Cls, Execution\+\_\+\+Interface, Type\+\_\+\+Converter $>$\+::mappings\+::current\+\_\+index = 0}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_source_l00428}{428}} of file \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_source}{host\+\_\+function.\+hpp}}.
+
+\Hypertarget{structsysio_1_1vm_1_1registered__host__functions_1_1mappings_a865841ca1593aac36fe63fedd8a365a4}\index{sysio::vm::registered\_host\_functions$<$ Cls, Execution\_Interface, Type\_Converter $>$::mappings@{sysio::vm::registered\_host\_functions$<$ Cls, Execution\_Interface, Type\_Converter $>$::mappings}!functions@{functions}}
+\index{functions@{functions}!sysio::vm::registered\_host\_functions$<$ Cls, Execution\_Interface, Type\_Converter $>$::mappings@{sysio::vm::registered\_host\_functions$<$ Cls, Execution\_Interface, Type\_Converter $>$::mappings}}
+\doxysubsubsection{\texorpdfstring{functions}{functions}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1registered__host__functions_1_1mappings_a865841ca1593aac36fe63fedd8a365a4} 
+template$<$typename Cls , typename Execution\+\_\+\+Interface  = execution\+\_\+interface, typename Type\+\_\+\+Converter  = type\+\_\+converter$<$\+Cls, Execution\+\_\+\+Interface$>$$>$ \\
+std\+::vector$<$ std\+::function$<$ void(Cls \texorpdfstring{$\ast$}{*}, Type\+\_\+\+Converter \&)$>$ $>$ \mbox{\hyperlink{structsysio_1_1vm_1_1registered__host__functions}{sysio\+::vm\+::registered\+\_\+host\+\_\+functions}}$<$ Cls, Execution\+\_\+\+Interface, Type\+\_\+\+Converter $>$\+::mappings\+::functions}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_source_l00426}{426}} of file \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_source}{host\+\_\+function.\+hpp}}.
+
+\Hypertarget{structsysio_1_1vm_1_1registered__host__functions_1_1mappings_a7488551fcf8c99a4af139c23a8424b92}\index{sysio::vm::registered\_host\_functions$<$ Cls, Execution\_Interface, Type\_Converter $>$::mappings@{sysio::vm::registered\_host\_functions$<$ Cls, Execution\_Interface, Type\_Converter $>$::mappings}!host\_functions@{host\_functions}}
+\index{host\_functions@{host\_functions}!sysio::vm::registered\_host\_functions$<$ Cls, Execution\_Interface, Type\_Converter $>$::mappings@{sysio::vm::registered\_host\_functions$<$ Cls, Execution\_Interface, Type\_Converter $>$::mappings}}
+\doxysubsubsection{\texorpdfstring{host\_functions}{host\_functions}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1registered__host__functions_1_1mappings_a7488551fcf8c99a4af139c23a8424b92} 
+template$<$typename Cls , typename Execution\+\_\+\+Interface  = execution\+\_\+interface, typename Type\+\_\+\+Converter  = type\+\_\+converter$<$\+Cls, Execution\+\_\+\+Interface$>$$>$ \\
+std\+::vector$<$ \mbox{\hyperlink{structsysio_1_1vm_1_1host__function}{host\+\_\+function}} $>$ \mbox{\hyperlink{structsysio_1_1vm_1_1registered__host__functions}{sysio\+::vm\+::registered\+\_\+host\+\_\+functions}}$<$ Cls, Execution\+\_\+\+Interface, Type\+\_\+\+Converter $>$\+::mappings\+::host\+\_\+functions}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_source_l00427}{427}} of file \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_source}{host\+\_\+function.\+hpp}}.
+
+\Hypertarget{structsysio_1_1vm_1_1registered__host__functions_1_1mappings_ad3b4995c0f7410db591f79c4043ad47a}\index{sysio::vm::registered\_host\_functions$<$ Cls, Execution\_Interface, Type\_Converter $>$::mappings@{sysio::vm::registered\_host\_functions$<$ Cls, Execution\_Interface, Type\_Converter $>$::mappings}!named\_mapping@{named\_mapping}}
+\index{named\_mapping@{named\_mapping}!sysio::vm::registered\_host\_functions$<$ Cls, Execution\_Interface, Type\_Converter $>$::mappings@{sysio::vm::registered\_host\_functions$<$ Cls, Execution\_Interface, Type\_Converter $>$::mappings}}
+\doxysubsubsection{\texorpdfstring{named\_mapping}{named\_mapping}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1registered__host__functions_1_1mappings_ad3b4995c0f7410db591f79c4043ad47a} 
+template$<$typename Cls , typename Execution\+\_\+\+Interface  = execution\+\_\+interface, typename Type\+\_\+\+Converter  = type\+\_\+converter$<$\+Cls, Execution\+\_\+\+Interface$>$$>$ \\
+std\+::unordered\+\_\+map$<$ \mbox{\hyperlink{namespacesysio_1_1vm_ad1184117bc161301bdbb67b52288e889}{host\+\_\+func\+\_\+pair}}, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}, \mbox{\hyperlink{structsysio_1_1vm_1_1host__func__pair__hash}{host\+\_\+func\+\_\+pair\+\_\+hash}} $>$ \mbox{\hyperlink{structsysio_1_1vm_1_1registered__host__functions}{sysio\+::vm\+::registered\+\_\+host\+\_\+functions}}$<$ Cls, Execution\+\_\+\+Interface, Type\+\_\+\+Converter $>$\+::mappings\+::named\+\_\+mapping}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_source_l00425}{425}} of file \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_source}{host\+\_\+function.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/include/sysio/sysio/vm/\mbox{\hyperlink{sysio_2vm_2host__function_8hpp}{host\+\_\+function.\+hpp}}\item 
+libraries/sys-\/vm/include/sysio/vm/\mbox{\hyperlink{vm_2host__function_8hpp}{host\+\_\+function.\+hpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,152 @@
+\doxysection{Catch\+::Section\+Stats Struct Reference}
+\hypertarget{struct_catch_1_1_section_stats}{}\label{struct_catch_1_1_section_stats}\index{Catch::SectionStats@{Catch::SectionStats}}
+
+
+{\ttfamily \#include $<$catch\+\_\+interfaces\+\_\+reporter.\+h$>$}
+
+
+
+Collaboration diagram for Catch\+::Section\+Stats\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_catch_1_1_section_stats__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_catch_1_1_section_stats_abadf375cb596682e34781b606eb10bfe}{Section\+Stats}} (\mbox{\hyperlink{struct_catch_1_1_section_info}{Section\+Info}} const \&\+\_\+section\+Info, \mbox{\hyperlink{struct_catch_1_1_counts}{Counts}} const \&\+\_\+assertions, double \+\_\+duration\+In\+Seconds, bool \+\_\+missing\+Assertions)
+\item 
+\mbox{\hyperlink{struct_catch_1_1_section_stats_a24900b499b930e625c0cb3467c827d14}{Section\+Stats}} (\mbox{\hyperlink{struct_catch_1_1_section_stats}{Section\+Stats}} const \&)=default
+\item 
+\mbox{\hyperlink{struct_catch_1_1_section_stats_a1e4d0002fdc0981c65cf9b01e1ba8afa}{Section\+Stats}} (\mbox{\hyperlink{struct_catch_1_1_section_stats}{Section\+Stats}} \&\&)=default
+\item 
+\mbox{\hyperlink{struct_catch_1_1_section_stats}{Section\+Stats}} \& \mbox{\hyperlink{struct_catch_1_1_section_stats_a9a57265b03ff86a7550b8833e7b25a71}{operator=}} (\mbox{\hyperlink{struct_catch_1_1_section_stats}{Section\+Stats}} const \&)=default
+\item 
+\mbox{\hyperlink{struct_catch_1_1_section_stats}{Section\+Stats}} \& \mbox{\hyperlink{struct_catch_1_1_section_stats_a47099ae361789dd16690a971056834d7}{operator=}} (\mbox{\hyperlink{struct_catch_1_1_section_stats}{Section\+Stats}} \&\&)=default
+\item 
+virtual \mbox{\hyperlink{struct_catch_1_1_section_stats_af4f6332ade5f20f7fc0e6a0db0ab0023}{\texorpdfstring{$\sim$}{\string~}\+Section\+Stats}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_catch_1_1_section_info}{Section\+Info}} \mbox{\hyperlink{struct_catch_1_1_section_stats_a524d0cd3b91acc6a4d0f24d6e50275bb}{section\+Info}}
+\item 
+\mbox{\hyperlink{struct_catch_1_1_counts}{Counts}} \mbox{\hyperlink{struct_catch_1_1_section_stats_a789bbc5c115f2914286458d282430685}{assertions}}
+\item 
+double \mbox{\hyperlink{struct_catch_1_1_section_stats_ae3276a60071b4221907a571b822b0a94}{duration\+In\+Seconds}}
+\item 
+bool \mbox{\hyperlink{struct_catch_1_1_section_stats_a4840f83088787653a656c98e664e6b51}{missing\+Assertions}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{catch__interfaces__reporter_8h_source_l00092}{92}} of file \mbox{\hyperlink{catch__interfaces__reporter_8h_source}{catch\+\_\+interfaces\+\_\+reporter.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{struct_catch_1_1_section_stats_abadf375cb596682e34781b606eb10bfe}\index{Catch::SectionStats@{Catch::SectionStats}!SectionStats@{SectionStats}}
+\index{SectionStats@{SectionStats}!Catch::SectionStats@{Catch::SectionStats}}
+\doxysubsubsection{\texorpdfstring{SectionStats()}{SectionStats()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_section_stats_abadf375cb596682e34781b606eb10bfe} 
+Catch\+::\+Section\+Stats\+::\+Section\+Stats (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_section_info}{Section\+Info}} const \&}]{\+\_\+section\+Info}{, }\item[{\mbox{\hyperlink{struct_catch_1_1_counts}{Counts}} const \&}]{\+\_\+assertions}{, }\item[{double}]{\+\_\+duration\+In\+Seconds}{, }\item[{bool}]{\+\_\+missing\+Assertions}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{include_2internal_2catch__interfaces__reporter_8cpp_source_l00055}{55}} of file \mbox{\hyperlink{include_2internal_2catch__interfaces__reporter_8cpp_source}{catch\+\_\+interfaces\+\_\+reporter.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00059\ \ \ \ \ :\ \ \ \mbox{\hyperlink{struct_catch_1_1_section_stats_a524d0cd3b91acc6a4d0f24d6e50275bb}{sectionInfo}}(\ \_sectionInfo\ ),}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_section_stats_a789bbc5c115f2914286458d282430685}{assertions}}(\ \_assertions\ ),}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_section_stats_ae3276a60071b4221907a571b822b0a94}{durationInSeconds}}(\ \_durationInSeconds\ ),}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_section_stats_a4840f83088787653a656c98e664e6b51}{missingAssertions}}(\ \_missingAssertions\ )}
+\DoxyCodeLine{00063\ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{struct_catch_1_1_section_stats_a24900b499b930e625c0cb3467c827d14}\index{Catch::SectionStats@{Catch::SectionStats}!SectionStats@{SectionStats}}
+\index{SectionStats@{SectionStats}!Catch::SectionStats@{Catch::SectionStats}}
+\doxysubsubsection{\texorpdfstring{SectionStats()}{SectionStats()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_section_stats_a24900b499b930e625c0cb3467c827d14} 
+Catch\+::\+Section\+Stats\+::\+Section\+Stats (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_section_stats}{Section\+Stats}} const \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [default]}}
+
+\Hypertarget{struct_catch_1_1_section_stats_a1e4d0002fdc0981c65cf9b01e1ba8afa}\index{Catch::SectionStats@{Catch::SectionStats}!SectionStats@{SectionStats}}
+\index{SectionStats@{SectionStats}!Catch::SectionStats@{Catch::SectionStats}}
+\doxysubsubsection{\texorpdfstring{SectionStats()}{SectionStats()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_section_stats_a1e4d0002fdc0981c65cf9b01e1ba8afa} 
+Catch\+::\+Section\+Stats\+::\+Section\+Stats (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_section_stats}{Section\+Stats}} \&\&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [default]}}
+
+\Hypertarget{struct_catch_1_1_section_stats_af4f6332ade5f20f7fc0e6a0db0ab0023}\index{Catch::SectionStats@{Catch::SectionStats}!````~SectionStats@{\texorpdfstring{$\sim$}{\string~}SectionStats}}
+\index{````~SectionStats@{\texorpdfstring{$\sim$}{\string~}SectionStats}!Catch::SectionStats@{Catch::SectionStats}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}SectionStats()}{\string~SectionStats()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_section_stats_af4f6332ade5f20f7fc0e6a0db0ab0023} 
+Catch\+::\+Section\+Stats\+::\texorpdfstring{$\sim$}{\string~}\+Section\+Stats (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}, {\ttfamily [default]}}
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_catch_1_1_section_stats_a47099ae361789dd16690a971056834d7}\index{Catch::SectionStats@{Catch::SectionStats}!operator=@{operator=}}
+\index{operator=@{operator=}!Catch::SectionStats@{Catch::SectionStats}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_section_stats_a47099ae361789dd16690a971056834d7} 
+\mbox{\hyperlink{struct_catch_1_1_section_stats}{Section\+Stats}} \& Catch\+::\+Section\+Stats\+::operator= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_section_stats}{Section\+Stats}} \&\&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [default]}}
+
+\Hypertarget{struct_catch_1_1_section_stats_a9a57265b03ff86a7550b8833e7b25a71}\index{Catch::SectionStats@{Catch::SectionStats}!operator=@{operator=}}
+\index{operator=@{operator=}!Catch::SectionStats@{Catch::SectionStats}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_section_stats_a9a57265b03ff86a7550b8833e7b25a71} 
+\mbox{\hyperlink{struct_catch_1_1_section_stats}{Section\+Stats}} \& Catch\+::\+Section\+Stats\+::operator= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_section_stats}{Section\+Stats}} const \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [default]}}
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_catch_1_1_section_stats_a789bbc5c115f2914286458d282430685}\index{Catch::SectionStats@{Catch::SectionStats}!assertions@{assertions}}
+\index{assertions@{assertions}!Catch::SectionStats@{Catch::SectionStats}}
+\doxysubsubsection{\texorpdfstring{assertions}{assertions}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_section_stats_a789bbc5c115f2914286458d282430685} 
+\mbox{\hyperlink{struct_catch_1_1_counts}{Counts}} Catch\+::\+Section\+Stats\+::assertions}
+
+
+
+Definition at line \mbox{\hyperlink{catch__interfaces__reporter_8h_source_l00104}{104}} of file \mbox{\hyperlink{catch__interfaces__reporter_8h_source}{catch\+\_\+interfaces\+\_\+reporter.\+h}}.
+
+\Hypertarget{struct_catch_1_1_section_stats_ae3276a60071b4221907a571b822b0a94}\index{Catch::SectionStats@{Catch::SectionStats}!durationInSeconds@{durationInSeconds}}
+\index{durationInSeconds@{durationInSeconds}!Catch::SectionStats@{Catch::SectionStats}}
+\doxysubsubsection{\texorpdfstring{durationInSeconds}{durationInSeconds}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_section_stats_ae3276a60071b4221907a571b822b0a94} 
+double Catch\+::\+Section\+Stats\+::duration\+In\+Seconds}
+
+
+
+Definition at line \mbox{\hyperlink{catch__interfaces__reporter_8h_source_l00105}{105}} of file \mbox{\hyperlink{catch__interfaces__reporter_8h_source}{catch\+\_\+interfaces\+\_\+reporter.\+h}}.
+
+\Hypertarget{struct_catch_1_1_section_stats_a4840f83088787653a656c98e664e6b51}\index{Catch::SectionStats@{Catch::SectionStats}!missingAssertions@{missingAssertions}}
+\index{missingAssertions@{missingAssertions}!Catch::SectionStats@{Catch::SectionStats}}
+\doxysubsubsection{\texorpdfstring{missingAssertions}{missingAssertions}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_section_stats_a4840f83088787653a656c98e664e6b51} 
+bool Catch\+::\+Section\+Stats\+::missing\+Assertions}
+
+
+
+Definition at line \mbox{\hyperlink{catch__interfaces__reporter_8h_source_l00106}{106}} of file \mbox{\hyperlink{catch__interfaces__reporter_8h_source}{catch\+\_\+interfaces\+\_\+reporter.\+h}}.
+
+\Hypertarget{struct_catch_1_1_section_stats_a524d0cd3b91acc6a4d0f24d6e50275bb}\index{Catch::SectionStats@{Catch::SectionStats}!sectionInfo@{sectionInfo}}
+\index{sectionInfo@{sectionInfo}!Catch::SectionStats@{Catch::SectionStats}}
+\doxysubsubsection{\texorpdfstring{sectionInfo}{sectionInfo}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_section_stats_a524d0cd3b91acc6a4d0f24d6e50275bb} 
+\mbox{\hyperlink{struct_catch_1_1_section_info}{Section\+Info}} Catch\+::\+Section\+Stats\+::section\+Info}
+
+
+
+Definition at line \mbox{\hyperlink{catch__interfaces__reporter_8h_source_l00103}{103}} of file \mbox{\hyperlink{catch__interfaces__reporter_8h_source}{catch\+\_\+interfaces\+\_\+reporter.\+h}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__interfaces__reporter_8h}{catch\+\_\+interfaces\+\_\+reporter.\+h}}\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{include_2internal_2catch__interfaces__reporter_8cpp}{catch\+\_\+interfaces\+\_\+reporter.\+cpp}}\end{DoxyCompactItemize}

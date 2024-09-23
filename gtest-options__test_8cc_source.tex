@@ -1,0 +1,219 @@
+\doxysection{gtest-\/options\+\_\+test.cc}
+\hypertarget{gtest-options__test_8cc_source}{}\label{gtest-options__test_8cc_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/test/gtest-\/options\_test.cc@{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/test/gtest-\/options\_test.cc}}
+\mbox{\hyperlink{gtest-options__test_8cc}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00001}00001\ \textcolor{comment}{//\ Copyright\ 2008,\ Google\ Inc.}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00002}00002\ \textcolor{comment}{//\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00003}00003\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00004}00004\ \textcolor{comment}{//\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00005}00005\ \textcolor{comment}{//\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00006}00006\ \textcolor{comment}{//\ met:}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00007}00007\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00008}00008\ \textcolor{comment}{//\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00009}00009\ \textcolor{comment}{//\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00010}00010\ \textcolor{comment}{//\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00011}00011\ \textcolor{comment}{//\ copyright\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00012}00012\ \textcolor{comment}{//\ in\ the\ documentation\ and/or\ other\ materials\ provided\ with\ the}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00013}00013\ \textcolor{comment}{//\ distribution.}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00014}00014\ \textcolor{comment}{//\ \ \ \ \ *\ Neither\ the\ name\ of\ Google\ Inc.\ nor\ the\ names\ of\ its}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00015}00015\ \textcolor{comment}{//\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products\ derived\ from}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00016}00016\ \textcolor{comment}{//\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00017}00017\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00018}00018\ \textcolor{comment}{//\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00019}00019\ \textcolor{comment}{//\ "{}AS\ IS"{}\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00020}00020\ \textcolor{comment}{//\ LIMITED\ TO,\ THE\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00021}00021\ \textcolor{comment}{//\ A\ PARTICULAR\ PURPOSE\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ THE\ COPYRIGHT}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00022}00022\ \textcolor{comment}{//\ OWNER\ OR\ CONTRIBUTORS\ BE\ LIABLE\ FOR\ ANY\ DIRECT,\ INDIRECT,\ INCIDENTAL,}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00023}00023\ \textcolor{comment}{//\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES\ (INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00024}00024\ \textcolor{comment}{//\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;\ LOSS\ OF\ USE,}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00025}00025\ \textcolor{comment}{//\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND\ ON\ ANY}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00026}00026\ \textcolor{comment}{//\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00027}00027\ \textcolor{comment}{//\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00028}00028\ \textcolor{comment}{//\ OF\ THIS\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00029}00029\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00030}00030\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00031}00031\ \textcolor{comment}{//\ Google\ Test\ UnitTestOptions\ tests}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00032}00032\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00033}00033\ \textcolor{comment}{//\ This\ file\ tests\ classes\ and\ functions\ used\ internally\ by}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00034}00034\ \textcolor{comment}{//\ Google\ Test.\ \ They\ are\ subject\ to\ change\ without\ notice.}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00035}00035\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00036}00036\ \textcolor{comment}{//\ This\ file\ is\ \#included\ from\ gtest.cc,\ to\ avoid\ changing\ build\ or}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00037}00037\ \textcolor{comment}{//\ make-\/files\ on\ Windows\ and\ other\ platforms.\ Do\ not\ \#include\ this\ file}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00038}00038\ \textcolor{comment}{//\ anywhere\ else!}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00040}00040\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{gtest_8h}{gtest/gtest.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00042}00042\ \textcolor{preprocessor}{\#if\ GTEST\_OS\_WINDOWS\_MOBILE}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00043}00043\ \textcolor{preprocessor}{\#\ include\ <windows.h>}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00044}00044\ \textcolor{preprocessor}{\#elif\ GTEST\_OS\_WINDOWS}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00045}00045\ \textcolor{preprocessor}{\#\ include\ <direct.h>}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00046}00046\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_OS\_WINDOWS\_MOBILE}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00048}00048\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{gtest-internal-inl_8h}{src/gtest-\/internal-\/inl.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00050}00050\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetesting}{testing}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00051}00051\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceinternal}{internal}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00052}00052\ \textcolor{keyword}{namespace\ }\{}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00054}00054\ \textcolor{comment}{//\ Turns\ the\ given\ relative\ path\ into\ an\ absolute\ path.}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00055}00055\ FilePath\ GetAbsolutePathOf(\textcolor{keyword}{const}\ FilePath\&\ relative\_path)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00056}00056\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_ac9d57987f60ac43f0c57b89e333e531e}{FilePath::ConcatPaths}}(\mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_aaff39ccd7bfb7a1c09c0220a64326387}{FilePath::GetCurrentDir}}(),\ relative\_path);}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00057}00057\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00059}00059\ \textcolor{comment}{//\ Testing\ UnitTestOptions::GetOutputFormat/GetOutputFile.}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00061}00061\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(XmlOutputTest,\ GetOutputFormatDefault)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00062}00062\ \ \ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(output)\ =\ \textcolor{stringliteral}{"{}"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00063}00063\ \ \ \mbox{\hyperlink{gtest_8h_ad20f7b94ac5081e16f0005b94e95f0c6}{EXPECT\_STREQ}}(\textcolor{stringliteral}{"{}"{}},\ \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_options_ae7413a21296d885c6924650b51ac4f6d}{UnitTestOptions::GetOutputFormat}}().c\_str());}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00064}00064\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00066}00066\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(XmlOutputTest,\ GetOutputFormat)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00067}00067\ \ \ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(output)\ =\ \textcolor{stringliteral}{"{}xml:filename"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00068}00068\ \ \ \mbox{\hyperlink{gtest_8h_ad20f7b94ac5081e16f0005b94e95f0c6}{EXPECT\_STREQ}}(\textcolor{stringliteral}{"{}xml"{}},\ \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_options_ae7413a21296d885c6924650b51ac4f6d}{UnitTestOptions::GetOutputFormat}}().c\_str());}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00069}00069\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00071}00071\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(XmlOutputTest,\ GetOutputFileDefault)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00072}00072\ \ \ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(output)\ =\ \textcolor{stringliteral}{"{}"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00073}00073\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(GetAbsolutePathOf(FilePath(\textcolor{stringliteral}{"{}test\_detail.xml"{}})).\textcolor{keywordtype}{string}(),}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00074}00074\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_options_a993fb30ad66104158c8c0ac508daca3f}{UnitTestOptions::GetAbsolutePathToOutputFile}}());}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00075}00075\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00076}00076\ }
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00077}00077\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(XmlOutputTest,\ GetOutputFileSingleFile)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00078}00078\ \ \ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(output)\ =\ \textcolor{stringliteral}{"{}xml:filename.abc"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00079}00079\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(GetAbsolutePathOf(FilePath(\textcolor{stringliteral}{"{}filename.abc"{}})).\textcolor{keywordtype}{string}(),}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00080}00080\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_options_a993fb30ad66104158c8c0ac508daca3f}{UnitTestOptions::GetAbsolutePathToOutputFile}}());}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00081}00081\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00083}00083\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(XmlOutputTest,\ GetOutputFileFromDirectoryPath)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00084}00084\ \ \ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(output)\ =\ \textcolor{stringliteral}{"{}xml:path"{}}\ \mbox{\hyperlink{gtest-port_8h_afbb636e91bdd50267dbef11a50490b29}{GTEST\_PATH\_SEP\_}};}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00085}00085\ \ \ \textcolor{keyword}{const}\ std::string\ expected\_output\_file\ =}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00086}00086\ \ \ \ \ \ \ GetAbsolutePathOf(}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00087}00087\ \ \ \ \ \ \ \ \ \ \ FilePath(std::string(\textcolor{stringliteral}{"{}path"{}})\ +\ \mbox{\hyperlink{gtest-port_8h_afbb636e91bdd50267dbef11a50490b29}{GTEST\_PATH\_SEP\_}}\ +}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00088}00088\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a7a2bbf069f75bc99873976ad6fc356ad}{GetCurrentExecutableName}}().\textcolor{keywordtype}{string}()\ +\ \textcolor{stringliteral}{"{}.xml"{}})).string();}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00089}00089\ \ \ \textcolor{keyword}{const}\ std::string\&\ output\_file\ =}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00090}00090\ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_options_a993fb30ad66104158c8c0ac508daca3f}{UnitTestOptions::GetAbsolutePathToOutputFile}}();}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00091}00091\ \textcolor{preprocessor}{\#if\ GTEST\_OS\_WINDOWS}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00092}00092\ \ \ \mbox{\hyperlink{gtest_8h_a740cab7e3eec5c178a64b4f558bde66e}{EXPECT\_STRCASEEQ}}(expected\_output\_file.c\_str(),\ output\_file.c\_str());}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00093}00093\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00094}00094\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(expected\_output\_file,\ output\_file.c\_str());}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00095}00095\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00096}00096\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00097}00097\ }
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00098}00098\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(OutputFileHelpersTest,\ \mbox{\hyperlink{namespacetesting_1_1internal_a7a2bbf069f75bc99873976ad6fc356ad}{GetCurrentExecutableName}})\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00099}00099\ \ \ \textcolor{keyword}{const}\ std::string\ exe\_str\ =\ \mbox{\hyperlink{namespacetesting_1_1internal_a7a2bbf069f75bc99873976ad6fc356ad}{GetCurrentExecutableName}}().\mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a44649e2fb65454648a9494a89a970d85}{string}}();}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00100}00100\ \textcolor{preprocessor}{\#if\ GTEST\_OS\_WINDOWS}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00101}00101\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a72ffd6653260a2dedcc4b55e39e10973a4e09c20e9a85794807a130e8283e8769}{success}}\ =}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00102}00102\ \ \ \ \ \ \ \_strcmpi(\textcolor{stringliteral}{"{}gtest-\/options\_test"{}},\ exe\_str.c\_str())\ ==\ 0\ ||}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00103}00103\ \ \ \ \ \ \ \_strcmpi(\textcolor{stringliteral}{"{}gtest-\/options-\/ex\_test"{}},\ exe\_str.c\_str())\ ==\ 0\ ||}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00104}00104\ \ \ \ \ \ \ \_strcmpi(\textcolor{stringliteral}{"{}gtest\_all\_test"{}},\ exe\_str.c\_str())\ ==\ 0\ ||}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00105}00105\ \ \ \ \ \ \ \_strcmpi(\textcolor{stringliteral}{"{}gtest\_dll\_test"{}},\ exe\_str.c\_str())\ ==\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00106}00106\ \textcolor{preprocessor}{\#elif\ GTEST\_OS\_FUCHSIA}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00107}00107\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a72ffd6653260a2dedcc4b55e39e10973a4e09c20e9a85794807a130e8283e8769}{success}}\ =\ exe\_str\ ==\ \textcolor{stringliteral}{"{}app"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00108}00108\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00109}00109\ \ \ \textcolor{comment}{//\ TODO(wan@google.com):\ remove\ the\ hard-\/coded\ "{}lt-\/"{}\ prefix\ when}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00110}00110\ \ \ \textcolor{comment}{//\ \ \ Chandler\ Carruth's\ libtool\ replacement\ is\ ready.}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00111}00111\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a72ffd6653260a2dedcc4b55e39e10973a4e09c20e9a85794807a130e8283e8769}{success}}\ =}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00112}00112\ \ \ \ \ \ \ exe\_str\ ==\ \textcolor{stringliteral}{"{}gtest-\/options\_test"{}}\ ||}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00113}00113\ \ \ \ \ \ \ exe\_str\ ==\ \textcolor{stringliteral}{"{}gtest\_all\_test"{}}\ ||}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00114}00114\ \ \ \ \ \ \ exe\_str\ ==\ \textcolor{stringliteral}{"{}lt-\/gtest\_all\_test"{}}\ ||}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00115}00115\ \ \ \ \ \ \ exe\_str\ ==\ \textcolor{stringliteral}{"{}gtest\_dll\_test"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00116}00116\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_OS\_WINDOWS}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00117}00117\ \ \ \textcolor{keywordflow}{if}\ (!success)}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00118}00118\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a3e26a8d27caa386ed0ea7ce9d5b7c4ed}{FAIL}}()\ <<\ \textcolor{stringliteral}{"{}GetCurrentExecutableName()\ returns\ "{}}\ <<\ exe\_str;}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00119}00119\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00120}00120\ }
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00121}00121\ \textcolor{preprocessor}{\#if\ !GTEST\_OS\_FUCHSIA}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00122}00122\ }
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00123}00123\ \textcolor{keyword}{class\ }XmlOutputChangeDirTest\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{class_test}{Test}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00124}00124\ \ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00125}00125\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ SetUp()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00126}00126\ \ \ \ \ \mbox{\hyperlink{gtest-options__test_8cc_aa5f13fd18a275d0a3117700f30bfb9ff}{original\_working\_dir\_}}\ =\ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_aaff39ccd7bfb7a1c09c0220a64326387}{FilePath::GetCurrentDir}}();}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00127}00127\ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_1_1posix_a1ddc8a4fc6bb21da372307485591a212}{posix::ChDir}}(\textcolor{stringliteral}{"{}.."{}});}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00128}00128\ \ \ \ \ \textcolor{comment}{//\ This\ will\ make\ the\ test\ fail\ if\ run\ from\ the\ root\ directory.}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00129}00129\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a6ae7443947f25abc58bfcfcfc56b0d75}{EXPECT\_NE}}(\mbox{\hyperlink{gtest-options__test_8cc_aa5f13fd18a275d0a3117700f30bfb9ff}{original\_working\_dir\_}}.string(),}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00130}00130\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_aaff39ccd7bfb7a1c09c0220a64326387}{FilePath::GetCurrentDir}}().\mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a44649e2fb65454648a9494a89a970d85}{string}}());}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00131}00131\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00132}00132\ }
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00133}00133\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ TearDown()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00134}00134\ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_1_1posix_a1ddc8a4fc6bb21da372307485591a212}{posix::ChDir}}(\mbox{\hyperlink{gtest-options__test_8cc_aa5f13fd18a275d0a3117700f30bfb9ff}{original\_working\_dir\_}}.string().c\_str());}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00135}00135\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00136}00136\ }
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00137}\mbox{\hyperlink{gtest-options__test_8cc_aa5f13fd18a275d0a3117700f30bfb9ff}{00137}}\ \ \ FilePath\ \mbox{\hyperlink{gtest-options__test_8cc_aa5f13fd18a275d0a3117700f30bfb9ff}{original\_working\_dir\_}};}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00138}00138\ \};}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00139}00139\ }
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00140}00140\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(XmlOutputChangeDirTest,\ PreserveOriginalWorkingDirWithDefault)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00141}00141\ \ \ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(output)\ =\ \textcolor{stringliteral}{"{}"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00142}00142\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_ac9d57987f60ac43f0c57b89e333e531e}{FilePath::ConcatPaths}}(\mbox{\hyperlink{gtest-options__test_8cc_aa5f13fd18a275d0a3117700f30bfb9ff}{original\_working\_dir\_}},}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00143}00143\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ FilePath(\textcolor{stringliteral}{"{}test\_detail.xml"{}})).\textcolor{keywordtype}{string}(),}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00144}00144\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_options_a993fb30ad66104158c8c0ac508daca3f}{UnitTestOptions::GetAbsolutePathToOutputFile}}());}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00145}00145\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00146}00146\ }
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00147}00147\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(XmlOutputChangeDirTest,\ PreserveOriginalWorkingDirWithDefaultXML)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00148}00148\ \ \ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(output)\ =\ \textcolor{stringliteral}{"{}xml"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00149}00149\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_ac9d57987f60ac43f0c57b89e333e531e}{FilePath::ConcatPaths}}(\mbox{\hyperlink{gtest-options__test_8cc_aa5f13fd18a275d0a3117700f30bfb9ff}{original\_working\_dir\_}},}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00150}00150\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ FilePath(\textcolor{stringliteral}{"{}test\_detail.xml"{}})).\textcolor{keywordtype}{string}(),}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00151}00151\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_options_a993fb30ad66104158c8c0ac508daca3f}{UnitTestOptions::GetAbsolutePathToOutputFile}}());}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00152}00152\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00153}00153\ }
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00154}00154\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(XmlOutputChangeDirTest,\ PreserveOriginalWorkingDirWithRelativeFile)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00155}00155\ \ \ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(output)\ =\ \textcolor{stringliteral}{"{}xml:filename.abc"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00156}00156\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_ac9d57987f60ac43f0c57b89e333e531e}{FilePath::ConcatPaths}}(\mbox{\hyperlink{gtest-options__test_8cc_aa5f13fd18a275d0a3117700f30bfb9ff}{original\_working\_dir\_}},}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00157}00157\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ FilePath(\textcolor{stringliteral}{"{}filename.abc"{}})).\textcolor{keywordtype}{string}(),}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00158}00158\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_options_a993fb30ad66104158c8c0ac508daca3f}{UnitTestOptions::GetAbsolutePathToOutputFile}}());}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00159}00159\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00160}00160\ }
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00161}00161\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(XmlOutputChangeDirTest,\ PreserveOriginalWorkingDirWithRelativePath)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00162}00162\ \ \ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(output)\ =\ \textcolor{stringliteral}{"{}xml:path"{}}\ \mbox{\hyperlink{gtest-port_8h_afbb636e91bdd50267dbef11a50490b29}{GTEST\_PATH\_SEP\_}};}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00163}00163\ \ \ \textcolor{keyword}{const}\ std::string\ expected\_output\_file\ =}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00164}00164\ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_ac9d57987f60ac43f0c57b89e333e531e}{FilePath::ConcatPaths}}(}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00165}00165\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest-options__test_8cc_aa5f13fd18a275d0a3117700f30bfb9ff}{original\_working\_dir\_}},}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00166}00166\ \ \ \ \ \ \ \ \ \ \ FilePath(std::string(\textcolor{stringliteral}{"{}path"{}})\ +\ \mbox{\hyperlink{gtest-port_8h_afbb636e91bdd50267dbef11a50490b29}{GTEST\_PATH\_SEP\_}}\ +}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00167}00167\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a7a2bbf069f75bc99873976ad6fc356ad}{GetCurrentExecutableName}}().\textcolor{keywordtype}{string}()\ +\ \textcolor{stringliteral}{"{}.xml"{}})).\mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a44649e2fb65454648a9494a89a970d85}{string}}();}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00168}00168\ \ \ \textcolor{keyword}{const}\ std::string\&\ output\_file\ =}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00169}00169\ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_options_a993fb30ad66104158c8c0ac508daca3f}{UnitTestOptions::GetAbsolutePathToOutputFile}}();}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00170}00170\ \textcolor{preprocessor}{\#if\ GTEST\_OS\_WINDOWS}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00171}00171\ \ \ \mbox{\hyperlink{gtest_8h_a740cab7e3eec5c178a64b4f558bde66e}{EXPECT\_STRCASEEQ}}(expected\_output\_file.c\_str(),\ output\_file.c\_str());}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00172}00172\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00173}00173\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(expected\_output\_file,\ output\_file.c\_str());}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00174}00174\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00175}00175\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00176}00176\ }
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00177}00177\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(XmlOutputChangeDirTest,\ PreserveOriginalWorkingDirWithAbsoluteFile)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00178}00178\ \textcolor{preprocessor}{\#if\ GTEST\_OS\_WINDOWS}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00179}00179\ \ \ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(output)\ =\ \textcolor{stringliteral}{"{}xml:c:\(\backslash\)\(\backslash\)tmp\(\backslash\)\(\backslash\)filename.abc"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00180}00180\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(FilePath(\textcolor{stringliteral}{"{}c:\(\backslash\)\(\backslash\)tmp\(\backslash\)\(\backslash\)filename.abc"{}}).\textcolor{keywordtype}{string}(),}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00181}00181\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_options_a993fb30ad66104158c8c0ac508daca3f}{UnitTestOptions::GetAbsolutePathToOutputFile}}());}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00182}00182\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00183}00183\ \ \ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(output)\ =\textcolor{stringliteral}{"{}xml:/tmp/filename.abc"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00184}00184\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(FilePath(\textcolor{stringliteral}{"{}/tmp/filename.abc"{}}).\textcolor{keywordtype}{string}(),}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00185}00185\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_options_a993fb30ad66104158c8c0ac508daca3f}{UnitTestOptions::GetAbsolutePathToOutputFile}}());}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00186}00186\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00187}00187\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00188}00188\ }
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00189}00189\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(XmlOutputChangeDirTest,\ PreserveOriginalWorkingDirWithAbsolutePath)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00190}00190\ \textcolor{preprocessor}{\#if\ GTEST\_OS\_WINDOWS}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00191}00191\ \ \ \textcolor{keyword}{const}\ std::string\ path\ =\ \textcolor{stringliteral}{"{}c:\(\backslash\)\(\backslash\)tmp\(\backslash\)\(\backslash\)"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00192}00192\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00193}00193\ \ \ \textcolor{keyword}{const}\ std::string\ path\ =\ \textcolor{stringliteral}{"{}/tmp/"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00194}00194\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00195}00195\ }
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00196}00196\ \ \ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(output)\ =\ \textcolor{stringliteral}{"{}xml:"{}}\ +\ path;}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00197}00197\ \ \ \textcolor{keyword}{const}\ std::string\ expected\_output\_file\ =}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00198}00198\ \ \ \ \ \ \ path\ +\ \mbox{\hyperlink{namespacetesting_1_1internal_a7a2bbf069f75bc99873976ad6fc356ad}{GetCurrentExecutableName}}().\mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a44649e2fb65454648a9494a89a970d85}{string}}()\ +\ \textcolor{stringliteral}{"{}.xml"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00199}00199\ \ \ \textcolor{keyword}{const}\ std::string\&\ output\_file\ =}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00200}00200\ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_options_a993fb30ad66104158c8c0ac508daca3f}{UnitTestOptions::GetAbsolutePathToOutputFile}}();}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00201}00201\ }
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00202}00202\ \textcolor{preprocessor}{\#if\ GTEST\_OS\_WINDOWS}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00203}00203\ \ \ \mbox{\hyperlink{gtest_8h_a740cab7e3eec5c178a64b4f558bde66e}{EXPECT\_STRCASEEQ}}(expected\_output\_file.c\_str(),\ output\_file.c\_str());}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00204}00204\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00205}00205\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(expected\_output\_file,\ output\_file.c\_str());}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00206}00206\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00207}00207\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00208}00208\ }
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00209}00209\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ !GTEST\_OS\_FUCHSIA}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00210}00210\ }
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00211}00211\ \}\ \ \textcolor{comment}{//\ namespace}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00212}00212\ \}\ \ \textcolor{comment}{//\ namespace\ internal}}
+\DoxyCodeLine{\Hypertarget{gtest-options__test_8cc_source_l00213}00213\ \}\ \ \textcolor{comment}{//\ namespace\ testing}}
+
+\end{DoxyCode}

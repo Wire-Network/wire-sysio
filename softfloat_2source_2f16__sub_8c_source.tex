@@ -1,0 +1,76 @@
+\doxysection{f16\+\_\+sub.\+c}
+\hypertarget{softfloat_2source_2f16__sub_8c_source}{}\label{softfloat_2source_2f16__sub_8c_source}\index{libraries/softfloat/source/f16\_sub.c@{libraries/softfloat/source/f16\_sub.c}}
+\mbox{\hyperlink{softfloat_2source_2f16__sub_8c}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00001}00001\ }
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00002}00002\ \textcolor{comment}{/*============================================================================}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00003}00003\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00004}00004\ \textcolor{comment}{This\ C\ source\ file\ is\ part\ of\ the\ SoftFloat\ IEEE\ Floating-\/Point\ Arithmetic}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00005}00005\ \textcolor{comment}{Package,\ Release\ 3e,\ by\ John\ R.\ Hauser.}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00006}00006\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00007}00007\ \textcolor{comment}{Copyright\ 2011,\ 2012,\ 2013,\ 2014,\ 2015,\ 2016\ The\ Regents\ of\ the\ University\ of}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00008}00008\ \textcolor{comment}{California.\ \ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00009}00009\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00010}00010\ \textcolor{comment}{Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00011}00011\ \textcolor{comment}{modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are\ met:}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00012}00012\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00013}00013\ \textcolor{comment}{\ 1.\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright\ notice,}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00014}00014\ \textcolor{comment}{\ \ \ \ this\ list\ of\ conditions,\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00015}00015\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00016}00016\ \textcolor{comment}{\ 2.\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above\ copyright\ notice,}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00017}00017\ \textcolor{comment}{\ \ \ \ this\ list\ of\ conditions,\ and\ the\ following\ disclaimer\ in\ the\ documentation}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00018}00018\ \textcolor{comment}{\ \ \ \ and/or\ other\ materials\ provided\ with\ the\ distribution.}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00019}00019\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00020}00020\ \textcolor{comment}{\ 3.\ Neither\ the\ name\ of\ the\ University\ nor\ the\ names\ of\ its\ contributors\ may}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00021}00021\ \textcolor{comment}{\ \ \ \ be\ used\ to\ endorse\ or\ promote\ products\ derived\ from\ this\ software\ without}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00022}00022\ \textcolor{comment}{\ \ \ \ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00023}00023\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00024}00024\ \textcolor{comment}{THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ REGENTS\ AND\ CONTRIBUTORS\ "{}AS\ IS"{},\ AND\ ANY}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00025}00025\ \textcolor{comment}{EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ THE\ IMPLIED}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00026}00026\ \textcolor{comment}{WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR\ A\ PARTICULAR\ PURPOSE,\ ARE}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00027}00027\ \textcolor{comment}{DISCLAIMED.\ \ IN\ NO\ EVENT\ SHALL\ THE\ REGENTS\ OR\ CONTRIBUTORS\ BE\ LIABLE\ FOR\ ANY}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00028}00028\ \textcolor{comment}{DIRECT,\ INDIRECT,\ INCIDENTAL,\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00029}00029\ \textcolor{comment}{(INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00030}00030\ \textcolor{comment}{LOSS\ OF\ USE,\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00031}00031\ \textcolor{comment}{ON\ ANY\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00032}00032\ \textcolor{comment}{(INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE\ OF\ THIS}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00033}00033\ \textcolor{comment}{SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00034}00034\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00035}00035\ \textcolor{comment}{=============================================================================*/}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00037}00037\ \textcolor{preprocessor}{\#include\ <stdbool.h>}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00038}00038\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{stdint_8h}{stdint.h}}>}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00039}00039\ \textcolor{preprocessor}{\#include\ "{}platform.h"{}}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00040}00040\ \textcolor{preprocessor}{\#include\ "{}internals.h"{}}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00041}00041\ \textcolor{preprocessor}{\#include\ "{}softfloat.h"{}}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00043}\mbox{\hyperlink{softfloat_2source_2f16__sub_8c_a28257da302a51ba2b9b6bb0f6f29be32}{00043}}\ \mbox{\hyperlink{structfloat16__t}{float16\_t}}\ \mbox{\hyperlink{softfloat_2source_2f16__sub_8c_a28257da302a51ba2b9b6bb0f6f29be32}{f16\_sub}}(\ \mbox{\hyperlink{structfloat16__t}{float16\_t}}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \mbox{\hyperlink{structfloat16__t}{float16\_t}}\ b\ )}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00044}00044\ \{}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00045}00045\ \ \ \ \ \textcolor{keyword}{union\ }\mbox{\hyperlink{unionui16__f16}{ui16\_f16}}\ uA;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00046}00046\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a6ed085329b153773ff76afa0702cf897}{uint\_fast16\_t}}\ uiA;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00047}00047\ \ \ \ \ \textcolor{keyword}{union\ }\mbox{\hyperlink{unionui16__f16}{ui16\_f16}}\ uB;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00048}00048\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a6ed085329b153773ff76afa0702cf897}{uint\_fast16\_t}}\ uiB;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00049}00049\ \textcolor{preprocessor}{\#if\ !\ defined\ INLINE\_LEVEL\ ||\ (INLINE\_LEVEL\ <\ 1)}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00050}00050\ \ \ \ \ \mbox{\hyperlink{structfloat16__t}{float16\_t}}\ (*magsFuncPtr)(\ \mbox{\hyperlink{stdint_8h_a6ed085329b153773ff76afa0702cf897}{uint\_fast16\_t}},\ \mbox{\hyperlink{stdint_8h_a6ed085329b153773ff76afa0702cf897}{uint\_fast16\_t}}\ );}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00051}00051\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00052}00052\ }
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00053}00053\ \ \ \ \ uA.\mbox{\hyperlink{unionui16__f16_ab323bc7bebcf8d648c2e9135482fde81}{f}}\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}};}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00054}00054\ \ \ \ \ uiA\ =\ uA.\mbox{\hyperlink{unionui16__f16_aac6c7d977adfc50a60af439130126fc4}{ui}};}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00055}00055\ \ \ \ \ uB.\mbox{\hyperlink{unionui16__f16_ab323bc7bebcf8d648c2e9135482fde81}{f}}\ =\ b;}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00056}00056\ \ \ \ \ uiB\ =\ uB.\mbox{\hyperlink{unionui16__f16_aac6c7d977adfc50a60af439130126fc4}{ui}};}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00057}00057\ \textcolor{preprocessor}{\#if\ defined\ INLINE\_LEVEL\ \&\&\ (1\ <=\ INLINE\_LEVEL)}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00058}00058\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a436bcbe96380e4dab48591350a95c45b}{signF16UI}}(\ uiA\ \string^\ uiB\ )\ )\ \{}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00059}00059\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_ae3b04e00d33a7b321f19a11ab38be542}{softfloat\_addMagsF16}}(\ uiA,\ uiB\ );}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00060}00060\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00061}00061\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a7b76530ca3e0df2a9199e22c87681d08}{softfloat\_subMagsF16}}(\ uiA,\ uiB\ );}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00062}00062\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00063}00063\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00064}00064\ \ \ \ \ magsFuncPtr\ =}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00065}00065\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a436bcbe96380e4dab48591350a95c45b}{signF16UI}}(\ uiA\ \string^\ uiB\ )\ ?\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_ae3b04e00d33a7b321f19a11ab38be542}{softfloat\_addMagsF16}}\ :\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a7b76530ca3e0df2a9199e22c87681d08}{softfloat\_subMagsF16}};}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00066}00066\ \ \ \ \ \textcolor{keywordflow}{return}\ (*magsFuncPtr)(\ uiA,\ uiB\ );}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00067}00067\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00069}00069\ \}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2f16__sub_8c_source_l00070}00070\ }
+
+\end{DoxyCode}

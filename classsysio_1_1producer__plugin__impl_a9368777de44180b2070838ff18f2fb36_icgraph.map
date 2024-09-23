@@ -1,0 +1,16 @@
+<map id="sysio::producer_plugin_impl::calculate_next_block_time" name="sysio::producer_plugin_impl::calculate_next_block_time">
+<area shape="rect" id="Node000001" title=" " alt="" coords="937,63,1088,119"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1producer__plugin__impl.html#a652ecc759215ca6fa58b36370cc72e43" title=" " alt="" coords="719,63,889,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="921,94,889,94,889,88,921,88"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1producer__plugin__impl.html#ad8895b72aaf8928b54665684ffdb9405" title=" " alt="" coords="262,71,472,111"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="704,90,671,90,520,90,472,91,472,85,520,84,671,84,704,85"/>
+<area shape="rect" id="Node000007" href="$classsysio_1_1producer__plugin__impl.html#a7db63178eda240d671fc6ae4e46bf01e" title=" " alt="" coords="520,99,671,139"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="704,107,672,111,672,106,704,102"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1producer__plugin__impl.html#a230c88a6ed7efbc3588a043fe4915bd9" title=" " alt="" coords="14,5,205,46"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="269,69,192,49,193,44,270,64"/>
+<area shape="rect" id="Node000005" href="$classsysio_1_1producer__plugin__impl.html#a9ce89d0c80f40aeb7df69c5a49beff5a" title=" " alt="" coords="24,71,195,111"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="246,94,196,94,196,88,246,88"/>
+<area shape="rect" id="Node000006" href="$classsysio_1_1producer__plugin__impl.html#ab57089953b20f4eac5adc247b73040ec" title=" " alt="" coords="5,136,214,177"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="270,118,193,138,192,133,269,113"/>
+<area shape="poly" id="edge7_Node000007_Node000003" title=" " alt="" coords="504,111,472,107,473,101,505,105"/>
+</map>

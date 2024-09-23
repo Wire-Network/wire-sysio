@@ -1,0 +1,7 @@
+<map id="sysio::chain::legacy::producer_key" name="sysio::chain::legacy::producer_key">
+<area shape="rect" id="Node000001" title=" " alt="" coords="84,94,221,135"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1name.html" title="Immutable except for fc::from_variant." alt="" coords="5,5,137,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="91,41,113,68,135,92,131,95,109,72,87,45"/>
+<area shape="rect" id="Node000003" href="$classfc_1_1crypto_1_1public__key.html" title=" " alt="" coords="160,5,307,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="224,46,206,72,181,96,178,92,202,68,219,43"/>
+</map>

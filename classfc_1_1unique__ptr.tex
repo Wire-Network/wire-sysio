@@ -1,0 +1,299 @@
+\doxysection{fc\+::unique\+\_\+ptr\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classfc_1_1unique__ptr}{}\label{classfc_1_1unique__ptr}\index{fc::unique\_ptr$<$ T $>$@{fc::unique\_ptr$<$ T $>$}}
+
+
+{\ttfamily \#include $<$unique\+\_\+ptr.\+hpp$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classfc_1_1unique__ptr_a0428c6a85877bd7a20eca8fb4b146c43}{pointer}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1unique__ptr_ae3b6625ef1d35bbdaf9ce25b5ef959ac}{unique\+\_\+ptr}} (\mbox{\hyperlink{classfc_1_1unique__ptr_a0428c6a85877bd7a20eca8fb4b146c43}{pointer}} t=nullptr)
+\item 
+\mbox{\hyperlink{classfc_1_1unique__ptr_a43c3dfad7a7f54d00162b783231cfd2b}{unique\+\_\+ptr}} (\mbox{\hyperlink{classfc_1_1unique__ptr}{unique\+\_\+ptr}} \&\&m)
+\item 
+\mbox{\hyperlink{classfc_1_1unique__ptr_af81e641b845724980a45d94c8b76e049}{\texorpdfstring{$\sim$}{\string~}unique\+\_\+ptr}} ()
+\item 
+\mbox{\hyperlink{classfc_1_1unique__ptr_ad0a1bf993e0f1c82d8da966731214297}{operator bool}} () const
+\item 
+\mbox{\hyperlink{classfc_1_1unique__ptr}{unique\+\_\+ptr}} \& \mbox{\hyperlink{classfc_1_1unique__ptr_a61b51ba78977d7b6bd049502c266e0dd}{operator=}} (\mbox{\hyperlink{namespacefc_aeffaff8d6d824699c60630a03055fd2f}{nullptr\+\_\+t}})
+\item 
+\mbox{\hyperlink{classfc_1_1unique__ptr}{unique\+\_\+ptr}} \& \mbox{\hyperlink{classfc_1_1unique__ptr_afbf8f122671380b172c9b2066d59270d}{operator=}} (\mbox{\hyperlink{classfc_1_1unique__ptr}{unique\+\_\+ptr}} \&\&o)
+\item 
+\mbox{\hyperlink{classfc_1_1unique__ptr_a0428c6a85877bd7a20eca8fb4b146c43}{pointer}} \mbox{\hyperlink{classfc_1_1unique__ptr_a03b7cde30febe65004e3232c3485bcb3}{operator-\/$>$}} () const
+\item 
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classfc_1_1unique__ptr_a92218a48b1aaadd36c2583dba8f29bc5}{operator\texorpdfstring{$\ast$}{*}}} () const
+\item 
+void \mbox{\hyperlink{classfc_1_1unique__ptr_afabaa48e02b058c61df6089f56b17cf6}{reset}} (\mbox{\hyperlink{classfc_1_1unique__ptr_a0428c6a85877bd7a20eca8fb4b146c43}{pointer}} v)
+\item 
+\mbox{\hyperlink{classfc_1_1unique__ptr_a0428c6a85877bd7a20eca8fb4b146c43}{pointer}} \mbox{\hyperlink{classfc_1_1unique__ptr_a6e8a72b0514b82ada6764c6b4e377559}{release}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{classfc_1_1unique__ptr_ad52c0c5bd0cbe61c7b4a4efde45efe9f}{operator==}} (const \mbox{\hyperlink{classfc_1_1unique__ptr}{unique\+\_\+ptr}} \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}, \mbox{\hyperlink{namespacefc_aeffaff8d6d824699c60630a03055fd2f}{nullptr\+\_\+t}})
+\item 
+bool \mbox{\hyperlink{classfc_1_1unique__ptr_acf4806900e0ae47262111250ece21e6e}{operator!=}} (const \mbox{\hyperlink{classfc_1_1unique__ptr}{unique\+\_\+ptr}} \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}, \mbox{\hyperlink{namespacefc_aeffaff8d6d824699c60630a03055fd2f}{nullptr\+\_\+t}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$\newline
+class fc\+::unique\+\_\+ptr$<$ T $>$}
+
+
+Definition at line \mbox{\hyperlink{unique__ptr_8hpp_source_l00008}{8}} of file \mbox{\hyperlink{unique__ptr_8hpp_source}{unique\+\_\+ptr.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classfc_1_1unique__ptr_a0428c6a85877bd7a20eca8fb4b146c43}\index{fc::unique\_ptr$<$ T $>$@{fc::unique\_ptr$<$ T $>$}!pointer@{pointer}}
+\index{pointer@{pointer}!fc::unique\_ptr$<$ T $>$@{fc::unique\_ptr$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{pointer}{pointer}}
+{\footnotesize\ttfamily \label{classfc_1_1unique__ptr_a0428c6a85877bd7a20eca8fb4b146c43} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classfc_1_1unique__ptr}{fc\+::unique\+\_\+ptr}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::pointer}
+
+
+
+Definition at line \mbox{\hyperlink{unique__ptr_8hpp_source_l00011}{11}} of file \mbox{\hyperlink{unique__ptr_8hpp_source}{unique\+\_\+ptr.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1unique__ptr_ae3b6625ef1d35bbdaf9ce25b5ef959ac}\index{fc::unique\_ptr$<$ T $>$@{fc::unique\_ptr$<$ T $>$}!unique\_ptr@{unique\_ptr}}
+\index{unique\_ptr@{unique\_ptr}!fc::unique\_ptr$<$ T $>$@{fc::unique\_ptr$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{unique\_ptr()}{unique\_ptr()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1unique__ptr_ae3b6625ef1d35bbdaf9ce25b5ef959ac} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{classfc_1_1unique__ptr}{fc\+::unique\+\_\+ptr}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::unique\+\_\+ptr (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1unique__ptr_a0428c6a85877bd7a20eca8fb4b146c43}{pointer}}}]{t}{ = {\ttfamily nullptr}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{unique__ptr_8hpp_source_l00013}{13}} of file \mbox{\hyperlink{unique__ptr_8hpp_source}{unique\+\_\+ptr.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00013\ :\_p(t)\{\}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1unique__ptr_a43c3dfad7a7f54d00162b783231cfd2b}\index{fc::unique\_ptr$<$ T $>$@{fc::unique\_ptr$<$ T $>$}!unique\_ptr@{unique\_ptr}}
+\index{unique\_ptr@{unique\_ptr}!fc::unique\_ptr$<$ T $>$@{fc::unique\_ptr$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{unique\_ptr()}{unique\_ptr()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1unique__ptr_a43c3dfad7a7f54d00162b783231cfd2b} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{classfc_1_1unique__ptr}{fc\+::unique\+\_\+ptr}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::unique\+\_\+ptr (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1unique__ptr}{unique\+\_\+ptr}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&\&}]{m}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{unique__ptr_8hpp_source_l00015}{15}} of file \mbox{\hyperlink{unique__ptr_8hpp_source}{unique\+\_\+ptr.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \ \ \ :\_p(m.\_p)\{\ m.\_p\ =\ \textcolor{keyword}{nullptr};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1unique__ptr_af81e641b845724980a45d94c8b76e049}\index{fc::unique\_ptr$<$ T $>$@{fc::unique\_ptr$<$ T $>$}!````~unique\_ptr@{\texorpdfstring{$\sim$}{\string~}unique\_ptr}}
+\index{````~unique\_ptr@{\texorpdfstring{$\sim$}{\string~}unique\_ptr}!fc::unique\_ptr$<$ T $>$@{fc::unique\_ptr$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}unique\_ptr()}{\string~unique\_ptr()}}
+{\footnotesize\ttfamily \label{classfc_1_1unique__ptr_af81e641b845724980a45d94c8b76e049} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{classfc_1_1unique__ptr}{fc\+::unique\+\_\+ptr}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::\texorpdfstring{$\sim$}{\string~}\mbox{\hyperlink{classfc_1_1unique__ptr}{unique\+\_\+ptr}} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{unique__ptr_8hpp_source_l00018}{18}} of file \mbox{\hyperlink{unique__ptr_8hpp_source}{unique\+\_\+ptr.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00018\ \{\ \textcolor{keyword}{delete}\ \_p;\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1unique__ptr_ad0a1bf993e0f1c82d8da966731214297}\index{fc::unique\_ptr$<$ T $>$@{fc::unique\_ptr$<$ T $>$}!operator bool@{operator bool}}
+\index{operator bool@{operator bool}!fc::unique\_ptr$<$ T $>$@{fc::unique\_ptr$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{operator bool()}{operator bool()}}
+{\footnotesize\ttfamily \label{classfc_1_1unique__ptr_ad0a1bf993e0f1c82d8da966731214297} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{classfc_1_1unique__ptr}{fc\+::unique\+\_\+ptr}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::operator bool (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{unique__ptr_8hpp_source_l00020}{20}} of file \mbox{\hyperlink{unique__ptr_8hpp_source}{unique\+\_\+ptr.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00020\ \{\ \textcolor{keywordflow}{return}\ \_p\ !=\ \textcolor{keyword}{nullptr};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1unique__ptr_a92218a48b1aaadd36c2583dba8f29bc5}\index{fc::unique\_ptr$<$ T $>$@{fc::unique\_ptr$<$ T $>$}!operator\texorpdfstring{$\ast$}{*}@{operator\texorpdfstring{$\ast$}{*}}}
+\index{operator\texorpdfstring{$\ast$}{*}@{operator\texorpdfstring{$\ast$}{*}}!fc::unique\_ptr$<$ T $>$@{fc::unique\_ptr$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{operator\texorpdfstring{$\ast$}{*}()}{operator*()}}
+{\footnotesize\ttfamily \label{classfc_1_1unique__ptr_a92218a48b1aaadd36c2583dba8f29bc5} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classfc_1_1unique__ptr}{fc\+::unique\+\_\+ptr}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::operator\texorpdfstring{$\ast$}{*} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{unique__ptr_8hpp_source_l00043}{43}} of file \mbox{\hyperlink{unique__ptr_8hpp_source}{unique\+\_\+ptr.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00043\ \{\ \textcolor{keywordflow}{return}\ *\_p;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1unique__ptr_a03b7cde30febe65004e3232c3485bcb3}\index{fc::unique\_ptr$<$ T $>$@{fc::unique\_ptr$<$ T $>$}!operator-\/$>$@{operator-\/$>$}}
+\index{operator-\/$>$@{operator-\/$>$}!fc::unique\_ptr$<$ T $>$@{fc::unique\_ptr$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{operator-\/$>$()}{operator->()}}
+{\footnotesize\ttfamily \label{classfc_1_1unique__ptr_a03b7cde30febe65004e3232c3485bcb3} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{classfc_1_1unique__ptr_a0428c6a85877bd7a20eca8fb4b146c43}{pointer}} \mbox{\hyperlink{classfc_1_1unique__ptr}{fc\+::unique\+\_\+ptr}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::operator-\/$>$ (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{unique__ptr_8hpp_source_l00042}{42}} of file \mbox{\hyperlink{unique__ptr_8hpp_source}{unique\+\_\+ptr.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00042\ \{\ \textcolor{keywordflow}{return}\ \_p;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1unique__ptr_a61b51ba78977d7b6bd049502c266e0dd}\index{fc::unique\_ptr$<$ T $>$@{fc::unique\_ptr$<$ T $>$}!operator=@{operator=}}
+\index{operator=@{operator=}!fc::unique\_ptr$<$ T $>$@{fc::unique\_ptr$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1unique__ptr_a61b51ba78977d7b6bd049502c266e0dd} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{classfc_1_1unique__ptr}{unique\+\_\+ptr}} \& \mbox{\hyperlink{classfc_1_1unique__ptr}{fc\+::unique\+\_\+ptr}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::operator= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacefc_aeffaff8d6d824699c60630a03055fd2f}{nullptr\+\_\+t}}}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{unique__ptr_8hpp_source_l00031}{31}} of file \mbox{\hyperlink{unique__ptr_8hpp_source}{unique\+\_\+ptr.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{delete}\ \_p;\ \_p\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1unique__ptr_afbf8f122671380b172c9b2066d59270d}\index{fc::unique\_ptr$<$ T $>$@{fc::unique\_ptr$<$ T $>$}!operator=@{operator=}}
+\index{operator=@{operator=}!fc::unique\_ptr$<$ T $>$@{fc::unique\_ptr$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1unique__ptr_afbf8f122671380b172c9b2066d59270d} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{classfc_1_1unique__ptr}{unique\+\_\+ptr}} \& \mbox{\hyperlink{classfc_1_1unique__ptr}{fc\+::unique\+\_\+ptr}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::operator= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1unique__ptr}{unique\+\_\+ptr}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&\&}]{o}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{unique__ptr_8hpp_source_l00036}{36}} of file \mbox{\hyperlink{unique__ptr_8hpp_source}{unique\+\_\+ptr.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{utility_8hpp_aa8fc7454c03dcfc9e542977e3b9250fa}{fc\_swap}}(\ \_p,\ o.\_p\ );}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=291pt]{classfc_1_1unique__ptr_afbf8f122671380b172c9b2066d59270d_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1unique__ptr_a6e8a72b0514b82ada6764c6b4e377559}\index{fc::unique\_ptr$<$ T $>$@{fc::unique\_ptr$<$ T $>$}!release@{release}}
+\index{release@{release}!fc::unique\_ptr$<$ T $>$@{fc::unique\_ptr$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{release()}{release()}}
+{\footnotesize\ttfamily \label{classfc_1_1unique__ptr_a6e8a72b0514b82ada6764c6b4e377559} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{classfc_1_1unique__ptr_a0428c6a85877bd7a20eca8fb4b146c43}{pointer}} \mbox{\hyperlink{classfc_1_1unique__ptr}{fc\+::unique\+\_\+ptr}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::release (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{unique__ptr_8hpp_source_l00049}{49}} of file \mbox{\hyperlink{unique__ptr_8hpp_source}{unique\+\_\+ptr.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ tmp\ =\ \_p;}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \ \ \ \_p\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ tmp;}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1unique__ptr_afabaa48e02b058c61df6089f56b17cf6}\index{fc::unique\_ptr$<$ T $>$@{fc::unique\_ptr$<$ T $>$}!reset@{reset}}
+\index{reset@{reset}!fc::unique\_ptr$<$ T $>$@{fc::unique\_ptr$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{reset()}{reset()}}
+{\footnotesize\ttfamily \label{classfc_1_1unique__ptr_afabaa48e02b058c61df6089f56b17cf6} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+void \mbox{\hyperlink{classfc_1_1unique__ptr}{fc\+::unique\+\_\+ptr}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::reset (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1unique__ptr_a0428c6a85877bd7a20eca8fb4b146c43}{pointer}}}]{v}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{unique__ptr_8hpp_source_l00045}{45}} of file \mbox{\hyperlink{unique__ptr_8hpp_source}{unique\+\_\+ptr.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{delete}\ \_p;\ \_p\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=332pt]{classfc_1_1unique__ptr_afabaa48e02b058c61df6089f56b17cf6_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{classfc_1_1unique__ptr_acf4806900e0ae47262111250ece21e6e}\index{fc::unique\_ptr$<$ T $>$@{fc::unique\_ptr$<$ T $>$}!operator"!=@{operator"!=}}
+\index{operator"!=@{operator"!=}!fc::unique\_ptr$<$ T $>$@{fc::unique\_ptr$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{operator"!=}{operator!=}}
+{\footnotesize\ttfamily \label{classfc_1_1unique__ptr_acf4806900e0ae47262111250ece21e6e} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+bool \mbox{\hyperlink{namespacefc_a40c368ac88294ae47b064cad937fdbf6}{operator!}}= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1unique__ptr}{unique\+\_\+ptr}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&}]{p}{, }\item[{\mbox{\hyperlink{namespacefc_aeffaff8d6d824699c60630a03055fd2f}{nullptr\+\_\+t}}}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{unique__ptr_8hpp_source_l00026}{26}} of file \mbox{\hyperlink{unique__ptr_8hpp_source}{unique\+\_\+ptr.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.\_p\ !=\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1unique__ptr_ad52c0c5bd0cbe61c7b4a4efde45efe9f}\index{fc::unique\_ptr$<$ T $>$@{fc::unique\_ptr$<$ T $>$}!operator==@{operator==}}
+\index{operator==@{operator==}!fc::unique\_ptr$<$ T $>$@{fc::unique\_ptr$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{operator==}{operator==}}
+{\footnotesize\ttfamily \label{classfc_1_1unique__ptr_ad52c0c5bd0cbe61c7b4a4efde45efe9f} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+bool operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1unique__ptr}{unique\+\_\+ptr}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&}]{p}{, }\item[{\mbox{\hyperlink{namespacefc_aeffaff8d6d824699c60630a03055fd2f}{nullptr\+\_\+t}}}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{unique__ptr_8hpp_source_l00021}{21}} of file \mbox{\hyperlink{unique__ptr_8hpp_source}{unique\+\_\+ptr.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.\_p\ ==\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/\mbox{\hyperlink{unique__ptr_8hpp}{unique\+\_\+ptr.\+hpp}}\end{DoxyCompactItemize}

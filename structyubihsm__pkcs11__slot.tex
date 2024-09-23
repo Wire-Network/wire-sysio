@@ -1,0 +1,153 @@
+\doxysection{yubihsm\+\_\+pkcs11\+\_\+slot Struct Reference}
+\hypertarget{structyubihsm__pkcs11__slot}{}\label{structyubihsm__pkcs11__slot}\index{yubihsm\_pkcs11\_slot@{yubihsm\_pkcs11\_slot}}
+
+
+{\ttfamily \#include $<$yubihsm\+\_\+pkcs11.\+h$>$}
+
+
+
+Collaboration diagram for yubihsm\+\_\+pkcs11\+\_\+slot\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structyubihsm__pkcs11__slot__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{structyubihsm__pkcs11__slot_a7a8ed452594de0255b468210b42f2383}{id}}
+\item 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{structyubihsm__pkcs11__slot_acb2adb2735c7e7fed62553254305888a}{max\+\_\+session\+\_\+id}}
+\item 
+char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structyubihsm__pkcs11__slot_aafd95d05495095288b23294aaae56caf}{connector\+\_\+name}}
+\item 
+\mbox{\hyperlink{structyh__connector}{yh\+\_\+connector}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structyubihsm__pkcs11__slot_a8022d3426b090c01b082636562f7c013}{connector}}
+\item 
+\mbox{\hyperlink{structyh__session}{yh\+\_\+session}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structyubihsm__pkcs11__slot_ac7e880be291dcd6d1616d84222173e39}{device\+\_\+session}}
+\item 
+\mbox{\hyperlink{struct_list}{List}} \mbox{\hyperlink{structyubihsm__pkcs11__slot_ab8e6a1f9aba139c1561f21304649b43a}{pkcs11\+\_\+sessions}}
+\item 
+\mbox{\hyperlink{structyubihsm__pkcs11__object__desc}{yubihsm\+\_\+pkcs11\+\_\+object\+\_\+desc}} \mbox{\hyperlink{structyubihsm__pkcs11__slot_acdf607a8422b0c6700664f0205980ba0}{objects}} \mbox{[}\mbox{\hyperlink{yubihsm_8h_a331b70d37ded99854638ff5ef0ca9735}{YH\+\_\+\+MAX\+\_\+\+ITEMS\+\_\+\+COUNT}}\mbox{]}
+\item 
+\mbox{\hyperlink{yubihsm_8h_a498937b5a72accbb0ef21bb1dcdd55ca}{yh\+\_\+algorithm}} \mbox{\hyperlink{structyubihsm__pkcs11__slot_acc712b62a1eba2487a602bc84f2567cf}{algorithms}} \mbox{[}\mbox{\hyperlink{yubihsm_8h_a6f472329e64b5720ed637fa886aea8c8}{YH\+\_\+\+MAX\+\_\+\+ALGORITHM\+\_\+\+COUNT}}\mbox{]}
+\item 
+size\+\_\+t \mbox{\hyperlink{structyubihsm__pkcs11__slot_ac4313bd333015ea2ae50240ed379da60}{n\+\_\+algorithms}}
+\item 
+void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structyubihsm__pkcs11__slot_a3ecfa0dfb39d722e9a0fad07a8d9334d}{mutex}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8h_source_l00150}{150}} of file \mbox{\hyperlink{yubihsm__pkcs11_8h_source}{yubihsm\+\_\+pkcs11.\+h}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structyubihsm__pkcs11__slot_acc712b62a1eba2487a602bc84f2567cf}\index{yubihsm\_pkcs11\_slot@{yubihsm\_pkcs11\_slot}!algorithms@{algorithms}}
+\index{algorithms@{algorithms}!yubihsm\_pkcs11\_slot@{yubihsm\_pkcs11\_slot}}
+\doxysubsubsection{\texorpdfstring{algorithms}{algorithms}}
+{\footnotesize\ttfamily \label{structyubihsm__pkcs11__slot_acc712b62a1eba2487a602bc84f2567cf} 
+\mbox{\hyperlink{yubihsm_8h_a498937b5a72accbb0ef21bb1dcdd55ca}{yh\+\_\+algorithm}} yubihsm\+\_\+pkcs11\+\_\+slot\+::algorithms\mbox{[}\mbox{\hyperlink{yubihsm_8h_a6f472329e64b5720ed637fa886aea8c8}{YH\+\_\+\+MAX\+\_\+\+ALGORITHM\+\_\+\+COUNT}}\mbox{]}}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8h_source_l00158}{158}} of file \mbox{\hyperlink{yubihsm__pkcs11_8h_source}{yubihsm\+\_\+pkcs11.\+h}}.
+
+\Hypertarget{structyubihsm__pkcs11__slot_a8022d3426b090c01b082636562f7c013}\index{yubihsm\_pkcs11\_slot@{yubihsm\_pkcs11\_slot}!connector@{connector}}
+\index{connector@{connector}!yubihsm\_pkcs11\_slot@{yubihsm\_pkcs11\_slot}}
+\doxysubsubsection{\texorpdfstring{connector}{connector}}
+{\footnotesize\ttfamily \label{structyubihsm__pkcs11__slot_a8022d3426b090c01b082636562f7c013} 
+\mbox{\hyperlink{structyh__connector}{yh\+\_\+connector}}\texorpdfstring{$\ast$}{*} yubihsm\+\_\+pkcs11\+\_\+slot\+::connector}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8h_source_l00154}{154}} of file \mbox{\hyperlink{yubihsm__pkcs11_8h_source}{yubihsm\+\_\+pkcs11.\+h}}.
+
+\Hypertarget{structyubihsm__pkcs11__slot_aafd95d05495095288b23294aaae56caf}\index{yubihsm\_pkcs11\_slot@{yubihsm\_pkcs11\_slot}!connector\_name@{connector\_name}}
+\index{connector\_name@{connector\_name}!yubihsm\_pkcs11\_slot@{yubihsm\_pkcs11\_slot}}
+\doxysubsubsection{\texorpdfstring{connector\_name}{connector\_name}}
+{\footnotesize\ttfamily \label{structyubihsm__pkcs11__slot_aafd95d05495095288b23294aaae56caf} 
+char\texorpdfstring{$\ast$}{*} yubihsm\+\_\+pkcs11\+\_\+slot\+::connector\+\_\+name}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8h_source_l00153}{153}} of file \mbox{\hyperlink{yubihsm__pkcs11_8h_source}{yubihsm\+\_\+pkcs11.\+h}}.
+
+\Hypertarget{structyubihsm__pkcs11__slot_ac7e880be291dcd6d1616d84222173e39}\index{yubihsm\_pkcs11\_slot@{yubihsm\_pkcs11\_slot}!device\_session@{device\_session}}
+\index{device\_session@{device\_session}!yubihsm\_pkcs11\_slot@{yubihsm\_pkcs11\_slot}}
+\doxysubsubsection{\texorpdfstring{device\_session}{device\_session}}
+{\footnotesize\ttfamily \label{structyubihsm__pkcs11__slot_ac7e880be291dcd6d1616d84222173e39} 
+\mbox{\hyperlink{structyh__session}{yh\+\_\+session}}\texorpdfstring{$\ast$}{*} yubihsm\+\_\+pkcs11\+\_\+slot\+::device\+\_\+session}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8h_source_l00155}{155}} of file \mbox{\hyperlink{yubihsm__pkcs11_8h_source}{yubihsm\+\_\+pkcs11.\+h}}.
+
+\Hypertarget{structyubihsm__pkcs11__slot_a7a8ed452594de0255b468210b42f2383}\index{yubihsm\_pkcs11\_slot@{yubihsm\_pkcs11\_slot}!id@{id}}
+\index{id@{id}!yubihsm\_pkcs11\_slot@{yubihsm\_pkcs11\_slot}}
+\doxysubsubsection{\texorpdfstring{id}{id}}
+{\footnotesize\ttfamily \label{structyubihsm__pkcs11__slot_a7a8ed452594de0255b468210b42f2383} 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} yubihsm\+\_\+pkcs11\+\_\+slot\+::id}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8h_source_l00151}{151}} of file \mbox{\hyperlink{yubihsm__pkcs11_8h_source}{yubihsm\+\_\+pkcs11.\+h}}.
+
+\Hypertarget{structyubihsm__pkcs11__slot_acb2adb2735c7e7fed62553254305888a}\index{yubihsm\_pkcs11\_slot@{yubihsm\_pkcs11\_slot}!max\_session\_id@{max\_session\_id}}
+\index{max\_session\_id@{max\_session\_id}!yubihsm\_pkcs11\_slot@{yubihsm\_pkcs11\_slot}}
+\doxysubsubsection{\texorpdfstring{max\_session\_id}{max\_session\_id}}
+{\footnotesize\ttfamily \label{structyubihsm__pkcs11__slot_acb2adb2735c7e7fed62553254305888a} 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} yubihsm\+\_\+pkcs11\+\_\+slot\+::max\+\_\+session\+\_\+id}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8h_source_l00152}{152}} of file \mbox{\hyperlink{yubihsm__pkcs11_8h_source}{yubihsm\+\_\+pkcs11.\+h}}.
+
+\Hypertarget{structyubihsm__pkcs11__slot_a3ecfa0dfb39d722e9a0fad07a8d9334d}\index{yubihsm\_pkcs11\_slot@{yubihsm\_pkcs11\_slot}!mutex@{mutex}}
+\index{mutex@{mutex}!yubihsm\_pkcs11\_slot@{yubihsm\_pkcs11\_slot}}
+\doxysubsubsection{\texorpdfstring{mutex}{mutex}}
+{\footnotesize\ttfamily \label{structyubihsm__pkcs11__slot_a3ecfa0dfb39d722e9a0fad07a8d9334d} 
+void\texorpdfstring{$\ast$}{*} yubihsm\+\_\+pkcs11\+\_\+slot\+::mutex}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8h_source_l00160}{160}} of file \mbox{\hyperlink{yubihsm__pkcs11_8h_source}{yubihsm\+\_\+pkcs11.\+h}}.
+
+\Hypertarget{structyubihsm__pkcs11__slot_ac4313bd333015ea2ae50240ed379da60}\index{yubihsm\_pkcs11\_slot@{yubihsm\_pkcs11\_slot}!n\_algorithms@{n\_algorithms}}
+\index{n\_algorithms@{n\_algorithms}!yubihsm\_pkcs11\_slot@{yubihsm\_pkcs11\_slot}}
+\doxysubsubsection{\texorpdfstring{n\_algorithms}{n\_algorithms}}
+{\footnotesize\ttfamily \label{structyubihsm__pkcs11__slot_ac4313bd333015ea2ae50240ed379da60} 
+size\+\_\+t yubihsm\+\_\+pkcs11\+\_\+slot\+::n\+\_\+algorithms}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8h_source_l00159}{159}} of file \mbox{\hyperlink{yubihsm__pkcs11_8h_source}{yubihsm\+\_\+pkcs11.\+h}}.
+
+\Hypertarget{structyubihsm__pkcs11__slot_acdf607a8422b0c6700664f0205980ba0}\index{yubihsm\_pkcs11\_slot@{yubihsm\_pkcs11\_slot}!objects@{objects}}
+\index{objects@{objects}!yubihsm\_pkcs11\_slot@{yubihsm\_pkcs11\_slot}}
+\doxysubsubsection{\texorpdfstring{objects}{objects}}
+{\footnotesize\ttfamily \label{structyubihsm__pkcs11__slot_acdf607a8422b0c6700664f0205980ba0} 
+\mbox{\hyperlink{structyubihsm__pkcs11__object__desc}{yubihsm\+\_\+pkcs11\+\_\+object\+\_\+desc}} yubihsm\+\_\+pkcs11\+\_\+slot\+::objects\mbox{[}\mbox{\hyperlink{yubihsm_8h_a331b70d37ded99854638ff5ef0ca9735}{YH\+\_\+\+MAX\+\_\+\+ITEMS\+\_\+\+COUNT}}\mbox{]}}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8h_source_l00157}{157}} of file \mbox{\hyperlink{yubihsm__pkcs11_8h_source}{yubihsm\+\_\+pkcs11.\+h}}.
+
+\Hypertarget{structyubihsm__pkcs11__slot_ab8e6a1f9aba139c1561f21304649b43a}\index{yubihsm\_pkcs11\_slot@{yubihsm\_pkcs11\_slot}!pkcs11\_sessions@{pkcs11\_sessions}}
+\index{pkcs11\_sessions@{pkcs11\_sessions}!yubihsm\_pkcs11\_slot@{yubihsm\_pkcs11\_slot}}
+\doxysubsubsection{\texorpdfstring{pkcs11\_sessions}{pkcs11\_sessions}}
+{\footnotesize\ttfamily \label{structyubihsm__pkcs11__slot_ab8e6a1f9aba139c1561f21304649b43a} 
+\mbox{\hyperlink{struct_list}{List}} yubihsm\+\_\+pkcs11\+\_\+slot\+::pkcs11\+\_\+sessions}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8h_source_l00156}{156}} of file \mbox{\hyperlink{yubihsm__pkcs11_8h_source}{yubihsm\+\_\+pkcs11.\+h}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/yubihsm/pkcs11/\mbox{\hyperlink{yubihsm__pkcs11_8h}{yubihsm\+\_\+pkcs11.\+h}}\end{DoxyCompactItemize}

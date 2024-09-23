@@ -1,0 +1,86 @@
+\doxysection{CLI\+::detail\+::App\+Friend Struct Reference}
+\hypertarget{struct_c_l_i_1_1detail_1_1_app_friend}{}\label{struct_c_l_i_1_1detail_1_1_app_friend}\index{CLI::detail::AppFriend@{CLI::detail::AppFriend}}
+
+
+This class is simply to allow tests access to \doxylink{class_c_l_i_1_1_app}{App}\textquotesingle{}s protected functions.  
+
+
+
+
+{\ttfamily \#include $<$CLI11.\+hpp$>$}
+
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename... Args$>$ }\\static auto \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1_app_friend_ab82dffa5cf9266f27dffd5ca5b1f2af3}{parse\+\_\+arg}} (\mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \texorpdfstring{$\ast$}{*}app, Args \&\&... args) -\/$>$ typename std\+::result\+\_\+of$<$ decltype(\&\mbox{\hyperlink{class_c_l_i_1_1_app_a73c9decd5eb2b0c7eeda63cc4bd5048e}{App\+::\+\_\+parse\+\_\+arg}})(\mbox{\hyperlink{class_c_l_i_1_1_app}{App}}, Args...)$>$\+::type
+\begin{DoxyCompactList}\small\item\em Wrap \+\_\+parse\+\_\+short, perfectly forward arguments and return. \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename... Args$>$ }\\static auto \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1_app_friend_a45f3935dccd56b5fe50917d47c77c7b2}{parse\+\_\+subcommand}} (\mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \texorpdfstring{$\ast$}{*}app, Args \&\&... args) -\/$>$ typename std\+::result\+\_\+of$<$ decltype(\&\mbox{\hyperlink{class_c_l_i_1_1_app_af20c05b97b9de2a4543a2de9bcc0993d}{App\+::\+\_\+parse\+\_\+subcommand}})(\mbox{\hyperlink{class_c_l_i_1_1_app}{App}}, Args...)$>$\+::type
+\begin{DoxyCompactList}\small\item\em Wrap \+\_\+parse\+\_\+subcommand, perfectly forward arguments and return. \end{DoxyCompactList}\item 
+static \mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1_app_friend_a4a6a8cc04f6f6abe980c65042798cac4}{get\+\_\+fallthrough\+\_\+parent}} (\mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \texorpdfstring{$\ast$}{*}app)
+\begin{DoxyCompactList}\small\item\em Wrap the fallthrough parent function to make sure that is working correctly. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l07603}{7603}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_c_l_i_1_1detail_1_1_app_friend_a4a6a8cc04f6f6abe980c65042798cac4}\index{CLI::detail::AppFriend@{CLI::detail::AppFriend}!get\_fallthrough\_parent@{get\_fallthrough\_parent}}
+\index{get\_fallthrough\_parent@{get\_fallthrough\_parent}!CLI::detail::AppFriend@{CLI::detail::AppFriend}}
+\doxysubsubsection{\texorpdfstring{get\_fallthrough\_parent()}{get\_fallthrough\_parent()}}
+{\footnotesize\ttfamily \label{struct_c_l_i_1_1detail_1_1_app_friend_a4a6a8cc04f6f6abe980c65042798cac4} 
+static \mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \texorpdfstring{$\ast$}{*} CLI\+::detail\+::\+App\+Friend\+::get\+\_\+fallthrough\+\_\+parent (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \texorpdfstring{$\ast$}{*}}]{app}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l07619}{7619}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{07619\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}-\/>\_get\_fallthrough\_parent();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_c_l_i_1_1detail_1_1_app_friend_ab82dffa5cf9266f27dffd5ca5b1f2af3}\index{CLI::detail::AppFriend@{CLI::detail::AppFriend}!parse\_arg@{parse\_arg}}
+\index{parse\_arg@{parse\_arg}!CLI::detail::AppFriend@{CLI::detail::AppFriend}}
+\doxysubsubsection{\texorpdfstring{parse\_arg()}{parse\_arg()}}
+{\footnotesize\ttfamily \label{struct_c_l_i_1_1detail_1_1_app_friend_ab82dffa5cf9266f27dffd5ca5b1f2af3} 
+template$<$typename... Args$>$ \\
+static auto CLI\+::detail\+::\+App\+Friend\+::parse\+\_\+arg (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \texorpdfstring{$\ast$}{*}}]{app}{, }\item[{Args \&\&...}]{args}{}\end{DoxyParamCaption}) -\/$>$ typename std\+::result\+\_\+of$<$decltype (\&\mbox{\hyperlink{class_c_l_i_1_1_app_a73c9decd5eb2b0c7eeda63cc4bd5048e}{App\+::\+\_\+parse\+\_\+arg}})(\mbox{\hyperlink{class_c_l_i_1_1_app}{App}}, Args...)$>$\+::type \hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l07607}{7607}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{07608\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{07609\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}-\/>\_parse\_arg(std::forward<Args>(args)...);}
+\DoxyCodeLine{07610\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_c_l_i_1_1detail_1_1_app_friend_a45f3935dccd56b5fe50917d47c77c7b2}\index{CLI::detail::AppFriend@{CLI::detail::AppFriend}!parse\_subcommand@{parse\_subcommand}}
+\index{parse\_subcommand@{parse\_subcommand}!CLI::detail::AppFriend@{CLI::detail::AppFriend}}
+\doxysubsubsection{\texorpdfstring{parse\_subcommand()}{parse\_subcommand()}}
+{\footnotesize\ttfamily \label{struct_c_l_i_1_1detail_1_1_app_friend_a45f3935dccd56b5fe50917d47c77c7b2} 
+template$<$typename... Args$>$ \\
+static auto CLI\+::detail\+::\+App\+Friend\+::parse\+\_\+subcommand (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \texorpdfstring{$\ast$}{*}}]{app}{, }\item[{Args \&\&...}]{args}{}\end{DoxyParamCaption}) -\/$>$ typename std\+::result\+\_\+of$<$decltype (\&\mbox{\hyperlink{class_c_l_i_1_1_app_af20c05b97b9de2a4543a2de9bcc0993d}{App\+::\+\_\+parse\+\_\+subcommand}})(\mbox{\hyperlink{class_c_l_i_1_1_app}{App}}, Args...)$>$\+::type \hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l07614}{7614}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{07615\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{07616\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}-\/>\_parse\_subcommand(std::forward<Args>(args)...);}
+\DoxyCodeLine{07617\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+programs/clio/\mbox{\hyperlink{_c_l_i11_8hpp}{CLI11.\+hpp}}\end{DoxyCompactItemize}

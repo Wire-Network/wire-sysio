@@ -1,0 +1,134 @@
+\doxysection{libff\+::bn128\+\_\+ate\+\_\+\+G1\+\_\+precomp Struct Reference}
+\hypertarget{structlibff_1_1bn128__ate___g1__precomp}{}\label{structlibff_1_1bn128__ate___g1__precomp}\index{libff::bn128\_ate\_G1\_precomp@{libff::bn128\_ate\_G1\_precomp}}
+
+
+{\ttfamily \#include $<$bn128\+\_\+pairing.\+hpp$>$}
+
+
+
+Collaboration diagram for libff\+::bn128\+\_\+ate\+\_\+\+G1\+\_\+precomp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structlibff_1_1bn128__ate___g1__precomp__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{structlibff_1_1bn128__ate___g1__precomp_a275f3372656ce5f84aaeb47331768550}{operator==}} (const \mbox{\hyperlink{structlibff_1_1bn128__ate___g1__precomp}{bn128\+\_\+ate\+\_\+\+G1\+\_\+precomp}} \&other) const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacebn_a790c0215583382a829e202ecb0c844b9}{bn\+::\+Fp}} \mbox{\hyperlink{structlibff_1_1bn128__ate___g1__precomp_a59312bc508942a0c1e9c4712d352f0bc}{P}} \mbox{[}3\mbox{]}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+std\+::ostream \& \mbox{\hyperlink{structlibff_1_1bn128__ate___g1__precomp_aa5a18b01d2b13cfe0e1d3cdbe5d9945a}{operator$<$$<$}} (std\+::ostream \&out, const \mbox{\hyperlink{structlibff_1_1bn128__ate___g1__precomp}{bn128\+\_\+ate\+\_\+\+G1\+\_\+precomp}} \&prec\+\_\+P)
+\item 
+std\+::istream \& \mbox{\hyperlink{structlibff_1_1bn128__ate___g1__precomp_a6bedfbfe5c8ed52c674c68964afd1af2}{operator$>$$>$}} (std\+::istream \&in, \mbox{\hyperlink{structlibff_1_1bn128__ate___g1__precomp}{bn128\+\_\+ate\+\_\+\+G1\+\_\+precomp}} \&prec\+\_\+P)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{bn128__pairing_8hpp_source_l00021}{21}} of file \mbox{\hyperlink{bn128__pairing_8hpp_source}{bn128\+\_\+pairing.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structlibff_1_1bn128__ate___g1__precomp_a275f3372656ce5f84aaeb47331768550}\index{libff::bn128\_ate\_G1\_precomp@{libff::bn128\_ate\_G1\_precomp}!operator==@{operator==}}
+\index{operator==@{operator==}!libff::bn128\_ate\_G1\_precomp@{libff::bn128\_ate\_G1\_precomp}}
+\doxysubsubsection{\texorpdfstring{operator==()}{operator==()}}
+{\footnotesize\ttfamily \label{structlibff_1_1bn128__ate___g1__precomp_a275f3372656ce5f84aaeb47331768550} 
+bool libff\+::bn128\+\_\+ate\+\_\+\+G1\+\_\+precomp\+::operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structlibff_1_1bn128__ate___g1__precomp}{bn128\+\_\+ate\+\_\+\+G1\+\_\+precomp}} \&}]{other}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{bn128__pairing_8cpp_source_l00022}{22}} of file \mbox{\hyperlink{bn128__pairing_8cpp_source}{bn128\+\_\+pairing.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00023\ \{}
+\DoxyCodeLine{00024\ \ \ \ \ \textcolor{keywordflow}{return}\ (this-\/>\mbox{\hyperlink{structlibff_1_1bn128__ate___g1__precomp_a59312bc508942a0c1e9c4712d352f0bc}{P}}[0]\ ==\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.P[0]\ \&\&}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \ \ \ \ this-\/>P[1]\ ==\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.P[1]\ \&\&}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \ \ \ this-\/>P[2]\ ==\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.P[2]);}
+\DoxyCodeLine{00027\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{structlibff_1_1bn128__ate___g1__precomp_aa5a18b01d2b13cfe0e1d3cdbe5d9945a}\index{libff::bn128\_ate\_G1\_precomp@{libff::bn128\_ate\_G1\_precomp}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!libff::bn128\_ate\_G1\_precomp@{libff::bn128\_ate\_G1\_precomp}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$}{operator<<}}
+{\footnotesize\ttfamily \label{structlibff_1_1bn128__ate___g1__precomp_aa5a18b01d2b13cfe0e1d3cdbe5d9945a} 
+std\+::ostream \& operator$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{out}{, }\item[{const \mbox{\hyperlink{structlibff_1_1bn128__ate___g1__precomp}{bn128\+\_\+ate\+\_\+\+G1\+\_\+precomp}} \&}]{prec\+\_\+P}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn128__pairing_8cpp_source_l00029}{29}} of file \mbox{\hyperlink{bn128__pairing_8cpp_source}{bn128\+\_\+pairing.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00030\ \{}
+\DoxyCodeLine{00031\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ 3;\ ++i)}
+\DoxyCodeLine{00032\ \ \ \ \ \{}
+\DoxyCodeLine{00033\ \textcolor{preprocessor}{\#ifndef\ BINARY\_OUTPUT}}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ out\ <<\ prec\_P.P[i]\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{00035\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ out.write((\textcolor{keywordtype}{char}*)\ \&prec\_P.P[i],\ \textcolor{keyword}{sizeof}(prec\_P.P[i]));}
+\DoxyCodeLine{00037\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00038\ \ \ \ \ \}}
+\DoxyCodeLine{00039\ \ \ \ \ \textcolor{keywordflow}{return}\ out;}
+\DoxyCodeLine{00040\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structlibff_1_1bn128__ate___g1__precomp_a6bedfbfe5c8ed52c674c68964afd1af2}\index{libff::bn128\_ate\_G1\_precomp@{libff::bn128\_ate\_G1\_precomp}!operator$>$$>$@{operator$>$$>$}}
+\index{operator$>$$>$@{operator$>$$>$}!libff::bn128\_ate\_G1\_precomp@{libff::bn128\_ate\_G1\_precomp}}
+\doxysubsubsection{\texorpdfstring{operator$>$$>$}{operator>>}}
+{\footnotesize\ttfamily \label{structlibff_1_1bn128__ate___g1__precomp_a6bedfbfe5c8ed52c674c68964afd1af2} 
+std\+::istream \& operator$>$$>$ (\begin{DoxyParamCaption}\item[{std\+::istream \&}]{in}{, }\item[{\mbox{\hyperlink{structlibff_1_1bn128__ate___g1__precomp}{bn128\+\_\+ate\+\_\+\+G1\+\_\+precomp}} \&}]{prec\+\_\+P}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn128__pairing_8cpp_source_l00042}{42}} of file \mbox{\hyperlink{bn128__pairing_8cpp_source}{bn128\+\_\+pairing.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00043\ \{}
+\DoxyCodeLine{00044\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ 3;\ ++i)}
+\DoxyCodeLine{00045\ \ \ \ \ \{}
+\DoxyCodeLine{00046\ \textcolor{preprocessor}{\#ifndef\ BINARY\_OUTPUT}}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ in\ >>\ prec\_P.P[i];}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacelibff_adf450a87fdc5eb1a37422fabcba95023}{consume\_newline}}(in);}
+\DoxyCodeLine{00049\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ in.read((\textcolor{keywordtype}{char}*)\ \&prec\_P.P[i],\ \textcolor{keyword}{sizeof}(prec\_P.P[i]));}
+\DoxyCodeLine{00051\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00052\ \ \ \ \ \}}
+\DoxyCodeLine{00053\ \ \ \ \ \textcolor{keywordflow}{return}\ in;}
+\DoxyCodeLine{00054\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structlibff_1_1bn128__ate___g1__precomp_a59312bc508942a0c1e9c4712d352f0bc}\index{libff::bn128\_ate\_G1\_precomp@{libff::bn128\_ate\_G1\_precomp}!P@{P}}
+\index{P@{P}!libff::bn128\_ate\_G1\_precomp@{libff::bn128\_ate\_G1\_precomp}}
+\doxysubsubsection{\texorpdfstring{P}{P}}
+{\footnotesize\ttfamily \label{structlibff_1_1bn128__ate___g1__precomp_a59312bc508942a0c1e9c4712d352f0bc} 
+\mbox{\hyperlink{namespacebn_a790c0215583382a829e202ecb0c844b9}{bn\+::\+Fp}} libff\+::bn128\+\_\+ate\+\_\+\+G1\+\_\+precomp\+::P\mbox{[}3\mbox{]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn128__pairing_8hpp_source_l00022}{22}} of file \mbox{\hyperlink{bn128__pairing_8hpp_source}{bn128\+\_\+pairing.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/libraries/ff/libff/algebra/curves/bn128/\mbox{\hyperlink{bn128__pairing_8hpp}{bn128\+\_\+pairing.\+hpp}}\item 
+libraries/fc/libraries/ff/libff/algebra/curves/bn128/\mbox{\hyperlink{bn128__pairing_8cpp}{bn128\+\_\+pairing.\+cpp}}\end{DoxyCompactItemize}

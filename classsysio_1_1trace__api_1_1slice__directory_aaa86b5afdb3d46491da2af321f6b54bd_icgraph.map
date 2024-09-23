@@ -1,0 +1,7 @@
+<map id="sysio::trace_api::slice_directory::find_or_create_trx_id_slice" name="sysio::trace_api::slice_directory::find_or_create_trx_id_slice">
+<area shape="rect" id="Node000001" title=" " alt="" coords="224,31,392,87"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1trace__api_1_1store__provider.html#a34a4fdef03a4b354b005e73e383d7e59" title=" " alt="" coords="15,5,166,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="208,46,166,40,167,35,209,41"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1trace__api_1_1store__provider.html#a03c9a6e4e79e019651c9a8f8a16ff4bf" title=" " alt="" coords="5,71,176,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="209,76,176,81,176,76,208,71"/>
+</map>

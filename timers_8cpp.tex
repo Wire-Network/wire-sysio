@@ -1,0 +1,234 @@
+\doxysection{libraries/fc/vendor/websocketpp/test/transport/asio/timers.cpp File Reference}
+\hypertarget{timers_8cpp}{}\label{timers_8cpp}\index{libraries/fc/vendor/websocketpp/test/transport/asio/timers.cpp@{libraries/fc/vendor/websocketpp/test/transport/asio/timers.cpp}}
+{\ttfamily \#include $<$boost/test/unit\+\_\+test.\+hpp$>$}\newline
+{\ttfamily \#include $<$exception$>$}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$websocketpp/common/thread.\+hpp$>$}\newline
+{\ttfamily \#include $<$websocketpp/transport/asio/endpoint.\+hpp$>$}\newline
+{\ttfamily \#include $<$websocketpp/transport/asio/security/tls.\+hpp$>$}\newline
+{\ttfamily \#include $<$websocketpp/concurrency/none.\+hpp$>$}\newline
+{\ttfamily \#include $<$websocketpp/http/request.\+hpp$>$}\newline
+{\ttfamily \#include $<$websocketpp/http/response.\+hpp$>$}\newline
+{\ttfamily \#include $<$websocketpp/logger/stub.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/asio.\+hpp$>$}\newline
+Include dependency graph for timers.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{timers_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{classconfig}{config}}
+\item 
+struct \mbox{\hyperlink{structmock__con}{mock\+\_\+con}}
+\item 
+struct \mbox{\hyperlink{structmock__endpoint}{mock\+\_\+endpoint}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{timers_8cpp_a6b2a3852db8bb19ab6909bac01859985}{BOOST\+\_\+\+TEST\+\_\+\+MODULE}}~transport\+\_\+asio\+\_\+timers
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef websocketpp\+::lib\+::shared\+\_\+ptr$<$ boost\+::asio\+::ssl\+::context $>$ \mbox{\hyperlink{timers_8cpp_ab68ea3df896e32c1d2fb314a96c46a8f}{context\+\_\+ptr}}
+\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection}{websocketpp\+::transport\+::asio\+::connection}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$ \mbox{\hyperlink{timers_8cpp_aeba2eb59b450548f59b752134a1fa9f3}{con\+\_\+type}}
+\item 
+typedef websocketpp\+::lib\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{structmock__con}{mock\+\_\+con}} $>$ \mbox{\hyperlink{timers_8cpp_ae77e432dffa334791c9db57e10b636ca}{connection\+\_\+ptr}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{timers_8cpp_adae8a838e5ff1800e984ce3dcf4d2428}{run\+\_\+dummy\+\_\+server}} (int port)
+\item 
+void \mbox{\hyperlink{timers_8cpp_a1bf8ac77e31c334f7241e82557a6722c}{run\+\_\+test\+\_\+timer}} (long \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+\mbox{\hyperlink{debug__client_8cpp_ab68ea3df896e32c1d2fb314a96c46a8f}{context\+\_\+ptr}} \mbox{\hyperlink{timers_8cpp_a229e17346c83a4dada1a58b39ad47c79}{on\+\_\+tls\+\_\+init}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{websocketpp\+::connection\+\_\+hdl}})
+\item 
+\mbox{\hyperlink{timers_8cpp_a54b22724b0bf3188576fd1db09594a16}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (tls\+\_\+handshake\+\_\+timeout)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{timers_8cpp_a6b2a3852db8bb19ab6909bac01859985}\index{timers.cpp@{timers.cpp}!BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}}
+\index{BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}!timers.cpp@{timers.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_TEST\_MODULE}{BOOST\_TEST\_MODULE}}
+{\footnotesize\ttfamily \label{timers_8cpp_a6b2a3852db8bb19ab6909bac01859985} 
+\#define BOOST\+\_\+\+TEST\+\_\+\+MODULE~transport\+\_\+asio\+\_\+timers}
+
+
+
+Definition at line \mbox{\hyperlink{timers_8cpp_source_l00028}{28}} of file \mbox{\hyperlink{timers_8cpp_source}{timers.\+cpp}}.
+
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{timers_8cpp_aeba2eb59b450548f59b752134a1fa9f3}\index{timers.cpp@{timers.cpp}!con\_type@{con\_type}}
+\index{con\_type@{con\_type}!timers.cpp@{timers.cpp}}
+\doxysubsubsection{\texorpdfstring{con\_type}{con\_type}}
+{\footnotesize\ttfamily \label{timers_8cpp_aeba2eb59b450548f59b752134a1fa9f3} 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection}{websocketpp\+::transport\+::asio\+::connection}}$<$\mbox{\hyperlink{classconfig}{config}}$>$ \mbox{\hyperlink{timers_8cpp_aeba2eb59b450548f59b752134a1fa9f3}{con\+\_\+type}}}
+
+
+
+Definition at line \mbox{\hyperlink{timers_8cpp_source_l00135}{135}} of file \mbox{\hyperlink{timers_8cpp_source}{timers.\+cpp}}.
+
+\Hypertarget{timers_8cpp_ae77e432dffa334791c9db57e10b636ca}\index{timers.cpp@{timers.cpp}!connection\_ptr@{connection\_ptr}}
+\index{connection\_ptr@{connection\_ptr}!timers.cpp@{timers.cpp}}
+\doxysubsubsection{\texorpdfstring{connection\_ptr}{connection\_ptr}}
+{\footnotesize\ttfamily \label{timers_8cpp_ae77e432dffa334791c9db57e10b636ca} 
+typedef websocketpp\+::lib\+::shared\+\_\+ptr$<$\mbox{\hyperlink{structmock__con}{mock\+\_\+con}}$>$ \mbox{\hyperlink{debug__client_8cpp_ae9c9779aea742ab80689add7e553df0d}{connection\+\_\+ptr}}}
+
+
+
+Definition at line \mbox{\hyperlink{timers_8cpp_source_l00136}{136}} of file \mbox{\hyperlink{timers_8cpp_source}{timers.\+cpp}}.
+
+\Hypertarget{timers_8cpp_ab68ea3df896e32c1d2fb314a96c46a8f}\index{timers.cpp@{timers.cpp}!context\_ptr@{context\_ptr}}
+\index{context\_ptr@{context\_ptr}!timers.cpp@{timers.cpp}}
+\doxysubsubsection{\texorpdfstring{context\_ptr}{context\_ptr}}
+{\footnotesize\ttfamily \label{timers_8cpp_ab68ea3df896e32c1d2fb314a96c46a8f} 
+typedef websocketpp\+::lib\+::shared\+\_\+ptr$<$boost\+::asio\+::ssl\+::context$>$ \mbox{\hyperlink{debug__client_8cpp_ab68ea3df896e32c1d2fb314a96c46a8f}{context\+\_\+ptr}}}
+
+
+
+Definition at line \mbox{\hyperlink{timers_8cpp_source_l00109}{109}} of file \mbox{\hyperlink{timers_8cpp_source}{timers.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{timers_8cpp_a54b22724b0bf3188576fd1db09594a16}\index{timers.cpp@{timers.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!timers.cpp@{timers.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}}
+{\footnotesize\ttfamily \label{timers_8cpp_a54b22724b0bf3188576fd1db09594a16} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{tls\+\_\+handshake\+\_\+timeout}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{timers_8cpp_source_l00177}{177}} of file \mbox{\hyperlink{timers_8cpp_source}{timers.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00178\ \ \ \ \ websocketpp::lib::thread\ dummy\_server(websocketpp::lib::bind(\&\mbox{\hyperlink{timers_8cpp_adae8a838e5ff1800e984ce3dcf4d2428}{run\_dummy\_server}},9005));}
+\DoxyCodeLine{00179\ \ \ \ \ websocketpp::lib::thread\ timer(websocketpp::lib::bind(\&\mbox{\hyperlink{timers_8cpp_a1bf8ac77e31c334f7241e82557a6722c}{run\_test\_timer}},5000));}
+\DoxyCodeLine{00180\ \ \ \ \ dummy\_server.detach();}
+\DoxyCodeLine{00181\ \ \ \ \ timer.detach();}
+\DoxyCodeLine{00182\ }
+\DoxyCodeLine{00183\ \ \ \ \ \mbox{\hyperlink{structmock__endpoint}{mock\_endpoint}}\ endpoint;}
+\DoxyCodeLine{00184\ \ \ \ \ endpoint.set\_tls\_init\_handler(\&\mbox{\hyperlink{timers_8cpp_a229e17346c83a4dada1a58b39ad47c79}{on\_tls\_init}});}
+\DoxyCodeLine{00185\ \ \ \ \ endpoint.\mbox{\hyperlink{structmock__endpoint_acf190f7ee5faaae2599125bf9d8513af}{connect}}(\textcolor{stringliteral}{"{}wss://localhost:9005"{}});}
+\DoxyCodeLine{00186\ \ \ \ \ endpoint.\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1endpoint_a5c457ea6734a1d8aafe6c6f364996dfe}{run}}();}
+\DoxyCodeLine{00187\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{timers_8cpp_a54b22724b0bf3188576fd1db09594a16_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{timers_8cpp_a229e17346c83a4dada1a58b39ad47c79}\index{timers.cpp@{timers.cpp}!on\_tls\_init@{on\_tls\_init}}
+\index{on\_tls\_init@{on\_tls\_init}!timers.cpp@{timers.cpp}}
+\doxysubsubsection{\texorpdfstring{on\_tls\_init()}{on\_tls\_init()}}
+{\footnotesize\ttfamily \label{timers_8cpp_a229e17346c83a4dada1a58b39ad47c79} 
+\mbox{\hyperlink{debug__client_8cpp_ab68ea3df896e32c1d2fb314a96c46a8f}{context\+\_\+ptr}} on\+\_\+tls\+\_\+init (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{websocketpp\+::connection\+\_\+hdl}}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{timers_8cpp_source_l00110}{110}} of file \mbox{\hyperlink{timers_8cpp_source}{timers.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00111\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{timers_8cpp_ab68ea3df896e32c1d2fb314a96c46a8f}{context\_ptr}}(\textcolor{keyword}{new}\ boost::asio::ssl::context(boost::asio::ssl::context::sslv23));}
+\DoxyCodeLine{00112\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=324pt]{timers_8cpp_a229e17346c83a4dada1a58b39ad47c79_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{timers_8cpp_adae8a838e5ff1800e984ce3dcf4d2428}\index{timers.cpp@{timers.cpp}!run\_dummy\_server@{run\_dummy\_server}}
+\index{run\_dummy\_server@{run\_dummy\_server}!timers.cpp@{timers.cpp}}
+\doxysubsubsection{\texorpdfstring{run\_dummy\_server()}{run\_dummy\_server()}}
+{\footnotesize\ttfamily \label{timers_8cpp_adae8a838e5ff1800e984ce3dcf4d2428} 
+void run\+\_\+dummy\+\_\+server (\begin{DoxyParamCaption}\item[{int}]{port}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{timers_8cpp_source_l00053}{53}} of file \mbox{\hyperlink{timers_8cpp_source}{timers.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00054\ \ \ \ \ \textcolor{keyword}{using\ }boost::asio::ip::tcp;}
+\DoxyCodeLine{00055\ }
+\DoxyCodeLine{00056\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ boost::asio::io\_service\ io\_service;}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ tcp::acceptor\ acceptor(io\_service,\ tcp::endpoint(tcp::v6(),\ port));}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ tcp::socket\ socket(io\_service);}
+\DoxyCodeLine{00060\ }
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ acceptor.accept(socket);}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (;;)\ \{}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ data[512];}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \ \ \ boost::system::error\_code\ ec;}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ socket.read\_some(boost::asio::buffer(data),\ ec);}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ec\ ==\ boost::asio::error::eof)\ \{}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (ec)\ \{}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ other\ error}}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ ec;}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00073\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (std::exception\ \&\ e)\ \{}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ std::cout\ <<\ e.what()\ <<\ std::endl;}
+\DoxyCodeLine{00075\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (boost::system::error\_code\ \&\ ec)\ \{}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ std::cout\ <<\ ec.message()\ <<\ std::endl;}
+\DoxyCodeLine{00077\ \ \ \ \ \}}
+\DoxyCodeLine{00078\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{timers_8cpp_adae8a838e5ff1800e984ce3dcf4d2428_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{timers_8cpp_a1bf8ac77e31c334f7241e82557a6722c}\index{timers.cpp@{timers.cpp}!run\_test\_timer@{run\_test\_timer}}
+\index{run\_test\_timer@{run\_test\_timer}!timers.cpp@{timers.cpp}}
+\doxysubsubsection{\texorpdfstring{run\_test\_timer()}{run\_test\_timer()}}
+{\footnotesize\ttfamily \label{timers_8cpp_a1bf8ac77e31c334f7241e82557a6722c} 
+void run\+\_\+test\+\_\+timer (\begin{DoxyParamCaption}\item[{long}]{value}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{timers_8cpp_source_l00081}{81}} of file \mbox{\hyperlink{timers_8cpp_source}{timers.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00082\ \ \ \ \ boost::asio::io\_service\ ios;}
+\DoxyCodeLine{00083\ \ \ \ \ boost::asio::deadline\_timer\ t(ios,boost::posix\_time::milliseconds(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}));}
+\DoxyCodeLine{00084\ \ \ \ \ boost::system::error\_code\ ec;}
+\DoxyCodeLine{00085\ \ \ \ \ t.wait(ec);}
+\DoxyCodeLine{00086\ \ \ \ \ BOOST\_FAIL(\ \textcolor{stringliteral}{"{}Test\ timed\ out"{}}\ );}
+\DoxyCodeLine{00087\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=342pt]{timers_8cpp_a1bf8ac77e31c334f7241e82557a6722c_icgraph}
+\end{center}
+\end{figure}

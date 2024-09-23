@@ -1,0 +1,9 @@
+<map id="Catch::JunitReporter::testRunStarting" name="Catch::JunitReporter::testRunStarting">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,35,148,75"/>
+<area shape="rect" id="Node000002" href="$class_catch_1_1_xml_writer.html#a6114b9d8038cd4f159ccd016f12d4992" title=" " alt="" coords="196,13,399,38"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="148,43,180,39,181,44,148,48"/>
+<area shape="rect" id="Node000004" href="$struct_catch_1_1_cumulative_reporter_base.html#a99061d05f2f9e162989f616c68670dbb" title=" " alt="" coords="207,63,388,103"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="148,61,192,67,192,72,148,67"/>
+<area shape="rect" id="Node000003" href="$class_catch_1_1_xml_writer.html#aba98703d9852416e237de82aed4a9c4f" title=" " alt="" coords="447,5,615,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="399,23,431,23,431,28,399,28"/>
+</map>

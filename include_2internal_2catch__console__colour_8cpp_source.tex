@@ -1,0 +1,243 @@
+\doxysection{catch\+\_\+console\+\_\+colour.\+cpp}
+\hypertarget{include_2internal_2catch__console__colour_8cpp_source}{}\label{include_2internal_2catch__console__colour_8cpp_source}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_console\_colour.cpp@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_console\_colour.cpp}}
+\mbox{\hyperlink{include_2internal_2catch__console__colour_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00002}00002\ \textcolor{comment}{\ *\ \ Created\ by\ Phil\ on\ 25/2/2012.}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00003}00003\ \textcolor{comment}{\ *\ \ Copyright\ 2012\ Two\ Blue\ Cubes\ Ltd.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00004}00004\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00005}00005\ \textcolor{comment}{\ *\ \ Distributed\ under\ the\ Boost\ Software\ License,\ Version\ 1.0.\ (See\ accompanying}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00006}00006\ \textcolor{comment}{\ *\ \ file\ LICENSE\_1\_0.txt\ or\ copy\ at\ http://www.boost.org/LICENSE\_1\_0.txt)}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00007}00007\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00010}00010\ \textcolor{preprocessor}{\#if\ defined(\_\_clang\_\_)}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00011}00011\ \textcolor{preprocessor}{\#\ \ \ \ pragma\ clang\ diagnostic\ push}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00012}00012\ \textcolor{preprocessor}{\#\ \ \ \ pragma\ clang\ diagnostic\ ignored\ "{}-\/Wexit-\/time-\/destructors"{}}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00013}00013\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00016}00016\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__console__colour_8h}{catch\_console\_colour.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00017}00017\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__enforce_8h}{catch\_enforce.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00018}00018\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__errno__guard_8h}{catch\_errno\_guard.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00019}00019\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__interfaces__config_8h}{catch\_interfaces\_config.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00020}00020\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__stream_8h}{catch\_stream.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00021}00021\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__context_8h}{catch\_context.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00022}00022\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__platform_8h}{catch\_platform.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00023}00023\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__debugger_8h}{catch\_debugger.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00024}00024\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__windows__h__proxy_8h}{catch\_windows\_h\_proxy.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00026}00026\ \textcolor{preprocessor}{\#include\ <sstream>}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00028}00028\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}}\ \{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00029}00029\ \ \ \ \ \textcolor{keyword}{namespace\ }\{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00031}00031\ \ \ \ \ \ \ \ \ \textcolor{keyword}{struct\ }IColourImpl\ \{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00032}00032\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \string~IColourImpl()\ =\ \textcolor{keywordflow}{default};}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00033}00033\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ use(\ \mbox{\hyperlink{struct_catch_1_1_colour_a987a596fd001bd80db06b3ba7d53231e}{Colour::Code}}\ \_colourCode\ )\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00034}00034\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00036}00036\ \ \ \ \ \ \ \ \ \textcolor{keyword}{struct\ }NoColourImpl\ :\ IColourImpl\ \{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00037}00037\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ use(\ \mbox{\hyperlink{struct_catch_1_1_colour_a987a596fd001bd80db06b3ba7d53231e}{Colour::Code}}\ )\ \{\}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00039}00039\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ IColourImpl*\ instance()\ \{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00040}00040\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ NoColourImpl\ s\_instance;}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00041}00041\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \&s\_instance;}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00042}00042\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00043}00043\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00045}00045\ \ \ \ \ \}\ \textcolor{comment}{//\ anon\ namespace}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00046}00046\ \}\ \textcolor{comment}{//\ namespace\ Catch}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00048}00048\ \textcolor{preprocessor}{\#if\ !defined(\ CATCH\_CONFIG\_COLOUR\_NONE\ )\ \&\&\ !defined(\ CATCH\_CONFIG\_COLOUR\_WINDOWS\ )\ \&\&\ !defined(\ CATCH\_CONFIG\_COLOUR\_ANSI\ )}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00049}00049\ \textcolor{preprocessor}{\#\ \ \ ifdef\ CATCH\_PLATFORM\_WINDOWS}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00050}00050\ \textcolor{preprocessor}{\#\ \ \ \ \ \ \ define\ CATCH\_CONFIG\_COLOUR\_WINDOWS}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00051}00051\ \textcolor{preprocessor}{\#\ \ \ else}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00052}\mbox{\hyperlink{include_2internal_2catch__console__colour_8cpp_add9ccb538fe36d74f6582595eab2923a}{00052}}\ \textcolor{preprocessor}{\#\ \ \ \ \ \ \ define\ CATCH\_CONFIG\_COLOUR\_ANSI}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00053}00053\ \textcolor{preprocessor}{\#\ \ \ endif}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00054}00054\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00057}00057\ \textcolor{preprocessor}{\#if\ defined\ (\ CATCH\_CONFIG\_COLOUR\_WINDOWS\ )\ }}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00059}00059\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}}\ \{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00060}00060\ \textcolor{keyword}{namespace\ }\{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00062}00062\ \ \ \ \ \textcolor{keyword}{class\ }Win32ColourImpl\ :\ \textcolor{keyword}{public}\ IColourImpl\ \{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00063}00063\ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00064}00064\ \ \ \ \ \ \ \ \ Win32ColourImpl()\ :\ stdoutHandle(\ GetStdHandle(STD\_OUTPUT\_HANDLE)\ )}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00065}00065\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00066}00066\ \ \ \ \ \ \ \ \ \ \ \ \ CONSOLE\_SCREEN\_BUFFER\_INFO\ csbiInfo;}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00067}00067\ \ \ \ \ \ \ \ \ \ \ \ \ GetConsoleScreenBufferInfo(\ stdoutHandle,\ \&csbiInfo\ );}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \ \ \ originalForegroundAttributes\ =\ csbiInfo.wAttributes\ \&\ \string~(\ BACKGROUND\_GREEN\ |\ BACKGROUND\_RED\ |\ BACKGROUND\_BLUE\ |\ BACKGROUND\_INTENSITY\ );}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \ \ \ originalBackgroundAttributes\ =\ csbiInfo.wAttributes\ \&\ \string~(\ FOREGROUND\_GREEN\ |\ FOREGROUND\_RED\ |\ FOREGROUND\_BLUE\ |\ FOREGROUND\_INTENSITY\ );}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00070}00070\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00072}00072\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ use(\ Colour::Code\ \_colourCode\ )\textcolor{keyword}{\ override\ }\{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00073}00073\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(\ \_colourCode\ )\ \{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00074}00074\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ Colour::None:\ \ \ \ \ \ \textcolor{keywordflow}{return}\ setTextAttribute(\ originalForegroundAttributes\ );}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00075}00075\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ Colour::White:\ \ \ \ \ \textcolor{keywordflow}{return}\ setTextAttribute(\ FOREGROUND\_GREEN\ |\ FOREGROUND\_RED\ |\ FOREGROUND\_BLUE\ );}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ Colour::Red:\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ setTextAttribute(\ FOREGROUND\_RED\ );}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ Colour::Green:\ \ \ \ \ \textcolor{keywordflow}{return}\ setTextAttribute(\ FOREGROUND\_GREEN\ );}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00078}00078\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ Colour::Blue:\ \ \ \ \ \ \textcolor{keywordflow}{return}\ setTextAttribute(\ FOREGROUND\_BLUE\ );}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ Colour::Cyan:\ \ \ \ \ \ \textcolor{keywordflow}{return}\ setTextAttribute(\ FOREGROUND\_BLUE\ |\ FOREGROUND\_GREEN\ );}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00080}00080\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ Colour::Yellow:\ \ \ \ \textcolor{keywordflow}{return}\ setTextAttribute(\ FOREGROUND\_RED\ |\ FOREGROUND\_GREEN\ );}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00081}00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ Colour::Grey:\ \ \ \ \ \ \textcolor{keywordflow}{return}\ setTextAttribute(\ 0\ );}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00083}00083\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ Colour::LightGrey:\ \ \ \ \ \textcolor{keywordflow}{return}\ setTextAttribute(\ FOREGROUND\_INTENSITY\ );}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00084}00084\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ Colour::BrightRed:\ \ \ \ \ \textcolor{keywordflow}{return}\ setTextAttribute(\ FOREGROUND\_INTENSITY\ |\ FOREGROUND\_RED\ );}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00085}00085\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ Colour::BrightGreen:\ \ \ \textcolor{keywordflow}{return}\ setTextAttribute(\ FOREGROUND\_INTENSITY\ |\ FOREGROUND\_GREEN\ );}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00086}00086\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ Colour::BrightWhite:\ \ \ \textcolor{keywordflow}{return}\ setTextAttribute(\ FOREGROUND\_INTENSITY\ |\ FOREGROUND\_GREEN\ |\ FOREGROUND\_RED\ |\ FOREGROUND\_BLUE\ );}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00087}00087\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ Colour::BrightYellow:\ \ \textcolor{keywordflow}{return}\ setTextAttribute(\ FOREGROUND\_INTENSITY\ |\ FOREGROUND\_RED\ |\ FOREGROUND\_GREEN\ );}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00088}00088\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00089}00089\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ Colour::Bright:\ \mbox{\hyperlink{catch__enforce_8h_a05b6c8a530fa2e5b397add8966522777}{CATCH\_INTERNAL\_ERROR}}(\ \textcolor{stringliteral}{"{}not\ a\ colour"{}}\ );}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00090}00090\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00091}00091\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00092}00092\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{catch__enforce_8h_adc6e1c0661c7c34fbb6033de06ec4833}{CATCH\_ERROR}}(\ \textcolor{stringliteral}{"{}Unknown\ colour\ requested"{}}\ );}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00093}00093\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00094}00094\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00095}00095\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00096}00096\ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00097}00097\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ setTextAttribute(\ WORD\ \_textAttribute\ )\ \{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00098}00098\ \ \ \ \ \ \ \ \ \ \ \ \ SetConsoleTextAttribute(\ stdoutHandle,\ \_textAttribute\ |\ originalBackgroundAttributes\ );}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00099}00099\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00100}00100\ \ \ \ \ \ \ \ \ HANDLE\ stdoutHandle;}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00101}00101\ \ \ \ \ \ \ \ \ WORD\ originalForegroundAttributes;}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00102}00102\ \ \ \ \ \ \ \ \ WORD\ originalBackgroundAttributes;}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00103}00103\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00104}00104\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00105}00105\ \ \ \ \ IColourImpl*\ platformColourInstance()\ \{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00106}00106\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ Win32ColourImpl\ s\_instance;}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00107}00107\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00108}00108\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_catch_a961f6f5f07e265684c220a8ae014d7d6}{IConfigPtr}}\ \mbox{\hyperlink{classconfig}{config}}\ =\ \mbox{\hyperlink{namespace_catch_a228a625318bb6183842e394eeba17d50}{getCurrentContext}}().\mbox{\hyperlink{struct_catch_1_1_i_context_ad72743ae753feab0a6f5505f26f79ced}{getConfig}}();}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00109}00109\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_use_colour_a6aa78da0c2de7539bb9e3757e204a3f1}{UseColour::YesOrNo}}\ colourMode\ =\ \mbox{\hyperlink{classconfig}{config}}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00110}00110\ \ \ \ \ \ \ \ \ \ \ \ \ ?\ \mbox{\hyperlink{classconfig}{config}}-\/>useColour()}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00111}00111\ \ \ \ \ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{struct_catch_1_1_use_colour_a6aa78da0c2de7539bb9e3757e204a3f1a15ae4b6fc168cb49a577b958239ec68a}{UseColour::Auto}};}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00112}00112\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ colourMode\ ==\ \mbox{\hyperlink{struct_catch_1_1_use_colour_a6aa78da0c2de7539bb9e3757e204a3f1a15ae4b6fc168cb49a577b958239ec68a}{UseColour::Auto}}\ )}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00113}00113\ \ \ \ \ \ \ \ \ \ \ \ \ colourMode\ =\ \mbox{\hyperlink{struct_catch_1_1_use_colour_a6aa78da0c2de7539bb9e3757e204a3f1a4c36d3a8b6c495b85ba6c4ca519e7fc3}{UseColour::Yes}};}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00114}00114\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ colourMode\ ==\ \mbox{\hyperlink{struct_catch_1_1_use_colour_a6aa78da0c2de7539bb9e3757e204a3f1a4c36d3a8b6c495b85ba6c4ca519e7fc3}{UseColour::Yes}}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00115}00115\ \ \ \ \ \ \ \ \ \ \ \ \ ?\ \&s\_instance}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00116}00116\ \ \ \ \ \ \ \ \ \ \ \ \ :\ NoColourImpl::instance();}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00117}00117\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00118}00118\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00119}00119\ \}\ \textcolor{comment}{//\ end\ anon\ namespace}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00120}00120\ \}\ \textcolor{comment}{//\ end\ namespace\ Catch}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00121}00121\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00122}00122\ \textcolor{preprocessor}{\#elif\ defined(\ CATCH\_CONFIG\_COLOUR\_ANSI\ )\ }}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00123}00123\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00124}00124\ \textcolor{preprocessor}{\#include\ <unistd.h>}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00125}00125\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00126}00126\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}}\ \{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00127}00127\ \textcolor{keyword}{namespace\ }\{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00128}00128\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00129}00129\ \ \ \ \ \textcolor{comment}{//\ use\ POSIX/\ ANSI\ console\ terminal\ codes}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00130}00130\ \ \ \ \ \textcolor{comment}{//\ Thanks\ to\ Adam\ Strzelecki\ for\ original\ contribution}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00131}00131\ \ \ \ \ \textcolor{comment}{//\ (http://github.com/nanoant)}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00132}00132\ \ \ \ \ \textcolor{comment}{//\ https://github.com/philsquared/Catch/pull/131}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00133}00133\ \ \ \ \ \textcolor{keyword}{class\ }PosixColourImpl\ :\ \textcolor{keyword}{public}\ IColourImpl\ \{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00134}00134\ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00135}00135\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ use(\ \mbox{\hyperlink{struct_catch_1_1_colour_a987a596fd001bd80db06b3ba7d53231e}{Colour::Code}}\ \_colourCode\ )\textcolor{keyword}{\ override\ }\{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00136}00136\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(\ \_colourCode\ )\ \{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00137}00137\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{struct_catch_1_1_colour_a987a596fd001bd80db06b3ba7d53231ea40dcc995da140b1531ff4c44bfbf269e}{Colour::None}}:}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00138}00138\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{struct_catch_1_1_colour_a987a596fd001bd80db06b3ba7d53231ea359c0becc4692fa7ef9498b95bb77182}{Colour::White}}:\ \ \ \ \ \textcolor{keywordflow}{return}\ setColour(\ \textcolor{stringliteral}{"{}[0m"{}}\ );}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00139}00139\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{struct_catch_1_1_colour_a987a596fd001bd80db06b3ba7d53231ea333f999cd07742b982440fd6f44af75e}{Colour::Red}}:\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ setColour(\ \textcolor{stringliteral}{"{}[0;31m"{}}\ );}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00140}00140\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{struct_catch_1_1_colour_a987a596fd001bd80db06b3ba7d53231ea7394f91c2c569ff50b9835031c3f553e}{Colour::Green}}:\ \ \ \ \ \textcolor{keywordflow}{return}\ setColour(\ \textcolor{stringliteral}{"{}[0;32m"{}}\ );}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00141}00141\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{struct_catch_1_1_colour_a987a596fd001bd80db06b3ba7d53231eaad6508d03666ff5fef87af939b781cf3}{Colour::Blue}}:\ \ \ \ \ \ \textcolor{keywordflow}{return}\ setColour(\ \textcolor{stringliteral}{"{}[0;34m"{}}\ );}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00142}00142\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{struct_catch_1_1_colour_a987a596fd001bd80db06b3ba7d53231ea28494c34a225dd3134e0ee7210e650bf}{Colour::Cyan}}:\ \ \ \ \ \ \textcolor{keywordflow}{return}\ setColour(\ \textcolor{stringliteral}{"{}[0;36m"{}}\ );}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00143}00143\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{struct_catch_1_1_colour_a987a596fd001bd80db06b3ba7d53231ea1b4afdbe5cc62b5a6794d68d81756fad}{Colour::Yellow}}:\ \ \ \ \textcolor{keywordflow}{return}\ setColour(\ \textcolor{stringliteral}{"{}[0;33m"{}}\ );}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00144}00144\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{struct_catch_1_1_colour_a987a596fd001bd80db06b3ba7d53231ea67e2d1fa799a13aa428dc16a07d9123a}{Colour::Grey}}:\ \ \ \ \ \ \textcolor{keywordflow}{return}\ setColour(\ \textcolor{stringliteral}{"{}[1;30m"{}}\ );}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00145}00145\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00146}00146\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{struct_catch_1_1_colour_a987a596fd001bd80db06b3ba7d53231ea77ba9d49f3bf6670679009e5e25de790}{Colour::LightGrey}}:\ \ \ \ \ \textcolor{keywordflow}{return}\ setColour(\ \textcolor{stringliteral}{"{}[0;37m"{}}\ );}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00147}00147\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{struct_catch_1_1_colour_a987a596fd001bd80db06b3ba7d53231ea43367ae98dadd7742a26c6b603b30885}{Colour::BrightRed}}:\ \ \ \ \ \textcolor{keywordflow}{return}\ setColour(\ \textcolor{stringliteral}{"{}[1;31m"{}}\ );}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00148}00148\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{struct_catch_1_1_colour_a987a596fd001bd80db06b3ba7d53231ea9e52f0245a17e11ca6a560e4a73f2327}{Colour::BrightGreen}}:\ \ \ \textcolor{keywordflow}{return}\ setColour(\ \textcolor{stringliteral}{"{}[1;32m"{}}\ );}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00149}00149\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{struct_catch_1_1_colour_a987a596fd001bd80db06b3ba7d53231ea0d72ca175013aab47f3a963fd6b2dfe2}{Colour::BrightWhite}}:\ \ \ \textcolor{keywordflow}{return}\ setColour(\ \textcolor{stringliteral}{"{}[1;37m"{}}\ );}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00150}00150\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{struct_catch_1_1_colour_a987a596fd001bd80db06b3ba7d53231ea91e883971fa283812f7bbf249e397f4d}{Colour::BrightYellow}}:\ \ \textcolor{keywordflow}{return}\ setColour(\ \textcolor{stringliteral}{"{}[1;33m"{}}\ );}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00151}00151\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00152}00152\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{struct_catch_1_1_colour_a987a596fd001bd80db06b3ba7d53231ea2ea7f580604f2882f2d8ec874fcc2f21}{Colour::Bright}}:\ \mbox{\hyperlink{catch__enforce_8h_a05b6c8a530fa2e5b397add8966522777}{CATCH\_INTERNAL\_ERROR}}(\ \textcolor{stringliteral}{"{}not\ a\ colour"{}}\ );}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00153}00153\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:\ \mbox{\hyperlink{catch__enforce_8h_a05b6c8a530fa2e5b397add8966522777}{CATCH\_INTERNAL\_ERROR}}(\ \textcolor{stringliteral}{"{}Unknown\ colour\ requested"{}}\ );}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00154}00154\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00155}00155\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00156}00156\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ IColourImpl*\ instance()\ \{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00157}00157\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ PosixColourImpl\ s\_instance;}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00158}00158\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \&s\_instance;}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00159}00159\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00160}00160\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00161}00161\ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00162}00162\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ setColour(\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \_escapeCode\ )\ \{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00163}00163\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_catch_a228a625318bb6183842e394eeba17d50}{getCurrentContext}}().\mbox{\hyperlink{struct_catch_1_1_i_context_ad72743ae753feab0a6f5505f26f79ced}{getConfig}}()-\/>stream()}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00164}00164\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{charliteral}{'\(\backslash\)033'}\ <<\ \_escapeCode;}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00165}00165\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00166}00166\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00167}00167\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00168}00168\ \ \ \ \ \textcolor{keywordtype}{bool}\ useColourOnPlatform()\ \{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00169}00169\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00170}00170\ \textcolor{preprocessor}{\#ifdef\ CATCH\_PLATFORM\_MAC}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00171}00171\ \ \ \ \ \ \ \ \ \ \ \ \ !\mbox{\hyperlink{namespace_catch_ab079497368fb1df25af39ad494d2a241}{isDebuggerActive}}()\ \&\&}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00172}00172\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00173}00173\ \textcolor{preprocessor}{\#if\ !(defined(\_\_DJGPP\_\_)\ \&\&\ defined(\_\_STRICT\_ANSI\_\_))}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00174}00174\ \ \ \ \ \ \ \ \ \ \ \ \ isatty(STDOUT\_FILENO)}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00175}00175\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00176}00176\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{false}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00177}00177\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00178}00178\ \ \ \ \ \ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00179}00179\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00180}00180\ \ \ \ \ IColourImpl*\ platformColourInstance()\ \{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00181}00181\ \ \ \ \ \ \ \ \ ErrnoGuard\ guard;}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00182}00182\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_catch_a961f6f5f07e265684c220a8ae014d7d6}{IConfigPtr}}\ \mbox{\hyperlink{classconfig}{config}}\ =\ \mbox{\hyperlink{namespace_catch_a228a625318bb6183842e394eeba17d50}{getCurrentContext}}().\mbox{\hyperlink{struct_catch_1_1_i_context_ad72743ae753feab0a6f5505f26f79ced}{getConfig}}();}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00183}00183\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_use_colour_a6aa78da0c2de7539bb9e3757e204a3f1}{UseColour::YesOrNo}}\ colourMode\ =\ \mbox{\hyperlink{classconfig}{config}}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00184}00184\ \ \ \ \ \ \ \ \ \ \ \ \ ?\ \mbox{\hyperlink{classconfig}{config}}-\/>useColour()}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00185}00185\ \ \ \ \ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{struct_catch_1_1_use_colour_a6aa78da0c2de7539bb9e3757e204a3f1a15ae4b6fc168cb49a577b958239ec68a}{UseColour::Auto}};}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00186}00186\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ colourMode\ ==\ \mbox{\hyperlink{struct_catch_1_1_use_colour_a6aa78da0c2de7539bb9e3757e204a3f1a15ae4b6fc168cb49a577b958239ec68a}{UseColour::Auto}}\ )}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00187}00187\ \ \ \ \ \ \ \ \ \ \ \ \ colourMode\ =\ useColourOnPlatform()}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00188}00188\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ?\ \mbox{\hyperlink{struct_catch_1_1_use_colour_a6aa78da0c2de7539bb9e3757e204a3f1a4c36d3a8b6c495b85ba6c4ca519e7fc3}{UseColour::Yes}}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00189}00189\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{struct_catch_1_1_use_colour_a6aa78da0c2de7539bb9e3757e204a3f1a3f3c3fbda04d356297ed9b3a46cf900c}{UseColour::No}};}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00190}00190\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ colourMode\ ==\ \mbox{\hyperlink{struct_catch_1_1_use_colour_a6aa78da0c2de7539bb9e3757e204a3f1a4c36d3a8b6c495b85ba6c4ca519e7fc3}{UseColour::Yes}}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00191}00191\ \ \ \ \ \ \ \ \ \ \ \ \ ?\ PosixColourImpl::instance()}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00192}00192\ \ \ \ \ \ \ \ \ \ \ \ \ :\ NoColourImpl::instance();}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00193}00193\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00194}00194\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00195}00195\ \}\ \textcolor{comment}{//\ end\ anon\ namespace}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00196}00196\ \}\ \textcolor{comment}{//\ end\ namespace\ Catch}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00197}00197\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00198}00198\ \textcolor{preprocessor}{\#else\ \ }\textcolor{comment}{//\ not\ Windows\ or\ ANSI\ ///////////////////////////////////////////////}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00199}00199\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00200}00200\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}}\ \{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00201}00201\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00202}00202\ \ \ \ \ \textcolor{keyword}{static}\ IColourImpl*\ platformColourInstance()\ \{\ \textcolor{keywordflow}{return}\ NoColourImpl::instance();\ \}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00203}00203\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00204}00204\ \}\ \textcolor{comment}{//\ end\ namespace\ Catch}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00205}00205\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00206}00206\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ Windows/\ ANSI/\ None}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00207}00207\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00208}00208\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}}\ \{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00209}00209\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00210}\mbox{\hyperlink{struct_catch_1_1_colour_a7e121974d19c92e0eacfd8e01ff16756}{00210}}\ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_colour_a7e121974d19c92e0eacfd8e01ff16756}{Colour::Colour}}(\ \mbox{\hyperlink{struct_code}{Code}}\ \_colourCode\ )\ \{\ \mbox{\hyperlink{struct_catch_1_1_colour_af8d7e51528dbd17a93ee49fa4862645d}{use}}(\ \_colourCode\ );\ \}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00211}\mbox{\hyperlink{struct_catch_1_1_colour_ad7e2efa552226bb2fcb53d05bc9c56c4}{00211}}\ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_colour_a7e121974d19c92e0eacfd8e01ff16756}{Colour::Colour}}(\ \mbox{\hyperlink{struct_catch_1_1_colour}{Colour}}\&\&\ rhs\ )\ \textcolor{keyword}{noexcept}\ \{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00212}00212\ \ \ \ \ \ \ \ \ m\_moved\ =\ rhs.m\_moved;}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00213}00213\ \ \ \ \ \ \ \ \ rhs.m\_moved\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00214}00214\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00215}\mbox{\hyperlink{struct_catch_1_1_colour_afba333077af59a1c236166d74aa67a45}{00215}}\ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_colour}{Colour}}\&\ \mbox{\hyperlink{struct_catch_1_1_colour_afba333077af59a1c236166d74aa67a45}{Colour::operator=}}(\ \mbox{\hyperlink{struct_catch_1_1_colour}{Colour}}\&\&\ rhs\ )\ \textcolor{keyword}{noexcept}\ \{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00216}00216\ \ \ \ \ \ \ \ \ m\_moved\ =\ rhs.m\_moved;}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00217}00217\ \ \ \ \ \ \ \ \ rhs.m\_moved\ \ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00218}00218\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00219}00219\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00220}00220\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00221}\mbox{\hyperlink{struct_catch_1_1_colour_a2c7994a306d12d316e2ebbecd84f58be}{00221}}\ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_colour_a2c7994a306d12d316e2ebbecd84f58be}{Colour::\string~Colour}}()\{\ \textcolor{keywordflow}{if}(\ !m\_moved\ )\ \mbox{\hyperlink{struct_catch_1_1_colour_af8d7e51528dbd17a93ee49fa4862645d}{use}}(\ \mbox{\hyperlink{struct_catch_1_1_colour_a987a596fd001bd80db06b3ba7d53231ea40dcc995da140b1531ff4c44bfbf269e}{None}}\ );\ \}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00222}00222\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00223}\mbox{\hyperlink{struct_catch_1_1_colour_af8d7e51528dbd17a93ee49fa4862645d}{00223}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_catch_1_1_colour_af8d7e51528dbd17a93ee49fa4862645d}{Colour::use}}(\ \mbox{\hyperlink{struct_code}{Code}}\ \_colourCode\ )\ \{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00224}00224\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ IColourImpl*\ impl\ =\ platformColourInstance();}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00225}00225\ \ \ \ \ \ \ \ \ impl-\/>use(\ \_colourCode\ );}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00226}00226\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00227}00227\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00228}\mbox{\hyperlink{namespace_catch_a10ae72554747aa1cbc57b265abc14b25}{00228}}\ \ \ \ \ std::ostream\&\ \mbox{\hyperlink{namespace_catch_abf821d46e662c8d93d80a98d79a10314}{operator\ <<\ }}(\ std::ostream\&\ os,\ \mbox{\hyperlink{struct_catch_1_1_colour}{Colour}}\ \textcolor{keyword}{const}\&\ )\ \{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00229}00229\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}};}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00230}00230\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00231}00231\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00232}00232\ \}\ \textcolor{comment}{//\ end\ namespace\ Catch}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00233}00233\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00234}00234\ \textcolor{preprocessor}{\#if\ defined(\_\_clang\_\_)}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00235}00235\ \textcolor{preprocessor}{\#\ \ \ \ pragma\ clang\ diagnostic\ pop}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00236}00236\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__console__colour_8cpp_source_l00237}00237\ }
+
+\end{DoxyCode}

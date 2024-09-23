@@ -1,0 +1,67 @@
+\doxysection{wast\+\_\+to\+\_\+wasm.\+cpp}
+\hypertarget{wast__to__wasm_8cpp_source}{}\label{wast__to__wasm_8cpp_source}\index{libraries/chain/wast\_to\_wasm.cpp@{libraries/chain/wast\_to\_wasm.cpp}}
+\mbox{\hyperlink{wast__to__wasm_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{wast__to__wasm_8hpp}{sysio/chain/wast\_to\_wasm.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{_basic_types_8h}{Inline/BasicTypes.h}}>}}
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{_module_8h}{IR/Module.h}}>}}
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{_validate_8h}{IR/Validate.h}}>}}
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{_w_a_s_t_8h}{WAST/WAST.h}}>}}
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{_w_a_s_m_8h}{WASM/WASM.h}}>}}
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <sstream>}}
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <iomanip>}}
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{exception_8hpp}{fc/exception/exception.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{scoped__exit_8hpp}{fc/scoped\_exit.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00011}00011\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp}{sysio/chain/exceptions.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00013}00013\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{\ \textcolor{keyword}{namespace\ }chain\ \{}
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00015}\mbox{\hyperlink{namespacesysio_1_1chain_ae6ea4fd60bb72cc213f5311600ca63e8}{00015}}\ \ \ \ std::vector<uint8\_t>\ \mbox{\hyperlink{namespacesysio_1_1chain_ae6ea4fd60bb72cc213f5311600ca63e8}{wast\_to\_wasm}}(\ \textcolor{keyword}{const}\ std::string\&\ wast\ )\ }
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00016}00016\ \ \ \ \{\ }
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00017}00017\ \ \ \ \ \ \ std::stringstream\ ss;}
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00018}00018\ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00019}00019\ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00020}00020\ \ \ \ \ \ \ \mbox{\hyperlink{struct_i_r_1_1_module}{IR::Module}}\ module;}
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00021}00021\ \ \ \ \ \ \ std::vector<WAST::Error>\ parse\_errors;}
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00022}00022\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_a6d93426db9bd262249b9ce93ddba7c87}{WAST::parseModule}}(wast.c\_str(),wast.size(),module,parse\_errors);}
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00023}00023\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(parse\_errors.size())}
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00024}00024\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00025}00025\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Print\ any\ parse\ errors;}}
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00026}00026\ \ \ \ \ \ \ \ \ \ ss\ <<\ \textcolor{stringliteral}{"{}Error\ parsing\ WebAssembly\ text\ file:"{}}\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00027}00027\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\&\ error\ :\ parse\_errors)}
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00028}00028\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00029}00029\ \ \ \ \ \ \ \ \ \ \ \ \ ss\ <<\ \textcolor{stringliteral}{"{}:"{}}\ <<\ error.locus.describe()\ <<\ \textcolor{stringliteral}{"{}:\ "{}}\ <<\ error.message.c\_str()\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00030}00030\ \ \ \ \ \ \ \ \ \ \ \ \ ss\ <<\ error.locus.sourceLine\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00031}00031\ \ \ \ \ \ \ \ \ \ \ \ \ ss\ <<\ std::setw(error.locus.column(8))\ <<\ \textcolor{stringliteral}{"{}\string^"{}}\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00032}00032\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00033}00033\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ \textcolor{keyword}{false},\ \mbox{\hyperlink{namespacesysio_1_1chain_a489ddfe76234ed9479deafde7d26c2b9}{wasm\_exception}},\ \textcolor{stringliteral}{"{}error\ parsing\ wast:\ \$\{msg\}"{}},\ (\textcolor{stringliteral}{"{}msg"{}},ss.str())\ );}
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00034}00034\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00036}00036\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\ sectionIt\ =\ module.userSections.begin();sectionIt\ !=\ module.userSections.end();++sectionIt)}
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00037}00037\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00038}00038\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(sectionIt-\/>name\ ==\ \textcolor{stringliteral}{"{}name"{}})\ \{\ \textcolor{keyword}{module}.userSections.erase(sectionIt);\ \textcolor{keywordflow}{break};\ \}}
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00039}00039\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00041}00041\ \ \ \ \ \ \ \textcolor{keywordflow}{try}}
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00042}00042\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00043}00043\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Serialize\ the\ WebAssembly\ module.}}
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00044}00044\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_serialization_1_1_array_output_stream}{Serialization::ArrayOutputStream}}\ stream;}
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00045}00045\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_serialization_a2a05c5aff4847073ca0fb887d20ac485}{WASM::serialize}}(stream,module);}
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00046}00046\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ stream.getBytes();}
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00047}00047\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00048}00048\ \ \ \ \ \ \ \textcolor{keywordflow}{catch}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_serialization_1_1_fatal_serialization_exception}{Serialization::FatalSerializationException}}\&\ \mbox{\hyperlink{classfc_1_1exception}{exception}})}
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00049}00049\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00050}00050\ \ \ \ \ \ \ \ \ \ ss\ <<\ \textcolor{stringliteral}{"{}Error\ serializing\ WebAssembly\ binary\ file:"{}}\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00051}00051\ \ \ \ \ \ \ \ \ \ ss\ <<\ \mbox{\hyperlink{classfc_1_1exception}{exception}}.message\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ \textcolor{keyword}{false},\ \mbox{\hyperlink{namespacesysio_1_1chain_a489ddfe76234ed9479deafde7d26c2b9}{wasm\_exception}},\ \textcolor{stringliteral}{"{}error\ converting\ to\ wasm:\ \$\{msg\}"{}},\ (\textcolor{stringliteral}{"{}msg"{}},ss.get())\ );}
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00053}00053\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_i_r_1_1_validation_exception}{IR::ValidationException}}\&\ e)\ \{}
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00054}00054\ \ \ \ \ \ \ \ \ \ ss\ <<\ \textcolor{stringliteral}{"{}Error\ validating\ WebAssembly\ binary\ file:"{}}\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00055}00055\ \ \ \ \ \ \ \ \ \ ss\ <<\ e.\mbox{\hyperlink{struct_i_r_1_1_validation_exception_a9308689c3efeb272361bf9a07bf8f8ae}{message}}\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ \textcolor{keyword}{false},\ \mbox{\hyperlink{namespacesysio_1_1chain_a489ddfe76234ed9479deafde7d26c2b9}{wasm\_exception}},\ \textcolor{stringliteral}{"{}error\ converting\ to\ wasm:\ \$\{msg\}"{}},\ (\textcolor{stringliteral}{"{}msg"{}},ss.get())\ );}
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00057}00057\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00059}00059\ \ \ \ \}\ \mbox{\hyperlink{exception_8hpp_a094902280cad82ad6529ebbd12a697eb}{FC\_CAPTURE\_AND\_RETHROW}}(\ (wast)\ )\ \}\ \ }
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{wast__to__wasm_8cpp_source_l00061}00061\ \}\ \}\ \textcolor{comment}{//\ sysio::chain}}
+
+\end{DoxyCode}

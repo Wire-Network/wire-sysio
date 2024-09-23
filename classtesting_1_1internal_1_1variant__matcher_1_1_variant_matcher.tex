@@ -1,0 +1,148 @@
+\doxysection{testing\+::internal\+::variant\+\_\+matcher\+::Variant\+Matcher\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classtesting_1_1internal_1_1variant__matcher_1_1_variant_matcher}{}\label{classtesting_1_1internal_1_1variant__matcher_1_1_variant_matcher}\index{testing::internal::variant\_matcher::VariantMatcher$<$ T $>$@{testing::internal::variant\_matcher::VariantMatcher$<$ T $>$}}
+
+
+{\ttfamily \#include $<$gmock-\/matchers.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1variant__matcher_1_1_variant_matcher_aa77bcc58de0571f9099cfe783eeee666}{Variant\+Matcher}} (\mbox{\hyperlink{classtesting_1_1_matcher}{\+::testing\+::\+Matcher}}$<$ const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& $>$ matcher)
+\item 
+{\footnotesize template$<$typename Variant $>$ }\\bool \mbox{\hyperlink{classtesting_1_1internal_1_1variant__matcher_1_1_variant_matcher_aa01aea191f2d02e81b0e653c46e73e3a}{Match\+And\+Explain}} (const Variant \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}, \mbox{\hyperlink{classtesting_1_1_match_result_listener}{\+::testing\+::\+Match\+Result\+Listener}} \texorpdfstring{$\ast$}{*}listener) const
+\item 
+void \mbox{\hyperlink{classtesting_1_1internal_1_1variant__matcher_1_1_variant_matcher_a77eb4d1355f774bd8934a30bcc6b29d5}{Describe\+To}} (std\+::ostream \texorpdfstring{$\ast$}{*}os) const
+\item 
+void \mbox{\hyperlink{classtesting_1_1internal_1_1variant__matcher_1_1_variant_matcher_abbb15a8956731aa0227707c4b5eab9db}{Describe\+Negation\+To}} (std\+::ostream \texorpdfstring{$\ast$}{*}os) const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$\newline
+class testing\+::internal\+::variant\+\_\+matcher\+::\+Variant\+Matcher$<$ T $>$}
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l04063}{4063}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1internal_1_1variant__matcher_1_1_variant_matcher_aa77bcc58de0571f9099cfe783eeee666}\index{testing::internal::variant\_matcher::VariantMatcher$<$ T $>$@{testing::internal::variant\_matcher::VariantMatcher$<$ T $>$}!VariantMatcher@{VariantMatcher}}
+\index{VariantMatcher@{VariantMatcher}!testing::internal::variant\_matcher::VariantMatcher$<$ T $>$@{testing::internal::variant\_matcher::VariantMatcher$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{VariantMatcher()}{VariantMatcher()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1variant__matcher_1_1_variant_matcher_aa77bcc58de0571f9099cfe783eeee666} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1variant__matcher_1_1_variant_matcher}{testing\+::internal\+::variant\+\_\+matcher\+::\+Variant\+Matcher}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::\+Variant\+Matcher (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classtesting_1_1_matcher}{\+::testing\+::\+Matcher}}$<$ const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& $>$}]{matcher}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l04065}{4065}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{04066\ \ \ \ \ \ \ :\ matcher\_(\mbox{\hyperlink{namespacetesting_1_1internal_aa1114d84589bd22f45d443527528cb35}{internal::move}}(matcher))\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1variant__matcher_1_1_variant_matcher_abbb15a8956731aa0227707c4b5eab9db}\index{testing::internal::variant\_matcher::VariantMatcher$<$ T $>$@{testing::internal::variant\_matcher::VariantMatcher$<$ T $>$}!DescribeNegationTo@{DescribeNegationTo}}
+\index{DescribeNegationTo@{DescribeNegationTo}!testing::internal::variant\_matcher::VariantMatcher$<$ T $>$@{testing::internal::variant\_matcher::VariantMatcher$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{DescribeNegationTo()}{DescribeNegationTo()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1variant__matcher_1_1_variant_matcher_abbb15a8956731aa0227707c4b5eab9db} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+void \mbox{\hyperlink{classtesting_1_1internal_1_1variant__matcher_1_1_variant_matcher}{testing\+::internal\+::variant\+\_\+matcher\+::\+Variant\+Matcher}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::\+Describe\+Negation\+To (\begin{DoxyParamCaption}\item[{std\+::ostream \texorpdfstring{$\ast$}{*}}]{os}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l04095}{4095}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{04095\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{04096\ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}is\ a\ variant<>\ with\ value\ of\ type\ other\ than\ '"{}}\ <<\ GetTypeName()}
+\DoxyCodeLine{04097\ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}'\ or\ the\ value\ "{}};}
+\DoxyCodeLine{04098\ \ \ \ \ matcher\_.\mbox{\hyperlink{classtesting_1_1internal_1_1_matcher_base_ac1089d49b6b8a381900618985cd69b7f}{DescribeNegationTo}}(os);}
+\DoxyCodeLine{04099\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1variant__matcher_1_1_variant_matcher_abbb15a8956731aa0227707c4b5eab9db_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1variant__matcher_1_1_variant_matcher_a77eb4d1355f774bd8934a30bcc6b29d5}\index{testing::internal::variant\_matcher::VariantMatcher$<$ T $>$@{testing::internal::variant\_matcher::VariantMatcher$<$ T $>$}!DescribeTo@{DescribeTo}}
+\index{DescribeTo@{DescribeTo}!testing::internal::variant\_matcher::VariantMatcher$<$ T $>$@{testing::internal::variant\_matcher::VariantMatcher$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{DescribeTo()}{DescribeTo()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1variant__matcher_1_1_variant_matcher_a77eb4d1355f774bd8934a30bcc6b29d5} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+void \mbox{\hyperlink{classtesting_1_1internal_1_1variant__matcher_1_1_variant_matcher}{testing\+::internal\+::variant\+\_\+matcher\+::\+Variant\+Matcher}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::\+Describe\+To (\begin{DoxyParamCaption}\item[{std\+::ostream \texorpdfstring{$\ast$}{*}}]{os}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l04089}{4089}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{04089\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{04090\ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}is\ a\ variant<>\ with\ value\ of\ type\ '"{}}\ <<\ GetTypeName()}
+\DoxyCodeLine{04091\ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}'\ and\ the\ value\ "{}};}
+\DoxyCodeLine{04092\ \ \ \ \ matcher\_.\mbox{\hyperlink{classtesting_1_1internal_1_1_matcher_base_a7e0c883c7745e0d646463077ef1c1267}{DescribeTo}}(os);}
+\DoxyCodeLine{04093\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1variant__matcher_1_1_variant_matcher_a77eb4d1355f774bd8934a30bcc6b29d5_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1variant__matcher_1_1_variant_matcher_aa01aea191f2d02e81b0e653c46e73e3a}\index{testing::internal::variant\_matcher::VariantMatcher$<$ T $>$@{testing::internal::variant\_matcher::VariantMatcher$<$ T $>$}!MatchAndExplain@{MatchAndExplain}}
+\index{MatchAndExplain@{MatchAndExplain}!testing::internal::variant\_matcher::VariantMatcher$<$ T $>$@{testing::internal::variant\_matcher::VariantMatcher$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{MatchAndExplain()}{MatchAndExplain()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1variant__matcher_1_1_variant_matcher_aa01aea191f2d02e81b0e653c46e73e3a} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+template$<$typename Variant $>$ \\
+bool \mbox{\hyperlink{classtesting_1_1internal_1_1variant__matcher_1_1_variant_matcher}{testing\+::internal\+::variant\+\_\+matcher\+::\+Variant\+Matcher}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::\+Match\+And\+Explain (\begin{DoxyParamCaption}\item[{const Variant \&}]{value}{, }\item[{\mbox{\hyperlink{classtesting_1_1_match_result_listener}{\+::testing\+::\+Match\+Result\+Listener}} \texorpdfstring{$\ast$}{*}}]{listener}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l04069}{4069}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{04070\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{04071\ \ \ \ \ \textcolor{keywordflow}{if}\ (!listener-\/>\mbox{\hyperlink{classtesting_1_1_match_result_listener_ac34f9771f2ba6128cd6a1348b3aebda3}{IsInterested}}())\ \{}
+\DoxyCodeLine{04072\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetesting_1_1internal_1_1variant__matcher_a7abc074a2ee89eead825738b28e42b61}{holds\_alternative<T>}}(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})\ \&\&\ matcher\_.\mbox{\hyperlink{classtesting_1_1internal_1_1_matcher_base_abc0dbefa4daff0a49943ca8740e987a6}{Matches}}(get<T>(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}));}
+\DoxyCodeLine{04073\ \ \ \ \ \}}
+\DoxyCodeLine{04074\ }
+\DoxyCodeLine{04075\ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{namespacetesting_1_1internal_1_1variant__matcher_a7abc074a2ee89eead825738b28e42b61}{holds\_alternative<T>}}(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}))\ \{}
+\DoxyCodeLine{04076\ \ \ \ \ \ \ *listener\ <<\ \textcolor{stringliteral}{"{}whose\ value\ is\ not\ of\ type\ '"{}}\ <<\ GetTypeName()\ <<\ \textcolor{stringliteral}{"{}'"{}};}
+\DoxyCodeLine{04077\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{04078\ \ \ \ \ \}}
+\DoxyCodeLine{04079\ }
+\DoxyCodeLine{04080\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}\ =\ \mbox{\hyperlink{namespacetesting_1_1internal_1_1variant__matcher_a24deefd971c596946165bb913953235d}{get<T>}}(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}});}
+\DoxyCodeLine{04081\ \ \ \ \ StringMatchResultListener\ elem\_listener;}
+\DoxyCodeLine{04082\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ match\ =\ matcher\_.\mbox{\hyperlink{classtesting_1_1internal_1_1_matcher_base_aab88b1d23b6b94a8495ce6a0e0c576ce}{MatchAndExplain}}(elem,\ \&elem\_listener);}
+\DoxyCodeLine{04083\ \ \ \ \ *listener\ <<\ \textcolor{stringliteral}{"{}whose\ value\ "{}}\ <<\ \mbox{\hyperlink{namespacetesting_aa5717bb1144edd1d262d310ba70c82ed}{PrintToString}}(elem)}
+\DoxyCodeLine{04084\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ (match\ ?\ \textcolor{stringliteral}{"{}\ matches"{}}\ :\ \textcolor{stringliteral}{"{}\ doesn't\ match"{}});}
+\DoxyCodeLine{04085\ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_ad609eb8bac84ab487464a3449c57640a}{PrintIfNotEmpty}}(elem\_listener.str(),\ listener-\/>\mbox{\hyperlink{classtesting_1_1_match_result_listener_a7f0e5cffd6983499e99546c759aee2f8}{stream}}());}
+\DoxyCodeLine{04086\ \ \ \ \ \textcolor{keywordflow}{return}\ match;}
+\DoxyCodeLine{04087\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1variant__matcher_1_1_variant_matcher_aa01aea191f2d02e81b0e653c46e73e3a_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/include/gmock/\mbox{\hyperlink{gmock-matchers_8h}{gmock-\/matchers.\+h}}\end{DoxyCompactItemize}

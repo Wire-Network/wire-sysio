@@ -1,0 +1,132 @@
+\doxysection{Catch\+::Exception\+Translator\+Registry Class Reference}
+\hypertarget{class_catch_1_1_exception_translator_registry}{}\label{class_catch_1_1_exception_translator_registry}\index{Catch::ExceptionTranslatorRegistry@{Catch::ExceptionTranslatorRegistry}}
+
+
+{\ttfamily \#include $<$catch\+\_\+exception\+\_\+translator\+\_\+registry.\+h$>$}
+
+
+
+Inheritance diagram for Catch\+::Exception\+Translator\+Registry\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=218pt]{class_catch_1_1_exception_translator_registry__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Catch\+::Exception\+Translator\+Registry\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=218pt]{class_catch_1_1_exception_translator_registry__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_catch_1_1_exception_translator_registry_a80970dbd74a32ea94d11618eeef59493}{\texorpdfstring{$\sim$}{\string~}\+Exception\+Translator\+Registry}} ()
+\item 
+virtual void \mbox{\hyperlink{class_catch_1_1_exception_translator_registry_a556a77deb4690677d774f682e1b90caa}{register\+Translator}} (const \mbox{\hyperlink{struct_catch_1_1_i_exception_translator}{IException\+Translator}} \texorpdfstring{$\ast$}{*}translator)
+\item 
+std\+::string \mbox{\hyperlink{class_catch_1_1_exception_translator_registry_a20708aa96760c083f5fd4ee0c894802e}{translate\+Active\+Exception}} () const override
+\item 
+std\+::string \mbox{\hyperlink{class_catch_1_1_exception_translator_registry_ab99cec0e802db0327362c576bedd4377}{try\+Translators}} () const
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{struct_catch_1_1_i_exception_translator_registry}{Catch\+::\+IException\+Translator\+Registry}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{struct_catch_1_1_i_exception_translator_registry_a5943b77f962a069348669fd5f0317084}{\texorpdfstring{$\sim$}{\string~}\+IException\+Translator\+Registry}} ()
+\item 
+virtual \mbox{\hyperlink{struct_catch_1_1_i_exception_translator_registry_acf7402e18789ea46d54ea8564ac358d3}{\texorpdfstring{$\sim$}{\string~}\+IException\+Translator\+Registry}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{catch__exception__translator__registry_8h_source_l00018}{18}} of file \mbox{\hyperlink{catch__exception__translator__registry_8h_source}{catch\+\_\+exception\+\_\+translator\+\_\+registry.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_catch_1_1_exception_translator_registry_a80970dbd74a32ea94d11618eeef59493}\index{Catch::ExceptionTranslatorRegistry@{Catch::ExceptionTranslatorRegistry}!````~ExceptionTranslatorRegistry@{\texorpdfstring{$\sim$}{\string~}ExceptionTranslatorRegistry}}
+\index{````~ExceptionTranslatorRegistry@{\texorpdfstring{$\sim$}{\string~}ExceptionTranslatorRegistry}!Catch::ExceptionTranslatorRegistry@{Catch::ExceptionTranslatorRegistry}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}ExceptionTranslatorRegistry()}{\string~ExceptionTranslatorRegistry()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_exception_translator_registry_a80970dbd74a32ea94d11618eeef59493} 
+Catch\+::\+Exception\+Translator\+Registry\+::\texorpdfstring{$\sim$}{\string~}\+Exception\+Translator\+Registry (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__exception__translator__registry_8cpp_source_l00020}{20}} of file \mbox{\hyperlink{catch__exception__translator__registry_8cpp_source}{catch\+\_\+exception\+\_\+translator\+\_\+registry.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00021\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_catch_1_1_exception_translator_registry_a556a77deb4690677d774f682e1b90caa}\index{Catch::ExceptionTranslatorRegistry@{Catch::ExceptionTranslatorRegistry}!registerTranslator@{registerTranslator}}
+\index{registerTranslator@{registerTranslator}!Catch::ExceptionTranslatorRegistry@{Catch::ExceptionTranslatorRegistry}}
+\doxysubsubsection{\texorpdfstring{registerTranslator()}{registerTranslator()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_exception_translator_registry_a556a77deb4690677d774f682e1b90caa} 
+void Catch\+::\+Exception\+Translator\+Registry\+::register\+Translator (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct_catch_1_1_i_exception_translator}{IException\+Translator}} \texorpdfstring{$\ast$}{*}}]{translator}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__exception__translator__registry_8cpp_source_l00023}{23}} of file \mbox{\hyperlink{catch__exception__translator__registry_8cpp_source}{catch\+\_\+exception\+\_\+translator\+\_\+registry.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ m\_translators.push\_back(\ std::unique\_ptr<const\ IExceptionTranslator>(\ translator\ )\ );}
+\DoxyCodeLine{00025\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_exception_translator_registry_a20708aa96760c083f5fd4ee0c894802e}\index{Catch::ExceptionTranslatorRegistry@{Catch::ExceptionTranslatorRegistry}!translateActiveException@{translateActiveException}}
+\index{translateActiveException@{translateActiveException}!Catch::ExceptionTranslatorRegistry@{Catch::ExceptionTranslatorRegistry}}
+\doxysubsubsection{\texorpdfstring{translateActiveException()}{translateActiveException()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_exception_translator_registry_a20708aa96760c083f5fd4ee0c894802e} 
+std\+::string Catch\+::\+Exception\+Translator\+Registry\+::translate\+Active\+Exception (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_i_exception_translator_registry_af76ae8c331a17f2a94c9720bc0d686bb}{Catch\+::\+IException\+Translator\+Registry}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__exception__translator__registry_8cpp_source_l00079}{79}} of file \mbox{\hyperlink{catch__exception__translator__registry_8cpp_source}{catch\+\_\+exception\+\_\+translator\+\_\+registry.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{catch__enforce_8h_a05b6c8a530fa2e5b397add8966522777}{CATCH\_INTERNAL\_ERROR}}(\textcolor{stringliteral}{"{}Attempted\ to\ translate\ active\ exception\ under\ CATCH\_CONFIG\_DISABLE\_EXCEPTIONS!"{}});}
+\DoxyCodeLine{00081\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_exception_translator_registry_ab99cec0e802db0327362c576bedd4377}\index{Catch::ExceptionTranslatorRegistry@{Catch::ExceptionTranslatorRegistry}!tryTranslators@{tryTranslators}}
+\index{tryTranslators@{tryTranslators}!Catch::ExceptionTranslatorRegistry@{Catch::ExceptionTranslatorRegistry}}
+\doxysubsubsection{\texorpdfstring{tryTranslators()}{tryTranslators()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_exception_translator_registry_ab99cec0e802db0327362c576bedd4377} 
+std\+::string Catch\+::\+Exception\+Translator\+Registry\+::try\+Translators (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{catch__exception__translator__registry_8cpp_source_l00083}{83}} of file \mbox{\hyperlink{catch__exception__translator__registry_8cpp_source}{catch\+\_\+exception\+\_\+translator\+\_\+registry.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{catch__enforce_8h_a05b6c8a530fa2e5b397add8966522777}{CATCH\_INTERNAL\_ERROR}}(\textcolor{stringliteral}{"{}Attempted\ to\ use\ exception\ translators\ under\ CATCH\_CONFIG\_DISABLE\_EXCEPTIONS!"{}});}
+\DoxyCodeLine{00085\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__exception__translator__registry_8h}{catch\+\_\+exception\+\_\+translator\+\_\+registry.\+h}}\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__exception__translator__registry_8cpp}{catch\+\_\+exception\+\_\+translator\+\_\+registry.\+cpp}}\end{DoxyCompactItemize}

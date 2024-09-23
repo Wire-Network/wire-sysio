@@ -1,0 +1,125 @@
+\chapter{generators}
+\hypertarget{md_libraries_2sys-vm_2external_2_catch2_2docs_2generators}{}\label{md_libraries_2sys-vm_2external_2_catch2_2docs_2generators}\index{generators@{generators}}
+\label{_top}%
+ \doxysection*{\doxylink{struct_data}{Data} Generators}
+
+\doxylink{struct_data}{Data} generators (also known as {\itshape data driven/parametrized test cases}) let you reuse the same set of assertions across different input values. In Catch2, this means that they respect the ordering and nesting of the {\ttfamily TEST\+\_\+\+CASE} and {\ttfamily SECTION} macros, and their nested sections are run once per each value in a generator.
+
+This is best explained with an example\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\textcolor{stringliteral}{"{}Generators"{}})\ \{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{auto}\ i\ =\ \mbox{\hyperlink{catch__generators_8hpp_a4941c6427cfa36ee7c52d734e460f9df}{GENERATE}}(1,\ 2,\ 3);}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\textcolor{stringliteral}{"{}one"{}})\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ =\ \mbox{\hyperlink{catch__generators_8hpp_a4941c6427cfa36ee7c52d734e460f9df}{GENERATE}}(\ -\/3,\ -\/2,\ -\/1\ );}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ <\ i);}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+The assertion in this test case will be run 9 times, because there are 3 possible values for {\ttfamily i} (1, 2, and 3) and there are 3 possible values for {\ttfamily j} (-\/3, -\/2, and -\/1).
+
+There are 2 parts to generators in Catch2, the {\ttfamily GENERATE} macro together with the already provided generators, and the {\ttfamily IGenerator\texorpdfstring{$<$}{<}T\texorpdfstring{$>$}{>}} interface that allows users to implement their own generators.
+
+\doxysubsection*{Provided generators}
+
+Catch2\textquotesingle{}s provided generator functionality consists of three parts,
+
+
+\begin{DoxyItemize}
+\item {\ttfamily GENERATE} macro, that serves to integrate generator expression with a test case,
+\item 2 fundamental generators
+\begin{DoxyItemize}
+\item {\ttfamily Value\+Generator\texorpdfstring{$<$}{<}T\texorpdfstring{$>$}{>}} -- contains only single element
+\item {\ttfamily Values\+Generator\texorpdfstring{$<$}{<}T\texorpdfstring{$>$}{>}} -- contains multiple elements
+\end{DoxyItemize}
+\item 5 generic generators that modify other generators
+\begin{DoxyItemize}
+\item {\ttfamily Filter\+Generator\texorpdfstring{$<$}{<}T, Predicate\texorpdfstring{$>$}{>}} -- filters out elements from a generator for which the predicate returns "{}false"{}
+\item {\ttfamily Take\+Generator\texorpdfstring{$<$}{<}T\texorpdfstring{$>$}{>}} -- takes first {\ttfamily n} elements from a generator
+\item {\ttfamily Repeat\+Generator\texorpdfstring{$<$}{<}T\texorpdfstring{$>$}{>}} -- repeats output from a generator {\ttfamily n} times
+\item {\ttfamily Map\+Generator\texorpdfstring{$<$}{<}T, \doxylink{union_u}{U}, Func\texorpdfstring{$>$}{>}} -- returns the result of applying {\ttfamily Func} on elements from a different generator
+\item {\ttfamily Chunk\+Generator\texorpdfstring{$<$}{<}T\texorpdfstring{$>$}{>}} -- returns chunks (inside {\ttfamily std\+::vector}) of n elements from a generator
+\end{DoxyItemize}
+\item 3 specific purpose generators
+\begin{DoxyItemize}
+\item {\ttfamily Random\+Integer\+Generator\texorpdfstring{$<$}{<}Integral\texorpdfstring{$>$}{>}} -- generates random Integrals from range
+\item {\ttfamily Random\+Float\+Generator\texorpdfstring{$<$}{<}Float\texorpdfstring{$>$}{>}} -- generates random \doxylink{namespace_floats}{Floats} from range
+\item {\ttfamily Range\+Generator\texorpdfstring{$<$}{<}T\texorpdfstring{$>$}{>}} -- generates all values inside a specific range
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+The generators also have associated helper functions that infer their type, making their usage much nicer. These are
+
+
+\begin{DoxyItemize}
+\item {\ttfamily value(T\&\&)} for {\ttfamily Value\+Generator\texorpdfstring{$<$}{<}T\texorpdfstring{$>$}{>}}
+\item {\ttfamily values(std\+::initializer\+\_\+list\texorpdfstring{$<$}{<}T\texorpdfstring{$>$}{>})} for {\ttfamily Values\+Generator\texorpdfstring{$<$}{<}T\texorpdfstring{$>$}{>}}
+\item {\ttfamily filter(predicate, Generator\+Wrapper\texorpdfstring{$<$}{<}T\texorpdfstring{$>$}{>}\&\&)} for {\ttfamily Filter\+Generator\texorpdfstring{$<$}{<}T, Predicate\texorpdfstring{$>$}{>}}
+\item {\ttfamily take(count, Generator\+Wrapper\texorpdfstring{$<$}{<}T\texorpdfstring{$>$}{>}\&\&)} for {\ttfamily Take\+Generator\texorpdfstring{$<$}{<}T\texorpdfstring{$>$}{>}}
+\item {\ttfamily repeat(repeats, Generator\+Wrapper\texorpdfstring{$<$}{<}T\texorpdfstring{$>$}{>}\&\&)} for {\ttfamily Repeat\+Generator\texorpdfstring{$<$}{<}T\texorpdfstring{$>$}{>}}
+\item {\ttfamily map(func, Generator\+Wrapper\texorpdfstring{$<$}{<}T\texorpdfstring{$>$}{>}\&\&)} for {\ttfamily Map\+Generator\texorpdfstring{$<$}{<}T, \doxylink{union_u}{U}, Func\texorpdfstring{$>$}{>}} (map {\ttfamily \doxylink{union_u}{U}} to {\ttfamily T}, deduced from {\ttfamily Func})
+\item {\ttfamily map\texorpdfstring{$<$}{<}T\texorpdfstring{$>$}{>}(func, Generator\+Wrapper\texorpdfstring{$<$}{<}\doxylink{union_u}{U}\texorpdfstring{$>$}{>}\&\&)} for {\ttfamily Map\+Generator\texorpdfstring{$<$}{<}T, \doxylink{union_u}{U}, Func\texorpdfstring{$>$}{>}} (map {\ttfamily \doxylink{union_u}{U}} to {\ttfamily T})
+\item {\ttfamily chunk(chunk-\/size, Generator\+Wrapper\texorpdfstring{$<$}{<}T\texorpdfstring{$>$}{>}\&\&)} for {\ttfamily Chunk\+Generator\texorpdfstring{$<$}{<}T\texorpdfstring{$>$}{>}}
+\item {\ttfamily \doxylink{yubico__otp_8c_a7ba1784f91d04c32f9b3139bc6fd8137}{random(\+Integer\+Or\+Float a, Integer\+Or\+Float b)}} for {\ttfamily Random\+Integer\+Generator} or {\ttfamily Random\+Float\+Generator}
+\item {\ttfamily range(start, end)} for {\ttfamily Range\+Generator\texorpdfstring{$<$}{<}T\texorpdfstring{$>$}{>}} with a step size of {\ttfamily 1}
+\item {\ttfamily range(start, end, step)} for {\ttfamily Range\+Generator\texorpdfstring{$<$}{<}T\texorpdfstring{$>$}{>}} with a custom step size
+\end{DoxyItemize}
+
+And can be used as shown in the example below to create a generator that returns 100 odd random number\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\textcolor{stringliteral}{"{}Generating\ random\ ints"{}},\ \textcolor{stringliteral}{"{}[example][generator]"{}})\ \{}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\textcolor{stringliteral}{"{}Deducing\ functions"{}})\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ i\ =\ \mbox{\hyperlink{catch__generators_8hpp_a4941c6427cfa36ee7c52d734e460f9df}{GENERATE}}(\mbox{\hyperlink{namespace_catch_1_1_generators_adedfdb318219078ce9107690745d2f2f}{take}}(100,\ filter([](\textcolor{keywordtype}{int}\ i)\ \{\ \textcolor{keywordflow}{return}\ i\ \%\ 2\ ==\ 1;\ \},\ \mbox{\hyperlink{yubico__otp_8c_a7ba1784f91d04c32f9b3139bc6fd8137}{random}}(-\/100,\ 100))));}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(i\ >\ -\/100);}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(i\ <\ 100);}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(i\ \%\ 2\ ==\ 1);}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+Apart from registering generators with Catch2, the {\ttfamily GENERATE} macro has one more purpose, and that is to provide simple way of generating trivial generators, as seen in the first example on this page, where we used it as {\ttfamily auto i = \doxylink{catch__generators_8hpp_a4941c6427cfa36ee7c52d734e460f9df}{GENERATE(1, 2, 3)};}. This usage converted each of the three literals into a single {\ttfamily Value\+Generator\texorpdfstring{$<$}{<}int\texorpdfstring{$>$}{>}} and then placed them all in a special generator that concatenates other generators. It can also be used with other generators as arguments, such as {\ttfamily auto i = GENERATE(0, 2, take(100, random(300, 3000)));}. This is useful e.\+g. if you know that specific inputs are problematic and want to test them separately/first.
+
+{\bfseries{For safety reasons, you cannot use variables inside the {\ttfamily GENERATE} macro. This is done because the generator expression {\itshape will} outlive the outside scope and thus capturing references is dangerous. If you need to use variables inside the generator expression, make sure you thought through the lifetime implications and use {\ttfamily GENERATE\+\_\+\+COPY} or {\ttfamily GENERATE\+\_\+\+REF}.}}
+
+You can also override the inferred type by using {\ttfamily as\texorpdfstring{$<$}{<}type\texorpdfstring{$>$}{>}} as the first argument to the macro. This can be useful when dealing with string literals, if you want them to come out as {\ttfamily std\+::string}\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\textcolor{stringliteral}{"{}type\ conversion"{}},\ \textcolor{stringliteral}{"{}[generators]"{}})\ \{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}\ =\ \mbox{\hyperlink{catch__generators_8hpp_a4941c6427cfa36ee7c52d734e460f9df}{GENERATE}}(as<std::string>\{\},\ \textcolor{stringliteral}{"{}a"{}},\ \textcolor{stringliteral}{"{}bb"{}},\ \textcolor{stringliteral}{"{}ccc"{}});}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}.size()\ >\ 0);}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection*{Generator interface}
+
+You can also implement your own generators, by deriving from the {\ttfamily IGenerator\texorpdfstring{$<$}{<}T\texorpdfstring{$>$}{>}} interface\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\textcolor{keyword}{struct\ }IGenerator\ :\ GeneratorUntypedBase\ \{}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ via\ GeneratorUntypedBase:}}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ Attempts\ to\ move\ the\ generator\ to\ the\ next\ element.}}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ Returns\ true\ if\ successful\ (and\ thus\ has\ another\ element\ that\ can\ be\ read)}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}}()\ =\ 0;}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ Precondition:}}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ The\ generator\ is\ either\ freshly\ constructed\ or\ the\ last\ call\ to\ next()\ returned\ true}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \textcolor{keyword}{const}\&\ get()\ \textcolor{keyword}{const}\ =\ 0;}
+\DoxyCodeLine{\};}
+
+\end{DoxyCode}
+
+
+However, to be able to use your custom generator inside {\ttfamily GENERATE}, it will need to be wrapped inside a {\ttfamily Generator\+Wrapper\texorpdfstring{$<$}{<}T\texorpdfstring{$>$}{>}}. {\ttfamily Generator\+Wrapper\texorpdfstring{$<$}{<}T\texorpdfstring{$>$}{>}} is a value wrapper around a {\ttfamily std\+::unique\+\_\+ptr\texorpdfstring{$<$}{<}IGenerator\texorpdfstring{$<$}{<}T\texorpdfstring{$>$}{>}\texorpdfstring{$>$}{>}}.
+
+For full example of implementing your own generator, look into Catch2\textquotesingle{}s examples, specifically \href{../examples/300-Gen-OwnGenerator.cpp}{\texttt{ Generators\+: Create your own generator}}. 

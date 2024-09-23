@@ -1,0 +1,736 @@
+\doxysection{fc\+::path Class Reference}
+\hypertarget{classfc_1_1path}{}\label{classfc_1_1path}\index{fc::path@{fc::path}}
+
+
+wraps boost\+::filesystem\+::path to provide platform independent path manipulation.  
+
+
+
+
+{\ttfamily \#include $<$filesystem.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1path_a2eac01e2a01fae18aa931c4b9369db08}{path}} ()
+\item 
+\mbox{\hyperlink{classfc_1_1path_a5c57209bbb7561e35dcbd8ce8804e9c7}{\texorpdfstring{$\sim$}{\string~}path}} ()
+\item 
+\mbox{\hyperlink{classfc_1_1path_add8f88ad5dd493b16904860ce9be6493}{path}} (const boost\+::filesystem\+::path \&)
+\item 
+\mbox{\hyperlink{classfc_1_1path_aca67292cff9d14da2d8814d09e0a7193}{path}} (const std\+::string \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})
+\item 
+\mbox{\hyperlink{classfc_1_1path_a53f157da299530b9241885abc9aed113}{path}} (const std\+::wstring \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})
+\begin{DoxyCompactList}\small\item\em Constructor to build path using unicode native characters. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classfc_1_1path_ab7e23e521ace1a15d0958d16e43cb69f}{path}} (const char \texorpdfstring{$\ast$}{*})
+\item 
+\mbox{\hyperlink{classfc_1_1path_a29e0e41c28ed846b7c9dca9b3031a4da}{path}} (const \mbox{\hyperlink{classfc_1_1path}{path}} \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})
+\item 
+\mbox{\hyperlink{classfc_1_1path_ab7ad3a6bc6a10744488f4fd18c163f16}{path}} (\mbox{\hyperlink{classfc_1_1path}{path}} \&\&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})
+\item 
+\mbox{\hyperlink{classfc_1_1path}{path}} \& \mbox{\hyperlink{classfc_1_1path_a76df00a037a781a2ebb3ae3100e06929}{operator=}} (const \mbox{\hyperlink{classfc_1_1path}{path}} \&)
+\item 
+\mbox{\hyperlink{classfc_1_1path}{path}} \& \mbox{\hyperlink{classfc_1_1path_abd300298b33db4c752481d93245fcbf4}{operator=}} (\mbox{\hyperlink{classfc_1_1path}{path}} \&\&)
+\item 
+\mbox{\hyperlink{classfc_1_1path}{path}} \& \mbox{\hyperlink{classfc_1_1path_addfacdbec90fcbdea3161373d314300d}{operator/=}} (const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&)
+\item 
+\mbox{\hyperlink{classfc_1_1path_a2630b0783273ac09a6db1ecec3661581}{operator boost\+::filesystem\+::path \&}} ()
+\item 
+\mbox{\hyperlink{classfc_1_1path_a39e648d6b1da8270dafeb4b927b984be}{operator const boost\+::filesystem\+::path \&}} () const
+\item 
+void \mbox{\hyperlink{classfc_1_1path_af7de3b21cee1e93c7496e480181e7af2}{replace\+\_\+extension}} (const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&e)
+\item 
+\mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \mbox{\hyperlink{classfc_1_1path_a6756e8e4adb1f4f2423f454adfbbf205}{stem}} () const
+\item 
+\mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \mbox{\hyperlink{classfc_1_1path_ab0d2cca0994e599a7d65a89c5c8f9e54}{extension}} () const
+\item 
+\mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \mbox{\hyperlink{classfc_1_1path_a1e6beb6e05c3f6d6f699c1c448c4b1d6}{filename}} () const
+\item 
+\mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \mbox{\hyperlink{classfc_1_1path_a10985bab813b9197980458e4345d0f36}{parent\+\_\+path}} () const
+\item 
+std\+::string \mbox{\hyperlink{classfc_1_1path_aaf0107e4a41f9977032b2a604161cf85}{string}} () const
+\item 
+std\+::string \mbox{\hyperlink{classfc_1_1path_ab1eae2062df4ea01435348ec52fb3784}{generic\+\_\+string}} () const
+\item 
+std\+::string \mbox{\hyperlink{classfc_1_1path_a9708f850e21e668a29523fbe6c4d0dca}{preferred\+\_\+string}} () const
+\item 
+std\+::wstring \mbox{\hyperlink{classfc_1_1path_a2eef878144c6265508787f3b9a6355e8}{wstring}} () const
+\item 
+std\+::wstring \mbox{\hyperlink{classfc_1_1path_a018f35936535482432e303d4b7d10c31}{generic\+\_\+wstring}} () const
+\item 
+std\+::wstring \mbox{\hyperlink{classfc_1_1path_a02b8088f909ec69bd18f1f2617cb1c1f}{preferred\+\_\+wstring}} () const
+\item 
+std\+::string \mbox{\hyperlink{classfc_1_1path_a9712c4ccfcfc54e02cc913510a858733}{to\+\_\+native\+\_\+ansi\+\_\+path}} () const
+\item 
+std\+::string \mbox{\hyperlink{classfc_1_1path_a12a75eca015d0c9880e2c062e371d08d}{windows\+\_\+string}} () const
+\begin{DoxyCompactList}\small\item\em replaces \textquotesingle{}/\textquotesingle{} with \textquotesingle{}\textbackslash{}\textquotesingle{} in the result of \doxylink{classfc_1_1path_ab1eae2062df4ea01435348ec52fb3784}{generic\+\_\+string()} \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classfc_1_1path_afbbbaae83c2d714a07cc424dc7b9f329}{is\+\_\+relative}} () const
+\item 
+bool \mbox{\hyperlink{classfc_1_1path_ae8ca694b3a1a776ae4a3c7d4622d746a}{is\+\_\+absolute}} () const
+\item 
+bool \mbox{\hyperlink{classfc_1_1path_a48f77d63358cb5633cd0a7a5bff99201}{empty}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static char \mbox{\hyperlink{classfc_1_1path_a613fc8b20159868e1aa62670d81a0aad}{separator\+\_\+char}} = static\+\_\+cast$<$char$>$(boost\+::filesystem\+::path("{}/"{}).make\+\_\+preferred().native()\mbox{[}0\mbox{]})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1path}{path}} \mbox{\hyperlink{classfc_1_1path_a6eff9b9fe0c496da927ac1a522a0161a}{operator/}} (const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}, const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&o)
+\item 
+bool \mbox{\hyperlink{classfc_1_1path_a7ce8306c3272fb14fe0174d18d22b3ed}{operator==}} (const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}, const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}})
+\item 
+bool \mbox{\hyperlink{classfc_1_1path_af4243784e3bf75282aa0f6ca697c1a1b}{operator!=}} (const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}, const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}})
+\item 
+bool \mbox{\hyperlink{classfc_1_1path_af46a9f5a58a1890adf262540e4064ab9}{operator$<$}} (const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}, const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Most calls are simply a passthrough to boost\+::filesystem\+::path, however exceptions are wrapped in an fc\+::error\+\_\+report and the additional helper method \doxylink{classfc_1_1path_a12a75eca015d0c9880e2c062e371d08d}{fc\+::path\+::windows\+\_\+string()}, can be used to calculate paths intended for systems different than the host.
+
+\begin{DoxyNote}{Note}
+Serializes to a fc\+::value() as the result of \doxylink{classfc_1_1path_ab1eae2062df4ea01435348ec52fb3784}{generic\+\_\+string()} 
+\end{DoxyNote}
+
+
+Definition at line \mbox{\hyperlink{filesystem_8hpp_source_l00028}{28}} of file \mbox{\hyperlink{filesystem_8hpp_source}{filesystem.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1path_a2eac01e2a01fae18aa931c4b9369db08}\index{fc::path@{fc::path}!path@{path}}
+\index{path@{path}!fc::path@{fc::path}}
+\doxysubsubsection{\texorpdfstring{path()}{path()}\hspace{0.1cm}{\footnotesize\ttfamily [1/7]}}
+{\footnotesize\ttfamily \label{classfc_1_1path_a2eac01e2a01fae18aa931c4b9369db08} 
+fc\+::path\+::path (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{filesystem_8cpp_source_l00053}{53}} of file \mbox{\hyperlink{filesystem_8cpp_source}{filesystem.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00053\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1path_a5c57209bbb7561e35dcbd8ce8804e9c7}\index{fc::path@{fc::path}!````~path@{\texorpdfstring{$\sim$}{\string~}path}}
+\index{````~path@{\texorpdfstring{$\sim$}{\string~}path}!fc::path@{fc::path}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}path()}{\string~path()}}
+{\footnotesize\ttfamily \label{classfc_1_1path_a5c57209bbb7561e35dcbd8ce8804e9c7} 
+fc\+::path\+::\texorpdfstring{$\sim$}{\string~}path (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{filesystem_8cpp_source_l00054}{54}} of file \mbox{\hyperlink{filesystem_8cpp_source}{filesystem.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00054\ \{\};}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1path_add8f88ad5dd493b16904860ce9be6493}\index{fc::path@{fc::path}!path@{path}}
+\index{path@{path}!fc::path@{fc::path}}
+\doxysubsubsection{\texorpdfstring{path()}{path()}\hspace{0.1cm}{\footnotesize\ttfamily [2/7]}}
+{\footnotesize\ttfamily \label{classfc_1_1path_add8f88ad5dd493b16904860ce9be6493} 
+fc\+::path\+::path (\begin{DoxyParamCaption}\item[{const boost\+::filesystem\+::path \&}]{p}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{filesystem_8cpp_source_l00055}{55}} of file \mbox{\hyperlink{filesystem_8cpp_source}{filesystem.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00056\ \ \ \ :\_p(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})\{\}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1path_aca67292cff9d14da2d8814d09e0a7193}\index{fc::path@{fc::path}!path@{path}}
+\index{path@{path}!fc::path@{fc::path}}
+\doxysubsubsection{\texorpdfstring{path()}{path()}\hspace{0.1cm}{\footnotesize\ttfamily [3/7]}}
+{\footnotesize\ttfamily \label{classfc_1_1path_aca67292cff9d14da2d8814d09e0a7193} 
+fc\+::path\+::path (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{p}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{filesystem_8cpp_source_l00060}{60}} of file \mbox{\hyperlink{filesystem_8cpp_source}{filesystem.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00061\ \ \ \ :\_p(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.c\_str())\{\}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1path_a53f157da299530b9241885abc9aed113}\index{fc::path@{fc::path}!path@{path}}
+\index{path@{path}!fc::path@{fc::path}}
+\doxysubsubsection{\texorpdfstring{path()}{path()}\hspace{0.1cm}{\footnotesize\ttfamily [4/7]}}
+{\footnotesize\ttfamily \label{classfc_1_1path_a53f157da299530b9241885abc9aed113} 
+fc\+::path\+::path (\begin{DoxyParamCaption}\item[{const std\+::wstring \&}]{p}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{filesystem_8cpp_source_l00063}{63}} of file \mbox{\hyperlink{filesystem_8cpp_source}{filesystem.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00064\ \ \ \ :\_p(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1path_ab7e23e521ace1a15d0958d16e43cb69f}\index{fc::path@{fc::path}!path@{path}}
+\index{path@{path}!fc::path@{fc::path}}
+\doxysubsubsection{\texorpdfstring{path()}{path()}\hspace{0.1cm}{\footnotesize\ttfamily [5/7]}}
+{\footnotesize\ttfamily \label{classfc_1_1path_ab7e23e521ace1a15d0958d16e43cb69f} 
+fc\+::path\+::path (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{p}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{filesystem_8cpp_source_l00058}{58}} of file \mbox{\hyperlink{filesystem_8cpp_source}{filesystem.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00059\ \ \ \ :\_p(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})\{\}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1path_a29e0e41c28ed846b7c9dca9b3031a4da}\index{fc::path@{fc::path}!path@{path}}
+\index{path@{path}!fc::path@{fc::path}}
+\doxysubsubsection{\texorpdfstring{path()}{path()}\hspace{0.1cm}{\footnotesize\ttfamily [6/7]}}
+{\footnotesize\ttfamily \label{classfc_1_1path_a29e0e41c28ed846b7c9dca9b3031a4da} 
+fc\+::path\+::path (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1path}{path}} \&}]{p}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{filesystem_8cpp_source_l00066}{66}} of file \mbox{\hyperlink{filesystem_8cpp_source}{filesystem.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00067\ \ \ \ :\_p(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})\{\}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1path_ab7ad3a6bc6a10744488f4fd18c163f16}\index{fc::path@{fc::path}!path@{path}}
+\index{path@{path}!fc::path@{fc::path}}
+\doxysubsubsection{\texorpdfstring{path()}{path()}\hspace{0.1cm}{\footnotesize\ttfamily [7/7]}}
+{\footnotesize\ttfamily \label{classfc_1_1path_ab7ad3a6bc6a10744488f4fd18c163f16} 
+fc\+::path\+::path (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1path}{path}} \&\&}]{p}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{filesystem_8cpp_source_l00069}{69}} of file \mbox{\hyperlink{filesystem_8cpp_source}{filesystem.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00070\ \ \ \ :\_p(std::move(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}))\{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1path_a48f77d63358cb5633cd0a7a5bff99201}\index{fc::path@{fc::path}!empty@{empty}}
+\index{empty@{empty}!fc::path@{fc::path}}
+\doxysubsubsection{\texorpdfstring{empty()}{empty()}}
+{\footnotesize\ttfamily \label{classfc_1_1path_a48f77d63358cb5633cd0a7a5bff99201} 
+bool fc\+::path\+::empty (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{filesystem_8cpp_source_l00175}{175}} of file \mbox{\hyperlink{filesystem_8cpp_source}{filesystem.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00175\ \{\ \textcolor{keywordflow}{return}\ \_p-\/>empty();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1path_ab0d2cca0994e599a7d65a89c5c8f9e54}\index{fc::path@{fc::path}!extension@{extension}}
+\index{extension@{extension}!fc::path@{fc::path}}
+\doxysubsubsection{\texorpdfstring{extension()}{extension()}}
+{\footnotesize\ttfamily \label{classfc_1_1path_ab0d2cca0994e599a7d65a89c5c8f9e54} 
+\mbox{\hyperlink{classfc_1_1path}{fc\+::path}} fc\+::path\+::extension (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{filesystem_8cpp_source_l00163}{163}} of file \mbox{\hyperlink{filesystem_8cpp_source}{filesystem.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00164\ \ \ \ \ \textcolor{keywordflow}{return}\ \_p-\/>extension();}
+\DoxyCodeLine{00165\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1path_a1e6beb6e05c3f6d6f699c1c448c4b1d6}\index{fc::path@{fc::path}!filename@{filename}}
+\index{filename@{filename}!fc::path@{fc::path}}
+\doxysubsubsection{\texorpdfstring{filename()}{filename()}}
+{\footnotesize\ttfamily \label{classfc_1_1path_a1e6beb6e05c3f6d6f699c1c448c4b1d6} 
+\mbox{\hyperlink{classfc_1_1path}{fc\+::path}} fc\+::path\+::filename (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{filesystem_8cpp_source_l00157}{157}} of file \mbox{\hyperlink{filesystem_8cpp_source}{filesystem.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00158\ \ \ \ \ \textcolor{keywordflow}{return}\ \_p-\/>filename();}
+\DoxyCodeLine{00159\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1path_a1e6beb6e05c3f6d6f699c1c448c4b1d6_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1path_ab1eae2062df4ea01435348ec52fb3784}\index{fc::path@{fc::path}!generic\_string@{generic\_string}}
+\index{generic\_string@{generic\_string}!fc::path@{fc::path}}
+\doxysubsubsection{\texorpdfstring{generic\_string()}{generic\_string()}}
+{\footnotesize\ttfamily \label{classfc_1_1path_ab1eae2062df4ea01435348ec52fb3784} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} fc\+::path\+::generic\+\_\+string (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{filesystem_8cpp_source_l00101}{101}} of file \mbox{\hyperlink{filesystem_8cpp_source}{filesystem.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00102\ \ \ \ \ \textcolor{keywordflow}{return}\ \_p-\/>generic\_string();}
+\DoxyCodeLine{00103\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1path_ab1eae2062df4ea01435348ec52fb3784_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1path_a018f35936535482432e303d4b7d10c31}\index{fc::path@{fc::path}!generic\_wstring@{generic\_wstring}}
+\index{generic\_wstring@{generic\_wstring}!fc::path@{fc::path}}
+\doxysubsubsection{\texorpdfstring{generic\_wstring()}{generic\_wstring()}}
+{\footnotesize\ttfamily \label{classfc_1_1path_a018f35936535482432e303d4b7d10c31} 
+std\+::wstring fc\+::path\+::generic\+\_\+wstring (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{filesystem_8cpp_source_l00115}{115}} of file \mbox{\hyperlink{filesystem_8cpp_source}{filesystem.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00116\ \ \ \ \ \{}
+\DoxyCodeLine{00117\ \ \ \ \ \textcolor{keywordflow}{return}\ \_p-\/>generic\_wstring();}
+\DoxyCodeLine{00118\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=334pt]{classfc_1_1path_a018f35936535482432e303d4b7d10c31_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1path_ae8ca694b3a1a776ae4a3c7d4622d746a}\index{fc::path@{fc::path}!is\_absolute@{is\_absolute}}
+\index{is\_absolute@{is\_absolute}!fc::path@{fc::path}}
+\doxysubsubsection{\texorpdfstring{is\_absolute()}{is\_absolute()}}
+{\footnotesize\ttfamily \label{classfc_1_1path_ae8ca694b3a1a776ae4a3c7d4622d746a} 
+bool fc\+::path\+::is\+\_\+absolute (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{filesystem_8cpp_source_l00173}{173}} of file \mbox{\hyperlink{filesystem_8cpp_source}{filesystem.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00173\ \{\ \textcolor{keywordflow}{return}\ \_p-\/>is\_absolute();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1path_afbbbaae83c2d714a07cc424dc7b9f329}\index{fc::path@{fc::path}!is\_relative@{is\_relative}}
+\index{is\_relative@{is\_relative}!fc::path@{fc::path}}
+\doxysubsubsection{\texorpdfstring{is\_relative()}{is\_relative()}}
+{\footnotesize\ttfamily \label{classfc_1_1path_afbbbaae83c2d714a07cc424dc7b9f329} 
+bool fc\+::path\+::is\+\_\+relative (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{filesystem_8cpp_source_l00172}{172}} of file \mbox{\hyperlink{filesystem_8cpp_source}{filesystem.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00172\ \{\ \textcolor{keywordflow}{return}\ \_p-\/>is\_relative();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1path_a2630b0783273ac09a6db1ecec3661581}\index{fc::path@{fc::path}!operator boost::filesystem::path \&@{operator boost::filesystem::path \&}}
+\index{operator boost::filesystem::path \&@{operator boost::filesystem::path \&}!fc::path@{fc::path}}
+\doxysubsubsection{\texorpdfstring{operator boost::filesystem::path \&()}{operator boost::filesystem::path \&()}}
+{\footnotesize\ttfamily \label{classfc_1_1path_a2630b0783273ac09a6db1ecec3661581} 
+fc\+::path\+::operator boost\+::filesystem\+::path \& (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{filesystem_8cpp_source_l00095}{95}} of file \mbox{\hyperlink{filesystem_8cpp_source}{filesystem.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00096\ \ \ \ \ \textcolor{keywordflow}{return}\ *\_p;}
+\DoxyCodeLine{00097\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1path_a39e648d6b1da8270dafeb4b927b984be}\index{fc::path@{fc::path}!operator const boost::filesystem::path \&@{operator const boost::filesystem::path \&}}
+\index{operator const boost::filesystem::path \&@{operator const boost::filesystem::path \&}!fc::path@{fc::path}}
+\doxysubsubsection{\texorpdfstring{operator const boost::filesystem::path \&()}{operator const boost::filesystem::path \&()}}
+{\footnotesize\ttfamily \label{classfc_1_1path_a39e648d6b1da8270dafeb4b927b984be} 
+fc\+::path\+::operator const boost\+::filesystem\+::path \& (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{filesystem_8cpp_source_l00098}{98}} of file \mbox{\hyperlink{filesystem_8cpp_source}{filesystem.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00099\ \ \ \ \ \textcolor{keywordflow}{return}\ *\_p;}
+\DoxyCodeLine{00100\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1path_addfacdbec90fcbdea3161373d314300d}\index{fc::path@{fc::path}!operator/=@{operator/=}}
+\index{operator/=@{operator/=}!fc::path@{fc::path}}
+\doxysubsubsection{\texorpdfstring{operator/=()}{operator/=()}}
+{\footnotesize\ttfamily \label{classfc_1_1path_addfacdbec90fcbdea3161373d314300d} 
+\mbox{\hyperlink{classfc_1_1path}{path}} \& fc\+::path\+::operator/= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&}]{p}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{filesystem_8cpp_source_l00085}{85}} of file \mbox{\hyperlink{filesystem_8cpp_source}{filesystem.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ *\_p\ /=\ *\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.\_p;}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00088\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1path_a76df00a037a781a2ebb3ae3100e06929}\index{fc::path@{fc::path}!operator=@{operator=}}
+\index{operator=@{operator=}!fc::path@{fc::path}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1path_a76df00a037a781a2ebb3ae3100e06929} 
+\mbox{\hyperlink{classfc_1_1path}{path}} \& fc\+::path\+::operator= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1path}{path}} \&}]{p}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{filesystem_8cpp_source_l00072}{72}} of file \mbox{\hyperlink{filesystem_8cpp_source}{filesystem.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00073\ \ \ \ \ *\_p\ =\ *\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.\_p;}
+\DoxyCodeLine{00074\ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00075\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1path_abd300298b33db4c752481d93245fcbf4}\index{fc::path@{fc::path}!operator=@{operator=}}
+\index{operator=@{operator=}!fc::path@{fc::path}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1path_abd300298b33db4c752481d93245fcbf4} 
+\mbox{\hyperlink{classfc_1_1path}{path}} \& fc\+::path\+::operator= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1path}{path}} \&\&}]{p}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{filesystem_8cpp_source_l00076}{76}} of file \mbox{\hyperlink{filesystem_8cpp_source}{filesystem.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00077\ \ \ \ \ *\_p\ =\ fc::move(\ *\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.\_p\ );}
+\DoxyCodeLine{00078\ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00079\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1path_a10985bab813b9197980458e4345d0f36}\index{fc::path@{fc::path}!parent\_path@{parent\_path}}
+\index{parent\_path@{parent\_path}!fc::path@{fc::path}}
+\doxysubsubsection{\texorpdfstring{parent\_path()}{parent\_path()}}
+{\footnotesize\ttfamily \label{classfc_1_1path_a10985bab813b9197980458e4345d0f36} 
+\mbox{\hyperlink{classfc_1_1path}{fc\+::path}} fc\+::path\+::parent\+\_\+path (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{filesystem_8cpp_source_l00169}{169}} of file \mbox{\hyperlink{filesystem_8cpp_source}{filesystem.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00170\ \ \ \ \ \textcolor{keywordflow}{return}\ \_p-\/>parent\_path();}
+\DoxyCodeLine{00171\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1path_a10985bab813b9197980458e4345d0f36_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1path_a9708f850e21e668a29523fbe6c4d0dca}\index{fc::path@{fc::path}!preferred\_string@{preferred\_string}}
+\index{preferred\_string@{preferred\_string}!fc::path@{fc::path}}
+\doxysubsubsection{\texorpdfstring{preferred\_string()}{preferred\_string()}}
+{\footnotesize\ttfamily \label{classfc_1_1path_a9708f850e21e668a29523fbe6c4d0dca} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} fc\+::path\+::preferred\+\_\+string (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+On windows, returns a path where all path separators are \textquotesingle{}\textbackslash{}\textquotesingle{} suitable for displaying to users. On other platforms, it does the same as \doxylink{classfc_1_1path_ab1eae2062df4ea01435348ec52fb3784}{generic\+\_\+string()} 
+
+Definition at line \mbox{\hyperlink{filesystem_8cpp_source_l00105}{105}} of file \mbox{\hyperlink{filesystem_8cpp_source}{filesystem.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00106\ \ \ \ \{}
+\DoxyCodeLine{00107\ \ \ \ \ \ \textcolor{keywordflow}{return}\ boost::filesystem::path(*\_p).make\_preferred().string();}
+\DoxyCodeLine{00108\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1path_a02b8088f909ec69bd18f1f2617cb1c1f}\index{fc::path@{fc::path}!preferred\_wstring@{preferred\_wstring}}
+\index{preferred\_wstring@{preferred\_wstring}!fc::path@{fc::path}}
+\doxysubsubsection{\texorpdfstring{preferred\_wstring()}{preferred\_wstring()}}
+{\footnotesize\ttfamily \label{classfc_1_1path_a02b8088f909ec69bd18f1f2617cb1c1f} 
+std\+::wstring fc\+::path\+::preferred\+\_\+wstring (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{filesystem_8cpp_source_l00120}{120}} of file \mbox{\hyperlink{filesystem_8cpp_source}{filesystem.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00121\ \ \ \{}
+\DoxyCodeLine{00122\ \ \ \ \ \textcolor{keywordflow}{return}\ boost::filesystem::path(*\_p).make\_preferred().wstring();}
+\DoxyCodeLine{00123\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1path_af7de3b21cee1e93c7496e480181e7af2}\index{fc::path@{fc::path}!replace\_extension@{replace\_extension}}
+\index{replace\_extension@{replace\_extension}!fc::path@{fc::path}}
+\doxysubsubsection{\texorpdfstring{replace\_extension()}{replace\_extension()}}
+{\footnotesize\ttfamily \label{classfc_1_1path_af7de3b21cee1e93c7496e480181e7af2} 
+void fc\+::path\+::replace\+\_\+extension (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&}]{e}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{filesystem_8cpp_source_l00160}{160}} of file \mbox{\hyperlink{filesystem_8cpp_source}{filesystem.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \_p-\/>replace\_extension(e);}
+\DoxyCodeLine{00162\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1path_af7de3b21cee1e93c7496e480181e7af2_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1path_a6756e8e4adb1f4f2423f454adfbbf205}\index{fc::path@{fc::path}!stem@{stem}}
+\index{stem@{stem}!fc::path@{fc::path}}
+\doxysubsubsection{\texorpdfstring{stem()}{stem()}}
+{\footnotesize\ttfamily \label{classfc_1_1path_a6756e8e4adb1f4f2423f454adfbbf205} 
+\mbox{\hyperlink{classfc_1_1path}{fc\+::path}} fc\+::path\+::stem (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{filesystem_8cpp_source_l00166}{166}} of file \mbox{\hyperlink{filesystem_8cpp_source}{filesystem.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00167\ \ \ \ \ \textcolor{keywordflow}{return}\ \_p-\/>stem();}
+\DoxyCodeLine{00168\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1path_aaf0107e4a41f9977032b2a604161cf85}\index{fc::path@{fc::path}!string@{string}}
+\index{string@{string}!fc::path@{fc::path}}
+\doxysubsubsection{\texorpdfstring{string()}{string()}}
+{\footnotesize\ttfamily \label{classfc_1_1path_aaf0107e4a41f9977032b2a604161cf85} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} fc\+::path\+::string (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{filesystem_8cpp_source_l00154}{154}} of file \mbox{\hyperlink{filesystem_8cpp_source}{filesystem.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00155\ \ \ \ \ \textcolor{keywordflow}{return}\ \_p-\/>string();}
+\DoxyCodeLine{00156\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1path_aaf0107e4a41f9977032b2a604161cf85_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1path_a9712c4ccfcfc54e02cc913510a858733}\index{fc::path@{fc::path}!to\_native\_ansi\_path@{to\_native\_ansi\_path}}
+\index{to\_native\_ansi\_path@{to\_native\_ansi\_path}!fc::path@{fc::path}}
+\doxysubsubsection{\texorpdfstring{to\_native\_ansi\_path()}{to\_native\_ansi\_path()}}
+{\footnotesize\ttfamily \label{classfc_1_1path_a9712c4ccfcfc54e02cc913510a858733} 
+std\+::string fc\+::path\+::to\+\_\+native\+\_\+ansi\+\_\+path (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+Retrieves native string path representation and next converts it into ANSI UTF-\/8 representation. It is needed since not all parts of fc library accept unicode paths (\doxylink{classfc_1_1file__mapping}{fc\+::file\+\_\+mapping}). 
+
+Definition at line \mbox{\hyperlink{filesystem_8cpp_source_l00125}{125}} of file \mbox{\hyperlink{filesystem_8cpp_source}{filesystem.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00126\ \ \ \ \ \{}
+\DoxyCodeLine{00127\ \ \ \ \ std::wstring\ \mbox{\hyperlink{classfc_1_1path_a2eac01e2a01fae18aa931c4b9369db08}{path}}\ =\ \mbox{\hyperlink{classfc_1_1path_a018f35936535482432e303d4b7d10c31}{generic\_wstring}}();}
+\DoxyCodeLine{00128\ }
+\DoxyCodeLine{00129\ \textcolor{preprocessor}{\#ifdef\ WIN32}}
+\DoxyCodeLine{00130\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ maxPath\ =\ 32*1024;}
+\DoxyCodeLine{00131\ \ \ \ \ std::vector<wchar\_t>\ short\_path;}
+\DoxyCodeLine{00132\ \ \ \ \ short\_path.resize(maxPath\ +\ 1);}
+\DoxyCodeLine{00133\ }
+\DoxyCodeLine{00134\ \ \ \ \ \textcolor{keywordtype}{wchar\_t}*\ buffer\ =\ short\_path.data();}
+\DoxyCodeLine{00135\ \ \ \ \ DWORD\ res\ =\ GetShortPathNameW(\mbox{\hyperlink{classfc_1_1path_a2eac01e2a01fae18aa931c4b9369db08}{path}}.c\_str(),\ buffer,\ maxPath);}
+\DoxyCodeLine{00136\ \ \ \ \ \textcolor{keywordflow}{if}(res\ !=\ 0)}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1path_a2eac01e2a01fae18aa931c4b9369db08}{path}}\ =\ buffer;}
+\DoxyCodeLine{00138\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00139\ \ \ \ \ std::string\ filePath;}
+\DoxyCodeLine{00140\ \ \ \ \ \mbox{\hyperlink{namespacefc_a929646b3a8b7feb5688409ddef1897c9}{fc::encodeUtf8}}(\mbox{\hyperlink{classfc_1_1path_a2eac01e2a01fae18aa931c4b9369db08}{path}},\ \&filePath);}
+\DoxyCodeLine{00141\ \ \ \ \ \textcolor{keywordflow}{return}\ filePath;}
+\DoxyCodeLine{00142\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1path_a9712c4ccfcfc54e02cc913510a858733_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1path_a12a75eca015d0c9880e2c062e371d08d}\index{fc::path@{fc::path}!windows\_string@{windows\_string}}
+\index{windows\_string@{windows\_string}!fc::path@{fc::path}}
+\doxysubsubsection{\texorpdfstring{windows\_string()}{windows\_string()}}
+{\footnotesize\ttfamily \label{classfc_1_1path_a12a75eca015d0c9880e2c062e371d08d} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} fc\+::path\+::windows\+\_\+string (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+\begin{DoxyNote}{Note}
+not part of boost\+::filesystem\+::path
+\end{DoxyNote}
+\begin{DoxyRefDesc}{Todo}
+\item[\mbox{\hyperlink{todo__todo000001}{Todo}}]use iterators instead of indexes for faster performance \end{DoxyRefDesc}
+
+
+Definition at line \mbox{\hyperlink{filesystem_8cpp_source_l00148}{148}} of file \mbox{\hyperlink{filesystem_8cpp_source}{filesystem.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00149\ \ \ \ \ \ std::string\ result\ =\ \_p-\/>generic\_string();}
+\DoxyCodeLine{00150\ \ \ \ \ \ std::replace(result.begin(),\ result.end(),\ \textcolor{charliteral}{'/'},\ \textcolor{charliteral}{'\(\backslash\)\(\backslash\)'});}
+\DoxyCodeLine{00151\ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00152\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1path_a2eef878144c6265508787f3b9a6355e8}\index{fc::path@{fc::path}!wstring@{wstring}}
+\index{wstring@{wstring}!fc::path@{fc::path}}
+\doxysubsubsection{\texorpdfstring{wstring()}{wstring()}}
+{\footnotesize\ttfamily \label{classfc_1_1path_a2eef878144c6265508787f3b9a6355e8} 
+std\+::wstring fc\+::path\+::wstring (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{filesystem_8cpp_source_l00110}{110}} of file \mbox{\hyperlink{filesystem_8cpp_source}{filesystem.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00111\ \ \ \ \ \{}
+\DoxyCodeLine{00112\ \ \ \ \ \textcolor{keywordflow}{return}\ \_p-\/>wstring();}
+\DoxyCodeLine{00113\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{classfc_1_1path_af4243784e3bf75282aa0f6ca697c1a1b}\index{fc::path@{fc::path}!operator"!=@{operator"!=}}
+\index{operator"!=@{operator"!=}!fc::path@{fc::path}}
+\doxysubsubsection{\texorpdfstring{operator"!=}{operator!=}}
+{\footnotesize\ttfamily \label{classfc_1_1path_af4243784e3bf75282aa0f6ca697c1a1b} 
+bool \mbox{\hyperlink{namespacefc_a40c368ac88294ae47b064cad937fdbf6}{operator!}}= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&}]{p}{, }\item[{const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&}]{r}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{filesystem_8cpp_source_l00083}{83}} of file \mbox{\hyperlink{filesystem_8cpp_source}{filesystem.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00083\ \{\ \textcolor{keywordflow}{return}\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}.\_p\ !=\ *\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.\_p;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1path_a6eff9b9fe0c496da927ac1a522a0161a}\index{fc::path@{fc::path}!operator/@{operator/}}
+\index{operator/@{operator/}!fc::path@{fc::path}}
+\doxysubsubsection{\texorpdfstring{operator/}{operator/}}
+{\footnotesize\ttfamily \label{classfc_1_1path_a6eff9b9fe0c496da927ac1a522a0161a} 
+\mbox{\hyperlink{classfc_1_1path}{path}} operator/ (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&}]{p}{, }\item[{const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&}]{o}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{filesystem_8cpp_source_l00089}{89}} of file \mbox{\hyperlink{filesystem_8cpp_source}{filesystem.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1path_a2eac01e2a01fae18aa931c4b9369db08}{path}}\ tmp;}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ tmp\ =\ *\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.\_p\ /\ *o.\_p;}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ tmp;}
+\DoxyCodeLine{00093\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1path_af46a9f5a58a1890adf262540e4064ab9}\index{fc::path@{fc::path}!operator$<$@{operator$<$}}
+\index{operator$<$@{operator$<$}!fc::path@{fc::path}}
+\doxysubsubsection{\texorpdfstring{operator$<$}{operator<}}
+{\footnotesize\ttfamily \label{classfc_1_1path_af46a9f5a58a1890adf262540e4064ab9} 
+bool operator$<$ (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&}]{p}{, }\item[{const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&}]{r}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{filesystem_8cpp_source_l00081}{81}} of file \mbox{\hyperlink{filesystem_8cpp_source}{filesystem.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00081\ \{\ \textcolor{keywordflow}{return}\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}.\_p\ <\ *\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.\_p;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1path_a7ce8306c3272fb14fe0174d18d22b3ed}\index{fc::path@{fc::path}!operator==@{operator==}}
+\index{operator==@{operator==}!fc::path@{fc::path}}
+\doxysubsubsection{\texorpdfstring{operator==}{operator==}}
+{\footnotesize\ttfamily \label{classfc_1_1path_a7ce8306c3272fb14fe0174d18d22b3ed} 
+bool operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&}]{p}{, }\item[{const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&}]{r}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{filesystem_8cpp_source_l00082}{82}} of file \mbox{\hyperlink{filesystem_8cpp_source}{filesystem.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00082\ \{\ \textcolor{keywordflow}{return}\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}.\_p\ ==\ *\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.\_p;\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classfc_1_1path_a613fc8b20159868e1aa62670d81a0aad}\index{fc::path@{fc::path}!separator\_char@{separator\_char}}
+\index{separator\_char@{separator\_char}!fc::path@{fc::path}}
+\doxysubsubsection{\texorpdfstring{separator\_char}{separator\_char}}
+{\footnotesize\ttfamily \label{classfc_1_1path_a613fc8b20159868e1aa62670d81a0aad} 
+char fc\+::path\+::separator\+\_\+char = static\+\_\+cast$<$char$>$(boost\+::filesystem\+::path("{}/"{}).make\+\_\+preferred().native()\mbox{[}0\mbox{]})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{filesystem_8hpp_source_l00085}{85}} of file \mbox{\hyperlink{filesystem_8hpp_source}{filesystem.\+hpp}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/\mbox{\hyperlink{filesystem_8hpp}{filesystem.\+hpp}}\item 
+libraries/fc/src/\mbox{\hyperlink{filesystem_8cpp}{filesystem.\+cpp}}\end{DoxyCompactItemize}

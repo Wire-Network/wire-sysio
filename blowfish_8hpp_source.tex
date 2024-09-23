@@ -1,0 +1,183 @@
+\doxysection{blowfish.\+hpp}
+\hypertarget{blowfish_8hpp_source}{}\label{blowfish_8hpp_source}\index{libraries/fc/include/fc/crypto/blowfish.hpp@{libraries/fc/include/fc/crypto/blowfish.hpp}}
+\mbox{\hyperlink{blowfish_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00001}00001\ }
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00003}00003\ \textcolor{comment}{//\ Blowfish.h\ Header\ File}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00004}00004\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00005}00005\ \textcolor{comment}{//\ \ \ \ BLOWFISH\ ENCRYPTION\ ALGORITHM}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00006}00006\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00007}00007\ \textcolor{comment}{//\ \ \ \ encryption\ and\ decryption\ of\ Byte\ Strings\ using\ the\ Blowfish\ encryption\ Algorithm.}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00008}00008\ \textcolor{comment}{//\ \ \ \ Blowfish\ is\ a\ block\ cipher\ that\ encrypts\ data\ in\ 8-\/byte\ blocks.\ The\ algorithm\ consists}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00009}00009\ \textcolor{comment}{//\ \ \ \ of\ two\ parts:\ a\ key-\/expansion\ part\ and\ a\ data-\/ancryption\ part.\ Key\ expansion\ converts\ a}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00010}00010\ \textcolor{comment}{//\ \ \ \ variable\ key\ of\ at\ least\ 1\ and\ at\ most\ 56\ bytes\ into\ several\ subkey\ arrays\ totaling}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00011}00011\ \textcolor{comment}{//\ \ \ \ 4168\ bytes.\ Blowfish\ has\ 16\ rounds.\ Each\ round\ consists\ of\ a\ key-\/dependent\ permutation,}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00012}00012\ \textcolor{comment}{//\ \ \ \ and\ a\ key\ and\ data-\/dependent\ substitution.\ All\ operations\ are\ XORs\ and\ additions\ on\ 32-\/bit\ words.}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00013}00013\ \textcolor{comment}{//\ \ \ \ The\ only\ additional\ operations\ are\ four\ indexed\ array\ data\ lookups\ per\ round.}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00014}00014\ \textcolor{comment}{//\ \ \ \ Blowfish\ uses\ a\ large\ number\ of\ subkeys.\ These\ keys\ must\ be\ precomputed\ before\ any\ data}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00015}00015\ \textcolor{comment}{//\ \ \ \ encryption\ or\ decryption.\ The\ P-\/array\ consists\ of\ 18\ 32-\/bit\ subkeys:\ P0,\ P1,...,P17.}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00016}00016\ \textcolor{comment}{//\ \ \ \ There\ are\ also\ four\ 32-\/bit\ S-\/boxes\ with\ 256\ entries\ each:\ S0,0,\ S0,1,...,S0,255;}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00017}00017\ \textcolor{comment}{//\ \ \ \ S1,0,\ S1,1,...,S1,255;\ S2,0,\ S2,1,...,S2,255;\ S3,0,\ S3,1,...,S3,255;}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00018}00018\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00019}00019\ \textcolor{comment}{//\ \ \ \ The\ Electronic\ Code\ Book\ (ECB),\ Cipher\ Block\ Chaining\ (CBC)\ and\ Cipher\ Feedback\ modes}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00020}00020\ \textcolor{comment}{//\ \ \ \ are\ used:}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00021}00021\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00022}00022\ \textcolor{comment}{//\ \ \ \ In\ ECB\ mode\ if\ the\ same\ block\ is\ encrypted\ twice\ with\ the\ same\ key,\ the\ resulting}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00023}00023\ \textcolor{comment}{//\ \ \ \ ciphertext\ blocks\ are\ the\ same.}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00024}00024\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00025}00025\ \textcolor{comment}{//\ \ \ \ In\ CBC\ Mode\ a\ ciphertext\ block\ is\ obtained\ by\ first\ xoring\ the}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00026}00026\ \textcolor{comment}{//\ \ \ \ plaintext\ block\ with\ the\ previous\ ciphertext\ block,\ and\ encrypting\ the\ resulting\ value.}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00027}00027\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00028}00028\ \textcolor{comment}{//\ \ \ \ In\ CFB\ mode\ a\ ciphertext\ block\ is\ obtained\ by\ encrypting\ the\ previous\ ciphertext\ block}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00029}00029\ \textcolor{comment}{//\ \ \ \ and\ xoring\ the\ resulting\ value\ with\ the\ plaintext}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00030}00030\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00031}00031\ \textcolor{comment}{//\ \ \ \ The\ previous\ ciphertext\ block\ is\ usually\ stored\ in\ an\ Initialization\ Vector\ (IV).}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00032}00032\ \textcolor{comment}{//\ \ \ \ An\ Initialization\ Vector\ of\ zero\ is\ commonly\ used\ for\ the\ first\ block,\ though\ other}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00033}00033\ \textcolor{comment}{//\ \ \ \ arrangements\ are\ also\ in\ use.}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00035}00035\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00036}00036\ \textcolor{comment}{http://www.counterpane.com/vectors.txt}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00037}00037\ \textcolor{comment}{Test\ vectors\ by\ Eric\ Young.\ \ These\ tests\ all\ assume\ Blowfish\ with\ 16}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00038}00038\ \textcolor{comment}{rounds.}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00039}00039\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00040}00040\ \textcolor{comment}{All\ data\ is\ shown\ as\ a\ hex\ string\ with\ 012345\ loading\ as}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00041}00041\ \textcolor{comment}{data[0]=0x01;}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00042}00042\ \textcolor{comment}{data[1]=0x23;}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00043}00043\ \textcolor{comment}{data[2]=0x45;}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00044}00044\ \textcolor{comment}{ecb\ test\ data\ (taken\ from\ the\ DES\ validation\ tests)}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00045}00045\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00046}00046\ \textcolor{comment}{key\ bytes\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ clear\ bytes\ \ \ \ \ \ \ \ \ \ \ \ \ cipher\ bytes}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00047}00047\ \textcolor{comment}{0000000000000000\ \ \ \ \ \ \ \ 0000000000000000\ \ \ \ \ \ \ \ 4EF997456198DD78}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00048}00048\ \textcolor{comment}{FFFFFFFFFFFFFFFF\ \ \ \ \ \ \ \ FFFFFFFFFFFFFFFF\ \ \ \ \ \ \ \ 51866FD5B85ECB8A}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00049}00049\ \textcolor{comment}{3000000000000000\ \ \ \ \ \ \ \ 1000000000000001\ \ \ \ \ \ \ \ 7D856F9A613063F2\ \ ???}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00050}00050\ \textcolor{comment}{1111111111111111\ \ \ \ \ \ \ \ 1111111111111111\ \ \ \ \ \ \ \ 2466DD878B963C9D}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00051}00051\ \textcolor{comment}{0123456789ABCDEF\ \ \ \ \ \ \ \ 1111111111111111\ \ \ \ \ \ \ \ 61F9C3802281B096}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00052}00052\ \textcolor{comment}{1111111111111111\ \ \ \ \ \ \ \ 0123456789ABCDEF\ \ \ \ \ \ \ \ 7D0CC630AFDA1EC7}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00053}00053\ \textcolor{comment}{0000000000000000\ \ \ \ \ \ \ \ 0000000000000000\ \ \ \ \ \ \ \ 4EF997456198DD78}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00054}00054\ \textcolor{comment}{FEDCBA9876543210\ \ \ \ \ \ \ \ 0123456789ABCDEF\ \ \ \ \ \ \ \ 0ACEAB0FC6A0A28D}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00055}00055\ \textcolor{comment}{7CA110454A1A6E57\ \ \ \ \ \ \ \ 01A1D6D039776742\ \ \ \ \ \ \ \ 59C68245EB05282B}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00056}00056\ \textcolor{comment}{0131D9619DC1376E\ \ \ \ \ \ \ \ 5CD54CA83DEF57DA\ \ \ \ \ \ \ \ B1B8CC0B250F09A0}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00057}00057\ \textcolor{comment}{07A1133E4A0B2686\ \ \ \ \ \ \ \ 0248D43806F67172\ \ \ \ \ \ \ \ 1730E5778BEA1DA4}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00058}00058\ \textcolor{comment}{3849674C2602319E\ \ \ \ \ \ \ \ 51454B582DDF440A\ \ \ \ \ \ \ \ A25E7856CF2651EB}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00059}00059\ \textcolor{comment}{04B915BA43FEB5B6\ \ \ \ \ \ \ \ 42FD443059577FA2\ \ \ \ \ \ \ \ 353882B109CE8F1A}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00060}00060\ \textcolor{comment}{0113B970FD34F2CE\ \ \ \ \ \ \ \ 059B5E0851CF143A\ \ \ \ \ \ \ \ 48F4D0884C379918}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00061}00061\ \textcolor{comment}{0170F175468FB5E6\ \ \ \ \ \ \ \ 0756D8E0774761D2\ \ \ \ \ \ \ \ 432193B78951FC98}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00062}00062\ \textcolor{comment}{43297FAD38E373FE\ \ \ \ \ \ \ \ 762514B829BF486A\ \ \ \ \ \ \ \ 13F04154D69D1AE5}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00063}00063\ \textcolor{comment}{07A7137045DA2A16\ \ \ \ \ \ \ \ 3BDD119049372802\ \ \ \ \ \ \ \ 2EEDDA93FFD39C79}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00064}00064\ \textcolor{comment}{04689104C2FD3B2F\ \ \ \ \ \ \ \ 26955F6835AF609A\ \ \ \ \ \ \ \ D887E0393C2DA6E3}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00065}00065\ \textcolor{comment}{37D06BB516CB7546\ \ \ \ \ \ \ \ 164D5E404F275232\ \ \ \ \ \ \ \ 5F99D04F5B163969}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00066}00066\ \textcolor{comment}{1F08260D1AC2465E\ \ \ \ \ \ \ \ 6B056E18759F5CCA\ \ \ \ \ \ \ \ 4A057A3B24D3977B}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00067}00067\ \textcolor{comment}{584023641ABA6176\ \ \ \ \ \ \ \ 004BD6EF09176062\ \ \ \ \ \ \ \ 452031C1E4FADA8E}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00068}00068\ \textcolor{comment}{025816164629B007\ \ \ \ \ \ \ \ 480D39006EE762F2\ \ \ \ \ \ \ \ 7555AE39F59B87BD}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00069}00069\ \textcolor{comment}{49793EBC79B3258F\ \ \ \ \ \ \ \ 437540C8698F3CFA\ \ \ \ \ \ \ \ 53C55F9CB49FC019}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00070}00070\ \textcolor{comment}{4FB05E1515AB73A7\ \ \ \ \ \ \ \ 072D43A077075292\ \ \ \ \ \ \ \ 7A8E7BFA937E89A3}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00071}00071\ \textcolor{comment}{49E95D6D4CA229BF\ \ \ \ \ \ \ \ 02FE55778117F12A\ \ \ \ \ \ \ \ CF9C5D7A4986ADB5}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00072}00072\ \textcolor{comment}{018310DC409B26D6\ \ \ \ \ \ \ \ 1D9D5C5018F728C2\ \ \ \ \ \ \ \ D1ABB290658BC778}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00073}00073\ \textcolor{comment}{1C587F1C13924FEF\ \ \ \ \ \ \ \ 305532286D6F295A\ \ \ \ \ \ \ \ 55CB3774D13EF201}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00074}00074\ \textcolor{comment}{0101010101010101\ \ \ \ \ \ \ \ 0123456789ABCDEF\ \ \ \ \ \ \ \ FA34EC4847B268B2}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00075}00075\ \textcolor{comment}{1F1F1F1F0E0E0E0E\ \ \ \ \ \ \ \ 0123456789ABCDEF\ \ \ \ \ \ \ \ A790795108EA3CAE}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00076}00076\ \textcolor{comment}{E0FEE0FEF1FEF1FE\ \ \ \ \ \ \ \ 0123456789ABCDEF\ \ \ \ \ \ \ \ C39E072D9FAC631D}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00077}00077\ \textcolor{comment}{0000000000000000\ \ \ \ \ \ \ \ FFFFFFFFFFFFFFFF\ \ \ \ \ \ \ \ 014933E0CDAFF6E4}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00078}00078\ \textcolor{comment}{FFFFFFFFFFFFFFFF\ \ \ \ \ \ \ \ 0000000000000000\ \ \ \ \ \ \ \ F21E9A77B71C49BC}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00079}00079\ \textcolor{comment}{0123456789ABCDEF\ \ \ \ \ \ \ \ 0000000000000000\ \ \ \ \ \ \ \ 245946885754369A}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00080}00080\ \textcolor{comment}{FEDCBA9876543210\ \ \ \ \ \ \ \ FFFFFFFFFFFFFFFF\ \ \ \ \ \ \ \ 6B5C5A9C5D9E0A5A}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00081}00081\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00082}00082\ \textcolor{comment}{set\_key\ test\ data}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00083}00083\ \textcolor{comment}{data[8]=\ FEDCBA9876543210}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00084}00084\ \textcolor{comment}{c=F9AD597C49DB005E\ k[\ 1]=F0}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00085}00085\ \textcolor{comment}{c=E91D21C1D961A6D6\ k[\ 2]=F0E1}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00086}00086\ \textcolor{comment}{c=E9C2B70A1BC65CF3\ k[\ 3]=F0E1D2}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00087}00087\ \textcolor{comment}{c=BE1E639408640F05\ k[\ 4]=F0E1D2C3}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00088}00088\ \textcolor{comment}{c=B39E44481BDB1E6E\ k[\ 5]=F0E1D2C3B4}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00089}00089\ \textcolor{comment}{c=9457AA83B1928C0D\ k[\ 6]=F0E1D2C3B4A5}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00090}00090\ \textcolor{comment}{c=8BB77032F960629D\ k[\ 7]=F0E1D2C3B4A596}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00091}00091\ \textcolor{comment}{c=E87A244E2CC85E82\ k[\ 8]=F0E1D2C3B4A59687}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00092}00092\ \textcolor{comment}{c=15750E7A4F4EC577\ k[\ 9]=F0E1D2C3B4A5968778}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00093}00093\ \textcolor{comment}{c=122BA70B3AB64AE0\ k[10]=F0E1D2C3B4A596877869}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00094}00094\ \textcolor{comment}{c=3A833C9AFFC537F6\ k[11]=F0E1D2C3B4A5968778695A}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00095}00095\ \textcolor{comment}{c=9409DA87A90F6BF2\ k[12]=F0E1D2C3B4A5968778695A4B}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00096}00096\ \textcolor{comment}{c=884F80625060B8B4\ k[13]=F0E1D2C3B4A5968778695A4B3C}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00097}00097\ \textcolor{comment}{c=1F85031C19E11968\ k[14]=F0E1D2C3B4A5968778695A4B3C2D}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00098}00098\ \textcolor{comment}{c=79D9373A714CA34F\ k[15]=F0E1D2C3B4A5968778695A4B3C2D1E\ ???}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00099}00099\ \textcolor{comment}{c=93142887EE3BE15C\ k[16]=F0E1D2C3B4A5968778695A4B3C2D1E0F}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00100}00100\ \textcolor{comment}{c=03429E838CE2D14B\ k[17]=F0E1D2C3B4A5968778695A4B3C2D1E0F00}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00101}00101\ \textcolor{comment}{c=A4299E27469FF67B\ k[18]=F0E1D2C3B4A5968778695A4B3C2D1E0F0011}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00102}00102\ \textcolor{comment}{c=AFD5AED1C1BC96A8\ k[19]=F0E1D2C3B4A5968778695A4B3C2D1E0F001122}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00103}00103\ \textcolor{comment}{c=10851C0E3858DA9F\ k[20]=F0E1D2C3B4A5968778695A4B3C2D1E0F00112233}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00104}00104\ \textcolor{comment}{c=E6F51ED79B9DB21F\ k[21]=F0E1D2C3B4A5968778695A4B3C2D1E0F0011223344}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00105}00105\ \textcolor{comment}{c=64A6E14AFD36B46F\ k[22]=F0E1D2C3B4A5968778695A4B3C2D1E0F001122334455}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00106}00106\ \textcolor{comment}{c=80C7D7D45A5479AD\ k[23]=F0E1D2C3B4A5968778695A4B3C2D1E0F00112233445566}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00107}00107\ \textcolor{comment}{c=05044B62FA52D080\ k[24]=F0E1D2C3B4A5968778695A4B3C2D1E0F0011223344556677}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00108}00108\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00109}00109\ \textcolor{comment}{chaining\ mode\ test\ data}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00110}00110\ \textcolor{comment}{key[16]\ \ \ =\ 0123456789ABCDEFF0E1D2C3B4A59687}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00111}00111\ \textcolor{comment}{iv[8]\ \ \ \ \ =\ FEDCBA9876543210}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00112}00112\ \textcolor{comment}{data[29]\ \ =\ "{}7654321\ Now\ is\ the\ time\ for\ "{}\ (includes\ trailing\ '\(\backslash\)0')}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00113}00113\ \textcolor{comment}{data[29]\ \ =\ 37363534333231204E6F77206973207468652074696D6520666F722000}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00114}00114\ \textcolor{comment}{cbc\ cipher\ text}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00115}00115\ \textcolor{comment}{cipher[32]=\ 6B77B4D63006DEE605B156E27403979358DEB9E7154616D959F1652BD5FF92CC}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00116}00116\ \textcolor{comment}{cfb64\ cipher\ text\ cipher[29]=\ }}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00117}00117\ \textcolor{comment}{E73214A2822139CAF26ECF6D2EB9E76E3DA3DE04D1517200519D57A6C3\ }}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00118}00118\ \textcolor{comment}{ofb64\ cipher\ text\ cipher[29]=\ }}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00119}00119\ \textcolor{comment}{E73214A2822139CA62B343CC5B65587310DD908D0C241B2263C2CF80DA}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00120}00120\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00121}00121\ \textcolor{comment}{*/}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00122}00122\ }
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00123}00123\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00124}00124\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{stdint_8h}{stdint.h}}>}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00125}00125\ }
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00126}00126\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}\ \{}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00127}00127\ }
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00128}00128\ \textcolor{comment}{//Block\ Structure}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00129}\mbox{\hyperlink{structfc_1_1sblock}{00129}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structfc_1_1sblock}{sblock}}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00130}00130\ \{}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00131}00131\ \ \ \ \ \textcolor{comment}{//Constructors}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00132}\mbox{\hyperlink{structfc_1_1sblock_abacfce927b4903c1c4e68b6a1a0a7435}{00132}}\ \ \ \ \ \mbox{\hyperlink{structfc_1_1sblock_abacfce927b4903c1c4e68b6a1a0a7435}{sblock}}(\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}=0,\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}=0)\ :\ \mbox{\hyperlink{structfc_1_1sblock_a47f86b4689f98ce75d61cf3b163311ea}{m\_uil}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}),\ \mbox{\hyperlink{structfc_1_1sblock_ab7bc3efb7f0e64dcb54715b9649ac412}{m\_uir}}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}})\ \{\}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00133}00133\ \ \ \ \ \textcolor{comment}{//Copy\ Constructor}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00134}\mbox{\hyperlink{structfc_1_1sblock_a19ba39ebb027cd9041d5187da827c2b5}{00134}}\ \ \ \ \ \mbox{\hyperlink{structfc_1_1sblock_a19ba39ebb027cd9041d5187da827c2b5}{sblock}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structfc_1_1sblock}{sblock}}\&\ roBlock)\ :\ \mbox{\hyperlink{structfc_1_1sblock_a47f86b4689f98ce75d61cf3b163311ea}{m\_uil}}(roBlock.\mbox{\hyperlink{structfc_1_1sblock_a47f86b4689f98ce75d61cf3b163311ea}{m\_uil}}),\ \mbox{\hyperlink{structfc_1_1sblock_ab7bc3efb7f0e64dcb54715b9649ac412}{m\_uir}}(roBlock.\mbox{\hyperlink{structfc_1_1sblock_ab7bc3efb7f0e64dcb54715b9649ac412}{m\_uir}})\ \{\}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00135}\mbox{\hyperlink{structfc_1_1sblock_a9bed8d45092fec7107bd4d3c3822e5a5}{00135}}\ \ \ \ \ \mbox{\hyperlink{structfc_1_1sblock}{sblock}}\&\ \mbox{\hyperlink{structfc_1_1sblock_a9bed8d45092fec7107bd4d3c3822e5a5}{operator\string^=}}(\mbox{\hyperlink{structfc_1_1sblock}{sblock}}\&\ b)\ \{\ \mbox{\hyperlink{structfc_1_1sblock_a47f86b4689f98ce75d61cf3b163311ea}{m\_uil}}\ \string^=\ b.\mbox{\hyperlink{structfc_1_1sblock_a47f86b4689f98ce75d61cf3b163311ea}{m\_uil}};\ \mbox{\hyperlink{structfc_1_1sblock_ab7bc3efb7f0e64dcb54715b9649ac412}{m\_uir}}\ \string^=\ b.\mbox{\hyperlink{structfc_1_1sblock_ab7bc3efb7f0e64dcb54715b9649ac412}{m\_uir}};\ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};\ \}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00136}\mbox{\hyperlink{structfc_1_1sblock_a47f86b4689f98ce75d61cf3b163311ea}{00136}}\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{structfc_1_1sblock_a47f86b4689f98ce75d61cf3b163311ea}{m\_uil}},\ \mbox{\hyperlink{structfc_1_1sblock_ab7bc3efb7f0e64dcb54715b9649ac412}{m\_uir}};}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00137}00137\ \};}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00138}00138\ }
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00139}\mbox{\hyperlink{classfc_1_1blowfish}{00139}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classfc_1_1blowfish}{blowfish}}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00140}00140\ \{}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00141}00141\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00142}\mbox{\hyperlink{classfc_1_1blowfish_adb5c19eb1f1da57986771336a3901deca66b16bd5692bf9565dda328081464223}{00142}}\ \ \ \ \ \textcolor{keyword}{enum}\ \{\ \mbox{\hyperlink{classfc_1_1blowfish_adb5c19eb1f1da57986771336a3901deca25f9cb5035bb002b7bed493e9457476e}{ECB}}=0,\ \mbox{\hyperlink{classfc_1_1blowfish_adb5c19eb1f1da57986771336a3901deca66b16bd5692bf9565dda328081464223}{CBC}}=1,\ \mbox{\hyperlink{classfc_1_1blowfish_adb5c19eb1f1da57986771336a3901decaccd0444db460143da30fe402523b6eae}{CFB}}=2\ \};}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00143}00143\ }
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00144}00144\ \ \ \ \ \textcolor{comment}{//Constructor\ -\/\ Initialize\ the\ P\ and\ S\ boxes\ for\ a\ given\ Key}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00145}00145\ \ \ \ \ \mbox{\hyperlink{classfc_1_1blowfish_a7b3c1907164f8299c99b70717384f9bf}{blowfish}}();}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00146}00146\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1blowfish_a867a7f6185f1ed29a60136496aaea8ef}{start}}(\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*\ ucKey,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ n,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structfc_1_1sblock}{sblock}}\&\ roChain\ =\ \mbox{\hyperlink{structfc_1_1sblock}{sblock}}(0UL,0UL));}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00147}00147\ }
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00148}00148\ \ \ \ \ \textcolor{comment}{//Resetting\ the\ chaining\ block}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00149}\mbox{\hyperlink{classfc_1_1blowfish_aeafb623506fb88c0efa401430613847e}{00149}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1blowfish_aeafb623506fb88c0efa401430613847e}{reset\_chain}}()\ \{\ m\_oChain\ =\ m\_oChain0;\ \}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00150}00150\ }
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00151}00151\ \ \ \ \ \textcolor{comment}{//\ encrypt/decrypt\ Buffer\ in\ Place}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00152}00152\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1blowfish_adb0d3d2c0327ce0ebfde779d33640448}{encrypt}}(\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ n,\ \textcolor{keywordtype}{int}\ iMode=\mbox{\hyperlink{classfc_1_1blowfish_adb5c19eb1f1da57986771336a3901decaccd0444db460143da30fe402523b6eae}{CFB}});}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00153}00153\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1blowfish_a8217a4d3497c7318bec0ea220a040f27}{decrypt}}(\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ n,\ \textcolor{keywordtype}{int}\ iMode=\mbox{\hyperlink{classfc_1_1blowfish_adb5c19eb1f1da57986771336a3901decaccd0444db460143da30fe402523b6eae}{CFB}});}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00154}00154\ }
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00155}00155\ \ \ \ \ \textcolor{comment}{//\ encrypt/decrypt\ from\ Input\ Buffer\ to\ Output\ Buffer}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00156}00156\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1blowfish_adb0d3d2c0327ce0ebfde779d33640448}{encrypt}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*\ in,\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*\ out,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ n,\ \textcolor{keywordtype}{int}\ iMode=\mbox{\hyperlink{classfc_1_1blowfish_adb5c19eb1f1da57986771336a3901decaccd0444db460143da30fe402523b6eae}{CFB}});}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00157}00157\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1blowfish_a8217a4d3497c7318bec0ea220a040f27}{decrypt}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*\ in,\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*\ out,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ n,\ \textcolor{keywordtype}{int}\ iMode=\mbox{\hyperlink{classfc_1_1blowfish_adb5c19eb1f1da57986771336a3901decaccd0444db460143da30fe402523b6eae}{CFB}});}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00158}00158\ }
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00159}00159\ \textcolor{comment}{//Private\ Functions}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00160}00160\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00161}00161\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ F(\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ ui);}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00162}00162\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1blowfish_adb0d3d2c0327ce0ebfde779d33640448}{encrypt}}(\mbox{\hyperlink{structfc_1_1sblock}{sblock}}\&);}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00163}00163\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1blowfish_a8217a4d3497c7318bec0ea220a040f27}{decrypt}}(\mbox{\hyperlink{structfc_1_1sblock}{sblock}}\&);}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00164}00164\ }
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00165}00165\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00166}00166\ \ \ \ \ \textcolor{comment}{//The\ Initialization\ Vector,\ by\ default\ \{0,\ 0\}}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00167}00167\ \ \ \ \ \mbox{\hyperlink{structfc_1_1sblock}{sblock}}\ m\_oChain0;}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00168}00168\ \ \ \ \ \mbox{\hyperlink{structfc_1_1sblock}{sblock}}\ m\_oChain;}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00169}00169\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ m\_auiP[18];}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00170}00170\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ m\_auiS[4][256];}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00171}00171\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ scm\_auiInitP[18];}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00172}00172\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ scm\_auiInitS[4][256];}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00173}00173\ \};}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00174}00174\ }
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00175}00175\ }
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00176}00176\ \}\ \textcolor{comment}{//\ namespace\ fc}}
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00177}00177\ }
+\DoxyCodeLine{\Hypertarget{blowfish_8hpp_source_l00178}00178\ }
+
+\end{DoxyCode}

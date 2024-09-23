@@ -1,0 +1,95 @@
+\doxysection{Serialization\+::Array\+Output\+Stream Struct Reference}
+\hypertarget{struct_serialization_1_1_array_output_stream}{}\label{struct_serialization_1_1_array_output_stream}\index{Serialization::ArrayOutputStream@{Serialization::ArrayOutputStream}}
+
+
+{\ttfamily \#include $<$Serialization.\+h$>$}
+
+
+
+Inheritance diagram for Serialization\+::Array\+Output\+Stream\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=216pt]{struct_serialization_1_1_array_output_stream__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Serialization\+::Array\+Output\+Stream\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=216pt]{struct_serialization_1_1_array_output_stream__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+std\+::vector$<$ \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} $>$ \&\& \mbox{\hyperlink{struct_serialization_1_1_array_output_stream_aaf6d663f4644239d5960b4cbdd426488}{get\+Bytes}} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{struct_serialization_1_1_output_stream}{Serialization\+::\+Output\+Stream}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_serialization_1_1_output_stream_aa0d8731bacb3f9c268d197e008c5cd50}{Output\+Stream}} ()
+\item 
+\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} \mbox{\hyperlink{struct_serialization_1_1_output_stream_acbf665b52ca229f30af8ef45fa9c3b8a}{capacity}} () const
+\item 
+\mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{struct_serialization_1_1_output_stream_a30478da9be388effe667062547675663}{advance}} (\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} num\+Bytes)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Public Types inherited from \mbox{\hyperlink{struct_serialization_1_1_output_stream}{Serialization\+::\+Output\+Stream}}}
+\begin{DoxyCompactItemize}
+\item 
+enum \{ \mbox{\hyperlink{struct_serialization_1_1_output_stream_ac1714f9a6bf67c3d43da4224e23fdadfa56fd45070e04dbf5aa8a7c122abd79f2}{is\+Input}} = false
+ \}
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Member Functions inherited from \mbox{\hyperlink{struct_serialization_1_1_output_stream}{Serialization\+::\+Output\+Stream}}}
+\doxysubsection*{Protected Attributes inherited from \mbox{\hyperlink{struct_serialization_1_1_output_stream}{Serialization\+::\+Output\+Stream}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{struct_serialization_1_1_output_stream_a6b5f479d5d7ca4a5c0a43607cfebe8e3}{next}}
+\item 
+\mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{struct_serialization_1_1_output_stream_a10ed33bdcaa84aa831c7ff09808d9a68}{end}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{_serialization_8h_source_l00058}{58}} of file \mbox{\hyperlink{_serialization_8h_source}{Serialization.\+h}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_serialization_1_1_array_output_stream_aaf6d663f4644239d5960b4cbdd426488}\index{Serialization::ArrayOutputStream@{Serialization::ArrayOutputStream}!getBytes@{getBytes}}
+\index{getBytes@{getBytes}!Serialization::ArrayOutputStream@{Serialization::ArrayOutputStream}}
+\doxysubsubsection{\texorpdfstring{getBytes()}{getBytes()}}
+{\footnotesize\ttfamily \label{struct_serialization_1_1_array_output_stream_aaf6d663f4644239d5960b4cbdd426488} 
+std\+::vector$<$ \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} $>$ \&\& Serialization\+::\+Array\+Output\+Stream\+::get\+Bytes (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_serialization_8h_source_l00061}{61}} of file \mbox{\hyperlink{_serialization_8h_source}{Serialization.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ bytes.resize(\mbox{\hyperlink{struct_serialization_1_1_output_stream_a6b5f479d5d7ca4a5c0a43607cfebe8e3}{next}}\ -\/\ bytes.data());}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_serialization_1_1_output_stream_a6b5f479d5d7ca4a5c0a43607cfebe8e3}{next}}\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ end\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::move(bytes);}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_serialization_1_1_array_output_stream_aaf6d663f4644239d5960b4cbdd426488_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/wasm-\/jit/\+Include/\+Inline/\mbox{\hyperlink{_serialization_8h}{Serialization.\+h}}\end{DoxyCompactItemize}

@@ -1,0 +1,84 @@
+\doxysection{testing\+::gmock\+\_\+matchers\+\_\+test\+::Is\+Half\+Of\+Matcher Class Reference}
+\hypertarget{classtesting_1_1gmock__matchers__test_1_1_is_half_of_matcher}{}\label{classtesting_1_1gmock__matchers__test_1_1_is_half_of_matcher}\index{testing::gmock\_matchers\_test::IsHalfOfMatcher@{testing::gmock\_matchers\_test::IsHalfOfMatcher}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename T1 , typename T2 $>$ }\\bool \mbox{\hyperlink{classtesting_1_1gmock__matchers__test_1_1_is_half_of_matcher_a8c919d71f6f7e05ac76c67f37107808c}{Match\+And\+Explain}} (const tuple$<$ T1, T2 $>$ \&a\+\_\+pair, \mbox{\hyperlink{classtesting_1_1_match_result_listener}{Match\+Result\+Listener}} \texorpdfstring{$\ast$}{*}listener) const
+\item 
+void \mbox{\hyperlink{classtesting_1_1gmock__matchers__test_1_1_is_half_of_matcher_aaf62b9984288cc339599286352d82e91}{Describe\+To}} (ostream \texorpdfstring{$\ast$}{*}os) const
+\item 
+void \mbox{\hyperlink{classtesting_1_1gmock__matchers__test_1_1_is_half_of_matcher_a759ba45c89acfa77a4e1afe95e7b768d}{Describe\+Negation\+To}} (ostream \texorpdfstring{$\ast$}{*}os) const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers__test_8cc_source_l06321}{6321}} of file \mbox{\hyperlink{gmock-matchers__test_8cc_source}{gmock-\/matchers\+\_\+test.\+cc}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1gmock__matchers__test_1_1_is_half_of_matcher_a759ba45c89acfa77a4e1afe95e7b768d}\index{testing::gmock\_matchers\_test::IsHalfOfMatcher@{testing::gmock\_matchers\_test::IsHalfOfMatcher}!DescribeNegationTo@{DescribeNegationTo}}
+\index{DescribeNegationTo@{DescribeNegationTo}!testing::gmock\_matchers\_test::IsHalfOfMatcher@{testing::gmock\_matchers\_test::IsHalfOfMatcher}}
+\doxysubsubsection{\texorpdfstring{DescribeNegationTo()}{DescribeNegationTo()}}
+{\footnotesize\ttfamily \label{classtesting_1_1gmock__matchers__test_1_1_is_half_of_matcher_a759ba45c89acfa77a4e1afe95e7b768d} 
+void testing\+::gmock\+\_\+matchers\+\_\+test\+::\+Is\+Half\+Of\+Matcher\+::\+Describe\+Negation\+To (\begin{DoxyParamCaption}\item[{ostream \texorpdfstring{$\ast$}{*}}]{os}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers__test_8cc_source_l06339}{6339}} of file \mbox{\hyperlink{gmock-matchers__test_8cc_source}{gmock-\/matchers\+\_\+test.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{06339\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{06340\ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}are\ a\ pair\ where\ the\ first\ isn't\ half\ of\ the\ second"{}};}
+\DoxyCodeLine{06341\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1gmock__matchers__test_1_1_is_half_of_matcher_aaf62b9984288cc339599286352d82e91}\index{testing::gmock\_matchers\_test::IsHalfOfMatcher@{testing::gmock\_matchers\_test::IsHalfOfMatcher}!DescribeTo@{DescribeTo}}
+\index{DescribeTo@{DescribeTo}!testing::gmock\_matchers\_test::IsHalfOfMatcher@{testing::gmock\_matchers\_test::IsHalfOfMatcher}}
+\doxysubsubsection{\texorpdfstring{DescribeTo()}{DescribeTo()}}
+{\footnotesize\ttfamily \label{classtesting_1_1gmock__matchers__test_1_1_is_half_of_matcher_aaf62b9984288cc339599286352d82e91} 
+void testing\+::gmock\+\_\+matchers\+\_\+test\+::\+Is\+Half\+Of\+Matcher\+::\+Describe\+To (\begin{DoxyParamCaption}\item[{ostream \texorpdfstring{$\ast$}{*}}]{os}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers__test_8cc_source_l06335}{6335}} of file \mbox{\hyperlink{gmock-matchers__test_8cc_source}{gmock-\/matchers\+\_\+test.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{06335\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{06336\ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}are\ a\ pair\ where\ the\ first\ is\ half\ of\ the\ second"{}};}
+\DoxyCodeLine{06337\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1gmock__matchers__test_1_1_is_half_of_matcher_a8c919d71f6f7e05ac76c67f37107808c}\index{testing::gmock\_matchers\_test::IsHalfOfMatcher@{testing::gmock\_matchers\_test::IsHalfOfMatcher}!MatchAndExplain@{MatchAndExplain}}
+\index{MatchAndExplain@{MatchAndExplain}!testing::gmock\_matchers\_test::IsHalfOfMatcher@{testing::gmock\_matchers\_test::IsHalfOfMatcher}}
+\doxysubsubsection{\texorpdfstring{MatchAndExplain()}{MatchAndExplain()}}
+{\footnotesize\ttfamily \label{classtesting_1_1gmock__matchers__test_1_1_is_half_of_matcher_a8c919d71f6f7e05ac76c67f37107808c} 
+template$<$typename T1 , typename T2 $>$ \\
+bool testing\+::gmock\+\_\+matchers\+\_\+test\+::\+Is\+Half\+Of\+Matcher\+::\+Match\+And\+Explain (\begin{DoxyParamCaption}\item[{const tuple$<$ T1, T2 $>$ \&}]{a\+\_\+pair}{, }\item[{\mbox{\hyperlink{classtesting_1_1_match_result_listener}{Match\+Result\+Listener}} \texorpdfstring{$\ast$}{*}}]{listener}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers__test_8cc_source_l06324}{6324}} of file \mbox{\hyperlink{gmock-matchers__test_8cc_source}{gmock-\/matchers\+\_\+test.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{06325\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{06326\ \ \ \ \ \textcolor{keywordflow}{if}\ (get<0>(a\_pair)\ ==\ get<1>(a\_pair)/2)\ \{}
+\DoxyCodeLine{06327\ \ \ \ \ \ \ *listener\ <<\ \textcolor{stringliteral}{"{}where\ the\ second\ is\ "{}}\ <<\ get<1>(a\_pair);}
+\DoxyCodeLine{06328\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{06329\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{06330\ \ \ \ \ \ \ *listener\ <<\ \textcolor{stringliteral}{"{}where\ the\ second/2\ is\ "{}}\ <<\ get<1>(a\_pair)/2;}
+\DoxyCodeLine{06331\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{06332\ \ \ \ \ \}}
+\DoxyCodeLine{06333\ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/test/\mbox{\hyperlink{gmock-matchers__test_8cc}{gmock-\/matchers\+\_\+test.\+cc}}\end{DoxyCompactItemize}

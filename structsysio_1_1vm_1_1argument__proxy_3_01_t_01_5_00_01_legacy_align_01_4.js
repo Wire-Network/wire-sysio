@@ -1,0 +1,27 @@
+var structsysio_1_1vm_1_1argument__proxy_3_01_t_01_5_00_01_legacy_align_01_4 =
+[
+    [ "pointee_type", "structsysio_1_1vm_1_1argument__proxy_3_01_t_01_5_00_01_legacy_align_01_4.html#a969716e9f02492f3aacb185c13528b8c", null ],
+    [ "proxy_type", "structsysio_1_1vm_1_1argument__proxy_3_01_t_01_5_00_01_legacy_align_01_4.html#ac2d34c7a31c42b8883fce199e45b90d4", null ],
+    [ "argument_proxy", "structsysio_1_1vm_1_1argument__proxy_3_01_t_01_5_00_01_legacy_align_01_4.html#a8d173cd81e1d985dda2db30d9f282c11", null ],
+    [ "argument_proxy", "structsysio_1_1vm_1_1argument__proxy_3_01_t_01_5_00_01_legacy_align_01_4.html#af7d08ad33e80b13992a662a7c436500d", null ],
+    [ "argument_proxy", "structsysio_1_1vm_1_1argument__proxy_3_01_t_01_5_00_01_legacy_align_01_4.html#a92747e03b1ea4e6daa3c142968c7a35a", null ],
+    [ "~argument_proxy", "structsysio_1_1vm_1_1argument__proxy_3_01_t_01_5_00_01_legacy_align_01_4.html#a65c37e11f2901c70e364f4fd4ddbcea0", null ],
+    [ "argument_proxy", "structsysio_1_1vm_1_1argument__proxy_3_01_t_01_5_00_01_legacy_align_01_4.html#a8d173cd81e1d985dda2db30d9f282c11", null ],
+    [ "argument_proxy", "structsysio_1_1vm_1_1argument__proxy_3_01_t_01_5_00_01_legacy_align_01_4.html#af7d08ad33e80b13992a662a7c436500d", null ],
+    [ "argument_proxy", "structsysio_1_1vm_1_1argument__proxy_3_01_t_01_5_00_01_legacy_align_01_4.html#a92747e03b1ea4e6daa3c142968c7a35a", null ],
+    [ "~argument_proxy", "structsysio_1_1vm_1_1argument__proxy_3_01_t_01_5_00_01_legacy_align_01_4.html#a65c37e11f2901c70e364f4fd4ddbcea0", null ],
+    [ "get", "structsysio_1_1vm_1_1argument__proxy_3_01_t_01_5_00_01_legacy_align_01_4.html#a68a9e93645a321e74910a9a5c6e26c12", null ],
+    [ "get", "structsysio_1_1vm_1_1argument__proxy_3_01_t_01_5_00_01_legacy_align_01_4.html#a68a9e93645a321e74910a9a5c6e26c12", null ],
+    [ "get", "structsysio_1_1vm_1_1argument__proxy_3_01_t_01_5_00_01_legacy_align_01_4.html#ac843554ee24427fa2a5b4d3b66d21700", null ],
+    [ "get", "structsysio_1_1vm_1_1argument__proxy_3_01_t_01_5_00_01_legacy_align_01_4.html#ac843554ee24427fa2a5b4d3b66d21700", null ],
+    [ "get_original_pointer", "structsysio_1_1vm_1_1argument__proxy_3_01_t_01_5_00_01_legacy_align_01_4.html#a6b74be1697f8629603ae48f5c6cc9027", null ],
+    [ "get_original_pointer", "structsysio_1_1vm_1_1argument__proxy_3_01_t_01_5_00_01_legacy_align_01_4.html#a6b74be1697f8629603ae48f5c6cc9027", null ],
+    [ "operator const T *", "structsysio_1_1vm_1_1argument__proxy_3_01_t_01_5_00_01_legacy_align_01_4.html#a67387735effd8ae6bee38b0e49ae2f82", null ],
+    [ "operator const T *", "structsysio_1_1vm_1_1argument__proxy_3_01_t_01_5_00_01_legacy_align_01_4.html#a67387735effd8ae6bee38b0e49ae2f82", null ],
+    [ "operator T*", "structsysio_1_1vm_1_1argument__proxy_3_01_t_01_5_00_01_legacy_align_01_4.html#ade955eaaa6b2ecbeceb83e926a547a5d", null ],
+    [ "operator T*", "structsysio_1_1vm_1_1argument__proxy_3_01_t_01_5_00_01_legacy_align_01_4.html#ade955eaaa6b2ecbeceb83e926a547a5d", null ],
+    [ "operator->", "structsysio_1_1vm_1_1argument__proxy_3_01_t_01_5_00_01_legacy_align_01_4.html#afa9a9608cb5fb2101c447e2518522851", null ],
+    [ "operator->", "structsysio_1_1vm_1_1argument__proxy_3_01_t_01_5_00_01_legacy_align_01_4.html#afa9a9608cb5fb2101c447e2518522851", null ],
+    [ "operator->", "structsysio_1_1vm_1_1argument__proxy_3_01_t_01_5_00_01_legacy_align_01_4.html#aace2f7cfd7e82d8bab3f2f9ad5f54d71", null ],
+    [ "operator->", "structsysio_1_1vm_1_1argument__proxy_3_01_t_01_5_00_01_legacy_align_01_4.html#aace2f7cfd7e82d8bab3f2f9ad5f54d71", null ]
+];

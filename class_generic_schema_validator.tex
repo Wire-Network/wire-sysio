@@ -1,0 +1,2081 @@
+\doxysection{Generic\+Schema\+Validator\texorpdfstring{$<$}{<} Schema\+Document\+Type, Output\+Handler, State\+Allocator \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{class_generic_schema_validator}{}\label{class_generic_schema_validator}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+
+
+JSON \doxylink{class_schema}{Schema} Validator.  
+
+
+
+
+{\ttfamily \#include $<$schema.\+h$>$}
+
+
+
+Inheritance diagram for Generic\+Schema\+Validator\texorpdfstring{$<$}{<} Schema\+Document\+Type, Output\+Handler, State\+Allocator \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_generic_schema_validator__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Generic\+Schema\+Validator\texorpdfstring{$<$}{<} Schema\+Document\+Type, Output\+Handler, State\+Allocator \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_generic_schema_validator__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef Schema\+Document\+Type\+::\+Schema\+Type \mbox{\hyperlink{class_generic_schema_validator_a405cf694dc7f2702e27de6e30c7ba00d}{Schema\+Type}}
+\item 
+typedef Schema\+Document\+Type\+::\+Pointer\+Type \mbox{\hyperlink{class_generic_schema_validator_a9e29fab15005c947ec941898fe9d3e2a}{Pointer\+Type}}
+\item 
+typedef Schema\+Type\+::\+Encoding\+Type \mbox{\hyperlink{class_generic_schema_validator_aa8361a14e41de7e918c45a978e834e91}{Encoding\+Type}}
+\item 
+typedef Schema\+Type\+::\+SValue \mbox{\hyperlink{class_generic_schema_validator_a258a5978bf9194b5a2dac36daebc3041}{SValue}}
+\item 
+typedef Encoding\+Type\+::\+Ch \mbox{\hyperlink{class_generic_schema_validator_a18b5119c8e964d37c2252706439e27cd}{Ch}}
+\item 
+typedef \mbox{\hyperlink{struct_generic_string_ref}{Generic\+String\+Ref}}$<$ \mbox{\hyperlink{class_generic_schema_validator_a18b5119c8e964d37c2252706439e27cd}{Ch}} $>$ \mbox{\hyperlink{class_generic_schema_validator_a4cb7ab643de05437f8c0263fd902b8c0}{String\+Ref\+Type}}
+\item 
+typedef \mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{class_generic_schema_validator_aa8361a14e41de7e918c45a978e834e91}{Encoding\+Type}}, State\+Allocator $>$ \mbox{\hyperlink{class_generic_schema_validator_adbc6401414470cc4feef8f03a43690cb}{Value\+Type}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Types inherited from \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler}{internal\+::\+IValidation\+Error\+Handler$<$ Schema\+Document\+Type\+::\+Schema\+Type $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+typedef Schema\+Type\+::\+Ch \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_abba4e628023fc09afffd499b3675c5bf}{Ch}}
+\item 
+typedef Schema\+Type\+::\+SValue \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a3cb3350cdd81afff317ac3787b40f48e}{SValue}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_generic_schema_validator_a202ee6fdbe5ae9eab3e77a81ecdfeb6d}{Generic\+Schema\+Validator}} (const Schema\+Document\+Type \&schema\+Document, State\+Allocator \texorpdfstring{$\ast$}{*}allocator=0, size\+\_\+t schema\+Stack\+Capacity=k\+Default\+Schema\+Stack\+Capacity, size\+\_\+t document\+Stack\+Capacity=k\+Default\+Document\+Stack\+Capacity)
+\begin{DoxyCompactList}\small\item\em Constructor without output handler. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_generic_schema_validator_ac2027be8ca55b01cd6f38b45f4e233b4}{Generic\+Schema\+Validator}} (const Schema\+Document\+Type \&schema\+Document, Output\+Handler \&output\+Handler, State\+Allocator \texorpdfstring{$\ast$}{*}allocator=0, size\+\_\+t schema\+Stack\+Capacity=k\+Default\+Schema\+Stack\+Capacity, size\+\_\+t document\+Stack\+Capacity=k\+Default\+Document\+Stack\+Capacity)
+\begin{DoxyCompactList}\small\item\em Constructor with output handler. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_generic_schema_validator_a3eab83d483a50efb0c0390adf3291963}{\texorpdfstring{$\sim$}{\string~}\+Generic\+Schema\+Validator}} ()
+\begin{DoxyCompactList}\small\item\em Destructor. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_generic_schema_validator_a49efbbe098cb77728be3d48cafed17e4}{Reset}} ()
+\begin{DoxyCompactList}\small\item\em \doxylink{struct_reset}{Reset} the internal states. \end{DoxyCompactList}\item 
+virtual bool \mbox{\hyperlink{class_generic_schema_validator_a8ebda4da3d8b1fc41e57f15dd62e8f19}{Is\+Valid}} () const
+\begin{DoxyCompactList}\small\item\em Checks whether the current state is valid. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_generic_schema_validator_adbc6401414470cc4feef8f03a43690cb}{Value\+Type}} \& \mbox{\hyperlink{class_generic_schema_validator_a21c0ad159e91398d222bab4d91d4c5dd}{Get\+Error}} ()
+\begin{DoxyCompactList}\small\item\em Gets the error object. \end{DoxyCompactList}\item 
+const \mbox{\hyperlink{class_generic_schema_validator_adbc6401414470cc4feef8f03a43690cb}{Value\+Type}} \& \mbox{\hyperlink{class_generic_schema_validator_ad7b8d71bd651c3da614a877816de7573}{Get\+Error}} () const
+\item 
+\mbox{\hyperlink{class_generic_schema_validator_a9e29fab15005c947ec941898fe9d3e2a}{Pointer\+Type}} \mbox{\hyperlink{class_generic_schema_validator_a5b8f2d5c466b2a362e2e4c3bcfbfc5a8}{Get\+Invalid\+Schema\+Pointer}} () const
+\begin{DoxyCompactList}\small\item\em Gets the JSON pointer pointed to the invalid schema. \end{DoxyCompactList}\item 
+const \mbox{\hyperlink{class_generic_schema_validator_a18b5119c8e964d37c2252706439e27cd}{Ch}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_generic_schema_validator_ab5980d72c786b81ab907526fdf4172f3}{Get\+Invalid\+Schema\+Keyword}} () const
+\begin{DoxyCompactList}\small\item\em Gets the keyword of invalid schema. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_generic_schema_validator_a9e29fab15005c947ec941898fe9d3e2a}{Pointer\+Type}} \mbox{\hyperlink{class_generic_schema_validator_ac10a88c4dc138bbdbe2afd041658a3b0}{Get\+Invalid\+Document\+Pointer}} () const
+\begin{DoxyCompactList}\small\item\em Gets the JSON pointer pointed to the invalid value. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_generic_schema_validator_ab2f08413a2b23d73d4bbd09c8ca1f547}{Not\+Multiple\+Of}} (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} actual, const \mbox{\hyperlink{class_generic_schema_validator_a258a5978bf9194b5a2dac36daebc3041}{SValue}} \&expected)
+\item 
+void \mbox{\hyperlink{class_generic_schema_validator_a5c59d25dc44d85404cc587ebfa7455cd}{Not\+Multiple\+Of}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} actual, const \mbox{\hyperlink{class_generic_schema_validator_a258a5978bf9194b5a2dac36daebc3041}{SValue}} \&expected)
+\item 
+void \mbox{\hyperlink{class_generic_schema_validator_ae5fc8a4545fed53955ec6c57b79ca949}{Not\+Multiple\+Of}} (double actual, const \mbox{\hyperlink{class_generic_schema_validator_a258a5978bf9194b5a2dac36daebc3041}{SValue}} \&expected)
+\item 
+void \mbox{\hyperlink{class_generic_schema_validator_a4c9c7db8a3488f84a5a86681ad1d8194}{Above\+Maximum}} (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} actual, const \mbox{\hyperlink{class_generic_schema_validator_a258a5978bf9194b5a2dac36daebc3041}{SValue}} \&expected, bool exclusive)
+\item 
+void \mbox{\hyperlink{class_generic_schema_validator_a9262c73768789eb7cf8dc271cfec7f96}{Above\+Maximum}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} actual, const \mbox{\hyperlink{class_generic_schema_validator_a258a5978bf9194b5a2dac36daebc3041}{SValue}} \&expected, bool exclusive)
+\item 
+void \mbox{\hyperlink{class_generic_schema_validator_abcf1f5b46bdae8ca20a80858d603483d}{Above\+Maximum}} (double actual, const \mbox{\hyperlink{class_generic_schema_validator_a258a5978bf9194b5a2dac36daebc3041}{SValue}} \&expected, bool exclusive)
+\item 
+void \mbox{\hyperlink{class_generic_schema_validator_a15a12306bc14f16357b4f2edea8396b7}{Below\+Minimum}} (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} actual, const \mbox{\hyperlink{class_generic_schema_validator_a258a5978bf9194b5a2dac36daebc3041}{SValue}} \&expected, bool exclusive)
+\item 
+void \mbox{\hyperlink{class_generic_schema_validator_ad3db1f3852a1b2e6fada43fbcad401ea}{Below\+Minimum}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} actual, const \mbox{\hyperlink{class_generic_schema_validator_a258a5978bf9194b5a2dac36daebc3041}{SValue}} \&expected, bool exclusive)
+\item 
+void \mbox{\hyperlink{class_generic_schema_validator_afdd4a9787239a6fc3eeb56d34fd531f4}{Below\+Minimum}} (double actual, const \mbox{\hyperlink{class_generic_schema_validator_a258a5978bf9194b5a2dac36daebc3041}{SValue}} \&expected, bool exclusive)
+\item 
+void \mbox{\hyperlink{class_generic_schema_validator_a227dce44e0684a73accbfb062200eb26}{Too\+Long}} (const \mbox{\hyperlink{class_generic_schema_validator_a18b5119c8e964d37c2252706439e27cd}{Ch}} \texorpdfstring{$\ast$}{*}str, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} length, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} expected)
+\item 
+void \mbox{\hyperlink{class_generic_schema_validator_a7711071f95ead18c0dd99f69c09a4c11}{Too\+Short}} (const \mbox{\hyperlink{class_generic_schema_validator_a18b5119c8e964d37c2252706439e27cd}{Ch}} \texorpdfstring{$\ast$}{*}str, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} length, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} expected)
+\item 
+void \mbox{\hyperlink{class_generic_schema_validator_af1be05889e634936c223f24c6e5f6ec5}{Does\+Not\+Match}} (const \mbox{\hyperlink{class_generic_schema_validator_a18b5119c8e964d37c2252706439e27cd}{Ch}} \texorpdfstring{$\ast$}{*}str, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} length)
+\item 
+void \mbox{\hyperlink{class_generic_schema_validator_a2d47a88a3d9fb82466b5bda480b6e70f}{Disallowed\+Item}} (\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} index)
+\item 
+void \mbox{\hyperlink{class_generic_schema_validator_af39007d9bf43126dab231961a1c5064f}{Too\+Few\+Items}} (\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} actual\+Count, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} expected\+Count)
+\item 
+void \mbox{\hyperlink{class_generic_schema_validator_a78e85eeae0e2bdef827815672a7fbbc9}{Too\+Many\+Items}} (\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} actual\+Count, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} expected\+Count)
+\item 
+void \mbox{\hyperlink{class_generic_schema_validator_a82aa865146069e3ba5010d25346a71f2}{Duplicate\+Items}} (\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} index1, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} index2)
+\item 
+void \mbox{\hyperlink{class_generic_schema_validator_ad7ca0a327420c110e9ee6e70b2cdbc87}{Too\+Many\+Properties}} (\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} actual\+Count, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} expected\+Count)
+\item 
+void \mbox{\hyperlink{class_generic_schema_validator_aaebaf28aa289826a3c39dc953b0ca466}{Too\+Few\+Properties}} (\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} actual\+Count, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} expected\+Count)
+\item 
+void \mbox{\hyperlink{class_generic_schema_validator_a41c4d67e349561f13948a5045bfc50c9}{Start\+Missing\+Properties}} ()
+\item 
+void \mbox{\hyperlink{class_generic_schema_validator_a8d355eeb25364e414d9a2f8121aa0eaa}{Add\+Missing\+Property}} (const \mbox{\hyperlink{class_generic_schema_validator_a258a5978bf9194b5a2dac36daebc3041}{SValue}} \&\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})
+\item 
+bool \mbox{\hyperlink{class_generic_schema_validator_a557b7aa531ff94a6355fed8f8575fed5}{End\+Missing\+Properties}} ()
+\item 
+void \mbox{\hyperlink{class_generic_schema_validator_a29fa7c6f787450b2df1f9d440436aeab}{Property\+Violations}} (ISchema\+Validator \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}subvalidators, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}})
+\item 
+void \mbox{\hyperlink{class_generic_schema_validator_a44f06b99edfb650c6088f17e8af5b5a8}{Disallowed\+Property}} (const \mbox{\hyperlink{class_generic_schema_validator_a18b5119c8e964d37c2252706439e27cd}{Ch}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} length)
+\item 
+void \mbox{\hyperlink{class_generic_schema_validator_a767f115cc90e0f2f5bdd1c9fbdbf75df}{Start\+Dependency\+Errors}} ()
+\item 
+void \mbox{\hyperlink{class_generic_schema_validator_ac4faa073bc4671f42e98a59a9e9cb01a}{Start\+Missing\+Dependent\+Properties}} ()
+\item 
+void \mbox{\hyperlink{class_generic_schema_validator_a85f2be483f0ddfc402a97665aff6eca9}{Add\+Missing\+Dependent\+Property}} (const \mbox{\hyperlink{class_generic_schema_validator_a258a5978bf9194b5a2dac36daebc3041}{SValue}} \&target\+Name)
+\item 
+void \mbox{\hyperlink{class_generic_schema_validator_afdcd2ff7b5f7e24f4f3d6976fa5b803e}{End\+Missing\+Dependent\+Properties}} (const \mbox{\hyperlink{class_generic_schema_validator_a258a5978bf9194b5a2dac36daebc3041}{SValue}} \&source\+Name)
+\item 
+void \mbox{\hyperlink{class_generic_schema_validator_a27542a75617cdc28f6846b594fe01229}{Add\+Dependency\+Schema\+Error}} (const \mbox{\hyperlink{class_generic_schema_validator_a258a5978bf9194b5a2dac36daebc3041}{SValue}} \&source\+Name, ISchema\+Validator \texorpdfstring{$\ast$}{*}subvalidator)
+\item 
+bool \mbox{\hyperlink{class_generic_schema_validator_ab6d1c964faaa0f86f9da51a0f66dc1e4}{End\+Dependency\+Errors}} ()
+\item 
+void \mbox{\hyperlink{class_generic_schema_validator_a2157f6c639b0464d9e34b00270472a19}{Disallowed\+Value}} ()
+\item 
+void \mbox{\hyperlink{class_generic_schema_validator_a9904719420fd91200f80772e92fe225f}{Start\+Disallowed\+Type}} ()
+\item 
+void \mbox{\hyperlink{class_generic_schema_validator_a68e5308e5ca9726ee66139a212b63bcc}{Add\+Expected\+Type}} (const typename Schema\+Type\+::\+Value\+Type \&expected\+Type)
+\item 
+void \mbox{\hyperlink{class_generic_schema_validator_ae0f99bfee3e2021c05322fd5d6de2f6e}{End\+Disallowed\+Type}} (const typename Schema\+Type\+::\+Value\+Type \&actual\+Type)
+\item 
+void \mbox{\hyperlink{class_generic_schema_validator_a4275b02cdd86bfe11b42afe94817eae5}{Not\+All\+Of}} (ISchema\+Validator \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}subvalidators, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}})
+\item 
+void \mbox{\hyperlink{class_generic_schema_validator_aae9c45082721c650b91f8418cecc7293}{None\+Of}} (ISchema\+Validator \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}subvalidators, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}})
+\item 
+void \mbox{\hyperlink{class_generic_schema_validator_ad4819a91a42d781391760f26014cd315}{Not\+One\+Of}} (ISchema\+Validator \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}subvalidators, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}})
+\item 
+void \mbox{\hyperlink{class_generic_schema_validator_acc65a322086c792d6534e306c7a091cf}{Disallowed}} ()
+\item 
+bool \mbox{\hyperlink{class_generic_schema_validator_a7137af73e934f50c66cbb8a9aa802ea6}{Null}} ()
+\item 
+bool \mbox{\hyperlink{class_generic_schema_validator_aa25fa7456f2f308a105e400f01a4afde}{Bool}} (bool b)
+\item 
+bool \mbox{\hyperlink{class_generic_schema_validator_ad823c29990225661a4df69d34647b659}{Int}} (int i)
+\item 
+bool \mbox{\hyperlink{class_generic_schema_validator_aa688665c5274f93543c84a4b6cabe8da}{Uint}} (unsigned u)
+\item 
+bool \mbox{\hyperlink{class_generic_schema_validator_ac5a9e416e18129a7b787f251019a828f}{Int64}} (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} i)
+\item 
+bool \mbox{\hyperlink{class_generic_schema_validator_abfc56c58cf0b65318e376fc5f2879292}{Uint64}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} u)
+\item 
+bool \mbox{\hyperlink{class_generic_schema_validator_aed0532dbda3ac6f3ca7196af06066b86}{Double}} (double d)
+\item 
+bool \mbox{\hyperlink{class_generic_schema_validator_ae4f024145421d2c1dde08a9de528722a}{Raw\+Number}} (const \mbox{\hyperlink{class_generic_schema_validator_a18b5119c8e964d37c2252706439e27cd}{Ch}} \texorpdfstring{$\ast$}{*}str, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} length, bool copy)
+\item 
+bool \mbox{\hyperlink{class_generic_schema_validator_a33cf3f83307a8fea38c3238ef75c3d58}{String}} (const \mbox{\hyperlink{class_generic_schema_validator_a18b5119c8e964d37c2252706439e27cd}{Ch}} \texorpdfstring{$\ast$}{*}str, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} length, bool copy)
+\item 
+bool \mbox{\hyperlink{class_generic_schema_validator_a59972d612c3d37aae9a30222e428d216}{Start\+Object}} ()
+\item 
+bool \mbox{\hyperlink{class_generic_schema_validator_a6d08b458216ec4a09eed9d94800d05c1}{Key}} (const \mbox{\hyperlink{class_generic_schema_validator_a18b5119c8e964d37c2252706439e27cd}{Ch}} \texorpdfstring{$\ast$}{*}str, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}, bool copy)
+\item 
+bool \mbox{\hyperlink{class_generic_schema_validator_aa89e14f0f731f6acdec22a0f7e003037}{End\+Object}} (\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} member\+Count)
+\item 
+bool \mbox{\hyperlink{class_generic_schema_validator_aba13751f802531ed8cbd850778ea993c}{Start\+Array}} ()
+\item 
+bool \mbox{\hyperlink{class_generic_schema_validator_a67b501f0f65d40e0086ca8216882b34f}{End\+Array}} (\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} element\+Count)
+\item 
+virtual ISchema\+Validator \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_generic_schema_validator_a6a999ead244d04bd9c386cf3c868d54c}{Create\+Schema\+Validator}} (const \mbox{\hyperlink{class_generic_schema_validator_a405cf694dc7f2702e27de6e30c7ba00d}{Schema\+Type}} \&root)
+\item 
+virtual void \mbox{\hyperlink{class_generic_schema_validator_ae24fa298e328f1fd7dda2ef6267156d2}{Destroy\+Schema\+Validator}} (ISchema\+Validator \texorpdfstring{$\ast$}{*}validator)
+\item 
+virtual void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_generic_schema_validator_a48ecc252813e60a0efdb4eb44b193bd5}{Create\+Hasher}} ()
+\item 
+virtual \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{class_generic_schema_validator_ac01c45982a1f512e1ca06fe5544b0c0f}{Get\+Hash\+Code}} (void \texorpdfstring{$\ast$}{*}hasher)
+\item 
+virtual void \mbox{\hyperlink{class_generic_schema_validator_a007eef58be575dc562543d069ddd2710}{Destrory\+Hasher}} (void \texorpdfstring{$\ast$}{*}hasher)
+\item 
+virtual void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_generic_schema_validator_a9f983043d6bd1a12d9e2dac756dabbae}{Malloc\+State}} (size\+\_\+t size)
+\item 
+virtual void \mbox{\hyperlink{class_generic_schema_validator_a4e250737a411af2969a9e585a7da4187}{Free\+State}} (void \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classinternal_1_1_i_schema_state_factory}{internal\+::\+ISchema\+State\+Factory$<$ Schema\+Document\+Type\+::\+Schema\+Type $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{classinternal_1_1_i_schema_state_factory_ae769eac75f9561fc8d0da7fadad2f6b4}{\texorpdfstring{$\sim$}{\string~}\+ISchema\+State\+Factory}} ()
+\item 
+virtual \mbox{\hyperlink{classinternal_1_1_i_schema_validator}{ISchema\+Validator}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classinternal_1_1_i_schema_state_factory_a701ea8bed7af3f8e2f92d8009afca0c1}{Create\+Schema\+Validator}} (const Schema\+Type \&)=0
+\item 
+virtual void \mbox{\hyperlink{classinternal_1_1_i_schema_state_factory_a112cbf154077050bc30ffe670032442c}{Destroy\+Schema\+Validator}} (\mbox{\hyperlink{classinternal_1_1_i_schema_validator}{ISchema\+Validator}} \texorpdfstring{$\ast$}{*}validator)=0
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classinternal_1_1_i_schema_validator}{internal\+::\+ISchema\+Validator}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{classinternal_1_1_i_schema_validator_aac77356c7a3f439bc5fb5302f3060c1d}{\texorpdfstring{$\sim$}{\string~}\+ISchema\+Validator}} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler}{internal\+::\+IValidation\+Error\+Handler$<$ Schema\+Document\+Type\+::\+Schema\+Type $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a79e5eb5707b73497cff913093dfec060}{\texorpdfstring{$\sim$}{\string~}\+IValidation\+Error\+Handler}} ()
+\item 
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_ae000553bd9312a5090eed393541243af}{Too\+Long}} (const \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_abba4e628023fc09afffd499b3675c5bf}{Ch}} \texorpdfstring{$\ast$}{*}str, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} length, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} expected)=0
+\item 
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a57f0cd2c2c9781af0e4c447700537f23}{Too\+Short}} (const \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_abba4e628023fc09afffd499b3675c5bf}{Ch}} \texorpdfstring{$\ast$}{*}str, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} length, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} expected)=0
+\item 
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a9551391add918d6679f9a2a85dffc19c}{Does\+Not\+Match}} (const \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_abba4e628023fc09afffd499b3675c5bf}{Ch}} \texorpdfstring{$\ast$}{*}str, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} length)=0
+\item 
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_abd92773fa046eeb6fd8416468e62e5b1}{Property\+Violations}} (\mbox{\hyperlink{classinternal_1_1_i_schema_validator}{ISchema\+Validator}} \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}subvalidators, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}})=0
+\item 
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a689b8acc4cbe3e8683c1a29950438ac8}{Disallowed\+Property}} (const \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_abba4e628023fc09afffd499b3675c5bf}{Ch}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} length)=0
+\item 
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a4b43ba6e6a9c544dfc631297104dc508}{Add\+Dependency\+Schema\+Error}} (const \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a3cb3350cdd81afff317ac3787b40f48e}{SValue}} \&souce\+Name, \mbox{\hyperlink{classinternal_1_1_i_schema_validator}{ISchema\+Validator}} \texorpdfstring{$\ast$}{*}subvalidator)=0
+\item 
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a3ce77d66a09eb5d91833fc86f8fa5680}{Not\+All\+Of}} (\mbox{\hyperlink{classinternal_1_1_i_schema_validator}{ISchema\+Validator}} \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}subvalidators, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}})=0
+\item 
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a70105117617fc7edbe7f032975888e13}{None\+Of}} (\mbox{\hyperlink{classinternal_1_1_i_schema_validator}{ISchema\+Validator}} \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}subvalidators, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}})=0
+\item 
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a76cae77f1b841843473f7a61975aa8e6}{Not\+One\+Of}} (\mbox{\hyperlink{classinternal_1_1_i_schema_validator}{ISchema\+Validator}} \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}subvalidators, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}})=0
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Schema\+Document\+Type, typename Output\+Handler = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator = Crt\+Allocator$>$\newline
+class Generic\+Schema\+Validator$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$}
+\doxylink{struct_a}{A} SAX style JSON schema validator. It uses a {\ttfamily \doxylink{class_generic_schema_document}{Generic\+Schema\+Document}} to validate SAX events. It delegates the incoming SAX events to an output handler. The default output handler does nothing. It can be reused multiple times by calling {\ttfamily \doxylink{class_generic_schema_validator_a49efbbe098cb77728be3d48cafed17e4}{Reset()}}.
+
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em Schema\+Document\+Type} & Type of schema document. \\
+\hline
+{\em Output\+Handler} & Type of output handler. Default handler does nothing. \\
+\hline
+{\em State\+Allocator} & Allocator for storing the internal validation states. \\
+\hline
+\end{DoxyTemplParams}
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l01763}{1763}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{class_generic_schema_validator_a18b5119c8e964d37c2252706439e27cd}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!Ch@{Ch}}
+\index{Ch@{Ch}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{Ch}{Ch}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_a18b5119c8e964d37c2252706439e27cd} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+Encoding\+Type\+::\+Ch \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+Ch}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l01773}{1773}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+\Hypertarget{class_generic_schema_validator_aa8361a14e41de7e918c45a978e834e91}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!EncodingType@{EncodingType}}
+\index{EncodingType@{EncodingType}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{EncodingType}{EncodingType}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_aa8361a14e41de7e918c45a978e834e91} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+Schema\+Type\+::\+Encoding\+Type \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+Encoding\+Type}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l01771}{1771}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+\Hypertarget{class_generic_schema_validator_a9e29fab15005c947ec941898fe9d3e2a}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!PointerType@{PointerType}}
+\index{PointerType@{PointerType}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{PointerType}{PointerType}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_a9e29fab15005c947ec941898fe9d3e2a} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+Schema\+Document\+Type\+::\+Pointer\+Type \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+Pointer\+Type}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l01770}{1770}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+\Hypertarget{class_generic_schema_validator_a405cf694dc7f2702e27de6e30c7ba00d}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!SchemaType@{SchemaType}}
+\index{SchemaType@{SchemaType}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{SchemaType}{SchemaType}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_a405cf694dc7f2702e27de6e30c7ba00d} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+Schema\+Document\+Type\+::\+Schema\+Type \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+Schema\+Type}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l01769}{1769}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+\Hypertarget{class_generic_schema_validator_a4cb7ab643de05437f8c0263fd902b8c0}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!StringRefType@{StringRefType}}
+\index{StringRefType@{StringRefType}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{StringRefType}{StringRefType}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_a4cb7ab643de05437f8c0263fd902b8c0} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+\mbox{\hyperlink{struct_generic_string_ref}{Generic\+String\+Ref}}$<$\mbox{\hyperlink{class_generic_schema_validator_a18b5119c8e964d37c2252706439e27cd}{Ch}}$>$ \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+String\+Ref\+Type}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l01774}{1774}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+\Hypertarget{class_generic_schema_validator_a258a5978bf9194b5a2dac36daebc3041}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!SValue@{SValue}}
+\index{SValue@{SValue}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{SValue}{SValue}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_a258a5978bf9194b5a2dac36daebc3041} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+Schema\+Type\+::\+SValue \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+SValue}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l01772}{1772}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+\Hypertarget{class_generic_schema_validator_adbc6401414470cc4feef8f03a43690cb}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!ValueType@{ValueType}}
+\index{ValueType@{ValueType}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{ValueType}{ValueType}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_adbc6401414470cc4feef8f03a43690cb} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+\mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$\mbox{\hyperlink{class_generic_schema_validator_aa8361a14e41de7e918c45a978e834e91}{Encoding\+Type}}, State\+Allocator$>$ \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+Value\+Type}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l01775}{1775}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_generic_schema_validator_a202ee6fdbe5ae9eab3e77a81ecdfeb6d}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!GenericSchemaValidator@{GenericSchemaValidator}}
+\index{GenericSchemaValidator@{GenericSchemaValidator}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{GenericSchemaValidator()}{GenericSchemaValidator()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_a202ee6fdbe5ae9eab3e77a81ecdfeb6d} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+\mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\mbox{\hyperlink{class_generic_schema_validator}{\+::\+Generic\+Schema\+Validator}} (\begin{DoxyParamCaption}\item[{const Schema\+Document\+Type \&}]{schema\+Document}{, }\item[{State\+Allocator \texorpdfstring{$\ast$}{*}}]{allocator}{ = {\ttfamily 0}, }\item[{size\+\_\+t}]{schema\+Stack\+Capacity}{ = {\ttfamily kDefaultSchemaStackCapacity}, }\item[{size\+\_\+t}]{document\+Stack\+Capacity}{ = {\ttfamily kDefaultDocumentStackCapacity}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+\begin{DoxyParams}{Parameters}
+{\em schema\+Document} & The schema document to conform to. \\
+\hline
+{\em allocator} & Optional allocator for storing internal validation states. \\
+\hline
+{\em schema\+Stack\+Capacity} & Optional initial capacity of schema path stack. \\
+\hline
+{\em document\+Stack\+Capacity} & Optional initial capacity of document path stack. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l01784}{1784}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01789\ \ \ \ \ \ \ \ \ :}
+\DoxyCodeLine{01790\ \ \ \ \ \ \ \ \ schemaDocument\_(\&schemaDocument),}
+\DoxyCodeLine{01791\ \ \ \ \ \ \ \ \ root\_(schemaDocument.GetRoot()),}
+\DoxyCodeLine{01792\ \ \ \ \ \ \ \ \ stateAllocator\_(allocator),}
+\DoxyCodeLine{01793\ \ \ \ \ \ \ \ \ ownStateAllocator\_(0),}
+\DoxyCodeLine{01794\ \ \ \ \ \ \ \ \ schemaStack\_(allocator,\ schemaStackCapacity),}
+\DoxyCodeLine{01795\ \ \ \ \ \ \ \ \ documentStack\_(allocator,\ documentStackCapacity),}
+\DoxyCodeLine{01796\ \ \ \ \ \ \ \ \ outputHandler\_(0),}
+\DoxyCodeLine{01797\ \ \ \ \ \ \ \ \ error\_(\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7a146f46700e905e8df96a6a90b5c7640f}{kObjectType}}),}
+\DoxyCodeLine{01798\ \ \ \ \ \ \ \ \ currentError\_(),}
+\DoxyCodeLine{01799\ \ \ \ \ \ \ \ \ missingDependents\_(),}
+\DoxyCodeLine{01800\ \ \ \ \ \ \ \ \ valid\_(\textcolor{keyword}{true})}
+\DoxyCodeLine{01801\ \textcolor{preprocessor}{\#if\ RAPIDJSON\_SCHEMA\_VERBOSE}}
+\DoxyCodeLine{01802\ \ \ \ \ \ \ \ \ ,\ depth\_(0)}
+\DoxyCodeLine{01803\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{01804\ \ \ \ \ \{}
+\DoxyCodeLine{01805\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_generic_schema_validator_a202ee6fdbe5ae9eab3e77a81ecdfeb6d_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_schema_validator_ac2027be8ca55b01cd6f38b45f4e233b4}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!GenericSchemaValidator@{GenericSchemaValidator}}
+\index{GenericSchemaValidator@{GenericSchemaValidator}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{GenericSchemaValidator()}{GenericSchemaValidator()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_ac2027be8ca55b01cd6f38b45f4e233b4} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+\mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\mbox{\hyperlink{class_generic_schema_validator}{\+::\+Generic\+Schema\+Validator}} (\begin{DoxyParamCaption}\item[{const Schema\+Document\+Type \&}]{schema\+Document}{, }\item[{Output\+Handler \&}]{output\+Handler}{, }\item[{State\+Allocator \texorpdfstring{$\ast$}{*}}]{allocator}{ = {\ttfamily 0}, }\item[{size\+\_\+t}]{schema\+Stack\+Capacity}{ = {\ttfamily kDefaultSchemaStackCapacity}, }\item[{size\+\_\+t}]{document\+Stack\+Capacity}{ = {\ttfamily kDefaultDocumentStackCapacity}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+\begin{DoxyParams}{Parameters}
+{\em schema\+Document} & The schema document to conform to. \\
+\hline
+{\em allocator} & Optional allocator for storing internal validation states. \\
+\hline
+{\em schema\+Stack\+Capacity} & Optional initial capacity of schema path stack. \\
+\hline
+{\em document\+Stack\+Capacity} & Optional initial capacity of document path stack. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l01814}{1814}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01820\ \ \ \ \ \ \ \ \ :}
+\DoxyCodeLine{01821\ \ \ \ \ \ \ \ \ schemaDocument\_(\&schemaDocument),}
+\DoxyCodeLine{01822\ \ \ \ \ \ \ \ \ root\_(schemaDocument.GetRoot()),}
+\DoxyCodeLine{01823\ \ \ \ \ \ \ \ \ stateAllocator\_(allocator),}
+\DoxyCodeLine{01824\ \ \ \ \ \ \ \ \ ownStateAllocator\_(0),}
+\DoxyCodeLine{01825\ \ \ \ \ \ \ \ \ schemaStack\_(allocator,\ schemaStackCapacity),}
+\DoxyCodeLine{01826\ \ \ \ \ \ \ \ \ documentStack\_(allocator,\ documentStackCapacity),}
+\DoxyCodeLine{01827\ \ \ \ \ \ \ \ \ outputHandler\_(\&outputHandler),}
+\DoxyCodeLine{01828\ \ \ \ \ \ \ \ \ error\_(\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7a146f46700e905e8df96a6a90b5c7640f}{kObjectType}}),}
+\DoxyCodeLine{01829\ \ \ \ \ \ \ \ \ currentError\_(),}
+\DoxyCodeLine{01830\ \ \ \ \ \ \ \ \ missingDependents\_(),}
+\DoxyCodeLine{01831\ \ \ \ \ \ \ \ \ valid\_(\textcolor{keyword}{true})}
+\DoxyCodeLine{01832\ \textcolor{preprocessor}{\#if\ RAPIDJSON\_SCHEMA\_VERBOSE}}
+\DoxyCodeLine{01833\ \ \ \ \ \ \ \ \ ,\ depth\_(0)}
+\DoxyCodeLine{01834\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{01835\ \ \ \ \ \{}
+\DoxyCodeLine{01836\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_schema_validator_a3eab83d483a50efb0c0390adf3291963}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!````~GenericSchemaValidator@{\texorpdfstring{$\sim$}{\string~}GenericSchemaValidator}}
+\index{````~GenericSchemaValidator@{\texorpdfstring{$\sim$}{\string~}GenericSchemaValidator}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}GenericSchemaValidator()}{\string~GenericSchemaValidator()}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_a3eab83d483a50efb0c0390adf3291963} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+\mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\texorpdfstring{$\sim$}{\string~}\mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l01839}{1839}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01839\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01840\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_schema_validator_a49efbbe098cb77728be3d48cafed17e4}{Reset}}();}
+\DoxyCodeLine{01841\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_a52c941c3fdd646527cdcd42aa846a28a}{RAPIDJSON\_DELETE}}(ownStateAllocator\_);}
+\DoxyCodeLine{01842\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_generic_schema_validator_a3eab83d483a50efb0c0390adf3291963_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_generic_schema_validator_abcf1f5b46bdae8ca20a80858d603483d}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!AboveMaximum@{AboveMaximum}}
+\index{AboveMaximum@{AboveMaximum}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{AboveMaximum()}{AboveMaximum()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_abcf1f5b46bdae8ca20a80858d603483d} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+void \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+Above\+Maximum (\begin{DoxyParamCaption}\item[{double}]{actual}{, }\item[{const \mbox{\hyperlink{class_generic_schema_validator_a258a5978bf9194b5a2dac36daebc3041}{SValue}} \&}]{expected}{, }\item[{bool}]{exclusive}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a5b9e4690c26adbf4128b0b16f9e0625f}{internal\+::\+IValidation\+Error\+Handler$<$ Schema\+Document\+Type\+::\+Schema\+Type $>$}}.
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l01900}{1900}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01900\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01901\ \ \ \ \ \ \ \ \ AddNumberError(SchemaType::GetMaximumString(),\ \mbox{\hyperlink{class_generic_schema_validator_adbc6401414470cc4feef8f03a43690cb}{ValueType}}(actual).Move(),\ expected,}
+\DoxyCodeLine{01902\ \ \ \ \ \ \ \ \ \ \ \ \ exclusive\ ?\ \&SchemaType::GetExclusiveMaximumString\ :\ 0);}
+\DoxyCodeLine{01903\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_schema_validator_a4c9c7db8a3488f84a5a86681ad1d8194}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!AboveMaximum@{AboveMaximum}}
+\index{AboveMaximum@{AboveMaximum}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{AboveMaximum()}{AboveMaximum()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_a4c9c7db8a3488f84a5a86681ad1d8194} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+void \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+Above\+Maximum (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}}]{actual}{, }\item[{const \mbox{\hyperlink{class_generic_schema_validator_a258a5978bf9194b5a2dac36daebc3041}{SValue}} \&}]{expected}{, }\item[{bool}]{exclusive}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a7dc32dfac536f8577cbcb702efde26d2}{internal\+::\+IValidation\+Error\+Handler$<$ Schema\+Document\+Type\+::\+Schema\+Type $>$}}.
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l01892}{1892}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01892\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01893\ \ \ \ \ \ \ \ \ AddNumberError(SchemaType::GetMaximumString(),\ \mbox{\hyperlink{class_generic_schema_validator_adbc6401414470cc4feef8f03a43690cb}{ValueType}}(actual).Move(),\ expected,}
+\DoxyCodeLine{01894\ \ \ \ \ \ \ \ \ \ \ \ \ exclusive\ ?\ \&SchemaType::GetExclusiveMaximumString\ :\ 0);}
+\DoxyCodeLine{01895\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_schema_validator_a9262c73768789eb7cf8dc271cfec7f96}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!AboveMaximum@{AboveMaximum}}
+\index{AboveMaximum@{AboveMaximum}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{AboveMaximum()}{AboveMaximum()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_a9262c73768789eb7cf8dc271cfec7f96} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+void \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+Above\+Maximum (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{actual}{, }\item[{const \mbox{\hyperlink{class_generic_schema_validator_a258a5978bf9194b5a2dac36daebc3041}{SValue}} \&}]{expected}{, }\item[{bool}]{exclusive}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a78554707b14366d2ff7763290e1a6219}{internal\+::\+IValidation\+Error\+Handler$<$ Schema\+Document\+Type\+::\+Schema\+Type $>$}}.
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l01896}{1896}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01896\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01897\ \ \ \ \ \ \ \ \ AddNumberError(SchemaType::GetMaximumString(),\ \mbox{\hyperlink{class_generic_schema_validator_adbc6401414470cc4feef8f03a43690cb}{ValueType}}(actual).Move(),\ expected,}
+\DoxyCodeLine{01898\ \ \ \ \ \ \ \ \ \ \ \ \ exclusive\ ?\ \&SchemaType::GetExclusiveMaximumString\ :\ 0);}
+\DoxyCodeLine{01899\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_schema_validator_a27542a75617cdc28f6846b594fe01229}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!AddDependencySchemaError@{AddDependencySchemaError}}
+\index{AddDependencySchemaError@{AddDependencySchemaError}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{AddDependencySchemaError()}{AddDependencySchemaError()}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_a27542a75617cdc28f6846b594fe01229} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+void \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+Add\+Dependency\+Schema\+Error (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_generic_schema_validator_a258a5978bf9194b5a2dac36daebc3041}{SValue}} \&}]{source\+Name}{, }\item[{ISchema\+Validator \texorpdfstring{$\ast$}{*}}]{subvalidator}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l02000}{2000}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02000\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02001\ \ \ \ \ \ \ \ \ currentError\_.AddMember(\mbox{\hyperlink{class_generic_schema_validator_adbc6401414470cc4feef8f03a43690cb}{ValueType}}(sourceName,\ GetStateAllocator()).Move(),}
+\DoxyCodeLine{02002\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{class_generic_schema_validator}{GenericSchemaValidator}}*\textcolor{keyword}{>}(subvalidator)-\/>\mbox{\hyperlink{class_generic_schema_validator_a21c0ad159e91398d222bab4d91d4c5dd}{GetError}}(),\ GetStateAllocator());}
+\DoxyCodeLine{02003\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_generic_schema_validator_a27542a75617cdc28f6846b594fe01229_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_schema_validator_a68e5308e5ca9726ee66139a212b63bcc}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!AddExpectedType@{AddExpectedType}}
+\index{AddExpectedType@{AddExpectedType}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{AddExpectedType()}{AddExpectedType()}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_a68e5308e5ca9726ee66139a212b63bcc} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+void \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+Add\+Expected\+Type (\begin{DoxyParamCaption}\item[{const typename Schema\+Type\+::\+Value\+Type \&}]{expected\+Type}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a5e4d9e5d937bd54e481f90e23ec3aea4}{internal\+::\+IValidation\+Error\+Handler$<$ Schema\+Document\+Type\+::\+Schema\+Type $>$}}.
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l02021}{2021}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02021\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02022\ \ \ \ \ \ \ \ \ currentError\_.PushBack(\mbox{\hyperlink{class_generic_schema_validator_adbc6401414470cc4feef8f03a43690cb}{ValueType}}(expectedType,\ GetStateAllocator()).Move(),\ GetStateAllocator());}
+\DoxyCodeLine{02023\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_schema_validator_a85f2be483f0ddfc402a97665aff6eca9}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!AddMissingDependentProperty@{AddMissingDependentProperty}}
+\index{AddMissingDependentProperty@{AddMissingDependentProperty}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{AddMissingDependentProperty()}{AddMissingDependentProperty()}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_a85f2be483f0ddfc402a97665aff6eca9} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+void \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+Add\+Missing\+Dependent\+Property (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_generic_schema_validator_a258a5978bf9194b5a2dac36daebc3041}{SValue}} \&}]{target\+Name}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a2e9e0b2f67467a62642e37e839f689c5}{internal\+::\+IValidation\+Error\+Handler$<$ Schema\+Document\+Type\+::\+Schema\+Type $>$}}.
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l01992}{1992}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01992\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01993\ \ \ \ \ \ \ \ \ missingDependents\_.PushBack(\mbox{\hyperlink{class_generic_schema_validator_adbc6401414470cc4feef8f03a43690cb}{ValueType}}(targetName,\ GetStateAllocator()).Move(),\ GetStateAllocator());}
+\DoxyCodeLine{01994\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_schema_validator_a8d355eeb25364e414d9a2f8121aa0eaa}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!AddMissingProperty@{AddMissingProperty}}
+\index{AddMissingProperty@{AddMissingProperty}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{AddMissingProperty()}{AddMissingProperty()}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_a8d355eeb25364e414d9a2f8121aa0eaa} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+void \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+Add\+Missing\+Property (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_generic_schema_validator_a258a5978bf9194b5a2dac36daebc3041}{SValue}} \&}]{name}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a3a2165f53ab565e052bcd35b6d19e473}{internal\+::\+IValidation\+Error\+Handler$<$ Schema\+Document\+Type\+::\+Schema\+Type $>$}}.
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l01964}{1964}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01964\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01965\ \ \ \ \ \ \ \ \ currentError\_.PushBack(\mbox{\hyperlink{class_generic_schema_validator_adbc6401414470cc4feef8f03a43690cb}{ValueType}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ GetStateAllocator()).Move(),\ GetStateAllocator());}
+\DoxyCodeLine{01966\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_schema_validator_afdd4a9787239a6fc3eeb56d34fd531f4}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!BelowMinimum@{BelowMinimum}}
+\index{BelowMinimum@{BelowMinimum}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{BelowMinimum()}{BelowMinimum()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_afdd4a9787239a6fc3eeb56d34fd531f4} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+void \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+Below\+Minimum (\begin{DoxyParamCaption}\item[{double}]{actual}{, }\item[{const \mbox{\hyperlink{class_generic_schema_validator_a258a5978bf9194b5a2dac36daebc3041}{SValue}} \&}]{expected}{, }\item[{bool}]{exclusive}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a921da9a7fa127035a2a259b19813230e}{internal\+::\+IValidation\+Error\+Handler$<$ Schema\+Document\+Type\+::\+Schema\+Type $>$}}.
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l01912}{1912}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01912\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01913\ \ \ \ \ \ \ \ \ AddNumberError(SchemaType::GetMinimumString(),\ \mbox{\hyperlink{class_generic_schema_validator_adbc6401414470cc4feef8f03a43690cb}{ValueType}}(actual).Move(),\ expected,}
+\DoxyCodeLine{01914\ \ \ \ \ \ \ \ \ \ \ \ \ exclusive\ ?\ \&SchemaType::GetExclusiveMinimumString\ :\ 0);}
+\DoxyCodeLine{01915\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_schema_validator_a15a12306bc14f16357b4f2edea8396b7}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!BelowMinimum@{BelowMinimum}}
+\index{BelowMinimum@{BelowMinimum}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{BelowMinimum()}{BelowMinimum()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_a15a12306bc14f16357b4f2edea8396b7} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+void \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+Below\+Minimum (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}}]{actual}{, }\item[{const \mbox{\hyperlink{class_generic_schema_validator_a258a5978bf9194b5a2dac36daebc3041}{SValue}} \&}]{expected}{, }\item[{bool}]{exclusive}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a5ad9849c01a0bfa923d37ef2f1b4c933}{internal\+::\+IValidation\+Error\+Handler$<$ Schema\+Document\+Type\+::\+Schema\+Type $>$}}.
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l01904}{1904}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01904\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01905\ \ \ \ \ \ \ \ \ AddNumberError(SchemaType::GetMinimumString(),\ \mbox{\hyperlink{class_generic_schema_validator_adbc6401414470cc4feef8f03a43690cb}{ValueType}}(actual).Move(),\ expected,}
+\DoxyCodeLine{01906\ \ \ \ \ \ \ \ \ \ \ \ \ exclusive\ ?\ \&SchemaType::GetExclusiveMinimumString\ :\ 0);}
+\DoxyCodeLine{01907\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_schema_validator_ad3db1f3852a1b2e6fada43fbcad401ea}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!BelowMinimum@{BelowMinimum}}
+\index{BelowMinimum@{BelowMinimum}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{BelowMinimum()}{BelowMinimum()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_ad3db1f3852a1b2e6fada43fbcad401ea} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+void \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+Below\+Minimum (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{actual}{, }\item[{const \mbox{\hyperlink{class_generic_schema_validator_a258a5978bf9194b5a2dac36daebc3041}{SValue}} \&}]{expected}{, }\item[{bool}]{exclusive}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_aa7bbfd1a69ba08ae31f87cb96ab5ec04}{internal\+::\+IValidation\+Error\+Handler$<$ Schema\+Document\+Type\+::\+Schema\+Type $>$}}.
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l01908}{1908}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01908\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01909\ \ \ \ \ \ \ \ \ AddNumberError(SchemaType::GetMinimumString(),\ \mbox{\hyperlink{class_generic_schema_validator_adbc6401414470cc4feef8f03a43690cb}{ValueType}}(actual).Move(),\ expected,}
+\DoxyCodeLine{01910\ \ \ \ \ \ \ \ \ \ \ \ \ exclusive\ ?\ \&SchemaType::GetExclusiveMinimumString\ :\ 0);}
+\DoxyCodeLine{01911\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_schema_validator_aa25fa7456f2f308a105e400f01a4afde}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!Bool@{Bool}}
+\index{Bool@{Bool}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{Bool()}{Bool()}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_aa25fa7456f2f308a105e400f01a4afde} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+bool \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\mbox{\hyperlink{struct_bool}{\+::\+Bool}} (\begin{DoxyParamCaption}\item[{bool}]{b}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l02104}{2104}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02104\ \{\ \mbox{\hyperlink{schema_8h_a8c347782f5ba7abab760e5dbc5795c41}{RAPIDJSON\_SCHEMA\_HANDLE\_VALUE\_}}(\mbox{\hyperlink{struct_bool}{Bool}},\ \ \ (CurrentContext(),\ b),\ (b));\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_schema_validator_a48ecc252813e60a0efdb4eb44b193bd5}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!CreateHasher@{CreateHasher}}
+\index{CreateHasher@{CreateHasher}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{CreateHasher()}{CreateHasher()}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_a48ecc252813e60a0efdb4eb44b193bd5} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+virtual void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+Create\+Hasher (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classinternal_1_1_i_schema_state_factory_ab26076418c94535cec2af570e8b0a436}{internal\+::\+ISchema\+State\+Factory$<$ Schema\+Document\+Type\+::\+Schema\+Type $>$}}.
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l02169}{2169}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02169\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02170\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ (GetStateAllocator().Malloc(\textcolor{keyword}{sizeof}(HasherType)))\ HasherType(\&GetStateAllocator());}
+\DoxyCodeLine{02171\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_schema_validator_a6a999ead244d04bd9c386cf3c868d54c}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!CreateSchemaValidator@{CreateSchemaValidator}}
+\index{CreateSchemaValidator@{CreateSchemaValidator}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{CreateSchemaValidator()}{CreateSchemaValidator()}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_a6a999ead244d04bd9c386cf3c868d54c} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+virtual ISchema\+Validator \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+Create\+Schema\+Validator (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_generic_schema_validator_a405cf694dc7f2702e27de6e30c7ba00d}{Schema\+Type}} \&}]{root}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l02155}{2155}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02155\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02156\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ (GetStateAllocator().Malloc(\textcolor{keyword}{sizeof}(\mbox{\hyperlink{class_generic_schema_validator}{GenericSchemaValidator}})))\ \mbox{\hyperlink{class_generic_schema_validator_a202ee6fdbe5ae9eab3e77a81ecdfeb6d}{GenericSchemaValidator}}(*schemaDocument\_,\ root,\ documentStack\_.template\ Bottom<char>(),\ documentStack\_.GetSize(),}
+\DoxyCodeLine{02157\ \#\textcolor{keywordflow}{if}\ \mbox{\hyperlink{schema_8h_a40c690b6fd0b7ae8d8484b613255cc72}{RAPIDJSON\_SCHEMA\_VERBOSE}}}
+\DoxyCodeLine{02158\ \ \ \ \ \ \ \ \ depth\_\ +\ 1,}
+\DoxyCodeLine{02159\ \#endif}
+\DoxyCodeLine{02160\ \ \ \ \ \ \ \ \ \&GetStateAllocator());}
+\DoxyCodeLine{02161\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_generic_schema_validator_a6a999ead244d04bd9c386cf3c868d54c_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_schema_validator_a007eef58be575dc562543d069ddd2710}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!DestroryHasher@{DestroryHasher}}
+\index{DestroryHasher@{DestroryHasher}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{DestroryHasher()}{DestroryHasher()}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_a007eef58be575dc562543d069ddd2710} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+virtual void \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+Destrory\+Hasher (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{hasher}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classinternal_1_1_i_schema_state_factory_a70b8d88180d2e6993105b17f19101635}{internal\+::\+ISchema\+State\+Factory$<$ Schema\+Document\+Type\+::\+Schema\+Type $>$}}.
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l02177}{2177}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02177\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02178\ \ \ \ \ \ \ \ \ HasherType*\ h\ =\ \textcolor{keyword}{static\_cast<}HasherType*\textcolor{keyword}{>}(hasher);}
+\DoxyCodeLine{02179\ \ \ \ \ \ \ \ \ h-\/>\string~HasherType();}
+\DoxyCodeLine{02180\ \ \ \ \ \ \ \ \ StateAllocator::Free(h);}
+\DoxyCodeLine{02181\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_schema_validator_ae24fa298e328f1fd7dda2ef6267156d2}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!DestroySchemaValidator@{DestroySchemaValidator}}
+\index{DestroySchemaValidator@{DestroySchemaValidator}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{DestroySchemaValidator()}{DestroySchemaValidator()}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_ae24fa298e328f1fd7dda2ef6267156d2} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+virtual void \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+Destroy\+Schema\+Validator (\begin{DoxyParamCaption}\item[{ISchema\+Validator \texorpdfstring{$\ast$}{*}}]{validator}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l02163}{2163}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02163\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02164\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_schema_validator}{GenericSchemaValidator}}*\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{class_generic_schema_validator}{GenericSchemaValidator}}*\textcolor{keyword}{>}(validator);}
+\DoxyCodeLine{02165\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>\string~GenericSchemaValidator();}
+\DoxyCodeLine{02166\ \ \ \ \ \ \ \ \ StateAllocator::Free(v);}
+\DoxyCodeLine{02167\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_schema_validator_acc65a322086c792d6534e306c7a091cf}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!Disallowed@{Disallowed}}
+\index{Disallowed@{Disallowed}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{Disallowed()}{Disallowed()}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_acc65a322086c792d6534e306c7a091cf} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+void \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+Disallowed (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a570a6723282e6c0576a47c492ffe5602}{internal\+::\+IValidation\+Error\+Handler$<$ Schema\+Document\+Type\+::\+Schema\+Type $>$}}.
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l02042}{2042}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02042\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02043\ \ \ \ \ \ \ \ \ currentError\_.SetObject();}
+\DoxyCodeLine{02044\ \ \ \ \ \ \ \ \ AddCurrentError(SchemaType::GetNotString());}
+\DoxyCodeLine{02045\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_schema_validator_a2d47a88a3d9fb82466b5bda480b6e70f}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!DisallowedItem@{DisallowedItem}}
+\index{DisallowedItem@{DisallowedItem}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{DisallowedItem()}{DisallowedItem()}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_a2d47a88a3d9fb82466b5bda480b6e70f} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+void \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+Disallowed\+Item (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{index}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a0ac36d4217d9a14205cbe392601f3ee7}{internal\+::\+IValidation\+Error\+Handler$<$ Schema\+Document\+Type\+::\+Schema\+Type $>$}}.
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l01931}{1931}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01931\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01932\ \ \ \ \ \ \ \ \ currentError\_.SetObject();}
+\DoxyCodeLine{01933\ \ \ \ \ \ \ \ \ currentError\_.AddMember(GetDisallowedString(),\ \mbox{\hyperlink{class_generic_schema_validator_adbc6401414470cc4feef8f03a43690cb}{ValueType}}(index).Move(),\ GetStateAllocator());}
+\DoxyCodeLine{01934\ \ \ \ \ \ \ \ \ AddCurrentError(SchemaType::GetAdditionalItemsString(),\ \textcolor{keyword}{true});}
+\DoxyCodeLine{01935\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_schema_validator_a44f06b99edfb650c6088f17e8af5b5a8}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!DisallowedProperty@{DisallowedProperty}}
+\index{DisallowedProperty@{DisallowedProperty}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{DisallowedProperty()}{DisallowedProperty()}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_a44f06b99edfb650c6088f17e8af5b5a8} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+void \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+Disallowed\+Property (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_generic_schema_validator_a18b5119c8e964d37c2252706439e27cd}{Ch}} \texorpdfstring{$\ast$}{*}}]{name}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{length}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l01980}{1980}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01980\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01981\ \ \ \ \ \ \ \ \ currentError\_.SetObject();}
+\DoxyCodeLine{01982\ \ \ \ \ \ \ \ \ currentError\_.AddMember(GetDisallowedString(),\ \mbox{\hyperlink{class_generic_schema_validator_adbc6401414470cc4feef8f03a43690cb}{ValueType}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ length,\ GetStateAllocator()).Move(),\ GetStateAllocator());}
+\DoxyCodeLine{01983\ \ \ \ \ \ \ \ \ AddCurrentError(SchemaType::GetAdditionalPropertiesString(),\ \textcolor{keyword}{true});}
+\DoxyCodeLine{01984\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_schema_validator_a2157f6c639b0464d9e34b00270472a19}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!DisallowedValue@{DisallowedValue}}
+\index{DisallowedValue@{DisallowedValue}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{DisallowedValue()}{DisallowedValue()}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_a2157f6c639b0464d9e34b00270472a19} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+void \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+Disallowed\+Value (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_acd352694d7b970b8695e9c0651eb5bab}{internal\+::\+IValidation\+Error\+Handler$<$ Schema\+Document\+Type\+::\+Schema\+Type $>$}}.
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l02014}{2014}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02014\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02015\ \ \ \ \ \ \ \ \ currentError\_.SetObject();}
+\DoxyCodeLine{02016\ \ \ \ \ \ \ \ \ AddCurrentError(SchemaType::GetEnumString());}
+\DoxyCodeLine{02017\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_schema_validator_af1be05889e634936c223f24c6e5f6ec5}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!DoesNotMatch@{DoesNotMatch}}
+\index{DoesNotMatch@{DoesNotMatch}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{DoesNotMatch()}{DoesNotMatch()}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_af1be05889e634936c223f24c6e5f6ec5} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+void \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+Does\+Not\+Match (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_generic_schema_validator_a18b5119c8e964d37c2252706439e27cd}{Ch}} \texorpdfstring{$\ast$}{*}}]{str}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{length}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l01925}{1925}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01925\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01926\ \ \ \ \ \ \ \ \ currentError\_.SetObject();}
+\DoxyCodeLine{01927\ \ \ \ \ \ \ \ \ currentError\_.AddMember(GetActualString(),\ \mbox{\hyperlink{class_generic_schema_validator_adbc6401414470cc4feef8f03a43690cb}{ValueType}}(str,\ length,\ GetStateAllocator()).Move(),\ GetStateAllocator());}
+\DoxyCodeLine{01928\ \ \ \ \ \ \ \ \ AddCurrentError(SchemaType::GetPatternString());}
+\DoxyCodeLine{01929\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_schema_validator_aed0532dbda3ac6f3ca7196af06066b86}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!Double@{Double}}
+\index{Double@{Double}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{Double()}{Double()}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_aed0532dbda3ac6f3ca7196af06066b86} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+bool \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+Double (\begin{DoxyParamCaption}\item[{double}]{d}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l02109}{2109}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02109\ \{\ \mbox{\hyperlink{schema_8h_a8c347782f5ba7abab760e5dbc5795c41}{RAPIDJSON\_SCHEMA\_HANDLE\_VALUE\_}}(\mbox{\hyperlink{class_generic_schema_validator_aed0532dbda3ac6f3ca7196af06066b86}{Double}},\ (CurrentContext(),\ d),\ (d));\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=203pt]{class_generic_schema_validator_aed0532dbda3ac6f3ca7196af06066b86_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=203pt]{class_generic_schema_validator_aed0532dbda3ac6f3ca7196af06066b86_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_schema_validator_a82aa865146069e3ba5010d25346a71f2}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!DuplicateItems@{DuplicateItems}}
+\index{DuplicateItems@{DuplicateItems}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{DuplicateItems()}{DuplicateItems()}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_a82aa865146069e3ba5010d25346a71f2} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+void \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+Duplicate\+Items (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{index1}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{index2}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a3a0836796f39c946f31f87b80ddd6cf1}{internal\+::\+IValidation\+Error\+Handler$<$ Schema\+Document\+Type\+::\+Schema\+Type $>$}}.
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l01944}{1944}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01944\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01945\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_schema_validator_adbc6401414470cc4feef8f03a43690cb}{ValueType}}\ duplicates(\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7af41527d6925efa3c5c3dadb23dfef7c8}{kArrayType}});}
+\DoxyCodeLine{01946\ \ \ \ \ \ \ \ \ duplicates.PushBack(index1,\ GetStateAllocator());}
+\DoxyCodeLine{01947\ \ \ \ \ \ \ \ \ duplicates.PushBack(index2,\ GetStateAllocator());}
+\DoxyCodeLine{01948\ \ \ \ \ \ \ \ \ currentError\_.SetObject();}
+\DoxyCodeLine{01949\ \ \ \ \ \ \ \ \ currentError\_.AddMember(GetDuplicatesString(),\ duplicates,\ GetStateAllocator());}
+\DoxyCodeLine{01950\ \ \ \ \ \ \ \ \ AddCurrentError(SchemaType::GetUniqueItemsString(),\ \textcolor{keyword}{true});}
+\DoxyCodeLine{01951\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_schema_validator_a67b501f0f65d40e0086ca8216882b34f}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!EndArray@{EndArray}}
+\index{EndArray@{EndArray}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{EndArray()}{EndArray()}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_a67b501f0f65d40e0086ca8216882b34f} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+bool \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+End\+Array (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{element\+Count}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l02142}{2142}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02142\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02143\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!valid\_)\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{02144\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{schema_8h_af17aaed9cdb88ac6faa2b7ca7029da63}{RAPIDJSON\_SCHEMA\_HANDLE\_PARALLEL\_}}(\mbox{\hyperlink{class_generic_schema_validator_a67b501f0f65d40e0086ca8216882b34f}{EndArray}},\ (elementCount));}
+\DoxyCodeLine{02145\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!CurrentSchema().\mbox{\hyperlink{class_generic_schema_validator_a67b501f0f65d40e0086ca8216882b34f}{EndArray}}(CurrentContext(),\ elementCount))\ \textcolor{keywordflow}{return}\ valid\_\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{02146\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{schema_8h_ab1cb400ef08159e3e417f03c8adefaff}{RAPIDJSON\_SCHEMA\_HANDLE\_END\_}}(\mbox{\hyperlink{class_generic_schema_validator_a67b501f0f65d40e0086ca8216882b34f}{EndArray}},\ (elementCount));}
+\DoxyCodeLine{02147\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=203pt]{class_generic_schema_validator_a67b501f0f65d40e0086ca8216882b34f_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=281pt]{class_generic_schema_validator_a67b501f0f65d40e0086ca8216882b34f_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_schema_validator_ab6d1c964faaa0f86f9da51a0f66dc1e4}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!EndDependencyErrors@{EndDependencyErrors}}
+\index{EndDependencyErrors@{EndDependencyErrors}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{EndDependencyErrors()}{EndDependencyErrors()}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_ab6d1c964faaa0f86f9da51a0f66dc1e4} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+bool \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+End\+Dependency\+Errors (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a817c1e3e9cc62603997a2fcdc564820b}{internal\+::\+IValidation\+Error\+Handler$<$ Schema\+Document\+Type\+::\+Schema\+Type $>$}}.
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l02004}{2004}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02004\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02005\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (currentError\_.ObjectEmpty())}
+\DoxyCodeLine{02006\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{02007\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_schema_validator_adbc6401414470cc4feef8f03a43690cb}{ValueType}}\ error(\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7a146f46700e905e8df96a6a90b5c7640f}{kObjectType}});}
+\DoxyCodeLine{02008\ \ \ \ \ \ \ \ \ error.AddMember(GetErrorsString(),\ currentError\_,\ GetStateAllocator());}
+\DoxyCodeLine{02009\ \ \ \ \ \ \ \ \ currentError\_\ =\ error;}
+\DoxyCodeLine{02010\ \ \ \ \ \ \ \ \ AddCurrentError(SchemaType::GetDependenciesString());}
+\DoxyCodeLine{02011\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{02012\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_schema_validator_ae0f99bfee3e2021c05322fd5d6de2f6e}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!EndDisallowedType@{EndDisallowedType}}
+\index{EndDisallowedType@{EndDisallowedType}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{EndDisallowedType()}{EndDisallowedType()}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_ae0f99bfee3e2021c05322fd5d6de2f6e} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+void \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+End\+Disallowed\+Type (\begin{DoxyParamCaption}\item[{const typename Schema\+Type\+::\+Value\+Type \&}]{actual\+Type}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_ad8133b3c055b3a91b5072af81304ab87}{internal\+::\+IValidation\+Error\+Handler$<$ Schema\+Document\+Type\+::\+Schema\+Type $>$}}.
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l02024}{2024}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02024\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02025\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_schema_validator_adbc6401414470cc4feef8f03a43690cb}{ValueType}}\ error(\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7a146f46700e905e8df96a6a90b5c7640f}{kObjectType}});}
+\DoxyCodeLine{02026\ \ \ \ \ \ \ \ \ error.AddMember(GetExpectedString(),\ currentError\_,\ GetStateAllocator());}
+\DoxyCodeLine{02027\ \ \ \ \ \ \ \ \ error.AddMember(GetActualString(),\ \mbox{\hyperlink{class_generic_schema_validator_adbc6401414470cc4feef8f03a43690cb}{ValueType}}(actualType,\ GetStateAllocator()).Move(),\ GetStateAllocator());}
+\DoxyCodeLine{02028\ \ \ \ \ \ \ \ \ currentError\_\ =\ error;}
+\DoxyCodeLine{02029\ \ \ \ \ \ \ \ \ AddCurrentError(SchemaType::GetTypeString());}
+\DoxyCodeLine{02030\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_schema_validator_afdcd2ff7b5f7e24f4f3d6976fa5b803e}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!EndMissingDependentProperties@{EndMissingDependentProperties}}
+\index{EndMissingDependentProperties@{EndMissingDependentProperties}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{EndMissingDependentProperties()}{EndMissingDependentProperties()}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_afdcd2ff7b5f7e24f4f3d6976fa5b803e} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+void \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+End\+Missing\+Dependent\+Properties (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_generic_schema_validator_a258a5978bf9194b5a2dac36daebc3041}{SValue}} \&}]{source\+Name}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a05af3199b8011a3476dfd238fa958213}{internal\+::\+IValidation\+Error\+Handler$<$ Schema\+Document\+Type\+::\+Schema\+Type $>$}}.
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l01995}{1995}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01995\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01996\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!missingDependents\_.Empty())}
+\DoxyCodeLine{01997\ \ \ \ \ \ \ \ \ \ \ \ \ currentError\_.AddMember(\mbox{\hyperlink{class_generic_schema_validator_adbc6401414470cc4feef8f03a43690cb}{ValueType}}(sourceName,\ GetStateAllocator()).Move(),}
+\DoxyCodeLine{01998\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ missingDependents\_,\ GetStateAllocator());}
+\DoxyCodeLine{01999\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_schema_validator_a557b7aa531ff94a6355fed8f8575fed5}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!EndMissingProperties@{EndMissingProperties}}
+\index{EndMissingProperties@{EndMissingProperties}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{EndMissingProperties()}{EndMissingProperties()}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_a557b7aa531ff94a6355fed8f8575fed5} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+bool \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+End\+Missing\+Properties (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a3a01eec1a969cfb600340a2bad157c9c}{internal\+::\+IValidation\+Error\+Handler$<$ Schema\+Document\+Type\+::\+Schema\+Type $>$}}.
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l01967}{1967}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01967\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01968\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (currentError\_.Empty())}
+\DoxyCodeLine{01969\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{01970\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_schema_validator_adbc6401414470cc4feef8f03a43690cb}{ValueType}}\ error(\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7a146f46700e905e8df96a6a90b5c7640f}{kObjectType}});}
+\DoxyCodeLine{01971\ \ \ \ \ \ \ \ \ error.AddMember(GetMissingString(),\ currentError\_,\ GetStateAllocator());}
+\DoxyCodeLine{01972\ \ \ \ \ \ \ \ \ currentError\_\ =\ error;}
+\DoxyCodeLine{01973\ \ \ \ \ \ \ \ \ AddCurrentError(SchemaType::GetRequiredString());}
+\DoxyCodeLine{01974\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{01975\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_schema_validator_aa89e14f0f731f6acdec22a0f7e003037}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!EndObject@{EndObject}}
+\index{EndObject@{EndObject}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{EndObject()}{EndObject()}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_aa89e14f0f731f6acdec22a0f7e003037} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+bool \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+End\+Object (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{member\+Count}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l02129}{2129}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02129\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ }
+\DoxyCodeLine{02130\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!valid\_)\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{02131\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{schema_8h_af17aaed9cdb88ac6faa2b7ca7029da63}{RAPIDJSON\_SCHEMA\_HANDLE\_PARALLEL\_}}(\mbox{\hyperlink{class_generic_schema_validator_aa89e14f0f731f6acdec22a0f7e003037}{EndObject}},\ (memberCount));}
+\DoxyCodeLine{02132\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!CurrentSchema().\mbox{\hyperlink{class_generic_schema_validator_aa89e14f0f731f6acdec22a0f7e003037}{EndObject}}(CurrentContext(),\ memberCount))\ \textcolor{keywordflow}{return}\ valid\_\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{02133\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{schema_8h_ab1cb400ef08159e3e417f03c8adefaff}{RAPIDJSON\_SCHEMA\_HANDLE\_END\_}}(\mbox{\hyperlink{class_generic_schema_validator_aa89e14f0f731f6acdec22a0f7e003037}{EndObject}},\ (memberCount));}
+\DoxyCodeLine{02134\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=203pt]{class_generic_schema_validator_aa89e14f0f731f6acdec22a0f7e003037_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=281pt]{class_generic_schema_validator_aa89e14f0f731f6acdec22a0f7e003037_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_schema_validator_a4e250737a411af2969a9e585a7da4187}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!FreeState@{FreeState}}
+\index{FreeState@{FreeState}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{FreeState()}{FreeState()}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_a4e250737a411af2969a9e585a7da4187} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+virtual void \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+Free\+State (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{p}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classinternal_1_1_i_schema_state_factory_a27bd2138940cac3c330dd8399c49b22b}{internal\+::\+ISchema\+State\+Factory$<$ Schema\+Document\+Type\+::\+Schema\+Type $>$}}.
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l02187}{2187}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02187\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02188\ \ \ \ \ \ \ \ \ StateAllocator::Free(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}});}
+\DoxyCodeLine{02189\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_schema_validator_a21c0ad159e91398d222bab4d91d4c5dd}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!GetError@{GetError}}
+\index{GetError@{GetError}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{GetError()}{GetError()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_a21c0ad159e91398d222bab4d91d4c5dd} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+\mbox{\hyperlink{class_generic_schema_validator_adbc6401414470cc4feef8f03a43690cb}{Value\+Type}} \& \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+Get\+Error (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l01860}{1860}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01860\ \{\ \textcolor{keywordflow}{return}\ error\_;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_generic_schema_validator_a21c0ad159e91398d222bab4d91d4c5dd_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_schema_validator_ad7b8d71bd651c3da614a877816de7573}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!GetError@{GetError}}
+\index{GetError@{GetError}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{GetError()}{GetError()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_ad7b8d71bd651c3da614a877816de7573} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+const \mbox{\hyperlink{class_generic_schema_validator_adbc6401414470cc4feef8f03a43690cb}{Value\+Type}} \& \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+Get\+Error (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l01861}{1861}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01861\ \{\ \textcolor{keywordflow}{return}\ error\_;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_schema_validator_ac01c45982a1f512e1ca06fe5544b0c0f}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!GetHashCode@{GetHashCode}}
+\index{GetHashCode@{GetHashCode}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{GetHashCode()}{GetHashCode()}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_ac01c45982a1f512e1ca06fe5544b0c0f} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+virtual \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+Get\+Hash\+Code (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{hasher}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classinternal_1_1_i_schema_state_factory_addfcf00963cc777edf642b204f07c8d6}{internal\+::\+ISchema\+State\+Factory$<$ Schema\+Document\+Type\+::\+Schema\+Type $>$}}.
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l02173}{2173}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02173\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02174\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}HasherType*\textcolor{keyword}{>}(hasher)-\/>\mbox{\hyperlink{class_generic_schema_validator_ac01c45982a1f512e1ca06fe5544b0c0f}{GetHashCode}}();}
+\DoxyCodeLine{02175\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=203pt]{class_generic_schema_validator_ac01c45982a1f512e1ca06fe5544b0c0f_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=203pt]{class_generic_schema_validator_ac01c45982a1f512e1ca06fe5544b0c0f_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_schema_validator_ac10a88c4dc138bbdbe2afd041658a3b0}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!GetInvalidDocumentPointer@{GetInvalidDocumentPointer}}
+\index{GetInvalidDocumentPointer@{GetInvalidDocumentPointer}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{GetInvalidDocumentPointer()}{GetInvalidDocumentPointer()}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_ac10a88c4dc138bbdbe2afd041658a3b0} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+\mbox{\hyperlink{class_generic_schema_validator_a9e29fab15005c947ec941898fe9d3e2a}{Pointer\+Type}} \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+Get\+Invalid\+Document\+Pointer (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l01874}{1874}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01874\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01875\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (documentStack\_.Empty())\ \{}
+\DoxyCodeLine{01876\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_generic_schema_validator_a9e29fab15005c947ec941898fe9d3e2a}{PointerType}}();}
+\DoxyCodeLine{01877\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01878\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{01879\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_generic_schema_validator_a9e29fab15005c947ec941898fe9d3e2a}{PointerType}}(documentStack\_.template\ Bottom<Ch>(),\ documentStack\_.GetSize()\ /\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{class_generic_schema_validator_a18b5119c8e964d37c2252706439e27cd}{Ch}}));}
+\DoxyCodeLine{01880\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01881\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_generic_schema_validator_ac10a88c4dc138bbdbe2afd041658a3b0_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_schema_validator_ab5980d72c786b81ab907526fdf4172f3}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!GetInvalidSchemaKeyword@{GetInvalidSchemaKeyword}}
+\index{GetInvalidSchemaKeyword@{GetInvalidSchemaKeyword}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{GetInvalidSchemaKeyword()}{GetInvalidSchemaKeyword()}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_ab5980d72c786b81ab907526fdf4172f3} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+const \mbox{\hyperlink{class_generic_schema_validator_a18b5119c8e964d37c2252706439e27cd}{Ch}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+Get\+Invalid\+Schema\+Keyword (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l01869}{1869}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01869\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01870\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ schemaStack\_.Empty()\ ?\ 0\ :\ CurrentContext().invalidKeyword;}
+\DoxyCodeLine{01871\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_generic_schema_validator_ab5980d72c786b81ab907526fdf4172f3_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_schema_validator_a5b8f2d5c466b2a362e2e4c3bcfbfc5a8}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!GetInvalidSchemaPointer@{GetInvalidSchemaPointer}}
+\index{GetInvalidSchemaPointer@{GetInvalidSchemaPointer}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{GetInvalidSchemaPointer()}{GetInvalidSchemaPointer()}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_a5b8f2d5c466b2a362e2e4c3bcfbfc5a8} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+\mbox{\hyperlink{class_generic_schema_validator_a9e29fab15005c947ec941898fe9d3e2a}{Pointer\+Type}} \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+Get\+Invalid\+Schema\+Pointer (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l01864}{1864}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01864\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01865\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ schemaStack\_.Empty()\ ?\ \mbox{\hyperlink{class_generic_schema_validator_a9e29fab15005c947ec941898fe9d3e2a}{PointerType}}()\ :\ CurrentSchema().GetPointer();}
+\DoxyCodeLine{01866\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_generic_schema_validator_a5b8f2d5c466b2a362e2e4c3bcfbfc5a8_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_schema_validator_ad823c29990225661a4df69d34647b659}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!Int@{Int}}
+\index{Int@{Int}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{Int()}{Int()}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_ad823c29990225661a4df69d34647b659} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+bool \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+Int (\begin{DoxyParamCaption}\item[{int}]{i}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l02105}{2105}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02105\ \{\ \mbox{\hyperlink{schema_8h_a8c347782f5ba7abab760e5dbc5795c41}{RAPIDJSON\_SCHEMA\_HANDLE\_VALUE\_}}(\mbox{\hyperlink{class_generic_schema_validator_ad823c29990225661a4df69d34647b659}{Int}},\ \ \ \ (CurrentContext(),\ i),\ (i));\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=221pt]{class_generic_schema_validator_ad823c29990225661a4df69d34647b659_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=221pt]{class_generic_schema_validator_ad823c29990225661a4df69d34647b659_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_schema_validator_ac5a9e416e18129a7b787f251019a828f}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!Int64@{Int64}}
+\index{Int64@{Int64}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{Int64()}{Int64()}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_ac5a9e416e18129a7b787f251019a828f} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+bool \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+Int64 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}}]{i}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l02107}{2107}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02107\ \{\ \mbox{\hyperlink{schema_8h_a8c347782f5ba7abab760e5dbc5795c41}{RAPIDJSON\_SCHEMA\_HANDLE\_VALUE\_}}(\mbox{\hyperlink{class_generic_schema_validator_ac5a9e416e18129a7b787f251019a828f}{Int64}},\ \ (CurrentContext(),\ i),\ (i));\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=203pt]{class_generic_schema_validator_ac5a9e416e18129a7b787f251019a828f_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=203pt]{class_generic_schema_validator_ac5a9e416e18129a7b787f251019a828f_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_schema_validator_a8ebda4da3d8b1fc41e57f15dd62e8f19}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!IsValid@{IsValid}}
+\index{IsValid@{IsValid}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{IsValid()}{IsValid()}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_a8ebda4da3d8b1fc41e57f15dd62e8f19} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+virtual bool \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+Is\+Valid (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classinternal_1_1_i_schema_validator_a94f61f24b1447497279ef12ee0127285}{internal\+::\+ISchema\+Validator}}.
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l01857}{1857}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01857\ \{\ \textcolor{keywordflow}{return}\ valid\_;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_generic_schema_validator_a8ebda4da3d8b1fc41e57f15dd62e8f19_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_schema_validator_a6d08b458216ec4a09eed9d94800d05c1}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!Key@{Key}}
+\index{Key@{Key}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{Key()}{Key()}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_a6d08b458216ec4a09eed9d94800d05c1} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+bool \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+Key (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_generic_schema_validator_a18b5119c8e964d37c2252706439e27cd}{Ch}} \texorpdfstring{$\ast$}{*}}]{str}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{len}{, }\item[{bool}]{copy}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l02121}{2121}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02121\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02122\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!valid\_)\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{02123\ \ \ \ \ \ \ \ \ AppendToken(str,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}});}
+\DoxyCodeLine{02124\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!CurrentSchema().\mbox{\hyperlink{class_generic_schema_validator_a6d08b458216ec4a09eed9d94800d05c1}{Key}}(CurrentContext(),\ str,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ copy))\ \textcolor{keywordflow}{return}\ valid\_\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{02125\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{schema_8h_af17aaed9cdb88ac6faa2b7ca7029da63}{RAPIDJSON\_SCHEMA\_HANDLE\_PARALLEL\_}}(Key,\ (str,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ copy));}
+\DoxyCodeLine{02126\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ valid\_\ =\ !outputHandler\_\ ||\ outputHandler\_-\/>Key(str,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ copy);}
+\DoxyCodeLine{02127\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=227pt]{class_generic_schema_validator_a6d08b458216ec4a09eed9d94800d05c1_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=304pt]{class_generic_schema_validator_a6d08b458216ec4a09eed9d94800d05c1_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_schema_validator_a9f983043d6bd1a12d9e2dac756dabbae}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!MallocState@{MallocState}}
+\index{MallocState@{MallocState}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{MallocState()}{MallocState()}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_a9f983043d6bd1a12d9e2dac756dabbae} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+virtual void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+Malloc\+State (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{size}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classinternal_1_1_i_schema_state_factory_abf29f19ba86e08f62b84b74a879b8922}{internal\+::\+ISchema\+State\+Factory$<$ Schema\+Document\+Type\+::\+Schema\+Type $>$}}.
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l02183}{2183}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02183\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02184\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ GetStateAllocator().Malloc(size);}
+\DoxyCodeLine{02185\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_schema_validator_aae9c45082721c650b91f8418cecc7293}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!NoneOf@{NoneOf}}
+\index{NoneOf@{NoneOf}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{NoneOf()}{NoneOf()}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_aae9c45082721c650b91f8418cecc7293} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+void \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+None\+Of (\begin{DoxyParamCaption}\item[{ISchema\+Validator \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{subvalidators}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{count}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l02036}{2036}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02036\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02037\ \ \ \ \ \ \ \ \ AddErrorArray(SchemaType::GetAnyOfString(),\ subvalidators,\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}});}
+\DoxyCodeLine{02038\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_schema_validator_a4275b02cdd86bfe11b42afe94817eae5}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!NotAllOf@{NotAllOf}}
+\index{NotAllOf@{NotAllOf}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{NotAllOf()}{NotAllOf()}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_a4275b02cdd86bfe11b42afe94817eae5} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+void \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+Not\+All\+Of (\begin{DoxyParamCaption}\item[{ISchema\+Validator \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{subvalidators}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{count}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l02031}{2031}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02031\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02032\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}};\ ++i)\ \{}
+\DoxyCodeLine{02033\ \ \ \ \ \ \ \ \ \ \ \ \ MergeError(\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{class_generic_schema_validator}{GenericSchemaValidator}}*\textcolor{keyword}{>}(subvalidators[i])-\/>\mbox{\hyperlink{class_generic_schema_validator_a21c0ad159e91398d222bab4d91d4c5dd}{GetError}}());}
+\DoxyCodeLine{02034\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{02035\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_generic_schema_validator_a4275b02cdd86bfe11b42afe94817eae5_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_schema_validator_ae5fc8a4545fed53955ec6c57b79ca949}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!NotMultipleOf@{NotMultipleOf}}
+\index{NotMultipleOf@{NotMultipleOf}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{NotMultipleOf()}{NotMultipleOf()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_ae5fc8a4545fed53955ec6c57b79ca949} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+void \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+Not\+Multiple\+Of (\begin{DoxyParamCaption}\item[{double}]{actual}{, }\item[{const \mbox{\hyperlink{class_generic_schema_validator_a258a5978bf9194b5a2dac36daebc3041}{SValue}} \&}]{expected}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_ada3d2275ccdeb4874f34942d257af9c5}{internal\+::\+IValidation\+Error\+Handler$<$ Schema\+Document\+Type\+::\+Schema\+Type $>$}}.
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l01889}{1889}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01889\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01890\ \ \ \ \ \ \ \ \ AddNumberError(SchemaType::GetMultipleOfString(),\ \mbox{\hyperlink{class_generic_schema_validator_adbc6401414470cc4feef8f03a43690cb}{ValueType}}(actual).Move(),\ expected);}
+\DoxyCodeLine{01891\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_schema_validator_ab2f08413a2b23d73d4bbd09c8ca1f547}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!NotMultipleOf@{NotMultipleOf}}
+\index{NotMultipleOf@{NotMultipleOf}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{NotMultipleOf()}{NotMultipleOf()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_ab2f08413a2b23d73d4bbd09c8ca1f547} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+void \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+Not\+Multiple\+Of (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}}]{actual}{, }\item[{const \mbox{\hyperlink{class_generic_schema_validator_a258a5978bf9194b5a2dac36daebc3041}{SValue}} \&}]{expected}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a195a561f0bbbfb66961c9331a6afab39}{internal\+::\+IValidation\+Error\+Handler$<$ Schema\+Document\+Type\+::\+Schema\+Type $>$}}.
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l01883}{1883}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01883\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01884\ \ \ \ \ \ \ \ \ AddNumberError(SchemaType::GetMultipleOfString(),\ \mbox{\hyperlink{class_generic_schema_validator_adbc6401414470cc4feef8f03a43690cb}{ValueType}}(actual).Move(),\ expected);}
+\DoxyCodeLine{01885\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_schema_validator_a5c59d25dc44d85404cc587ebfa7455cd}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!NotMultipleOf@{NotMultipleOf}}
+\index{NotMultipleOf@{NotMultipleOf}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{NotMultipleOf()}{NotMultipleOf()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_a5c59d25dc44d85404cc587ebfa7455cd} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+void \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+Not\+Multiple\+Of (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{actual}{, }\item[{const \mbox{\hyperlink{class_generic_schema_validator_a258a5978bf9194b5a2dac36daebc3041}{SValue}} \&}]{expected}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_ad8bd123f154f4c39f48b366219878526}{internal\+::\+IValidation\+Error\+Handler$<$ Schema\+Document\+Type\+::\+Schema\+Type $>$}}.
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l01886}{1886}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01886\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01887\ \ \ \ \ \ \ \ \ AddNumberError(SchemaType::GetMultipleOfString(),\ \mbox{\hyperlink{class_generic_schema_validator_adbc6401414470cc4feef8f03a43690cb}{ValueType}}(actual).Move(),\ expected);}
+\DoxyCodeLine{01888\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_schema_validator_ad4819a91a42d781391760f26014cd315}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!NotOneOf@{NotOneOf}}
+\index{NotOneOf@{NotOneOf}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{NotOneOf()}{NotOneOf()}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_ad4819a91a42d781391760f26014cd315} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+void \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+Not\+One\+Of (\begin{DoxyParamCaption}\item[{ISchema\+Validator \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{subvalidators}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{count}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l02039}{2039}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02039\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02040\ \ \ \ \ \ \ \ \ AddErrorArray(SchemaType::GetOneOfString(),\ subvalidators,\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}});}
+\DoxyCodeLine{02041\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_schema_validator_a7137af73e934f50c66cbb8a9aa802ea6}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!Null@{Null}}
+\index{Null@{Null}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{Null()}{Null()}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_a7137af73e934f50c66cbb8a9aa802ea6} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+bool \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+Null (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l02103}{2103}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02103\ \{\ \mbox{\hyperlink{schema_8h_a8c347782f5ba7abab760e5dbc5795c41}{RAPIDJSON\_SCHEMA\_HANDLE\_VALUE\_}}(\mbox{\hyperlink{class_generic_schema_validator_a7137af73e934f50c66cbb8a9aa802ea6}{Null}},\ \ \ (CurrentContext()),\ (\ ));\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=203pt]{class_generic_schema_validator_a7137af73e934f50c66cbb8a9aa802ea6_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=203pt]{class_generic_schema_validator_a7137af73e934f50c66cbb8a9aa802ea6_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_schema_validator_a29fa7c6f787450b2df1f9d440436aeab}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!PropertyViolations@{PropertyViolations}}
+\index{PropertyViolations@{PropertyViolations}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{PropertyViolations()}{PropertyViolations()}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_a29fa7c6f787450b2df1f9d440436aeab} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+void \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+Property\+Violations (\begin{DoxyParamCaption}\item[{ISchema\+Validator \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{subvalidators}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{count}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l01976}{1976}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01976\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01977\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}};\ ++i)}
+\DoxyCodeLine{01978\ \ \ \ \ \ \ \ \ \ \ \ \ MergeError(\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{class_generic_schema_validator}{GenericSchemaValidator}}*\textcolor{keyword}{>}(subvalidators[i])-\/>\mbox{\hyperlink{class_generic_schema_validator_a21c0ad159e91398d222bab4d91d4c5dd}{GetError}}());}
+\DoxyCodeLine{01979\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_generic_schema_validator_a29fa7c6f787450b2df1f9d440436aeab_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_schema_validator_ae4f024145421d2c1dde08a9de528722a}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!RawNumber@{RawNumber}}
+\index{RawNumber@{RawNumber}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{RawNumber()}{RawNumber()}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_ae4f024145421d2c1dde08a9de528722a} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+bool \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+Raw\+Number (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_generic_schema_validator_a18b5119c8e964d37c2252706439e27cd}{Ch}} \texorpdfstring{$\ast$}{*}}]{str}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{length}{, }\item[{bool}]{copy}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l02110}{2110}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02111\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ \mbox{\hyperlink{schema_8h_a8c347782f5ba7abab760e5dbc5795c41}{RAPIDJSON\_SCHEMA\_HANDLE\_VALUE\_}}(\mbox{\hyperlink{class_generic_schema_validator_a33cf3f83307a8fea38c3238ef75c3d58}{String}},\ (CurrentContext(),\ str,\ length,\ copy),\ (str,\ length,\ copy));\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_generic_schema_validator_ae4f024145421d2c1dde08a9de528722a_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_schema_validator_a49efbbe098cb77728be3d48cafed17e4}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!Reset@{Reset}}
+\index{Reset@{Reset}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{Reset()}{Reset()}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_a49efbbe098cb77728be3d48cafed17e4} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+void \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\mbox{\hyperlink{struct_reset}{\+::\+Reset}} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l01845}{1845}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01845\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01846\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (!schemaStack\_.Empty())}
+\DoxyCodeLine{01847\ \ \ \ \ \ \ \ \ \ \ \ \ PopSchema();}
+\DoxyCodeLine{01848\ \ \ \ \ \ \ \ \ documentStack\_.Clear();}
+\DoxyCodeLine{01849\ \ \ \ \ \ \ \ \ error\_.SetObject();}
+\DoxyCodeLine{01850\ \ \ \ \ \ \ \ \ currentError\_.SetNull();}
+\DoxyCodeLine{01851\ \ \ \ \ \ \ \ \ missingDependents\_.SetNull();}
+\DoxyCodeLine{01852\ \ \ \ \ \ \ \ \ valid\_\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{01853\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_generic_schema_validator_a49efbbe098cb77728be3d48cafed17e4_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_schema_validator_aba13751f802531ed8cbd850778ea993c}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!StartArray@{StartArray}}
+\index{StartArray@{StartArray}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{StartArray()}{StartArray()}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_aba13751f802531ed8cbd850778ea993c} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+bool \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+Start\+Array (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l02136}{2136}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02136\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02137\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{schema_8h_a25701b28a823cc7621f1e01ae7031007}{RAPIDJSON\_SCHEMA\_HANDLE\_BEGIN\_}}(\mbox{\hyperlink{class_generic_schema_validator_aba13751f802531ed8cbd850778ea993c}{StartArray}},\ (CurrentContext()));}
+\DoxyCodeLine{02138\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{schema_8h_af17aaed9cdb88ac6faa2b7ca7029da63}{RAPIDJSON\_SCHEMA\_HANDLE\_PARALLEL\_}}(\mbox{\hyperlink{class_generic_schema_validator_aba13751f802531ed8cbd850778ea993c}{StartArray}},\ ());}
+\DoxyCodeLine{02139\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ valid\_\ =\ !outputHandler\_\ ||\ outputHandler\_-\/>StartArray();}
+\DoxyCodeLine{02140\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=203pt]{class_generic_schema_validator_aba13751f802531ed8cbd850778ea993c_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=281pt]{class_generic_schema_validator_aba13751f802531ed8cbd850778ea993c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_schema_validator_a767f115cc90e0f2f5bdd1c9fbdbf75df}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!StartDependencyErrors@{StartDependencyErrors}}
+\index{StartDependencyErrors@{StartDependencyErrors}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{StartDependencyErrors()}{StartDependencyErrors()}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_a767f115cc90e0f2f5bdd1c9fbdbf75df} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+void \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+Start\+Dependency\+Errors (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_ab3cf4b9fe450ff76f52d70a2888f0342}{internal\+::\+IValidation\+Error\+Handler$<$ Schema\+Document\+Type\+::\+Schema\+Type $>$}}.
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l01986}{1986}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01986\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01987\ \ \ \ \ \ \ \ \ currentError\_.SetObject();}
+\DoxyCodeLine{01988\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_schema_validator_a9904719420fd91200f80772e92fe225f}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!StartDisallowedType@{StartDisallowedType}}
+\index{StartDisallowedType@{StartDisallowedType}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{StartDisallowedType()}{StartDisallowedType()}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_a9904719420fd91200f80772e92fe225f} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+void \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+Start\+Disallowed\+Type (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a994a8b1526a79737b9d7b7575def4f65}{internal\+::\+IValidation\+Error\+Handler$<$ Schema\+Document\+Type\+::\+Schema\+Type $>$}}.
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l02018}{2018}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02018\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02019\ \ \ \ \ \ \ \ \ currentError\_.SetArray();}
+\DoxyCodeLine{02020\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_schema_validator_ac4faa073bc4671f42e98a59a9e9cb01a}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!StartMissingDependentProperties@{StartMissingDependentProperties}}
+\index{StartMissingDependentProperties@{StartMissingDependentProperties}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{StartMissingDependentProperties()}{StartMissingDependentProperties()}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_ac4faa073bc4671f42e98a59a9e9cb01a} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+void \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+Start\+Missing\+Dependent\+Properties (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_ae312aea74718dda0411af023c0c78ef6}{internal\+::\+IValidation\+Error\+Handler$<$ Schema\+Document\+Type\+::\+Schema\+Type $>$}}.
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l01989}{1989}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01989\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01990\ \ \ \ \ \ \ \ \ missingDependents\_.SetArray();}
+\DoxyCodeLine{01991\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_schema_validator_a41c4d67e349561f13948a5045bfc50c9}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!StartMissingProperties@{StartMissingProperties}}
+\index{StartMissingProperties@{StartMissingProperties}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{StartMissingProperties()}{StartMissingProperties()}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_a41c4d67e349561f13948a5045bfc50c9} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+void \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+Start\+Missing\+Properties (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_ac0073bef86b572b4517876b304aada0f}{internal\+::\+IValidation\+Error\+Handler$<$ Schema\+Document\+Type\+::\+Schema\+Type $>$}}.
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l01961}{1961}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01961\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01962\ \ \ \ \ \ \ \ \ currentError\_.SetArray();}
+\DoxyCodeLine{01963\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_schema_validator_a59972d612c3d37aae9a30222e428d216}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!StartObject@{StartObject}}
+\index{StartObject@{StartObject}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{StartObject()}{StartObject()}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_a59972d612c3d37aae9a30222e428d216} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+bool \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+Start\+Object (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l02115}{2115}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02115\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02116\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{schema_8h_a25701b28a823cc7621f1e01ae7031007}{RAPIDJSON\_SCHEMA\_HANDLE\_BEGIN\_}}(\mbox{\hyperlink{class_generic_schema_validator_a59972d612c3d37aae9a30222e428d216}{StartObject}},\ (CurrentContext()));}
+\DoxyCodeLine{02117\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{schema_8h_af17aaed9cdb88ac6faa2b7ca7029da63}{RAPIDJSON\_SCHEMA\_HANDLE\_PARALLEL\_}}(\mbox{\hyperlink{class_generic_schema_validator_a59972d612c3d37aae9a30222e428d216}{StartObject}},\ ());}
+\DoxyCodeLine{02118\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ valid\_\ =\ !outputHandler\_\ ||\ outputHandler\_-\/>StartObject();}
+\DoxyCodeLine{02119\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=203pt]{class_generic_schema_validator_a59972d612c3d37aae9a30222e428d216_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=281pt]{class_generic_schema_validator_a59972d612c3d37aae9a30222e428d216_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_schema_validator_a33cf3f83307a8fea38c3238ef75c3d58}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!String@{String}}
+\index{String@{String}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{String()}{String()}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_a33cf3f83307a8fea38c3238ef75c3d58} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+bool \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+String (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_generic_schema_validator_a18b5119c8e964d37c2252706439e27cd}{Ch}} \texorpdfstring{$\ast$}{*}}]{str}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{length}{, }\item[{bool}]{copy}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l02112}{2112}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02113\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ \mbox{\hyperlink{schema_8h_a8c347782f5ba7abab760e5dbc5795c41}{RAPIDJSON\_SCHEMA\_HANDLE\_VALUE\_}}(\mbox{\hyperlink{class_generic_schema_validator_a33cf3f83307a8fea38c3238ef75c3d58}{String}},\ (CurrentContext(),\ str,\ length,\ copy),\ (str,\ length,\ copy));\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=203pt]{class_generic_schema_validator_a33cf3f83307a8fea38c3238ef75c3d58_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_generic_schema_validator_a33cf3f83307a8fea38c3238ef75c3d58_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_schema_validator_af39007d9bf43126dab231961a1c5064f}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!TooFewItems@{TooFewItems}}
+\index{TooFewItems@{TooFewItems}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{TooFewItems()}{TooFewItems()}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_af39007d9bf43126dab231961a1c5064f} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+void \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+Too\+Few\+Items (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{actual\+Count}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{expected\+Count}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_afc144690ba0e24636a72f541efd32c3b}{internal\+::\+IValidation\+Error\+Handler$<$ Schema\+Document\+Type\+::\+Schema\+Type $>$}}.
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l01936}{1936}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01936\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01937\ \ \ \ \ \ \ \ \ AddNumberError(SchemaType::GetMinItemsString(),}
+\DoxyCodeLine{01938\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_schema_validator_adbc6401414470cc4feef8f03a43690cb}{ValueType}}(actualCount).Move(),\ \mbox{\hyperlink{class_generic_schema_validator_a258a5978bf9194b5a2dac36daebc3041}{SValue}}(expectedCount).Move());}
+\DoxyCodeLine{01939\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_schema_validator_aaebaf28aa289826a3c39dc953b0ca466}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!TooFewProperties@{TooFewProperties}}
+\index{TooFewProperties@{TooFewProperties}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{TooFewProperties()}{TooFewProperties()}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_aaebaf28aa289826a3c39dc953b0ca466} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+void \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+Too\+Few\+Properties (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{actual\+Count}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{expected\+Count}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_adf515d2fad2e55bc0735a6fb16eec9e6}{internal\+::\+IValidation\+Error\+Handler$<$ Schema\+Document\+Type\+::\+Schema\+Type $>$}}.
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l01957}{1957}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01957\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01958\ \ \ \ \ \ \ \ \ AddNumberError(SchemaType::GetMinPropertiesString(),}
+\DoxyCodeLine{01959\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_schema_validator_adbc6401414470cc4feef8f03a43690cb}{ValueType}}(actualCount).Move(),\ \mbox{\hyperlink{class_generic_schema_validator_a258a5978bf9194b5a2dac36daebc3041}{SValue}}(expectedCount).Move());}
+\DoxyCodeLine{01960\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_schema_validator_a227dce44e0684a73accbfb062200eb26}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!TooLong@{TooLong}}
+\index{TooLong@{TooLong}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{TooLong()}{TooLong()}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_a227dce44e0684a73accbfb062200eb26} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+void \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+Too\+Long (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_generic_schema_validator_a18b5119c8e964d37c2252706439e27cd}{Ch}} \texorpdfstring{$\ast$}{*}}]{str}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{length}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{expected}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l01917}{1917}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01917\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01918\ \ \ \ \ \ \ \ \ AddNumberError(SchemaType::GetMaxLengthString(),}
+\DoxyCodeLine{01919\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_schema_validator_adbc6401414470cc4feef8f03a43690cb}{ValueType}}(str,\ length,\ GetStateAllocator()).Move(),\ \mbox{\hyperlink{class_generic_schema_validator_a258a5978bf9194b5a2dac36daebc3041}{SValue}}(expected).Move());}
+\DoxyCodeLine{01920\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_schema_validator_a78e85eeae0e2bdef827815672a7fbbc9}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!TooManyItems@{TooManyItems}}
+\index{TooManyItems@{TooManyItems}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{TooManyItems()}{TooManyItems()}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_a78e85eeae0e2bdef827815672a7fbbc9} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+void \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+Too\+Many\+Items (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{actual\+Count}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{expected\+Count}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a9371ca15622897a429971f69c07c47ef}{internal\+::\+IValidation\+Error\+Handler$<$ Schema\+Document\+Type\+::\+Schema\+Type $>$}}.
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l01940}{1940}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01940\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01941\ \ \ \ \ \ \ \ \ AddNumberError(SchemaType::GetMaxItemsString(),}
+\DoxyCodeLine{01942\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_schema_validator_adbc6401414470cc4feef8f03a43690cb}{ValueType}}(actualCount).Move(),\ \mbox{\hyperlink{class_generic_schema_validator_a258a5978bf9194b5a2dac36daebc3041}{SValue}}(expectedCount).Move());}
+\DoxyCodeLine{01943\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_schema_validator_ad7ca0a327420c110e9ee6e70b2cdbc87}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!TooManyProperties@{TooManyProperties}}
+\index{TooManyProperties@{TooManyProperties}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{TooManyProperties()}{TooManyProperties()}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_ad7ca0a327420c110e9ee6e70b2cdbc87} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+void \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+Too\+Many\+Properties (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{actual\+Count}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{expected\+Count}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a3494e9d2bff94979649e186aba71b32e}{internal\+::\+IValidation\+Error\+Handler$<$ Schema\+Document\+Type\+::\+Schema\+Type $>$}}.
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l01953}{1953}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01953\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01954\ \ \ \ \ \ \ \ \ AddNumberError(SchemaType::GetMaxPropertiesString(),}
+\DoxyCodeLine{01955\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_schema_validator_adbc6401414470cc4feef8f03a43690cb}{ValueType}}(actualCount).Move(),\ \mbox{\hyperlink{class_generic_schema_validator_a258a5978bf9194b5a2dac36daebc3041}{SValue}}(expectedCount).Move());}
+\DoxyCodeLine{01956\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_schema_validator_a7711071f95ead18c0dd99f69c09a4c11}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!TooShort@{TooShort}}
+\index{TooShort@{TooShort}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{TooShort()}{TooShort()}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_a7711071f95ead18c0dd99f69c09a4c11} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+void \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+Too\+Short (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_generic_schema_validator_a18b5119c8e964d37c2252706439e27cd}{Ch}} \texorpdfstring{$\ast$}{*}}]{str}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{length}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{expected}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l01921}{1921}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01921\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01922\ \ \ \ \ \ \ \ \ AddNumberError(SchemaType::GetMinLengthString(),}
+\DoxyCodeLine{01923\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_schema_validator_adbc6401414470cc4feef8f03a43690cb}{ValueType}}(str,\ length,\ GetStateAllocator()).Move(),\ \mbox{\hyperlink{class_generic_schema_validator_a258a5978bf9194b5a2dac36daebc3041}{SValue}}(expected).Move());}
+\DoxyCodeLine{01924\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_schema_validator_aa688665c5274f93543c84a4b6cabe8da}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!Uint@{Uint}}
+\index{Uint@{Uint}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{Uint()}{Uint()}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_aa688665c5274f93543c84a4b6cabe8da} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+bool \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+Uint (\begin{DoxyParamCaption}\item[{unsigned}]{u}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l02106}{2106}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02106\ \{\ \mbox{\hyperlink{schema_8h_a8c347782f5ba7abab760e5dbc5795c41}{RAPIDJSON\_SCHEMA\_HANDLE\_VALUE\_}}(\mbox{\hyperlink{class_generic_schema_validator_aa688665c5274f93543c84a4b6cabe8da}{Uint}},\ \ \ (CurrentContext(),\ u),\ (u));\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=203pt]{class_generic_schema_validator_aa688665c5274f93543c84a4b6cabe8da_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=203pt]{class_generic_schema_validator_aa688665c5274f93543c84a4b6cabe8da_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_schema_validator_abfc56c58cf0b65318e376fc5f2879292}\index{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}!Uint64@{Uint64}}
+\index{Uint64@{Uint64}!GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$@{GenericSchemaValidator$<$ SchemaDocumentType, OutputHandler, StateAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{Uint64()}{Uint64()}}
+{\footnotesize\ttfamily \label{class_generic_schema_validator_abfc56c58cf0b65318e376fc5f2879292} 
+template$<$typename Schema\+Document\+Type , typename Output\+Handler  = Base\+Reader\+Handler$<$typename Schema\+Document\+Type\+::\+Schema\+Type\+::\+Encoding\+Type$>$, typename State\+Allocator  = Crt\+Allocator$>$ \\
+bool \mbox{\hyperlink{class_generic_schema_validator}{Generic\+Schema\+Validator}}$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$\+::\+Uint64 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{u}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l02108}{2108}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02108\ \{\ \mbox{\hyperlink{schema_8h_a8c347782f5ba7abab760e5dbc5795c41}{RAPIDJSON\_SCHEMA\_HANDLE\_VALUE\_}}(\mbox{\hyperlink{class_generic_schema_validator_abfc56c58cf0b65318e376fc5f2879292}{Uint64}},\ (CurrentContext(),\ u),\ (u));\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=203pt]{class_generic_schema_validator_abfc56c58cf0b65318e376fc5f2879292_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=203pt]{class_generic_schema_validator_abfc56c58cf0b65318e376fc5f2879292_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/\mbox{\hyperlink{fwd_8h}{fwd.\+h}}\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/\mbox{\hyperlink{schema_8h}{schema.\+h}}\end{DoxyCompactItemize}

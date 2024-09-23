@@ -1,0 +1,11 @@
+<map id="sysio::chain::webassembly::eosvmoc::array_ptr_impl" name="sysio::chain::webassembly::eosvmoc::array_ptr_impl">
+<area shape="rect" id="Node000001" title=" " alt="" coords="292,133,471,174"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1webassembly_1_1eosvmoc_1_1eos__vm__oc__type__converter.html#a8b8e2bdba03960207f81aca57b4ccc37" title=" " alt="" coords="30,5,219,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="334,126,291,100,243,76,215,64,217,59,245,71,293,96,337,122"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1chain_1_1webassembly_1_1eosvmoc_1_1eos__vm__oc__type__converter.html#a48a63b9f5bbdc8d2b597796c6b900993" title=" " alt="" coords="5,85,244,141"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="276,139,244,134,245,129,276,134"/>
+<area shape="rect" id="Node000004" href="$structsysio_1_1chain_1_1webassembly_1_1eosvmoc_1_1eos__vm__oc__type__converter.html#ae123a76281a9a046f28ff9290477f3a5" title=" " alt="" coords="5,165,244,221"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="276,172,245,177,244,172,276,167"/>
+<area shape="rect" id="Node000005" href="$structsysio_1_1chain_1_1webassembly_1_1eosvmoc_1_1eos__vm__oc__type__converter.html#ada7e7ef0cabeb6610444d879b084f184" title=" " alt="" coords="5,245,244,301"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="337,185,293,211,245,236,217,247,215,242,243,231,291,206,334,180"/>
+</map>

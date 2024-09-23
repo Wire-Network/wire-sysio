@@ -1,0 +1,21 @@
+<map id="fc::zipkin_span::~zipkin_span" name="fc::zipkin_span::~zipkin_span">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,108,200,133"/>
+<area shape="rect" id="Node000002" href="$classfc_1_1zipkin__config.html#ae0348c29d052b3060150e3b379e8e9ce" title=" " alt="" coords="252,5,376,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="132,105,251,50,254,55,134,109"/>
+<area shape="rect" id="Node000003" href="$classfc_1_1zipkin__config.html#a9556dacb1a00643aecbf33b1f1e889d0" title="Thread safe only if init() called from main thread before spawning of any threads." alt="" coords="252,71,376,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="199,104,236,99,237,104,200,110"/>
+<area shape="rect" id="Node000004" href="$classfc_1_1zipkin.html#a0f15921f7cb4ccefe0684bf656dbe6e6" title=" " alt="" coords="264,136,364,161"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="201,131,249,137,249,142,200,136"/>
+<area shape="rect" id="Node000005" href="$classfc_1_1time__point.html#aa164ff1268a16d4b32afcff181f6100e" title=" " alt="" coords="248,185,380,210"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="141,131,249,171,263,176,261,181,247,176,139,136"/>
+<area shape="rect" id="Node000006" href="$classfc_1_1mock__time__traits.html#a0bed781012a73b8c15882648397b56be" title=" " alt="" coords="428,79,568,119"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="357,182,379,171,403,151,426,130,435,125,438,129,430,134,406,155,381,176,359,187"/>
+<area shape="rect" id="Node000008" href="$classfc_1_1mock__time__traits.html#adddeebdf472c33f927827c111ddbf0b1" title=" " alt="" coords="428,144,568,185"/>
+<area shape="poly" id="edge7_Node000005_Node000008" title=" " alt="" coords="380,183,413,177,414,182,381,188"/>
+<area shape="rect" id="Node000009" href="$classfc_1_1time__point.html#ab46781dcaab4880902bc136f36e39e5e" title=" " alt="" coords="432,209,565,250"/>
+<area shape="poly" id="edge8_Node000005_Node000009" title=" " alt="" coords="381,207,416,213,416,218,380,212"/>
+<area shape="rect" id="Node000010" href="$classfc_1_1time__point.html#abfea5efbe9ef58024cda814395ee9945" title=" " alt="" coords="432,275,565,315"/>
+<area shape="poly" id="edge9_Node000005_Node000010" title=" " alt="" coords="339,209,429,259,440,265,438,270,427,264,337,213"/>
+<area shape="rect" id="Node000007" href="$classfc_1_1mock__time__traits.html#a0d7245b32fd62b3bc712f658250cc4db" title=" " alt="" coords="616,86,789,112"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="569,96,601,96,601,102,569,102"/>
+</map>

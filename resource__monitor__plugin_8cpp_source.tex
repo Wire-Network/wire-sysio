@@ -1,0 +1,174 @@
+\doxysection{resource\+\_\+monitor\+\_\+plugin.\+cpp}
+\hypertarget{resource__monitor__plugin_8cpp_source}{}\label{resource__monitor__plugin_8cpp_source}\index{plugins/resource\_monitor\_plugin/resource\_monitor\_plugin.cpp@{plugins/resource\_monitor\_plugin/resource\_monitor\_plugin.cpp}}
+\mbox{\hyperlink{resource__monitor__plugin_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00001}00001\ }
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00018}00018\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{resource__monitor__plugin_8hpp}{sysio/resource\_monitor\_plugin/resource\_monitor\_plugin.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00019}00019\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{file__space__handler_8hpp}{sysio/resource\_monitor\_plugin/file\_space\_handler.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00020}00020\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{system__file__space__provider_8hpp}{sysio/resource\_monitor\_plugin/system\_file\_space\_provider.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00022}00022\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp}{sysio/chain/exceptions.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00024}00024\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{exception_8hpp}{fc/exception/exception.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00025}00025\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{logger__config_8hpp}{fc/log/logger\_config.hpp}}>}\ \textcolor{comment}{//\ set\_os\_thread\_name}}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00027}00027\ \textcolor{preprocessor}{\#include\ <boost/filesystem.hpp>}}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00029}00029\ \textcolor{preprocessor}{\#include\ <thread>}}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00031}00031\ \textcolor{preprocessor}{\#include\ <sys/stat.h>}}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00033}00033\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacesysio_1_1resource__monitor}{sysio::resource\_monitor}};}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00035}00035\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceboost_1_1filesystem}{bfs}}\ =\ \mbox{\hyperlink{namespaceboost_1_1filesystem}{boost::filesystem}};}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00037}00037\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00038}00038\ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classappbase_1_1abstract__plugin}{appbase::abstract\_plugin}}\&\ \_resource\_monitor\_plugin\ =\ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_a87e84549150056c56c0327cc4976cc2a}{register\_plugin}}<\mbox{\hyperlink{classsysio_1_1resource__monitor__plugin}{resource\_monitor\_plugin}}>();}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00040}\mbox{\hyperlink{classsysio_1_1resource__monitor__plugin__impl}{00040}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1resource__monitor__plugin__impl}{resource\_monitor\_plugin\_impl}}\ \{}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00041}00041\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00042}\mbox{\hyperlink{classsysio_1_1resource__monitor__plugin__impl_ac0bf91535f24c4fdfbfe55e1dbd13139}{00042}}\ \ \ \ \mbox{\hyperlink{classsysio_1_1resource__monitor__plugin__impl_ac0bf91535f24c4fdfbfe55e1dbd13139}{resource\_monitor\_plugin\_impl}}()}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00043}00043\ \ \ \ \ \ \ :space\_handler(\mbox{\hyperlink{classsysio_1_1resource__monitor_1_1system__file__space__provider}{system\_file\_space\_provider}}(),\ ctx)}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00044}00044\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00045}00045\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00047}\mbox{\hyperlink{classsysio_1_1resource__monitor__plugin__impl_a72bffc3828b3c596d680d57271dccdea}{00047}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1resource__monitor__plugin__impl_a72bffc3828b3c596d680d57271dccdea}{set\_program\_options}}(options\_description\&,\ options\_description\&\ cfg)\ \{}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00048}00048\ \ \ \ \ \ \ cfg.add\_options()}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \ (\ \textcolor{stringliteral}{"{}resource-\/monitor-\/interval-\/seconds"{}},\ bpo::value<uint32\_t>()-\/>default\_value(def\_interval\_in\_secs),}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00050}00050\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Time\ in\ seconds\ between\ two\ consecutive\ checks\ of\ resource\ usage.\ Should\ be\ between\ 1\ and\ 300"{}}\ )}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00051}00051\ \ \ \ \ \ \ \ \ \ (\ \textcolor{stringliteral}{"{}resource-\/monitor-\/space-\/threshold"{}},\ bpo::value<uint32\_t>()-\/>default\_value(def\_space\_threshold),}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Threshold\ in\ terms\ of\ percentage\ of\ used\ space\ vs\ total\ space.\ If\ used\ space\ is\ above\ (threshold\ -\/\ 5\%),\ a\ warning\ is\ generated.\ \ Unless\ resource-\/monitor-\/not-\/shutdown-\/on-\/threshold-\/exceeded\ is\ enabled,\ a\ graceful\ shutdown\ is\ initiated\ if\ used\ space\ is\ above\ the\ threshold.\ The\ value\ should\ be\ between\ 6\ and\ 99"{}}\ )}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \ (\ \textcolor{stringliteral}{"{}resource-\/monitor-\/not-\/shutdown-\/on-\/threshold-\/exceeded"{}},}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Used\ to\ indicate\ nodeop\ will\ not\ shutdown\ when\ threshold\ is\ exceeded."{}}\ )}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00055}00055\ \ \ \ \ \ \ \ \ \ (\ \textcolor{stringliteral}{"{}resource-\/monitor-\/warning-\/interval"{}},\ bpo::value<uint32\_t>()-\/>default\_value(def\_monitor\_warning\_interval),}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Number\ of\ resource\ monitor\ intervals\ between\ two\ consecutive\ warnings\ when\ the\ threshold\ is\ hit.\ Should\ be\ between\ 1\ and\ 450"{}}\ )}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00057}00057\ \ \ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00058}00058\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00059}00059\ \ \ \ }
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00060}\mbox{\hyperlink{classsysio_1_1resource__monitor__plugin__impl_a0660c265b1bb7600e647c61087be62da}{00060}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1resource__monitor__plugin__impl_a0660c265b1bb7600e647c61087be62da}{plugin\_initialize}}(\textcolor{keyword}{const}\ appbase::variables\_map\&\ options)\ \{}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00061}00061\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a3da1571bad6ca6c94df9a3660b2115ee}{dlog}}(\textcolor{stringliteral}{"{}plugin\_initialize"{}});}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00062}00062\ \ \ \ }
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00063}00063\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ interval\ =\ options.at(\textcolor{stringliteral}{"{}resource-\/monitor-\/interval-\/seconds"{}}).as<\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}>();}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00064}00064\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(interval\ >=\ monitor\_interval\_min\ \&\&\ interval\ <=\ monitor\_interval\_max,\ chain::plugin\_config\_exception,}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00065}00065\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)"{}resource-\/monitor-\/interval-\/seconds\(\backslash\)"{}\ must\ be\ between\ \$\{monitor\_interval\_min\}\ and\ \$\{monitor\_interval\_max\}"{}},\ (\textcolor{stringliteral}{"{}monitor\_interval\_min"{}},\ monitor\_interval\_min)\ (\textcolor{stringliteral}{"{}monitor\_interval\_max"{}},\ monitor\_interval\_max));}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00066}00066\ \ \ \ \ \ \ space\_handler.\mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler_af1ad683111aac7f94733e3866db0149e}{set\_sleep\_time}}(interval);}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00067}00067\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\textcolor{stringliteral}{"{}Monitoring\ interval\ set\ to\ \$\{interval\}"{}},\ (\textcolor{stringliteral}{"{}interval"{}},\ interval));}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00068}00068\ \ \ \ }
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00069}00069\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ threshold\ =\ options.at(\textcolor{stringliteral}{"{}resource-\/monitor-\/space-\/threshold"{}}).as<\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}>();}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00070}00070\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(threshold\ >=\ space\_threshold\_min\ \ \&\&\ threshold\ <=\ space\_threshold\_max,\ chain::plugin\_config\_exception,}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00071}00071\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)"{}resource-\/monitor-\/space-\/threshold\(\backslash\)"{}\ must\ be\ between\ \$\{space\_threshold\_min\}\ and\ \$\{space\_threshold\_max\}"{}},\ (\textcolor{stringliteral}{"{}space\_threshold\_min"{}},\ space\_threshold\_min)\ (\textcolor{stringliteral}{"{}space\_threshold\_max"{}},\ space\_threshold\_max));}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00072}00072\ \ \ \ \ \ \ space\_handler.\mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler_a51eaff9443b1a88e06cbbd1344a78071}{set\_threshold}}(threshold,\ threshold\ -\/\ space\_threshold\_warning\_diff);}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00073}00073\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\textcolor{stringliteral}{"{}Space\ usage\ threshold\ set\ to\ \$\{threshold\}"{}},\ (\textcolor{stringliteral}{"{}threshold"{}},\ threshold));}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00074}00074\ \ \ \ }
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00075}00075\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (options.count(\textcolor{stringliteral}{"{}resource-\/monitor-\/not-\/shutdown-\/on-\/threshold-\/exceeded"{}}))\ \{}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ set,\ not\ shutdown}}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00077}00077\ \ \ \ \ \ \ \ \ \ space\_handler.\mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler_ac0f510cb0298b9cefe68102772fc5db7}{set\_shutdown\_on\_exceeded}}(\textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00078}00078\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\textcolor{stringliteral}{"{}Shutdown\ flag\ when\ threshold\ exceeded\ set\ to\ false"{}});}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00079}00079\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00080}00080\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Default\ will\ shut\ down}}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00081}00081\ \ \ \ \ \ \ \ \ \ space\_handler.\mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler_ac0f510cb0298b9cefe68102772fc5db7}{set\_shutdown\_on\_exceeded}}(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00082}00082\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\textcolor{stringliteral}{"{}Shutdown\ flag\ when\ threshold\ exceeded\ set\ to\ true"{}});}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00083}00083\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00084}00084\ }
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00085}00085\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ warning\_interval\ =\ options.at(\textcolor{stringliteral}{"{}resource-\/monitor-\/warning-\/interval"{}}).as<\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}>();}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00086}00086\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(warning\_interval\ >=\ warning\_interval\_min\ \&\&\ warning\_interval\ <=\ warning\_interval\_max,\ chain::plugin\_config\_exception,}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00087}00087\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)"{}resource-\/monitor-\/warning-\/interval\(\backslash\)"{}\ must\ be\ between\ \$\{warning\_interval\_min\}\ and\ \$\{warning\_interval\_max\}"{}},\ (\textcolor{stringliteral}{"{}warning\_interval\_min"{}},\ warning\_interval\_min)\ (\textcolor{stringliteral}{"{}warning\_interval\_max"{}},\ warning\_interval\_max));}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00088}00088\ \ \ \ \ \ \ space\_handler.\mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler_a5465fcb7ca6562cdb3622c5ef09b29a9}{set\_warning\_interval}}(warning\_interval);}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00089}00089\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\textcolor{stringliteral}{"{}Warning\ interval\ set\ to\ \$\{warning\_interval\}"{}},\ (\textcolor{stringliteral}{"{}warning\_interval"{}},\ warning\_interval));}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00090}00090\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00091}00091\ \ \ \ }
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00092}00092\ \ \ \ \textcolor{comment}{//\ Start\ main\ thread}}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00093}\mbox{\hyperlink{classsysio_1_1resource__monitor__plugin__impl_ae06c885da6f082b29ca5b5ff8c5724e4}{00093}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1resource__monitor__plugin__impl_ae06c885da6f082b29ca5b5ff8c5724e4}{plugin\_startup}}()\ \{}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00094}00094\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\textcolor{stringliteral}{"{}Creating\ and\ starting\ monitor\ thread"{}});}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00095}00095\ \ \ \ }
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00096}00096\ \ \ \ \ \ \ \textcolor{comment}{//\ By\ now\ all\ plugins\ are\ initialized.}}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00097}00097\ \ \ \ \ \ \ \textcolor{comment}{//\ Find\ out\ filesystems\ containing\ the\ directories\ requested}}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00098}00098\ \ \ \ \ \ \ \textcolor{comment}{//\ so\ far.}}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00099}00099\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\ \textcolor{keyword}{auto}\&\ dir:\ directories\_registered\ )\ \{}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00100}00100\ \ \ \ \ \ \ \ \ \ space\_handler.\mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler_a6a5e01f3f35cab4c846640e060b91b63}{add\_file\_system}}(\ dir\ );}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00101}00101\ \ \ \ }
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00102}00102\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ A\ directory\ like\ "{}data"{}\ contains\ subdirectories\ like}}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00103}00103\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ "{}block"{}.\ Those\ subdirectories\ can\ mount\ on\ different}}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00104}00104\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ file\ systems.\ Make\ sure\ they\ are\ taken\ care\ of.}}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00105}00105\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (bfs::directory\_iterator\ itr(dir);\ itr\ !=\ bfs::directory\_iterator();\ ++itr)\ \{}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00106}00106\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacefc_ab123bfeadf918cc293ecad88bca7c499}{fc::is\_directory}}(itr-\/>path()))\ \{}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00107}00107\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ space\_handler.\mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler_a6a5e01f3f35cab4c846640e060b91b63}{add\_file\_system}}(\ itr-\/>path()\ );}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00108}00108\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00109}00109\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00110}00110\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00111}00111\ \ \ \ }
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00112}00112\ \ \ \ \ \ \ monitor\_thread\ =\ std::thread(\ [\textcolor{keyword}{this}]\ \{}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00113}00113\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_ab58a7f71e88d7d4d5761bbd24837c595}{fc::set\_os\_thread\_name}}(\ \textcolor{stringliteral}{"{}resmon"{}}\ );\ \textcolor{comment}{//\ console\_appender\ uses\ 9\ chars\ for\ thread\ name\ reporting.\ }}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00114}00114\ \ \ \ \ \ \ \ \ \ space\_handler.\mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler_a6faa30d2db31020b3db4886a554e147a}{space\_monitor\_loop}}();}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00115}00115\ \ \ \ }
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00116}00116\ \ \ \ \ \ \ \ \ \ ctx.run();}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00117}00117\ \ \ \ \ \ \ \}\ );}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00118}00118\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00119}00119\ \ \ \ }
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00120}00120\ \ \ \ \textcolor{comment}{//\ System\ is\ shutting\ down.}}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00121}\mbox{\hyperlink{classsysio_1_1resource__monitor__plugin__impl_afb3fda25f6f91bb22d539fd8df00d8e2}{00121}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1resource__monitor__plugin__impl_afb3fda25f6f91bb22d539fd8df00d8e2}{plugin\_shutdown}}()\ \{}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00122}00122\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\textcolor{stringliteral}{"{}shutdown..."{}});}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00123}00123\ \ \ \ }
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00124}00124\ \ \ \ \ \ \ ctx.stop();}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00125}00125\ \ \ \ }
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00126}00126\ \ \ \ \ \ \ \textcolor{comment}{//\ Wait\ for\ the\ thread\ to\ end}}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00127}00127\ \ \ \ \ \ \ monitor\_thread.join();}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00128}00128\ \ \ \ }
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00129}00129\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\textcolor{stringliteral}{"{}exit\ shutdown"{}});}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00130}00130\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00131}00131\ }
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00132}\mbox{\hyperlink{classsysio_1_1resource__monitor__plugin__impl_a8f86e65106c603d0afa743a2114d96ef}{00132}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1resource__monitor__plugin__impl_a8f86e65106c603d0afa743a2114d96ef}{monitor\_directory}}(\textcolor{keyword}{const}\ bfs::path\&\ \mbox{\hyperlink{classfc_1_1path}{path}})\ \{}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00133}00133\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a3da1571bad6ca6c94df9a3660b2115ee}{dlog}}(\textcolor{stringliteral}{"{}\$\{path\}\ registered\ to\ be\ monitored"{}},\ (\textcolor{stringliteral}{"{}path"{}},\ \mbox{\hyperlink{classfc_1_1path}{path}}.\mbox{\hyperlink{classfc_1_1path_aaf0107e4a41f9977032b2a604161cf85}{string}}()));}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00134}00134\ \ \ \ \ \ \ directories\_registered.push\_back(\mbox{\hyperlink{classfc_1_1path}{path}});}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00135}00135\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00136}00136\ }
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00137}00137\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00138}00138\ \ \ \ std::thread\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ monitor\_thread;}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00139}00139\ \ \ \ std::vector<bfs::path>\ \ \ \ directories\_registered;}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00140}00140\ \ \ \ }
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00141}00141\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ def\_interval\_in\_secs\ =\ 2;}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00142}00142\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ monitor\_interval\_min\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00143}00143\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ monitor\_interval\_max\ =\ 300;}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00144}00144\ }
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00145}00145\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ def\_space\_threshold\ =\ 90;\ \textcolor{comment}{//\ in\ percentage}}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00146}00146\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ space\_threshold\_min\ =\ 6;\ \textcolor{comment}{//\ in\ percentage}}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00147}00147\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ space\_threshold\_max\ =\ 99;\ \textcolor{comment}{//\ in\ percentage}}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00148}00148\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ space\_threshold\_warning\_diff\ =\ 5;\ \textcolor{comment}{//\ Warning\ issued\ when\ space\ used\ reached\ (threshold\ -\/\ space\_threshold\_warning\_diff).\ space\_threshold\_warning\_diff\ must\ be\ smaller\ than\ space\_threshold\_min}}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00149}00149\ }
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00150}00150\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ def\_monitor\_warning\_interval\ =\ 30;\ \textcolor{comment}{//\ After\ this\ number\ of\ monitor\ intervals,\ warning\ is\ output\ if\ the\ threshold\ is\ hit}}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00151}00151\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ warning\_interval\_min\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00152}00152\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ warning\_interval\_max\ =\ 450;\ \textcolor{comment}{//\ e.g.\ if\ the\ monitor\ interval\ is\ 2\ sec,\ the\ warning\ interval\ is\ at\ most\ 15\ minutes}}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00153}00153\ }
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00154}00154\ \ \ \ boost::asio::io\_context\ \ \ ctx;}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00155}00155\ }
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00156}00156\ \ \ \ \textcolor{keyword}{using\ }file\_space\_handler\_t\ =\ \mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler}{file\_space\_handler<system\_file\_space\_provider>}};}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00157}00157\ \ \ \ file\_space\_handler\_t\ space\_handler;}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00158}00158\ \};}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00159}00159\ }
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00160}\mbox{\hyperlink{classsysio_1_1resource__monitor__plugin_a90e0286a4d611b80f01ef62efa3a9a0c}{00160}}\ \mbox{\hyperlink{classsysio_1_1resource__monitor__plugin_a90e0286a4d611b80f01ef62efa3a9a0c}{resource\_monitor\_plugin::resource\_monitor\_plugin}}():my(\mbox{\hyperlink{namespacestd}{std}}::make\_unique<\mbox{\hyperlink{classsysio_1_1resource__monitor__plugin__impl}{resource\_monitor\_plugin\_impl}}>())\ \{\}}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00161}00161\ }
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00162}\mbox{\hyperlink{classsysio_1_1resource__monitor__plugin_a8b93e10a48ce2ead30ffb21c06db7713}{00162}}\ \mbox{\hyperlink{classsysio_1_1resource__monitor__plugin_a8b93e10a48ce2ead30ffb21c06db7713}{resource\_monitor\_plugin::\string~resource\_monitor\_plugin}}()\ \{\}}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00163}00163\ }
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00164}\mbox{\hyperlink{classsysio_1_1resource__monitor__plugin_a6d82af2b00041a1f160d7268c1b454b7}{00164}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1resource__monitor__plugin_a6d82af2b00041a1f160d7268c1b454b7}{resource\_monitor\_plugin::set\_program\_options}}(options\_description\&\ \mbox{\hyperlink{xbyak__mnemonic_8h_a4229a9b84f8b8673326f12bd41acd27c}{cli}},\ options\_description\&\ cfg)\ \{}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00165}00165\ \ \ \ my-\/>set\_program\_options(\mbox{\hyperlink{xbyak__mnemonic_8h_a4229a9b84f8b8673326f12bd41acd27c}{cli}},\ cfg);}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00166}00166\ \}}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00167}00167\ }
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00168}\mbox{\hyperlink{classsysio_1_1resource__monitor__plugin_a8aa338848d9b4ea7f0af24674fb9afe3}{00168}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1resource__monitor__plugin_a8aa338848d9b4ea7f0af24674fb9afe3}{resource\_monitor\_plugin::plugin\_initialize}}(\textcolor{keyword}{const}\ variables\_map\&\ options)\ \{}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00169}00169\ \ \ \ my-\/>plugin\_initialize(options);}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00170}00170\ \}}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00171}00171\ }
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00172}\mbox{\hyperlink{classsysio_1_1resource__monitor__plugin_a9450b8a934658e7baa38d0b581c98812}{00172}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1resource__monitor__plugin_a9450b8a934658e7baa38d0b581c98812}{resource\_monitor\_plugin::plugin\_startup}}()\ \{}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00173}00173\ \ \ \ my-\/>plugin\_startup();}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00174}00174\ \}}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00175}00175\ }
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00176}\mbox{\hyperlink{classsysio_1_1resource__monitor__plugin_aec66e2d4bf2493717a81701b2504e138}{00176}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1resource__monitor__plugin_aec66e2d4bf2493717a81701b2504e138}{resource\_monitor\_plugin::plugin\_shutdown}}()\ \{}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00177}00177\ \ \ \ my-\/>plugin\_shutdown();}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00178}00178\ \}}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00179}00179\ }
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00180}\mbox{\hyperlink{classsysio_1_1resource__monitor__plugin_a756d8d52fe7acf391a9e11e27a1a482b}{00180}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1resource__monitor__plugin_a756d8d52fe7acf391a9e11e27a1a482b}{resource\_monitor\_plugin::monitor\_directory}}(\textcolor{keyword}{const}\ bfs::path\&\ \mbox{\hyperlink{classfc_1_1path}{path}})\ \{}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00181}00181\ \ \ \ my-\/>monitor\_directory(\ \mbox{\hyperlink{classfc_1_1path}{path}}\ );}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00182}00182\ \}}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00183}00183\ }
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8cpp_source_l00184}00184\ \}\ \textcolor{comment}{//\ namespace}}
+
+\end{DoxyCode}

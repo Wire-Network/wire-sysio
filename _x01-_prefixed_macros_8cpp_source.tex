@@ -1,0 +1,89 @@
+\doxysection{X01-\/\+Prefixed\+Macros.cpp}
+\hypertarget{_x01-_prefixed_macros_8cpp_source}{}\label{_x01-_prefixed_macros_8cpp_source}\index{libraries/sys-\/vm/external/Catch2/projects/ExtraTests/X01-\/PrefixedMacros.cpp@{libraries/sys-\/vm/external/Catch2/projects/ExtraTests/X01-\/PrefixedMacros.cpp}}
+\mbox{\hyperlink{_x01-_prefixed_macros_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00001}00001\ \textcolor{comment}{//\ X11-\/DisableStringification.cpp}}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00002}00002\ \textcolor{comment}{//\ Test\ that\ Catch's\ prefixed\ macros\ compile\ and\ run\ properly.}}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00004}\mbox{\hyperlink{_x01-_prefixed_macros_8cpp_a656eb5868e824d59f489f910db438420}{00004}}\ \textcolor{preprocessor}{\#define\ CATCH\_CONFIG\_MAIN}}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00005}00005\ \textcolor{comment}{//\ This\ won't\ provide\ full\ coverage,\ but\ it\ might\ be\ worth\ checking}}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00006}00006\ \textcolor{comment}{//\ the\ other\ branch\ as\ well}}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00007}\mbox{\hyperlink{_x01-_prefixed_macros_8cpp_a358d6b3cdce0f94ff4af2f9cb77d0881}{00007}}\ \textcolor{preprocessor}{\#define\ CATCH\_CONFIG\_RUNTIME\_STATIC\_REQUIRE}}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{single__include_2catch2_2catch_8hpp}{catch2/catch.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <type\_traits>}}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00011}00011\ \textcolor{preprocessor}{\#include\ <stdexcept>}}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00013}00013\ [[noreturn]]}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00014}\mbox{\hyperlink{_x01-_prefixed_macros_8cpp_a465fde4d8686a44d0583e023c4287edd}{00014}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{_x01-_prefixed_macros_8cpp_a465fde4d8686a44d0583e023c4287edd}{this\_throws}}()\ \{}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00015}00015\ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}Some\ msg"{}});}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00016}00016\ \}}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00017}\mbox{\hyperlink{_x01-_prefixed_macros_8cpp_a4e2493ea940d46d216484edb2ed663e2}{00017}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{_x01-_prefixed_macros_8cpp_a4e2493ea940d46d216484edb2ed663e2}{this\_doesnt\_throw}}()\ \{\}}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00019}\mbox{\hyperlink{_x01-_prefixed_macros_8cpp_a753ae846eb9eb11e8e03dbdfe3f95b59}{00019}}\ \mbox{\hyperlink{_x01-_prefixed_macros_8cpp_a753ae846eb9eb11e8e03dbdfe3f95b59}{CATCH\_TEST\_CASE}}(\textcolor{stringliteral}{"{}PrefixedMacros"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00020}00020\ \ \ \ \ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespace_catch_1_1_matchers}{Catch::Matchers}};}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00022}00022\ \ \ \ \ CATCH\_REQUIRE(\ 1\ ==\ 1\ );}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00023}00023\ \ \ \ \ CATCH\_REQUIRE\_FALSE(\ 1\ !=\ 1\ );}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00025}00025\ \ \ \ \ CATCH\_REQUIRE\_THROWS(\mbox{\hyperlink{_x01-_prefixed_macros_8cpp_a465fde4d8686a44d0583e023c4287edd}{this\_throws}}());}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00026}00026\ \ \ \ \ CATCH\_REQUIRE\_THROWS\_AS(\mbox{\hyperlink{_x01-_prefixed_macros_8cpp_a465fde4d8686a44d0583e023c4287edd}{this\_throws}}(),\ std::runtime\_error);}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00027}00027\ \ \ \ \ CATCH\_REQUIRE\_THROWS\_WITH(\mbox{\hyperlink{_x01-_prefixed_macros_8cpp_a465fde4d8686a44d0583e023c4287edd}{this\_throws}}(),\ \textcolor{stringliteral}{"{}Some\ msg"{}});}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00028}00028\ \ \ \ \ CATCH\_REQUIRE\_THROWS\_MATCHES(\mbox{\hyperlink{_x01-_prefixed_macros_8cpp_a465fde4d8686a44d0583e023c4287edd}{this\_throws}}(),\ std::runtime\_error,\ Predicate<std::runtime\_error>([](std::runtime\_error\ \textcolor{keyword}{const}\&)\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \}));}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00029}00029\ \ \ \ \ CATCH\_REQUIRE\_NOTHROW(\mbox{\hyperlink{_x01-_prefixed_macros_8cpp_a4e2493ea940d46d216484edb2ed663e2}{this\_doesnt\_throw}}());}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00031}00031\ \ \ \ \ CATCH\_CHECK(\ 1\ ==\ 1\ );}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00032}00032\ \ \ \ \ CATCH\_CHECK\_FALSE(\ 1\ !=\ 1\ );}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00033}00033\ \ \ \ \ CATCH\_CHECKED\_IF(\ 1\ ==\ 1\ )\ \{}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00034}00034\ \ \ \ \ \ \ \ \ CATCH\_SUCCEED(\textcolor{stringliteral}{"{}don't\ care"{}});}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00035}00035\ \ \ \ \ \}\ CATCH\_CHECKED\_ELSE\ (\ 1\ ==\ 1\ )\ \{}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00036}00036\ \ \ \ \ \ \ \ \ CATCH\_SUCCEED(\textcolor{stringliteral}{"{}don't\ care"{}});}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00037}00037\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00039}00039\ \ \ \ \ CATCH\_CHECK\_NOFAIL(1\ ==\ 2);}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00041}00041\ \ \ \ \ CATCH\_CHECK\_THROWS(\mbox{\hyperlink{_x01-_prefixed_macros_8cpp_a465fde4d8686a44d0583e023c4287edd}{this\_throws}}());}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00042}00042\ \ \ \ \ CATCH\_CHECK\_THROWS\_AS(\mbox{\hyperlink{_x01-_prefixed_macros_8cpp_a465fde4d8686a44d0583e023c4287edd}{this\_throws}}(),\ std::runtime\_error);}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00043}00043\ \ \ \ \ CATCH\_CHECK\_THROWS\_WITH(\mbox{\hyperlink{_x01-_prefixed_macros_8cpp_a465fde4d8686a44d0583e023c4287edd}{this\_throws}}(),\ \textcolor{stringliteral}{"{}Some\ msg"{}});}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00044}00044\ \ \ \ \ CATCH\_CHECK\_THROWS\_MATCHES(\mbox{\hyperlink{_x01-_prefixed_macros_8cpp_a465fde4d8686a44d0583e023c4287edd}{this\_throws}}(),\ std::runtime\_error,\ Predicate<std::runtime\_error>([](std::runtime\_error\ \textcolor{keyword}{const}\&)\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \}));}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00045}00045\ \ \ \ \ CATCH\_CHECK\_NOTHROW(\mbox{\hyperlink{_x01-_prefixed_macros_8cpp_a4e2493ea940d46d216484edb2ed663e2}{this\_doesnt\_throw}}());}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00047}00047\ \ \ \ \ CATCH\_REQUIRE\_THAT(\textcolor{stringliteral}{"{}abcd"{}},\ Equals(\textcolor{stringliteral}{"{}abcd"{}}));}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00048}00048\ \ \ \ \ CATCH\_CHECK\_THAT(\textcolor{stringliteral}{"{}bdef"{}},\ Equals(\textcolor{stringliteral}{"{}bdef"{}}));}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00050}00050\ \ \ \ \ CATCH\_INFO(\ \textcolor{stringliteral}{"{}some\ info"{}}\ );}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00051}00051\ \ \ \ \ CATCH\_WARN(\ \textcolor{stringliteral}{"{}some\ warn"{}}\ );}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00052}00052\ \ \ \ \ CATCH\_SECTION(\textcolor{stringliteral}{"{}some\ section"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ i\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00054}00054\ \ \ \ \ \ \ \ \ CATCH\_CAPTURE(\ i\ );}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00055}00055\ \ \ \ \ \ \ \ \ CATCH\_DYNAMIC\_SECTION(\textcolor{stringliteral}{"{}Dynamic\ section:\ "{}}\ <<\ i)\ \{}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \ \ \ CATCH\_FAIL\_CHECK(\ \textcolor{stringliteral}{"{}failure"{}}\ );}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00057}00057\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00058}00058\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00060}00060\ \ \ \ \ CATCH\_STATIC\_REQUIRE(\ std::is\_void<void>::value\ );}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00061}00061\ \ \ \ \ CATCH\_STATIC\_REQUIRE\_FALSE(\ std::is\_void<int>::value\ );}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00062}00062\ \}}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00064}\mbox{\hyperlink{_x01-_prefixed_macros_8cpp_a0ac1669dcb33ae21e3943063cb1bb53f}{00064}}\ \mbox{\hyperlink{_x01-_prefixed_macros_8cpp_a0ac1669dcb33ae21e3943063cb1bb53f}{CATCH\_ANON\_TEST\_CASE}}()\ \{}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00065}00065\ \ \ \ \ CATCH\_FAIL(\textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00066}00066\ \}}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00067}00067\ }
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00068}00068\ \textcolor{comment}{//\ Missing:}}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00069}00069\ }
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00070}00070\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00071}00071\ \textcolor{comment}{//\ \#define\ CATCH\_TEST\_CASE\_METHOD(\ className,\ ...\ )\ INTERNAL\_CATCH\_TEST\_CASE\_METHOD(\ className,\ \_\_VA\_ARGS\_\_\ )}}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00072}00072\ \textcolor{comment}{//\ \#define\ CATCH\_METHOD\_AS\_TEST\_CASE(\ method,\ ...\ )\ INTERNAL\_CATCH\_METHOD\_AS\_TEST\_CASE(\ method,\ \_\_VA\_ARGS\_\_\ )}}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00073}00073\ \textcolor{comment}{//\ \#define\ CATCH\_REGISTER\_TEST\_CASE(\ Function,\ ...\ )\ INTERNAL\_CATCH\_REGISTER\_TESTCASE(\ Function,\ \_\_VA\_ARGS\_\_\ )}}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00074}00074\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00075}00075\ \textcolor{comment}{//\ //\ "{}BDD-\/style"{}\ convenience\ wrappers}}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00076}00076\ \textcolor{comment}{//\ \#define\ CATCH\_SCENARIO(\ ...\ )\ CATCH\_TEST\_CASE(\ "{}Scenario:\ "{}\ \_\_VA\_ARGS\_\_\ )}}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00077}00077\ \textcolor{comment}{//\ \#define\ CATCH\_SCENARIO\_METHOD(\ className,\ ...\ )\ INTERNAL\_CATCH\_TEST\_CASE\_METHOD(\ className,\ "{}Scenario:\ "{}\ \_\_VA\_ARGS\_\_\ )}}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00078}00078\ \textcolor{comment}{//\ \#define\ CATCH\_GIVEN(\ desc\ )\ \ \ \ INTERNAL\_CATCH\_DYNAMIC\_SECTION(\ "{}\ \ \ Given:\ "{}\ <<\ desc\ )}}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00079}00079\ \textcolor{comment}{//\ \#define\ CATCH\_WHEN(\ desc\ )\ \ \ \ \ INTERNAL\_CATCH\_DYNAMIC\_SECTION(\ "{}\ \ \ \ When:\ "{}\ <<\ desc\ )}}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00080}00080\ \textcolor{comment}{//\ \#define\ CATCH\_AND\_WHEN(\ desc\ )\ INTERNAL\_CATCH\_DYNAMIC\_SECTION(\ "{}And\ when:\ "{}\ <<\ desc\ )}}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00081}00081\ \textcolor{comment}{//\ \#define\ CATCH\_THEN(\ desc\ )\ \ \ \ \ INTERNAL\_CATCH\_DYNAMIC\_SECTION(\ "{}\ \ \ \ Then:\ "{}\ <<\ desc\ )}}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00082}00082\ \textcolor{comment}{//\ \#define\ CATCH\_AND\_THEN(\ desc\ )\ INTERNAL\_CATCH\_DYNAMIC\_SECTION(\ "{}\ \ \ \ \ And:\ "{}\ <<\ desc\ )}}
+\DoxyCodeLine{\Hypertarget{_x01-_prefixed_macros_8cpp_source_l00083}00083\ \textcolor{comment}{//}}
+
+\end{DoxyCode}

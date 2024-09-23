@@ -1,0 +1,177 @@
+\doxysection{libraries/fc/include/fc/io/raw\+\_\+fwd.hpp File Reference}
+\hypertarget{raw__fwd_8hpp}{}\label{raw__fwd_8hpp}\index{libraries/fc/include/fc/io/raw\_fwd.hpp@{libraries/fc/include/fc/io/raw\_fwd.hpp}}
+{\ttfamily \#include $<$fc/container/flat\+\_\+fwd.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/container/deque\+\_\+fwd.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/io/varint.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/array.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/safe.\+hpp$>$}\newline
+{\ttfamily \#include $<$deque$>$}\newline
+{\ttfamily \#include $<$vector$>$}\newline
+{\ttfamily \#include $<$string$>$}\newline
+{\ttfamily \#include $<$unordered\+\_\+set$>$}\newline
+{\ttfamily \#include $<$unordered\+\_\+map$>$}\newline
+{\ttfamily \#include $<$set$>$}\newline
+{\ttfamily \#include $<$variant$>$}\newline
+Include dependency graph for raw\+\_\+fwd.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{raw__fwd_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{raw__fwd_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacefc}{fc}}
+\begin{DoxyCompactList}\small\item\em namespace \doxylink{namespacesysio_1_1chain}{sysio\+::chain} \end{DoxyCompactList}\item 
+namespace \mbox{\hyperlink{namespacefc_1_1ip}{fc\+::ip}}
+\item 
+namespace \mbox{\hyperlink{namespacefc_1_1ecc}{fc\+::ecc}}
+\item 
+namespace \mbox{\hyperlink{namespacefc_1_1raw}{fc\+::raw}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\size\+\_\+t \mbox{\hyperlink{namespacefc_1_1raw_a64937a5adc8041247f7007882224e225}{fc\+::raw\+::pack\+\_\+size}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&v)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename Storage $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_ad16e9fa73c9e4d1c2864d9dfe08cec0b}{fc\+::raw\+::pack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, const \mbox{\hyperlink{classfc_1_1fixed__string}{fc\+::fixed\+\_\+string}}$<$ Storage $>$ \&u)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename Storage $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_a396b70a7749206abf6d2f90f4122fec3}{fc\+::raw\+::unpack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, \mbox{\hyperlink{classfc_1_1fixed__string}{fc\+::fixed\+\_\+string}}$<$ Storage $>$ \&u)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename Int\+Type , typename Enum\+Type $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_aaab001dba3d9f44e2dd3c783140f0ce6}{fc\+::raw\+::pack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, const \mbox{\hyperlink{classfc_1_1enum__type}{fc\+::enum\+\_\+type}}$<$ Int\+Type, Enum\+Type $>$ \&tp)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename Int\+Type , typename Enum\+Type $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_a1b6856fecc88663223d4bfe562d25545}{fc\+::raw\+::unpack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, \mbox{\hyperlink{classfc_1_1enum__type}{fc\+::enum\+\_\+type}}$<$ Int\+Type, Enum\+Type $>$ \&tp)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_adb38138cfe5cf6f5f7ee63fca71dd2f4}{fc\+::raw\+::pack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, const std\+::set$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_a311ce8a6c6bf552061e282ea7d3a7147}{fc\+::raw\+::unpack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, std\+::set$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_a719169120fd05a6546824739fa5e4342}{fc\+::raw\+::pack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, const std\+::unordered\+\_\+set$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_aa10d1d1815362915e15825191573696d}{fc\+::raw\+::unpack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, std\+::unordered\+\_\+set$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename... T$>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_a85de16b30a7d5eee96300e07ef5af3ab}{fc\+::raw\+::pack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, const std\+::variant$<$ T... $>$ \&sv)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename... T$>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_a54dc46bdb4c7d1c2e5150d8d3f6153b1}{fc\+::raw\+::unpack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, std\+::variant$<$ T... $>$ \&sv)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc\+::raw\+::pack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, const std\+::deque$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_a0b442d98ceb22dd5a6ae84745e43ffab}{fc\+::raw\+::unpack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, std\+::deque$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename... U$>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_a5811868e21bdac7a595b27bf31fa3b57}{fc\+::raw\+::pack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, const boost\+::container\+::deque$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, U... $>$ \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename... U$>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_a7fad168342b07ed43ed520d67660673c}{fc\+::raw\+::unpack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, boost\+::container\+::deque$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, U... $>$ \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename \mbox{\hyperlink{make__512_8cpp_a3d4e997ddc51e0c06c306fe4862826c0}{K}} , typename \mbox{\hyperlink{struct_v}{V}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_a0cc49861443b438814db009e9181b60e}{fc\+::raw\+::pack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, const std\+::unordered\+\_\+map$<$ \mbox{\hyperlink{make__512_8cpp_a3d4e997ddc51e0c06c306fe4862826c0}{K}}, \mbox{\hyperlink{struct_v}{V}} $>$ \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename \mbox{\hyperlink{make__512_8cpp_a3d4e997ddc51e0c06c306fe4862826c0}{K}} , typename \mbox{\hyperlink{struct_v}{V}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_a1c8ad87391e7a8b774f5668c7c0f48b3}{fc\+::raw\+::unpack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, std\+::unordered\+\_\+map$<$ \mbox{\hyperlink{make__512_8cpp_a3d4e997ddc51e0c06c306fe4862826c0}{K}}, \mbox{\hyperlink{struct_v}{V}} $>$ \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename \mbox{\hyperlink{make__512_8cpp_a3d4e997ddc51e0c06c306fe4862826c0}{K}} , typename \mbox{\hyperlink{struct_v}{V}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_a27d0dba273c0ba43eb92bca1a7603797}{fc\+::raw\+::pack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, const std\+::map$<$ \mbox{\hyperlink{make__512_8cpp_a3d4e997ddc51e0c06c306fe4862826c0}{K}}, \mbox{\hyperlink{struct_v}{V}} $>$ \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename \mbox{\hyperlink{make__512_8cpp_a3d4e997ddc51e0c06c306fe4862826c0}{K}} , typename \mbox{\hyperlink{struct_v}{V}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_a2170d3403828f6dac644f86a1a1ebe4b}{fc\+::raw\+::unpack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, std\+::map$<$ \mbox{\hyperlink{make__512_8cpp_a3d4e997ddc51e0c06c306fe4862826c0}{K}}, \mbox{\hyperlink{struct_v}{V}} $>$ \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename \mbox{\hyperlink{make__512_8cpp_a3d4e997ddc51e0c06c306fe4862826c0}{K}} , typename \mbox{\hyperlink{struct_v}{V}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_a6bfa8d4867ded739fee81194b5dd8389}{fc\+::raw\+::pack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, const std\+::pair$<$ \mbox{\hyperlink{make__512_8cpp_a3d4e997ddc51e0c06c306fe4862826c0}{K}}, \mbox{\hyperlink{struct_v}{V}} $>$ \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename \mbox{\hyperlink{make__512_8cpp_a3d4e997ddc51e0c06c306fe4862826c0}{K}} , typename \mbox{\hyperlink{struct_v}{V}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_a84c3c90a913dafd4c090f9891e25dd67}{fc\+::raw\+::unpack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, std\+::pair$<$ \mbox{\hyperlink{make__512_8cpp_a3d4e997ddc51e0c06c306fe4862826c0}{K}}, \mbox{\hyperlink{struct_v}{V}} $>$ \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t S$>$ }\\auto \mbox{\hyperlink{namespacefc_1_1raw_a48ff4e4cd4b3daf56773a9a52f773ce0}{fc\+::raw\+::pack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, const std\+::array$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{struct_s}{S}} $>$ \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}) -\/$>$ std\+::enable\+\_\+if\+\_\+t$<$ \mbox{\hyperlink{namespacefc_1_1raw_a50f635d725e18ce9ea38508c5a732926}{is\+\_\+trivial\+\_\+array}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ $>$
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t S$>$ }\\auto \mbox{\hyperlink{namespacefc_1_1raw_aa5f3fd917ffdd993234e9ade39cfef2d}{fc\+::raw\+::unpack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, std\+::array$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{struct_s}{S}} $>$ \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}) -\/$>$ std\+::enable\+\_\+if\+\_\+t$<$ \mbox{\hyperlink{namespacefc_1_1raw_a50f635d725e18ce9ea38508c5a732926}{is\+\_\+trivial\+\_\+array}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ $>$
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_a9330005e0cc3bd154e24eee8e48e5948}{fc\+::raw\+::pack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, const \mbox{\hyperlink{classfc_1_1variant__object}{variant\+\_\+object}} \&v)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_ae273ecf236c8d8d212c9d5dc128347f3}{fc\+::raw\+::unpack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, \mbox{\hyperlink{classfc_1_1variant__object}{variant\+\_\+object}} \&v)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_a68cd27ab73d4d1b601b4b504e3a924bb}{fc\+::raw\+::pack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, const \mbox{\hyperlink{classfc_1_1variant}{variant}} \&v)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_ad898ed0ffe169c5ea5244a1ce4558eda}{fc\+::raw\+::unpack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, \mbox{\hyperlink{classfc_1_1variant}{variant}} \&v)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_a363008130dad99ee5c5669830f122086}{fc\+::raw\+::pack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&tp)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_a8116fa09e0457b661d102947eee25d04}{fc\+::raw\+::unpack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&tp)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_a0fdb9c6ae378596a96db14f8c4408dee}{fc\+::raw\+::pack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, const \mbox{\hyperlink{classfc_1_1ip_1_1endpoint}{ip\+::endpoint}} \&v)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_a463c3e6576b91e9bb634d9fac69b72ef}{fc\+::raw\+::unpack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, \mbox{\hyperlink{classfc_1_1ip_1_1endpoint}{ip\+::endpoint}} \&v)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_a8d8c5b3d9ad3b68b738b98d830048008}{fc\+::raw\+::unpack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, std\+::optional$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&v)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_a234f37e68ae495cf1fae7de03b0c6b23}{fc\+::raw\+::unpack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&vi)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_afb071fb0c2276c2b05c3b2623538d4a3}{fc\+::raw\+::pack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, const std\+::optional$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&v)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_a26d0eb6b1a5f7322e169b18d87491e55}{fc\+::raw\+::pack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, const \mbox{\hyperlink{structfc_1_1safe}{safe}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&v)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_ab406e5a6a27a4ccbedd947f9b1021b6a}{fc\+::raw\+::unpack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, \mbox{\hyperlink{structfc_1_1safe}{fc\+::safe}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&v)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_a698aa730f0edf6aa582932ec8e5c557a}{fc\+::raw\+::unpack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, \mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}} \&tp)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_af86d2f0841518cf3bad8927cdbdb423a}{fc\+::raw\+::pack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, const \mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}} \&tp)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_abc5faea01ee805ad5c1cff20e6d88b31}{fc\+::raw\+::unpack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, \mbox{\hyperlink{classfc_1_1time__point__sec}{fc\+::time\+\_\+point\+\_\+sec}} \&tp)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_a2c8b2fb77a4b62e79019ac70f9f7f8b7}{fc\+::raw\+::pack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, const \mbox{\hyperlink{classfc_1_1time__point__sec}{fc\+::time\+\_\+point\+\_\+sec}} \&tp)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_acd21e607b08af2b09c2c28299ecd8c79}{fc\+::raw\+::unpack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} \&v)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_a8ebbc74167fa3603e7f10b6c8673c8c8}{fc\+::raw\+::pack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} \&v)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_a68ecd1a0fea178dfb381f2ce23d45c77}{fc\+::raw\+::unpack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, \mbox{\hyperlink{classfc_1_1ecc_1_1public__key}{fc\+::ecc\+::public\+\_\+key}} \&pk)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_a9eecb072d3a184c2d5dc19c6827135f7}{fc\+::raw\+::pack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, const \mbox{\hyperlink{classfc_1_1ecc_1_1public__key}{fc\+::ecc\+::public\+\_\+key}} \&pk)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_a8e8867758230bf90b637d0e46268f77e}{fc\+::raw\+::unpack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, \mbox{\hyperlink{classfc_1_1ecc_1_1private__key}{fc\+::ecc\+::private\+\_\+key}} \&pk)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_ad003e62682aaf0914bf58543033de1ae}{fc\+::raw\+::pack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, const \mbox{\hyperlink{classfc_1_1ecc_1_1private__key}{fc\+::ecc\+::private\+\_\+key}} \&pk)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_ad3aa653b2a5c5115fe1480da7e33e052}{fc\+::raw\+::pack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&v)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_af687cfa28fad98a060654d9039d0bf2b}{fc\+::raw\+::unpack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&v)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_a3112cabea66c93d30ac00024858272c4}{fc\+::raw\+::pack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, const std\+::vector$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_afc280229863f36d108c595d73f0c4787}{fc\+::raw\+::unpack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, std\+::vector$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_aaf86a368b41fd7387e650118dc76c16b}{fc\+::raw\+::pack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, const \mbox{\hyperlink{structfc_1_1signed__int}{signed\+\_\+int}} \&v)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_ad5cc23c416b00f91554e0113d4c2f228}{fc\+::raw\+::unpack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, \mbox{\hyperlink{structfc_1_1signed__int}{signed\+\_\+int}} \&vi)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_a2b6c821f8272feaf148c356afed9be10}{fc\+::raw\+::pack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, const \mbox{\hyperlink{structfc_1_1unsigned__int}{unsigned\+\_\+int}} \&v)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_a7c53fc63be442d31d37a942231f23954}{fc\+::raw\+::unpack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, \mbox{\hyperlink{structfc_1_1unsigned__int}{unsigned\+\_\+int}} \&vi)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_a134fe9acb5ab1bd68a553946f14ffd4f}{fc\+::raw\+::pack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, const char \texorpdfstring{$\ast$}{*}v)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_a725f8a4a02d00634515f84852d6f2a1f}{fc\+::raw\+::pack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, const std\+::vector$<$ char $>$ \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_aa169baf1201da018a31a44188749e486}{fc\+::raw\+::unpack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, std\+::vector$<$ char $>$ \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , size\+\_\+t N$>$ }\\auto \mbox{\hyperlink{namespacefc_1_1raw_a02e6da4d9404c570b136c1f8ccc32e35}{fc\+::raw\+::pack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, const \mbox{\hyperlink{classfc_1_1array}{fc\+::array}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}} $>$ \&v) -\/$>$ std\+::enable\+\_\+if\+\_\+t$<$!\mbox{\hyperlink{namespacefc_1_1raw_a50f635d725e18ce9ea38508c5a732926}{is\+\_\+trivial\+\_\+array}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ $>$
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , size\+\_\+t N$>$ }\\auto \mbox{\hyperlink{namespacefc_1_1raw_a7d51f346175908c9c61b024f3cb6e8ff}{fc\+::raw\+::unpack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, \mbox{\hyperlink{classfc_1_1array}{fc\+::array}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}} $>$ \&v) -\/$>$ std\+::enable\+\_\+if\+\_\+t$<$!\mbox{\hyperlink{namespacefc_1_1raw_a50f635d725e18ce9ea38508c5a732926}{is\+\_\+trivial\+\_\+array}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ $>$
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_a07044dd3d3b6fa1bf4439bf09dd99c42}{fc\+::raw\+::pack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, const bool \&v)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_aa32b83c3bfc40bf1cc741b69c96fab50}{fc\+::raw\+::unpack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, bool \&v)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\std\+::vector$<$ char $>$ \mbox{\hyperlink{namespacefc_1_1raw_a74a2d3576c1d8bc03ebfb3fbfcc9f2b7}{fc\+::raw\+::pack}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&v)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{namespacefc_1_1raw_aa7242573b01600ab440fd437e37c091b}{fc\+::raw\+::unpack}} (const std\+::vector$<$ char $>$ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{namespacefc_1_1raw_a9fae02a9ccf1d398bcf3cf11a548475a}{fc\+::raw\+::unpack}} (const char \texorpdfstring{$\ast$}{*}d, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_ab7250a68159efdc9ca209d51ab4ea3c0}{fc\+::raw\+::unpack}} (const char \texorpdfstring{$\ast$}{*}d, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&v)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\constexpr bool \mbox{\hyperlink{namespacefc_1_1raw_a50f635d725e18ce9ea38508c5a732926}{fc\+::raw\+::is\+\_\+trivial\+\_\+array}} = std\+::is\+\_\+scalar$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}} == true \&\& std\+::is\+\_\+pointer$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}} == false
+\end{DoxyCompactItemize}

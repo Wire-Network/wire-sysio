@@ -1,0 +1,170 @@
+\doxysection{incremental\+\_\+merkle.\+hpp}
+\hypertarget{incremental__merkle_8hpp_source}{}\label{incremental__merkle_8hpp_source}\index{libraries/chain/include/sysio/chain/incremental\_merkle.hpp@{libraries/chain/include/sysio/chain/incremental\_merkle.hpp}}
+\mbox{\hyperlink{incremental__merkle_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{chain_2include_2sysio_2chain_2types_8hpp}{sysio/chain/types.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{merkle_8hpp}{sysio/chain/merkle.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{raw_8hpp}{fc/io/raw.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00006}00006\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{\ \textcolor{keyword}{namespace\ }chain\ \{}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00008}00008\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacedetail}{detail}}\ \{}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00017}\mbox{\hyperlink{namespacesysio_1_1chain_1_1detail_aadb14742ae5e74e7a95b645635e81182}{00017}}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1detail_aadb14742ae5e74e7a95b645635e81182}{next\_power\_of\_2}}(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})\ \{}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00018}00018\ \ \ \ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ -\/=\ 1;}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00019}00019\ \ \ \ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ |=\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ >>\ 1;}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00020}00020\ \ \ \ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ |=\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ >>\ 2;}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00021}00021\ \ \ \ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ |=\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ >>\ 4;}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00022}00022\ \ \ \ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ |=\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ >>\ 8;}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00023}00023\ \ \ \ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ |=\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ >>\ 16;}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00024}00024\ \ \ \ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ |=\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ >>\ 32;}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00025}00025\ \ \ \ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ +=\ 1;}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00026}00026\ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}};}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00027}00027\ \}}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00038}\mbox{\hyperlink{namespacesysio_1_1chain_1_1detail_aa2a5b13da34aba1dad3652772bcc7abd}{00038}}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1detail_aa2a5b13da34aba1dad3652772bcc7abd}{clz\_power\_2}}(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})\ \{}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00039}00039\ \ \ \ \textcolor{keywordtype}{int}\ lz\ =\ 64;}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00041}00041\ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})\ lz-\/-\/;}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00042}00042\ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ \&\ 0x00000000FFFFFFFFULL)\ lz\ -\/=\ 32;}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00043}00043\ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ \&\ 0x0000FFFF0000FFFFULL)\ lz\ -\/=\ 16;}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00044}00044\ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ \&\ 0x00FF00FF00FF00FFULL)\ lz\ -\/=\ 8;}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00045}00045\ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ \&\ 0x0F0F0F0F0F0F0F0FULL)\ lz\ -\/=\ 4;}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00046}00046\ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ \&\ 0x3333333333333333ULL)\ lz\ -\/=\ 2;}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00047}00047\ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ \&\ 0x5555555555555555ULL)\ lz\ -\/=\ 1;}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00049}00049\ \ \ \ \textcolor{keywordflow}{return}\ lz;}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00050}00050\ \}}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00059}\mbox{\hyperlink{namespacesysio_1_1chain_1_1detail_a4792d9890e3eac4dcda1701a5205b6a0}{00059}}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1detail_a4792d9890e3eac4dcda1701a5205b6a0}{calcluate\_max\_depth}}(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ node\_count)\ \{}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00060}00060\ \ \ \ \textcolor{keywordflow}{if}\ (node\_count\ ==\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00061}00061\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00062}00062\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00063}00063\ \ \ \ \textcolor{keyword}{auto}\ implied\_count\ =\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1detail_aadb14742ae5e74e7a95b645635e81182}{next\_power\_of\_2}}(node\_count);}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00064}00064\ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1detail_aa2a5b13da34aba1dad3652772bcc7abd}{clz\_power\_2}}(implied\_count)\ +\ 1;}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00065}00065\ \}}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00067}00067\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ ContainerA,\ \textcolor{keyword}{typename}\ ContainerB>}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00068}\mbox{\hyperlink{namespacesysio_1_1chain_1_1detail_ae701f28aaa83d39549003f9df7b5dd7a}{00068}}\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1detail_ae701f28aaa83d39549003f9df7b5dd7a}{move\_nodes}}(ContainerA\&\ to,\ \textcolor{keyword}{const}\ ContainerB\&\ from)\ \{}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00069}00069\ \ \ \ to.clear();}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00070}00070\ \ \ \ to.insert(to.begin(),\ from.begin(),\ from.end());}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00071}00071\ \}}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00073}00073\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ Container>}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00074}\mbox{\hyperlink{namespacesysio_1_1chain_1_1detail_a877b80d6ef213d2933bd06295bb086aa}{00074}}\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1detail_ae701f28aaa83d39549003f9df7b5dd7a}{move\_nodes}}(Container\&\ to,\ Container\&\&\ from)\ \{}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00075}00075\ \ \ \ to\ =\ std::forward<Container>(from);}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00076}00076\ \}}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00077}00077\ }
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00079}00079\ \}\ }
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00080}00080\ }
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00094}00094\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ DigestType,\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ ...>\ \textcolor{keyword}{class\ }Container\ =\ \mbox{\hyperlink{classfc_1_1vector}{vector}},\ \textcolor{keyword}{typename}\ ...Args>}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00095}\mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl}{00095}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl}{incremental\_merkle\_impl}}\ \{}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00096}00096\ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00097}\mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl_ac99d8e01e28d02fa609b783a0ebd0af8}{00097}}\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl_ac99d8e01e28d02fa609b783a0ebd0af8}{incremental\_merkle\_impl}}()}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00098}00098\ \ \ \ \ \ \ :\mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl_ac877442baeeb8db5ff69267bd9c46cc5}{\_node\_count}}(0)}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00099}00099\ \ \ \ \ \ \ \{\}}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00100}00100\ }
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00101}\mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl_abe69a28e8afcf187714b8a4d6546c609}{00101}}\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl_abe69a28e8afcf187714b8a4d6546c609}{incremental\_merkle\_impl}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl}{incremental\_merkle\_impl}}\&\ )\ =\ \textcolor{keywordflow}{default};}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00102}\mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl_ad2794bd3ccd8f0f75c45497dba80c104}{00102}}\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl_ad2794bd3ccd8f0f75c45497dba80c104}{incremental\_merkle\_impl}}(\ \mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl}{incremental\_merkle\_impl}}\&\&\ )\ =\ \textcolor{keywordflow}{default};}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00103}\mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl_a189c517565c5733a2a5e4aa1a47971ff}{00103}}\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl}{incremental\_merkle\_impl}}\&\ \mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl_a189c517565c5733a2a5e4aa1a47971ff}{operator=\ }}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl}{incremental\_merkle\_impl}}\&\ )\ =\ \textcolor{keywordflow}{default};}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00104}\mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl_a34013a415c8106c7585be2addb3237ab}{00104}}\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl}{incremental\_merkle\_impl}}\&\ \mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl_a189c517565c5733a2a5e4aa1a47971ff}{operator=\ }}(\ \mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl}{incremental\_merkle\_impl}}\&\&\ )\ =\ \textcolor{keywordflow}{default};}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00105}00105\ }
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00106}00106\ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ Allocator,\ std::enable\_if\_t<!std::is\_same<std::decay\_t<Allocator>,\ incremental\_merkle\_impl>::value,\ \textcolor{keywordtype}{int}>\ =\ 0>}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00107}\mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl_ab99b2dca68e1d5384b82f016b1aa0f2b}{00107}}\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl_ab99b2dca68e1d5384b82f016b1aa0f2b}{incremental\_merkle\_impl}}(\ \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}\&\&\ alloc\ ):\mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl_a60ab24f98b31e15542b84427d77a0fc1}{\_active\_nodes}}(forward<\mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}>(alloc))\{\}}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00108}00108\ }
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00109}00109\ \ \ \ \ \ \ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00110}00110\ \textcolor{comment}{\ \ \ \ \ \ template<template<typename\ ...>\ class\ OtherContainer,\ typename\ ...OtherArgs>}}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00111}00111\ \textcolor{comment}{\ \ \ \ \ \ incremental\_merkle\_impl(\ incremental\_merkle\_impl<DigestType,\ OtherContainer,\ OtherArgs...>\&\&\ other\ )}}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00112}00112\ \textcolor{comment}{\ \ \ \ \ \ :\_node\_count(other.\_node\_count)}}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00113}00113\ \textcolor{comment}{\ \ \ \ \ \ ,\_active\_nodes(other.\_active\_nodes.begin(),\ other.active\_nodes.end())}}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00114}00114\ \textcolor{comment}{\ \ \ \ \ \ \{\}}}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00115}00115\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00116}00116\ \textcolor{comment}{\ \ \ \ \ \ incremental\_merkle\_impl(\ incremental\_merkle\_impl\&\&\ other\ )}}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00117}00117\ \textcolor{comment}{\ \ \ \ \ \ :\_node\_count(other.\_node\_count)}}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00118}00118\ \textcolor{comment}{\ \ \ \ \ \ ,\_active\_nodes(std::forward<decltype(\_active\_nodes)>(other.\_active\_nodes))}}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00119}00119\ \textcolor{comment}{\ \ \ \ \ \ \{\}}}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00120}00120\ \textcolor{comment}{\ \ \ \ \ \ */}}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00121}00121\ }
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00168}\mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl_a4192de0909a94a3eadcf2938079c5adb}{00168}}\ \ \ \ \ \ \ \textcolor{keyword}{const}\ DigestType\&\ \mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl_a4192de0909a94a3eadcf2938079c5adb}{append}}(\textcolor{keyword}{const}\ DigestType\&\ \mbox{\hyperlink{namespacefc_a150ca4cd9c0318ca45dc0dc7df5d58b9}{digest}})\ \{}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00169}00169\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ partial\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00170}00170\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ max\_depth\ =\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1detail_a4792d9890e3eac4dcda1701a5205b6a0}{detail::calcluate\_max\_depth}}(\mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl_ac877442baeeb8db5ff69267bd9c46cc5}{\_node\_count}}\ +\ 1);}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00171}00171\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ current\_depth\ =\ max\_depth\ -\/\ 1;}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00172}00172\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ index\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl_ac877442baeeb8db5ff69267bd9c46cc5}{\_node\_count}};}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00173}00173\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ top\ =\ \mbox{\hyperlink{namespacefc_a150ca4cd9c0318ca45dc0dc7df5d58b9}{digest}};}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00174}00174\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ active\_iter\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl_a60ab24f98b31e15542b84427d77a0fc1}{\_active\_nodes}}.begin();}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00175}00175\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ updated\_active\_nodes\ =\ \mbox{\hyperlink{classfc_1_1vector}{vector<DigestType>}}();}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00176}00176\ \ \ \ \ \ \ \ \ \ updated\_active\_nodes.reserve(max\_depth);}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00177}00177\ }
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00178}00178\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (current\_depth\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00179}00179\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!(index\ \&\ 0x1))\ \{}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00180}00180\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ we\ are\ collapsing\ from\ a\ "{}left"{}\ value\ and\ an\ implied\ "{}right"{}\ creating\ a\ partial\ node}}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00181}00181\ }
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00182}00182\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ we\ only\ need\ to\ append\ this\ node\ if\ it\ is\ fully-\/realized\ and\ by\ definition}}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00183}00183\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ if\ we\ have\ encountered\ a\ partial\ node\ during\ collapse\ this\ cannot\ be}}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00184}00184\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ fully-\/realized}}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00185}00185\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!partial)\ \{}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00186}00186\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ updated\_active\_nodes.emplace\_back(top);}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00187}00187\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00188}00188\ }
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00189}00189\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ calculate\ the\ partially\ realized\ node\ value\ by\ implying\ the\ "{}right"{}\ value\ is\ identical}}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00190}00190\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ to\ the\ "{}left"{}\ value}}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00191}00191\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ top\ =\ DigestType::hash(\mbox{\hyperlink{namespacesysio_1_1chain_aaef17ed9b59c73f49f1889fe7484314f}{make\_canonical\_pair}}(top,\ top));}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00192}00192\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ partial\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00193}00193\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00194}00194\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ we\ are\ collapsing\ from\ a\ "{}right"{}\ value\ and\ an\ fully-\/realized\ "{}left"{}}}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00195}00195\ }
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00196}00196\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ pull\ a\ "{}left"{}\ value\ from\ the\ previous\ active\ nodes}}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00197}00197\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ left\_value\ =\ *active\_iter;}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00198}00198\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++active\_iter;}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00199}00199\ }
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00200}00200\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ if\ the\ "{}right"{}\ value\ is\ a\ partial\ node\ we\ will\ need\ to\ copy\ the\ "{}left"{}\ as\ future\ appends\ still\ need\ it}}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00201}00201\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ otherwise,\ it\ can\ be\ dropped\ from\ the\ set\ of\ active\ nodes\ as\ we\ are\ collapsing\ a\ fully-\/realized\ node}}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00202}00202\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (partial)\ \{}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00203}00203\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ updated\_active\_nodes.emplace\_back(left\_value);}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00204}00204\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00205}00205\ }
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00206}00206\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ calculate\ the\ node}}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00207}00207\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ top\ =\ DigestType::hash(\mbox{\hyperlink{namespacesysio_1_1chain_aaef17ed9b59c73f49f1889fe7484314f}{make\_canonical\_pair}}(left\_value,\ top));}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00208}00208\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00209}00209\ }
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00210}00210\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ move\ up\ a\ level\ in\ the\ tree}}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00211}00211\ \ \ \ \ \ \ \ \ \ \ \ \ current\_depth-\/-\/;}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00212}00212\ \ \ \ \ \ \ \ \ \ \ \ \ index\ =\ index\ >>\ 1;}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00213}00213\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00214}00214\ }
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00215}00215\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ append\ the\ top\ of\ the\ collapsed\ tree\ (aka\ the\ root\ of\ the\ merkle)}}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00216}00216\ \ \ \ \ \ \ \ \ \ updated\_active\_nodes.emplace\_back(top);}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00217}00217\ }
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00218}00218\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ store\ the\ new\ active\_nodes}}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00219}00219\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1detail_ae701f28aaa83d39549003f9df7b5dd7a}{detail::move\_nodes}}(\mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl_a60ab24f98b31e15542b84427d77a0fc1}{\_active\_nodes}},\ std::move(updated\_active\_nodes));}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00220}00220\ }
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00221}00221\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ update\ the\ node\ count}}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00222}00222\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl_ac877442baeeb8db5ff69267bd9c46cc5}{\_node\_count}}++;}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00223}00223\ }
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00224}00224\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl_a60ab24f98b31e15542b84427d77a0fc1}{\_active\_nodes}}.back();}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00225}00225\ }
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00226}00226\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00227}00227\ }
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00233}\mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl_ab760e92a9b454f1f0281a8cc053e0965}{00233}}\ \ \ \ \ \ \ DigestType\ \mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl_ab760e92a9b454f1f0281a8cc053e0965}{get\_root}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00234}00234\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl_ac877442baeeb8db5ff69267bd9c46cc5}{\_node\_count}}\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00235}00235\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl_a60ab24f98b31e15542b84427d77a0fc1}{\_active\_nodes}}.back();}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00236}00236\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00237}00237\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ DigestType();}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00238}00238\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00239}00239\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00240}00240\ }
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00241}00241\ \textcolor{comment}{//\ \ \ private:}}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00242}\mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl_ac877442baeeb8db5ff69267bd9c46cc5}{00242}}\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl_ac877442baeeb8db5ff69267bd9c46cc5}{\_node\_count}};}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00243}\mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl_a60ab24f98b31e15542b84427d77a0fc1}{00243}}\ \ \ \ \ \ \ Container<DigestType,\ Args...>\ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl_a60ab24f98b31e15542b84427d77a0fc1}{\_active\_nodes}};}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00244}00244\ \};}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00245}00245\ }
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00246}\mbox{\hyperlink{namespacesysio_1_1chain_a59349972af67217139919b7dd5df6202}{00246}}\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl}{incremental\_merkle\_impl<digest\_type>}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_a59349972af67217139919b7dd5df6202}{incremental\_merkle}};}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00247}\mbox{\hyperlink{namespacesysio_1_1chain_a152b8adb1dec299d65cddd6fb8071be3}{00247}}\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl}{incremental\_merkle\_impl<digest\_type,shared\_vector>}}\ \mbox{\hyperlink{namespacesysio_1_1chain_a152b8adb1dec299d65cddd6fb8071be3}{shared\_incremental\_merkle}};}
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00248}00248\ }
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00249}00249\ \}\ \}\ }
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00250}00250\ }
+\DoxyCodeLine{\Hypertarget{incremental__merkle_8hpp_source_l00251}\mbox{\hyperlink{incremental__merkle_8hpp_ac7b9658f746214135c40c89915840c7f}{00251}}\ \mbox{\hyperlink{reflect_8hpp_a2ace850e636b1ca0b18fe3177e413d99}{FC\_REFLECT}}(\ \mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl}{sysio::chain::incremental\_merkle}},\ (\_active\_nodes)(\_node\_count)\ );}
+
+\end{DoxyCode}

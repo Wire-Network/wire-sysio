@@ -1,0 +1,62 @@
+\doxysection{libraries/chain/include/sysio/chain/unapplied\+\_\+transaction\+\_\+queue.hpp File Reference}
+\hypertarget{unapplied__transaction__queue_8hpp}{}\label{unapplied__transaction__queue_8hpp}\index{libraries/chain/include/sysio/chain/unapplied\_transaction\_queue.hpp@{libraries/chain/include/sysio/chain/unapplied\_transaction\_queue.hpp}}
+{\ttfamily \#include $<$sysio/chain/transaction\+\_\+metadata.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/trace.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/block\+\_\+state.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/exceptions.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/multi\+\_\+index\+\_\+container.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/multi\+\_\+index/hashed\+\_\+index.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/multi\+\_\+index/member.\+hpp$>$}\newline
+Include dependency graph for unapplied\+\_\+transaction\+\_\+queue.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{unapplied__transaction__queue_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{unapplied__transaction__queue_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1unapplied__transaction}{sysio\+::chain\+::unapplied\+\_\+transaction}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1chain_1_1unapplied__transaction__queue}{sysio\+::chain\+::unapplied\+\_\+transaction\+\_\+queue}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacefc}{fc}}
+\begin{DoxyCompactList}\small\item\em namespace \doxylink{namespacesysio_1_1chain}{sysio\+::chain} \end{DoxyCompactList}\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain}{sysio\+::chain}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_a47750d720a427777d8c5c17da406b682}{sysio\+::chain\+::next\+\_\+func\+\_\+t}} = std\+::function$<$void(const std\+::variant$<$\mbox{\hyperlink{namespacefc_a15170d1be1e682691dfe6ae09790edce}{fc\+::exception\+\_\+ptr}}, \mbox{\hyperlink{namespacesysio_1_1chain_a4ee2867a6bec961c7a78b203cfd76be9}{transaction\+\_\+trace\+\_\+ptr}}$>$\&)$>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum class \mbox{\hyperlink{namespacesysio_1_1chain_affd9603ab5a713a9762157b12c8f6b9b}{sysio\+::chain\+::trx\+\_\+enum\+\_\+type}} \{ \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_affd9603ab5a713a9762157b12c8f6b9baad921d60486366258809553a3db49a4a}{sysio\+::chain\+::unknown}} = 0
+, \mbox{\hyperlink{namespacesysio_1_1chain_affd9603ab5a713a9762157b12c8f6b9ba3af65799b58d5c9938325b3af06a0d91}{sysio\+::chain\+::persisted}} = 1
+, \mbox{\hyperlink{namespacesysio_1_1chain_affd9603ab5a713a9762157b12c8f6b9ba96a3fc7e9e9f98157497c592d3b54730}{sysio\+::chain\+::forked}} = 2
+, \mbox{\hyperlink{namespacesysio_1_1chain_affd9603ab5a713a9762157b12c8f6b9badfb7069bfc6e0064a6c667626eca07b4}{sysio\+::chain\+::aborted}} = 3
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_affd9603ab5a713a9762157b12c8f6b9ba19690ad10dec174fbc20e26d31019121}{sysio\+::chain\+::incoming\+\_\+persisted}} = 4
+, \mbox{\hyperlink{namespacesysio_1_1chain_affd9603ab5a713a9762157b12c8f6b9bad48f944ac6c78b97d544f98b89b506ca}{sysio\+::chain\+::incoming}} = 5
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+std\+::size\+\_\+t \mbox{\hyperlink{namespacefc_a84a53e88f98e144a26071a23f3951847}{fc\+::hash\+\_\+value}} (const \mbox{\hyperlink{classfc_1_1sha256}{fc\+::sha256}} \&v)
+\end{DoxyCompactItemize}

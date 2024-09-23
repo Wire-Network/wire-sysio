@@ -1,0 +1,350 @@
+\doxysection{Jsonx\+Writer\texorpdfstring{$<$}{<} Output\+Stream \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{class_jsonx_writer}{}\label{class_jsonx_writer}\index{JsonxWriter$<$ OutputStream $>$@{JsonxWriter$<$ OutputStream $>$}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_jsonx_writer_aa43c2ee8f8c1875a20e120bcc174f70d}{Jsonx\+Writer}} (Output\+Stream \&os)
+\item 
+bool \mbox{\hyperlink{class_jsonx_writer_a3dda55ba4832a85514cc9c3e66a8c12e}{Null}} ()
+\item 
+bool \mbox{\hyperlink{class_jsonx_writer_aa4c8c87eea249fcecb4f76abee8fe25e}{Bool}} (bool b)
+\item 
+bool \mbox{\hyperlink{class_jsonx_writer_a923eebdabd91a1f84243ade5583901ad}{Int}} (int i)
+\item 
+bool \mbox{\hyperlink{class_jsonx_writer_afb6c2c476c1ae1f520353a541a87ec4d}{Uint}} (unsigned i)
+\item 
+bool \mbox{\hyperlink{class_jsonx_writer_a2cba74c8e1acf013c7c5a400e3baceaf}{Int64}} (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} i)
+\item 
+bool \mbox{\hyperlink{class_jsonx_writer_ae8bd17577c271639ed3cb1e1ed3b2681}{Uint64}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} i)
+\item 
+bool \mbox{\hyperlink{class_jsonx_writer_a6d35c09b23f97d8e7f6a308be0acf6f0}{Double}} (double d)
+\item 
+bool \mbox{\hyperlink{class_jsonx_writer_a798678f47ce084bc344b0d90272fcd9f}{Raw\+Number}} (const char \texorpdfstring{$\ast$}{*}str, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} length, bool)
+\item 
+bool \mbox{\hyperlink{class_jsonx_writer_acc623d1129468102e293bd881eeded5e}{String}} (const char \texorpdfstring{$\ast$}{*}str, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} length, bool)
+\item 
+bool \mbox{\hyperlink{class_jsonx_writer_a38f68935a631167b50a754ec6b19102e}{Start\+Object}} ()
+\item 
+bool \mbox{\hyperlink{class_jsonx_writer_a3918b97f58e159ed23e7bb5ea4af74eb}{Key}} (const char \texorpdfstring{$\ast$}{*}str, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} length, bool)
+\item 
+bool \mbox{\hyperlink{class_jsonx_writer_aba8b0d42b40400bcc20a7587362ce406}{End\+Object}} (\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}})
+\item 
+bool \mbox{\hyperlink{class_jsonx_writer_add57dd20adffc1c9e8531b0470396b2a}{Start\+Array}} ()
+\item 
+bool \mbox{\hyperlink{class_jsonx_writer_a6ef9bf3272da42a81efaaddd2e8a812d}{End\+Array}} (\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Output\+Stream$>$\newline
+class Jsonx\+Writer$<$ Output\+Stream $>$}
+
+
+Definition at line \mbox{\hyperlink{jsonx_8cpp_source_l00019}{19}} of file \mbox{\hyperlink{jsonx_8cpp_source}{jsonx.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_jsonx_writer_aa43c2ee8f8c1875a20e120bcc174f70d}\index{JsonxWriter$<$ OutputStream $>$@{JsonxWriter$<$ OutputStream $>$}!JsonxWriter@{JsonxWriter}}
+\index{JsonxWriter@{JsonxWriter}!JsonxWriter$<$ OutputStream $>$@{JsonxWriter$<$ OutputStream $>$}}
+\doxysubsubsection{\texorpdfstring{JsonxWriter()}{JsonxWriter()}}
+{\footnotesize\ttfamily \label{class_jsonx_writer_aa43c2ee8f8c1875a20e120bcc174f70d} 
+template$<$typename Output\+Stream $>$ \\
+\mbox{\hyperlink{class_jsonx_writer}{Jsonx\+Writer}}$<$ Output\+Stream $>$\mbox{\hyperlink{class_jsonx_writer}{\+::\+Jsonx\+Writer}} (\begin{DoxyParamCaption}\item[{Output\+Stream \&}]{os}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{jsonx_8cpp_source_l00021}{21}} of file \mbox{\hyperlink{jsonx_8cpp_source}{jsonx.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ os\_(os),\ name\_(),\ level\_(0),\ hasName\_(\textcolor{keyword}{false})\ \{}
+\DoxyCodeLine{00022\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_jsonx_writer_aa4c8c87eea249fcecb4f76abee8fe25e}\index{JsonxWriter$<$ OutputStream $>$@{JsonxWriter$<$ OutputStream $>$}!Bool@{Bool}}
+\index{Bool@{Bool}!JsonxWriter$<$ OutputStream $>$@{JsonxWriter$<$ OutputStream $>$}}
+\doxysubsubsection{\texorpdfstring{Bool()}{Bool()}}
+{\footnotesize\ttfamily \label{class_jsonx_writer_aa4c8c87eea249fcecb4f76abee8fe25e} 
+template$<$typename Output\+Stream $>$ \\
+bool \mbox{\hyperlink{class_jsonx_writer}{Jsonx\+Writer}}$<$ Output\+Stream $>$\mbox{\hyperlink{struct_bool}{\+::\+Bool}} (\begin{DoxyParamCaption}\item[{bool}]{b}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{jsonx_8cpp_source_l00028}{28}} of file \mbox{\hyperlink{jsonx_8cpp_source}{jsonx.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ }
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ \ \ \ WriteStartElement(\textcolor{stringliteral}{"{}boolean"{}})\ \&\&}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \ \ \ WriteString(b\ ?\ \textcolor{stringliteral}{"{}true"{}}\ :\ \textcolor{stringliteral}{"{}false"{}})\ \&\&}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \ \ \ WriteEndElement(\textcolor{stringliteral}{"{}boolean"{}});}
+\DoxyCodeLine{00033\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_jsonx_writer_a6d35c09b23f97d8e7f6a308be0acf6f0}\index{JsonxWriter$<$ OutputStream $>$@{JsonxWriter$<$ OutputStream $>$}!Double@{Double}}
+\index{Double@{Double}!JsonxWriter$<$ OutputStream $>$@{JsonxWriter$<$ OutputStream $>$}}
+\doxysubsubsection{\texorpdfstring{Double()}{Double()}}
+{\footnotesize\ttfamily \label{class_jsonx_writer_a6d35c09b23f97d8e7f6a308be0acf6f0} 
+template$<$typename Output\+Stream $>$ \\
+bool \mbox{\hyperlink{class_jsonx_writer}{Jsonx\+Writer}}$<$ Output\+Stream $>$\+::\+Double (\begin{DoxyParamCaption}\item[{double}]{d}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{jsonx_8cpp_source_l00055}{55}} of file \mbox{\hyperlink{jsonx_8cpp_source}{jsonx.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ buffer[30];}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ WriteNumberElement(buffer,\ sprintf(buffer,\ \textcolor{stringliteral}{"{}\%.17g"{}},\ d));}
+\DoxyCodeLine{00058\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_jsonx_writer_a6ef9bf3272da42a81efaaddd2e8a812d}\index{JsonxWriter$<$ OutputStream $>$@{JsonxWriter$<$ OutputStream $>$}!EndArray@{EndArray}}
+\index{EndArray@{EndArray}!JsonxWriter$<$ OutputStream $>$@{JsonxWriter$<$ OutputStream $>$}}
+\doxysubsubsection{\texorpdfstring{EndArray()}{EndArray()}}
+{\footnotesize\ttfamily \label{class_jsonx_writer_a6ef9bf3272da42a81efaaddd2e8a812d} 
+template$<$typename Output\+Stream $>$ \\
+bool \mbox{\hyperlink{class_jsonx_writer}{Jsonx\+Writer}}$<$ Output\+Stream $>$\+::\+End\+Array (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{jsonx_8cpp_source_l00095}{95}} of file \mbox{\hyperlink{jsonx_8cpp_source}{jsonx.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ WriteEndElement(\textcolor{stringliteral}{"{}array"{}});}
+\DoxyCodeLine{00097\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_jsonx_writer_aba8b0d42b40400bcc20a7587362ce406}\index{JsonxWriter$<$ OutputStream $>$@{JsonxWriter$<$ OutputStream $>$}!EndObject@{EndObject}}
+\index{EndObject@{EndObject}!JsonxWriter$<$ OutputStream $>$@{JsonxWriter$<$ OutputStream $>$}}
+\doxysubsubsection{\texorpdfstring{EndObject()}{EndObject()}}
+{\footnotesize\ttfamily \label{class_jsonx_writer_aba8b0d42b40400bcc20a7587362ce406} 
+template$<$typename Output\+Stream $>$ \\
+bool \mbox{\hyperlink{class_jsonx_writer}{Jsonx\+Writer}}$<$ Output\+Stream $>$\+::\+End\+Object (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{jsonx_8cpp_source_l00087}{87}} of file \mbox{\hyperlink{jsonx_8cpp_source}{jsonx.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ WriteEndElement(\textcolor{stringliteral}{"{}object"{}});}
+\DoxyCodeLine{00089\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_jsonx_writer_a923eebdabd91a1f84243ade5583901ad}\index{JsonxWriter$<$ OutputStream $>$@{JsonxWriter$<$ OutputStream $>$}!Int@{Int}}
+\index{Int@{Int}!JsonxWriter$<$ OutputStream $>$@{JsonxWriter$<$ OutputStream $>$}}
+\doxysubsubsection{\texorpdfstring{Int()}{Int()}}
+{\footnotesize\ttfamily \label{class_jsonx_writer_a923eebdabd91a1f84243ade5583901ad} 
+template$<$typename Output\+Stream $>$ \\
+bool \mbox{\hyperlink{class_jsonx_writer}{Jsonx\+Writer}}$<$ Output\+Stream $>$\+::\+Int (\begin{DoxyParamCaption}\item[{int}]{i}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{jsonx_8cpp_source_l00035}{35}} of file \mbox{\hyperlink{jsonx_8cpp_source}{jsonx.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ buffer[12];}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ WriteNumberElement(buffer,\ sprintf(buffer,\ \textcolor{stringliteral}{"{}\%d"{}},\ i));}
+\DoxyCodeLine{00038\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_jsonx_writer_a2cba74c8e1acf013c7c5a400e3baceaf}\index{JsonxWriter$<$ OutputStream $>$@{JsonxWriter$<$ OutputStream $>$}!Int64@{Int64}}
+\index{Int64@{Int64}!JsonxWriter$<$ OutputStream $>$@{JsonxWriter$<$ OutputStream $>$}}
+\doxysubsubsection{\texorpdfstring{Int64()}{Int64()}}
+{\footnotesize\ttfamily \label{class_jsonx_writer_a2cba74c8e1acf013c7c5a400e3baceaf} 
+template$<$typename Output\+Stream $>$ \\
+bool \mbox{\hyperlink{class_jsonx_writer}{Jsonx\+Writer}}$<$ Output\+Stream $>$\+::\+Int64 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}}]{i}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{jsonx_8cpp_source_l00045}{45}} of file \mbox{\hyperlink{jsonx_8cpp_source}{jsonx.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ buffer[21];}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ WriteNumberElement(buffer,\ sprintf(buffer,\ \textcolor{stringliteral}{"{}\%"{}}\ \mbox{\hyperlink{inttypes_8h_ae372e90b62c1e8b51dc5d95bf7f5ba48}{PRId64}},\ i));}
+\DoxyCodeLine{00048\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_jsonx_writer_a3918b97f58e159ed23e7bb5ea4af74eb}\index{JsonxWriter$<$ OutputStream $>$@{JsonxWriter$<$ OutputStream $>$}!Key@{Key}}
+\index{Key@{Key}!JsonxWriter$<$ OutputStream $>$@{JsonxWriter$<$ OutputStream $>$}}
+\doxysubsubsection{\texorpdfstring{Key()}{Key()}}
+{\footnotesize\ttfamily \label{class_jsonx_writer_a3918b97f58e159ed23e7bb5ea4af74eb} 
+template$<$typename Output\+Stream $>$ \\
+bool \mbox{\hyperlink{class_jsonx_writer}{Jsonx\+Writer}}$<$ Output\+Stream $>$\+::\+Key (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{str}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{length}{, }\item[{bool}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{jsonx_8cpp_source_l00078}{78}} of file \mbox{\hyperlink{jsonx_8cpp_source}{jsonx.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ backup\ key\ to\ name\_}}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ name\_.\mbox{\hyperlink{class_generic_string_buffer_a42f15c959046d899cb74c3120a6995f9}{Clear}}();}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\ i\ =\ 0;\ i\ <\ length;\ i++)}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \ \ \ name\_.\mbox{\hyperlink{class_generic_string_buffer_a8be5c8fadccacdcf40e20220f38e0afa}{Put}}(str[i]);}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ hasName\_\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00085\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_jsonx_writer_a3918b97f58e159ed23e7bb5ea4af74eb_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_jsonx_writer_a3dda55ba4832a85514cc9c3e66a8c12e}\index{JsonxWriter$<$ OutputStream $>$@{JsonxWriter$<$ OutputStream $>$}!Null@{Null}}
+\index{Null@{Null}!JsonxWriter$<$ OutputStream $>$@{JsonxWriter$<$ OutputStream $>$}}
+\doxysubsubsection{\texorpdfstring{Null()}{Null()}}
+{\footnotesize\ttfamily \label{class_jsonx_writer_a3dda55ba4832a85514cc9c3e66a8c12e} 
+template$<$typename Output\+Stream $>$ \\
+bool \mbox{\hyperlink{class_jsonx_writer}{Jsonx\+Writer}}$<$ Output\+Stream $>$\+::\+Null (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{jsonx_8cpp_source_l00024}{24}} of file \mbox{\hyperlink{jsonx_8cpp_source}{jsonx.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ WriteStartElement(\textcolor{stringliteral}{"{}null"{}},\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00026\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_jsonx_writer_a798678f47ce084bc344b0d90272fcd9f}\index{JsonxWriter$<$ OutputStream $>$@{JsonxWriter$<$ OutputStream $>$}!RawNumber@{RawNumber}}
+\index{RawNumber@{RawNumber}!JsonxWriter$<$ OutputStream $>$@{JsonxWriter$<$ OutputStream $>$}}
+\doxysubsubsection{\texorpdfstring{RawNumber()}{RawNumber()}}
+{\footnotesize\ttfamily \label{class_jsonx_writer_a798678f47ce084bc344b0d90272fcd9f} 
+template$<$typename Output\+Stream $>$ \\
+bool \mbox{\hyperlink{class_jsonx_writer}{Jsonx\+Writer}}$<$ Output\+Stream $>$\+::\+Raw\+Number (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{str}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{length}{, }\item[{bool}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{jsonx_8cpp_source_l00060}{60}} of file \mbox{\hyperlink{jsonx_8cpp_source}{jsonx.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \ \ \ WriteStartElement(\textcolor{stringliteral}{"{}number"{}})\ \&\&}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ WriteEscapedText(str,\ length)\ \&\&}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \ \ \ WriteEndElement(\textcolor{stringliteral}{"{}number"{}});}
+\DoxyCodeLine{00065\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_jsonx_writer_add57dd20adffc1c9e8531b0470396b2a}\index{JsonxWriter$<$ OutputStream $>$@{JsonxWriter$<$ OutputStream $>$}!StartArray@{StartArray}}
+\index{StartArray@{StartArray}!JsonxWriter$<$ OutputStream $>$@{JsonxWriter$<$ OutputStream $>$}}
+\doxysubsubsection{\texorpdfstring{StartArray()}{StartArray()}}
+{\footnotesize\ttfamily \label{class_jsonx_writer_add57dd20adffc1c9e8531b0470396b2a} 
+template$<$typename Output\+Stream $>$ \\
+bool \mbox{\hyperlink{class_jsonx_writer}{Jsonx\+Writer}}$<$ Output\+Stream $>$\+::\+Start\+Array (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{jsonx_8cpp_source_l00091}{91}} of file \mbox{\hyperlink{jsonx_8cpp_source}{jsonx.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ WriteStartElement(\textcolor{stringliteral}{"{}array"{}});}
+\DoxyCodeLine{00093\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_jsonx_writer_a38f68935a631167b50a754ec6b19102e}\index{JsonxWriter$<$ OutputStream $>$@{JsonxWriter$<$ OutputStream $>$}!StartObject@{StartObject}}
+\index{StartObject@{StartObject}!JsonxWriter$<$ OutputStream $>$@{JsonxWriter$<$ OutputStream $>$}}
+\doxysubsubsection{\texorpdfstring{StartObject()}{StartObject()}}
+{\footnotesize\ttfamily \label{class_jsonx_writer_a38f68935a631167b50a754ec6b19102e} 
+template$<$typename Output\+Stream $>$ \\
+bool \mbox{\hyperlink{class_jsonx_writer}{Jsonx\+Writer}}$<$ Output\+Stream $>$\+::\+Start\+Object (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{jsonx_8cpp_source_l00074}{74}} of file \mbox{\hyperlink{jsonx_8cpp_source}{jsonx.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ WriteStartElement(\textcolor{stringliteral}{"{}object"{}});}
+\DoxyCodeLine{00076\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_jsonx_writer_acc623d1129468102e293bd881eeded5e}\index{JsonxWriter$<$ OutputStream $>$@{JsonxWriter$<$ OutputStream $>$}!String@{String}}
+\index{String@{String}!JsonxWriter$<$ OutputStream $>$@{JsonxWriter$<$ OutputStream $>$}}
+\doxysubsubsection{\texorpdfstring{String()}{String()}}
+{\footnotesize\ttfamily \label{class_jsonx_writer_acc623d1129468102e293bd881eeded5e} 
+template$<$typename Output\+Stream $>$ \\
+bool \mbox{\hyperlink{class_jsonx_writer}{Jsonx\+Writer}}$<$ Output\+Stream $>$\+::\+String (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{str}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{length}{, }\item[{bool}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{jsonx_8cpp_source_l00067}{67}} of file \mbox{\hyperlink{jsonx_8cpp_source}{jsonx.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ WriteStartElement(\textcolor{stringliteral}{"{}string"{}})\ \&\&}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \ \ \ WriteEscapedText(str,\ length)\ \&\&}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \ \ \ WriteEndElement(\textcolor{stringliteral}{"{}string"{}});}
+\DoxyCodeLine{00072\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_jsonx_writer_afb6c2c476c1ae1f520353a541a87ec4d}\index{JsonxWriter$<$ OutputStream $>$@{JsonxWriter$<$ OutputStream $>$}!Uint@{Uint}}
+\index{Uint@{Uint}!JsonxWriter$<$ OutputStream $>$@{JsonxWriter$<$ OutputStream $>$}}
+\doxysubsubsection{\texorpdfstring{Uint()}{Uint()}}
+{\footnotesize\ttfamily \label{class_jsonx_writer_afb6c2c476c1ae1f520353a541a87ec4d} 
+template$<$typename Output\+Stream $>$ \\
+bool \mbox{\hyperlink{class_jsonx_writer}{Jsonx\+Writer}}$<$ Output\+Stream $>$\+::\+Uint (\begin{DoxyParamCaption}\item[{unsigned}]{i}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{jsonx_8cpp_source_l00040}{40}} of file \mbox{\hyperlink{jsonx_8cpp_source}{jsonx.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ buffer[11];}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ WriteNumberElement(buffer,\ sprintf(buffer,\ \textcolor{stringliteral}{"{}\%u"{}},\ i));}
+\DoxyCodeLine{00043\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_jsonx_writer_ae8bd17577c271639ed3cb1e1ed3b2681}\index{JsonxWriter$<$ OutputStream $>$@{JsonxWriter$<$ OutputStream $>$}!Uint64@{Uint64}}
+\index{Uint64@{Uint64}!JsonxWriter$<$ OutputStream $>$@{JsonxWriter$<$ OutputStream $>$}}
+\doxysubsubsection{\texorpdfstring{Uint64()}{Uint64()}}
+{\footnotesize\ttfamily \label{class_jsonx_writer_ae8bd17577c271639ed3cb1e1ed3b2681} 
+template$<$typename Output\+Stream $>$ \\
+bool \mbox{\hyperlink{class_jsonx_writer}{Jsonx\+Writer}}$<$ Output\+Stream $>$\+::\+Uint64 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{i}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{jsonx_8cpp_source_l00050}{50}} of file \mbox{\hyperlink{jsonx_8cpp_source}{jsonx.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ buffer[21];}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ WriteNumberElement(buffer,\ sprintf(buffer,\ \textcolor{stringliteral}{"{}\%"{}}\ \mbox{\hyperlink{inttypes_8h_ac582131d7a7c8ee57e73180d1714f9d5}{PRIu64}},\ i));}
+\DoxyCodeLine{00053\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/example/jsonx/\mbox{\hyperlink{jsonx_8cpp}{jsonx.\+cpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,15 @@
+<map id="sysio::wallet::detail::yubihsm_wallet_impl::lock" name="sysio::wallet::detail::yubihsm_wallet_impl::lock">
+<area shape="rect" id="Node000001" title=" " alt="" coords="411,182,593,223"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl.html#a6266bcd9001ddbb02101bea6088f299b" title=" " alt="" coords="208,5,358,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="470,173,421,124,361,75,343,64,346,59,365,71,425,120,474,169"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl.html#a6412f92a0ad381f2370582372a5b6082" title=" " alt="" coords="204,109,363,165"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="416,180,363,164,364,158,418,175"/>
+<area shape="rect" id="Node000004" href="$structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl.html#a00ee0ac7ac4a819d0b8755bf4f442263" title=" " alt="" coords="5,143,156,198"/>
+<area shape="poly" id="edge6_Node000001_Node000004" title=" " alt="" coords="395,197,156,179,156,174,396,192"/>
+<area shape="rect" id="Node000005" href="$structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl.html#a8987016445813c0391f04894e9bdb002" title=" " alt="" coords="208,240,358,296"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="418,230,360,248,358,243,417,225"/>
+<area shape="rect" id="Node000006" href="$structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl.html#af535b22a76cac37f33ef43715865648c" title=" " alt="" coords="204,320,362,376"/>
+<area shape="poly" id="edge7_Node000001_Node000006" title=" " alt="" coords="466,235,419,272,364,310,344,322,342,317,362,306,416,268,463,231"/>
+<area shape="poly" id="edge3_Node000003_Node000003" title=" " alt="" coords="315,97,303,90,283,88,266,90,254,95,249,101,249,109,243,109,244,99,251,90,264,85,283,83,305,85,318,92"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="189,155,157,161,156,155,188,150"/>
+</map>

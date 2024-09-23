@@ -1,0 +1,9 @@
+<map id="sysio::chain::controller::get_pending_trx_receipts" name="sysio::chain::controller::get_pending_trx_receipts">
+<area shape="rect" id="Node000001" title=" " alt="" coords="672,5,847,46"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1sub__chain__plugin.html#aaac3c80301ede51c90d925992bc14c7c" title=" " alt="" coords="443,5,624,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="657,28,625,28,625,23,657,23"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1producer__plugin__impl.html#a336a35581aedb4308f8fc7f4eb44f152" title=" " alt="" coords="244,5,395,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="427,28,395,28,395,23,427,23"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1producer__plugin__impl.html#a230c88a6ed7efbc3588a043fe4915bd9" title=" " alt="" coords="5,5,196,46"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="228,28,196,28,196,23,228,23"/>
+</map>

@@ -1,0 +1,141 @@
+\doxysection{filterkey.\+cpp}
+\hypertarget{filterkey_8cpp_source}{}\label{filterkey_8cpp_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/example/filterkey/filterkey.cpp@{libraries/fc/include/fc/crypto/webauthn\_json/example/filterkey/filterkey.cpp}}
+\mbox{\hyperlink{filterkey_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00001}00001\ \textcolor{comment}{//\ JSON\ filterkey\ example\ with\ SAX-\/style\ API.}}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00003}00003\ \textcolor{comment}{//\ This\ example\ parses\ JSON\ text\ from\ stdin\ with\ validation.}}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00004}00004\ \textcolor{comment}{//\ During\ parsing,\ specified\ key\ will\ be\ filtered\ using\ a\ SAX\ handler.}}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00005}00005\ \textcolor{comment}{//\ It\ re-\/output\ the\ JSON\ content\ to\ stdout\ without\ whitespace.}}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{reader_8h}{rapidjson/reader.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{writer_8h}{rapidjson/writer.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{filereadstream_8h}{rapidjson/filereadstream.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{filewritestream_8h}{rapidjson/filewritestream.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00011}00011\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{en_8h}{rapidjson/error/en.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00012}00012\ \textcolor{preprocessor}{\#include\ <stack>}}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00014}00014\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacerapidjson}{rapidjson}};}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00016}00016\ \textcolor{comment}{//\ This\ handler\ forwards\ event\ into\ an\ output\ handler,\ with\ filtering\ the\ descendent\ events\ of\ specified\ key.}}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00017}00017\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ OutputHandler>}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00018}\mbox{\hyperlink{class_filter_key_handler}{00018}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_filter_key_handler}{FilterKeyHandler}}\ \{}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00019}00019\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00020}\mbox{\hyperlink{class_filter_key_handler_a9c4de4bf706794410bc8bdc40a7cf95d}{00020}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{class_filter_key_handler_a9c4de4bf706794410bc8bdc40a7cf95d}{Ch}};}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00022}\mbox{\hyperlink{class_filter_key_handler_ab7e37d9d0aad1573e4388af6c6d0250a}{00022}}\ \ \ \ \ \mbox{\hyperlink{class_filter_key_handler_ab7e37d9d0aad1573e4388af6c6d0250a}{FilterKeyHandler}}(OutputHandler\&\ outputHandler,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_filter_key_handler_a9c4de4bf706794410bc8bdc40a7cf95d}{Ch}}*\ keyString,\ \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\ keyLength)\ :\ }
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00023}00023\ \ \ \ \ \ \ \ \ outputHandler\_(outputHandler),\ keyString\_(keyString),\ keyLength\_(keyLength),\ filterValueDepth\_(),\ filteredKeyCount\_()}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00024}00024\ \ \ \ \ \{\}}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00026}\mbox{\hyperlink{class_filter_key_handler_a0961f7f4188d46fd1cff814e2c6ad45b}{00026}}\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_filter_key_handler_a0961f7f4188d46fd1cff814e2c6ad45b}{Null}}()\ \ \ \ \ \ \ \ \ \ \ \ \ \{\ \textcolor{keywordflow}{return}\ filterValueDepth\_\ >\ 0\ ?\ EndValue()\ :\ outputHandler\_.Null()\ \ \ \ \&\&\ EndValue();\ \}}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00027}\mbox{\hyperlink{class_filter_key_handler_a534c3b357be44f8a7bdeefe79e9d5dd7}{00027}}\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_filter_key_handler_a534c3b357be44f8a7bdeefe79e9d5dd7}{Bool}}(\textcolor{keywordtype}{bool}\ b)\ \ \ \ \ \ \ \{\ \textcolor{keywordflow}{return}\ filterValueDepth\_\ >\ 0\ ?\ EndValue()\ :\ outputHandler\_.Bool(b)\ \ \ \&\&\ EndValue();\ \}}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00028}\mbox{\hyperlink{class_filter_key_handler_a916721741643c42f460d1a62044bcd10}{00028}}\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_filter_key_handler_a916721741643c42f460d1a62044bcd10}{Int}}(\textcolor{keywordtype}{int}\ i)\ \ \ \ \ \ \ \ \ \{\ \textcolor{keywordflow}{return}\ filterValueDepth\_\ >\ 0\ ?\ EndValue()\ :\ outputHandler\_.Int(i)\ \ \ \ \&\&\ EndValue();\ \}}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00029}\mbox{\hyperlink{class_filter_key_handler_afc365d8748bd77fa1d1a98d56bdcd12c}{00029}}\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_filter_key_handler_afc365d8748bd77fa1d1a98d56bdcd12c}{Uint}}(\textcolor{keywordtype}{unsigned}\ u)\ \ \ \{\ \textcolor{keywordflow}{return}\ filterValueDepth\_\ >\ 0\ ?\ EndValue()\ :\ outputHandler\_.Uint(u)\ \ \ \&\&\ EndValue();\ \}}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00030}\mbox{\hyperlink{class_filter_key_handler_a6e7338a8a49ebfb60d116e717d9cee1d}{00030}}\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_filter_key_handler_a6e7338a8a49ebfb60d116e717d9cee1d}{Int64}}(\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ i)\ \ \ \{\ \textcolor{keywordflow}{return}\ filterValueDepth\_\ >\ 0\ ?\ EndValue()\ :\ outputHandler\_.Int64(i)\ \ \&\&\ EndValue();\ \}}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00031}\mbox{\hyperlink{class_filter_key_handler_a93eed6c20bd41eb6bd597861e43bfe12}{00031}}\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_filter_key_handler_a93eed6c20bd41eb6bd597861e43bfe12}{Uint64}}(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ u)\ \{\ \textcolor{keywordflow}{return}\ filterValueDepth\_\ >\ 0\ ?\ EndValue()\ :\ outputHandler\_.Uint64(u)\ \&\&\ EndValue();\ \}}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00032}\mbox{\hyperlink{class_filter_key_handler_a9d718ce635cedaafa03cd65788d9dd91}{00032}}\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_filter_key_handler_a9d718ce635cedaafa03cd65788d9dd91}{Double}}(\textcolor{keywordtype}{double}\ d)\ \ \ \{\ \textcolor{keywordflow}{return}\ filterValueDepth\_\ >\ 0\ ?\ EndValue()\ :\ outputHandler\_.Double(\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}})\ \&\&\ EndValue();\ \}}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00033}\mbox{\hyperlink{class_filter_key_handler_ac240886ec2015817189a28f8f66938f9}{00033}}\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_filter_key_handler_ac240886ec2015817189a28f8f66938f9}{RawNumber}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{class_filter_key_handler_a9c4de4bf706794410bc8bdc40a7cf95d}{Ch}}*\ str,\ \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ \textcolor{keywordtype}{bool}\ copy)\ \{\ \textcolor{keywordflow}{return}\ filterValueDepth\_\ >\ 0\ ?\ EndValue()\ :\ outputHandler\_.RawNumber(str,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ copy)\ \&\&\ EndValue();\ \}}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00034}\mbox{\hyperlink{class_filter_key_handler_a2e5ee8ad7545dafcb0c8a60d82e7c579}{00034}}\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_filter_key_handler_a2e5ee8ad7545dafcb0c8a60d82e7c579}{String}}\ \ \ (\textcolor{keyword}{const}\ \mbox{\hyperlink{class_filter_key_handler_a9c4de4bf706794410bc8bdc40a7cf95d}{Ch}}*\ str,\ \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ \textcolor{keywordtype}{bool}\ copy)\ \{\ \textcolor{keywordflow}{return}\ filterValueDepth\_\ >\ 0\ ?\ EndValue()\ :\ outputHandler\_.String\ \ \ (str,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ copy)\ \&\&\ EndValue();\ \}}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00035}00035\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00036}\mbox{\hyperlink{class_filter_key_handler_ab595e71b6dc9ece313f2ab9a255667f7}{00036}}\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_filter_key_handler_ab595e71b6dc9ece313f2ab9a255667f7}{StartObject}}()\ \{\ }
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00037}00037\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (filterValueDepth\_\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00038}00038\ \ \ \ \ \ \ \ \ \ \ \ \ filterValueDepth\_++;}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00039}00039\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00040}00040\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00041}00041\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00042}00042\ \ \ \ \ \ \ \ \ \ \ \ \ filteredKeyCount\_.push(0);}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00043}00043\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ outputHandler\_.StartObject();}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00044}00044\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00045}00045\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00046}00046\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00047}\mbox{\hyperlink{class_filter_key_handler_a9dbf14eeda9713e58fc8fc9ce6de0f33}{00047}}\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_filter_key_handler_a9dbf14eeda9713e58fc8fc9ce6de0f33}{Key}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{class_filter_key_handler_a9c4de4bf706794410bc8bdc40a7cf95d}{Ch}}*\ str,\ \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ \textcolor{keywordtype}{bool}\ copy)\ \{\ }
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (filterValueDepth\_\ >\ 0)\ }
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00050}00050\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ ==\ keyLength\_\ \&\&\ std::memcmp(str,\ keyString\_,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})\ ==\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00051}00051\ \ \ \ \ \ \ \ \ \ \ \ \ filterValueDepth\_\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00054}00054\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \ \ \ ++filteredKeyCount\_.top();}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ outputHandler\_.Key(str,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ copy);}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00057}00057\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00058}00058\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00060}\mbox{\hyperlink{class_filter_key_handler_a49612ff389f37602aa9ad78350f392aa}{00060}}\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_filter_key_handler_a49612ff389f37602aa9ad78350f392aa}{EndObject}}(\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}})\ \{}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00061}00061\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (filterValueDepth\_\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00062}00062\ \ \ \ \ \ \ \ \ \ \ \ \ filterValueDepth\_-\/-\/;}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ EndValue();}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00064}00064\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00065}00065\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00066}00066\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Use\ our\ own\ filtered\ memberCount}}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00067}00067\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\ memberCount\ =\ filteredKeyCount\_.top();}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \ \ \ filteredKeyCount\_.pop();}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ outputHandler\_.EndObject(memberCount)\ \&\&\ EndValue();}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00070}00070\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00071}00071\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00073}\mbox{\hyperlink{class_filter_key_handler_a3f75f5092a076657f7ab016271a7d559}{00073}}\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_filter_key_handler_a3f75f5092a076657f7ab016271a7d559}{StartArray}}()\ \{}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00074}00074\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (filterValueDepth\_\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00075}00075\ \ \ \ \ \ \ \ \ \ \ \ \ filterValueDepth\_++;}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00077}00077\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00078}00078\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ outputHandler\_.StartArray();}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00080}00080\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00081}00081\ }
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00082}\mbox{\hyperlink{class_filter_key_handler_ab95bdeaedf7ef33a40074b59489c3a8c}{00082}}\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_filter_key_handler_ab95bdeaedf7ef33a40074b59489c3a8c}{EndArray}}(\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\ elementCount)\ \{}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00083}00083\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (filterValueDepth\_\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00084}00084\ \ \ \ \ \ \ \ \ \ \ \ \ filterValueDepth\_-\/-\/;}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00085}00085\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ EndValue();}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00086}00086\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00087}00087\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00088}00088\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ outputHandler\_.EndArray(elementCount)\ \&\&\ EndValue();}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00089}00089\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00090}00090\ }
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00091}00091\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00092}00092\ \ \ \ \ \mbox{\hyperlink{class_filter_key_handler_ab7e37d9d0aad1573e4388af6c6d0250a}{FilterKeyHandler}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{class_filter_key_handler}{FilterKeyHandler}}\&);}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00093}00093\ \ \ \ \ \mbox{\hyperlink{class_filter_key_handler}{FilterKeyHandler}}\&\ operator=(\textcolor{keyword}{const}\ \mbox{\hyperlink{class_filter_key_handler}{FilterKeyHandler}}\&);}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00094}00094\ }
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00095}00095\ \ \ \ \ \textcolor{keywordtype}{bool}\ EndValue()\ \{}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00096}00096\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (filterValueDepth\_\ ==\ 1)\ \textcolor{comment}{//\ Just\ at\ the\ end\ of\ value\ after\ filtered\ key}}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00097}00097\ \ \ \ \ \ \ \ \ \ \ \ \ filterValueDepth\_\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00098}00098\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00099}00099\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00100}00100\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00101}00101\ \ \ \ \ OutputHandler\&\ outputHandler\_;}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00102}00102\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ keyString\_;}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00103}00103\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\ keyLength\_;}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00104}00104\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ filterValueDepth\_;}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00105}00105\ \ \ \ \ std::stack<SizeType>\ filteredKeyCount\_;}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00106}00106\ \};}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00107}00107\ }
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00108}\mbox{\hyperlink{filterkey_8cpp_a0ddf1224851353fc92bfbff6f499fa97}{00108}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}(\textcolor{keywordtype}{int}\ argc,\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[])\ \{}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00109}00109\ \ \ \ \ \textcolor{keywordflow}{if}\ (argc\ !=\ 2)\ \{}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00110}00110\ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}filterkey\ key\ <\ input.json\ >\ output.json\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00111}00111\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00112}00112\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00113}00113\ }
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00114}00114\ \ \ \ \ \textcolor{comment}{//\ Prepare\ JSON\ reader\ and\ input\ stream.}}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00115}00115\ \ \ \ \ \mbox{\hyperlink{class_generic_reader}{Reader}}\ reader;}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00116}00116\ \ \ \ \ \textcolor{keywordtype}{char}\ readBuffer[65536];}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00117}00117\ \ \ \ \ \mbox{\hyperlink{class_file_read_stream}{FileReadStream}}\ is(stdin,\ readBuffer,\ \textcolor{keyword}{sizeof}(readBuffer));}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00118}00118\ }
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00119}00119\ \ \ \ \ \textcolor{comment}{//\ Prepare\ JSON\ writer\ and\ output\ stream.}}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00120}00120\ \ \ \ \ \textcolor{keywordtype}{char}\ writeBuffer[65536];}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00121}00121\ \ \ \ \ \mbox{\hyperlink{class_file_write_stream}{FileWriteStream}}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}(stdout,\ writeBuffer,\ \textcolor{keyword}{sizeof}(writeBuffer));}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00122}00122\ \ \ \ \ \mbox{\hyperlink{class_writer}{Writer<FileWriteStream>}}\ writer(os);}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00123}00123\ }
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00124}00124\ \ \ \ \ \textcolor{comment}{//\ Prepare\ Filter}}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00125}00125\ \ \ \ \ \mbox{\hyperlink{class_filter_key_handler}{FilterKeyHandler<Writer<FileWriteStream>}}\ >\ filter(writer,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[1],\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\textcolor{keyword}{>}(strlen(\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[1])));}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00126}00126\ }
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00127}00127\ \ \ \ \ \textcolor{comment}{//\ JSON\ reader\ parse\ from\ the\ input\ stream,\ filter\ handler\ filters\ the\ events,\ and\ forward\ to\ writer.}}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00128}00128\ \ \ \ \ \textcolor{comment}{//\ i.e.\ the\ events\ flow\ is:\ reader\ -\/>\ filter\ -\/>\ writer}}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00129}00129\ \ \ \ \ \textcolor{keywordflow}{if}\ (!reader.\mbox{\hyperlink{class_generic_reader_a0c450620d14ff1824e58bb7bd9b42099}{Parse}}(is,\ filter))\ \{}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00130}00130\ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}\(\backslash\)nError(\%u):\ \%s\(\backslash\)n"{}},\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\textcolor{keyword}{>}(reader.\mbox{\hyperlink{class_generic_reader_ae9008523ccd06d839a57335835cb4091}{GetErrorOffset}}()),\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_ga28835eb93d2c3c07bbea13515eb31415}{GetParseError\_En}}(reader.\mbox{\hyperlink{class_generic_reader_a937bf90919f50e1c370b312cee5833e8}{GetParseErrorCode}}()));}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00131}00131\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00132}00132\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00133}00133\ }
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00134}00134\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00135}00135\ \}}
+
+\end{DoxyCode}

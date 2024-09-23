@@ -1,0 +1,22 @@
+<map id="to_asset" name="to_asset">
+<area shape="rect" id="Node000001" title=" " alt="" coords="461,249,532,274"/>
+<area shape="rect" id="Node000002" href="$structbidname__subcommand.html#ac60c6a6ace11634a66cb10938608df50" title=" " alt="" coords="230,5,393,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="489,234,481,195,466,149,443,102,411,61,392,47,395,43,415,57,448,99,471,147,486,194,494,233"/>
+<area shape="rect" id="Node000003" href="$structbuyram__subcommand.html#aefe28771c949401bedb6bc69b1596421" title=" " alt="" coords="233,71,390,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="483,235,456,180,436,151,411,126,389,113,392,108,415,122,440,148,461,177,488,233"/>
+<area shape="rect" id="Node000004" href="$structcreate__account__subcommand.html#a46440dab55b6a8b52d22e14901e48e9e" title=" " alt="" coords="210,136,413,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="471,239,444,214,412,191,389,180,391,175,414,186,448,210,475,235"/>
+<area shape="rect" id="Node000005" href="$structdelegate__bandwidth__subcommand.html#a7ef09be51fd71407ca8206b70eae3816" title=" " alt="" coords="225,200,398,256"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="445,255,398,247,399,241,446,250"/>
+<area shape="rect" id="Node000006" href="$programs_2clio_2main_8cpp.html#a0b4fb9a3e114ce27a049e4a8268b8300" title=" " alt="" coords="265,332,358,357"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="465,286,414,315,359,335,357,330,412,310,463,281"/>
+<area shape="rect" id="Node000007" href="$programs_2clio_2main_8cpp.html#a3c04138a5bfe5d72780bb7e82a18e627" title=" " alt="" coords="59,281,108,306"/>
+<area shape="poly" id="edge8_Node000001_Node000007" title=" " alt="" coords="446,268,413,271,109,295,109,289,413,266,445,263"/>
+<area shape="rect" id="Node000009" href="$programs_2clio_2main_8cpp.html#a7502913d1d3a1c6fd033a744047abfb5" title=" " alt="" coords="276,381,347,406"/>
+<area shape="poly" id="edge9_Node000001_Node000009" title=" " alt="" coords="484,290,456,332,437,354,414,372,381,387,348,394,347,389,380,382,412,367,433,350,452,329,480,287"/>
+<area shape="rect" id="Node000010" href="$structundelegate__bandwidth__subcommand.html#a536b6238ada347a9d2754c096e45556a" title=" " alt="" coords="223,431,400,487"/>
+<area shape="poly" id="edge10_Node000001_Node000010" title=" " alt="" coords="490,291,463,355,442,390,415,421,399,433,396,428,411,417,438,387,458,353,485,288"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="250,334,108,302,109,296,251,328"/>
+<area shape="rect" id="Node000008" href="$classsysio_1_1chain__api__plugin.html#a91f0262ad889564cfbe6abfe70dce6a9" title=" " alt="" coords="5,331,162,371"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="250,349,162,351,162,346,250,343"/>
+</map>

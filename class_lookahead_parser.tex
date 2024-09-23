@@ -1,0 +1,630 @@
+\doxysection{Lookahead\+Parser Class Reference}
+\hypertarget{class_lookahead_parser}{}\label{class_lookahead_parser}\index{LookaheadParser@{LookaheadParser}}
+
+
+Inheritance diagram for Lookahead\+Parser\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=206pt]{class_lookahead_parser__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Lookahead\+Parser\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_lookahead_parser__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_lookahead_parser_a126093b7e0e6ad1d007f4f07030bcd81}{Lookahead\+Parser}} (char \texorpdfstring{$\ast$}{*}str)
+\item 
+bool \mbox{\hyperlink{class_lookahead_parser_aa91c5b65b5b119b1d27c8b5d63651be1}{Enter\+Object}} ()
+\item 
+bool \mbox{\hyperlink{class_lookahead_parser_a36ec1615d48fe4d2e16e373adea63e2b}{Enter\+Array}} ()
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_lookahead_parser_a5fa1c656fa149e2a580a4065351705e8}{Next\+Object\+Key}} ()
+\item 
+bool \mbox{\hyperlink{class_lookahead_parser_a0c9116fd6becabf6fabfe4c7b0d2544f}{Next\+Array\+Value}} ()
+\item 
+int \mbox{\hyperlink{class_lookahead_parser_a2b36cab5f9af8c1273b58ac4174f0158}{Get\+Int}} ()
+\item 
+double \mbox{\hyperlink{class_lookahead_parser_a9456db070c2321b42bf8fe1e62dd1b72}{Get\+Double}} ()
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_lookahead_parser_a254a193b0bf66ddfa5b4a915768c07a8}{Get\+String}} ()
+\item 
+bool \mbox{\hyperlink{class_lookahead_parser_ad27dd0413166aab3fb173d4f52b045b7}{Get\+Bool}} ()
+\item 
+void \mbox{\hyperlink{class_lookahead_parser_a2a70de5ba5eab2ad0a4220cfafc61a59}{Get\+Null}} ()
+\item 
+void \mbox{\hyperlink{class_lookahead_parser_a26c28d790e7c915f86c6454a56597098}{Skip\+Object}} ()
+\item 
+void \mbox{\hyperlink{class_lookahead_parser_a864c0b5ca3d7bcd6655b7b5b91eb7d4c}{Skip\+Array}} ()
+\item 
+void \mbox{\hyperlink{class_lookahead_parser_a32530191b0e9f290e639c540813a0a5c}{Skip\+Value}} ()
+\item 
+\mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_lookahead_parser_a28f142988e64794a006f0f7650def537}{Peek\+Value}} ()
+\item 
+int \mbox{\hyperlink{class_lookahead_parser_a2ace6cf83f030330cc6fec191fa62418}{Peek\+Type}} ()
+\item 
+bool \mbox{\hyperlink{class_lookahead_parser_a320cb1a9934a9fd67b7bf2cd0ff413d9}{Is\+Valid}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{class_lookahead_parser_aa8d1c7d1588947612aefd02cf5fd3590}{Skip\+Out}} (int depth)
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Member Functions inherited from \mbox{\hyperlink{class_lookahead_parser_handler}{Lookahead\+Parser\+Handler}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_lookahead_parser_handler_aa56a8db4091e158c3dfecea6b2e7c96e}{Lookahead\+Parser\+Handler}} (char \texorpdfstring{$\ast$}{*}str)
+\item 
+void \mbox{\hyperlink{class_lookahead_parser_handler_a7d0cc7887e9e0c37e645e27744a5b356}{Parse\+Next}} ()
+\end{DoxyCompactItemize}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{class_lookahead_parser_handler_a85ccb4b2536522ae930b4af571a53f33}{Null}} ()
+\item 
+bool \mbox{\hyperlink{class_lookahead_parser_handler_aa955ecc5369dc814acf003d2131c4d25}{Bool}} (bool b)
+\item 
+bool \mbox{\hyperlink{class_lookahead_parser_handler_a5f2b3e640904bae9b2387f7bf1f81844}{Int}} (int i)
+\item 
+bool \mbox{\hyperlink{class_lookahead_parser_handler_a89d96f278529d0fc4b38babb1b12a7bf}{Uint}} (unsigned u)
+\item 
+bool \mbox{\hyperlink{class_lookahead_parser_handler_a4631a4de15f0529ae6968f978df7e5be}{Int64}} (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} i)
+\item 
+bool \mbox{\hyperlink{class_lookahead_parser_handler_aab1be7f0bdd8ee8d9999f26085eb15f4}{Uint64}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} u)
+\item 
+bool \mbox{\hyperlink{class_lookahead_parser_handler_aed09e1f187f88a8280009190a111c218}{Double}} (double d)
+\item 
+bool \mbox{\hyperlink{class_lookahead_parser_handler_a0aaf8c093d2a385f7490d2ac0152dbe9}{Raw\+Number}} (const char \texorpdfstring{$\ast$}{*}, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}, bool)
+\item 
+bool \mbox{\hyperlink{class_lookahead_parser_handler_a9f2950368d68abee5868de20d3f8a673}{String}} (const char \texorpdfstring{$\ast$}{*}str, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} length, bool)
+\item 
+bool \mbox{\hyperlink{class_lookahead_parser_handler_a00a8690452c9ecea125d621344e87d10}{Start\+Object}} ()
+\item 
+bool \mbox{\hyperlink{class_lookahead_parser_handler_a94a76a0ce3032dfa008cbf97cc7fcec8}{Key}} (const char \texorpdfstring{$\ast$}{*}str, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} length, bool)
+\item 
+bool \mbox{\hyperlink{class_lookahead_parser_handler_a5d0aa1d01d2a120c34ca01c20b69e046}{End\+Object}} (\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}})
+\item 
+bool \mbox{\hyperlink{class_lookahead_parser_handler_a7d345e799ae345624448b605a4a6aab3}{Start\+Array}} ()
+\item 
+bool \mbox{\hyperlink{class_lookahead_parser_handler_a8375dcab0e4bfb73067517e15e8a9991}{End\+Array}} (\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Protected Types inherited from \mbox{\hyperlink{class_lookahead_parser_handler}{Lookahead\+Parser\+Handler}}}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{class_lookahead_parser_handler_ae334adb8f4e9f8ae9912a026eef9f40a}{Lookahead\+Parsing\+State}} \{ \newline
+\mbox{\hyperlink{class_lookahead_parser_handler_ae334adb8f4e9f8ae9912a026eef9f40aa5a684cd67d320c36fe15b25c4c39ad0c}{k\+Init}}
+, \mbox{\hyperlink{class_lookahead_parser_handler_ae334adb8f4e9f8ae9912a026eef9f40aad76ea407bb7cc307e6e95d181f845d45}{k\+Error}}
+, \mbox{\hyperlink{class_lookahead_parser_handler_ae334adb8f4e9f8ae9912a026eef9f40aa00cc1c35661ac51ff7101ff12b733448}{k\+Has\+Null}}
+, \mbox{\hyperlink{class_lookahead_parser_handler_ae334adb8f4e9f8ae9912a026eef9f40aad9f9336c30ffd2acd766298b24246eec}{k\+Has\+Bool}}
+, \newline
+\mbox{\hyperlink{class_lookahead_parser_handler_ae334adb8f4e9f8ae9912a026eef9f40aa2e55a1f4539fc2c9c3ce9b8860d50288}{k\+Has\+Number}}
+, \mbox{\hyperlink{class_lookahead_parser_handler_ae334adb8f4e9f8ae9912a026eef9f40aada0be4b465fce304dd5300d710f5e01c}{k\+Has\+String}}
+, \mbox{\hyperlink{class_lookahead_parser_handler_ae334adb8f4e9f8ae9912a026eef9f40aadea4f79ab30f23f94fe694aa923a12bb}{k\+Has\+Key}}
+, \mbox{\hyperlink{class_lookahead_parser_handler_ae334adb8f4e9f8ae9912a026eef9f40aadfd64dce5fb7510a35452945eb3e1f81}{k\+Entering\+Object}}
+, \newline
+\mbox{\hyperlink{class_lookahead_parser_handler_ae334adb8f4e9f8ae9912a026eef9f40aa79f2f8d0ebe5856a0e45bca27640b920}{k\+Exiting\+Object}}
+, \mbox{\hyperlink{class_lookahead_parser_handler_ae334adb8f4e9f8ae9912a026eef9f40aaa04d166db393c889f3b444e932f30842}{k\+Entering\+Array}}
+, \mbox{\hyperlink{class_lookahead_parser_handler_ae334adb8f4e9f8ae9912a026eef9f40aa11da35dbfb582c675b5a2e53e693afe5}{k\+Exiting\+Array}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Attributes inherited from \mbox{\hyperlink{class_lookahead_parser_handler}{Lookahead\+Parser\+Handler}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} \mbox{\hyperlink{class_lookahead_parser_handler_a180a9567951c536adf91b8ab74621eb5}{v\+\_\+}}
+\item 
+\mbox{\hyperlink{class_lookahead_parser_handler_ae334adb8f4e9f8ae9912a026eef9f40a}{Lookahead\+Parsing\+State}} \mbox{\hyperlink{class_lookahead_parser_handler_a167f959f2c0930dc4cb60e8e7267f7d6}{st\+\_\+}}
+\item 
+\mbox{\hyperlink{fwd_8h_ab7f1c1207749ff25c0d7f0cc88e62788}{Reader}} \mbox{\hyperlink{class_lookahead_parser_handler_afcdd963db296b957f3afb8bbcb170e09}{r\+\_\+}}
+\item 
+\mbox{\hyperlink{fwd_8h_a87256fd77e335ea15cd195ed8c55e312}{Insitu\+String\+Stream}} \mbox{\hyperlink{class_lookahead_parser_handler_a0a1dd732ae2d8aab57dd04677bc55f6b}{ss\+\_\+}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Static Protected Attributes inherited from \mbox{\hyperlink{class_lookahead_parser_handler}{Lookahead\+Parser\+Handler}}}
+\begin{DoxyCompactItemize}
+\item 
+static const int \mbox{\hyperlink{class_lookahead_parser_handler_a42807dffc6082004527f5baaa0dd9cf3}{parse\+Flags}} = \mbox{\hyperlink{reader_8h_ab7be7dabe6ffcba60fad441505583450a9104b0946d648e9467cb7a967401ec80}{k\+Parse\+Default\+Flags}} \texorpdfstring{$\vert$}{|} \mbox{\hyperlink{reader_8h_ab7be7dabe6ffcba60fad441505583450a13188bd483b4df0b6582bebe2aeb5b01}{k\+Parse\+Insitu\+Flag}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{lookaheadparser_8cpp_source_l00101}{101}} of file \mbox{\hyperlink{lookaheadparser_8cpp_source}{lookaheadparser.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_lookahead_parser_a126093b7e0e6ad1d007f4f07030bcd81}\index{LookaheadParser@{LookaheadParser}!LookaheadParser@{LookaheadParser}}
+\index{LookaheadParser@{LookaheadParser}!LookaheadParser@{LookaheadParser}}
+\doxysubsubsection{\texorpdfstring{LookaheadParser()}{LookaheadParser()}}
+{\footnotesize\ttfamily \label{class_lookahead_parser_a126093b7e0e6ad1d007f4f07030bcd81} 
+Lookahead\+Parser\+::\+Lookahead\+Parser (\begin{DoxyParamCaption}\item[{char \texorpdfstring{$\ast$}{*}}]{str}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{lookaheadparser_8cpp_source_l00103}{103}} of file \mbox{\hyperlink{lookaheadparser_8cpp_source}{lookaheadparser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00103\ :\ \mbox{\hyperlink{class_lookahead_parser_handler_aa56a8db4091e158c3dfecea6b2e7c96e}{LookaheadParserHandler}}(str)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_lookahead_parser_a36ec1615d48fe4d2e16e373adea63e2b}\index{LookaheadParser@{LookaheadParser}!EnterArray@{EnterArray}}
+\index{EnterArray@{EnterArray}!LookaheadParser@{LookaheadParser}}
+\doxysubsubsection{\texorpdfstring{EnterArray()}{EnterArray()}}
+{\footnotesize\ttfamily \label{class_lookahead_parser_a36ec1615d48fe4d2e16e373adea63e2b} 
+bool Lookahead\+Parser\+::\+Enter\+Array (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{lookaheadparser_8cpp_source_l00137}{137}} of file \mbox{\hyperlink{lookaheadparser_8cpp_source}{lookaheadparser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00138\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_lookahead_parser_handler_a167f959f2c0930dc4cb60e8e7267f7d6}{st\_}}\ !=\ \mbox{\hyperlink{class_lookahead_parser_handler_ae334adb8f4e9f8ae9912a026eef9f40aaa04d166db393c889f3b444e932f30842}{kEnteringArray}})\ \{}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_lookahead_parser_handler_a167f959f2c0930dc4cb60e8e7267f7d6}{st\_}}\ \ =\ \mbox{\hyperlink{class_lookahead_parser_handler_ae334adb8f4e9f8ae9912a026eef9f40aad76ea407bb7cc307e6e95d181f845d45}{kError}};}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00141\ \ \ \ \ \}}
+\DoxyCodeLine{00142\ \ \ \ \ }
+\DoxyCodeLine{00143\ \ \ \ \ \mbox{\hyperlink{class_lookahead_parser_handler_a7d0cc7887e9e0c37e645e27744a5b356}{ParseNext}}();}
+\DoxyCodeLine{00144\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00145\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_lookahead_parser_a36ec1615d48fe4d2e16e373adea63e2b_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_lookahead_parser_aa91c5b65b5b119b1d27c8b5d63651be1}\index{LookaheadParser@{LookaheadParser}!EnterObject@{EnterObject}}
+\index{EnterObject@{EnterObject}!LookaheadParser@{LookaheadParser}}
+\doxysubsubsection{\texorpdfstring{EnterObject()}{EnterObject()}}
+{\footnotesize\ttfamily \label{class_lookahead_parser_aa91c5b65b5b119b1d27c8b5d63651be1} 
+bool Lookahead\+Parser\+::\+Enter\+Object (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{lookaheadparser_8cpp_source_l00127}{127}} of file \mbox{\hyperlink{lookaheadparser_8cpp_source}{lookaheadparser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00128\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_lookahead_parser_handler_a167f959f2c0930dc4cb60e8e7267f7d6}{st\_}}\ !=\ \mbox{\hyperlink{class_lookahead_parser_handler_ae334adb8f4e9f8ae9912a026eef9f40aadfd64dce5fb7510a35452945eb3e1f81}{kEnteringObject}})\ \{}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_lookahead_parser_handler_a167f959f2c0930dc4cb60e8e7267f7d6}{st\_}}\ \ =\ \mbox{\hyperlink{class_lookahead_parser_handler_ae334adb8f4e9f8ae9912a026eef9f40aad76ea407bb7cc307e6e95d181f845d45}{kError}};}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00131\ \ \ \ \ \}}
+\DoxyCodeLine{00132\ \ \ \ \ }
+\DoxyCodeLine{00133\ \ \ \ \ \mbox{\hyperlink{class_lookahead_parser_handler_a7d0cc7887e9e0c37e645e27744a5b356}{ParseNext}}();}
+\DoxyCodeLine{00134\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00135\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_lookahead_parser_aa91c5b65b5b119b1d27c8b5d63651be1_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_lookahead_parser_ad27dd0413166aab3fb173d4f52b045b7}\index{LookaheadParser@{LookaheadParser}!GetBool@{GetBool}}
+\index{GetBool@{GetBool}!LookaheadParser@{LookaheadParser}}
+\doxysubsubsection{\texorpdfstring{GetBool()}{GetBool()}}
+{\footnotesize\ttfamily \label{class_lookahead_parser_ad27dd0413166aab3fb173d4f52b045b7} 
+bool Lookahead\+Parser\+::\+Get\+Bool (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{lookaheadparser_8cpp_source_l00199}{199}} of file \mbox{\hyperlink{lookaheadparser_8cpp_source}{lookaheadparser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00200\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_lookahead_parser_handler_a167f959f2c0930dc4cb60e8e7267f7d6}{st\_}}\ !=\ \mbox{\hyperlink{class_lookahead_parser_handler_ae334adb8f4e9f8ae9912a026eef9f40aad9f9336c30ffd2acd766298b24246eec}{kHasBool}})\ \{}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_lookahead_parser_handler_a167f959f2c0930dc4cb60e8e7267f7d6}{st\_}}\ \ =\ \mbox{\hyperlink{class_lookahead_parser_handler_ae334adb8f4e9f8ae9912a026eef9f40aad76ea407bb7cc307e6e95d181f845d45}{kError}};}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00203\ \ \ \ \ \}}
+\DoxyCodeLine{00204\ \ \ \ \ }
+\DoxyCodeLine{00205\ \ \ \ \ \textcolor{keywordtype}{bool}\ result\ =\ \mbox{\hyperlink{class_lookahead_parser_handler_a180a9567951c536adf91b8ab74621eb5}{v\_}}.GetBool();}
+\DoxyCodeLine{00206\ \ \ \ \ \mbox{\hyperlink{class_lookahead_parser_handler_a7d0cc7887e9e0c37e645e27744a5b356}{ParseNext}}();}
+\DoxyCodeLine{00207\ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00208\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_lookahead_parser_ad27dd0413166aab3fb173d4f52b045b7_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_lookahead_parser_a9456db070c2321b42bf8fe1e62dd1b72}\index{LookaheadParser@{LookaheadParser}!GetDouble@{GetDouble}}
+\index{GetDouble@{GetDouble}!LookaheadParser@{LookaheadParser}}
+\doxysubsubsection{\texorpdfstring{GetDouble()}{GetDouble()}}
+{\footnotesize\ttfamily \label{class_lookahead_parser_a9456db070c2321b42bf8fe1e62dd1b72} 
+double Lookahead\+Parser\+::\+Get\+Double (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{lookaheadparser_8cpp_source_l00188}{188}} of file \mbox{\hyperlink{lookaheadparser_8cpp_source}{lookaheadparser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00189\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_lookahead_parser_handler_a167f959f2c0930dc4cb60e8e7267f7d6}{st\_}}\ !=\ \mbox{\hyperlink{class_lookahead_parser_handler_ae334adb8f4e9f8ae9912a026eef9f40aa2e55a1f4539fc2c9c3ce9b8860d50288}{kHasNumber}})\ \{}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_lookahead_parser_handler_a167f959f2c0930dc4cb60e8e7267f7d6}{st\_}}\ \ =\ \mbox{\hyperlink{class_lookahead_parser_handler_ae334adb8f4e9f8ae9912a026eef9f40aad76ea407bb7cc307e6e95d181f845d45}{kError}};}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0.;}
+\DoxyCodeLine{00192\ \ \ \ \ \}}
+\DoxyCodeLine{00193\ \ \ \ \ }
+\DoxyCodeLine{00194\ \ \ \ \ \textcolor{keywordtype}{double}\ result\ =\ \mbox{\hyperlink{class_lookahead_parser_handler_a180a9567951c536adf91b8ab74621eb5}{v\_}}.GetDouble();}
+\DoxyCodeLine{00195\ \ \ \ \ \mbox{\hyperlink{class_lookahead_parser_handler_a7d0cc7887e9e0c37e645e27744a5b356}{ParseNext}}();}
+\DoxyCodeLine{00196\ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00197\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_lookahead_parser_a9456db070c2321b42bf8fe1e62dd1b72_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_lookahead_parser_a2b36cab5f9af8c1273b58ac4174f0158}\index{LookaheadParser@{LookaheadParser}!GetInt@{GetInt}}
+\index{GetInt@{GetInt}!LookaheadParser@{LookaheadParser}}
+\doxysubsubsection{\texorpdfstring{GetInt()}{GetInt()}}
+{\footnotesize\ttfamily \label{class_lookahead_parser_a2b36cab5f9af8c1273b58ac4174f0158} 
+int Lookahead\+Parser\+::\+Get\+Int (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{lookaheadparser_8cpp_source_l00177}{177}} of file \mbox{\hyperlink{lookaheadparser_8cpp_source}{lookaheadparser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00178\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_lookahead_parser_handler_a167f959f2c0930dc4cb60e8e7267f7d6}{st\_}}\ !=\ \mbox{\hyperlink{class_lookahead_parser_handler_ae334adb8f4e9f8ae9912a026eef9f40aa2e55a1f4539fc2c9c3ce9b8860d50288}{kHasNumber}}\ ||\ !\mbox{\hyperlink{class_lookahead_parser_handler_a180a9567951c536adf91b8ab74621eb5}{v\_}}.IsInt())\ \{}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_lookahead_parser_handler_a167f959f2c0930dc4cb60e8e7267f7d6}{st\_}}\ =\ \mbox{\hyperlink{class_lookahead_parser_handler_ae334adb8f4e9f8ae9912a026eef9f40aad76ea407bb7cc307e6e95d181f845d45}{kError}};}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00181\ \ \ \ \ \}}
+\DoxyCodeLine{00182\ }
+\DoxyCodeLine{00183\ \ \ \ \ \textcolor{keywordtype}{int}\ result\ =\ \mbox{\hyperlink{class_lookahead_parser_handler_a180a9567951c536adf91b8ab74621eb5}{v\_}}.GetInt();}
+\DoxyCodeLine{00184\ \ \ \ \ \mbox{\hyperlink{class_lookahead_parser_handler_a7d0cc7887e9e0c37e645e27744a5b356}{ParseNext}}();}
+\DoxyCodeLine{00185\ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00186\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_lookahead_parser_a2b36cab5f9af8c1273b58ac4174f0158_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_lookahead_parser_a2a70de5ba5eab2ad0a4220cfafc61a59}\index{LookaheadParser@{LookaheadParser}!GetNull@{GetNull}}
+\index{GetNull@{GetNull}!LookaheadParser@{LookaheadParser}}
+\doxysubsubsection{\texorpdfstring{GetNull()}{GetNull()}}
+{\footnotesize\ttfamily \label{class_lookahead_parser_a2a70de5ba5eab2ad0a4220cfafc61a59} 
+void Lookahead\+Parser\+::\+Get\+Null (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{lookaheadparser_8cpp_source_l00210}{210}} of file \mbox{\hyperlink{lookaheadparser_8cpp_source}{lookaheadparser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00211\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_lookahead_parser_handler_a167f959f2c0930dc4cb60e8e7267f7d6}{st\_}}\ !=\ \mbox{\hyperlink{class_lookahead_parser_handler_ae334adb8f4e9f8ae9912a026eef9f40aa00cc1c35661ac51ff7101ff12b733448}{kHasNull}})\ \{}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_lookahead_parser_handler_a167f959f2c0930dc4cb60e8e7267f7d6}{st\_}}\ \ =\ \mbox{\hyperlink{class_lookahead_parser_handler_ae334adb8f4e9f8ae9912a026eef9f40aad76ea407bb7cc307e6e95d181f845d45}{kError}};}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00214\ \ \ \ \ \}}
+\DoxyCodeLine{00215\ }
+\DoxyCodeLine{00216\ \ \ \ \ \mbox{\hyperlink{class_lookahead_parser_handler_a7d0cc7887e9e0c37e645e27744a5b356}{ParseNext}}();}
+\DoxyCodeLine{00217\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_lookahead_parser_a2a70de5ba5eab2ad0a4220cfafc61a59_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_lookahead_parser_a254a193b0bf66ddfa5b4a915768c07a8}\index{LookaheadParser@{LookaheadParser}!GetString@{GetString}}
+\index{GetString@{GetString}!LookaheadParser@{LookaheadParser}}
+\doxysubsubsection{\texorpdfstring{GetString()}{GetString()}}
+{\footnotesize\ttfamily \label{class_lookahead_parser_a254a193b0bf66ddfa5b4a915768c07a8} 
+const char \texorpdfstring{$\ast$}{*} Lookahead\+Parser\+::\+Get\+String (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{lookaheadparser_8cpp_source_l00219}{219}} of file \mbox{\hyperlink{lookaheadparser_8cpp_source}{lookaheadparser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00220\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_lookahead_parser_handler_a167f959f2c0930dc4cb60e8e7267f7d6}{st\_}}\ !=\ \mbox{\hyperlink{class_lookahead_parser_handler_ae334adb8f4e9f8ae9912a026eef9f40aada0be4b465fce304dd5300d710f5e01c}{kHasString}})\ \{}
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_lookahead_parser_handler_a167f959f2c0930dc4cb60e8e7267f7d6}{st\_}}\ \ =\ \mbox{\hyperlink{class_lookahead_parser_handler_ae334adb8f4e9f8ae9912a026eef9f40aad76ea407bb7cc307e6e95d181f845d45}{kError}};}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00223\ \ \ \ \ \}}
+\DoxyCodeLine{00224\ \ \ \ \ }
+\DoxyCodeLine{00225\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ result\ =\ \mbox{\hyperlink{class_lookahead_parser_handler_a180a9567951c536adf91b8ab74621eb5}{v\_}}.GetString();}
+\DoxyCodeLine{00226\ \ \ \ \ \mbox{\hyperlink{class_lookahead_parser_handler_a7d0cc7887e9e0c37e645e27744a5b356}{ParseNext}}();}
+\DoxyCodeLine{00227\ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00228\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_lookahead_parser_a254a193b0bf66ddfa5b4a915768c07a8_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_lookahead_parser_a320cb1a9934a9fd67b7bf2cd0ff413d9}\index{LookaheadParser@{LookaheadParser}!IsValid@{IsValid}}
+\index{IsValid@{IsValid}!LookaheadParser@{LookaheadParser}}
+\doxysubsubsection{\texorpdfstring{IsValid()}{IsValid()}}
+{\footnotesize\ttfamily \label{class_lookahead_parser_a320cb1a9934a9fd67b7bf2cd0ff413d9} 
+bool Lookahead\+Parser\+::\+Is\+Valid (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{lookaheadparser_8cpp_source_l00121}{121}} of file \mbox{\hyperlink{lookaheadparser_8cpp_source}{lookaheadparser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00121\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_lookahead_parser_handler_a167f959f2c0930dc4cb60e8e7267f7d6}{st\_}}\ !=\ \mbox{\hyperlink{class_lookahead_parser_handler_ae334adb8f4e9f8ae9912a026eef9f40aad76ea407bb7cc307e6e95d181f845d45}{kError}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_lookahead_parser_a0c9116fd6becabf6fabfe4c7b0d2544f}\index{LookaheadParser@{LookaheadParser}!NextArrayValue@{NextArrayValue}}
+\index{NextArrayValue@{NextArrayValue}!LookaheadParser@{LookaheadParser}}
+\doxysubsubsection{\texorpdfstring{NextArrayValue()}{NextArrayValue()}}
+{\footnotesize\ttfamily \label{class_lookahead_parser_a0c9116fd6becabf6fabfe4c7b0d2544f} 
+bool Lookahead\+Parser\+::\+Next\+Array\+Value (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{lookaheadparser_8cpp_source_l00163}{163}} of file \mbox{\hyperlink{lookaheadparser_8cpp_source}{lookaheadparser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00164\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_lookahead_parser_handler_a167f959f2c0930dc4cb60e8e7267f7d6}{st\_}}\ ==\ \mbox{\hyperlink{class_lookahead_parser_handler_ae334adb8f4e9f8ae9912a026eef9f40aa11da35dbfb582c675b5a2e53e693afe5}{kExitingArray}})\ \{}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_lookahead_parser_handler_a7d0cc7887e9e0c37e645e27744a5b356}{ParseNext}}();}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00167\ \ \ \ \ \}}
+\DoxyCodeLine{00168\ \ \ \ \ }
+\DoxyCodeLine{00169\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_lookahead_parser_handler_a167f959f2c0930dc4cb60e8e7267f7d6}{st\_}}\ ==\ \mbox{\hyperlink{class_lookahead_parser_handler_ae334adb8f4e9f8ae9912a026eef9f40aad76ea407bb7cc307e6e95d181f845d45}{kError}}\ ||\ \mbox{\hyperlink{class_lookahead_parser_handler_a167f959f2c0930dc4cb60e8e7267f7d6}{st\_}}\ ==\ \mbox{\hyperlink{class_lookahead_parser_handler_ae334adb8f4e9f8ae9912a026eef9f40aa79f2f8d0ebe5856a0e45bca27640b920}{kExitingObject}}\ ||\ \mbox{\hyperlink{class_lookahead_parser_handler_a167f959f2c0930dc4cb60e8e7267f7d6}{st\_}}\ ==\ \mbox{\hyperlink{class_lookahead_parser_handler_ae334adb8f4e9f8ae9912a026eef9f40aadea4f79ab30f23f94fe694aa923a12bb}{kHasKey}})\ \{}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_lookahead_parser_handler_a167f959f2c0930dc4cb60e8e7267f7d6}{st\_}}\ =\ \mbox{\hyperlink{class_lookahead_parser_handler_ae334adb8f4e9f8ae9912a026eef9f40aad76ea407bb7cc307e6e95d181f845d45}{kError}};}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00172\ \ \ \ \ \}}
+\DoxyCodeLine{00173\ }
+\DoxyCodeLine{00174\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00175\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_lookahead_parser_a0c9116fd6becabf6fabfe4c7b0d2544f_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_lookahead_parser_a5fa1c656fa149e2a580a4065351705e8}\index{LookaheadParser@{LookaheadParser}!NextObjectKey@{NextObjectKey}}
+\index{NextObjectKey@{NextObjectKey}!LookaheadParser@{LookaheadParser}}
+\doxysubsubsection{\texorpdfstring{NextObjectKey()}{NextObjectKey()}}
+{\footnotesize\ttfamily \label{class_lookahead_parser_a5fa1c656fa149e2a580a4065351705e8} 
+const char \texorpdfstring{$\ast$}{*} Lookahead\+Parser\+::\+Next\+Object\+Key (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{lookaheadparser_8cpp_source_l00147}{147}} of file \mbox{\hyperlink{lookaheadparser_8cpp_source}{lookaheadparser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00148\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_lookahead_parser_handler_a167f959f2c0930dc4cb60e8e7267f7d6}{st\_}}\ ==\ \mbox{\hyperlink{class_lookahead_parser_handler_ae334adb8f4e9f8ae9912a026eef9f40aadea4f79ab30f23f94fe694aa923a12bb}{kHasKey}})\ \{}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ result\ =\ \mbox{\hyperlink{class_lookahead_parser_handler_a180a9567951c536adf91b8ab74621eb5}{v\_}}.GetString();}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_lookahead_parser_handler_a7d0cc7887e9e0c37e645e27744a5b356}{ParseNext}}();}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00152\ \ \ \ \ \}}
+\DoxyCodeLine{00153\ \ \ \ \ }
+\DoxyCodeLine{00154\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_lookahead_parser_handler_a167f959f2c0930dc4cb60e8e7267f7d6}{st\_}}\ !=\ \mbox{\hyperlink{class_lookahead_parser_handler_ae334adb8f4e9f8ae9912a026eef9f40aa79f2f8d0ebe5856a0e45bca27640b920}{kExitingObject}})\ \{}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_lookahead_parser_handler_a167f959f2c0930dc4cb60e8e7267f7d6}{st\_}}\ =\ \mbox{\hyperlink{class_lookahead_parser_handler_ae334adb8f4e9f8ae9912a026eef9f40aad76ea407bb7cc307e6e95d181f845d45}{kError}};}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00157\ \ \ \ \ \}}
+\DoxyCodeLine{00158\ \ \ \ \ }
+\DoxyCodeLine{00159\ \ \ \ \ \mbox{\hyperlink{class_lookahead_parser_handler_a7d0cc7887e9e0c37e645e27744a5b356}{ParseNext}}();}
+\DoxyCodeLine{00160\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00161\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_lookahead_parser_a5fa1c656fa149e2a580a4065351705e8_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_lookahead_parser_a2ace6cf83f030330cc6fec191fa62418}\index{LookaheadParser@{LookaheadParser}!PeekType@{PeekType}}
+\index{PeekType@{PeekType}!LookaheadParser@{LookaheadParser}}
+\doxysubsubsection{\texorpdfstring{PeekType()}{PeekType()}}
+{\footnotesize\ttfamily \label{class_lookahead_parser_a2ace6cf83f030330cc6fec191fa62418} 
+int Lookahead\+Parser\+::\+Peek\+Type (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{lookaheadparser_8cpp_source_l00267}{267}} of file \mbox{\hyperlink{lookaheadparser_8cpp_source}{lookaheadparser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00267\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00268\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_lookahead_parser_handler_a167f959f2c0930dc4cb60e8e7267f7d6}{st\_}}\ >=\ \mbox{\hyperlink{class_lookahead_parser_handler_ae334adb8f4e9f8ae9912a026eef9f40aa00cc1c35661ac51ff7101ff12b733448}{kHasNull}}\ \&\&\ \mbox{\hyperlink{class_lookahead_parser_handler_a167f959f2c0930dc4cb60e8e7267f7d6}{st\_}}\ <=\ \mbox{\hyperlink{class_lookahead_parser_handler_ae334adb8f4e9f8ae9912a026eef9f40aadea4f79ab30f23f94fe694aa923a12bb}{kHasKey}})\ \{}
+\DoxyCodeLine{00269\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_lookahead_parser_handler_a180a9567951c536adf91b8ab74621eb5}{v\_}}.GetType();}
+\DoxyCodeLine{00270\ \ \ \ \ \}}
+\DoxyCodeLine{00271\ \ \ \ \ }
+\DoxyCodeLine{00272\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_lookahead_parser_handler_a167f959f2c0930dc4cb60e8e7267f7d6}{st\_}}\ ==\ \mbox{\hyperlink{class_lookahead_parser_handler_ae334adb8f4e9f8ae9912a026eef9f40aaa04d166db393c889f3b444e932f30842}{kEnteringArray}})\ \{}
+\DoxyCodeLine{00273\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7af41527d6925efa3c5c3dadb23dfef7c8}{kArrayType}};}
+\DoxyCodeLine{00274\ \ \ \ \ \}}
+\DoxyCodeLine{00275\ \ \ \ \ }
+\DoxyCodeLine{00276\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_lookahead_parser_handler_a167f959f2c0930dc4cb60e8e7267f7d6}{st\_}}\ ==\ \mbox{\hyperlink{class_lookahead_parser_handler_ae334adb8f4e9f8ae9912a026eef9f40aadfd64dce5fb7510a35452945eb3e1f81}{kEnteringObject}})\ \{}
+\DoxyCodeLine{00277\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7a146f46700e905e8df96a6a90b5c7640f}{kObjectType}};}
+\DoxyCodeLine{00278\ \ \ \ \ \}}
+\DoxyCodeLine{00279\ }
+\DoxyCodeLine{00280\ \ \ \ \ \textcolor{keywordflow}{return}\ -\/1;}
+\DoxyCodeLine{00281\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_lookahead_parser_a28f142988e64794a006f0f7650def537}\index{LookaheadParser@{LookaheadParser}!PeekValue@{PeekValue}}
+\index{PeekValue@{PeekValue}!LookaheadParser@{LookaheadParser}}
+\doxysubsubsection{\texorpdfstring{PeekValue()}{PeekValue()}}
+{\footnotesize\ttfamily \label{class_lookahead_parser_a28f142988e64794a006f0f7650def537} 
+\mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} \texorpdfstring{$\ast$}{*} Lookahead\+Parser\+::\+Peek\+Value (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{lookaheadparser_8cpp_source_l00259}{259}} of file \mbox{\hyperlink{lookaheadparser_8cpp_source}{lookaheadparser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00259\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00260\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_lookahead_parser_handler_a167f959f2c0930dc4cb60e8e7267f7d6}{st\_}}\ >=\ \mbox{\hyperlink{class_lookahead_parser_handler_ae334adb8f4e9f8ae9912a026eef9f40aa00cc1c35661ac51ff7101ff12b733448}{kHasNull}}\ \&\&\ \mbox{\hyperlink{class_lookahead_parser_handler_a167f959f2c0930dc4cb60e8e7267f7d6}{st\_}}\ <=\ \mbox{\hyperlink{class_lookahead_parser_handler_ae334adb8f4e9f8ae9912a026eef9f40aadea4f79ab30f23f94fe694aa923a12bb}{kHasKey}})\ \{}
+\DoxyCodeLine{00261\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \&\mbox{\hyperlink{class_lookahead_parser_handler_a180a9567951c536adf91b8ab74621eb5}{v\_}};}
+\DoxyCodeLine{00262\ \ \ \ \ \}}
+\DoxyCodeLine{00263\ \ \ \ \ }
+\DoxyCodeLine{00264\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00265\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_lookahead_parser_a864c0b5ca3d7bcd6655b7b5b91eb7d4c}\index{LookaheadParser@{LookaheadParser}!SkipArray@{SkipArray}}
+\index{SkipArray@{SkipArray}!LookaheadParser@{LookaheadParser}}
+\doxysubsubsection{\texorpdfstring{SkipArray()}{SkipArray()}}
+{\footnotesize\ttfamily \label{class_lookahead_parser_a864c0b5ca3d7bcd6655b7b5b91eb7d4c} 
+void Lookahead\+Parser\+::\+Skip\+Array (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{lookaheadparser_8cpp_source_l00251}{251}} of file \mbox{\hyperlink{lookaheadparser_8cpp_source}{lookaheadparser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00251\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00252\ \ \ \ \ \mbox{\hyperlink{class_lookahead_parser_aa8d1c7d1588947612aefd02cf5fd3590}{SkipOut}}(1);}
+\DoxyCodeLine{00253\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_lookahead_parser_a864c0b5ca3d7bcd6655b7b5b91eb7d4c_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_lookahead_parser_a26c28d790e7c915f86c6454a56597098}\index{LookaheadParser@{LookaheadParser}!SkipObject@{SkipObject}}
+\index{SkipObject@{SkipObject}!LookaheadParser@{LookaheadParser}}
+\doxysubsubsection{\texorpdfstring{SkipObject()}{SkipObject()}}
+{\footnotesize\ttfamily \label{class_lookahead_parser_a26c28d790e7c915f86c6454a56597098} 
+void Lookahead\+Parser\+::\+Skip\+Object (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{lookaheadparser_8cpp_source_l00255}{255}} of file \mbox{\hyperlink{lookaheadparser_8cpp_source}{lookaheadparser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00255\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00256\ \ \ \ \ \mbox{\hyperlink{class_lookahead_parser_aa8d1c7d1588947612aefd02cf5fd3590}{SkipOut}}(1);}
+\DoxyCodeLine{00257\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_lookahead_parser_a26c28d790e7c915f86c6454a56597098_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_lookahead_parser_aa8d1c7d1588947612aefd02cf5fd3590}\index{LookaheadParser@{LookaheadParser}!SkipOut@{SkipOut}}
+\index{SkipOut@{SkipOut}!LookaheadParser@{LookaheadParser}}
+\doxysubsubsection{\texorpdfstring{SkipOut()}{SkipOut()}}
+{\footnotesize\ttfamily \label{class_lookahead_parser_aa8d1c7d1588947612aefd02cf5fd3590} 
+void Lookahead\+Parser\+::\+Skip\+Out (\begin{DoxyParamCaption}\item[{int}]{depth}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{lookaheadparser_8cpp_source_l00230}{230}} of file \mbox{\hyperlink{lookaheadparser_8cpp_source}{lookaheadparser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00230\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00231\ \ \ \ \ \textcolor{keywordflow}{do}\ \{}
+\DoxyCodeLine{00232\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_lookahead_parser_handler_a167f959f2c0930dc4cb60e8e7267f7d6}{st\_}}\ ==\ \mbox{\hyperlink{class_lookahead_parser_handler_ae334adb8f4e9f8ae9912a026eef9f40aaa04d166db393c889f3b444e932f30842}{kEnteringArray}}\ ||\ \mbox{\hyperlink{class_lookahead_parser_handler_a167f959f2c0930dc4cb60e8e7267f7d6}{st\_}}\ ==\ \mbox{\hyperlink{class_lookahead_parser_handler_ae334adb8f4e9f8ae9912a026eef9f40aadfd64dce5fb7510a35452945eb3e1f81}{kEnteringObject}})\ \{}
+\DoxyCodeLine{00233\ \ \ \ \ \ \ \ \ \ \ \ \ ++depth;}
+\DoxyCodeLine{00234\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_lookahead_parser_handler_a167f959f2c0930dc4cb60e8e7267f7d6}{st\_}}\ ==\ \mbox{\hyperlink{class_lookahead_parser_handler_ae334adb8f4e9f8ae9912a026eef9f40aa11da35dbfb582c675b5a2e53e693afe5}{kExitingArray}}\ ||\ \mbox{\hyperlink{class_lookahead_parser_handler_a167f959f2c0930dc4cb60e8e7267f7d6}{st\_}}\ ==\ \mbox{\hyperlink{class_lookahead_parser_handler_ae334adb8f4e9f8ae9912a026eef9f40aa79f2f8d0ebe5856a0e45bca27640b920}{kExitingObject}})\ \{}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ \ \ \ \ -\/-\/depth;}
+\DoxyCodeLine{00237\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00238\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_lookahead_parser_handler_a167f959f2c0930dc4cb60e8e7267f7d6}{st\_}}\ ==\ \mbox{\hyperlink{class_lookahead_parser_handler_ae334adb8f4e9f8ae9912a026eef9f40aad76ea407bb7cc307e6e95d181f845d45}{kError}})\ \{}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00241\ }
+\DoxyCodeLine{00242\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_lookahead_parser_handler_a7d0cc7887e9e0c37e645e27744a5b356}{ParseNext}}();}
+\DoxyCodeLine{00243\ \ \ \ \ \}}
+\DoxyCodeLine{00244\ \ \ \ \ \textcolor{keywordflow}{while}\ (depth\ >\ 0);}
+\DoxyCodeLine{00245\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_lookahead_parser_aa8d1c7d1588947612aefd02cf5fd3590_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_lookahead_parser_aa8d1c7d1588947612aefd02cf5fd3590_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_lookahead_parser_a32530191b0e9f290e639c540813a0a5c}\index{LookaheadParser@{LookaheadParser}!SkipValue@{SkipValue}}
+\index{SkipValue@{SkipValue}!LookaheadParser@{LookaheadParser}}
+\doxysubsubsection{\texorpdfstring{SkipValue()}{SkipValue()}}
+{\footnotesize\ttfamily \label{class_lookahead_parser_a32530191b0e9f290e639c540813a0a5c} 
+void Lookahead\+Parser\+::\+Skip\+Value (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{lookaheadparser_8cpp_source_l00247}{247}} of file \mbox{\hyperlink{lookaheadparser_8cpp_source}{lookaheadparser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00247\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00248\ \ \ \ \ \mbox{\hyperlink{class_lookahead_parser_aa8d1c7d1588947612aefd02cf5fd3590}{SkipOut}}(0);}
+\DoxyCodeLine{00249\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_lookahead_parser_a32530191b0e9f290e639c540813a0a5c_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/example/lookaheadparser/\mbox{\hyperlink{lookaheadparser_8cpp}{lookaheadparser.\+cpp}}\end{DoxyCompactItemize}

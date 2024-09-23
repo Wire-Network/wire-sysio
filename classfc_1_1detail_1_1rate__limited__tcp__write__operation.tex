@@ -1,0 +1,151 @@
+\doxysection{fc\+::detail\+::rate\+\_\+limited\+\_\+tcp\+\_\+write\+\_\+operation Class Reference}
+\hypertarget{classfc_1_1detail_1_1rate__limited__tcp__write__operation}{}\label{classfc_1_1detail_1_1rate__limited__tcp__write__operation}\index{fc::detail::rate\_limited\_tcp\_write\_operation@{fc::detail::rate\_limited\_tcp\_write\_operation}}
+
+
+Inheritance diagram for fc\+::detail\+::rate\+\_\+limited\+\_\+tcp\+\_\+write\+\_\+operation\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=190pt]{classfc_1_1detail_1_1rate__limited__tcp__write__operation__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for fc\+::detail\+::rate\+\_\+limited\+\_\+tcp\+\_\+write\+\_\+operation\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=207pt]{classfc_1_1detail_1_1rate__limited__tcp__write__operation__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__write__operation_a35409a17cddfb784f7665afbe1ed2494}{rate\+\_\+limited\+\_\+tcp\+\_\+write\+\_\+operation}} (boost\+::asio\+::ip\+::tcp\+::socket \&\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__write__operation_a1b36ac1191e9d7317cc51d57dd4c5f6f}{socket}}, const std\+::shared\+\_\+ptr$<$ const char $>$ \&buffer, size\+\_\+t \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ae8457a63170710103e077ec951c26564}{length}}, size\+\_\+t \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_a6ba877d2a0fdcb8b029af48feb07421f}{offset}}, promise$<$ size\+\_\+t $>$\+::ptr \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ac8b6e31c5908b626e58252fe8048f8b9}{completion\+\_\+promise}})
+\item 
+virtual void \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__write__operation_a333fa348b1497124ff27733ab0d5e3d8}{perform\+\_\+operation}} () override
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation}{fc\+::detail\+::rate\+\_\+limited\+\_\+operation}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_aa04333ce2124f5041df4d4c29edf6c43}{rate\+\_\+limited\+\_\+operation}} (size\+\_\+t \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ae8457a63170710103e077ec951c26564}{length}}, size\+\_\+t \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_a6ba877d2a0fdcb8b029af48feb07421f}{offset}}, promise$<$ size\+\_\+t $>$\+::ptr \&\&\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ac8b6e31c5908b626e58252fe8048f8b9}{completion\+\_\+promise}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+boost\+::asio\+::ip\+::tcp\+::socket \& \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__write__operation_a1b36ac1191e9d7317cc51d57dd4c5f6f}{socket}}
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__write__operation_ab5343397e7574c37408274dbe835eb07}{raw\+\_\+buffer}}
+\item 
+std\+::shared\+\_\+ptr$<$ const char $>$ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__write__operation_a8eecc0c17095acd1c5062ffcaed266e5}{shared\+\_\+buffer}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes inherited from \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation}{fc\+::detail\+::rate\+\_\+limited\+\_\+operation}}}
+\begin{DoxyCompactItemize}
+\item 
+size\+\_\+t \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ae8457a63170710103e077ec951c26564}{length}}
+\item 
+size\+\_\+t \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_a6ba877d2a0fdcb8b029af48feb07421f}{offset}}
+\item 
+size\+\_\+t \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ae0ebd3357543b80e348bf68b75b796ad}{permitted\+\_\+length}}
+\item 
+promise$<$ size\+\_\+t $>$\+::ptr \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ac8b6e31c5908b626e58252fe8048f8b9}{completion\+\_\+promise}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00040}{40}} of file \mbox{\hyperlink{rate__limiting_8cpp_source}{rate\+\_\+limiting.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1detail_1_1rate__limited__tcp__write__operation_a35409a17cddfb784f7665afbe1ed2494}\index{fc::detail::rate\_limited\_tcp\_write\_operation@{fc::detail::rate\_limited\_tcp\_write\_operation}!rate\_limited\_tcp\_write\_operation@{rate\_limited\_tcp\_write\_operation}}
+\index{rate\_limited\_tcp\_write\_operation@{rate\_limited\_tcp\_write\_operation}!fc::detail::rate\_limited\_tcp\_write\_operation@{fc::detail::rate\_limited\_tcp\_write\_operation}}
+\doxysubsubsection{\texorpdfstring{rate\_limited\_tcp\_write\_operation()}{rate\_limited\_tcp\_write\_operation()}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1rate__limited__tcp__write__operation_a35409a17cddfb784f7665afbe1ed2494} 
+fc\+::detail\+::rate\+\_\+limited\+\_\+tcp\+\_\+write\+\_\+operation\+::rate\+\_\+limited\+\_\+tcp\+\_\+write\+\_\+operation (\begin{DoxyParamCaption}\item[{boost\+::asio\+::ip\+::tcp\+::socket \&}]{socket}{, }\item[{const std\+::shared\+\_\+ptr$<$ const char $>$ \&}]{buffer}{, }\item[{size\+\_\+t}]{length}{, }\item[{size\+\_\+t}]{offset}{, }\item[{promise$<$ size\+\_\+t $>$\+::ptr}]{completion\+\_\+promise}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00062}{62}} of file \mbox{\hyperlink{rate__limiting_8cpp_source}{rate\+\_\+limiting.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_aa04333ce2124f5041df4d4c29edf6c43}{rate\_limited\_operation}}(length,\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_a6ba877d2a0fdcb8b029af48feb07421f}{offset}},\ std::move(\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ac8b6e31c5908b626e58252fe8048f8b9}{completion\_promise}})),}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__write__operation_a1b36ac1191e9d7317cc51d57dd4c5f6f}{socket}}(socket),}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__write__operation_ab5343397e7574c37408274dbe835eb07}{raw\_buffer}}(\textcolor{keyword}{nullptr}),}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__write__operation_a8eecc0c17095acd1c5062ffcaed266e5}{shared\_buffer}}(buffer)}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1detail_1_1rate__limited__tcp__write__operation_a333fa348b1497124ff27733ab0d5e3d8}\index{fc::detail::rate\_limited\_tcp\_write\_operation@{fc::detail::rate\_limited\_tcp\_write\_operation}!perform\_operation@{perform\_operation}}
+\index{perform\_operation@{perform\_operation}!fc::detail::rate\_limited\_tcp\_write\_operation@{fc::detail::rate\_limited\_tcp\_write\_operation}}
+\doxysubsubsection{\texorpdfstring{perform\_operation()}{perform\_operation()}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1rate__limited__tcp__write__operation_a333fa348b1497124ff27733ab0d5e3d8} 
+virtual void fc\+::detail\+::rate\+\_\+limited\+\_\+tcp\+\_\+write\+\_\+operation\+::perform\+\_\+operation (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_a7090878b9387f70e1718021b5fc596cb}{fc\+::detail\+::rate\+\_\+limited\+\_\+operation}}.
+
+
+
+Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00072}{72}} of file \mbox{\hyperlink{rate__limiting_8cpp_source}{rate\+\_\+limiting.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__write__operation_ab5343397e7574c37408274dbe835eb07}{raw\_buffer}})}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \ asio::async\_write\_some(socket,}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__write__operation_ab5343397e7574c37408274dbe835eb07}{raw\_buffer}},\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ae0ebd3357543b80e348bf68b75b796ad}{permitted\_length}},}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ac8b6e31c5908b626e58252fe8048f8b9}{completion\_promise}});}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ \ asio::async\_write\_some(socket,}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__write__operation_a8eecc0c17095acd1c5062ffcaed266e5}{shared\_buffer}},\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ae0ebd3357543b80e348bf68b75b796ad}{permitted\_length}},\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_a6ba877d2a0fdcb8b029af48feb07421f}{offset}},}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ac8b6e31c5908b626e58252fe8048f8b9}{completion\_promise}});}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classfc_1_1detail_1_1rate__limited__tcp__write__operation_ab5343397e7574c37408274dbe835eb07}\index{fc::detail::rate\_limited\_tcp\_write\_operation@{fc::detail::rate\_limited\_tcp\_write\_operation}!raw\_buffer@{raw\_buffer}}
+\index{raw\_buffer@{raw\_buffer}!fc::detail::rate\_limited\_tcp\_write\_operation@{fc::detail::rate\_limited\_tcp\_write\_operation}}
+\doxysubsubsection{\texorpdfstring{raw\_buffer}{raw\_buffer}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1rate__limited__tcp__write__operation_ab5343397e7574c37408274dbe835eb07} 
+const char\texorpdfstring{$\ast$}{*} fc\+::detail\+::rate\+\_\+limited\+\_\+tcp\+\_\+write\+\_\+operation\+::raw\+\_\+buffer}
+
+
+
+Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00044}{44}} of file \mbox{\hyperlink{rate__limiting_8cpp_source}{rate\+\_\+limiting.\+cpp}}.
+
+\Hypertarget{classfc_1_1detail_1_1rate__limited__tcp__write__operation_a8eecc0c17095acd1c5062ffcaed266e5}\index{fc::detail::rate\_limited\_tcp\_write\_operation@{fc::detail::rate\_limited\_tcp\_write\_operation}!shared\_buffer@{shared\_buffer}}
+\index{shared\_buffer@{shared\_buffer}!fc::detail::rate\_limited\_tcp\_write\_operation@{fc::detail::rate\_limited\_tcp\_write\_operation}}
+\doxysubsubsection{\texorpdfstring{shared\_buffer}{shared\_buffer}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1rate__limited__tcp__write__operation_a8eecc0c17095acd1c5062ffcaed266e5} 
+std\+::shared\+\_\+ptr$<$const char$>$ fc\+::detail\+::rate\+\_\+limited\+\_\+tcp\+\_\+write\+\_\+operation\+::shared\+\_\+buffer}
+
+
+
+Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00045}{45}} of file \mbox{\hyperlink{rate__limiting_8cpp_source}{rate\+\_\+limiting.\+cpp}}.
+
+\Hypertarget{classfc_1_1detail_1_1rate__limited__tcp__write__operation_a1b36ac1191e9d7317cc51d57dd4c5f6f}\index{fc::detail::rate\_limited\_tcp\_write\_operation@{fc::detail::rate\_limited\_tcp\_write\_operation}!socket@{socket}}
+\index{socket@{socket}!fc::detail::rate\_limited\_tcp\_write\_operation@{fc::detail::rate\_limited\_tcp\_write\_operation}}
+\doxysubsubsection{\texorpdfstring{socket}{socket}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1rate__limited__tcp__write__operation_a1b36ac1191e9d7317cc51d57dd4c5f6f} 
+boost\+::asio\+::ip\+::tcp\+::socket\& fc\+::detail\+::rate\+\_\+limited\+\_\+tcp\+\_\+write\+\_\+operation\+::socket}
+
+
+
+Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00043}{43}} of file \mbox{\hyperlink{rate__limiting_8cpp_source}{rate\+\_\+limiting.\+cpp}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/src/network/\mbox{\hyperlink{rate__limiting_8cpp}{rate\+\_\+limiting.\+cpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,10 @@
+<map id="CLI::Option_group::add_subcommand" name="CLI::Option_group::add_subcommand">
+<area shape="rect" id="Node000001" title="Add an existing subcommand to be a member of an option_group." alt="" coords="5,29,141,70"/>
+<area shape="poly" id="edge1_Node000001_Node000001" title=" " alt="" coords="32,29,30,19,36,10,51,5,73,3,97,5,111,11,109,16,95,10,73,8,52,10,40,15,35,21,37,28"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_app.html#a5f31177cf639f148d3a315861ff6ca5c" title="Get the parent of this subcommand (or nullptr if master app)" alt="" coords="221,12,363,37"/>
+<area shape="poly" id="edge2_Node000001_Node000002" title=" " alt="" coords="141,39,205,32,206,37,141,45"/>
+<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_app.html#a63c0110a3e63515e3b9b70b7b560d676" title="Check to see if a subcommand is part of this command and get a shared_ptr to it." alt="" coords="189,61,395,86"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="141,54,174,58,173,63,141,60"/>
+<area shape="rect" id="Node000004" href="$class_c_l_i_1_1_app.html#adeac41bd40859dfbff9817244c09c989" title="Get the name of the current app." alt="" coords="443,61,581,86"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="396,71,427,71,427,76,396,76"/>
+</map>

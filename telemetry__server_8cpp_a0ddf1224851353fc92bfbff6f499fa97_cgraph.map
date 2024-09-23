@@ -1,0 +1,32 @@
+<map id="main" name="main">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,112,55,137"/>
+<area shape="rect" id="Node000002" href="$classtelemetry__server.html#a8c09eba40e8993079859e9f1974254ab" title=" " alt="" coords="103,112,247,137"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="55,122,87,122,87,127,55,127"/>
+<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1endpoint.html#a1d9163813aa02ed32100f443b4ddbd8e" title="Get reference to access logger." alt="" coords="696,5,851,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="193,109,237,81,294,56,396,34,499,22,597,17,680,18,680,23,597,23,500,27,397,39,296,62,240,86,196,113"/>
+<area shape="rect" id="Node000004" href="$classtelemetry__server.html#a2a510e3a3c91c123f37d95d7b7d140ea" title=" " alt="" coords="304,71,448,111"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="247,110,288,103,289,108,248,115"/>
+<area shape="rect" id="Node000007" href="$classwebsocketpp_1_1server.html#a0204a7d444144f7ea5b8bbcf14689fc1" title="Starts the server&#39;s async connection acceptance loop (exception free)" alt="" coords="305,136,447,177"/>
+<area shape="poly" id="edge8_Node000002_Node000007" title=" " alt="" coords="248,133,290,140,289,145,247,138"/>
+<area shape="rect" id="Node000014" href="$classwebsocketpp_1_1exception.html#a62dabd977bc59faaca6dc268744a6089" title=" " alt="" coords="295,201,457,242"/>
+<area shape="poly" id="edge16_Node000002_Node000014" title=" " alt="" coords="201,135,296,186,310,192,307,197,294,191,198,140"/>
+<area shape="rect" id="Node000005" href="$classtelemetry__server.html#acc29e40bd4262e42b3d16e4fcd79ec22" title=" " alt="" coords="506,71,647,111"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="449,97,491,97,491,103,449,102"/>
+<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="639,68,695,49,696,54,641,73"/>
+<area shape="poly" id="edge7_Node000005_Node000004" title=" " alt="" coords="506,85,464,85,464,79,506,80"/>
+<area shape="rect" id="Node000006" href="$classwebsocketpp_1_1endpoint.html#a5341f59de7ef1a565a2fd93daba212d5" title="Create a message and add it to the outgoing send queue (exception free)" alt="" coords="696,71,851,111"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="647,88,680,88,680,94,647,94"/>
+<area shape="rect" id="Node000008" href="$classwebsocketpp_1_1server.html#a9146c63ed1afb5bdec29eca52c487226" title="Create and initialize a new connection." alt="" coords="505,136,648,177"/>
+<area shape="poly" id="edge9_Node000007_Node000008" title=" " alt="" coords="448,154,490,154,490,159,448,159"/>
+<area shape="rect" id="Node000010" href="$classwebsocketpp_1_1server.html#aa24feb1c5d2bde47de8b11f5369c54d4" title="Handler callback for start_accept." alt="" coords="505,213,648,254"/>
+<area shape="poly" id="edge11_Node000007_Node000010" title=" " alt="" coords="432,175,508,205,506,210,430,180"/>
+<area shape="rect" id="Node000012" href="$namespacewebsocketpp_1_1error.html#a3344622df8c36e8ae03c59164e7b5e89" title=" " alt="" coords="510,279,643,319"/>
+<area shape="poly" id="edge14_Node000007_Node000012" title=" " alt="" coords="440,175,459,188,476,207,484,226,492,245,507,264,512,268,509,272,503,268,487,248,479,228,471,210,456,192,437,179"/>
+<area shape="rect" id="Node000009" href="$classwebsocketpp_1_1endpoint.html#abfbee4cb244700560ef80594a913cd95" title=" " alt="" coords="696,136,851,177"/>
+<area shape="poly" id="edge10_Node000008_Node000009" title=" " alt="" coords="648,154,680,154,680,159,648,159"/>
+<area shape="rect" id="Node000011" href="$classwebsocketpp_1_1server.html#ab61bcdf9fd532fe7ebd934f8d84fdfea" title="Starts the server&#39;s async connection acceptance loop." alt="" coords="702,225,844,266"/>
+<area shape="poly" id="edge12_Node000010_Node000011" title=" " alt="" coords="648,235,687,238,687,243,648,241"/>
+<area shape="poly" id="edge13_Node000011_Node000011" title=" " alt="" coords="736,225,734,215,740,206,753,201,773,199,795,201,808,207,805,212,793,206,773,204,755,206,744,211,739,216,741,224"/>
+<area shape="rect" id="Node000013" href="$namespacewebsocketpp_1_1error.html#ac1acac2bfb24bbd2b1791db80993b0c2" title=" " alt="" coords="707,291,840,331"/>
+<area shape="poly" id="edge15_Node000012_Node000013" title=" " alt="" coords="643,300,692,303,691,309,643,306"/>
+</map>

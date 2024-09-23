@@ -1,0 +1,17 @@
+<map id="TEST" name="TEST">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,56,61,82"/>
+<area shape="rect" id="Node000002" href="$class_generic_document.html#a1362cbdcce6ca37356744a3a0dbb11d6" title="Get the allocator of this document." alt="" coords="109,7,315,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="60,56,108,41,134,34,135,39,109,46,62,61"/>
+<area shape="rect" id="Node000003" href="$class_generic_document.html#a1c3ab2d23fcced40fced7409b9d4a1d2" title="Exchange the contents of this document with those of another." alt="" coords="128,56,296,82"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="61,66,112,66,112,72,61,72"/>
+<area shape="rect" id="Node000006" href="$namespacestd.html#abb7e41c7063536ff6eeee4bb5f66de6c" title=" " alt="" coords="173,107,251,132"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="62,76,109,92,158,105,157,110,108,97,60,81"/>
+<area shape="rect" id="Node000004" href="$classinternal_1_1_stack.html#a5e601199a21d84b1ac612f558be0f2c3" title=" " alt="" coords="364,5,510,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="272,53,361,32,362,38,273,58"/>
+<area shape="rect" id="Node000005" href="$namespaceinternal.html#a72b2c71d36273b9691487f58c671ce04" title="Custom swap() to avoid dependency on C++ &lt;algorithm&gt; header." alt="" coords="558,31,663,56"/>
+<area shape="poly" id="edge5_Node000003_Node000005" title=" " alt="" coords="296,61,543,45,543,50,296,66"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="510,26,543,31,543,36,510,31"/>
+<area shape="rect" id="Node000007" href="$classpicojson_1_1value.html#a6c948adb3a5c55091bfd16a84437199c" title=" " alt="" coords="363,107,510,132"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="251,124,348,126,348,131,251,129"/>
+<area shape="poly" id="edge8_Node000007_Node000006" title=" " alt="" coords="363,114,267,114,267,109,363,108"/>
+</map>

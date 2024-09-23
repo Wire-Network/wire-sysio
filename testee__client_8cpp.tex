@@ -1,0 +1,179 @@
+\doxysection{libraries/fc/vendor/websocketpp/examples/testee\+\_\+client/testee\+\_\+client.cpp File Reference}
+\hypertarget{testee__client_8cpp}{}\label{testee__client_8cpp}\index{libraries/fc/vendor/websocketpp/examples/testee\_client/testee\_client.cpp@{libraries/fc/vendor/websocketpp/examples/testee\_client/testee\_client.cpp}}
+{\ttfamily \#include $<$websocketpp/config/asio\+\_\+no\+\_\+tls\+\_\+client.\+hpp$>$}\newline
+{\ttfamily \#include $<$websocketpp/client.\+hpp$>$}\newline
+{\ttfamily \#include $<$websocketpp/extensions/permessage\+\_\+deflate/enabled.\+hpp$>$}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+Include dependency graph for testee\+\_\+client.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{testee__client_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structdeflate__config}{deflate\+\_\+config}}
+\item 
+struct \mbox{\hyperlink{structdeflate__config_1_1transport__config}{deflate\+\_\+config\+::transport\+\_\+config}}
+\item 
+struct \mbox{\hyperlink{structdeflate__config_1_1permessage__deflate__config}{deflate\+\_\+config\+::permessage\+\_\+deflate\+\_\+config}}
+\begin{DoxyCompactList}\small\item\em permessage\+\_\+compress extension \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1client}{websocketpp\+::client}}$<$ \mbox{\hyperlink{structdeflate__config}{deflate\+\_\+config}} $>$ \mbox{\hyperlink{testee__client_8cpp_ac4a785e94a03e77c7ee239d01730eb22}{client}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{testee__client_8cpp_a8c13595a4801a15825ae3f8c8bb37ed4}{on\+\_\+message}} (\mbox{\hyperlink{debug__client_8cpp_aff8c62b83a9c8aefc476f96166656b76}{client}} \texorpdfstring{$\ast$}{*}c, \mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{websocketpp\+::connection\+\_\+hdl}} hdl, \mbox{\hyperlink{debug__client_8cpp_a08398c4d31a4dc3e42d1b9a9ef64c6ad}{message\+\_\+ptr}} msg)
+\item 
+int \mbox{\hyperlink{testee__client_8cpp_a0ddf1224851353fc92bfbff6f499fa97}{main}} (int argc, char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}\mbox{[}$\,$\mbox{]})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{testee__client_8cpp_aecf1f2db6e52cb7f15f8b1b3b04ef3fa}{case\+\_\+count}} = 0
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{testee__client_8cpp_ac4a785e94a03e77c7ee239d01730eb22}\index{testee\_client.cpp@{testee\_client.cpp}!client@{client}}
+\index{client@{client}!testee\_client.cpp@{testee\_client.cpp}}
+\doxysubsubsection{\texorpdfstring{client}{client}}
+{\footnotesize\ttfamily \label{testee__client_8cpp_ac4a785e94a03e77c7ee239d01730eb22} 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1client}{websocketpp\+::client}}$<$\mbox{\hyperlink{structdeflate__config}{deflate\+\_\+config}}$>$ \mbox{\hyperlink{debug__client_8cpp_aff8c62b83a9c8aefc476f96166656b76}{client}}}
+
+
+
+Definition at line \mbox{\hyperlink{testee__client_8cpp_source_l00072}{72}} of file \mbox{\hyperlink{testee__client_8cpp_source}{testee\+\_\+client.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{testee__client_8cpp_a0ddf1224851353fc92bfbff6f499fa97}\index{testee\_client.cpp@{testee\_client.cpp}!main@{main}}
+\index{main@{main}!testee\_client.cpp@{testee\_client.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{testee__client_8cpp_a0ddf1224851353fc92bfbff6f499fa97} 
+int main (\begin{DoxyParamCaption}\item[{int}]{argc}{, }\item[{char \texorpdfstring{$\ast$}{*}}]{argv}{\mbox{[}$\,$\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{testee__client_8cpp_source_l00095}{95}} of file \mbox{\hyperlink{testee__client_8cpp_source}{testee\+\_\+client.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00096\ \ \ \ \ \textcolor{comment}{//\ Create\ a\ server\ endpoint}}
+\DoxyCodeLine{00097\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1client}{client}}\ c;}
+\DoxyCodeLine{00098\ }
+\DoxyCodeLine{00099\ \ \ \ \ std::string\ uri\ =\ \textcolor{stringliteral}{"{}ws://localhost:9001"{}};}
+\DoxyCodeLine{00100\ }
+\DoxyCodeLine{00101\ \ \ \ \ \textcolor{keywordflow}{if}\ (argc\ ==\ 2)\ \{}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ uri\ =\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[1];}
+\DoxyCodeLine{00103\ \ \ \ \ \}}
+\DoxyCodeLine{00104\ }
+\DoxyCodeLine{00105\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ We\ expect\ there\ to\ be\ a\ lot\ of\ errors,\ so\ suppress\ them}}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ c.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a3fe357b3c6434273a9965eb52902575d}{clear\_access\_channels}}(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a853aa0b8976e53f3181af3bc398d493e}{websocketpp::log::alevel::all}});}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ c.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a8cefa4fc37c0df4eb6ed0bcf04bb0da5}{clear\_error\_channels}}(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1elevel_a9b31ff708c221d314f9f4eb3ff2b1ad7}{websocketpp::log::elevel::all}});}
+\DoxyCodeLine{00109\ }
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Initialize\ ASIO}}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ c.init\_asio();}
+\DoxyCodeLine{00112\ }
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Register\ our\ handlers}}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ c.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a34a3a8351bff65ba878975be471cab85}{set\_message\_handler}}(bind(\&\mbox{\hyperlink{testee__client_8cpp_a8c13595a4801a15825ae3f8c8bb37ed4}{on\_message}},\&c,::\_1,::\_2));}
+\DoxyCodeLine{00115\ }
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ websocketpp::lib::error\_code\ ec;}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1client_ad9e541a43023d33d5cd5669d62a13edc}{client::connection\_ptr}}\ con\ =\ c.\mbox{\hyperlink{classwebsocketpp_1_1client_aa95cec974921e32bc37a61c683ae240d}{get\_connection}}(uri+\textcolor{stringliteral}{"{}/getCaseCount"{}},\ ec);}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ c.\mbox{\hyperlink{classwebsocketpp_1_1client_a818c30343180123bf1fee6dc21524bae}{connect}}(con);}
+\DoxyCodeLine{00119\ }
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Start\ the\ ASIO\ io\_service\ run\ loop}}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ c.run();}
+\DoxyCodeLine{00122\ }
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}case\ count:\ "{}}\ <<\ \mbox{\hyperlink{testee__client_8cpp_aecf1f2db6e52cb7f15f8b1b3b04ef3fa}{case\_count}}\ <<\ std::endl;}
+\DoxyCodeLine{00124\ }
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 1;\ i\ <=\ \mbox{\hyperlink{testee__client_8cpp_aecf1f2db6e52cb7f15f8b1b3b04ef3fa}{case\_count}};\ i++)\ \{}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \ \ \ c.reset();}
+\DoxyCodeLine{00127\ }
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \ \ \ \ std::stringstream\ \mbox{\hyperlink{programs_2clio_2main_8cpp_aa03c1ef4c41f36b048cf58d5aade7653}{url}};}
+\DoxyCodeLine{00129\ }
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{programs_2clio_2main_8cpp_aa03c1ef4c41f36b048cf58d5aade7653}{url}}\ <<\ uri\ <<\ \textcolor{stringliteral}{"{}/runCase?case="{}}\ <<\ i\ <<\ \textcolor{stringliteral}{"{}\&agent="{}}}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ websocketpp::user\_agent;}
+\DoxyCodeLine{00132\ }
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \ \ \ \ con\ =\ c.\mbox{\hyperlink{classwebsocketpp_1_1client_aa95cec974921e32bc37a61c683ae240d}{get\_connection}}(\mbox{\hyperlink{programs_2clio_2main_8cpp_aa03c1ef4c41f36b048cf58d5aade7653}{url}}.str(),\ ec);}
+\DoxyCodeLine{00134\ }
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \ \ \ \ c.\mbox{\hyperlink{classwebsocketpp_1_1client_a818c30343180123bf1fee6dc21524bae}{connect}}(con);}
+\DoxyCodeLine{00136\ }
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ \ \ \ c.run();}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00139\ }
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}done"{}}\ <<\ std::endl;}
+\DoxyCodeLine{00141\ }
+\DoxyCodeLine{00142\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\mbox{\hyperlink{classwebsocketpp_1_1exception}{websocketpp::exception}}\ \textcolor{keyword}{const}\ \&\ e)\ \{}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ std::cout\ <<\ e.\mbox{\hyperlink{classwebsocketpp_1_1exception_a62dabd977bc59faaca6dc268744a6089}{what}}()\ <<\ std::endl;}
+\DoxyCodeLine{00144\ \ \ \ \ \}}
+\DoxyCodeLine{00145\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{testee__client_8cpp_a0ddf1224851353fc92bfbff6f499fa97_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{testee__client_8cpp_a8c13595a4801a15825ae3f8c8bb37ed4}\index{testee\_client.cpp@{testee\_client.cpp}!on\_message@{on\_message}}
+\index{on\_message@{on\_message}!testee\_client.cpp@{testee\_client.cpp}}
+\doxysubsubsection{\texorpdfstring{on\_message()}{on\_message()}}
+{\footnotesize\ttfamily \label{testee__client_8cpp_a8c13595a4801a15825ae3f8c8bb37ed4} 
+void on\+\_\+message (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{debug__client_8cpp_aff8c62b83a9c8aefc476f96166656b76}{client}} \texorpdfstring{$\ast$}{*}}]{c}{, }\item[{\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{websocketpp\+::connection\+\_\+hdl}}}]{hdl}{, }\item[{\mbox{\hyperlink{debug__client_8cpp_a08398c4d31a4dc3e42d1b9a9ef64c6ad}{message\+\_\+ptr}}}]{msg}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{testee__client_8cpp_source_l00083}{83}} of file \mbox{\hyperlink{testee__client_8cpp_source}{testee\+\_\+client.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00084\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1client_ad9e541a43023d33d5cd5669d62a13edc}{client::connection\_ptr}}\ con\ =\ c-\/>\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a0fe4457427d4124abe7ca022ba7afbb4}{get\_con\_from\_hdl}}(hdl);}
+\DoxyCodeLine{00085\ }
+\DoxyCodeLine{00086\ \ \ \ \ \textcolor{keywordflow}{if}\ (con-\/>get\_resource()\ ==\ \textcolor{stringliteral}{"{}/getCaseCount"{}})\ \{}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}Detected\ "{}}\ <<\ msg-\/>get\_payload()\ <<\ \textcolor{stringliteral}{"{}\ test\ cases."{}}}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ std::endl;}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{testee__client_8cpp_aecf1f2db6e52cb7f15f8b1b3b04ef3fa}{case\_count}}\ =\ atoi(msg-\/>get\_payload().c\_str());}
+\DoxyCodeLine{00090\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ c-\/>\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a5341f59de7ef1a565a2fd93daba212d5}{send}}(hdl,\ msg-\/>get\_payload(),\ msg-\/>get\_opcode());}
+\DoxyCodeLine{00092\ \ \ \ \ \}}
+\DoxyCodeLine{00093\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{testee__client_8cpp_a8c13595a4801a15825ae3f8c8bb37ed4_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=225pt]{testee__client_8cpp_a8c13595a4801a15825ae3f8c8bb37ed4_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{testee__client_8cpp_aecf1f2db6e52cb7f15f8b1b3b04ef3fa}\index{testee\_client.cpp@{testee\_client.cpp}!case\_count@{case\_count}}
+\index{case\_count@{case\_count}!testee\_client.cpp@{testee\_client.cpp}}
+\doxysubsubsection{\texorpdfstring{case\_count}{case\_count}}
+{\footnotesize\ttfamily \label{testee__client_8cpp_aecf1f2db6e52cb7f15f8b1b3b04ef3fa} 
+int case\+\_\+count = 0}
+
+
+
+Definition at line \mbox{\hyperlink{testee__client_8cpp_source_l00081}{81}} of file \mbox{\hyperlink{testee__client_8cpp_source}{testee\+\_\+client.\+cpp}}.
+

@@ -1,0 +1,62 @@
+\doxysection{test\+\_\+static\+\_\+variant.\+cpp}
+\hypertarget{test__static__variant_8cpp_source}{}\label{test__static__variant_8cpp_source}\index{libraries/fc/test/static\_variant/test\_static\_variant.cpp@{libraries/fc/test/static\_variant/test\_static\_variant.cpp}}
+\mbox{\hyperlink{test__static__variant_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{test__static__variant_8cpp_source_l00001}\mbox{\hyperlink{test__static__variant_8cpp_a6b2a3852db8bb19ab6909bac01859985}{00001}}\ \textcolor{preprocessor}{\#define\ BOOST\_TEST\_MODULE\ static\_variant}}
+\DoxyCodeLine{\Hypertarget{test__static__variant_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <boost/test/included/unit\_test.hpp>}}
+\DoxyCodeLine{\Hypertarget{test__static__variant_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{exception_8hpp}{fc/exception/exception.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{test__static__variant_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{static__variant_8hpp}{fc/static\_variant.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{test__static__variant_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{fc_2include_2fc_2variant_8hpp}{fc/variant.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{test__static__variant_8cpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{test__static__variant_8cpp_source_l00007}00007\ BOOST\_AUTO\_TEST\_SUITE(static\_variant\_test\_suite)}
+\DoxyCodeLine{\Hypertarget{test__static__variant_8cpp_source_l00008}\mbox{\hyperlink{test__static__variant_8cpp_aa9908ea5d99985771d3e7da5a939ce32}{00008}}\ \ \ \ \mbox{\hyperlink{test__static__variant_8cpp_aa9908ea5d99985771d3e7da5a939ce32}{BOOST\_AUTO\_TEST\_CASE}}(to\_from\_fc\_variant)}
+\DoxyCodeLine{\Hypertarget{test__static__variant_8cpp_source_l00009}00009\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__static__variant_8cpp_source_l00010}00010\ \ \ \ \ \ \ \textcolor{keyword}{using\ }variant\_type\ =\ std::variant<int32\_t,\ bool>;}
+\DoxyCodeLine{\Hypertarget{test__static__variant_8cpp_source_l00011}00011\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ std\_variant\_1\ =\ variant\_type\{\textcolor{keyword}{false}\};}
+\DoxyCodeLine{\Hypertarget{test__static__variant_8cpp_source_l00012}00012\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ fc\_variant\ =\ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}\{\};}
+\DoxyCodeLine{\Hypertarget{test__static__variant_8cpp_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{test__static__variant_8cpp_source_l00014}00014\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_adea61f2343de94d0fbcb920a32332ad9}{fc::to\_variant}}(std\_variant\_1,\ fc\_variant);}
+\DoxyCodeLine{\Hypertarget{test__static__variant_8cpp_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{test__static__variant_8cpp_source_l00016}00016\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ std\_variant\_2\ =\ variant\_type\{\};}
+\DoxyCodeLine{\Hypertarget{test__static__variant_8cpp_source_l00017}00017\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_accef08adf4ee05c36ccc550d8101b08f}{fc::from\_variant}}(fc\_variant,\ std\_variant\_2);}
+\DoxyCodeLine{\Hypertarget{test__static__variant_8cpp_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{test__static__variant_8cpp_source_l00019}00019\ \ \ \ \ \ \ BOOST\_REQUIRE(std\_variant\_1\ ==\ std\_variant\_2);}
+\DoxyCodeLine{\Hypertarget{test__static__variant_8cpp_source_l00020}00020\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__static__variant_8cpp_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{test__static__variant_8cpp_source_l00022}\mbox{\hyperlink{test__static__variant_8cpp_a33cdc45ca0a790286c9549498f84ef87}{00022}}\ \ \ \ \mbox{\hyperlink{test__static__variant_8cpp_aa9908ea5d99985771d3e7da5a939ce32}{BOOST\_AUTO\_TEST\_CASE}}(get)}
+\DoxyCodeLine{\Hypertarget{test__static__variant_8cpp_source_l00023}00023\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__static__variant_8cpp_source_l00024}00024\ \ \ \ \ \ \textcolor{keyword}{using\ }variant\_type\ =\ std::variant<int32\_t,\ bool,\ std::string>;}
+\DoxyCodeLine{\Hypertarget{test__static__variant_8cpp_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{test__static__variant_8cpp_source_l00026}00026\ \ \ \ \ \ \textcolor{keyword}{auto}\ v1\ =\ variant\_type\{std::string\{\textcolor{stringliteral}{"{}hello\ world"{}}\}\};}
+\DoxyCodeLine{\Hypertarget{test__static__variant_8cpp_source_l00027}00027\ \ \ \ \ \ BOOST\_CHECK\_EXCEPTION(std::get<int32\_t>(v1),\ std::bad\_variant\_access,\ [](\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ e)\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \});}
+\DoxyCodeLine{\Hypertarget{test__static__variant_8cpp_source_l00028}00028\ \ \ \ \ \ \textcolor{keyword}{auto}\ result1\ =\ std::get<std::string>(v1);}
+\DoxyCodeLine{\Hypertarget{test__static__variant_8cpp_source_l00029}00029\ \ \ \ \ \ BOOST\_REQUIRE(result1\ ==\ std::string\{\textcolor{stringliteral}{"{}hello\ world"{}}\});}
+\DoxyCodeLine{\Hypertarget{test__static__variant_8cpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{test__static__variant_8cpp_source_l00031}00031\ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ v2\ =\ variant\_type\{std::string\{\textcolor{stringliteral}{"{}hello\ world"{}}\}\};}
+\DoxyCodeLine{\Hypertarget{test__static__variant_8cpp_source_l00032}00032\ \ \ \ \ \ BOOST\_CHECK\_EXCEPTION(std::get<int32\_t>(v2),\ std::bad\_variant\_access,\ [](\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ e)\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \});}
+\DoxyCodeLine{\Hypertarget{test__static__variant_8cpp_source_l00033}00033\ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ result2\ =\ std::get<std::string>(v2);}
+\DoxyCodeLine{\Hypertarget{test__static__variant_8cpp_source_l00034}00034\ \ \ \ \ \ BOOST\_REQUIRE(result2\ ==\ std::string\{\textcolor{stringliteral}{"{}hello\ world"{}}\});}
+\DoxyCodeLine{\Hypertarget{test__static__variant_8cpp_source_l00035}00035\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__static__variant_8cpp_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{test__static__variant_8cpp_source_l00037}\mbox{\hyperlink{test__static__variant_8cpp_a64b07157437d1978950ed804e546a5da}{00037}}\ \ \ \ \mbox{\hyperlink{test__static__variant_8cpp_aa9908ea5d99985771d3e7da5a939ce32}{BOOST\_AUTO\_TEST\_CASE}}(static\_variant\_from\_index)}
+\DoxyCodeLine{\Hypertarget{test__static__variant_8cpp_source_l00038}00038\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__static__variant_8cpp_source_l00039}00039\ \ \ \ \ \ \ \textcolor{keyword}{using\ }variant\_type\ =\ std::variant<int32\_t,\ bool,\ std::string>;}
+\DoxyCodeLine{\Hypertarget{test__static__variant_8cpp_source_l00040}00040\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ v\ =\ variant\_type\{\};}
+\DoxyCodeLine{\Hypertarget{test__static__variant_8cpp_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{test__static__variant_8cpp_source_l00042}00042\ \ \ \ \ \ \ BOOST\_CHECK\_EXCEPTION(\mbox{\hyperlink{namespacefc_afc8acfd464a85f8a41ec497039c22934}{fc::from\_index}}(v,\ 3),\ fc::assert\_exception,\ [](\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ e)\ \{\ \textcolor{keywordflow}{return}\ e.code()\ ==\ \mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca0609f726018df8d223cd932c85d31b6c}{fc::assert\_exception\_code}};\ \});}
+\DoxyCodeLine{\Hypertarget{test__static__variant_8cpp_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{test__static__variant_8cpp_source_l00044}00044\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_afc8acfd464a85f8a41ec497039c22934}{fc::from\_index}}(v,\ 2);}
+\DoxyCodeLine{\Hypertarget{test__static__variant_8cpp_source_l00045}00045\ \ \ \ \ \ \ BOOST\_REQUIRE(std::string\{\}\ ==\ std::get<std::string>(v));}
+\DoxyCodeLine{\Hypertarget{test__static__variant_8cpp_source_l00046}00046\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__static__variant_8cpp_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{test__static__variant_8cpp_source_l00048}\mbox{\hyperlink{test__static__variant_8cpp_a1ad0f7768b734082d34fa89cab75ce05}{00048}}\ \ \ \ \mbox{\hyperlink{test__static__variant_8cpp_aa9908ea5d99985771d3e7da5a939ce32}{BOOST\_AUTO\_TEST\_CASE}}(static\_variant\_get\_index)}
+\DoxyCodeLine{\Hypertarget{test__static__variant_8cpp_source_l00049}00049\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__static__variant_8cpp_source_l00050}00050\ \ \ \ \ \ \ \textcolor{keyword}{using\ }variant\_type\ =\ std::variant<int32\_t,\ bool,\ std::string>;}
+\DoxyCodeLine{\Hypertarget{test__static__variant_8cpp_source_l00051}00051\ \ \ \ \ \ \ BOOST\_REQUIRE((\mbox{\hyperlink{namespacefc_ae009b19d1fecf5979996e9f326cd98c3}{fc::get\_index<variant\_type,\ int32\_t>}}()\ ==\ 0));}
+\DoxyCodeLine{\Hypertarget{test__static__variant_8cpp_source_l00052}00052\ \ \ \ \ \ \ BOOST\_REQUIRE((\mbox{\hyperlink{namespacefc_ae009b19d1fecf5979996e9f326cd98c3}{fc::get\_index<variant\_type,\ bool>}}()\ ==\ 1));}
+\DoxyCodeLine{\Hypertarget{test__static__variant_8cpp_source_l00053}00053\ \ \ \ \ \ \ BOOST\_REQUIRE((\mbox{\hyperlink{namespacefc_ae009b19d1fecf5979996e9f326cd98c3}{fc::get\_index<variant\_type,\ std::string>}}()\ ==\ 2));}
+\DoxyCodeLine{\Hypertarget{test__static__variant_8cpp_source_l00054}00054\ \ \ \ \ \ \ BOOST\_REQUIRE((\mbox{\hyperlink{namespacefc_ae009b19d1fecf5979996e9f326cd98c3}{fc::get\_index<variant\_type,\ double>}}()\ ==\ std::variant\_size\_v<variant\_type>));\ \textcolor{comment}{//\ Isn't\ a\ type\ contained\ in\ variant.}}
+\DoxyCodeLine{\Hypertarget{test__static__variant_8cpp_source_l00055}00055\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__static__variant_8cpp_source_l00056}00056\ BOOST\_AUTO\_TEST\_SUITE\_END()}
+
+\end{DoxyCode}

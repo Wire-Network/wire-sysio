@@ -1,0 +1,438 @@
+\doxysection{fc\+::crypto Namespace Reference}
+\hypertarget{namespacefc_1_1crypto}{}\label{namespacefc_1_1crypto}\index{fc::crypto@{fc::crypto}}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacefc_1_1crypto_1_1config}{config}}
+\item 
+namespace \mbox{\hyperlink{namespacefc_1_1crypto_1_1r1}{r1}}
+\item 
+namespace \mbox{\hyperlink{namespacefc_1_1crypto_1_1webauthn}{webauthn}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structfc_1_1crypto_1_1base58__str__parser}{base58\+\_\+str\+\_\+parser}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1crypto_1_1base58__str__parser_3_01std_1_1variant_3_01_ts_8_8_8_01_4_00_01_prefixes_01_4}{base58\+\_\+str\+\_\+parser$<$ std\+::variant$<$ Ts... $>$, Prefixes $>$}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1crypto_1_1base58__str__parser__impl}{base58\+\_\+str\+\_\+parser\+\_\+impl}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1crypto_1_1base58__str__parser__impl_3_01_result_00_01_prefixes_00_01_position_01_4}{base58\+\_\+str\+\_\+parser\+\_\+impl$<$ Result, Prefixes, Position $>$}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1crypto_1_1base58__str__parser__impl_3_01_result_00_01_prefixes_00_01_position_00_01_key_type_00_01_rem_8_8_8_01_4}{base58\+\_\+str\+\_\+parser\+\_\+impl$<$ Result, Prefixes, Position, Key\+Type, Rem... $>$}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1crypto_1_1base58str__visitor}{base58str\+\_\+visitor}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1crypto_1_1checksummed__data}{checksummed\+\_\+data}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1crypto_1_1eq__comparator}{eq\+\_\+comparator}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1crypto_1_1eq__comparator_3_01std_1_1variant_3_01_ts_8_8_8_01_4_01_4}{eq\+\_\+comparator$<$ std\+::variant$<$ Ts... $>$ $>$}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1crypto_1_1eq__comparator_3_01webauthn_1_1public__key_01_4}{eq\+\_\+comparator$<$ webauthn\+::public\+\_\+key $>$}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1crypto_1_1eq__comparator_3_01webauthn_1_1signature_01_4}{eq\+\_\+comparator$<$ webauthn\+::signature $>$}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1crypto_1_1generate__shared__secret__visitor}{generate\+\_\+shared\+\_\+secret\+\_\+visitor}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1crypto_1_1hash__visitor}{hash\+\_\+visitor}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1crypto_1_1is__valid__visitor}{is\+\_\+valid\+\_\+visitor}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1crypto_1_1less__comparator}{less\+\_\+comparator}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1crypto_1_1less__comparator_3_01std_1_1variant_3_01_ts_8_8_8_01_4_01_4}{less\+\_\+comparator$<$ std\+::variant$<$ Ts... $>$ $>$}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1crypto_1_1less__comparator_3_01webauthn_1_1public__key_01_4}{less\+\_\+comparator$<$ webauthn\+::public\+\_\+key $>$}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1crypto_1_1less__comparator_3_01webauthn_1_1signature_01_4}{less\+\_\+comparator$<$ webauthn\+::signature $>$}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1crypto_1_1overloaded}{overloaded}}
+\item 
+class \mbox{\hyperlink{classfc_1_1crypto_1_1private__key}{private\+\_\+key}}
+\item 
+class \mbox{\hyperlink{classfc_1_1crypto_1_1public__key}{public\+\_\+key}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1crypto_1_1public__key__visitor}{public\+\_\+key\+\_\+visitor}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1crypto_1_1recovery__visitor}{recovery\+\_\+visitor}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1crypto_1_1shim}{shim}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1crypto_1_1sign__visitor}{sign\+\_\+visitor}}
+\item 
+class \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{signature}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{namespacefc_1_1crypto_adbd074892feb2e888a1a22592aa7c195}{prefix\+\_\+matches}} (const char \texorpdfstring{$\ast$}{*}prefix, const std\+::string \&str)
+\item 
+size\+\_\+t \mbox{\hyperlink{namespacefc_1_1crypto_a94acf114d8936bc8b79952c01d3a84fe}{hash\+\_\+value}} (const \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{signature}} \&b)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{struct_data}{Data}} $>$ }\\\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacefc_1_1crypto_a038e7d327d964106629bae215ff3f9b2}{to\+\_\+wif}} (const \mbox{\hyperlink{struct_data}{Data}} \&secret, const \mbox{\hyperlink{namespacefc_a978f9e97f64eb2ce6cbe892d3cc93397}{fc\+::yield\+\_\+function\+\_\+t}} \&yield)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{struct_data}{Data}} $>$ }\\\mbox{\hyperlink{struct_data}{Data}} \mbox{\hyperlink{namespacefc_1_1crypto_ab4444bee7d54256c3ba895dabc5c7cfd}{from\+\_\+wif}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&wif\+\_\+key)
+\item 
+std\+::ostream \& \mbox{\hyperlink{namespacefc_1_1crypto_a059817e20371c13458be5fa50cbf065e}{operator$<$$<$}} (std\+::ostream \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, const \mbox{\hyperlink{classfc_1_1crypto_1_1private__key}{private\+\_\+key}} \&k)
+\item 
+bool \mbox{\hyperlink{namespacefc_1_1crypto_abad4085318662bc781ea106f8fb96e43}{operator==}} (const \mbox{\hyperlink{classfc_1_1crypto_1_1private__key}{private\+\_\+key}} \&p1, const \mbox{\hyperlink{classfc_1_1crypto_1_1private__key}{private\+\_\+key}} \&p2)
+\item 
+bool \mbox{\hyperlink{namespacefc_1_1crypto_a895e9cb33feda8dee0e2c33ec0ffa917}{operator$<$}} (const \mbox{\hyperlink{classfc_1_1crypto_1_1private__key}{private\+\_\+key}} \&p1, const \mbox{\hyperlink{classfc_1_1crypto_1_1private__key}{private\+\_\+key}} \&p2)
+\item 
+std\+::ostream \& \mbox{\hyperlink{namespacefc_1_1crypto_a1c6418f8455f72fae82ee6f2bc49ff93}{operator$<$$<$}} (std\+::ostream \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, const \mbox{\hyperlink{classfc_1_1crypto_1_1public__key}{public\+\_\+key}} \&k)
+\item 
+bool \mbox{\hyperlink{namespacefc_1_1crypto_a2b94eabda48712807a8c56fa8e81f566}{operator==}} (const \mbox{\hyperlink{classfc_1_1crypto_1_1public__key}{public\+\_\+key}} \&p1, const \mbox{\hyperlink{classfc_1_1crypto_1_1public__key}{public\+\_\+key}} \&p2)
+\item 
+bool \mbox{\hyperlink{namespacefc_1_1crypto_aa25f9556dc55dfc9e747ec761058c954}{operator!=}} (const \mbox{\hyperlink{classfc_1_1crypto_1_1public__key}{public\+\_\+key}} \&p1, const \mbox{\hyperlink{classfc_1_1crypto_1_1public__key}{public\+\_\+key}} \&p2)
+\item 
+bool \mbox{\hyperlink{namespacefc_1_1crypto_a991d703bdcb1176cfe1949559df7ea9f}{operator$<$}} (const \mbox{\hyperlink{classfc_1_1crypto_1_1public__key}{public\+\_\+key}} \&p1, const \mbox{\hyperlink{classfc_1_1crypto_1_1public__key}{public\+\_\+key}} \&p2)
+\item 
+{\footnotesize template$<$class... Ts$>$ }\\\mbox{\hyperlink{namespacefc_1_1crypto_a31718e1baf7ba5d37f8a233db473eedf}{overloaded}} (Ts...) -\/$>$ overloaded$<$ Ts... $>$
+\item 
+std\+::ostream \& \mbox{\hyperlink{namespacefc_1_1crypto_a62f3fb1b619cf4626e59a824dad86927}{operator$<$$<$}} (std\+::ostream \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, const \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{signature}} \&k)
+\item 
+bool \mbox{\hyperlink{namespacefc_1_1crypto_a343a6b1e3b0ead69d8e4fa16f56c03a3}{operator==}} (const \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{signature}} \&p1, const \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{signature}} \&p2)
+\item 
+bool \mbox{\hyperlink{namespacefc_1_1crypto_a9ad2136c8dd3aae7a497e810a6a5ae6d}{operator!=}} (const \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{signature}} \&p1, const \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{signature}} \&p2)
+\item 
+bool \mbox{\hyperlink{namespacefc_1_1crypto_a5aec096f07e3df869bfeb098ce5d7349}{operator$<$}} (const \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{signature}} \&p1, const \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{signature}} \&p2)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacefc_1_1crypto_ab4444bee7d54256c3ba895dabc5c7cfd}\index{fc::crypto@{fc::crypto}!from\_wif@{from\_wif}}
+\index{from\_wif@{from\_wif}!fc::crypto@{fc::crypto}}
+\doxysubsubsection{\texorpdfstring{from\_wif()}{from\_wif()}}
+{\footnotesize\ttfamily \label{namespacefc_1_1crypto_ab4444bee7d54256c3ba895dabc5c7cfd} 
+template$<$typename \mbox{\hyperlink{struct_data}{Data}} $>$ \\
+\mbox{\hyperlink{struct_data}{Data}} fc\+::crypto\+::from\+\_\+wif (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&}]{wif\+\_\+key}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{private__key_8cpp_source_l00077}{77}} of file \mbox{\hyperlink{private__key_8cpp_source}{private\+\_\+key.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00078\ \ \ \ \{}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ wif\_bytes\ =\ \mbox{\hyperlink{namespacefc_ab9aa48ceb035b5fc4b0ff9e48b40bc1d}{from\_base58}}(wif\_key);}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(wif\_bytes.size()\ >=\ 5);}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ key\_bytes\ =\ \mbox{\hyperlink{classfc_1_1vector}{vector<char>}}(wif\_bytes.begin()\ +\ 1,\ wif\_bytes.end()\ -\/\ 4);}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1sha256}{fc::sha256}}\ check\ =\ \mbox{\hyperlink{classfc_1_1sha256_a474784de7d6213b855abd7e952df5e36}{fc::sha256::hash}}(wif\_bytes.data(),\ wif\_bytes.size()\ -\/\ 4);}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1sha256}{fc::sha256}}\ check2\ =\ \mbox{\hyperlink{classfc_1_1sha256_a474784de7d6213b855abd7e952df5e36}{fc::sha256::hash}}(check);}
+\DoxyCodeLine{00084\ }
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(memcmp(\ (\textcolor{keywordtype}{char}*)\&check,\ wif\_bytes.data()\ +\ wif\_bytes.size()\ -\/\ 4,\ 4\ )\ ==\ 0\ ||}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ memcmp(\ (\textcolor{keywordtype}{char}*)\&check2,\ wif\_bytes.data()\ +\ wif\_bytes.size()\ -\/\ 4,\ 4\ )\ ==\ 0\ );}
+\DoxyCodeLine{00087\ }
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_data}{Data}}(\mbox{\hyperlink{classfc_1_1variant}{fc::variant}}(key\_bytes).as<typename\ Data::data\_type>());}
+\DoxyCodeLine{00089\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacefc_1_1crypto_ab4444bee7d54256c3ba895dabc5c7cfd_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacefc_1_1crypto_a94acf114d8936bc8b79952c01d3a84fe}\index{fc::crypto@{fc::crypto}!hash\_value@{hash\_value}}
+\index{hash\_value@{hash\_value}!fc::crypto@{fc::crypto}}
+\doxysubsubsection{\texorpdfstring{hash\_value()}{hash\_value()}}
+{\footnotesize\ttfamily \label{namespacefc_1_1crypto_a94acf114d8936bc8b79952c01d3a84fe} 
+size\+\_\+t fc\+::crypto\+::hash\+\_\+value (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{signature}} \&}]{b}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{signature_8cpp_source_l00081}{81}} of file \mbox{\hyperlink{signature_8cpp_source}{signature.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::visit(\mbox{\hyperlink{structfc_1_1crypto_1_1hash__visitor}{hash\_visitor}}(),\ b.\_storage);}
+\DoxyCodeLine{00083\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=347pt]{namespacefc_1_1crypto_a94acf114d8936bc8b79952c01d3a84fe_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacefc_1_1crypto_aa25f9556dc55dfc9e747ec761058c954}\index{fc::crypto@{fc::crypto}!operator"!=@{operator"!=}}
+\index{operator"!=@{operator"!=}!fc::crypto@{fc::crypto}}
+\doxysubsubsection{\texorpdfstring{operator"!=()}{operator!=()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{namespacefc_1_1crypto_aa25f9556dc55dfc9e747ec761058c954} 
+bool fc\+::crypto\+::operator!= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1crypto_1_1public__key}{public\+\_\+key}} \&}]{p1}{, }\item[{const \mbox{\hyperlink{classfc_1_1crypto_1_1public__key}{public\+\_\+key}} \&}]{p2}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{public__key_8cpp_source_l00096}{96}} of file \mbox{\hyperlink{public__key_8cpp_source}{public\+\_\+key.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !(p1\ ==\ p2);}
+\DoxyCodeLine{00098\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacefc_1_1crypto_a9ad2136c8dd3aae7a497e810a6a5ae6d}\index{fc::crypto@{fc::crypto}!operator"!=@{operator"!=}}
+\index{operator"!=@{operator"!=}!fc::crypto@{fc::crypto}}
+\doxysubsubsection{\texorpdfstring{operator"!=()}{operator!=()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{namespacefc_1_1crypto_a9ad2136c8dd3aae7a497e810a6a5ae6d} 
+bool fc\+::crypto\+::operator!= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{signature}} \&}]{p1}{, }\item[{const \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{signature}} \&}]{p2}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{signature_8cpp_source_l00072}{72}} of file \mbox{\hyperlink{signature_8cpp_source}{signature.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !\mbox{\hyperlink{structfc_1_1crypto_1_1eq__comparator}{eq\_comparator<signature::storage\_type>::apply}}(p1.\_storage,\ p2.\_storage);}
+\DoxyCodeLine{00074\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacefc_1_1crypto_a895e9cb33feda8dee0e2c33ec0ffa917}\index{fc::crypto@{fc::crypto}!operator$<$@{operator$<$}}
+\index{operator$<$@{operator$<$}!fc::crypto@{fc::crypto}}
+\doxysubsubsection{\texorpdfstring{operator$<$()}{operator<()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{namespacefc_1_1crypto_a895e9cb33feda8dee0e2c33ec0ffa917} 
+bool fc\+::crypto\+::operator$<$ (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1crypto_1_1private__key}{private\+\_\+key}} \&}]{p1}{, }\item[{const \mbox{\hyperlink{classfc_1_1crypto_1_1private__key}{private\+\_\+key}} \&}]{p2}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{private__key_8cpp_source_l00136}{136}} of file \mbox{\hyperlink{private__key_8cpp_source}{private\+\_\+key.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00137\ \ \ \ \{}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structfc_1_1crypto_1_1less__comparator}{less\_comparator<private\_key::storage\_type>::apply}}(p1.\_storage,\ p2.\_storage);}
+\DoxyCodeLine{00139\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacefc_1_1crypto_a991d703bdcb1176cfe1949559df7ea9f}\index{fc::crypto@{fc::crypto}!operator$<$@{operator$<$}}
+\index{operator$<$@{operator$<$}!fc::crypto@{fc::crypto}}
+\doxysubsubsection{\texorpdfstring{operator$<$()}{operator<()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{namespacefc_1_1crypto_a991d703bdcb1176cfe1949559df7ea9f} 
+bool fc\+::crypto\+::operator$<$ (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1crypto_1_1public__key}{public\+\_\+key}} \&}]{p1}{, }\item[{const \mbox{\hyperlink{classfc_1_1crypto_1_1public__key}{public\+\_\+key}} \&}]{p2}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{public__key_8cpp_source_l00100}{100}} of file \mbox{\hyperlink{public__key_8cpp_source}{public\+\_\+key.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00101\ \ \ \ \{}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structfc_1_1crypto_1_1less__comparator}{less\_comparator<public\_key::storage\_type>::apply}}(p1.\mbox{\hyperlink{classfc_1_1crypto_1_1public__key_a09f1aed24d7aff644d0abbe3f392c4a1}{\_storage}},\ p2.\mbox{\hyperlink{classfc_1_1crypto_1_1public__key_a09f1aed24d7aff644d0abbe3f392c4a1}{\_storage}});}
+\DoxyCodeLine{00103\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacefc_1_1crypto_a5aec096f07e3df869bfeb098ce5d7349}\index{fc::crypto@{fc::crypto}!operator$<$@{operator$<$}}
+\index{operator$<$@{operator$<$}!fc::crypto@{fc::crypto}}
+\doxysubsubsection{\texorpdfstring{operator$<$()}{operator<()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{namespacefc_1_1crypto_a5aec096f07e3df869bfeb098ce5d7349} 
+bool fc\+::crypto\+::operator$<$ (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{signature}} \&}]{p1}{, }\item[{const \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{signature}} \&}]{p2}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{signature_8cpp_source_l00076}{76}} of file \mbox{\hyperlink{signature_8cpp_source}{signature.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00077\ \ \ \ \{}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structfc_1_1crypto_1_1less__comparator}{less\_comparator<signature::storage\_type>::apply}}(p1.\_storage,\ p2.\_storage);}
+\DoxyCodeLine{00079\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacefc_1_1crypto_a059817e20371c13458be5fa50cbf065e}\index{fc::crypto@{fc::crypto}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!fc::crypto@{fc::crypto}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{namespacefc_1_1crypto_a059817e20371c13458be5fa50cbf065e} 
+std\+::ostream \& fc\+::crypto\+::operator$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{s}{, }\item[{const \mbox{\hyperlink{classfc_1_1crypto_1_1private__key}{private\+\_\+key}} \&}]{k}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{private__key_8cpp_source_l00127}{127}} of file \mbox{\hyperlink{private__key_8cpp_source}{private\+\_\+key.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ <<\ \textcolor{stringliteral}{"{}private\_key("{}}\ <<\ k.\mbox{\hyperlink{classfc_1_1crypto_1_1private__key_a0430a98b68f76afaf991723d6b0ff925}{to\_string}}()\ <<\ \textcolor{charliteral}{')'};}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{00130\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacefc_1_1crypto_a059817e20371c13458be5fa50cbf065e_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacefc_1_1crypto_a1c6418f8455f72fae82ee6f2bc49ff93}\index{fc::crypto@{fc::crypto}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!fc::crypto@{fc::crypto}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{namespacefc_1_1crypto_a1c6418f8455f72fae82ee6f2bc49ff93} 
+std\+::ostream \& fc\+::crypto\+::operator$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{s}{, }\item[{const \mbox{\hyperlink{classfc_1_1crypto_1_1public__key}{public\+\_\+key}} \&}]{k}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{public__key_8cpp_source_l00087}{87}} of file \mbox{\hyperlink{public__key_8cpp_source}{public\+\_\+key.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ <<\ \textcolor{stringliteral}{"{}public\_key("{}}\ <<\ k.\mbox{\hyperlink{classfc_1_1crypto_1_1public__key_ada5158a385e0d407268feb4790ba8646}{to\_string}}()\ <<\ \textcolor{charliteral}{')'};}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{00090\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacefc_1_1crypto_a62f3fb1b619cf4626e59a824dad86927}\index{fc::crypto@{fc::crypto}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!fc::crypto@{fc::crypto}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{namespacefc_1_1crypto_a62f3fb1b619cf4626e59a824dad86927} 
+std\+::ostream \& fc\+::crypto\+::operator$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{s}{, }\item[{const \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{signature}} \&}]{k}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{signature_8cpp_source_l00063}{63}} of file \mbox{\hyperlink{signature_8cpp_source}{signature.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ <<\ \textcolor{stringliteral}{"{}signature("{}}\ <<\ k.\mbox{\hyperlink{classfc_1_1crypto_1_1signature_a9e02c6ea0f56ba55ffd9fb799ae0a940}{to\_string}}()\ <<\ \textcolor{charliteral}{')'};}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{00066\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=330pt]{namespacefc_1_1crypto_a62f3fb1b619cf4626e59a824dad86927_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacefc_1_1crypto_abad4085318662bc781ea106f8fb96e43}\index{fc::crypto@{fc::crypto}!operator==@{operator==}}
+\index{operator==@{operator==}!fc::crypto@{fc::crypto}}
+\doxysubsubsection{\texorpdfstring{operator==()}{operator==()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{namespacefc_1_1crypto_abad4085318662bc781ea106f8fb96e43} 
+bool fc\+::crypto\+::operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1crypto_1_1private__key}{private\+\_\+key}} \&}]{p1}{, }\item[{const \mbox{\hyperlink{classfc_1_1crypto_1_1private__key}{private\+\_\+key}} \&}]{p2}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{private__key_8cpp_source_l00132}{132}} of file \mbox{\hyperlink{private__key_8cpp_source}{private\+\_\+key.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structfc_1_1crypto_1_1eq__comparator}{eq\_comparator<private\_key::storage\_type>::apply}}(p1.\_storage,\ p2.\_storage);}
+\DoxyCodeLine{00134\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacefc_1_1crypto_a2b94eabda48712807a8c56fa8e81f566}\index{fc::crypto@{fc::crypto}!operator==@{operator==}}
+\index{operator==@{operator==}!fc::crypto@{fc::crypto}}
+\doxysubsubsection{\texorpdfstring{operator==()}{operator==()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{namespacefc_1_1crypto_a2b94eabda48712807a8c56fa8e81f566} 
+bool fc\+::crypto\+::operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1crypto_1_1public__key}{public\+\_\+key}} \&}]{p1}{, }\item[{const \mbox{\hyperlink{classfc_1_1crypto_1_1public__key}{public\+\_\+key}} \&}]{p2}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{public__key_8cpp_source_l00092}{92}} of file \mbox{\hyperlink{public__key_8cpp_source}{public\+\_\+key.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structfc_1_1crypto_1_1eq__comparator}{eq\_comparator<public\_key::storage\_type>::apply}}(p1.\mbox{\hyperlink{classfc_1_1crypto_1_1public__key_a09f1aed24d7aff644d0abbe3f392c4a1}{\_storage}},\ p2.\mbox{\hyperlink{classfc_1_1crypto_1_1public__key_a09f1aed24d7aff644d0abbe3f392c4a1}{\_storage}});}
+\DoxyCodeLine{00094\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacefc_1_1crypto_a343a6b1e3b0ead69d8e4fa16f56c03a3}\index{fc::crypto@{fc::crypto}!operator==@{operator==}}
+\index{operator==@{operator==}!fc::crypto@{fc::crypto}}
+\doxysubsubsection{\texorpdfstring{operator==()}{operator==()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{namespacefc_1_1crypto_a343a6b1e3b0ead69d8e4fa16f56c03a3} 
+bool fc\+::crypto\+::operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{signature}} \&}]{p1}{, }\item[{const \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{signature}} \&}]{p2}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{signature_8cpp_source_l00068}{68}} of file \mbox{\hyperlink{signature_8cpp_source}{signature.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structfc_1_1crypto_1_1eq__comparator}{eq\_comparator<signature::storage\_type>::apply}}(p1.\_storage,\ p2.\_storage);}
+\DoxyCodeLine{00070\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacefc_1_1crypto_a31718e1baf7ba5d37f8a233db473eedf}\index{fc::crypto@{fc::crypto}!overloaded@{overloaded}}
+\index{overloaded@{overloaded}!fc::crypto@{fc::crypto}}
+\doxysubsubsection{\texorpdfstring{overloaded()}{overloaded()}}
+{\footnotesize\ttfamily \label{namespacefc_1_1crypto_a31718e1baf7ba5d37f8a233db473eedf} 
+template$<$class... Ts$>$ \\
+fc\+::crypto\+::overloaded (\begin{DoxyParamCaption}\item[{Ts...}]{}{}\end{DoxyParamCaption}) -\/$>$  overloaded$<$ Ts... $>$}
+
+\Hypertarget{namespacefc_1_1crypto_adbd074892feb2e888a1a22592aa7c195}\index{fc::crypto@{fc::crypto}!prefix\_matches@{prefix\_matches}}
+\index{prefix\_matches@{prefix\_matches}!fc::crypto@{fc::crypto}}
+\doxysubsubsection{\texorpdfstring{prefix\_matches()}{prefix\_matches()}}
+{\footnotesize\ttfamily \label{namespacefc_1_1crypto_adbd074892feb2e888a1a22592aa7c195} 
+bool fc\+::crypto\+::prefix\+\_\+matches (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{prefix}{, }\item[{const std\+::string \&}]{str}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{libraries_2fc_2include_2fc_2crypto_2common_8hpp_source_l00027}{27}} of file \mbox{\hyperlink{libraries_2fc_2include_2fc_2crypto_2common_8hpp_source}{common.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ prefix\_len\ =\ const\_strlen(prefix);}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ str.size()\ >\ prefix\_len\ \&\&\ str.substr(0,\ prefix\_len).compare(prefix)\ ==\ 0;}
+\DoxyCodeLine{00030\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=287pt]{namespacefc_1_1crypto_adbd074892feb2e888a1a22592aa7c195_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacefc_1_1crypto_a038e7d327d964106629bae215ff3f9b2}\index{fc::crypto@{fc::crypto}!to\_wif@{to\_wif}}
+\index{to\_wif@{to\_wif}!fc::crypto@{fc::crypto}}
+\doxysubsubsection{\texorpdfstring{to\_wif()}{to\_wif()}}
+{\footnotesize\ttfamily \label{namespacefc_1_1crypto_a038e7d327d964106629bae215ff3f9b2} 
+template$<$typename \mbox{\hyperlink{struct_data}{Data}} $>$ \\
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} fc\+::crypto\+::to\+\_\+wif (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct_data}{Data}} \&}]{secret}{, }\item[{const \mbox{\hyperlink{namespacefc_a978f9e97f64eb2ce6cbe892d3cc93397}{fc\+::yield\+\_\+function\+\_\+t}} \&}]{yield}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{private__key_8cpp_source_l00063}{63}} of file \mbox{\hyperlink{private__key_8cpp_source}{private\+\_\+key.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00064\ \ \ \ \{}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ size\_of\_data\_to\_hash\ =\ \textcolor{keyword}{sizeof}(\textcolor{keyword}{typename}\ Data::data\_type)\ +\ 1;}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ size\_of\_hash\_bytes\ =\ 4;}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ data[size\_of\_data\_to\_hash\ +\ size\_of\_hash\_bytes];}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ data[0]\ =\ (char)0x80;\ \textcolor{comment}{//\ this\ is\ the\ Bitcoin\ MainNet\ code}}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(\&data[1],\ (\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*)\&secret.serialize(),\ \textcolor{keyword}{sizeof}(\textcolor{keyword}{typename}\ Data::data\_type));}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1sha256}{sha256}}\ \mbox{\hyperlink{namespacefc_a150ca4cd9c0318ca45dc0dc7df5d58b9}{digest}}\ =\ sha256::hash(data,\ size\_of\_data\_to\_hash);}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a150ca4cd9c0318ca45dc0dc7df5d58b9}{digest}}\ =\ sha256::hash(digest);}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(data\ +\ size\_of\_data\_to\_hash,\ (\textcolor{keywordtype}{char}*)\&digest,\ size\_of\_hash\_bytes);}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_a0dd6c1e5792e0823aa1987e06513a4ce}{to\_base58}}(data,\ \textcolor{keyword}{sizeof}(data),\ yield);}
+\DoxyCodeLine{00074\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacefc_1_1crypto_a038e7d327d964106629bae215ff3f9b2_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacefc_1_1crypto_a038e7d327d964106629bae215ff3f9b2_icgraph}
+\end{center}
+\end{figure}

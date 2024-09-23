@@ -1,0 +1,240 @@
+\doxysection{preconditions\+\_\+tests.\+cpp}
+\hypertarget{preconditions__tests_8cpp_source}{}\label{preconditions__tests_8cpp_source}\index{libraries/sys-\/vm/tests/preconditions\_tests.cpp@{libraries/sys-\/vm/tests/preconditions\_tests.cpp}}
+\mbox{\hyperlink{preconditions__tests_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <sysio/vm/backend.hpp>}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <sysio/vm/host\_function.hpp>}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{sys-vm_2tests_2utils_8hpp}{utils.hpp}}"{}}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{single__include_2catch2_2catch_8hpp}{catch2/catch.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <exception>}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00009}00009\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacesysio_1_1vm}{sysio::vm}};}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00011}00011\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ check\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00012}00012\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ check2\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00014}\mbox{\hyperlink{preconditions__tests_8cpp_a0b1ceaff9df8cc7afc3849bbe3b78bad}{00014}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{preconditions__tests_8cpp_a0b1ceaff9df8cc7afc3849bbe3b78bad}{test\_func\_a}}(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \textcolor{keywordtype}{float}\ b)\ \{}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00015}00015\ \}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00016}\mbox{\hyperlink{preconditions__tests_8cpp_a980b15843c458b641ccf0e5df8562f0d}{00016}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{preconditions__tests_8cpp_a980b15843c458b641ccf0e5df8562f0d}{test\_func\_b}}(\textcolor{keywordtype}{char}*\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \textcolor{keywordtype}{float}*\ b,\ \textcolor{keywordtype}{int}\&\ c)\ \{}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00017}00017\ \}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00018}\mbox{\hyperlink{preconditions__tests_8cpp_ae8b5bf3b0187cc638a1f14ed38a33951}{00018}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{preconditions__tests_8cpp_ae8b5bf3b0187cc638a1f14ed38a33951}{test\_func\_c}}(\textcolor{keywordtype}{float}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ b,\ \mbox{\hyperlink{classsysio_1_1vm_1_1span}{span<const\ char>}}\ c,\ \textcolor{keywordtype}{int}\ d)\ \{}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00019}00019\ \ \ \ check\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}};}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00020}00020\ \}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00021}\mbox{\hyperlink{preconditions__tests_8cpp_a133131dba89ff2fb086beb5ed5f40783}{00021}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{preconditions__tests_8cpp_a133131dba89ff2fb086beb5ed5f40783}{test\_func\_d}}()\ \{}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00022}00022\ \}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00023}\mbox{\hyperlink{preconditions__tests_8cpp_a475029760796e6c17bd255887478f905}{00023}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{preconditions__tests_8cpp_a475029760796e6c17bd255887478f905}{test\_func\_e}}(\textcolor{keywordtype}{float}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ b,\ \mbox{\hyperlink{classsysio_1_1vm_1_1span}{span<const\ char>}}\ c,\ \textcolor{keywordtype}{int}\ d)\ \{}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00024}00024\ \ \ \ check\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}};}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00025}00025\ \}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00027}00027\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ Ex,\ \textcolor{keyword}{typename}\ F>}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00028}\mbox{\hyperlink{preconditions__tests_8cpp_aac54f0a689bb06f389fe2fca8976534e}{00028}}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{preconditions__tests_8cpp_aac54f0a689bb06f389fe2fca8976534e}{check\_exception\_msg}}(F\&\&\ \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2}{func}},\ \textcolor{keyword}{const}\ std::string\&\ chck)\ \{}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00029}00029\ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00030}00030\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2}{func}}();}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00031}00031\ \ \ \ \}\ \textcolor{keywordflow}{catch}(\ Ex\ ex\ )\ \{}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00032}00032\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ex.what()\ ==\ chck;}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00033}00033\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00034}00034\ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00035}00035\ \}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00037}\mbox{\hyperlink{preconditions__tests_8cpp_ac7f94d5b44850c40c973df65c005f77d}{00037}}\ \textcolor{preprocessor}{\#define\ CHECK\_MSG(Msg,\ ...)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00038}00038\ \textcolor{preprocessor}{\ \ \ CHECK(check\_exception\_msg<std::runtime\_error>([\&]()\{\ \_\_VA\_ARGS\_\_;\ \},\ Msg))}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00040}\mbox{\hyperlink{preconditions__tests_8cpp_a8e3d55729143b277e93e57655851ea1a}{00040}}\ \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_a0ae6dea7d9c49bffd63d1c8e10be8b7b}{SYS\_VM\_PRECONDITION}}(int\_equals\_42,}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00041}00041\ \ \ \ \ \ \ \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_a576aca63e32e4cbf42537c5876c0d95b}{SYS\_VM\_INVOKE\_ON}}(\textcolor{keywordtype}{int},\ [\&](\textcolor{keyword}{auto}\ arg,\ \textcolor{keyword}{auto}\&\&...\ rest)\ \{}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00042}00042\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (arg\ !=\ 42)}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00043}00043\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}arg\ !=\ 42"{}});}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00044}00044\ \ \ \ \ \ \ \}));}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00046}\mbox{\hyperlink{preconditions__tests_8cpp_a70e71356c35e568784e97970c2e1299a}{00046}}\ \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_a0ae6dea7d9c49bffd63d1c8e10be8b7b}{SYS\_VM\_PRECONDITION}}(float\_equals\_42,}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00047}00047\ \ \ \ \ \ \ \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_a576aca63e32e4cbf42537c5876c0d95b}{SYS\_VM\_INVOKE\_ON}}(\textcolor{keywordtype}{float},\ [\&](\textcolor{keyword}{auto}\ arg,\ \textcolor{keyword}{auto}\&\&...\ rest)\ \{}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (arg\ !=\ 42.42f)}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}arg\ !=\ 42.42f"{}});}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00050}00050\ \ \ \ \ \ \ \}));}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00052}\mbox{\hyperlink{preconditions__tests_8cpp_aad05d5f204d8ae3520760f4941c619f4}{00052}}\ \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_a0ae6dea7d9c49bffd63d1c8e10be8b7b}{SYS\_VM\_PRECONDITION}}(str\_equals\_hello,}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00053}00053\ \ \ \ \ \ \ \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_a576aca63e32e4cbf42537c5876c0d95b}{SYS\_VM\_INVOKE\_ON}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*,\ [\&](\textcolor{keyword}{auto}\ arg,\ \textcolor{keyword}{auto}\&\&...\ rest)\ \{}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (memcmp(arg,\ \textcolor{stringliteral}{"{}hello"{}},\ 5)\ !=\ 0)}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}str\ !=\ hello"{}});}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00056}00056\ \ \ \ \ \ \ \}));}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00058}\mbox{\hyperlink{preconditions__tests_8cpp_ab70cd104ada133067b00f6b946dc314e}{00058}}\ \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_a0ae6dea7d9c49bffd63d1c8e10be8b7b}{SYS\_VM\_PRECONDITION}}(span\_and\_check,}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00059}00059\ \ \ \ \ \ \ \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_a27c519adc3a74a176aba34c519f8d409}{SYS\_VM\_INVOKE\_ON\_ALL}}([\&](\textcolor{keyword}{auto}\ arg,\ \textcolor{keyword}{auto}\&\&...\ rest)\ \{}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keyword}{constexpr}\ (is\_span\_type\_v<\textcolor{keyword}{decltype}(arg)>)\ \{}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00061}00061\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (memcmp(arg.data(),\ \textcolor{stringliteral}{"{}hellohe"{}},\ arg.size\_bytes())\ !=\ 0)}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00062}00062\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}span<T>\ !=\ hellohe"{}});}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00064}00064\ \ \ \ \ \ \ \}));}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00066}\mbox{\hyperlink{preconditions__tests_8cpp_a9497f61d74b9bf37d8158d2605f44eab}{00066}}\ \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_a0ae6dea7d9c49bffd63d1c8e10be8b7b}{SYS\_VM\_PRECONDITION}}(check2\_once,}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00067}00067\ \ \ \ \ \ \ \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_a1ddb4f842ec1c70bcd410d65e586a1ad}{SYS\_VM\_INVOKE\_ONCE}}([\&](\textcolor{keyword}{auto}\&\&...\ args)\ \{}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00068}00068\ \ \ \ \ \ \ \ \ \ check2++;}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00069}00069\ \ \ \ \ \ \ \}));}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00071}\mbox{\hyperlink{preconditions__tests_8cpp_a8732baf842a41b96b4090aa0024bb159}{00071}}\ \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_a0ae6dea7d9c49bffd63d1c8e10be8b7b}{SYS\_VM\_PRECONDITION}}(check2\_all,}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00072}00072\ \ \ \ \ \ \ \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_a27c519adc3a74a176aba34c519f8d409}{SYS\_VM\_INVOKE\_ON\_ALL}}([\&](\textcolor{keyword}{auto}\&\&...\ args)\ \{}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00073}00073\ \ \ \ \ \ \ \ \ \ check2++;}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00074}00074\ \ \ \ \ \ \ \}));}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00075}00075\ }
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00076}\mbox{\hyperlink{structcnv}{00076}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structcnv}{cnv}}\ :\ \mbox{\hyperlink{structsysio_1_1vm_1_1type__converter}{type\_converter}}<standalone\_function\_t>\ \{}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00077}00077\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{structsysio_1_1chain_1_1basic__type__converter_a6669247f8d5b1394fd4d7b5527d21a3f}{type\_converter::from\_wasm}};}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00078}00078\ \ \ \ \textcolor{keyword}{using\ }type\_converter::type\_converter;}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00079}\mbox{\hyperlink{structcnv_a4480db85bb1ca77f2a22f9e859d58746}{00079}}\ \ \ \ \mbox{\hyperlink{structcnv_a4480db85bb1ca77f2a22f9e859d58746}{SYS\_VM\_FROM\_WASM}}(\textcolor{keywordtype}{char}*,\ (\textcolor{keywordtype}{void}*\ ptr))\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(ptr);\ \}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00080}\mbox{\hyperlink{structcnv_a8165fab2176db6e3483f439102c278f7}{00080}}\ \ \ \ \mbox{\hyperlink{structcnv_a8165fab2176db6e3483f439102c278f7}{SYS\_VM\_FROM\_WASM}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*,\ (\textcolor{keywordtype}{void}*\ ptr))\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(ptr);\ \}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00081}\mbox{\hyperlink{structcnv_af0e8c1ba5b729c88f4d1fc5ff81edc95}{00081}}\ \ \ \ \mbox{\hyperlink{structcnv_af0e8c1ba5b729c88f4d1fc5ff81edc95}{SYS\_VM\_FROM\_WASM}}(\textcolor{keywordtype}{float}*,\ (\textcolor{keywordtype}{void}*\ ptr))\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{float}*\textcolor{keyword}{>}(ptr);\ \}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00082}\mbox{\hyperlink{structcnv_aabe1c2edd339deead373e2f04e14918c}{00082}}\ \ \ \ \mbox{\hyperlink{structcnv_aabe1c2edd339deead373e2f04e14918c}{SYS\_VM\_FROM\_WASM}}(\textcolor{keywordtype}{int}\&,\ (\textcolor{keywordtype}{void}*\ ptr))\ \{\ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}*\textcolor{keyword}{>}(ptr);\ \}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00083}00083\ \};}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00084}00084\ }
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00085}\mbox{\hyperlink{preconditions__tests_8cpp_ab6ebb1eb28c94cdff83d66d9ea24f935}{00085}}\ \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_a3e5f265967cb6d730cad8ca15e807ac2}{BACKEND\_TEST\_CASE}}(\textcolor{stringliteral}{"{}Testing\ invoke\_on"{}},\ \textcolor{stringliteral}{"{}[preconditions\_tests]"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00086}00086\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{structsysio_1_1vm_1_1registered__host__functions}{rhf\_t}}\ =\ \mbox{\hyperlink{structsysio_1_1vm_1_1registered__host__functions}{registered\_host\_functions<standalone\_function\_t,\ execution\_interface,\ cnv>}};}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00087}00087\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<rhf\_t,\ TestType>}};}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00088}00088\ }
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00089}00089\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00090}00090\ \textcolor{comment}{(module}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00091}00091\ \textcolor{comment}{\ \ (type\ (;0;)\ (func\ (param\ i32\ i32\ i32)))}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00092}00092\ \textcolor{comment}{\ \ (type\ (;1;)\ (func\ (param\ i32\ f32)))}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00093}00093\ \textcolor{comment}{\ \ (type\ (;2;)\ (func\ (param)))}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00094}00094\ \textcolor{comment}{\ \ (type\ (;3;)\ (func\ (param\ f32\ i32\ i32\ i32\ i32)))}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00095}00095\ \textcolor{comment}{\ \ (import\ "{}env"{}\ "{}test\_func\_b"{}\ (func\ (;0;)\ (type\ 0)))}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00096}00096\ \textcolor{comment}{\ \ (import\ "{}env"{}\ "{}test\_func\_a"{}\ (func\ (;1;)\ (type\ 1)))}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00097}00097\ \textcolor{comment}{\ \ (import\ "{}env"{}\ "{}test\_func\_c"{}\ (func\ (;2;)\ (type\ 3)))}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00098}00098\ \textcolor{comment}{\ \ (import\ "{}env"{}\ "{}test\_func\_d"{}\ (func\ (;3;)\ (type\ 2)))}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00099}00099\ \textcolor{comment}{\ \ (import\ "{}env"{}\ "{}test\_func\_e"{}\ (func\ (;4;)\ (type\ 3)))}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00100}00100\ \textcolor{comment}{\ \ (func\ (;5;)\ (type\ 2)}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00101}00101\ \textcolor{comment}{\ \ \ \ i32.const\ 42}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00102}00102\ \textcolor{comment}{\ \ \ \ f32.const\ 42.42}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00103}00103\ \textcolor{comment}{\ \ \ \ call\ 1)}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00104}00104\ \textcolor{comment}{\ \ (func\ (;6;)\ (type\ 2)}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00105}00105\ \textcolor{comment}{\ \ \ \ i32.const\ 8208}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00106}00106\ \textcolor{comment}{\ \ \ \ i32.const\ 8232}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00107}00107\ \textcolor{comment}{\ \ \ \ i32.const\ 8232}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00108}00108\ \textcolor{comment}{\ \ \ \ call\ 0)}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00109}00109\ \textcolor{comment}{\ \ (func\ (;7;)\ (type\ 2)}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00110}00110\ \textcolor{comment}{\ \ \ \ i32.const\ 32}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00111}00111\ \textcolor{comment}{\ \ \ \ f32.const\ 42}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00112}00112\ \textcolor{comment}{\ \ \ \ call\ 1)}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00113}00113\ \textcolor{comment}{\ \ (func\ (;8;)\ (type\ 2)}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00114}00114\ \textcolor{comment}{\ \ \ \ i32.const\ 42}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00115}00115\ \textcolor{comment}{\ \ \ \ f32.const\ 32}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00116}00116\ \textcolor{comment}{\ \ \ \ call\ 1)}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00117}00117\ \textcolor{comment}{\ \ (func\ (;9;)\ (type\ 2)}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00118}00118\ \textcolor{comment}{\ \ \ \ i32.const\ 0}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00119}00119\ \textcolor{comment}{\ \ \ \ i32.const\ 0}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00120}00120\ \textcolor{comment}{\ \ \ \ i32.const\ 0}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00121}00121\ \textcolor{comment}{\ \ \ \ call\ 0)}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00122}00122\ \textcolor{comment}{\ \ (func\ (;10;)\ (type\ 2)}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00123}00123\ \textcolor{comment}{\ \ \ \ f32.const\ 42.42}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00124}00124\ \textcolor{comment}{\ \ \ \ i32.const\ 8208}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00125}00125\ \textcolor{comment}{\ \ \ \ i32.const\ 8208}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00126}00126\ \textcolor{comment}{\ \ \ \ i32.const\ 7}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00127}00127\ \textcolor{comment}{\ \ \ \ i32.const\ 77}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00128}00128\ \textcolor{comment}{\ \ \ \ call\ 2)}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00129}00129\ \textcolor{comment}{\ \ (func\ (;11;)\ (type\ 2)}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00130}00130\ \textcolor{comment}{\ \ \ \ f32.const\ 42.42}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00131}00131\ \textcolor{comment}{\ \ \ \ i32.const\ 8232}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00132}00132\ \textcolor{comment}{\ \ \ \ i32.const\ 8232}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00133}00133\ \textcolor{comment}{\ \ \ \ i32.const\ 4}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00134}00134\ \textcolor{comment}{\ \ \ \ i32.const\ 77}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00135}00135\ \textcolor{comment}{\ \ \ \ call\ 2)}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00136}00136\ \textcolor{comment}{\ \ (func\ (;12;)\ (type\ 2)}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00137}00137\ \textcolor{comment}{\ \ \ \ call\ 3)}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00138}00138\ \textcolor{comment}{\ \ (func\ (;13;)\ (type\ 2)}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00139}00139\ \textcolor{comment}{\ \ \ \ f32.const\ 42.42}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00140}00140\ \textcolor{comment}{\ \ \ \ i32.const\ 8232}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00141}00141\ \textcolor{comment}{\ \ \ \ i32.const\ 8232}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00142}00142\ \textcolor{comment}{\ \ \ \ i32.const\ 4}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00143}00143\ \textcolor{comment}{\ \ \ \ i32.const\ 77}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00144}00144\ \textcolor{comment}{\ \ \ \ call\ 4)}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00145}00145\ \textcolor{comment}{\ \ (memory\ (;0;)\ 1)}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00146}00146\ \textcolor{comment}{\ \ (export\ "{}call\_test\_a"{}\ (func\ 5))}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00147}00147\ \textcolor{comment}{\ \ (export\ "{}call\_test\_b"{}\ (func\ 6))}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00148}00148\ \textcolor{comment}{\ \ (export\ "{}call\_test\_c"{}\ (func\ 7))}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00149}00149\ \textcolor{comment}{\ \ (export\ "{}call\_test\_d"{}\ (func\ 8))}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00150}00150\ \textcolor{comment}{\ \ (export\ "{}call\_test\_e"{}\ (func\ 9))}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00151}00151\ \textcolor{comment}{\ \ (export\ "{}call\_test\_f"{}\ (func\ 10))}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00152}00152\ \textcolor{comment}{\ \ (export\ "{}call\_test\_g"{}\ (func\ 11))}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00153}00153\ \textcolor{comment}{\ \ (export\ "{}call\_test\_h"{}\ (func\ 12))}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00154}00154\ \textcolor{comment}{\ \ (export\ "{}call\_test\_j"{}\ (func\ 13))}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00155}00155\ \textcolor{comment}{\ \ (data\ (i32.const\ 8208)\ "{}hellohello\(\backslash\)00"{})}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00156}00156\ \textcolor{comment}{\ \ (data\ (i32.const\ 8232)\ "{}\(\backslash\)ff\(\backslash\)ff\(\backslash\)ff\(\backslash\)ff"{}))}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00157}00157\ \textcolor{comment}{*/}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00158}00158\ \ \ \ \mbox{\hyperlink{namespacesysio_1_1vm_a6ffa5796148f0f779a3d44799c3f0cce}{wasm\_code}}\ test\_wasm\ =\ \{}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00159}00159\ \ \ \ \ \ \ 0x00,\ 0x61,\ 0x73,\ 0x6d,\ 0x01,\ 0x00,\ 0x00,\ 0x00,\ 0x01,\ 0x17,\ 0x04,\ 0x60,}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00160}00160\ \ \ \ \ \ \ 0x03,\ 0x7f,\ 0x7f,\ 0x7f,\ 0x00,\ 0x60,\ 0x02,\ 0x7f,\ 0x7d,\ 0x00,\ 0x60,\ 0x00,}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00161}00161\ \ \ \ \ \ \ 0x00,\ 0x60,\ 0x05,\ 0x7d,\ 0x7f,\ 0x7f,\ 0x7f,\ 0x7f,\ 0x00,\ 0x02,\ 0x5b,\ 0x05,}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00162}00162\ \ \ \ \ \ \ 0x03,\ 0x65,\ 0x6e,\ 0x76,\ 0x0b,\ 0x74,\ 0x65,\ 0x73,\ 0x74,\ 0x5f,\ 0x66,\ 0x75,}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00163}00163\ \ \ \ \ \ \ 0x6e,\ 0x63,\ 0x5f,\ 0x62,\ 0x00,\ 0x00,\ 0x03,\ 0x65,\ 0x6e,\ 0x76,\ 0x0b,\ 0x74,}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00164}00164\ \ \ \ \ \ \ 0x65,\ 0x73,\ 0x74,\ 0x5f,\ 0x66,\ 0x75,\ 0x6e,\ 0x63,\ 0x5f,\ 0x61,\ 0x00,\ 0x01,}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00165}00165\ \ \ \ \ \ \ 0x03,\ 0x65,\ 0x6e,\ 0x76,\ 0x0b,\ 0x74,\ 0x65,\ 0x73,\ 0x74,\ 0x5f,\ 0x66,\ 0x75,}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00166}00166\ \ \ \ \ \ \ 0x6e,\ 0x63,\ 0x5f,\ 0x63,\ 0x00,\ 0x03,\ 0x03,\ 0x65,\ 0x6e,\ 0x76,\ 0x0b,\ 0x74,}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00167}00167\ \ \ \ \ \ \ 0x65,\ 0x73,\ 0x74,\ 0x5f,\ 0x66,\ 0x75,\ 0x6e,\ 0x63,\ 0x5f,\ 0x64,\ 0x00,\ 0x02,}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00168}00168\ \ \ \ \ \ \ 0x03,\ 0x65,\ 0x6e,\ 0x76,\ 0x0b,\ 0x74,\ 0x65,\ 0x73,\ 0x74,\ 0x5f,\ 0x66,\ 0x75,}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00169}00169\ \ \ \ \ \ \ 0x6e,\ 0x63,\ 0x5f,\ 0x65,\ 0x00,\ 0x03,\ 0x03,\ 0x0a,\ 0x09,\ 0x02,\ 0x02,\ 0x02,}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00170}00170\ \ \ \ \ \ \ 0x02,\ 0x02,\ 0x02,\ 0x02,\ 0x02,\ 0x02,\ 0x05,\ 0x03,\ 0x01,\ 0x00,\ 0x01,\ 0x07,}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00171}00171\ \ \ \ \ \ \ 0x7f,\ 0x09,\ 0x0b,\ 0x63,\ 0x61,\ 0x6c,\ 0x6c,\ 0x5f,\ 0x74,\ 0x65,\ 0x73,\ 0x74,}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00172}00172\ \ \ \ \ \ \ 0x5f,\ 0x61,\ 0x00,\ 0x05,\ 0x0b,\ 0x63,\ 0x61,\ 0x6c,\ 0x6c,\ 0x5f,\ 0x74,\ 0x65,}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00173}00173\ \ \ \ \ \ \ 0x73,\ 0x74,\ 0x5f,\ 0x62,\ 0x00,\ 0x06,\ 0x0b,\ 0x63,\ 0x61,\ 0x6c,\ 0x6c,\ 0x5f,}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00174}00174\ \ \ \ \ \ \ 0x74,\ 0x65,\ 0x73,\ 0x74,\ 0x5f,\ 0x63,\ 0x00,\ 0x07,\ 0x0b,\ 0x63,\ 0x61,\ 0x6c,}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00175}00175\ \ \ \ \ \ \ 0x6c,\ 0x5f,\ 0x74,\ 0x65,\ 0x73,\ 0x74,\ 0x5f,\ 0x64,\ 0x00,\ 0x08,\ 0x0b,\ 0x63,}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00176}00176\ \ \ \ \ \ \ 0x61,\ 0x6c,\ 0x6c,\ 0x5f,\ 0x74,\ 0x65,\ 0x73,\ 0x74,\ 0x5f,\ 0x65,\ 0x00,\ 0x09,}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00177}00177\ \ \ \ \ \ \ 0x0b,\ 0x63,\ 0x61,\ 0x6c,\ 0x6c,\ 0x5f,\ 0x74,\ 0x65,\ 0x73,\ 0x74,\ 0x5f,\ 0x66,}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00178}00178\ \ \ \ \ \ \ 0x00,\ 0x0a,\ 0x0b,\ 0x63,\ 0x61,\ 0x6c,\ 0x6c,\ 0x5f,\ 0x74,\ 0x65,\ 0x73,\ 0x74,}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00179}00179\ \ \ \ \ \ \ 0x5f,\ 0x67,\ 0x00,\ 0x0b,\ 0x0b,\ 0x63,\ 0x61,\ 0x6c,\ 0x6c,\ 0x5f,\ 0x74,\ 0x65,}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00180}00180\ \ \ \ \ \ \ 0x73,\ 0x74,\ 0x5f,\ 0x68,\ 0x00,\ 0x0c,\ 0x0b,\ 0x63,\ 0x61,\ 0x6c,\ 0x6c,\ 0x5f,}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00181}00181\ \ \ \ \ \ \ 0x74,\ 0x65,\ 0x73,\ 0x74,\ 0x5f,\ 0x6a,\ 0x00,\ 0x0d,\ 0x0a,\ 0x8b,\ 0x01,\ 0x09,}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00182}00182\ \ \ \ \ \ \ 0x0b,\ 0x00,\ 0x41,\ 0x2a,\ 0x43,\ 0x14,\ 0xae,\ 0x29,\ 0x42,\ 0x10,\ 0x01,\ 0x0b,}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00183}00183\ \ \ \ \ \ \ 0x10,\ 0x00,\ 0x41,\ 0x90,\ 0xc0,\ 0x00,\ 0x41,\ 0xa8,\ 0xc0,\ 0x00,\ 0x41,\ 0xa8,}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00184}00184\ \ \ \ \ \ \ 0xc0,\ 0x00,\ 0x10,\ 0x00,\ 0x0b,\ 0x0b,\ 0x00,\ 0x41,\ 0x20,\ 0x43,\ 0x00,\ 0x00,}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00185}00185\ \ \ \ \ \ \ 0x28,\ 0x42,\ 0x10,\ 0x01,\ 0x0b,\ 0x0b,\ 0x00,\ 0x41,\ 0x2a,\ 0x43,\ 0x00,\ 0x00,}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00186}00186\ \ \ \ \ \ \ 0x00,\ 0x42,\ 0x10,\ 0x01,\ 0x0b,\ 0x0a,\ 0x00,\ 0x41,\ 0x00,\ 0x41,\ 0x00,\ 0x41,}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00187}00187\ \ \ \ \ \ \ 0x00,\ 0x10,\ 0x00,\ 0x0b,\ 0x16,\ 0x00,\ 0x43,\ 0x14,\ 0xae,\ 0x29,\ 0x42,\ 0x41,}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00188}00188\ \ \ \ \ \ \ 0x90,\ 0xc0,\ 0x00,\ 0x41,\ 0x90,\ 0xc0,\ 0x00,\ 0x41,\ 0x07,\ 0x41,\ 0xcd,\ 0x00,}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00189}00189\ \ \ \ \ \ \ 0x10,\ 0x02,\ 0x0b,\ 0x16,\ 0x00,\ 0x43,\ 0x14,\ 0xae,\ 0x29,\ 0x42,\ 0x41,\ 0xa8,}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00190}00190\ \ \ \ \ \ \ 0xc0,\ 0x00,\ 0x41,\ 0xa8,\ 0xc0,\ 0x00,\ 0x41,\ 0x04,\ 0x41,\ 0xcd,\ 0x00,\ 0x10,}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00191}00191\ \ \ \ \ \ \ 0x02,\ 0x0b,\ 0x04,\ 0x00,\ 0x10,\ 0x03,\ 0x0b,\ 0x16,\ 0x00,\ 0x43,\ 0x14,\ 0xae,}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00192}00192\ \ \ \ \ \ \ 0x29,\ 0x42,\ 0x41,\ 0xa8,\ 0xc0,\ 0x00,\ 0x41,\ 0xa8,\ 0xc0,\ 0x00,\ 0x41,\ 0x04,}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00193}00193\ \ \ \ \ \ \ 0x41,\ 0xcd,\ 0x00,\ 0x10,\ 0x04,\ 0x0b,\ 0x0b,\ 0x1e,\ 0x02,\ 0x00,\ 0x41,\ 0x90,}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00194}00194\ \ \ \ \ \ \ 0xc0,\ 0x00,\ 0x0b,\ 0x0b,\ 0x68,\ 0x65,\ 0x6c,\ 0x6c,\ 0x6f,\ 0x68,\ 0x65,\ 0x6c,}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00195}00195\ \ \ \ \ \ \ 0x6c,\ 0x6f,\ 0x00,\ 0x00,\ 0x41,\ 0xa8,\ 0xc0,\ 0x00,\ 0x0b,\ 0x04,\ 0xff,\ 0xff,}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00196}00196\ \ \ \ \ \ \ 0xff,\ 0xff}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00197}00197\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00198}00198\ }
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00199}00199\ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1registered__host__functions_a11ed5e893c0eb9af80290f9024485be2}{rhf\_t::add<\&test\_func\_a,\ int\_equals\_42,\ float\_equals\_42>}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}test\_func\_a"{}});}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00200}00200\ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1registered__host__functions_a11ed5e893c0eb9af80290f9024485be2}{rhf\_t::add<\&test\_func\_b,\ str\_equals\_hello>}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}test\_func\_b"{}});}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00201}00201\ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1registered__host__functions_a11ed5e893c0eb9af80290f9024485be2}{rhf\_t::add<\&test\_func\_c,\ float\_equals\_42,\ str\_equals\_hello,\ span\_and\_check>}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}test\_func\_c"{}});}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00202}00202\ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1registered__host__functions_a11ed5e893c0eb9af80290f9024485be2}{rhf\_t::add<\&test\_func\_d,\ check2\_once>}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}test\_func\_d"{}});}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00203}00203\ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1registered__host__functions_a11ed5e893c0eb9af80290f9024485be2}{rhf\_t::add<\&test\_func\_e,\ check2\_all>}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}test\_func\_e"{}});}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00204}00204\ }
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00205}00205\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator}{wasm\_allocator}}\ \mbox{\hyperlink{allow__code__after__function__end__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}};}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00206}00206\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ \mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}(test\_wasm,\ \&\mbox{\hyperlink{allow__code__after__function__end__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00207}00207\ }
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00208}00208\ \ \ \ check\ \ =\ 0;}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00209}00209\ \ \ \ check2\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00210}00210\ \ \ \ \mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}call\_test\_a"{}});}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00211}00211\ \ \ \ \mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}call\_test\_b"{}});}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00212}00212\ \ \ \ \mbox{\hyperlink{preconditions__tests_8cpp_ac7f94d5b44850c40c973df65c005f77d}{CHECK\_MSG}}(\textcolor{stringliteral}{"{}arg\ !=\ 42"{}},\ \mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}call\_test\_c"{}}));}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00213}00213\ \ \ \ \mbox{\hyperlink{preconditions__tests_8cpp_ac7f94d5b44850c40c973df65c005f77d}{CHECK\_MSG}}(\textcolor{stringliteral}{"{}arg\ !=\ 42.42f"{}},\ \mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}call\_test\_d"{}}));}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00214}00214\ \ \ \ \mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}call\_test\_e"{}});}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00215}00215\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(check\ ==\ 0);}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00216}00216\ \ \ \ \mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}call\_test\_f"{}});}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00217}00217\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(check\ ==\ 77);}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00218}00218\ }
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00219}00219\ \ \ \ \textcolor{comment}{//\ reset\ check}}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00220}00220\ \ \ \ check\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00221}00221\ \ \ \ \mbox{\hyperlink{preconditions__tests_8cpp_ac7f94d5b44850c40c973df65c005f77d}{CHECK\_MSG}}(\textcolor{stringliteral}{"{}str\ !=\ hello"{}},\ \mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}call\_test\_g"{}}));}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00222}00222\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(check\ ==\ 0);}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00223}00223\ }
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00224}00224\ \ \ \ \mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}call\_test\_h"{}});}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00225}00225\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(check2\ ==\ 1);}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00226}00226\ \ \ \ \mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}call\_test\_h"{}});}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00227}00227\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(check2\ ==\ 2);}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00228}00228\ }
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00229}00229\ \ \ \ check2\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00230}00230\ \ \ \ \mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}call\_test\_j"{}});}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00231}00231\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(check2\ ==\ 4);}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00232}00232\ \ \ \ \mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}call\_test\_j"{}});}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00233}00233\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(check2\ ==\ 8);}
+\DoxyCodeLine{\Hypertarget{preconditions__tests_8cpp_source_l00234}00234\ \}}
+
+\end{DoxyCode}

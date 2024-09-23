@@ -1,0 +1,267 @@
+\doxysection{Fp12 Class Reference}
+\hypertarget{class_fp12}{}\label{class_fp12}\index{Fp12@{Fp12}}
+
+
+{\ttfamily \#include $<$bn254\+\_\+if.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_fp12_a0ff269e64056f340e537908282545837}{Fp12}} ()
+\item 
+\mbox{\hyperlink{class_fp12_aa45a00ec6c5dca55e7dfe0106d79dc06}{Fp12}} (const \mbox{\hyperlink{class_fp12}{Fp12}} \&x)
+\item 
+\mbox{\hyperlink{class_fp12_a3ce47ed7339f139604300b52d68c6124}{Fp12}} (int x)
+\item 
+void \mbox{\hyperlink{class_fp12_adb148b95c439334bcb7a9686d991864a}{set}} (const std\+::string \&str)  throw (std\+::exception)
+\item 
+std\+::string \mbox{\hyperlink{class_fp12_ae00cdc715c54c538a070666c24f8c25c}{to\+String}} () const  throw (std\+::exception)
+\item 
+bool \mbox{\hyperlink{class_fp12_a1d476339267cc55fbfcd608b1c4fc87c}{equals}} (const \mbox{\hyperlink{class_fp12}{Fp12}} \&rhs) const
+\item 
+void \mbox{\hyperlink{class_fp12_ae52f49e9c907322e24311b44ce867c4f}{add}} (const \mbox{\hyperlink{class_fp12}{Fp12}} \&rhs)  throw (std\+::exception)
+\item 
+void \mbox{\hyperlink{class_fp12_a3db8e47879b196fdbfb2e6cb3eeb427a}{sub}} (const \mbox{\hyperlink{class_fp12}{Fp12}} \&rhs)  throw (std\+::exception)
+\item 
+void \mbox{\hyperlink{class_fp12_a120decc9bc6a64401de37f6cf2b3337e}{mul}} (const \mbox{\hyperlink{class_fp12}{Fp12}} \&rhs)  throw (std\+::exception)
+\item 
+void \mbox{\hyperlink{class_fp12_a4976cc243715314ffa9ee8939e8e0f46}{pairing}} (const \mbox{\hyperlink{class_ec2}{Ec2}} \&ec2, const \mbox{\hyperlink{class_ec1}{Ec1}} \&ec1)
+\item 
+void \mbox{\hyperlink{class_fp12_ad6a32b66bcd128daaa0f8416b3dc5b53}{power}} (const \mbox{\hyperlink{class_mpz}{Mpz}} \&x)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{bn254__if_8hpp_source_l00123}{123}} of file \mbox{\hyperlink{bn254__if_8hpp_source}{bn254\+\_\+if.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_fp12_a0ff269e64056f340e537908282545837}\index{Fp12@{Fp12}!Fp12@{Fp12}}
+\index{Fp12@{Fp12}!Fp12@{Fp12}}
+\doxysubsubsection{\texorpdfstring{Fp12()}{Fp12()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{class_fp12_a0ff269e64056f340e537908282545837} 
+Fp12\+::\+Fp12 (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn254__if_8hpp_source_l00126}{126}} of file \mbox{\hyperlink{bn254__if_8hpp_source}{bn254\+\_\+if.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00126\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{class_fp12_aa45a00ec6c5dca55e7dfe0106d79dc06}\index{Fp12@{Fp12}!Fp12@{Fp12}}
+\index{Fp12@{Fp12}!Fp12@{Fp12}}
+\doxysubsubsection{\texorpdfstring{Fp12()}{Fp12()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{class_fp12_aa45a00ec6c5dca55e7dfe0106d79dc06} 
+Fp12\+::\+Fp12 (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_fp12}{Fp12}} \&}]{x}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn254__if_8hpp_source_l00127}{127}} of file \mbox{\hyperlink{bn254__if_8hpp_source}{bn254\+\_\+if.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00127\ :\ self\_(x.self\_)\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{class_fp12_a3ce47ed7339f139604300b52d68c6124}\index{Fp12@{Fp12}!Fp12@{Fp12}}
+\index{Fp12@{Fp12}!Fp12@{Fp12}}
+\doxysubsubsection{\texorpdfstring{Fp12()}{Fp12()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{class_fp12_a3ce47ed7339f139604300b52d68c6124} 
+Fp12\+::\+Fp12 (\begin{DoxyParamCaption}\item[{int}]{x}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn254__if_8hpp_source_l00128}{128}} of file \mbox{\hyperlink{bn254__if_8hpp_source}{bn254\+\_\+if.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00128\ :\ self\_(x)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_fp12_ae52f49e9c907322e24311b44ce867c4f}\index{Fp12@{Fp12}!add@{add}}
+\index{add@{add}!Fp12@{Fp12}}
+\doxysubsubsection{\texorpdfstring{add()}{add()}}
+{\footnotesize\ttfamily \label{class_fp12_ae52f49e9c907322e24311b44ce867c4f} 
+void Fp12\+::add (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_fp12}{Fp12}} \&}]{rhs}{}\end{DoxyParamCaption}) throw ( std\+::exception) \hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn254__if_8hpp_source_l00141}{141}} of file \mbox{\hyperlink{bn254__if_8hpp_source}{bn254\+\_\+if.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00141\ \{\ self\_\ +=\ rhs.self\_;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=302pt]{class_fp12_ae52f49e9c907322e24311b44ce867c4f_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_fp12_a1d476339267cc55fbfcd608b1c4fc87c}\index{Fp12@{Fp12}!equals@{equals}}
+\index{equals@{equals}!Fp12@{Fp12}}
+\doxysubsubsection{\texorpdfstring{equals()}{equals()}}
+{\footnotesize\ttfamily \label{class_fp12_a1d476339267cc55fbfcd608b1c4fc87c} 
+bool Fp12\+::equals (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_fp12}{Fp12}} \&}]{rhs}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn254__if_8hpp_source_l00140}{140}} of file \mbox{\hyperlink{bn254__if_8hpp_source}{bn254\+\_\+if.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00140\ \{\ \textcolor{keywordflow}{return}\ self\_\ ==\ rhs.self\_;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_fp12_a120decc9bc6a64401de37f6cf2b3337e}\index{Fp12@{Fp12}!mul@{mul}}
+\index{mul@{mul}!Fp12@{Fp12}}
+\doxysubsubsection{\texorpdfstring{mul()}{mul()}}
+{\footnotesize\ttfamily \label{class_fp12_a120decc9bc6a64401de37f6cf2b3337e} 
+void Fp12\+::mul (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_fp12}{Fp12}} \&}]{rhs}{}\end{DoxyParamCaption}) throw ( std\+::exception) \hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn254__if_8hpp_source_l00143}{143}} of file \mbox{\hyperlink{bn254__if_8hpp_source}{bn254\+\_\+if.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00143\ \{\ self\_\ *=\ rhs.self\_;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=264pt]{class_fp12_a120decc9bc6a64401de37f6cf2b3337e_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_fp12_a4976cc243715314ffa9ee8939e8e0f46}\index{Fp12@{Fp12}!pairing@{pairing}}
+\index{pairing@{pairing}!Fp12@{Fp12}}
+\doxysubsubsection{\texorpdfstring{pairing()}{pairing()}}
+{\footnotesize\ttfamily \label{class_fp12_a4976cc243715314ffa9ee8939e8e0f46} 
+void Fp12\+::pairing (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_ec2}{Ec2}} \&}]{ec2}{, }\item[{const \mbox{\hyperlink{class_ec1}{Ec1}} \&}]{ec1}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bn254__if_8hpp_source_l00245}{245}} of file \mbox{\hyperlink{bn254__if_8hpp_source}{bn254\+\_\+if.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00246\ \{}
+\DoxyCodeLine{00247\ \ \ \ \ \mbox{\hyperlink{namespacebn_ad9358851168fca47e8912f07288e8f1a}{::bn::opt\_atePairing}}(self\_,\ ec2.self\_,\ ec1.self\_);}
+\DoxyCodeLine{00248\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_fp12_a4976cc243715314ffa9ee8939e8e0f46_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=277pt]{class_fp12_a4976cc243715314ffa9ee8939e8e0f46_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_fp12_ad6a32b66bcd128daaa0f8416b3dc5b53}\index{Fp12@{Fp12}!power@{power}}
+\index{power@{power}!Fp12@{Fp12}}
+\doxysubsubsection{\texorpdfstring{power()}{power()}}
+{\footnotesize\ttfamily \label{class_fp12_ad6a32b66bcd128daaa0f8416b3dc5b53} 
+void Fp12\+::power (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_mpz}{Mpz}} \&}]{x}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn254__if_8hpp_source_l00145}{145}} of file \mbox{\hyperlink{bn254__if_8hpp_source}{bn254\+\_\+if.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00146\ \ \ \ \ \{}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ self\_\ =\ \mbox{\hyperlink{namespacemie_a595f193249b72c666b84e42439a60817}{mie::power}}(self\_,\ x.self\_);}
+\DoxyCodeLine{00148\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=250pt]{class_fp12_ad6a32b66bcd128daaa0f8416b3dc5b53_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=275pt]{class_fp12_ad6a32b66bcd128daaa0f8416b3dc5b53_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_fp12_adb148b95c439334bcb7a9686d991864a}\index{Fp12@{Fp12}!set@{set}}
+\index{set@{set}!Fp12@{Fp12}}
+\doxysubsubsection{\texorpdfstring{set()}{set()}}
+{\footnotesize\ttfamily \label{class_fp12_adb148b95c439334bcb7a9686d991864a} 
+void Fp12\+::set (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{str}{}\end{DoxyParamCaption}) throw ( std\+::exception) \hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn254__if_8hpp_source_l00129}{129}} of file \mbox{\hyperlink{bn254__if_8hpp_source}{bn254\+\_\+if.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00130\ \ \ \ \ \{}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ std::istringstream\ iss(str);}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ iss\ >>\ self\_;}
+\DoxyCodeLine{00133\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_fp12_a3db8e47879b196fdbfb2e6cb3eeb427a}\index{Fp12@{Fp12}!sub@{sub}}
+\index{sub@{sub}!Fp12@{Fp12}}
+\doxysubsubsection{\texorpdfstring{sub()}{sub()}}
+{\footnotesize\ttfamily \label{class_fp12_a3db8e47879b196fdbfb2e6cb3eeb427a} 
+void Fp12\+::sub (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_fp12}{Fp12}} \&}]{rhs}{}\end{DoxyParamCaption}) throw ( std\+::exception) \hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn254__if_8hpp_source_l00142}{142}} of file \mbox{\hyperlink{bn254__if_8hpp_source}{bn254\+\_\+if.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00142\ \{\ self\_\ -\/=\ rhs.self\_;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_fp12_ae00cdc715c54c538a070666c24f8c25c}\index{Fp12@{Fp12}!toString@{toString}}
+\index{toString@{toString}!Fp12@{Fp12}}
+\doxysubsubsection{\texorpdfstring{toString()}{toString()}}
+{\footnotesize\ttfamily \label{class_fp12_ae00cdc715c54c538a070666c24f8c25c} 
+std\+::string Fp12\+::to\+String (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const throw ( std\+::exception) \hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn254__if_8hpp_source_l00134}{134}} of file \mbox{\hyperlink{bn254__if_8hpp_source}{bn254\+\_\+if.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00135\ \ \ \ \ \{}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ std::ostringstream\ oss;}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ oss\ <<\ self\_;}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ oss.str();}
+\DoxyCodeLine{00139\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/libraries/ff/depends/ate-\/pairing/java/\mbox{\hyperlink{bn254__if_8hpp}{bn254\+\_\+if.\+hpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,187 @@
+\doxysection{decrypt\+\_\+rsa.\+c}
+\hypertarget{decrypt__rsa_8c_source}{}\label{decrypt__rsa_8c_source}\index{libraries/yubihsm/examples/decrypt\_rsa.c@{libraries/yubihsm/examples/decrypt\_rsa.c}}
+\mbox{\hyperlink{decrypt__rsa_8c}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ 2015-\/2018\ Yubico\ AB}}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00004}00004\ \textcolor{comment}{\ *\ Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00005}00005\ \textcolor{comment}{\ *\ you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00006}00006\ \textcolor{comment}{\ *\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00008}00008\ \textcolor{comment}{\ *\ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00009}00009\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00010}00010\ \textcolor{comment}{\ *\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00011}00011\ \textcolor{comment}{\ *\ distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00012}00012\ \textcolor{comment}{\ *\ WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00013}00013\ \textcolor{comment}{\ *\ See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00014}00014\ \textcolor{comment}{\ *\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00015}00015\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00017}00017\ \textcolor{preprocessor}{\#ifdef\ NDEBUG}}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00018}00018\ \textcolor{preprocessor}{\#undef\ NDEBUG}}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00019}00019\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00020}00020\ \textcolor{preprocessor}{\#include\ <assert.h>}}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00021}00021\ \textcolor{preprocessor}{\#include\ <stdbool.h>}}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00022}00022\ \textcolor{preprocessor}{\#include\ <stdio.h>}}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00023}00023\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{stdint_8h}{stdint.h}}>}}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00024}00024\ \textcolor{preprocessor}{\#include\ <stdlib.h>}}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00025}00025\ \textcolor{preprocessor}{\#include\ <string.h>}}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00027}00027\ \textcolor{preprocessor}{\#include\ <openssl/evp.h>}}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00028}00028\ \textcolor{preprocessor}{\#include\ <openssl/rsa.h>}}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00030}00030\ \textcolor{preprocessor}{\#include\ "{}util.h"{}}}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00032}00032\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{yubihsm_8h}{yubihsm.h}}>}}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00034}00034\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{openssl-compat_8h}{openssl-\/compat.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00036}00036\ \textcolor{preprocessor}{\#ifndef\ DEFAULT\_CONNECTOR\_URL}}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00037}\mbox{\hyperlink{decrypt__rsa_8c_a377ec96b1eb26c7b26b84bb5b0c9a928}{00037}}\ \textcolor{preprocessor}{\#define\ DEFAULT\_CONNECTOR\_URL\ "{}http://127.0.0.1:12345"{}}}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00038}00038\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00040}\mbox{\hyperlink{decrypt__rsa_8c_af210cb68c10e6bb8995d9ab688b43659}{00040}}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{decrypt__rsa_8c_af210cb68c10e6bb8995d9ab688b43659}{rsa2048\_pvtkey\_file}}[]\ =\ \textcolor{stringliteral}{"{}rsa2048\_pvtkey.pem"{}};}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00041}\mbox{\hyperlink{decrypt__rsa_8c_a870e61ded67e4529500d708a5f1af286}{00041}}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{decrypt__rsa_8c_a870e61ded67e4529500d708a5f1af286}{key\_label}}\ =\ \textcolor{stringliteral}{"{}label"{}};}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00042}\mbox{\hyperlink{decrypt__rsa_8c_abd7f8a696584d8ab4b9f4d1e1970be37}{00042}}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ password[]\ =\ \textcolor{stringliteral}{"{}password"{}};}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00043}\mbox{\hyperlink{decrypt__rsa_8c_a66f605b5d05f113d85c146f44d6ecc26}{00043}}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ data[]\ =\ \textcolor{stringliteral}{"{}sudo\ make\ me\ a\ sandwich"{}};}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00044}\mbox{\hyperlink{decrypt__rsa_8c_aa6784fb2706fb074f84723451803e95f}{00044}}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \mbox{\hyperlink{decrypt__rsa_8c_aa6784fb2706fb074f84723451803e95f}{sha1\_empty\_string}}[]\ =\ \{0xda,\ 0x39,\ 0xa3,\ 0xee,\ 0x5e,\ 0x6b,\ 0x4b,}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00045}00045\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x0d,\ 0x32,\ 0x55,\ 0xbf,\ 0xef,\ 0x95,\ 0x60,}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00046}00046\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x18,\ 0x90,\ 0xaf,\ 0xd8,\ 0x07,\ 0x09\};}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00048}\mbox{\hyperlink{decrypt__rsa_8c_a840291bc02cba5474a4cb46a9b9566fe}{00048}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{decrypt__rsa_8c_a840291bc02cba5474a4cb46a9b9566fe}{main}}(\textcolor{keywordtype}{void})\ \{}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00049}00049\ \ \ \mbox{\hyperlink{structyh__connector}{yh\_connector}}\ *connector\ =\ NULL;}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00050}00050\ \ \ \mbox{\hyperlink{structyh__session}{yh\_session}}\ *\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}}\ =\ NULL;}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00051}00051\ \ \ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366}{yh\_rc}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a39fbc5bce29b178582419ae9d31ad252}{YHR\_GENERIC\_ERROR}};}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00052}00052\ }
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00053}00053\ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ authkey\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00054}00054\ }
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00055}00055\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *connector\_url;}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00057}00057\ \ \ connector\_url\ =\ getenv(\textcolor{stringliteral}{"{}DEFAULT\_CONNECTOR\_URL"{}});}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00058}00058\ \ \ \textcolor{keywordflow}{if}\ (connector\_url\ ==\ NULL)\ \{}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00059}00059\ \ \ \ \ connector\_url\ =\ \mbox{\hyperlink{decrypt__rsa_8c_a377ec96b1eb26c7b26b84bb5b0c9a928}{DEFAULT\_CONNECTOR\_URL}};}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00060}00060\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00062}00062\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a5392844a98c6220c69fe08d3dcf8f1bc}{yh\_init}}();}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00063}00063\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00065}00065\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a9c700747902a722d6c1d2073277de294}{yh\_init\_connector}}(connector\_url,\ \&connector);}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00066}00066\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00067}00067\ }
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00068}00068\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_aa19be6ac70a2a5d1cef8d7e6902fe05f}{yh\_connect}}(connector,\ 0);}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00069}00069\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00071}00071\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a3be331dcf8907ff3569e4dc230e1c615}{yh\_create\_session\_derived}}(connector,\ authkey,\ password,}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{sizeof}(password),\ \textcolor{keyword}{false},\ \&\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}});}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00073}00073\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00074}00074\ }
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00075}00075\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a77870209747d5ccd90f9da3aae2bdfa8}{yh\_authenticate\_session}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}});}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00076}00076\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00077}00077\ }
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00078}00078\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ session\_id;}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00079}00079\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_aeabf472faf1ba8d963b39866e04df6b0}{yh\_get\_session\_id}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}},\ \&session\_id);}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00080}00080\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00081}00081\ }
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00082}00082\ \ \ printf(\textcolor{stringliteral}{"{}Successfully\ established\ session\ \%02d\(\backslash\)n"{}},\ session\_id);}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00083}00083\ }
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00084}00084\ \ \ FILE\ *fp\ =\ fopen(\mbox{\hyperlink{decrypt__rsa_8c_af210cb68c10e6bb8995d9ab688b43659}{rsa2048\_pvtkey\_file}},\ \textcolor{stringliteral}{"{}rb"{}});}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00085}00085\ \ \ assert(fp\ !=\ NULL);}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00086}00086\ }
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00087}00087\ \ \ \mbox{\hyperlink{yubihsm_8h_a498937b5a72accbb0ef21bb1dcdd55ca}{yh\_algorithm}}\ \mbox{\hyperlink{yubihsm_8h_a67bb26eddc39413f8e94c98aedbbd391}{algorithm}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00088}00088\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ key[2048];}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00089}00089\ \ \ \textcolor{keywordtype}{size\_t}\ key\_material\_len\ =\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{yubico__otp_8c_a9246c20bb98ad2b4c60313c053c70f08}{key}});}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00090}00090\ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{util_8c_ad07cc3629c0f077bad477d9a05c1081b}{read\_file}}(fp,\ key,\ \&key\_material\_len))\ \{}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00091}00091\ \ \ \ \ assert(\textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00092}00092\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00093}00093\ \ \ \textcolor{keywordtype}{bool}\ ret2\ =\ \mbox{\hyperlink{util_8c_ae88d850a063cdc9ed3c114feab9af651}{read\_private\_key}}(key,\ key\_material\_len,\ \&\mbox{\hyperlink{yubihsm_8h_a67bb26eddc39413f8e94c98aedbbd391}{algorithm}},\ key,}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00094}00094\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&key\_material\_len,\ \textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00095}00095\ \ \ assert(ret2\ ==\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00096}00096\ \ \ assert(\mbox{\hyperlink{yubihsm_8h_a67bb26eddc39413f8e94c98aedbbd391}{algorithm}}\ ==\ \mbox{\hyperlink{yubihsm_8h_a498937b5a72accbb0ef21bb1dcdd55caaafe94e6a770edb51c6db84f77d98d2c6}{YH\_ALGO\_RSA\_2048}});}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00097}00097\ }
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00098}00098\ \ \ \mbox{\hyperlink{structyh__capabilities}{yh\_capabilities}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a08393519edfd7c59fb01fb8db97514b5}{capabilities}}\ =\ \{\{0\}\};}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00099}00099\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_aab440e1cb671d9ba7a2e7d1243960e42}{yh\_string\_to\_capabilities}}(\textcolor{stringliteral}{"{}decrypt-\/pkcs,decrypt-\/oaep"{}},\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a08393519edfd7c59fb01fb8db97514b5}{capabilities}});}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00100}00100\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00101}00101\ }
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00102}00102\ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ domain\_five\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00103}00103\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a96a4c751a281515d5610adb8fd779438}{yh\_string\_to\_domains}}(\textcolor{stringliteral}{"{}5"{}},\ \&domain\_five);}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00104}00104\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00105}00105\ }
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00106}00106\ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_ada12860f8f9f5f3cac5b179ef352434c}{key\_id}}\ =\ 0;\ \textcolor{comment}{//\ ID\ 0\ lets\ the\ device\ generate\ an\ ID}}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00107}00107\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_ab0ca24007ce6942d2185859560c43e8a}{yh\_util\_import\_rsa\_key}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}},\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_ada12860f8f9f5f3cac5b179ef352434c}{key\_id}},\ \mbox{\hyperlink{decrypt__rsa_8c_a870e61ded67e4529500d708a5f1af286}{key\_label}},\ domain\_five,}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00108}00108\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a08393519edfd7c59fb01fb8db97514b5}{capabilities}},\ \mbox{\hyperlink{yubihsm_8h_a67bb26eddc39413f8e94c98aedbbd391}{algorithm}},\ key,}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00109}00109\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ key\ +\ (key\_material\_len\ /\ 2));}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00110}00110\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00111}00111\ }
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00112}00112\ \ \ printf(\textcolor{stringliteral}{"{}Key\ imported\ with\ ID\ \%04x\(\backslash\)n"{}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_ada12860f8f9f5f3cac5b179ef352434c}{key\_id}});}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00113}00113\ }
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00114}00114\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ public\_key[512];}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00115}00115\ \ \ \textcolor{keywordtype}{size\_t}\ public\_key\_len\ =\ \textcolor{keyword}{sizeof}(public\_key);}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00116}00116\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00117}00117\ \ \ \ \ \mbox{\hyperlink{yubihsm_8c_aa7b8b42156c4bdaf41d8b9758a2fd73f}{yh\_util\_get\_public\_key}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_ada12860f8f9f5f3cac5b179ef352434c}{key\_id}},\ public\_key,\ \&public\_key\_len,\ NULL);}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00118}00118\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00119}00119\ }
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00120}00120\ \ \ printf(\textcolor{stringliteral}{"{}Public\ key\ (\%zu\ bytes)\ is:"{}},\ public\_key\_len);}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00121}00121\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ public\_key\_len;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00122}00122\ \ \ \ \ printf(\textcolor{stringliteral}{"{}\ \%02x"{}},\ public\_key[i]);}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00123}00123\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00124}00124\ \ \ printf(\textcolor{stringliteral}{"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00125}00125\ }
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00126}00126\ \ \ \mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_a62125ea4e1d748a4a9c1aed9766f451a}{BIGNUM}}\ *n\ =\ BN\_bin2bn(public\_key,\ public\_key\_len,\ NULL);}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00127}00127\ \ \ assert(n\ !=\ NULL);}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00128}00128\ }
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00129}00129\ \ \ \mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_a62125ea4e1d748a4a9c1aed9766f451a}{BIGNUM}}\ *e\ =\ BN\_bin2bn((\textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}\(\backslash\)x01\(\backslash\)x00\(\backslash\)x01"{}},\ 3,\ NULL);}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00130}00130\ \ \ assert(e\ !=\ NULL);}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00131}00131\ }
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00132}00132\ \ \ RSA\ *rsa\ =\ RSA\_new();}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00133}00133\ \ \ assert(\mbox{\hyperlink{openssl-compat_8c_ada007b0a8f3f9089fed98a22cb2b1554}{RSA\_set0\_key}}(rsa,\ n,\ e,\ NULL)\ !=\ 0);}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00134}00134\ }
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00135}00135\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ encrypted[512];}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00136}00136\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00137}00137\ \ \ \ \ RSA\_public\_encrypt(\textcolor{keyword}{sizeof}(data),\ data,\ encrypted,\ rsa,\ RSA\_PKCS1\_PADDING);}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00138}00138\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ ==\ RSA\_size(rsa));}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00139}00139\ }
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00140}00140\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ decrypted[512];}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00141}00141\ \ \ \textcolor{keywordtype}{size\_t}\ decrypted\_len\ =\ \textcolor{keyword}{sizeof}(decrypted);}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00142}00142\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a5ebf6932cd2e68b9a23787c27fde3e26}{yh\_util\_decrypt\_pkcs1v1\_5}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_ada12860f8f9f5f3cac5b179ef352434c}{key\_id}},\ encrypted,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}},\ decrypted,}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00143}00143\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&decrypted\_len);}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00144}00144\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00145}00145\ }
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00146}00146\ \ \ assert(memcmp(data,\ decrypted,\ decrypted\_len)\ ==\ 0);}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00147}00147\ }
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00148}00148\ \ \ printf(\textcolor{stringliteral}{"{}PKCS1v1.5\ decrypted\ data\ matches\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00149}00149\ }
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00150}00150\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ RSA\_public\_encrypt(\textcolor{keyword}{sizeof}(data),\ data,\ encrypted,\ rsa,}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00151}00151\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ RSA\_PKCS1\_OAEP\_PADDING);}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00152}00152\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ ==\ RSA\_size(rsa));}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00153}00153\ }
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00154}00154\ \ \ decrypted\_len\ =\ \textcolor{keyword}{sizeof}(decrypted);}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00155}00155\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00156}00156\ \ \ \ \ \mbox{\hyperlink{yubihsm_8c_aa939f8764ed0cca27884d9c8f640ac14}{yh\_util\_decrypt\_oaep}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_ada12860f8f9f5f3cac5b179ef352434c}{key\_id}},\ encrypted,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}},\ decrypted,}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00157}00157\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&decrypted\_len,\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *)\ \mbox{\hyperlink{decrypt__rsa_8c_aa6784fb2706fb074f84723451803e95f}{sha1\_empty\_string}},}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00158}00158\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{decrypt__rsa_8c_aa6784fb2706fb074f84723451803e95f}{sha1\_empty\_string}}),\ \mbox{\hyperlink{yubihsm_8h_a498937b5a72accbb0ef21bb1dcdd55caae1ab21f2df42a56bdc8ff046ed14797a}{YH\_ALGO\_MGF1\_SHA1}});}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00159}00159\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00160}00160\ }
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00161}00161\ \ \ assert(memcmp(data,\ decrypted,\ decrypted\_len)\ ==\ 0);}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00162}00162\ }
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00163}00163\ \ \ printf(\textcolor{stringliteral}{"{}OAEP\ decrypted\ data\ matches\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00164}00164\ }
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00165}00165\ \ \ RSA\_free(rsa);}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00166}00166\ \ \ rsa\ =\ NULL;}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00167}00167\ }
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00168}00168\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a61ab8dbab67b1cceb49cd306f8c3f4b1}{yh\_util\_close\_session}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}});}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00169}00169\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00170}00170\ }
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00171}00171\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a1a35f8ae5a739848408633a514e41b2d}{yh\_destroy\_session}}(\&\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}});}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00172}00172\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00173}00173\ }
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00174}00174\ \ \ \mbox{\hyperlink{yubihsm_8c_ab12d5a42d2219741bd3630b99ed1c7d2}{yh\_disconnect}}(connector);}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00175}00175\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00176}00176\ }
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00177}00177\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a36e3d9a07c6689e14a9339ca1ebb7259}{yh\_exit}}();}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00178}00178\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00179}00179\ }
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00180}00180\ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{decrypt__rsa_8c_source_l00181}00181\ \}}
+
+\end{DoxyCode}

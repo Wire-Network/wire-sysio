@@ -1,0 +1,7 @@
+<map id="sysio::chain::controller::is_trusted_producer" name="sysio::chain::controller::is_trusted_producer">
+<area shape="rect" id="Node000001" title=" " alt="" coords="220,39,372,79"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1net__plugin__impl.html#a64d690dbcd0e9773f2f966e3de3caa75" title=" " alt="" coords="5,5,172,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="204,47,172,42,173,36,205,42"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1chain_1_1controller__impl.html#ac2d3794f1bd0ff1bd5837d8ead15d289" title=" " alt="" coords="12,71,165,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="205,76,166,82,165,77,204,70"/>
+</map>

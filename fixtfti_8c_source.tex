@@ -1,0 +1,43 @@
+\doxysection{fixtfti.\+c}
+\hypertarget{fixtfti_8c_source}{}\label{fixtfti_8c_source}\index{libraries/builtins/fixtfti.c@{libraries/builtins/fixtfti.c}}
+\mbox{\hyperlink{fixtfti_8c}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{fixtfti_8c_source_l00001}00001\ \textcolor{comment}{/*\ ===-\/-\/\ fixtfti.c\ -\/\ Implement\ \_\_fixtfti\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/===}}
+\DoxyCodeLine{\Hypertarget{fixtfti_8c_source_l00002}00002\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{fixtfti_8c_source_l00003}00003\ \textcolor{comment}{\ *\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ The\ LLVM\ Compiler\ Infrastructure}}
+\DoxyCodeLine{\Hypertarget{fixtfti_8c_source_l00004}00004\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{fixtfti_8c_source_l00005}00005\ \textcolor{comment}{\ *\ This\ file\ is\ dual\ licensed\ under\ the\ MIT\ and\ the\ University\ of\ Illinois\ Open}}
+\DoxyCodeLine{\Hypertarget{fixtfti_8c_source_l00006}00006\ \textcolor{comment}{\ *\ Source\ Licenses.\ See\ LICENSE.TXT\ for\ details.}}
+\DoxyCodeLine{\Hypertarget{fixtfti_8c_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{fixtfti_8c_source_l00008}00008\ \textcolor{comment}{\ *\ ===-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/===}}
+\DoxyCodeLine{\Hypertarget{fixtfti_8c_source_l00009}00009\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{fixtfti_8c_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{fixtfti_8c_source_l00011}00011\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{fp128_8h}{fp128.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{fixtfti_8c_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{fixtfti_8c_source_l00013}\mbox{\hyperlink{compiler__builtins_8hpp_acc7c9fbb89d3a38beb253082708bb17c}{00013}}\ \_\_int128\ \mbox{\hyperlink{fixtfti_8c_a94e56ee40bda71c7c8e46a79da94cc86}{\_\_\_fixtfti}}(\ \mbox{\hyperlink{structfloat128__t}{float128\_t}}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})\ \{}
+\DoxyCodeLine{\Hypertarget{fixtfti_8c_source_l00014}00014\ \ \ \ \ \textcolor{keyword}{const}\ \_\_int128\ fixint\_max\ =\ (\_\_int128)((\string~(\textcolor{keywordtype}{unsigned}\ \_\_int128)0)\ /\ 2);}
+\DoxyCodeLine{\Hypertarget{fixtfti_8c_source_l00015}00015\ \ \ \ \ \textcolor{keyword}{const}\ \_\_int128\ fixint\_min\ =\ -\/fixint\_max\ -\/\ 1;}
+\DoxyCodeLine{\Hypertarget{fixtfti_8c_source_l00016}00016\ \ \ \ \ \textcolor{comment}{//\ Break\ a\ into\ sign,\ exponent,\ significand}}
+\DoxyCodeLine{\Hypertarget{fixtfti_8c_source_l00017}00017\ \ \ \ \ \textcolor{keyword}{const}\ \_\_int128\ aRep\ =\ toRep(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{\Hypertarget{fixtfti_8c_source_l00018}00018\ \ \ \ \ \textcolor{keyword}{const}\ \_\_int128\ aAbs\ =\ aRep\ \&\ \mbox{\hyperlink{fp128_8h_ab5203388c0b3fa56667e16d1bbd1e7a7}{absMask}};}
+\DoxyCodeLine{\Hypertarget{fixtfti_8c_source_l00019}00019\ \ \ \ \ \textcolor{keyword}{const}\ \_\_int128\ sign\ =\ aRep\ \&\ \mbox{\hyperlink{fp128_8h_a24a207bac48041c7a290ab7b276a3b8b}{signBit}}\ ?\ -\/1\ :\ 1;}
+\DoxyCodeLine{\Hypertarget{fixtfti_8c_source_l00020}00020\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ exponent\ =\ (aAbs\ >>\ \mbox{\hyperlink{fp128_8h_a726ad4aea754fb8a716f9e9071d908e6}{significandBits}})\ -\/\ \mbox{\hyperlink{fp128_8h_a27dcfb4c2f9f888ad75b26c2cc4e0ace}{exponentBias}};}
+\DoxyCodeLine{\Hypertarget{fixtfti_8c_source_l00021}00021\ \ \ \ \ \textcolor{keyword}{const}\ \_\_int128\ significand\ =\ (aAbs\ \&\ \mbox{\hyperlink{fp128_8h_a83ac658944510a105f99f0d48a3ccc0d}{significandMask}})\ |\ \mbox{\hyperlink{fp128_8h_a0ad3d8cdc9ca3d2f03786e592d7c01af}{implicitBit}};}
+\DoxyCodeLine{\Hypertarget{fixtfti_8c_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{fixtfti_8c_source_l00023}00023\ \ \ \ \ \textcolor{comment}{//\ If\ exponent\ is\ negative,\ the\ result\ is\ zero.}}
+\DoxyCodeLine{\Hypertarget{fixtfti_8c_source_l00024}00024\ \ \ \ \ \textcolor{keywordflow}{if}\ (exponent\ <\ 0)}
+\DoxyCodeLine{\Hypertarget{fixtfti_8c_source_l00025}00025\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{fixtfti_8c_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{fixtfti_8c_source_l00027}00027\ \ \ \ \ \textcolor{comment}{//\ If\ the\ value\ is\ too\ large\ for\ the\ integer\ type,\ saturate.}}
+\DoxyCodeLine{\Hypertarget{fixtfti_8c_source_l00028}00028\ \ \ \ \ \textcolor{keywordflow}{if}\ ((\textcolor{keywordtype}{unsigned})exponent\ >=\ \textcolor{keyword}{sizeof}(\_\_int128)\ *\ CHAR\_BIT)}
+\DoxyCodeLine{\Hypertarget{fixtfti_8c_source_l00029}00029\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ sign\ ==\ 1\ ?\ fixint\_max\ :\ fixint\_min;}
+\DoxyCodeLine{\Hypertarget{fixtfti_8c_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{fixtfti_8c_source_l00031}00031\ \ \ \ \ \textcolor{comment}{//\ If\ 0\ <=\ exponent\ <\ significandBits,\ right\ shift\ to\ get\ the\ result.}}
+\DoxyCodeLine{\Hypertarget{fixtfti_8c_source_l00032}00032\ \ \ \ \ \textcolor{comment}{//\ Otherwise,\ shift\ left.}}
+\DoxyCodeLine{\Hypertarget{fixtfti_8c_source_l00033}00033\ \ \ \ \ \textcolor{keywordflow}{if}\ (exponent\ <\ \mbox{\hyperlink{fp128_8h_a726ad4aea754fb8a716f9e9071d908e6}{significandBits}})}
+\DoxyCodeLine{\Hypertarget{fixtfti_8c_source_l00034}00034\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ sign\ *\ (significand\ >>\ (\mbox{\hyperlink{fp128_8h_a726ad4aea754fb8a716f9e9071d908e6}{significandBits}}\ -\/\ exponent));}
+\DoxyCodeLine{\Hypertarget{fixtfti_8c_source_l00035}00035\ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{fixtfti_8c_source_l00036}00036\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ sign\ *\ ((\_\_int128)significand\ <<\ (exponent\ -\/\ \mbox{\hyperlink{fp128_8h_a726ad4aea754fb8a716f9e9071d908e6}{significandBits}}));}
+\DoxyCodeLine{\Hypertarget{fixtfti_8c_source_l00037}00037\ \}}
+
+\end{DoxyCode}

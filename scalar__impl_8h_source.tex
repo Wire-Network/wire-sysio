@@ -1,0 +1,294 @@
+\doxysection{scalar\+\_\+impl.\+h}
+\hypertarget{scalar__impl_8h_source}{}\label{scalar__impl_8h_source}\index{libraries/fc/secp256k1/secp256k1/src/scalar\_impl.h@{libraries/fc/secp256k1/secp256k1/src/scalar\_impl.h}}
+\mbox{\hyperlink{scalar__impl_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00001}00001\ \textcolor{comment}{/***********************************************************************}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2014\ Pieter\ Wuille\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00003}00003\ \textcolor{comment}{\ *\ Distributed\ under\ the\ MIT\ software\ license,\ see\ the\ accompanying\ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00004}00004\ \textcolor{comment}{\ *\ file\ COPYING\ or\ https://www.opensource.org/licenses/mit-\/license.php.*}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00005}00005\ \textcolor{comment}{\ ***********************************************************************/}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00007}00007\ \textcolor{preprocessor}{\#ifndef\ SECP256K1\_SCALAR\_IMPL\_H}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00008}00008\ \textcolor{preprocessor}{\#define\ SECP256K1\_SCALAR\_IMPL\_H}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00010}00010\ \textcolor{preprocessor}{\#ifdef\ VERIFY}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00011}00011\ \textcolor{preprocessor}{\#include\ <string.h>}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00012}00012\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00014}00014\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{scalar_8h}{scalar.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00015}00015\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h}{util.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00017}00017\ \textcolor{preprocessor}{\#if\ defined\ HAVE\_CONFIG\_H}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00018}00018\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{libsecp256k1-config_8h}{libsecp256k1-\/config.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00019}00019\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00021}00021\ \textcolor{preprocessor}{\#if\ defined(EXHAUSTIVE\_TEST\_ORDER)}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00022}00022\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{scalar__low__impl_8h}{scalar\_low\_impl.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00023}00023\ \textcolor{preprocessor}{\#elif\ defined(SECP256K1\_WIDEMUL\_INT128)}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00024}00024\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{scalar__4x64__impl_8h}{scalar\_4x64\_impl.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00025}00025\ \textcolor{preprocessor}{\#elif\ defined(SECP256K1\_WIDEMUL\_INT64)}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00026}00026\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{scalar__8x32__impl_8h}{scalar\_8x32\_impl.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00027}00027\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00028}00028\ \textcolor{preprocessor}{\#error\ "{}Please\ select\ wide\ multiplication\ implementation"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00029}00029\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00031}00031\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ secp256k1\_scalar\_one\ =\ \mbox{\hyperlink{scalar__4x64_8h_aacfea2d1debc522154567ac4ac7b4fc9}{SECP256K1\_SCALAR\_CONST}}(0,\ 0,\ 0,\ 0,\ 0,\ 0,\ 0,\ 1);}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00032}00032\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ secp256k1\_scalar\_zero\ =\ \mbox{\hyperlink{scalar__4x64_8h_aacfea2d1debc522154567ac4ac7b4fc9}{SECP256K1\_SCALAR\_CONST}}(0,\ 0,\ 0,\ 0,\ 0,\ 0,\ 0,\ 0);}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00034}00034\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ secp256k1\_scalar\_set\_b32\_seckey(\mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *bin)\ \{}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00035}00035\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a49aa97067a36875627e1380c3fb3833d}{overflow}};}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00036}00036\ \ \ \ \ secp256k1\_scalar\_set\_b32(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ bin,\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a49aa97067a36875627e1380c3fb3833d}{overflow}});}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00037}00037\ \ \ \ \ \textcolor{keywordflow}{return}\ (!\mbox{\hyperlink{yubihsm__pkcs11_8c_a49aa97067a36875627e1380c3fb3833d}{overflow}})\ \&\ (!secp256k1\_scalar\_is\_zero(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}));}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00038}00038\ \}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00040}00040\ \textcolor{comment}{/*\ These\ parameters\ are\ generated\ using\ sage/gen\_exhaustive\_groups.sage.\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00041}00041\ \textcolor{preprocessor}{\#if\ defined(EXHAUSTIVE\_TEST\_ORDER)}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00042}00042\ \textcolor{preprocessor}{\#\ \ if\ EXHAUSTIVE\_TEST\_ORDER\ ==\ 13}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00043}00043\ \textcolor{preprocessor}{\#\ \ \ \ define\ EXHAUSTIVE\_TEST\_LAMBDA\ 9}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00044}00044\ \textcolor{preprocessor}{\#\ \ elif\ EXHAUSTIVE\_TEST\_ORDER\ ==\ 199}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00045}00045\ \textcolor{preprocessor}{\#\ \ \ \ define\ EXHAUSTIVE\_TEST\_LAMBDA\ 92}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00046}00046\ \textcolor{preprocessor}{\#\ \ else}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00047}00047\ \textcolor{preprocessor}{\#\ \ \ \ error\ No\ known\ lambda\ for\ the\ specified\ exhaustive\ test\ group\ order.}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00048}00048\ \textcolor{preprocessor}{\#\ \ endif}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00056}00056\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_scalar\_split\_lambda(\mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *r1,\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *r2,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *k)\ \{}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00057}00057\ \ \ \ \ *r2\ =\ (*k\ +\ 5)\ \%\ \mbox{\hyperlink{tests__exhaustive_8c_aef79eeed489f1f87f86dbbef6f0cb41b}{EXHAUSTIVE\_TEST\_ORDER}};}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00058}00058\ \ \ \ \ *r1\ =\ (*k\ +\ (\mbox{\hyperlink{tests__exhaustive_8c_aef79eeed489f1f87f86dbbef6f0cb41b}{EXHAUSTIVE\_TEST\_ORDER}}\ -\/\ *r2)\ *\ EXHAUSTIVE\_TEST\_LAMBDA)\ \%\ \mbox{\hyperlink{tests__exhaustive_8c_aef79eeed489f1f87f86dbbef6f0cb41b}{EXHAUSTIVE\_TEST\_ORDER}};}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00059}00059\ \}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00060}00060\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00064}00064\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ secp256k1\_const\_lambda\ =\ \mbox{\hyperlink{scalar__4x64_8h_aacfea2d1debc522154567ac4ac7b4fc9}{SECP256K1\_SCALAR\_CONST}}(}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00065}00065\ \ \ \ \ 0x5363AD4CUL,\ 0xC05C30E0UL,\ 0xA5261C02UL,\ 0x8812645AUL,}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00066}00066\ \ \ \ \ 0x122E22EAUL,\ 0x20816678UL,\ 0xDF02967CUL,\ 0x1B23BD72UL}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00067}00067\ );}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00069}00069\ \textcolor{preprocessor}{\#ifdef\ VERIFY}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00070}00070\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_scalar\_split\_lambda\_verify(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *r1,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *r2,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *k);}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00071}00071\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00073}00073\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00074}00074\ \textcolor{comment}{\ *\ Both\ lambda\ and\ beta\ are\ primitive\ cube\ roots\ of\ unity.\ \ That\ is\ lamba\string^3\ ==\ 1\ mod\ n\ and}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00075}00075\ \textcolor{comment}{\ *\ beta\string^3\ ==\ 1\ mod\ p,\ where\ n\ is\ the\ curve\ order\ and\ p\ is\ the\ field\ order.}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00076}00076\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00077}00077\ \textcolor{comment}{\ *\ Furthermore,\ because\ (X\string^3\ -\/\ 1)\ =\ (X\ -\/\ 1)(X\string^2\ +\ X\ +\ 1),\ the\ primitive\ cube\ roots\ of\ unity\ are}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00078}00078\ \textcolor{comment}{\ *\ roots\ of\ X\string^2\ +\ X\ +\ 1.\ \ Therefore\ lambda\string^2\ +\ lamba\ ==\ -\/1\ mod\ n\ and\ beta\string^2\ +\ beta\ ==\ -\/1\ mod\ p.}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00079}00079\ \textcolor{comment}{\ *\ (The\ other\ primitive\ cube\ roots\ of\ unity\ are\ lambda\string^2\ and\ beta\string^2\ respectively.)}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00080}00080\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00081}00081\ \textcolor{comment}{\ *\ Let\ l\ =\ -\/1/2\ +\ i*sqrt(3)/2,\ the\ complex\ root\ of\ X\string^2\ +\ X\ +\ 1.\ We\ can\ define\ a\ ring}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00082}00082\ \textcolor{comment}{\ *\ homomorphism\ phi\ :\ Z[l]\ -\/>\ Z\_n\ where\ phi(a\ +\ b*l)\ ==\ a\ +\ b*lambda\ mod\ n.\ The\ kernel\ of\ phi}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00083}00083\ \textcolor{comment}{\ *\ is\ a\ lattice\ over\ Z[l]\ (considering\ Z[l]\ as\ a\ Z-\/module).\ This\ lattice\ is\ generated\ by\ a}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00084}00084\ \textcolor{comment}{\ *\ reduced\ basis\ \{a1\ +\ b1*l,\ a2\ +\ b2*l\}\ where}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00085}00085\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00086}00086\ \textcolor{comment}{\ *\ -\/\ a1\ =\ \ \ \ \ \ \{0x30,0x86,0xd2,0x21,0xa7,0xd4,0x6b,0xcd,0xe8,0x6c,0x90,0xe4,0x92,0x84,0xeb,0x15\}}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00087}00087\ \textcolor{comment}{\ *\ -\/\ b1\ =\ \ \ \ \ -\/\{0xe4,0x43,0x7e,0xd6,0x01,0x0e,0x88,0x28,0x6f,0x54,0x7f,0xa9,0x0a,0xbf,0xe4,0xc3\}}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00088}00088\ \textcolor{comment}{\ *\ -\/\ a2\ =\ \{0x01,0x14,0xca,0x50,0xf7,0xa8,0xe2,0xf3,0xf6,0x57,0xc1,0x10,0x8d,0x9d,0x44,0xcf,0xd8\}}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00089}00089\ \textcolor{comment}{\ *\ -\/\ b2\ =\ \ \ \ \ \ \{0x30,0x86,0xd2,0x21,0xa7,0xd4,0x6b,0xcd,0xe8,0x6c,0x90,0xe4,0x92,0x84,0xeb,0x15\}}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00090}00090\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00091}00091\ \textcolor{comment}{\ *\ "{}Guide\ to\ Elliptic\ Curve\ Cryptography"{}\ (Hankerson,\ Menezes,\ Vanstone)\ gives\ an\ algorithm}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00092}00092\ \textcolor{comment}{\ *\ (algorithm\ 3.74)\ to\ find\ k1\ and\ k2\ given\ k,\ such\ that\ k1\ +\ k2\ *\ lambda\ ==\ k\ mod\ n,\ and\ k1}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00093}00093\ \textcolor{comment}{\ *\ and\ k2\ are\ small\ in\ absolute\ value.}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00094}00094\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00095}00095\ \textcolor{comment}{\ *\ The\ algorithm\ computes\ c1\ =\ round(b2\ *\ k\ /\ n)\ and\ c2\ =\ round((-\/b1)\ *\ k\ /\ n),\ and\ gives}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00096}00096\ \textcolor{comment}{\ *\ k1\ =\ k\ -\/\ (c1*a1\ +\ c2*a2)\ and\ k2\ =\ -\/(c1*b1\ +\ c2*b2).\ Instead,\ we\ use\ modular\ arithmetic,\ and}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00097}00097\ \textcolor{comment}{\ *\ compute\ r2\ =\ k2\ mod\ n,\ and\ r1\ =\ k1\ mod\ n\ =\ (k\ -\/\ r2\ *\ lambda)\ mod\ n,\ avoiding\ the\ need\ for}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00098}00098\ \textcolor{comment}{\ *\ the\ constants\ a1\ and\ a2.}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00099}00099\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00100}00100\ \textcolor{comment}{\ *\ g1,\ g2\ are\ precomputed\ constants\ used\ to\ replace\ division\ with\ a\ rounded\ multiplication}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00101}00101\ \textcolor{comment}{\ *\ when\ decomposing\ the\ scalar\ for\ an\ endomorphism-\/based\ point\ multiplication.}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00102}00102\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00103}00103\ \textcolor{comment}{\ *\ The\ possibility\ of\ using\ precomputed\ estimates\ is\ mentioned\ in\ "{}Guide\ to\ Elliptic\ Curve}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00104}00104\ \textcolor{comment}{\ *\ Cryptography"{}\ (Hankerson,\ Menezes,\ Vanstone)\ in\ section\ 3.5.}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00105}00105\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00106}00106\ \textcolor{comment}{\ *\ The\ derivation\ is\ described\ in\ the\ paper\ "{}Efficient\ Software\ Implementation\ of\ Public-\/Key}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00107}00107\ \textcolor{comment}{\ *\ Cryptography\ on\ Sensor\ Networks\ Using\ the\ MSP430X\ Microcontroller"{}\ (Gouvea,\ Oliveira,\ Lopez),}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00108}00108\ \textcolor{comment}{\ *\ Section\ 4.3\ (here\ we\ use\ a\ somewhat\ higher-\/precision\ estimate):}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00109}00109\ \textcolor{comment}{\ *\ d\ =\ a1*b2\ -\/\ b1*a2}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00110}00110\ \textcolor{comment}{\ *\ g1\ =\ round(2\string^384\ *\ b2/d)}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00111}00111\ \textcolor{comment}{\ *\ g2\ =\ round(2\string^384\ *\ (-\/b1)/d)}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00112}00112\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00113}00113\ \textcolor{comment}{\ *\ (Note\ that\ d\ is\ also\ equal\ to\ the\ curve\ order,\ n,\ here\ because\ [a1,b1]\ and\ [a2,b2]}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00114}00114\ \textcolor{comment}{\ *\ can\ be\ found\ as\ outputs\ of\ the\ Extended\ Euclidean\ Algorithm\ on\ inputs\ n\ and\ lambda).}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00115}00115\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00116}00116\ \textcolor{comment}{\ *\ The\ function\ below\ splits\ k\ into\ r1\ and\ r2,\ such\ that}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00117}00117\ \textcolor{comment}{\ *\ -\/\ r1\ +\ lambda\ *\ r2\ ==\ k\ (mod\ n)}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00118}00118\ \textcolor{comment}{\ *\ -\/\ either\ r1\ <\ 2\string^128\ or\ -\/r1\ mod\ n\ <\ 2\string^128}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00119}00119\ \textcolor{comment}{\ *\ -\/\ either\ r2\ <\ 2\string^128\ or\ -\/r2\ mod\ n\ <\ 2\string^128}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00120}00120\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00121}00121\ \textcolor{comment}{\ *\ See\ proof\ below.}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00122}00122\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00123}00123\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_scalar\_split\_lambda(\mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *r1,\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *r2,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *k)\ \{}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00124}00124\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ c1,\ c2;}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00125}00125\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ minus\_b1\ =\ \mbox{\hyperlink{scalar__4x64_8h_aacfea2d1debc522154567ac4ac7b4fc9}{SECP256K1\_SCALAR\_CONST}}(}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00126}00126\ \ \ \ \ \ \ \ \ 0x00000000UL,\ 0x00000000UL,\ 0x00000000UL,\ 0x00000000UL,}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00127}00127\ \ \ \ \ \ \ \ \ 0xE4437ED6UL,\ 0x010E8828UL,\ 0x6F547FA9UL,\ 0x0ABFE4C3UL}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00128}00128\ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00129}00129\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ minus\_b2\ =\ \mbox{\hyperlink{scalar__4x64_8h_aacfea2d1debc522154567ac4ac7b4fc9}{SECP256K1\_SCALAR\_CONST}}(}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00130}00130\ \ \ \ \ \ \ \ \ 0xFFFFFFFFUL,\ 0xFFFFFFFFUL,\ 0xFFFFFFFFUL,\ 0xFFFFFFFEUL,}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00131}00131\ \ \ \ \ \ \ \ \ 0x8A280AC5UL,\ 0x0774346DUL,\ 0xD765CDA8UL,\ 0x3DB1562CUL}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00132}00132\ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00133}00133\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ g1\ =\ \mbox{\hyperlink{scalar__4x64_8h_aacfea2d1debc522154567ac4ac7b4fc9}{SECP256K1\_SCALAR\_CONST}}(}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00134}00134\ \ \ \ \ \ \ \ \ 0x3086D221UL,\ 0xA7D46BCDUL,\ 0xE86C90E4UL,\ 0x9284EB15UL,}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00135}00135\ \ \ \ \ \ \ \ \ 0x3DAA8A14UL,\ 0x71E8CA7FUL,\ 0xE893209AUL,\ 0x45DBB031UL}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00136}00136\ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00137}00137\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ g2\ =\ \mbox{\hyperlink{scalar__4x64_8h_aacfea2d1debc522154567ac4ac7b4fc9}{SECP256K1\_SCALAR\_CONST}}(}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00138}00138\ \ \ \ \ \ \ \ \ 0xE4437ED6UL,\ 0x010E8828UL,\ 0x6F547FA9UL,\ 0x0ABFE4C4UL,}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00139}00139\ \ \ \ \ \ \ \ \ 0x221208ACUL,\ 0x9DF506C6UL,\ 0x1571B4AEUL,\ 0x8AC47F71UL}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00140}00140\ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00141}00141\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(r1\ !=\ k);}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00142}00142\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(r2\ !=\ k);}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00143}00143\ \ \ \ \ \textcolor{comment}{/*\ these\ \_var\ calls\ are\ constant\ time\ since\ the\ shift\ amount\ is\ constant\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00144}00144\ \ \ \ \ secp256k1\_scalar\_mul\_shift\_var(\&c1,\ k,\ \&g1,\ 384);}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00145}00145\ \ \ \ \ secp256k1\_scalar\_mul\_shift\_var(\&c2,\ k,\ \&g2,\ 384);}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00146}00146\ \ \ \ \ secp256k1\_scalar\_mul(\&c1,\ \&c1,\ \&minus\_b1);}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00147}00147\ \ \ \ \ secp256k1\_scalar\_mul(\&c2,\ \&c2,\ \&minus\_b2);}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00148}00148\ \ \ \ \ secp256k1\_scalar\_add(r2,\ \&c1,\ \&c2);}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00149}00149\ \ \ \ \ secp256k1\_scalar\_mul(r1,\ r2,\ \&secp256k1\_const\_lambda);}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00150}00150\ \ \ \ \ secp256k1\_scalar\_negate(r1,\ r1);}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00151}00151\ \ \ \ \ secp256k1\_scalar\_add(r1,\ r1,\ k);}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00152}00152\ }
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00153}00153\ \textcolor{preprocessor}{\#ifdef\ VERIFY}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00154}00154\ \ \ \ \ secp256k1\_scalar\_split\_lambda\_verify(r1,\ r2,\ k);}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00155}00155\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00156}00156\ \}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00157}00157\ }
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00158}00158\ \textcolor{preprocessor}{\#ifdef\ VERIFY}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00159}00159\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00160}00160\ \textcolor{comment}{\ *\ Proof\ for\ secp256k1\_scalar\_split\_lambda's\ bounds.}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00161}00161\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00162}00162\ \textcolor{comment}{\ *\ Let}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00163}00163\ \textcolor{comment}{\ *\ \ -\/\ epsilon1\ =\ 2\string^256\ *\ |g1/2\string^384\ -\/\ b2/d|}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00164}00164\ \textcolor{comment}{\ *\ \ -\/\ epsilon2\ =\ 2\string^256\ *\ |g2/2\string^384\ -\/\ (-\/b1)/d|}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00165}00165\ \textcolor{comment}{\ *\ \ -\/\ c1\ =\ round(k*g1/2\string^384)}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00166}00166\ \textcolor{comment}{\ *\ \ -\/\ c2\ =\ round(k*g2/2\string^384)}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00167}00167\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00168}00168\ \textcolor{comment}{\ *\ Lemma\ 1:\ |c1\ -\/\ k*b2/d|\ <\ 2\string^-\/1\ +\ epsilon1}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00169}00169\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00170}00170\ \textcolor{comment}{\ *\ \ \ \ |c1\ -\/\ k*b2/d|}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00171}00171\ \textcolor{comment}{\ *\ \ =}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00172}00172\ \textcolor{comment}{\ *\ \ \ \ |c1\ -\/\ k*g1/2\string^384\ +\ k*g1/2\string^384\ -\/\ k*b2/d|}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00173}00173\ \textcolor{comment}{\ *\ <=\ \ \ \{triangle\ inequality\}}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00174}00174\ \textcolor{comment}{\ *\ \ \ \ |c1\ -\/\ k*g1/2\string^384|\ +\ |k*g1/2\string^384\ -\/\ k*b2/d|}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00175}00175\ \textcolor{comment}{\ *\ \ =}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00176}00176\ \textcolor{comment}{\ *\ \ \ \ |c1\ -\/\ k*g1/2\string^384|\ +\ k*|g1/2\string^384\ -\/\ b2/d|}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00177}00177\ \textcolor{comment}{\ *\ <\ \ \ \ \{rounding\ in\ c1\ and\ 0\ <=\ k\ <\ 2\string^256\}}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00178}00178\ \textcolor{comment}{\ *\ \ \ \ 2\string^-\/1\ +\ 2\string^256\ *\ |g1/2\string^384\ -\/\ b2/d|}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00179}00179\ \textcolor{comment}{\ *\ \ =\ \ \ \{definition\ of\ epsilon1\}}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00180}00180\ \textcolor{comment}{\ *\ \ \ \ 2\string^-\/1\ +\ epsilon1}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00181}00181\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00182}00182\ \textcolor{comment}{\ *\ Lemma\ 2:\ |c2\ -\/\ k*(-\/b1)/d|\ <\ 2\string^-\/1\ +\ epsilon2}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00183}00183\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00184}00184\ \textcolor{comment}{\ *\ \ \ \ |c2\ -\/\ k*(-\/b1)/d|}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00185}00185\ \textcolor{comment}{\ *\ \ =}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00186}00186\ \textcolor{comment}{\ *\ \ \ \ |c2\ -\/\ k*g2/2\string^384\ +\ k*g2/2\string^384\ -\/\ k*(-\/b1)/d|}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00187}00187\ \textcolor{comment}{\ *\ <=\ \ \ \{triangle\ inequality\}}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00188}00188\ \textcolor{comment}{\ *\ \ \ \ |c2\ -\/\ k*g2/2\string^384|\ +\ |k*g2/2\string^384\ -\/\ k*(-\/b1)/d|}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00189}00189\ \textcolor{comment}{\ *\ \ =}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00190}00190\ \textcolor{comment}{\ *\ \ \ \ |c2\ -\/\ k*g2/2\string^384|\ +\ k*|g2/2\string^384\ -\/\ (-\/b1)/d|}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00191}00191\ \textcolor{comment}{\ *\ <\ \ \ \ \{rounding\ in\ c2\ and\ 0\ <=\ k\ <\ 2\string^256\}}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00192}00192\ \textcolor{comment}{\ *\ \ \ \ 2\string^-\/1\ +\ 2\string^256\ *\ |g2/2\string^384\ -\/\ (-\/b1)/d|}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00193}00193\ \textcolor{comment}{\ *\ \ =\ \ \ \{definition\ of\ epsilon2\}}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00194}00194\ \textcolor{comment}{\ *\ \ \ \ 2\string^-\/1\ +\ epsilon2}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00195}00195\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00196}00196\ \textcolor{comment}{\ *\ Let}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00197}00197\ \textcolor{comment}{\ *\ \ -\/\ k1\ =\ k\ -\/\ c1*a1\ -\/\ c2*a2}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00198}00198\ \textcolor{comment}{\ *\ \ -\/\ k2\ =\ -\/\ c1*b1\ -\/\ c2*b2}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00199}00199\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00200}00200\ \textcolor{comment}{\ *\ Lemma\ 3:\ |k1|\ <\ (a1\ +\ a2\ +\ 1)/2\ <\ 2\string^128}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00201}00201\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00202}00202\ \textcolor{comment}{\ *\ \ \ \ |k1|}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00203}00203\ \textcolor{comment}{\ *\ \ =\ \ \ \{definition\ of\ k1\}}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00204}00204\ \textcolor{comment}{\ *\ \ \ \ |k\ -\/\ c1*a1\ -\/\ c2*a2|}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00205}00205\ \textcolor{comment}{\ *\ \ =\ \ \ \{(a1*b2\ -\/\ b1*a2)/n\ =\ 1\}}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00206}00206\ \textcolor{comment}{\ *\ \ \ \ |k*(a1*b2\ -\/\ b1*a2)/n\ -\/\ c1*a1\ -\/\ c2*a2|}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00207}00207\ \textcolor{comment}{\ *\ \ =}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00208}00208\ \textcolor{comment}{\ *\ \ \ \ |a1*(k*b2/n\ -\/\ c1)\ +\ a2*(k*(-\/b1)/n\ -\/\ c2)|}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00209}00209\ \textcolor{comment}{\ *\ <=\ \ \ \{triangle\ inequality\}}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00210}00210\ \textcolor{comment}{\ *\ \ \ \ a1*|k*b2/n\ -\/\ c1|\ +\ a2*|k*(-\/b1)/n\ -\/\ c2|}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00211}00211\ \textcolor{comment}{\ *\ <\ \ \ \ \{Lemma\ 1\ and\ Lemma\ 2\}}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00212}00212\ \textcolor{comment}{\ *\ \ \ \ a1*(2\string^-\/1\ +\ epslion1)\ +\ a2*(2\string^-\/1\ +\ epsilon2)}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00213}00213\ \textcolor{comment}{\ *\ <\ \ \ \ \{rounding\ up\ to\ an\ integer\}}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00214}00214\ \textcolor{comment}{\ *\ \ \ \ (a1\ +\ a2\ +\ 1)/2}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00215}00215\ \textcolor{comment}{\ *\ <\ \ \ \ \{rounding\ up\ to\ a\ power\ of\ 2\}}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00216}00216\ \textcolor{comment}{\ *\ \ \ \ 2\string^128}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00217}00217\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00218}00218\ \textcolor{comment}{\ *\ Lemma\ 4:\ |k2|\ <\ (-\/b1\ +\ b2)/2\ +\ 1\ <\ 2\string^128}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00219}00219\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00220}00220\ \textcolor{comment}{\ *\ \ \ \ |k2|}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00221}00221\ \textcolor{comment}{\ *\ \ =\ \ \ \{definition\ of\ k2\}}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00222}00222\ \textcolor{comment}{\ *\ \ \ \ |-\/\ c1*a1\ -\/\ c2*a2|}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00223}00223\ \textcolor{comment}{\ *\ \ =\ \ \ \{(b1*b2\ -\/\ b1*b2)/n\ =\ 0\}}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00224}00224\ \textcolor{comment}{\ *\ \ \ \ |k*(b1*b2\ -\/\ b1*b2)/n\ -\/\ c1*b1\ -\/\ c2*b2|}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00225}00225\ \textcolor{comment}{\ *\ \ =}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00226}00226\ \textcolor{comment}{\ *\ \ \ \ |b1*(k*b2/n\ -\/\ c1)\ +\ b2*(k*(-\/b1)/n\ -\/\ c2)|}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00227}00227\ \textcolor{comment}{\ *\ <=\ \ \ \{triangle\ inequality\}}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00228}00228\ \textcolor{comment}{\ *\ \ \ \ (-\/b1)*|k*b2/n\ -\/\ c1|\ +\ b2*|k*(-\/b1)/n\ -\/\ c2|}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00229}00229\ \textcolor{comment}{\ *\ <\ \ \ \ \{Lemma\ 1\ and\ Lemma\ 2\}}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00230}00230\ \textcolor{comment}{\ *\ \ \ \ (-\/b1)*(2\string^-\/1\ +\ epslion1)\ +\ b2*(2\string^-\/1\ +\ epsilon2)}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00231}00231\ \textcolor{comment}{\ *\ <\ \ \ \ \{rounding\ up\ to\ an\ integer\}}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00232}00232\ \textcolor{comment}{\ *\ \ \ \ (-\/b1\ +\ b2)/2\ +\ 1}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00233}00233\ \textcolor{comment}{\ *\ <\ \ \ \ \{rounding\ up\ to\ a\ power\ of\ 2\}}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00234}00234\ \textcolor{comment}{\ *\ \ \ \ 2\string^128}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00235}00235\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00236}00236\ \textcolor{comment}{\ *\ Let}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00237}00237\ \textcolor{comment}{\ *\ \ -\/\ r2\ =\ k2\ mod\ n}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00238}00238\ \textcolor{comment}{\ *\ \ -\/\ r1\ =\ k\ -\/\ r2*lambda\ mod\ n.}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00239}00239\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00240}00240\ \textcolor{comment}{\ *\ Notice\ that\ r1\ is\ defined\ such\ that\ r1\ +\ r2\ *\ lambda\ ==\ k\ (mod\ n).}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00241}00241\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00242}00242\ \textcolor{comment}{\ *\ Lemma\ 5:\ r1\ ==\ k1\ mod\ n.}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00243}00243\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00244}00244\ \textcolor{comment}{\ *\ \ \ \ r1}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00245}00245\ \textcolor{comment}{\ *\ ==\ \ \ \{definition\ of\ r1\ and\ r2\}}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00246}00246\ \textcolor{comment}{\ *\ \ \ \ k\ -\/\ k2*lambda}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00247}00247\ \textcolor{comment}{\ *\ ==\ \ \ \{definition\ of\ k2\}}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00248}00248\ \textcolor{comment}{\ *\ \ \ \ k\ -\/\ (-\/\ c1*b1\ -\/\ c2*b2)*lambda}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00249}00249\ \textcolor{comment}{\ *\ ==}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00250}00250\ \textcolor{comment}{\ *\ \ \ \ k\ +\ c1*b1*lambda\ +\ c2*b2*lambda}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00251}00251\ \textcolor{comment}{\ *\ ==\ \ \{a1\ +\ b1*lambda\ ==\ 0\ mod\ n\ and\ a2\ +\ b2*lambda\ ==\ 0\ mod\ n\}}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00252}00252\ \textcolor{comment}{\ *\ \ \ \ k\ -\/\ c1*a1\ -\/\ c2*a2}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00253}00253\ \textcolor{comment}{\ *\ ==\ \ \{definition\ of\ k1\}}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00254}00254\ \textcolor{comment}{\ *\ \ \ \ k1}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00255}00255\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00256}00256\ \textcolor{comment}{\ *\ From\ Lemma\ 3,\ Lemma\ 4,\ Lemma\ 5\ and\ the\ definition\ of\ r2,\ we\ can\ conclude\ that}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00257}00257\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00258}00258\ \textcolor{comment}{\ *\ \ -\/\ either\ r1\ <\ 2\string^128\ or\ -\/r1\ mod\ n\ <\ 2\string^128}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00259}00259\ \textcolor{comment}{\ *\ \ -\/\ either\ r2\ <\ 2\string^128\ or\ -\/r2\ mod\ n\ <\ 2\string^128.}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00260}00260\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00261}00261\ \textcolor{comment}{\ *\ Q.E.D.}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00262}00262\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00263}00263\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_scalar\_split\_lambda\_verify(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *r1,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *r2,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *k)\ \{}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00264}00264\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00265}00265\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ buf1[32];}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00266}00266\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ buf2[32];}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00267}00267\ }
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00268}00268\ \ \ \ \ \textcolor{comment}{/*\ (a1\ +\ a2\ +\ 1)/2\ is\ 0xa2a8918ca85bafe22016d0b917e4dd77\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00269}00269\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ k1\_bound[32]\ =\ \{}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00270}00270\ \ \ \ \ \ \ \ \ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x00,}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00271}00271\ \ \ \ \ \ \ \ \ 0xa2,\ 0xa8,\ 0x91,\ 0x8c,\ 0xa8,\ 0x5b,\ 0xaf,\ 0xe2,\ 0x20,\ 0x16,\ 0xd0,\ 0xb9,\ 0x17,\ 0xe4,\ 0xdd,\ 0x77}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00272}00272\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00273}00273\ }
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00274}00274\ \ \ \ \ \textcolor{comment}{/*\ (-\/b1\ +\ b2)/2\ +\ 1\ is\ 0x8a65287bd47179fb2be08846cea267ed\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00275}00275\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ k2\_bound[32]\ =\ \{}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00276}00276\ \ \ \ \ \ \ \ \ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x00,}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00277}00277\ \ \ \ \ \ \ \ \ 0x8a,\ 0x65,\ 0x28,\ 0x7b,\ 0xd4,\ 0x71,\ 0x79,\ 0xfb,\ 0x2b,\ 0xe0,\ 0x88,\ 0x46,\ 0xce,\ 0xa2,\ 0x67,\ 0xed}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00278}00278\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00279}00279\ }
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00280}00280\ \ \ \ \ secp256k1\_scalar\_mul(\&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ \&secp256k1\_const\_lambda,\ r2);}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00281}00281\ \ \ \ \ secp256k1\_scalar\_add(\&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ r1);}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00282}00282\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(secp256k1\_scalar\_eq(\&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ k));}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00283}00283\ }
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00284}00284\ \ \ \ \ secp256k1\_scalar\_negate(\&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ r1);}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00285}00285\ \ \ \ \ secp256k1\_scalar\_get\_b32(buf1,\ r1);}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00286}00286\ \ \ \ \ secp256k1\_scalar\_get\_b32(buf2,\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00287}00287\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(secp256k1\_memcmp\_var(buf1,\ k1\_bound,\ 32)\ <\ 0\ ||\ secp256k1\_memcmp\_var(buf2,\ k1\_bound,\ 32)\ <\ 0);}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00288}00288\ }
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00289}00289\ \ \ \ \ secp256k1\_scalar\_negate(\&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ r2);}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00290}00290\ \ \ \ \ secp256k1\_scalar\_get\_b32(buf1,\ r2);}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00291}00291\ \ \ \ \ secp256k1\_scalar\_get\_b32(buf2,\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00292}00292\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(secp256k1\_memcmp\_var(buf1,\ k2\_bound,\ 32)\ <\ 0\ ||\ secp256k1\_memcmp\_var(buf2,\ k2\_bound,\ 32)\ <\ 0);}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00293}00293\ \}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00294}00294\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{/*\ VERIFY\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00295}00295\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{/*\ !defined(EXHAUSTIVE\_TEST\_ORDER)\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00296}00296\ }
+\DoxyCodeLine{\Hypertarget{scalar__impl_8h_source_l00297}00297\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{/*\ SECP256K1\_SCALAR\_IMPL\_H\ */}\textcolor{preprocessor}{}}
+
+\end{DoxyCode}

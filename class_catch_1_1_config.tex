@@ -1,0 +1,673 @@
+\doxysection{Catch\+::Config Class Reference}
+\hypertarget{class_catch_1_1_config}{}\label{class_catch_1_1_config}\index{Catch::Config@{Catch::Config}}
+
+
+{\ttfamily \#include $<$catch\+\_\+config.\+hpp$>$}
+
+
+
+Inheritance diagram for Catch\+::Config\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=188pt]{class_catch_1_1_config__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Catch\+::Config\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=188pt]{class_catch_1_1_config__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_catch_1_1_config_aef773b055ffea632b300f9a44caac969}{Config}} ()=default
+\item 
+\mbox{\hyperlink{class_catch_1_1_config_a25ad0360a8386e7bc068c9c1ac5320bf}{Config}} (\mbox{\hyperlink{struct_catch_1_1_config_data}{Config\+Data}} const \&data)
+\item 
+virtual \mbox{\hyperlink{class_catch_1_1_config_a8d9e3b27beba3c957d4f75385d0cae49}{\texorpdfstring{$\sim$}{\string~}\+Config}} ()=default
+\item 
+std\+::string const \& \mbox{\hyperlink{class_catch_1_1_config_a7ab6757592ffc73a7ceabd11e4a3ef15}{get\+Filename}} () const
+\item 
+bool \mbox{\hyperlink{class_catch_1_1_config_a4717b0c64f13c6f7dc4afdaeb396b7b9}{list\+Tests}} () const
+\item 
+bool \mbox{\hyperlink{class_catch_1_1_config_a82aa3cb7e5cd1b0705abab7c46009855}{list\+Test\+Names\+Only}} () const
+\item 
+bool \mbox{\hyperlink{class_catch_1_1_config_a87797a539ff81a7c3c0b302ede7ec9d3}{list\+Tags}} () const
+\item 
+bool \mbox{\hyperlink{class_catch_1_1_config_a4af3e61afbc5db0c2bb1138254a765ce}{list\+Reporters}} () const
+\item 
+std\+::string \mbox{\hyperlink{class_catch_1_1_config_ad0fe41d317f0429eecc31cc3a8aa298c}{get\+Process\+Name}} () const
+\item 
+std\+::string const \& \mbox{\hyperlink{class_catch_1_1_config_add24f3b9307edb6f8168753fe3bdec6c}{get\+Reporter\+Name}} () const
+\item 
+std\+::vector$<$ std\+::string $>$ const \& \mbox{\hyperlink{class_catch_1_1_config_a0861c17ff4a01038f73eac5836d5c6fc}{get\+Tests\+Or\+Tags}} () const override
+\item 
+std\+::vector$<$ std\+::string $>$ const \& \mbox{\hyperlink{class_catch_1_1_config_a32e48a3b9bbf4ce933a154545de13b3f}{get\+Sections\+To\+Run}} () const override
+\item 
+\mbox{\hyperlink{class_catch_1_1_test_spec}{Test\+Spec}} const \& \mbox{\hyperlink{class_catch_1_1_config_a9444b56d6f7549c2c6aad594d1bc6423}{test\+Spec}} () const override
+\item 
+bool \mbox{\hyperlink{class_catch_1_1_config_a25c21a50fd3ac97d55dd8a068d83a732}{has\+Test\+Filters}} () const override
+\item 
+bool \mbox{\hyperlink{class_catch_1_1_config_af86a5df3faae04019a4fcadaae412e06}{show\+Help}} () const
+\item 
+bool \mbox{\hyperlink{class_catch_1_1_config_aeb09ac92356afabdd2adde43f188d80b}{allow\+Throws}} () const override
+\item 
+std\+::ostream \& \mbox{\hyperlink{class_catch_1_1_config_ad8ea5e9e3f59d3829cb50e5a8585ff3e}{stream}} () const override
+\item 
+std\+::string \mbox{\hyperlink{class_catch_1_1_config_a31a90838216993be7c9a8ce29a821293}{name}} () const override
+\item 
+bool \mbox{\hyperlink{class_catch_1_1_config_a7f4f4c2b7bffa63026df5f47e845c526}{include\+Successful\+Results}} () const override
+\item 
+bool \mbox{\hyperlink{class_catch_1_1_config_a517d35c4a4d9e8fd0009f22e85af1bea}{warn\+About\+Missing\+Assertions}} () const override
+\item 
+bool \mbox{\hyperlink{class_catch_1_1_config_acc2ad529989a83e6066a9077906b02ba}{warn\+About\+No\+Tests}} () const override
+\item 
+\mbox{\hyperlink{struct_catch_1_1_show_durations_a82fa0174554187220c1eda175f122ee1}{Show\+Durations\+::\+Or\+Not}} \mbox{\hyperlink{class_catch_1_1_config_a7c377b4288f19502c5c848d2ab83e835}{show\+Durations}} () const override
+\item 
+\mbox{\hyperlink{struct_catch_1_1_run_tests_ab56bd851b1dd085869992d1a9d73dc5d}{Run\+Tests\+::\+In\+What\+Order}} \mbox{\hyperlink{class_catch_1_1_config_ab6e21b9f22df4209a994045bb32a135f}{run\+Order}} () const override
+\item 
+unsigned int \mbox{\hyperlink{class_catch_1_1_config_a4abe80a8070e3365ba1b7cd37dbf4cbe}{rng\+Seed}} () const override
+\item 
+int \mbox{\hyperlink{class_catch_1_1_config_a54f9341be3d7de2461bace24346da332}{benchmark\+Resolution\+Multiple}} () const override
+\item 
+\mbox{\hyperlink{struct_catch_1_1_use_colour_a6aa78da0c2de7539bb9e3757e204a3f1}{Use\+Colour\+::\+Yes\+Or\+No}} \mbox{\hyperlink{class_catch_1_1_config_a77222e21f29817112a777546504f3930}{use\+Colour}} () const override
+\item 
+bool \mbox{\hyperlink{class_catch_1_1_config_aec665ed79cc298ea0eb88908870f8b44}{should\+Debug\+Break}} () const override
+\item 
+int \mbox{\hyperlink{class_catch_1_1_config_acb7644621cf5d1f8221a6cb2cfe209a8}{abort\+After}} () const override
+\item 
+bool \mbox{\hyperlink{class_catch_1_1_config_a692d44c3e1d5fa3cf6f19d4f7e317611}{show\+Invisibles}} () const override
+\item 
+\mbox{\hyperlink{namespace_catch_af85c0d46dfe687d923a157362fd07737}{Verbosity}} \mbox{\hyperlink{class_catch_1_1_config_aa0ac4601dd8e5bedf7dc4c0761ec2097}{verbosity}} () const override
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{struct_catch_1_1_i_config}{Catch\+::\+IConfig}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{struct_catch_1_1_i_config_a001afe9548a978b25f048f889f98f65a}{\texorpdfstring{$\sim$}{\string~}\+IConfig}} ()
+\item 
+virtual \mbox{\hyperlink{struct_catch_1_1_i_config_adadf7c57478e4b0c83bea5b38d2dbc87}{\texorpdfstring{$\sim$}{\string~}\+IConfig}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Protected Member Functions inherited from \mbox{\hyperlink{class_catch_1_1_non_copyable}{Catch\+::\+Non\+Copyable}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_catch_1_1_non_copyable_a4b492dd5753f9952350fb64dc6cb9fe2}{Non\+Copyable}} ()
+\item 
+virtual \mbox{\hyperlink{class_catch_1_1_non_copyable_a01c810b6a334f415babd9c9c4af62027}{\texorpdfstring{$\sim$}{\string~}\+Non\+Copyable}} ()
+\item 
+\mbox{\hyperlink{class_catch_1_1_non_copyable_a4b492dd5753f9952350fb64dc6cb9fe2}{Non\+Copyable}} ()
+\item 
+virtual \mbox{\hyperlink{class_catch_1_1_non_copyable_a81254677280fef337eb4a676e91e3293}{\texorpdfstring{$\sim$}{\string~}\+Non\+Copyable}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{catch__config_8hpp_source_l00068}{68}} of file \mbox{\hyperlink{catch__config_8hpp_source}{catch\+\_\+config.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_catch_1_1_config_aef773b055ffea632b300f9a44caac969}\index{Catch::Config@{Catch::Config}!Config@{Config}}
+\index{Config@{Config}!Catch::Config@{Catch::Config}}
+\doxysubsubsection{\texorpdfstring{Config()}{Config()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_config_aef773b055ffea632b300f9a44caac969} 
+Catch\+::\+Config\+::\+Config (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [default]}}
+
+\Hypertarget{class_catch_1_1_config_a25ad0360a8386e7bc068c9c1ac5320bf}\index{Catch::Config@{Catch::Config}!Config@{Config}}
+\index{Config@{Config}!Catch::Config@{Catch::Config}}
+\doxysubsubsection{\texorpdfstring{Config()}{Config()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_config_a25ad0360a8386e7bc068c9c1ac5320bf} 
+Catch\+::\+Config\+::\+Config (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_config_data}{Config\+Data}} const \&}]{data}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__config_8cpp_source_l00014}{14}} of file \mbox{\hyperlink{catch__config_8cpp_source}{catch\+\_\+config.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00015\ \ \ \ \ :\ \ \ m\_data(\ data\ ),}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \ \ m\_stream(\ openStream()\ )}
+\DoxyCodeLine{00017\ \ \ \ \ \{}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ TestSpecParser\ \mbox{\hyperlink{namespaceupload_af9e508d19dc2dd9cdb7c642dde0bdd21}{parser}}(\mbox{\hyperlink{struct_catch_1_1_i_tag_alias_registry_a7c4bf6e2fc52de95fb2596ba19b3bf76}{ITagAliasRegistry::get}}());}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!data.testsOrTags.empty())\ \{}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \ \ \ \ m\_hasTestFilters\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\ \textcolor{keyword}{const}\&\ testOrTags\ :\ data.testsOrTags\ )}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceupload_af9e508d19dc2dd9cdb7c642dde0bdd21}{parser}}.parse(\ testOrTags\ );}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ m\_testSpec\ =\ \mbox{\hyperlink{namespaceupload_af9e508d19dc2dd9cdb7c642dde0bdd21}{parser}}.testSpec();}
+\DoxyCodeLine{00025\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_config_a25ad0360a8386e7bc068c9c1ac5320bf_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_config_a8d9e3b27beba3c957d4f75385d0cae49}\index{Catch::Config@{Catch::Config}!````~Config@{\texorpdfstring{$\sim$}{\string~}Config}}
+\index{````~Config@{\texorpdfstring{$\sim$}{\string~}Config}!Catch::Config@{Catch::Config}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}Config()}{\string~Config()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_config_a8d9e3b27beba3c957d4f75385d0cae49} 
+virtual Catch\+::\+Config\+::\texorpdfstring{$\sim$}{\string~}\+Config (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}, {\ttfamily [default]}}
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_catch_1_1_config_acb7644621cf5d1f8221a6cb2cfe209a8}\index{Catch::Config@{Catch::Config}!abortAfter@{abortAfter}}
+\index{abortAfter@{abortAfter}!Catch::Config@{Catch::Config}}
+\doxysubsubsection{\texorpdfstring{abortAfter()}{abortAfter()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_config_acb7644621cf5d1f8221a6cb2cfe209a8} 
+int Catch\+::\+Config\+::abort\+After (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_i_config_a363f3388a439d02217f37198eff96744}{Catch\+::\+IConfig}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__config_8cpp_source_l00060}{60}} of file \mbox{\hyperlink{catch__config_8cpp_source}{catch\+\_\+config.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00060\ \{\ \textcolor{keywordflow}{return}\ m\_data.\mbox{\hyperlink{struct_catch_1_1_config_data_a2d5505751aab745d5ae5e4ffe5c92c35}{abortAfter}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_config_aeb09ac92356afabdd2adde43f188d80b}\index{Catch::Config@{Catch::Config}!allowThrows@{allowThrows}}
+\index{allowThrows@{allowThrows}!Catch::Config@{Catch::Config}}
+\doxysubsubsection{\texorpdfstring{allowThrows()}{allowThrows()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_config_aeb09ac92356afabdd2adde43f188d80b} 
+bool Catch\+::\+Config\+::allow\+Throws (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_i_config_aadb95f849359de1e6eb915aab063e542}{Catch\+::\+IConfig}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__config_8cpp_source_l00048}{48}} of file \mbox{\hyperlink{catch__config_8cpp_source}{catch\+\_\+config.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00048\ \{\ \textcolor{keywordflow}{return}\ !m\_data.\mbox{\hyperlink{struct_catch_1_1_config_data_a6dd23f8c9d9337f46187e7dbb6a8328e}{noThrow}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_config_a54f9341be3d7de2461bace24346da332}\index{Catch::Config@{Catch::Config}!benchmarkResolutionMultiple@{benchmarkResolutionMultiple}}
+\index{benchmarkResolutionMultiple@{benchmarkResolutionMultiple}!Catch::Config@{Catch::Config}}
+\doxysubsubsection{\texorpdfstring{benchmarkResolutionMultiple()}{benchmarkResolutionMultiple()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_config_a54f9341be3d7de2461bace24346da332} 
+int Catch\+::\+Config\+::benchmark\+Resolution\+Multiple (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_i_config_a775f740b8af9df931e87db51dfdc6033}{Catch\+::\+IConfig}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__config_8cpp_source_l00057}{57}} of file \mbox{\hyperlink{catch__config_8cpp_source}{catch\+\_\+config.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00057\ \{\ \textcolor{keywordflow}{return}\ m\_data.\mbox{\hyperlink{struct_catch_1_1_config_data_af16d87b34e8ec22285b008fd7414574f}{benchmarkResolutionMultiple}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_config_a7ab6757592ffc73a7ceabd11e4a3ef15}\index{Catch::Config@{Catch::Config}!getFilename@{getFilename}}
+\index{getFilename@{getFilename}!Catch::Config@{Catch::Config}}
+\doxysubsubsection{\texorpdfstring{getFilename()}{getFilename()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_config_a7ab6757592ffc73a7ceabd11e4a3ef15} 
+std\+::string const  \& Catch\+::\+Config\+::get\+Filename (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{catch__config_8cpp_source_l00027}{27}} of file \mbox{\hyperlink{catch__config_8cpp_source}{catch\+\_\+config.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_data.\mbox{\hyperlink{struct_catch_1_1_config_data_a6eaa8b628b7051824ac1717a5c2e8b5c}{outputFilename}}\ ;}
+\DoxyCodeLine{00029\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_config_ad0fe41d317f0429eecc31cc3a8aa298c}\index{Catch::Config@{Catch::Config}!getProcessName@{getProcessName}}
+\index{getProcessName@{getProcessName}!Catch::Config@{Catch::Config}}
+\doxysubsubsection{\texorpdfstring{getProcessName()}{getProcessName()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_config_ad0fe41d317f0429eecc31cc3a8aa298c} 
+std\+::string Catch\+::\+Config\+::get\+Process\+Name (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{catch__config_8cpp_source_l00036}{36}} of file \mbox{\hyperlink{catch__config_8cpp_source}{catch\+\_\+config.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00036\ \{\ \textcolor{keywordflow}{return}\ m\_data.\mbox{\hyperlink{struct_catch_1_1_config_data_ac181ec69c5b6c925ac9bea9eaf7039c3}{processName}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_config_add24f3b9307edb6f8168753fe3bdec6c}\index{Catch::Config@{Catch::Config}!getReporterName@{getReporterName}}
+\index{getReporterName@{getReporterName}!Catch::Config@{Catch::Config}}
+\doxysubsubsection{\texorpdfstring{getReporterName()}{getReporterName()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_config_add24f3b9307edb6f8168753fe3bdec6c} 
+std\+::string const  \& Catch\+::\+Config\+::get\+Reporter\+Name (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{catch__config_8cpp_source_l00037}{37}} of file \mbox{\hyperlink{catch__config_8cpp_source}{catch\+\_\+config.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00037\ \{\ \textcolor{keywordflow}{return}\ m\_data.\mbox{\hyperlink{struct_catch_1_1_config_data_a86a1832b579b5b1728e3bd04dc03c35d}{reporterName}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_config_a32e48a3b9bbf4ce933a154545de13b3f}\index{Catch::Config@{Catch::Config}!getSectionsToRun@{getSectionsToRun}}
+\index{getSectionsToRun@{getSectionsToRun}!Catch::Config@{Catch::Config}}
+\doxysubsubsection{\texorpdfstring{getSectionsToRun()}{getSectionsToRun()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_config_a32e48a3b9bbf4ce933a154545de13b3f} 
+std\+::vector$<$ std\+::string $>$ const  \& Catch\+::\+Config\+::get\+Sections\+To\+Run (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_i_config_aeb282b2b74d01c0d95ef1a4dbd2d12df}{Catch\+::\+IConfig}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__config_8cpp_source_l00040}{40}} of file \mbox{\hyperlink{catch__config_8cpp_source}{catch\+\_\+config.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00040\ \{\ \textcolor{keywordflow}{return}\ m\_data.\mbox{\hyperlink{struct_catch_1_1_config_data_a76026ccfbefe117a33dde6540161b113}{sectionsToRun}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_config_a0861c17ff4a01038f73eac5836d5c6fc}\index{Catch::Config@{Catch::Config}!getTestsOrTags@{getTestsOrTags}}
+\index{getTestsOrTags@{getTestsOrTags}!Catch::Config@{Catch::Config}}
+\doxysubsubsection{\texorpdfstring{getTestsOrTags()}{getTestsOrTags()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_config_a0861c17ff4a01038f73eac5836d5c6fc} 
+std\+::vector$<$ std\+::string $>$ const  \& Catch\+::\+Config\+::get\+Tests\+Or\+Tags (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_i_config_a439d37638d37248d8a7f3f39ad5dc6f2}{Catch\+::\+IConfig}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__config_8cpp_source_l00039}{39}} of file \mbox{\hyperlink{catch__config_8cpp_source}{catch\+\_\+config.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00039\ \{\ \textcolor{keywordflow}{return}\ m\_data.\mbox{\hyperlink{struct_catch_1_1_config_data_aa40b0e5d2f78a7addbd5c8d16a111840}{testsOrTags}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_config_a25c21a50fd3ac97d55dd8a068d83a732}\index{Catch::Config@{Catch::Config}!hasTestFilters@{hasTestFilters}}
+\index{hasTestFilters@{hasTestFilters}!Catch::Config@{Catch::Config}}
+\doxysubsubsection{\texorpdfstring{hasTestFilters()}{hasTestFilters()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_config_a25c21a50fd3ac97d55dd8a068d83a732} 
+bool Catch\+::\+Config\+::has\+Test\+Filters (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_i_config_a49a475bbeb3180c06799d6d958914649}{Catch\+::\+IConfig}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__config_8cpp_source_l00043}{43}} of file \mbox{\hyperlink{catch__config_8cpp_source}{catch\+\_\+config.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00043\ \{\ \textcolor{keywordflow}{return}\ m\_hasTestFilters;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=335pt]{class_catch_1_1_config_a25c21a50fd3ac97d55dd8a068d83a732_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_config_a7f4f4c2b7bffa63026df5f47e845c526}\index{Catch::Config@{Catch::Config}!includeSuccessfulResults@{includeSuccessfulResults}}
+\index{includeSuccessfulResults@{includeSuccessfulResults}!Catch::Config@{Catch::Config}}
+\doxysubsubsection{\texorpdfstring{includeSuccessfulResults()}{includeSuccessfulResults()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_config_a7f4f4c2b7bffa63026df5f47e845c526} 
+bool Catch\+::\+Config\+::include\+Successful\+Results (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_i_config_a2f1b0391019b9ce69921527a684eab23}{Catch\+::\+IConfig}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__config_8cpp_source_l00051}{51}} of file \mbox{\hyperlink{catch__config_8cpp_source}{catch\+\_\+config.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00051\ \{\ \textcolor{keywordflow}{return}\ m\_data.\mbox{\hyperlink{struct_catch_1_1_config_data_aeb091ca2df2c654caaa2ad29c14578e5}{showSuccessfulTests}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_config_a4af3e61afbc5db0c2bb1138254a765ce}\index{Catch::Config@{Catch::Config}!listReporters@{listReporters}}
+\index{listReporters@{listReporters}!Catch::Config@{Catch::Config}}
+\doxysubsubsection{\texorpdfstring{listReporters()}{listReporters()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_config_a4af3e61afbc5db0c2bb1138254a765ce} 
+bool Catch\+::\+Config\+::list\+Reporters (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{catch__config_8cpp_source_l00034}{34}} of file \mbox{\hyperlink{catch__config_8cpp_source}{catch\+\_\+config.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00034\ \{\ \textcolor{keywordflow}{return}\ m\_data.\mbox{\hyperlink{struct_catch_1_1_config_data_a4ba3618cae31b43237724f55359bfe95}{listReporters}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_config_a87797a539ff81a7c3c0b302ede7ec9d3}\index{Catch::Config@{Catch::Config}!listTags@{listTags}}
+\index{listTags@{listTags}!Catch::Config@{Catch::Config}}
+\doxysubsubsection{\texorpdfstring{listTags()}{listTags()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_config_a87797a539ff81a7c3c0b302ede7ec9d3} 
+bool Catch\+::\+Config\+::list\+Tags (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{catch__config_8cpp_source_l00033}{33}} of file \mbox{\hyperlink{catch__config_8cpp_source}{catch\+\_\+config.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00033\ \{\ \textcolor{keywordflow}{return}\ m\_data.\mbox{\hyperlink{struct_catch_1_1_config_data_af780422bdef8d8b905204542855cf6b3}{listTags}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_config_a82aa3cb7e5cd1b0705abab7c46009855}\index{Catch::Config@{Catch::Config}!listTestNamesOnly@{listTestNamesOnly}}
+\index{listTestNamesOnly@{listTestNamesOnly}!Catch::Config@{Catch::Config}}
+\doxysubsubsection{\texorpdfstring{listTestNamesOnly()}{listTestNamesOnly()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_config_a82aa3cb7e5cd1b0705abab7c46009855} 
+bool Catch\+::\+Config\+::list\+Test\+Names\+Only (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{catch__config_8cpp_source_l00032}{32}} of file \mbox{\hyperlink{catch__config_8cpp_source}{catch\+\_\+config.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00032\ \{\ \textcolor{keywordflow}{return}\ m\_data.\mbox{\hyperlink{struct_catch_1_1_config_data_abedaace37c0166fbc64ff25968aad944}{listTestNamesOnly}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_config_a4717b0c64f13c6f7dc4afdaeb396b7b9}\index{Catch::Config@{Catch::Config}!listTests@{listTests}}
+\index{listTests@{listTests}!Catch::Config@{Catch::Config}}
+\doxysubsubsection{\texorpdfstring{listTests()}{listTests()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_config_a4717b0c64f13c6f7dc4afdaeb396b7b9} 
+bool Catch\+::\+Config\+::list\+Tests (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{catch__config_8cpp_source_l00031}{31}} of file \mbox{\hyperlink{catch__config_8cpp_source}{catch\+\_\+config.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00031\ \{\ \textcolor{keywordflow}{return}\ m\_data.\mbox{\hyperlink{struct_catch_1_1_config_data_a0da0f6d493ef8f799273b4358d420a3a}{listTests}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_config_a31a90838216993be7c9a8ce29a821293}\index{Catch::Config@{Catch::Config}!name@{name}}
+\index{name@{name}!Catch::Config@{Catch::Config}}
+\doxysubsubsection{\texorpdfstring{name()}{name()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_config_a31a90838216993be7c9a8ce29a821293} 
+std\+::string Catch\+::\+Config\+::name (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_i_config_aa2315800a05c19db71518b1edc39d43b}{Catch\+::\+IConfig}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__config_8cpp_source_l00050}{50}} of file \mbox{\hyperlink{catch__config_8cpp_source}{catch\+\_\+config.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00050\ \{\ \textcolor{keywordflow}{return}\ m\_data.\mbox{\hyperlink{struct_catch_1_1_config_data_a6c62e90478bc2911d032ec54c2e9d8df}{name}}.empty()\ ?\ m\_data.\mbox{\hyperlink{struct_catch_1_1_config_data_ac181ec69c5b6c925ac9bea9eaf7039c3}{processName}}\ :\ m\_data.\mbox{\hyperlink{struct_catch_1_1_config_data_a6c62e90478bc2911d032ec54c2e9d8df}{name}};\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_config_a31a90838216993be7c9a8ce29a821293_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_config_a4abe80a8070e3365ba1b7cd37dbf4cbe}\index{Catch::Config@{Catch::Config}!rngSeed@{rngSeed}}
+\index{rngSeed@{rngSeed}!Catch::Config@{Catch::Config}}
+\doxysubsubsection{\texorpdfstring{rngSeed()}{rngSeed()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_config_a4abe80a8070e3365ba1b7cd37dbf4cbe} 
+unsigned int Catch\+::\+Config\+::rng\+Seed (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_i_config_ae049eb45979d841073fa65d1094c7f14}{Catch\+::\+IConfig}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__config_8cpp_source_l00056}{56}} of file \mbox{\hyperlink{catch__config_8cpp_source}{catch\+\_\+config.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00056\ \{\ \textcolor{keywordflow}{return}\ m\_data.\mbox{\hyperlink{struct_catch_1_1_config_data_adc64e7994765fa481177d6f41d6875fa}{rngSeed}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_config_ab6e21b9f22df4209a994045bb32a135f}\index{Catch::Config@{Catch::Config}!runOrder@{runOrder}}
+\index{runOrder@{runOrder}!Catch::Config@{Catch::Config}}
+\doxysubsubsection{\texorpdfstring{runOrder()}{runOrder()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_config_ab6e21b9f22df4209a994045bb32a135f} 
+\mbox{\hyperlink{struct_catch_1_1_run_tests_ab56bd851b1dd085869992d1a9d73dc5d}{Run\+Tests\+::\+In\+What\+Order}} Catch\+::\+Config\+::run\+Order (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_i_config_a0fc59c9aba1d4018538d5526daa5eb78}{Catch\+::\+IConfig}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__config_8cpp_source_l00055}{55}} of file \mbox{\hyperlink{catch__config_8cpp_source}{catch\+\_\+config.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00055\ \{\ \textcolor{keywordflow}{return}\ m\_data.\mbox{\hyperlink{struct_catch_1_1_config_data_a452a207267820df047268e019f4517b9}{runOrder}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_config_aec665ed79cc298ea0eb88908870f8b44}\index{Catch::Config@{Catch::Config}!shouldDebugBreak@{shouldDebugBreak}}
+\index{shouldDebugBreak@{shouldDebugBreak}!Catch::Config@{Catch::Config}}
+\doxysubsubsection{\texorpdfstring{shouldDebugBreak()}{shouldDebugBreak()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_config_aec665ed79cc298ea0eb88908870f8b44} 
+bool Catch\+::\+Config\+::should\+Debug\+Break (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_i_config_a5b886c5aad9001e90f63a7cf0726af63}{Catch\+::\+IConfig}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__config_8cpp_source_l00059}{59}} of file \mbox{\hyperlink{catch__config_8cpp_source}{catch\+\_\+config.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00059\ \{\ \textcolor{keywordflow}{return}\ m\_data.\mbox{\hyperlink{struct_catch_1_1_config_data_afec8310b1904784edb292e143a602fba}{shouldDebugBreak}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_config_a7c377b4288f19502c5c848d2ab83e835}\index{Catch::Config@{Catch::Config}!showDurations@{showDurations}}
+\index{showDurations@{showDurations}!Catch::Config@{Catch::Config}}
+\doxysubsubsection{\texorpdfstring{showDurations()}{showDurations()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_config_a7c377b4288f19502c5c848d2ab83e835} 
+\mbox{\hyperlink{struct_catch_1_1_show_durations_a82fa0174554187220c1eda175f122ee1}{Show\+Durations\+::\+Or\+Not}} Catch\+::\+Config\+::show\+Durations (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_i_config_abaa97d281484278291f0d3db6d404aeb}{Catch\+::\+IConfig}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__config_8cpp_source_l00054}{54}} of file \mbox{\hyperlink{catch__config_8cpp_source}{catch\+\_\+config.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00054\ \{\ \textcolor{keywordflow}{return}\ m\_data.\mbox{\hyperlink{struct_catch_1_1_config_data_a26b02455c7cc772ab0be25af0ac12feb}{showDurations}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_config_af86a5df3faae04019a4fcadaae412e06}\index{Catch::Config@{Catch::Config}!showHelp@{showHelp}}
+\index{showHelp@{showHelp}!Catch::Config@{Catch::Config}}
+\doxysubsubsection{\texorpdfstring{showHelp()}{showHelp()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_config_af86a5df3faae04019a4fcadaae412e06} 
+bool Catch\+::\+Config\+::show\+Help (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{catch__config_8cpp_source_l00045}{45}} of file \mbox{\hyperlink{catch__config_8cpp_source}{catch\+\_\+config.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00045\ \{\ \textcolor{keywordflow}{return}\ m\_data.\mbox{\hyperlink{struct_catch_1_1_config_data_a12535241547dfc57e6864c4fc2cd4dd9}{showHelp}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_config_a692d44c3e1d5fa3cf6f19d4f7e317611}\index{Catch::Config@{Catch::Config}!showInvisibles@{showInvisibles}}
+\index{showInvisibles@{showInvisibles}!Catch::Config@{Catch::Config}}
+\doxysubsubsection{\texorpdfstring{showInvisibles()}{showInvisibles()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_config_a692d44c3e1d5fa3cf6f19d4f7e317611} 
+bool Catch\+::\+Config\+::show\+Invisibles (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_i_config_aa288bf92ccd0aafd85409d8aefdf738c}{Catch\+::\+IConfig}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__config_8cpp_source_l00061}{61}} of file \mbox{\hyperlink{catch__config_8cpp_source}{catch\+\_\+config.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00061\ \{\ \textcolor{keywordflow}{return}\ m\_data.\mbox{\hyperlink{struct_catch_1_1_config_data_a3c243de7a5957fa5311167039064379c}{showInvisibles}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_config_ad8ea5e9e3f59d3829cb50e5a8585ff3e}\index{Catch::Config@{Catch::Config}!stream@{stream}}
+\index{stream@{stream}!Catch::Config@{Catch::Config}}
+\doxysubsubsection{\texorpdfstring{stream()}{stream()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_config_ad8ea5e9e3f59d3829cb50e5a8585ff3e} 
+std\+::ostream \& Catch\+::\+Config\+::stream (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_i_config_a4e4714e479596394d5e129e8763f7853}{Catch\+::\+IConfig}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__config_8cpp_source_l00049}{49}} of file \mbox{\hyperlink{catch__config_8cpp_source}{catch\+\_\+config.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00049\ \{\ \textcolor{keywordflow}{return}\ m\_stream-\/>stream();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_config_a9444b56d6f7549c2c6aad594d1bc6423}\index{Catch::Config@{Catch::Config}!testSpec@{testSpec}}
+\index{testSpec@{testSpec}!Catch::Config@{Catch::Config}}
+\doxysubsubsection{\texorpdfstring{testSpec()}{testSpec()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_config_a9444b56d6f7549c2c6aad594d1bc6423} 
+\mbox{\hyperlink{class_catch_1_1_test_spec}{Test\+Spec}} const  \& Catch\+::\+Config\+::test\+Spec (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_i_config_a6c021a1bf5cae58cb6c4b754af6cd4b5}{Catch\+::\+IConfig}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__config_8cpp_source_l00042}{42}} of file \mbox{\hyperlink{catch__config_8cpp_source}{catch\+\_\+config.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00042\ \{\ \textcolor{keywordflow}{return}\ m\_testSpec;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=312pt]{class_catch_1_1_config_a9444b56d6f7549c2c6aad594d1bc6423_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_config_a77222e21f29817112a777546504f3930}\index{Catch::Config@{Catch::Config}!useColour@{useColour}}
+\index{useColour@{useColour}!Catch::Config@{Catch::Config}}
+\doxysubsubsection{\texorpdfstring{useColour()}{useColour()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_config_a77222e21f29817112a777546504f3930} 
+\mbox{\hyperlink{struct_catch_1_1_use_colour_a6aa78da0c2de7539bb9e3757e204a3f1}{Use\+Colour\+::\+Yes\+Or\+No}} Catch\+::\+Config\+::use\+Colour (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_i_config_a87ec19a6b486eb5b5015cf7738fee026}{Catch\+::\+IConfig}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__config_8cpp_source_l00058}{58}} of file \mbox{\hyperlink{catch__config_8cpp_source}{catch\+\_\+config.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00058\ \{\ \textcolor{keywordflow}{return}\ m\_data.\mbox{\hyperlink{struct_catch_1_1_config_data_abbc2f39fe99f73539752e8dfec0a7709}{useColour}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_config_aa0ac4601dd8e5bedf7dc4c0761ec2097}\index{Catch::Config@{Catch::Config}!verbosity@{verbosity}}
+\index{verbosity@{verbosity}!Catch::Config@{Catch::Config}}
+\doxysubsubsection{\texorpdfstring{verbosity()}{verbosity()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_config_aa0ac4601dd8e5bedf7dc4c0761ec2097} 
+\mbox{\hyperlink{namespace_catch_af85c0d46dfe687d923a157362fd07737}{Verbosity}} Catch\+::\+Config\+::verbosity (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_i_config_a55aff5924bdbb3f558775821b1eb4b3d}{Catch\+::\+IConfig}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__config_8cpp_source_l00062}{62}} of file \mbox{\hyperlink{catch__config_8cpp_source}{catch\+\_\+config.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00062\ \{\ \textcolor{keywordflow}{return}\ m\_data.\mbox{\hyperlink{struct_catch_1_1_config_data_ab0e6ea949455438bfdc22ed25bab12f8}{verbosity}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_config_a517d35c4a4d9e8fd0009f22e85af1bea}\index{Catch::Config@{Catch::Config}!warnAboutMissingAssertions@{warnAboutMissingAssertions}}
+\index{warnAboutMissingAssertions@{warnAboutMissingAssertions}!Catch::Config@{Catch::Config}}
+\doxysubsubsection{\texorpdfstring{warnAboutMissingAssertions()}{warnAboutMissingAssertions()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_config_a517d35c4a4d9e8fd0009f22e85af1bea} 
+bool Catch\+::\+Config\+::warn\+About\+Missing\+Assertions (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_i_config_a75d970c495a28e46b8e9b04a1d32149f}{Catch\+::\+IConfig}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__config_8cpp_source_l00052}{52}} of file \mbox{\hyperlink{catch__config_8cpp_source}{catch\+\_\+config.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00052\ \{\ \textcolor{keywordflow}{return}\ !!(m\_data.\mbox{\hyperlink{struct_catch_1_1_config_data_af3a1c0b4a748b24799941b59bcd9c138}{warnings}}\ \&\ \mbox{\hyperlink{struct_catch_1_1_warn_about_ae3dde70ef78d700ea896eb29314e0fa3a04bcb5104bbb5aeb7f74ee59868289da}{WarnAbout::NoAssertions}});\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_config_acc2ad529989a83e6066a9077906b02ba}\index{Catch::Config@{Catch::Config}!warnAboutNoTests@{warnAboutNoTests}}
+\index{warnAboutNoTests@{warnAboutNoTests}!Catch::Config@{Catch::Config}}
+\doxysubsubsection{\texorpdfstring{warnAboutNoTests()}{warnAboutNoTests()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_config_acc2ad529989a83e6066a9077906b02ba} 
+bool Catch\+::\+Config\+::warn\+About\+No\+Tests (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_i_config_a30590623e3918825f2896c2262bf6fe3}{Catch\+::\+IConfig}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__config_8cpp_source_l00053}{53}} of file \mbox{\hyperlink{catch__config_8cpp_source}{catch\+\_\+config.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00053\ \{\ \textcolor{keywordflow}{return}\ !!(m\_data.\mbox{\hyperlink{struct_catch_1_1_config_data_af3a1c0b4a748b24799941b59bcd9c138}{warnings}}\ \&\ \mbox{\hyperlink{struct_catch_1_1_warn_about_ae3dde70ef78d700ea896eb29314e0fa3acca5dc9e6d4240d98a441b8177d3ab97}{WarnAbout::NoTests}});\ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__config_8hpp}{catch\+\_\+config.\+hpp}}\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__config_8cpp}{catch\+\_\+config.\+cpp}}\end{DoxyCompactItemize}

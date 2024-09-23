@@ -1,0 +1,16 @@
+<map id="sysio::chain::pending_block_header_state::finish_next" name="sysio::chain::pending_block_header_state::finish_next">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,76,155,131"/>
+<area shape="rect" id="Node000002" href="$namespacesysio_1_1chain_1_1detail.html#ad7f3ac7b970f7c5d559e3f176461a579" title=" " alt="" coords="203,83,343,124"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="155,101,187,101,187,106,155,106"/>
+<area shape="rect" id="Node000003" href="$namespacefc.html#a150ca4cd9c0318ca45dc0dc7df5d58b9" title=" " alt="" coords="434,57,509,83"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="343,89,418,76,419,82,344,94"/>
+<area shape="rect" id="Node000007" href="$classsysio_1_1chain_1_1protocol__feature__set.html#a5dd91e60ec8a213c9e24b61565c9f860" title=" " alt="" coords="391,108,551,163"/>
+<area shape="poly" id="edge7_Node000002_Node000007" title=" " alt="" coords="344,112,376,117,375,123,343,117"/>
+<area shape="rect" id="Node000004" href="$namespacefc_1_1raw.html#a3a18d8161aa5b4f4f02b6fcfdff5e5d1" title=" " alt="" coords="619,29,716,55"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="509,62,603,49,604,54,510,67"/>
+<area shape="rect" id="Node000005" href="$classfc_1_1sha256_1_1encoder.html#a4d8b8181e912194cf98a56164671adf8" title=" " alt="" coords="599,79,736,120"/>
+<area shape="poly" id="edge5_Node000003_Node000005" title=" " alt="" coords="510,73,584,84,583,90,509,78"/>
+<area shape="poly" id="edge4_Node000004_Node000004" title=" " alt="" coords="638,30,632,21,636,11,648,5,668,3,689,5,700,12,697,16,687,10,667,8,649,10,640,15,638,20,643,28"/>
+<area shape="rect" id="Node000006" href="$classfc_1_1sha256.html#ab897537f6c524085b28049be51ed370d" title=" " alt="" coords="784,87,899,112"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="736,97,768,97,768,102,736,102"/>
+</map>

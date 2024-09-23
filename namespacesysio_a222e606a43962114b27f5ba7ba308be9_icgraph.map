@@ -1,0 +1,9 @@
+<map id="sysio::get_ship_features" name="sysio::get_ship_features">
+<area shape="rect" id="Node000001" title=" " alt="" coords="397,46,560,72"/>
+<area shape="rect" id="Node000002" href="$namespacesysio.html#a18132f8f1084f1195249e432f1d9329e" title=" " alt="" coords="206,5,349,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="382,46,349,40,350,35,383,40"/>
+<area shape="rect" id="Node000003" href="$namespacesysio.html#a967f7bd318ee315bed33e22f2abb1bc2" title=" " alt="" coords="215,71,340,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="382,77,341,84,340,78,381,72"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1state__history__log.html#a6d85c85a918a3a0a987ab3e25bb6b44c" title=" " alt="" coords="5,71,158,111"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="199,94,158,94,158,88,199,88"/>
+</map>

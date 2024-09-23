@@ -1,0 +1,29 @@
+\doxysection{X10-\/\+Fallback\+Stringifier.cpp}
+\hypertarget{_x10-_fallback_stringifier_8cpp_source}{}\label{_x10-_fallback_stringifier_8cpp_source}\index{libraries/sys-\/vm/external/Catch2/projects/ExtraTests/X10-\/FallbackStringifier.cpp@{libraries/sys-\/vm/external/Catch2/projects/ExtraTests/X10-\/FallbackStringifier.cpp}}
+\mbox{\hyperlink{_x10-_fallback_stringifier_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_x10-_fallback_stringifier_8cpp_source_l00001}00001\ \textcolor{comment}{//\ X10-\/FallbackStringifier.cpp}}
+\DoxyCodeLine{\Hypertarget{_x10-_fallback_stringifier_8cpp_source_l00002}00002\ \textcolor{comment}{//\ Test\ that\ defining\ fallbackStringifier\ compiles}}
+\DoxyCodeLine{\Hypertarget{_x10-_fallback_stringifier_8cpp_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{_x10-_fallback_stringifier_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{\Hypertarget{_x10-_fallback_stringifier_8cpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{_x10-_fallback_stringifier_8cpp_source_l00006}00006\ \textcolor{comment}{//\ A\ catch-\/all\ stringifier}}
+\DoxyCodeLine{\Hypertarget{_x10-_fallback_stringifier_8cpp_source_l00007}00007\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{_x10-_fallback_stringifier_8cpp_source_l00008}\mbox{\hyperlink{_x10-_fallback_stringifier_8cpp_acc07612f29563277b38d96006c7fe302}{00008}}\ std::string\ \mbox{\hyperlink{_x10-_fallback_stringifier_8cpp_acc07612f29563277b38d96006c7fe302}{fallbackStringifier}}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \textcolor{keyword}{const}\&)\ \{}
+\DoxyCodeLine{\Hypertarget{_x10-_fallback_stringifier_8cpp_source_l00009}00009\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}\{\ !!!\ \}"{}};}
+\DoxyCodeLine{\Hypertarget{_x10-_fallback_stringifier_8cpp_source_l00010}00010\ \}}
+\DoxyCodeLine{\Hypertarget{_x10-_fallback_stringifier_8cpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{_x10-_fallback_stringifier_8cpp_source_l00012}\mbox{\hyperlink{_x10-_fallback_stringifier_8cpp_a656eb5868e824d59f489f910db438420}{00012}}\ \textcolor{preprocessor}{\#define\ CATCH\_CONFIG\_MAIN}}
+\DoxyCodeLine{\Hypertarget{_x10-_fallback_stringifier_8cpp_source_l00013}00013\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{single__include_2catch2_2catch_8hpp}{catch2/catch.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{_x10-_fallback_stringifier_8cpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{_x10-_fallback_stringifier_8cpp_source_l00015}00015\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{namespacefoo}{foo}}\ \{}
+\DoxyCodeLine{\Hypertarget{_x10-_fallback_stringifier_8cpp_source_l00016}\mbox{\hyperlink{structfoo_a3119bc7d58836666951bdf540d8db180}{00016}}\ \ \ \ \ \textcolor{keyword}{explicit}\ \textcolor{keyword}{operator}\ bool()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{_x10-_fallback_stringifier_8cpp_source_l00017}00017\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_x10-_fallback_stringifier_8cpp_source_l00018}00018\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_x10-_fallback_stringifier_8cpp_source_l00019}00019\ \};}
+\DoxyCodeLine{\Hypertarget{_x10-_fallback_stringifier_8cpp_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{_x10-_fallback_stringifier_8cpp_source_l00021}\mbox{\hyperlink{_x10-_fallback_stringifier_8cpp_a91807e1bfe62070874a320f979fe34e3}{00021}}\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\textcolor{stringliteral}{"{}aa"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{_x10-_fallback_stringifier_8cpp_source_l00022}00022\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\mbox{\hyperlink{namespacefoo}{foo}}\{\});}
+\DoxyCodeLine{\Hypertarget{_x10-_fallback_stringifier_8cpp_source_l00023}00023\ \}}
+
+\end{DoxyCode}

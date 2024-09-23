@@ -1,0 +1,28 @@
+\doxysection{localize.\+hpp}
+\hypertarget{localize_8hpp_source}{}\label{localize_8hpp_source}\index{programs/clio/localize.hpp@{programs/clio/localize.hpp}}
+\mbox{\hyperlink{localize_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{localize_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{localize_8hpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{localize_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{fc_2include_2fc_2variant_8hpp}{fc/variant.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{localize_8hpp_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{localize_8hpp_source_l00005}\mbox{\hyperlink{namespacesysio_1_1client_1_1localize}{00005}}\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{classwebsocketpp_1_1client}{client}}\ \{\ \textcolor{keyword}{namespace\ }localize\ \{}
+\DoxyCodeLine{\Hypertarget{localize_8hpp_source_l00006}00006\ \textcolor{preprocessor}{\ \ \ \#if\ !defined(\_)}}
+\DoxyCodeLine{\Hypertarget{localize_8hpp_source_l00007}\mbox{\hyperlink{localize_8hpp_a6554a5ea005e85d0f84f2f34c11de938}{00007}}\ \textcolor{preprocessor}{\ \ \ \#define\ \_(str)\ str}}
+\DoxyCodeLine{\Hypertarget{localize_8hpp_source_l00008}00008\ \textcolor{preprocessor}{\ \ \ \#endif}}
+\DoxyCodeLine{\Hypertarget{localize_8hpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{localize_8hpp_source_l00010}\mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{00010}}\ \textcolor{preprocessor}{\ \ \ \#define\ localized(str,\ ...)\ localized\_with\_variant((str),\ fc::mutable\_variant\_object()\ \_\_VA\_ARGS\_\_\ )}}
+\DoxyCodeLine{\Hypertarget{localize_8hpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{localize_8hpp_source_l00012}\mbox{\hyperlink{namespacesysio_1_1client_1_1localize_a2454a920e2bebe7223e14bb9843a665e}{00012}}\ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacesysio_1_1client_1_1localize_a2454a920e2bebe7223e14bb9843a665e}{localized\_with\_variant}}(\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ raw\_fmt,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1variant__object}{fc::variant\_object}}\&\ args)\ \{}
+\DoxyCodeLine{\Hypertarget{localize_8hpp_source_l00013}00013\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (raw\_fmt\ !=\ \textcolor{keyword}{nullptr})\ \{}
+\DoxyCodeLine{\Hypertarget{localize_8hpp_source_l00014}00014\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{localize_8hpp_source_l00015}00015\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_acd5129981ae93fce3154d3fed6f6acbc}{fc::format\_string}}(raw\_fmt,\ args);}
+\DoxyCodeLine{\Hypertarget{localize_8hpp_source_l00016}00016\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{}
+\DoxyCodeLine{\Hypertarget{localize_8hpp_source_l00017}00017\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{localize_8hpp_source_l00018}00018\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::string(raw\_fmt);}
+\DoxyCodeLine{\Hypertarget{localize_8hpp_source_l00019}00019\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{localize_8hpp_source_l00020}00020\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::string();}
+\DoxyCodeLine{\Hypertarget{localize_8hpp_source_l00021}00021\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{localize_8hpp_source_l00022}00022\ \}\}\}}
+
+\end{DoxyCode}

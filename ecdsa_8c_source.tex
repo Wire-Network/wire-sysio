@@ -1,0 +1,143 @@
+\doxysection{ecdsa.\+c}
+\hypertarget{ecdsa_8c_source}{}\label{ecdsa_8c_source}\index{libraries/fc/secp256k1/secp256k1/examples/ecdsa.c@{libraries/fc/secp256k1/secp256k1/examples/ecdsa.c}}
+\mbox{\hyperlink{ecdsa_8c}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00001}00001\ \textcolor{comment}{/*************************************************************************}}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00002}00002\ \textcolor{comment}{\ *\ Written\ in\ 2020-\/2022\ by\ Elichai\ Turkel\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00003}00003\ \textcolor{comment}{\ *\ To\ the\ extent\ possible\ under\ law,\ the\ author(s)\ have\ dedicated\ all\ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00004}00004\ \textcolor{comment}{\ *\ copyright\ and\ related\ and\ neighboring\ rights\ to\ the\ software\ in\ this\ \ *}}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00005}00005\ \textcolor{comment}{\ *\ file\ to\ the\ public\ domain\ worldwide.\ This\ software\ is\ distributed\ \ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00006}00006\ \textcolor{comment}{\ *\ without\ any\ warranty.\ For\ the\ CC0\ Public\ Domain\ Dedication,\ see\ \ \ \ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00007}00007\ \textcolor{comment}{\ *\ EXAMPLES\_COPYING\ or\ https://creativecommons.org/publicdomain/zero/1.0\ *}}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00008}00008\ \textcolor{comment}{\ *************************************************************************/}}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <stdio.h>}}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00011}00011\ \textcolor{preprocessor}{\#include\ <assert.h>}}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00012}00012\ \textcolor{preprocessor}{\#include\ <string.h>}}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00014}00014\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{secp256k1_8h}{secp256k1.h}}>}}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00016}00016\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{random_8h}{random.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00020}\mbox{\hyperlink{ecdsa_8c_a840291bc02cba5474a4cb46a9b9566fe}{00020}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{ecdsa_8c_a840291bc02cba5474a4cb46a9b9566fe}{main}}(\textcolor{keywordtype}{void})\ \{}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00021}00021\ \ \ \ \ \textcolor{comment}{/*\ Instead\ of\ signing\ the\ message\ directly,\ we\ must\ sign\ a\ 32-\/byte\ hash.}}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00022}00022\ \textcolor{comment}{\ \ \ \ \ *\ Here\ the\ message\ is\ "{}Hello,\ world!"{}\ and\ the\ hash\ function\ was\ SHA-\/256.}}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00023}00023\ \textcolor{comment}{\ \ \ \ \ *\ An\ actual\ implementation\ should\ just\ call\ SHA-\/256,\ but\ this\ example}}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00024}00024\ \textcolor{comment}{\ \ \ \ \ *\ hardcodes\ the\ output\ to\ avoid\ depending\ on\ an\ additional\ library.}}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00025}00025\ \textcolor{comment}{\ \ \ \ \ *\ See\ https://bitcoin.stackexchange.com/questions/81115/if-\/someone-\/wanted-\/to-\/pretend-\/to-\/be-\/satoshi-\/by-\/posting-\/a-\/fake-\/signature-\/to-\/defrau/81116\#81116\ */}}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00026}00026\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ msg\_hash[32]\ =\ \{}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00027}00027\ \ \ \ \ \ \ \ \ 0x31,\ 0x5F,\ 0x5B,\ 0xDB,\ 0x76,\ 0xD0,\ 0x78,\ 0xC4,}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00028}00028\ \ \ \ \ \ \ \ \ 0x3B,\ 0x8A,\ 0xC0,\ 0x06,\ 0x4E,\ 0x4A,\ 0x01,\ 0x64,}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00029}00029\ \ \ \ \ \ \ \ \ 0x61,\ 0x2B,\ 0x1F,\ 0xCE,\ 0x77,\ 0xC8,\ 0x69,\ 0x34,}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00030}00030\ \ \ \ \ \ \ \ \ 0x5B,\ 0xFC,\ 0x94,\ 0xC7,\ 0x58,\ 0x94,\ 0xED,\ 0xD3,}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00031}00031\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00032}00032\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ seckey[32];}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00033}00033\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ randomize[32];}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00034}00034\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ compressed\_pubkey[33];}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00035}00035\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ serialized\_signature[64];}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00036}00036\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}};}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00037}00037\ \ \ \ \ \textcolor{keywordtype}{int}\ is\_signature\_valid;}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00038}00038\ \ \ \ \ \textcolor{keywordtype}{int}\ return\_val;}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00039}00039\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__pubkey}{secp256k1\_pubkey}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}};}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00040}00040\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__ecdsa__signature}{secp256k1\_ecdsa\_signature}}\ sig;}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00041}00041\ \ \ \ \ \textcolor{comment}{/*\ The\ specification\ in\ secp256k1.h\ states\ that\ \`{}secp256k1\_ec\_pubkey\_create`\ needs}}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00042}00042\ \textcolor{comment}{\ \ \ \ \ *\ a\ context\ object\ initialized\ for\ signing\ and\ \`{}secp256k1\_ecdsa\_verify`\ needs}}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00043}00043\ \textcolor{comment}{\ \ \ \ \ *\ a\ context\ initialized\ for\ verification,\ which\ is\ why\ we\ create\ a\ context}}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00044}00044\ \textcolor{comment}{\ \ \ \ \ *\ for\ both\ signing\ and\ verification\ with\ the\ SECP256K1\_CONTEXT\_SIGN\ and}}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00045}00045\ \textcolor{comment}{\ \ \ \ \ *\ SECP256K1\_CONTEXT\_VERIFY\ flags.\ */}}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00046}00046\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__context__struct}{secp256k1\_context}}*\ ctx\ =\ \mbox{\hyperlink{secp256k1_8h_a3aaa9fcc3ab67bc8f841779a049069c5}{secp256k1\_context\_create}}(\mbox{\hyperlink{secp256k1_8h_a0d34fe6baa73d3145f2e376e43de0b15}{SECP256K1\_CONTEXT\_SIGN}}\ |\ \mbox{\hyperlink{secp256k1_8h_add20a6c320e247ca7bd524cbc4259d64}{SECP256K1\_CONTEXT\_VERIFY}});}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00047}00047\ \ \ \ \ \textcolor{keywordflow}{if}\ (!fill\_random(randomize,\ \textcolor{keyword}{sizeof}(randomize)))\ \{}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00048}00048\ \ \ \ \ \ \ \ \ printf(\textcolor{stringliteral}{"{}Failed\ to\ generate\ randomness\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00049}00049\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00050}00050\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00051}00051\ \ \ \ \ \textcolor{comment}{/*\ Randomizing\ the\ context\ is\ recommended\ to\ protect\ against\ side-\/channel}}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00052}00052\ \textcolor{comment}{\ \ \ \ \ *\ leakage\ See\ \`{}secp256k1\_context\_randomize`\ in\ secp256k1.h\ for\ more}}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00053}00053\ \textcolor{comment}{\ \ \ \ \ *\ information\ about\ it.\ This\ should\ never\ fail.\ */}}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00054}00054\ \ \ \ \ return\_val\ =\ \mbox{\hyperlink{secp256k1_8h_a1b81d70feb6ed24dc902cbbd5ba569e7}{secp256k1\_context\_randomize}}(ctx,\ randomize);}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00055}00055\ \ \ \ \ assert(return\_val);}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00057}00057\ \textcolor{comment}{\ \ \ \ /***\ Key\ Generation\ ***/}}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00059}00059\ \ \ \ \ \textcolor{comment}{/*\ If\ the\ secret\ key\ is\ zero\ or\ out\ of\ range\ (bigger\ than\ secp256k1's}}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00060}00060\ \textcolor{comment}{\ \ \ \ \ *\ order),\ we\ try\ to\ sample\ a\ new\ key.\ Note\ that\ the\ probability\ of\ this}}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00061}00061\ \textcolor{comment}{\ \ \ \ \ *\ happening\ is\ negligible.\ */}}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00062}00062\ \ \ \ \ \textcolor{keywordflow}{while}\ (1)\ \{}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00063}00063\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!fill\_random(seckey,\ \textcolor{keyword}{sizeof}(seckey)))\ \{}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00064}00064\ \ \ \ \ \ \ \ \ \ \ \ \ printf(\textcolor{stringliteral}{"{}Failed\ to\ generate\ randomness\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00065}00065\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00066}00066\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00067}00067\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{secp256k1_8h_a366f922fc0c787351e82ff8e3a95f652}{secp256k1\_ec\_seckey\_verify}}(ctx,\ seckey))\ \{}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00069}00069\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00070}00070\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00072}00072\ \ \ \ \ \textcolor{comment}{/*\ Public\ key\ creation\ using\ a\ valid\ context\ with\ a\ verified\ secret\ key\ should\ never\ fail\ */}}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00073}00073\ \ \ \ \ return\_val\ =\ \mbox{\hyperlink{secp256k1_8h_a7438071aa8a6dc4697abe4f4659f2161}{secp256k1\_ec\_pubkey\_create}}(ctx,\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}},\ seckey);}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00074}00074\ \ \ \ \ assert(return\_val);}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00075}00075\ }
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00076}00076\ \ \ \ \ \textcolor{comment}{/*\ Serialize\ the\ pubkey\ in\ a\ compressed\ form(33\ bytes).\ Should\ always\ return\ 1.\ */}}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00077}00077\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ =\ \textcolor{keyword}{sizeof}(compressed\_pubkey);}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00078}00078\ \ \ \ \ return\_val\ =\ \mbox{\hyperlink{secp256k1_8h_a34977bf00322e510e881160c421836d7}{secp256k1\_ec\_pubkey\_serialize}}(ctx,\ compressed\_pubkey,\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}},\ \mbox{\hyperlink{secp256k1_8h_a7b8f642c65e8b5c81fa4421b7c42ab57}{SECP256K1\_EC\_COMPRESSED}});}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00079}00079\ \ \ \ \ assert(return\_val);}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00080}00080\ \ \ \ \ \textcolor{comment}{/*\ Should\ be\ the\ same\ size\ as\ the\ size\ of\ the\ output,\ because\ we\ passed\ a\ 33\ byte\ array.\ */}}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00081}00081\ \ \ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ ==\ \textcolor{keyword}{sizeof}(compressed\_pubkey));}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00083}00083\ \textcolor{comment}{\ \ \ \ /***\ Signing\ ***/}}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00084}00084\ }
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00085}00085\ \ \ \ \ \textcolor{comment}{/*\ Generate\ an\ ECDSA\ signature\ \`{}noncefp`\ and\ \`{}ndata`\ allows\ you\ to\ pass\ a}}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00086}00086\ \textcolor{comment}{\ \ \ \ \ *\ custom\ nonce\ function,\ passing\ \`{}NULL`\ will\ use\ the\ RFC-\/6979\ safe\ default.}}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00087}00087\ \textcolor{comment}{\ \ \ \ \ *\ Signing\ with\ a\ valid\ context,\ verified\ secret\ key}}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00088}00088\ \textcolor{comment}{\ \ \ \ \ *\ and\ the\ default\ nonce\ function\ should\ never\ fail.\ */}}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00089}00089\ \ \ \ \ return\_val\ =\ \mbox{\hyperlink{secp256k1_8h_a4185cc9a9de502e52cfe5350f7dc8438}{secp256k1\_ecdsa\_sign}}(ctx,\ \&sig,\ msg\_hash,\ seckey,\ NULL,\ NULL);}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00090}00090\ \ \ \ \ assert(return\_val);}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00091}00091\ }
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00092}00092\ \ \ \ \ \textcolor{comment}{/*\ Serialize\ the\ signature\ in\ a\ compact\ form.\ Should\ always\ return\ 1}}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00093}00093\ \textcolor{comment}{\ \ \ \ \ *\ according\ to\ the\ documentation\ in\ secp256k1.h.\ */}}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00094}00094\ \ \ \ \ return\_val\ =\ \mbox{\hyperlink{secp256k1_8h_af8571ca8dcfb7f892519b337504dc700}{secp256k1\_ecdsa\_signature\_serialize\_compact}}(ctx,\ serialized\_signature,\ \&sig);}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00095}00095\ \ \ \ \ assert(return\_val);}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00096}00096\ }
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00097}00097\ }
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00098}00098\ \textcolor{comment}{\ \ \ \ /***\ Verification\ ***/}}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00099}00099\ }
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00100}00100\ \ \ \ \ \textcolor{comment}{/*\ Deserialize\ the\ signature.\ This\ will\ return\ 0\ if\ the\ signature\ can't\ be\ parsed\ correctly.\ */}}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00101}00101\ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{secp256k1_8h_a2aff2802eca3d15ec54298e879579897}{secp256k1\_ecdsa\_signature\_parse\_compact}}(ctx,\ \&sig,\ serialized\_signature))\ \{}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00102}00102\ \ \ \ \ \ \ \ \ printf(\textcolor{stringliteral}{"{}Failed\ parsing\ the\ signature\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00103}00103\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00104}00104\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00105}00105\ }
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00106}00106\ \ \ \ \ \textcolor{comment}{/*\ Deserialize\ the\ public\ key.\ This\ will\ return\ 0\ if\ the\ public\ key\ can't\ be\ parsed\ correctly.\ */}}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00107}00107\ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{secp256k1_8h_a4e5dc8952c9a7e791376505ef2023ca1}{secp256k1\_ec\_pubkey\_parse}}(ctx,\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}},\ compressed\_pubkey,\ \textcolor{keyword}{sizeof}(compressed\_pubkey)))\ \{}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00108}00108\ \ \ \ \ \ \ \ \ printf(\textcolor{stringliteral}{"{}Failed\ parsing\ the\ public\ key\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00109}00109\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00110}00110\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00111}00111\ }
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00112}00112\ \ \ \ \ \textcolor{comment}{/*\ Verify\ a\ signature.\ This\ will\ return\ 1\ if\ it's\ valid\ and\ 0\ if\ it's\ not.\ */}}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00113}00113\ \ \ \ \ is\_signature\_valid\ =\ \mbox{\hyperlink{secp256k1_8h_a7dd6acb7ef7100a6aebff91ecb7ede30}{secp256k1\_ecdsa\_verify}}(ctx,\ \&sig,\ msg\_hash,\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}});}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00114}00114\ }
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00115}00115\ \ \ \ \ printf(\textcolor{stringliteral}{"{}Is\ the\ signature\ valid?\ \%s\(\backslash\)n"{}},\ is\_signature\_valid\ ?\ \textcolor{stringliteral}{"{}true"{}}\ :\ \textcolor{stringliteral}{"{}false"{}});}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00116}00116\ \ \ \ \ printf(\textcolor{stringliteral}{"{}Secret\ Key:\ "{}});}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00117}00117\ \ \ \ \ print\_hex(seckey,\ \textcolor{keyword}{sizeof}(seckey));}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00118}00118\ \ \ \ \ printf(\textcolor{stringliteral}{"{}Public\ Key:\ "{}});}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00119}00119\ \ \ \ \ print\_hex(compressed\_pubkey,\ \textcolor{keyword}{sizeof}(compressed\_pubkey));}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00120}00120\ \ \ \ \ printf(\textcolor{stringliteral}{"{}Signature:\ "{}});}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00121}00121\ \ \ \ \ print\_hex(serialized\_signature,\ \textcolor{keyword}{sizeof}(serialized\_signature));}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00122}00122\ }
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00123}00123\ }
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00124}00124\ \ \ \ \ \textcolor{comment}{/*\ This\ will\ clear\ everything\ from\ the\ context\ and\ free\ the\ memory\ */}}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00125}00125\ \ \ \ \ \mbox{\hyperlink{secp256k1_8h_a026db914e3723531825ecf25a0cbd699}{secp256k1\_context\_destroy}}(ctx);}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00126}00126\ }
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00127}00127\ \ \ \ \ \textcolor{comment}{/*\ It's\ best\ practice\ to\ try\ to\ clear\ secrets\ from\ memory\ after\ using\ them.}}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00128}00128\ \textcolor{comment}{\ \ \ \ \ *\ This\ is\ done\ because\ some\ bugs\ can\ allow\ an\ attacker\ to\ leak\ memory,\ for}}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00129}00129\ \textcolor{comment}{\ \ \ \ \ *\ example\ through\ "{}out\ of\ bounds"{}\ array\ access\ (see\ Heartbleed),\ Or\ the\ OS}}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00130}00130\ \textcolor{comment}{\ \ \ \ \ *\ swapping\ them\ to\ disk.\ Hence,\ we\ overwrite\ the\ secret\ key\ buffer\ with\ zeros.}}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00131}00131\ \textcolor{comment}{\ \ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00132}00132\ \textcolor{comment}{\ \ \ \ \ *\ TODO:\ Prevent\ these\ writes\ from\ being\ optimized\ out,\ as\ any\ good\ compiler}}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00133}00133\ \textcolor{comment}{\ \ \ \ \ *\ will\ remove\ any\ writes\ that\ aren't\ used.\ */}}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00134}00134\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(seckey,\ 0,\ \textcolor{keyword}{sizeof}(seckey));}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00135}00135\ }
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00136}00136\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{ecdsa_8c_source_l00137}00137\ \}}
+
+\end{DoxyCode}

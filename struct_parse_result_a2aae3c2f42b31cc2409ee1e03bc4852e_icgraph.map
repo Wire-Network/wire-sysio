@@ -1,0 +1,34 @@
+<map id="ParseResult::Code" name="ParseResult::Code">
+<area shape="rect" id="Node000001" title="Get the error code." alt="" coords="515,217,648,243"/>
+<area shape="rect" id="Node000002" href="$class_generic_document.html#a9400a5bd3169cc6ed545e681ccc06070" title="Get the ParseErrorCode of last parsing." alt="" coords="258,10,447,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="562,206,521,151,495,121,466,94,434,71,401,53,403,49,437,67,469,89,498,117,525,147,566,203"/>
+<area shape="rect" id="Node000003" href="$documenttest_8cpp.html#a724ac92c78ef829fcd9e0a7dd8ed0105" title=" " alt="" coords="121,5,176,31"/>
+<area shape="poly" id="edge14_Node000001_Node000003" title=" " alt="" coords="538,213,236,65,175,34,178,29,238,60,540,208"/>
+<area shape="rect" id="Node000004" href="$class_generic_reader.html#a937bf90919f50e1c370b312cee5833e8" title="Get the ParseErrorCode of last parsing." alt="" coords="237,192,467,218"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="500,224,467,220,468,215,500,219"/>
+<area shape="rect" id="Node000014" href="$filterkeydom_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97" title=" " alt="" coords="328,241,377,267"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="500,241,377,254,377,249,500,236"/>
+<area shape="rect" id="Node000015" href="$readertest_8cpp.html#a2be15887d12d0e7bb634d6807da64b17" title=" " alt="" coords="324,291,380,316"/>
+<area shape="poly" id="edge15_Node000001_Node000015" title=" " alt="" coords="541,253,468,282,381,302,380,297,467,277,539,248"/>
+<area shape="rect" id="Node000016" href="$unittest_2schematest_8cpp.html#a00d58655bbb7f86b4190665373514c89" title=" " alt="" coords="324,340,380,366"/>
+<area shape="poly" id="edge16_Node000001_Node000016" title=" " alt="" coords="561,257,521,296,496,315,468,331,423,347,380,354,380,348,422,342,466,326,493,311,517,292,557,253"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="242,26,177,22,177,17,242,21"/>
+<area shape="rect" id="Node000005" href="$filterkey_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97" title=" " alt="" coords="124,55,174,80"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="316,186,235,131,187,94,171,83,174,79,191,89,239,127,319,181"/>
+<area shape="rect" id="Node000006" href="$capitalize_8cpp.html#a81ce304348a420752ee080480d2b3095" title=" " alt="" coords="124,104,174,130"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="306,188,173,130,175,125,308,183"/>
+<area shape="rect" id="Node000007" href="$readertest_8cpp.html#a5df37d2665c76b6becee133720872a39" title=" " alt="" coords="121,153,176,179"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="266,191,176,174,177,169,267,186"/>
+<area shape="rect" id="Node000008" href="$readertest_8cpp.html#a6e04bdedbeaf39e022d22054f399af8a" title=" " alt="" coords="121,203,176,228"/>
+<area shape="poly" id="edge7_Node000004_Node000008" title=" " alt="" coords="222,214,177,217,177,211,221,209"/>
+<area shape="rect" id="Node000009" href="$readertest_8cpp.html#a4ed130c1c10e5e9c32bb00ca9fb715ce" title=" " alt="" coords="121,252,176,278"/>
+<area shape="poly" id="edge8_Node000004_Node000009" title=" " alt="" coords="263,224,238,231,178,255,176,250,236,226,262,219"/>
+<area shape="rect" id="Node000010" href="$readertest_8cpp.html#aae5733e8671508fb38ac9e90911e1be7" title=" " alt="" coords="121,301,176,327"/>
+<area shape="poly" id="edge9_Node000004_Node000010" title=" " alt="" coords="247,226,239,231,223,245,214,259,205,275,191,292,177,303,173,299,187,288,201,272,209,256,219,241,235,227,244,222"/>
+<area shape="rect" id="Node000011" href="$readertest_8cpp.html#a287de0c3676e77b625b3984de3c8018d" title=" " alt="" coords="121,351,176,376"/>
+<area shape="poly" id="edge10_Node000004_Node000011" title=" " alt="" coords="243,228,239,231,227,243,219,256,213,282,208,311,202,326,191,341,179,352,175,348,187,338,197,323,203,309,208,281,214,254,222,240,235,227,239,224"/>
+<area shape="rect" id="Node000012" href="$readertest_8cpp.html#aecbde81eaceef1ab965fbccc9c6a2cc1" title=" " alt="" coords="109,400,189,426"/>
+<area shape="poly" id="edge11_Node000004_Node000012" title=" " alt="" coords="241,229,239,231,223,249,215,267,212,306,211,346,204,368,191,391,180,401,176,397,187,387,199,366,205,346,207,305,210,266,219,246,235,227,237,225"/>
+<area shape="rect" id="Node000013" href="$readertest_8cpp.html#abd8b31cbdcf64777f9389eb782096914" title=" " alt="" coords="5,400,61,426"/>
+<area shape="poly" id="edge12_Node000012_Node000013" title=" " alt="" coords="94,416,61,416,61,410,94,410"/>
+</map>

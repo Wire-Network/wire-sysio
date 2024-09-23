@@ -1,0 +1,104 @@
+\doxysection{libraries/fc/libraries/ff/libff/algebra/curves/mnt/mnt4/mnt4\+\_\+init.hpp File Reference}
+\hypertarget{mnt4__init_8hpp}{}\label{mnt4__init_8hpp}\index{libraries/fc/libraries/ff/libff/algebra/curves/mnt/mnt4/mnt4\_init.hpp@{libraries/fc/libraries/ff/libff/algebra/curves/mnt/mnt4/mnt4\_init.hpp}}
+{\ttfamily \#include $<$libff/algebra/curves/mnt/mnt46\+\_\+common.\+hpp$>$}\newline
+{\ttfamily \#include $<$libff/algebra/curves/public\+\_\+params.\+hpp$>$}\newline
+{\ttfamily \#include $<$libff/algebra/fields/fp.\+hpp$>$}\newline
+{\ttfamily \#include $<$libff/algebra/fields/fp2.\+hpp$>$}\newline
+{\ttfamily \#include $<$libff/algebra/fields/fp4.\+hpp$>$}\newline
+Include dependency graph for mnt4\+\_\+init.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{mnt4__init_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{mnt4__init_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacelibff}{libff}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{mnt4__init_8hpp_ac267217facf8578800da1358562687a6}{mnt4\+\_\+modulus\+\_\+r}}~mnt46\+\_\+modulus\+\_\+A
+\item 
+\#define \mbox{\hyperlink{mnt4__init_8hpp_aa4f3930304b6bfcc3849a36c835e18a1}{mnt4\+\_\+modulus\+\_\+q}}~mnt46\+\_\+modulus\+\_\+B
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}}$<$ \mbox{\hyperlink{namespacelibff_afee6cefe6339eb54823c8232328ce915}{mnt4\+\_\+r\+\_\+limbs}}, \mbox{\hyperlink{namespacelibff_a6935c30a3e73441cec511cc7d2ef1de7}{mnt4\+\_\+modulus\+\_\+r}} $>$ \mbox{\hyperlink{namespacelibff_acb06a59452ad852e91aab16188c4a869}{libff\+::mnt4\+\_\+\+Fr}}
+\item 
+typedef \mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}}$<$ \mbox{\hyperlink{namespacelibff_a3995c79e41b7c7545a1d71086cb17990}{mnt4\+\_\+q\+\_\+limbs}}, \mbox{\hyperlink{namespacelibff_a18dd2948ab9acb33a6543b99786bd1a2}{mnt4\+\_\+modulus\+\_\+q}} $>$ \mbox{\hyperlink{namespacelibff_a154a17eb594eb795e7a034ccfd2e397a}{libff\+::mnt4\+\_\+\+Fq}}
+\item 
+typedef \mbox{\hyperlink{classlibff_1_1_fp2__model}{Fp2\+\_\+model}}$<$ \mbox{\hyperlink{namespacelibff_a3995c79e41b7c7545a1d71086cb17990}{mnt4\+\_\+q\+\_\+limbs}}, \mbox{\hyperlink{namespacelibff_a18dd2948ab9acb33a6543b99786bd1a2}{mnt4\+\_\+modulus\+\_\+q}} $>$ \mbox{\hyperlink{namespacelibff_ad38f36eb4d1adc0b1205acb4fb00cef6}{libff\+::mnt4\+\_\+\+Fq2}}
+\item 
+typedef \mbox{\hyperlink{classlibff_1_1_fp4__model}{Fp4\+\_\+model}}$<$ \mbox{\hyperlink{namespacelibff_a3995c79e41b7c7545a1d71086cb17990}{mnt4\+\_\+q\+\_\+limbs}}, \mbox{\hyperlink{namespacelibff_a18dd2948ab9acb33a6543b99786bd1a2}{mnt4\+\_\+modulus\+\_\+q}} $>$ \mbox{\hyperlink{namespacelibff_a3a92b490839b94a3ff13b10e3205bcab}{libff\+::mnt4\+\_\+\+Fq4}}
+\item 
+typedef \mbox{\hyperlink{namespacelibff_a3a92b490839b94a3ff13b10e3205bcab}{mnt4\+\_\+\+Fq4}} \mbox{\hyperlink{namespacelibff_a22f0adfc36d976822d3c1c79c02d1d55}{libff\+::mnt4\+\_\+\+GT}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{namespacelibff_a418fc2dba8fb78bcd6522010f31cb5fd}{libff\+::init\+\_\+mnt4\+\_\+params}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+const mp\+\_\+size\+\_\+t \mbox{\hyperlink{namespacelibff_ad71e5c2bd60455387d323f847b1a652d}{libff\+::mnt4\+\_\+r\+\_\+bitcount}} = \mbox{\hyperlink{namespacelibff_aa2953c5eab167d60a11456440ae802df}{mnt46\+\_\+\+A\+\_\+bitcount}}
+\item 
+const mp\+\_\+size\+\_\+t \mbox{\hyperlink{namespacelibff_a8ecd563e91e0c148aaff1ac474345f87}{libff\+::mnt4\+\_\+q\+\_\+bitcount}} = \mbox{\hyperlink{namespacelibff_a4dcac82e16e879f09821463c88ce9867}{mnt46\+\_\+\+B\+\_\+bitcount}}
+\item 
+const mp\+\_\+size\+\_\+t \mbox{\hyperlink{namespacelibff_afee6cefe6339eb54823c8232328ce915}{libff\+::mnt4\+\_\+r\+\_\+limbs}} = \mbox{\hyperlink{namespacelibff_a5c9daf492971fd861a17bd0719efc7c7}{mnt46\+\_\+\+A\+\_\+limbs}}
+\item 
+const mp\+\_\+size\+\_\+t \mbox{\hyperlink{namespacelibff_a3995c79e41b7c7545a1d71086cb17990}{libff\+::mnt4\+\_\+q\+\_\+limbs}} = \mbox{\hyperlink{namespacelibff_ab1c78d21e299b6d4cfc20c1737f0c103}{mnt46\+\_\+\+B\+\_\+limbs}}
+\item 
+\mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ \mbox{\hyperlink{namespacelibff_afee6cefe6339eb54823c8232328ce915}{mnt4\+\_\+r\+\_\+limbs}} $>$ \mbox{\hyperlink{namespacelibff_a6935c30a3e73441cec511cc7d2ef1de7}{libff\+::mnt4\+\_\+modulus\+\_\+r}}
+\item 
+\mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ \mbox{\hyperlink{namespacelibff_a3995c79e41b7c7545a1d71086cb17990}{mnt4\+\_\+q\+\_\+limbs}} $>$ \mbox{\hyperlink{namespacelibff_a18dd2948ab9acb33a6543b99786bd1a2}{libff\+::mnt4\+\_\+modulus\+\_\+q}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Declaration of interfaces for initializing MNT4.
+
+\begin{DoxyAuthor}{Author}
+This file is part of libff, developed by SCIPR Lab and contributors (see AUTHORS). 
+\end{DoxyAuthor}
+\begin{DoxyCopyright}{Copyright}
+MIT license (see LICENSE file) 
+\end{DoxyCopyright}
+
+
+Definition in file \mbox{\hyperlink{mnt4__init_8hpp_source}{mnt4\+\_\+init.\+hpp}}.
+
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{mnt4__init_8hpp_aa4f3930304b6bfcc3849a36c835e18a1}\index{mnt4\_init.hpp@{mnt4\_init.hpp}!mnt4\_modulus\_q@{mnt4\_modulus\_q}}
+\index{mnt4\_modulus\_q@{mnt4\_modulus\_q}!mnt4\_init.hpp@{mnt4\_init.hpp}}
+\doxysubsubsection{\texorpdfstring{mnt4\_modulus\_q}{mnt4\_modulus\_q}}
+{\footnotesize\ttfamily \label{mnt4__init_8hpp_aa4f3930304b6bfcc3849a36c835e18a1} 
+\#define mnt4\+\_\+modulus\+\_\+q~mnt46\+\_\+modulus\+\_\+B}
+
+
+
+Definition at line \mbox{\hyperlink{mnt4__init_8hpp_source_l00024}{24}} of file \mbox{\hyperlink{mnt4__init_8hpp_source}{mnt4\+\_\+init.\+hpp}}.
+
+\Hypertarget{mnt4__init_8hpp_ac267217facf8578800da1358562687a6}\index{mnt4\_init.hpp@{mnt4\_init.hpp}!mnt4\_modulus\_r@{mnt4\_modulus\_r}}
+\index{mnt4\_modulus\_r@{mnt4\_modulus\_r}!mnt4\_init.hpp@{mnt4\_init.hpp}}
+\doxysubsubsection{\texorpdfstring{mnt4\_modulus\_r}{mnt4\_modulus\_r}}
+{\footnotesize\ttfamily \label{mnt4__init_8hpp_ac267217facf8578800da1358562687a6} 
+\#define mnt4\+\_\+modulus\+\_\+r~mnt46\+\_\+modulus\+\_\+A}
+
+
+
+Definition at line \mbox{\hyperlink{mnt4__init_8hpp_source_l00023}{23}} of file \mbox{\hyperlink{mnt4__init_8hpp_source}{mnt4\+\_\+init.\+hpp}}.
+

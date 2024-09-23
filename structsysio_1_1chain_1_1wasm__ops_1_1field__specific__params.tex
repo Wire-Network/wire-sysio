@@ -1,0 +1,114 @@
+\doxysection{sysio\+::chain\+::wasm\+\_\+ops\+::field\+\_\+specific\+\_\+params\texorpdfstring{$<$}{<} Field \texorpdfstring{$>$}{>} Struct Template Reference}
+\hypertarget{structsysio_1_1chain_1_1wasm__ops_1_1field__specific__params}{}\label{structsysio_1_1chain_1_1wasm__ops_1_1field__specific__params}\index{sysio::chain::wasm\_ops::field\_specific\_params$<$ Field $>$@{sysio::chain::wasm\_ops::field\_specific\_params$<$ Field $>$}}
+
+
+{\ttfamily \#include $<$wasm\+\_\+sysio\+\_\+binary\+\_\+ops.\+hpp$>$}
+
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static auto \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1field__specific__params_a36f98722439cc9c1404d1c6e2d6d09f1}{unpack}} (char \texorpdfstring{$\ast$}{*}opcode, Field \&\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})
+\item 
+static void \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1field__specific__params_a339299c3f46966941dbe52e59db41ba3}{pack}} (\mbox{\hyperlink{classsysio_1_1chain_1_1wasm__ops_1_1instruction__stream}{instruction\+\_\+stream}} \texorpdfstring{$\ast$}{*}stream, Field \&\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})
+\item 
+static auto \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1field__specific__params_a4c3d6ee424cc3b0b3a8c206cdd3d9b69}{to\+\_\+string}} (Field \&\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static constexpr int \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1field__specific__params_af84f8f8ec35adb716f4167467cb3d386}{skip\+\_\+ahead}} = \mbox{\hyperlink{yubihsm__pkcs11_8c_af82555d15fc1c126f72a5c0566b5389a}{sizeof}}(\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}}) + \mbox{\hyperlink{yubihsm__pkcs11_8c_af82555d15fc1c126f72a5c0566b5389a}{sizeof}}(Field)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Field$>$\newline
+struct sysio\+::chain\+::wasm\+\_\+ops\+::field\+\_\+specific\+\_\+params$<$ Field $>$}
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_source_l00136}{136}} of file \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_source}{wasm\+\_\+sysio\+\_\+binary\+\_\+ops.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1chain_1_1wasm__ops_1_1field__specific__params_a339299c3f46966941dbe52e59db41ba3}\index{sysio::chain::wasm\_ops::field\_specific\_params$<$ Field $>$@{sysio::chain::wasm\_ops::field\_specific\_params$<$ Field $>$}!pack@{pack}}
+\index{pack@{pack}!sysio::chain::wasm\_ops::field\_specific\_params$<$ Field $>$@{sysio::chain::wasm\_ops::field\_specific\_params$<$ Field $>$}}
+\doxysubsubsection{\texorpdfstring{pack()}{pack()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__ops_1_1field__specific__params_a339299c3f46966941dbe52e59db41ba3} 
+template$<$typename Field $>$ \\
+static void \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1field__specific__params}{sysio\+::chain\+::wasm\+\_\+ops\+::field\+\_\+specific\+\_\+params}}$<$ Field $>$\+::pack (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classsysio_1_1chain_1_1wasm__ops_1_1instruction__stream}{instruction\+\_\+stream}} \texorpdfstring{$\ast$}{*}}]{stream}{, }\item[{Field \&}]{f}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_source_l00139}{139}} of file \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_source}{wasm\+\_\+sysio\+\_\+binary\+\_\+ops.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00139\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_a2037777efc75e528d703850afeff8cd4}{sysio::chain::wasm\_ops::pack}}(stream,\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}});\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=318pt]{structsysio_1_1chain_1_1wasm__ops_1_1field__specific__params_a339299c3f46966941dbe52e59db41ba3_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1wasm__ops_1_1field__specific__params_a4c3d6ee424cc3b0b3a8c206cdd3d9b69}\index{sysio::chain::wasm\_ops::field\_specific\_params$<$ Field $>$@{sysio::chain::wasm\_ops::field\_specific\_params$<$ Field $>$}!to\_string@{to\_string}}
+\index{to\_string@{to\_string}!sysio::chain::wasm\_ops::field\_specific\_params$<$ Field $>$@{sysio::chain::wasm\_ops::field\_specific\_params$<$ Field $>$}}
+\doxysubsubsection{\texorpdfstring{to\_string()}{to\_string()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__ops_1_1field__specific__params_a4c3d6ee424cc3b0b3a8c206cdd3d9b69} 
+template$<$typename Field $>$ \\
+static auto \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1field__specific__params}{sysio\+::chain\+::wasm\+\_\+ops\+::field\+\_\+specific\+\_\+params}}$<$ Field $>$\+::to\+\_\+string (\begin{DoxyParamCaption}\item[{Field \&}]{f}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_source_l00140}{140}} of file \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_source}{wasm\+\_\+sysio\+\_\+binary\+\_\+ops.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ \textcolor{keywordflow}{return}\ std::string(\textcolor{stringliteral}{"{}\ "{}})+}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_a7f5043d86d9d203459eb0c8e4071e9d8}{sysio::chain::wasm\_ops::to\_string}}(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}});\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=318pt]{structsysio_1_1chain_1_1wasm__ops_1_1field__specific__params_a4c3d6ee424cc3b0b3a8c206cdd3d9b69_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1wasm__ops_1_1field__specific__params_a36f98722439cc9c1404d1c6e2d6d09f1}\index{sysio::chain::wasm\_ops::field\_specific\_params$<$ Field $>$@{sysio::chain::wasm\_ops::field\_specific\_params$<$ Field $>$}!unpack@{unpack}}
+\index{unpack@{unpack}!sysio::chain::wasm\_ops::field\_specific\_params$<$ Field $>$@{sysio::chain::wasm\_ops::field\_specific\_params$<$ Field $>$}}
+\doxysubsubsection{\texorpdfstring{unpack()}{unpack()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__ops_1_1field__specific__params_a36f98722439cc9c1404d1c6e2d6d09f1} 
+template$<$typename Field $>$ \\
+static auto \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1field__specific__params}{sysio\+::chain\+::wasm\+\_\+ops\+::field\+\_\+specific\+\_\+params}}$<$ Field $>$\+::unpack (\begin{DoxyParamCaption}\item[{char \texorpdfstring{$\ast$}{*}}]{opcode}{, }\item[{Field \&}]{f}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_source_l00138}{138}} of file \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_source}{wasm\+\_\+sysio\+\_\+binary\+\_\+ops.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00138\ \{\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}\ =\ *\textcolor{keyword}{reinterpret\_cast<}Field*\textcolor{keyword}{>}(\mbox{\hyperlink{namespacesysio_1_1vm_af1bb7d8ae2889df51b65eaef31f1ea74}{opcode}});\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1chain_1_1wasm__ops_1_1field__specific__params_af84f8f8ec35adb716f4167467cb3d386}\index{sysio::chain::wasm\_ops::field\_specific\_params$<$ Field $>$@{sysio::chain::wasm\_ops::field\_specific\_params$<$ Field $>$}!skip\_ahead@{skip\_ahead}}
+\index{skip\_ahead@{skip\_ahead}!sysio::chain::wasm\_ops::field\_specific\_params$<$ Field $>$@{sysio::chain::wasm\_ops::field\_specific\_params$<$ Field $>$}}
+\doxysubsubsection{\texorpdfstring{skip\_ahead}{skip\_ahead}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__ops_1_1field__specific__params_af84f8f8ec35adb716f4167467cb3d386} 
+template$<$typename Field $>$ \\
+int \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1field__specific__params}{sysio\+::chain\+::wasm\+\_\+ops\+::field\+\_\+specific\+\_\+params}}$<$ Field $>$\+::skip\+\_\+ahead = \mbox{\hyperlink{yubihsm__pkcs11_8c_af82555d15fc1c126f72a5c0566b5389a}{sizeof}}(\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}}) + \mbox{\hyperlink{yubihsm__pkcs11_8c_af82555d15fc1c126f72a5c0566b5389a}{sizeof}}(Field)\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_source_l00137}{137}} of file \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_source}{wasm\+\_\+sysio\+\_\+binary\+\_\+ops.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{wasm__sysio__binary__ops_8hpp}{wasm\+\_\+sysio\+\_\+binary\+\_\+ops.\+hpp}}\end{DoxyCompactItemize}

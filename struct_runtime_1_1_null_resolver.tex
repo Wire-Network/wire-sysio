@@ -1,0 +1,66 @@
+\doxysection{Runtime\+::Null\+Resolver Struct Reference}
+\hypertarget{struct_runtime_1_1_null_resolver}{}\label{struct_runtime_1_1_null_resolver}\index{Runtime::NullResolver@{Runtime::NullResolver}}
+
+
+{\ttfamily \#include $<$Linker.\+h$>$}
+
+
+
+Inheritance diagram for Runtime\+::Null\+Resolver\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=195pt]{struct_runtime_1_1_null_resolver__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Runtime\+::Null\+Resolver\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=195pt]{struct_runtime_1_1_null_resolver__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{struct_runtime_1_1_null_resolver_a2a6e6891570ac79ad660c78e7b8ea042}{resolve}} (const std\+::string \&module\+Name, const std\+::string \&export\+Name, \mbox{\hyperlink{struct_i_r_1_1_object_type}{IR\+::\+Object\+Type}} type, \mbox{\hyperlink{struct_runtime_1_1_object_instance}{Runtime\+::\+Object\+Instance}} \texorpdfstring{$\ast$}{*}\&out\+Object) override
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{struct_runtime_1_1_resolver}{Runtime\+::\+Resolver}}}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{_linker_8h_source_l00053}{53}} of file \mbox{\hyperlink{_linker_8h_source}{Linker.\+h}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_runtime_1_1_null_resolver_a2a6e6891570ac79ad660c78e7b8ea042}\index{Runtime::NullResolver@{Runtime::NullResolver}!resolve@{resolve}}
+\index{resolve@{resolve}!Runtime::NullResolver@{Runtime::NullResolver}}
+\doxysubsubsection{\texorpdfstring{resolve()}{resolve()}}
+{\footnotesize\ttfamily \label{struct_runtime_1_1_null_resolver_a2a6e6891570ac79ad660c78e7b8ea042} 
+bool Runtime\+::\+Null\+Resolver\+::resolve (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{module\+Name}{, }\item[{const std\+::string \&}]{export\+Name}{, }\item[{\mbox{\hyperlink{struct_i_r_1_1_object_type}{IR\+::\+Object\+Type}}}]{type}{, }\item[{\mbox{\hyperlink{struct_runtime_1_1_object_instance}{Runtime\+::\+Object\+Instance}} \texorpdfstring{$\ast$}{*}\&}]{out\+Object}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_runtime_1_1_resolver_a8387253cf2addc917647cba230a00334}{Runtime\+::\+Resolver}}.
+
+
+
+Definition at line \mbox{\hyperlink{_linker_8h_source_l00055}{55}} of file \mbox{\hyperlink{_linker_8h_source}{Linker.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/wasm-\/jit/\+Include/\+Runtime/\mbox{\hyperlink{_linker_8h}{Linker.\+h}}\end{DoxyCompactItemize}

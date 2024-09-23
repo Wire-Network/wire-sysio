@@ -1,0 +1,98 @@
+\doxysection{platform\+\_\+timer\+\_\+asio\+\_\+fallback.\+cpp}
+\hypertarget{platform__timer__asio__fallback_8cpp_source}{}\label{platform__timer__asio__fallback_8cpp_source}\index{libraries/chain/platform\_timer\_asio\_fallback.cpp@{libraries/chain/platform\_timer\_asio\_fallback.cpp}}
+\mbox{\hyperlink{platform__timer__asio__fallback_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{platform__timer_8hpp}{sysio/chain/platform\_timer.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{platform__timer__accuracy_8hpp}{sysio/chain/platform\_timer\_accuracy.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{fwd__impl_8hpp}{fc/fwd\_impl.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{logger__config_8hpp}{fc/log/logger\_config.hpp}}>}\ \textcolor{comment}{//set\_os\_thread\_name()}}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <boost/asio.hpp>}}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ <mutex>}}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <thread>}}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00012}00012\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{\ \textcolor{keyword}{namespace\ }chain\ \{}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00014}00014\ \textcolor{comment}{//a\ thread\ is\ shared\ for\ all\ instances}}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00015}00015\ \textcolor{keyword}{static}\ std::mutex\ timer\_ref\_mutex;}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00016}00016\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{unsigned}\ refcount;}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00017}00017\ \textcolor{keyword}{static}\ std::thread\ checktime\_thread;}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00018}00018\ \textcolor{keyword}{static}\ std::unique\_ptr<boost::asio::io\_service>\ checktime\_ios;}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00020}00020\ \textcolor{keyword}{struct\ }platform\_timer::impl\ \{}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00021}\mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_1_1impl_afa759b0d1dcbb82167c4bea0cfe192c4}{00021}}\ \ \ \ std::unique\_ptr<boost::asio::high\_resolution\_timer>\ \mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_1_1impl_afa759b0d1dcbb82167c4bea0cfe192c4}{timer}};}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00022}00022\ \};}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00024}\mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_a73955c69921017b77b595476e8de4eea}{00024}}\ \mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_a73955c69921017b77b595476e8de4eea}{platform\_timer::platform\_timer}}()\ \{}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00025}00025\ \ \ \ \textcolor{keyword}{static\_assert}(\textcolor{keyword}{sizeof}(\mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_1_1impl}{impl}})\ <=\ fwd\_size);}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00027}00027\ \ \ \ std::lock\_guard\ guard(timer\_ref\_mutex);}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00029}00029\ \ \ \ \textcolor{keywordflow}{if}(refcount++\ ==\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00030}00030\ \ \ \ \ \ \ std::promise<void>\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}};}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00031}00031\ \ \ \ \ \ \ checktime\_thread\ =\ std::thread([\&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}]()\ \{}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00032}00032\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_ab58a7f71e88d7d4d5761bbd24837c595}{fc::set\_os\_thread\_name}}(\textcolor{stringliteral}{"{}checktime"{}});}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00033}00033\ \ \ \ \ \ \ \ \ \ checktime\_ios\ =\ std::make\_unique<boost::asio::io\_service>();}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00034}00034\ \ \ \ \ \ \ \ \ \ boost::asio::io\_service::work\ work(*checktime\_ios);}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00035}00035\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.set\_value();}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00037}00037\ \ \ \ \ \ \ \ \ \ checktime\_ios-\/>run();}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00038}00038\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00039}00039\ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.get\_future().get();}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00040}00040\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00042}00042\ \ \ \ my-\/>timer\ =\ std::make\_unique<boost::asio::high\_resolution\_timer>(*checktime\_ios);}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00044}00044\ \ \ \ \textcolor{comment}{//compute\_and\_print\_timer\_accuracy(*this);}}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00045}00045\ \}}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00047}\mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_ab241e03e3055f290f13d6b367d8447b7}{00047}}\ \mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_ab241e03e3055f290f13d6b367d8447b7}{platform\_timer::\string~platform\_timer}}()\ \{}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00048}00048\ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_a5cb70a095755d00bf02d37d31b6e46af}{stop}}();}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00049}00049\ \ \ \ \textcolor{keywordflow}{if}(std::lock\_guard\ guard(timer\_ref\_mutex);\ -\/-\/refcount\ ==\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00050}00050\ \ \ \ \ \ \ checktime\_ios-\/>stop();}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00051}00051\ \ \ \ \ \ \ checktime\_thread.join();}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00052}00052\ \ \ \ \ \ \ checktime\_ios.reset();}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00053}00053\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00054}00054\ \}}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00056}\mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_a8396e86c6a626dd2632cb075bd254ad4}{00056}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_a8396e86c6a626dd2632cb075bd254ad4}{platform\_timer::start}}(\mbox{\hyperlink{classfc_1_1time__point}{fc::time\_point}}\ tp)\ \{}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00057}00057\ \ \ \ \textcolor{keywordflow}{if}(tp\ ==\ \mbox{\hyperlink{classfc_1_1time__point_aeccf1b70aa34b132c5269313b8a50573}{fc::time\_point::maximum}}())\ \{}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00058}00058\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_a801fb6084f296f86fdc1dedd980ac643}{expired}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00059}00059\ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00060}00060\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00061}00061\ \ \ \ \mbox{\hyperlink{classfc_1_1microseconds}{fc::microseconds}}\ x\ =\ tp.\mbox{\hyperlink{classfc_1_1time__point_abfea5efbe9ef58024cda814395ee9945}{time\_since\_epoch}}()\ -\/\ \mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{fc::time\_point::now}}().\mbox{\hyperlink{classfc_1_1time__point_abfea5efbe9ef58024cda814395ee9945}{time\_since\_epoch}}();}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00062}00062\ \ \ \ \textcolor{keywordflow}{if}(x.\mbox{\hyperlink{classfc_1_1microseconds_a20fba59ec7e1f50c6b8f2c9443cc9b92}{count}}()\ <=\ 0)}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00063}00063\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_a801fb6084f296f86fdc1dedd980ac643}{expired}}\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00064}00064\ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00065}00065\ \textcolor{preprocessor}{\#if\ 0}}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00066}00066\ \ \ \ \ \ \ std::promise<void>\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}};}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00067}00067\ \ \ \ \ \ \ checktime\_ios-\/>post([\&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\textcolor{keyword}{this}]()\ \{}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_a801fb6084f296f86fdc1dedd980ac643}{expired}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.set\_value();}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00070}00070\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00071}00071\ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.get\_future().get();}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00072}00072\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00073}00073\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_a801fb6084f296f86fdc1dedd980ac643}{expired}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00074}00074\ \ \ \ \ \ \ my-\/>timer-\/>expires\_after(std::chrono::microseconds(x.\mbox{\hyperlink{classfc_1_1microseconds_a20fba59ec7e1f50c6b8f2c9443cc9b92}{count}}()));}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00075}00075\ \ \ \ \ \ \ my-\/>timer-\/>async\_wait([\textcolor{keyword}{this}](\textcolor{keyword}{const}\ boost::system::error\_code\&\ ec)\ \{}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(ec)}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00078}00078\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_a801fb6084f296f86fdc1dedd980ac643}{expired}}\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00079}00079\ \ \ \ \ \ \ \ \ \ call\_expiration\_callback();}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00080}00080\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00081}00081\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00082}00082\ \}}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00083}00083\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00084}\mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_a5cb70a095755d00bf02d37d31b6e46af}{00084}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_a5cb70a095755d00bf02d37d31b6e46af}{platform\_timer::stop}}()\ \{}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00085}00085\ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_a801fb6084f296f86fdc1dedd980ac643}{expired}})}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00086}00086\ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00087}00087\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00088}00088\ \ \ \ my-\/>timer-\/>cancel();}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00089}00089\ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_a801fb6084f296f86fdc1dedd980ac643}{expired}}\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00090}00090\ \}}
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00091}00091\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__asio__fallback_8cpp_source_l00092}00092\ \}\}}
+
+\end{DoxyCode}

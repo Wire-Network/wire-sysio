@@ -1,0 +1,19 @@
+<map id="libraries/yubihsm/ykyh/ykyh.h" name="libraries/yubihsm/ykyh/ykyh.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="350,5,501,46"/>
+<area shape="rect" id="Node000002" href="$yubihsm-shell_8h.html" title=" " alt="" coords="88,94,229,135"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="351,54,220,96,218,91,349,49"/>
+<area shape="rect" id="Node000006" href="$yhauth_2main_8c.html" title=" " alt="" coords="254,94,416,135"/>
+<area shape="poly" id="edge7_Node000001_Node000006" title=" " alt="" coords="396,59,357,95,353,92,392,55"/>
+<area shape="rect" id="Node000007" href="$ykyh_2error_8c.html" title=" " alt="" coords="440,94,592,135"/>
+<area shape="poly" id="edge8_Node000001_Node000007" title=" " alt="" coords="458,55,497,92,494,95,455,59"/>
+<area shape="rect" id="Node000008" href="$ykyh_8c.html" title=" " alt="" coords="616,94,768,135"/>
+<area shape="poly" id="edge9_Node000001_Node000008" title=" " alt="" coords="501,49,632,91,631,96,500,54"/>
+<area shape="rect" id="Node000003" href="$commands_8c.html" title=" " alt="" coords="5,271,147,312"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="111,146,93,163,78,184,72,206,70,229,74,271,69,271,64,229,66,205,74,182,89,160,108,142"/>
+<area shape="rect" id="Node000004" href="$commands_8h.html" title=" " alt="" coords="88,183,229,223"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="161,150,161,182,156,182,156,150"/>
+<area shape="rect" id="Node000005" href="$src_2main_8c.html" title=" " alt="" coords="183,271,324,312"/>
+<area shape="poly" id="edge6_Node000002_Node000005" title=" " alt="" coords="208,142,228,160,244,181,253,204,257,228,258,271,253,271,252,229,248,206,239,184,224,163,205,146"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="131,237,97,273,93,269,127,233"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="193,232,234,269,230,273,190,236"/>
+</map>

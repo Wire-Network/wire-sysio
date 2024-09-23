@@ -1,0 +1,495 @@
+\doxysection{libraries/fc/secp256k1/secp256k1/src/scalar\+\_\+8x32\+\_\+impl.h File Reference}
+\hypertarget{scalar__8x32__impl_8h}{}\label{scalar__8x32__impl_8h}\index{libraries/fc/secp256k1/secp256k1/src/scalar\_8x32\_impl.h@{libraries/fc/secp256k1/secp256k1/src/scalar\_8x32\_impl.h}}
+{\ttfamily \#include "{}modinv32\+\_\+impl.\+h"{}}\newline
+Include dependency graph for scalar\+\_\+8x32\+\_\+impl.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=295pt]{scalar__8x32__impl_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{scalar__8x32__impl_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{scalar__8x32__impl_8h_a9e65a0592c11e099de8e8f58b38a14ae}{SECP256\+K1\+\_\+\+N\+\_\+0}}~((\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}})0x\+D0364141\+UL)
+\item 
+\#define \mbox{\hyperlink{scalar__8x32__impl_8h_a53cc412ecd7e47061b65c0ff5c6db4e2}{SECP256\+K1\+\_\+\+N\+\_\+1}}~((\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}})0x\+BFD25\+E8\+CUL)
+\item 
+\#define \mbox{\hyperlink{scalar__8x32__impl_8h_a5cfbef70d2cba970443032a43450d0b3}{SECP256\+K1\+\_\+\+N\+\_\+2}}~((\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}})0x\+AF48\+A03\+BUL)
+\item 
+\#define \mbox{\hyperlink{scalar__8x32__impl_8h_a1d38f968c428d48fe1041ef38eec96d4}{SECP256\+K1\+\_\+\+N\+\_\+3}}~((\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}})0x\+BAAEDCE6\+UL)
+\item 
+\#define \mbox{\hyperlink{scalar__8x32__impl_8h_af49420627eb89d20a39c6c9ad1abdda1}{SECP256\+K1\+\_\+\+N\+\_\+4}}~((\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}})0x\+FFFFFFFEUL)
+\item 
+\#define \mbox{\hyperlink{scalar__8x32__impl_8h_a1c393acd02b626594cdb245a2baf782d}{SECP256\+K1\+\_\+\+N\+\_\+5}}~((\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}})0x\+FFFFFFFFUL)
+\item 
+\#define \mbox{\hyperlink{scalar__8x32__impl_8h_a2aadbc7f6ecb66c1e9c6e08ac6a362b0}{SECP256\+K1\+\_\+\+N\+\_\+6}}~((\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}})0x\+FFFFFFFFUL)
+\item 
+\#define \mbox{\hyperlink{scalar__8x32__impl_8h_af6d852c6e2a7756ae93262dcd5588b78}{SECP256\+K1\+\_\+\+N\+\_\+7}}~((\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}})0x\+FFFFFFFFUL)
+\item 
+\#define \mbox{\hyperlink{scalar__8x32__impl_8h_a7004f2007d2a43820488d377d7167ece}{SECP256\+K1\+\_\+\+N\+\_\+\+C\+\_\+0}}~(\texorpdfstring{$\sim$}{\string~}\mbox{\hyperlink{scalar__4x64__impl_8h_a9e65a0592c11e099de8e8f58b38a14ae}{SECP256\+K1\+\_\+\+N\+\_\+0}} + 1)
+\item 
+\#define \mbox{\hyperlink{scalar__8x32__impl_8h_a3f8f9c444183fbe3da955925b585290c}{SECP256\+K1\+\_\+\+N\+\_\+\+C\+\_\+1}}~(\texorpdfstring{$\sim$}{\string~}\mbox{\hyperlink{scalar__4x64__impl_8h_a53cc412ecd7e47061b65c0ff5c6db4e2}{SECP256\+K1\+\_\+\+N\+\_\+1}})
+\item 
+\#define \mbox{\hyperlink{scalar__8x32__impl_8h_a2ba4e9e828bc0a11cf7ffc81cd823509}{SECP256\+K1\+\_\+\+N\+\_\+\+C\+\_\+2}}~(\texorpdfstring{$\sim$}{\string~}\mbox{\hyperlink{scalar__4x64__impl_8h_a5cfbef70d2cba970443032a43450d0b3}{SECP256\+K1\+\_\+\+N\+\_\+2}})
+\item 
+\#define \mbox{\hyperlink{scalar__8x32__impl_8h_a82beb160f9d4bae9b4c2615573e08330}{SECP256\+K1\+\_\+\+N\+\_\+\+C\+\_\+3}}~(\texorpdfstring{$\sim$}{\string~}\mbox{\hyperlink{scalar__4x64__impl_8h_a1d38f968c428d48fe1041ef38eec96d4}{SECP256\+K1\+\_\+\+N\+\_\+3}})
+\item 
+\#define \mbox{\hyperlink{scalar__8x32__impl_8h_a1c82df2aab75218ad66f892a4d042501}{SECP256\+K1\+\_\+\+N\+\_\+\+C\+\_\+4}}~(1)
+\item 
+\#define \mbox{\hyperlink{scalar__8x32__impl_8h_a824415debca677af24eb249946df4404}{SECP256\+K1\+\_\+\+N\+\_\+\+H\+\_\+0}}~((\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}})0x681\+B20\+A0\+UL)
+\item 
+\#define \mbox{\hyperlink{scalar__8x32__impl_8h_a93c4692d6cad53df3cce3fb4631dee82}{SECP256\+K1\+\_\+\+N\+\_\+\+H\+\_\+1}}~((\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}})0x\+DFE92\+F46\+UL)
+\item 
+\#define \mbox{\hyperlink{scalar__8x32__impl_8h_a5dfabdaac8359544dd1131ca3af807ae}{SECP256\+K1\+\_\+\+N\+\_\+\+H\+\_\+2}}~((\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}})0x57\+A4501\+DUL)
+\item 
+\#define \mbox{\hyperlink{scalar__8x32__impl_8h_ac658856dbff7e81aca7cdd131c05dde4}{SECP256\+K1\+\_\+\+N\+\_\+\+H\+\_\+3}}~((\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}})0x5\+D576\+E73\+UL)
+\item 
+\#define \mbox{\hyperlink{scalar__8x32__impl_8h_ac989056e75a50d48b62d59f23f672f73}{SECP256\+K1\+\_\+\+N\+\_\+\+H\+\_\+4}}~((\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}})0x\+FFFFFFFFUL)
+\item 
+\#define \mbox{\hyperlink{scalar__8x32__impl_8h_a7f398e7f8481aeaab8ed4ff9dde370cd}{SECP256\+K1\+\_\+\+N\+\_\+\+H\+\_\+5}}~((\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}})0x\+FFFFFFFFUL)
+\item 
+\#define \mbox{\hyperlink{scalar__8x32__impl_8h_a95ba1afafdd6538e951d4034409ec764}{SECP256\+K1\+\_\+\+N\+\_\+\+H\+\_\+6}}~((\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}})0x\+FFFFFFFFUL)
+\item 
+\#define \mbox{\hyperlink{scalar__8x32__impl_8h_aab2e4316a08ed3eaaca42a738c37de75}{SECP256\+K1\+\_\+\+N\+\_\+\+H\+\_\+7}}~((\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}})0x7\+FFFFFFFUL)
+\item 
+\#define \mbox{\hyperlink{scalar__8x32__impl_8h_a7c03352e405b1d65f6afd0b7a0f01730}{muladd}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},  b)
+\item 
+\#define \mbox{\hyperlink{scalar__8x32__impl_8h_adeb6e766b53f39bb9c0c9f6502aa3b62}{muladd\+\_\+fast}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},  b)
+\item 
+\#define \mbox{\hyperlink{scalar__8x32__impl_8h_a833c2f6d148537ff7aac34a668c9a455}{sumadd}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})
+\item 
+\#define \mbox{\hyperlink{scalar__8x32__impl_8h_a4f682f5ec94e74581289057925976d11}{sumadd\+\_\+fast}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})
+\item 
+\#define \mbox{\hyperlink{scalar__8x32__impl_8h_a2384e06d62f7580d7599d3b77b68acbb}{extract}}(n)
+\item 
+\#define \mbox{\hyperlink{scalar__8x32__impl_8h_a7738483bf87a265b882763603d527b3b}{extract\+\_\+fast}}(n)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{scalar__8x32__impl_8h_a2384e06d62f7580d7599d3b77b68acbb}\index{scalar\_8x32\_impl.h@{scalar\_8x32\_impl.h}!extract@{extract}}
+\index{extract@{extract}!scalar\_8x32\_impl.h@{scalar\_8x32\_impl.h}}
+\doxysubsubsection{\texorpdfstring{extract}{extract}}
+{\footnotesize\ttfamily \label{scalar__8x32__impl_8h_a2384e06d62f7580d7599d3b77b68acbb} 
+\#define extract(\begin{DoxyParamCaption}\item[{}]{n}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ (n)\ =\ c0;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ c0\ =\ c1;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ c1\ =\ c2;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ c2\ =\ 0;\ \(\backslash\)}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+Extract the lowest 32 bits of (c0,c1,c2) into n, and left shift the number 32 bits. 
+
+Definition at line \mbox{\hyperlink{scalar__8x32__impl_8h_source_l00314}{314}} of file \mbox{\hyperlink{scalar__8x32__impl_8h_source}{scalar\+\_\+8x32\+\_\+impl.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00314\ \textcolor{preprocessor}{\#define\ extract(n)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00315\ \textcolor{preprocessor}{\ \ \ \ (n)\ =\ c0;\ \(\backslash\)}}
+\DoxyCodeLine{00316\ \textcolor{preprocessor}{\ \ \ \ c0\ =\ c1;\ \(\backslash\)}}
+\DoxyCodeLine{00317\ \textcolor{preprocessor}{\ \ \ \ c1\ =\ c2;\ \(\backslash\)}}
+\DoxyCodeLine{00318\ \textcolor{preprocessor}{\ \ \ \ c2\ =\ 0;\ \(\backslash\)}}
+\DoxyCodeLine{00319\ \textcolor{preprocessor}{\}}}
+
+\end{DoxyCode}
+\Hypertarget{scalar__8x32__impl_8h_a7738483bf87a265b882763603d527b3b}\index{scalar\_8x32\_impl.h@{scalar\_8x32\_impl.h}!extract\_fast@{extract\_fast}}
+\index{extract\_fast@{extract\_fast}!scalar\_8x32\_impl.h@{scalar\_8x32\_impl.h}}
+\doxysubsubsection{\texorpdfstring{extract\_fast}{extract\_fast}}
+{\footnotesize\ttfamily \label{scalar__8x32__impl_8h_a7738483bf87a265b882763603d527b3b} 
+\#define extract\+\_\+fast(\begin{DoxyParamCaption}\item[{}]{n}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ (n)\ =\ c0;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ c0\ =\ c1;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ c1\ =\ 0;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ VERIFY\_CHECK(c2\ ==\ 0);\ \(\backslash\)}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+Extract the lowest 32 bits of (c0,c1,c2) into n, and left shift the number 32 bits. c2 is required to be zero. 
+
+Definition at line \mbox{\hyperlink{scalar__8x32__impl_8h_source_l00322}{322}} of file \mbox{\hyperlink{scalar__8x32__impl_8h_source}{scalar\+\_\+8x32\+\_\+impl.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00322\ \textcolor{preprocessor}{\#define\ extract\_fast(n)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00323\ \textcolor{preprocessor}{\ \ \ \ (n)\ =\ c0;\ \(\backslash\)}}
+\DoxyCodeLine{00324\ \textcolor{preprocessor}{\ \ \ \ c0\ =\ c1;\ \(\backslash\)}}
+\DoxyCodeLine{00325\ \textcolor{preprocessor}{\ \ \ \ c1\ =\ 0;\ \(\backslash\)}}
+\DoxyCodeLine{00326\ \textcolor{preprocessor}{\ \ \ \ VERIFY\_CHECK(c2\ ==\ 0);\ \(\backslash\)}}
+\DoxyCodeLine{00327\ \textcolor{preprocessor}{\}}}
+
+\end{DoxyCode}
+\Hypertarget{scalar__8x32__impl_8h_a7c03352e405b1d65f6afd0b7a0f01730}\index{scalar\_8x32\_impl.h@{scalar\_8x32\_impl.h}!muladd@{muladd}}
+\index{muladd@{muladd}!scalar\_8x32\_impl.h@{scalar\_8x32\_impl.h}}
+\doxysubsubsection{\texorpdfstring{muladd}{muladd}}
+{\footnotesize\ttfamily \label{scalar__8x32__impl_8h_a7c03352e405b1d65f6afd0b7a0f01730} 
+\#define muladd(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}}{, }\item[{}]{b}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ tl,\ th;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ t\ =\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ *\ b;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ th\ =\ t\ >>\ 32;\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ at\ most\ 0xFFFFFFFE\ */}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ tl\ =\ t;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ c0\ +=\ tl;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ overflow\ is\ handled\ on\ the\ next\ line\ */}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ th\ +=\ (c0\ <\ tl);\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ at\ most\ 0xFFFFFFFF\ */}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ c1\ +=\ th;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ overflow\ is\ handled\ on\ the\ next\ line\ */}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ c2\ +=\ (c1\ <\ th);\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ never\ overflows\ by\ contract\ (verified\ in\ the\ next\ line)\ */}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ VERIFY\_CHECK((c1\ >=\ th)\ ||\ (c2\ !=\ 0));\ \(\backslash\)}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+Add a\texorpdfstring{$\ast$}{*}b to the number defined by (c0,c1,c2). c2 must never overflow. 
+
+Definition at line \mbox{\hyperlink{scalar__8x32__impl_8h_source_l00268}{268}} of file \mbox{\hyperlink{scalar__8x32__impl_8h_source}{scalar\+\_\+8x32\+\_\+impl.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00268\ \textcolor{preprocessor}{\#define\ muladd(a,b)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00269\ \textcolor{preprocessor}{\ \ \ \ uint32\_t\ tl,\ th;\ \(\backslash\)}}
+\DoxyCodeLine{00270\ \textcolor{preprocessor}{\ \ \ \ \{\ \(\backslash\)}}
+\DoxyCodeLine{00271\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ uint64\_t\ t\ =\ (uint64\_t)a\ *\ b;\ \(\backslash\)}}
+\DoxyCodeLine{00272\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ th\ =\ t\ >>\ 32;\ \ \ \ \ \ \ \ \ }\textcolor{comment}{/*\ at\ most\ 0xFFFFFFFE\ */}\textcolor{preprocessor}{\ \(\backslash\)}}
+\DoxyCodeLine{00273\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ tl\ =\ t;\ \(\backslash\)}}
+\DoxyCodeLine{00274\ \textcolor{preprocessor}{\ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00275\ \textcolor{preprocessor}{\ \ \ \ c0\ +=\ tl;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }\textcolor{comment}{/*\ overflow\ is\ handled\ on\ the\ next\ line\ */}\textcolor{preprocessor}{\ \(\backslash\)}}
+\DoxyCodeLine{00276\ \textcolor{preprocessor}{\ \ \ \ th\ +=\ (c0\ <\ tl);\ \ \ \ \ \ \ \ \ \ }\textcolor{comment}{/*\ at\ most\ 0xFFFFFFFF\ */}\textcolor{preprocessor}{\ \(\backslash\)}}
+\DoxyCodeLine{00277\ \textcolor{preprocessor}{\ \ \ \ c1\ +=\ th;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }\textcolor{comment}{/*\ overflow\ is\ handled\ on\ the\ next\ line\ */}\textcolor{preprocessor}{\ \(\backslash\)}}
+\DoxyCodeLine{00278\ \textcolor{preprocessor}{\ \ \ \ c2\ +=\ (c1\ <\ th);\ \ \ \ \ \ \ \ \ \ }\textcolor{comment}{/*\ never\ overflows\ by\ contract\ (verified\ in\ the\ next\ line)\ */}\textcolor{preprocessor}{\ \(\backslash\)}}
+\DoxyCodeLine{00279\ \textcolor{preprocessor}{\ \ \ \ VERIFY\_CHECK((c1\ >=\ th)\ ||\ (c2\ !=\ 0));\ \(\backslash\)}}
+\DoxyCodeLine{00280\ \textcolor{preprocessor}{\}}}
+
+\end{DoxyCode}
+\Hypertarget{scalar__8x32__impl_8h_adeb6e766b53f39bb9c0c9f6502aa3b62}\index{scalar\_8x32\_impl.h@{scalar\_8x32\_impl.h}!muladd\_fast@{muladd\_fast}}
+\index{muladd\_fast@{muladd\_fast}!scalar\_8x32\_impl.h@{scalar\_8x32\_impl.h}}
+\doxysubsubsection{\texorpdfstring{muladd\_fast}{muladd\_fast}}
+{\footnotesize\ttfamily \label{scalar__8x32__impl_8h_adeb6e766b53f39bb9c0c9f6502aa3b62} 
+\#define muladd\+\_\+fast(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}}{, }\item[{}]{b}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ tl,\ th;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ t\ =\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ *\ b;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ th\ =\ t\ >>\ 32;\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ at\ most\ 0xFFFFFFFE\ */}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ tl\ =\ t;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ c0\ +=\ tl;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ overflow\ is\ handled\ on\ the\ next\ line\ */}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ th\ +=\ (c0\ <\ tl);\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ at\ most\ 0xFFFFFFFF\ */}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ c1\ +=\ th;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ never\ overflows\ by\ contract\ (verified\ in\ the\ next\ line)\ */}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ VERIFY\_CHECK(c1\ >=\ th);\ \(\backslash\)}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+Add a\texorpdfstring{$\ast$}{*}b to the number defined by (c0,c1). c1 must never overflow. 
+
+Definition at line \mbox{\hyperlink{scalar__8x32__impl_8h_source_l00283}{283}} of file \mbox{\hyperlink{scalar__8x32__impl_8h_source}{scalar\+\_\+8x32\+\_\+impl.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00283\ \textcolor{preprocessor}{\#define\ muladd\_fast(a,b)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00284\ \textcolor{preprocessor}{\ \ \ \ uint32\_t\ tl,\ th;\ \(\backslash\)}}
+\DoxyCodeLine{00285\ \textcolor{preprocessor}{\ \ \ \ \{\ \(\backslash\)}}
+\DoxyCodeLine{00286\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ uint64\_t\ t\ =\ (uint64\_t)a\ *\ b;\ \(\backslash\)}}
+\DoxyCodeLine{00287\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ th\ =\ t\ >>\ 32;\ \ \ \ \ \ \ \ \ }\textcolor{comment}{/*\ at\ most\ 0xFFFFFFFE\ */}\textcolor{preprocessor}{\ \(\backslash\)}}
+\DoxyCodeLine{00288\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ tl\ =\ t;\ \(\backslash\)}}
+\DoxyCodeLine{00289\ \textcolor{preprocessor}{\ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00290\ \textcolor{preprocessor}{\ \ \ \ c0\ +=\ tl;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }\textcolor{comment}{/*\ overflow\ is\ handled\ on\ the\ next\ line\ */}\textcolor{preprocessor}{\ \(\backslash\)}}
+\DoxyCodeLine{00291\ \textcolor{preprocessor}{\ \ \ \ th\ +=\ (c0\ <\ tl);\ \ \ \ \ \ \ \ \ \ }\textcolor{comment}{/*\ at\ most\ 0xFFFFFFFF\ */}\textcolor{preprocessor}{\ \(\backslash\)}}
+\DoxyCodeLine{00292\ \textcolor{preprocessor}{\ \ \ \ c1\ +=\ th;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }\textcolor{comment}{/*\ never\ overflows\ by\ contract\ (verified\ in\ the\ next\ line)\ */}\textcolor{preprocessor}{\ \(\backslash\)}}
+\DoxyCodeLine{00293\ \textcolor{preprocessor}{\ \ \ \ VERIFY\_CHECK(c1\ >=\ th);\ \(\backslash\)}}
+\DoxyCodeLine{00294\ \textcolor{preprocessor}{\}}}
+
+\end{DoxyCode}
+\Hypertarget{scalar__8x32__impl_8h_a9e65a0592c11e099de8e8f58b38a14ae}\index{scalar\_8x32\_impl.h@{scalar\_8x32\_impl.h}!SECP256K1\_N\_0@{SECP256K1\_N\_0}}
+\index{SECP256K1\_N\_0@{SECP256K1\_N\_0}!scalar\_8x32\_impl.h@{scalar\_8x32\_impl.h}}
+\doxysubsubsection{\texorpdfstring{SECP256K1\_N\_0}{SECP256K1\_N\_0}}
+{\footnotesize\ttfamily \label{scalar__8x32__impl_8h_a9e65a0592c11e099de8e8f58b38a14ae} 
+\#define SECP256\+K1\+\_\+\+N\+\_\+0~((\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}})0x\+D0364141\+UL)}
+
+
+
+Definition at line \mbox{\hyperlink{scalar__8x32__impl_8h_source_l00013}{13}} of file \mbox{\hyperlink{scalar__8x32__impl_8h_source}{scalar\+\_\+8x32\+\_\+impl.\+h}}.
+
+\Hypertarget{scalar__8x32__impl_8h_a53cc412ecd7e47061b65c0ff5c6db4e2}\index{scalar\_8x32\_impl.h@{scalar\_8x32\_impl.h}!SECP256K1\_N\_1@{SECP256K1\_N\_1}}
+\index{SECP256K1\_N\_1@{SECP256K1\_N\_1}!scalar\_8x32\_impl.h@{scalar\_8x32\_impl.h}}
+\doxysubsubsection{\texorpdfstring{SECP256K1\_N\_1}{SECP256K1\_N\_1}}
+{\footnotesize\ttfamily \label{scalar__8x32__impl_8h_a53cc412ecd7e47061b65c0ff5c6db4e2} 
+\#define SECP256\+K1\+\_\+\+N\+\_\+1~((\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}})0x\+BFD25\+E8\+CUL)}
+
+
+
+Definition at line \mbox{\hyperlink{scalar__8x32__impl_8h_source_l00014}{14}} of file \mbox{\hyperlink{scalar__8x32__impl_8h_source}{scalar\+\_\+8x32\+\_\+impl.\+h}}.
+
+\Hypertarget{scalar__8x32__impl_8h_a5cfbef70d2cba970443032a43450d0b3}\index{scalar\_8x32\_impl.h@{scalar\_8x32\_impl.h}!SECP256K1\_N\_2@{SECP256K1\_N\_2}}
+\index{SECP256K1\_N\_2@{SECP256K1\_N\_2}!scalar\_8x32\_impl.h@{scalar\_8x32\_impl.h}}
+\doxysubsubsection{\texorpdfstring{SECP256K1\_N\_2}{SECP256K1\_N\_2}}
+{\footnotesize\ttfamily \label{scalar__8x32__impl_8h_a5cfbef70d2cba970443032a43450d0b3} 
+\#define SECP256\+K1\+\_\+\+N\+\_\+2~((\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}})0x\+AF48\+A03\+BUL)}
+
+
+
+Definition at line \mbox{\hyperlink{scalar__8x32__impl_8h_source_l00015}{15}} of file \mbox{\hyperlink{scalar__8x32__impl_8h_source}{scalar\+\_\+8x32\+\_\+impl.\+h}}.
+
+\Hypertarget{scalar__8x32__impl_8h_a1d38f968c428d48fe1041ef38eec96d4}\index{scalar\_8x32\_impl.h@{scalar\_8x32\_impl.h}!SECP256K1\_N\_3@{SECP256K1\_N\_3}}
+\index{SECP256K1\_N\_3@{SECP256K1\_N\_3}!scalar\_8x32\_impl.h@{scalar\_8x32\_impl.h}}
+\doxysubsubsection{\texorpdfstring{SECP256K1\_N\_3}{SECP256K1\_N\_3}}
+{\footnotesize\ttfamily \label{scalar__8x32__impl_8h_a1d38f968c428d48fe1041ef38eec96d4} 
+\#define SECP256\+K1\+\_\+\+N\+\_\+3~((\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}})0x\+BAAEDCE6\+UL)}
+
+
+
+Definition at line \mbox{\hyperlink{scalar__8x32__impl_8h_source_l00016}{16}} of file \mbox{\hyperlink{scalar__8x32__impl_8h_source}{scalar\+\_\+8x32\+\_\+impl.\+h}}.
+
+\Hypertarget{scalar__8x32__impl_8h_af49420627eb89d20a39c6c9ad1abdda1}\index{scalar\_8x32\_impl.h@{scalar\_8x32\_impl.h}!SECP256K1\_N\_4@{SECP256K1\_N\_4}}
+\index{SECP256K1\_N\_4@{SECP256K1\_N\_4}!scalar\_8x32\_impl.h@{scalar\_8x32\_impl.h}}
+\doxysubsubsection{\texorpdfstring{SECP256K1\_N\_4}{SECP256K1\_N\_4}}
+{\footnotesize\ttfamily \label{scalar__8x32__impl_8h_af49420627eb89d20a39c6c9ad1abdda1} 
+\#define SECP256\+K1\+\_\+\+N\+\_\+4~((\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}})0x\+FFFFFFFEUL)}
+
+
+
+Definition at line \mbox{\hyperlink{scalar__8x32__impl_8h_source_l00017}{17}} of file \mbox{\hyperlink{scalar__8x32__impl_8h_source}{scalar\+\_\+8x32\+\_\+impl.\+h}}.
+
+\Hypertarget{scalar__8x32__impl_8h_a1c393acd02b626594cdb245a2baf782d}\index{scalar\_8x32\_impl.h@{scalar\_8x32\_impl.h}!SECP256K1\_N\_5@{SECP256K1\_N\_5}}
+\index{SECP256K1\_N\_5@{SECP256K1\_N\_5}!scalar\_8x32\_impl.h@{scalar\_8x32\_impl.h}}
+\doxysubsubsection{\texorpdfstring{SECP256K1\_N\_5}{SECP256K1\_N\_5}}
+{\footnotesize\ttfamily \label{scalar__8x32__impl_8h_a1c393acd02b626594cdb245a2baf782d} 
+\#define SECP256\+K1\+\_\+\+N\+\_\+5~((\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}})0x\+FFFFFFFFUL)}
+
+
+
+Definition at line \mbox{\hyperlink{scalar__8x32__impl_8h_source_l00018}{18}} of file \mbox{\hyperlink{scalar__8x32__impl_8h_source}{scalar\+\_\+8x32\+\_\+impl.\+h}}.
+
+\Hypertarget{scalar__8x32__impl_8h_a2aadbc7f6ecb66c1e9c6e08ac6a362b0}\index{scalar\_8x32\_impl.h@{scalar\_8x32\_impl.h}!SECP256K1\_N\_6@{SECP256K1\_N\_6}}
+\index{SECP256K1\_N\_6@{SECP256K1\_N\_6}!scalar\_8x32\_impl.h@{scalar\_8x32\_impl.h}}
+\doxysubsubsection{\texorpdfstring{SECP256K1\_N\_6}{SECP256K1\_N\_6}}
+{\footnotesize\ttfamily \label{scalar__8x32__impl_8h_a2aadbc7f6ecb66c1e9c6e08ac6a362b0} 
+\#define SECP256\+K1\+\_\+\+N\+\_\+6~((\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}})0x\+FFFFFFFFUL)}
+
+
+
+Definition at line \mbox{\hyperlink{scalar__8x32__impl_8h_source_l00019}{19}} of file \mbox{\hyperlink{scalar__8x32__impl_8h_source}{scalar\+\_\+8x32\+\_\+impl.\+h}}.
+
+\Hypertarget{scalar__8x32__impl_8h_af6d852c6e2a7756ae93262dcd5588b78}\index{scalar\_8x32\_impl.h@{scalar\_8x32\_impl.h}!SECP256K1\_N\_7@{SECP256K1\_N\_7}}
+\index{SECP256K1\_N\_7@{SECP256K1\_N\_7}!scalar\_8x32\_impl.h@{scalar\_8x32\_impl.h}}
+\doxysubsubsection{\texorpdfstring{SECP256K1\_N\_7}{SECP256K1\_N\_7}}
+{\footnotesize\ttfamily \label{scalar__8x32__impl_8h_af6d852c6e2a7756ae93262dcd5588b78} 
+\#define SECP256\+K1\+\_\+\+N\+\_\+7~((\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}})0x\+FFFFFFFFUL)}
+
+
+
+Definition at line \mbox{\hyperlink{scalar__8x32__impl_8h_source_l00020}{20}} of file \mbox{\hyperlink{scalar__8x32__impl_8h_source}{scalar\+\_\+8x32\+\_\+impl.\+h}}.
+
+\Hypertarget{scalar__8x32__impl_8h_a7004f2007d2a43820488d377d7167ece}\index{scalar\_8x32\_impl.h@{scalar\_8x32\_impl.h}!SECP256K1\_N\_C\_0@{SECP256K1\_N\_C\_0}}
+\index{SECP256K1\_N\_C\_0@{SECP256K1\_N\_C\_0}!scalar\_8x32\_impl.h@{scalar\_8x32\_impl.h}}
+\doxysubsubsection{\texorpdfstring{SECP256K1\_N\_C\_0}{SECP256K1\_N\_C\_0}}
+{\footnotesize\ttfamily \label{scalar__8x32__impl_8h_a7004f2007d2a43820488d377d7167ece} 
+\#define SECP256\+K1\+\_\+\+N\+\_\+\+C\+\_\+0~(\texorpdfstring{$\sim$}{\string~}\mbox{\hyperlink{scalar__4x64__impl_8h_a9e65a0592c11e099de8e8f58b38a14ae}{SECP256\+K1\+\_\+\+N\+\_\+0}} + 1)}
+
+
+
+Definition at line \mbox{\hyperlink{scalar__8x32__impl_8h_source_l00023}{23}} of file \mbox{\hyperlink{scalar__8x32__impl_8h_source}{scalar\+\_\+8x32\+\_\+impl.\+h}}.
+
+\Hypertarget{scalar__8x32__impl_8h_a3f8f9c444183fbe3da955925b585290c}\index{scalar\_8x32\_impl.h@{scalar\_8x32\_impl.h}!SECP256K1\_N\_C\_1@{SECP256K1\_N\_C\_1}}
+\index{SECP256K1\_N\_C\_1@{SECP256K1\_N\_C\_1}!scalar\_8x32\_impl.h@{scalar\_8x32\_impl.h}}
+\doxysubsubsection{\texorpdfstring{SECP256K1\_N\_C\_1}{SECP256K1\_N\_C\_1}}
+{\footnotesize\ttfamily \label{scalar__8x32__impl_8h_a3f8f9c444183fbe3da955925b585290c} 
+\#define SECP256\+K1\+\_\+\+N\+\_\+\+C\+\_\+1~(\texorpdfstring{$\sim$}{\string~}\mbox{\hyperlink{scalar__4x64__impl_8h_a53cc412ecd7e47061b65c0ff5c6db4e2}{SECP256\+K1\+\_\+\+N\+\_\+1}})}
+
+
+
+Definition at line \mbox{\hyperlink{scalar__8x32__impl_8h_source_l00024}{24}} of file \mbox{\hyperlink{scalar__8x32__impl_8h_source}{scalar\+\_\+8x32\+\_\+impl.\+h}}.
+
+\Hypertarget{scalar__8x32__impl_8h_a2ba4e9e828bc0a11cf7ffc81cd823509}\index{scalar\_8x32\_impl.h@{scalar\_8x32\_impl.h}!SECP256K1\_N\_C\_2@{SECP256K1\_N\_C\_2}}
+\index{SECP256K1\_N\_C\_2@{SECP256K1\_N\_C\_2}!scalar\_8x32\_impl.h@{scalar\_8x32\_impl.h}}
+\doxysubsubsection{\texorpdfstring{SECP256K1\_N\_C\_2}{SECP256K1\_N\_C\_2}}
+{\footnotesize\ttfamily \label{scalar__8x32__impl_8h_a2ba4e9e828bc0a11cf7ffc81cd823509} 
+\#define SECP256\+K1\+\_\+\+N\+\_\+\+C\+\_\+2~(\texorpdfstring{$\sim$}{\string~}\mbox{\hyperlink{scalar__4x64__impl_8h_a5cfbef70d2cba970443032a43450d0b3}{SECP256\+K1\+\_\+\+N\+\_\+2}})}
+
+
+
+Definition at line \mbox{\hyperlink{scalar__8x32__impl_8h_source_l00025}{25}} of file \mbox{\hyperlink{scalar__8x32__impl_8h_source}{scalar\+\_\+8x32\+\_\+impl.\+h}}.
+
+\Hypertarget{scalar__8x32__impl_8h_a82beb160f9d4bae9b4c2615573e08330}\index{scalar\_8x32\_impl.h@{scalar\_8x32\_impl.h}!SECP256K1\_N\_C\_3@{SECP256K1\_N\_C\_3}}
+\index{SECP256K1\_N\_C\_3@{SECP256K1\_N\_C\_3}!scalar\_8x32\_impl.h@{scalar\_8x32\_impl.h}}
+\doxysubsubsection{\texorpdfstring{SECP256K1\_N\_C\_3}{SECP256K1\_N\_C\_3}}
+{\footnotesize\ttfamily \label{scalar__8x32__impl_8h_a82beb160f9d4bae9b4c2615573e08330} 
+\#define SECP256\+K1\+\_\+\+N\+\_\+\+C\+\_\+3~(\texorpdfstring{$\sim$}{\string~}\mbox{\hyperlink{scalar__4x64__impl_8h_a1d38f968c428d48fe1041ef38eec96d4}{SECP256\+K1\+\_\+\+N\+\_\+3}})}
+
+
+
+Definition at line \mbox{\hyperlink{scalar__8x32__impl_8h_source_l00026}{26}} of file \mbox{\hyperlink{scalar__8x32__impl_8h_source}{scalar\+\_\+8x32\+\_\+impl.\+h}}.
+
+\Hypertarget{scalar__8x32__impl_8h_a1c82df2aab75218ad66f892a4d042501}\index{scalar\_8x32\_impl.h@{scalar\_8x32\_impl.h}!SECP256K1\_N\_C\_4@{SECP256K1\_N\_C\_4}}
+\index{SECP256K1\_N\_C\_4@{SECP256K1\_N\_C\_4}!scalar\_8x32\_impl.h@{scalar\_8x32\_impl.h}}
+\doxysubsubsection{\texorpdfstring{SECP256K1\_N\_C\_4}{SECP256K1\_N\_C\_4}}
+{\footnotesize\ttfamily \label{scalar__8x32__impl_8h_a1c82df2aab75218ad66f892a4d042501} 
+\#define SECP256\+K1\+\_\+\+N\+\_\+\+C\+\_\+4~(1)}
+
+
+
+Definition at line \mbox{\hyperlink{scalar__8x32__impl_8h_source_l00027}{27}} of file \mbox{\hyperlink{scalar__8x32__impl_8h_source}{scalar\+\_\+8x32\+\_\+impl.\+h}}.
+
+\Hypertarget{scalar__8x32__impl_8h_a824415debca677af24eb249946df4404}\index{scalar\_8x32\_impl.h@{scalar\_8x32\_impl.h}!SECP256K1\_N\_H\_0@{SECP256K1\_N\_H\_0}}
+\index{SECP256K1\_N\_H\_0@{SECP256K1\_N\_H\_0}!scalar\_8x32\_impl.h@{scalar\_8x32\_impl.h}}
+\doxysubsubsection{\texorpdfstring{SECP256K1\_N\_H\_0}{SECP256K1\_N\_H\_0}}
+{\footnotesize\ttfamily \label{scalar__8x32__impl_8h_a824415debca677af24eb249946df4404} 
+\#define SECP256\+K1\+\_\+\+N\+\_\+\+H\+\_\+0~((\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}})0x681\+B20\+A0\+UL)}
+
+
+
+Definition at line \mbox{\hyperlink{scalar__8x32__impl_8h_source_l00030}{30}} of file \mbox{\hyperlink{scalar__8x32__impl_8h_source}{scalar\+\_\+8x32\+\_\+impl.\+h}}.
+
+\Hypertarget{scalar__8x32__impl_8h_a93c4692d6cad53df3cce3fb4631dee82}\index{scalar\_8x32\_impl.h@{scalar\_8x32\_impl.h}!SECP256K1\_N\_H\_1@{SECP256K1\_N\_H\_1}}
+\index{SECP256K1\_N\_H\_1@{SECP256K1\_N\_H\_1}!scalar\_8x32\_impl.h@{scalar\_8x32\_impl.h}}
+\doxysubsubsection{\texorpdfstring{SECP256K1\_N\_H\_1}{SECP256K1\_N\_H\_1}}
+{\footnotesize\ttfamily \label{scalar__8x32__impl_8h_a93c4692d6cad53df3cce3fb4631dee82} 
+\#define SECP256\+K1\+\_\+\+N\+\_\+\+H\+\_\+1~((\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}})0x\+DFE92\+F46\+UL)}
+
+
+
+Definition at line \mbox{\hyperlink{scalar__8x32__impl_8h_source_l00031}{31}} of file \mbox{\hyperlink{scalar__8x32__impl_8h_source}{scalar\+\_\+8x32\+\_\+impl.\+h}}.
+
+\Hypertarget{scalar__8x32__impl_8h_a5dfabdaac8359544dd1131ca3af807ae}\index{scalar\_8x32\_impl.h@{scalar\_8x32\_impl.h}!SECP256K1\_N\_H\_2@{SECP256K1\_N\_H\_2}}
+\index{SECP256K1\_N\_H\_2@{SECP256K1\_N\_H\_2}!scalar\_8x32\_impl.h@{scalar\_8x32\_impl.h}}
+\doxysubsubsection{\texorpdfstring{SECP256K1\_N\_H\_2}{SECP256K1\_N\_H\_2}}
+{\footnotesize\ttfamily \label{scalar__8x32__impl_8h_a5dfabdaac8359544dd1131ca3af807ae} 
+\#define SECP256\+K1\+\_\+\+N\+\_\+\+H\+\_\+2~((\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}})0x57\+A4501\+DUL)}
+
+
+
+Definition at line \mbox{\hyperlink{scalar__8x32__impl_8h_source_l00032}{32}} of file \mbox{\hyperlink{scalar__8x32__impl_8h_source}{scalar\+\_\+8x32\+\_\+impl.\+h}}.
+
+\Hypertarget{scalar__8x32__impl_8h_ac658856dbff7e81aca7cdd131c05dde4}\index{scalar\_8x32\_impl.h@{scalar\_8x32\_impl.h}!SECP256K1\_N\_H\_3@{SECP256K1\_N\_H\_3}}
+\index{SECP256K1\_N\_H\_3@{SECP256K1\_N\_H\_3}!scalar\_8x32\_impl.h@{scalar\_8x32\_impl.h}}
+\doxysubsubsection{\texorpdfstring{SECP256K1\_N\_H\_3}{SECP256K1\_N\_H\_3}}
+{\footnotesize\ttfamily \label{scalar__8x32__impl_8h_ac658856dbff7e81aca7cdd131c05dde4} 
+\#define SECP256\+K1\+\_\+\+N\+\_\+\+H\+\_\+3~((\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}})0x5\+D576\+E73\+UL)}
+
+
+
+Definition at line \mbox{\hyperlink{scalar__8x32__impl_8h_source_l00033}{33}} of file \mbox{\hyperlink{scalar__8x32__impl_8h_source}{scalar\+\_\+8x32\+\_\+impl.\+h}}.
+
+\Hypertarget{scalar__8x32__impl_8h_ac989056e75a50d48b62d59f23f672f73}\index{scalar\_8x32\_impl.h@{scalar\_8x32\_impl.h}!SECP256K1\_N\_H\_4@{SECP256K1\_N\_H\_4}}
+\index{SECP256K1\_N\_H\_4@{SECP256K1\_N\_H\_4}!scalar\_8x32\_impl.h@{scalar\_8x32\_impl.h}}
+\doxysubsubsection{\texorpdfstring{SECP256K1\_N\_H\_4}{SECP256K1\_N\_H\_4}}
+{\footnotesize\ttfamily \label{scalar__8x32__impl_8h_ac989056e75a50d48b62d59f23f672f73} 
+\#define SECP256\+K1\+\_\+\+N\+\_\+\+H\+\_\+4~((\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}})0x\+FFFFFFFFUL)}
+
+
+
+Definition at line \mbox{\hyperlink{scalar__8x32__impl_8h_source_l00034}{34}} of file \mbox{\hyperlink{scalar__8x32__impl_8h_source}{scalar\+\_\+8x32\+\_\+impl.\+h}}.
+
+\Hypertarget{scalar__8x32__impl_8h_a7f398e7f8481aeaab8ed4ff9dde370cd}\index{scalar\_8x32\_impl.h@{scalar\_8x32\_impl.h}!SECP256K1\_N\_H\_5@{SECP256K1\_N\_H\_5}}
+\index{SECP256K1\_N\_H\_5@{SECP256K1\_N\_H\_5}!scalar\_8x32\_impl.h@{scalar\_8x32\_impl.h}}
+\doxysubsubsection{\texorpdfstring{SECP256K1\_N\_H\_5}{SECP256K1\_N\_H\_5}}
+{\footnotesize\ttfamily \label{scalar__8x32__impl_8h_a7f398e7f8481aeaab8ed4ff9dde370cd} 
+\#define SECP256\+K1\+\_\+\+N\+\_\+\+H\+\_\+5~((\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}})0x\+FFFFFFFFUL)}
+
+
+
+Definition at line \mbox{\hyperlink{scalar__8x32__impl_8h_source_l00035}{35}} of file \mbox{\hyperlink{scalar__8x32__impl_8h_source}{scalar\+\_\+8x32\+\_\+impl.\+h}}.
+
+\Hypertarget{scalar__8x32__impl_8h_a95ba1afafdd6538e951d4034409ec764}\index{scalar\_8x32\_impl.h@{scalar\_8x32\_impl.h}!SECP256K1\_N\_H\_6@{SECP256K1\_N\_H\_6}}
+\index{SECP256K1\_N\_H\_6@{SECP256K1\_N\_H\_6}!scalar\_8x32\_impl.h@{scalar\_8x32\_impl.h}}
+\doxysubsubsection{\texorpdfstring{SECP256K1\_N\_H\_6}{SECP256K1\_N\_H\_6}}
+{\footnotesize\ttfamily \label{scalar__8x32__impl_8h_a95ba1afafdd6538e951d4034409ec764} 
+\#define SECP256\+K1\+\_\+\+N\+\_\+\+H\+\_\+6~((\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}})0x\+FFFFFFFFUL)}
+
+
+
+Definition at line \mbox{\hyperlink{scalar__8x32__impl_8h_source_l00036}{36}} of file \mbox{\hyperlink{scalar__8x32__impl_8h_source}{scalar\+\_\+8x32\+\_\+impl.\+h}}.
+
+\Hypertarget{scalar__8x32__impl_8h_aab2e4316a08ed3eaaca42a738c37de75}\index{scalar\_8x32\_impl.h@{scalar\_8x32\_impl.h}!SECP256K1\_N\_H\_7@{SECP256K1\_N\_H\_7}}
+\index{SECP256K1\_N\_H\_7@{SECP256K1\_N\_H\_7}!scalar\_8x32\_impl.h@{scalar\_8x32\_impl.h}}
+\doxysubsubsection{\texorpdfstring{SECP256K1\_N\_H\_7}{SECP256K1\_N\_H\_7}}
+{\footnotesize\ttfamily \label{scalar__8x32__impl_8h_aab2e4316a08ed3eaaca42a738c37de75} 
+\#define SECP256\+K1\+\_\+\+N\+\_\+\+H\+\_\+7~((\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}})0x7\+FFFFFFFUL)}
+
+
+
+Definition at line \mbox{\hyperlink{scalar__8x32__impl_8h_source_l00037}{37}} of file \mbox{\hyperlink{scalar__8x32__impl_8h_source}{scalar\+\_\+8x32\+\_\+impl.\+h}}.
+
+\Hypertarget{scalar__8x32__impl_8h_a833c2f6d148537ff7aac34a668c9a455}\index{scalar\_8x32\_impl.h@{scalar\_8x32\_impl.h}!sumadd@{sumadd}}
+\index{sumadd@{sumadd}!scalar\_8x32\_impl.h@{scalar\_8x32\_impl.h}}
+\doxysubsubsection{\texorpdfstring{sumadd}{sumadd}}
+{\footnotesize\ttfamily \label{scalar__8x32__impl_8h_a833c2f6d148537ff7aac34a668c9a455} 
+\#define sumadd(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ over;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ c0\ +=\ (\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ overflow\ is\ handled\ on\ the\ next\ line\ */}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ over\ =\ (c0\ <\ (\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}));\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ c1\ +=\ over;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ overflow\ is\ handled\ on\ the\ next\ line\ */}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ c2\ +=\ (c1\ <\ over);\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ never\ overflows\ by\ contract\ */}\ \(\backslash\)}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+Add a to the number defined by (c0,c1,c2). c2 must never overflow. 
+
+Definition at line \mbox{\hyperlink{scalar__8x32__impl_8h_source_l00297}{297}} of file \mbox{\hyperlink{scalar__8x32__impl_8h_source}{scalar\+\_\+8x32\+\_\+impl.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00297\ \textcolor{preprocessor}{\#define\ sumadd(a)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00298\ \textcolor{preprocessor}{\ \ \ \ unsigned\ int\ over;\ \(\backslash\)}}
+\DoxyCodeLine{00299\ \textcolor{preprocessor}{\ \ \ \ c0\ +=\ (a);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }\textcolor{comment}{/*\ overflow\ is\ handled\ on\ the\ next\ line\ */}\textcolor{preprocessor}{\ \(\backslash\)}}
+\DoxyCodeLine{00300\ \textcolor{preprocessor}{\ \ \ \ over\ =\ (c0\ <\ (a));\ \(\backslash\)}}
+\DoxyCodeLine{00301\ \textcolor{preprocessor}{\ \ \ \ c1\ +=\ over;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }\textcolor{comment}{/*\ overflow\ is\ handled\ on\ the\ next\ line\ */}\textcolor{preprocessor}{\ \(\backslash\)}}
+\DoxyCodeLine{00302\ \textcolor{preprocessor}{\ \ \ \ c2\ +=\ (c1\ <\ over);\ \ \ \ \ \ \ \ \ \ }\textcolor{comment}{/*\ never\ overflows\ by\ contract\ */}\textcolor{preprocessor}{\ \(\backslash\)}}
+\DoxyCodeLine{00303\ \textcolor{preprocessor}{\}}}
+
+\end{DoxyCode}
+\Hypertarget{scalar__8x32__impl_8h_a4f682f5ec94e74581289057925976d11}\index{scalar\_8x32\_impl.h@{scalar\_8x32\_impl.h}!sumadd\_fast@{sumadd\_fast}}
+\index{sumadd\_fast@{sumadd\_fast}!scalar\_8x32\_impl.h@{scalar\_8x32\_impl.h}}
+\doxysubsubsection{\texorpdfstring{sumadd\_fast}{sumadd\_fast}}
+{\footnotesize\ttfamily \label{scalar__8x32__impl_8h_a4f682f5ec94e74581289057925976d11} 
+\#define sumadd\+\_\+fast(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ c0\ +=\ (\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ overflow\ is\ handled\ on\ the\ next\ line\ */}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ c1\ +=\ (c0\ <\ (\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}));\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ never\ overflows\ by\ contract\ (verified\ the\ next\ line)\ */}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ VERIFY\_CHECK((c1\ !=\ 0)\ |\ (c0\ >=\ (\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})));\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ VERIFY\_CHECK(c2\ ==\ 0);\ \(\backslash\)}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+Add a to the number defined by (c0,c1). c1 must never overflow, c2 must be zero. 
+
+Definition at line \mbox{\hyperlink{scalar__8x32__impl_8h_source_l00306}{306}} of file \mbox{\hyperlink{scalar__8x32__impl_8h_source}{scalar\+\_\+8x32\+\_\+impl.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00306\ \textcolor{preprocessor}{\#define\ sumadd\_fast(a)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00307\ \textcolor{preprocessor}{\ \ \ \ c0\ +=\ (a);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }\textcolor{comment}{/*\ overflow\ is\ handled\ on\ the\ next\ line\ */}\textcolor{preprocessor}{\ \(\backslash\)}}
+\DoxyCodeLine{00308\ \textcolor{preprocessor}{\ \ \ \ c1\ +=\ (c0\ <\ (a));\ \ \ \ \ \ \ \ \ \ }\textcolor{comment}{/*\ never\ overflows\ by\ contract\ (verified\ the\ next\ line)\ */}\textcolor{preprocessor}{\ \(\backslash\)}}
+\DoxyCodeLine{00309\ \textcolor{preprocessor}{\ \ \ \ VERIFY\_CHECK((c1\ !=\ 0)\ |\ (c0\ >=\ (a)));\ \(\backslash\)}}
+\DoxyCodeLine{00310\ \textcolor{preprocessor}{\ \ \ \ VERIFY\_CHECK(c2\ ==\ 0);\ \(\backslash\)}}
+\DoxyCodeLine{00311\ \textcolor{preprocessor}{\}}}
+
+\end{DoxyCode}

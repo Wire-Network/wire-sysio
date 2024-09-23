@@ -1,0 +1,49 @@
+\doxysection{Benchmark.\+cpp}
+\hypertarget{_benchmark_8cpp_source}{}\label{_benchmark_8cpp_source}\index{libraries/wasm-\/jit/Test/Benchmark/Benchmark.cpp@{libraries/wasm-\/jit/Test/Benchmark/Benchmark.cpp}}
+\mbox{\hyperlink{_benchmark_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_benchmark_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{\Hypertarget{_benchmark_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <iostream>}}
+\DoxyCodeLine{\Hypertarget{_benchmark_8cpp_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{_benchmark_8cpp_source_l00004}\mbox{\hyperlink{structpoint}{00004}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structpoint}{point}}}
+\DoxyCodeLine{\Hypertarget{_benchmark_8cpp_source_l00005}00005\ \{}
+\DoxyCodeLine{\Hypertarget{_benchmark_8cpp_source_l00006}\mbox{\hyperlink{structpoint_a9c6b34deaf4900ad4193c17935fd384a}{00006}}\ \ \ \ \ \textcolor{keywordtype}{double}\ \mbox{\hyperlink{structpoint_a9c6b34deaf4900ad4193c17935fd384a}{x}};}
+\DoxyCodeLine{\Hypertarget{_benchmark_8cpp_source_l00007}\mbox{\hyperlink{structpoint_a613f8f0d7352731638b0094e1b958b87}{00007}}\ \ \ \ \ \textcolor{keywordtype}{double}\ \mbox{\hyperlink{structpoint_a613f8f0d7352731638b0094e1b958b87}{y}};}
+\DoxyCodeLine{\Hypertarget{_benchmark_8cpp_source_l00008}00008\ \};}
+\DoxyCodeLine{\Hypertarget{_benchmark_8cpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{_benchmark_8cpp_source_l00010}\mbox{\hyperlink{_benchmark_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{00010}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{_benchmark_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}()}
+\DoxyCodeLine{\Hypertarget{_benchmark_8cpp_source_l00011}00011\ \{}
+\DoxyCodeLine{\Hypertarget{_benchmark_8cpp_source_l00012}00012\ \ \ \ \ \textcolor{comment}{//\ Generate\ a\ lot\ of\ uniformly\ distributed\ 2d\ points\ in\ the\ range\ -\/1,-\/1\ to\ +1,+1.}}
+\DoxyCodeLine{\Hypertarget{_benchmark_8cpp_source_l00013}00013\ \ \ \ \ \textcolor{keyword}{enum}\ \{\ numXSamples\ =\ 10000\ \};}
+\DoxyCodeLine{\Hypertarget{_benchmark_8cpp_source_l00014}00014\ \ \ \ \ \textcolor{keyword}{enum}\ \{\ numYSamples\ =\ 10000\ \};}
+\DoxyCodeLine{\Hypertarget{_benchmark_8cpp_source_l00015}00015\ \ \ \ \ std::vector<point>\ points;}
+\DoxyCodeLine{\Hypertarget{_benchmark_8cpp_source_l00016}00016\ \ \ \ \ points.reserve(numXSamples\ *\ numYSamples);}
+\DoxyCodeLine{\Hypertarget{_benchmark_8cpp_source_l00017}00017\ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int}\ x\ =\ 0;x\ <\ numXSamples;++x)}
+\DoxyCodeLine{\Hypertarget{_benchmark_8cpp_source_l00018}00018\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_benchmark_8cpp_source_l00019}00019\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int}\ y\ =\ 0;y\ <\ numXSamples;++y)}
+\DoxyCodeLine{\Hypertarget{_benchmark_8cpp_source_l00020}00020\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_benchmark_8cpp_source_l00021}00021\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structpoint}{point}}\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ \{-\/1.0\ +\ 2.0\ *\ x\ /\ (numXSamples-\/1),-\/1.0\ +\ 2.0\ *\ y\ /\ (numYSamples-\/1)\};}
+\DoxyCodeLine{\Hypertarget{_benchmark_8cpp_source_l00022}00022\ \ \ \ \ \ \ \ \ \ \ \ \ points.push\_back(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}});}
+\DoxyCodeLine{\Hypertarget{_benchmark_8cpp_source_l00023}00023\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_benchmark_8cpp_source_l00024}00024\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_benchmark_8cpp_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{_benchmark_8cpp_source_l00026}00026\ \ \ \ \ \textcolor{comment}{//\ Count\ the\ ratio\ of\ points\ inside\ the\ unit\ circle.}}
+\DoxyCodeLine{\Hypertarget{_benchmark_8cpp_source_l00027}00027\ \ \ \ \ \textcolor{keywordtype}{int}\ numerator\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{_benchmark_8cpp_source_l00028}00028\ \ \ \ \ \textcolor{keywordtype}{int}\ denominator\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{_benchmark_8cpp_source_l00029}00029\ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\ pointIt\ =\ points.begin();pointIt\ !=\ points.end();++pointIt)}
+\DoxyCodeLine{\Hypertarget{_benchmark_8cpp_source_l00030}00030\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_benchmark_8cpp_source_l00031}00031\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(pointIt-\/>x\ *\ pointIt-\/>x\ +\ pointIt-\/>y\ *\ pointIt-\/>y\ <\ 1.0)}
+\DoxyCodeLine{\Hypertarget{_benchmark_8cpp_source_l00032}00032\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_benchmark_8cpp_source_l00033}00033\ \ \ \ \ \ \ \ \ \ \ \ \ ++numerator;}
+\DoxyCodeLine{\Hypertarget{_benchmark_8cpp_source_l00034}00034\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_benchmark_8cpp_source_l00035}00035\ \ \ \ \ \ \ \ \ ++denominator;}
+\DoxyCodeLine{\Hypertarget{_benchmark_8cpp_source_l00036}00036\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_benchmark_8cpp_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{_benchmark_8cpp_source_l00038}00038\ \ \ \ \ \textcolor{comment}{//\ Derive\ the\ area\ of\ the\ unit\ circle.}}
+\DoxyCodeLine{\Hypertarget{_benchmark_8cpp_source_l00039}00039\ \ \ \ \ \textcolor{keyword}{auto}\ circleArea\ =\ 4.0\ *\ (double)numerator\ /\ denominator;}
+\DoxyCodeLine{\Hypertarget{_benchmark_8cpp_source_l00040}00040\ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}result:\ "{}}\ <<\ circleArea\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{_benchmark_8cpp_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{_benchmark_8cpp_source_l00042}00042\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{_benchmark_8cpp_source_l00043}00043\ \}}
+
+\end{DoxyCode}

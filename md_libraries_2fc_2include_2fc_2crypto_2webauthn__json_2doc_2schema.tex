@@ -1,0 +1,425 @@
+\chapter{Schema}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema}{}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema}\index{Schema@{Schema}}
+(This feature was released in v1.\+1.\+0)
+
+JSON \doxylink{class_schema}{Schema} is a draft standard for describing the format of JSON data. The schema itself is also JSON data. By validating a JSON structure with JSON \doxylink{class_schema}{Schema}, your code can safely access the DOM without manually checking types, or whether a key exists, etc. It can also ensure that the serialized JSON conform to a specified schema.
+
+Rapid\+JSON implemented a JSON \doxylink{class_schema}{Schema} validator for \href{http://json-schema.org/documentation.html}{\texttt{ JSON Schema Draft v4}}. If you are not familiar with JSON \doxylink{class_schema}{Schema}, you may refer to \href{http://spacetelescope.github.io/understanding-json-schema/}{\texttt{ Understanding JSON Schema}}.\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_Basic}{}\doxysection{\texorpdfstring{Basic Usage}{Basic Usage}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_Basic}
+First of all, you need to parse a JSON \doxylink{class_schema}{Schema} into {\ttfamily Document}, and then compile the {\ttfamily Document} into a {\ttfamily Schema\+Document}.
+
+Secondly, construct a {\ttfamily Schema\+Validator} with the {\ttfamily Schema\+Document}. It is similar to a {\ttfamily \doxylink{class_writer}{Writer}} in the sense of handling SAX events. So, you can use {\ttfamily document.\+Accept(validator)} to validate a document, and then check the validity.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{schema_8h}{rapidjson/schema.h}}"{}}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ ...}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_document}{Document}}\ sd;}
+\DoxyCodeLine{\textcolor{keywordflow}{if}\ (sd.\mbox{\hyperlink{class_generic_document_a901db1678f99a1b550003eed75bc380a}{Parse}}(schemaJson).\mbox{\hyperlink{class_generic_document_a510a0588db4eb372f5d81bc3646578fb}{HasParseError}}())\ \{}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ the\ schema\ is\ not\ a\ valid\ JSON.}}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ ...\ \ \ \ \ \ \ }}
+\DoxyCodeLine{\}}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_schema_document}{SchemaDocument}}\ schema(sd);\ \textcolor{comment}{//\ Compile\ a\ Document\ to\ SchemaDocument}}
+\DoxyCodeLine{\textcolor{comment}{//\ sd\ is\ no\ longer\ needed\ here.}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_document}{Document}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}};}
+\DoxyCodeLine{\textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.Parse(inputJson).HasParseError())\ \{}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ the\ input\ is\ not\ a\ valid\ JSON.}}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ ...\ \ \ \ \ \ \ }}
+\DoxyCodeLine{\}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_schema_validator}{SchemaValidator}}\ validator(schema);}
+\DoxyCodeLine{\textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.Accept(validator))\ \{}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ Input\ JSON\ is\ invalid\ according\ to\ the\ schema}}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ Output\ diagnostic\ information}}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{class_generic_string_buffer}{StringBuffer}}\ sb;}
+\DoxyCodeLine{\ \ \ \ validator.GetInvalidSchemaPointer().StringifyUriFragment(sb);}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Invalid\ schema:\ \%s\(\backslash\)n"{}},\ sb.\mbox{\hyperlink{class_generic_string_buffer_a42079865bab1deb930c6cff7d491c719}{GetString}}());}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Invalid\ keyword:\ \%s\(\backslash\)n"{}},\ validator.GetInvalidSchemaKeyword());}
+\DoxyCodeLine{\ \ \ \ sb.\mbox{\hyperlink{class_generic_string_buffer_a42f15c959046d899cb74c3120a6995f9}{Clear}}();}
+\DoxyCodeLine{\ \ \ \ validator.GetInvalidDocumentPointer().StringifyUriFragment(sb);}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Invalid\ document:\ \%s\(\backslash\)n"{}},\ sb.\mbox{\hyperlink{class_generic_string_buffer_a42079865bab1deb930c6cff7d491c719}{GetString}}());}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+Some notes\+:
+
+
+\begin{DoxyItemize}
+\item One {\ttfamily Schema\+Document} can be referenced by multiple {\ttfamily Schema\+Validator}s. It will not be modified by {\ttfamily Schema\+Validator}s.
+\item \doxylink{struct_a}{A} {\ttfamily Schema\+Validator} may be reused to validate multiple documents. To run it for other documents, call {\ttfamily validator.\+Reset()} first.
+\end{DoxyItemize}\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_Fused}{}\doxysection{\texorpdfstring{Validation during parsing/serialization}{Validation during parsing/serialization}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_Fused}
+Unlike most JSON \doxylink{class_schema}{Schema} validator implementations, Rapid\+JSON provides a SAX-\/based schema validator. Therefore, you can parse a JSON from a stream while validating it on the fly. If the validator encounters a JSON value that invalidates the supplied schema, the parsing will be terminated immediately. This design is especially useful for parsing large JSON files.\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_DOM}{}\doxysubsection{\texorpdfstring{DOM parsing}{DOM parsing}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_DOM}
+For using DOM in parsing, {\ttfamily Document} needs some preparation and finalizing tasks, in addition to receiving SAX events, thus it needs some work to route the reader, validator and the document. {\ttfamily \doxylink{class_schema_validating_reader}{Schema\+Validating\+Reader}} is a helper class that doing such work.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{filereadstream_8h}{rapidjson/filereadstream.h}}"{}}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ ...}}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_schema_document}{SchemaDocument}}\ schema(sd);\ \textcolor{comment}{//\ Compile\ a\ Document\ to\ SchemaDocument}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ Use\ reader\ to\ parse\ the\ JSON}}
+\DoxyCodeLine{FILE*\ fp\ =\ fopen(\textcolor{stringliteral}{"{}big.json"{}},\ \textcolor{stringliteral}{"{}r"{}});}
+\DoxyCodeLine{\mbox{\hyperlink{class_file_read_stream}{FileReadStream}}\ is(fp,\ buffer,\ \textcolor{keyword}{sizeof}(buffer));}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ Parse\ JSON\ from\ reader,\ validate\ the\ SAX\ events,\ and\ store\ in\ d.}}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_document}{Document}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}};}
+\DoxyCodeLine{\mbox{\hyperlink{class_schema_validating_reader}{SchemaValidatingReader<kParseDefaultFlags,\ FileReadStream,\ UTF8<>}}\ >\ reader(is,\ schema);}
+\DoxyCodeLine{\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.Populate(reader);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keywordflow}{if}\ (!reader.GetParseResult())\ \{}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ Not\ a\ valid\ JSON}}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ When\ reader.GetParseResult().Code()\ ==\ kParseErrorTermination,}}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ it\ may\ be\ terminated\ by:}}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ (1)\ the\ validator\ found\ that\ the\ JSON\ is\ invalid\ according\ to\ schema;\ or}}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ (2)\ the\ input\ stream\ has\ I/O\ error.}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ Check\ the\ validation\ result}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{if}\ (!reader.IsValid())\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{comment}{//\ Input\ JSON\ is\ invalid\ according\ to\ the\ schema}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{comment}{//\ Output\ diagnostic\ information}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_string_buffer}{StringBuffer}}\ sb;}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ reader.GetInvalidSchemaPointer().StringifyUriFragment(sb);}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Invalid\ schema:\ \%s\(\backslash\)n"{}},\ sb.\mbox{\hyperlink{class_generic_string_buffer_a42079865bab1deb930c6cff7d491c719}{GetString}}());}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Invalid\ keyword:\ \%s\(\backslash\)n"{}},\ reader.GetInvalidSchemaKeyword());}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ sb.\mbox{\hyperlink{class_generic_string_buffer_a42f15c959046d899cb74c3120a6995f9}{Clear}}();}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ reader.GetInvalidDocumentPointer().StringifyUriFragment(sb);}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Invalid\ document:\ \%s\(\backslash\)n"{}},\ sb.\mbox{\hyperlink{class_generic_string_buffer_a42079865bab1deb930c6cff7d491c719}{GetString}}());}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_SAX}{}\doxysubsection{\texorpdfstring{SAX parsing}{SAX parsing}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_SAX}
+For using SAX in parsing, it is much simpler. If it only need to validate the JSON without further processing, it is simply\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{SchemaValidator\ validator(schema);}
+\DoxyCodeLine{Reader\ reader;}
+\DoxyCodeLine{if\ (!reader.Parse(stream,\ validator))\ \{}
+\DoxyCodeLine{\ \ \ \ if\ (!validator.IsValid())\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ //\ ...\ \ \ \ }
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+This is exactly the method used in the \href{example/schemavalidator/schemavalidator.cpp}{\texttt{ schemavalidator}} example. The distinct advantage is low memory usage, no matter how big the JSON was (the memory usage depends on the complexity of the schema).
+
+If you need to handle the SAX events further, then you need to use the template class {\ttfamily \doxylink{class_generic_schema_validator}{Generic\+Schema\+Validator}} to set the output handler of the validator\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{MyHandler\ handler;}
+\DoxyCodeLine{GenericSchemaValidator<SchemaDocument,\ MyHandler>\ validator(schema,\ handler);}
+\DoxyCodeLine{Reader\ reader;}
+\DoxyCodeLine{if\ (!reader.Parse(ss,\ validator))\ \{}
+\DoxyCodeLine{\ \ \ \ if\ (!validator.IsValid())\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ //\ ...\ \ \ \ }
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_8zh-cn_Serialization}{}\doxysubsection{\texorpdfstring{Serialization}{Serialization}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_8zh-cn_Serialization}
+It is also possible to do validation during serializing. This can ensure the result JSON is valid according to the JSON schema.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{StringBuffer\ sb;}
+\DoxyCodeLine{Writer<StringBuffer>\ writer(sb);}
+\DoxyCodeLine{GenericSchemaValidator<SchemaDocument,\ Writer<StringBuffer>\ >\ validator(s,\ writer);}
+\DoxyCodeLine{if\ (!d.Accept(validator))\ \{}
+\DoxyCodeLine{\ \ \ \ //\ Some\ problem\ during\ Accept(),\ it\ may\ be\ validation\ or\ encoding\ issues.}
+\DoxyCodeLine{\ \ \ \ if\ (!validator.IsValid())\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ //\ ...}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+Of course, if your application only needs SAX-\/style serialization, it can simply send SAX events to {\ttfamily Schema\+Validator} instead of {\ttfamily \doxylink{class_writer}{Writer}}.\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_Remote}{}\doxysection{\texorpdfstring{Remote Schema}{Remote Schema}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_Remote}
+JSON \doxylink{class_schema}{Schema} supports \href{http://spacetelescope.github.io/understanding-json-schema/structuring.html}{\texttt{ {\ttfamily \$ref} keyword}}, which is a \doxylink{pointer_8md}{JSON pointer} referencing to a local or remote schema. Local pointer is prefixed with {\ttfamily \#}, while remote pointer is an relative or absolute URI. For example\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\{\ "{}\$ref"{}:\ "{}definitions.json\#/address"{}\ \}}
+
+\end{DoxyCode}
+
+
+As {\ttfamily Schema\+Document} does not know how to resolve such URI, it needs a user-\/provided {\ttfamily IRemote\+Schema\+Document\+Provider} instance to do so.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{class\ MyRemoteSchemaDocumentProvider\ :\ public\ IRemoteSchemaDocumentProvider\ \{}
+\DoxyCodeLine{public:}
+\DoxyCodeLine{\ \ \ \ virtual\ const\ SchemaDocument*\ GetRemoteDocument(const\ char*\ uri,\ SizeType\ length)\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ //\ Resolve\ the\ uri\ and\ returns\ a\ pointer\ to\ that\ schema.}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{\};}
+\DoxyCodeLine{}
+\DoxyCodeLine{//\ ...}
+\DoxyCodeLine{}
+\DoxyCodeLine{MyRemoteSchemaDocumentProvider\ provider;}
+\DoxyCodeLine{SchemaDocument\ schema(sd,\ \&provider);}
+
+\end{DoxyCode}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_8zh-cn_Conformance}{}\doxysection{\texorpdfstring{Conformance}{Conformance}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_8zh-cn_Conformance}
+Rapid\+JSON passed 262 out of 263 tests in \href{https://github.com/json-schema/JSON-Schema-Test-Suite}{\texttt{ JSON Schema Test Suite}} (Json \doxylink{class_schema}{Schema} draft 4).
+
+The failed test is "{}changed scope ref invalid"{} of "{}change resolution scope"{} in {\ttfamily ref\+Remote.\+json}. It is due to that {\ttfamily id} schema keyword and URI combining function are not implemented.
+
+Besides, the {\ttfamily format} schema keyword for string values is ignored, since it is not required by the specification.\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_Regex}{}\doxysubsection{\texorpdfstring{Regular Expression}{Regular Expression}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_Regex}
+The schema keyword {\ttfamily pattern} and {\ttfamily pattern\+Properties} uses regular expression to match the required pattern.
+
+Rapid\+JSON implemented a simple \doxylink{namespace_n_f_a}{NFA} regular expression engine, which is used by default. It supports the following syntax.
+
+\tabulinesep=1mm
+\begin{longtabu}spread 0pt [c]{*{2}{|X[-1]}|}
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Syntax   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Description    }\\\cline{1-2}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Syntax   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Description    }\\\cline{1-2}
+\endhead
+{\ttfamily ab}   &Concatenation    \\\cline{1-2}
+{\ttfamily a\&\#124;b}   &Alternation    \\\cline{1-2}
+{\ttfamily a?}   &Zero or one    \\\cline{1-2}
+{\ttfamily a\texorpdfstring{$\ast$}{*}}   &Zero or more    \\\cline{1-2}
+{\ttfamily a+}   &One or more    \\\cline{1-2}
+{\ttfamily a\{3\}}   &Exactly 3 times    \\\cline{1-2}
+{\ttfamily a\{3,\}}   &At least 3 times    \\\cline{1-2}
+{\ttfamily a\{3,5\}}   &3 to 5 times    \\\cline{1-2}
+{\ttfamily (ab)}   &Grouping    \\\cline{1-2}
+{\ttfamily \texorpdfstring{$^\wedge$}{\string^}a}   &At the beginning    \\\cline{1-2}
+{\ttfamily a\$}   &At the end    \\\cline{1-2}
+{\ttfamily .}   &Any character    \\\cline{1-2}
+{\ttfamily \mbox{[}abc\mbox{]}}   &Character classes    \\\cline{1-2}
+{\ttfamily \mbox{[}a-\/c\mbox{]}}   &Character class range    \\\cline{1-2}
+{\ttfamily \mbox{[}a-\/z0-\/9\+\_\+\mbox{]}}   &Character class combination    \\\cline{1-2}
+{\ttfamily \mbox{[}\texorpdfstring{$^\wedge$}{\string^}abc\mbox{]}}   &Negated character classes    \\\cline{1-2}
+{\ttfamily \mbox{[}\texorpdfstring{$^\wedge$}{\string^}a-\/c\mbox{]}}   &Negated character class range    \\\cline{1-2}
+{\ttfamily \mbox{[}\textbackslash{}b\mbox{]}}   &Backspace (U+0008)    \\\cline{1-2}
+{\ttfamily \textbackslash{}\&\#124;}, {\ttfamily \textbackslash{}\textbackslash{}}, ...   &Escape characters    \\\cline{1-2}
+{\ttfamily \textbackslash{}f}   &Form feed (U+000C)    \\\cline{1-2}
+{\ttfamily \textbackslash{}n}   &Line feed (U+000A)    \\\cline{1-2}
+{\ttfamily \textbackslash{}r}   &Carriage return (U+000D)    \\\cline{1-2}
+{\ttfamily \textbackslash{}t}   &Tab (U+0009)    \\\cline{1-2}
+{\ttfamily \textbackslash{}v}   &Vertical tab (U+000B)   \\\cline{1-2}
+\end{longtabu}
+
+
+For C++11 compiler, it is also possible to use the {\ttfamily std\+::regex} by defining {\ttfamily RAPIDJSON\+\_\+\+SCHEMA\+\_\+\+USE\+\_\+\+INTERNALREGEX=0} and {\ttfamily RAPIDJSON\+\_\+\+SCHEMA\+\_\+\+USE\+\_\+\+STDREGEX=1}. If your schemas do not need {\ttfamily pattern} and {\ttfamily pattern\+Properties}, you can set both macros to zero to disable this feature, which will reduce some code size.\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_8zh-cn_Performance}{}\doxysection{\texorpdfstring{Performance}{Performance}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_8zh-cn_Performance}
+Most C++ JSON libraries do not yet support JSON \doxylink{class_schema}{Schema}. So we tried to evaluate the performance of Rapid\+JSON\textquotesingle{}s JSON \doxylink{class_schema}{Schema} validator according to \href{https://github.com/ebdrup/json-schema-benchmark}{\texttt{ json-\/schema-\/benchmark}}, which tests 11 Java\+Script libraries running on Node.\+js.
+
+That benchmark runs validations on \href{https://github.com/json-schema/JSON-Schema-Test-Suite}{\texttt{ JSON Schema Test Suite}}, in which some test suites and tests are excluded. We made the same benchmarking procedure in \href{test/perftest/schematest.cpp}{\texttt{ {\ttfamily schematest.\+cpp}}}.
+
+On a Mac Book Pro (2.\+8 GHz Intel Core i7), the following results are collected.
+
+\tabulinesep=1mm
+\begin{longtabu}spread 0pt [c]{*{3}{|X[-1]}|}
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Validator   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Relative speed   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Number of test runs per second    }\\\cline{1-3}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Validator   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Relative speed   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Number of test runs per second    }\\\cline{1-3}
+\endhead
+Rapid\+JSON   &\PBS\centering 155\%   &\PBS\centering 30682    \\\cline{1-3}
+\href{https://github.com/epoberezkin/ajv}{\texttt{ {\ttfamily ajv}}}   &\PBS\centering 100\%   &\PBS\centering 19770 (± 1.\+31\%)    \\\cline{1-3}
+\href{https://github.com/mafintosh/is-my-json-valid}{\texttt{ {\ttfamily is-\/my-\/json-\/valid}}}   &\PBS\centering 70\%   &\PBS\centering 13835 (± 2.\+84\%)    \\\cline{1-3}
+\href{https://github.com/bugventure/jsen}{\texttt{ {\ttfamily jsen}}}   &\PBS\centering 57.\+7\%   &\PBS\centering 11411 (± 1.\+27\%)    \\\cline{1-3}
+\href{https://github.com/AlexeyGrishin/schemasaurus}{\texttt{ {\ttfamily schemasaurus}}}   &\PBS\centering 26\%   &\PBS\centering 5145 (± 1.\+62\%)    \\\cline{1-3}
+\href{https://github.com/playlyfe/themis}{\texttt{ {\ttfamily themis}}}   &\PBS\centering 19.\+9\%   &\PBS\centering 3935 (± 2.\+69\%)    \\\cline{1-3}
+\href{https://github.com/zaggino/z-schema}{\texttt{ {\ttfamily z-\/schema}}}   &\PBS\centering 7\%   &\PBS\centering 1388 (± 0.\+84\%)    \\\cline{1-3}
+\href{https://github.com/pandastrike/jsck\#readme}{\texttt{ {\ttfamily jsck}}}   &\PBS\centering 3.\+1\%   &\PBS\centering 606 (± 2.\+84\%)    \\\cline{1-3}
+\href{https://github.com/tdegrunt/jsonschema\#readme}{\texttt{ {\ttfamily jsonschema}}}   &\PBS\centering 0.\+9\%   &\PBS\centering 185 (± 1.\+01\%)    \\\cline{1-3}
+\href{https://github.com/Prestaul/skeemas\#readme}{\texttt{ {\ttfamily skeemas}}}   &\PBS\centering 0.\+8\%   &\PBS\centering 154 (± 0.\+79\%)    \\\cline{1-3}
+tv4   &\PBS\centering 0.\+5\%   &\PBS\centering 93 (± 0.\+94\%)    \\\cline{1-3}
+\href{https://github.com/natesilva/jayschema}{\texttt{ {\ttfamily jayschema}}}   &\PBS\centering 0.\+1\%   &\PBS\centering 21 (± 1.\+14\%)   \\\cline{1-3}
+\end{longtabu}
+
+
+That is, Rapid\+JSON is about 1.\+5x faster than the fastest Java\+Script library (ajv). And 1400x faster than the slowest one.\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_Reporting}{}\doxysection{\texorpdfstring{Schema violation reporting}{Schema violation reporting}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_Reporting}
+(Unreleased as of 2017-\/09-\/20)
+
+When validating an instance against a JSON \doxylink{class_schema}{Schema}, it is often desirable to report not only whether the instance is valid, but also the ways in which it violates the schema.
+
+The {\ttfamily Schema\+Validator} class collects errors encountered during validation into a JSON {\ttfamily Value}. This error object can then be accessed as {\ttfamily validator.\+Get\+Error()}.
+
+The structure of the error object is subject to change in future versions of Rapid\+JSON, as there is no standard schema for violations. The details below this point are provisional only.\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_ReportingGeneral}{}\doxysubsection{\texorpdfstring{General provisions}{General provisions}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_ReportingGeneral}
+Validation of an instance value against a schema produces an error value. The error value is always an object. An empty object {\ttfamily \{\}} indicates the instance is valid.
+
+
+\begin{DoxyItemize}
+\item The name of each member corresponds to the JSON \doxylink{class_schema}{Schema} keyword that is violated.
+\item The value is either an object describing a single violation, or an array of such objects.
+\end{DoxyItemize}
+
+Each violation object contains two string-\/valued members named {\ttfamily instance\+Ref} and {\ttfamily schema\+Ref}. {\ttfamily instance\+Ref} contains the URI fragment serialization of a JSON Pointer to the instance subobject in which the violation was detected. {\ttfamily schema\+Ref} contains the URI of the schema and the fragment serialization of a JSON Pointer to the subschema that was violated.
+
+Individual violation objects can contain other keyword-\/specific members. These are detailed further.
+
+For example, validating this instance\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\{"{}numbers"{}:\ [1,\ 2,\ "{}3"{},\ 4,\ 5]\}}
+
+\end{DoxyCode}
+
+
+against this schema\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\{}
+\DoxyCodeLine{\ \ "{}type"{}:\ "{}object"{},}
+\DoxyCodeLine{\ \ "{}properties"{}:\ \{}
+\DoxyCodeLine{\ \ \ \ "{}numbers"{}:\ \{"{}\$ref"{}:\ "{}numbers.schema.json"{}\}}
+\DoxyCodeLine{\ \ \}}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+where {\ttfamily numbers.\+schema.\+json} refers (via a suitable {\ttfamily IRemote\+Schema\+Document\+Provider}) to this schema\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\{}
+\DoxyCodeLine{\ \ "{}type"{}:\ "{}array"{},}
+\DoxyCodeLine{\ \ "{}items"{}:\ \{"{}type"{}:\ "{}number"{}\}}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+produces the following error object\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\{}
+\DoxyCodeLine{\ \ "{}type"{}:\ \{}
+\DoxyCodeLine{\ \ \ \ "{}instanceRef"{}:\ "{}\#/numbers/2"{},}
+\DoxyCodeLine{\ \ \ \ "{}schemaRef"{}:\ "{}numbers.schema.json\#/items"{},}
+\DoxyCodeLine{\ \ \ \ "{}expected"{}:\ ["{}number"{}],}
+\DoxyCodeLine{\ \ \ \ "{}actual"{}:\ "{}string"{}}
+\DoxyCodeLine{\ \ \}}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_Numbers}{}\doxysubsection{\texorpdfstring{Validation keywords for numbers}{Validation keywords for numbers}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_Numbers}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_multipleof}{}\doxysubsubsection{\texorpdfstring{multiple\+Of}{multiple\+Of}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_multipleof}
+
+\begin{DoxyItemize}
+\item {\ttfamily expected}\+: required number strictly greater than 0. The value of the {\ttfamily multiple\+Of} keyword specified in the schema.
+\item {\ttfamily actual}\+: required number. The instance value.
+\end{DoxyItemize}\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_maximum}{}\doxysubsubsection{\texorpdfstring{maximum}{maximum}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_maximum}
+
+\begin{DoxyItemize}
+\item {\ttfamily expected}\+: required number. The value of the {\ttfamily maximum} keyword specified in the schema.
+\item {\ttfamily exclusive\+Maximum}\+: optional boolean. This will be true if the schema specified {\ttfamily "{}exclusive\+Maximum"{}\+: true}, and will be omitted otherwise.
+\item {\ttfamily actual}\+: required number. The instance value.
+\end{DoxyItemize}\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_minimum}{}\doxysubsubsection{\texorpdfstring{minimum}{minimum}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_minimum}
+
+\begin{DoxyItemize}
+\item {\ttfamily expected}\+: required number. The value of the {\ttfamily minimum} keyword specified in the schema.
+\item {\ttfamily exclusive\+Minimum}\+: optional boolean. This will be true if the schema specified {\ttfamily "{}exclusive\+Minimum"{}\+: true}, and will be omitted otherwise.
+\item {\ttfamily actual}\+: required number. The instance value.
+\end{DoxyItemize}\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_Strings}{}\doxysubsection{\texorpdfstring{Validation keywords for strings}{Validation keywords for strings}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_Strings}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_maxLength}{}\doxysubsubsection{\texorpdfstring{max\+Length}{max\+Length}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_maxLength}
+
+\begin{DoxyItemize}
+\item {\ttfamily expected}\+: required number greater than or equal to 0. The value of the {\ttfamily max\+Length} keyword specified in the schema.
+\item {\ttfamily actual}\+: required string. The instance value.
+\end{DoxyItemize}\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_minLength}{}\doxysubsubsection{\texorpdfstring{min\+Length}{min\+Length}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_minLength}
+
+\begin{DoxyItemize}
+\item {\ttfamily expected}\+: required number greater than or equal to 0. The value of the {\ttfamily min\+Length} keyword specified in the schema.
+\item {\ttfamily actual}\+: required string. The instance value.
+\end{DoxyItemize}\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_pattern}{}\doxysubsubsection{\texorpdfstring{pattern}{pattern}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_pattern}
+
+\begin{DoxyItemize}
+\item {\ttfamily actual}\+: required string. The instance value.
+\end{DoxyItemize}
+
+(The expected pattern is not reported because the internal representation in {\ttfamily Schema\+Document} does not store the pattern in original string form.)\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_Arrays}{}\doxysubsection{\texorpdfstring{Validation keywords for arrays}{Validation keywords for arrays}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_Arrays}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_additionalItems}{}\doxysubsubsection{\texorpdfstring{additional\+Items}{additional\+Items}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_additionalItems}
+This keyword is reported when the value of {\ttfamily items} schema keyword is an array, the value of {\ttfamily additional\+Items} is {\ttfamily false}, and the instance is an array with more items than specified in the {\ttfamily items} array.
+
+
+\begin{DoxyItemize}
+\item {\ttfamily disallowed}\+: required integer greater than or equal to 0. The index of the first item that has no corresponding schema.
+\end{DoxyItemize}\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_maxItems-minItems}{}\doxysubsubsection{\texorpdfstring{max\+Items and min\+Items}{max\+Items and min\+Items}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_maxItems-minItems}
+
+\begin{DoxyItemize}
+\item {\ttfamily expected}\+: required integer greater than or equal to 0. The value of {\ttfamily max\+Items} (respectively, {\ttfamily min\+Items}) specified in the schema.
+\item {\ttfamily actual}\+: required integer greater than or equal to 0. Number of items in the instance array.
+\end{DoxyItemize}\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_uniqueItems}{}\doxysubsubsection{\texorpdfstring{unique\+Items}{unique\+Items}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_uniqueItems}
+
+\begin{DoxyItemize}
+\item {\ttfamily duplicates}\+: required array whose items are integers greater than or equal to 0. Indices of items of the instance that are equal.
+\end{DoxyItemize}
+
+(Rapid\+JSON only reports the first two equal items, for performance reasons.)
+
+\doxysubsection*{Validation keywords for objects}\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_maxProperties-minProperties}{}\doxysubsubsection{\texorpdfstring{max\+Properties and min\+Properties}{max\+Properties and min\+Properties}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_maxProperties-minProperties}
+
+\begin{DoxyItemize}
+\item {\ttfamily expected}\+: required integer greater than or equal to 0. The value of {\ttfamily max\+Properties} (respectively, {\ttfamily min\+Properties}) specified in the schema.
+\item {\ttfamily actual}\+: required integer greater than or equal to 0. Number of properties in the instance object.
+\end{DoxyItemize}\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_required}{}\doxysubsubsection{\texorpdfstring{required}{required}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_required}
+
+\begin{DoxyItemize}
+\item {\ttfamily missing}\+: required array of one or more unique strings. The names of properties that are listed in the value of the {\ttfamily required} schema keyword but not present in the instance object.
+\end{DoxyItemize}\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_additionalProperties}{}\doxysubsubsection{\texorpdfstring{additional\+Properties}{additional\+Properties}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_additionalProperties}
+This keyword is reported when the schema specifies {\ttfamily additional\+Properties\+: false} and the name of a property of the instance is neither listed in the {\ttfamily properties} keyword nor matches any regular expression in the {\ttfamily pattern\+Properties} keyword.
+
+
+\begin{DoxyItemize}
+\item {\ttfamily disallowed}\+: required string. Name of the offending property of the instance.
+\end{DoxyItemize}
+
+(For performance reasons, Rapid\+JSON only reports the first such property encountered.)\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_dependencies}{}\doxysubsubsection{\texorpdfstring{dependencies}{dependencies}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_dependencies}
+
+\begin{DoxyItemize}
+\item {\ttfamily errors}\+: required object with one or more properties. Names and values of its properties are described below.
+\end{DoxyItemize}
+
+Recall that JSON \doxylink{class_schema}{Schema} Draft 04 supports {\itshape schema dependencies}, where presence of a named {\itshape controlling} property requires the instance object to be valid against a subschema, and {\itshape property dependencies}, where presence of a controlling property requires other {\itshape dependent} properties to be also present.
+
+For a violated schema dependency, {\ttfamily errors} will contain a property with the name of the controlling property and its value will be the error object produced by validating the instance object against the dependent schema.
+
+For a violated property dependency, {\ttfamily errors} will contain a property with the name of the controlling property and its value will be an array of one or more unique strings listing the missing dependent properties.\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_AnyTypes}{}\doxysubsection{\texorpdfstring{Validation keywords for any instance type}{Validation keywords for any instance type}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_AnyTypes}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_enum}{}\doxysubsubsection{\texorpdfstring{enum}{enum}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_enum}
+This keyword has no additional properties beyond {\ttfamily instance\+Ref} and {\ttfamily schema\+Ref}.
+
+
+\begin{DoxyItemize}
+\item The allowed values are not listed because {\ttfamily Schema\+Document} does not store them in original form.
+\item The violating value is not reported because it might be unwieldy.
+\end{DoxyItemize}
+
+If you need to report these details to your users, you can access the necessary information by following {\ttfamily instance\+Ref} and {\ttfamily schema\+Ref}.\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_type}{}\doxysubsubsection{\texorpdfstring{type}{type}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_type}
+
+\begin{DoxyItemize}
+\item {\ttfamily expected}\+: required array of one or more unique strings, each of which is one of the seven primitive types defined by the JSON \doxylink{class_schema}{Schema} Draft 04 Core specification. Lists the types allowed by the {\ttfamily type} schema keyword.
+\item {\ttfamily actual}\+: required string, also one of seven primitive types. The primitive type of the instance.
+\end{DoxyItemize}\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_allOf-anyOf-oneOf}{}\doxysubsubsection{\texorpdfstring{all\+Of, any\+Of, and one\+Of}{all\+Of, any\+Of, and one\+Of}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_allOf-anyOf-oneOf}
+
+\begin{DoxyItemize}
+\item {\ttfamily errors}\+: required array of at least one object. There will be as many items as there are subschemas in the {\ttfamily all\+Of}, {\ttfamily any\+Of} or {\ttfamily one\+Of} schema keyword, respectively. Each item will be the error value produced by validating the instance against the corresponding subschema.
+\end{DoxyItemize}
+
+For {\ttfamily all\+Of}, at least one error value will be non-\/empty. For {\ttfamily any\+Of}, all error values will be non-\/empty. For {\ttfamily one\+Of}, either all error values will be non-\/empty, or more than one will be empty.\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_not}{}\doxysubsubsection{\texorpdfstring{not}{not}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_not}
+This keyword has no additional properties apart from {\ttfamily instance\+Ref} and {\ttfamily schema\+Ref}. 

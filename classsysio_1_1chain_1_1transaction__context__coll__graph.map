@@ -1,0 +1,31 @@
+<map id="sysio::chain::transaction_context" name="sysio::chain::transaction_context">
+<area shape="rect" id="Node000001" title=" " alt="" coords="760,388,923,429"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1chain_1_1controller.html" title=" " alt="" coords="409,202,562,228"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="577,209,617,212,658,219,699,231,737,250,773,281,801,318,822,355,835,387,830,389,817,358,796,321,769,284,735,255,697,236,657,224,616,217,577,214"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="35,8,189,33"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="204,14,247,17,293,25,339,39,381,60,419,92,448,132,469,171,482,201,477,203,464,173,443,135,415,96,378,64,337,44,292,30,247,23,204,20"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="38,57,186,98"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="202,75,290,86,337,98,381,115,411,134,438,157,476,200,472,203,434,161,408,138,378,120,335,103,289,92,201,81"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="42,123,182,163"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="198,157,415,199,414,204,197,162"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="37,187,187,243"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="203,212,409,212,409,218,203,218"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="5,266,219,337"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="233,271,426,226,427,231,235,276"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="48,361,176,402"/>
+<area shape="poly" id="edge7_Node000002_Node000008" title=" " alt="" coords="189,355,218,346,266,334,304,327,339,316,378,290,386,278,389,267,392,254,402,241,426,226,429,231,405,245,397,256,394,268,391,281,382,293,342,321,305,332,267,339,219,351,191,360"/>
+<area shape="rect" id="Node000009" href="$structsysio_1_1chain_1_1packed__transaction.html" title=" " alt="" coords="415,255,556,295"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="572,269,654,278,697,288,737,303,766,321,791,343,828,386,824,390,787,347,762,325,735,308,695,293,653,283,571,275"/>
+<area shape="rect" id="Node000010" href="$structfc_1_1reflect__init.html" title=" " alt="" coords="62,426,162,452"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="177,448,226,452,280,449,332,436,356,424,378,409,386,399,390,390,391,369,391,345,401,320,416,305,433,294,436,298,419,309,406,323,396,346,397,369,396,391,391,402,381,413,359,429,334,441,280,454,226,457,177,454"/>
+<area shape="rect" id="Node000011" href="$classfc_1_1time__point.html" title=" " alt="" coords="435,334,536,360"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="551,349,639,358,737,374,779,385,778,390,735,379,639,363,551,354"/>
+<area shape="rect" id="Node000012" href="$classfc_1_1vector.html" title=" " alt="" coords="405,396,566,421"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="582,406,760,406,760,411,582,411"/>
+<area shape="rect" id="Node000013" title=" " alt="" coords="412,449,558,490"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="574,463,653,455,735,441,786,427,787,432,737,446,653,460,574,468"/>
+<area shape="rect" id="Node000014" href="$classfc_1_1microseconds.html" title=" " alt="" coords="425,518,546,544"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="561,530,647,521,692,511,735,496,760,482,784,464,821,427,825,431,788,468,763,486,737,501,693,516,648,527,562,535"/>
+<area shape="rect" id="Node000015" href="$structsysio_1_1chain_1_1transaction__checktime__timer.html" title=" " alt="" coords="404,568,567,609"/>
+<area shape="poly" id="edge14_Node000001_Node000015" title=" " alt="" coords="582,589,660,578,699,566,735,549,767,523,794,490,815,456,829,428,834,430,820,459,799,493,771,526,737,554,700,571,661,583,582,594"/>
+</map>

@@ -1,0 +1,83 @@
+\doxysection{sysio\+::vm\+::detail\+::generate\+\_\+subtuples\+\_\+impl\texorpdfstring{$<$}{<} std\+::tuple\texorpdfstring{$<$}{<} T, Ts... \texorpdfstring{$>$}{>} \texorpdfstring{$>$}{>} Struct Template Reference}
+\hypertarget{structsysio_1_1vm_1_1detail_1_1generate__subtuples__impl_3_01std_1_1tuple_3_01_t_00_01_ts_8_8_8_01_4_01_4}{}\label{structsysio_1_1vm_1_1detail_1_1generate__subtuples__impl_3_01std_1_1tuple_3_01_t_00_01_ts_8_8_8_01_4_01_4}\index{sysio::vm::detail::generate\_subtuples\_impl$<$ std::tuple$<$ T, Ts... $>$ $>$@{sysio::vm::detail::generate\_subtuples\_impl$<$ std::tuple$<$ T, Ts... $>$ $>$}}
+
+
+{\ttfamily \#include $<$utils.\+hpp$>$}
+
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$size\+\_\+t... Is$>$ }\\static constexpr auto \mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1generate__subtuples__impl_3_01std_1_1tuple_3_01_t_00_01_ts_8_8_8_01_4_01_4_a5b4da55eef5cdd3f2ea3e62b7da074a6}{value}} (std\+::index\+\_\+sequence$<$ Is... $>$)
+\item 
+{\footnotesize template$<$size\+\_\+t... Is$>$ }\\static constexpr auto \mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1generate__subtuples__impl_3_01std_1_1tuple_3_01_t_00_01_ts_8_8_8_01_4_01_4_a5b4da55eef5cdd3f2ea3e62b7da074a6}{value}} (std\+::index\+\_\+sequence$<$ Is... $>$)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, typename... Ts$>$\newline
+struct sysio\+::vm\+::detail\+::generate\+\_\+subtuples\+\_\+impl$<$ std\+::tuple$<$ T, Ts... $>$ $>$}
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2utils_8hpp_source_l00126}{126}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2utils_8hpp_source}{utils.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1vm_1_1detail_1_1generate__subtuples__impl_3_01std_1_1tuple_3_01_t_00_01_ts_8_8_8_01_4_01_4_a5b4da55eef5cdd3f2ea3e62b7da074a6}\index{sysio::vm::detail::generate\_subtuples\_impl$<$ std::tuple$<$ T, Ts... $>$ $>$@{sysio::vm::detail::generate\_subtuples\_impl$<$ std::tuple$<$ T, Ts... $>$ $>$}!value@{value}}
+\index{value@{value}!sysio::vm::detail::generate\_subtuples\_impl$<$ std::tuple$<$ T, Ts... $>$ $>$@{sysio::vm::detail::generate\_subtuples\_impl$<$ std::tuple$<$ T, Ts... $>$ $>$}}
+\doxysubsubsection{\texorpdfstring{value()}{value()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1detail_1_1generate__subtuples__impl_3_01std_1_1tuple_3_01_t_00_01_ts_8_8_8_01_4_01_4_a5b4da55eef5cdd3f2ea3e62b7da074a6} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename... Ts$>$ \\
+template$<$size\+\_\+t... Is$>$ \\
+static constexpr auto \mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1generate__subtuples__impl}{sysio\+::vm\+::detail\+::generate\+\_\+subtuples\+\_\+impl}}$<$ std\+::tuple$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Ts... $>$ $>$\+::value (\begin{DoxyParamCaption}\item[{std\+::index\+\_\+sequence$<$ Is... $>$}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2utils_8hpp_source_l00128}{128}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2utils_8hpp_source}{utils.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::make\_tuple(std::declval<\mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a857851c5576526ad54ed2ac2047e5ee6}{subtuple\_t}}<Is,\ std::tuple<T,\ Ts...>>>()...);}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=345pt]{structsysio_1_1vm_1_1detail_1_1generate__subtuples__impl_3_01std_1_1tuple_3_01_t_00_01_ts_8_8_8_01_4_01_4_a5b4da55eef5cdd3f2ea3e62b7da074a6_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1vm_1_1detail_1_1generate__subtuples__impl_3_01std_1_1tuple_3_01_t_00_01_ts_8_8_8_01_4_01_4_a5b4da55eef5cdd3f2ea3e62b7da074a6}\index{sysio::vm::detail::generate\_subtuples\_impl$<$ std::tuple$<$ T, Ts... $>$ $>$@{sysio::vm::detail::generate\_subtuples\_impl$<$ std::tuple$<$ T, Ts... $>$ $>$}!value@{value}}
+\index{value@{value}!sysio::vm::detail::generate\_subtuples\_impl$<$ std::tuple$<$ T, Ts... $>$ $>$@{sysio::vm::detail::generate\_subtuples\_impl$<$ std::tuple$<$ T, Ts... $>$ $>$}}
+\doxysubsubsection{\texorpdfstring{value()}{value()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1detail_1_1generate__subtuples__impl_3_01std_1_1tuple_3_01_t_00_01_ts_8_8_8_01_4_01_4_a5b4da55eef5cdd3f2ea3e62b7da074a6} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename... Ts$>$ \\
+template$<$size\+\_\+t... Is$>$ \\
+static constexpr auto \mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1generate__subtuples__impl}{sysio\+::vm\+::detail\+::generate\+\_\+subtuples\+\_\+impl}}$<$ std\+::tuple$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Ts... $>$ $>$\+::value (\begin{DoxyParamCaption}\item[{std\+::index\+\_\+sequence$<$ Is... $>$}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2utils_8hpp_source_l00128}{128}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2utils_8hpp_source}{utils.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::make\_tuple(std::declval<\mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a857851c5576526ad54ed2ac2047e5ee6}{subtuple\_t}}<Is,\ std::tuple<T,\ Ts...>>>()...);}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=345pt]{structsysio_1_1vm_1_1detail_1_1generate__subtuples__impl_3_01std_1_1tuple_3_01_t_00_01_ts_8_8_8_01_4_01_4_a5b4da55eef5cdd3f2ea3e62b7da074a6_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/include/sysio/sysio/vm/\mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2utils_8hpp}{utils.\+hpp}}\item 
+libraries/sys-\/vm/include/sysio/vm/\mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2utils_8hpp}{utils.\+hpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,21 @@
+<map id="Writer::String" name="Writer::String">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,104,103,130"/>
+<area shape="rect" id="Node000002" href="$class_writer.html#adc1cadbabc309d31f19cf7463251d879" title=" " alt="" coords="155,55,274,80"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="98,101,155,83,156,88,99,106"/>
+<area shape="rect" id="Node000005" href="$class_writer.html#a1fc40f8b9f3abc2548c0c5782ce1755d" title=" " alt="" coords="166,104,263,130"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="103,114,150,114,150,120,103,120"/>
+<area shape="rect" id="Node000007" href="$class_writer.html#acda4412ef5f4cac6e89f9544e4b10f70" title=" " alt="" coords="151,177,278,203"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="85,128,171,168,169,173,83,133"/>
+<area shape="rect" id="Node000003" href="$classinternal_1_1_stack.html#a2b8bda380e33838a99e3c73ff9785f03" title=" " alt="" coords="345,5,496,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="271,51,349,33,350,38,272,57"/>
+<area shape="rect" id="Node000004" href="$class_writer.html#a8ca4e364c546b2eb526caa68dde011d2" title="Flush the output stream." alt="" coords="373,55,468,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="274,65,358,65,358,70,274,70"/>
+<area shape="rect" id="Node000006" href="$classinternal_1_1_stack.html#ac484468a2791bd3e9ba609bd1600ab48" title=" " alt="" coords="340,104,501,130"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="263,114,325,114,325,120,263,120"/>
+<area shape="rect" id="Node000008" href="$stream_8h.html#aa817b00a466bb84d96c5de1616436c95" title="Reserve n characters for writing to a stream." alt="" coords="376,153,466,179"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="278,180,360,170,361,176,279,185"/>
+<area shape="rect" id="Node000009" href="$stream_8h.html#ad57ba7f2912c5509924b69dec7db4396" title="Write character to a stream, presuming buffer is reserved." alt="" coords="379,203,462,228"/>
+<area shape="poly" id="edge8_Node000007_Node000009" title=" " alt="" coords="279,195,364,206,364,211,278,201"/>
+<area shape="rect" id="Node000010" href="$class_writer.html#a94140803bba7863a1b39c936bbe6d262" title=" " alt="" coords="326,252,515,293"/>
+<area shape="poly" id="edge9_Node000007_Node000010" title=" " alt="" coords="244,201,327,238,343,244,341,249,325,243,242,206"/>
+</map>

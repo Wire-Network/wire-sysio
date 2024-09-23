@@ -1,0 +1,163 @@
+\doxysection{libff\+::mnt4\+\_\+ate\+\_\+dbl\+\_\+coeffs Struct Reference}
+\hypertarget{structlibff_1_1mnt4__ate__dbl__coeffs}{}\label{structlibff_1_1mnt4__ate__dbl__coeffs}\index{libff::mnt4\_ate\_dbl\_coeffs@{libff::mnt4\_ate\_dbl\_coeffs}}
+
+
+{\ttfamily \#include $<$mnt4\+\_\+pairing.\+hpp$>$}
+
+
+
+Collaboration diagram for libff\+::mnt4\+\_\+ate\+\_\+dbl\+\_\+coeffs\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structlibff_1_1mnt4__ate__dbl__coeffs__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{structlibff_1_1mnt4__ate__dbl__coeffs_a7e23ce1fb3e7814ffa63e2faaaa51f50}{operator==}} (const \mbox{\hyperlink{structlibff_1_1mnt4__ate__dbl__coeffs}{mnt4\+\_\+ate\+\_\+dbl\+\_\+coeffs}} \&other) const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacelibff_ad38f36eb4d1adc0b1205acb4fb00cef6}{mnt4\+\_\+\+Fq2}} \mbox{\hyperlink{structlibff_1_1mnt4__ate__dbl__coeffs_a299fc08f6a45e7f9bed39b95cba932ac}{c\+\_\+H}}
+\item 
+\mbox{\hyperlink{namespacelibff_ad38f36eb4d1adc0b1205acb4fb00cef6}{mnt4\+\_\+\+Fq2}} \mbox{\hyperlink{structlibff_1_1mnt4__ate__dbl__coeffs_a0d9077c2a29105ea42f2e4b7d4b1e0fb}{c\+\_\+4C}}
+\item 
+\mbox{\hyperlink{namespacelibff_ad38f36eb4d1adc0b1205acb4fb00cef6}{mnt4\+\_\+\+Fq2}} \mbox{\hyperlink{structlibff_1_1mnt4__ate__dbl__coeffs_a92154dd6272681582b5582637033682e}{c\+\_\+J}}
+\item 
+\mbox{\hyperlink{namespacelibff_ad38f36eb4d1adc0b1205acb4fb00cef6}{mnt4\+\_\+\+Fq2}} \mbox{\hyperlink{structlibff_1_1mnt4__ate__dbl__coeffs_a7a373f7faffef7e1e7af128842918d9d}{c\+\_\+L}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+std\+::ostream \& \mbox{\hyperlink{structlibff_1_1mnt4__ate__dbl__coeffs_a31aeee07704b0a9d1ad17c3647944161}{operator$<$$<$}} (std\+::ostream \&out, const \mbox{\hyperlink{structlibff_1_1mnt4__ate__dbl__coeffs}{mnt4\+\_\+ate\+\_\+dbl\+\_\+coeffs}} \&dc)
+\item 
+std\+::istream \& \mbox{\hyperlink{structlibff_1_1mnt4__ate__dbl__coeffs_a9f3deca8df4ce598661d720a99873e6d}{operator$>$$>$}} (std\+::istream \&in, \mbox{\hyperlink{structlibff_1_1mnt4__ate__dbl__coeffs}{mnt4\+\_\+ate\+\_\+dbl\+\_\+coeffs}} \&dc)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{mnt4__pairing_8hpp_source_l00071}{71}} of file \mbox{\hyperlink{mnt4__pairing_8hpp_source}{mnt4\+\_\+pairing.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structlibff_1_1mnt4__ate__dbl__coeffs_a7e23ce1fb3e7814ffa63e2faaaa51f50}\index{libff::mnt4\_ate\_dbl\_coeffs@{libff::mnt4\_ate\_dbl\_coeffs}!operator==@{operator==}}
+\index{operator==@{operator==}!libff::mnt4\_ate\_dbl\_coeffs@{libff::mnt4\_ate\_dbl\_coeffs}}
+\doxysubsubsection{\texorpdfstring{operator==()}{operator==()}}
+{\footnotesize\ttfamily \label{structlibff_1_1mnt4__ate__dbl__coeffs_a7e23ce1fb3e7814ffa63e2faaaa51f50} 
+bool libff\+::mnt4\+\_\+ate\+\_\+dbl\+\_\+coeffs\+::operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structlibff_1_1mnt4__ate__dbl__coeffs}{mnt4\+\_\+ate\+\_\+dbl\+\_\+coeffs}} \&}]{other}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{mnt4__pairing_8cpp_source_l00053}{53}} of file \mbox{\hyperlink{mnt4__pairing_8cpp_source}{mnt4\+\_\+pairing.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00054\ \{}
+\DoxyCodeLine{00055\ \ \ \ \ \textcolor{keywordflow}{return}\ (this-\/>\mbox{\hyperlink{structlibff_1_1mnt4__ate__dbl__coeffs_a299fc08f6a45e7f9bed39b95cba932ac}{c\_H}}\ ==\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.c\_H\ \&\&}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ \ \ \ this-\/>c\_4C\ ==\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.c\_4C\ \&\&}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ \ \ \ this-\/>c\_J\ ==\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.c\_J\ \&\&}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \ \ \ this-\/>c\_L\ ==\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.c\_L);}
+\DoxyCodeLine{00059\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{structlibff_1_1mnt4__ate__dbl__coeffs_a31aeee07704b0a9d1ad17c3647944161}\index{libff::mnt4\_ate\_dbl\_coeffs@{libff::mnt4\_ate\_dbl\_coeffs}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!libff::mnt4\_ate\_dbl\_coeffs@{libff::mnt4\_ate\_dbl\_coeffs}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$}{operator<<}}
+{\footnotesize\ttfamily \label{structlibff_1_1mnt4__ate__dbl__coeffs_a31aeee07704b0a9d1ad17c3647944161} 
+std\+::ostream \& operator$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{out}{, }\item[{const \mbox{\hyperlink{structlibff_1_1mnt4__ate__dbl__coeffs}{mnt4\+\_\+ate\+\_\+dbl\+\_\+coeffs}} \&}]{dc}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{mnt4__pairing_8cpp_source_l00061}{61}} of file \mbox{\hyperlink{mnt4__pairing_8cpp_source}{mnt4\+\_\+pairing.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00062\ \{}
+\DoxyCodeLine{00063\ \ \ \ \ out\ <<\ dc.c\_H\ <<\ \mbox{\hyperlink{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_ad80cfbe7456c7d029544e8bc2cec16c8}{OUTPUT\_SEPARATOR}}\ <<\ dc.c\_4C\ <<\ \mbox{\hyperlink{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_ad80cfbe7456c7d029544e8bc2cec16c8}{OUTPUT\_SEPARATOR}}\ <<\ dc.c\_J\ <<\ \mbox{\hyperlink{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_ad80cfbe7456c7d029544e8bc2cec16c8}{OUTPUT\_SEPARATOR}}\ <<\ dc.c\_L;}
+\DoxyCodeLine{00064\ \ \ \ \ \textcolor{keywordflow}{return}\ out;}
+\DoxyCodeLine{00065\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structlibff_1_1mnt4__ate__dbl__coeffs_a9f3deca8df4ce598661d720a99873e6d}\index{libff::mnt4\_ate\_dbl\_coeffs@{libff::mnt4\_ate\_dbl\_coeffs}!operator$>$$>$@{operator$>$$>$}}
+\index{operator$>$$>$@{operator$>$$>$}!libff::mnt4\_ate\_dbl\_coeffs@{libff::mnt4\_ate\_dbl\_coeffs}}
+\doxysubsubsection{\texorpdfstring{operator$>$$>$}{operator>>}}
+{\footnotesize\ttfamily \label{structlibff_1_1mnt4__ate__dbl__coeffs_a9f3deca8df4ce598661d720a99873e6d} 
+std\+::istream \& operator$>$$>$ (\begin{DoxyParamCaption}\item[{std\+::istream \&}]{in}{, }\item[{\mbox{\hyperlink{structlibff_1_1mnt4__ate__dbl__coeffs}{mnt4\+\_\+ate\+\_\+dbl\+\_\+coeffs}} \&}]{dc}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{mnt4__pairing_8cpp_source_l00067}{67}} of file \mbox{\hyperlink{mnt4__pairing_8cpp_source}{mnt4\+\_\+pairing.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00068\ \{}
+\DoxyCodeLine{00069\ \ \ \ \ in\ >>\ dc.c\_H;}
+\DoxyCodeLine{00070\ \ \ \ \ \mbox{\hyperlink{namespacelibff_a3b7a446329c9be967e16ab1c04f260e6}{consume\_OUTPUT\_SEPARATOR}}(in);}
+\DoxyCodeLine{00071\ \ \ \ \ in\ >>\ dc.c\_4C;}
+\DoxyCodeLine{00072\ \ \ \ \ \mbox{\hyperlink{namespacelibff_a3b7a446329c9be967e16ab1c04f260e6}{consume\_OUTPUT\_SEPARATOR}}(in);}
+\DoxyCodeLine{00073\ \ \ \ \ in\ >>\ dc.c\_J;}
+\DoxyCodeLine{00074\ \ \ \ \ \mbox{\hyperlink{namespacelibff_a3b7a446329c9be967e16ab1c04f260e6}{consume\_OUTPUT\_SEPARATOR}}(in);}
+\DoxyCodeLine{00075\ \ \ \ \ in\ >>\ dc.c\_L;}
+\DoxyCodeLine{00076\ }
+\DoxyCodeLine{00077\ \ \ \ \ \textcolor{keywordflow}{return}\ in;}
+\DoxyCodeLine{00078\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structlibff_1_1mnt4__ate__dbl__coeffs_a0d9077c2a29105ea42f2e4b7d4b1e0fb}\index{libff::mnt4\_ate\_dbl\_coeffs@{libff::mnt4\_ate\_dbl\_coeffs}!c\_4C@{c\_4C}}
+\index{c\_4C@{c\_4C}!libff::mnt4\_ate\_dbl\_coeffs@{libff::mnt4\_ate\_dbl\_coeffs}}
+\doxysubsubsection{\texorpdfstring{c\_4C}{c\_4C}}
+{\footnotesize\ttfamily \label{structlibff_1_1mnt4__ate__dbl__coeffs_a0d9077c2a29105ea42f2e4b7d4b1e0fb} 
+\mbox{\hyperlink{namespacelibff_ad38f36eb4d1adc0b1205acb4fb00cef6}{mnt4\+\_\+\+Fq2}} libff\+::mnt4\+\_\+ate\+\_\+dbl\+\_\+coeffs\+::c\+\_\+4C}
+
+
+
+Definition at line \mbox{\hyperlink{mnt4__pairing_8hpp_source_l00073}{73}} of file \mbox{\hyperlink{mnt4__pairing_8hpp_source}{mnt4\+\_\+pairing.\+hpp}}.
+
+\Hypertarget{structlibff_1_1mnt4__ate__dbl__coeffs_a299fc08f6a45e7f9bed39b95cba932ac}\index{libff::mnt4\_ate\_dbl\_coeffs@{libff::mnt4\_ate\_dbl\_coeffs}!c\_H@{c\_H}}
+\index{c\_H@{c\_H}!libff::mnt4\_ate\_dbl\_coeffs@{libff::mnt4\_ate\_dbl\_coeffs}}
+\doxysubsubsection{\texorpdfstring{c\_H}{c\_H}}
+{\footnotesize\ttfamily \label{structlibff_1_1mnt4__ate__dbl__coeffs_a299fc08f6a45e7f9bed39b95cba932ac} 
+\mbox{\hyperlink{namespacelibff_ad38f36eb4d1adc0b1205acb4fb00cef6}{mnt4\+\_\+\+Fq2}} libff\+::mnt4\+\_\+ate\+\_\+dbl\+\_\+coeffs\+::c\+\_\+H}
+
+
+
+Definition at line \mbox{\hyperlink{mnt4__pairing_8hpp_source_l00072}{72}} of file \mbox{\hyperlink{mnt4__pairing_8hpp_source}{mnt4\+\_\+pairing.\+hpp}}.
+
+\Hypertarget{structlibff_1_1mnt4__ate__dbl__coeffs_a92154dd6272681582b5582637033682e}\index{libff::mnt4\_ate\_dbl\_coeffs@{libff::mnt4\_ate\_dbl\_coeffs}!c\_J@{c\_J}}
+\index{c\_J@{c\_J}!libff::mnt4\_ate\_dbl\_coeffs@{libff::mnt4\_ate\_dbl\_coeffs}}
+\doxysubsubsection{\texorpdfstring{c\_J}{c\_J}}
+{\footnotesize\ttfamily \label{structlibff_1_1mnt4__ate__dbl__coeffs_a92154dd6272681582b5582637033682e} 
+\mbox{\hyperlink{namespacelibff_ad38f36eb4d1adc0b1205acb4fb00cef6}{mnt4\+\_\+\+Fq2}} libff\+::mnt4\+\_\+ate\+\_\+dbl\+\_\+coeffs\+::c\+\_\+J}
+
+
+
+Definition at line \mbox{\hyperlink{mnt4__pairing_8hpp_source_l00074}{74}} of file \mbox{\hyperlink{mnt4__pairing_8hpp_source}{mnt4\+\_\+pairing.\+hpp}}.
+
+\Hypertarget{structlibff_1_1mnt4__ate__dbl__coeffs_a7a373f7faffef7e1e7af128842918d9d}\index{libff::mnt4\_ate\_dbl\_coeffs@{libff::mnt4\_ate\_dbl\_coeffs}!c\_L@{c\_L}}
+\index{c\_L@{c\_L}!libff::mnt4\_ate\_dbl\_coeffs@{libff::mnt4\_ate\_dbl\_coeffs}}
+\doxysubsubsection{\texorpdfstring{c\_L}{c\_L}}
+{\footnotesize\ttfamily \label{structlibff_1_1mnt4__ate__dbl__coeffs_a7a373f7faffef7e1e7af128842918d9d} 
+\mbox{\hyperlink{namespacelibff_ad38f36eb4d1adc0b1205acb4fb00cef6}{mnt4\+\_\+\+Fq2}} libff\+::mnt4\+\_\+ate\+\_\+dbl\+\_\+coeffs\+::c\+\_\+L}
+
+
+
+Definition at line \mbox{\hyperlink{mnt4__pairing_8hpp_source_l00075}{75}} of file \mbox{\hyperlink{mnt4__pairing_8hpp_source}{mnt4\+\_\+pairing.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/libraries/ff/libff/algebra/curves/mnt/mnt4/\mbox{\hyperlink{mnt4__pairing_8hpp}{mnt4\+\_\+pairing.\+hpp}}\item 
+libraries/fc/libraries/ff/libff/algebra/curves/mnt/mnt4/\mbox{\hyperlink{mnt4__pairing_8cpp}{mnt4\+\_\+pairing.\+cpp}}\end{DoxyCompactItemize}

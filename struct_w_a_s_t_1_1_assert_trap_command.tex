@@ -1,0 +1,119 @@
+\doxysection{WAST\+::Assert\+Trap\+Command Struct Reference}
+\hypertarget{struct_w_a_s_t_1_1_assert_trap_command}{}\label{struct_w_a_s_t_1_1_assert_trap_command}\index{WAST::AssertTrapCommand@{WAST::AssertTrapCommand}}
+
+
+{\ttfamily \#include $<$Test\+Script.\+h$>$}
+
+
+
+Inheritance diagram for WAST\+::Assert\+Trap\+Command\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=222pt]{struct_w_a_s_t_1_1_assert_trap_command__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for WAST\+::Assert\+Trap\+Command\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=222pt]{struct_w_a_s_t_1_1_assert_trap_command__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_w_a_s_t_1_1_assert_trap_command_a5f510074d6411c02fcd2ddeec3ed99da}{Assert\+Trap\+Command}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_text_file_locus}{Text\+File\+Locus}} \&\&in\+Locus, \mbox{\hyperlink{struct_w_a_s_t_1_1_action}{Action}} \texorpdfstring{$\ast$}{*}in\+Action, \mbox{\hyperlink{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59c}{Runtime\+::\+Exception\+::\+Cause}} in\+Expected\+Cause)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{struct_w_a_s_t_1_1_command}{WAST\+::\+Command}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_w_a_s_t_1_1_command_a8411f2eb2349e310829ece56d1acfc30}{Command}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_command_afd324aa82f13813a050e1d9939b50611}{Type}} in\+Type, \mbox{\hyperlink{struct_w_a_s_t_1_1_text_file_locus}{Text\+File\+Locus}} \&\&in\+Locus)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::unique\+\_\+ptr$<$ \mbox{\hyperlink{struct_w_a_s_t_1_1_action}{Action}} $>$ \mbox{\hyperlink{struct_w_a_s_t_1_1_assert_trap_command_a90341ef97bd75c36593b246bf9bde8eb}{action}}
+\item 
+\mbox{\hyperlink{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59c}{Runtime\+::\+Exception\+::\+Cause}} \mbox{\hyperlink{struct_w_a_s_t_1_1_assert_trap_command_a3ecfcb3a06cb2016e846d5aa18d32031}{expected\+Cause}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes inherited from \mbox{\hyperlink{struct_w_a_s_t_1_1_command}{WAST\+::\+Command}}}
+\begin{DoxyCompactItemize}
+\item 
+const \mbox{\hyperlink{struct_w_a_s_t_1_1_command_afd324aa82f13813a050e1d9939b50611}{Type}} \mbox{\hyperlink{struct_w_a_s_t_1_1_command_af3295caa44373840203d77728de4814b}{type}}
+\item 
+const \mbox{\hyperlink{struct_w_a_s_t_1_1_text_file_locus}{Text\+File\+Locus}} \mbox{\hyperlink{struct_w_a_s_t_1_1_command_a6eca05a9daa236b4a1b49c4807bca3f4}{locus}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Public Types inherited from \mbox{\hyperlink{struct_w_a_s_t_1_1_command}{WAST\+::\+Command}}}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{struct_w_a_s_t_1_1_command_afd324aa82f13813a050e1d9939b50611}{Type}} \{ \newline
+\mbox{\hyperlink{struct_w_a_s_t_1_1_command_afd324aa82f13813a050e1d9939b50611a00615310f13ac3289240510d7f380047}{\+\_\+register}}
+, \mbox{\hyperlink{struct_w_a_s_t_1_1_command_afd324aa82f13813a050e1d9939b50611a7d7243c45725a49a5d972f2a5b733038}{action}}
+, \mbox{\hyperlink{struct_w_a_s_t_1_1_command_afd324aa82f13813a050e1d9939b50611a56f84491631f056cee5ae6aaffe13bec}{assert\+\_\+return}}
+, \mbox{\hyperlink{struct_w_a_s_t_1_1_command_afd324aa82f13813a050e1d9939b50611a14eea3f555403eab6bc4f09377993cd7}{assert\+\_\+return\+\_\+canonical\+\_\+nan}}
+, \newline
+\mbox{\hyperlink{struct_w_a_s_t_1_1_command_afd324aa82f13813a050e1d9939b50611a71d656e27755941efd3fdebcf251a208}{assert\+\_\+return\+\_\+arithmetic\+\_\+nan}}
+, \mbox{\hyperlink{struct_w_a_s_t_1_1_command_afd324aa82f13813a050e1d9939b50611ac598b3cb940d7c1f4481d70e2ce4605f}{assert\+\_\+trap}}
+, \mbox{\hyperlink{struct_w_a_s_t_1_1_command_afd324aa82f13813a050e1d9939b50611abef86193d9f61227ea40694f4305eb14}{assert\+\_\+invalid}}
+, \mbox{\hyperlink{struct_w_a_s_t_1_1_command_afd324aa82f13813a050e1d9939b50611a983e304728632d13b858eb6f01a2b185}{assert\+\_\+malformed}}
+, \newline
+\mbox{\hyperlink{struct_w_a_s_t_1_1_command_afd324aa82f13813a050e1d9939b50611a0c8ba8956fcb0350a17efd501ff90148}{assert\+\_\+unlinkable}}
+ \}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{_test_script_8h_source_l00116}{116}} of file \mbox{\hyperlink{_test_script_8h_source}{Test\+Script.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{struct_w_a_s_t_1_1_assert_trap_command_a5f510074d6411c02fcd2ddeec3ed99da}\index{WAST::AssertTrapCommand@{WAST::AssertTrapCommand}!AssertTrapCommand@{AssertTrapCommand}}
+\index{AssertTrapCommand@{AssertTrapCommand}!WAST::AssertTrapCommand@{WAST::AssertTrapCommand}}
+\doxysubsubsection{\texorpdfstring{AssertTrapCommand()}{AssertTrapCommand()}}
+{\footnotesize\ttfamily \label{struct_w_a_s_t_1_1_assert_trap_command_a5f510074d6411c02fcd2ddeec3ed99da} 
+WAST\+::\+Assert\+Trap\+Command\+::\+Assert\+Trap\+Command (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_w_a_s_t_1_1_text_file_locus}{Text\+File\+Locus}} \&\&}]{in\+Locus}{, }\item[{\mbox{\hyperlink{struct_w_a_s_t_1_1_action}{Action}} \texorpdfstring{$\ast$}{*}}]{in\+Action}{, }\item[{\mbox{\hyperlink{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59c}{Runtime\+::\+Exception\+::\+Cause}}}]{in\+Expected\+Cause}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_test_script_8h_source_l00120}{120}} of file \mbox{\hyperlink{_test_script_8h_source}{Test\+Script.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{src_2main_8c_a62d1747f225814325ab32d45082a23c1}{Command}}(Command::assert\_trap,std::move(inLocus)),\ \mbox{\hyperlink{struct_w_a_s_t_1_1_assert_trap_command_a90341ef97bd75c36593b246bf9bde8eb}{action}}(inAction),\ \mbox{\hyperlink{struct_w_a_s_t_1_1_assert_trap_command_a3ecfcb3a06cb2016e846d5aa18d32031}{expectedCause}}(inExpectedCause)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_w_a_s_t_1_1_assert_trap_command_a90341ef97bd75c36593b246bf9bde8eb}\index{WAST::AssertTrapCommand@{WAST::AssertTrapCommand}!action@{action}}
+\index{action@{action}!WAST::AssertTrapCommand@{WAST::AssertTrapCommand}}
+\doxysubsubsection{\texorpdfstring{action}{action}}
+{\footnotesize\ttfamily \label{struct_w_a_s_t_1_1_assert_trap_command_a90341ef97bd75c36593b246bf9bde8eb} 
+std\+::unique\+\_\+ptr$<$\mbox{\hyperlink{struct_w_a_s_t_1_1_action}{Action}}$>$ WAST\+::\+Assert\+Trap\+Command\+::action}
+
+
+
+Definition at line \mbox{\hyperlink{_test_script_8h_source_l00118}{118}} of file \mbox{\hyperlink{_test_script_8h_source}{Test\+Script.\+h}}.
+
+\Hypertarget{struct_w_a_s_t_1_1_assert_trap_command_a3ecfcb3a06cb2016e846d5aa18d32031}\index{WAST::AssertTrapCommand@{WAST::AssertTrapCommand}!expectedCause@{expectedCause}}
+\index{expectedCause@{expectedCause}!WAST::AssertTrapCommand@{WAST::AssertTrapCommand}}
+\doxysubsubsection{\texorpdfstring{expectedCause}{expectedCause}}
+{\footnotesize\ttfamily \label{struct_w_a_s_t_1_1_assert_trap_command_a3ecfcb3a06cb2016e846d5aa18d32031} 
+\mbox{\hyperlink{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59c}{Runtime\+::\+Exception\+::\+Cause}} WAST\+::\+Assert\+Trap\+Command\+::expected\+Cause}
+
+
+
+Definition at line \mbox{\hyperlink{_test_script_8h_source_l00119}{119}} of file \mbox{\hyperlink{_test_script_8h_source}{Test\+Script.\+h}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/wasm-\/jit/\+Include/\+WAST/\mbox{\hyperlink{_test_script_8h}{Test\+Script.\+h}}\end{DoxyCompactItemize}

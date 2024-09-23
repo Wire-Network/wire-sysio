@@ -1,0 +1,99 @@
+\doxysection{report\+\_\+time Struct Reference}
+\hypertarget{structreport__time}{}\label{structreport__time}\index{report\_time@{report\_time}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structreport__time_a2adc352a5e8326095cd22a2be7203260}{report\+\_\+time}} (std\+::string desc)
+\item 
+void \mbox{\hyperlink{structreport__time_a397785710bcbb888db539e0bb292fc82}{report}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+const std\+::chrono\+::high\+\_\+resolution\+\_\+clock\+::time\+\_\+point \mbox{\hyperlink{structreport__time_a4125b948a2f57b4420adc68be7e69d8d}{\+\_\+start}}
+\item 
+const std\+::string \mbox{\hyperlink{structreport__time_a9f3ca525de316ff32554f723379e24e1}{\+\_\+desc}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{programs_2sysio-blocklog_2main_8cpp_source_l00057}{57}} of file \mbox{\hyperlink{programs_2sysio-blocklog_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structreport__time_a2adc352a5e8326095cd22a2be7203260}\index{report\_time@{report\_time}!report\_time@{report\_time}}
+\index{report\_time@{report\_time}!report\_time@{report\_time}}
+\doxysubsubsection{\texorpdfstring{report\_time()}{report\_time()}}
+{\footnotesize\ttfamily \label{structreport__time_a2adc352a5e8326095cd22a2be7203260} 
+report\+\_\+time\+::report\+\_\+time (\begin{DoxyParamCaption}\item[{std\+::string}]{desc}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2sysio-blocklog_2main_8cpp_source_l00058}{58}} of file \mbox{\hyperlink{programs_2sysio-blocklog_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00059\ \ \ \ \ :\ \mbox{\hyperlink{structreport__time_a4125b948a2f57b4420adc68be7e69d8d}{\_start}}(std::chrono::high\_resolution\_clock::now())}
+\DoxyCodeLine{00060\ \ \ \ \ ,\ \mbox{\hyperlink{structreport__time_a9f3ca525de316ff32554f723379e24e1}{\_desc}}(desc)\ \{}
+\DoxyCodeLine{00061\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structreport__time_a397785710bcbb888db539e0bb292fc82}\index{report\_time@{report\_time}!report@{report}}
+\index{report@{report}!report\_time@{report\_time}}
+\doxysubsubsection{\texorpdfstring{report()}{report()}}
+{\footnotesize\ttfamily \label{structreport__time_a397785710bcbb888db539e0bb292fc82} 
+void report\+\_\+time\+::report (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2sysio-blocklog_2main_8cpp_source_l00063}{63}} of file \mbox{\hyperlink{programs_2sysio-blocklog_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ duration\ =\ std::chrono::duration\_cast<std::chrono::microseconds>(std::chrono::high\_resolution\_clock::now()\ -\/\ \mbox{\hyperlink{structreport__time_a4125b948a2f57b4420adc68be7e69d8d}{\_start}}).count()\ /\ 1000;}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\textcolor{stringliteral}{"{}sysio-\/blocklog\ -\/\ \$\{desc\}\ took\ \$\{t\}\ msec"{}},\ (\textcolor{stringliteral}{"{}desc"{}},\ \mbox{\hyperlink{structreport__time_a9f3ca525de316ff32554f723379e24e1}{\_desc}})(\textcolor{stringliteral}{"{}t"{}},\ duration));}
+\DoxyCodeLine{00066\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structreport__time_a397785710bcbb888db539e0bb292fc82_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structreport__time_a9f3ca525de316ff32554f723379e24e1}\index{report\_time@{report\_time}!\_desc@{\_desc}}
+\index{\_desc@{\_desc}!report\_time@{report\_time}}
+\doxysubsubsection{\texorpdfstring{\_desc}{\_desc}}
+{\footnotesize\ttfamily \label{structreport__time_a9f3ca525de316ff32554f723379e24e1} 
+const std\+::string report\+\_\+time\+::\+\_\+desc}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2sysio-blocklog_2main_8cpp_source_l00069}{69}} of file \mbox{\hyperlink{programs_2sysio-blocklog_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{structreport__time_a4125b948a2f57b4420adc68be7e69d8d}\index{report\_time@{report\_time}!\_start@{\_start}}
+\index{\_start@{\_start}!report\_time@{report\_time}}
+\doxysubsubsection{\texorpdfstring{\_start}{\_start}}
+{\footnotesize\ttfamily \label{structreport__time_a4125b948a2f57b4420adc68be7e69d8d} 
+const std\+::chrono\+::high\+\_\+resolution\+\_\+clock\+::time\+\_\+point report\+\_\+time\+::\+\_\+start}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2sysio-blocklog_2main_8cpp_source_l00068}{68}} of file \mbox{\hyperlink{programs_2sysio-blocklog_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+programs/sysio-\/blocklog/\mbox{\hyperlink{programs_2sysio-blocklog_2main_8cpp}{main.\+cpp}}\end{DoxyCompactItemize}

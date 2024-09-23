@@ -1,0 +1,358 @@
+\doxysection{libraries/fc/secp256k1/secp256k1/src/modules/ecdh/tests\+\_\+impl.h File Reference}
+\hypertarget{ecdh_2tests__impl_8h}{}\label{ecdh_2tests__impl_8h}\index{libraries/fc/secp256k1/secp256k1/src/modules/ecdh/tests\_impl.h@{libraries/fc/secp256k1/secp256k1/src/modules/ecdh/tests\_impl.h}}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{ecdh_2tests__impl_8h_a76454f307a6df9e790f6db8adf3b81d5}{ecdh\+\_\+hash\+\_\+function\+\_\+test\+\_\+fail}} (unsigned char \texorpdfstring{$\ast$}{*}output, const unsigned char \texorpdfstring{$\ast$}{*}x, const unsigned char \texorpdfstring{$\ast$}{*}y, void \texorpdfstring{$\ast$}{*}data)
+\item 
+int \mbox{\hyperlink{ecdh_2tests__impl_8h_a4f286ad55d3c0658fe7759ba5bd13019}{ecdh\+\_\+hash\+\_\+function\+\_\+custom}} (unsigned char \texorpdfstring{$\ast$}{*}output, const unsigned char \texorpdfstring{$\ast$}{*}x, const unsigned char \texorpdfstring{$\ast$}{*}y, void \texorpdfstring{$\ast$}{*}data)
+\item 
+void \mbox{\hyperlink{ecdh_2tests__impl_8h_aa7159f9419cd1b57e4c1524a99b731de}{test\+\_\+ecdh\+\_\+api}} (void)
+\item 
+void \mbox{\hyperlink{ecdh_2tests__impl_8h_ab13157e14f777c18f14fefc834d067c5}{test\+\_\+ecdh\+\_\+generator\+\_\+basepoint}} (void)
+\item 
+void \mbox{\hyperlink{ecdh_2tests__impl_8h_a505bff7cea922e6d8aa4f7525cfd191a}{test\+\_\+bad\+\_\+scalar}} (void)
+\item 
+void \mbox{\hyperlink{ecdh_2tests__impl_8h_a7b1b85ce1718b9ef666343dd8a0eaac2}{test\+\_\+result\+\_\+basepoint}} (void)
+\item 
+void \mbox{\hyperlink{ecdh_2tests__impl_8h_aab6cd779f0b87dc8a7afdf4eaf873407}{run\+\_\+ecdh\+\_\+tests}} (void)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{ecdh_2tests__impl_8h_a4f286ad55d3c0658fe7759ba5bd13019}\index{tests\_impl.h@{tests\_impl.h}!ecdh\_hash\_function\_custom@{ecdh\_hash\_function\_custom}}
+\index{ecdh\_hash\_function\_custom@{ecdh\_hash\_function\_custom}!tests\_impl.h@{tests\_impl.h}}
+\doxysubsubsection{\texorpdfstring{ecdh\_hash\_function\_custom()}{ecdh\_hash\_function\_custom()}}
+{\footnotesize\ttfamily \label{ecdh_2tests__impl_8h_a4f286ad55d3c0658fe7759ba5bd13019} 
+int ecdh\+\_\+hash\+\_\+function\+\_\+custom (\begin{DoxyParamCaption}\item[{unsigned char \texorpdfstring{$\ast$}{*}}]{output}{, }\item[{const unsigned char \texorpdfstring{$\ast$}{*}}]{x}{, }\item[{const unsigned char \texorpdfstring{$\ast$}{*}}]{y}{, }\item[{void \texorpdfstring{$\ast$}{*}}]{data}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{ecdh_2tests__impl_8h_source_l00018}{18}} of file \mbox{\hyperlink{ecdh_2tests__impl_8h_source}{tests\+\_\+impl.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00019\ \ \ \ \ (void)data;}
+\DoxyCodeLine{00020\ \ \ \ \ \textcolor{comment}{/*\ Save\ x\ and\ y\ as\ uncompressed\ public\ key\ */}}
+\DoxyCodeLine{00021\ \ \ \ \ output[0]\ =\ 0x04;}
+\DoxyCodeLine{00022\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(output\ +\ 1,\ x,\ 32);}
+\DoxyCodeLine{00023\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(output\ +\ 33,\ y,\ 32);}
+\DoxyCodeLine{00024\ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{00025\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=273pt]{ecdh_2tests__impl_8h_a4f286ad55d3c0658fe7759ba5bd13019_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{ecdh_2tests__impl_8h_a4f286ad55d3c0658fe7759ba5bd13019_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{ecdh_2tests__impl_8h_a76454f307a6df9e790f6db8adf3b81d5}\index{tests\_impl.h@{tests\_impl.h}!ecdh\_hash\_function\_test\_fail@{ecdh\_hash\_function\_test\_fail}}
+\index{ecdh\_hash\_function\_test\_fail@{ecdh\_hash\_function\_test\_fail}!tests\_impl.h@{tests\_impl.h}}
+\doxysubsubsection{\texorpdfstring{ecdh\_hash\_function\_test\_fail()}{ecdh\_hash\_function\_test\_fail()}}
+{\footnotesize\ttfamily \label{ecdh_2tests__impl_8h_a76454f307a6df9e790f6db8adf3b81d5} 
+int ecdh\+\_\+hash\+\_\+function\+\_\+test\+\_\+fail (\begin{DoxyParamCaption}\item[{unsigned char \texorpdfstring{$\ast$}{*}}]{output}{, }\item[{const unsigned char \texorpdfstring{$\ast$}{*}}]{x}{, }\item[{const unsigned char \texorpdfstring{$\ast$}{*}}]{y}{, }\item[{void \texorpdfstring{$\ast$}{*}}]{data}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{ecdh_2tests__impl_8h_source_l00010}{10}} of file \mbox{\hyperlink{ecdh_2tests__impl_8h_source}{tests\+\_\+impl.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00010\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00011\ \ \ \ \ (void)output;}
+\DoxyCodeLine{00012\ \ \ \ \ (void)x;}
+\DoxyCodeLine{00013\ \ \ \ \ (void)y;}
+\DoxyCodeLine{00014\ \ \ \ \ (void)data;}
+\DoxyCodeLine{00015\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00016\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{ecdh_2tests__impl_8h_a76454f307a6df9e790f6db8adf3b81d5_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{ecdh_2tests__impl_8h_aab6cd779f0b87dc8a7afdf4eaf873407}\index{tests\_impl.h@{tests\_impl.h}!run\_ecdh\_tests@{run\_ecdh\_tests}}
+\index{run\_ecdh\_tests@{run\_ecdh\_tests}!tests\_impl.h@{tests\_impl.h}}
+\doxysubsubsection{\texorpdfstring{run\_ecdh\_tests()}{run\_ecdh\_tests()}}
+{\footnotesize\ttfamily \label{ecdh_2tests__impl_8h_aab6cd779f0b87dc8a7afdf4eaf873407} 
+void run\+\_\+ecdh\+\_\+tests (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{ecdh_2tests__impl_8h_source_l00158}{158}} of file \mbox{\hyperlink{ecdh_2tests__impl_8h_source}{tests\+\_\+impl.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00159\ \ \ \ \ \mbox{\hyperlink{ecdh_2tests__impl_8h_aa7159f9419cd1b57e4c1524a99b731de}{test\_ecdh\_api}}();}
+\DoxyCodeLine{00160\ \ \ \ \ \mbox{\hyperlink{ecdh_2tests__impl_8h_ab13157e14f777c18f14fefc834d067c5}{test\_ecdh\_generator\_basepoint}}();}
+\DoxyCodeLine{00161\ \ \ \ \ \mbox{\hyperlink{ecdh_2tests__impl_8h_a505bff7cea922e6d8aa4f7525cfd191a}{test\_bad\_scalar}}();}
+\DoxyCodeLine{00162\ \ \ \ \ \mbox{\hyperlink{ecdh_2tests__impl_8h_a7b1b85ce1718b9ef666343dd8a0eaac2}{test\_result\_basepoint}}();}
+\DoxyCodeLine{00163\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{ecdh_2tests__impl_8h_aab6cd779f0b87dc8a7afdf4eaf873407_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=236pt]{ecdh_2tests__impl_8h_aab6cd779f0b87dc8a7afdf4eaf873407_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{ecdh_2tests__impl_8h_a505bff7cea922e6d8aa4f7525cfd191a}\index{tests\_impl.h@{tests\_impl.h}!test\_bad\_scalar@{test\_bad\_scalar}}
+\index{test\_bad\_scalar@{test\_bad\_scalar}!tests\_impl.h@{tests\_impl.h}}
+\doxysubsubsection{\texorpdfstring{test\_bad\_scalar()}{test\_bad\_scalar()}}
+{\footnotesize\ttfamily \label{ecdh_2tests__impl_8h_a505bff7cea922e6d8aa4f7525cfd191a} 
+void test\+\_\+bad\+\_\+scalar (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{ecdh_2tests__impl_8h_source_l00097}{97}} of file \mbox{\hyperlink{ecdh_2tests__impl_8h_source}{tests\+\_\+impl.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00098\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ s\_zero[32]\ =\ \{\ 0\ \};}
+\DoxyCodeLine{00099\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ s\_overflow[32]\ =\ \{}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ 0xff,\ 0xff,\ 0xff,\ 0xff,\ 0xff,\ 0xff,\ 0xff,\ 0xff,}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ 0xff,\ 0xff,\ 0xff,\ 0xff,\ 0xff,\ 0xff,\ 0xff,\ 0xfe,}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ 0xba,\ 0xae,\ 0xdc,\ 0xe6,\ 0xaf,\ 0x48,\ 0xa0,\ 0x3b,}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ 0xbf,\ 0xd2,\ 0x5e,\ 0x8c,\ 0xd0,\ 0x36,\ 0x41,\ 0x41}
+\DoxyCodeLine{00104\ \ \ \ \ \};}
+\DoxyCodeLine{00105\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ s\_rand[32]\ =\ \{\ 0\ \};}
+\DoxyCodeLine{00106\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ output[32];}
+\DoxyCodeLine{00107\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ rand;}
+\DoxyCodeLine{00108\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__pubkey}{secp256k1\_pubkey}}\ \mbox{\hyperlink{structpoint}{point}};}
+\DoxyCodeLine{00109\ }
+\DoxyCodeLine{00110\ \ \ \ \ \textcolor{comment}{/*\ Create\ random\ point\ */}}
+\DoxyCodeLine{00111\ \ \ \ \ \mbox{\hyperlink{tests_8c_a01cf4b4fc9b4ab8cb3e04fd3dc2ff57f}{random\_scalar\_order}}(\&rand);}
+\DoxyCodeLine{00112\ \ \ \ \ secp256k1\_scalar\_get\_b32(s\_rand,\ \&rand);}
+\DoxyCodeLine{00113\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{secp256k1_8h_a7438071aa8a6dc4697abe4f4659f2161}{secp256k1\_ec\_pubkey\_create}}(ctx,\ \&\mbox{\hyperlink{structpoint}{point}},\ s\_rand)\ ==\ 1);}
+\DoxyCodeLine{00114\ }
+\DoxyCodeLine{00115\ \ \ \ \ \textcolor{comment}{/*\ Try\ to\ multiply\ it\ by\ bad\ values\ */}}
+\DoxyCodeLine{00116\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{secp256k1__ecdh_8h_a4386914d0dce8b04f056ce3fae9a37a8}{secp256k1\_ecdh}}(ctx,\ output,\ \&\mbox{\hyperlink{structpoint}{point}},\ s\_zero,\ NULL,\ NULL)\ ==\ 0);}
+\DoxyCodeLine{00117\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{secp256k1__ecdh_8h_a4386914d0dce8b04f056ce3fae9a37a8}{secp256k1\_ecdh}}(ctx,\ output,\ \&\mbox{\hyperlink{structpoint}{point}},\ s\_overflow,\ NULL,\ NULL)\ ==\ 0);}
+\DoxyCodeLine{00118\ \ \ \ \ \textcolor{comment}{/*\ ...and\ a\ good\ one\ */}}
+\DoxyCodeLine{00119\ \ \ \ \ s\_overflow[31]\ -\/=\ 1;}
+\DoxyCodeLine{00120\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{secp256k1__ecdh_8h_a4386914d0dce8b04f056ce3fae9a37a8}{secp256k1\_ecdh}}(ctx,\ output,\ \&\mbox{\hyperlink{structpoint}{point}},\ s\_overflow,\ NULL,\ NULL)\ ==\ 1);}
+\DoxyCodeLine{00121\ }
+\DoxyCodeLine{00122\ \ \ \ \ \textcolor{comment}{/*\ Hash\ function\ failure\ results\ in\ ecdh\ failure\ */}}
+\DoxyCodeLine{00123\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{secp256k1__ecdh_8h_a4386914d0dce8b04f056ce3fae9a37a8}{secp256k1\_ecdh}}(ctx,\ output,\ \&\mbox{\hyperlink{structpoint}{point}},\ s\_overflow,\ \mbox{\hyperlink{ecdh_2tests__impl_8h_a76454f307a6df9e790f6db8adf3b81d5}{ecdh\_hash\_function\_test\_fail}},\ NULL)\ ==\ 0);}
+\DoxyCodeLine{00124\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{ecdh_2tests__impl_8h_a505bff7cea922e6d8aa4f7525cfd191a_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{ecdh_2tests__impl_8h_a505bff7cea922e6d8aa4f7525cfd191a_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{ecdh_2tests__impl_8h_aa7159f9419cd1b57e4c1524a99b731de}\index{tests\_impl.h@{tests\_impl.h}!test\_ecdh\_api@{test\_ecdh\_api}}
+\index{test\_ecdh\_api@{test\_ecdh\_api}!tests\_impl.h@{tests\_impl.h}}
+\doxysubsubsection{\texorpdfstring{test\_ecdh\_api()}{test\_ecdh\_api()}}
+{\footnotesize\ttfamily \label{ecdh_2tests__impl_8h_aa7159f9419cd1b57e4c1524a99b731de} 
+void test\+\_\+ecdh\+\_\+api (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{ecdh_2tests__impl_8h_source_l00027}{27}} of file \mbox{\hyperlink{ecdh_2tests__impl_8h_source}{tests\+\_\+impl.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00028\ \ \ \ \ \textcolor{comment}{/*\ Setup\ context\ that\ just\ counts\ errors\ */}}
+\DoxyCodeLine{00029\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__context__struct}{secp256k1\_context}}\ *tctx\ =\ \mbox{\hyperlink{secp256k1_8h_a3aaa9fcc3ab67bc8f841779a049069c5}{secp256k1\_context\_create}}(\mbox{\hyperlink{secp256k1_8h_a0d34fe6baa73d3145f2e376e43de0b15}{SECP256K1\_CONTEXT\_SIGN}});}
+\DoxyCodeLine{00030\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__pubkey}{secp256k1\_pubkey}}\ \mbox{\hyperlink{structpoint}{point}};}
+\DoxyCodeLine{00031\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ res[32];}
+\DoxyCodeLine{00032\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ s\_one[32]\ =\ \{\ 0\ \};}
+\DoxyCodeLine{00033\ \ \ \ \ \mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}}\ ecount\ =\ 0;}
+\DoxyCodeLine{00034\ \ \ \ \ s\_one[31]\ =\ 1;}
+\DoxyCodeLine{00035\ }
+\DoxyCodeLine{00036\ \ \ \ \ \mbox{\hyperlink{secp256k1_8h_a35106efb325f03468bcf5faa524c1cc4}{secp256k1\_context\_set\_error\_callback}}(tctx,\ counting\_illegal\_callback\_fn,\ \&ecount);}
+\DoxyCodeLine{00037\ \ \ \ \ \mbox{\hyperlink{secp256k1_8h_a3ec29bece9974f9535337eb7d91b351c}{secp256k1\_context\_set\_illegal\_callback}}(tctx,\ counting\_illegal\_callback\_fn,\ \&ecount);}
+\DoxyCodeLine{00038\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{secp256k1_8h_a7438071aa8a6dc4697abe4f4659f2161}{secp256k1\_ec\_pubkey\_create}}(tctx,\ \&\mbox{\hyperlink{structpoint}{point}},\ s\_one)\ ==\ 1);}
+\DoxyCodeLine{00039\ }
+\DoxyCodeLine{00040\ \ \ \ \ \textcolor{comment}{/*\ Check\ all\ NULLs\ are\ detected\ */}}
+\DoxyCodeLine{00041\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{secp256k1__ecdh_8h_a4386914d0dce8b04f056ce3fae9a37a8}{secp256k1\_ecdh}}(tctx,\ res,\ \&\mbox{\hyperlink{structpoint}{point}},\ s\_one,\ NULL,\ NULL)\ ==\ 1);}
+\DoxyCodeLine{00042\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(ecount\ ==\ 0);}
+\DoxyCodeLine{00043\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{secp256k1__ecdh_8h_a4386914d0dce8b04f056ce3fae9a37a8}{secp256k1\_ecdh}}(tctx,\ NULL,\ \&\mbox{\hyperlink{structpoint}{point}},\ s\_one,\ NULL,\ NULL)\ ==\ 0);}
+\DoxyCodeLine{00044\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(ecount\ ==\ 1);}
+\DoxyCodeLine{00045\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{secp256k1__ecdh_8h_a4386914d0dce8b04f056ce3fae9a37a8}{secp256k1\_ecdh}}(tctx,\ res,\ NULL,\ s\_one,\ NULL,\ NULL)\ ==\ 0);}
+\DoxyCodeLine{00046\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(ecount\ ==\ 2);}
+\DoxyCodeLine{00047\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{secp256k1__ecdh_8h_a4386914d0dce8b04f056ce3fae9a37a8}{secp256k1\_ecdh}}(tctx,\ res,\ \&\mbox{\hyperlink{structpoint}{point}},\ NULL,\ NULL,\ NULL)\ ==\ 0);}
+\DoxyCodeLine{00048\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(ecount\ ==\ 3);}
+\DoxyCodeLine{00049\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{secp256k1__ecdh_8h_a4386914d0dce8b04f056ce3fae9a37a8}{secp256k1\_ecdh}}(tctx,\ res,\ \&\mbox{\hyperlink{structpoint}{point}},\ s\_one,\ NULL,\ NULL)\ ==\ 1);}
+\DoxyCodeLine{00050\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(ecount\ ==\ 3);}
+\DoxyCodeLine{00051\ }
+\DoxyCodeLine{00052\ \ \ \ \ \textcolor{comment}{/*\ Cleanup\ */}}
+\DoxyCodeLine{00053\ \ \ \ \ \mbox{\hyperlink{secp256k1_8h_a026db914e3723531825ecf25a0cbd699}{secp256k1\_context\_destroy}}(tctx);}
+\DoxyCodeLine{00054\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{ecdh_2tests__impl_8h_aa7159f9419cd1b57e4c1524a99b731de_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=349pt]{ecdh_2tests__impl_8h_aa7159f9419cd1b57e4c1524a99b731de_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{ecdh_2tests__impl_8h_ab13157e14f777c18f14fefc834d067c5}\index{tests\_impl.h@{tests\_impl.h}!test\_ecdh\_generator\_basepoint@{test\_ecdh\_generator\_basepoint}}
+\index{test\_ecdh\_generator\_basepoint@{test\_ecdh\_generator\_basepoint}!tests\_impl.h@{tests\_impl.h}}
+\doxysubsubsection{\texorpdfstring{test\_ecdh\_generator\_basepoint()}{test\_ecdh\_generator\_basepoint()}}
+{\footnotesize\ttfamily \label{ecdh_2tests__impl_8h_ab13157e14f777c18f14fefc834d067c5} 
+void test\+\_\+ecdh\+\_\+generator\+\_\+basepoint (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{ecdh_2tests__impl_8h_source_l00056}{56}} of file \mbox{\hyperlink{ecdh_2tests__impl_8h_source}{tests\+\_\+impl.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00057\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ s\_one[32]\ =\ \{\ 0\ \};}
+\DoxyCodeLine{00058\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__pubkey}{secp256k1\_pubkey}}\ \mbox{\hyperlink{structpoint}{point}}[2];}
+\DoxyCodeLine{00059\ \ \ \ \ \textcolor{keywordtype}{int}\ i;}
+\DoxyCodeLine{00060\ }
+\DoxyCodeLine{00061\ \ \ \ \ s\_one[31]\ =\ 1;}
+\DoxyCodeLine{00062\ \ \ \ \ \textcolor{comment}{/*\ Check\ against\ pubkey\ creation\ when\ the\ basepoint\ is\ the\ generator\ */}}
+\DoxyCodeLine{00063\ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ 2\ *\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}};\ ++i)\ \{}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsecp256k1__sha256}{secp256k1\_sha256}}\ sha;}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ s\_b32[32];}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ output\_ecdh[65];}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ output\_ser[32];}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ point\_ser[65];}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ point\_ser\_len\ =\ \textcolor{keyword}{sizeof}(point\_ser);}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{00071\ }
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{tests_8c_a01cf4b4fc9b4ab8cb3e04fd3dc2ff57f}{random\_scalar\_order}}(\&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ secp256k1\_scalar\_get\_b32(s\_b32,\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{00074\ }
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{secp256k1_8h_a7438071aa8a6dc4697abe4f4659f2161}{secp256k1\_ec\_pubkey\_create}}(ctx,\ \&\mbox{\hyperlink{structpoint}{point}}[0],\ s\_one)\ ==\ 1);}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{secp256k1_8h_a7438071aa8a6dc4697abe4f4659f2161}{secp256k1\_ec\_pubkey\_create}}(ctx,\ \&\mbox{\hyperlink{structpoint}{point}}[1],\ s\_b32)\ ==\ 1);}
+\DoxyCodeLine{00077\ }
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ compute\ using\ ECDH\ function\ with\ custom\ hash\ function\ */}}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{secp256k1__ecdh_8h_a4386914d0dce8b04f056ce3fae9a37a8}{secp256k1\_ecdh}}(ctx,\ output\_ecdh,\ \&\mbox{\hyperlink{structpoint}{point}}[0],\ s\_b32,\ \mbox{\hyperlink{ecdh_2tests__impl_8h_a4f286ad55d3c0658fe7759ba5bd13019}{ecdh\_hash\_function\_custom}},\ NULL)\ ==\ 1);}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ compute\ "{}explicitly"{}\ */}}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{secp256k1_8h_a34977bf00322e510e881160c421836d7}{secp256k1\_ec\_pubkey\_serialize}}(ctx,\ point\_ser,\ \&point\_ser\_len,\ \&\mbox{\hyperlink{structpoint}{point}}[1],\ \mbox{\hyperlink{secp256k1_8h_ab8e25dc58843e83926f95795f9e8a6e2}{SECP256K1\_EC\_UNCOMPRESSED}})\ ==\ 1);}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ compare\ */}}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(secp256k1\_memcmp\_var(output\_ecdh,\ point\_ser,\ 65)\ ==\ 0);}
+\DoxyCodeLine{00084\ }
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ compute\ using\ ECDH\ function\ with\ default\ hash\ function\ */}}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{secp256k1__ecdh_8h_a4386914d0dce8b04f056ce3fae9a37a8}{secp256k1\_ecdh}}(ctx,\ output\_ecdh,\ \&\mbox{\hyperlink{structpoint}{point}}[0],\ s\_b32,\ NULL,\ NULL)\ ==\ 1);}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ compute\ "{}explicitly"{}\ */}}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{secp256k1_8h_a34977bf00322e510e881160c421836d7}{secp256k1\_ec\_pubkey\_serialize}}(ctx,\ point\_ser,\ \&point\_ser\_len,\ \&\mbox{\hyperlink{structpoint}{point}}[1],\ \mbox{\hyperlink{secp256k1_8h_a7b8f642c65e8b5c81fa4421b7c42ab57}{SECP256K1\_EC\_COMPRESSED}})\ ==\ 1);}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ secp256k1\_sha256\_initialize(\&sha);}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ secp256k1\_sha256\_write(\&sha,\ point\_ser,\ point\_ser\_len);}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ secp256k1\_sha256\_finalize(\&sha,\ output\_ser);}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ compare\ */}}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(secp256k1\_memcmp\_var(output\_ecdh,\ output\_ser,\ 32)\ ==\ 0);}
+\DoxyCodeLine{00094\ \ \ \ \ \}}
+\DoxyCodeLine{00095\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{ecdh_2tests__impl_8h_ab13157e14f777c18f14fefc834d067c5_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{ecdh_2tests__impl_8h_ab13157e14f777c18f14fefc834d067c5_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{ecdh_2tests__impl_8h_a7b1b85ce1718b9ef666343dd8a0eaac2}\index{tests\_impl.h@{tests\_impl.h}!test\_result\_basepoint@{test\_result\_basepoint}}
+\index{test\_result\_basepoint@{test\_result\_basepoint}!tests\_impl.h@{tests\_impl.h}}
+\doxysubsubsection{\texorpdfstring{test\_result\_basepoint()}{test\_result\_basepoint()}}
+{\footnotesize\ttfamily \label{ecdh_2tests__impl_8h_a7b1b85ce1718b9ef666343dd8a0eaac2} 
+void test\+\_\+result\+\_\+basepoint (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+\doxylink{class_test}{Test} that ECDH(sG, 1/s) == ECDH((1/s)G, s) == ECDH(\+G, 1) for a few random s. 
+
+Definition at line \mbox{\hyperlink{ecdh_2tests__impl_8h_source_l00127}{127}} of file \mbox{\hyperlink{ecdh_2tests__impl_8h_source}{tests\+\_\+impl.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00128\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__pubkey}{secp256k1\_pubkey}}\ \mbox{\hyperlink{structpoint}{point}};}
+\DoxyCodeLine{00129\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ rand;}
+\DoxyCodeLine{00130\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}[32];}
+\DoxyCodeLine{00131\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ s\_inv[32];}
+\DoxyCodeLine{00132\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ out[32];}
+\DoxyCodeLine{00133\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ out\_inv[32];}
+\DoxyCodeLine{00134\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ out\_base[32];}
+\DoxyCodeLine{00135\ \ \ \ \ \textcolor{keywordtype}{int}\ i;}
+\DoxyCodeLine{00136\ }
+\DoxyCodeLine{00137\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ s\_one[32]\ =\ \{\ 0\ \};}
+\DoxyCodeLine{00138\ \ \ \ \ s\_one[31]\ =\ 1;}
+\DoxyCodeLine{00139\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{secp256k1_8h_a7438071aa8a6dc4697abe4f4659f2161}{secp256k1\_ec\_pubkey\_create}}(ctx,\ \&\mbox{\hyperlink{structpoint}{point}},\ s\_one)\ ==\ 1);}
+\DoxyCodeLine{00140\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{secp256k1__ecdh_8h_a4386914d0dce8b04f056ce3fae9a37a8}{secp256k1\_ecdh}}(ctx,\ out\_base,\ \&\mbox{\hyperlink{structpoint}{point}},\ s\_one,\ NULL,\ NULL)\ ==\ 1);}
+\DoxyCodeLine{00141\ }
+\DoxyCodeLine{00142\ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ 2\ *\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}};\ i++)\ \{}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{tests_8c_a01cf4b4fc9b4ab8cb3e04fd3dc2ff57f}{random\_scalar\_order}}(\&rand);}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ secp256k1\_scalar\_get\_b32(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ \&rand);}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ secp256k1\_scalar\_inverse(\&rand,\ \&rand);}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ secp256k1\_scalar\_get\_b32(s\_inv,\ \&rand);}
+\DoxyCodeLine{00147\ }
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{secp256k1_8h_a7438071aa8a6dc4697abe4f4659f2161}{secp256k1\_ec\_pubkey\_create}}(ctx,\ \&\mbox{\hyperlink{structpoint}{point}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})\ ==\ 1);}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{secp256k1__ecdh_8h_a4386914d0dce8b04f056ce3fae9a37a8}{secp256k1\_ecdh}}(ctx,\ out,\ \&\mbox{\hyperlink{structpoint}{point}},\ s\_inv,\ NULL,\ NULL)\ ==\ 1);}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(secp256k1\_memcmp\_var(out,\ out\_base,\ 32)\ ==\ 0);}
+\DoxyCodeLine{00151\ }
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{secp256k1_8h_a7438071aa8a6dc4697abe4f4659f2161}{secp256k1\_ec\_pubkey\_create}}(ctx,\ \&\mbox{\hyperlink{structpoint}{point}},\ s\_inv)\ ==\ 1);}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{secp256k1__ecdh_8h_a4386914d0dce8b04f056ce3fae9a37a8}{secp256k1\_ecdh}}(ctx,\ out\_inv,\ \&\mbox{\hyperlink{structpoint}{point}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ NULL,\ NULL)\ ==\ 1);}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(secp256k1\_memcmp\_var(out\_inv,\ out\_base,\ 32)\ ==\ 0);}
+\DoxyCodeLine{00155\ \ \ \ \ \}}
+\DoxyCodeLine{00156\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{ecdh_2tests__impl_8h_a7b1b85ce1718b9ef666343dd8a0eaac2_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{ecdh_2tests__impl_8h_a7b1b85ce1718b9ef666343dd8a0eaac2_icgraph}
+\end{center}
+\end{figure}

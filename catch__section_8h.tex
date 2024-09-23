@@ -1,0 +1,91 @@
+\doxysection{libraries/sys-\/vm/external/\+Catch2/include/internal/catch\+\_\+section.h File Reference}
+\hypertarget{catch__section_8h}{}\label{catch__section_8h}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_section.h@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_section.h}}
+{\ttfamily \#include "{}catch\+\_\+compiler\+\_\+capabilities.\+h"{}}\newline
+{\ttfamily \#include "{}catch\+\_\+section\+\_\+info.\+h"{}}\newline
+{\ttfamily \#include "{}catch\+\_\+totals.\+h"{}}\newline
+{\ttfamily \#include "{}catch\+\_\+timer.\+h"{}}\newline
+{\ttfamily \#include $<$string$>$}\newline
+Include dependency graph for catch\+\_\+section.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{catch__section_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{catch__section_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{class_catch_1_1_section}{Catch\+::\+Section}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespace_catch}{Catch}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{catch__section_8h_a2969ec50cc661169e94b1b80ac799c07}{INTERNAL\+\_\+\+CATCH\+\_\+\+SECTION}}(...)
+\item 
+\#define \mbox{\hyperlink{catch__section_8h_abe92a5063c83dec8143bf685e4b4a198}{INTERNAL\+\_\+\+CATCH\+\_\+\+DYNAMIC\+\_\+\+SECTION}}(...)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{catch__section_8h_abe92a5063c83dec8143bf685e4b4a198}\index{catch\_section.h@{catch\_section.h}!INTERNAL\_CATCH\_DYNAMIC\_SECTION@{INTERNAL\_CATCH\_DYNAMIC\_SECTION}}
+\index{INTERNAL\_CATCH\_DYNAMIC\_SECTION@{INTERNAL\_CATCH\_DYNAMIC\_SECTION}!catch\_section.h@{catch\_section.h}}
+\doxysubsubsection{\texorpdfstring{INTERNAL\_CATCH\_DYNAMIC\_SECTION}{INTERNAL\_CATCH\_DYNAMIC\_SECTION}}
+{\footnotesize\ttfamily \label{catch__section_8h_abe92a5063c83dec8143bf685e4b4a198} 
+\#define INTERNAL\+\_\+\+CATCH\+\_\+\+DYNAMIC\+\_\+\+SECTION(\begin{DoxyParamCaption}\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ CATCH\_INTERNAL\_SUPPRESS\_UNUSED\_WARNINGS\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ if(\ \mbox{\hyperlink{class_catch_1_1_section}{Catch::Section}}\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{catch__common_8h_afe320ceec108fc8c160f9ac3938f1bc8}{INTERNAL\_CATCH\_UNIQUE\_NAME}}(\ catch\_internal\_Section\ )\ =\ \mbox{\hyperlink{struct_catch_1_1_section_info}{Catch::SectionInfo}}(\ \mbox{\hyperlink{catch__common_8h_abc0b2405454c51748a31e0393d9ad5d1}{CATCH\_INTERNAL\_LINEINFO}},\ (\mbox{\hyperlink{class_catch_1_1_reusable_string_stream}{Catch::ReusableStringStream}}()\ <<\ \_\_VA\_ARGS\_\_).str()\ )\ )\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{catch__compiler__capabilities_8h_aaeeb989308b3a06e021d98af54f669c1}{CATCH\_INTERNAL\_UNSUPPRESS\_UNUSED\_WARNINGS}}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__section_8h_source_l00044}{44}} of file \mbox{\hyperlink{catch__section_8h_source}{catch\+\_\+section.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00044\ \textcolor{preprocessor}{\#define\ INTERNAL\_CATCH\_DYNAMIC\_SECTION(\ ...\ )\ \(\backslash\)}}
+\DoxyCodeLine{00045\ \textcolor{preprocessor}{\ \ \ \ CATCH\_INTERNAL\_SUPPRESS\_UNUSED\_WARNINGS\ \(\backslash\)}}
+\DoxyCodeLine{00046\ \textcolor{preprocessor}{\ \ \ \ if(\ Catch::Section\ const\&\ INTERNAL\_CATCH\_UNIQUE\_NAME(\ catch\_internal\_Section\ )\ =\ Catch::SectionInfo(\ CATCH\_INTERNAL\_LINEINFO,\ (Catch::ReusableStringStream()\ <<\ \_\_VA\_ARGS\_\_).str()\ )\ )\ \(\backslash\)}}
+\DoxyCodeLine{00047\ \textcolor{preprocessor}{\ \ \ \ CATCH\_INTERNAL\_UNSUPPRESS\_UNUSED\_WARNINGS}}
+
+\end{DoxyCode}
+\Hypertarget{catch__section_8h_a2969ec50cc661169e94b1b80ac799c07}\index{catch\_section.h@{catch\_section.h}!INTERNAL\_CATCH\_SECTION@{INTERNAL\_CATCH\_SECTION}}
+\index{INTERNAL\_CATCH\_SECTION@{INTERNAL\_CATCH\_SECTION}!catch\_section.h@{catch\_section.h}}
+\doxysubsubsection{\texorpdfstring{INTERNAL\_CATCH\_SECTION}{INTERNAL\_CATCH\_SECTION}}
+{\footnotesize\ttfamily \label{catch__section_8h_a2969ec50cc661169e94b1b80ac799c07} 
+\#define INTERNAL\+\_\+\+CATCH\+\_\+\+SECTION(\begin{DoxyParamCaption}\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ CATCH\_INTERNAL\_SUPPRESS\_UNUSED\_WARNINGS\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ if(\ \mbox{\hyperlink{class_catch_1_1_section}{Catch::Section}}\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{catch__common_8h_afe320ceec108fc8c160f9ac3938f1bc8}{INTERNAL\_CATCH\_UNIQUE\_NAME}}(\ catch\_internal\_Section\ )\ =\ \mbox{\hyperlink{struct_catch_1_1_section_info}{Catch::SectionInfo}}(\ \mbox{\hyperlink{catch__common_8h_abc0b2405454c51748a31e0393d9ad5d1}{CATCH\_INTERNAL\_LINEINFO}},\ \_\_VA\_ARGS\_\_\ )\ )\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{catch__compiler__capabilities_8h_aaeeb989308b3a06e021d98af54f669c1}{CATCH\_INTERNAL\_UNSUPPRESS\_UNUSED\_WARNINGS}}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__section_8h_source_l00039}{39}} of file \mbox{\hyperlink{catch__section_8h_source}{catch\+\_\+section.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00039\ \textcolor{preprocessor}{\#define\ INTERNAL\_CATCH\_SECTION(\ ...\ )\ \(\backslash\)}}
+\DoxyCodeLine{00040\ \textcolor{preprocessor}{\ \ \ \ CATCH\_INTERNAL\_SUPPRESS\_UNUSED\_WARNINGS\ \(\backslash\)}}
+\DoxyCodeLine{00041\ \textcolor{preprocessor}{\ \ \ \ if(\ Catch::Section\ const\&\ INTERNAL\_CATCH\_UNIQUE\_NAME(\ catch\_internal\_Section\ )\ =\ Catch::SectionInfo(\ CATCH\_INTERNAL\_LINEINFO,\ \_\_VA\_ARGS\_\_\ )\ )\ \(\backslash\)}}
+\DoxyCodeLine{00042\ \textcolor{preprocessor}{\ \ \ \ CATCH\_INTERNAL\_UNSUPPRESS\_UNUSED\_WARNINGS}}
+
+\end{DoxyCode}

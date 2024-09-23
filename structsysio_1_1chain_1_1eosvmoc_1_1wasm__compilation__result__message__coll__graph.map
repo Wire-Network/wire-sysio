@@ -1,0 +1,9 @@
+<map id="sysio::chain::eosvmoc::wasm_compilation_result_message" name="sysio::chain::eosvmoc::wasm_compilation_result_message">
+<area shape="rect" id="Node000001" title=" " alt="" coords="89,198,266,253"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1eosvmoc_1_1code__tuple.html" title=" " alt="" coords="5,94,158,135"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="111,145,156,195,152,199,107,148"/>
+<area shape="rect" id="Node000003" href="$classfc_1_1sha256.html" title=" " alt="" coords="40,5,123,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="84,46,84,93,79,93,79,46"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="181,102,238,127"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="204,143,188,198,183,196,199,141"/>
+</map>

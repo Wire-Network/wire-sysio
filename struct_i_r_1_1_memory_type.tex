@@ -1,0 +1,154 @@
+\doxysection{IR\+::Memory\+Type Struct Reference}
+\hypertarget{struct_i_r_1_1_memory_type}{}\label{struct_i_r_1_1_memory_type}\index{IR::MemoryType@{IR::MemoryType}}
+
+
+{\ttfamily \#include $<$Types.\+h$>$}
+
+
+
+Collaboration diagram for IR\+::Memory\+Type\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=182pt]{struct_i_r_1_1_memory_type__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_i_r_1_1_memory_type_ae2c1846abdcb6abf6d76b0b1447c68ac}{Memory\+Type}} ()
+\item 
+\mbox{\hyperlink{struct_i_r_1_1_memory_type_a2e887ab42c62923f644577c4d51004e3}{Memory\+Type}} (bool in\+Is\+Shared, const \mbox{\hyperlink{struct_i_r_1_1_size_constraints}{Size\+Constraints}} \&in\+Size)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{struct_i_r_1_1_memory_type_ae245ae2dbb9720d60091a741279559a0}{is\+Shared}}
+\item 
+\mbox{\hyperlink{struct_i_r_1_1_size_constraints}{Size\+Constraints}} \mbox{\hyperlink{struct_i_r_1_1_memory_type_a64d44c1808398bd0152bc18934ca9f4f}{size}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{struct_i_r_1_1_memory_type_ab33b480d139b2ea704387197aa091d06}{operator==}} (const \mbox{\hyperlink{struct_i_r_1_1_memory_type}{Memory\+Type}} \&left, const \mbox{\hyperlink{struct_i_r_1_1_memory_type}{Memory\+Type}} \&right)
+\item 
+bool \mbox{\hyperlink{struct_i_r_1_1_memory_type_ab29921da3355cfaa07885bc89d877cb0}{operator!=}} (const \mbox{\hyperlink{struct_i_r_1_1_memory_type}{Memory\+Type}} \&left, const \mbox{\hyperlink{struct_i_r_1_1_memory_type}{Memory\+Type}} \&right)
+\item 
+bool \mbox{\hyperlink{struct_i_r_1_1_memory_type_a93a8714ea89f7139788b658e0c3fc4de}{is\+Subset}} (const \mbox{\hyperlink{struct_i_r_1_1_memory_type}{Memory\+Type}} \&super, const \mbox{\hyperlink{struct_i_r_1_1_memory_type}{Memory\+Type}} \&\mbox{\hyperlink{xbyak__mnemonic_8h_ad8856ea517c970ed0584a251c3fdc94f}{sub}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{_types_8h_source_l00271}{271}} of file \mbox{\hyperlink{_types_8h_source}{Types.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{struct_i_r_1_1_memory_type_ae2c1846abdcb6abf6d76b0b1447c68ac}\index{IR::MemoryType@{IR::MemoryType}!MemoryType@{MemoryType}}
+\index{MemoryType@{MemoryType}!IR::MemoryType@{IR::MemoryType}}
+\doxysubsubsection{\texorpdfstring{MemoryType()}{MemoryType()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_memory_type_ae2c1846abdcb6abf6d76b0b1447c68ac} 
+IR\+::\+Memory\+Type\+::\+Memory\+Type (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_types_8h_source_l00276}{276}} of file \mbox{\hyperlink{_types_8h_source}{Types.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00276\ :\ \mbox{\hyperlink{struct_i_r_1_1_memory_type_ae245ae2dbb9720d60091a741279559a0}{isShared}}(\textcolor{keyword}{false}),\ \mbox{\hyperlink{struct_i_r_1_1_memory_type_a64d44c1808398bd0152bc18934ca9f4f}{size}}(\{0,\mbox{\hyperlink{stdint_8h_a30654b4b67d97c42ca3f9b6052dda916}{UINT64\_MAX}}\})\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{struct_i_r_1_1_memory_type_a2e887ab42c62923f644577c4d51004e3}\index{IR::MemoryType@{IR::MemoryType}!MemoryType@{MemoryType}}
+\index{MemoryType@{MemoryType}!IR::MemoryType@{IR::MemoryType}}
+\doxysubsubsection{\texorpdfstring{MemoryType()}{MemoryType()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_memory_type_a2e887ab42c62923f644577c4d51004e3} 
+IR\+::\+Memory\+Type\+::\+Memory\+Type (\begin{DoxyParamCaption}\item[{bool}]{in\+Is\+Shared}{, }\item[{const \mbox{\hyperlink{struct_i_r_1_1_size_constraints}{Size\+Constraints}} \&}]{in\+Size}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_types_8h_source_l00277}{277}} of file \mbox{\hyperlink{_types_8h_source}{Types.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00277\ :\ \mbox{\hyperlink{struct_i_r_1_1_memory_type_ae245ae2dbb9720d60091a741279559a0}{isShared}}(inIsShared),\ \mbox{\hyperlink{struct_i_r_1_1_memory_type_a64d44c1808398bd0152bc18934ca9f4f}{size}}(inSize)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{struct_i_r_1_1_memory_type_a93a8714ea89f7139788b658e0c3fc4de}\index{IR::MemoryType@{IR::MemoryType}!isSubset@{isSubset}}
+\index{isSubset@{isSubset}!IR::MemoryType@{IR::MemoryType}}
+\doxysubsubsection{\texorpdfstring{isSubset}{isSubset}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_memory_type_a93a8714ea89f7139788b658e0c3fc4de} 
+bool is\+Subset (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct_i_r_1_1_memory_type}{Memory\+Type}} \&}]{super}{, }\item[{const \mbox{\hyperlink{struct_i_r_1_1_memory_type}{Memory\+Type}} \&}]{sub}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{_types_8h_source_l00281}{281}} of file \mbox{\hyperlink{_types_8h_source}{Types.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00281\ \{\ \textcolor{keywordflow}{return}\ super.isShared\ ==\ \mbox{\hyperlink{xbyak__mnemonic_8h_ad8856ea517c970ed0584a251c3fdc94f}{sub}}.isShared\ \&\&\ \mbox{\hyperlink{struct_i_r_1_1_memory_type_a93a8714ea89f7139788b658e0c3fc4de}{isSubset}}(super.size,\mbox{\hyperlink{xbyak__mnemonic_8h_ad8856ea517c970ed0584a251c3fdc94f}{sub}}.size);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_i_r_1_1_memory_type_ab29921da3355cfaa07885bc89d877cb0}\index{IR::MemoryType@{IR::MemoryType}!operator"!=@{operator"!=}}
+\index{operator"!=@{operator"!=}!IR::MemoryType@{IR::MemoryType}}
+\doxysubsubsection{\texorpdfstring{operator"!=}{operator!=}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_memory_type_ab29921da3355cfaa07885bc89d877cb0} 
+bool operator!= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct_i_r_1_1_memory_type}{Memory\+Type}} \&}]{left}{, }\item[{const \mbox{\hyperlink{struct_i_r_1_1_memory_type}{Memory\+Type}} \&}]{right}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{_types_8h_source_l00280}{280}} of file \mbox{\hyperlink{_types_8h_source}{Types.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00280\ \{\ \textcolor{keywordflow}{return}\ left.isShared\ !=\ right.isShared\ ||\ left.size\ !=\ right.size;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_i_r_1_1_memory_type_ab33b480d139b2ea704387197aa091d06}\index{IR::MemoryType@{IR::MemoryType}!operator==@{operator==}}
+\index{operator==@{operator==}!IR::MemoryType@{IR::MemoryType}}
+\doxysubsubsection{\texorpdfstring{operator==}{operator==}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_memory_type_ab33b480d139b2ea704387197aa091d06} 
+bool operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct_i_r_1_1_memory_type}{Memory\+Type}} \&}]{left}{, }\item[{const \mbox{\hyperlink{struct_i_r_1_1_memory_type}{Memory\+Type}} \&}]{right}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{_types_8h_source_l00279}{279}} of file \mbox{\hyperlink{_types_8h_source}{Types.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00279\ \{\ \textcolor{keywordflow}{return}\ left.isShared\ ==\ right.isShared\ \&\&\ left.size\ ==\ right.size;\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_i_r_1_1_memory_type_ae245ae2dbb9720d60091a741279559a0}\index{IR::MemoryType@{IR::MemoryType}!isShared@{isShared}}
+\index{isShared@{isShared}!IR::MemoryType@{IR::MemoryType}}
+\doxysubsubsection{\texorpdfstring{isShared}{isShared}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_memory_type_ae245ae2dbb9720d60091a741279559a0} 
+bool IR\+::\+Memory\+Type\+::is\+Shared}
+
+
+
+Definition at line \mbox{\hyperlink{_types_8h_source_l00273}{273}} of file \mbox{\hyperlink{_types_8h_source}{Types.\+h}}.
+
+\Hypertarget{struct_i_r_1_1_memory_type_a64d44c1808398bd0152bc18934ca9f4f}\index{IR::MemoryType@{IR::MemoryType}!size@{size}}
+\index{size@{size}!IR::MemoryType@{IR::MemoryType}}
+\doxysubsubsection{\texorpdfstring{size}{size}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_memory_type_a64d44c1808398bd0152bc18934ca9f4f} 
+\mbox{\hyperlink{struct_i_r_1_1_size_constraints}{Size\+Constraints}} IR\+::\+Memory\+Type\+::size}
+
+
+
+Definition at line \mbox{\hyperlink{_types_8h_source_l00274}{274}} of file \mbox{\hyperlink{_types_8h_source}{Types.\+h}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/wasm-\/jit/\+Include/\+IR/\mbox{\hyperlink{_types_8h}{Types.\+h}}\end{DoxyCompactItemize}

@@ -1,0 +1,188 @@
+\doxysection{Custom\+String\+Stream\texorpdfstring{$<$}{<} Encoding \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{class_custom_string_stream}{}\label{class_custom_string_stream}\index{CustomStringStream$<$ Encoding $>$@{CustomStringStream$<$ Encoding $>$}}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef Encoding\+::\+Ch \mbox{\hyperlink{class_custom_string_stream_a40f952cc3d216baa2b292f39b92bae9b}{Ch}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_custom_string_stream_ae52f3c6066b9af8eb092ba6c15194d5b}{Custom\+String\+Stream}} (const \mbox{\hyperlink{class_custom_string_stream_a40f952cc3d216baa2b292f39b92bae9b}{Ch}} \texorpdfstring{$\ast$}{*}src)
+\item 
+\mbox{\hyperlink{class_custom_string_stream_a40f952cc3d216baa2b292f39b92bae9b}{Ch}} \mbox{\hyperlink{class_custom_string_stream_a6d4e3fca7431796282842f3844b59a0c}{Peek}} () const
+\item 
+\mbox{\hyperlink{class_custom_string_stream_a40f952cc3d216baa2b292f39b92bae9b}{Ch}} \mbox{\hyperlink{class_custom_string_stream_a84df37e5ad6bb53bb96c406502a7bc24}{Take}} ()
+\item 
+size\+\_\+t \mbox{\hyperlink{class_custom_string_stream_aaa90887a920b8fb1b69890baabd235c4}{Tell}} () const
+\item 
+\mbox{\hyperlink{class_custom_string_stream_a40f952cc3d216baa2b292f39b92bae9b}{Ch}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_custom_string_stream_a203bbea8b48fa7885e8e0ed6f233a3bf}{Put\+Begin}} ()
+\item 
+void \mbox{\hyperlink{class_custom_string_stream_ad57289c3cbb96b2d479ab0f8e17e0bd5}{Put}} (\mbox{\hyperlink{class_custom_string_stream_a40f952cc3d216baa2b292f39b92bae9b}{Ch}})
+\item 
+void \mbox{\hyperlink{class_custom_string_stream_a4720bd4fb0ff01a8a860971346f89305}{Flush}} ()
+\item 
+size\+\_\+t \mbox{\hyperlink{class_custom_string_stream_a4858f871165f0824151412e23138b207}{Put\+End}} (\mbox{\hyperlink{class_custom_string_stream_a40f952cc3d216baa2b292f39b92bae9b}{Ch}} \texorpdfstring{$\ast$}{*})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}$>$\newline
+class Custom\+String\+Stream$<$ Encoding $>$}
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01314}{1314}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{class_custom_string_stream_a40f952cc3d216baa2b292f39b92bae9b}\index{CustomStringStream$<$ Encoding $>$@{CustomStringStream$<$ Encoding $>$}!Ch@{Ch}}
+\index{Ch@{Ch}!CustomStringStream$<$ Encoding $>$@{CustomStringStream$<$ Encoding $>$}}
+\doxysubsubsection{\texorpdfstring{Ch}{Ch}}
+{\footnotesize\ttfamily \label{class_custom_string_stream_a40f952cc3d216baa2b292f39b92bae9b} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$ \\
+Encoding\+::\+Ch \mbox{\hyperlink{class_custom_string_stream}{Custom\+String\+Stream}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$\+::\+Ch}
+
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01316}{1316}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_custom_string_stream_ae52f3c6066b9af8eb092ba6c15194d5b}\index{CustomStringStream$<$ Encoding $>$@{CustomStringStream$<$ Encoding $>$}!CustomStringStream@{CustomStringStream}}
+\index{CustomStringStream@{CustomStringStream}!CustomStringStream$<$ Encoding $>$@{CustomStringStream$<$ Encoding $>$}}
+\doxysubsubsection{\texorpdfstring{CustomStringStream()}{CustomStringStream()}}
+{\footnotesize\ttfamily \label{class_custom_string_stream_ae52f3c6066b9af8eb092ba6c15194d5b} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$ \\
+\mbox{\hyperlink{class_custom_string_stream}{Custom\+String\+Stream}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$\mbox{\hyperlink{class_custom_string_stream}{\+::\+Custom\+String\+Stream}} (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_custom_string_stream_a40f952cc3d216baa2b292f39b92bae9b}{Ch}} \texorpdfstring{$\ast$}{*}}]{src}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01318}{1318}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01318\ :\ src\_(src),\ head\_(src)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_custom_string_stream_a4720bd4fb0ff01a8a860971346f89305}\index{CustomStringStream$<$ Encoding $>$@{CustomStringStream$<$ Encoding $>$}!Flush@{Flush}}
+\index{Flush@{Flush}!CustomStringStream$<$ Encoding $>$@{CustomStringStream$<$ Encoding $>$}}
+\doxysubsubsection{\texorpdfstring{Flush()}{Flush()}}
+{\footnotesize\ttfamily \label{class_custom_string_stream_a4720bd4fb0ff01a8a860971346f89305} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$ \\
+void \mbox{\hyperlink{class_custom_string_stream}{Custom\+String\+Stream}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$\+::\+Flush (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01326}{1326}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01326\ \{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\textcolor{keyword}{false});\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_custom_string_stream_a6d4e3fca7431796282842f3844b59a0c}\index{CustomStringStream$<$ Encoding $>$@{CustomStringStream$<$ Encoding $>$}!Peek@{Peek}}
+\index{Peek@{Peek}!CustomStringStream$<$ Encoding $>$@{CustomStringStream$<$ Encoding $>$}}
+\doxysubsubsection{\texorpdfstring{Peek()}{Peek()}}
+{\footnotesize\ttfamily \label{class_custom_string_stream_a6d4e3fca7431796282842f3844b59a0c} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$ \\
+\mbox{\hyperlink{class_custom_string_stream_a40f952cc3d216baa2b292f39b92bae9b}{Ch}} \mbox{\hyperlink{class_custom_string_stream}{Custom\+String\+Stream}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$\+::\+Peek (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01320}{1320}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01320\ \{\ \textcolor{keywordflow}{return}\ *src\_;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_custom_string_stream_ad57289c3cbb96b2d479ab0f8e17e0bd5}\index{CustomStringStream$<$ Encoding $>$@{CustomStringStream$<$ Encoding $>$}!Put@{Put}}
+\index{Put@{Put}!CustomStringStream$<$ Encoding $>$@{CustomStringStream$<$ Encoding $>$}}
+\doxysubsubsection{\texorpdfstring{Put()}{Put()}}
+{\footnotesize\ttfamily \label{class_custom_string_stream_ad57289c3cbb96b2d479ab0f8e17e0bd5} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$ \\
+void \mbox{\hyperlink{class_custom_string_stream}{Custom\+String\+Stream}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$\+::\+Put (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_custom_string_stream_a40f952cc3d216baa2b292f39b92bae9b}{Ch}}}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01325}{1325}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01325\ \{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\textcolor{keyword}{false});\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_custom_string_stream_a203bbea8b48fa7885e8e0ed6f233a3bf}\index{CustomStringStream$<$ Encoding $>$@{CustomStringStream$<$ Encoding $>$}!PutBegin@{PutBegin}}
+\index{PutBegin@{PutBegin}!CustomStringStream$<$ Encoding $>$@{CustomStringStream$<$ Encoding $>$}}
+\doxysubsubsection{\texorpdfstring{PutBegin()}{PutBegin()}}
+{\footnotesize\ttfamily \label{class_custom_string_stream_a203bbea8b48fa7885e8e0ed6f233a3bf} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$ \\
+\mbox{\hyperlink{class_custom_string_stream_a40f952cc3d216baa2b292f39b92bae9b}{Ch}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_custom_string_stream}{Custom\+String\+Stream}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$\+::\+Put\+Begin (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01324}{1324}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01324\ \{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\textcolor{keyword}{false});\ \textcolor{keywordflow}{return}\ 0;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_custom_string_stream_a4858f871165f0824151412e23138b207}\index{CustomStringStream$<$ Encoding $>$@{CustomStringStream$<$ Encoding $>$}!PutEnd@{PutEnd}}
+\index{PutEnd@{PutEnd}!CustomStringStream$<$ Encoding $>$@{CustomStringStream$<$ Encoding $>$}}
+\doxysubsubsection{\texorpdfstring{PutEnd()}{PutEnd()}}
+{\footnotesize\ttfamily \label{class_custom_string_stream_a4858f871165f0824151412e23138b207} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$ \\
+size\+\_\+t \mbox{\hyperlink{class_custom_string_stream}{Custom\+String\+Stream}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$\+::\+Put\+End (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_custom_string_stream_a40f952cc3d216baa2b292f39b92bae9b}{Ch}} \texorpdfstring{$\ast$}{*}}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01327}{1327}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01327\ \{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\textcolor{keyword}{false});\ \textcolor{keywordflow}{return}\ 0;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_custom_string_stream_a84df37e5ad6bb53bb96c406502a7bc24}\index{CustomStringStream$<$ Encoding $>$@{CustomStringStream$<$ Encoding $>$}!Take@{Take}}
+\index{Take@{Take}!CustomStringStream$<$ Encoding $>$@{CustomStringStream$<$ Encoding $>$}}
+\doxysubsubsection{\texorpdfstring{Take()}{Take()}}
+{\footnotesize\ttfamily \label{class_custom_string_stream_a84df37e5ad6bb53bb96c406502a7bc24} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$ \\
+\mbox{\hyperlink{class_custom_string_stream_a40f952cc3d216baa2b292f39b92bae9b}{Ch}} \mbox{\hyperlink{class_custom_string_stream}{Custom\+String\+Stream}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$\+::\+Take (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01321}{1321}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01321\ \{\ \textcolor{keywordflow}{return}\ *src\_++;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_custom_string_stream_aaa90887a920b8fb1b69890baabd235c4}\index{CustomStringStream$<$ Encoding $>$@{CustomStringStream$<$ Encoding $>$}!Tell@{Tell}}
+\index{Tell@{Tell}!CustomStringStream$<$ Encoding $>$@{CustomStringStream$<$ Encoding $>$}}
+\doxysubsubsection{\texorpdfstring{Tell()}{Tell()}}
+{\footnotesize\ttfamily \label{class_custom_string_stream_aaa90887a920b8fb1b69890baabd235c4} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$ \\
+size\+\_\+t \mbox{\hyperlink{class_custom_string_stream}{Custom\+String\+Stream}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$\+::\+Tell (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01322}{1322}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01322\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(src\_\ -\/\ head\_);\ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/test/unittest/\mbox{\hyperlink{readertest_8cpp}{readertest.\+cpp}}\end{DoxyCompactItemize}

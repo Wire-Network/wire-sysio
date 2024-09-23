@@ -1,0 +1,8 @@
+<map id="CLI::App::immediate_callback" name="CLI::App::immediate_callback">
+<area shape="rect" id="Node000001" title="Set the subcommand callback to be executed immediately on subcommand completion." alt="" coords="5,5,147,46"/>
+<area shape="rect" id="Node000002" href="$namespacestd.html#abb7e41c7063536ff6eeee4bb5f66de6c" title=" " alt="" coords="195,13,273,38"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="147,23,179,23,179,28,147,28"/>
+<area shape="rect" id="Node000003" href="$classpicojson_1_1value.html#a6c948adb3a5c55091bfd16a84437199c" title=" " alt="" coords="321,13,468,38"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="274,31,306,32,305,37,273,36"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="321,19,289,20,289,14,321,14"/>
+</map>

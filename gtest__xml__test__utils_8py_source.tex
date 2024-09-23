@@ -1,0 +1,202 @@
+\doxysection{gtest\+\_\+xml\+\_\+test\+\_\+utils.\+py}
+\hypertarget{gtest__xml__test__utils_8py_source}{}\label{gtest__xml__test__utils_8py_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/test/gtest\_xml\_test\_utils.py@{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/test/gtest\_xml\_test\_utils.py}}
+\mbox{\hyperlink{gtest__xml__test__utils_8py}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00001}\mbox{\hyperlink{namespacegtest__xml__test__utils}{00001}}\ \textcolor{comment}{\#\ Copyright\ 2006,\ Google\ Inc.}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00002}00002\ \textcolor{comment}{\#\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00003}00003\ \textcolor{comment}{\#}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00004}00004\ \textcolor{comment}{\#\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00005}00005\ \textcolor{comment}{\#\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00006}00006\ \textcolor{comment}{\#\ met:}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00007}00007\ \textcolor{comment}{\#}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00008}00008\ \textcolor{comment}{\#\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00009}00009\ \textcolor{comment}{\#\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00010}00010\ \textcolor{comment}{\#\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00011}00011\ \textcolor{comment}{\#\ copyright\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00012}00012\ \textcolor{comment}{\#\ in\ the\ documentation\ and/or\ other\ materials\ provided\ with\ the}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00013}00013\ \textcolor{comment}{\#\ distribution.}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00014}00014\ \textcolor{comment}{\#\ \ \ \ \ *\ Neither\ the\ name\ of\ Google\ Inc.\ nor\ the\ names\ of\ its}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00015}00015\ \textcolor{comment}{\#\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products\ derived\ from}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00016}00016\ \textcolor{comment}{\#\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00017}00017\ \textcolor{comment}{\#}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00018}00018\ \textcolor{comment}{\#\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00019}00019\ \textcolor{comment}{\#\ "{}AS\ IS"{}\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00020}00020\ \textcolor{comment}{\#\ LIMITED\ TO,\ THE\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00021}00021\ \textcolor{comment}{\#\ A\ PARTICULAR\ PURPOSE\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ THE\ COPYRIGHT}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00022}00022\ \textcolor{comment}{\#\ OWNER\ OR\ CONTRIBUTORS\ BE\ LIABLE\ FOR\ ANY\ DIRECT,\ INDIRECT,\ INCIDENTAL,}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00023}00023\ \textcolor{comment}{\#\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES\ (INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00024}00024\ \textcolor{comment}{\#\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;\ LOSS\ OF\ USE,}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00025}00025\ \textcolor{comment}{\#\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND\ ON\ ANY}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00026}00026\ \textcolor{comment}{\#\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00027}00027\ \textcolor{comment}{\#\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00028}00028\ \textcolor{comment}{\#\ OF\ THIS\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00030}00030\ \textcolor{stringliteral}{"{}"{}"{}Unit\ test\ utilities\ for\ gtest\_xml\_output"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00032}00032\ \textcolor{keyword}{import}\ re}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00033}00033\ \textcolor{keyword}{from}\ xml.dom\ \textcolor{keyword}{import}\ minidom,\ Node}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00034}00034\ \textcolor{keyword}{import}\ gtest\_test\_utils}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00036}\mbox{\hyperlink{namespacegtest__xml__test__utils_ae670fbb406e37633a94a057b13347ed5}{00036}}\ GTEST\_DEFAULT\_OUTPUT\_FILE\ =\ \textcolor{stringliteral}{'test\_detail.xml'}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00038}\mbox{\hyperlink{classgtest__xml__test__utils_1_1_g_test_x_m_l_test_case}{00038}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classgtest__xml__test__utils_1_1_g_test_x_m_l_test_case}{GTestXMLTestCase}}(\mbox{\hyperlink{namespacegtest__test__utils_acb97a85206c09d233db6c7f2362e5428}{gtest\_test\_utils.TestCase}}):}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00039}00039\ \ \ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00040}00040\ \textcolor{stringliteral}{\ \ Base\ class\ for\ tests\ of\ Google\ Test's\ XML\ output\ functionality.}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00041}00041\ \textcolor{stringliteral}{\ \ "{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00044}\mbox{\hyperlink{classgtest__xml__test__utils_1_1_g_test_x_m_l_test_case_aa18d40539741ab7357616c9557781e82}{00044}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classgtest__xml__test__utils_1_1_g_test_x_m_l_test_case_aa18d40539741ab7357616c9557781e82}{AssertEquivalentNodes}}(self,\ expected\_node,\ actual\_node):}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00045}00045\ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00046}00046\ \textcolor{stringliteral}{\ \ \ \ Asserts\ that\ actual\_node\ (a\ DOM\ node\ object)\ is\ equivalent\ to}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00047}00047\ \textcolor{stringliteral}{\ \ \ \ expected\_node\ (another\ DOM\ node\ object),\ in\ that\ either\ both\ of}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00048}00048\ \textcolor{stringliteral}{\ \ \ \ them\ are\ CDATA\ nodes\ and\ have\ the\ same\ value,\ or\ both\ are\ DOM}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00049}00049\ \textcolor{stringliteral}{\ \ \ \ elements\ and\ actual\_node\ meets\ all\ of\ the\ following\ conditions:}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00050}00050\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00051}00051\ \textcolor{stringliteral}{\ \ \ \ *\ \ It\ has\ the\ same\ tag\ name\ as\ expected\_node.}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00052}00052\ \textcolor{stringliteral}{\ \ \ \ *\ \ It\ has\ the\ same\ set\ of\ attributes\ as\ expected\_node,\ each\ with}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00053}00053\ \textcolor{stringliteral}{\ \ \ \ \ \ \ the\ same\ value\ as\ the\ corresponding\ attribute\ of\ expected\_node.}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00054}00054\ \textcolor{stringliteral}{\ \ \ \ \ \ \ Exceptions\ are\ any\ attribute\ named\ "{}time"{},\ which\ needs\ only\ be}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00055}00055\ \textcolor{stringliteral}{\ \ \ \ \ \ \ convertible\ to\ a\ floating-\/point\ number\ and\ any\ attribute\ named}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00056}00056\ \textcolor{stringliteral}{\ \ \ \ \ \ \ "{}type\_param"{}\ which\ only\ has\ to\ be\ non-\/empty.}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00057}00057\ \textcolor{stringliteral}{\ \ \ \ *\ \ It\ has\ an\ equivalent\ set\ of\ child\ nodes\ (including\ elements\ and}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00058}00058\ \textcolor{stringliteral}{\ \ \ \ \ \ \ CDATA\ sections)\ as\ expected\_node.\ \ Note\ that\ we\ ignore\ the}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00059}00059\ \textcolor{stringliteral}{\ \ \ \ \ \ \ order\ of\ the\ children\ as\ they\ are\ not\ guaranteed\ to\ be\ in\ any}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00060}00060\ \textcolor{stringliteral}{\ \ \ \ \ \ \ particular\ order.}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00061}00061\ \textcolor{stringliteral}{\ \ \ \ "{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00062}00062\ }
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00063}00063\ \ \ \ \ \textcolor{keywordflow}{if}\ expected\_node.nodeType\ ==\ Node.CDATA\_SECTION\_NODE:}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00064}00064\ \ \ \ \ \ \ self.assertEquals(Node.CDATA\_SECTION\_NODE,\ actual\_node.nodeType)}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00065}00065\ \ \ \ \ \ \ self.assertEquals(expected\_node.nodeValue,\ actual\_node.nodeValue)}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00066}00066\ \ \ \ \ \ \ \textcolor{keywordflow}{return}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00067}00067\ }
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00068}00068\ \ \ \ \ self.assertEquals(Node.ELEMENT\_NODE,\ actual\_node.nodeType)}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00069}00069\ \ \ \ \ self.assertEquals(Node.ELEMENT\_NODE,\ expected\_node.nodeType)}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00070}00070\ \ \ \ \ self.assertEquals(expected\_node.tagName,\ actual\_node.tagName)}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00072}00072\ \ \ \ \ expected\_attributes\ =\ expected\_node.attributes}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00073}00073\ \ \ \ \ actual\_attributes\ \ \ =\ actual\_node\ \ .attributes}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00074}00074\ \ \ \ \ self.assertEquals(}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00075}00075\ \ \ \ \ \ \ \ \ expected\_attributes.length,\ actual\_attributes.length,}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00076}00076\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'attribute\ numbers\ differ\ in\ element\ \%s:\(\backslash\)nExpected:\ \%r\(\backslash\)nActual:\ \%r'}\ \%\ (}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ actual\_node.tagName,\ expected\_attributes.keys(),}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00078}00078\ \ \ \ \ \ \ \ \ \ \ \ \ actual\_attributes.keys()))}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00079}00079\ \ \ \ \ \textcolor{keywordflow}{for}\ i\ \textcolor{keywordflow}{in}\ range(expected\_attributes.length):}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00080}00080\ \ \ \ \ \ \ expected\_attr\ =\ expected\_attributes.item(i)}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00081}00081\ \ \ \ \ \ \ actual\_attr\ \ \ =\ actual\_attributes.get(expected\_attr.name)}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00082}00082\ \ \ \ \ \ \ self.assert\_(}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00083}00083\ \ \ \ \ \ \ \ \ \ \ actual\_attr\ \textcolor{keywordflow}{is}\ \textcolor{keywordflow}{not}\ \textcolor{keywordtype}{None},}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00084}00084\ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'expected\ attribute\ \%s\ not\ found\ in\ element\ \%s'}\ \%}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00085}00085\ \ \ \ \ \ \ \ \ \ \ (expected\_attr.name,\ actual\_node.tagName))}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00086}00086\ \ \ \ \ \ \ self.assertEquals(}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00087}00087\ \ \ \ \ \ \ \ \ \ \ expected\_attr.value,\ actual\_attr.value,}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00088}00088\ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'\ values\ of\ attribute\ \%s\ in\ element\ \%s\ differ:\ \%s\ vs\ \%s'}\ \%}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00089}00089\ \ \ \ \ \ \ \ \ \ \ (expected\_attr.name,\ actual\_node.tagName,}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00090}00090\ \ \ \ \ \ \ \ \ \ \ \ expected\_attr.value,\ actual\_attr.value))}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00091}00091\ }
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00092}00092\ \ \ \ \ expected\_children\ =\ self.\mbox{\hyperlink{classgtest__xml__test__utils_1_1_g_test_x_m_l_test_case_a2359b446aa283a582efe48d1e2f3f75a}{\_GetChildren}}(expected\_node)}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00093}00093\ \ \ \ \ actual\_children\ =\ self.\mbox{\hyperlink{classgtest__xml__test__utils_1_1_g_test_x_m_l_test_case_a2359b446aa283a582efe48d1e2f3f75a}{\_GetChildren}}(actual\_node)}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00094}00094\ \ \ \ \ self.assertEquals(}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00095}00095\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}(expected\_children),\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}(actual\_children),}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00096}00096\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'number\ of\ child\ elements\ differ\ in\ element\ '}\ +\ actual\_node.tagName)}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00097}00097\ \ \ \ \ \textcolor{keywordflow}{for}\ child\_id,\ child\ \textcolor{keywordflow}{in}\ expected\_children.iteritems():}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00098}00098\ \ \ \ \ \ \ self.assert\_(child\_id\ \textcolor{keywordflow}{in}\ actual\_children,}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00099}00099\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'<\%s>\ is\ not\ in\ <\%s>\ (in\ element\ \%s)'}\ \%}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00100}00100\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (child\_id,\ actual\_children,\ actual\_node.tagName))}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00101}00101\ \ \ \ \ \ \ self.\mbox{\hyperlink{classgtest__xml__test__utils_1_1_g_test_x_m_l_test_case_aa18d40539741ab7357616c9557781e82}{AssertEquivalentNodes}}(child,\ actual\_children[child\_id])}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00102}00102\ }
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00103}\mbox{\hyperlink{classgtest__xml__test__utils_1_1_g_test_x_m_l_test_case_a15d033a555b3e323399c4a03e57e82d1}{00103}}\ \ \ identifying\_attribute\ =\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00104}00104\ \ \ \ \ \ \ \textcolor{stringliteral}{'testsuites'}:\ \textcolor{stringliteral}{'name'},}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00105}00105\ \ \ \ \ \ \ \textcolor{stringliteral}{'testsuite'}:\ \textcolor{stringliteral}{'name'},}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00106}00106\ \ \ \ \ \ \ \textcolor{stringliteral}{'testcase'}:\ \textcolor{stringliteral}{'name'},}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00107}00107\ \ \ \ \ \ \ \textcolor{stringliteral}{'failure'}:\ \textcolor{stringliteral}{'message'},}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00108}00108\ \ \ \ \ \ \ \textcolor{stringliteral}{'property'}:\ \textcolor{stringliteral}{'name'},}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00109}00109\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00110}00110\ }
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00111}\mbox{\hyperlink{classgtest__xml__test__utils_1_1_g_test_x_m_l_test_case_a2359b446aa283a582efe48d1e2f3f75a}{00111}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classgtest__xml__test__utils_1_1_g_test_x_m_l_test_case_a2359b446aa283a582efe48d1e2f3f75a}{\_GetChildren}}(self,\ element):}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00112}00112\ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00113}00113\ \textcolor{stringliteral}{\ \ \ \ Fetches\ all\ of\ the\ child\ nodes\ of\ element,\ a\ DOM\ Element\ object.}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00114}00114\ \textcolor{stringliteral}{\ \ \ \ Returns\ them\ as\ the\ values\ of\ a\ dictionary\ keyed\ by\ the\ IDs\ of\ the}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00115}00115\ \textcolor{stringliteral}{\ \ \ \ children.\ \ For\ <testsuites>,\ <testsuite>,\ <testcase>,\ and\ <property>}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00116}00116\ \textcolor{stringliteral}{\ \ \ \ elements,\ the\ ID\ is\ the\ value\ of\ their\ "{}name"{}\ attribute;\ for\ <failure>}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00117}00117\ \textcolor{stringliteral}{\ \ \ \ elements,\ it\ is\ the\ value\ of\ the\ "{}message"{}\ attribute;\ for\ <properties>}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00118}00118\ \textcolor{stringliteral}{\ \ \ \ elements,\ it\ is\ the\ value\ of\ their\ parent's\ "{}name"{}\ attribute\ plus\ the}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00119}00119\ \textcolor{stringliteral}{\ \ \ \ literal\ string\ "{}properties"{};\ CDATA\ sections\ and\ non-\/whitespace}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00120}00120\ \textcolor{stringliteral}{\ \ \ \ text\ nodes\ are\ concatenated\ into\ a\ single\ CDATA\ section\ with\ ID}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00121}00121\ \textcolor{stringliteral}{\ \ \ \ "{}detail"{}.\ \ An\ exception\ is\ raised\ if\ any\ element\ other\ than\ the\ above}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00122}00122\ \textcolor{stringliteral}{\ \ \ \ four\ is\ encountered,\ if\ two\ child\ elements\ with\ the\ same\ identifying}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00123}00123\ \textcolor{stringliteral}{\ \ \ \ attributes\ are\ encountered,\ or\ if\ any\ other\ type\ of\ node\ is\ encountered.}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00124}00124\ \textcolor{stringliteral}{\ \ \ \ "{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00125}00125\ }
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00126}00126\ \ \ \ \ children\ =\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00127}00127\ \ \ \ \ \textcolor{keywordflow}{for}\ child\ \textcolor{keywordflow}{in}\ element.childNodes:}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00128}00128\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ child.nodeType\ ==\ Node.ELEMENT\_NODE:}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00129}00129\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ child.tagName\ ==\ \textcolor{stringliteral}{'properties'}:}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00130}00130\ \ \ \ \ \ \ \ \ \ \ self.assert\_(child.parentNode\ \textcolor{keywordflow}{is}\ \textcolor{keywordflow}{not}\ \textcolor{keywordtype}{None},}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00131}00131\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'Encountered\ <properties>\ element\ without\ a\ parent'})}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00132}00132\ \ \ \ \ \ \ \ \ \ \ child\_id\ =\ child.parentNode.getAttribute(\textcolor{stringliteral}{'name'})\ +\ \textcolor{stringliteral}{'-\/properties'}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00133}00133\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00134}00134\ \ \ \ \ \ \ \ \ \ \ self.assert\_(child.tagName\ \textcolor{keywordflow}{in}\ self.\mbox{\hyperlink{classgtest__xml__test__utils_1_1_g_test_x_m_l_test_case_a15d033a555b3e323399c4a03e57e82d1}{identifying\_attribute}},}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00135}00135\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'Encountered\ unknown\ element\ <\%s>'}\ \%\ child.tagName)}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00136}00136\ \ \ \ \ \ \ \ \ \ \ child\_id\ =\ child.getAttribute(}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00137}00137\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ self.\mbox{\hyperlink{classgtest__xml__test__utils_1_1_g_test_x_m_l_test_case_a15d033a555b3e323399c4a03e57e82d1}{identifying\_attribute}}[child.tagName])}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00138}00138\ \ \ \ \ \ \ \ \ self.assert\_(child\_id\ \textcolor{keywordflow}{not}\ \textcolor{keywordflow}{in}\ children)}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00139}00139\ \ \ \ \ \ \ \ \ children[child\_id]\ =\ child}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00140}00140\ \ \ \ \ \ \ \textcolor{keywordflow}{elif}\ child.nodeType\ \textcolor{keywordflow}{in}\ [Node.TEXT\_NODE,\ Node.CDATA\_SECTION\_NODE]:}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00141}00141\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{stringliteral}{'detail'}\ \textcolor{keywordflow}{not}\ \textcolor{keywordflow}{in}\ children:}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00142}00142\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (child.nodeType\ ==\ Node.CDATA\_SECTION\_NODE\ \textcolor{keywordflow}{or}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00143}00143\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{not}\ child.nodeValue.isspace()):}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00144}00144\ \ \ \ \ \ \ \ \ \ \ \ \ children[\textcolor{stringliteral}{'detail'}]\ =\ child.ownerDocument.createCDATASection(}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00145}00145\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ child.nodeValue)}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00146}00146\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00147}00147\ \ \ \ \ \ \ \ \ \ \ children[\textcolor{stringliteral}{'detail'}].nodeValue\ +=\ child.nodeValue}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00148}00148\ \ \ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00149}00149\ \ \ \ \ \ \ \ \ self.fail(\textcolor{stringliteral}{'Encountered\ unexpected\ node\ type\ \%d'}\ \%\ child.nodeType)}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00150}00150\ \ \ \ \ \textcolor{keywordflow}{return}\ children}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00151}00151\ }
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00152}\mbox{\hyperlink{classgtest__xml__test__utils_1_1_g_test_x_m_l_test_case_a2b8aed90eb732e3cc3f0cc333e19a2f0}{00152}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classgtest__xml__test__utils_1_1_g_test_x_m_l_test_case_a2b8aed90eb732e3cc3f0cc333e19a2f0}{NormalizeXml}}(self,\ element):}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00153}00153\ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00154}00154\ \textcolor{stringliteral}{\ \ \ \ Normalizes\ Google\ Test's\ XML\ output\ to\ eliminate\ references\ to\ transient}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00155}00155\ \textcolor{stringliteral}{\ \ \ \ information\ that\ may\ change\ from\ run\ to\ run.}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00156}00156\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00157}00157\ \textcolor{stringliteral}{\ \ \ \ *\ \ The\ "{}time"{}\ attribute\ of\ <testsuites>,\ <testsuite>\ and\ <testcase>}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00158}00158\ \textcolor{stringliteral}{\ \ \ \ \ \ \ elements\ is\ replaced\ with\ a\ single\ asterisk,\ if\ it\ contains}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00159}00159\ \textcolor{stringliteral}{\ \ \ \ \ \ \ only\ digit\ characters.}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00160}00160\ \textcolor{stringliteral}{\ \ \ \ *\ \ The\ "{}timestamp"{}\ attribute\ of\ <testsuites>\ elements\ is\ replaced\ with\ a}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00161}00161\ \textcolor{stringliteral}{\ \ \ \ \ \ \ single\ asterisk,\ if\ it\ contains\ a\ valid\ ISO8601\ datetime\ value.}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00162}00162\ \textcolor{stringliteral}{\ \ \ \ *\ \ The\ "{}type\_param"{}\ attribute\ of\ <testcase>\ elements\ is\ replaced\ with\ a}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00163}00163\ \textcolor{stringliteral}{\ \ \ \ \ \ \ single\ asterisk\ (if\ it\ sn\ non-\/empty)\ as\ it\ is\ the\ type\ name\ returned}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00164}00164\ \textcolor{stringliteral}{\ \ \ \ \ \ \ by\ the\ compiler\ and\ is\ platform\ dependent.}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00165}00165\ \textcolor{stringliteral}{\ \ \ \ *\ \ The\ line\ info\ reported\ in\ the\ first\ line\ of\ the\ "{}message"{}}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00166}00166\ \textcolor{stringliteral}{\ \ \ \ \ \ \ attribute\ and\ CDATA\ section\ of\ <failure>\ elements\ is\ replaced\ with\ the}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00167}00167\ \textcolor{stringliteral}{\ \ \ \ \ \ \ file's\ basename\ and\ a\ single\ asterisk\ for\ the\ line\ number.}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00168}00168\ \textcolor{stringliteral}{\ \ \ \ *\ \ The\ directory\ names\ in\ file\ paths\ are\ removed.}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00169}00169\ \textcolor{stringliteral}{\ \ \ \ *\ \ The\ stack\ traces\ are\ removed.}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00170}00170\ \textcolor{stringliteral}{\ \ \ \ "{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00171}00171\ }
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00172}00172\ \ \ \ \ \textcolor{keywordflow}{if}\ element.tagName\ ==\ \textcolor{stringliteral}{'testsuites'}:}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00173}00173\ \ \ \ \ \ \ timestamp\ =\ element.getAttributeNode(\textcolor{stringliteral}{'timestamp'})}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00174}00174\ \ \ \ \ \ \ timestamp.value\ =\ re.sub(\textcolor{stringliteral}{r'\string^\(\backslash\)d\{4\}-\/\(\backslash\)d\(\backslash\)d-\/\(\backslash\)d\(\backslash\)dT\(\backslash\)d\(\backslash\)d:\(\backslash\)d\(\backslash\)d:\(\backslash\)d\(\backslash\)d\$'},}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00175}00175\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'*'},\ timestamp.value)}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00176}00176\ \ \ \ \ \textcolor{keywordflow}{if}\ element.tagName\ \textcolor{keywordflow}{in}\ (\textcolor{stringliteral}{'testsuites'},\ \textcolor{stringliteral}{'testsuite'},\ \textcolor{stringliteral}{'testcase'}):}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00177}00177\ \ \ \ \ \ \ time\ =\ element.getAttributeNode(\textcolor{stringliteral}{'time'})}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00178}00178\ \ \ \ \ \ \ time.value\ =\ re.sub(\textcolor{stringliteral}{r'\string^\(\backslash\)d+(\(\backslash\).\(\backslash\)d+)?\$'},\ \textcolor{stringliteral}{'*'},\ time.value)}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00179}00179\ \ \ \ \ \ \ type\_param\ =\ element.getAttributeNode(\textcolor{stringliteral}{'type\_param'})}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00180}00180\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ type\_param\ \textcolor{keywordflow}{and}\ type\_param.value:}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00181}00181\ \ \ \ \ \ \ \ \ type\_param.value\ =\ \textcolor{stringliteral}{'*'}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00182}00182\ \ \ \ \ \textcolor{keywordflow}{elif}\ element.tagName\ ==\ \textcolor{stringliteral}{'failure'}:}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00183}00183\ \ \ \ \ \ \ source\_line\_pat\ =\ \textcolor{stringliteral}{r'\string^.*[/\(\backslash\)\(\backslash\)](.*:)\(\backslash\)d+\(\backslash\)n'}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00184}00184\ \ \ \ \ \ \ \textcolor{comment}{\#\ Replaces\ the\ source\ line\ information\ with\ a\ normalized\ form.}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00185}00185\ \ \ \ \ \ \ message\ =\ element.getAttributeNode(\textcolor{stringliteral}{'message'})}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00186}00186\ \ \ \ \ \ \ message.value\ =\ re.sub(source\_line\_pat,\ \textcolor{stringliteral}{'\(\backslash\)\(\backslash\)1*\(\backslash\)n'},\ message.value)}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00187}00187\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ child\ \textcolor{keywordflow}{in}\ element.childNodes:}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00188}00188\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ child.nodeType\ ==\ Node.CDATA\_SECTION\_NODE:}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00189}00189\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Replaces\ the\ source\ line\ information\ with\ a\ normalized\ form.}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00190}00190\ \ \ \ \ \ \ \ \ \ \ cdata\ =\ re.sub(source\_line\_pat,\ \textcolor{stringliteral}{'\(\backslash\)\(\backslash\)1*\(\backslash\)n'},\ child.nodeValue)}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00191}00191\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Removes\ the\ actual\ stack\ trace.}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00192}00192\ \ \ \ \ \ \ \ \ \ \ child.nodeValue\ =\ re.sub(\textcolor{stringliteral}{r'Stack\ trace:\(\backslash\)n(.|\(\backslash\)n)*'},}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00193}00193\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'Stack\ trace:\(\backslash\)n*'},\ cdata)}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00194}00194\ \ \ \ \ \textcolor{keywordflow}{for}\ child\ \textcolor{keywordflow}{in}\ element.childNodes:}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00195}00195\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ child.nodeType\ ==\ Node.ELEMENT\_NODE:}
+\DoxyCodeLine{\Hypertarget{gtest__xml__test__utils_8py_source_l00196}00196\ \ \ \ \ \ \ \ \ self.\mbox{\hyperlink{classgtest__xml__test__utils_1_1_g_test_x_m_l_test_case_a2b8aed90eb732e3cc3f0cc333e19a2f0}{NormalizeXml}}(child)}
+
+\end{DoxyCode}

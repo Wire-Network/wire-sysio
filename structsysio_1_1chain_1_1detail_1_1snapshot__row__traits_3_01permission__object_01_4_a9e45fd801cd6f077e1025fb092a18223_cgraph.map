@@ -1,0 +1,13 @@
+<map id="sysio::chain::detail::snapshot_row_traits&lt; permission_object &gt;::to_snapshot_row" name="sysio::chain::detail::snapshot_row_traits&lt; permission_object &gt;::to_snapshot_row">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,20,156,90"/>
+<area shape="rect" id="Node000002" href="$classchainbase_1_1database.html#afcfe00f81a526c1376d4f51197dd3a9a" title=" " alt="" coords="204,13,371,38"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="156,42,188,37,188,42,156,47"/>
+<area shape="rect" id="Node000005" href="$structsysio_1_1chain_1_1name.html#a8847252c767dea5c3e8b60cc9d78505f" title=" " alt="" coords="222,63,353,103"/>
+<area shape="poly" id="edge6_Node000001_Node000005" title=" " alt="" coords="156,63,207,69,206,75,156,68"/>
+<area shape="rect" id="Node000003" href="$classchainbase_1_1database.html#aa5a2ca0da0092693ac49b36b7ec6817a" title=" " alt="" coords="419,5,560,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="372,32,403,32,403,37,372,37"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="419,20,387,19,387,14,419,14"/>
+<area shape="rect" id="Node000004" href="$classchainbase_1_1database.html#a4d5297635dcf70be481d9b600da9bc13" title=" " alt="" coords="608,35,750,75"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="561,34,594,39,593,44,560,39"/>
+<area shape="poly" id="edge5_Node000004_Node000002" title=" " alt="" coords="608,60,560,60,489,63,419,60,347,46,348,41,419,55,489,58,560,55,608,54"/>
+</map>

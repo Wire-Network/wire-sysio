@@ -1,0 +1,242 @@
+\doxysection{libraries/fc/include/fc/variant.hpp File Reference}
+\hypertarget{fc_2include_2fc_2variant_8hpp}{}\label{fc_2include_2fc_2variant_8hpp}\index{libraries/fc/include/fc/variant.hpp@{libraries/fc/include/fc/variant.hpp}}
+{\ttfamily \#include $<$deque$>$}\newline
+{\ttfamily \#include $<$map$>$}\newline
+{\ttfamily \#include $<$memory$>$}\newline
+{\ttfamily \#include $<$set$>$}\newline
+{\ttfamily \#include $<$unordered\+\_\+map$>$}\newline
+{\ttfamily \#include $<$unordered\+\_\+set$>$}\newline
+{\ttfamily \#include $<$vector$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include $<$fc/string.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/time.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/container/deque\+\_\+fwd.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/container/flat\+\_\+fwd.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/multi\+\_\+index\+\_\+container\+\_\+fwd.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/multiprecision/cpp\+\_\+int.\+hpp$>$}\newline
+{\ttfamily \#include $<$variant$>$}\newline
+{\ttfamily \#include $<$fc/reflect/reflect.\+hpp$>$}\newline
+Include dependency graph for variant.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{fc_2include_2fc_2variant_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{fc_2include_2fc_2variant_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structfc_1_1blob}{fc\+::blob}}
+\item 
+class \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}}
+\begin{DoxyCompactList}\small\item\em stores null, int64, uint64, double, bool, string, std\+::vector$<$variant$>$, and \doxylink{classfc_1_1variant__object}{variant\+\_\+object}\textquotesingle{}s. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{classfc_1_1variant_1_1visitor}{fc\+::variant\+::visitor}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacefc}{fc}}
+\begin{DoxyCompactList}\small\item\em namespace \doxylink{namespacesysio_1_1chain}{sysio\+::chain} \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$size\+\_\+t Size$>$ }\\using \mbox{\hyperlink{namespacefc_a9e2bd4a5bea5dbed1bd6ea4c637ce664}{fc\+::\+UInt}}
+\item 
+{\footnotesize template$<$size\+\_\+t Size$>$ }\\using \mbox{\hyperlink{namespacefc_aa1a3610d3660e7059584d102ce20a43c}{fc\+::\+Int}}
+\item 
+typedef std\+::vector$<$ \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} $>$ \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{fc\+::variants}}
+\item 
+typedef std\+::optional$<$ \mbox{\hyperlink{classfc_1_1variant}{variant}} $>$ \mbox{\hyperlink{namespacefc_ac4b2b4e6d16eb9a9160a055b70f8ee8f}{fc\+::ovariant}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{namespacefc_a3353fd9c1626f07cba4c35f522f1efd0}{fc\+::to\+\_\+variant}} (const \mbox{\hyperlink{structfc_1_1blob}{blob}} \&b, \mbox{\hyperlink{classfc_1_1variant}{variant}} \&v)
+\item 
+void \mbox{\hyperlink{namespacefc_ac2c1cdb7900b6ed71097bfffafd30886}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{variant}} \&v, \mbox{\hyperlink{structfc_1_1blob}{blob}} \&b)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename... Args$>$ }\\void \mbox{\hyperlink{namespacefc_a218fe3d3a807185ab39d48b4e0d37863}{fc\+::to\+\_\+variant}} (const boost\+::multi\+\_\+index\+\_\+container$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Args... $>$ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&v)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename... Args$>$ }\\void \mbox{\hyperlink{namespacefc_ac71414dbc80c8c2af113c8ce6c760a99}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&v, boost\+::multi\+\_\+index\+\_\+container$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Args... $>$ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\item 
+void \mbox{\hyperlink{namespacefc_aec200b471b6fb2df4c1bc953f3c2c028}{fc\+::to\+\_\+variant}} (const \mbox{\hyperlink{namespacefc_a9e2bd4a5bea5dbed1bd6ea4c637ce664}{UInt}}$<$ 8 $>$ \&n, \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&v)
+\item 
+void \mbox{\hyperlink{namespacefc_ade140d395ba0de1b3ab244cbc19b2ee7}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&v, \mbox{\hyperlink{namespacefc_a9e2bd4a5bea5dbed1bd6ea4c637ce664}{UInt}}$<$ 8 $>$ \&n)
+\item 
+void \mbox{\hyperlink{namespacefc_a036bcc922f8ec9f81ece7e880e91f31e}{fc\+::to\+\_\+variant}} (const \mbox{\hyperlink{namespacefc_a9e2bd4a5bea5dbed1bd6ea4c637ce664}{UInt}}$<$ 16 $>$ \&n, \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&v)
+\item 
+void \mbox{\hyperlink{namespacefc_a92ab29489c0f1c9c4978eaf3ca87fd0c}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&v, \mbox{\hyperlink{namespacefc_a9e2bd4a5bea5dbed1bd6ea4c637ce664}{UInt}}$<$ 16 $>$ \&n)
+\item 
+void \mbox{\hyperlink{namespacefc_ab9c42617b7814d36fa53be34775562f1}{fc\+::to\+\_\+variant}} (const \mbox{\hyperlink{namespacefc_a9e2bd4a5bea5dbed1bd6ea4c637ce664}{UInt}}$<$ 32 $>$ \&n, \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&v)
+\item 
+void \mbox{\hyperlink{namespacefc_ae7f02dc07791bf4052755f2795adc777}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&v, \mbox{\hyperlink{namespacefc_a9e2bd4a5bea5dbed1bd6ea4c637ce664}{UInt}}$<$ 32 $>$ \&n)
+\item 
+void \mbox{\hyperlink{namespacefc_aad1960a5e62cd495739feb2563f11b7b}{fc\+::to\+\_\+variant}} (const \mbox{\hyperlink{namespacefc_a9e2bd4a5bea5dbed1bd6ea4c637ce664}{UInt}}$<$ 64 $>$ \&n, \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&v)
+\item 
+void \mbox{\hyperlink{namespacefc_aaa0bfe4862a7caf2489e4157dbf70001}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&v, \mbox{\hyperlink{namespacefc_a9e2bd4a5bea5dbed1bd6ea4c637ce664}{UInt}}$<$ 64 $>$ \&n)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{namespacefc_ae6d292fc12d46e2aecb47e7595a2e25d}{fc\+::to\+\_\+variant}} (const boost\+::multiprecision\+::number$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&n, \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&v)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{namespacefc_a5ecfa6ddad7491ce1d48bb376fdcfe81}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&v, boost\+::multiprecision\+::number$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&n)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{namespacefc_a650decf68c721662300568f8831ae6cf}{fc\+::to\+\_\+variant}} (const \mbox{\hyperlink{structfc_1_1safe}{safe}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&v)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{namespacefc_a323868135b766c6335d1725a22dc0116}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&v, \mbox{\hyperlink{structfc_1_1safe}{safe}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{namespacefc_a7c12afe06d8a5b84a28a57fd3935e0e4}{fc\+::to\+\_\+variant}} (const std\+::unique\+\_\+ptr$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&v)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{namespacefc_a5e7288e5503a6bb3a16749b3541da41e}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&v, std\+::unique\+\_\+ptr$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\item 
+{\footnotesize template$<$typename... T$>$ }\\void \mbox{\hyperlink{namespacefc_a61bd2f687994eff826299cb88bdb692e}{fc\+::to\+\_\+variant}} (const std\+::variant$<$ T... $>$ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&v)
+\item 
+{\footnotesize template$<$typename... T$>$ }\\void \mbox{\hyperlink{namespacefc_a26fa0bf98a0dc288fe6d9ff149b314c1}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&v, std\+::variant$<$ T... $>$ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\item 
+void \mbox{\hyperlink{namespacefc_a5b7658ec85bb4b4078abfbdb22bd0fe4}{fc\+::to\+\_\+variant}} (const \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \&var, \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&vo)
+\item 
+void \mbox{\hyperlink{namespacefc_ac47d96b2c15081fe1a403d151e227cb0}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&var, \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \&vo)
+\item 
+void \mbox{\hyperlink{namespacefc_ae815723d13125ab772a326ddf2112fbd}{fc\+::to\+\_\+variant}} (const \mbox{\hyperlink{stdint_8h_aef44329758059c91c76d334e8fc09700}{int8\+\_\+t}} \&var, \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&vo)
+\item 
+void \mbox{\hyperlink{namespacefc_a50c2775b40d9ef49dfa6ee847a241924}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&var, \mbox{\hyperlink{stdint_8h_aef44329758059c91c76d334e8fc09700}{int8\+\_\+t}} \&vo)
+\item 
+void \mbox{\hyperlink{namespacefc_adf60eb3a5491d0a4dae8011c623fe64a}{fc\+::to\+\_\+variant}} (const \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \&var, \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&vo)
+\item 
+void \mbox{\hyperlink{namespacefc_a7fd8a6125273ab54202b9617a98817e6}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&var, \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \&vo)
+\item 
+void \mbox{\hyperlink{namespacefc_a22dfc90cc043b0f0901e96909df557e6}{fc\+::to\+\_\+variant}} (const \mbox{\hyperlink{stdint_8h_a269259c924dce846340ddbb810db2e3c}{int16\+\_\+t}} \&var, \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&vo)
+\item 
+void \mbox{\hyperlink{namespacefc_a3e93a62b4b406dbd4c942dc2559c05dc}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&var, \mbox{\hyperlink{stdint_8h_a269259c924dce846340ddbb810db2e3c}{int16\+\_\+t}} \&vo)
+\item 
+void \mbox{\hyperlink{namespacefc_a65587acb138ab9e7e64d6534c1f613a2}{fc\+::to\+\_\+variant}} (const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \&var, \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&vo)
+\item 
+void \mbox{\hyperlink{namespacefc_ac6e80cc14fcc98526df46529d90ffd76}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&var, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \&vo)
+\item 
+void \mbox{\hyperlink{namespacefc_a2499d70ae86dc98e5881fba093fdfd54}{fc\+::to\+\_\+variant}} (const \mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\+\_\+t}} \&var, \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&vo)
+\item 
+void \mbox{\hyperlink{namespacefc_a32f88617b33c79853e594bdf4fbb901e}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&var, \mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\+\_\+t}} \&vo)
+\item 
+void \mbox{\hyperlink{namespacefc_a64a3e02b99ec2f4c7b185d18f6c1f066}{fc\+::to\+\_\+variant}} (const unsigned \+\_\+\+\_\+int128 \&var, \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&vo)
+\item 
+void \mbox{\hyperlink{namespacefc_ad99755ff0259cfb547b0217839ceeb02}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&var, unsigned \+\_\+\+\_\+int128 \&vo)
+\item 
+void \mbox{\hyperlink{namespacefc_a4d4502427951afb64eaca795b60015cd}{fc\+::to\+\_\+variant}} (const \+\_\+\+\_\+int128 \&var, \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&vo)
+\item 
+void \mbox{\hyperlink{namespacefc_a37863bc6e3f14b3012294d0ceda92ae9}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&var, \+\_\+\+\_\+int128 \&vo)
+\item 
+void \mbox{\hyperlink{namespacefc_ac00bee279aa7977d7fc2c6308f05e210}{fc\+::to\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant__object}{variant\+\_\+object}} \&var, \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&vo)
+\item 
+void \mbox{\hyperlink{namespacefc_a30763bca5aab1eeaf534ff52097c1f66}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&var, \mbox{\hyperlink{classfc_1_1variant__object}{variant\+\_\+object}} \&vo)
+\item 
+void \mbox{\hyperlink{namespacefc_a66ce42e39858d7eaf9cdae295b2c24e5}{fc\+::to\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\+\_\+variant\+\_\+object}} \&var, \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&vo)
+\item 
+void \mbox{\hyperlink{namespacefc_adcd1cd5adde54a2e67f481c6941675e6}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&var, \mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\+\_\+variant\+\_\+object}} \&vo)
+\item 
+void \mbox{\hyperlink{namespacefc_adf63646cbcc6cc309a40c1237f9b93b6}{fc\+::to\+\_\+variant}} (const std\+::vector$<$ char $>$ \&var, \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&vo)
+\item 
+void \mbox{\hyperlink{namespacefc_a58721e6f67ce0cd5a4fac54e448b146d}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&var, std\+::vector$<$ char $>$ \&vo)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{make__512_8cpp_a3d4e997ddc51e0c06c306fe4862826c0}{K}} , typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{namespacefc_a4b53bd1896ae66779e914823f596f6cd}{fc\+::to\+\_\+variant}} (const std\+::unordered\+\_\+map$<$ \mbox{\hyperlink{make__512_8cpp_a3d4e997ddc51e0c06c306fe4862826c0}{K}}, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&var, \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&vo)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{make__512_8cpp_a3d4e997ddc51e0c06c306fe4862826c0}{K}} , typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{namespacefc_a367b6ea59e3edf715d957e38d7251019}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&var, std\+::unordered\+\_\+map$<$ \mbox{\hyperlink{make__512_8cpp_a3d4e997ddc51e0c06c306fe4862826c0}{K}}, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&vo)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{make__512_8cpp_a3d4e997ddc51e0c06c306fe4862826c0}{K}} , typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{namespacefc_ac0f1a9f1e1a1a52a504a3357c74eb679}{fc\+::to\+\_\+variant}} (const std\+::map$<$ \mbox{\hyperlink{make__512_8cpp_a3d4e997ddc51e0c06c306fe4862826c0}{K}}, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&var, \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&vo)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{make__512_8cpp_a3d4e997ddc51e0c06c306fe4862826c0}{K}} , typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{namespacefc_a633c4fd68dd3a30aea8fe7449024d22a}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&var, std\+::map$<$ \mbox{\hyperlink{make__512_8cpp_a3d4e997ddc51e0c06c306fe4862826c0}{K}}, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&vo)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{make__512_8cpp_a3d4e997ddc51e0c06c306fe4862826c0}{K}} , typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{namespacefc_ae853103bbde9b77916f8c82458a07935}{fc\+::to\+\_\+variant}} (const std\+::multimap$<$ \mbox{\hyperlink{make__512_8cpp_a3d4e997ddc51e0c06c306fe4862826c0}{K}}, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&var, \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&vo)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{make__512_8cpp_a3d4e997ddc51e0c06c306fe4862826c0}{K}} , typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{namespacefc_a3f6379342d9a4f2e2409aa3fec2e29ec}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&var, std\+::multimap$<$ \mbox{\hyperlink{make__512_8cpp_a3d4e997ddc51e0c06c306fe4862826c0}{K}}, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&vo)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{namespacefc_a5fb9ca326858f6f8a05e6d3a72fb0fec}{fc\+::to\+\_\+variant}} (const std\+::unordered\+\_\+set$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&var, \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&vo)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{namespacefc_a7903e521d3a7a8b6403f030c607a94f3}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&var, std\+::unordered\+\_\+set$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&vo)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{namespacefc_aa469193d20be3eeeea219d6aacac1c85}{fc\+::to\+\_\+variant}} (const std\+::deque$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&var, \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&vo)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{namespacefc_a0662d18869cb61abbd25666cea3ab5a9}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&var, std\+::deque$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&vo)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename... U$>$ }\\void \mbox{\hyperlink{namespacefc_a759a4cb50ad6d8ac5af0ca6ea006204f}{fc\+::to\+\_\+variant}} (const boost\+::container\+::deque$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, U... $>$ \&d, \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&vo)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename... U$>$ }\\void \mbox{\hyperlink{namespacefc_a3c9bd99de1d7c407f31035d6fcd90526}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&v, boost\+::container\+::deque$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, U... $>$ \&d)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{namespacefc_a45821580644852ddf59682fa502deb74}{fc\+::to\+\_\+variant}} (const std\+::set$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&var, \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&vo)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{namespacefc_a622c0e66e678aab45dc7d4ef851c0118}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&var, std\+::set$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&vo)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t S$>$ }\\void \mbox{\hyperlink{namespacefc_acf41a2168a2f545b4996b8286de9de92}{fc\+::to\+\_\+variant}} (const std\+::array$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{struct_s}{S}} $>$ \&var, \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&vo)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t S$>$ }\\void \mbox{\hyperlink{namespacefc_a11e4b9c974c5da8ec8a995f3ff998b54}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&var, std\+::array$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{struct_s}{S}} $>$ \&vo)
+\item 
+void \mbox{\hyperlink{namespacefc_af8910fe916a48b80934350e360515a08}{fc\+::to\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} \&var, \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&vo)
+\item 
+void \mbox{\hyperlink{namespacefc_a1aa200e8e1cbe0da59c52053ee6e00f4}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&var, \mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} \&vo)
+\item 
+void \mbox{\hyperlink{namespacefc_a24a8c1f007a72d150ba477d5b9863d4e}{fc\+::to\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1time__point__sec}{time\+\_\+point\+\_\+sec}} \&var, \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&vo)
+\item 
+void \mbox{\hyperlink{namespacefc_a6a143ca3e334e9c18ad4264a3e1ee055}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&var, \mbox{\hyperlink{classfc_1_1time__point__sec}{time\+\_\+point\+\_\+sec}} \&vo)
+\item 
+void \mbox{\hyperlink{namespacefc_a91859540574b996a87eca48e36990a47}{fc\+::to\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}} \&, \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&)
+\item 
+void \mbox{\hyperlink{namespacefc_adbd4dad54bd3fa870eb0ba0962f373ec}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&, \mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}} \&)
+\item 
+void \mbox{\hyperlink{namespacefc_a0c2c73f0e49993a6fe4f1adf1aa008b8}{fc\+::to\+\_\+variant}} (long long int \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&v)
+\item 
+void \mbox{\hyperlink{namespacefc_a08605c0592119392f22aa7931ff4d355}{fc\+::to\+\_\+variant}} (unsigned long long int \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&v)
+\item 
+void \mbox{\hyperlink{namespacefc_abd201b547fd8a2f871cae4169de3dd27}{fc\+::to\+\_\+variant}} (const std\+::string \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&v)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{namespacefc_ade7db6d8932f1d60db2ba2fc72120f5f}{fc\+::to\+\_\+variant}} (const std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&var, \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&vo)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{namespacefc_ac7058792563077a9024ae19799e4d3fe}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&var, std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&vo)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{struct_a}{A}} , typename B $>$ }\\void \mbox{\hyperlink{namespacefc_a274f139d20508e29acf1d89936bfdc8b}{fc\+::to\+\_\+variant}} (const std\+::pair$<$ \mbox{\hyperlink{struct_a}{A}}, B $>$ \&t, \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&v)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{struct_a}{A}} , typename B $>$ }\\void \mbox{\hyperlink{namespacefc_aa338b68fb679d4956535fec4c94743a8}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&v, std\+::pair$<$ \mbox{\hyperlink{struct_a}{A}}, B $>$ \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})
+\item 
+void \mbox{\hyperlink{namespacefc_a7d8fd3d908309ff335ec8c9bd44fcf17}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&var, \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&vo)
+\item 
+void \mbox{\hyperlink{namespacefc_a8a1dc5198e3d3824eccadacc2382d1c5}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&var, \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{fc\+::variants}} \&vo)
+\item 
+void \mbox{\hyperlink{namespacefc_a28f23655eebcd43d051867a3e6537062}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&var, \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&vo)
+\item 
+void \mbox{\hyperlink{namespacefc_a8143802e125b35eeaf430493cfa0e65f}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&var, \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \&vo)
+\item 
+void \mbox{\hyperlink{namespacefc_a44ce4ebb53135b93bd20c4690c30752b}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&var, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \&vo)
+\item 
+void \mbox{\hyperlink{namespacefc_a74f0e759f2d77e1dd7d7d8eda184ca5e}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&var, bool \&vo)
+\item 
+void \mbox{\hyperlink{namespacefc_a08d879ca99e0e8bc56592ed075545523}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&var, double \&vo)
+\item 
+void \mbox{\hyperlink{namespacefc_aa6a7042cf77fa1280f302033c9a39f6d}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&var, float \&vo)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{namespacefc_af633372d43a3ae7805f40a401c285f84}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{variant}} \&var, std\+::optional$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&vo)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{namespacefc_a4634ef1248349e00ac93a8ab47c694b9}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&var, std\+::vector$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&tmp)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{namespacefc_acc155f597c50f052a07a4a34e85725c4}{fc\+::to\+\_\+variant}} (const std\+::vector$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&t, \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&v)
+\item 
+\mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \mbox{\hyperlink{namespacefc_aaafd214e0d8824a4026671556052bb6a}{fc\+::operator+}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&b)
+\item 
+\mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \mbox{\hyperlink{namespacefc_a1cb7228e7544f0f33968e74d689043c0}{fc\+::operator-\/}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&b)
+\item 
+\mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \mbox{\hyperlink{namespacefc_a92c39ecffe7d07a97f76afb2737236b9}{fc\+::operator\texorpdfstring{$\ast$}{*}}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&b)
+\item 
+\mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \mbox{\hyperlink{namespacefc_ab862a767a4e9e5ee6802cc007bde81d7}{fc\+::operator/}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&b)
+\item 
+bool \mbox{\hyperlink{namespacefc_a14003bce448d9395d43e96bd7a381c1e}{fc\+::operator==}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&b)
+\item 
+bool \mbox{\hyperlink{namespacefc_ad466abc33ef57725419a69f6be42e01c}{fc\+::operator!=}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&b)
+\item 
+bool \mbox{\hyperlink{namespacefc_a5c0a7e40df1cd437f788fe52f1ea410a}{fc\+::operator$<$}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&b)
+\item 
+bool \mbox{\hyperlink{namespacefc_a7cb58b43ce474cd83351603c46abd890}{fc\+::operator$>$}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&b)
+\item 
+bool \mbox{\hyperlink{namespacefc_a40c368ac88294ae47b064cad937fdbf6}{fc\+::operator!}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})
+\end{DoxyCompactItemize}

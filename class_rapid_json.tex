@@ -1,0 +1,155 @@
+\doxysection{Rapid\+Json Class Reference}
+\hypertarget{class_rapid_json}{}\label{class_rapid_json}\index{RapidJson@{RapidJson}}
+
+
+Inheritance diagram for Rapid\+Json\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=143pt]{class_rapid_json__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Rapid\+Json\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_rapid_json__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_rapid_json_a5bd86d58d01d92ae83938bc3e09192d5}{Rapid\+Json}} ()
+\item 
+virtual void \mbox{\hyperlink{class_rapid_json_ae4e7e160193b9cac9c22f226e3d2b20e}{Set\+Up}} ()
+\item 
+virtual void \mbox{\hyperlink{class_rapid_json_ac89662f7dc5847e43237fe7c4121e2e4}{Tear\+Down}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_rapid_json_a03764452de8099f9fc03e5c7666dd5af}{temp\+\_\+}}
+\item 
+\mbox{\hyperlink{document_8h_ac6ea5b168e3fe8c7fa532450fc9391f7}{Document}} \mbox{\hyperlink{class_rapid_json_ab3e1ab7e5ed74284ebb9d9a4a6de0bcf}{doc\+\_\+}}
+\item 
+\mbox{\hyperlink{document_8h_ac6ea5b168e3fe8c7fa532450fc9391f7}{Document}} \mbox{\hyperlink{class_rapid_json_af0f2f377ad71e864a8d0b44da52ff2ae}{types\+Doc\+\_\+}} \mbox{[}7\mbox{]}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{rapidjsontest_8cpp_source_l00042}{42}} of file \mbox{\hyperlink{rapidjsontest_8cpp_source}{rapidjsontest.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_rapid_json_a5bd86d58d01d92ae83938bc3e09192d5}\index{RapidJson@{RapidJson}!RapidJson@{RapidJson}}
+\index{RapidJson@{RapidJson}!RapidJson@{RapidJson}}
+\doxysubsubsection{\texorpdfstring{RapidJson()}{RapidJson()}}
+{\footnotesize\ttfamily \label{class_rapid_json_a5bd86d58d01d92ae83938bc3e09192d5} 
+Rapid\+Json\+::\+Rapid\+Json (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{rapidjsontest_8cpp_source_l00044}{44}} of file \mbox{\hyperlink{rapidjsontest_8cpp_source}{rapidjsontest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00044\ :\ \mbox{\hyperlink{class_rapid_json_a03764452de8099f9fc03e5c7666dd5af}{temp\_}}(),\ \mbox{\hyperlink{class_rapid_json_ab3e1ab7e5ed74284ebb9d9a4a6de0bcf}{doc\_}}()\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_rapid_json_ae4e7e160193b9cac9c22f226e3d2b20e}\index{RapidJson@{RapidJson}!SetUp@{SetUp}}
+\index{SetUp@{SetUp}!RapidJson@{RapidJson}}
+\doxysubsubsection{\texorpdfstring{SetUp()}{SetUp()}}
+{\footnotesize\ttfamily \label{class_rapid_json_ae4e7e160193b9cac9c22f226e3d2b20e} 
+virtual void Rapid\+Json\+::\+Set\+Up (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{rapidjsontest_8cpp_source_l00046}{46}} of file \mbox{\hyperlink{rapidjsontest_8cpp_source}{rapidjsontest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ PerfTest::SetUp();}
+\DoxyCodeLine{00048\ }
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ temp\ buffer\ for\ insitu\ parsing.}}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_rapid_json_a03764452de8099f9fc03e5c7666dd5af}{temp\_}}\ =\ (\textcolor{keywordtype}{char}\ *)malloc(length\_\ +\ 1);}
+\DoxyCodeLine{00051\ }
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Parse\ as\ a\ document}}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(\mbox{\hyperlink{class_rapid_json_ab3e1ab7e5ed74284ebb9d9a4a6de0bcf}{doc\_}}.\mbox{\hyperlink{class_generic_document_a901db1678f99a1b550003eed75bc380a}{Parse}}(json\_).\mbox{\hyperlink{class_generic_document_a510a0588db4eb372f5d81bc3646578fb}{HasParseError}}());}
+\DoxyCodeLine{00054\ }
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ 7;\ i++)}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(\mbox{\hyperlink{class_rapid_json_af0f2f377ad71e864a8d0b44da52ff2ae}{typesDoc\_}}[i].Parse(types\_[i]).HasParseError());}
+\DoxyCodeLine{00057\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_rapid_json_ae4e7e160193b9cac9c22f226e3d2b20e_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_rapid_json_ac89662f7dc5847e43237fe7c4121e2e4}\index{RapidJson@{RapidJson}!TearDown@{TearDown}}
+\index{TearDown@{TearDown}!RapidJson@{RapidJson}}
+\doxysubsubsection{\texorpdfstring{TearDown()}{TearDown()}}
+{\footnotesize\ttfamily \label{class_rapid_json_ac89662f7dc5847e43237fe7c4121e2e4} 
+virtual void Rapid\+Json\+::\+Tear\+Down (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{rapidjsontest_8cpp_source_l00059}{59}} of file \mbox{\hyperlink{rapidjsontest_8cpp_source}{rapidjsontest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ PerfTest::TearDown();}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ free(\mbox{\hyperlink{class_rapid_json_a03764452de8099f9fc03e5c7666dd5af}{temp\_}});}
+\DoxyCodeLine{00062\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{class_rapid_json_ab3e1ab7e5ed74284ebb9d9a4a6de0bcf}\index{RapidJson@{RapidJson}!doc\_@{doc\_}}
+\index{doc\_@{doc\_}!RapidJson@{RapidJson}}
+\doxysubsubsection{\texorpdfstring{doc\_}{doc\_}}
+{\footnotesize\ttfamily \label{class_rapid_json_ab3e1ab7e5ed74284ebb9d9a4a6de0bcf} 
+\mbox{\hyperlink{document_8h_ac6ea5b168e3fe8c7fa532450fc9391f7}{Document}} Rapid\+Json\+::doc\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{rapidjsontest_8cpp_source_l00070}{70}} of file \mbox{\hyperlink{rapidjsontest_8cpp_source}{rapidjsontest.\+cpp}}.
+
+\Hypertarget{class_rapid_json_a03764452de8099f9fc03e5c7666dd5af}\index{RapidJson@{RapidJson}!temp\_@{temp\_}}
+\index{temp\_@{temp\_}!RapidJson@{RapidJson}}
+\doxysubsubsection{\texorpdfstring{temp\_}{temp\_}}
+{\footnotesize\ttfamily \label{class_rapid_json_a03764452de8099f9fc03e5c7666dd5af} 
+char\texorpdfstring{$\ast$}{*} Rapid\+Json\+::temp\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{rapidjsontest_8cpp_source_l00069}{69}} of file \mbox{\hyperlink{rapidjsontest_8cpp_source}{rapidjsontest.\+cpp}}.
+
+\Hypertarget{class_rapid_json_af0f2f377ad71e864a8d0b44da52ff2ae}\index{RapidJson@{RapidJson}!typesDoc\_@{typesDoc\_}}
+\index{typesDoc\_@{typesDoc\_}!RapidJson@{RapidJson}}
+\doxysubsubsection{\texorpdfstring{typesDoc\_}{typesDoc\_}}
+{\footnotesize\ttfamily \label{class_rapid_json_af0f2f377ad71e864a8d0b44da52ff2ae} 
+\mbox{\hyperlink{document_8h_ac6ea5b168e3fe8c7fa532450fc9391f7}{Document}} Rapid\+Json\+::types\+Doc\+\_\+\mbox{[}7\mbox{]}\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{rapidjsontest_8cpp_source_l00071}{71}} of file \mbox{\hyperlink{rapidjsontest_8cpp_source}{rapidjsontest.\+cpp}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/test/perftest/\mbox{\hyperlink{rapidjsontest_8cpp}{rapidjsontest.\+cpp}}\end{DoxyCompactItemize}

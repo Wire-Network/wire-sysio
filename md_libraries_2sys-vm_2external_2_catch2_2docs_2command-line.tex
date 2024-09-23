@@ -1,0 +1,416 @@
+\chapter{command-\/line}
+\hypertarget{md_libraries_2sys-vm_2external_2_catch2_2docs_2command-line}{}\label{md_libraries_2sys-vm_2external_2_catch2_2docs_2command-line}\index{command-\/line@{command-\/line}}
+\label{_top}%
+ \doxysection*{\doxylink{struct_command}{Command} line}
+
+{\bfseries{Contents}}~\newline
+ Specifying which tests to run~\newline
+ Choosing a reporter to use~\newline
+ Breaking into the debugger~\newline
+ Showing results for successful tests~\newline
+ Aborting after a certain number of failures~\newline
+ Listing available tests, tags or reporters~\newline
+ Sending output to a file~\newline
+ Naming a test run~\newline
+ Eliding assertions expected to throw~\newline
+ Make whitespace visible~\newline
+ Warnings~\newline
+ Reporting timings~\newline
+ Load test names to run from a file~\newline
+ Just test names~\newline
+ Specify the order test cases are run~\newline
+ Specify a seed for the Random Number Generator~\newline
+ Identify framework and version according to the lib\+Identify standard~\newline
+ Wait for key before continuing~\newline
+ Specify multiples of clock resolution to run benchmarks for~\newline
+ Usage~\newline
+ Specify the section to run~\newline
+ Filenames as tags~\newline
+ Override output colouring~\newline
+
+
+\doxylink{namespace_catch}{Catch} works quite nicely without any command line options at all -\/ but for those times when you want greater control the following options are available. Click one of the following links to take you straight to that option -\/ or scroll on to browse the available options.
+
+\href{\#specifying-which-tests-to-run}{\texttt{ {\ttfamily \texorpdfstring{$<$}{<}test-\/spec\texorpdfstring{$>$}{>} ...}}}~\newline
+ \href{\#usage}{\texttt{ {\ttfamily -\/h, -\/?, -\/-\/help}}}~\newline
+ \href{\#listing-available-tests-tags-or-reporters}{\texttt{ {\ttfamily -\/l, -\/-\/list-\/tests}}}~\newline
+ \href{\#listing-available-tests-tags-or-reporters}{\texttt{ {\ttfamily -\/t, -\/-\/list-\/tags}}}~\newline
+ \href{\#showing-results-for-successful-tests}{\texttt{ {\ttfamily -\/s, -\/-\/success}}}~\newline
+ \href{\#breaking-into-the-debugger}{\texttt{ {\ttfamily -\/b, -\/-\/break}}}~\newline
+ \href{\#eliding-assertions-expected-to-throw}{\texttt{ {\ttfamily -\/e, -\/-\/nothrow}}}~\newline
+ \href{\#invisibles}{\texttt{ {\ttfamily -\/i, -\/-\/invisibles}}}~\newline
+ \href{\#sending-output-to-a-file}{\texttt{ {\ttfamily -\/o, -\/-\/out}}}~\newline
+ \href{\#choosing-a-reporter-to-use}{\texttt{ {\ttfamily -\/r, -\/-\/reporter}}}~\newline
+ \href{\#naming-a-test-run}{\texttt{ {\ttfamily -\/n, -\/-\/name}}}~\newline
+ \href{\#aborting-after-a-certain-number-of-failures}{\texttt{ {\ttfamily -\/a, -\/-\/abort}}}~\newline
+ \href{\#aborting-after-a-certain-number-of-failures}{\texttt{ {\ttfamily -\/x, -\/-\/abortx}}}~\newline
+ \href{\#warnings}{\texttt{ {\ttfamily -\/w, -\/-\/warn}}}~\newline
+ \href{\#reporting-timings}{\texttt{ {\ttfamily -\/d, -\/-\/durations}}}~\newline
+ \href{\#input-file}{\texttt{ {\ttfamily -\/f, -\/-\/input-\/file}}}~\newline
+ \href{\#run-section}{\texttt{ {\ttfamily -\/c, -\/-\/section}}}~\newline
+ \href{\#filenames-as-tags}{\texttt{ {\ttfamily -\/\#, -\/-\/filenames-\/as-\/tags}}}~\newline
+
+
+\href{\#list-test-names-only}{\texttt{ {\ttfamily -\/-\/list-\/test-\/names-\/only}}}~\newline
+ \href{\#listing-available-tests-tags-or-reporters}{\texttt{ {\ttfamily -\/-\/list-\/reporters}}}~\newline
+ \href{\#order}{\texttt{ {\ttfamily -\/-\/order}}}~\newline
+ \href{\#rng-seed}{\texttt{ {\ttfamily -\/-\/rng-\/seed}}}~\newline
+ \href{\#libidentify}{\texttt{ {\ttfamily -\/-\/libidentify}}}~\newline
+ \href{\#wait-for-keypress}{\texttt{ {\ttfamily -\/-\/wait-\/for-\/keypress}}}~\newline
+ \href{\#benchmark-resolution-multiple}{\texttt{ {\ttfamily -\/-\/benchmark-\/resolution-\/multiple}}}~\newline
+ \href{\#use-colour}{\texttt{ {\ttfamily -\/-\/use-\/colour}}}~\newline
+
+
+\label{_specifying-which-tests-to-run}%
+ \doxysubsection*{Specifying which tests to run}
+
+
+\begin{DoxyPre}<test-\/spec> ...\end{DoxyPre}
+
+
+\doxylink{class_test}{Test} cases, wildcarded test cases, tags and tag expressions are all passed directly as arguments. Tags are distinguished by being enclosed in square brackets.
+
+If no test specs are supplied then all test cases, except "{}hidden"{} tests, are run. \doxylink{struct_a}{A} test is hidden by giving it any tag starting with (or just) a period ({\ttfamily .}) -\/ or, in the deprecated case, tagged {\ttfamily \mbox{[}hide\mbox{]}} or given name starting with `'./\textquotesingle{}{\ttfamily . To specify hidden tests from the command line}{\ttfamily \mbox{[}.\mbox{]}}{\ttfamily or}{\ttfamily \mbox{[}hide\mbox{]}}\`{} can be used {\itshape regardless of how they were declared}.
+
+Specs must be enclosed in quotes if they contain spaces. If they do not contain spaces the quotes are optional.
+
+Wildcards consist of the {\ttfamily \texorpdfstring{$\ast$}{*}} character at the beginning and/or end of test case names and can substitute for any number of any characters (including none).
+
+\doxylink{class_test}{Test} specs are case insensitive.
+
+If a spec is prefixed with {\ttfamily exclude\+:} or the {\ttfamily \texorpdfstring{$\sim$}{\string~}} character then the pattern matches an exclusion. This means that tests matching the pattern are excluded from the set -\/ even if a prior inclusion spec included them. Subsequent inclusion specs will take precedence, however. Inclusions and exclusions are evaluated in left-\/to-\/right order.
+
+\doxylink{class_test}{Test} case examples\+:
+
+
+\begin{DoxyPre}thisTestOnly            Matches the test case called, 'thisTestOnly'
+"{}this test only"{}        Matches the test case called, 'this test only'
+these*                  Matches all cases starting with 'these'
+exclude:notThis         Matches all tests except, 'notThis'
+\string~notThis                Matches all tests except, 'notThis'
+\string~*private*              Matches all tests except those that contain 'private'
+a* \string~ab* abc             Matches all tests that start with 'a', except those that
+                        start with 'ab', except 'abc', which is included
+\end{DoxyPre}
+
+
+Names within square brackets are interpreted as tags. \doxylink{struct_a}{A} series of tags form an AND expression whereas a comma-\/separated sequence forms an OR expression. e.\+g.\+:
+
+
+\begin{DoxyPre}[one][two],[three]\end{DoxyPre}
+ This matches all tests tagged {\ttfamily \mbox{[}one\mbox{]}} and {\ttfamily \mbox{[}two\mbox{]}}, as well as all tests tagged {\ttfamily \mbox{[}three\mbox{]}}
+
+\doxylink{class_test}{Test} names containing special characters, such as {\ttfamily ,} or {\ttfamily \mbox{[}} can specify them on the command line using {\ttfamily \textbackslash{}}. {\ttfamily \textbackslash{}} also escapes itself.
+
+\label{_choosing-a-reporter-to-use}%
+ \doxysubsection*{Choosing a reporter to use}
+
+
+\begin{DoxyPre}-\/r, -\/-\/reporter <reporter>\end{DoxyPre}
+
+
+\doxylink{struct_a}{A} reporter is an object that formats and structures the output of running tests, and potentially summarises the results. By default a console reporter is used that writes, IDE friendly, textual output. \doxylink{namespace_catch}{Catch} comes bundled with some alternative reporters, but more can be added in client code.~\newline
+ The bundled reporters are\+:
+
+
+\begin{DoxyPre}-\/r console
+-\/r compact
+-\/r xml
+-\/r junit
+\end{DoxyPre}
+
+
+The JUnit reporter is an xml format that follows the structure of the JUnit XML Report ANT task, as consumed by a number of third-\/party tools, including Continuous Integration servers such as Hudson. If not otherwise needed, the standard XML reporter is preferred as this is a streaming reporter, whereas the Junit reporter needs to hold all its results until the end so it can write the overall results into attributes of the root node.
+
+\label{_breaking-into-the-debugger}%
+ \doxysubsection*{Breaking into the debugger}
+
+
+\begin{DoxyPre}-\/b, -\/-\/break\end{DoxyPre}
+
+
+Under most debuggers Catch2 is capable of automatically breaking on a test failure. This allows the user to see the current state of the test during failure.
+
+\label{_showing-results-for-successful-tests}%
+ \doxysubsection*{Showing results for successful tests}
+
+
+\begin{DoxyPre}-\/s, -\/-\/success\end{DoxyPre}
+
+
+Usually you only want to see reporting for failed tests. Sometimes it\textquotesingle{}s useful to see {\itshape all} the output (especially when you don\textquotesingle{}t trust that that test you just added worked first time!). To see successful, as well as failing, test results just pass this option. Note that each reporter may treat this option differently. The Junit reporter, for example, logs all results regardless.
+
+\label{_aborting-after-a-certain-number-of-failures}%
+ \doxysubsection*{Aborting after a certain number of failures}
+
+
+\begin{DoxyPre}-\/a, -\/-\/abort
+-\/x, -\/-\/abortx [<failure threshold>]
+\end{DoxyPre}
+
+
+If a {\ttfamily REQUIRE} assertion fails the test case aborts, but subsequent test cases are still run. If a {\ttfamily CHECK} assertion fails even the current test case is not aborted.
+
+Sometimes this results in a flood of failure messages and you\textquotesingle{}d rather just see the first few. Specifying {\ttfamily -\/a} or {\ttfamily -\/-\/abort} on its own will abort the whole test run on the first failed assertion of any kind. Use {\ttfamily -\/x} or {\ttfamily -\/-\/abortx} followed by a number to abort after that number of assertion failures.
+
+\label{_listing-available-tests-tags-or-reporters}%
+ \doxysubsection*{Listing available tests, tags or reporters}
+
+
+\begin{DoxyPre}-\/l, -\/-\/list-\/tests
+-\/t, -\/-\/list-\/tags
+-\/-\/list-\/reporters
+\end{DoxyPre}
+
+
+{\ttfamily -\/l} or {\ttfamily -\/-\/list-\/tests} will list all registered tests, along with any tags. If one or more test-\/specs have been supplied too then only the matching tests will be listed.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{-\/t}
+
+\end{DoxyCode}
+ or {\ttfamily -\/-\/list-\/tags} lists all available tags, along with the number of test cases they match. Again, supplying test specs limits the tags that match.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{-\/-\/list-\/reporters}
+
+\end{DoxyCode}
+ lists the available reporters.
+
+\label{_sending-output-to-a-file}%
+ \doxysubsection*{Sending output to a file}
+
+
+\begin{DoxyPre}-\/o, -\/-\/out <filename>
+\end{DoxyPre}
+
+
+Use this option to send all output to a file. By default output is sent to stdout (note that uses of stdout and stderr {\itshape from within test cases} are redirected and included in the report -\/ so even stderr will effectively end up on stdout).
+
+\label{_naming-a-test-run}%
+ \doxysubsection*{Naming a test run}
+
+
+\begin{DoxyPre}-\/n, -\/-\/name <name for test run>\end{DoxyPre}
+
+
+If a name is supplied it will be used by the reporter to provide an overall name for the test run. This can be useful if you are sending to a file, for example, and need to distinguish different test runs -\/ either from different \doxylink{namespace_catch}{Catch} executables or runs of the same executable with different options. If not supplied the name is defaulted to the name of the executable.
+
+\label{_eliding-assertions-expected-to-throw}%
+ \doxysubsection*{Eliding assertions expected to throw}
+
+
+\begin{DoxyPre}-\/e, -\/-\/nothrow\end{DoxyPre}
+
+
+Skips all assertions that test that an exception is thrown, e.\+g. {\ttfamily REQUIRE\+\_\+\+THROWS}.
+
+These can be a nuisance in certain debugging environments that may break when exceptions are thrown (while this is usually optional for handled exceptions, it can be useful to have enabled if you are trying to track down something unexpected).
+
+Sometimes exceptions are expected outside of one of the assertions that tests for them (perhaps thrown and caught within the code-\/under-\/test). The whole test case can be skipped when using {\ttfamily -\/e} by marking it with the {\ttfamily \mbox{[}!throws\mbox{]}} tag.
+
+When running with this option any throw checking assertions are skipped so as not to contribute additional noise. Be careful if this affects the behaviour of subsequent tests.
+
+\label{_invisibles}%
+ \doxysubsection*{Make whitespace visible}
+
+
+\begin{DoxyPre}-\/i, -\/-\/invisibles\end{DoxyPre}
+
+
+If a string comparison fails due to differences in whitespace -\/ especially leading or trailing whitespace -\/ it can be hard to see what\textquotesingle{}s going on. This option transforms tabs and newline characters into {\ttfamily \textbackslash{}t} and {\ttfamily \textbackslash{}n} respectively when printing.
+
+\label{_warnings}%
+ \doxysubsection*{Warnings}
+
+
+\begin{DoxyPre}-\/w, -\/-\/warn <warning name>\end{DoxyPre}
+
+
+Enables reporting of suspicious test states. There are currently two available warnings
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{NoAssertions\ \ \ //\ Fail\ test\ case\ /\ leaf\ section\ if\ no\ assertions}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ //\ (e.g.\ \`{}REQUIRE`)\ is\ encountered.}
+\DoxyCodeLine{NoTests\ \ \ \ \ \ \ \ //\ Return\ non-\/zero\ exit\ code\ when\ no\ test\ cases\ were\ run}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ //\ Also\ calls\ reporter's\ noMatchingTestCases\ method}
+
+\end{DoxyCode}
+
+
+\label{_reporting-timings}%
+ \doxysubsection*{Reporting timings}
+
+
+\begin{DoxyPre}-\/d, -\/-\/durations <yes/no>\end{DoxyPre}
+
+
+When set to {\ttfamily yes} \doxylink{namespace_catch}{Catch} will report the duration of each test case, in milliseconds. Note that it does this regardless of whether a test case passes or fails. Note, also, the certain reporters (e.\+g. Junit) always report test case durations regardless of this option being set or not.
+
+\label{_input-file}%
+ \doxysubsection*{Load test names to run from a file}
+
+
+\begin{DoxyPre}-\/f, -\/-\/input-\/file <filename>\end{DoxyPre}
+
+
+Provide the name of a file that contains a list of test case names -\/ one per line. Blank lines are skipped and anything after the comment character, {\ttfamily \#}, is ignored.
+
+\doxylink{struct_a}{A} useful way to generate an initial instance of this file is to use the \href{\#list-test-names-only}{\texttt{ list-\/test-\/names-\/only}} option. This can then be manually curated to specify a specific subset of tests -\/ or in a specific order.
+
+\label{_list-test-names-only}%
+ \doxysubsection*{Just test names}
+
+
+\begin{DoxyPre}-\/-\/list-\/test-\/names-\/only\end{DoxyPre}
+
+
+This option lists all available tests in a non-\/indented form, one on each line. This makes it ideal for saving to a file and feeding back into the \href{\#input-file}{\texttt{ {\ttfamily -\/f} or {\ttfamily -\/-\/input-\/file}}} option.
+
+\label{_order}%
+ \doxysubsection*{Specify the order test cases are run}
+
+
+\begin{DoxyPre}-\/-\/order <decl|lex|rand>\end{DoxyPre}
+
+
+\doxylink{class_test}{Test} cases are ordered one of three ways\+:
+
+\doxysubsubsection*{decl}
+
+Declaration order. The order the tests were originally declared in. Note that ordering between files is not guaranteed and is implementation dependent.
+
+\doxysubsubsection*{lex}
+
+Lexicographically sorted. Tests are sorted, alpha-\/numerically, by name.
+
+\doxysubsubsection*{rand}
+
+Randomly sorted. \doxylink{class_test}{Test} names are sorted using {\ttfamily std\+::random\+\_\+shuffle()}. By default the random number generator is seeded with 0 -\/ and so the order is repeatable. To control the random seed see \href{\#rng-seed}{\texttt{ rng-\/seed}}.
+
+\label{_rng-seed}%
+ \doxysubsection*{Specify a seed for the \doxylink{class_random}{Random} Number Generator}
+
+
+\begin{DoxyPre}-\/-\/rng-\/seed <'time'|number>\end{DoxyPre}
+
+
+Sets a seed for the random number generator using {\ttfamily std\+::srand()}. If a number is provided this is used directly as the seed so the random pattern is repeatable. Alternatively if the keyword {\ttfamily time} is provided then the result of calling {\ttfamily std\+::time(0)} is used and so the pattern becomes unpredictable.
+
+In either case the actual value for the seed is printed as part of \doxylink{namespace_catch}{Catch}\textquotesingle{}s output so if an issue is discovered that is sensitive to test ordering the ordering can be reproduced -\/ even if it was originally seeded from {\ttfamily std\+::time(0)}.
+
+\label{_libidentify}%
+ \doxysubsection*{Identify framework and version according to the lib\+Identify standard}
+
+
+\begin{DoxyPre}-\/-\/libidentify\end{DoxyPre}
+
+
+See \href{https://github.com/janwilmans/LibIdentify}{\texttt{ The Lib\+Identify repo for more information and examples}}.
+
+\label{_wait-for-keypress}%
+ \doxysubsection*{Wait for key before continuing}
+
+
+\begin{DoxyPre}-\/-\/wait-\/for-\/keypress <start|exit|both>\end{DoxyPre}
+
+
+Will cause the executable to print a message and wait until the return/ enter key is pressed before continuing -\/ either before running any tests, after running all tests -\/ or both, depending on the argument.
+
+\label{_benchmark-resolution-multiple}%
+ \doxysubsection*{Specify multiples of clock resolution to run benchmarks for}
+
+
+\begin{DoxyPre}-\/-\/benchmark-\/resolution-\/multiple <multiplier>\end{DoxyPre}
+
+
+When running benchmarks the clock resolution is estimated. Benchmarks are then run for exponentially increasing numbers of iterations until some multiple of the estimated resolution is exceed. By default that multiple is 100, but it can be overridden here.
+
+\label{_usage}%
+ \doxysubsection*{Usage}
+
+
+\begin{DoxyPre}-\/h, -\/?, -\/-\/help\end{DoxyPre}
+
+
+Prints the command line arguments to stdout
+
+\label{_run-section}%
+ \doxysubsection*{Specify the section to run}
+
+
+\begin{DoxyPre}-\/c, -\/-\/section <section name>\end{DoxyPre}
+
+
+To limit execution to a specific section within a test case, use this option one or more times. To narrow to sub-\/sections use multiple instances, where each subsequent instance specifies a deeper nesting level.
+
+E.\+g. if you have\+:
+
+
+\begin{DoxyPre}
+TEST\_CASE( "{}Test"{} ) \{
+  SECTION( "{}sa"{} ) \{
+    SECTION( "{}sb"{} ) \{
+      /*...*/
+    \}
+    SECTION( "{}sc"{} ) \{
+      /*...*/
+    \}
+  \}
+  SECTION( "{}sd"{} ) \{
+    /*...*/
+  \}
+\}
+\end{DoxyPre}
+
+
+Then you can run {\ttfamily sb} with\+: 
+\begin{DoxyPre}./MyExe \doxylink{class_test}{Test} -\/c sa -\/c sb\end{DoxyPre}
+
+
+Or run just {\ttfamily sd} with\+: 
+\begin{DoxyPre}./MyExe \doxylink{class_test}{Test} -\/c sd\end{DoxyPre}
+
+
+To run all of {\ttfamily sa}, including {\ttfamily sb} and {\ttfamily sc} use\+: 
+\begin{DoxyPre}./MyExe \doxylink{class_test}{Test} -\/c sa\end{DoxyPre}
+
+
+There are some limitations of this feature to be aware of\+:
+\begin{DoxyItemize}
+\item \doxylink{struct_code}{Code} outside of sections being skipped will still be executed -\/ e.\+g. any set-\/up code in the TEST\+\_\+\+CASE before the start of the first section.
+\end{DoxyItemize}
+\begin{DoxyItemize}
+\item At time of writing, wildcards are not supported in section names.
+\item If you specify a section without narrowing to a test case first then all test cases will be executed (but only matching sections within them).
+\end{DoxyItemize}
+
+\label{_filenames-as-tags}%
+ \doxysubsection*{Filenames as tags}
+
+
+\begin{DoxyPre}-\/\#, -\/-\/filenames-\/as-\/tags\end{DoxyPre}
+
+
+When this option is used then every test is given an additional tag which is formed of the unqualified filename it is found in, with any extension stripped, prefixed with the {\ttfamily \#} character.
+
+So, for example, tests within the file {\ttfamily \texorpdfstring{$\sim$}{\string~}\textbackslash{}Dev\textbackslash{}My\+Project\textbackslash{}Ferrets.\+cpp} would be tagged {\ttfamily \mbox{[}\#Ferrets\mbox{]}}.
+
+\label{_use-colour}%
+ \doxysubsection*{Override output colouring}
+
+
+\begin{DoxyPre}-\/-\/use-\/colour <yes|no|auto>\end{DoxyPre}
+
+
+\doxylink{namespace_catch}{Catch} colours output for terminals, but omits colouring when it detects that output is being sent to a pipe. This is done to avoid interfering with automated processing of output.
+
+{\ttfamily -\/-\/use-\/colour yes} forces coloured output, {\ttfamily -\/-\/use-\/colour no} disables coloured output. The default behaviour is {\ttfamily -\/-\/use-\/colour auto}.
+
+\DoxyHorRuler{0}
+
+
+\href{Readme.md\#top}{\texttt{ Home}} 

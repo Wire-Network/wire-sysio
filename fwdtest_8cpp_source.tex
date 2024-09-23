@@ -1,0 +1,236 @@
+\doxysection{fwdtest.\+cpp}
+\hypertarget{fwdtest_8cpp_source}{}\label{fwdtest_8cpp_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/test/unittest/fwdtest.cpp@{libraries/fc/include/fc/crypto/webauthn\_json/test/unittest/fwdtest.cpp}}
+\mbox{\hyperlink{fwdtest_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00001}00001\ \textcolor{comment}{//\ Tencent\ is\ pleased\ to\ support\ the\ open\ source\ community\ by\ making\ RapidJSON\ available.}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00002}00002\ \textcolor{comment}{//\ }}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00003}00003\ \textcolor{comment}{//\ Copyright\ (C)\ 2015\ THL\ A29\ Limited,\ a\ Tencent\ company,\ and\ Milo\ Yip.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00004}00004\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00005}00005\ \textcolor{comment}{//\ Licensed\ under\ the\ MIT\ License\ (the\ "{}License"{});\ you\ may\ not\ use\ this\ file\ except}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00006}00006\ \textcolor{comment}{//\ in\ compliance\ with\ the\ License.\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00007}00007\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00008}00008\ \textcolor{comment}{//\ http://opensource.org/licenses/MIT}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00009}00009\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00010}00010\ \textcolor{comment}{//\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software\ distributed\ }}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00011}00011\ \textcolor{comment}{//\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,\ WITHOUT\ WARRANTIES\ OR\ }}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00012}00012\ \textcolor{comment}{//\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.\ See\ the\ License\ for\ the\ }}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00013}00013\ \textcolor{comment}{//\ specific\ language\ governing\ permissions\ and\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00015}00015\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{unittest_8h}{unittest.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00017}00017\ \textcolor{comment}{//\ Using\ forward\ declared\ types\ here.}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00019}00019\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{fwd_8h}{rapidjson/fwd.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00021}00021\ \textcolor{preprocessor}{\#ifdef\ \_\_GNUC\_\_}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00022}00022\ RAPIDJSON\_DIAG\_PUSH}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00023}00023\ RAPIDJSON\_DIAG\_OFF(effc++)}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00024}00024\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00026}00026\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacerapidjson}{rapidjson}};}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00028}\mbox{\hyperlink{struct_foo}{00028}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_foo}{Foo}}\ \{}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00029}00029\ \ \ \ \ \mbox{\hyperlink{struct_foo_a5c036d1b3561a0e1beffe8c6799a4276}{Foo}}();}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00030}00030\ \ \ \ \ \mbox{\hyperlink{struct_foo_ab5d0e04c302f74429916d603e0fd8610}{\string~Foo}}();}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00032}00032\ \ \ \ \ \textcolor{comment}{//\ encodings.h}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00033}\mbox{\hyperlink{struct_foo_a0690d7a3e59020efcd0a2b593ad52203}{00033}}\ \ \ \ \ \mbox{\hyperlink{struct_u_t_f8}{UTF8<char>}}*\ \mbox{\hyperlink{struct_foo_a0690d7a3e59020efcd0a2b593ad52203}{utf8}};}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00034}\mbox{\hyperlink{struct_foo_a6f425443f0529337b0749102c95e3a0a}{00034}}\ \ \ \ \ \mbox{\hyperlink{struct_u_t_f16}{UTF16<wchar\_t>}}*\ \mbox{\hyperlink{struct_foo_a6f425443f0529337b0749102c95e3a0a}{utf16}};}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00035}\mbox{\hyperlink{struct_foo_ad48b014a4f6832bb846b822382f941ce}{00035}}\ \ \ \ \ \mbox{\hyperlink{struct_u_t_f16_b_e}{UTF16BE<wchar\_t>}}*\ \mbox{\hyperlink{struct_foo_ad48b014a4f6832bb846b822382f941ce}{utf16be}};}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00036}\mbox{\hyperlink{struct_foo_af459df7434c8b942513fc8edd684febe}{00036}}\ \ \ \ \ \mbox{\hyperlink{struct_u_t_f16_l_e}{UTF16LE<wchar\_t>}}*\ \mbox{\hyperlink{struct_foo_af459df7434c8b942513fc8edd684febe}{utf16le}};}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00037}\mbox{\hyperlink{struct_foo_a82da10e57f68e56da0dfd215cbe7b925}{00037}}\ \ \ \ \ \mbox{\hyperlink{struct_u_t_f32}{UTF32<unsigned>}}*\ \mbox{\hyperlink{struct_foo_a82da10e57f68e56da0dfd215cbe7b925}{utf32}};}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00038}\mbox{\hyperlink{struct_foo_aef43473ce70845a4fc8370e8ade10d85}{00038}}\ \ \ \ \ \mbox{\hyperlink{struct_u_t_f32_b_e}{UTF32BE<unsigned>}}*\ \mbox{\hyperlink{struct_foo_aef43473ce70845a4fc8370e8ade10d85}{utf32be}};}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00039}\mbox{\hyperlink{struct_foo_aca7c35c438272e5386ee96d6a74606e2}{00039}}\ \ \ \ \ \mbox{\hyperlink{struct_u_t_f32_l_e}{UTF32LE<unsigned>}}*\ \mbox{\hyperlink{struct_foo_aca7c35c438272e5386ee96d6a74606e2}{utf32le}};}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00040}\mbox{\hyperlink{struct_foo_a379b2b35c1a8702178cce361eb568508}{00040}}\ \ \ \ \ \mbox{\hyperlink{struct_a_s_c_i_i}{ASCII<char>}}*\ \mbox{\hyperlink{struct_foo_a379b2b35c1a8702178cce361eb568508}{ascii}};}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00041}\mbox{\hyperlink{struct_foo_acbeb6996d4b597ae1343481c357c4015}{00041}}\ \ \ \ \ \mbox{\hyperlink{struct_auto_u_t_f}{AutoUTF<unsigned>}}*\ \mbox{\hyperlink{struct_foo_acbeb6996d4b597ae1343481c357c4015}{autoutf}};}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00042}\mbox{\hyperlink{struct_foo_a6d0be345a665d2952c4c2f54b7a08907}{00042}}\ \ \ \ \ \mbox{\hyperlink{struct_transcoder}{Transcoder<UTF8<char>}},\ \mbox{\hyperlink{struct_u_t_f8}{UTF8<char>}}\ >*\ \mbox{\hyperlink{struct_foo_a6d0be345a665d2952c4c2f54b7a08907}{transcoder}};}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00044}00044\ \ \ \ \ \textcolor{comment}{//\ allocators.h}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00045}\mbox{\hyperlink{struct_foo_a123641d561899f1b9b7445ee671177b9}{00045}}\ \ \ \ \ \mbox{\hyperlink{class_crt_allocator}{CrtAllocator}}*\ \mbox{\hyperlink{struct_foo_a123641d561899f1b9b7445ee671177b9}{crtallocator}};}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00046}\mbox{\hyperlink{struct_foo_a56b3f8b4a24ae0565fbbe8de62c180bf}{00046}}\ \ \ \ \ \mbox{\hyperlink{class_memory_pool_allocator}{MemoryPoolAllocator<CrtAllocator>}}*\ \mbox{\hyperlink{struct_foo_a56b3f8b4a24ae0565fbbe8de62c180bf}{memorypoolallocator}};}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00048}00048\ \ \ \ \ \textcolor{comment}{//\ stream.h}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00049}\mbox{\hyperlink{struct_foo_a659efc100e0eb26540b4546d1c60a11d}{00049}}\ \ \ \ \ \mbox{\hyperlink{struct_generic_string_stream}{StringStream}}*\ \mbox{\hyperlink{struct_foo_a659efc100e0eb26540b4546d1c60a11d}{stringstream}};}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00050}\mbox{\hyperlink{struct_foo_aa532f00fa249eef63d4bafba835d7bc5}{00050}}\ \ \ \ \ \mbox{\hyperlink{struct_generic_insitu_string_stream}{InsituStringStream}}*\ \mbox{\hyperlink{struct_foo_aa532f00fa249eef63d4bafba835d7bc5}{insitustringstream}};}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00052}00052\ \ \ \ \ \textcolor{comment}{//\ stringbuffer.h}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00053}\mbox{\hyperlink{struct_foo_a7a217935d39e8e4f5d696dc3ea456f9b}{00053}}\ \ \ \ \ \mbox{\hyperlink{class_generic_string_buffer}{StringBuffer}}*\ \mbox{\hyperlink{struct_foo_a7a217935d39e8e4f5d696dc3ea456f9b}{stringbuffer}};}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00054}00054\ }
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00055}00055\ \ \ \ \ \textcolor{comment}{//\ //\ filereadstream.h}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00056}00056\ \ \ \ \ \textcolor{comment}{//\ FileReadStream*\ filereadstream;}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00058}00058\ \ \ \ \ \textcolor{comment}{//\ //\ filewritestream.h}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00059}00059\ \ \ \ \ \textcolor{comment}{//\ FileWriteStream*\ filewritestream;}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00061}00061\ \ \ \ \ \textcolor{comment}{//\ memorybuffer.h}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00062}\mbox{\hyperlink{struct_foo_a351bfa05d9088a3527c8b0f38c543e58}{00062}}\ \ \ \ \ \mbox{\hyperlink{struct_generic_memory_buffer}{MemoryBuffer}}*\ \mbox{\hyperlink{struct_foo_a351bfa05d9088a3527c8b0f38c543e58}{memorybuffer}};}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00064}00064\ \ \ \ \ \textcolor{comment}{//\ memorystream.h}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00065}\mbox{\hyperlink{struct_foo_af3f76c4999db2c997845f29da4e9a11b}{00065}}\ \ \ \ \ \mbox{\hyperlink{struct_memory_stream}{MemoryStream}}*\ \mbox{\hyperlink{struct_foo_af3f76c4999db2c997845f29da4e9a11b}{memorystream}};}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00067}00067\ \ \ \ \ \textcolor{comment}{//\ reader.h}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00068}\mbox{\hyperlink{struct_foo_aebfa4e32be3e3fcba101a92a47ab0fc3}{00068}}\ \ \ \ \ BaseReaderHandler<UTF8<char>,\ \textcolor{keywordtype}{void}>*\ \mbox{\hyperlink{struct_foo_aebfa4e32be3e3fcba101a92a47ab0fc3}{basereaderhandler}};}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00069}\mbox{\hyperlink{struct_foo_a663cb5f1f0305f21412e09b0aa0d022e}{00069}}\ \ \ \ \ \mbox{\hyperlink{class_generic_reader}{Reader}}*\ \mbox{\hyperlink{struct_foo_a663cb5f1f0305f21412e09b0aa0d022e}{reader}};}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00071}00071\ \ \ \ \ \textcolor{comment}{//\ writer.h}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00072}\mbox{\hyperlink{struct_foo_aa3fefdf934244a8572dee24e865d3d62}{00072}}\ \ \ \ \ \mbox{\hyperlink{class_writer}{Writer<StringBuffer,\ UTF8<char>}},\ \mbox{\hyperlink{struct_u_t_f8}{UTF8<char>}},\ \mbox{\hyperlink{class_crt_allocator}{CrtAllocator}},\ 0>*\ \mbox{\hyperlink{struct_foo_aa3fefdf934244a8572dee24e865d3d62}{writer}};}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00073}00073\ }
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00074}00074\ \ \ \ \ \textcolor{comment}{//\ prettywriter.h}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00075}\mbox{\hyperlink{struct_foo_aba8fe59d9a6a5474e2e1f444b46feee5}{00075}}\ \ \ \ \ \mbox{\hyperlink{class_pretty_writer}{PrettyWriter<StringBuffer,\ UTF8<char>}},\ \mbox{\hyperlink{struct_u_t_f8}{UTF8<char>}},\ \mbox{\hyperlink{class_crt_allocator}{CrtAllocator}},\ 0>*\ \mbox{\hyperlink{struct_foo_aba8fe59d9a6a5474e2e1f444b46feee5}{prettywriter}};}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00076}00076\ }
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00077}00077\ \ \ \ \ \textcolor{comment}{//\ document.h}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00078}\mbox{\hyperlink{struct_foo_aa421db30562573d6f11ea87bc746f8b4}{00078}}\ \ \ \ \ Value*\ \mbox{\hyperlink{struct_foo_aa421db30562573d6f11ea87bc746f8b4}{value}};}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00079}\mbox{\hyperlink{struct_foo_a99ea693f1701ba60505e7c6ba85c74b0}{00079}}\ \ \ \ \ \mbox{\hyperlink{class_generic_document}{Document}}*\ \mbox{\hyperlink{struct_foo_a99ea693f1701ba60505e7c6ba85c74b0}{document}};}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00080}00080\ }
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00081}00081\ \ \ \ \ \textcolor{comment}{//\ pointer.h}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00082}\mbox{\hyperlink{struct_foo_a80cbd61669d0dea714ae7061932da956}{00082}}\ \ \ \ \ \mbox{\hyperlink{class_generic_pointer}{Pointer}}*\ \mbox{\hyperlink{struct_foo_a80cbd61669d0dea714ae7061932da956}{pointer}};}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00083}00083\ }
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00084}00084\ \ \ \ \ \textcolor{comment}{//\ schema.h}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00085}\mbox{\hyperlink{struct_foo_aa0e7a71aaa10fcbe3bc8564fc735a4ca}{00085}}\ \ \ \ \ \mbox{\hyperlink{class_generic_schema_document}{SchemaDocument}}*\ \mbox{\hyperlink{struct_foo_aa0e7a71aaa10fcbe3bc8564fc735a4ca}{schemadocument}};}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00086}\mbox{\hyperlink{struct_foo_aeae9f65bd845178d4e60ad7cf52e5eb1}{00086}}\ \ \ \ \ \mbox{\hyperlink{class_generic_schema_validator}{SchemaValidator}}*\ \mbox{\hyperlink{struct_foo_aeae9f65bd845178d4e60ad7cf52e5eb1}{schemavalidator}};}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00087}00087\ }
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00088}00088\ \ \ \ \ \textcolor{comment}{//\ char\ buffer[16];}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00089}00089\ \};}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00090}00090\ }
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00091}00091\ \textcolor{comment}{//\ Using\ type\ definitions\ here.}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00092}00092\ }
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00093}00093\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{stringbuffer_8h}{rapidjson/stringbuffer.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00094}00094\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{filereadstream_8h}{rapidjson/filereadstream.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00095}00095\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{filewritestream_8h}{rapidjson/filewritestream.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00096}00096\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{memorybuffer_8h}{rapidjson/memorybuffer.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00097}00097\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{memorystream_8h}{rapidjson/memorystream.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00098}00098\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{document_8h}{rapidjson/document.h}}"{}}\ \textcolor{comment}{//\ -\/>\ reader.h}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00099}00099\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{writer_8h}{rapidjson/writer.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00100}00100\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{prettywriter_8h}{rapidjson/prettywriter.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00101}00101\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{schema_8h}{rapidjson/schema.h}}"{}}\ \ \ \textcolor{comment}{//\ -\/>\ pointer.h}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00102}00102\ }
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00103}\mbox{\hyperlink{fwdtest_8cpp_ae900c49b5a91b7c475938b636d5b439d}{00103}}\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{struct_transcoder}{Transcoder<UTF8<>}},\ \mbox{\hyperlink{struct_u_t_f8}{UTF8<>}}\ >\ \mbox{\hyperlink{fwdtest_8cpp_ae900c49b5a91b7c475938b636d5b439d}{TranscoderUtf8ToUtf8}};}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00104}\mbox{\hyperlink{fwdtest_8cpp_a8a42d262ef3e52e3b736977481021887}{00104}}\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{struct_base_reader_handler}{BaseReaderHandler<UTF8<>}},\ \textcolor{keywordtype}{void}>\ \mbox{\hyperlink{fwdtest_8cpp_a8a42d262ef3e52e3b736977481021887}{BaseReaderHandlerUtf8Void}};}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00105}00105\ }
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00106}\mbox{\hyperlink{struct_foo_a5c036d1b3561a0e1beffe8c6799a4276}{00106}}\ \mbox{\hyperlink{struct_foo_a5c036d1b3561a0e1beffe8c6799a4276}{Foo::Foo}}()\ :\ }
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00107}00107\ \ \ \ \ \textcolor{comment}{//\ encodings.h}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00108}00108\ \ \ \ \ \mbox{\hyperlink{namespaceutf8}{utf8}}(\mbox{\hyperlink{rapidjson_8h_abdc7cd7902748ffe6626d71c59a73c3b}{RAPIDJSON\_NEW}}(\mbox{\hyperlink{namespace_u_t_f8}{UTF8}}<>)),}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00109}00109\ \ \ \ \ utf16(\mbox{\hyperlink{rapidjson_8h_abdc7cd7902748ffe6626d71c59a73c3b}{RAPIDJSON\_NEW}}(\mbox{\hyperlink{struct_u_t_f16}{UTF16}}<>)),}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00110}00110\ \ \ \ \ utf16be(\mbox{\hyperlink{rapidjson_8h_abdc7cd7902748ffe6626d71c59a73c3b}{RAPIDJSON\_NEW}}(\mbox{\hyperlink{struct_u_t_f16_b_e}{UTF16BE}}<>)),}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00111}00111\ \ \ \ \ utf16le(\mbox{\hyperlink{rapidjson_8h_abdc7cd7902748ffe6626d71c59a73c3b}{RAPIDJSON\_NEW}}(\mbox{\hyperlink{struct_u_t_f16_l_e}{UTF16LE}}<>)),}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00112}00112\ \ \ \ \ utf32(\mbox{\hyperlink{rapidjson_8h_abdc7cd7902748ffe6626d71c59a73c3b}{RAPIDJSON\_NEW}}(\mbox{\hyperlink{struct_u_t_f32}{UTF32}}<>)),}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00113}00113\ \ \ \ \ utf32be(\mbox{\hyperlink{rapidjson_8h_abdc7cd7902748ffe6626d71c59a73c3b}{RAPIDJSON\_NEW}}(\mbox{\hyperlink{struct_u_t_f32_b_e}{UTF32BE}}<>)),}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00114}00114\ \ \ \ \ utf32le(\mbox{\hyperlink{rapidjson_8h_abdc7cd7902748ffe6626d71c59a73c3b}{RAPIDJSON\_NEW}}(\mbox{\hyperlink{struct_u_t_f32_l_e}{UTF32LE}}<>)),}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00115}00115\ \ \ \ \ ascii(\mbox{\hyperlink{rapidjson_8h_abdc7cd7902748ffe6626d71c59a73c3b}{RAPIDJSON\_NEW}}(\mbox{\hyperlink{struct_a_s_c_i_i}{ASCII}}<>)),}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00116}00116\ \ \ \ \ autoutf(\mbox{\hyperlink{rapidjson_8h_abdc7cd7902748ffe6626d71c59a73c3b}{RAPIDJSON\_NEW}}(\mbox{\hyperlink{struct_auto_u_t_f}{AutoUTF}}<unsigned>)),}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00117}00117\ \ \ \ \ transcoder(\mbox{\hyperlink{rapidjson_8h_abdc7cd7902748ffe6626d71c59a73c3b}{RAPIDJSON\_NEW}}(\mbox{\hyperlink{struct_transcoder}{TranscoderUtf8ToUtf8}})),}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00118}00118\ }
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00119}00119\ \ \ \ \ \textcolor{comment}{//\ allocators.h}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00120}00120\ \ \ \ \ crtallocator(\mbox{\hyperlink{rapidjson_8h_abdc7cd7902748ffe6626d71c59a73c3b}{RAPIDJSON\_NEW}}(\mbox{\hyperlink{class_crt_allocator}{CrtAllocator}})),}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00121}00121\ \ \ \ \ memorypoolallocator(\mbox{\hyperlink{rapidjson_8h_abdc7cd7902748ffe6626d71c59a73c3b}{RAPIDJSON\_NEW}}(\mbox{\hyperlink{class_memory_pool_allocator}{MemoryPoolAllocator}}<>)),}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00122}00122\ }
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00123}00123\ \ \ \ \ \textcolor{comment}{//\ stream.h}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00124}00124\ \ \ \ \ stringstream(\mbox{\hyperlink{rapidjson_8h_abdc7cd7902748ffe6626d71c59a73c3b}{RAPIDJSON\_NEW}}(\mbox{\hyperlink{struct_generic_string_stream}{StringStream}})(NULL)),}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00125}00125\ \ \ \ \ insitustringstream(\mbox{\hyperlink{rapidjson_8h_abdc7cd7902748ffe6626d71c59a73c3b}{RAPIDJSON\_NEW}}(\mbox{\hyperlink{struct_generic_insitu_string_stream}{InsituStringStream}})(NULL)),}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00126}00126\ }
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00127}00127\ \ \ \ \ \textcolor{comment}{//\ stringbuffer.h}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00128}00128\ \ \ \ \ stringbuffer(\mbox{\hyperlink{rapidjson_8h_abdc7cd7902748ffe6626d71c59a73c3b}{RAPIDJSON\_NEW}}(\mbox{\hyperlink{class_generic_string_buffer}{StringBuffer}})),}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00129}00129\ }
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00130}00130\ \ \ \ \ \textcolor{comment}{//\ //\ filereadstream.h}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00131}00131\ \ \ \ \ \textcolor{comment}{//\ filereadstream(RAPIDJSON\_NEW(FileReadStream)(stdout,\ buffer,\ sizeof(buffer))),}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00132}00132\ }
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00133}00133\ \ \ \ \ \textcolor{comment}{//\ //\ filewritestream.h}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00134}00134\ \ \ \ \ \textcolor{comment}{//\ filewritestream(RAPIDJSON\_NEW(FileWriteStream)(stdout,\ buffer,\ sizeof(buffer))),}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00135}00135\ }
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00136}00136\ \ \ \ \ \textcolor{comment}{//\ memorybuffer.h}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00137}00137\ \ \ \ \ memorybuffer(\mbox{\hyperlink{rapidjson_8h_abdc7cd7902748ffe6626d71c59a73c3b}{RAPIDJSON\_NEW}}(\mbox{\hyperlink{struct_generic_memory_buffer}{MemoryBuffer}})),}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00138}00138\ }
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00139}00139\ \ \ \ \ \textcolor{comment}{//\ memorystream.h}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00140}00140\ \ \ \ \ memorystream(\mbox{\hyperlink{rapidjson_8h_abdc7cd7902748ffe6626d71c59a73c3b}{RAPIDJSON\_NEW}}(\mbox{\hyperlink{struct_memory_stream}{MemoryStream}})(NULL,\ 0)),}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00141}00141\ }
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00142}00142\ \ \ \ \ \textcolor{comment}{//\ reader.h}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00143}00143\ \ \ \ \ basereaderhandler(\mbox{\hyperlink{rapidjson_8h_abdc7cd7902748ffe6626d71c59a73c3b}{RAPIDJSON\_NEW}}(\mbox{\hyperlink{struct_base_reader_handler}{BaseReaderHandlerUtf8Void}})),}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00144}00144\ \ \ \ \ reader(\mbox{\hyperlink{rapidjson_8h_abdc7cd7902748ffe6626d71c59a73c3b}{RAPIDJSON\_NEW}}(\mbox{\hyperlink{class_generic_reader}{Reader}})),}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00145}00145\ }
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00146}00146\ \ \ \ \ \textcolor{comment}{//\ writer.h}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00147}00147\ \ \ \ \ writer(\mbox{\hyperlink{rapidjson_8h_abdc7cd7902748ffe6626d71c59a73c3b}{RAPIDJSON\_NEW}}(\mbox{\hyperlink{class_writer}{Writer}}<\mbox{\hyperlink{class_generic_string_buffer}{StringBuffer}}>)),}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00148}00148\ }
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00149}00149\ \ \ \ \ \textcolor{comment}{//\ prettywriter.h}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00150}00150\ \ \ \ \ prettywriter(\mbox{\hyperlink{rapidjson_8h_abdc7cd7902748ffe6626d71c59a73c3b}{RAPIDJSON\_NEW}}(\mbox{\hyperlink{class_pretty_writer}{PrettyWriter}}<\mbox{\hyperlink{class_generic_string_buffer}{StringBuffer}}>)),}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00151}00151\ }
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00152}00152\ \ \ \ \ \textcolor{comment}{//\ document.h}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00153}00153\ \ \ \ \ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}(\mbox{\hyperlink{rapidjson_8h_abdc7cd7902748ffe6626d71c59a73c3b}{RAPIDJSON\_NEW}}(Value)),}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00154}00154\ \ \ \ \ document(\mbox{\hyperlink{rapidjson_8h_abdc7cd7902748ffe6626d71c59a73c3b}{RAPIDJSON\_NEW}}(\mbox{\hyperlink{class_generic_document}{Document}})),}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00155}00155\ }
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00156}00156\ \ \ \ \ \textcolor{comment}{//\ pointer.h}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00157}00157\ \ \ \ \ \mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}}(\mbox{\hyperlink{rapidjson_8h_abdc7cd7902748ffe6626d71c59a73c3b}{RAPIDJSON\_NEW}}(\mbox{\hyperlink{class_generic_pointer}{Pointer}})),}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00158}00158\ }
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00159}00159\ \ \ \ \ \textcolor{comment}{//\ schema.h}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00160}00160\ \ \ \ \ schemadocument(\mbox{\hyperlink{rapidjson_8h_abdc7cd7902748ffe6626d71c59a73c3b}{RAPIDJSON\_NEW}}(\mbox{\hyperlink{class_generic_schema_document}{SchemaDocument}})(*document)),}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00161}00161\ \ \ \ \ schemavalidator(\mbox{\hyperlink{rapidjson_8h_abdc7cd7902748ffe6626d71c59a73c3b}{RAPIDJSON\_NEW}}(\mbox{\hyperlink{class_generic_schema_validator}{SchemaValidator}})(*schemadocument))}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00162}00162\ \{}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00163}00163\ }
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00164}00164\ \}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00165}00165\ }
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00166}\mbox{\hyperlink{struct_foo_ab5d0e04c302f74429916d603e0fd8610}{00166}}\ \mbox{\hyperlink{struct_foo_ab5d0e04c302f74429916d603e0fd8610}{Foo::\string~Foo}}()\ \{}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00167}00167\ \ \ \ \ \textcolor{comment}{//\ encodings.h}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00168}00168\ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_a52c941c3fdd646527cdcd42aa846a28a}{RAPIDJSON\_DELETE}}(\mbox{\hyperlink{namespaceutf8}{utf8}});}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00169}00169\ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_a52c941c3fdd646527cdcd42aa846a28a}{RAPIDJSON\_DELETE}}(\mbox{\hyperlink{struct_foo_a6f425443f0529337b0749102c95e3a0a}{utf16}});}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00170}00170\ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_a52c941c3fdd646527cdcd42aa846a28a}{RAPIDJSON\_DELETE}}(\mbox{\hyperlink{struct_foo_ad48b014a4f6832bb846b822382f941ce}{utf16be}});}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00171}00171\ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_a52c941c3fdd646527cdcd42aa846a28a}{RAPIDJSON\_DELETE}}(\mbox{\hyperlink{struct_foo_af459df7434c8b942513fc8edd684febe}{utf16le}});}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00172}00172\ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_a52c941c3fdd646527cdcd42aa846a28a}{RAPIDJSON\_DELETE}}(\mbox{\hyperlink{struct_foo_a82da10e57f68e56da0dfd215cbe7b925}{utf32}});}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00173}00173\ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_a52c941c3fdd646527cdcd42aa846a28a}{RAPIDJSON\_DELETE}}(\mbox{\hyperlink{struct_foo_aef43473ce70845a4fc8370e8ade10d85}{utf32be}});}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00174}00174\ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_a52c941c3fdd646527cdcd42aa846a28a}{RAPIDJSON\_DELETE}}(\mbox{\hyperlink{struct_foo_aca7c35c438272e5386ee96d6a74606e2}{utf32le}});}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00175}00175\ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_a52c941c3fdd646527cdcd42aa846a28a}{RAPIDJSON\_DELETE}}(\mbox{\hyperlink{struct_foo_a379b2b35c1a8702178cce361eb568508}{ascii}});}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00176}00176\ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_a52c941c3fdd646527cdcd42aa846a28a}{RAPIDJSON\_DELETE}}(\mbox{\hyperlink{struct_foo_acbeb6996d4b597ae1343481c357c4015}{autoutf}});}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00177}00177\ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_a52c941c3fdd646527cdcd42aa846a28a}{RAPIDJSON\_DELETE}}(\mbox{\hyperlink{struct_foo_a6d0be345a665d2952c4c2f54b7a08907}{transcoder}});}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00178}00178\ }
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00179}00179\ \ \ \ \ \textcolor{comment}{//\ allocators.h}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00180}00180\ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_a52c941c3fdd646527cdcd42aa846a28a}{RAPIDJSON\_DELETE}}(\mbox{\hyperlink{struct_foo_a123641d561899f1b9b7445ee671177b9}{crtallocator}});}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00181}00181\ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_a52c941c3fdd646527cdcd42aa846a28a}{RAPIDJSON\_DELETE}}(\mbox{\hyperlink{struct_foo_a56b3f8b4a24ae0565fbbe8de62c180bf}{memorypoolallocator}});}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00182}00182\ }
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00183}00183\ \ \ \ \ \textcolor{comment}{//\ stream.h}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00184}00184\ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_a52c941c3fdd646527cdcd42aa846a28a}{RAPIDJSON\_DELETE}}(\mbox{\hyperlink{struct_foo_a659efc100e0eb26540b4546d1c60a11d}{stringstream}});}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00185}00185\ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_a52c941c3fdd646527cdcd42aa846a28a}{RAPIDJSON\_DELETE}}(\mbox{\hyperlink{struct_foo_aa532f00fa249eef63d4bafba835d7bc5}{insitustringstream}});}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00186}00186\ }
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00187}00187\ \ \ \ \ \textcolor{comment}{//\ stringbuffer.h}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00188}00188\ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_a52c941c3fdd646527cdcd42aa846a28a}{RAPIDJSON\_DELETE}}(\mbox{\hyperlink{struct_foo_a7a217935d39e8e4f5d696dc3ea456f9b}{stringbuffer}});}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00189}00189\ }
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00190}00190\ \ \ \ \ \textcolor{comment}{//\ //\ filereadstream.h}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00191}00191\ \ \ \ \ \textcolor{comment}{//\ RAPIDJSON\_DELETE(filereadstream);}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00192}00192\ }
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00193}00193\ \ \ \ \ \textcolor{comment}{//\ //\ filewritestream.h}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00194}00194\ \ \ \ \ \textcolor{comment}{//\ RAPIDJSON\_DELETE(filewritestream);}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00195}00195\ }
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00196}00196\ \ \ \ \ \textcolor{comment}{//\ memorybuffer.h}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00197}00197\ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_a52c941c3fdd646527cdcd42aa846a28a}{RAPIDJSON\_DELETE}}(\mbox{\hyperlink{struct_foo_a351bfa05d9088a3527c8b0f38c543e58}{memorybuffer}});}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00198}00198\ }
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00199}00199\ \ \ \ \ \textcolor{comment}{//\ memorystream.h}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00200}00200\ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_a52c941c3fdd646527cdcd42aa846a28a}{RAPIDJSON\_DELETE}}(\mbox{\hyperlink{struct_foo_af3f76c4999db2c997845f29da4e9a11b}{memorystream}});}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00201}00201\ }
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00202}00202\ \ \ \ \ \textcolor{comment}{//\ reader.h}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00203}00203\ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_a52c941c3fdd646527cdcd42aa846a28a}{RAPIDJSON\_DELETE}}(\mbox{\hyperlink{struct_foo_aebfa4e32be3e3fcba101a92a47ab0fc3}{basereaderhandler}});}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00204}00204\ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_a52c941c3fdd646527cdcd42aa846a28a}{RAPIDJSON\_DELETE}}(\mbox{\hyperlink{struct_foo_a663cb5f1f0305f21412e09b0aa0d022e}{reader}});}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00205}00205\ }
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00206}00206\ \ \ \ \ \textcolor{comment}{//\ writer.h}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00207}00207\ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_a52c941c3fdd646527cdcd42aa846a28a}{RAPIDJSON\_DELETE}}(\mbox{\hyperlink{struct_foo_aa3fefdf934244a8572dee24e865d3d62}{writer}});}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00208}00208\ }
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00209}00209\ \ \ \ \ \textcolor{comment}{//\ prettywriter.h}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00210}00210\ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_a52c941c3fdd646527cdcd42aa846a28a}{RAPIDJSON\_DELETE}}(\mbox{\hyperlink{struct_foo_aba8fe59d9a6a5474e2e1f444b46feee5}{prettywriter}});}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00211}00211\ }
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00212}00212\ \ \ \ \ \textcolor{comment}{//\ document.h}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00213}00213\ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_a52c941c3fdd646527cdcd42aa846a28a}{RAPIDJSON\_DELETE}}(\mbox{\hyperlink{struct_foo_aa421db30562573d6f11ea87bc746f8b4}{value}});}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00214}00214\ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_a52c941c3fdd646527cdcd42aa846a28a}{RAPIDJSON\_DELETE}}(\mbox{\hyperlink{struct_foo_a99ea693f1701ba60505e7c6ba85c74b0}{document}});}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00215}00215\ }
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00216}00216\ \ \ \ \ \textcolor{comment}{//\ pointer.h}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00217}00217\ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_a52c941c3fdd646527cdcd42aa846a28a}{RAPIDJSON\_DELETE}}(\mbox{\hyperlink{struct_foo_a80cbd61669d0dea714ae7061932da956}{pointer}});}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00218}00218\ }
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00219}00219\ \ \ \ \ \textcolor{comment}{//\ schema.h}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00220}00220\ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_a52c941c3fdd646527cdcd42aa846a28a}{RAPIDJSON\_DELETE}}(\mbox{\hyperlink{struct_foo_aa0e7a71aaa10fcbe3bc8564fc735a4ca}{schemadocument}});}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00221}00221\ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_a52c941c3fdd646527cdcd42aa846a28a}{RAPIDJSON\_DELETE}}(\mbox{\hyperlink{struct_foo_aeae9f65bd845178d4e60ad7cf52e5eb1}{schemavalidator}});}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00222}00222\ \}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00223}00223\ }
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00224}\mbox{\hyperlink{fwdtest_8cpp_af9f3bb46dcd6cb92aab94e5e94152eff}{00224}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(Fwd,\ Fwd)\ \{}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00225}00225\ \ \ \ \ \mbox{\hyperlink{struct_foo}{Foo}}\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}};}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00226}00226\ \}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00227}00227\ }
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00228}00228\ \textcolor{preprocessor}{\#ifdef\ \_\_GNUC\_\_}}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00229}00229\ RAPIDJSON\_DIAG\_POP}
+\DoxyCodeLine{\Hypertarget{fwdtest_8cpp_source_l00230}00230\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

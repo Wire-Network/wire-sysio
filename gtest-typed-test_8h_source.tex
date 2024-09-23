@@ -1,0 +1,270 @@
+\doxysection{gtest-\/typed-\/test.h}
+\hypertarget{gtest-typed-test_8h_source}{}\label{gtest-typed-test_8h_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/include/gtest/gtest-\/typed-\/test.h@{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/include/gtest/gtest-\/typed-\/test.h}}
+\mbox{\hyperlink{gtest-typed-test_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00001}00001\ \textcolor{comment}{//\ Copyright\ 2008\ Google\ Inc.}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00002}00002\ \textcolor{comment}{//\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00003}00003\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00004}00004\ \textcolor{comment}{//\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00005}00005\ \textcolor{comment}{//\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00006}00006\ \textcolor{comment}{//\ met:}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00007}00007\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00008}00008\ \textcolor{comment}{//\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00009}00009\ \textcolor{comment}{//\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00010}00010\ \textcolor{comment}{//\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00011}00011\ \textcolor{comment}{//\ copyright\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00012}00012\ \textcolor{comment}{//\ in\ the\ documentation\ and/or\ other\ materials\ provided\ with\ the}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00013}00013\ \textcolor{comment}{//\ distribution.}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00014}00014\ \textcolor{comment}{//\ \ \ \ \ *\ Neither\ the\ name\ of\ Google\ Inc.\ nor\ the\ names\ of\ its}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00015}00015\ \textcolor{comment}{//\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products\ derived\ from}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00016}00016\ \textcolor{comment}{//\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00017}00017\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00018}00018\ \textcolor{comment}{//\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00019}00019\ \textcolor{comment}{//\ "{}AS\ IS"{}\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00020}00020\ \textcolor{comment}{//\ LIMITED\ TO,\ THE\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00021}00021\ \textcolor{comment}{//\ A\ PARTICULAR\ PURPOSE\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ THE\ COPYRIGHT}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00022}00022\ \textcolor{comment}{//\ OWNER\ OR\ CONTRIBUTORS\ BE\ LIABLE\ FOR\ ANY\ DIRECT,\ INDIRECT,\ INCIDENTAL,}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00023}00023\ \textcolor{comment}{//\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES\ (INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00024}00024\ \textcolor{comment}{//\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;\ LOSS\ OF\ USE,}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00025}00025\ \textcolor{comment}{//\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND\ ON\ ANY}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00026}00026\ \textcolor{comment}{//\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00027}00027\ \textcolor{comment}{//\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00028}00028\ \textcolor{comment}{//\ OF\ THIS\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00029}00029\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00030}00030\ \textcolor{comment}{//\ Author:\ wan@google.com\ (Zhanyong\ Wan)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00032}00032\ \textcolor{preprocessor}{\#ifndef\ GTEST\_INCLUDE\_GTEST\_GTEST\_TYPED\_TEST\_H\_}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00033}00033\ \textcolor{preprocessor}{\#define\ GTEST\_INCLUDE\_GTEST\_GTEST\_TYPED\_TEST\_H\_}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00035}00035\ \textcolor{comment}{//\ This\ header\ implements\ typed\ tests\ and\ type-\/parameterized\ tests.}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00037}00037\ \textcolor{comment}{//\ Typed\ (aka\ type-\/driven)\ tests\ repeat\ the\ same\ test\ for\ types\ in\ a}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00038}00038\ \textcolor{comment}{//\ list.\ \ You\ must\ know\ which\ types\ you\ want\ to\ test\ with\ when\ writing}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00039}00039\ \textcolor{comment}{//\ typed\ tests.\ Here's\ how\ you\ do\ it:}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00041}00041\ \textcolor{preprocessor}{\#if\ 0}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00043}00043\ \textcolor{comment}{//\ First,\ define\ a\ fixture\ class\ template.\ \ It\ should\ be\ parameterized}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00044}00044\ \textcolor{comment}{//\ by\ a\ type.\ \ Remember\ to\ derive\ it\ from\ testing::Test.}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00045}00045\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00046}00046\ \textcolor{keyword}{class\ }FooTest\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1_test}{testing::Test}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00047}00047\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00048}00048\ \ \ ...}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00049}00049\ \ \ \textcolor{keyword}{typedef}\ std::list<T>\ \mbox{\hyperlink{struct_list}{List}};}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00050}00050\ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ shared\_;}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00051}00051\ \ \ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ value\_;}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00052}00052\ \};}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00054}00054\ \textcolor{comment}{//\ Next,\ associate\ a\ list\ of\ types\ with\ the\ test\ case,\ which\ will\ be}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00055}00055\ \textcolor{comment}{//\ repeated\ for\ each\ type\ in\ the\ list.\ \ The\ typedef\ is\ necessary\ for}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00056}00056\ \textcolor{comment}{//\ the\ macro\ to\ parse\ correctly.}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00057}00057\ \textcolor{keyword}{typedef}\ testing::Types<char,\ int,\ unsigned\ int>\ \mbox{\hyperlink{gtest__list__tests__unittest___8cc_a16f58cd49c18568802322bbaf9f3f654}{MyTypes}};}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00058}00058\ \mbox{\hyperlink{gtest__list__tests__unittest___8cc_a862ed8944c2b3e4827e95002d20c45d3}{TYPED\_TEST\_CASE}}(FooTest,\ \mbox{\hyperlink{gtest__list__tests__unittest___8cc_a16f58cd49c18568802322bbaf9f3f654}{MyTypes}});}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00060}00060\ \textcolor{comment}{//\ If\ the\ type\ list\ contains\ only\ one\ type,\ you\ can\ write\ that\ type}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00061}00061\ \textcolor{comment}{//\ directly\ without\ Types<...>:}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00062}00062\ \textcolor{comment}{//\ \ \ TYPED\_TEST\_CASE(FooTest,\ int);}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00064}00064\ \textcolor{comment}{//\ Then,\ use\ TYPED\_TEST()\ instead\ of\ TEST\_F()\ to\ define\ as\ many\ typed}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00065}00065\ \textcolor{comment}{//\ tests\ for\ this\ test\ case\ as\ you\ want.}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00066}00066\ \mbox{\hyperlink{gtest__list__tests__unittest___8cc_a83ec84c5fac9fdffa59a16e5d043bd66}{TYPED\_TEST}}(FooTest,\ DoesBlah)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00067}00067\ \ \ \textcolor{comment}{//\ Inside\ a\ test,\ refer\ to\ TypeParam\ to\ get\ the\ type\ parameter.}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00068}00068\ \ \ \textcolor{comment}{//\ Since\ we\ are\ inside\ a\ derived\ class\ template,\ C++\ requires\ use\ to}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00069}00069\ \ \ \textcolor{comment}{//\ visit\ the\ members\ of\ FooTest\ via\ 'this'.}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00070}00070\ \ \ TypeParam\ n\ =\ this-\/>value\_;}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00072}00072\ \ \ \textcolor{comment}{//\ To\ visit\ static\ members\ of\ the\ fixture,\ add\ the\ TestFixture::}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00073}00073\ \ \ \textcolor{comment}{//\ prefix.}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00074}00074\ \ \ n\ +=\ TestFixture::shared\_;}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00075}00075\ }
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00076}00076\ \ \ \textcolor{comment}{//\ To\ refer\ to\ typedefs\ in\ the\ fixture,\ add\ the\ "{}typename}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00077}00077\ \ \ \textcolor{comment}{//\ TestFixture::"{}\ prefix.}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00078}00078\ \ \ \textcolor{keyword}{typename}\ TestFixture::List\ \mbox{\hyperlink{namespace_catch_1_1_generators_aff55717239311a0e8352a4de5d29967f}{values}};}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00079}00079\ \ \ \mbox{\hyperlink{namespace_catch_1_1_generators_aff55717239311a0e8352a4de5d29967f}{values}}.push\_back(n);}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00080}00080\ \ \ ...}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00081}00081\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00083}00083\ \mbox{\hyperlink{gtest__list__tests__unittest___8cc_a83ec84c5fac9fdffa59a16e5d043bd66}{TYPED\_TEST}}(FooTest,\ HasPropertyA)\ \{\ ...\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00084}00084\ }
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00085}00085\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ 0}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00086}00086\ }
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00087}00087\ \textcolor{comment}{//\ Type-\/parameterized\ tests\ are\ abstract\ test\ patterns\ parameterized}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00088}00088\ \textcolor{comment}{//\ by\ a\ type.\ \ Compared\ with\ typed\ tests,\ type-\/parameterized\ tests}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00089}00089\ \textcolor{comment}{//\ allow\ you\ to\ define\ the\ test\ pattern\ without\ knowing\ what\ the\ type}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00090}00090\ \textcolor{comment}{//\ parameters\ are.\ \ The\ defined\ pattern\ can\ be\ instantiated\ with}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00091}00091\ \textcolor{comment}{//\ different\ types\ any\ number\ of\ times,\ in\ any\ number\ of\ translation}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00092}00092\ \textcolor{comment}{//\ units.}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00093}00093\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00094}00094\ \textcolor{comment}{//\ If\ you\ are\ designing\ an\ interface\ or\ concept,\ you\ can\ define\ a}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00095}00095\ \textcolor{comment}{//\ suite\ of\ type-\/parameterized\ tests\ to\ verify\ properties\ that\ any}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00096}00096\ \textcolor{comment}{//\ valid\ implementation\ of\ the\ interface/concept\ should\ have.\ \ Then,}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00097}00097\ \textcolor{comment}{//\ each\ implementation\ can\ easily\ instantiate\ the\ test\ suite\ to\ verify}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00098}00098\ \textcolor{comment}{//\ that\ it\ conforms\ to\ the\ requirements,\ without\ having\ to\ write}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00099}00099\ \textcolor{comment}{//\ similar\ tests\ repeatedly.\ \ Here's\ an\ example:}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00100}00100\ }
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00101}00101\ \textcolor{preprocessor}{\#if\ 0}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00102}00102\ }
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00103}00103\ \textcolor{comment}{//\ First,\ define\ a\ fixture\ class\ template.\ \ It\ should\ be\ parameterized}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00104}00104\ \textcolor{comment}{//\ by\ a\ type.\ \ Remember\ to\ derive\ it\ from\ testing::Test.}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00105}00105\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00106}00106\ \textcolor{keyword}{class\ }FooTest\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1_test}{testing::Test}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00107}00107\ \ \ ...}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00108}00108\ \};}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00109}00109\ }
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00110}00110\ \textcolor{comment}{//\ Next,\ declare\ that\ you\ will\ define\ a\ type-\/parameterized\ test\ case}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00111}00111\ \textcolor{comment}{//\ (the\ \_P\ suffix\ is\ for\ "{}parameterized"{}\ or\ "{}pattern"{},\ whichever\ you}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00112}00112\ \textcolor{comment}{//\ prefer):}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00113}00113\ \mbox{\hyperlink{gtest__list__tests__unittest___8cc_a8f36af28829ba875ca3675b4054f48b6}{TYPED\_TEST\_CASE\_P}}(FooTest);}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00114}00114\ }
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00115}00115\ \textcolor{comment}{//\ Then,\ use\ TYPED\_TEST\_P()\ to\ define\ as\ many\ type-\/parameterized\ tests}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00116}00116\ \textcolor{comment}{//\ for\ this\ type-\/parameterized\ test\ case\ as\ you\ want.}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00117}00117\ \mbox{\hyperlink{gtest__list__tests__unittest___8cc_aadd51dfff9d63b5e0faa0130697684c1}{TYPED\_TEST\_P}}(FooTest,\ DoesBlah)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00118}00118\ \ \ \textcolor{comment}{//\ Inside\ a\ test,\ refer\ to\ TypeParam\ to\ get\ the\ type\ parameter.}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00119}00119\ \ \ TypeParam\ n\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00120}00120\ \ \ ...}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00121}00121\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00122}00122\ }
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00123}00123\ \mbox{\hyperlink{gtest__list__tests__unittest___8cc_aadd51dfff9d63b5e0faa0130697684c1}{TYPED\_TEST\_P}}(FooTest,\ HasPropertyA)\ \{\ ...\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00124}00124\ }
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00125}00125\ \textcolor{comment}{//\ Now\ the\ tricky\ part:\ you\ need\ to\ register\ all\ test\ patterns\ before}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00126}00126\ \textcolor{comment}{//\ you\ can\ instantiate\ them.\ \ The\ first\ argument\ of\ the\ macro\ is\ the}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00127}00127\ \textcolor{comment}{//\ test\ case\ name;\ the\ rest\ are\ the\ names\ of\ the\ tests\ in\ this\ test}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00128}00128\ \textcolor{comment}{//\ case.}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00129}00129\ \mbox{\hyperlink{gtest__list__tests__unittest___8cc_a3316a9dc1c581f96a50ec10e0c116e5c}{REGISTER\_TYPED\_TEST\_CASE\_P}}(FooTest,}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00130}00130\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ DoesBlah,\ HasPropertyA);}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00131}00131\ }
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00132}00132\ \textcolor{comment}{//\ Finally,\ you\ are\ free\ to\ instantiate\ the\ pattern\ with\ the\ types\ you}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00133}00133\ \textcolor{comment}{//\ want.\ \ If\ you\ put\ the\ above\ code\ in\ a\ header\ file,\ you\ can\ \#include}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00134}00134\ \textcolor{comment}{//\ it\ in\ multiple\ C++\ source\ files\ and\ instantiate\ it\ multiple\ times.}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00135}00135\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00136}00136\ \textcolor{comment}{//\ To\ distinguish\ different\ instances\ of\ the\ pattern,\ the\ first}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00137}00137\ \textcolor{comment}{//\ argument\ to\ the\ INSTANTIATE\_*\ macro\ is\ a\ prefix\ that\ will\ be\ added}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00138}00138\ \textcolor{comment}{//\ to\ the\ actual\ test\ case\ name.\ \ Remember\ to\ pick\ unique\ prefixes\ for}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00139}00139\ \textcolor{comment}{//\ different\ instances.}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00140}00140\ \textcolor{keyword}{typedef}\ testing::Types<char,\ int,\ unsigned\ int>\ \mbox{\hyperlink{gtest__list__tests__unittest___8cc_a16f58cd49c18568802322bbaf9f3f654}{MyTypes}};}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00141}00141\ \mbox{\hyperlink{gtest__list__tests__unittest___8cc_abace4e22d147fb69e2be527b355a2316}{INSTANTIATE\_TYPED\_TEST\_CASE\_P}}(My,\ FooTest,\ \mbox{\hyperlink{gtest__list__tests__unittest___8cc_a16f58cd49c18568802322bbaf9f3f654}{MyTypes}});}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00142}00142\ }
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00143}00143\ \textcolor{comment}{//\ If\ the\ type\ list\ contains\ only\ one\ type,\ you\ can\ write\ that\ type}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00144}00144\ \textcolor{comment}{//\ directly\ without\ Types<...>:}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00145}00145\ \textcolor{comment}{//\ \ \ INSTANTIATE\_TYPED\_TEST\_CASE\_P(My,\ FooTest,\ int);}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00146}00146\ }
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00147}00147\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ 0}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00148}00148\ }
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00149}00149\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{gtest-port_8h}{gtest/internal/gtest-\/port.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00150}00150\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{gtest-type-util_8h}{gtest/internal/gtest-\/type-\/util.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00151}00151\ }
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00152}00152\ \textcolor{comment}{//\ Implements\ typed\ tests.}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00153}00153\ }
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00154}00154\ \textcolor{preprocessor}{\#if\ GTEST\_HAS\_TYPED\_TEST}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00155}00155\ }
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00156}00156\ \textcolor{comment}{//\ INTERNAL\ IMPLEMENTATION\ -\/\ DO\ NOT\ USE\ IN\ USER\ CODE.}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00157}00157\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00158}00158\ \textcolor{comment}{//\ Expands\ to\ the\ name\ of\ the\ typedef\ for\ the\ type\ parameters\ of\ the}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00159}00159\ \textcolor{comment}{//\ given\ test\ case.}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00160}00160\ \textcolor{preprocessor}{\#\ define\ GTEST\_TYPE\_PARAMS\_(TestCaseName)\ gtest\_type\_params\_\#\#TestCaseName\#\#\_}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00161}00161\ }
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00162}00162\ \textcolor{comment}{//\ The\ 'Types'\ template\ argument\ below\ must\ have\ spaces\ around\ it}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00163}00163\ \textcolor{comment}{//\ since\ some\ compilers\ may\ choke\ on\ '>>'\ when\ passing\ a\ template}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00164}00164\ \textcolor{comment}{//\ instance\ (e.g.\ Types<int>)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00165}00165\ \textcolor{preprocessor}{\#\ define\ TYPED\_TEST\_CASE(CaseName,\ Types)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00166}00166\ \textcolor{preprocessor}{\ \ typedef\ ::testing::internal::TypeList<\ Types\ >::type\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00167}00167\ \textcolor{preprocessor}{\ \ \ \ \ \ GTEST\_TYPE\_PARAMS\_(CaseName)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00168}00168\ }
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00169}00169\ \textcolor{preprocessor}{\#\ define\ TYPED\_TEST(CaseName,\ TestName)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00170}00170\ \textcolor{preprocessor}{\ \ template\ <typename\ gtest\_TypeParam\_>\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00171}00171\ \textcolor{preprocessor}{\ \ class\ GTEST\_TEST\_CLASS\_NAME\_(CaseName,\ TestName)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00172}00172\ \textcolor{preprocessor}{\ \ \ \ \ \ :\ public\ CaseName<gtest\_TypeParam\_>\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00173}00173\ \textcolor{preprocessor}{\ \ \ private:\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00174}00174\ \textcolor{preprocessor}{\ \ \ \ typedef\ CaseName<gtest\_TypeParam\_>\ TestFixture;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00175}00175\ \textcolor{preprocessor}{\ \ \ \ typedef\ gtest\_TypeParam\_\ TypeParam;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00176}00176\ \textcolor{preprocessor}{\ \ \ \ virtual\ void\ TestBody();\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00177}00177\ \textcolor{preprocessor}{\ \ \};\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00178}00178\ \textcolor{preprocessor}{\ \ bool\ gtest\_\#\#CaseName\#\#\_\#\#TestName\#\#\_registered\_\ GTEST\_ATTRIBUTE\_UNUSED\_\ =\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00179}00179\ \textcolor{preprocessor}{\ \ \ \ \ \ ::testing::internal::TypeParameterizedTest<\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00180}00180\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ CaseName,\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00181}00181\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ ::testing::internal::TemplateSel<\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00182}00182\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ GTEST\_TEST\_CLASS\_NAME\_(CaseName,\ TestName)>,\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00183}00183\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ GTEST\_TYPE\_PARAMS\_(CaseName)>::Register(\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00184}00184\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ "{}"{},\ ::testing::internal::CodeLocation(\_\_FILE\_\_,\ \_\_LINE\_\_),\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00185}00185\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \#CaseName,\ \#TestName,\ 0);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00186}00186\ \textcolor{preprocessor}{\ \ template\ <typename\ gtest\_TypeParam\_>\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00187}00187\ \textcolor{preprocessor}{\ \ void\ GTEST\_TEST\_CLASS\_NAME\_(CaseName,\ TestName)<gtest\_TypeParam\_>::TestBody()}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00188}00188\ }
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00189}00189\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_HAS\_TYPED\_TEST}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00190}00190\ }
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00191}00191\ \textcolor{comment}{//\ Implements\ type-\/parameterized\ tests.}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00192}00192\ }
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00193}00193\ \textcolor{preprocessor}{\#if\ GTEST\_HAS\_TYPED\_TEST\_P}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00194}00194\ }
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00195}00195\ \textcolor{comment}{//\ INTERNAL\ IMPLEMENTATION\ -\/\ DO\ NOT\ USE\ IN\ USER\ CODE.}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00196}00196\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00197}00197\ \textcolor{comment}{//\ Expands\ to\ the\ namespace\ name\ that\ the\ type-\/parameterized\ tests\ for}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00198}00198\ \textcolor{comment}{//\ the\ given\ type-\/parameterized\ test\ case\ are\ defined\ in.\ \ The\ exact}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00199}00199\ \textcolor{comment}{//\ name\ of\ the\ namespace\ is\ subject\ to\ change\ without\ notice.}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00200}00200\ \textcolor{preprocessor}{\#\ define\ GTEST\_CASE\_NAMESPACE\_(TestCaseName)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00201}00201\ \textcolor{preprocessor}{\ \ gtest\_case\_\#\#TestCaseName\#\#\_}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00202}00202\ }
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00203}00203\ \textcolor{comment}{//\ INTERNAL\ IMPLEMENTATION\ -\/\ DO\ NOT\ USE\ IN\ USER\ CODE.}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00204}00204\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00205}00205\ \textcolor{comment}{//\ Expands\ to\ the\ name\ of\ the\ variable\ used\ to\ remember\ the\ names\ of}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00206}00206\ \textcolor{comment}{//\ the\ defined\ tests\ in\ the\ given\ test\ case.}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00207}00207\ \textcolor{preprocessor}{\#\ define\ GTEST\_TYPED\_TEST\_CASE\_P\_STATE\_(TestCaseName)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00208}00208\ \textcolor{preprocessor}{\ \ gtest\_typed\_test\_case\_p\_state\_\#\#TestCaseName\#\#\_}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00209}00209\ }
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00210}00210\ \textcolor{comment}{//\ INTERNAL\ IMPLEMENTATION\ -\/\ DO\ NOT\ USE\ IN\ USER\ CODE\ DIRECTLY.}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00211}00211\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00212}00212\ \textcolor{comment}{//\ Expands\ to\ the\ name\ of\ the\ variable\ used\ to\ remember\ the\ names\ of}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00213}00213\ \textcolor{comment}{//\ the\ registered\ tests\ in\ the\ given\ test\ case.}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00214}00214\ \textcolor{preprocessor}{\#\ define\ GTEST\_REGISTERED\_TEST\_NAMES\_(TestCaseName)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00215}00215\ \textcolor{preprocessor}{\ \ gtest\_registered\_test\_names\_\#\#TestCaseName\#\#\_}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00216}00216\ }
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00217}00217\ \textcolor{comment}{//\ The\ variables\ defined\ in\ the\ type-\/parameterized\ test\ macros\ are}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00218}00218\ \textcolor{comment}{//\ static\ as\ typically\ these\ macros\ are\ used\ in\ a\ .h\ file\ that\ can\ be}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00219}00219\ \textcolor{comment}{//\ \#included\ in\ multiple\ translation\ units\ linked\ together.}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00220}00220\ \textcolor{preprocessor}{\#\ define\ TYPED\_TEST\_CASE\_P(CaseName)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00221}00221\ \textcolor{preprocessor}{\ \ static\ ::testing::internal::TypedTestCasePState\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00222}00222\ \textcolor{preprocessor}{\ \ \ \ \ \ GTEST\_TYPED\_TEST\_CASE\_P\_STATE\_(CaseName)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00223}00223\ }
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00224}00224\ \textcolor{preprocessor}{\#\ define\ TYPED\_TEST\_P(CaseName,\ TestName)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00225}00225\ \textcolor{preprocessor}{\ \ namespace\ GTEST\_CASE\_NAMESPACE\_(CaseName)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00226}00226\ \textcolor{preprocessor}{\ \ template\ <typename\ gtest\_TypeParam\_>\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00227}00227\ \textcolor{preprocessor}{\ \ class\ TestName\ :\ public\ CaseName<gtest\_TypeParam\_>\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00228}00228\ \textcolor{preprocessor}{\ \ \ private:\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00229}00229\ \textcolor{preprocessor}{\ \ \ \ typedef\ CaseName<gtest\_TypeParam\_>\ TestFixture;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00230}00230\ \textcolor{preprocessor}{\ \ \ \ typedef\ gtest\_TypeParam\_\ TypeParam;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00231}00231\ \textcolor{preprocessor}{\ \ \ \ virtual\ void\ TestBody();\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00232}00232\ \textcolor{preprocessor}{\ \ \};\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00233}00233\ \textcolor{preprocessor}{\ \ static\ bool\ gtest\_\#\#TestName\#\#\_defined\_\ GTEST\_ATTRIBUTE\_UNUSED\_\ =\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00234}00234\ \textcolor{preprocessor}{\ \ \ \ \ \ GTEST\_TYPED\_TEST\_CASE\_P\_STATE\_(CaseName).AddTestName(\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00235}00235\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \_\_FILE\_\_,\ \_\_LINE\_\_,\ \#CaseName,\ \#TestName);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00236}00236\ \textcolor{preprocessor}{\ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00237}00237\ \textcolor{preprocessor}{\ \ template\ <typename\ gtest\_TypeParam\_>\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00238}00238\ \textcolor{preprocessor}{\ \ void\ GTEST\_CASE\_NAMESPACE\_(CaseName)::TestName<gtest\_TypeParam\_>::TestBody()}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00239}00239\ }
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00240}00240\ \textcolor{preprocessor}{\#\ define\ REGISTER\_TYPED\_TEST\_CASE\_P(CaseName,\ ...)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00241}00241\ \textcolor{preprocessor}{\ \ namespace\ GTEST\_CASE\_NAMESPACE\_(CaseName)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00242}00242\ \textcolor{preprocessor}{\ \ typedef\ ::testing::internal::Templates<\_\_VA\_ARGS\_\_>::type\ gtest\_AllTests\_;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00243}00243\ \textcolor{preprocessor}{\ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00244}00244\ \textcolor{preprocessor}{\ \ static\ const\ char*\ const\ GTEST\_REGISTERED\_TEST\_NAMES\_(CaseName)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00245}00245\ \textcolor{preprocessor}{\ \ \ \ \ \ GTEST\_ATTRIBUTE\_UNUSED\_\ =\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00246}00246\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ GTEST\_TYPED\_TEST\_CASE\_P\_STATE\_(CaseName).VerifyRegisteredTestNames(\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00247}00247\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \_\_FILE\_\_,\ \_\_LINE\_\_,\ \#\_\_VA\_ARGS\_\_)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00248}00248\ }
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00249}00249\ \textcolor{comment}{//\ The\ 'Types'\ template\ argument\ below\ must\ have\ spaces\ around\ it}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00250}00250\ \textcolor{comment}{//\ since\ some\ compilers\ may\ choke\ on\ '>>'\ when\ passing\ a\ template}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00251}00251\ \textcolor{comment}{//\ instance\ (e.g.\ Types<int>)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00252}00252\ \textcolor{preprocessor}{\#\ define\ INSTANTIATE\_TYPED\_TEST\_CASE\_P(Prefix,\ CaseName,\ Types)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00253}00253\ \textcolor{preprocessor}{\ \ bool\ gtest\_\#\#Prefix\#\#\_\#\#CaseName\ GTEST\_ATTRIBUTE\_UNUSED\_\ =\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00254}00254\ \textcolor{preprocessor}{\ \ \ \ \ \ ::testing::internal::TypeParameterizedTestCase<CaseName,\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00255}00255\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ GTEST\_CASE\_NAMESPACE\_(CaseName)::gtest\_AllTests\_,\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00256}00256\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ ::testing::internal::TypeList<\ Types\ >::type>::Register(\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00257}00257\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \#Prefix,\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00258}00258\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ ::testing::internal::CodeLocation(\_\_FILE\_\_,\ \_\_LINE\_\_),\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00259}00259\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \&GTEST\_TYPED\_TEST\_CASE\_P\_STATE\_(CaseName),\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00260}00260\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \#CaseName,\ GTEST\_REGISTERED\_TEST\_NAMES\_(CaseName))}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00261}00261\ }
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00262}00262\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_HAS\_TYPED\_TEST\_P}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00263}00263\ }
+\DoxyCodeLine{\Hypertarget{gtest-typed-test_8h_source_l00264}00264\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_INCLUDE\_GTEST\_GTEST\_TYPED\_TEST\_H\_}}
+
+\end{DoxyCode}

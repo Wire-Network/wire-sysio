@@ -1,0 +1,130 @@
+\doxysection{sysio\+::trace\+\_\+api\+::transaction\+\_\+trace\+\_\+v1 Struct Reference}
+\hypertarget{structsysio_1_1trace__api_1_1transaction__trace__v1}{}\label{structsysio_1_1trace__api_1_1transaction__trace__v1}\index{sysio::trace\_api::transaction\_trace\_v1@{sysio::trace\_api::transaction\_trace\_v1}}
+
+
+{\ttfamily \#include $<$trace.\+hpp$>$}
+
+
+
+Inheritance diagram for sysio\+::trace\+\_\+api\+::transaction\+\_\+trace\+\_\+v1\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=219pt]{structsysio_1_1trace__api_1_1transaction__trace__v1__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for sysio\+::trace\+\_\+api\+::transaction\+\_\+trace\+\_\+v1\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1trace__api_1_1transaction__trace__v1__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1enum__type}{fc\+::enum\+\_\+type}}$<$ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}}, \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__receipt__header_a2bb00bac16048e6f624c2ded867ebf55}{status\+\_\+type}} $>$ \mbox{\hyperlink{structsysio_1_1trace__api_1_1transaction__trace__v1_abb7a116016152555cd2ce66710bfd2eb}{status}} = \{\}
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1trace__api_1_1transaction__trace__v1_a0f4b3a2bce1b936b7596de36081709da}{cpu\+\_\+usage\+\_\+us}} = 0
+\item 
+\mbox{\hyperlink{structfc_1_1unsigned__int}{fc\+::unsigned\+\_\+int}} \mbox{\hyperlink{structsysio_1_1trace__api_1_1transaction__trace__v1_adedc7939bf1614bb93e3a33b0d76a02d}{net\+\_\+usage\+\_\+words}}
+\item 
+std\+::vector$<$ \mbox{\hyperlink{namespacesysio_1_1chain_af141a69eb789b86fa0eb93c2d263f0df}{chain\+::signature\+\_\+type}} $>$ \mbox{\hyperlink{structsysio_1_1trace__api_1_1transaction__trace__v1_a35500ba20d4914a6fc8d76555c5c28fb}{signatures}} = \{\}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1transaction__header}{chain\+::transaction\+\_\+header}} \mbox{\hyperlink{structsysio_1_1trace__api_1_1transaction__trace__v1_a550fd041d7f18c710554a03e6802c16c}{trx\+\_\+header}} = \{\}
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes inherited from \mbox{\hyperlink{structsysio_1_1trace__api_1_1transaction__trace__v0}{sysio\+::trace\+\_\+api\+::transaction\+\_\+trace\+\_\+v0}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_aa85a3b49b3b219d1e3840567579e7e63}{chain\+::transaction\+\_\+id\+\_\+type}} \mbox{\hyperlink{structsysio_1_1trace__api_1_1transaction__trace__v0_abd005737722a090ce5876c7afafa31cb}{id}} = \{\}
+\item 
+std\+::vector$<$ \mbox{\hyperlink{structsysio_1_1trace__api_1_1action__trace__v0}{action\+\_\+trace\+\_\+v0}} $>$ \mbox{\hyperlink{structsysio_1_1trace__api_1_1transaction__trace__v0_ad3e7b4140ab3306d2dd3a43ac6b19b70}{actions}} = \{\}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Public Types inherited from \mbox{\hyperlink{structsysio_1_1trace__api_1_1transaction__trace__v0}{sysio\+::trace\+\_\+api\+::transaction\+\_\+trace\+\_\+v0}}}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{structsysio_1_1trace__api_1_1transaction__trace__v0_a8e4db2f33d4d7460d6c10f89aaf335e6}{status\+\_\+type}} = \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__receipt__header_a2bb00bac16048e6f624c2ded867ebf55}{chain\+::transaction\+\_\+receipt\+\_\+header\+::status\+\_\+enum}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{plugins_2trace__api__plugin_2include_2sysio_2trace__api_2trace_8hpp_source_l00035}{35}} of file \mbox{\hyperlink{plugins_2trace__api__plugin_2include_2sysio_2trace__api_2trace_8hpp_source}{trace.\+hpp}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1trace__api_1_1transaction__trace__v1_a0f4b3a2bce1b936b7596de36081709da}\index{sysio::trace\_api::transaction\_trace\_v1@{sysio::trace\_api::transaction\_trace\_v1}!cpu\_usage\_us@{cpu\_usage\_us}}
+\index{cpu\_usage\_us@{cpu\_usage\_us}!sysio::trace\_api::transaction\_trace\_v1@{sysio::trace\_api::transaction\_trace\_v1}}
+\doxysubsubsection{\texorpdfstring{cpu\_usage\_us}{cpu\_usage\_us}}
+{\footnotesize\ttfamily \label{structsysio_1_1trace__api_1_1transaction__trace__v1_a0f4b3a2bce1b936b7596de36081709da} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::trace\+\_\+api\+::transaction\+\_\+trace\+\_\+v1\+::cpu\+\_\+usage\+\_\+us = 0}
+
+
+
+Definition at line \mbox{\hyperlink{plugins_2trace__api__plugin_2include_2sysio_2trace__api_2trace_8hpp_source_l00037}{37}} of file \mbox{\hyperlink{plugins_2trace__api__plugin_2include_2sysio_2trace__api_2trace_8hpp_source}{trace.\+hpp}}.
+
+\Hypertarget{structsysio_1_1trace__api_1_1transaction__trace__v1_adedc7939bf1614bb93e3a33b0d76a02d}\index{sysio::trace\_api::transaction\_trace\_v1@{sysio::trace\_api::transaction\_trace\_v1}!net\_usage\_words@{net\_usage\_words}}
+\index{net\_usage\_words@{net\_usage\_words}!sysio::trace\_api::transaction\_trace\_v1@{sysio::trace\_api::transaction\_trace\_v1}}
+\doxysubsubsection{\texorpdfstring{net\_usage\_words}{net\_usage\_words}}
+{\footnotesize\ttfamily \label{structsysio_1_1trace__api_1_1transaction__trace__v1_adedc7939bf1614bb93e3a33b0d76a02d} 
+\mbox{\hyperlink{structfc_1_1unsigned__int}{fc\+::unsigned\+\_\+int}} sysio\+::trace\+\_\+api\+::transaction\+\_\+trace\+\_\+v1\+::net\+\_\+usage\+\_\+words}
+
+
+
+Definition at line \mbox{\hyperlink{plugins_2trace__api__plugin_2include_2sysio_2trace__api_2trace_8hpp_source_l00038}{38}} of file \mbox{\hyperlink{plugins_2trace__api__plugin_2include_2sysio_2trace__api_2trace_8hpp_source}{trace.\+hpp}}.
+
+\Hypertarget{structsysio_1_1trace__api_1_1transaction__trace__v1_a35500ba20d4914a6fc8d76555c5c28fb}\index{sysio::trace\_api::transaction\_trace\_v1@{sysio::trace\_api::transaction\_trace\_v1}!signatures@{signatures}}
+\index{signatures@{signatures}!sysio::trace\_api::transaction\_trace\_v1@{sysio::trace\_api::transaction\_trace\_v1}}
+\doxysubsubsection{\texorpdfstring{signatures}{signatures}}
+{\footnotesize\ttfamily \label{structsysio_1_1trace__api_1_1transaction__trace__v1_a35500ba20d4914a6fc8d76555c5c28fb} 
+std\+::vector$<$\mbox{\hyperlink{namespacesysio_1_1chain_af141a69eb789b86fa0eb93c2d263f0df}{chain\+::signature\+\_\+type}}$>$ sysio\+::trace\+\_\+api\+::transaction\+\_\+trace\+\_\+v1\+::signatures = \{\}}
+
+
+
+Definition at line \mbox{\hyperlink{plugins_2trace__api__plugin_2include_2sysio_2trace__api_2trace_8hpp_source_l00039}{39}} of file \mbox{\hyperlink{plugins_2trace__api__plugin_2include_2sysio_2trace__api_2trace_8hpp_source}{trace.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00039\ \{\};}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1trace__api_1_1transaction__trace__v1_abb7a116016152555cd2ce66710bfd2eb}\index{sysio::trace\_api::transaction\_trace\_v1@{sysio::trace\_api::transaction\_trace\_v1}!status@{status}}
+\index{status@{status}!sysio::trace\_api::transaction\_trace\_v1@{sysio::trace\_api::transaction\_trace\_v1}}
+\doxysubsubsection{\texorpdfstring{status}{status}}
+{\footnotesize\ttfamily \label{structsysio_1_1trace__api_1_1transaction__trace__v1_abb7a116016152555cd2ce66710bfd2eb} 
+\mbox{\hyperlink{classfc_1_1enum__type}{fc\+::enum\+\_\+type}}$<$\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}},\mbox{\hyperlink{structsysio_1_1chain_1_1transaction__receipt__header_a2bb00bac16048e6f624c2ded867ebf55}{status\+\_\+type}}$>$ sysio\+::trace\+\_\+api\+::transaction\+\_\+trace\+\_\+v1\+::status = \{\}}
+
+
+
+Definition at line \mbox{\hyperlink{plugins_2trace__api__plugin_2include_2sysio_2trace__api_2trace_8hpp_source_l00036}{36}} of file \mbox{\hyperlink{plugins_2trace__api__plugin_2include_2sysio_2trace__api_2trace_8hpp_source}{trace.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00036\ \{\};}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1trace__api_1_1transaction__trace__v1_a550fd041d7f18c710554a03e6802c16c}\index{sysio::trace\_api::transaction\_trace\_v1@{sysio::trace\_api::transaction\_trace\_v1}!trx\_header@{trx\_header}}
+\index{trx\_header@{trx\_header}!sysio::trace\_api::transaction\_trace\_v1@{sysio::trace\_api::transaction\_trace\_v1}}
+\doxysubsubsection{\texorpdfstring{trx\_header}{trx\_header}}
+{\footnotesize\ttfamily \label{structsysio_1_1trace__api_1_1transaction__trace__v1_a550fd041d7f18c710554a03e6802c16c} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1transaction__header}{chain\+::transaction\+\_\+header}} sysio\+::trace\+\_\+api\+::transaction\+\_\+trace\+\_\+v1\+::trx\+\_\+header = \{\}}
+
+
+
+Definition at line \mbox{\hyperlink{plugins_2trace__api__plugin_2include_2sysio_2trace__api_2trace_8hpp_source_l00040}{40}} of file \mbox{\hyperlink{plugins_2trace__api__plugin_2include_2sysio_2trace__api_2trace_8hpp_source}{trace.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00040\ \{\};}
+
+\end{DoxyCode}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+plugins/trace\+\_\+api\+\_\+plugin/include/sysio/trace\+\_\+api/\mbox{\hyperlink{plugins_2trace__api__plugin_2include_2sysio_2trace__api_2trace_8hpp}{trace.\+hpp}}\end{DoxyCompactItemize}

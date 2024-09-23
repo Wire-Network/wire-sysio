@@ -1,0 +1,10 @@
+<map id="upload.MercurialVCS.GenerateDiff" name="upload.MercurialVCS.GenerateDiff">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,29,228,55"/>
+<area shape="rect" id="Node000002" href="$namespaceupload.html#aded00b2430ea094be3da97c21c1ec61f" title=" " alt="" coords="490,5,604,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="228,33,474,19,474,25,228,39"/>
+<area shape="rect" id="Node000003" href="$namespaceupload.html#adc4aea7c4a79d29dfab04f650c274fdb" title=" " alt="" coords="276,55,392,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="229,53,260,56,260,62,228,58"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="389,51,439,40,474,32,475,37,441,45,391,57"/>
+<area shape="rect" id="Node000004" href="$namespaceupload.html#aaf7f85c895770c6aba543e1bf57533ae" title=" " alt="" coords="440,55,653,80"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="393,65,424,65,424,70,393,70"/>
+</map>

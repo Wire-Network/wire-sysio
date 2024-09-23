@@ -1,0 +1,68 @@
+\doxysection{testing\+::Polymorphic\+Action\texorpdfstring{$<$}{<} Impl \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classtesting_1_1_polymorphic_action}{}\label{classtesting_1_1_polymorphic_action}\index{testing::PolymorphicAction$<$ Impl $>$@{testing::PolymorphicAction$<$ Impl $>$}}
+
+
+{\ttfamily \#include $<$gmock-\/actions.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1_polymorphic_action_a062e5a45ad61dcf8085b15cc882ca0ae}{Polymorphic\+Action}} (const Impl \&impl)
+\item 
+{\footnotesize template$<$typename F $>$ }\\\mbox{\hyperlink{classtesting_1_1_polymorphic_action_ac35461616cc15c06f1a2f9ee1c03fb8f}{operator Action$<$ F $>$}} () const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Impl$>$\newline
+class testing\+::\+Polymorphic\+Action$<$ Impl $>$}
+
+
+Definition at line \mbox{\hyperlink{gmock-actions_8h_source_l00453}{453}} of file \mbox{\hyperlink{gmock-actions_8h_source}{gmock-\/actions.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1_polymorphic_action_a062e5a45ad61dcf8085b15cc882ca0ae}\index{testing::PolymorphicAction$<$ Impl $>$@{testing::PolymorphicAction$<$ Impl $>$}!PolymorphicAction@{PolymorphicAction}}
+\index{PolymorphicAction@{PolymorphicAction}!testing::PolymorphicAction$<$ Impl $>$@{testing::PolymorphicAction$<$ Impl $>$}}
+\doxysubsubsection{\texorpdfstring{PolymorphicAction()}{PolymorphicAction()}}
+{\footnotesize\ttfamily \label{classtesting_1_1_polymorphic_action_a062e5a45ad61dcf8085b15cc882ca0ae} 
+template$<$typename Impl $>$ \\
+\mbox{\hyperlink{classtesting_1_1_polymorphic_action}{testing\+::\+Polymorphic\+Action}}$<$ Impl $>$\+::\+Polymorphic\+Action (\begin{DoxyParamCaption}\item[{const Impl \&}]{impl}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-actions_8h_source_l00455}{455}} of file \mbox{\hyperlink{gmock-actions_8h_source}{gmock-\/actions.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00455\ :\ impl\_(impl)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1_polymorphic_action_ac35461616cc15c06f1a2f9ee1c03fb8f}\index{testing::PolymorphicAction$<$ Impl $>$@{testing::PolymorphicAction$<$ Impl $>$}!operator Action$<$ F $>$@{operator Action$<$ F $>$}}
+\index{operator Action$<$ F $>$@{operator Action$<$ F $>$}!testing::PolymorphicAction$<$ Impl $>$@{testing::PolymorphicAction$<$ Impl $>$}}
+\doxysubsubsection{\texorpdfstring{operator Action$<$ F $>$()}{operator Action< F >()}}
+{\footnotesize\ttfamily \label{classtesting_1_1_polymorphic_action_ac35461616cc15c06f1a2f9ee1c03fb8f} 
+template$<$typename Impl $>$ \\
+template$<$typename F $>$ \\
+\mbox{\hyperlink{classtesting_1_1_polymorphic_action}{testing\+::\+Polymorphic\+Action}}$<$ Impl $>$\+::operator \mbox{\hyperlink{classtesting_1_1_action}{Action}}$<$ F $>$ (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-actions_8h_source_l00458}{458}} of file \mbox{\hyperlink{gmock-actions_8h_source}{gmock-\/actions.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00458\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00459\ \ \ \ \ \textcolor{keywordflow}{return}\ Action<F>(\textcolor{keyword}{new}\ MonomorphicImpl<F>(impl\_));}
+\DoxyCodeLine{00460\ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/include/gmock/\mbox{\hyperlink{gmock-actions_8h}{gmock-\/actions.\+h}}\end{DoxyCompactItemize}

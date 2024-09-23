@@ -1,0 +1,5 @@
+<map id="websocketpp::connection::get_buffered_amount" name="websocketpp::connection::get_buffered_amount">
+<area shape="rect" id="Node000001" title="Get the size of the outgoing write buffer (in payload bytes)" alt="" coords="223,5,392,46"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1connection.html#aaaad6dc1c81fc944593f529575b67d96" title="Get the size of the outgoing write buffer (in payload bytes)" alt="" coords="5,5,175,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="207,28,175,28,175,23,207,23"/>
+</map>

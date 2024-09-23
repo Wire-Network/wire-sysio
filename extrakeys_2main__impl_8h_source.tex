@@ -1,0 +1,287 @@
+\doxysection{main\+\_\+impl.\+h}
+\hypertarget{extrakeys_2main__impl_8h_source}{}\label{extrakeys_2main__impl_8h_source}\index{libraries/fc/secp256k1/secp256k1/src/modules/extrakeys/main\_impl.h@{libraries/fc/secp256k1/secp256k1/src/modules/extrakeys/main\_impl.h}}
+\mbox{\hyperlink{extrakeys_2main__impl_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00001}00001\ \textcolor{comment}{/***********************************************************************}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2020\ Jonas\ Nick\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00003}00003\ \textcolor{comment}{\ *\ Distributed\ under\ the\ MIT\ software\ license,\ see\ the\ accompanying\ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00004}00004\ \textcolor{comment}{\ *\ file\ COPYING\ or\ https://www.opensource.org/licenses/mit-\/license.php.*}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00005}00005\ \textcolor{comment}{\ ***********************************************************************/}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00007}00007\ \textcolor{preprocessor}{\#ifndef\ SECP256K1\_MODULE\_EXTRAKEYS\_MAIN\_H}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00008}00008\ \textcolor{preprocessor}{\#define\ SECP256K1\_MODULE\_EXTRAKEYS\_MAIN\_H}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00010}00010\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{secp256k1_8h}{../../../include/secp256k1.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00011}00011\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{secp256k1__extrakeys_8h}{../../../include/secp256k1\_extrakeys.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00013}00013\ \textcolor{keyword}{static}\ \mbox{\hyperlink{secp256k1_8h_a7ddc487fd46aee88f21cabedb7268b1e}{SECP256K1\_INLINE}}\ \textcolor{keywordtype}{int}\ secp256k1\_xonly\_pubkey\_load(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__context__struct}{secp256k1\_context}}*\ ctx,\ \mbox{\hyperlink{structsecp256k1__ge}{secp256k1\_ge}}\ *ge,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__xonly__pubkey}{secp256k1\_xonly\_pubkey}}\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}})\ \{}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00014}00014\ \ \ \ \ \textcolor{keywordflow}{return}\ secp256k1\_pubkey\_load(ctx,\ ge,\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__pubkey}{secp256k1\_pubkey}}\ *)\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}});}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00015}00015\ \}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00017}00017\ \textcolor{keyword}{static}\ \mbox{\hyperlink{secp256k1_8h_a7ddc487fd46aee88f21cabedb7268b1e}{SECP256K1\_INLINE}}\ \textcolor{keywordtype}{void}\ secp256k1\_xonly\_pubkey\_save(\mbox{\hyperlink{structsecp256k1__xonly__pubkey}{secp256k1\_xonly\_pubkey}}\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}},\ \mbox{\hyperlink{structsecp256k1__ge}{secp256k1\_ge}}\ *ge)\ \{}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00018}00018\ \ \ \ \ secp256k1\_pubkey\_save((\mbox{\hyperlink{structsecp256k1__pubkey}{secp256k1\_pubkey}}\ *)\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}},\ ge);}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00019}00019\ \}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00021}\mbox{\hyperlink{secp256k1__extrakeys_8h_ad9e5f1dae6a1e3e03d0093aa17e6c21c}{00021}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{extrakeys_2main__impl_8h_ad13aa30c6a14103321a6467918965b16}{secp256k1\_xonly\_pubkey\_parse}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__context__struct}{secp256k1\_context}}*\ ctx,\ \mbox{\hyperlink{structsecp256k1__xonly__pubkey}{secp256k1\_xonly\_pubkey}}\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}},\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *input32)\ \{}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00022}00022\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__ge}{secp256k1\_ge}}\ pk;}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00023}00023\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__fe}{secp256k1\_fe}}\ x;}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00025}00025\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(ctx\ !=\ NULL);}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00026}00026\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}}\ !=\ NULL);}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00027}00027\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}},\ 0,\ \textcolor{keyword}{sizeof}(*\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}}));}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00028}00028\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(input32\ !=\ NULL);}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00030}00030\ \ \ \ \ \textcolor{keywordflow}{if}\ (!secp256k1\_fe\_set\_b32(\&x,\ input32))\ \{}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00031}00031\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00032}00032\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00033}00033\ \ \ \ \ \textcolor{keywordflow}{if}\ (!secp256k1\_ge\_set\_xo\_var(\&pk,\ \&x,\ 0))\ \{}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00034}00034\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00035}00035\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00036}00036\ \ \ \ \ \textcolor{keywordflow}{if}\ (!secp256k1\_ge\_is\_in\_correct\_subgroup(\&pk))\ \{}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00037}00037\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00038}00038\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00039}00039\ \ \ \ \ secp256k1\_xonly\_pubkey\_save(\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}},\ \&pk);}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00040}00040\ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00041}00041\ \}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00043}\mbox{\hyperlink{secp256k1__extrakeys_8h_a455e86be0f18f4313ba8ea73e34a25a6}{00043}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{extrakeys_2main__impl_8h_a29339d5ba3db7c60337c8e7fab89c31a}{secp256k1\_xonly\_pubkey\_serialize}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__context__struct}{secp256k1\_context}}*\ ctx,\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *output32,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__xonly__pubkey}{secp256k1\_xonly\_pubkey}}\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}})\ \{}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00044}00044\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__ge}{secp256k1\_ge}}\ pk;}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00046}00046\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(ctx\ !=\ NULL);}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00047}00047\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(output32\ !=\ NULL);}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00048}00048\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(output32,\ 0,\ 32);}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00049}00049\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}}\ !=\ NULL);}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00051}00051\ \ \ \ \ \textcolor{keywordflow}{if}\ (!secp256k1\_xonly\_pubkey\_load(ctx,\ \&pk,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}}))\ \{}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00052}00052\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00053}00053\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00054}00054\ \ \ \ \ secp256k1\_fe\_get\_b32(output32,\ \&pk.\mbox{\hyperlink{structsecp256k1__ge_a3c04a97b606c82ea87e55d4a06f06b6e}{x}});}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00055}00055\ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00056}00056\ \}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00058}\mbox{\hyperlink{secp256k1__extrakeys_8h_a06f07f2cde819fd612ff4cc13e785aa9}{00058}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{extrakeys_2main__impl_8h_af8b4c7998e5f0584b4a4f6b8f740de8b}{secp256k1\_xonly\_pubkey\_cmp}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__context__struct}{secp256k1\_context}}*\ ctx,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__xonly__pubkey}{secp256k1\_xonly\_pubkey}}*\ pk0,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__xonly__pubkey}{secp256k1\_xonly\_pubkey}}*\ pk1)\ \{}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00059}00059\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ out[2][32];}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00060}00060\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__xonly__pubkey}{secp256k1\_xonly\_pubkey}}*\ pk[2];}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00061}00061\ \ \ \ \ \textcolor{keywordtype}{int}\ i;}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00062}00062\ }
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00063}00063\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(ctx\ !=\ NULL);}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00064}00064\ \ \ \ \ pk[0]\ =\ pk0;\ pk[1]\ =\ pk1;}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00065}00065\ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ 2;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00066}00066\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ If\ the\ public\ key\ is\ NULL\ or\ invalid,\ xonly\_pubkey\_serialize\ will}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00067}00067\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ *\ call\ the\ illegal\_callback\ and\ return\ 0.\ In\ that\ case\ we\ will}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00068}00068\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ *\ serialize\ the\ key\ as\ all\ zeros\ which\ is\ less\ than\ any\ valid\ public}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00069}00069\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ *\ key.\ This\ results\ in\ consistent\ comparisons\ even\ if\ NULL\ or\ invalid}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00070}00070\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ *\ pubkeys\ are\ involved\ and\ prevents\ edge\ cases\ such\ as\ sorting}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00071}00071\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ *\ algorithms\ that\ use\ this\ function\ and\ do\ not\ terminate\ as\ a}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00072}00072\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ *\ result.\ */}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00073}00073\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{extrakeys_2main__impl_8h_a29339d5ba3db7c60337c8e7fab89c31a}{secp256k1\_xonly\_pubkey\_serialize}}(ctx,\ out[i],\ pk[i]))\ \{}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00074}00074\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ Note\ that\ xonly\_pubkey\_serialize\ should\ already\ set\ the\ output\ to}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00075}00075\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ *\ zero\ in\ that\ case,\ but\ it's\ not\ guaranteed\ by\ the\ API,\ we\ can't}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00076}00076\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ *\ test\ it\ and\ writing\ a\ VERIFY\_CHECK\ is\ more\ complex\ than}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00077}00077\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ *\ explicitly\ memsetting\ (again).\ */}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00078}00078\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(out[i],\ 0,\ \textcolor{keyword}{sizeof}(out[i]));}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00079}00079\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00080}00080\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00081}00081\ \ \ \ \ \textcolor{keywordflow}{return}\ secp256k1\_memcmp\_var(out[0],\ out[1],\ \textcolor{keyword}{sizeof}(out[1]));}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00082}00082\ \}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00083}00083\ }
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00087}00087\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ secp256k1\_extrakeys\_ge\_even\_y(\mbox{\hyperlink{structsecp256k1__ge}{secp256k1\_ge}}\ *\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}})\ \{}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00088}00088\ \ \ \ \ \textcolor{keywordtype}{int}\ y\_parity\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00089}00089\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(!secp256k1\_ge\_is\_infinity(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}));}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00090}00090\ }
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00091}00091\ \ \ \ \ \textcolor{keywordflow}{if}\ (secp256k1\_fe\_is\_odd(\&\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>y))\ \{}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00092}00092\ \ \ \ \ \ \ \ \ secp256k1\_fe\_negate(\&\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>y,\ \&\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>y,\ 1);}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00093}00093\ \ \ \ \ \ \ \ \ y\_parity\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00094}00094\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00095}00095\ \ \ \ \ \textcolor{keywordflow}{return}\ y\_parity;}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00096}00096\ \}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00097}00097\ }
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00098}\mbox{\hyperlink{secp256k1__extrakeys_8h_a64abe13b27419d0abec481a2a137737d}{00098}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{extrakeys_2main__impl_8h_a93b2eb2b61d3df951aa9115234b36faa}{secp256k1\_xonly\_pubkey\_from\_pubkey}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__context__struct}{secp256k1\_context}}*\ ctx,\ \mbox{\hyperlink{structsecp256k1__xonly__pubkey}{secp256k1\_xonly\_pubkey}}\ *xonly\_pubkey,\ \textcolor{keywordtype}{int}\ *pk\_parity,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__pubkey}{secp256k1\_pubkey}}\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}})\ \{}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00099}00099\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__ge}{secp256k1\_ge}}\ pk;}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00100}00100\ \ \ \ \ \textcolor{keywordtype}{int}\ tmp;}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00101}00101\ }
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00102}00102\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(ctx\ !=\ NULL);}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00103}00103\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(xonly\_pubkey\ !=\ NULL);}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00104}00104\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}}\ !=\ NULL);}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00105}00105\ }
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00106}00106\ \ \ \ \ \textcolor{keywordflow}{if}\ (!secp256k1\_pubkey\_load(ctx,\ \&pk,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}}))\ \{}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00107}00107\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00108}00108\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00109}00109\ \ \ \ \ tmp\ =\ secp256k1\_extrakeys\_ge\_even\_y(\&pk);}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00110}00110\ \ \ \ \ \textcolor{keywordflow}{if}\ (pk\_parity\ !=\ NULL)\ \{}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00111}00111\ \ \ \ \ \ \ \ \ *pk\_parity\ =\ tmp;}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00112}00112\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00113}00113\ \ \ \ \ secp256k1\_xonly\_pubkey\_save(xonly\_pubkey,\ \&pk);}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00114}00114\ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00115}00115\ \}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00116}00116\ }
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00117}\mbox{\hyperlink{secp256k1__extrakeys_8h_aaf832fa110c2610d69dee6ca74c856e8}{00117}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{extrakeys_2main__impl_8h_a23b0b9f1c39ddb8eae5cd9c4116d0d12}{secp256k1\_xonly\_pubkey\_tweak\_add}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__context__struct}{secp256k1\_context}}*\ ctx,\ \mbox{\hyperlink{structsecp256k1__pubkey}{secp256k1\_pubkey}}\ *output\_pubkey,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__xonly__pubkey}{secp256k1\_xonly\_pubkey}}\ *internal\_pubkey,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *tweak32)\ \{}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00118}00118\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__ge}{secp256k1\_ge}}\ pk;}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00119}00119\ }
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00120}00120\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(ctx\ !=\ NULL);}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00121}00121\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(output\_pubkey\ !=\ NULL);}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00122}00122\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(output\_pubkey,\ 0,\ \textcolor{keyword}{sizeof}(*output\_pubkey));}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00123}00123\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(internal\_pubkey\ !=\ NULL);}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00124}00124\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(tweak32\ !=\ NULL);}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00125}00125\ }
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00126}00126\ \ \ \ \ \textcolor{keywordflow}{if}\ (!secp256k1\_xonly\_pubkey\_load(ctx,\ \&pk,\ internal\_pubkey)}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00127}00127\ \ \ \ \ \ \ \ \ ||\ !secp256k1\_ec\_pubkey\_tweak\_add\_helper(\&pk,\ tweak32))\ \{}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00128}00128\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00129}00129\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00130}00130\ \ \ \ \ secp256k1\_pubkey\_save(output\_pubkey,\ \&pk);}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00131}00131\ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00132}00132\ \}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00133}00133\ }
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00134}\mbox{\hyperlink{secp256k1__extrakeys_8h_a466fe5b6ca122c33e51f7a3e70ff3590}{00134}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{extrakeys_2main__impl_8h_a2116028e77999db9ce453655ba391cb9}{secp256k1\_xonly\_pubkey\_tweak\_add\_check}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__context__struct}{secp256k1\_context}}*\ ctx,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *tweaked\_pubkey32,\ \textcolor{keywordtype}{int}\ tweaked\_pk\_parity,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__xonly__pubkey}{secp256k1\_xonly\_pubkey}}\ *internal\_pubkey,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *tweak32)\ \{}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00135}00135\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__ge}{secp256k1\_ge}}\ pk;}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00136}00136\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ pk\_expected32[32];}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00137}00137\ }
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00138}00138\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(ctx\ !=\ NULL);}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00139}00139\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(internal\_pubkey\ !=\ NULL);}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00140}00140\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(tweaked\_pubkey32\ !=\ NULL);}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00141}00141\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(tweak32\ !=\ NULL);}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00142}00142\ }
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00143}00143\ \ \ \ \ \textcolor{keywordflow}{if}\ (!secp256k1\_xonly\_pubkey\_load(ctx,\ \&pk,\ internal\_pubkey)}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00144}00144\ \ \ \ \ \ \ \ \ ||\ !secp256k1\_ec\_pubkey\_tweak\_add\_helper(\&pk,\ tweak32))\ \{}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00145}00145\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00146}00146\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00147}00147\ \ \ \ \ secp256k1\_fe\_normalize\_var(\&pk.\mbox{\hyperlink{structsecp256k1__ge_a3c04a97b606c82ea87e55d4a06f06b6e}{x}});}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00148}00148\ \ \ \ \ secp256k1\_fe\_normalize\_var(\&pk.\mbox{\hyperlink{structsecp256k1__ge_a604295983a1f4aa6e8b5b0f1e46f9ee0}{y}});}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00149}00149\ \ \ \ \ secp256k1\_fe\_get\_b32(pk\_expected32,\ \&pk.\mbox{\hyperlink{structsecp256k1__ge_a3c04a97b606c82ea87e55d4a06f06b6e}{x}});}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00150}00150\ }
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00151}00151\ \ \ \ \ \textcolor{keywordflow}{return}\ secp256k1\_memcmp\_var(\&pk\_expected32,\ tweaked\_pubkey32,\ 32)\ ==\ 0}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00152}00152\ \ \ \ \ \ \ \ \ \ \ \ \ \&\&\ secp256k1\_fe\_is\_odd(\&pk.\mbox{\hyperlink{structsecp256k1__ge_a604295983a1f4aa6e8b5b0f1e46f9ee0}{y}})\ ==\ tweaked\_pk\_parity;}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00153}00153\ \}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00154}00154\ }
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00155}00155\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_keypair\_save(\mbox{\hyperlink{structsecp256k1__keypair}{secp256k1\_keypair}}\ *keypair,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *sk,\ \mbox{\hyperlink{structsecp256k1__ge}{secp256k1\_ge}}\ *pk)\ \{}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00156}00156\ \ \ \ \ secp256k1\_scalar\_get\_b32(\&keypair-\/>\mbox{\hyperlink{structsecp256k1__keypair_a4ef617e9a3e4460ead0e7af425c1943e}{data}}[0],\ sk);}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00157}00157\ \ \ \ \ secp256k1\_pubkey\_save((\mbox{\hyperlink{structsecp256k1__pubkey}{secp256k1\_pubkey}}\ *)\&keypair-\/>\mbox{\hyperlink{structsecp256k1__keypair_a4ef617e9a3e4460ead0e7af425c1943e}{data}}[32],\ pk);}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00158}00158\ \}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00159}00159\ }
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00160}00160\ }
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00161}00161\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ secp256k1\_keypair\_seckey\_load(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__context__struct}{secp256k1\_context}}*\ ctx,\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *sk,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__keypair}{secp256k1\_keypair}}\ *keypair)\ \{}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00162}00162\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00163}00163\ }
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00164}00164\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ secp256k1\_scalar\_set\_b32\_seckey(sk,\ \&keypair-\/>\mbox{\hyperlink{structsecp256k1__keypair_a4ef617e9a3e4460ead0e7af425c1943e}{data}}[0]);}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00165}00165\ \ \ \ \ \textcolor{comment}{/*\ We\ can\ declassify\ ret\ here\ because\ sk\ is\ only\ zero\ if\ a\ keypair\ function}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00166}00166\ \textcolor{comment}{\ \ \ \ \ *\ failed\ (which\ zeroes\ the\ keypair)\ and\ its\ return\ value\ is\ ignored.\ */}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00167}00167\ \ \ \ \ secp256k1\_declassify(ctx,\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}},\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}));}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00168}00168\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}});}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00169}00169\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00170}00170\ \}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00171}00171\ }
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00172}00172\ \textcolor{comment}{/*\ Load\ a\ keypair\ into\ pk\ and\ sk\ (if\ non-\/NULL).\ This\ function\ declassifies\ pk}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00173}00173\ \textcolor{comment}{\ *\ and\ ARG\_CHECKs\ that\ the\ keypair\ is\ not\ invalid.\ It\ always\ initializes\ sk\ and}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00174}00174\ \textcolor{comment}{\ *\ pk\ with\ dummy\ values.\ */}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00175}00175\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ secp256k1\_keypair\_load(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__context__struct}{secp256k1\_context}}*\ ctx,\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *sk,\ \mbox{\hyperlink{structsecp256k1__ge}{secp256k1\_ge}}\ *pk,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__keypair}{secp256k1\_keypair}}\ *keypair)\ \{}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00176}00176\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00177}00177\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__pubkey}{secp256k1\_pubkey}}\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}}\ =\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__pubkey}{secp256k1\_pubkey}}\ *)\&keypair-\/>\mbox{\hyperlink{structsecp256k1__keypair_a4ef617e9a3e4460ead0e7af425c1943e}{data}}[32];}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00178}00178\ }
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00179}00179\ \ \ \ \ \textcolor{comment}{/*\ Need\ to\ declassify\ the\ pubkey\ because\ pubkey\_load\ ARG\_CHECKs\ if\ it's}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00180}00180\ \textcolor{comment}{\ \ \ \ \ *\ invalid.\ */}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00181}00181\ \ \ \ \ secp256k1\_declassify(ctx,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}},\ \textcolor{keyword}{sizeof}(*\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}}));}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00182}00182\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ secp256k1\_pubkey\_load(ctx,\ pk,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}});}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00183}00183\ \ \ \ \ \textcolor{keywordflow}{if}\ (sk\ !=\ NULL)\ \{}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00184}00184\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ \&\&\ secp256k1\_keypair\_seckey\_load(ctx,\ sk,\ keypair);}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00185}00185\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00186}00186\ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}})\ \{}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00187}00187\ \ \ \ \ \ \ \ \ *pk\ =\ secp256k1\_ge\_const\_g;}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00188}00188\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (sk\ !=\ NULL)\ \{}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00189}00189\ \ \ \ \ \ \ \ \ \ \ \ \ *sk\ =\ secp256k1\_scalar\_one;}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00190}00190\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00191}00191\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00192}00192\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00193}00193\ \}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00194}00194\ }
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00195}\mbox{\hyperlink{secp256k1__extrakeys_8h_a61b1362ada2435ab10240e52ff738476}{00195}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{extrakeys_2main__impl_8h_a0b67a64a755a308e1777e6c2bde4f57b}{secp256k1\_keypair\_create}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__context__struct}{secp256k1\_context}}*\ ctx,\ \mbox{\hyperlink{structsecp256k1__keypair}{secp256k1\_keypair}}\ *keypair,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *seckey32)\ \{}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00196}00196\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ sk;}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00197}00197\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__ge}{secp256k1\_ge}}\ pk;}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00198}00198\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00199}00199\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(ctx\ !=\ NULL);}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00200}00200\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(keypair\ !=\ NULL);}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00201}00201\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(keypair,\ 0,\ \textcolor{keyword}{sizeof}(*keypair));}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00202}00202\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(secp256k1\_ecmult\_gen\_context\_is\_built(\&ctx-\/>\mbox{\hyperlink{structsecp256k1__context__struct_aacc2071a68f9c5a6c05eb783f523b9eb}{ecmult\_gen\_ctx}}));}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00203}00203\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(seckey32\ !=\ NULL);}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00204}00204\ }
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00205}00205\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ secp256k1\_ec\_pubkey\_create\_helper(\&ctx-\/>\mbox{\hyperlink{structsecp256k1__context__struct_aacc2071a68f9c5a6c05eb783f523b9eb}{ecmult\_gen\_ctx}},\ \&sk,\ \&pk,\ seckey32);}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00206}00206\ \ \ \ \ secp256k1\_keypair\_save(keypair,\ \&sk,\ \&pk);}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00207}00207\ \ \ \ \ secp256k1\_memczero(keypair,\ \textcolor{keyword}{sizeof}(*keypair),\ !\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}});}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00208}00208\ }
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00209}00209\ \ \ \ \ secp256k1\_scalar\_clear(\&sk);}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00210}00210\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00211}00211\ \}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00212}00212\ }
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00213}\mbox{\hyperlink{secp256k1__extrakeys_8h_a39b3678ca32b950618267bfd1082a6a3}{00213}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{extrakeys_2main__impl_8h_a2f1110f6ff6c80818d31b3961e6d3d41}{secp256k1\_keypair\_sec}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__context__struct}{secp256k1\_context}}*\ ctx,\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *seckey,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__keypair}{secp256k1\_keypair}}\ *keypair)\ \{}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00214}00214\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(ctx\ !=\ NULL);}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00215}00215\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(seckey\ !=\ NULL);}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00216}00216\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(seckey,\ 0,\ 32);}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00217}00217\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(keypair\ !=\ NULL);}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00218}00218\ }
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00219}00219\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(seckey,\ \&keypair-\/>\mbox{\hyperlink{structsecp256k1__keypair_a4ef617e9a3e4460ead0e7af425c1943e}{data}}[0],\ 32);}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00220}00220\ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00221}00221\ \}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00222}00222\ }
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00223}\mbox{\hyperlink{secp256k1__extrakeys_8h_a22d8896d0f5bbe8a9738de8dad71adea}{00223}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{extrakeys_2main__impl_8h_ac5836773627908038f7ae3ce78eb12da}{secp256k1\_keypair\_pub}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__context__struct}{secp256k1\_context}}*\ ctx,\ \mbox{\hyperlink{structsecp256k1__pubkey}{secp256k1\_pubkey}}\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__keypair}{secp256k1\_keypair}}\ *keypair)\ \{}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00224}00224\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(ctx\ !=\ NULL);}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00225}00225\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}}\ !=\ NULL);}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00226}00226\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}},\ 0,\ \textcolor{keyword}{sizeof}(*\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}}));}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00227}00227\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(keypair\ !=\ NULL);}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00228}00228\ }
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00229}00229\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}}-\/>data,\ \&keypair-\/>\mbox{\hyperlink{structsecp256k1__keypair_a4ef617e9a3e4460ead0e7af425c1943e}{data}}[32],\ \textcolor{keyword}{sizeof}(*\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}}));}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00230}00230\ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00231}00231\ \}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00232}00232\ }
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00233}\mbox{\hyperlink{secp256k1__extrakeys_8h_ab0383c461b3790fdcfcaef0f89deb709}{00233}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{extrakeys_2main__impl_8h_a5ef5543ae89fd59edea43c13cad73cfb}{secp256k1\_keypair\_xonly\_pub}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__context__struct}{secp256k1\_context}}*\ ctx,\ \mbox{\hyperlink{structsecp256k1__xonly__pubkey}{secp256k1\_xonly\_pubkey}}\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}},\ \textcolor{keywordtype}{int}\ *pk\_parity,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__keypair}{secp256k1\_keypair}}\ *keypair)\ \{}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00234}00234\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__ge}{secp256k1\_ge}}\ pk;}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00235}00235\ \ \ \ \ \textcolor{keywordtype}{int}\ tmp;}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00236}00236\ }
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00237}00237\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(ctx\ !=\ NULL);}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00238}00238\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}}\ !=\ NULL);}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00239}00239\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}},\ 0,\ \textcolor{keyword}{sizeof}(*\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}}));}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00240}00240\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(keypair\ !=\ NULL);}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00241}00241\ }
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00242}00242\ \ \ \ \ \textcolor{keywordflow}{if}\ (!secp256k1\_keypair\_load(ctx,\ NULL,\ \&pk,\ keypair))\ \{}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00243}00243\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00244}00244\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00245}00245\ \ \ \ \ tmp\ =\ secp256k1\_extrakeys\_ge\_even\_y(\&pk);}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00246}00246\ \ \ \ \ \textcolor{keywordflow}{if}\ (pk\_parity\ !=\ NULL)\ \{}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00247}00247\ \ \ \ \ \ \ \ \ *pk\_parity\ =\ tmp;}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00248}00248\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00249}00249\ \ \ \ \ secp256k1\_xonly\_pubkey\_save(\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}},\ \&pk);}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00250}00250\ }
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00251}00251\ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00252}00252\ \}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00253}00253\ }
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00254}\mbox{\hyperlink{secp256k1__extrakeys_8h_aa99a68bfe473704d08eac556915883b6}{00254}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{extrakeys_2main__impl_8h_a1534dc2e974d8debf0a2a361b57fba27}{secp256k1\_keypair\_xonly\_tweak\_add}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__context__struct}{secp256k1\_context}}*\ ctx,\ \mbox{\hyperlink{structsecp256k1__keypair}{secp256k1\_keypair}}\ *keypair,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *tweak32)\ \{}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00255}00255\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__ge}{secp256k1\_ge}}\ pk;}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00256}00256\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ sk;}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00257}00257\ \ \ \ \ \textcolor{keywordtype}{int}\ y\_parity;}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00258}00258\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00259}00259\ }
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00260}00260\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(ctx\ !=\ NULL);}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00261}00261\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(keypair\ !=\ NULL);}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00262}00262\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(tweak32\ !=\ NULL);}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00263}00263\ }
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00264}00264\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ secp256k1\_keypair\_load(ctx,\ \&sk,\ \&pk,\ keypair);}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00265}00265\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(keypair,\ 0,\ \textcolor{keyword}{sizeof}(*keypair));}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00266}00266\ }
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00267}00267\ \ \ \ \ y\_parity\ =\ secp256k1\_extrakeys\_ge\_even\_y(\&pk);}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00268}00268\ \ \ \ \ \textcolor{keywordflow}{if}\ (y\_parity\ ==\ 1)\ \{}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00269}00269\ \ \ \ \ \ \ \ \ secp256k1\_scalar\_negate(\&sk,\ \&sk);}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00270}00270\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00271}00271\ }
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00272}00272\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ \&=\ secp256k1\_ec\_seckey\_tweak\_add\_helper(\&sk,\ tweak32);}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00273}00273\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ \&=\ secp256k1\_ec\_pubkey\_tweak\_add\_helper(\&pk,\ tweak32);}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00274}00274\ }
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00275}00275\ \ \ \ \ secp256k1\_declassify(ctx,\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}},\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}));}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00276}00276\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}})\ \{}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00277}00277\ \ \ \ \ \ \ \ \ secp256k1\_keypair\_save(keypair,\ \&sk,\ \&pk);}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00278}00278\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00279}00279\ }
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00280}00280\ \ \ \ \ secp256k1\_scalar\_clear(\&sk);}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00281}00281\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00282}00282\ \}}
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00283}00283\ }
+\DoxyCodeLine{\Hypertarget{extrakeys_2main__impl_8h_source_l00284}00284\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

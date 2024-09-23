@@ -1,0 +1,108 @@
+\doxysection{libraries/sys-\/vm/tests/fuzz/fuzz\+\_\+parser.cpp File Reference}
+\hypertarget{fuzz__parser_8cpp}{}\label{fuzz__parser_8cpp}\index{libraries/sys-\/vm/tests/fuzz/fuzz\_parser.cpp@{libraries/sys-\/vm/tests/fuzz/fuzz\_parser.cpp}}
+{\ttfamily \#include $<$sysio/wasm\+\_\+backend/parser.\+hpp$>$}\newline
+{\ttfamily \#include $<$fstream$>$}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$chrono$>$}\newline
+Include dependency graph for fuzz\+\_\+parser.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{fuzz__parser_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+std\+::vector$<$ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} $>$ \mbox{\hyperlink{fuzz__parser_8cpp_ab6d9537f94c320b20d681495d7f93099}{read\+\_\+wasm}} (const std\+::string \&fname)
+\item 
+int \mbox{\hyperlink{fuzz__parser_8cpp_ac0f2228420376f4db7e1274f2b41667c}{main}} (int argc, const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}\mbox{[}$\,$\mbox{]})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{fuzz__parser_8cpp_ac0f2228420376f4db7e1274f2b41667c}\index{fuzz\_parser.cpp@{fuzz\_parser.cpp}!main@{main}}
+\index{main@{main}!fuzz\_parser.cpp@{fuzz\_parser.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{fuzz__parser_8cpp_ac0f2228420376f4db7e1274f2b41667c} 
+int main (\begin{DoxyParamCaption}\item[{int}]{argc}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{argv}{\mbox{[}$\,$\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{fuzz__parser_8cpp_source_l00034}{34}} of file \mbox{\hyperlink{fuzz__parser_8cpp_source}{fuzz\+\_\+parser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00035\ \ \ \ high\_resolution\_clock::time\_point\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103aea2b2676c28c0db26d39331a336c6b92}{start}};}
+\DoxyCodeLine{00036\ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ memory\_manager::set\_memory\_limits(\ 128*1024,\ 64*1024\ );}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ binary\_parser\ \mbox{\hyperlink{namespace_xbyak_1_1util_aa8a7e90a7fce7c382d20fa2a7895cda3}{bp}};}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \textcolor{keyword}{module}\ mod;}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1vm_a6ffa5796148f0f779a3d44799c3f0cce}{wasm\_code}}\ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68daee5b74d2be31ca48e104578d6c2b7425}{test}}\ =\ \mbox{\hyperlink{fuzz__parser_8cpp_ab6d9537f94c320b20d681495d7f93099}{read\_wasm}}(\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[1]);}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103aea2b2676c28c0db26d39331a336c6b92}{start}}\ =\ high\_resolution\_clock::now();}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_aa8a7e90a7fce7c382d20fa2a7895cda3}{bp}}.parse\_module(\ test,\ mod\ );}
+\DoxyCodeLine{00043\ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\mbox{\hyperlink{classfc_1_1exception}{fc::exception}}\&\ e)\ \{}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}FAIL\ :\ "{}}\ <<\ e.\mbox{\hyperlink{classfc_1_1exception_ab1104818bf0d9b6a29f0dfe036cf97f6}{what}}()\ <<\textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{00045\ \ \ \ \}}
+\DoxyCodeLine{00046\ \ \ \ \textcolor{keyword}{auto}\ stop\ \ =\ high\_resolution\_clock::now();}
+\DoxyCodeLine{00047\ \ \ \ \textcolor{keyword}{auto}\ duration\ =\ duration\_cast<microseconds>(stop\ -\/\ start);}
+\DoxyCodeLine{00048\ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}TIME\ :\ "{}}\ <<\ duration.count()\ <<\ \textcolor{stringliteral}{"{}us\(\backslash\)n"{}};}
+\DoxyCodeLine{00049\ }
+\DoxyCodeLine{00050\ \textcolor{preprocessor}{\#if\ 0}}
+\DoxyCodeLine{00051\ \ \ \ \textcolor{keywordflow}{catch}\ (\ wasm\_parse\_exception\&\ ex\ )\ \{}
+\DoxyCodeLine{00052\ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\ wasm\_interpreter\_exception\&\ ex\ )\ \{}
+\DoxyCodeLine{00053\ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\ wasm\_section\_length\_exception\&\ ex\ )\ \{}
+\DoxyCodeLine{00054\ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\ wasm\_bad\_alloc\&\ ex\ )\ \{}
+\DoxyCodeLine{00055\ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\ wasm\_double\_free\&\ ex\ )\ \{}
+\DoxyCodeLine{00056\ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\ wasm\_vector\_oob\_exception\&\ ex\ )\ \{}
+\DoxyCodeLine{00057\ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\ wasm\_memory\_exception\&\ ex\ )\ \{}
+\DoxyCodeLine{00058\ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\ wasm\_unsupported\_import\_exception\&\ ex\ )\ \{}
+\DoxyCodeLine{00059\ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\ wasm\_illegal\_opcode\_exception\&\ ex\ )\ \{}
+\DoxyCodeLine{00060\ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\ guarded\_ptr\_exception\&\ ex\ )\ \{}
+\DoxyCodeLine{00061\ \ \ \ \}}
+\DoxyCodeLine{00062\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00063\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=252pt]{fuzz__parser_8cpp_ac0f2228420376f4db7e1274f2b41667c_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{fuzz__parser_8cpp_ab6d9537f94c320b20d681495d7f93099}\index{fuzz\_parser.cpp@{fuzz\_parser.cpp}!read\_wasm@{read\_wasm}}
+\index{read\_wasm@{read\_wasm}!fuzz\_parser.cpp@{fuzz\_parser.cpp}}
+\doxysubsubsection{\texorpdfstring{read\_wasm()}{read\_wasm()}}
+{\footnotesize\ttfamily \label{fuzz__parser_8cpp_ab6d9537f94c320b20d681495d7f93099} 
+std\+::vector$<$ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} $>$ read\+\_\+wasm (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{fname}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{fuzz__parser_8cpp_source_l00011}{11}} of file \mbox{\hyperlink{fuzz__parser_8cpp_source}{fuzz\+\_\+parser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00011\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00012\ \ \ \ std::ifstream\ wasm\_file(fname,\ std::ios::binary);}
+\DoxyCodeLine{00013\ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ wasm\_file.is\_open(),\ \textcolor{stringliteral}{"{}wasm\ file\ cannot\ be\ found"{}}\ );}
+\DoxyCodeLine{00014\ \ \ \ wasm\_file.seekg(0,\ std::ios::end);}
+\DoxyCodeLine{00015\ \ \ \ std::vector<uint8\_t>\ wasm;\ }
+\DoxyCodeLine{00016\ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ =\ wasm\_file.tellg();}
+\DoxyCodeLine{00017\ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ >=\ 0,\ \textcolor{stringliteral}{"{}wasm\ file\ length\ is\ -\/1"{}}\ );}
+\DoxyCodeLine{00018\ \ \ \ wasm.resize(\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}});}
+\DoxyCodeLine{00019\ \ \ \ wasm\_file.seekg(0,\ std::ios::beg);}
+\DoxyCodeLine{00020\ \ \ \ wasm\_file.read((\textcolor{keywordtype}{char}*)wasm.data(),\ wasm.size());}
+\DoxyCodeLine{00021\ \ \ \ wasm\_file.close();}
+\DoxyCodeLine{00022\ \ \ \ \textcolor{keywordflow}{return}\ wasm;}
+\DoxyCodeLine{00023\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=219pt]{fuzz__parser_8cpp_ab6d9537f94c320b20d681495d7f93099_icgraph}
+\end{center}
+\end{figure}

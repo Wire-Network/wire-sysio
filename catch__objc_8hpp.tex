@@ -1,0 +1,129 @@
+\doxysection{libraries/sys-\/vm/external/\+Catch2/include/internal/catch\+\_\+objc.hpp File Reference}
+\hypertarget{catch__objc_8hpp}{}\label{catch__objc_8hpp}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_objc.hpp@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_objc.hpp}}
+{\ttfamily \#include "{}catch\+\_\+objc\+\_\+arc.\+hpp"{}}\newline
+{\ttfamily import $<$objc/runtime.\+h$>$}\newline
+{\ttfamily \#include $<$string$>$}\newline
+{\ttfamily \#include "{}catch\+\_\+test\+\_\+case\+\_\+info.\+h"{}}\newline
+{\ttfamily \#include "{}catch\+\_\+string\+\_\+manip.\+h"{}}\newline
+{\ttfamily \#include "{}catch\+\_\+tostring.\+h"{}}\newline
+Include dependency graph for catch\+\_\+objc.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{catch__objc_8hpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+protocol \mbox{\hyperlink{protocol_oc_fixture-p}{$<$\+Oc\+Fixture$>$}}
+\item 
+class \mbox{\hyperlink{class_catch_1_1_oc_method}{Catch\+::\+Oc\+Method}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespace_catch}{Catch}}
+\item 
+namespace \mbox{\hyperlink{namespace_catch_1_1_detail}{Catch\+::\+Detail}}
+\item 
+namespace \mbox{\hyperlink{namespace_catch_1_1_matchers}{Catch\+::\+Matchers}}
+\item 
+namespace \mbox{\hyperlink{namespace_catch_1_1_matchers_1_1_impl}{Catch\+::\+Matchers\+::\+Impl}}
+\item 
+namespace \mbox{\hyperlink{namespace_catch_1_1_matchers_1_1_impl_1_1_n_s_string_matchers}{Catch\+::\+Matchers\+::\+Impl\+::\+NSString\+Matchers}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{catch__objc_8hpp_a66054ddaea7161ec549b4467760b5d84}{OC\+\_\+\+MAKE\+\_\+\+UNIQUE\+\_\+\+NAME}}(root,  unique\+Suffix)
+\item 
+\#define \mbox{\hyperlink{catch__objc_8hpp_a991015bae17ec5c7109f9e9a9ad6189e}{OC\+\_\+\+TEST\+\_\+\+CASE2}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  desc,  unique\+Suffix)
+\item 
+\#define \mbox{\hyperlink{catch__objc_8hpp_a648ab6307626eb2d0afc76440a699c3f}{OC\+\_\+\+TEST\+\_\+\+CASE}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  desc)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+std\+::string \mbox{\hyperlink{namespace_catch_1_1_detail_a76e0b8b7e795c2c04e0affe4102bafa0}{Catch\+::\+Detail\+::get\+Annotation}} (Class cls, std\+::string const \&annotation\+Name, std\+::string const \&test\+Case\+Name)
+\item 
+std\+::size\+\_\+t \mbox{\hyperlink{namespace_catch_ad0c3dd7b4c55aeb3a31a7a8b13c17cfb}{Catch\+::register\+Test\+Methods}} ()
+\item 
+Impl\+::\+NSString\+Matchers\+::\+Equals \mbox{\hyperlink{namespace_catch_1_1_matchers_a0b82dc8519a4f672f5786c3bfe68162a}{Catch\+::\+Matchers\+::\+Equals}} (NSString \texorpdfstring{$\ast$}{*}substr)
+\item 
+Impl\+::\+NSString\+Matchers\+::\+Contains \mbox{\hyperlink{namespace_catch_1_1_matchers_a458c4db31800afc7873ac3311b0e37a0}{Catch\+::\+Matchers\+::\+Contains}} (NSString \texorpdfstring{$\ast$}{*}substr)
+\item 
+Impl\+::\+NSString\+Matchers\+::\+Starts\+With \mbox{\hyperlink{namespace_catch_1_1_matchers_ad222691d2ef1a4f130f749e2c3eff4a8}{Catch\+::\+Matchers\+::\+Starts\+With}} (NSString \texorpdfstring{$\ast$}{*}substr)
+\item 
+Impl\+::\+NSString\+Matchers\+::\+Ends\+With \mbox{\hyperlink{namespace_catch_1_1_matchers_af89abc55e7425b46b7b47ac5cf839c28}{Catch\+::\+Matchers\+::\+Ends\+With}} (NSString \texorpdfstring{$\ast$}{*}substr)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{catch__objc_8hpp_a66054ddaea7161ec549b4467760b5d84}\index{catch\_objc.hpp@{catch\_objc.hpp}!OC\_MAKE\_UNIQUE\_NAME@{OC\_MAKE\_UNIQUE\_NAME}}
+\index{OC\_MAKE\_UNIQUE\_NAME@{OC\_MAKE\_UNIQUE\_NAME}!catch\_objc.hpp@{catch\_objc.hpp}}
+\doxysubsubsection{\texorpdfstring{OC\_MAKE\_UNIQUE\_NAME}{OC\_MAKE\_UNIQUE\_NAME}}
+{\footnotesize\ttfamily \label{catch__objc_8hpp_a66054ddaea7161ec549b4467760b5d84} 
+\#define OC\+\_\+\+MAKE\+\_\+\+UNIQUE\+\_\+\+NAME(\begin{DoxyParamCaption}\item[{}]{root}{, }\item[{}]{unique\+Suffix}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{root\#\#uniqueSuffix}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__objc_8hpp_source_l00201}{201}} of file \mbox{\hyperlink{catch__objc_8hpp_source}{catch\+\_\+objc.\+hpp}}.
+
+\Hypertarget{catch__objc_8hpp_a648ab6307626eb2d0afc76440a699c3f}\index{catch\_objc.hpp@{catch\_objc.hpp}!OC\_TEST\_CASE@{OC\_TEST\_CASE}}
+\index{OC\_TEST\_CASE@{OC\_TEST\_CASE}!catch\_objc.hpp@{catch\_objc.hpp}}
+\doxysubsubsection{\texorpdfstring{OC\_TEST\_CASE}{OC\_TEST\_CASE}}
+{\footnotesize\ttfamily \label{catch__objc_8hpp_a648ab6307626eb2d0afc76440a699c3f} 
+\#define OC\+\_\+\+TEST\+\_\+\+CASE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{desc}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__objc_8hpp_a991015bae17ec5c7109f9e9a9ad6189e}{OC\_TEST\_CASE2}}(\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ desc,\ \_\_LINE\_\_\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__objc_8hpp_source_l00213}{213}} of file \mbox{\hyperlink{catch__objc_8hpp_source}{catch\+\_\+objc.\+hpp}}.
+
+\Hypertarget{catch__objc_8hpp_a991015bae17ec5c7109f9e9a9ad6189e}\index{catch\_objc.hpp@{catch\_objc.hpp}!OC\_TEST\_CASE2@{OC\_TEST\_CASE2}}
+\index{OC\_TEST\_CASE2@{OC\_TEST\_CASE2}!catch\_objc.hpp@{catch\_objc.hpp}}
+\doxysubsubsection{\texorpdfstring{OC\_TEST\_CASE2}{OC\_TEST\_CASE2}}
+{\footnotesize\ttfamily \label{catch__objc_8hpp_a991015bae17ec5c7109f9e9a9ad6189e} 
+\#define OC\+\_\+\+TEST\+\_\+\+CASE2(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{desc}{, }\item[{}]{unique\+Suffix}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{+(NSString*)\ \mbox{\hyperlink{catch__objc_8hpp_a66054ddaea7161ec549b4467760b5d84}{OC\_MAKE\_UNIQUE\_NAME}}(\ Catch\_Name\_test\_,\ uniqueSuffix\ )\ \(\backslash\)}
+\DoxyCodeLine{\{\ \(\backslash\)}
+\DoxyCodeLine{\textcolor{keywordflow}{return}\ @\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}};\ \(\backslash\)}
+\DoxyCodeLine{\}\ \(\backslash\)}
+\DoxyCodeLine{+(NSString*)\ \mbox{\hyperlink{catch__objc_8hpp_a66054ddaea7161ec549b4467760b5d84}{OC\_MAKE\_UNIQUE\_NAME}}(\ Catch\_Description\_test\_,\ uniqueSuffix\ )\ \(\backslash\)}
+\DoxyCodeLine{\{\ \(\backslash\)}
+\DoxyCodeLine{\textcolor{keywordflow}{return}\ @\ desc;\ \(\backslash\)}
+\DoxyCodeLine{\}\ \(\backslash\)}
+\DoxyCodeLine{-\/(void)\ \mbox{\hyperlink{catch__objc_8hpp_a66054ddaea7161ec549b4467760b5d84}{OC\_MAKE\_UNIQUE\_NAME}}(\ Catch\_TestCase\_test\_,\ uniqueSuffix\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__objc_8hpp_source_l00202}{202}} of file \mbox{\hyperlink{catch__objc_8hpp_source}{catch\+\_\+objc.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00202\ \textcolor{preprocessor}{\#define\ OC\_TEST\_CASE2(\ name,\ desc,\ uniqueSuffix\ )\ \(\backslash\)}}
+\DoxyCodeLine{00203\ \textcolor{preprocessor}{+(NSString*)\ OC\_MAKE\_UNIQUE\_NAME(\ Catch\_Name\_test\_,\ uniqueSuffix\ )\ \(\backslash\)}}
+\DoxyCodeLine{00204\ \textcolor{preprocessor}{\{\ \(\backslash\)}}
+\DoxyCodeLine{00205\ \textcolor{preprocessor}{return\ @\ name;\ \(\backslash\)}}
+\DoxyCodeLine{00206\ \textcolor{preprocessor}{\}\ \(\backslash\)}}
+\DoxyCodeLine{00207\ \textcolor{preprocessor}{+(NSString*)\ OC\_MAKE\_UNIQUE\_NAME(\ Catch\_Description\_test\_,\ uniqueSuffix\ )\ \(\backslash\)}}
+\DoxyCodeLine{00208\ \textcolor{preprocessor}{\{\ \(\backslash\)}}
+\DoxyCodeLine{00209\ \textcolor{preprocessor}{return\ @\ desc;\ \(\backslash\)}}
+\DoxyCodeLine{00210\ \textcolor{preprocessor}{\}\ \(\backslash\)}}
+\DoxyCodeLine{00211\ \textcolor{preprocessor}{-\/(void)\ OC\_MAKE\_UNIQUE\_NAME(\ Catch\_TestCase\_test\_,\ uniqueSuffix\ )}}
+
+\end{DoxyCode}

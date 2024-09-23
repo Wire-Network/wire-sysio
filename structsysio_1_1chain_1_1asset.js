@@ -1,0 +1,27 @@
+var structsysio_1_1chain_1_1asset =
+[
+    [ "asset", "structsysio_1_1chain_1_1asset.html#ae1bdaa1519f4c6a01ae1e4ebea043818", null ],
+    [ "decimals", "structsysio_1_1chain_1_1asset.html#a58fe81c1851c659b8421de02fbf1d188", null ],
+    [ "get_amount", "structsysio_1_1chain_1_1asset.html#acc87ca658e2775603c29c56536b5bacb", null ],
+    [ "get_symbol", "structsysio_1_1chain_1_1asset.html#a807aa81522392e1869c5180289b3a41d", null ],
+    [ "is_amount_within_range", "structsysio_1_1chain_1_1asset.html#a0fb34915bbb8b149ec3e6f9ec19234ef", null ],
+    [ "is_valid", "structsysio_1_1chain_1_1asset.html#a058e4453f13add9098ecd2f2a9332181", null ],
+    [ "operator+=", "structsysio_1_1chain_1_1asset.html#a72b7f3c81f37740a5898e90f2eb21f8f", null ],
+    [ "operator-", "structsysio_1_1chain_1_1asset.html#a5983ddd53f635e31e2b383ba5b65b6bb", null ],
+    [ "operator-=", "structsysio_1_1chain_1_1asset.html#a1f26aea6d84328a7ab2a94d9657acf0e", null ],
+    [ "precision", "structsysio_1_1chain_1_1asset.html#a4cee270d5cd1e6a34ddf22beff6f902b", null ],
+    [ "reflector_init", "structsysio_1_1chain_1_1asset.html#aca6134beae07f2b5899835f9bfa6c05a", null ],
+    [ "symbol_name", "structsysio_1_1chain_1_1asset.html#a1808300b4460da11bebd5dbf7717e1e1", null ],
+    [ "to_real", "structsysio_1_1chain_1_1asset.html#ae3c75f5e967d01930cf6fad1683f02df", null ],
+    [ "to_string", "structsysio_1_1chain_1_1asset.html#a48c40a7e8e433a43b7af638d10a8debb", null ],
+    [ "fc::reflector< asset >", "structsysio_1_1chain_1_1asset.html#a76c2e19b162496d23b5a156054d31267", null ],
+    [ "operator!=", "structsysio_1_1chain_1_1asset.html#adb0577649f2f48023169390b0b78e234", null ],
+    [ "operator+", "structsysio_1_1chain_1_1asset.html#a606c72fe4e28b359ba977a6043f56300", null ],
+    [ "operator-", "structsysio_1_1chain_1_1asset.html#a101f03e631cf8c72d8094b91a5524207", null ],
+    [ "operator<", "structsysio_1_1chain_1_1asset.html#a4c5d8977b23e534426a070f568524d02", null ],
+    [ "operator<<", "structsysio_1_1chain_1_1asset.html#ab041046df3ca32f824c838021615dfcb", null ],
+    [ "operator<=", "structsysio_1_1chain_1_1asset.html#a9d586e9b54232432779a91e2d6d8b78e", null ],
+    [ "operator==", "structsysio_1_1chain_1_1asset.html#a8c79ce3d3e367c6345a8c5cb75bab48d", null ],
+    [ "operator>", "structsysio_1_1chain_1_1asset.html#a88d1352c1cf2b7377292377449a4ced8", null ],
+    [ "operator>=", "structsysio_1_1chain_1_1asset.html#aa5ae6feb2c7097211820fc31cf24b5f5", null ]
+];

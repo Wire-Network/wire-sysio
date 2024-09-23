@@ -1,0 +1,148 @@
+\doxysection{sysio\+::wallet Namespace Reference}
+\hypertarget{namespacesysio_1_1wallet}{}\label{namespacesysio_1_1wallet}\index{sysio::wallet@{sysio::wallet}}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1wallet_1_1detail}{detail}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1wallet_1_1plain__keys}{plain\+\_\+keys}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1wallet_1_1se__wallet}{se\+\_\+wallet}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1wallet_1_1soft__wallet}{soft\+\_\+wallet}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1wallet_1_1wallet__api}{wallet\+\_\+api}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1wallet_1_1wallet__data}{wallet\+\_\+data}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1wallet_1_1wallet__manager}{wallet\+\_\+manager}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1wallet_1_1yubihsm__wallet}{yubihsm\+\_\+wallet}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{namespacesysio_1_1wallet_a5d7d84e2ba47b6ecc1f5db0940b8bffa}{transaction\+\_\+handle\+\_\+type}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+std\+::string \mbox{\hyperlink{namespacesysio_1_1wallet_a5cbf37650ae10182ec2ee887e21dadb6}{gen\+\_\+password}} ()
+\item 
+bool \mbox{\hyperlink{namespacesysio_1_1wallet_aec99b3a63cebacb7d46a30201e7e806b}{valid\+\_\+filename}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+constexpr auto \mbox{\hyperlink{namespacesysio_1_1wallet_afc44f526472a47e0ee8e39eca7cde17b}{file\+\_\+ext}} = "{}.wallet"{}
+\item 
+constexpr auto \mbox{\hyperlink{namespacesysio_1_1wallet_a5e9d0eafc0c11de92335950ff518dee9}{password\+\_\+prefix}} = "{}PW"{}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{namespacesysio_1_1wallet_a5d7d84e2ba47b6ecc1f5db0940b8bffa}\index{sysio::wallet@{sysio::wallet}!transaction\_handle\_type@{transaction\_handle\_type}}
+\index{transaction\_handle\_type@{transaction\_handle\_type}!sysio::wallet@{sysio::wallet}}
+\doxysubsubsection{\texorpdfstring{transaction\_handle\_type}{transaction\_handle\_type}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1wallet_a5d7d84e2ba47b6ecc1f5db0940b8bffa} 
+typedef \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{namespacesysio_1_1wallet_a5d7d84e2ba47b6ecc1f5db0940b8bffa}{sysio\+::wallet\+::transaction\+\_\+handle\+\_\+type}}}
+
+
+
+Definition at line \mbox{\hyperlink{wallet_8hpp_source_l00014}{14}} of file \mbox{\hyperlink{wallet_8hpp_source}{wallet.\+hpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacesysio_1_1wallet_a5cbf37650ae10182ec2ee887e21dadb6}\index{sysio::wallet@{sysio::wallet}!gen\_password@{gen\_password}}
+\index{gen\_password@{gen\_password}!sysio::wallet@{sysio::wallet}}
+\doxysubsubsection{\texorpdfstring{gen\_password()}{gen\_password()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1wallet_a5cbf37650ae10182ec2ee887e21dadb6} 
+std\+::string sysio\+::wallet\+::gen\+\_\+password (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{wallet__manager_8cpp_source_l00013}{13}} of file \mbox{\hyperlink{wallet__manager_8cpp_source}{wallet\+\_\+manager.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00013\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00014\ \ \ \ \textcolor{keyword}{auto}\ key\ =\ \mbox{\hyperlink{classfc_1_1crypto_1_1private__key_a54177eb6dda9421bb6e9661478f29807}{private\_key\_type::generate}}();}
+\DoxyCodeLine{00015\ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacesysio_1_1wallet_a5e9d0eafc0c11de92335950ff518dee9}{password\_prefix}}\ +\ key.to\_string();}
+\DoxyCodeLine{00016\ }
+\DoxyCodeLine{00017\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1wallet_a5cbf37650ae10182ec2ee887e21dadb6_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=311pt]{namespacesysio_1_1wallet_a5cbf37650ae10182ec2ee887e21dadb6_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacesysio_1_1wallet_aec99b3a63cebacb7d46a30201e7e806b}\index{sysio::wallet@{sysio::wallet}!valid\_filename@{valid\_filename}}
+\index{valid\_filename@{valid\_filename}!sysio::wallet@{sysio::wallet}}
+\doxysubsubsection{\texorpdfstring{valid\_filename()}{valid\_filename()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1wallet_aec99b3a63cebacb7d46a30201e7e806b} 
+bool sysio\+::wallet\+::valid\+\_\+filename (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&}]{name}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{wallet__manager_8cpp_source_l00019}{19}} of file \mbox{\hyperlink{wallet__manager_8cpp_source}{wallet\+\_\+manager.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00020\ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}.\mbox{\hyperlink{structsysio_1_1chain_1_1name_ac074a360785947747ebec83c2cab287a}{empty}}())\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00021\ \ \ \ \textcolor{keywordflow}{if}\ (std::find\_if(\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}.begin(),\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}.end(),\ !boost::algorithm::is\_alnum()\ \&\&\ !boost::algorithm::is\_any\_of(\textcolor{stringliteral}{"{}.\_-\/"{}}))\ !=\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}.end())\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00022\ \ \ \ \textcolor{keywordflow}{return}\ boost::filesystem::path(\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}).filename().string()\ ==\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}};}
+\DoxyCodeLine{00023\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=312pt]{namespacesysio_1_1wallet_aec99b3a63cebacb7d46a30201e7e806b_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1wallet_aec99b3a63cebacb7d46a30201e7e806b_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{namespacesysio_1_1wallet_afc44f526472a47e0ee8e39eca7cde17b}\index{sysio::wallet@{sysio::wallet}!file\_ext@{file\_ext}}
+\index{file\_ext@{file\_ext}!sysio::wallet@{sysio::wallet}}
+\doxysubsubsection{\texorpdfstring{file\_ext}{file\_ext}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1wallet_afc44f526472a47e0ee8e39eca7cde17b} 
+auto sysio\+::wallet\+::file\+\_\+ext = "{}.wallet"{}\hspace{0.3cm}{\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{wallet__manager_8cpp_source_l00010}{10}} of file \mbox{\hyperlink{wallet__manager_8cpp_source}{wallet\+\_\+manager.\+cpp}}.
+
+\Hypertarget{namespacesysio_1_1wallet_a5e9d0eafc0c11de92335950ff518dee9}\index{sysio::wallet@{sysio::wallet}!password\_prefix@{password\_prefix}}
+\index{password\_prefix@{password\_prefix}!sysio::wallet@{sysio::wallet}}
+\doxysubsubsection{\texorpdfstring{password\_prefix}{password\_prefix}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1wallet_a5e9d0eafc0c11de92335950ff518dee9} 
+auto sysio\+::wallet\+::password\+\_\+prefix = "{}PW"{}\hspace{0.3cm}{\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{wallet__manager_8cpp_source_l00011}{11}} of file \mbox{\hyperlink{wallet__manager_8cpp_source}{wallet\+\_\+manager.\+cpp}}.
+

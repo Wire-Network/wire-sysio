@@ -1,0 +1,30 @@
+<map id="Catch::XmlWriter::scopedElement" name="Catch::XmlWriter::scopedElement">
+<area shape="rect" id="Node000001" title=" " alt="" coords="1147,267,1319,307"/>
+<area shape="rect" id="Node000002" href="$class_catch_1_1_xml_reporter.html#a133d3b5deb923998634d96ff8f234cde" title=" " alt="" coords="960,5,1097,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1217,253,1198,210,1172,159,1139,107,1098,61,1081,49,1084,44,1101,57,1143,104,1177,157,1203,208,1222,251"/>
+<area shape="rect" id="Node000003" href="$class_catch_1_1_xml_reporter.html#a73c809f067d58a7a6748cb13643448e5" title=" " alt="" coords="960,71,1097,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="1209,255,1162,191,1131,157,1098,126,1079,114,1082,110,1101,122,1135,153,1166,188,1213,252"/>
+<area shape="rect" id="Node000004" href="$class_catch_1_1_xml_reporter.html#ab641ec7e115cb94efa02f85e9d91de0f" title=" " alt="" coords="960,136,1097,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="1193,259,1148,225,1098,192,1075,180,1078,175,1101,187,1151,221,1196,255"/>
+<area shape="rect" id="Node000005" href="$class_catch_1_1_xml_reporter.html#ab9ba05f0311cb976fb6f7e5bd2df477c" title=" " alt="" coords="960,201,1097,242"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="1152,264,1094,245,1095,240,1153,259"/>
+<area shape="rect" id="Node000006" href="$class_catch_1_1_xml_reporter.html#a2458c9f342a446f0b3a7480b53c93705" title=" " alt="" coords="960,267,1097,307"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="1132,290,1097,290,1097,284,1132,284"/>
+<area shape="rect" id="Node000007" href="$class_catch_1_1_xml_reporter.html#ab5de0b02d5a30612ae5449360d867672" title=" " alt="" coords="960,332,1097,373"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="1153,315,1095,334,1094,329,1152,310"/>
+<area shape="rect" id="Node000008" href="$class_catch_1_1_junit_reporter.html#a5f357b138781615261724e3271600aaa" title=" " alt="" coords="957,397,1099,438"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="1196,319,1151,353,1101,387,1078,399,1075,394,1098,382,1148,349,1193,315"/>
+<area shape="rect" id="Node000010" href="$class_catch_1_1_junit_reporter.html#a8dcc9668b6f52aeb23cc479b835f681f" title=" " alt="" coords="576,448,719,489"/>
+<area shape="poly" id="edge15_Node000001_Node000010" title=" " alt="" coords="1218,322,1198,355,1172,391,1139,425,1101,452,1053,472,1002,485,950,494,898,497,800,495,719,485,720,480,801,490,898,492,949,488,1001,480,1051,467,1098,447,1136,421,1168,388,1194,352,1213,320"/>
+<area shape="rect" id="Node000012" href="$class_catch_1_1_junit_reporter.html#a13caa24a5b9bcfdb398702fe3146e066" title=" " alt="" coords="196,477,338,518"/>
+<area shape="poly" id="edge14_Node000001_Node000012" title=" " alt="" coords="1223,323,1205,365,1180,413,1145,459,1124,480,1101,497,1066,517,1034,528,1005,535,976,536,915,532,839,528,646,528,480,522,338,509,339,503,481,516,646,523,839,523,915,527,976,531,1004,529,1033,523,1064,512,1098,493,1121,476,1141,456,1175,410,1201,362,1218,321"/>
+<area shape="rect" id="Node000009" href="$class_catch_1_1_junit_reporter.html#ace9a2e3a52dee4591e8dc9ed7b82b5ff" title=" " alt="" coords="767,397,909,438"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="941,420,909,420,909,415,941,415"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="752,443,720,452,718,447,751,438"/>
+<area shape="poly" id="edge10_Node000010_Node000010" title=" " alt="" coords="678,435,667,429,647,427,630,429,619,433,615,439,616,447,611,448,609,438,615,429,628,423,648,421,668,424,681,430"/>
+<area shape="rect" id="Node000011" href="$class_catch_1_1_junit_reporter.html#ae0b70c4ea05bd99d8be6727e27b8dd71" title=" " alt="" coords="386,448,528,489"/>
+<area shape="poly" id="edge11_Node000010_Node000011" title=" " alt="" coords="561,471,529,471,529,466,561,466"/>
+<area shape="poly" id="edge12_Node000011_Node000012" title=" " alt="" coords="371,484,339,489,338,484,370,479"/>
+<area shape="rect" id="Node000013" href="$class_catch_1_1_junit_reporter.html#aa91e71b824c3a7733993821668fe7e6e" title=" " alt="" coords="5,477,148,518"/>
+<area shape="poly" id="edge13_Node000012_Node000013" title=" " alt="" coords="180,500,148,500,148,495,180,495"/>
+</map>

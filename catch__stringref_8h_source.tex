@@ -1,0 +1,131 @@
+\doxysection{catch\+\_\+stringref.\+h}
+\hypertarget{catch__stringref_8h_source}{}\label{catch__stringref_8h_source}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_stringref.h@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_stringref.h}}
+\mbox{\hyperlink{catch__stringref_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00002}00002\ \textcolor{comment}{\ *\ \ Copyright\ 2016\ Two\ Blue\ Cubes\ Ltd.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00004}00004\ \textcolor{comment}{\ *\ \ Distributed\ under\ the\ Boost\ Software\ License,\ Version\ 1.0.\ (See\ accompanying}}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00005}00005\ \textcolor{comment}{\ *\ \ file\ LICENSE\_1\_0.txt\ or\ copy\ at\ http://www.boost.org/LICENSE\_1\_0.txt)}}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00006}00006\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00007}00007\ \textcolor{preprocessor}{\#ifndef\ CATCH\_STRINGREF\_H\_INCLUDED}}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00008}00008\ \textcolor{preprocessor}{\#define\ CATCH\_STRINGREF\_H\_INCLUDED}}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <cstddef>}}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00011}00011\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00012}00012\ \textcolor{preprocessor}{\#include\ <iosfwd>}}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00014}00014\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00023}00023\ \ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{document_8h_aa6b9fd9f6aa49405a574c362ba9af6b5}{StringRef}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00024}00024\ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00025}\mbox{\hyperlink{class_catch_1_1_string_ref_af692c52f6846750283341163b0c7f5e2}{00025}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{class_catch_1_1_string_ref_af692c52f6846750283341163b0c7f5e2}{size\_type}}\ =\ std::size\_t;}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00027}00027\ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00028}\mbox{\hyperlink{class_catch_1_1_string_ref_a923324f930c2eff7664ee1c6d3a1c483}{00028}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{friend}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_catch_1_1_string_ref_test_access}{StringRefTestAccess}};}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00030}00030\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ \textcolor{keyword}{const}*\ m\_start;}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00031}00031\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_string_ref_af692c52f6846750283341163b0c7f5e2}{size\_type}}\ m\_size;}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00033}00033\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}*\ m\_data\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00035}00035\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ takeOwnership();}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00037}00037\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{char}\ \textcolor{keyword}{const}*\ \textcolor{keyword}{const}\ s\_empty\ =\ \textcolor{stringliteral}{"{}"{}};}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00039}00039\ \ \ \ \ \textcolor{keyword}{public}:\ \textcolor{comment}{//\ construction/\ assignment}}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00040}\mbox{\hyperlink{class_catch_1_1_string_ref_a94319c75df6542327c93a312c6a80754}{00040}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_string_ref_a94319c75df6542327c93a312c6a80754}{StringRef}}()\ noexcept}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00041}00041\ \ \ \ \ \ \ \ \ :\ \ \ \mbox{\hyperlink{class_catch_1_1_string_ref}{StringRef}}(\ s\_empty,\ 0\ )}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00042}00042\ \ \ \ \ \ \ \ \ \{\}}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00044}\mbox{\hyperlink{class_catch_1_1_string_ref_a2f287267c3a988b288bfd910667c1cfc}{00044}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_string_ref_a2f287267c3a988b288bfd910667c1cfc}{StringRef}}(\ \mbox{\hyperlink{class_catch_1_1_string_ref}{StringRef}}\ \textcolor{keyword}{const}\&\ other\ )\ noexcept}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00045}00045\ \ \ \ \ \ \ \ \ :\ \ \ m\_start(\ other.m\_start\ ),}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00046}00046\ \ \ \ \ \ \ \ \ \ \ \ \ m\_size(\ other.m\_size\ )}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00047}00047\ \ \ \ \ \ \ \ \ \{\}}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00049}\mbox{\hyperlink{class_catch_1_1_string_ref_a407d5737b94e5a374add5c2794589733}{00049}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_string_ref_a407d5737b94e5a374add5c2794589733}{StringRef}}(\ \mbox{\hyperlink{class_catch_1_1_string_ref}{StringRef}}\&\&\ other\ )\ noexcept}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00050}00050\ \ \ \ \ \ \ \ \ :\ \ \ m\_start(\ other.m\_start\ ),}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00051}00051\ \ \ \ \ \ \ \ \ \ \ \ \ m\_size(\ other.m\_size\ ),}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \ \ \ m\_data(\ other.m\_data\ )}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00053}00053\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \ \ \ other.m\_data\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00055}00055\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00057}00057\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_string_ref_a94319c75df6542327c93a312c6a80754}{StringRef}}(\ \textcolor{keywordtype}{char}\ \textcolor{keyword}{const}*\ rawChars\ )\ \textcolor{keyword}{noexcept};}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00059}\mbox{\hyperlink{class_catch_1_1_string_ref_a320bf235274ebb90dd6af80485af2797}{00059}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_string_ref_a320bf235274ebb90dd6af80485af2797}{StringRef}}(\ \textcolor{keywordtype}{char}\ \textcolor{keyword}{const}*\ rawChars,\ \mbox{\hyperlink{class_catch_1_1_string_ref_af692c52f6846750283341163b0c7f5e2}{size\_type}}\ \mbox{\hyperlink{class_catch_1_1_string_ref_ae084d72cb2952cee61a63ef36611d0ad}{size}}\ )\ noexcept}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00060}00060\ \ \ \ \ \ \ \ \ :\ \ \ m\_start(\ rawChars\ ),}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00061}00061\ \ \ \ \ \ \ \ \ \ \ \ \ m\_size(\ \mbox{\hyperlink{class_catch_1_1_string_ref_ae084d72cb2952cee61a63ef36611d0ad}{size}}\ )}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00062}00062\ \ \ \ \ \ \ \ \ \{\}}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00064}\mbox{\hyperlink{class_catch_1_1_string_ref_a7fe41469048f906e9a847798cd335f23}{00064}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_string_ref_a7fe41469048f906e9a847798cd335f23}{StringRef}}(\ std::string\ \textcolor{keyword}{const}\&\ stdString\ )\ noexcept}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00065}00065\ \ \ \ \ \ \ \ \ :\ \ \ m\_start(\ stdString.c\_str()\ ),}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00066}00066\ \ \ \ \ \ \ \ \ \ \ \ \ m\_size(\ stdString.size()\ )}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00067}00067\ \ \ \ \ \ \ \ \ \{\}}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00069}\mbox{\hyperlink{class_catch_1_1_string_ref_a387795c6d883d7281befe5e82920faf8}{00069}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_string_ref_a387795c6d883d7281befe5e82920faf8}{\string~StringRef}}()\ noexcept\ \{}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{delete}[]\ m\_data;}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00071}00071\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00073}\mbox{\hyperlink{class_catch_1_1_string_ref_a14d5a1983e33c51c6b5fd33bffbebabb}{00073}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{class_catch_1_1_string_ref_a14d5a1983e33c51c6b5fd33bffbebabb}{operator\ =\ }}(\ \mbox{\hyperlink{class_catch_1_1_string_ref}{StringRef}}\ \textcolor{keyword}{const}\ \&other\ )\ \textcolor{keyword}{noexcept}\ -\/>\ \mbox{\hyperlink{class_catch_1_1_string_ref}{StringRef}}\&\ \{}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00074}00074\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{delete}[]\ m\_data;}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00075}00075\ \ \ \ \ \ \ \ \ \ \ \ \ m\_data\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \ \ \ m\_start\ =\ other.m\_start;}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ m\_size\ =\ other.m\_size;}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00078}00078\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00079}00079\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00080}00080\ }
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00081}00081\ \ \ \ \ \ \ \ \ \textcolor{keyword}{operator}\ std::string()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00083}00083\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_string_ref_a8a843e39ad3560d10a80524ed926ed63}{swap}}(\ \mbox{\hyperlink{class_catch_1_1_string_ref}{StringRef}}\&\ other\ )\ \textcolor{keyword}{noexcept};}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00084}00084\ }
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00085}00085\ \ \ \ \ \textcolor{keyword}{public}:\ \textcolor{comment}{//\ operators}}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00086}00086\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{class_catch_1_1_string_ref_aabb30149ab961187e4b3ff3394bf6e73}{operator\ ==\ }}(\ \mbox{\hyperlink{class_catch_1_1_string_ref}{StringRef}}\ \textcolor{keyword}{const}\&\ other\ )\ \textcolor{keyword}{const}\ \textcolor{keyword}{noexcept}\ -\/>\ bool;}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00087}00087\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{class_catch_1_1_string_ref_aaa6c8bf61c4628034c19763d1c8ad215}{operator\ !=\ }}(\ \mbox{\hyperlink{class_catch_1_1_string_ref}{StringRef}}\ \textcolor{keyword}{const}\&\ other\ )\ \textcolor{keyword}{const}\ \textcolor{keyword}{noexcept}\ -\/>\ bool;}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00088}00088\ }
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00089}00089\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{class_catch_1_1_string_ref_a4ba2e01eec1f0f56c257d213c796ab3b}{operator[]\ }}(\ \mbox{\hyperlink{class_catch_1_1_string_ref_af692c52f6846750283341163b0c7f5e2}{size\_type}}\ index\ )\ \textcolor{keyword}{const}\ \textcolor{keyword}{noexcept}\ -\/>\ char;}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00090}00090\ }
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00091}00091\ \ \ \ \ \textcolor{keyword}{public}:\ \textcolor{comment}{//\ named\ queries}}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00092}\mbox{\hyperlink{class_catch_1_1_string_ref_ac6b68b9dc1e1dec69e884e3f7be581bd}{00092}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{class_catch_1_1_string_ref_ac6b68b9dc1e1dec69e884e3f7be581bd}{empty}}()\ const\ noexcept\ -\/>\ \textcolor{keywordtype}{bool}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00093}00093\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_size\ ==\ 0;}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00094}00094\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00095}\mbox{\hyperlink{class_catch_1_1_string_ref_ae084d72cb2952cee61a63ef36611d0ad}{00095}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{class_catch_1_1_string_ref_ae084d72cb2952cee61a63ef36611d0ad}{size}}()\ const\ noexcept\ -\/>\ \mbox{\hyperlink{class_catch_1_1_string_ref_af692c52f6846750283341163b0c7f5e2}{size\_type}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00096}00096\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_size;}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00097}00097\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00098}00098\ }
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00099}00099\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{class_catch_1_1_string_ref_a6a6cac7430e626ffdd7550a081e8168f}{numberOfCharacters}}()\ const\ noexcept\ -\/>\ \mbox{\hyperlink{class_catch_1_1_string_ref_af692c52f6846750283341163b0c7f5e2}{size\_type}};}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00100}00100\ \ \ \ \ \ \ \ \ auto\ \mbox{\hyperlink{class_catch_1_1_string_ref_a1669cb2765e820ca258159676cbd82a5}{c\_str}}()\ const\ -\/>\ \textcolor{keywordtype}{char}\ const*;}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00101}00101\ }
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00102}00102\ \ \ \ \ public:\ \textcolor{comment}{//\ substrings\ and\ searches}}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00103}00103\ \ \ \ \ \ \ \ \ auto\ \mbox{\hyperlink{class_catch_1_1_string_ref_a248568b467cf6599320903ae613c8eee}{substr}}(\ \mbox{\hyperlink{class_catch_1_1_string_ref_af692c52f6846750283341163b0c7f5e2}{size\_type}}\ start,\ \mbox{\hyperlink{class_catch_1_1_string_ref_af692c52f6846750283341163b0c7f5e2}{size\_type}}\ \mbox{\hyperlink{class_catch_1_1_string_ref_ae084d72cb2952cee61a63ef36611d0ad}{size}}\ )\ const\ noexcept\ -\/>\ \mbox{\hyperlink{class_catch_1_1_string_ref}{StringRef}};}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00104}00104\ }
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00105}00105\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Returns\ the\ current\ start\ pointer.}}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00106}00106\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Note\ that\ the\ pointer\ can\ change\ when\ if\ the\ StringRef\ is\ a\ substring}}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00107}00107\ \ \ \ \ \ \ \ \ auto\ \mbox{\hyperlink{class_catch_1_1_string_ref_aee240387305ca8b249169d79f36e7002}{currentData}}()\ const\ noexcept\ -\/>\ \textcolor{keywordtype}{char}\ const*;}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00108}00108\ }
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00109}00109\ \ \ \ \ private:\ \textcolor{comment}{//\ ownership\ queries\ -\/\ may\ not\ be\ consistent\ between\ calls}}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00110}00110\ \ \ \ \ \ \ \ \ auto\ isOwned()\ const\ noexcept\ -\/>\ \textcolor{keywordtype}{bool};}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00111}00111\ \ \ \ \ \ \ \ \ auto\ isSubstring()\ const\ noexcept\ -\/>\ \textcolor{keywordtype}{bool};}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00112}00112\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00113}00113\ }
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00114}00114\ \ \ \ \ auto\ operator\ +\ (\ \mbox{\hyperlink{class_catch_1_1_string_ref}{StringRef}}\ const\&\ lhs,\ \mbox{\hyperlink{class_catch_1_1_string_ref}{StringRef}}\ const\&\ rhs\ )\ -\/>\ \mbox{\hyperlink{namespacestd}{std}}::\textcolor{keywordtype}{string};}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00115}00115\ \ \ \ \ auto\ operator\ +\ (\ \mbox{\hyperlink{class_catch_1_1_string_ref}{StringRef}}\ const\&\ lhs,\ \textcolor{keywordtype}{char}\ const*\ rhs\ )\ -\/>\ \mbox{\hyperlink{namespacestd}{std}}::\textcolor{keywordtype}{string};}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00116}00116\ \ \ \ \ auto\ operator\ +\ (\ \textcolor{keywordtype}{char}\ const*\ lhs,\ \mbox{\hyperlink{class_catch_1_1_string_ref}{StringRef}}\ const\&\ rhs\ )\ -\/>\ \mbox{\hyperlink{namespacestd}{std}}::\textcolor{keywordtype}{string};}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00117}00117\ }
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00118}00118\ \ \ \ \ auto\ operator\ +=\ (\ \mbox{\hyperlink{namespacestd}{std}}::\textcolor{keywordtype}{string}\&\ lhs,\ \mbox{\hyperlink{class_catch_1_1_string_ref}{StringRef}}\ const\&\ sr\ )\ -\/>\ \mbox{\hyperlink{namespacestd}{std}}::\textcolor{keywordtype}{string}\&;}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00119}00119\ \ \ \ \ auto\ operator\ <<\ (\ \mbox{\hyperlink{namespacestd}{std}}::ostream\&\ os,\ \mbox{\hyperlink{class_catch_1_1_string_ref}{StringRef}}\ const\&\ sr\ )\ -\/>\ \mbox{\hyperlink{namespacestd}{std}}::ostream\&;}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00120}00120\ }
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00121}00121\ }
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00122}\mbox{\hyperlink{namespace_catch_a56dcfbb436fa40d778e784bf862e78a6}{00122}}\ \ \ \ \ inline\ auto\ operator\ "{}"{}\ \_sr(\ \textcolor{keywordtype}{char}\ const*\ rawChars,\ \mbox{\hyperlink{namespacestd}{std}}::\textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{class_catch_1_1_string_ref_ae084d72cb2952cee61a63ef36611d0ad}{size}}\ )\ noexcept\ -\/>\ \mbox{\hyperlink{class_catch_1_1_string_ref}{StringRef}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00123}00123\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_catch_1_1_string_ref_a94319c75df6542327c93a312c6a80754}{StringRef}}(\ rawChars,\ \mbox{\hyperlink{class_catch_1_1_string_ref_ae084d72cb2952cee61a63ef36611d0ad}{size}}\ );}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00124}00124\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00125}00125\ }
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00126}00126\ \}\ \textcolor{comment}{//\ namespace\ Catch}}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00127}00127\ }
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00128}\mbox{\hyperlink{catch__stringref_8h_a741882c3457a7d151a0e81fd3f011b31}{00128}}\ \textcolor{keyword}{inline}\ \textcolor{keyword}{auto}\ \textcolor{keyword}{operator}\ \textcolor{stringliteral}{"{}"{}}\ \_catch\_sr(\ \textcolor{keywordtype}{char}\ \textcolor{keyword}{const}*\ rawChars,\ std::size\_t\ size\ )\ \textcolor{keyword}{noexcept}\ -\/>\ \mbox{\hyperlink{class_catch_1_1_string_ref}{Catch::StringRef}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00129}00129\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_catch_1_1_string_ref}{Catch::StringRef}}(\ rawChars,\ size\ );}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00130}00130\ \}}
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00131}00131\ }
+\DoxyCodeLine{\Hypertarget{catch__stringref_8h_source_l00132}00132\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ CATCH\_STRINGREF\_H\_INCLUDED}}
+
+\end{DoxyCode}

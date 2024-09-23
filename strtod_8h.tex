@@ -1,0 +1,46 @@
+\doxysection{libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/internal/strtod.h File Reference}
+\hypertarget{strtod_8h}{}\label{strtod_8h}\index{libraries/fc/include/fc/crypto/webauthn\_json/include/rapidjson/internal/strtod.h@{libraries/fc/include/fc/crypto/webauthn\_json/include/rapidjson/internal/strtod.h}}
+{\ttfamily \#include "{}ieee754.\+h"{}}\newline
+{\ttfamily \#include "{}biginteger.\+h"{}}\newline
+{\ttfamily \#include "{}diyfp.\+h"{}}\newline
+{\ttfamily \#include "{}pow10.\+h"{}}\newline
+{\ttfamily \#include $<$climits$>$}\newline
+{\ttfamily \#include $<$limits$>$}\newline
+Include dependency graph for strtod.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{strtod_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{strtod_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespaceinternal}{internal}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+double \mbox{\hyperlink{namespaceinternal_aa1bb51d788788eb5390a16462b40d98d}{internal\+::\+Fast\+Path}} (double significand, int exp)
+\item 
+double \mbox{\hyperlink{namespaceinternal_a9e5fac4695310f09892fe52b1d24ab19}{internal\+::\+Strtod\+Normal\+Precision}} (double d, int \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{namespaceinternal_ace304441347098a4953ea99f50805da9}{internal\+::\+Min3}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} b, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} c)
+\item 
+int \mbox{\hyperlink{namespaceinternal_a190f9c286df64526a7e3550528ed6b02}{internal\+::\+Check\+Within\+Half\+ULP}} (double b, const \mbox{\hyperlink{classinternal_1_1_big_integer}{Big\+Integer}} \&d, int d\+Exp)
+\item 
+bool \mbox{\hyperlink{namespaceinternal_a598b2d2f85130bff3c3942e4750b9185}{internal\+::\+Strtod\+Fast}} (double d, int \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}, double \texorpdfstring{$\ast$}{*}result)
+\item 
+bool \mbox{\hyperlink{namespaceinternal_a1c2f6cd37a0445a85495724e407cd8c0}{internal\+::\+Strtod\+Diy\+Fp}} (const char \texorpdfstring{$\ast$}{*}decimals, int d\+Len, int d\+Exp, double \texorpdfstring{$\ast$}{*}result)
+\item 
+double \mbox{\hyperlink{namespaceinternal_a1880ef34e46ff75764f9e86987c52dd7}{internal\+::\+Strtod\+Big\+Integer}} (double approx, const char \texorpdfstring{$\ast$}{*}decimals, int d\+Len, int d\+Exp)
+\item 
+double \mbox{\hyperlink{namespaceinternal_a899ff5a0c5f9b203d720bb6f5631ed10}{internal\+::\+Strtod\+Full\+Precision}} (double d, int \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}, const char \texorpdfstring{$\ast$}{*}decimals, size\+\_\+t length, size\+\_\+t decimal\+Position, int exp)
+\end{DoxyCompactItemize}

@@ -1,0 +1,10 @@
+<map id="fc::tracked_storage::write" name="fc::tracked_storage::write">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,47,139,88"/>
+<area shape="rect" id="Node000002" href="$namespacefc_1_1raw.html#a3a18d8161aa5b4f4f02b6fcfdff5e5d1" title=" " alt="" coords="188,29,286,55"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="139,55,172,49,173,55,140,60"/>
+<area shape="rect" id="Node000003" href="$classfc_1_1cfile.html#af6ad44b8179f355db75a9d01de931235" title=" " alt="" coords="187,79,287,104"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="140,75,171,79,171,85,139,80"/>
+<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="209,30,203,21,207,11,218,5,237,3,257,5,268,12,265,16,255,10,237,8,220,10,211,15,209,20,213,28"/>
+<area shape="rect" id="Node000004" href="$classfc_1_1path.html#ab1eae2062df4ea01435348ec52fb3784" title=" " alt="" coords="335,79,489,104"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="288,89,320,89,320,94,288,94"/>
+</map>

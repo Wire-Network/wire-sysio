@@ -1,0 +1,117 @@
+\doxysection{testing\+::Test\+Property Class Reference}
+\hypertarget{classtesting_1_1_test_property}{}\label{classtesting_1_1_test_property}\index{testing::TestProperty@{testing::TestProperty}}
+
+
+{\ttfamily \#include $<$gtest.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1_test_property_a25a0ccf1c75a92af46a48d3c2a873e6d}{Test\+Property}} (const std\+::string \&a\+\_\+key, const std\+::string \&a\+\_\+value)
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classtesting_1_1_test_property_a76de43828e3ac38d01f8e7bd9e4f99bc}{key}} () const
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classtesting_1_1_test_property_a05c05de28707cf2dcbb6e2a330342a5b}{value}} () const
+\item 
+void \mbox{\hyperlink{classtesting_1_1_test_property_a377245335d9f614cd06d1650e3358e1d}{Set\+Value}} (const std\+::string \&new\+\_\+value)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{gtest_8h_source_l00512}{512}} of file \mbox{\hyperlink{gtest_8h_source}{gtest.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1_test_property_a25a0ccf1c75a92af46a48d3c2a873e6d}\index{testing::TestProperty@{testing::TestProperty}!TestProperty@{TestProperty}}
+\index{TestProperty@{TestProperty}!testing::TestProperty@{testing::TestProperty}}
+\doxysubsubsection{\texorpdfstring{TestProperty()}{TestProperty()}}
+{\footnotesize\ttfamily \label{classtesting_1_1_test_property_a25a0ccf1c75a92af46a48d3c2a873e6d} 
+testing\+::\+Test\+Property\+::\+Test\+Property (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{a\+\_\+key}{, }\item[{const std\+::string \&}]{a\+\_\+value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8h_source_l00517}{517}} of file \mbox{\hyperlink{gtest_8h_source}{gtest.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00517\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :}
+\DoxyCodeLine{00518\ \ \ \ \ key\_(a\_key),\ value\_(a\_value)\ \{}
+\DoxyCodeLine{00519\ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1_test_property_a76de43828e3ac38d01f8e7bd9e4f99bc}\index{testing::TestProperty@{testing::TestProperty}!key@{key}}
+\index{key@{key}!testing::TestProperty@{testing::TestProperty}}
+\doxysubsubsection{\texorpdfstring{key()}{key()}}
+{\footnotesize\ttfamily \label{classtesting_1_1_test_property_a76de43828e3ac38d01f8e7bd9e4f99bc} 
+const char \texorpdfstring{$\ast$}{*} testing\+::\+Test\+Property\+::key (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8h_source_l00522}{522}} of file \mbox{\hyperlink{gtest_8h_source}{gtest.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00522\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00523\ \ \ \ \ \textcolor{keywordflow}{return}\ key\_.c\_str();}
+\DoxyCodeLine{00524\ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1_test_property_a76de43828e3ac38d01f8e7bd9e4f99bc_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1_test_property_a377245335d9f614cd06d1650e3358e1d}\index{testing::TestProperty@{testing::TestProperty}!SetValue@{SetValue}}
+\index{SetValue@{SetValue}!testing::TestProperty@{testing::TestProperty}}
+\doxysubsubsection{\texorpdfstring{SetValue()}{SetValue()}}
+{\footnotesize\ttfamily \label{classtesting_1_1_test_property_a377245335d9f614cd06d1650e3358e1d} 
+void testing\+::\+Test\+Property\+::\+Set\+Value (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{new\+\_\+value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8h_source_l00532}{532}} of file \mbox{\hyperlink{gtest_8h_source}{gtest.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00532\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00533\ \ \ \ \ value\_\ =\ new\_value;}
+\DoxyCodeLine{00534\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1_test_property_a05c05de28707cf2dcbb6e2a330342a5b}\index{testing::TestProperty@{testing::TestProperty}!value@{value}}
+\index{value@{value}!testing::TestProperty@{testing::TestProperty}}
+\doxysubsubsection{\texorpdfstring{value()}{value()}}
+{\footnotesize\ttfamily \label{classtesting_1_1_test_property_a05c05de28707cf2dcbb6e2a330342a5b} 
+const char \texorpdfstring{$\ast$}{*} testing\+::\+Test\+Property\+::value (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8h_source_l00527}{527}} of file \mbox{\hyperlink{gtest_8h_source}{gtest.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00527\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00528\ \ \ \ \ \textcolor{keywordflow}{return}\ value\_.c\_str();}
+\DoxyCodeLine{00529\ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=327pt]{classtesting_1_1_test_property_a05c05de28707cf2dcbb6e2a330342a5b_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/include/gtest/\mbox{\hyperlink{gtest_8h}{gtest.\+h}}\end{DoxyCompactItemize}

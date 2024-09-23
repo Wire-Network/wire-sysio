@@ -1,0 +1,12 @@
+<map id="websocketpp::transport::asio::tls_socket::connection::post_init" name="websocketpp::transport::asio::tls_socket::connection::post_init">
+<area shape="rect" id="Node000001" title="Post&#45;initialize security policy." alt="" coords="5,85,198,141"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1transport_1_1asio_1_1tls__socket_1_1connection.html#ab03c718432a6b2020e8315d137930945" title="Get a shared pointer to this component." alt="" coords="246,5,438,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="186,82,241,64,242,69,188,87"/>
+<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1transport_1_1asio_1_1tls__socket_1_1connection.html#a83d9c15ccd470b56d4ed55086a9286cb" title=" " alt="" coords="246,85,438,141"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="198,110,230,110,230,116,198,116"/>
+<area shape="rect" id="Node000004" href="$namespacewebsocketpp_1_1transport_1_1asio_1_1socket.html#a9e5cb8d54b6d0d1376168955a99fe458" title=" " alt="" coords="486,126,694,167"/>
+<area shape="poly" id="edge5_Node000001_Node000004" title=" " alt="" coords="191,139,246,151,361,158,470,155,470,161,361,164,245,156,189,144"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="439,123,471,128,470,133,438,129"/>
+<area shape="rect" id="Node000005" href="$namespacewebsocketpp_1_1transport_1_1asio_1_1socket.html#aa1a18c040d8b74e53230fb9e3eb649d4" title=" " alt="" coords="742,119,915,174"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="695,144,727,144,727,149,695,149"/>
+</map>

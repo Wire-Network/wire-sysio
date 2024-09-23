@@ -1,0 +1,66 @@
+\doxysection{testing\+::Matcher\+Interface\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classtesting_1_1_matcher_interface}{}\label{classtesting_1_1_matcher_interface}\index{testing::MatcherInterface$<$ T $>$@{testing::MatcherInterface$<$ T $>$}}
+
+
+{\ttfamily \#include $<$gmock-\/matchers.\+h$>$}
+
+
+
+Inheritance diagram for testing\+::Matcher\+Interface\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1_matcher_interface__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for testing\+::Matcher\+Interface\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=229pt]{classtesting_1_1_matcher_interface__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual bool \mbox{\hyperlink{classtesting_1_1_matcher_interface_a296b43607cd99d60365f0e6a762777cf}{Match\+And\+Explain}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} x, \mbox{\hyperlink{classtesting_1_1_match_result_listener}{Match\+Result\+Listener}} \texorpdfstring{$\ast$}{*}listener) const =0
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classtesting_1_1_matcher_describer_interface}{testing\+::\+Matcher\+Describer\+Interface}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{classtesting_1_1_matcher_describer_interface_ae2236a56ad2cc35cad10efc1208854f4}{\texorpdfstring{$\sim$}{\string~}\+Matcher\+Describer\+Interface}} ()
+\item 
+virtual void \mbox{\hyperlink{classtesting_1_1_matcher_describer_interface_ad9f861588bd969b6e3e717f13bb94e7b}{Describe\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}os) const =0
+\item 
+virtual void \mbox{\hyperlink{classtesting_1_1_matcher_describer_interface_a2071afbc47097c4d1c0064275af34db0}{Describe\+Negation\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}os) const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$\newline
+class testing\+::\+Matcher\+Interface$<$ T $>$}
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l00142}{142}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1_matcher_interface_a296b43607cd99d60365f0e6a762777cf}\index{testing::MatcherInterface$<$ T $>$@{testing::MatcherInterface$<$ T $>$}!MatchAndExplain@{MatchAndExplain}}
+\index{MatchAndExplain@{MatchAndExplain}!testing::MatcherInterface$<$ T $>$@{testing::MatcherInterface$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{MatchAndExplain()}{MatchAndExplain()}}
+{\footnotesize\ttfamily \label{classtesting_1_1_matcher_interface_a296b43607cd99d60365f0e6a762777cf} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+virtual bool \mbox{\hyperlink{classtesting_1_1_matcher_interface}{testing\+::\+Matcher\+Interface}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::\+Match\+And\+Explain (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}}]{x}{, }\item[{\mbox{\hyperlink{classtesting_1_1_match_result_listener}{Match\+Result\+Listener}} \texorpdfstring{$\ast$}{*}}]{listener}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{classtesting_1_1internal_1_1_args_matcher_impl_a60383b3073a61f9d82cbf31fe19e6bfa}{testing\+::internal\+::\+Args\+Matcher\+Impl$<$ Args\+Tuple, k0, k1, k2, k3, k4, k5, k6, k7, k8, k9 $>$}}, \mbox{\hyperlink{classtesting_1_1internal_1_1_begin_end_distance_is_matcher_1_1_impl_aa7bda59eae256018247699b0baa285c9}{testing\+::internal\+::\+Begin\+End\+Distance\+Is\+Matcher$<$ Distance\+Matcher $>$\+::\+Impl$<$ Container $>$}}, \mbox{\hyperlink{classtesting_1_1internal_1_1_contains_matcher_impl_a1cb9f1d2da48bd4a48c281215f8f94e9}{testing\+::internal\+::\+Contains\+Matcher\+Impl$<$ Container $>$}}, \mbox{\hyperlink{classtesting_1_1internal_1_1_each_matcher_impl_a3b8ca89c85a96bbbcc74196ad29bf1ec}{testing\+::internal\+::\+Each\+Matcher\+Impl$<$ Container $>$}}, \mbox{\hyperlink{classtesting_1_1internal_1_1_elements_are_matcher_impl_a6562159fa83e09417c3552fd881f878e}{testing\+::internal\+::\+Elements\+Are\+Matcher\+Impl$<$ Container $>$}}, \mbox{\hyperlink{classtesting_1_1internal_1_1_floating_eq_matcher_1_1_impl_a4ce47c481fdc4973ed671a492f455f99}{testing\+::internal\+::\+Floating\+Eq\+Matcher$<$ Float\+Type $>$\+::\+Impl$<$ T $>$}}, \mbox{\hyperlink{classtesting_1_1internal_1_1_key_matcher_impl_ae821c96473c6400defbb21eb9eca8d4c}{testing\+::internal\+::\+Key\+Matcher\+Impl$<$ Pair\+Type $>$}}, \mbox{\hyperlink{classtesting_1_1internal_1_1_optional_matcher_1_1_impl_a784959b22185ab7ab188dd9142e0e751}{testing\+::internal\+::\+Optional\+Matcher$<$ Value\+Matcher $>$\+::\+Impl$<$ Optional $>$}}, \mbox{\hyperlink{classtesting_1_1internal_1_1_pair_matcher_impl_a1bba47f97cbf50a1f6331d3f7bfd47a1}{testing\+::internal\+::\+Pair\+Matcher\+Impl$<$ Pair\+Type $>$}}, \mbox{\hyperlink{classtesting_1_1internal_1_1_pointwise_matcher_1_1_impl_a4253946989f3743c4dd983909f2d062b}{testing\+::internal\+::\+Pointwise\+Matcher$<$ Tuple\+Matcher, Rhs\+Container $>$\+::\+Impl$<$ Lhs\+Container $>$}}, \mbox{\hyperlink{classtesting_1_1internal_1_1_size_is_matcher_1_1_impl_a5180472f5a18b8c0314ed835c52e09d4}{testing\+::internal\+::\+Size\+Is\+Matcher$<$ Size\+Matcher $>$\+::\+Impl$<$ Container $>$}}, \mbox{\hyperlink{classtesting_1_1internal_1_1_unordered_elements_are_matcher_impl_a4031291eef9be8c1e9e1effdd02c4334}{testing\+::internal\+::\+Unordered\+Elements\+Are\+Matcher\+Impl$<$ Container $>$}}, and \mbox{\hyperlink{classtesting_1_1internal_1_1_when_sorted_by_matcher_1_1_impl_a9d8f57c729df8c041f2fd7febbc950da}{testing\+::internal\+::\+When\+Sorted\+By\+Matcher$<$ Comparator, Container\+Matcher $>$\+::\+Impl$<$ Lhs\+Container $>$}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/include/gmock/\mbox{\hyperlink{gmock-matchers_8h}{gmock-\/matchers.\+h}}\end{DoxyCompactItemize}

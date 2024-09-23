@@ -1,0 +1,5 @@
+<map id="sysio::block_status_monitor::reset" name="sysio::block_status_monitor::reset">
+<area shape="rect" id="Node000001" title="reset to initial state" alt="" coords="188,5,322,46"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1block__status__monitor.html#a55c26a4ba12f3d4a8f1d9bb406d0bebb" title="called when a block is accepted (sync_recv_block)" alt="" coords="5,5,140,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="172,28,140,28,140,23,172,23"/>
+</map>

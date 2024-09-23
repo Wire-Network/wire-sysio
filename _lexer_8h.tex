@@ -1,0 +1,238 @@
+\doxysection{libraries/wasm-\/jit/\+Source/\+WAST/\+Lexer.h File Reference}
+\hypertarget{_lexer_8h}{}\label{_lexer_8h}\index{libraries/wasm-\/jit/Source/WAST/Lexer.h@{libraries/wasm-\/jit/Source/WAST/Lexer.h}}
+{\ttfamily \#include "{}Inline/\+Basic\+Types.\+h"{}}\newline
+{\ttfamily \#include "{}IR/\+Operators.\+h"{}}\newline
+{\ttfamily \#include "{}WAST.\+h"{}}\newline
+Include dependency graph for Lexer.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{_lexer_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{_lexer_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespace_w_a_s_t}{WAST}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{_lexer_8h_a9a5e1c837415e02975ae4b05503a1003}{VISIT\+\_\+\+OPERATOR\+\_\+\+TOKEN}}(opcode,  \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  name\+String, ...)
+\item 
+\#define \mbox{\hyperlink{_lexer_8h_a10550c16c28a6cfef01917591c615132}{VISIT\+\_\+\+LITERAL\+\_\+\+TOKEN}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})
+\item 
+\#define \mbox{\hyperlink{_lexer_8h_a935799414b43c9ea38224a78360fadc8}{ENUM\+\_\+\+LITERAL\+\_\+\+TOKENS}}()
+\item 
+\#define \mbox{\hyperlink{_lexer_8h_a5260185a275a3b005a2b95f192fb12b6}{ENUM\+\_\+\+SIMD\+\_\+\+LITERAL\+\_\+\+TOKENS}}()
+\item 
+\#define \mbox{\hyperlink{_lexer_8h_a44201a8ebbcc0d7ade75480d088f57b2}{ENUM\+\_\+\+TOKENS}}()
+\item 
+\#define \mbox{\hyperlink{_lexer_8h_acf96d144ddd91dfdb0eef97cf4aa1cee}{VISIT\+\_\+\+TOKEN}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  description)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{namespace_w_a_s_t_a57c99a932a2a7d69084cbeca01031f32}{WAST\+::\+Token\+Type}} \+: U16 \{ \mbox{\hyperlink{namespace_w_a_s_t_a57c99a932a2a7d69084cbeca01031f32a39fb9d16c0964296c4a8b6b567b1c17d}{WAST\+::num\+Token\+Types}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespace_w_a_s_t_aa7cfc1625466b4ac24691f75df863cc7}{WAST\+::\+PACKED\+\_\+\+STRUCT}} (struct Token \{ \mbox{\hyperlink{namespace_w_a_s_t_a57c99a932a2a7d69084cbeca01031f32}{Token\+Type}} type;\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}} begin;\})
+\item 
+Token \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_w_a_s_t_a9ffdd3dd8d6db105464488183a5f13da}{WAST\+::lex}} (const char \texorpdfstring{$\ast$}{*}string, \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} string\+Length, \mbox{\hyperlink{struct_w_a_s_t_1_1_line_info}{Line\+Info}} \texorpdfstring{$\ast$}{*}\&out\+Line\+Info)
+\item 
+void \mbox{\hyperlink{namespace_w_a_s_t_ac4e53dc178c5ceaf93b846c81f9adfc2}{WAST\+::free\+Tokens}} (Token \texorpdfstring{$\ast$}{*}tokens)
+\item 
+void \mbox{\hyperlink{namespace_w_a_s_t_ae0e7852160946f05f04d4cab549275d9}{WAST\+::free\+Line\+Info}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_line_info}{Line\+Info}} \texorpdfstring{$\ast$}{*}line\+Info)
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_w_a_s_t_a23505430f91325d50b390d1318fd20b5}{WAST\+::describe\+Token}} (\mbox{\hyperlink{namespace_w_a_s_t_a57c99a932a2a7d69084cbeca01031f32}{Token\+Type}} token\+Type)
+\item 
+\mbox{\hyperlink{struct_w_a_s_t_1_1_text_file_locus}{Text\+File\+Locus}} \mbox{\hyperlink{namespace_w_a_s_t_a29cdb29885fdca5fa42fd1e7bf3c62b1}{WAST\+::calc\+Locus\+From\+Offset}} (const char \texorpdfstring{$\ast$}{*}string, const \mbox{\hyperlink{struct_w_a_s_t_1_1_line_info}{Line\+Info}} \texorpdfstring{$\ast$}{*}line\+Info, \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} char\+Offset)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{_lexer_8h_a935799414b43c9ea38224a78360fadc8}\index{Lexer.h@{Lexer.h}!ENUM\_LITERAL\_TOKENS@{ENUM\_LITERAL\_TOKENS}}
+\index{ENUM\_LITERAL\_TOKENS@{ENUM\_LITERAL\_TOKENS}!Lexer.h@{Lexer.h}}
+\doxysubsubsection{\texorpdfstring{ENUM\_LITERAL\_TOKENS}{ENUM\_LITERAL\_TOKENS}}
+{\footnotesize\ttfamily \label{_lexer_8h_a935799414b43c9ea38224a78360fadc8} 
+\#define ENUM\+\_\+\+LITERAL\+\_\+\+TOKENS(\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_lexer_8h_source_l00011}{11}} of file \mbox{\hyperlink{_lexer_8h_source}{Lexer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00011\ \textcolor{preprocessor}{\#define\ ENUM\_LITERAL\_TOKENS()\ \(\backslash\)}}
+\DoxyCodeLine{00012\ \textcolor{preprocessor}{\ \ \ \ VISIT\_LITERAL\_TOKEN(module)\ \(\backslash\)}}
+\DoxyCodeLine{00013\ \textcolor{preprocessor}{\ \ \ \ VISIT\_LITERAL\_TOKEN(func)\ \(\backslash\)}}
+\DoxyCodeLine{00014\ \textcolor{preprocessor}{\ \ \ \ VISIT\_LITERAL\_TOKEN(type)\ \(\backslash\)}}
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\ \ \ \ VISIT\_LITERAL\_TOKEN(table)\ \(\backslash\)}}
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\ \ \ \ VISIT\_LITERAL\_TOKEN(export)\ \(\backslash\)}}
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\ \ \ \ VISIT\_LITERAL\_TOKEN(import)\ \(\backslash\)}}
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\ \ \ \ VISIT\_LITERAL\_TOKEN(memory)\ \(\backslash\)}}
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\ \ \ \ VISIT\_LITERAL\_TOKEN(data)\ \(\backslash\)}}
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\ \ \ \ VISIT\_LITERAL\_TOKEN(elem)\ \(\backslash\)}}
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\ \ \ \ VISIT\_LITERAL\_TOKEN(start)\ \(\backslash\)}}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\ \ \ \ VISIT\_LITERAL\_TOKEN(param)\ \(\backslash\)}}
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\ \ \ \ VISIT\_LITERAL\_TOKEN(result)\ \(\backslash\)}}
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\ \ \ \ VISIT\_LITERAL\_TOKEN(local)\ \(\backslash\)}}
+\DoxyCodeLine{00025\ \textcolor{preprocessor}{\ \ \ \ VISIT\_LITERAL\_TOKEN(global)\ \(\backslash\)}}
+\DoxyCodeLine{00026\ \textcolor{preprocessor}{\ \ \ \ VISIT\_LITERAL\_TOKEN(assert\_return)\ \(\backslash\)}}
+\DoxyCodeLine{00027\ \textcolor{preprocessor}{\ \ \ \ VISIT\_LITERAL\_TOKEN(assert\_return\_canonical\_nan)\ \(\backslash\)}}
+\DoxyCodeLine{00028\ \textcolor{preprocessor}{\ \ \ \ VISIT\_LITERAL\_TOKEN(assert\_return\_arithmetic\_nan)\ \(\backslash\)}}
+\DoxyCodeLine{00029\ \textcolor{preprocessor}{\ \ \ \ VISIT\_LITERAL\_TOKEN(assert\_trap)\ \(\backslash\)}}
+\DoxyCodeLine{00030\ \textcolor{preprocessor}{\ \ \ \ VISIT\_LITERAL\_TOKEN(assert\_invalid)\ \(\backslash\)}}
+\DoxyCodeLine{00031\ \textcolor{preprocessor}{\ \ \ \ VISIT\_LITERAL\_TOKEN(assert\_unlinkable)\ \(\backslash\)}}
+\DoxyCodeLine{00032\ \textcolor{preprocessor}{\ \ \ \ VISIT\_LITERAL\_TOKEN(assert\_malformed)\ \(\backslash\)}}
+\DoxyCodeLine{00033\ \textcolor{preprocessor}{\ \ \ \ VISIT\_LITERAL\_TOKEN(assert\_exhaustion)\ \(\backslash\)}}
+\DoxyCodeLine{00034\ \textcolor{preprocessor}{\ \ \ \ VISIT\_LITERAL\_TOKEN(invoke)\ \(\backslash\)}}
+\DoxyCodeLine{00035\ \textcolor{preprocessor}{\ \ \ \ VISIT\_LITERAL\_TOKEN(get)\ \(\backslash\)}}
+\DoxyCodeLine{00036\ \textcolor{preprocessor}{\ \ \ \ VISIT\_LITERAL\_TOKEN(align)\ \(\backslash\)}}
+\DoxyCodeLine{00037\ \textcolor{preprocessor}{\ \ \ \ VISIT\_LITERAL\_TOKEN(offset)\ \(\backslash\)}}
+\DoxyCodeLine{00038\ \textcolor{preprocessor}{\ \ \ \ VISIT\_LITERAL\_TOKEN(then)\ \(\backslash\)}}
+\DoxyCodeLine{00039\ \textcolor{preprocessor}{\ \ \ \ VISIT\_LITERAL\_TOKEN(register)\ \(\backslash\)}}
+\DoxyCodeLine{00040\ \textcolor{preprocessor}{\ \ \ \ VISIT\_LITERAL\_TOKEN(mut)\ \(\backslash\)}}
+\DoxyCodeLine{00041\ \textcolor{preprocessor}{\ \ \ \ VISIT\_LITERAL\_TOKEN(i32)\ \(\backslash\)}}
+\DoxyCodeLine{00042\ \textcolor{preprocessor}{\ \ \ \ VISIT\_LITERAL\_TOKEN(i64)\ \(\backslash\)}}
+\DoxyCodeLine{00043\ \textcolor{preprocessor}{\ \ \ \ VISIT\_LITERAL\_TOKEN(f32)\ \(\backslash\)}}
+\DoxyCodeLine{00044\ \textcolor{preprocessor}{\ \ \ \ VISIT\_LITERAL\_TOKEN(f64)\ \(\backslash\)}}
+\DoxyCodeLine{00045\ \textcolor{preprocessor}{\ \ \ \ VISIT\_LITERAL\_TOKEN(anyfunc)\ \(\backslash\)}}
+\DoxyCodeLine{00046\ \textcolor{preprocessor}{\ \ \ \ VISIT\_LITERAL\_TOKEN(shared)\ \(\backslash\)}}
+\DoxyCodeLine{00047\ \textcolor{preprocessor}{\ \ \ \ VISIT\_LITERAL\_TOKEN(quote)\ \(\backslash\)}}
+\DoxyCodeLine{00048\ \textcolor{preprocessor}{\ \ \ \ VISIT\_LITERAL\_TOKEN(binary)\ \(\backslash\)}}
+\DoxyCodeLine{00049\ \textcolor{preprocessor}{\ \ \ \ ENUM\_SIMD\_LITERAL\_TOKENS()}}
+
+\end{DoxyCode}
+\Hypertarget{_lexer_8h_a5260185a275a3b005a2b95f192fb12b6}\index{Lexer.h@{Lexer.h}!ENUM\_SIMD\_LITERAL\_TOKENS@{ENUM\_SIMD\_LITERAL\_TOKENS}}
+\index{ENUM\_SIMD\_LITERAL\_TOKENS@{ENUM\_SIMD\_LITERAL\_TOKENS}!Lexer.h@{Lexer.h}}
+\doxysubsubsection{\texorpdfstring{ENUM\_SIMD\_LITERAL\_TOKENS}{ENUM\_SIMD\_LITERAL\_TOKENS}}
+{\footnotesize\ttfamily \label{_lexer_8h_a5260185a275a3b005a2b95f192fb12b6} 
+\#define ENUM\+\_\+\+SIMD\+\_\+\+LITERAL\+\_\+\+TOKENS(\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_lexer_8h_source_l00052}{52}} of file \mbox{\hyperlink{_lexer_8h_source}{Lexer.\+h}}.
+
+\Hypertarget{_lexer_8h_a44201a8ebbcc0d7ade75480d088f57b2}\index{Lexer.h@{Lexer.h}!ENUM\_TOKENS@{ENUM\_TOKENS}}
+\index{ENUM\_TOKENS@{ENUM\_TOKENS}!Lexer.h@{Lexer.h}}
+\doxysubsubsection{\texorpdfstring{ENUM\_TOKENS}{ENUM\_TOKENS}}
+{\footnotesize\ttfamily \label{_lexer_8h_a44201a8ebbcc0d7ade75480d088f57b2} 
+\#define ENUM\+\_\+\+TOKENS(\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{_lexer_8h_acf96d144ddd91dfdb0eef97cf4aa1cee}{VISIT\_TOKEN}}(eof,\textcolor{stringliteral}{"{}eof"{}})\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ VISIT\_TOKEN(unterminatedComment,\textcolor{stringliteral}{"{}unterminated\ comment"{}})\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ VISIT\_TOKEN(unrecognized,\textcolor{stringliteral}{"{}unrecognized\ token"{}})\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ VISIT\_TOKEN(decimalFloat,\textcolor{stringliteral}{"{}decimal\ float\ literal"{}})\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ VISIT\_TOKEN(decimalInt,\textcolor{stringliteral}{"{}decimal\ int\ literal"{}})\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ VISIT\_TOKEN(hexFloat,\textcolor{stringliteral}{"{}hexadecimal\ float\ literal"{}})\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ VISIT\_TOKEN(hexInt,\textcolor{stringliteral}{"{}hexadecimal\ int\ literal"{}})\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ VISIT\_TOKEN(floatNaN,\textcolor{stringliteral}{"{}float\ NaN\ literal"{}})\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ VISIT\_TOKEN(floatInf,\textcolor{stringliteral}{"{}float\ infinity\ literal"{}})\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ VISIT\_TOKEN(\textcolor{keywordtype}{string},\textcolor{stringliteral}{"{}string\ literal"{}})\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ VISIT\_TOKEN(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\textcolor{stringliteral}{"{}name\ literal"{}})\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ VISIT\_TOKEN(leftParenthesis,\textcolor{stringliteral}{"{}'('"{}})\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ VISIT\_TOKEN(rightParenthesis,\textcolor{stringliteral}{"{}')'"{}})\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ VISIT\_TOKEN(equals,\textcolor{stringliteral}{"{}'='"{}})\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ ENUM\_LITERAL\_TOKENS()\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ ENUM\_OPERATORS(\mbox{\hyperlink{_lexer_8h_a9a5e1c837415e02975ae4b05503a1003}{VISIT\_OPERATOR\_TOKEN}})}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{_lexer_8h_source_l00062}{62}} of file \mbox{\hyperlink{_lexer_8h_source}{Lexer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00062\ \textcolor{preprocessor}{\#define\ ENUM\_TOKENS()\ \(\backslash\)}}
+\DoxyCodeLine{00063\ \textcolor{preprocessor}{\ \ \ \ VISIT\_TOKEN(eof,"{}eof"{})\ \(\backslash\)}}
+\DoxyCodeLine{00064\ \textcolor{preprocessor}{\ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00065\ \textcolor{preprocessor}{\ \ \ \ VISIT\_TOKEN(unterminatedComment,"{}unterminated\ comment"{})\ \(\backslash\)}}
+\DoxyCodeLine{00066\ \textcolor{preprocessor}{\ \ \ \ VISIT\_TOKEN(unrecognized,"{}unrecognized\ token"{})\ \(\backslash\)}}
+\DoxyCodeLine{00067\ \textcolor{preprocessor}{\ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00068\ \textcolor{preprocessor}{\ \ \ \ VISIT\_TOKEN(decimalFloat,"{}decimal\ float\ literal"{})\ \(\backslash\)}}
+\DoxyCodeLine{00069\ \textcolor{preprocessor}{\ \ \ \ VISIT\_TOKEN(decimalInt,"{}decimal\ int\ literal"{})\ \(\backslash\)}}
+\DoxyCodeLine{00070\ \textcolor{preprocessor}{\ \ \ \ VISIT\_TOKEN(hexFloat,"{}hexadecimal\ float\ literal"{})\ \(\backslash\)}}
+\DoxyCodeLine{00071\ \textcolor{preprocessor}{\ \ \ \ VISIT\_TOKEN(hexInt,"{}hexadecimal\ int\ literal"{})\ \(\backslash\)}}
+\DoxyCodeLine{00072\ \textcolor{preprocessor}{\ \ \ \ VISIT\_TOKEN(floatNaN,"{}float\ NaN\ literal"{})\ \(\backslash\)}}
+\DoxyCodeLine{00073\ \textcolor{preprocessor}{\ \ \ \ VISIT\_TOKEN(floatInf,"{}float\ infinity\ literal"{})\ \(\backslash\)}}
+\DoxyCodeLine{00074\ \textcolor{preprocessor}{\ \ \ \ VISIT\_TOKEN(string,"{}string\ literal"{})\ \(\backslash\)}}
+\DoxyCodeLine{00075\ \textcolor{preprocessor}{\ \ \ \ VISIT\_TOKEN(name,"{}name\ literal"{})\ \(\backslash\)}}
+\DoxyCodeLine{00076\ \textcolor{preprocessor}{\ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00077\ \textcolor{preprocessor}{\ \ \ \ VISIT\_TOKEN(leftParenthesis,"{}'('"{})\ \(\backslash\)}}
+\DoxyCodeLine{00078\ \textcolor{preprocessor}{\ \ \ \ VISIT\_TOKEN(rightParenthesis,"{}')'"{})\ \(\backslash\)}}
+\DoxyCodeLine{00079\ \textcolor{preprocessor}{\ \ \ \ VISIT\_TOKEN(equals,"{}'='"{})\ \(\backslash\)}}
+\DoxyCodeLine{00080\ \textcolor{preprocessor}{\ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00081\ \textcolor{preprocessor}{\ \ \ \ ENUM\_LITERAL\_TOKENS()\ \(\backslash\)}}
+\DoxyCodeLine{00082\ \textcolor{preprocessor}{\ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00083\ \textcolor{preprocessor}{\ \ \ \ ENUM\_OPERATORS(VISIT\_OPERATOR\_TOKEN)}}
+
+\end{DoxyCode}
+\Hypertarget{_lexer_8h_a10550c16c28a6cfef01917591c615132}\index{Lexer.h@{Lexer.h}!VISIT\_LITERAL\_TOKEN@{VISIT\_LITERAL\_TOKEN}}
+\index{VISIT\_LITERAL\_TOKEN@{VISIT\_LITERAL\_TOKEN}!Lexer.h@{Lexer.h}}
+\doxysubsubsection{\texorpdfstring{VISIT\_LITERAL\_TOKEN}{VISIT\_LITERAL\_TOKEN}}
+{\footnotesize\ttfamily \label{_lexer_8h_a10550c16c28a6cfef01917591c615132} 
+\#define VISIT\+\_\+\+LITERAL\+\_\+\+TOKEN(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{_lexer_8h_acf96d144ddd91dfdb0eef97cf4aa1cee}{VISIT\_TOKEN}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\textcolor{stringliteral}{"{}'"{}}\ \#\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ \textcolor{stringliteral}{"{}'"{}})}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{_lexer_8h_source_l00010}{10}} of file \mbox{\hyperlink{_lexer_8h_source}{Lexer.\+h}}.
+
+\Hypertarget{_lexer_8h_a9a5e1c837415e02975ae4b05503a1003}\index{Lexer.h@{Lexer.h}!VISIT\_OPERATOR\_TOKEN@{VISIT\_OPERATOR\_TOKEN}}
+\index{VISIT\_OPERATOR\_TOKEN@{VISIT\_OPERATOR\_TOKEN}!Lexer.h@{Lexer.h}}
+\doxysubsubsection{\texorpdfstring{VISIT\_OPERATOR\_TOKEN}{VISIT\_OPERATOR\_TOKEN}}
+{\footnotesize\ttfamily \label{_lexer_8h_a9a5e1c837415e02975ae4b05503a1003} 
+\#define VISIT\+\_\+\+OPERATOR\+\_\+\+TOKEN(\begin{DoxyParamCaption}\item[{}]{opcode}{, }\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{name\+String}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{_lexer_8h_acf96d144ddd91dfdb0eef97cf4aa1cee}{VISIT\_TOKEN}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\textcolor{stringliteral}{"{}'"{}}\ \#nameString\ \textcolor{stringliteral}{"{}'"{}})}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{_lexer_8h_source_l00007}{7}} of file \mbox{\hyperlink{_lexer_8h_source}{Lexer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\#define\ VISIT\_OPERATOR\_TOKEN(opcode,name,nameString,...)\ \(\backslash\)}}
+\DoxyCodeLine{00008\ \textcolor{preprocessor}{\ \ \ \ VISIT\_TOKEN(name,"{}'"{}\ \#nameString\ "{}'"{})}}
+
+\end{DoxyCode}
+\Hypertarget{_lexer_8h_acf96d144ddd91dfdb0eef97cf4aa1cee}\index{Lexer.h@{Lexer.h}!VISIT\_TOKEN@{VISIT\_TOKEN}}
+\index{VISIT\_TOKEN@{VISIT\_TOKEN}!Lexer.h@{Lexer.h}}
+\doxysubsubsection{\texorpdfstring{VISIT\_TOKEN}{VISIT\_TOKEN}}
+{\footnotesize\ttfamily \label{_lexer_8h_acf96d144ddd91dfdb0eef97cf4aa1cee} 
+\#define VISIT\+\_\+\+TOKEN(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{description}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{t\_\#\#\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{_lexer_8h_source_l00089}{89}} of file \mbox{\hyperlink{_lexer_8h_source}{Lexer.\+h}}.
+

@@ -1,0 +1,10 @@
+<map id="ecdsa_signature_parse_der_lax" name="ecdsa_signature_parse_der_lax">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,48,161,89"/>
+<area shape="rect" id="Node000002" href="$yubihsm__pkcs11_8c.html#ae785d5badbf1f08b491af31f32a135a1" title=" " alt="" coords="266,5,338,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="161,48,250,27,251,32,162,53"/>
+<area shape="rect" id="Node000003" href="$yubihsm__pkcs11_8c.html#adc4bd59a60361844aa0e852efa210105" title=" " alt="" coords="443,85,511,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="161,72,428,92,428,97,161,77"/>
+<area shape="rect" id="Node000004" href="$secp256k1_8c.html#a933083356e7171e174bc958b8233f758" title=" " alt="" coords="209,106,395,146"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="162,87,208,99,206,104,160,92"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="395,109,427,103,428,109,396,114"/>
+</map>

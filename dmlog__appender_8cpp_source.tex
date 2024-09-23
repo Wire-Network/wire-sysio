@@ -1,0 +1,103 @@
+\doxysection{dmlog\+\_\+appender.\+cpp}
+\hypertarget{dmlog__appender_8cpp_source}{}\label{dmlog__appender_8cpp_source}\index{libraries/fc/src/log/dmlog\_appender.cpp@{libraries/fc/src/log/dmlog\_appender.cpp}}
+\mbox{\hyperlink{dmlog__appender_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{dmlog__appender_8hpp}{fc/log/dmlog\_appender.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{log__message_8hpp}{fc/log/log\_message.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{string_8hpp}{fc/string.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{fc_2include_2fc_2variant_8hpp}{fc/variant.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{fc_2include_2fc_2reflect_2variant_8hpp}{fc/reflect/variant.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#ifndef\ WIN32}}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <unistd.h>}}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <signal.h>}}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00009}00009\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <boost/asio/io\_context.hpp>}}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00011}00011\ \textcolor{preprocessor}{\#include\ <boost/thread/mutex.hpp>}}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00012}00012\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{exception_8hpp}{fc/exception/exception.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00013}00013\ \textcolor{preprocessor}{\#include\ <iomanip>}}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00014}00014\ \textcolor{preprocessor}{\#include\ <mutex>}}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00015}00015\ \textcolor{preprocessor}{\#include\ <sstream>}}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00017}00017\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}\ \{}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00018}\mbox{\hyperlink{classfc_1_1dmlog__appender_1_1impl}{00018}}\ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classfc_1_1dmlog__appender_1_1impl}{dmlog\_appender::impl}}\ \{}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00019}00019\ \ \ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00020}\mbox{\hyperlink{classfc_1_1dmlog__appender_1_1impl_a945b6e01d7d05d5d87cf440ad0e12a0e}{00020}}\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classfc_1_1dmlog__appender_1_1impl_a945b6e01d7d05d5d87cf440ad0e12a0e}{is\_stopped}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00021}\mbox{\hyperlink{classfc_1_1dmlog__appender_1_1impl_a738e92512b553f7b8ce1d5a628756437}{00021}}\ \ \ \ \ \ \ \ \ \ FILE*\ out\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00022}\mbox{\hyperlink{classfc_1_1dmlog__appender_1_1impl_abf2cd5275207fab097bc2201ef6fc45b}{00022}}\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classfc_1_1dmlog__appender_1_1impl_abf2cd5275207fab097bc2201ef6fc45b}{owns\_out}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00023}00023\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00025}00025\ \ \ \ dmlog\_appender::dmlog\_appender(\ \textcolor{keyword}{const}\ std::optional<dmlog\_appender::config>\&\ args\ )}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00026}00026\ \ \ \ :\mbox{\hyperlink{classfc_1_1dmlog__appender}{dmlog\_appender}}()\{}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00027}00027\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!args\ ||\ args-\/>file\ ==\ \textcolor{stringliteral}{"{}-\/"{}})}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00028}00028\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00029}00029\ \ \ \ \ \ \ \ \ \ my-\/>out\ =\ stdout;}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00030}00030\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00031}00031\ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00032}00032\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00033}00033\ \ \ \ \ \ \ \ \ \ my-\/>out\ =\ std::fopen(args-\/>file.c\_str(),\ \textcolor{stringliteral}{"{}a"{}});}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00034}00034\ \ \ \ \ \ \ \ \ \ if\ (my-\/>out)}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00035}00035\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00036}00036\ \ \ \ \ \ \ \ \ \ \ \ \ std::setbuf(my-\/>out,\ nullptr);}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00037}00037\ \ \ \ \ \ \ \ \ \ \ \ \ my-\/>owns\_out\ =\ true;}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00038}00038\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00039}00039\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00040}00040\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00041}00041\ \ \ \ \ \ \ \ \ \ \ \ \ FC\_THROW(\textcolor{stringliteral}{"{}Failed\ to\ open\ deep\ mind\ log\ file\ \$\{name\}"{}},\ (\textcolor{stringliteral}{"{}name"{}},\ args-\/>file));}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00042}00042\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00043}00043\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00044}00044\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00046}\mbox{\hyperlink{classfc_1_1dmlog__appender_af528a4e9c4c27adf5c15c1a6f228d7e7}{00046}}\ \ \ \ dmlog\_appender::dmlog\_appender(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1variant}{variant}}\&\ args\ )}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00047}00047\ \ \ \ :\mbox{\hyperlink{classfc_1_1dmlog__appender}{dmlog\_appender}}(args.as<\mbox{\hyperlink{namespacestd}{std}}::optional<\mbox{\hyperlink{structfc_1_1dmlog__appender_1_1config}{config}}>>())\{\}}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00049}00049\ \ \ \ dmlog\_appender::dmlog\_appender()}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00050}00050\ \ \ \ :my(new\ impl)\{\}}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00052}\mbox{\hyperlink{classfc_1_1dmlog__appender_aebd667ed3a974dc557f3ac3b95c593c6}{00052}}\ \ \ \ \mbox{\hyperlink{classfc_1_1dmlog__appender_aebd667ed3a974dc557f3ac3b95c593c6}{dmlog\_appender::\string~dmlog\_appender}}()\ \{}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00053}00053\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (my-\/>owns\_out)}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00054}00054\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00055}00055\ \ \ \ \ \ \ \ \ \ std::fclose(my-\/>out);}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00056}00056\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00057}00057\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00059}\mbox{\hyperlink{classfc_1_1dmlog__appender_a1ed404efec9f684dcfdbe56cfc3821fc}{00059}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1dmlog__appender_a1ed404efec9f684dcfdbe56cfc3821fc}{dmlog\_appender::initialize}}(\ boost::asio::io\_service\&\ io\_service\ )\ \{\}}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00061}\mbox{\hyperlink{classfc_1_1dmlog__appender_a7ad23d287447893ca7ee30059fbffe9b}{00061}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1dmlog__appender_a7ad23d287447893ca7ee30059fbffe9b}{dmlog\_appender::log}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1log__message}{log\_message}}\&\ m\ )\ \{}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00062}00062\ \ \ \ \ \ \ FILE*\ out\ =\ my-\/>out;}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00064}00064\ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ message\ =\ \mbox{\hyperlink{namespacefc_acd5129981ae93fce3154d3fed6f6acbc}{format\_string}}(\ \textcolor{stringliteral}{"{}DMLOG\ "{}}\ +\ m.\mbox{\hyperlink{classfc_1_1log__message_ad966a7abc653c4e9a253d8352acf8c40}{get\_format}}()\ +\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}},\ m.\mbox{\hyperlink{classfc_1_1log__message_af68127555870f9aa5d06f7c2db9f1d32}{get\_data}}()\ );}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00066}00066\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ remaining\_size\ =\ message.size();}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00067}00067\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{debug__client_8cpp_a08398c4d31a4dc3e42d1b9a9ef64c6ad}{message\_ptr}}\ =\ message.c\_str();}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00068}00068\ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (!my-\/>is\_stopped\ \&\&\ remaining\_size)\ \{}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ written\ =\ fwrite(\mbox{\hyperlink{debug__client_8cpp_a08398c4d31a4dc3e42d1b9a9ef64c6ad}{message\_ptr}},\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{char}),\ remaining\_size,\ out);}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00071}00071\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ EINTR\ shouldn't\ happen\ anymore,\ but\ keep\ this\ detection,\ just\ in\ case.}}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(written\ ==\ 0\ \&\&\ errno\ !=\ EINTR)}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00073}00073\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00074}00074\ \ \ \ \ \ \ \ \ \ \ \ \ my-\/>is\_stopped\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00075}00075\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00076}00076\ }
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(written\ !=\ remaining\_size)}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00078}00078\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}DMLOG\ FPRINTF\_FAILED\ failed\ written=\%lu\ remaining=\%lu\ \%d\ \%s\(\backslash\)n"{}},\ written,\ remaining\_size,\ ferror(out),\ strerror(errno));}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00080}00080\ \ \ \ \ \ \ \ \ \ \ \ \ clearerr(out);}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00081}00081\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00083}00083\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(my-\/>is\_stopped)}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00084}00084\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00085}00085\ \ \ \ \ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}DMLOG\ FPRINTF\_FAILURE\_TERMINATED\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00086}00086\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Depending\ on\ the\ error,\ we\ might\ have\ already\ gotten\ a\ SIGPIPE}}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00087}00087\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ An\ extra\ signal\ is\ harmless,\ though.\ \ Use\ a\ process\ targeted}}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00088}00088\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ signal\ (not\ raise)\ because\ the\ SIGTERM\ may\ be\ blocked\ in\ this}}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00089}00089\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ thread.}}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00090}00090\ \ \ \ \ \ \ \ \ \ \ \ \ kill(getpid(),\ SIGTERM);}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00091}00091\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00092}00092\ }
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00093}00093\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{debug__client_8cpp_a08398c4d31a4dc3e42d1b9a9ef64c6ad}{message\_ptr}}\ =\ \&\mbox{\hyperlink{debug__client_8cpp_a08398c4d31a4dc3e42d1b9a9ef64c6ad}{message\_ptr}}[written];}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00094}00094\ \ \ \ \ \ \ \ \ \ remaining\_size\ -\/=\ written;}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00095}00095\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00096}00096\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{dmlog__appender_8cpp_source_l00097}00097\ \}}
+
+\end{DoxyCode}

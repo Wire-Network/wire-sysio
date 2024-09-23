@@ -1,0 +1,59 @@
+\doxysection{utils.\+hpp}
+\hypertarget{fc_2libraries_2ff_2libff_2common_2utils_8hpp_source}{}\label{fc_2libraries_2ff_2libff_2common_2utils_8hpp_source}\index{libraries/fc/libraries/ff/libff/common/utils.hpp@{libraries/fc/libraries/ff/libff/common/utils.hpp}}
+\mbox{\hyperlink{fc_2libraries_2ff_2libff_2common_2utils_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2utils_8hpp_source_l00001}00001\ }
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2utils_8hpp_source_l00010}00010\ \textcolor{preprocessor}{\#ifndef\ UTILS\_HPP\_}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2utils_8hpp_source_l00011}00011\ \textcolor{preprocessor}{\#define\ UTILS\_HPP\_}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2utils_8hpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2utils_8hpp_source_l00013}00013\ \textcolor{preprocessor}{\#include\ <cassert>}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2utils_8hpp_source_l00014}00014\ \textcolor{preprocessor}{\#include\ <iostream>}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2utils_8hpp_source_l00015}00015\ \textcolor{preprocessor}{\#include\ <sstream>}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2utils_8hpp_source_l00016}00016\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2utils_8hpp_source_l00017}00017\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2utils_8hpp_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2utils_8hpp_source_l00019}00019\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacelibff}{libff}}\ \{}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2utils_8hpp_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2utils_8hpp_source_l00021}\mbox{\hyperlink{namespacelibff_a696ce545f08b1dfc65e1cf261eed148c}{00021}}\ \textcolor{keyword}{typedef}\ std::vector<bool>\ \mbox{\hyperlink{namespacelibff_a696ce545f08b1dfc65e1cf261eed148c}{bit\_vector}};}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2utils_8hpp_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2utils_8hpp_source_l00023}00023\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{namespacelibff_a66321d6122496a1c917e5c1712133244}{get\_power\_of\_two}}(\textcolor{keywordtype}{size\_t}\ n);}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2utils_8hpp_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2utils_8hpp_source_l00026}00026\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{namespacelibff_a7afad10ffee58e885a8377a69aa37e3f}{log2}}(\textcolor{keywordtype}{size\_t}\ n);}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2utils_8hpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2utils_8hpp_source_l00028}\mbox{\hyperlink{namespacelibff_aeeaf15a4afe6a54d76f6345b5c03778c}{00028}}\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{namespacelibff_aeeaf15a4afe6a54d76f6345b5c03778c}{exp2}}(\textcolor{keywordtype}{size\_t}\ k)\ \{\ \textcolor{keywordflow}{return}\ size\_t(1)\ <<\ k;\ \}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2utils_8hpp_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2utils_8hpp_source_l00030}00030\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{namespacelibff_adae19a9e52ef2610bca7c75758878c9a}{to\_twos\_complement}}(\textcolor{keywordtype}{int}\ i,\ \textcolor{keywordtype}{size\_t}\ w);}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2utils_8hpp_source_l00031}00031\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacelibff_ae72300e9869c3d754f7089bfc5b126a9}{from\_twos\_complement}}(\textcolor{keywordtype}{size\_t}\ i,\ \textcolor{keywordtype}{size\_t}\ w);}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2utils_8hpp_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2utils_8hpp_source_l00033}00033\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{namespacelibff_a3cfe8798393d5ff53eadcea8403e5f5c}{bitreverse}}(\textcolor{keywordtype}{size\_t}\ n,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}});}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2utils_8hpp_source_l00034}00034\ \mbox{\hyperlink{namespacelibff_a696ce545f08b1dfc65e1cf261eed148c}{bit\_vector}}\ \mbox{\hyperlink{namespacelibff_adaa8c41c123a0086e707bfdf17a8ded5}{int\_list\_to\_bits}}(\textcolor{keyword}{const}\ std::initializer\_list<unsigned\ long>\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}},\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ wordsize);}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2utils_8hpp_source_l00035}00035\ \textcolor{keywordtype}{long}\ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{namespacelibff_afc9ea110e0de37d57286c4f1e0424425}{div\_ceil}}(\textcolor{keywordtype}{long}\ \textcolor{keywordtype}{long}\ x,\ \textcolor{keywordtype}{long}\ \textcolor{keywordtype}{long}\ y);}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2utils_8hpp_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2utils_8hpp_source_l00037}00037\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacelibff_a91495578c17649f0bb3bc532c59dda94}{is\_little\_endian}}();}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2utils_8hpp_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2utils_8hpp_source_l00039}00039\ std::string\ \mbox{\hyperlink{namespacelibff_abc98dc0e6da05efad228d6a29f3ec506}{FORMAT}}(\textcolor{keyword}{const}\ std::string\ \&prefix,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}},\ ...);}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2utils_8hpp_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2utils_8hpp_source_l00041}00041\ \textcolor{comment}{/*\ A\ variadic\ template\ to\ suppress\ unused\ argument\ warnings\ */}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2utils_8hpp_source_l00042}00042\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ ...\ Types>}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2utils_8hpp_source_l00043}\mbox{\hyperlink{namespacelibff_aaabbf77c9739979d0d966c57065bf0c2}{00043}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a86d500a34c624c2cae56bc25a31b12f3}{UNUSED}}(Types\&\&...)\ \{\}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2utils_8hpp_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2utils_8hpp_source_l00045}00045\ \textcolor{preprocessor}{\#ifdef\ DEBUG}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2utils_8hpp_source_l00046}00046\ \textcolor{preprocessor}{\#define\ FMT\ libff::FORMAT}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2utils_8hpp_source_l00047}00047\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2utils_8hpp_source_l00048}\mbox{\hyperlink{fc_2libraries_2ff_2libff_2common_2utils_8hpp_a0f38ae11835b4d77923ffb6f90fc9acb}{00048}}\ \textcolor{preprocessor}{\#define\ FMT(...)\ (libff::UNUSED(\_\_VA\_ARGS\_\_),\ "{}"{})}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2utils_8hpp_source_l00049}00049\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2utils_8hpp_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2utils_8hpp_source_l00051}00051\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacelibff_afa6e1452b5974a94a8dddd9a2a5039cc}{serialize\_bit\_vector}}(std::ostream\ \&out,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacelibff_a696ce545f08b1dfc65e1cf261eed148c}{bit\_vector}}\ \&v);}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2utils_8hpp_source_l00052}00052\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacelibff_a2f2e93960c0519b73a33b20eec2880f2}{deserialize\_bit\_vector}}(std::istream\ \&in,\ \mbox{\hyperlink{namespacelibff_a696ce545f08b1dfc65e1cf261eed148c}{bit\_vector}}\ \&v);}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2utils_8hpp_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2utils_8hpp_source_l00054}00054\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2utils_8hpp_source_l00055}\mbox{\hyperlink{namespacelibff_a658687e84ee39701c8c808c2cd5b98df}{00055}}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{namespacelibff_a658687e84ee39701c8c808c2cd5b98df}{size\_in\_bits}}(\textcolor{keyword}{const}\ std::vector<T>\ \&v);}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2utils_8hpp_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2utils_8hpp_source_l00057}\mbox{\hyperlink{fc_2libraries_2ff_2libff_2common_2utils_8hpp_a3c7c6a69f690fc8d2abf0e385280a532}{00057}}\ \textcolor{preprocessor}{\#define\ ARRAY\_SIZE(arr)\ (sizeof(arr)/sizeof(arr[0]))}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2utils_8hpp_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2utils_8hpp_source_l00059}00059\ \}\ \textcolor{comment}{//\ libff}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2utils_8hpp_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2utils_8hpp_source_l00061}00061\ \textcolor{preprocessor}{\#include\ <libff/common/utils.tcc>}\ \textcolor{comment}{/*\ note\ that\ utils\ has\ a\ templatized\ part\ (utils.tcc)\ and\ non-\/templatized\ part\ (utils.cpp)\ */}}
+\DoxyCodeLine{\Hypertarget{fc_2libraries_2ff_2libff_2common_2utils_8hpp_source_l00062}00062\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ UTILS\_HPP\_}}
+
+\end{DoxyCode}

@@ -1,0 +1,122 @@
+\doxysection{fc\+::exception\+\_\+factory Class Reference}
+\hypertarget{classfc_1_1exception__factory}{}\label{classfc_1_1exception__factory}\index{fc::exception\_factory@{fc::exception\_factory}}
+
+
+{\ttfamily \#include $<$exception.\+hpp$>$}
+
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structfc_1_1exception__factory_1_1base__exception__builder}{base\+\_\+exception\+\_\+builder}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1exception__factory_1_1exception__builder}{exception\+\_\+builder}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{classfc_1_1exception__factory_a59581ba21d7c93104a43a0f5fed3cc9d}{register\+\_\+exception}} ()
+\item 
+void \mbox{\hyperlink{utility_8hpp_a9bc43e3ee0ae83643b65e07fe1fd0132}{NO\+\_\+\+RETURN}} \mbox{\hyperlink{classfc_1_1exception__factory_a61092b88bfa736748a4fcb860b18e5b2}{rethrow}} (const \mbox{\hyperlink{classfc_1_1exception}{exception}} \&e) const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static \mbox{\hyperlink{classfc_1_1exception__factory}{exception\+\_\+factory}} \& \mbox{\hyperlink{classfc_1_1exception__factory_abd81007923f875be9136102a48609f8c}{instance}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{exception_8hpp_source_l00210}{210}} of file \mbox{\hyperlink{exception_8hpp_source}{exception.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1exception__factory_abd81007923f875be9136102a48609f8c}\index{fc::exception\_factory@{fc::exception\_factory}!instance@{instance}}
+\index{instance@{instance}!fc::exception\_factory@{fc::exception\_factory}}
+\doxysubsubsection{\texorpdfstring{instance()}{instance()}}
+{\footnotesize\ttfamily \label{classfc_1_1exception__factory_abd81007923f875be9136102a48609f8c} 
+static \mbox{\hyperlink{classfc_1_1exception__factory}{exception\+\_\+factory}} \& fc\+::exception\+\_\+factory\+::instance (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{exception_8hpp_source_l00239}{239}} of file \mbox{\hyperlink{exception_8hpp_source}{exception.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00241\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ exception\_factory\ once;}
+\DoxyCodeLine{00242\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ once;}
+\DoxyCodeLine{00243\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1exception__factory_abd81007923f875be9136102a48609f8c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1exception__factory_a59581ba21d7c93104a43a0f5fed3cc9d}\index{fc::exception\_factory@{fc::exception\_factory}!register\_exception@{register\_exception}}
+\index{register\_exception@{register\_exception}!fc::exception\_factory@{fc::exception\_factory}}
+\doxysubsubsection{\texorpdfstring{register\_exception()}{register\_exception()}}
+{\footnotesize\ttfamily \label{classfc_1_1exception__factory_a59581ba21d7c93104a43a0f5fed3cc9d} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+void fc\+::exception\+\_\+factory\+::register\+\_\+exception (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{exception_8hpp_source_l00228}{228}} of file \mbox{\hyperlink{exception_8hpp_source}{exception.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00229\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00230\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ exception\_builder<T>\ builder;}
+\DoxyCodeLine{00231\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ \_registered\_exceptions.find(\ T::code\_value\ );}
+\DoxyCodeLine{00232\ \ \ \ \ \ \ \ \ \ \ \ assert(\ itr\ ==\ \_registered\_exceptions.end()\ );}
+\DoxyCodeLine{00233\ \ \ \ \ \ \ \ \ \ \ \ (void)itr;\ \textcolor{comment}{//\ in\ release\ builds\ this\ hides\ warnings}}
+\DoxyCodeLine{00234\ \ \ \ \ \ \ \ \ \ \ \ \_registered\_exceptions[T::code\_value]\ =\ \&builder;}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1exception__factory_a61092b88bfa736748a4fcb860b18e5b2}\index{fc::exception\_factory@{fc::exception\_factory}!rethrow@{rethrow}}
+\index{rethrow@{rethrow}!fc::exception\_factory@{fc::exception\_factory}}
+\doxysubsubsection{\texorpdfstring{rethrow()}{rethrow()}}
+{\footnotesize\ttfamily \label{classfc_1_1exception__factory_a61092b88bfa736748a4fcb860b18e5b2} 
+void \mbox{\hyperlink{utility_8hpp_a9bc43e3ee0ae83643b65e07fe1fd0132}{NO\+\_\+\+RETURN}} fc\+::exception\+\_\+factory\+::rethrow (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1exception}{exception}} \&}]{e}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{exception_8cpp_source_l00247}{247}} of file \mbox{\hyperlink{exception_8cpp_source}{exception.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00248\ \ \ \ \{}
+\DoxyCodeLine{00249\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ \_registered\_exceptions.find(\ e.code()\ );}
+\DoxyCodeLine{00250\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr\ !=\ \_registered\_exceptions.end()\ )}
+\DoxyCodeLine{00251\ \ \ \ \ \ \ \ \ \ itr-\/>second-\/>rethrow(\ e\ );}
+\DoxyCodeLine{00252\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ e;}
+\DoxyCodeLine{00253\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=323pt]{classfc_1_1exception__factory_a61092b88bfa736748a4fcb860b18e5b2_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1exception__factory_a61092b88bfa736748a4fcb860b18e5b2_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/exception/\mbox{\hyperlink{exception_8hpp}{exception.\+hpp}}\item 
+libraries/fc/src/\mbox{\hyperlink{exception_8cpp}{exception.\+cpp}}\end{DoxyCompactItemize}

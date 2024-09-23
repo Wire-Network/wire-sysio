@@ -1,0 +1,88 @@
+\doxysection{platform\+\_\+timer\+\_\+posix.\+cpp}
+\hypertarget{platform__timer__posix_8cpp_source}{}\label{platform__timer__posix_8cpp_source}\index{libraries/chain/platform\_timer\_posix.cpp@{libraries/chain/platform\_timer\_posix.cpp}}
+\mbox{\hyperlink{platform__timer__posix_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{platform__timer_8hpp}{sysio/chain/platform\_timer.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{platform__timer__accuracy_8hpp}{sysio/chain/platform\_timer\_accuracy.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{include_2fc_2time_8hpp}{fc/time.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{fwd__impl_8hpp}{fc/fwd\_impl.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{exception_8hpp}{fc/exception/exception.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <mutex>}}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <signal.h>}}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00011}00011\ \textcolor{preprocessor}{\#include\ <time.h>}}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00013}00013\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{\ \textcolor{keyword}{namespace\ }chain\ \{}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00015}00015\ \textcolor{keyword}{static\_assert}(std::atomic\_bool::is\_always\_lock\_free,\ \textcolor{stringliteral}{"{}Only\ lock-\/free\ atomics\ AS-\/safe."{}});}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00017}\mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_1_1impl}{00017}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_1_1impl}{platform\_timer::impl}}\ \{}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00018}\mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_1_1impl_a86e2fb4a06f086482286ed3085b373d1}{00018}}\ \ \ \ timer\_t\ \mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_1_1impl_a86e2fb4a06f086482286ed3085b373d1}{timerid}};}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00020}\mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_1_1impl_ab8595c05cd8f1d4b66f68d83c0ff715a}{00020}}\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_1_1impl_ab8595c05cd8f1d4b66f68d83c0ff715a}{sig\_handler}}(\textcolor{keywordtype}{int},\ siginfo\_t*\ si,\ \textcolor{keywordtype}{void}*)\ \{}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00021}00021\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer}{platform\_timer}}*\ \mbox{\hyperlink{namespacesysio_a5c18cd9d34b8c5d3af8e2de75577673fa1f42b089b0bc1105b38f19140a65cc2a}{self}}\ =\ (\mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer}{platform\_timer}}*)si-\/>si\_value.sival\_ptr;}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00022}00022\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_a5c18cd9d34b8c5d3af8e2de75577673fa1f42b089b0bc1105b38f19140a65cc2a}{self}}-\/>expired\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00023}00023\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_a5c18cd9d34b8c5d3af8e2de75577673fa1f42b089b0bc1105b38f19140a65cc2a}{self}}-\/>call\_expiration\_callback();}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00024}00024\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00025}00025\ \};}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00027}00027\ \mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_a73955c69921017b77b595476e8de4eea}{platform\_timer::platform\_timer}}()\ \{}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00028}00028\ \ \ \ \textcolor{keyword}{static\_assert}(\textcolor{keyword}{sizeof}(impl)\ <=\ fwd\_size);}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00030}00030\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{bool}\ initialized;}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00031}00031\ \ \ \ \textcolor{keyword}{static}\ std::mutex\ initalized\_mutex;}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00033}00033\ \ \ \ \textcolor{keywordflow}{if}(std::lock\_guard\ guard(initalized\_mutex);\ !initialized)\ \{}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00034}00034\ \ \ \ \ \ \ \textcolor{keyword}{struct\ }sigaction\ act;}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00035}00035\ \ \ \ \ \ \ sigemptyset(\&act.sa\_mask);}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00036}00036\ \ \ \ \ \ \ act.sa\_sigaction\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_1_1impl_ab8595c05cd8f1d4b66f68d83c0ff715a}{impl::sig\_handler}};}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00037}00037\ \ \ \ \ \ \ act.sa\_flags\ =\ SA\_SIGINFO\ |\ SA\_RESTART;}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00038}00038\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(sigaction(SIGRTMIN,\ \&act,\ NULL)\ ==\ 0,\ \textcolor{stringliteral}{"{}failed\ to\ aquire\ SIGRTMIN\ signal"{}});}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00039}00039\ \ \ \ \ \ \ initialized\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00040}00040\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00042}00042\ \ \ \ \textcolor{keyword}{struct\ }sigevent\ se;}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00043}00043\ \ \ \ se.sigev\_notify\ =\ SIGEV\_SIGNAL;}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00044}00044\ \ \ \ se.sigev\_signo\ =\ SIGRTMIN;}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00045}00045\ \ \ \ se.sigev\_value.sival\_ptr\ =\ (\textcolor{keywordtype}{void}*)\textcolor{keyword}{this};}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00047}00047\ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(timer\_create(CLOCK\_REALTIME,\ \&se,\ \&my-\/>timerid)\ ==\ 0,\ \textcolor{stringliteral}{"{}failed\ to\ create\ timer"{}});}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00049}00049\ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_ae7932098515897c80ae49b0d569441ba}{compute\_and\_print\_timer\_accuracy}}(*\textcolor{keyword}{this});}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00050}00050\ \}}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00052}00052\ \mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_ab241e03e3055f290f13d6b367d8447b7}{platform\_timer::\string~platform\_timer}}()\ \{}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00053}00053\ \ \ \ timer\_delete(my-\/>timerid);}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00054}00054\ \}}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00056}00056\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_a8396e86c6a626dd2632cb075bd254ad4}{platform\_timer::start}}(\mbox{\hyperlink{classfc_1_1time__point}{fc::time\_point}}\ tp)\ \{}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00057}00057\ \ \ \ \textcolor{keywordflow}{if}(tp\ ==\ \mbox{\hyperlink{classfc_1_1time__point_aeccf1b70aa34b132c5269313b8a50573}{fc::time\_point::maximum}}())\ \{}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00058}00058\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_a801fb6084f296f86fdc1dedd980ac643}{expired}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00059}00059\ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00060}00060\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00061}00061\ \ \ \ \mbox{\hyperlink{classfc_1_1microseconds}{fc::microseconds}}\ x\ =\ tp.\mbox{\hyperlink{classfc_1_1time__point_abfea5efbe9ef58024cda814395ee9945}{time\_since\_epoch}}()\ -\/\ \mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{fc::time\_point::now}}().\mbox{\hyperlink{classfc_1_1time__point_abfea5efbe9ef58024cda814395ee9945}{time\_since\_epoch}}();}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00062}00062\ \ \ \ \textcolor{keywordflow}{if}(x.\mbox{\hyperlink{classfc_1_1microseconds_a20fba59ec7e1f50c6b8f2c9443cc9b92}{count}}()\ <=\ 0)}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00063}00063\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_a801fb6084f296f86fdc1dedd980ac643}{expired}}\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00064}00064\ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00065}00065\ \ \ \ \ \ \ time\_t\ secs\ =\ x.\mbox{\hyperlink{classfc_1_1microseconds_a20fba59ec7e1f50c6b8f2c9443cc9b92}{count}}()\ /\ 1000000;}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00066}00066\ \ \ \ \ \ \ \textcolor{keywordtype}{long}\ nsec\ =\ (x.\mbox{\hyperlink{classfc_1_1microseconds_a20fba59ec7e1f50c6b8f2c9443cc9b92}{count}}()\ -\/\ (secs*1000000))\ *\ 1000;}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00067}00067\ \ \ \ \ \ \ \textcolor{keyword}{struct\ }itimerspec\ enable\ =\ \{\{0,\ 0\},\ \{secs,\ nsec\}\};}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00068}00068\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_a801fb6084f296f86fdc1dedd980ac643}{expired}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00069}00069\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(timer\_settime(my-\/>timerid,\ 0,\ \&enable,\ NULL)\ !=\ 0)}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_a801fb6084f296f86fdc1dedd980ac643}{expired}}\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00071}00071\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00072}00072\ \}}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00073}00073\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00074}00074\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_a5cb70a095755d00bf02d37d31b6e46af}{platform\_timer::stop}}()\ \{}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00075}00075\ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_a801fb6084f296f86fdc1dedd980ac643}{expired}})}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00076}00076\ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00077}00077\ \ \ \ \textcolor{keyword}{struct\ }itimerspec\ disable\ =\ \{\{0,\ 0\},\ \{0,\ 0\}\};}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00078}00078\ \ \ \ timer\_settime(my-\/>timerid,\ 0,\ \&disable,\ NULL);}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00079}00079\ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_a801fb6084f296f86fdc1dedd980ac643}{expired}}\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00080}00080\ \}}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00081}00081\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__posix_8cpp_source_l00082}00082\ \}\}}
+
+\end{DoxyCode}

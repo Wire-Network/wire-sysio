@@ -1,0 +1,9 @@
+<map id="websocketpp::frame::get_jumbo_size" name="websocketpp::frame::get_jumbo_size">
+<area shape="rect" id="Node000001" title="Extract the jumbo size field from an extended header." alt="" coords="631,13,771,54"/>
+<area shape="rect" id="Node000002" href="$namespacewebsocketpp_1_1frame.html#a2ca0b9ba6077f201997da543d45b067f" title="Extract the full payload size field from a WebSocket header." alt="" coords="444,13,583,54"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="616,36,584,36,584,30,616,30"/>
+<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1processor_1_1hybi13.html#aee8565136bb0820e9a8914dfc5fdb753" title="Validate an incoming extended header." alt="" coords="217,5,396,61"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="428,36,397,36,397,30,428,30"/>
+<area shape="rect" id="Node000004" href="$classwebsocketpp_1_1processor_1_1hybi13.html#a5c5e3234a0067c7f14fe0ceb4e647659" title="Process new websocket connection bytes." alt="" coords="5,13,169,54"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="201,36,169,36,169,30,201,30"/>
+</map>

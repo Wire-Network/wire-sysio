@@ -1,0 +1,145 @@
+\doxysection{console.\+cpp}
+\hypertarget{chain_2webassembly_2console_8cpp_source}{}\label{chain_2webassembly_2console_8cpp_source}\index{libraries/chain/webassembly/console.cpp@{libraries/chain/webassembly/console.cpp}}
+\mbox{\hyperlink{chain_2webassembly_2console_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{interface_8hpp}{sysio/chain/webassembly/interface.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{apply__context_8hpp}{sysio/chain/apply\_context.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{uint128_8hpp}{fc/uint128.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00005}00005\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{\ \textcolor{keyword}{namespace\ }chain\ \{\ \textcolor{keyword}{namespace\ }webassembly\ \{}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00007}00007\ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ Ctx,\ \textcolor{keyword}{typename}\ F>}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00008}00008\ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ predicated\_print(Ctx\&\ \mbox{\hyperlink{structcontext}{context}},\ F\&\&\ print\_func)\ \{}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00009}00009\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{exception_8hpp_ab10d0a221f4d7a706701b806c8135fd7}{UNLIKELY}}(\mbox{\hyperlink{structcontext}{context}}.control.contracts\_console()))}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00010}00010\ \ \ \ \ \ \ \ \ \ print\_func();}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00011}00011\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00013}00013\ \ \ \ \textcolor{comment}{//\ Kept\ as\ intrinsic\ rather\ than\ implementing\ on\ WASM\ side\ (using\ prints\_l\ and\ strlen)\ because\ strlen\ is\ faster\ on\ native\ side.}}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00014}00014\ \ \ \ \textcolor{comment}{//\ TODO\ predicate\ these\ for\ ignore}}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00015}\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_a64b1da4695436518bb714324121624ed}{00015}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_a64b1da4695436518bb714324121624ed}{interface::prints}}(\mbox{\hyperlink{structsysio_1_1chain_1_1null__terminated__ptr}{null\_terminated\_ptr}}\ str)\ \{}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00016}00016\ \ \ \ \ \ \ predicated\_print(\mbox{\hyperlink{structcontext}{context}},}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00017}00017\ \ \ \ \ \ \ [\&]()\ \{\ \mbox{\hyperlink{structcontext}{context}}.console\_append(\ \textcolor{keyword}{static\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(str.data())\ );\ \});}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00018}00018\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00020}\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_a4e41165b7220f1aaf7f3988a26948959}{00020}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_a4e41165b7220f1aaf7f3988a26948959}{interface::prints\_l}}(\mbox{\hyperlink{structsysio_1_1vm_1_1argument__proxy}{legacy\_span<const\ char>}}\ str\ )\ \{}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00021}00021\ \ \ \ \ \ \ \ \ predicated\_print(\mbox{\hyperlink{structcontext}{context}},}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00022}00022\ \ \ \ \ \ \ [\&]()\ \{\ \mbox{\hyperlink{structcontext}{context}}.console\_append(std::string\_view(str.data(),\ str.size()));\ \});}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00023}00023\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00025}\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_a064f4ed180517956df7161a06ea077ca}{00025}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_a064f4ed180517956df7161a06ea077ca}{interface::printi}}(\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ val)\ \{}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00026}00026\ \ \ \ \ \ \ \ \ predicated\_print(\mbox{\hyperlink{structcontext}{context}},}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00027}00027\ \ \ \ \ \ \ [\&]()\ \{}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00028}00028\ \ \ \ \ \ \ \ \ \ \ \ \ std::ostringstream\ oss;}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00029}00029\ \ \ \ \ \ \ \ \ \ \ \ \ oss\ <<\ val;}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00030}00030\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structcontext}{context}}.console\_append(\ oss.str()\ );}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00031}00031\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00032}00032\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00034}\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_a5895bc45e98aa34db076626eaa1cdcd2}{00034}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_a5895bc45e98aa34db076626eaa1cdcd2}{interface::printui}}(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ val)\ \{}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00035}00035\ \ \ \ \ \ \ \ \ predicated\_print(\mbox{\hyperlink{structcontext}{context}},}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00036}00036\ \ \ \ \ \ \ [\&]()\ \{}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00037}00037\ \ \ \ \ \ \ \ \ \ \ \ \ std::ostringstream\ oss;}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00038}00038\ \ \ \ \ \ \ \ \ \ \ \ \ oss\ <<\ val;}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00039}00039\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structcontext}{context}}.console\_append(\ oss.str()\ );}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00040}00040\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00041}00041\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00043}\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_ad9ce29d75b0afc6cf121d8f47fae2fe6}{00043}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_ad9ce29d75b0afc6cf121d8f47fae2fe6}{interface::printi128}}(\mbox{\hyperlink{structsysio_1_1vm_1_1argument__proxy}{legacy\_ptr<const\ \_\_int128>}}\ val)\ \{}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00044}00044\ \ \ \ \ \ \ \ \ predicated\_print(\mbox{\hyperlink{structcontext}{context}},}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00045}00045\ \ \ \ \ \ \ [\&]()\ \{}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00046}00046\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ is\_negative\ =\ (*val\ <\ 0);}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00047}00047\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \_\_int128\ val\_magnitude;}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ is\_negative\ )}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00050}00050\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ val\_magnitude\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\ \_\_int128\textcolor{keyword}{>}(-\/*val);\ \textcolor{comment}{//\ Works\ even\ if\ val\ is\ at\ the\ lowest\ possible\ value\ of\ a\ int128\_t}}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00051}00051\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ val\_magnitude\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\ \_\_int128\textcolor{keyword}{>}(*val);}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1uint128}{fc::uint128}}\ v(val\_magnitude>>64,\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\textcolor{keyword}{>}(val\_magnitude)\ );}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ is\_negative\ )\ \{}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ +=\ \textcolor{charliteral}{'-\/'};}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00059}00059\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ +=\ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}(v).\mbox{\hyperlink{classfc_1_1variant_a2ca9f4d2feb8c9743da4128b18bfa886}{get\_string}}();}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00062}00062\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structcontext}{context}}.console\_append(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ );}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00063}00063\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00064}00064\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00066}\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_a8b57e2b5575d116e3c906fc7adccbd56}{00066}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_a8b57e2b5575d116e3c906fc7adccbd56}{interface::printui128}}(\mbox{\hyperlink{structsysio_1_1vm_1_1argument__proxy}{legacy\_ptr<const\ unsigned\ \_\_int128>}}\ val)\ \{}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00067}00067\ \ \ \ \ \ \ \ \ predicated\_print(\mbox{\hyperlink{structcontext}{context}},}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00068}00068\ \ \ \ \ \ \ [\&]()\ \{}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1uint128}{fc::uint128}}\ v(*val>>64,\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\textcolor{keyword}{>}(*val)\ );}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structcontext}{context}}.console\_append(\mbox{\hyperlink{classfc_1_1variant}{fc::variant}}(v).get\_string());}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00071}00071\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00072}00072\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00073}00073\ }
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00074}\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_a3ba48306fd4b977973fbc5a905e01ee0}{00074}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_a3ba48306fd4b977973fbc5a905e01ee0}{interface::printsf}}(\ \mbox{\hyperlink{structfloat32__t}{float32\_t}}\ val\ )\ \{}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00075}00075\ \ \ \ \ \ \ \ \ predicated\_print(\mbox{\hyperlink{structcontext}{context}},}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00076}00076\ \ \ \ \ \ \ [\&]()\ \{}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Assumes\ float\ representation\ on\ native\ side\ is\ the\ same\ as\ on\ the\ WASM\ side}}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00078}00078\ \ \ \ \ \ \ \ \ \ \ \ \ std::ostringstream\ oss;}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \ \ \ oss.setf(\ std::ios::scientific,\ std::ios::floatfield\ );}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00080}00080\ \ \ \ \ \ \ \ \ \ \ \ \ oss.precision(\ std::numeric\_limits<float>::digits10\ );}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00081}00081\ \ \ \ \ \ \ \ \ \ \ \ \ oss\ <<\ \mbox{\hyperlink{softfloat_2source_2include_2softfloat_8hpp_aa9844e6aebaaa652c490e1731c80ba86}{::from\_softfloat32}}(val);}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00082}00082\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structcontext}{context}}.console\_append(\ oss.str()\ );}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00083}00083\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00084}00084\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00085}00085\ }
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00086}\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_a64a53f8de3d906ff76c7a3351b110c5d}{00086}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_a64a53f8de3d906ff76c7a3351b110c5d}{interface::printdf}}(\ \mbox{\hyperlink{structfloat64__t}{float64\_t}}\ val\ )\ \{}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00087}00087\ \ \ \ \ \ \ \ \ predicated\_print(\mbox{\hyperlink{structcontext}{context}},}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00088}00088\ \ \ \ \ \ \ [\&]()\ \{}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00089}00089\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Assumes\ double\ representation\ on\ native\ side\ is\ the\ same\ as\ on\ the\ WASM\ side}}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00090}00090\ \ \ \ \ \ \ \ \ \ \ \ \ std::ostringstream\ oss;}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00091}00091\ \ \ \ \ \ \ \ \ \ \ \ \ oss.setf(\ std::ios::scientific,\ std::ios::floatfield\ );}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00092}00092\ \ \ \ \ \ \ \ \ \ \ \ \ oss.precision(\ std::numeric\_limits<double>::digits10\ );}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00093}00093\ \ \ \ \ \ \ \ \ \ \ \ \ oss\ <<\ \mbox{\hyperlink{softfloat_2source_2include_2softfloat_8hpp_a6877d003f279236fa2d8359583e8a4b3}{::from\_softfloat64}}(val);}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00094}00094\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structcontext}{context}}.console\_append(\ oss.str()\ );}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00095}00095\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00096}00096\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00097}00097\ }
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00098}\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_affee51c72db3f7331b74c1f93f1eb490}{00098}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_affee51c72db3f7331b74c1f93f1eb490}{interface::printqf}}(\ \mbox{\hyperlink{structsysio_1_1vm_1_1argument__proxy}{legacy\_ptr<const\ float128\_t>}}\ val\ )\ \{}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00099}00099\ \ \ \ \ \ \ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00100}00100\ \textcolor{comment}{\ \ \ \ \ \ \ *\ Native-\/side\ long\ double\ uses\ an\ 80-\/bit\ extended-\/precision\ floating-\/point\ number.}}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00101}00101\ \textcolor{comment}{\ \ \ \ \ \ \ *\ The\ easiest\ solution\ for\ now\ was\ to\ use\ the\ Berkeley\ softfloat\ library\ to\ round\ the\ 128-\/bit}}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00102}00102\ \textcolor{comment}{\ \ \ \ \ \ \ *\ quadruple-\/precision\ floating-\/point\ number\ to\ an\ 80-\/bit\ extended-\/precision\ floating-\/point\ number}}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00103}00103\ \textcolor{comment}{\ \ \ \ \ \ \ *\ (losing\ precision)\ which\ then\ allows\ us\ to\ simply\ cast\ it\ into\ a\ long\ double\ for\ printing\ purposes.}}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00104}00104\ \textcolor{comment}{\ \ \ \ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00105}00105\ \textcolor{comment}{\ \ \ \ \ \ \ *\ Later\ we\ might\ find\ a\ better\ solution\ to\ print\ the\ full\ quadruple-\/precision\ floating-\/point\ number.}}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00106}00106\ \textcolor{comment}{\ \ \ \ \ \ \ *\ Maybe\ with\ some\ compilation\ flag\ that\ turns\ long\ double\ into\ a\ quadruple-\/precision\ floating-\/point\ number,}}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00107}00107\ \textcolor{comment}{\ \ \ \ \ \ \ *\ or\ maybe\ with\ some\ library\ that\ allows\ us\ to\ print\ out\ quadruple-\/precision\ floating-\/point\ numbers\ without}}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00108}00108\ \textcolor{comment}{\ \ \ \ \ \ \ *\ having\ to\ deal\ with\ long\ doubles\ at\ all.}}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00109}00109\ \textcolor{comment}{\ \ \ \ \ \ \ */}}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00110}00110\ }
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00111}00111\ \ \ \ \ \ \ \ \ predicated\_print(\mbox{\hyperlink{structcontext}{context}},}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00112}00112\ \ \ \ \ \ \ [\&]()\ \{}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00113}00113\ \ \ \ \ \ \ \ \ \ \ \ \ std::ostringstream\ oss;}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00114}00114\ \ \ \ \ \ \ \ \ \ \ \ \ oss.setf(\ std::ios::scientific,\ std::ios::floatfield\ );}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00115}00115\ }
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00116}00116\ \textcolor{preprocessor}{\#ifdef\ \_\_x86\_64\_\_}}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00117}00117\ \ \ \ \ \ \ \ \ \ \ \ \ oss.precision(\ std::numeric\_limits<long\ double>::digits10\ );}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00118}00118\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structext_float80_m}{extFloat80\_t}}\ val\_approx;}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00119}00119\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{softfloat_2source_2f128_m__to__ext_f80_m_8c_a1ccf94616a04a0774933bd8185389a74}{f128M\_to\_extF80M}}(val.get(),\ \&val\_approx);}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00120}00120\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{long}\ \textcolor{keywordtype}{double}\ \_val;}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00121}00121\ \ \ \ \ \ \ \ \ \ \ \ \ std::memcpy((\textcolor{keywordtype}{char}*)\&\_val,\ (\textcolor{keywordtype}{char}*)\&val\_approx,\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{long}\ \textcolor{keywordtype}{double}));}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00122}00122\ \ \ \ \ \ \ \ \ \ \ \ \ oss\ <<\ \_val;}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00123}00123\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00124}00124\ \ \ \ \ \ \ \ \ \ \ \ \ oss.precision(\ std::numeric\_limits<double>::digits10\ );}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00125}00125\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ val\_approx\ =\ \mbox{\hyperlink{softfloat_2source_2include_2softfloat_8hpp_a6877d003f279236fa2d8359583e8a4b3}{from\_softfloat64}}(\ \mbox{\hyperlink{softfloat_2source_2f128_m__to__f64_8c_a3940fec63bdb711eca82ebffff7a76b5}{f128M\_to\_f64}}(val.get())\ );}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00126}00126\ \ \ \ \ \ \ \ \ \ \ \ \ oss\ <<\ val\_approx;}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00127}00127\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00128}00128\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structcontext}{context}}.console\_append(\ oss.str()\ );}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00129}00129\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00130}00130\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00131}00131\ }
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00132}\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_a81731102a63cb8679aac3a5c4aa76546}{00132}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_a81731102a63cb8679aac3a5c4aa76546}{interface::printn}}(\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})\ \{}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00133}00133\ \ \ \ \ \ \ \ \ predicated\_print(\mbox{\hyperlink{structcontext}{context}},\ [\&]()\ \{\ \mbox{\hyperlink{structcontext}{context}}.console\_append(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}.to\_string());\ \});}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00134}00134\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00135}00135\ }
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00136}\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_a0517c870a8e34d0fbcd21c015de0ff81}{00136}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_a0517c870a8e34d0fbcd21c015de0ff81}{interface::printhex}}(\mbox{\hyperlink{structsysio_1_1vm_1_1argument__proxy}{legacy\_span<const\ char>}}\ data\ )\ \{}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00137}00137\ \ \ \ \ \ \ predicated\_print(\mbox{\hyperlink{structcontext}{context}},\ [\&]()\ \{\ \mbox{\hyperlink{structcontext}{context}}.console\_append(\mbox{\hyperlink{namespacefc_aab567c89004d329f560014d9943afcd6}{fc::to\_hex}}(data.data(),\ data.size()));\ \});}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00138}00138\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{chain_2webassembly_2console_8cpp_source_l00139}00139\ \}\}\}\ \textcolor{comment}{//\ ns\ sysio::chain::webassembly}}
+
+\end{DoxyCode}

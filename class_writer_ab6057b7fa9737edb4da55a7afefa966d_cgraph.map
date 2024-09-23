@@ -1,0 +1,6 @@
+<map id="Writer::Key" name="Writer::Key">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,29,92,55"/>
+<area shape="poly" id="edge1_Node000001_Node000001" title=" " alt="" coords="23,30,19,21,21,11,32,5,49,3,66,5,76,12,73,16,64,10,48,8,34,10,26,14,24,20,28,28"/>
+<area shape="rect" id="Node000002" href="$namespaceinternal.html#a86326fb0c9d7c7ea8edd7deedbb2b26e" title="Custom strlen() which works on different character types." alt="" coords="140,29,249,55"/>
+<area shape="poly" id="edge2_Node000001_Node000002" title=" " alt="" coords="92,40,124,40,124,45,92,45"/>
+</map>

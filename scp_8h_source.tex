@@ -1,0 +1,85 @@
+\doxysection{scp.\+h}
+\hypertarget{scp_8h_source}{}\label{scp_8h_source}\index{libraries/yubihsm/lib/scp.h@{libraries/yubihsm/lib/scp.h}}
+\mbox{\hyperlink{scp_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ 2015-\/2018\ Yubico\ AB}}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00004}00004\ \textcolor{comment}{\ *\ Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00005}00005\ \textcolor{comment}{\ *\ you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00006}00006\ \textcolor{comment}{\ *\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00008}00008\ \textcolor{comment}{\ *\ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00009}00009\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00010}00010\ \textcolor{comment}{\ *\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00011}00011\ \textcolor{comment}{\ *\ distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00012}00012\ \textcolor{comment}{\ *\ WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00013}00013\ \textcolor{comment}{\ *\ See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00014}00014\ \textcolor{comment}{\ *\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00015}00015\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00017}00017\ \textcolor{preprocessor}{\#ifndef\ SCP\_H}}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00018}00018\ \textcolor{preprocessor}{\#define\ SCP\_H}}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00020}00020\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{stdint_8h}{stdint.h}}>}}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00021}00021\ \textcolor{preprocessor}{\#include\ <stdbool.h>}}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00023}00023\ \textcolor{comment}{//\ Data\ derivation\ constants}}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00024}\mbox{\hyperlink{scp_8h_a7e24e08cc1bb8ad34d1b7016bdef195b}{00024}}\ \textcolor{preprocessor}{\#define\ SCP\_CARD\_CRYPTOGRAM\ 0x00}}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00025}\mbox{\hyperlink{scp_8h_ad5723ce4d78de90a38fd090a833fd7e3}{00025}}\ \textcolor{preprocessor}{\#define\ SCP\_HOST\_CRYPTOGRAM\ 0x01}}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00027}\mbox{\hyperlink{scp_8h_ab6d04dcaed0075fa4247a560273c1108}{00027}}\ \textcolor{preprocessor}{\#define\ SCP\_CARD\_CHALLENGE\ 0x02}}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00029}\mbox{\hyperlink{scp_8h_aa5299032812d3274d208ff3b7a8953ae}{00029}}\ \textcolor{preprocessor}{\#define\ SCP\_S\_ENC\_DERIVATION\ 0x04}}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00030}\mbox{\hyperlink{scp_8h_a8d9b13667d43e31afde591cd054dbf60}{00030}}\ \textcolor{preprocessor}{\#define\ SCP\_S\_MAC\_DERIVATION\ 0x06}}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00031}\mbox{\hyperlink{scp_8h_a18c28fa29fad6513199b92e31a4e9d9e}{00031}}\ \textcolor{preprocessor}{\#define\ SCP\_S\_RMAC\_DERIVATION\ 0x07}}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00033}00033\ \textcolor{comment}{//\ Lengths}}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00034}\mbox{\hyperlink{scp_8h_a241f094f3b6ba7ec6d190568247b41aa}{00034}}\ \textcolor{preprocessor}{\#define\ AES\_128\_KEY\_LEN\ 16}}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00035}\mbox{\hyperlink{scp_8h_a69b5c8002b833d55f5b2ff5271ff429d}{00035}}\ \textcolor{preprocessor}{\#define\ AES\_192\_KEY\_LEN\ 24}}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00036}\mbox{\hyperlink{scp_8h_afdc3c9f91fda0de0029266fa37157fc5}{00036}}\ \textcolor{preprocessor}{\#define\ AES\_256\_KEY\_LEN\ 32}}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00037}\mbox{\hyperlink{scp_8h_a25905234f13446437b28c85d0504216d}{00037}}\ \textcolor{preprocessor}{\#define\ SCP\_KEY\_LEN\ (AES\_128\_KEY\_LEN)}}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00038}\mbox{\hyperlink{scp_8h_a8f01665a0470dd4125b6518bd77e3328}{00038}}\ \textcolor{preprocessor}{\#define\ SCP\_PRF\_LEN\ 16\ }\textcolor{comment}{//\ One\ AES\ block}}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00040}\mbox{\hyperlink{scp_8h_aa341425f7d11b792662ebc93abf38cde}{00040}}\ \textcolor{preprocessor}{\#define\ SCP\_CARD\_CHAL\_LEN\ 8}}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00041}\mbox{\hyperlink{scp_8h_ac8a88e113e5d7d245aeb27e841214563}{00041}}\ \textcolor{preprocessor}{\#define\ SCP\_HOST\_CHAL\_LEN\ 8}}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00043}\mbox{\hyperlink{scp_8h_afa9d0a3bb1ce2a7951ca1b5f9f06dbe7}{00043}}\ \textcolor{preprocessor}{\#define\ SCP\_CARD\_CRYPTO\_LEN\ 8}}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00044}\mbox{\hyperlink{scp_8h_ab69c4b9b326bc5bd847773167ca5c969}{00044}}\ \textcolor{preprocessor}{\#define\ SCP\_HOST\_CRYPTO\_LEN\ 8}}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00046}\mbox{\hyperlink{scp_8h_a4b017661aafe8f0a0bde0ff377684303}{00046}}\ \textcolor{preprocessor}{\#define\ SCP\_MAC\_LEN\ 8}}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00048}\mbox{\hyperlink{scp_8h_a2a7a1f4b618c112a923cf452cdb1f506}{00048}}\ \textcolor{preprocessor}{\#define\ SCP\_CONTEXT\_LEN\ 16}}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00050}\mbox{\hyperlink{scp_8h_aaa32e6b7edd5513108f1410315fa594e}{00050}}\ \textcolor{preprocessor}{\#define\ SCP\_AUTHKEY\_ID\_LEN\ 2}}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00052}\mbox{\hyperlink{scp_8h_ab34d7a732259f8803a741b84924cd64e}{00052}}\ \textcolor{preprocessor}{\#define\ SCP\_MSG\_BUF\_SIZE\ 2048}}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00054}00054\ \textcolor{comment}{//\ Message}}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00055}00055\ \textcolor{preprocessor}{\#pragma\ pack(push,\ 1)}}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00056}\mbox{\hyperlink{union___msg}{00056}}\ \textcolor{keyword}{union\ }\mbox{\hyperlink{union___msg}{\_Msg}}\ \{}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00057}00057\ \ \ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00058}\mbox{\hyperlink{union___msg_a99d3b325b099f57b7e7a705ed425a6b2}{00058}}\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \mbox{\hyperlink{union___msg_a99d3b325b099f57b7e7a705ed425a6b2}{cmd}};}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00059}\mbox{\hyperlink{union___msg_a5754c0fdce0fe264f605064a5603f0ca}{00059}}\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ \mbox{\hyperlink{union___msg_a5754c0fdce0fe264f605064a5603f0ca}{len}};}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00060}\mbox{\hyperlink{union___msg_a0d3f68a22845523e89a99d6dd26cc982}{00060}}\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ data[\mbox{\hyperlink{scp_8h_ab34d7a732259f8803a741b84924cd64e}{SCP\_MSG\_BUF\_SIZE}}];}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00061}\mbox{\hyperlink{union___msg_a6b67958147999d1199c922c26763d7f0}{00061}}\ \ \ \}\ \mbox{\hyperlink{union___msg_a6b67958147999d1199c922c26763d7f0}{st}};}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00062}\mbox{\hyperlink{union___msg_aeba349af15322ba6c42fe23750437b0d}{00062}}\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \mbox{\hyperlink{union___msg_aeba349af15322ba6c42fe23750437b0d}{raw}}[3\ +\ \mbox{\hyperlink{scp_8h_ab34d7a732259f8803a741b84924cd64e}{SCP\_MSG\_BUF\_SIZE}}];}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00063}00063\ \};}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00064}00064\ \textcolor{preprocessor}{\#pragma\ pack(pop)}}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00066}\mbox{\hyperlink{scp_8h_a2026a4fe4ea2811a4929044067ea1718}{00066}}\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{union\ }\mbox{\hyperlink{union___msg}{\_Msg}}\ \mbox{\hyperlink{union___msg}{Msg}};}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00067}00067\ }
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00068}\mbox{\hyperlink{struct_scp__ctx}{00068}}\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00069}\mbox{\hyperlink{struct_scp__ctx_af58bb8b1e7185c27de7c8a2df94de1f5}{00069}}\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \mbox{\hyperlink{struct_scp__ctx_af58bb8b1e7185c27de7c8a2df94de1f5}{sid}};}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00070}\mbox{\hyperlink{struct_scp__ctx_af74beebd17620c5ff6fc1bd48fd017bf}{00070}}\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ s\_enc[\mbox{\hyperlink{scp_8h_a25905234f13446437b28c85d0504216d}{SCP\_KEY\_LEN}}];}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00071}\mbox{\hyperlink{struct_scp__ctx_a5c1e57aa4641ea9404201193367bfd37}{00071}}\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ s\_mac[\mbox{\hyperlink{scp_8h_a25905234f13446437b28c85d0504216d}{SCP\_KEY\_LEN}}];}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00072}\mbox{\hyperlink{struct_scp__ctx_a6d4e08d26c9ab0e28d75a3976d16967c}{00072}}\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ s\_rmac[\mbox{\hyperlink{scp_8h_a25905234f13446437b28c85d0504216d}{SCP\_KEY\_LEN}}];}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00073}\mbox{\hyperlink{struct_scp__ctx_add310cda0e0781e2aab63e521419cf55}{00073}}\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ mac\_chaining\_value[\mbox{\hyperlink{scp_8h_a8f01665a0470dd4125b6518bd77e3328}{SCP\_PRF\_LEN}}];}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00074}\mbox{\hyperlink{struct_scp__ctx_a7050b98c881eeb82bb6b07d4b63dc12e}{00074}}\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ ctr[\mbox{\hyperlink{scp_8h_a8f01665a0470dd4125b6518bd77e3328}{SCP\_PRF\_LEN}}];}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00075}\mbox{\hyperlink{struct_scp__ctx_a4f2c4b796d6b78ca3fc1ec4571aa46ed}{00075}}\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_scp__ctx_a4f2c4b796d6b78ca3fc1ec4571aa46ed}{in\_use}};}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00076}\mbox{\hyperlink{struct_scp__ctx_ad7df361dae029f1254024bbaceb1a8fe}{00076}}\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_scp__ctx_ad7df361dae029f1254024bbaceb1a8fe}{authenticated}};}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00077}00077\ \}\ \mbox{\hyperlink{struct_scp__ctx}{Scp\_ctx}};}
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{scp_8h_source_l00079}00079\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

@@ -1,0 +1,57 @@
+\doxysection{libraries/fc/include/fc/crypto/signature.hpp File Reference}
+\hypertarget{signature_8hpp}{}\label{signature_8hpp}\index{libraries/fc/include/fc/crypto/signature.hpp@{libraries/fc/include/fc/crypto/signature.hpp}}
+{\ttfamily \#include $<$fc/static\+\_\+variant.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/crypto/elliptic.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/crypto/elliptic\+\_\+r1.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/crypto/elliptic\+\_\+webauthn.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/crypto/elliptic\+\_\+em.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/reflect/reflect.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/reflect/variant.\+hpp$>$}\newline
+Include dependency graph for signature.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{signature_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{signature_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{fc\+::crypto\+::signature}}
+\item 
+struct \mbox{\hyperlink{structstd_1_1hash_3_01fc_1_1crypto_1_1signature_01_4}{std\+::hash$<$ fc\+::crypto\+::signature $>$}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacefc}{fc}}
+\begin{DoxyCompactList}\small\item\em namespace \doxylink{namespacesysio_1_1chain}{sysio\+::chain} \end{DoxyCompactList}\item 
+namespace \mbox{\hyperlink{namespacefc_1_1crypto}{fc\+::crypto}}
+\item 
+namespace \mbox{\hyperlink{namespacefc_1_1crypto_1_1config}{fc\+::crypto\+::config}}
+\item 
+namespace \mbox{\hyperlink{namespacestd}{std}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+size\+\_\+t \mbox{\hyperlink{namespacefc_1_1crypto_a94acf114d8936bc8b79952c01d3a84fe}{fc\+::crypto\+::hash\+\_\+value}} (const \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{signature}} \&b)
+\item 
+void \mbox{\hyperlink{namespacefc_a973cc5e78100b1312d14f405dcb0ccd6}{fc\+::to\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{crypto\+::signature}} \&var, \mbox{\hyperlink{classfc_1_1variant}{variant}} \&vo, const \mbox{\hyperlink{namespacefc_a978f9e97f64eb2ce6cbe892d3cc93397}{fc\+::yield\+\_\+function\+\_\+t}} \&yield=\mbox{\hyperlink{namespacefc_a978f9e97f64eb2ce6cbe892d3cc93397}{fc\+::yield\+\_\+function\+\_\+t}}())
+\item 
+void \mbox{\hyperlink{namespacefc_a5df83b6ab6fb04781a438ac3ad62970b}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{variant}} \&var, \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{crypto\+::signature}} \&vo)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+constexpr const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacefc_1_1crypto_1_1config_aaddff7f87ef4d24d92e1ccc4854ae620}{fc\+::crypto\+::config\+::signature\+\_\+base\+\_\+prefix}} = "{}SIG"{}
+\item 
+constexpr const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacefc_1_1crypto_1_1config_a729b7dd94fb0ae2b3b13616b5cd2fe62}{fc\+::crypto\+::config\+::signature\+\_\+prefix}} \mbox{[}$\,$\mbox{]}
+\end{DoxyCompactItemize}

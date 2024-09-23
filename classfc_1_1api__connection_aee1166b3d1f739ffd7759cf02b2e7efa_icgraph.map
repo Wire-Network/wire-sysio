@@ -1,0 +1,7 @@
+<map id="fc::api_connection::receive_call" name="fc::api_connection::receive_call">
+<area shape="rect" id="Node000001" title=" " alt="" coords="240,41,367,82"/>
+<area shape="rect" id="Node000002" href="$classfc_1_1rpc_1_1http__api__connection.html#a725d9f6837ca97683ba2e744cf206138" title=" " alt="" coords="7,5,190,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="224,50,190,44,191,39,225,45"/>
+<area shape="rect" id="Node000003" href="$classfc_1_1rpc_1_1websocket__api__connection.html#abe1996df25102b53d14348ef2336f6be" title=" " alt="" coords="5,70,192,126"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="225,78,192,84,191,79,224,73"/>
+</map>

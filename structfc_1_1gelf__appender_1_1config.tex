@@ -1,0 +1,116 @@
+\doxysection{fc\+::gelf\+\_\+appender\+::config Struct Reference}
+\hypertarget{structfc_1_1gelf__appender_1_1config}{}\label{structfc_1_1gelf__appender_1_1config}\index{fc::gelf\_appender::config@{fc::gelf\_appender::config}}
+
+
+{\ttfamily \#include $<$gelf\+\_\+appender.\+hpp$>$}
+
+
+
+Collaboration diagram for fc\+::gelf\+\_\+appender\+::config\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=230pt]{structfc_1_1gelf__appender_1_1config__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structfc_1_1gelf__appender_1_1config_a05092e63c79b6a42d6afe28be8f8b494}{endpoint}} = "{}127.\+0.\+0.\+1\+:12201"{}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structfc_1_1gelf__appender_1_1config_a74fb5bd5d3e044746fe5840a711722bd}{host}} = "{}fc"{}
+\item 
+\mbox{\hyperlink{classfc_1_1variant__object}{variant\+\_\+object}} \mbox{\hyperlink{structfc_1_1gelf__appender_1_1config_a044c2e8c1d386806035bd935937b3b09}{user\+\_\+fields}} = \{\}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static const std\+::vector$<$ std\+::string $>$ \mbox{\hyperlink{structfc_1_1gelf__appender_1_1config_a5ead47478e6c821001032156703ee429}{reserved\+\_\+field\+\_\+names}}
+\item 
+static const std\+::regex \mbox{\hyperlink{structfc_1_1gelf__appender_1_1config_a0ba11c2eea758783eb90d34fbaef0ae5}{user\+\_\+field\+\_\+name\+\_\+pattern}} \{"{}\texorpdfstring{$^\wedge$}{\string^}\+\_\+\mbox{[}\textbackslash{}\textbackslash{}w\textbackslash{}\textbackslash{}.\textbackslash{}\textbackslash{}-\/\mbox{]}\texorpdfstring{$\ast$}{*}\$"{}\}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{gelf__appender_8hpp_source_l00016}{16}} of file \mbox{\hyperlink{gelf__appender_8hpp_source}{gelf\+\_\+appender.\+hpp}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structfc_1_1gelf__appender_1_1config_a05092e63c79b6a42d6afe28be8f8b494}\index{fc::gelf\_appender::config@{fc::gelf\_appender::config}!endpoint@{endpoint}}
+\index{endpoint@{endpoint}!fc::gelf\_appender::config@{fc::gelf\_appender::config}}
+\doxysubsubsection{\texorpdfstring{endpoint}{endpoint}}
+{\footnotesize\ttfamily \label{structfc_1_1gelf__appender_1_1config_a05092e63c79b6a42d6afe28be8f8b494} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} fc\+::gelf\+\_\+appender\+::config\+::endpoint = "{}127.\+0.\+0.\+1\+:12201"{}}
+
+
+
+Definition at line \mbox{\hyperlink{gelf__appender_8hpp_source_l00020}{20}} of file \mbox{\hyperlink{gelf__appender_8hpp_source}{gelf\+\_\+appender.\+hpp}}.
+
+\Hypertarget{structfc_1_1gelf__appender_1_1config_a74fb5bd5d3e044746fe5840a711722bd}\index{fc::gelf\_appender::config@{fc::gelf\_appender::config}!host@{host}}
+\index{host@{host}!fc::gelf\_appender::config@{fc::gelf\_appender::config}}
+\doxysubsubsection{\texorpdfstring{host}{host}}
+{\footnotesize\ttfamily \label{structfc_1_1gelf__appender_1_1config_a74fb5bd5d3e044746fe5840a711722bd} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} fc\+::gelf\+\_\+appender\+::config\+::host = "{}fc"{}}
+
+
+
+Definition at line \mbox{\hyperlink{gelf__appender_8hpp_source_l00021}{21}} of file \mbox{\hyperlink{gelf__appender_8hpp_source}{gelf\+\_\+appender.\+hpp}}.
+
+\Hypertarget{structfc_1_1gelf__appender_1_1config_a5ead47478e6c821001032156703ee429}\index{fc::gelf\_appender::config@{fc::gelf\_appender::config}!reserved\_field\_names@{reserved\_field\_names}}
+\index{reserved\_field\_names@{reserved\_field\_names}!fc::gelf\_appender::config@{fc::gelf\_appender::config}}
+\doxysubsubsection{\texorpdfstring{reserved\_field\_names}{reserved\_field\_names}}
+{\footnotesize\ttfamily \label{structfc_1_1gelf__appender_1_1config_a5ead47478e6c821001032156703ee429} 
+const std\+::vector$<$ std\+::string $>$ fc\+::gelf\+\_\+appender\+::config\+::reserved\+\_\+field\+\_\+names\hspace{0.3cm}{\ttfamily [static]}}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{stringliteral}{"{}\_id"{}},\ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{stringliteral}{"{}\_timestamp\_ns"{}},\ \ }
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{stringliteral}{"{}\_log\_id"{}},}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{stringliteral}{"{}\_line"{}},}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{stringliteral}{"{}\_file"{}},}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{stringliteral}{"{}\_method\_name"{}},}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{stringliteral}{"{}\_thread\_name"{}},}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{stringliteral}{"{}\_task\_name"{}}}
+\DoxyCodeLine{\ \ \ \}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{gelf__appender_8hpp_source_l00018}{18}} of file \mbox{\hyperlink{gelf__appender_8hpp_source}{gelf\+\_\+appender.\+hpp}}.
+
+\Hypertarget{structfc_1_1gelf__appender_1_1config_a0ba11c2eea758783eb90d34fbaef0ae5}\index{fc::gelf\_appender::config@{fc::gelf\_appender::config}!user\_field\_name\_pattern@{user\_field\_name\_pattern}}
+\index{user\_field\_name\_pattern@{user\_field\_name\_pattern}!fc::gelf\_appender::config@{fc::gelf\_appender::config}}
+\doxysubsubsection{\texorpdfstring{user\_field\_name\_pattern}{user\_field\_name\_pattern}}
+{\footnotesize\ttfamily \label{structfc_1_1gelf__appender_1_1config_a0ba11c2eea758783eb90d34fbaef0ae5} 
+const std\+::regex fc\+::gelf\+\_\+appender\+::config\+::user\+\_\+field\+\_\+name\+\_\+pattern \{"{}\texorpdfstring{$^\wedge$}{\string^}\+\_\+\mbox{[}\textbackslash{}\textbackslash{}w\textbackslash{}\textbackslash{}.\textbackslash{}\textbackslash{}-\/\mbox{]}\texorpdfstring{$\ast$}{*}\$"{}\}\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{gelf__appender_8hpp_source_l00019}{19}} of file \mbox{\hyperlink{gelf__appender_8hpp_source}{gelf\+\_\+appender.\+hpp}}.
+
+\Hypertarget{structfc_1_1gelf__appender_1_1config_a044c2e8c1d386806035bd935937b3b09}\index{fc::gelf\_appender::config@{fc::gelf\_appender::config}!user\_fields@{user\_fields}}
+\index{user\_fields@{user\_fields}!fc::gelf\_appender::config@{fc::gelf\_appender::config}}
+\doxysubsubsection{\texorpdfstring{user\_fields}{user\_fields}}
+{\footnotesize\ttfamily \label{structfc_1_1gelf__appender_1_1config_a044c2e8c1d386806035bd935937b3b09} 
+\mbox{\hyperlink{classfc_1_1variant__object}{variant\+\_\+object}} fc\+::gelf\+\_\+appender\+::config\+::user\+\_\+fields = \{\}}
+
+
+
+Definition at line \mbox{\hyperlink{gelf__appender_8hpp_source_l00022}{22}} of file \mbox{\hyperlink{gelf__appender_8hpp_source}{gelf\+\_\+appender.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00022\ \{\};}
+
+\end{DoxyCode}
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/log/\mbox{\hyperlink{gelf__appender_8hpp}{gelf\+\_\+appender.\+hpp}}\item 
+libraries/fc/src/log/\mbox{\hyperlink{gelf__appender_8cpp}{gelf\+\_\+appender.\+cpp}}\end{DoxyCompactItemize}

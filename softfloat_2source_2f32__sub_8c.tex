@@ -1,0 +1,76 @@
+\doxysection{libraries/softfloat/source/f32\+\_\+sub.c File Reference}
+\hypertarget{softfloat_2source_2f32__sub_8c}{}\label{softfloat_2source_2f32__sub_8c}\index{libraries/softfloat/source/f32\_sub.c@{libraries/softfloat/source/f32\_sub.c}}
+{\ttfamily \#include $<$stdbool.\+h$>$}\newline
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include "{}platform.\+h"{}}\newline
+{\ttfamily \#include "{}internals.\+h"{}}\newline
+{\ttfamily \#include "{}softfloat.\+h"{}}\newline
+Include dependency graph for f32\+\_\+sub.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{softfloat_2source_2f32__sub_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structfloat32__t}{float32\+\_\+t}} \mbox{\hyperlink{softfloat_2source_2f32__sub_8c_a99eab45f2a5d5670f033a19e998689f5}{f32\+\_\+sub}} (\mbox{\hyperlink{structfloat32__t}{float32\+\_\+t}} \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, \mbox{\hyperlink{structfloat32__t}{float32\+\_\+t}} b)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{softfloat_2source_2f32__sub_8c_a99eab45f2a5d5670f033a19e998689f5}\index{f32\_sub.c@{f32\_sub.c}!f32\_sub@{f32\_sub}}
+\index{f32\_sub@{f32\_sub}!f32\_sub.c@{f32\_sub.c}}
+\doxysubsubsection{\texorpdfstring{f32\_sub()}{f32\_sub()}}
+{\footnotesize\ttfamily \label{softfloat_2source_2f32__sub_8c_a99eab45f2a5d5670f033a19e998689f5} 
+\mbox{\hyperlink{structfloat32__t}{float32\+\_\+t}} f32\+\_\+sub (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structfloat32__t}{float32\+\_\+t}}}]{a}{, }\item[{\mbox{\hyperlink{structfloat32__t}{float32\+\_\+t}}}]{b}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2f32__sub_8c_source_l00043}{43}} of file \mbox{\hyperlink{softfloat_2source_2f32__sub_8c_source}{f32\+\_\+sub.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00044\ \{}
+\DoxyCodeLine{00045\ \ \ \ \ \textcolor{keyword}{union\ }\mbox{\hyperlink{unionui32__f32}{ui32\_f32}}\ uA;}
+\DoxyCodeLine{00046\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a8f075c759c74e109e8184306c663809d}{uint\_fast32\_t}}\ uiA;}
+\DoxyCodeLine{00047\ \ \ \ \ \textcolor{keyword}{union\ }\mbox{\hyperlink{unionui32__f32}{ui32\_f32}}\ uB;}
+\DoxyCodeLine{00048\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a8f075c759c74e109e8184306c663809d}{uint\_fast32\_t}}\ uiB;}
+\DoxyCodeLine{00049\ \textcolor{preprocessor}{\#if\ !\ defined\ INLINE\_LEVEL\ ||\ (INLINE\_LEVEL\ <\ 1)}}
+\DoxyCodeLine{00050\ \ \ \ \ \mbox{\hyperlink{structfloat32__t}{float32\_t}}\ (*magsFuncPtr)(\ \mbox{\hyperlink{stdint_8h_a8f075c759c74e109e8184306c663809d}{uint\_fast32\_t}},\ \mbox{\hyperlink{stdint_8h_a8f075c759c74e109e8184306c663809d}{uint\_fast32\_t}}\ );}
+\DoxyCodeLine{00051\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ \ \ \ \ uA.f\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}};}
+\DoxyCodeLine{00054\ \ \ \ \ uiA\ =\ uA.ui;}
+\DoxyCodeLine{00055\ \ \ \ \ uB.f\ =\ b;}
+\DoxyCodeLine{00056\ \ \ \ \ uiB\ =\ uB.ui;}
+\DoxyCodeLine{00057\ \textcolor{preprocessor}{\#if\ defined\ INLINE\_LEVEL\ \&\&\ (1\ <=\ INLINE\_LEVEL)}}
+\DoxyCodeLine{00058\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a9c521ec28024dd8d31df41a9fa764f7a}{signF32UI}}(\ uiA\ \string^\ uiB\ )\ )\ \{}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a1ce7ec1c44f05211459b32974647cbbf}{softfloat\_addMagsF32}}(\ uiA,\ uiB\ );}
+\DoxyCodeLine{00060\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_ab2a11e0397876503266ce8e18aeb207d}{softfloat\_subMagsF32}}(\ uiA,\ uiB\ );}
+\DoxyCodeLine{00062\ \ \ \ \ \}}
+\DoxyCodeLine{00063\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00064\ \ \ \ \ magsFuncPtr\ =}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a9c521ec28024dd8d31df41a9fa764f7a}{signF32UI}}(\ uiA\ \string^\ uiB\ )\ ?\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a1ce7ec1c44f05211459b32974647cbbf}{softfloat\_addMagsF32}}\ :\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_ab2a11e0397876503266ce8e18aeb207d}{softfloat\_subMagsF32}};}
+\DoxyCodeLine{00066\ \ \ \ \ \textcolor{keywordflow}{return}\ (*magsFuncPtr)(\ uiA,\ uiB\ );}
+\DoxyCodeLine{00067\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00068\ }
+\DoxyCodeLine{00069\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{softfloat_2source_2f32__sub_8c_a99eab45f2a5d5670f033a19e998689f5_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=305pt]{softfloat_2source_2f32__sub_8c_a99eab45f2a5d5670f033a19e998689f5_icgraph}
+\end{center}
+\end{figure}

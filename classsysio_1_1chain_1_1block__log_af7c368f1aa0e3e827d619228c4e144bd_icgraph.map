@@ -1,0 +1,9 @@
+<map id="sysio::chain::block_log::reset" name="sysio::chain::block_log::reset">
+<area shape="rect" id="Node000001" title=" " alt="" coords="206,71,336,111"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1controller__impl.html#a90da90c73cb32b5e5ec498da5e02753f" title=" " alt="" coords="5,5,158,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="195,68,142,49,143,44,196,63"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1chain_1_1controller__impl.html#a7863870ecde398ac7def54e4814db6bc" title=" " alt="" coords="5,71,158,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="190,94,158,94,158,88,190,88"/>
+<area shape="rect" id="Node000004" href="$structsysio_1_1chain_1_1controller__impl.html#a18bcf25847599b0f9caa6566364bb0ac" title=" " alt="" coords="5,136,158,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="196,119,143,138,142,133,195,114"/>
+</map>

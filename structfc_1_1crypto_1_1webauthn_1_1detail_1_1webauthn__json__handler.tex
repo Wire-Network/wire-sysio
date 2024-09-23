@@ -1,0 +1,594 @@
+\doxysection{fc\+::crypto\+::webauthn\+::detail\+::webauthn\+\_\+json\+\_\+handler Struct Reference}
+\hypertarget{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler}{}\label{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler}\index{fc::crypto::webauthn::detail::webauthn\_json\_handler@{fc::crypto::webauthn::detail::webauthn\_json\_handler}}
+
+
+Inheritance diagram for fc\+::crypto\+::webauthn\+::detail\+::webauthn\+\_\+json\+\_\+handler\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=235pt]{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for fc\+::crypto\+::webauthn\+::detail\+::webauthn\+\_\+json\+\_\+handler\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=325pt]{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cf}{parse\+\_\+stat\+\_\+t}} \{ \newline
+\mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfa51857b5bc697befbb1f5ccdfa4578916}{EXPECT\+\_\+\+FIRST\+\_\+\+OBJECT\+\_\+\+START}}
+, \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfa9f1e6ce3654de0eb6ac0c7d2138646cb}{EXPECT\+\_\+\+FIRST\+\_\+\+OBJECT\+\_\+\+KEY}}
+, \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfaf421d7c6bbf093e1cb3183239cff4de5}{EXPECT\+\_\+\+FIRST\+\_\+\+OBJECT\+\_\+\+DONTCARE\+\_\+\+VALUE}}
+, \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfad5599063a7eaccb7cfd557f75aa9bd4f}{EXPECT\+\_\+\+CHALLENGE\+\_\+\+VALUE}}
+, \newline
+\mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfae6978b376ec51ea9cd51ec2ce410623d}{EXPECT\+\_\+\+ORIGIN\+\_\+\+VALUE}}
+, \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfa58f3d5ed6e8beeb6da31eb3546ce7eb7}{EXPECT\+\_\+\+TYPE\+\_\+\+VALUE}}
+, \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfafe6b52d953e4e47a224d3c80de8b2b32}{IN\+\_\+\+NESTED\+\_\+\+CONTAINER}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_ae2f441a51068d9613949090262da7789}{basic\+\_\+stuff}} ()
+\item 
+bool \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a880d242d053570d2f627aaa2be8978b0}{Null}} ()
+\item 
+bool \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa935f68ac87b10c9fa66389f4bf1c830}{Bool}} (bool)
+\item 
+bool \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a8c9f70e4588a0afb8c9d42d04b2ce4b4}{Int}} (int)
+\item 
+bool \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a64002c7465bc4b48dd40ab5f512eeb6e}{Uint}} (unsigned)
+\item 
+bool \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a27099801401a38ae58c97e8a01d7eee0}{Int64}} (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}})
+\item 
+bool \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a8a0c828753c627c7170cedc8aa9d7dca}{Uint64}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}})
+\item 
+bool \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a2c7d8e99944c377744317579732d6267}{Double}} (double)
+\item 
+bool \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_abc6520124533830928575031afee51f4}{String}} (const char \texorpdfstring{$\ast$}{*}str, rapidjson\+::\+Size\+Type length, bool \mbox{\hyperlink{namespacefc_a79771837fffd80fcc4bc658ee2fc4b2b}{copy}})
+\item 
+bool \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a60641d42a9187ca57d28c4aa99bd7bec}{Start\+Object}} ()
+\item 
+bool \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a7d87c580718a97d7bf913444b3fb8dab}{Key}} (const char \texorpdfstring{$\ast$}{*}str, rapidjson\+::\+Size\+Type length, bool \mbox{\hyperlink{namespacefc_a79771837fffd80fcc4bc658ee2fc4b2b}{copy}})
+\item 
+bool \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa2907291fc8ffc4471ba007387731c65}{End\+Object}} (rapidjson\+::\+Size\+Type member\+Count)
+\item 
+bool \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a61ab24019beddc7f23f1dcfd3929b5bb}{Start\+Array}} ()
+\item 
+bool \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_ad64e7e8f4d07f94d586313b0c0c50bb1}{End\+Array}} (rapidjson\+::\+Size\+Type element\+Count)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::string \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a63b958367ddcf66b7ee5e485834eb765}{found\+\_\+challenge}}
+\item 
+std\+::string \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a02309e9303c7f0cff332aa48e9a79342}{found\+\_\+origin}}
+\item 
+std\+::string \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_ad660c485d66065211559da7382e4cda6}{found\+\_\+type}}
+\item 
+enum \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cf}{fc\+::crypto\+::webauthn\+::detail\+::webauthn\+\_\+json\+\_\+handler\+::parse\+\_\+stat\+\_\+t}} \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a63d479870c42f3e147d9112720d3f0b7}{current\+\_\+state}} = \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfa51857b5bc697befbb1f5ccdfa4578916}{EXPECT\+\_\+\+FIRST\+\_\+\+OBJECT\+\_\+\+START}}
+\item 
+unsigned \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a57b336e11903dd8007ae6a8c4c190a14}{current\+\_\+nested\+\_\+container\+\_\+depth}} = 0
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{elliptic__webauthn_8cpp_source_l00021}{21}} of file \mbox{\hyperlink{elliptic__webauthn_8cpp_source}{elliptic\+\_\+webauthn.\+cpp}}.
+
+
+
+\doxysubsection{Member Enumeration Documentation}
+\Hypertarget{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cf}\index{fc::crypto::webauthn::detail::webauthn\_json\_handler@{fc::crypto::webauthn::detail::webauthn\_json\_handler}!parse\_stat\_t@{parse\_stat\_t}}
+\index{parse\_stat\_t@{parse\_stat\_t}!fc::crypto::webauthn::detail::webauthn\_json\_handler@{fc::crypto::webauthn::detail::webauthn\_json\_handler}}
+\doxysubsubsection{\texorpdfstring{parse\_stat\_t}{parse\_stat\_t}}
+{\footnotesize\ttfamily \label{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cf} 
+enum \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cf}{fc\+::crypto\+::webauthn\+::detail\+::webauthn\+\_\+json\+\_\+handler\+::parse\+\_\+stat\+\_\+t}}}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{EXPECT\_FIRST\_OBJECT\_START@{EXPECT\_FIRST\_OBJECT\_START}!fc::crypto::webauthn::detail::webauthn\_json\_handler@{fc::crypto::webauthn::detail::webauthn\_json\_handler}}\index{fc::crypto::webauthn::detail::webauthn\_json\_handler@{fc::crypto::webauthn::detail::webauthn\_json\_handler}!EXPECT\_FIRST\_OBJECT\_START@{EXPECT\_FIRST\_OBJECT\_START}}}\Hypertarget{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfa51857b5bc697befbb1f5ccdfa4578916}\label{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cf} 
+EXPECT\+\_\+\+FIRST\+\_\+\+OBJECT\+\_\+\+START&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{EXPECT\_FIRST\_OBJECT\_KEY@{EXPECT\_FIRST\_OBJECT\_KEY}!fc::crypto::webauthn::detail::webauthn\_json\_handler@{fc::crypto::webauthn::detail::webauthn\_json\_handler}}\index{fc::crypto::webauthn::detail::webauthn\_json\_handler@{fc::crypto::webauthn::detail::webauthn\_json\_handler}!EXPECT\_FIRST\_OBJECT\_KEY@{EXPECT\_FIRST\_OBJECT\_KEY}}}\Hypertarget{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfa9f1e6ce3654de0eb6ac0c7d2138646cb}\label{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cf} 
+EXPECT\+\_\+\+FIRST\+\_\+\+OBJECT\+\_\+\+KEY&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{EXPECT\_FIRST\_OBJECT\_DONTCARE\_VALUE@{EXPECT\_FIRST\_OBJECT\_DONTCARE\_VALUE}!fc::crypto::webauthn::detail::webauthn\_json\_handler@{fc::crypto::webauthn::detail::webauthn\_json\_handler}}\index{fc::crypto::webauthn::detail::webauthn\_json\_handler@{fc::crypto::webauthn::detail::webauthn\_json\_handler}!EXPECT\_FIRST\_OBJECT\_DONTCARE\_VALUE@{EXPECT\_FIRST\_OBJECT\_DONTCARE\_VALUE}}}\Hypertarget{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfaf421d7c6bbf093e1cb3183239cff4de5}\label{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cf} 
+EXPECT\+\_\+\+FIRST\+\_\+\+OBJECT\+\_\+\+DONTCARE\+\_\+\+VALUE&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{EXPECT\_CHALLENGE\_VALUE@{EXPECT\_CHALLENGE\_VALUE}!fc::crypto::webauthn::detail::webauthn\_json\_handler@{fc::crypto::webauthn::detail::webauthn\_json\_handler}}\index{fc::crypto::webauthn::detail::webauthn\_json\_handler@{fc::crypto::webauthn::detail::webauthn\_json\_handler}!EXPECT\_CHALLENGE\_VALUE@{EXPECT\_CHALLENGE\_VALUE}}}\Hypertarget{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfad5599063a7eaccb7cfd557f75aa9bd4f}\label{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cf} 
+EXPECT\+\_\+\+CHALLENGE\+\_\+\+VALUE&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{EXPECT\_ORIGIN\_VALUE@{EXPECT\_ORIGIN\_VALUE}!fc::crypto::webauthn::detail::webauthn\_json\_handler@{fc::crypto::webauthn::detail::webauthn\_json\_handler}}\index{fc::crypto::webauthn::detail::webauthn\_json\_handler@{fc::crypto::webauthn::detail::webauthn\_json\_handler}!EXPECT\_ORIGIN\_VALUE@{EXPECT\_ORIGIN\_VALUE}}}\Hypertarget{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfae6978b376ec51ea9cd51ec2ce410623d}\label{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cf} 
+EXPECT\+\_\+\+ORIGIN\+\_\+\+VALUE&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{EXPECT\_TYPE\_VALUE@{EXPECT\_TYPE\_VALUE}!fc::crypto::webauthn::detail::webauthn\_json\_handler@{fc::crypto::webauthn::detail::webauthn\_json\_handler}}\index{fc::crypto::webauthn::detail::webauthn\_json\_handler@{fc::crypto::webauthn::detail::webauthn\_json\_handler}!EXPECT\_TYPE\_VALUE@{EXPECT\_TYPE\_VALUE}}}\Hypertarget{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfa58f3d5ed6e8beeb6da31eb3546ce7eb7}\label{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cf} 
+EXPECT\+\_\+\+TYPE\+\_\+\+VALUE&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{IN\_NESTED\_CONTAINER@{IN\_NESTED\_CONTAINER}!fc::crypto::webauthn::detail::webauthn\_json\_handler@{fc::crypto::webauthn::detail::webauthn\_json\_handler}}\index{fc::crypto::webauthn::detail::webauthn\_json\_handler@{fc::crypto::webauthn::detail::webauthn\_json\_handler}!IN\_NESTED\_CONTAINER@{IN\_NESTED\_CONTAINER}}}\Hypertarget{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfafe6b52d953e4e47a224d3c80de8b2b32}\label{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cf} 
+IN\+\_\+\+NESTED\+\_\+\+CONTAINER&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{elliptic__webauthn_8cpp_source_l00026}{26}} of file \mbox{\hyperlink{elliptic__webauthn_8cpp_source}{elliptic\+\_\+webauthn.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfa51857b5bc697befbb1f5ccdfa4578916}{EXPECT\_FIRST\_OBJECT\_START}},}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfa9f1e6ce3654de0eb6ac0c7d2138646cb}{EXPECT\_FIRST\_OBJECT\_KEY}},}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfaf421d7c6bbf093e1cb3183239cff4de5}{EXPECT\_FIRST\_OBJECT\_DONTCARE\_VALUE}},}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfad5599063a7eaccb7cfd557f75aa9bd4f}{EXPECT\_CHALLENGE\_VALUE}},}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfae6978b376ec51ea9cd51ec2ce410623d}{EXPECT\_ORIGIN\_VALUE}},}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfa58f3d5ed6e8beeb6da31eb3546ce7eb7}{EXPECT\_TYPE\_VALUE}},}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfafe6b52d953e4e47a224d3c80de8b2b32}{IN\_NESTED\_CONTAINER}}}
+\DoxyCodeLine{00034\ \ \ \ \}\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a63d479870c42f3e147d9112720d3f0b7}{current\_state}}\ =\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfa51857b5bc697befbb1f5ccdfa4578916}{EXPECT\_FIRST\_OBJECT\_START}};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_ae2f441a51068d9613949090262da7789}\index{fc::crypto::webauthn::detail::webauthn\_json\_handler@{fc::crypto::webauthn::detail::webauthn\_json\_handler}!basic\_stuff@{basic\_stuff}}
+\index{basic\_stuff@{basic\_stuff}!fc::crypto::webauthn::detail::webauthn\_json\_handler@{fc::crypto::webauthn::detail::webauthn\_json\_handler}}
+\doxysubsubsection{\texorpdfstring{basic\_stuff()}{basic\_stuff()}}
+{\footnotesize\ttfamily \label{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_ae2f441a51068d9613949090262da7789} 
+bool fc\+::crypto\+::webauthn\+::detail\+::webauthn\+\_\+json\+\_\+handler\+::basic\+\_\+stuff (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic__webauthn_8cpp_source_l00037}{37}} of file \mbox{\hyperlink{elliptic__webauthn_8cpp_source}{elliptic\+\_\+webauthn.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a63d479870c42f3e147d9112720d3f0b7}{current\_state}}\ ==\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfafe6b52d953e4e47a224d3c80de8b2b32}{IN\_NESTED\_CONTAINER}})}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a63d479870c42f3e147d9112720d3f0b7}{current\_state}}\ ==\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfaf421d7c6bbf093e1cb3183239cff4de5}{EXPECT\_FIRST\_OBJECT\_DONTCARE\_VALUE}})\ \{}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a63d479870c42f3e147d9112720d3f0b7}{current\_state}}\ =\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfa9f1e6ce3654de0eb6ac0c7d2138646cb}{EXPECT\_FIRST\_OBJECT\_KEY}};}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00045\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=349pt]{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_ae2f441a51068d9613949090262da7789_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa935f68ac87b10c9fa66389f4bf1c830}\index{fc::crypto::webauthn::detail::webauthn\_json\_handler@{fc::crypto::webauthn::detail::webauthn\_json\_handler}!Bool@{Bool}}
+\index{Bool@{Bool}!fc::crypto::webauthn::detail::webauthn\_json\_handler@{fc::crypto::webauthn::detail::webauthn\_json\_handler}}
+\doxysubsubsection{\texorpdfstring{Bool()}{Bool()}}
+{\footnotesize\ttfamily \label{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa935f68ac87b10c9fa66389f4bf1c830} 
+bool fc\+::crypto\+::webauthn\+::detail\+::webauthn\+\_\+json\+\_\+handler\+::\+Bool (\begin{DoxyParamCaption}\item[{bool}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic__webauthn_8cpp_source_l00050}{50}} of file \mbox{\hyperlink{elliptic__webauthn_8cpp_source}{elliptic\+\_\+webauthn.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_ae2f441a51068d9613949090262da7789}{basic\_stuff}}();}
+\DoxyCodeLine{00052\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=349pt]{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa935f68ac87b10c9fa66389f4bf1c830_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a2c7d8e99944c377744317579732d6267}\index{fc::crypto::webauthn::detail::webauthn\_json\_handler@{fc::crypto::webauthn::detail::webauthn\_json\_handler}!Double@{Double}}
+\index{Double@{Double}!fc::crypto::webauthn::detail::webauthn\_json\_handler@{fc::crypto::webauthn::detail::webauthn\_json\_handler}}
+\doxysubsubsection{\texorpdfstring{Double()}{Double()}}
+{\footnotesize\ttfamily \label{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a2c7d8e99944c377744317579732d6267} 
+bool fc\+::crypto\+::webauthn\+::detail\+::webauthn\+\_\+json\+\_\+handler\+::\+Double (\begin{DoxyParamCaption}\item[{double}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic__webauthn_8cpp_source_l00065}{65}} of file \mbox{\hyperlink{elliptic__webauthn_8cpp_source}{elliptic\+\_\+webauthn.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_ae2f441a51068d9613949090262da7789}{basic\_stuff}}();}
+\DoxyCodeLine{00067\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=349pt]{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a2c7d8e99944c377744317579732d6267_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_ad64e7e8f4d07f94d586313b0c0c50bb1}\index{fc::crypto::webauthn::detail::webauthn\_json\_handler@{fc::crypto::webauthn::detail::webauthn\_json\_handler}!EndArray@{EndArray}}
+\index{EndArray@{EndArray}!fc::crypto::webauthn::detail::webauthn\_json\_handler@{fc::crypto::webauthn::detail::webauthn\_json\_handler}}
+\doxysubsubsection{\texorpdfstring{EndArray()}{EndArray()}}
+{\footnotesize\ttfamily \label{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_ad64e7e8f4d07f94d586313b0c0c50bb1} 
+bool fc\+::crypto\+::webauthn\+::detail\+::webauthn\+\_\+json\+\_\+handler\+::\+End\+Array (\begin{DoxyParamCaption}\item[{rapidjson\+::\+Size\+Type}]{element\+Count}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic__webauthn_8cpp_source_l00170}{170}} of file \mbox{\hyperlink{elliptic__webauthn_8cpp_source}{elliptic\+\_\+webauthn.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(\mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a63d479870c42f3e147d9112720d3f0b7}{current\_state}})\ \{}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfa51857b5bc697befbb1f5ccdfa4578916}{EXPECT\_FIRST\_OBJECT\_START}}:}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfaf421d7c6bbf093e1cb3183239cff4de5}{EXPECT\_FIRST\_OBJECT\_DONTCARE\_VALUE}}:}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfad5599063a7eaccb7cfd557f75aa9bd4f}{EXPECT\_CHALLENGE\_VALUE}}:}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfae6978b376ec51ea9cd51ec2ce410623d}{EXPECT\_ORIGIN\_VALUE}}:}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfa58f3d5ed6e8beeb6da31eb3546ce7eb7}{EXPECT\_TYPE\_VALUE}}:}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfa9f1e6ce3654de0eb6ac0c7d2138646cb}{EXPECT\_FIRST\_OBJECT\_KEY}}:}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfafe6b52d953e4e47a224d3c80de8b2b32}{IN\_NESTED\_CONTAINER}}:}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!-\/-\/\mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a57b336e11903dd8007ae6a8c4c190a14}{current\_nested\_container\_depth}})}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a63d479870c42f3e147d9112720d3f0b7}{current\_state}}\ =\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfa9f1e6ce3654de0eb6ac0c7d2138646cb}{EXPECT\_FIRST\_OBJECT\_KEY}};}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00184\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa2907291fc8ffc4471ba007387731c65}\index{fc::crypto::webauthn::detail::webauthn\_json\_handler@{fc::crypto::webauthn::detail::webauthn\_json\_handler}!EndObject@{EndObject}}
+\index{EndObject@{EndObject}!fc::crypto::webauthn::detail::webauthn\_json\_handler@{fc::crypto::webauthn::detail::webauthn\_json\_handler}}
+\doxysubsubsection{\texorpdfstring{EndObject()}{EndObject()}}
+{\footnotesize\ttfamily \label{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa2907291fc8ffc4471ba007387731c65} 
+bool fc\+::crypto\+::webauthn\+::detail\+::webauthn\+\_\+json\+\_\+handler\+::\+End\+Object (\begin{DoxyParamCaption}\item[{rapidjson\+::\+Size\+Type}]{member\+Count}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic__webauthn_8cpp_source_l00136}{136}} of file \mbox{\hyperlink{elliptic__webauthn_8cpp_source}{elliptic\+\_\+webauthn.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(\mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a63d479870c42f3e147d9112720d3f0b7}{current\_state}})\ \{}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfa51857b5bc697befbb1f5ccdfa4578916}{EXPECT\_FIRST\_OBJECT\_START}}:}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfaf421d7c6bbf093e1cb3183239cff4de5}{EXPECT\_FIRST\_OBJECT\_DONTCARE\_VALUE}}:}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfad5599063a7eaccb7cfd557f75aa9bd4f}{EXPECT\_CHALLENGE\_VALUE}}:}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfae6978b376ec51ea9cd51ec2ce410623d}{EXPECT\_ORIGIN\_VALUE}}:}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfa58f3d5ed6e8beeb6da31eb3546ce7eb7}{EXPECT\_TYPE\_VALUE}}:}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfafe6b52d953e4e47a224d3c80de8b2b32}{IN\_NESTED\_CONTAINER}}:}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!-\/-\/\mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a57b336e11903dd8007ae6a8c4c190a14}{current\_nested\_container\_depth}})}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a63d479870c42f3e147d9112720d3f0b7}{current\_state}}\ =\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfa9f1e6ce3654de0eb6ac0c7d2138646cb}{EXPECT\_FIRST\_OBJECT\_KEY}};}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfa9f1e6ce3654de0eb6ac0c7d2138646cb}{EXPECT\_FIRST\_OBJECT\_KEY}}:}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00151\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a8c9f70e4588a0afb8c9d42d04b2ce4b4}\index{fc::crypto::webauthn::detail::webauthn\_json\_handler@{fc::crypto::webauthn::detail::webauthn\_json\_handler}!Int@{Int}}
+\index{Int@{Int}!fc::crypto::webauthn::detail::webauthn\_json\_handler@{fc::crypto::webauthn::detail::webauthn\_json\_handler}}
+\doxysubsubsection{\texorpdfstring{Int()}{Int()}}
+{\footnotesize\ttfamily \label{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a8c9f70e4588a0afb8c9d42d04b2ce4b4} 
+bool fc\+::crypto\+::webauthn\+::detail\+::webauthn\+\_\+json\+\_\+handler\+::\+Int (\begin{DoxyParamCaption}\item[{int}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic__webauthn_8cpp_source_l00053}{53}} of file \mbox{\hyperlink{elliptic__webauthn_8cpp_source}{elliptic\+\_\+webauthn.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_ae2f441a51068d9613949090262da7789}{basic\_stuff}}();}
+\DoxyCodeLine{00055\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=349pt]{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a8c9f70e4588a0afb8c9d42d04b2ce4b4_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a27099801401a38ae58c97e8a01d7eee0}\index{fc::crypto::webauthn::detail::webauthn\_json\_handler@{fc::crypto::webauthn::detail::webauthn\_json\_handler}!Int64@{Int64}}
+\index{Int64@{Int64}!fc::crypto::webauthn::detail::webauthn\_json\_handler@{fc::crypto::webauthn::detail::webauthn\_json\_handler}}
+\doxysubsubsection{\texorpdfstring{Int64()}{Int64()}}
+{\footnotesize\ttfamily \label{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a27099801401a38ae58c97e8a01d7eee0} 
+bool fc\+::crypto\+::webauthn\+::detail\+::webauthn\+\_\+json\+\_\+handler\+::\+Int64 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic__webauthn_8cpp_source_l00059}{59}} of file \mbox{\hyperlink{elliptic__webauthn_8cpp_source}{elliptic\+\_\+webauthn.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_ae2f441a51068d9613949090262da7789}{basic\_stuff}}();}
+\DoxyCodeLine{00061\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=349pt]{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a27099801401a38ae58c97e8a01d7eee0_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a7d87c580718a97d7bf913444b3fb8dab}\index{fc::crypto::webauthn::detail::webauthn\_json\_handler@{fc::crypto::webauthn::detail::webauthn\_json\_handler}!Key@{Key}}
+\index{Key@{Key}!fc::crypto::webauthn::detail::webauthn\_json\_handler@{fc::crypto::webauthn::detail::webauthn\_json\_handler}}
+\doxysubsubsection{\texorpdfstring{Key()}{Key()}}
+{\footnotesize\ttfamily \label{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a7d87c580718a97d7bf913444b3fb8dab} 
+bool fc\+::crypto\+::webauthn\+::detail\+::webauthn\+\_\+json\+\_\+handler\+::\+Key (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{str}{, }\item[{rapidjson\+::\+Size\+Type}]{length}{, }\item[{bool}]{copy}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic__webauthn_8cpp_source_l00113}{113}} of file \mbox{\hyperlink{elliptic__webauthn_8cpp_source}{elliptic\+\_\+webauthn.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(\mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a63d479870c42f3e147d9112720d3f0b7}{current\_state}})\ \{}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfa51857b5bc697befbb1f5ccdfa4578916}{EXPECT\_FIRST\_OBJECT\_START}}:}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfaf421d7c6bbf093e1cb3183239cff4de5}{EXPECT\_FIRST\_OBJECT\_DONTCARE\_VALUE}}:}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfad5599063a7eaccb7cfd557f75aa9bd4f}{EXPECT\_CHALLENGE\_VALUE}}:}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfae6978b376ec51ea9cd51ec2ce410623d}{EXPECT\_ORIGIN\_VALUE}}:}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfa58f3d5ed6e8beeb6da31eb3546ce7eb7}{EXPECT\_TYPE\_VALUE}}:}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfa9f1e6ce3654de0eb6ac0c7d2138646cb}{EXPECT\_FIRST\_OBJECT\_KEY}}:\ \{}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\textcolor{stringliteral}{"{}challenge"{}}\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ ==\ str)}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a63d479870c42f3e147d9112720d3f0b7}{current\_state}}\ =\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfad5599063a7eaccb7cfd557f75aa9bd4f}{EXPECT\_CHALLENGE\_VALUE}};}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(\textcolor{stringliteral}{"{}origin"{}}\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ ==\ str)}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a63d479870c42f3e147d9112720d3f0b7}{current\_state}}\ =\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfae6978b376ec51ea9cd51ec2ce410623d}{EXPECT\_ORIGIN\_VALUE}};}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(\textcolor{stringliteral}{"{}type"{}}\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ ==\ str)}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a63d479870c42f3e147d9112720d3f0b7}{current\_state}}\ =\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfa58f3d5ed6e8beeb6da31eb3546ce7eb7}{EXPECT\_TYPE\_VALUE}};}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a63d479870c42f3e147d9112720d3f0b7}{current\_state}}\ =\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfaf421d7c6bbf093e1cb3183239cff4de5}{EXPECT\_FIRST\_OBJECT\_DONTCARE\_VALUE}};}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfafe6b52d953e4e47a224d3c80de8b2b32}{IN\_NESTED\_CONTAINER}}:}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00135\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a880d242d053570d2f627aaa2be8978b0}\index{fc::crypto::webauthn::detail::webauthn\_json\_handler@{fc::crypto::webauthn::detail::webauthn\_json\_handler}!Null@{Null}}
+\index{Null@{Null}!fc::crypto::webauthn::detail::webauthn\_json\_handler@{fc::crypto::webauthn::detail::webauthn\_json\_handler}}
+\doxysubsubsection{\texorpdfstring{Null()}{Null()}}
+{\footnotesize\ttfamily \label{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a880d242d053570d2f627aaa2be8978b0} 
+bool fc\+::crypto\+::webauthn\+::detail\+::webauthn\+\_\+json\+\_\+handler\+::\+Null (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic__webauthn_8cpp_source_l00047}{47}} of file \mbox{\hyperlink{elliptic__webauthn_8cpp_source}{elliptic\+\_\+webauthn.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_ae2f441a51068d9613949090262da7789}{basic\_stuff}}();}
+\DoxyCodeLine{00049\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=349pt]{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a880d242d053570d2f627aaa2be8978b0_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a61ab24019beddc7f23f1dcfd3929b5bb}\index{fc::crypto::webauthn::detail::webauthn\_json\_handler@{fc::crypto::webauthn::detail::webauthn\_json\_handler}!StartArray@{StartArray}}
+\index{StartArray@{StartArray}!fc::crypto::webauthn::detail::webauthn\_json\_handler@{fc::crypto::webauthn::detail::webauthn\_json\_handler}}
+\doxysubsubsection{\texorpdfstring{StartArray()}{StartArray()}}
+{\footnotesize\ttfamily \label{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a61ab24019beddc7f23f1dcfd3929b5bb} 
+bool fc\+::crypto\+::webauthn\+::detail\+::webauthn\+\_\+json\+\_\+handler\+::\+Start\+Array (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic__webauthn_8cpp_source_l00153}{153}} of file \mbox{\hyperlink{elliptic__webauthn_8cpp_source}{elliptic\+\_\+webauthn.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(\mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a63d479870c42f3e147d9112720d3f0b7}{current\_state}})\ \{}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfaf421d7c6bbf093e1cb3183239cff4de5}{EXPECT\_FIRST\_OBJECT\_DONTCARE\_VALUE}}:}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a63d479870c42f3e147d9112720d3f0b7}{current\_state}}\ =\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfafe6b52d953e4e47a224d3c80de8b2b32}{IN\_NESTED\_CONTAINER}};}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \ \ \ \ ++\mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a57b336e11903dd8007ae6a8c4c190a14}{current\_nested\_container\_depth}};}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfafe6b52d953e4e47a224d3c80de8b2b32}{IN\_NESTED\_CONTAINER}}:}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \ \ \ \ ++\mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a57b336e11903dd8007ae6a8c4c190a14}{current\_nested\_container\_depth}};}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfa51857b5bc697befbb1f5ccdfa4578916}{EXPECT\_FIRST\_OBJECT\_START}}:}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfa9f1e6ce3654de0eb6ac0c7d2138646cb}{EXPECT\_FIRST\_OBJECT\_KEY}}:}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfad5599063a7eaccb7cfd557f75aa9bd4f}{EXPECT\_CHALLENGE\_VALUE}}:}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfae6978b376ec51ea9cd51ec2ce410623d}{EXPECT\_ORIGIN\_VALUE}}:}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfa58f3d5ed6e8beeb6da31eb3546ce7eb7}{EXPECT\_TYPE\_VALUE}}:}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00169\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a60641d42a9187ca57d28c4aa99bd7bec}\index{fc::crypto::webauthn::detail::webauthn\_json\_handler@{fc::crypto::webauthn::detail::webauthn\_json\_handler}!StartObject@{StartObject}}
+\index{StartObject@{StartObject}!fc::crypto::webauthn::detail::webauthn\_json\_handler@{fc::crypto::webauthn::detail::webauthn\_json\_handler}}
+\doxysubsubsection{\texorpdfstring{StartObject()}{StartObject()}}
+{\footnotesize\ttfamily \label{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a60641d42a9187ca57d28c4aa99bd7bec} 
+bool fc\+::crypto\+::webauthn\+::detail\+::webauthn\+\_\+json\+\_\+handler\+::\+Start\+Object (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic__webauthn_8cpp_source_l00094}{94}} of file \mbox{\hyperlink{elliptic__webauthn_8cpp_source}{elliptic\+\_\+webauthn.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(\mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a63d479870c42f3e147d9112720d3f0b7}{current\_state}})\ \{}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfa51857b5bc697befbb1f5ccdfa4578916}{EXPECT\_FIRST\_OBJECT\_START}}:}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a63d479870c42f3e147d9112720d3f0b7}{current\_state}}\ =\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfa9f1e6ce3654de0eb6ac0c7d2138646cb}{EXPECT\_FIRST\_OBJECT\_KEY}};}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfaf421d7c6bbf093e1cb3183239cff4de5}{EXPECT\_FIRST\_OBJECT\_DONTCARE\_VALUE}}:}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a63d479870c42f3e147d9112720d3f0b7}{current\_state}}\ =\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfafe6b52d953e4e47a224d3c80de8b2b32}{IN\_NESTED\_CONTAINER}};}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \ \ \ ++\mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a57b336e11903dd8007ae6a8c4c190a14}{current\_nested\_container\_depth}};}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfafe6b52d953e4e47a224d3c80de8b2b32}{IN\_NESTED\_CONTAINER}}:}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ \ \ \ ++\mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a57b336e11903dd8007ae6a8c4c190a14}{current\_nested\_container\_depth}};}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfa9f1e6ce3654de0eb6ac0c7d2138646cb}{EXPECT\_FIRST\_OBJECT\_KEY}}:}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfad5599063a7eaccb7cfd557f75aa9bd4f}{EXPECT\_CHALLENGE\_VALUE}}:}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfae6978b376ec51ea9cd51ec2ce410623d}{EXPECT\_ORIGIN\_VALUE}}:}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfa58f3d5ed6e8beeb6da31eb3546ce7eb7}{EXPECT\_TYPE\_VALUE}}:}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00112\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_abc6520124533830928575031afee51f4}\index{fc::crypto::webauthn::detail::webauthn\_json\_handler@{fc::crypto::webauthn::detail::webauthn\_json\_handler}!String@{String}}
+\index{String@{String}!fc::crypto::webauthn::detail::webauthn\_json\_handler@{fc::crypto::webauthn::detail::webauthn\_json\_handler}}
+\doxysubsubsection{\texorpdfstring{String()}{String()}}
+{\footnotesize\ttfamily \label{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_abc6520124533830928575031afee51f4} 
+bool fc\+::crypto\+::webauthn\+::detail\+::webauthn\+\_\+json\+\_\+handler\+::\+String (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{str}{, }\item[{rapidjson\+::\+Size\+Type}]{length}{, }\item[{bool}]{copy}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic__webauthn_8cpp_source_l00069}{69}} of file \mbox{\hyperlink{elliptic__webauthn_8cpp_source}{elliptic\+\_\+webauthn.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(\mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a63d479870c42f3e147d9112720d3f0b7}{current\_state}})\ \{}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfa51857b5bc697befbb1f5ccdfa4578916}{EXPECT\_FIRST\_OBJECT\_START}}:}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfa9f1e6ce3654de0eb6ac0c7d2138646cb}{EXPECT\_FIRST\_OBJECT\_KEY}}:}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfad5599063a7eaccb7cfd557f75aa9bd4f}{EXPECT\_CHALLENGE\_VALUE}}:}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a63b958367ddcf66b7ee5e485834eb765}{found\_challenge}}\ =\ std::string(str,\ length);}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a63d479870c42f3e147d9112720d3f0b7}{current\_state}}\ =\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfa9f1e6ce3654de0eb6ac0c7d2138646cb}{EXPECT\_FIRST\_OBJECT\_KEY}};}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfae6978b376ec51ea9cd51ec2ce410623d}{EXPECT\_ORIGIN\_VALUE}}:}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a02309e9303c7f0cff332aa48e9a79342}{found\_origin}}\ =\ std::string(str,\ length);}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a63d479870c42f3e147d9112720d3f0b7}{current\_state}}\ =\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfa9f1e6ce3654de0eb6ac0c7d2138646cb}{EXPECT\_FIRST\_OBJECT\_KEY}};}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfa58f3d5ed6e8beeb6da31eb3546ce7eb7}{EXPECT\_TYPE\_VALUE}}:}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_ad660c485d66065211559da7382e4cda6}{found\_type}}\ =\ std::string(str,\ length);}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a63d479870c42f3e147d9112720d3f0b7}{current\_state}}\ =\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfa9f1e6ce3654de0eb6ac0c7d2138646cb}{EXPECT\_FIRST\_OBJECT\_KEY}};}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfaf421d7c6bbf093e1cb3183239cff4de5}{EXPECT\_FIRST\_OBJECT\_DONTCARE\_VALUE}}:}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a63d479870c42f3e147d9112720d3f0b7}{current\_state}}\ =\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfa9f1e6ce3654de0eb6ac0c7d2138646cb}{EXPECT\_FIRST\_OBJECT\_KEY}};}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfafe6b52d953e4e47a224d3c80de8b2b32}{IN\_NESTED\_CONTAINER}}:}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00092\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a64002c7465bc4b48dd40ab5f512eeb6e}\index{fc::crypto::webauthn::detail::webauthn\_json\_handler@{fc::crypto::webauthn::detail::webauthn\_json\_handler}!Uint@{Uint}}
+\index{Uint@{Uint}!fc::crypto::webauthn::detail::webauthn\_json\_handler@{fc::crypto::webauthn::detail::webauthn\_json\_handler}}
+\doxysubsubsection{\texorpdfstring{Uint()}{Uint()}}
+{\footnotesize\ttfamily \label{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a64002c7465bc4b48dd40ab5f512eeb6e} 
+bool fc\+::crypto\+::webauthn\+::detail\+::webauthn\+\_\+json\+\_\+handler\+::\+Uint (\begin{DoxyParamCaption}\item[{unsigned}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic__webauthn_8cpp_source_l00056}{56}} of file \mbox{\hyperlink{elliptic__webauthn_8cpp_source}{elliptic\+\_\+webauthn.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_ae2f441a51068d9613949090262da7789}{basic\_stuff}}();}
+\DoxyCodeLine{00058\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=349pt]{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a64002c7465bc4b48dd40ab5f512eeb6e_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a8a0c828753c627c7170cedc8aa9d7dca}\index{fc::crypto::webauthn::detail::webauthn\_json\_handler@{fc::crypto::webauthn::detail::webauthn\_json\_handler}!Uint64@{Uint64}}
+\index{Uint64@{Uint64}!fc::crypto::webauthn::detail::webauthn\_json\_handler@{fc::crypto::webauthn::detail::webauthn\_json\_handler}}
+\doxysubsubsection{\texorpdfstring{Uint64()}{Uint64()}}
+{\footnotesize\ttfamily \label{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a8a0c828753c627c7170cedc8aa9d7dca} 
+bool fc\+::crypto\+::webauthn\+::detail\+::webauthn\+\_\+json\+\_\+handler\+::\+Uint64 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic__webauthn_8cpp_source_l00062}{62}} of file \mbox{\hyperlink{elliptic__webauthn_8cpp_source}{elliptic\+\_\+webauthn.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_ae2f441a51068d9613949090262da7789}{basic\_stuff}}();}
+\DoxyCodeLine{00064\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=349pt]{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a8a0c828753c627c7170cedc8aa9d7dca_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a57b336e11903dd8007ae6a8c4c190a14}\index{fc::crypto::webauthn::detail::webauthn\_json\_handler@{fc::crypto::webauthn::detail::webauthn\_json\_handler}!current\_nested\_container\_depth@{current\_nested\_container\_depth}}
+\index{current\_nested\_container\_depth@{current\_nested\_container\_depth}!fc::crypto::webauthn::detail::webauthn\_json\_handler@{fc::crypto::webauthn::detail::webauthn\_json\_handler}}
+\doxysubsubsection{\texorpdfstring{current\_nested\_container\_depth}{current\_nested\_container\_depth}}
+{\footnotesize\ttfamily \label{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a57b336e11903dd8007ae6a8c4c190a14} 
+unsigned fc\+::crypto\+::webauthn\+::detail\+::webauthn\+\_\+json\+\_\+handler\+::current\+\_\+nested\+\_\+container\+\_\+depth = 0}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic__webauthn_8cpp_source_l00035}{35}} of file \mbox{\hyperlink{elliptic__webauthn_8cpp_source}{elliptic\+\_\+webauthn.\+cpp}}.
+
+\Hypertarget{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a63d479870c42f3e147d9112720d3f0b7}\index{fc::crypto::webauthn::detail::webauthn\_json\_handler@{fc::crypto::webauthn::detail::webauthn\_json\_handler}!current\_state@{current\_state}}
+\index{current\_state@{current\_state}!fc::crypto::webauthn::detail::webauthn\_json\_handler@{fc::crypto::webauthn::detail::webauthn\_json\_handler}}
+\doxysubsubsection{\texorpdfstring{current\_state}{current\_state}}
+{\footnotesize\ttfamily \label{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a63d479870c42f3e147d9112720d3f0b7} 
+enum \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cf}{fc\+::crypto\+::webauthn\+::detail\+::webauthn\+\_\+json\+\_\+handler\+::parse\+\_\+stat\+\_\+t}} fc\+::crypto\+::webauthn\+::detail\+::webauthn\+\_\+json\+\_\+handler\+::current\+\_\+state = \mbox{\hyperlink{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_aa240d4ef8c43b9c4301b2052888707cfa51857b5bc697befbb1f5ccdfa4578916}{EXPECT\+\_\+\+FIRST\+\_\+\+OBJECT\+\_\+\+START}}}
+
+\Hypertarget{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a63b958367ddcf66b7ee5e485834eb765}\index{fc::crypto::webauthn::detail::webauthn\_json\_handler@{fc::crypto::webauthn::detail::webauthn\_json\_handler}!found\_challenge@{found\_challenge}}
+\index{found\_challenge@{found\_challenge}!fc::crypto::webauthn::detail::webauthn\_json\_handler@{fc::crypto::webauthn::detail::webauthn\_json\_handler}}
+\doxysubsubsection{\texorpdfstring{found\_challenge}{found\_challenge}}
+{\footnotesize\ttfamily \label{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a63b958367ddcf66b7ee5e485834eb765} 
+std\+::string fc\+::crypto\+::webauthn\+::detail\+::webauthn\+\_\+json\+\_\+handler\+::found\+\_\+challenge}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic__webauthn_8cpp_source_l00022}{22}} of file \mbox{\hyperlink{elliptic__webauthn_8cpp_source}{elliptic\+\_\+webauthn.\+cpp}}.
+
+\Hypertarget{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a02309e9303c7f0cff332aa48e9a79342}\index{fc::crypto::webauthn::detail::webauthn\_json\_handler@{fc::crypto::webauthn::detail::webauthn\_json\_handler}!found\_origin@{found\_origin}}
+\index{found\_origin@{found\_origin}!fc::crypto::webauthn::detail::webauthn\_json\_handler@{fc::crypto::webauthn::detail::webauthn\_json\_handler}}
+\doxysubsubsection{\texorpdfstring{found\_origin}{found\_origin}}
+{\footnotesize\ttfamily \label{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_a02309e9303c7f0cff332aa48e9a79342} 
+std\+::string fc\+::crypto\+::webauthn\+::detail\+::webauthn\+\_\+json\+\_\+handler\+::found\+\_\+origin}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic__webauthn_8cpp_source_l00023}{23}} of file \mbox{\hyperlink{elliptic__webauthn_8cpp_source}{elliptic\+\_\+webauthn.\+cpp}}.
+
+\Hypertarget{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_ad660c485d66065211559da7382e4cda6}\index{fc::crypto::webauthn::detail::webauthn\_json\_handler@{fc::crypto::webauthn::detail::webauthn\_json\_handler}!found\_type@{found\_type}}
+\index{found\_type@{found\_type}!fc::crypto::webauthn::detail::webauthn\_json\_handler@{fc::crypto::webauthn::detail::webauthn\_json\_handler}}
+\doxysubsubsection{\texorpdfstring{found\_type}{found\_type}}
+{\footnotesize\ttfamily \label{structfc_1_1crypto_1_1webauthn_1_1detail_1_1webauthn__json__handler_ad660c485d66065211559da7382e4cda6} 
+std\+::string fc\+::crypto\+::webauthn\+::detail\+::webauthn\+\_\+json\+\_\+handler\+::found\+\_\+type}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic__webauthn_8cpp_source_l00024}{24}} of file \mbox{\hyperlink{elliptic__webauthn_8cpp_source}{elliptic\+\_\+webauthn.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/src/crypto/\mbox{\hyperlink{elliptic__webauthn_8cpp}{elliptic\+\_\+webauthn.\+cpp}}\end{DoxyCompactItemize}

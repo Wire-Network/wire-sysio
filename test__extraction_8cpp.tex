@@ -1,0 +1,383 @@
+\doxysection{plugins/trace\+\_\+api\+\_\+plugin/test/test\+\_\+extraction.cpp File Reference}
+\hypertarget{test__extraction_8cpp}{}\label{test__extraction_8cpp}\index{plugins/trace\_api\_plugin/test/test\_extraction.cpp@{plugins/trace\_api\_plugin/test/test\_extraction.cpp}}
+{\ttfamily \#include $<$boost/test/included/unit\+\_\+test.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/types.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/contract\+\_\+types.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/trace.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/transaction.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/block.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/block\+\_\+state.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/trace\+\_\+api/test\+\_\+common.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/trace\+\_\+api/chain\+\_\+extraction.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/bitutil.\+hpp$>$}\newline
+Include dependency graph for test\+\_\+extraction.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__extraction_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structextraction__test__fixture}{extraction\+\_\+test\+\_\+fixture}}
+\item 
+struct \mbox{\hyperlink{structextraction__test__fixture_1_1mock__logfile__provider__type}{extraction\+\_\+test\+\_\+fixture\+::mock\+\_\+logfile\+\_\+provider\+\_\+type}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{test__extraction_8cpp_a6b2a3852db8bb19ab6909bac01859985}{BOOST\+\_\+\+TEST\+\_\+\+MODULE}}~trace\+\_\+data\+\_\+extraction
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{test__extraction_8cpp_abb35f24810053ae3e26ee8924bf2d064}{BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE}} (basic\+\_\+single\+\_\+transaction\+\_\+block, \mbox{\hyperlink{structextraction__test__fixture}{extraction\+\_\+test\+\_\+fixture}})
+\item 
+\mbox{\hyperlink{test__extraction_8cpp_a9e693fc131434163ab9b8e714c31a328}{BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE}} (basic\+\_\+multi\+\_\+transaction\+\_\+block, \mbox{\hyperlink{structextraction__test__fixture}{extraction\+\_\+test\+\_\+fixture}})
+\item 
+\mbox{\hyperlink{test__extraction_8cpp_a36ece680757906e620edc38e7bfe81fe}{BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE}} (onerror\+\_\+transaction\+\_\+block, \mbox{\hyperlink{structextraction__test__fixture}{extraction\+\_\+test\+\_\+fixture}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{test__extraction_8cpp_a6b2a3852db8bb19ab6909bac01859985}\index{test\_extraction.cpp@{test\_extraction.cpp}!BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}}
+\index{BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}!test\_extraction.cpp@{test\_extraction.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_TEST\_MODULE}{BOOST\_TEST\_MODULE}}
+{\footnotesize\ttfamily \label{test__extraction_8cpp_a6b2a3852db8bb19ab6909bac01859985} 
+\#define BOOST\+\_\+\+TEST\+\_\+\+MODULE~trace\+\_\+data\+\_\+extraction}
+
+
+
+Definition at line \mbox{\hyperlink{test__extraction_8cpp_source_l00001}{1}} of file \mbox{\hyperlink{test__extraction_8cpp_source}{test\+\_\+extraction.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{test__extraction_8cpp_a9e693fc131434163ab9b8e714c31a328}\index{test\_extraction.cpp@{test\_extraction.cpp}!BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}}
+\index{BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}!test\_extraction.cpp@{test\_extraction.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_FIXTURE\_TEST\_CASE()}{BOOST\_FIXTURE\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{test__extraction_8cpp_a9e693fc131434163ab9b8e714c31a328} 
+BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{basic\+\_\+multi\+\_\+transaction\+\_\+block}]{}{, }\item[{\mbox{\hyperlink{structextraction__test__fixture}{extraction\+\_\+test\+\_\+fixture}}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__extraction_8cpp_source_l00239}{239}} of file \mbox{\hyperlink{test__extraction_8cpp_source}{test\+\_\+extraction.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ act1\ =\ make\_transfer\_action(\ \textcolor{stringliteral}{"{}alice"{}}\_n,\ \textcolor{stringliteral}{"{}bob"{}}\_n,\ \textcolor{stringliteral}{"{}0.0001\ SYS"{}}\_t,\ \textcolor{stringliteral}{"{}Memo!"{}}\ );}
+\DoxyCodeLine{00241\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ act2\ =\ make\_transfer\_action(\ \textcolor{stringliteral}{"{}bob"{}}\_n,\ \textcolor{stringliteral}{"{}alice"{}}\_n,\ \textcolor{stringliteral}{"{}0.0001\ SYS"{}}\_t,\ \textcolor{stringliteral}{"{}Memo!"{}}\ );}
+\DoxyCodeLine{00242\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ act3\ =\ make\_transfer\_action(\ \textcolor{stringliteral}{"{}fred"{}}\_n,\ \textcolor{stringliteral}{"{}bob"{}}\_n,\ \textcolor{stringliteral}{"{}0.0001\ SYS"{}}\_t,\ \textcolor{stringliteral}{"{}Memo!"{}}\ );}
+\DoxyCodeLine{00243\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ actt1\ =\ make\_action\_trace(\ 0,\ act1,\ \textcolor{stringliteral}{"{}sysio.token"{}}\_n\ );}
+\DoxyCodeLine{00244\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ actt2\ =\ make\_action\_trace(\ 1,\ act2,\ \textcolor{stringliteral}{"{}bob"{}}\_n\ );}
+\DoxyCodeLine{00245\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ actt3\ =\ make\_action\_trace(\ 2,\ act3,\ \textcolor{stringliteral}{"{}fred"{}}\_n\ );}
+\DoxyCodeLine{00246\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ ptrx1\ =\ make\_packed\_trx(\ \{\ act1\ \}\ );}
+\DoxyCodeLine{00247\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ ptrx2\ =\ make\_packed\_trx(\ \{\ act2\ \}\ );}
+\DoxyCodeLine{00248\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ ptrx3\ =\ make\_packed\_trx(\ \{\ act3\ \}\ );}
+\DoxyCodeLine{00249\ }
+\DoxyCodeLine{00250\ \ \ \ \ \ \ signal\_applied\_transaction(}
+\DoxyCodeLine{00251\ \ \ \ \ \ \ \ \ \ \ \ \ make\_transaction\_trace(\ ptrx1.id(),\ 1,\ 1,\ \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__receipt__header_a2bb00bac16048e6f624c2ded867ebf55a7a6de58f1f84063a5f85bbfb59b43608}{chain::transaction\_receipt\_header::executed}},}
+\DoxyCodeLine{00252\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ actt1\ \}\ ),}
+\DoxyCodeLine{00253\ \ \ \ \ \ \ \ \ \ \ \ \ std::make\_shared<packed\_transaction>(\ ptrx1\ )\ );}
+\DoxyCodeLine{00254\ \ \ \ \ \ \ signal\_applied\_transaction(}
+\DoxyCodeLine{00255\ \ \ \ \ \ \ \ \ \ \ \ \ make\_transaction\_trace(\ ptrx2.id(),\ 1,\ 1,\ \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__receipt__header_a2bb00bac16048e6f624c2ded867ebf55a7a6de58f1f84063a5f85bbfb59b43608}{chain::transaction\_receipt\_header::executed}},}
+\DoxyCodeLine{00256\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ actt2\ \}\ ),}
+\DoxyCodeLine{00257\ \ \ \ \ \ \ \ \ \ \ \ \ std::make\_shared<packed\_transaction>(\ ptrx2\ )\ );}
+\DoxyCodeLine{00258\ \ \ \ \ \ \ signal\_applied\_transaction(}
+\DoxyCodeLine{00259\ \ \ \ \ \ \ \ \ \ \ \ \ make\_transaction\_trace(\ ptrx3.id(),\ 1,\ 1,\ \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__receipt__header_a2bb00bac16048e6f624c2ded867ebf55a7a6de58f1f84063a5f85bbfb59b43608}{chain::transaction\_receipt\_header::executed}},}
+\DoxyCodeLine{00260\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ actt3\ \}\ ),}
+\DoxyCodeLine{00261\ \ \ \ \ \ \ \ \ \ \ \ \ std::make\_shared<packed\_transaction>(\ ptrx3\ )\ );}
+\DoxyCodeLine{00262\ }
+\DoxyCodeLine{00263\ \ \ \ \ \ \ \textcolor{comment}{//\ accept\ the\ block\ with\ three\ transaction}}
+\DoxyCodeLine{00264\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ bsp1\ =\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a7ad028261e9ab9a38fd557c8f7628615}{make\_block\_state}}(\ chain::block\_id\_type(),\ 1,\ 1,\ \textcolor{stringliteral}{"{}bp.one"{}}\_n,}
+\DoxyCodeLine{00265\ \ \ \ \ \ \ \ \ \ \ \ \ \{\ chain::packed\_transaction(ptrx1),\ chain::packed\_transaction(ptrx2),\ chain::packed\_transaction(ptrx3)\ \}\ );}
+\DoxyCodeLine{00266\ \ \ \ \ \ \ signal\_accepted\_block(\ bsp1\ );}
+\DoxyCodeLine{00267\ }
+\DoxyCodeLine{00268\ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::vector<action\_trace\_v1>\ expected\_action\_trace1\ \{}
+\DoxyCodeLine{00269\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00270\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00271\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0,}
+\DoxyCodeLine{00272\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio.token"{}}\_n,\ \textcolor{stringliteral}{"{}sysio.token"{}}\_n,\ \textcolor{stringliteral}{"{}transfer"{}}\_n,}
+\DoxyCodeLine{00273\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\{\textcolor{stringliteral}{"{}alice"{}}\_n,\ \textcolor{stringliteral}{"{}active"{}}\_n\}\},}
+\DoxyCodeLine{00274\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_aab47dbcf73e5456e7109c9f0d25dd035}{make\_transfer\_data}}(\textcolor{stringliteral}{"{}alice"{}}\_n,\ \textcolor{stringliteral}{"{}bob"{}}\_n,\ \textcolor{stringliteral}{"{}0.0001\ SYS"{}}\_t,\ \textcolor{stringliteral}{"{}Memo!"{}})}
+\DoxyCodeLine{00275\ \ \ \ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{00276\ \ \ \ \ \ \ \ \ \ \ \ \ \{\}}
+\DoxyCodeLine{00277\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00278\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00279\ }
+\DoxyCodeLine{00280\ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::vector<action\_trace\_v1>\ expected\_action\_trace2\ \{}
+\DoxyCodeLine{00281\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00282\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00283\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 1,}
+\DoxyCodeLine{00284\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}bob"{}}\_n,\ \textcolor{stringliteral}{"{}sysio.token"{}}\_n,\ \textcolor{stringliteral}{"{}transfer"{}}\_n,}
+\DoxyCodeLine{00285\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\{\ \textcolor{stringliteral}{"{}bob"{}}\_n,\ \textcolor{stringliteral}{"{}active"{}}\_n\ \}\},}
+\DoxyCodeLine{00286\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_aab47dbcf73e5456e7109c9f0d25dd035}{make\_transfer\_data}}(\ \textcolor{stringliteral}{"{}bob"{}}\_n,\ \textcolor{stringliteral}{"{}alice"{}}\_n,\ \textcolor{stringliteral}{"{}0.0001\ SYS"{}}\_t,\ \textcolor{stringliteral}{"{}Memo!"{}}\ )}
+\DoxyCodeLine{00287\ \ \ \ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{00288\ \ \ \ \ \ \ \ \ \ \ \ \ \{\}}
+\DoxyCodeLine{00289\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00290\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00291\ }
+\DoxyCodeLine{00292\ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::vector<action\_trace\_v1>\ expected\_action\_trace3\ \{}
+\DoxyCodeLine{00293\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00294\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00295\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 2,}
+\DoxyCodeLine{00296\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}fred"{}}\_n,\ \textcolor{stringliteral}{"{}sysio.token"{}}\_n,\ \textcolor{stringliteral}{"{}transfer"{}}\_n,}
+\DoxyCodeLine{00297\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\{\ \textcolor{stringliteral}{"{}fred"{}}\_n,\ \textcolor{stringliteral}{"{}active"{}}\_n\ \}\},}
+\DoxyCodeLine{00298\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_aab47dbcf73e5456e7109c9f0d25dd035}{make\_transfer\_data}}(\ \textcolor{stringliteral}{"{}fred"{}}\_n,\ \textcolor{stringliteral}{"{}bob"{}}\_n,\ \textcolor{stringliteral}{"{}0.0001\ SYS"{}}\_t,\ \textcolor{stringliteral}{"{}Memo!"{}}\ )}
+\DoxyCodeLine{00299\ \ \ \ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{00300\ \ \ \ \ \ \ \ \ \ \ \ \ \{\}}
+\DoxyCodeLine{00301\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00302\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00303\ }
+\DoxyCodeLine{00304\ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::vector<transaction\_trace\_v3>\ expected\_transaction\_traces\ \{}
+\DoxyCodeLine{00305\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00306\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00307\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ptrx1.id(),}
+\DoxyCodeLine{00308\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ expected\_action\_trace1,}
+\DoxyCodeLine{00309\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1enum__type}{fc::enum\_type<uint8\_t,\ chain::transaction\_receipt\_header::status\_enum>}}\{bsp1-\/>block-\/>transactions[0].status\},}
+\DoxyCodeLine{00310\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ bsp1-\/>block-\/>transactions[0].cpu\_usage\_us,}
+\DoxyCodeLine{00311\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ bsp1-\/>block-\/>transactions[0].net\_usage\_words,}
+\DoxyCodeLine{00312\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ptrx1.get\_signatures(),}
+\DoxyCodeLine{00313\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ make\_trx\_header(ptrx1.get\_transaction())}
+\DoxyCodeLine{00314\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00315\ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{00316\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00317\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00318\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ptrx2.id(),}
+\DoxyCodeLine{00319\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ expected\_action\_trace2,}
+\DoxyCodeLine{00320\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1enum__type}{fc::enum\_type<uint8\_t,\ chain::transaction\_receipt\_header::status\_enum>}}\{bsp1-\/>block-\/>transactions[1].status\},}
+\DoxyCodeLine{00321\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ bsp1-\/>block-\/>transactions[1].cpu\_usage\_us,}
+\DoxyCodeLine{00322\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ bsp1-\/>block-\/>transactions[1].net\_usage\_words,}
+\DoxyCodeLine{00323\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ptrx2.get\_signatures(),}
+\DoxyCodeLine{00324\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ make\_trx\_header(ptrx2.get\_transaction())}
+\DoxyCodeLine{00325\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00326\ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{00327\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00328\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00329\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ptrx3.id(),}
+\DoxyCodeLine{00330\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ expected\_action\_trace3,}
+\DoxyCodeLine{00331\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1enum__type}{fc::enum\_type<uint8\_t,\ chain::transaction\_receipt\_header::status\_enum>}}\{bsp1-\/>block-\/>transactions[2].status\},}
+\DoxyCodeLine{00332\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ bsp1-\/>block-\/>transactions[2].cpu\_usage\_us,}
+\DoxyCodeLine{00333\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ bsp1-\/>block-\/>transactions[2].net\_usage\_words,}
+\DoxyCodeLine{00334\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ptrx3.get\_signatures(),}
+\DoxyCodeLine{00335\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ make\_trx\_header(ptrx3.get\_transaction())}
+\DoxyCodeLine{00336\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00337\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00338\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00339\ }
+\DoxyCodeLine{00340\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1block__trace__v2}{block\_trace\_v2}}\ expected\_block\_trace\ \{}
+\DoxyCodeLine{00341\ \ \ \ \ \ \ \ \ \ bsp1-\/>id,}
+\DoxyCodeLine{00342\ \ \ \ \ \ \ \ \ \ 1,}
+\DoxyCodeLine{00343\ \ \ \ \ \ \ \ \ \ bsp1-\/>prev(),}
+\DoxyCodeLine{00344\ \ \ \ \ \ \ \ \ \ chain::block\_timestamp\_type(1),}
+\DoxyCodeLine{00345\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}bp.one"{}}\_n,}
+\DoxyCodeLine{00346\ \ \ \ \ \ \ \ \ \ bsp1-\/>block-\/>transaction\_mroot,}
+\DoxyCodeLine{00347\ \ \ \ \ \ \ \ \ \ bsp1-\/>block-\/>action\_mroot,}
+\DoxyCodeLine{00348\ \ \ \ \ \ \ \ \ \ bsp1-\/>block-\/>schedule\_version,}
+\DoxyCodeLine{00349\ \ \ \ \ \ \ \ \ \ expected\_transaction\_traces}
+\DoxyCodeLine{00350\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00351\ }
+\DoxyCodeLine{00352\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(max\_lib,\ 0);}
+\DoxyCodeLine{00353\ \ \ \ \ \ \ BOOST\_REQUIRE(data\_log.size()\ ==\ 1);}
+\DoxyCodeLine{00354\ \ \ \ \ \ \ BOOST\_REQUIRE(std::holds\_alternative<block\_trace\_v2>(data\_log.at(0)));}
+\DoxyCodeLine{00355\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(std::get<block\_trace\_v2>(data\_log.at(0)),\ expected\_block\_trace);}
+\DoxyCodeLine{00356\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__extraction_8cpp_a9e693fc131434163ab9b8e714c31a328_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__extraction_8cpp_abb35f24810053ae3e26ee8924bf2d064}\index{test\_extraction.cpp@{test\_extraction.cpp}!BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}}
+\index{BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}!test\_extraction.cpp@{test\_extraction.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_FIXTURE\_TEST\_CASE()}{BOOST\_FIXTURE\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{test__extraction_8cpp_abb35f24810053ae3e26ee8924bf2d064} 
+BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{basic\+\_\+single\+\_\+transaction\+\_\+block}]{}{, }\item[{\mbox{\hyperlink{structextraction__test__fixture}{extraction\+\_\+test\+\_\+fixture}}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__extraction_8cpp_source_l00155}{155}} of file \mbox{\hyperlink{test__extraction_8cpp_source}{test\+\_\+extraction.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00156\ \ \ \ \{}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ act1\ =\ make\_transfer\_action(\ \textcolor{stringliteral}{"{}alice"{}}\_n,\ \textcolor{stringliteral}{"{}bob"{}}\_n,\ \textcolor{stringliteral}{"{}0.0001\ SYS"{}}\_t,\ \textcolor{stringliteral}{"{}Memo!"{}}\ );}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ act2\ =\ make\_transfer\_action(\ \textcolor{stringliteral}{"{}alice"{}}\_n,\ \textcolor{stringliteral}{"{}bob"{}}\_n,\ \textcolor{stringliteral}{"{}0.0001\ SYS"{}}\_t,\ \textcolor{stringliteral}{"{}Memo!"{}}\ );}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ act3\ =\ make\_transfer\_action(\ \textcolor{stringliteral}{"{}alice"{}}\_n,\ \textcolor{stringliteral}{"{}bob"{}}\_n,\ \textcolor{stringliteral}{"{}0.0001\ SYS"{}}\_t,\ \textcolor{stringliteral}{"{}Memo!"{}}\ );}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ actt1\ =\ make\_action\_trace(\ 0,\ act1,\ \textcolor{stringliteral}{"{}sysio.token"{}}\_n\ );}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ actt2\ =\ make\_action\_trace(\ 1,\ act2,\ \textcolor{stringliteral}{"{}alice"{}}\_n\ );}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ actt3\ =\ make\_action\_trace(\ 2,\ act3,\ \textcolor{stringliteral}{"{}bob"{}}\_n\ );}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ ptrx1\ =\ make\_packed\_trx(\ \{\ act1,\ act2,\ act3\ \}\ );}
+\DoxyCodeLine{00164\ }
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \textcolor{comment}{//\ apply\ a\ basic\ transfer}}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ signal\_applied\_transaction(}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \ \ \ \ \ \ make\_transaction\_trace(\ ptrx1.id(),\ 1,\ 1,\ \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__receipt__header_a2bb00bac16048e6f624c2ded867ebf55a7a6de58f1f84063a5f85bbfb59b43608}{chain::transaction\_receipt\_header::executed}},}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ actt1,\ actt2,\ actt3\ \}\ ),}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \ \ \ \ std::make\_shared<packed\_transaction>(ptrx1)\ );}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ }
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \textcolor{comment}{//\ accept\ the\ block\ with\ one\ transaction}}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ bsp1\ =\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a7ad028261e9ab9a38fd557c8f7628615}{make\_block\_state}}(\ chain::block\_id\_type(),\ 1,\ 1,\ \textcolor{stringliteral}{"{}bp.one"{}}\_n,}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ \ \ \ \ \{\ chain::packed\_transaction(ptrx1)\ \}\ );}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ signal\_accepted\_block(\ bsp1\ );}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ }
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::vector<action\_trace\_v1>\ expected\_action\_traces\ \{}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0,}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio.token"{}}\_n,\ \textcolor{stringliteral}{"{}sysio.token"{}}\_n,\ \textcolor{stringliteral}{"{}transfer"{}}\_n,}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\{\textcolor{stringliteral}{"{}alice"{}}\_n,\ \textcolor{stringliteral}{"{}active"{}}\_n\}\},}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_aab47dbcf73e5456e7109c9f0d25dd035}{make\_transfer\_data}}(\textcolor{stringliteral}{"{}alice"{}}\_n,\ \textcolor{stringliteral}{"{}bob"{}}\_n,\ \textcolor{stringliteral}{"{}0.0001\ SYS"{}}\_t,\ \textcolor{stringliteral}{"{}Memo!"{}})}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ \ \ \ \ \{\}}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 1,}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}alice"{}}\_n,\ \textcolor{stringliteral}{"{}sysio.token"{}}\_n,\ \textcolor{stringliteral}{"{}transfer"{}}\_n,}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\{\textcolor{stringliteral}{"{}alice"{}}\_n,\ \textcolor{stringliteral}{"{}active"{}}\_n\}\},}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_aab47dbcf73e5456e7109c9f0d25dd035}{make\_transfer\_data}}(\textcolor{stringliteral}{"{}alice"{}}\_n,\ \textcolor{stringliteral}{"{}bob"{}}\_n,\ \textcolor{stringliteral}{"{}0.0001\ SYS"{}}\_t,\ \textcolor{stringliteral}{"{}Memo!"{}})}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \ \ \ \ \ \ \{\}}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 2,}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}bob"{}}\_n,\ \textcolor{stringliteral}{"{}sysio.token"{}}\_n,\ \textcolor{stringliteral}{"{}transfer"{}}\_n,}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\{\textcolor{stringliteral}{"{}alice"{}}\_n,\ \textcolor{stringliteral}{"{}active"{}}\_n\}\},}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_aab47dbcf73e5456e7109c9f0d25dd035}{make\_transfer\_data}}(\textcolor{stringliteral}{"{}alice"{}}\_n,\ \textcolor{stringliteral}{"{}bob"{}}\_n,\ \textcolor{stringliteral}{"{}0.0001\ SYS"{}}\_t,\ \textcolor{stringliteral}{"{}Memo!"{}})}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \ \ \ \ \ \ \{\}}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00205\ }
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1transaction__trace__v3}{transaction\_trace\_v3}}\ expected\_transaction\_trace\ \{}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \ \ \ \ \ \ ptrx1.id(),}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \ \ \ \ \ \ expected\_action\_traces,}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1enum__type}{fc::enum\_type<uint8\_t,\ chain::transaction\_receipt\_header::status\_enum>}}\{bsp1-\/>block-\/>transactions[0].status\},}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \ \ \ \ \ \ bsp1-\/>block-\/>transactions[0].cpu\_usage\_us,}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \ \ \ \ \ \ bsp1-\/>block-\/>transactions[0].net\_usage\_words,}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \ \ \ \ \ \ ptrx1.get\_signatures(),}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ \ \ \ \ make\_trx\_header(ptrx1.get\_transaction())}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00217\ }
+\DoxyCodeLine{00218\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1block__trace__v2}{block\_trace\_v2}}\ expected\_block\_trace\ \{}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \ \ \ bsp1-\/>id,}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \ \ \ 1,}
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \ \ \ bsp1-\/>prev(),}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \ \ \ chain::block\_timestamp\_type(1),}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}bp.one"{}}\_n,}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \ \ \ bsp1-\/>block-\/>transaction\_mroot,}
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \ \ \ bsp1-\/>block-\/>action\_mroot,}
+\DoxyCodeLine{00226\ \ \ \ \ \ \ \ \ \ bsp1-\/>block-\/>schedule\_version,}
+\DoxyCodeLine{00227\ \ \ \ \ \ \ \ \ \ std::vector<transaction\_trace\_v3>\ \{}
+\DoxyCodeLine{00228\ \ \ \ \ \ \ \ \ \ \ \ \ expected\_transaction\_trace}
+\DoxyCodeLine{00229\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00230\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00231\ }
+\DoxyCodeLine{00232\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(max\_lib,\ 0);}
+\DoxyCodeLine{00233\ \ \ \ \ \ \ BOOST\_REQUIRE(data\_log.size()\ ==\ 1);}
+\DoxyCodeLine{00234\ \ \ \ \ \ \ BOOST\_REQUIRE(std::holds\_alternative<block\_trace\_v2>(data\_log.at(0)));}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(std::get<block\_trace\_v2>(data\_log.at(0)),\ expected\_block\_trace);}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(id\_log.at(bsp1-\/>block\_num).size(),\ \ bsp1-\/>block-\/>transactions.size());}
+\DoxyCodeLine{00237\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__extraction_8cpp_abb35f24810053ae3e26ee8924bf2d064_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__extraction_8cpp_a36ece680757906e620edc38e7bfe81fe}\index{test\_extraction.cpp@{test\_extraction.cpp}!BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}}
+\index{BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}!test\_extraction.cpp@{test\_extraction.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_FIXTURE\_TEST\_CASE()}{BOOST\_FIXTURE\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{test__extraction_8cpp_a36ece680757906e620edc38e7bfe81fe} 
+BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{onerror\+\_\+transaction\+\_\+block}]{}{, }\item[{\mbox{\hyperlink{structextraction__test__fixture}{extraction\+\_\+test\+\_\+fixture}}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__extraction_8cpp_source_l00358}{358}} of file \mbox{\hyperlink{test__extraction_8cpp_source}{test\+\_\+extraction.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00359\ \ \ \ \{}
+\DoxyCodeLine{00360\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ onerror\_act\ =\ make\_onerror\_action(\ \textcolor{stringliteral}{"{}alice"{}}\_n,\ 1\ );}
+\DoxyCodeLine{00361\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ actt1\ =\ make\_action\_trace(\ 0,\ onerror\_act,\ \textcolor{stringliteral}{"{}sysio.token"{}}\_n\ );}
+\DoxyCodeLine{00362\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ ptrx1\ =\ make\_packed\_trx(\ \{\ onerror\_act\ \}\ );}
+\DoxyCodeLine{00363\ }
+\DoxyCodeLine{00364\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ act2\ =\ make\_transfer\_action(\ \textcolor{stringliteral}{"{}bob"{}}\_n,\ \textcolor{stringliteral}{"{}alice"{}}\_n,\ \textcolor{stringliteral}{"{}0.0001\ SYS"{}}\_t,\ \textcolor{stringliteral}{"{}Memo!"{}}\ );}
+\DoxyCodeLine{00365\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ actt2\ =\ make\_action\_trace(\ 1,\ act2,\ \textcolor{stringliteral}{"{}bob"{}}\_n\ );}
+\DoxyCodeLine{00366\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ transfer\_trx\ =\ make\_packed\_trx(\ \{\ act2\ \}\ );}
+\DoxyCodeLine{00367\ }
+\DoxyCodeLine{00368\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ onerror\_trace\ =\ make\_transaction\_trace(\ ptrx1.id(),\ 1,\ 1,\ \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__receipt__header_a2bb00bac16048e6f624c2ded867ebf55a7a6de58f1f84063a5f85bbfb59b43608}{chain::transaction\_receipt\_header::executed}},}
+\DoxyCodeLine{00369\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ actt1\ \}\ );}
+\DoxyCodeLine{00370\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ transfer\_trace\ =\ make\_transaction\_trace(\ transfer\_trx.id(),\ 1,\ 1,\ \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__receipt__header_a2bb00bac16048e6f624c2ded867ebf55a98d0df834b74445e549f5d2123443b4e}{chain::transaction\_receipt\_header::soft\_fail}},}
+\DoxyCodeLine{00371\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ actt2\ \}\ );}
+\DoxyCodeLine{00372\ \ \ \ \ \ \ onerror\_trace-\/>failed\_dtrx\_trace\ =\ transfer\_trace;}
+\DoxyCodeLine{00373\ }
+\DoxyCodeLine{00374\ \ \ \ \ \ \ signal\_applied\_transaction(\ onerror\_trace,\ std::make\_shared<packed\_transaction>(\ transfer\_trx\ )\ );}
+\DoxyCodeLine{00375\ }
+\DoxyCodeLine{00376\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ bsp1\ =\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a7ad028261e9ab9a38fd557c8f7628615}{make\_block\_state}}(\ chain::block\_id\_type(),\ 1,\ 1,\ \textcolor{stringliteral}{"{}bp.one"{}}\_n,}
+\DoxyCodeLine{00377\ \ \ \ \ \ \ \ \ \ \ \ \ \{\ chain::packed\_transaction(transfer\_trx)\ \}\ );}
+\DoxyCodeLine{00378\ \ \ \ \ \ \ signal\_accepted\_block(\ bsp1\ );}
+\DoxyCodeLine{00379\ }
+\DoxyCodeLine{00380\ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::vector<action\_trace\_v1>\ expected\_action\_trace\ \{}
+\DoxyCodeLine{00381\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00382\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00383\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0,}
+\DoxyCodeLine{00384\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio.token"{}}\_n,\ \textcolor{stringliteral}{"{}sysio"{}}\_n,\ \textcolor{stringliteral}{"{}onerror"{}}\_n,}
+\DoxyCodeLine{00385\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\{\ \textcolor{stringliteral}{"{}alice"{}}\_n,\ \textcolor{stringliteral}{"{}active"{}}\_n\ \}\},}
+\DoxyCodeLine{00386\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ make\_onerror\_data(\ chain::onerror\{\ 1,\ \textcolor{stringliteral}{"{}test\ "{}},\ 4\ \}\ )}
+\DoxyCodeLine{00387\ \ \ \ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{00388\ \ \ \ \ \ \ \ \ \ \ \ \ \{\}}
+\DoxyCodeLine{00389\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00390\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00391\ }
+\DoxyCodeLine{00392\ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::vector<transaction\_trace\_v3>\ expected\_transaction\_traces\ \{}
+\DoxyCodeLine{00393\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00394\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00395\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ transfer\_trx.id(),\ \textcolor{comment}{//\ transfer\_trx.id()\ because\ that\ is\ the\ trx\ id\ known\ to\ the\ user}}
+\DoxyCodeLine{00396\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ expected\_action\_trace,}
+\DoxyCodeLine{00397\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1enum__type}{fc::enum\_type<uint8\_t,\ chain::transaction\_receipt\_header::status\_enum>}}\{bsp1-\/>block-\/>transactions[0].status\},}
+\DoxyCodeLine{00398\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ bsp1-\/>block-\/>transactions[0].cpu\_usage\_us,}
+\DoxyCodeLine{00399\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ bsp1-\/>block-\/>transactions[0].net\_usage\_words,}
+\DoxyCodeLine{00400\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ transfer\_trx.get\_signatures(),}
+\DoxyCodeLine{00401\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ make\_trx\_header(transfer\_trx.get\_transaction())}
+\DoxyCodeLine{00402\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00403\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00404\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00405\ }
+\DoxyCodeLine{00406\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1block__trace__v2}{block\_trace\_v2}}\ expected\_block\_trace\ \{}
+\DoxyCodeLine{00407\ \ \ \ \ \ \ \ \ \ bsp1-\/>id,}
+\DoxyCodeLine{00408\ \ \ \ \ \ \ \ \ \ 1,}
+\DoxyCodeLine{00409\ \ \ \ \ \ \ \ \ \ bsp1-\/>prev(),}
+\DoxyCodeLine{00410\ \ \ \ \ \ \ \ \ \ chain::block\_timestamp\_type(1),}
+\DoxyCodeLine{00411\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}bp.one"{}}\_n,}
+\DoxyCodeLine{00412\ \ \ \ \ \ \ \ \ \ bsp1-\/>block-\/>transaction\_mroot,}
+\DoxyCodeLine{00413\ \ \ \ \ \ \ \ \ \ bsp1-\/>block-\/>action\_mroot,}
+\DoxyCodeLine{00414\ \ \ \ \ \ \ \ \ \ bsp1-\/>block-\/>schedule\_version,}
+\DoxyCodeLine{00415\ \ \ \ \ \ \ \ \ \ expected\_transaction\_traces}
+\DoxyCodeLine{00416\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00417\ }
+\DoxyCodeLine{00418\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(max\_lib,\ 0);}
+\DoxyCodeLine{00419\ \ \ \ \ \ \ BOOST\_REQUIRE(data\_log.size()\ ==\ 1);}
+\DoxyCodeLine{00420\ \ \ \ \ \ \ BOOST\_REQUIRE(std::holds\_alternative<block\_trace\_v2>(data\_log.at(0)));}
+\DoxyCodeLine{00421\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(std::get<block\_trace\_v2>(data\_log.at(0)),\ expected\_block\_trace);}
+\DoxyCodeLine{00422\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__extraction_8cpp_a36ece680757906e620edc38e7bfe81fe_cgraph}
+\end{center}
+\end{figure}

@@ -1,0 +1,1079 @@
+\doxysection{test\+\_\+trace\+\_\+file.\+cpp}
+\hypertarget{test__trace__file_8cpp_source}{}\label{test__trace__file_8cpp_source}\index{plugins/trace\_api\_plugin/test/test\_trace\_file.cpp@{plugins/trace\_api\_plugin/test/test\_trace\_file.cpp}}
+\mbox{\hyperlink{test__trace__file_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00001}\mbox{\hyperlink{test__trace__file_8cpp_a6b2a3852db8bb19ab6909bac01859985}{00001}}\ \textcolor{preprocessor}{\#define\ BOOST\_TEST\_MODULE\ trace\_trace\_file}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <boost/test/included/unit\_test.hpp>}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{cfile_8hpp}{fc/io/cfile.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{test__common_8hpp}{sysio/trace\_api/test\_common.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{store__provider_8hpp}{sysio/trace\_api/store\_provider.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <boost/filesystem.hpp>}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00008}00008\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00009}00009\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacesysio_1_1trace__api}{sysio::trace\_api}};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00010}00010\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common}{sysio::trace\_api::test\_common}};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00011}00011\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceboost_1_1filesystem}{bfs}}\ =\ \mbox{\hyperlink{namespaceboost_1_1filesystem}{boost::filesystem}};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00012}\mbox{\hyperlink{test__trace__file_8cpp_a198834d0a121ab5b82820ffa8361e521}{00012}}\ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a532effe653319aa639caa41b48709ae0}{open\_state}}\ =\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a532effe653319aa639caa41b48709ae0}{slice\_directory::open\_state}};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00014}00014\ \textcolor{keyword}{namespace\ }\{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00015}00015\ \ \ \ \textcolor{keyword}{struct\ }test\_fixture\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00017}00017\ \ \ \ \ \ \ std::vector<action\_trace\_v1>\ actions\ =\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00018}00018\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00019}00019\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00020}00020\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 1,}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00021}00021\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}receiver"{}}\_n,\ \textcolor{stringliteral}{"{}contract"{}}\_n,\ \textcolor{stringliteral}{"{}action"{}}\_n,}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00022}00022\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\{\ \textcolor{stringliteral}{"{}alice"{}}\_n,\ \textcolor{stringliteral}{"{}active"{}}\_n\ \}\},}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00023}00023\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ 0x01,\ 0x01,\ 0x01,\ 0x01\ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00024}00024\ \ \ \ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00025}00025\ \ \ \ \ \ \ \ \ \ \ \ \ \{\ 0x05,\ 0x05,\ 0x05,\ 0x05\ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00026}00026\ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00027}00027\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00028}00028\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00029}00029\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0,}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00030}00030\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}receiver"{}}\_n,\ \textcolor{stringliteral}{"{}contract"{}}\_n,\ \textcolor{stringliteral}{"{}action"{}}\_n,}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00031}00031\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\{\ \textcolor{stringliteral}{"{}alice"{}}\_n,\ \textcolor{stringliteral}{"{}active"{}}\_n\ \}\},}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00032}00032\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ 0x00,\ 0x00,\ 0x00,\ 0x00\ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00033}00033\ \ \ \ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00034}00034\ \ \ \ \ \ \ \ \ \ \ \ \ \{\ 0x04,\ 0x04,\ 0x04,\ 0x04\}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00035}00035\ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00036}00036\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00037}00037\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00038}00038\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 2,}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00039}00039\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}receiver"{}}\_n,\ \textcolor{stringliteral}{"{}contract"{}}\_n,\ \textcolor{stringliteral}{"{}action"{}}\_n,}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00040}00040\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\{\ \textcolor{stringliteral}{"{}alice"{}}\_n,\ \textcolor{stringliteral}{"{}active"{}}\_n\ \}\},}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00041}00041\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ 0x02,\ 0x02,\ 0x02,\ 0x02\ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00042}00042\ \ \ \ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00043}00043\ \ \ \ \ \ \ \ \ \ \ \ \ \{\ 0x06,\ 0x06,\ 0x06,\ 0x06\ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00044}00044\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00045}00045\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00047}00047\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1trace__api_1_1transaction__trace__v2}{transaction\_trace\_v2}}\ \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__trace}{transaction\_trace}}\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}0000000000000000000000000000000000000000000000000000000000000001"{}}\_h,}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \ actions,}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00050}00050\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1enum__type}{fc::enum\_type<uint8\_t,\ chain::transaction\_receipt\_header::status\_enum>}}\{chain::transaction\_receipt\_header::status\_enum::executed\},}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00051}00051\ \ \ \ \ \ \ \ \ \ 10,}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00052}00052\ \ \ \ \ \ \ \ \ \ 5,}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \{\ \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{chain::signature\_type}}()\ \},}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \{\ \mbox{\hyperlink{classfc_1_1time__point}{chain::time\_point}}(),\ 1,\ 0,\ 100,\ 50,\ 0\ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00055}00055\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00057}00057\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1trace__api_1_1block__trace__v2}{block\_trace\_v2}}\ block\_trace1\_v2\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}b000000000000000000000000000000000000000000000000000000000000001"{}}\_h,}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00059}00059\ \ \ \ \ \ \ \ \ \ 1,}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}0000000000000000000000000000000000000000000000000000000000000000"{}}\_h,}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00061}00061\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{chain::block\_timestamp\_type}}(0),}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00062}00062\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}bp.one"{}}\_n,}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}0000000000000000000000000000000000000000000000000000000000000000"{}}\_h,}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00064}00064\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}0000000000000000000000000000000000000000000000000000000000000000"{}}\_h,}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00065}00065\ \ \ \ \ \ \ \ \ \ 0,}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00066}00066\ \ \ \ \ \ \ \ \ \ std::vector<transaction\_trace\_v2>\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00067}00067\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__trace}{transaction\_trace}}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00069}00069\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00071}00071\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1trace__api_1_1block__trace__v2}{block\_trace\_v2}}\ block\_trace2\_v2\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}b000000000000000000000000000000000000000000000000000000000000001"{}}\_h,}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00073}00073\ \ \ \ \ \ \ \ \ \ 5,}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00074}00074\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}0000000000000000000000000000000000000000000000000000000000000000"{}}\_h,}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00075}00075\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{chain::block\_timestamp\_type}}(0),}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}bp.one"{}}\_n,}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}0000000000000000000000000000000000000000000000000000000000000000"{}}\_h,}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00078}00078\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}0000000000000000000000000000000000000000000000000000000000000000"{}}\_h,}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00079}00079\ \ \ \ \ \ \ \ \ \ 0,}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00080}00080\ \ \ \ \ \ \ \ \ \ std::vector<transaction\_trace\_v2>\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00081}00081\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__trace}{transaction\_trace}}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00082}00082\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00083}00083\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00084}00084\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00085}00085\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1block__trace__v1}{block\_trace\_v1}}\ bt\_v1\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00086}00086\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00087}00087\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}0000000000000000000000000000000000000000000000000000000000000001"{}}\_h,}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00088}00088\ \ \ \ \ \ \ \ \ \ \ \ \ 1,}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00089}00089\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}0000000000000000000000000000000000000000000000000000000000000003"{}}\_h,}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00090}00090\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{chain::block\_timestamp\_type}}(1),}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00091}00091\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}bp.one"{}}\_n,}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00092}00092\ \ \ \ \ \ \ \ \ \ \ \ \ \{\}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00093}00093\ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00094}00094\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}0000000000000000000000000000000000000000000000000000000000000000"{}}\_h,}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00095}00095\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}0000000000000000000000000000000000000000000000000000000000000000"{}}\_h,}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00096}00096\ \ \ \ \ \ \ \ \ \ 0,}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00097}00097\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00098}00098\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00099}00099\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00100}00100\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}0000000000000000000000000000000000000000000000000000000000000001"{}}\_h,}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00101}00101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00102}00102\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00103}00103\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0,}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00104}00104\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio.token"{}}\_n,\ \textcolor{stringliteral}{"{}sysio.token"{}}\_n,\ \textcolor{stringliteral}{"{}transfer"{}}\_n,}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00105}00105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\{\ \textcolor{stringliteral}{"{}alice"{}}\_n,\ \textcolor{stringliteral}{"{}active"{}}\_n\ \}\},}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00106}00106\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_aab47dbcf73e5456e7109c9f0d25dd035}{make\_transfer\_data}}(\ \textcolor{stringliteral}{"{}alice"{}}\_n,\ \textcolor{stringliteral}{"{}bob"{}}\_n,\ \textcolor{stringliteral}{"{}0.0001\ SYS"{}}\_t,\ \textcolor{stringliteral}{"{}Memo!"{}}\ )}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00107}00107\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00108}00108\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00109}00109\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 1,}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00110}00110\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}alice"{}}\_n,\ \textcolor{stringliteral}{"{}sysio.token"{}}\_n,\ \textcolor{stringliteral}{"{}transfer"{}}\_n,}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00111}00111\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\{\ \textcolor{stringliteral}{"{}alice"{}}\_n,\ \textcolor{stringliteral}{"{}active"{}}\_n\ \}\},}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00112}00112\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_aab47dbcf73e5456e7109c9f0d25dd035}{make\_transfer\_data}}(\ \textcolor{stringliteral}{"{}alice"{}}\_n,\ \textcolor{stringliteral}{"{}bob"{}}\_n,\ \textcolor{stringliteral}{"{}0.0001\ SYS"{}}\_t,\ \textcolor{stringliteral}{"{}Memo!"{}}\ )}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00113}00113\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00114}00114\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00115}00115\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 2,}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00116}00116\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}bob"{}}\_n,\ \textcolor{stringliteral}{"{}sysio.token"{}}\_n,\ \textcolor{stringliteral}{"{}transfer"{}}\_n,}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00117}00117\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\{\ \textcolor{stringliteral}{"{}alice"{}}\_n,\ \textcolor{stringliteral}{"{}active"{}}\_n\ \}\},}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00118}00118\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_aab47dbcf73e5456e7109c9f0d25dd035}{make\_transfer\_data}}(\ \textcolor{stringliteral}{"{}alice"{}}\_n,\ \textcolor{stringliteral}{"{}bob"{}}\_n,\ \textcolor{stringliteral}{"{}0.0001\ SYS"{}}\_t,\ \textcolor{stringliteral}{"{}Memo!"{}}\ )}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00119}00119\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00120}00120\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00121}00121\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00122}00122\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1enum__type}{fc::enum\_type<uint8\_t,\ chain::transaction\_receipt\_header::status\_enum>}}\{chain::transaction\_receipt\_header::status\_enum::executed\},}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00123}00123\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 10,}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00124}00124\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 5,}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00125}00125\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::vector<chain::signature\_type>\{\mbox{\hyperlink{classfc_1_1crypto_1_1signature}{chain::signature\_type}}()\},}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00126}00126\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__header}{chain::transaction\_header}}\{\mbox{\hyperlink{classfc_1_1time__point}{chain::time\_point}}(),\ 1,\ 0,\ 100,\ 50,\ 0\}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00127}00127\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00128}00128\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00129}00129\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00130}00130\ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00131}00131\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1block__trace__v1}{block\_trace\_v1}}\ bt2\_v1\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00132}00132\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00133}00133\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}0000000000000000000000000000000000000000000000000000000000000002"{}}\_h,}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00134}00134\ \ \ \ \ \ \ \ \ \ \ \ \ 5,}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00135}00135\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}0000000000000000000000000000000000000000000000000000000000000005"{}}\_h,}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00136}00136\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{chain::block\_timestamp\_type}}(2),}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00137}00137\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}bp.two"{}}\_n}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00138}00138\ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00139}00139\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}0000000000000000000000000000000000000000000000000000000000000000"{}}\_h,}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00140}00140\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}0000000000000000000000000000000000000000000000000000000000000000"{}}\_h,}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00141}00141\ \ \ \ \ \ \ \ \ \ 0,}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00142}00142\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00143}00143\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00144}00144\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00145}00145\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}f000000000000000000000000000000000000000000000000000000000000004"{}}\_h,}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00146}00146\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00147}00147\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00148}00148\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1enum__type}{fc::enum\_type<uint8\_t,\ chain::transaction\_receipt\_header::status\_enum>}}\{chain::transaction\_receipt\_header::status\_enum::executed\},}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00149}00149\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 10,}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00150}00150\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 5,}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00151}00151\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::vector<chain::signature\_type>\{\mbox{\hyperlink{classfc_1_1crypto_1_1signature}{chain::signature\_type}}()\},}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00152}00152\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__header}{chain::transaction\_header}}\{\mbox{\hyperlink{classfc_1_1time__point}{chain::time\_point}}(),\ 1,\ 0,\ 100,\ 50,\ 0\}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00153}00153\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00154}00154\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00155}00155\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00156}00156\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00157}00157\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1block__trace__v0}{block\_trace\_v0}}\ bt\_v0\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00158}00158\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}0000000000000000000000000000000000000000000000000000000000000001"{}}\_h,}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00159}00159\ \ \ \ \ \ \ \ \ \ 1,}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00160}00160\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}0000000000000000000000000000000000000000000000000000000000000003"{}}\_h,}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00161}00161\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{chain::block\_timestamp\_type}}(1),}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00162}00162\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}bp.one"{}}\_n,}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00163}00163\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00164}00164\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00165}00165\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}0000000000000000000000000000000000000000000000000000000000000001"{}}\_h,}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00166}00166\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00167}00167\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00168}00168\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0,}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00169}00169\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio.token"{}}\_n,\ \textcolor{stringliteral}{"{}sysio.token"{}}\_n,\ \textcolor{stringliteral}{"{}transfer"{}}\_n,}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00170}00170\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\{\ \textcolor{stringliteral}{"{}alice"{}}\_n,\ \textcolor{stringliteral}{"{}active"{}}\_n\ \}\},}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00171}00171\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_aab47dbcf73e5456e7109c9f0d25dd035}{make\_transfer\_data}}(\ \textcolor{stringliteral}{"{}alice"{}}\_n,\ \textcolor{stringliteral}{"{}bob"{}}\_n,\ \textcolor{stringliteral}{"{}0.0001\ SYS"{}}\_t,\ \textcolor{stringliteral}{"{}Memo!"{}}\ )}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00172}00172\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00173}00173\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00174}00174\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 1,}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00175}00175\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}alice"{}}\_n,\ \textcolor{stringliteral}{"{}sysio.token"{}}\_n,\ \textcolor{stringliteral}{"{}transfer"{}}\_n,}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00176}00176\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\{\ \textcolor{stringliteral}{"{}alice"{}}\_n,\ \textcolor{stringliteral}{"{}active"{}}\_n\ \}\},}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00177}00177\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_aab47dbcf73e5456e7109c9f0d25dd035}{make\_transfer\_data}}(\ \textcolor{stringliteral}{"{}alice"{}}\_n,\ \textcolor{stringliteral}{"{}bob"{}}\_n,\ \textcolor{stringliteral}{"{}0.0001\ SYS"{}}\_t,\ \textcolor{stringliteral}{"{}Memo!"{}}\ )}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00178}00178\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00179}00179\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00180}00180\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 2,}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00181}00181\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}bob"{}}\_n,\ \textcolor{stringliteral}{"{}sysio.token"{}}\_n,\ \textcolor{stringliteral}{"{}transfer"{}}\_n,}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00182}00182\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\{\ \textcolor{stringliteral}{"{}alice"{}}\_n,\ \textcolor{stringliteral}{"{}active"{}}\_n\ \}\},}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00183}00183\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_aab47dbcf73e5456e7109c9f0d25dd035}{make\_transfer\_data}}(\ \textcolor{stringliteral}{"{}alice"{}}\_n,\ \textcolor{stringliteral}{"{}bob"{}}\_n,\ \textcolor{stringliteral}{"{}0.0001\ SYS"{}}\_t,\ \textcolor{stringliteral}{"{}Memo!"{}}\ )}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00184}00184\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00185}00185\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00186}00186\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00187}00187\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00188}00188\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00189}00189\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00190}00190\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1trace__api_a7a6a31e37b6c94cbd85b0f2019e2ff3c}{metadata\_log\_entry}}\ be1\ \{\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1block__entry__v0}{block\_entry\_v0}}\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00191}00191\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}b000000000000000000000000000000000000000000000000000000000000001"{}}\_h,\ 5,\ 0}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00192}00192\ \ \ \ \ \ \ \}\ \};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00193}00193\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1trace__api_a7a6a31e37b6c94cbd85b0f2019e2ff3c}{metadata\_log\_entry}}\ le1\ \{\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1lib__entry__v0}{lib\_entry\_v0}}\ \{\ 4\ \}\ \};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00194}00194\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1trace__api_a7a6a31e37b6c94cbd85b0f2019e2ff3c}{metadata\_log\_entry}}\ be2\ \{\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1block__entry__v0}{block\_entry\_v0}}\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00195}00195\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}b000000000000000000000000000000000000000000000000000000000000002"{}}\_h,\ 7,\ 0}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00196}00196\ \ \ \ \ \ \ \}\ \};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00197}00197\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1trace__api_a7a6a31e37b6c94cbd85b0f2019e2ff3c}{metadata\_log\_entry}}\ le2\ \{\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1lib__entry__v0}{lib\_entry\_v0}}\ \{\ 5\ \}\ \};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00198}00198\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00199}00199\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ create\_non\_empty\_trace\_slice(\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory}{slice\_directory}}\&\ sd,\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ slice\_number,\ \mbox{\hyperlink{classfc_1_1cfile}{fc::cfile}}\&\ file)\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00200}00200\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ bad\_which\ =\ 0x7F;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00201}00201\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!sd.\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a365023e0ceb97c69aa3ad66c393c2125}{find\_or\_create\_trace\_slice}}(slice\_number,\ open\_state::write,\ file))\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00202}00202\ \ \ \ \ \ \ \ \ \ \ \ \ file.write(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(\&bad\_which),\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}));}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00203}00203\ \ \ \ \ \ \ \ \ \ \ \ \ file.close();}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00204}00204\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ sd.\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a365023e0ceb97c69aa3ad66c393c2125}{find\_or\_create\_trace\_slice}}(slice\_number,\ open\_state::read,\ file);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00205}00205\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00206}00206\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00207}00207\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00208}00208\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00209}00209\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00210}00210\ \ \ \ \textcolor{keyword}{struct\ }test\_store\_provider\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1store__provider}{store\_provider}}\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00211}00211\ \ \ \ \ \ \ test\_store\_provider(\textcolor{keyword}{const}\ bfs::path\&\ slice\_dir,\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{catch__reporter__console_8cpp_a2474a5474cbff19523a51eb1de01cda4}{width}},\ std::optional<uint32\_t>\ minimum\_irreversible\_history\_blocks\ =\ std::optional<uint32\_t>(),\ std::optional<uint32\_t>\ minimum\_uncompressed\_irreversible\_history\_blocks\ =\ std::optional<uint32\_t>(),\ \textcolor{keywordtype}{size\_t}\ compression\_seek\_point\_stride\ =\ 0)}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00212}00212\ \ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1store__provider}{store\_provider}}(slice\_dir,\ \mbox{\hyperlink{catch__reporter__console_8cpp_a2474a5474cbff19523a51eb1de01cda4}{width}},\ minimum\_irreversible\_history\_blocks,\ minimum\_uncompressed\_irreversible\_history\_blocks,\ compression\_seek\_point\_stride)\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00213}00213\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00214}00214\ \ \ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1trace__api_1_1store__provider_a22d3bc262b20308a93c1e9c8a423a1fa}{store\_provider::scan\_metadata\_log\_from}};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00215}00215\ \ \ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1trace__api_1_1store__provider_afcff133b7357a33643a4ae3e7df99284}{store\_provider::read\_data\_log}};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00216}00216\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00217}00217\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00218}00218\ \ \ \ \textcolor{keyword}{class\ }vslice\_datastream;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00219}00219\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00220}00220\ \ \ \ \textcolor{keyword}{struct\ }vslice\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00221}00221\ \ \ \ \ \ \ \textcolor{keyword}{enum}\ mode\ \{\ read\_mode,\ write\_mode\};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00222}00222\ \ \ \ \ \ \ vslice(mode\ m\ =\ write\_mode)\ :\ \_mode(m)\ \{\}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00223}00223\ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ tellp()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00224}00224\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \_pos;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00225}00225\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00226}00226\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00227}00227\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ seek(\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ loc\ )\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00228}00228\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\_mode\ ==\ read\_mode)\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00229}00229\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (loc\ >\ \_buffer.size())\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00230}00230\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::ios\_base::failure(\ \textcolor{stringliteral}{"{}read\ vslice\ unable\ to\ seek\ to:\ "{}}\ +\ std::to\_string(loc)\ +\ \textcolor{stringliteral}{"{},\ end\ is\ at:\ "{}}\ +\ std::to\_string(\_buffer.size()));}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00231}00231\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00232}00232\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00233}00233\ \ \ \ \ \ \ \ \ \ \_pos\ =\ loc;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00234}00234\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00235}00235\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00236}00236\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ seek\_end(\ \textcolor{keywordtype}{long}\ loc\ )\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00237}00237\ \ \ \ \ \ \ \ \ \ \_pos\ =\ \_buffer.size();}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00238}00238\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00239}00239\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00240}00240\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ read(\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}},\ \textcolor{keywordtype}{size\_t}\ n\ )\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00241}00241\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \_pos\ +\ n\ >\ \_buffer.size()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00242}00242\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::ios\_base::failure(\ \textcolor{stringliteral}{"{}vslice\ unable\ to\ read\ "{}}\ +\ std::to\_string(\ n\ )\ +\ \textcolor{stringliteral}{"{}\ bytes;\ only\ can\ read\ "{}}\ +\ std::to\_string(\ \_buffer.size()\ -\/\ \_pos\ )\ );}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00243}00243\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00244}00244\ \ \ \ \ \ \ \ \ \ std::memcpy(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}},\ \_buffer.data()\ +\ \_pos,\ n);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00245}00245\ \ \ \ \ \ \ \ \ \ \_pos\ +=\ n;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00246}00246\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00247}00247\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00248}00248\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ write(\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}},\ \textcolor{keywordtype}{size\_t}\ n\ )\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00249}00249\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\_mode\ ==\ read\_mode)\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00250}00250\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::ios\_base::failure(\ \textcolor{stringliteral}{"{}read\ vslice\ should\ not\ have\ write\ called"{}}\ );}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00251}00251\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00252}00252\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\_buffer.size()\ <\ \_pos\ +\ n)\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00253}00253\ \ \ \ \ \ \ \ \ \ \ \ \ \_buffer.resize(\_pos\ +\ n);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00254}00254\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00255}00255\ \ \ \ \ \ \ \ \ \ std::memcpy(\ \_buffer.data()\ +\ \_pos,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}},\ n);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00256}00256\ \ \ \ \ \ \ \ \ \ \_pos\ +=\ n;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00257}00257\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00258}00258\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00259}00259\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ flush()\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00260}00260\ \ \ \ \ \ \ \ \ \ \_flush\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00261}00261\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00262}00262\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00263}00263\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ sync()\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00264}00264\ \ \ \ \ \ \ \ \ \ \_sync\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00265}00265\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00266}00266\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00267}00267\ \ \ \ \ \ \ vslice\_datastream\ create\_datastream();}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00268}00268\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00269}00269\ \ \ \ \ \ \ std::vector<char>\ \_buffer;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00270}00270\ \ \ \ \ \ \ mode\ \_mode\ =\ write\_mode;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00271}00271\ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ \_pos\ =\ 0lu;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00272}00272\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \_flush\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00273}00273\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \_sync\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00274}00274\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00275}00275\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00276}00276\ \ \ \ \textcolor{keyword}{class\ }vslice\_datastream\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00277}00277\ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00278}00278\ \ \ \ \ \ \ \textcolor{keyword}{explicit}\ vslice\_datastream(\ vslice\&\ vs\ )\ :\ \_vs(vs)\ \{\}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00279}00279\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00280}00280\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ skip(\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00281}00281\ \ \ \ \ \ \ \ \ \ std::vector<char>\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ );}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00282}00282\ \ \ \ \ \ \ \ \ \ read(\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}[0],\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ );}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00283}00283\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00284}00284\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00285}00285\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ read(\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}},\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00286}00286\ \ \ \ \ \ \ \ \ \ \_vs.read(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ );}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00287}00287\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00288}00288\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00289}00289\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00290}00290\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ get(\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\&\ c\ )\ \{\ \textcolor{keywordflow}{return}\ get(\ *(\textcolor{keywordtype}{char}*)\&c\ );\ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00291}00291\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00292}00292\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ get(\ \textcolor{keywordtype}{char}\&\ c\ )\ \{\ \textcolor{keywordflow}{return}\ read(\&c,\ 1);\ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00293}00293\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00294}00294\ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00295}00295\ \ \ \ \ \ \ vslice\&\ \_vs;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00296}00296\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00297}00297\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00298}00298\ \ \ \ \textcolor{keyword}{inline}\ vslice\_datastream\ vslice::create\_datastream()\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00299}00299\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ vslice\_datastream(*\textcolor{keyword}{this});}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00300}00300\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00301}00301\ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00302}00302\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00303}00303\ BOOST\_AUTO\_TEST\_SUITE(slice\_tests)}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00304}\mbox{\hyperlink{test__trace__file_8cpp_a9dad05b7acee8b1c0b7a8f345f13efed}{00304}}\ \ \ \ \mbox{\hyperlink{test__trace__file_8cpp_a9dad05b7acee8b1c0b7a8f345f13efed}{BOOST\_FIXTURE\_TEST\_CASE}}(write\_data\_trace,\ test\_fixture)}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00305}00305\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00306}00306\ \ \ \ \ \ \ vslice\ vs;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00307}00307\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ offset\ =\ append\_store(bt\_v1,\ vs\ );}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00308}00308\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(offset,0);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00309}00309\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00310}00310\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ offset2\ =\ append\_store(bt2\_v1,\ vs\ );}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00311}00311\ \ \ \ \ \ \ BOOST\_REQUIRE(offset\ <\ offset2);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00312}00312\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00313}00313\ \ \ \ \ \ \ vs.\_pos\ =\ offset;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00314}00314\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ bt\_returned\ =\ extract\_store<block\_trace\_v1>(\ vs\ );}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00315}00315\ \ \ \ \ \ \ BOOST\_REQUIRE(bt\_returned\ ==\ bt\_v1);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00316}00316\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00317}00317\ \ \ \ \ \ \ vs.\_pos\ =\ offset2;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00318}00318\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ bt\_returned2\ =\ extract\_store<block\_trace\_v1>(\ vs\ );}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00319}00319\ \ \ \ \ \ \ BOOST\_REQUIRE(bt\_returned2\ ==\ bt2\_v1);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00320}00320\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00321}00321\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00322}\mbox{\hyperlink{test__trace__file_8cpp_a27bd099dbfda309095d62e3e2ab8cafa}{00322}}\ \ \ \ \mbox{\hyperlink{test__trace__file_8cpp_a9dad05b7acee8b1c0b7a8f345f13efed}{BOOST\_FIXTURE\_TEST\_CASE}}(write\_data\_multi\_trace\_version,\ test\_fixture)}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00323}00323\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00324}00324\ \ \ \ \ \ \ vslice\ vs;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00325}00325\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ offset\ =\ append\_store(bt\_v0,\ vs\ );}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00326}00326\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(offset,0);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00327}00327\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00328}00328\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ offset2\ =\ append\_store(bt\_v1,\ vs\ );}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00329}00329\ \ \ \ \ \ \ BOOST\_REQUIRE(offset\ <\ offset2);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00330}00330\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00331}00331\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ offset3\ =\ append\_store(block\_trace1\_v2,\ vs\ );}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00332}00332\ \ \ \ \ \ \ BOOST\_REQUIRE(offset2\ <\ offset3);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00333}00333\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00334}00334\ \ \ \ \ \ \ vs.\_pos\ =\ offset;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00335}00335\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ bt\_returned\ =\ extract\_store<block\_trace\_v0>(\ vs\ );}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00336}00336\ \ \ \ \ \ \ BOOST\_REQUIRE(bt\_returned\ ==\ bt\_v0);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00337}00337\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00338}00338\ \ \ \ \ \ \ vs.\_pos\ =\ offset2;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00339}00339\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ bt\_returned2\ =\ extract\_store<block\_trace\_v1>(\ vs\ );}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00340}00340\ \ \ \ \ \ \ BOOST\_REQUIRE(bt\_returned2\ ==\ bt\_v1);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00341}00341\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00342}00342\ \ \ \ \ \ \ vs.\_pos\ =\ offset3;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00343}00343\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ bt\_returned3\ =\ extract\_store<block\_trace\_v2>(\ vs\ );}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00344}00344\ \ \ \ \ \ \ BOOST\_REQUIRE(bt\_returned3\ ==\ block\_trace1\_v2);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00345}00345\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00346}00346\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00347}\mbox{\hyperlink{test__trace__file_8cpp_a002dd15999bbf46e61258b144662d871}{00347}}\ \ \ \ \mbox{\hyperlink{test__trace__file_8cpp_a9dad05b7acee8b1c0b7a8f345f13efed}{BOOST\_FIXTURE\_TEST\_CASE}}(write\_metadata\_trace,\ test\_fixture)}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00348}00348\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00349}00349\ \ \ \ \ \ \ vslice\ vs;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00350}00350\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ offset\ =\ append\_store(\ be1,\ vs\ );}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00351}00351\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ next\_offset\ =\ vs.\_pos;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00352}00352\ \ \ \ \ \ \ BOOST\_REQUIRE(offset\ <\ next\_offset);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00353}00353\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ offset2\ =\ append\_store(\ le1,\ vs\ );}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00354}00354\ \ \ \ \ \ \ BOOST\_REQUIRE(next\_offset\ <=\ offset2);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00355}00355\ \ \ \ \ \ \ BOOST\_REQUIRE(offset2\ <\ vs.\_pos);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00356}00356\ \ \ \ \ \ \ next\_offset\ =\ vs.\_pos;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00357}00357\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ offset3\ =\ append\_store(\ be2,\ vs\ );}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00358}00358\ \ \ \ \ \ \ BOOST\_REQUIRE(next\_offset\ <=\ offset3);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00359}00359\ \ \ \ \ \ \ BOOST\_REQUIRE(offset3\ <\ vs.\_pos);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00360}00360\ \ \ \ \ \ \ next\_offset\ =\ vs.\_pos;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00361}00361\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ offset4\ =\ append\_store(\ le2,\ vs\ );}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00362}00362\ \ \ \ \ \ \ BOOST\_REQUIRE(next\_offset\ <=\ offset4);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00363}00363\ \ \ \ \ \ \ BOOST\_REQUIRE(offset4\ <\ vs.\_pos);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00364}00364\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00365}00365\ \ \ \ \ \ \ vs.\_pos\ =\ offset;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00366}00366\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ be\_returned1\ =\ extract\_store<metadata\_log\_entry>(\ vs\ );}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00367}00367\ \ \ \ \ \ \ BOOST\_REQUIRE(std::holds\_alternative<block\_entry\_v0>(be\_returned1));}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00368}00368\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ real\_be\_returned1\ =\ std::get<block\_entry\_v0>(be\_returned1);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00369}00369\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ real\_be1\ =\ std::get<block\_entry\_v0>(be1);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00370}00370\ \ \ \ \ \ \ BOOST\_REQUIRE(real\_be\_returned1\ ==\ real\_be1);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00371}00371\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00372}00372\ \ \ \ \ \ \ vs.\_pos\ =\ offset2;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00373}00373\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ le\_returned1\ =\ extract\_store<metadata\_log\_entry>(\ vs\ );}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00374}00374\ \ \ \ \ \ \ BOOST\_REQUIRE(std::holds\_alternative<lib\_entry\_v0>(le\_returned1));}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00375}00375\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ real\_le\_returned1\ =\ std::get<lib\_entry\_v0>(le\_returned1);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00376}00376\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ real\_le1\ =\ std::get<lib\_entry\_v0>(le1);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00377}00377\ \ \ \ \ \ \ BOOST\_REQUIRE(real\_le\_returned1\ ==\ real\_le1);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00378}00378\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00379}00379\ \ \ \ \ \ \ vs.\_pos\ =\ offset3;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00380}00380\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ be\_returned2\ =\ extract\_store<metadata\_log\_entry>(\ vs\ );}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00381}00381\ \ \ \ \ \ \ BOOST\_REQUIRE(std::holds\_alternative<block\_entry\_v0>(be\_returned2));}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00382}00382\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ real\_be\_returned2\ =\ std::get<block\_entry\_v0>(be\_returned2);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00383}00383\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ real\_be2\ =\ std::get<block\_entry\_v0>(be2);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00384}00384\ \ \ \ \ \ \ BOOST\_REQUIRE(real\_be\_returned2\ ==\ real\_be2);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00385}00385\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00386}00386\ \ \ \ \ \ \ vs.\_pos\ =\ offset4;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00387}00387\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ le\_returned2\ =\ extract\_store<metadata\_log\_entry>(\ vs\ );}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00388}00388\ \ \ \ \ \ \ BOOST\_REQUIRE(std::holds\_alternative<lib\_entry\_v0>(le\_returned2));}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00389}00389\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ real\_le\_returned2\ =\ std::get<lib\_entry\_v0>(le\_returned2);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00390}00390\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ real\_le2\ =\ std::get<lib\_entry\_v0>(le2);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00391}00391\ \ \ \ \ \ \ BOOST\_REQUIRE(real\_le\_returned2\ ==\ real\_le2);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00392}00392\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00393}00393\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00394}\mbox{\hyperlink{test__trace__file_8cpp_ab71d7ab106f333fc4a26cbd547f5acc9}{00394}}\ \ \ \ \mbox{\hyperlink{test__trace__file_8cpp_a9dad05b7acee8b1c0b7a8f345f13efed}{BOOST\_FIXTURE\_TEST\_CASE}}(slice\_number,\ test\_fixture)}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00395}00395\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00396}00396\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1temp__directory}{fc::temp\_directory}}\ tempdir;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00397}00397\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory}{slice\_directory}}\ sd(tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}(),\ 100,\ std::optional<uint32\_t>(),\ std::optional<uint32\_t>(),\ 0);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00398}00398\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(sd.\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a47a30741cf28932df1556209da63b227}{slice\_number}}(99),\ 0);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00399}00399\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(sd.\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a47a30741cf28932df1556209da63b227}{slice\_number}}(100),\ 1);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00400}00400\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(sd.\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a47a30741cf28932df1556209da63b227}{slice\_number}}(1599),\ 15);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00401}00401\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory}{slice\_directory}}\ sd2(tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}(),\ 0x10,\ std::optional<uint32\_t>(),\ std::optional<uint32\_t>(),\ 0);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00402}00402\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(sd2.\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a47a30741cf28932df1556209da63b227}{slice\_number}}(0xf),\ 0);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00403}00403\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(sd2.\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a47a30741cf28932df1556209da63b227}{slice\_number}}(0x100),\ 0x10);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00404}00404\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(sd2.\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a47a30741cf28932df1556209da63b227}{slice\_number}}(0x233),\ 0x23);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00405}00405\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00406}00406\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00407}\mbox{\hyperlink{test__trace__file_8cpp_a5e1b80e8551bf5d0081e1828243dc423}{00407}}\ \ \ \ \mbox{\hyperlink{test__trace__file_8cpp_a9dad05b7acee8b1c0b7a8f345f13efed}{BOOST\_FIXTURE\_TEST\_CASE}}(slice\_file,\ test\_fixture)}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00408}00408\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00409}00409\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1temp__directory}{fc::temp\_directory}}\ tempdir;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00410}00410\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory}{slice\_directory}}\ sd(tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}(),\ 100,\ std::optional<uint32\_t>(),\ std::optional<uint32\_t>(),\ 0);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00411}00411\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1cfile}{fc::cfile}}\ slice;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00412}00412\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00413}00413\ \ \ \ \ \ \ \textcolor{comment}{//\ create\ trace\ slices}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00414}00414\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (uint\ i\ =\ 0;\ i\ <\ 9;\ ++i)\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00415}00415\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ found\ =\ sd.\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a365023e0ceb97c69aa3ad66c393c2125}{find\_or\_create\_trace\_slice}}(i,\ open\_state::write,\ slice);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00416}00416\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE(!found);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00417}00417\ \ \ \ \ \ \ \ \ \ bfs::path\ fp\ =\ slice.\mbox{\hyperlink{classfc_1_1cfile_aba9b5dcf06d12cc653b8eb4224351ff7}{get\_file\_path}}();}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00418}00418\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(fp.parent\_path().generic\_string(),\ tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}().\mbox{\hyperlink{classfc_1_1path_ab1eae2062df4ea01435348ec52fb3784}{generic\_string}}());}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00419}00419\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::string\ expected\_filename\ =\ \textcolor{stringliteral}{"{}trace\_0000000"{}}\ +\ std::to\_string(i)\ +\ \textcolor{stringliteral}{"{}00-\/0000000"{}}\ +\ std::to\_string(i+1)\ +\ \textcolor{stringliteral}{"{}00.log"{}};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00420}00420\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(fp.filename().generic\_string(),\ expected\_filename);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00421}00421\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE(slice.\mbox{\hyperlink{classfc_1_1cfile_ae5cdb4f43248d08842f7420b48534863}{is\_open}}());}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00422}00422\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(bfs::file\_size(fp),\ 0);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00423}00423\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(slice.\mbox{\hyperlink{classfc_1_1cfile_abc92fc8d64550b772a69ca1b63f75bfb}{tellp}}(),\ 0);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00424}00424\ \ \ \ \ \ \ \ \ \ slice.\mbox{\hyperlink{classfc_1_1cfile_a25b3bbb8ed2f690b750a197380153985}{close}}();}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00425}00425\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00426}00426\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00427}00427\ \ \ \ \ \ \ \textcolor{comment}{//\ create\ trace\ index\ slices}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00428}00428\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (uint\ i\ =\ 0;\ i\ <\ 9;\ ++i)\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00429}00429\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ found\ =\ sd.\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a24faf23a87e249099bea549dbda165b2}{find\_or\_create\_index\_slice}}(i,\ open\_state::write,\ slice);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00430}00430\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE(!found);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00431}00431\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1path}{fc::path}}\ fp\ =\ slice.\mbox{\hyperlink{classfc_1_1cfile_aba9b5dcf06d12cc653b8eb4224351ff7}{get\_file\_path}}();}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00432}00432\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(fp.\mbox{\hyperlink{classfc_1_1path_a10985bab813b9197980458e4345d0f36}{parent\_path}}().\mbox{\hyperlink{classfc_1_1path_ab1eae2062df4ea01435348ec52fb3784}{generic\_string}}(),\ tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}().\mbox{\hyperlink{classfc_1_1path_ab1eae2062df4ea01435348ec52fb3784}{generic\_string}}());}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00433}00433\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::string\ expected\_filename\ =\ \textcolor{stringliteral}{"{}trace\_index\_0000000"{}}\ +\ std::to\_string(i)\ +\ \textcolor{stringliteral}{"{}00-\/0000000"{}}\ +\ std::to\_string(i+1)\ +\ \textcolor{stringliteral}{"{}00.log"{}};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00434}00434\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(fp.\mbox{\hyperlink{classfc_1_1path_a1e6beb6e05c3f6d6f699c1c448c4b1d6}{filename}}().\mbox{\hyperlink{classfc_1_1path_ab1eae2062df4ea01435348ec52fb3784}{generic\_string}}(),\ expected\_filename);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00435}00435\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE(slice.\mbox{\hyperlink{classfc_1_1cfile_ae5cdb4f43248d08842f7420b48534863}{is\_open}}());}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00436}00436\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1trace__api_1_1slice__directory_1_1index__header}{slice\_directory::index\_header}}\ h;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00437}00437\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ data\ =\ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(h);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00438}00438\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(bfs::file\_size(fp),\ data.size());}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00439}00439\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(slice.\mbox{\hyperlink{classfc_1_1cfile_abc92fc8d64550b772a69ca1b63f75bfb}{tellp}}(),\ data.size());}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00440}00440\ \ \ \ \ \ \ \ \ \ slice.\mbox{\hyperlink{classfc_1_1cfile_a25b3bbb8ed2f690b750a197380153985}{close}}();}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00441}00441\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00442}00442\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00443}00443\ \ \ \ \ \ \ \textcolor{comment}{//\ reopen\ trace\ slice\ for\ append}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00444}00444\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ found\ =\ sd.\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a365023e0ceb97c69aa3ad66c393c2125}{find\_or\_create\_trace\_slice}}(0,\ open\_state::write,\ slice);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00445}00445\ \ \ \ \ \ \ BOOST\_REQUIRE(found);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00446}00446\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1path}{fc::path}}\ fp\ =\ slice.\mbox{\hyperlink{classfc_1_1cfile_aba9b5dcf06d12cc653b8eb4224351ff7}{get\_file\_path}}();}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00447}00447\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(fp.\mbox{\hyperlink{classfc_1_1path_a10985bab813b9197980458e4345d0f36}{parent\_path}}().\mbox{\hyperlink{classfc_1_1path_ab1eae2062df4ea01435348ec52fb3784}{generic\_string}}(),\ tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}().\mbox{\hyperlink{classfc_1_1path_ab1eae2062df4ea01435348ec52fb3784}{generic\_string}}());}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00448}00448\ \ \ \ \ \ \ std::string\ expected\_filename\ =\ \textcolor{stringliteral}{"{}trace\_0000000000-\/0000000100.log"{}};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00449}00449\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(fp.\mbox{\hyperlink{classfc_1_1path_a1e6beb6e05c3f6d6f699c1c448c4b1d6}{filename}}().\mbox{\hyperlink{classfc_1_1path_ab1eae2062df4ea01435348ec52fb3784}{generic\_string}}(),\ expected\_filename);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00450}00450\ \ \ \ \ \ \ BOOST\_REQUIRE(slice.\mbox{\hyperlink{classfc_1_1cfile_ae5cdb4f43248d08842f7420b48534863}{is\_open}}());}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00451}00451\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(bfs::file\_size(fp),\ 0);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00452}00452\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(slice.\mbox{\hyperlink{classfc_1_1cfile_abc92fc8d64550b772a69ca1b63f75bfb}{tellp}}(),\ 0);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00453}00453\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ offset\ =\ append\_store(bt\_v1,\ slice);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00454}00454\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(offset,\ 0);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00455}00455\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ data\ =\ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(bt\_v1);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00456}00456\ \ \ \ \ \ \ BOOST\_REQUIRE(slice.\mbox{\hyperlink{classfc_1_1cfile_abc92fc8d64550b772a69ca1b63f75bfb}{tellp}}()\ >\ 0);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00457}00457\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(data.size(),\ slice.\mbox{\hyperlink{classfc_1_1cfile_abc92fc8d64550b772a69ca1b63f75bfb}{tellp}}());}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00458}00458\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(bfs::file\_size(fp),\ slice.\mbox{\hyperlink{classfc_1_1cfile_abc92fc8d64550b772a69ca1b63f75bfb}{tellp}}());}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00459}00459\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ trace\_file\_size\ =\ bfs::file\_size(fp);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00460}00460\ \ \ \ \ \ \ slice.\mbox{\hyperlink{classfc_1_1cfile_a25b3bbb8ed2f690b750a197380153985}{close}}();}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00461}00461\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00462}00462\ \ \ \ \ \ \ \textcolor{comment}{//\ open\ same\ file\ for\ read}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00463}00463\ \ \ \ \ \ \ found\ =\ sd.\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a365023e0ceb97c69aa3ad66c393c2125}{find\_or\_create\_trace\_slice}}(0,\ open\_state::read,\ slice);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00464}00464\ \ \ \ \ \ \ BOOST\_REQUIRE(found);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00465}00465\ \ \ \ \ \ \ fp\ =\ slice.\mbox{\hyperlink{classfc_1_1cfile_aba9b5dcf06d12cc653b8eb4224351ff7}{get\_file\_path}}();}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00466}00466\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(fp.\mbox{\hyperlink{classfc_1_1path_a1e6beb6e05c3f6d6f699c1c448c4b1d6}{filename}}().\mbox{\hyperlink{classfc_1_1path_ab1eae2062df4ea01435348ec52fb3784}{generic\_string}}(),\ expected\_filename);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00467}00467\ \ \ \ \ \ \ BOOST\_REQUIRE(slice.\mbox{\hyperlink{classfc_1_1cfile_ae5cdb4f43248d08842f7420b48534863}{is\_open}}());}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00468}00468\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(bfs::file\_size(fp),\ trace\_file\_size);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00469}00469\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(slice.\mbox{\hyperlink{classfc_1_1cfile_abc92fc8d64550b772a69ca1b63f75bfb}{tellp}}(),\ 0);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00470}00470\ \ \ \ \ \ \ slice.\mbox{\hyperlink{classfc_1_1cfile_a25b3bbb8ed2f690b750a197380153985}{close}}();}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00471}00471\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00472}00472\ \ \ \ \ \ \ \textcolor{comment}{//\ open\ same\ file\ for\ append\ again}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00473}00473\ \ \ \ \ \ \ found\ =\ sd.\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a365023e0ceb97c69aa3ad66c393c2125}{find\_or\_create\_trace\_slice}}(0,\ open\_state::write,\ slice);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00474}00474\ \ \ \ \ \ \ BOOST\_REQUIRE(found);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00475}00475\ \ \ \ \ \ \ fp\ =\ slice.\mbox{\hyperlink{classfc_1_1cfile_aba9b5dcf06d12cc653b8eb4224351ff7}{get\_file\_path}}();}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00476}00476\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(fp.\mbox{\hyperlink{classfc_1_1path_a1e6beb6e05c3f6d6f699c1c448c4b1d6}{filename}}().\mbox{\hyperlink{classfc_1_1path_ab1eae2062df4ea01435348ec52fb3784}{generic\_string}}(),\ expected\_filename);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00477}00477\ \ \ \ \ \ \ BOOST\_REQUIRE(slice.\mbox{\hyperlink{classfc_1_1cfile_ae5cdb4f43248d08842f7420b48534863}{is\_open}}());}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00478}00478\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(bfs::file\_size(fp),\ trace\_file\_size);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00479}00479\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(slice.\mbox{\hyperlink{classfc_1_1cfile_abc92fc8d64550b772a69ca1b63f75bfb}{tellp}}(),\ trace\_file\_size);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00480}00480\ \ \ \ \ \ \ slice.\mbox{\hyperlink{classfc_1_1cfile_a25b3bbb8ed2f690b750a197380153985}{close}}();}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00481}00481\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00482}00482\ \ \ \ \ \ \ \textcolor{comment}{//\ reopen\ trace\ index\ slice\ for\ append}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00483}00483\ \ \ \ \ \ \ found\ =\ sd.\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a24faf23a87e249099bea549dbda165b2}{find\_or\_create\_index\_slice}}(1,\ open\_state::write,\ slice);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00484}00484\ \ \ \ \ \ \ BOOST\_REQUIRE(found);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00485}00485\ \ \ \ \ \ \ fp\ =\ slice.\mbox{\hyperlink{classfc_1_1cfile_aba9b5dcf06d12cc653b8eb4224351ff7}{get\_file\_path}}();}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00486}00486\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(fp.\mbox{\hyperlink{classfc_1_1path_a10985bab813b9197980458e4345d0f36}{parent\_path}}().\mbox{\hyperlink{classfc_1_1path_ab1eae2062df4ea01435348ec52fb3784}{generic\_string}}(),\ tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}().\mbox{\hyperlink{classfc_1_1path_ab1eae2062df4ea01435348ec52fb3784}{generic\_string}}());}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00487}00487\ \ \ \ \ \ \ expected\_filename\ =\ \textcolor{stringliteral}{"{}trace\_index\_0000000100-\/0000000200.log"{}};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00488}00488\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(fp.\mbox{\hyperlink{classfc_1_1path_a1e6beb6e05c3f6d6f699c1c448c4b1d6}{filename}}().\mbox{\hyperlink{classfc_1_1path_ab1eae2062df4ea01435348ec52fb3784}{generic\_string}}(),\ expected\_filename);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00489}00489\ \ \ \ \ \ \ BOOST\_REQUIRE(slice.\mbox{\hyperlink{classfc_1_1cfile_ae5cdb4f43248d08842f7420b48534863}{is\_open}}());}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00490}00490\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1trace__api_1_1slice__directory_1_1index__header}{slice\_directory::index\_header}}\ h;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00491}00491\ \ \ \ \ \ \ data\ =\ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(h);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00492}00492\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ header\_size\ =\ data.size();}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00493}00493\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(bfs::file\_size(fp),\ header\_size);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00494}00494\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(slice.\mbox{\hyperlink{classfc_1_1cfile_abc92fc8d64550b772a69ca1b63f75bfb}{tellp}}(),\ header\_size);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00495}00495\ \ \ \ \ \ \ offset\ =\ append\_store(be1,\ slice);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00496}00496\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(offset,\ header\_size);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00497}00497\ \ \ \ \ \ \ data\ =\ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(be1);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00498}00498\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ be1\_size\ =\ data.size();}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00499}00499\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(header\_size\ +\ be1\_size,\ slice.\mbox{\hyperlink{classfc_1_1cfile_abc92fc8d64550b772a69ca1b63f75bfb}{tellp}}());}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00500}00500\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(bfs::file\_size(fp),\ slice.\mbox{\hyperlink{classfc_1_1cfile_abc92fc8d64550b772a69ca1b63f75bfb}{tellp}}());}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00501}00501\ \ \ \ \ \ \ slice.\mbox{\hyperlink{classfc_1_1cfile_a25b3bbb8ed2f690b750a197380153985}{close}}();}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00502}00502\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00503}00503\ \ \ \ \ \ \ found\ =\ sd.\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a24faf23a87e249099bea549dbda165b2}{find\_or\_create\_index\_slice}}(1,\ open\_state::read,\ slice);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00504}00504\ \ \ \ \ \ \ BOOST\_REQUIRE(found);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00505}00505\ \ \ \ \ \ \ fp\ =\ slice.\mbox{\hyperlink{classfc_1_1cfile_aba9b5dcf06d12cc653b8eb4224351ff7}{get\_file\_path}}();}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00506}00506\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(fp.\mbox{\hyperlink{classfc_1_1path_a1e6beb6e05c3f6d6f699c1c448c4b1d6}{filename}}().\mbox{\hyperlink{classfc_1_1path_ab1eae2062df4ea01435348ec52fb3784}{generic\_string}}(),\ expected\_filename);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00507}00507\ \ \ \ \ \ \ BOOST\_REQUIRE(slice.\mbox{\hyperlink{classfc_1_1cfile_ae5cdb4f43248d08842f7420b48534863}{is\_open}}());}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00508}00508\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(bfs::file\_size(fp),\ header\_size\ +\ be1\_size);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00509}00509\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(slice.\mbox{\hyperlink{classfc_1_1cfile_abc92fc8d64550b772a69ca1b63f75bfb}{tellp}}(),\ header\_size);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00510}00510\ \ \ \ \ \ \ slice.\mbox{\hyperlink{classfc_1_1cfile_a25b3bbb8ed2f690b750a197380153985}{close}}();}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00511}00511\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00512}00512\ \ \ \ \ \ \ found\ =\ sd.\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a24faf23a87e249099bea549dbda165b2}{find\_or\_create\_index\_slice}}(1,\ open\_state::write,\ slice);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00513}00513\ \ \ \ \ \ \ BOOST\_REQUIRE(found);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00514}00514\ \ \ \ \ \ \ fp\ =\ slice.\mbox{\hyperlink{classfc_1_1cfile_aba9b5dcf06d12cc653b8eb4224351ff7}{get\_file\_path}}();}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00515}00515\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(fp.\mbox{\hyperlink{classfc_1_1path_a1e6beb6e05c3f6d6f699c1c448c4b1d6}{filename}}().\mbox{\hyperlink{classfc_1_1path_ab1eae2062df4ea01435348ec52fb3784}{generic\_string}}(),\ expected\_filename);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00516}00516\ \ \ \ \ \ \ BOOST\_REQUIRE(slice.\mbox{\hyperlink{classfc_1_1cfile_ae5cdb4f43248d08842f7420b48534863}{is\_open}}());}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00517}00517\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(bfs::file\_size(fp),\ header\_size\ +\ be1\_size);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00518}00518\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(slice.\mbox{\hyperlink{classfc_1_1cfile_abc92fc8d64550b772a69ca1b63f75bfb}{tellp}}(),\ header\_size\ +\ be1\_size);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00519}00519\ \ \ \ \ \ \ offset\ =\ append\_store(le1,\ slice);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00520}00520\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(offset,\ header\_size\ +\ be1\_size);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00521}00521\ \ \ \ \ \ \ data\ =\ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(le1);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00522}00522\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ le1\_size\ =\ data.size();}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00523}00523\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(header\_size\ +\ be1\_size\ +\ le1\_size,\ slice.\mbox{\hyperlink{classfc_1_1cfile_abc92fc8d64550b772a69ca1b63f75bfb}{tellp}}());}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00524}00524\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(bfs::file\_size(fp),\ slice.\mbox{\hyperlink{classfc_1_1cfile_abc92fc8d64550b772a69ca1b63f75bfb}{tellp}}());}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00525}00525\ \ \ \ \ \ \ slice.\mbox{\hyperlink{classfc_1_1cfile_a25b3bbb8ed2f690b750a197380153985}{close}}();}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00526}00526\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00527}00527\ \ \ \ \ \ \ found\ =\ sd.\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a24faf23a87e249099bea549dbda165b2}{find\_or\_create\_index\_slice}}(1,\ open\_state::read,\ slice);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00528}00528\ \ \ \ \ \ \ BOOST\_REQUIRE(found);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00529}00529\ \ \ \ \ \ \ fp\ =\ slice.\mbox{\hyperlink{classfc_1_1cfile_aba9b5dcf06d12cc653b8eb4224351ff7}{get\_file\_path}}();}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00530}00530\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(fp.\mbox{\hyperlink{classfc_1_1path_a1e6beb6e05c3f6d6f699c1c448c4b1d6}{filename}}().\mbox{\hyperlink{classfc_1_1path_ab1eae2062df4ea01435348ec52fb3784}{generic\_string}}(),\ expected\_filename);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00531}00531\ \ \ \ \ \ \ BOOST\_REQUIRE(slice.\mbox{\hyperlink{classfc_1_1cfile_ae5cdb4f43248d08842f7420b48534863}{is\_open}}());}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00532}00532\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(bfs::file\_size(fp),\ header\_size\ +\ be1\_size\ +\ le1\_size);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00533}00533\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(slice.\mbox{\hyperlink{classfc_1_1cfile_abc92fc8d64550b772a69ca1b63f75bfb}{tellp}}(),\ header\_size);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00534}00534\ \ \ \ \ \ \ slice.\mbox{\hyperlink{classfc_1_1cfile_a25b3bbb8ed2f690b750a197380153985}{close}}();}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00535}00535\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00536}00536\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00537}\mbox{\hyperlink{test__trace__file_8cpp_a243805af9dcac3c05356447dcec150b2}{00537}}\ \ \ \ \mbox{\hyperlink{test__trace__file_8cpp_a9dad05b7acee8b1c0b7a8f345f13efed}{BOOST\_FIXTURE\_TEST\_CASE}}(slice\_file\_find\_test,\ test\_fixture)}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00538}00538\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00539}00539\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1temp__directory}{fc::temp\_directory}}\ tempdir;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00540}00540\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory}{slice\_directory}}\ sd(tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}(),\ 100,\ std::optional<uint32\_t>(),\ std::optional<uint32\_t>(),\ 0);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00541}00541\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1cfile}{fc::cfile}}\ slice;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00542}00542\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00543}00543\ \ \ \ \ \ \ \textcolor{comment}{//\ create\ trace\ slice}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00544}00544\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ found\ =\ sd.\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a365023e0ceb97c69aa3ad66c393c2125}{find\_or\_create\_trace\_slice}}(1,\ open\_state::write,\ slice);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00545}00545\ \ \ \ \ \ \ BOOST\_REQUIRE(!found);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00546}00546\ \ \ \ \ \ \ bfs::path\ fp\ =\ slice.\mbox{\hyperlink{classfc_1_1cfile_aba9b5dcf06d12cc653b8eb4224351ff7}{get\_file\_path}}();}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00547}00547\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(fp.parent\_path().generic\_string(),\ tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}().\mbox{\hyperlink{classfc_1_1path_ab1eae2062df4ea01435348ec52fb3784}{generic\_string}}());}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00548}00548\ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::string\ expected\_filename\ =\ \textcolor{stringliteral}{"{}trace\_0000000100-\/0000000200.log"{}};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00549}00549\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(fp.filename().generic\_string(),\ expected\_filename);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00550}00550\ \ \ \ \ \ \ BOOST\_REQUIRE(slice.\mbox{\hyperlink{classfc_1_1cfile_ae5cdb4f43248d08842f7420b48534863}{is\_open}}());}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00551}00551\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(bfs::file\_size(fp),\ 0);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00552}00552\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(slice.\mbox{\hyperlink{classfc_1_1cfile_abc92fc8d64550b772a69ca1b63f75bfb}{tellp}}(),\ 0);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00553}00553\ \ \ \ \ \ \ slice.\mbox{\hyperlink{classfc_1_1cfile_a25b3bbb8ed2f690b750a197380153985}{close}}();}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00554}00554\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00555}00555\ \ \ \ \ \ \ \textcolor{comment}{//\ find\ trace\ slice\ (and\ open)}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00556}00556\ \ \ \ \ \ \ found\ =\ sd.\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a314838e3f2122e4bcc7f1279b78f7d0c}{find\_trace\_slice}}(1,\ open\_state::write,\ slice);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00557}00557\ \ \ \ \ \ \ BOOST\_REQUIRE(found);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00558}00558\ \ \ \ \ \ \ fp\ =\ slice.\mbox{\hyperlink{classfc_1_1cfile_aba9b5dcf06d12cc653b8eb4224351ff7}{get\_file\_path}}();}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00559}00559\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(fp.parent\_path().generic\_string(),\ tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}().\mbox{\hyperlink{classfc_1_1path_ab1eae2062df4ea01435348ec52fb3784}{generic\_string}}());}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00560}00560\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(fp.filename().generic\_string(),\ expected\_filename);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00561}00561\ \ \ \ \ \ \ BOOST\_REQUIRE(slice.\mbox{\hyperlink{classfc_1_1cfile_ae5cdb4f43248d08842f7420b48534863}{is\_open}}());}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00562}00562\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(bfs::file\_size(fp),\ 0);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00563}00563\ \ \ \ \ \ \ slice.\mbox{\hyperlink{classfc_1_1cfile_a25b3bbb8ed2f690b750a197380153985}{close}}();}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00564}00564\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00565}00565\ \ \ \ \ \ \ \textcolor{comment}{//\ find\ trace\ slice\ (and\ don't\ open)}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00566}00566\ \ \ \ \ \ \ found\ =\ sd.\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a314838e3f2122e4bcc7f1279b78f7d0c}{find\_trace\_slice}}(1,\ open\_state::write,\ slice,\ \textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00567}00567\ \ \ \ \ \ \ BOOST\_REQUIRE(found);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00568}00568\ \ \ \ \ \ \ fp\ =\ slice.\mbox{\hyperlink{classfc_1_1cfile_aba9b5dcf06d12cc653b8eb4224351ff7}{get\_file\_path}}();}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00569}00569\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(fp.parent\_path().generic\_string(),\ tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}().\mbox{\hyperlink{classfc_1_1path_ab1eae2062df4ea01435348ec52fb3784}{generic\_string}}());}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00570}00570\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(fp.filename().generic\_string(),\ expected\_filename);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00571}00571\ \ \ \ \ \ \ BOOST\_REQUIRE(!slice.\mbox{\hyperlink{classfc_1_1cfile_ae5cdb4f43248d08842f7420b48534863}{is\_open}}());}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00572}00572\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(bfs::file\_size(fp),\ 0);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00573}00573\ \ \ \ \ \ \ slice.\mbox{\hyperlink{classfc_1_1cfile_a25b3bbb8ed2f690b750a197380153985}{close}}();}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00574}00574\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00575}00575\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00576}\mbox{\hyperlink{test__trace__file_8cpp_ac49ab2cf53f615a1a84cdef0579d6fb8}{00576}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{test__trace__file_8cpp_ac49ab2cf53f615a1a84cdef0579d6fb8}{verify\_directory\_contents}}(\textcolor{keyword}{const}\ bfs::path\&\ tempdir,\ std::set<bfs::path>\ expected\_files)\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00577}00577\ \ \ \ \ \ \ std::set<bfs::path>\ unexpected\_files;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00578}00578\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (bfs::directory\_iterator\ itr(tempdir);\ itr\ !=\ \mbox{\hyperlink{classfc_1_1directory__iterator}{directory\_iterator}}();\ ++itr)\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00579}00579\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ filename\ =\ itr-\/>path().filename();}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00580}00580\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (expected\_files.erase(filename)\ <\ 1)\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00581}00581\ \ \ \ \ \ \ \ \ \ \ \ \ unexpected\_files.insert(filename);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00582}00582\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00583}00583\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00584}00584\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (expected\_files.size()\ +\ unexpected\_files.size()\ ==\ 0)}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00585}00585\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00586}00586\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00587}00587\ \ \ \ \ \ \ std::string\ msg;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00588}00588\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (expected\_files.size())\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00589}00589\ \ \ \ \ \ \ \ \ \ msg\ +=\ \textcolor{stringliteral}{"{}\ Expected\ the\ following\ files\ to\ be\ present,\ but\ were\ not:"{}};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00590}00590\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00591}00591\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ comma\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00592}00592\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\ file\ :\ expected\_files)\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00593}00593\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (comma)}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00594}00594\ \ \ \ \ \ \ \ \ \ \ \ \ msg\ +=\ \textcolor{stringliteral}{"{},"{}};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00595}00595\ \ \ \ \ \ \ \ \ \ msg\ +=\ \textcolor{stringliteral}{"{}\ "{}}\ +\ file.generic\_string();}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00596}00596\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00597}00597\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (unexpected\_files.size())\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00598}00598\ \ \ \ \ \ \ \ \ \ msg\ +=\ \textcolor{stringliteral}{"{}\ Did\ not\ expect\ the\ following\ files\ to\ be\ present,\ but\ they\ were:"{}};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00599}00599\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00600}00600\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\ file\ :\ expected\_files)\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00601}00601\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (comma)}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00602}00602\ \ \ \ \ \ \ \ \ \ \ \ \ msg\ +=\ \textcolor{stringliteral}{"{},"{}};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00603}00603\ \ \ \ \ \ \ \ \ \ msg\ +=\ \textcolor{stringliteral}{"{}\ "{}}\ +\ file.generic\_string();}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00604}00604\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00605}00605\ \ \ \ \ \ \ BOOST\_FAIL(msg);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00606}00606\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00607}00607\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00608}\mbox{\hyperlink{test__trace__file_8cpp_a66729e2b0f8ef9a605dab627b7e99dc1}{00608}}\ \ \ \ \mbox{\hyperlink{test__trace__file_8cpp_a9dad05b7acee8b1c0b7a8f345f13efed}{BOOST\_FIXTURE\_TEST\_CASE}}(slice\_dir\_cleanup\_height\_less\_than\_width,\ test\_fixture)}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00609}00609\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00610}00610\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1temp__directory}{fc::temp\_directory}}\ tempdir;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00611}00611\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{catch__reporter__console_8cpp_a2474a5474cbff19523a51eb1de01cda4}{width}}\ =\ 10;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00612}00612\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ min\_saved\_blocks\ =\ 5;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00613}00613\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory}{slice\_directory}}\ sd(tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}(),\ \mbox{\hyperlink{catch__reporter__console_8cpp_a2474a5474cbff19523a51eb1de01cda4}{width}},\ std::optional<uint32\_t>(min\_saved\_blocks),\ std::optional<uint32\_t>(),\ 0);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00614}00614\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1cfile}{fc::cfile}}\ file;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00615}00615\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00616}00616\ \ \ \ \ \ \ \textcolor{comment}{//\ verify\ it\ cleans\ up\ when\ there\ is\ just\ an\ index\ file,\ just\ a\ trace\ file,\ or\ when\ both\ are\ there}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00617}00617\ \ \ \ \ \ \ \textcolor{comment}{//\ verify\ it\ cleans\ up\ all\ slices\ that\ need\ to\ be\ cleaned}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00618}00618\ \ \ \ \ \ \ std::set<bfs::path>\ files;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00619}00619\ \ \ \ \ \ \ BOOST\_REQUIRE(!sd.\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a24faf23a87e249099bea549dbda165b2}{find\_or\_create\_index\_slice}}(0,\ open\_state::read,\ file));}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00620}00620\ \ \ \ \ \ \ files.insert(file.get\_file\_path().filename());}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00621}00621\ \ \ \ \ \ \ \mbox{\hyperlink{test__trace__file_8cpp_ac49ab2cf53f615a1a84cdef0579d6fb8}{verify\_directory\_contents}}(tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}(),\ files);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00622}00622\ \ \ \ \ \ \ BOOST\_REQUIRE(!sd.\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a365023e0ceb97c69aa3ad66c393c2125}{find\_or\_create\_trace\_slice}}(0,\ open\_state::read,\ file));}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00623}00623\ \ \ \ \ \ \ files.insert(file.get\_file\_path().filename());}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00624}00624\ \ \ \ \ \ \ BOOST\_REQUIRE(!sd.\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a24faf23a87e249099bea549dbda165b2}{find\_or\_create\_index\_slice}}(1,\ open\_state::read,\ file));}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00625}00625\ \ \ \ \ \ \ files.insert(file.get\_file\_path().filename());}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00626}00626\ \ \ \ \ \ \ BOOST\_REQUIRE(!sd.\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a365023e0ceb97c69aa3ad66c393c2125}{find\_or\_create\_trace\_slice}}(2,\ open\_state::read,\ file));}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00627}00627\ \ \ \ \ \ \ files.insert(file.get\_file\_path().filename());}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00628}00628\ \ \ \ \ \ \ BOOST\_REQUIRE(!sd.\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a24faf23a87e249099bea549dbda165b2}{find\_or\_create\_index\_slice}}(3,\ open\_state::read,\ file));}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00629}00629\ \ \ \ \ \ \ files.insert(file.get\_file\_path().filename());}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00630}00630\ \ \ \ \ \ \ BOOST\_REQUIRE(!sd.\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a24faf23a87e249099bea549dbda165b2}{find\_or\_create\_index\_slice}}(4,\ open\_state::read,\ file));}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00631}00631\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ index4\ =\ file.get\_file\_path().filename();}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00632}00632\ \ \ \ \ \ \ files.insert(index4);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00633}00633\ \ \ \ \ \ \ BOOST\_REQUIRE(!sd.\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a365023e0ceb97c69aa3ad66c393c2125}{find\_or\_create\_trace\_slice}}(4,\ open\_state::read,\ file));}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00634}00634\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ trace4\ =\ file.get\_file\_path().filename();}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00635}00635\ \ \ \ \ \ \ files.insert(trace4);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00636}00636\ \ \ \ \ \ \ BOOST\_REQUIRE(!sd.\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a24faf23a87e249099bea549dbda165b2}{find\_or\_create\_index\_slice}}(5,\ open\_state::read,\ file));}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00637}00637\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ index5\ =\ file.get\_file\_path().filename();}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00638}00638\ \ \ \ \ \ \ files.insert(index5);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00639}00639\ \ \ \ \ \ \ BOOST\_REQUIRE(!sd.\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a365023e0ceb97c69aa3ad66c393c2125}{find\_or\_create\_trace\_slice}}(6,\ open\_state::read,\ file));}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00640}00640\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ trace6\ =\ file.get\_file\_path().filename();}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00641}00641\ \ \ \ \ \ \ files.insert(trace6);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00642}00642\ \ \ \ \ \ \ \mbox{\hyperlink{test__trace__file_8cpp_ac49ab2cf53f615a1a84cdef0579d6fb8}{verify\_directory\_contents}}(tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}(),\ files);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00643}00643\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00644}00644\ \ \ \ \ \ \ \textcolor{comment}{//\ verify\ that\ the\ current\_slice\ and\ the\ previous\ are\ maintained\ as\ long\ as\ lib\ -\/\ min\_saved\_blocks\ is\ part\ of\ previous\ slice}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00645}00645\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ current\_slice\ =\ 6;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00646}00646\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ lib\ =\ current\_slice\ *\ \mbox{\hyperlink{catch__reporter__console_8cpp_a2474a5474cbff19523a51eb1de01cda4}{width}};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00647}00647\ \ \ \ \ \ \ sd.\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a8b15d66d020bfc67d541e6cf09404ab9}{run\_maintenance\_tasks}}(lib,\ \{\});}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00648}00648\ \ \ \ \ \ \ std::set<bfs::path>\ files2;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00649}00649\ \ \ \ \ \ \ files2.insert(index5);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00650}00650\ \ \ \ \ \ \ files2.insert(trace6);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00651}00651\ \ \ \ \ \ \ \mbox{\hyperlink{test__trace__file_8cpp_ac49ab2cf53f615a1a84cdef0579d6fb8}{verify\_directory\_contents}}(tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}(),\ files2);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00652}00652\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00653}00653\ \ \ \ \ \ \ \textcolor{comment}{//\ saved\ blocks\ still\ in\ previous\ slice}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00654}00654\ \ \ \ \ \ \ lib\ +=\ min\_saved\_blocks\ -\/\ 1;\ \ \textcolor{comment}{//\ current\_slice\ *\ width\ +\ min\_saved\_blocks\ -\/\ 1}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00655}00655\ \ \ \ \ \ \ sd.\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a8b15d66d020bfc67d541e6cf09404ab9}{run\_maintenance\_tasks}}(lib,\ \{\});}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00656}00656\ \ \ \ \ \ \ \mbox{\hyperlink{test__trace__file_8cpp_ac49ab2cf53f615a1a84cdef0579d6fb8}{verify\_directory\_contents}}(tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}(),\ files2);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00657}00657\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00658}00658\ \ \ \ \ \ \ \textcolor{comment}{//\ now\ all\ saved\ blocks\ in\ current\ slice}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00659}00659\ \ \ \ \ \ \ lib\ +=\ 1;\ \textcolor{comment}{//\ current\_slice\ *\ width\ +\ min\_saved\_blocks}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00660}00660\ \ \ \ \ \ \ sd.\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a8b15d66d020bfc67d541e6cf09404ab9}{run\_maintenance\_tasks}}(lib,\ \{\});}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00661}00661\ \ \ \ \ \ \ std::set<bfs::path>\ files3;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00662}00662\ \ \ \ \ \ \ files3.insert(trace6);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00663}00663\ \ \ \ \ \ \ \mbox{\hyperlink{test__trace__file_8cpp_ac49ab2cf53f615a1a84cdef0579d6fb8}{verify\_directory\_contents}}(tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}(),\ files3);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00664}00664\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00665}00665\ \ \ \ \ \ \ \textcolor{comment}{//\ moving\ lib\ into\ next\ slice,\ so\ 1\ saved\ blocks\ still\ in\ 6th\ slice}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00666}00666\ \ \ \ \ \ \ lib\ +=\ \mbox{\hyperlink{catch__reporter__console_8cpp_a2474a5474cbff19523a51eb1de01cda4}{width}}\ -\/\ 1;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00667}00667\ \ \ \ \ \ \ sd.\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a8b15d66d020bfc67d541e6cf09404ab9}{run\_maintenance\_tasks}}(lib,\ \{\});}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00668}00668\ \ \ \ \ \ \ \mbox{\hyperlink{test__trace__file_8cpp_ac49ab2cf53f615a1a84cdef0579d6fb8}{verify\_directory\_contents}}(tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}(),\ files3);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00669}00669\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00670}00670\ \ \ \ \ \ \ \textcolor{comment}{//\ moved\ last\ saved\ block\ out\ of\ 6th\ slice,\ so\ 6th\ slice\ is\ cleaned\ up}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00671}00671\ \ \ \ \ \ \ lib\ +=\ 1;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00672}00672\ \ \ \ \ \ \ sd.\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a8b15d66d020bfc67d541e6cf09404ab9}{run\_maintenance\_tasks}}(lib,\ \{\});}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00673}00673\ \ \ \ \ \ \ \mbox{\hyperlink{test__trace__file_8cpp_ac49ab2cf53f615a1a84cdef0579d6fb8}{verify\_directory\_contents}}(tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}(),\ std::set<bfs::path>());}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00674}00674\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00675}00675\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00676}\mbox{\hyperlink{test__trace__file_8cpp_a87483942b91385d216d42689d0af1535}{00676}}\ \ \ \ \mbox{\hyperlink{test__trace__file_8cpp_a9dad05b7acee8b1c0b7a8f345f13efed}{BOOST\_FIXTURE\_TEST\_CASE}}(slice\_dir\_compress,\ test\_fixture)}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00677}00677\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00678}00678\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1temp__directory}{fc::temp\_directory}}\ tempdir;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00679}00679\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{catch__reporter__console_8cpp_a2474a5474cbff19523a51eb1de01cda4}{width}}\ =\ 10;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00680}00680\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ min\_uncompressed\_blocks\ =\ 5;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00681}00681\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory}{slice\_directory}}\ sd(tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}(),\ \mbox{\hyperlink{catch__reporter__console_8cpp_a2474a5474cbff19523a51eb1de01cda4}{width}},\ std::optional<uint32\_t>(),\ std::optional<uint32\_t>(min\_uncompressed\_blocks),\ 8);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00682}00682\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1cfile}{fc::cfile}}\ file;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00683}00683\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00684}00684\ \ \ \ \ \ \ \textcolor{keyword}{using\ }file\_vector\_t\ =\ std::vector<std::tuple<bfs::path,\ bfs::path,\ bfs::path>>;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00685}00685\ \ \ \ \ \ \ file\_vector\_t\ file\_paths;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00686}00686\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ 7\ ;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00687}00687\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE(!sd.\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a24faf23a87e249099bea549dbda165b2}{find\_or\_create\_index\_slice}}(i,\ open\_state::read,\ file));}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00688}00688\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ index\_name\ =\ file.get\_file\_path().filename();}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00689}00689\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE(create\_non\_empty\_trace\_slice(sd,\ i,\ file));}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00690}00690\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ trace\_name\ =\ file.get\_file\_path().filename();}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00691}00691\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ compressed\_trace\_name\ =\ trace\_name;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00692}00692\ \ \ \ \ \ \ \ \ \ compressed\_trace\_name.replace\_extension(\textcolor{stringliteral}{"{}.clog"{}});}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00693}00693\ \ \ \ \ \ \ \ \ \ file\_paths.emplace\_back(index\_name,\ trace\_name,\ compressed\_trace\_name);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00694}00694\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00695}00695\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00696}00696\ \ \ \ \ \ \ \textcolor{comment}{//\ initial\ set\ is\ only\ indices\ and\ uncompressed\ traces}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00697}00697\ \ \ \ \ \ \ std::set<bfs::path>\ files;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00698}00698\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ e:\ file\_paths)\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00699}00699\ \ \ \ \ \ \ \ \ \ files.insert(std::get<0>(e));}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00700}00700\ \ \ \ \ \ \ \ \ \ files.insert(std::get<1>(e));}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00701}00701\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00702}00702\ \ \ \ \ \ \ \mbox{\hyperlink{test__trace__file_8cpp_ac49ab2cf53f615a1a84cdef0579d6fb8}{verify\_directory\_contents}}(tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}(),\ files);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00703}00703\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00704}00704\ \ \ \ \ \ \ \textcolor{comment}{//\ verify\ no\ change\ up\ to\ the\ last\ block\ before\ a\ slice\ becomes\ compressible}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00705}00705\ \ \ \ \ \ \ sd.\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a8b15d66d020bfc67d541e6cf09404ab9}{run\_maintenance\_tasks}}(14,\ \{\});}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00706}00706\ \ \ \ \ \ \ \mbox{\hyperlink{test__trace__file_8cpp_ac49ab2cf53f615a1a84cdef0579d6fb8}{verify\_directory\_contents}}(tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}(),\ files);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00707}00707\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00708}00708\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (std::size\_t\ reps\ =\ 0;\ reps\ <\ file\_paths.size();\ reps++)\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00709}00709\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ \ leading\ edge,}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00710}00710\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ \ compresses\ one\ slice}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00711}00711\ \ \ \ \ \ \ \ \ \ files.erase(std::get<1>(file\_paths.at(reps)));}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00712}00712\ \ \ \ \ \ \ \ \ \ files.insert(std::get<2>(file\_paths.at(reps)));}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00713}00713\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00714}00714\ \ \ \ \ \ \ \ \ \ sd.\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a8b15d66d020bfc67d541e6cf09404ab9}{run\_maintenance\_tasks}}(15\ +\ (reps\ *\ \mbox{\hyperlink{catch__reporter__console_8cpp_a2474a5474cbff19523a51eb1de01cda4}{width}}),\ \{\});}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00715}00715\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{test__trace__file_8cpp_ac49ab2cf53f615a1a84cdef0579d6fb8}{verify\_directory\_contents}}(tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}(),\ files);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00716}00716\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00717}00717\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ trailing\ edge,\ no\ change}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00718}00718\ \ \ \ \ \ \ \ \ \ sd.\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a8b15d66d020bfc67d541e6cf09404ab9}{run\_maintenance\_tasks}}(24\ +\ (reps\ *\ \mbox{\hyperlink{catch__reporter__console_8cpp_a2474a5474cbff19523a51eb1de01cda4}{width}}),\ \{\});}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00719}00719\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{test__trace__file_8cpp_ac49ab2cf53f615a1a84cdef0579d6fb8}{verify\_directory\_contents}}(tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}(),\ files);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00720}00720\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00721}00721\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00722}00722\ \ \ \ \ \ \ \textcolor{comment}{//\ make\ sure\ the\ test\ is\ correct\ and\ and\ no\ uncompressed\ files\ remain}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00723}00723\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ e:\ file\_paths)\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00724}00724\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(files.count(std::get<0>(e)),\ 1);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00725}00725\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(files.count(std::get<1>(e)),\ 0);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00726}00726\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(files.count(std::get<2>(e)),\ 1);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00727}00727\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00728}00728\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00729}00729\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00730}\mbox{\hyperlink{test__trace__file_8cpp_ae06d4153674bd514a96d7a5e6f743f16}{00730}}\ \ \ \ \mbox{\hyperlink{test__trace__file_8cpp_a9dad05b7acee8b1c0b7a8f345f13efed}{BOOST\_FIXTURE\_TEST\_CASE}}(slice\_dir\_compress\_and\_delete,\ test\_fixture)}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00731}00731\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00732}00732\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1temp__directory}{fc::temp\_directory}}\ tempdir;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00733}00733\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{catch__reporter__console_8cpp_a2474a5474cbff19523a51eb1de01cda4}{width}}\ =\ 10;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00734}00734\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ min\_uncompressed\_blocks\ =\ 5;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00735}00735\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ min\_saved\_blocks\ =\ min\_uncompressed\_blocks\ +\ \mbox{\hyperlink{catch__reporter__console_8cpp_a2474a5474cbff19523a51eb1de01cda4}{width}};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00736}00736\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory}{slice\_directory}}\ sd(tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}(),\ \mbox{\hyperlink{catch__reporter__console_8cpp_a2474a5474cbff19523a51eb1de01cda4}{width}},\ std::optional<uint32\_t>(min\_saved\_blocks),\ std::optional<uint32\_t>(min\_uncompressed\_blocks),\ 8);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00737}00737\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1cfile}{fc::cfile}}\ file;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00738}00738\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00739}00739\ \ \ \ \ \ \ \textcolor{keyword}{using\ }file\_vector\_t\ =\ std::vector<std::tuple<bfs::path,\ bfs::path,\ bfs::path>>;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00740}00740\ \ \ \ \ \ \ file\_vector\_t\ file\_paths;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00741}00741\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ 7\ ;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00742}00742\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE(!sd.\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a24faf23a87e249099bea549dbda165b2}{find\_or\_create\_index\_slice}}(i,\ open\_state::read,\ file));}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00743}00743\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ index\_name\ =\ file.get\_file\_path().filename();}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00744}00744\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE(create\_non\_empty\_trace\_slice(sd,\ i,\ file));}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00745}00745\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ trace\_name\ =\ file.get\_file\_path().filename();}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00746}00746\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ compressed\_trace\_name\ =\ trace\_name;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00747}00747\ \ \ \ \ \ \ \ \ \ compressed\_trace\_name.replace\_extension(\textcolor{stringliteral}{"{}.clog"{}});}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00748}00748\ \ \ \ \ \ \ \ \ \ file\_paths.emplace\_back(index\_name,\ trace\_name,\ compressed\_trace\_name);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00749}00749\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00750}00750\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00751}00751\ \ \ \ \ \ \ \textcolor{comment}{//\ initial\ set\ is\ only\ indices\ and\ uncompressed\ traces}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00752}00752\ \ \ \ \ \ \ std::set<bfs::path>\ files;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00753}00753\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ e:\ file\_paths)\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00754}00754\ \ \ \ \ \ \ \ \ \ files.insert(std::get<0>(e));}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00755}00755\ \ \ \ \ \ \ \ \ \ files.insert(std::get<1>(e));}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00756}00756\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00757}00757\ \ \ \ \ \ \ \mbox{\hyperlink{test__trace__file_8cpp_ac49ab2cf53f615a1a84cdef0579d6fb8}{verify\_directory\_contents}}(tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}(),\ files);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00758}00758\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00759}00759\ \ \ \ \ \ \ \textcolor{comment}{//\ verify\ no\ change\ up\ to\ the\ last\ block\ before\ a\ slice\ becomes\ compressible}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00760}00760\ \ \ \ \ \ \ sd.\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a8b15d66d020bfc67d541e6cf09404ab9}{run\_maintenance\_tasks}}(14,\ \{\});}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00761}00761\ \ \ \ \ \ \ \mbox{\hyperlink{test__trace__file_8cpp_ac49ab2cf53f615a1a84cdef0579d6fb8}{verify\_directory\_contents}}(tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}(),\ files);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00762}00762\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00763}00763\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (std::size\_t\ reps\ =\ 0;\ reps\ <\ file\_paths.size()\ +\ 1;\ reps++)\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00764}00764\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ \ leading\ edge,}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00765}00765\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ \ compresses\ one\ slice\ IF\ its\ not\ past\ the\ end\ of\ our\ test,}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00766}00766\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (reps\ <\ file\_paths.size())\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00767}00767\ \ \ \ \ \ \ \ \ \ \ \ \ files.erase(std::get<1>(file\_paths.at(reps)));}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00768}00768\ \ \ \ \ \ \ \ \ \ \ \ \ files.insert(std::get<2>(file\_paths.at(reps)));}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00769}00769\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00770}00770\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00771}00771\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ removes\ one\ IF\ its\ not\ the\ first}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00772}00772\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (reps\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00773}00773\ \ \ \ \ \ \ \ \ \ \ \ \ files.erase(std::get<0>(file\_paths.at(reps-\/1)));}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00774}00774\ \ \ \ \ \ \ \ \ \ \ \ \ files.erase(std::get<2>(file\_paths.at(reps-\/1)));}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00775}00775\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00776}00776\ \ \ \ \ \ \ \ \ \ sd.\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a8b15d66d020bfc67d541e6cf09404ab9}{run\_maintenance\_tasks}}(15\ +\ (reps\ *\ \mbox{\hyperlink{catch__reporter__console_8cpp_a2474a5474cbff19523a51eb1de01cda4}{width}}),\ \{\});}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00777}00777\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{test__trace__file_8cpp_ac49ab2cf53f615a1a84cdef0579d6fb8}{verify\_directory\_contents}}(tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}(),\ files);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00778}00778\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00779}00779\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ trailing\ edge,\ no\ change}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00780}00780\ \ \ \ \ \ \ \ \ \ sd.\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a8b15d66d020bfc67d541e6cf09404ab9}{run\_maintenance\_tasks}}(24\ +\ (reps\ *\ \mbox{\hyperlink{catch__reporter__console_8cpp_a2474a5474cbff19523a51eb1de01cda4}{width}}),\ \{\});}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00781}00781\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{test__trace__file_8cpp_ac49ab2cf53f615a1a84cdef0579d6fb8}{verify\_directory\_contents}}(tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}(),\ files);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00782}00782\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00783}00783\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00784}00784\ \ \ \ \ \ \ \textcolor{comment}{//\ make\ sure\ the\ test\ is\ correct\ and\ ran\ through\ the\ permutations}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00785}00785\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(files.size(),\ 0);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00786}00786\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00787}00787\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00788}\mbox{\hyperlink{test__trace__file_8cpp_a7e05034a45e2e97de2fbda6dcfb72665}{00788}}\ \ \ \ \mbox{\hyperlink{test__trace__file_8cpp_a9dad05b7acee8b1c0b7a8f345f13efed}{BOOST\_FIXTURE\_TEST\_CASE}}(store\_provider\_write\_read\_v1,\ test\_fixture)}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00789}00789\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00790}00790\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1temp__directory}{fc::temp\_directory}}\ tempdir;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00791}00791\ \ \ \ \ \ \ test\_store\_provider\ sp(tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}(),\ 100);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00792}00792\ \ \ \ \ \ \ sp.append(bt\_v1);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00793}00793\ \ \ \ \ \ \ sp.append\_lib(54);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00794}00794\ \ \ \ \ \ \ sp.append(bt2\_v1);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00795}00795\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ bt\_bn\ =\ bt\_v1.number;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00796}00796\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ found\_block\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00797}00797\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ lib\_seen\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00798}00798\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ first\_offset\ =\ sp.scan\_metadata\_log\_from(9,\ 0,\ [\&](\textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1trace__api_a7a6a31e37b6c94cbd85b0f2019e2ff3c}{metadata\_log\_entry}}\&\ e)\ -\/>\ \textcolor{keywordtype}{bool}\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00799}00799\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (std::holds\_alternative<block\_entry\_v0>(e))\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00800}00800\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ block\ =\ std::get<block\_entry\_v0>(e);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00801}00801\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (block.number\ ==\ bt\_bn)\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00802}00802\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE(!found\_block);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00803}00803\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ found\_block\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00804}00804\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00805}00805\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (std::holds\_alternative<lib\_entry\_v0>(e))\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00806}00806\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ best\_lib\ =\ std::get<lib\_entry\_v0>(e);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00807}00807\ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE(!lib\_seen);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00808}00808\ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(best\_lib.lib,\ 54);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00809}00809\ \ \ \ \ \ \ \ \ \ \ \ \ lib\_seen\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00810}00810\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00811}00811\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00812}00812\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00813}00813\ \ \ \ \ \ \ \},\ []()\ \{\});}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00814}00814\ \ \ \ \ \ \ BOOST\_REQUIRE(found\_block);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00815}00815\ \ \ \ \ \ \ BOOST\_REQUIRE(lib\_seen);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00816}00816\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00817}00817\ \ \ \ \ \ \ std::vector<uint32\_t>\ block\_nums;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00818}00818\ \ \ \ \ \ \ std::vector<uint64\_t>\ block\_offsets;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00819}00819\ \ \ \ \ \ \ lib\_seen\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00820}00820\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ offset\ =\ sp.scan\_metadata\_log\_from(9,\ 0,\ [\&](\textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1trace__api_a7a6a31e37b6c94cbd85b0f2019e2ff3c}{metadata\_log\_entry}}\&\ e)\ -\/>\ \textcolor{keywordtype}{bool}\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00821}00821\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (std::holds\_alternative<block\_entry\_v0>(e))\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00822}00822\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ block\ =\ std::get<block\_entry\_v0>(e);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00823}00823\ \ \ \ \ \ \ \ \ \ \ \ \ block\_nums.push\_back(block.number);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00824}00824\ \ \ \ \ \ \ \ \ \ \ \ \ block\_offsets.push\_back(block.offset);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00825}00825\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (std::holds\_alternative<lib\_entry\_v0>(e))\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00826}00826\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ best\_lib\ =\ std::get<lib\_entry\_v0>(e);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00827}00827\ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE(!lib\_seen);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00828}00828\ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(best\_lib.lib,\ 54);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00829}00829\ \ \ \ \ \ \ \ \ \ \ \ \ lib\_seen\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00830}00830\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00831}00831\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00832}00832\ \ \ \ \ \ \ \},\ []()\ \{\});}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00833}00833\ \ \ \ \ \ \ BOOST\_REQUIRE(lib\_seen);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00834}00834\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(block\_nums.size(),\ 2);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00835}00835\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(block\_nums[0],\ bt\_v1.number);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00836}00836\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(block\_nums[1],\ bt2\_v1.number);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00837}00837\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(block\_offsets.size(),\ 2);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00838}00838\ \ \ \ \ \ \ BOOST\_REQUIRE(block\_offsets[0]\ <\ block\_offsets[1]);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00839}00839\ \ \ \ \ \ \ BOOST\_REQUIRE(first\_offset\ <\ offset);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00840}00840\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00841}00841\ \ \ \ \ \ \ std::optional<data\_log\_entry>\ bt\_data\ =\ sp.read\_data\_log(block\_nums[0],\ block\_offsets[0]);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00842}00842\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(std::get<block\_trace\_v1>(*bt\_data),\ bt\_v1);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00843}00843\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00844}00844\ \ \ \ \ \ \ bt\_data\ =\ sp.read\_data\_log(block\_nums[1],\ block\_offsets[1]);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00845}00845\ \ \ \ \ \ \ BOOST\_REQUIRE(bt\_data);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00846}00846\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ v\ =\ std::variant<block\_trace\_v0,\ block\_trace\_v1,\ block\_trace\_v2>(*bt\_data);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00847}00847\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(std::get<block\_trace\_v1>(v),\ bt2\_v1);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00848}00848\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00849}00849\ \ \ \ \ \ \ block\_nums.clear();}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00850}00850\ \ \ \ \ \ \ block\_offsets.clear();}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00851}00851\ \ \ \ \ \ \ lib\_seen\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00852}00852\ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ counter\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00853}00853\ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00854}00854\ \ \ \ \ \ \ \ \ \ offset\ =\ sp.scan\_metadata\_log\_from(9,\ 0,\ [\&](\textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1trace__api_a7a6a31e37b6c94cbd85b0f2019e2ff3c}{metadata\_log\_entry}}\&\ e)\ -\/>\ \textcolor{keywordtype}{bool}\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00855}00855\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (std::holds\_alternative<block\_entry\_v0>(e))\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00856}00856\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ block\ =\ std::get<block\_entry\_v0>(e);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00857}00857\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ block\_nums.push\_back(block.number);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00858}00858\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ block\_offsets.push\_back(block.offset);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00859}00859\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (std::holds\_alternative<lib\_entry\_v0>(e))\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00860}00860\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ best\_lib\ =\ std::get<lib\_entry\_v0>(e);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00861}00861\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE(!lib\_seen);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00862}00862\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(best\_lib.lib,\ 54);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00863}00863\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lib\_seen\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00864}00864\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00865}00865\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00866}00866\ \ \ \ \ \ \ \ \ \ \},\ [\&counter]()\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00867}00867\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ ++counter\ ==\ 3\ )\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00868}00868\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1yield__exception}{yield\_exception}}(\textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00869}00869\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00870}00870\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00871}00871\ \ \ \ \ \ \ \ \ \ BOOST\_FAIL(\textcolor{stringliteral}{"{}Should\ not\ have\ completed\ scan"{}});}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00872}00872\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1yield__exception}{yield\_exception}}\&\ ex)\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00873}00873\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00874}00874\ \ \ \ \ \ \ BOOST\_REQUIRE(lib\_seen);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00875}00875\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(block\_nums.size(),\ 1);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00876}00876\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(block\_nums[0],\ bt\_v1.number);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00877}00877\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(block\_offsets.size(),\ 1);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00878}00878\ \ \ \ \ \ \ BOOST\_REQUIRE(first\_offset\ <\ offset);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00879}00879\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00880}00880\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00881}\mbox{\hyperlink{test__trace__file_8cpp_ae1fc559fc23557e8b64249fea4ea8e3d}{00881}}\ \ \ \ \mbox{\hyperlink{test__trace__file_8cpp_a9dad05b7acee8b1c0b7a8f345f13efed}{BOOST\_FIXTURE\_TEST\_CASE}}(store\_provider\_write\_read\_v2,\ test\_fixture)}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00882}00882\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00883}00883\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1temp__directory}{fc::temp\_directory}}\ tempdir;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00884}00884\ \ \ \ \ \ \ test\_store\_provider\ sp(tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}(),\ 100);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00885}00885\ \ \ \ \ \ \ sp.append(block\_trace1\_v2);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00886}00886\ \ \ \ \ \ \ sp.append\_lib(54);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00887}00887\ \ \ \ \ \ \ sp.append(block\_trace2\_v2);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00888}00888\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ bt\_bn\ =\ block\_trace1\_v2.number;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00889}00889\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ found\_block\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00890}00890\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ lib\_seen\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00891}00891\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ first\_offset\ =\ sp.scan\_metadata\_log\_from(9,\ 0,\ [\&](\textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1trace__api_a7a6a31e37b6c94cbd85b0f2019e2ff3c}{metadata\_log\_entry}}\&\ e)\ -\/>\ \textcolor{keywordtype}{bool}\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00892}00892\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (std::holds\_alternative<block\_entry\_v0>(e))\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00893}00893\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ block\ =\ std::get<block\_entry\_v0>(e);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00894}00894\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (block.number\ ==\ bt\_bn)\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00895}00895\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE(!found\_block);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00896}00896\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ found\_block\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00897}00897\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00898}00898\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (std::holds\_alternative<lib\_entry\_v0>(e))\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00899}00899\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ best\_lib\ =\ std::get<lib\_entry\_v0>(e);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00900}00900\ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE(!lib\_seen);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00901}00901\ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(best\_lib.lib,\ 54);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00902}00902\ \ \ \ \ \ \ \ \ \ \ \ \ lib\_seen\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00903}00903\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00904}00904\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00905}00905\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00906}00906\ \ \ \ \ \ \ \},\ []()\ \{\});}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00907}00907\ \ \ \ \ \ \ BOOST\_REQUIRE(found\_block);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00908}00908\ \ \ \ \ \ \ BOOST\_REQUIRE(lib\_seen);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00909}00909\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00910}00910\ \ \ \ \ \ \ std::vector<uint32\_t>\ block\_nums;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00911}00911\ \ \ \ \ \ \ std::vector<uint64\_t>\ block\_offsets;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00912}00912\ \ \ \ \ \ \ lib\_seen\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00913}00913\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ offset\ =\ sp.scan\_metadata\_log\_from(9,\ 0,\ [\&](\textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1trace__api_a7a6a31e37b6c94cbd85b0f2019e2ff3c}{metadata\_log\_entry}}\&\ e)\ -\/>\ \textcolor{keywordtype}{bool}\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00914}00914\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (std::holds\_alternative<block\_entry\_v0>(e))\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00915}00915\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ block\ =\ std::get<block\_entry\_v0>(e);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00916}00916\ \ \ \ \ \ \ \ \ \ \ \ \ block\_nums.push\_back(block.number);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00917}00917\ \ \ \ \ \ \ \ \ \ \ \ \ block\_offsets.push\_back(block.offset);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00918}00918\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (std::holds\_alternative<lib\_entry\_v0>(e))\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00919}00919\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ best\_lib\ =\ std::get<lib\_entry\_v0>(e);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00920}00920\ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE(!lib\_seen);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00921}00921\ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(best\_lib.lib,\ 54);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00922}00922\ \ \ \ \ \ \ \ \ \ \ \ \ lib\_seen\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00923}00923\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00924}00924\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00925}00925\ \ \ \ \ \ \ \},\ []()\ \{\});}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00926}00926\ \ \ \ \ \ \ BOOST\_REQUIRE(lib\_seen);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00927}00927\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(block\_nums.size(),\ 2);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00928}00928\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(block\_nums[0],\ block\_trace1\_v2.number);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00929}00929\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(block\_nums[1],\ block\_trace2\_v2.number);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00930}00930\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(block\_offsets.size(),\ 2);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00931}00931\ \ \ \ \ \ \ BOOST\_REQUIRE(block\_offsets[0]\ <\ block\_offsets[1]);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00932}00932\ \ \ \ \ \ \ BOOST\_REQUIRE(first\_offset\ <\ offset);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00933}00933\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00934}00934\ \ \ \ \ \ \ std::optional<data\_log\_entry>\ bt\_data\ =\ sp.read\_data\_log(block\_nums[0],\ block\_offsets[0]);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00935}00935\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(std::get<block\_trace\_v2>(*bt\_data),\ block\_trace1\_v2);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00936}00936\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00937}00937\ \ \ \ \ \ \ bt\_data\ =\ sp.read\_data\_log(block\_nums[1],\ block\_offsets[1]);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00938}00938\ \ \ \ \ \ \ BOOST\_REQUIRE(bt\_data);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00939}00939\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ v\ =\ \mbox{\hyperlink{namespacesysio_1_1trace__api_a98bdcc53a9d9aa6aff851a743516c3b9}{data\_log\_entry}}(*bt\_data);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00940}00940\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(std::get<block\_trace\_v2>(v),\ block\_trace2\_v2);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00941}00941\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00942}00942\ \ \ \ \ \ \ block\_nums.clear();}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00943}00943\ \ \ \ \ \ \ block\_offsets.clear();}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00944}00944\ \ \ \ \ \ \ lib\_seen\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00945}00945\ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ counter\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00946}00946\ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00947}00947\ \ \ \ \ \ \ \ \ \ offset\ =\ sp.scan\_metadata\_log\_from(9,\ 0,\ [\&](\textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1trace__api_a7a6a31e37b6c94cbd85b0f2019e2ff3c}{metadata\_log\_entry}}\&\ e)\ -\/>\ \textcolor{keywordtype}{bool}\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00948}00948\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (std::holds\_alternative<block\_entry\_v0>(e))\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00949}00949\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ block\ =\ std::get<block\_entry\_v0>(e);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00950}00950\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ block\_nums.push\_back(block.number);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00951}00951\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ block\_offsets.push\_back(block.offset);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00952}00952\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (std::holds\_alternative<lib\_entry\_v0>(e))\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00953}00953\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ best\_lib\ =\ std::get<lib\_entry\_v0>(e);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00954}00954\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE(!lib\_seen);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00955}00955\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(best\_lib.lib,\ 54);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00956}00956\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lib\_seen\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00957}00957\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00958}00958\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00959}00959\ \ \ \ \ \ \ \ \ \ \},\ [\&counter]()\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00960}00960\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ ++counter\ ==\ 3\ )\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00961}00961\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1yield__exception}{yield\_exception}}(\textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00962}00962\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00963}00963\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00964}00964\ \ \ \ \ \ \ \ \ \ BOOST\_FAIL(\textcolor{stringliteral}{"{}Should\ not\ have\ completed\ scan"{}});}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00965}00965\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1yield__exception}{yield\_exception}}\&\ ex)\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00966}00966\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00967}00967\ \ \ \ \ \ \ BOOST\_REQUIRE(lib\_seen);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00968}00968\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(block\_nums.size(),\ 1);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00969}00969\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(block\_nums[0],\ block\_trace1\_v2.number);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00970}00970\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(block\_offsets.size(),\ 1);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00971}00971\ \ \ \ \ \ \ BOOST\_REQUIRE(first\_offset\ <\ offset);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00972}00972\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00973}00973\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00974}\mbox{\hyperlink{test__trace__file_8cpp_aa817ae36507430bf33f82a441984be8b}{00974}}\ \ \ \ \mbox{\hyperlink{test__trace__file_8cpp_a9dad05b7acee8b1c0b7a8f345f13efed}{BOOST\_FIXTURE\_TEST\_CASE}}(test\_get\_block\_v1,\ test\_fixture)}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00975}00975\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00976}00976\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1temp__directory}{fc::temp\_directory}}\ tempdir;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00977}00977\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1trace__api_1_1store__provider}{store\_provider}}\ sp(tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}(),\ 100,\ std::optional<uint32\_t>(),\ std::optional<uint32\_t>(),\ 0);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00978}00978\ \ \ \ \ \ \ sp.append(bt\_v1);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00979}00979\ \ \ \ \ \ \ sp.append\_lib(1);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00980}00980\ \ \ \ \ \ \ sp.append(bt2\_v1);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00981}00981\ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00982}00982\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1trace__api_a4fe812fd823fbfebfe869a30ef75a248}{get\_block\_t}}\ block1\ =\ sp.get\_block(1,\ [\&\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}]()\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00983}00983\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (++\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ >=\ 3)\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00984}00984\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1yield__exception}{yield\_exception}}(\textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00985}00985\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00986}00986\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00987}00987\ \ \ \ \ \ \ BOOST\_REQUIRE(block1);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00988}00988\ \ \ \ \ \ \ BOOST\_REQUIRE(std::get<1>(*block1));}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00989}00989\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ block1\_bt\ =\ std::get<0>(*block1);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00990}00990\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(std::get<block\_trace\_v1>(block1\_bt),\ bt\_v1);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00991}00991\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00992}00992\ \ \ \ \ \ \ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00993}00993\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1trace__api_a4fe812fd823fbfebfe869a30ef75a248}{get\_block\_t}}\ block2\ =\ sp.get\_block(5,\ [\&\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}]()\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00994}00994\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (++\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ >=\ 4)\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00995}00995\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1yield__exception}{yield\_exception}}(\textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00996}00996\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00997}00997\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00998}00998\ \ \ \ \ \ \ BOOST\_REQUIRE(block2);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l00999}00999\ \ \ \ \ \ \ BOOST\_REQUIRE(!std::get<1>(*block2));}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01000}01000\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ block2\_bt\ =\ std::get<0>(*block2);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01001}01001\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(std::get<block\_trace\_v1>(block2\_bt),\ bt2\_v1);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01002}01002\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01003}01003\ \ \ \ \ \ \ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01004}01004\ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01005}01005\ \ \ \ \ \ \ \ \ \ sp.get\_block(5,[\&\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}]()\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01006}01006\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (++\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ >=\ 3)\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01007}01007\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1yield__exception}{yield\_exception}}(\textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01008}01008\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01009}01009\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01010}01010\ \ \ \ \ \ \ \ \ \ BOOST\_FAIL(\textcolor{stringliteral}{"{}Should\ not\ have\ completed\ scan"{}});}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01011}01011\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1yield__exception}{yield\_exception}}\&\ ex)\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01012}01012\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01013}01013\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01014}01014\ \ \ \ \ \ \ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01015}01015\ \ \ \ \ \ \ block2\ =\ sp.get\_block(2,[\&\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}]()\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01016}01016\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (++\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ >=\ 4)\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01017}01017\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1yield__exception}{yield\_exception}}(\textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01018}01018\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01019}01019\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01020}01020\ \ \ \ \ \ \ BOOST\_REQUIRE(!block2);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01021}01021\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01022}01022\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01023}\mbox{\hyperlink{test__trace__file_8cpp_a9bc9670edbc9fdddae69bfebe25a6fa8}{01023}}\ \ \ \ \mbox{\hyperlink{test__trace__file_8cpp_a9dad05b7acee8b1c0b7a8f345f13efed}{BOOST\_FIXTURE\_TEST\_CASE}}(test\_get\_block\_v2,\ test\_fixture)}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01024}01024\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01025}01025\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1temp__directory}{fc::temp\_directory}}\ tempdir;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01026}01026\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1trace__api_1_1store__provider}{store\_provider}}\ sp(tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}(),\ 100,\ std::optional<uint32\_t>(),\ std::optional<uint32\_t>(),\ 0);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01027}01027\ \ \ \ \ \ \ sp.append(block\_trace1\_v2);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01028}01028\ \ \ \ \ \ \ sp.append\_lib(1);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01029}01029\ \ \ \ \ \ \ sp.append(block\_trace2\_v2);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01030}01030\ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01031}01031\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1trace__api_a4fe812fd823fbfebfe869a30ef75a248}{get\_block\_t}}\ block1\ =\ sp.get\_block(1,\ [\&\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}]()\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01032}01032\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (++\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ >=\ 3)\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01033}01033\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1yield__exception}{yield\_exception}}(\textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01034}01034\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01035}01035\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01036}01036\ \ \ \ \ \ \ BOOST\_REQUIRE(block1);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01037}01037\ \ \ \ \ \ \ BOOST\_REQUIRE(std::get<1>(*block1));}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01038}01038\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ block1\_bt\ =\ std::get<0>(*block1);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01039}01039\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(std::get<block\_trace\_v2>(block1\_bt),\ block\_trace1\_v2);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01040}01040\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01041}01041\ \ \ \ \ \ \ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01042}01042\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1trace__api_a4fe812fd823fbfebfe869a30ef75a248}{get\_block\_t}}\ block2\ =\ sp.get\_block(5,\ [\&\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}]()\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01043}01043\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (++\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ >=\ 4)\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01044}01044\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1yield__exception}{yield\_exception}}(\textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01045}01045\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01046}01046\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01047}01047\ \ \ \ \ \ \ BOOST\_REQUIRE(block2);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01048}01048\ \ \ \ \ \ \ BOOST\_REQUIRE(!std::get<1>(*block2));}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01049}01049\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ block2\_bt\ =\ std::get<0>(*block2);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01050}01050\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(std::get<block\_trace\_v2>(block2\_bt),\ block\_trace2\_v2);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01051}01051\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01052}01052\ \ \ \ \ \ \ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01053}01053\ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01054}01054\ \ \ \ \ \ \ \ \ \ sp.get\_block(5,[\&\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}]()\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01055}01055\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (++\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ >=\ 3)\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01056}01056\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1yield__exception}{yield\_exception}}(\textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01057}01057\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01058}01058\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01059}01059\ \ \ \ \ \ \ \ \ \ BOOST\_FAIL(\textcolor{stringliteral}{"{}Should\ not\ have\ completed\ scan"{}});}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01060}01060\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1yield__exception}{yield\_exception}}\&\ ex)\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01061}01061\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01062}01062\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01063}01063\ \ \ \ \ \ \ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01064}01064\ \ \ \ \ \ \ block2\ =\ sp.get\_block(2,[\&\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}]()\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01065}01065\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (++\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ >=\ 4)\ \{}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01066}01066\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1yield__exception}{yield\_exception}}(\textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01067}01067\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01068}01068\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01069}01069\ \ \ \ \ \ \ BOOST\_REQUIRE(!block2);}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01070}01070\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01071}01071\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01072}01072\ }
+\DoxyCodeLine{\Hypertarget{test__trace__file_8cpp_source_l01073}01073\ BOOST\_AUTO\_TEST\_SUITE\_END()}
+
+\end{DoxyCode}

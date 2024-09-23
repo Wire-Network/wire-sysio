@@ -1,0 +1,78 @@
+\doxysection{plugins/chain\+\_\+interface/include/sysio/chain/plugin\+\_\+interface.hpp File Reference}
+\hypertarget{plugin__interface_8hpp}{}\label{plugin__interface_8hpp}\index{plugins/chain\_interface/include/sysio/chain/plugin\_interface.hpp@{plugins/chain\_interface/include/sysio/chain/plugin\_interface.hpp}}
+{\ttfamily \#include $<$appbase/channel.\+hpp$>$}\newline
+{\ttfamily \#include $<$appbase/method.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/block.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/block\+\_\+state.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/transaction\+\_\+metadata.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/trace.\+hpp$>$}\newline
+Include dependency graph for plugin\+\_\+interface.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{plugin__interface_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{plugin__interface_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain}{sysio\+::chain}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain_1_1plugin__interface}{sysio\+::chain\+::plugin\+\_\+interface}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain_1_1plugin__interface_1_1channels}{sysio\+::chain\+::plugin\+\_\+interface\+::channels}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain_1_1plugin__interface_1_1methods}{sysio\+::chain\+::plugin\+\_\+interface\+::methods}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain_1_1plugin__interface_1_1incoming}{sysio\+::chain\+::plugin\+\_\+interface\+::incoming}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain_1_1plugin__interface_1_1incoming_1_1methods}{sysio\+::chain\+::plugin\+\_\+interface\+::incoming\+::methods}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain_1_1plugin__interface_1_1compat}{sysio\+::chain\+::plugin\+\_\+interface\+::compat}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain_1_1plugin__interface_1_1compat_1_1channels}{sysio\+::chain\+::plugin\+\_\+interface\+::compat\+::channels}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\using \mbox{\hyperlink{namespacesysio_1_1chain_1_1plugin__interface_a6ed984ecf76e4d360d5b142d27004c80}{sysio\+::chain\+::plugin\+\_\+interface\+::next\+\_\+function}} = std\+::function$<$void(const std\+::variant$<$\mbox{\hyperlink{namespacefc_a15170d1be1e682691dfe6ae09790edce}{fc\+::exception\+\_\+ptr}}, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$\&)$>$
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1plugin__interface_1_1channels_a5b4e9ff36dc393302372e3be76cc85c3}{sysio\+::chain\+::plugin\+\_\+interface\+::channels\+::pre\+\_\+accepted\+\_\+block}} = \mbox{\hyperlink{structappbase_1_1channel__decl}{channel\+\_\+decl}}$<$struct pre\+\_\+accepted\+\_\+block\+\_\+tag, \mbox{\hyperlink{namespacesysio_1_1chain_aa10ee348c57604b615bc8570f6685102}{signed\+\_\+block\+\_\+ptr}}$>$
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1plugin__interface_1_1channels_affcf848d658aaab60ca196e471c07ccb}{sysio\+::chain\+::plugin\+\_\+interface\+::channels\+::rejected\+\_\+block}} = \mbox{\hyperlink{structappbase_1_1channel__decl}{channel\+\_\+decl}}$<$struct rejected\+\_\+block\+\_\+tag, \mbox{\hyperlink{namespacesysio_1_1chain_aa10ee348c57604b615bc8570f6685102}{signed\+\_\+block\+\_\+ptr}}$>$
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1plugin__interface_1_1channels_a63fe3c9a596a62d1e28b087eaa7f87ed}{sysio\+::chain\+::plugin\+\_\+interface\+::channels\+::accepted\+\_\+block\+\_\+header}} = \mbox{\hyperlink{structappbase_1_1channel__decl}{channel\+\_\+decl}}$<$struct accepted\+\_\+block\+\_\+header\+\_\+tag, \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\+\_\+state\+\_\+ptr}}$>$
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1plugin__interface_1_1channels_ab6243cb5c3f6787e4f07bec5c3317ca4}{sysio\+::chain\+::plugin\+\_\+interface\+::channels\+::accepted\+\_\+block}} = \mbox{\hyperlink{structappbase_1_1channel__decl}{channel\+\_\+decl}}$<$struct accepted\+\_\+block\+\_\+tag, \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\+\_\+state\+\_\+ptr}}$>$
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1plugin__interface_1_1channels_ab47cd7980e29f546e9d748aa06239e03}{sysio\+::chain\+::plugin\+\_\+interface\+::channels\+::irreversible\+\_\+block}} = \mbox{\hyperlink{structappbase_1_1channel__decl}{channel\+\_\+decl}}$<$struct irreversible\+\_\+block\+\_\+tag, \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\+\_\+state\+\_\+ptr}}$>$
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1plugin__interface_1_1channels_a4686b900c87229da1053bfa882b44d9d}{sysio\+::chain\+::plugin\+\_\+interface\+::channels\+::accepted\+\_\+transaction}} = \mbox{\hyperlink{structappbase_1_1channel__decl}{channel\+\_\+decl}}$<$struct accepted\+\_\+transaction\+\_\+tag, \mbox{\hyperlink{namespacesysio_1_1chain_ad795329e0af850251f4f47cc32e8d770}{transaction\+\_\+metadata\+\_\+ptr}}$>$
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1plugin__interface_1_1channels_ab7c8273e4179069de2eab525bef3f87e}{sysio\+::chain\+::plugin\+\_\+interface\+::channels\+::applied\+\_\+transaction}} = \mbox{\hyperlink{structappbase_1_1channel__decl}{channel\+\_\+decl}}$<$struct applied\+\_\+transaction\+\_\+tag, \mbox{\hyperlink{namespacesysio_1_1chain_a4ee2867a6bec961c7a78b203cfd76be9}{transaction\+\_\+trace\+\_\+ptr}}$>$
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1plugin__interface_1_1methods_a1dc915fee440a66569fa5d9705eaa779}{sysio\+::chain\+::plugin\+\_\+interface\+::methods\+::get\+\_\+block\+\_\+by\+\_\+number}} = \mbox{\hyperlink{structappbase_1_1method__decl}{method\+\_\+decl}}$<$chain\+\_\+plugin\+\_\+interface, \mbox{\hyperlink{namespacesysio_1_1chain_aa10ee348c57604b615bc8570f6685102}{signed\+\_\+block\+\_\+ptr}}(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} block\+\_\+num)$>$
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1plugin__interface_1_1methods_ac76686a7ff5a8f959b5a0eb404d49290}{sysio\+::chain\+::plugin\+\_\+interface\+::methods\+::get\+\_\+block\+\_\+by\+\_\+id}} = \mbox{\hyperlink{structappbase_1_1method__decl}{method\+\_\+decl}}$<$chain\+\_\+plugin\+\_\+interface, \mbox{\hyperlink{namespacesysio_1_1chain_aa10ee348c57604b615bc8570f6685102}{signed\+\_\+block\+\_\+ptr}}(const \mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{block\+\_\+id\+\_\+type}}\& block\+\_\+id)$>$
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1plugin__interface_1_1methods_aec45b7f4f9bb35e9860ec982cd79960e}{sysio\+::chain\+::plugin\+\_\+interface\+::methods\+::get\+\_\+head\+\_\+block\+\_\+id}} = \mbox{\hyperlink{structappbase_1_1method__decl}{method\+\_\+decl}}$<$chain\+\_\+plugin\+\_\+interface, \mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{block\+\_\+id\+\_\+type}} ()$>$
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1plugin__interface_1_1methods_adbbafc44d94293f7ad1e8738184ac794}{sysio\+::chain\+::plugin\+\_\+interface\+::methods\+::get\+\_\+lib\+\_\+block\+\_\+id}} = \mbox{\hyperlink{structappbase_1_1method__decl}{method\+\_\+decl}}$<$chain\+\_\+plugin\+\_\+interface, \mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{block\+\_\+id\+\_\+type}} ()$>$
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1plugin__interface_1_1methods_a5103be0de226bafc7aa3b176f7a95efc}{sysio\+::chain\+::plugin\+\_\+interface\+::methods\+::get\+\_\+last\+\_\+irreversible\+\_\+block\+\_\+number}} = \mbox{\hyperlink{structappbase_1_1method__decl}{method\+\_\+decl}}$<$chain\+\_\+plugin\+\_\+interface, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} ()$>$
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1plugin__interface_1_1incoming_1_1methods_aaa798d2ee8688071b08a9a72ebce78a6}{sysio\+::chain\+::plugin\+\_\+interface\+::incoming\+::methods\+::block\+\_\+sync}} = \mbox{\hyperlink{structappbase_1_1method__decl}{method\+\_\+decl}}$<$chain\+\_\+plugin\+\_\+interface, bool(const \mbox{\hyperlink{namespacesysio_1_1chain_aa10ee348c57604b615bc8570f6685102}{signed\+\_\+block\+\_\+ptr}}\&, const std\+::optional$<$\mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{block\+\_\+id\+\_\+type}}$>$\&, const \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\+\_\+state\+\_\+ptr}}\&), \mbox{\hyperlink{structappbase_1_1first__provider__policy}{first\+\_\+provider\+\_\+policy}}$>$
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1plugin__interface_1_1incoming_1_1methods_a1b2e9e63d343e94a6d93e09d5acc6e3d}{sysio\+::chain\+::plugin\+\_\+interface\+::incoming\+::methods\+::transaction\+\_\+async}} = \mbox{\hyperlink{structappbase_1_1method__decl}{method\+\_\+decl}}$<$chain\+\_\+plugin\+\_\+interface, void(const \mbox{\hyperlink{namespacesysio_1_1chain_a7041c0316bd294d0866609ab3e0cc7a7}{packed\+\_\+transaction\+\_\+ptr}}\&, bool, bool, bool, \mbox{\hyperlink{namespacesysio_1_1chain_1_1plugin__interface_a6ed984ecf76e4d360d5b142d27004c80}{next\+\_\+function}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_a4ee2867a6bec961c7a78b203cfd76be9}{transaction\+\_\+trace\+\_\+ptr}}$>$), \mbox{\hyperlink{structappbase_1_1first__provider__policy}{first\+\_\+provider\+\_\+policy}}$>$
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1plugin__interface_1_1compat_1_1channels_aafef184fcfbe1890ef24c66b67335d51}{sysio\+::chain\+::plugin\+\_\+interface\+::compat\+::channels\+::transaction\+\_\+ack}} = \mbox{\hyperlink{structappbase_1_1channel__decl}{channel\+\_\+decl}}$<$struct accepted\+\_\+transaction\+\_\+tag, std\+::pair$<$\mbox{\hyperlink{namespacefc_a15170d1be1e682691dfe6ae09790edce}{fc\+::exception\+\_\+ptr}}, \mbox{\hyperlink{namespacesysio_1_1chain_a7041c0316bd294d0866609ab3e0cc7a7}{packed\+\_\+transaction\+\_\+ptr}}$>$$>$
+\end{DoxyCompactItemize}

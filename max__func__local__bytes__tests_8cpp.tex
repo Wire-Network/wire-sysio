@@ -1,0 +1,279 @@
+\doxysection{libraries/sys-\/vm/tests/max\+\_\+func\+\_\+local\+\_\+bytes\+\_\+tests.cpp File Reference}
+\hypertarget{max__func__local__bytes__tests_8cpp}{}\label{max__func__local__bytes__tests_8cpp}\index{libraries/sys-\/vm/tests/max\_func\_local\_bytes\_tests.cpp@{libraries/sys-\/vm/tests/max\_func\_local\_bytes\_tests.cpp}}
+{\ttfamily \#include $<$sysio/vm/backend.\+hpp$>$}\newline
+{\ttfamily \#include "{}utils.\+hpp"{}}\newline
+{\ttfamily \#include $<$catch2/catch.\+hpp$>$}\newline
+Include dependency graph for max\+\_\+func\+\_\+local\+\_\+bytes\+\_\+tests.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{max__func__local__bytes__tests_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{max__func__local__bytes__tests_8cpp_a659f3fbca70c095a63d2aace2b8a9c5a}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Test max\+\_\+func\+\_\+local\+\_\+bytes default"{}, "{}\mbox{[}max\+\_\+func\+\_\+local\+\_\+bytes\+\_\+test\mbox{]}"{})
+\item 
+\mbox{\hyperlink{max__func__local__bytes__tests_8cpp_ab1794553f9d5b6d905c8da4de711666e}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Test max\+\_\+func\+\_\+local\+\_\+bytes unlimited"{}, "{}\mbox{[}max\+\_\+func\+\_\+local\+\_\+bytes\+\_\+test\mbox{]}"{})
+\item 
+\mbox{\hyperlink{max__func__local__bytes__tests_8cpp_a5808f895784cb1dd7d7c2a9e10ac3a7c}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Test max\+\_\+func\+\_\+local\+\_\+bytes static fail"{}, "{}\mbox{[}max\+\_\+func\+\_\+local\+\_\+bytes\+\_\+test\mbox{]}"{})
+\item 
+\mbox{\hyperlink{max__func__local__bytes__tests_8cpp_abf66e271c73d6e1d00b25a2249733d25}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Test max\+\_\+func\+\_\+local\+\_\+bytes static pass"{}, "{}\mbox{[}max\+\_\+func\+\_\+local\+\_\+bytes\+\_\+test\mbox{]}"{})
+\item 
+\mbox{\hyperlink{max__func__local__bytes__tests_8cpp_a2f7ed66127600b54f6c10fe6dd3ce2a3}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Test max\+\_\+func\+\_\+local\+\_\+bytes dynamic fail"{}, "{}\mbox{[}max\+\_\+func\+\_\+local\+\_\+bytes\+\_\+test\mbox{]}"{})
+\item 
+\mbox{\hyperlink{max__func__local__bytes__tests_8cpp_af5ef0973afde1d3342a90a8b109f1516}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Test max\+\_\+func\+\_\+local\+\_\+bytes dynamic pass"{}, "{}\mbox{[}max\+\_\+func\+\_\+local\+\_\+bytes\+\_\+test\mbox{]}"{})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+wasm\+\_\+allocator \mbox{\hyperlink{max__func__local__bytes__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{max__func__local__bytes__tests_8cpp_a659f3fbca70c095a63d2aace2b8a9c5a}\index{max\_func\_local\_bytes\_tests.cpp@{max\_func\_local\_bytes\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!max\_func\_local\_bytes\_tests.cpp@{max\_func\_local\_bytes\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/6]}}
+{\footnotesize\ttfamily \label{max__func__local__bytes__tests_8cpp_a659f3fbca70c095a63d2aace2b8a9c5a} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Test max\+\_\+func\+\_\+local\+\_\+bytes default"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}max\+\_\+func\+\_\+local\+\_\+bytes\+\_\+test\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{max__func__local__bytes__tests_8cpp_source_l00119}{119}} of file \mbox{\hyperlink{max__func__local__bytes__tests_8cpp_source}{max\+\_\+func\+\_\+local\+\_\+bytes\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00120\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType>}};}
+\DoxyCodeLine{00121\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_unused(unused\_type\_wasm,\ \&\mbox{\hyperlink{max__func__local__bytes__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00122\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_param(param\_16\_wasm,\ \&\mbox{\hyperlink{max__func__local__bytes__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00123\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_local(local\_16\_wasm,\ \&\mbox{\hyperlink{max__func__local__bytes__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00124\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_stack(stack\_16\_wasm,\ \&\mbox{\hyperlink{max__func__local__bytes__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00125\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_mixed(mixed\_16\_wasm,\ \&\mbox{\hyperlink{max__func__local__bytes__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00126\ \}}
+
+\end{DoxyCode}
+\Hypertarget{max__func__local__bytes__tests_8cpp_a2f7ed66127600b54f6c10fe6dd3ce2a3}\index{max\_func\_local\_bytes\_tests.cpp@{max\_func\_local\_bytes\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!max\_func\_local\_bytes\_tests.cpp@{max\_func\_local\_bytes\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/6]}}
+{\footnotesize\ttfamily \label{max__func__local__bytes__tests_8cpp_a2f7ed66127600b54f6c10fe6dd3ce2a3} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Test max\+\_\+func\+\_\+local\+\_\+bytes dynamic fail"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}max\+\_\+func\+\_\+local\+\_\+bytes\+\_\+test\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{max__func__local__bytes__tests_8cpp_source_l00229}{229}} of file \mbox{\hyperlink{max__func__local__bytes__tests_8cpp_source}{max\+\_\+func\+\_\+local\+\_\+bytes\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00229\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00230\ \ \ \ \{}
+\DoxyCodeLine{00231\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ dynamic\_options>}};}
+\DoxyCodeLine{00232\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(param\_16\_wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\{8,\ lp\}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{00233\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(param\_16\_wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\{8,\ ps\}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{00234\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(local\_16\_wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\{8,\ lp\}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{00235\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(local\_16\_wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\{8,\ ls\}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{00236\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(stack\_16\_wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\{8,\ ls\}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{00237\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(stack\_16\_wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\{8,\ ps\}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{00238\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(mixed\_16\_wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\{8,\ lp\}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{00239\ \ \ \ \}}
+\DoxyCodeLine{00240\ }
+\DoxyCodeLine{00241\ \ \ \ \{}
+\DoxyCodeLine{00242\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ dynamic\_options\_empty\_flags>}};}
+\DoxyCodeLine{00243\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(local\_16\_wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\_empty\_flags\{8\}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{00244\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(stack\_16\_wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\_empty\_flags\{8\}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{00245\ \ \ \ \}}
+\DoxyCodeLine{00246\ \}}
+
+\end{DoxyCode}
+\Hypertarget{max__func__local__bytes__tests_8cpp_af5ef0973afde1d3342a90a8b109f1516}\index{max\_func\_local\_bytes\_tests.cpp@{max\_func\_local\_bytes\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!max\_func\_local\_bytes\_tests.cpp@{max\_func\_local\_bytes\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [3/6]}}
+{\footnotesize\ttfamily \label{max__func__local__bytes__tests_8cpp_af5ef0973afde1d3342a90a8b109f1516} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Test max\+\_\+func\+\_\+local\+\_\+bytes dynamic pass"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}max\+\_\+func\+\_\+local\+\_\+bytes\+\_\+test\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{max__func__local__bytes__tests_8cpp_source_l00248}{248}} of file \mbox{\hyperlink{max__func__local__bytes__tests_8cpp_source}{max\+\_\+func\+\_\+local\+\_\+bytes\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00248\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00249\ \ \ \ \{}
+\DoxyCodeLine{00250\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ dynamic\_options>}};}
+\DoxyCodeLine{00251\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_unused(unused\_type\_wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\{8,\ lp\});}
+\DoxyCodeLine{00252\ }
+\DoxyCodeLine{00253\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_param1(param\_16\_wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\{16,\ lp\});}
+\DoxyCodeLine{00254\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_param2(param\_16\_wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\{8,\ ls\});}
+\DoxyCodeLine{00255\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_param3(param\_16\_wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\{16,\ ps\});}
+\DoxyCodeLine{00256\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_local1(local\_16\_wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\{16,\ lp\});}
+\DoxyCodeLine{00257\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_local2(local\_16\_wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\{16,\ ls\});}
+\DoxyCodeLine{00258\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_local3(local\_16\_wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\{8,\ ps\});}
+\DoxyCodeLine{00259\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_stack1(stack\_16\_wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\{8,\ lp\});}
+\DoxyCodeLine{00260\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_stack3(stack\_16\_wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\{16,\ ps\});}
+\DoxyCodeLine{00261\ }
+\DoxyCodeLine{00262\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_mixed(mixed\_16\_wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\{16,\ lp\});}
+\DoxyCodeLine{00263\ \ \ \ \}}
+\DoxyCodeLine{00264\ \ \ \ \{}
+\DoxyCodeLine{00265\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ dynamic\_options\_empty\_flags>}};}
+\DoxyCodeLine{00266\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_param2(param\_16\_wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\_empty\_flags\{8\});}
+\DoxyCodeLine{00267\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_local2(local\_16\_wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\_empty\_flags\{16\});}
+\DoxyCodeLine{00268\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_stack2(stack\_16\_wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\_empty\_flags\{16\});}
+\DoxyCodeLine{00269\ \ \ \ \}}
+\DoxyCodeLine{00270\ \}}
+
+\end{DoxyCode}
+\Hypertarget{max__func__local__bytes__tests_8cpp_a5808f895784cb1dd7d7c2a9e10ac3a7c}\index{max\_func\_local\_bytes\_tests.cpp@{max\_func\_local\_bytes\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!max\_func\_local\_bytes\_tests.cpp@{max\_func\_local\_bytes\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [4/6]}}
+{\footnotesize\ttfamily \label{max__func__local__bytes__tests_8cpp_a5808f895784cb1dd7d7c2a9e10ac3a7c} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Test max\+\_\+func\+\_\+local\+\_\+bytes static fail"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}max\+\_\+func\+\_\+local\+\_\+bytes\+\_\+test\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{max__func__local__bytes__tests_8cpp_source_l00171}{171}} of file \mbox{\hyperlink{max__func__local__bytes__tests_8cpp_source}{max\+\_\+func\+\_\+local\+\_\+bytes\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00172\ \ \ \ \{}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ static\_options<8,\ lp>}}>;}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_unused(unused\_type\_wasm,\ \&\mbox{\hyperlink{max__func__local__bytes__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(param\_16\_wasm,\ \&\mbox{\hyperlink{max__func__local__bytes__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(local\_16\_wasm,\ \&\mbox{\hyperlink{max__func__local__bytes__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_stack(stack\_16\_wasm,\ \&\mbox{\hyperlink{max__func__local__bytes__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(mixed\_16\_wasm,\ \&\mbox{\hyperlink{max__func__local__bytes__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{00179\ \ \ \ \}}
+\DoxyCodeLine{00180\ \ \ \ \{}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ static\_options<8,\ ls>}}>;}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_param(param\_16\_wasm,\ \&\mbox{\hyperlink{max__func__local__bytes__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(local\_16\_wasm,\ \&\mbox{\hyperlink{max__func__local__bytes__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(stack\_16\_wasm,\ \&\mbox{\hyperlink{max__func__local__bytes__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{00185\ \ \ \ \}}
+\DoxyCodeLine{00186\ \ \ \ \{}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ static\_options<8,\ ps>}}>;}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(param\_16\_wasm,\ \&\mbox{\hyperlink{max__func__local__bytes__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_local(local\_16\_wasm,\ \&\mbox{\hyperlink{max__func__local__bytes__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(stack\_16\_wasm,\ \&\mbox{\hyperlink{max__func__local__bytes__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{00191\ \ \ \ \}}
+\DoxyCodeLine{00192\ \ \ \ \{}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ static\_options\_empty\_flags<8>}}>;}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_param(param\_16\_wasm,\ \&\mbox{\hyperlink{max__func__local__bytes__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(local\_16\_wasm,\ \&\mbox{\hyperlink{max__func__local__bytes__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(stack\_16\_wasm,\ \&\mbox{\hyperlink{max__func__local__bytes__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{00197\ \ \ \ \}}
+\DoxyCodeLine{00198\ \}}
+
+\end{DoxyCode}
+\Hypertarget{max__func__local__bytes__tests_8cpp_abf66e271c73d6e1d00b25a2249733d25}\index{max\_func\_local\_bytes\_tests.cpp@{max\_func\_local\_bytes\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!max\_func\_local\_bytes\_tests.cpp@{max\_func\_local\_bytes\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [5/6]}}
+{\footnotesize\ttfamily \label{max__func__local__bytes__tests_8cpp_abf66e271c73d6e1d00b25a2249733d25} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Test max\+\_\+func\+\_\+local\+\_\+bytes static pass"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}max\+\_\+func\+\_\+local\+\_\+bytes\+\_\+test\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{max__func__local__bytes__tests_8cpp_source_l00200}{200}} of file \mbox{\hyperlink{max__func__local__bytes__tests_8cpp_source}{max\+\_\+func\+\_\+local\+\_\+bytes\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00201\ \ \ \ \{}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ static\_options<16,\ lp>}}>;}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_unused(unused\_type\_wasm,\ \&\mbox{\hyperlink{max__func__local__bytes__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_param(param\_16\_wasm,\ \&\mbox{\hyperlink{max__func__local__bytes__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_local(local\_16\_wasm,\ \&\mbox{\hyperlink{max__func__local__bytes__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_stack(stack\_16\_wasm,\ \&\mbox{\hyperlink{max__func__local__bytes__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_mixed(mixed\_16\_wasm,\ \&\mbox{\hyperlink{max__func__local__bytes__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00208\ \ \ \ \}}
+\DoxyCodeLine{00209\ \ \ \ \{}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ static\_options<16,\ ps>}}>;}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_param(param\_16\_wasm,\ \&\mbox{\hyperlink{max__func__local__bytes__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_local(local\_16\_wasm,\ \&\mbox{\hyperlink{max__func__local__bytes__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_stack(stack\_16\_wasm,\ \&\mbox{\hyperlink{max__func__local__bytes__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00214\ \ \ \ \}}
+\DoxyCodeLine{00215\ \ \ \ \{}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ static\_options<16,\ ls>}}>;}
+\DoxyCodeLine{00217\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_param(param\_16\_wasm,\ \&\mbox{\hyperlink{max__func__local__bytes__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00218\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_local(local\_16\_wasm,\ \&\mbox{\hyperlink{max__func__local__bytes__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_stack(stack\_16\_wasm,\ \&\mbox{\hyperlink{max__func__local__bytes__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00220\ \ \ \ \}}
+\DoxyCodeLine{00221\ \ \ \ \{}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ static\_options\_empty\_flags<16>}}>;}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_param(param\_16\_wasm,\ \&\mbox{\hyperlink{max__func__local__bytes__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_local(local\_16\_wasm,\ \&\mbox{\hyperlink{max__func__local__bytes__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_stack(stack\_16\_wasm,\ \&\mbox{\hyperlink{max__func__local__bytes__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00226\ \ \ \ \}}
+\DoxyCodeLine{00227\ \}}
+
+\end{DoxyCode}
+\Hypertarget{max__func__local__bytes__tests_8cpp_ab1794553f9d5b6d905c8da4de711666e}\index{max\_func\_local\_bytes\_tests.cpp@{max\_func\_local\_bytes\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!max\_func\_local\_bytes\_tests.cpp@{max\_func\_local\_bytes\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [6/6]}}
+{\footnotesize\ttfamily \label{max__func__local__bytes__tests_8cpp_ab1794553f9d5b6d905c8da4de711666e} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Test max\+\_\+func\+\_\+local\+\_\+bytes unlimited"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}max\+\_\+func\+\_\+local\+\_\+bytes\+\_\+test\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{max__func__local__bytes__tests_8cpp_source_l00128}{128}} of file \mbox{\hyperlink{max__func__local__bytes__tests_8cpp_source}{max\+\_\+func\+\_\+local\+\_\+bytes\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00129\ \ \ \ \{}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ empty\_options>}};}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_unused(unused\_type\_wasm,\ \&\mbox{\hyperlink{max__func__local__bytes__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_param(param\_16\_wasm,\ \&\mbox{\hyperlink{max__func__local__bytes__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_local(local\_16\_wasm,\ \&\mbox{\hyperlink{max__func__local__bytes__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_stack(stack\_16\_wasm,\ \&\mbox{\hyperlink{max__func__local__bytes__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_mixed(mixed\_16\_wasm,\ \&\mbox{\hyperlink{max__func__local__bytes__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00136\ \ \ \ \}}
+\DoxyCodeLine{00137\ \ \ \ \{}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ empty\_options\_static\_flags<lp>}}>;}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_unused(unused\_type\_wasm,\ \&\mbox{\hyperlink{max__func__local__bytes__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_param(param\_16\_wasm,\ \&\mbox{\hyperlink{max__func__local__bytes__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_local(local\_16\_wasm,\ \&\mbox{\hyperlink{max__func__local__bytes__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_stack(stack\_16\_wasm,\ \&\mbox{\hyperlink{max__func__local__bytes__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_mixed(mixed\_16\_wasm,\ \&\mbox{\hyperlink{max__func__local__bytes__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00144\ \ \ \ \}}
+\DoxyCodeLine{00145\ \ \ \ \{}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ empty\_options\_static\_flags<ps>}}>;}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_unused(unused\_type\_wasm,\ \&\mbox{\hyperlink{max__func__local__bytes__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_param(param\_16\_wasm,\ \&\mbox{\hyperlink{max__func__local__bytes__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_local(local\_16\_wasm,\ \&\mbox{\hyperlink{max__func__local__bytes__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_stack(stack\_16\_wasm,\ \&\mbox{\hyperlink{max__func__local__bytes__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_mixed(mixed\_16\_wasm,\ \&\mbox{\hyperlink{max__func__local__bytes__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00152\ \ \ \ \}}
+\DoxyCodeLine{00153\ \ \ \ \{}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ empty\_options\_static\_flags<ls>}}>;}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_unused(unused\_type\_wasm,\ \&\mbox{\hyperlink{max__func__local__bytes__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_param(param\_16\_wasm,\ \&\mbox{\hyperlink{max__func__local__bytes__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_local(local\_16\_wasm,\ \&\mbox{\hyperlink{max__func__local__bytes__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_stack(stack\_16\_wasm,\ \&\mbox{\hyperlink{max__func__local__bytes__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_mixed(mixed\_16\_wasm,\ \&\mbox{\hyperlink{max__func__local__bytes__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00160\ \ \ \ \}}
+\DoxyCodeLine{00161\ \ \ \ \{}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ empty\_options\_dynamic\_flags>}};}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_unused(unused\_type\_wasm,\ \textcolor{keyword}{nullptr},\ empty\_options\_dynamic\_flags\{lps\});}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_param(param\_16\_wasm,\ \textcolor{keyword}{nullptr},\ empty\_options\_dynamic\_flags\{lps\});}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_local(local\_16\_wasm,\ \textcolor{keyword}{nullptr},\ empty\_options\_dynamic\_flags\{lps\});}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_stack(stack\_16\_wasm,\ \textcolor{keyword}{nullptr},\ empty\_options\_dynamic\_flags\{lps\});}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_mixed(mixed\_16\_wasm,\ \textcolor{keyword}{nullptr},\ empty\_options\_dynamic\_flags\{lps\});}
+\DoxyCodeLine{00168\ \ \ \ \}}
+\DoxyCodeLine{00169\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{max__func__local__bytes__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}\index{max\_func\_local\_bytes\_tests.cpp@{max\_func\_local\_bytes\_tests.cpp}!wa@{wa}}
+\index{wa@{wa}!max\_func\_local\_bytes\_tests.cpp@{max\_func\_local\_bytes\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{wa}{wa}}
+{\footnotesize\ttfamily \label{max__func__local__bytes__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89} 
+wasm\+\_\+allocator wa\hspace{0.3cm}{\ttfamily [extern]}}
+
+
+
+Definition at line \mbox{\hyperlink{libraries_2sys-vm_2tests_2main_8cpp_source_l00010}{10}} of file \mbox{\hyperlink{libraries_2sys-vm_2tests_2main_8cpp_source}{main.\+cpp}}.
+

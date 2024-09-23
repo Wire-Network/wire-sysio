@@ -1,0 +1,69 @@
+\doxysection{sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::get\+\_\+table\+\_\+rows\+\_\+result Struct Reference}
+\hypertarget{structsysio_1_1chain__apis_1_1read__only_1_1get__table__rows__result}{}\label{structsysio_1_1chain__apis_1_1read__only_1_1get__table__rows__result}\index{sysio::chain\_apis::read\_only::get\_table\_rows\_result@{sysio::chain\_apis::read\_only::get\_table\_rows\_result}}
+
+
+{\ttfamily \#include $<$chain\+\_\+plugin.\+hpp$>$}
+
+
+
+Collaboration diagram for sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::get\+\_\+table\+\_\+rows\+\_\+result\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=262pt]{structsysio_1_1chain__apis_1_1read__only_1_1get__table__rows__result__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1vector}{vector}}$<$ \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} $>$ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1get__table__rows__result_a149b2c1089ccfedd4ec66e31fa626556}{rows}}
+\begin{DoxyCompactList}\small\item\em one row per item, either encoded as hex String or JSON object \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1get__table__rows__result_a485cd463ae28eb1d9b762e8ed5514b1e}{more}} = false
+\begin{DoxyCompactList}\small\item\em true if last element in data is not the end and sizeof data() \texorpdfstring{$<$}{<} limit \end{DoxyCompactList}\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1get__table__rows__result_ac519402f2a94ab9eed619110dcec0297}{next\+\_\+key}}
+\begin{DoxyCompactList}\small\item\em fill lower\+\_\+bound with this value to fetch more rows \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{chain__plugin_8hpp_source_l00353}{353}} of file \mbox{\hyperlink{chain__plugin_8hpp_source}{chain\+\_\+plugin.\+hpp}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1chain__apis_1_1read__only_1_1get__table__rows__result_a485cd463ae28eb1d9b762e8ed5514b1e}\index{sysio::chain\_apis::read\_only::get\_table\_rows\_result@{sysio::chain\_apis::read\_only::get\_table\_rows\_result}!more@{more}}
+\index{more@{more}!sysio::chain\_apis::read\_only::get\_table\_rows\_result@{sysio::chain\_apis::read\_only::get\_table\_rows\_result}}
+\doxysubsubsection{\texorpdfstring{more}{more}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain__apis_1_1read__only_1_1get__table__rows__result_a485cd463ae28eb1d9b762e8ed5514b1e} 
+bool sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::get\+\_\+table\+\_\+rows\+\_\+result\+::more = false}
+
+
+
+Definition at line \mbox{\hyperlink{chain__plugin_8hpp_source_l00355}{355}} of file \mbox{\hyperlink{chain__plugin_8hpp_source}{chain\+\_\+plugin.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain__apis_1_1read__only_1_1get__table__rows__result_ac519402f2a94ab9eed619110dcec0297}\index{sysio::chain\_apis::read\_only::get\_table\_rows\_result@{sysio::chain\_apis::read\_only::get\_table\_rows\_result}!next\_key@{next\_key}}
+\index{next\_key@{next\_key}!sysio::chain\_apis::read\_only::get\_table\_rows\_result@{sysio::chain\_apis::read\_only::get\_table\_rows\_result}}
+\doxysubsubsection{\texorpdfstring{next\_key}{next\_key}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain__apis_1_1read__only_1_1get__table__rows__result_ac519402f2a94ab9eed619110dcec0297} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::get\+\_\+table\+\_\+rows\+\_\+result\+::next\+\_\+key}
+
+
+
+Definition at line \mbox{\hyperlink{chain__plugin_8hpp_source_l00356}{356}} of file \mbox{\hyperlink{chain__plugin_8hpp_source}{chain\+\_\+plugin.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain__apis_1_1read__only_1_1get__table__rows__result_a149b2c1089ccfedd4ec66e31fa626556}\index{sysio::chain\_apis::read\_only::get\_table\_rows\_result@{sysio::chain\_apis::read\_only::get\_table\_rows\_result}!rows@{rows}}
+\index{rows@{rows}!sysio::chain\_apis::read\_only::get\_table\_rows\_result@{sysio::chain\_apis::read\_only::get\_table\_rows\_result}}
+\doxysubsubsection{\texorpdfstring{rows}{rows}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain__apis_1_1read__only_1_1get__table__rows__result_a149b2c1089ccfedd4ec66e31fa626556} 
+\mbox{\hyperlink{classfc_1_1vector}{vector}}$<$\mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}}$>$ sysio\+::chain\+\_\+apis\+::read\+\_\+only\+::get\+\_\+table\+\_\+rows\+\_\+result\+::rows}
+
+
+
+Definition at line \mbox{\hyperlink{chain__plugin_8hpp_source_l00354}{354}} of file \mbox{\hyperlink{chain__plugin_8hpp_source}{chain\+\_\+plugin.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+plugins/chain\+\_\+plugin/include/sysio/chain\+\_\+plugin/\mbox{\hyperlink{chain__plugin_8hpp}{chain\+\_\+plugin.\+hpp}}\end{DoxyCompactItemize}

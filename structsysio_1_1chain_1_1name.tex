@@ -1,0 +1,411 @@
+\doxysection{sysio\+::chain\+::name Struct Reference}
+\hypertarget{structsysio_1_1chain_1_1name}{}\label{structsysio_1_1chain_1_1name}\index{sysio::chain::name@{sysio::chain::name}}
+
+
+Immutable except for \doxylink{namespacefc_accef08adf4ee05c36ccc550d8101b08f}{fc\+::from\+\_\+variant}.  
+
+
+
+
+{\ttfamily \#include $<$name.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+constexpr bool \mbox{\hyperlink{structsysio_1_1chain_1_1name_ac074a360785947747ebec83c2cab287a}{empty}} () const
+\item 
+constexpr bool \mbox{\hyperlink{structsysio_1_1chain_1_1name_a00b8bba321fb9b589a995d2924b6754d}{good}} () const
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1name_a8847252c767dea5c3e8b60cc9d78505f}{name}} (std\+::string\+\_\+view str)
+\item 
+constexpr \mbox{\hyperlink{structsysio_1_1chain_1_1name_a17bb0512b9c2744c9ea7408fab6f2768}{name}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} v)
+\item 
+constexpr \mbox{\hyperlink{structsysio_1_1chain_1_1name_a2bb046df117a1a5a029c8aac1a76c5f6}{name}} ()=default
+\item 
+std\+::string \mbox{\hyperlink{structsysio_1_1chain_1_1name_ad1e96c77890d21207fc5cda532244019}{to\+\_\+string}} () const
+\item 
+constexpr \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1name_acca781afc8c444ce3278404477f83987}{to\+\_\+uint64\+\_\+t}} () const
+\item 
+constexpr \mbox{\hyperlink{structsysio_1_1chain_1_1name_a21a592a1b2a978888423d8f3045bff00}{operator bool}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1name_ae6213c17985a8535ed0ff85db7a5c0f4}{fc\+::reflector$<$ name $>$}}
+\item 
+void \mbox{\hyperlink{structsysio_1_1chain_1_1name_a9243995546f47d1ad8040d26d1b87009}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&v, \mbox{\hyperlink{structsysio_1_1chain_1_1name}{sysio\+::chain\+::name}} \&check)
+\item 
+std\+::ostream \& \mbox{\hyperlink{structsysio_1_1chain_1_1name_ab7b9f8eabe005fc48757cce98217c503}{operator$<$$<$}} (std\+::ostream \&out, const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&n)
+\item 
+constexpr bool \mbox{\hyperlink{structsysio_1_1chain_1_1name_a743497f458dd217e1eccf368d060bbd5}{operator$<$}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&b)
+\item 
+constexpr bool \mbox{\hyperlink{structsysio_1_1chain_1_1name_a9fa91b7928cf5b9fead2651f6450c040}{operator$>$}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&b)
+\item 
+constexpr bool \mbox{\hyperlink{structsysio_1_1chain_1_1name_a6b807850c2f71bc45eab34d987bf2127}{operator$<$=}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&b)
+\item 
+constexpr bool \mbox{\hyperlink{structsysio_1_1chain_1_1name_afb3628ba436121eacb8ea845e51cbf0b}{operator$>$=}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&b)
+\item 
+constexpr bool \mbox{\hyperlink{structsysio_1_1chain_1_1name_a7815a04748b0d6b1e28f1bb11e668595}{operator==}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&b)
+\item 
+constexpr bool \mbox{\hyperlink{structsysio_1_1chain_1_1name_af1df898dfc723d4873fe9356cc70eacb}{operator!=}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&b)
+\item 
+constexpr bool \mbox{\hyperlink{structsysio_1_1chain_1_1name_a3eb64427b8b6ef745af53908c51f1b08}{operator==}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} b)
+\item 
+constexpr bool \mbox{\hyperlink{structsysio_1_1chain_1_1name_a950de8f9a8a29f8a65b28dac65e62577}{operator!=}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} b)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{name_8hpp_source_l00043}{43}} of file \mbox{\hyperlink{name_8hpp_source}{name.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structsysio_1_1chain_1_1name_a8847252c767dea5c3e8b60cc9d78505f}\index{sysio::chain::name@{sysio::chain::name}!name@{name}}
+\index{name@{name}!sysio::chain::name@{sysio::chain::name}}
+\doxysubsubsection{\texorpdfstring{name()}{name()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1name_a8847252c767dea5c3e8b60cc9d78505f} 
+sysio\+::chain\+::name\+::name (\begin{DoxyParamCaption}\item[{std\+::string\+\_\+view}]{str}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{name_8hpp_source_l00056}{56}} of file \mbox{\hyperlink{name_8hpp_source}{name.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00056\ \{\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a893468abdce45d586a5b659094a25e6c}{set}}(\ str\ );\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1name_a8847252c767dea5c3e8b60cc9d78505f_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1name_a17bb0512b9c2744c9ea7408fab6f2768}\index{sysio::chain::name@{sysio::chain::name}!name@{name}}
+\index{name@{name}!sysio::chain::name@{sysio::chain::name}}
+\doxysubsubsection{\texorpdfstring{name()}{name()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1name_a17bb0512b9c2744c9ea7408fab6f2768} 
+sysio\+::chain\+::name\+::name (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{v}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{name_8hpp_source_l00057}{57}} of file \mbox{\hyperlink{name_8hpp_source}{name.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00057\ :\ value(v)\ \{\}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1name_a17bb0512b9c2744c9ea7408fab6f2768_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1name_a2bb046df117a1a5a029c8aac1a76c5f6}\index{sysio::chain::name@{sysio::chain::name}!name@{name}}
+\index{name@{name}!sysio::chain::name@{sysio::chain::name}}
+\doxysubsubsection{\texorpdfstring{name()}{name()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1name_a2bb046df117a1a5a029c8aac1a76c5f6} 
+sysio\+::chain\+::name\+::name (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [constexpr]}, {\ttfamily [default]}}
+
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1name_a2bb046df117a1a5a029c8aac1a76c5f6_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1chain_1_1name_ac074a360785947747ebec83c2cab287a}\index{sysio::chain::name@{sysio::chain::name}!empty@{empty}}
+\index{empty@{empty}!sysio::chain::name@{sysio::chain::name}}
+\doxysubsubsection{\texorpdfstring{empty()}{empty()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1name_ac074a360785947747ebec83c2cab287a} 
+bool sysio\+::chain\+::name\+::empty (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{name_8hpp_source_l00053}{53}} of file \mbox{\hyperlink{name_8hpp_source}{name.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00053\ \{\ \textcolor{keywordflow}{return}\ 0\ ==\ value;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1name_ac074a360785947747ebec83c2cab287a_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1name_a00b8bba321fb9b589a995d2924b6754d}\index{sysio::chain::name@{sysio::chain::name}!good@{good}}
+\index{good@{good}!sysio::chain::name@{sysio::chain::name}}
+\doxysubsubsection{\texorpdfstring{good()}{good()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1name_a00b8bba321fb9b589a995d2924b6754d} 
+bool sysio\+::chain\+::name\+::good (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{name_8hpp_source_l00054}{54}} of file \mbox{\hyperlink{name_8hpp_source}{name.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00054\ \{\ \textcolor{keywordflow}{return}\ !\mbox{\hyperlink{structsysio_1_1chain_1_1name_ac074a360785947747ebec83c2cab287a}{empty}}();\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=313pt]{structsysio_1_1chain_1_1name_a00b8bba321fb9b589a995d2924b6754d_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1name_a00b8bba321fb9b589a995d2924b6754d_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1name_a21a592a1b2a978888423d8f3045bff00}\index{sysio::chain::name@{sysio::chain::name}!operator bool@{operator bool}}
+\index{operator bool@{operator bool}!sysio::chain::name@{sysio::chain::name}}
+\doxysubsubsection{\texorpdfstring{operator bool()}{operator bool()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1name_a21a592a1b2a978888423d8f3045bff00} 
+sysio\+::chain\+::name\+::operator bool (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{name_8hpp_source_l00077}{77}} of file \mbox{\hyperlink{name_8hpp_source}{name.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00077\ \{\ \textcolor{keywordflow}{return}\ value\ !=\ 0;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1name_ad1e96c77890d21207fc5cda532244019}\index{sysio::chain::name@{sysio::chain::name}!to\_string@{to\_string}}
+\index{to\_string@{to\_string}!sysio::chain::name@{sysio::chain::name}}
+\doxysubsubsection{\texorpdfstring{to\_string()}{to\_string()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1name_ad1e96c77890d21207fc5cda532244019} 
+std\+::string sysio\+::chain\+::name\+::to\+\_\+string (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{name_8cpp_source_l00019}{19}} of file \mbox{\hyperlink{name_8cpp_source}{name.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00020\ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ charmap\ =\ \textcolor{stringliteral}{"{}.12345abcdefghijklmnopqrstuvwxyz"{}};}
+\DoxyCodeLine{00021\ }
+\DoxyCodeLine{00022\ \ \ \ \ \ \ std::string\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}(13,\textcolor{charliteral}{'.'});}
+\DoxyCodeLine{00023\ }
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ tmp\ =\ value;}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ i\ =\ 0;\ i\ <=\ 12;\ ++i\ )\ \{}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ c\ =\ charmap[tmp\ \&\ (i\ ==\ 0\ ?\ 0x0f\ :\ 0x1f)];}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}[12-\/i]\ =\ c;}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \ tmp\ >>=\ (i\ ==\ 0\ ?\ 4\ :\ 5);}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00030\ }
+\DoxyCodeLine{00031\ \ \ \ \ \ \ boost::algorithm::trim\_right\_if(\ str,\ [](\ \textcolor{keywordtype}{char}\ c\ )\{\ \textcolor{keywordflow}{return}\ c\ ==\ \textcolor{charliteral}{'.'};\ \}\ );}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}};}
+\DoxyCodeLine{00033\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1name_ad1e96c77890d21207fc5cda532244019_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1name_acca781afc8c444ce3278404477f83987}\index{sysio::chain::name@{sysio::chain::name}!to\_uint64\_t@{to\_uint64\_t}}
+\index{to\_uint64\_t@{to\_uint64\_t}!sysio::chain::name@{sysio::chain::name}}
+\doxysubsubsection{\texorpdfstring{to\_uint64\_t()}{to\_uint64\_t()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1name_acca781afc8c444ce3278404477f83987} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} sysio\+::chain\+::name\+::to\+\_\+uint64\+\_\+t (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{name_8hpp_source_l00061}{61}} of file \mbox{\hyperlink{name_8hpp_source}{name.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00061\ \{\ \textcolor{keywordflow}{return}\ value;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1name_acca781afc8c444ce3278404477f83987_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{structsysio_1_1chain_1_1name_a9243995546f47d1ad8040d26d1b87009}\index{sysio::chain::name@{sysio::chain::name}!fc::from\_variant@{fc::from\_variant}}
+\index{fc::from\_variant@{fc::from\_variant}!sysio::chain::name@{sysio::chain::name}}
+\doxysubsubsection{\texorpdfstring{fc::from\_variant}{fc::from\_variant}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1name_a9243995546f47d1ad8040d26d1b87009} 
+void \mbox{\hyperlink{namespacefc_accef08adf4ee05c36ccc550d8101b08f}{fc\+::from\+\_\+variant}} (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&}]{v}{, }\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1name}{sysio\+::chain\+::name}} \&}]{check}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+\Hypertarget{structsysio_1_1chain_1_1name_ae6213c17985a8535ed0ff85db7a5c0f4}\index{sysio::chain::name@{sysio::chain::name}!fc::reflector$<$ name $>$@{fc::reflector$<$ name $>$}}
+\index{fc::reflector$<$ name $>$@{fc::reflector$<$ name $>$}!sysio::chain::name@{sysio::chain::name}}
+\doxysubsubsection{\texorpdfstring{fc::reflector$<$ name $>$}{fc::reflector< name >}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1name_ae6213c17985a8535ed0ff85db7a5c0f4} 
+friend struct \mbox{\hyperlink{structfc_1_1reflector}{fc\+::reflector}}$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{name_8hpp_source_l00045}{45}} of file \mbox{\hyperlink{name_8hpp_source}{name.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1name_af1df898dfc723d4873fe9356cc70eacb}\index{sysio::chain::name@{sysio::chain::name}!operator"!=@{operator"!=}}
+\index{operator"!=@{operator"!=}!sysio::chain::name@{sysio::chain::name}}
+\doxysubsubsection{\texorpdfstring{operator"!=}{operator!=}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1name_af1df898dfc723d4873fe9356cc70eacb} 
+bool \mbox{\hyperlink{namespacefc_a40c368ac88294ae47b064cad937fdbf6}{operator!}}= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&}]{a}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&}]{b}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{name_8hpp_source_l00072}{72}} of file \mbox{\hyperlink{name_8hpp_source}{name.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00072\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.value\ !=\ b.value;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1name_a950de8f9a8a29f8a65b28dac65e62577}\index{sysio::chain::name@{sysio::chain::name}!operator"!=@{operator"!=}}
+\index{operator"!=@{operator"!=}!sysio::chain::name@{sysio::chain::name}}
+\doxysubsubsection{\texorpdfstring{operator"!=}{operator!=}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1name_a950de8f9a8a29f8a65b28dac65e62577} 
+bool \mbox{\hyperlink{namespacefc_a40c368ac88294ae47b064cad937fdbf6}{operator!}}= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&}]{a}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{b}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{name_8hpp_source_l00075}{75}} of file \mbox{\hyperlink{name_8hpp_source}{name.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00075\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.value\ !=\ b;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1name_a743497f458dd217e1eccf368d060bbd5}\index{sysio::chain::name@{sysio::chain::name}!operator$<$@{operator$<$}}
+\index{operator$<$@{operator$<$}!sysio::chain::name@{sysio::chain::name}}
+\doxysubsubsection{\texorpdfstring{operator$<$}{operator<}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1name_a743497f458dd217e1eccf368d060bbd5} 
+bool operator$<$ (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&}]{a}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&}]{b}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{name_8hpp_source_l00067}{67}} of file \mbox{\hyperlink{name_8hpp_source}{name.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00067\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.value\ <\ b.value;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1name_ab7b9f8eabe005fc48757cce98217c503}\index{sysio::chain::name@{sysio::chain::name}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!sysio::chain::name@{sysio::chain::name}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$}{operator<<}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1name_ab7b9f8eabe005fc48757cce98217c503} 
+std\+::ostream \& operator$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{out}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&}]{n}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{name_8hpp_source_l00063}{63}} of file \mbox{\hyperlink{name_8hpp_source}{name.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ out\ <<\ n.to\_string();}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1name_a6b807850c2f71bc45eab34d987bf2127}\index{sysio::chain::name@{sysio::chain::name}!operator$<$=@{operator$<$=}}
+\index{operator$<$=@{operator$<$=}!sysio::chain::name@{sysio::chain::name}}
+\doxysubsubsection{\texorpdfstring{operator$<$=}{operator<=}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1name_a6b807850c2f71bc45eab34d987bf2127} 
+bool operator$<$= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&}]{a}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&}]{b}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{name_8hpp_source_l00069}{69}} of file \mbox{\hyperlink{name_8hpp_source}{name.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00069\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.value\ <=\ b.value;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1name_a7815a04748b0d6b1e28f1bb11e668595}\index{sysio::chain::name@{sysio::chain::name}!operator==@{operator==}}
+\index{operator==@{operator==}!sysio::chain::name@{sysio::chain::name}}
+\doxysubsubsection{\texorpdfstring{operator==}{operator==}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1name_a7815a04748b0d6b1e28f1bb11e668595} 
+bool operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&}]{a}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&}]{b}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{name_8hpp_source_l00071}{71}} of file \mbox{\hyperlink{name_8hpp_source}{name.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00071\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.value\ ==\ b.value;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1name_a3eb64427b8b6ef745af53908c51f1b08}\index{sysio::chain::name@{sysio::chain::name}!operator==@{operator==}}
+\index{operator==@{operator==}!sysio::chain::name@{sysio::chain::name}}
+\doxysubsubsection{\texorpdfstring{operator==}{operator==}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1name_a3eb64427b8b6ef745af53908c51f1b08} 
+bool operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&}]{a}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{b}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{name_8hpp_source_l00074}{74}} of file \mbox{\hyperlink{name_8hpp_source}{name.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00074\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.value\ ==\ b;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1name_a9fa91b7928cf5b9fead2651f6450c040}\index{sysio::chain::name@{sysio::chain::name}!operator$>$@{operator$>$}}
+\index{operator$>$@{operator$>$}!sysio::chain::name@{sysio::chain::name}}
+\doxysubsubsection{\texorpdfstring{operator$>$}{operator>}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1name_a9fa91b7928cf5b9fead2651f6450c040} 
+bool operator$>$ (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&}]{a}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&}]{b}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{name_8hpp_source_l00068}{68}} of file \mbox{\hyperlink{name_8hpp_source}{name.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00068\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.value\ >\ b.value;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1name_afb3628ba436121eacb8ea845e51cbf0b}\index{sysio::chain::name@{sysio::chain::name}!operator$>$=@{operator$>$=}}
+\index{operator$>$=@{operator$>$=}!sysio::chain::name@{sysio::chain::name}}
+\doxysubsubsection{\texorpdfstring{operator$>$=}{operator>=}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1name_afb3628ba436121eacb8ea845e51cbf0b} 
+bool operator$>$= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&}]{a}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&}]{b}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{name_8hpp_source_l00070}{70}} of file \mbox{\hyperlink{name_8hpp_source}{name.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00070\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.value\ >=\ b.value;\ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{name_8hpp}{name.\+hpp}}\item 
+libraries/chain/\mbox{\hyperlink{name_8cpp}{name.\+cpp}}\end{DoxyCompactItemize}

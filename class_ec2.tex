@@ -1,0 +1,498 @@
+\doxysection{Ec2 Class Reference}
+\hypertarget{class_ec2}{}\label{class_ec2}\index{Ec2@{Ec2}}
+
+
+{\ttfamily \#include $<$bn254\+\_\+if.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_ec2_aba24b8d99cbeac6e06be39eb25dcfc13}{Ec2}} ()
+\item 
+\mbox{\hyperlink{class_ec2_ace3c4f715d9317aaaf1e5e13fee1b894}{Ec2}} (const \mbox{\hyperlink{class_ec2}{Ec2}} \&x)
+\item 
+\mbox{\hyperlink{class_ec2_a0da1268fc5875118744f5c1352acbd1a}{Ec2}} (const \mbox{\hyperlink{class_fp2}{Fp2}} \&x, const \mbox{\hyperlink{class_fp2}{Fp2}} \&y)  throw (std\+::exception)
+\item 
+\mbox{\hyperlink{class_ec2_af6f14a585de6f22b2e2de1673f94c2d1}{Ec2}} (const \mbox{\hyperlink{class_fp2}{Fp2}} \&x, const \mbox{\hyperlink{class_fp2}{Fp2}} \&y, const \mbox{\hyperlink{class_fp2}{Fp2}} \&z)  throw (std\+::exception)
+\item 
+bool \mbox{\hyperlink{class_ec2_a5e6bf9e7de6c2358140c60e19bce6759}{is\+Valid}} () const
+\item 
+void \mbox{\hyperlink{class_ec2_ab279208fa5a4d04d53526ddde679efee}{set}} (const \mbox{\hyperlink{class_fp2}{Fp2}} \&x, const \mbox{\hyperlink{class_fp2}{Fp2}} \&y)  throw (std\+::exception)
+\item 
+void \mbox{\hyperlink{class_ec2_ac1de79f16525a7701cf303c5560dffa8}{set}} (const \mbox{\hyperlink{class_fp2}{Fp2}} \&x, const \mbox{\hyperlink{class_fp2}{Fp2}} \&y, const \mbox{\hyperlink{class_fp2}{Fp2}} \&z)  throw (std\+::exception)
+\item 
+void \mbox{\hyperlink{class_ec2_a9fa200fa21bb31b6313935a6a70e3641}{set}} (const std\+::string \&str)  throw (std\+::exception)
+\item 
+std\+::string \mbox{\hyperlink{class_ec2_a752a8228b8d648d2f7b64d8044cb50e1}{to\+String}} () const  throw (std\+::exception)
+\item 
+bool \mbox{\hyperlink{class_ec2_a37a3620bb5bfbbec7f0db74f8e98743d}{equals}} (const \mbox{\hyperlink{class_ec2}{Ec2}} \&rhs) const
+\item 
+bool \mbox{\hyperlink{class_ec2_ad66a05f76a354ead24d6a15b326baf4f}{is\+Zero}} () const
+\item 
+void \mbox{\hyperlink{class_ec2_af4b7732b51aa1152cea0ba4ec9fc7330}{clear}} ()
+\item 
+void \mbox{\hyperlink{class_ec2_ab7dfa5b49f312359dfd51a61504495a6}{dbl}} ()
+\item 
+void \mbox{\hyperlink{class_ec2_a4fdb28b2fc83a5244796f6005d51aec3}{neg}} ()
+\item 
+void \mbox{\hyperlink{class_ec2_a79ebe72ec06a76a705b0ca08612e1cf0}{add}} (const \mbox{\hyperlink{class_ec2}{Ec2}} \&rhs)
+\item 
+void \mbox{\hyperlink{class_ec2_a0959900bfbdbda35ea0840bd354e2b1e}{sub}} (const \mbox{\hyperlink{class_ec2}{Ec2}} \&rhs)
+\item 
+void \mbox{\hyperlink{class_ec2_ad05d82e70e2e9ae02d1964da54f2161a}{mul}} (const \mbox{\hyperlink{class_mpz}{Mpz}} \&rhs)
+\item 
+\mbox{\hyperlink{class_fp2}{Fp2}} \& \mbox{\hyperlink{class_ec2_acd9fb5c2e6c5d26d02fe33223b24626f}{getX}} ()
+\item 
+\mbox{\hyperlink{class_fp2}{Fp2}} \& \mbox{\hyperlink{class_ec2_ae928a921453cdbf5a0d2e184906ea0c3}{getY}} ()
+\item 
+\mbox{\hyperlink{class_fp2}{Fp2}} \& \mbox{\hyperlink{class_ec2_a7e2ca1cc806a7b4f46df780183459b50}{getZ}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{class_ec2_a7483dba502586f341465adc97709aced}{Fp12}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{bn254__if_8hpp_source_l00198}{198}} of file \mbox{\hyperlink{bn254__if_8hpp_source}{bn254\+\_\+if.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_ec2_aba24b8d99cbeac6e06be39eb25dcfc13}\index{Ec2@{Ec2}!Ec2@{Ec2}}
+\index{Ec2@{Ec2}!Ec2@{Ec2}}
+\doxysubsubsection{\texorpdfstring{Ec2()}{Ec2()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{class_ec2_aba24b8d99cbeac6e06be39eb25dcfc13} 
+Ec2\+::\+Ec2 (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn254__if_8hpp_source_l00202}{202}} of file \mbox{\hyperlink{bn254__if_8hpp_source}{bn254\+\_\+if.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00202\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{class_ec2_ace3c4f715d9317aaaf1e5e13fee1b894}\index{Ec2@{Ec2}!Ec2@{Ec2}}
+\index{Ec2@{Ec2}!Ec2@{Ec2}}
+\doxysubsubsection{\texorpdfstring{Ec2()}{Ec2()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{class_ec2_ace3c4f715d9317aaaf1e5e13fee1b894} 
+Ec2\+::\+Ec2 (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_ec2}{Ec2}} \&}]{x}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn254__if_8hpp_source_l00203}{203}} of file \mbox{\hyperlink{bn254__if_8hpp_source}{bn254\+\_\+if.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00203\ :\ self\_(x.self\_)\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{class_ec2_a0da1268fc5875118744f5c1352acbd1a}\index{Ec2@{Ec2}!Ec2@{Ec2}}
+\index{Ec2@{Ec2}!Ec2@{Ec2}}
+\doxysubsubsection{\texorpdfstring{Ec2()}{Ec2()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{class_ec2_a0da1268fc5875118744f5c1352acbd1a} 
+Ec2\+::\+Ec2 (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_fp2}{Fp2}} \&}]{x}{, }\item[{const \mbox{\hyperlink{class_fp2}{Fp2}} \&}]{y}{}\end{DoxyParamCaption}) throw ( std\+::exception) \hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn254__if_8hpp_source_l00204}{204}} of file \mbox{\hyperlink{bn254__if_8hpp_source}{bn254\+\_\+if.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00205\ \ \ \ \ \{}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a893468abdce45d586a5b659094a25e6c}{set}}(x,\ y);}
+\DoxyCodeLine{00207\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_ec2_af6f14a585de6f22b2e2de1673f94c2d1}\index{Ec2@{Ec2}!Ec2@{Ec2}}
+\index{Ec2@{Ec2}!Ec2@{Ec2}}
+\doxysubsubsection{\texorpdfstring{Ec2()}{Ec2()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{class_ec2_af6f14a585de6f22b2e2de1673f94c2d1} 
+Ec2\+::\+Ec2 (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_fp2}{Fp2}} \&}]{x}{, }\item[{const \mbox{\hyperlink{class_fp2}{Fp2}} \&}]{y}{, }\item[{const \mbox{\hyperlink{class_fp2}{Fp2}} \&}]{z}{}\end{DoxyParamCaption}) throw ( std\+::exception) \hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn254__if_8hpp_source_l00208}{208}} of file \mbox{\hyperlink{bn254__if_8hpp_source}{bn254\+\_\+if.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00209\ \ \ \ \ \{}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a893468abdce45d586a5b659094a25e6c}{set}}(x,\ y,\ z);}
+\DoxyCodeLine{00211\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_ec2_a79ebe72ec06a76a705b0ca08612e1cf0}\index{Ec2@{Ec2}!add@{add}}
+\index{add@{add}!Ec2@{Ec2}}
+\doxysubsubsection{\texorpdfstring{add()}{add()}}
+{\footnotesize\ttfamily \label{class_ec2_a79ebe72ec06a76a705b0ca08612e1cf0} 
+void Ec2\+::add (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_ec2}{Ec2}} \&}]{rhs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn254__if_8hpp_source_l00237}{237}} of file \mbox{\hyperlink{bn254__if_8hpp_source}{bn254\+\_\+if.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00237\ \{\ \mbox{\hyperlink{classbn_1_1_ec_t_ad4217e38c5c16c1a97d2036a1f21e751}{::bn::Ec2::add}}(self\_,\ self\_,\ rhs.self\_);\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_ec2_a79ebe72ec06a76a705b0ca08612e1cf0_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=297pt]{class_ec2_a79ebe72ec06a76a705b0ca08612e1cf0_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_ec2_af4b7732b51aa1152cea0ba4ec9fc7330}\index{Ec2@{Ec2}!clear@{clear}}
+\index{clear@{clear}!Ec2@{Ec2}}
+\doxysubsubsection{\texorpdfstring{clear()}{clear()}}
+{\footnotesize\ttfamily \label{class_ec2_af4b7732b51aa1152cea0ba4ec9fc7330} 
+void Ec2\+::clear (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn254__if_8hpp_source_l00234}{234}} of file \mbox{\hyperlink{bn254__if_8hpp_source}{bn254\+\_\+if.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00234\ \{\ self\_.\mbox{\hyperlink{classbn_1_1_ec_t_a4b8eaf8b11ddd7a51294316a6696c9cf}{clear}}();\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=252pt]{class_ec2_af4b7732b51aa1152cea0ba4ec9fc7330_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_ec2_ab7dfa5b49f312359dfd51a61504495a6}\index{Ec2@{Ec2}!dbl@{dbl}}
+\index{dbl@{dbl}!Ec2@{Ec2}}
+\doxysubsubsection{\texorpdfstring{dbl()}{dbl()}}
+{\footnotesize\ttfamily \label{class_ec2_ab7dfa5b49f312359dfd51a61504495a6} 
+void Ec2\+::dbl (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn254__if_8hpp_source_l00235}{235}} of file \mbox{\hyperlink{bn254__if_8hpp_source}{bn254\+\_\+if.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00235\ \{\ \mbox{\hyperlink{classbn_1_1_ec_t_a7116d6ac94beb5b42e792adb38290e3d}{::bn::Ec2::dbl}}(self\_,\ self\_);\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_ec2_ab7dfa5b49f312359dfd51a61504495a6_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_ec2_a37a3620bb5bfbbec7f0db74f8e98743d}\index{Ec2@{Ec2}!equals@{equals}}
+\index{equals@{equals}!Ec2@{Ec2}}
+\doxysubsubsection{\texorpdfstring{equals()}{equals()}}
+{\footnotesize\ttfamily \label{class_ec2_a37a3620bb5bfbbec7f0db74f8e98743d} 
+bool Ec2\+::equals (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_ec2}{Ec2}} \&}]{rhs}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn254__if_8hpp_source_l00232}{232}} of file \mbox{\hyperlink{bn254__if_8hpp_source}{bn254\+\_\+if.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00232\ \{\ \textcolor{keywordflow}{return}\ self\_\ ==\ rhs.self\_;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_ec2_acd9fb5c2e6c5d26d02fe33223b24626f}\index{Ec2@{Ec2}!getX@{getX}}
+\index{getX@{getX}!Ec2@{Ec2}}
+\doxysubsubsection{\texorpdfstring{getX()}{getX()}}
+{\footnotesize\ttfamily \label{class_ec2_acd9fb5c2e6c5d26d02fe33223b24626f} 
+\mbox{\hyperlink{class_fp2}{Fp2}} \& Ec2\+::getX (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn254__if_8hpp_source_l00240}{240}} of file \mbox{\hyperlink{bn254__if_8hpp_source}{bn254\+\_\+if.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00240\ \{\ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{class_fp2}{Fp2}}*\textcolor{keyword}{>}(\&self\_.\mbox{\hyperlink{classbn_1_1_ec_t_a0eb648e193bff335b651852b18d9b286}{p}}[0]);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_ec2_ae928a921453cdbf5a0d2e184906ea0c3}\index{Ec2@{Ec2}!getY@{getY}}
+\index{getY@{getY}!Ec2@{Ec2}}
+\doxysubsubsection{\texorpdfstring{getY()}{getY()}}
+{\footnotesize\ttfamily \label{class_ec2_ae928a921453cdbf5a0d2e184906ea0c3} 
+\mbox{\hyperlink{class_fp2}{Fp2}} \& Ec2\+::getY (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn254__if_8hpp_source_l00241}{241}} of file \mbox{\hyperlink{bn254__if_8hpp_source}{bn254\+\_\+if.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00241\ \{\ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{class_fp2}{Fp2}}*\textcolor{keyword}{>}(\&self\_.\mbox{\hyperlink{classbn_1_1_ec_t_a0eb648e193bff335b651852b18d9b286}{p}}[1]);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_ec2_a7e2ca1cc806a7b4f46df780183459b50}\index{Ec2@{Ec2}!getZ@{getZ}}
+\index{getZ@{getZ}!Ec2@{Ec2}}
+\doxysubsubsection{\texorpdfstring{getZ()}{getZ()}}
+{\footnotesize\ttfamily \label{class_ec2_a7e2ca1cc806a7b4f46df780183459b50} 
+\mbox{\hyperlink{class_fp2}{Fp2}} \& Ec2\+::getZ (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn254__if_8hpp_source_l00242}{242}} of file \mbox{\hyperlink{bn254__if_8hpp_source}{bn254\+\_\+if.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00242\ \{\ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{class_fp2}{Fp2}}*\textcolor{keyword}{>}(\&self\_.\mbox{\hyperlink{classbn_1_1_ec_t_a0eb648e193bff335b651852b18d9b286}{p}}[2]);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_ec2_a5e6bf9e7de6c2358140c60e19bce6759}\index{Ec2@{Ec2}!isValid@{isValid}}
+\index{isValid@{isValid}!Ec2@{Ec2}}
+\doxysubsubsection{\texorpdfstring{isValid()}{isValid()}}
+{\footnotesize\ttfamily \label{class_ec2_a5e6bf9e7de6c2358140c60e19bce6759} 
+bool Ec2\+::is\+Valid (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn254__if_8hpp_source_l00212}{212}} of file \mbox{\hyperlink{bn254__if_8hpp_source}{bn254\+\_\+if.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00212\ \{\ \textcolor{keywordflow}{return}\ self\_.\mbox{\hyperlink{classbn_1_1_ec_t_a227bf547dcef48bd6baae58c55bb6415}{isValid}}();\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=267pt]{class_ec2_a5e6bf9e7de6c2358140c60e19bce6759_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=346pt]{class_ec2_a5e6bf9e7de6c2358140c60e19bce6759_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_ec2_ad66a05f76a354ead24d6a15b326baf4f}\index{Ec2@{Ec2}!isZero@{isZero}}
+\index{isZero@{isZero}!Ec2@{Ec2}}
+\doxysubsubsection{\texorpdfstring{isZero()}{isZero()}}
+{\footnotesize\ttfamily \label{class_ec2_ad66a05f76a354ead24d6a15b326baf4f} 
+bool Ec2\+::is\+Zero (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn254__if_8hpp_source_l00233}{233}} of file \mbox{\hyperlink{bn254__if_8hpp_source}{bn254\+\_\+if.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00233\ \{\ \textcolor{keywordflow}{return}\ self\_.\mbox{\hyperlink{classbn_1_1_ec_t_a34fbacd76c38d93f37902936a8e60183}{isZero}}();\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=264pt]{class_ec2_ad66a05f76a354ead24d6a15b326baf4f_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=344pt]{class_ec2_ad66a05f76a354ead24d6a15b326baf4f_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_ec2_ad05d82e70e2e9ae02d1964da54f2161a}\index{Ec2@{Ec2}!mul@{mul}}
+\index{mul@{mul}!Ec2@{Ec2}}
+\doxysubsubsection{\texorpdfstring{mul()}{mul()}}
+{\footnotesize\ttfamily \label{class_ec2_ad05d82e70e2e9ae02d1964da54f2161a} 
+void Ec2\+::mul (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_mpz}{Mpz}} \&}]{rhs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn254__if_8hpp_source_l00239}{239}} of file \mbox{\hyperlink{bn254__if_8hpp_source}{bn254\+\_\+if.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00239\ \{\ \mbox{\hyperlink{classbn_1_1_ec_t_af902e7017a845933a033b420f6e4c6fb}{::bn::Ec2::mul}}(self\_,\ self\_,\ rhs.self\_);\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_ec2_ad05d82e70e2e9ae02d1964da54f2161a_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=333pt]{class_ec2_ad05d82e70e2e9ae02d1964da54f2161a_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_ec2_a4fdb28b2fc83a5244796f6005d51aec3}\index{Ec2@{Ec2}!neg@{neg}}
+\index{neg@{neg}!Ec2@{Ec2}}
+\doxysubsubsection{\texorpdfstring{neg()}{neg()}}
+{\footnotesize\ttfamily \label{class_ec2_a4fdb28b2fc83a5244796f6005d51aec3} 
+void Ec2\+::neg (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn254__if_8hpp_source_l00236}{236}} of file \mbox{\hyperlink{bn254__if_8hpp_source}{bn254\+\_\+if.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00236\ \{\ \mbox{\hyperlink{classbn_1_1_ec_t_ae669e880299e26fdcb10d387b6e61be9}{::bn::Ec2::neg}}(self\_,\ self\_);\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=242pt]{class_ec2_a4fdb28b2fc83a5244796f6005d51aec3_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_ec2_ab279208fa5a4d04d53526ddde679efee}\index{Ec2@{Ec2}!set@{set}}
+\index{set@{set}!Ec2@{Ec2}}
+\doxysubsubsection{\texorpdfstring{set()}{set()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{class_ec2_ab279208fa5a4d04d53526ddde679efee} 
+void Ec2\+::set (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_fp2}{Fp2}} \&}]{x}{, }\item[{const \mbox{\hyperlink{class_fp2}{Fp2}} \&}]{y}{}\end{DoxyParamCaption}) throw ( std\+::exception) \hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn254__if_8hpp_source_l00213}{213}} of file \mbox{\hyperlink{bn254__if_8hpp_source}{bn254\+\_\+if.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00214\ \ \ \ \ \{}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \ \ self\_.\mbox{\hyperlink{classbn_1_1_ec_t_afba661f12cf8f908a8b22696837a72e4}{set}}(x.self\_,\ \mbox{\hyperlink{namespacefc_ab199a7c94624123911206db59ebe45da}{y}}.self\_);}
+\DoxyCodeLine{00216\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_ec2_ab279208fa5a4d04d53526ddde679efee_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_ec2_ac1de79f16525a7701cf303c5560dffa8}\index{Ec2@{Ec2}!set@{set}}
+\index{set@{set}!Ec2@{Ec2}}
+\doxysubsubsection{\texorpdfstring{set()}{set()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{class_ec2_ac1de79f16525a7701cf303c5560dffa8} 
+void Ec2\+::set (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_fp2}{Fp2}} \&}]{x}{, }\item[{const \mbox{\hyperlink{class_fp2}{Fp2}} \&}]{y}{, }\item[{const \mbox{\hyperlink{class_fp2}{Fp2}} \&}]{z}{}\end{DoxyParamCaption}) throw ( std\+::exception) \hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn254__if_8hpp_source_l00217}{217}} of file \mbox{\hyperlink{bn254__if_8hpp_source}{bn254\+\_\+if.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00218\ \ \ \ \ \{}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \ \ self\_.\mbox{\hyperlink{classbn_1_1_ec_t_afba661f12cf8f908a8b22696837a72e4}{set}}(x.self\_,\ \mbox{\hyperlink{namespacefc_ab199a7c94624123911206db59ebe45da}{y}}.self\_,\ z.self\_);}
+\DoxyCodeLine{00220\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_ec2_ac1de79f16525a7701cf303c5560dffa8_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_ec2_a9fa200fa21bb31b6313935a6a70e3641}\index{Ec2@{Ec2}!set@{set}}
+\index{set@{set}!Ec2@{Ec2}}
+\doxysubsubsection{\texorpdfstring{set()}{set()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{class_ec2_a9fa200fa21bb31b6313935a6a70e3641} 
+void Ec2\+::set (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{str}{}\end{DoxyParamCaption}) throw ( std\+::exception) \hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn254__if_8hpp_source_l00221}{221}} of file \mbox{\hyperlink{bn254__if_8hpp_source}{bn254\+\_\+if.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00222\ \ \ \ \ \{}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \ \ std::istringstream\ iss(str);}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \ \ iss\ >>\ self\_;}
+\DoxyCodeLine{00225\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_ec2_a0959900bfbdbda35ea0840bd354e2b1e}\index{Ec2@{Ec2}!sub@{sub}}
+\index{sub@{sub}!Ec2@{Ec2}}
+\doxysubsubsection{\texorpdfstring{sub()}{sub()}}
+{\footnotesize\ttfamily \label{class_ec2_a0959900bfbdbda35ea0840bd354e2b1e} 
+void Ec2\+::sub (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_ec2}{Ec2}} \&}]{rhs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn254__if_8hpp_source_l00238}{238}} of file \mbox{\hyperlink{bn254__if_8hpp_source}{bn254\+\_\+if.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00238\ \{\ \mbox{\hyperlink{classbn_1_1_ec_t_a776ccbedfdd789b2e9eb47b7e725e644}{::bn::Ec2::sub}}(self\_,\ self\_,\ rhs.self\_);\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_ec2_a0959900bfbdbda35ea0840bd354e2b1e_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_ec2_a752a8228b8d648d2f7b64d8044cb50e1}\index{Ec2@{Ec2}!toString@{toString}}
+\index{toString@{toString}!Ec2@{Ec2}}
+\doxysubsubsection{\texorpdfstring{toString()}{toString()}}
+{\footnotesize\ttfamily \label{class_ec2_a752a8228b8d648d2f7b64d8044cb50e1} 
+std\+::string Ec2\+::to\+String (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const throw ( std\+::exception) \hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn254__if_8hpp_source_l00226}{226}} of file \mbox{\hyperlink{bn254__if_8hpp_source}{bn254\+\_\+if.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00227\ \ \ \ \ \{}
+\DoxyCodeLine{00228\ \ \ \ \ \ \ \ \ std::ostringstream\ oss;}
+\DoxyCodeLine{00229\ \ \ \ \ \ \ \ \ oss\ <<\ self\_;}
+\DoxyCodeLine{00230\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ oss.str();}
+\DoxyCodeLine{00231\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{class_ec2_a7483dba502586f341465adc97709aced}\index{Ec2@{Ec2}!Fp12@{Fp12}}
+\index{Fp12@{Fp12}!Ec2@{Ec2}}
+\doxysubsubsection{\texorpdfstring{Fp12}{Fp12}}
+{\footnotesize\ttfamily \label{class_ec2_a7483dba502586f341465adc97709aced} 
+friend \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{class_fp12}{Fp12}}\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn254__if_8hpp_source_l00200}{200}} of file \mbox{\hyperlink{bn254__if_8hpp_source}{bn254\+\_\+if.\+hpp}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/libraries/ff/depends/ate-\/pairing/java/\mbox{\hyperlink{bn254__if_8hpp}{bn254\+\_\+if.\+hpp}}\end{DoxyCompactItemize}

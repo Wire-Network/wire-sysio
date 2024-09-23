@@ -1,0 +1,600 @@
+\doxysection{fc\+::json Class Reference}
+\hypertarget{classfc_1_1json}{}\label{classfc_1_1json}\index{fc::json@{fc::json}}
+
+
+{\ttfamily \#include $<$json.\+hpp$>$}
+
+
+
+Collaboration diagram for fc\+::json\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=193pt]{classfc_1_1json__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum class \mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788}{parse\+\_\+type}} \+: unsigned char \{ \mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788aa7d2f7881e4fbc4c5aae78d9b67beebe}{legacy\+\_\+parser}} = 0
+, \mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788a5fc1d56a3deaf9031e0d974ccc08a63e}{strict\+\_\+parser}} = 1
+, \mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788a843ff9a876d06313fa83ab6b39086170}{relaxed\+\_\+parser}} = 2
+, \mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788ad00f2b912d7e65fd24ae34f52cd14a38}{legacy\+\_\+parser\+\_\+with\+\_\+string\+\_\+doubles}} = 3
+ \}
+\item 
+enum class \mbox{\hyperlink{classfc_1_1json_afb6b3878fb58ad18c6c85f2f964bd998}{output\+\_\+formatting}} \+: unsigned char \{ \mbox{\hyperlink{classfc_1_1json_afb6b3878fb58ad18c6c85f2f964bd998a600e70d661c425431c4bf2dc28b57acf}{stringify\+\_\+large\+\_\+ints\+\_\+and\+\_\+doubles}} = 0
+, \mbox{\hyperlink{classfc_1_1json_afb6b3878fb58ad18c6c85f2f964bd998af29772e49cee90c19d21fbb60a3f88d4}{legacy\+\_\+generator}} = 1
+ \}
+\item 
+using \mbox{\hyperlink{classfc_1_1json_ab3f3e006979a528f3f56acd4e43fe8bc}{yield\+\_\+function\+\_\+t}} = \mbox{\hyperlink{classfc_1_1optional__delegate}{fc\+::optional\+\_\+delegate}}$<$void(size\+\_\+t)$>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static \mbox{\hyperlink{classfc_1_1variant}{variant}} \mbox{\hyperlink{classfc_1_1json_afad69f9f9c2a9f0105aae99f532f90cb}{from\+\_\+string}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&utf8\+\_\+str, const \mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788}{parse\+\_\+type}} ptype=\mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788aa7d2f7881e4fbc4c5aae78d9b67beebe}{parse\+\_\+type\+::legacy\+\_\+parser}}, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} max\+\_\+depth=\mbox{\hyperlink{json_8hpp_aee45ef1ffa047f0cdfef5fc453a98ac6}{DEFAULT\+\_\+\+MAX\+\_\+\+RECURSION\+\_\+\+DEPTH}})
+\item 
+static \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}} \mbox{\hyperlink{classfc_1_1json_aaea4012545c444aa3919baa0192504e8}{variants\+\_\+from\+\_\+string}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&utf8\+\_\+str, const \mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788}{parse\+\_\+type}} ptype=\mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788aa7d2f7881e4fbc4c5aae78d9b67beebe}{parse\+\_\+type\+::legacy\+\_\+parser}}, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} max\+\_\+depth=\mbox{\hyperlink{json_8hpp_aee45ef1ffa047f0cdfef5fc453a98ac6}{DEFAULT\+\_\+\+MAX\+\_\+\+RECURSION\+\_\+\+DEPTH}})
+\item 
+static \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{classfc_1_1json_aa6541960d7f05567559b866cfaf88dfa}{to\+\_\+string}} (const \mbox{\hyperlink{classfc_1_1variant}{variant}} \&v, const \mbox{\hyperlink{classfc_1_1json_ab3f3e006979a528f3f56acd4e43fe8bc}{yield\+\_\+function\+\_\+t}} \&yield, const \mbox{\hyperlink{classfc_1_1json_afb6b3878fb58ad18c6c85f2f964bd998}{output\+\_\+formatting}} \mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}=\mbox{\hyperlink{classfc_1_1json_afb6b3878fb58ad18c6c85f2f964bd998a600e70d661c425431c4bf2dc28b57acf}{output\+\_\+formatting\+::stringify\+\_\+large\+\_\+ints\+\_\+and\+\_\+doubles}})
+\item 
+static \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{classfc_1_1json_ae6c022ab581a9552ae2c97ff5d73aaf8}{to\+\_\+pretty\+\_\+string}} (const \mbox{\hyperlink{classfc_1_1variant}{variant}} \&v, const \mbox{\hyperlink{classfc_1_1json_ab3f3e006979a528f3f56acd4e43fe8bc}{yield\+\_\+function\+\_\+t}} \&yield, const \mbox{\hyperlink{classfc_1_1json_afb6b3878fb58ad18c6c85f2f964bd998}{output\+\_\+formatting}} \mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}=\mbox{\hyperlink{classfc_1_1json_afb6b3878fb58ad18c6c85f2f964bd998a600e70d661c425431c4bf2dc28b57acf}{output\+\_\+formatting\+::stringify\+\_\+large\+\_\+ints\+\_\+and\+\_\+doubles}})
+\item 
+static bool \mbox{\hyperlink{classfc_1_1json_a16e86479a3669137ca26e4b96572d70f}{is\+\_\+valid}} (const std\+::string \&json\+\_\+str, const \mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788}{parse\+\_\+type}} ptype=\mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788aa7d2f7881e4fbc4c5aae78d9b67beebe}{parse\+\_\+type\+::legacy\+\_\+parser}}, const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} max\+\_\+depth=\mbox{\hyperlink{json_8hpp_aee45ef1ffa047f0cdfef5fc453a98ac6}{DEFAULT\+\_\+\+MAX\+\_\+\+RECURSION\+\_\+\+DEPTH}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\static bool \mbox{\hyperlink{classfc_1_1json_a7d6bb8dc49fecafcf96688c5202b22e5}{save\+\_\+to\+\_\+file}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&v, const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&fi, const bool pretty=true, const \mbox{\hyperlink{classfc_1_1json_afb6b3878fb58ad18c6c85f2f964bd998}{output\+\_\+formatting}} \mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}=\mbox{\hyperlink{classfc_1_1json_afb6b3878fb58ad18c6c85f2f964bd998a600e70d661c425431c4bf2dc28b57acf}{output\+\_\+formatting\+::stringify\+\_\+large\+\_\+ints\+\_\+and\+\_\+doubles}})
+\item 
+static bool \mbox{\hyperlink{classfc_1_1json_af7a9b05ad5ada8666928af2aa139ed5e}{save\+\_\+to\+\_\+file}} (const \mbox{\hyperlink{classfc_1_1variant}{variant}} \&v, const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&fi, const bool pretty=true, const \mbox{\hyperlink{classfc_1_1json_afb6b3878fb58ad18c6c85f2f964bd998}{output\+\_\+formatting}} \mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}=\mbox{\hyperlink{classfc_1_1json_afb6b3878fb58ad18c6c85f2f964bd998a600e70d661c425431c4bf2dc28b57acf}{output\+\_\+formatting\+::stringify\+\_\+large\+\_\+ints\+\_\+and\+\_\+doubles}})
+\item 
+static \mbox{\hyperlink{classfc_1_1variant}{variant}} \mbox{\hyperlink{classfc_1_1json_a0b324722ac4eb4541d50ddaeed2dcb65}{from\+\_\+file}} (const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}, const \mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788}{parse\+\_\+type}} ptype=\mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788aa7d2f7881e4fbc4c5aae78d9b67beebe}{parse\+\_\+type\+::legacy\+\_\+parser}}, const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} max\+\_\+depth=\mbox{\hyperlink{json_8hpp_aee45ef1ffa047f0cdfef5fc453a98ac6}{DEFAULT\+\_\+\+MAX\+\_\+\+RECURSION\+\_\+\+DEPTH}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\static \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{classfc_1_1json_aa861e0a1b66eeaeb0cbdf2c81f3855d1}{from\+\_\+file}} (const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}, const \mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788}{parse\+\_\+type}} ptype=\mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788aa7d2f7881e4fbc4c5aae78d9b67beebe}{parse\+\_\+type\+::legacy\+\_\+parser}}, const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} max\+\_\+depth=\mbox{\hyperlink{json_8hpp_aee45ef1ffa047f0cdfef5fc453a98ac6}{DEFAULT\+\_\+\+MAX\+\_\+\+RECURSION\+\_\+\+DEPTH}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\static \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{classfc_1_1json_a32307d930967fd5936e6abea74af1088}{to\+\_\+string}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&v, const \mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}} \&deadline, const \mbox{\hyperlink{classfc_1_1json_afb6b3878fb58ad18c6c85f2f964bd998}{output\+\_\+formatting}} \mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}=\mbox{\hyperlink{classfc_1_1json_afb6b3878fb58ad18c6c85f2f964bd998a600e70d661c425431c4bf2dc28b57acf}{output\+\_\+formatting\+::stringify\+\_\+large\+\_\+ints\+\_\+and\+\_\+doubles}}, const \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} max\+\_\+len=\mbox{\hyperlink{classfc_1_1json_ae336bf3cde4ed97f08f768736fa1e278}{max\+\_\+length\+\_\+limit}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\static \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{classfc_1_1json_a8b842fa420717b6cb0c16f410494cf31}{to\+\_\+pretty\+\_\+string}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&v, const \mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}} \&deadline=\mbox{\hyperlink{classfc_1_1time__point_aeccf1b70aa34b132c5269313b8a50573}{fc\+::time\+\_\+point\+::maximum}}(), const \mbox{\hyperlink{classfc_1_1json_afb6b3878fb58ad18c6c85f2f964bd998}{output\+\_\+formatting}} \mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}=\mbox{\hyperlink{classfc_1_1json_afb6b3878fb58ad18c6c85f2f964bd998a600e70d661c425431c4bf2dc28b57acf}{output\+\_\+formatting\+::stringify\+\_\+large\+\_\+ints\+\_\+and\+\_\+doubles}}, const \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} max\+\_\+len=\mbox{\hyperlink{classfc_1_1json_ae336bf3cde4ed97f08f768736fa1e278}{max\+\_\+length\+\_\+limit}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\static bool \mbox{\hyperlink{classfc_1_1json_adcf0faf2a62916ccab34c12932fc7616}{save\+\_\+to\+\_\+file}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&v, const std\+::string \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}, const bool pretty=true, const \mbox{\hyperlink{classfc_1_1json_afb6b3878fb58ad18c6c85f2f964bd998}{output\+\_\+formatting}} \mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}=\mbox{\hyperlink{classfc_1_1json_afb6b3878fb58ad18c6c85f2f964bd998a600e70d661c425431c4bf2dc28b57acf}{output\+\_\+formatting\+::stringify\+\_\+large\+\_\+ints\+\_\+and\+\_\+doubles}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static constexpr \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{classfc_1_1json_ae336bf3cde4ed97f08f768736fa1e278}{max\+\_\+length\+\_\+limit}} = std\+::numeric\+\_\+limits$<$\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}$>$\+::max()
+\item 
+static constexpr size\+\_\+t \mbox{\hyperlink{classfc_1_1json_a9aa90f1a72da7a0221ed61bc941dfcd7}{escape\+\_\+string\+\_\+yield\+\_\+check\+\_\+count}} = 128
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Provides interface for json serialization.
+
+json strings are always \doxylink{struct_u_t_f8}{UTF8} 
+
+Definition at line \mbox{\hyperlink{json_8hpp_source_l00019}{19}} of file \mbox{\hyperlink{json_8hpp_source}{json.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classfc_1_1json_ab3f3e006979a528f3f56acd4e43fe8bc}\index{fc::json@{fc::json}!yield\_function\_t@{yield\_function\_t}}
+\index{yield\_function\_t@{yield\_function\_t}!fc::json@{fc::json}}
+\doxysubsubsection{\texorpdfstring{yield\_function\_t}{yield\_function\_t}}
+{\footnotesize\ttfamily \label{classfc_1_1json_ab3f3e006979a528f3f56acd4e43fe8bc} 
+using \mbox{\hyperlink{classfc_1_1json_ab3f3e006979a528f3f56acd4e43fe8bc}{fc\+::json\+::yield\+\_\+function\+\_\+t}} = \mbox{\hyperlink{classfc_1_1optional__delegate}{fc\+::optional\+\_\+delegate}}$<$void(size\+\_\+t)$>$}
+
+
+
+Definition at line \mbox{\hyperlink{json_8hpp_source_l00034}{34}} of file \mbox{\hyperlink{json_8hpp_source}{json.\+hpp}}.
+
+
+
+\doxysubsection{Member Enumeration Documentation}
+\Hypertarget{classfc_1_1json_afb6b3878fb58ad18c6c85f2f964bd998}\index{fc::json@{fc::json}!output\_formatting@{output\_formatting}}
+\index{output\_formatting@{output\_formatting}!fc::json@{fc::json}}
+\doxysubsubsection{\texorpdfstring{output\_formatting}{output\_formatting}}
+{\footnotesize\ttfamily \label{classfc_1_1json_afb6b3878fb58ad18c6c85f2f964bd998} 
+enum \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classfc_1_1json_afb6b3878fb58ad18c6c85f2f964bd998}{fc\+::json\+::output\+\_\+formatting}} \+: unsigned char\hspace{0.3cm}{\ttfamily [strong]}}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{stringify\_large\_ints\_and\_doubles@{stringify\_large\_ints\_and\_doubles}!fc::json@{fc::json}}\index{fc::json@{fc::json}!stringify\_large\_ints\_and\_doubles@{stringify\_large\_ints\_and\_doubles}}}\Hypertarget{classfc_1_1json_afb6b3878fb58ad18c6c85f2f964bd998a600e70d661c425431c4bf2dc28b57acf}\label{classfc_1_1json_afb6b3878fb58ad18c6c85f2f964bd998} 
+stringify\+\_\+large\+\_\+ints\+\_\+and\+\_\+doubles&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{legacy\_generator@{legacy\_generator}!fc::json@{fc::json}}\index{fc::json@{fc::json}!legacy\_generator@{legacy\_generator}}}\Hypertarget{classfc_1_1json_afb6b3878fb58ad18c6c85f2f964bd998af29772e49cee90c19d21fbb60a3f88d4}\label{classfc_1_1json_afb6b3878fb58ad18c6c85f2f964bd998} 
+legacy\+\_\+generator&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{json_8hpp_source_l00029}{29}} of file \mbox{\hyperlink{json_8hpp_source}{json.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1json_afb6b3878fb58ad18c6c85f2f964bd998a600e70d661c425431c4bf2dc28b57acf}{stringify\_large\_ints\_and\_doubles}}\ =\ 0,}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1json_afb6b3878fb58ad18c6c85f2f964bd998af29772e49cee90c19d21fbb60a3f88d4}{legacy\_generator}}\ =\ 1}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \};}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788}\index{fc::json@{fc::json}!parse\_type@{parse\_type}}
+\index{parse\_type@{parse\_type}!fc::json@{fc::json}}
+\doxysubsubsection{\texorpdfstring{parse\_type}{parse\_type}}
+{\footnotesize\ttfamily \label{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788} 
+enum \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788}{fc\+::json\+::parse\+\_\+type}} \+: unsigned char\hspace{0.3cm}{\ttfamily [strong]}}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{legacy\_parser@{legacy\_parser}!fc::json@{fc::json}}\index{fc::json@{fc::json}!legacy\_parser@{legacy\_parser}}}\Hypertarget{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788aa7d2f7881e4fbc4c5aae78d9b67beebe}\label{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788} 
+legacy\+\_\+parser&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{strict\_parser@{strict\_parser}!fc::json@{fc::json}}\index{fc::json@{fc::json}!strict\_parser@{strict\_parser}}}\Hypertarget{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788a5fc1d56a3deaf9031e0d974ccc08a63e}\label{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788} 
+strict\+\_\+parser&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{relaxed\_parser@{relaxed\_parser}!fc::json@{fc::json}}\index{fc::json@{fc::json}!relaxed\_parser@{relaxed\_parser}}}\Hypertarget{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788a843ff9a876d06313fa83ab6b39086170}\label{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788} 
+relaxed\+\_\+parser&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{legacy\_parser\_with\_string\_doubles@{legacy\_parser\_with\_string\_doubles}!fc::json@{fc::json}}\index{fc::json@{fc::json}!legacy\_parser\_with\_string\_doubles@{legacy\_parser\_with\_string\_doubles}}}\Hypertarget{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788ad00f2b912d7e65fd24ae34f52cd14a38}\label{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788} 
+legacy\+\_\+parser\+\_\+with\+\_\+string\+\_\+doubles&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{json_8hpp_source_l00022}{22}} of file \mbox{\hyperlink{json_8hpp_source}{json.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788aa7d2f7881e4fbc4c5aae78d9b67beebe}{legacy\_parser}}\ \ \ \ \ \ \ \ \ =\ 0,}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788a5fc1d56a3deaf9031e0d974ccc08a63e}{strict\_parser}}\ \ \ \ \ \ \ \ \ =\ 1,}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788a843ff9a876d06313fa83ab6b39086170}{relaxed\_parser}}\ \ \ \ \ \ \ \ =\ 2,}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788ad00f2b912d7e65fd24ae34f52cd14a38}{legacy\_parser\_with\_string\_doubles}}\ =\ 3}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1json_a0b324722ac4eb4541d50ddaeed2dcb65}\index{fc::json@{fc::json}!from\_file@{from\_file}}
+\index{from\_file@{from\_file}!fc::json@{fc::json}}
+\doxysubsubsection{\texorpdfstring{from\_file()}{from\_file()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1json_a0b324722ac4eb4541d50ddaeed2dcb65} 
+\mbox{\hyperlink{classfc_1_1variant}{variant}} fc\+::json\+::from\+\_\+file (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&}]{p}{, }\item[{const \mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788}{parse\+\_\+type}}}]{ptype}{ = {\ttfamily \mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788aa7d2f7881e4fbc4c5aae78d9b67beebe}{parse\+\_\+type\+::legacy\+\_\+parser}}}, }\item[{const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{max\+\_\+depth}{ = {\ttfamily \mbox{\hyperlink{json_8hpp_aee45ef1ffa047f0cdfef5fc453a98ac6}{DEFAULT\+\_\+\+MAX\+\_\+\+RECURSION\+\_\+\+DEPTH}}}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{json_8cpp_source_l00797}{797}} of file \mbox{\hyperlink{json_8cpp_source}{json.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00798\ \ \ \ \{}
+\DoxyCodeLine{00799\ \ \ \ \ \ \ \textcolor{comment}{//auto\ tmp\ =\ std::make\_shared<fc::ifstream>(\ p,\ ifstream::binary\ );}}
+\DoxyCodeLine{00800\ \ \ \ \ \ \ \textcolor{comment}{//auto\ tmp\ =\ std::make\_shared<std::ifstream>(\ p.generic\_string().c\_str(),\ std::ios::binary\ );}}
+\DoxyCodeLine{00801\ \ \ \ \ \ \ \textcolor{comment}{//buffered\_istream\ bi(\ tmp\ );}}
+\DoxyCodeLine{00802\ \ \ \ \ \ \ boost::filesystem::ifstream\ bi(\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\ std::ios::binary\ );}
+\DoxyCodeLine{00803\ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(\ ptype\ )}
+\DoxyCodeLine{00804\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00805\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788aa7d2f7881e4fbc4c5aae78d9b67beebe}{json::parse\_type::legacy\_parser}}:}
+\DoxyCodeLine{00806\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_aea26b5fef1951af5f8c449fb5c2b9ef3}{variant\_from\_stream<boost::filesystem::ifstream,\ json::parse\_type::legacy\_parser>}}(\ bi,\ max\_depth\ );}
+\DoxyCodeLine{00807\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788ad00f2b912d7e65fd24ae34f52cd14a38}{json::parse\_type::legacy\_parser\_with\_string\_doubles}}:}
+\DoxyCodeLine{00808\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_aea26b5fef1951af5f8c449fb5c2b9ef3}{variant\_from\_stream<boost::filesystem::ifstream,\ json::parse\_type::legacy\_parser\_with\_string\_doubles>}}(\ bi,\ max\_depth\ );}
+\DoxyCodeLine{00809\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788a5fc1d56a3deaf9031e0d974ccc08a63e}{json::parse\_type::strict\_parser}}:}
+\DoxyCodeLine{00810\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_1_1json__relaxed_a93f8ed4a8dfc1215a360508b01460758}{json\_relaxed::variant\_from\_stream<boost::filesystem::ifstream,\ true>}}(\ bi,\ max\_depth\ );}
+\DoxyCodeLine{00811\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788a843ff9a876d06313fa83ab6b39086170}{json::parse\_type::relaxed\_parser}}:}
+\DoxyCodeLine{00812\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_1_1json__relaxed_a93f8ed4a8dfc1215a360508b01460758}{json\_relaxed::variant\_from\_stream<boost::filesystem::ifstream,\ false>}}(\ bi,\ max\_depth\ );}
+\DoxyCodeLine{00813\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00814\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ \textcolor{keyword}{false},\ \textcolor{stringliteral}{"{}Unknown\ JSON\ parser\ type\ \{ptype\}"{}},\ (\textcolor{stringliteral}{"{}ptype"{}},\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(ptype))\ );}
+\DoxyCodeLine{00815\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00816\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1json_a0b324722ac4eb4541d50ddaeed2dcb65_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1json_a0b324722ac4eb4541d50ddaeed2dcb65_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1json_aa861e0a1b66eeaeb0cbdf2c81f3855d1}\index{fc::json@{fc::json}!from\_file@{from\_file}}
+\index{from\_file@{from\_file}!fc::json@{fc::json}}
+\doxysubsubsection{\texorpdfstring{from\_file()}{from\_file()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1json_aa861e0a1b66eeaeb0cbdf2c81f3855d1} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+static \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} fc\+::json\+::from\+\_\+file (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&}]{p}{, }\item[{const \mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788}{parse\+\_\+type}}}]{ptype}{ = {\ttfamily \mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788aa7d2f7881e4fbc4c5aae78d9b67beebe}{parse\+\_\+type\+::legacy\+\_\+parser}}}, }\item[{const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{max\+\_\+depth}{ = {\ttfamily \mbox{\hyperlink{json_8hpp_aee45ef1ffa047f0cdfef5fc453a98ac6}{DEFAULT\+\_\+\+MAX\+\_\+\+RECURSION\+\_\+\+DEPTH}}}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{json_8hpp_source_l00054}{54}} of file \mbox{\hyperlink{json_8hpp_source}{json.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1json_a0b324722ac4eb4541d50ddaeed2dcb65}{json::from\_file}}(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\ ptype,\ max\_depth).\mbox{\hyperlink{classfc_1_1variant_a82edd1f33199355d3a1f19bbb92909cc}{as}}<\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}>();}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1json_aa861e0a1b66eeaeb0cbdf2c81f3855d1_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1json_afad69f9f9c2a9f0105aae99f532f90cb}\index{fc::json@{fc::json}!from\_string@{from\_string}}
+\index{from\_string@{from\_string}!fc::json@{fc::json}}
+\doxysubsubsection{\texorpdfstring{from\_string()}{from\_string()}}
+{\footnotesize\ttfamily \label{classfc_1_1json_afad69f9f9c2a9f0105aae99f532f90cb} 
+\mbox{\hyperlink{classfc_1_1variant}{variant}} fc\+::json\+::from\+\_\+string (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&}]{utf8\+\_\+str}{, }\item[{const \mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788}{parse\+\_\+type}}}]{ptype}{ = {\ttfamily \mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788aa7d2f7881e4fbc4c5aae78d9b67beebe}{parse\+\_\+type\+::legacy\+\_\+parser}}}, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{max\+\_\+depth}{ = {\ttfamily \mbox{\hyperlink{json_8hpp_aee45ef1ffa047f0cdfef5fc453a98ac6}{DEFAULT\+\_\+\+MAX\+\_\+\+RECURSION\+\_\+\+DEPTH}}}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{json_8cpp_source_l00442}{442}} of file \mbox{\hyperlink{json_8cpp_source}{json.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00443\ \ \ \ \{\ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00444\ \ \ \ \ \ \ std::stringstream\ in(\ utf8\_str\ );}
+\DoxyCodeLine{00445\ \ \ \ \ \ \ \textcolor{comment}{//in.exceptions(\ std::ifstream::eofbit\ );}}
+\DoxyCodeLine{00446\ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(\ ptype\ )}
+\DoxyCodeLine{00447\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00448\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788aa7d2f7881e4fbc4c5aae78d9b67beebe}{parse\_type::legacy\_parser}}:}
+\DoxyCodeLine{00449\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_aea26b5fef1951af5f8c449fb5c2b9ef3}{variant\_from\_stream<std::stringstream,\ json::parse\_type::legacy\_parser>}}(\ in,\ max\_depth\ );}
+\DoxyCodeLine{00450\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788ad00f2b912d7e65fd24ae34f52cd14a38}{parse\_type::legacy\_parser\_with\_string\_doubles}}:}
+\DoxyCodeLine{00451\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_aea26b5fef1951af5f8c449fb5c2b9ef3}{variant\_from\_stream<std::stringstream,\ json::parse\_type::legacy\_parser\_with\_string\_doubles>}}(\ in,\ max\_depth\ );}
+\DoxyCodeLine{00452\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788a5fc1d56a3deaf9031e0d974ccc08a63e}{parse\_type::strict\_parser}}:}
+\DoxyCodeLine{00453\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_1_1json__relaxed_a93f8ed4a8dfc1215a360508b01460758}{json\_relaxed::variant\_from\_stream<std::stringstream,\ true>}}(\ in,\ max\_depth\ );}
+\DoxyCodeLine{00454\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788a843ff9a876d06313fa83ab6b39086170}{parse\_type::relaxed\_parser}}:}
+\DoxyCodeLine{00455\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_1_1json__relaxed_a93f8ed4a8dfc1215a360508b01460758}{json\_relaxed::variant\_from\_stream<std::stringstream,\ false>}}(\ in,\ max\_depth\ );}
+\DoxyCodeLine{00456\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00457\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ \textcolor{keyword}{false},\ \textcolor{stringliteral}{"{}Unknown\ JSON\ parser\ type\ \{ptype\}"{}},\ (\textcolor{stringliteral}{"{}ptype"{}},\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(ptype))\ );}
+\DoxyCodeLine{00458\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00459\ \ \ \ \}\ \mbox{\hyperlink{exception_8hpp_af3731d6e3beb140d9e652adf7a18113b}{FC\_RETHROW\_EXCEPTIONS}}(\ warn,\ \textcolor{stringliteral}{"{}"{}},\ (\textcolor{stringliteral}{"{}str"{}},utf8\_str)\ )\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1json_afad69f9f9c2a9f0105aae99f532f90cb_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1json_afad69f9f9c2a9f0105aae99f532f90cb_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1json_a16e86479a3669137ca26e4b96572d70f}\index{fc::json@{fc::json}!is\_valid@{is\_valid}}
+\index{is\_valid@{is\_valid}!fc::json@{fc::json}}
+\doxysubsubsection{\texorpdfstring{is\_valid()}{is\_valid()}}
+{\footnotesize\ttfamily \label{classfc_1_1json_a16e86479a3669137ca26e4b96572d70f} 
+bool fc\+::json\+::is\+\_\+valid (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{json\+\_\+str}{, }\item[{const \mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788}{parse\+\_\+type}}}]{ptype}{ = {\ttfamily \mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788aa7d2f7881e4fbc4c5aae78d9b67beebe}{parse\+\_\+type\+::legacy\+\_\+parser}}}, }\item[{const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{max\+\_\+depth}{ = {\ttfamily \mbox{\hyperlink{json_8hpp_aee45ef1ffa047f0cdfef5fc453a98ac6}{DEFAULT\+\_\+\+MAX\+\_\+\+RECURSION\+\_\+\+DEPTH}}}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{json_8cpp_source_l00836}{836}} of file \mbox{\hyperlink{json_8cpp_source}{json.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00837\ \ \ \ \{}
+\DoxyCodeLine{00838\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ utf8\_str.size()\ ==\ 0\ )\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00839\ \ \ \ \ \ \ std::stringstream\ in(\ utf8\_str\ );}
+\DoxyCodeLine{00840\ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(\ ptype\ )}
+\DoxyCodeLine{00841\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00842\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788aa7d2f7881e4fbc4c5aae78d9b67beebe}{json::parse\_type::legacy\_parser}}:}
+\DoxyCodeLine{00843\ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_aea26b5fef1951af5f8c449fb5c2b9ef3}{variant\_from\_stream<std::stringstream,\ json::parse\_type::legacy\_parser>}}(\ in,\ max\_depth\ );}
+\DoxyCodeLine{00844\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00845\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788ad00f2b912d7e65fd24ae34f52cd14a38}{json::parse\_type::legacy\_parser\_with\_string\_doubles}}:}
+\DoxyCodeLine{00846\ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_aea26b5fef1951af5f8c449fb5c2b9ef3}{variant\_from\_stream<std::stringstream,\ json::parse\_type::legacy\_parser\_with\_string\_doubles>}}(\ in,\ max\_depth\ );}
+\DoxyCodeLine{00847\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00848\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788a5fc1d56a3deaf9031e0d974ccc08a63e}{json::parse\_type::strict\_parser}}:}
+\DoxyCodeLine{00849\ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1json__relaxed_a93f8ed4a8dfc1215a360508b01460758}{json\_relaxed::variant\_from\_stream<std::stringstream,\ true>}}(\ in,\ max\_depth\ );}
+\DoxyCodeLine{00850\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00851\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788a843ff9a876d06313fa83ab6b39086170}{json::parse\_type::relaxed\_parser}}:}
+\DoxyCodeLine{00852\ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1json__relaxed_a93f8ed4a8dfc1215a360508b01460758}{json\_relaxed::variant\_from\_stream<std::stringstream,\ false>}}(\ in,\ max\_depth\ );}
+\DoxyCodeLine{00853\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00854\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00855\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ \textcolor{keyword}{false},\ \textcolor{stringliteral}{"{}Unknown\ JSON\ parser\ type\ \{ptype\}"{}},\ (\textcolor{stringliteral}{"{}ptype"{}},\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(ptype))\ );}
+\DoxyCodeLine{00856\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00857\ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{\ in.peek();\ \}\ \textcolor{keywordflow}{catch}\ (\ \textcolor{keyword}{const}\ eof\_exception\&\ e\ )\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \}}
+\DoxyCodeLine{00858\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00859\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1json_a16e86479a3669137ca26e4b96572d70f_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1json_a7d6bb8dc49fecafcf96688c5202b22e5}\index{fc::json@{fc::json}!save\_to\_file@{save\_to\_file}}
+\index{save\_to\_file@{save\_to\_file}!fc::json@{fc::json}}
+\doxysubsubsection{\texorpdfstring{save\_to\_file()}{save\_to\_file()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{classfc_1_1json_a7d6bb8dc49fecafcf96688c5202b22e5} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+static bool fc\+::json\+::save\+\_\+to\+\_\+file (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{v}{, }\item[{const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&}]{fi}{, }\item[{const bool}]{pretty}{ = {\ttfamily true}, }\item[{const \mbox{\hyperlink{classfc_1_1json_afb6b3878fb58ad18c6c85f2f964bd998}{output\+\_\+formatting}}}]{format}{ = {\ttfamily \mbox{\hyperlink{classfc_1_1json_afb6b3878fb58ad18c6c85f2f964bd998a600e70d661c425431c4bf2dc28b57acf}{output\+\_\+formatting\+::stringify\+\_\+large\+\_\+ints\+\_\+and\+\_\+doubles}}}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{json_8hpp_source_l00045}{45}} of file \mbox{\hyperlink{json_8hpp_source}{json.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1json_a7d6bb8dc49fecafcf96688c5202b22e5}{save\_to\_file}}(\ variant(v),\ fi,\ pretty,\ \mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}\ );}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=187pt]{classfc_1_1json_a7d6bb8dc49fecafcf96688c5202b22e5_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1json_a7d6bb8dc49fecafcf96688c5202b22e5_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1json_adcf0faf2a62916ccab34c12932fc7616}\index{fc::json@{fc::json}!save\_to\_file@{save\_to\_file}}
+\index{save\_to\_file@{save\_to\_file}!fc::json@{fc::json}}
+\doxysubsubsection{\texorpdfstring{save\_to\_file()}{save\_to\_file()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{classfc_1_1json_adcf0faf2a62916ccab34c12932fc7616} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+static bool fc\+::json\+::save\+\_\+to\+\_\+file (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{v}{, }\item[{const std\+::string \&}]{p}{, }\item[{const bool}]{pretty}{ = {\ttfamily true}, }\item[{const \mbox{\hyperlink{classfc_1_1json_afb6b3878fb58ad18c6c85f2f964bd998}{output\+\_\+formatting}}}]{format}{ = {\ttfamily \mbox{\hyperlink{classfc_1_1json_afb6b3878fb58ad18c6c85f2f964bd998a600e70d661c425431c4bf2dc28b57acf}{output\+\_\+formatting\+::stringify\+\_\+large\+\_\+ints\+\_\+and\+\_\+doubles}}}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{json_8hpp_source_l00080}{80}} of file \mbox{\hyperlink{json_8hpp_source}{json.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1json_a7d6bb8dc49fecafcf96688c5202b22e5}{save\_to\_file}}(\ variant(v),\ \mbox{\hyperlink{classfc_1_1path}{fc::path}}(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}),\ pretty,\ \mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}\ );}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=330pt]{classfc_1_1json_adcf0faf2a62916ccab34c12932fc7616_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1json_af7a9b05ad5ada8666928af2aa139ed5e}\index{fc::json@{fc::json}!save\_to\_file@{save\_to\_file}}
+\index{save\_to\_file@{save\_to\_file}!fc::json@{fc::json}}
+\doxysubsubsection{\texorpdfstring{save\_to\_file()}{save\_to\_file()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{classfc_1_1json_af7a9b05ad5ada8666928af2aa139ed5e} 
+bool fc\+::json\+::save\+\_\+to\+\_\+file (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1variant}{variant}} \&}]{v}{, }\item[{const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&}]{fi}{, }\item[{const bool}]{pretty}{ = {\ttfamily true}, }\item[{const \mbox{\hyperlink{classfc_1_1json_afb6b3878fb58ad18c6c85f2f964bd998}{output\+\_\+formatting}}}]{format}{ = {\ttfamily \mbox{\hyperlink{classfc_1_1json_afb6b3878fb58ad18c6c85f2f964bd998a600e70d661c425431c4bf2dc28b57acf}{output\+\_\+formatting\+::stringify\+\_\+large\+\_\+ints\+\_\+and\+\_\+doubles}}}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{json_8cpp_source_l00781}{781}} of file \mbox{\hyperlink{json_8cpp_source}{json.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00782\ \ \ \ \{}
+\DoxyCodeLine{00783\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ pretty\ )\ \{}
+\DoxyCodeLine{00784\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}\ =\ \mbox{\hyperlink{classfc_1_1json_ae6c022ab581a9552ae2c97ff5d73aaf8}{json::to\_pretty\_string}}(\ v,\ \mbox{\hyperlink{classfc_1_1time__point_aeccf1b70aa34b132c5269313b8a50573}{fc::time\_point::maximum}}(),\ \mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}},\ \mbox{\hyperlink{classfc_1_1json_ae336bf3cde4ed97f08f768736fa1e278}{max\_length\_limit}}\ );}
+\DoxyCodeLine{00785\ \ \ \ \ \ \ \ \ \ std::ofstream\ o(fi.\mbox{\hyperlink{classfc_1_1path_ab1eae2062df4ea01435348ec52fb3784}{generic\_string}}().c\_str());}
+\DoxyCodeLine{00786\ \ \ \ \ \ \ \ \ \ o.write(\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}.c\_str(),\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}.size()\ );}
+\DoxyCodeLine{00787\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ o.good();}
+\DoxyCodeLine{00788\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00789\ \ \ \ \ \ \ \ \ \ std::ofstream\ o(fi.\mbox{\hyperlink{classfc_1_1path_ab1eae2062df4ea01435348ec52fb3784}{generic\_string}}().c\_str());}
+\DoxyCodeLine{00790\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespaceboost_1_1fibers_1_1asio_a65142b77539b20ba6d2abb35a0d4f5d2}{yield}}\ =\ [\&](\textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})\ \{}
+\DoxyCodeLine{00791\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ no\ limitation}}
+\DoxyCodeLine{00792\ \ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00793\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_af9bea69c5790941ddc601fcd96cce071}{fc::to\_stream}}(\ o,\ v,\ yield,\ \mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}\ );}
+\DoxyCodeLine{00794\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ o.good();}
+\DoxyCodeLine{00795\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00796\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1json_af7a9b05ad5ada8666928af2aa139ed5e_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1json_a8b842fa420717b6cb0c16f410494cf31}\index{fc::json@{fc::json}!to\_pretty\_string@{to\_pretty\_string}}
+\index{to\_pretty\_string@{to\_pretty\_string}!fc::json@{fc::json}}
+\doxysubsubsection{\texorpdfstring{to\_pretty\_string()}{to\_pretty\_string()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1json_a8b842fa420717b6cb0c16f410494cf31} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+static \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} fc\+::json\+::to\+\_\+pretty\+\_\+string (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{v}{, }\item[{const \mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}} \&}]{deadline}{ = {\ttfamily \mbox{\hyperlink{classfc_1_1time__point_aeccf1b70aa34b132c5269313b8a50573}{fc\+::time\+\_\+point\+::maximum}}()}, }\item[{const \mbox{\hyperlink{classfc_1_1json_afb6b3878fb58ad18c6c85f2f964bd998}{output\+\_\+formatting}}}]{format}{ = {\ttfamily \mbox{\hyperlink{classfc_1_1json_afb6b3878fb58ad18c6c85f2f964bd998a600e70d661c425431c4bf2dc28b57acf}{output\+\_\+formatting\+::stringify\+\_\+large\+\_\+ints\+\_\+and\+\_\+doubles}}}, }\item[{const \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{max\+\_\+len}{ = {\ttfamily \mbox{\hyperlink{classfc_1_1json_ae336bf3cde4ed97f08f768736fa1e278}{max\+\_\+length\+\_\+limit}}}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{json_8hpp_source_l00070}{70}} of file \mbox{\hyperlink{json_8hpp_source}{json.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespaceboost_1_1fibers_1_1asio_a65142b77539b20ba6d2abb35a0d4f5d2}{yield}}\ =\ [\&](\textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})\ \{}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a03f2a3185ee8e8b39a309dfd336b64b5}{FC\_CHECK\_DEADLINE}}(deadline);}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ <=\ max\_len\ );}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1json_ae6c022ab581a9552ae2c97ff5d73aaf8}{to\_pretty\_string}}(\ variant(v),\ yield,\ \mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}\ );}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1json_a8b842fa420717b6cb0c16f410494cf31_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1json_ae6c022ab581a9552ae2c97ff5d73aaf8}\index{fc::json@{fc::json}!to\_pretty\_string@{to\_pretty\_string}}
+\index{to\_pretty\_string@{to\_pretty\_string}!fc::json@{fc::json}}
+\doxysubsubsection{\texorpdfstring{to\_pretty\_string()}{to\_pretty\_string()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1json_ae6c022ab581a9552ae2c97ff5d73aaf8} 
+std\+::string fc\+::json\+::to\+\_\+pretty\+\_\+string (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1variant}{variant}} \&}]{v}{, }\item[{const \mbox{\hyperlink{classfc_1_1json_ab3f3e006979a528f3f56acd4e43fe8bc}{yield\+\_\+function\+\_\+t}} \&}]{yield}{, }\item[{const \mbox{\hyperlink{classfc_1_1json_afb6b3878fb58ad18c6c85f2f964bd998}{output\+\_\+formatting}}}]{format}{ = {\ttfamily \mbox{\hyperlink{classfc_1_1json_afb6b3878fb58ad18c6c85f2f964bd998a600e70d661c425431c4bf2dc28b57acf}{output\+\_\+formatting\+::stringify\+\_\+large\+\_\+ints\+\_\+and\+\_\+doubles}}}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{json_8cpp_source_l00775}{775}} of file \mbox{\hyperlink{json_8cpp_source}{json.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00775\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00776\ }
+\DoxyCodeLine{00777\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ =\ \mbox{\hyperlink{classfc_1_1json_aa6541960d7f05567559b866cfaf88dfa}{to\_string}}(v,\ yield,\ \mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}});}
+\DoxyCodeLine{00778\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_ac11f6266177ed5f42e899ccc37550181}{pretty\_print}}(\ std::move(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ ),\ 2);}
+\DoxyCodeLine{00779\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1json_ae6c022ab581a9552ae2c97ff5d73aaf8_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{classfc_1_1json_ae6c022ab581a9552ae2c97ff5d73aaf8_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1json_a32307d930967fd5936e6abea74af1088}\index{fc::json@{fc::json}!to\_string@{to\_string}}
+\index{to\_string@{to\_string}!fc::json@{fc::json}}
+\doxysubsubsection{\texorpdfstring{to\_string()}{to\_string()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1json_a32307d930967fd5936e6abea74af1088} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+static \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} fc\+::json\+::to\+\_\+string (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{v}{, }\item[{const \mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}} \&}]{deadline}{, }\item[{const \mbox{\hyperlink{classfc_1_1json_afb6b3878fb58ad18c6c85f2f964bd998}{output\+\_\+formatting}}}]{format}{ = {\ttfamily \mbox{\hyperlink{classfc_1_1json_afb6b3878fb58ad18c6c85f2f964bd998a600e70d661c425431c4bf2dc28b57acf}{output\+\_\+formatting\+::stringify\+\_\+large\+\_\+ints\+\_\+and\+\_\+doubles}}}, }\item[{const \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{max\+\_\+len}{ = {\ttfamily \mbox{\hyperlink{classfc_1_1json_ae336bf3cde4ed97f08f768736fa1e278}{max\+\_\+length\+\_\+limit}}}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{json_8hpp_source_l00060}{60}} of file \mbox{\hyperlink{json_8hpp_source}{json.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespaceboost_1_1fibers_1_1asio_a65142b77539b20ba6d2abb35a0d4f5d2}{yield}}\ =\ [\&](\textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})\ \{}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a03f2a3185ee8e8b39a309dfd336b64b5}{FC\_CHECK\_DEADLINE}}(deadline);}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ <=\ max\_len);}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1json_aa6541960d7f05567559b866cfaf88dfa}{to\_string}}(\ variant(v),\ yield,\ \mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}\ );}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1json_a32307d930967fd5936e6abea74af1088_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1json_aa6541960d7f05567559b866cfaf88dfa}\index{fc::json@{fc::json}!to\_string@{to\_string}}
+\index{to\_string@{to\_string}!fc::json@{fc::json}}
+\doxysubsubsection{\texorpdfstring{to\_string()}{to\_string()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1json_aa6541960d7f05567559b866cfaf88dfa} 
+std\+::string fc\+::json\+::to\+\_\+string (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1variant}{variant}} \&}]{v}{, }\item[{const \mbox{\hyperlink{classfc_1_1json_ab3f3e006979a528f3f56acd4e43fe8bc}{yield\+\_\+function\+\_\+t}} \&}]{yield}{, }\item[{const \mbox{\hyperlink{classfc_1_1json_afb6b3878fb58ad18c6c85f2f964bd998}{output\+\_\+formatting}}}]{format}{ = {\ttfamily \mbox{\hyperlink{classfc_1_1json_afb6b3878fb58ad18c6c85f2f964bd998a600e70d661c425431c4bf2dc28b57acf}{output\+\_\+formatting\+::stringify\+\_\+large\+\_\+ints\+\_\+and\+\_\+doubles}}}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{json_8cpp_source_l00674}{674}} of file \mbox{\hyperlink{json_8cpp_source}{json.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00675\ \ \ \ \{}
+\DoxyCodeLine{00676\ \ \ \ \ \ \ std::stringstream\ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}};}
+\DoxyCodeLine{00677\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_af9bea69c5790941ddc601fcd96cce071}{fc::to\_stream}}(\ ss,\ v,\ yield,\ \mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}\ );}
+\DoxyCodeLine{00678\ \ \ \ \ \ \ \mbox{\hyperlink{namespaceboost_1_1fibers_1_1asio_a65142b77539b20ba6d2abb35a0d4f5d2}{yield}}(\mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}.tellp());}
+\DoxyCodeLine{00679\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}.str();}
+\DoxyCodeLine{00680\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=282pt]{classfc_1_1json_aa6541960d7f05567559b866cfaf88dfa_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1json_aa6541960d7f05567559b866cfaf88dfa_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1json_aaea4012545c444aa3919baa0192504e8}\index{fc::json@{fc::json}!variants\_from\_string@{variants\_from\_string}}
+\index{variants\_from\_string@{variants\_from\_string}!fc::json@{fc::json}}
+\doxysubsubsection{\texorpdfstring{variants\_from\_string()}{variants\_from\_string()}}
+{\footnotesize\ttfamily \label{classfc_1_1json_aaea4012545c444aa3919baa0192504e8} 
+\mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}} fc\+::json\+::variants\+\_\+from\+\_\+string (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&}]{utf8\+\_\+str}{, }\item[{const \mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788}{parse\+\_\+type}}}]{ptype}{ = {\ttfamily \mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788aa7d2f7881e4fbc4c5aae78d9b67beebe}{parse\+\_\+type\+::legacy\+\_\+parser}}}, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{max\+\_\+depth}{ = {\ttfamily \mbox{\hyperlink{json_8hpp_aee45ef1ffa047f0cdfef5fc453a98ac6}{DEFAULT\+\_\+\+MAX\+\_\+\+RECURSION\+\_\+\+DEPTH}}}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{json_8cpp_source_l00461}{461}} of file \mbox{\hyperlink{json_8cpp_source}{json.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00462\ \ \ \ \{\ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00463\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}\ result;}
+\DoxyCodeLine{00464\ \ \ \ \ \ \ std::stringstream\ in(\ utf8\_str\ );}
+\DoxyCodeLine{00465\ \ \ \ \ \ \ \textcolor{comment}{//in.exceptions(\ std::ifstream::eofbit\ );}}
+\DoxyCodeLine{00466\ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00467\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\ \textcolor{keyword}{true}\ )}
+\DoxyCodeLine{00468\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00469\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ result.push\_back(\ variant\_from\_stream(\ in\ ));}}
+\DoxyCodeLine{00470\ \ \ \ \ \ \ \ \ \ \ \ result.push\_back(\mbox{\hyperlink{namespacefc_1_1json__relaxed_a93f8ed4a8dfc1215a360508b01460758}{json\_relaxed::variant\_from\_stream<std::stringstream,\ false>}}(\ in,\ max\_depth\ ));}
+\DoxyCodeLine{00471\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00472\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\ \textcolor{keyword}{const}\ fc::eof\_exception\&\ )\{\}}
+\DoxyCodeLine{00473\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00474\ \ \ \ \}\ \mbox{\hyperlink{exception_8hpp_af3731d6e3beb140d9e652adf7a18113b}{FC\_RETHROW\_EXCEPTIONS}}(\ warn,\ \textcolor{stringliteral}{"{}"{}},\ (\textcolor{stringliteral}{"{}str"{}},utf8\_str)\ )\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1json_aaea4012545c444aa3919baa0192504e8_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classfc_1_1json_a9aa90f1a72da7a0221ed61bc941dfcd7}\index{fc::json@{fc::json}!escape\_string\_yield\_check\_count@{escape\_string\_yield\_check\_count}}
+\index{escape\_string\_yield\_check\_count@{escape\_string\_yield\_check\_count}!fc::json@{fc::json}}
+\doxysubsubsection{\texorpdfstring{escape\_string\_yield\_check\_count}{escape\_string\_yield\_check\_count}}
+{\footnotesize\ttfamily \label{classfc_1_1json_a9aa90f1a72da7a0221ed61bc941dfcd7} 
+size\+\_\+t fc\+::json\+::escape\+\_\+string\+\_\+yield\+\_\+check\+\_\+count = 128\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{json_8hpp_source_l00036}{36}} of file \mbox{\hyperlink{json_8hpp_source}{json.\+hpp}}.
+
+\Hypertarget{classfc_1_1json_ae336bf3cde4ed97f08f768736fa1e278}\index{fc::json@{fc::json}!max\_length\_limit@{max\_length\_limit}}
+\index{max\_length\_limit@{max\_length\_limit}!fc::json@{fc::json}}
+\doxysubsubsection{\texorpdfstring{max\_length\_limit}{max\_length\_limit}}
+{\footnotesize\ttfamily \label{classfc_1_1json_ae336bf3cde4ed97f08f768736fa1e278} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} fc\+::json\+::max\+\_\+length\+\_\+limit = std\+::numeric\+\_\+limits$<$\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}$>$\+::max()\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{json_8hpp_source_l00035}{35}} of file \mbox{\hyperlink{json_8hpp_source}{json.\+hpp}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/io/\mbox{\hyperlink{json_8hpp}{json.\+hpp}}\item 
+libraries/fc/src/io/\mbox{\hyperlink{json_8cpp}{json.\+cpp}}\end{DoxyCompactItemize}

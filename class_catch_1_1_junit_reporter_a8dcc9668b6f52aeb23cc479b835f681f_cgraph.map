@@ -1,0 +1,30 @@
+<map id="Catch::JunitReporter::writeSection" name="Catch::JunitReporter::writeSection">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,125,148,165"/>
+<area shape="poly" id="edge15_Node000001_Node000001" title=" " alt="" coords="37,125,36,115,42,106,56,100,77,98,99,101,112,107,110,112,97,106,76,103,57,105,45,110,41,116,43,124"/>
+<area shape="rect" id="Node000002" href="$class_catch_1_1_xml_writer.html#a48f1a53e3255938813ff91f9fec9b690" title=" " alt="" coords="631,23,802,64"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="91,122,134,77,163,55,195,39,248,22,304,11,361,5,417,3,525,8,616,20,615,25,524,13,417,8,361,10,305,16,250,27,197,44,165,60,137,81,95,126"/>
+<area shape="rect" id="Node000005" href="$namespace_catch_1_1_detail.html#af0ad48344ffd3f92f3568465248a9880" title=" " alt="" coords="206,54,358,79"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="118,122,195,88,213,82,215,87,197,93,120,127"/>
+<area shape="rect" id="Node000006" href="$namespace_catch.html#a084108b47f37d8bfd5db51c50c7451b3" title=" " alt="" coords="239,103,326,129"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="148,132,224,121,224,127,149,138"/>
+<area shape="rect" id="Node000007" href="$class_catch_1_1_junit_reporter.html#ace9a2e3a52dee4591e8dc9ed7b82b5ff" title=" " alt="" coords="211,153,354,193"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="149,152,196,159,195,164,148,157"/>
+<area shape="rect" id="Node000010" href="$class_catch_1_1_xml_writer.html#ad433310b59d30e0fedc7130dc11c563b" title=" " alt="" coords="613,215,820,241"/>
+<area shape="poly" id="edge14_Node000001_Node000010" title=" " alt="" coords="111,164,151,185,196,203,301,223,407,233,509,236,598,234,598,239,509,241,407,239,300,228,195,208,148,190,108,168"/>
+<area shape="rect" id="Node000012" href="$class_catch_1_1_xml_writer_1_1_scoped_element.html#a189c87f530ce85304ce4e1075609d2f5" title=" " alt="" coords="196,267,369,308"/>
+<area shape="poly" id="edge16_Node000001_Node000012" title=" " alt="" coords="99,164,143,205,197,247,216,258,213,262,194,251,139,209,96,168"/>
+<area shape="rect" id="Node000003" href="$class_catch_1_1_xml_writer.html#a6114b9d8038cd4f159ccd016f12d4992" title=" " alt="" coords="874,52,1077,78"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="803,48,859,53,858,58,803,54"/>
+<area shape="rect" id="Node000004" href="$class_catch_1_1_xml_writer.html#aba98703d9852416e237de82aed4a9c4f" title=" " alt="" coords="1125,90,1293,131"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="1046,76,1110,89,1109,94,1045,81"/>
+<area shape="rect" id="Node000008" href="$class_catch_1_1_junit_reporter.html#a5f357b138781615261724e3271600aaa" title=" " alt="" coords="417,153,559,193"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="354,170,402,170,402,176,354,176"/>
+<area shape="poly" id="edge8_Node000008_Node000002" title=" " alt="" coords="508,150,551,111,606,73,617,68,619,73,609,78,554,116,511,154"/>
+<area shape="rect" id="Node000009" href="$class_catch_1_1_reusable_string_stream.html#a0e9ecf260b2a5d35f4886ef0d51f6270" title=" " alt="" coords="607,112,826,138"/>
+<area shape="poly" id="edge9_Node000008_Node000009" title=" " alt="" coords="559,156,637,139,638,144,560,161"/>
+<area shape="poly" id="edge11_Node000008_Node000010" title=" " alt="" coords="560,188,646,208,644,213,559,193"/>
+<area shape="rect" id="Node000011" href="$class_catch_1_1_xml_writer.html#a4c49775bdf7b5bd870b34ab22af62a9c" title=" " alt="" coords="884,122,1066,147"/>
+<area shape="poly" id="edge12_Node000008_Node000011" title=" " alt="" coords="560,167,825,148,869,144,869,149,826,153,560,172"/>
+<area shape="poly" id="edge10_Node000009_Node000009" title=" " alt="" coords="679,114,671,104,676,94,691,88,717,86,744,88,759,95,756,100,743,93,716,91,692,93,679,98,676,103,683,110"/>
+<area shape="poly" id="edge13_Node000011_Node000004" title=" " alt="" coords="1066,122,1109,118,1110,123,1067,128"/>
+</map>

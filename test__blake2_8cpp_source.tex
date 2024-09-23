@@ -1,0 +1,125 @@
+\doxysection{test\+\_\+blake2.\+cpp}
+\hypertarget{test__blake2_8cpp_source}{}\label{test__blake2_8cpp_source}\index{libraries/fc/test/crypto/test\_blake2.cpp@{libraries/fc/test/crypto/test\_blake2.cpp}}
+\mbox{\hyperlink{test__blake2_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00001}\mbox{\hyperlink{test__blake2_8cpp_a6b2a3852db8bb19ab6909bac01859985}{00001}}\ \textcolor{preprocessor}{\#define\ BOOST\_TEST\_MODULE\ blake2}}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <boost/test/included/unit\_test.hpp>}}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{exception_8hpp}{fc/exception/exception.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{hex_8hpp}{fc/crypto/hex.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{blake2_8hpp}{fc/crypto/blake2.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{utility_8hpp}{fc/utility.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00009}00009\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacefc}{fc}};}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00011}00011\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{test__utils_8hpp}{test\_utils.hpp}}"{}}}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00013}00013\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacestd}{std}}\ \{}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00014}\mbox{\hyperlink{namespacestd_a3c490ded06e2fc5021e12b8d4df72bbe}{00014}}\ std::ostream\&\ \mbox{\hyperlink{namespacestd_aa723876b3fe465de1898817742c90b93}{operator<<}}(std::ostream\&\ st,\ \textcolor{keyword}{const}\ std::variant<fc::blake2b\_error,\ bytes>\&\ err)}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00015}00015\ \{}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00016}00016\ \ \ \ \ \textcolor{keywordflow}{if}(std::holds\_alternative<fc::blake2b\_error>(err))}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00017}00017\ \ \ \ \ \ \ \ \ st\ <<\ static\_cast<int32\_t>(std::get<fc::blake2b\_error>(err));}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00018}00018\ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00019}00019\ \ \ \ \ \ \ \ \ st\ <<\ fc::to\_hex(std::get<bytes>(err));}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00020}00020\ \ \ \ \ \textcolor{keywordflow}{return}\ st;}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00021}00021\ \}}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00022}00022\ \}}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00024}00024\ BOOST\_AUTO\_TEST\_SUITE(blake2)}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00025}\mbox{\hyperlink{test__blake2_8cpp_a93fa666c563e70d58529e058265a0101}{00025}}\ \mbox{\hyperlink{test__blake2_8cpp_a93fa666c563e70d58529e058265a0101}{BOOST\_AUTO\_TEST\_CASE}}(compress)\ \mbox{\hyperlink{hello__driver_8cpp_abe4cc9788f52e49485473dc699537388}{try}}\ \{}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00027}00027\ \ \ \ \ \textcolor{keyword}{using\ }compress\_test\ =\ std::tuple<std::vector<string>,\ std::variant<fc::blake2b\_error,\ bytes>>;}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00029}00029\ \ \ \ \ \textcolor{keyword}{const}\ std::vector<compress\_test>\ tests\ \{}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00030}00030\ \ \ \ \ \ \ \ \ \textcolor{comment}{//test1}}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00031}00031\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00032}00032\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00033}00033\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}00000000"{}},}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00034}00034\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}48c9bdf267e6096a3ba7ca8485ae67bb2bf894fe72f36e3cf1361d5f3af54fa5d182e6ad7f520e511f6c3e2b8c68059b6bbd41fbabd9831f79217e1319cde05b"{}},}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00035}00035\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}6162630000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"{}},}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00036}00036\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}0300000000000000"{}},}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00037}00037\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}0000000000000000"{}},}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00038}00038\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}01"{}},}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00039}00039\ \ \ \ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00040}00040\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{test__utils_8hpp_af42811e238a2a23276bd4200e2b40dde}{to\_bytes}}(\textcolor{stringliteral}{"{}08c9bcf367e6096a3ba7ca8485ae67bb2bf894fe72f36e3cf1361d5f3af54fa5d282e6ad7f520e511f6c3e2b8c68059b9442be0454267ce079217e1319cde05b"{}})}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00041}00041\ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00043}00043\ \ \ \ \ \ \ \ \ \textcolor{comment}{//test2}}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00044}00044\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00045}00045\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00046}00046\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}0000000c"{}},}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00047}00047\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}48c9bdf267e6096a3ba7ca8485ae67bb2bf894fe72f36e3cf1361d5f3af54fa5d182e6ad7f520e511f6c3e2b8c68059b6bbd41fbabd9831f79217e1319cde05b"{}},}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}6162630000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"{}},}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}0300000000000000"{}},}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00050}00050\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}0000000000000000"{}},}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00051}00051\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}01"{}},}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{test__utils_8hpp_af42811e238a2a23276bd4200e2b40dde}{to\_bytes}}(\textcolor{stringliteral}{"{}ba80a53f981c4d0d6a2797b69f12f6e94c212f14685ac4b74b12bb6fdbffa2d17d87c5392aab792dc252d5de4533cc9518d38aa8dbf1925ab92386edd4009923"{}})}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00054}00054\ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00056}00056\ \ \ \ \ \ \ \ \ \textcolor{comment}{//test3}}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00057}00057\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00059}00059\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}0000000c"{}},}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}48c9bdf267e6096a3ba7ca8485ae67bb2bf894fe72f36e3cf1361d5f3af54fa5d182e6ad7f520e511f6c3e2b8c68059b6bbd41fbabd9831f79217e1319cde05b"{}},}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00061}00061\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}6162630000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"{}},}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00062}00062\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}0300000000000000"{}},}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}0000000000000000"{}},}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00064}00064\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}00"{}},}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00065}00065\ \ \ \ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00066}00066\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{test__utils_8hpp_af42811e238a2a23276bd4200e2b40dde}{to\_bytes}}(\textcolor{stringliteral}{"{}75ab69d3190a562c51aef8d88f1c2775876944407270c42c9844252c26d2875298743e7f6d5ea2f2d3e8d226039cd31b4e426ac4f2d3d666a610c2116fde4735"{}})}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00067}00067\ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00069}00069\ \ \ \ \ \ \ \ \ \textcolor{comment}{//test4}}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00070}00070\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00071}00071\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}00000001"{}},}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00073}00073\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}48c9bdf267e6096a3ba7ca8485ae67bb2bf894fe72f36e3cf1361d5f3af54fa5d182e6ad7f520e511f6c3e2b8c68059b6bbd41fbabd9831f79217e1319cde05b"{}},}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00074}00074\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}6162630000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"{}},}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00075}00075\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}0300000000000000"{}},}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}0000000000000000"{}},}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}01"{}},}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00078}00078\ \ \ \ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{test__utils_8hpp_af42811e238a2a23276bd4200e2b40dde}{to\_bytes}}(\textcolor{stringliteral}{"{}b63a380cb2897d521994a85234ee2c181b5f844d2c624c002677e9703449d2fba551b3a8333bcdf5f2f7e08993d53923de3d64fcc68c034e717b9293fed7a421"{}})}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00080}00080\ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00081}00081\ }
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00082}00082\ \ \ \ \ \ \ \ \ \textcolor{comment}{//test5}}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00083}00083\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00084}00084\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00085}00085\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}00000000"{}},}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00086}00086\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}c9bdf267e6096a3ba7ca8485ae67bb2bf894fe72f36e3cf1361d5f3af54fa5d182e6ad7f520e511f6c3e2b8c68059b6bbd41fbabd9831f79217e1319cde05b"{}},}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00087}00087\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}6162630000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"{}},}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00088}00088\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}0300000000000000"{}},}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00089}00089\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}0000000000000000"{}},}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00090}00090\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}01"{}},}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00091}00091\ \ \ \ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00092}00092\ \ \ \ \ \ \ \ \ \ \ \ \ blake2b\_error::input\_len\_error}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00093}00093\ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00094}00094\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00095}00095\ }
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00096}00096\ \ \ \ \ \mbox{\hyperlink{classfc_1_1optional__delegate}{yield\_function\_t}}\ yield\ =\ []()\{\};}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00097}00097\ }
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00098}00098\ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ test\ :\ tests)\ \{}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00099}00099\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00100}00100\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params}{params}}\ \ \ \ \ \ \ \ \ \ =\ std::get<0>(test);}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00101}00101\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{ssh_8c_a2cd19dc464a5cf91cd7c2e717b9dffd7}{expected\_result}}\ =\ std::get<1>(test);}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00102}00102\ }
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00103}00103\ \ \ \ \ \ \ \ \ BOOST\_REQUIRE(\mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params}{params}}.size()\ ==\ 6);}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00104}00104\ }
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00105}00105\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \_rounds\ \ \ \ =\ \mbox{\hyperlink{test__utils_8hpp_a47b91eb796fa8eeaabeec08ffd54038a}{to\_uint32}}(\mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params}{params}}[0]\ );}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00106}00106\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}}\ \ \ \ \_h\ \ \ \ \ \ \ \ \ =\ \mbox{\hyperlink{test__utils_8hpp_af42811e238a2a23276bd4200e2b40dde}{to\_bytes}}(\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params}{params}}[1]\ );}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00107}00107\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}}\ \ \ \ \_m\ \ \ \ \ \ \ \ \ =\ \mbox{\hyperlink{test__utils_8hpp_af42811e238a2a23276bd4200e2b40dde}{to\_bytes}}(\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params}{params}}[2]\ );}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00108}00108\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}}\ \ \ \ \_t0\_offset\ =\ \mbox{\hyperlink{test__utils_8hpp_af42811e238a2a23276bd4200e2b40dde}{to\_bytes}}(\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params}{params}}[3]\ );}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00109}00109\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}}\ \ \ \ \_t1\_offset\ =\ \mbox{\hyperlink{test__utils_8hpp_af42811e238a2a23276bd4200e2b40dde}{to\_bytes}}(\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params}{params}}[4]\ );}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00110}00110\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \ \ \ \ \_f\ \ \ \ \ \ \ \ \ =\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params}{params}}[5]\ ==\ \textcolor{stringliteral}{"{}00"{}}\ ?\ false\ :\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00111}00111\ }
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00112}00112\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ res\ =\ \mbox{\hyperlink{namespacefc_a3bcfede4e3ebdbd08006e020492dc7ce}{blake2b}}(\_rounds,\ \_h,\ \_m,\ \_t0\_offset,\ \_t1\_offset,\ \_f,\ yield);}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00113}00113\ }
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00114}00114\ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(res,\ \mbox{\hyperlink{ssh_8c_a2cd19dc464a5cf91cd7c2e717b9dffd7}{expected\_result}});}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00115}00115\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00116}00116\ }
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00117}\mbox{\hyperlink{test__blake2_8cpp_ae70bfa24f5a3bc0917382b3c17fc033c}{00117}}\ \}\ \mbox{\hyperlink{test__blake2_8cpp_ae70bfa24f5a3bc0917382b3c17fc033c}{FC\_LOG\_AND\_RETHROW}}();}
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00118}00118\ }
+\DoxyCodeLine{\Hypertarget{test__blake2_8cpp_source_l00119}00119\ BOOST\_AUTO\_TEST\_SUITE\_END()}
+
+\end{DoxyCode}

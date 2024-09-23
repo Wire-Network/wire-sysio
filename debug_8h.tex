@@ -1,0 +1,204 @@
+\doxysection{libraries/yubihsm/common/debug.h File Reference}
+\hypertarget{debug_8h}{}\label{debug_8h}\index{libraries/yubihsm/common/debug.h@{libraries/yubihsm/common/debug.h}}
+{\ttfamily \#include $<$sys/time.\+h$>$}\newline
+{\ttfamily \#include $<$time.\+h$>$}\newline
+Include dependency graph for debug.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=211pt]{debug_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{debug_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{debug_8h_a7f026776e12ac1b5e7736c24b756085d}{ANSI\+\_\+\+RED}}~"{}"{}
+\item 
+\#define \mbox{\hyperlink{debug_8h_ad050fd71ced44460a0c723a1715c40e5}{ANSI\+\_\+\+GREEN}}~"{}"{}
+\item 
+\#define \mbox{\hyperlink{debug_8h_af6e8b5c7b35e8bff4c581efd8019c798}{ANSI\+\_\+\+YELLOW}}~"{}"{}
+\item 
+\#define \mbox{\hyperlink{debug_8h_a50a197ede59d7694515c3dad4557cf00}{ANSI\+\_\+\+BLUE}}~"{}"{}
+\item 
+\#define \mbox{\hyperlink{debug_8h_a8a9c0853e05b02c03acdfaab90f534c8}{ANSI\+\_\+\+MAGENTA}}~"{}"{}
+\item 
+\#define \mbox{\hyperlink{debug_8h_a8e74e295b54795a32a16ea744f6aed5e}{ANSI\+\_\+\+CYAN}}~"{}"{}
+\item 
+\#define \mbox{\hyperlink{debug_8h_af77a445894f2f750d43cf2182cd29e55}{ANSI\+\_\+\+RESET}}~"{}"{}
+\item 
+\#define \mbox{\hyperlink{debug_8h_a5fccb4fc71e44089a1b1a77fc76c0b68}{\+\_\+\+\_\+\+FILENAME\+\_\+\+\_\+}}~  (strrchr(\+\_\+\+\_\+\+FILE\+\_\+\+\_\+, \textquotesingle{}/\textquotesingle{}) ? strrchr(\+\_\+\+\_\+\+FILE\+\_\+\+\_\+, \textquotesingle{}/\textquotesingle{}) + 1 \+: \+\_\+\+\_\+\+FILE\+\_\+\+\_\+)
+\item 
+\#define \mbox{\hyperlink{debug_8h_a6a96826afbc53984fc8331e32328fb3b}{D}}(var,  file,  col,  who,  lev, ...)
+\item 
+\#define \mbox{\hyperlink{debug_8h_a8c0c9c83cadd7fa25d2463c00eea6e7c}{DLN}}(var,  file,  col,  who,  lev, ...)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{debug_8h_a5fccb4fc71e44089a1b1a77fc76c0b68}\index{debug.h@{debug.h}!\_\_FILENAME\_\_@{\_\_FILENAME\_\_}}
+\index{\_\_FILENAME\_\_@{\_\_FILENAME\_\_}!debug.h@{debug.h}}
+\doxysubsubsection{\texorpdfstring{\_\_FILENAME\_\_}{\_\_FILENAME\_\_}}
+{\footnotesize\ttfamily \label{debug_8h_a5fccb4fc71e44089a1b1a77fc76c0b68} 
+\#define \+\_\+\+\_\+\+FILENAME\+\_\+\+\_\+~  (strrchr(\+\_\+\+\_\+\+FILE\+\_\+\+\_\+, \textquotesingle{}/\textquotesingle{}) ? strrchr(\+\_\+\+\_\+\+FILE\+\_\+\+\_\+, \textquotesingle{}/\textquotesingle{}) + 1 \+: \+\_\+\+\_\+\+FILE\+\_\+\+\_\+)}
+
+
+
+Definition at line \mbox{\hyperlink{debug_8h_source_l00041}{41}} of file \mbox{\hyperlink{debug_8h_source}{debug.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00041\ \textcolor{preprocessor}{\#define\ \_\_FILENAME\_\_\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00042\ \textcolor{preprocessor}{\ \ (strrchr(\_\_FILE\_\_,\ '/')\ ?\ strrchr(\_\_FILE\_\_,\ '/')\ +\ 1\ :\ \_\_FILE\_\_)}}
+
+\end{DoxyCode}
+\Hypertarget{debug_8h_a50a197ede59d7694515c3dad4557cf00}\index{debug.h@{debug.h}!ANSI\_BLUE@{ANSI\_BLUE}}
+\index{ANSI\_BLUE@{ANSI\_BLUE}!debug.h@{debug.h}}
+\doxysubsubsection{\texorpdfstring{ANSI\_BLUE}{ANSI\_BLUE}}
+{\footnotesize\ttfamily \label{debug_8h_a50a197ede59d7694515c3dad4557cf00} 
+\#define ANSI\+\_\+\+BLUE~"{}"{}}
+
+
+
+Definition at line \mbox{\hyperlink{debug_8h_source_l00035}{35}} of file \mbox{\hyperlink{debug_8h_source}{debug.\+h}}.
+
+\Hypertarget{debug_8h_a8e74e295b54795a32a16ea744f6aed5e}\index{debug.h@{debug.h}!ANSI\_CYAN@{ANSI\_CYAN}}
+\index{ANSI\_CYAN@{ANSI\_CYAN}!debug.h@{debug.h}}
+\doxysubsubsection{\texorpdfstring{ANSI\_CYAN}{ANSI\_CYAN}}
+{\footnotesize\ttfamily \label{debug_8h_a8e74e295b54795a32a16ea744f6aed5e} 
+\#define ANSI\+\_\+\+CYAN~"{}"{}}
+
+
+
+Definition at line \mbox{\hyperlink{debug_8h_source_l00037}{37}} of file \mbox{\hyperlink{debug_8h_source}{debug.\+h}}.
+
+\Hypertarget{debug_8h_ad050fd71ced44460a0c723a1715c40e5}\index{debug.h@{debug.h}!ANSI\_GREEN@{ANSI\_GREEN}}
+\index{ANSI\_GREEN@{ANSI\_GREEN}!debug.h@{debug.h}}
+\doxysubsubsection{\texorpdfstring{ANSI\_GREEN}{ANSI\_GREEN}}
+{\footnotesize\ttfamily \label{debug_8h_ad050fd71ced44460a0c723a1715c40e5} 
+\#define ANSI\+\_\+\+GREEN~"{}"{}}
+
+
+
+Definition at line \mbox{\hyperlink{debug_8h_source_l00033}{33}} of file \mbox{\hyperlink{debug_8h_source}{debug.\+h}}.
+
+\Hypertarget{debug_8h_a8a9c0853e05b02c03acdfaab90f534c8}\index{debug.h@{debug.h}!ANSI\_MAGENTA@{ANSI\_MAGENTA}}
+\index{ANSI\_MAGENTA@{ANSI\_MAGENTA}!debug.h@{debug.h}}
+\doxysubsubsection{\texorpdfstring{ANSI\_MAGENTA}{ANSI\_MAGENTA}}
+{\footnotesize\ttfamily \label{debug_8h_a8a9c0853e05b02c03acdfaab90f534c8} 
+\#define ANSI\+\_\+\+MAGENTA~"{}"{}}
+
+
+
+Definition at line \mbox{\hyperlink{debug_8h_source_l00036}{36}} of file \mbox{\hyperlink{debug_8h_source}{debug.\+h}}.
+
+\Hypertarget{debug_8h_a7f026776e12ac1b5e7736c24b756085d}\index{debug.h@{debug.h}!ANSI\_RED@{ANSI\_RED}}
+\index{ANSI\_RED@{ANSI\_RED}!debug.h@{debug.h}}
+\doxysubsubsection{\texorpdfstring{ANSI\_RED}{ANSI\_RED}}
+{\footnotesize\ttfamily \label{debug_8h_a7f026776e12ac1b5e7736c24b756085d} 
+\#define ANSI\+\_\+\+RED~"{}"{}}
+
+
+
+Definition at line \mbox{\hyperlink{debug_8h_source_l00032}{32}} of file \mbox{\hyperlink{debug_8h_source}{debug.\+h}}.
+
+\Hypertarget{debug_8h_af77a445894f2f750d43cf2182cd29e55}\index{debug.h@{debug.h}!ANSI\_RESET@{ANSI\_RESET}}
+\index{ANSI\_RESET@{ANSI\_RESET}!debug.h@{debug.h}}
+\doxysubsubsection{\texorpdfstring{ANSI\_RESET}{ANSI\_RESET}}
+{\footnotesize\ttfamily \label{debug_8h_af77a445894f2f750d43cf2182cd29e55} 
+\#define ANSI\+\_\+\+RESET~"{}"{}}
+
+
+
+Definition at line \mbox{\hyperlink{debug_8h_source_l00038}{38}} of file \mbox{\hyperlink{debug_8h_source}{debug.\+h}}.
+
+\Hypertarget{debug_8h_af6e8b5c7b35e8bff4c581efd8019c798}\index{debug.h@{debug.h}!ANSI\_YELLOW@{ANSI\_YELLOW}}
+\index{ANSI\_YELLOW@{ANSI\_YELLOW}!debug.h@{debug.h}}
+\doxysubsubsection{\texorpdfstring{ANSI\_YELLOW}{ANSI\_YELLOW}}
+{\footnotesize\ttfamily \label{debug_8h_af6e8b5c7b35e8bff4c581efd8019c798} 
+\#define ANSI\+\_\+\+YELLOW~"{}"{}}
+
+
+
+Definition at line \mbox{\hyperlink{debug_8h_source_l00034}{34}} of file \mbox{\hyperlink{debug_8h_source}{debug.\+h}}.
+
+\Hypertarget{debug_8h_a6a96826afbc53984fc8331e32328fb3b}\index{debug.h@{debug.h}!D@{D}}
+\index{D@{D}!debug.h@{debug.h}}
+\doxysubsubsection{\texorpdfstring{D}{D}}
+{\footnotesize\ttfamily \label{debug_8h_a6a96826afbc53984fc8331e32328fb3b} 
+\#define D(\begin{DoxyParamCaption}\item[{}]{var}{, }\item[{}]{file}{, }\item[{}]{col}{, }\item[{}]{who}{, }\item[{}]{lev}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \textcolor{keywordflow}{if}\ (var)\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{struct\ }timeval\ \_tv;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{struct\ }tm\ \_tm;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{char}\ \_tbuf[20];\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ time\_t\ \_tsecs;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ gettimeofday(\&\_tv,\ NULL);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \_tsecs\ =\ \_tv.tv\_sec;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ localtime\_r(\&\_tsecs,\ \&\_tm);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ strftime(\_tbuf,\ 20,\ \textcolor{stringliteral}{"{}\%H:\%M:\%S"{}},\ \&\_tm);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ fprintf(file,\ \textcolor{stringliteral}{"{}["{}}\ col\ who\ \textcolor{stringliteral}{"{}\ -\/\ "{}}\ lev\ \mbox{\hyperlink{debug_8h_af77a445894f2f750d43cf2182cd29e55}{ANSI\_RESET}}\ \textcolor{stringliteral}{"{}\ \%s.\%06ld]\ "{}},\ \_tbuf,\ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{keywordtype}{long})\ \_tv.tv\_usec);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ fprintf(file,\ \textcolor{stringliteral}{"{}\%s:\%d\ (\%s):\ "{}},\ \mbox{\hyperlink{debug_8h_a5fccb4fc71e44089a1b1a77fc76c0b68}{\_\_FILENAME\_\_}},\ \_\_LINE\_\_,\ \mbox{\hyperlink{log__message_8hpp_a7d6e1cf1a8d53f38471e9e9db3faf740}{\_\_func\_\_}});\ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ fprintf(file,\ \_\_VA\_ARGS\_\_);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{debug_8h_source_l00044}{44}} of file \mbox{\hyperlink{debug_8h_source}{debug.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00044\ \textcolor{preprocessor}{\#define\ D(var,\ file,\ col,\ who,\ lev,\ ...)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00045\ \textcolor{preprocessor}{\ \ if\ (var)\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00046\ \textcolor{preprocessor}{\ \ \ \ struct\ timeval\ \_tv;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00047\ \textcolor{preprocessor}{\ \ \ \ struct\ tm\ \_tm;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00048\ \textcolor{preprocessor}{\ \ \ \ char\ \_tbuf[20];\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00049\ \textcolor{preprocessor}{\ \ \ \ time\_t\ \_tsecs;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00050\ \textcolor{preprocessor}{\ \ \ \ gettimeofday(\&\_tv,\ NULL);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00051\ \textcolor{preprocessor}{\ \ \ \ \_tsecs\ =\ \_tv.tv\_sec;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00052\ \textcolor{preprocessor}{\ \ \ \ localtime\_r(\&\_tsecs,\ \&\_tm);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00053\ \textcolor{preprocessor}{\ \ \ \ strftime(\_tbuf,\ 20,\ "{}\%H:\%M:\%S"{},\ \&\_tm);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00054\ \textcolor{preprocessor}{\ \ \ \ fprintf(file,\ "{}["{}\ col\ who\ "{}\ -\/\ "{}\ lev\ ANSI\_RESET\ "{}\ \%s.\%06ld]\ "{},\ \_tbuf,\ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00055\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ (long)\ \_tv.tv\_usec);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00056\ \textcolor{preprocessor}{\ \ \ \ fprintf(file,\ "{}\%s:\%d\ (\%s):\ "{},\ \_\_FILENAME\_\_,\ \_\_LINE\_\_,\ \_\_func\_\_);\ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00057\ \textcolor{preprocessor}{\ \ \ \ fprintf(file,\ \_\_VA\_ARGS\_\_);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00058\ \textcolor{preprocessor}{\ \ \}}}
+
+\end{DoxyCode}
+\Hypertarget{debug_8h_a8c0c9c83cadd7fa25d2463c00eea6e7c}\index{debug.h@{debug.h}!DLN@{DLN}}
+\index{DLN@{DLN}!debug.h@{debug.h}}
+\doxysubsubsection{\texorpdfstring{DLN}{DLN}}
+{\footnotesize\ttfamily \label{debug_8h_a8c0c9c83cadd7fa25d2463c00eea6e7c} 
+\#define DLN(\begin{DoxyParamCaption}\item[{}]{var}{, }\item[{}]{file}{, }\item[{}]{col}{, }\item[{}]{who}{, }\item[{}]{lev}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \textcolor{keywordflow}{if}\ (var)\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ D(var,\ file,\ col,\ who,\ lev,\ \_\_VA\_ARGS\_\_);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ fprintf(file,\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}});\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{debug_8h_source_l00060}{60}} of file \mbox{\hyperlink{debug_8h_source}{debug.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00060\ \textcolor{preprocessor}{\#define\ DLN(var,\ file,\ col,\ who,\ lev,\ ...)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00061\ \textcolor{preprocessor}{\ \ if\ (var)\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00062\ \textcolor{preprocessor}{\ \ \ \ D(var,\ file,\ col,\ who,\ lev,\ \_\_VA\_ARGS\_\_);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00063\ \textcolor{preprocessor}{\ \ \ \ fprintf(file,\ "{}\(\backslash\)n"{});\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00064\ \textcolor{preprocessor}{\ \ \}}}
+
+\end{DoxyCode}

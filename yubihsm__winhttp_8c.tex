@@ -1,0 +1,202 @@
+\doxysection{libraries/yubihsm/lib/yubihsm\+\_\+winhttp.c File Reference}
+\hypertarget{yubihsm__winhttp_8c}{}\label{yubihsm__winhttp_8c}\index{libraries/yubihsm/lib/yubihsm\_winhttp.c@{libraries/yubihsm/lib/yubihsm\_winhttp.c}}
+{\ttfamily \#include $<$windows.\+h$>$}\newline
+{\ttfamily \#include $<$winhttp.\+h$>$}\newline
+{\ttfamily \#include $<$winsock.\+h$>$}\newline
+{\ttfamily \#include $<$wchar.\+h$>$}\newline
+{\ttfamily \#include $<$stdbool.\+h$>$}\newline
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include "{}yubihsm.\+h"{}}\newline
+{\ttfamily \#include "{}internal.\+h"{}}\newline
+{\ttfamily \#include "{}debug\+\_\+lib.\+h"{}}\newline
+Include dependency graph for yubihsm\+\_\+winhttp.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{yubihsm__winhttp_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structurl_components}{url\+Components}}
+\item 
+struct \mbox{\hyperlink{structcontext}{context}}
+\item 
+struct \mbox{\hyperlink{structstate}{state}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{yubihsm__winhttp_8c_a58ce36916c399104e18d32ff090f21c6}{MAX\+\_\+\+STR\+\_\+\+LEN}}~128
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{yubihsm__winhttp_8c_ad7668fe49909e0598d75380816eba577}{stage}} \{ \newline
+\mbox{\hyperlink{yubihsm__winhttp_8c_ad7668fe49909e0598d75380816eba577a90dbc0b0d6d158e36c6b998066bbd9eb}{NO\+\_\+\+INIT}}
+, \mbox{\hyperlink{yubihsm__winhttp_8c_ad7668fe49909e0598d75380816eba577ae46a25ff778480f13615efa00987190b}{REQUEST\+\_\+\+SENT}}
+, \mbox{\hyperlink{yubihsm__winhttp_8c_ad7668fe49909e0598d75380816eba577a887c01037b6a83c68faf8c335b8aebc6}{RESPONSE\+\_\+\+WAITING}}
+, \mbox{\hyperlink{yubihsm__winhttp_8c_ad7668fe49909e0598d75380816eba577a76526acf7fff481667c4ec404347c3ce}{RESPONSE\+\_\+\+RECEIVED}}
+, \newline
+\mbox{\hyperlink{yubihsm__winhttp_8c_ad7668fe49909e0598d75380816eba577a2d0cc703f09e78588dcf94f96365dd04}{DATA\+\_\+\+AVAILABLE}}
+, \mbox{\hyperlink{yubihsm__winhttp_8c_ad7668fe49909e0598d75380816eba577a41a93d458a8206cf1e8522a676edb5ab}{DATA\+\_\+\+WAITING}}
+, \mbox{\hyperlink{yubihsm__winhttp_8c_ad7668fe49909e0598d75380816eba577ac392f600e040b2dc9c799ae10d092da3}{READ\+\_\+\+COMPLETE}}
+, \mbox{\hyperlink{yubihsm__winhttp_8c_ad7668fe49909e0598d75380816eba577afa7f62a088cb57a9dd0773d2ff8838e9}{REQUEST\+\_\+\+SUCCESS}}
+, \newline
+\mbox{\hyperlink{yubihsm__winhttp_8c_ad7668fe49909e0598d75380816eba577a76dc82f10897a47b5213bb9f5aa207f6}{REQUEST\+\_\+\+ERROR}}
+, \mbox{\hyperlink{yubihsm__winhttp_8c_ad7668fe49909e0598d75380816eba577adf8a4f150be2e7a0f2d3e215a496da2a}{CLOSE\+\_\+\+WAITING}}
+, \mbox{\hyperlink{yubihsm__winhttp_8c_ad7668fe49909e0598d75380816eba577a50c1d04f5a7dadd4d85260d2aa5d58a0}{REQUEST\+\_\+\+CLOSED}}
+, \mbox{\hyperlink{yubihsm__winhttp_8c_ad7668fe49909e0598d75380816eba577a5400f2283d9d0a6bf57a1b98f8d873b7}{REQUEST\+\_\+\+DONE}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+struct backend\+\_\+functions \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{yubihsm__winhttp_8c_adfda6969b701fc0b0606dcc6436eae0e}{backend\+\_\+functions}} (void)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{aes_8h_a3f74f478154eb204fc614b5e9fcde0d1}{YH\+\_\+\+INTERNAL}} \mbox{\hyperlink{yubihsm__winhttp_8c_ae4161fcb73239ec957bc7f6367366ba7}{\+\_\+yh\+\_\+verbosity}}
+\item 
+FILE \mbox{\hyperlink{aes_8h_a3f74f478154eb204fc614b5e9fcde0d1}{YH\+\_\+\+INTERNAL}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{yubihsm__winhttp_8c_aa16b80e4bacfea2ad33b6f8285754f9d}{\+\_\+yh\+\_\+output}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{yubihsm__winhttp_8c_a58ce36916c399104e18d32ff090f21c6}\index{yubihsm\_winhttp.c@{yubihsm\_winhttp.c}!MAX\_STR\_LEN@{MAX\_STR\_LEN}}
+\index{MAX\_STR\_LEN@{MAX\_STR\_LEN}!yubihsm\_winhttp.c@{yubihsm\_winhttp.c}}
+\doxysubsubsection{\texorpdfstring{MAX\_STR\_LEN}{MAX\_STR\_LEN}}
+{\footnotesize\ttfamily \label{yubihsm__winhttp_8c_a58ce36916c399104e18d32ff090f21c6} 
+\#define MAX\+\_\+\+STR\+\_\+\+LEN~128}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__winhttp_8c_source_l00028}{28}} of file \mbox{\hyperlink{yubihsm__winhttp_8c_source}{yubihsm\+\_\+winhttp.\+c}}.
+
+
+
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{yubihsm__winhttp_8c_ad7668fe49909e0598d75380816eba577}\index{yubihsm\_winhttp.c@{yubihsm\_winhttp.c}!stage@{stage}}
+\index{stage@{stage}!yubihsm\_winhttp.c@{yubihsm\_winhttp.c}}
+\doxysubsubsection{\texorpdfstring{stage}{stage}}
+{\footnotesize\ttfamily \label{yubihsm__winhttp_8c_ad7668fe49909e0598d75380816eba577} 
+enum \mbox{\hyperlink{yubihsm__winhttp_8c_ad7668fe49909e0598d75380816eba577}{stage}}}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{NO\_INIT@{NO\_INIT}!yubihsm\_winhttp.c@{yubihsm\_winhttp.c}}\index{yubihsm\_winhttp.c@{yubihsm\_winhttp.c}!NO\_INIT@{NO\_INIT}}}\Hypertarget{yubihsm__winhttp_8c_ad7668fe49909e0598d75380816eba577a90dbc0b0d6d158e36c6b998066bbd9eb}\label{yubihsm__winhttp_8c_ad7668fe49909e0598d75380816eba577} 
+NO\+\_\+\+INIT&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{REQUEST\_SENT@{REQUEST\_SENT}!yubihsm\_winhttp.c@{yubihsm\_winhttp.c}}\index{yubihsm\_winhttp.c@{yubihsm\_winhttp.c}!REQUEST\_SENT@{REQUEST\_SENT}}}\Hypertarget{yubihsm__winhttp_8c_ad7668fe49909e0598d75380816eba577ae46a25ff778480f13615efa00987190b}\label{yubihsm__winhttp_8c_ad7668fe49909e0598d75380816eba577} 
+REQUEST\+\_\+\+SENT&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{RESPONSE\_WAITING@{RESPONSE\_WAITING}!yubihsm\_winhttp.c@{yubihsm\_winhttp.c}}\index{yubihsm\_winhttp.c@{yubihsm\_winhttp.c}!RESPONSE\_WAITING@{RESPONSE\_WAITING}}}\Hypertarget{yubihsm__winhttp_8c_ad7668fe49909e0598d75380816eba577a887c01037b6a83c68faf8c335b8aebc6}\label{yubihsm__winhttp_8c_ad7668fe49909e0598d75380816eba577} 
+RESPONSE\+\_\+\+WAITING&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{RESPONSE\_RECEIVED@{RESPONSE\_RECEIVED}!yubihsm\_winhttp.c@{yubihsm\_winhttp.c}}\index{yubihsm\_winhttp.c@{yubihsm\_winhttp.c}!RESPONSE\_RECEIVED@{RESPONSE\_RECEIVED}}}\Hypertarget{yubihsm__winhttp_8c_ad7668fe49909e0598d75380816eba577a76526acf7fff481667c4ec404347c3ce}\label{yubihsm__winhttp_8c_ad7668fe49909e0598d75380816eba577} 
+RESPONSE\+\_\+\+RECEIVED&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{DATA\_AVAILABLE@{DATA\_AVAILABLE}!yubihsm\_winhttp.c@{yubihsm\_winhttp.c}}\index{yubihsm\_winhttp.c@{yubihsm\_winhttp.c}!DATA\_AVAILABLE@{DATA\_AVAILABLE}}}\Hypertarget{yubihsm__winhttp_8c_ad7668fe49909e0598d75380816eba577a2d0cc703f09e78588dcf94f96365dd04}\label{yubihsm__winhttp_8c_ad7668fe49909e0598d75380816eba577} 
+DATA\+\_\+\+AVAILABLE&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{DATA\_WAITING@{DATA\_WAITING}!yubihsm\_winhttp.c@{yubihsm\_winhttp.c}}\index{yubihsm\_winhttp.c@{yubihsm\_winhttp.c}!DATA\_WAITING@{DATA\_WAITING}}}\Hypertarget{yubihsm__winhttp_8c_ad7668fe49909e0598d75380816eba577a41a93d458a8206cf1e8522a676edb5ab}\label{yubihsm__winhttp_8c_ad7668fe49909e0598d75380816eba577} 
+DATA\+\_\+\+WAITING&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{READ\_COMPLETE@{READ\_COMPLETE}!yubihsm\_winhttp.c@{yubihsm\_winhttp.c}}\index{yubihsm\_winhttp.c@{yubihsm\_winhttp.c}!READ\_COMPLETE@{READ\_COMPLETE}}}\Hypertarget{yubihsm__winhttp_8c_ad7668fe49909e0598d75380816eba577ac392f600e040b2dc9c799ae10d092da3}\label{yubihsm__winhttp_8c_ad7668fe49909e0598d75380816eba577} 
+READ\+\_\+\+COMPLETE&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{REQUEST\_SUCCESS@{REQUEST\_SUCCESS}!yubihsm\_winhttp.c@{yubihsm\_winhttp.c}}\index{yubihsm\_winhttp.c@{yubihsm\_winhttp.c}!REQUEST\_SUCCESS@{REQUEST\_SUCCESS}}}\Hypertarget{yubihsm__winhttp_8c_ad7668fe49909e0598d75380816eba577afa7f62a088cb57a9dd0773d2ff8838e9}\label{yubihsm__winhttp_8c_ad7668fe49909e0598d75380816eba577} 
+REQUEST\+\_\+\+SUCCESS&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{REQUEST\_ERROR@{REQUEST\_ERROR}!yubihsm\_winhttp.c@{yubihsm\_winhttp.c}}\index{yubihsm\_winhttp.c@{yubihsm\_winhttp.c}!REQUEST\_ERROR@{REQUEST\_ERROR}}}\Hypertarget{yubihsm__winhttp_8c_ad7668fe49909e0598d75380816eba577a76dc82f10897a47b5213bb9f5aa207f6}\label{yubihsm__winhttp_8c_ad7668fe49909e0598d75380816eba577} 
+REQUEST\+\_\+\+ERROR&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{CLOSE\_WAITING@{CLOSE\_WAITING}!yubihsm\_winhttp.c@{yubihsm\_winhttp.c}}\index{yubihsm\_winhttp.c@{yubihsm\_winhttp.c}!CLOSE\_WAITING@{CLOSE\_WAITING}}}\Hypertarget{yubihsm__winhttp_8c_ad7668fe49909e0598d75380816eba577adf8a4f150be2e7a0f2d3e215a496da2a}\label{yubihsm__winhttp_8c_ad7668fe49909e0598d75380816eba577} 
+CLOSE\+\_\+\+WAITING&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{REQUEST\_CLOSED@{REQUEST\_CLOSED}!yubihsm\_winhttp.c@{yubihsm\_winhttp.c}}\index{yubihsm\_winhttp.c@{yubihsm\_winhttp.c}!REQUEST\_CLOSED@{REQUEST\_CLOSED}}}\Hypertarget{yubihsm__winhttp_8c_ad7668fe49909e0598d75380816eba577a50c1d04f5a7dadd4d85260d2aa5d58a0}\label{yubihsm__winhttp_8c_ad7668fe49909e0598d75380816eba577} 
+REQUEST\+\_\+\+CLOSED&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{REQUEST\_DONE@{REQUEST\_DONE}!yubihsm\_winhttp.c@{yubihsm\_winhttp.c}}\index{yubihsm\_winhttp.c@{yubihsm\_winhttp.c}!REQUEST\_DONE@{REQUEST\_DONE}}}\Hypertarget{yubihsm__winhttp_8c_ad7668fe49909e0598d75380816eba577a5400f2283d9d0a6bf57a1b98f8d873b7}\label{yubihsm__winhttp_8c_ad7668fe49909e0598d75380816eba577} 
+REQUEST\+\_\+\+DONE&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{yubihsm__winhttp_8c_source_l00037}{37}} of file \mbox{\hyperlink{yubihsm__winhttp_8c_source}{yubihsm\+\_\+winhttp.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00038\ \ \ \mbox{\hyperlink{yubihsm__winhttp_8c_ad7668fe49909e0598d75380816eba577a90dbc0b0d6d158e36c6b998066bbd9eb}{NO\_INIT}},}
+\DoxyCodeLine{00039\ \ \ \mbox{\hyperlink{yubihsm__winhttp_8c_ad7668fe49909e0598d75380816eba577ae46a25ff778480f13615efa00987190b}{REQUEST\_SENT}},}
+\DoxyCodeLine{00040\ \ \ \mbox{\hyperlink{yubihsm__winhttp_8c_ad7668fe49909e0598d75380816eba577a887c01037b6a83c68faf8c335b8aebc6}{RESPONSE\_WAITING}},}
+\DoxyCodeLine{00041\ \ \ \mbox{\hyperlink{yubihsm__winhttp_8c_ad7668fe49909e0598d75380816eba577a76526acf7fff481667c4ec404347c3ce}{RESPONSE\_RECEIVED}},}
+\DoxyCodeLine{00042\ \ \ \mbox{\hyperlink{yubihsm__winhttp_8c_ad7668fe49909e0598d75380816eba577a2d0cc703f09e78588dcf94f96365dd04}{DATA\_AVAILABLE}},}
+\DoxyCodeLine{00043\ \ \ \mbox{\hyperlink{yubihsm__winhttp_8c_ad7668fe49909e0598d75380816eba577a41a93d458a8206cf1e8522a676edb5ab}{DATA\_WAITING}},}
+\DoxyCodeLine{00044\ \ \ \mbox{\hyperlink{yubihsm__winhttp_8c_ad7668fe49909e0598d75380816eba577ac392f600e040b2dc9c799ae10d092da3}{READ\_COMPLETE}},}
+\DoxyCodeLine{00045\ \ \ \mbox{\hyperlink{yubihsm__winhttp_8c_ad7668fe49909e0598d75380816eba577afa7f62a088cb57a9dd0773d2ff8838e9}{REQUEST\_SUCCESS}},}
+\DoxyCodeLine{00046\ \ \ \mbox{\hyperlink{yubihsm__winhttp_8c_ad7668fe49909e0598d75380816eba577a76dc82f10897a47b5213bb9f5aa207f6}{REQUEST\_ERROR}},}
+\DoxyCodeLine{00047\ \ \ \mbox{\hyperlink{yubihsm__winhttp_8c_ad7668fe49909e0598d75380816eba577adf8a4f150be2e7a0f2d3e215a496da2a}{CLOSE\_WAITING}},}
+\DoxyCodeLine{00048\ \ \ \mbox{\hyperlink{yubihsm__winhttp_8c_ad7668fe49909e0598d75380816eba577a50c1d04f5a7dadd4d85260d2aa5d58a0}{REQUEST\_CLOSED}},}
+\DoxyCodeLine{00049\ \ \ \mbox{\hyperlink{yubihsm__winhttp_8c_ad7668fe49909e0598d75380816eba577a5400f2283d9d0a6bf57a1b98f8d873b7}{REQUEST\_DONE}},}
+\DoxyCodeLine{00050\ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{yubihsm__winhttp_8c_adfda6969b701fc0b0606dcc6436eae0e}\index{yubihsm\_winhttp.c@{yubihsm\_winhttp.c}!backend\_functions@{backend\_functions}}
+\index{backend\_functions@{backend\_functions}!yubihsm\_winhttp.c@{yubihsm\_winhttp.c}}
+\doxysubsubsection{\texorpdfstring{backend\_functions()}{backend\_functions()}}
+{\footnotesize\ttfamily \label{yubihsm__winhttp_8c_adfda6969b701fc0b0606dcc6436eae0e} 
+struct backend\+\_\+functions \texorpdfstring{$\ast$}{*} backend\+\_\+functions (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__winhttp_8c_source_l00413}{413}} of file \mbox{\hyperlink{yubihsm__winhttp_8c_source}{yubihsm\+\_\+winhttp.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00413\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00414\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00415\ \ \ \textcolor{keywordflow}{return}\ \&\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}};}
+\DoxyCodeLine{00416\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{yubihsm__winhttp_8c_aa16b80e4bacfea2ad33b6f8285754f9d}\index{yubihsm\_winhttp.c@{yubihsm\_winhttp.c}!\_yh\_output@{\_yh\_output}}
+\index{\_yh\_output@{\_yh\_output}!yubihsm\_winhttp.c@{yubihsm\_winhttp.c}}
+\doxysubsubsection{\texorpdfstring{\_yh\_output}{\_yh\_output}}
+{\footnotesize\ttfamily \label{yubihsm__winhttp_8c_aa16b80e4bacfea2ad33b6f8285754f9d} 
+FILE \mbox{\hyperlink{aes_8h_a3f74f478154eb204fc614b5e9fcde0d1}{YH\+\_\+\+INTERNAL}}\texorpdfstring{$\ast$}{*} \+\_\+yh\+\_\+output}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__winhttp_8c_source_l00067}{67}} of file \mbox{\hyperlink{yubihsm__winhttp_8c_source}{yubihsm\+\_\+winhttp.\+c}}.
+
+\Hypertarget{yubihsm__winhttp_8c_ae4161fcb73239ec957bc7f6367366ba7}\index{yubihsm\_winhttp.c@{yubihsm\_winhttp.c}!\_yh\_verbosity@{\_yh\_verbosity}}
+\index{\_yh\_verbosity@{\_yh\_verbosity}!yubihsm\_winhttp.c@{yubihsm\_winhttp.c}}
+\doxysubsubsection{\texorpdfstring{\_yh\_verbosity}{\_yh\_verbosity}}
+{\footnotesize\ttfamily \label{yubihsm__winhttp_8c_ae4161fcb73239ec957bc7f6367366ba7} 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{aes_8h_a3f74f478154eb204fc614b5e9fcde0d1}{YH\+\_\+\+INTERNAL}} \+\_\+yh\+\_\+verbosity}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__winhttp_8c_source_l00066}{66}} of file \mbox{\hyperlink{yubihsm__winhttp_8c_source}{yubihsm\+\_\+winhttp.\+c}}.
+

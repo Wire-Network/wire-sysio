@@ -1,0 +1,59 @@
+\doxysection{libraries/chain/include/sysio/chain/webassembly/sys-\/vm.hpp File Reference}
+\hypertarget{sys-vm_8hpp}{}\label{sys-vm_8hpp}\index{libraries/chain/include/sysio/chain/webassembly/sys-\/vm.hpp@{libraries/chain/include/sysio/chain/webassembly/sys-\/vm.hpp}}
+{\ttfamily \#include $<$sysio/chain/webassembly/common.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/webassembly/runtime\+\_\+interface.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/exceptions.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/apply\+\_\+context.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/wasm\+\_\+config.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/whitelisted\+\_\+intrinsics.\+hpp$>$}\newline
+{\ttfamily \#include $<$softfloat\+\_\+types.\+h$>$}\newline
+{\ttfamily \#include $<$sysio/vm/backend.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/vm/profile.\+hpp$>$}\newline
+Include dependency graph for sys-\/vm.hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sys-vm_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sys-vm_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1profile__config}{sysio\+::chain\+::webassembly\+::eos\+\_\+vm\+\_\+runtime\+::profile\+\_\+config}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1eos__vm__runtime}{sysio\+::chain\+::webassembly\+::eos\+\_\+vm\+\_\+runtime\+::eos\+\_\+vm\+\_\+runtime$<$ Backend $>$}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1eos__vm__profile__runtime}{sysio\+::chain\+::webassembly\+::eos\+\_\+vm\+\_\+runtime\+::eos\+\_\+vm\+\_\+profile\+\_\+runtime}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain}{sysio\+::chain}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly}{sysio\+::chain\+::webassembly}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_1_1eos__vm__runtime}{sysio\+::chain\+::webassembly\+::eos\+\_\+vm\+\_\+runtime}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename Impl $>$ }\\using \mbox{\hyperlink{namespacesysio_1_1chain_a48442460d3a1314dec60433ab2f5ab15}{sysio\+::chain\+::eos\+\_\+vm\+\_\+backend\+\_\+t}} = \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio\+::vm\+::backend}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_a91759da2646c40537849fc779d1fbaed}{eos\+\_\+vm\+\_\+host\+\_\+functions\+\_\+t}}, Impl, \mbox{\hyperlink{structsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1apply__options}{webassembly\+::eos\+\_\+vm\+\_\+runtime\+::apply\+\_\+options}}, \mbox{\hyperlink{classsysio_1_1vm_1_1profile__instr__map}{vm\+::profile\+\_\+instr\+\_\+map}}$>$
+\item 
+{\footnotesize template$<$typename Options $>$ }\\using \mbox{\hyperlink{namespacesysio_1_1chain_a09c1c5a11e3c4c94710b30af5f141e9e}{sysio\+::chain\+::eos\+\_\+vm\+\_\+null\+\_\+backend\+\_\+t}} = \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio\+::vm\+::backend}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_a91759da2646c40537849fc779d1fbaed}{eos\+\_\+vm\+\_\+host\+\_\+functions\+\_\+t}}, \mbox{\hyperlink{structsysio_1_1vm_1_1null__backend}{sysio\+::vm\+::null\+\_\+backend}}, Options$>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_a78d9d364a9ab60de8d18b4660f592d5f}{sysio\+::chain\+::webassembly\+::eos\+\_\+vm\+\_\+runtime\+::validate}} (const \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}} \&code, const \mbox{\hyperlink{namespacesysio_1_1chain_ab67e634f02d35e09950917271779b2ff}{whitelisted\+\_\+intrinsics\+\_\+type}} \&intrinsics)
+\item 
+void \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_a9cd22b0e9d05f910358f809fcd29ffec}{sysio\+::chain\+::webassembly\+::eos\+\_\+vm\+\_\+runtime\+::validate}} (const \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}} \&code, const \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config}{wasm\+\_\+config}} \&cfg, const \mbox{\hyperlink{namespacesysio_1_1chain_ab67e634f02d35e09950917271779b2ff}{whitelisted\+\_\+intrinsics\+\_\+type}} \&intrinsics)
+\end{DoxyCompactItemize}

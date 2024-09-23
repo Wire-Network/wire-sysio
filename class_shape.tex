@@ -1,0 +1,184 @@
+\doxysection{Shape Class Reference}
+\hypertarget{class_shape}{}\label{class_shape}\index{Shape@{Shape}}
+
+
+Inheritance diagram for Shape\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=172pt]{class_shape__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Shape\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=125pt]{class_shape__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{class_shape_ac3b9fc48965274893f25b18aa14ba665}{\texorpdfstring{$\sim$}{\string~}\+Shape}} ()
+\item 
+virtual const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_shape_a8b6867bd77e0c1e3bd323aceb0d97382}{Get\+Type}} () const =0
+\item 
+virtual void \mbox{\hyperlink{class_shape_a7dab84dc6f915f8b919954aab44fcd91}{Print}} (std\+::ostream \&os) const =0
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_shape_aaa8d87171e65e0d8ba3c5459978992a7}{Shape}} ()
+\item 
+\mbox{\hyperlink{class_shape_afea00449915131bc1f07fbb5acc5ac25}{Shape}} (double x, double y)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+double \mbox{\hyperlink{class_shape_a0974311a6a8584d89c0b0ef54bf39025}{x\+\_\+}}
+\item 
+double \mbox{\hyperlink{class_shape_a262c653c278f26cf0bd1029279a03923}{y\+\_\+}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{class_archiver}{Archiver}} $>$ }\\\mbox{\hyperlink{class_archiver}{Archiver}} \& \mbox{\hyperlink{class_shape_abbaa4a3bf18ee5cda37be6ec9f43449f}{operator\&}} (\mbox{\hyperlink{class_archiver}{Archiver}} \&ar, \mbox{\hyperlink{class_shape}{Shape}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{archivertest_8cpp_source_l00126}{126}} of file \mbox{\hyperlink{archivertest_8cpp_source}{archivertest.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_shape_ac3b9fc48965274893f25b18aa14ba665}\index{Shape@{Shape}!````~Shape@{\texorpdfstring{$\sim$}{\string~}Shape}}
+\index{````~Shape@{\texorpdfstring{$\sim$}{\string~}Shape}!Shape@{Shape}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}Shape()}{\string~Shape()}}
+{\footnotesize\ttfamily \label{class_shape_ac3b9fc48965274893f25b18aa14ba665} 
+virtual Shape\+::\texorpdfstring{$\sim$}{\string~}\+Shape (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{archivertest_8cpp_source_l00128}{128}} of file \mbox{\hyperlink{archivertest_8cpp_source}{archivertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00128\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{class_shape_aaa8d87171e65e0d8ba3c5459978992a7}\index{Shape@{Shape}!Shape@{Shape}}
+\index{Shape@{Shape}!Shape@{Shape}}
+\doxysubsubsection{\texorpdfstring{Shape()}{Shape()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_shape_aaa8d87171e65e0d8ba3c5459978992a7} 
+Shape\+::\+Shape (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{archivertest_8cpp_source_l00133}{133}} of file \mbox{\hyperlink{archivertest_8cpp_source}{archivertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00133\ :\ \mbox{\hyperlink{class_shape_a0974311a6a8584d89c0b0ef54bf39025}{x\_}}(),\ \mbox{\hyperlink{class_shape_a262c653c278f26cf0bd1029279a03923}{y\_}}()\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{class_shape_afea00449915131bc1f07fbb5acc5ac25}\index{Shape@{Shape}!Shape@{Shape}}
+\index{Shape@{Shape}!Shape@{Shape}}
+\doxysubsubsection{\texorpdfstring{Shape()}{Shape()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_shape_afea00449915131bc1f07fbb5acc5ac25} 
+Shape\+::\+Shape (\begin{DoxyParamCaption}\item[{double}]{x}{, }\item[{double}]{y}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{archivertest_8cpp_source_l00134}{134}} of file \mbox{\hyperlink{archivertest_8cpp_source}{archivertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00134\ :\ \mbox{\hyperlink{class_shape_a0974311a6a8584d89c0b0ef54bf39025}{x\_}}(x),\ \mbox{\hyperlink{class_shape_a262c653c278f26cf0bd1029279a03923}{y\_}}(y)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_shape_a8b6867bd77e0c1e3bd323aceb0d97382}\index{Shape@{Shape}!GetType@{GetType}}
+\index{GetType@{GetType}!Shape@{Shape}}
+\doxysubsubsection{\texorpdfstring{GetType()}{GetType()}}
+{\footnotesize\ttfamily \label{class_shape_a8b6867bd77e0c1e3bd323aceb0d97382} 
+virtual const char \texorpdfstring{$\ast$}{*} Shape\+::\+Get\+Type (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{class_box_adaceada7d5d145b0f23a9826cff7b6a8}{Box}}, and \mbox{\hyperlink{class_circle_aee815ead7d60465de46900a46fcc828f}{Circle}}.
+
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=261pt]{class_shape_a8b6867bd77e0c1e3bd323aceb0d97382_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_shape_a7dab84dc6f915f8b919954aab44fcd91}\index{Shape@{Shape}!Print@{Print}}
+\index{Print@{Print}!Shape@{Shape}}
+\doxysubsubsection{\texorpdfstring{Print()}{Print()}}
+{\footnotesize\ttfamily \label{class_shape_a7dab84dc6f915f8b919954aab44fcd91} 
+virtual void Shape\+::\+Print (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{os}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{class_box_a86242bc341ab7392b64def3a3d08c300}{Box}}, and \mbox{\hyperlink{class_circle_a120f5ea0bee0b2ecf636639d09370ac9}{Circle}}.
+
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{class_shape_abbaa4a3bf18ee5cda37be6ec9f43449f}\index{Shape@{Shape}!operator\&@{operator\&}}
+\index{operator\&@{operator\&}!Shape@{Shape}}
+\doxysubsubsection{\texorpdfstring{operator\&}{operator\&}}
+{\footnotesize\ttfamily \label{class_shape_abbaa4a3bf18ee5cda37be6ec9f43449f} 
+template$<$typename \mbox{\hyperlink{class_archiver}{Archiver}} $>$ \\
+\mbox{\hyperlink{class_archiver}{Archiver}} \& operator\& (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_archiver}{Archiver}} \&}]{ar}{, }\item[{\mbox{\hyperlink{class_shape}{Shape}} \&}]{s}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{archivertest_8cpp_source_l00143}{143}} of file \mbox{\hyperlink{archivertest_8cpp_source}{archivertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00144\ \ \ \ \ ar.Member(\textcolor{stringliteral}{"{}x"{}})\ \&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.x\_;}
+\DoxyCodeLine{00145\ \ \ \ \ ar.Member(\textcolor{stringliteral}{"{}y"{}})\ \&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.y\_;}
+\DoxyCodeLine{00146\ \ \ \ \ \textcolor{keywordflow}{return}\ ar;}
+\DoxyCodeLine{00147\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{class_shape_a0974311a6a8584d89c0b0ef54bf39025}\index{Shape@{Shape}!x\_@{x\_}}
+\index{x\_@{x\_}!Shape@{Shape}}
+\doxysubsubsection{\texorpdfstring{x\_}{x\_}}
+{\footnotesize\ttfamily \label{class_shape_a0974311a6a8584d89c0b0ef54bf39025} 
+double Shape\+::x\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{archivertest_8cpp_source_l00139}{139}} of file \mbox{\hyperlink{archivertest_8cpp_source}{archivertest.\+cpp}}.
+
+\Hypertarget{class_shape_a262c653c278f26cf0bd1029279a03923}\index{Shape@{Shape}!y\_@{y\_}}
+\index{y\_@{y\_}!Shape@{Shape}}
+\doxysubsubsection{\texorpdfstring{y\_}{y\_}}
+{\footnotesize\ttfamily \label{class_shape_a262c653c278f26cf0bd1029279a03923} 
+double Shape\+::y\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{archivertest_8cpp_source_l00139}{139}} of file \mbox{\hyperlink{archivertest_8cpp_source}{archivertest.\+cpp}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/example/archiver/\mbox{\hyperlink{archivertest_8cpp}{archivertest.\+cpp}}\end{DoxyCompactItemize}

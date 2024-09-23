@@ -1,0 +1,286 @@
+\doxysection{libraries/fc/libraries/ff/libff/algebra/scalar\+\_\+multiplication/multiexp\+\_\+profile.cpp File Reference}
+\hypertarget{multiexp__profile_8cpp}{}\label{multiexp__profile_8cpp}\index{libraries/fc/libraries/ff/libff/algebra/scalar\_multiplication/multiexp\_profile.cpp@{libraries/fc/libraries/ff/libff/algebra/scalar\_multiplication/multiexp\_profile.cpp}}
+{\ttfamily \#include $<$cstdio$>$}\newline
+{\ttfamily \#include $<$vector$>$}\newline
+{\ttfamily \#include $<$libff/algebra/curves/bn128/bn128\+\_\+pp.\+hpp$>$}\newline
+{\ttfamily \#include $<$libff/algebra/scalar\+\_\+multiplication/multiexp.\+hpp$>$}\newline
+{\ttfamily \#include $<$libff/common/profiling.\+hpp$>$}\newline
+{\ttfamily \#include $<$libff/common/rng.\+hpp$>$}\newline
+Include dependency graph for multiexp\+\_\+profile.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{multiexp__profile_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename GroupT $>$ }\\using \mbox{\hyperlink{multiexp__profile_8cpp_a374880438c838689dc195b4884b4dd16}{run\+\_\+result\+\_\+t}} = std\+::pair$<$long long, std\+::vector$<$GroupT$>$ $>$
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\using \mbox{\hyperlink{multiexp__profile_8cpp_a5acd4ff1e7a344b55c71dcbd6e9cf01b}{test\+\_\+instances\+\_\+t}} = std\+::vector$<$std\+::vector$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$ $>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename GroupT $>$ }\\\mbox{\hyperlink{multiexp__profile_8cpp_a5acd4ff1e7a344b55c71dcbd6e9cf01b}{test\+\_\+instances\+\_\+t}}$<$ GroupT $>$ \mbox{\hyperlink{multiexp__profile_8cpp_afaf7a343cff3466e9fbbc089792e863e}{generate\+\_\+group\+\_\+elements}} (size\+\_\+t \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}, size\+\_\+t size)
+\item 
+{\footnotesize template$<$typename FieldT $>$ }\\\mbox{\hyperlink{multiexp__profile_8cpp_a5acd4ff1e7a344b55c71dcbd6e9cf01b}{test\+\_\+instances\+\_\+t}}$<$ FieldT $>$ \mbox{\hyperlink{multiexp__profile_8cpp_ae02794cf54d8b475ca170925187837a0}{generate\+\_\+scalars}} (size\+\_\+t \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}, size\+\_\+t size)
+\item 
+{\footnotesize template$<$typename GroupT , typename FieldT , \mbox{\hyperlink{namespacelibff_a8b13cbb28debbfc9b15e779d932e6709}{multi\+\_\+exp\+\_\+method}} Method$>$ }\\\mbox{\hyperlink{multiexp__profile_8cpp_a374880438c838689dc195b4884b4dd16}{run\+\_\+result\+\_\+t}}$<$ GroupT $>$ \mbox{\hyperlink{multiexp__profile_8cpp_aba4aee414fcfab68d0803154b25c0553}{profile\+\_\+multiexp}} (\mbox{\hyperlink{multiexp__profile_8cpp_a5acd4ff1e7a344b55c71dcbd6e9cf01b}{test\+\_\+instances\+\_\+t}}$<$ GroupT $>$ group\+\_\+elements, \mbox{\hyperlink{multiexp__profile_8cpp_a5acd4ff1e7a344b55c71dcbd6e9cf01b}{test\+\_\+instances\+\_\+t}}$<$ FieldT $>$ scalars)
+\item 
+{\footnotesize template$<$typename GroupT , typename FieldT $>$ }\\void \mbox{\hyperlink{multiexp__profile_8cpp_acb0d9f2af0ecc08a78d3d05b1b2a990f}{print\+\_\+performance\+\_\+csv}} (size\+\_\+t expn\+\_\+start, size\+\_\+t expn\+\_\+end\+\_\+fast, size\+\_\+t expn\+\_\+end\+\_\+naive, bool compare\+\_\+answers)
+\item 
+int \mbox{\hyperlink{multiexp__profile_8cpp_a840291bc02cba5474a4cb46a9b9566fe}{main}} (void)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{multiexp__profile_8cpp_a374880438c838689dc195b4884b4dd16}\index{multiexp\_profile.cpp@{multiexp\_profile.cpp}!run\_result\_t@{run\_result\_t}}
+\index{run\_result\_t@{run\_result\_t}!multiexp\_profile.cpp@{multiexp\_profile.cpp}}
+\doxysubsubsection{\texorpdfstring{run\_result\_t}{run\_result\_t}}
+{\footnotesize\ttfamily \label{multiexp__profile_8cpp_a374880438c838689dc195b4884b4dd16} 
+template$<$typename GroupT $>$ \\
+using \mbox{\hyperlink{multiexp__profile_8cpp_a374880438c838689dc195b4884b4dd16}{run\+\_\+result\+\_\+t}} = std\+::pair$<$long long, std\+::vector$<$GroupT$>$ $>$}
+
+
+
+Definition at line \mbox{\hyperlink{multiexp__profile_8cpp_source_l00012}{12}} of file \mbox{\hyperlink{multiexp__profile_8cpp_source}{multiexp\+\_\+profile.\+cpp}}.
+
+\Hypertarget{multiexp__profile_8cpp_a5acd4ff1e7a344b55c71dcbd6e9cf01b}\index{multiexp\_profile.cpp@{multiexp\_profile.cpp}!test\_instances\_t@{test\_instances\_t}}
+\index{test\_instances\_t@{test\_instances\_t}!multiexp\_profile.cpp@{multiexp\_profile.cpp}}
+\doxysubsubsection{\texorpdfstring{test\_instances\_t}{test\_instances\_t}}
+{\footnotesize\ttfamily \label{multiexp__profile_8cpp_a5acd4ff1e7a344b55c71dcbd6e9cf01b} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+using \mbox{\hyperlink{multiexp__profile_8cpp_a5acd4ff1e7a344b55c71dcbd6e9cf01b}{test\+\_\+instances\+\_\+t}} = std\+::vector$<$std\+::vector$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$ $>$}
+
+
+
+Definition at line \mbox{\hyperlink{multiexp__profile_8cpp_source_l00015}{15}} of file \mbox{\hyperlink{multiexp__profile_8cpp_source}{multiexp\+\_\+profile.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{multiexp__profile_8cpp_afaf7a343cff3466e9fbbc089792e863e}\index{multiexp\_profile.cpp@{multiexp\_profile.cpp}!generate\_group\_elements@{generate\_group\_elements}}
+\index{generate\_group\_elements@{generate\_group\_elements}!multiexp\_profile.cpp@{multiexp\_profile.cpp}}
+\doxysubsubsection{\texorpdfstring{generate\_group\_elements()}{generate\_group\_elements()}}
+{\footnotesize\ttfamily \label{multiexp__profile_8cpp_afaf7a343cff3466e9fbbc089792e863e} 
+template$<$typename GroupT $>$ \\
+\mbox{\hyperlink{multiexp__profile_8cpp_a5acd4ff1e7a344b55c71dcbd6e9cf01b}{test\+\_\+instances\+\_\+t}}$<$ GroupT $>$ generate\+\_\+group\+\_\+elements (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{count}{, }\item[{size\+\_\+t}]{size}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{multiexp__profile_8cpp_source_l00018}{18}} of file \mbox{\hyperlink{multiexp__profile_8cpp_source}{multiexp\+\_\+profile.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00019\ \{}
+\DoxyCodeLine{00020\ \ \ \ \ \textcolor{comment}{//\ generating\ a\ random\ group\ element\ is\ expensive,}}
+\DoxyCodeLine{00021\ \ \ \ \ \textcolor{comment}{//\ so\ for\ now\ we\ only\ generate\ a\ single\ one\ and\ repeat\ it}}
+\DoxyCodeLine{00022\ \ \ \ \ \mbox{\hyperlink{multiexp__profile_8cpp_a5acd4ff1e7a344b55c71dcbd6e9cf01b}{test\_instances\_t<GroupT>}}\ result(\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}});}
+\DoxyCodeLine{00023\ }
+\DoxyCodeLine{00024\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}};\ i++)\ \{}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ GroupT\ x\ =\ GroupT::random\_element();}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ x.to\_special();\ \textcolor{comment}{//\ djb\ requires\ input\ to\ be\ in\ special\ form}}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ =\ 0;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ <\ size;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}++)\ \{}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \ \ \ \ result[i].push\_back(x);}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ result[i].push\_back(GroupT::random\_element());}}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00031\ \ \ \ \ \}}
+\DoxyCodeLine{00032\ }
+\DoxyCodeLine{00033\ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00034\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{multiexp__profile_8cpp_afaf7a343cff3466e9fbbc089792e863e_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{multiexp__profile_8cpp_ae02794cf54d8b475ca170925187837a0}\index{multiexp\_profile.cpp@{multiexp\_profile.cpp}!generate\_scalars@{generate\_scalars}}
+\index{generate\_scalars@{generate\_scalars}!multiexp\_profile.cpp@{multiexp\_profile.cpp}}
+\doxysubsubsection{\texorpdfstring{generate\_scalars()}{generate\_scalars()}}
+{\footnotesize\ttfamily \label{multiexp__profile_8cpp_ae02794cf54d8b475ca170925187837a0} 
+template$<$typename FieldT $>$ \\
+\mbox{\hyperlink{multiexp__profile_8cpp_a5acd4ff1e7a344b55c71dcbd6e9cf01b}{test\+\_\+instances\+\_\+t}}$<$ FieldT $>$ generate\+\_\+scalars (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{count}{, }\item[{size\+\_\+t}]{size}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{multiexp__profile_8cpp_source_l00037}{37}} of file \mbox{\hyperlink{multiexp__profile_8cpp_source}{multiexp\+\_\+profile.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00038\ \{}
+\DoxyCodeLine{00039\ \ \ \ \ \textcolor{comment}{//\ we\ use\ SHA512\_rng\ because\ it\ is\ much\ faster\ than}}
+\DoxyCodeLine{00040\ \ \ \ \ \textcolor{comment}{//\ FieldT::random\_element()}}
+\DoxyCodeLine{00041\ \ \ \ \ \mbox{\hyperlink{multiexp__profile_8cpp_a5acd4ff1e7a344b55c71dcbd6e9cf01b}{test\_instances\_t<FieldT>}}\ result(\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}});}
+\DoxyCodeLine{00042\ }
+\DoxyCodeLine{00043\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}};\ i++)\ \{}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ =\ 0;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ <\ size;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}++)\ \{}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \ \ \ result[i].push\_back(\mbox{\hyperlink{namespacelibff_ac97862c35064df387d87ccf3cbc2af1d}{SHA512\_rng<FieldT>}}(i\ *\ size\ +\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}));}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00047\ \ \ \ \ \}}
+\DoxyCodeLine{00048\ }
+\DoxyCodeLine{00049\ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00050\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=300pt]{multiexp__profile_8cpp_ae02794cf54d8b475ca170925187837a0_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{multiexp__profile_8cpp_ae02794cf54d8b475ca170925187837a0_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{multiexp__profile_8cpp_a840291bc02cba5474a4cb46a9b9566fe}\index{multiexp\_profile.cpp@{multiexp\_profile.cpp}!main@{main}}
+\index{main@{main}!multiexp\_profile.cpp@{multiexp\_profile.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{multiexp__profile_8cpp_a840291bc02cba5474a4cb46a9b9566fe} 
+int main (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{multiexp__profile_8cpp_source_l00116}{116}} of file \mbox{\hyperlink{multiexp__profile_8cpp_source}{multiexp\+\_\+profile.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00117\ \{}
+\DoxyCodeLine{00118\ \ \ \ \ \mbox{\hyperlink{namespacelibff_ae2b657d337cbf53d4ce21b530b76efc5}{print\_compilation\_info}}();}
+\DoxyCodeLine{00119\ }
+\DoxyCodeLine{00120\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Profiling\ BN128\_G1\(\backslash\)n"{}});}
+\DoxyCodeLine{00121\ \ \ \ \ \mbox{\hyperlink{classlibff_1_1bn128__pp_ae44372429d5c8f7d85e87d6ddeb10a19}{bn128\_pp::init\_public\_params}}();}
+\DoxyCodeLine{00122\ \ \ \ \ \mbox{\hyperlink{multiexp__profile_8cpp_acb0d9f2af0ecc08a78d3d05b1b2a990f}{print\_performance\_csv<G1<bn128\_pp>}},\ \mbox{\hyperlink{namespacelibff_a4d9ee1177daeded24b60e6425e5370d3}{Fr<bn128\_pp>}}\ >(2,\ 20,\ 14,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00123\ }
+\DoxyCodeLine{00124\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Profiling\ BN128\_G2\(\backslash\)n"{}});}
+\DoxyCodeLine{00125\ \ \ \ \ \mbox{\hyperlink{multiexp__profile_8cpp_acb0d9f2af0ecc08a78d3d05b1b2a990f}{print\_performance\_csv<G2<bn128\_pp>}},\ \mbox{\hyperlink{namespacelibff_a4d9ee1177daeded24b60e6425e5370d3}{Fr<bn128\_pp>}}\ >(2,\ 20,\ 14,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00126\ }
+\DoxyCodeLine{00127\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00128\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{multiexp__profile_8cpp_a840291bc02cba5474a4cb46a9b9566fe_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{multiexp__profile_8cpp_acb0d9f2af0ecc08a78d3d05b1b2a990f}\index{multiexp\_profile.cpp@{multiexp\_profile.cpp}!print\_performance\_csv@{print\_performance\_csv}}
+\index{print\_performance\_csv@{print\_performance\_csv}!multiexp\_profile.cpp@{multiexp\_profile.cpp}}
+\doxysubsubsection{\texorpdfstring{print\_performance\_csv()}{print\_performance\_csv()}}
+{\footnotesize\ttfamily \label{multiexp__profile_8cpp_acb0d9f2af0ecc08a78d3d05b1b2a990f} 
+template$<$typename GroupT , typename FieldT $>$ \\
+void print\+\_\+performance\+\_\+csv (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{expn\+\_\+start}{, }\item[{size\+\_\+t}]{expn\+\_\+end\+\_\+fast}{, }\item[{size\+\_\+t}]{expn\+\_\+end\+\_\+naive}{, }\item[{bool}]{compare\+\_\+answers}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{multiexp__profile_8cpp_source_l00073}{73}} of file \mbox{\hyperlink{multiexp__profile_8cpp_source}{multiexp\+\_\+profile.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00078\ \{}
+\DoxyCodeLine{00079\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ expn\ =\ expn\_start;\ expn\ <=\ expn\_end\_fast;\ expn++)\ \{}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\%ld"{}},\ expn);\ fflush(stdout);}
+\DoxyCodeLine{00081\ }
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{multiexp__profile_8cpp_a5acd4ff1e7a344b55c71dcbd6e9cf01b}{test\_instances\_t<GroupT>}}\ group\_elements\ =}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{multiexp__profile_8cpp_afaf7a343cff3466e9fbbc089792e863e}{generate\_group\_elements<GroupT>}}(10,\ 1\ <<\ expn);}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{multiexp__profile_8cpp_a5acd4ff1e7a344b55c71dcbd6e9cf01b}{test\_instances\_t<FieldT>}}\ scalars\ =}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{multiexp__profile_8cpp_ae02794cf54d8b475ca170925187837a0}{generate\_scalars<FieldT>}}(10,\ 1\ <<\ expn);}
+\DoxyCodeLine{00086\ }
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{multiexp__profile_8cpp_a374880438c838689dc195b4884b4dd16}{run\_result\_t<GroupT>}}\ result\_bos\_coster\ =}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{multiexp__profile_8cpp_aba4aee414fcfab68d0803154b25c0553}{profile\_multiexp<GroupT,\ FieldT,\ multi\_exp\_method\_bos\_coster>}}(}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ group\_elements,\ scalars);}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\(\backslash\)t\%lld"{}},\ result\_bos\_coster.first);\ fflush(stdout);}
+\DoxyCodeLine{00091\ }
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{multiexp__profile_8cpp_a374880438c838689dc195b4884b4dd16}{run\_result\_t<GroupT>}}\ result\_djb\ =}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{multiexp__profile_8cpp_aba4aee414fcfab68d0803154b25c0553}{profile\_multiexp<GroupT,\ FieldT,\ multi\_exp\_method\_BDLO12>}}(}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ group\_elements,\ scalars);}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\(\backslash\)t\%lld"{}},\ result\_djb.first);\ fflush(stdout);}
+\DoxyCodeLine{00096\ }
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (compare\_answers\ \&\&\ (result\_bos\_coster.second\ !=\ result\_djb.second))\ \{}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Answers\ NOT\ MATCHING\ (bos\ coster\ !=\ djb)\(\backslash\)n"{}});}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00100\ }
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (expn\ <=\ expn\_end\_naive)\ \{}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{multiexp__profile_8cpp_a374880438c838689dc195b4884b4dd16}{run\_result\_t<GroupT>}}\ result\_naive\ =}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{multiexp__profile_8cpp_aba4aee414fcfab68d0803154b25c0553}{profile\_multiexp<GroupT,\ FieldT,\ multi\_exp\_method\_naive>}}(}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ group\_elements,\ scalars);}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\(\backslash\)t\%lld"{}},\ result\_naive.first);\ fflush(stdout);}
+\DoxyCodeLine{00106\ }
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (compare\_answers\ \&\&\ (result\_bos\_coster.second\ !=\ result\_naive.second))\ \{}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Answers\ NOT\ MATCHING\ (bos\ coster\ !=\ naive)\(\backslash\)n"{}});}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00111\ }
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{00113\ \ \ \ \ \}}
+\DoxyCodeLine{00114\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{multiexp__profile_8cpp_acb0d9f2af0ecc08a78d3d05b1b2a990f_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=268pt]{multiexp__profile_8cpp_acb0d9f2af0ecc08a78d3d05b1b2a990f_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{multiexp__profile_8cpp_aba4aee414fcfab68d0803154b25c0553}\index{multiexp\_profile.cpp@{multiexp\_profile.cpp}!profile\_multiexp@{profile\_multiexp}}
+\index{profile\_multiexp@{profile\_multiexp}!multiexp\_profile.cpp@{multiexp\_profile.cpp}}
+\doxysubsubsection{\texorpdfstring{profile\_multiexp()}{profile\_multiexp()}}
+{\footnotesize\ttfamily \label{multiexp__profile_8cpp_aba4aee414fcfab68d0803154b25c0553} 
+template$<$typename GroupT , typename FieldT , \mbox{\hyperlink{namespacelibff_a8b13cbb28debbfc9b15e779d932e6709}{multi\+\_\+exp\+\_\+method}} Method$>$ \\
+\mbox{\hyperlink{multiexp__profile_8cpp_a374880438c838689dc195b4884b4dd16}{run\+\_\+result\+\_\+t}}$<$ GroupT $>$ profile\+\_\+multiexp (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{multiexp__profile_8cpp_a5acd4ff1e7a344b55c71dcbd6e9cf01b}{test\+\_\+instances\+\_\+t}}$<$ GroupT $>$}]{group\+\_\+elements}{, }\item[{\mbox{\hyperlink{multiexp__profile_8cpp_a5acd4ff1e7a344b55c71dcbd6e9cf01b}{test\+\_\+instances\+\_\+t}}$<$ FieldT $>$}]{scalars}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{multiexp__profile_8cpp_source_l00053}{53}} of file \mbox{\hyperlink{multiexp__profile_8cpp_source}{multiexp\+\_\+profile.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00056\ \{}
+\DoxyCodeLine{00057\ \ \ \ \ \textcolor{keywordtype}{long}\ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{namespacelibff_af8ae91a4bcbdd7c4e71db45703edaae3}{start\_time}}\ =\ \mbox{\hyperlink{namespacelibff_a81e225ed671a1a00f2dfe5753f89b6cf}{get\_nsec\_time}}();}
+\DoxyCodeLine{00058\ }
+\DoxyCodeLine{00059\ \ \ \ \ std::vector<GroupT>\ answers;}
+\DoxyCodeLine{00060\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ group\_elements.size();\ i++)\ \{}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ answers.push\_back(\mbox{\hyperlink{namespacelibff_a909c5131f90d7c9c35b61ca332f08f3a}{multi\_exp<GroupT,\ FieldT,\ Method>}}(}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \ \ \ group\_elements[i].cbegin(),\ group\_elements[i].cend(),}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ scalars[i].cbegin(),\ scalars[i].cend(),}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \ \ \ 1));}
+\DoxyCodeLine{00065\ \ \ \ \ \}}
+\DoxyCodeLine{00066\ }
+\DoxyCodeLine{00067\ \ \ \ \ \textcolor{keywordtype}{long}\ \textcolor{keywordtype}{long}\ time\_delta\ =\ \mbox{\hyperlink{namespacelibff_a81e225ed671a1a00f2dfe5753f89b6cf}{get\_nsec\_time}}()\ -\/\ \mbox{\hyperlink{namespacelibff_af8ae91a4bcbdd7c4e71db45703edaae3}{start\_time}};}
+\DoxyCodeLine{00068\ }
+\DoxyCodeLine{00069\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{multiexp__profile_8cpp_a374880438c838689dc195b4884b4dd16}{run\_result\_t<GroupT>}}(time\_delta,\ answers);}
+\DoxyCodeLine{00070\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=302pt]{multiexp__profile_8cpp_aba4aee414fcfab68d0803154b25c0553_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{multiexp__profile_8cpp_aba4aee414fcfab68d0803154b25c0553_icgraph}
+\end{center}
+\end{figure}

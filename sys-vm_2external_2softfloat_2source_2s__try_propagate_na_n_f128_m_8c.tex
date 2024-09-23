@@ -1,0 +1,59 @@
+\doxysection{libraries/sys-\/vm/external/softfloat/source/s\+\_\+try\+Propagate\+Na\+NF128M.c File Reference}
+\hypertarget{sys-vm_2external_2softfloat_2source_2s__try_propagate_na_n_f128_m_8c}{}\label{sys-vm_2external_2softfloat_2source_2s__try_propagate_na_n_f128_m_8c}\index{libraries/sys-\/vm/external/softfloat/source/s\_tryPropagateNaNF128M.c@{libraries/sys-\/vm/external/softfloat/source/s\_tryPropagateNaNF128M.c}}
+{\ttfamily \#include $<$stdbool.\+h$>$}\newline
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include "{}platform.\+h"{}}\newline
+{\ttfamily \#include "{}internals.\+h"{}}\newline
+{\ttfamily \#include "{}specialize.\+h"{}}\newline
+Include dependency graph for s\+\_\+try\+Propagate\+Na\+NF128\+M.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sys-vm_2external_2softfloat_2source_2s__try_propagate_na_n_f128_m_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2s__try_propagate_na_n_f128_m_8c_abeccac6ac029cf15470d8b565f757bc4}{softfloat\+\_\+try\+Propagate\+Na\+NF128M}} (const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*}a\+WPtr, const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*}b\+WPtr, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*}z\+WPtr)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{sys-vm_2external_2softfloat_2source_2s__try_propagate_na_n_f128_m_8c_abeccac6ac029cf15470d8b565f757bc4}\index{s\_tryPropagateNaNF128M.c@{s\_tryPropagateNaNF128M.c}!softfloat\_tryPropagateNaNF128M@{softfloat\_tryPropagateNaNF128M}}
+\index{softfloat\_tryPropagateNaNF128M@{softfloat\_tryPropagateNaNF128M}!s\_tryPropagateNaNF128M.c@{s\_tryPropagateNaNF128M.c}}
+\doxysubsubsection{\texorpdfstring{softfloat\_tryPropagateNaNF128M()}{softfloat\_tryPropagateNaNF128M()}}
+{\footnotesize\ttfamily \label{sys-vm_2external_2softfloat_2source_2s__try_propagate_na_n_f128_m_8c_abeccac6ac029cf15470d8b565f757bc4} 
+bool softfloat\+\_\+try\+Propagate\+Na\+NF128M (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{a\+WPtr}{, }\item[{const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{b\+WPtr}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{z\+WPtr}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2s__try_propagate_na_n_f128_m_8c_source_l00044}{44}} of file \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2s__try_propagate_na_n_f128_m_8c_source}{s\+\_\+try\+Propagate\+Na\+NF128\+M.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00046\ \{}
+\DoxyCodeLine{00047\ }
+\DoxyCodeLine{00048\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a20b9dda0624f400a1cffd66ac207e165}{softfloat\_isNaNF128M}}(\ aWPtr\ )\ ||\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a20b9dda0624f400a1cffd66ac207e165}{softfloat\_isNaNF128M}}(\ bWPtr\ )\ )\ \{}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2s__propagate_na_n_f128_m_8c_a04b5d25277cae924dd506c491f0af1ec}{softfloat\_propagateNaNF128M}}(\ aWPtr,\ bWPtr,\ zWPtr\ );}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00051\ \ \ \ \ \}}
+\DoxyCodeLine{00052\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00053\ }
+\DoxyCodeLine{00054\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sys-vm_2external_2softfloat_2source_2s__try_propagate_na_n_f128_m_8c_abeccac6ac029cf15470d8b565f757bc4_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sys-vm_2external_2softfloat_2source_2s__try_propagate_na_n_f128_m_8c_abeccac6ac029cf15470d8b565f757bc4_icgraph}
+\end{center}
+\end{figure}

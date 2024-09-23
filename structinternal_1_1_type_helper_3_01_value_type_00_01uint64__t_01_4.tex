@@ -1,0 +1,98 @@
+\doxysection{internal\+::Type\+Helper\texorpdfstring{$<$}{<} Value\+Type, uint64\+\_\+t \texorpdfstring{$>$}{>} Struct Template Reference}
+\hypertarget{structinternal_1_1_type_helper_3_01_value_type_00_01uint64__t_01_4}{}\label{structinternal_1_1_type_helper_3_01_value_type_00_01uint64__t_01_4}\index{internal::TypeHelper$<$ ValueType, uint64\_t $>$@{internal::TypeHelper$<$ ValueType, uint64\_t $>$}}
+
+
+{\ttfamily \#include $<$document.\+h$>$}
+
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static bool \mbox{\hyperlink{structinternal_1_1_type_helper_3_01_value_type_00_01uint64__t_01_4_a4916651732ed27fa944c96a32cec5b88}{Is}} (const Value\+Type \&v)
+\item 
+static \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structinternal_1_1_type_helper_3_01_value_type_00_01uint64__t_01_4_a1b1b2e4fe3c38fb37701284c6571ee92}{Get}} (const Value\+Type \&v)
+\item 
+static Value\+Type \& \mbox{\hyperlink{structinternal_1_1_type_helper_3_01_value_type_00_01uint64__t_01_4_ae7dd2b4d800b7021a60dedc665be8ae4}{Set}} (Value\+Type \&v, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} data)
+\item 
+static Value\+Type \& \mbox{\hyperlink{structinternal_1_1_type_helper_3_01_value_type_00_01uint64__t_01_4_a85ba4f6efcd460739e8fbad1fa804220}{Set}} (Value\+Type \&v, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} data, typename Value\+Type\+::\+Allocator\+Type \&)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Value\+Type$>$\newline
+struct internal\+::\+Type\+Helper$<$ Value\+Type, uint64\+\_\+t $>$}
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l00484}{484}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structinternal_1_1_type_helper_3_01_value_type_00_01uint64__t_01_4_a1b1b2e4fe3c38fb37701284c6571ee92}\index{internal::TypeHelper$<$ ValueType, uint64\_t $>$@{internal::TypeHelper$<$ ValueType, uint64\_t $>$}!Get@{Get}}
+\index{Get@{Get}!internal::TypeHelper$<$ ValueType, uint64\_t $>$@{internal::TypeHelper$<$ ValueType, uint64\_t $>$}}
+\doxysubsubsection{\texorpdfstring{Get()}{Get()}}
+{\footnotesize\ttfamily \label{structinternal_1_1_type_helper_3_01_value_type_00_01uint64__t_01_4_a1b1b2e4fe3c38fb37701284c6571ee92} 
+template$<$typename Value\+Type $>$ \\
+static \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structinternal_1_1_type_helper}{internal\+::\+Type\+Helper}}$<$ Value\+Type, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} $>$\+::\+Get (\begin{DoxyParamCaption}\item[{const Value\+Type \&}]{v}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l00486}{486}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00486\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.GetUint64();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structinternal_1_1_type_helper_3_01_value_type_00_01uint64__t_01_4_a4916651732ed27fa944c96a32cec5b88}\index{internal::TypeHelper$<$ ValueType, uint64\_t $>$@{internal::TypeHelper$<$ ValueType, uint64\_t $>$}!Is@{Is}}
+\index{Is@{Is}!internal::TypeHelper$<$ ValueType, uint64\_t $>$@{internal::TypeHelper$<$ ValueType, uint64\_t $>$}}
+\doxysubsubsection{\texorpdfstring{Is()}{Is()}}
+{\footnotesize\ttfamily \label{structinternal_1_1_type_helper_3_01_value_type_00_01uint64__t_01_4_a4916651732ed27fa944c96a32cec5b88} 
+template$<$typename Value\+Type $>$ \\
+static bool \mbox{\hyperlink{structinternal_1_1_type_helper}{internal\+::\+Type\+Helper}}$<$ Value\+Type, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} $>$\+::\+Is (\begin{DoxyParamCaption}\item[{const Value\+Type \&}]{v}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l00485}{485}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00485\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.IsUint64();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structinternal_1_1_type_helper_3_01_value_type_00_01uint64__t_01_4_ae7dd2b4d800b7021a60dedc665be8ae4}\index{internal::TypeHelper$<$ ValueType, uint64\_t $>$@{internal::TypeHelper$<$ ValueType, uint64\_t $>$}!Set@{Set}}
+\index{Set@{Set}!internal::TypeHelper$<$ ValueType, uint64\_t $>$@{internal::TypeHelper$<$ ValueType, uint64\_t $>$}}
+\doxysubsubsection{\texorpdfstring{Set()}{Set()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structinternal_1_1_type_helper_3_01_value_type_00_01uint64__t_01_4_ae7dd2b4d800b7021a60dedc665be8ae4} 
+template$<$typename Value\+Type $>$ \\
+static Value\+Type \& \mbox{\hyperlink{structinternal_1_1_type_helper}{internal\+::\+Type\+Helper}}$<$ Value\+Type, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} $>$\+::\+Set (\begin{DoxyParamCaption}\item[{Value\+Type \&}]{v}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{data}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l00487}{487}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00487\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.SetUint64(data);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structinternal_1_1_type_helper_3_01_value_type_00_01uint64__t_01_4_a85ba4f6efcd460739e8fbad1fa804220}\index{internal::TypeHelper$<$ ValueType, uint64\_t $>$@{internal::TypeHelper$<$ ValueType, uint64\_t $>$}!Set@{Set}}
+\index{Set@{Set}!internal::TypeHelper$<$ ValueType, uint64\_t $>$@{internal::TypeHelper$<$ ValueType, uint64\_t $>$}}
+\doxysubsubsection{\texorpdfstring{Set()}{Set()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structinternal_1_1_type_helper_3_01_value_type_00_01uint64__t_01_4_a85ba4f6efcd460739e8fbad1fa804220} 
+template$<$typename Value\+Type $>$ \\
+static Value\+Type \& \mbox{\hyperlink{structinternal_1_1_type_helper}{internal\+::\+Type\+Helper}}$<$ Value\+Type, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} $>$\+::\+Set (\begin{DoxyParamCaption}\item[{Value\+Type \&}]{v}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{data}{, }\item[{typename Value\+Type\+::\+Allocator\+Type \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l00488}{488}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00488\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.SetUint64(data);\ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/\mbox{\hyperlink{document_8h}{document.\+h}}\end{DoxyCompactItemize}

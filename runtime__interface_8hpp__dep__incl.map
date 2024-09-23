@@ -1,0 +1,22 @@
+<map id="libraries/chain/include/sysio/chain/webassembly/runtime_interface.hpp" name="libraries/chain/include/sysio/chain/webassembly/runtime_interface.hpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="221,5,396,61"/>
+<area shape="rect" id="Node000002" href="$wasm__interface__private_8hpp.html" title=" " alt="" coords="215,213,402,268"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="311,76,311,212,306,212,306,76"/>
+<area shape="rect" id="Node000004" href="$sys-vm-oc_8hpp.html" title=" " alt="" coords="53,109,228,165"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="252,72,187,111,184,106,249,67"/>
+<area shape="rect" id="Node000006" href="$sys-vm_8hpp.html" title=" " alt="" coords="352,109,527,165"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="357,69,406,106,403,110,354,73"/>
+<area shape="rect" id="Node000003" href="$wasm__interface_8cpp.html" title=" " alt="" coords="238,316,379,357"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="311,284,311,316,306,316,306,284"/>
+<area shape="rect" id="Node000005" href="$sys-vm-oc_8cpp.html" title=" " alt="" coords="5,220,191,261"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="126,180,109,221,104,219,121,178"/>
+<area shape="poly" id="edge6_Node000006_Node000002" title=" " alt="" coords="394,177,345,214,342,210,391,172"/>
+<area shape="poly" id="edge10_Node000006_Node000003" title=" " alt="" coords="442,180,435,225,428,248,416,270,389,298,357,318,355,314,386,294,412,267,423,246,430,224,437,180"/>
+<area shape="rect" id="Node000007" href="$preconditions_8hpp.html" title=" " alt="" coords="477,213,652,268"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="486,173,533,210,529,214,483,177"/>
+<area shape="rect" id="Node000008" href="$sys-vm_8cpp.html" title=" " alt="" coords="612,316,797,357"/>
+<area shape="poly" id="edge11_Node000006_Node000008" title=" " alt="" coords="543,149,608,171,639,189,667,211,685,236,696,264,706,315,701,316,691,266,680,238,663,214,636,193,606,176,541,154"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="619,275,677,314,674,318,616,279"/>
+<area shape="rect" id="Node000009" href="$softfloat_8cpp.html" title=" " alt="" coords="403,316,588,357"/>
+<area shape="poly" id="edge9_Node000007_Node000009" title=" " alt="" coords="538,283,512,318,507,314,533,279"/>
+</map>

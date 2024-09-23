@@ -1,0 +1,216 @@
+\doxysection{Catch\+::Reusable\+String\+Stream Class Reference}
+\hypertarget{class_catch_1_1_reusable_string_stream}{}\label{class_catch_1_1_reusable_string_stream}\index{Catch::ReusableStringStream@{Catch::ReusableStringStream}}
+
+
+{\ttfamily \#include $<$catch\+\_\+stream.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_catch_1_1_reusable_string_stream_a9b3f8c52b0d2d63ffd825297a9c09781}{Reusable\+String\+Stream}} ()
+\item 
+\mbox{\hyperlink{class_catch_1_1_reusable_string_stream_aba9384e258a4db3178447b6a58414712}{\texorpdfstring{$\sim$}{\string~}\+Reusable\+String\+Stream}} ()
+\item 
+auto \mbox{\hyperlink{class_catch_1_1_reusable_string_stream_a0e9ecf260b2a5d35f4886ef0d51f6270}{str}} () const -\/$>$ std\+::string
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\auto \mbox{\hyperlink{class_catch_1_1_reusable_string_stream_af95f72024c082db70e5e50782e28e4f6}{operator$<$$<$}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}) -\/$>$ \mbox{\hyperlink{class_catch_1_1_reusable_string_stream}{Reusable\+String\+Stream}} \&
+\item 
+auto \mbox{\hyperlink{class_catch_1_1_reusable_string_stream_a6881808c60a080d4e24a0b81c94cbf67}{get}} () -\/$>$ std\+::ostream \&
+\item 
+\mbox{\hyperlink{class_catch_1_1_reusable_string_stream_a9b3f8c52b0d2d63ffd825297a9c09781}{Reusable\+String\+Stream}} ()
+\item 
+\mbox{\hyperlink{class_catch_1_1_reusable_string_stream_aba9384e258a4db3178447b6a58414712}{\texorpdfstring{$\sim$}{\string~}\+Reusable\+String\+Stream}} ()
+\item 
+auto \mbox{\hyperlink{class_catch_1_1_reusable_string_stream_a0e9ecf260b2a5d35f4886ef0d51f6270}{str}} () const -\/$>$ std\+::string
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\auto \mbox{\hyperlink{class_catch_1_1_reusable_string_stream_af95f72024c082db70e5e50782e28e4f6}{operator$<$$<$}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}) -\/$>$ \mbox{\hyperlink{class_catch_1_1_reusable_string_stream}{Reusable\+String\+Stream}} \&
+\item 
+auto \mbox{\hyperlink{class_catch_1_1_reusable_string_stream_a6881808c60a080d4e24a0b81c94cbf67}{get}} () -\/$>$ std\+::ostream \&
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source_l01150}{1150}} of file \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source}{catch.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_catch_1_1_reusable_string_stream_a9b3f8c52b0d2d63ffd825297a9c09781}\index{Catch::ReusableStringStream@{Catch::ReusableStringStream}!ReusableStringStream@{ReusableStringStream}}
+\index{ReusableStringStream@{ReusableStringStream}!Catch::ReusableStringStream@{Catch::ReusableStringStream}}
+\doxysubsubsection{\texorpdfstring{ReusableStringStream()}{ReusableStringStream()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_reusable_string_stream_a9b3f8c52b0d2d63ffd825297a9c09781} 
+Catch\+::\+Reusable\+String\+Stream\+::\+Reusable\+String\+Stream (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{include_2internal_2catch__stream_8cpp_source_l00163}{163}} of file \mbox{\hyperlink{include_2internal_2catch__stream_8cpp_source}{catch\+\_\+stream.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00164\ \ \ \ \ :\ \ \ m\_index(\ \mbox{\hyperlink{class_catch_1_1_singleton_a8c18286fe40405813c5bab05e20ce4f0}{Singleton<StringStreams>::getMutable}}().\mbox{\hyperlink{static__buf_8cpp_aa99823a0fc8313c9c32541ce768fb801}{add}}()\ ),}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ m\_oss(\ \mbox{\hyperlink{class_catch_1_1_singleton_a8c18286fe40405813c5bab05e20ce4f0}{Singleton<StringStreams>::getMutable}}().m\_streams[m\_index].\mbox{\hyperlink{class_catch_1_1_reusable_string_stream_a6881808c60a080d4e24a0b81c94cbf67}{get}}()\ )}
+\DoxyCodeLine{00166\ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_reusable_string_stream_aba9384e258a4db3178447b6a58414712}\index{Catch::ReusableStringStream@{Catch::ReusableStringStream}!````~ReusableStringStream@{\texorpdfstring{$\sim$}{\string~}ReusableStringStream}}
+\index{````~ReusableStringStream@{\texorpdfstring{$\sim$}{\string~}ReusableStringStream}!Catch::ReusableStringStream@{Catch::ReusableStringStream}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}ReusableStringStream()}{\string~ReusableStringStream()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_reusable_string_stream_aba9384e258a4db3178447b6a58414712} 
+Catch\+::\+Reusable\+String\+Stream\+::\texorpdfstring{$\sim$}{\string~}\+Reusable\+String\+Stream (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{include_2internal_2catch__stream_8cpp_source_l00168}{168}} of file \mbox{\hyperlink{include_2internal_2catch__stream_8cpp_source}{catch\+\_\+stream.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}std::ostringstream*\textcolor{keyword}{>}(\ m\_oss\ )-\/>\mbox{\hyperlink{class_catch_1_1_reusable_string_stream_a0e9ecf260b2a5d35f4886ef0d51f6270}{str}}(\textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ m\_oss-\/>clear();}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_singleton_a8c18286fe40405813c5bab05e20ce4f0}{Singleton<StringStreams>::getMutable}}().release(\ m\_index\ );}
+\DoxyCodeLine{00172\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_reusable_string_stream_aba9384e258a4db3178447b6a58414712_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_reusable_string_stream_a9b3f8c52b0d2d63ffd825297a9c09781}\index{Catch::ReusableStringStream@{Catch::ReusableStringStream}!ReusableStringStream@{ReusableStringStream}}
+\index{ReusableStringStream@{ReusableStringStream}!Catch::ReusableStringStream@{Catch::ReusableStringStream}}
+\doxysubsubsection{\texorpdfstring{ReusableStringStream()}{ReusableStringStream()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_reusable_string_stream_a9b3f8c52b0d2d63ffd825297a9c09781} 
+Catch\+::\+Reusable\+String\+Stream\+::\+Reusable\+String\+Stream (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{class_catch_1_1_reusable_string_stream_aba9384e258a4db3178447b6a58414712}\index{Catch::ReusableStringStream@{Catch::ReusableStringStream}!````~ReusableStringStream@{\texorpdfstring{$\sim$}{\string~}ReusableStringStream}}
+\index{````~ReusableStringStream@{\texorpdfstring{$\sim$}{\string~}ReusableStringStream}!Catch::ReusableStringStream@{Catch::ReusableStringStream}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}ReusableStringStream()}{\string~ReusableStringStream()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_reusable_string_stream_aba9384e258a4db3178447b6a58414712} 
+Catch\+::\+Reusable\+String\+Stream\+::\texorpdfstring{$\sim$}{\string~}\+Reusable\+String\+Stream (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_catch_1_1_reusable_string_stream_a6881808c60a080d4e24a0b81c94cbf67}\index{Catch::ReusableStringStream@{Catch::ReusableStringStream}!get@{get}}
+\index{get@{get}!Catch::ReusableStringStream@{Catch::ReusableStringStream}}
+\doxysubsubsection{\texorpdfstring{get()}{get()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_reusable_string_stream_a6881808c60a080d4e24a0b81c94cbf67} 
+auto Catch\+::\+Reusable\+String\+Stream\+::get (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) -\/$>$ std\+::ostream\& \hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__stream_8h_source_l00045}{45}} of file \mbox{\hyperlink{catch__stream_8h_source}{catch\+\_\+stream.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00045\ \{\ \textcolor{keywordflow}{return}\ *m\_oss;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_reusable_string_stream_a6881808c60a080d4e24a0b81c94cbf67_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_reusable_string_stream_a6881808c60a080d4e24a0b81c94cbf67}\index{Catch::ReusableStringStream@{Catch::ReusableStringStream}!get@{get}}
+\index{get@{get}!Catch::ReusableStringStream@{Catch::ReusableStringStream}}
+\doxysubsubsection{\texorpdfstring{get()}{get()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_reusable_string_stream_a6881808c60a080d4e24a0b81c94cbf67} 
+auto Catch\+::\+Reusable\+String\+Stream\+::get (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) -\/$>$ std\+::ostream\& \hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source_l01164}{1164}} of file \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source}{catch.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01164\ \{\ \textcolor{keywordflow}{return}\ *m\_oss;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_reusable_string_stream_af95f72024c082db70e5e50782e28e4f6}\index{Catch::ReusableStringStream@{Catch::ReusableStringStream}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!Catch::ReusableStringStream@{Catch::ReusableStringStream}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_reusable_string_stream_af95f72024c082db70e5e50782e28e4f6} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+auto Catch\+::\+Reusable\+String\+Stream\+::operator$<$$<$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const \&}]{value}{}\end{DoxyParamCaption}) -\/$>$ \mbox{\hyperlink{class_catch_1_1_reusable_string_stream}{Reusable\+String\+Stream}}\& \hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__stream_8h_source_l00041}{41}} of file \mbox{\hyperlink{catch__stream_8h_source}{catch\+\_\+stream.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \ \ \ *m\_oss\ <<\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}};}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_reusable_string_stream_af95f72024c082db70e5e50782e28e4f6}\index{Catch::ReusableStringStream@{Catch::ReusableStringStream}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!Catch::ReusableStringStream@{Catch::ReusableStringStream}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_reusable_string_stream_af95f72024c082db70e5e50782e28e4f6} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+auto Catch\+::\+Reusable\+String\+Stream\+::operator$<$$<$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const \&}]{value}{}\end{DoxyParamCaption}) -\/$>$ \mbox{\hyperlink{class_catch_1_1_reusable_string_stream}{Reusable\+String\+Stream}}\& \hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source_l01160}{1160}} of file \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source}{catch.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01160\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01161\ \ \ \ \ \ \ \ \ \ \ \ \ *m\_oss\ <<\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}};}
+\DoxyCodeLine{01162\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{01163\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_reusable_string_stream_a0e9ecf260b2a5d35f4886ef0d51f6270}\index{Catch::ReusableStringStream@{Catch::ReusableStringStream}!str@{str}}
+\index{str@{str}!Catch::ReusableStringStream@{Catch::ReusableStringStream}}
+\doxysubsubsection{\texorpdfstring{str()}{str()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_reusable_string_stream_a0e9ecf260b2a5d35f4886ef0d51f6270} 
+auto Catch\+::\+Reusable\+String\+Stream\+::str (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const -\/$>$ std\+::string}
+
+
+
+Definition at line \mbox{\hyperlink{include_2internal_2catch__stream_8cpp_source_l00174}{174}} of file \mbox{\hyperlink{include_2internal_2catch__stream_8cpp_source}{catch\+\_\+stream.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}std::ostringstream*\textcolor{keyword}{>}(\ m\_oss\ )-\/>\mbox{\hyperlink{class_catch_1_1_reusable_string_stream_a0e9ecf260b2a5d35f4886ef0d51f6270}{str}}();}
+\DoxyCodeLine{00176\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=244pt]{class_catch_1_1_reusable_string_stream_a0e9ecf260b2a5d35f4886ef0d51f6270_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_reusable_string_stream_a0e9ecf260b2a5d35f4886ef0d51f6270_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_reusable_string_stream_a0e9ecf260b2a5d35f4886ef0d51f6270}\index{Catch::ReusableStringStream@{Catch::ReusableStringStream}!str@{str}}
+\index{str@{str}!Catch::ReusableStringStream@{Catch::ReusableStringStream}}
+\doxysubsubsection{\texorpdfstring{str()}{str()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_reusable_string_stream_a0e9ecf260b2a5d35f4886ef0d51f6270} 
+auto Catch\+::\+Reusable\+String\+Stream\+::str (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const -\/$>$  std\+::string}
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__stream_8h}{catch\+\_\+stream.\+h}}\item 
+libraries/sys-\/vm/external/\+Catch2/single\+\_\+include/catch2/\mbox{\hyperlink{single__include_2catch2_2catch_8hpp}{catch.\+hpp}}\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{include_2internal_2catch__stream_8cpp}{catch\+\_\+stream.\+cpp}}\end{DoxyCompactItemize}

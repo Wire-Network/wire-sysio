@@ -1,0 +1,47 @@
+\doxysection{yubihsm\+\_\+wallet.\+hpp}
+\hypertarget{yubihsm__wallet_8hpp_source}{}\label{yubihsm__wallet_8hpp_source}\index{plugins/wallet\_plugin/include/sysio/wallet\_plugin/yubihsm\_wallet.hpp@{plugins/wallet\_plugin/include/sysio/wallet\_plugin/yubihsm\_wallet.hpp}}
+\mbox{\hyperlink{yubihsm__wallet_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{yubihsm__wallet_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{yubihsm__wallet_8hpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__wallet_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{chain_2include_2sysio_2chain_2types_8hpp}{sysio/chain/types.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{yubihsm__wallet_8hpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{wallet__api_8hpp}{sysio/wallet\_plugin/wallet\_api.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{yubihsm__wallet_8hpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__wallet_8hpp_source_l00006}00006\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacestd}{std}};}
+\DoxyCodeLine{\Hypertarget{yubihsm__wallet_8hpp_source_l00007}00007\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacesysio_1_1chain}{sysio::chain}};}
+\DoxyCodeLine{\Hypertarget{yubihsm__wallet_8hpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__wallet_8hpp_source_l00009}00009\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{\ \textcolor{keyword}{namespace\ }wallet\ \{}
+\DoxyCodeLine{\Hypertarget{yubihsm__wallet_8hpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__wallet_8hpp_source_l00011}00011\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacedetail}{detail}}\ \{}
+\DoxyCodeLine{\Hypertarget{yubihsm__wallet_8hpp_source_l00012}00012\ \textcolor{keyword}{struct\ }yubihsm\_wallet\_impl;}
+\DoxyCodeLine{\Hypertarget{yubihsm__wallet_8hpp_source_l00013}00013\ \}}
+\DoxyCodeLine{\Hypertarget{yubihsm__wallet_8hpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__wallet_8hpp_source_l00015}\mbox{\hyperlink{classsysio_1_1wallet_1_1yubihsm__wallet}{00015}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1wallet_1_1yubihsm__wallet}{yubihsm\_wallet}}\ final\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classsysio_1_1wallet_1_1wallet__api}{wallet\_api}}\ \{}
+\DoxyCodeLine{\Hypertarget{yubihsm__wallet_8hpp_source_l00016}00016\ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{yubihsm__wallet_8hpp_source_l00017}00017\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1wallet_1_1yubihsm__wallet_a673025e3abbd9372315a713c329f1333}{yubihsm\_wallet}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\&\ connector,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ authkey);}
+\DoxyCodeLine{\Hypertarget{yubihsm__wallet_8hpp_source_l00018}00018\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1wallet_1_1yubihsm__wallet_a679b501556534e34e06ebe54c5721998}{\string~yubihsm\_wallet}}();}
+\DoxyCodeLine{\Hypertarget{yubihsm__wallet_8hpp_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__wallet_8hpp_source_l00020}00020\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1crypto_1_1private__key}{private\_key\_type}}\ \mbox{\hyperlink{classsysio_1_1wallet_1_1yubihsm__wallet_aedf5834c5b703dfdea01d20c73456e23}{get\_private\_key}}(\mbox{\hyperlink{classfc_1_1crypto_1_1public__key}{public\_key\_type}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}})\ \textcolor{keyword}{const\ override};}
+\DoxyCodeLine{\Hypertarget{yubihsm__wallet_8hpp_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__wallet_8hpp_source_l00022}00022\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classsysio_1_1wallet_1_1yubihsm__wallet_aadb41176f808cb5918236a14a47943c3}{is\_locked}}()\ \textcolor{keyword}{const\ override};}
+\DoxyCodeLine{\Hypertarget{yubihsm__wallet_8hpp_source_l00023}00023\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1wallet_1_1yubihsm__wallet_add449d4c47024ff03ddf8dc50507caf8}{lock}}()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{yubihsm__wallet_8hpp_source_l00024}00024\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1wallet_1_1yubihsm__wallet_a32626226becf373892a2f9174b5a5b7f}{unlock}}(\textcolor{keywordtype}{string}\ password)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{yubihsm__wallet_8hpp_source_l00025}00025\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1wallet_1_1yubihsm__wallet_a2900f5eb84ae3320276ca6452a66f213}{check\_password}}(\textcolor{keywordtype}{string}\ password)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{yubihsm__wallet_8hpp_source_l00026}00026\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1wallet_1_1yubihsm__wallet_a3b84a6691260db0632c6972a5e46b110}{set\_password}}(\textcolor{keywordtype}{string}\ password)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{yubihsm__wallet_8hpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__wallet_8hpp_source_l00028}00028\ \ \ \ \ \ \ map<public\_key\_type,\ private\_key\_type>\ \mbox{\hyperlink{classsysio_1_1wallet_1_1yubihsm__wallet_a2dae8187d77d09dc4ff04d0f49a3287a}{list\_keys}}()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{yubihsm__wallet_8hpp_source_l00029}00029\ \ \ \ \ \ \ flat\_set<public\_key\_type>\ \mbox{\hyperlink{classsysio_1_1wallet_1_1yubihsm__wallet_a84f99523df39cd73a37eea5a747a96c4}{list\_public\_keys}}()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{yubihsm__wallet_8hpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__wallet_8hpp_source_l00031}00031\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classsysio_1_1wallet_1_1yubihsm__wallet_a93a658f97b4e05e35fe86f83f6b7344a}{import\_key}}(\textcolor{keywordtype}{string}\ wif\_key)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{yubihsm__wallet_8hpp_source_l00032}00032\ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ \mbox{\hyperlink{classsysio_1_1wallet_1_1yubihsm__wallet_ab72c9defbbae7026dece7fea74fa5fff}{create\_key}}(\textcolor{keywordtype}{string}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_afa4592d59d085cf06cad9000120eba84}{key\_type}})\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{yubihsm__wallet_8hpp_source_l00033}00033\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classsysio_1_1wallet_1_1yubihsm__wallet_a27f0c21f29c43cfa497f097dd65d4892}{remove\_key}}(\textcolor{keywordtype}{string}\ key)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{yubihsm__wallet_8hpp_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__wallet_8hpp_source_l00035}00035\ \ \ \ \ \ \ std::optional<signature\_type>\ \mbox{\hyperlink{classsysio_1_1wallet_1_1yubihsm__wallet_a83f6a573368deda82829e73e124b3d03}{try\_sign\_digest}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha256}{digest\_type}}\ \mbox{\hyperlink{namespacefc_a150ca4cd9c0318ca45dc0dc7df5d58b9}{digest}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1crypto_1_1public__key}{public\_key\_type}}\ \mbox{\hyperlink{classfc_1_1crypto_1_1r1_1_1public__key}{public\_key}})\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{yubihsm__wallet_8hpp_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__wallet_8hpp_source_l00037}00037\ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{yubihsm__wallet_8hpp_source_l00038}00038\ \ \ \ \ \ \ std::unique\_ptr<detail::yubihsm\_wallet\_impl>\ my;}
+\DoxyCodeLine{\Hypertarget{yubihsm__wallet_8hpp_source_l00039}00039\ \};}
+\DoxyCodeLine{\Hypertarget{yubihsm__wallet_8hpp_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__wallet_8hpp_source_l00041}00041\ \}\}}
+
+\end{DoxyCode}

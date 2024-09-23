@@ -1,0 +1,49 @@
+\doxysection{libraries/appbase/include/appbase/channel.hpp File Reference}
+\hypertarget{channel_8hpp}{}\label{channel_8hpp}\index{libraries/appbase/include/appbase/channel.hpp@{libraries/appbase/include/appbase/channel.hpp}}
+{\ttfamily \#include $<$boost/asio.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/signals2.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/exception/diagnostic\+\_\+information.\+hpp$>$}\newline
+Include dependency graph for channel.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{channel_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{channel_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structappbase_1_1drop__exceptions}{appbase\+::drop\+\_\+exceptions}}
+\item 
+class \mbox{\hyperlink{classappbase_1_1channel}{appbase\+::channel$<$ Data, Dispatch\+Policy $>$}}
+\item 
+class \mbox{\hyperlink{classappbase_1_1channel_1_1handle}{appbase\+::channel$<$ Data, Dispatch\+Policy $>$\+::handle}}
+\item 
+struct \mbox{\hyperlink{structappbase_1_1channel__decl}{appbase\+::channel\+\_\+decl$<$ Tag, Data, Dispatch\+Policy $>$}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespaceappbase}{appbase}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{namespaceappbase_abe439eb2985b17412fc24a7f9f45a79c}{appbase\+::erased\+\_\+channel\+\_\+ptr}} = std\+::unique\+\_\+ptr$<$void, void(\texorpdfstring{$\ast$}{*})(void\texorpdfstring{$\ast$}{*})$>$
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\using \mbox{\hyperlink{namespaceappbase_a8bca2384fc9c0fe6dc0eb2c35038d0cc}{appbase\+::is\+\_\+channel\+\_\+decl}} = decltype(\mbox{\hyperlink{namespaceappbase_a861d9387127f53a940cfd8e449f96c5f}{is\+\_\+channel\+\_\+decl\+\_\+impl}}(std\+::declval$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\texorpdfstring{$\ast$}{*}$>$()))
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename... Ts$>$ }\\std\+::true\+\_\+type \mbox{\hyperlink{namespaceappbase_a861d9387127f53a940cfd8e449f96c5f}{appbase\+::is\+\_\+channel\+\_\+decl\+\_\+impl}} (const \mbox{\hyperlink{structappbase_1_1channel__decl}{channel\+\_\+decl}}$<$ Ts... $>$ \texorpdfstring{$\ast$}{*})
+\item 
+std\+::false\+\_\+type \mbox{\hyperlink{namespaceappbase_af20e49b41f3f7398d5c7e09577db9b52}{appbase\+::is\+\_\+channel\+\_\+decl\+\_\+impl}} (...)
+\end{DoxyCompactItemize}

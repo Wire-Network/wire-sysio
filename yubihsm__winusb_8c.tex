@@ -1,0 +1,445 @@
+\doxysection{libraries/yubihsm/lib/yubihsm\+\_\+winusb.c File Reference}
+\hypertarget{yubihsm__winusb_8c}{}\label{yubihsm__winusb_8c}\index{libraries/yubihsm/lib/yubihsm\_winusb.c@{libraries/yubihsm/lib/yubihsm\_winusb.c}}
+{\ttfamily \#include $<$windows.\+h$>$}\newline
+{\ttfamily \#include $<$winusb.\+h$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include $<$setupapi.\+h$>$}\newline
+{\ttfamily \#include "{}yubihsm.\+h"{}}\newline
+{\ttfamily \#include "{}internal.\+h"{}}\newline
+{\ttfamily \#include "{}yubihsm\+\_\+usb.\+h"{}}\newline
+{\ttfamily \#include "{}debug\+\_\+lib.\+h"{}}\newline
+Include dependency graph for yubihsm\+\_\+winusb.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{yubihsm__winusb_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structstate}{state}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{yubihsm__winusb_8c_af2aa1b20c10d6507c47f11588e21c324}{PIPE\+\_\+\+OUT}}~0x01
+\item 
+\#define \mbox{\hyperlink{yubihsm__winusb_8c_a3fc15bc38c2cd3ce6f7dd40f4c0115dd}{PIPE\+\_\+\+IN}}~0x81
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{yubihsm__winusb_8c_a7ae85ad3f1d05331c3c7ccdc3443dbe4}{usb\+\_\+set\+\_\+serial}} (\mbox{\hyperlink{lib_2internal_8h_af0b8c5ac57556b935ae71249ec6cc388}{yh\+\_\+backend}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{structstate}{state}}, unsigned long \mbox{\hyperlink{yubihsm__pkcs11_8c_a1149ca4bd0659030412db8e77bebdf88}{serial}})
+\item 
+bool \mbox{\hyperlink{yubihsm__winusb_8c_ab7b5c16cf1c8af0f6ce8b8623b612689}{usb\+\_\+open\+\_\+device}} (\mbox{\hyperlink{lib_2internal_8h_af0b8c5ac57556b935ae71249ec6cc388}{yh\+\_\+backend}} \texorpdfstring{$\ast$}{*}backend)
+\item 
+\mbox{\hyperlink{lib_2internal_8h_af0b8c5ac57556b935ae71249ec6cc388}{yh\+\_\+backend}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{yubihsm__winusb_8c_a7d85725309ab01a6ec82ee958806102b}{backend\+\_\+create}} (void)
+\item 
+void \mbox{\hyperlink{yubihsm__winusb_8c_a71df5e0ff7b712f398eacfc6fcf878f0}{usb\+\_\+close}} (\mbox{\hyperlink{lib_2internal_8h_af0b8c5ac57556b935ae71249ec6cc388}{yh\+\_\+backend}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{structstate}{state}})
+\item 
+void \mbox{\hyperlink{yubihsm__winusb_8c_a5c7d1af3985bcf7fd85536f9d109e837}{usb\+\_\+destroy}} (\mbox{\hyperlink{lib_2internal_8h_af0b8c5ac57556b935ae71249ec6cc388}{yh\+\_\+backend}} \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\mbox{\hyperlink{structstate}{state}})
+\item 
+int \mbox{\hyperlink{yubihsm__winusb_8c_ad588c46d8af37c48a320beae5d18617a}{usb\+\_\+write}} (\mbox{\hyperlink{lib_2internal_8h_af0b8c5ac57556b935ae71249ec6cc388}{yh\+\_\+backend}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{structstate}{state}}, unsigned char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}, long unsigned \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})
+\item 
+int \mbox{\hyperlink{yubihsm__winusb_8c_a5c40f15e76018a849b36d53f70c4f101}{usb\+\_\+read}} (\mbox{\hyperlink{lib_2internal_8h_af0b8c5ac57556b935ae71249ec6cc388}{yh\+\_\+backend}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{structstate}{state}}, unsigned char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}, long unsigned \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{yubihsm__winusb_8c_a3fc15bc38c2cd3ce6f7dd40f4c0115dd}\index{yubihsm\_winusb.c@{yubihsm\_winusb.c}!PIPE\_IN@{PIPE\_IN}}
+\index{PIPE\_IN@{PIPE\_IN}!yubihsm\_winusb.c@{yubihsm\_winusb.c}}
+\doxysubsubsection{\texorpdfstring{PIPE\_IN}{PIPE\_IN}}
+{\footnotesize\ttfamily \label{yubihsm__winusb_8c_a3fc15bc38c2cd3ce6f7dd40f4c0115dd} 
+\#define PIPE\+\_\+\+IN~0x81}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__winusb_8c_source_l00040}{40}} of file \mbox{\hyperlink{yubihsm__winusb_8c_source}{yubihsm\+\_\+winusb.\+c}}.
+
+\Hypertarget{yubihsm__winusb_8c_af2aa1b20c10d6507c47f11588e21c324}\index{yubihsm\_winusb.c@{yubihsm\_winusb.c}!PIPE\_OUT@{PIPE\_OUT}}
+\index{PIPE\_OUT@{PIPE\_OUT}!yubihsm\_winusb.c@{yubihsm\_winusb.c}}
+\doxysubsubsection{\texorpdfstring{PIPE\_OUT}{PIPE\_OUT}}
+{\footnotesize\ttfamily \label{yubihsm__winusb_8c_af2aa1b20c10d6507c47f11588e21c324} 
+\#define PIPE\+\_\+\+OUT~0x01}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__winusb_8c_source_l00039}{39}} of file \mbox{\hyperlink{yubihsm__winusb_8c_source}{yubihsm\+\_\+winusb.\+c}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{yubihsm__winusb_8c_a7d85725309ab01a6ec82ee958806102b}\index{yubihsm\_winusb.c@{yubihsm\_winusb.c}!backend\_create@{backend\_create}}
+\index{backend\_create@{backend\_create}!yubihsm\_winusb.c@{yubihsm\_winusb.c}}
+\doxysubsubsection{\texorpdfstring{backend\_create()}{backend\_create()}}
+{\footnotesize\ttfamily \label{yubihsm__winusb_8c_a7d85725309ab01a6ec82ee958806102b} 
+\mbox{\hyperlink{lib_2internal_8h_af0b8c5ac57556b935ae71249ec6cc388}{yh\+\_\+backend}} \texorpdfstring{$\ast$}{*} backend\+\_\+create (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__winusb_8c_source_l00254}{254}} of file \mbox{\hyperlink{yubihsm__winusb_8c_source}{yubihsm\+\_\+winusb.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00254\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00255\ \ \ \mbox{\hyperlink{structstate}{yh\_backend}}\ *backend\ =\ calloc(1,\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{structstate}{yh\_backend}}));}
+\DoxyCodeLine{00256\ \ \ \textcolor{keywordflow}{return}\ backend;}
+\DoxyCodeLine{00257\ \}}
+
+\end{DoxyCode}
+\Hypertarget{yubihsm__winusb_8c_a71df5e0ff7b712f398eacfc6fcf878f0}\index{yubihsm\_winusb.c@{yubihsm\_winusb.c}!usb\_close@{usb\_close}}
+\index{usb\_close@{usb\_close}!yubihsm\_winusb.c@{yubihsm\_winusb.c}}
+\doxysubsubsection{\texorpdfstring{usb\_close()}{usb\_close()}}
+{\footnotesize\ttfamily \label{yubihsm__winusb_8c_a71df5e0ff7b712f398eacfc6fcf878f0} 
+void usb\+\_\+close (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{lib_2internal_8h_af0b8c5ac57556b935ae71249ec6cc388}{yh\+\_\+backend}} \texorpdfstring{$\ast$}{*}}]{state}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__winusb_8c_source_l00259}{259}} of file \mbox{\hyperlink{yubihsm__winusb_8c_source}{yubihsm\+\_\+winusb.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00259\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00260\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structstate}{state}}\ \&\&\ \mbox{\hyperlink{structstate}{state}}-\/>\mbox{\hyperlink{structstate_acf21ac1d62465dec9bdbc6fa196ca202}{hDevice}}\ !=\ INVALID\_HANDLE\_VALUE)\ \{}
+\DoxyCodeLine{00261\ \ \ \ \ CloseHandle(\mbox{\hyperlink{structstate}{state}}-\/>\mbox{\hyperlink{structstate_acf21ac1d62465dec9bdbc6fa196ca202}{hDevice}});}
+\DoxyCodeLine{00262\ \ \ \ \ \mbox{\hyperlink{structstate}{state}}-\/>\mbox{\hyperlink{structstate_acf21ac1d62465dec9bdbc6fa196ca202}{hDevice}}\ =\ INVALID\_HANDLE\_VALUE;}
+\DoxyCodeLine{00263\ \ \ \}}
+\DoxyCodeLine{00264\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structstate}{state}}\ \&\&\ \mbox{\hyperlink{structstate}{state}}-\/>\mbox{\hyperlink{structstate_a8ab01fdf8a0356f22b4cf3453bc11c02}{hWinUSB}}\ !=\ INVALID\_HANDLE\_VALUE)\ \{}
+\DoxyCodeLine{00265\ \ \ \ \ WinUsb\_Free(\mbox{\hyperlink{structstate}{state}}-\/>\mbox{\hyperlink{structstate_a8ab01fdf8a0356f22b4cf3453bc11c02}{hWinUSB}});}
+\DoxyCodeLine{00266\ \ \ \ \ \mbox{\hyperlink{structstate}{state}}-\/>\mbox{\hyperlink{structstate_a8ab01fdf8a0356f22b4cf3453bc11c02}{hWinUSB}}\ =\ INVALID\_HANDLE\_VALUE;}
+\DoxyCodeLine{00267\ \ \ \}}
+\DoxyCodeLine{00268\ \}}
+
+\end{DoxyCode}
+\Hypertarget{yubihsm__winusb_8c_a5c7d1af3985bcf7fd85536f9d109e837}\index{yubihsm\_winusb.c@{yubihsm\_winusb.c}!usb\_destroy@{usb\_destroy}}
+\index{usb\_destroy@{usb\_destroy}!yubihsm\_winusb.c@{yubihsm\_winusb.c}}
+\doxysubsubsection{\texorpdfstring{usb\_destroy()}{usb\_destroy()}}
+{\footnotesize\ttfamily \label{yubihsm__winusb_8c_a5c7d1af3985bcf7fd85536f9d109e837} 
+void usb\+\_\+destroy (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{lib_2internal_8h_af0b8c5ac57556b935ae71249ec6cc388}{yh\+\_\+backend}} \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{state}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__winusb_8c_source_l00270}{270}} of file \mbox{\hyperlink{yubihsm__winusb_8c_source}{yubihsm\+\_\+winusb.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00270\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00271\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structstate}{state}}\ \&\&\ *\mbox{\hyperlink{structstate}{state}})\ \{}
+\DoxyCodeLine{00272\ \ \ \ \ free(*\mbox{\hyperlink{structstate}{state}});}
+\DoxyCodeLine{00273\ \ \ \ \ *\mbox{\hyperlink{structstate}{state}}\ =\ NULL;}
+\DoxyCodeLine{00274\ \ \ \}}
+\DoxyCodeLine{00275\ \}}
+
+\end{DoxyCode}
+\Hypertarget{yubihsm__winusb_8c_ab7b5c16cf1c8af0f6ce8b8623b612689}\index{yubihsm\_winusb.c@{yubihsm\_winusb.c}!usb\_open\_device@{usb\_open\_device}}
+\index{usb\_open\_device@{usb\_open\_device}!yubihsm\_winusb.c@{yubihsm\_winusb.c}}
+\doxysubsubsection{\texorpdfstring{usb\_open\_device()}{usb\_open\_device()}}
+{\footnotesize\ttfamily \label{yubihsm__winusb_8c_ab7b5c16cf1c8af0f6ce8b8623b612689} 
+bool usb\+\_\+open\+\_\+device (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{lib_2internal_8h_af0b8c5ac57556b935ae71249ec6cc388}{yh\+\_\+backend}} \texorpdfstring{$\ast$}{*}}]{backend}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__winusb_8c_source_l00046}{46}} of file \mbox{\hyperlink{yubihsm__winusb_8c_source}{yubihsm\+\_\+winusb.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00047\ \ \ BOOL\ bResult\ =\ \mbox{\hyperlink{pkcs11_8h_aa8cecfc5c5c054d2875c03e77b7be15d}{TRUE}};}
+\DoxyCodeLine{00048\ \ \ HDEVINFO\ hDeviceInfo;}
+\DoxyCodeLine{00049\ \ \ SP\_DEVINFO\_DATA\ DeviceInfoData;}
+\DoxyCodeLine{00050\ \ \ SP\_DEVICE\_INTERFACE\_DATA\ deviceInterfaceData;}
+\DoxyCodeLine{00051\ \ \ PSP\_DEVICE\_INTERFACE\_DETAIL\_DATA\ pInterfaceDetailData\ =\ NULL;}
+\DoxyCodeLine{00052\ \ \ ULONG\ requiredLength\ =\ 0;}
+\DoxyCodeLine{00053\ \ \ DWORD\ index\ =\ 0;}
+\DoxyCodeLine{00054\ \ \ HANDLE\ hnd\ =\ INVALID\_HANDLE\_VALUE;}
+\DoxyCodeLine{00055\ \ \ WINUSB\_INTERFACE\_HANDLE\ wusbHnd\ =\ INVALID\_HANDLE\_VALUE;}
+\DoxyCodeLine{00056\ }
+\DoxyCodeLine{00057\ \ \ \textcolor{comment}{//\ Get\ information\ about\ all\ the\ installed\ devices\ for\ the\ specified}}
+\DoxyCodeLine{00058\ \ \ \textcolor{comment}{//\ device\ interface\ class.}}
+\DoxyCodeLine{00059\ \ \ hDeviceInfo\ =\ SetupDiGetClassDevs(\&devGUID,\ NULL,\ NULL,}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ DIGCF\_PRESENT\ |\ DIGCF\_DEVICEINTERFACE);}
+\DoxyCodeLine{00061\ }
+\DoxyCodeLine{00062\ \ \ \textcolor{keywordflow}{if}\ (hDeviceInfo\ ==\ INVALID\_HANDLE\_VALUE)\ \{}
+\DoxyCodeLine{00063\ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a2e3ed21e5ffba18d940d164aaec64a2a}{DBG\_ERR}}(\textcolor{stringliteral}{"{}SetupDiGetClassDevs\ failed,\ error=\%lx\(\backslash\)n"{}},\ GetLastError());}
+\DoxyCodeLine{00064\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00065\ \ \ \}}
+\DoxyCodeLine{00066\ }
+\DoxyCodeLine{00067\ \ \ \textcolor{comment}{//\ Enumerate\ all\ the\ device\ interfaces\ in\ the\ device\ information\ set.}}
+\DoxyCodeLine{00068\ \ \ DeviceInfoData.cbSize\ =\ \textcolor{keyword}{sizeof}(SP\_DEVINFO\_DATA);}
+\DoxyCodeLine{00069\ }
+\DoxyCodeLine{00070\ \ \ \textcolor{keywordflow}{for}\ (index\ =\ 0;\ SetupDiEnumDeviceInfo(hDeviceInfo,\ index,\ \&DeviceInfoData);}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ index++)\ \{}
+\DoxyCodeLine{00072\ }
+\DoxyCodeLine{00073\ \ \ \ \ deviceInterfaceData.cbSize\ =\ \textcolor{keyword}{sizeof}(SP\_INTERFACE\_DEVICE\_DATA);}
+\DoxyCodeLine{00074\ }
+\DoxyCodeLine{00075\ \ \ \ \ \textcolor{comment}{//\ Get\ information\ about\ the\ device\ interface.}}
+\DoxyCodeLine{00076\ }
+\DoxyCodeLine{00077\ \ \ \ \ bResult\ =\ SetupDiEnumDeviceInterfaces(hDeviceInfo,\ \&DeviceInfoData,}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&devGUID,\ 0,\ \&deviceInterfaceData);}
+\DoxyCodeLine{00079\ }
+\DoxyCodeLine{00080\ \ \ \ \ \textcolor{keywordflow}{if}\ (!bResult)\ \{}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \textcolor{comment}{//\ Check\ if\ last\ item}}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (GetLastError()\ ==\ ERROR\_NO\_MORE\_ITEMS)\ \{}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a2e3ed21e5ffba18d940d164aaec64a2a}{DBG\_ERR}}(\textcolor{stringliteral}{"{}No\ more\ items\ found"{}});}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ out;}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00086\ }
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \textcolor{comment}{//\ Check\ for\ some\ other\ error}}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a2e3ed21e5ffba18d940d164aaec64a2a}{DBG\_ERR}}(\textcolor{stringliteral}{"{}SetupDiEnumDeviceInterfaces(1)\ failed,\ error=\%lx\(\backslash\)n"{}},}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ GetLastError());}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ out;}
+\DoxyCodeLine{00091\ \ \ \ \ \}}
+\DoxyCodeLine{00092\ }
+\DoxyCodeLine{00093\ \ \ \ \ \textcolor{comment}{//\ Interface\ data\ is\ returned\ in\ SP\_DEVICE\_INTERFACE\_DETAIL\_DATA}}
+\DoxyCodeLine{00094\ \ \ \ \ \textcolor{comment}{//\ which\ we\ need\ to\ allocate,\ so\ we\ have\ to\ call\ this\ function\ twice.}}
+\DoxyCodeLine{00095\ \ \ \ \ \textcolor{comment}{//\ First\ to\ get\ the\ size\ so\ that\ we\ know\ how\ much\ to\ allocate}}
+\DoxyCodeLine{00096\ \ \ \ \ \textcolor{comment}{//\ Second,\ the\ actual\ call\ with\ the\ allocated\ buffer}}
+\DoxyCodeLine{00097\ }
+\DoxyCodeLine{00098\ \ \ \ \ bResult\ =\ SetupDiGetDeviceInterfaceDetail(hDeviceInfo,\ \&deviceInterfaceData,}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ NULL,\ 0,\ \&requiredLength,\ NULL);}
+\DoxyCodeLine{00100\ }
+\DoxyCodeLine{00101\ \ \ \ \ \textcolor{keywordflow}{if}\ (!bResult\ \&\&\ (GetLastError()\ !=\ ERROR\_INSUFFICIENT\_BUFFER))\ \{}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a2e3ed21e5ffba18d940d164aaec64a2a}{DBG\_ERR}}(\textcolor{stringliteral}{"{}SetupDiEnumDeviceInterfaces(2)\ failed,\ error=\%lx\(\backslash\)n"{}},}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ GetLastError());}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ out;}
+\DoxyCodeLine{00105\ \ \ \ \ \}}
+\DoxyCodeLine{00106\ }
+\DoxyCodeLine{00107\ \ \ \ \ \textcolor{comment}{//\ Get\ the\ interface\ detailed\ data\ and\ allocate\ storage}}
+\DoxyCodeLine{00108\ \ \ \ \ pInterfaceDetailData\ =\ malloc(requiredLength);}
+\DoxyCodeLine{00109\ \ \ \ \ pInterfaceDetailData-\/>cbSize\ =\ \textcolor{keyword}{sizeof}(SP\_DEVICE\_INTERFACE\_DETAIL\_DATA);}
+\DoxyCodeLine{00110\ }
+\DoxyCodeLine{00111\ \ \ \ \ \textcolor{comment}{//\ Now\ call\ it\ with\ the\ correct\ size\ and\ allocated\ buffer}}
+\DoxyCodeLine{00112\ \ \ \ \ bResult\ =}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ SetupDiGetDeviceInterfaceDetail(hDeviceInfo,\ \&deviceInterfaceData,}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ pInterfaceDetailData,\ requiredLength,}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ NULL,\ \&DeviceInfoData);}
+\DoxyCodeLine{00116\ }
+\DoxyCodeLine{00117\ \ \ \ \ \textcolor{keywordflow}{if}\ (!bResult)\ \{}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a2e3ed21e5ffba18d940d164aaec64a2a}{DBG\_ERR}}(\textcolor{stringliteral}{"{}SetupDiGetDeviceInterfaceDetail\ failed,\ error=\%lx\(\backslash\)n"{}},}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ GetLastError());}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ out;}
+\DoxyCodeLine{00121\ \ \ \ \ \}}
+\DoxyCodeLine{00122\ }
+\DoxyCodeLine{00123\ \ \ \ \ hnd\ =}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ CreateFile(pInterfaceDetailData-\/>DevicePath,\ GENERIC\_READ\ |\ GENERIC\_WRITE,}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ FILE\_SHARE\_READ\ |\ FILE\_SHARE\_WRITE,\ NULL,\ OPEN\_EXISTING,}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ FILE\_FLAG\_OVERLAPPED,\ NULL);}
+\DoxyCodeLine{00127\ }
+\DoxyCodeLine{00128\ \ \ \ \ free(pInterfaceDetailData);}
+\DoxyCodeLine{00129\ \ \ \ \ pInterfaceDetailData\ =\ NULL;}
+\DoxyCodeLine{00130\ }
+\DoxyCodeLine{00131\ \ \ \ \ \textcolor{keywordflow}{if}\ (hnd\ ==\ INVALID\_HANDLE\_VALUE)\ \{}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a2e3ed21e5ffba18d940d164aaec64a2a}{DBG\_ERR}}(\textcolor{stringliteral}{"{}CreateFile\ failed,\ error=\%lx"{}},\ GetLastError());}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{00134\ \ \ \ \ \}}
+\DoxyCodeLine{00135\ }
+\DoxyCodeLine{00136\ \ \ \ \ \textcolor{keywordflow}{if}\ (!WinUsb\_Initialize(hnd,\ \&wusbHnd))\ \{}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a2e3ed21e5ffba18d940d164aaec64a2a}{DBG\_ERR}}(\textcolor{stringliteral}{"{}WinUsb\_Initialize\ failed,\ error=\%lx"{}},\ GetLastError());}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ \mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}};}
+\DoxyCodeLine{00139\ \ \ \ \ \}}
+\DoxyCodeLine{00140\ }
+\DoxyCodeLine{00141\ \ \ \ \ \textcolor{keywordflow}{if}\ (backend-\/>\mbox{\hyperlink{structstate_a427c87eb42b2a735f1ac44b76aba1664}{serial}}\ !=\ 0)\ \{}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ USB\_DEVICE\_DESCRIPTOR\ desc;}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ ULONG\ written;}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ ser\_num[128]\ =\ \{0\};}
+\DoxyCodeLine{00145\ }
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!WinUsb\_GetDescriptor(wusbHnd,\ USB\_DEVICE\_DESCRIPTOR\_TYPE,\ 0,\ 0,}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \&desc,\ \textcolor{keyword}{sizeof}(desc),}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&written))\ \{}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a2e3ed21e5ffba18d940d164aaec64a2a}{DBG\_ERR}}(\textcolor{stringliteral}{"{}WinUsb\_GetDescriptor\ failed,\ error=\%lx"{}},\ GetLastError());}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ \mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}};}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00152\ }
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!WinUsb\_GetDescriptor(wusbHnd,\ USB\_STRING\_DESCRIPTOR\_TYPE,}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ desc.iSerialNumber,}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x0409,\ \textcolor{comment}{//\ English\ (US)}}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ser\_num,\ \textcolor{keyword}{sizeof}(ser\_num),\ \&written))\ \{}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a2e3ed21e5ffba18d940d164aaec64a2a}{DBG\_ERR}}(\textcolor{stringliteral}{"{}WinUsb\_GetDescriptor\ failed,\ error=\%lx"{}},\ GetLastError());}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ \mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}};}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00160\ }
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a8c4742440a149ad8bcb5d58ae76c5ed3}{DBG\_INFO}}(\textcolor{stringliteral}{"{}Extracted\ serial\ \%ls\ (\%lu\ bytes)\ from\ device\ desc\ \%d"{}},}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{keywordtype}{wchar\_t}\ *)\ (ser\_num\ +\ 2),\ written,\ desc.iSerialNumber);}
+\DoxyCodeLine{00163\ }
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ devSerial\ =\ wcstoul((\textcolor{keywordtype}{wchar\_t}\ *)\ (ser\_num\ +\ 2),\ NULL,\ 10);}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (devSerial\ !=\ backend-\/>\mbox{\hyperlink{structstate_a427c87eb42b2a735f1ac44b76aba1664}{serial}})\ \{}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a8c4742440a149ad8bcb5d58ae76c5ed3}{DBG\_INFO}}(\textcolor{stringliteral}{"{}Device\ has\ serial\ \%lu,\ not\ matching\ searched\ \%lu"{}},\ devSerial,}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ backend-\/>\mbox{\hyperlink{structstate_a427c87eb42b2a735f1ac44b76aba1664}{serial}});}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ \mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}};}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00170\ \ \ \ \ \}}
+\DoxyCodeLine{00171\ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00172\ \ \ \mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}}:}
+\DoxyCodeLine{00173\ \ \ \ \ \textcolor{keywordflow}{if}\ (wusbHnd\ !=\ INVALID\_HANDLE\_VALUE)\ \{}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ WinUsb\_Free(wusbHnd);}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ wusbHnd\ =\ INVALID\_HANDLE\_VALUE;}
+\DoxyCodeLine{00176\ \ \ \ \ \}}
+\DoxyCodeLine{00177\ \ \ \ \ \textcolor{keywordflow}{if}\ (hnd\ !=\ INVALID\_HANDLE\_VALUE)\ \{}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ CloseHandle(hnd);}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ hnd\ =\ INVALID\_HANDLE\_VALUE;}
+\DoxyCodeLine{00180\ \ \ \ \ \}}
+\DoxyCodeLine{00181\ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{00182\ \ \ \}}
+\DoxyCodeLine{00183\ }
+\DoxyCodeLine{00184\ \ \ \textcolor{keywordflow}{if}\ (wusbHnd\ !=\ INVALID\_HANDLE\_VALUE)\ \{}
+\DoxyCodeLine{00185\ }
+\DoxyCodeLine{00186\ \ \ \ \ \textcolor{comment}{//\ Make\ sure\ we\ get\ a\ ZLP\ at\ the\ end\ every\ time}}
+\DoxyCodeLine{00187\ \ \ \ \ bResult\ =\ WinUsb\_SetPipePolicy(wusbHnd,\ \mbox{\hyperlink{yubihsm__winusb_8c_af2aa1b20c10d6507c47f11588e21c324}{PIPE\_OUT}},\ SHORT\_PACKET\_TERMINATE,\ 1,}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (PVOID)\ \textcolor{stringliteral}{"{}\(\backslash\)x1"{}});}
+\DoxyCodeLine{00189\ \ \ \ \ \textcolor{keywordflow}{if}\ (!bResult)\ \{}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a2e3ed21e5ffba18d940d164aaec64a2a}{DBG\_ERR}}(\textcolor{stringliteral}{"{}SetPipePolicy\ failed"{}});}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ WinUsb\_Free(wusbHnd);}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ wusbHnd\ =\ INVALID\_HANDLE\_VALUE;}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ CloseHandle(hnd);}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ hnd\ =\ INVALID\_HANDLE\_VALUE;}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ out;}
+\DoxyCodeLine{00196\ \ \ \ \ \}}
+\DoxyCodeLine{00197\ }
+\DoxyCodeLine{00198\ \ \ \ \ \{}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \textcolor{comment}{//\ we\ set\ up\ a\ dummy\ read\ with\ a\ 10ms\ timeout\ here,\ if\ the\ timeout\ is\ too}}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \textcolor{comment}{//\ short\ this\ times\ out\ before\ it\ has\ time\ to\ complete.\ The\ reason\ for}}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \textcolor{comment}{//\ doing\ this\ is\ that\ there\ might\ be\ data\ left\ in\ the\ device\ buffers\ from}}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \textcolor{comment}{//\ earlier\ transactions,\ this\ should\ flush\ it.}}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}[\mbox{\hyperlink{yubihsm_8h_a706bd8e7adf0de85e6cfb0efc8981d3f}{YH\_MSG\_BUF\_SIZE}}];}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ transferred\ =\ 0;}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ timeout\ =\ 10;}
+\DoxyCodeLine{00206\ }
+\DoxyCodeLine{00207\ \ \ \ \ \ \ bResult\ =\ WinUsb\_SetPipePolicy(wusbHnd,\ \mbox{\hyperlink{yubihsm__winusb_8c_a3fc15bc38c2cd3ce6f7dd40f4c0115dd}{PIPE\_IN}},\ PIPE\_TRANSFER\_TIMEOUT,}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{sizeof}(timeout),\ \&timeout);}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!bResult)\ \{}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a2e3ed21e5ffba18d940d164aaec64a2a}{DBG\_ERR}}(\textcolor{stringliteral}{"{}SetPipePolicy\ failed"{}});}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \ \ WinUsb\_Free(wusbHnd);}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \ \ wusbHnd\ =\ INVALID\_HANDLE\_VALUE;}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \ \ CloseHandle(hnd);}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ hnd\ =\ INVALID\_HANDLE\_VALUE;}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ out;}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00217\ }
+\DoxyCodeLine{00218\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (WinUsb\_ReadPipe(wusbHnd,\ \mbox{\hyperlink{yubihsm__winusb_8c_a3fc15bc38c2cd3ce6f7dd40f4c0115dd}{PIPE\_IN}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}),\ \&transferred,}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0))\ \{}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a8c4742440a149ad8bcb5d58ae76c5ed3}{DBG\_INFO}}(\textcolor{stringliteral}{"{}\%lu\ bytes\ of\ stale\ data\ read"{}},\ transferred);}
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00222\ }
+\DoxyCodeLine{00223\ \ \ \ \ \ \ timeout\ =\ 0;}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ bResult\ =\ WinUsb\_SetPipePolicy(wusbHnd,\ \mbox{\hyperlink{yubihsm__winusb_8c_a3fc15bc38c2cd3ce6f7dd40f4c0115dd}{PIPE\_IN}},\ PIPE\_TRANSFER\_TIMEOUT,}
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{sizeof}(timeout),\ \&timeout);}
+\DoxyCodeLine{00226\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!bResult)\ \{}
+\DoxyCodeLine{00227\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a2e3ed21e5ffba18d940d164aaec64a2a}{DBG\_ERR}}(\textcolor{stringliteral}{"{}SetPipePolicy\ failed"{}});}
+\DoxyCodeLine{00228\ \ \ \ \ \ \ \ \ WinUsb\_Free(wusbHnd);}
+\DoxyCodeLine{00229\ \ \ \ \ \ \ \ \ wusbHnd\ =\ INVALID\_HANDLE\_VALUE;}
+\DoxyCodeLine{00230\ \ \ \ \ \ \ \ \ CloseHandle(hnd);}
+\DoxyCodeLine{00231\ \ \ \ \ \ \ \ \ hnd\ =\ INVALID\_HANDLE\_VALUE;}
+\DoxyCodeLine{00232\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ out;}
+\DoxyCodeLine{00233\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00234\ \ \ \ \ \}}
+\DoxyCodeLine{00235\ \ \ \}}
+\DoxyCodeLine{00236\ }
+\DoxyCodeLine{00237\ out:}
+\DoxyCodeLine{00238\ \ \ backend-\/>\mbox{\hyperlink{structstate_acf21ac1d62465dec9bdbc6fa196ca202}{hDevice}}\ =\ hnd;}
+\DoxyCodeLine{00239\ \ \ backend-\/>\mbox{\hyperlink{structstate_a8ab01fdf8a0356f22b4cf3453bc11c02}{hWinUSB}}\ =\ wusbHnd;}
+\DoxyCodeLine{00240\ }
+\DoxyCodeLine{00241\ \ \ \textcolor{keywordflow}{if}\ (hDeviceInfo)\ \{}
+\DoxyCodeLine{00242\ \ \ \ \ SetupDiDestroyDeviceInfoList(hDeviceInfo);}
+\DoxyCodeLine{00243\ \ \ \}}
+\DoxyCodeLine{00244\ }
+\DoxyCodeLine{00245\ \ \ free(pInterfaceDetailData);}
+\DoxyCodeLine{00246\ }
+\DoxyCodeLine{00247\ \ \ \textcolor{keywordflow}{if}\ (wusbHnd\ !=\ INVALID\_HANDLE\_VALUE)\ \{}
+\DoxyCodeLine{00248\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00249\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00250\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00251\ \ \ \}}
+\DoxyCodeLine{00252\ \}}
+
+\end{DoxyCode}
+\Hypertarget{yubihsm__winusb_8c_a5c40f15e76018a849b36d53f70c4f101}\index{yubihsm\_winusb.c@{yubihsm\_winusb.c}!usb\_read@{usb\_read}}
+\index{usb\_read@{usb\_read}!yubihsm\_winusb.c@{yubihsm\_winusb.c}}
+\doxysubsubsection{\texorpdfstring{usb\_read()}{usb\_read()}}
+{\footnotesize\ttfamily \label{yubihsm__winusb_8c_a5c40f15e76018a849b36d53f70c4f101} 
+int usb\+\_\+read (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{lib_2internal_8h_af0b8c5ac57556b935ae71249ec6cc388}{yh\+\_\+backend}} \texorpdfstring{$\ast$}{*}}]{state}{, }\item[{unsigned char \texorpdfstring{$\ast$}{*}}]{buf}{, }\item[{long unsigned \texorpdfstring{$\ast$}{*}}]{len}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__winusb_8c_source_l00302}{302}} of file \mbox{\hyperlink{yubihsm__winusb_8c_source}{yubihsm\+\_\+winusb.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00302\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00303\ \ \ \textcolor{keywordtype}{long}\ \textcolor{keywordtype}{unsigned}\ transferred\ =\ 0;}
+\DoxyCodeLine{00304\ \ \ BOOL\ bResult;}
+\DoxyCodeLine{00305\ }
+\DoxyCodeLine{00306\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structstate}{state}}-\/>\mbox{\hyperlink{structstate_a8ab01fdf8a0356f22b4cf3453bc11c02}{hWinUSB}}\ ==\ INVALID\_HANDLE\_VALUE)\ \{}
+\DoxyCodeLine{00307\ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a2e3ed21e5ffba18d940d164aaec64a2a}{DBG\_ERR}}(\textcolor{stringliteral}{"{}No\ connected\ device"{}});}
+\DoxyCodeLine{00308\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00309\ \ \ \}}
+\DoxyCodeLine{00310\ }
+\DoxyCodeLine{00311\ \ \ \mbox{\hyperlink{debug__lib_8h_a8c4742440a149ad8bcb5d58ae76c5ed3}{DBG\_INFO}}(\textcolor{stringliteral}{"{}Doing\ usb\ read"{}});}
+\DoxyCodeLine{00312\ }
+\DoxyCodeLine{00313\ \ \ bResult\ =}
+\DoxyCodeLine{00314\ \ \ \ \ WinUsb\_ReadPipe(\mbox{\hyperlink{structstate}{state}}-\/>\mbox{\hyperlink{structstate_a8ab01fdf8a0356f22b4cf3453bc11c02}{hWinUSB}},\ \mbox{\hyperlink{yubihsm__winusb_8c_a3fc15bc38c2cd3ce6f7dd40f4c0115dd}{PIPE\_IN}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ \&transferred,\ 0);}
+\DoxyCodeLine{00315\ \ \ \textcolor{keywordflow}{if}\ (!bResult)\ \{}
+\DoxyCodeLine{00316\ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a2e3ed21e5ffba18d940d164aaec64a2a}{DBG\_ERR}}(\textcolor{stringliteral}{"{}WinUsb\_ReadPipe\ failed,\ error=\%lx\(\backslash\)n"{}},\ GetLastError());}
+\DoxyCodeLine{00317\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00318\ \ \ \}}
+\DoxyCodeLine{00319\ \ \ \mbox{\hyperlink{debug__lib_8h_a8c4742440a149ad8bcb5d58ae76c5ed3}{DBG\_INFO}}(\textcolor{stringliteral}{"{}Read\ \%lu\ bytes"{}},\ transferred);}
+\DoxyCodeLine{00320\ \ \ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ =\ transferred;}
+\DoxyCodeLine{00321\ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{00322\ \}}
+
+\end{DoxyCode}
+\Hypertarget{yubihsm__winusb_8c_a7ae85ad3f1d05331c3c7ccdc3443dbe4}\index{yubihsm\_winusb.c@{yubihsm\_winusb.c}!usb\_set\_serial@{usb\_set\_serial}}
+\index{usb\_set\_serial@{usb\_set\_serial}!yubihsm\_winusb.c@{yubihsm\_winusb.c}}
+\doxysubsubsection{\texorpdfstring{usb\_set\_serial()}{usb\_set\_serial()}}
+{\footnotesize\ttfamily \label{yubihsm__winusb_8c_a7ae85ad3f1d05331c3c7ccdc3443dbe4} 
+void usb\+\_\+set\+\_\+serial (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{lib_2internal_8h_af0b8c5ac57556b935ae71249ec6cc388}{yh\+\_\+backend}} \texorpdfstring{$\ast$}{*}}]{state}{, }\item[{unsigned long}]{serial}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__winusb_8c_source_l00042}{42}} of file \mbox{\hyperlink{yubihsm__winusb_8c_source}{yubihsm\+\_\+winusb.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00043\ \ \ \mbox{\hyperlink{structstate}{state}}-\/>\mbox{\hyperlink{structstate_a427c87eb42b2a735f1ac44b76aba1664}{serial}}\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a1149ca4bd0659030412db8e77bebdf88}{serial}};}
+\DoxyCodeLine{00044\ \}}
+
+\end{DoxyCode}
+\Hypertarget{yubihsm__winusb_8c_ad588c46d8af37c48a320beae5d18617a}\index{yubihsm\_winusb.c@{yubihsm\_winusb.c}!usb\_write@{usb\_write}}
+\index{usb\_write@{usb\_write}!yubihsm\_winusb.c@{yubihsm\_winusb.c}}
+\doxysubsubsection{\texorpdfstring{usb\_write()}{usb\_write()}}
+{\footnotesize\ttfamily \label{yubihsm__winusb_8c_ad588c46d8af37c48a320beae5d18617a} 
+int usb\+\_\+write (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{lib_2internal_8h_af0b8c5ac57556b935ae71249ec6cc388}{yh\+\_\+backend}} \texorpdfstring{$\ast$}{*}}]{state}{, }\item[{unsigned char \texorpdfstring{$\ast$}{*}}]{buf}{, }\item[{long unsigned}]{len}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__winusb_8c_source_l00277}{277}} of file \mbox{\hyperlink{yubihsm__winusb_8c_source}{yubihsm\+\_\+winusb.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00277\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00278\ \ \ \textcolor{keywordtype}{long}\ \textcolor{keywordtype}{unsigned}\ transferred;}
+\DoxyCodeLine{00279\ }
+\DoxyCodeLine{00280\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structstate}{state}}-\/>\mbox{\hyperlink{structstate_a8ab01fdf8a0356f22b4cf3453bc11c02}{hWinUSB}}\ ==\ INVALID\_HANDLE\_VALUE)\ \{}
+\DoxyCodeLine{00281\ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a2e3ed21e5ffba18d940d164aaec64a2a}{DBG\_ERR}}(\textcolor{stringliteral}{"{}No\ connected\ device"{}});}
+\DoxyCodeLine{00282\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00283\ \ \ \}}
+\DoxyCodeLine{00284\ }
+\DoxyCodeLine{00285\ \ \ BOOL\ bResult\ =}
+\DoxyCodeLine{00286\ \ \ \ \ WinUsb\_WritePipe(\mbox{\hyperlink{structstate}{state}}-\/>\mbox{\hyperlink{structstate_a8ab01fdf8a0356f22b4cf3453bc11c02}{hWinUSB}},\ \mbox{\hyperlink{yubihsm__winusb_8c_af2aa1b20c10d6507c47f11588e21c324}{PIPE\_OUT}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ \&transferred,\ 0);}
+\DoxyCodeLine{00287\ \ \ \textcolor{keywordflow}{if}\ (bResult)\ \{}
+\DoxyCodeLine{00288\ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a8c4742440a149ad8bcb5d58ae76c5ed3}{DBG\_INFO}}(\textcolor{stringliteral}{"{}Written\ \%lu\ bytes"{}},\ transferred);}
+\DoxyCodeLine{00289\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00290\ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a2e3ed21e5ffba18d940d164aaec64a2a}{DBG\_ERR}}(\textcolor{stringliteral}{"{}WinUsb\_WritePipe\ failed,\ error=\%lx"{}},\ GetLastError());}
+\DoxyCodeLine{00291\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00292\ \ \ \}}
+\DoxyCodeLine{00293\ }
+\DoxyCodeLine{00294\ \ \ \textcolor{keywordflow}{if}\ (transferred\ !=\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})\ \{}
+\DoxyCodeLine{00295\ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a2e3ed21e5ffba18d940d164aaec64a2a}{DBG\_ERR}}(\textcolor{stringliteral}{"{}Transferred\ did\ not\ match\ len\ of\ write\ \%lu-\/\%lu"{}},\ transferred,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}});}
+\DoxyCodeLine{00296\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00297\ \ \ \}}
+\DoxyCodeLine{00298\ }
+\DoxyCodeLine{00299\ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{00300\ \}}
+
+\end{DoxyCode}

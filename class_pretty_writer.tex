@@ -1,0 +1,1127 @@
+\doxysection{Pretty\+Writer\texorpdfstring{$<$}{<} Output\+Stream, Source\+Encoding, Target\+Encoding, Stack\+Allocator, write\+Flags \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{class_pretty_writer}{}\label{class_pretty_writer}\index{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$@{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$}}
+
+
+\doxylink{class_writer}{Writer} with indentation and spacing.  
+
+
+
+
+{\ttfamily \#include $<$prettywriter.\+h$>$}
+
+
+
+Inheritance diagram for Pretty\+Writer\texorpdfstring{$<$}{<} Output\+Stream, Source\+Encoding, Target\+Encoding, Stack\+Allocator, write\+Flags \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=247pt]{class_pretty_writer__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Pretty\+Writer\texorpdfstring{$<$}{<} Output\+Stream, Source\+Encoding, Target\+Encoding, Stack\+Allocator, write\+Flags \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=295pt]{class_pretty_writer__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{class_writer}{Writer}}$<$ Output\+Stream, Source\+Encoding, Target\+Encoding, Stack\+Allocator, write\+Flags $>$ \mbox{\hyperlink{class_pretty_writer_aef4194a67be1cbc605b7dd9371626a12}{Base}}
+\item 
+typedef \mbox{\hyperlink{class_writer_a265c76a2263d4465cd8635b6d5550d1b}{Base\+::\+Ch}} \mbox{\hyperlink{class_pretty_writer_aaa96adc74fbd28fe3d7bfe19a961af6b}{Ch}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Types inherited from \mbox{\hyperlink{class_writer}{Writer$<$ Output\+Stream, UTF8$<$$>$, UTF8$<$$>$, Crt\+Allocator, k\+Write\+Default\+Flags $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{struct_u_t_f8}{UTF8}}$<$$>$\+::\+Ch \mbox{\hyperlink{class_writer_a265c76a2263d4465cd8635b6d5550d1b}{Ch}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_pretty_writer_a928ac2a5235b8877048ebdd5f35a556f}{Pretty\+Writer}} (Output\+Stream \&os, Stack\+Allocator \texorpdfstring{$\ast$}{*}allocator=0, size\+\_\+t level\+Depth=\mbox{\hyperlink{class_writer_a9cb4caeb9d8971f305edff1d70e67acb}{Base\+::k\+Default\+Level\+Depth}})
+\begin{DoxyCompactList}\small\item\em Constructor. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_pretty_writer_a4a9077e0300c6b0e1c830a58c1e738d2}{Pretty\+Writer}} (Stack\+Allocator \texorpdfstring{$\ast$}{*}allocator=0, size\+\_\+t level\+Depth=\mbox{\hyperlink{class_writer_a9cb4caeb9d8971f305edff1d70e67acb}{Base\+::k\+Default\+Level\+Depth}})
+\item 
+\mbox{\hyperlink{class_pretty_writer}{Pretty\+Writer}} \& \mbox{\hyperlink{class_pretty_writer_abbdc83ce02cf4a811a7355aa3879b45a}{Set\+Indent}} (\mbox{\hyperlink{class_pretty_writer_aaa96adc74fbd28fe3d7bfe19a961af6b}{Ch}} indent\+Char, unsigned indent\+Char\+Count)
+\begin{DoxyCompactList}\small\item\em Set custom indentation. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_pretty_writer}{Pretty\+Writer}} \& \mbox{\hyperlink{class_pretty_writer_aade3381a128071f1da060f5f3075de10}{Set\+Format\+Options}} (\mbox{\hyperlink{prettywriter_8h_a150fd6ef2dbf4025c33ece85451982d5}{Pretty\+Format\+Options}} options)
+\begin{DoxyCompactList}\small\item\em Set pretty writer formatting options. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\begin{Indent}\textbf{ Implementation of Handler}\par
+{\em \begin{DoxySeeAlso}{See also}
+Handler 
+\end{DoxySeeAlso}
+}\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{class_pretty_writer_aa144f2d0f0c3c69248cdbe957349528c}{Null}} ()
+\item 
+bool \mbox{\hyperlink{class_pretty_writer_a6e765ee7ada5ed40f317c78a98f6f90b}{Bool}} (bool b)
+\item 
+bool \mbox{\hyperlink{class_pretty_writer_aa1815263e61cb7af3b6dfba480a0f481}{Int}} (int i)
+\item 
+bool \mbox{\hyperlink{class_pretty_writer_a8c82302877a5588eae77eb7d042c49ef}{Uint}} (unsigned u)
+\item 
+bool \mbox{\hyperlink{class_pretty_writer_ad42b797429f4ee19efdce610f5aff976}{Int64}} (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} i64)
+\item 
+bool \mbox{\hyperlink{class_pretty_writer_aba75ac1f13c2629b2a55ffbf3d8a116c}{Uint64}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} u64)
+\item 
+bool \mbox{\hyperlink{class_pretty_writer_ad9d592e86b985da666665926e87db415}{Double}} (double d)
+\item 
+bool \mbox{\hyperlink{class_pretty_writer_a3941bc21d6a261ca8a86eff330db30ef}{Raw\+Number}} (const \mbox{\hyperlink{class_pretty_writer_aaa96adc74fbd28fe3d7bfe19a961af6b}{Ch}} \texorpdfstring{$\ast$}{*}str, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} length, bool copy=false)
+\item 
+bool \mbox{\hyperlink{class_pretty_writer_ae544ccfe35dd7e80ed694873062409f6}{String}} (const \mbox{\hyperlink{class_pretty_writer_aaa96adc74fbd28fe3d7bfe19a961af6b}{Ch}} \texorpdfstring{$\ast$}{*}str, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} length, bool copy=false)
+\item 
+bool \mbox{\hyperlink{class_pretty_writer_a27bdda225dc152b8974e44c1df7525b7}{Start\+Object}} ()
+\item 
+bool \mbox{\hyperlink{class_pretty_writer_a20ecbe1d31a871e4da4a3899b40ad3cd}{Key}} (const \mbox{\hyperlink{class_pretty_writer_aaa96adc74fbd28fe3d7bfe19a961af6b}{Ch}} \texorpdfstring{$\ast$}{*}str, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} length, bool copy=false)
+\item 
+bool \mbox{\hyperlink{class_pretty_writer_a6bfdfa4193193ef763cce5c592c4d20c}{End\+Object}} (\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} member\+Count=0)
+\item 
+bool \mbox{\hyperlink{class_pretty_writer_aec7fdf4798a3af5e31c147633f4798ed}{Start\+Array}} ()
+\item 
+bool \mbox{\hyperlink{class_pretty_writer_a1e9d97fc950d349f55abd864c787ff37}{End\+Array}} (\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} member\+Count=0)
+\end{DoxyCompactItemize}
+\end{Indent}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{class_writer}{Writer$<$ Output\+Stream, UTF8$<$$>$, UTF8$<$$>$, Crt\+Allocator, k\+Write\+Default\+Flags $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_writer_af4f54830d6927d9daf5bd53bfd134dd3}{Writer}} (Output\+Stream \&os, \mbox{\hyperlink{class_crt_allocator}{Crt\+Allocator}} \texorpdfstring{$\ast$}{*}stack\+Allocator=0, size\+\_\+t level\+Depth=\mbox{\hyperlink{class_writer_a9cb4caeb9d8971f305edff1d70e67acb}{k\+Default\+Level\+Depth}})
+\begin{DoxyCompactList}\small\item\em Constructor. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_writer_a7b885cea71542fc436be80eff447fb64}{Writer}} (\mbox{\hyperlink{class_crt_allocator}{Crt\+Allocator}} \texorpdfstring{$\ast$}{*}allocator=0, size\+\_\+t level\+Depth=\mbox{\hyperlink{class_writer_a9cb4caeb9d8971f305edff1d70e67acb}{k\+Default\+Level\+Depth}})
+\item 
+void \mbox{\hyperlink{class_writer_a8b53e8f137f7fcf694f5500711b3f58d}{Reset}} (Output\+Stream \&os)
+\begin{DoxyCompactList}\small\item\em \doxylink{struct_reset}{Reset} the writer with a new stream. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_writer_a07d74d36dd3191b06e0aab678c246157}{Is\+Complete}} () const
+\begin{DoxyCompactList}\small\item\em Checks whether the output is a complete JSON. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{class_writer_ad35ddb56c6969d9584bf1e73bebda5ab}{Get\+Max\+Decimal\+Places}} () const
+\item 
+void \mbox{\hyperlink{class_writer_a58e3f94dc5af1432a8eace5ba427eca7}{Set\+Max\+Decimal\+Places}} (int max\+Decimal\+Places)
+\begin{DoxyCompactList}\small\item\em Sets the maximum number of decimal places for double output. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{class_writer_af700ed03c8810d48a4aaa3c5baeaf26c}{Null}} ()
+\item 
+bool \mbox{\hyperlink{class_writer_ad7491f4dedb02e7456b240b23ef8c1ad}{Bool}} (bool b)
+\item 
+bool \mbox{\hyperlink{class_writer_ad471415aa7741e732bab0bcfbb9522a8}{Int}} (int i)
+\item 
+bool \mbox{\hyperlink{class_writer_a5fb0c3228f89f6f9bef15f3e6e6f1739}{Uint}} (unsigned u)
+\item 
+bool \mbox{\hyperlink{class_writer_a4144d7086ed9d3d807c373de242bde45}{Int64}} (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} i64)
+\item 
+bool \mbox{\hyperlink{class_writer_a55bb9f286ecdaf4cdb07bddb02e0cb2d}{Uint64}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} u64)
+\item 
+bool \mbox{\hyperlink{class_writer_a22a43e8a7193105deec6b808736f7a1a}{Double}} (double d)
+\begin{DoxyCompactList}\small\item\em Writes the given {\ttfamily double} value to the stream. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_writer_ad462dc606fddea0f34fc0e190c3bdaee}{Raw\+Number}} (const \mbox{\hyperlink{class_writer_a265c76a2263d4465cd8635b6d5550d1b}{Ch}} \texorpdfstring{$\ast$}{*}str, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} length, bool copy=false)
+\item 
+bool \mbox{\hyperlink{class_writer_a8b4dc44f471403a83c9959575796ceab}{String}} (const \mbox{\hyperlink{class_writer_a265c76a2263d4465cd8635b6d5550d1b}{Ch}} \texorpdfstring{$\ast$}{*}str, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} length, bool copy=false)
+\item 
+bool \mbox{\hyperlink{class_writer_aec3200b2fc80ec87d1c37f775256b2e1}{Start\+Object}} ()
+\item 
+bool \mbox{\hyperlink{class_writer_a19096d2ccb90761f63ab1240337bf90a}{Key}} (const \mbox{\hyperlink{class_writer_a265c76a2263d4465cd8635b6d5550d1b}{Ch}} \texorpdfstring{$\ast$}{*}str, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} length, bool copy=false)
+\item 
+bool \mbox{\hyperlink{class_writer_a0771a565261564c27676b7300b11f2b5}{End\+Object}} (\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} member\+Count=0)
+\item 
+bool \mbox{\hyperlink{class_writer_a38715785194b42cd67ba5dd52bf7967e}{Start\+Array}} ()
+\item 
+bool \mbox{\hyperlink{class_writer_ac88d533095591a878500b63b351d4013}{End\+Array}} (\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} element\+Count=0)
+\end{DoxyCompactItemize}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{class_writer_a2a2c6f51644b2013471aec4dac0d7466}{String}} (const \mbox{\hyperlink{class_writer_a265c76a2263d4465cd8635b6d5550d1b}{Ch}} \texorpdfstring{$\ast$}{*}const \&str)
+\begin{DoxyCompactList}\small\item\em Simpler but slower overload. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{class_writer_ab6057b7fa9737edb4da55a7afefa966d}{Key}} (const \mbox{\hyperlink{class_writer_a265c76a2263d4465cd8635b6d5550d1b}{Ch}} \texorpdfstring{$\ast$}{*}const \&str)
+\end{DoxyCompactItemize}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{class_writer_ae0d1615104e4e88040b9640e6784008a}{Raw\+Value}} (const \mbox{\hyperlink{class_writer_a265c76a2263d4465cd8635b6d5550d1b}{Ch}} \texorpdfstring{$\ast$}{*}json, size\+\_\+t length, \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}} type)
+\begin{DoxyCompactList}\small\item\em Write a raw JSON value. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{class_writer_a8ca4e364c546b2eb526caa68dde011d2}{Flush}} ()
+\begin{DoxyCompactList}\small\item\em Flush the output stream. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Convenience extensions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_pretty_writer_aaa96adc74fbd28fe3d7bfe19a961af6b}{Ch}} \mbox{\hyperlink{class_pretty_writer_aaa3f6380daa8466a5101ed18fc33bf04}{indent\+Char\+\_\+}}
+\item 
+unsigned \mbox{\hyperlink{class_pretty_writer_a7d00b9716ef3cd7e34ae1b744c968f13}{indent\+Char\+Count\+\_\+}}
+\item 
+\mbox{\hyperlink{prettywriter_8h_a150fd6ef2dbf4025c33ece85451982d5}{Pretty\+Format\+Options}} \mbox{\hyperlink{class_pretty_writer_a15505ed4ea0fa85d339b3a987f1a3aaf}{format\+Options\+\_\+}}
+\item 
+bool \mbox{\hyperlink{class_pretty_writer_a7e85689355a827d273f272c26b447225}{String}} (const \mbox{\hyperlink{class_pretty_writer_aaa96adc74fbd28fe3d7bfe19a961af6b}{Ch}} \texorpdfstring{$\ast$}{*}str)
+\begin{DoxyCompactList}\small\item\em Simpler but slower overload. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_pretty_writer_a4b2a2a6eef02c12d7a3fd77966bd4499}{Key}} (const \mbox{\hyperlink{class_pretty_writer_aaa96adc74fbd28fe3d7bfe19a961af6b}{Ch}} \texorpdfstring{$\ast$}{*}str)
+\item 
+bool \mbox{\hyperlink{class_pretty_writer_a440890a72408a150ef46edda6becdc94}{Raw\+Value}} (const \mbox{\hyperlink{class_pretty_writer_aaa96adc74fbd28fe3d7bfe19a961af6b}{Ch}} \texorpdfstring{$\ast$}{*}json, size\+\_\+t length, \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}} type)
+\begin{DoxyCompactList}\small\item\em Write a raw JSON value. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_pretty_writer_a09709ffa3b545e007631ecfd35029843}{Pretty\+Prefix}} (\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}} type)
+\item 
+void \mbox{\hyperlink{class_pretty_writer_a6f244ecc94fd5b134d424033b1574b7e}{Write\+Indent}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Static Public Attributes inherited from \mbox{\hyperlink{class_writer}{Writer$<$ Output\+Stream, UTF8$<$$>$, UTF8$<$$>$, Crt\+Allocator, k\+Write\+Default\+Flags $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+static const int \mbox{\hyperlink{class_writer_ab46d66ae0ca78cb03ab7fb865d129934}{k\+Default\+Max\+Decimal\+Places}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Member Functions inherited from \mbox{\hyperlink{class_writer}{Writer$<$ Output\+Stream, UTF8$<$$>$, UTF8$<$$>$, Crt\+Allocator, k\+Write\+Default\+Flags $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{class_writer_aaa9cddc35dbc6a612ef01633ed8a6687}{Write\+Int}} (int i)
+\item 
+bool \mbox{\hyperlink{class_writer_a9159dbd1625b1506cd13c79e3b7bad4a}{Write\+Uint}} (unsigned u)
+\item 
+bool \mbox{\hyperlink{class_writer_a439aacf94c862df151c16d9c907afe0f}{Write\+Int64}} (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} i64)
+\item 
+bool \mbox{\hyperlink{class_writer_aa1d514cd0200ec1732e74fe26ebcf463}{Write\+Uint64}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} u)
+\item 
+bool \mbox{\hyperlink{class_writer_a114c748ae1f770c20f6ecd7cfc7b67bb}{Write\+Double}} (double d)
+\end{DoxyCompactItemize}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{class_writer_a44862b3eba8d84b909c69aba875c9f4d}{Write\+Null}} ()
+\end{DoxyCompactItemize}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{class_writer_a42ad68b6950431bb8ca0199568546eaf}{Write\+Bool}} (bool b)
+\end{DoxyCompactItemize}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{class_writer_a31d0feda654ca245c41462be7dc59998}{Write\+Int}} (int i)
+\end{DoxyCompactItemize}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{class_writer_a2861227e93707d1478d2cf56644dca3b}{Write\+Uint}} (unsigned u)
+\end{DoxyCompactItemize}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{class_writer_aa58d3f80c06394648de5055ecfb41587}{Write\+Int64}} (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} i64)
+\end{DoxyCompactItemize}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{class_writer_ad07b325157220e3aa791c1c8c904021e}{Write\+Uint64}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} u64)
+\end{DoxyCompactItemize}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{class_writer_ae7a0fc4740681d845d92c1213bd25aa1}{Write\+Double}} (double d)
+\end{DoxyCompactItemize}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{class_writer_acda4412ef5f4cac6e89f9544e4b10f70}{Write\+String}} (const \mbox{\hyperlink{class_writer_a265c76a2263d4465cd8635b6d5550d1b}{Ch}} \texorpdfstring{$\ast$}{*}str, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} length)
+\end{DoxyCompactItemize}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{class_writer_a94140803bba7863a1b39c936bbe6d262}{Scan\+Write\+Unescaped\+String}} (\mbox{\hyperlink{struct_generic_string_stream}{Generic\+String\+Stream}}$<$ \mbox{\hyperlink{struct_u_t_f8}{UTF8}}$<$$>$ $>$ \&is, size\+\_\+t length)
+\end{DoxyCompactItemize}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{class_writer_a81c72a2eecd47e042f56ca93a27a5cb1}{Write\+Start\+Object}} ()
+\end{DoxyCompactItemize}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{class_writer_a7e3f6760a50a72f4217a9b2d625c43ee}{Write\+End\+Object}} ()
+\end{DoxyCompactItemize}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{class_writer_a3c3560a96cac58f98f4a74d6cb227204}{Write\+Start\+Array}} ()
+\end{DoxyCompactItemize}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{class_writer_aabda2df1be6e83cef416e9b1f042e8f4}{Write\+End\+Array}} ()
+\end{DoxyCompactItemize}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{class_writer_a8ee1135b2595261819b134907f67614e}{Write\+Raw\+Value}} (const \mbox{\hyperlink{class_writer_a265c76a2263d4465cd8635b6d5550d1b}{Ch}} \texorpdfstring{$\ast$}{*}json, size\+\_\+t length)
+\end{DoxyCompactItemize}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{class_writer_a1fc40f8b9f3abc2548c0c5782ce1755d}{Prefix}} (\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}} type)
+\end{DoxyCompactItemize}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{class_writer_adc1cadbabc309d31f19cf7463251d879}{End\+Value}} (bool \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}})
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Attributes inherited from \mbox{\hyperlink{class_writer}{Writer$<$ Output\+Stream, UTF8$<$$>$, UTF8$<$$>$, Crt\+Allocator, k\+Write\+Default\+Flags $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+Output\+Stream \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_writer_a3a3f60140f78dd67b5274978fd3a33ff}{os\+\_\+}}
+\end{DoxyCompactItemize}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classinternal_1_1_stack}{internal\+::\+Stack}}$<$ \mbox{\hyperlink{class_crt_allocator}{Crt\+Allocator}} $>$ \mbox{\hyperlink{class_writer_a9e6c13c06fc721dfd8486f17b9ff29de}{level\+\_\+stack\+\_\+}}
+\end{DoxyCompactItemize}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{class_writer_a3d4ef664c3cdf34a286b13d27adcdd4d}{max\+Decimal\+Places\+\_\+}}
+\end{DoxyCompactItemize}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{class_writer_affc6b9e0332b50bee0d33f8b1841c9a6}{has\+Root\+\_\+}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Static Protected Attributes inherited from \mbox{\hyperlink{class_writer}{Writer$<$ Output\+Stream, UTF8$<$$>$, UTF8$<$$>$, Crt\+Allocator, k\+Write\+Default\+Flags $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+static const size\+\_\+t \mbox{\hyperlink{class_writer_a9cb4caeb9d8971f305edff1d70e67acb}{k\+Default\+Level\+Depth}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Output\+Stream, typename Source\+Encoding = UTF8$<$$>$, typename Target\+Encoding = UTF8$<$$>$, typename Stack\+Allocator = Crt\+Allocator, unsigned write\+Flags = k\+Write\+Default\+Flags$>$\newline
+class Pretty\+Writer$<$ Output\+Stream, Source\+Encoding, Target\+Encoding, Stack\+Allocator, write\+Flags $>$}
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em Output\+Stream} & Type of output os. \\
+\hline
+{\em Source\+Encoding} & Encoding of source string. \\
+\hline
+{\em Target\+Encoding} & Encoding of output stream. \\
+\hline
+{\em Stack\+Allocator} & Type of allocator for allocating memory of stack. \\
+\hline
+\end{DoxyTemplParams}
+
+
+Definition at line \mbox{\hyperlink{prettywriter_8h_source_l00048}{48}} of file \mbox{\hyperlink{prettywriter_8h_source}{prettywriter.\+h}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{class_pretty_writer_aef4194a67be1cbc605b7dd9371626a12}\index{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$@{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$}!Base@{Base}}
+\index{Base@{Base}!PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$@{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$}}
+\doxysubsubsection{\texorpdfstring{Base}{Base}}
+{\footnotesize\ttfamily \label{class_pretty_writer_aef4194a67be1cbc605b7dd9371626a12} 
+template$<$typename Output\+Stream , typename Source\+Encoding  = UTF8$<$$>$, typename Target\+Encoding  = UTF8$<$$>$, typename Stack\+Allocator  = Crt\+Allocator, unsigned write\+Flags = k\+Write\+Default\+Flags$>$ \\
+\mbox{\hyperlink{class_writer}{Writer}}$<$Output\+Stream, Source\+Encoding, Target\+Encoding, Stack\+Allocator, write\+Flags$>$ \mbox{\hyperlink{class_pretty_writer}{Pretty\+Writer}}$<$ Output\+Stream, Source\+Encoding, Target\+Encoding, Stack\+Allocator, write\+Flags $>$\+::\+Base}
+
+
+
+Definition at line \mbox{\hyperlink{prettywriter_8h_source_l00050}{50}} of file \mbox{\hyperlink{prettywriter_8h_source}{prettywriter.\+h}}.
+
+\Hypertarget{class_pretty_writer_aaa96adc74fbd28fe3d7bfe19a961af6b}\index{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$@{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$}!Ch@{Ch}}
+\index{Ch@{Ch}!PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$@{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$}}
+\doxysubsubsection{\texorpdfstring{Ch}{Ch}}
+{\footnotesize\ttfamily \label{class_pretty_writer_aaa96adc74fbd28fe3d7bfe19a961af6b} 
+template$<$typename Output\+Stream , typename Source\+Encoding  = UTF8$<$$>$, typename Target\+Encoding  = UTF8$<$$>$, typename Stack\+Allocator  = Crt\+Allocator, unsigned write\+Flags = k\+Write\+Default\+Flags$>$ \\
+\mbox{\hyperlink{class_writer_a265c76a2263d4465cd8635b6d5550d1b}{Base\+::\+Ch}} \mbox{\hyperlink{class_pretty_writer}{Pretty\+Writer}}$<$ Output\+Stream, Source\+Encoding, Target\+Encoding, Stack\+Allocator, write\+Flags $>$\+::\+Ch}
+
+
+
+Definition at line \mbox{\hyperlink{prettywriter_8h_source_l00051}{51}} of file \mbox{\hyperlink{prettywriter_8h_source}{prettywriter.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_pretty_writer_a928ac2a5235b8877048ebdd5f35a556f}\index{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$@{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$}!PrettyWriter@{PrettyWriter}}
+\index{PrettyWriter@{PrettyWriter}!PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$@{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$}}
+\doxysubsubsection{\texorpdfstring{PrettyWriter()}{PrettyWriter()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_pretty_writer_a928ac2a5235b8877048ebdd5f35a556f} 
+template$<$typename Output\+Stream , typename Source\+Encoding  = UTF8$<$$>$, typename Target\+Encoding  = UTF8$<$$>$, typename Stack\+Allocator  = Crt\+Allocator, unsigned write\+Flags = k\+Write\+Default\+Flags$>$ \\
+\mbox{\hyperlink{class_pretty_writer}{Pretty\+Writer}}$<$ Output\+Stream, Source\+Encoding, Target\+Encoding, Stack\+Allocator, write\+Flags $>$\mbox{\hyperlink{class_pretty_writer}{\+::\+Pretty\+Writer}} (\begin{DoxyParamCaption}\item[{Output\+Stream \&}]{os}{, }\item[{Stack\+Allocator \texorpdfstring{$\ast$}{*}}]{allocator}{ = {\ttfamily 0}, }\item[{size\+\_\+t}]{level\+Depth}{ = {\ttfamily \mbox{\hyperlink{class_writer_a9cb4caeb9d8971f305edff1d70e67acb}{Base\+::k\+Default\+Level\+Depth}}}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+\begin{DoxyParams}{Parameters}
+{\em os} & Output stream. \\
+\hline
+{\em allocator} & User supplied allocator. If it is null, it will create a private one. \\
+\hline
+{\em level\+Depth} & Initial capacity of stack. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{prettywriter_8h_source_l00058}{58}} of file \mbox{\hyperlink{prettywriter_8h_source}{prettywriter.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ }
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_pretty_writer_aef4194a67be1cbc605b7dd9371626a12}{Base}}(os,\ allocator,\ levelDepth),\ \mbox{\hyperlink{class_pretty_writer_aaa3f6380daa8466a5101ed18fc33bf04}{indentChar\_}}(\textcolor{charliteral}{'\ '}),\ \mbox{\hyperlink{class_pretty_writer_a7d00b9716ef3cd7e34ae1b744c968f13}{indentCharCount\_}}(4),\ \mbox{\hyperlink{class_pretty_writer_a15505ed4ea0fa85d339b3a987f1a3aaf}{formatOptions\_}}(\mbox{\hyperlink{prettywriter_8h_a150fd6ef2dbf4025c33ece85451982d5a00acc6a868833bb14b6426314f09cbed}{kFormatDefault}})\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{class_pretty_writer_a4a9077e0300c6b0e1c830a58c1e738d2}\index{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$@{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$}!PrettyWriter@{PrettyWriter}}
+\index{PrettyWriter@{PrettyWriter}!PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$@{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$}}
+\doxysubsubsection{\texorpdfstring{PrettyWriter()}{PrettyWriter()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_pretty_writer_a4a9077e0300c6b0e1c830a58c1e738d2} 
+template$<$typename Output\+Stream , typename Source\+Encoding  = UTF8$<$$>$, typename Target\+Encoding  = UTF8$<$$>$, typename Stack\+Allocator  = Crt\+Allocator, unsigned write\+Flags = k\+Write\+Default\+Flags$>$ \\
+\mbox{\hyperlink{class_pretty_writer}{Pretty\+Writer}}$<$ Output\+Stream, Source\+Encoding, Target\+Encoding, Stack\+Allocator, write\+Flags $>$\mbox{\hyperlink{class_pretty_writer}{\+::\+Pretty\+Writer}} (\begin{DoxyParamCaption}\item[{Stack\+Allocator \texorpdfstring{$\ast$}{*}}]{allocator}{ = {\ttfamily 0}, }\item[{size\+\_\+t}]{level\+Depth}{ = {\ttfamily \mbox{\hyperlink{class_writer_a9cb4caeb9d8971f305edff1d70e67acb}{Base\+::k\+Default\+Level\+Depth}}}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{prettywriter_8h_source_l00062}{62}} of file \mbox{\hyperlink{prettywriter_8h_source}{prettywriter.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ }
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_pretty_writer_aef4194a67be1cbc605b7dd9371626a12}{Base}}(allocator,\ levelDepth),\ \mbox{\hyperlink{class_pretty_writer_aaa3f6380daa8466a5101ed18fc33bf04}{indentChar\_}}(\textcolor{charliteral}{'\ '}),\ \mbox{\hyperlink{class_pretty_writer_a7d00b9716ef3cd7e34ae1b744c968f13}{indentCharCount\_}}(4)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_pretty_writer_a6e765ee7ada5ed40f317c78a98f6f90b}\index{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$@{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$}!Bool@{Bool}}
+\index{Bool@{Bool}!PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$@{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$}}
+\doxysubsubsection{\texorpdfstring{Bool()}{Bool()}}
+{\footnotesize\ttfamily \label{class_pretty_writer_a6e765ee7ada5ed40f317c78a98f6f90b} 
+template$<$typename Output\+Stream , typename Source\+Encoding  = UTF8$<$$>$, typename Target\+Encoding  = UTF8$<$$>$, typename Stack\+Allocator  = Crt\+Allocator, unsigned write\+Flags = k\+Write\+Default\+Flags$>$ \\
+bool \mbox{\hyperlink{class_pretty_writer}{Pretty\+Writer}}$<$ Output\+Stream, Source\+Encoding, Target\+Encoding, Stack\+Allocator, write\+Flags $>$\mbox{\hyperlink{struct_bool}{\+::\+Bool}} (\begin{DoxyParamCaption}\item[{bool}]{b}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{prettywriter_8h_source_l00096}{96}} of file \mbox{\hyperlink{prettywriter_8h_source}{prettywriter.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00096\ \{\ \mbox{\hyperlink{class_pretty_writer_a09709ffa3b545e007631ecfd35029843}{PrettyPrefix}}(b\ ?\ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7a209434e5edd66630011ca19d710d7cd6}{kTrueType}}\ :\ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7a062b8296274a258acf0e142868684c54}{kFalseType}});\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_writer_adc1cadbabc309d31f19cf7463251d879}{Base::EndValue}}(\mbox{\hyperlink{class_writer_a42ad68b6950431bb8ca0199568546eaf}{Base::WriteBool}}(b));\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_pretty_writer_a6e765ee7ada5ed40f317c78a98f6f90b_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_pretty_writer_ad9d592e86b985da666665926e87db415}\index{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$@{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$}!Double@{Double}}
+\index{Double@{Double}!PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$@{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$}}
+\doxysubsubsection{\texorpdfstring{Double()}{Double()}}
+{\footnotesize\ttfamily \label{class_pretty_writer_ad9d592e86b985da666665926e87db415} 
+template$<$typename Output\+Stream , typename Source\+Encoding  = UTF8$<$$>$, typename Target\+Encoding  = UTF8$<$$>$, typename Stack\+Allocator  = Crt\+Allocator, unsigned write\+Flags = k\+Write\+Default\+Flags$>$ \\
+bool \mbox{\hyperlink{class_pretty_writer}{Pretty\+Writer}}$<$ Output\+Stream, Source\+Encoding, Target\+Encoding, Stack\+Allocator, write\+Flags $>$\+::\+Double (\begin{DoxyParamCaption}\item[{double}]{d}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{prettywriter_8h_source_l00101}{101}} of file \mbox{\hyperlink{prettywriter_8h_source}{prettywriter.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00101\ \{\ \mbox{\hyperlink{class_pretty_writer_a09709ffa3b545e007631ecfd35029843}{PrettyPrefix}}(\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7afc9f813b7aaf71911bdae20a86b2702d}{kNumberType}});\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_writer_adc1cadbabc309d31f19cf7463251d879}{Base::EndValue}}(\mbox{\hyperlink{class_writer_ae7a0fc4740681d845d92c1213bd25aa1}{Base::WriteDouble}}(d));\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_pretty_writer_ad9d592e86b985da666665926e87db415_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=262pt]{class_pretty_writer_ad9d592e86b985da666665926e87db415_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_pretty_writer_a1e9d97fc950d349f55abd864c787ff37}\index{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$@{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$}!EndArray@{EndArray}}
+\index{EndArray@{EndArray}!PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$@{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$}}
+\doxysubsubsection{\texorpdfstring{EndArray()}{EndArray()}}
+{\footnotesize\ttfamily \label{class_pretty_writer_a1e9d97fc950d349f55abd864c787ff37} 
+template$<$typename Output\+Stream , typename Source\+Encoding  = UTF8$<$$>$, typename Target\+Encoding  = UTF8$<$$>$, typename Stack\+Allocator  = Crt\+Allocator, unsigned write\+Flags = k\+Write\+Default\+Flags$>$ \\
+bool \mbox{\hyperlink{class_pretty_writer}{Pretty\+Writer}}$<$ Output\+Stream, Source\+Encoding, Target\+Encoding, Stack\+Allocator, write\+Flags $>$\+::\+End\+Array (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{member\+Count}{ = {\ttfamily 0}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{prettywriter_8h_source_l00163}{163}} of file \mbox{\hyperlink{prettywriter_8h_source}{prettywriter.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ (void)memberCount;}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\mbox{\hyperlink{class_writer_a9e6c13c06fc721dfd8486f17b9ff29de}{Base::level\_stack\_}}.GetSize()\ >=\ \textcolor{keyword}{sizeof}(\textcolor{keyword}{typename}\ Base::Level));}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\mbox{\hyperlink{class_writer_a9e6c13c06fc721dfd8486f17b9ff29de}{Base::level\_stack\_}}.\textcolor{keyword}{template}\ Top<typename\ Base::Level>()-\/>inArray);}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ empty\ =\ \mbox{\hyperlink{class_writer_a9e6c13c06fc721dfd8486f17b9ff29de}{Base::level\_stack\_}}.template\ Pop<typename\ Base::Level>(1)-\/>valueCount\ ==\ 0;}
+\DoxyCodeLine{00168\ }
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!empty\ \&\&\ !(\mbox{\hyperlink{class_pretty_writer_a15505ed4ea0fa85d339b3a987f1a3aaf}{formatOptions\_}}\ \&\ \mbox{\hyperlink{prettywriter_8h_a150fd6ef2dbf4025c33ece85451982d5addf85c922d2d597ab1074a55b27c3fe2}{kFormatSingleLineArray}}))\ \{}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_writer_a3a3f60140f78dd67b5274978fd3a33ff}{Base::os\_}}-\/>Put(\textcolor{charliteral}{'\(\backslash\)n'});}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_pretty_writer_a6f244ecc94fd5b134d424033b1574b7e}{WriteIndent}}();}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{class_writer_adc1cadbabc309d31f19cf7463251d879}{Base::EndValue}}(\mbox{\hyperlink{class_writer_aabda2df1be6e83cef416e9b1f042e8f4}{Base::WriteEndArray}}());}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ (void)\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ ==\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_writer_a9e6c13c06fc721dfd8486f17b9ff29de}{Base::level\_stack\_}}.Empty())\ \textcolor{comment}{//\ end\ of\ json\ text}}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_writer_a8ca4e364c546b2eb526caa68dde011d2}{Base::Flush}}();}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00179\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_pretty_writer_a1e9d97fc950d349f55abd864c787ff37_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=272pt]{class_pretty_writer_a1e9d97fc950d349f55abd864c787ff37_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_pretty_writer_a6bfdfa4193193ef763cce5c592c4d20c}\index{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$@{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$}!EndObject@{EndObject}}
+\index{EndObject@{EndObject}!PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$@{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$}}
+\doxysubsubsection{\texorpdfstring{EndObject()}{EndObject()}}
+{\footnotesize\ttfamily \label{class_pretty_writer_a6bfdfa4193193ef763cce5c592c4d20c} 
+template$<$typename Output\+Stream , typename Source\+Encoding  = UTF8$<$$>$, typename Target\+Encoding  = UTF8$<$$>$, typename Stack\+Allocator  = Crt\+Allocator, unsigned write\+Flags = k\+Write\+Default\+Flags$>$ \\
+bool \mbox{\hyperlink{class_pretty_writer}{Pretty\+Writer}}$<$ Output\+Stream, Source\+Encoding, Target\+Encoding, Stack\+Allocator, write\+Flags $>$\+::\+End\+Object (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{member\+Count}{ = {\ttfamily 0}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{prettywriter_8h_source_l00137}{137}} of file \mbox{\hyperlink{prettywriter_8h_source}{prettywriter.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ (void)memberCount;}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\mbox{\hyperlink{class_writer_a9e6c13c06fc721dfd8486f17b9ff29de}{Base::level\_stack\_}}.GetSize()\ >=\ \textcolor{keyword}{sizeof}(\textcolor{keyword}{typename}\ Base::Level));\ \textcolor{comment}{//\ not\ inside\ an\ Object}}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(!\mbox{\hyperlink{class_writer_a9e6c13c06fc721dfd8486f17b9ff29de}{Base::level\_stack\_}}.\textcolor{keyword}{template}\ Top<typename\ Base::Level>()-\/>inArray);\ \textcolor{comment}{//\ currently\ inside\ an\ Array,\ not\ Object}}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(0\ ==\ \mbox{\hyperlink{class_writer_a9e6c13c06fc721dfd8486f17b9ff29de}{Base::level\_stack\_}}.\textcolor{keyword}{template}\ Top<typename\ Base::Level>()-\/>valueCount\ \%\ 2);\ \textcolor{comment}{//\ Object\ has\ a\ Key\ without\ a\ Value}}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ empty\ =\ \mbox{\hyperlink{class_writer_a9e6c13c06fc721dfd8486f17b9ff29de}{Base::level\_stack\_}}.template\ Pop<typename\ Base::Level>(1)-\/>valueCount\ ==\ 0;}
+\DoxyCodeLine{00144\ }
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!empty)\ \{}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_writer_a3a3f60140f78dd67b5274978fd3a33ff}{Base::os\_}}-\/>Put(\textcolor{charliteral}{'\(\backslash\)n'});}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_pretty_writer_a6f244ecc94fd5b134d424033b1574b7e}{WriteIndent}}();}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{class_writer_adc1cadbabc309d31f19cf7463251d879}{Base::EndValue}}(\mbox{\hyperlink{class_writer_a7e3f6760a50a72f4217a9b2d625c43ee}{Base::WriteEndObject}}());}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ (void)\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ ==\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_writer_a9e6c13c06fc721dfd8486f17b9ff29de}{Base::level\_stack\_}}.Empty())\ \textcolor{comment}{//\ end\ of\ json\ text}}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_writer_a8ca4e364c546b2eb526caa68dde011d2}{Base::Flush}}();}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00155\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_pretty_writer_a6bfdfa4193193ef763cce5c592c4d20c_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=277pt]{class_pretty_writer_a6bfdfa4193193ef763cce5c592c4d20c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_pretty_writer_aa1815263e61cb7af3b6dfba480a0f481}\index{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$@{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$}!Int@{Int}}
+\index{Int@{Int}!PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$@{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$}}
+\doxysubsubsection{\texorpdfstring{Int()}{Int()}}
+{\footnotesize\ttfamily \label{class_pretty_writer_aa1815263e61cb7af3b6dfba480a0f481} 
+template$<$typename Output\+Stream , typename Source\+Encoding  = UTF8$<$$>$, typename Target\+Encoding  = UTF8$<$$>$, typename Stack\+Allocator  = Crt\+Allocator, unsigned write\+Flags = k\+Write\+Default\+Flags$>$ \\
+bool \mbox{\hyperlink{class_pretty_writer}{Pretty\+Writer}}$<$ Output\+Stream, Source\+Encoding, Target\+Encoding, Stack\+Allocator, write\+Flags $>$\+::\+Int (\begin{DoxyParamCaption}\item[{int}]{i}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{prettywriter_8h_source_l00097}{97}} of file \mbox{\hyperlink{prettywriter_8h_source}{prettywriter.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00097\ \{\ \mbox{\hyperlink{class_pretty_writer_a09709ffa3b545e007631ecfd35029843}{PrettyPrefix}}(\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7afc9f813b7aaf71911bdae20a86b2702d}{kNumberType}});\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_writer_adc1cadbabc309d31f19cf7463251d879}{Base::EndValue}}(\mbox{\hyperlink{class_writer_a31d0feda654ca245c41462be7dc59998}{Base::WriteInt}}(i));\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_pretty_writer_aa1815263e61cb7af3b6dfba480a0f481_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=243pt]{class_pretty_writer_aa1815263e61cb7af3b6dfba480a0f481_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_pretty_writer_ad42b797429f4ee19efdce610f5aff976}\index{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$@{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$}!Int64@{Int64}}
+\index{Int64@{Int64}!PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$@{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$}}
+\doxysubsubsection{\texorpdfstring{Int64()}{Int64()}}
+{\footnotesize\ttfamily \label{class_pretty_writer_ad42b797429f4ee19efdce610f5aff976} 
+template$<$typename Output\+Stream , typename Source\+Encoding  = UTF8$<$$>$, typename Target\+Encoding  = UTF8$<$$>$, typename Stack\+Allocator  = Crt\+Allocator, unsigned write\+Flags = k\+Write\+Default\+Flags$>$ \\
+bool \mbox{\hyperlink{class_pretty_writer}{Pretty\+Writer}}$<$ Output\+Stream, Source\+Encoding, Target\+Encoding, Stack\+Allocator, write\+Flags $>$\+::\+Int64 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}}]{i64}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{prettywriter_8h_source_l00099}{99}} of file \mbox{\hyperlink{prettywriter_8h_source}{prettywriter.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00099\ \{\ \mbox{\hyperlink{class_pretty_writer_a09709ffa3b545e007631ecfd35029843}{PrettyPrefix}}(\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7afc9f813b7aaf71911bdae20a86b2702d}{kNumberType}});\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_writer_adc1cadbabc309d31f19cf7463251d879}{Base::EndValue}}(\mbox{\hyperlink{class_writer_aa58d3f80c06394648de5055ecfb41587}{Base::WriteInt64}}(i64));\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_pretty_writer_ad42b797429f4ee19efdce610f5aff976_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_pretty_writer_a4b2a2a6eef02c12d7a3fd77966bd4499}\index{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$@{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$}!Key@{Key}}
+\index{Key@{Key}!PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$@{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$}}
+\doxysubsubsection{\texorpdfstring{Key()}{Key()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_pretty_writer_a4b2a2a6eef02c12d7a3fd77966bd4499} 
+template$<$typename Output\+Stream , typename Source\+Encoding  = UTF8$<$$>$, typename Target\+Encoding  = UTF8$<$$>$, typename Stack\+Allocator  = Crt\+Allocator, unsigned write\+Flags = k\+Write\+Default\+Flags$>$ \\
+bool \mbox{\hyperlink{class_pretty_writer}{Pretty\+Writer}}$<$ Output\+Stream, Source\+Encoding, Target\+Encoding, Stack\+Allocator, write\+Flags $>$\+::\+Key (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_pretty_writer_aaa96adc74fbd28fe3d7bfe19a961af6b}{Ch}} \texorpdfstring{$\ast$}{*}}]{str}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{prettywriter_8h_source_l00188}{188}} of file \mbox{\hyperlink{prettywriter_8h_source}{prettywriter.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00188\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_pretty_writer_a20ecbe1d31a871e4da4a3899b40ad3cd}{Key}}(str,\ \mbox{\hyperlink{namespaceinternal_a86326fb0c9d7c7ea8edd7deedbb2b26e}{internal::StrLen}}(str));\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=289pt]{class_pretty_writer_a4b2a2a6eef02c12d7a3fd77966bd4499_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=171pt]{class_pretty_writer_a4b2a2a6eef02c12d7a3fd77966bd4499_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_pretty_writer_a20ecbe1d31a871e4da4a3899b40ad3cd}\index{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$@{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$}!Key@{Key}}
+\index{Key@{Key}!PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$@{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$}}
+\doxysubsubsection{\texorpdfstring{Key()}{Key()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_pretty_writer_a20ecbe1d31a871e4da4a3899b40ad3cd} 
+template$<$typename Output\+Stream , typename Source\+Encoding  = UTF8$<$$>$, typename Target\+Encoding  = UTF8$<$$>$, typename Stack\+Allocator  = Crt\+Allocator, unsigned write\+Flags = k\+Write\+Default\+Flags$>$ \\
+bool \mbox{\hyperlink{class_pretty_writer}{Pretty\+Writer}}$<$ Output\+Stream, Source\+Encoding, Target\+Encoding, Stack\+Allocator, write\+Flags $>$\+::\+Key (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_pretty_writer_aaa96adc74fbd28fe3d7bfe19a961af6b}{Ch}} \texorpdfstring{$\ast$}{*}}]{str}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{length}{, }\item[{bool}]{copy}{ = {\ttfamily false}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{prettywriter_8h_source_l00129}{129}} of file \mbox{\hyperlink{prettywriter_8h_source}{prettywriter.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00129\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_pretty_writer_ae544ccfe35dd7e80ed694873062409f6}{String}}(str,\ length,\ copy);\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_pretty_writer_a20ecbe1d31a871e4da4a3899b40ad3cd_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=249pt]{class_pretty_writer_a20ecbe1d31a871e4da4a3899b40ad3cd_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_pretty_writer_aa144f2d0f0c3c69248cdbe957349528c}\index{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$@{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$}!Null@{Null}}
+\index{Null@{Null}!PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$@{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$}}
+\doxysubsubsection{\texorpdfstring{Null()}{Null()}}
+{\footnotesize\ttfamily \label{class_pretty_writer_aa144f2d0f0c3c69248cdbe957349528c} 
+template$<$typename Output\+Stream , typename Source\+Encoding  = UTF8$<$$>$, typename Target\+Encoding  = UTF8$<$$>$, typename Stack\+Allocator  = Crt\+Allocator, unsigned write\+Flags = k\+Write\+Default\+Flags$>$ \\
+bool \mbox{\hyperlink{class_pretty_writer}{Pretty\+Writer}}$<$ Output\+Stream, Source\+Encoding, Target\+Encoding, Stack\+Allocator, write\+Flags $>$\+::\+Null (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{prettywriter_8h_source_l00095}{95}} of file \mbox{\hyperlink{prettywriter_8h_source}{prettywriter.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00095\ \{\ \mbox{\hyperlink{class_pretty_writer_a09709ffa3b545e007631ecfd35029843}{PrettyPrefix}}(\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7aa09befbfb4f2e1409f237817979d8087}{kNullType}});\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_writer_adc1cadbabc309d31f19cf7463251d879}{Base::EndValue}}(\mbox{\hyperlink{class_writer_a44862b3eba8d84b909c69aba875c9f4d}{Base::WriteNull}}());\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_pretty_writer_aa144f2d0f0c3c69248cdbe957349528c_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=249pt]{class_pretty_writer_aa144f2d0f0c3c69248cdbe957349528c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_pretty_writer_a09709ffa3b545e007631ecfd35029843}\index{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$@{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$}!PrettyPrefix@{PrettyPrefix}}
+\index{PrettyPrefix@{PrettyPrefix}!PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$@{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$}}
+\doxysubsubsection{\texorpdfstring{PrettyPrefix()}{PrettyPrefix()}}
+{\footnotesize\ttfamily \label{class_pretty_writer_a09709ffa3b545e007631ecfd35029843} 
+template$<$typename Output\+Stream , typename Source\+Encoding  = UTF8$<$$>$, typename Target\+Encoding  = UTF8$<$$>$, typename Stack\+Allocator  = Crt\+Allocator, unsigned write\+Flags = k\+Write\+Default\+Flags$>$ \\
+void \mbox{\hyperlink{class_pretty_writer}{Pretty\+Writer}}$<$ Output\+Stream, Source\+Encoding, Target\+Encoding, Stack\+Allocator, write\+Flags $>$\+::\+Pretty\+Prefix (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}}}]{type}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{prettywriter_8h_source_l00208}{208}} of file \mbox{\hyperlink{prettywriter_8h_source}{prettywriter.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \ \ (void)type;}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_writer_a9e6c13c06fc721dfd8486f17b9ff29de}{Base::level\_stack\_}}.GetSize()\ !=\ 0)\ \{\ \textcolor{comment}{//\ this\ value\ is\ not\ at\ root}}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typename}\ Base::Level*\ \mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}}\ =\ \mbox{\hyperlink{class_writer_a9e6c13c06fc721dfd8486f17b9ff29de}{Base::level\_stack\_}}.template\ Top<typename\ Base::Level>();}
+\DoxyCodeLine{00212\ }
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}}-\/>inArray)\ \{}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}}-\/>valueCount\ >\ 0)\ \{}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_writer_a3a3f60140f78dd67b5274978fd3a33ff}{Base::os\_}}-\/>Put(\textcolor{charliteral}{','});\ \textcolor{comment}{//\ add\ comma\ if\ it\ is\ not\ the\ first\ element\ in\ array}}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_pretty_writer_a15505ed4ea0fa85d339b3a987f1a3aaf}{formatOptions\_}}\ \&\ \mbox{\hyperlink{prettywriter_8h_a150fd6ef2dbf4025c33ece85451982d5addf85c922d2d597ab1074a55b27c3fe2}{kFormatSingleLineArray}})}
+\DoxyCodeLine{00217\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_writer_a3a3f60140f78dd67b5274978fd3a33ff}{Base::os\_}}-\/>Put(\textcolor{charliteral}{'\ '});}
+\DoxyCodeLine{00218\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00219\ }
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!(\mbox{\hyperlink{class_pretty_writer_a15505ed4ea0fa85d339b3a987f1a3aaf}{formatOptions\_}}\ \&\ \mbox{\hyperlink{prettywriter_8h_a150fd6ef2dbf4025c33ece85451982d5addf85c922d2d597ab1074a55b27c3fe2}{kFormatSingleLineArray}}))\ \{}
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_writer_a3a3f60140f78dd67b5274978fd3a33ff}{Base::os\_}}-\/>Put(\textcolor{charliteral}{'\(\backslash\)n'});}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_pretty_writer_a6f244ecc94fd5b134d424033b1574b7e}{WriteIndent}}();}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{\ \ \textcolor{comment}{//\ in\ object}}
+\DoxyCodeLine{00226\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}}-\/>valueCount\ >\ 0)\ \{}
+\DoxyCodeLine{00227\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}}-\/>valueCount\ \%\ 2\ ==\ 0)\ \{}
+\DoxyCodeLine{00228\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_writer_a3a3f60140f78dd67b5274978fd3a33ff}{Base::os\_}}-\/>Put(\textcolor{charliteral}{','});}
+\DoxyCodeLine{00229\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_writer_a3a3f60140f78dd67b5274978fd3a33ff}{Base::os\_}}-\/>Put(\textcolor{charliteral}{'\(\backslash\)n'});}
+\DoxyCodeLine{00230\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00231\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00232\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_writer_a3a3f60140f78dd67b5274978fd3a33ff}{Base::os\_}}-\/>Put(\textcolor{charliteral}{':'});}
+\DoxyCodeLine{00233\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_writer_a3a3f60140f78dd67b5274978fd3a33ff}{Base::os\_}}-\/>Put(\textcolor{charliteral}{'\ '});}
+\DoxyCodeLine{00234\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00237\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_writer_a3a3f60140f78dd67b5274978fd3a33ff}{Base::os\_}}-\/>Put(\textcolor{charliteral}{'\(\backslash\)n'});}
+\DoxyCodeLine{00238\ }
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}}-\/>valueCount\ \%\ 2\ ==\ 0)}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_pretty_writer_a6f244ecc94fd5b134d424033b1574b7e}{WriteIndent}}();}
+\DoxyCodeLine{00241\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00242\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}}-\/>inArray\ \&\&\ \mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}}-\/>valueCount\ \%\ 2\ ==\ 0)}
+\DoxyCodeLine{00243\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(type\ ==\ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7a2d823b89b055bc743d05c03183d3f338}{kStringType}});\ \ \textcolor{comment}{//\ if\ it's\ in\ object,\ then\ even\ number\ should\ be\ a\ name}}
+\DoxyCodeLine{00244\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}}-\/>valueCount++;}
+\DoxyCodeLine{00245\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00246\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00247\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(!\mbox{\hyperlink{class_writer_affc6b9e0332b50bee0d33f8b1841c9a6}{Base::hasRoot\_}});\ \ \textcolor{comment}{//\ Should\ only\ has\ one\ and\ only\ one\ root.}}
+\DoxyCodeLine{00248\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_writer_affc6b9e0332b50bee0d33f8b1841c9a6}{Base::hasRoot\_}}\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00249\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00250\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_pretty_writer_a09709ffa3b545e007631ecfd35029843_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_pretty_writer_a09709ffa3b545e007631ecfd35029843_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_pretty_writer_a3941bc21d6a261ca8a86eff330db30ef}\index{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$@{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$}!RawNumber@{RawNumber}}
+\index{RawNumber@{RawNumber}!PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$@{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$}}
+\doxysubsubsection{\texorpdfstring{RawNumber()}{RawNumber()}}
+{\footnotesize\ttfamily \label{class_pretty_writer_a3941bc21d6a261ca8a86eff330db30ef} 
+template$<$typename Output\+Stream , typename Source\+Encoding  = UTF8$<$$>$, typename Target\+Encoding  = UTF8$<$$>$, typename Stack\+Allocator  = Crt\+Allocator, unsigned write\+Flags = k\+Write\+Default\+Flags$>$ \\
+bool \mbox{\hyperlink{class_pretty_writer}{Pretty\+Writer}}$<$ Output\+Stream, Source\+Encoding, Target\+Encoding, Stack\+Allocator, write\+Flags $>$\+::\+Raw\+Number (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_pretty_writer_aaa96adc74fbd28fe3d7bfe19a961af6b}{Ch}} \texorpdfstring{$\ast$}{*}}]{str}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{length}{, }\item[{bool}]{copy}{ = {\ttfamily false}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{prettywriter_8h_source_l00103}{103}} of file \mbox{\hyperlink{prettywriter_8h_source}{prettywriter.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(str\ !=\ 0);}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ (void)copy;}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_pretty_writer_a09709ffa3b545e007631ecfd35029843}{PrettyPrefix}}(\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7afc9f813b7aaf71911bdae20a86b2702d}{kNumberType}});}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_writer_adc1cadbabc309d31f19cf7463251d879}{Base::EndValue}}(\mbox{\hyperlink{class_writer_acda4412ef5f4cac6e89f9544e4b10f70}{Base::WriteString}}(str,\ length));}
+\DoxyCodeLine{00108\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_pretty_writer_a3941bc21d6a261ca8a86eff330db30ef_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_pretty_writer_a440890a72408a150ef46edda6becdc94}\index{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$@{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$}!RawValue@{RawValue}}
+\index{RawValue@{RawValue}!PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$@{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$}}
+\doxysubsubsection{\texorpdfstring{RawValue()}{RawValue()}}
+{\footnotesize\ttfamily \label{class_pretty_writer_a440890a72408a150ef46edda6becdc94} 
+template$<$typename Output\+Stream , typename Source\+Encoding  = UTF8$<$$>$, typename Target\+Encoding  = UTF8$<$$>$, typename Stack\+Allocator  = Crt\+Allocator, unsigned write\+Flags = k\+Write\+Default\+Flags$>$ \\
+bool \mbox{\hyperlink{class_pretty_writer}{Pretty\+Writer}}$<$ Output\+Stream, Source\+Encoding, Target\+Encoding, Stack\+Allocator, write\+Flags $>$\+::\+Raw\+Value (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_pretty_writer_aaa96adc74fbd28fe3d7bfe19a961af6b}{Ch}} \texorpdfstring{$\ast$}{*}}]{json}{, }\item[{size\+\_\+t}]{length}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}}}]{type}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+For user to write a stringified JSON as a value.
+
+
+\begin{DoxyParams}{Parameters}
+{\em json} & \doxylink{struct_a}{A} well-\/formed JSON value. It should not contain null character within \mbox{[}0, length -\/ 1\mbox{]} range. \\
+\hline
+{\em length} & Length of the json. \\
+\hline
+{\em type} & Type of the root of json. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyNote}{Note}
+When using \doxylink{class_pretty_writer_a440890a72408a150ef46edda6becdc94}{Pretty\+Writer\+::\+Raw\+Value()}, the result json may not be indented correctly. 
+\end{DoxyNote}
+
+
+Definition at line \mbox{\hyperlink{prettywriter_8h_source_l00201}{201}} of file \mbox{\hyperlink{prettywriter_8h_source}{prettywriter.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(json\ !=\ 0);}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_pretty_writer_a09709ffa3b545e007631ecfd35029843}{PrettyPrefix}}(type);}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_writer_adc1cadbabc309d31f19cf7463251d879}{Base::EndValue}}(\mbox{\hyperlink{class_writer_a8ee1135b2595261819b134907f67614e}{Base::WriteRawValue}}(json,\ length));}
+\DoxyCodeLine{00205\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_pretty_writer_a440890a72408a150ef46edda6becdc94_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=276pt]{class_pretty_writer_a440890a72408a150ef46edda6becdc94_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_pretty_writer_aade3381a128071f1da060f5f3075de10}\index{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$@{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$}!SetFormatOptions@{SetFormatOptions}}
+\index{SetFormatOptions@{SetFormatOptions}!PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$@{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$}}
+\doxysubsubsection{\texorpdfstring{SetFormatOptions()}{SetFormatOptions()}}
+{\footnotesize\ttfamily \label{class_pretty_writer_aade3381a128071f1da060f5f3075de10} 
+template$<$typename Output\+Stream , typename Source\+Encoding  = UTF8$<$$>$, typename Target\+Encoding  = UTF8$<$$>$, typename Stack\+Allocator  = Crt\+Allocator, unsigned write\+Flags = k\+Write\+Default\+Flags$>$ \\
+\mbox{\hyperlink{class_pretty_writer}{Pretty\+Writer}} \& \mbox{\hyperlink{class_pretty_writer}{Pretty\+Writer}}$<$ Output\+Stream, Source\+Encoding, Target\+Encoding, Stack\+Allocator, write\+Flags $>$\+::\+Set\+Format\+Options (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywriter_8h_a150fd6ef2dbf4025c33ece85451982d5}{Pretty\+Format\+Options}}}]{options}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+\begin{DoxyParams}{Parameters}
+{\em options} & Formatting options. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{prettywriter_8h_source_l00085}{85}} of file \mbox{\hyperlink{prettywriter_8h_source}{prettywriter.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_pretty_writer_a15505ed4ea0fa85d339b3a987f1a3aaf}{formatOptions\_}}\ =\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}};}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00088\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=311pt]{class_pretty_writer_aade3381a128071f1da060f5f3075de10_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_pretty_writer_abbdc83ce02cf4a811a7355aa3879b45a}\index{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$@{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$}!SetIndent@{SetIndent}}
+\index{SetIndent@{SetIndent}!PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$@{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$}}
+\doxysubsubsection{\texorpdfstring{SetIndent()}{SetIndent()}}
+{\footnotesize\ttfamily \label{class_pretty_writer_abbdc83ce02cf4a811a7355aa3879b45a} 
+template$<$typename Output\+Stream , typename Source\+Encoding  = UTF8$<$$>$, typename Target\+Encoding  = UTF8$<$$>$, typename Stack\+Allocator  = Crt\+Allocator, unsigned write\+Flags = k\+Write\+Default\+Flags$>$ \\
+\mbox{\hyperlink{class_pretty_writer}{Pretty\+Writer}} \& \mbox{\hyperlink{class_pretty_writer}{Pretty\+Writer}}$<$ Output\+Stream, Source\+Encoding, Target\+Encoding, Stack\+Allocator, write\+Flags $>$\+::\+Set\+Indent (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_pretty_writer_aaa96adc74fbd28fe3d7bfe19a961af6b}{Ch}}}]{indent\+Char}{, }\item[{unsigned}]{indent\+Char\+Count}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+\begin{DoxyParams}{Parameters}
+{\em indent\+Char} & Character for indentation. Must be whitespace character (\textquotesingle{} \textquotesingle{}, \textquotesingle{}\textbackslash{}t\textquotesingle{}, \textquotesingle{}\textbackslash{}n\textquotesingle{}, \textquotesingle{}\textbackslash{}r\textquotesingle{}). \\
+\hline
+{\em indent\+Char\+Count} & Number of indent characters for each indentation level. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyNote}{Note}
+The default indentation is 4 spaces. 
+\end{DoxyNote}
+
+
+Definition at line \mbox{\hyperlink{prettywriter_8h_source_l00075}{75}} of file \mbox{\hyperlink{prettywriter_8h_source}{prettywriter.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(indentChar\ ==\ \textcolor{charliteral}{'\ '}\ ||\ indentChar\ ==\ \textcolor{charliteral}{'\(\backslash\)t'}\ ||\ indentChar\ ==\ \textcolor{charliteral}{'\(\backslash\)n'}\ ||\ indentChar\ ==\ \textcolor{charliteral}{'\(\backslash\)r'});}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_pretty_writer_aaa3f6380daa8466a5101ed18fc33bf04}{indentChar\_}}\ =\ indentChar;}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_pretty_writer_a7d00b9716ef3cd7e34ae1b744c968f13}{indentCharCount\_}}\ =\ indentCharCount;}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00080\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=285pt]{class_pretty_writer_abbdc83ce02cf4a811a7355aa3879b45a_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_pretty_writer_aec7fdf4798a3af5e31c147633f4798ed}\index{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$@{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$}!StartArray@{StartArray}}
+\index{StartArray@{StartArray}!PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$@{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$}}
+\doxysubsubsection{\texorpdfstring{StartArray()}{StartArray()}}
+{\footnotesize\ttfamily \label{class_pretty_writer_aec7fdf4798a3af5e31c147633f4798ed} 
+template$<$typename Output\+Stream , typename Source\+Encoding  = UTF8$<$$>$, typename Target\+Encoding  = UTF8$<$$>$, typename Stack\+Allocator  = Crt\+Allocator, unsigned write\+Flags = k\+Write\+Default\+Flags$>$ \\
+bool \mbox{\hyperlink{class_pretty_writer}{Pretty\+Writer}}$<$ Output\+Stream, Source\+Encoding, Target\+Encoding, Stack\+Allocator, write\+Flags $>$\+::\+Start\+Array (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{prettywriter_8h_source_l00157}{157}} of file \mbox{\hyperlink{prettywriter_8h_source}{prettywriter.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_pretty_writer_a09709ffa3b545e007631ecfd35029843}{PrettyPrefix}}(\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7af41527d6925efa3c5c3dadb23dfef7c8}{kArrayType}});}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ (\mbox{\hyperlink{class_writer_a9e6c13c06fc721dfd8486f17b9ff29de}{Base::level\_stack\_}}.template\ Push<typename\ Base::Level>())\ \textcolor{keyword}{typename}\ Base::Level(\textcolor{keyword}{true});}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_writer_a3c3560a96cac58f98f4a74d6cb227204}{Base::WriteStartArray}}();}
+\DoxyCodeLine{00161\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_pretty_writer_aec7fdf4798a3af5e31c147633f4798ed_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=276pt]{class_pretty_writer_aec7fdf4798a3af5e31c147633f4798ed_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_pretty_writer_a27bdda225dc152b8974e44c1df7525b7}\index{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$@{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$}!StartObject@{StartObject}}
+\index{StartObject@{StartObject}!PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$@{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$}}
+\doxysubsubsection{\texorpdfstring{StartObject()}{StartObject()}}
+{\footnotesize\ttfamily \label{class_pretty_writer_a27bdda225dc152b8974e44c1df7525b7} 
+template$<$typename Output\+Stream , typename Source\+Encoding  = UTF8$<$$>$, typename Target\+Encoding  = UTF8$<$$>$, typename Stack\+Allocator  = Crt\+Allocator, unsigned write\+Flags = k\+Write\+Default\+Flags$>$ \\
+bool \mbox{\hyperlink{class_pretty_writer}{Pretty\+Writer}}$<$ Output\+Stream, Source\+Encoding, Target\+Encoding, Stack\+Allocator, write\+Flags $>$\+::\+Start\+Object (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{prettywriter_8h_source_l00123}{123}} of file \mbox{\hyperlink{prettywriter_8h_source}{prettywriter.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_pretty_writer_a09709ffa3b545e007631ecfd35029843}{PrettyPrefix}}(\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7a146f46700e905e8df96a6a90b5c7640f}{kObjectType}});}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ (\mbox{\hyperlink{class_writer_a9e6c13c06fc721dfd8486f17b9ff29de}{Base::level\_stack\_}}.template\ Push<typename\ Base::Level>())\ \textcolor{keyword}{typename}\ Base::Level(\textcolor{keyword}{false});}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_writer_a81c72a2eecd47e042f56ca93a27a5cb1}{Base::WriteStartObject}}();}
+\DoxyCodeLine{00127\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_pretty_writer_a27bdda225dc152b8974e44c1df7525b7_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=281pt]{class_pretty_writer_a27bdda225dc152b8974e44c1df7525b7_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_pretty_writer_a7e85689355a827d273f272c26b447225}\index{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$@{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$}!String@{String}}
+\index{String@{String}!PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$@{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$}}
+\doxysubsubsection{\texorpdfstring{String()}{String()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_pretty_writer_a7e85689355a827d273f272c26b447225} 
+template$<$typename Output\+Stream , typename Source\+Encoding  = UTF8$<$$>$, typename Target\+Encoding  = UTF8$<$$>$, typename Stack\+Allocator  = Crt\+Allocator, unsigned write\+Flags = k\+Write\+Default\+Flags$>$ \\
+bool \mbox{\hyperlink{class_pretty_writer}{Pretty\+Writer}}$<$ Output\+Stream, Source\+Encoding, Target\+Encoding, Stack\+Allocator, write\+Flags $>$\+::\+String (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_pretty_writer_aaa96adc74fbd28fe3d7bfe19a961af6b}{Ch}} \texorpdfstring{$\ast$}{*}}]{str}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{prettywriter_8h_source_l00187}{187}} of file \mbox{\hyperlink{prettywriter_8h_source}{prettywriter.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00187\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_pretty_writer_ae544ccfe35dd7e80ed694873062409f6}{String}}(str,\ \mbox{\hyperlink{namespaceinternal_a86326fb0c9d7c7ea8edd7deedbb2b26e}{internal::StrLen}}(str));\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=297pt]{class_pretty_writer_a7e85689355a827d273f272c26b447225_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=179pt]{class_pretty_writer_a7e85689355a827d273f272c26b447225_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_pretty_writer_ae544ccfe35dd7e80ed694873062409f6}\index{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$@{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$}!String@{String}}
+\index{String@{String}!PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$@{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$}}
+\doxysubsubsection{\texorpdfstring{String()}{String()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_pretty_writer_ae544ccfe35dd7e80ed694873062409f6} 
+template$<$typename Output\+Stream , typename Source\+Encoding  = UTF8$<$$>$, typename Target\+Encoding  = UTF8$<$$>$, typename Stack\+Allocator  = Crt\+Allocator, unsigned write\+Flags = k\+Write\+Default\+Flags$>$ \\
+bool \mbox{\hyperlink{class_pretty_writer}{Pretty\+Writer}}$<$ Output\+Stream, Source\+Encoding, Target\+Encoding, Stack\+Allocator, write\+Flags $>$\+::\+String (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_pretty_writer_aaa96adc74fbd28fe3d7bfe19a961af6b}{Ch}} \texorpdfstring{$\ast$}{*}}]{str}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{length}{, }\item[{bool}]{copy}{ = {\ttfamily false}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{prettywriter_8h_source_l00110}{110}} of file \mbox{\hyperlink{prettywriter_8h_source}{prettywriter.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(str\ !=\ 0);}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ (void)copy;}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_pretty_writer_a09709ffa3b545e007631ecfd35029843}{PrettyPrefix}}(\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7a2d823b89b055bc743d05c03183d3f338}{kStringType}});}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_writer_adc1cadbabc309d31f19cf7463251d879}{Base::EndValue}}(\mbox{\hyperlink{class_writer_acda4412ef5f4cac6e89f9544e4b10f70}{Base::WriteString}}(str,\ length));}
+\DoxyCodeLine{00115\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_pretty_writer_ae544ccfe35dd7e80ed694873062409f6_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_pretty_writer_ae544ccfe35dd7e80ed694873062409f6_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_pretty_writer_a8c82302877a5588eae77eb7d042c49ef}\index{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$@{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$}!Uint@{Uint}}
+\index{Uint@{Uint}!PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$@{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$}}
+\doxysubsubsection{\texorpdfstring{Uint()}{Uint()}}
+{\footnotesize\ttfamily \label{class_pretty_writer_a8c82302877a5588eae77eb7d042c49ef} 
+template$<$typename Output\+Stream , typename Source\+Encoding  = UTF8$<$$>$, typename Target\+Encoding  = UTF8$<$$>$, typename Stack\+Allocator  = Crt\+Allocator, unsigned write\+Flags = k\+Write\+Default\+Flags$>$ \\
+bool \mbox{\hyperlink{class_pretty_writer}{Pretty\+Writer}}$<$ Output\+Stream, Source\+Encoding, Target\+Encoding, Stack\+Allocator, write\+Flags $>$\+::\+Uint (\begin{DoxyParamCaption}\item[{unsigned}]{u}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{prettywriter_8h_source_l00098}{98}} of file \mbox{\hyperlink{prettywriter_8h_source}{prettywriter.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00098\ \{\ \mbox{\hyperlink{class_pretty_writer_a09709ffa3b545e007631ecfd35029843}{PrettyPrefix}}(\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7afc9f813b7aaf71911bdae20a86b2702d}{kNumberType}});\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_writer_adc1cadbabc309d31f19cf7463251d879}{Base::EndValue}}(\mbox{\hyperlink{class_writer_a2861227e93707d1478d2cf56644dca3b}{Base::WriteUint}}(u));\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_pretty_writer_a8c82302877a5588eae77eb7d042c49ef_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_pretty_writer_aba75ac1f13c2629b2a55ffbf3d8a116c}\index{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$@{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$}!Uint64@{Uint64}}
+\index{Uint64@{Uint64}!PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$@{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$}}
+\doxysubsubsection{\texorpdfstring{Uint64()}{Uint64()}}
+{\footnotesize\ttfamily \label{class_pretty_writer_aba75ac1f13c2629b2a55ffbf3d8a116c} 
+template$<$typename Output\+Stream , typename Source\+Encoding  = UTF8$<$$>$, typename Target\+Encoding  = UTF8$<$$>$, typename Stack\+Allocator  = Crt\+Allocator, unsigned write\+Flags = k\+Write\+Default\+Flags$>$ \\
+bool \mbox{\hyperlink{class_pretty_writer}{Pretty\+Writer}}$<$ Output\+Stream, Source\+Encoding, Target\+Encoding, Stack\+Allocator, write\+Flags $>$\+::\+Uint64 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{u64}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{prettywriter_8h_source_l00100}{100}} of file \mbox{\hyperlink{prettywriter_8h_source}{prettywriter.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00100\ \{\ \mbox{\hyperlink{class_pretty_writer_a09709ffa3b545e007631ecfd35029843}{PrettyPrefix}}(\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7afc9f813b7aaf71911bdae20a86b2702d}{kNumberType}});\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_writer_adc1cadbabc309d31f19cf7463251d879}{Base::EndValue}}(\mbox{\hyperlink{class_writer_ad07b325157220e3aa791c1c8c904021e}{Base::WriteUint64}}(u64));\ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_pretty_writer_aba75ac1f13c2629b2a55ffbf3d8a116c_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_pretty_writer_a6f244ecc94fd5b134d424033b1574b7e}\index{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$@{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$}!WriteIndent@{WriteIndent}}
+\index{WriteIndent@{WriteIndent}!PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$@{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$}}
+\doxysubsubsection{\texorpdfstring{WriteIndent()}{WriteIndent()}}
+{\footnotesize\ttfamily \label{class_pretty_writer_a6f244ecc94fd5b134d424033b1574b7e} 
+template$<$typename Output\+Stream , typename Source\+Encoding  = UTF8$<$$>$, typename Target\+Encoding  = UTF8$<$$>$, typename Stack\+Allocator  = Crt\+Allocator, unsigned write\+Flags = k\+Write\+Default\+Flags$>$ \\
+void \mbox{\hyperlink{class_pretty_writer}{Pretty\+Writer}}$<$ Output\+Stream, Source\+Encoding, Target\+Encoding, Stack\+Allocator, write\+Flags $>$\+::\+Write\+Indent (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{prettywriter_8h_source_l00252}{252}} of file \mbox{\hyperlink{prettywriter_8h_source}{prettywriter.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00252\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00253\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ =\ (\mbox{\hyperlink{class_writer_a9e6c13c06fc721dfd8486f17b9ff29de}{Base::level\_stack\_}}.\mbox{\hyperlink{classinternal_1_1_stack_ac484468a2791bd3e9ba609bd1600ab48}{GetSize}}()\ /\ \textcolor{keyword}{sizeof}(\textcolor{keyword}{typename}\ Base::Level))\ *\ \mbox{\hyperlink{class_pretty_writer_a7d00b9716ef3cd7e34ae1b744c968f13}{indentCharCount\_}};}
+\DoxyCodeLine{00254\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{filewritestream_8h_a5c9b0f0e6249be2acf7f3505c295c132}{PutN}}(*\mbox{\hyperlink{class_writer_a3a3f60140f78dd67b5274978fd3a33ff}{Base::os\_}},\ \textcolor{keyword}{static\_cast<}typename\ OutputStream::Ch\textcolor{keyword}{>}(\mbox{\hyperlink{class_pretty_writer_aaa3f6380daa8466a5101ed18fc33bf04}{indentChar\_}}),\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}});}
+\DoxyCodeLine{00255\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_pretty_writer_a6f244ecc94fd5b134d424033b1574b7e_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_pretty_writer_a6f244ecc94fd5b134d424033b1574b7e_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{class_pretty_writer_a15505ed4ea0fa85d339b3a987f1a3aaf}\index{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$@{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$}!formatOptions\_@{formatOptions\_}}
+\index{formatOptions\_@{formatOptions\_}!PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$@{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$}}
+\doxysubsubsection{\texorpdfstring{formatOptions\_}{formatOptions\_}}
+{\footnotesize\ttfamily \label{class_pretty_writer_a15505ed4ea0fa85d339b3a987f1a3aaf} 
+template$<$typename Output\+Stream , typename Source\+Encoding  = UTF8$<$$>$, typename Target\+Encoding  = UTF8$<$$>$, typename Stack\+Allocator  = Crt\+Allocator, unsigned write\+Flags = k\+Write\+Default\+Flags$>$ \\
+\mbox{\hyperlink{prettywriter_8h_a150fd6ef2dbf4025c33ece85451982d5}{Pretty\+Format\+Options}} \mbox{\hyperlink{class_pretty_writer}{Pretty\+Writer}}$<$ Output\+Stream, Source\+Encoding, Target\+Encoding, Stack\+Allocator, write\+Flags $>$\+::format\+Options\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{prettywriter_8h_source_l00259}{259}} of file \mbox{\hyperlink{prettywriter_8h_source}{prettywriter.\+h}}.
+
+\Hypertarget{class_pretty_writer_aaa3f6380daa8466a5101ed18fc33bf04}\index{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$@{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$}!indentChar\_@{indentChar\_}}
+\index{indentChar\_@{indentChar\_}!PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$@{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$}}
+\doxysubsubsection{\texorpdfstring{indentChar\_}{indentChar\_}}
+{\footnotesize\ttfamily \label{class_pretty_writer_aaa3f6380daa8466a5101ed18fc33bf04} 
+template$<$typename Output\+Stream , typename Source\+Encoding  = UTF8$<$$>$, typename Target\+Encoding  = UTF8$<$$>$, typename Stack\+Allocator  = Crt\+Allocator, unsigned write\+Flags = k\+Write\+Default\+Flags$>$ \\
+\mbox{\hyperlink{class_pretty_writer_aaa96adc74fbd28fe3d7bfe19a961af6b}{Ch}} \mbox{\hyperlink{class_pretty_writer}{Pretty\+Writer}}$<$ Output\+Stream, Source\+Encoding, Target\+Encoding, Stack\+Allocator, write\+Flags $>$\+::indent\+Char\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{prettywriter_8h_source_l00257}{257}} of file \mbox{\hyperlink{prettywriter_8h_source}{prettywriter.\+h}}.
+
+\Hypertarget{class_pretty_writer_a7d00b9716ef3cd7e34ae1b744c968f13}\index{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$@{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$}!indentCharCount\_@{indentCharCount\_}}
+\index{indentCharCount\_@{indentCharCount\_}!PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$@{PrettyWriter$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$}}
+\doxysubsubsection{\texorpdfstring{indentCharCount\_}{indentCharCount\_}}
+{\footnotesize\ttfamily \label{class_pretty_writer_a7d00b9716ef3cd7e34ae1b744c968f13} 
+template$<$typename Output\+Stream , typename Source\+Encoding  = UTF8$<$$>$, typename Target\+Encoding  = UTF8$<$$>$, typename Stack\+Allocator  = Crt\+Allocator, unsigned write\+Flags = k\+Write\+Default\+Flags$>$ \\
+unsigned \mbox{\hyperlink{class_pretty_writer}{Pretty\+Writer}}$<$ Output\+Stream, Source\+Encoding, Target\+Encoding, Stack\+Allocator, write\+Flags $>$\+::indent\+Char\+Count\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{prettywriter_8h_source_l00258}{258}} of file \mbox{\hyperlink{prettywriter_8h_source}{prettywriter.\+h}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/\mbox{\hyperlink{fwd_8h}{fwd.\+h}}\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/\mbox{\hyperlink{prettywriter_8h}{prettywriter.\+h}}\end{DoxyCompactItemize}

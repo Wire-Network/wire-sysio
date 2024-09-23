@@ -1,0 +1,7 @@
+<map id="fakeTestCase" name="fakeTestCase">
+<area shape="rect" id="Node000001" title=" " alt="" coords="153,31,255,56"/>
+<area shape="rect" id="Node000002" href="$_cmd_line_8tests_8cpp.html#a0fd69e25bdfb62c4f72014ad241bb8c3" title=" " alt="" coords="5,5,105,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="137,35,105,29,106,24,138,30"/>
+<area shape="rect" id="Node000003" href="$_cmd_line_8tests_8cpp.html#a44d5ced817b0c1ec9baafeab51cbe1fd" title=" " alt="" coords="5,55,105,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="138,57,106,62,105,57,137,52"/>
+</map>

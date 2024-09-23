@@ -1,0 +1,92 @@
+\doxysection{sysio\+::vm\+::binary\+\_\+parser\texorpdfstring{$<$}{<} Writer, Options, Debug\+Info \texorpdfstring{$>$}{>}\+::pc\+\_\+element\+\_\+t Struct Reference}
+\hypertarget{structsysio_1_1vm_1_1binary__parser_1_1pc__element__t}{}\label{structsysio_1_1vm_1_1binary__parser_1_1pc__element__t}\index{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::pc\_element\_t@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::pc\_element\_t}}
+
+
+{\ttfamily \#include $<$parser.\+hpp$>$}
+
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1pc__element__t_aeb7e8a576bbcf3f725501fb3404c73a8}{operand\+\_\+depth}}
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1pc__element__t_ae26a1ebcdedfcd856b5d1e7e51b0eb56}{expected\+\_\+result}}
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1pc__element__t_aa23926a779989d1b92634b8eb54f438e}{label\+\_\+result}}
+\item 
+bool \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1pc__element__t_aad3e852423be29cd4ddbe1611d0484b8}{is\+\_\+if}}
+\item 
+std\+::variant$<$ \mbox{\hyperlink{classsysio_1_1vm_1_1binary__parser_a46c91be41183750a25fbdc41aeebbd0e}{label\+\_\+t}}, std\+::vector$<$ \mbox{\hyperlink{classsysio_1_1vm_1_1binary__parser_a15c0ace9f90a15a5395de19fd1836e90}{branch\+\_\+t}} $>$ $>$ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1pc__element__t_a5d6cd5db219e8dd7bc440e03a87da8e4}{relocations}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{class_writer}{Writer}}, typename Options = default\+\_\+options, typename Debug\+Info = null\+\_\+debug\+\_\+info$>$\newline
+struct sysio\+::vm\+::binary\+\_\+parser$<$ Writer, Options, Debug\+Info $>$\+::pc\+\_\+element\+\_\+t}
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2parser_8hpp_source_l00615}{615}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1vm_1_1binary__parser_1_1pc__element__t_ae26a1ebcdedfcd856b5d1e7e51b0eb56}\index{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::pc\_element\_t@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::pc\_element\_t}!expected\_result@{expected\_result}}
+\index{expected\_result@{expected\_result}!sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::pc\_element\_t@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::pc\_element\_t}}
+\doxysubsubsection{\texorpdfstring{expected\_result}{expected\_result}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1binary__parser_1_1pc__element__t_ae26a1ebcdedfcd856b5d1e7e51b0eb56} 
+template$<$typename \mbox{\hyperlink{class_writer}{Writer}} , typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classsysio_1_1vm_1_1binary__parser}{sysio\+::vm\+::binary\+\_\+parser}}$<$ \mbox{\hyperlink{class_writer}{Writer}}, Options, Debug\+Info $>$\+::pc\+\_\+element\+\_\+t\+::expected\+\_\+result}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_source_l00617}{617}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_source}{parser.\+hpp}}.
+
+\Hypertarget{structsysio_1_1vm_1_1binary__parser_1_1pc__element__t_aad3e852423be29cd4ddbe1611d0484b8}\index{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::pc\_element\_t@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::pc\_element\_t}!is\_if@{is\_if}}
+\index{is\_if@{is\_if}!sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::pc\_element\_t@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::pc\_element\_t}}
+\doxysubsubsection{\texorpdfstring{is\_if}{is\_if}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1binary__parser_1_1pc__element__t_aad3e852423be29cd4ddbe1611d0484b8} 
+template$<$typename \mbox{\hyperlink{class_writer}{Writer}} , typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+bool \mbox{\hyperlink{classsysio_1_1vm_1_1binary__parser}{sysio\+::vm\+::binary\+\_\+parser}}$<$ \mbox{\hyperlink{class_writer}{Writer}}, Options, Debug\+Info $>$\+::pc\+\_\+element\+\_\+t\+::is\+\_\+if}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_source_l00619}{619}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_source}{parser.\+hpp}}.
+
+\Hypertarget{structsysio_1_1vm_1_1binary__parser_1_1pc__element__t_aa23926a779989d1b92634b8eb54f438e}\index{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::pc\_element\_t@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::pc\_element\_t}!label\_result@{label\_result}}
+\index{label\_result@{label\_result}!sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::pc\_element\_t@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::pc\_element\_t}}
+\doxysubsubsection{\texorpdfstring{label\_result}{label\_result}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1binary__parser_1_1pc__element__t_aa23926a779989d1b92634b8eb54f438e} 
+template$<$typename \mbox{\hyperlink{class_writer}{Writer}} , typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classsysio_1_1vm_1_1binary__parser}{sysio\+::vm\+::binary\+\_\+parser}}$<$ \mbox{\hyperlink{class_writer}{Writer}}, Options, Debug\+Info $>$\+::pc\+\_\+element\+\_\+t\+::label\+\_\+result}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_source_l00618}{618}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_source}{parser.\+hpp}}.
+
+\Hypertarget{structsysio_1_1vm_1_1binary__parser_1_1pc__element__t_aeb7e8a576bbcf3f725501fb3404c73a8}\index{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::pc\_element\_t@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::pc\_element\_t}!operand\_depth@{operand\_depth}}
+\index{operand\_depth@{operand\_depth}!sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::pc\_element\_t@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::pc\_element\_t}}
+\doxysubsubsection{\texorpdfstring{operand\_depth}{operand\_depth}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1binary__parser_1_1pc__element__t_aeb7e8a576bbcf3f725501fb3404c73a8} 
+template$<$typename \mbox{\hyperlink{class_writer}{Writer}} , typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classsysio_1_1vm_1_1binary__parser}{sysio\+::vm\+::binary\+\_\+parser}}$<$ \mbox{\hyperlink{class_writer}{Writer}}, Options, Debug\+Info $>$\+::pc\+\_\+element\+\_\+t\+::operand\+\_\+depth}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_source_l00616}{616}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_source}{parser.\+hpp}}.
+
+\Hypertarget{structsysio_1_1vm_1_1binary__parser_1_1pc__element__t_a5d6cd5db219e8dd7bc440e03a87da8e4}\index{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::pc\_element\_t@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::pc\_element\_t}!relocations@{relocations}}
+\index{relocations@{relocations}!sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::pc\_element\_t@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::pc\_element\_t}}
+\doxysubsubsection{\texorpdfstring{relocations}{relocations}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1binary__parser_1_1pc__element__t_a5d6cd5db219e8dd7bc440e03a87da8e4} 
+template$<$typename \mbox{\hyperlink{class_writer}{Writer}} , typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+std\+::variant$<$ \mbox{\hyperlink{classsysio_1_1vm_1_1binary__parser_a46c91be41183750a25fbdc41aeebbd0e}{label\+\_\+t}}, std\+::vector$<$ \mbox{\hyperlink{classsysio_1_1vm_1_1binary__parser_a15c0ace9f90a15a5395de19fd1836e90}{branch\+\_\+t}} $>$ $>$ \mbox{\hyperlink{classsysio_1_1vm_1_1binary__parser}{sysio\+::vm\+::binary\+\_\+parser}}$<$ \mbox{\hyperlink{class_writer}{Writer}}, Options, Debug\+Info $>$\+::pc\+\_\+element\+\_\+t\+::relocations}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_source_l00620}{620}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/include/sysio/sysio/vm/\mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp}{parser.\+hpp}}\item 
+libraries/sys-\/vm/include/sysio/vm/\mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2parser_8hpp}{parser.\+hpp}}\end{DoxyCompactItemize}

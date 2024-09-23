@@ -1,0 +1,27 @@
+\doxysection{trace\+\_\+converter.\+hpp}
+\hypertarget{trace__converter_8hpp_source}{}\label{trace__converter_8hpp_source}\index{libraries/state\_history/include/sysio/state\_history/trace\_converter.hpp@{libraries/state\_history/include/sysio/state\_history/trace\_converter.hpp}}
+\mbox{\hyperlink{trace__converter_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{trace__converter_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{trace__converter_8hpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{trace__converter_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{block__state_8hpp}{sysio/chain/block\_state.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{trace__converter_8hpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{state__history_2include_2sysio_2state__history_2types_8hpp}{sysio/state\_history/types.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{trace__converter_8hpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{trace__converter_8hpp_source_l00006}00006\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{}
+\DoxyCodeLine{\Hypertarget{trace__converter_8hpp_source_l00007}00007\ \textcolor{keyword}{namespace\ }state\_history\ \{}
+\DoxyCodeLine{\Hypertarget{trace__converter_8hpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{trace__converter_8hpp_source_l00009}00009\ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{chain::block\_state\_ptr}};}
+\DoxyCodeLine{\Hypertarget{trace__converter_8hpp_source_l00010}00010\ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacesysio_1_1chain_aa85a3b49b3b219d1e3840567579e7e63}{chain::transaction\_id\_type}};}
+\DoxyCodeLine{\Hypertarget{trace__converter_8hpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{trace__converter_8hpp_source_l00012}\mbox{\hyperlink{structsysio_1_1state__history_1_1trace__converter}{00012}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structsysio_1_1state__history_1_1trace__converter}{trace\_converter}}\ \{}
+\DoxyCodeLine{\Hypertarget{trace__converter_8hpp_source_l00013}\mbox{\hyperlink{structsysio_1_1state__history_1_1trace__converter_ad0809adfb2d44c4587a46763d02efdaf}{00013}}\ \ \ \ std::map<transaction\_id\_type,\ augmented\_transaction\_trace>\ \mbox{\hyperlink{structsysio_1_1state__history_1_1trace__converter_ad0809adfb2d44c4587a46763d02efdaf}{cached\_traces}};}
+\DoxyCodeLine{\Hypertarget{trace__converter_8hpp_source_l00014}\mbox{\hyperlink{structsysio_1_1state__history_1_1trace__converter_a86c4c2c779102104f43943f1278f58dc}{00014}}\ \ \ \ std::optional<augmented\_transaction\_trace>\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1state__history_1_1trace__converter_a86c4c2c779102104f43943f1278f58dc}{onblock\_trace}};}
+\DoxyCodeLine{\Hypertarget{trace__converter_8hpp_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{trace__converter_8hpp_source_l00016}00016\ \ \ \ \textcolor{keywordtype}{void}\ \ \mbox{\hyperlink{structsysio_1_1state__history_1_1trace__converter_ab4ca84fdc2d30675408e6e9f4d4c18c8}{add\_transaction}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_a4ee2867a6bec961c7a78b203cfd76be9}{transaction\_trace\_ptr}}\&\ trace,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_a7041c0316bd294d0866609ab3e0cc7a7}{chain::packed\_transaction\_ptr}}\&\ \mbox{\hyperlink{structsysio_1_1chain_1_1transaction}{transaction}});}
+\DoxyCodeLine{\Hypertarget{trace__converter_8hpp_source_l00017}00017\ \ \ \ \mbox{\hyperlink{classfc_1_1vector}{bytes}}\ \mbox{\hyperlink{structsysio_1_1state__history_1_1trace__converter_a62e0192e6d6919f2171f46b7335eafa5}{pack}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classchainbase_1_1database}{chainbase::database}}\&\ db,\ \textcolor{keywordtype}{bool}\ trace\_debug\_mode,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\_state\_ptr}}\&\ \mbox{\hyperlink{structsysio_1_1chain_1_1block__state}{block\_state}});}
+\DoxyCodeLine{\Hypertarget{trace__converter_8hpp_source_l00018}00018\ \};}
+\DoxyCodeLine{\Hypertarget{trace__converter_8hpp_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{trace__converter_8hpp_source_l00020}00020\ \}\ \textcolor{comment}{//\ namespace\ state\_history}}
+\DoxyCodeLine{\Hypertarget{trace__converter_8hpp_source_l00021}00021\ \}\ \textcolor{comment}{//\ namespace\ sysio}}
+
+\end{DoxyCode}

@@ -1,0 +1,74 @@
+\doxysection{fc\+::optional\+\_\+delegate\texorpdfstring{$<$}{<} R(Args...)\texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classfc_1_1optional__delegate_3_01_r_07_args_8_8_8_08_4}{}\label{classfc_1_1optional__delegate_3_01_r_07_args_8_8_8_08_4}\index{fc::optional\_delegate$<$ R(Args...)$>$@{fc::optional\_delegate$<$ R(Args...)$>$}}
+
+
+{\ttfamily \#include $<$utility.\+hpp$>$}
+
+
+
+Inheritance diagram for fc\+::optional\+\_\+delegate\texorpdfstring{$<$}{<} R(Args...)\texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=208pt]{classfc_1_1optional__delegate_3_01_r_07_args_8_8_8_08_4__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for fc\+::optional\+\_\+delegate\texorpdfstring{$<$}{<} R(Args...)\texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=208pt]{classfc_1_1optional__delegate_3_01_r_07_args_8_8_8_08_4__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+auto \mbox{\hyperlink{classfc_1_1optional__delegate_3_01_r_07_args_8_8_8_08_4_a8d3daf0a27ff53a823de84087d094e5c}{operator()}} (Args... args) const -\/$>$ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}, typename ... Args$>$\newline
+class fc\+::optional\+\_\+delegate$<$ R(\+Args...)$>$}
+
+
+Definition at line \mbox{\hyperlink{utility_8hpp_source_l00186}{186}} of file \mbox{\hyperlink{utility_8hpp_source}{utility.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1optional__delegate_3_01_r_07_args_8_8_8_08_4_a8d3daf0a27ff53a823de84087d094e5c}\index{fc::optional\_delegate$<$ R(Args...)$>$@{fc::optional\_delegate$<$ R(Args...)$>$}!operator()@{operator()}}
+\index{operator()@{operator()}!fc::optional\_delegate$<$ R(Args...)$>$@{fc::optional\_delegate$<$ R(Args...)$>$}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}}
+{\footnotesize\ttfamily \label{classfc_1_1optional__delegate_3_01_r_07_args_8_8_8_08_4_a8d3daf0a27ff53a823de84087d094e5c} 
+template$<$typename \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}} , typename ... Args$>$ \\
+auto \mbox{\hyperlink{classfc_1_1optional__delegate}{fc\+::optional\+\_\+delegate}}$<$ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}(Args...)$>$\+::operator() (\begin{DoxyParamCaption}\item[{Args...}]{args}{}\end{DoxyParamCaption}) const -\/$>$ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}} \hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{utility_8hpp_source_l00190}{190}} of file \mbox{\hyperlink{utility_8hpp_source}{utility.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{bool}\textcolor{keyword}{>}(*\textcolor{keyword}{this}))\ \{}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keyword}{constexpr}(\ std::is\_move\_constructible\_v<R>\ )\ \{}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::function<\mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}(Args...)>::operator()(std::move(args)...);}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::function<\mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}(Args...)>::operator()(\mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}...);}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keyword}{constexpr}(\ !std::is\_void\_v<R>\ )\ \{}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{\};}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00202\ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/\mbox{\hyperlink{utility_8hpp}{utility.\+hpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,10 @@
+<map id="websocketpp::processor::hybi00::get_uri" name="websocketpp::processor::hybi00::get_uri">
+<area shape="rect" id="Node000001" title="Extracts client uri from a handshake request." alt="" coords="494,48,657,89"/>
+<area shape="rect" id="Node000002" href="$hybi00_8cpp.html#a28ab49690cd74a3b00567ad9b87ef437" title=" " alt="" coords="250,5,446,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="478,50,409,34,410,29,479,45"/>
+<area shape="rect" id="Node000003" href="$hybi00_8cpp.html#aa574a21bd8b369edb379ed3e0a61bb46" title=" " alt="" coords="5,85,202,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="479,77,202,95,202,89,478,72"/>
+<area shape="rect" id="Node000004" href="$classwebsocketpp_1_1processor_1_1hybi00.html#a29c4300aa053e7028ee5a46601319afd" title="Calculate the appropriate response for this websocket request." alt="" coords="252,106,444,146"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="480,96,432,108,431,103,479,90"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="236,116,202,112,202,107,237,111"/>
+</map>

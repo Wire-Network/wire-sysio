@@ -1,0 +1,170 @@
+\doxysection{CAuto\+BN\+\_\+\+CTX Class Reference}
+\hypertarget{class_c_auto_b_n___c_t_x}{}\label{class_c_auto_b_n___c_t_x}\index{CAutoBN\_CTX@{CAutoBN\_CTX}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_c_auto_b_n___c_t_x_a0ef12d97d8825efa9ee75537936217c5}{CAuto\+BN\+\_\+\+CTX}} ()
+\item 
+\mbox{\hyperlink{class_c_auto_b_n___c_t_x_a5de213d9beb6b3f40e78d8b90a0724e1}{\texorpdfstring{$\sim$}{\string~}\+CAuto\+BN\+\_\+\+CTX}} ()
+\item 
+\mbox{\hyperlink{class_c_auto_b_n___c_t_x_a17f28434d1ddfb3133ba34aaa73d44b4}{operator BN\+\_\+\+CTX \texorpdfstring{$\ast$}{*}}} ()
+\item 
+BN\+\_\+\+CTX \& \mbox{\hyperlink{class_c_auto_b_n___c_t_x_afb8a60d15d7f9567acb4b095982bddeb}{operator\texorpdfstring{$\ast$}{*}}} ()
+\item 
+BN\+\_\+\+CTX \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_c_auto_b_n___c_t_x_a203d1a55d0ef0b2c41c18c9f468e75ab}{operator\&}} ()
+\item 
+bool \mbox{\hyperlink{class_c_auto_b_n___c_t_x_a33c967d143efcbfafcac9f863fce1d4f}{operator!}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+BN\+\_\+\+CTX \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_c_auto_b_n___c_t_x_aef6de16db7bacbcafcbfe0cd0e9b7036}{operator=}} (BN\+\_\+\+CTX \texorpdfstring{$\ast$}{*}pnew)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+BN\+\_\+\+CTX \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_c_auto_b_n___c_t_x_a264ef42b71cb55111928fce1aa4d9ad3}{pctx}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+RAII encapsulated BN\+\_\+\+CTX (Open\+SSL bignum context) 
+
+Definition at line \mbox{\hyperlink{base58_8cpp_source_l00041}{41}} of file \mbox{\hyperlink{base58_8cpp_source}{base58.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_c_auto_b_n___c_t_x_a0ef12d97d8825efa9ee75537936217c5}\index{CAutoBN\_CTX@{CAutoBN\_CTX}!CAutoBN\_CTX@{CAutoBN\_CTX}}
+\index{CAutoBN\_CTX@{CAutoBN\_CTX}!CAutoBN\_CTX@{CAutoBN\_CTX}}
+\doxysubsubsection{\texorpdfstring{CAutoBN\_CTX()}{CAutoBN\_CTX()}}
+{\footnotesize\ttfamily \label{class_c_auto_b_n___c_t_x_a0ef12d97d8825efa9ee75537936217c5} 
+CAuto\+BN\+\_\+\+CTX\+::\+CAuto\+BN\+\_\+\+CTX (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{base58_8cpp_source_l00048}{48}} of file \mbox{\hyperlink{base58_8cpp_source}{base58.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00049\ \ \ \ \ \{}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_c_auto_b_n___c_t_x_a264ef42b71cb55111928fce1aa4d9ad3}{pctx}}\ =\ BN\_CTX\_new();}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_c_auto_b_n___c_t_x_a264ef42b71cb55111928fce1aa4d9ad3}{pctx}}\ ==\ NULL)}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{classbignum__error}{bignum\_error}}(\textcolor{stringliteral}{"{}CAutoBN\_CTX\ :\ BN\_CTX\_new()\ returned\ NULL"{}});}
+\DoxyCodeLine{00053\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_c_auto_b_n___c_t_x_a5de213d9beb6b3f40e78d8b90a0724e1}\index{CAutoBN\_CTX@{CAutoBN\_CTX}!````~CAutoBN\_CTX@{\texorpdfstring{$\sim$}{\string~}CAutoBN\_CTX}}
+\index{````~CAutoBN\_CTX@{\texorpdfstring{$\sim$}{\string~}CAutoBN\_CTX}!CAutoBN\_CTX@{CAutoBN\_CTX}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}CAutoBN\_CTX()}{\string~CAutoBN\_CTX()}}
+{\footnotesize\ttfamily \label{class_c_auto_b_n___c_t_x_a5de213d9beb6b3f40e78d8b90a0724e1} 
+CAuto\+BN\+\_\+\+CTX\+::\texorpdfstring{$\sim$}{\string~}\+CAuto\+BN\+\_\+\+CTX (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{base58_8cpp_source_l00055}{55}} of file \mbox{\hyperlink{base58_8cpp_source}{base58.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00056\ \ \ \ \ \{}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_c_auto_b_n___c_t_x_a264ef42b71cb55111928fce1aa4d9ad3}{pctx}}\ !=\ NULL)}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \ \ \ BN\_CTX\_free(\mbox{\hyperlink{class_c_auto_b_n___c_t_x_a264ef42b71cb55111928fce1aa4d9ad3}{pctx}});}
+\DoxyCodeLine{00059\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_c_auto_b_n___c_t_x_a17f28434d1ddfb3133ba34aaa73d44b4}\index{CAutoBN\_CTX@{CAutoBN\_CTX}!operator BN\_CTX \texorpdfstring{$\ast$}{*}@{operator BN\_CTX \texorpdfstring{$\ast$}{*}}}
+\index{operator BN\_CTX \texorpdfstring{$\ast$}{*}@{operator BN\_CTX \texorpdfstring{$\ast$}{*}}!CAutoBN\_CTX@{CAutoBN\_CTX}}
+\doxysubsubsection{\texorpdfstring{operator BN\_CTX \texorpdfstring{$\ast$}{*}()}{operator BN\_CTX *()}}
+{\footnotesize\ttfamily \label{class_c_auto_b_n___c_t_x_a17f28434d1ddfb3133ba34aaa73d44b4} 
+CAuto\+BN\+\_\+\+CTX\+::operator BN\+\_\+\+CTX \texorpdfstring{$\ast$}{*} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{base58_8cpp_source_l00061}{61}} of file \mbox{\hyperlink{base58_8cpp_source}{base58.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00061\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_c_auto_b_n___c_t_x_a264ef42b71cb55111928fce1aa4d9ad3}{pctx}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_c_auto_b_n___c_t_x_a33c967d143efcbfafcac9f863fce1d4f}\index{CAutoBN\_CTX@{CAutoBN\_CTX}!operator"!@{operator"!}}
+\index{operator"!@{operator"!}!CAutoBN\_CTX@{CAutoBN\_CTX}}
+\doxysubsubsection{\texorpdfstring{operator"!()}{operator!()}}
+{\footnotesize\ttfamily \label{class_c_auto_b_n___c_t_x_a33c967d143efcbfafcac9f863fce1d4f} 
+bool CAuto\+BN\+\_\+\+CTX\+::operator! (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{base58_8cpp_source_l00064}{64}} of file \mbox{\hyperlink{base58_8cpp_source}{base58.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00064\ \{\ \textcolor{keywordflow}{return}\ (\mbox{\hyperlink{class_c_auto_b_n___c_t_x_a264ef42b71cb55111928fce1aa4d9ad3}{pctx}}\ ==\ NULL);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_c_auto_b_n___c_t_x_a203d1a55d0ef0b2c41c18c9f468e75ab}\index{CAutoBN\_CTX@{CAutoBN\_CTX}!operator\&@{operator\&}}
+\index{operator\&@{operator\&}!CAutoBN\_CTX@{CAutoBN\_CTX}}
+\doxysubsubsection{\texorpdfstring{operator\&()}{operator\&()}}
+{\footnotesize\ttfamily \label{class_c_auto_b_n___c_t_x_a203d1a55d0ef0b2c41c18c9f468e75ab} 
+BN\+\_\+\+CTX \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*} CAuto\+BN\+\_\+\+CTX\+::operator\& (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{base58_8cpp_source_l00063}{63}} of file \mbox{\hyperlink{base58_8cpp_source}{base58.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00063\ \{\ \textcolor{keywordflow}{return}\ \&\mbox{\hyperlink{class_c_auto_b_n___c_t_x_a264ef42b71cb55111928fce1aa4d9ad3}{pctx}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_c_auto_b_n___c_t_x_afb8a60d15d7f9567acb4b095982bddeb}\index{CAutoBN\_CTX@{CAutoBN\_CTX}!operator\texorpdfstring{$\ast$}{*}@{operator\texorpdfstring{$\ast$}{*}}}
+\index{operator\texorpdfstring{$\ast$}{*}@{operator\texorpdfstring{$\ast$}{*}}!CAutoBN\_CTX@{CAutoBN\_CTX}}
+\doxysubsubsection{\texorpdfstring{operator\texorpdfstring{$\ast$}{*}()}{operator*()}}
+{\footnotesize\ttfamily \label{class_c_auto_b_n___c_t_x_afb8a60d15d7f9567acb4b095982bddeb} 
+BN\+\_\+\+CTX \& CAuto\+BN\+\_\+\+CTX\+::operator\texorpdfstring{$\ast$}{*} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{base58_8cpp_source_l00062}{62}} of file \mbox{\hyperlink{base58_8cpp_source}{base58.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00062\ \{\ \textcolor{keywordflow}{return}\ *\mbox{\hyperlink{class_c_auto_b_n___c_t_x_a264ef42b71cb55111928fce1aa4d9ad3}{pctx}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_c_auto_b_n___c_t_x_aef6de16db7bacbcafcbfe0cd0e9b7036}\index{CAutoBN\_CTX@{CAutoBN\_CTX}!operator=@{operator=}}
+\index{operator=@{operator=}!CAutoBN\_CTX@{CAutoBN\_CTX}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}}
+{\footnotesize\ttfamily \label{class_c_auto_b_n___c_t_x_aef6de16db7bacbcafcbfe0cd0e9b7036} 
+BN\+\_\+\+CTX \texorpdfstring{$\ast$}{*} CAuto\+BN\+\_\+\+CTX\+::operator= (\begin{DoxyParamCaption}\item[{BN\+\_\+\+CTX \texorpdfstring{$\ast$}{*}}]{pnew}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{base58_8cpp_source_l00045}{45}} of file \mbox{\hyperlink{base58_8cpp_source}{base58.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00045\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_c_auto_b_n___c_t_x_a264ef42b71cb55111928fce1aa4d9ad3}{pctx}}\ =\ pnew;\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{class_c_auto_b_n___c_t_x_a264ef42b71cb55111928fce1aa4d9ad3}\index{CAutoBN\_CTX@{CAutoBN\_CTX}!pctx@{pctx}}
+\index{pctx@{pctx}!CAutoBN\_CTX@{CAutoBN\_CTX}}
+\doxysubsubsection{\texorpdfstring{pctx}{pctx}}
+{\footnotesize\ttfamily \label{class_c_auto_b_n___c_t_x_a264ef42b71cb55111928fce1aa4d9ad3} 
+BN\+\_\+\+CTX\texorpdfstring{$\ast$}{*} CAuto\+BN\+\_\+\+CTX\+::pctx\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{base58_8cpp_source_l00044}{44}} of file \mbox{\hyperlink{base58_8cpp_source}{base58.\+cpp}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/src/crypto/\mbox{\hyperlink{base58_8cpp}{base58.\+cpp}}\end{DoxyCompactItemize}

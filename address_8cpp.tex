@@ -1,0 +1,290 @@
+\doxysection{libraries/fc/libraries/ff/depends/xbyak/test/address.cpp File Reference}
+\hypertarget{address_8cpp}{}\label{address_8cpp}\index{libraries/fc/libraries/ff/depends/xbyak/test/address.cpp@{libraries/fc/libraries/ff/depends/xbyak/test/address.cpp}}
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+Include dependency graph for address.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=194pt]{address_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{address_8cpp_a21ff7c588b94b603f37cc3cb3f21cb6a}{NUM\+\_\+\+OF\+\_\+\+ARRAY}}(x)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{address_8cpp_a10f4eade9df7fe8f4ed03974acb7ca11}{gen\+Vsib\+Sub}} (bool is\+JIT, const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}, const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{cvt__test_8cpp_af73a49a9258b274934a51f5b17b0d1be}{tbl}}\mbox{[}$\,$\mbox{]}, size\+\_\+t tbl\+Size)
+\item 
+void \mbox{\hyperlink{address_8cpp_a97ee08e802964a33ef962aed11d636b8}{gen\+Vsib}} (bool is\+JIT)
+\item 
+void \mbox{\hyperlink{address_8cpp_a00fd897f5facd975bb765b03d54973db}{gen\+Address}} (bool is\+JIT, const char reg\+Tbl\mbox{[}$\,$\mbox{]}\mbox{[}5\mbox{]}, size\+\_\+t reg\+Tbl\+Num)
+\item 
+int \mbox{\hyperlink{address_8cpp_a0ddf1224851353fc92bfbff6f499fa97}{main}} (int argc, char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}\mbox{[}$\,$\mbox{]})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{address_8cpp_a21ff7c588b94b603f37cc3cb3f21cb6a}\index{address.cpp@{address.cpp}!NUM\_OF\_ARRAY@{NUM\_OF\_ARRAY}}
+\index{NUM\_OF\_ARRAY@{NUM\_OF\_ARRAY}!address.cpp@{address.cpp}}
+\doxysubsubsection{\texorpdfstring{NUM\_OF\_ARRAY}{NUM\_OF\_ARRAY}}
+{\footnotesize\ttfamily \label{address_8cpp_a21ff7c588b94b603f37cc3cb3f21cb6a} 
+\#define NUM\+\_\+\+OF\+\_\+\+ARRAY(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(\textcolor{keyword}{sizeof}(x)\ /\ \textcolor{keyword}{sizeof}(x[0]))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{address_8cpp_source_l00004}{4}} of file \mbox{\hyperlink{address_8cpp_source}{address.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{address_8cpp_a00fd897f5facd975bb765b03d54973db}\index{address.cpp@{address.cpp}!genAddress@{genAddress}}
+\index{genAddress@{genAddress}!address.cpp@{address.cpp}}
+\doxysubsubsection{\texorpdfstring{genAddress()}{genAddress()}}
+{\footnotesize\ttfamily \label{address_8cpp_a00fd897f5facd975bb765b03d54973db} 
+void gen\+Address (\begin{DoxyParamCaption}\item[{bool}]{is\+JIT}{, }\item[{const char}]{reg\+Tbl}{\mbox{[}$\,$\mbox{]}\mbox{[}5\mbox{]}, }\item[{size\+\_\+t}]{reg\+Tbl\+Num}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{address_8cpp_source_l00060}{60}} of file \mbox{\hyperlink{address_8cpp_source}{address.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00061\ \{}
+\DoxyCodeLine{00062\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ =\ 0;}
+\DoxyCodeLine{00063\ \ \ \ \ \textcolor{keywordtype}{int}\ funcNum\ =\ 1;}
+\DoxyCodeLine{00064\ \ \ \ \ \textcolor{keywordflow}{if}\ (isJIT)\ \{}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ puts(\textcolor{stringliteral}{"{}void\ gen0()\{"{}});}
+\DoxyCodeLine{00066\ \ \ \ \ \}}
+\DoxyCodeLine{00067\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ regTblNum\ +\ 1;\ i++)\ \{}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *base\ =\ regTbl[i];}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ =\ 0;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ <\ regTblNum\ +\ 1;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}++)\ \{}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ ==\ 4)\ \textcolor{keywordflow}{continue};\ \textcolor{comment}{/*\ esp\ is\ not\ index\ register\ */}}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *index\ =\ regTbl[\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}];}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ scaleTbl[]\ =\ \{\ 0,\ 1,\ 2,\ 4,\ 8\ \};}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ k\ =\ 0;\ k\ <\ \mbox{\hyperlink{address_8cpp_a21ff7c588b94b603f37cc3cb3f21cb6a}{NUM\_OF\_ARRAY}}(scaleTbl);\ k++)\ \{}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ scale\ =\ scaleTbl[k];}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ dispTbl[]\ =\ \{\ 0,\ 1,\ 1000,\ -\/1,\ -\/1000\ \};}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ m\ =\ 0;\ m\ <\ \mbox{\hyperlink{address_8cpp_a21ff7c588b94b603f37cc3cb3f21cb6a}{NUM\_OF\_ARRAY}}(dispTbl);\ m++)\ \{}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ disp\ =\ dispTbl[m];}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ isFirst\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isJIT)\ \{}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}mov\ (ecx,\ ptr["{}});}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}mov\ ecx,\ ["{}});}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (i\ <\ regTblNum)\ \{}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\%s"{}},\ base);}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ isFirst\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ <\ regTblNum)\ \{}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!isFirst)\ putchar(\textcolor{charliteral}{'+'});}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\%s"{}},\ index);}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (scale)\ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}*\%d"{}},\ scale);}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ isFirst\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isFirst)\ \{}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isJIT)\ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}(void*)"{}});}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}0x\%08X"{}},\ disp);}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (disp\ >=\ 0)\ \{}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ putchar(\textcolor{charliteral}{'+'});}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\%d"{}},\ disp);}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ isFirst\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isJIT)\ \{}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}]);\ dump();\(\backslash\)n"{}});}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}]\(\backslash\)n"{}});}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isJIT)\ \{}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}++;}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ \%\ 100)\ ==\ 0)\ \{}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\}\(\backslash\)n\ \ \ \ void\ gen\%d()\{\(\backslash\)n"{}},\ funcNum++);}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00118\ \ \ \ \ \}}
+\DoxyCodeLine{00119\ \ \ \ \ \textcolor{keywordflow}{if}\ (isJIT)\ puts(\textcolor{stringliteral}{"{}\}"{}});}
+\DoxyCodeLine{00120\ \ \ \ \ \mbox{\hyperlink{address_8cpp_a97ee08e802964a33ef962aed11d636b8}{genVsib}}(isJIT);}
+\DoxyCodeLine{00121\ \ \ \ \ \textcolor{keywordflow}{if}\ (isJIT)\ \{}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}void\ gen()\{\(\backslash\)n"{}});}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ funcNum;\ i++)\ \{}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\ \ \ gen\%d();\(\backslash\)n"{}},\ i);}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ puts(\textcolor{stringliteral}{"{}genVsib();"{}});}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\}\(\backslash\)n"{}});}
+\DoxyCodeLine{00128\ \ \ \ \ \}}
+\DoxyCodeLine{00129\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=340pt]{address_8cpp_a00fd897f5facd975bb765b03d54973db_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=221pt]{address_8cpp_a00fd897f5facd975bb765b03d54973db_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{address_8cpp_a97ee08e802964a33ef962aed11d636b8}\index{address.cpp@{address.cpp}!genVsib@{genVsib}}
+\index{genVsib@{genVsib}!address.cpp@{address.cpp}}
+\doxysubsubsection{\texorpdfstring{genVsib()}{genVsib()}}
+{\footnotesize\ttfamily \label{address_8cpp_a97ee08e802964a33ef962aed11d636b8} 
+void gen\+Vsib (\begin{DoxyParamCaption}\item[{bool}]{is\+JIT}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{address_8cpp_source_l00022}{22}} of file \mbox{\hyperlink{address_8cpp_source}{address.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00023\ \{}
+\DoxyCodeLine{00024\ \ \ \ \ \textcolor{keywordflow}{if}\ (isJIT)\ puts(\textcolor{stringliteral}{"{}void\ genVsib()\ \{"{}});}
+\DoxyCodeLine{00025\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *vm32xTbl[]\ =\ \{}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}xmm0"{}},}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}xmm0\ *\ 1"{}},}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}xmm0\ +\ 4"{}},}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}xmm0\ +\ eax"{}},}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}xmm0\ *\ 4\ +\ ecx"{}},}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}xmm3\ *\ 8\ +\ edi\ +\ 123"{}},}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}xmm2\ *\ 2\ +\ 5"{}},}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}eax\ +\ xmm0"{}},}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}esp\ +\ xmm4"{}},}
+\DoxyCodeLine{00035\ \ \ \ \ \};}
+\DoxyCodeLine{00036\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *vm32yTbl[]\ =\ \{}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}ymm0"{}},}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}ymm0\ *\ 1"{}},}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}ymm0\ +\ 4"{}},}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}ymm0\ +\ eax"{}},}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}ymm0\ *\ 4\ +\ ecx"{}},}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}ymm3\ *\ 8\ +\ edi\ +\ 123"{}},}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}ymm2\ *\ 2\ +\ 5"{}},}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}eax\ +\ ymm0"{}},}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}esp\ +\ ymm4"{}},}
+\DoxyCodeLine{00046\ \ \ \ \ \};}
+\DoxyCodeLine{00047\ \ \ \ \ \mbox{\hyperlink{address_8cpp_a10f4eade9df7fe8f4ed03974acb7ca11}{genVsibSub}}(isJIT,\ \textcolor{stringliteral}{"{}vgatherdpd"{}},\ vm32xTbl,\ \mbox{\hyperlink{address_8cpp_a21ff7c588b94b603f37cc3cb3f21cb6a}{NUM\_OF\_ARRAY}}(vm32xTbl));}
+\DoxyCodeLine{00048\ \ \ \ \ \mbox{\hyperlink{address_8cpp_a10f4eade9df7fe8f4ed03974acb7ca11}{genVsibSub}}(isJIT,\ \textcolor{stringliteral}{"{}vgatherqpd"{}},\ vm32yTbl,\ \mbox{\hyperlink{address_8cpp_a21ff7c588b94b603f37cc3cb3f21cb6a}{NUM\_OF\_ARRAY}}(vm32yTbl));}
+\DoxyCodeLine{00049\ \textcolor{preprocessor}{\#ifdef\ XBYAK64}}
+\DoxyCodeLine{00050\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *vm32x64Tbl[]\ =\ \{}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}xmm0\ +\ r11"{}},}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}r13\ +\ xmm15"{}},}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}123\ +\ rsi\ +\ xmm2\ *\ 4"{}},}
+\DoxyCodeLine{00054\ \ \ \ \ \};}
+\DoxyCodeLine{00055\ \ \ \ \ \mbox{\hyperlink{address_8cpp_a10f4eade9df7fe8f4ed03974acb7ca11}{genVsibSub}}(isJIT,\ \textcolor{stringliteral}{"{}vgatherdpd"{}},\ vm32x64Tbl,\ \mbox{\hyperlink{address_8cpp_a21ff7c588b94b603f37cc3cb3f21cb6a}{NUM\_OF\_ARRAY}}(vm32x64Tbl));}
+\DoxyCodeLine{00056\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00057\ \ \ \ \ \textcolor{keywordflow}{if}\ (isJIT)\ puts(\textcolor{stringliteral}{"{}\}"{}});}
+\DoxyCodeLine{00058\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=236pt]{address_8cpp_a97ee08e802964a33ef962aed11d636b8_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=308pt]{address_8cpp_a97ee08e802964a33ef962aed11d636b8_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{address_8cpp_a10f4eade9df7fe8f4ed03974acb7ca11}\index{address.cpp@{address.cpp}!genVsibSub@{genVsibSub}}
+\index{genVsibSub@{genVsibSub}!address.cpp@{address.cpp}}
+\doxysubsubsection{\texorpdfstring{genVsibSub()}{genVsibSub()}}
+{\footnotesize\ttfamily \label{address_8cpp_a10f4eade9df7fe8f4ed03974acb7ca11} 
+void gen\+Vsib\+Sub (\begin{DoxyParamCaption}\item[{bool}]{is\+JIT}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{name}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{tbl}{\mbox{[}$\,$\mbox{]}, }\item[{size\+\_\+t}]{tbl\+Size}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{address_8cpp_source_l00006}{6}} of file \mbox{\hyperlink{address_8cpp_source}{address.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00007\ \{}
+\DoxyCodeLine{00008\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ tblSize;\ i++)\ \{}
+\DoxyCodeLine{00009\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isJIT)\ \{}
+\DoxyCodeLine{00010\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\%s\ (ymm7,\ ptr["{}},\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}});}
+\DoxyCodeLine{00011\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00012\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\%s\ ymm7,\ ["{}},\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}});}
+\DoxyCodeLine{00013\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00014\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\%s"{}},\ \mbox{\hyperlink{cvt__test_8cpp_af73a49a9258b274934a51f5b17b0d1be}{tbl}}[i]);}
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isJIT)\ \{}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}],\ ymm4);\ dump();\(\backslash\)n"{}});}
+\DoxyCodeLine{00017\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}],\ ymm4\(\backslash\)n"{}});}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00020\ \ \ \ \ \}}
+\DoxyCodeLine{00021\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{address_8cpp_a10f4eade9df7fe8f4ed03974acb7ca11_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{address_8cpp_a0ddf1224851353fc92bfbff6f499fa97}\index{address.cpp@{address.cpp}!main@{main}}
+\index{main@{main}!address.cpp@{address.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{address_8cpp_a0ddf1224851353fc92bfbff6f499fa97} 
+int main (\begin{DoxyParamCaption}\item[{int}]{argc}{, }\item[{char \texorpdfstring{$\ast$}{*}}]{argv}{\mbox{[}$\,$\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{address_8cpp_source_l00131}{131}} of file \mbox{\hyperlink{address_8cpp_source}{address.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00132\ \{}
+\DoxyCodeLine{00133\ \ \ \ \ argc-\/-\/,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}++;}
+\DoxyCodeLine{00134\ \ \ \ \ \textcolor{keywordtype}{bool}\ phase\ =\ argc\ >\ 0\ \&\&\ strcmp(*\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}1"{}})\ ==\ 0;}
+\DoxyCodeLine{00135\ \ \ \ \ \textcolor{keywordtype}{bool}\ isJIT\ =\ (argc\ >\ 1);}
+\DoxyCodeLine{00136\ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}phase:\%c\ \%s\(\backslash\)n"{}},\ phase\ ?\ \textcolor{charliteral}{'1'}\ :\ \textcolor{charliteral}{'2'},\ isJIT\ ?\ \textcolor{stringliteral}{"{}jit"{}}\ :\ \textcolor{stringliteral}{"{}asm"{}});}
+\DoxyCodeLine{00137\ \ \ \ \ \textcolor{keywordflow}{if}\ (phase)\ \{}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}32bit\ reg\(\backslash\)n"{}});}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ reg32Tbl[][5]\ =\ \{}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}eax"{}},\ \textcolor{stringliteral}{"{}ecx"{}},\ \textcolor{stringliteral}{"{}edx"{}},\ \textcolor{stringliteral}{"{}ebx"{}},\ \textcolor{stringliteral}{"{}esp"{}},\ \textcolor{stringliteral}{"{}ebp"{}},\ \textcolor{stringliteral}{"{}esi"{}},\ \textcolor{stringliteral}{"{}edi"{}},}
+\DoxyCodeLine{00141\ \textcolor{preprocessor}{\#ifdef\ XBYAK64}}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}r9d"{}},\ \textcolor{stringliteral}{"{}r10d"{}},\ \textcolor{stringliteral}{"{}r11d"{}},\ \textcolor{stringliteral}{"{}r12d"{}},\ \textcolor{stringliteral}{"{}r13d"{}},\ \textcolor{stringliteral}{"{}r14d"{}},\ \textcolor{stringliteral}{"{}r15d"{}},}
+\DoxyCodeLine{00143\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{address_8cpp_a00fd897f5facd975bb765b03d54973db}{genAddress}}(isJIT,\ reg32Tbl,\ \mbox{\hyperlink{address_8cpp_a21ff7c588b94b603f37cc3cb3f21cb6a}{NUM\_OF\_ARRAY}}(reg32Tbl));}
+\DoxyCodeLine{00146\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00147\ \textcolor{preprocessor}{\#ifdef\ XBYAK64}}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}64bit\ reg\(\backslash\)n"{}});}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ reg64Tbl[][5]\ =\ \{}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}rax"{}},\ \textcolor{stringliteral}{"{}rcx"{}},\ \textcolor{stringliteral}{"{}rdx"{}},\ \textcolor{stringliteral}{"{}rbx"{}},\ \textcolor{stringliteral}{"{}rsp"{}},\ \textcolor{stringliteral}{"{}rbp"{}},\ \textcolor{stringliteral}{"{}rsi"{}},\ \textcolor{stringliteral}{"{}rdi"{}},\ \textcolor{stringliteral}{"{}r9"{}},\ \textcolor{stringliteral}{"{}r10"{}},\ \textcolor{stringliteral}{"{}r11"{}},\ \textcolor{stringliteral}{"{}r12"{}},\ \textcolor{stringliteral}{"{}r13"{}},\ \textcolor{stringliteral}{"{}r14"{}},\ \textcolor{stringliteral}{"{}r15"{}},}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{address_8cpp_a00fd897f5facd975bb765b03d54973db}{genAddress}}(isJIT,\ reg64Tbl,\ \mbox{\hyperlink{address_8cpp_a21ff7c588b94b603f37cc3cb3f21cb6a}{NUM\_OF\_ARRAY}}(reg64Tbl));}
+\DoxyCodeLine{00153\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00154\ \ \ \ \ \}}
+\DoxyCodeLine{00155\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{address_8cpp_a0ddf1224851353fc92bfbff6f499fa97_cgraph}
+\end{center}
+\end{figure}

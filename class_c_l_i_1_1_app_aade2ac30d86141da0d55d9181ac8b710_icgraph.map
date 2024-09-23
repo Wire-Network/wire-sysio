@@ -1,0 +1,44 @@
+<map id="CLI::App::_compare_subcommand_names" name="CLI::App::_compare_subcommand_names">
+<area shape="rect" id="Node000001" title="Helper function to run through all possible comparisons of subcommand names to check there is no over..." alt="" coords="711,96,864,137"/>
+<area shape="poly" id="edge1_Node000001_Node000001" title=" " alt="" coords="823,83,810,77,787,75,767,77,754,82,749,88,751,95,746,96,744,87,751,78,766,72,788,70,811,72,825,78"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_app.html#a99e2ddf1ae27593e19162eba3aec5fcd" title="Add a previously created app as a subcommand." alt="" coords="476,5,663,31"/>
+<area shape="poly" id="edge2_Node000001_Node000002" title=" " alt="" coords="744,90,705,66,662,45,632,34,634,29,664,40,708,61,746,85"/>
+<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_app.html#ad5d02ee857879c6abd007c8293a1151a" title="Set an alias for the app." alt="" coords="516,55,624,80"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="696,99,624,82,625,77,697,94"/>
+<area shape="rect" id="Node000006" href="$class_c_l_i_1_1_app.html#a1e0b05ed58f80301b945ffc344b61aa3" title="Ignore case. Subcommands inherit value." alt="" coords="494,104,645,130"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="696,120,646,120,646,114,696,114"/>
+<area shape="rect" id="Node000007" href="$class_c_l_i_1_1_app.html#aca4afbde81a59b25fc514b960d472c08" title="Ignore underscore. Subcommands inherit value." alt="" coords="476,153,663,179"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="697,140,630,155,629,150,696,135"/>
+<area shape="rect" id="Node000008" href="$class_c_l_i_1_1_app.html#a76d7d45b60647632df392dd5e696877a" title="Set a name for the app (empty will use parser to set the name)" alt="" coords="513,341,626,367"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="759,150,585,343,581,339,755,147"/>
+<area shape="rect" id="Node000004" href="$classcpp_1_1ast_1_1_typedef.html#ac461b1e6209716f39cc06baa5d726f56" title=" " alt="" coords="252,55,414,80"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="500,70,414,70,414,65,500,65"/>
+<area shape="rect" id="Node000005" href="$classcpp_1_1ast_1_1_typedef.html#ad94253075cea5a5110bf5e9b8fe0ee61" title=" " alt="" coords="248,5,418,31"/>
+<area shape="poly" id="edge5_Node000003_Node000005" title=" " alt="" coords="500,56,397,34,398,29,501,51"/>
+<area shape="poly" id="edge14_Node000008_Node000004" title=" " alt="" coords="550,329,474,193,462,163,455,139,446,117,426,95,407,83,410,79,430,91,450,114,460,137,467,161,478,190,555,327"/>
+<area shape="rect" id="Node000009" href="$classcpp_1_1ast_1_1___nested_type.html#a944c5478ca7586a71d1d10bfcc7be1bb" title=" " alt="" coords="258,104,408,145"/>
+<area shape="poly" id="edge9_Node000008_Node000009" title=" " alt="" coords="554,329,534,291,505,245,469,199,426,159,407,147,410,143,430,155,473,195,510,242,538,288,558,326"/>
+<area shape="rect" id="Node000010" href="$classcpp_1_1ast_1_1_class.html#a572953e3438a048cdc5f103fbf6ab7b0" title=" " alt="" coords="258,169,408,195"/>
+<area shape="poly" id="edge10_Node000008_Node000010" title=" " alt="" coords="549,330,499,268,465,236,427,208,403,198,406,193,429,204,468,232,503,265,553,327"/>
+<area shape="rect" id="Node000011" href="$classcpp_1_1ast_1_1_define.html#a8e51e0611e1a76c5874f6b39e27a6d6a" title=" " alt="" coords="256,219,410,244"/>
+<area shape="poly" id="edge11_Node000008_Node000011" title=" " alt="" coords="540,333,489,296,427,259,395,247,397,242,429,254,492,291,543,329"/>
+<area shape="rect" id="Node000012" href="$classcpp_1_1ast_1_1_function.html#a61e8eadca35b3848183554f62acf0ffb" title=" " alt="" coords="268,268,398,309"/>
+<area shape="poly" id="edge12_Node000008_Node000012" title=" " alt="" coords="505,339,397,309,399,304,506,334"/>
+<area shape="rect" id="Node000013" href="$classcpp_1_1ast_1_1_parameter.html#aebd069a2a057dc791df21c56e22912bb" title=" " alt="" coords="267,334,398,374"/>
+<area shape="poly" id="edge13_Node000008_Node000013" title=" " alt="" coords="498,357,399,357,399,352,498,352"/>
+<area shape="rect" id="Node000014" href="$classcpp_1_1tokenize_1_1_token.html#ad93a4059e9932fa2dea149510f0ef002" title=" " alt="" coords="264,399,402,440"/>
+<area shape="poly" id="edge15_Node000008_Node000014" title=" " alt="" coords="507,374,403,403,402,398,505,369"/>
+<area shape="rect" id="Node000015" href="$classvalidate__reflection_1_1_empty_scope.html#a423076007160dd8dd8e9b314aa1429b1" title=" " alt="" coords="249,464,417,505"/>
+<area shape="poly" id="edge16_Node000008_Node000015" title=" " alt="" coords="542,379,491,416,429,454,401,466,399,461,427,449,488,412,539,374"/>
+<area shape="rect" id="Node000016" href="$classvalidate__reflection_1_1_empty_scope.html#a5c2e058527ec1f3b72266c29c77ad0b2" title=" " alt="" coords="249,530,417,570"/>
+<area shape="poly" id="edge17_Node000008_Node000016" title=" " alt="" coords="554,382,504,450,469,487,429,519,407,532,404,527,427,515,465,483,500,446,550,379"/>
+<area shape="rect" id="Node000017" href="$classvalidate__reflection_1_1_empty_scope.html#a1fb4f76506790294268dc078986d7430" title=" " alt="" coords="13,559,182,600"/>
+<area shape="poly" id="edge20_Node000008_Node000017" title=" " alt="" coords="564,382,547,429,520,486,482,541,457,565,429,584,399,599,366,608,299,616,233,613,175,603,176,598,234,607,299,610,365,603,397,594,427,580,454,561,478,538,516,483,542,427,559,381"/>
+<area shape="rect" id="Node000018" href="$classcpp_1_1ast_1_1___generic_declaration.html#a4851c5ea09b0a312d762342b71211bb1" title=" " alt="" coords="238,644,428,685"/>
+<area shape="poly" id="edge19_Node000008_Node000018" title=" " alt="" coords="564,383,547,434,519,499,481,568,457,600,430,628,403,646,400,642,426,624,453,596,476,565,515,497,542,432,558,381"/>
+<area shape="rect" id="Node000019" href="$classcpp_1_1ast_1_1_variable_declaration.html#ad8821ceb26b91d7c3604486a424c3f8f" title=" " alt="" coords="241,710,425,750"/>
+<area shape="poly" id="edge21_Node000008_Node000019" title=" " alt="" coords="567,383,555,447,530,531,512,576,490,621,462,662,430,699,413,711,410,707,426,695,458,659,485,618,507,574,525,530,550,446,562,382"/>
+<area shape="poly" id="edge18_Node000016_Node000017" title=" " alt="" coords="234,565,182,572,182,566,233,560"/>
+<area shape="rect" id="Node000020" href="$classcpp_1_1ast_1_1_variable_declaration.html#aeafe1b55bcf3005d00951f0accb18def" title=" " alt="" coords="5,710,190,750"/>
+<area shape="poly" id="edge22_Node000019_Node000020" title=" " alt="" coords="225,733,190,733,190,728,225,728"/>
+</map>

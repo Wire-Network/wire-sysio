@@ -1,0 +1,7 @@
+<map id="GenericValue::SetMembersPointer" name="GenericValue::SetMembersPointer">
+<area shape="rect" id="Node000001" title=" " alt="" coords="245,23,425,64"/>
+<area shape="rect" id="Node000002" href="$class_generic_value.html#a76c68b72723a06045776dbd425f9e8b6" title="Explicit copy constructor (with allocator)" alt="" coords="9,5,193,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="229,35,193,31,193,25,229,29"/>
+<area shape="rect" id="Node000003" href="$class_generic_value.html#a26c8ec7d68858df1038506df7fcff22d" title="Initialize this value as object with initial data, without calling destructor." alt="" coords="5,55,197,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="229,57,197,60,197,55,229,52"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="GenericReader::GetErrorOffset" name="GenericReader::GetErrorOffset">
+<area shape="rect" id="Node000001" title="Get the position of last parsing error in input, 0 otherwise." alt="" coords="5,5,207,31"/>
+<area shape="rect" id="Node000002" href="$struct_parse_result.html#afbe762766ac21b2aae266105f1dfa643" title="Get the error offset, if IsError(), 0 otherwise." alt="" coords="255,5,392,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="207,16,239,16,239,21,207,21"/>
+</map>

@@ -1,0 +1,11 @@
+<map id="TEST" name="TEST">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,61,56"/>
+<area shape="rect" id="Node000002" href="$pointer_8h.html#a581633984b11d0587c2ad06649efefc4" title=" " alt="" coords="115,5,246,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="61,36,99,29,100,35,62,41"/>
+<area shape="rect" id="Node000003" href="$pointer_8h.html#a542981a8bdcf3bc3c701c7eff39648ac" title=" " alt="" coords="109,55,252,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="62,45,94,51,93,56,61,51"/>
+<area shape="rect" id="Node000004" href="$class_generic_pointer.html#af148818f7c2b10243221953d887044c6" title="Swap the content of this pointer with an other." alt="" coords="300,55,448,80"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="252,65,285,65,285,70,252,70"/>
+<area shape="rect" id="Node000005" href="$namespaceinternal.html#a72b2c71d36273b9691487f58c671ce04" title="Custom swap() to avoid dependency on C++ &lt;algorithm&gt; header." alt="" coords="496,55,601,80"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="449,65,481,65,481,70,449,70"/>
+</map>

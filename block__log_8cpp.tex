@@ -1,0 +1,157 @@
+\doxysection{libraries/chain/block\+\_\+log.cpp File Reference}
+\hypertarget{block__log_8cpp}{}\label{block__log_8cpp}\index{libraries/chain/block\_log.cpp@{libraries/chain/block\_log.cpp}}
+{\ttfamily \#include $<$sysio/chain/block\+\_\+log.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/exceptions.\+hpp$>$}\newline
+{\ttfamily \#include $<$fstream$>$}\newline
+{\ttfamily \#include $<$fc/bitutil.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/io/cfile.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/io/raw.\+hpp$>$}\newline
+Include dependency graph for block\+\_\+log.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{block__log_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classsysio_1_1chain_1_1detail_1_1block__log__impl}{sysio\+::chain\+::detail\+::block\+\_\+log\+\_\+impl}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1chain_1_1detail_1_1reverse__iterator}{sysio\+::chain\+::detail\+::reverse\+\_\+iterator}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1chain_1_1detail_1_1index__writer}{sysio\+::chain\+::detail\+::index\+\_\+writer}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1chain_1_1detail_1_1fileptr__datastream}{sysio\+::chain\+::detail\+::fileptr\+\_\+datastream}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain}{sysio\+::chain}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain_1_1detail}{sysio\+::chain\+::detail}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{block__log_8cpp_a3497123c2fea68436d49bf8958cb4a16}{LOG\+\_\+\+READ}}~(std\+::ios\+::in \texorpdfstring{$\vert$}{|} std\+::ios\+::binary)
+\item 
+\#define \mbox{\hyperlink{block__log_8cpp_aaf68571e96842f6a43dab5c1a97cd923}{LOG\+\_\+\+WRITE}}~(std\+::ios\+::out \texorpdfstring{$\vert$}{|} std\+::ios\+::binary \texorpdfstring{$\vert$}{|} std\+::ios\+::app)
+\item 
+\#define \mbox{\hyperlink{block__log_8cpp_a6f0acfbd73600c63b0e08ce1f46057c8}{LOG\+\_\+\+RW}}~( std\+::ios\+::in \texorpdfstring{$\vert$}{|} std\+::ios\+::out \texorpdfstring{$\vert$}{|} std\+::ios\+::binary )
+\item 
+\#define \mbox{\hyperlink{block__log_8cpp_ac45b3ac31205498f15768648d162af9c}{LOG\+\_\+\+WRITE\+\_\+C}}~"{}ab+"{}
+\item 
+\#define \mbox{\hyperlink{block__log_8cpp_a644b2e9b450d4e270de82f6fd641d064}{LOG\+\_\+\+RW\+\_\+C}}~"{}rb+"{}
+\item 
+\#define \mbox{\hyperlink{block__log_8cpp_a61f5167b6b67be986af6e081a925267f}{FC\+\_\+\+FOPEN}}(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},  m)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1detail_a7719a8d16b3516f5190dd1ba2b79f3c0}{sysio\+::chain\+::detail\+::unique\+\_\+file}} = std\+::unique\+\_\+ptr$<$FILE, decltype(\&fclose)$>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+constexpr \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{namespacesysio_1_1chain_1_1detail_a0ec7620d9c4f228b1fac2049a5de16bf}{sysio\+::chain\+::detail\+::buffer\+\_\+location\+\_\+to\+\_\+file\+\_\+location}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} buffer\+\_\+location)
+\item 
+constexpr \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{namespacesysio_1_1chain_1_1detail_a2130cf67bd9c71a07c642590b3ff434f}{sysio\+::chain\+::detail\+::file\+\_\+location\+\_\+to\+\_\+buffer\+\_\+location}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} file\+\_\+location)
+\item 
+void \mbox{\hyperlink{block__log_8cpp_a89d0b2651280e79120d0aad7f10b9f92}{block\+\_\+log\+\_\+set\+\_\+buff\+\_\+len}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})
+\begin{DoxyCompactList}\small\item\em \doxylink{namespacesysio_1_1chain}{sysio\+::chain} \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+constexpr \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{namespacesysio_1_1chain_1_1detail_a0edc30f70978f937e139af24359d8654}{sysio\+::chain\+::detail\+::pruned\+\_\+version\+\_\+flag}} = 1$<$$<$31
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{block__log_8cpp_a61f5167b6b67be986af6e081a925267f}\index{block\_log.cpp@{block\_log.cpp}!FC\_FOPEN@{FC\_FOPEN}}
+\index{FC\_FOPEN@{FC\_FOPEN}!block\_log.cpp@{block\_log.cpp}}
+\doxysubsubsection{\texorpdfstring{FC\_FOPEN}{FC\_FOPEN}}
+{\footnotesize\ttfamily \label{block__log_8cpp_a61f5167b6b67be986af6e081a925267f} 
+\#define FC\+\_\+\+FOPEN(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}}{, }\item[{}]{m}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{fopen(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\ m)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{block__log_8cpp_source_l00016}{16}} of file \mbox{\hyperlink{block__log_8cpp_source}{block\+\_\+log.\+cpp}}.
+
+\Hypertarget{block__log_8cpp_a3497123c2fea68436d49bf8958cb4a16}\index{block\_log.cpp@{block\_log.cpp}!LOG\_READ@{LOG\_READ}}
+\index{LOG\_READ@{LOG\_READ}!block\_log.cpp@{block\_log.cpp}}
+\doxysubsubsection{\texorpdfstring{LOG\_READ}{LOG\_READ}}
+{\footnotesize\ttfamily \label{block__log_8cpp_a3497123c2fea68436d49bf8958cb4a16} 
+\#define LOG\+\_\+\+READ~(std\+::ios\+::in \texorpdfstring{$\vert$}{|} std\+::ios\+::binary)}
+
+
+
+Definition at line \mbox{\hyperlink{block__log_8cpp_source_l00009}{9}} of file \mbox{\hyperlink{block__log_8cpp_source}{block\+\_\+log.\+cpp}}.
+
+\Hypertarget{block__log_8cpp_a6f0acfbd73600c63b0e08ce1f46057c8}\index{block\_log.cpp@{block\_log.cpp}!LOG\_RW@{LOG\_RW}}
+\index{LOG\_RW@{LOG\_RW}!block\_log.cpp@{block\_log.cpp}}
+\doxysubsubsection{\texorpdfstring{LOG\_RW}{LOG\_RW}}
+{\footnotesize\ttfamily \label{block__log_8cpp_a6f0acfbd73600c63b0e08ce1f46057c8} 
+\#define LOG\+\_\+\+RW~( std\+::ios\+::in \texorpdfstring{$\vert$}{|} std\+::ios\+::out \texorpdfstring{$\vert$}{|} std\+::ios\+::binary )}
+
+
+
+Definition at line \mbox{\hyperlink{block__log_8cpp_source_l00011}{11}} of file \mbox{\hyperlink{block__log_8cpp_source}{block\+\_\+log.\+cpp}}.
+
+\Hypertarget{block__log_8cpp_a644b2e9b450d4e270de82f6fd641d064}\index{block\_log.cpp@{block\_log.cpp}!LOG\_RW\_C@{LOG\_RW\_C}}
+\index{LOG\_RW\_C@{LOG\_RW\_C}!block\_log.cpp@{block\_log.cpp}}
+\doxysubsubsection{\texorpdfstring{LOG\_RW\_C}{LOG\_RW\_C}}
+{\footnotesize\ttfamily \label{block__log_8cpp_a644b2e9b450d4e270de82f6fd641d064} 
+\#define LOG\+\_\+\+RW\+\_\+C~"{}rb+"{}}
+
+
+
+Definition at line \mbox{\hyperlink{block__log_8cpp_source_l00013}{13}} of file \mbox{\hyperlink{block__log_8cpp_source}{block\+\_\+log.\+cpp}}.
+
+\Hypertarget{block__log_8cpp_aaf68571e96842f6a43dab5c1a97cd923}\index{block\_log.cpp@{block\_log.cpp}!LOG\_WRITE@{LOG\_WRITE}}
+\index{LOG\_WRITE@{LOG\_WRITE}!block\_log.cpp@{block\_log.cpp}}
+\doxysubsubsection{\texorpdfstring{LOG\_WRITE}{LOG\_WRITE}}
+{\footnotesize\ttfamily \label{block__log_8cpp_aaf68571e96842f6a43dab5c1a97cd923} 
+\#define LOG\+\_\+\+WRITE~(std\+::ios\+::out \texorpdfstring{$\vert$}{|} std\+::ios\+::binary \texorpdfstring{$\vert$}{|} std\+::ios\+::app)}
+
+
+
+Definition at line \mbox{\hyperlink{block__log_8cpp_source_l00010}{10}} of file \mbox{\hyperlink{block__log_8cpp_source}{block\+\_\+log.\+cpp}}.
+
+\Hypertarget{block__log_8cpp_ac45b3ac31205498f15768648d162af9c}\index{block\_log.cpp@{block\_log.cpp}!LOG\_WRITE\_C@{LOG\_WRITE\_C}}
+\index{LOG\_WRITE\_C@{LOG\_WRITE\_C}!block\_log.cpp@{block\_log.cpp}}
+\doxysubsubsection{\texorpdfstring{LOG\_WRITE\_C}{LOG\_WRITE\_C}}
+{\footnotesize\ttfamily \label{block__log_8cpp_ac45b3ac31205498f15768648d162af9c} 
+\#define LOG\+\_\+\+WRITE\+\_\+C~"{}ab+"{}}
+
+
+
+Definition at line \mbox{\hyperlink{block__log_8cpp_source_l00012}{12}} of file \mbox{\hyperlink{block__log_8cpp_source}{block\+\_\+log.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{block__log_8cpp_a89d0b2651280e79120d0aad7f10b9f92}\index{block\_log.cpp@{block\_log.cpp}!block\_log\_set\_buff\_len@{block\_log\_set\_buff\_len}}
+\index{block\_log\_set\_buff\_len@{block\_log\_set\_buff\_len}!block\_log.cpp@{block\_log.cpp}}
+\doxysubsubsection{\texorpdfstring{block\_log\_set\_buff\_len()}{block\_log\_set\_buff\_len()}}
+{\footnotesize\ttfamily \label{block__log_8cpp_a89d0b2651280e79120d0aad7f10b9f92} 
+void block\+\_\+log\+\_\+set\+\_\+buff\+\_\+len (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{len}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{block__log_8cpp_source_l01432}{1432}} of file \mbox{\hyperlink{block__log_8cpp_source}{block\+\_\+log.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01432\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01433\ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1detail_1_1reverse__iterator_a52163ca3aca71df680e1b934d8bfb187}{sysio::chain::detail::reverse\_iterator::\_buf\_len}}\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}};}
+\DoxyCodeLine{01434\ \}}
+
+\end{DoxyCode}

@@ -1,0 +1,156 @@
+\doxysection{libraries/sys-\/vm/tests/max\+\_\+nested\+\_\+structures\+\_\+tests.cpp File Reference}
+\hypertarget{max__nested__structures__tests_8cpp}{}\label{max__nested__structures__tests_8cpp}\index{libraries/sys-\/vm/tests/max\_nested\_structures\_tests.cpp@{libraries/sys-\/vm/tests/max\_nested\_structures\_tests.cpp}}
+{\ttfamily \#include $<$sysio/vm/backend.\+hpp$>$}\newline
+{\ttfamily \#include "{}utils.\+hpp"{}}\newline
+{\ttfamily \#include $<$catch2/catch.\+hpp$>$}\newline
+Include dependency graph for max\+\_\+nested\+\_\+structures\+\_\+tests.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{max__nested__structures__tests_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{max__nested__structures__tests_8cpp_ad81bc39440c76abfb468ae32d3a8dc6e}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Test max\+\_\+nested\+\_\+structures default"{}, "{}\mbox{[}max\+\_\+nested\+\_\+structures\+\_\+test\mbox{]}"{})
+\item 
+\mbox{\hyperlink{max__nested__structures__tests_8cpp_afb08a31310bffb4240132b9d406ed979}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Test max\+\_\+nested\+\_\+structures unlimited"{}, "{}\mbox{[}max\+\_\+nested\+\_\+structures\+\_\+test\mbox{]}"{})
+\item 
+\mbox{\hyperlink{max__nested__structures__tests_8cpp_a3646952c511924e44724df8a48fce12b}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Test max\+\_\+nested\+\_\+structures static fail"{}, "{}\mbox{[}max\+\_\+nested\+\_\+structures\+\_\+test\mbox{]}"{})
+\item 
+\mbox{\hyperlink{max__nested__structures__tests_8cpp_a4ed2ca248a3116fb54bb8003a19372d3}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Test max\+\_\+nested\+\_\+structures static pass"{}, "{}\mbox{[}max\+\_\+nested\+\_\+structures\+\_\+test\mbox{]}"{})
+\item 
+\mbox{\hyperlink{max__nested__structures__tests_8cpp_a63cfaa6212ac6ccec100dbd76ad5cb5b}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Test max\+\_\+nested\+\_\+structures dynamic fail"{}, "{}\mbox{[}max\+\_\+nested\+\_\+structures\+\_\+test\mbox{]}"{})
+\item 
+\mbox{\hyperlink{max__nested__structures__tests_8cpp_a1ed9cf0577abe59273356d9c27446af7}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Test max\+\_\+nested\+\_\+structures dynamic pass"{}, "{}\mbox{[}max\+\_\+nested\+\_\+structures\+\_\+test\mbox{]}"{})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+wasm\+\_\+allocator \mbox{\hyperlink{max__nested__structures__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{max__nested__structures__tests_8cpp_ad81bc39440c76abfb468ae32d3a8dc6e}\index{max\_nested\_structures\_tests.cpp@{max\_nested\_structures\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!max\_nested\_structures\_tests.cpp@{max\_nested\_structures\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/6]}}
+{\footnotesize\ttfamily \label{max__nested__structures__tests_8cpp_ad81bc39440c76abfb468ae32d3a8dc6e} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Test max\+\_\+nested\+\_\+structures default"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}max\+\_\+nested\+\_\+structures\+\_\+test\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{max__nested__structures__tests_8cpp_source_l00036}{36}} of file \mbox{\hyperlink{max__nested__structures__tests_8cpp_source}{max\+\_\+nested\+\_\+structures\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00037\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType>}};}
+\DoxyCodeLine{00038\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend}}(depth\_2\_wasm,\ \&\mbox{\hyperlink{max__nested__structures__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00039\ \}}
+
+\end{DoxyCode}
+\Hypertarget{max__nested__structures__tests_8cpp_a63cfaa6212ac6ccec100dbd76ad5cb5b}\index{max\_nested\_structures\_tests.cpp@{max\_nested\_structures\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!max\_nested\_structures\_tests.cpp@{max\_nested\_structures\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/6]}}
+{\footnotesize\ttfamily \label{max__nested__structures__tests_8cpp_a63cfaa6212ac6ccec100dbd76ad5cb5b} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Test max\+\_\+nested\+\_\+structures dynamic fail"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}max\+\_\+nested\+\_\+structures\+\_\+test\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{max__nested__structures__tests_8cpp_source_l00056}{56}} of file \mbox{\hyperlink{max__nested__structures__tests_8cpp_source}{max\+\_\+nested\+\_\+structures\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00057\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ dynamic\_options>}};}
+\DoxyCodeLine{00058\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(depth\_2\_wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\{1\}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{00059\ \}}
+
+\end{DoxyCode}
+\Hypertarget{max__nested__structures__tests_8cpp_a1ed9cf0577abe59273356d9c27446af7}\index{max\_nested\_structures\_tests.cpp@{max\_nested\_structures\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!max\_nested\_structures\_tests.cpp@{max\_nested\_structures\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [3/6]}}
+{\footnotesize\ttfamily \label{max__nested__structures__tests_8cpp_a1ed9cf0577abe59273356d9c27446af7} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Test max\+\_\+nested\+\_\+structures dynamic pass"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}max\+\_\+nested\+\_\+structures\+\_\+test\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{max__nested__structures__tests_8cpp_source_l00061}{61}} of file \mbox{\hyperlink{max__nested__structures__tests_8cpp_source}{max\+\_\+nested\+\_\+structures\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00062\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ dynamic\_options>}};}
+\DoxyCodeLine{00063\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend}}(depth\_2\_wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\{2\});}
+\DoxyCodeLine{00064\ \}}
+
+\end{DoxyCode}
+\Hypertarget{max__nested__structures__tests_8cpp_a3646952c511924e44724df8a48fce12b}\index{max\_nested\_structures\_tests.cpp@{max\_nested\_structures\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!max\_nested\_structures\_tests.cpp@{max\_nested\_structures\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [4/6]}}
+{\footnotesize\ttfamily \label{max__nested__structures__tests_8cpp_a3646952c511924e44724df8a48fce12b} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Test max\+\_\+nested\+\_\+structures static fail"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}max\+\_\+nested\+\_\+structures\+\_\+test\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{max__nested__structures__tests_8cpp_source_l00046}{46}} of file \mbox{\hyperlink{max__nested__structures__tests_8cpp_source}{max\+\_\+nested\+\_\+structures\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00047\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ static\_options\_1>}};}
+\DoxyCodeLine{00048\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(depth\_2\_wasm,\ \&\mbox{\hyperlink{max__nested__structures__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{00049\ \}}
+
+\end{DoxyCode}
+\Hypertarget{max__nested__structures__tests_8cpp_a4ed2ca248a3116fb54bb8003a19372d3}\index{max\_nested\_structures\_tests.cpp@{max\_nested\_structures\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!max\_nested\_structures\_tests.cpp@{max\_nested\_structures\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [5/6]}}
+{\footnotesize\ttfamily \label{max__nested__structures__tests_8cpp_a4ed2ca248a3116fb54bb8003a19372d3} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Test max\+\_\+nested\+\_\+structures static pass"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}max\+\_\+nested\+\_\+structures\+\_\+test\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{max__nested__structures__tests_8cpp_source_l00051}{51}} of file \mbox{\hyperlink{max__nested__structures__tests_8cpp_source}{max\+\_\+nested\+\_\+structures\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00052\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ static\_options\_2>}};}
+\DoxyCodeLine{00053\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend}}(depth\_2\_wasm,\ \&\mbox{\hyperlink{max__nested__structures__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00054\ \}}
+
+\end{DoxyCode}
+\Hypertarget{max__nested__structures__tests_8cpp_afb08a31310bffb4240132b9d406ed979}\index{max\_nested\_structures\_tests.cpp@{max\_nested\_structures\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!max\_nested\_structures\_tests.cpp@{max\_nested\_structures\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [6/6]}}
+{\footnotesize\ttfamily \label{max__nested__structures__tests_8cpp_afb08a31310bffb4240132b9d406ed979} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Test max\+\_\+nested\+\_\+structures unlimited"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}max\+\_\+nested\+\_\+structures\+\_\+test\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{max__nested__structures__tests_8cpp_source_l00041}{41}} of file \mbox{\hyperlink{max__nested__structures__tests_8cpp_source}{max\+\_\+nested\+\_\+structures\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00042\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ empty\_options>}};}
+\DoxyCodeLine{00043\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend}}(depth\_2\_wasm,\ \&\mbox{\hyperlink{max__nested__structures__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00044\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{max__nested__structures__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}\index{max\_nested\_structures\_tests.cpp@{max\_nested\_structures\_tests.cpp}!wa@{wa}}
+\index{wa@{wa}!max\_nested\_structures\_tests.cpp@{max\_nested\_structures\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{wa}{wa}}
+{\footnotesize\ttfamily \label{max__nested__structures__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89} 
+wasm\+\_\+allocator wa\hspace{0.3cm}{\ttfamily [extern]}}
+
+
+
+Definition at line \mbox{\hyperlink{libraries_2sys-vm_2tests_2main_8cpp_source_l00010}{10}} of file \mbox{\hyperlink{libraries_2sys-vm_2tests_2main_8cpp_source}{main.\+cpp}}.
+

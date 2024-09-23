@@ -1,0 +1,104 @@
+\doxysection{libraries/fc/libraries/ff/libff/algebra/curves/mnt/mnt6/mnt6\+\_\+pairing.cpp File Reference}
+\hypertarget{mnt6__pairing_8cpp}{}\label{mnt6__pairing_8cpp}\index{libraries/fc/libraries/ff/libff/algebra/curves/mnt/mnt6/mnt6\_pairing.cpp@{libraries/fc/libraries/ff/libff/algebra/curves/mnt/mnt6/mnt6\_pairing.cpp}}
+{\ttfamily \#include $<$cassert$>$}\newline
+{\ttfamily \#include $<$libff/algebra/curves/mnt/mnt6/mnt6\+\_\+g1.\+hpp$>$}\newline
+{\ttfamily \#include $<$libff/algebra/curves/mnt/mnt6/mnt6\+\_\+g2.\+hpp$>$}\newline
+{\ttfamily \#include $<$libff/algebra/curves/mnt/mnt6/mnt6\+\_\+init.\+hpp$>$}\newline
+{\ttfamily \#include $<$libff/algebra/curves/mnt/mnt6/mnt6\+\_\+pairing.\+hpp$>$}\newline
+{\ttfamily \#include $<$libff/algebra/scalar\+\_\+multiplication/wnaf.\+hpp$>$}\newline
+{\ttfamily \#include $<$libff/common/profiling.\+hpp$>$}\newline
+Include dependency graph for mnt6\+\_\+pairing.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{mnt6__pairing_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structlibff_1_1extended__mnt6___g2__projective}{libff\+::extended\+\_\+mnt6\+\_\+\+G2\+\_\+projective}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacelibff}{libff}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+std\+::ostream \& \mbox{\hyperlink{namespacelibff_a6a08db502bc6948a5336f796c5cc6ca1}{libff\+::operator$<$$<$}} (std\+::ostream \&out, const \mbox{\hyperlink{structlibff_1_1mnt6__ate___g1__precomp}{mnt6\+\_\+ate\+\_\+\+G1\+\_\+precomp}} \&prec\+\_\+P)
+\item 
+std\+::istream \& \mbox{\hyperlink{namespacelibff_a2c1bea3965ce4278db2298fb2b5b81ac}{libff\+::operator$>$$>$}} (std\+::istream \&in, \mbox{\hyperlink{structlibff_1_1mnt6__ate___g1__precomp}{mnt6\+\_\+ate\+\_\+\+G1\+\_\+precomp}} \&prec\+\_\+P)
+\item 
+std\+::ostream \& \mbox{\hyperlink{namespacelibff_a7e683897c66bdfdc9cade9e1a830f96a}{libff\+::operator$<$$<$}} (std\+::ostream \&out, const \mbox{\hyperlink{structlibff_1_1mnt6__ate__dbl__coeffs}{mnt6\+\_\+ate\+\_\+dbl\+\_\+coeffs}} \&dc)
+\item 
+std\+::istream \& \mbox{\hyperlink{namespacelibff_a3605e13958ebb0d2bf4848c6eb5352ff}{libff\+::operator$>$$>$}} (std\+::istream \&in, \mbox{\hyperlink{structlibff_1_1mnt6__ate__dbl__coeffs}{mnt6\+\_\+ate\+\_\+dbl\+\_\+coeffs}} \&dc)
+\item 
+std\+::ostream \& \mbox{\hyperlink{namespacelibff_a776072f6352296e921d9ddf73cee10e1}{libff\+::operator$<$$<$}} (std\+::ostream \&out, const \mbox{\hyperlink{structlibff_1_1mnt6__ate__add__coeffs}{mnt6\+\_\+ate\+\_\+add\+\_\+coeffs}} \&ac)
+\item 
+std\+::istream \& \mbox{\hyperlink{namespacelibff_a377703b344630c1e3736397f1f7731e7}{libff\+::operator$>$$>$}} (std\+::istream \&in, \mbox{\hyperlink{structlibff_1_1mnt6__ate__add__coeffs}{mnt6\+\_\+ate\+\_\+add\+\_\+coeffs}} \&ac)
+\item 
+std\+::ostream \& \mbox{\hyperlink{namespacelibff_ab74b067b2dfd563bf20a0a1adf181d6d}{libff\+::operator$<$$<$}} (std\+::ostream \&out, const \mbox{\hyperlink{structlibff_1_1mnt6__ate___g2__precomp}{mnt6\+\_\+ate\+\_\+\+G2\+\_\+precomp}} \&prec\+\_\+Q)
+\item 
+std\+::istream \& \mbox{\hyperlink{namespacelibff_ae48d8131293955190f8dc8be5532357a}{libff\+::operator$>$$>$}} (std\+::istream \&in, \mbox{\hyperlink{structlibff_1_1mnt6__ate___g2__precomp}{mnt6\+\_\+ate\+\_\+\+G2\+\_\+precomp}} \&prec\+\_\+Q)
+\item 
+\mbox{\hyperlink{namespacelibff_a05c88eafe15e4902420decd263b7552a}{mnt6\+\_\+\+Fq6}} \mbox{\hyperlink{namespacelibff_a25a40bf5a3dae3f0aa1e1058ac5b5ad7}{libff\+::mnt6\+\_\+final\+\_\+exponentiation\+\_\+last\+\_\+chunk}} (const \mbox{\hyperlink{namespacelibff_a05c88eafe15e4902420decd263b7552a}{mnt6\+\_\+\+Fq6}} \&elt, const \mbox{\hyperlink{namespacelibff_a05c88eafe15e4902420decd263b7552a}{mnt6\+\_\+\+Fq6}} \&elt\+\_\+inv)
+\item 
+\mbox{\hyperlink{namespacelibff_a05c88eafe15e4902420decd263b7552a}{mnt6\+\_\+\+Fq6}} \mbox{\hyperlink{namespacelibff_a98cecad0beae70c255ac9ca178973bf3}{libff\+::mnt6\+\_\+final\+\_\+exponentiation\+\_\+first\+\_\+chunk}} (const \mbox{\hyperlink{namespacelibff_a05c88eafe15e4902420decd263b7552a}{mnt6\+\_\+\+Fq6}} \&elt, const \mbox{\hyperlink{namespacelibff_a05c88eafe15e4902420decd263b7552a}{mnt6\+\_\+\+Fq6}} \&elt\+\_\+inv)
+\item 
+\mbox{\hyperlink{namespacelibff_a980f01e00963b1deb05e1b59e9ebe5ec}{mnt6\+\_\+\+GT}} \mbox{\hyperlink{namespacelibff_a090c6829d62b7f9516b91406926cd87f}{libff\+::mnt6\+\_\+final\+\_\+exponentiation}} (const \mbox{\hyperlink{namespacelibff_a05c88eafe15e4902420decd263b7552a}{mnt6\+\_\+\+Fq6}} \&elt)
+\item 
+\mbox{\hyperlink{structlibff_1_1mnt6__affine__ate___g1__precomputation}{mnt6\+\_\+affine\+\_\+ate\+\_\+\+G1\+\_\+precomputation}} \mbox{\hyperlink{namespacelibff_abe383e7b0590959ea0e418104cbbced7}{libff\+::mnt6\+\_\+affine\+\_\+ate\+\_\+precompute\+\_\+\+G1}} (const \mbox{\hyperlink{classlibff_1_1mnt6___g1}{mnt6\+\_\+\+G1}} \&\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}})
+\item 
+\mbox{\hyperlink{structlibff_1_1mnt6__affine__ate___g2__precomputation}{mnt6\+\_\+affine\+\_\+ate\+\_\+\+G2\+\_\+precomputation}} \mbox{\hyperlink{namespacelibff_aee3090d964cd83e8fb1e505cf7180963}{libff\+::mnt6\+\_\+affine\+\_\+ate\+\_\+precompute\+\_\+\+G2}} (const \mbox{\hyperlink{classlibff_1_1mnt6___g2}{mnt6\+\_\+\+G2}} \&Q)
+\item 
+\mbox{\hyperlink{namespacelibff_a05c88eafe15e4902420decd263b7552a}{mnt6\+\_\+\+Fq6}} \mbox{\hyperlink{namespacelibff_ae16d9451848e585e644eb7a7d0670384}{libff\+::mnt6\+\_\+affine\+\_\+ate\+\_\+miller\+\_\+loop}} (const \mbox{\hyperlink{structlibff_1_1mnt6__affine__ate___g1__precomputation}{mnt6\+\_\+affine\+\_\+ate\+\_\+\+G1\+\_\+precomputation}} \&prec\+\_\+P, const \mbox{\hyperlink{structlibff_1_1mnt6__affine__ate___g2__precomputation}{mnt6\+\_\+affine\+\_\+ate\+\_\+\+G2\+\_\+precomputation}} \&prec\+\_\+Q)
+\item 
+void \mbox{\hyperlink{namespacelibff_ae63dd7056bb2594b56b2d296951c62a7}{libff\+::doubling\+\_\+step\+\_\+for\+\_\+flipped\+\_\+miller\+\_\+loop}} (\mbox{\hyperlink{structlibff_1_1extended__mnt6___g2__projective}{extended\+\_\+mnt6\+\_\+\+G2\+\_\+projective}} \&current, \mbox{\hyperlink{structlibff_1_1mnt6__ate__dbl__coeffs}{mnt6\+\_\+ate\+\_\+dbl\+\_\+coeffs}} \&dc)
+\item 
+void \mbox{\hyperlink{namespacelibff_ab4fd21a1885d9bb2b178d1dc31903660}{libff\+::mixed\+\_\+addition\+\_\+step\+\_\+for\+\_\+flipped\+\_\+miller\+\_\+loop}} (const \mbox{\hyperlink{namespacelibff_ad13fd48c480a123c223f4587ac92321b}{mnt6\+\_\+\+Fq3}} base\+\_\+X, const \mbox{\hyperlink{namespacelibff_ad13fd48c480a123c223f4587ac92321b}{mnt6\+\_\+\+Fq3}} base\+\_\+Y, const \mbox{\hyperlink{namespacelibff_ad13fd48c480a123c223f4587ac92321b}{mnt6\+\_\+\+Fq3}} base\+\_\+\+Y\+\_\+squared, \mbox{\hyperlink{structlibff_1_1extended__mnt6___g2__projective}{extended\+\_\+mnt6\+\_\+\+G2\+\_\+projective}} \&current, \mbox{\hyperlink{structlibff_1_1mnt6__ate__add__coeffs}{mnt6\+\_\+ate\+\_\+add\+\_\+coeffs}} \&ac)
+\item 
+\mbox{\hyperlink{structlibff_1_1mnt6__ate___g1__precomp}{mnt6\+\_\+ate\+\_\+\+G1\+\_\+precomp}} \mbox{\hyperlink{namespacelibff_a282b69dac7844d68833acbd6a8b9c1b8}{libff\+::mnt6\+\_\+ate\+\_\+precompute\+\_\+\+G1}} (const \mbox{\hyperlink{classlibff_1_1mnt6___g1}{mnt6\+\_\+\+G1}} \&\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}})
+\item 
+\mbox{\hyperlink{structlibff_1_1mnt6__ate___g2__precomp}{mnt6\+\_\+ate\+\_\+\+G2\+\_\+precomp}} \mbox{\hyperlink{namespacelibff_a2e98514f1a39e8d6088850c72bc795de}{libff\+::mnt6\+\_\+ate\+\_\+precompute\+\_\+\+G2}} (const \mbox{\hyperlink{classlibff_1_1mnt6___g2}{mnt6\+\_\+\+G2}} \&Q)
+\item 
+\mbox{\hyperlink{namespacelibff_a05c88eafe15e4902420decd263b7552a}{mnt6\+\_\+\+Fq6}} \mbox{\hyperlink{namespacelibff_a0fad643f9f7eaed1708e9bf9eca123fa}{libff\+::mnt6\+\_\+ate\+\_\+miller\+\_\+loop}} (const \mbox{\hyperlink{structlibff_1_1mnt6__ate___g1__precomp}{mnt6\+\_\+ate\+\_\+\+G1\+\_\+precomp}} \&prec\+\_\+P, const \mbox{\hyperlink{structlibff_1_1mnt6__ate___g2__precomp}{mnt6\+\_\+ate\+\_\+\+G2\+\_\+precomp}} \&prec\+\_\+Q)
+\item 
+\mbox{\hyperlink{namespacelibff_a05c88eafe15e4902420decd263b7552a}{mnt6\+\_\+\+Fq6}} \mbox{\hyperlink{namespacelibff_aaf20a3c32edcf3fae170f1419f1522b1}{libff\+::mnt6\+\_\+ate\+\_\+double\+\_\+miller\+\_\+loop}} (const \mbox{\hyperlink{structlibff_1_1mnt6__ate___g1__precomp}{mnt6\+\_\+ate\+\_\+\+G1\+\_\+precomp}} \&prec\+\_\+\+P1, const \mbox{\hyperlink{structlibff_1_1mnt6__ate___g2__precomp}{mnt6\+\_\+ate\+\_\+\+G2\+\_\+precomp}} \&prec\+\_\+\+Q1, const \mbox{\hyperlink{structlibff_1_1mnt6__ate___g1__precomp}{mnt6\+\_\+ate\+\_\+\+G1\+\_\+precomp}} \&prec\+\_\+\+P2, const \mbox{\hyperlink{structlibff_1_1mnt6__ate___g2__precomp}{mnt6\+\_\+ate\+\_\+\+G2\+\_\+precomp}} \&prec\+\_\+\+Q2)
+\item 
+\mbox{\hyperlink{namespacelibff_a05c88eafe15e4902420decd263b7552a}{mnt6\+\_\+\+Fq6}} \mbox{\hyperlink{namespacelibff_a79b23d4ed2fa9e1471f068b498acbd14}{libff\+::mnt6\+\_\+ate\+\_\+pairing}} (const \mbox{\hyperlink{classlibff_1_1mnt6___g1}{mnt6\+\_\+\+G1}} \&\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}}, const \mbox{\hyperlink{classlibff_1_1mnt6___g2}{mnt6\+\_\+\+G2}} \&Q)
+\item 
+\mbox{\hyperlink{namespacelibff_a980f01e00963b1deb05e1b59e9ebe5ec}{mnt6\+\_\+\+GT}} \mbox{\hyperlink{namespacelibff_a297dfe9a15af7a001cda37669624c5bc}{libff\+::mnt6\+\_\+ate\+\_\+reduced\+\_\+pairing}} (const \mbox{\hyperlink{classlibff_1_1mnt6___g1}{mnt6\+\_\+\+G1}} \&\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}}, const \mbox{\hyperlink{classlibff_1_1mnt6___g2}{mnt6\+\_\+\+G2}} \&Q)
+\item 
+\mbox{\hyperlink{namespacelibff_a4850e69aa8b81df1c4e76af75a4ca189}{mnt6\+\_\+\+G1\+\_\+precomp}} \mbox{\hyperlink{namespacelibff_ad975e1a663cdff44dc94342055ef5036}{libff\+::mnt6\+\_\+precompute\+\_\+\+G1}} (const \mbox{\hyperlink{classlibff_1_1mnt6___g1}{mnt6\+\_\+\+G1}} \&\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}})
+\item 
+\mbox{\hyperlink{namespacelibff_a9550dc39139de99491a0aa8e5764d719}{mnt6\+\_\+\+G2\+\_\+precomp}} \mbox{\hyperlink{namespacelibff_af3ddbcf0a87afa46f9351c300de2696e}{libff\+::mnt6\+\_\+precompute\+\_\+\+G2}} (const \mbox{\hyperlink{classlibff_1_1mnt6___g2}{mnt6\+\_\+\+G2}} \&Q)
+\item 
+\mbox{\hyperlink{namespacelibff_a05c88eafe15e4902420decd263b7552a}{mnt6\+\_\+\+Fq6}} \mbox{\hyperlink{namespacelibff_a3ad50cd35382dbaa4fe4d1a77c2055f6}{libff\+::mnt6\+\_\+miller\+\_\+loop}} (const \mbox{\hyperlink{namespacelibff_a4850e69aa8b81df1c4e76af75a4ca189}{mnt6\+\_\+\+G1\+\_\+precomp}} \&prec\+\_\+P, const \mbox{\hyperlink{namespacelibff_a9550dc39139de99491a0aa8e5764d719}{mnt6\+\_\+\+G2\+\_\+precomp}} \&prec\+\_\+Q)
+\item 
+\mbox{\hyperlink{namespacelibff_a05c88eafe15e4902420decd263b7552a}{mnt6\+\_\+\+Fq6}} \mbox{\hyperlink{namespacelibff_a651d5c86d39de0e9cf6f1cf184880079}{libff\+::mnt6\+\_\+double\+\_\+miller\+\_\+loop}} (const \mbox{\hyperlink{namespacelibff_a4850e69aa8b81df1c4e76af75a4ca189}{mnt6\+\_\+\+G1\+\_\+precomp}} \&prec\+\_\+\+P1, const \mbox{\hyperlink{namespacelibff_a9550dc39139de99491a0aa8e5764d719}{mnt6\+\_\+\+G2\+\_\+precomp}} \&prec\+\_\+\+Q1, const \mbox{\hyperlink{namespacelibff_a4850e69aa8b81df1c4e76af75a4ca189}{mnt6\+\_\+\+G1\+\_\+precomp}} \&prec\+\_\+\+P2, const \mbox{\hyperlink{namespacelibff_a9550dc39139de99491a0aa8e5764d719}{mnt6\+\_\+\+G2\+\_\+precomp}} \&prec\+\_\+\+Q2)
+\item 
+\mbox{\hyperlink{namespacelibff_a05c88eafe15e4902420decd263b7552a}{mnt6\+\_\+\+Fq6}} \mbox{\hyperlink{namespacelibff_a8aaa35918ab963e8ee8accd0ed67451c}{libff\+::mnt6\+\_\+pairing}} (const \mbox{\hyperlink{classlibff_1_1mnt6___g1}{mnt6\+\_\+\+G1}} \&\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}}, const \mbox{\hyperlink{classlibff_1_1mnt6___g2}{mnt6\+\_\+\+G2}} \&Q)
+\item 
+\mbox{\hyperlink{namespacelibff_a980f01e00963b1deb05e1b59e9ebe5ec}{mnt6\+\_\+\+GT}} \mbox{\hyperlink{namespacelibff_a31123de4f5948bcbed068d9e4cae7195}{libff\+::mnt6\+\_\+reduced\+\_\+pairing}} (const \mbox{\hyperlink{classlibff_1_1mnt6___g1}{mnt6\+\_\+\+G1}} \&\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}}, const \mbox{\hyperlink{classlibff_1_1mnt6___g2}{mnt6\+\_\+\+G2}} \&Q)
+\item 
+\mbox{\hyperlink{namespacelibff_a980f01e00963b1deb05e1b59e9ebe5ec}{mnt6\+\_\+\+GT}} \mbox{\hyperlink{namespacelibff_ad83ad1f2d8128601ca173c358f80990e}{libff\+::mnt6\+\_\+affine\+\_\+reduced\+\_\+pairing}} (const \mbox{\hyperlink{classlibff_1_1mnt6___g1}{mnt6\+\_\+\+G1}} \&\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}}, const \mbox{\hyperlink{classlibff_1_1mnt6___g2}{mnt6\+\_\+\+G2}} \&Q)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Implementation of interfaces for pairing operations on MNT6.
+
+See \doxylink{mnt6__pairing_8hpp}{mnt6\+\_\+pairing.\+hpp} .
+
+\begin{DoxyAuthor}{Author}
+This file is part of libff, developed by SCIPR Lab and contributors (see AUTHORS). 
+\end{DoxyAuthor}
+\begin{DoxyCopyright}{Copyright}
+MIT license (see LICENSE file) 
+\end{DoxyCopyright}
+
+
+Definition in file \mbox{\hyperlink{mnt6__pairing_8cpp_source}{mnt6\+\_\+pairing.\+cpp}}.
+

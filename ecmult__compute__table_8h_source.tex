@@ -1,0 +1,22 @@
+\doxysection{ecmult\+\_\+compute\+\_\+table.\+h}
+\hypertarget{ecmult__compute__table_8h_source}{}\label{ecmult__compute__table_8h_source}\index{libraries/fc/secp256k1/secp256k1/src/ecmult\_compute\_table.h@{libraries/fc/secp256k1/secp256k1/src/ecmult\_compute\_table.h}}
+\mbox{\hyperlink{ecmult__compute__table_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table_8h_source_l00001}00001\ \textcolor{comment}{/*****************************************************************************************************}}
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table_8h_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2013,\ 2014,\ 2017,\ 2021\ Pieter\ Wuille,\ Andrew\ Poelstra,\ Jonas\ Nick,\ Russell\ O'Connor\ *}}
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table_8h_source_l00003}00003\ \textcolor{comment}{\ *\ Distributed\ under\ the\ MIT\ software\ license,\ see\ the\ accompanying\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table_8h_source_l00004}00004\ \textcolor{comment}{\ *\ file\ COPYING\ or\ https://www.opensource.org/licenses/mit-\/license.php.\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table_8h_source_l00005}00005\ \textcolor{comment}{\ *****************************************************************************************************/}}
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table_8h_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table_8h_source_l00007}00007\ \textcolor{preprocessor}{\#ifndef\ SECP256K1\_ECMULT\_COMPUTE\_TABLE\_H}}
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table_8h_source_l00008}00008\ \textcolor{preprocessor}{\#define\ SECP256K1\_ECMULT\_COMPUTE\_TABLE\_H}}
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table_8h_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table_8h_source_l00010}00010\ \textcolor{comment}{/*\ Construct\ table\ of\ all\ odd\ multiples\ of\ gen\ in\ range\ 1..(2**(window\_g-\/1)-\/1).\ */}}
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table_8h_source_l00011}00011\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_ecmult\_compute\_table(\mbox{\hyperlink{structsecp256k1__ge__storage}{secp256k1\_ge\_storage}}*\ table,\ \textcolor{keywordtype}{int}\ window\_g,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__gej}{secp256k1\_gej}}*\ gen);}
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table_8h_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table_8h_source_l00013}00013\ \textcolor{comment}{/*\ Like\ secp256k1\_ecmult\_compute\_table,\ but\ one\ for\ both\ gen\ and\ gen*2\string^128.\ */}}
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table_8h_source_l00014}00014\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_ecmult\_compute\_two\_tables(\mbox{\hyperlink{structsecp256k1__ge__storage}{secp256k1\_ge\_storage}}*\ table,\ \mbox{\hyperlink{structsecp256k1__ge__storage}{secp256k1\_ge\_storage}}*\ table\_128,\ \textcolor{keywordtype}{int}\ window\_g,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__ge}{secp256k1\_ge}}*\ gen);}
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table_8h_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table_8h_source_l00016}00016\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{/*\ SECP256K1\_ECMULT\_COMPUTE\_TABLE\_H\ */}\textcolor{preprocessor}{}}
+
+\end{DoxyCode}

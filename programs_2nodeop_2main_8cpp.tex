@@ -1,0 +1,296 @@
+\doxysection{programs/nodeop/main.cpp File Reference}
+\hypertarget{programs_2nodeop_2main_8cpp}{}\label{programs_2nodeop_2main_8cpp}\index{programs/nodeop/main.cpp@{programs/nodeop/main.cpp}}
+{\ttfamily \#include $<$appbase/application.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain\+\_\+plugin/chain\+\_\+plugin.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/http\+\_\+plugin/http\+\_\+plugin.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/net\+\_\+plugin/net\+\_\+plugin.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/producer\+\_\+plugin/producer\+\_\+plugin.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/resource\+\_\+monitor\+\_\+plugin/resource\+\_\+monitor\+\_\+plugin.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/version/version.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/log/logger.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/log/logger\+\_\+config.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/log/appender.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/exception/exception.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/dll/runtime\+\_\+symbol\+\_\+info.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/exception/diagnostic\+\_\+information.\+hpp$>$}\newline
+{\ttfamily \#include "{}config.\+hpp"{}}\newline
+Include dependency graph for main.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{programs_2nodeop_2main_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacedetail}{detail}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{programs_2nodeop_2main_8cpp_aaca7161d951febc512af343029761de1}{return\+\_\+codes}} \{ \newline
+\mbox{\hyperlink{programs_2nodeop_2main_8cpp_aaca7161d951febc512af343029761de1aa3277f670231ab10babc706ab8b6dfe3}{OTHER\+\_\+\+FAIL}} = -\/2
+, \mbox{\hyperlink{programs_2nodeop_2main_8cpp_aaca7161d951febc512af343029761de1a1c3494c0a167cf502080fef2ba7e392d}{INITIALIZE\+\_\+\+FAIL}} = -\/1
+, \mbox{\hyperlink{programs_2nodeop_2main_8cpp_aaca7161d951febc512af343029761de1ac7f69f7c9e5aea9b8f54cf02870e2bf8}{SUCCESS}} = 0
+, \mbox{\hyperlink{programs_2nodeop_2main_8cpp_aaca7161d951febc512af343029761de1a660150ee9830d9dde6c013a814618984}{BAD\+\_\+\+ALLOC}} = 1
+, \newline
+\mbox{\hyperlink{programs_2nodeop_2main_8cpp_aaca7161d951febc512af343029761de1a221363d45c0cf958a477d744fbd1a854}{DATABASE\+\_\+\+DIRTY}} = 2
+, \mbox{\hyperlink{programs_2nodeop_2main_8cpp_aaca7161d951febc512af343029761de1a16aec1d31e053c75c58beedc611b5ae6}{FIXED\+\_\+\+REVERSIBLE}} = SUCCESS
+, \mbox{\hyperlink{programs_2nodeop_2main_8cpp_aaca7161d951febc512af343029761de1a8a6b92be770b9f4a37b7b66fee9524a0}{EXTRACTED\+\_\+\+GENESIS}} = SUCCESS
+, \mbox{\hyperlink{programs_2nodeop_2main_8cpp_aaca7161d951febc512af343029761de1a48008637c3835fd1b6331d942a212c4d}{NODE\+\_\+\+MANAGEMENT\+\_\+\+SUCCESS}} = 5
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structfc_1_1logging__config}{fc\+::logging\+\_\+config}} \& \mbox{\hyperlink{namespacedetail_a7ccce9b35f2d32d6af42af40a302d36e}{detail\+::add\+\_\+deep\+\_\+mind\+\_\+logger}} (\mbox{\hyperlink{structfc_1_1logging__config}{fc\+::logging\+\_\+config}} \&\mbox{\hyperlink{classconfig}{config}})
+\item 
+void \mbox{\hyperlink{namespacedetail_a9de2cd0b6fb14bad597633a8c5e01a73}{detail\+::configure\+\_\+logging}} (const bfs\+::path \&config\+\_\+path)
+\item 
+void \mbox{\hyperlink{programs_2nodeop_2main_8cpp_abaf0af9c61c10d5ecdc00eb4fdb87917}{logging\+\_\+conf\+\_\+handler}} ()
+\item 
+void \mbox{\hyperlink{programs_2nodeop_2main_8cpp_a73166cb9cb44aa126b3a0db898360fb1}{initialize\+\_\+logging}} ()
+\item 
+int \mbox{\hyperlink{programs_2nodeop_2main_8cpp_a3c04138a5bfe5d72780bb7e82a18e627}{main}} (int argc, char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{programs_2nodeop_2main_8cpp_aaca7161d951febc512af343029761de1}\index{main.cpp@{main.cpp}!return\_codes@{return\_codes}}
+\index{return\_codes@{return\_codes}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{return\_codes}{return\_codes}}
+{\footnotesize\ttfamily \label{programs_2nodeop_2main_8cpp_aaca7161d951febc512af343029761de1} 
+enum \mbox{\hyperlink{programs_2nodeop_2main_8cpp_aaca7161d951febc512af343029761de1}{return\+\_\+codes}}}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{OTHER\_FAIL@{OTHER\_FAIL}!main.cpp@{main.cpp}}\index{main.cpp@{main.cpp}!OTHER\_FAIL@{OTHER\_FAIL}}}\Hypertarget{programs_2nodeop_2main_8cpp_aaca7161d951febc512af343029761de1aa3277f670231ab10babc706ab8b6dfe3}\label{programs_2nodeop_2main_8cpp_aaca7161d951febc512af343029761de1} 
+OTHER\+\_\+\+FAIL&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{INITIALIZE\_FAIL@{INITIALIZE\_FAIL}!main.cpp@{main.cpp}}\index{main.cpp@{main.cpp}!INITIALIZE\_FAIL@{INITIALIZE\_FAIL}}}\Hypertarget{programs_2nodeop_2main_8cpp_aaca7161d951febc512af343029761de1a1c3494c0a167cf502080fef2ba7e392d}\label{programs_2nodeop_2main_8cpp_aaca7161d951febc512af343029761de1} 
+INITIALIZE\+\_\+\+FAIL&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{SUCCESS@{SUCCESS}!main.cpp@{main.cpp}}\index{main.cpp@{main.cpp}!SUCCESS@{SUCCESS}}}\Hypertarget{programs_2nodeop_2main_8cpp_aaca7161d951febc512af343029761de1ac7f69f7c9e5aea9b8f54cf02870e2bf8}\label{programs_2nodeop_2main_8cpp_aaca7161d951febc512af343029761de1} 
+SUCCESS&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{BAD\_ALLOC@{BAD\_ALLOC}!main.cpp@{main.cpp}}\index{main.cpp@{main.cpp}!BAD\_ALLOC@{BAD\_ALLOC}}}\Hypertarget{programs_2nodeop_2main_8cpp_aaca7161d951febc512af343029761de1a660150ee9830d9dde6c013a814618984}\label{programs_2nodeop_2main_8cpp_aaca7161d951febc512af343029761de1} 
+BAD\+\_\+\+ALLOC&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{DATABASE\_DIRTY@{DATABASE\_DIRTY}!main.cpp@{main.cpp}}\index{main.cpp@{main.cpp}!DATABASE\_DIRTY@{DATABASE\_DIRTY}}}\Hypertarget{programs_2nodeop_2main_8cpp_aaca7161d951febc512af343029761de1a221363d45c0cf958a477d744fbd1a854}\label{programs_2nodeop_2main_8cpp_aaca7161d951febc512af343029761de1} 
+DATABASE\+\_\+\+DIRTY&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{FIXED\_REVERSIBLE@{FIXED\_REVERSIBLE}!main.cpp@{main.cpp}}\index{main.cpp@{main.cpp}!FIXED\_REVERSIBLE@{FIXED\_REVERSIBLE}}}\Hypertarget{programs_2nodeop_2main_8cpp_aaca7161d951febc512af343029761de1a16aec1d31e053c75c58beedc611b5ae6}\label{programs_2nodeop_2main_8cpp_aaca7161d951febc512af343029761de1} 
+FIXED\+\_\+\+REVERSIBLE&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{EXTRACTED\_GENESIS@{EXTRACTED\_GENESIS}!main.cpp@{main.cpp}}\index{main.cpp@{main.cpp}!EXTRACTED\_GENESIS@{EXTRACTED\_GENESIS}}}\Hypertarget{programs_2nodeop_2main_8cpp_aaca7161d951febc512af343029761de1a8a6b92be770b9f4a37b7b66fee9524a0}\label{programs_2nodeop_2main_8cpp_aaca7161d951febc512af343029761de1} 
+EXTRACTED\+\_\+\+GENESIS&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{NODE\_MANAGEMENT\_SUCCESS@{NODE\_MANAGEMENT\_SUCCESS}!main.cpp@{main.cpp}}\index{main.cpp@{main.cpp}!NODE\_MANAGEMENT\_SUCCESS@{NODE\_MANAGEMENT\_SUCCESS}}}\Hypertarget{programs_2nodeop_2main_8cpp_aaca7161d951febc512af343029761de1a48008637c3835fd1b6331d942a212c4d}\label{programs_2nodeop_2main_8cpp_aaca7161d951febc512af343029761de1} 
+NODE\+\_\+\+MANAGEMENT\+\_\+\+SUCCESS&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{programs_2nodeop_2main_8cpp_source_l00097}{97}} of file \mbox{\hyperlink{programs_2nodeop_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00098\ \ \ \ \mbox{\hyperlink{programs_2nodeop_2main_8cpp_aaca7161d951febc512af343029761de1aa3277f670231ab10babc706ab8b6dfe3}{OTHER\_FAIL}}\ \ \ \ \ \ \ \ =\ -\/2,}
+\DoxyCodeLine{00099\ \ \ \ \mbox{\hyperlink{programs_2nodeop_2main_8cpp_aaca7161d951febc512af343029761de1a1c3494c0a167cf502080fef2ba7e392d}{INITIALIZE\_FAIL}}\ \ \ =\ -\/1,}
+\DoxyCodeLine{00100\ \ \ \ \mbox{\hyperlink{programs_2nodeop_2main_8cpp_aaca7161d951febc512af343029761de1ac7f69f7c9e5aea9b8f54cf02870e2bf8}{SUCCESS}}\ \ \ \ \ \ \ \ \ \ \ =\ 0,}
+\DoxyCodeLine{00101\ \ \ \ \mbox{\hyperlink{programs_2nodeop_2main_8cpp_aaca7161d951febc512af343029761de1a660150ee9830d9dde6c013a814618984}{BAD\_ALLOC}}\ \ \ \ \ \ \ \ \ =\ 1,}
+\DoxyCodeLine{00102\ \ \ \ \mbox{\hyperlink{programs_2nodeop_2main_8cpp_aaca7161d951febc512af343029761de1a221363d45c0cf958a477d744fbd1a854}{DATABASE\_DIRTY}}\ \ \ \ =\ 2,}
+\DoxyCodeLine{00103\ \ \ \ \mbox{\hyperlink{programs_2nodeop_2main_8cpp_aaca7161d951febc512af343029761de1a16aec1d31e053c75c58beedc611b5ae6}{FIXED\_REVERSIBLE}}\ \ =\ \mbox{\hyperlink{programs_2nodeop_2main_8cpp_aaca7161d951febc512af343029761de1ac7f69f7c9e5aea9b8f54cf02870e2bf8}{SUCCESS}},}
+\DoxyCodeLine{00104\ \ \ \ \mbox{\hyperlink{programs_2nodeop_2main_8cpp_aaca7161d951febc512af343029761de1a8a6b92be770b9f4a37b7b66fee9524a0}{EXTRACTED\_GENESIS}}\ =\ \mbox{\hyperlink{programs_2nodeop_2main_8cpp_aaca7161d951febc512af343029761de1ac7f69f7c9e5aea9b8f54cf02870e2bf8}{SUCCESS}},}
+\DoxyCodeLine{00105\ \ \ \ \mbox{\hyperlink{programs_2nodeop_2main_8cpp_aaca7161d951febc512af343029761de1a48008637c3835fd1b6331d942a212c4d}{NODE\_MANAGEMENT\_SUCCESS}}\ =\ 5}
+\DoxyCodeLine{00106\ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{programs_2nodeop_2main_8cpp_a73166cb9cb44aa126b3a0db898360fb1}\index{main.cpp@{main.cpp}!initialize\_logging@{initialize\_logging}}
+\index{initialize\_logging@{initialize\_logging}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{initialize\_logging()}{initialize\_logging()}}
+{\footnotesize\ttfamily \label{programs_2nodeop_2main_8cpp_a73166cb9cb44aa126b3a0db898360fb1} 
+void initialize\+\_\+logging (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2nodeop_2main_8cpp_source_l00081}{81}} of file \mbox{\hyperlink{programs_2nodeop_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00082\ \{}
+\DoxyCodeLine{00083\ \ \ \ \textcolor{keyword}{auto}\ config\_path\ =\ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_a9abb5f5858e4dc6ba3ba45071ffdaed5}{get\_logging\_conf}}();}
+\DoxyCodeLine{00084\ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{namespacefc_a3fcf0d920aea28014aacae50a51d8485}{fc::exists}}(config\_path))}
+\DoxyCodeLine{00085\ \ \ \ \ \ \mbox{\hyperlink{namespacefc_ad64fa786e47f4f646fb607f1a039c680}{fc::configure\_logging}}(config\_path);\ \textcolor{comment}{//\ intentionally\ allowing\ exceptions\ to\ escape}}
+\DoxyCodeLine{00086\ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ cfg\ =\ \mbox{\hyperlink{structfc_1_1logging__config_a8af01d185dda6259354f127c526902d5}{fc::logging\_config::default\_config}}();}
+\DoxyCodeLine{00088\ }
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_ad64fa786e47f4f646fb607f1a039c680}{fc::configure\_logging}}(\ \mbox{\hyperlink{namespacedetail_a7ccce9b35f2d32d6af42af40a302d36e}{::detail::add\_deep\_mind\_logger}}(cfg)\ );}
+\DoxyCodeLine{00090\ \ \ \ \}}
+\DoxyCodeLine{00091\ }
+\DoxyCodeLine{00092\ \ \ \ \mbox{\hyperlink{structfc_1_1log__config_a471dafd77fe6c2f69b04d51aba09f1b3}{fc::log\_config::initialize\_appenders}}(\ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().get\_io\_service()\ );}
+\DoxyCodeLine{00093\ }
+\DoxyCodeLine{00094\ \ \ \ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_a741b1b2adb2974b9cf72f1fa129b1adf}{set\_sighup\_callback}}(\mbox{\hyperlink{programs_2nodeop_2main_8cpp_abaf0af9c61c10d5ecdc00eb4fdb87917}{logging\_conf\_handler}});}
+\DoxyCodeLine{00095\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{programs_2nodeop_2main_8cpp_a73166cb9cb44aa126b3a0db898360fb1_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=240pt]{programs_2nodeop_2main_8cpp_a73166cb9cb44aa126b3a0db898360fb1_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{programs_2nodeop_2main_8cpp_abaf0af9c61c10d5ecdc00eb4fdb87917}\index{main.cpp@{main.cpp}!logging\_conf\_handler@{logging\_conf\_handler}}
+\index{logging\_conf\_handler@{logging\_conf\_handler}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{logging\_conf\_handler()}{logging\_conf\_handler()}}
+{\footnotesize\ttfamily \label{programs_2nodeop_2main_8cpp_abaf0af9c61c10d5ecdc00eb4fdb87917} 
+void logging\+\_\+conf\+\_\+handler (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2nodeop_2main_8cpp_source_l00069}{69}} of file \mbox{\hyperlink{programs_2nodeop_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00070\ \{}
+\DoxyCodeLine{00071\ \ \ \ \textcolor{keyword}{auto}\ config\_path\ =\ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_a9abb5f5858e4dc6ba3ba45071ffdaed5}{get\_logging\_conf}}();}
+\DoxyCodeLine{00072\ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{namespacefc_a3fcf0d920aea28014aacae50a51d8485}{fc::exists}}(\ config\_path\ )\ )\ \{}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\ \textcolor{stringliteral}{"{}Received\ HUP.\ \ Reloading\ logging\ configuration\ from\ \$\{p\}."{}},\ (\textcolor{stringliteral}{"{}p"{}},\ config\_path.string())\ );}
+\DoxyCodeLine{00074\ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\ \textcolor{stringliteral}{"{}Received\ HUP.\ \ No\ log\ config\ found\ at\ \$\{p\},\ setting\ to\ default."{}},\ (\textcolor{stringliteral}{"{}p"{}},\ config\_path.string())\ );}
+\DoxyCodeLine{00076\ \ \ \ \}}
+\DoxyCodeLine{00077\ \ \ \ \mbox{\hyperlink{namespacedetail_a9de2cd0b6fb14bad597633a8c5e01a73}{::detail::configure\_logging}}(\ config\_path\ );}
+\DoxyCodeLine{00078\ \ \ \ \mbox{\hyperlink{structfc_1_1log__config_a471dafd77fe6c2f69b04d51aba09f1b3}{fc::log\_config::initialize\_appenders}}(\ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().get\_io\_service()\ );}
+\DoxyCodeLine{00079\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{programs_2nodeop_2main_8cpp_abaf0af9c61c10d5ecdc00eb4fdb87917_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{programs_2nodeop_2main_8cpp_abaf0af9c61c10d5ecdc00eb4fdb87917_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{programs_2nodeop_2main_8cpp_a3c04138a5bfe5d72780bb7e82a18e627}\index{main.cpp@{main.cpp}!main@{main}}
+\index{main@{main}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{programs_2nodeop_2main_8cpp_a3c04138a5bfe5d72780bb7e82a18e627} 
+int main (\begin{DoxyParamCaption}\item[{int}]{argc}{, }\item[{char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{argv}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2nodeop_2main_8cpp_source_l00108}{108}} of file \mbox{\hyperlink{programs_2nodeop_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00109\ \{}
+\DoxyCodeLine{00110\ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_a2794807d31e9f29f1327811dda40820d}{set\_version}}(sysio::nodeop::config::version);}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_a1d2a9932724a536b94eb3d5cff815ffc}{set\_version\_string}}(\mbox{\hyperlink{namespacesysio_1_1version_a0eb84a32a53aa306749bc5b7db097f62}{sysio::version::version\_client}}());}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_ae894f512cb24cba9b754cf984dceaa84}{set\_full\_version\_string}}(\mbox{\hyperlink{namespacesysio_1_1version_a34aecb5a2d640b3dac7236df81787ce8}{sysio::version::version\_full}}());}
+\DoxyCodeLine{00114\ }
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ root\ =\ \mbox{\hyperlink{namespacefc_a3e2cb20721f4d3404ec07ff31694153e}{fc::app\_path}}();}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_af81fa07af200b5b24049ed5d197a864f}{set\_default\_data\_dir}}(root\ /\ \textcolor{stringliteral}{"{}sysio"{}}\ /\ nodeop::config::node\_executable\_name\ /\ \textcolor{stringliteral}{"{}data"{}}\ );}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_a49901c76b365337c933e6485649a50b6}{set\_default\_config\_dir}}(root\ /\ \textcolor{stringliteral}{"{}sysio"{}}\ /\ nodeop::config::node\_executable\_name\ /\ \textcolor{stringliteral}{"{}config"{}}\ );}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1http__plugin_aaf46561ac841485d6bf25266b4aa9b5a}{http\_plugin::set\_defaults}}(\{}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ .default\_unix\_socket\_path\ =\ \textcolor{stringliteral}{"{}"{}},}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ .default\_http\_port\ =\ 8888}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!\mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().initialize<chain\_plugin,\ net\_plugin,\ producer\_plugin,\ resource\_monitor\_plugin>(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}))\ \{}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ opts\ =\ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_a1cd05ae43f6400f07f9c60a09cc610cb}{get\_options}}();}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ opts.count(\textcolor{stringliteral}{"{}help"{}})\ ||\ opts.count(\textcolor{stringliteral}{"{}version"{}})\ ||\ opts.count(\textcolor{stringliteral}{"{}full-\/version"{}})\ ||\ opts.count(\textcolor{stringliteral}{"{}print-\/default-\/config"{}})\ )\ \{}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{programs_2nodeop_2main_8cpp_aaca7161d951febc512af343029761de1ac7f69f7c9e5aea9b8f54cf02870e2bf8}{SUCCESS}};}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{programs_2nodeop_2main_8cpp_aaca7161d951febc512af343029761de1a1c3494c0a167cf502080fef2ba7e392d}{INITIALIZE\_FAIL}};}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{auto}\ resmon\_plugin\ =\ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().find\_plugin<resource\_monitor\_plugin>())\ \{}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ resmon\_plugin-\/>monitor\_directory(\mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().data\_dir());}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}}(\textcolor{stringliteral}{"{}resource\_monitor\_plugin\ failed\ to\ initialize"{}});}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{programs_2nodeop_2main_8cpp_aaca7161d951febc512af343029761de1a1c3494c0a167cf502080fef2ba7e392d}{INITIALIZE\_FAIL}};}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \mbox{\hyperlink{programs_2nodeop_2main_8cpp_a73166cb9cb44aa126b3a0db898360fb1}{initialize\_logging}}();}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\ \textcolor{stringliteral}{"{}\$\{name\}\ version\ \$\{ver\}\ \$\{fv\}"{}},}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}name"{}},\ nodeop::config::node\_executable\_name)(\textcolor{stringliteral}{"{}ver"{}},\ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().version\_string())}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}fv"{}},\ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().version\_string()\ ==\ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().full\_version\_string()\ ?\ \textcolor{stringliteral}{"{}"{}}\ :\ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().full\_version\_string())\ );}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\textcolor{stringliteral}{"{}\$\{name\}\ using\ configuration\ file\ \$\{c\}"{}},\ (\textcolor{stringliteral}{"{}name"{}},\ nodeop::config::node\_executable\_name)(\textcolor{stringliteral}{"{}c"{}},\ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().full\_config\_file\_path().\textcolor{keywordtype}{string}()));}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\textcolor{stringliteral}{"{}\$\{name\}\ data\ directory\ is\ \$\{d\}"{}},\ (\textcolor{stringliteral}{"{}name"{}},\ nodeop::config::node\_executable\_name)(\textcolor{stringliteral}{"{}d"{}},\ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().data\_dir().\textcolor{keywordtype}{string}()));}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_a3b77bd811744da79c9d8ba0d078e7668}{startup}}();}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_a81b7e2878583791179e90e1ec5ba9131}{set\_thread\_priority\_max}}();}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_a39286b0b034b97f6940568a00f44edaf}{exec}}();}
+\DoxyCodeLine{00144\ \ \ \ \}\ \textcolor{keywordflow}{catch}(\ \textcolor{keyword}{const}\ extract\_genesis\_state\_exception\&\ e\ )\ \{}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{programs_2nodeop_2main_8cpp_aaca7161d951febc512af343029761de1a8a6b92be770b9f4a37b7b66fee9524a0}{EXTRACTED\_GENESIS}};}
+\DoxyCodeLine{00146\ \ \ \ \}\ \textcolor{keywordflow}{catch}(\ \textcolor{keyword}{const}\ fixed\_reversible\_db\_exception\&\ e\ )\ \{}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{programs_2nodeop_2main_8cpp_aaca7161d951febc512af343029761de1a16aec1d31e053c75c58beedc611b5ae6}{FIXED\_REVERSIBLE}};}
+\DoxyCodeLine{00148\ \ \ \ \}\ \textcolor{keywordflow}{catch}(\ \textcolor{keyword}{const}\ node\_management\_success\&\ e\ )\ \{}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{programs_2nodeop_2main_8cpp_aaca7161d951febc512af343029761de1a48008637c3835fd1b6331d942a212c4d}{NODE\_MANAGEMENT\_SUCCESS}};}
+\DoxyCodeLine{00150\ \ \ \ \}\ \textcolor{keywordflow}{catch}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1exception}{fc::exception}}\&\ e\ )\ \{}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ e.\mbox{\hyperlink{classfc_1_1exception_a79a36225cde10dcd23057bbe19d3390f}{code}}()\ ==\ \mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca969f910e4a1ec90bac8bf8eca1a8cec0}{fc::std\_exception\_code}}\ )\ \{}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ e.\mbox{\hyperlink{classfc_1_1exception_aeea900db85f79e5b4be0710a9df373db}{top\_message}}().find(\ \textcolor{stringliteral}{"{}atabase\ dirty\ flag\ set"{}}\ )\ !=\ std::string::npos\ )\ \{}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}}(\ \textcolor{stringliteral}{"{}database\ dirty\ flag\ set\ (likely\ due\ to\ unclean\ shutdown):\ replay\ required"{}}\ );}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{programs_2nodeop_2main_8cpp_aaca7161d951febc512af343029761de1a221363d45c0cf958a477d744fbd1a854}{DATABASE\_DIRTY}};}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}}(\ \textcolor{stringliteral}{"{}\$\{e\}"{}},\ (\textcolor{stringliteral}{"{}e"{}},\ e.\mbox{\hyperlink{classfc_1_1exception_a7611ea8fbe25dde56649b685c2298a37}{to\_detail\_string}}()));}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{programs_2nodeop_2main_8cpp_aaca7161d951febc512af343029761de1aa3277f670231ab10babc706ab8b6dfe3}{OTHER\_FAIL}};}
+\DoxyCodeLine{00159\ \ \ \ \}\ \textcolor{keywordflow}{catch}(\ \textcolor{keyword}{const}\ boost::interprocess::bad\_alloc\&\ e\ )\ \{}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}}(\textcolor{stringliteral}{"{}bad\ alloc"{}});}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{programs_2nodeop_2main_8cpp_aaca7161d951febc512af343029761de1a660150ee9830d9dde6c013a814618984}{BAD\_ALLOC}};}
+\DoxyCodeLine{00162\ \ \ \ \}\ \textcolor{keywordflow}{catch}(\ \textcolor{keyword}{const}\ boost::exception\&\ e\ )\ \{}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}}(\textcolor{stringliteral}{"{}\$\{e\}"{}},\ (\textcolor{stringliteral}{"{}e"{}},boost::diagnostic\_information(e)));}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{programs_2nodeop_2main_8cpp_aaca7161d951febc512af343029761de1aa3277f670231ab10babc706ab8b6dfe3}{OTHER\_FAIL}};}
+\DoxyCodeLine{00165\ \ \ \ \}\ \textcolor{keywordflow}{catch}(\ \textcolor{keyword}{const}\ std::runtime\_error\&\ e\ )\ \{}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ std::string(e.what()).find(\textcolor{stringliteral}{"{}atabase\ dirty\ flag\ set"{}})\ !=\ std::string::npos\ )\ \{}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}}(\ \textcolor{stringliteral}{"{}database\ dirty\ flag\ set\ (likely\ due\ to\ unclean\ shutdown):\ replay\ required"{}}\ );}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{programs_2nodeop_2main_8cpp_aaca7161d951febc512af343029761de1a221363d45c0cf958a477d744fbd1a854}{DATABASE\_DIRTY}};}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}}(\ \textcolor{stringliteral}{"{}\$\{e\}"{}},\ (\textcolor{stringliteral}{"{}e"{}},e.what()));}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{programs_2nodeop_2main_8cpp_aaca7161d951febc512af343029761de1aa3277f670231ab10babc706ab8b6dfe3}{OTHER\_FAIL}};}
+\DoxyCodeLine{00173\ \ \ \ \}\ \textcolor{keywordflow}{catch}(\ \textcolor{keyword}{const}\ std::exception\&\ e\ )\ \{}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}}(\textcolor{stringliteral}{"{}\$\{e\}"{}},\ (\textcolor{stringliteral}{"{}e"{}},e.what()));}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{programs_2nodeop_2main_8cpp_aaca7161d951febc512af343029761de1aa3277f670231ab10babc706ab8b6dfe3}{OTHER\_FAIL}};}
+\DoxyCodeLine{00176\ \ \ \ \}\ \textcolor{keywordflow}{catch}(\ ...\ )\ \{}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}}(\textcolor{stringliteral}{"{}unknown\ exception"{}});}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{programs_2nodeop_2main_8cpp_aaca7161d951febc512af343029761de1aa3277f670231ab10babc706ab8b6dfe3}{OTHER\_FAIL}};}
+\DoxyCodeLine{00179\ \ \ \ \}}
+\DoxyCodeLine{00180\ }
+\DoxyCodeLine{00181\ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\textcolor{stringliteral}{"{}\$\{name\}\ successfully\ exiting"{}},\ (\textcolor{stringliteral}{"{}name"{}},\ nodeop::config::node\_executable\_name));}
+\DoxyCodeLine{00182\ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{programs_2nodeop_2main_8cpp_aaca7161d951febc512af343029761de1ac7f69f7c9e5aea9b8f54cf02870e2bf8}{SUCCESS}};}
+\DoxyCodeLine{00183\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{programs_2nodeop_2main_8cpp_a3c04138a5bfe5d72780bb7e82a18e627_cgraph}
+\end{center}
+\end{figure}

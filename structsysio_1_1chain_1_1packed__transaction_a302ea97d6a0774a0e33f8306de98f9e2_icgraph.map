@@ -1,0 +1,7 @@
+<map id="sysio::chain::packed_transaction::get_packed_context_free_data" name="sysio::chain::packed_transaction::get_packed_context_free_data">
+<area shape="rect" id="Node000001" title=" " alt="" coords="409,5,576,61"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1impl_1_1abi__to__variant.html#a0092202221bfbf9ab05dffe09089619c" title=" " alt="" coords="222,13,361,54"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="394,36,361,36,361,30,394,30"/>
+<area shape="rect" id="Node000003" href="$classvalidate__reflection_1_1_empty_scope.html#a1fb4f76506790294268dc078986d7430" title=" " alt="" coords="5,13,174,54"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="206,36,174,36,174,30,206,30"/>
+</map>

@@ -1,0 +1,108 @@
+\doxysection{Catch\+::Wildcard\+Pattern Class Reference}
+\hypertarget{class_catch_1_1_wildcard_pattern}{}\label{class_catch_1_1_wildcard_pattern}\index{Catch::WildcardPattern@{Catch::WildcardPattern}}
+
+
+{\ttfamily \#include $<$catch\+\_\+wildcard\+\_\+pattern.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_catch_1_1_wildcard_pattern_ac58366a382dc34a398eb8825bd56c9d2}{Wildcard\+Pattern}} (std\+::string const \&pattern, \mbox{\hyperlink{struct_catch_1_1_case_sensitive_aad49d3aee2d97066642fffa919685c6a}{Case\+Sensitive\+::\+Choice}} case\+Sensitivity)
+\item 
+virtual \mbox{\hyperlink{class_catch_1_1_wildcard_pattern_ada6ab8738c3ab6066f2f5713397dd183}{\texorpdfstring{$\sim$}{\string~}\+Wildcard\+Pattern}} ()=default
+\item 
+virtual bool \mbox{\hyperlink{class_catch_1_1_wildcard_pattern_ae88acde37f50f7cbec8605acf434fe85}{matches}} (std\+::string const \&str) const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{catch__wildcard__pattern_8h_source_l00016}{16}} of file \mbox{\hyperlink{catch__wildcard__pattern_8h_source}{catch\+\_\+wildcard\+\_\+pattern.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_catch_1_1_wildcard_pattern_ac58366a382dc34a398eb8825bd56c9d2}\index{Catch::WildcardPattern@{Catch::WildcardPattern}!WildcardPattern@{WildcardPattern}}
+\index{WildcardPattern@{WildcardPattern}!Catch::WildcardPattern@{Catch::WildcardPattern}}
+\doxysubsubsection{\texorpdfstring{WildcardPattern()}{WildcardPattern()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_wildcard_pattern_ac58366a382dc34a398eb8825bd56c9d2} 
+Catch\+::\+Wildcard\+Pattern\+::\+Wildcard\+Pattern (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{pattern}{, }\item[{\mbox{\hyperlink{struct_catch_1_1_case_sensitive_aad49d3aee2d97066642fffa919685c6a}{Case\+Sensitive\+::\+Choice}}}]{case\+Sensitivity}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__wildcard__pattern_8cpp_source_l00016}{16}} of file \mbox{\hyperlink{catch__wildcard__pattern_8cpp_source}{catch\+\_\+wildcard\+\_\+pattern.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00018\ \ \ \ \ :\ \ \ m\_caseSensitivity(\ caseSensitivity\ ),}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ m\_pattern(\ adjustCase(\ pattern\ )\ )}
+\DoxyCodeLine{00020\ \ \ \ \ \{}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{namespace_catch_a695f62327be0676e046291eeaae15110}{startsWith}}(\ m\_pattern,\ \textcolor{charliteral}{'*'}\ )\ )\ \{}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \ \ \ \ m\_pattern\ =\ m\_pattern.substr(\ 1\ );}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \ \ \ \ m\_wildcard\ =\ WildcardAtStart;}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{namespace_catch_ada025504f627feaf9ac68ca391515dff}{endsWith}}(\ m\_pattern,\ \textcolor{charliteral}{'*'}\ )\ )\ \{}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \ \ \ m\_pattern\ =\ m\_pattern.substr(\ 0,\ m\_pattern.size()-\/1\ );}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \ \ \ \ m\_wildcard\ =\ \textcolor{keyword}{static\_cast<}WildcardPosition\textcolor{keyword}{>}(\ m\_wildcard\ |\ WildcardAtEnd\ );}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00029\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=327pt]{class_catch_1_1_wildcard_pattern_ac58366a382dc34a398eb8825bd56c9d2_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_wildcard_pattern_ada6ab8738c3ab6066f2f5713397dd183}\index{Catch::WildcardPattern@{Catch::WildcardPattern}!````~WildcardPattern@{\texorpdfstring{$\sim$}{\string~}WildcardPattern}}
+\index{````~WildcardPattern@{\texorpdfstring{$\sim$}{\string~}WildcardPattern}!Catch::WildcardPattern@{Catch::WildcardPattern}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}WildcardPattern()}{\string~WildcardPattern()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_wildcard_pattern_ada6ab8738c3ab6066f2f5713397dd183} 
+virtual Catch\+::\+Wildcard\+Pattern\+::\texorpdfstring{$\sim$}{\string~}\+Wildcard\+Pattern (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}, {\ttfamily [default]}}
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_catch_1_1_wildcard_pattern_ae88acde37f50f7cbec8605acf434fe85}\index{Catch::WildcardPattern@{Catch::WildcardPattern}!matches@{matches}}
+\index{matches@{matches}!Catch::WildcardPattern@{Catch::WildcardPattern}}
+\doxysubsubsection{\texorpdfstring{matches()}{matches()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_wildcard_pattern_ae88acde37f50f7cbec8605acf434fe85} 
+bool Catch\+::\+Wildcard\+Pattern\+::matches (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{str}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__wildcard__pattern_8cpp_source_l00031}{31}} of file \mbox{\hyperlink{catch__wildcard__pattern_8cpp_source}{catch\+\_\+wildcard\+\_\+pattern.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(\ m\_wildcard\ )\ \{}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ NoWildcard:}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_pattern\ ==\ adjustCase(\ str\ );}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ WildcardAtStart:}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_catch_ada025504f627feaf9ac68ca391515dff}{endsWith}}(\ adjustCase(\ str\ ),\ m\_pattern\ );}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ WildcardAtEnd:}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_catch_a695f62327be0676e046291eeaae15110}{startsWith}}(\ adjustCase(\ str\ ),\ m\_pattern\ );}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ WildcardAtBothEnds:}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_catch_aa52974b0e426e7e2fbd725a900e9c36e}{contains}}(\ adjustCase(\ str\ ),\ m\_pattern\ );}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{catch__enforce_8h_a05b6c8a530fa2e5b397add8966522777}{CATCH\_INTERNAL\_ERROR}}(\ \textcolor{stringliteral}{"{}Unknown\ enum"{}}\ );}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00044\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=327pt]{class_catch_1_1_wildcard_pattern_ae88acde37f50f7cbec8605acf434fe85_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__wildcard__pattern_8h}{catch\+\_\+wildcard\+\_\+pattern.\+h}}\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__wildcard__pattern_8cpp}{catch\+\_\+wildcard\+\_\+pattern.\+cpp}}\end{DoxyCompactItemize}

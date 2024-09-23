@@ -1,0 +1,52 @@
+\doxysection{Runtime\+::Resolver Struct Reference}
+\hypertarget{struct_runtime_1_1_resolver}{}\label{struct_runtime_1_1_resolver}\index{Runtime::Resolver@{Runtime::Resolver}}
+
+
+{\ttfamily \#include $<$Linker.\+h$>$}
+
+
+
+Inheritance diagram for Runtime\+::Resolver\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_runtime_1_1_resolver__inherit__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual bool \mbox{\hyperlink{struct_runtime_1_1_resolver_a8387253cf2addc917647cba230a00334}{resolve}} (const std\+::string \&module\+Name, const std\+::string \&export\+Name, \mbox{\hyperlink{struct_i_r_1_1_object_type}{IR\+::\+Object\+Type}} type, \mbox{\hyperlink{struct_runtime_1_1_object_instance}{Object\+Instance}} \texorpdfstring{$\ast$}{*}\&out\+Object)=0
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{_linker_8h_source_l00011}{11}} of file \mbox{\hyperlink{_linker_8h_source}{Linker.\+h}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_runtime_1_1_resolver_a8387253cf2addc917647cba230a00334}\index{Runtime::Resolver@{Runtime::Resolver}!resolve@{resolve}}
+\index{resolve@{resolve}!Runtime::Resolver@{Runtime::Resolver}}
+\doxysubsubsection{\texorpdfstring{resolve()}{resolve()}}
+{\footnotesize\ttfamily \label{struct_runtime_1_1_resolver_a8387253cf2addc917647cba230a00334} 
+virtual bool Runtime\+::\+Resolver\+::resolve (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{module\+Name}{, }\item[{const std\+::string \&}]{export\+Name}{, }\item[{\mbox{\hyperlink{struct_i_r_1_1_object_type}{IR\+::\+Object\+Type}}}]{type}{, }\item[{\mbox{\hyperlink{struct_runtime_1_1_object_instance}{Object\+Instance}} \texorpdfstring{$\ast$}{*}\&}]{out\+Object}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{struct_runtime_1_1_intrinsic_resolver_a2a56dfa6a88e030be17a066d2907c763}{Runtime\+::\+Intrinsic\+Resolver}}, \mbox{\hyperlink{struct_runtime_1_1_lazy_resolver_a017b70308cc0fb38d2fcdbb372f74362}{Runtime\+::\+Lazy\+Resolver}}, \mbox{\hyperlink{struct_runtime_1_1_module_export_resolver_af72a8f24c5c5c1501466dc94b57eb97f}{Runtime\+::\+Module\+Export\+Resolver}}, and \mbox{\hyperlink{struct_runtime_1_1_null_resolver_a2a6e6891570ac79ad660c78e7b8ea042}{Runtime\+::\+Null\+Resolver}}.
+
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_runtime_1_1_resolver_a8387253cf2addc917647cba230a00334_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/wasm-\/jit/\+Include/\+Runtime/\mbox{\hyperlink{_linker_8h}{Linker.\+h}}\end{DoxyCompactItemize}

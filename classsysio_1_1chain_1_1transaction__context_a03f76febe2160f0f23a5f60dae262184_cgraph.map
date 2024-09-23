@@ -1,0 +1,14 @@
+<map id="sysio::chain::transaction_context::init_for_deferred_trx" name="sysio::chain::transaction_context::init_for_deferred_trx">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,87,200,127"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1packed__transaction.html#ad193d26eb97cfd5b3f7d8b957eaa35a2" title=" " alt="" coords="248,5,437,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="164,84,265,49,267,54,166,89"/>
+<area shape="rect" id="Node000003" href="$lib__test_8cpp.html#a02fd73d861ef2e4aabb38c0c9ff82947" title=" " alt="" coords="323,94,362,120"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="200,104,307,104,307,110,200,110"/>
+<area shape="rect" id="Node000006" href="$classfc_1_1time__point__sec.html#ab537213a0f1caf331b0c43cee6297b3f" title=" " alt="" coords="277,144,408,185"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="191,125,262,143,261,148,190,131"/>
+<area shape="poly" id="edge3_Node000003_Node000003" title=" " alt="" coords="321,101,309,91,308,79,320,70,342,68,360,69,372,74,377,82,376,90,371,89,372,83,369,78,359,74,342,73,322,75,313,81,314,88,325,97"/>
+<area shape="rect" id="Node000004" href="$struct_a.html#ae6a8af4c0a13366326d0f3784d46847b" title=" " alt="" coords="488,70,545,96"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="362,102,473,86,474,92,362,107"/>
+<area shape="rect" id="Node000005" href="$lib_8h.html#a3275d706a60352411b10ffe9c266f0cd" title=" " alt="" coords="485,120,548,145"/>
+<area shape="poly" id="edge5_Node000003_Node000005" title=" " alt="" coords="362,107,470,123,469,128,362,112"/>
+</map>

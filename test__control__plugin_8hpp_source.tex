@@ -1,0 +1,69 @@
+\doxysection{test\+\_\+control\+\_\+plugin.\+hpp}
+\hypertarget{test__control__plugin_8hpp_source}{}\label{test__control__plugin_8hpp_source}\index{plugins/test\_control\_plugin/include/sysio/test\_control\_plugin/test\_control\_plugin.hpp@{plugins/test\_control\_plugin/include/sysio/test\_control\_plugin/test\_control\_plugin.hpp}}
+\mbox{\hyperlink{test__control__plugin_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{application_8hpp}{appbase/application.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{chain__plugin_8hpp}{sysio/chain\_plugin/chain\_plugin.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{fc_2include_2fc_2variant_8hpp}{fc/variant.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <memory>}}
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00007}00007\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}\ \{\ \textcolor{keyword}{class\ }variant;\ \}}
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00009}00009\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{}
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00010}00010\ \ \ \ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespaceappbase}{appbase}};}
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00011}\mbox{\hyperlink{namespacesysio_a04093c5a9d5b187dfb51baf841b87c3a}{00011}}\ \ \ \ \textcolor{keyword}{typedef}\ std::shared\_ptr<class\ test\_control\_plugin\_impl>\ \mbox{\hyperlink{namespacesysio_a04093c5a9d5b187dfb51baf841b87c3a}{test\_control\_ptr}};}
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00013}\mbox{\hyperlink{namespacesysio_1_1test__control__apis}{00013}}\ \textcolor{keyword}{namespace\ }test\_control\_apis\ \{}
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00014}\mbox{\hyperlink{structsysio_1_1test__control__apis_1_1empty}{00014}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structsysio_1_1test__control__apis_1_1empty}{empty}}\{\};}
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00016}\mbox{\hyperlink{classsysio_1_1test__control__apis_1_1read__write}{00016}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1test__control__apis_1_1read__write}{read\_write}}\ \{}
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00018}00018\ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00019}\mbox{\hyperlink{classsysio_1_1test__control__apis_1_1read__write_a444d293b859906726c7f04741886d1a8}{00019}}\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1test__control__apis_1_1read__write_a444d293b859906726c7f04741886d1a8}{read\_write}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_a04093c5a9d5b187dfb51baf841b87c3a}{test\_control\_ptr}}\&\ test\_control)}
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00020}00020\ \ \ \ \ \ \ \ \ \ :\ my(test\_control)\ \{\}}
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00022}\mbox{\hyperlink{structsysio_1_1test__control__apis_1_1read__write_1_1kill__node__on__producer__params}{00022}}\ \ \ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structsysio_1_1test__control__apis_1_1read__write_1_1kill__node__on__producer__params}{kill\_node\_on\_producer\_params}}\ \{}
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00023}\mbox{\hyperlink{structsysio_1_1test__control__apis_1_1read__write_1_1kill__node__on__producer__params_a02019c37ed8da4106cc4ddd328b4d99b}{00023}}\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1test__control__apis_1_1read__write_1_1kill__node__on__producer__params_a02019c37ed8da4106cc4ddd328b4d99b}{producer}};}
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00024}\mbox{\hyperlink{structsysio_1_1test__control__apis_1_1read__write_1_1kill__node__on__producer__params_a8afb0b169d9319c57d51c9e262011e29}{00024}}\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \ \mbox{\hyperlink{structsysio_1_1test__control__apis_1_1read__write_1_1kill__node__on__producer__params_a8afb0b169d9319c57d51c9e262011e29}{where\_in\_sequence}};}
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00025}\mbox{\hyperlink{structsysio_1_1test__control__apis_1_1read__write_1_1kill__node__on__producer__params_a1a36296fd09c86588d044e561a3485f7}{00025}}\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1test__control__apis_1_1read__write_1_1kill__node__on__producer__params_a1a36296fd09c86588d044e561a3485f7}{based\_on\_lib}};}
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00026}00026\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00027}\mbox{\hyperlink{classsysio_1_1test__control__apis_1_1read__write_a15c483cb82f991aadbe52a9ff4ec8ea6}{00027}}\ \ \ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{structsysio_1_1test__control__apis_1_1empty}{kill\_node\_on\_producer\_results}}\ =\ \mbox{\hyperlink{structsysio_1_1test__control__apis_1_1empty}{empty}};}
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00028}00028\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1test__control__apis_1_1empty}{kill\_node\_on\_producer\_results}}\ \mbox{\hyperlink{classsysio_1_1test__control__apis_1_1read__write_aeebf7d7ea7bde53ebba25651bd8bcca9}{kill\_node\_on\_producer}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1test__control__apis_1_1read__write_1_1kill__node__on__producer__params}{kill\_node\_on\_producer\_params}}\&\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params}{params}})\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00030}00030\ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00031}00031\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_a04093c5a9d5b187dfb51baf841b87c3a}{test\_control\_ptr}}\ my;}
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00032}00032\ \};}
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00035}00035\ \}\ \textcolor{comment}{//\ namespace\ test\_control\_apis}}
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00038}\mbox{\hyperlink{classsysio_1_1test__control__plugin}{00038}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1test__control__plugin}{test\_control\_plugin}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classappbase_1_1plugin}{plugin}}<test\_control\_plugin>\ \{}
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00039}00039\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00040}00040\ \ \ \ \mbox{\hyperlink{plugin_8hpp_ae81793dd38463b82491d75a9ccd209e1}{APPBASE\_PLUGIN\_REQUIRES}}((\mbox{\hyperlink{classsysio_1_1chain__plugin}{chain\_plugin}}))}
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00042}\mbox{\hyperlink{classsysio_1_1test__control__plugin_a512b355ee4fc55acd961cea12ae636d9}{00042}}\ \ \ \ \mbox{\hyperlink{classsysio_1_1test__control__plugin}{test\_control\_plugin}}();}
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00043}\mbox{\hyperlink{classsysio_1_1test__control__plugin_a02dfaa76e4f0e5b95fd21359be457143}{00043}}\ \ \ \ \mbox{\hyperlink{classsysio_1_1test__control__plugin}{test\_control\_plugin}}(const\ \mbox{\hyperlink{classsysio_1_1test__control__plugin}{test\_control\_plugin}}\&)\ =\ delete;}
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00044}\mbox{\hyperlink{classsysio_1_1test__control__plugin_a4513600434eae4c95563f248fd7ce78f}{00044}}\ \ \ \ \mbox{\hyperlink{classsysio_1_1test__control__plugin}{test\_control\_plugin}}(\mbox{\hyperlink{classsysio_1_1test__control__plugin}{test\_control\_plugin}}\&\&)\ =\ delete;}
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00045}\mbox{\hyperlink{classsysio_1_1test__control__plugin_a8b4290e8565a034e8f49812619259b68}{00045}}\ \ \ \ \mbox{\hyperlink{classsysio_1_1test__control__plugin}{test\_control\_plugin}}\&\ operator=(const\ \mbox{\hyperlink{classsysio_1_1test__control__plugin}{test\_control\_plugin}}\&)\ =\ delete;}
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00046}\mbox{\hyperlink{classsysio_1_1test__control__plugin_ae345b6bec2b7d8c07c922dbb9f9a2bb0}{00046}}\ \ \ \ \mbox{\hyperlink{classsysio_1_1test__control__plugin}{test\_control\_plugin}}\&\ operator=(\mbox{\hyperlink{classsysio_1_1test__control__plugin}{test\_control\_plugin}}\&\&)\ =\ delete;}
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00047}\mbox{\hyperlink{classsysio_1_1test__control__plugin_a17dd7c186a299196049cf7155c6beeac}{00047}}\ \ \ \ virtual\ \string~\mbox{\hyperlink{classsysio_1_1test__control__plugin}{test\_control\_plugin}}()\ override\ =\ default;}
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00049}00049\ \ \ \ virtual\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1test__control__plugin_a8102347593e0e79afed0dd9bb4a90e1d}{set\_program\_options}}(options\_description\&\ \mbox{\hyperlink{xbyak__mnemonic_8h_a4229a9b84f8b8673326f12bd41acd27c}{cli}},\ options\_description\&\ cfg)\ override;}
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00050}00050\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1test__control__plugin_abb9ddbcab9bfd75b0236e521f27f2c73}{plugin\_initialize}}(const\ variables\_map\&\ options);}
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00051}00051\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1test__control__plugin_ab97ea4fc387dd8fc51814f9b55498f9f}{plugin\_startup}}();}
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00052}00052\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1test__control__plugin_a887f6c56d18af61ca3119c79374495b0}{plugin\_shutdown}}();}
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00054}\mbox{\hyperlink{classsysio_1_1test__control__plugin_a61a1331b80e7d89d0f189e333e526ba1}{00054}}\ \ \ \ test\_control\_apis::\mbox{\hyperlink{namespacefc_a3d8a2be677709cc41f09aa7925f2d55fa4eaf6936474fac52a87743f3de041c42}{read\_write}}\ \mbox{\hyperlink{classsysio_1_1test__control__plugin_a61a1331b80e7d89d0f189e333e526ba1}{get\_read\_write\_api}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1test__control__apis_1_1read__write}{test\_control\_apis::read\_write}}(my);\ \}}
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00056}00056\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00057}00057\ \ \ \ \mbox{\hyperlink{namespacesysio_a04093c5a9d5b187dfb51baf841b87c3a}{test\_control\_ptr}}\ my;}
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00058}00058\ \};}
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00060}00060\ \}}
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00062}00062\ \mbox{\hyperlink{reflect_8hpp_a2ace850e636b1ca0b18fe3177e413d99}{FC\_REFLECT}}(\mbox{\hyperlink{structsysio_1_1test__control__apis_1_1empty}{sysio::test\_control\_apis::empty}},\ )}
+\DoxyCodeLine{\Hypertarget{test__control__plugin_8hpp_source_l00063}00063\ \mbox{\hyperlink{reflect_8hpp_a2ace850e636b1ca0b18fe3177e413d99}{FC\_REFLECT}}(\mbox{\hyperlink{namespacesysio}{sysio}}::test\_control\_apis::read\_write::kill\_node\_on\_producer\_params,\ (producer)(where\_in\_sequence)(based\_on\_lib)\ )}
+
+\end{DoxyCode}

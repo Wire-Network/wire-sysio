@@ -1,0 +1,6 @@
+<map id="Writer::String" name="Writer::String">
+<area shape="rect" id="Node000001" title="Simpler but slower overload." alt="" coords="5,29,103,55"/>
+<area shape="poly" id="edge1_Node000001_Node000001" title=" " alt="" coords="28,30,23,21,26,11,37,5,54,3,73,5,82,12,79,16,71,10,54,8,38,10,30,15,28,20,33,28"/>
+<area shape="rect" id="Node000002" href="$namespaceinternal.html#a86326fb0c9d7c7ea8edd7deedbb2b26e" title="Custom strlen() which works on different character types." alt="" coords="151,29,260,55"/>
+<area shape="poly" id="edge2_Node000001_Node000002" title=" " alt="" coords="103,40,135,40,135,45,103,45"/>
+</map>

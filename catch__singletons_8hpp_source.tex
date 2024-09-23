@@ -1,0 +1,50 @@
+\doxysection{catch\+\_\+singletons.\+hpp}
+\hypertarget{catch__singletons_8hpp_source}{}\label{catch__singletons_8hpp_source}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_singletons.hpp@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_singletons.hpp}}
+\mbox{\hyperlink{catch__singletons_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{catch__singletons_8hpp_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{catch__singletons_8hpp_source_l00002}00002\ \textcolor{comment}{\ *\ \ Created\ by\ Phil\ Nash\ on\ 15/6/2018.}}
+\DoxyCodeLine{\Hypertarget{catch__singletons_8hpp_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{catch__singletons_8hpp_source_l00004}00004\ \textcolor{comment}{\ *\ \ Distributed\ under\ the\ Boost\ Software\ License,\ Version\ 1.0.\ (See\ accompanying}}
+\DoxyCodeLine{\Hypertarget{catch__singletons_8hpp_source_l00005}00005\ \textcolor{comment}{\ *\ \ file\ LICENSE\_1\_0.txt\ or\ copy\ at\ http://www.boost.org/LICENSE\_1\_0.txt)}}
+\DoxyCodeLine{\Hypertarget{catch__singletons_8hpp_source_l00006}00006\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{catch__singletons_8hpp_source_l00007}00007\ \textcolor{preprocessor}{\#ifndef\ TWOBLUECUBES\_CATCH\_SINGLETONS\_HPP\_INCLUDED}}
+\DoxyCodeLine{\Hypertarget{catch__singletons_8hpp_source_l00008}00008\ \textcolor{preprocessor}{\#define\ TWOBLUECUBES\_CATCH\_SINGLETONS\_HPP\_INCLUDED}}
+\DoxyCodeLine{\Hypertarget{catch__singletons_8hpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{catch__singletons_8hpp_source_l00010}00010\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__singletons_8hpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{catch__singletons_8hpp_source_l00012}\mbox{\hyperlink{struct_catch_1_1_i_singleton}{00012}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_catch_1_1_i_singleton}{ISingleton}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__singletons_8hpp_source_l00013}00013\ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{struct_catch_1_1_i_singleton_a17edca318d45b74b977a780c0183e5c3}{\string~ISingleton}}();}
+\DoxyCodeLine{\Hypertarget{catch__singletons_8hpp_source_l00014}00014\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{catch__singletons_8hpp_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{catch__singletons_8hpp_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{catch__singletons_8hpp_source_l00017}00017\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespace_catch_a788ebefcd83342b7c479222a1eeffaee}{addSingleton}}(\ \mbox{\hyperlink{struct_catch_1_1_i_singleton}{ISingleton}}*\ singleton\ );}
+\DoxyCodeLine{\Hypertarget{catch__singletons_8hpp_source_l00018}00018\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespace_catch_a8bdb92cb53a4e016bc0dee66efd99118}{cleanupSingletons}}();}
+\DoxyCodeLine{\Hypertarget{catch__singletons_8hpp_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{catch__singletons_8hpp_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{catch__singletons_8hpp_source_l00021}00021\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ SingletonImplT,\ \textcolor{keyword}{typename}\ InterfaceT\ =\ SingletonImplT,\ \textcolor{keyword}{typename}\ MutableInterfaceT\ =\ InterfaceT>}
+\DoxyCodeLine{\Hypertarget{catch__singletons_8hpp_source_l00022}\mbox{\hyperlink{class_catch_1_1_singleton}{00022}}\ \ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_catch_1_1_singleton}{Singleton}}\ :\ SingletonImplT,\ \textcolor{keyword}{public}\ \mbox{\hyperlink{struct_catch_1_1_i_singleton}{ISingleton}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__singletons_8hpp_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{catch__singletons_8hpp_source_l00024}00024\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ getInternal()\ -\/>\ \mbox{\hyperlink{class_catch_1_1_singleton}{Singleton}}*\ \{}
+\DoxyCodeLine{\Hypertarget{catch__singletons_8hpp_source_l00025}00025\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{class_catch_1_1_singleton}{Singleton}}*\ s\_instance\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{catch__singletons_8hpp_source_l00026}00026\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !s\_instance\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__singletons_8hpp_source_l00027}00027\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ s\_instance\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_catch_1_1_singleton}{Singleton}};}
+\DoxyCodeLine{\Hypertarget{catch__singletons_8hpp_source_l00028}00028\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_catch_a788ebefcd83342b7c479222a1eeffaee}{addSingleton}}(\ s\_instance\ );}
+\DoxyCodeLine{\Hypertarget{catch__singletons_8hpp_source_l00029}00029\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__singletons_8hpp_source_l00030}00030\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ s\_instance;}
+\DoxyCodeLine{\Hypertarget{catch__singletons_8hpp_source_l00031}00031\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__singletons_8hpp_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{catch__singletons_8hpp_source_l00033}00033\ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{catch__singletons_8hpp_source_l00034}\mbox{\hyperlink{class_catch_1_1_singleton_aa1b2bb002acd8838489a225dbbaf2865}{00034}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{class_catch_1_1_singleton_aa1b2bb002acd8838489a225dbbaf2865}{get}}()\ -\/>\ InterfaceT\ \textcolor{keyword}{const}\&\ \{}
+\DoxyCodeLine{\Hypertarget{catch__singletons_8hpp_source_l00035}00035\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *getInternal();}
+\DoxyCodeLine{\Hypertarget{catch__singletons_8hpp_source_l00036}00036\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__singletons_8hpp_source_l00037}\mbox{\hyperlink{class_catch_1_1_singleton_a8c18286fe40405813c5bab05e20ce4f0}{00037}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{class_catch_1_1_singleton_a8c18286fe40405813c5bab05e20ce4f0}{getMutable}}()\ -\/>\ MutableInterfaceT\&\ \{}
+\DoxyCodeLine{\Hypertarget{catch__singletons_8hpp_source_l00038}00038\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *getInternal();}
+\DoxyCodeLine{\Hypertarget{catch__singletons_8hpp_source_l00039}00039\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__singletons_8hpp_source_l00040}00040\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{catch__singletons_8hpp_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{catch__singletons_8hpp_source_l00042}00042\ \}\ \textcolor{comment}{//\ namespace\ Catch}}
+\DoxyCodeLine{\Hypertarget{catch__singletons_8hpp_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{catch__singletons_8hpp_source_l00044}00044\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ TWOBLUECUBES\_CATCH\_SINGLETONS\_HPP\_INCLUDED}}
+
+\end{DoxyCode}

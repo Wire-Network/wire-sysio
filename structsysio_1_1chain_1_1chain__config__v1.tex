@@ -1,0 +1,364 @@
+\doxysection{sysio\+::chain\+::chain\+\_\+config\+\_\+v1 Struct Reference}
+\hypertarget{structsysio_1_1chain_1_1chain__config__v1}{}\label{structsysio_1_1chain_1_1chain__config__v1}\index{sysio::chain::chain\_config\_v1@{sysio::chain::chain\_config\_v1}}
+
+
+v1 Producer-\/voted blockchain configuration parameters  
+
+
+
+
+{\ttfamily \#include $<$chain\+\_\+config.\+hpp$>$}
+
+
+
+Inheritance diagram for sysio\+::chain\+::chain\+\_\+config\+\_\+v1\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=178pt]{structsysio_1_1chain_1_1chain__config__v1__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for sysio\+::chain\+::chain\+\_\+config\+\_\+v1\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=178pt]{structsysio_1_1chain_1_1chain__config__v1__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \{ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v1_a5000ca17abb32e72f6a6fe4d36bab91fade99bcd127eb42daf0316c8115e28f91}{max\+\_\+action\+\_\+return\+\_\+value\+\_\+size\+\_\+id}} = Base\+::PARAMS\+\_\+\+COUNT
+, \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v1_a5000ca17abb32e72f6a6fe4d36bab91fac5223ce06268d60ec655757488489d67}{PARAMS\+\_\+\+COUNT}}
+ \}
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v1_ab8840e0ca0593c7f4faf4502c72d4873}{Base}} = \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0}{chain\+\_\+config\+\_\+v0}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Types inherited from \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0}{sysio\+::chain\+::chain\+\_\+config\+\_\+v0}}}
+\begin{DoxyCompactItemize}
+\item 
+enum \{ \newline
+\mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1a45bfc96a932cb311b1b7b44da0df5afe}{max\+\_\+block\+\_\+net\+\_\+usage\+\_\+id}}
+, \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1ac9d8e5a4f63c520dd96018bfc0c46794}{target\+\_\+block\+\_\+net\+\_\+usage\+\_\+pct\+\_\+id}}
+, \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1a6fd3688c394f7c4a80afa034033dabcd}{max\+\_\+transaction\+\_\+net\+\_\+usage\+\_\+id}}
+, \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1a844ad237a8a02d01db9fa0403f05e2cd}{base\+\_\+per\+\_\+transaction\+\_\+net\+\_\+usage\+\_\+id}}
+, \newline
+\mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1aede059e4202b5adee31185a63b8bcd4d}{net\+\_\+usage\+\_\+leeway\+\_\+id}}
+, \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1aabbda820e0f7068f4fe1eec2c97dfa11}{context\+\_\+free\+\_\+discount\+\_\+net\+\_\+usage\+\_\+num\+\_\+id}}
+, \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1abdf8121d6911bc5414604c3841659ada}{context\+\_\+free\+\_\+discount\+\_\+net\+\_\+usage\+\_\+den\+\_\+id}}
+, \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1af8ba42549917640b9e076d59cf120aab}{max\+\_\+block\+\_\+cpu\+\_\+usage\+\_\+id}}
+, \newline
+\mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1a316dff7e583be251da8fb7dfd539593d}{target\+\_\+block\+\_\+cpu\+\_\+usage\+\_\+pct\+\_\+id}}
+, \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1a71585d613d327b79a39e1b7c3b92e2f7}{max\+\_\+transaction\+\_\+cpu\+\_\+usage\+\_\+id}}
+, \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1a2abbce92086e253939039c625acf3e49}{min\+\_\+transaction\+\_\+cpu\+\_\+usage\+\_\+id}}
+, \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1a9cdff63dd1610c357f2e2f739a6aae3a}{max\+\_\+transaction\+\_\+lifetime\+\_\+id}}
+, \newline
+\mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1ad3fd0393bc997d48d0ae89b96c49d2b1}{deferred\+\_\+trx\+\_\+expiration\+\_\+window\+\_\+id}}
+, \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1af65bc5f7ba0c30175ec949351333b739}{max\+\_\+transaction\+\_\+delay\+\_\+id}}
+, \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1aad5922d4ae7fd737134eea72aa765118}{max\+\_\+inline\+\_\+action\+\_\+size\+\_\+id}}
+, \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1a9321581c1673cde45ad180f9fbc955a9}{max\+\_\+inline\+\_\+action\+\_\+depth\+\_\+id}}
+, \newline
+\mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1a45f2199603e2f0c911f01df8f16b588d}{max\+\_\+authority\+\_\+depth\+\_\+id}}
+, \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1a4e0622771c1b20555a45772e5c7d7508}{PARAMS\+\_\+\+COUNT}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+const \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v1_ab8840e0ca0593c7f4faf4502c72d4873}{Base}} \& \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v1_ac1c2ee76e0a21a47feaf8e4bbe4c0b9d}{base}} () const
+\item 
+void \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v1_a176ca08bbc7a48727a71e1ba7d5ea795}{validate}} () const
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v1}{chain\+\_\+config\+\_\+v1}} \& \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v1_adac012f89b5ae88017875fe8643ca1f1}{operator=}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v1_ab8840e0ca0593c7f4faf4502c72d4873}{Base}} \&b)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0}{sysio\+::chain\+::chain\+\_\+config\+\_\+v0}}}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_ae96e3222e7161e113ef4182829823595}{validate}} () const
+\item 
+const \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0}{chain\+\_\+config\+\_\+v0}} \& \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a0043dd2e7395c5354b77e0b66d704fa0}{v0}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v1_a3c1a801259d0520ace0d51964fdfa984}{max\+\_\+action\+\_\+return\+\_\+value\+\_\+size}} = config\+::default\+\_\+max\+\_\+action\+\_\+return\+\_\+value\+\_\+size
+\begin{DoxyCompactList}\small\item\em size limit for action return value \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes inherited from \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0}{sysio\+::chain\+::chain\+\_\+config\+\_\+v0}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a796dada63527fcff40f838efc42a04ec}{max\+\_\+block\+\_\+net\+\_\+usage}}
+\begin{DoxyCompactList}\small\item\em the maxiumum net usage in instructions for a block \end{DoxyCompactList}\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a216d150c1c6ad9ea64aaf82d86926d19}{target\+\_\+block\+\_\+net\+\_\+usage\+\_\+pct}}
+\begin{DoxyCompactList}\small\item\em the target percent (1\% == 100, 100\%= 10,000) of maximum net usage; exceeding this triggers congestion handling \end{DoxyCompactList}\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_ab817deae6ddf13840297eae4fe6f8345}{max\+\_\+transaction\+\_\+net\+\_\+usage}}
+\begin{DoxyCompactList}\small\item\em the maximum objectively measured net usage that the chain will allow regardless of account limits \end{DoxyCompactList}\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_ad96077f2371a87e736383b1ae63a2942}{base\+\_\+per\+\_\+transaction\+\_\+net\+\_\+usage}}
+\begin{DoxyCompactList}\small\item\em the base amount of net usage billed for a transaction to cover incidentals \end{DoxyCompactList}\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a964d9d4fe4d9a1bb658e3dc840b62ca8}{net\+\_\+usage\+\_\+leeway}}
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a216d6c8dad55925ff3eebde858a30fef}{context\+\_\+free\+\_\+discount\+\_\+net\+\_\+usage\+\_\+num}}
+\begin{DoxyCompactList}\small\item\em the numerator for the discount on net usage of context-\/free data \end{DoxyCompactList}\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_ab6eca0d78bfbc7a23b250ce38a527d43}{context\+\_\+free\+\_\+discount\+\_\+net\+\_\+usage\+\_\+den}}
+\begin{DoxyCompactList}\small\item\em the denominator for the discount on net usage of context-\/free data \end{DoxyCompactList}\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a292759d9e893bccf78a5d22279fb5752}{max\+\_\+block\+\_\+cpu\+\_\+usage}}
+\begin{DoxyCompactList}\small\item\em the maxiumum billable cpu usage (in microseconds) for a block \end{DoxyCompactList}\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_af2b14c2153bc64969ca85c8df8fbb7f9}{target\+\_\+block\+\_\+cpu\+\_\+usage\+\_\+pct}}
+\begin{DoxyCompactList}\small\item\em the target percent (1\% == 100, 100\%= 10,000) of maximum cpu usage; exceeding this triggers congestion handling \end{DoxyCompactList}\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a27ec75a65de87237c8f7ed2728db3ba5}{max\+\_\+transaction\+\_\+cpu\+\_\+usage}}
+\begin{DoxyCompactList}\small\item\em the maximum billable cpu usage (in microseconds) that the chain will allow regardless of account limits \end{DoxyCompactList}\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a460f6b269c9da35d40b1cc5927c2205a}{min\+\_\+transaction\+\_\+cpu\+\_\+usage}}
+\begin{DoxyCompactList}\small\item\em the minimum billable cpu usage (in microseconds) that the chain requires \end{DoxyCompactList}\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a05237a51dab031f2c76ec9c3a42fec5d}{max\+\_\+transaction\+\_\+lifetime}}
+\begin{DoxyCompactList}\small\item\em the maximum number of seconds that an input transaction\textquotesingle{}s expiration can be ahead of the time of the block in which it is first included \end{DoxyCompactList}\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a6ab303c6326dc33d1280e0b8d13eed68}{deferred\+\_\+trx\+\_\+expiration\+\_\+window}}
+\begin{DoxyCompactList}\small\item\em the number of seconds after the time a deferred transaction can first execute until it expires \end{DoxyCompactList}\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_ad98015ab0842f0258be2df72e7ace5e3}{max\+\_\+transaction\+\_\+delay}}
+\begin{DoxyCompactList}\small\item\em the maximum number of seconds that can be imposed as a delay requirement by authorization checks \end{DoxyCompactList}\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_afb8514589814c9672abd5d0f9c7297cb}{max\+\_\+inline\+\_\+action\+\_\+size}}
+\begin{DoxyCompactList}\small\item\em maximum allowed size (in bytes) of an inline action \end{DoxyCompactList}\item 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a007444fa5297c0950b749d4ca2b64e2c}{max\+\_\+inline\+\_\+action\+\_\+depth}}
+\begin{DoxyCompactList}\small\item\em recursion depth limit on sending inline actions \end{DoxyCompactList}\item 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_ab919615c14dd47bfb30dea47443e8f6a}{max\+\_\+authority\+\_\+depth}}
+\begin{DoxyCompactList}\small\item\em recursion depth limit for checking if an authority is satisfied \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \& \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v1_af3aa5715c515ed65aeb47103ea790781}{log}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&out) const
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Member Functions inherited from \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0}{sysio\+::chain\+::chain\+\_\+config\+\_\+v0}}}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \& \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a840d8c6785472f77182425c924ecbd6a}{log}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&out) const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \& \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v1_a8b2b4a8dbf0142d1b108d64469c34d56}{operator$<$$<$}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&out, const \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v1}{chain\+\_\+config\+\_\+v1}} \&c)
+\item 
+bool \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v1_ac585ffdcaeee929a18d4443d0482bdd7}{operator==}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v1}{chain\+\_\+config\+\_\+v1}} \&lhs, const \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v1}{chain\+\_\+config\+\_\+v1}} \&rhs)
+\item 
+bool \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v1_acb18f57004d9ca2fe78cb96c2fedc888}{operator!=}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v1}{chain\+\_\+config\+\_\+v1}} \&lhs, const \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v1}{chain\+\_\+config\+\_\+v1}} \&rhs)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+If Adding new parameters create chain\+\_\+config\+\_\+v\mbox{[}n\mbox{]} class instead of adding new parameters to v1 or v0. This is needed for snapshots backward compatibility 
+
+Definition at line \mbox{\hyperlink{chain__config_8hpp_source_l00143}{143}} of file \mbox{\hyperlink{chain__config_8hpp_source}{chain\+\_\+config.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{structsysio_1_1chain_1_1chain__config__v1_ab8840e0ca0593c7f4faf4502c72d4873}\index{sysio::chain::chain\_config\_v1@{sysio::chain::chain\_config\_v1}!Base@{Base}}
+\index{Base@{Base}!sysio::chain::chain\_config\_v1@{sysio::chain::chain\_config\_v1}}
+\doxysubsubsection{\texorpdfstring{Base}{Base}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1chain__config__v1_ab8840e0ca0593c7f4faf4502c72d4873} 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v1_ab8840e0ca0593c7f4faf4502c72d4873}{sysio\+::chain\+::chain\+\_\+config\+\_\+v1\+::\+Base}} = \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0}{chain\+\_\+config\+\_\+v0}}}
+
+
+
+Definition at line \mbox{\hyperlink{chain__config_8hpp_source_l00144}{144}} of file \mbox{\hyperlink{chain__config_8hpp_source}{chain\+\_\+config.\+hpp}}.
+
+
+
+\doxysubsection{Member Enumeration Documentation}
+\Hypertarget{structsysio_1_1chain_1_1chain__config__v1_a5000ca17abb32e72f6a6fe4d36bab91f}\doxysubsubsection{\texorpdfstring{anonymous enum}{anonymous enum}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1chain__config__v1_a5000ca17abb32e72f6a6fe4d36bab91f} 
+anonymous enum}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{max\_action\_return\_value\_size\_id@{max\_action\_return\_value\_size\_id}!sysio::chain::chain\_config\_v1@{sysio::chain::chain\_config\_v1}}\index{sysio::chain::chain\_config\_v1@{sysio::chain::chain\_config\_v1}!max\_action\_return\_value\_size\_id@{max\_action\_return\_value\_size\_id}}}\Hypertarget{structsysio_1_1chain_1_1chain__config__v1_a5000ca17abb32e72f6a6fe4d36bab91fade99bcd127eb42daf0316c8115e28f91}\label{structsysio_1_1chain_1_1chain__config__v1_a5000ca17abb32e72f6a6fe4d36bab91f} 
+max\+\_\+action\+\_\+return\+\_\+value\+\_\+size\+\_\+id&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PARAMS\_COUNT@{PARAMS\_COUNT}!sysio::chain::chain\_config\_v1@{sysio::chain::chain\_config\_v1}}\index{sysio::chain::chain\_config\_v1@{sysio::chain::chain\_config\_v1}!PARAMS\_COUNT@{PARAMS\_COUNT}}}\Hypertarget{structsysio_1_1chain_1_1chain__config__v1_a5000ca17abb32e72f6a6fe4d36bab91fac5223ce06268d60ec655757488489d67}\label{structsysio_1_1chain_1_1chain__config__v1_a5000ca17abb32e72f6a6fe4d36bab91f} 
+PARAMS\+\_\+\+COUNT&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{chain__config_8hpp_source_l00149}{149}} of file \mbox{\hyperlink{chain__config_8hpp_source}{chain\+\_\+config.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00150\ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v1_a5000ca17abb32e72f6a6fe4d36bab91fade99bcd127eb42daf0316c8115e28f91}{max\_action\_return\_value\_size\_id}}\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1a4e0622771c1b20555a45772e5c7d7508}{Base::PARAMS\_COUNT}},}
+\DoxyCodeLine{00151\ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v1_a5000ca17abb32e72f6a6fe4d36bab91fac5223ce06268d60ec655757488489d67}{PARAMS\_COUNT}}}
+\DoxyCodeLine{00152\ \ \ \ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1chain_1_1chain__config__v1_ac1c2ee76e0a21a47feaf8e4bbe4c0b9d}\index{sysio::chain::chain\_config\_v1@{sysio::chain::chain\_config\_v1}!base@{base}}
+\index{base@{base}!sysio::chain::chain\_config\_v1@{sysio::chain::chain\_config\_v1}}
+\doxysubsubsection{\texorpdfstring{base()}{base()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1chain__config__v1_ac1c2ee76e0a21a47feaf8e4bbe4c0b9d} 
+const \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v1_ab8840e0ca0593c7f4faf4502c72d4873}{Base}} \& sysio\+::chain\+::chain\+\_\+config\+\_\+v1\+::base (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{chain__config_8hpp_source_l00154}{154}} of file \mbox{\hyperlink{chain__config_8hpp_source}{chain\+\_\+config.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\textcolor{keyword}{const\ }Base\&\textcolor{keyword}{>}(*this);}
+\DoxyCodeLine{00156\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=312pt]{structsysio_1_1chain_1_1chain__config__v1_ac1c2ee76e0a21a47feaf8e4bbe4c0b9d_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1chain__config__v1_af3aa5715c515ed65aeb47103ea790781}\index{sysio::chain::chain\_config\_v1@{sysio::chain::chain\_config\_v1}!log@{log}}
+\index{log@{log}!sysio::chain::chain\_config\_v1@{sysio::chain::chain\_config\_v1}}
+\doxysubsubsection{\texorpdfstring{log()}{log()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1chain__config__v1_af3aa5715c515ed65aeb47103ea790781} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ \\
+\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \& sysio\+::chain\+::chain\+\_\+config\+\_\+v1\+::log (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&}]{out}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{chain__config_8hpp_source_l00182}{182}} of file \mbox{\hyperlink{chain__config_8hpp_source}{chain\+\_\+config.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v1_ac1c2ee76e0a21a47feaf8e4bbe4c0b9d}{base}}().\mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a840d8c6785472f77182425c924ecbd6a}{log}}(out)\ <<\ \textcolor{stringliteral}{"{},\ Max\ Action\ Return\ Value\ Size:\ "{}}\ <<\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v1_a3c1a801259d0520ace0d51964fdfa984}{max\_action\_return\_value\_size}};}
+\DoxyCodeLine{00184\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=312pt]{structsysio_1_1chain_1_1chain__config__v1_af3aa5715c515ed65aeb47103ea790781_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1chain__config__v1_adac012f89b5ae88017875fe8643ca1f1}\index{sysio::chain::chain\_config\_v1@{sysio::chain::chain\_config\_v1}!operator=@{operator=}}
+\index{operator=@{operator=}!sysio::chain::chain\_config\_v1@{sysio::chain::chain\_config\_v1}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1chain__config__v1_adac012f89b5ae88017875fe8643ca1f1} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v1}{chain\+\_\+config\+\_\+v1}} \& sysio\+::chain\+::chain\+\_\+config\+\_\+v1\+::operator= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v1_ab8840e0ca0593c7f4faf4502c72d4873}{Base}} \&}]{b}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{chain__config_8hpp_source_l00175}{175}} of file \mbox{\hyperlink{chain__config_8hpp_source}{chain\+\_\+config.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ Base::operator=\ (b);}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00178\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1chain__config__v1_a176ca08bbc7a48727a71e1ba7d5ea795}\index{sysio::chain::chain\_config\_v1@{sysio::chain::chain\_config\_v1}!validate@{validate}}
+\index{validate@{validate}!sysio::chain::chain\_config\_v1@{sysio::chain::chain\_config\_v1}}
+\doxysubsubsection{\texorpdfstring{validate()}{validate()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1chain__config__v1_a176ca08bbc7a48727a71e1ba7d5ea795} 
+void sysio\+::chain\+::chain\+\_\+config\+\_\+v1\+::validate (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{chain__config_8cpp_source_l00042}{42}} of file \mbox{\hyperlink{chain__config_8cpp_source}{chain\+\_\+config.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00043\ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_ae96e3222e7161e113ef4182829823595}{chain\_config\_v0::validate}}();}
+\DoxyCodeLine{00044\ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v1_a3c1a801259d0520ace0d51964fdfa984}{max\_action\_return\_value\_size}}\ <=\ \mbox{\hyperlink{utility_8hpp_a5e3c645782d12166c98f3654471efd61}{MAX\_SIZE\_OF\_BYTE\_ARRAYS}},\ \mbox{\hyperlink{namespacesysio_1_1chain_a764b50974b9b72a0e233e72176913d6b}{action\_validate\_exception}},}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}max\ action\ return\ value\ size\ should\ be\ less\ than\ MAX\_SIZE\_OF\_BYTE\_ARRAYS"{}}\ );}
+\DoxyCodeLine{00046\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=322pt]{structsysio_1_1chain_1_1chain__config__v1_a176ca08bbc7a48727a71e1ba7d5ea795_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{structsysio_1_1chain_1_1chain__config__v1_acb18f57004d9ca2fe78cb96c2fedc888}\index{sysio::chain::chain\_config\_v1@{sysio::chain::chain\_config\_v1}!operator"!=@{operator"!=}}
+\index{operator"!=@{operator"!=}!sysio::chain::chain\_config\_v1@{sysio::chain::chain\_config\_v1}}
+\doxysubsubsection{\texorpdfstring{operator"!=}{operator!=}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1chain__config__v1_acb18f57004d9ca2fe78cb96c2fedc888} 
+bool \mbox{\hyperlink{namespacefc_a40c368ac88294ae47b064cad937fdbf6}{operator!}}= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v1}{chain\+\_\+config\+\_\+v1}} \&}]{lhs}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v1}{chain\+\_\+config\+\_\+v1}} \&}]{rhs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{chain__config_8hpp_source_l00171}{171}} of file \mbox{\hyperlink{chain__config_8hpp_source}{chain\+\_\+config.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !(lhs\ ==\ rhs);}
+\DoxyCodeLine{00173\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1chain__config__v1_a8b2b4a8dbf0142d1b108d64469c34d56}\index{sysio::chain::chain\_config\_v1@{sysio::chain::chain\_config\_v1}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!sysio::chain::chain\_config\_v1@{sysio::chain::chain\_config\_v1}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$}{operator<<}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1chain__config__v1_a8b2b4a8dbf0142d1b108d64469c34d56} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ \\
+\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \& operator$<$$<$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&}]{out}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v1}{chain\+\_\+config\+\_\+v1}} \&}]{c}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{chain__config_8hpp_source_l00161}{161}} of file \mbox{\hyperlink{chain__config_8hpp_source}{chain\+\_\+config.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ c.log(out)\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{00163\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1chain__config__v1_ac585ffdcaeee929a18d4443d0482bdd7}\index{sysio::chain::chain\_config\_v1@{sysio::chain::chain\_config\_v1}!operator==@{operator==}}
+\index{operator==@{operator==}!sysio::chain::chain\_config\_v1@{sysio::chain::chain\_config\_v1}}
+\doxysubsubsection{\texorpdfstring{operator==}{operator==}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1chain__config__v1_ac585ffdcaeee929a18d4443d0482bdd7} 
+bool operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v1}{chain\+\_\+config\+\_\+v1}} \&}]{lhs}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v1}{chain\+\_\+config\+\_\+v1}} \&}]{rhs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{chain__config_8hpp_source_l00165}{165}} of file \mbox{\hyperlink{chain__config_8hpp_source}{chain\+\_\+config.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \textcolor{comment}{//add\ v1\ parameters\ comarison\ here}}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::tie(lhs.max\_action\_return\_value\_size)\ ==\ std::tie(rhs.max\_action\_return\_value\_size)\ }
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \ \ \&\&\ lhs.base()\ ==\ rhs.base();}
+\DoxyCodeLine{00169\ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1chain_1_1chain__config__v1_a3c1a801259d0520ace0d51964fdfa984}\index{sysio::chain::chain\_config\_v1@{sysio::chain::chain\_config\_v1}!max\_action\_return\_value\_size@{max\_action\_return\_value\_size}}
+\index{max\_action\_return\_value\_size@{max\_action\_return\_value\_size}!sysio::chain::chain\_config\_v1@{sysio::chain::chain\_config\_v1}}
+\doxysubsubsection{\texorpdfstring{max\_action\_return\_value\_size}{max\_action\_return\_value\_size}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1chain__config__v1_a3c1a801259d0520ace0d51964fdfa984} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::chain\+::chain\+\_\+config\+\_\+v1\+::max\+\_\+action\+\_\+return\+\_\+value\+\_\+size = config\+::default\+\_\+max\+\_\+action\+\_\+return\+\_\+value\+\_\+size}
+
+
+
+Definition at line \mbox{\hyperlink{chain__config_8hpp_source_l00146}{146}} of file \mbox{\hyperlink{chain__config_8hpp_source}{chain\+\_\+config.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{chain__config_8hpp}{chain\+\_\+config.\+hpp}}\item 
+libraries/chain/\mbox{\hyperlink{chain__config_8cpp}{chain\+\_\+config.\+cpp}}\end{DoxyCompactItemize}

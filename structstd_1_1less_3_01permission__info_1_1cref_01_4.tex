@@ -1,0 +1,39 @@
+\doxysection{std\+::less\texorpdfstring{$<$}{<} permission\+\_\+info\+::cref \texorpdfstring{$>$}{>} Struct Reference}
+\hypertarget{structstd_1_1less_3_01permission__info_1_1cref_01_4}{}\label{structstd_1_1less_3_01permission__info_1_1cref_01_4}\index{std::less$<$ permission\_info::cref $>$@{std::less$<$ permission\_info::cref $>$}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{structstd_1_1less_3_01permission__info_1_1cref_01_4_a06506be0139ee5e4eabeaf489798fd29}{operator()}} (const permission\+\_\+info\+::cref \&lhs, const permission\+\_\+info\+::cref \&rhs) const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+support for using {\ttfamily permission\+\_\+info\+::cref} in ordered containers 
+
+Definition at line \mbox{\hyperlink{account__query__db_8cpp_source_l00109}{109}} of file \mbox{\hyperlink{account__query__db_8cpp_source}{account\+\_\+query\+\_\+db.\+cpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structstd_1_1less_3_01permission__info_1_1cref_01_4_a06506be0139ee5e4eabeaf489798fd29}\index{std::less$<$ permission\_info::cref $>$@{std::less$<$ permission\_info::cref $>$}!operator()@{operator()}}
+\index{operator()@{operator()}!std::less$<$ permission\_info::cref $>$@{std::less$<$ permission\_info::cref $>$}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}}
+{\footnotesize\ttfamily \label{structstd_1_1less_3_01permission__info_1_1cref_01_4_a06506be0139ee5e4eabeaf489798fd29} 
+bool std\+::less$<$ permission\+\_\+info\+::cref $>$\+::operator() (\begin{DoxyParamCaption}\item[{const permission\+\_\+info\+::cref \&}]{lhs}{, }\item[{const permission\+\_\+info\+::cref \&}]{rhs}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{account__query__db_8cpp_source_l00110}{110}} of file \mbox{\hyperlink{account__query__db_8cpp_source}{account\+\_\+query\+\_\+db.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::uintptr\_t(\&lhs.get())\ <\ std::uintptr\_t(\&rhs.get());}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+plugins/chain\+\_\+plugin/\mbox{\hyperlink{account__query__db_8cpp}{account\+\_\+query\+\_\+db.\+cpp}}\end{DoxyCompactItemize}

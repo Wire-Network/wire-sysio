@@ -1,0 +1,280 @@
+\doxysection{appbase\+::application\+\_\+impl Class Reference}
+\hypertarget{classappbase_1_1application__impl}{}\label{classappbase_1_1application__impl}\index{appbase::application\_impl@{appbase::application\_impl}}
+
+
+Collaboration diagram for appbase\+::application\+\_\+impl\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classappbase_1_1application__impl__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classappbase_1_1application__impl_aade87dbe7aecbf59edff84b93883ea9c}{application\+\_\+impl}} ()
+\item 
+\mbox{\hyperlink{classappbase_1_1application__impl_a5882ebf1f096c40406db720883bfaae1}{\texorpdfstring{$\sim$}{\string~}application\+\_\+impl}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+options\+\_\+description \mbox{\hyperlink{classappbase_1_1application__impl_aeaad17ab2e8496dfcddcde22001f71e9}{\+\_\+app\+\_\+options}}
+\item 
+options\+\_\+description \mbox{\hyperlink{classappbase_1_1application__impl_a4679e6fc2486345acb6fceb7ed836b57}{\+\_\+cfg\+\_\+options}}
+\item 
+variables\+\_\+map \mbox{\hyperlink{classappbase_1_1application__impl_a1fe6f4e56447859c1cc6bcae1e38d7fb}{\+\_\+options}}
+\item 
+bfs\+::path \mbox{\hyperlink{classappbase_1_1application__impl_a16991047b49dae072cec342862666ded}{\+\_\+data\+\_\+dir}} \{"{}data-\/dir"{}\}
+\item 
+bfs\+::path \mbox{\hyperlink{classappbase_1_1application__impl_aadb245a4b7200b02559678b7297c4796}{\+\_\+config\+\_\+dir}} \{"{}config-\/dir"{}\}
+\item 
+bfs\+::path \mbox{\hyperlink{classappbase_1_1application__impl_ab72d2102d709f8fec17cd87c4e1fcacb}{\+\_\+logging\+\_\+conf}} \{"{}logging.\+json"{}\}
+\item 
+bfs\+::path \mbox{\hyperlink{classappbase_1_1application__impl_a138be1de4cc18850693da4ccd50f8308}{\+\_\+config\+\_\+file\+\_\+name}}
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{classappbase_1_1application__impl_a01df2a4f435ae8dd80599748419071f3}{\+\_\+version}} = 0
+\item 
+std\+::string \mbox{\hyperlink{classappbase_1_1application__impl_a829cfc290b5ba1b689f643eadf3cb4fc}{\+\_\+version\+\_\+str}} = \mbox{\hyperlink{namespaceappbase_a5e40542184adc7d1355d331552e5959d}{appbase\+\_\+version\+\_\+string}}
+\item 
+std\+::string \mbox{\hyperlink{classappbase_1_1application__impl_a8872583e2f920f5f9d603fa89ad1364e}{\+\_\+full\+\_\+version\+\_\+str}} = \mbox{\hyperlink{namespaceappbase_a5e40542184adc7d1355d331552e5959d}{appbase\+\_\+version\+\_\+string}}
+\item 
+std\+::atomic\+\_\+bool \mbox{\hyperlink{classappbase_1_1application__impl_a4676ccb4254603ef5225105dc708b8b2}{\+\_\+is\+\_\+quiting}} \{false\}
+\item 
+\mbox{\hyperlink{namespaceappbase_aade924f565cf5f8cfca31b35dcc289d9}{any\+\_\+type\+\_\+compare\+\_\+map}} \mbox{\hyperlink{classappbase_1_1application__impl_a126c931d56805b86f758aaac212d68f4}{\+\_\+any\+\_\+compare\+\_\+map}}
+\item 
+std\+::thread \mbox{\hyperlink{classappbase_1_1application__impl_a13ccdd1b4961e7ec26bb76f08bfe96c5}{\+\_\+signal\+\_\+catching\+\_\+thread}}
+\item 
+std\+::optional$<$ boost\+::asio\+::io\+\_\+context $>$ \mbox{\hyperlink{classappbase_1_1application__impl_a8f84809f06f2633d7e36322138006c5b}{\+\_\+signal\+\_\+catching\+\_\+io\+\_\+ctx}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{application_8cpp_source_l00027}{27}} of file \mbox{\hyperlink{application_8cpp_source}{application.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classappbase_1_1application__impl_aade87dbe7aecbf59edff84b93883ea9c}\index{appbase::application\_impl@{appbase::application\_impl}!application\_impl@{application\_impl}}
+\index{application\_impl@{application\_impl}!appbase::application\_impl@{appbase::application\_impl}}
+\doxysubsubsection{\texorpdfstring{application\_impl()}{application\_impl()}}
+{\footnotesize\ttfamily \label{classappbase_1_1application__impl_aade87dbe7aecbf59edff84b93883ea9c} 
+appbase\+::application\+\_\+impl\+::application\+\_\+impl (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{application_8cpp_source_l00029}{29}} of file \mbox{\hyperlink{application_8cpp_source}{application.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\mbox{\hyperlink{classappbase_1_1application__impl_aeaad17ab2e8496dfcddcde22001f71e9}{\_app\_options}}(\textcolor{stringliteral}{"{}Application\ Options"{}})\{}
+\DoxyCodeLine{00030\ \textcolor{preprocessor}{\#ifndef\ \_WIN32}}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Create\ a\ separate\ thread\ to\ handle\ signals,\ so\ that\ they\ don't\ interrupt\ I/O.}}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ stdio\ does\ not\ recover\ from\ EINTR.}}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classappbase_1_1application__impl_a8f84809f06f2633d7e36322138006c5b}{\_signal\_catching\_io\_ctx}}.emplace();}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classappbase_1_1application__impl_a13ccdd1b4961e7ec26bb76f08bfe96c5}{\_signal\_catching\_thread}}\ =\ std::thread([\&ioctx\ =\ *\mbox{\hyperlink{classappbase_1_1application__impl_a8f84809f06f2633d7e36322138006c5b}{\_signal\_catching\_io\_ctx}}]()\ \{}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ workwork\ =\ boost::asio::make\_work\_guard(ioctx);}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ \ \ \ ioctx.run();}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00038\ }
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ sigset\_t\ blocked\_signals;}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ sigemptyset(\&blocked\_signals);}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ sigaddset(\&blocked\_signals,\ SIGINT);}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ sigaddset(\&blocked\_signals,\ SIGTERM);}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ sigaddset(\&blocked\_signals,\ SIGPIPE);}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ sigaddset(\&blocked\_signals,\ SIGHUP);}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ pthread\_sigmask(SIG\_BLOCK,\ \&blocked\_signals,\ \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{00046\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classappbase_1_1application__impl_a5882ebf1f096c40406db720883bfaae1}\index{appbase::application\_impl@{appbase::application\_impl}!````~application\_impl@{\texorpdfstring{$\sim$}{\string~}application\_impl}}
+\index{````~application\_impl@{\texorpdfstring{$\sim$}{\string~}application\_impl}!appbase::application\_impl@{appbase::application\_impl}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}application\_impl()}{\string~application\_impl()}}
+{\footnotesize\ttfamily \label{classappbase_1_1application__impl_a5882ebf1f096c40406db720883bfaae1} 
+appbase\+::application\+\_\+impl\+::\texorpdfstring{$\sim$}{\string~}application\+\_\+impl (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{application_8cpp_source_l00049}{49}} of file \mbox{\hyperlink{application_8cpp_source}{application.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{classappbase_1_1application__impl_a13ccdd1b4961e7ec26bb76f08bfe96c5}{\_signal\_catching\_thread}}.joinable())\ \{}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classappbase_1_1application__impl_a8f84809f06f2633d7e36322138006c5b}{\_signal\_catching\_io\_ctx}}-\/>stop();}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classappbase_1_1application__impl_a13ccdd1b4961e7ec26bb76f08bfe96c5}{\_signal\_catching\_thread}}.join();}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classappbase_1_1application__impl_a126c931d56805b86f758aaac212d68f4}\index{appbase::application\_impl@{appbase::application\_impl}!\_any\_compare\_map@{\_any\_compare\_map}}
+\index{\_any\_compare\_map@{\_any\_compare\_map}!appbase::application\_impl@{appbase::application\_impl}}
+\doxysubsubsection{\texorpdfstring{\_any\_compare\_map}{\_any\_compare\_map}}
+{\footnotesize\ttfamily \label{classappbase_1_1application__impl_a126c931d56805b86f758aaac212d68f4} 
+\mbox{\hyperlink{namespaceappbase_aade924f565cf5f8cfca31b35dcc289d9}{any\+\_\+type\+\_\+compare\+\_\+map}} appbase\+::application\+\_\+impl\+::\+\_\+any\+\_\+compare\+\_\+map}
+
+
+
+Definition at line \mbox{\hyperlink{application_8cpp_source_l00071}{71}} of file \mbox{\hyperlink{application_8cpp_source}{application.\+cpp}}.
+
+\Hypertarget{classappbase_1_1application__impl_aeaad17ab2e8496dfcddcde22001f71e9}\index{appbase::application\_impl@{appbase::application\_impl}!\_app\_options@{\_app\_options}}
+\index{\_app\_options@{\_app\_options}!appbase::application\_impl@{appbase::application\_impl}}
+\doxysubsubsection{\texorpdfstring{\_app\_options}{\_app\_options}}
+{\footnotesize\ttfamily \label{classappbase_1_1application__impl_aeaad17ab2e8496dfcddcde22001f71e9} 
+options\+\_\+description appbase\+::application\+\_\+impl\+::\+\_\+app\+\_\+options}
+
+
+
+Definition at line \mbox{\hyperlink{application_8cpp_source_l00056}{56}} of file \mbox{\hyperlink{application_8cpp_source}{application.\+cpp}}.
+
+\Hypertarget{classappbase_1_1application__impl_a4679e6fc2486345acb6fceb7ed836b57}\index{appbase::application\_impl@{appbase::application\_impl}!\_cfg\_options@{\_cfg\_options}}
+\index{\_cfg\_options@{\_cfg\_options}!appbase::application\_impl@{appbase::application\_impl}}
+\doxysubsubsection{\texorpdfstring{\_cfg\_options}{\_cfg\_options}}
+{\footnotesize\ttfamily \label{classappbase_1_1application__impl_a4679e6fc2486345acb6fceb7ed836b57} 
+options\+\_\+description appbase\+::application\+\_\+impl\+::\+\_\+cfg\+\_\+options}
+
+
+
+Definition at line \mbox{\hyperlink{application_8cpp_source_l00057}{57}} of file \mbox{\hyperlink{application_8cpp_source}{application.\+cpp}}.
+
+\Hypertarget{classappbase_1_1application__impl_aadb245a4b7200b02559678b7297c4796}\index{appbase::application\_impl@{appbase::application\_impl}!\_config\_dir@{\_config\_dir}}
+\index{\_config\_dir@{\_config\_dir}!appbase::application\_impl@{appbase::application\_impl}}
+\doxysubsubsection{\texorpdfstring{\_config\_dir}{\_config\_dir}}
+{\footnotesize\ttfamily \label{classappbase_1_1application__impl_aadb245a4b7200b02559678b7297c4796} 
+bfs\+::path appbase\+::application\+\_\+impl\+::\+\_\+config\+\_\+dir \{"{}config-\/dir"{}\}}
+
+
+
+Definition at line \mbox{\hyperlink{application_8cpp_source_l00061}{61}} of file \mbox{\hyperlink{application_8cpp_source}{application.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00061\ \{\textcolor{stringliteral}{"{}config-\/dir"{}}\};}
+
+\end{DoxyCode}
+\Hypertarget{classappbase_1_1application__impl_a138be1de4cc18850693da4ccd50f8308}\index{appbase::application\_impl@{appbase::application\_impl}!\_config\_file\_name@{\_config\_file\_name}}
+\index{\_config\_file\_name@{\_config\_file\_name}!appbase::application\_impl@{appbase::application\_impl}}
+\doxysubsubsection{\texorpdfstring{\_config\_file\_name}{\_config\_file\_name}}
+{\footnotesize\ttfamily \label{classappbase_1_1application__impl_a138be1de4cc18850693da4ccd50f8308} 
+bfs\+::path appbase\+::application\+\_\+impl\+::\+\_\+config\+\_\+file\+\_\+name}
+
+
+
+Definition at line \mbox{\hyperlink{application_8cpp_source_l00063}{63}} of file \mbox{\hyperlink{application_8cpp_source}{application.\+cpp}}.
+
+\Hypertarget{classappbase_1_1application__impl_a16991047b49dae072cec342862666ded}\index{appbase::application\_impl@{appbase::application\_impl}!\_data\_dir@{\_data\_dir}}
+\index{\_data\_dir@{\_data\_dir}!appbase::application\_impl@{appbase::application\_impl}}
+\doxysubsubsection{\texorpdfstring{\_data\_dir}{\_data\_dir}}
+{\footnotesize\ttfamily \label{classappbase_1_1application__impl_a16991047b49dae072cec342862666ded} 
+bfs\+::path appbase\+::application\+\_\+impl\+::\+\_\+data\+\_\+dir \{"{}data-\/dir"{}\}}
+
+
+
+Definition at line \mbox{\hyperlink{application_8cpp_source_l00060}{60}} of file \mbox{\hyperlink{application_8cpp_source}{application.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00060\ \{\textcolor{stringliteral}{"{}data-\/dir"{}}\};}
+
+\end{DoxyCode}
+\Hypertarget{classappbase_1_1application__impl_a8872583e2f920f5f9d603fa89ad1364e}\index{appbase::application\_impl@{appbase::application\_impl}!\_full\_version\_str@{\_full\_version\_str}}
+\index{\_full\_version\_str@{\_full\_version\_str}!appbase::application\_impl@{appbase::application\_impl}}
+\doxysubsubsection{\texorpdfstring{\_full\_version\_str}{\_full\_version\_str}}
+{\footnotesize\ttfamily \label{classappbase_1_1application__impl_a8872583e2f920f5f9d603fa89ad1364e} 
+std\+::string appbase\+::application\+\_\+impl\+::\+\_\+full\+\_\+version\+\_\+str = \mbox{\hyperlink{namespaceappbase_a5e40542184adc7d1355d331552e5959d}{appbase\+\_\+version\+\_\+string}}}
+
+
+
+Definition at line \mbox{\hyperlink{application_8cpp_source_l00067}{67}} of file \mbox{\hyperlink{application_8cpp_source}{application.\+cpp}}.
+
+\Hypertarget{classappbase_1_1application__impl_a4676ccb4254603ef5225105dc708b8b2}\index{appbase::application\_impl@{appbase::application\_impl}!\_is\_quiting@{\_is\_quiting}}
+\index{\_is\_quiting@{\_is\_quiting}!appbase::application\_impl@{appbase::application\_impl}}
+\doxysubsubsection{\texorpdfstring{\_is\_quiting}{\_is\_quiting}}
+{\footnotesize\ttfamily \label{classappbase_1_1application__impl_a4676ccb4254603ef5225105dc708b8b2} 
+std\+::atomic\+\_\+bool appbase\+::application\+\_\+impl\+::\+\_\+is\+\_\+quiting \{false\}}
+
+
+
+Definition at line \mbox{\hyperlink{application_8cpp_source_l00069}{69}} of file \mbox{\hyperlink{application_8cpp_source}{application.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00069\ \{\textcolor{keyword}{false}\};}
+
+\end{DoxyCode}
+\Hypertarget{classappbase_1_1application__impl_ab72d2102d709f8fec17cd87c4e1fcacb}\index{appbase::application\_impl@{appbase::application\_impl}!\_logging\_conf@{\_logging\_conf}}
+\index{\_logging\_conf@{\_logging\_conf}!appbase::application\_impl@{appbase::application\_impl}}
+\doxysubsubsection{\texorpdfstring{\_logging\_conf}{\_logging\_conf}}
+{\footnotesize\ttfamily \label{classappbase_1_1application__impl_ab72d2102d709f8fec17cd87c4e1fcacb} 
+bfs\+::path appbase\+::application\+\_\+impl\+::\+\_\+logging\+\_\+conf \{"{}logging.\+json"{}\}}
+
+
+
+Definition at line \mbox{\hyperlink{application_8cpp_source_l00062}{62}} of file \mbox{\hyperlink{application_8cpp_source}{application.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00062\ \{\textcolor{stringliteral}{"{}logging.json"{}}\};}
+
+\end{DoxyCode}
+\Hypertarget{classappbase_1_1application__impl_a1fe6f4e56447859c1cc6bcae1e38d7fb}\index{appbase::application\_impl@{appbase::application\_impl}!\_options@{\_options}}
+\index{\_options@{\_options}!appbase::application\_impl@{appbase::application\_impl}}
+\doxysubsubsection{\texorpdfstring{\_options}{\_options}}
+{\footnotesize\ttfamily \label{classappbase_1_1application__impl_a1fe6f4e56447859c1cc6bcae1e38d7fb} 
+variables\+\_\+map appbase\+::application\+\_\+impl\+::\+\_\+options}
+
+
+
+Definition at line \mbox{\hyperlink{application_8cpp_source_l00058}{58}} of file \mbox{\hyperlink{application_8cpp_source}{application.\+cpp}}.
+
+\Hypertarget{classappbase_1_1application__impl_a8f84809f06f2633d7e36322138006c5b}\index{appbase::application\_impl@{appbase::application\_impl}!\_signal\_catching\_io\_ctx@{\_signal\_catching\_io\_ctx}}
+\index{\_signal\_catching\_io\_ctx@{\_signal\_catching\_io\_ctx}!appbase::application\_impl@{appbase::application\_impl}}
+\doxysubsubsection{\texorpdfstring{\_signal\_catching\_io\_ctx}{\_signal\_catching\_io\_ctx}}
+{\footnotesize\ttfamily \label{classappbase_1_1application__impl_a8f84809f06f2633d7e36322138006c5b} 
+std\+::optional$<$boost\+::asio\+::io\+\_\+context$>$ appbase\+::application\+\_\+impl\+::\+\_\+signal\+\_\+catching\+\_\+io\+\_\+ctx}
+
+
+
+Definition at line \mbox{\hyperlink{application_8cpp_source_l00074}{74}} of file \mbox{\hyperlink{application_8cpp_source}{application.\+cpp}}.
+
+\Hypertarget{classappbase_1_1application__impl_a13ccdd1b4961e7ec26bb76f08bfe96c5}\index{appbase::application\_impl@{appbase::application\_impl}!\_signal\_catching\_thread@{\_signal\_catching\_thread}}
+\index{\_signal\_catching\_thread@{\_signal\_catching\_thread}!appbase::application\_impl@{appbase::application\_impl}}
+\doxysubsubsection{\texorpdfstring{\_signal\_catching\_thread}{\_signal\_catching\_thread}}
+{\footnotesize\ttfamily \label{classappbase_1_1application__impl_a13ccdd1b4961e7ec26bb76f08bfe96c5} 
+std\+::thread appbase\+::application\+\_\+impl\+::\+\_\+signal\+\_\+catching\+\_\+thread}
+
+
+
+Definition at line \mbox{\hyperlink{application_8cpp_source_l00073}{73}} of file \mbox{\hyperlink{application_8cpp_source}{application.\+cpp}}.
+
+\Hypertarget{classappbase_1_1application__impl_a01df2a4f435ae8dd80599748419071f3}\index{appbase::application\_impl@{appbase::application\_impl}!\_version@{\_version}}
+\index{\_version@{\_version}!appbase::application\_impl@{appbase::application\_impl}}
+\doxysubsubsection{\texorpdfstring{\_version}{\_version}}
+{\footnotesize\ttfamily \label{classappbase_1_1application__impl_a01df2a4f435ae8dd80599748419071f3} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} appbase\+::application\+\_\+impl\+::\+\_\+version = 0}
+
+
+
+Definition at line \mbox{\hyperlink{application_8cpp_source_l00065}{65}} of file \mbox{\hyperlink{application_8cpp_source}{application.\+cpp}}.
+
+\Hypertarget{classappbase_1_1application__impl_a829cfc290b5ba1b689f643eadf3cb4fc}\index{appbase::application\_impl@{appbase::application\_impl}!\_version\_str@{\_version\_str}}
+\index{\_version\_str@{\_version\_str}!appbase::application\_impl@{appbase::application\_impl}}
+\doxysubsubsection{\texorpdfstring{\_version\_str}{\_version\_str}}
+{\footnotesize\ttfamily \label{classappbase_1_1application__impl_a829cfc290b5ba1b689f643eadf3cb4fc} 
+std\+::string appbase\+::application\+\_\+impl\+::\+\_\+version\+\_\+str = \mbox{\hyperlink{namespaceappbase_a5e40542184adc7d1355d331552e5959d}{appbase\+\_\+version\+\_\+string}}}
+
+
+
+Definition at line \mbox{\hyperlink{application_8cpp_source_l00066}{66}} of file \mbox{\hyperlink{application_8cpp_source}{application.\+cpp}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/appbase/\mbox{\hyperlink{application_8cpp}{application.\+cpp}}\end{DoxyCompactItemize}

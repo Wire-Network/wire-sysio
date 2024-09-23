@@ -1,0 +1,8 @@
+<map id="CLI::Option::reduced_results" name="CLI::Option::reduced_results">
+<area shape="rect" id="Node000001" title="Get a copy of the results." alt="" coords="191,39,333,80"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_option.html#a251a3c10c556855c236fddbd419709b1" title="Get the results as a specified type." alt="" coords="6,5,142,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="175,43,135,34,136,29,177,38"/>
+<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_config_base.html#a5832f6f03212648fa08a8ff83bc9bc08" title="Convert an app into a configuration." alt="" coords="5,79,143,120"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="176,80,144,87,142,82,175,75"/>
+<area shape="poly" id="edge3_Node000003_Node000003" title=" " alt="" coords="104,66,93,60,74,58,56,60,46,64,42,70,43,78,38,79,36,69,42,60,55,55,74,53,95,55,107,61"/>
+</map>

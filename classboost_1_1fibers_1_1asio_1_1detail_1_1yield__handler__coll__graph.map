@@ -1,0 +1,9 @@
+<map id="boost::fibers::asio::detail::yield_handler&lt; T &gt;" name="boost::fibers::asio::detail::yield_handler&lt; T &gt;">
+<area shape="rect" id="Node000001" title=" " alt="" coords="64,199,240,240"/>
+<area shape="rect" id="Node000002" href="$classboost_1_1fibers_1_1asio_1_1detail_1_1yield__handler__base.html" title=" " alt="" coords="62,109,242,150"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="155,165,155,199,149,199,149,165"/>
+<area shape="rect" id="Node000003" href="$classboost_1_1fibers_1_1asio_1_1yield__t.html" title=" " alt="" coords="5,5,131,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="96,56,138,107,134,110,92,60"/>
+<area shape="rect" id="Node000004" href="$structboost_1_1fibers_1_1asio_1_1detail_1_1yield__completion.html" title=" " alt="" coords="155,5,320,46"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="213,60,170,110,166,107,209,56"/>
+</map>

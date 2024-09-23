@@ -1,0 +1,12 @@
+<map id="Catch::Generators::RandomIntegerGenerator::RandomIntegerGenerator" name="Catch::Generators::RandomIntegerGenerator::RandomIntegerGenerator">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,22,181,78"/>
+<area shape="rect" id="Node000002" href="$namespace_catch.html#a228a625318bb6183842e394eeba17d50" title=" " alt="" coords="392,13,564,38"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="181,42,377,29,377,35,181,47"/>
+<area shape="rect" id="Node000004" href="$namespace_catch.html#acf5ea05e942d2d7fe79111e12754ed76" title=" " alt="" coords="229,62,341,88"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="182,59,213,63,213,68,181,64"/>
+<area shape="rect" id="Node000003" href="$namespace_catch.html#a710841d4732b86c06f816bd4822bd425" title=" " alt="" coords="615,5,787,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="564,23,600,23,600,28,564,28"/>
+<area shape="poly" id="edge5_Node000004_Node000002" title=" " alt="" coords="338,59,409,40,411,46,339,64"/>
+<area shape="rect" id="Node000005" href="$struct_catch_1_1_i_context.html#ad72743ae753feab0a6f5505f26f79ced" title=" " alt="" coords="389,62,567,88"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="341,72,373,72,373,78,341,78"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="XT&lt; dummy &gt;" name="XT&lt; dummy &gt;">
+<area shape="rect" id="Node000001" title=" " alt="" coords="39,259,144,285"/>
+<area shape="rect" id="Node000002" href="$struct_a.html" title=" " alt="" coords="72,155,111,181"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="94,197,94,259,89,259,89,197"/>
+<area shape="rect" id="Node000003" href="$class_test.html" title=" " alt="" coords="68,80,115,106"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="94,121,94,155,89,155,89,121"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="5,5,178,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="94,46,94,80,89,80,89,46"/>
+</map>

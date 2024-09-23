@@ -1,0 +1,15 @@
+<map id="yh_util_delete_object" name="yh_util_delete_object">
+<area shape="rect" id="Node000001" title=" " alt="" coords="482,55,626,80"/>
+<area shape="rect" id="Node000002" href="$ssh_8c.html#a840291bc02cba5474a4cb46a9b9566fe" title=" " alt="" coords="340,5,390,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="487,53,389,27,391,22,488,48"/>
+<area shape="rect" id="Node000003" href="$commands_8c.html#ae2e50929acc6085cd395d0bd4ddb02db" title=" " alt="" coords="296,55,434,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="467,70,435,70,435,65,467,65"/>
+<area shape="rect" id="Node000006" href="$commands_8c.html#ad490f0e89d33c1300a44bd095eb5562c" title=" " alt="" coords="310,104,420,130"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="488,87,418,106,417,101,486,82"/>
+<area shape="rect" id="Node000004" href="$src_2main_8c.html#a34a9e8c400dcf19e771e884636316060" title=" " alt="" coords="103,55,248,80"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="281,70,248,70,248,65,281,65"/>
+<area shape="rect" id="Node000005" href="$src_2main_8c.html#a0ddf1224851353fc92bfbff6f499fa97" title=" " alt="" coords="5,80,55,106"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="88,85,55,91,54,86,87,80"/>
+<area shape="poly" id="edge6_Node000006_Node000004" title=" " alt="" coords="297,102,227,84,228,78,299,97"/>
+<area shape="poly" id="edge7_Node000006_Node000005" title=" " alt="" coords="295,115,55,97,55,92,295,109"/>
+</map>

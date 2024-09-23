@@ -1,0 +1,90 @@
+\doxysection{hello\+\_\+driver.\+cpp}
+\hypertarget{hello__driver_8cpp_source}{}\label{hello__driver_8cpp_source}\index{libraries/sys-\/vm/tools/hello\_driver.cpp@{libraries/sys-\/vm/tools/hello\_driver.cpp}}
+\mbox{\hyperlink{hello__driver_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <sysio/vm/backend.hpp>}}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <sysio/vm/error\_codes.hpp>}}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <sysio/vm/host\_function.hpp>}}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <sysio/vm/watchdog.hpp>}}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <iostream>}}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00009}00009\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}};}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00010}00010\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacesysio_1_1vm}{sysio::vm}};}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00012}00012\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{hello_8wasm_8hpp}{hello.wasm.hpp}}"{}}}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00014}\mbox{\hyperlink{structexample__host__methods}{00014}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structexample__host__methods}{example\_host\_methods}}\ \{}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00015}\mbox{\hyperlink{structexample__host__methods_aafe26636e9ac62100c1bf20a45fabf89}{00015}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structexample__host__methods_aafe26636e9ac62100c1bf20a45fabf89}{print\_num}}(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ n)\ \{\ std::cout\ <<\ \textcolor{stringliteral}{"{}Number\ :\ "{}}\ <<\ n\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};\ \}}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00016}00016\ \ \ \ \textcolor{comment}{//\ example\ of\ a\ host\ "{}method"{}}}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00017}\mbox{\hyperlink{structexample__host__methods_a7410c320366b22a9359913b4b9ec98f9}{00017}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structexample__host__methods_a7410c320366b22a9359913b4b9ec98f9}{print\_name}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ nm)\ \{\ std::cout\ <<\ \textcolor{stringliteral}{"{}Name\ :\ "{}}\ <<\ nm\ <<\ \textcolor{stringliteral}{"{}\ "{}}\ <<\ \mbox{\hyperlink{structexample__host__methods_a5bea5fc1bf19ab72166d9366f32d87e4}{field}}\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};\ \}}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00018}00018\ \ \ \ \textcolor{comment}{//\ example\ of\ another\ type\ of\ host\ function}}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00019}\mbox{\hyperlink{structexample__host__methods_af69f9804f8f8a31ddd1831eff5da931a}{00019}}\ \ \ \ \textcolor{keywordtype}{void}*\ \mbox{\hyperlink{structexample__host__methods_af69f9804f8f8a31ddd1831eff5da931a}{memset}}(\textcolor{keywordtype}{char}*\ ptr,\ \textcolor{keywordtype}{int}\ x,\ \textcolor{keywordtype}{size\_t}\ n)\ \{\ return\ ::memset(ptr,\ x,\ n);\ \}}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00020}\mbox{\hyperlink{structexample__host__methods_a5bea5fc1bf19ab72166d9366f32d87e4}{00020}}\ \ \ \ std::string\ \ \mbox{\hyperlink{structexample__host__methods_a5bea5fc1bf19ab72166d9366f32d87e4}{field}}\ =\ \textcolor{stringliteral}{"{}"{}};}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00022}\mbox{\hyperlink{structexample__host__methods_aaeab9f9f56aa8c95e137eea0fdc5bdae}{00022}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structexample__host__methods_aaeab9f9f56aa8c95e137eea0fdc5bdae}{sysio\_assert}}(\textcolor{keywordtype}{bool}\ test,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ msg)\ \{}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00023}00023\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!test)\ \{}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00024}00024\ \ \ \ \ \ \ \ \ \ std::cout\ <<\ msg\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00025}00025\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ 0;}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00026}00026\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00027}00027\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00029}\mbox{\hyperlink{structexample__host__methods_a935fb22c9cdbd90d5b11b5610396169e}{00029}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structexample__host__methods_a935fb22c9cdbd90d5b11b5610396169e}{print\_span}}(\mbox{\hyperlink{classsysio_1_1vm_1_1span}{span<const\ char>}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})\ \{}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00030}00030\ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}Span\ :\ "{}}\ <<\ std::string\{\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.data(),\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.size()\}\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00031}00031\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00032}00032\ \};}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00034}00034\ \textcolor{keyword}{struct\ }cnv\ :\ \mbox{\hyperlink{structsysio_1_1vm_1_1type__converter}{type\_converter}}<example\_host\_methods>\ \{}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00035}00035\ \ \ \ \textcolor{keyword}{using\ }type\_converter::type\_converter;}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00036}00036\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{structsysio_1_1chain_1_1basic__type__converter_a6669247f8d5b1394fd4d7b5527d21a3f}{type\_converter::from\_wasm}};}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00037}\mbox{\hyperlink{structcnv_a96d30da49fa0486b14a3b953a73cc8d1}{00037}}\ \ \ \ \mbox{\hyperlink{structcnv_a96d30da49fa0486b14a3b953a73cc8d1}{SYS\_VM\_FROM\_WASM}}(\textcolor{keywordtype}{bool},\ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}))\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ ?\ 1\ :\ 0;\ \}}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00038}\mbox{\hyperlink{structcnv_a4480db85bb1ca77f2a22f9e859d58746}{00038}}\ \ \ \ \mbox{\hyperlink{structcnv_a4480db85bb1ca77f2a22f9e859d58746}{SYS\_VM\_FROM\_WASM}}(\textcolor{keywordtype}{char}*,\ (\textcolor{keywordtype}{void}*\ ptr))\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(ptr);\ \}}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00039}\mbox{\hyperlink{structcnv_a8165fab2176db6e3483f439102c278f7}{00039}}\ \ \ \ \mbox{\hyperlink{structcnv_a8165fab2176db6e3483f439102c278f7}{SYS\_VM\_FROM\_WASM}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*,\ (\textcolor{keywordtype}{void}*\ ptr))\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(ptr);\ \}}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00040}00040\ \};}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00042}\mbox{\hyperlink{hello__driver_8cpp_a2abd2eb320174c8ccc5019ef3edaac9c}{00042}}\ \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_a0ae6dea7d9c49bffd63d1c8e10be8b7b}{SYS\_VM\_PRECONDITION}}(test\_name,}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00043}00043\ \ \ \ \ \ \ \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_a576aca63e32e4cbf42537c5876c0d95b}{SYS\_VM\_INVOKE\_ON}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*,\ [\&](\textcolor{keyword}{auto}\&\&\ nm,\ \textcolor{keyword}{auto}\&\&...\ rest)\ \{}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00044}00044\ \ \ \ \ \ \ \ \ \ std::string\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ =\ nm;}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00045}00045\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ ==\ \textcolor{stringliteral}{"{}sys-\/vm2"{}})}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00046}00046\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{stringliteral}{"{}failure"{}};}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00047}00047\ \ \ \ \}))}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00052}\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{00052}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}(\textcolor{keywordtype}{int}\ argc,\ \textcolor{keywordtype}{char}**\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}})\ \{}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00053}00053\ \ \ \ \textcolor{keywordflow}{if}\ (argc\ <\ 4)\ \{}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00054}00054\ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}Please\ enter\ three\ numbers\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00055}00055\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ -\/1;}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00056}00056\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00057}00057\ \ \ \ \textcolor{comment}{//\ Thread\ specific\ \`{}allocator`\ used\ for\ wasm\ linear\ memory.}}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00058}00058\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator}{wasm\_allocator}}\ \mbox{\hyperlink{allow__code__after__function__end__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}};}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00059}00059\ \ \ \ \textcolor{comment}{//\ Specific\ the\ backend\ with\ example\_host\_methods\ for\ host\ functions.}}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00060}\mbox{\hyperlink{hello__driver_8cpp_aadb2815fd78380a040e937d86fa70dcf}{00060}}\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{structsysio_1_1vm_1_1registered__host__functions}{rhf\_t}}\ \ \ \ \ =\ \mbox{\hyperlink{structsysio_1_1vm_1_1registered__host__functions}{sysio::vm::registered\_host\_functions<example\_host\_methods,\ execution\_interface,\ cnv>}};}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00061}\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{00061}}\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio::vm::backend<rhf\_t>}};}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00062}00062\ }
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00063}00063\ \ \ \ \textcolor{comment}{//\ register\ print\_num}}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00064}00064\ \ \ \ rhf\_t::add<\&example\_host\_methods::print\_num>(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}print\_num"{}});}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00065}00065\ \ \ \ \textcolor{comment}{//\ register\ sysio\_assert}}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00066}00066\ \ \ \ rhf\_t::add<\&example\_host\_methods::sysio\_assert>(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}sysio\_assert"{}});}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00067}00067\ \ \ \ \textcolor{comment}{//\ register\ print\_name}}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00068}00068\ \ \ \ rhf\_t::add<\&example\_host\_methods::print\_name,\ test\_name>(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}print\_name"{}});}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00069}00069\ \ \ \ \textcolor{comment}{//\ finally\ register\ memset}}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00070}00070\ \ \ \ rhf\_t::add<\&example\_host\_methods::memset>(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}memset"{}});}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00071}00071\ \ \ \ rhf\_t::add<\&example\_host\_methods::print\_span>(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}print\_span"{}});}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00073}\mbox{\hyperlink{hello__driver_8cpp_aa199bff2581e446e3865732d06d873f0}{00073}}\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1watchdog}{watchdog}}\ \mbox{\hyperlink{hello__driver_8cpp_aa199bff2581e446e3865732d06d873f0}{wd}}\{std::chrono::seconds(3)\};}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00074}\mbox{\hyperlink{hello__driver_8cpp_abe4cc9788f52e49485473dc699537388}{00074}}\ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00075}00075\ \ \ \ \ \ \ \mbox{\hyperlink{structexample__host__methods}{example\_host\_methods}}\ ehm;}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00076}00076\ \ \ \ \ \ \ \textcolor{comment}{//\ Instaniate\ a\ new\ backend\ using\ the\ wasm\ provided.}}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00077}\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{00077}}\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ \mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}(\mbox{\hyperlink{hello_8wasm_8hpp_aefb57c647ba161305295c1038f86b7b8}{hello\_wasm}},\ ehm,\ \&\mbox{\hyperlink{allow__code__after__function__end__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00079}00079\ \ \ \ \ \ \ \textcolor{comment}{//\ Instaniate\ a\ "{}host"{}}}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00080}\mbox{\hyperlink{hello__driver_8cpp_a0b6f424d9a532680c6b2ca5c119c938b}{00080}}\ \ \ \ \ \ \ ehm.\mbox{\hyperlink{structexample__host__methods_a5bea5fc1bf19ab72166d9366f32d87e4}{field}}\ =\ \textcolor{stringliteral}{"{}testing"{}};}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00081}00081\ \ \ \ \ \ \ \textcolor{comment}{//\ Execute\ apply.}}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00082}\mbox{\hyperlink{hello__driver_8cpp_a008263978d442dedd79e31cecee41f42}{00082}}\ \ \ \ \ \ \ \mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}(ehm,\ \textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}apply"{}},\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})std::atoi(\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[1]),\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})std::atoi(\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[2]),}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00083}00083\ \ \ \ \ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})std::atoi(\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[3]));}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00084}00084\ }
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00085}\mbox{\hyperlink{hello__driver_8cpp_a1204fa6444ae7174767e202a6d39b815}{00085}}\ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{\ std::cerr\ <<\ \textcolor{stringliteral}{"{}sys-\/vm\ interpreter\ error\(\backslash\)n"{}};\ \}}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00086}\mbox{\hyperlink{hello__driver_8cpp_a9717e7bbecb906637e86cef6da3d83c2}{00086}}\ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{hello__driver_8cpp_source_l00087}00087\ \}}
+
+\end{DoxyCode}

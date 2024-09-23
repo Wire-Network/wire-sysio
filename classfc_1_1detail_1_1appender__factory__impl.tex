@@ -1,0 +1,79 @@
+\doxysection{fc\+::detail\+::appender\+\_\+factory\+\_\+impl\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classfc_1_1detail_1_1appender__factory__impl}{}\label{classfc_1_1detail_1_1appender__factory__impl}\index{fc::detail::appender\_factory\_impl$<$ T $>$@{fc::detail::appender\_factory\_impl$<$ T $>$}}
+
+
+{\ttfamily \#include $<$appender.\+hpp$>$}
+
+
+
+Inheritance diagram for fc\+::detail\+::appender\+\_\+factory\+\_\+impl\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=185pt]{classfc_1_1detail_1_1appender__factory__impl__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for fc\+::detail\+::appender\+\_\+factory\+\_\+impl\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=185pt]{classfc_1_1detail_1_1appender__factory__impl__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classfc_1_1appender}{appender}} $>$ \mbox{\hyperlink{classfc_1_1detail_1_1appender__factory__impl_a198e0440024a99260ca45bb90ef4ab6e}{create}} (const \mbox{\hyperlink{classfc_1_1variant}{variant}} \&args)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classfc_1_1appender__factory}{fc\+::appender\+\_\+factory}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{classfc_1_1appender__factory_add87c0099c23039a3a597b418c466e4e}{\texorpdfstring{$\sim$}{\string~}appender\+\_\+factory}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Public Types inherited from \mbox{\hyperlink{classfc_1_1appender__factory}{fc\+::appender\+\_\+factory}}}
+\begin{DoxyCompactItemize}
+\item 
+typedef std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classfc_1_1appender__factory}{appender\+\_\+factory}} $>$ \mbox{\hyperlink{classfc_1_1appender__factory_a614d9219568f7a70abfb3a0bfa75c222}{ptr}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$\newline
+class fc\+::detail\+::appender\+\_\+factory\+\_\+impl$<$ T $>$}
+
+
+Definition at line \mbox{\hyperlink{appender_8hpp_source_l00027}{27}} of file \mbox{\hyperlink{appender_8hpp_source}{appender.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1detail_1_1appender__factory__impl_a198e0440024a99260ca45bb90ef4ab6e}\index{fc::detail::appender\_factory\_impl$<$ T $>$@{fc::detail::appender\_factory\_impl$<$ T $>$}!create@{create}}
+\index{create@{create}!fc::detail::appender\_factory\_impl$<$ T $>$@{fc::detail::appender\_factory\_impl$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{create()}{create()}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1appender__factory__impl_a198e0440024a99260ca45bb90ef4ab6e} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+virtual std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classfc_1_1appender}{appender}} $>$ \mbox{\hyperlink{classfc_1_1detail_1_1appender__factory__impl}{fc\+::detail\+::appender\+\_\+factory\+\_\+impl}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::create (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1variant}{variant}} \&}]{args}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classfc_1_1appender__factory_aac275525e1053167488de8a9313e0d74}{fc\+::appender\+\_\+factory}}.
+
+
+
+Definition at line \mbox{\hyperlink{appender_8hpp_source_l00029}{29}} of file \mbox{\hyperlink{appender_8hpp_source}{appender.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::shared\_ptr<appender>(\textcolor{keyword}{new}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}(args));}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/log/\mbox{\hyperlink{appender_8hpp}{appender.\+hpp}}\end{DoxyCompactItemize}

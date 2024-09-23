@@ -1,0 +1,220 @@
+\doxysection{sysiosystem\+::voter\+\_\+info Struct Reference}
+\hypertarget{structsysiosystem_1_1voter__info}{}\label{structsysiosystem_1_1voter__info}\index{sysiosystem::voter\_info@{sysiosystem::voter\_info}}
+
+
+{\ttfamily \#include $<$sysio.\+system.\+hpp$>$}
+
+
+
+Collaboration diagram for sysiosystem\+::voter\+\_\+info\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysiosystem_1_1voter__info__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum class \mbox{\hyperlink{structsysiosystem_1_1voter__info_a327be7d8d01a553dfe29535d56828576}{flags1\+\_\+fields}} \+: uint32\+\_\+t \{ \mbox{\hyperlink{structsysiosystem_1_1voter__info_a327be7d8d01a553dfe29535d56828576ae149b497807ee78e9e5180d213e5a402}{ram\+\_\+managed}} = 1
+, \mbox{\hyperlink{structsysiosystem_1_1voter__info_a327be7d8d01a553dfe29535d56828576a944559ad694d4c0fc4bf286864caf2a2}{net\+\_\+managed}} = 2
+, \mbox{\hyperlink{structsysiosystem_1_1voter__info_a327be7d8d01a553dfe29535d56828576ace319c6a1aa0ced6ea5a02270d863f4c}{cpu\+\_\+managed}} = 4
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1voter__info_a8b219900ab6c942d3fd4fef81cc972d1}{primary\+\_\+key}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \mbox{\hyperlink{structsysiosystem_1_1voter__info_aa0395988571b075580e1bef002788f60}{owner}}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \mbox{\hyperlink{structsysiosystem_1_1voter__info_a1c11aa68c2055cf0c73632b0e7fc3e2e}{proxy}}
+\begin{DoxyCompactList}\small\item\em the voter \end{DoxyCompactList}\item 
+std\+::vector$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$ \mbox{\hyperlink{structsysiosystem_1_1voter__info_a21400ed63d17554f3b60efb7f3c93d69}{producers}}
+\begin{DoxyCompactList}\small\item\em the proxy set by the voter, if any \end{DoxyCompactList}\item 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1voter__info_a47c79bb811658eabffb9f4f4f9729e74}{staked}} = 0
+\begin{DoxyCompactList}\small\item\em the producers approved by this voter if no proxy set \end{DoxyCompactList}\item 
+double \mbox{\hyperlink{structsysiosystem_1_1voter__info_abe8cd60fac3e53299a83f9c5da0dab6f}{last\+\_\+vote\+\_\+weight}} = 0
+\item 
+double \mbox{\hyperlink{structsysiosystem_1_1voter__info_a86ffad6f186e1390bc92218f5040189a}{proxied\+\_\+vote\+\_\+weight}} = 0
+\begin{DoxyCompactList}\small\item\em the vote weight cast the last time the vote was updated \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{structsysiosystem_1_1voter__info_aeecb59279b1762166a30bd99328bfc68}{is\+\_\+proxy}} = 0
+\begin{DoxyCompactList}\small\item\em the total vote weight delegated to this voter as a proxy \end{DoxyCompactList}\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1voter__info_a1eef132095f95dda77f99ec6c1859d17}{flags1}} = 0
+\begin{DoxyCompactList}\small\item\em whether the voter is a proxy for others \end{DoxyCompactList}\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1voter__info_aa7fd35eacb2870a6a6739f45ebcca1d2}{reserved2}} = 0
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1asset}{sysio\+::asset}} \mbox{\hyperlink{structsysiosystem_1_1voter__info_ab51bd54c3d6c5016dd3751fe98bb17c3}{reserved3}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00290}{290}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+
+
+\doxysubsection{Member Enumeration Documentation}
+\Hypertarget{structsysiosystem_1_1voter__info_a327be7d8d01a553dfe29535d56828576}\index{sysiosystem::voter\_info@{sysiosystem::voter\_info}!flags1\_fields@{flags1\_fields}}
+\index{flags1\_fields@{flags1\_fields}!sysiosystem::voter\_info@{sysiosystem::voter\_info}}
+\doxysubsubsection{\texorpdfstring{flags1\_fields}{flags1\_fields}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1voter__info_a327be7d8d01a553dfe29535d56828576} 
+enum \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{structsysiosystem_1_1voter__info_a327be7d8d01a553dfe29535d56828576}{sysiosystem\+::voter\+\_\+info\+::flags1\+\_\+fields}} \+: \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}\hspace{0.3cm}{\ttfamily [strong]}}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ram\_managed@{ram\_managed}!sysiosystem::voter\_info@{sysiosystem::voter\_info}}\index{sysiosystem::voter\_info@{sysiosystem::voter\_info}!ram\_managed@{ram\_managed}}}\Hypertarget{structsysiosystem_1_1voter__info_a327be7d8d01a553dfe29535d56828576ae149b497807ee78e9e5180d213e5a402}\label{structsysiosystem_1_1voter__info_a327be7d8d01a553dfe29535d56828576} 
+ram\+\_\+managed&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{net\_managed@{net\_managed}!sysiosystem::voter\_info@{sysiosystem::voter\_info}}\index{sysiosystem::voter\_info@{sysiosystem::voter\_info}!net\_managed@{net\_managed}}}\Hypertarget{structsysiosystem_1_1voter__info_a327be7d8d01a553dfe29535d56828576a944559ad694d4c0fc4bf286864caf2a2}\label{structsysiosystem_1_1voter__info_a327be7d8d01a553dfe29535d56828576} 
+net\+\_\+managed&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{cpu\_managed@{cpu\_managed}!sysiosystem::voter\_info@{sysiosystem::voter\_info}}\index{sysiosystem::voter\_info@{sysiosystem::voter\_info}!cpu\_managed@{cpu\_managed}}}\Hypertarget{structsysiosystem_1_1voter__info_a327be7d8d01a553dfe29535d56828576ace319c6a1aa0ced6ea5a02270d863f4c}\label{structsysiosystem_1_1voter__info_a327be7d8d01a553dfe29535d56828576} 
+cpu\+\_\+managed&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00312}{312}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00312\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \{}
+\DoxyCodeLine{00313\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysiosystem_1_1voter__info_a327be7d8d01a553dfe29535d56828576ae149b497807ee78e9e5180d213e5a402}{ram\_managed}}\ =\ 1,}
+\DoxyCodeLine{00314\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysiosystem_1_1voter__info_a327be7d8d01a553dfe29535d56828576a944559ad694d4c0fc4bf286864caf2a2}{net\_managed}}\ =\ 2,}
+\DoxyCodeLine{00315\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysiosystem_1_1voter__info_a327be7d8d01a553dfe29535d56828576ace319c6a1aa0ced6ea5a02270d863f4c}{cpu\_managed}}\ =\ 4}
+\DoxyCodeLine{00316\ \ \ \ \ \ \ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysiosystem_1_1voter__info_a8b219900ab6c942d3fd4fef81cc972d1}\index{sysiosystem::voter\_info@{sysiosystem::voter\_info}!primary\_key@{primary\_key}}
+\index{primary\_key@{primary\_key}!sysiosystem::voter\_info@{sysiosystem::voter\_info}}
+\doxysubsubsection{\texorpdfstring{primary\_key()}{primary\_key()}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1voter__info_a8b219900ab6c942d3fd4fef81cc972d1} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} sysiosystem\+::voter\+\_\+info\+::primary\+\_\+key (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00310}{310}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00310\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysiosystem_1_1voter__info_aa0395988571b075580e1bef002788f60}{owner}}.value;\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysiosystem_1_1voter__info_a1eef132095f95dda77f99ec6c1859d17}\index{sysiosystem::voter\_info@{sysiosystem::voter\_info}!flags1@{flags1}}
+\index{flags1@{flags1}!sysiosystem::voter\_info@{sysiosystem::voter\_info}}
+\doxysubsubsection{\texorpdfstring{flags1}{flags1}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1voter__info_a1eef132095f95dda77f99ec6c1859d17} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysiosystem\+::voter\+\_\+info\+::flags1 = 0}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00306}{306}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1voter__info_aeecb59279b1762166a30bd99328bfc68}\index{sysiosystem::voter\_info@{sysiosystem::voter\_info}!is\_proxy@{is\_proxy}}
+\index{is\_proxy@{is\_proxy}!sysiosystem::voter\_info@{sysiosystem::voter\_info}}
+\doxysubsubsection{\texorpdfstring{is\_proxy}{is\_proxy}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1voter__info_aeecb59279b1762166a30bd99328bfc68} 
+bool sysiosystem\+::voter\+\_\+info\+::is\+\_\+proxy = 0}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00303}{303}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1voter__info_abe8cd60fac3e53299a83f9c5da0dab6f}\index{sysiosystem::voter\_info@{sysiosystem::voter\_info}!last\_vote\_weight@{last\_vote\_weight}}
+\index{last\_vote\_weight@{last\_vote\_weight}!sysiosystem::voter\_info@{sysiosystem::voter\_info}}
+\doxysubsubsection{\texorpdfstring{last\_vote\_weight}{last\_vote\_weight}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1voter__info_abe8cd60fac3e53299a83f9c5da0dab6f} 
+double sysiosystem\+::voter\+\_\+info\+::last\+\_\+vote\+\_\+weight = 0}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00299}{299}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1voter__info_aa0395988571b075580e1bef002788f60}\index{sysiosystem::voter\_info@{sysiosystem::voter\_info}!owner@{owner}}
+\index{owner@{owner}!sysiosystem::voter\_info@{sysiosystem::voter\_info}}
+\doxysubsubsection{\texorpdfstring{owner}{owner}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1voter__info_aa0395988571b075580e1bef002788f60} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} sysiosystem\+::voter\+\_\+info\+::owner}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00291}{291}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1voter__info_a21400ed63d17554f3b60efb7f3c93d69}\index{sysiosystem::voter\_info@{sysiosystem::voter\_info}!producers@{producers}}
+\index{producers@{producers}!sysiosystem::voter\_info@{sysiosystem::voter\_info}}
+\doxysubsubsection{\texorpdfstring{producers}{producers}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1voter__info_a21400ed63d17554f3b60efb7f3c93d69} 
+std\+::vector$<$\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}$>$ sysiosystem\+::voter\+\_\+info\+::producers}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00293}{293}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1voter__info_a86ffad6f186e1390bc92218f5040189a}\index{sysiosystem::voter\_info@{sysiosystem::voter\_info}!proxied\_vote\_weight@{proxied\_vote\_weight}}
+\index{proxied\_vote\_weight@{proxied\_vote\_weight}!sysiosystem::voter\_info@{sysiosystem::voter\_info}}
+\doxysubsubsection{\texorpdfstring{proxied\_vote\_weight}{proxied\_vote\_weight}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1voter__info_a86ffad6f186e1390bc92218f5040189a} 
+double sysiosystem\+::voter\+\_\+info\+::proxied\+\_\+vote\+\_\+weight = 0}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00302}{302}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1voter__info_a1c11aa68c2055cf0c73632b0e7fc3e2e}\index{sysiosystem::voter\_info@{sysiosystem::voter\_info}!proxy@{proxy}}
+\index{proxy@{proxy}!sysiosystem::voter\_info@{sysiosystem::voter\_info}}
+\doxysubsubsection{\texorpdfstring{proxy}{proxy}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1voter__info_a1c11aa68c2055cf0c73632b0e7fc3e2e} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} sysiosystem\+::voter\+\_\+info\+::proxy}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00292}{292}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1voter__info_aa7fd35eacb2870a6a6739f45ebcca1d2}\index{sysiosystem::voter\_info@{sysiosystem::voter\_info}!reserved2@{reserved2}}
+\index{reserved2@{reserved2}!sysiosystem::voter\_info@{sysiosystem::voter\_info}}
+\doxysubsubsection{\texorpdfstring{reserved2}{reserved2}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1voter__info_aa7fd35eacb2870a6a6739f45ebcca1d2} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysiosystem\+::voter\+\_\+info\+::reserved2 = 0}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00307}{307}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1voter__info_ab51bd54c3d6c5016dd3751fe98bb17c3}\index{sysiosystem::voter\_info@{sysiosystem::voter\_info}!reserved3@{reserved3}}
+\index{reserved3@{reserved3}!sysiosystem::voter\_info@{sysiosystem::voter\_info}}
+\doxysubsubsection{\texorpdfstring{reserved3}{reserved3}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1voter__info_ab51bd54c3d6c5016dd3751fe98bb17c3} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1asset}{sysio\+::asset}} sysiosystem\+::voter\+\_\+info\+::reserved3}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00308}{308}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1voter__info_a47c79bb811658eabffb9f4f4f9729e74}\index{sysiosystem::voter\_info@{sysiosystem::voter\_info}!staked@{staked}}
+\index{staked@{staked}!sysiosystem::voter\_info@{sysiosystem::voter\_info}}
+\doxysubsubsection{\texorpdfstring{staked}{staked}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1voter__info_a47c79bb811658eabffb9f4f4f9729e74} 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} sysiosystem\+::voter\+\_\+info\+::staked = 0}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00294}{294}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/svetlasyrimis/\+Desktop/wire-\/network/\+WN-\/org/wire-\/system-\/contracts/contracts/sysio.\+system/include/sysio.\+system/\mbox{\hyperlink{sysio_8system_8hpp}{sysio.\+system.\+hpp}}\end{DoxyCompactItemize}

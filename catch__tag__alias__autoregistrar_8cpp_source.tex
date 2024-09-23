@@ -1,0 +1,22 @@
+\doxysection{catch\+\_\+tag\+\_\+alias\+\_\+autoregistrar.\+cpp}
+\hypertarget{catch__tag__alias__autoregistrar_8cpp_source}{}\label{catch__tag__alias__autoregistrar_8cpp_source}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_tag\_alias\_autoregistrar.cpp@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_tag\_alias\_autoregistrar.cpp}}
+\mbox{\hyperlink{catch__tag__alias__autoregistrar_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__autoregistrar_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__tag__alias__autoregistrar_8h}{catch\_tag\_alias\_autoregistrar.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__autoregistrar_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__compiler__capabilities_8h}{catch\_compiler\_capabilities.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__autoregistrar_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__interfaces__registry__hub_8h}{catch\_interfaces\_registry\_hub.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__autoregistrar_8cpp_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__autoregistrar_8cpp_source_l00005}00005\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__autoregistrar_8cpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__autoregistrar_8cpp_source_l00007}\mbox{\hyperlink{struct_catch_1_1_registrar_for_tag_aliases_ae4e45830e4763bcd65d55d8db9167b69}{00007}}\ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_registrar_for_tag_aliases_ae4e45830e4763bcd65d55d8db9167b69}{RegistrarForTagAliases::RegistrarForTagAliases}}(\textcolor{keywordtype}{char}\ \textcolor{keyword}{const}*\ alias,\ \textcolor{keywordtype}{char}\ \textcolor{keyword}{const}*\ tag,\ \mbox{\hyperlink{struct_catch_1_1_source_line_info}{SourceLineInfo}}\ \textcolor{keyword}{const}\&\ lineInfo)\ \{}
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__autoregistrar_8cpp_source_l00008}00008\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{catch__compiler__capabilities_8h_ab76c2d22e571ab1a828f5c60d2f485a6}{CATCH\_TRY}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__autoregistrar_8cpp_source_l00009}00009\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_catch_a585459763f2c7610e57de2dd22dd1ad8}{getMutableRegistryHub}}().\mbox{\hyperlink{struct_catch_1_1_i_mutable_registry_hub_abf2e386b6f94f615719ada711adbf822}{registerTagAlias}}(alias,\ tag,\ lineInfo);}
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__autoregistrar_8cpp_source_l00010}00010\ \ \ \ \ \ \ \ \ \}\ \mbox{\hyperlink{catch__compiler__capabilities_8h_afa0ae14e70806dca4f8bf06d06645fa9}{CATCH\_CATCH\_ALL}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__autoregistrar_8cpp_source_l00011}00011\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Do\ not\ throw\ when\ constructing\ global\ objects,\ instead\ register\ the\ exception\ to\ be\ processed\ later}}
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__autoregistrar_8cpp_source_l00012}00012\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_catch_a585459763f2c7610e57de2dd22dd1ad8}{getMutableRegistryHub}}().\mbox{\hyperlink{struct_catch_1_1_i_mutable_registry_hub_a72a7d5386851ac3200f8da794a009c86}{registerStartupException}}();}
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__autoregistrar_8cpp_source_l00013}00013\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__autoregistrar_8cpp_source_l00014}00014\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__autoregistrar_8cpp_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__autoregistrar_8cpp_source_l00016}00016\ \}}
+
+\end{DoxyCode}

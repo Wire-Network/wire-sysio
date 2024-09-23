@@ -1,0 +1,9 @@
+<map id="softfloat_normRoundPackToF32" name="softfloat_normRoundPackToF32">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,214,56"/>
+<area shape="rect" id="Node000002" href="$sys-vm_2external_2softfloat_2source_2s__round_pack_to_f32_8c.html#a95adfbcd39520724557eced9b215c399" title=" " alt="" coords="262,31,435,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="214,41,246,41,246,46,214,46"/>
+<area shape="rect" id="Node000003" href="$softfloat_2source_28086-_s_s_e_2softfloat__raise_flags_8c.html#ac16bbf09eca0fe8ff91301d82c5a667f" title=" " alt="" coords="500,5,636,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="435,31,485,25,485,30,436,36"/>
+<area shape="rect" id="Node000004" href="$sys-vm_2external_2softfloat_2source_2s__shift_right_jam32_8c.html#a6b119a74cc6fd0a60fd3d85448b24bc6" title=" " alt="" coords="483,55,653,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="436,50,468,54,467,59,435,56"/>
+</map>

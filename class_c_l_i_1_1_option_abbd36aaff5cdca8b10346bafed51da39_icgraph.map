@@ -1,0 +1,29 @@
+<map id="CLI::Option::clear" name="CLI::Option::clear">
+<area shape="rect" id="Node000001" title="Clear the parsed results (mostly for testing)" alt="" coords="1482,155,1606,181"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_app.html#a6b5a085a039cab7e5906b3cd4407fdc8" title="Reset the parsed data." alt="" coords="1325,155,1434,181"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1466,171,1435,171,1435,165,1466,165"/>
+<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_app.html#adec0b4c1ae96c8ea1a031b416772e87c" title="Trigger the pre_parse callback if needed." alt="" coords="1136,118,1260,159"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="1309,159,1260,151,1261,146,1310,154"/>
+<area shape="rect" id="Node000006" href="$class_c_l_i_1_1_app.html#a8ffb155a1153ee23d442c5bfed21225c" title="The real work is done here. Expects a reversed vector." alt="" coords="5,130,119,156"/>
+<area shape="poly" id="edge14_Node000002_Node000006" title=" " alt="" coords="1347,148,1285,107,1199,61,1150,41,1099,24,1045,12,992,8,401,8,333,10,280,18,230,34,168,62,116,97,78,131,74,127,113,92,165,58,228,29,279,13,332,5,401,3,992,3,1046,7,1100,18,1152,36,1202,56,1288,103,1350,144"/>
+<area shape="rect" id="Node000007" href="$class_c_l_i_1_1_app.html#a878c1067ade7145aa11478d64f5173ed" title=" " alt="" coords="5,179,119,205"/>
+<area shape="poly" id="edge15_Node000002_Node000007" title=" " alt="" coords="1310,186,1165,211,1078,220,992,224,401,224,247,216,118,202,119,197,248,211,401,219,992,219,1078,215,1164,206,1310,181"/>
+<area shape="rect" id="Node000012" href="$class_c_l_i_1_1_app.html#a2a3aca3df859e7d772298a44d7b91fc9" title="clear all the aliases of the current App" alt="" coords="1119,259,1277,285"/>
+<area shape="poly" id="edge13_Node000002_Node000012" title=" " alt="" coords="1351,193,1278,242,1238,261,1236,256,1275,238,1348,188"/>
+<area shape="rect" id="Node000004" href="$class_c_l_i_1_1_app.html#a26a92886a7d7f10a9afbd39b6535f42b" title="Internal parse function." alt="" coords="167,72,287,98"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="1146,114,1109,97,1071,84,991,66,928,59,782,59,583,59,423,66,287,80,287,75,422,61,583,53,782,53,929,54,992,61,1072,79,1111,92,1148,109"/>
+<area shape="rect" id="Node000005" href="$class_c_l_i_1_1_app.html#a241ba75a6c98b36349ae2f71a9137291" title="Internal parse function." alt="" coords="167,154,287,180"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="1121,151,965,166,782,173,583,173,287,170,287,165,583,168,782,168,964,160,1120,145"/>
+<area shape="rect" id="Node000008" href="$class_c_l_i_1_1_app.html#a1f7a70f4bc4c375a7de10073a5de709d" title="Fill in a single config option." alt="" coords="910,93,1071,134"/>
+<area shape="poly" id="edge7_Node000003_Node000008" title=" " alt="" coords="1120,132,1072,126,1072,121,1121,127"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="151,158,119,154,119,148,151,153"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="151,181,119,186,119,181,151,176"/>
+<area shape="rect" id="Node000009" href="$class_c_l_i_1_1_app.html#aee09795046c3b47948e6c2fa45349eca" title=" " alt="" coords="700,100,862,126"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="895,116,862,116,862,111,895,111"/>
+<area shape="rect" id="Node000010" href="$class_c_l_i_1_1_app.html#a7a15e5743d4a8eccac57955ed5a6a3b6" title="Read and process a configuration file (main app only)" alt="" coords="517,93,652,134"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="684,116,652,116,652,111,684,111"/>
+<area shape="rect" id="Node000011" href="$class_c_l_i_1_1_app.html#a0fec24c804daf5b458bb5762e4e75a73" title="Process callbacks and such." alt="" coords="335,100,469,126"/>
+<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="502,116,470,116,470,111,502,111"/>
+<area shape="poly" id="edge11_Node000011_Node000004" title=" " alt="" coords="319,103,287,98,288,92,320,98"/>
+<area shape="poly" id="edge12_Node000011_Node000005" title=" " alt="" coords="344,134,273,156,271,151,342,129"/>
+</map>

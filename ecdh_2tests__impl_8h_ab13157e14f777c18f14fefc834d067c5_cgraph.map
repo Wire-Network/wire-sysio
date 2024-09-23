@@ -1,0 +1,19 @@
+<map id="test_ecdh_generator_basepoint" name="test_ecdh_generator_basepoint">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,120,145,161"/>
+<area shape="rect" id="Node000002" href="$ecdh_2tests__impl_8h.html#a4f286ad55d3c0658fe7759ba5bd13019" title=" " alt="" coords="201,5,338,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="100,117,142,87,191,55,200,51,202,56,194,60,145,91,104,122"/>
+<area shape="rect" id="Node000004" href="$tests_8c.html#a01cf4b4fc9b4ab8cb3e04fd3dc2ff57f" title=" " alt="" coords="199,70,341,96"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="144,117,209,98,210,103,146,122"/>
+<area shape="rect" id="Node000005" href="$secp256k1_8c.html#ac5806cffd3278e64f863027eaa8e1284" title=" " alt="" coords="193,120,347,161"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="145,138,177,138,177,143,145,143"/>
+<area shape="rect" id="Node000007" href="$secp256k1_8c.html#a3b0440ba2ccd06e9262b94b41b680df1" title=" " alt="" coords="193,185,347,226"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="139,159,194,177,192,182,137,164"/>
+<area shape="rect" id="Node000008" href="$ecdh_2main__impl_8h.html#a41a6133ba49bca6d023c75739b191544" title=" " alt="" coords="210,250,330,276"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="98,159,140,198,194,235,206,242,204,246,191,240,137,202,95,163"/>
+<area shape="rect" id="Node000003" href="$yubihsm__pkcs11_8c.html#ae785d5badbf1f08b491af31f32a135a1" title=" " alt="" coords="395,13,466,38"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="339,23,380,23,380,28,339,28"/>
+<area shape="rect" id="Node000006" href="$yubihsm__pkcs11_8c.html#adc4bd59a60361844aa0e852efa210105" title=" " alt="" coords="396,193,465,218"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="323,159,384,184,382,189,321,164"/>
+<area shape="poly" id="edge7_Node000007_Node000006" title=" " alt="" coords="347,203,381,203,381,208,347,208"/>
+<area shape="poly" id="edge9_Node000008_Node000006" title=" " alt="" coords="312,247,346,235,381,222,383,227,348,240,313,252"/>
+</map>

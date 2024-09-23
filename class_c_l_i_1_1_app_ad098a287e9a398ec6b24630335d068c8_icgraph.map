@@ -1,0 +1,9 @@
+<map id="CLI::App::get_option" name="CLI::App::get_option">
+<area shape="rect" id="Node000001" title="Get an option by name." alt="" coords="190,55,331,80"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_app.html#a89776486006cb61d112ae1cdd73848e1" title="Counts the number of times the given option was passed." alt="" coords="17,5,130,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="193,53,124,34,126,29,195,48"/>
+<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_app.html#a443c945fd3d3f03d33ad24be91b0ccbb" title="Shortcut bracket operator for getting a pointer to an option." alt="" coords="5,55,142,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="174,70,142,70,142,65,174,65"/>
+<area shape="rect" id="Node000004" href="$class_c_l_i_1_1_app.html#a05c1dbeb654a91b792889551656c0ab8" title="Shortcut bracket operator for getting a pointer to an option." alt="" coords="5,104,142,130"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="195,87,126,106,124,101,193,82"/>
+</map>

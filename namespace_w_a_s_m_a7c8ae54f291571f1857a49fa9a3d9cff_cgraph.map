@@ -1,0 +1,15 @@
+<map id="WASM::serialize" name="WASM::serialize">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,46,124,72"/>
+<area shape="rect" id="Node000002" href="$namespace_serialization.html#a2a05c5aff4847073ca0fb887d20ac485" title=" " alt="" coords="172,16,320,41"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="123,46,156,41,157,46,124,52"/>
+<area shape="rect" id="Node000006" href="$namespace_serialization.html#a1ea6ecb2f4de00340f936648398f4f66" title=" " alt="" coords="172,67,320,107"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="124,65,157,71,156,76,123,71"/>
+<area shape="rect" id="Node000003" href="$namespace_serialization.html#acbd5d61d25bec4a37a4ecc33f7734155" title=" " alt="" coords="368,5,516,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="320,25,352,24,353,30,320,30"/>
+<area shape="rect" id="Node000004" href="$namespace_serialization.html#aee190f414695b837a7b75cd86adc516f" title=" " alt="" coords="564,5,713,46"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="517,23,549,23,549,28,517,28"/>
+<area shape="rect" id="Node000005" href="$yubihsm__pkcs11_8c.html#ae785d5badbf1f08b491af31f32a135a1" title=" " alt="" coords="761,13,832,38"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="713,23,745,23,745,28,713,28"/>
+<area shape="rect" id="Node000007" href="$namespace_serialization.html#a7542db4eecbd9af4bc8398241da2614d" title=" " alt="" coords="368,71,516,111"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="320,86,353,87,352,92,320,91"/>
+</map>

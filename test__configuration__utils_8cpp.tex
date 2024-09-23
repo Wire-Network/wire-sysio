@@ -1,0 +1,135 @@
+\doxysection{plugins/trace\+\_\+api\+\_\+plugin/test/test\+\_\+configuration\+\_\+utils.cpp File Reference}
+\hypertarget{test__configuration__utils_8cpp}{}\label{test__configuration__utils_8cpp}\index{plugins/trace\_api\_plugin/test/test\_configuration\_utils.cpp@{plugins/trace\_api\_plugin/test/test\_configuration\_utils.cpp}}
+{\ttfamily \#include $<$boost/test/included/unit\+\_\+test.\+hpp$>$}\newline
+{\ttfamily \#include $<$list$>$}\newline
+{\ttfamily \#include $<$boost/filesystem.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/filesystem/fstream.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/trace\+\_\+api/configuration\+\_\+utils.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/trace\+\_\+api/test\+\_\+common.\+hpp$>$}\newline
+Include dependency graph for test\+\_\+configuration\+\_\+utils.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__configuration__utils_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structtemp__file__fixture}{temp\+\_\+file\+\_\+fixture}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{test__configuration__utils_8cpp_a6b2a3852db8bb19ab6909bac01859985}{BOOST\+\_\+\+TEST\+\_\+\+MODULE}}~trace\+\_\+configuration\+\_\+utils
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{test__configuration__utils_8cpp_ab196ea5cdfde9600d99e1abd208ab402}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (parse\+\_\+kv\+\_\+pairs\+\_\+test)
+\item 
+\mbox{\hyperlink{test__configuration__utils_8cpp_a595a81017330a8960029d489fd8595cc}{BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE}} (abi\+\_\+def\+\_\+from\+\_\+file\+\_\+test, \mbox{\hyperlink{structtemp__file__fixture}{temp\+\_\+file\+\_\+fixture}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{test__configuration__utils_8cpp_a6b2a3852db8bb19ab6909bac01859985}\index{test\_configuration\_utils.cpp@{test\_configuration\_utils.cpp}!BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}}
+\index{BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}!test\_configuration\_utils.cpp@{test\_configuration\_utils.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_TEST\_MODULE}{BOOST\_TEST\_MODULE}}
+{\footnotesize\ttfamily \label{test__configuration__utils_8cpp_a6b2a3852db8bb19ab6909bac01859985} 
+\#define BOOST\+\_\+\+TEST\+\_\+\+MODULE~trace\+\_\+configuration\+\_\+utils}
+
+
+
+Definition at line \mbox{\hyperlink{test__configuration__utils_8cpp_source_l00001}{1}} of file \mbox{\hyperlink{test__configuration__utils_8cpp_source}{test\+\_\+configuration\+\_\+utils.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{test__configuration__utils_8cpp_ab196ea5cdfde9600d99e1abd208ab402}\index{test\_configuration\_utils.cpp@{test\_configuration\_utils.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!test\_configuration\_utils.cpp@{test\_configuration\_utils.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}}
+{\footnotesize\ttfamily \label{test__configuration__utils_8cpp_ab196ea5cdfde9600d99e1abd208ab402} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{parse\+\_\+kv\+\_\+pairs\+\_\+test}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__configuration__utils_8cpp_source_l00038}{38}} of file \mbox{\hyperlink{test__configuration__utils_8cpp_source}{test\+\_\+configuration\+\_\+utils.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00039\ \ \ \ \{}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \textcolor{keyword}{using\ }spair\ =\ std::pair<std::string,\ std::string>;}
+\DoxyCodeLine{00041\ }
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \textcolor{comment}{//\ basic}}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ BOOST\_TEST(\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1configuration__utils_a1d240ad24c2e4abfb7daa4fa19ac36bf}{parse\_kv\_pairs}}(\textcolor{stringliteral}{"{}a=b"{}})\ ==\ spair(\textcolor{stringliteral}{"{}a"{}},\ \textcolor{stringliteral}{"{}b"{}})\ );}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ BOOST\_TEST(\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1configuration__utils_a1d240ad24c2e4abfb7daa4fa19ac36bf}{parse\_kv\_pairs}}(\textcolor{stringliteral}{"{}a==b"{}})\ ==\ spair(\textcolor{stringliteral}{"{}a"{}},\ \textcolor{stringliteral}{"{}=b"{}})\ );}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ BOOST\_TEST(\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1configuration__utils_a1d240ad24c2e4abfb7daa4fa19ac36bf}{parse\_kv\_pairs}}(\textcolor{stringliteral}{"{}a=\{\}:\(\backslash\)"{}="{}})\ ==\ spair(\textcolor{stringliteral}{"{}a"{}},\ \textcolor{stringliteral}{"{}\{\}:\(\backslash\)"{}="{}})\ );}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ BOOST\_TEST(\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1configuration__utils_a1d240ad24c2e4abfb7daa4fa19ac36bf}{parse\_kv\_pairs}}(\textcolor{stringliteral}{"{}\{\}:\(\backslash\)"{}=a"{}})\ ==\ spair(\textcolor{stringliteral}{"{}\{\}:\(\backslash\)"{}"{}},\ \textcolor{stringliteral}{"{}a"{}})\ );}
+\DoxyCodeLine{00047\ }
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \textcolor{comment}{//\ missing\ key\ not\ OK}}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ BOOST\_REQUIRE\_THROW(\mbox{\hyperlink{namespacesysio_1_1trace__api_1_1configuration__utils_a1d240ad24c2e4abfb7daa4fa19ac36bf}{parse\_kv\_pairs}}(\textcolor{stringliteral}{"{}=b"{}}),\ chain::plugin\_config\_exception);}
+\DoxyCodeLine{00050\ }
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \textcolor{comment}{//\ missing\ value\ not\ OK}}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ BOOST\_REQUIRE\_THROW(\mbox{\hyperlink{namespacesysio_1_1trace__api_1_1configuration__utils_a1d240ad24c2e4abfb7daa4fa19ac36bf}{parse\_kv\_pairs}}(\textcolor{stringliteral}{"{}a="{}}),\ chain::plugin\_config\_exception);}
+\DoxyCodeLine{00053\ }
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \textcolor{comment}{//\ missing\ =\ not\ OK}}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ BOOST\_REQUIRE\_THROW(\mbox{\hyperlink{namespacesysio_1_1trace__api_1_1configuration__utils_a1d240ad24c2e4abfb7daa4fa19ac36bf}{parse\_kv\_pairs}}(\textcolor{stringliteral}{"{}a"{}}),\ chain::plugin\_config\_exception);}
+\DoxyCodeLine{00056\ }
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \textcolor{comment}{//\ emptynot\ OK}}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ BOOST\_REQUIRE\_THROW(\mbox{\hyperlink{namespacesysio_1_1trace__api_1_1configuration__utils_a1d240ad24c2e4abfb7daa4fa19ac36bf}{parse\_kv\_pairs}}(\textcolor{stringliteral}{"{}"{}}),\ chain::plugin\_config\_exception);}
+\DoxyCodeLine{00059\ }
+\DoxyCodeLine{00060\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__configuration__utils_8cpp_ab196ea5cdfde9600d99e1abd208ab402_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__configuration__utils_8cpp_a595a81017330a8960029d489fd8595cc}\index{test\_configuration\_utils.cpp@{test\_configuration\_utils.cpp}!BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}}
+\index{BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}!test\_configuration\_utils.cpp@{test\_configuration\_utils.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_FIXTURE\_TEST\_CASE()}{BOOST\_FIXTURE\_TEST\_CASE()}}
+{\footnotesize\ttfamily \label{test__configuration__utils_8cpp_a595a81017330a8960029d489fd8595cc} 
+BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{abi\+\_\+def\+\_\+from\+\_\+file\+\_\+test}]{}{, }\item[{\mbox{\hyperlink{structtemp__file__fixture}{temp\+\_\+file\+\_\+fixture}}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__configuration__utils_8cpp_source_l00062}{62}} of file \mbox{\hyperlink{test__configuration__utils_8cpp_source}{test\+\_\+configuration\+\_\+utils.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00063\ \ \ \ \{}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ data\_dir\ =\ \mbox{\hyperlink{classfc_1_1path}{fc::path}}(bfs::temp\_directory\_path());}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ good\_json\ =\ std::string(\textcolor{stringliteral}{"{}\{\(\backslash\)"{}version\(\backslash\)"{}\ :\ \(\backslash\)"{}test\ string\ please\ ignore\(\backslash\)"{}\}"{}});}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ good\_json\_filename\ =\ create\_temp\_file(good\_json);}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ relative\_json\_filename\ =\ bfs::path(good\_json\_filename).filename().generic\_string();}
+\DoxyCodeLine{00068\ }
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ good\_abi\ =\ chain::abi\_def();}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ good\_abi.version\ =\ \textcolor{stringliteral}{"{}test\ string\ please\ ignore"{}};}
+\DoxyCodeLine{00071\ }
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ bad\_json\ \ =\ std::string(\textcolor{stringliteral}{"{}\{\{\(\backslash\)"{}version\(\backslash\)"{}:oops\(\backslash\)"{}\}"{}});}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ bad\_json\_filename\ =\ create\_temp\_file(bad\_json);}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ bad\_filename\ =\ (bfs::temp\_directory\_path()\ /\ bfs::unique\_path()).generic\_string();}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ directory\_name\ =\ bfs::temp\_directory\_path().generic\_string();}
+\DoxyCodeLine{00076\ }
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \textcolor{comment}{//\ good\ cases}}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ BOOST\_TEST(\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1configuration__utils_af66eb1c8879c8d045ad82f33233aed66}{abi\_def\_from\_file}}(good\_json\_filename,\ data\_dir)\ ==\ good\_abi\ );}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ BOOST\_TEST(\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1configuration__utils_af66eb1c8879c8d045ad82f33233aed66}{abi\_def\_from\_file}}(relative\_json\_filename,\ data\_dir)\ ==\ good\_abi\ );}
+\DoxyCodeLine{00080\ }
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \textcolor{comment}{//\ bad\ cases}}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ BOOST\_REQUIRE\_THROW(\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1configuration__utils_af66eb1c8879c8d045ad82f33233aed66}{abi\_def\_from\_file}}(bad\_json\_filename,\ data\_dir),\ chain::json\_parse\_exception\ );}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ BOOST\_REQUIRE\_THROW(\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1configuration__utils_af66eb1c8879c8d045ad82f33233aed66}{abi\_def\_from\_file}}(bad\_filename,\ data\_dir),\ chain::plugin\_config\_exception\ );}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ BOOST\_REQUIRE\_THROW(\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1configuration__utils_af66eb1c8879c8d045ad82f33233aed66}{abi\_def\_from\_file}}(directory\_name,\ data\_dir),\ chain::plugin\_config\_exception\ );}
+\DoxyCodeLine{00085\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__configuration__utils_8cpp_a595a81017330a8960029d489fd8595cc_cgraph}
+\end{center}
+\end{figure}

@@ -1,0 +1,7 @@
+<map id="libff::bn128_G2::dbl" name="libff::bn128_G2::dbl">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,35,140,60"/>
+<area shape="rect" id="Node000002" href="$namespacebn_1_1ecop.html#a0e64ca6d01c24fb266f1986ebce3a07d" title=" " alt="" coords="188,5,327,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="140,34,172,29,172,34,141,39"/>
+<area shape="rect" id="Node000003" href="$classlibff_1_1bn128___g2.html#ad330137b7c96ab8caee5361b09276ce6" title=" " alt="" coords="192,55,322,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="141,55,177,61,177,66,140,60"/>
+</map>

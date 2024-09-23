@@ -1,0 +1,40 @@
+\doxysection{grow\+\_\+shrink.\+cpp}
+\hypertarget{grow__shrink_8cpp_source}{}\label{grow__shrink_8cpp_source}\index{libraries/chainbase/test/grow\_shrink.cpp@{libraries/chainbase/test/grow\_shrink.cpp}}
+\mbox{\hyperlink{grow__shrink_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{grow__shrink_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <boost/test/unit\_test.hpp>}}
+\DoxyCodeLine{\Hypertarget{grow__shrink_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <boost/test/data/test\_case.hpp>}}
+\DoxyCodeLine{\Hypertarget{grow__shrink_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <boost/test/data/monomorphic.hpp>}}
+\DoxyCodeLine{\Hypertarget{grow__shrink_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{chainbase_8hpp}{chainbase/chainbase.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{grow__shrink_8cpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{grow__shrink_8cpp_source_l00006}00006\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacechainbase}{chainbase}};}
+\DoxyCodeLine{\Hypertarget{grow__shrink_8cpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{grow__shrink_8cpp_source_l00008}\mbox{\hyperlink{grow__shrink_8cpp_aa47370771328d3eddb92b8b2dee0ebc2}{00008}}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a7fe6684b11f441d2e971fe65166d7d5f}{pinnable\_mapped\_file::map\_mode}}\ \mbox{\hyperlink{grow__shrink_8cpp_aa47370771328d3eddb92b8b2dee0ebc2}{test\_modes}}[]\ =\ \{pinnable\_mapped\_file::map\_mode::mapped,\ pinnable\_mapped\_file::map\_mode::heap\};}
+\DoxyCodeLine{\Hypertarget{grow__shrink_8cpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{grow__shrink_8cpp_source_l00010}\mbox{\hyperlink{grow__shrink_8cpp_a035ef6e4811c03e6a0770283b0d3ef7a}{00010}}\ \mbox{\hyperlink{grow__shrink_8cpp_a035ef6e4811c03e6a0770283b0d3ef7a}{BOOST\_DATA\_TEST\_CASE}}(grow\_shrink,\ boost::unit\_test::data::make(\mbox{\hyperlink{grow__shrink_8cpp_aa47370771328d3eddb92b8b2dee0ebc2}{test\_modes}}),\ map\_mode)\ \{}
+\DoxyCodeLine{\Hypertarget{grow__shrink_8cpp_source_l00011}00011\ \ \ \ boost::filesystem::path\ temp\ =\ boost::filesystem::temp\_directory\_path()\ /\ boost::filesystem::unique\_path();}
+\DoxyCodeLine{\Hypertarget{grow__shrink_8cpp_source_l00012}00012\ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{grow__shrink_8cpp_source_l00013}00013\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ db\_start\_size\ \ =\ 8u*1024u*1024u;}
+\DoxyCodeLine{\Hypertarget{grow__shrink_8cpp_source_l00014}00014\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ db\_grow\_size\ \ \ =\ 16u*1024u*1024u;}
+\DoxyCodeLine{\Hypertarget{grow__shrink_8cpp_source_l00015}00015\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ db\_shrunk\_size\ =\ 2u*1024u*1024u;}
+\DoxyCodeLine{\Hypertarget{grow__shrink_8cpp_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{grow__shrink_8cpp_source_l00017}00017\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{grow__shrink_8cpp_source_l00018}00018\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classchainbase_1_1database}{chainbase::database}}\ db(temp,\ database::read\_write,\ db\_start\_size,\ \textcolor{keyword}{false},\ map\_mode);}
+\DoxyCodeLine{\Hypertarget{grow__shrink_8cpp_source_l00019}00019\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{grow__shrink_8cpp_source_l00020}00020\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{grow__shrink_8cpp_source_l00021}00021\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classchainbase_1_1database}{chainbase::database}}\ db(temp,\ database::read\_write,\ db\_grow\_size,\ \textcolor{keyword}{false},\ map\_mode);}
+\DoxyCodeLine{\Hypertarget{grow__shrink_8cpp_source_l00022}00022\ \ \ \ \ \ BOOST\_CHECK(db.\mbox{\hyperlink{classchainbase_1_1database_a63a87fe56634ee1e93511a894b98e40d}{get\_free\_memory}}()\ >\ db\_start\_size);}
+\DoxyCodeLine{\Hypertarget{grow__shrink_8cpp_source_l00023}00023\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{grow__shrink_8cpp_source_l00024}00024\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{grow__shrink_8cpp_source_l00025}00025\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classchainbase_1_1database}{chainbase::database}}\ db(temp,\ database::read\_write,\ db\_shrunk\_size,\ \textcolor{keyword}{false},\ map\_mode);}
+\DoxyCodeLine{\Hypertarget{grow__shrink_8cpp_source_l00026}00026\ \ \ \ \ \ BOOST\_CHECK(db.\mbox{\hyperlink{classchainbase_1_1database_a63a87fe56634ee1e93511a894b98e40d}{get\_free\_memory}}()\ >\ db\_start\_size);}
+\DoxyCodeLine{\Hypertarget{grow__shrink_8cpp_source_l00027}00027\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{grow__shrink_8cpp_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{grow__shrink_8cpp_source_l00029}00029\ \ \ \ \}\ \textcolor{keywordflow}{catch}(...)\ \{}
+\DoxyCodeLine{\Hypertarget{grow__shrink_8cpp_source_l00030}00030\ \ \ \ \ \ \ bfs::remove\_all(temp);}
+\DoxyCodeLine{\Hypertarget{grow__shrink_8cpp_source_l00031}00031\ \ \ \ \ \ \ \textcolor{keywordflow}{throw};}
+\DoxyCodeLine{\Hypertarget{grow__shrink_8cpp_source_l00032}00032\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{grow__shrink_8cpp_source_l00033}00033\ \ \ \ bfs::remove\_all(temp);}
+\DoxyCodeLine{\Hypertarget{grow__shrink_8cpp_source_l00034}00034\ \}}
+
+\end{DoxyCode}

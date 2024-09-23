@@ -1,0 +1,18 @@
+<map id="libraries/builtins/fp128.h" name="libraries/builtins/fp128.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="27,5,138,46"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,330,69,356"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="82,47,43,315,38,314,77,46"/>
+<area shape="rect" id="Node000003" href="$stdint_8h.html" title=" " alt="" coords="97,256,161,282"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="89,46,126,240,121,241,83,47"/>
+<area shape="rect" id="Node000005" href="$softfloat_2source_2include_2softfloat_8h.html" title=" " alt="" coords="132,94,260,135"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="110,44,160,82,156,87,106,49"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="115,285,66,323,63,318,112,280"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="96,330,162,356"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="132,282,132,314,126,314,126,282"/>
+<area shape="poly" id="edge7_Node000005_Node000003" title=" " alt="" coords="186,136,161,184,139,243,134,241,156,182,181,134"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="170,183,245,208"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="201,135,206,167,201,167,196,135"/>
+<area shape="rect" id="Node000007" href="$softfloat_2source_2include_2softfloat__types_8h.html" title=" " alt="" coords="268,183,387,208"/>
+<area shape="poly" id="edge8_Node000005_Node000007" title=" " alt="" coords="230,133,296,172,293,177,227,138"/>
+<area shape="poly" id="edge9_Node000007_Node000003" title=" " alt="" coords="295,211,177,254,175,249,293,206"/>
+</map>

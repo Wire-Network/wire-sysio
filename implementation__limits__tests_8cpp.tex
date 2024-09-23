@@ -1,0 +1,149 @@
+\doxysection{libraries/sys-\/vm/tests/implementation\+\_\+limits\+\_\+tests.cpp File Reference}
+\hypertarget{implementation__limits__tests_8cpp}{}\label{implementation__limits__tests_8cpp}\index{libraries/sys-\/vm/tests/implementation\_limits\_tests.cpp@{libraries/sys-\/vm/tests/implementation\_limits\_tests.cpp}}
+{\ttfamily \#include $<$algorithm$>$}\newline
+{\ttfamily \#include $<$vector$>$}\newline
+{\ttfamily \#include $<$iterator$>$}\newline
+{\ttfamily \#include $<$cstdlib$>$}\newline
+{\ttfamily \#include $<$fstream$>$}\newline
+{\ttfamily \#include $<$string$>$}\newline
+{\ttfamily \#include $<$catch2/catch.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/vm/backend.\+hpp$>$}\newline
+{\ttfamily \#include "{}wasm\+\_\+config.\+hpp"{}}\newline
+{\ttfamily \#include "{}utils.\+hpp"{}}\newline
+{\ttfamily \#include "{}implementation\+\_\+limits.\+hpp"{}}\newline
+Include dependency graph for implementation\+\_\+limits\+\_\+tests.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{implementation__limits__tests_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{implementation__limits__tests_8cpp_afd30cb08c2510f30dea7ca8cdadd715c}{host\+\_\+call}} ()
+\item 
+\mbox{\hyperlink{implementation__limits__tests_8cpp_a75852f164664918221f13dc5b1cd4ee7}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Test \mbox{\hyperlink{programs_2clio_2main_8cpp_af931af8e9f099860a2670931f8d3ad2c}{call}} depth"{}, "{}\mbox{[}call\+\_\+depth\mbox{]}"{})
+\item 
+\mbox{\hyperlink{implementation__limits__tests_8cpp_a62a8ae4b1a8ab3f4a7d74bc1d458965d}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Test \mbox{\hyperlink{programs_2clio_2main_8cpp_af931af8e9f099860a2670931f8d3ad2c}{call}} depth dynamic"{}, "{}\mbox{[}call\+\_\+depth\mbox{]}"{})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{implementation__limits__tests_8cpp_a62a8ae4b1a8ab3f4a7d74bc1d458965d}\index{implementation\_limits\_tests.cpp@{implementation\_limits\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!implementation\_limits\_tests.cpp@{implementation\_limits\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{implementation__limits__tests_8cpp_a62a8ae4b1a8ab3f4a7d74bc1d458965d} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Test \mbox{\hyperlink{programs_2clio_2main_8cpp_af931af8e9f099860a2670931f8d3ad2c}{call}} depth dynamic"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}call\+\_\+depth\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{implementation__limits__tests_8cpp_source_l00055}{55}} of file \mbox{\hyperlink{implementation__limits__tests_8cpp_source}{implementation\+\_\+limits\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00056\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator}{wasm\_allocator}}\ \mbox{\hyperlink{allow__code__after__function__end__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}};}
+\DoxyCodeLine{00057\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{structsysio_1_1vm_1_1registered__host__functions}{rhf\_t}}\ \ \ \ \ =\ \mbox{\hyperlink{structsysio_1_1vm_1_1registered__host__functions}{sysio::vm::registered\_host\_functions<standalone\_function\_t>}};}
+\DoxyCodeLine{00058\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio::vm::backend<rhf\_t,\ TestType,\ dynamic\_options>}};}
+\DoxyCodeLine{00059\ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1registered__host__functions_a11ed5e893c0eb9af80290f9024485be2}{rhf\_t::add<\&host\_call>}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}host.call"{}});}
+\DoxyCodeLine{00060\ }
+\DoxyCodeLine{00061\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ \mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}(implementation\_limits\_wasm\_code,\ \textcolor{keyword}{nullptr},\ dynamic\_options\{151\});}
+\DoxyCodeLine{00062\ \ \ \ \mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_afb52bdfbf023f8e042d9228928ed93b7}{set\_wasm\_allocator}}(\&\mbox{\hyperlink{allow__code__after__function__end__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00063\ \ \ \ \mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_ad9fabfa0081daaedb3fbe3a62b42bd01}{initialize}}(\textcolor{keyword}{nullptr});}
+\DoxyCodeLine{00064\ }
+\DoxyCodeLine{00065\ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1registered__host__functions_abb74daf946a6b4a1756a0ba3f08c1c04}{rhf\_t::resolve}}(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af2bdf6918391f431538eb92100389eab}{get\_module}}());}
+\DoxyCodeLine{00066\ }
+\DoxyCodeLine{00067\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(!\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}call"{}},\ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})150));}
+\DoxyCodeLine{00068\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_a63fc40356b116cdac6cd50788b25eab1}{call}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}call"{}},\ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})151),\ std::exception);}
+\DoxyCodeLine{00069\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(!\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}call.indirect"{}},\ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})150));}
+\DoxyCodeLine{00070\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_a63fc40356b116cdac6cd50788b25eab1}{call}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}call.indirect"{}},\ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})151),\ std::exception);}
+\DoxyCodeLine{00071\ \ \ \ \textcolor{comment}{//\ The\ host\ call\ is\ added\ to\ the\ recursive\ function,\ so\ we\ have\ one\ fewer\ frames}}
+\DoxyCodeLine{00072\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(!\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}call.host"{}},\ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})149));}
+\DoxyCodeLine{00073\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_a63fc40356b116cdac6cd50788b25eab1}{call}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}call.host"{}},\ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})150),\ std::exception);}
+\DoxyCodeLine{00074\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(!\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}call.indirect.host"{}},\ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})149));}
+\DoxyCodeLine{00075\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_a63fc40356b116cdac6cd50788b25eab1}{call}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}call.indirect.host"{}},\ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})150),\ std::exception);}
+\DoxyCodeLine{00076\ }
+\DoxyCodeLine{00077\ \ \ \ \mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_ad9fabfa0081daaedb3fbe3a62b42bd01}{initialize}}(\textcolor{keyword}{nullptr},\ dynamic\_options\{51\});}
+\DoxyCodeLine{00078\ }
+\DoxyCodeLine{00079\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(!\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}call"{}},\ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})50));}
+\DoxyCodeLine{00080\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_a63fc40356b116cdac6cd50788b25eab1}{call}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}call"{}},\ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})51),\ std::exception);}
+\DoxyCodeLine{00081\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(!\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}call.indirect"{}},\ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})50));}
+\DoxyCodeLine{00082\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_a63fc40356b116cdac6cd50788b25eab1}{call}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}call.indirect"{}},\ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})51),\ std::exception);}
+\DoxyCodeLine{00083\ \ \ \ \textcolor{comment}{//\ The\ host\ call\ is\ added\ to\ the\ recursive\ function,\ so\ we\ have\ one\ fewer\ frames}}
+\DoxyCodeLine{00084\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(!\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}call.host"{}},\ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})49));}
+\DoxyCodeLine{00085\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_a63fc40356b116cdac6cd50788b25eab1}{call}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}call.host"{}},\ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})50),\ std::exception);}
+\DoxyCodeLine{00086\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(!\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}call.indirect.host"{}},\ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})49));}
+\DoxyCodeLine{00087\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_a63fc40356b116cdac6cd50788b25eab1}{call}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}call.indirect.host"{}},\ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})50),\ std::exception);}
+\DoxyCodeLine{00088\ }
+\DoxyCodeLine{00089\ \ \ \ \textcolor{comment}{//\ Very\ large\ call\ depth\ requires\ dynamically\ allocating\ a\ new\ stack}}
+\DoxyCodeLine{00090\ \ \ \ \mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_ad9fabfa0081daaedb3fbe3a62b42bd01}{initialize}}(\textcolor{keyword}{nullptr},\ dynamic\_options\{1024*1024\});}
+\DoxyCodeLine{00091\ }
+\DoxyCodeLine{00092\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(!\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}call"{}},\ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})1024*1024\ -\/\ 1));}
+\DoxyCodeLine{00093\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{implementation__limits__tests_8cpp_a62a8ae4b1a8ab3f4a7d74bc1d458965d_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{implementation__limits__tests_8cpp_a75852f164664918221f13dc5b1cd4ee7}\index{implementation\_limits\_tests.cpp@{implementation\_limits\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!implementation\_limits\_tests.cpp@{implementation\_limits\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{implementation__limits__tests_8cpp_a75852f164664918221f13dc5b1cd4ee7} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Test \mbox{\hyperlink{programs_2clio_2main_8cpp_af931af8e9f099860a2670931f8d3ad2c}{call}} depth"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}call\+\_\+depth\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{implementation__limits__tests_8cpp_source_l00033}{33}} of file \mbox{\hyperlink{implementation__limits__tests_8cpp_source}{implementation\+\_\+limits\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00034\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator}{wasm\_allocator}}\ \mbox{\hyperlink{allow__code__after__function__end__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}};}
+\DoxyCodeLine{00035\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{structsysio_1_1vm_1_1registered__host__functions}{rhf\_t}}\ \ \ \ \ =\ \mbox{\hyperlink{structsysio_1_1vm_1_1registered__host__functions}{sysio::vm::registered\_host\_functions<standalone\_function\_t>}};}
+\DoxyCodeLine{00036\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio::vm::backend<rhf\_t,\ TestType>}};}
+\DoxyCodeLine{00037\ }
+\DoxyCodeLine{00038\ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1registered__host__functions_a11ed5e893c0eb9af80290f9024485be2}{rhf\_t::add<\&host\_call>}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}host.call"{}});}
+\DoxyCodeLine{00039\ }
+\DoxyCodeLine{00040\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ \mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}(implementation\_limits\_wasm\_code,\ \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_a4c503c4f3ca9f4afce322078d5a33f3e}{get\_wasm\_allocator}}());}
+\DoxyCodeLine{00041\ }
+\DoxyCodeLine{00042\ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1registered__host__functions_abb74daf946a6b4a1756a0ba3f08c1c04}{rhf\_t::resolve}}(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af2bdf6918391f431538eb92100389eab}{get\_module}}());}
+\DoxyCodeLine{00043\ }
+\DoxyCodeLine{00044\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(!\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}call"{}},\ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})250));}
+\DoxyCodeLine{00045\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_a63fc40356b116cdac6cd50788b25eab1}{call}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}call"{}},\ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})251),\ std::exception);}
+\DoxyCodeLine{00046\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(!\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}call.indirect"{}},\ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})250));}
+\DoxyCodeLine{00047\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_a63fc40356b116cdac6cd50788b25eab1}{call}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}call.indirect"{}},\ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})251),\ std::exception);}
+\DoxyCodeLine{00048\ \ \ \ \textcolor{comment}{//\ The\ host\ call\ is\ added\ to\ the\ recursive\ function,\ so\ we\ have\ one\ fewer\ frames}}
+\DoxyCodeLine{00049\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(!\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}call.host"{}},\ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})249));}
+\DoxyCodeLine{00050\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_a63fc40356b116cdac6cd50788b25eab1}{call}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}call.host"{}},\ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})250),\ std::exception);}
+\DoxyCodeLine{00051\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(!\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}call.indirect.host"{}},\ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})249));}
+\DoxyCodeLine{00052\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_a63fc40356b116cdac6cd50788b25eab1}{call}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}call.indirect.host"{}},\ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})250),\ std::exception);}
+\DoxyCodeLine{00053\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{implementation__limits__tests_8cpp_a75852f164664918221f13dc5b1cd4ee7_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{implementation__limits__tests_8cpp_afd30cb08c2510f30dea7ca8cdadd715c}\index{implementation\_limits\_tests.cpp@{implementation\_limits\_tests.cpp}!host\_call@{host\_call}}
+\index{host\_call@{host\_call}!implementation\_limits\_tests.cpp@{implementation\_limits\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{host\_call()}{host\_call()}}
+{\footnotesize\ttfamily \label{implementation__limits__tests_8cpp_afd30cb08c2510f30dea7ca8cdadd715c} 
+void host\+\_\+call (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{implementation__limits__tests_8cpp_source_l00017}{17}} of file \mbox{\hyperlink{implementation__limits__tests_8cpp_source}{implementation\+\_\+limits\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00017\ \{\}}
+
+\end{DoxyCode}

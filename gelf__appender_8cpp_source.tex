@@ -1,0 +1,257 @@
+\doxysection{gelf\+\_\+appender.\+cpp}
+\hypertarget{gelf__appender_8cpp_source}{}\label{gelf__appender_8cpp_source}\index{libraries/fc/src/log/gelf\_appender.cpp@{libraries/fc/src/log/gelf\_appender.cpp}}
+\mbox{\hyperlink{gelf__appender_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{udp__socket_8hpp}{fc/network/udp\_socket.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{ip_8hpp}{fc/network/ip.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{resolve_8hpp}{fc/network/resolve.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{exception_8hpp}{fc/exception/exception.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{gelf__appender_8hpp}{fc/log/gelf\_appender.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{fc_2include_2fc_2reflect_2variant_8hpp}{fc/reflect/variant.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{fc_2include_2fc_2variant_8hpp}{fc/variant.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{json_8hpp}{fc/io/json.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{city_8hpp}{fc/crypto/city.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{zlib_8hpp}{fc/compress/zlib.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00012}00012\ \textcolor{preprocessor}{\#include\ <boost/lexical\_cast.hpp>}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00013}00013\ \textcolor{preprocessor}{\#include\ <iomanip>}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00014}00014\ \textcolor{preprocessor}{\#include\ <iostream>}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00015}00015\ \textcolor{preprocessor}{\#include\ <queue>}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00016}00016\ \textcolor{preprocessor}{\#include\ <sstream>}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00017}00017\ \textcolor{preprocessor}{\#include\ <iostream>}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00019}00019\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00020}00020\ \{}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00021}00021\ \ \ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacedetail}{detail}}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00022}00022\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00023}\mbox{\hyperlink{namespacefc_1_1detail_af06ee7eaeece465975b471d5b8d98d6b}{00023}}\ \ \ \ \ boost::asio::ip::udp::endpoint\ \mbox{\hyperlink{namespacefc_1_1detail_af06ee7eaeece465975b471d5b8d98d6b}{to\_asio\_ep}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1ip_1_1endpoint}{fc::ip::endpoint}}\&\ e\ )}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00024}00024\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00025}00025\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ boost::asio::ip::udp::endpoint(boost::asio::ip::address\_v4(e.\mbox{\hyperlink{classfc_1_1ip_1_1endpoint_a61b2902b0e0e02172a60f3a17469f780}{get\_address}}()),\ e.\mbox{\hyperlink{classfc_1_1ip_1_1endpoint_ab243ed508cf8f9d34a32b2ece708466b}{port}}()\ );}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00026}00026\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00027}00027\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00029}00029\ \ \ \textcolor{keyword}{const}\ std::vector<std::string>\ \mbox{\hyperlink{structfc_1_1gelf__appender_1_1config_a5ead47478e6c821001032156703ee429}{gelf\_appender::config::reserved\_field\_names}}\ \ =\ \{}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00030}00030\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\_id"{}},\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ per\ GELF\ specification}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00031}00031\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\_timestamp\_ns"{}},\ \ \textcolor{comment}{//\ Remaining\ names\ all\ populated\ by\ appender}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00032}00032\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\_log\_id"{}},}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00033}00033\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\_line"{}},}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00034}00034\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\_file"{}},}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00035}00035\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\_method\_name"{}},}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00036}00036\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\_thread\_name"{}},}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00037}00037\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\_task\_name"{}}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00038}00038\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00040}00040\ \ \ \ \textcolor{keyword}{const}\ std::regex\ \mbox{\hyperlink{structfc_1_1gelf__appender_1_1config_a0ba11c2eea758783eb90d34fbaef0ae5}{gelf\_appender::config::user\_field\_name\_pattern}}\{\textcolor{stringliteral}{"{}\string^\_[\(\backslash\)\(\backslash\)w\(\backslash\)\(\backslash\).\(\backslash\)\(\backslash\)-\/]*\$"{}}\};\ \textcolor{comment}{//\ per\ GELF\ specification}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00042}\mbox{\hyperlink{classfc_1_1gelf__appender_1_1impl}{00042}}\ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classfc_1_1gelf__appender_1_1impl}{gelf\_appender::impl}}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00043}00043\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00044}00044\ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00045}\mbox{\hyperlink{classfc_1_1gelf__appender_1_1impl_a7683f0beb1017eb880d31371cf782a12}{00045}}\ \ \ \ \ \mbox{\hyperlink{structfc_1_1gelf__appender_1_1config}{config}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1gelf__appender_1_1impl_a7683f0beb1017eb880d31371cf782a12}{cfg}};}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00046}\mbox{\hyperlink{classfc_1_1gelf__appender_1_1impl_a00dcdf19ddba1b784797e0c466963aa7}{00046}}\ \ \ \ \ std::optional<boost::asio::ip::udp::endpoint>\ \ \mbox{\hyperlink{classfc_1_1gelf__appender_1_1impl_a00dcdf19ddba1b784797e0c466963aa7}{gelf\_endpoint}};}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00047}\mbox{\hyperlink{classfc_1_1gelf__appender_1_1impl_a5dab5ac04f505ecd7b9970df45111ef6}{00047}}\ \ \ \ \ \mbox{\hyperlink{classfc_1_1udp__socket}{udp\_socket}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1gelf__appender_1_1impl_a5dab5ac04f505ecd7b9970df45111ef6}{gelf\_socket}};}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00049}\mbox{\hyperlink{classfc_1_1gelf__appender_1_1impl_aa279d25319b99bb8bccf92cd186c0db0}{00049}}\ \ \ \ \ \mbox{\hyperlink{classfc_1_1gelf__appender_1_1impl_aa279d25319b99bb8bccf92cd186c0db0}{impl}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1variant}{variant}}\&\ c)}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00050}00050\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00051}00051\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\_variant\_object}}\ mvo;}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00052}00052\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_accef08adf4ee05c36ccc550d8101b08f}{from\_variant}}(c,\ mvo);}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00054}00054\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1gelf__appender_1_1impl_a7683f0beb1017eb880d31371cf782a12}{cfg}}.\mbox{\hyperlink{structfc_1_1gelf__appender_1_1config_a05092e63c79b6a42d6afe28be8f8b494}{endpoint}}\ =\ mvo[\textcolor{stringliteral}{"{}endpoint"{}}].as<std::string>();}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00055}00055\ \ \ \ \ \ \ mvo.\mbox{\hyperlink{classfc_1_1mutable__variant__object_ada38caab5cc7624046cc61fcd033c4db}{erase}}(\textcolor{stringliteral}{"{}endpoint"{}});}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00056}00056\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1gelf__appender_1_1impl_a7683f0beb1017eb880d31371cf782a12}{cfg}}.\mbox{\hyperlink{structfc_1_1gelf__appender_1_1config_a74fb5bd5d3e044746fe5840a711722bd}{host}}\ =\ mvo[\textcolor{stringliteral}{"{}host"{}}].as<std::string>();}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00057}00057\ \ \ \ \ \ \ mvo.\mbox{\hyperlink{classfc_1_1mutable__variant__object_ada38caab5cc7624046cc61fcd033c4db}{erase}}(\textcolor{stringliteral}{"{}host"{}});}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00058}00058\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1gelf__appender_1_1impl_a7683f0beb1017eb880d31371cf782a12}{cfg}}.\mbox{\hyperlink{structfc_1_1gelf__appender_1_1config_a044c2e8c1d386806035bd935937b3b09}{user\_fields}}\ =\ mvo;}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00060}00060\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\&\&\ field\_name\ :\ config::reserved\_field\_names)\ \{}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00061}00061\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classfc_1_1gelf__appender_1_1impl_a7683f0beb1017eb880d31371cf782a12}{cfg}}.\mbox{\hyperlink{structfc_1_1gelf__appender_1_1config_a044c2e8c1d386806035bd935937b3b09}{user\_fields}}.\mbox{\hyperlink{classfc_1_1variant__object_ae4ed31b7cb6bc6e1d2873f9121049589}{contains}}(field\_name.c\_str()))\ \{}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00062}00062\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(invalid\_arg\_exception,\ \textcolor{stringliteral}{"{}Field\ name\ '\$\{field\_name\}'\ is\ reserved"{}},}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}field\_name"{}},\ field\_name));}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00064}00064\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00065}00065\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00066}00066\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\&\&\ \mbox{\hyperlink{hello__driver_8cpp_a0b6f424d9a532680c6b2ca5c119c938b}{field}}\ :\ \mbox{\hyperlink{classfc_1_1gelf__appender_1_1impl_a7683f0beb1017eb880d31371cf782a12}{cfg}}.\mbox{\hyperlink{structfc_1_1gelf__appender_1_1config_a044c2e8c1d386806035bd935937b3b09}{user\_fields}})\ \{}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00067}00067\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!std::regex\_match(\mbox{\hyperlink{hello__driver_8cpp_a0b6f424d9a532680c6b2ca5c119c938b}{field}}.key(),\ config::user\_field\_name\_pattern))\ \{}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(invalid\_arg\_exception,\ \textcolor{stringliteral}{"{}Field\ name\ '\$\{field\_name\}\ must\ begin\ with\ an\ underscore\ and\ contain\ only\ letters,\ numbers,\ underscores,\ dashes,\ and\ dots."{}},}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}field\_name"{}},\ \mbox{\hyperlink{hello__driver_8cpp_a0b6f424d9a532680c6b2ca5c119c938b}{field}}.key()));}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00071}00071\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00072}00072\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00073}00073\ }
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00074}\mbox{\hyperlink{classfc_1_1gelf__appender_1_1impl_a97852f27131d3a3623abd6cc820a34a5}{00074}}\ \ \ \ \ \mbox{\hyperlink{classfc_1_1gelf__appender_1_1impl_a97852f27131d3a3623abd6cc820a34a5}{\string~impl}}()}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00075}00075\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00076}00076\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00077}00077\ \ \ \};}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00079}\mbox{\hyperlink{classfc_1_1gelf__appender_a604a1c78a72120d9a25a2b26ef3234b1}{00079}}\ \ \ \mbox{\hyperlink{classfc_1_1gelf__appender_a604a1c78a72120d9a25a2b26ef3234b1}{gelf\_appender::gelf\_appender}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1variant}{variant}}\&\ args)\ :}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00080}00080\ \ \ \ \ my(new\ \mbox{\hyperlink{classfc_1_1gelf__appender_1_1impl}{impl}}(args))}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00081}00081\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00082}00082\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00083}00083\ }
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00084}\mbox{\hyperlink{classfc_1_1gelf__appender_ab6509d82a033f86a7066849841465ff0}{00084}}\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1gelf__appender_ab6509d82a033f86a7066849841465ff0}{gelf\_appender::initialize}}(boost::asio::io\_service\ \&io\_service)}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00085}00085\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00086}00086\ \ \ \ \ \textcolor{keywordflow}{try}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00087}00087\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00088}00088\ \ \ \ \ \ \ \textcolor{keywordflow}{try}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00089}00089\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00090}00090\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ if\ it's\ a\ numeric\ address:port,\ this\ will\ parse\ it}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00091}00091\ \ \ \ \ \ \ \ \ my-\/>gelf\_endpoint\ =\ \mbox{\hyperlink{namespacefc_1_1detail_af06ee7eaeece465975b471d5b8d98d6b}{detail::to\_asio\_ep}}(\mbox{\hyperlink{classfc_1_1ip_1_1endpoint_a80c154405619b208c9d057d2c91958c9}{ip::endpoint::from\_string}}(my-\/>cfg.endpoint));}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00092}00092\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00093}00093\ \ \ \ \ \ \ \textcolor{keywordflow}{catch}\ (...)}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00094}00094\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00095}00095\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00096}00096\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!my-\/>gelf\_endpoint)}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00097}00097\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00098}00098\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ couldn't\ parse\ as\ a\ numeric\ ip\ address,\ try\ resolving\ as\ a\ DNS\ name.}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00099}00099\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ This\ can\ yield,\ so\ don't\ do\ it\ in\ the\ catch\ block\ above}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00100}00100\ \ \ \ \ \ \ \ \ string::size\_type\ colon\_pos\ =\ my-\/>cfg.endpoint.find(\textcolor{charliteral}{':'});}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00101}00101\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00102}00102\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00103}00103\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ port\ =\ boost::lexical\_cast<uint16\_t>(my-\/>cfg.endpoint.substr(colon\_pos\ +\ 1,\ my-\/>cfg.endpoint.size()));}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00104}00104\ }
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00105}00105\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ hostname\ =\ my-\/>cfg.endpoint.substr(\ 0,\ colon\_pos\ );}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00106}00106\ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ endpoints\ =\ \mbox{\hyperlink{namespacefc_ab306ee2beea98abbf390068aa881ca42}{resolve}}(io\_service,\ hostname,\ port);}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00107}00107\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (endpoints.empty())}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00108}00108\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(unknown\_host\_exception,\ \textcolor{stringliteral}{"{}The\ logging\ destination\ host\ name\ can\ not\ be\ resolved:\ \$\{hostname\}"{}},}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00109}00109\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}hostname"{}},\ hostname));}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00110}00110\ \ \ \ \ \ \ \ \ \ \ my-\/>gelf\_endpoint\ =\ endpoints.back();}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00111}00111\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00112}00112\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{catch}\ (\textcolor{keyword}{const}\ boost::bad\_lexical\_cast\&)}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00113}00113\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00114}00114\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a3a1fa84768603c99866fe61af96c9f36}{FC\_THROW}}(\textcolor{stringliteral}{"{}Bad\ port:\ \$\{port\}"{}},\ (\textcolor{stringliteral}{"{}port"{}},\ my-\/>cfg.endpoint.substr(colon\_pos\ +\ 1,\ my-\/>cfg.endpoint.size())));}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00115}00115\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00116}00116\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00117}00117\ }
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00118}00118\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (my-\/>gelf\_endpoint)}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00119}00119\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00120}00120\ \ \ \ \ \ \ \ \ my-\/>gelf\_socket.initialize(io\_service);}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00121}00121\ \ \ \ \ \ \ \ \ my-\/>gelf\_socket.open();}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00122}00122\ \ \ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}opened\ GELF\ socket\ to\ endpoint\ "{}}\ <<\ my-\/>cfg.endpoint\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00123}00123\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00124}00124\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00125}00125\ \ \ \ \ \textcolor{keywordflow}{catch}\ (...)}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00126}00126\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00127}00127\ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}error\ opening\ GELF\ socket\ to\ endpoint\ "{}}\ <<\ my-\/>cfg.endpoint\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00128}00128\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00129}00129\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00130}00130\ }
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00131}\mbox{\hyperlink{classfc_1_1gelf__appender_a88d87ea70783e681ab6b2b1a24b81b2c}{00131}}\ \ \ \mbox{\hyperlink{classfc_1_1gelf__appender_a88d87ea70783e681ab6b2b1a24b81b2c}{gelf\_appender::\string~gelf\_appender}}()}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00132}00132\ \ \ \{\}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00133}00133\ }
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00134}\mbox{\hyperlink{classfc_1_1gelf__appender_a2f41c751b1f98f809b5305df6d6a6ffc}{00134}}\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1gelf__appender_a2f41c751b1f98f809b5305df6d6a6ffc}{gelf\_appender::log}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1log__message}{log\_message}}\&\ message)}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00135}00135\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00136}00136\ \ \ \ \ \textcolor{keywordflow}{if}\ (!my-\/>gelf\_endpoint)}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00137}00137\ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00138}00138\ }
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00139}00139\ \ \ \ \ \mbox{\hyperlink{classfc_1_1log__context}{log\_context}}\ \mbox{\hyperlink{structcontext}{context}}\ =\ message.get\_context();}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00140}00140\ }
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00141}00141\ \ \ \ \ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\_variant\_object}}\ gelf\_message;}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00142}00142\ \ \ \ \ gelf\_message[\textcolor{stringliteral}{"{}version"{}}]\ =\ \textcolor{stringliteral}{"{}1.1"{}};}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00143}00143\ \ \ \ \ gelf\_message[\textcolor{stringliteral}{"{}host"{}}]\ =\ my-\/>cfg.host;}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00144}00144\ \ \ \ \ gelf\_message[\textcolor{stringliteral}{"{}short\_message"{}}]\ =\ \mbox{\hyperlink{namespacefc_acd5129981ae93fce3154d3fed6f6acbc}{format\_string}}(message.get\_format(),\ message.get\_data(),\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00145}00145\ }
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00146}00146\ \ \ \ \ \textcolor{comment}{//\ use\ now()\ instead\ of\ context.get\_timestamp()\ because\ log\_message\ construction\ can\ include\ user\ provided\ long\ running\ calls}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00147}00147\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ time\_ns\ =\ \mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{time\_point::now}}().\mbox{\hyperlink{classfc_1_1time__point_abfea5efbe9ef58024cda814395ee9945}{time\_since\_epoch}}().\mbox{\hyperlink{classfc_1_1microseconds_a20fba59ec7e1f50c6b8f2c9443cc9b92}{count}}();}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00148}00148\ \ \ \ \ gelf\_message[\textcolor{stringliteral}{"{}timestamp"{}}]\ =\ time\_ns\ /\ 1000000.;}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00149}00149\ \ \ \ \ gelf\_message[\textcolor{stringliteral}{"{}\_timestamp\_ns"{}}]\ =\ time\_ns;}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00150}00150\ }
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00151}00151\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ gelf\_log\_counter;}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00152}00152\ \ \ \ \ gelf\_message[\textcolor{stringliteral}{"{}\_log\_id"{}}]\ =\ \mbox{\hyperlink{namespacefc_a4e07b3870aa72f8c38bdd5f78044dad1}{fc::to\_string}}(++gelf\_log\_counter);}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00153}00153\ }
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00154}00154\ \ \ \ \ \textcolor{keywordflow}{switch}\ (\mbox{\hyperlink{structcontext}{context}}.get\_log\_level())}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00155}00155\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00156}00156\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4a30d2de77e71beb8d09d530cac04efa25}{log\_level::debug}}:}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00157}00157\ \ \ \ \ \ \ gelf\_message[\textcolor{stringliteral}{"{}level"{}}]\ =\ 7;\ \textcolor{comment}{//\ debug}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00158}00158\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00159}00159\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4afe6da1f3a75c3911b0b59bffaea070e1}{log\_level::info}}:}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00160}00160\ \ \ \ \ \ \ gelf\_message[\textcolor{stringliteral}{"{}level"{}}]\ =\ 6;\ \textcolor{comment}{//\ info}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00161}00161\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00162}00162\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4a890c8f6993efee47d617cf72e6b19583}{log\_level::warn}}:}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00163}00163\ \ \ \ \ \ \ gelf\_message[\textcolor{stringliteral}{"{}level"{}}]\ =\ 4;\ \textcolor{comment}{//\ warning}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00164}00164\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00165}00165\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4a836fc8bbd6f9c9445879679eb512df49}{log\_level::error}}:}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00166}00166\ \ \ \ \ \ \ gelf\_message[\textcolor{stringliteral}{"{}level"{}}]\ =\ 3;\ \textcolor{comment}{//\ error}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00167}00167\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00168}00168\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4a890e233ab2c5d4db2a1c26a10bd2de7d}{log\_level::all}}:}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00169}00169\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4a93f96542fabbe1792786b3ab17ad1dda}{log\_level::off}}:}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00170}00170\ \ \ \ \ \ \ \textcolor{comment}{//\ these\ shouldn't\ be\ used\ in\ log\ messages,\ but\ do\ something\ deterministic\ just\ in\ case}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00171}00171\ \ \ \ \ \ \ gelf\_message[\textcolor{stringliteral}{"{}level"{}}]\ =\ 6;\ \textcolor{comment}{//\ info}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00172}00172\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00173}00173\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00174}00174\ }
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00175}00175\ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{structcontext}{context}}.get\_context().empty())}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00176}00176\ \ \ \ \ \ \ gelf\_message[\textcolor{stringliteral}{"{}context"{}}]\ =\ \mbox{\hyperlink{structcontext}{context}}.get\_context();}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00177}00177\ \ \ \ \ gelf\_message[\textcolor{stringliteral}{"{}\_line"{}}]\ =\ \mbox{\hyperlink{structcontext}{context}}.get\_line\_number();}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00178}00178\ \ \ \ \ gelf\_message[\textcolor{stringliteral}{"{}\_file"{}}]\ =\ \mbox{\hyperlink{structcontext}{context}}.get\_file();}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00179}00179\ \ \ \ \ gelf\_message[\textcolor{stringliteral}{"{}\_method\_name"{}}]\ =\ \mbox{\hyperlink{structcontext}{context}}.get\_method();}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00180}00180\ \ \ \ \ gelf\_message[\textcolor{stringliteral}{"{}\_thread\_name"{}}]\ =\ \mbox{\hyperlink{structcontext}{context}}.get\_thread\_name();}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00181}00181\ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{structcontext}{context}}.get\_task\_name().empty())}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00182}00182\ \ \ \ \ \ \ gelf\_message[\textcolor{stringliteral}{"{}\_task\_name"{}}]\ =\ \mbox{\hyperlink{structcontext}{context}}.get\_task\_name();}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00183}00183\ }
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00184}00184\ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\&\&\ \mbox{\hyperlink{hello__driver_8cpp_a0b6f424d9a532680c6b2ca5c119c938b}{field}}\ :\ my-\/>cfg.user\_fields)\ \{}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00185}00185\ \ \ \ \ \ \ gelf\_message[\mbox{\hyperlink{hello__driver_8cpp_a0b6f424d9a532680c6b2ca5c119c938b}{field}}.key()]\ =\ \mbox{\hyperlink{hello__driver_8cpp_a0b6f424d9a532680c6b2ca5c119c938b}{field}}.value();}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00186}00186\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00187}00187\ }
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00188}00188\ \ \ \ \ \textcolor{keywordtype}{string}\ gelf\_message\_as\_string\ =\ \mbox{\hyperlink{classfc_1_1json_aa6541960d7f05567559b866cfaf88dfa}{json::to\_string}}(gelf\_message,}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00189}00189\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{fc::time\_point::now}}()\ +\ \mbox{\hyperlink{classfc_1_1exception_a13463219d1d09f150e987fe1b0368752}{fc::exception::format\_time\_limit}},}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00190}00190\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1json_afb6b3878fb58ad18c6c85f2f964bd998af29772e49cee90c19d21fbb60a3f88d4}{json::output\_formatting::legacy\_generator}});\ \textcolor{comment}{//\ GELF\ 1.1\ specifies\ unstringified\ numbers}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00191}00191\ \ \ \ \ gelf\_message\_as\_string\ =\ \mbox{\hyperlink{namespacefc_a5067fd64dc65a9185a024b76dd0272db}{zlib\_compress}}(gelf\_message\_as\_string);}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00192}00192\ }
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00193}00193\ \ \ \ \ \textcolor{comment}{//\ packets\ are\ sent\ by\ UDP,\ and\ they\ tend\ to\ disappear\ if\ they}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00194}00194\ \ \ \ \ \textcolor{comment}{//\ get\ too\ large.\ \ It's\ hard\ to\ find\ any\ solid\ numbers\ on\ how}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00195}00195\ \ \ \ \ \textcolor{comment}{//\ large\ they\ can\ be\ before\ they\ get\ dropped\ -\/-\/\ datagrams\ can}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00196}00196\ \ \ \ \ \textcolor{comment}{//\ be\ up\ to\ 64k,\ but\ anything\ over\ 512\ is\ not\ guaranteed.}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00197}00197\ \ \ \ \ \textcolor{comment}{//\ You\ can\ play\ with\ this\ number,\ intermediate\ values\ like}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00198}00198\ \ \ \ \ \textcolor{comment}{//\ 1400\ and\ 8100\ are\ likely\ to\ work\ on\ most\ intranets.}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00199}00199\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ max\_payload\_size\ =\ 512;}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00200}00200\ }
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00201}00201\ \ \ \ \ \textcolor{keywordflow}{if}\ (gelf\_message\_as\_string.size()\ <=\ max\_payload\_size)}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00202}00202\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00203}00203\ \ \ \ \ \ \ \textcolor{comment}{//\ no\ need\ to\ split}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00204}00204\ \ \ \ \ \ \ std::shared\_ptr<char>\ send\_buffer(\textcolor{keyword}{new}\ \textcolor{keywordtype}{char}[gelf\_message\_as\_string.size()],}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00205}00205\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [](\textcolor{keywordtype}{char}*\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})\{\ delete[]\ p;\ \});}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00206}00206\ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(send\_buffer.get(),\ gelf\_message\_as\_string.c\_str(),}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00207}00207\ \ \ \ \ \ \ \ \ \ \ \ \ \ gelf\_message\_as\_string.size());}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00208}00208\ }
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00209}00209\ \ \ \ \ \ \ my-\/>gelf\_socket.send\_to(send\_buffer,\ gelf\_message\_as\_string.size(),}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00210}00210\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *my-\/>gelf\_endpoint);}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00211}00211\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00212}00212\ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00213}00213\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00214}00214\ \ \ \ \ \ \ \textcolor{comment}{//\ split\ the\ message}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00215}00215\ \ \ \ \ \ \ \textcolor{comment}{//\ we\ need\ to\ generate\ an\ 8-\/byte\ ID\ for\ this\ message.}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00216}00216\ \ \ \ \ \ \ \textcolor{comment}{//\ city\ hash\ should\ do}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00217}00217\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ message\_id\ =\ \mbox{\hyperlink{namespacefc_a8bc1967c65aedd6545bf78fe6ffde635}{city\_hash64}}(gelf\_message\_as\_string.c\_str(),\ gelf\_message\_as\_string.size());}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00218}00218\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ header\_length\ =\ 2\ \textcolor{comment}{/*\ magic\ */}\ +\ 8\ \textcolor{comment}{/*\ msg\ id\ */}\ +\ 1\ \textcolor{comment}{/*\ seq\ */}\ +\ 1\ \textcolor{comment}{/*\ count\ */};}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00219}00219\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ body\_length\ =\ max\_payload\_size\ -\/\ header\_length;}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00220}00220\ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ total\_number\_of\_packets\ =\ (gelf\_message\_as\_string.size()\ +\ body\_length\ -\/\ 1)\ /\ body\_length;}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00221}00221\ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ bytes\_sent\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00222}00222\ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ number\_of\_packets\_sent\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00223}00223\ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (bytes\_sent\ <\ gelf\_message\_as\_string.size())}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00224}00224\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00225}00225\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ bytes\_to\_send\ =\ std::min((\textcolor{keywordtype}{unsigned})gelf\_message\_as\_string.size()\ -\/\ bytes\_sent,}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00226}00226\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ body\_length);}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00227}00227\ }
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00228}00228\ \ \ \ \ \ \ \ \ std::shared\_ptr<char>\ send\_buffer(\textcolor{keyword}{new}\ \textcolor{keywordtype}{char}[max\_payload\_size],}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00229}00229\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [](\textcolor{keywordtype}{char}*\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})\{\ \textcolor{keyword}{delete}[]\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}};\ \});}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00230}00230\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{classfc_1_1appender_a860a005f416319eee3b733bb375308c9}{ptr}}\ =\ send\_buffer.get();}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00231}00231\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ magic\ number\ for\ chunked\ message}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00232}00232\ \ \ \ \ \ \ \ \ *(\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)\mbox{\hyperlink{classfc_1_1appender_a860a005f416319eee3b733bb375308c9}{ptr}}++\ =\ 0x1e;}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00233}00233\ \ \ \ \ \ \ \ \ *(\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)\mbox{\hyperlink{classfc_1_1appender_a860a005f416319eee3b733bb375308c9}{ptr}}++\ =\ 0x0f;}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00234}00234\ }
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00235}00235\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ message\ id}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00236}00236\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(\mbox{\hyperlink{classfc_1_1appender_a860a005f416319eee3b733bb375308c9}{ptr}},\ (\textcolor{keywordtype}{char}*)\&message\_id,\ \textcolor{keyword}{sizeof}(message\_id));}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00237}00237\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1appender_a860a005f416319eee3b733bb375308c9}{ptr}}\ +=\ \textcolor{keyword}{sizeof}(message\_id);}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00238}00238\ }
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00239}00239\ \ \ \ \ \ \ \ \ *(\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)(\mbox{\hyperlink{classfc_1_1appender_a860a005f416319eee3b733bb375308c9}{ptr}}++)\ =\ number\_of\_packets\_sent;}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00240}00240\ \ \ \ \ \ \ \ \ *(\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)(\mbox{\hyperlink{classfc_1_1appender_a860a005f416319eee3b733bb375308c9}{ptr}}++)\ =\ total\_number\_of\_packets;}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00241}00241\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(\mbox{\hyperlink{classfc_1_1appender_a860a005f416319eee3b733bb375308c9}{ptr}},\ gelf\_message\_as\_string.c\_str()\ +\ bytes\_sent,}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00242}00242\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ bytes\_to\_send);}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00243}00243\ \ \ \ \ \ \ \ \ my-\/>gelf\_socket.send\_to(send\_buffer,\ header\_length\ +\ bytes\_to\_send,}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00244}00244\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *my-\/>gelf\_endpoint);}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00245}00245\ \ \ \ \ \ \ \ \ ++number\_of\_packets\_sent;}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00246}00246\ \ \ \ \ \ \ \ \ bytes\_sent\ +=\ bytes\_to\_send;}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00247}00247\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00248}00248\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(number\_of\_packets\_sent\ ==\ total\_number\_of\_packets);}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00249}00249\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00250}00250\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gelf__appender_8cpp_source_l00251}00251\ \}\ \textcolor{comment}{//\ fc}}
+
+\end{DoxyCode}

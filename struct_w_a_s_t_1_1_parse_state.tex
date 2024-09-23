@@ -1,0 +1,117 @@
+\doxysection{WAST\+::Parse\+State Struct Reference}
+\hypertarget{struct_w_a_s_t_1_1_parse_state}{}\label{struct_w_a_s_t_1_1_parse_state}\index{WAST::ParseState@{WAST::ParseState}}
+
+
+{\ttfamily \#include $<$Parse.\+h$>$}
+
+
+
+Inheritance diagram for WAST\+::Parse\+State\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=209pt]{struct_w_a_s_t_1_1_parse_state__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for WAST\+::Parse\+State\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=178pt]{struct_w_a_s_t_1_1_parse_state__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state_a80ce3e02bd5f5a10b35ace17f0f26ec2}{Parse\+State}} (const char \texorpdfstring{$\ast$}{*}in\+String, const \mbox{\hyperlink{struct_w_a_s_t_1_1_line_info}{Line\+Info}} \texorpdfstring{$\ast$}{*}in\+Line\+Info, std\+::vector$<$ \mbox{\hyperlink{struct_w_a_s_t_1_1_unresolved_error}{Unresolved\+Error}} $>$ \&in\+Errors, const Token \texorpdfstring{$\ast$}{*}in\+Next\+Token)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state_aa0756e24fc46d44cf21e3f447f7a8bde}{string}}
+\item 
+const \mbox{\hyperlink{struct_w_a_s_t_1_1_line_info}{Line\+Info}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state_a2f6f78f2d0ed37f48d49da19b52ccadd}{line\+Info}}
+\item 
+std\+::vector$<$ \mbox{\hyperlink{struct_w_a_s_t_1_1_unresolved_error}{Unresolved\+Error}} $>$ \& \mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state_ac8bc40a0614e2b9aa88ca995dce9d7ba}{errors}}
+\item 
+const Token \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state_aed44236c3beecfffdb5807d5a5af3e7a}{next\+Token}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{_parse_8h_source_l00028}{28}} of file \mbox{\hyperlink{_parse_8h_source}{Parse.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{struct_w_a_s_t_1_1_parse_state_a80ce3e02bd5f5a10b35ace17f0f26ec2}\index{WAST::ParseState@{WAST::ParseState}!ParseState@{ParseState}}
+\index{ParseState@{ParseState}!WAST::ParseState@{WAST::ParseState}}
+\doxysubsubsection{\texorpdfstring{ParseState()}{ParseState()}}
+{\footnotesize\ttfamily \label{struct_w_a_s_t_1_1_parse_state_a80ce3e02bd5f5a10b35ace17f0f26ec2} 
+WAST\+::\+Parse\+State\+::\+Parse\+State (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{in\+String}{, }\item[{const \mbox{\hyperlink{struct_w_a_s_t_1_1_line_info}{Line\+Info}} \texorpdfstring{$\ast$}{*}}]{in\+Line\+Info}{, }\item[{std\+::vector$<$ \mbox{\hyperlink{struct_w_a_s_t_1_1_unresolved_error}{Unresolved\+Error}} $>$ \&}]{in\+Errors}{, }\item[{const Token \texorpdfstring{$\ast$}{*}}]{in\+Next\+Token}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_8h_source_l00035}{35}} of file \mbox{\hyperlink{_parse_8h_source}{Parse.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state_aa0756e24fc46d44cf21e3f447f7a8bde}{string}}(inString)}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ ,\ \mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state_a2f6f78f2d0ed37f48d49da19b52ccadd}{lineInfo}}(inLineInfo)}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ ,\ \mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state_ac8bc40a0614e2b9aa88ca995dce9d7ba}{errors}}(inErrors)}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ ,\ \mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state_aed44236c3beecfffdb5807d5a5af3e7a}{nextToken}}(inNextToken)}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_w_a_s_t_1_1_parse_state_ac8bc40a0614e2b9aa88ca995dce9d7ba}\index{WAST::ParseState@{WAST::ParseState}!errors@{errors}}
+\index{errors@{errors}!WAST::ParseState@{WAST::ParseState}}
+\doxysubsubsection{\texorpdfstring{errors}{errors}}
+{\footnotesize\ttfamily \label{struct_w_a_s_t_1_1_parse_state_ac8bc40a0614e2b9aa88ca995dce9d7ba} 
+std\+::vector$<$\mbox{\hyperlink{struct_w_a_s_t_1_1_unresolved_error}{Unresolved\+Error}}$>$\& WAST\+::\+Parse\+State\+::errors}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_8h_source_l00032}{32}} of file \mbox{\hyperlink{_parse_8h_source}{Parse.\+h}}.
+
+\Hypertarget{struct_w_a_s_t_1_1_parse_state_a2f6f78f2d0ed37f48d49da19b52ccadd}\index{WAST::ParseState@{WAST::ParseState}!lineInfo@{lineInfo}}
+\index{lineInfo@{lineInfo}!WAST::ParseState@{WAST::ParseState}}
+\doxysubsubsection{\texorpdfstring{lineInfo}{lineInfo}}
+{\footnotesize\ttfamily \label{struct_w_a_s_t_1_1_parse_state_a2f6f78f2d0ed37f48d49da19b52ccadd} 
+const \mbox{\hyperlink{struct_w_a_s_t_1_1_line_info}{Line\+Info}}\texorpdfstring{$\ast$}{*} WAST\+::\+Parse\+State\+::line\+Info}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_8h_source_l00031}{31}} of file \mbox{\hyperlink{_parse_8h_source}{Parse.\+h}}.
+
+\Hypertarget{struct_w_a_s_t_1_1_parse_state_aed44236c3beecfffdb5807d5a5af3e7a}\index{WAST::ParseState@{WAST::ParseState}!nextToken@{nextToken}}
+\index{nextToken@{nextToken}!WAST::ParseState@{WAST::ParseState}}
+\doxysubsubsection{\texorpdfstring{nextToken}{nextToken}}
+{\footnotesize\ttfamily \label{struct_w_a_s_t_1_1_parse_state_aed44236c3beecfffdb5807d5a5af3e7a} 
+const Token\texorpdfstring{$\ast$}{*} WAST\+::\+Parse\+State\+::next\+Token}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_8h_source_l00033}{33}} of file \mbox{\hyperlink{_parse_8h_source}{Parse.\+h}}.
+
+\Hypertarget{struct_w_a_s_t_1_1_parse_state_aa0756e24fc46d44cf21e3f447f7a8bde}\index{WAST::ParseState@{WAST::ParseState}!string@{string}}
+\index{string@{string}!WAST::ParseState@{WAST::ParseState}}
+\doxysubsubsection{\texorpdfstring{string}{string}}
+{\footnotesize\ttfamily \label{struct_w_a_s_t_1_1_parse_state_aa0756e24fc46d44cf21e3f447f7a8bde} 
+const char\texorpdfstring{$\ast$}{*} WAST\+::\+Parse\+State\+::string}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_8h_source_l00030}{30}} of file \mbox{\hyperlink{_parse_8h_source}{Parse.\+h}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/wasm-\/jit/\+Source/\+WAST/\mbox{\hyperlink{_parse_8h}{Parse.\+h}}\end{DoxyCompactItemize}

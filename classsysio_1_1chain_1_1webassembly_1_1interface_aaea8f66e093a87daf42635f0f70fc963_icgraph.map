@@ -1,0 +1,11 @@
+<map id="sysio::chain::webassembly::interface::_sysio_f32_trunc" name="sysio::chain::webassembly::interface::_sysio_f32_trunc">
+<area shape="rect" id="Node000001" title=" " alt="" coords="233,133,419,174"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1chain_1_1webassembly_1_1interface.html#a3d1b710ae1566f72221026551ed0980d" title=" " alt="" coords="5,5,185,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="276,127,183,76,160,64,162,59,186,71,278,122"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1chain_1_1webassembly_1_1interface.html#a113c5ce4b607217e9dbe56b266d6d032" title=" " alt="" coords="5,85,185,141"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="217,137,185,131,186,126,218,132"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1chain_1_1webassembly_1_1interface.html#aa92527ac38efcfc016d861455f043a30" title=" " alt="" coords="5,165,185,221"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="218,175,186,180,185,175,217,169"/>
+<area shape="rect" id="Node000005" href="$classsysio_1_1chain_1_1webassembly_1_1interface.html#a56997f7cc9aeca9388bc0877bf157f2f" title=" " alt="" coords="5,245,185,301"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="278,184,186,236,162,247,160,242,183,231,276,179"/>
+</map>

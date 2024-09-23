@@ -1,0 +1,5 @@
+<map id="CLI::detail::PositiveNumber" name="CLI::detail::PositiveNumber">
+<area shape="rect" id="Node000001" title="Validate the argument is a number and greater than 0." alt="" coords="5,79,188,105"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_validator.html" title="Some validators that are provided." alt="" coords="46,5,147,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="99,46,99,79,94,79,94,46"/>
+</map>

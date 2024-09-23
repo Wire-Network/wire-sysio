@@ -1,0 +1,68 @@
+\doxysection{testing\+::internal\+::Universal\+Printer\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classtesting_1_1internal_1_1_universal_printer}{}\label{classtesting_1_1internal_1_1_universal_printer}\index{testing::internal::UniversalPrinter$<$ T $>$@{testing::internal::UniversalPrinter$<$ T $>$}}
+
+
+{\ttfamily \#include $<$gtest-\/printers.\+h$>$}
+
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static void \mbox{\hyperlink{classtesting_1_1internal_1_1_universal_printer_aecec021e1abbaa260b701e24e3fe33eb}{Print}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}, \+::std\+::ostream \texorpdfstring{$\ast$}{*}os)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$\newline
+class testing\+::internal\+::\+Universal\+Printer$<$ T $>$}
+
+
+Definition at line \mbox{\hyperlink{gtest-printers_8h_source_l00748}{748}} of file \mbox{\hyperlink{gtest-printers_8h_source}{gtest-\/printers.\+h}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_universal_printer_aecec021e1abbaa260b701e24e3fe33eb}\index{testing::internal::UniversalPrinter$<$ T $>$@{testing::internal::UniversalPrinter$<$ T $>$}!Print@{Print}}
+\index{Print@{Print}!testing::internal::UniversalPrinter$<$ T $>$@{testing::internal::UniversalPrinter$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{Print()}{Print()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_universal_printer_aecec021e1abbaa260b701e24e3fe33eb} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+static void \mbox{\hyperlink{classtesting_1_1internal_1_1_universal_printer}{testing\+::internal\+::\+Universal\+Printer}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::\+Print (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{value}{, }\item[{\+::std\+::ostream \texorpdfstring{$\ast$}{*}}]{os}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-printers_8h_source_l00757}{757}} of file \mbox{\hyperlink{gtest-printers_8h_source}{gtest-\/printers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00757\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00758\ \ \ \ \ \textcolor{comment}{//\ By\ default,\ ::testing::internal::PrintTo()\ is\ used\ for\ printing}}
+\DoxyCodeLine{00759\ \ \ \ \ \textcolor{comment}{//\ the\ value.}}
+\DoxyCodeLine{00760\ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00761\ \ \ \ \ \textcolor{comment}{//\ Thanks\ to\ Koenig\ look-\/up,\ if\ T\ is\ a\ class\ and\ has\ its\ own}}
+\DoxyCodeLine{00762\ \ \ \ \ \textcolor{comment}{//\ PrintTo()\ function\ defined\ in\ its\ namespace,\ that\ function\ will}}
+\DoxyCodeLine{00763\ \ \ \ \ \textcolor{comment}{//\ be\ visible\ here.\ \ Since\ it\ is\ more\ specific\ than\ the\ generic\ ones}}
+\DoxyCodeLine{00764\ \ \ \ \ \textcolor{comment}{//\ in\ ::testing::internal,\ it\ will\ be\ picked\ by\ the\ compiler\ in\ the}}
+\DoxyCodeLine{00765\ \ \ \ \ \textcolor{comment}{//\ following\ statement\ -\/\ exactly\ what\ we\ want.}}
+\DoxyCodeLine{00766\ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a8fd10cc30084c36a89c74868c8bd53f8}{PrintTo}}(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\ os);}
+\DoxyCodeLine{00767\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=317pt]{classtesting_1_1internal_1_1_universal_printer_aecec021e1abbaa260b701e24e3fe33eb_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{classtesting_1_1internal_1_1_universal_printer_aecec021e1abbaa260b701e24e3fe33eb_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/include/gtest/\mbox{\hyperlink{gtest-printers_8h}{gtest-\/printers.\+h}}\end{DoxyCompactItemize}

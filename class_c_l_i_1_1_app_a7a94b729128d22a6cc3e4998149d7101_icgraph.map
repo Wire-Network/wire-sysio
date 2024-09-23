@@ -1,0 +1,15 @@
+<map id="CLI::App::remaining_size" name="CLI::App::remaining_size">
+<area shape="rect" id="Node000001" title="This returns the number of remaining options, minus the – separator." alt="" coords="517,63,686,88"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_app.html#a4d57bf638f00715cbf27dcf055580398" title="Throw an error if anything is left over and should not be." alt="" coords="335,22,469,62"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="506,62,470,56,470,51,506,57"/>
+<area shape="rect" id="Node000007" href="$class_c_l_i_1_1_app.html#a7e8e59098befcc1f10969b9e5c88e0f9" title=" " alt="" coords="335,87,469,128"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="503,94,470,99,469,94,502,89"/>
+<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_app.html#a26a92886a7d7f10a9afbd39b6535f42b" title="Internal parse function." alt="" coords="167,5,287,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="319,33,287,29,288,24,320,28"/>
+<area shape="rect" id="Node000004" href="$class_c_l_i_1_1_app.html#a241ba75a6c98b36349ae2f71a9137291" title="Internal parse function." alt="" coords="167,55,287,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="320,57,288,61,287,56,319,51"/>
+<area shape="rect" id="Node000005" href="$class_c_l_i_1_1_app.html#a8ffb155a1153ee23d442c5bfed21225c" title="The real work is done here. Expects a reversed vector." alt="" coords="5,29,119,55"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="151,58,119,54,119,48,151,53"/>
+<area shape="rect" id="Node000006" href="$class_c_l_i_1_1_app.html#a878c1067ade7145aa11478d64f5173ed" title=" " alt="" coords="5,79,119,104"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="151,81,119,86,119,81,151,76"/>
+</map>

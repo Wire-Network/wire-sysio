@@ -1,0 +1,201 @@
+\doxysection{websocketpp\+::http Namespace Reference}
+\hypertarget{namespacewebsocketpp_1_1http}{}\label{namespacewebsocketpp_1_1http}\index{websocketpp::http@{websocketpp::http}}
+
+
+HTTP handling support.  
+
+
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser}{parser}}
+\item 
+namespace \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1status__code}{status\+\_\+code}}
+\begin{DoxyCompactList}\small\item\em HTTP Status codes. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classwebsocketpp_1_1http_1_1exception}{exception}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef std\+::map$<$ std\+::string, std\+::string $>$ \mbox{\hyperlink{namespacewebsocketpp_1_1http_a9744f4104772b987aa9e86c35ce1357b}{attribute\+\_\+list}}
+\begin{DoxyCompactList}\small\item\em The type of an HTTP attribute list. \end{DoxyCompactList}\item 
+typedef std\+::vector$<$ std\+::pair$<$ std\+::string, \mbox{\hyperlink{namespacewebsocketpp_1_1http_a9744f4104772b987aa9e86c35ce1357b}{attribute\+\_\+list}} $>$ $>$ \mbox{\hyperlink{namespacewebsocketpp_1_1http_a2c285bc959df5a63bf962bed842fccfb}{parameter\+\_\+list}}
+\begin{DoxyCompactList}\small\item\em The type of an HTTP parameter list. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{namespacewebsocketpp_1_1http_aa414db2fb0b24344fe795183e0a4dbd9}{is\+\_\+token\+\_\+char}} (unsigned char c)
+\begin{DoxyCompactList}\small\item\em Is the character a token. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{namespacewebsocketpp_1_1http_a45a9b60b72b68de7b32fb75d89ad4c04}{is\+\_\+not\+\_\+token\+\_\+char}} (unsigned char c)
+\begin{DoxyCompactList}\small\item\em Is the character a non-\/token. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{namespacewebsocketpp_1_1http_a8ff7039dd19159bdbce3b98159c66ae2}{is\+\_\+whitespace\+\_\+char}} (unsigned char c)
+\begin{DoxyCompactList}\small\item\em Is the character whitespace. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{namespacewebsocketpp_1_1http_a95df9e609616688298d34fee9ec34945}{is\+\_\+not\+\_\+whitespace\+\_\+char}} (unsigned char c)
+\begin{DoxyCompactList}\small\item\em Is the character non-\/whitespace. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+size\+\_\+t const \mbox{\hyperlink{namespacewebsocketpp_1_1http_a514b8c48c36a9e42964f9ea35a82bc95}{max\+\_\+header\+\_\+size}} = 16000
+\begin{DoxyCompactList}\small\item\em Maximum size in bytes before rejecting an HTTP header as too big. \end{DoxyCompactList}\item 
+size\+\_\+t const \mbox{\hyperlink{namespacewebsocketpp_1_1http_a0cc54432842e22de04c4985cba23f54f}{max\+\_\+body\+\_\+size}} = 32000000
+\begin{DoxyCompactList}\small\item\em Default Maximum size in bytes for HTTP message bodies. \end{DoxyCompactList}\item 
+size\+\_\+t const \mbox{\hyperlink{namespacewebsocketpp_1_1http_a3632e5504bc2aeaa6b82d1cbffc2ec10}{istream\+\_\+buffer}} = 512
+\begin{DoxyCompactList}\small\item\em Number of bytes to use for temporary istream read buffers. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{namespacewebsocketpp_1_1http_a9744f4104772b987aa9e86c35ce1357b}\index{websocketpp::http@{websocketpp::http}!attribute\_list@{attribute\_list}}
+\index{attribute\_list@{attribute\_list}!websocketpp::http@{websocketpp::http}}
+\doxysubsubsection{\texorpdfstring{attribute\_list}{attribute\_list}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1http_a9744f4104772b987aa9e86c35ce1357b} 
+typedef std\+::map$<$std\+::string,std\+::string$>$ \mbox{\hyperlink{namespacewebsocketpp_1_1http_a9744f4104772b987aa9e86c35ce1357b}{websocketpp\+::http\+::attribute\+\_\+list}}}
+
+The attribute list is an unordered key/value map. Encoded attribute values are delimited by semicolons. 
+
+Definition at line \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2constants_8hpp_source_l00045}{45}} of file \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2constants_8hpp_source}{constants.\+hpp}}.
+
+\Hypertarget{namespacewebsocketpp_1_1http_a2c285bc959df5a63bf962bed842fccfb}\index{websocketpp::http@{websocketpp::http}!parameter\_list@{parameter\_list}}
+\index{parameter\_list@{parameter\_list}!websocketpp::http@{websocketpp::http}}
+\doxysubsubsection{\texorpdfstring{parameter\_list}{parameter\_list}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1http_a2c285bc959df5a63bf962bed842fccfb} 
+typedef std\+::vector$<$ std\+::pair$<$std\+::string,\mbox{\hyperlink{namespacewebsocketpp_1_1http_a9744f4104772b987aa9e86c35ce1357b}{attribute\+\_\+list}}$>$ $>$ \mbox{\hyperlink{namespacewebsocketpp_1_1http_a2c285bc959df5a63bf962bed842fccfb}{websocketpp\+::http\+::parameter\+\_\+list}}}
+
+The parameter list is an ordered pairing of a parameter and its associated attribute list. Encoded parameter values are delimited by commas. 
+
+Definition at line \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2constants_8hpp_source_l00053}{53}} of file \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2constants_8hpp_source}{constants.\+hpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacewebsocketpp_1_1http_a45a9b60b72b68de7b32fb75d89ad4c04}\index{websocketpp::http@{websocketpp::http}!is\_not\_token\_char@{is\_not\_token\_char}}
+\index{is\_not\_token\_char@{is\_not\_token\_char}!websocketpp::http@{websocketpp::http}}
+\doxysubsubsection{\texorpdfstring{is\_not\_token\_char()}{is\_not\_token\_char()}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1http_a45a9b60b72b68de7b32fb75d89ad4c04} 
+bool websocketpp\+::http\+::is\+\_\+not\+\_\+token\+\_\+char (\begin{DoxyParamCaption}\item[{unsigned char}]{c}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2constants_8hpp_source_l00103}{103}} of file \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2constants_8hpp_source}{constants.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !header\_token[c];}
+\DoxyCodeLine{00105\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacewebsocketpp_1_1http_a45a9b60b72b68de7b32fb75d89ad4c04_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacewebsocketpp_1_1http_a95df9e609616688298d34fee9ec34945}\index{websocketpp::http@{websocketpp::http}!is\_not\_whitespace\_char@{is\_not\_whitespace\_char}}
+\index{is\_not\_whitespace\_char@{is\_not\_whitespace\_char}!websocketpp::http@{websocketpp::http}}
+\doxysubsubsection{\texorpdfstring{is\_not\_whitespace\_char()}{is\_not\_whitespace\_char()}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1http_a95df9e609616688298d34fee9ec34945} 
+bool websocketpp\+::http\+::is\+\_\+not\+\_\+whitespace\+\_\+char (\begin{DoxyParamCaption}\item[{unsigned char}]{c}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2constants_8hpp_source_l00116}{116}} of file \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2constants_8hpp_source}{constants.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (c\ !=\ 9\ \&\&\ c\ !=\ 32);}
+\DoxyCodeLine{00118\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacewebsocketpp_1_1http_a95df9e609616688298d34fee9ec34945_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacewebsocketpp_1_1http_aa414db2fb0b24344fe795183e0a4dbd9}\index{websocketpp::http@{websocketpp::http}!is\_token\_char@{is\_token\_char}}
+\index{is\_token\_char@{is\_token\_char}!websocketpp::http@{websocketpp::http}}
+\doxysubsubsection{\texorpdfstring{is\_token\_char()}{is\_token\_char()}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1http_aa414db2fb0b24344fe795183e0a4dbd9} 
+bool websocketpp\+::http\+::is\+\_\+token\+\_\+char (\begin{DoxyParamCaption}\item[{unsigned char}]{c}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2constants_8hpp_source_l00098}{98}} of file \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2constants_8hpp_source}{constants.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (header\_token[c]\ ==\ 1);}
+\DoxyCodeLine{00100\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacewebsocketpp_1_1http_aa414db2fb0b24344fe795183e0a4dbd9_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacewebsocketpp_1_1http_a8ff7039dd19159bdbce3b98159c66ae2}\index{websocketpp::http@{websocketpp::http}!is\_whitespace\_char@{is\_whitespace\_char}}
+\index{is\_whitespace\_char@{is\_whitespace\_char}!websocketpp::http@{websocketpp::http}}
+\doxysubsubsection{\texorpdfstring{is\_whitespace\_char()}{is\_whitespace\_char()}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1http_a8ff7039dd19159bdbce3b98159c66ae2} 
+bool websocketpp\+::http\+::is\+\_\+whitespace\+\_\+char (\begin{DoxyParamCaption}\item[{unsigned char}]{c}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+whitespace is space (32) or horizontal tab (9) 
+
+Definition at line \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2constants_8hpp_source_l00111}{111}} of file \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2constants_8hpp_source}{constants.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (c\ ==\ 9\ ||\ c\ ==\ 32);}
+\DoxyCodeLine{00113\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacewebsocketpp_1_1http_a8ff7039dd19159bdbce3b98159c66ae2_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{namespacewebsocketpp_1_1http_a3632e5504bc2aeaa6b82d1cbffc2ec10}\index{websocketpp::http@{websocketpp::http}!istream\_buffer@{istream\_buffer}}
+\index{istream\_buffer@{istream\_buffer}!websocketpp::http@{websocketpp::http}}
+\doxysubsubsection{\texorpdfstring{istream\_buffer}{istream\_buffer}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1http_a3632e5504bc2aeaa6b82d1cbffc2ec10} 
+size\+\_\+t const websocketpp\+::http\+::istream\+\_\+buffer = 512}
+
+
+
+Definition at line \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2constants_8hpp_source_l00071}{71}} of file \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2constants_8hpp_source}{constants.\+hpp}}.
+
+\Hypertarget{namespacewebsocketpp_1_1http_a0cc54432842e22de04c4985cba23f54f}\index{websocketpp::http@{websocketpp::http}!max\_body\_size@{max\_body\_size}}
+\index{max\_body\_size@{max\_body\_size}!websocketpp::http@{websocketpp::http}}
+\doxysubsubsection{\texorpdfstring{max\_body\_size}{max\_body\_size}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1http_a0cc54432842e22de04c4985cba23f54f} 
+size\+\_\+t const websocketpp\+::http\+::max\+\_\+body\+\_\+size = 32000000}
+
+
+
+Definition at line \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2constants_8hpp_source_l00068}{68}} of file \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2constants_8hpp_source}{constants.\+hpp}}.
+
+\Hypertarget{namespacewebsocketpp_1_1http_a514b8c48c36a9e42964f9ea35a82bc95}\index{websocketpp::http@{websocketpp::http}!max\_header\_size@{max\_header\_size}}
+\index{max\_header\_size@{max\_header\_size}!websocketpp::http@{websocketpp::http}}
+\doxysubsubsection{\texorpdfstring{max\_header\_size}{max\_header\_size}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1http_a514b8c48c36a9e42964f9ea35a82bc95} 
+size\+\_\+t const websocketpp\+::http\+::max\+\_\+header\+\_\+size = 16000}
+
+
+
+Definition at line \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2constants_8hpp_source_l00065}{65}} of file \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2constants_8hpp_source}{constants.\+hpp}}.
+

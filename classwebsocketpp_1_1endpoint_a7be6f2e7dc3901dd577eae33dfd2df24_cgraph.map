@@ -1,0 +1,9 @@
+<map id="websocketpp::endpoint::get_con_from_hdl" name="websocketpp::endpoint::get_con_from_hdl">
+<area shape="rect" id="Node000001" title="Retrieves a connection_ptr from a connection_hdl (exception version)" alt="" coords="5,5,161,46"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1endpoint.html#a0fe4457427d4124abe7ca022ba7afbb4" title="Retrieves a connection_ptr from a connection_hdl (exception free)" alt="" coords="209,5,364,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="161,23,193,23,193,28,161,28"/>
+<area shape="rect" id="Node000003" href="$namespacewebsocketpp_1_1error.html#a3344622df8c36e8ae03c59164e7b5e89" title=" " alt="" coords="412,5,544,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="365,23,396,23,396,28,365,28"/>
+<area shape="rect" id="Node000004" href="$namespacewebsocketpp_1_1error.html#ac1acac2bfb24bbd2b1791db80993b0c2" title=" " alt="" coords="592,5,725,46"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="545,23,577,23,577,28,545,28"/>
+</map>

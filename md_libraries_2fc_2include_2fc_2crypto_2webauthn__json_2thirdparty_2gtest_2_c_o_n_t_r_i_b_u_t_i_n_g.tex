@@ -1,0 +1,117 @@
+\chapter{How to become a contributor and submit your own code}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2thirdparty_2gtest_2_c_o_n_t_r_i_b_u_t_i_n_g}{}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2thirdparty_2gtest_2_c_o_n_t_r_i_b_u_t_i_n_g}\index{How to become a contributor and submit your own code@{How to become a contributor and submit your own code}}
+\doxysection*{Contributor License Agreements}
+
+We\textquotesingle{}d love to accept your patches! Before we can take them, we have to jump a couple of legal hurdles.
+
+Please fill out either the individual or corporate Contributor License Agreement (CLA).
+
+
+\begin{DoxyItemize}
+\item If you are an individual writing original source code and you\textquotesingle{}re sure you own the intellectual property, then you\textquotesingle{}ll need to sign an \href{https://developers.google.com/open-source/cla/individual}{\texttt{ individual CLA}}.
+\item If you work for a company that wants to allow you to contribute your work, then you\textquotesingle{}ll need to sign a \href{https://developers.google.com/open-source/cla/corporate}{\texttt{ corporate CLA}}.
+\end{DoxyItemize}
+
+Follow either of the two links above to access the appropriate CLA and instructions for how to sign and return it. Once we receive it, we\textquotesingle{}ll be able to accept your pull requests.
+
+\doxysection*{Contributing \doxylink{struct_a}{A} Patch}
+
+
+\begin{DoxyEnumerate}
+\item Submit an issue describing your proposed change to the \href{https://github.com/google/googletest}{\texttt{ issue tracker}}.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Please don\textquotesingle{}t mix more than one logical change per submittal, because it makes the history hard to follow. If you want to make a change that doesn\textquotesingle{}t have a corresponding issue in the issue tracker, please create one.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Also, coordinate with team members that are listed on the issue in question. This ensures that work isn\textquotesingle{}t being duplicated and communicating your plan early also generally leads to better patches.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item If your proposed change is accepted, and you haven\textquotesingle{}t already done so, sign a Contributor License Agreement (see details above).
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Fork the desired repo, develop and test your code changes.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Ensure that your code adheres to the existing style in the sample to which you are contributing.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Ensure that your code has an appropriate set of unit tests which all pass.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Submit a pull request.
+\end{DoxyEnumerate}
+
+If you are a Googler, it is preferable to first create an internal change and have it reviewed and submitted, and then create an upstreaming pull request here.
+
+\doxysection*{The Google \doxylink{class_test}{Test} and Google \doxylink{class_mock}{Mock} Communities}
+
+The Google \doxylink{class_test}{Test} community exists primarily through the \href{http://groups.google.com/group/googletestframework}{\texttt{ discussion group}} and the Git\+Hub repository. Likewise, the Google \doxylink{class_mock}{Mock} community exists primarily through their own \href{http://groups.google.com/group/googlemock}{\texttt{ discussion group}}. You are definitely encouraged to contribute to the discussion and you can also help us to keep the effectiveness of the group high by following and promoting the guidelines listed here.
+
+\doxysubsection*{Please Be Friendly}
+
+Showing courtesy and respect to others is a vital part of the Google culture, and we strongly encourage everyone participating in Google \doxylink{class_test}{Test} development to join us in accepting nothing less. Of course, being courteous is not the same as failing to constructively disagree with each other, but it does mean that we should be respectful of each other when enumerating the 42 technical reasons that a particular proposal may not be the best choice. There\textquotesingle{}s never a reason to be antagonistic or dismissive toward anyone who is sincerely trying to contribute to a discussion.
+
+Sure, C++ testing is serious business and all that, but it\textquotesingle{}s also a lot of fun. Let\textquotesingle{}s keep it that way. Let\textquotesingle{}s strive to be one of the friendliest communities in all of open source.
+
+As always, discuss Google \doxylink{class_test}{Test} in the official Google\+Test discussion group. You don\textquotesingle{}t have to actually submit code in order to sign up. Your participation itself is a valuable contribution.
+
+\doxysection*{Style}
+
+To keep the source consistent, readable, diffable and easy to merge, we use a fairly rigid coding style, as defined by the \href{https://github.com/google/styleguide}{\texttt{ google-\/styleguide}} project. All patches will be expected to conform to the style outlined \href{https://google.github.io/styleguide/cppguide.html}{\texttt{ here}}.
+
+\doxysection*{Requirements for Contributors}
+
+If you plan to contribute a patch, you need to build Google \doxylink{class_test}{Test}, Google \doxylink{class_mock}{Mock}, and their own tests from a git checkout, which has further requirements\+:
+
+
+\begin{DoxyItemize}
+\item \href{https://www.python.org/}{\texttt{ Python}} v2.\+3 or newer (for running some of the tests and re-\/generating certain source files from templates)
+\item \href{https://cmake.org/}{\texttt{ CMake}} v2.\+6.\+4 or newer
+\item \href{https://en.wikipedia.org/wiki/GNU_Build_System}{\texttt{ GNU Build System}} including automake (\texorpdfstring{$>$}{>}= 1.\+9), autoconf (\texorpdfstring{$>$}{>}= 2.\+59), and libtool / libtoolize.
+\end{DoxyItemize}
+
+\doxysection*{Developing Google \doxylink{class_test}{Test}}
+
+This section discusses how to make your own changes to Google \doxylink{class_test}{Test}.
+
+\doxysubsection*{Testing Google \doxylink{class_test}{Test} Itself}
+
+To make sure your changes work as intended and don\textquotesingle{}t break existing functionality, you\textquotesingle{}ll want to compile and run Google \doxylink{class_test}{Test}\textquotesingle{}s own tests. For that you can use CMake\+: \begin{DoxyVerb}mkdir mybuild
+cd mybuild
+cmake -Dgtest_build_tests=ON ${GTEST_DIR}
+\end{DoxyVerb}
+
+
+Make sure you have Python installed, as some of Google \doxylink{class_test}{Test}\textquotesingle{}s tests are written in Python. If the cmake command complains about not being able to find Python ({\ttfamily Could NOT find Python\+Interp (missing\+: PYTHON\+\_\+\+EXECUTABLE)}), try telling it explicitly where your Python executable can be found\+: \begin{DoxyVerb}cmake -DPYTHON_EXECUTABLE=path/to/python -Dgtest_build_tests=ON ${GTEST_DIR}
+\end{DoxyVerb}
+
+
+Next, you can build Google \doxylink{class_test}{Test} and all of its own tests. On \texorpdfstring{$\ast$}{*}nix, this is usually done by \textquotesingle{}make\textquotesingle{}. To run the tests, do \begin{DoxyVerb}make test
+\end{DoxyVerb}
+
+
+All tests should pass.
+
+\doxysubsection*{Regenerating Source Files}
+
+Some of Google \doxylink{class_test}{Test}\textquotesingle{}s source files are generated from templates (not in the C++ sense) using a script. For example, the file include/gtest/internal/gtest-\/type-\/util.\+h.\+pump is used to generate \doxylink{gtest-type-util_8h}{gtest-\/type-\/util.\+h} in the same directory.
+
+You don\textquotesingle{}t need to worry about regenerating the source files unless you need to modify them. You would then modify the corresponding {\ttfamily .pump} files and run the \textquotesingle{}\href{googletest/scripts/pump.py}{\texttt{ pump.\+py}}\textquotesingle{} generator script. See the \doxysectlink{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2thirdparty_2gtest_2googletest_2docs_2_pump_manual}{Pump Manual}{0}.
+
+\doxysection*{Developing Google \doxylink{class_mock}{Mock}}
+
+This section discusses how to make your own changes to Google \doxylink{class_mock}{Mock}.
+
+\doxysubsubsection*{Testing Google \doxylink{class_mock}{Mock} Itself}
+
+To make sure your changes work as intended and don\textquotesingle{}t break existing functionality, you\textquotesingle{}ll want to compile and run Google \doxylink{class_test}{Test}\textquotesingle{}s own tests. For that you\textquotesingle{}ll need Autotools. First, make sure you have followed the instructions above to configure Google \doxylink{class_mock}{Mock}. Then, create a build output directory and enter it. Next, \begin{DoxyVerb}${GMOCK_DIR}/configure  # try --help for more info
+\end{DoxyVerb}
+
+
+Once you have successfully configured Google \doxylink{class_mock}{Mock}, the build steps are standard for GNU-\/style OSS packages. \begin{DoxyVerb}make        # Standard makefile following GNU conventions
+make check  # Builds and runs all tests - all should pass.
+\end{DoxyVerb}
+
+
+Note that when building your project against Google \doxylink{class_mock}{Mock}, you are building against Google \doxylink{class_test}{Test} as well. There is no need to configure Google \doxylink{class_test}{Test} separately. 

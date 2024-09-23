@@ -1,0 +1,23 @@
+\doxysection{producer.\+cpp}
+\hypertarget{producer_8cpp_source}{}\label{producer_8cpp_source}\index{libraries/chain/webassembly/producer.cpp@{libraries/chain/webassembly/producer.cpp}}
+\mbox{\hyperlink{producer_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{producer_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{interface_8hpp}{sysio/chain/webassembly/interface.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{producer_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{apply__context_8hpp}{sysio/chain/apply\_context.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{producer_8cpp_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{producer_8cpp_source_l00004}00004\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{\ \textcolor{keyword}{namespace\ }chain\ \{\ \textcolor{keyword}{namespace\ }webassembly\ \{}
+\DoxyCodeLine{\Hypertarget{producer_8cpp_source_l00005}\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_a342015925d70b1510505f5cbd82880fa}{00005}}\ \ \ \ \mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}}\ \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_a342015925d70b1510505f5cbd82880fa}{interface::get\_active\_producers}}(\ \mbox{\hyperlink{structsysio_1_1vm_1_1argument__proxy}{legacy\_span<account\_name>}}\ \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a6d42fdcc89e90507ee6f095c8e92fa2b}{producers}}\ )\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{producer_8cpp_source_l00006}00006\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ active\_producers\ =\ \mbox{\hyperlink{structcontext}{context}}.get\_active\_producers();}
+\DoxyCodeLine{\Hypertarget{producer_8cpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{producer_8cpp_source_l00008}00008\ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ =\ active\_producers.size();}
+\DoxyCodeLine{\Hypertarget{producer_8cpp_source_l00009}00009\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ *\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{chain::account\_name}});}
+\DoxyCodeLine{\Hypertarget{producer_8cpp_source_l00010}00010\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a6d42fdcc89e90507ee6f095c8e92fa2b}{producers}}.size\_bytes()\ ==\ 0\ )\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{\Hypertarget{producer_8cpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{producer_8cpp_source_l00012}00012\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ copy\_size\ =\ std::min(\ \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a6d42fdcc89e90507ee6f095c8e92fa2b}{producers}}.size(),\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ );}
+\DoxyCodeLine{\Hypertarget{producer_8cpp_source_l00013}00013\ \ \ \ \ \ \ std::memcpy(\ \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a6d42fdcc89e90507ee6f095c8e92fa2b}{producers}}.data(),\ active\_producers.data(),\ copy\_size\ );}
+\DoxyCodeLine{\Hypertarget{producer_8cpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{producer_8cpp_source_l00015}00015\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ copy\_size;}
+\DoxyCodeLine{\Hypertarget{producer_8cpp_source_l00016}00016\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{producer_8cpp_source_l00017}00017\ \}\}\}\ \textcolor{comment}{//\ ns\ sysio::chain::webassembly}}
+
+\end{DoxyCode}

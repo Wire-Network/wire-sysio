@@ -1,0 +1,7 @@
+<map id="sysiosystem::block_header" name="sysiosystem::block_header">
+<area shape="rect" id="Node000001" title=" " alt="" coords="74,124,209,165"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1name.html" title="Immutable except for fc::from_variant." alt="" coords="5,5,137,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="87,43,133,122,128,125,83,46"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="161,5,264,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="205,47,179,101,161,125,157,122,174,99,200,45"/>
+</map>

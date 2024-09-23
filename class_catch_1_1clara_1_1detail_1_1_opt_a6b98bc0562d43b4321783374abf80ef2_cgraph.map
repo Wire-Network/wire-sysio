@@ -1,0 +1,18 @@
+<map id="Catch::clara::detail::Opt::parse" name="Catch::clara::detail::Opt::parse">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,92,137,133"/>
+<area shape="rect" id="Node000002" href="$class_catch_1_1clara_1_1detail_1_1_opt.html#a86bfa4649191d9890d3b9344ae738c2e" title=" " alt="" coords="209,5,340,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="120,89,210,50,212,55,122,94"/>
+<area shape="rect" id="Node000004" href="$class_catch_1_1clara_1_1detail_1_1_basic_result.html#ac48a1cb282f89218d149c021cbd32eb6" title=" " alt="" coords="623,124,755,165"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="137,102,224,96,334,91,455,94,576,106,621,116,619,122,575,111,455,99,334,97,224,101,137,108"/>
+<area shape="rect" id="Node000005" href="$class_catch_1_1clara_1_1detail_1_1_basic_result.html#a8beb3ea9d8153ee786cb1f5578f938a8" title=" " alt="" coords="185,120,364,161"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="137,119,169,123,169,128,137,124"/>
+<area shape="rect" id="Node000006" href="$class_catch_1_1clara_1_1detail_1_1_opt.html#aff9c008fe44ec3ab07f62ef2a3a3aa7c" title=" " alt="" coords="209,185,340,226"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="110,131,186,170,201,177,199,181,184,175,107,136"/>
+<area shape="rect" id="Node000003" href="$namespace_catch_1_1clara_1_1detail.html#aba708db78a9ed26368ee21e7e011e59e" title=" " alt="" coords="428,5,559,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="340,23,412,23,412,28,340,28"/>
+<area shape="rect" id="Node000007" href="$class_catch_1_1clara_1_1detail_1_1_basic_result.html#ad3fa504334ce2f7d9b98fd680cf30e3d" title=" " alt="" coords="412,120,575,161"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="339,184,407,163,409,168,341,189"/>
+<area shape="rect" id="Node000008" href="$class_catch_1_1clara_1_1detail_1_1_parser_base.html#a6f649e38d0d320834809f904fbba762d" title=" " alt="" coords="418,185,569,226"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="340,203,403,203,403,208,340,208"/>
+<area shape="poly" id="edge8_Node000008_Node000004" title=" " alt="" coords="560,182,608,167,609,172,562,187"/>
+</map>

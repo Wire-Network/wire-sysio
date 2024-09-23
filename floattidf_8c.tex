@@ -1,0 +1,100 @@
+\doxysection{libraries/builtins/floattidf.c File Reference}
+\hypertarget{floattidf_8c}{}\label{floattidf_8c}\index{libraries/builtins/floattidf.c@{libraries/builtins/floattidf.c}}
+{\ttfamily \#include $<$float.\+h$>$}\newline
+{\ttfamily \#include "{}int\+\_\+t.\+h"{}}\newline
+Include dependency graph for floattidf.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=228pt]{floattidf_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+double \mbox{\hyperlink{floattidf_8c_ad2e43c554e23d7415e97d1ac0f32a11d}{\+\_\+\+\_\+\+\_\+floattidf}} (\+\_\+\+\_\+int128 \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{floattidf_8c_ad2e43c554e23d7415e97d1ac0f32a11d}\index{floattidf.c@{floattidf.c}!\_\_\_floattidf@{\_\_\_floattidf}}
+\index{\_\_\_floattidf@{\_\_\_floattidf}!floattidf.c@{floattidf.c}}
+\doxysubsubsection{\texorpdfstring{\_\_\_floattidf()}{\_\_\_floattidf()}}
+{\footnotesize\ttfamily \label{floattidf_8c_ad2e43c554e23d7415e97d1ac0f32a11d} 
+double \+\_\+\+\_\+\+\_\+floattidf (\begin{DoxyParamCaption}\item[{\+\_\+\+\_\+int128}]{a}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{floattidf_8c_source_l00026}{26}} of file \mbox{\hyperlink{floattidf_8c_source}{floattidf.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00027\ \{}
+\DoxyCodeLine{00028\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ ==\ 0)}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0.0;}
+\DoxyCodeLine{00030\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\ =\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{int__t_8h_a809ddb4bf175c5d5cb11a93120f171bd}{ti\_int}})\ *\ CHAR\_BIT;}
+\DoxyCodeLine{00031\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{int__t_8h_a809ddb4bf175c5d5cb11a93120f171bd}{ti\_int}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ >>\ (\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}-\/1);}
+\DoxyCodeLine{00032\ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ =\ (\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ \string^\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})\ -\/\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{00033\ \ \ \ \ \textcolor{keywordtype}{int}\ sd\ =\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\ -\/\ \mbox{\hyperlink{int__t_8h_a2d5320c270ab41e5bbbcf4ff2b941832}{\_\_clzti2}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});\ \ \textcolor{comment}{/*\ number\ of\ significant\ digits\ */}}
+\DoxyCodeLine{00034\ \ \ \ \ \textcolor{keywordtype}{int}\ e\ =\ sd\ -\/\ 1;\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ exponent\ */}}
+\DoxyCodeLine{00035\ \ \ \ \ \textcolor{keywordflow}{if}\ (sd\ >\ DBL\_MANT\_DIG)}
+\DoxyCodeLine{00036\ \ \ \ \ \{}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ start:\ \ 0000000000000000000001xxxxxxxxxxxxxxxxxxxxxxPQxxxxxxxxxxxxxxxxxx}}
+\DoxyCodeLine{00038\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ *\ \ finish:\ 000000000000000000000000000000000000001xxxxxxxxxxxxxxxxxxxxxxPQR}}
+\DoxyCodeLine{00039\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ *\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 12345678901234567890123456}}
+\DoxyCodeLine{00040\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ *\ 1\ =\ msb\ 1\ bit}}
+\DoxyCodeLine{00041\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ *\ P\ =\ bit\ DBL\_MANT\_DIG-\/1\ bits\ to\ the\ right\ of\ 1}}
+\DoxyCodeLine{00042\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ *\ Q\ =\ bit\ DBL\_MANT\_DIG\ bits\ to\ the\ right\ of\ 1}}
+\DoxyCodeLine{00043\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ *\ R\ =\ "{}or"{}\ of\ all\ bits\ to\ the\ right\ of\ Q}}
+\DoxyCodeLine{00044\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ */}}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (sd)}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ DBL\_MANT\_DIG\ +\ 1:}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ <<=\ 1;}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ DBL\_MANT\_DIG\ +\ 2:}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ =\ ((\mbox{\hyperlink{fixunstfti_8c_a37d58ea0ad02657a74cd76aa6d3c88e6}{tu\_int}})\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ >>\ (sd\ -\/\ (DBL\_MANT\_DIG+2)))\ |}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ \&\ ((\mbox{\hyperlink{fixunstfti_8c_a37d58ea0ad02657a74cd76aa6d3c88e6}{tu\_int}})(-\/1)\ >>\ ((\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\ +\ DBL\_MANT\_DIG+2)\ -\/\ sd)))\ !=\ 0);}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ finish:\ */}}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ |=\ (\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ \&\ 4)\ !=\ 0;\ \ \textcolor{comment}{/*\ Or\ P\ into\ R\ */}}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ ++\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}};\ \ \textcolor{comment}{/*\ round\ -\/\ this\ step\ may\ add\ a\ significant\ bit\ */}}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ >>=\ 2;\ \ \textcolor{comment}{/*\ dump\ Q\ and\ R\ */}}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ a\ is\ now\ rounded\ to\ DBL\_MANT\_DIG\ or\ DBL\_MANT\_DIG+1\ bits\ */}}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ \&\ ((\mbox{\hyperlink{fixunstfti_8c_a37d58ea0ad02657a74cd76aa6d3c88e6}{tu\_int}})1\ <<\ DBL\_MANT\_DIG))}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ >>=\ 1;}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \ \ \ ++e;}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ a\ is\ now\ rounded\ to\ DBL\_MANT\_DIG\ bits\ */}}
+\DoxyCodeLine{00067\ \ \ \ \ \}}
+\DoxyCodeLine{00068\ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00069\ \ \ \ \ \{}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ <<=\ (DBL\_MANT\_DIG\ -\/\ sd);}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ a\ is\ now\ rounded\ to\ DBL\_MANT\_DIG\ bits\ */}}
+\DoxyCodeLine{00072\ \ \ \ \ \}}
+\DoxyCodeLine{00073\ \ \ \ \ \mbox{\hyperlink{uniondouble__bits}{double\_bits}}\ fb;}
+\DoxyCodeLine{00074\ \ \ \ \ fb.\mbox{\hyperlink{uniondouble__bits_ad25214e05a20a4be9b61c1230fab3fe7}{u}}.\mbox{\hyperlink{unionudwords_a7638ca5d28010c22362690629d8853ca}{s}}.high\ =\ ((\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ \&\ 0x80000000)\ |\ \ \ \ \ \ \ \ \textcolor{comment}{/*\ sign\ */}}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((e\ +\ 1023)\ <<\ 20)\ \ \ \ \ \ |\ \ \ \ \ \ \ \ \textcolor{comment}{/*\ exponent\ */}}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ >>\ 32)\ \&\ 0x000FFFFF);\ \textcolor{comment}{/*\ mantissa-\/high\ */}}
+\DoxyCodeLine{00077\ \ \ \ \ fb.\mbox{\hyperlink{uniondouble__bits_ad25214e05a20a4be9b61c1230fab3fe7}{u}}.\mbox{\hyperlink{unionudwords_a7638ca5d28010c22362690629d8853ca}{s}}.low\ =\ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ mantissa-\/low\ */}}
+\DoxyCodeLine{00078\ \ \ \ \ \textcolor{keywordflow}{return}\ fb.\mbox{\hyperlink{uniondouble__bits_a3af9745e2519808d43c1ddb192b2ee02}{f}};}
+\DoxyCodeLine{00079\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=230pt]{floattidf_8c_ad2e43c554e23d7415e97d1ac0f32a11d_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=315pt]{floattidf_8c_ad2e43c554e23d7415e97d1ac0f32a11d_icgraph}
+\end{center}
+\end{figure}

@@ -1,0 +1,5 @@
+<map id="websocketpp::transport::iostream::connection::register_ostream" name="websocketpp::transport::iostream::connection::register_ostream">
+<area shape="rect" id="Node000001" title="Register a std::ostream with the transport for writing output." alt="" coords="5,5,163,61"/>
+<area shape="rect" id="Node000002" href="$xbyak__mnemonic_8h.html#aa81aed607133209dade63a226818224d" title=" " alt="" coords="211,20,256,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="163,30,195,30,195,36,163,36"/>
+</map>

@@ -1,0 +1,11 @@
+<map id="LookaheadParserHandler::ParseNext" name="LookaheadParserHandler::ParseNext">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,27,173,68"/>
+<area shape="rect" id="Node000002" href="$class_generic_reader.html#ac417441794477ea747b63adb6d3653a9" title="Whether a parse error has occurred in the last parsing." alt="" coords="221,5,423,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="172,34,205,30,206,36,173,40"/>
+<area shape="rect" id="Node000004" href="$class_generic_reader.html#a257891331e0c259903e7066fb4cebf92" title="Parse one token from JSON text." alt="" coords="240,55,404,96"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="173,55,225,61,224,67,172,60"/>
+<area shape="rect" id="Node000003" href="$struct_parse_result.html#adfe0ef5b994e82f8aa9ebf0b30c924b1" title="Whether the result is an error." alt="" coords="473,5,613,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="424,16,458,16,458,21,424,21"/>
+<area shape="rect" id="Node000005" href="$classinternal_1_1_stack.html#a02da31665a372738e81ded2f7b7d598e" title=" " alt="" coords="471,63,615,88"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="404,73,455,73,455,78,404,78"/>
+</map>

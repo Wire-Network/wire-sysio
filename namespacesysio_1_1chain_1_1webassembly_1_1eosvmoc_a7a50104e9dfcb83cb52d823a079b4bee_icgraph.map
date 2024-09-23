@@ -1,0 +1,12 @@
+<map id="sysio::chain::webassembly::eosvmoc::get_ct_args_i" name="sysio::chain::webassembly::eosvmoc::get_ct_args_i">
+<area shape="rect" id="Node000001" title=" " alt="" coords="936,29,1115,70"/>
+<area shape="rect" id="Node000002" href="$namespacesysio_1_1chain_1_1webassembly_1_1eosvmoc.html#a4eac6dba434ae4fbd77147eaefe0277d" title=" " alt="" coords="708,29,888,70"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="920,52,888,52,888,47,920,47"/>
+<area shape="rect" id="Node000003" href="$namespacesysio_1_1chain_1_1webassembly_1_1eosvmoc.html#a3dd1211a90dc7ff1746b5459a3e03b2c" title=" " alt="" coords="481,29,660,70"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="693,52,661,52,661,47,693,47"/>
+<area shape="poly" id="edge3_Node000003_Node000003" title=" " alt="" coords="608,16,594,10,571,8,549,10,536,15,531,21,533,28,528,29,526,19,533,10,548,5,571,3,595,5,610,11"/>
+<area shape="rect" id="Node000004" href="$namespacesysio_1_1chain_1_1webassembly_1_1eosvmoc.html#a6efa174d4d38f5f348b1a3dc0c9d9c0b" title=" " alt="" coords="233,29,433,70"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="465,52,433,52,433,47,465,47"/>
+<area shape="rect" id="Node000005" href="$structsysio_1_1chain_1_1webassembly_1_1host__function__registrator.html#a8373c77aa3ef9e367a25f8f52c55ea7d" title=" " alt="" coords="5,22,185,78"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="217,52,185,52,185,47,217,47"/>
+</map>

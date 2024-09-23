@@ -1,0 +1,33 @@
+\doxysection{catch\+\_\+platform.\+h}
+\hypertarget{catch__platform_8h_source}{}\label{catch__platform_8h_source}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_platform.h@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_platform.h}}
+\mbox{\hyperlink{catch__platform_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{catch__platform_8h_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{catch__platform_8h_source_l00002}00002\ \textcolor{comment}{\ *\ \ Created\ by\ Phil\ on\ 16/8/2013.}}
+\DoxyCodeLine{\Hypertarget{catch__platform_8h_source_l00003}00003\ \textcolor{comment}{\ *\ \ Copyright\ 2013\ Two\ Blue\ Cubes\ Ltd.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{catch__platform_8h_source_l00004}00004\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{catch__platform_8h_source_l00005}00005\ \textcolor{comment}{\ *\ \ Distributed\ under\ the\ Boost\ Software\ License,\ Version\ 1.0.\ (See\ accompanying}}
+\DoxyCodeLine{\Hypertarget{catch__platform_8h_source_l00006}00006\ \textcolor{comment}{\ *\ \ file\ LICENSE\_1\_0.txt\ or\ copy\ at\ http://www.boost.org/LICENSE\_1\_0.txt)}}
+\DoxyCodeLine{\Hypertarget{catch__platform_8h_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{catch__platform_8h_source_l00008}00008\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{catch__platform_8h_source_l00009}00009\ \textcolor{preprocessor}{\#ifndef\ TWOBLUECUBES\_CATCH\_PLATFORM\_H\_INCLUDED}}
+\DoxyCodeLine{\Hypertarget{catch__platform_8h_source_l00010}00010\ \textcolor{preprocessor}{\#define\ TWOBLUECUBES\_CATCH\_PLATFORM\_H\_INCLUDED}}
+\DoxyCodeLine{\Hypertarget{catch__platform_8h_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{catch__platform_8h_source_l00012}00012\ \textcolor{preprocessor}{\#ifdef\ \_\_APPLE\_\_}}
+\DoxyCodeLine{\Hypertarget{catch__platform_8h_source_l00013}00013\ \textcolor{preprocessor}{\#\ include\ <TargetConditionals.h>}}
+\DoxyCodeLine{\Hypertarget{catch__platform_8h_source_l00014}00014\ \textcolor{preprocessor}{\#\ if\ TARGET\_OS\_OSX\ ==\ 1}}
+\DoxyCodeLine{\Hypertarget{catch__platform_8h_source_l00015}00015\ \textcolor{preprocessor}{\#\ \ define\ CATCH\_PLATFORM\_MAC}}
+\DoxyCodeLine{\Hypertarget{catch__platform_8h_source_l00016}00016\ \textcolor{preprocessor}{\#\ elif\ TARGET\_OS\_IPHONE\ ==\ 1}}
+\DoxyCodeLine{\Hypertarget{catch__platform_8h_source_l00017}00017\ \textcolor{preprocessor}{\#\ \ define\ CATCH\_PLATFORM\_IPHONE}}
+\DoxyCodeLine{\Hypertarget{catch__platform_8h_source_l00018}00018\ \textcolor{preprocessor}{\#\ endif}}
+\DoxyCodeLine{\Hypertarget{catch__platform_8h_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{catch__platform_8h_source_l00020}00020\ \textcolor{preprocessor}{\#elif\ defined(linux)\ ||\ defined(\_\_linux)\ ||\ defined(\_\_linux\_\_)}}
+\DoxyCodeLine{\Hypertarget{catch__platform_8h_source_l00021}00021\ \textcolor{preprocessor}{\#\ \ define\ CATCH\_PLATFORM\_LINUX}}
+\DoxyCodeLine{\Hypertarget{catch__platform_8h_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{catch__platform_8h_source_l00023}00023\ \textcolor{preprocessor}{\#elif\ defined(WIN32)\ ||\ defined(\_\_WIN32\_\_)\ ||\ defined(\_WIN32)\ ||\ defined(\_MSC\_VER)\ ||\ defined(\_\_MINGW32\_\_)}}
+\DoxyCodeLine{\Hypertarget{catch__platform_8h_source_l00024}00024\ \textcolor{preprocessor}{\#\ \ define\ CATCH\_PLATFORM\_WINDOWS}}
+\DoxyCodeLine{\Hypertarget{catch__platform_8h_source_l00025}00025\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{catch__platform_8h_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{catch__platform_8h_source_l00027}00027\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ TWOBLUECUBES\_CATCH\_PLATFORM\_H\_INCLUDED}}
+
+\end{DoxyCode}

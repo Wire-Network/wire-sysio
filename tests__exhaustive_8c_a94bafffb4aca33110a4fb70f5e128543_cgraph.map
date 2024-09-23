@@ -1,0 +1,7 @@
+<map id="test_exhaustive_addition" name="test_exhaustive_addition">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,171,56"/>
+<area shape="rect" id="Node000002" href="$tests__exhaustive_8c.html#a6e3e2f3948ab2013a46f0a356f1057ae" title=" " alt="" coords="220,5,322,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="171,29,204,25,205,30,171,35"/>
+<area shape="rect" id="Node000003" href="$tests__exhaustive_8c.html#a7930deeb9d6815fba34afad98b8dfa69" title=" " alt="" coords="219,55,323,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="171,52,203,56,203,61,171,57"/>
+</map>

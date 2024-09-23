@@ -1,0 +1,868 @@
+\doxysection{scalar\+\_\+4x64\+\_\+impl.\+h}
+\hypertarget{scalar__4x64__impl_8h_source}{}\label{scalar__4x64__impl_8h_source}\index{libraries/fc/secp256k1/secp256k1/src/scalar\_4x64\_impl.h@{libraries/fc/secp256k1/secp256k1/src/scalar\_4x64\_impl.h}}
+\mbox{\hyperlink{scalar__4x64__impl_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00001}00001\ \textcolor{comment}{/***********************************************************************}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2013,\ 2014\ Pieter\ Wuille\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00003}00003\ \textcolor{comment}{\ *\ Distributed\ under\ the\ MIT\ software\ license,\ see\ the\ accompanying\ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00004}00004\ \textcolor{comment}{\ *\ file\ COPYING\ or\ https://www.opensource.org/licenses/mit-\/license.php.*}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00005}00005\ \textcolor{comment}{\ ***********************************************************************/}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00007}00007\ \textcolor{preprocessor}{\#ifndef\ SECP256K1\_SCALAR\_REPR\_IMPL\_H}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00008}00008\ \textcolor{preprocessor}{\#define\ SECP256K1\_SCALAR\_REPR\_IMPL\_H}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00010}00010\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{modinv64__impl_8h}{modinv64\_impl.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00012}00012\ \textcolor{comment}{/*\ Limbs\ of\ the\ secp256k1\ order.\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00013}\mbox{\hyperlink{scalar__4x64__impl_8h_a9e65a0592c11e099de8e8f58b38a14ae}{00013}}\ \textcolor{preprocessor}{\#define\ SECP256K1\_N\_0\ ((uint64\_t)0xBFD25E8CD0364141ULL)}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00014}\mbox{\hyperlink{scalar__4x64__impl_8h_a53cc412ecd7e47061b65c0ff5c6db4e2}{00014}}\ \textcolor{preprocessor}{\#define\ SECP256K1\_N\_1\ ((uint64\_t)0xBAAEDCE6AF48A03BULL)}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00015}\mbox{\hyperlink{scalar__4x64__impl_8h_a5cfbef70d2cba970443032a43450d0b3}{00015}}\ \textcolor{preprocessor}{\#define\ SECP256K1\_N\_2\ ((uint64\_t)0xFFFFFFFFFFFFFFFEULL)}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00016}\mbox{\hyperlink{scalar__4x64__impl_8h_a1d38f968c428d48fe1041ef38eec96d4}{00016}}\ \textcolor{preprocessor}{\#define\ SECP256K1\_N\_3\ ((uint64\_t)0xFFFFFFFFFFFFFFFFULL)}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00018}00018\ \textcolor{comment}{/*\ Limbs\ of\ 2\string^256\ minus\ the\ secp256k1\ order.\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00019}\mbox{\hyperlink{scalar__4x64__impl_8h_a7004f2007d2a43820488d377d7167ece}{00019}}\ \textcolor{preprocessor}{\#define\ SECP256K1\_N\_C\_0\ (\string~SECP256K1\_N\_0\ +\ 1)}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00020}\mbox{\hyperlink{scalar__4x64__impl_8h_a3f8f9c444183fbe3da955925b585290c}{00020}}\ \textcolor{preprocessor}{\#define\ SECP256K1\_N\_C\_1\ (\string~SECP256K1\_N\_1)}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00021}\mbox{\hyperlink{scalar__4x64__impl_8h_a2ba4e9e828bc0a11cf7ffc81cd823509}{00021}}\ \textcolor{preprocessor}{\#define\ SECP256K1\_N\_C\_2\ (1)}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00023}00023\ \textcolor{comment}{/*\ Limbs\ of\ half\ the\ secp256k1\ order.\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00024}\mbox{\hyperlink{scalar__4x64__impl_8h_a824415debca677af24eb249946df4404}{00024}}\ \textcolor{preprocessor}{\#define\ SECP256K1\_N\_H\_0\ ((uint64\_t)0xDFE92F46681B20A0ULL)}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00025}\mbox{\hyperlink{scalar__4x64__impl_8h_a93c4692d6cad53df3cce3fb4631dee82}{00025}}\ \textcolor{preprocessor}{\#define\ SECP256K1\_N\_H\_1\ ((uint64\_t)0x5D576E7357A4501DULL)}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00026}\mbox{\hyperlink{scalar__4x64__impl_8h_a5dfabdaac8359544dd1131ca3af807ae}{00026}}\ \textcolor{preprocessor}{\#define\ SECP256K1\_N\_H\_2\ ((uint64\_t)0xFFFFFFFFFFFFFFFFULL)}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00027}\mbox{\hyperlink{scalar__4x64__impl_8h_ac658856dbff7e81aca7cdd131c05dde4}{00027}}\ \textcolor{preprocessor}{\#define\ SECP256K1\_N\_H\_3\ ((uint64\_t)0x7FFFFFFFFFFFFFFFULL)}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00029}00029\ \mbox{\hyperlink{secp256k1_8h_a7ddc487fd46aee88f21cabedb7268b1e}{SECP256K1\_INLINE}}\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_scalar\_clear(\mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}})\ \{}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00030}00030\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[0]\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00031}00031\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[1]\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00032}00032\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[2]\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00033}00033\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[3]\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00034}00034\ \}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00036}00036\ \mbox{\hyperlink{secp256k1_8h_a7ddc487fd46aee88f21cabedb7268b1e}{SECP256K1\_INLINE}}\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_scalar\_set\_int(\mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ v)\ \{}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00037}00037\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[0]\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00038}00038\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[1]\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00039}00039\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[2]\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00040}00040\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[3]\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00041}00041\ \}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00043}00043\ \mbox{\hyperlink{secp256k1_8h_a7ddc487fd46aee88f21cabedb7268b1e}{SECP256K1\_INLINE}}\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ secp256k1\_scalar\_get\_bits(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ offset,\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}})\ \{}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00044}00044\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}((offset\ +\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ -\/\ 1)\ >>\ 6\ ==\ offset\ >>\ 6);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00045}00045\ \ \ \ \ \textcolor{keywordflow}{return}\ (\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[offset\ >>\ 6]\ >>\ (offset\ \&\ 0x3F))\ \&\ ((((\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})1)\ <<\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}})\ -\/\ 1);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00046}00046\ \}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00048}00048\ \mbox{\hyperlink{secp256k1_8h_a7ddc487fd46aee88f21cabedb7268b1e}{SECP256K1\_INLINE}}\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ secp256k1\_scalar\_get\_bits\_var(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ offset,\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}})\ \{}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00049}00049\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ <\ 32);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00050}00050\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(offset\ +\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ <=\ 256);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00051}00051\ \ \ \ \ \textcolor{keywordflow}{if}\ ((offset\ +\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ -\/\ 1)\ >>\ 6\ ==\ offset\ >>\ 6)\ \{}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00052}00052\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ secp256k1\_scalar\_get\_bits(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ offset,\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}});}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00053}00053\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00054}00054\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}((offset\ >>\ 6)\ +\ 1\ <\ 4);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00055}00055\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ((\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[offset\ >>\ 6]\ >>\ (offset\ \&\ 0x3F))\ |\ (\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[(offset\ >>\ 6)\ +\ 1]\ <<\ (64\ -\/\ (offset\ \&\ 0x3F))))\ \&\ ((((\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})1)\ <<\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}})\ -\/\ 1);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00056}00056\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00057}00057\ \}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00059}00059\ \mbox{\hyperlink{secp256k1_8h_a7ddc487fd46aee88f21cabedb7268b1e}{SECP256K1\_INLINE}}\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ secp256k1\_scalar\_check\_overflow(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})\ \{}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00060}00060\ \ \ \ \ \textcolor{keywordtype}{int}\ yes\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00061}00061\ \ \ \ \ \textcolor{keywordtype}{int}\ no\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00062}00062\ \ \ \ \ no\ |=\ (\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[3]\ <\ \mbox{\hyperlink{scalar__4x64__impl_8h_a1d38f968c428d48fe1041ef38eec96d4}{SECP256K1\_N\_3}});\ \textcolor{comment}{/*\ No\ need\ for\ a\ >\ check.\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00063}00063\ \ \ \ \ no\ |=\ (\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[2]\ <\ \mbox{\hyperlink{scalar__4x64__impl_8h_a5cfbef70d2cba970443032a43450d0b3}{SECP256K1\_N\_2}});}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00064}00064\ \ \ \ \ yes\ |=\ (\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[2]\ >\ \mbox{\hyperlink{scalar__4x64__impl_8h_a5cfbef70d2cba970443032a43450d0b3}{SECP256K1\_N\_2}})\ \&\ \string~no;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00065}00065\ \ \ \ \ no\ |=\ (\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[1]\ <\ \mbox{\hyperlink{scalar__4x64__impl_8h_a53cc412ecd7e47061b65c0ff5c6db4e2}{SECP256K1\_N\_1}});}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00066}00066\ \ \ \ \ yes\ |=\ (\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[1]\ >\ \mbox{\hyperlink{scalar__4x64__impl_8h_a53cc412ecd7e47061b65c0ff5c6db4e2}{SECP256K1\_N\_1}})\ \&\ \string~no;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00067}00067\ \ \ \ \ yes\ |=\ (\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[0]\ >=\ \mbox{\hyperlink{scalar__4x64__impl_8h_a9e65a0592c11e099de8e8f58b38a14ae}{SECP256K1\_N\_0}})\ \&\ \string~no;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00068}00068\ \ \ \ \ \textcolor{keywordflow}{return}\ yes;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00069}00069\ \}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00071}00071\ \mbox{\hyperlink{secp256k1_8h_a7ddc487fd46aee88f21cabedb7268b1e}{SECP256K1\_INLINE}}\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ secp256k1\_scalar\_reduce(\mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a49aa97067a36875627e1380c3fb3833d}{overflow}})\ \{}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00072}00072\ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a376f631fcb770bd4b2e8349a33e52f8a}{uint128\_t}}\ t;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00073}00073\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a49aa97067a36875627e1380c3fb3833d}{overflow}}\ <=\ 1);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00074}00074\ \ \ \ \ t\ =\ (\mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a376f631fcb770bd4b2e8349a33e52f8a}{uint128\_t}})\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[0]\ +\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a49aa97067a36875627e1380c3fb3833d}{overflow}}\ *\ \mbox{\hyperlink{scalar__4x64__impl_8h_a7004f2007d2a43820488d377d7167ece}{SECP256K1\_N\_C\_0}};}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00075}00075\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[0]\ =\ t\ \&\ 0xFFFFFFFFFFFFFFFFULL;\ t\ >>=\ 64;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00076}00076\ \ \ \ \ t\ +=\ (\mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a376f631fcb770bd4b2e8349a33e52f8a}{uint128\_t}})\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[1]\ +\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a49aa97067a36875627e1380c3fb3833d}{overflow}}\ *\ \mbox{\hyperlink{scalar__4x64__impl_8h_a3f8f9c444183fbe3da955925b585290c}{SECP256K1\_N\_C\_1}};}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00077}00077\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[1]\ =\ t\ \&\ 0xFFFFFFFFFFFFFFFFULL;\ t\ >>=\ 64;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00078}00078\ \ \ \ \ t\ +=\ (\mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a376f631fcb770bd4b2e8349a33e52f8a}{uint128\_t}})\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[2]\ +\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a49aa97067a36875627e1380c3fb3833d}{overflow}}\ *\ \mbox{\hyperlink{scalar__4x64__impl_8h_a2ba4e9e828bc0a11cf7ffc81cd823509}{SECP256K1\_N\_C\_2}};}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00079}00079\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[2]\ =\ t\ \&\ 0xFFFFFFFFFFFFFFFFULL;\ t\ >>=\ 64;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00080}00080\ \ \ \ \ t\ +=\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[3];}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00081}00081\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[3]\ =\ t\ \&\ 0xFFFFFFFFFFFFFFFFULL;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00082}00082\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a49aa97067a36875627e1380c3fb3833d}{overflow}};}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00083}00083\ \}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00084}00084\ }
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00085}00085\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ secp256k1\_scalar\_add(\mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *b)\ \{}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00086}00086\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a49aa97067a36875627e1380c3fb3833d}{overflow}};}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00087}00087\ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a376f631fcb770bd4b2e8349a33e52f8a}{uint128\_t}}\ t\ =\ (\mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a376f631fcb770bd4b2e8349a33e52f8a}{uint128\_t}})\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[0]\ +\ b-\/>\mbox{\hyperlink{structsecp256k1__scalar_a4aba1d263d205acdd537ed9a995393cd}{d}}[0];}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00088}00088\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[0]\ =\ t\ \&\ 0xFFFFFFFFFFFFFFFFULL;\ t\ >>=\ 64;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00089}00089\ \ \ \ \ t\ +=\ (\mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a376f631fcb770bd4b2e8349a33e52f8a}{uint128\_t}})\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[1]\ +\ b-\/>d[1];}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00090}00090\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[1]\ =\ t\ \&\ 0xFFFFFFFFFFFFFFFFULL;\ t\ >>=\ 64;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00091}00091\ \ \ \ \ t\ +=\ (\mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a376f631fcb770bd4b2e8349a33e52f8a}{uint128\_t}})\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[2]\ +\ b-\/>d[2];}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00092}00092\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[2]\ =\ t\ \&\ 0xFFFFFFFFFFFFFFFFULL;\ t\ >>=\ 64;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00093}00093\ \ \ \ \ t\ +=\ (\mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a376f631fcb770bd4b2e8349a33e52f8a}{uint128\_t}})\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[3]\ +\ b-\/>d[3];}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00094}00094\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[3]\ =\ t\ \&\ 0xFFFFFFFFFFFFFFFFULL;\ t\ >>=\ 64;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00095}00095\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a49aa97067a36875627e1380c3fb3833d}{overflow}}\ =\ t\ +\ secp256k1\_scalar\_check\_overflow(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}});}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00096}00096\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a49aa97067a36875627e1380c3fb3833d}{overflow}}\ ==\ 0\ ||\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a49aa97067a36875627e1380c3fb3833d}{overflow}}\ ==\ 1);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00097}00097\ \ \ \ \ secp256k1\_scalar\_reduce(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a49aa97067a36875627e1380c3fb3833d}{overflow}});}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00098}00098\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a49aa97067a36875627e1380c3fb3833d}{overflow}};}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00099}00099\ \}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00100}00100\ }
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00101}00101\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_scalar\_cadd\_bit(\mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}},\ \textcolor{keywordtype}{int}\ flag)\ \{}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00102}00102\ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a376f631fcb770bd4b2e8349a33e52f8a}{uint128\_t}}\ t;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00103}00103\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(\mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}}\ <\ 256);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00104}00104\ \ \ \ \ \mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}}\ +=\ ((\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})\ flag\ -\/\ 1)\ \&\ 0x100;\ \ \textcolor{comment}{/*\ forcing\ (bit\ >>\ 6)\ >\ 3\ makes\ this\ a\ noop\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00105}00105\ \ \ \ \ t\ =\ (\mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a376f631fcb770bd4b2e8349a33e52f8a}{uint128\_t}})\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[0]\ +\ (((\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})((\mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}}\ >>\ 6)\ ==\ 0))\ <<\ (\mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}}\ \&\ 0x3F));}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00106}00106\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[0]\ =\ t\ \&\ 0xFFFFFFFFFFFFFFFFULL;\ t\ >>=\ 64;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00107}00107\ \ \ \ \ t\ +=\ (\mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a376f631fcb770bd4b2e8349a33e52f8a}{uint128\_t}})\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[1]\ +\ (((\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})((\mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}}\ >>\ 6)\ ==\ 1))\ <<\ (\mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}}\ \&\ 0x3F));}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00108}00108\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[1]\ =\ t\ \&\ 0xFFFFFFFFFFFFFFFFULL;\ t\ >>=\ 64;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00109}00109\ \ \ \ \ t\ +=\ (\mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a376f631fcb770bd4b2e8349a33e52f8a}{uint128\_t}})\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[2]\ +\ (((\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})((\mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}}\ >>\ 6)\ ==\ 2))\ <<\ (\mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}}\ \&\ 0x3F));}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00110}00110\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[2]\ =\ t\ \&\ 0xFFFFFFFFFFFFFFFFULL;\ t\ >>=\ 64;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00111}00111\ \ \ \ \ t\ +=\ (\mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a376f631fcb770bd4b2e8349a33e52f8a}{uint128\_t}})\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[3]\ +\ (((\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})((\mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}}\ >>\ 6)\ ==\ 3))\ <<\ (\mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}}\ \&\ 0x3F));}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00112}00112\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[3]\ =\ t\ \&\ 0xFFFFFFFFFFFFFFFFULL;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00113}00113\ \textcolor{preprocessor}{\#ifdef\ VERIFY}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00114}00114\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}((t\ >>\ 64)\ ==\ 0);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00115}00115\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(secp256k1\_scalar\_check\_overflow(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}})\ ==\ 0);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00116}00116\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00117}00117\ \}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00118}00118\ }
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00119}00119\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_scalar\_set\_b32(\mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *b32,\ \textcolor{keywordtype}{int}\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a49aa97067a36875627e1380c3fb3833d}{overflow}})\ \{}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00120}00120\ \ \ \ \ \textcolor{keywordtype}{int}\ over;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00121}00121\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[0]\ =\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})b32[31]\ |\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})b32[30]\ <<\ 8\ |\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})b32[29]\ <<\ 16\ |\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})b32[28]\ <<\ 24\ |\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})b32[27]\ <<\ 32\ |\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})b32[26]\ <<\ 40\ |\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})b32[25]\ <<\ 48\ |\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})b32[24]\ <<\ 56;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00122}00122\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[1]\ =\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})b32[23]\ |\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})b32[22]\ <<\ 8\ |\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})b32[21]\ <<\ 16\ |\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})b32[20]\ <<\ 24\ |\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})b32[19]\ <<\ 32\ |\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})b32[18]\ <<\ 40\ |\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})b32[17]\ <<\ 48\ |\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})b32[16]\ <<\ 56;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00123}00123\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[2]\ =\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})b32[15]\ |\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})b32[14]\ <<\ 8\ |\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})b32[13]\ <<\ 16\ |\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})b32[12]\ <<\ 24\ |\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})b32[11]\ <<\ 32\ |\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})b32[10]\ <<\ 40\ |\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})b32[9]\ <<\ 48\ |\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})b32[8]\ <<\ 56;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00124}00124\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[3]\ =\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})b32[7]\ |\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})b32[6]\ <<\ 8\ |\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})b32[5]\ <<\ 16\ |\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})b32[4]\ <<\ 24\ |\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})b32[3]\ <<\ 32\ |\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})b32[2]\ <<\ 40\ |\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})b32[1]\ <<\ 48\ |\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})b32[0]\ <<\ 56;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00125}00125\ \ \ \ \ over\ =\ secp256k1\_scalar\_reduce(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ secp256k1\_scalar\_check\_overflow(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}));}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00126}00126\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a49aa97067a36875627e1380c3fb3833d}{overflow}})\ \{}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00127}00127\ \ \ \ \ \ \ \ \ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a49aa97067a36875627e1380c3fb3833d}{overflow}}\ =\ over;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00128}00128\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00129}00129\ \}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00130}00130\ }
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00131}00131\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_scalar\_get\_b32(\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *bin,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}*\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})\ \{}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00132}00132\ \ \ \ \ bin[0]\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[3]\ >>\ 56;\ bin[1]\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[3]\ >>\ 48;\ bin[2]\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[3]\ >>\ 40;\ bin[3]\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[3]\ >>\ 32;\ bin[4]\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[3]\ >>\ 24;\ bin[5]\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[3]\ >>\ 16;\ bin[6]\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[3]\ >>\ 8;\ bin[7]\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[3];}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00133}00133\ \ \ \ \ bin[8]\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[2]\ >>\ 56;\ bin[9]\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[2]\ >>\ 48;\ bin[10]\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[2]\ >>\ 40;\ bin[11]\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[2]\ >>\ 32;\ bin[12]\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[2]\ >>\ 24;\ bin[13]\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[2]\ >>\ 16;\ bin[14]\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[2]\ >>\ 8;\ bin[15]\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[2];}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00134}00134\ \ \ \ \ bin[16]\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[1]\ >>\ 56;\ bin[17]\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[1]\ >>\ 48;\ bin[18]\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[1]\ >>\ 40;\ bin[19]\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[1]\ >>\ 32;\ bin[20]\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[1]\ >>\ 24;\ bin[21]\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[1]\ >>\ 16;\ bin[22]\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[1]\ >>\ 8;\ bin[23]\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[1];}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00135}00135\ \ \ \ \ bin[24]\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[0]\ >>\ 56;\ bin[25]\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[0]\ >>\ 48;\ bin[26]\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[0]\ >>\ 40;\ bin[27]\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[0]\ >>\ 32;\ bin[28]\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[0]\ >>\ 24;\ bin[29]\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[0]\ >>\ 16;\ bin[30]\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[0]\ >>\ 8;\ bin[31]\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[0];}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00136}00136\ \}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00137}00137\ }
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00138}00138\ \mbox{\hyperlink{secp256k1_8h_a7ddc487fd46aee88f21cabedb7268b1e}{SECP256K1\_INLINE}}\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ secp256k1\_scalar\_is\_zero(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})\ \{}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00139}00139\ \ \ \ \ \textcolor{keywordflow}{return}\ (\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[0]\ |\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[1]\ |\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[2]\ |\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[3])\ ==\ 0;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00140}00140\ \}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00141}00141\ }
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00142}00142\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_scalar\_negate(\mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})\ \{}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00143}00143\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ nonzero\ =\ 0xFFFFFFFFFFFFFFFFULL\ *\ (secp256k1\_scalar\_is\_zero(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})\ ==\ 0);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00144}00144\ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a376f631fcb770bd4b2e8349a33e52f8a}{uint128\_t}}\ t\ =\ (\mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a376f631fcb770bd4b2e8349a33e52f8a}{uint128\_t}})(\string~\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[0])\ +\ \mbox{\hyperlink{scalar__4x64__impl_8h_a9e65a0592c11e099de8e8f58b38a14ae}{SECP256K1\_N\_0}}\ +\ 1;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00145}00145\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[0]\ =\ t\ \&\ nonzero;\ t\ >>=\ 64;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00146}00146\ \ \ \ \ t\ +=\ (\mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a376f631fcb770bd4b2e8349a33e52f8a}{uint128\_t}})(\string~\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[1])\ +\ \mbox{\hyperlink{scalar__4x64__impl_8h_a53cc412ecd7e47061b65c0ff5c6db4e2}{SECP256K1\_N\_1}};}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00147}00147\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[1]\ =\ t\ \&\ nonzero;\ t\ >>=\ 64;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00148}00148\ \ \ \ \ t\ +=\ (\mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a376f631fcb770bd4b2e8349a33e52f8a}{uint128\_t}})(\string~\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[2])\ +\ \mbox{\hyperlink{scalar__4x64__impl_8h_a5cfbef70d2cba970443032a43450d0b3}{SECP256K1\_N\_2}};}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00149}00149\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[2]\ =\ t\ \&\ nonzero;\ t\ >>=\ 64;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00150}00150\ \ \ \ \ t\ +=\ (\mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a376f631fcb770bd4b2e8349a33e52f8a}{uint128\_t}})(\string~\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[3])\ +\ \mbox{\hyperlink{scalar__4x64__impl_8h_a1d38f968c428d48fe1041ef38eec96d4}{SECP256K1\_N\_3}};}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00151}00151\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[3]\ =\ t\ \&\ nonzero;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00152}00152\ \}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00153}00153\ }
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00154}00154\ \mbox{\hyperlink{secp256k1_8h_a7ddc487fd46aee88f21cabedb7268b1e}{SECP256K1\_INLINE}}\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ secp256k1\_scalar\_is\_one(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})\ \{}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00155}00155\ \ \ \ \ \textcolor{keywordflow}{return}\ ((\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[0]\ \string^\ 1)\ |\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[1]\ |\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[2]\ |\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[3])\ ==\ 0;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00156}00156\ \}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00157}00157\ }
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00158}00158\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ secp256k1\_scalar\_is\_high(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})\ \{}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00159}00159\ \ \ \ \ \textcolor{keywordtype}{int}\ yes\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00160}00160\ \ \ \ \ \textcolor{keywordtype}{int}\ no\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00161}00161\ \ \ \ \ no\ |=\ (\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[3]\ <\ \mbox{\hyperlink{scalar__4x64__impl_8h_ac658856dbff7e81aca7cdd131c05dde4}{SECP256K1\_N\_H\_3}});}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00162}00162\ \ \ \ \ yes\ |=\ (\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[3]\ >\ \mbox{\hyperlink{scalar__4x64__impl_8h_ac658856dbff7e81aca7cdd131c05dde4}{SECP256K1\_N\_H\_3}})\ \&\ \string~no;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00163}00163\ \ \ \ \ no\ |=\ (\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[2]\ <\ \mbox{\hyperlink{scalar__4x64__impl_8h_a5dfabdaac8359544dd1131ca3af807ae}{SECP256K1\_N\_H\_2}})\ \&\ \string~yes;\ \textcolor{comment}{/*\ No\ need\ for\ a\ >\ check.\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00164}00164\ \ \ \ \ no\ |=\ (\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[1]\ <\ \mbox{\hyperlink{scalar__4x64__impl_8h_a93c4692d6cad53df3cce3fb4631dee82}{SECP256K1\_N\_H\_1}})\ \&\ \string~yes;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00165}00165\ \ \ \ \ yes\ |=\ (\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[1]\ >\ \mbox{\hyperlink{scalar__4x64__impl_8h_a93c4692d6cad53df3cce3fb4631dee82}{SECP256K1\_N\_H\_1}})\ \&\ \string~no;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00166}00166\ \ \ \ \ yes\ |=\ (\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[0]\ >\ \mbox{\hyperlink{scalar__4x64__impl_8h_a824415debca677af24eb249946df4404}{SECP256K1\_N\_H\_0}})\ \&\ \string~no;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00167}00167\ \ \ \ \ \textcolor{keywordflow}{return}\ yes;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00168}00168\ \}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00169}00169\ }
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00170}00170\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ secp256k1\_scalar\_cond\_negate(\mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \textcolor{keywordtype}{int}\ flag)\ \{}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00171}00171\ \ \ \ \ \textcolor{comment}{/*\ If\ we\ are\ flag\ =\ 0,\ mask\ =\ 00...00\ and\ this\ is\ a\ no-\/op;}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00172}00172\ \textcolor{comment}{\ \ \ \ \ *\ if\ we\ are\ flag\ =\ 1,\ mask\ =\ 11...11\ and\ this\ is\ identical\ to\ secp256k1\_scalar\_negate\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00173}00173\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ mask\ =\ !flag\ -\/\ 1;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00174}00174\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ nonzero\ =\ (secp256k1\_scalar\_is\_zero(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}})\ !=\ 0)\ -\/\ 1;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00175}00175\ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a376f631fcb770bd4b2e8349a33e52f8a}{uint128\_t}}\ t\ =\ (\mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a376f631fcb770bd4b2e8349a33e52f8a}{uint128\_t}})(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[0]\ \string^\ mask)\ +\ ((\mbox{\hyperlink{scalar__4x64__impl_8h_a9e65a0592c11e099de8e8f58b38a14ae}{SECP256K1\_N\_0}}\ +\ 1)\ \&\ mask);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00176}00176\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[0]\ =\ t\ \&\ nonzero;\ t\ >>=\ 64;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00177}00177\ \ \ \ \ t\ +=\ (\mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a376f631fcb770bd4b2e8349a33e52f8a}{uint128\_t}})(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[1]\ \string^\ mask)\ +\ (\mbox{\hyperlink{scalar__4x64__impl_8h_a53cc412ecd7e47061b65c0ff5c6db4e2}{SECP256K1\_N\_1}}\ \&\ mask);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00178}00178\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[1]\ =\ t\ \&\ nonzero;\ t\ >>=\ 64;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00179}00179\ \ \ \ \ t\ +=\ (\mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a376f631fcb770bd4b2e8349a33e52f8a}{uint128\_t}})(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[2]\ \string^\ mask)\ +\ (\mbox{\hyperlink{scalar__4x64__impl_8h_a5cfbef70d2cba970443032a43450d0b3}{SECP256K1\_N\_2}}\ \&\ mask);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00180}00180\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[2]\ =\ t\ \&\ nonzero;\ t\ >>=\ 64;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00181}00181\ \ \ \ \ t\ +=\ (\mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a376f631fcb770bd4b2e8349a33e52f8a}{uint128\_t}})(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[3]\ \string^\ mask)\ +\ (\mbox{\hyperlink{scalar__4x64__impl_8h_a1d38f968c428d48fe1041ef38eec96d4}{SECP256K1\_N\_3}}\ \&\ mask);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00182}00182\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[3]\ =\ t\ \&\ nonzero;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00183}00183\ \ \ \ \ \textcolor{keywordflow}{return}\ 2\ *\ (mask\ ==\ 0)\ -\/\ 1;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00184}00184\ \}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00185}00185\ }
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00186}00186\ \textcolor{comment}{/*\ Inspired\ by\ the\ macros\ in\ OpenSSL's\ crypto/bn/asm/x86\_64-\/gcc.c.\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00187}00187\ }
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00189}\mbox{\hyperlink{scalar__4x64__impl_8h_a7c03352e405b1d65f6afd0b7a0f01730}{00189}}\ \textcolor{preprocessor}{\#define\ muladd(a,b)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00190}00190\ \textcolor{preprocessor}{\ \ \ \ uint64\_t\ tl,\ th;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00191}00191\ \textcolor{preprocessor}{\ \ \ \ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00192}00192\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ uint128\_t\ t\ =\ (uint128\_t)a\ *\ b;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00193}00193\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ th\ =\ t\ >>\ 64;\ \ \ \ \ \ \ \ \ }\textcolor{comment}{/*\ at\ most\ 0xFFFFFFFFFFFFFFFE\ */}\textcolor{preprocessor}{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00194}00194\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ tl\ =\ t;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00195}00195\ \textcolor{preprocessor}{\ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00196}00196\ \textcolor{preprocessor}{\ \ \ \ c0\ +=\ tl;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }\textcolor{comment}{/*\ overflow\ is\ handled\ on\ the\ next\ line\ */}\textcolor{preprocessor}{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00197}00197\ \textcolor{preprocessor}{\ \ \ \ th\ +=\ (c0\ <\ tl);\ \ \ \ \ \ \ \ \ \ }\textcolor{comment}{/*\ at\ most\ 0xFFFFFFFFFFFFFFFF\ */}\textcolor{preprocessor}{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00198}00198\ \textcolor{preprocessor}{\ \ \ \ c1\ +=\ th;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }\textcolor{comment}{/*\ overflow\ is\ handled\ on\ the\ next\ line\ */}\textcolor{preprocessor}{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00199}00199\ \textcolor{preprocessor}{\ \ \ \ c2\ +=\ (c1\ <\ th);\ \ \ \ \ \ \ \ \ \ }\textcolor{comment}{/*\ never\ overflows\ by\ contract\ (verified\ in\ the\ next\ line)\ */}\textcolor{preprocessor}{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00200}00200\ \textcolor{preprocessor}{\ \ \ \ VERIFY\_CHECK((c1\ >=\ th)\ ||\ (c2\ !=\ 0));\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00201}00201\ \textcolor{preprocessor}{\}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00202}00202\ }
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00204}\mbox{\hyperlink{scalar__4x64__impl_8h_adeb6e766b53f39bb9c0c9f6502aa3b62}{00204}}\ \textcolor{preprocessor}{\#define\ muladd\_fast(a,b)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00205}00205\ \textcolor{preprocessor}{\ \ \ \ uint64\_t\ tl,\ th;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00206}00206\ \textcolor{preprocessor}{\ \ \ \ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00207}00207\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ uint128\_t\ t\ =\ (uint128\_t)a\ *\ b;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00208}00208\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ th\ =\ t\ >>\ 64;\ \ \ \ \ \ \ \ \ }\textcolor{comment}{/*\ at\ most\ 0xFFFFFFFFFFFFFFFE\ */}\textcolor{preprocessor}{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00209}00209\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ tl\ =\ t;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00210}00210\ \textcolor{preprocessor}{\ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00211}00211\ \textcolor{preprocessor}{\ \ \ \ c0\ +=\ tl;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }\textcolor{comment}{/*\ overflow\ is\ handled\ on\ the\ next\ line\ */}\textcolor{preprocessor}{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00212}00212\ \textcolor{preprocessor}{\ \ \ \ th\ +=\ (c0\ <\ tl);\ \ \ \ \ \ \ \ \ \ }\textcolor{comment}{/*\ at\ most\ 0xFFFFFFFFFFFFFFFF\ */}\textcolor{preprocessor}{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00213}00213\ \textcolor{preprocessor}{\ \ \ \ c1\ +=\ th;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }\textcolor{comment}{/*\ never\ overflows\ by\ contract\ (verified\ in\ the\ next\ line)\ */}\textcolor{preprocessor}{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00214}00214\ \textcolor{preprocessor}{\ \ \ \ VERIFY\_CHECK(c1\ >=\ th);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00215}00215\ \textcolor{preprocessor}{\}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00216}00216\ }
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00218}\mbox{\hyperlink{scalar__4x64__impl_8h_a833c2f6d148537ff7aac34a668c9a455}{00218}}\ \textcolor{preprocessor}{\#define\ sumadd(a)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00219}00219\ \textcolor{preprocessor}{\ \ \ \ unsigned\ int\ over;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00220}00220\ \textcolor{preprocessor}{\ \ \ \ c0\ +=\ (a);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }\textcolor{comment}{/*\ overflow\ is\ handled\ on\ the\ next\ line\ */}\textcolor{preprocessor}{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00221}00221\ \textcolor{preprocessor}{\ \ \ \ over\ =\ (c0\ <\ (a));\ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00222}00222\ \textcolor{preprocessor}{\ \ \ \ c1\ +=\ over;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }\textcolor{comment}{/*\ overflow\ is\ handled\ on\ the\ next\ line\ */}\textcolor{preprocessor}{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00223}00223\ \textcolor{preprocessor}{\ \ \ \ c2\ +=\ (c1\ <\ over);\ \ \ \ \ \ \ \ \ \ }\textcolor{comment}{/*\ never\ overflows\ by\ contract\ */}\textcolor{preprocessor}{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00224}00224\ \textcolor{preprocessor}{\}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00225}00225\ }
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00227}\mbox{\hyperlink{scalar__4x64__impl_8h_a4f682f5ec94e74581289057925976d11}{00227}}\ \textcolor{preprocessor}{\#define\ sumadd\_fast(a)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00228}00228\ \textcolor{preprocessor}{\ \ \ \ c0\ +=\ (a);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }\textcolor{comment}{/*\ overflow\ is\ handled\ on\ the\ next\ line\ */}\textcolor{preprocessor}{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00229}00229\ \textcolor{preprocessor}{\ \ \ \ c1\ +=\ (c0\ <\ (a));\ \ \ \ \ \ \ \ \ \ }\textcolor{comment}{/*\ never\ overflows\ by\ contract\ (verified\ the\ next\ line)\ */}\textcolor{preprocessor}{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00230}00230\ \textcolor{preprocessor}{\ \ \ \ VERIFY\_CHECK((c1\ !=\ 0)\ |\ (c0\ >=\ (a)));\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00231}00231\ \textcolor{preprocessor}{\ \ \ \ VERIFY\_CHECK(c2\ ==\ 0);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00232}00232\ \textcolor{preprocessor}{\}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00233}00233\ }
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00235}\mbox{\hyperlink{scalar__4x64__impl_8h_a2384e06d62f7580d7599d3b77b68acbb}{00235}}\ \textcolor{preprocessor}{\#define\ extract(n)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00236}00236\ \textcolor{preprocessor}{\ \ \ \ (n)\ =\ c0;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00237}00237\ \textcolor{preprocessor}{\ \ \ \ c0\ =\ c1;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00238}00238\ \textcolor{preprocessor}{\ \ \ \ c1\ =\ c2;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00239}00239\ \textcolor{preprocessor}{\ \ \ \ c2\ =\ 0;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00240}00240\ \textcolor{preprocessor}{\}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00241}00241\ }
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00243}\mbox{\hyperlink{scalar__4x64__impl_8h_a7738483bf87a265b882763603d527b3b}{00243}}\ \textcolor{preprocessor}{\#define\ extract\_fast(n)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00244}00244\ \textcolor{preprocessor}{\ \ \ \ (n)\ =\ c0;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00245}00245\ \textcolor{preprocessor}{\ \ \ \ c0\ =\ c1;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00246}00246\ \textcolor{preprocessor}{\ \ \ \ c1\ =\ 0;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00247}00247\ \textcolor{preprocessor}{\ \ \ \ VERIFY\_CHECK(c2\ ==\ 0);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00248}00248\ \textcolor{preprocessor}{\}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00249}00249\ }
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00250}00250\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_scalar\_reduce\_512(\mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}})\ \{}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00251}00251\ \textcolor{preprocessor}{\#ifdef\ USE\_ASM\_X86\_64}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00252}00252\ \ \ \ \ \textcolor{comment}{/*\ Reduce\ 512\ bits\ into\ 385.\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00253}00253\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ m0,\ m1,\ m2,\ m3,\ m4,\ m5,\ m6;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00254}00254\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ p0,\ p1,\ p2,\ p3,\ p4;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00255}00255\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ c;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00256}00256\ }
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00257}00257\ \ \ \ \ \_\_asm\_\_\ \_\_volatile\_\_(}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00258}00258\ \ \ \ \ \textcolor{comment}{/*\ Preload.\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00259}00259\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ 32(\%\%rsi),\ \%\%r11\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00260}00260\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ 40(\%\%rsi),\ \%\%r12\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00261}00261\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ 48(\%\%rsi),\ \%\%r13\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00262}00262\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ 56(\%\%rsi),\ \%\%r14\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00263}00263\ \ \ \ \ \textcolor{comment}{/*\ Initialize\ r8,r9,r10\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00264}00264\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ 0(\%\%rsi),\ \%\%r8\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00265}00265\ \ \ \ \ \textcolor{stringliteral}{"{}xorq\ \%\%r9,\ \%\%r9\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00266}00266\ \ \ \ \ \textcolor{stringliteral}{"{}xorq\ \%\%r10,\ \%\%r10\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00267}00267\ \ \ \ \ \textcolor{comment}{/*\ (r8,r9)\ +=\ n0\ *\ c0\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00268}00268\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%8,\ \%\%rax\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00269}00269\ \ \ \ \ \textcolor{stringliteral}{"{}mulq\ \%\%r11\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00270}00270\ \ \ \ \ \textcolor{stringliteral}{"{}addq\ \%\%rax,\ \%\%r8\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00271}00271\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \%\%rdx,\ \%\%r9\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00272}00272\ \ \ \ \ \textcolor{comment}{/*\ extract\ m0\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00273}00273\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%\%r8,\ \%q0\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00274}00274\ \ \ \ \ \textcolor{stringliteral}{"{}xorq\ \%\%r8,\ \%\%r8\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00275}00275\ \ \ \ \ \textcolor{comment}{/*\ (r9,r10)\ +=\ l1\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00276}00276\ \ \ \ \ \textcolor{stringliteral}{"{}addq\ 8(\%\%rsi),\ \%\%r9\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00277}00277\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \$0,\ \%\%r10\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00278}00278\ \ \ \ \ \textcolor{comment}{/*\ (r9,r10,r8)\ +=\ n1\ *\ c0\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00279}00279\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%8,\ \%\%rax\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00280}00280\ \ \ \ \ \textcolor{stringliteral}{"{}mulq\ \%\%r12\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00281}00281\ \ \ \ \ \textcolor{stringliteral}{"{}addq\ \%\%rax,\ \%\%r9\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00282}00282\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \%\%rdx,\ \%\%r10\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00283}00283\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \$0,\ \%\%r8\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00284}00284\ \ \ \ \ \textcolor{comment}{/*\ (r9,r10,r8)\ +=\ n0\ *\ c1\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00285}00285\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%9,\ \%\%rax\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00286}00286\ \ \ \ \ \textcolor{stringliteral}{"{}mulq\ \%\%r11\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00287}00287\ \ \ \ \ \textcolor{stringliteral}{"{}addq\ \%\%rax,\ \%\%r9\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00288}00288\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \%\%rdx,\ \%\%r10\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00289}00289\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \$0,\ \%\%r8\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00290}00290\ \ \ \ \ \textcolor{comment}{/*\ extract\ m1\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00291}00291\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%\%r9,\ \%q1\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00292}00292\ \ \ \ \ \textcolor{stringliteral}{"{}xorq\ \%\%r9,\ \%\%r9\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00293}00293\ \ \ \ \ \textcolor{comment}{/*\ (r10,r8,r9)\ +=\ l2\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00294}00294\ \ \ \ \ \textcolor{stringliteral}{"{}addq\ 16(\%\%rsi),\ \%\%r10\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00295}00295\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \$0,\ \%\%r8\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00296}00296\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \$0,\ \%\%r9\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00297}00297\ \ \ \ \ \textcolor{comment}{/*\ (r10,r8,r9)\ +=\ n2\ *\ c0\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00298}00298\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%8,\ \%\%rax\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00299}00299\ \ \ \ \ \textcolor{stringliteral}{"{}mulq\ \%\%r13\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00300}00300\ \ \ \ \ \textcolor{stringliteral}{"{}addq\ \%\%rax,\ \%\%r10\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00301}00301\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \%\%rdx,\ \%\%r8\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00302}00302\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \$0,\ \%\%r9\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00303}00303\ \ \ \ \ \textcolor{comment}{/*\ (r10,r8,r9)\ +=\ n1\ *\ c1\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00304}00304\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%9,\ \%\%rax\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00305}00305\ \ \ \ \ \textcolor{stringliteral}{"{}mulq\ \%\%r12\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00306}00306\ \ \ \ \ \textcolor{stringliteral}{"{}addq\ \%\%rax,\ \%\%r10\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00307}00307\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \%\%rdx,\ \%\%r8\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00308}00308\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \$0,\ \%\%r9\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00309}00309\ \ \ \ \ \textcolor{comment}{/*\ (r10,r8,r9)\ +=\ n0\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00310}00310\ \ \ \ \ \textcolor{stringliteral}{"{}addq\ \%\%r11,\ \%\%r10\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00311}00311\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \$0,\ \%\%r8\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00312}00312\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \$0,\ \%\%r9\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00313}00313\ \ \ \ \ \textcolor{comment}{/*\ extract\ m2\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00314}00314\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%\%r10,\ \%q2\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00315}00315\ \ \ \ \ \textcolor{stringliteral}{"{}xorq\ \%\%r10,\ \%\%r10\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00316}00316\ \ \ \ \ \textcolor{comment}{/*\ (r8,r9,r10)\ +=\ l3\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00317}00317\ \ \ \ \ \textcolor{stringliteral}{"{}addq\ 24(\%\%rsi),\ \%\%r8\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00318}00318\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \$0,\ \%\%r9\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00319}00319\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \$0,\ \%\%r10\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00320}00320\ \ \ \ \ \textcolor{comment}{/*\ (r8,r9,r10)\ +=\ n3\ *\ c0\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00321}00321\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%8,\ \%\%rax\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00322}00322\ \ \ \ \ \textcolor{stringliteral}{"{}mulq\ \%\%r14\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00323}00323\ \ \ \ \ \textcolor{stringliteral}{"{}addq\ \%\%rax,\ \%\%r8\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00324}00324\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \%\%rdx,\ \%\%r9\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00325}00325\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \$0,\ \%\%r10\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00326}00326\ \ \ \ \ \textcolor{comment}{/*\ (r8,r9,r10)\ +=\ n2\ *\ c1\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00327}00327\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%9,\ \%\%rax\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00328}00328\ \ \ \ \ \textcolor{stringliteral}{"{}mulq\ \%\%r13\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00329}00329\ \ \ \ \ \textcolor{stringliteral}{"{}addq\ \%\%rax,\ \%\%r8\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00330}00330\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \%\%rdx,\ \%\%r9\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00331}00331\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \$0,\ \%\%r10\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00332}00332\ \ \ \ \ \textcolor{comment}{/*\ (r8,r9,r10)\ +=\ n1\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00333}00333\ \ \ \ \ \textcolor{stringliteral}{"{}addq\ \%\%r12,\ \%\%r8\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00334}00334\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \$0,\ \%\%r9\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00335}00335\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \$0,\ \%\%r10\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00336}00336\ \ \ \ \ \textcolor{comment}{/*\ extract\ m3\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00337}00337\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%\%r8,\ \%q3\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00338}00338\ \ \ \ \ \textcolor{stringliteral}{"{}xorq\ \%\%r8,\ \%\%r8\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00339}00339\ \ \ \ \ \textcolor{comment}{/*\ (r9,r10,r8)\ +=\ n3\ *\ c1\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00340}00340\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%9,\ \%\%rax\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00341}00341\ \ \ \ \ \textcolor{stringliteral}{"{}mulq\ \%\%r14\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00342}00342\ \ \ \ \ \textcolor{stringliteral}{"{}addq\ \%\%rax,\ \%\%r9\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00343}00343\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \%\%rdx,\ \%\%r10\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00344}00344\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \$0,\ \%\%r8\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00345}00345\ \ \ \ \ \textcolor{comment}{/*\ (r9,r10,r8)\ +=\ n2\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00346}00346\ \ \ \ \ \textcolor{stringliteral}{"{}addq\ \%\%r13,\ \%\%r9\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00347}00347\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \$0,\ \%\%r10\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00348}00348\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \$0,\ \%\%r8\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00349}00349\ \ \ \ \ \textcolor{comment}{/*\ extract\ m4\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00350}00350\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%\%r9,\ \%q4\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00351}00351\ \ \ \ \ \textcolor{comment}{/*\ (r10,r8)\ +=\ n3\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00352}00352\ \ \ \ \ \textcolor{stringliteral}{"{}addq\ \%\%r14,\ \%\%r10\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00353}00353\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \$0,\ \%\%r8\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00354}00354\ \ \ \ \ \textcolor{comment}{/*\ extract\ m5\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00355}00355\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%\%r10,\ \%q5\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00356}00356\ \ \ \ \ \textcolor{comment}{/*\ extract\ m6\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00357}00357\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%\%r8,\ \%q6\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00358}00358\ \ \ \ \ :\ \textcolor{stringliteral}{"{}=g"{}}(m0),\ \textcolor{stringliteral}{"{}=g"{}}(m1),\ \textcolor{stringliteral}{"{}=g"{}}(m2),\ \textcolor{stringliteral}{"{}=g"{}}(m3),\ \textcolor{stringliteral}{"{}=g"{}}(m4),\ \textcolor{stringliteral}{"{}=g"{}}(m5),\ \textcolor{stringliteral}{"{}=g"{}}(m6)}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00359}00359\ \ \ \ \ :\ \textcolor{stringliteral}{"{}S"{}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}),\ \textcolor{stringliteral}{"{}i"{}}(\mbox{\hyperlink{scalar__4x64__impl_8h_a7004f2007d2a43820488d377d7167ece}{SECP256K1\_N\_C\_0}}),\ \textcolor{stringliteral}{"{}i"{}}(\mbox{\hyperlink{scalar__4x64__impl_8h_a3f8f9c444183fbe3da955925b585290c}{SECP256K1\_N\_C\_1}})}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00360}00360\ \ \ \ \ :\ \textcolor{stringliteral}{"{}rax"{}},\ \textcolor{stringliteral}{"{}rdx"{}},\ \textcolor{stringliteral}{"{}r8"{}},\ \textcolor{stringliteral}{"{}r9"{}},\ \textcolor{stringliteral}{"{}r10"{}},\ \textcolor{stringliteral}{"{}r11"{}},\ \textcolor{stringliteral}{"{}r12"{}},\ \textcolor{stringliteral}{"{}r13"{}},\ \textcolor{stringliteral}{"{}r14"{}},\ \textcolor{stringliteral}{"{}cc"{}});}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00361}00361\ }
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00362}00362\ \ \ \ \ \textcolor{comment}{/*\ Reduce\ 385\ bits\ into\ 258.\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00363}00363\ \ \ \ \ \_\_asm\_\_\ \_\_volatile\_\_(}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00364}00364\ \ \ \ \ \textcolor{comment}{/*\ Preload\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00365}00365\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%q9,\ \%\%r11\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00366}00366\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%q10,\ \%\%r12\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00367}00367\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%q11,\ \%\%r13\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00368}00368\ \ \ \ \ \textcolor{comment}{/*\ Initialize\ (r8,r9,r10)\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00369}00369\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%q5,\ \%\%r8\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00370}00370\ \ \ \ \ \textcolor{stringliteral}{"{}xorq\ \%\%r9,\ \%\%r9\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00371}00371\ \ \ \ \ \textcolor{stringliteral}{"{}xorq\ \%\%r10,\ \%\%r10\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00372}00372\ \ \ \ \ \textcolor{comment}{/*\ (r8,r9)\ +=\ m4\ *\ c0\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00373}00373\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%12,\ \%\%rax\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00374}00374\ \ \ \ \ \textcolor{stringliteral}{"{}mulq\ \%\%r11\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00375}00375\ \ \ \ \ \textcolor{stringliteral}{"{}addq\ \%\%rax,\ \%\%r8\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00376}00376\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \%\%rdx,\ \%\%r9\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00377}00377\ \ \ \ \ \textcolor{comment}{/*\ extract\ p0\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00378}00378\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%\%r8,\ \%q0\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00379}00379\ \ \ \ \ \textcolor{stringliteral}{"{}xorq\ \%\%r8,\ \%\%r8\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00380}00380\ \ \ \ \ \textcolor{comment}{/*\ (r9,r10)\ +=\ m1\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00381}00381\ \ \ \ \ \textcolor{stringliteral}{"{}addq\ \%q6,\ \%\%r9\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00382}00382\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \$0,\ \%\%r10\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00383}00383\ \ \ \ \ \textcolor{comment}{/*\ (r9,r10,r8)\ +=\ m5\ *\ c0\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00384}00384\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%12,\ \%\%rax\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00385}00385\ \ \ \ \ \textcolor{stringliteral}{"{}mulq\ \%\%r12\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00386}00386\ \ \ \ \ \textcolor{stringliteral}{"{}addq\ \%\%rax,\ \%\%r9\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00387}00387\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \%\%rdx,\ \%\%r10\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00388}00388\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \$0,\ \%\%r8\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00389}00389\ \ \ \ \ \textcolor{comment}{/*\ (r9,r10,r8)\ +=\ m4\ *\ c1\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00390}00390\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%13,\ \%\%rax\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00391}00391\ \ \ \ \ \textcolor{stringliteral}{"{}mulq\ \%\%r11\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00392}00392\ \ \ \ \ \textcolor{stringliteral}{"{}addq\ \%\%rax,\ \%\%r9\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00393}00393\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \%\%rdx,\ \%\%r10\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00394}00394\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \$0,\ \%\%r8\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00395}00395\ \ \ \ \ \textcolor{comment}{/*\ extract\ p1\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00396}00396\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%\%r9,\ \%q1\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00397}00397\ \ \ \ \ \textcolor{stringliteral}{"{}xorq\ \%\%r9,\ \%\%r9\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00398}00398\ \ \ \ \ \textcolor{comment}{/*\ (r10,r8,r9)\ +=\ m2\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00399}00399\ \ \ \ \ \textcolor{stringliteral}{"{}addq\ \%q7,\ \%\%r10\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00400}00400\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \$0,\ \%\%r8\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00401}00401\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \$0,\ \%\%r9\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00402}00402\ \ \ \ \ \textcolor{comment}{/*\ (r10,r8,r9)\ +=\ m6\ *\ c0\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00403}00403\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%12,\ \%\%rax\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00404}00404\ \ \ \ \ \textcolor{stringliteral}{"{}mulq\ \%\%r13\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00405}00405\ \ \ \ \ \textcolor{stringliteral}{"{}addq\ \%\%rax,\ \%\%r10\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00406}00406\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \%\%rdx,\ \%\%r8\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00407}00407\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \$0,\ \%\%r9\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00408}00408\ \ \ \ \ \textcolor{comment}{/*\ (r10,r8,r9)\ +=\ m5\ *\ c1\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00409}00409\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%13,\ \%\%rax\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00410}00410\ \ \ \ \ \textcolor{stringliteral}{"{}mulq\ \%\%r12\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00411}00411\ \ \ \ \ \textcolor{stringliteral}{"{}addq\ \%\%rax,\ \%\%r10\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00412}00412\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \%\%rdx,\ \%\%r8\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00413}00413\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \$0,\ \%\%r9\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00414}00414\ \ \ \ \ \textcolor{comment}{/*\ (r10,r8,r9)\ +=\ m4\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00415}00415\ \ \ \ \ \textcolor{stringliteral}{"{}addq\ \%\%r11,\ \%\%r10\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00416}00416\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \$0,\ \%\%r8\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00417}00417\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \$0,\ \%\%r9\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00418}00418\ \ \ \ \ \textcolor{comment}{/*\ extract\ p2\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00419}00419\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%\%r10,\ \%q2\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00420}00420\ \ \ \ \ \textcolor{comment}{/*\ (r8,r9)\ +=\ m3\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00421}00421\ \ \ \ \ \textcolor{stringliteral}{"{}addq\ \%q8,\ \%\%r8\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00422}00422\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \$0,\ \%\%r9\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00423}00423\ \ \ \ \ \textcolor{comment}{/*\ (r8,r9)\ +=\ m6\ *\ c1\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00424}00424\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%13,\ \%\%rax\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00425}00425\ \ \ \ \ \textcolor{stringliteral}{"{}mulq\ \%\%r13\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00426}00426\ \ \ \ \ \textcolor{stringliteral}{"{}addq\ \%\%rax,\ \%\%r8\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00427}00427\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \%\%rdx,\ \%\%r9\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00428}00428\ \ \ \ \ \textcolor{comment}{/*\ (r8,r9)\ +=\ m5\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00429}00429\ \ \ \ \ \textcolor{stringliteral}{"{}addq\ \%\%r12,\ \%\%r8\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00430}00430\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \$0,\ \%\%r9\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00431}00431\ \ \ \ \ \textcolor{comment}{/*\ extract\ p3\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00432}00432\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%\%r8,\ \%q3\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00433}00433\ \ \ \ \ \textcolor{comment}{/*\ (r9)\ +=\ m6\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00434}00434\ \ \ \ \ \textcolor{stringliteral}{"{}addq\ \%\%r13,\ \%\%r9\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00435}00435\ \ \ \ \ \textcolor{comment}{/*\ extract\ p4\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00436}00436\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%\%r9,\ \%q4\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00437}00437\ \ \ \ \ :\ \textcolor{stringliteral}{"{}=\&g"{}}(p0),\ \textcolor{stringliteral}{"{}=\&g"{}}(p1),\ \textcolor{stringliteral}{"{}=\&g"{}}(p2),\ \textcolor{stringliteral}{"{}=g"{}}(p3),\ \textcolor{stringliteral}{"{}=g"{}}(p4)}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00438}00438\ \ \ \ \ :\ \textcolor{stringliteral}{"{}g"{}}(m0),\ \textcolor{stringliteral}{"{}g"{}}(m1),\ \textcolor{stringliteral}{"{}g"{}}(m2),\ \textcolor{stringliteral}{"{}g"{}}(m3),\ \textcolor{stringliteral}{"{}g"{}}(m4),\ \textcolor{stringliteral}{"{}g"{}}(m5),\ \textcolor{stringliteral}{"{}g"{}}(m6),\ \textcolor{stringliteral}{"{}i"{}}(\mbox{\hyperlink{scalar__4x64__impl_8h_a7004f2007d2a43820488d377d7167ece}{SECP256K1\_N\_C\_0}}),\ \textcolor{stringliteral}{"{}i"{}}(\mbox{\hyperlink{scalar__4x64__impl_8h_a3f8f9c444183fbe3da955925b585290c}{SECP256K1\_N\_C\_1}})}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00439}00439\ \ \ \ \ :\ \textcolor{stringliteral}{"{}rax"{}},\ \textcolor{stringliteral}{"{}rdx"{}},\ \textcolor{stringliteral}{"{}r8"{}},\ \textcolor{stringliteral}{"{}r9"{}},\ \textcolor{stringliteral}{"{}r10"{}},\ \textcolor{stringliteral}{"{}r11"{}},\ \textcolor{stringliteral}{"{}r12"{}},\ \textcolor{stringliteral}{"{}r13"{}},\ \textcolor{stringliteral}{"{}cc"{}});}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00440}00440\ }
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00441}00441\ \ \ \ \ \textcolor{comment}{/*\ Reduce\ 258\ bits\ into\ 256.\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00442}00442\ \ \ \ \ \_\_asm\_\_\ \_\_volatile\_\_(}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00443}00443\ \ \ \ \ \textcolor{comment}{/*\ Preload\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00444}00444\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%q5,\ \%\%r10\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00445}00445\ \ \ \ \ \textcolor{comment}{/*\ (rax,rdx)\ =\ p4\ *\ c0\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00446}00446\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%7,\ \%\%rax\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00447}00447\ \ \ \ \ \textcolor{stringliteral}{"{}mulq\ \%\%r10\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00448}00448\ \ \ \ \ \textcolor{comment}{/*\ (rax,rdx)\ +=\ p0\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00449}00449\ \ \ \ \ \textcolor{stringliteral}{"{}addq\ \%q1,\ \%\%rax\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00450}00450\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \$0,\ \%\%rdx\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00451}00451\ \ \ \ \ \textcolor{comment}{/*\ extract\ r0\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00452}00452\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%\%rax,\ 0(\%q6)\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00453}00453\ \ \ \ \ \textcolor{comment}{/*\ Move\ to\ (r8,r9)\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00454}00454\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%\%rdx,\ \%\%r8\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00455}00455\ \ \ \ \ \textcolor{stringliteral}{"{}xorq\ \%\%r9,\ \%\%r9\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00456}00456\ \ \ \ \ \textcolor{comment}{/*\ (r8,r9)\ +=\ p1\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00457}00457\ \ \ \ \ \textcolor{stringliteral}{"{}addq\ \%q2,\ \%\%r8\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00458}00458\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \$0,\ \%\%r9\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00459}00459\ \ \ \ \ \textcolor{comment}{/*\ (r8,r9)\ +=\ p4\ *\ c1\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00460}00460\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%8,\ \%\%rax\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00461}00461\ \ \ \ \ \textcolor{stringliteral}{"{}mulq\ \%\%r10\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00462}00462\ \ \ \ \ \textcolor{stringliteral}{"{}addq\ \%\%rax,\ \%\%r8\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00463}00463\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \%\%rdx,\ \%\%r9\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00464}00464\ \ \ \ \ \textcolor{comment}{/*\ Extract\ r1\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00465}00465\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%\%r8,\ 8(\%q6)\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00466}00466\ \ \ \ \ \textcolor{stringliteral}{"{}xorq\ \%\%r8,\ \%\%r8\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00467}00467\ \ \ \ \ \textcolor{comment}{/*\ (r9,r8)\ +=\ p4\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00468}00468\ \ \ \ \ \textcolor{stringliteral}{"{}addq\ \%\%r10,\ \%\%r9\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00469}00469\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \$0,\ \%\%r8\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00470}00470\ \ \ \ \ \textcolor{comment}{/*\ (r9,r8)\ +=\ p2\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00471}00471\ \ \ \ \ \textcolor{stringliteral}{"{}addq\ \%q3,\ \%\%r9\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00472}00472\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \$0,\ \%\%r8\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00473}00473\ \ \ \ \ \textcolor{comment}{/*\ Extract\ r2\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00474}00474\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%\%r9,\ 16(\%q6)\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00475}00475\ \ \ \ \ \textcolor{stringliteral}{"{}xorq\ \%\%r9,\ \%\%r9\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00476}00476\ \ \ \ \ \textcolor{comment}{/*\ (r8,r9)\ +=\ p3\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00477}00477\ \ \ \ \ \textcolor{stringliteral}{"{}addq\ \%q4,\ \%\%r8\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00478}00478\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \$0,\ \%\%r9\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00479}00479\ \ \ \ \ \textcolor{comment}{/*\ Extract\ r3\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00480}00480\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%\%r8,\ 24(\%q6)\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00481}00481\ \ \ \ \ \textcolor{comment}{/*\ Extract\ c\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00482}00482\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%\%r9,\ \%q0\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00483}00483\ \ \ \ \ :\ \textcolor{stringliteral}{"{}=g"{}}(c)}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00484}00484\ \ \ \ \ :\ \textcolor{stringliteral}{"{}g"{}}(p0),\ \textcolor{stringliteral}{"{}g"{}}(p1),\ \textcolor{stringliteral}{"{}g"{}}(p2),\ \textcolor{stringliteral}{"{}g"{}}(p3),\ \textcolor{stringliteral}{"{}g"{}}(p4),\ \textcolor{stringliteral}{"{}D"{}}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}),\ \textcolor{stringliteral}{"{}i"{}}(\mbox{\hyperlink{scalar__4x64__impl_8h_a7004f2007d2a43820488d377d7167ece}{SECP256K1\_N\_C\_0}}),\ \textcolor{stringliteral}{"{}i"{}}(\mbox{\hyperlink{scalar__4x64__impl_8h_a3f8f9c444183fbe3da955925b585290c}{SECP256K1\_N\_C\_1}})}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00485}00485\ \ \ \ \ :\ \textcolor{stringliteral}{"{}rax"{}},\ \textcolor{stringliteral}{"{}rdx"{}},\ \textcolor{stringliteral}{"{}r8"{}},\ \textcolor{stringliteral}{"{}r9"{}},\ \textcolor{stringliteral}{"{}r10"{}},\ \textcolor{stringliteral}{"{}cc"{}},\ \textcolor{stringliteral}{"{}memory"{}});}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00486}00486\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00487}00487\ \ \ \ \ uint128\_t\ c;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00488}00488\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ c0,\ c1,\ c2;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00489}00489\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ n0\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}[4],\ n1\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}[5],\ n2\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}[6],\ n3\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}[7];}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00490}00490\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ m0,\ m1,\ m2,\ m3,\ m4,\ m5;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00491}00491\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ m6;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00492}00492\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ p0,\ p1,\ p2,\ p3;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00493}00493\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ p4;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00494}00494\ }
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00495}00495\ \ \ \ \ \textcolor{comment}{/*\ Reduce\ 512\ bits\ into\ 385.\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00496}00496\ \ \ \ \ \textcolor{comment}{/*\ m[0..6]\ =\ l[0..3]\ +\ n[0..3]\ *\ SECP256K1\_N\_C.\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00497}00497\ \ \ \ \ c0\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}[0];\ c1\ =\ 0;\ c2\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00498}00498\ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_adeb6e766b53f39bb9c0c9f6502aa3b62}{muladd\_fast}}(n0,\ \mbox{\hyperlink{scalar__4x64__impl_8h_a7004f2007d2a43820488d377d7167ece}{SECP256K1\_N\_C\_0}});}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00499}00499\ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_a7738483bf87a265b882763603d527b3b}{extract\_fast}}(m0);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00500}00500\ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_a4f682f5ec94e74581289057925976d11}{sumadd\_fast}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}[1]);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00501}00501\ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_a7c03352e405b1d65f6afd0b7a0f01730}{muladd}}(n1,\ \mbox{\hyperlink{scalar__4x64__impl_8h_a7004f2007d2a43820488d377d7167ece}{SECP256K1\_N\_C\_0}});}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00502}00502\ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_a7c03352e405b1d65f6afd0b7a0f01730}{muladd}}(n0,\ \mbox{\hyperlink{scalar__4x64__impl_8h_a3f8f9c444183fbe3da955925b585290c}{SECP256K1\_N\_C\_1}});}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00503}00503\ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_a2384e06d62f7580d7599d3b77b68acbb}{extract}}(m1);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00504}00504\ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_a833c2f6d148537ff7aac34a668c9a455}{sumadd}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}[2]);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00505}00505\ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_a7c03352e405b1d65f6afd0b7a0f01730}{muladd}}(n2,\ \mbox{\hyperlink{scalar__4x64__impl_8h_a7004f2007d2a43820488d377d7167ece}{SECP256K1\_N\_C\_0}});}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00506}00506\ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_a7c03352e405b1d65f6afd0b7a0f01730}{muladd}}(n1,\ \mbox{\hyperlink{scalar__4x64__impl_8h_a3f8f9c444183fbe3da955925b585290c}{SECP256K1\_N\_C\_1}});}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00507}00507\ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_a833c2f6d148537ff7aac34a668c9a455}{sumadd}}(n0);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00508}00508\ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_a2384e06d62f7580d7599d3b77b68acbb}{extract}}(m2);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00509}00509\ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_a833c2f6d148537ff7aac34a668c9a455}{sumadd}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}[3]);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00510}00510\ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_a7c03352e405b1d65f6afd0b7a0f01730}{muladd}}(n3,\ \mbox{\hyperlink{scalar__4x64__impl_8h_a7004f2007d2a43820488d377d7167ece}{SECP256K1\_N\_C\_0}});}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00511}00511\ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_a7c03352e405b1d65f6afd0b7a0f01730}{muladd}}(n2,\ \mbox{\hyperlink{scalar__4x64__impl_8h_a3f8f9c444183fbe3da955925b585290c}{SECP256K1\_N\_C\_1}});}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00512}00512\ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_a833c2f6d148537ff7aac34a668c9a455}{sumadd}}(n1);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00513}00513\ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_a2384e06d62f7580d7599d3b77b68acbb}{extract}}(m3);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00514}00514\ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_a7c03352e405b1d65f6afd0b7a0f01730}{muladd}}(n3,\ \mbox{\hyperlink{scalar__4x64__impl_8h_a3f8f9c444183fbe3da955925b585290c}{SECP256K1\_N\_C\_1}});}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00515}00515\ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_a833c2f6d148537ff7aac34a668c9a455}{sumadd}}(n2);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00516}00516\ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_a2384e06d62f7580d7599d3b77b68acbb}{extract}}(m4);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00517}00517\ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_a4f682f5ec94e74581289057925976d11}{sumadd\_fast}}(n3);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00518}00518\ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_a7738483bf87a265b882763603d527b3b}{extract\_fast}}(m5);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00519}00519\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(c0\ <=\ 1);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00520}00520\ \ \ \ \ m6\ =\ c0;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00521}00521\ }
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00522}00522\ \ \ \ \ \textcolor{comment}{/*\ Reduce\ 385\ bits\ into\ 258.\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00523}00523\ \ \ \ \ \textcolor{comment}{/*\ p[0..4]\ =\ m[0..3]\ +\ m[4..6]\ *\ SECP256K1\_N\_C.\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00524}00524\ \ \ \ \ c0\ =\ m0;\ c1\ =\ 0;\ c2\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00525}00525\ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_adeb6e766b53f39bb9c0c9f6502aa3b62}{muladd\_fast}}(m4,\ \mbox{\hyperlink{scalar__4x64__impl_8h_a7004f2007d2a43820488d377d7167ece}{SECP256K1\_N\_C\_0}});}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00526}00526\ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_a7738483bf87a265b882763603d527b3b}{extract\_fast}}(p0);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00527}00527\ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_a4f682f5ec94e74581289057925976d11}{sumadd\_fast}}(m1);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00528}00528\ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_a7c03352e405b1d65f6afd0b7a0f01730}{muladd}}(m5,\ \mbox{\hyperlink{scalar__4x64__impl_8h_a7004f2007d2a43820488d377d7167ece}{SECP256K1\_N\_C\_0}});}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00529}00529\ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_a7c03352e405b1d65f6afd0b7a0f01730}{muladd}}(m4,\ \mbox{\hyperlink{scalar__4x64__impl_8h_a3f8f9c444183fbe3da955925b585290c}{SECP256K1\_N\_C\_1}});}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00530}00530\ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_a2384e06d62f7580d7599d3b77b68acbb}{extract}}(p1);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00531}00531\ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_a833c2f6d148537ff7aac34a668c9a455}{sumadd}}(m2);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00532}00532\ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_a7c03352e405b1d65f6afd0b7a0f01730}{muladd}}(m6,\ \mbox{\hyperlink{scalar__4x64__impl_8h_a7004f2007d2a43820488d377d7167ece}{SECP256K1\_N\_C\_0}});}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00533}00533\ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_a7c03352e405b1d65f6afd0b7a0f01730}{muladd}}(m5,\ \mbox{\hyperlink{scalar__4x64__impl_8h_a3f8f9c444183fbe3da955925b585290c}{SECP256K1\_N\_C\_1}});}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00534}00534\ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_a833c2f6d148537ff7aac34a668c9a455}{sumadd}}(m4);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00535}00535\ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_a2384e06d62f7580d7599d3b77b68acbb}{extract}}(p2);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00536}00536\ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_a4f682f5ec94e74581289057925976d11}{sumadd\_fast}}(m3);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00537}00537\ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_adeb6e766b53f39bb9c0c9f6502aa3b62}{muladd\_fast}}(m6,\ \mbox{\hyperlink{scalar__4x64__impl_8h_a3f8f9c444183fbe3da955925b585290c}{SECP256K1\_N\_C\_1}});}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00538}00538\ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_a4f682f5ec94e74581289057925976d11}{sumadd\_fast}}(m5);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00539}00539\ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_a7738483bf87a265b882763603d527b3b}{extract\_fast}}(p3);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00540}00540\ \ \ \ \ p4\ =\ c0\ +\ m6;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00541}00541\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(p4\ <=\ 2);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00542}00542\ }
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00543}00543\ \ \ \ \ \textcolor{comment}{/*\ Reduce\ 258\ bits\ into\ 256.\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00544}00544\ \ \ \ \ \textcolor{comment}{/*\ r[0..3]\ =\ p[0..3]\ +\ p[4]\ *\ SECP256K1\_N\_C.\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00545}00545\ \ \ \ \ c\ =\ p0\ +\ (uint128\_t)\mbox{\hyperlink{scalar__4x64__impl_8h_a7004f2007d2a43820488d377d7167ece}{SECP256K1\_N\_C\_0}}\ *\ p4;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00546}00546\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[0]\ =\ c\ \&\ 0xFFFFFFFFFFFFFFFFULL;\ c\ >>=\ 64;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00547}00547\ \ \ \ \ c\ +=\ p1\ +\ (uint128\_t)\mbox{\hyperlink{scalar__4x64__impl_8h_a3f8f9c444183fbe3da955925b585290c}{SECP256K1\_N\_C\_1}}\ *\ p4;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00548}00548\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[1]\ =\ c\ \&\ 0xFFFFFFFFFFFFFFFFULL;\ c\ >>=\ 64;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00549}00549\ \ \ \ \ c\ +=\ p2\ +\ (uint128\_t)p4;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00550}00550\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[2]\ =\ c\ \&\ 0xFFFFFFFFFFFFFFFFULL;\ c\ >>=\ 64;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00551}00551\ \ \ \ \ c\ +=\ p3;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00552}00552\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[3]\ =\ c\ \&\ 0xFFFFFFFFFFFFFFFFULL;\ c\ >>=\ 64;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00553}00553\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00554}00554\ }
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00555}00555\ \ \ \ \ \textcolor{comment}{/*\ Final\ reduction\ of\ r.\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00556}00556\ \ \ \ \ secp256k1\_scalar\_reduce(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ c\ +\ secp256k1\_scalar\_check\_overflow(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}));}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00557}00557\ \}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00558}00558\ }
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00559}00559\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_scalar\_mul\_512(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}[8],\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *b)\ \{}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00560}00560\ \textcolor{preprocessor}{\#ifdef\ USE\_ASM\_X86\_64}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00561}00561\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ *pb\ =\ b-\/>\mbox{\hyperlink{structsecp256k1__scalar_a4aba1d263d205acdd537ed9a995393cd}{d}};}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00562}00562\ \ \ \ \ \_\_asm\_\_\ \_\_volatile\_\_(}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00563}00563\ \ \ \ \ \textcolor{comment}{/*\ Preload\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00564}00564\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ 0(\%\%rdi),\ \%\%r15\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00565}00565\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ 8(\%\%rdi),\ \%\%rbx\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00566}00566\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ 16(\%\%rdi),\ \%\%rcx\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00567}00567\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ 0(\%\%rdx),\ \%\%r11\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00568}00568\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ 8(\%\%rdx),\ \%\%r12\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00569}00569\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ 16(\%\%rdx),\ \%\%r13\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00570}00570\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ 24(\%\%rdx),\ \%\%r14\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00571}00571\ \ \ \ \ \textcolor{comment}{/*\ (rax,rdx)\ =\ a0\ *\ b0\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00572}00572\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%\%r15,\ \%\%rax\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00573}00573\ \ \ \ \ \textcolor{stringliteral}{"{}mulq\ \%\%r11\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00574}00574\ \ \ \ \ \textcolor{comment}{/*\ Extract\ l0\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00575}00575\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%\%rax,\ 0(\%\%rsi)\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00576}00576\ \ \ \ \ \textcolor{comment}{/*\ (r8,r9,r10)\ =\ (rdx)\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00577}00577\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%\%rdx,\ \%\%r8\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00578}00578\ \ \ \ \ \textcolor{stringliteral}{"{}xorq\ \%\%r9,\ \%\%r9\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00579}00579\ \ \ \ \ \textcolor{stringliteral}{"{}xorq\ \%\%r10,\ \%\%r10\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00580}00580\ \ \ \ \ \textcolor{comment}{/*\ (r8,r9,r10)\ +=\ a0\ *\ b1\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00581}00581\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%\%r15,\ \%\%rax\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00582}00582\ \ \ \ \ \textcolor{stringliteral}{"{}mulq\ \%\%r12\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00583}00583\ \ \ \ \ \textcolor{stringliteral}{"{}addq\ \%\%rax,\ \%\%r8\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00584}00584\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \%\%rdx,\ \%\%r9\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00585}00585\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \$0,\ \%\%r10\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00586}00586\ \ \ \ \ \textcolor{comment}{/*\ (r8,r9,r10)\ +=\ a1\ *\ b0\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00587}00587\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%\%rbx,\ \%\%rax\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00588}00588\ \ \ \ \ \textcolor{stringliteral}{"{}mulq\ \%\%r11\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00589}00589\ \ \ \ \ \textcolor{stringliteral}{"{}addq\ \%\%rax,\ \%\%r8\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00590}00590\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \%\%rdx,\ \%\%r9\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00591}00591\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \$0,\ \%\%r10\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00592}00592\ \ \ \ \ \textcolor{comment}{/*\ Extract\ l1\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00593}00593\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%\%r8,\ 8(\%\%rsi)\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00594}00594\ \ \ \ \ \textcolor{stringliteral}{"{}xorq\ \%\%r8,\ \%\%r8\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00595}00595\ \ \ \ \ \textcolor{comment}{/*\ (r9,r10,r8)\ +=\ a0\ *\ b2\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00596}00596\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%\%r15,\ \%\%rax\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00597}00597\ \ \ \ \ \textcolor{stringliteral}{"{}mulq\ \%\%r13\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00598}00598\ \ \ \ \ \textcolor{stringliteral}{"{}addq\ \%\%rax,\ \%\%r9\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00599}00599\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \%\%rdx,\ \%\%r10\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00600}00600\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \$0,\ \%\%r8\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00601}00601\ \ \ \ \ \textcolor{comment}{/*\ (r9,r10,r8)\ +=\ a1\ *\ b1\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00602}00602\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%\%rbx,\ \%\%rax\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00603}00603\ \ \ \ \ \textcolor{stringliteral}{"{}mulq\ \%\%r12\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00604}00604\ \ \ \ \ \textcolor{stringliteral}{"{}addq\ \%\%rax,\ \%\%r9\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00605}00605\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \%\%rdx,\ \%\%r10\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00606}00606\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \$0,\ \%\%r8\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00607}00607\ \ \ \ \ \textcolor{comment}{/*\ (r9,r10,r8)\ +=\ a2\ *\ b0\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00608}00608\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%\%rcx,\ \%\%rax\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00609}00609\ \ \ \ \ \textcolor{stringliteral}{"{}mulq\ \%\%r11\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00610}00610\ \ \ \ \ \textcolor{stringliteral}{"{}addq\ \%\%rax,\ \%\%r9\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00611}00611\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \%\%rdx,\ \%\%r10\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00612}00612\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \$0,\ \%\%r8\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00613}00613\ \ \ \ \ \textcolor{comment}{/*\ Extract\ l2\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00614}00614\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%\%r9,\ 16(\%\%rsi)\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00615}00615\ \ \ \ \ \textcolor{stringliteral}{"{}xorq\ \%\%r9,\ \%\%r9\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00616}00616\ \ \ \ \ \textcolor{comment}{/*\ (r10,r8,r9)\ +=\ a0\ *\ b3\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00617}00617\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%\%r15,\ \%\%rax\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00618}00618\ \ \ \ \ \textcolor{stringliteral}{"{}mulq\ \%\%r14\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00619}00619\ \ \ \ \ \textcolor{stringliteral}{"{}addq\ \%\%rax,\ \%\%r10\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00620}00620\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \%\%rdx,\ \%\%r8\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00621}00621\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \$0,\ \%\%r9\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00622}00622\ \ \ \ \ \textcolor{comment}{/*\ Preload\ a3\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00623}00623\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ 24(\%\%rdi),\ \%\%r15\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00624}00624\ \ \ \ \ \textcolor{comment}{/*\ (r10,r8,r9)\ +=\ a1\ *\ b2\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00625}00625\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%\%rbx,\ \%\%rax\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00626}00626\ \ \ \ \ \textcolor{stringliteral}{"{}mulq\ \%\%r13\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00627}00627\ \ \ \ \ \textcolor{stringliteral}{"{}addq\ \%\%rax,\ \%\%r10\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00628}00628\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \%\%rdx,\ \%\%r8\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00629}00629\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \$0,\ \%\%r9\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00630}00630\ \ \ \ \ \textcolor{comment}{/*\ (r10,r8,r9)\ +=\ a2\ *\ b1\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00631}00631\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%\%rcx,\ \%\%rax\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00632}00632\ \ \ \ \ \textcolor{stringliteral}{"{}mulq\ \%\%r12\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00633}00633\ \ \ \ \ \textcolor{stringliteral}{"{}addq\ \%\%rax,\ \%\%r10\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00634}00634\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \%\%rdx,\ \%\%r8\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00635}00635\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \$0,\ \%\%r9\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00636}00636\ \ \ \ \ \textcolor{comment}{/*\ (r10,r8,r9)\ +=\ a3\ *\ b0\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00637}00637\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%\%r15,\ \%\%rax\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00638}00638\ \ \ \ \ \textcolor{stringliteral}{"{}mulq\ \%\%r11\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00639}00639\ \ \ \ \ \textcolor{stringliteral}{"{}addq\ \%\%rax,\ \%\%r10\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00640}00640\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \%\%rdx,\ \%\%r8\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00641}00641\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \$0,\ \%\%r9\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00642}00642\ \ \ \ \ \textcolor{comment}{/*\ Extract\ l3\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00643}00643\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%\%r10,\ 24(\%\%rsi)\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00644}00644\ \ \ \ \ \textcolor{stringliteral}{"{}xorq\ \%\%r10,\ \%\%r10\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00645}00645\ \ \ \ \ \textcolor{comment}{/*\ (r8,r9,r10)\ +=\ a1\ *\ b3\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00646}00646\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%\%rbx,\ \%\%rax\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00647}00647\ \ \ \ \ \textcolor{stringliteral}{"{}mulq\ \%\%r14\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00648}00648\ \ \ \ \ \textcolor{stringliteral}{"{}addq\ \%\%rax,\ \%\%r8\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00649}00649\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \%\%rdx,\ \%\%r9\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00650}00650\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \$0,\ \%\%r10\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00651}00651\ \ \ \ \ \textcolor{comment}{/*\ (r8,r9,r10)\ +=\ a2\ *\ b2\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00652}00652\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%\%rcx,\ \%\%rax\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00653}00653\ \ \ \ \ \textcolor{stringliteral}{"{}mulq\ \%\%r13\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00654}00654\ \ \ \ \ \textcolor{stringliteral}{"{}addq\ \%\%rax,\ \%\%r8\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00655}00655\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \%\%rdx,\ \%\%r9\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00656}00656\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \$0,\ \%\%r10\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00657}00657\ \ \ \ \ \textcolor{comment}{/*\ (r8,r9,r10)\ +=\ a3\ *\ b1\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00658}00658\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%\%r15,\ \%\%rax\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00659}00659\ \ \ \ \ \textcolor{stringliteral}{"{}mulq\ \%\%r12\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00660}00660\ \ \ \ \ \textcolor{stringliteral}{"{}addq\ \%\%rax,\ \%\%r8\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00661}00661\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \%\%rdx,\ \%\%r9\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00662}00662\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \$0,\ \%\%r10\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00663}00663\ \ \ \ \ \textcolor{comment}{/*\ Extract\ l4\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00664}00664\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%\%r8,\ 32(\%\%rsi)\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00665}00665\ \ \ \ \ \textcolor{stringliteral}{"{}xorq\ \%\%r8,\ \%\%r8\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00666}00666\ \ \ \ \ \textcolor{comment}{/*\ (r9,r10,r8)\ +=\ a2\ *\ b3\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00667}00667\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%\%rcx,\ \%\%rax\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00668}00668\ \ \ \ \ \textcolor{stringliteral}{"{}mulq\ \%\%r14\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00669}00669\ \ \ \ \ \textcolor{stringliteral}{"{}addq\ \%\%rax,\ \%\%r9\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00670}00670\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \%\%rdx,\ \%\%r10\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00671}00671\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \$0,\ \%\%r8\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00672}00672\ \ \ \ \ \textcolor{comment}{/*\ (r9,r10,r8)\ +=\ a3\ *\ b2\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00673}00673\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%\%r15,\ \%\%rax\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00674}00674\ \ \ \ \ \textcolor{stringliteral}{"{}mulq\ \%\%r13\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00675}00675\ \ \ \ \ \textcolor{stringliteral}{"{}addq\ \%\%rax,\ \%\%r9\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00676}00676\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \%\%rdx,\ \%\%r10\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00677}00677\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \$0,\ \%\%r8\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00678}00678\ \ \ \ \ \textcolor{comment}{/*\ Extract\ l5\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00679}00679\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%\%r9,\ 40(\%\%rsi)\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00680}00680\ \ \ \ \ \textcolor{comment}{/*\ (r10,r8)\ +=\ a3\ *\ b3\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00681}00681\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%\%r15,\ \%\%rax\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00682}00682\ \ \ \ \ \textcolor{stringliteral}{"{}mulq\ \%\%r14\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00683}00683\ \ \ \ \ \textcolor{stringliteral}{"{}addq\ \%\%rax,\ \%\%r10\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00684}00684\ \ \ \ \ \textcolor{stringliteral}{"{}adcq\ \%\%rdx,\ \%\%r8\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00685}00685\ \ \ \ \ \textcolor{comment}{/*\ Extract\ l6\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00686}00686\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%\%r10,\ 48(\%\%rsi)\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00687}00687\ \ \ \ \ \textcolor{comment}{/*\ Extract\ l7\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00688}00688\ \ \ \ \ \textcolor{stringliteral}{"{}movq\ \%\%r8,\ 56(\%\%rsi)\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00689}00689\ \ \ \ \ :\ \textcolor{stringliteral}{"{}+d"{}}(pb)}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00690}00690\ \ \ \ \ :\ \textcolor{stringliteral}{"{}S"{}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}),\ \textcolor{stringliteral}{"{}D"{}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d)}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00691}00691\ \ \ \ \ :\ \textcolor{stringliteral}{"{}rax"{}},\ \textcolor{stringliteral}{"{}rbx"{}},\ \textcolor{stringliteral}{"{}rcx"{}},\ \textcolor{stringliteral}{"{}r8"{}},\ \textcolor{stringliteral}{"{}r9"{}},\ \textcolor{stringliteral}{"{}r10"{}},\ \textcolor{stringliteral}{"{}r11"{}},\ \textcolor{stringliteral}{"{}r12"{}},\ \textcolor{stringliteral}{"{}r13"{}},\ \textcolor{stringliteral}{"{}r14"{}},\ \textcolor{stringliteral}{"{}r15"{}},\ \textcolor{stringliteral}{"{}cc"{}},\ \textcolor{stringliteral}{"{}memory"{}});}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00692}00692\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00693}00693\ \ \ \ \ \textcolor{comment}{/*\ 160\ bit\ accumulator.\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00694}00694\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ c0\ =\ 0,\ c1\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00695}00695\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ c2\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00696}00696\ }
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00697}00697\ \ \ \ \ \textcolor{comment}{/*\ l[0..7]\ =\ a[0..3]\ *\ b[0..3].\ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00698}00698\ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_adeb6e766b53f39bb9c0c9f6502aa3b62}{muladd\_fast}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[0],\ b-\/>\mbox{\hyperlink{structsecp256k1__scalar_a4aba1d263d205acdd537ed9a995393cd}{d}}[0]);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00699}00699\ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_a7738483bf87a265b882763603d527b3b}{extract\_fast}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}[0]);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00700}00700\ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_a7c03352e405b1d65f6afd0b7a0f01730}{muladd}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[0],\ b-\/>\mbox{\hyperlink{structsecp256k1__scalar_a4aba1d263d205acdd537ed9a995393cd}{d}}[1]);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00701}00701\ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_a7c03352e405b1d65f6afd0b7a0f01730}{muladd}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[1],\ b-\/>\mbox{\hyperlink{structsecp256k1__scalar_a4aba1d263d205acdd537ed9a995393cd}{d}}[0]);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00702}00702\ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_a2384e06d62f7580d7599d3b77b68acbb}{extract}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}[1]);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00703}00703\ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_a7c03352e405b1d65f6afd0b7a0f01730}{muladd}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[0],\ b-\/>\mbox{\hyperlink{structsecp256k1__scalar_a4aba1d263d205acdd537ed9a995393cd}{d}}[2]);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00704}00704\ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_a7c03352e405b1d65f6afd0b7a0f01730}{muladd}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[1],\ b-\/>\mbox{\hyperlink{structsecp256k1__scalar_a4aba1d263d205acdd537ed9a995393cd}{d}}[1]);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00705}00705\ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_a7c03352e405b1d65f6afd0b7a0f01730}{muladd}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[2],\ b-\/>\mbox{\hyperlink{structsecp256k1__scalar_a4aba1d263d205acdd537ed9a995393cd}{d}}[0]);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00706}00706\ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_a2384e06d62f7580d7599d3b77b68acbb}{extract}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}[2]);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00707}00707\ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_a7c03352e405b1d65f6afd0b7a0f01730}{muladd}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[0],\ b-\/>\mbox{\hyperlink{structsecp256k1__scalar_a4aba1d263d205acdd537ed9a995393cd}{d}}[3]);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00708}00708\ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_a7c03352e405b1d65f6afd0b7a0f01730}{muladd}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[1],\ b-\/>\mbox{\hyperlink{structsecp256k1__scalar_a4aba1d263d205acdd537ed9a995393cd}{d}}[2]);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00709}00709\ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_a7c03352e405b1d65f6afd0b7a0f01730}{muladd}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[2],\ b-\/>\mbox{\hyperlink{structsecp256k1__scalar_a4aba1d263d205acdd537ed9a995393cd}{d}}[1]);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00710}00710\ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_a7c03352e405b1d65f6afd0b7a0f01730}{muladd}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[3],\ b-\/>\mbox{\hyperlink{structsecp256k1__scalar_a4aba1d263d205acdd537ed9a995393cd}{d}}[0]);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00711}00711\ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_a2384e06d62f7580d7599d3b77b68acbb}{extract}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}[3]);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00712}00712\ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_a7c03352e405b1d65f6afd0b7a0f01730}{muladd}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[1],\ b-\/>\mbox{\hyperlink{structsecp256k1__scalar_a4aba1d263d205acdd537ed9a995393cd}{d}}[3]);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00713}00713\ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_a7c03352e405b1d65f6afd0b7a0f01730}{muladd}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[2],\ b-\/>\mbox{\hyperlink{structsecp256k1__scalar_a4aba1d263d205acdd537ed9a995393cd}{d}}[2]);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00714}00714\ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_a7c03352e405b1d65f6afd0b7a0f01730}{muladd}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[3],\ b-\/>\mbox{\hyperlink{structsecp256k1__scalar_a4aba1d263d205acdd537ed9a995393cd}{d}}[1]);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00715}00715\ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_a2384e06d62f7580d7599d3b77b68acbb}{extract}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}[4]);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00716}00716\ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_a7c03352e405b1d65f6afd0b7a0f01730}{muladd}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[2],\ b-\/>\mbox{\hyperlink{structsecp256k1__scalar_a4aba1d263d205acdd537ed9a995393cd}{d}}[3]);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00717}00717\ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_a7c03352e405b1d65f6afd0b7a0f01730}{muladd}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[3],\ b-\/>\mbox{\hyperlink{structsecp256k1__scalar_a4aba1d263d205acdd537ed9a995393cd}{d}}[2]);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00718}00718\ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_a2384e06d62f7580d7599d3b77b68acbb}{extract}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}[5]);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00719}00719\ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_adeb6e766b53f39bb9c0c9f6502aa3b62}{muladd\_fast}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[3],\ b-\/>\mbox{\hyperlink{structsecp256k1__scalar_a4aba1d263d205acdd537ed9a995393cd}{d}}[3]);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00720}00720\ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_a7738483bf87a265b882763603d527b3b}{extract\_fast}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}[6]);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00721}00721\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(c1\ ==\ 0);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00722}00722\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}[7]\ =\ c0;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00723}00723\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00724}00724\ \}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00725}00725\ }
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00726}00726\ \textcolor{preprocessor}{\#undef\ sumadd}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00727}00727\ \textcolor{preprocessor}{\#undef\ sumadd\_fast}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00728}00728\ \textcolor{preprocessor}{\#undef\ muladd}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00729}00729\ \textcolor{preprocessor}{\#undef\ muladd\_fast}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00730}00730\ \textcolor{preprocessor}{\#undef\ extract}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00731}00731\ \textcolor{preprocessor}{\#undef\ extract\_fast}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00732}00732\ }
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00733}00733\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_scalar\_mul(\mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *b)\ \{}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00734}00734\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}[8];}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00735}00735\ \ \ \ \ secp256k1\_scalar\_mul\_512(\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}},\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ b);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00736}00736\ \ \ \ \ secp256k1\_scalar\_reduce\_512(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}});}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00737}00737\ \}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00738}00738\ }
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00739}00739\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ secp256k1\_scalar\_shr\_int(\mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \textcolor{keywordtype}{int}\ n)\ \{}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00740}00740\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00741}00741\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(n\ >\ 0);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00742}00742\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(n\ <\ 16);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00743}00743\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[0]\ \&\ ((1\ <<\ n)\ -\/\ 1);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00744}00744\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[0]\ =\ (\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[0]\ >>\ n)\ +\ (\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[1]\ <<\ (64\ -\/\ n));}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00745}00745\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[1]\ =\ (\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[1]\ >>\ n)\ +\ (\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[2]\ <<\ (64\ -\/\ n));}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00746}00746\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[2]\ =\ (\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[2]\ >>\ n)\ +\ (\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[3]\ <<\ (64\ -\/\ n));}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00747}00747\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[3]\ =\ (\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[3]\ >>\ n);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00748}00748\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00749}00749\ \}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00750}00750\ }
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00751}00751\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_scalar\_split\_128(\mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *r1,\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *r2,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *k)\ \{}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00752}00752\ \ \ \ \ r1-\/>\mbox{\hyperlink{structsecp256k1__scalar_a4aba1d263d205acdd537ed9a995393cd}{d}}[0]\ =\ k-\/>\mbox{\hyperlink{structsecp256k1__scalar_a4aba1d263d205acdd537ed9a995393cd}{d}}[0];}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00753}00753\ \ \ \ \ r1-\/>\mbox{\hyperlink{structsecp256k1__scalar_a4aba1d263d205acdd537ed9a995393cd}{d}}[1]\ =\ k-\/>\mbox{\hyperlink{structsecp256k1__scalar_a4aba1d263d205acdd537ed9a995393cd}{d}}[1];}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00754}00754\ \ \ \ \ r1-\/>\mbox{\hyperlink{structsecp256k1__scalar_a4aba1d263d205acdd537ed9a995393cd}{d}}[2]\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00755}00755\ \ \ \ \ r1-\/>\mbox{\hyperlink{structsecp256k1__scalar_a4aba1d263d205acdd537ed9a995393cd}{d}}[3]\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00756}00756\ \ \ \ \ r2-\/>\mbox{\hyperlink{structsecp256k1__scalar_a4aba1d263d205acdd537ed9a995393cd}{d}}[0]\ =\ k-\/>\mbox{\hyperlink{structsecp256k1__scalar_a4aba1d263d205acdd537ed9a995393cd}{d}}[2];}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00757}00757\ \ \ \ \ r2-\/>\mbox{\hyperlink{structsecp256k1__scalar_a4aba1d263d205acdd537ed9a995393cd}{d}}[1]\ =\ k-\/>\mbox{\hyperlink{structsecp256k1__scalar_a4aba1d263d205acdd537ed9a995393cd}{d}}[3];}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00758}00758\ \ \ \ \ r2-\/>\mbox{\hyperlink{structsecp256k1__scalar_a4aba1d263d205acdd537ed9a995393cd}{d}}[2]\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00759}00759\ \ \ \ \ r2-\/>\mbox{\hyperlink{structsecp256k1__scalar_a4aba1d263d205acdd537ed9a995393cd}{d}}[3]\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00760}00760\ \}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00761}00761\ }
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00762}00762\ \mbox{\hyperlink{secp256k1_8h_a7ddc487fd46aee88f21cabedb7268b1e}{SECP256K1\_INLINE}}\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ secp256k1\_scalar\_eq(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *b)\ \{}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00763}00763\ \ \ \ \ \textcolor{keywordflow}{return}\ ((\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[0]\ \string^\ b-\/>\mbox{\hyperlink{structsecp256k1__scalar_a4aba1d263d205acdd537ed9a995393cd}{d}}[0])\ |\ (\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[1]\ \string^\ b-\/>\mbox{\hyperlink{structsecp256k1__scalar_a4aba1d263d205acdd537ed9a995393cd}{d}}[1])\ |\ (\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[2]\ \string^\ b-\/>\mbox{\hyperlink{structsecp256k1__scalar_a4aba1d263d205acdd537ed9a995393cd}{d}}[2])\ |\ (\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[3]\ \string^\ b-\/>\mbox{\hyperlink{structsecp256k1__scalar_a4aba1d263d205acdd537ed9a995393cd}{d}}[3]))\ ==\ 0;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00764}00764\ \}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00765}00765\ }
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00766}00766\ \mbox{\hyperlink{secp256k1_8h_a7ddc487fd46aee88f21cabedb7268b1e}{SECP256K1\_INLINE}}\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_scalar\_mul\_shift\_var(\mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *b,\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ shift)\ \{}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00767}00767\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}[8];}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00768}00768\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ shiftlimbs;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00769}00769\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ shiftlow;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00770}00770\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ shifthigh;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00771}00771\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(shift\ >=\ 256);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00772}00772\ \ \ \ \ secp256k1\_scalar\_mul\_512(\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}},\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ b);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00773}00773\ \ \ \ \ shiftlimbs\ =\ shift\ >>\ 6;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00774}00774\ \ \ \ \ shiftlow\ =\ shift\ \&\ 0x3F;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00775}00775\ \ \ \ \ shifthigh\ =\ 64\ -\/\ shiftlow;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00776}00776\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[0]\ =\ shift\ <\ 512\ ?\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}[0\ +\ shiftlimbs]\ >>\ shiftlow\ |\ (shift\ <\ 448\ \&\&\ shiftlow\ ?\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}[1\ +\ shiftlimbs]\ <<\ shifthigh)\ :\ 0))\ :\ 0;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00777}00777\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[1]\ =\ shift\ <\ 448\ ?\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}[1\ +\ shiftlimbs]\ >>\ shiftlow\ |\ (shift\ <\ 384\ \&\&\ shiftlow\ ?\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}[2\ +\ shiftlimbs]\ <<\ shifthigh)\ :\ 0))\ :\ 0;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00778}00778\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[2]\ =\ shift\ <\ 384\ ?\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}[2\ +\ shiftlimbs]\ >>\ shiftlow\ |\ (shift\ <\ 320\ \&\&\ shiftlow\ ?\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}[3\ +\ shiftlimbs]\ <<\ shifthigh)\ :\ 0))\ :\ 0;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00779}00779\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[3]\ =\ shift\ <\ 320\ ?\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}[3\ +\ shiftlimbs]\ >>\ shiftlow)\ :\ 0;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00780}00780\ \ \ \ \ secp256k1\_scalar\_cadd\_bit(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ 0,\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}[(shift\ -\/\ 1)\ >>\ 6]\ >>\ ((shift\ -\/\ 1)\ \&\ 0x3f))\ \&\ 1);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00781}00781\ \}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00782}00782\ }
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00783}00783\ \textcolor{keyword}{static}\ \mbox{\hyperlink{secp256k1_8h_a7ddc487fd46aee88f21cabedb7268b1e}{SECP256K1\_INLINE}}\ \textcolor{keywordtype}{void}\ secp256k1\_scalar\_cmov(\mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \textcolor{keywordtype}{int}\ flag)\ \{}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00784}00784\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ mask0,\ mask1;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00785}00785\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_a30c2919bb25654a7ff58814c3a004a86}{VG\_CHECK\_VERIFY}}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d,\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d));}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00786}00786\ \ \ \ \ mask0\ =\ flag\ +\ \string~((\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})0);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00787}00787\ \ \ \ \ mask1\ =\ \string~mask0;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00788}00788\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[0]\ =\ (\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[0]\ \&\ mask0)\ |\ (\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[0]\ \&\ mask1);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00789}00789\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[1]\ =\ (\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[1]\ \&\ mask0)\ |\ (\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[1]\ \&\ mask1);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00790}00790\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[2]\ =\ (\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[2]\ \&\ mask0)\ |\ (\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[2]\ \&\ mask1);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00791}00791\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[3]\ =\ (\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[3]\ \&\ mask0)\ |\ (\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[3]\ \&\ mask1);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00792}00792\ \}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00793}00793\ }
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00794}00794\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_scalar\_from\_signed62(\mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__modinv64__signed62}{secp256k1\_modinv64\_signed62}}\ *\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})\ \{}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00795}00795\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ a0\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>v[0],\ a1\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>v[1],\ a2\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>v[2],\ a3\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>v[3],\ a4\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>v[4];}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00796}00796\ }
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00797}00797\ \ \ \ \ \textcolor{comment}{/*\ The\ output\ from\ secp256k1\_modinv64\{\_var\}\ should\ be\ normalized\ to\ range\ [0,modulus),\ and}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00798}00798\ \textcolor{comment}{\ \ \ \ \ *\ have\ limbs\ in\ [0,2\string^62).\ The\ modulus\ is\ <\ 2\string^256,\ so\ the\ top\ limb\ must\ be\ below\ 2\string^(256-\/62*4).}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00799}00799\ \textcolor{comment}{\ \ \ \ \ */}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00800}00800\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(a0\ >>\ 62\ ==\ 0);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00801}00801\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(a1\ >>\ 62\ ==\ 0);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00802}00802\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(a2\ >>\ 62\ ==\ 0);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00803}00803\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(a3\ >>\ 62\ ==\ 0);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00804}00804\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(a4\ >>\ 8\ ==\ 0);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00805}00805\ }
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00806}00806\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[0]\ =\ a0\ \ \ \ \ \ |\ a1\ <<\ 62;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00807}00807\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[1]\ =\ a1\ >>\ 2\ |\ a2\ <<\ 60;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00808}00808\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[2]\ =\ a2\ >>\ 4\ |\ a3\ <<\ 58;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00809}00809\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d[3]\ =\ a3\ >>\ 6\ |\ a4\ <<\ 56;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00810}00810\ }
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00811}00811\ \textcolor{preprocessor}{\#ifdef\ VERIFY}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00812}00812\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(secp256k1\_scalar\_check\_overflow(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}})\ ==\ 0);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00813}00813\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00814}00814\ \}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00815}00815\ }
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00816}00816\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_scalar\_to\_signed62(\mbox{\hyperlink{structsecp256k1__modinv64__signed62}{secp256k1\_modinv64\_signed62}}\ *\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})\ \{}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00817}00817\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ M62\ =\ \mbox{\hyperlink{stdint_8h_a30654b4b67d97c42ca3f9b6052dda916}{UINT64\_MAX}}\ >>\ 2;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00818}00818\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ a0\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[0],\ a1\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[1],\ a2\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[2],\ a3\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[3];}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00819}00819\ }
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00820}00820\ \textcolor{preprocessor}{\#ifdef\ VERIFY}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00821}00821\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(secp256k1\_scalar\_check\_overflow(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})\ ==\ 0);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00822}00822\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00823}00823\ }
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00824}00824\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>v[0]\ =\ \ a0\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\ M62;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00825}00825\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>v[1]\ =\ (a0\ >>\ 62\ |\ a1\ <<\ \ 2)\ \&\ M62;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00826}00826\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>v[2]\ =\ (a1\ >>\ 60\ |\ a2\ <<\ \ 4)\ \&\ M62;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00827}00827\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>v[3]\ =\ (a2\ >>\ 58\ |\ a3\ <<\ \ 6)\ \&\ M62;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00828}00828\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>v[4]\ =\ \ a3\ >>\ 56;}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00829}00829\ \}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00830}00830\ }
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00831}00831\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__modinv64__modinfo}{secp256k1\_modinv64\_modinfo}}\ secp256k1\_const\_modinfo\_scalar\ =\ \{}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00832}00832\ \ \ \ \ \{\{0x3FD25E8CD0364141LL,\ 0x2ABB739ABD2280EELL,\ -\/0x15LL,\ 0,\ 256\}\},}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00833}00833\ \ \ \ \ 0x34F20099AA774EC1LL}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00834}00834\ \};}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00835}00835\ }
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00836}00836\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_scalar\_inverse(\mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *x)\ \{}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00837}00837\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__modinv64__signed62}{secp256k1\_modinv64\_signed62}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00838}00838\ \textcolor{preprocessor}{\#ifdef\ VERIFY}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00839}00839\ \ \ \ \ \textcolor{keywordtype}{int}\ zero\_in\ =\ secp256k1\_scalar\_is\_zero(x);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00840}00840\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00841}00841\ \ \ \ \ secp256k1\_scalar\_to\_signed62(\&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ x);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00842}00842\ \ \ \ \ secp256k1\_modinv64(\&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ \&secp256k1\_const\_modinfo\_scalar);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00843}00843\ \ \ \ \ secp256k1\_scalar\_from\_signed62(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00844}00844\ }
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00845}00845\ \textcolor{preprocessor}{\#ifdef\ VERIFY}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00846}00846\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(secp256k1\_scalar\_is\_zero(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}})\ ==\ zero\_in);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00847}00847\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00848}00848\ \}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00849}00849\ }
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00850}00850\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_scalar\_inverse\_var(\mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *x)\ \{}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00851}00851\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__modinv64__signed62}{secp256k1\_modinv64\_signed62}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00852}00852\ \textcolor{preprocessor}{\#ifdef\ VERIFY}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00853}00853\ \ \ \ \ \textcolor{keywordtype}{int}\ zero\_in\ =\ secp256k1\_scalar\_is\_zero(x);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00854}00854\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00855}00855\ \ \ \ \ secp256k1\_scalar\_to\_signed62(\&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ x);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00856}00856\ \ \ \ \ secp256k1\_modinv64\_var(\&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ \&secp256k1\_const\_modinfo\_scalar);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00857}00857\ \ \ \ \ secp256k1\_scalar\_from\_signed62(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00858}00858\ }
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00859}00859\ \textcolor{preprocessor}{\#ifdef\ VERIFY}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00860}00860\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(secp256k1\_scalar\_is\_zero(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}})\ ==\ zero\_in);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00861}00861\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00862}00862\ \}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00863}00863\ }
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00864}00864\ \mbox{\hyperlink{secp256k1_8h_a7ddc487fd46aee88f21cabedb7268b1e}{SECP256K1\_INLINE}}\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ secp256k1\_scalar\_is\_even(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})\ \{}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00865}00865\ \ \ \ \ \textcolor{keywordflow}{return}\ !(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>d[0]\ \&\ 1);}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00866}00866\ \}}
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00867}00867\ }
+\DoxyCodeLine{\Hypertarget{scalar__4x64__impl_8h_source_l00868}00868\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{/*\ SECP256K1\_SCALAR\_REPR\_IMPL\_H\ */}\textcolor{preprocessor}{}}
+
+\end{DoxyCode}

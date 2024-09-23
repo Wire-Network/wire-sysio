@@ -1,0 +1,94 @@
+\doxysection{Runtime\+::Lazy\+Resolver Struct Reference}
+\hypertarget{struct_runtime_1_1_lazy_resolver}{}\label{struct_runtime_1_1_lazy_resolver}\index{Runtime::LazyResolver@{Runtime::LazyResolver}}
+
+
+{\ttfamily \#include $<$Linker.\+h$>$}
+
+
+
+Inheritance diagram for Runtime\+::Lazy\+Resolver\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=199pt]{struct_runtime_1_1_lazy_resolver__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Runtime\+::Lazy\+Resolver\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=199pt]{struct_runtime_1_1_lazy_resolver__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_runtime_1_1_lazy_resolver_aa5bcb6ac1a7d1042c612ec60bc30cf35}{Lazy\+Resolver}} (std\+::function$<$ \mbox{\hyperlink{struct_runtime_1_1_resolver}{Resolver}} \texorpdfstring{$\ast$}{*}()$>$ \&in\+Inner\+Resolver\+Thunk)
+\item 
+bool \mbox{\hyperlink{struct_runtime_1_1_lazy_resolver_a017b70308cc0fb38d2fcdbb372f74362}{resolve}} (const std\+::string \&module\+Name, const std\+::string \&export\+Name, \mbox{\hyperlink{struct_i_r_1_1_object_type}{IR\+::\+Object\+Type}} type, \mbox{\hyperlink{struct_runtime_1_1_object_instance}{Runtime\+::\+Object\+Instance}} \texorpdfstring{$\ast$}{*}\&out\+Object) override
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{struct_runtime_1_1_resolver}{Runtime\+::\+Resolver}}}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{_linker_8h_source_l00035}{35}} of file \mbox{\hyperlink{_linker_8h_source}{Linker.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{struct_runtime_1_1_lazy_resolver_aa5bcb6ac1a7d1042c612ec60bc30cf35}\index{Runtime::LazyResolver@{Runtime::LazyResolver}!LazyResolver@{LazyResolver}}
+\index{LazyResolver@{LazyResolver}!Runtime::LazyResolver@{Runtime::LazyResolver}}
+\doxysubsubsection{\texorpdfstring{LazyResolver()}{LazyResolver()}}
+{\footnotesize\ttfamily \label{struct_runtime_1_1_lazy_resolver_aa5bcb6ac1a7d1042c612ec60bc30cf35} 
+Runtime\+::\+Lazy\+Resolver\+::\+Lazy\+Resolver (\begin{DoxyParamCaption}\item[{std\+::function$<$ \mbox{\hyperlink{struct_runtime_1_1_resolver}{Resolver}} \texorpdfstring{$\ast$}{*}()$>$ \&}]{in\+Inner\+Resolver\+Thunk}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_linker_8h_source_l00037}{37}} of file \mbox{\hyperlink{_linker_8h_source}{Linker.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ :\ innerResolverThunk(std::move(inInnerResolverThunk)),\ innerResolver(\textcolor{keyword}{nullptr})\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_runtime_1_1_lazy_resolver_a017b70308cc0fb38d2fcdbb372f74362}\index{Runtime::LazyResolver@{Runtime::LazyResolver}!resolve@{resolve}}
+\index{resolve@{resolve}!Runtime::LazyResolver@{Runtime::LazyResolver}}
+\doxysubsubsection{\texorpdfstring{resolve()}{resolve()}}
+{\footnotesize\ttfamily \label{struct_runtime_1_1_lazy_resolver_a017b70308cc0fb38d2fcdbb372f74362} 
+bool Runtime\+::\+Lazy\+Resolver\+::resolve (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{module\+Name}{, }\item[{const std\+::string \&}]{export\+Name}{, }\item[{\mbox{\hyperlink{struct_i_r_1_1_object_type}{IR\+::\+Object\+Type}}}]{type}{, }\item[{\mbox{\hyperlink{struct_runtime_1_1_object_instance}{Runtime\+::\+Object\+Instance}} \texorpdfstring{$\ast$}{*}\&}]{out\+Object}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_runtime_1_1_resolver_a8387253cf2addc917647cba230a00334}{Runtime\+::\+Resolver}}.
+
+
+
+Definition at line \mbox{\hyperlink{_linker_8h_source_l00040}{40}} of file \mbox{\hyperlink{_linker_8h_source}{Linker.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!innerResolver)\ \{\ innerResolver\ =\ innerResolverThunk();\ \}}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ innerResolver-\/>\mbox{\hyperlink{struct_runtime_1_1_resolver_a8387253cf2addc917647cba230a00334}{resolve}}(moduleName,exportName,type,outObject);}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=339pt]{struct_runtime_1_1_lazy_resolver_a017b70308cc0fb38d2fcdbb372f74362_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/wasm-\/jit/\+Include/\+Runtime/\mbox{\hyperlink{_linker_8h}{Linker.\+h}}\end{DoxyCompactItemize}

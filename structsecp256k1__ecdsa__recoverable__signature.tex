@@ -1,0 +1,40 @@
+\doxysection{secp256k1\+\_\+ecdsa\+\_\+recoverable\+\_\+signature Struct Reference}
+\hypertarget{structsecp256k1__ecdsa__recoverable__signature}{}\label{structsecp256k1__ecdsa__recoverable__signature}\index{secp256k1\_ecdsa\_recoverable\_signature@{secp256k1\_ecdsa\_recoverable\_signature}}
+
+
+{\ttfamily \#include $<$secp256k1\+\_\+recovery.\+h$>$}
+
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+unsigned char \mbox{\hyperlink{structsecp256k1__ecdsa__recoverable__signature_a7157f0cd8b8fb97fceacfd9c0024a952}{data}} \mbox{[}65\mbox{]}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\doxylink{struct_opaque}{Opaque} data structured that holds a parsed ECDSA signature, supporting pubkey recovery.
+
+The exact representation of data inside is implementation defined and not guaranteed to be portable between different platforms or versions. It is however guaranteed to be 65 bytes in size, and can be safely copied/moved. If you need to convert to a format suitable for storage or transmission, use the secp256k1\+\_\+ecdsa\+\_\+signature\+\_\+serialize\+\_\+\texorpdfstring{$\ast$}{*} and secp256k1\+\_\+ecdsa\+\_\+signature\+\_\+parse\+\_\+\texorpdfstring{$\ast$}{*} functions.
+
+Furthermore, it is guaranteed that identical signatures (including their recoverability) will have identical representation, so they can be memcmp\textquotesingle{}ed. 
+
+Definition at line \mbox{\hyperlink{secp256k1__recovery_8h_source_l00024}{24}} of file \mbox{\hyperlink{secp256k1__recovery_8h_source}{secp256k1\+\_\+recovery.\+h}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsecp256k1__ecdsa__recoverable__signature_a7157f0cd8b8fb97fceacfd9c0024a952}\index{secp256k1\_ecdsa\_recoverable\_signature@{secp256k1\_ecdsa\_recoverable\_signature}!data@{data}}
+\index{data@{data}!secp256k1\_ecdsa\_recoverable\_signature@{secp256k1\_ecdsa\_recoverable\_signature}}
+\doxysubsubsection{\texorpdfstring{data}{data}}
+{\footnotesize\ttfamily \label{structsecp256k1__ecdsa__recoverable__signature_a7157f0cd8b8fb97fceacfd9c0024a952} 
+unsigned char secp256k1\+\_\+ecdsa\+\_\+recoverable\+\_\+signature\+::data\mbox{[}65\mbox{]}}
+
+
+
+Definition at line \mbox{\hyperlink{secp256k1__recovery_8h_source_l00025}{25}} of file \mbox{\hyperlink{secp256k1__recovery_8h_source}{secp256k1\+\_\+recovery.\+h}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/secp256k1/secp256k1/include/\mbox{\hyperlink{secp256k1__recovery_8h}{secp256k1\+\_\+recovery.\+h}}\end{DoxyCompactItemize}

@@ -1,0 +1,44 @@
+\doxysection{libraries/wasm-\/jit/\+Include/\+Emscripten/\+Emscripten.h File Reference}
+\hypertarget{_emscripten_8h}{}\label{_emscripten_8h}\index{libraries/wasm-\/jit/Include/Emscripten/Emscripten.h@{libraries/wasm-\/jit/Include/Emscripten/Emscripten.h}}
+{\ttfamily \#include $<$vector$>$}\newline
+Include dependency graph for Emscripten.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=183pt]{_emscripten_8h__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespace_i_r}{IR}}
+\item 
+namespace \mbox{\hyperlink{namespace_runtime}{Runtime}}
+\item 
+namespace \mbox{\hyperlink{namespace_emscripten}{Emscripten}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{_emscripten_8h_a4b3f8752943cdf5ebba1a9e51ed77b41}{EMSCRIPTEN\+\_\+\+API}}~\mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_a14d005bd653c82f4e705b4ded2a4fc07}{DLL\+\_\+\+IMPORT}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{_emscripten_8h_a4b3f8752943cdf5ebba1a9e51ed77b41}{EMSCRIPTEN\+\_\+\+API}} void \mbox{\hyperlink{namespace_emscripten_a791859937162ae42a5f5a475b4d5cb80}{Emscripten\+::init\+Instance}} (const \mbox{\hyperlink{struct_i_r_1_1_module}{IR\+::\+Module}} \&module, \mbox{\hyperlink{struct_runtime_1_1_module_instance}{Runtime\+::\+Module\+Instance}} \texorpdfstring{$\ast$}{*}module\+Instance)
+\item 
+\mbox{\hyperlink{_emscripten_8h_a4b3f8752943cdf5ebba1a9e51ed77b41}{EMSCRIPTEN\+\_\+\+API}} void \mbox{\hyperlink{namespace_emscripten_ae2d22409e576d2c68b801586ccc1787e}{Emscripten\+::inject\+Command\+Args}} (const std\+::vector$<$ const char \texorpdfstring{$\ast$}{*} $>$ \&arg\+Strings, std\+::vector$<$ \mbox{\hyperlink{struct_runtime_1_1_value}{Runtime\+::\+Value}} $>$ \&out\+Invoke\+Args)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{_emscripten_8h_a4b3f8752943cdf5ebba1a9e51ed77b41}\index{Emscripten.h@{Emscripten.h}!EMSCRIPTEN\_API@{EMSCRIPTEN\_API}}
+\index{EMSCRIPTEN\_API@{EMSCRIPTEN\_API}!Emscripten.h@{Emscripten.h}}
+\doxysubsubsection{\texorpdfstring{EMSCRIPTEN\_API}{EMSCRIPTEN\_API}}
+{\footnotesize\ttfamily \label{_emscripten_8h_a4b3f8752943cdf5ebba1a9e51ed77b41} 
+\#define EMSCRIPTEN\+\_\+\+API~\mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_a14d005bd653c82f4e705b4ded2a4fc07}{DLL\+\_\+\+IMPORT}}}
+
+
+
+Definition at line \mbox{\hyperlink{_emscripten_8h_source_l00004}{4}} of file \mbox{\hyperlink{_emscripten_8h_source}{Emscripten.\+h}}.
+

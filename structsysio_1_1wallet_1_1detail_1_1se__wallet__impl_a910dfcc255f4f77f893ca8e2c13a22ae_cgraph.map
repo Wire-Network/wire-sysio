@@ -1,0 +1,16 @@
+<map id="sysio::wallet::detail::se_wallet_impl::create" name="sysio::wallet::detail::se_wallet_impl::create">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,147,165,187"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1wallet_1_1detail_1_1se__wallet__impl.html#a4143e58c3ef85d340f73fd65e5805f3f" title=" " alt="" coords="213,68,354,124"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="143,144,197,124,199,129,145,149"/>
+<area shape="rect" id="Node000005" href="$structsysio_1_1wallet_1_1detail_1_1se__wallet__impl.html#a617c3932501399454678530512b48f57" title=" " alt="" coords="591,102,747,157"/>
+<area shape="poly" id="edge8_Node000001_Node000005" title=" " alt="" coords="165,174,245,181,339,184,442,182,543,171,585,160,587,165,544,176,442,188,339,190,244,186,165,179"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1wallet_1_1detail_1_1se__wallet__impl.html#a06cd1a5418bb1d4d6fd34a06d98479d7" title=" " alt="" coords="402,31,543,87"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="354,80,386,73,387,78,355,85"/>
+<area shape="rect" id="Node000004" href="$yubihsm__pkcs11_8c.html#ae785d5badbf1f08b491af31f32a135a1" title=" " alt="" coords="633,14,705,40"/>
+<area shape="poly" id="edge5_Node000002_Node000004" title=" " alt="" coords="315,66,354,38,401,16,458,5,517,3,572,7,618,14,617,19,571,12,517,8,459,11,403,21,357,43,318,70"/>
+<area shape="rect" id="Node000006" href="$namespacefc_1_1raw.html#a0b442d98ceb22dd5a6ae84745e43ffab" title=" " alt="" coords="417,135,528,161"/>
+<area shape="poly" id="edge6_Node000002_Node000006" title=" " alt="" coords="355,113,410,128,408,133,353,118"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="543,45,618,32,619,38,544,50"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="545,82,578,94,576,99,543,87"/>
+<area shape="poly" id="edge7_Node000006_Node000006" title=" " alt="" coords="441,136,435,127,438,117,451,111,473,109,496,111,508,118,505,123,494,116,473,114,453,116,442,121,440,126,445,134"/>
+</map>

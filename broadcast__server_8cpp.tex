@@ -1,0 +1,128 @@
+\doxysection{libraries/fc/vendor/websocketpp/examples/broadcast\+\_\+server/broadcast\+\_\+server.cpp File Reference}
+\hypertarget{broadcast__server_8cpp}{}\label{broadcast__server_8cpp}\index{libraries/fc/vendor/websocketpp/examples/broadcast\_server/broadcast\_server.cpp@{libraries/fc/vendor/websocketpp/examples/broadcast\_server/broadcast\_server.cpp}}
+{\ttfamily \#include $<$websocketpp/config/asio\+\_\+no\+\_\+tls.\+hpp$>$}\newline
+{\ttfamily \#include $<$websocketpp/server.\+hpp$>$}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$set$>$}\newline
+{\ttfamily \#include $<$websocketpp/common/thread.\+hpp$>$}\newline
+Include dependency graph for broadcast\+\_\+server.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{broadcast__server_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structaction}{action}}
+\item 
+class \mbox{\hyperlink{classbroadcast__server}{broadcast\+\_\+server}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1server}{websocketpp\+::server}}$<$ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio}{websocketpp\+::config\+::asio}} $>$ \mbox{\hyperlink{broadcast__server_8cpp_afc38239e3eef2a4200e324bff14d91d1}{server}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{broadcast__server_8cpp_a864de25b94a13d8c17e790b2e1638687}{action\+\_\+type}} \{ \mbox{\hyperlink{broadcast__server_8cpp_a864de25b94a13d8c17e790b2e1638687abc6f919ff681f5f552b2f7d1f0fba832}{SUBSCRIBE}}
+, \mbox{\hyperlink{broadcast__server_8cpp_a864de25b94a13d8c17e790b2e1638687a8395e5981c15d813c588c86988fd4aea}{UNSUBSCRIBE}}
+, \mbox{\hyperlink{broadcast__server_8cpp_a864de25b94a13d8c17e790b2e1638687ab3e6d7e18839259526a01001f558200f}{MESSAGE}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{broadcast__server_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{broadcast__server_8cpp_afc38239e3eef2a4200e324bff14d91d1}\index{broadcast\_server.cpp@{broadcast\_server.cpp}!server@{server}}
+\index{server@{server}!broadcast\_server.cpp@{broadcast\_server.cpp}}
+\doxysubsubsection{\texorpdfstring{server}{server}}
+{\footnotesize\ttfamily \label{broadcast__server_8cpp_afc38239e3eef2a4200e324bff14d91d1} 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1server}{websocketpp\+::server}}$<$\mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio}{websocketpp\+::config\+::asio}}$>$ \mbox{\hyperlink{docs_2simple__broadcast__server_8cpp_afc38239e3eef2a4200e324bff14d91d1}{server}}}
+
+
+
+Definition at line \mbox{\hyperlink{broadcast__server_8cpp_source_l00013}{13}} of file \mbox{\hyperlink{broadcast__server_8cpp_source}{broadcast\+\_\+server.\+cpp}}.
+
+
+
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{broadcast__server_8cpp_a864de25b94a13d8c17e790b2e1638687}\index{broadcast\_server.cpp@{broadcast\_server.cpp}!action\_type@{action\_type}}
+\index{action\_type@{action\_type}!broadcast\_server.cpp@{broadcast\_server.cpp}}
+\doxysubsubsection{\texorpdfstring{action\_type}{action\_type}}
+{\footnotesize\ttfamily \label{broadcast__server_8cpp_a864de25b94a13d8c17e790b2e1638687} 
+enum \mbox{\hyperlink{broadcast__server_8cpp_a864de25b94a13d8c17e790b2e1638687}{action\+\_\+type}}}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{SUBSCRIBE@{SUBSCRIBE}!broadcast\_server.cpp@{broadcast\_server.cpp}}\index{broadcast\_server.cpp@{broadcast\_server.cpp}!SUBSCRIBE@{SUBSCRIBE}}}\Hypertarget{broadcast__server_8cpp_a864de25b94a13d8c17e790b2e1638687abc6f919ff681f5f552b2f7d1f0fba832}\label{broadcast__server_8cpp_a864de25b94a13d8c17e790b2e1638687} 
+SUBSCRIBE&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{UNSUBSCRIBE@{UNSUBSCRIBE}!broadcast\_server.cpp@{broadcast\_server.cpp}}\index{broadcast\_server.cpp@{broadcast\_server.cpp}!UNSUBSCRIBE@{UNSUBSCRIBE}}}\Hypertarget{broadcast__server_8cpp_a864de25b94a13d8c17e790b2e1638687a8395e5981c15d813c588c86988fd4aea}\label{broadcast__server_8cpp_a864de25b94a13d8c17e790b2e1638687} 
+UNSUBSCRIBE&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{MESSAGE@{MESSAGE}!broadcast\_server.cpp@{broadcast\_server.cpp}}\index{broadcast\_server.cpp@{broadcast\_server.cpp}!MESSAGE@{MESSAGE}}}\Hypertarget{broadcast__server_8cpp_a864de25b94a13d8c17e790b2e1638687ab3e6d7e18839259526a01001f558200f}\label{broadcast__server_8cpp_a864de25b94a13d8c17e790b2e1638687} 
+MESSAGE&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{broadcast__server_8cpp_source_l00031}{31}} of file \mbox{\hyperlink{broadcast__server_8cpp_source}{broadcast\+\_\+server.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00032\ \ \ \ \ \mbox{\hyperlink{broadcast__server_8cpp_a864de25b94a13d8c17e790b2e1638687abc6f919ff681f5f552b2f7d1f0fba832}{SUBSCRIBE}},}
+\DoxyCodeLine{00033\ \ \ \ \ \mbox{\hyperlink{broadcast__server_8cpp_a864de25b94a13d8c17e790b2e1638687a8395e5981c15d813c588c86988fd4aea}{UNSUBSCRIBE}},}
+\DoxyCodeLine{00034\ \ \ \ \ \mbox{\hyperlink{broadcast__server_8cpp_a864de25b94a13d8c17e790b2e1638687ab3e6d7e18839259526a01001f558200f}{MESSAGE}}}
+\DoxyCodeLine{00035\ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{broadcast__server_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}\index{broadcast\_server.cpp@{broadcast\_server.cpp}!main@{main}}
+\index{main@{main}!broadcast\_server.cpp@{broadcast\_server.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{broadcast__server_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4} 
+int main (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{broadcast__server_8cpp_source_l00145}{145}} of file \mbox{\hyperlink{broadcast__server_8cpp_source}{broadcast\+\_\+server.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00146\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00147\ \ \ \ \ \mbox{\hyperlink{classbroadcast__server}{broadcast\_server}}\ server\_instance;}
+\DoxyCodeLine{00148\ }
+\DoxyCodeLine{00149\ \ \ \ \ \textcolor{comment}{//\ Start\ a\ thread\ to\ run\ the\ processing\ loop}}
+\DoxyCodeLine{00150\ \ \ \ \ thread\ t(bind(\&\mbox{\hyperlink{classbroadcast__server_aab1bd3f376f3d5242660b686c6b45b40}{broadcast\_server::process\_messages}},\&server\_instance));}
+\DoxyCodeLine{00151\ }
+\DoxyCodeLine{00152\ \ \ \ \ \textcolor{comment}{//\ Run\ the\ asio\ loop\ with\ the\ main\ thread}}
+\DoxyCodeLine{00153\ \ \ \ \ server\_instance.\mbox{\hyperlink{classbroadcast__server_af7c28eeb788bf2451364e76a02615cac}{run}}(9002);}
+\DoxyCodeLine{00154\ }
+\DoxyCodeLine{00155\ \ \ \ \ t.join();}
+\DoxyCodeLine{00156\ }
+\DoxyCodeLine{00157\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\mbox{\hyperlink{classwebsocketpp_1_1exception}{websocketpp::exception}}\ \textcolor{keyword}{const}\ \&\ e)\ \{}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ std::cout\ <<\ e.\mbox{\hyperlink{classwebsocketpp_1_1exception_a62dabd977bc59faaca6dc268744a6089}{what}}()\ <<\ std::endl;}
+\DoxyCodeLine{00159\ \ \ \ \ \}}
+\DoxyCodeLine{00160\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{broadcast__server_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4_cgraph}
+\end{center}
+\end{figure}

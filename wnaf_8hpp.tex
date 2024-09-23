@@ -1,0 +1,48 @@
+\doxysection{libraries/fc/libraries/ff/libff/algebra/scalar\+\_\+multiplication/wnaf.hpp File Reference}
+\hypertarget{wnaf_8hpp}{}\label{wnaf_8hpp}\index{libraries/fc/libraries/ff/libff/algebra/scalar\_multiplication/wnaf.hpp@{libraries/fc/libraries/ff/libff/algebra/scalar\_multiplication/wnaf.hpp}}
+{\ttfamily \#include $<$vector$>$}\newline
+{\ttfamily \#include $<$libff/algebra/fields/bigint.\+hpp$>$}\newline
+{\ttfamily \#include $<$libff/algebra/scalar\+\_\+multiplication/wnaf.\+tcc$>$}\newline
+Include dependency graph for wnaf.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{wnaf_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{wnaf_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacelibff}{libff}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$mp\+\_\+size\+\_\+t n$>$ }\\std\+::vector$<$ long $>$ \mbox{\hyperlink{namespacelibff_aad4268b05dd7f4fa841fce242db396bd}{libff\+::find\+\_\+wnaf}} (const size\+\_\+t window\+\_\+size, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \&scalar)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , mp\+\_\+size\+\_\+t n$>$ }\\\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{namespacelibff_a5b0d51c8c4cd9505a3c4bcc34eecb84b}{libff\+::fixed\+\_\+window\+\_\+wnaf\+\_\+exp}} (const size\+\_\+t window\+\_\+size, const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&base, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \&scalar)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , mp\+\_\+size\+\_\+t n$>$ }\\\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{namespacelibff_a7e41f4b65faa599ab97a386b9840b0eb}{libff\+::opt\+\_\+window\+\_\+wnaf\+\_\+exp}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&base, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \&scalar, const size\+\_\+t scalar\+\_\+bits)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Declaration of interfaces for w\+NAF ("{}width-\/w Non-\/\+Adjacent Form"{}) exponentiation routines.
+
+\begin{DoxyAuthor}{Author}
+This file is part of libff, developed by SCIPR Lab and contributors (see AUTHORS). 
+\end{DoxyAuthor}
+\begin{DoxyCopyright}{Copyright}
+MIT license (see LICENSE file) 
+\end{DoxyCopyright}
+
+
+Definition in file \mbox{\hyperlink{wnaf_8hpp_source}{wnaf.\+hpp}}.
+

@@ -1,0 +1,176 @@
+\doxysection{libraries/sys-\/vm/tests/max\+\_\+pages\+\_\+tests.cpp File Reference}
+\hypertarget{max__pages__tests_8cpp}{}\label{max__pages__tests_8cpp}\index{libraries/sys-\/vm/tests/max\_pages\_tests.cpp@{libraries/sys-\/vm/tests/max\_pages\_tests.cpp}}
+{\ttfamily \#include $<$sysio/vm/backend.\+hpp$>$}\newline
+{\ttfamily \#include "{}utils.\+hpp"{}}\newline
+{\ttfamily \#include $<$catch2/catch.\+hpp$>$}\newline
+Include dependency graph for max\+\_\+pages\+\_\+tests.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{max__pages__tests_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{max__pages__tests_8cpp_a4518c616205d0cdbc45d6eb9f6ccfc97}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Test max\+\_\+pages default"{}, "{}\mbox{[}max\+\_\+pages\+\_\+test\mbox{]}"{})
+\item 
+\mbox{\hyperlink{max__pages__tests_8cpp_a25b52c8fc7678a56b25e46d821e70ebc}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Test max\+\_\+pages unlimited"{}, "{}\mbox{[}max\+\_\+pages\+\_\+test\mbox{]}"{})
+\item 
+\mbox{\hyperlink{max__pages__tests_8cpp_a448625321b285046e86f230407c5086f}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Test max\+\_\+pages static fail"{}, "{}\mbox{[}max\+\_\+pages\+\_\+test\mbox{]}"{})
+\item 
+\mbox{\hyperlink{max__pages__tests_8cpp_ac75985fdea7355c9d5d0d39ff2b4d5a6}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Test max\+\_\+pages static pass"{}, "{}\mbox{[}max\+\_\+pages\+\_\+test\mbox{]}"{})
+\item 
+\mbox{\hyperlink{max__pages__tests_8cpp_a564a8a3d1e65ec7861c6b1c03bb1a66b}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Test max\+\_\+pages dynamic fail"{}, "{}\mbox{[}max\+\_\+pages\+\_\+test\mbox{]}"{})
+\item 
+\mbox{\hyperlink{max__pages__tests_8cpp_a59ae3f6c16b1afed250789dc8fe8a329}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Test max\+\_\+pages dynamic pass"{}, "{}\mbox{[}max\+\_\+pages\+\_\+test\mbox{]}"{})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+wasm\+\_\+allocator \mbox{\hyperlink{max__pages__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{max__pages__tests_8cpp_a4518c616205d0cdbc45d6eb9f6ccfc97}\index{max\_pages\_tests.cpp@{max\_pages\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!max\_pages\_tests.cpp@{max\_pages\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/6]}}
+{\footnotesize\ttfamily \label{max__pages__tests_8cpp_a4518c616205d0cdbc45d6eb9f6ccfc97} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Test max\+\_\+pages default"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}max\+\_\+pages\+\_\+test\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{max__pages__tests_8cpp_source_l00041}{41}} of file \mbox{\hyperlink{max__pages__tests_8cpp_source}{max\+\_\+pages\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00042\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType>}};}
+\DoxyCodeLine{00043\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend}}(mem\_wasm,\ \&\mbox{\hyperlink{max__pages__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00044\ \}}
+
+\end{DoxyCode}
+\Hypertarget{max__pages__tests_8cpp_a564a8a3d1e65ec7861c6b1c03bb1a66b}\index{max\_pages\_tests.cpp@{max\_pages\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!max\_pages\_tests.cpp@{max\_pages\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/6]}}
+{\footnotesize\ttfamily \label{max__pages__tests_8cpp_a564a8a3d1e65ec7861c6b1c03bb1a66b} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Test max\+\_\+pages dynamic fail"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}max\+\_\+pages\+\_\+test\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{max__pages__tests_8cpp_source_l00062}{62}} of file \mbox{\hyperlink{max__pages__tests_8cpp_source}{max\+\_\+pages\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00063\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ dynamic\_options>}};}
+\DoxyCodeLine{00064\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(mem\_wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\{2\}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{00065\ \}}
+
+\end{DoxyCode}
+\Hypertarget{max__pages__tests_8cpp_a59ae3f6c16b1afed250789dc8fe8a329}\index{max\_pages\_tests.cpp@{max\_pages\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!max\_pages\_tests.cpp@{max\_pages\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [3/6]}}
+{\footnotesize\ttfamily \label{max__pages__tests_8cpp_a59ae3f6c16b1afed250789dc8fe8a329} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Test max\+\_\+pages dynamic pass"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}max\+\_\+pages\+\_\+test\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{max__pages__tests_8cpp_source_l00067}{67}} of file \mbox{\hyperlink{max__pages__tests_8cpp_source}{max\+\_\+pages\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00068\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ dynamic\_options>}};}
+\DoxyCodeLine{00069\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend}}(mem\_wasm,\ \&\mbox{\hyperlink{max__pages__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}},\ dynamic\_options\{3\});}
+\DoxyCodeLine{00070\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}f"{}})-\/>to\_i32()\ ==\ -\/1);}
+\DoxyCodeLine{00071\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_ad9fabfa0081daaedb3fbe3a62b42bd01}{initialize}}(\textcolor{keyword}{nullptr},\ dynamic\_options\{4\});}
+\DoxyCodeLine{00072\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}f"{}})-\/>to\_i32()\ ==\ 3);}
+\DoxyCodeLine{00073\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_ad9fabfa0081daaedb3fbe3a62b42bd01}{initialize}}(\textcolor{keyword}{nullptr},\ dynamic\_options\{3\});}
+\DoxyCodeLine{00074\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_ad9fabfa0081daaedb3fbe3a62b42bd01}{initialize}}(\textcolor{keyword}{nullptr},\ dynamic\_options\{2\}),\ std::exception);}
+\DoxyCodeLine{00075\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=347pt]{max__pages__tests_8cpp_a59ae3f6c16b1afed250789dc8fe8a329_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{max__pages__tests_8cpp_a448625321b285046e86f230407c5086f}\index{max\_pages\_tests.cpp@{max\_pages\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!max\_pages\_tests.cpp@{max\_pages\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [4/6]}}
+{\footnotesize\ttfamily \label{max__pages__tests_8cpp_a448625321b285046e86f230407c5086f} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Test max\+\_\+pages static fail"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}max\+\_\+pages\+\_\+test\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{max__pages__tests_8cpp_source_l00051}{51}} of file \mbox{\hyperlink{max__pages__tests_8cpp_source}{max\+\_\+pages\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00052\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ static\_options\_2>}};}
+\DoxyCodeLine{00053\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(mem\_wasm,\ \&\mbox{\hyperlink{max__pages__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{00054\ \}}
+
+\end{DoxyCode}
+\Hypertarget{max__pages__tests_8cpp_ac75985fdea7355c9d5d0d39ff2b4d5a6}\index{max\_pages\_tests.cpp@{max\_pages\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!max\_pages\_tests.cpp@{max\_pages\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [5/6]}}
+{\footnotesize\ttfamily \label{max__pages__tests_8cpp_ac75985fdea7355c9d5d0d39ff2b4d5a6} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Test max\+\_\+pages static pass"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}max\+\_\+pages\+\_\+test\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{max__pages__tests_8cpp_source_l00056}{56}} of file \mbox{\hyperlink{max__pages__tests_8cpp_source}{max\+\_\+pages\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00057\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ static\_options\_3>}};}
+\DoxyCodeLine{00058\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend}}(mem\_wasm,\ \&\mbox{\hyperlink{max__pages__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00059\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}f"{}})-\/>to\_i32()\ ==\ -\/1);}
+\DoxyCodeLine{00060\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=347pt]{max__pages__tests_8cpp_ac75985fdea7355c9d5d0d39ff2b4d5a6_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{max__pages__tests_8cpp_a25b52c8fc7678a56b25e46d821e70ebc}\index{max\_pages\_tests.cpp@{max\_pages\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!max\_pages\_tests.cpp@{max\_pages\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [6/6]}}
+{\footnotesize\ttfamily \label{max__pages__tests_8cpp_a25b52c8fc7678a56b25e46d821e70ebc} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Test max\+\_\+pages unlimited"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}max\+\_\+pages\+\_\+test\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{max__pages__tests_8cpp_source_l00046}{46}} of file \mbox{\hyperlink{max__pages__tests_8cpp_source}{max\+\_\+pages\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00047\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ empty\_options>}};}
+\DoxyCodeLine{00048\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend}}(mem\_wasm,\ \&\mbox{\hyperlink{max__pages__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00049\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{max__pages__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}\index{max\_pages\_tests.cpp@{max\_pages\_tests.cpp}!wa@{wa}}
+\index{wa@{wa}!max\_pages\_tests.cpp@{max\_pages\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{wa}{wa}}
+{\footnotesize\ttfamily \label{max__pages__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89} 
+wasm\+\_\+allocator wa\hspace{0.3cm}{\ttfamily [extern]}}
+
+
+
+Definition at line \mbox{\hyperlink{libraries_2sys-vm_2tests_2main_8cpp_source_l00010}{10}} of file \mbox{\hyperlink{libraries_2sys-vm_2tests_2main_8cpp_source}{main.\+cpp}}.
+

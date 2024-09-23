@@ -1,0 +1,60 @@
+\doxysection{finality\+\_\+status\+\_\+object.\+hpp}
+\hypertarget{finality__status__object_8hpp_source}{}\label{finality__status__object_8hpp_source}\index{plugins/chain\_plugin/include/sysio/chain\_plugin/finality\_status\_object.hpp@{plugins/chain\_plugin/include/sysio/chain\_plugin/finality\_status\_object.hpp}}
+\mbox{\hyperlink{finality__status__object_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{finality__status__object_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{finality__status__object_8hpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{block__header_8hpp}{sysio/chain/block\_header.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{finality__status__object_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{chain_2include_2sysio_2chain_2types_8hpp}{sysio/chain/types.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{finality__status__object_8hpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{multi__index__includes_8hpp}{sysio/chain/multi\_index\_includes.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{finality__status__object_8hpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <boost/multi\_index/hashed\_index.hpp>}}
+\DoxyCodeLine{\Hypertarget{finality__status__object_8hpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{finality__status__object_8hpp_source_l00007}00007\ \textcolor{keyword}{namespace\ }bmi\ =\ boost::multi\_index;}
+\DoxyCodeLine{\Hypertarget{finality__status__object_8hpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{finality__status__object_8hpp_source_l00009}00009\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{}
+\DoxyCodeLine{\Hypertarget{finality__status__object_8hpp_source_l00018}\mbox{\hyperlink{structsysio_1_1finality__status__object}{00018}}\ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structsysio_1_1finality__status__object}{finality\_status\_object}}}
+\DoxyCodeLine{\Hypertarget{finality__status__object_8hpp_source_l00019}00019\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{finality__status__object_8hpp_source_l00020}\mbox{\hyperlink{structsysio_1_1finality__status__object_a007dbda184841433ac53eeefa19b7f4c}{00020}}\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1sha256}{chain::transaction\_id\_type}}\ \ \mbox{\hyperlink{structsysio_1_1finality__status__object_a007dbda184841433ac53eeefa19b7f4c}{trx\_id}};}
+\DoxyCodeLine{\Hypertarget{finality__status__object_8hpp_source_l00021}\mbox{\hyperlink{structsysio_1_1finality__status__object_a62a02b141ed732030c8a8b164b768e65}{00021}}\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1time__point}{fc::time\_point}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1finality__status__object_a62a02b141ed732030c8a8b164b768e65}{trx\_expiry}};\ \ \ \ \ \ \textcolor{comment}{//\ if\ block\ time\ past\ trx\_expiry\ \&\&\ !block\_num\ -\/>\ in\ failed\ list}}
+\DoxyCodeLine{\Hypertarget{finality__status__object_8hpp_source_l00022}\mbox{\hyperlink{structsysio_1_1finality__status__object_a29332707e28e29790d2a6cd0c063a0b9}{00022}}\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1time__point}{fc::time\_point}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1finality__status__object_a29332707e28e29790d2a6cd0c063a0b9}{received}};}
+\DoxyCodeLine{\Hypertarget{finality__status__object_8hpp_source_l00023}\mbox{\hyperlink{structsysio_1_1finality__status__object_a45ea8643d0061aeedda3fd2cb610cd81}{00023}}\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1sha256}{chain::block\_id\_type}}\ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1finality__status__object_a45ea8643d0061aeedda3fd2cb610cd81}{block\_id}};}
+\DoxyCodeLine{\Hypertarget{finality__status__object_8hpp_source_l00024}\mbox{\hyperlink{structsysio_1_1finality__status__object_a84419aca3d888816a90fff72fccc440b}{00024}}\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{chain::block\_timestamp\_type}}\ \mbox{\hyperlink{structsysio_1_1finality__status__object_a84419aca3d888816a90fff72fccc440b}{block\_timestamp}};}
+\DoxyCodeLine{\Hypertarget{finality__status__object_8hpp_source_l00025}\mbox{\hyperlink{structsysio_1_1finality__status__object_ac845ab23a755acae525aea4fb3e98a2e}{00025}}\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1finality__status__object_ac845ab23a755acae525aea4fb3e98a2e}{forked\_out}}\ =\ \textcolor{keyword}{false};\ \textcolor{comment}{//\ if\ !block\_num\ \&\&\ forked\_out\ -\/>\ status\ ==\ "{}forked\ out"{}}}
+\DoxyCodeLine{\Hypertarget{finality__status__object_8hpp_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{finality__status__object_8hpp_source_l00027}\mbox{\hyperlink{structsysio_1_1finality__status__object_a7ae6a77093644a97ede827d2be8d8c41}{00027}}\ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{structsysio_1_1finality__status__object_a7ae6a77093644a97ede827d2be8d8c41}{memory\_size}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{sizeof}(*this);\ \}}
+\DoxyCodeLine{\Hypertarget{finality__status__object_8hpp_source_l00028}\mbox{\hyperlink{structsysio_1_1finality__status__object_a6e9c5479c4fba403a1141d71e4a0954c}{00028}}\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{structsysio_1_1finality__status__object_a6e9c5479c4fba403a1141d71e4a0954c}{is\_in\_block}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{finality__status__object_8hpp_source_l00029}00029\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !\mbox{\hyperlink{structsysio_1_1finality__status__object_ac845ab23a755acae525aea4fb3e98a2e}{forked\_out}}\ \&\&\ \mbox{\hyperlink{structsysio_1_1finality__status__object_a45ea8643d0061aeedda3fd2cb610cd81}{block\_id}}\ !=\ \mbox{\hyperlink{classfc_1_1sha256}{chain::block\_id\_type}}\{\};}
+\DoxyCodeLine{\Hypertarget{finality__status__object_8hpp_source_l00030}00030\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{finality__status__object_8hpp_source_l00031}\mbox{\hyperlink{structsysio_1_1finality__status__object_ab0aa7a62ce0809972ecbe23806b57b6f}{00031}}\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{structsysio_1_1finality__status__object_ab0aa7a62ce0809972ecbe23806b57b6f}{block\_num}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1chain_1_1block__header_a39d57e33ef8d3f6ba59b4c458f0ae375}{chain::block\_header::num\_from\_id}}(\mbox{\hyperlink{structsysio_1_1finality__status__object_a45ea8643d0061aeedda3fd2cb610cd81}{block\_id}});\ \}}
+\DoxyCodeLine{\Hypertarget{finality__status__object_8hpp_source_l00032}00032\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{finality__status__object_8hpp_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{finality__status__object_8hpp_source_l00034}\mbox{\hyperlink{namespacesysio_1_1finality__status}{00034}}\ \ \ \ \textcolor{keyword}{namespace\ }finality\_status\ \{}
+\DoxyCodeLine{\Hypertarget{finality__status__object_8hpp_source_l00035}00035\ \ \ \ \ \ \ \textcolor{keyword}{struct\ }by\_trx\_id;}
+\DoxyCodeLine{\Hypertarget{finality__status__object_8hpp_source_l00036}00036\ \ \ \ \ \ \ \textcolor{keyword}{struct\ }by\_status\_expiry;}
+\DoxyCodeLine{\Hypertarget{finality__status__object_8hpp_source_l00037}00037\ \ \ \ \ \ \ \textcolor{keyword}{struct\ }by\_block\_num;}
+\DoxyCodeLine{\Hypertarget{finality__status__object_8hpp_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{finality__status__object_8hpp_source_l00039}\mbox{\hyperlink{namespacesysio_1_1finality__status_a430cb979326fb1399b7f5f2e70baa63a}{00039}}\ \ \ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{structsysio_1_1chain_1_1block__header}{cbh}}\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1block__header}{chain::block\_header}};}
+\DoxyCodeLine{\Hypertarget{finality__status__object_8hpp_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{finality__status__object_8hpp_source_l00041}\mbox{\hyperlink{namespacesysio_1_1finality__status_aa2f6a378e104dee648942ec55fd40328}{00041}}\ \ \ \ \ \ \ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{namespacesysio_1_1finality__status_aa2f6a378e104dee648942ec55fd40328}{no\_block\_num}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{finality__status__object_8hpp_source_l00042}00042\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{finality__status__object_8hpp_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{finality__status__object_8hpp_source_l00044}\mbox{\hyperlink{namespacesysio_acbbfd2623a8f7c28995f31397b745807}{00044}}\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacesysio_acbbfd2623a8f7c28995f31397b745807}{finality\_status\_multi\_index}}\ =\ boost::multi\_index\_container<}
+\DoxyCodeLine{\Hypertarget{finality__status__object_8hpp_source_l00045}00045\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1finality__status__object}{finality\_status\_object}},}
+\DoxyCodeLine{\Hypertarget{finality__status__object_8hpp_source_l00046}00046\ \ \ \ \ \ \ indexed\_by<}
+\DoxyCodeLine{\Hypertarget{finality__status__object_8hpp_source_l00047}00047\ \ \ \ \ \ \ \ \ \ bmi::hashed\_unique<\ tag<finality\_status::by\_trx\_id>,}
+\DoxyCodeLine{\Hypertarget{finality__status__object_8hpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ member<finality\_status\_object,\ chain::transaction\_id\_type,\ \&finality\_status\_object::trx\_id>\ >,}
+\DoxyCodeLine{\Hypertarget{finality__status__object_8hpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \ ordered\_non\_unique<\ tag<finality\_status::by\_status\_expiry>,\ }
+\DoxyCodeLine{\Hypertarget{finality__status__object_8hpp_source_l00050}00050\ \ \ \ \ \ \ \ \ \ \ \ \ composite\_key<\ \mbox{\hyperlink{structsysio_1_1finality__status__object}{finality\_status\_object}},}
+\DoxyCodeLine{\Hypertarget{finality__status__object_8hpp_source_l00051}00051\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ const\_mem\_fun<finality\_status\_object,\ bool,\ \ \ \ \ \ \ \ \ \ \ \&finality\_status\_object::is\_in\_block>,}
+\DoxyCodeLine{\Hypertarget{finality__status__object_8hpp_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ member<\ finality\_status\_object,\ \ \ \ \ \ \ fc::time\_point,\ \&finality\_status\_object::received\ >}
+\DoxyCodeLine{\Hypertarget{finality__status__object_8hpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \ \ \ >}
+\DoxyCodeLine{\Hypertarget{finality__status__object_8hpp_source_l00054}00054\ \ \ \ \ \ \ \ \ \ >,}
+\DoxyCodeLine{\Hypertarget{finality__status__object_8hpp_source_l00055}00055\ \ \ \ \ \ \ \ \ \ ordered\_non\_unique<\ tag<finality\_status::by\_block\_num>,}
+\DoxyCodeLine{\Hypertarget{finality__status__object_8hpp_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ const\_mem\_fun<finality\_status\_object,\ uint32\_t,\ \&finality\_status\_object::block\_num>\ >}
+\DoxyCodeLine{\Hypertarget{finality__status__object_8hpp_source_l00057}00057\ \ \ \ \ \ \ >}
+\DoxyCodeLine{\Hypertarget{finality__status__object_8hpp_source_l00058}00058\ \ \ \ >;}
+\DoxyCodeLine{\Hypertarget{finality__status__object_8hpp_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{finality__status__object_8hpp_source_l00060}00060\ \}}
+\DoxyCodeLine{\Hypertarget{finality__status__object_8hpp_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{finality__status__object_8hpp_source_l00062}00062\ \mbox{\hyperlink{reflect_8hpp_a2ace850e636b1ca0b18fe3177e413d99}{FC\_REFLECT}}(\ \mbox{\hyperlink{structsysio_1_1finality__status__object}{sysio::finality\_status\_object}},\ (trx\_id)(trx\_expiry)(\mbox{\hyperlink{sip__client_8cpp_a6dbe87354d47906dcbb42c7ba634b102}{received}})(block\_id)(block\_timestamp)(forked\_out)\ )}
+
+\end{DoxyCode}

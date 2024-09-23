@@ -1,0 +1,295 @@
+\chapter{DOM}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2dom_8zh-cn}{}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2dom_8zh-cn}\index{DOM@{DOM}}
+文档对象模型（\+Document Object Model, DOM）是一种罝于内存中的 JSON 表示方式，以供查询及操作。我们己于 \doxylink{tutorial_8zh-cn_8md}{教程} 中介绍了 DOM 的基本用法，本节将讲述一些细节及高级用法。\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2dom_8zh-cn_Template}{}\doxysection{\texorpdfstring{Template}{Template}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2dom_8zh-cn_Template}
+教程中使用了 {\ttfamily Value} 和 {\ttfamily Document} 类型。与 {\ttfamily std\+::string} 相似，这些类型其实是两个模板类的 {\ttfamily typedef}：
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacerapidjson}{rapidjson}}\ \{}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ Encoding,\ \textcolor{keyword}{typename}\ Allocator\ =\ MemoryPoolAllocator<>\ >}
+\DoxyCodeLine{\textcolor{keyword}{class\ }\mbox{\hyperlink{class_generic_value}{GenericValue}}\ \{}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ ...}}
+\DoxyCodeLine{\};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ Encoding,\ \textcolor{keyword}{typename}\ Allocator\ =\ MemoryPoolAllocator<>\ >}
+\DoxyCodeLine{\textcolor{keyword}{class\ }\mbox{\hyperlink{class_generic_document}{GenericDocument}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{class_generic_value}{GenericValue}}<Encoding,\ Allocator>\ \{}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ ...}}
+\DoxyCodeLine{\};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{typedef}\ \mbox{\hyperlink{class_generic_value}{GenericValue<UTF8<>}}\ >\ \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}};}
+\DoxyCodeLine{\textcolor{keyword}{typedef}\ \mbox{\hyperlink{class_generic_document}{GenericDocument<UTF8<>}}\ >\ \mbox{\hyperlink{document_8h_ac6ea5b168e3fe8c7fa532450fc9391f7}{Document}};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\}\ \textcolor{comment}{//\ namespace\ rapidjson}}
+
+\end{DoxyCode}
+
+
+使用者可以自定义这些模板参数。\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2dom_8zh-cn_Encoding}{}\doxysubsection{\texorpdfstring{Encoding}{Encoding}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2dom_8zh-cn_Encoding}
+{\ttfamily Encoding} 参数指明在内存中的 JSON String 使用哪种编码。可行的选项有 {\ttfamily \doxylink{struct_u_t_f8}{UTF8}}、{\ttfamily \doxylink{struct_u_t_f16}{UTF16}}、{\ttfamily \doxylink{struct_u_t_f32}{UTF32}}。要注意这 3 个类型其实也是模板类。{\ttfamily \doxylink{struct_u_t_f8}{UTF8}\texorpdfstring{$<$}{<}\texorpdfstring{$>$}{>}} 等同 {\ttfamily \doxylink{struct_u_t_f8}{UTF8}\texorpdfstring{$<$}{<}char\texorpdfstring{$>$}{>}}，这代表它使用 {\ttfamily char} 来存储字符串。更多细节可以参考 \doxylink{encoding_8zh-cn_8md}{编码}。
+
+这里是一个例子。假设一个 Windows 应用软件希望查询存储于 JSON 中的本地化字符串。\+Windows 中含 Unicode 的函数使用 UTF-\/16（宽字符）编码。无论 JSON 文件使用哪种编码，我们都可以把字符串以 UTF-\/16 形式存储在内存。
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacerapidjson}{rapidjson}};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{typedef}\ \mbox{\hyperlink{class_generic_document}{GenericDocument<UTF16<>}}\ >\ WDocument;}
+\DoxyCodeLine{\textcolor{keyword}{typedef}\ \mbox{\hyperlink{class_generic_value}{GenericValue<UTF16<>}}\ >\ WValue;}
+\DoxyCodeLine{}
+\DoxyCodeLine{FILE*\ fp\ =\ fopen(\textcolor{stringliteral}{"{}localization.json"{}},\ \textcolor{stringliteral}{"{}rb"{}});\ \textcolor{comment}{//\ 非\ Windows\ 平台使用\ "{}r"{}}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keywordtype}{char}\ readBuffer[256];}
+\DoxyCodeLine{\mbox{\hyperlink{class_file_read_stream}{FileReadStream}}\ bis(fp,\ readBuffer,\ \textcolor{keyword}{sizeof}(readBuffer));}
+\DoxyCodeLine{}
+\DoxyCodeLine{\mbox{\hyperlink{class_auto_u_t_f_input_stream}{AutoUTFInputStream<unsigned,\ FileReadStream>}}\ eis(bis);\ \ \textcolor{comment}{//\ 包装\ bis\ 成\ eis}}
+\DoxyCodeLine{}
+\DoxyCodeLine{WDocument\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}};}
+\DoxyCodeLine{\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.ParseStream<0,\ \mbox{\hyperlink{struct_auto_u_t_f}{AutoUTF<unsigned>}}\ >(eis);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{const}\ WValue\ locale(L\textcolor{stringliteral}{"{}ja"{}});\ \textcolor{comment}{//\ Japanese}}
+\DoxyCodeLine{}
+\DoxyCodeLine{MessageBoxW(hWnd,\ d[locale].GetString(),\ L\textcolor{stringliteral}{"{}Test"{}},\ MB\_OK);}
+
+\end{DoxyCode}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2dom_8zh-cn_Allocator}{}\doxysubsection{\texorpdfstring{Allocator}{Allocator}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2dom_8zh-cn_Allocator}
+{\ttfamily Allocator} 定义当 {\ttfamily Document}/{\ttfamily Value} 分配或释放内存时使用那个分配类。{\ttfamily Document} 拥有或引用到一个 {\ttfamily Allocator} 实例。而为了节省内存，{\ttfamily Value} 没有这么做。
+
+{\ttfamily \doxylink{class_generic_document}{Generic\+Document}} 的缺省分配器是 {\ttfamily \doxylink{class_memory_pool_allocator}{Memory\+Pool\+Allocator}}。此分配器实际上会顺序地分配内存，并且不能逐一释放。当要解析一个 JSON 并生成 DOM，这种分配器是非常合适的。
+
+Rapid\+JSON 还提供另一个分配器 {\ttfamily \doxylink{class_crt_allocator}{Crt\+Allocator}}，当中 CRT 是 C 运行库（C Run\+Time library）的缩写。此分配器简单地读用标准的 {\ttfamily malloc()}/{\ttfamily realloc()}/{\ttfamily free()}。当我们需要许多增减操作，这种分配器会更为适合。然而这种分配器远远比 {\ttfamily \doxylink{class_memory_pool_allocator}{Memory\+Pool\+Allocator}} 低效。\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2dom_8zh-cn_Parsing}{}\doxysection{\texorpdfstring{Parsing}{Parsing}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2dom_8zh-cn_Parsing}
+{\ttfamily Document} 提供几个解析函数。以下的 (1) 是根本的函数，其他都是调用 (1) 的协助函数。
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacerapidjson}{rapidjson}};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ (1)\ 根本}}
+\DoxyCodeLine{\textcolor{keyword}{template}\ <\textcolor{keywordtype}{unsigned}\ parseFlags,\ \textcolor{keyword}{typename}\ SourceEncoding,\ \textcolor{keyword}{typename}\ InputStream>}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_document}{GenericDocument}}\&\ \mbox{\hyperlink{class_generic_document_a7bc1827a7ab04de4789fe46237f0e921}{GenericDocument::ParseStream}}(InputStream\&\ is);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ (2)\ 使用流的编码}}
+\DoxyCodeLine{\textcolor{keyword}{template}\ <\textcolor{keywordtype}{unsigned}\ parseFlags,\ \textcolor{keyword}{typename}\ InputStream>}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_document}{GenericDocument}}\&\ \mbox{\hyperlink{class_generic_document_a7bc1827a7ab04de4789fe46237f0e921}{GenericDocument::ParseStream}}(InputStream\&\ is);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ (3)\ 使用缺省标志}}
+\DoxyCodeLine{\textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ InputStream>}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_document}{GenericDocument}}\&\ \mbox{\hyperlink{class_generic_document_a7bc1827a7ab04de4789fe46237f0e921}{GenericDocument::ParseStream}}(InputStream\&\ is);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ (4)\ 原位解析}}
+\DoxyCodeLine{\textcolor{keyword}{template}\ <\textcolor{keywordtype}{unsigned}\ parseFlags>}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_document}{GenericDocument}}\&\ \mbox{\hyperlink{class_generic_document_a13f68b1896a24eea4cdbc03a3916225f}{GenericDocument::ParseInsitu}}(\mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}*\ str);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ (5)\ 原位解析，使用缺省标志}}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_document}{GenericDocument}}\&\ \mbox{\hyperlink{class_generic_document_a13f68b1896a24eea4cdbc03a3916225f}{GenericDocument::ParseInsitu}}(\mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}*\ str);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ (6)\ 正常解析一个字符串}}
+\DoxyCodeLine{\textcolor{keyword}{template}\ <\textcolor{keywordtype}{unsigned}\ parseFlags,\ \textcolor{keyword}{typename}\ SourceEncoding>}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_document}{GenericDocument}}\&\ \mbox{\hyperlink{class_generic_document_a901db1678f99a1b550003eed75bc380a}{GenericDocument::Parse}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}*\ str);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ (7)\ 正常解析一个字符串，使用\ Document\ 的编码}}
+\DoxyCodeLine{\textcolor{keyword}{template}\ <\textcolor{keywordtype}{unsigned}\ parseFlags>}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_document}{GenericDocument}}\&\ \mbox{\hyperlink{class_generic_document_a901db1678f99a1b550003eed75bc380a}{GenericDocument::Parse}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}*\ str);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ (8)\ 正常解析一个字符串，使用缺省标志}}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_document}{GenericDocument}}\&\ \mbox{\hyperlink{class_generic_document_a901db1678f99a1b550003eed75bc380a}{GenericDocument::Parse}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}*\ str);}
+
+\end{DoxyCode}
+
+
+\doxylink{tutorial_8zh-cn_8md}{教程} 中的例使用 (8) 去正常解析字符串。而 \doxylink{stream_8zh-cn_8md}{流} 的例子使用前 3 个函数。我们将稍后介绍原位（\texorpdfstring{$\ast$}{*}\+In situ\texorpdfstring{$\ast$}{*}） 解析。
+
+{\ttfamily parse\+Flags} 是以下位标置的组合：
+
+\tabulinesep=1mm
+\begin{longtabu}spread 0pt [c]{*{2}{|X[-1]}|}
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 解析位标志   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 意义    }\\\cline{1-2}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 解析位标志   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 意义    }\\\cline{1-2}
+\endhead
+{\ttfamily k\+Parse\+No\+Flags}   &没有任何标志。    \\\cline{1-2}
+{\ttfamily k\+Parse\+Default\+Flags}   &缺省的解析选项。它等于 {\ttfamily RAPIDJSON\+\_\+\+PARSE\+\_\+\+DEFAULT\+\_\+\+FLAGS} 宏，此宏定义为 {\ttfamily k\+Parse\+No\+Flags}。    \\\cline{1-2}
+{\ttfamily k\+Parse\+Insitu\+Flag}   &原位（破坏性）解析。    \\\cline{1-2}
+{\ttfamily k\+Parse\+Validate\+Encoding\+Flag}   &校验 JSON 字符串的编码。    \\\cline{1-2}
+{\ttfamily k\+Parse\+Iterative\+Flag}   &迭代式（调用堆栈大小为常数复杂度）解析。    \\\cline{1-2}
+{\ttfamily k\+Parse\+Stop\+When\+Done\+Flag}   &当从流解析了一个完整的 JSON 根节点之后，停止继续处理余下的流。当使用了此标志，解析器便不会产生 {\ttfamily k\+Parse\+Error\+Document\+Root\+Not\+Singular} 错误。可使用本标志去解析同一个流里的多个 JSON。    \\\cline{1-2}
+{\ttfamily k\+Parse\+Full\+Precision\+Flag}   &使用完整的精确度去解析数字（较慢）。如不设置此标节，则会使用正常的精确度（较快）。正常精确度会有最多 3 个 \href{http://en.wikipedia.org/wiki/Unit_in_the_last_place}{\texttt{ ULP}} 的误差。    \\\cline{1-2}
+{\ttfamily k\+Parse\+Comments\+Flag}   &容许单行 {\ttfamily // ...} 及多行 {\ttfamily /\texorpdfstring{$\ast$}{*} ... \texorpdfstring{$\ast$}{*}/} 注释（放宽的 JSON 语法）。    \\\cline{1-2}
+{\ttfamily k\+Parse\+Numbers\+As\+Strings\+Flag}   &把数字类型解析成字符串。    \\\cline{1-2}
+{\ttfamily k\+Parse\+Trailing\+Commas\+Flag}   &容许在对象和数组结束前含有逗号（放宽的 JSON 语法）。    \\\cline{1-2}
+{\ttfamily k\+Parse\+Nan\+And\+Inf\+Flag}   &容许 {\ttfamily NaN}、{\ttfamily Inf}、{\ttfamily Infinity}、{\ttfamily -\/Inf} 及 {\ttfamily -\/Infinity} 作为 {\ttfamily double} 值（放宽的 JSON 语法）。   \\\cline{1-2}
+\end{longtabu}
+
+
+由于使用了非类型模板参数，而不是函数参数，\+C++ 编译器能为个别组合生成代码，以改善性能及减少代码尺寸（当只用单种特化）。缺点是需要在编译期决定标志。
+
+{\ttfamily Source\+Encoding} 参数定义流使用了什么编码。这与 {\ttfamily Document} 的 {\ttfamily Encoding} 不相同。细节可参考 \doxysectlink{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2dom_8zh-cn_TranscodingAndValidation}{转码和校验}{2} 一节。
+
+此外 {\ttfamily Input\+Stream} 是输入流的类型。\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2dom_8zh-cn_ParseError}{}\doxysubsection{\texorpdfstring{Parse Error}{Parse Error}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2dom_8zh-cn_ParseError}
+当解析过程顺利完成，{\ttfamily Document} 便会含有解析结果。当过程出现错误，原来的 DOM 会\texorpdfstring{$\ast$}{*}维持不变\texorpdfstring{$\ast$}{*}。可使用 {\ttfamily bool Has\+Parse\+Error()}、{\ttfamily Parse\+Error\+Code Get\+Parse\+Error()} 及 {\ttfamily size\+\_\+t Get\+Error\+Offset()} 获取解析的错误状态。
+
+\tabulinesep=1mm
+\begin{longtabu}spread 0pt [c]{*{2}{|X[-1]}|}
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 解析错误代号   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 描述    }\\\cline{1-2}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 解析错误代号   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 描述    }\\\cline{1-2}
+\endhead
+{\ttfamily k\+Parse\+Error\+None}   &无错误。    \\\cline{1-2}
+{\ttfamily k\+Parse\+Error\+Document\+Empty}   &文档是空的。    \\\cline{1-2}
+{\ttfamily k\+Parse\+Error\+Document\+Root\+Not\+Singular}   &文档的根后面不能有其它值。    \\\cline{1-2}
+{\ttfamily k\+Parse\+Error\+Value\+Invalid}   &不合法的值。    \\\cline{1-2}
+{\ttfamily k\+Parse\+Error\+Object\+Miss\+Name}   &Object 成员缺少名字。    \\\cline{1-2}
+{\ttfamily k\+Parse\+Error\+Object\+Miss\+Colon}   &Object 成员名字后缺少冒号。    \\\cline{1-2}
+{\ttfamily k\+Parse\+Error\+Object\+Miss\+Comma\+Or\+Curly\+Bracket}   &Object 成员后缺少逗号或 {\ttfamily \}}。    \\\cline{1-2}
+{\ttfamily k\+Parse\+Error\+Array\+Miss\+Comma\+Or\+Square\+Bracket}   &Array 元素后缺少逗号或 {\ttfamily \mbox{]}} 。    \\\cline{1-2}
+{\ttfamily k\+Parse\+Error\+String\+Unicode\+Escape\+Invalid\+Hex}   &String 中的 {\ttfamily \textbackslash{}\textbackslash{}u} 转义符后含非十六进位数字。    \\\cline{1-2}
+{\ttfamily k\+Parse\+Error\+String\+Unicode\+Surrogate\+Invalid}   &String 中的代理对（surrogate pair）不合法。    \\\cline{1-2}
+{\ttfamily k\+Parse\+Error\+String\+Escape\+Invalid}   &String 含非法转义字符。    \\\cline{1-2}
+{\ttfamily k\+Parse\+Error\+String\+Miss\+Quotation\+Mark}   &String 缺少关闭引号。    \\\cline{1-2}
+{\ttfamily k\+Parse\+Error\+String\+Invalid\+Encoding}   &String 含非法编码。    \\\cline{1-2}
+{\ttfamily k\+Parse\+Error\+Number\+Too\+Big}   &Number 的值太大，不能存储于 {\ttfamily double}。    \\\cline{1-2}
+{\ttfamily k\+Parse\+Error\+Number\+Miss\+Fraction}   &Number 缺少了小数部分。    \\\cline{1-2}
+{\ttfamily k\+Parse\+Error\+Number\+Miss\+Exponent}   &Number 缺少了指数。   \\\cline{1-2}
+\end{longtabu}
+
+
+错误的偏移量定义为从流开始至错误处的字符数量。目前 Rapid\+JSON 不记录错误行号。
+
+要取得错误讯息，\+Rapid\+JSON 在 {\ttfamily \doxylink{en_8h}{rapidjson/error/en.\+h}} 中提供了英文错误讯息。使用者可以修改它用于其他语言环境，或使用一个自定义的本地化系统。
+
+以下是一个处理错误的例子。
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{document_8h}{rapidjson/document.h}}"{}}}
+\DoxyCodeLine{\textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{en_8h}{rapidjson/error/en.h}}"{}}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ ...}}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_document}{Document}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}};}
+\DoxyCodeLine{\textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.Parse(json).HasParseError())\ \{}
+\DoxyCodeLine{\ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}\(\backslash\)nError(offset\ \%u):\ \%s\(\backslash\)n"{}},\ }
+\DoxyCodeLine{\ \ \ \ \ \ \ \ (\textcolor{keywordtype}{unsigned})\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.GetErrorOffset(),}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_ga28835eb93d2c3c07bbea13515eb31415}{GetParseError\_En}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.GetParseErrorCode()));}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ ...}}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2dom_8zh-cn_InSituParsing}{}\doxysubsection{\texorpdfstring{In Situ Parsing}{In Situ Parsing}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2dom_8zh-cn_InSituParsing}
+根据 \href{http://en.wikipedia.org/wiki/In_situ}{\texttt{ 维基百科}}\+:
+
+\begin{quote}
+{\itshape In situ} ... is a Latin phrase that translates literally to "{}on site"{} or "{}in position"{}. It means "{}locally"{}, "{}on site"{}, "{}on the premises"{} or "{}in place"{} to describe an event where it takes place, and is used in many different contexts. ... (In computer science) An algorithm is said to be an in situ algorithm, or in-\/place algorithm, if the extra amount of memory required to execute the algorithm is O(1), that is, does not exceed a constant no matter how large the input. For example, heapsort is an in situ sorting algorithm. \end{quote}
+\begin{quote}
+翻译：\texorpdfstring{$\ast$}{*}\+In situ\texorpdfstring{$\ast$}{*}……是一个拉丁文片语，字面上的意思是指「现场」、「在位置」。在许多不同语境中，它描述一个事件发生的位置，意指「本地」、「现场」、「在处所」、「就位」。 …… （在计算机科学中）一个算法若称为原位算法，或在位算法，是指执行该算法所需的额外内存空间是 O(1) 的，换句话说，无论输入大小都只需要常数空间。例如，堆排序是一个原位排序算法。 \end{quote}
+在正常的解析过程中，对 JSON string 解码并复制至其他缓冲区是一个很大的开销。原位解析（\texorpdfstring{$\ast$}{*}in situ\texorpdfstring{$\ast$}{*} parsing）把这些 JSON string 直接解码于它原来存储的地方。由于解码后的 string 长度总是短于或等于原来储存于 JSON 的 string，所以这是可行的。在这个语境下，对 JSON string 进行解码是指处理转义符，如 {\ttfamily "{}\textbackslash{}n"{}}、{\ttfamily "{}\textbackslash{}u1234"{}} 等，以及在 string 末端加入空终止符号 (`'\textbackslash{}0\textquotesingle{}\`{})。
+
+以下的图比较正常及原位解析。\+JSON string 值包含指向解码后的字符串。
+
+
+
+在正常解析中，解码后的字符串被复制至全新分配的缓冲区中。{\ttfamily "{}\textbackslash{}\textbackslash{}n"{}}（2 个字符）被解码成 {\ttfamily "{}\textbackslash{}n"{}}（1 个字符）。{\ttfamily "{}\textbackslash{}\textbackslash{}u0073"{}}（6 个字符）被解码成 {\ttfamily "{}s"{}}（1 个字符）。
+
+
+
+原位解析直接修改了原来的 JSON。图中高亮了被更新的字符。若 JSON string 不含转义符，例如 {\ttfamily "{}msg"{}}，那么解析过程仅仅是以空字符代替结束双引号。
+
+由于原位解析修改了输入，其解析 API 需要 {\ttfamily char\texorpdfstring{$\ast$}{*}} 而非 {\ttfamily const char\texorpdfstring{$\ast$}{*}}。
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{comment}{//\ 把整个文件读入\ buffer}}
+\DoxyCodeLine{FILE*\ fp\ =\ fopen(\textcolor{stringliteral}{"{}test.json"{}},\ \textcolor{stringliteral}{"{}r"{}});}
+\DoxyCodeLine{fseek(fp,\ 0,\ SEEK\_END);}
+\DoxyCodeLine{\textcolor{keywordtype}{size\_t}\ filesize\ =\ (size\_t)ftell(fp);}
+\DoxyCodeLine{fseek(fp,\ 0,\ SEEK\_SET);}
+\DoxyCodeLine{\textcolor{keywordtype}{char}*\ buffer\ =\ (\textcolor{keywordtype}{char}*)malloc(filesize\ +\ 1);}
+\DoxyCodeLine{\textcolor{keywordtype}{size\_t}\ readLength\ =\ fread(buffer,\ 1,\ filesize,\ fp);}
+\DoxyCodeLine{buffer[readLength]\ =\ \textcolor{charliteral}{'\(\backslash\)0'};}
+\DoxyCodeLine{fclose(fp);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ 原位解析\ buffer\ 至\ d，buffer\ 内容会被修改。}}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_document}{Document}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}};}
+\DoxyCodeLine{\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.ParseInsitu(buffer);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ 在此查询、修改\ DOM……}}
+\DoxyCodeLine{}
+\DoxyCodeLine{free(buffer);}
+\DoxyCodeLine{\textcolor{comment}{//\ 注意：在这个位置，d\ 可能含有指向已被释放的\ buffer\ 的悬空指针}}
+
+\end{DoxyCode}
+
+
+JSON string 会被打上 const-\/string 的标志。但它们可能并非真正的「常数」。它的生命周期取决于存储 JSON 的缓冲区。
+
+原位解析把分配开销及内存复制减至最小。通常这样做能改善缓存一致性，而这对现代计算机来说是一个重要的性能因素。
+
+原位解析有以下限制：
+
+
+\begin{DoxyEnumerate}
+\item 整个 JSON 须存储在内存之中。
+\item 流的来源缓码与文档的目标编码必须相同。
+\item 需要保留缓冲区，直至文档不再被使用。
+\item 若 DOM 需要在解析后被长期使用，而 DOM 内只有很少 JSON string，保留缓冲区可能造成内存浪费。
+\end{DoxyEnumerate}
+
+原位解析最适合用于短期的、用完即弃的 JSON。实际应用中，这些场合是非常普遍的，例如反序列化 JSON 至 C++ 对象、处理以 JSON 表示的 web 请求等。\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2dom_8zh-cn_TranscodingAndValidation}{}\doxysubsection{\texorpdfstring{Transcoding and Validation}{Transcoding and Validation}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2dom_8zh-cn_TranscodingAndValidation}
+Rapid\+JSON 内部支持不同 Unicode 格式（正式的术语是 UCS 变换格式）间的转换。在 DOM 解析时，流的来源编码与 DOM 的编码可以不同。例如，来源流可能含有 UTF-\/8 的 JSON，而 DOM 则使用 UTF-\/16 编码。在 \doxylink{stream_8zh-cn_8md}{Encoded\+Input\+Stream} 一节里有一个例子。
+
+当从 DOM 输出一个 JSON 至输出流之时，也可以使用转码功能。在 \doxylink{stream_8zh-cn_8md}{Encoded\+Output\+Stream} 一节里有一个例子。
+
+在转码过程中，会把来源 string 解码成 Unicode 码点，然后把码点编码成目标格式。在解码时，它会校验来源 string 的字节序列是否合法。若遇上非合法序列，解析器会停止并返回 {\ttfamily k\+Parse\+Error\+String\+Invalid\+Encoding} 错误。
+
+当来源编码与 DOM 的编码相同，解析器缺省地 \texorpdfstring{$\ast$}{*} 不会 \texorpdfstring{$\ast$}{*} 校验序列。使用者可开启 {\ttfamily k\+Parse\+Validate\+Encoding\+Flag} 去强制校验。\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2dom_8zh-cn_Techniques}{}\doxysection{\texorpdfstring{Techniques}{Techniques}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2dom_8zh-cn_Techniques}
+这里讨论一些 DOM API 的使用技巧。
+
+\doxysubsection*{把 DOM 作为 SAX 事件发表者}
+
+在 Rapid\+JSON 中，利用 {\ttfamily \doxylink{class_writer}{Writer}} 把 DOM 生成 JSON 的做法，看来有点奇怪。
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{comment}{//\ ...}}
+\DoxyCodeLine{\mbox{\hyperlink{class_writer}{Writer<StringBuffer>}}\ writer(buffer);}
+\DoxyCodeLine{\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.Accept(writer);}
+
+\end{DoxyCode}
+
+
+实际上，{\ttfamily Value\+::\+Accept()} 是负责发布该值相关的 SAX 事件至处理器的。通过这个设计，{\ttfamily Value} 及 {\ttfamily \doxylink{class_writer}{Writer}} 解除了偶合。{\ttfamily Value} 可生成 SAX 事件，而 {\ttfamily \doxylink{class_writer}{Writer}} 则可以处理这些事件。
+
+使用者可以创建自定义的处理器，去把 DOM 转换成其它格式。例如，一个把 DOM 转换成 XML 的处理器。
+
+要知道更多关于 SAX 事件与处理器，可参阅 \doxylink{sax_8zh-cn_8md}{SAX}。\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2dom_8zh-cn_UserBuffer}{}\doxysubsection{\texorpdfstring{User Buffer}{User Buffer}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2dom_8zh-cn_UserBuffer}
+许多应用软件可能需要尽量减少内存分配。
+
+{\ttfamily \doxylink{class_memory_pool_allocator}{Memory\+Pool\+Allocator}} 可以帮助这方面，它容许使用者提供一个缓冲区。该缓冲区可能置于程序堆栈，或是一个静态分配的「草稿缓冲区（scratch buffer）」（一个静态／全局的数组），用于储存临时数据。
+
+{\ttfamily \doxylink{class_memory_pool_allocator}{Memory\+Pool\+Allocator}} 会先用使用者缓冲区去解决分配请求。当使用者缓冲区用完，就会从基础分配器（缺省为 {\ttfamily \doxylink{class_crt_allocator}{Crt\+Allocator}}）分配一块内存。
+
+以下是使用堆栈内存的例子，第一个分配器用于存储值，第二个用于解析时的临时缓冲。
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{typedef}\ \mbox{\hyperlink{class_generic_document}{GenericDocument<UTF8<>}},\ \mbox{\hyperlink{class_memory_pool_allocator}{MemoryPoolAllocator<>}},\ \mbox{\hyperlink{class_memory_pool_allocator}{MemoryPoolAllocator<>}}>\ DocumentType;}
+\DoxyCodeLine{\textcolor{keywordtype}{char}\ valueBuffer[4096];}
+\DoxyCodeLine{\textcolor{keywordtype}{char}\ parseBuffer[1024];}
+\DoxyCodeLine{\mbox{\hyperlink{class_memory_pool_allocator}{MemoryPoolAllocator<>}}\ valueAllocator(valueBuffer,\ \textcolor{keyword}{sizeof}(valueBuffer));}
+\DoxyCodeLine{\mbox{\hyperlink{class_memory_pool_allocator}{MemoryPoolAllocator<>}}\ parseAllocator(parseBuffer,\ \textcolor{keyword}{sizeof}(parseBuffer));}
+\DoxyCodeLine{DocumentType\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}(\&valueAllocator,\ \textcolor{keyword}{sizeof}(parseBuffer),\ \&parseAllocator);}
+\DoxyCodeLine{\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.Parse(json);}
+
+\end{DoxyCode}
+
+
+若解析时分配总量少于 4096+1024 字节时，这段代码不会造成任何堆内存分配（经 {\ttfamily new} 或 {\ttfamily malloc()}）。
+
+使用者可以通过 {\ttfamily \doxylink{class_memory_pool_allocator_ae7fcf0341c13e899cf488bc7c8949956}{Memory\+Pool\+Allocator\+::\+Size()}} 查询当前已分的内存大小。那么使用者可以拟定使用者缓冲区的合适大小。 

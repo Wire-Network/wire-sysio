@@ -1,0 +1,61 @@
+\doxysection{wasm\+\_\+config.\+hpp}
+\hypertarget{wasm__config_8hpp_source}{}\label{wasm__config_8hpp_source}\index{libraries/chain/include/sysio/chain/wasm\_config.hpp@{libraries/chain/include/sysio/chain/wasm\_config.hpp}}
+\mbox{\hyperlink{wasm__config_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{wasm__config_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{wasm__config_8hpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{wasm__config_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{wasm__sysio__constraints_8hpp}{sysio/chain/wasm\_sysio\_constraints.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{wasm__config_8hpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <cstdint>}}
+\DoxyCodeLine{\Hypertarget{wasm__config_8hpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{reflect_8hpp}{fc/reflect/reflect.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{wasm__config_8hpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{wasm__config_8hpp_source_l00007}00007\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{\ \textcolor{keyword}{namespace\ }chain\ \{}
+\DoxyCodeLine{\Hypertarget{wasm__config_8hpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{wasm__config_8hpp_source_l00009}\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config}{00009}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config}{wasm\_config}}\ \{}
+\DoxyCodeLine{\Hypertarget{wasm__config_8hpp_source_l00010}\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_aac3373d413a918e87214821a2d46c6fd}{00010}}\ \ \ \ std::uint32\_t\ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_aac3373d413a918e87214821a2d46c6fd}{max\_mutable\_global\_bytes}};}
+\DoxyCodeLine{\Hypertarget{wasm__config_8hpp_source_l00011}\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_a20a5ed65c27d5b99fb8f34faa4ad1ec7}{00011}}\ \ \ \ std::uint32\_t\ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_a20a5ed65c27d5b99fb8f34faa4ad1ec7}{max\_table\_elements}};}
+\DoxyCodeLine{\Hypertarget{wasm__config_8hpp_source_l00012}\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_a40cd48e3034b328fe4f9694f9d49b8f4}{00012}}\ \ \ \ std::uint32\_t\ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_a40cd48e3034b328fe4f9694f9d49b8f4}{max\_section\_elements}};}
+\DoxyCodeLine{\Hypertarget{wasm__config_8hpp_source_l00013}\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_a10f26fadecb0acd707c88858931737f3}{00013}}\ \ \ \ std::uint32\_t\ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_a10f26fadecb0acd707c88858931737f3}{max\_linear\_memory\_init}};}
+\DoxyCodeLine{\Hypertarget{wasm__config_8hpp_source_l00014}\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_a26926533af2db9739612fcc42268b6b7}{00014}}\ \ \ \ std::uint32\_t\ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_a26926533af2db9739612fcc42268b6b7}{max\_func\_local\_bytes}};}
+\DoxyCodeLine{\Hypertarget{wasm__config_8hpp_source_l00015}\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_a76f94e2c8b5e6a17e8d6ccc3be4eeadf}{00015}}\ \ \ \ std::uint32\_t\ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_a76f94e2c8b5e6a17e8d6ccc3be4eeadf}{max\_nested\_structures}};}
+\DoxyCodeLine{\Hypertarget{wasm__config_8hpp_source_l00016}\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_a0bab877f4f8877793f2fe1079fac6b44}{00016}}\ \ \ \ std::uint32\_t\ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_a0bab877f4f8877793f2fe1079fac6b44}{max\_symbol\_bytes}};}
+\DoxyCodeLine{\Hypertarget{wasm__config_8hpp_source_l00017}\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_a9babd37977ef9c65c151773743dda59a}{00017}}\ \ \ \ std::uint32\_t\ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_a9babd37977ef9c65c151773743dda59a}{max\_module\_bytes}};}
+\DoxyCodeLine{\Hypertarget{wasm__config_8hpp_source_l00018}\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_af87fa79dbb232ad9512984b68c5068e2}{00018}}\ \ \ \ std::uint32\_t\ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_af87fa79dbb232ad9512984b68c5068e2}{max\_code\_bytes}};}
+\DoxyCodeLine{\Hypertarget{wasm__config_8hpp_source_l00019}\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_a3bf7b3aba9d090887ff190d23c7b6510}{00019}}\ \ \ \ std::uint32\_t\ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_a3bf7b3aba9d090887ff190d23c7b6510}{max\_pages}};}
+\DoxyCodeLine{\Hypertarget{wasm__config_8hpp_source_l00020}\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_a6b45f20640aff5bd336e8f2b70c8f8c1}{00020}}\ \ \ \ std::uint32\_t\ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_a6b45f20640aff5bd336e8f2b70c8f8c1}{max\_call\_depth}};}
+\DoxyCodeLine{\Hypertarget{wasm__config_8hpp_source_l00021}00021\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_ab0237cb4af348d20ab9b509c6e19e83d}{validate}}()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{wasm__config_8hpp_source_l00022}00022\ \};}
+\DoxyCodeLine{\Hypertarget{wasm__config_8hpp_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{wasm__config_8hpp_source_l00024}\mbox{\hyperlink{namespacesysio_1_1chain_abfd0064bf1108214e28248e8d521cbf2}{00024}}\ \textcolor{keyword}{inline}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacesysio_1_1chain_a0fc6c75576d3bf4645b51dfd6855890c}{operator==}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config}{wasm\_config}}\&\ lhs,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config}{wasm\_config}}\&\ rhs)\ \{}
+\DoxyCodeLine{\Hypertarget{wasm__config_8hpp_source_l00025}00025\ \ \ \ \textcolor{keywordflow}{return}\ lhs.\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_aac3373d413a918e87214821a2d46c6fd}{max\_mutable\_global\_bytes}}\ ==\ rhs.\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_aac3373d413a918e87214821a2d46c6fd}{max\_mutable\_global\_bytes}}\ \&\&}
+\DoxyCodeLine{\Hypertarget{wasm__config_8hpp_source_l00026}00026\ \ \ \ \ \ lhs.\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_a20a5ed65c27d5b99fb8f34faa4ad1ec7}{max\_table\_elements}}\ ==\ rhs.\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_a20a5ed65c27d5b99fb8f34faa4ad1ec7}{max\_table\_elements}}\ \&\&}
+\DoxyCodeLine{\Hypertarget{wasm__config_8hpp_source_l00027}00027\ \ \ \ \ \ lhs.\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_a40cd48e3034b328fe4f9694f9d49b8f4}{max\_section\_elements}}\ ==\ rhs.\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_a40cd48e3034b328fe4f9694f9d49b8f4}{max\_section\_elements}}\ \&\&}
+\DoxyCodeLine{\Hypertarget{wasm__config_8hpp_source_l00028}00028\ \ \ \ \ \ lhs.\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_a10f26fadecb0acd707c88858931737f3}{max\_linear\_memory\_init}}\ ==\ rhs.\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_a10f26fadecb0acd707c88858931737f3}{max\_linear\_memory\_init}}\ \&\&}
+\DoxyCodeLine{\Hypertarget{wasm__config_8hpp_source_l00029}00029\ \ \ \ \ \ lhs.\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_a26926533af2db9739612fcc42268b6b7}{max\_func\_local\_bytes}}\ ==\ rhs.\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_a26926533af2db9739612fcc42268b6b7}{max\_func\_local\_bytes}}\ \&\&}
+\DoxyCodeLine{\Hypertarget{wasm__config_8hpp_source_l00030}00030\ \ \ \ \ \ lhs.\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_a76f94e2c8b5e6a17e8d6ccc3be4eeadf}{max\_nested\_structures}}\ ==\ rhs.\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_a76f94e2c8b5e6a17e8d6ccc3be4eeadf}{max\_nested\_structures}}\ \&\&}
+\DoxyCodeLine{\Hypertarget{wasm__config_8hpp_source_l00031}00031\ \ \ \ \ \ lhs.\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_a0bab877f4f8877793f2fe1079fac6b44}{max\_symbol\_bytes}}\ ==\ rhs.\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_a0bab877f4f8877793f2fe1079fac6b44}{max\_symbol\_bytes}}\ \&\&}
+\DoxyCodeLine{\Hypertarget{wasm__config_8hpp_source_l00032}00032\ \ \ \ \ \ lhs.\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_a9babd37977ef9c65c151773743dda59a}{max\_module\_bytes}}\ ==\ rhs.\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_a9babd37977ef9c65c151773743dda59a}{max\_module\_bytes}}\ \&\&}
+\DoxyCodeLine{\Hypertarget{wasm__config_8hpp_source_l00033}00033\ \ \ \ \ \ lhs.\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_af87fa79dbb232ad9512984b68c5068e2}{max\_code\_bytes}}\ ==\ rhs.\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_af87fa79dbb232ad9512984b68c5068e2}{max\_code\_bytes}}\ \&\&}
+\DoxyCodeLine{\Hypertarget{wasm__config_8hpp_source_l00034}00034\ \ \ \ \ \ lhs.\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_a3bf7b3aba9d090887ff190d23c7b6510}{max\_pages}}\ ==\ rhs.\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_a3bf7b3aba9d090887ff190d23c7b6510}{max\_pages}}\ \&\&}
+\DoxyCodeLine{\Hypertarget{wasm__config_8hpp_source_l00035}00035\ \ \ \ \ \ lhs.\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_a6b45f20640aff5bd336e8f2b70c8f8c1}{max\_call\_depth}}\ ==\ rhs.\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_a6b45f20640aff5bd336e8f2b70c8f8c1}{max\_call\_depth}};}
+\DoxyCodeLine{\Hypertarget{wasm__config_8hpp_source_l00036}00036\ \}}
+\DoxyCodeLine{\Hypertarget{wasm__config_8hpp_source_l00037}\mbox{\hyperlink{namespacesysio_1_1chain_a30933cebb968569ed95ff9968b93c49c}{00037}}\ \textcolor{keyword}{inline}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacesysio_1_1chain_a5a450a5c1c452d22fea6e156bf083739}{operator!=}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config}{wasm\_config}}\&\ lhs,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config}{wasm\_config}}\&\ rhs)\ \{}
+\DoxyCodeLine{\Hypertarget{wasm__config_8hpp_source_l00038}00038\ \ \ \ \textcolor{keywordflow}{return}\ !(lhs\ ==\ rhs);}
+\DoxyCodeLine{\Hypertarget{wasm__config_8hpp_source_l00039}00039\ \}}
+\DoxyCodeLine{\Hypertarget{wasm__config_8hpp_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{wasm__config_8hpp_source_l00041}00041\ \}\}}
+\DoxyCodeLine{\Hypertarget{wasm__config_8hpp_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{wasm__config_8hpp_source_l00043}00043\ \mbox{\hyperlink{reflect_8hpp_a2ace850e636b1ca0b18fe3177e413d99}{FC\_REFLECT}}(\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config}{sysio::chain::wasm\_config}},}
+\DoxyCodeLine{\Hypertarget{wasm__config_8hpp_source_l00044}00044\ \ \ \ \ \ \ \ \ \ \ \ (max\_mutable\_global\_bytes)}
+\DoxyCodeLine{\Hypertarget{wasm__config_8hpp_source_l00045}00045\ \ \ \ \ \ \ \ \ \ \ \ (max\_table\_elements)}
+\DoxyCodeLine{\Hypertarget{wasm__config_8hpp_source_l00046}00046\ \ \ \ \ \ \ \ \ \ \ \ (max\_section\_elements)}
+\DoxyCodeLine{\Hypertarget{wasm__config_8hpp_source_l00047}00047\ \ \ \ \ \ \ \ \ \ \ \ (max\_linear\_memory\_init)}
+\DoxyCodeLine{\Hypertarget{wasm__config_8hpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \ \ (max\_func\_local\_bytes)}
+\DoxyCodeLine{\Hypertarget{wasm__config_8hpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \ \ \ (max\_nested\_structures)}
+\DoxyCodeLine{\Hypertarget{wasm__config_8hpp_source_l00050}00050\ \ \ \ \ \ \ \ \ \ \ \ (max\_symbol\_bytes)}
+\DoxyCodeLine{\Hypertarget{wasm__config_8hpp_source_l00051}00051\ \ \ \ \ \ \ \ \ \ \ \ (max\_module\_bytes)}
+\DoxyCodeLine{\Hypertarget{wasm__config_8hpp_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \ \ (max\_code\_bytes)}
+\DoxyCodeLine{\Hypertarget{wasm__config_8hpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \ \ (max\_pages)}
+\DoxyCodeLine{\Hypertarget{wasm__config_8hpp_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \ \ (max\_call\_depth)}
+\DoxyCodeLine{\Hypertarget{wasm__config_8hpp_source_l00055}00055\ )}
+
+\end{DoxyCode}

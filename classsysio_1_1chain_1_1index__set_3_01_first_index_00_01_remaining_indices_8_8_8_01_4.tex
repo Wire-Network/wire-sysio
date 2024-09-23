@@ -1,0 +1,69 @@
+\doxysection{sysio\+::chain\+::index\+\_\+set\texorpdfstring{$<$}{<} First\+Index, Remaining\+Indices... \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classsysio_1_1chain_1_1index__set_3_01_first_index_00_01_remaining_indices_8_8_8_01_4}{}\label{classsysio_1_1chain_1_1index__set_3_01_first_index_00_01_remaining_indices_8_8_8_01_4}\index{sysio::chain::index\_set$<$ FirstIndex, RemainingIndices... $>$@{sysio::chain::index\_set$<$ FirstIndex, RemainingIndices... $>$}}
+
+
+{\ttfamily \#include $<$database\+\_\+utils.\+hpp$>$}
+
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static void \mbox{\hyperlink{classsysio_1_1chain_1_1index__set_3_01_first_index_00_01_remaining_indices_8_8_8_01_4_a9aa5dcaef4d0b89c41949515dfd95818}{add\+\_\+indices}} (\mbox{\hyperlink{classchainbase_1_1database}{chainbase\+::database}} \&db)
+\item 
+{\footnotesize template$<$typename F $>$ }\\static void \mbox{\hyperlink{classsysio_1_1chain_1_1index__set_3_01_first_index_00_01_remaining_indices_8_8_8_01_4_afb133b535ccce6a9f9c45c7fff5136c2}{walk\+\_\+indices}} (F function)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename First\+Index, typename ... Remaining\+Indices$>$\newline
+class sysio\+::chain\+::index\+\_\+set$<$ First\+Index, Remaining\+Indices... $>$}
+
+
+Definition at line \mbox{\hyperlink{database__utils_8hpp_source_l00069}{69}} of file \mbox{\hyperlink{database__utils_8hpp_source}{database\+\_\+utils.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1chain_1_1index__set_3_01_first_index_00_01_remaining_indices_8_8_8_01_4_a9aa5dcaef4d0b89c41949515dfd95818}\index{sysio::chain::index\_set$<$ FirstIndex, RemainingIndices... $>$@{sysio::chain::index\_set$<$ FirstIndex, RemainingIndices... $>$}!add\_indices@{add\_indices}}
+\index{add\_indices@{add\_indices}!sysio::chain::index\_set$<$ FirstIndex, RemainingIndices... $>$@{sysio::chain::index\_set$<$ FirstIndex, RemainingIndices... $>$}}
+\doxysubsubsection{\texorpdfstring{add\_indices()}{add\_indices()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1index__set_3_01_first_index_00_01_remaining_indices_8_8_8_01_4_a9aa5dcaef4d0b89c41949515dfd95818} 
+template$<$typename First\+Index , typename ... Remaining\+Indices$>$ \\
+static void \mbox{\hyperlink{classsysio_1_1chain_1_1index__set}{sysio\+::chain\+::index\+\_\+set}}$<$ First\+Index, Remaining\+Indices... $>$\+::add\+\_\+indices (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classchainbase_1_1database}{chainbase\+::database}} \&}]{db}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{database__utils_8hpp_source_l00071}{71}} of file \mbox{\hyperlink{database__utils_8hpp_source}{database\+\_\+utils.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ index\_set<FirstIndex>::add\_indices(db);}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ index\_set<RemainingIndices...>::add\_indices(db);}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1index__set_3_01_first_index_00_01_remaining_indices_8_8_8_01_4_afb133b535ccce6a9f9c45c7fff5136c2}\index{sysio::chain::index\_set$<$ FirstIndex, RemainingIndices... $>$@{sysio::chain::index\_set$<$ FirstIndex, RemainingIndices... $>$}!walk\_indices@{walk\_indices}}
+\index{walk\_indices@{walk\_indices}!sysio::chain::index\_set$<$ FirstIndex, RemainingIndices... $>$@{sysio::chain::index\_set$<$ FirstIndex, RemainingIndices... $>$}}
+\doxysubsubsection{\texorpdfstring{walk\_indices()}{walk\_indices()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1index__set_3_01_first_index_00_01_remaining_indices_8_8_8_01_4_afb133b535ccce6a9f9c45c7fff5136c2} 
+template$<$typename First\+Index , typename ... Remaining\+Indices$>$ \\
+template$<$typename F $>$ \\
+static void \mbox{\hyperlink{classsysio_1_1chain_1_1index__set}{sysio\+::chain\+::index\+\_\+set}}$<$ First\+Index, Remaining\+Indices... $>$\+::walk\+\_\+indices (\begin{DoxyParamCaption}\item[{F}]{function}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{database__utils_8hpp_source_l00077}{77}} of file \mbox{\hyperlink{database__utils_8hpp_source}{database\+\_\+utils.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ index\_set<FirstIndex>::walk\_indices(function);}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ index\_set<RemainingIndices...>::walk\_indices(function);}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{database__utils_8hpp}{database\+\_\+utils.\+hpp}}\end{DoxyCompactItemize}

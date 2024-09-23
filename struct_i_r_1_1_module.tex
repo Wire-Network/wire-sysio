@@ -1,0 +1,176 @@
+\doxysection{IR\+::Module Struct Reference}
+\hypertarget{struct_i_r_1_1_module}{}\label{struct_i_r_1_1_module}\index{IR::Module@{IR::Module}}
+
+
+{\ttfamily \#include $<$Module.\+h$>$}
+
+
+
+Collaboration diagram for IR\+::Module\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_i_r_1_1_module__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_i_r_1_1_module_a89ee060f66650d5a16da5d8607932a17}{Module}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::vector$<$ const \mbox{\hyperlink{struct_i_r_1_1_function_type}{Function\+Type}} \texorpdfstring{$\ast$}{*} $>$ \mbox{\hyperlink{struct_i_r_1_1_module_a682c9e762448410a20c98ea062a50308}{types}}
+\item 
+\mbox{\hyperlink{struct_i_r_1_1_index_space}{Index\+Space}}$<$ \mbox{\hyperlink{struct_i_r_1_1_function_def}{Function\+Def}}, \mbox{\hyperlink{struct_i_r_1_1_indexed_function_type}{Indexed\+Function\+Type}} $>$ \mbox{\hyperlink{struct_i_r_1_1_module_a439e1f32fa3fa9bf47f58ac309bfc50a}{functions}}
+\item 
+\mbox{\hyperlink{struct_i_r_1_1_index_space}{Index\+Space}}$<$ \mbox{\hyperlink{struct_i_r_1_1_table_def}{Table\+Def}}, \mbox{\hyperlink{struct_i_r_1_1_table_type}{Table\+Type}} $>$ \mbox{\hyperlink{struct_i_r_1_1_module_a3093728dba0995da777601adf56082d1}{tables}}
+\item 
+\mbox{\hyperlink{struct_i_r_1_1_index_space}{Index\+Space}}$<$ \mbox{\hyperlink{struct_i_r_1_1_memory_def}{Memory\+Def}}, \mbox{\hyperlink{struct_i_r_1_1_memory_type}{Memory\+Type}} $>$ \mbox{\hyperlink{struct_i_r_1_1_module_a27e85034ab34b4db4321603722d3917c}{memories}}
+\item 
+\mbox{\hyperlink{struct_i_r_1_1_index_space}{Index\+Space}}$<$ \mbox{\hyperlink{struct_i_r_1_1_global_def}{Global\+Def}}, \mbox{\hyperlink{struct_i_r_1_1_global_type}{Global\+Type}} $>$ \mbox{\hyperlink{struct_i_r_1_1_module_ab1340b21e56875a7f1163d1afcf4d7fd}{globals}}
+\item 
+std\+::vector$<$ \mbox{\hyperlink{struct_i_r_1_1_export}{Export}} $>$ \mbox{\hyperlink{struct_i_r_1_1_module_afcc776ae7fc46f6202700f3540b500d9}{exports}}
+\item 
+std\+::vector$<$ \mbox{\hyperlink{struct_i_r_1_1_data_segment}{Data\+Segment}} $>$ \mbox{\hyperlink{struct_i_r_1_1_module_af7d4ea2e86159b15bbe1a3c5ea57c69e}{data\+Segments}}
+\item 
+std\+::vector$<$ \mbox{\hyperlink{struct_i_r_1_1_table_segment}{Table\+Segment}} $>$ \mbox{\hyperlink{struct_i_r_1_1_module_a79205d5c2b09c7a2464f99e82f94be75}{table\+Segments}}
+\item 
+std\+::vector$<$ \mbox{\hyperlink{struct_i_r_1_1_user_section}{User\+Section}} $>$ \mbox{\hyperlink{struct_i_r_1_1_module_a1e31553725937946ccd34c2a0a7411fa}{user\+Sections}}
+\item 
+\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} \mbox{\hyperlink{struct_i_r_1_1_module_a8d982a1899d9832570db181af07e6430}{start\+Function\+Index}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{_module_8h_source_l00129}{129}} of file \mbox{\hyperlink{_module_8h_source}{Module.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{struct_i_r_1_1_module_a89ee060f66650d5a16da5d8607932a17}\index{IR::Module@{IR::Module}!Module@{Module}}
+\index{Module@{Module}!IR::Module@{IR::Module}}
+\doxysubsubsection{\texorpdfstring{Module()}{Module()}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_module_a89ee060f66650d5a16da5d8607932a17} 
+IR\+::\+Module\+::\+Module (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_module_8h_source_l00145}{145}} of file \mbox{\hyperlink{_module_8h_source}{Module.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00145\ :\ \mbox{\hyperlink{struct_i_r_1_1_module_a8d982a1899d9832570db181af07e6430}{startFunctionIndex}}(\mbox{\hyperlink{stdint_8h_ab2355300ea19395357e62d780f4dd073}{UINTPTR\_MAX}})\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_i_r_1_1_module_af7d4ea2e86159b15bbe1a3c5ea57c69e}\index{IR::Module@{IR::Module}!dataSegments@{dataSegments}}
+\index{dataSegments@{dataSegments}!IR::Module@{IR::Module}}
+\doxysubsubsection{\texorpdfstring{dataSegments}{dataSegments}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_module_af7d4ea2e86159b15bbe1a3c5ea57c69e} 
+std\+::vector$<$\mbox{\hyperlink{struct_i_r_1_1_data_segment}{Data\+Segment}}$>$ IR\+::\+Module\+::data\+Segments}
+
+
+
+Definition at line \mbox{\hyperlink{_module_8h_source_l00139}{139}} of file \mbox{\hyperlink{_module_8h_source}{Module.\+h}}.
+
+\Hypertarget{struct_i_r_1_1_module_afcc776ae7fc46f6202700f3540b500d9}\index{IR::Module@{IR::Module}!exports@{exports}}
+\index{exports@{exports}!IR::Module@{IR::Module}}
+\doxysubsubsection{\texorpdfstring{exports}{exports}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_module_afcc776ae7fc46f6202700f3540b500d9} 
+std\+::vector$<$\mbox{\hyperlink{struct_i_r_1_1_export}{Export}}$>$ IR\+::\+Module\+::exports}
+
+
+
+Definition at line \mbox{\hyperlink{_module_8h_source_l00138}{138}} of file \mbox{\hyperlink{_module_8h_source}{Module.\+h}}.
+
+\Hypertarget{struct_i_r_1_1_module_a439e1f32fa3fa9bf47f58ac309bfc50a}\index{IR::Module@{IR::Module}!functions@{functions}}
+\index{functions@{functions}!IR::Module@{IR::Module}}
+\doxysubsubsection{\texorpdfstring{functions}{functions}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_module_a439e1f32fa3fa9bf47f58ac309bfc50a} 
+\mbox{\hyperlink{struct_i_r_1_1_index_space}{Index\+Space}}$<$\mbox{\hyperlink{struct_i_r_1_1_function_def}{Function\+Def}},\mbox{\hyperlink{struct_i_r_1_1_indexed_function_type}{Indexed\+Function\+Type}}$>$ IR\+::\+Module\+::functions}
+
+
+
+Definition at line \mbox{\hyperlink{_module_8h_source_l00133}{133}} of file \mbox{\hyperlink{_module_8h_source}{Module.\+h}}.
+
+\Hypertarget{struct_i_r_1_1_module_ab1340b21e56875a7f1163d1afcf4d7fd}\index{IR::Module@{IR::Module}!globals@{globals}}
+\index{globals@{globals}!IR::Module@{IR::Module}}
+\doxysubsubsection{\texorpdfstring{globals}{globals}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_module_ab1340b21e56875a7f1163d1afcf4d7fd} 
+\mbox{\hyperlink{struct_i_r_1_1_index_space}{Index\+Space}}$<$\mbox{\hyperlink{struct_i_r_1_1_global_def}{Global\+Def}},\mbox{\hyperlink{struct_i_r_1_1_global_type}{Global\+Type}}$>$ IR\+::\+Module\+::globals}
+
+
+
+Definition at line \mbox{\hyperlink{_module_8h_source_l00136}{136}} of file \mbox{\hyperlink{_module_8h_source}{Module.\+h}}.
+
+\Hypertarget{struct_i_r_1_1_module_a27e85034ab34b4db4321603722d3917c}\index{IR::Module@{IR::Module}!memories@{memories}}
+\index{memories@{memories}!IR::Module@{IR::Module}}
+\doxysubsubsection{\texorpdfstring{memories}{memories}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_module_a27e85034ab34b4db4321603722d3917c} 
+\mbox{\hyperlink{struct_i_r_1_1_index_space}{Index\+Space}}$<$\mbox{\hyperlink{struct_i_r_1_1_memory_def}{Memory\+Def}},\mbox{\hyperlink{struct_i_r_1_1_memory_type}{Memory\+Type}}$>$ IR\+::\+Module\+::memories}
+
+
+
+Definition at line \mbox{\hyperlink{_module_8h_source_l00135}{135}} of file \mbox{\hyperlink{_module_8h_source}{Module.\+h}}.
+
+\Hypertarget{struct_i_r_1_1_module_a8d982a1899d9832570db181af07e6430}\index{IR::Module@{IR::Module}!startFunctionIndex@{startFunctionIndex}}
+\index{startFunctionIndex@{startFunctionIndex}!IR::Module@{IR::Module}}
+\doxysubsubsection{\texorpdfstring{startFunctionIndex}{startFunctionIndex}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_module_a8d982a1899d9832570db181af07e6430} 
+\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} IR\+::\+Module\+::start\+Function\+Index}
+
+
+
+Definition at line \mbox{\hyperlink{_module_8h_source_l00143}{143}} of file \mbox{\hyperlink{_module_8h_source}{Module.\+h}}.
+
+\Hypertarget{struct_i_r_1_1_module_a3093728dba0995da777601adf56082d1}\index{IR::Module@{IR::Module}!tables@{tables}}
+\index{tables@{tables}!IR::Module@{IR::Module}}
+\doxysubsubsection{\texorpdfstring{tables}{tables}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_module_a3093728dba0995da777601adf56082d1} 
+\mbox{\hyperlink{struct_i_r_1_1_index_space}{Index\+Space}}$<$\mbox{\hyperlink{struct_i_r_1_1_table_def}{Table\+Def}},\mbox{\hyperlink{struct_i_r_1_1_table_type}{Table\+Type}}$>$ IR\+::\+Module\+::tables}
+
+
+
+Definition at line \mbox{\hyperlink{_module_8h_source_l00134}{134}} of file \mbox{\hyperlink{_module_8h_source}{Module.\+h}}.
+
+\Hypertarget{struct_i_r_1_1_module_a79205d5c2b09c7a2464f99e82f94be75}\index{IR::Module@{IR::Module}!tableSegments@{tableSegments}}
+\index{tableSegments@{tableSegments}!IR::Module@{IR::Module}}
+\doxysubsubsection{\texorpdfstring{tableSegments}{tableSegments}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_module_a79205d5c2b09c7a2464f99e82f94be75} 
+std\+::vector$<$\mbox{\hyperlink{struct_i_r_1_1_table_segment}{Table\+Segment}}$>$ IR\+::\+Module\+::table\+Segments}
+
+
+
+Definition at line \mbox{\hyperlink{_module_8h_source_l00140}{140}} of file \mbox{\hyperlink{_module_8h_source}{Module.\+h}}.
+
+\Hypertarget{struct_i_r_1_1_module_a682c9e762448410a20c98ea062a50308}\index{IR::Module@{IR::Module}!types@{types}}
+\index{types@{types}!IR::Module@{IR::Module}}
+\doxysubsubsection{\texorpdfstring{types}{types}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_module_a682c9e762448410a20c98ea062a50308} 
+std\+::vector$<$const \mbox{\hyperlink{struct_i_r_1_1_function_type}{Function\+Type}}\texorpdfstring{$\ast$}{*}$>$ IR\+::\+Module\+::types}
+
+
+
+Definition at line \mbox{\hyperlink{_module_8h_source_l00131}{131}} of file \mbox{\hyperlink{_module_8h_source}{Module.\+h}}.
+
+\Hypertarget{struct_i_r_1_1_module_a1e31553725937946ccd34c2a0a7411fa}\index{IR::Module@{IR::Module}!userSections@{userSections}}
+\index{userSections@{userSections}!IR::Module@{IR::Module}}
+\doxysubsubsection{\texorpdfstring{userSections}{userSections}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_module_a1e31553725937946ccd34c2a0a7411fa} 
+std\+::vector$<$\mbox{\hyperlink{struct_i_r_1_1_user_section}{User\+Section}}$>$ IR\+::\+Module\+::user\+Sections}
+
+
+
+Definition at line \mbox{\hyperlink{_module_8h_source_l00141}{141}} of file \mbox{\hyperlink{_module_8h_source}{Module.\+h}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/wasm-\/jit/\+Include/\+IR/\mbox{\hyperlink{_module_8h}{Module.\+h}}\end{DoxyCompactItemize}

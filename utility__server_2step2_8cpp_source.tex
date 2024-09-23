@@ -1,0 +1,88 @@
+\doxysection{step2.\+cpp}
+\hypertarget{utility__server_2step2_8cpp_source}{}\label{utility__server_2step2_8cpp_source}\index{libraries/fc/vendor/websocketpp/tutorials/utility\_server/step2.cpp@{libraries/fc/vendor/websocketpp/tutorials/utility\_server/step2.cpp}}
+\mbox{\hyperlink{utility__server_2step2_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2015,\ Peter\ Thorson.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00004}00004\ \textcolor{comment}{\ *\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00005}00005\ \textcolor{comment}{\ *\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are\ met:}}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00006}00006\ \textcolor{comment}{\ *\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00007}00007\ \textcolor{comment}{\ *\ \ \ \ \ \ \ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00008}00008\ \textcolor{comment}{\ *\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00009}00009\ \textcolor{comment}{\ *\ \ \ \ \ \ \ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer\ in\ the}}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00010}00010\ \textcolor{comment}{\ *\ \ \ \ \ \ \ documentation\ and/or\ other\ materials\ provided\ with\ the\ distribution.}}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00011}00011\ \textcolor{comment}{\ *\ \ \ \ \ *\ Neither\ the\ name\ of\ the\ WebSocket++\ Project\ nor\ the}}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00012}00012\ \textcolor{comment}{\ *\ \ \ \ \ \ \ names\ of\ its\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products}}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00013}00013\ \textcolor{comment}{\ *\ \ \ \ \ \ \ derived\ from\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00014}00014\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00015}00015\ \textcolor{comment}{\ *\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS\ "{}AS\ IS"{}}}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00016}00016\ \textcolor{comment}{\ *\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ THE}}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00017}00017\ \textcolor{comment}{\ *\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR\ A\ PARTICULAR\ PURPOSE}}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00018}00018\ \textcolor{comment}{\ *\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ PETER\ THORSON\ BE\ LIABLE\ FOR\ ANY}}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00019}00019\ \textcolor{comment}{\ *\ DIRECT,\ INDIRECT,\ INCIDENTAL,\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES}}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00020}00020\ \textcolor{comment}{\ *\ (INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;}}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00021}00021\ \textcolor{comment}{\ *\ LOSS\ OF\ USE,\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND}}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00022}00022\ \textcolor{comment}{\ *\ ON\ ANY\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00023}00023\ \textcolor{comment}{\ *\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE\ OF\ THIS}}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00024}00024\ \textcolor{comment}{\ *\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00025}00025\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00027}00027\ \textcolor{comment}{//\ **NOTE:**\ This\ file\ is\ a\ snapshot\ of\ the\ WebSocket++\ utility\ server\ tutorial.}}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00028}00028\ \textcolor{comment}{//\ Additional\ related\ material\ can\ be\ found\ in\ the\ tutorials/utility\_server}}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00029}00029\ \textcolor{comment}{//\ directory\ of\ the\ WebSocket++\ repository.}}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00031}00031\ \textcolor{comment}{//\ The\ ASIO\_STANDALONE\ define\ is\ necessary\ to\ use\ the\ standalone\ version\ of\ Asio.}}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00032}00032\ \textcolor{comment}{//\ Remove\ if\ you\ are\ using\ Boost\ Asio.}}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00033}\mbox{\hyperlink{utility__server_2step2_8cpp_a5b90f4adb6bc09ca319c35c3448ee67a}{00033}}\ \textcolor{preprocessor}{\#define\ ASIO\_STANDALONE}}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00035}00035\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{asio__no__tls_8hpp}{websocketpp/config/asio\_no\_tls.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00036}00036\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{server_8hpp}{websocketpp/server.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00038}00038\ \textcolor{preprocessor}{\#include\ <functional>}}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00040}\mbox{\hyperlink{utility__server_2step2_8cpp_afc38239e3eef2a4200e324bff14d91d1}{00040}}\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1server}{websocketpp::server<websocketpp::config::asio>}}\ \mbox{\hyperlink{utility__server_2step2_8cpp_afc38239e3eef2a4200e324bff14d91d1}{server}};}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00042}00042\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classutility__server}{utility\_server}}\ \{}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00043}00043\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00044}\mbox{\hyperlink{classutility__server_a4644a7feb970cc203374dd68eb8dec9c}{00044}}\ \ \ \ \ \mbox{\hyperlink{classutility__server_a4644a7feb970cc203374dd68eb8dec9c}{utility\_server}}()\ \{}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00045}00045\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Set\ logging\ settings}}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00046}00046\ \ \ \ \ \ \ \ \ m\_endpoint.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a8292bcdca9344b57af1b0964ff7fc778}{set\_error\_channels}}(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1elevel_a9b31ff708c221d314f9f4eb3ff2b1ad7}{websocketpp::log::elevel::all}});}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00047}00047\ \ \ \ \ \ \ \ \ m\_endpoint.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a5d7da609ebd2f797e5e67b6d050ebc59}{set\_access\_channels}}(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a853aa0b8976e53f3181af3bc398d493e}{websocketpp::log::alevel::all}}\ \string^\ \mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_aa38cfdf7a82f33cac319438462707e90}{websocketpp::log::alevel::frame\_payload}});}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Initialize\ Asio}}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00050}00050\ \ \ \ \ \ \ \ \ m\_endpoint.init\_asio();}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00052}00052\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Set\ the\ default\ message\ handler\ to\ the\ echo\ handler}}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00053}00053\ \ \ \ \ \ \ \ \ m\_endpoint.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a34a3a8351bff65ba878975be471cab85}{set\_message\_handler}}(std::bind(}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{classutility__server_a34dbd3789ee5ef7c1918e4ff9d154a15}{utility\_server::echo\_handler}},\ \textcolor{keyword}{this},}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \ \ \ std::placeholders::\_1,\ std::placeholders::\_2}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00056}00056\ \ \ \ \ \ \ \ \ ));}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00057}00057\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00059}\mbox{\hyperlink{classutility__server_a34dbd3789ee5ef7c1918e4ff9d154a15}{00059}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classutility__server_a34dbd3789ee5ef7c1918e4ff9d154a15}{echo\_handler}}(\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{websocketpp::connection\_hdl}}\ hdl,\ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a8097edab4feb0c36a69601c3786f0062}{server::message\_ptr}}\ msg)\ \{}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00060}00060\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ write\ a\ new\ message}}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00061}00061\ \ \ \ \ \ \ \ \ m\_endpoint.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a5341f59de7ef1a565a2fd93daba212d5}{send}}(hdl,\ msg-\/>get\_payload(),\ msg-\/>get\_opcode());}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00062}00062\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00064}\mbox{\hyperlink{classutility__server_a86f83e6b79b082f181c7d5edbb6b6324}{00064}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classutility__server_a86f83e6b79b082f181c7d5edbb6b6324}{run}}()\ \{}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00065}00065\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Listen\ on\ port\ 9002}}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00066}00066\ \ \ \ \ \ \ \ \ m\_endpoint.listen(9002);}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00067}00067\ }
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00068}00068\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Queues\ a\ connection\ accept\ operation}}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00069}00069\ \ \ \ \ \ \ \ \ m\_endpoint.\mbox{\hyperlink{classwebsocketpp_1_1server_a0204a7d444144f7ea5b8bbcf14689fc1}{start\_accept}}();}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00071}00071\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Start\ the\ Asio\ io\_service\ run\ loop}}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00072}00072\ \ \ \ \ \ \ \ \ m\_endpoint.run();}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00073}00073\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00074}00074\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00075}00075\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1server}{server}}\ m\_endpoint;}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00076}00076\ \};}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00077}00077\ }
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00078}\mbox{\hyperlink{utility__server_2step2_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{00078}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{utility__client_2step2_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}()\ \{}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00079}00079\ \ \ \ \ \mbox{\hyperlink{classutility__server}{utility\_server}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00080}00080\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.\mbox{\hyperlink{classutility__server_a86f83e6b79b082f181c7d5edbb6b6324}{run}}();}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00081}00081\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{utility__server_2step2_8cpp_source_l00082}00082\ \}}
+
+\end{DoxyCode}

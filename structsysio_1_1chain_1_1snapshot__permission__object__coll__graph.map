@@ -1,0 +1,15 @@
+<map id="sysio::chain::snapshot_permission_object" name="sysio::chain::snapshot_permission_object">
+<area shape="rect" id="Node000001" title=" " alt="" coords="543,77,695,118"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1name.html" title="Immutable except for fc::from_variant." alt="" coords="277,24,408,49"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="424,45,520,63,559,74,557,79,518,68,423,50"/>
+<area shape="rect" id="Node000003" href="$classfc_1_1time__point.html" title=" " alt="" coords="292,85,392,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="408,95,542,95,542,100,408,100"/>
+<area shape="rect" id="Node000004" href="$structsysio_1_1chain_1_1authority.html" title=" " alt="" coords="268,134,417,160"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="432,130,519,115,542,111,543,116,519,121,433,136"/>
+<area shape="rect" id="Node000005" href="$classfc_1_1vector.html" title=" " alt="" coords="15,55,153,95"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="169,96,294,131,292,136,167,101"/>
+<area shape="rect" id="Node000006" href="$classfc_1_1vector.html" title=" " alt="" coords="5,119,163,175"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="178,144,267,144,267,150,178,150"/>
+<area shape="rect" id="Node000007" href="$classfc_1_1vector.html" title=" " alt="" coords="13,199,155,239"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="169,193,293,158,294,163,170,198"/>
+</map>

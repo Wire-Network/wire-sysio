@@ -1,0 +1,11 @@
+<map id="sysio::vm::detail::resolve_result" name="sysio::vm::detail::resolve_result">
+<area shape="rect" id="Node000001" title=" " alt="" coords="681,49,807,90"/>
+<area shape="rect" id="Node000002" href="$namespacesysio_1_1vm.html#aeacefe5e97adf981cb4015f02a33d7a6" title=" " alt="" coords="464,13,624,54"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="666,58,624,50,625,45,667,53"/>
+<area shape="rect" id="Node000005" href="$structsysio_1_1chain_1_1webassembly_1_1eosvmoc_1_1result__resolver.html#aecd80de4ddfdc16914731f713891f9ff" title=" " alt="" coords="454,77,633,133"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="667,86,634,92,634,86,666,80"/>
+<area shape="rect" id="Node000003" href="$namespacesysio_1_1vm.html#aade1d3d5329b64aae3f2dab5c018e49f" title=" " alt="" coords="231,20,406,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="448,36,406,36,406,30,448,30"/>
+<area shape="rect" id="Node000004" href="$structsysio_1_1vm_1_1registered__host__functions_1_1mappings.html#af26f42cea5b288ea5ab591e8ac05e2b7" title=" " alt="" coords="5,5,183,61"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="215,36,183,36,183,30,215,30"/>
+</map>

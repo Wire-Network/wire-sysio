@@ -1,0 +1,141 @@
+\doxysection{test.\+cpp}
+\hypertarget{test_8cpp_source}{}\label{test_8cpp_source}\index{libraries/chainbase/test/test.cpp@{libraries/chainbase/test/test.cpp}}
+\mbox{\hyperlink{test_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00001}\mbox{\hyperlink{test_8cpp_a6b2a3852db8bb19ab6909bac01859985}{00001}}\ \textcolor{preprocessor}{\#define\ BOOST\_TEST\_MODULE\ chainbase\ test}}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <boost/test/unit\_test.hpp>}}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{chainbase_8hpp}{chainbase/chainbase.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <boost/multi\_index\_container.hpp>}}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <boost/multi\_index/ordered\_index.hpp>}}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <boost/multi\_index/member.hpp>}}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <iostream>}}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00012}00012\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacechainbase}{chainbase}};}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00013}00013\ \textcolor{keyword}{using\ namespace\ }boost::multi\_index;}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00015}00015\ \textcolor{comment}{//BOOST\_TEST\_SUITE(\ serialization\_tests,\ clean\_database\_fixture\ )}}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00017}\mbox{\hyperlink{structbook}{00017}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structbook}{book}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{structchainbase_1_1object}{chainbase::object}}<0,\ book>\ \{}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00019}00019\ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ Constructor,\ \textcolor{keyword}{typename}\ Allocator>}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00020}\mbox{\hyperlink{structbook_a81f1584c0672cca9dd2298944ec7fe30}{00020}}\ \ \ \ \ \mbox{\hyperlink{structbook_a81f1584c0672cca9dd2298944ec7fe30}{book}}(\ \ Constructor\&\&\ c,\ \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}\&\&\ \mbox{\hyperlink{structbook_a65565986ed9d713d8a888c008e446d52}{a}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00021}00021\ \ \ \ \ \ \ \ c(*\textcolor{keyword}{this});}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00022}00022\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00024}\mbox{\hyperlink{structbook_acc37660e6c336aaa48aefd654f5fe04a}{00024}}\ \ \ \ \ \mbox{\hyperlink{classchainbase_1_1oid}{id\_type}}\ \mbox{\hyperlink{structbook_acc37660e6c336aaa48aefd654f5fe04a}{id}};}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00025}\mbox{\hyperlink{structbook_a65565986ed9d713d8a888c008e446d52}{00025}}\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{structbook_a65565986ed9d713d8a888c008e446d52}{a}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00026}\mbox{\hyperlink{structbook_a03b5e022845367e4a56d3edf751ad59b}{00026}}\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{structbook_a03b5e022845367e4a56d3edf751ad59b}{b}}\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00027}00027\ \};}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00029}00029\ \textcolor{keyword}{typedef}\ multi\_index\_container<}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00030}00030\ \ \ \mbox{\hyperlink{structbook}{book}},}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00031}00031\ \ \ indexed\_by<}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00032}00032\ \ \ \ \ \ ordered\_unique<\ member<book,book::id\_type,\&book::id>\ >,}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00033}00033\ \ \ \ \ \ ordered\_unique<\ BOOST\_MULTI\_INDEX\_MEMBER(\mbox{\hyperlink{structbook}{book}},\textcolor{keywordtype}{int},\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})\ >,}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00034}00034\ \ \ \ \ \ ordered\_unique<\ BOOST\_MULTI\_INDEX\_MEMBER(\mbox{\hyperlink{structbook}{book}},\textcolor{keywordtype}{int},b)\ >}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00035}00035\ \ \ >,}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00036}00036\ \ \ \mbox{\hyperlink{classchainbase_1_1chainbase__node__allocator}{chainbase::node\_allocator<book>}}}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00037}\mbox{\hyperlink{test_8cpp_a943890c2cbccfeea3b499c742901185d}{00037}}\ >\ \mbox{\hyperlink{test_8cpp_a943890c2cbccfeea3b499c742901185d}{book\_index}};}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00039}00039\ \mbox{\hyperlink{chainbase_8hpp_a789572f90cbf8d6a0c1909c170298a1a}{CHAINBASE\_SET\_INDEX\_TYPE}}(\ \mbox{\hyperlink{structbook}{book}},\ \mbox{\hyperlink{test_8cpp_a943890c2cbccfeea3b499c742901185d}{book\_index}}\ )}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00042}\mbox{\hyperlink{test_8cpp_a17ad3362b7befd62662dc155abc23919}{00042}}\ \mbox{\hyperlink{test_8cpp_a17ad3362b7befd62662dc155abc23919}{BOOST\_AUTO\_TEST\_CASE}}(\ open\_and\_create\ )\ \{}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00043}00043\ \ \ \ boost::filesystem::path\ temp\ =\ boost::filesystem::temp\_directory\_path()\ /\ boost::filesystem::unique\_path();}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00044}00044\ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00045}00045\ \ \ \ \ \ \ std::cerr\ <<\ temp\ <<\ \textcolor{stringliteral}{"{}\ \(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00047}00047\ \ \ \ \ \ \ \mbox{\hyperlink{classchainbase_1_1database}{chainbase::database}}\ db(temp,\ database::read\_write,\ 1024*1024*8);}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00048}00048\ \ \ \ \ \ \ \mbox{\hyperlink{classchainbase_1_1database}{chainbase::database}}\ db2(temp,\ database::read\_only,\ 0,\ \textcolor{keyword}{true});\ }
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00049}00049\ \ \ \ \ \ \ BOOST\_CHECK\_THROW(\ db2.\mbox{\hyperlink{classchainbase_1_1database_a43a85f8b7d728b69dbf7a9d69c9ebc1c}{add\_index}}<\ \mbox{\hyperlink{test_8cpp_a943890c2cbccfeea3b499c742901185d}{book\_index}}\ >(),\ std::runtime\_error\ );\ }
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00051}00051\ \ \ \ \ \ \ db.\mbox{\hyperlink{classchainbase_1_1database_a43a85f8b7d728b69dbf7a9d69c9ebc1c}{add\_index}}<\ \mbox{\hyperlink{test_8cpp_a943890c2cbccfeea3b499c742901185d}{book\_index}}\ >();}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00052}00052\ \ \ \ \ \ \ BOOST\_CHECK\_THROW(\ db.\mbox{\hyperlink{classchainbase_1_1database_a43a85f8b7d728b69dbf7a9d69c9ebc1c}{add\_index}}<\mbox{\hyperlink{test_8cpp_a943890c2cbccfeea3b499c742901185d}{book\_index}}>(),\ std::logic\_error\ );\ }
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00054}00054\ }
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00055}00055\ \ \ \ \ \ \ db2.\mbox{\hyperlink{classchainbase_1_1database_a43a85f8b7d728b69dbf7a9d69c9ebc1c}{add\_index}}<\ \mbox{\hyperlink{test_8cpp_a943890c2cbccfeea3b499c742901185d}{book\_index}}\ >();\ }
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00058}00058\ \ \ \ \ \ \ BOOST\_TEST\_MESSAGE(\ \textcolor{stringliteral}{"{}Creating\ book"{}}\ );}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00059}00059\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ new\_book\ =\ db.\mbox{\hyperlink{classchainbase_1_1database_adc8f336b33d7013d1b0400399b16c5a7}{create}}<\mbox{\hyperlink{structbook}{book}}>(\ [](\ \mbox{\hyperlink{structbook}{book}}\&\ b\ )\ \{}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \ b.a\ =\ 3;}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00061}00061\ \ \ \ \ \ \ \ \ \ \ b.b\ =\ 4;}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00062}00062\ \ \ \ \ \ \ \}\ );}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00063}00063\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ copy\_new\_book\ =\ db2.\mbox{\hyperlink{classchainbase_1_1database_afcfe00f81a526c1376d4f51197dd3a9a}{get}}(\ \mbox{\hyperlink{classchainbase_1_1oid}{book::id\_type}}(0)\ );}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00064}00064\ \ \ \ \ \ \ BOOST\_REQUIRE(\ \&new\_book\ !=\ \&copy\_new\_book\ );\ }
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00066}00066\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(\ new\_book.a,\ copy\_new\_book.\mbox{\hyperlink{structbook_a65565986ed9d713d8a888c008e446d52}{a}}\ );}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00067}00067\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(\ new\_book.b,\ copy\_new\_book.\mbox{\hyperlink{structbook_a03b5e022845367e4a56d3edf751ad59b}{b}}\ );}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00069}00069\ \ \ \ \ \ \ db.\mbox{\hyperlink{classchainbase_1_1database_a9ebc006075e8fc2e84357a0e068b58d4}{modify}}(\ new\_book,\ [\&](\ \mbox{\hyperlink{structbook}{book}}\&\ b\ )\ \{}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \ b.\mbox{\hyperlink{structbook_a65565986ed9d713d8a888c008e446d52}{a}}\ =\ 5;}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00071}00071\ \ \ \ \ \ \ \ \ \ \ b.\mbox{\hyperlink{structbook_a03b5e022845367e4a56d3edf751ad59b}{b}}\ =\ 6;}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00072}00072\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00073}00073\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(\ new\_book.a,\ 5\ );}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00074}00074\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(\ new\_book.b,\ 6\ );}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00075}00075\ }
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00076}00076\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(\ new\_book.a,\ copy\_new\_book.\mbox{\hyperlink{structbook_a65565986ed9d713d8a888c008e446d52}{a}}\ );}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00077}00077\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(\ new\_book.b,\ copy\_new\_book.\mbox{\hyperlink{structbook_a03b5e022845367e4a56d3edf751ad59b}{b}}\ );}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00079}00079\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00080}00080\ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}}\ =\ db.\mbox{\hyperlink{classchainbase_1_1database_abb570c03bda1ee6ae1b428d41481b476}{start\_undo\_session}}(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00081}00081\ \ \ \ \ \ \ \ \ \ \ db.\mbox{\hyperlink{classchainbase_1_1database_a9ebc006075e8fc2e84357a0e068b58d4}{modify}}(\ new\_book,\ [\&](\ \mbox{\hyperlink{structbook}{book}}\&\ b\ )\ \{}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00082}00082\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ b.\mbox{\hyperlink{structbook_a65565986ed9d713d8a888c008e446d52}{a}}\ =\ 7;}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00083}00083\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ b.\mbox{\hyperlink{structbook_a03b5e022845367e4a56d3edf751ad59b}{b}}\ =\ 8;}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00084}00084\ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00085}00085\ }
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00086}00086\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(\ new\_book.a,\ 7\ );}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00087}00087\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(\ new\_book.b,\ 8\ );}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00088}00088\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00089}00089\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(\ new\_book.a,\ 5\ );}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00090}00090\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(\ new\_book.b,\ 6\ );}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00091}00091\ }
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00092}00092\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00093}00093\ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}}\ =\ db.\mbox{\hyperlink{classchainbase_1_1database_abb570c03bda1ee6ae1b428d41481b476}{start\_undo\_session}}(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00094}00094\ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ book2\ =\ db.\mbox{\hyperlink{classchainbase_1_1database_adc8f336b33d7013d1b0400399b16c5a7}{create}}<\mbox{\hyperlink{structbook}{book}}>(\ [\&](\ \mbox{\hyperlink{structbook}{book}}\&\ b\ )\ \{}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00095}00095\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ b.\mbox{\hyperlink{structbook_a65565986ed9d713d8a888c008e446d52}{a}}\ =\ 9;}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00096}00096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ b.\mbox{\hyperlink{structbook_a03b5e022845367e4a56d3edf751ad59b}{b}}\ =\ 10;}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00097}00097\ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00098}00098\ }
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00099}00099\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(\ new\_book.a,\ 5\ );}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00100}00100\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(\ new\_book.b,\ 6\ );}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00101}00101\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(\ book2.a,\ 9\ );}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00102}00102\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(\ book2.b,\ 10\ );}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00103}00103\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00104}00104\ \ \ \ \ \ \ BOOST\_CHECK\_THROW(\ db2.\mbox{\hyperlink{classchainbase_1_1database_afcfe00f81a526c1376d4f51197dd3a9a}{get}}(\ \mbox{\hyperlink{classchainbase_1_1oid}{book::id\_type}}(1)\ ),\ std::out\_of\_range\ );}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00105}00105\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(\ new\_book.a,\ 5\ );}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00106}00106\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(\ new\_book.b,\ 6\ );}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00107}00107\ }
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00108}00108\ }
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00109}00109\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00110}00110\ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}}\ =\ db.\mbox{\hyperlink{classchainbase_1_1database_abb570c03bda1ee6ae1b428d41481b476}{start\_undo\_session}}(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00111}00111\ \ \ \ \ \ \ \ \ \ \ db.\mbox{\hyperlink{classchainbase_1_1database_a9ebc006075e8fc2e84357a0e068b58d4}{modify}}(\ new\_book,\ [\&](\ \mbox{\hyperlink{structbook}{book}}\&\ b\ )\ \{}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00112}00112\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ b.\mbox{\hyperlink{structbook_a65565986ed9d713d8a888c008e446d52}{a}}\ =\ 7;}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00113}00113\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ b.\mbox{\hyperlink{structbook_a03b5e022845367e4a56d3edf751ad59b}{b}}\ =\ 8;}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00114}00114\ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00115}00115\ }
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00116}00116\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(\ new\_book.a,\ 7\ );}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00117}00117\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(\ new\_book.b,\ 8\ );}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00118}00118\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}}.push();}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00119}00119\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00120}00120\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(\ new\_book.a,\ 7\ );}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00121}00121\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(\ new\_book.b,\ 8\ );}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00122}00122\ \ \ \ \ \ \ db.\mbox{\hyperlink{classchainbase_1_1database_a167bce30384de1f373ebe0c25d4d0de6}{undo}}();}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00123}00123\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(\ new\_book.a,\ 5\ );}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00124}00124\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(\ new\_book.b,\ 6\ );}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00125}00125\ }
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00126}00126\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(\ new\_book.a,\ copy\_new\_book.\mbox{\hyperlink{structbook_a65565986ed9d713d8a888c008e446d52}{a}}\ );}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00127}00127\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(\ new\_book.b,\ copy\_new\_book.\mbox{\hyperlink{structbook_a03b5e022845367e4a56d3edf751ad59b}{b}}\ );}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00128}00128\ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\ ...\ )\ \{}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00129}00129\ \ \ \ \ \ \ bfs::remove\_all(\ temp\ );}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00130}00130\ \ \ \ \ \ \ \textcolor{keywordflow}{throw};}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00131}00131\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00132}00132\ \ \ \ bfs::remove\_all(\ temp\ );}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00133}00133\ \}}
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00134}00134\ }
+\DoxyCodeLine{\Hypertarget{test_8cpp_source_l00135}00135\ \textcolor{comment}{//\ BOOST\_AUTO\_TEST\_SUITE\_END()}}
+
+\end{DoxyCode}

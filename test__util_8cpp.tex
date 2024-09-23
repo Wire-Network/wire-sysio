@@ -1,0 +1,212 @@
+\doxysection{libraries/fc/libraries/ff/depends/xbyak/sample/test\+\_\+util.cpp File Reference}
+\hypertarget{test__util_8cpp}{}\label{test__util_8cpp}\index{libraries/fc/libraries/ff/depends/xbyak/sample/test\_util.cpp@{libraries/fc/libraries/ff/depends/xbyak/sample/test\_util.cpp}}
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include "{}xbyak/xbyak\+\_\+util.\+h"{}}\newline
+Include dependency graph for test\+\_\+util.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__util_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_pop_count_test}{Pop\+Count\+Test}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{test__util_8cpp_a3ede98665532cce0e33f614fac5150f9}{XBYAK\+\_\+\+NO\+\_\+\+OP\+\_\+\+NAMES}}
+\item 
+\#define \mbox{\hyperlink{test__util_8cpp_a21ff7c588b94b603f37cc3cb3f21cb6a}{NUM\+\_\+\+OF\+\_\+\+ARRAY}}(x)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{test__util_8cpp_ab94283ba604f6cb242d92b97989d10e5}{put\+CPUinfo}} ()
+\item 
+int \mbox{\hyperlink{test__util_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{test__util_8cpp_a21ff7c588b94b603f37cc3cb3f21cb6a}\index{test\_util.cpp@{test\_util.cpp}!NUM\_OF\_ARRAY@{NUM\_OF\_ARRAY}}
+\index{NUM\_OF\_ARRAY@{NUM\_OF\_ARRAY}!test\_util.cpp@{test\_util.cpp}}
+\doxysubsubsection{\texorpdfstring{NUM\_OF\_ARRAY}{NUM\_OF\_ARRAY}}
+{\footnotesize\ttfamily \label{test__util_8cpp_a21ff7c588b94b603f37cc3cb3f21cb6a} 
+\#define NUM\+\_\+\+OF\+\_\+\+ARRAY(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(\textcolor{keyword}{sizeof}(x)\ /\ \textcolor{keyword}{sizeof}(x[0]))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{test__util_8cpp_source_l00005}{5}} of file \mbox{\hyperlink{test__util_8cpp_source}{test\+\_\+util.\+cpp}}.
+
+\Hypertarget{test__util_8cpp_a3ede98665532cce0e33f614fac5150f9}\index{test\_util.cpp@{test\_util.cpp}!XBYAK\_NO\_OP\_NAMES@{XBYAK\_NO\_OP\_NAMES}}
+\index{XBYAK\_NO\_OP\_NAMES@{XBYAK\_NO\_OP\_NAMES}!test\_util.cpp@{test\_util.cpp}}
+\doxysubsubsection{\texorpdfstring{XBYAK\_NO\_OP\_NAMES}{XBYAK\_NO\_OP\_NAMES}}
+{\footnotesize\ttfamily \label{test__util_8cpp_a3ede98665532cce0e33f614fac5150f9} 
+\#define XBYAK\+\_\+\+NO\+\_\+\+OP\+\_\+\+NAMES}
+
+
+
+Definition at line \mbox{\hyperlink{test__util_8cpp_source_l00002}{2}} of file \mbox{\hyperlink{test__util_8cpp_source}{test\+\_\+util.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{test__util_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}\index{test\_util.cpp@{test\_util.cpp}!main@{main}}
+\index{main@{main}!test\_util.cpp@{test\_util.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{test__util_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4} 
+int main (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__util_8cpp_source_l00112}{112}} of file \mbox{\hyperlink{test__util_8cpp_source}{test\+\_\+util.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00113\ \{}
+\DoxyCodeLine{00114\ \textcolor{preprocessor}{\#ifdef\ XBYAK32}}
+\DoxyCodeLine{00115\ \ \ \ \ puts(\textcolor{stringliteral}{"{}32bit"{}});}
+\DoxyCodeLine{00116\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00117\ \ \ \ \ puts(\textcolor{stringliteral}{"{}64bit"{}});}
+\DoxyCodeLine{00118\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00119\ \ \ \ \ \mbox{\hyperlink{test__util_8cpp_ab94283ba604f6cb242d92b97989d10e5}{putCPUinfo}}();}
+\DoxyCodeLine{00120\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__util_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__util_8cpp_ab94283ba604f6cb242d92b97989d10e5}\index{test\_util.cpp@{test\_util.cpp}!putCPUinfo@{putCPUinfo}}
+\index{putCPUinfo@{putCPUinfo}!test\_util.cpp@{test\_util.cpp}}
+\doxysubsubsection{\texorpdfstring{putCPUinfo()}{putCPUinfo()}}
+{\footnotesize\ttfamily \label{test__util_8cpp_ab94283ba604f6cb242d92b97989d10e5} 
+void put\+CPUinfo (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__util_8cpp_source_l00016}{16}} of file \mbox{\hyperlink{test__util_8cpp_source}{test\+\_\+util.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00017\ \{}
+\DoxyCodeLine{00018\ \ \ \ \ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespace_xbyak_1_1util}{Xbyak::util}};}
+\DoxyCodeLine{00019\ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu}{Cpu}}\ cpu;}
+\DoxyCodeLine{00020\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}vendor\ \%s\(\backslash\)n"{}},\ cpu.\mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a445001cdff95d3819b6aecf4bfcf073c}{has}}(Cpu::tINTEL)\ ?\ \textcolor{stringliteral}{"{}intel"{}}\ :\ \textcolor{stringliteral}{"{}amd"{}});}
+\DoxyCodeLine{00021\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Cpu::Type}}\ \mbox{\hyperlink{yubihsm_8h_a1d127017fb298b889f4ba24752d08b8e}{type}};}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}};}
+\DoxyCodeLine{00024\ \ \ \ \ \}\ \mbox{\hyperlink{cvt__test_8cpp_af73a49a9258b274934a51f5b17b0d1be}{tbl}}[]\ =\ \{}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \{\ Cpu::tMMX,\ \textcolor{stringliteral}{"{}mmx"{}}\ \},}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \{\ Cpu::tMMX2,\ \textcolor{stringliteral}{"{}mmx2"{}}\ \},}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \{\ Cpu::tCMOV,\ \textcolor{stringliteral}{"{}cmov"{}}\ \},}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \{\ Cpu::tSSE,\ \textcolor{stringliteral}{"{}sse"{}}\ \},}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \{\ Cpu::tSSE2,\ \textcolor{stringliteral}{"{}sse2"{}}\ \},}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \{\ Cpu::tSSE3,\ \textcolor{stringliteral}{"{}sse3"{}}\ \},}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \{\ Cpu::tSSSE3,\ \textcolor{stringliteral}{"{}ssse3"{}}\ \},}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \{\ Cpu::tSSE41,\ \textcolor{stringliteral}{"{}sse41"{}}\ \},}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \{\ Cpu::tSSE42,\ \textcolor{stringliteral}{"{}sse42"{}}\ \},}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \{\ Cpu::tPOPCNT,\ \textcolor{stringliteral}{"{}popcnt"{}}\ \},}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \{\ Cpu::t3DN,\ \textcolor{stringliteral}{"{}3dn"{}}\ \},}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \{\ Cpu::tE3DN,\ \textcolor{stringliteral}{"{}e3dn"{}}\ \},}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \{\ Cpu::tSSE4a,\ \textcolor{stringliteral}{"{}sse4a"{}}\ \},}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \{\ Cpu::tSSE5,\ \textcolor{stringliteral}{"{}sse5"{}}\ \},}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \{\ Cpu::tAESNI,\ \textcolor{stringliteral}{"{}aesni"{}}\ \},}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \{\ Cpu::tRDTSCP,\ \textcolor{stringliteral}{"{}rdtscp"{}}\ \},}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \{\ Cpu::tOSXSAVE,\ \textcolor{stringliteral}{"{}osxsave(xgetvb)"{}}\ \},}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \{\ Cpu::tPCLMULQDQ,\ \textcolor{stringliteral}{"{}pclmulqdq"{}}\ \},}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \{\ Cpu::tAVX,\ \textcolor{stringliteral}{"{}avx"{}}\ \},}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \{\ Cpu::tFMA,\ \textcolor{stringliteral}{"{}fma"{}}\ \},}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \{\ Cpu::tAVX2,\ \textcolor{stringliteral}{"{}avx2"{}}\ \},}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \{\ Cpu::tBMI1,\ \textcolor{stringliteral}{"{}bmi1"{}}\ \},}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \{\ Cpu::tBMI2,\ \textcolor{stringliteral}{"{}bmi2"{}}\ \},}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \{\ Cpu::tLZCNT,\ \textcolor{stringliteral}{"{}lzcnt"{}}\ \},}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \{\ Cpu::tPREFETCHW,\ \textcolor{stringliteral}{"{}prefetchw"{}}\ \},}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \{\ Cpu::tENHANCED\_REP,\ \textcolor{stringliteral}{"{}enh\_rep"{}}\ \},}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \{\ Cpu::tRDRAND,\ \textcolor{stringliteral}{"{}rdrand"{}}\ \},}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \{\ Cpu::tADX,\ \textcolor{stringliteral}{"{}adx"{}}\ \},}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \{\ Cpu::tRDSEED,\ \textcolor{stringliteral}{"{}rdseed"{}}\ \},}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \{\ Cpu::tSMAP,\ \textcolor{stringliteral}{"{}smap"{}}\ \},}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \{\ Cpu::tHLE,\ \textcolor{stringliteral}{"{}hle"{}}\ \},}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \{\ Cpu::tRTM,\ \textcolor{stringliteral}{"{}rtm"{}}\ \},}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \{\ Cpu::tMPX,\ \textcolor{stringliteral}{"{}mpx"{}}\ \},}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \{\ Cpu::tSHA,\ \textcolor{stringliteral}{"{}sha"{}}\ \},}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \{\ Cpu::tPREFETCHWT1,\ \textcolor{stringliteral}{"{}prefetchwt1"{}}\ \},}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \{\ Cpu::tF16C,\ \textcolor{stringliteral}{"{}f16c"{}}\ \},}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \{\ Cpu::tMOVBE,\ \textcolor{stringliteral}{"{}movbe"{}}\ \},}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \{\ Cpu::tAVX512F,\ \textcolor{stringliteral}{"{}avx512f"{}}\ \},}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \{\ Cpu::tAVX512DQ,\ \textcolor{stringliteral}{"{}avx512dq"{}}\ \},}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \{\ Cpu::tAVX512IFMA,\ \textcolor{stringliteral}{"{}avx512\_ifma"{}}\ \},}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \{\ Cpu::tAVX512PF,\ \textcolor{stringliteral}{"{}avx512pf"{}}\ \},}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \{\ Cpu::tAVX512ER,\ \textcolor{stringliteral}{"{}avx512er"{}}\ \},}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \{\ Cpu::tAVX512CD,\ \textcolor{stringliteral}{"{}avx512cd"{}}\ \},}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \{\ Cpu::tAVX512BW,\ \textcolor{stringliteral}{"{}avx512bw"{}}\ \},}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \{\ Cpu::tAVX512VL,\ \textcolor{stringliteral}{"{}avx512vl"{}}\ \},}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \{\ Cpu::tAVX512VBMI,\ \textcolor{stringliteral}{"{}avx512\_vbmi"{}}\ \},}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \{\ Cpu::tAVX512\_4VNNIW,\ \textcolor{stringliteral}{"{}avx512\_4vnniw"{}}\ \},}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \{\ Cpu::tAVX512\_4FMAPS,\ \textcolor{stringliteral}{"{}avx512\_4fmaps"{}}\ \},}
+\DoxyCodeLine{00073\ }
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \{\ Cpu::tAVX512\_VBMI2,\ \textcolor{stringliteral}{"{}avx512\_vbmi2"{}}\ \},}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \{\ Cpu::tGFNI,\ \textcolor{stringliteral}{"{}gfni"{}}\ \},}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \{\ Cpu::tVAES,\ \textcolor{stringliteral}{"{}vaes"{}}\ \},}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \{\ Cpu::tVPCLMULQDQ,\ \textcolor{stringliteral}{"{}vpclmulqdq"{}}\ \},}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \{\ Cpu::tAVX512\_VNNI,\ \textcolor{stringliteral}{"{}avx512\_vnni"{}}\ \},}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \{\ Cpu::tAVX512\_BITALG,\ \textcolor{stringliteral}{"{}avx512\_bitalg"{}}\ \},}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \{\ Cpu::tAVX512\_VPOPCNTDQ,\ \textcolor{stringliteral}{"{}avx512\_vpopcntdq"{}}\ \},}
+\DoxyCodeLine{00081\ \ \ \ \ \};}
+\DoxyCodeLine{00082\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{test__util_8cpp_a21ff7c588b94b603f37cc3cb3f21cb6a}{NUM\_OF\_ARRAY}}(\mbox{\hyperlink{cvt__test_8cpp_af73a49a9258b274934a51f5b17b0d1be}{tbl}});\ i++)\ \{}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (cpu.\mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a445001cdff95d3819b6aecf4bfcf073c}{has}}(\mbox{\hyperlink{cvt__test_8cpp_af73a49a9258b274934a51f5b17b0d1be}{tbl}}[i].type))\ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\ \%s"{}},\ \mbox{\hyperlink{cvt__test_8cpp_af73a49a9258b274934a51f5b17b0d1be}{tbl}}[i].str);}
+\DoxyCodeLine{00084\ \ \ \ \ \}}
+\DoxyCodeLine{00085\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{00086\ \ \ \ \ \textcolor{keywordflow}{if}\ (cpu.\mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a445001cdff95d3819b6aecf4bfcf073c}{has}}(Cpu::tPOPCNT))\ \{}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ n\ =\ 0x12345678;\ \textcolor{comment}{//\ bitcount\ =\ 13}}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3ac3fdc8e4e3df74b216721e3ae1fd4945}{ok}}\ =\ 13;}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ =\ \mbox{\hyperlink{struct_pop_count_test}{PopCountTest}}(n).\mbox{\hyperlink{class_xbyak_1_1_code_array_a9ad8a38842d1e0de9045338e460f58ce}{getCode}}<int\ (*)()>()();}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ ==\ ok)\ \{}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ \ \ puts(\textcolor{stringliteral}{"{}popcnt\ ok"{}});}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}popcnt\ ng\ \%d\ \%d\(\backslash\)n"{}},\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ ok);}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00095\ \ \ \ \ \}}
+\DoxyCodeLine{00096\ \ \ \ \ \textcolor{comment}{/*}}
+\DoxyCodeLine{00097\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ displayFamily\ displayModel}}
+\DoxyCodeLine{00098\ \textcolor{comment}{\ \ \ \ \ \ \ \ Opteron\ 2376\ \ \ \ \ \ \ \ 10\ \ \ \ \ \ \ \ \ \ \ \ 4}}
+\DoxyCodeLine{00099\ \textcolor{comment}{\ \ \ \ \ \ \ \ Core2\ Duo\ T7100\ \ \ \ \ \ 6\ \ \ \ \ \ \ \ \ \ \ \ F}}
+\DoxyCodeLine{00100\ \textcolor{comment}{\ \ \ \ \ \ \ \ Core\ i3-\/2120T\ \ \ \ \ \ \ \ 6\ \ \ \ \ \ \ \ \ \ \ 2A}}
+\DoxyCodeLine{00101\ \textcolor{comment}{\ \ \ \ \ \ \ \ Core\ i7-\/2600\ \ \ \ \ \ \ \ \ 6\ \ \ \ \ \ \ \ \ \ \ 2A}}
+\DoxyCodeLine{00102\ \textcolor{comment}{\ \ \ \ \ \ \ \ Xeon\ X5650\ \ \ \ \ \ \ \ \ \ \ 6\ \ \ \ \ \ \ \ \ \ \ 2C}}
+\DoxyCodeLine{00103\ \textcolor{comment}{\ \ \ \ \ \ \ \ Core\ i7-\/3517\ \ \ \ \ \ \ \ \ 6\ \ \ \ \ \ \ \ \ \ \ 3A}}
+\DoxyCodeLine{00104\ \textcolor{comment}{\ \ \ \ \ \ \ \ Core\ i7-\/3930K\ \ \ \ \ \ \ \ 6\ \ \ \ \ \ \ \ \ \ \ 2D}}
+\DoxyCodeLine{00105\ \textcolor{comment}{\ \ \ \ */}}
+\DoxyCodeLine{00106\ \ \ \ \ cpu.\mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a72aba63f99c5427292b39b9414a25f1b}{putFamily}}();}
+\DoxyCodeLine{00107\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ cpu.\mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a33b95225d23baee8be46cd64ff9425c3}{getDataCacheLevels}}();\ i++)\ \{}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}cache\ level=\%u\ data\ cache\ size=\%u\ cores\ sharing\ data\ cache=\%u\(\backslash\)n"{}},\ i,\ cpu.\mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_ae08b3c85154cca76ee23adb6e1dbd226}{getDataCacheSize}}(i),\ cpu.\mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a48de211c96391a0ff01ad1ecb273c400}{getCoresSharingDataCache}}(i));}
+\DoxyCodeLine{00109\ \ \ \ \ \}}
+\DoxyCodeLine{00110\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=322pt]{test__util_8cpp_ab94283ba604f6cb242d92b97989d10e5_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=220pt]{test__util_8cpp_ab94283ba604f6cb242d92b97989d10e5_icgraph}
+\end{center}
+\end{figure}

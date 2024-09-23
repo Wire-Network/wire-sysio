@@ -1,0 +1,31 @@
+<map id="CLI::Option::add_result" name="CLI::Option::add_result">
+<area shape="rect" id="Node000001" title="Puts a result at the end." alt="" coords="1028,116,1184,142"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_app.html#a3b564aa8c90f25152f5379c661ab82b1" title=" " alt="" coords="798,29,980,55"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1067,111,979,70,943,58,945,53,981,65,1069,106"/>
+<area shape="rect" id="Node000009" href="$class_c_l_i_1_1_app.html#a7a15e5743d4a8eccac57955ed5a6a3b6" title="Read and process a configuration file (main app only)" alt="" coords="822,79,956,120"/>
+<area shape="poly" id="edge10_Node000001_Node000009" title=" " alt="" coords="1012,119,956,111,957,106,1013,114"/>
+<area shape="rect" id="Node000011" href="$class_c_l_i_1_1_app.html#a0a367021eca99facc7968bb24333a8fb" title="Get envname options if not yet passed. Runs on all subcommands." alt="" coords="566,141,728,167"/>
+<area shape="poly" id="edge14_Node000001_Node000011" title=" " alt="" coords="1012,137,729,152,728,147,1012,131"/>
+<area shape="rect" id="Node000012" href="$class_c_l_i_1_1_option.html#ad54a6c2a78d84970977f84212a7a6a7b" title=" " alt="" coords="809,195,968,220"/>
+<area shape="poly" id="edge17_Node000001_Node000012" title=" " alt="" coords="1056,150,981,178,929,197,927,192,979,173,1054,145"/>
+<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="927,17,914,10,889,8,866,10,854,15,851,20,857,27,853,31,846,21,850,11,865,5,889,3,915,5,929,12"/>
+<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_app.html#a02368e2fe89470ab9b4131c7e3288349" title=" " alt="" coords="335,41,496,67"/>
+<area shape="poly" id="edge3_Node000002_Node000003" title=" " alt="" coords="782,32,668,26,606,26,545,30,470,43,469,38,544,25,605,21,668,21,782,27"/>
+<area shape="rect" id="Node000008" href="$class_c_l_i_1_1_app.html#af20c05b97b9de2a4543a2de9bcc0993d" title=" " alt="" coords="544,40,750,66"/>
+<area shape="poly" id="edge8_Node000002_Node000008" title=" " alt="" coords="782,50,750,51,750,46,782,44"/>
+<area shape="rect" id="Node000004" href="$class_c_l_i_1_1_app.html#a26a92886a7d7f10a9afbd39b6535f42b" title="Internal parse function." alt="" coords="167,41,287,67"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="320,57,287,57,287,52,320,52"/>
+<area shape="rect" id="Node000005" href="$class_c_l_i_1_1_app.html#a241ba75a6c98b36349ae2f71a9137291" title="Internal parse function." alt="" coords="167,91,287,116"/>
+<area shape="poly" id="edge5_Node000003_Node000005" title=" " alt="" coords="350,74,280,93,278,87,348,69"/>
+<area shape="rect" id="Node000006" href="$class_c_l_i_1_1_app.html#a8ffb155a1153ee23d442c5bfed21225c" title="The real work is done here. Expects a reversed vector." alt="" coords="5,65,119,91"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="151,94,119,90,119,84,151,89"/>
+<area shape="rect" id="Node000007" href="$class_c_l_i_1_1_app.html#a878c1067ade7145aa11478d64f5173ed" title=" " alt="" coords="5,115,119,140"/>
+<area shape="poly" id="edge7_Node000005_Node000007" title=" " alt="" coords="151,117,119,122,119,117,151,112"/>
+<area shape="poly" id="edge9_Node000008_Node000003" title=" " alt="" coords="529,56,497,56,497,51,529,51"/>
+<area shape="rect" id="Node000010" href="$class_c_l_i_1_1_app.html#a0fec24c804daf5b458bb5762e4e75a73" title="Process callbacks and such." alt="" coords="348,91,483,116"/>
+<area shape="poly" id="edge11_Node000009_Node000010" title=" " alt="" coords="806,103,483,106,483,100,806,98"/>
+<area shape="poly" id="edge12_Node000010_Node000004" title=" " alt="" coords="348,89,278,70,280,65,350,84"/>
+<area shape="poly" id="edge13_Node000010_Node000005" title=" " alt="" coords="333,106,287,106,287,101,333,101"/>
+<area shape="poly" id="edge15_Node000011_Node000005" title=" " alt="" coords="550,153,446,145,335,131,277,120,278,114,335,126,447,140,550,147"/>
+<area shape="poly" id="edge16_Node000011_Node000010" title=" " alt="" coords="570,140,477,120,478,114,571,135"/>
+</map>

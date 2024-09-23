@@ -1,0 +1,23 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" href="$structwebsocketpp_1_1config_1_1core.html" title="Server config with iostream transport." alt="" coords="5,188,147,229"/>
+<area shape="rect" id="Node000001" href="$structdebug__config__client.html" title=" " alt="" coords="197,117,334,143"/>
+<area shape="poly" id="edge1020_Node000000_Node000001" title=" " alt="" coords="132,179,194,152,222,141,224,146,196,156,134,184"/>
+<area shape="rect" id="Node000002" href="$structstub__config.html" title=" " alt="" coords="221,166,310,192"/>
+<area shape="poly" id="edge1021_Node000000_Node000002" title=" " alt="" coords="161,193,221,183,221,189,162,198"/>
+<area shape="rect" id="Node000003" href="$structwebsocketpp_1_1config_1_1asio.html" title="Server config with asio transport and TLS disabled." alt="" coords="195,216,336,257"/>
+<area shape="poly" id="edge1022_Node000000_Node000003" title=" " alt="" coords="162,219,195,224,194,229,162,224"/>
+<area shape="rect" id="Node000010" href="$structwebsocketpp_1_1config_1_1asio__tls.html" title="Server config with asio transport and TLS enabled." alt="" coords="195,282,336,322"/>
+<area shape="poly" id="edge1029_Node000000_Node000010" title=" " alt="" coords="132,234,196,266,221,279,219,283,193,271,130,239"/>
+<area shape="rect" id="Node000004" href="$structsysio_1_1detail_1_1asio__with__stub__log.html" title=" " alt="" coords="384,5,581,76"/>
+<area shape="poly" id="edge1023_Node000003_Node000004" title=" " alt="" coords="332,205,334,203,345,188,352,174,357,146,363,116,370,101,382,86,394,74,398,78,386,89,375,104,368,118,363,147,357,176,350,191,338,206,336,208"/>
+<area shape="rect" id="Node000005" href="$structsysio_1_1detail_1_1asio__with__stub__log.html" title=" " alt="" coords="384,100,581,171"/>
+<area shape="poly" id="edge1024_Node000003_Node000005" title=" " alt="" coords="325,207,335,202,405,169,408,174,337,207,327,212"/>
+<area shape="rect" id="Node000006" href="$structcustom__config.html" title=" " alt="" coords="430,194,536,220"/>
+<area shape="poly" id="edge1025_Node000003_Node000006" title=" " alt="" coords="351,222,429,212,429,217,352,228"/>
+<area shape="rect" id="Node000007" href="$structsysio_1_1detail_1_1asio__local__with__stub__log.html" title=" " alt="" coords="412,244,554,285"/>
+<area shape="poly" id="edge1026_Node000003_Node000007" title=" " alt="" coords="352,245,411,253,411,258,351,250"/>
+<area shape="rect" id="Node000008" href="$structsysio_1_1detail_1_1asio__with__stub__log.html" title=" " alt="" coords="412,310,553,350"/>
+<area shape="poly" id="edge1027_Node000003_Node000008" title=" " alt="" coords="326,262,337,268,385,294,416,307,414,312,383,299,335,272,324,267"/>
+<area shape="rect" id="Node000009" href="$structtestee__config.html" title=" " alt="" coords="433,374,532,400"/>
+<area shape="poly" id="edge1028_Node000003_Node000009" title=" " alt="" coords="334,264,338,268,355,293,361,317,368,339,386,360,408,373,433,380,432,385,406,378,382,364,364,341,356,318,350,295,334,272,330,268"/>
+</map>

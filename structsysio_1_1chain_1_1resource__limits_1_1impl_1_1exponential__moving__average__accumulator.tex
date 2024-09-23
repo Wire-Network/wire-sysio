@@ -1,0 +1,208 @@
+\doxysection{sysio\+::chain\+::resource\+\_\+limits\+::impl\+::exponential\+\_\+moving\+\_\+average\+\_\+accumulator\texorpdfstring{$<$}{<} Precision \texorpdfstring{$>$}{>} Struct Template Reference}
+\hypertarget{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator}{}\label{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator}\index{sysio::chain::resource\_limits::impl::exponential\_moving\_average\_accumulator$<$ Precision $>$@{sysio::chain::resource\_limits::impl::exponential\_moving\_average\_accumulator$<$ Precision $>$}}
+
+
+{\ttfamily \#include $<$resource\+\_\+limits\+\_\+private.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator_a212c4355a9c491bda7141cade7f1722e}{exponential\+\_\+moving\+\_\+average\+\_\+accumulator}} ()
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator_ac565af684cfacb1625e39084e88ec742}{average}} () const
+\item 
+void \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator_aa0e71fca059e77ca32875a373e446f67}{add}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} units, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} ordinal, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} window\+\_\+size)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator_a71318b93d001293944aa2edb7413e30f}{last\+\_\+ordinal}}
+\begin{DoxyCompactList}\small\item\em The ordinal of the last period which has contributed to the average. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator_a287aeeff9e2c62aae2ea1f2860e50a32}{value\+\_\+ex}}
+\begin{DoxyCompactList}\small\item\em The current average pre-\/multiplied by Precision. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator_a10942e33869aa60d5b644aa3da2e366b}{consumed}}
+\begin{DoxyCompactList}\small\item\em The last periods average + the current periods contribution so far. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static constexpr \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator_a6dc9da0aa8c3397fd6308480fd6dae0c}{max\+\_\+raw\+\_\+value}} = std\+::numeric\+\_\+limits$<$\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}$>$\+::max() / Precision
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} Precision = config\+::rate\+\_\+limiting\+\_\+precision$>$\newline
+struct sysio\+::chain\+::resource\+\_\+limits\+::impl\+::exponential\+\_\+moving\+\_\+average\+\_\+accumulator$<$ Precision $>$}
+This class accumulates and exponential moving average based on inputs This accumulator assumes there are no drops in input data
+
+The value stored is Precision times the sum of the inputs. 
+
+Definition at line \mbox{\hyperlink{resource__limits__private_8hpp_source_l00069}{69}} of file \mbox{\hyperlink{resource__limits__private_8hpp_source}{resource\+\_\+limits\+\_\+private.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator_a212c4355a9c491bda7141cade7f1722e}\index{sysio::chain::resource\_limits::impl::exponential\_moving\_average\_accumulator$<$ Precision $>$@{sysio::chain::resource\_limits::impl::exponential\_moving\_average\_accumulator$<$ Precision $>$}!exponential\_moving\_average\_accumulator@{exponential\_moving\_average\_accumulator}}
+\index{exponential\_moving\_average\_accumulator@{exponential\_moving\_average\_accumulator}!sysio::chain::resource\_limits::impl::exponential\_moving\_average\_accumulator$<$ Precision $>$@{sysio::chain::resource\_limits::impl::exponential\_moving\_average\_accumulator$<$ Precision $>$}}
+\doxysubsubsection{\texorpdfstring{exponential\_moving\_average\_accumulator()}{exponential\_moving\_average\_accumulator()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator_a212c4355a9c491bda7141cade7f1722e} 
+template$<$\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} Precision = config\+::rate\+\_\+limiting\+\_\+precision$>$ \\
+\mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator}{sysio\+::chain\+::resource\+\_\+limits\+::impl\+::exponential\+\_\+moving\+\_\+average\+\_\+accumulator}}$<$ Precision $>$\+::exponential\+\_\+moving\+\_\+average\+\_\+accumulator (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{resource__limits__private_8hpp_source_l00074}{74}} of file \mbox{\hyperlink{resource__limits__private_8hpp_source}{resource\+\_\+limits\+\_\+private.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator_a71318b93d001293944aa2edb7413e30f}{last\_ordinal}}(0)}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ ,\ \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator_a287aeeff9e2c62aae2ea1f2860e50a32}{value\_ex}}(0)}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ ,\ \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator_a10942e33869aa60d5b644aa3da2e366b}{consumed}}(0)}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator_aa0e71fca059e77ca32875a373e446f67}\index{sysio::chain::resource\_limits::impl::exponential\_moving\_average\_accumulator$<$ Precision $>$@{sysio::chain::resource\_limits::impl::exponential\_moving\_average\_accumulator$<$ Precision $>$}!add@{add}}
+\index{add@{add}!sysio::chain::resource\_limits::impl::exponential\_moving\_average\_accumulator$<$ Precision $>$@{sysio::chain::resource\_limits::impl::exponential\_moving\_average\_accumulator$<$ Precision $>$}}
+\doxysubsubsection{\texorpdfstring{add()}{add()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator_aa0e71fca059e77ca32875a373e446f67} 
+template$<$\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} Precision = config\+::rate\+\_\+limiting\+\_\+precision$>$ \\
+void \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator}{sysio\+::chain\+::resource\+\_\+limits\+::impl\+::exponential\+\_\+moving\+\_\+average\+\_\+accumulator}}$<$ Precision $>$\+::add (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{units}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{ordinal}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{window\+\_\+size}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{resource__limits__private_8hpp_source_l00092}{92}} of file \mbox{\hyperlink{resource__limits__private_8hpp_source}{resource\+\_\+limits\+\_\+private.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ check\ for\ some\ numerical\ limits\ before\ doing\ any\ state\ mutations}}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(units\ <=\ \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator_a6dc9da0aa8c3397fd6308480fd6dae0c}{max\_raw\_value}},\ rate\_limiting\_state\_inconsistent,\ \textcolor{stringliteral}{"{}Usage\ exceeds\ maximum\ value\ representable\ after\ extending\ for\ precision"{}});}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(std::numeric\_limits<\textcolor{keyword}{decltype}(\mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator_a10942e33869aa60d5b644aa3da2e366b}{consumed}})>::max()\ -\/\ \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator_a10942e33869aa60d5b644aa3da2e366b}{consumed}}\ >=\ units,\ rate\_limiting\_state\_inconsistent,\ \textcolor{stringliteral}{"{}Overflow\ in\ tracked\ usage\ when\ adding\ usage!"{}});}
+\DoxyCodeLine{00097\ }
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ value\_ex\_contrib\ =\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1resource__limits_1_1impl_ad13603146ccf93edbdb851067320dd6e}{downgrade\_cast<uint64\_t>}}(\mbox{\hyperlink{namespacesysio_1_1chain_1_1resource__limits_1_1impl_a27299c32ef2c573ed173bd68edd2cd21}{integer\_divide\_ceil}}((\mbox{\hyperlink{namespacesysio_1_1chain_a896515137d9a7844105786ee3a6b1d47}{uint128\_t}})units\ *\ Precision,\ (\mbox{\hyperlink{namespacesysio_1_1chain_a896515137d9a7844105786ee3a6b1d47}{uint128\_t}})window\_size));}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(std::numeric\_limits<\textcolor{keyword}{decltype}(\mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator_a287aeeff9e2c62aae2ea1f2860e50a32}{value\_ex}})>::max()\ -\/\ \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator_a287aeeff9e2c62aae2ea1f2860e50a32}{value\_ex}}\ >=\ value\_ex\_contrib,\ rate\_limiting\_state\_inconsistent,\ \textcolor{stringliteral}{"{}Overflow\ in\ accumulated\ value\ when\ adding\ usage!"{}});}
+\DoxyCodeLine{00100\ }
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator_a71318b93d001293944aa2edb7413e30f}{last\_ordinal}}\ !=\ ordinal\ )\ \{}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ ordinal\ >\ \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator_a71318b93d001293944aa2edb7413e30f}{last\_ordinal}},\ resource\_limit\_exception,\ \textcolor{stringliteral}{"{}new\ ordinal\ cannot\ be\ less\ than\ the\ previous\ ordinal"{}}\ );}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})\mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator_a71318b93d001293944aa2edb7413e30f}{last\_ordinal}}\ +\ window\_size\ >\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})ordinal\ )\ \{}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ delta\ =\ ordinal\ -\/\ \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator_a71318b93d001293944aa2edb7413e30f}{last\_ordinal}};\ \textcolor{comment}{//\ clearly\ 0\ <\ delta\ <\ window\_size}}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ decay\ =\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1resource__limits_1_1impl_a4b7474bf36737d614cdfe51ed0ca0b6a}{make\_ratio}}(}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})window\_size\ -\/\ delta,}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})window\_size}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00109\ }
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator_a287aeeff9e2c62aae2ea1f2860e50a32}{value\_ex}}\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator_a287aeeff9e2c62aae2ea1f2860e50a32}{value\_ex}}\ *\ decay;}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator_a287aeeff9e2c62aae2ea1f2860e50a32}{value\_ex}}\ =\ 0;}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00114\ }
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator_a71318b93d001293944aa2edb7413e30f}{last\_ordinal}}\ =\ ordinal;}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator_a10942e33869aa60d5b644aa3da2e366b}{consumed}}\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator_ac565af684cfacb1625e39084e88ec742}{average}}();}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00118\ }
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator_a10942e33869aa60d5b644aa3da2e366b}{consumed}}\ +=\ units;}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator_a287aeeff9e2c62aae2ea1f2860e50a32}{value\_ex}}\ +=\ value\_ex\_contrib;}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator_aa0e71fca059e77ca32875a373e446f67_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator_aa0e71fca059e77ca32875a373e446f67_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator_ac565af684cfacb1625e39084e88ec742}\index{sysio::chain::resource\_limits::impl::exponential\_moving\_average\_accumulator$<$ Precision $>$@{sysio::chain::resource\_limits::impl::exponential\_moving\_average\_accumulator$<$ Precision $>$}!average@{average}}
+\index{average@{average}!sysio::chain::resource\_limits::impl::exponential\_moving\_average\_accumulator$<$ Precision $>$@{sysio::chain::resource\_limits::impl::exponential\_moving\_average\_accumulator$<$ Precision $>$}}
+\doxysubsubsection{\texorpdfstring{average()}{average()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator_ac565af684cfacb1625e39084e88ec742} 
+template$<$\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} Precision = config\+::rate\+\_\+limiting\+\_\+precision$>$ \\
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator}{sysio\+::chain\+::resource\+\_\+limits\+::impl\+::exponential\+\_\+moving\+\_\+average\+\_\+accumulator}}$<$ Precision $>$\+::average (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+return the average value 
+
+Definition at line \mbox{\hyperlink{resource__limits__private_8hpp_source_l00088}{88}} of file \mbox{\hyperlink{resource__limits__private_8hpp_source}{resource\+\_\+limits\+\_\+private.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1resource__limits_1_1impl_a27299c32ef2c573ed173bd68edd2cd21}{integer\_divide\_ceil}}(\mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator_a287aeeff9e2c62aae2ea1f2860e50a32}{value\_ex}},\ Precision);}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator_ac565af684cfacb1625e39084e88ec742_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator_ac565af684cfacb1625e39084e88ec742_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator_a10942e33869aa60d5b644aa3da2e366b}\index{sysio::chain::resource\_limits::impl::exponential\_moving\_average\_accumulator$<$ Precision $>$@{sysio::chain::resource\_limits::impl::exponential\_moving\_average\_accumulator$<$ Precision $>$}!consumed@{consumed}}
+\index{consumed@{consumed}!sysio::chain::resource\_limits::impl::exponential\_moving\_average\_accumulator$<$ Precision $>$@{sysio::chain::resource\_limits::impl::exponential\_moving\_average\_accumulator$<$ Precision $>$}}
+\doxysubsubsection{\texorpdfstring{consumed}{consumed}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator_a10942e33869aa60d5b644aa3da2e366b} 
+template$<$\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} Precision = config\+::rate\+\_\+limiting\+\_\+precision$>$ \\
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator}{sysio\+::chain\+::resource\+\_\+limits\+::impl\+::exponential\+\_\+moving\+\_\+average\+\_\+accumulator}}$<$ Precision $>$\+::consumed}
+
+
+
+Definition at line \mbox{\hyperlink{resource__limits__private_8hpp_source_l00083}{83}} of file \mbox{\hyperlink{resource__limits__private_8hpp_source}{resource\+\_\+limits\+\_\+private.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator_a71318b93d001293944aa2edb7413e30f}\index{sysio::chain::resource\_limits::impl::exponential\_moving\_average\_accumulator$<$ Precision $>$@{sysio::chain::resource\_limits::impl::exponential\_moving\_average\_accumulator$<$ Precision $>$}!last\_ordinal@{last\_ordinal}}
+\index{last\_ordinal@{last\_ordinal}!sysio::chain::resource\_limits::impl::exponential\_moving\_average\_accumulator$<$ Precision $>$@{sysio::chain::resource\_limits::impl::exponential\_moving\_average\_accumulator$<$ Precision $>$}}
+\doxysubsubsection{\texorpdfstring{last\_ordinal}{last\_ordinal}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator_a71318b93d001293944aa2edb7413e30f} 
+template$<$\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} Precision = config\+::rate\+\_\+limiting\+\_\+precision$>$ \\
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator}{sysio\+::chain\+::resource\+\_\+limits\+::impl\+::exponential\+\_\+moving\+\_\+average\+\_\+accumulator}}$<$ Precision $>$\+::last\+\_\+ordinal}
+
+
+
+Definition at line \mbox{\hyperlink{resource__limits__private_8hpp_source_l00081}{81}} of file \mbox{\hyperlink{resource__limits__private_8hpp_source}{resource\+\_\+limits\+\_\+private.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator_a6dc9da0aa8c3397fd6308480fd6dae0c}\index{sysio::chain::resource\_limits::impl::exponential\_moving\_average\_accumulator$<$ Precision $>$@{sysio::chain::resource\_limits::impl::exponential\_moving\_average\_accumulator$<$ Precision $>$}!max\_raw\_value@{max\_raw\_value}}
+\index{max\_raw\_value@{max\_raw\_value}!sysio::chain::resource\_limits::impl::exponential\_moving\_average\_accumulator$<$ Precision $>$@{sysio::chain::resource\_limits::impl::exponential\_moving\_average\_accumulator$<$ Precision $>$}}
+\doxysubsubsection{\texorpdfstring{max\_raw\_value}{max\_raw\_value}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator_a6dc9da0aa8c3397fd6308480fd6dae0c} 
+template$<$\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} Precision = config\+::rate\+\_\+limiting\+\_\+precision$>$ \\
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator}{sysio\+::chain\+::resource\+\_\+limits\+::impl\+::exponential\+\_\+moving\+\_\+average\+\_\+accumulator}}$<$ Precision $>$\+::max\+\_\+raw\+\_\+value = std\+::numeric\+\_\+limits$<$\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}$>$\+::max() / Precision\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{resource__limits__private_8hpp_source_l00072}{72}} of file \mbox{\hyperlink{resource__limits__private_8hpp_source}{resource\+\_\+limits\+\_\+private.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator_a287aeeff9e2c62aae2ea1f2860e50a32}\index{sysio::chain::resource\_limits::impl::exponential\_moving\_average\_accumulator$<$ Precision $>$@{sysio::chain::resource\_limits::impl::exponential\_moving\_average\_accumulator$<$ Precision $>$}!value\_ex@{value\_ex}}
+\index{value\_ex@{value\_ex}!sysio::chain::resource\_limits::impl::exponential\_moving\_average\_accumulator$<$ Precision $>$@{sysio::chain::resource\_limits::impl::exponential\_moving\_average\_accumulator$<$ Precision $>$}}
+\doxysubsubsection{\texorpdfstring{value\_ex}{value\_ex}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator_a287aeeff9e2c62aae2ea1f2860e50a32} 
+template$<$\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} Precision = config\+::rate\+\_\+limiting\+\_\+precision$>$ \\
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator}{sysio\+::chain\+::resource\+\_\+limits\+::impl\+::exponential\+\_\+moving\+\_\+average\+\_\+accumulator}}$<$ Precision $>$\+::value\+\_\+ex}
+
+
+
+Definition at line \mbox{\hyperlink{resource__limits__private_8hpp_source_l00082}{82}} of file \mbox{\hyperlink{resource__limits__private_8hpp_source}{resource\+\_\+limits\+\_\+private.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{resource__limits__private_8hpp}{resource\+\_\+limits\+\_\+private.\+hpp}}\end{DoxyCompactItemize}

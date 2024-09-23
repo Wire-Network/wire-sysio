@@ -1,0 +1,17 @@
+<map id="sysio::chain::protocol_feature_activation::extension_id" name="sysio::chain::protocol_feature_activation::extension_id">
+<area shape="rect" id="Node000001" title=" " alt="" coords="472,150,684,191"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1pending__block__header__state.html#ae4bf90999ac21cec8f2cf8cb0d4a2b95" title=" " alt="" coords="254,5,403,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="533,143,481,109,423,76,399,64,401,59,425,71,484,105,536,139"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1chain_1_1impl_1_1abi__to__variant.html#ae426aa0cc2761ccedfc68152e75b5592" title=" " alt="" coords="259,85,398,126"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="482,148,398,126,399,121,484,143"/>
+<area shape="rect" id="Node000005" href="$structsysio_1_1chain_1_1fork__database__impl.html#a04a30379f1937bd83b8ced954d7a4ef7" title=" " alt="" coords="242,150,414,191"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="456,173,415,173,415,168,456,168"/>
+<area shape="rect" id="Node000007" href="$structsysio_1_1chain_1_1block__header__state.html#ac3b7399c0a141940dada8c36eee6aa02" title=" " alt="" coords="233,215,424,270"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="492,198,425,217,424,212,490,193"/>
+<area shape="rect" id="Node000008" href="$structsysio_1_1chain_1_1pending__block__header__state.html#ad78d659c77418866805767eb7ca8b04d" title=" " alt="" coords="254,295,403,350"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="542,203,488,244,425,285,403,296,400,292,423,280,485,240,539,199"/>
+<area shape="rect" id="Node000004" href="$classvalidate__reflection_1_1_empty_scope.html#a1fb4f76506790294268dc078986d7430" title=" " alt="" coords="11,85,179,126"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="244,108,180,108,180,102,244,102"/>
+<area shape="rect" id="Node000006" href="$structsysio_1_1chain_1_1fork__database__impl.html#ab8bde04ebc49f6731e46ab330812bd00" title=" " alt="" coords="5,150,185,191"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="227,173,185,173,185,168,227,168"/>
+</map>

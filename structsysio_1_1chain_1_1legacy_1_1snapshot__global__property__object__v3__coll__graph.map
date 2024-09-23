@@ -1,0 +1,13 @@
+<map id="sysio::chain::legacy::snapshot_global_property_object_v3" name="sysio::chain::legacy::snapshot_global_property_object_v3">
+<area shape="rect" id="Node000001" title=" " alt="" coords="607,63,784,119"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1producer__authority__schedule.html" title=" " alt="" coords="294,5,443,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="458,41,607,71,606,76,457,46"/>
+<area shape="rect" id="Node000003" href="$classfc_1_1vector.html" title=" " alt="" coords="5,5,185,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="200,23,293,23,293,28,200,28"/>
+<area shape="rect" id="Node000004" href="$structsysio_1_1chain_1_1chain__config__v0.html" title="Producer&#45;voted blockchain configuration parameters." alt="" coords="303,71,434,111"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="449,88,606,88,606,94,449,94"/>
+<area shape="rect" id="Node000005" href="$structsysio_1_1chain_1_1chain__id__type.html" title=" " alt="" coords="303,136,434,177"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="448,138,606,106,607,111,449,143"/>
+<area shape="rect" id="Node000006" href="$classfc_1_1sha256.html" title=" " alt="" coords="54,144,136,169"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="152,154,303,154,303,159,152,159"/>
+</map>

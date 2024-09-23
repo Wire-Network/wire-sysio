@@ -1,0 +1,11 @@
+<map id="sysio::chain::producer_authority::get_abi_variant" name="sysio::chain::producer_authority::get_abi_variant">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,180,46"/>
+<area shape="rect" id="Node000002" href="$namespacefc.html#adea61f2343de94d0fbcb920a32332ad9" title=" " alt="" coords="228,13,325,38"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="180,23,212,23,212,28,180,28"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1chain_1_1shared__public__key.html#a328e4a70940629953f9087100c46b207" title=" " alt="" coords="373,5,521,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="325,23,358,23,358,28,325,28"/>
+<area shape="rect" id="Node000004" href="$classfc_1_1crypto_1_1public__key.html#ada5158a385e0d407268feb4790ba8646" title=" " alt="" coords="569,5,688,46"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="522,23,554,23,554,28,522,28"/>
+<area shape="rect" id="Node000005" href="$classfc_1_1crypto_1_1public__key.html#aa96a2da856cbba914572aa8629c06c09" title=" " alt="" coords="736,5,854,46"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="688,23,720,23,720,28,688,28"/>
+</map>

@@ -1,0 +1,144 @@
+\doxysection{compress\+\_\+cmd.\+cpp}
+\hypertarget{compress__cmd_8cpp_source}{}\label{compress__cmd_8cpp_source}\index{plugins/trace\_api\_plugin/utils/compress\_cmd.cpp@{plugins/trace\_api\_plugin/utils/compress\_cmd.cpp}}
+\mbox{\hyperlink{compress__cmd_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{compressed__file_8hpp}{sysio/trace\_api/compressed\_file.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{cmd__registration_8hpp}{sysio/trace\_api/cmd\_registration.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <iostream>}}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <boost/program\_options.hpp>}}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <boost/filesystem.hpp>}}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{exception_8hpp}{fc/exception/exception.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00010}00010\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacesysio_1_1trace__api}{sysio::trace\_api}};}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00011}00011\ \textcolor{keyword}{namespace\ }bpo\ =\ boost::program\_options;}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00012}00012\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceboost_1_1filesystem}{bfs}}\ =\ \mbox{\hyperlink{namespaceboost_1_1filesystem}{boost::filesystem}};}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00014}00014\ \textcolor{keyword}{namespace\ }\{}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00015}00015\ \ \ \ std::string\ validate\_input\_path(\textcolor{keyword}{const}\ bpo::variables\_map\&\ vmap)\ \{}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00016}00016\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (vmap.count(\textcolor{stringliteral}{"{}input-\/path"{}})\ ==\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00017}00017\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ bpo::required\_option(\textcolor{stringliteral}{"{}input-\/path"{}});}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00018}00018\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00020}00020\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ input\_path\ =\ vmap.at(\textcolor{stringliteral}{"{}input-\/path"{}}).as<std::string>();}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00022}00022\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!bfs::exists(input\_path))\ \{}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00023}00023\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::logic\_error(input\_path\ +\ \textcolor{stringliteral}{"{}\ does\ not\ exist\ or\ cannot\ be\ read"{}});}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00024}00024\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00026}00026\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (bfs::is\_directory(input\_path))\ \{}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00027}00027\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::logic\_error(input\_path\ +\ \textcolor{stringliteral}{"{}\ is\ a\ directory\ and\ not\ a\ trace\ file"{}});}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00028}00028\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00030}00030\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ input\_path;}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00031}00031\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00033}00033\ \ \ \ std::string\ validate\_output\_path(\textcolor{keyword}{const}\ bpo::variables\_map\&\ vmap,\ \textcolor{keyword}{const}\ std::string\&\ input\_path)\ \{}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00034}00034\ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ std::string\ default\_output\_extension\ =\ \textcolor{stringliteral}{"{}.clog"{}};}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00035}00035\ \ \ \ \ \ \ std::string\ output\_path;}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00036}00036\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (vmap.count(\textcolor{stringliteral}{"{}output-\/path"{}}))\ \{}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00037}00037\ \ \ \ \ \ \ \ \ \ output\_path\ =\ vmap.at(\textcolor{stringliteral}{"{}output-\/path"{}}).as<std::string>();}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00039}00039\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (bfs::exists(output\_path)\ \&\&\ bfs::is\_directory(output\_path))\ \{}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00040}00040\ \ \ \ \ \ \ \ \ \ \ \ \ output\_path\ =\ (bfs::path(output\_path)\ /\ bfs::path(input\_path).filename()).replace\_extension(}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00041}00041\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ default\_output\_extension).generic\_string();}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00042}00042\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00043}00043\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespaceversiongenerate_aab714e0aa9036025ba7c83eb7422c567}{output\_dir}}\ =\ bfs::path(output\_path).parent\_path();}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00044}00044\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{namespaceversiongenerate_aab714e0aa9036025ba7c83eb7422c567}{output\_dir}}.empty()\ \&\&\ !bfs::exists(output\_dir))\ \{}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00045}00045\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::logic\_error(}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00046}00046\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::string(\textcolor{stringliteral}{"{}Output\ file\ parent\ directory:\ "{}}\ +\ \mbox{\hyperlink{namespaceversiongenerate_aab714e0aa9036025ba7c83eb7422c567}{output\_dir}}.generic\_string()\ +\ \textcolor{stringliteral}{"{}\ does\ not\ exist"{}}));}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00047}00047\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00049}00049\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00050}00050\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ input\ =\ bfs::path(input\_path);}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00051}00051\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (input.extension()\ !=\ \textcolor{stringliteral}{"{}.log"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::logic\_error(std::string(\textcolor{stringliteral}{"{}Unrecognized\ extension:\ "{}})\ +\ input.extension().generic\_string());}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00054}00054\ }
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00055}00055\ \ \ \ \ \ \ \ \ \ output\_path\ =\ input.replace\_extension(default\_output\_extension).generic\_string();}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00056}00056\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00058}00058\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ output\_path;}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00059}00059\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00061}00061\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacesysio_1_1client_1_1help_a5990309d6951c912f658bdc05d4369d8}{print\_help\_text}}(std::ostream\&\ os,\ \textcolor{keyword}{const}\ bpo::options\_description\&\ opts)\ \{}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00062}00062\ \ \ \ \ \ \ os\ <<}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Usage:\ trace\_api\_util\ compress\ <options>\ input-\/path\ [output-\/path]\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00064}00064\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00065}00065\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Compress\ a\ trace\ file\ to\ into\ the\ \(\backslash\)"{}clog\(\backslash\)"{}\ format.\ \ By\ default\ the\ name\ of\ the\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00066}00066\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}of\ the\ compressed\ file\ will\ the\ the\ same\ as\ the\ input-\/path\ with\ a\ changing\ the\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00067}00067\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}extension\ to\ \(\backslash\)"{}clog\(\backslash\)"{}."{}}}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)n\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Positional\ Options:\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ \ input-\/path\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ path\ to\ the\ file\ to\ compress\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00071}00071\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ \ output-\/path\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [Optional]\ output\ file\ or\ directory\ path.\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00073}00073\ \ \ \ \ \ \ os\ <<\ opts\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00074}00074\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00075}00075\ }
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00076}00076\ \ \ \ \textcolor{keywordtype}{int}\ do\_compress(\textcolor{keyword}{const}\ bpo::variables\_map\&\ global\_args,\ \textcolor{keyword}{const}\ std::vector<std::string>\&\ args)\ \{}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00077}00077\ \ \ \ \ \ \ bpo::options\_description\ vis\_desc(\textcolor{stringliteral}{"{}Options"{}});}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00078}00078\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ opts\ =\ vis\_desc.add\_options();}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00079}00079\ \ \ \ \ \ \ opts(\textcolor{stringliteral}{"{}help,h"{}},\ \textcolor{stringliteral}{"{}show\ usage\ help\ message"{}});}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00080}00080\ \ \ \ \ \ \ opts(\textcolor{stringliteral}{"{}seek-\/point-\/stride,s"{}},\ bpo::value<uint32\_t>()-\/>default\_value(512),}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00081}00081\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}the\ number\ of\ bytes\ between\ seek\ points\ in\ a\ compressed\ trace.\ \ "{}}}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00082}00082\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}A\ smaller\ stride\ may\ degrade\ compression\ efficiency\ but\ increase\ read\ efficiency"{}});}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00083}00083\ }
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00084}00084\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (global\_args.count(\textcolor{stringliteral}{"{}help"{}}))\ \{}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00085}00085\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1client_1_1help_a5990309d6951c912f658bdc05d4369d8}{print\_help\_text}}(std::cout,\ vis\_desc);}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00086}00086\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00087}00087\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00088}00088\ }
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00089}00089\ \ \ \ \ \ \ bpo::options\_description\ hidden\_desc(\textcolor{stringliteral}{"{}hidden"{}});}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00090}00090\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ hidden\_opts\ =\ hidden\_desc.add\_options();}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00091}00091\ \ \ \ \ \ \ hidden\_opts(\textcolor{stringliteral}{"{}input-\/path,i"{}},\ bpo::value<std::string>(),\ \textcolor{stringliteral}{"{}input\ path"{}});}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00092}00092\ \ \ \ \ \ \ hidden\_opts(\textcolor{stringliteral}{"{}output-\/path,o"{}},\ bpo::value<std::string>(),\ \textcolor{stringliteral}{"{}output\ path"{}});}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00093}00093\ }
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00094}00094\ \ \ \ \ \ \ bpo::positional\_options\_description\ pos\_desc;}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00095}00095\ \ \ \ \ \ \ pos\_desc.add(\textcolor{stringliteral}{"{}input-\/path"{}},\ 1);}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00096}00096\ \ \ \ \ \ \ pos\_desc.add(\textcolor{stringliteral}{"{}output-\/path"{}},\ 1);}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00097}00097\ }
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00098}00098\ \ \ \ \ \ \ bpo::options\_description\ cmdline\_options;}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00099}00099\ \ \ \ \ \ \ cmdline\_options.add(vis\_desc).add(hidden\_desc);}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00100}00100\ }
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00101}00101\ \ \ \ \ \ \ bpo::variables\_map\ vmap;}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00102}00102\ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00103}00103\ \ \ \ \ \ \ \ \ \ bpo::store(bpo::command\_line\_parser(args).\mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}(cmdline\_options).positional(pos\_desc).run(),\ vmap);}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00104}00104\ \ \ \ \ \ \ \ \ \ bpo::notify(vmap);}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00105}00105\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (global\_args.count(\textcolor{stringliteral}{"{}help"{}})\ ==\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00106}00106\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ input\_path\ =\ validate\_input\_path(vmap);}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00107}00107\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ output\_path\ =\ validate\_output\_path(vmap,\ input\_path);}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00108}00108\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ seek\_point\_stride\ =\ vmap.at(\textcolor{stringliteral}{"{}seek-\/point-\/stride"{}}).as<\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}>();}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00109}00109\ }
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00110}00110\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file_ab13021e139e2ee1be1e38e84499810e2}{compressed\_file::process}}(input\_path,\ output\_path,\ seek\_point\_stride))\ \{}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00111}00111\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}Unexpected\ compression\ failure"{}});}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00112}00112\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00113}00113\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00114}00114\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1client_1_1help_a5990309d6951c912f658bdc05d4369d8}{print\_help\_text}}(std::cout,\ vis\_desc);}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00115}00115\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00116}00116\ }
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00117}00117\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00118}00118\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\textcolor{keyword}{const}\ bpo::error\&\ e)\ \{}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00119}00119\ \ \ \ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}Error:\ "{}}\ <<\ e.what()\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00120}00120\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1client_1_1help_a5990309d6951c912f658bdc05d4369d8}{print\_help\_text}}(std::cerr,\ vis\_desc);}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00121}00121\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\ \textcolor{keyword}{const}\ std::bad\_alloc\&\ )\ \{}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00122}00122\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw};}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00123}00123\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\ \textcolor{keyword}{const}\ boost::interprocess::bad\_alloc\&\ )\ \{}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00124}00124\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw};}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00125}00125\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1exception}{fc::exception}}\&\ e)\ \{}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00126}00126\ \ \ \ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}Error:\ "{}}\ <<\ e.\mbox{\hyperlink{classfc_1_1exception_a7611ea8fbe25dde56649b685c2298a37}{to\_detail\_string}}()\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00127}00127\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\textcolor{keyword}{const}\ std::exception\&\ e)\ \{}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00128}00128\ \ \ \ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}Error:\ "{}}\ <<\ e.what()\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00129}00129\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00130}00130\ \ \ \ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}An\ Unknown\ Error\ Occurred\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00131}00131\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00132}00132\ }
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00133}00133\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00134}00134\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00135}00135\ }
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00136}00136\ \ \ \ \textcolor{keyword}{auto}\ \_reg\ =\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1command__registration}{command\_registration}}(\textcolor{stringliteral}{"{}compress"{}},\ \textcolor{stringliteral}{"{}Compress\ a\ trace\ file\ to\ into\ the\ \(\backslash\)"{}clog\(\backslash\)"{}\ format"{}},\ do\_compress);}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00137}00137\ \}}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00138}00138\ }
+
+\end{DoxyCode}

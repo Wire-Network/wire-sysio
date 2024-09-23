@@ -1,0 +1,22 @@
+<map id="CLI::Option::check_name" name="CLI::Option::check_name">
+<area shape="rect" id="Node000001" title="Check a name. Requires &quot;&#45;&quot; or &quot;&#45;&#45;&quot; for short / long, supports positional name." alt="" coords="5,102,176,128"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_option.html#a481001137137be0d6a4e5998866d604a" title="Requires &quot;&#45;&#45;&quot; to be removed from string." alt="" coords="224,61,355,102"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="171,99,208,92,209,98,172,104"/>
+<area shape="rect" id="Node000005" href="$namespace_c_l_i_1_1detail.html#ae83709ec148057ec53df4383645727e9" title="Return a lower case version of a string." alt="" coords="820,10,958,36"/>
+<area shape="poly" id="edge12_Node000001_Node000005" title=" " alt="" coords="111,99,161,72,223,47,301,29,381,16,462,8,542,4,688,5,804,11,804,17,688,10,542,10,463,14,382,22,302,34,224,52,163,76,114,104"/>
+<area shape="rect" id="Node000007" href="$namespace_c_l_i_1_1detail.html#a5359a7a0e33366a12e15523b100f591a" title="remove underscores from a string" alt="" coords="823,154,955,195"/>
+<area shape="poly" id="edge11_Node000001_Node000007" title=" " alt="" coords="114,126,163,153,224,176,375,209,437,217,495,219,617,214,771,197,807,192,808,197,772,203,617,219,495,225,437,222,374,214,223,181,161,158,111,130"/>
+<area shape="rect" id="Node000008" href="$class_c_l_i_1_1_option.html#acfa639ba77f034615c7e66028da1fc3b" title="Requires &quot;&#45;&quot; to be removed from string." alt="" coords="224,126,355,167"/>
+<area shape="poly" id="edge9_Node000001_Node000008" title=" " alt="" coords="175,126,209,131,208,136,174,131"/>
+<area shape="rect" id="Node000003" href="$namespace_c_l_i_1_1detail.html#a356b9c9cc904af2b0a918fd55e86cd9c" title="Check if a string is a member of a list of strings and optionally ignore case or ignore underscores." alt="" coords="403,90,567,116"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="356,86,388,89,387,95,355,91"/>
+<area shape="rect" id="Node000004" href="$namespace_c_l_i.html#a0c52326d2681814c22aa1a93ce43375e" title="Helper function to allow ignore_case to be passed to IsMember or Transform." alt="" coords="633,61,754,86"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="567,89,618,81,619,87,568,94"/>
+<area shape="poly" id="edge8_Node000003_Node000005" title=" " alt="" coords="510,87,558,65,615,45,712,28,804,21,804,27,713,34,616,51,560,70,512,92"/>
+<area shape="rect" id="Node000006" href="$namespace_c_l_i.html#a111b6f05d21b9b84e7ba933ade79884c" title="Helper function to allow ignore_underscore to be passed to IsMember or Transform." alt="" coords="615,162,772,188"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="526,114,641,154,639,159,524,119"/>
+<area shape="poly" id="edge7_Node000003_Node000007" title=" " alt="" coords="568,112,772,147,808,154,807,159,771,152,567,117"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="745,57,821,37,823,43,747,63"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="772,172,807,172,807,177,772,177"/>
+<area shape="poly" id="edge10_Node000008_Node000003" title=" " alt="" coords="355,129,409,117,411,122,356,135"/>
+</map>

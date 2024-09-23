@@ -1,0 +1,9 @@
+<map id="Canvas::AddShape" name="Canvas::AddShape">
+<area shape="rect" id="Node000001" title=" " alt="" coords="348,31,482,56"/>
+<area shape="rect" id="Node000002" href="$archivertest_8cpp.html#a6d0455dd5c30adda100e95f0423c786e" title=" " alt="" coords="250,31,300,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="332,46,301,46,301,41,332,41"/>
+<area shape="rect" id="Node000003" href="$parser_8cpp.html#aaf32dbf85a444e1657a5ee29489fdc4b" title=" " alt="" coords="5,5,202,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="234,40,194,34,195,29,235,35"/>
+<area shape="rect" id="Node000004" href="$archivertest_8cpp.html#ae66f6b31b5ad750f1fe042a706a4e3d4" title=" " alt="" coords="79,55,128,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="235,52,129,67,128,62,234,46"/>
+</map>

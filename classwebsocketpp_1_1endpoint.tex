@@ -1,0 +1,1877 @@
+\doxysection{websocketpp\+::endpoint\texorpdfstring{$<$}{<} connection, config \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classwebsocketpp_1_1endpoint}{}\label{classwebsocketpp_1_1endpoint}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+
+
+Creates and manages connections associated with a Web\+Socket endpoint.  
+
+
+
+
+{\ttfamily \#include $<$endpoint.\+hpp$>$}
+
+
+
+Inheritance diagram for websocketpp\+::endpoint\texorpdfstring{$<$}{<} connection, config \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1endpoint__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for websocketpp\+::endpoint\texorpdfstring{$<$}{<} connection, config \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1endpoint__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a70a5de6d11b241eb73c8ab7f675d06ae}{type}}
+\item 
+typedef config\+::transport\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1endpoint_acb9f10a56c1ace1ae494a826cc82a3b5}{transport\+\_\+type}}
+\begin{DoxyCompactList}\small\item\em Type of the transport component of this endpoint. \end{DoxyCompactList}\item 
+typedef config\+::concurrency\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1endpoint_ad62ddd751b47bb56d5ad9b488186270b}{concurrency\+\_\+type}}
+\begin{DoxyCompactList}\small\item\em Type of the concurrency component of this endpoint. \end{DoxyCompactList}\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a480ce09473cadd3156b20a0248167787}{connection\+\_\+type}}
+\begin{DoxyCompactList}\small\item\em Type of the connections that this endpoint creates. \end{DoxyCompactList}\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1connection_af5839adca921ce08ea3ca3e634155e86}{connection\+\_\+type\+::ptr}} \mbox{\hyperlink{classwebsocketpp_1_1endpoint_aab0c5b0f36b0baabd78672e0ee2f1346}{connection\+\_\+ptr}}
+\begin{DoxyCompactList}\small\item\em Shared pointer to connection\+\_\+type. \end{DoxyCompactList}\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1connection_a96d3321aee803b0c23f4a72e6c5cc875}{connection\+\_\+type\+::weak\+\_\+ptr}} \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a7f7f67e1ceb178688201d89f5c2e870d}{connection\+\_\+weak\+\_\+ptr}}
+\begin{DoxyCompactList}\small\item\em Weak pointer to connection type. \end{DoxyCompactList}\item 
+typedef transport\+\_\+type\+::transport\+\_\+con\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1endpoint_ae95c95597c19ed0d5b6251e9cb261255}{transport\+\_\+con\+\_\+type}}
+\item 
+typedef transport\+\_\+con\+\_\+type\+::ptr \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a3f75dfb60f17dec1278c4b3f2feaca45}{transport\+\_\+con\+\_\+ptr}}
+\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1connection_a78988e5609b6ccdbd0949d5cd5fe440a}{connection\+\_\+type\+::message\+\_\+handler}} \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a539ae39b8ae01e0cb22e237373bfea6c}{message\+\_\+handler}}
+\begin{DoxyCompactList}\small\item\em Type of message\+\_\+handler. \end{DoxyCompactList}\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1connection_a470a4dfe286833dc14e0906eb6e858a5}{connection\+\_\+type\+::message\+\_\+ptr}} \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a8097edab4feb0c36a69601c3786f0062}{message\+\_\+ptr}}
+\begin{DoxyCompactList}\small\item\em Type of message pointers that this endpoint uses. \end{DoxyCompactList}\item 
+typedef config\+::elog\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a928771bc4dae5bf42879aeb2e98ae69a}{elog\+\_\+type}}
+\begin{DoxyCompactList}\small\item\em Type of error logger. \end{DoxyCompactList}\item 
+typedef config\+::alog\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1endpoint_ae2b58b244a7b824e30a18ee2ddaccc02}{alog\+\_\+type}}
+\begin{DoxyCompactList}\small\item\em Type of access logger. \end{DoxyCompactList}\item 
+typedef concurrency\+\_\+type\+::scoped\+\_\+lock\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a0270a5b25d41d95a4d136b9bdf1fd547}{scoped\+\_\+lock\+\_\+type}}
+\begin{DoxyCompactList}\small\item\em Type of our concurrency policy\textquotesingle{}s scoped lock object. \end{DoxyCompactList}\item 
+typedef concurrency\+\_\+type\+::mutex\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1endpoint_aa8dead9a91c34343e29dae2c34adbd1f}{mutex\+\_\+type}}
+\begin{DoxyCompactList}\small\item\em Type of our concurrency policy\textquotesingle{}s mutex object. \end{DoxyCompactList}\item 
+typedef config\+::rng\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a21266599607a9cfa5bd9cf9a9763405a}{rng\+\_\+type}}
+\begin{DoxyCompactList}\small\item\em Type of RNG. \end{DoxyCompactList}\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1connection_a0dafdb1188f82418a8fd33a3638496ea}{connection\+\_\+type\+::termination\+\_\+handler}} \mbox{\hyperlink{classwebsocketpp_1_1endpoint_aa5166db2b96fb109d1955660663eb859}{termination\+\_\+handler}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a12015b0910fe39d0cbbd7fc7ea5ffcfd}{endpoint}} (bool p\+\_\+is\+\_\+server)
+\item 
+\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a4fea6c12eff3d5326d13731a08df2f9e}{\texorpdfstring{$\sim$}{\string~}endpoint}} ()
+\begin{DoxyCompactList}\small\item\em Destructor. \end{DoxyCompactList}\item 
+std\+::string \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a2a106056b019063573120c7a61472834}{get\+\_\+user\+\_\+agent}} () const
+\begin{DoxyCompactList}\small\item\em Returns the user agent string that this endpoint will use. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a06a703c52196d900d1e58b79d6657cc8}{set\+\_\+user\+\_\+agent}} (std\+::string const \&ua)
+\begin{DoxyCompactList}\small\item\em Sets the user agent string that this endpoint will use. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a4f6a1e239250ef6c485865e2adf65b1b}{is\+\_\+server}} () const
+\begin{DoxyCompactList}\small\item\em Returns whether or not this endpoint is a server. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a5d7da609ebd2f797e5e67b6d050ebc59}{set\+\_\+access\+\_\+channels}} (\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{log\+::level}} channels)
+\begin{DoxyCompactList}\small\item\em Set Access logging channel. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a3fe357b3c6434273a9965eb52902575d}{clear\+\_\+access\+\_\+channels}} (\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{log\+::level}} channels)
+\begin{DoxyCompactList}\small\item\em Clear Access logging channels. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a8292bcdca9344b57af1b0964ff7fc778}{set\+\_\+error\+\_\+channels}} (\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{log\+::level}} channels)
+\begin{DoxyCompactList}\small\item\em Set Error logging channel. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a8cefa4fc37c0df4eb6ed0bcf04bb0da5}{clear\+\_\+error\+\_\+channels}} (\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{log\+::level}} channels)
+\begin{DoxyCompactList}\small\item\em Clear Error logging channels. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classwebsocketpp_1_1endpoint_ae2b58b244a7b824e30a18ee2ddaccc02}{alog\+\_\+type}} \& \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a1d9163813aa02ed32100f443b4ddbd8e}{get\+\_\+alog}} ()
+\begin{DoxyCompactList}\small\item\em Get reference to access logger. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a928771bc4dae5bf42879aeb2e98ae69a}{elog\+\_\+type}} \& \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a4be3f1d85aca33ccc6ed149c943a5f1e}{get\+\_\+elog}} ()
+\begin{DoxyCompactList}\small\item\em Get reference to error logger. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a5753d9848aefc04ee91da401c0cc65b8}{set\+\_\+open\+\_\+handler}} (\mbox{\hyperlink{namespacewebsocketpp_a53c8b4ae59cf13b5f883b119bbd14d72}{open\+\_\+handler}} h)
+\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a8d7d95bebc154879655211e2b0b5e069}{set\+\_\+close\+\_\+handler}} (\mbox{\hyperlink{namespacewebsocketpp_a27acb39e01cbca06ccc4e4e8eb8f877d}{close\+\_\+handler}} h)
+\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a073540365f5c810f5a45e5fc76f52f87}{set\+\_\+fail\+\_\+handler}} (\mbox{\hyperlink{namespacewebsocketpp_a5bb2e61cfe649b2e012f1a2c5693a4d5}{fail\+\_\+handler}} h)
+\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_adc6caf0164a0cd073f0535078ccac123}{set\+\_\+ping\+\_\+handler}} (\mbox{\hyperlink{namespacewebsocketpp_a9dcaaa7370865f1bcacb55ae715793ef}{ping\+\_\+handler}} h)
+\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a8ab51c3878bbbcfc92cf5ed6af65e8d7}{set\+\_\+pong\+\_\+handler}} (\mbox{\hyperlink{namespacewebsocketpp_a1798d54e6d98a481cf870091af84bc1f}{pong\+\_\+handler}} h)
+\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a02f6288d1e7c32de7a5940a337076917}{set\+\_\+pong\+\_\+timeout\+\_\+handler}} (\mbox{\hyperlink{namespacewebsocketpp_a2c5925a111b9e553efebea35d5ea155f}{pong\+\_\+timeout\+\_\+handler}} h)
+\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a026eb37f85cea8e79f1a007d12bb55dd}{set\+\_\+interrupt\+\_\+handler}} (\mbox{\hyperlink{namespacewebsocketpp_a55f6947df7673a9de3c44b6bd5d4a82a}{interrupt\+\_\+handler}} h)
+\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a511874384b71238b042968cf736bc510}{set\+\_\+http\+\_\+handler}} (\mbox{\hyperlink{namespacewebsocketpp_a37bc4d5b3b21d3bb494d8a23236315d2}{http\+\_\+handler}} h)
+\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_ac5d059736dd862ccfb3582ba310dfae7}{set\+\_\+validate\+\_\+handler}} (\mbox{\hyperlink{namespacewebsocketpp_ae28f3fed86a59b1998746694f3d4edbd}{validate\+\_\+handler}} h)
+\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a34a3a8351bff65ba878975be471cab85}{set\+\_\+message\+\_\+handler}} (\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a539ae39b8ae01e0cb22e237373bfea6c}{message\+\_\+handler}} h)
+\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_adb8b3736e30bb8e5ee6add965a948102}{set\+\_\+open\+\_\+handshake\+\_\+timeout}} (long dur)
+\begin{DoxyCompactList}\small\item\em Set open handshake timeout. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a54caf799e1cf531d26f67999068d483b}{set\+\_\+close\+\_\+handshake\+\_\+timeout}} (long dur)
+\begin{DoxyCompactList}\small\item\em Set close handshake timeout. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_abcb25dde6f71933c3dbe517c45ebe5c6}{set\+\_\+pong\+\_\+timeout}} (long dur)
+\begin{DoxyCompactList}\small\item\em Set pong timeout. \end{DoxyCompactList}\item 
+size\+\_\+t \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a67d0a1ac6e9a332a485f569e71f85882}{get\+\_\+max\+\_\+message\+\_\+size}} () const
+\begin{DoxyCompactList}\small\item\em Get default maximum message size. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a6268a63c9ce030941fcfb32ddabf3090}{set\+\_\+max\+\_\+message\+\_\+size}} (size\+\_\+t new\+\_\+value)
+\begin{DoxyCompactList}\small\item\em Set default maximum message size. \end{DoxyCompactList}\item 
+size\+\_\+t \mbox{\hyperlink{classwebsocketpp_1_1endpoint_ace4f1bdfdf20c13557b34c35c10ca554}{get\+\_\+max\+\_\+http\+\_\+body\+\_\+size}} () const
+\begin{DoxyCompactList}\small\item\em Get maximum HTTP message body size. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a00be7e08ca5c567dd2a4989b8d41d26b}{set\+\_\+max\+\_\+http\+\_\+body\+\_\+size}} (size\+\_\+t new\+\_\+value)
+\begin{DoxyCompactList}\small\item\em Set maximum HTTP message body size. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_ab6cd8d850c40f33f48d0afb4d7be094c}{interrupt}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}} hdl, lib\+::error\+\_\+code \&ec)
+\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_aa77facb47f09c143e5c22486f02bb455}{interrupt}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}} hdl)
+\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_aef7666b82bf98864b213c3df09298595}{pause\+\_\+reading}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}} hdl, lib\+::error\+\_\+code \&ec)
+\begin{DoxyCompactList}\small\item\em Pause reading of new data (exception free) \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_af7ec27363d0fb1d657a264c4ad853b8e}{pause\+\_\+reading}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}} hdl)
+\begin{DoxyCompactList}\small\item\em Pause reading of new data. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a9753aaade09c9a7a0efd459861ba3b97}{resume\+\_\+reading}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}} hdl, lib\+::error\+\_\+code \&ec)
+\begin{DoxyCompactList}\small\item\em Resume reading of new data (exception free) \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a4592d2270f56fce0f30a41cd17f77650}{resume\+\_\+reading}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}} hdl)
+\begin{DoxyCompactList}\small\item\em Resume reading of new data. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_ae78b1414f7e0cf71c9eab0a29efab8a1}{send\+\_\+http\+\_\+response}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}} hdl, lib\+::error\+\_\+code \&ec)
+\begin{DoxyCompactList}\small\item\em Send deferred HTTP Response. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_af29ca34a6659beea0422a2f27718b9c2}{send\+\_\+http\+\_\+response}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}} hdl)
+\begin{DoxyCompactList}\small\item\em Send deferred HTTP Response (exception free) \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a5341f59de7ef1a565a2fd93daba212d5}{send}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}} hdl, std\+::string const \&payload, \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e}{frame\+::opcode\+::value}} \mbox{\hyperlink{unionop}{op}}, lib\+::error\+\_\+code \&ec)
+\begin{DoxyCompactList}\small\item\em Create a message and add it to the outgoing send queue (exception free) \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a9eb8f9fd7fbb7d8374eb02e100430bcf}{send}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}} hdl, std\+::string const \&payload, \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e}{frame\+::opcode\+::value}} \mbox{\hyperlink{unionop}{op}})
+\begin{DoxyCompactList}\small\item\em Create a message and add it to the outgoing send queue. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a71e4454af8d8f133ca736e80c3adf268}{send}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}} hdl, void const \texorpdfstring{$\ast$}{*}payload, size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}, \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e}{frame\+::opcode\+::value}} \mbox{\hyperlink{unionop}{op}}, lib\+::error\+\_\+code \&ec)
+\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_adc03a5bd5797a54fde64afd279032671}{send}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}} hdl, void const \texorpdfstring{$\ast$}{*}payload, size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}, \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e}{frame\+::opcode\+::value}} \mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a5cad5b7944435e7eec248e98e7e7a912}{send}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}} hdl, \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a8097edab4feb0c36a69601c3786f0062}{message\+\_\+ptr}} msg, lib\+::error\+\_\+code \&ec)
+\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a702e7d609babdacb8ae772b82c3fa8d0}{send}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}} hdl, \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a8097edab4feb0c36a69601c3786f0062}{message\+\_\+ptr}} msg)
+\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_aa6b81c003dba27c6b30d62d5e79593a6}{close}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}} hdl, \mbox{\hyperlink{namespacewebsocketpp_1_1close_1_1status_a8614a5c4733d708e2d2a32191c5bef84}{close\+::status\+::value}} const code, std\+::string const \&reason, lib\+::error\+\_\+code \&ec)
+\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a7a4595364dc18d423ff5aa6eda41ecde}{close}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}} hdl, \mbox{\hyperlink{namespacewebsocketpp_1_1close_1_1status_a8614a5c4733d708e2d2a32191c5bef84}{close\+::status\+::value}} const code, std\+::string const \&reason)
+\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a1d4bcbc3fcd87f48120fbb421467f414}{ping}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}} hdl, std\+::string const \&payload, lib\+::error\+\_\+code \&ec)
+\begin{DoxyCompactList}\small\item\em Send a ping to a specific connection. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a35267939caf4b611b01701ba13cd0b33}{ping}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}} hdl, std\+::string const \&payload)
+\begin{DoxyCompactList}\small\item\em Send a ping to a specific connection. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a58a55e0288d4da518b2a806587df3809}{pong}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}} hdl, std\+::string const \&payload, lib\+::error\+\_\+code \&ec)
+\begin{DoxyCompactList}\small\item\em Send a pong to a specific connection. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_ab546cb4089f868a09c8d0694fb6f0be6}{pong}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}} hdl, std\+::string const \&payload)
+\begin{DoxyCompactList}\small\item\em Send a pong to a specific connection. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classwebsocketpp_1_1endpoint_aab0c5b0f36b0baabd78672e0ee2f1346}{connection\+\_\+ptr}} \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a0fe4457427d4124abe7ca022ba7afbb4}{get\+\_\+con\+\_\+from\+\_\+hdl}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}} hdl, lib\+::error\+\_\+code \&ec)
+\begin{DoxyCompactList}\small\item\em Retrieves a connection\+\_\+ptr from a connection\+\_\+hdl (exception free) \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classwebsocketpp_1_1endpoint_aab0c5b0f36b0baabd78672e0ee2f1346}{connection\+\_\+ptr}} \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a7be6f2e7dc3901dd577eae33dfd2df24}{get\+\_\+con\+\_\+from\+\_\+hdl}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}} hdl)
+\begin{DoxyCompactList}\small\item\em Retrieves a connection\+\_\+ptr from a connection\+\_\+hdl (exception version) \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classwebsocketpp_1_1endpoint_aab0c5b0f36b0baabd78672e0ee2f1346}{connection\+\_\+ptr}} \mbox{\hyperlink{classwebsocketpp_1_1endpoint_abfbee4cb244700560ef80594a913cd95}{create\+\_\+connection}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classwebsocketpp_1_1endpoint_ae2b58b244a7b824e30a18ee2ddaccc02}{alog\+\_\+type}} \mbox{\hyperlink{classwebsocketpp_1_1endpoint_ab77acb19adafe52f5c28aa387077cfbc}{m\+\_\+alog}}
+\item 
+\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a928771bc4dae5bf42879aeb2e98ae69a}{elog\+\_\+type}} \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a46d6afb6f4f1541da167230c8c1e6f9a}{m\+\_\+elog}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, typename \mbox{\hyperlink{classconfig}{config}}$>$\newline
+class websocketpp\+::endpoint$<$ connection, config $>$}
+
+
+Definition at line \mbox{\hyperlink{endpoint_8hpp_source_l00042}{42}} of file \mbox{\hyperlink{endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classwebsocketpp_1_1endpoint_ae2b58b244a7b824e30a18ee2ddaccc02}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!alog\_type@{alog\_type}}
+\index{alog\_type@{alog\_type}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{alog\_type}{alog\_type}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_ae2b58b244a7b824e30a18ee2ddaccc02} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+config\+::alog\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::alog\+\_\+type}
+
+
+
+Definition at line \mbox{\hyperlink{endpoint_8hpp_source_l00075}{75}} of file \mbox{\hyperlink{endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+\Hypertarget{classwebsocketpp_1_1endpoint_ad62ddd751b47bb56d5ad9b488186270b}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!concurrency\_type@{concurrency\_type}}
+\index{concurrency\_type@{concurrency\_type}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{concurrency\_type}{concurrency\_type}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_ad62ddd751b47bb56d5ad9b488186270b} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+config\+::concurrency\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::concurrency\+\_\+type}
+
+
+
+Definition at line \mbox{\hyperlink{endpoint_8hpp_source_l00051}{51}} of file \mbox{\hyperlink{endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+\Hypertarget{classwebsocketpp_1_1endpoint_aab0c5b0f36b0baabd78672e0ee2f1346}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!connection\_ptr@{connection\_ptr}}
+\index{connection\_ptr@{connection\_ptr}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{connection\_ptr}{connection\_ptr}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_aab0c5b0f36b0baabd78672e0ee2f1346} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+\mbox{\hyperlink{classwebsocketpp_1_1connection_af5839adca921ce08ea3ca3e634155e86}{connection\+\_\+type\+::ptr}} \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\mbox{\hyperlink{debug__client_8cpp_ae9c9779aea742ab80689add7e553df0d}{\+::connection\+\_\+ptr}}}
+
+
+
+Definition at line \mbox{\hyperlink{endpoint_8hpp_source_l00056}{56}} of file \mbox{\hyperlink{endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+\Hypertarget{classwebsocketpp_1_1endpoint_a480ce09473cadd3156b20a0248167787}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!connection\_type@{connection\_type}}
+\index{connection\_type@{connection\_type}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{connection\_type}{connection\_type}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_a480ce09473cadd3156b20a0248167787} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+\mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::connection\+\_\+type}
+
+
+
+Definition at line \mbox{\hyperlink{endpoint_8hpp_source_l00054}{54}} of file \mbox{\hyperlink{endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+\Hypertarget{classwebsocketpp_1_1endpoint_a7f7f67e1ceb178688201d89f5c2e870d}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!connection\_weak\_ptr@{connection\_weak\_ptr}}
+\index{connection\_weak\_ptr@{connection\_weak\_ptr}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{connection\_weak\_ptr}{connection\_weak\_ptr}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_a7f7f67e1ceb178688201d89f5c2e870d} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+\mbox{\hyperlink{classwebsocketpp_1_1connection_a96d3321aee803b0c23f4a72e6c5cc875}{connection\+\_\+type\+::weak\+\_\+ptr}} \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::connection\+\_\+weak\+\_\+ptr}
+
+
+
+Definition at line \mbox{\hyperlink{endpoint_8hpp_source_l00058}{58}} of file \mbox{\hyperlink{endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+\Hypertarget{classwebsocketpp_1_1endpoint_a928771bc4dae5bf42879aeb2e98ae69a}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!elog\_type@{elog\_type}}
+\index{elog\_type@{elog\_type}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{elog\_type}{elog\_type}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_a928771bc4dae5bf42879aeb2e98ae69a} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+config\+::elog\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::elog\+\_\+type}
+
+
+
+Definition at line \mbox{\hyperlink{endpoint_8hpp_source_l00073}{73}} of file \mbox{\hyperlink{endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+\Hypertarget{classwebsocketpp_1_1endpoint_a539ae39b8ae01e0cb22e237373bfea6c}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!message\_handler@{message\_handler}}
+\index{message\_handler@{message\_handler}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{message\_handler}{message\_handler}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_a539ae39b8ae01e0cb22e237373bfea6c} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+\mbox{\hyperlink{classwebsocketpp_1_1connection_a78988e5609b6ccdbd0949d5cd5fe440a}{connection\+\_\+type\+::message\+\_\+handler}} \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::message\+\_\+handler}
+
+
+
+Definition at line \mbox{\hyperlink{endpoint_8hpp_source_l00068}{68}} of file \mbox{\hyperlink{endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+\Hypertarget{classwebsocketpp_1_1endpoint_a8097edab4feb0c36a69601c3786f0062}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!message\_ptr@{message\_ptr}}
+\index{message\_ptr@{message\_ptr}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{message\_ptr}{message\_ptr}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_a8097edab4feb0c36a69601c3786f0062} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+\mbox{\hyperlink{classwebsocketpp_1_1connection_a470a4dfe286833dc14e0906eb6e858a5}{connection\+\_\+type\+::message\+\_\+ptr}} \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\mbox{\hyperlink{debug__client_8cpp_a08398c4d31a4dc3e42d1b9a9ef64c6ad}{\+::message\+\_\+ptr}}}
+
+
+
+Definition at line \mbox{\hyperlink{endpoint_8hpp_source_l00070}{70}} of file \mbox{\hyperlink{endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+\Hypertarget{classwebsocketpp_1_1endpoint_aa8dead9a91c34343e29dae2c34adbd1f}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!mutex\_type@{mutex\_type}}
+\index{mutex\_type@{mutex\_type}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{mutex\_type}{mutex\_type}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_aa8dead9a91c34343e29dae2c34adbd1f} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+concurrency\+\_\+type\+::mutex\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::mutex\+\_\+type}
+
+
+
+Definition at line \mbox{\hyperlink{endpoint_8hpp_source_l00080}{80}} of file \mbox{\hyperlink{endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+\Hypertarget{classwebsocketpp_1_1endpoint_a21266599607a9cfa5bd9cf9a9763405a}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!rng\_type@{rng\_type}}
+\index{rng\_type@{rng\_type}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{rng\_type}{rng\_type}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_a21266599607a9cfa5bd9cf9a9763405a} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+config\+::rng\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::rng\+\_\+type}
+
+
+
+Definition at line \mbox{\hyperlink{endpoint_8hpp_source_l00083}{83}} of file \mbox{\hyperlink{endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+\Hypertarget{classwebsocketpp_1_1endpoint_a0270a5b25d41d95a4d136b9bdf1fd547}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!scoped\_lock\_type@{scoped\_lock\_type}}
+\index{scoped\_lock\_type@{scoped\_lock\_type}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{scoped\_lock\_type}{scoped\_lock\_type}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_a0270a5b25d41d95a4d136b9bdf1fd547} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+concurrency\+\_\+type\+::scoped\+\_\+lock\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::scoped\+\_\+lock\+\_\+type}
+
+
+
+Definition at line \mbox{\hyperlink{endpoint_8hpp_source_l00078}{78}} of file \mbox{\hyperlink{endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+\Hypertarget{classwebsocketpp_1_1endpoint_aa5166db2b96fb109d1955660663eb859}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!termination\_handler@{termination\_handler}}
+\index{termination\_handler@{termination\_handler}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{termination\_handler}{termination\_handler}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_aa5166db2b96fb109d1955660663eb859} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+\mbox{\hyperlink{classwebsocketpp_1_1connection_a0dafdb1188f82418a8fd33a3638496ea}{connection\+\_\+type\+::termination\+\_\+handler}} \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::termination\+\_\+handler}
+
+
+
+Definition at line \mbox{\hyperlink{endpoint_8hpp_source_l00086}{86}} of file \mbox{\hyperlink{endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+\Hypertarget{classwebsocketpp_1_1endpoint_a3f75dfb60f17dec1278c4b3f2feaca45}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!transport\_con\_ptr@{transport\_con\_ptr}}
+\index{transport\_con\_ptr@{transport\_con\_ptr}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{transport\_con\_ptr}{transport\_con\_ptr}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_a3f75dfb60f17dec1278c4b3f2feaca45} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+transport\+\_\+con\+\_\+type\+::ptr \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::transport\+\_\+con\+\_\+ptr}
+
+Type of a shared pointer to the transport component of the connections that this endpoint creates. 
+
+Definition at line \mbox{\hyperlink{endpoint_8hpp_source_l00065}{65}} of file \mbox{\hyperlink{endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+\Hypertarget{classwebsocketpp_1_1endpoint_ae95c95597c19ed0d5b6251e9cb261255}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!transport\_con\_type@{transport\_con\_type}}
+\index{transport\_con\_type@{transport\_con\_type}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{transport\_con\_type}{transport\_con\_type}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_ae95c95597c19ed0d5b6251e9cb261255} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+transport\+\_\+type\+::transport\+\_\+con\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::transport\+\_\+con\+\_\+type}
+
+Type of the transport component of the connections that this endpoint creates 
+
+Definition at line \mbox{\hyperlink{endpoint_8hpp_source_l00062}{62}} of file \mbox{\hyperlink{endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+\Hypertarget{classwebsocketpp_1_1endpoint_acb9f10a56c1ace1ae494a826cc82a3b5}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!transport\_type@{transport\_type}}
+\index{transport\_type@{transport\_type}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{transport\_type}{transport\_type}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_acb9f10a56c1ace1ae494a826cc82a3b5} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+config\+::transport\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::transport\+\_\+type}
+
+
+
+Definition at line \mbox{\hyperlink{endpoint_8hpp_source_l00049}{49}} of file \mbox{\hyperlink{endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+\Hypertarget{classwebsocketpp_1_1endpoint_a70a5de6d11b241eb73c8ab7f675d06ae}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!type@{type}}
+\index{type@{type}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{type}{type}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_a70a5de6d11b241eb73c8ab7f675d06ae} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+\mbox{\hyperlink{classwebsocketpp_1_1endpoint}{endpoint}}$<$\mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}},\mbox{\hyperlink{classconfig}{config}}$>$ \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::type}
+
+
+
+Definition at line \mbox{\hyperlink{endpoint_8hpp_source_l00046}{46}} of file \mbox{\hyperlink{endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classwebsocketpp_1_1endpoint_a12015b0910fe39d0cbbd7fc7ea5ffcfd}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!endpoint@{endpoint}}
+\index{endpoint@{endpoint}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{endpoint()}{endpoint()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_a12015b0910fe39d0cbbd7fc7ea5ffcfd} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+\mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::endpoint (\begin{DoxyParamCaption}\item[{bool}]{p\+\_\+is\+\_\+server}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{endpoint_8hpp_source_l00091}{91}} of file \mbox{\hyperlink{endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ :\ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_ab77acb19adafe52f5c28aa387077cfbc}{m\_alog}}(config::alog\_level,\ \mbox{\hyperlink{structwebsocketpp_1_1log_1_1channel__type__hint_a8c38587fffbffbfcfc35577734b0d653}{log::channel\_type\_hint::access}})}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ ,\ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a46d6afb6f4f1541da167230c8c1e6f9a}{m\_elog}}(config::elog\_level,\ \mbox{\hyperlink{structwebsocketpp_1_1log_1_1channel__type__hint_a91473ac49fba696549da438483a6fe31}{log::channel\_type\_hint::error}})}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ ,\ m\_user\_agent(::websocketpp::user\_agent)}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ ,\ m\_open\_handshake\_timeout\_dur(config::timeout\_open\_handshake)}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ ,\ m\_close\_handshake\_timeout\_dur(config::timeout\_close\_handshake)}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ ,\ m\_pong\_timeout\_dur(config::timeout\_pong)}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ ,\ m\_max\_message\_size(config::max\_message\_size)}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ ,\ m\_max\_http\_body\_size(config::max\_http\_body\_size)}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ ,\ m\_is\_server(p\_is\_server)}
+\DoxyCodeLine{00101\ \ \ \ \ \{}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_ab77acb19adafe52f5c28aa387077cfbc}{m\_alog}}.set\_channels(config::alog\_level);}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a46d6afb6f4f1541da167230c8c1e6f9a}{m\_elog}}.set\_channels(config::elog\_level);}
+\DoxyCodeLine{00104\ }
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_ab77acb19adafe52f5c28aa387077cfbc}{m\_alog}}.write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}{log::alevel::devel}},\ \textcolor{stringliteral}{"{}endpoint\ constructor"{}});}
+\DoxyCodeLine{00106\ }
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ transport\_type::init\_logging(\&\mbox{\hyperlink{classwebsocketpp_1_1endpoint_ab77acb19adafe52f5c28aa387077cfbc}{m\_alog}},\ \&\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a46d6afb6f4f1541da167230c8c1e6f9a}{m\_elog}});}
+\DoxyCodeLine{00108\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1endpoint_a4fea6c12eff3d5326d13731a08df2f9e}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!````~endpoint@{\texorpdfstring{$\sim$}{\string~}endpoint}}
+\index{````~endpoint@{\texorpdfstring{$\sim$}{\string~}endpoint}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}endpoint()}{\string~endpoint()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_a4fea6c12eff3d5326d13731a08df2f9e} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+\mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::\texorpdfstring{$\sim$}{\string~}\mbox{\hyperlink{classwebsocketpp_1_1endpoint}{endpoint}} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{endpoint_8hpp_source_l00091}{91}} of file \mbox{\hyperlink{endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00112\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classwebsocketpp_1_1endpoint_a3fe357b3c6434273a9965eb52902575d}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!clear\_access\_channels@{clear\_access\_channels}}
+\index{clear\_access\_channels@{clear\_access\_channels}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{clear\_access\_channels()}{clear\_access\_channels()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_a3fe357b3c6434273a9965eb52902575d} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::clear\+\_\+access\+\_\+channels (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{log\+::level}}}]{channels}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Clear the access logger\textquotesingle{}s channel value. The value is a number whose interpretation depends on the logging policy in use.
+
+
+\begin{DoxyParams}{Parameters}
+{\em channels} & The channel \doxylink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value(s)} to clear \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{endpoint_8hpp_source_l00231}{231}} of file \mbox{\hyperlink{endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00231\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00232\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_ab77acb19adafe52f5c28aa387077cfbc}{m\_alog}}.clear\_channels(channels);}
+\DoxyCodeLine{00233\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1endpoint_a3fe357b3c6434273a9965eb52902575d_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1endpoint_a8cefa4fc37c0df4eb6ed0bcf04bb0da5}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!clear\_error\_channels@{clear\_error\_channels}}
+\index{clear\_error\_channels@{clear\_error\_channels}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{clear\_error\_channels()}{clear\_error\_channels()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_a8cefa4fc37c0df4eb6ed0bcf04bb0da5} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::clear\+\_\+error\+\_\+channels (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{log\+::level}}}]{channels}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Clear the error logger\textquotesingle{}s channel value. The value is a number whose interpretation depends on the logging policy in use.
+
+
+\begin{DoxyParams}{Parameters}
+{\em channels} & The channel \doxylink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value(s)} to clear \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{endpoint_8hpp_source_l00253}{253}} of file \mbox{\hyperlink{endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00253\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00254\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a46d6afb6f4f1541da167230c8c1e6f9a}{m\_elog}}.clear\_channels(channels);}
+\DoxyCodeLine{00255\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1endpoint_a8cefa4fc37c0df4eb6ed0bcf04bb0da5_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1endpoint_a7a4595364dc18d423ff5aa6eda41ecde}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!close@{close}}
+\index{close@{close}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{close()}{close()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_a7a4595364dc18d423ff5aa6eda41ecde} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::close (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}}}]{hdl}{, }\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1close_1_1status_a8614a5c4733d708e2d2a32191c5bef84}{close\+::status\+::value}} const}]{code}{, }\item[{std\+::string const \&}]{reason}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{endpoint__impl_8hpp_source_l00225}{225}} of file \mbox{\hyperlink{endpoint__impl_8hpp_source}{endpoint\+\_\+impl.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00227\ \{}
+\DoxyCodeLine{00228\ \ \ \ \ lib::error\_code\ ec;}
+\DoxyCodeLine{00229\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_aa6b81c003dba27c6b30d62d5e79593a6}{close}}(hdl,code,reason,ec);}
+\DoxyCodeLine{00230\ \ \ \ \ \textcolor{keywordflow}{if}\ (ec)\ \{\ \textcolor{keywordflow}{throw}\ exception(ec);\ \}}
+\DoxyCodeLine{00231\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1endpoint_aa6b81c003dba27c6b30d62d5e79593a6}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!close@{close}}
+\index{close@{close}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{close()}{close()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_aa6b81c003dba27c6b30d62d5e79593a6} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::close (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}}}]{hdl}{, }\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1close_1_1status_a8614a5c4733d708e2d2a32191c5bef84}{close\+::status\+::value}} const}]{code}{, }\item[{std\+::string const \&}]{reason}{, }\item[{lib\+::error\+\_\+code \&}]{ec}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{endpoint__impl_8hpp_source_l00215}{215}} of file \mbox{\hyperlink{endpoint__impl_8hpp_source}{endpoint\+\_\+impl.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00218\ \{}
+\DoxyCodeLine{00219\ \ \ \ \ \mbox{\hyperlink{debug__client_8cpp_ae9c9779aea742ab80689add7e553df0d}{connection\_ptr}}\ con\ =\ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a0fe4457427d4124abe7ca022ba7afbb4}{get\_con\_from\_hdl}}(hdl,ec);}
+\DoxyCodeLine{00220\ \ \ \ \ \textcolor{keywordflow}{if}\ (ec)\ \{\textcolor{keywordflow}{return};\}}
+\DoxyCodeLine{00221\ \ \ \ \ con-\/>close(code,reason,ec);}
+\DoxyCodeLine{00222\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1endpoint_aa6b81c003dba27c6b30d62d5e79593a6_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1endpoint_abfbee4cb244700560ef80594a913cd95}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!create\_connection@{create\_connection}}
+\index{create\_connection@{create\_connection}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{create\_connection()}{create\_connection()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_abfbee4cb244700560ef80594a913cd95} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+\mbox{\hyperlink{classwebsocketpp_1_1endpoint}{endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\mbox{\hyperlink{debug__client_8cpp_ae9c9779aea742ab80689add7e553df0d}{\+::connection\+\_\+ptr}} \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::create\+\_\+connection (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{endpoint__impl_8hpp_source_l00037}{37}} of file \mbox{\hyperlink{endpoint__impl_8hpp_source}{endpoint\+\_\+impl.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00038\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_ab77acb19adafe52f5c28aa387077cfbc}{m\_alog}}.write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}{log::alevel::devel}},\textcolor{stringliteral}{"{}create\_connection"{}});}
+\DoxyCodeLine{00039\ \ \ \ \ \textcolor{comment}{//scoped\_lock\_type\ lock(m\_state\_lock);}}
+\DoxyCodeLine{00040\ }
+\DoxyCodeLine{00041\ \ \ \ \ \textcolor{comment}{/*if\ (m\_state\ ==\ STOPPING\ ||\ m\_state\ ==\ STOPPED)\ \{}}
+\DoxyCodeLine{00042\ \textcolor{comment}{\ \ \ \ \ \ \ \ return\ connection\_ptr();}}
+\DoxyCodeLine{00043\ \textcolor{comment}{\ \ \ \ \}*/}}
+\DoxyCodeLine{00044\ }
+\DoxyCodeLine{00045\ \ \ \ \ \textcolor{comment}{//scoped\_lock\_type\ guard(m\_mutex);}}
+\DoxyCodeLine{00046\ \ \ \ \ \textcolor{comment}{//\ Create\ a\ connection\ on\ the\ heap\ and\ manage\ it\ using\ a\ shared\ pointer}}
+\DoxyCodeLine{00047\ \ \ \ \ \mbox{\hyperlink{debug__client_8cpp_ae9c9779aea742ab80689add7e553df0d}{connection\_ptr}}\ con\ =\ lib::make\_shared<connection\_type>(m\_is\_server,}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ m\_user\_agent,\ lib::ref(\mbox{\hyperlink{classwebsocketpp_1_1endpoint_ab77acb19adafe52f5c28aa387077cfbc}{m\_alog}}),\ lib::ref(\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a46d6afb6f4f1541da167230c8c1e6f9a}{m\_elog}}),\ lib::ref(m\_rng));}
+\DoxyCodeLine{00049\ }
+\DoxyCodeLine{00050\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a7f7f67e1ceb178688201d89f5c2e870d}{connection\_weak\_ptr}}\ w(con);}
+\DoxyCodeLine{00051\ }
+\DoxyCodeLine{00052\ \ \ \ \ \textcolor{comment}{//\ Create\ a\ weak\ pointer\ on\ the\ heap\ using\ that\ shared\_ptr.}}
+\DoxyCodeLine{00053\ \ \ \ \ \textcolor{comment}{//\ Cast\ that\ weak\ pointer\ to\ void*\ and\ manage\ it\ using\ another\ shared\_ptr}}
+\DoxyCodeLine{00054\ \ \ \ \ \textcolor{comment}{//\ connection\_hdl\ hdl(reinterpret\_cast<void*>(new\ connection\_weak\_ptr(con)));}}
+\DoxyCodeLine{00055\ }
+\DoxyCodeLine{00056\ \ \ \ \ con-\/>set\_handle(w);}
+\DoxyCodeLine{00057\ }
+\DoxyCodeLine{00058\ \ \ \ \ \textcolor{comment}{//\ Copy\ default\ handlers\ from\ the\ endpoint}}
+\DoxyCodeLine{00059\ \ \ \ \ con-\/>set\_open\_handler(m\_open\_handler);}
+\DoxyCodeLine{00060\ \ \ \ \ con-\/>set\_close\_handler(m\_close\_handler);}
+\DoxyCodeLine{00061\ \ \ \ \ con-\/>set\_fail\_handler(m\_fail\_handler);}
+\DoxyCodeLine{00062\ \ \ \ \ con-\/>set\_ping\_handler(m\_ping\_handler);}
+\DoxyCodeLine{00063\ \ \ \ \ con-\/>set\_pong\_handler(m\_pong\_handler);}
+\DoxyCodeLine{00064\ \ \ \ \ con-\/>set\_pong\_timeout\_handler(m\_pong\_timeout\_handler);}
+\DoxyCodeLine{00065\ \ \ \ \ con-\/>set\_interrupt\_handler(m\_interrupt\_handler);}
+\DoxyCodeLine{00066\ \ \ \ \ con-\/>set\_http\_handler(m\_http\_handler);}
+\DoxyCodeLine{00067\ \ \ \ \ con-\/>set\_validate\_handler(m\_validate\_handler);}
+\DoxyCodeLine{00068\ \ \ \ \ con-\/>set\_message\_handler(m\_message\_handler);}
+\DoxyCodeLine{00069\ }
+\DoxyCodeLine{00070\ \ \ \ \ \textcolor{keywordflow}{if}\ (m\_open\_handshake\_timeout\_dur\ !=\ config::timeout\_open\_handshake)\ \{}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ con-\/>set\_open\_handshake\_timeout(m\_open\_handshake\_timeout\_dur);}
+\DoxyCodeLine{00072\ \ \ \ \ \}}
+\DoxyCodeLine{00073\ \ \ \ \ \textcolor{keywordflow}{if}\ (m\_close\_handshake\_timeout\_dur\ !=\ config::timeout\_close\_handshake)\ \{}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ con-\/>set\_close\_handshake\_timeout(m\_close\_handshake\_timeout\_dur);}
+\DoxyCodeLine{00075\ \ \ \ \ \}}
+\DoxyCodeLine{00076\ \ \ \ \ \textcolor{keywordflow}{if}\ (m\_pong\_timeout\_dur\ !=\ config::timeout\_pong)\ \{}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ con-\/>set\_pong\_timeout(m\_pong\_timeout\_dur);}
+\DoxyCodeLine{00078\ \ \ \ \ \}}
+\DoxyCodeLine{00079\ \ \ \ \ \textcolor{keywordflow}{if}\ (m\_max\_message\_size\ !=\ config::max\_message\_size)\ \{}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ con-\/>set\_max\_message\_size(m\_max\_message\_size);}
+\DoxyCodeLine{00081\ \ \ \ \ \}}
+\DoxyCodeLine{00082\ \ \ \ \ con-\/>set\_max\_http\_body\_size(m\_max\_http\_body\_size);}
+\DoxyCodeLine{00083\ }
+\DoxyCodeLine{00084\ \ \ \ \ lib::error\_code\ ec;}
+\DoxyCodeLine{00085\ }
+\DoxyCodeLine{00086\ \ \ \ \ ec\ =\ transport\_type::init(con);}
+\DoxyCodeLine{00087\ \ \ \ \ \textcolor{keywordflow}{if}\ (ec)\ \{}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a46d6afb6f4f1541da167230c8c1e6f9a}{m\_elog}}.write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1elevel_aa909808e0fb142742a0ebd2dca54f517}{log::elevel::fatal}},ec.message());}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_aab0c5b0f36b0baabd78672e0ee2f1346}{connection\_ptr}}();}
+\DoxyCodeLine{00090\ \ \ \ \ \}}
+\DoxyCodeLine{00091\ }
+\DoxyCodeLine{00092\ \ \ \ \ \textcolor{keywordflow}{return}\ con;}
+\DoxyCodeLine{00093\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1endpoint_abfbee4cb244700560ef80594a913cd95_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1endpoint_a1d9163813aa02ed32100f443b4ddbd8e}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!get\_alog@{get\_alog}}
+\index{get\_alog@{get\_alog}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{get\_alog()}{get\_alog()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_a1d9163813aa02ed32100f443b4ddbd8e} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+\mbox{\hyperlink{classwebsocketpp_1_1endpoint_ae2b58b244a7b824e30a18ee2ddaccc02}{alog\+\_\+type}} \& \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::get\+\_\+alog (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\begin{DoxyReturn}{Returns}
+\doxylink{struct_a}{A} reference to the access logger 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{endpoint_8hpp_source_l00261}{261}} of file \mbox{\hyperlink{endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00261\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00262\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_ab77acb19adafe52f5c28aa387077cfbc}{m\_alog}};}
+\DoxyCodeLine{00263\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1endpoint_a1d9163813aa02ed32100f443b4ddbd8e_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1endpoint_a7be6f2e7dc3901dd577eae33dfd2df24}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!get\_con\_from\_hdl@{get\_con\_from\_hdl}}
+\index{get\_con\_from\_hdl@{get\_con\_from\_hdl}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{get\_con\_from\_hdl()}{get\_con\_from\_hdl()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_a7be6f2e7dc3901dd577eae33dfd2df24} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+\mbox{\hyperlink{classwebsocketpp_1_1endpoint_aab0c5b0f36b0baabd78672e0ee2f1346}{connection\+\_\+ptr}} \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::get\+\_\+con\+\_\+from\+\_\+hdl (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}}}]{hdl}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{endpoint_8hpp_source_l00653}{653}} of file \mbox{\hyperlink{endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00653\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00654\ \ \ \ \ \ \ \ \ lib::error\_code\ ec;}
+\DoxyCodeLine{00655\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{debug__client_8cpp_ae9c9779aea742ab80689add7e553df0d}{connection\_ptr}}\ con\ =\ this-\/>\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a0fe4457427d4124abe7ca022ba7afbb4}{get\_con\_from\_hdl}}(hdl,ec);}
+\DoxyCodeLine{00656\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ec)\ \{}
+\DoxyCodeLine{00657\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ exception(ec);}
+\DoxyCodeLine{00658\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00659\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ con;}
+\DoxyCodeLine{00660\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1endpoint_a7be6f2e7dc3901dd577eae33dfd2df24_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1endpoint_a0fe4457427d4124abe7ca022ba7afbb4}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!get\_con\_from\_hdl@{get\_con\_from\_hdl}}
+\index{get\_con\_from\_hdl@{get\_con\_from\_hdl}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{get\_con\_from\_hdl()}{get\_con\_from\_hdl()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_a0fe4457427d4124abe7ca022ba7afbb4} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+\mbox{\hyperlink{classwebsocketpp_1_1endpoint_aab0c5b0f36b0baabd78672e0ee2f1346}{connection\+\_\+ptr}} \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::get\+\_\+con\+\_\+from\+\_\+hdl (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}}}]{hdl}{, }\item[{lib\+::error\+\_\+code \&}]{ec}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Converting a weak pointer to shared\+\_\+ptr is not thread safe because the pointer could be deleted at any time.
+
+NOTE\+: This method may be called by handler to upgrade its handle to a full connection\+\_\+ptr. That full connection may then be used safely for the remainder of the handler body. get\+\_\+con\+\_\+from\+\_\+hdl and the resulting connection\+\_\+ptr are NOT safe to use outside the handler loop.
+
+
+\begin{DoxyParams}{Parameters}
+{\em hdl} & The connection handle to translate\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the connection\+\_\+ptr. May be NULL if the handle was invalid. 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{endpoint_8hpp_source_l00643}{643}} of file \mbox{\hyperlink{endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00643\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00644\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{debug__client_8cpp_ae9c9779aea742ab80689add7e553df0d}{connection\_ptr}}\ con\ =\ lib::static\_pointer\_cast<connection\_type>(}
+\DoxyCodeLine{00645\ \ \ \ \ \ \ \ \ \ \ \ \ hdl.lock());}
+\DoxyCodeLine{00646\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!con)\ \{}
+\DoxyCodeLine{00647\ \ \ \ \ \ \ \ \ \ \ \ \ ec\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a3344622df8c36e8ae03c59164e7b5e89}{error::make\_error\_code}}(\mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da9d05e6c7355920beb025ef1034941841}{error::bad\_connection}});}
+\DoxyCodeLine{00648\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00649\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ con;}
+\DoxyCodeLine{00650\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1endpoint_a0fe4457427d4124abe7ca022ba7afbb4_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1endpoint_a0fe4457427d4124abe7ca022ba7afbb4_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1endpoint_a4be3f1d85aca33ccc6ed149c943a5f1e}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!get\_elog@{get\_elog}}
+\index{get\_elog@{get\_elog}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{get\_elog()}{get\_elog()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_a4be3f1d85aca33ccc6ed149c943a5f1e} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a928771bc4dae5bf42879aeb2e98ae69a}{elog\+\_\+type}} \& \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::get\+\_\+elog (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\begin{DoxyReturn}{Returns}
+\doxylink{struct_a}{A} reference to the error logger 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{endpoint_8hpp_source_l00269}{269}} of file \mbox{\hyperlink{endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00269\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00270\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a46d6afb6f4f1541da167230c8c1e6f9a}{m\_elog}};}
+\DoxyCodeLine{00271\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1endpoint_ace4f1bdfdf20c13557b34c35c10ca554}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!get\_max\_http\_body\_size@{get\_max\_http\_body\_size}}
+\index{get\_max\_http\_body\_size@{get\_max\_http\_body\_size}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{get\_max\_http\_body\_size()}{get\_max\_http\_body\_size()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_ace4f1bdfdf20c13557b34c35c10ca554} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+size\+\_\+t \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::get\+\_\+max\+\_\+http\+\_\+body\+\_\+size (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+Get maximum HTTP message body size. Maximum message body size determines the point at which the connection will stop reading an HTTP request whose body is too large.
+
+The default is set by the max\+\_\+http\+\_\+body\+\_\+size value from the template config
+
+\begin{DoxySince}{Since}
+0.\+5.\+0
+\end{DoxySince}
+\begin{DoxyReturn}{Returns}
+The maximum HTTP message body size 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{endpoint_8hpp_source_l00449}{449}} of file \mbox{\hyperlink{endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00449\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00450\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_max\_http\_body\_size;}
+\DoxyCodeLine{00451\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1endpoint_a67d0a1ac6e9a332a485f569e71f85882}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!get\_max\_message\_size@{get\_max\_message\_size}}
+\index{get\_max\_message\_size@{get\_max\_message\_size}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{get\_max\_message\_size()}{get\_max\_message\_size()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_a67d0a1ac6e9a332a485f569e71f85882} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+size\+\_\+t \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::get\+\_\+max\+\_\+message\+\_\+size (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+Get the default maximum message size that will be used for new connections created by this endpoint. The maximum message size determines the point at which the connection will fail a connection with the message\+\_\+too\+\_\+big protocol error.
+
+The default is set by the max\+\_\+message\+\_\+size value from the template config
+
+\begin{DoxySince}{Since}
+0.\+3.\+0 
+\end{DoxySince}
+
+
+Definition at line \mbox{\hyperlink{endpoint_8hpp_source_l00415}{415}} of file \mbox{\hyperlink{endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00415\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00416\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_max\_message\_size;}
+\DoxyCodeLine{00417\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1endpoint_a2a106056b019063573120c7a61472834}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!get\_user\_agent@{get\_user\_agent}}
+\index{get\_user\_agent@{get\_user\_agent}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{get\_user\_agent()}{get\_user\_agent()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_a2a106056b019063573120c7a61472834} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+std\+::string \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::get\+\_\+user\+\_\+agent (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+Returns the user agent string that this endpoint will use when creating new connections.
+
+The default value for this version is stored in websocketpp\+::user\+\_\+agent
+
+\begin{DoxyReturn}{Returns}
+The user agent string. 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{endpoint_8hpp_source_l00169}{169}} of file \mbox{\hyperlink{endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a0270a5b25d41d95a4d136b9bdf1fd547}{scoped\_lock\_type}}\ guard(m\_mutex);}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_user\_agent;}
+\DoxyCodeLine{00172\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1endpoint_aa77facb47f09c143e5c22486f02bb455}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!interrupt@{interrupt}}
+\index{interrupt@{interrupt}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{interrupt()}{interrupt()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_aa77facb47f09c143e5c22486f02bb455} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::interrupt (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}}}]{hdl}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{endpoint__impl_8hpp_source_l00107}{107}} of file \mbox{\hyperlink{endpoint__impl_8hpp_source}{endpoint\+\_\+impl.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00108\ \ \ \ \ lib::error\_code\ ec;}
+\DoxyCodeLine{00109\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_ab6cd8d850c40f33f48d0afb4d7be094c}{interrupt}}(hdl,ec);}
+\DoxyCodeLine{00110\ \ \ \ \ \textcolor{keywordflow}{if}\ (ec)\ \{\ \textcolor{keywordflow}{throw}\ exception(ec);\ \}}
+\DoxyCodeLine{00111\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1endpoint_ab6cd8d850c40f33f48d0afb4d7be094c}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!interrupt@{interrupt}}
+\index{interrupt@{interrupt}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{interrupt()}{interrupt()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_ab6cd8d850c40f33f48d0afb4d7be094c} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::interrupt (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}}}]{hdl}{, }\item[{lib\+::error\+\_\+code \&}]{ec}{}\end{DoxyParamCaption})}
+
+These functions act as adaptors to their counterparts in connection. They can produce one additional type of error, the bad\+\_\+connection error, that indicates that the conversion from connection\+\_\+hdl to connection\+\_\+ptr failed due to the connection not existing anymore. Each method has a default and an exception free varient. 
+
+Definition at line \mbox{\hyperlink{endpoint__impl_8hpp_source_l00096}{96}} of file \mbox{\hyperlink{endpoint__impl_8hpp_source}{endpoint\+\_\+impl.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00097\ \{}
+\DoxyCodeLine{00098\ \ \ \ \ \mbox{\hyperlink{debug__client_8cpp_ae9c9779aea742ab80689add7e553df0d}{connection\_ptr}}\ con\ =\ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a0fe4457427d4124abe7ca022ba7afbb4}{get\_con\_from\_hdl}}(hdl,ec);}
+\DoxyCodeLine{00099\ \ \ \ \ \textcolor{keywordflow}{if}\ (ec)\ \{\textcolor{keywordflow}{return};\}}
+\DoxyCodeLine{00100\ }
+\DoxyCodeLine{00101\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_ab77acb19adafe52f5c28aa387077cfbc}{m\_alog}}.write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}{log::alevel::devel}},\textcolor{stringliteral}{"{}Interrupting\ connection"{}});}
+\DoxyCodeLine{00102\ }
+\DoxyCodeLine{00103\ \ \ \ \ ec\ =\ con-\/>interrupt();}
+\DoxyCodeLine{00104\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1endpoint_a4f6a1e239250ef6c485865e2adf65b1b}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!is\_server@{is\_server}}
+\index{is\_server@{is\_server}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{is\_server()}{is\_server()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_a4f6a1e239250ef6c485865e2adf65b1b} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+bool \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::is\+\_\+server (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+\begin{DoxyReturn}{Returns}
+Whether or not this endpoint is a server 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{endpoint_8hpp_source_l00205}{205}} of file \mbox{\hyperlink{endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_is\_server;}
+\DoxyCodeLine{00207\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1endpoint_af7ec27363d0fb1d657a264c4ad853b8e}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!pause\_reading@{pause\_reading}}
+\index{pause\_reading@{pause\_reading}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{pause\_reading()}{pause\_reading()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_af7ec27363d0fb1d657a264c4ad853b8e} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::pause\+\_\+reading (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}}}]{hdl}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{endpoint__impl_8hpp_source_l00123}{123}} of file \mbox{\hyperlink{endpoint__impl_8hpp_source}{endpoint\+\_\+impl.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00124\ \ \ \ \ lib::error\_code\ ec;}
+\DoxyCodeLine{00125\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_aef7666b82bf98864b213c3df09298595}{pause\_reading}}(hdl,ec);}
+\DoxyCodeLine{00126\ \ \ \ \ \textcolor{keywordflow}{if}\ (ec)\ \{\ \textcolor{keywordflow}{throw}\ exception(ec);\ \}}
+\DoxyCodeLine{00127\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1endpoint_aef7666b82bf98864b213c3df09298595}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!pause\_reading@{pause\_reading}}
+\index{pause\_reading@{pause\_reading}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{pause\_reading()}{pause\_reading()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_aef7666b82bf98864b213c3df09298595} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::pause\+\_\+reading (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}}}]{hdl}{, }\item[{lib\+::error\+\_\+code \&}]{ec}{}\end{DoxyParamCaption})}
+
+Signals to the connection to halt reading of new data. While reading is paused, the connection will stop reading from its associated socket. In turn this will result in TCP based flow control kicking in and slowing data flow from the remote endpoint.
+
+This is useful for applications that push new requests to a queue to be processed by another thread and need a way to signal when their request queue is full without blocking the network processing thread.
+
+Use {\ttfamily \doxylink{classwebsocketpp_1_1endpoint_a9753aaade09c9a7a0efd459861ba3b97}{resume\+\_\+reading()}} to resume.
+
+If supported by the transport this is done asynchronously. As such reading may not stop until the current read operation completes. Typically you can expect to receive no more bytes after initiating a read pause than the size of the read buffer.
+
+If reading is paused for this connection already nothing is changed. 
+
+Definition at line \mbox{\hyperlink{endpoint__impl_8hpp_source_l00114}{114}} of file \mbox{\hyperlink{endpoint__impl_8hpp_source}{endpoint\+\_\+impl.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00115\ \{}
+\DoxyCodeLine{00116\ \ \ \ \ \mbox{\hyperlink{debug__client_8cpp_ae9c9779aea742ab80689add7e553df0d}{connection\_ptr}}\ con\ =\ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a0fe4457427d4124abe7ca022ba7afbb4}{get\_con\_from\_hdl}}(hdl,ec);}
+\DoxyCodeLine{00117\ \ \ \ \ \textcolor{keywordflow}{if}\ (ec)\ \{\textcolor{keywordflow}{return};\}}
+\DoxyCodeLine{00118\ }
+\DoxyCodeLine{00119\ \ \ \ \ ec\ =\ con-\/>pause\_reading();}
+\DoxyCodeLine{00120\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1endpoint_a35267939caf4b611b01701ba13cd0b33}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!ping@{ping}}
+\index{ping@{ping}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{ping()}{ping()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_a35267939caf4b611b01701ba13cd0b33} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::ping (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}}}]{hdl}{, }\item[{std\+::string const \&}]{payload}{}\end{DoxyParamCaption})}
+
+Exception variant of {\ttfamily ping}
+
+\begin{DoxySince}{Since}
+0.\+3.\+0-\/alpha3
+\end{DoxySince}
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em hdl} & The connection\+\_\+hdl of the connection to send to. \\
+\hline
+\mbox{\texttt{ in}}  & {\em payload} & The payload string to send. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{endpoint__impl_8hpp_source_l00243}{243}} of file \mbox{\hyperlink{endpoint__impl_8hpp_source}{endpoint\+\_\+impl.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00244\ \{}
+\DoxyCodeLine{00245\ \ \ \ \ lib::error\_code\ ec;}
+\DoxyCodeLine{00246\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a1d4bcbc3fcd87f48120fbb421467f414}{ping}}(hdl,payload,ec);}
+\DoxyCodeLine{00247\ \ \ \ \ \textcolor{keywordflow}{if}\ (ec)\ \{\ \textcolor{keywordflow}{throw}\ exception(ec);\ \}}
+\DoxyCodeLine{00248\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1endpoint_a1d4bcbc3fcd87f48120fbb421467f414}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!ping@{ping}}
+\index{ping@{ping}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{ping()}{ping()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_a1d4bcbc3fcd87f48120fbb421467f414} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::ping (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}}}]{hdl}{, }\item[{std\+::string const \&}]{payload}{, }\item[{lib\+::error\+\_\+code \&}]{ec}{}\end{DoxyParamCaption})}
+
+\begin{DoxySince}{Since}
+0.\+3.\+0-\/alpha3
+\end{DoxySince}
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em hdl} & The connection\+\_\+hdl of the connection to send to. \\
+\hline
+\mbox{\texttt{ in}}  & {\em payload} & The payload string to send. \\
+\hline
+\mbox{\texttt{ out}}  & {\em ec} & \doxylink{struct_a}{A} reference to an error code to fill in \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{endpoint__impl_8hpp_source_l00234}{234}} of file \mbox{\hyperlink{endpoint__impl_8hpp_source}{endpoint\+\_\+impl.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00236\ \{}
+\DoxyCodeLine{00237\ \ \ \ \ \mbox{\hyperlink{debug__client_8cpp_ae9c9779aea742ab80689add7e553df0d}{connection\_ptr}}\ con\ =\ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a0fe4457427d4124abe7ca022ba7afbb4}{get\_con\_from\_hdl}}(hdl,ec);}
+\DoxyCodeLine{00238\ \ \ \ \ \textcolor{keywordflow}{if}\ (ec)\ \{\textcolor{keywordflow}{return};\}}
+\DoxyCodeLine{00239\ \ \ \ \ con-\/>ping(payload,ec);}
+\DoxyCodeLine{00240\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1endpoint_ab546cb4089f868a09c8d0694fb6f0be6}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!pong@{pong}}
+\index{pong@{pong}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{pong()}{pong()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_ab546cb4089f868a09c8d0694fb6f0be6} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::pong (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}}}]{hdl}{, }\item[{std\+::string const \&}]{payload}{}\end{DoxyParamCaption})}
+
+Exception variant of {\ttfamily pong}
+
+\begin{DoxySince}{Since}
+0.\+3.\+0-\/alpha3
+\end{DoxySince}
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em hdl} & The connection\+\_\+hdl of the connection to send to. \\
+\hline
+\mbox{\texttt{ in}}  & {\em payload} & The payload string to send. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{endpoint__impl_8hpp_source_l00260}{260}} of file \mbox{\hyperlink{endpoint__impl_8hpp_source}{endpoint\+\_\+impl.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00261\ \{}
+\DoxyCodeLine{00262\ \ \ \ \ lib::error\_code\ ec;}
+\DoxyCodeLine{00263\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a58a55e0288d4da518b2a806587df3809}{pong}}(hdl,payload,ec);}
+\DoxyCodeLine{00264\ \ \ \ \ \textcolor{keywordflow}{if}\ (ec)\ \{\ \textcolor{keywordflow}{throw}\ exception(ec);\ \}}
+\DoxyCodeLine{00265\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1endpoint_a58a55e0288d4da518b2a806587df3809}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!pong@{pong}}
+\index{pong@{pong}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{pong()}{pong()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_a58a55e0288d4da518b2a806587df3809} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::pong (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}}}]{hdl}{, }\item[{std\+::string const \&}]{payload}{, }\item[{lib\+::error\+\_\+code \&}]{ec}{}\end{DoxyParamCaption})}
+
+\begin{DoxySince}{Since}
+0.\+3.\+0-\/alpha3
+\end{DoxySince}
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em hdl} & The connection\+\_\+hdl of the connection to send to. \\
+\hline
+\mbox{\texttt{ in}}  & {\em payload} & The payload string to send. \\
+\hline
+\mbox{\texttt{ out}}  & {\em ec} & \doxylink{struct_a}{A} reference to an error code to fill in \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{endpoint__impl_8hpp_source_l00251}{251}} of file \mbox{\hyperlink{endpoint__impl_8hpp_source}{endpoint\+\_\+impl.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00253\ \{}
+\DoxyCodeLine{00254\ \ \ \ \ \mbox{\hyperlink{debug__client_8cpp_ae9c9779aea742ab80689add7e553df0d}{connection\_ptr}}\ con\ =\ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a0fe4457427d4124abe7ca022ba7afbb4}{get\_con\_from\_hdl}}(hdl,ec);}
+\DoxyCodeLine{00255\ \ \ \ \ \textcolor{keywordflow}{if}\ (ec)\ \{\textcolor{keywordflow}{return};\}}
+\DoxyCodeLine{00256\ \ \ \ \ con-\/>pong(payload,ec);}
+\DoxyCodeLine{00257\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1endpoint_a4592d2270f56fce0f30a41cd17f77650}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!resume\_reading@{resume\_reading}}
+\index{resume\_reading@{resume\_reading}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{resume\_reading()}{resume\_reading()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_a4592d2270f56fce0f30a41cd17f77650} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::resume\+\_\+reading (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}}}]{hdl}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{endpoint__impl_8hpp_source_l00139}{139}} of file \mbox{\hyperlink{endpoint__impl_8hpp_source}{endpoint\+\_\+impl.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00140\ \ \ \ \ lib::error\_code\ ec;}
+\DoxyCodeLine{00141\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a9753aaade09c9a7a0efd459861ba3b97}{resume\_reading}}(hdl,ec);}
+\DoxyCodeLine{00142\ \ \ \ \ \textcolor{keywordflow}{if}\ (ec)\ \{\ \textcolor{keywordflow}{throw}\ exception(ec);\ \}}
+\DoxyCodeLine{00143\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1endpoint_a9753aaade09c9a7a0efd459861ba3b97}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!resume\_reading@{resume\_reading}}
+\index{resume\_reading@{resume\_reading}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{resume\_reading()}{resume\_reading()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_a9753aaade09c9a7a0efd459861ba3b97} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::resume\+\_\+reading (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}}}]{hdl}{, }\item[{lib\+::error\+\_\+code \&}]{ec}{}\end{DoxyParamCaption})}
+
+Signals to the connection to resume reading of new data after it was paused by {\ttfamily \doxylink{classwebsocketpp_1_1endpoint_aef7666b82bf98864b213c3df09298595}{pause\+\_\+reading()}}.
+
+If reading is not paused for this connection already nothing is changed. 
+
+Definition at line \mbox{\hyperlink{endpoint__impl_8hpp_source_l00130}{130}} of file \mbox{\hyperlink{endpoint__impl_8hpp_source}{endpoint\+\_\+impl.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00131\ \{}
+\DoxyCodeLine{00132\ \ \ \ \ \mbox{\hyperlink{debug__client_8cpp_ae9c9779aea742ab80689add7e553df0d}{connection\_ptr}}\ con\ =\ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a0fe4457427d4124abe7ca022ba7afbb4}{get\_con\_from\_hdl}}(hdl,ec);}
+\DoxyCodeLine{00133\ \ \ \ \ \textcolor{keywordflow}{if}\ (ec)\ \{\textcolor{keywordflow}{return};\}}
+\DoxyCodeLine{00134\ }
+\DoxyCodeLine{00135\ \ \ \ \ ec\ =\ con-\/>resume\_reading();}
+\DoxyCodeLine{00136\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1endpoint_a702e7d609babdacb8ae772b82c3fa8d0}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!send@{send}}
+\index{send@{send}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{send()}{send()}\hspace{0.1cm}{\footnotesize\ttfamily [1/6]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_a702e7d609babdacb8ae772b82c3fa8d0} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::send (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}}}]{hdl}{, }\item[{\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a8097edab4feb0c36a69601c3786f0062}{message\+\_\+ptr}}}]{msg}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{endpoint__impl_8hpp_source_l00208}{208}} of file \mbox{\hyperlink{endpoint__impl_8hpp_source}{endpoint\+\_\+impl.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00209\ \ \ \ \ lib::error\_code\ ec;}
+\DoxyCodeLine{00210\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a5341f59de7ef1a565a2fd93daba212d5}{send}}(hdl,msg,ec);}
+\DoxyCodeLine{00211\ \ \ \ \ \textcolor{keywordflow}{if}\ (ec)\ \{\ \textcolor{keywordflow}{throw}\ exception(ec);\ \}}
+\DoxyCodeLine{00212\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1endpoint_a5cad5b7944435e7eec248e98e7e7a912}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!send@{send}}
+\index{send@{send}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{send()}{send()}\hspace{0.1cm}{\footnotesize\ttfamily [2/6]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_a5cad5b7944435e7eec248e98e7e7a912} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::send (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}}}]{hdl}{, }\item[{\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a8097edab4feb0c36a69601c3786f0062}{message\+\_\+ptr}}}]{msg}{, }\item[{lib\+::error\+\_\+code \&}]{ec}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{endpoint__impl_8hpp_source_l00199}{199}} of file \mbox{\hyperlink{endpoint__impl_8hpp_source}{endpoint\+\_\+impl.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00201\ \{}
+\DoxyCodeLine{00202\ \ \ \ \ \mbox{\hyperlink{debug__client_8cpp_ae9c9779aea742ab80689add7e553df0d}{connection\_ptr}}\ con\ =\ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a0fe4457427d4124abe7ca022ba7afbb4}{get\_con\_from\_hdl}}(hdl,ec);}
+\DoxyCodeLine{00203\ \ \ \ \ \textcolor{keywordflow}{if}\ (ec)\ \{\textcolor{keywordflow}{return};\}}
+\DoxyCodeLine{00204\ \ \ \ \ ec\ =\ con-\/>send(msg);}
+\DoxyCodeLine{00205\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1endpoint_a9eb8f9fd7fbb7d8374eb02e100430bcf}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!send@{send}}
+\index{send@{send}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{send()}{send()}\hspace{0.1cm}{\footnotesize\ttfamily [3/6]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_a9eb8f9fd7fbb7d8374eb02e100430bcf} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::send (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}}}]{hdl}{, }\item[{std\+::string const \&}]{payload}{, }\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e}{frame\+::opcode\+::value}}}]{op}{}\end{DoxyParamCaption})}
+
+Convenience method to send a message given a payload string and an opcode
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em hdl} & The handle identifying the connection to send via. \\
+\hline
+\mbox{\texttt{ in}}  & {\em payload} & The payload string to generated the message with \\
+\hline
+\mbox{\texttt{ in}}  & {\em op} & The opcode to generated the message with. \\
+\hline
+\mbox{\texttt{ out}}  & {\em ec} & \doxylink{struct_a}{A} code to fill in for errors \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{endpoint__impl_8hpp_source_l00172}{172}} of file \mbox{\hyperlink{endpoint__impl_8hpp_source}{endpoint\+\_\+impl.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00174\ \{}
+\DoxyCodeLine{00175\ \ \ \ \ lib::error\_code\ ec;}
+\DoxyCodeLine{00176\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a5341f59de7ef1a565a2fd93daba212d5}{send}}(hdl,payload,\mbox{\hyperlink{unionop}{op}},ec);}
+\DoxyCodeLine{00177\ \ \ \ \ \textcolor{keywordflow}{if}\ (ec)\ \{\ \textcolor{keywordflow}{throw}\ exception(ec);\ \}}
+\DoxyCodeLine{00178\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1endpoint_a5341f59de7ef1a565a2fd93daba212d5}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!send@{send}}
+\index{send@{send}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{send()}{send()}\hspace{0.1cm}{\footnotesize\ttfamily [4/6]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_a5341f59de7ef1a565a2fd93daba212d5} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::send (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}}}]{hdl}{, }\item[{std\+::string const \&}]{payload}{, }\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e}{frame\+::opcode\+::value}}}]{op}{, }\item[{lib\+::error\+\_\+code \&}]{ec}{}\end{DoxyParamCaption})}
+
+Convenience method to send a message given a payload string and an opcode
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em hdl} & The handle identifying the connection to send via. \\
+\hline
+\mbox{\texttt{ in}}  & {\em payload} & The payload string to generated the message with \\
+\hline
+\mbox{\texttt{ in}}  & {\em op} & The opcode to generated the message with. \\
+\hline
+\mbox{\texttt{ out}}  & {\em ec} & \doxylink{struct_a}{A} code to fill in for errors \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{endpoint__impl_8hpp_source_l00162}{162}} of file \mbox{\hyperlink{endpoint__impl_8hpp_source}{endpoint\+\_\+impl.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00164\ \{}
+\DoxyCodeLine{00165\ \ \ \ \ \mbox{\hyperlink{debug__client_8cpp_ae9c9779aea742ab80689add7e553df0d}{connection\_ptr}}\ con\ =\ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a0fe4457427d4124abe7ca022ba7afbb4}{get\_con\_from\_hdl}}(hdl,ec);}
+\DoxyCodeLine{00166\ \ \ \ \ \textcolor{keywordflow}{if}\ (ec)\ \{\textcolor{keywordflow}{return};\}}
+\DoxyCodeLine{00167\ }
+\DoxyCodeLine{00168\ \ \ \ \ ec\ =\ con-\/>send(payload,\mbox{\hyperlink{unionop}{op}});}
+\DoxyCodeLine{00169\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1endpoint_a5341f59de7ef1a565a2fd93daba212d5_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1endpoint_adc03a5bd5797a54fde64afd279032671}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!send@{send}}
+\index{send@{send}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{send()}{send()}\hspace{0.1cm}{\footnotesize\ttfamily [5/6]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_adc03a5bd5797a54fde64afd279032671} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::send (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}}}]{hdl}{, }\item[{void const \texorpdfstring{$\ast$}{*}}]{payload}{, }\item[{size\+\_\+t}]{len}{, }\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e}{frame\+::opcode\+::value}}}]{op}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{endpoint__impl_8hpp_source_l00190}{190}} of file \mbox{\hyperlink{endpoint__impl_8hpp_source}{endpoint\+\_\+impl.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00192\ \{}
+\DoxyCodeLine{00193\ \ \ \ \ lib::error\_code\ ec;}
+\DoxyCodeLine{00194\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a5341f59de7ef1a565a2fd93daba212d5}{send}}(hdl,payload,\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\mbox{\hyperlink{unionop}{op}},ec);}
+\DoxyCodeLine{00195\ \ \ \ \ \textcolor{keywordflow}{if}\ (ec)\ \{\ \textcolor{keywordflow}{throw}\ exception(ec);\ \}}
+\DoxyCodeLine{00196\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1endpoint_a71e4454af8d8f133ca736e80c3adf268}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!send@{send}}
+\index{send@{send}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{send()}{send()}\hspace{0.1cm}{\footnotesize\ttfamily [6/6]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_a71e4454af8d8f133ca736e80c3adf268} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::send (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}}}]{hdl}{, }\item[{void const \texorpdfstring{$\ast$}{*}}]{payload}{, }\item[{size\+\_\+t}]{len}{, }\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e}{frame\+::opcode\+::value}}}]{op}{, }\item[{lib\+::error\+\_\+code \&}]{ec}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{endpoint__impl_8hpp_source_l00181}{181}} of file \mbox{\hyperlink{endpoint__impl_8hpp_source}{endpoint\+\_\+impl.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00183\ \{}
+\DoxyCodeLine{00184\ \ \ \ \ \mbox{\hyperlink{debug__client_8cpp_ae9c9779aea742ab80689add7e553df0d}{connection\_ptr}}\ con\ =\ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a0fe4457427d4124abe7ca022ba7afbb4}{get\_con\_from\_hdl}}(hdl,ec);}
+\DoxyCodeLine{00185\ \ \ \ \ \textcolor{keywordflow}{if}\ (ec)\ \{\textcolor{keywordflow}{return};\}}
+\DoxyCodeLine{00186\ \ \ \ \ ec\ =\ con-\/>send(payload,\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\mbox{\hyperlink{unionop}{op}});}
+\DoxyCodeLine{00187\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1endpoint_af29ca34a6659beea0422a2f27718b9c2}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!send\_http\_response@{send\_http\_response}}
+\index{send\_http\_response@{send\_http\_response}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{send\_http\_response()}{send\_http\_response()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_af29ca34a6659beea0422a2f27718b9c2} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::send\+\_\+http\+\_\+response (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}}}]{hdl}{}\end{DoxyParamCaption})}
+
+Sends an http response to an HTTP connection that was deferred. This will send a complete response including all headers, status line, and body text. The connection will be closed afterwards.
+
+Exception variant
+
+\begin{DoxySince}{Since}
+0.\+6.\+0
+\end{DoxySince}
+
+\begin{DoxyParams}{Parameters}
+{\em hdl} & The connection to send the response on \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{endpoint__impl_8hpp_source_l00155}{155}} of file \mbox{\hyperlink{endpoint__impl_8hpp_source}{endpoint\+\_\+impl.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00156\ \ \ \ \ lib::error\_code\ ec;}
+\DoxyCodeLine{00157\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_ae78b1414f7e0cf71c9eab0a29efab8a1}{send\_http\_response}}(hdl,ec);}
+\DoxyCodeLine{00158\ \ \ \ \ \textcolor{keywordflow}{if}\ (ec)\ \{\ \textcolor{keywordflow}{throw}\ exception(ec);\ \}}
+\DoxyCodeLine{00159\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1endpoint_ae78b1414f7e0cf71c9eab0a29efab8a1}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!send\_http\_response@{send\_http\_response}}
+\index{send\_http\_response@{send\_http\_response}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{send\_http\_response()}{send\_http\_response()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_ae78b1414f7e0cf71c9eab0a29efab8a1} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::send\+\_\+http\+\_\+response (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}}}]{hdl}{, }\item[{lib\+::error\+\_\+code \&}]{ec}{}\end{DoxyParamCaption})}
+
+Sends an http response to an HTTP connection that was deferred. This will send a complete response including all headers, status line, and body text. The connection will be closed afterwards.
+
+Exception free variant
+
+\begin{DoxySince}{Since}
+0.\+6.\+0
+\end{DoxySince}
+
+\begin{DoxyParams}{Parameters}
+{\em hdl} & The connection to send the response on \\
+\hline
+{\em ec} & \doxylink{struct_a}{A} status code, zero on success, non-\/zero otherwise \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{endpoint__impl_8hpp_source_l00146}{146}} of file \mbox{\hyperlink{endpoint__impl_8hpp_source}{endpoint\+\_\+impl.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00148\ \{}
+\DoxyCodeLine{00149\ \ \ \ \ \mbox{\hyperlink{debug__client_8cpp_ae9c9779aea742ab80689add7e553df0d}{connection\_ptr}}\ con\ =\ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a0fe4457427d4124abe7ca022ba7afbb4}{get\_con\_from\_hdl}}(hdl,ec);}
+\DoxyCodeLine{00150\ \ \ \ \ \textcolor{keywordflow}{if}\ (ec)\ \{\textcolor{keywordflow}{return};\}}
+\DoxyCodeLine{00151\ \ \ \ \ con-\/>send\_http\_response(ec);}
+\DoxyCodeLine{00152\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1endpoint_a5d7da609ebd2f797e5e67b6d050ebc59}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!set\_access\_channels@{set\_access\_channels}}
+\index{set\_access\_channels@{set\_access\_channels}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{set\_access\_channels()}{set\_access\_channels()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_a5d7da609ebd2f797e5e67b6d050ebc59} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::set\+\_\+access\+\_\+channels (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{log\+::level}}}]{channels}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Set the access logger\textquotesingle{}s channel value. The value is a number whose interpretation depends on the logging policy in use.
+
+
+\begin{DoxyParams}{Parameters}
+{\em channels} & The channel \doxylink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value(s)} to set \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{endpoint_8hpp_source_l00220}{220}} of file \mbox{\hyperlink{endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_ab77acb19adafe52f5c28aa387077cfbc}{m\_alog}}.set\_channels(channels);}
+\DoxyCodeLine{00222\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1endpoint_a5d7da609ebd2f797e5e67b6d050ebc59_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1endpoint_a8d7d95bebc154879655211e2b0b5e069}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!set\_close\_handler@{set\_close\_handler}}
+\index{set\_close\_handler@{set\_close\_handler}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{set\_close\_handler()}{set\_close\_handler()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_a8d7d95bebc154879655211e2b0b5e069} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::set\+\_\+close\+\_\+handler (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_a27acb39e01cbca06ccc4e4e8eb8f877d}{close\+\_\+handler}}}]{h}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{endpoint_8hpp_source_l00282}{282}} of file \mbox{\hyperlink{endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00282\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00283\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_ab77acb19adafe52f5c28aa387077cfbc}{m\_alog}}.write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}{log::alevel::devel}},\textcolor{stringliteral}{"{}set\_close\_handler"{}});}
+\DoxyCodeLine{00284\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a0270a5b25d41d95a4d136b9bdf1fd547}{scoped\_lock\_type}}\ guard(m\_mutex);}
+\DoxyCodeLine{00285\ \ \ \ \ \ \ \ \ m\_close\_handler\ =\ h;}
+\DoxyCodeLine{00286\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1endpoint_a8d7d95bebc154879655211e2b0b5e069_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1endpoint_a54caf799e1cf531d26f67999068d483b}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!set\_close\_handshake\_timeout@{set\_close\_handshake\_timeout}}
+\index{set\_close\_handshake\_timeout@{set\_close\_handshake\_timeout}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{set\_close\_handshake\_timeout()}{set\_close\_handshake\_timeout()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_a54caf799e1cf531d26f67999068d483b} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::set\+\_\+close\+\_\+handshake\+\_\+timeout (\begin{DoxyParamCaption}\item[{long}]{dur}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Sets the length of time the library will wait after a closing handshake has been initiated before cancelling it. This can be used to prevent excessive wait times for outgoing clients or excessive resource usage from broken clients or DoS attacks on servers.
+
+Connections that time out will have their close handlers called with the close\+\_\+handshake\+\_\+timeout error code.
+
+The default value is specified via the compile time config value \textquotesingle{}timeout\+\_\+close\+\_\+handshake\textquotesingle{}. The default value in the core config is 5000ms. \doxylink{struct_a}{A} value of 0 will disable the timer entirely.
+
+To be effective, the transport you are using must support timers. See the documentation for your transport policy for details about its timer support.
+
+
+\begin{DoxyParams}{Parameters}
+{\em dur} & The length of the close handshake timeout in ms \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{endpoint_8hpp_source_l00377}{377}} of file \mbox{\hyperlink{endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00377\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00378\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a0270a5b25d41d95a4d136b9bdf1fd547}{scoped\_lock\_type}}\ guard(m\_mutex);}
+\DoxyCodeLine{00379\ \ \ \ \ \ \ \ \ m\_close\_handshake\_timeout\_dur\ =\ dur;}
+\DoxyCodeLine{00380\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1endpoint_a8292bcdca9344b57af1b0964ff7fc778}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!set\_error\_channels@{set\_error\_channels}}
+\index{set\_error\_channels@{set\_error\_channels}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{set\_error\_channels()}{set\_error\_channels()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_a8292bcdca9344b57af1b0964ff7fc778} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::set\+\_\+error\+\_\+channels (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{log\+::level}}}]{channels}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Set the error logger\textquotesingle{}s channel value. The value is a number whose interpretation depends on the logging policy in use.
+
+
+\begin{DoxyParams}{Parameters}
+{\em channels} & The channel \doxylink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value(s)} to set \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{endpoint_8hpp_source_l00242}{242}} of file \mbox{\hyperlink{endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00242\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00243\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a46d6afb6f4f1541da167230c8c1e6f9a}{m\_elog}}.set\_channels(channels);}
+\DoxyCodeLine{00244\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1endpoint_a8292bcdca9344b57af1b0964ff7fc778_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1endpoint_a073540365f5c810f5a45e5fc76f52f87}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!set\_fail\_handler@{set\_fail\_handler}}
+\index{set\_fail\_handler@{set\_fail\_handler}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{set\_fail\_handler()}{set\_fail\_handler()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_a073540365f5c810f5a45e5fc76f52f87} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::set\+\_\+fail\+\_\+handler (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_a5bb2e61cfe649b2e012f1a2c5693a4d5}{fail\+\_\+handler}}}]{h}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{endpoint_8hpp_source_l00287}{287}} of file \mbox{\hyperlink{endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00287\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00288\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_ab77acb19adafe52f5c28aa387077cfbc}{m\_alog}}.write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}{log::alevel::devel}},\textcolor{stringliteral}{"{}set\_fail\_handler"{}});}
+\DoxyCodeLine{00289\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a0270a5b25d41d95a4d136b9bdf1fd547}{scoped\_lock\_type}}\ guard(m\_mutex);}
+\DoxyCodeLine{00290\ \ \ \ \ \ \ \ \ m\_fail\_handler\ =\ h;}
+\DoxyCodeLine{00291\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1endpoint_a073540365f5c810f5a45e5fc76f52f87_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1endpoint_a511874384b71238b042968cf736bc510}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!set\_http\_handler@{set\_http\_handler}}
+\index{set\_http\_handler@{set\_http\_handler}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{set\_http\_handler()}{set\_http\_handler()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_a511874384b71238b042968cf736bc510} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::set\+\_\+http\+\_\+handler (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_a37bc4d5b3b21d3bb494d8a23236315d2}{http\+\_\+handler}}}]{h}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{endpoint_8hpp_source_l00312}{312}} of file \mbox{\hyperlink{endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00312\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00313\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_ab77acb19adafe52f5c28aa387077cfbc}{m\_alog}}.write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}{log::alevel::devel}},\textcolor{stringliteral}{"{}set\_http\_handler"{}});}
+\DoxyCodeLine{00314\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a0270a5b25d41d95a4d136b9bdf1fd547}{scoped\_lock\_type}}\ guard(m\_mutex);}
+\DoxyCodeLine{00315\ \ \ \ \ \ \ \ \ m\_http\_handler\ =\ h;}
+\DoxyCodeLine{00316\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1endpoint_a511874384b71238b042968cf736bc510_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1endpoint_a026eb37f85cea8e79f1a007d12bb55dd}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!set\_interrupt\_handler@{set\_interrupt\_handler}}
+\index{set\_interrupt\_handler@{set\_interrupt\_handler}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{set\_interrupt\_handler()}{set\_interrupt\_handler()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_a026eb37f85cea8e79f1a007d12bb55dd} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::set\+\_\+interrupt\+\_\+handler (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_a55f6947df7673a9de3c44b6bd5d4a82a}{interrupt\+\_\+handler}}}]{h}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{endpoint_8hpp_source_l00307}{307}} of file \mbox{\hyperlink{endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00307\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00308\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_ab77acb19adafe52f5c28aa387077cfbc}{m\_alog}}.write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}{log::alevel::devel}},\textcolor{stringliteral}{"{}set\_interrupt\_handler"{}});}
+\DoxyCodeLine{00309\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a0270a5b25d41d95a4d136b9bdf1fd547}{scoped\_lock\_type}}\ guard(m\_mutex);}
+\DoxyCodeLine{00310\ \ \ \ \ \ \ \ \ m\_interrupt\_handler\ =\ h;}
+\DoxyCodeLine{00311\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1endpoint_a00be7e08ca5c567dd2a4989b8d41d26b}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!set\_max\_http\_body\_size@{set\_max\_http\_body\_size}}
+\index{set\_max\_http\_body\_size@{set\_max\_http\_body\_size}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{set\_max\_http\_body\_size()}{set\_max\_http\_body\_size()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_a00be7e08ca5c567dd2a4989b8d41d26b} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::set\+\_\+max\+\_\+http\+\_\+body\+\_\+size (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{new\+\_\+value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Set maximum HTTP message body size. Maximum message body size determines the point at which the connection will stop reading an HTTP request whose body is too large.
+
+The default is set by the max\+\_\+http\+\_\+body\+\_\+size value from the template config
+
+\begin{DoxySince}{Since}
+0.\+5.\+1
+\end{DoxySince}
+
+\begin{DoxyParams}{Parameters}
+{\em new\+\_\+value} & The value to set as the maximum message size. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{endpoint_8hpp_source_l00466}{466}} of file \mbox{\hyperlink{endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00466\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00467\ \ \ \ \ \ \ \ \ m\_max\_http\_body\_size\ =\ new\_value;}
+\DoxyCodeLine{00468\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1endpoint_a6268a63c9ce030941fcfb32ddabf3090}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!set\_max\_message\_size@{set\_max\_message\_size}}
+\index{set\_max\_message\_size@{set\_max\_message\_size}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{set\_max\_message\_size()}{set\_max\_message\_size()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_a6268a63c9ce030941fcfb32ddabf3090} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::set\+\_\+max\+\_\+message\+\_\+size (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{new\+\_\+value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Set the default maximum message size that will be used for new connections created by this endpoint. Maximum message size determines the point at which the connection will fail a connection with the message\+\_\+too\+\_\+big protocol error.
+
+The default is set by the max\+\_\+message\+\_\+size value from the template config
+
+\begin{DoxySince}{Since}
+0.\+3.\+0
+\end{DoxySince}
+
+\begin{DoxyParams}{Parameters}
+{\em new\+\_\+value} & The value to set as the maximum message size. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{endpoint_8hpp_source_l00432}{432}} of file \mbox{\hyperlink{endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00432\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00433\ \ \ \ \ \ \ \ \ m\_max\_message\_size\ =\ new\_value;}
+\DoxyCodeLine{00434\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1endpoint_a34a3a8351bff65ba878975be471cab85}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!set\_message\_handler@{set\_message\_handler}}
+\index{set\_message\_handler@{set\_message\_handler}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{set\_message\_handler()}{set\_message\_handler()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_a34a3a8351bff65ba878975be471cab85} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::set\+\_\+message\+\_\+handler (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a539ae39b8ae01e0cb22e237373bfea6c}{message\+\_\+handler}}}]{h}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{endpoint_8hpp_source_l00322}{322}} of file \mbox{\hyperlink{endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00322\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00323\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_ab77acb19adafe52f5c28aa387077cfbc}{m\_alog}}.write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}{log::alevel::devel}},\textcolor{stringliteral}{"{}set\_message\_handler"{}});}
+\DoxyCodeLine{00324\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a0270a5b25d41d95a4d136b9bdf1fd547}{scoped\_lock\_type}}\ guard(m\_mutex);}
+\DoxyCodeLine{00325\ \ \ \ \ \ \ \ \ m\_message\_handler\ =\ h;}
+\DoxyCodeLine{00326\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1endpoint_a34a3a8351bff65ba878975be471cab85_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1endpoint_a5753d9848aefc04ee91da401c0cc65b8}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!set\_open\_handler@{set\_open\_handler}}
+\index{set\_open\_handler@{set\_open\_handler}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{set\_open\_handler()}{set\_open\_handler()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_a5753d9848aefc04ee91da401c0cc65b8} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::set\+\_\+open\+\_\+handler (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_a53c8b4ae59cf13b5f883b119bbd14d72}{open\+\_\+handler}}}]{h}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{endpoint_8hpp_source_l00277}{277}} of file \mbox{\hyperlink{endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00277\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00278\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_ab77acb19adafe52f5c28aa387077cfbc}{m\_alog}}.write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}{log::alevel::devel}},\textcolor{stringliteral}{"{}set\_open\_handler"{}});}
+\DoxyCodeLine{00279\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a0270a5b25d41d95a4d136b9bdf1fd547}{scoped\_lock\_type}}\ guard(m\_mutex);}
+\DoxyCodeLine{00280\ \ \ \ \ \ \ \ \ m\_open\_handler\ =\ h;}
+\DoxyCodeLine{00281\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{classwebsocketpp_1_1endpoint_a5753d9848aefc04ee91da401c0cc65b8_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1endpoint_adb8b3736e30bb8e5ee6add965a948102}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!set\_open\_handshake\_timeout@{set\_open\_handshake\_timeout}}
+\index{set\_open\_handshake\_timeout@{set\_open\_handshake\_timeout}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{set\_open\_handshake\_timeout()}{set\_open\_handshake\_timeout()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_adb8b3736e30bb8e5ee6add965a948102} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::set\+\_\+open\+\_\+handshake\+\_\+timeout (\begin{DoxyParamCaption}\item[{long}]{dur}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Sets the length of time the library will wait after an opening handshake has been initiated before cancelling it. This can be used to prevent excessive wait times for outgoing clients or excessive resource usage from broken clients or DoS attacks on servers.
+
+Connections that time out will have their fail handlers called with the open\+\_\+handshake\+\_\+timeout error code.
+
+The default value is specified via the compile time config value \textquotesingle{}timeout\+\_\+open\+\_\+handshake\textquotesingle{}. The default value in the core config is 5000ms. \doxylink{struct_a}{A} value of 0 will disable the timer entirely.
+
+To be effective, the transport you are using must support timers. See the documentation for your transport policy for details about its timer support.
+
+
+\begin{DoxyParams}{Parameters}
+{\em dur} & The length of the open handshake timeout in ms \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{endpoint_8hpp_source_l00352}{352}} of file \mbox{\hyperlink{endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00352\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00353\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a0270a5b25d41d95a4d136b9bdf1fd547}{scoped\_lock\_type}}\ guard(m\_mutex);}
+\DoxyCodeLine{00354\ \ \ \ \ \ \ \ \ m\_open\_handshake\_timeout\_dur\ =\ dur;}
+\DoxyCodeLine{00355\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1endpoint_adc6caf0164a0cd073f0535078ccac123}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!set\_ping\_handler@{set\_ping\_handler}}
+\index{set\_ping\_handler@{set\_ping\_handler}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{set\_ping\_handler()}{set\_ping\_handler()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_adc6caf0164a0cd073f0535078ccac123} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::set\+\_\+ping\+\_\+handler (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_a9dcaaa7370865f1bcacb55ae715793ef}{ping\+\_\+handler}}}]{h}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{endpoint_8hpp_source_l00292}{292}} of file \mbox{\hyperlink{endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00292\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00293\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_ab77acb19adafe52f5c28aa387077cfbc}{m\_alog}}.write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}{log::alevel::devel}},\textcolor{stringliteral}{"{}set\_ping\_handler"{}});}
+\DoxyCodeLine{00294\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a0270a5b25d41d95a4d136b9bdf1fd547}{scoped\_lock\_type}}\ guard(m\_mutex);}
+\DoxyCodeLine{00295\ \ \ \ \ \ \ \ \ m\_ping\_handler\ =\ h;}
+\DoxyCodeLine{00296\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1endpoint_adc6caf0164a0cd073f0535078ccac123_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1endpoint_a8ab51c3878bbbcfc92cf5ed6af65e8d7}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!set\_pong\_handler@{set\_pong\_handler}}
+\index{set\_pong\_handler@{set\_pong\_handler}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{set\_pong\_handler()}{set\_pong\_handler()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_a8ab51c3878bbbcfc92cf5ed6af65e8d7} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::set\+\_\+pong\+\_\+handler (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_a1798d54e6d98a481cf870091af84bc1f}{pong\+\_\+handler}}}]{h}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{endpoint_8hpp_source_l00297}{297}} of file \mbox{\hyperlink{endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00297\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00298\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_ab77acb19adafe52f5c28aa387077cfbc}{m\_alog}}.write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}{log::alevel::devel}},\textcolor{stringliteral}{"{}set\_pong\_handler"{}});}
+\DoxyCodeLine{00299\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a0270a5b25d41d95a4d136b9bdf1fd547}{scoped\_lock\_type}}\ guard(m\_mutex);}
+\DoxyCodeLine{00300\ \ \ \ \ \ \ \ \ m\_pong\_handler\ =\ h;}
+\DoxyCodeLine{00301\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1endpoint_a8ab51c3878bbbcfc92cf5ed6af65e8d7_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1endpoint_abcb25dde6f71933c3dbe517c45ebe5c6}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!set\_pong\_timeout@{set\_pong\_timeout}}
+\index{set\_pong\_timeout@{set\_pong\_timeout}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{set\_pong\_timeout()}{set\_pong\_timeout()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_abcb25dde6f71933c3dbe517c45ebe5c6} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::set\+\_\+pong\+\_\+timeout (\begin{DoxyParamCaption}\item[{long}]{dur}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Sets the length of time the library will wait for a pong response to a ping. This can be used as a keepalive or to detect broken connections.
+
+Pong responses that time out will have the pong timeout handler called.
+
+The default value is specified via the compile time config value \textquotesingle{}timeout\+\_\+pong\textquotesingle{}. The default value in the core config is 5000ms. \doxylink{struct_a}{A} value of 0 will disable the timer entirely.
+
+To be effective, the transport you are using must support timers. See the documentation for your transport policy for details about its timer support.
+
+
+\begin{DoxyParams}{Parameters}
+{\em dur} & The length of the pong timeout in ms \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{endpoint_8hpp_source_l00399}{399}} of file \mbox{\hyperlink{endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00399\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00400\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a0270a5b25d41d95a4d136b9bdf1fd547}{scoped\_lock\_type}}\ guard(m\_mutex);}
+\DoxyCodeLine{00401\ \ \ \ \ \ \ \ \ m\_pong\_timeout\_dur\ =\ dur;}
+\DoxyCodeLine{00402\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1endpoint_a02f6288d1e7c32de7a5940a337076917}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!set\_pong\_timeout\_handler@{set\_pong\_timeout\_handler}}
+\index{set\_pong\_timeout\_handler@{set\_pong\_timeout\_handler}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{set\_pong\_timeout\_handler()}{set\_pong\_timeout\_handler()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_a02f6288d1e7c32de7a5940a337076917} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::set\+\_\+pong\+\_\+timeout\+\_\+handler (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_a2c5925a111b9e553efebea35d5ea155f}{pong\+\_\+timeout\+\_\+handler}}}]{h}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{endpoint_8hpp_source_l00302}{302}} of file \mbox{\hyperlink{endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00302\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00303\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_ab77acb19adafe52f5c28aa387077cfbc}{m\_alog}}.write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}{log::alevel::devel}},\textcolor{stringliteral}{"{}set\_pong\_timeout\_handler"{}});}
+\DoxyCodeLine{00304\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a0270a5b25d41d95a4d136b9bdf1fd547}{scoped\_lock\_type}}\ guard(m\_mutex);}
+\DoxyCodeLine{00305\ \ \ \ \ \ \ \ \ m\_pong\_timeout\_handler\ =\ h;}
+\DoxyCodeLine{00306\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1endpoint_a02f6288d1e7c32de7a5940a337076917_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1endpoint_a06a703c52196d900d1e58b79d6657cc8}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!set\_user\_agent@{set\_user\_agent}}
+\index{set\_user\_agent@{set\_user\_agent}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{set\_user\_agent()}{set\_user\_agent()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_a06a703c52196d900d1e58b79d6657cc8} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::set\+\_\+user\+\_\+agent (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{ua}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Sets the identifier that this endpoint will use when creating new connections. Changing this value will only affect future connections. For client endpoints this will be sent as the "{}\+User-\/\+Agent"{} header in outgoing requests. For server endpoints this will be sent in the "{}\+Server"{} response header.
+
+Setting this value to the empty string will suppress the use of the Server and User-\/\+Agent headers. This is typically done to hide implementation details for security purposes.
+
+For best results set this before accepting or opening connections.
+
+The default value for this version is stored in websocketpp\+::user\+\_\+agent
+
+This can be overridden on an individual connection basis by setting a custom "{}\+Server"{} header during the validate handler or "{}\+User-\/\+Agent"{} header on a connection before calling connect().
+
+
+\begin{DoxyParams}{Parameters}
+{\em ua} & The string to set the user agent to. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{endpoint_8hpp_source_l00196}{196}} of file \mbox{\hyperlink{endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a0270a5b25d41d95a4d136b9bdf1fd547}{scoped\_lock\_type}}\ guard(m\_mutex);}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ m\_user\_agent\ =\ ua;}
+\DoxyCodeLine{00199\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1endpoint_a06a703c52196d900d1e58b79d6657cc8_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1endpoint_ac5d059736dd862ccfb3582ba310dfae7}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!set\_validate\_handler@{set\_validate\_handler}}
+\index{set\_validate\_handler@{set\_validate\_handler}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{set\_validate\_handler()}{set\_validate\_handler()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_ac5d059736dd862ccfb3582ba310dfae7} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::set\+\_\+validate\+\_\+handler (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_ae28f3fed86a59b1998746694f3d4edbd}{validate\+\_\+handler}}}]{h}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{endpoint_8hpp_source_l00317}{317}} of file \mbox{\hyperlink{endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00317\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00318\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_ab77acb19adafe52f5c28aa387077cfbc}{m\_alog}}.write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}{log::alevel::devel}},\textcolor{stringliteral}{"{}set\_validate\_handler"{}});}
+\DoxyCodeLine{00319\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a0270a5b25d41d95a4d136b9bdf1fd547}{scoped\_lock\_type}}\ guard(m\_mutex);}
+\DoxyCodeLine{00320\ \ \ \ \ \ \ \ \ m\_validate\_handler\ =\ h;}
+\DoxyCodeLine{00321\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=270pt]{classwebsocketpp_1_1endpoint_ac5d059736dd862ccfb3582ba310dfae7_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classwebsocketpp_1_1endpoint_ab77acb19adafe52f5c28aa387077cfbc}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!m\_alog@{m\_alog}}
+\index{m\_alog@{m\_alog}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{m\_alog}{m\_alog}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_ab77acb19adafe52f5c28aa387077cfbc} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+\mbox{\hyperlink{classwebsocketpp_1_1endpoint_ae2b58b244a7b824e30a18ee2ddaccc02}{alog\+\_\+type}} \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::m\+\_\+alog\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{endpoint_8hpp_source_l00664}{664}} of file \mbox{\hyperlink{endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+\Hypertarget{classwebsocketpp_1_1endpoint_a46d6afb6f4f1541da167230c8c1e6f9a}\index{websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}!m\_elog@{m\_elog}}
+\index{m\_elog@{m\_elog}!websocketpp::endpoint$<$ connection, config $>$@{websocketpp::endpoint$<$ connection, config $>$}}
+\doxysubsubsection{\texorpdfstring{m\_elog}{m\_elog}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1endpoint_a46d6afb6f4f1541da167230c8c1e6f9a} 
+template$<$typename \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} , typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a928771bc4dae5bf42879aeb2e98ae69a}{elog\+\_\+type}} \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$\+::m\+\_\+elog\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{endpoint_8hpp_source_l00665}{665}} of file \mbox{\hyperlink{endpoint_8hpp_source}{endpoint.\+hpp}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/vendor/websocketpp/websocketpp/\mbox{\hyperlink{endpoint_8hpp}{endpoint.\+hpp}}\item 
+libraries/fc/vendor/websocketpp/websocketpp/impl/\mbox{\hyperlink{endpoint__impl_8hpp}{endpoint\+\_\+impl.\+hpp}}\end{DoxyCompactItemize}

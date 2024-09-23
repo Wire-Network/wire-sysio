@@ -1,0 +1,9 @@
+<map id="XXH32_digest" name="XXH32_digest">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,111,31"/>
+<area shape="rect" id="Node000002" href="$xxhash_8c.html#a16a98ec2b456c390c8b19c8a6844fd0c" title=" " alt="" coords="159,5,309,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="111,16,143,16,143,21,111,21"/>
+<area shape="rect" id="Node000003" href="$xxhash_8c.html#a62a4676ea59e4ecf420e0770fa66f5ad" title=" " alt="" coords="357,5,468,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="309,16,341,16,341,21,309,21"/>
+<area shape="rect" id="Node000004" href="$xxhash_8c.html#aa7bbcded59b6f6fae7f6273d7562ed52" title=" " alt="" coords="516,5,662,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="469,16,501,16,501,21,469,21"/>
+</map>

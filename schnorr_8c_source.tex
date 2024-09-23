@@ -1,0 +1,158 @@
+\doxysection{schnorr.\+c}
+\hypertarget{schnorr_8c_source}{}\label{schnorr_8c_source}\index{libraries/fc/secp256k1/secp256k1/examples/schnorr.c@{libraries/fc/secp256k1/secp256k1/examples/schnorr.c}}
+\mbox{\hyperlink{schnorr_8c}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00001}00001\ \textcolor{comment}{/*************************************************************************}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00002}00002\ \textcolor{comment}{\ *\ Written\ in\ 2020-\/2022\ by\ Elichai\ Turkel\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00003}00003\ \textcolor{comment}{\ *\ To\ the\ extent\ possible\ under\ law,\ the\ author(s)\ have\ dedicated\ all\ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00004}00004\ \textcolor{comment}{\ *\ copyright\ and\ related\ and\ neighboring\ rights\ to\ the\ software\ in\ this\ \ *}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00005}00005\ \textcolor{comment}{\ *\ file\ to\ the\ public\ domain\ worldwide.\ This\ software\ is\ distributed\ \ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00006}00006\ \textcolor{comment}{\ *\ without\ any\ warranty.\ For\ the\ CC0\ Public\ Domain\ Dedication,\ see\ \ \ \ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00007}00007\ \textcolor{comment}{\ *\ EXAMPLES\_COPYING\ or\ https://creativecommons.org/publicdomain/zero/1.0\ *}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00008}00008\ \textcolor{comment}{\ *************************************************************************/}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <stdio.h>}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00011}00011\ \textcolor{preprocessor}{\#include\ <assert.h>}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00012}00012\ \textcolor{preprocessor}{\#include\ <string.h>}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00014}00014\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{secp256k1_8h}{secp256k1.h}}>}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00015}00015\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{secp256k1__extrakeys_8h}{secp256k1\_extrakeys.h}}>}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00016}00016\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{secp256k1__schnorrsig_8h}{secp256k1\_schnorrsig.h}}>}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00018}00018\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{random_8h}{random.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00020}\mbox{\hyperlink{schnorr_8c_a840291bc02cba5474a4cb46a9b9566fe}{00020}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{schnorr_8c_a840291bc02cba5474a4cb46a9b9566fe}{main}}(\textcolor{keywordtype}{void})\ \{}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00021}00021\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ msg[12]\ =\ \textcolor{stringliteral}{"{}Hello\ World!"{}};}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00022}00022\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ msg\_hash[32];}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00023}00023\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ tag[17]\ =\ \textcolor{stringliteral}{"{}my\_fancy\_protocol"{}};}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00024}00024\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ seckey[32];}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00025}00025\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ randomize[32];}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00026}00026\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ auxiliary\_rand[32];}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00027}00027\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ serialized\_pubkey[32];}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00028}00028\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ signature[64];}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00029}00029\ \ \ \ \ \textcolor{keywordtype}{int}\ is\_signature\_valid;}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00030}00030\ \ \ \ \ \textcolor{keywordtype}{int}\ return\_val;}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00031}00031\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__xonly__pubkey}{secp256k1\_xonly\_pubkey}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}};}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00032}00032\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__keypair}{secp256k1\_keypair}}\ keypair;}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00033}00033\ \ \ \ \ \textcolor{comment}{/*\ The\ specification\ in\ secp256k1\_extrakeys.h\ states\ that\ \`{}secp256k1\_keypair\_create`}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00034}00034\ \textcolor{comment}{\ \ \ \ \ *\ needs\ a\ context\ object\ initialized\ for\ signing.\ And\ in\ secp256k1\_schnorrsig.h}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00035}00035\ \textcolor{comment}{\ \ \ \ \ *\ they\ state\ that\ \`{}secp256k1\_schnorrsig\_verify`\ needs\ a\ context\ initialized\ for}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00036}00036\ \textcolor{comment}{\ \ \ \ \ *\ verification,\ which\ is\ why\ we\ create\ a\ context\ for\ both\ signing\ and\ verification}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00037}00037\ \textcolor{comment}{\ \ \ \ \ *\ with\ the\ SECP256K1\_CONTEXT\_SIGN\ and\ SECP256K1\_CONTEXT\_VERIFY\ flags.\ */}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00038}00038\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__context__struct}{secp256k1\_context}}*\ ctx\ =\ \mbox{\hyperlink{secp256k1_8h_a3aaa9fcc3ab67bc8f841779a049069c5}{secp256k1\_context\_create}}(\mbox{\hyperlink{secp256k1_8h_a0d34fe6baa73d3145f2e376e43de0b15}{SECP256K1\_CONTEXT\_SIGN}}\ |\ \mbox{\hyperlink{secp256k1_8h_add20a6c320e247ca7bd524cbc4259d64}{SECP256K1\_CONTEXT\_VERIFY}});}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00039}00039\ \ \ \ \ \textcolor{keywordflow}{if}\ (!fill\_random(randomize,\ \textcolor{keyword}{sizeof}(randomize)))\ \{}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00040}00040\ \ \ \ \ \ \ \ \ printf(\textcolor{stringliteral}{"{}Failed\ to\ generate\ randomness\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00041}00041\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00042}00042\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00043}00043\ \ \ \ \ \textcolor{comment}{/*\ Randomizing\ the\ context\ is\ recommended\ to\ protect\ against\ side-\/channel}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00044}00044\ \textcolor{comment}{\ \ \ \ \ *\ leakage\ See\ \`{}secp256k1\_context\_randomize`\ in\ secp256k1.h\ for\ more}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00045}00045\ \textcolor{comment}{\ \ \ \ \ *\ information\ about\ it.\ This\ should\ never\ fail.\ */}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00046}00046\ \ \ \ \ return\_val\ =\ \mbox{\hyperlink{secp256k1_8h_a1b81d70feb6ed24dc902cbbd5ba569e7}{secp256k1\_context\_randomize}}(ctx,\ randomize);}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00047}00047\ \ \ \ \ assert(return\_val);}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00049}00049\ \textcolor{comment}{\ \ \ \ /***\ Key\ Generation\ ***/}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00051}00051\ \ \ \ \ \textcolor{comment}{/*\ If\ the\ secret\ key\ is\ zero\ or\ out\ of\ range\ (bigger\ than\ secp256k1's}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00052}00052\ \textcolor{comment}{\ \ \ \ \ *\ order),\ we\ try\ to\ sample\ a\ new\ key.\ Note\ that\ the\ probability\ of\ this}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00053}00053\ \textcolor{comment}{\ \ \ \ \ *\ happening\ is\ negligible.\ */}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00054}00054\ \ \ \ \ \textcolor{keywordflow}{while}\ (1)\ \{}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00055}00055\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!fill\_random(seckey,\ \textcolor{keyword}{sizeof}(seckey)))\ \{}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \ \ \ printf(\textcolor{stringliteral}{"{}Failed\ to\ generate\ randomness\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00058}00058\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00059}00059\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ Try\ to\ create\ a\ keypair\ with\ a\ valid\ context,\ it\ should\ only\ fail\ if}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00060}00060\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ *\ the\ secret\ key\ is\ zero\ or\ out\ of\ range.\ */}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00061}00061\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{secp256k1__extrakeys_8h_a61b1362ada2435ab10240e52ff738476}{secp256k1\_keypair\_create}}(ctx,\ \&keypair,\ seckey))\ \{}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00062}00062\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00063}00063\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00064}00064\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00066}00066\ \ \ \ \ \textcolor{comment}{/*\ Extract\ the\ X-\/only\ public\ key\ from\ the\ keypair.\ We\ pass\ NULL\ for}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00067}00067\ \textcolor{comment}{\ \ \ \ \ *\ \`{}pk\_parity`\ as\ the\ parity\ isn't\ needed\ for\ signing\ or\ verification.}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00068}00068\ \textcolor{comment}{\ \ \ \ \ *\ \`{}secp256k1\_keypair\_xonly\_pub`\ supports\ returning\ the\ parity\ for}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00069}00069\ \textcolor{comment}{\ \ \ \ \ *\ other\ use\ cases\ such\ as\ tests\ or\ verifying\ Taproot\ tweaks.}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00070}00070\ \textcolor{comment}{\ \ \ \ \ *\ This\ should\ never\ fail\ with\ a\ valid\ context\ and\ public\ key.\ */}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00071}00071\ \ \ \ \ return\_val\ =\ \mbox{\hyperlink{secp256k1__extrakeys_8h_ab0383c461b3790fdcfcaef0f89deb709}{secp256k1\_keypair\_xonly\_pub}}(ctx,\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}},\ NULL,\ \&keypair);}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00072}00072\ \ \ \ \ assert(return\_val);}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00073}00073\ }
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00074}00074\ \ \ \ \ \textcolor{comment}{/*\ Serialize\ the\ public\ key.\ Should\ always\ return\ 1\ for\ a\ valid\ public\ key.\ */}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00075}00075\ \ \ \ \ return\_val\ =\ \mbox{\hyperlink{secp256k1__extrakeys_8h_a455e86be0f18f4313ba8ea73e34a25a6}{secp256k1\_xonly\_pubkey\_serialize}}(ctx,\ serialized\_pubkey,\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}});}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00076}00076\ \ \ \ \ assert(return\_val);}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00077}00077\ }
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00078}00078\ \textcolor{comment}{\ \ \ \ /***\ Signing\ ***/}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00080}00080\ \ \ \ \ \textcolor{comment}{/*\ Instead\ of\ signing\ (possibly\ very\ long)\ messages\ directly,\ we\ sign\ a}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00081}00081\ \textcolor{comment}{\ \ \ \ \ *\ 32-\/byte\ hash\ of\ the\ message\ in\ this\ example.}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00082}00082\ \textcolor{comment}{\ \ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00083}00083\ \textcolor{comment}{\ \ \ \ \ *\ We\ use\ secp256k1\_tagged\_sha256\ to\ create\ this\ hash.\ This\ function\ expects}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00084}00084\ \textcolor{comment}{\ \ \ \ \ *\ a\ context-\/specific\ "{}tag"{},\ which\ restricts\ the\ context\ in\ which\ the\ signed}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00085}00085\ \textcolor{comment}{\ \ \ \ \ *\ messages\ should\ be\ considered\ valid.\ For\ example,\ if\ protocol\ A\ mandates}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00086}00086\ \textcolor{comment}{\ \ \ \ \ *\ to\ use\ the\ tag\ "{}my\_fancy\_protocol"{}\ and\ protocol\ B\ mandates\ to\ use\ the\ tag}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00087}00087\ \textcolor{comment}{\ \ \ \ \ *\ "{}my\_boring\_protocol"{},\ then\ signed\ messages\ from\ protocol\ A\ will\ never\ be}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00088}00088\ \textcolor{comment}{\ \ \ \ \ *\ valid\ in\ protocol\ B\ (and\ vice\ versa),\ even\ if\ keys\ are\ reused\ across}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00089}00089\ \textcolor{comment}{\ \ \ \ \ *\ protocols.\ This\ implements\ "{}domain\ separation"{},\ which\ is\ considered\ good}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00090}00090\ \textcolor{comment}{\ \ \ \ \ *\ practice.\ It\ avoids\ attacks\ in\ which\ users\ are\ tricked\ into\ signing\ a}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00091}00091\ \textcolor{comment}{\ \ \ \ \ *\ message\ that\ has\ intended\ consequences\ in\ the\ intended\ context\ (e.g.,}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00092}00092\ \textcolor{comment}{\ \ \ \ \ *\ protocol\ A)\ but\ would\ have\ unintended\ consequences\ if\ it\ were\ valid\ in}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00093}00093\ \textcolor{comment}{\ \ \ \ \ *\ some\ other\ context\ (e.g.,\ protocol\ B).\ */}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00094}00094\ \ \ \ \ return\_val\ =\ \mbox{\hyperlink{secp256k1_8h_a797aef211241f7f6edbb60dcc81c6036}{secp256k1\_tagged\_sha256}}(ctx,\ msg\_hash,\ tag,\ \textcolor{keyword}{sizeof}(tag),\ msg,\ \textcolor{keyword}{sizeof}(msg));}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00095}00095\ \ \ \ \ assert(return\_val);}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00096}00096\ }
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00097}00097\ \ \ \ \ \textcolor{comment}{/*\ Generate\ 32\ bytes\ of\ randomness\ to\ use\ with\ BIP-\/340\ schnorr\ signing.\ */}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00098}00098\ \ \ \ \ \textcolor{keywordflow}{if}\ (!fill\_random(auxiliary\_rand,\ \textcolor{keyword}{sizeof}(auxiliary\_rand)))\ \{}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00099}00099\ \ \ \ \ \ \ \ \ printf(\textcolor{stringliteral}{"{}Failed\ to\ generate\ randomness\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00100}00100\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00101}00101\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00102}00102\ }
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00103}00103\ \ \ \ \ \textcolor{comment}{/*\ Generate\ a\ Schnorr\ signature.}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00104}00104\ \textcolor{comment}{\ \ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00105}00105\ \textcolor{comment}{\ \ \ \ \ *\ We\ use\ the\ secp256k1\_schnorrsig\_sign32\ function\ that\ provides\ a\ simple}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00106}00106\ \textcolor{comment}{\ \ \ \ \ *\ interface\ for\ signing\ 32-\/byte\ messages\ (which\ in\ our\ case\ is\ a\ hash\ of}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00107}00107\ \textcolor{comment}{\ \ \ \ \ *\ the\ actual\ message).\ BIP-\/340\ recommends\ passing\ 32\ bytes\ of\ randomness}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00108}00108\ \textcolor{comment}{\ \ \ \ \ *\ to\ the\ signing\ function\ to\ improve\ security\ against\ side-\/channel\ attacks.}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00109}00109\ \textcolor{comment}{\ \ \ \ \ *\ Signing\ with\ a\ valid\ context,\ a\ 32-\/byte\ message,\ a\ verified\ keypair,\ and}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00110}00110\ \textcolor{comment}{\ \ \ \ \ *\ any\ 32\ bytes\ of\ auxiliary\ random\ data\ should\ never\ fail.\ */}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00111}00111\ \ \ \ \ return\_val\ =\ \mbox{\hyperlink{secp256k1__schnorrsig_8h_a562fe7745d3c285d64ef8b88ab70d7e1}{secp256k1\_schnorrsig\_sign32}}(ctx,\ signature,\ msg\_hash,\ \&keypair,\ auxiliary\_rand);}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00112}00112\ \ \ \ \ assert(return\_val);}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00113}00113\ }
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00114}00114\ \textcolor{comment}{\ \ \ \ /***\ Verification\ ***/}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00115}00115\ }
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00116}00116\ \ \ \ \ \textcolor{comment}{/*\ Deserialize\ the\ public\ key.\ This\ will\ return\ 0\ if\ the\ public\ key\ can't}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00117}00117\ \textcolor{comment}{\ \ \ \ \ *\ be\ parsed\ correctly\ */}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00118}00118\ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{secp256k1__extrakeys_8h_ad9e5f1dae6a1e3e03d0093aa17e6c21c}{secp256k1\_xonly\_pubkey\_parse}}(ctx,\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}},\ serialized\_pubkey))\ \{}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00119}00119\ \ \ \ \ \ \ \ \ printf(\textcolor{stringliteral}{"{}Failed\ parsing\ the\ public\ key\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00120}00120\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00121}00121\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00122}00122\ }
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00123}00123\ \ \ \ \ \textcolor{comment}{/*\ Compute\ the\ tagged\ hash\ on\ the\ received\ messages\ using\ the\ same\ tag\ as\ the\ signer.\ */}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00124}00124\ \ \ \ \ return\_val\ =\ \mbox{\hyperlink{secp256k1_8h_a797aef211241f7f6edbb60dcc81c6036}{secp256k1\_tagged\_sha256}}(ctx,\ msg\_hash,\ tag,\ \textcolor{keyword}{sizeof}(tag),\ msg,\ \textcolor{keyword}{sizeof}(msg));}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00125}00125\ \ \ \ \ assert(return\_val);}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00126}00126\ }
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00127}00127\ \ \ \ \ \textcolor{comment}{/*\ Verify\ a\ signature.\ This\ will\ return\ 1\ if\ it's\ valid\ and\ 0\ if\ it's\ not.\ */}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00128}00128\ \ \ \ \ is\_signature\_valid\ =\ \mbox{\hyperlink{secp256k1__schnorrsig_8h_ad8c9ecde1b1b561bb0a864ef307a48cb}{secp256k1\_schnorrsig\_verify}}(ctx,\ signature,\ msg\_hash,\ 32,\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}});}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00129}00129\ }
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00130}00130\ }
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00131}00131\ \ \ \ \ printf(\textcolor{stringliteral}{"{}Is\ the\ signature\ valid?\ \%s\(\backslash\)n"{}},\ is\_signature\_valid\ ?\ \textcolor{stringliteral}{"{}true"{}}\ :\ \textcolor{stringliteral}{"{}false"{}});}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00132}00132\ \ \ \ \ printf(\textcolor{stringliteral}{"{}Secret\ Key:\ "{}});}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00133}00133\ \ \ \ \ print\_hex(seckey,\ \textcolor{keyword}{sizeof}(seckey));}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00134}00134\ \ \ \ \ printf(\textcolor{stringliteral}{"{}Public\ Key:\ "{}});}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00135}00135\ \ \ \ \ print\_hex(serialized\_pubkey,\ \textcolor{keyword}{sizeof}(serialized\_pubkey));}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00136}00136\ \ \ \ \ printf(\textcolor{stringliteral}{"{}Signature:\ "{}});}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00137}00137\ \ \ \ \ print\_hex(signature,\ \textcolor{keyword}{sizeof}(signature));}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00138}00138\ }
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00139}00139\ \ \ \ \ \textcolor{comment}{/*\ This\ will\ clear\ everything\ from\ the\ context\ and\ free\ the\ memory\ */}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00140}00140\ \ \ \ \ \mbox{\hyperlink{secp256k1_8h_a026db914e3723531825ecf25a0cbd699}{secp256k1\_context\_destroy}}(ctx);}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00141}00141\ }
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00142}00142\ \ \ \ \ \textcolor{comment}{/*\ It's\ best\ practice\ to\ try\ to\ clear\ secrets\ from\ memory\ after\ using\ them.}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00143}00143\ \textcolor{comment}{\ \ \ \ \ *\ This\ is\ done\ because\ some\ bugs\ can\ allow\ an\ attacker\ to\ leak\ memory,\ for}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00144}00144\ \textcolor{comment}{\ \ \ \ \ *\ example\ through\ "{}out\ of\ bounds"{}\ array\ access\ (see\ Heartbleed),\ Or\ the\ OS}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00145}00145\ \textcolor{comment}{\ \ \ \ \ *\ swapping\ them\ to\ disk.\ Hence,\ we\ overwrite\ the\ secret\ key\ buffer\ with\ zeros.}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00146}00146\ \textcolor{comment}{\ \ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00147}00147\ \textcolor{comment}{\ \ \ \ \ *\ TODO:\ Prevent\ these\ writes\ from\ being\ optimized\ out,\ as\ any\ good\ compiler}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00148}00148\ \textcolor{comment}{\ \ \ \ \ *\ will\ remove\ any\ writes\ that\ aren't\ used.\ */}}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00149}00149\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(seckey,\ 0,\ \textcolor{keyword}{sizeof}(seckey));}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00150}00150\ }
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00151}00151\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{schnorr_8c_source_l00152}00152\ \}}
+
+\end{DoxyCode}

@@ -1,0 +1,592 @@
+\doxysection{sysio\+::sync\+\_\+manager Class Reference}
+\hypertarget{classsysio_1_1sync__manager}{}\label{classsysio_1_1sync__manager}\index{sysio::sync\_manager@{sysio::sync\_manager}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classsysio_1_1sync__manager_a3446e9dbeea966108e51f7ace13efd34}{sync\+\_\+manager}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{namespacesysio_1_1chain_a68ee5032824b9877df35eec12344398d}{span}})
+\item 
+bool \mbox{\hyperlink{classsysio_1_1sync__manager_aeaee19ed7ea8e42c21e1a70b1f7ac625}{syncing\+\_\+with\+\_\+peer}} () const
+\item 
+void \mbox{\hyperlink{classsysio_1_1sync__manager_ab81caff4e1eae073cee42d0a16600fb0}{sync\+\_\+reset\+\_\+lib\+\_\+num}} (const \mbox{\hyperlink{namespacesysio_aefc0023f14362306826da768553b8daf}{connection\+\_\+ptr}} \&conn, bool closing)
+\item 
+void \mbox{\hyperlink{classsysio_1_1sync__manager_a6acfea4380e06a48ff83764b2a779a96}{sync\+\_\+reassign\+\_\+fetch}} (const \mbox{\hyperlink{namespacesysio_aefc0023f14362306826da768553b8daf}{connection\+\_\+ptr}} \&c, \mbox{\hyperlink{namespacesysio_a5c18cd9d34b8c5d3af8e2de75577673f}{go\+\_\+away\+\_\+reason}} reason)
+\item 
+void \mbox{\hyperlink{classsysio_1_1sync__manager_a51eb06caeee4ecfe79679e4dfca5240e}{rejected\+\_\+block}} (const \mbox{\hyperlink{namespacesysio_aefc0023f14362306826da768553b8daf}{connection\+\_\+ptr}} \&c, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} blk\+\_\+num)
+\item 
+void \mbox{\hyperlink{classsysio_1_1sync__manager_afbcb08cf70b4e5cb2416b1fd59be9787}{sync\+\_\+recv\+\_\+block}} (const \mbox{\hyperlink{namespacesysio_aefc0023f14362306826da768553b8daf}{connection\+\_\+ptr}} \&c, const \mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{block\+\_\+id\+\_\+type}} \&blk\+\_\+id, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} blk\+\_\+num, bool blk\+\_\+applied)
+\item 
+void \mbox{\hyperlink{classsysio_1_1sync__manager_af128876bbe4648c785d7a0905110186e}{sync\+\_\+update\+\_\+expected}} (const \mbox{\hyperlink{namespacesysio_aefc0023f14362306826da768553b8daf}{connection\+\_\+ptr}} \&c, const \mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{block\+\_\+id\+\_\+type}} \&blk\+\_\+id, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} blk\+\_\+num, bool blk\+\_\+applied)
+\item 
+void \mbox{\hyperlink{classsysio_1_1sync__manager_a4df766ac98a672861e3f9e2a7ca715e6}{recv\+\_\+handshake}} (const \mbox{\hyperlink{namespacesysio_aefc0023f14362306826da768553b8daf}{connection\+\_\+ptr}} \&c, const \mbox{\hyperlink{structsysio_1_1handshake__message}{handshake\+\_\+message}} \&msg)
+\item 
+void \mbox{\hyperlink{classsysio_1_1sync__manager_a4947bb9b1146d531ae706d4fc9d57025}{sync\+\_\+recv\+\_\+notice}} (const \mbox{\hyperlink{namespacesysio_aefc0023f14362306826da768553b8daf}{connection\+\_\+ptr}} \&c, const \mbox{\hyperlink{structsysio_1_1notice__message}{notice\+\_\+message}} \&msg)
+\item 
+std\+::unique\+\_\+lock$<$ std\+::mutex $>$ \mbox{\hyperlink{classsysio_1_1sync__manager_a59c2a3a3594344b9ce771954d4115a70}{locked\+\_\+sync\+\_\+mutex}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1sync__manager_a671900953bfaa2a06219f40687df4388}{reset\+\_\+last\+\_\+requested\+\_\+num}} (const std\+::unique\+\_\+lock$<$ std\+::mutex $>$ \&lock)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static void \mbox{\hyperlink{classsysio_1_1sync__manager_afe3debb36f6f73dbbf6a3bbb8c4ef734}{send\+\_\+handshakes}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l00119}{119}} of file \mbox{\hyperlink{net__plugin_8cpp_source}{net\+\_\+plugin.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classsysio_1_1sync__manager_a3446e9dbeea966108e51f7ace13efd34}\index{sysio::sync\_manager@{sysio::sync\_manager}!sync\_manager@{sync\_manager}}
+\index{sync\_manager@{sync\_manager}!sysio::sync\_manager@{sysio::sync\_manager}}
+\doxysubsubsection{\texorpdfstring{sync\_manager()}{sync\_manager()}}
+{\footnotesize\ttfamily \label{classsysio_1_1sync__manager_a3446e9dbeea966108e51f7ace13efd34} 
+sysio\+::sync\+\_\+manager\+::sync\+\_\+manager (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{span}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l01537}{1537}} of file \mbox{\hyperlink{net__plugin_8cpp_source}{net\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01538\ \ \ \ \ \ \ :sync\_known\_lib\_num(\ 0\ )}
+\DoxyCodeLine{01539\ \ \ \ \ \ \ ,sync\_last\_requested\_num(\ 0\ )}
+\DoxyCodeLine{01540\ \ \ \ \ \ \ ,sync\_next\_expected\_num(\ 1\ )}
+\DoxyCodeLine{01541\ \ \ \ \ \ \ ,sync\_req\_span(\ req\_span\ )}
+\DoxyCodeLine{01542\ \ \ \ \ \ \ ,sync\_source()}
+\DoxyCodeLine{01543\ \ \ \ \ \ \ ,sync\_state(in\_sync)}
+\DoxyCodeLine{01544\ \ \ \ \{}
+\DoxyCodeLine{01545\ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1sync__manager_a59c2a3a3594344b9ce771954d4115a70}\index{sysio::sync\_manager@{sysio::sync\_manager}!locked\_sync\_mutex@{locked\_sync\_mutex}}
+\index{locked\_sync\_mutex@{locked\_sync\_mutex}!sysio::sync\_manager@{sysio::sync\_manager}}
+\doxysubsubsection{\texorpdfstring{locked\_sync\_mutex()}{locked\_sync\_mutex()}}
+{\footnotesize\ttfamily \label{classsysio_1_1sync__manager_a59c2a3a3594344b9ce771954d4115a70} 
+std\+::unique\+\_\+lock$<$ std\+::mutex $>$ sysio\+::sync\+\_\+manager\+::locked\+\_\+sync\+\_\+mutex (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l00157}{157}} of file \mbox{\hyperlink{net__plugin_8cpp_source}{net\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::unique\_lock<std::mutex>(sync\_mtx);}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1sync__manager_a4df766ac98a672861e3f9e2a7ca715e6}\index{sysio::sync\_manager@{sysio::sync\_manager}!recv\_handshake@{recv\_handshake}}
+\index{recv\_handshake@{recv\_handshake}!sysio::sync\_manager@{sysio::sync\_manager}}
+\doxysubsubsection{\texorpdfstring{recv\_handshake()}{recv\_handshake()}}
+{\footnotesize\ttfamily \label{classsysio_1_1sync__manager_a4df766ac98a672861e3f9e2a7ca715e6} 
+void sysio\+::sync\+\_\+manager\+::recv\+\_\+handshake (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_aefc0023f14362306826da768553b8daf}{connection\+\_\+ptr}} \&}]{c}{, }\item[{const \mbox{\hyperlink{structsysio_1_1handshake__message}{handshake\+\_\+message}} \&}]{msg}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l01774}{1774}} of file \mbox{\hyperlink{net__plugin_8cpp_source}{net\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01774\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01775\ }
+\DoxyCodeLine{01776\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ c-\/>is\_transactions\_only\_connection()\ )\ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{01777\ }
+\DoxyCodeLine{01778\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ lib\_num\ =\ 0;}
+\DoxyCodeLine{01779\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ peer\_lib\ =\ msg.last\_irreversible\_block\_num;}
+\DoxyCodeLine{01780\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ head\ =\ 0;}
+\DoxyCodeLine{01781\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1sha256}{block\_id\_type}}\ head\_id;}
+\DoxyCodeLine{01782\ \ \ \ \ \ \ std::tie(\ lib\_num,\ std::ignore,\ head,}
+\DoxyCodeLine{01783\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::ignore,\ std::ignore,\ head\_id\ )\ =\ my\_impl-\/>\mbox{\hyperlink{classsysio_1_1net__plugin__impl_ab7de62c1cba9cb5a30060a687ef913e2}{get\_chain\_info}}();}
+\DoxyCodeLine{01784\ }
+\DoxyCodeLine{01785\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1sync__manager_ab81caff4e1eae073cee42d0a16600fb0}{sync\_reset\_lib\_num}}(c,\ \textcolor{keyword}{false});}
+\DoxyCodeLine{01786\ }
+\DoxyCodeLine{01787\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ current\_time\_ns\ =\ std::chrono::duration\_cast<std::chrono::nanoseconds>(std::chrono::system\_clock::now().time\_since\_epoch()).count();}
+\DoxyCodeLine{01788\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ network\_latency\_ns\ =\ current\_time\_ns\ -\/\ msg.time;\ \textcolor{comment}{//\ net\ latency\ in\ nanoseconds}}
+\DoxyCodeLine{01789\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ network\_latency\_ns\ <\ 0\ )\ \{}
+\DoxyCodeLine{01790\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{net__plugin_8cpp_af53787454493a30650fdab0193037465}{peer\_wlog}}(c,\ \textcolor{stringliteral}{"{}Peer\ sent\ a\ handshake\ with\ a\ timestamp\ skewed\ by\ at\ least\ \$\{t\}ms"{}},\ (\textcolor{stringliteral}{"{}t"{}},\ network\_latency\_ns/1000000));}
+\DoxyCodeLine{01791\ \ \ \ \ \ \ \ \ \ network\_latency\_ns\ =\ 0;}
+\DoxyCodeLine{01792\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01793\ \ \ \ \ \ \ \textcolor{comment}{//\ number\ of\ blocks\ syncing\ node\ is\ behind\ from\ a\ peer\ node}}
+\DoxyCodeLine{01794\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ nblk\_behind\_by\_net\_latency\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\textcolor{keyword}{>}(network\_latency\_ns\ /\ block\_interval\_ns);}
+\DoxyCodeLine{01795\ \ \ \ \ \ \ \textcolor{comment}{//\ 2x\ for\ time\ it\ takes\ for\ message\ to\ reach\ back\ to\ peer\ node,\ +1\ to\ compensate\ for\ integer\ division\ truncation}}
+\DoxyCodeLine{01796\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ nblk\_combined\_latency\ =\ 2\ *\ nblk\_behind\_by\_net\_latency\ +\ 1;}
+\DoxyCodeLine{01797\ \ \ \ \ \ \ \textcolor{comment}{//\ message\ in\ the\ log\ below\ is\ used\ in\ p2p\_high\_latency\_test.py\ test}}
+\DoxyCodeLine{01798\ \ \ \ \ \ \ \mbox{\hyperlink{net__plugin_8cpp_a051c62a0ec99dcd3e7a38fd03bec1fe0}{peer\_dlog}}(c,\ \textcolor{stringliteral}{"{}Network\ latency\ is\ \$\{lat\}ms,\ \$\{num\}\ blocks\ discrepancy\ by\ network\ latency,\ \$\{tot\_num\}\ blocks\ discrepancy\ expected\ once\ message\ received"{}},}
+\DoxyCodeLine{01799\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}lat"{}},\ network\_latency\_ns/1000000)(\textcolor{stringliteral}{"{}num"{}},\ nblk\_behind\_by\_net\_latency)(\textcolor{stringliteral}{"{}tot\_num"{}},\ nblk\_combined\_latency));}
+\DoxyCodeLine{01800\ }
+\DoxyCodeLine{01801\ \ \ \ \ \ \ \textcolor{comment}{//-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{01802\ \ \ \ \ \ \ \textcolor{comment}{//\ sync\ need\ checks;\ (lib\ ==\ last\ irreversible\ block)}}
+\DoxyCodeLine{01803\ \ \ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{01804\ \ \ \ \ \ \ \textcolor{comment}{//\ 0.\ my\ head\ block\ id\ ==\ peer\ head\ id\ means\ we\ are\ all\ caught\ up\ block\ wise}}
+\DoxyCodeLine{01805\ \ \ \ \ \ \ \textcolor{comment}{//\ 1.\ my\ head\ block\ num\ <\ peer\ lib\ -\/\ start\ sync\ locally}}
+\DoxyCodeLine{01806\ \ \ \ \ \ \ \textcolor{comment}{//\ 2.\ my\ lib\ >\ peer\ head\ num\ +\ nblk\_combined\_latency\ -\/\ send\ last\_irr\_catch\_up\ notice\ if\ not\ the\ first\ generation}}
+\DoxyCodeLine{01807\ \ \ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{01808\ \ \ \ \ \ \ \textcolor{comment}{//\ 3\ \ my\ head\ block\ num\ +\ nblk\_combined\_latency\ <\ peer\ head\ block\ num\ -\/\ update\ sync\ state\ and\ send\ a\ catchup\ request}}
+\DoxyCodeLine{01809\ \ \ \ \ \ \ \textcolor{comment}{//\ 4\ \ my\ head\ block\ num\ >=\ peer\ block\ num\ +\ nblk\_combined\_latency\ send\ a\ notice\ catchup\ if\ this\ is\ not\ the\ first\ generation}}
+\DoxyCodeLine{01810\ \ \ \ \ \ \ \textcolor{comment}{//\ \ \ \ 4.1\ if\ peer\ appears\ to\ be\ on\ a\ different\ fork\ (\ our\_id\_for(\ msg.head\_num\ )\ !=\ msg.head\_id\ )}}
+\DoxyCodeLine{01811\ \ \ \ \ \ \ \textcolor{comment}{//\ \ \ \ \ \ \ \ then\ request\ peer's\ blocks}}
+\DoxyCodeLine{01812\ \ \ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{01813\ \ \ \ \ \ \ \textcolor{comment}{//-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{01814\ }
+\DoxyCodeLine{01815\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (head\_id\ ==\ msg.head\_id)\ \{}
+\DoxyCodeLine{01816\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{net__plugin_8cpp_ad909b2ce03eb19202983c88ae2abe9bd}{peer\_ilog}}(\ c,\ \textcolor{stringliteral}{"{}handshake\ lib\ \$\{lib\},\ head\ \$\{head\},\ head\ id\ \$\{id\}..\ sync\ 0"{}},}
+\DoxyCodeLine{01817\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}lib"{}},\ msg.last\_irreversible\_block\_num)(\textcolor{stringliteral}{"{}head"{}},\ msg.head\_num)(\textcolor{stringliteral}{"{}id"{}},\ msg.head\_id.str().substr(8,16))\ );}
+\DoxyCodeLine{01818\ \ \ \ \ \ \ \ \ \ c-\/>syncing\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{01819\ \ \ \ \ \ \ \ \ \ notice\_message\ note;}
+\DoxyCodeLine{01820\ \ \ \ \ \ \ \ \ \ note.known\_blocks.mode\ =\ \mbox{\hyperlink{namespacesysio_a3a283f786468e0f0e35b0177214ca59ea3820b1d3d12c986267353dcda2fdf2d6}{none}};}
+\DoxyCodeLine{01821\ \ \ \ \ \ \ \ \ \ note.known\_trx.mode\ =\ \mbox{\hyperlink{namespacesysio_a3a283f786468e0f0e35b0177214ca59ea9b09221c2cc0fc2ea1d69a00b99ea58f}{catch\_up}};}
+\DoxyCodeLine{01822\ \ \ \ \ \ \ \ \ \ note.known\_trx.pending\ =\ 0;}
+\DoxyCodeLine{01823\ \ \ \ \ \ \ \ \ \ c-\/>enqueue(\ note\ );}
+\DoxyCodeLine{01824\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{01825\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01826\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (head\ <\ peer\_lib)\ \{}
+\DoxyCodeLine{01827\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{net__plugin_8cpp_ad909b2ce03eb19202983c88ae2abe9bd}{peer\_ilog}}(\ c,\ \textcolor{stringliteral}{"{}handshake\ lib\ \$\{lib\},\ head\ \$\{head\},\ head\ id\ \$\{id\}..\ sync\ 1"{}},}
+\DoxyCodeLine{01828\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}lib"{}},\ msg.last\_irreversible\_block\_num)(\textcolor{stringliteral}{"{}head"{}},\ msg.head\_num)(\textcolor{stringliteral}{"{}id"{}},\ msg.head\_id.str().substr(8,16))\ );}
+\DoxyCodeLine{01829\ \ \ \ \ \ \ \ \ \ c-\/>syncing\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{01830\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (c-\/>sent\_handshake\_count\ >\ 0)\ \{}
+\DoxyCodeLine{01831\ \ \ \ \ \ \ \ \ \ \ \ \ c-\/>send\_handshake();}
+\DoxyCodeLine{01832\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01833\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{01834\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01835\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (lib\_num\ >\ msg.head\_num\ +\ nblk\_combined\_latency)\ \{}
+\DoxyCodeLine{01836\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{net__plugin_8cpp_ad909b2ce03eb19202983c88ae2abe9bd}{peer\_ilog}}(\ c,\ \textcolor{stringliteral}{"{}handshake\ lib\ \$\{lib\},\ head\ \$\{head\},\ head\ id\ \$\{id\}..\ sync\ 2"{}},}
+\DoxyCodeLine{01837\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}lib"{}},\ msg.last\_irreversible\_block\_num)(\textcolor{stringliteral}{"{}head"{}},\ msg.head\_num)(\textcolor{stringliteral}{"{}id"{}},\ msg.head\_id.str().substr(8,16))\ );}
+\DoxyCodeLine{01838\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (msg.generation\ >\ 1\ ||\ c-\/>protocol\_version\ >\ \mbox{\hyperlink{namespacesysio_a29c84c78972f13f77601781f98d2283b}{proto\_base}})\ \{}
+\DoxyCodeLine{01839\ \ \ \ \ \ \ \ \ \ \ \ \ notice\_message\ note;}
+\DoxyCodeLine{01840\ \ \ \ \ \ \ \ \ \ \ \ \ note.known\_trx.pending\ =\ lib\_num;}
+\DoxyCodeLine{01841\ \ \ \ \ \ \ \ \ \ \ \ \ note.known\_trx.mode\ =\ \mbox{\hyperlink{namespacesysio_a3a283f786468e0f0e35b0177214ca59ea528a803ed30b308213498b10d8048e62}{last\_irr\_catch\_up}};}
+\DoxyCodeLine{01842\ \ \ \ \ \ \ \ \ \ \ \ \ note.known\_blocks.mode\ =\ \mbox{\hyperlink{namespacesysio_a3a283f786468e0f0e35b0177214ca59ea528a803ed30b308213498b10d8048e62}{last\_irr\_catch\_up}};}
+\DoxyCodeLine{01843\ \ \ \ \ \ \ \ \ \ \ \ \ note.known\_blocks.pending\ =\ head;}
+\DoxyCodeLine{01844\ \ \ \ \ \ \ \ \ \ \ \ \ c-\/>enqueue(\ note\ );}
+\DoxyCodeLine{01845\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01846\ \ \ \ \ \ \ \ \ \ c-\/>syncing\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{01847\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{01848\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01849\ }
+\DoxyCodeLine{01850\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (head\ +\ nblk\_combined\_latency\ <\ msg.head\_num\ )\ \{}
+\DoxyCodeLine{01851\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{net__plugin_8cpp_ad909b2ce03eb19202983c88ae2abe9bd}{peer\_ilog}}(\ c,\ \textcolor{stringliteral}{"{}handshake\ lib\ \$\{lib\},\ head\ \$\{head\},\ head\ id\ \$\{id\}..\ sync\ 3"{}},}
+\DoxyCodeLine{01852\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}lib"{}},\ msg.last\_irreversible\_block\_num)(\textcolor{stringliteral}{"{}head"{}},\ msg.head\_num)(\textcolor{stringliteral}{"{}id"{}},\ msg.head\_id.str().substr(8,16))\ );}
+\DoxyCodeLine{01853\ \ \ \ \ \ \ \ \ \ c-\/>syncing\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{01854\ \ \ \ \ \ \ \ \ \ verify\_catchup(c,\ msg.head\_num,\ msg.head\_id);}
+\DoxyCodeLine{01855\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{01856\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(head\ >=\ msg.head\_num\ +\ nblk\_combined\_latency)\ \{}
+\DoxyCodeLine{01857\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{net__plugin_8cpp_ad909b2ce03eb19202983c88ae2abe9bd}{peer\_ilog}}(\ c,\ \textcolor{stringliteral}{"{}handshake\ lib\ \$\{lib\},\ head\ \$\{head\},\ head\ id\ \$\{id\}..\ sync\ 4"{}},}
+\DoxyCodeLine{01858\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}lib"{}},\ msg.last\_irreversible\_block\_num)(\textcolor{stringliteral}{"{}head"{}},\ msg.head\_num)(\textcolor{stringliteral}{"{}id"{}},\ msg.head\_id.str().substr(8,16))\ );}
+\DoxyCodeLine{01859\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (msg.generation\ >\ 1\ ||\ \ c-\/>protocol\_version\ >\ \mbox{\hyperlink{namespacesysio_a29c84c78972f13f77601781f98d2283b}{proto\_base}})\ \{}
+\DoxyCodeLine{01860\ \ \ \ \ \ \ \ \ \ \ \ \ notice\_message\ note;}
+\DoxyCodeLine{01861\ \ \ \ \ \ \ \ \ \ \ \ \ note.known\_trx.mode\ =\ \mbox{\hyperlink{namespacesysio_a3a283f786468e0f0e35b0177214ca59ea3820b1d3d12c986267353dcda2fdf2d6}{none}};}
+\DoxyCodeLine{01862\ \ \ \ \ \ \ \ \ \ \ \ \ note.known\_blocks.mode\ =\ \mbox{\hyperlink{namespacesysio_a3a283f786468e0f0e35b0177214ca59ea9b09221c2cc0fc2ea1d69a00b99ea58f}{catch\_up}};}
+\DoxyCodeLine{01863\ \ \ \ \ \ \ \ \ \ \ \ \ note.known\_blocks.pending\ =\ head;}
+\DoxyCodeLine{01864\ \ \ \ \ \ \ \ \ \ \ \ \ note.known\_blocks.ids.push\_back(head\_id);}
+\DoxyCodeLine{01865\ \ \ \ \ \ \ \ \ \ \ \ \ c-\/>enqueue(\ note\ );}
+\DoxyCodeLine{01866\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01867\ \ \ \ \ \ \ \ \ \ c-\/>syncing\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{01868\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_a77aff91b861010fd61a616c59b310dcc}{post}}(\ \mbox{\hyperlink{structappbase_1_1priority_a89fc0f21b0f87574f0299932fc1724b4}{priority::medium}},\ [chain\_plug\ =\ my\_impl-\/>\mbox{\hyperlink{classsysio_1_1net__plugin__impl_a932907eaa912c9420b96ea45103b66b8}{chain\_plug}},\ c,}
+\DoxyCodeLine{01869\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ msg\_head\_num\ =\ msg.head\_num,\ msg\_head\_id\ =\ msg.head\_id]()\ \{}
+\DoxyCodeLine{01870\ \ \ \ \ \ \ \ \ \ \ \ \ bool\ on\_fork\ =\ true;}
+\DoxyCodeLine{01871\ \ \ \ \ \ \ \ \ \ \ \ \ try\ \{}
+\DoxyCodeLine{01872\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ controller\&\ cc\ =\ chain\_plug-\/>chain();}
+\DoxyCodeLine{01873\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ on\_fork\ =\ cc.get\_block\_id\_for\_num(\ msg\_head\_num\ )\ !=\ msg\_head\_id;}
+\DoxyCodeLine{01874\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}(\ ...\ )\ \{\}}
+\DoxyCodeLine{01875\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ on\_fork\ )\ \{}
+\DoxyCodeLine{01876\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ c-\/>strand.post(\ [c]()\ \{}
+\DoxyCodeLine{01877\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ request\_message\ req;}
+\DoxyCodeLine{01878\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ req.req\_blocks.mode\ =\ catch\_up;}
+\DoxyCodeLine{01879\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ req.req\_trx.mode\ =\ none;}
+\DoxyCodeLine{01880\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ c-\/>enqueue(\ req\ );}
+\DoxyCodeLine{01881\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ );}
+\DoxyCodeLine{01882\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01883\ \ \ \ \ \ \ \ \ \ \}\ );}
+\DoxyCodeLine{01884\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{01885\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{01886\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{net__plugin_8cpp_a051c62a0ec99dcd3e7a38fd03bec1fe0}{peer\_dlog}}(\ c,\ \textcolor{stringliteral}{"{}Block\ discrepancy\ is\ within\ network\ latency\ range."{}});}
+\DoxyCodeLine{01887\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01888\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1sync__manager_a4df766ac98a672861e3f9e2a7ca715e6_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1sync__manager_a51eb06caeee4ecfe79679e4dfca5240e}\index{sysio::sync\_manager@{sysio::sync\_manager}!rejected\_block@{rejected\_block}}
+\index{rejected\_block@{rejected\_block}!sysio::sync\_manager@{sysio::sync\_manager}}
+\doxysubsubsection{\texorpdfstring{rejected\_block()}{rejected\_block()}}
+{\footnotesize\ttfamily \label{classsysio_1_1sync__manager_a51eb06caeee4ecfe79679e4dfca5240e} 
+void sysio\+::sync\+\_\+manager\+::rejected\+\_\+block (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_aefc0023f14362306826da768553b8daf}{connection\+\_\+ptr}} \&}]{c}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{blk\+\_\+num}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l01966}{1966}} of file \mbox{\hyperlink{net__plugin_8cpp_source}{net\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01966\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01967\ \ \ \ \ \ \ c-\/>block\_status\_monitor\_.rejected();}
+\DoxyCodeLine{01968\ \ \ \ \ \ \ std::unique\_lock<std::mutex>\ g(\ sync\_mtx\ );}
+\DoxyCodeLine{01969\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1sync__manager_a671900953bfaa2a06219f40687df4388}{reset\_last\_requested\_num}}(g);}
+\DoxyCodeLine{01970\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ c-\/>block\_status\_monitor\_.max\_events\_violated())\ \{}
+\DoxyCodeLine{01971\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{net__plugin_8cpp_af53787454493a30650fdab0193037465}{peer\_wlog}}(\ c,\ \textcolor{stringliteral}{"{}block\ \$\{bn\}\ not\ accepted,\ closing\ connection"{}},\ (\textcolor{stringliteral}{"{}bn"{}},\ blk\_num)\ );}
+\DoxyCodeLine{01972\ \ \ \ \ \ \ \ \ \ sync\_source.reset();}
+\DoxyCodeLine{01973\ \ \ \ \ \ \ \ \ \ g.unlock();}
+\DoxyCodeLine{01974\ \ \ \ \ \ \ \ \ \ c-\/>close();}
+\DoxyCodeLine{01975\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{01976\ \ \ \ \ \ \ \ \ \ g.unlock();}
+\DoxyCodeLine{01977\ \ \ \ \ \ \ \ \ \ c-\/>send\_handshake();}
+\DoxyCodeLine{01978\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01979\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1sync__manager_a51eb06caeee4ecfe79679e4dfca5240e_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1sync__manager_a671900953bfaa2a06219f40687df4388}\index{sysio::sync\_manager@{sysio::sync\_manager}!reset\_last\_requested\_num@{reset\_last\_requested\_num}}
+\index{reset\_last\_requested\_num@{reset\_last\_requested\_num}!sysio::sync\_manager@{sysio::sync\_manager}}
+\doxysubsubsection{\texorpdfstring{reset\_last\_requested\_num()}{reset\_last\_requested\_num()}}
+{\footnotesize\ttfamily \label{classsysio_1_1sync__manager_a671900953bfaa2a06219f40687df4388} 
+void sysio\+::sync\+\_\+manager\+::reset\+\_\+last\+\_\+requested\+\_\+num (\begin{DoxyParamCaption}\item[{const std\+::unique\+\_\+lock$<$ std\+::mutex $>$ \&}]{lock}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l00160}{160}} of file \mbox{\hyperlink{net__plugin_8cpp_source}{net\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \ sync\_last\_requested\_num\ =\ 0;}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1sync__manager_a671900953bfaa2a06219f40687df4388_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1sync__manager_afe3debb36f6f73dbbf6a3bbb8c4ef734}\index{sysio::sync\_manager@{sysio::sync\_manager}!send\_handshakes@{send\_handshakes}}
+\index{send\_handshakes@{send\_handshakes}!sysio::sync\_manager@{sysio::sync\_manager}}
+\doxysubsubsection{\texorpdfstring{send\_handshakes()}{send\_handshakes()}}
+{\footnotesize\ttfamily \label{classsysio_1_1sync__manager_afe3debb36f6f73dbbf6a3bbb8c4ef734} 
+void sysio\+::sync\+\_\+manager\+::send\+\_\+handshakes (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l01711}{1711}} of file \mbox{\hyperlink{net__plugin_8cpp_source}{net\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01711\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01712\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_af36f44203d6675615cf012396bcef424}{for\_each\_connection}}(\ [](\ \textcolor{keyword}{auto}\&\ ci\ )\ \{}
+\DoxyCodeLine{01713\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ ci-\/>current()\ )\ \{}
+\DoxyCodeLine{01714\ \ \ \ \ \ \ \ \ \ \ \ \ ci-\/>send\_handshake();}
+\DoxyCodeLine{01715\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01716\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{01717\ \ \ \ \ \ \ \}\ );}
+\DoxyCodeLine{01718\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1sync__manager_afe3debb36f6f73dbbf6a3bbb8c4ef734_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=334pt]{classsysio_1_1sync__manager_afe3debb36f6f73dbbf6a3bbb8c4ef734_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1sync__manager_a6acfea4380e06a48ff83764b2a779a96}\index{sysio::sync\_manager@{sysio::sync\_manager}!sync\_reassign\_fetch@{sync\_reassign\_fetch}}
+\index{sync\_reassign\_fetch@{sync\_reassign\_fetch}!sysio::sync\_manager@{sysio::sync\_manager}}
+\doxysubsubsection{\texorpdfstring{sync\_reassign\_fetch()}{sync\_reassign\_fetch()}}
+{\footnotesize\ttfamily \label{classsysio_1_1sync__manager_a6acfea4380e06a48ff83764b2a779a96} 
+void sysio\+::sync\+\_\+manager\+::sync\+\_\+reassign\+\_\+fetch (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_aefc0023f14362306826da768553b8daf}{connection\+\_\+ptr}} \&}]{c}{, }\item[{\mbox{\hyperlink{namespacesysio_a5c18cd9d34b8c5d3af8e2de75577673f}{go\+\_\+away\+\_\+reason}}}]{reason}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l01761}{1761}} of file \mbox{\hyperlink{net__plugin_8cpp_source}{net\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01761\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01762\ \ \ \ \ \ \ std::unique\_lock<std::mutex>\ g(\ sync\_mtx\ );}
+\DoxyCodeLine{01763\ \ \ \ \ \ \ \mbox{\hyperlink{net__plugin_8cpp_ad909b2ce03eb19202983c88ae2abe9bd}{peer\_ilog}}(\ c,\ \textcolor{stringliteral}{"{}reassign\_fetch,\ our\ last\ req\ is\ \$\{cc\},\ next\ expected\ is\ \$\{ne\}"{}},}
+\DoxyCodeLine{01764\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}cc"{}},\ sync\_last\_requested\_num)(\textcolor{stringliteral}{"{}ne"{}},\ sync\_next\_expected\_num)\ );}
+\DoxyCodeLine{01765\ }
+\DoxyCodeLine{01766\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ c\ ==\ sync\_source\ )\ \{}
+\DoxyCodeLine{01767\ \ \ \ \ \ \ \ \ \ c-\/>cancel\_sync(reason);}
+\DoxyCodeLine{01768\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1sync__manager_a671900953bfaa2a06219f40687df4388}{reset\_last\_requested\_num}}(g);}
+\DoxyCodeLine{01769\ \ \ \ \ \ \ \ \ \ request\_next\_chunk(\ std::move(g)\ );}
+\DoxyCodeLine{01770\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01771\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1sync__manager_a6acfea4380e06a48ff83764b2a779a96_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1sync__manager_afbcb08cf70b4e5cb2416b1fd59be9787}\index{sysio::sync\_manager@{sysio::sync\_manager}!sync\_recv\_block@{sync\_recv\_block}}
+\index{sync\_recv\_block@{sync\_recv\_block}!sysio::sync\_manager@{sysio::sync\_manager}}
+\doxysubsubsection{\texorpdfstring{sync\_recv\_block()}{sync\_recv\_block()}}
+{\footnotesize\ttfamily \label{classsysio_1_1sync__manager_afbcb08cf70b4e5cb2416b1fd59be9787} 
+void sysio\+::sync\+\_\+manager\+::sync\+\_\+recv\+\_\+block (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_aefc0023f14362306826da768553b8daf}{connection\+\_\+ptr}} \&}]{c}{, }\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{block\+\_\+id\+\_\+type}} \&}]{blk\+\_\+id}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{blk\+\_\+num}{, }\item[{bool}]{blk\+\_\+applied}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l01998}{1998}} of file \mbox{\hyperlink{net__plugin_8cpp_source}{net\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01998\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01999\ \ \ \ \ \ \ \mbox{\hyperlink{net__plugin_8cpp_a051c62a0ec99dcd3e7a38fd03bec1fe0}{peer\_dlog}}(\ c,\ \textcolor{stringliteral}{"{}got\ block\ \$\{bn\}"{}},\ (\textcolor{stringliteral}{"{}bn"{}},\ blk\_num)\ );}
+\DoxyCodeLine{02000\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().is\_quiting()\ )\ \{}
+\DoxyCodeLine{02001\ \ \ \ \ \ \ \ \ \ c-\/>close(\ \textcolor{keyword}{false},\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{02002\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{02003\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{02004\ \ \ \ \ \ \ c-\/>block\_status\_monitor\_.accepted();}
+\DoxyCodeLine{02005\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1sync__manager_af128876bbe4648c785d7a0905110186e}{sync\_update\_expected}}(\ c,\ blk\_id,\ blk\_num,\ blk\_applied\ );}
+\DoxyCodeLine{02006\ \ \ \ \ \ \ std::unique\_lock<std::mutex>\ g\_sync(\ sync\_mtx\ );}
+\DoxyCodeLine{02007\ \ \ \ \ \ \ stages\ \mbox{\hyperlink{structstate}{state}}\ =\ sync\_state;}
+\DoxyCodeLine{02008\ \ \ \ \ \ \ \mbox{\hyperlink{net__plugin_8cpp_a051c62a0ec99dcd3e7a38fd03bec1fe0}{peer\_dlog}}(\ c,\ \textcolor{stringliteral}{"{}state\ \$\{s\}"{}},\ (\textcolor{stringliteral}{"{}s"{}},\ stage\_str(\ \mbox{\hyperlink{structstate}{state}}\ ))\ );}
+\DoxyCodeLine{02009\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{structstate}{state}}\ ==\ head\_catchup\ )\ \{}
+\DoxyCodeLine{02010\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{net__plugin_8cpp_a051c62a0ec99dcd3e7a38fd03bec1fe0}{peer\_dlog}}(\ c,\ \textcolor{stringliteral}{"{}sync\_manager\ in\ head\_catchup\ state"{}}\ );}
+\DoxyCodeLine{02011\ \ \ \ \ \ \ \ \ \ sync\_source.reset();}
+\DoxyCodeLine{02012\ \ \ \ \ \ \ \ \ \ g\_sync.unlock();}
+\DoxyCodeLine{02013\ }
+\DoxyCodeLine{02014\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1sha256}{block\_id\_type}}\ null\_id;}
+\DoxyCodeLine{02015\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ set\_state\_to\_head\_catchup\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{02016\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_a0369be74f29dbab1c8afd88c3f6d2858}{for\_each\_block\_connection}}(\ [\&null\_id,\ blk\_num,\ \&blk\_id,\ \&c,\ \&set\_state\_to\_head\_catchup](\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ cp\ )\ \{}
+\DoxyCodeLine{02017\ \ \ \ \ \ \ \ \ \ \ \ \ std::unique\_lock<std::mutex>\ g\_cp\_conn(\ cp-\/>conn\_mtx\ );}
+\DoxyCodeLine{02018\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ fork\_head\_num\ =\ cp-\/>fork\_head\_num;}
+\DoxyCodeLine{02019\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1sha256}{block\_id\_type}}\ fork\_head\_id\ =\ cp-\/>fork\_head;}
+\DoxyCodeLine{02020\ \ \ \ \ \ \ \ \ \ \ \ \ g\_cp\_conn.unlock();}
+\DoxyCodeLine{02021\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ fork\_head\_id\ ==\ null\_id\ )\ \{}
+\DoxyCodeLine{02022\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ continue}}
+\DoxyCodeLine{02023\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(\ fork\_head\_num\ <\ blk\_num\ ||\ fork\_head\_id\ ==\ blk\_id\ )\ \{}
+\DoxyCodeLine{02024\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::lock\_guard<std::mutex>\ g\_conn(\ c-\/>conn\_mtx\ );}
+\DoxyCodeLine{02025\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ c-\/>fork\_head\ =\ null\_id;}
+\DoxyCodeLine{02026\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ c-\/>fork\_head\_num\ =\ 0;}
+\DoxyCodeLine{02027\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{02028\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ set\_state\_to\_head\_catchup\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{02029\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{02030\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{02031\ \ \ \ \ \ \ \ \ \ \}\ );}
+\DoxyCodeLine{02032\ }
+\DoxyCodeLine{02033\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ set\_state\_to\_head\_catchup\ )\ \{}
+\DoxyCodeLine{02034\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ set\_state(\ head\_catchup\ )\ )\ \{}
+\DoxyCodeLine{02035\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1sync__manager_afe3debb36f6f73dbbf6a3bbb8c4ef734}{send\_handshakes}}();}
+\DoxyCodeLine{02036\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{02037\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{02038\ \ \ \ \ \ \ \ \ \ \ \ \ set\_state(\ in\_sync\ );}
+\DoxyCodeLine{02039\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1sync__manager_afe3debb36f6f73dbbf6a3bbb8c4ef734}{send\_handshakes}}();}
+\DoxyCodeLine{02040\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{02041\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{structstate}{state}}\ ==\ lib\_catchup\ )\ \{}
+\DoxyCodeLine{02042\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ blk\_num\ >=\ sync\_known\_lib\_num\ )\ \{}
+\DoxyCodeLine{02043\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{net__plugin_8cpp_a051c62a0ec99dcd3e7a38fd03bec1fe0}{peer\_dlog}}(\ c,\ \textcolor{stringliteral}{"{}All\ caught\ up\ with\ last\ known\ last\ irreversible\ block\ resending\ handshake"{}}\ );}
+\DoxyCodeLine{02044\ \ \ \ \ \ \ \ \ \ \ \ \ set\_state(\ in\_sync\ );}
+\DoxyCodeLine{02045\ \ \ \ \ \ \ \ \ \ \ \ \ g\_sync.unlock();}
+\DoxyCodeLine{02046\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1sync__manager_afe3debb36f6f73dbbf6a3bbb8c4ef734}{send\_handshakes}}();}
+\DoxyCodeLine{02047\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(\ blk\_num\ >=\ sync\_last\_requested\_num\ )\ \{}
+\DoxyCodeLine{02048\ \ \ \ \ \ \ \ \ \ \ \ \ request\_next\_chunk(\ std::move(\ g\_sync)\ );}
+\DoxyCodeLine{02049\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{02050\ \ \ \ \ \ \ \ \ \ \ \ \ g\_sync.unlock();}
+\DoxyCodeLine{02051\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{net__plugin_8cpp_a051c62a0ec99dcd3e7a38fd03bec1fe0}{peer\_dlog}}(\ c,\ \textcolor{stringliteral}{"{}calling\ sync\_wait"{}}\ );}
+\DoxyCodeLine{02052\ \ \ \ \ \ \ \ \ \ \ \ \ c-\/>sync\_wait();}
+\DoxyCodeLine{02053\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{02054\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{02055\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1sync__manager_afbcb08cf70b4e5cb2416b1fd59be9787_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1sync__manager_a4947bb9b1146d531ae706d4fc9d57025}\index{sysio::sync\_manager@{sysio::sync\_manager}!sync\_recv\_notice@{sync\_recv\_notice}}
+\index{sync\_recv\_notice@{sync\_recv\_notice}!sysio::sync\_manager@{sysio::sync\_manager}}
+\doxysubsubsection{\texorpdfstring{sync\_recv\_notice()}{sync\_recv\_notice()}}
+{\footnotesize\ttfamily \label{classsysio_1_1sync__manager_a4947bb9b1146d531ae706d4fc9d57025} 
+void sysio\+::sync\+\_\+manager\+::sync\+\_\+recv\+\_\+notice (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_aefc0023f14362306826da768553b8daf}{connection\+\_\+ptr}} \&}]{c}{, }\item[{const \mbox{\hyperlink{structsysio_1_1notice__message}{notice\+\_\+message}} \&}]{msg}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l01937}{1937}} of file \mbox{\hyperlink{net__plugin_8cpp_source}{net\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01937\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01938\ \ \ \ \ \ \ \mbox{\hyperlink{net__plugin_8cpp_a051c62a0ec99dcd3e7a38fd03bec1fe0}{peer\_dlog}}(\ c,\ \textcolor{stringliteral}{"{}sync\_manager\ got\ \$\{m\}\ block\ notice"{}},\ (\textcolor{stringliteral}{"{}m"{}},\ \mbox{\hyperlink{namespacesysio_a454edd6d34c5564da3a8c796090837fe}{modes\_str}}(\ msg.known\_blocks.mode\ ))\ );}
+\DoxyCodeLine{01939\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ msg.known\_blocks.mode\ ==\ \mbox{\hyperlink{namespacesysio_a3a283f786468e0f0e35b0177214ca59ea9b09221c2cc0fc2ea1d69a00b99ea58f}{catch\_up}}\ ||\ msg.known\_blocks.mode\ ==\ \mbox{\hyperlink{namespacesysio_a3a283f786468e0f0e35b0177214ca59ea528a803ed30b308213498b10d8048e62}{last\_irr\_catch\_up}},\ plugin\_exception,}
+\DoxyCodeLine{01940\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sync\_recv\_notice\ only\ called\ on\ catch\_up"{}}\ );}
+\DoxyCodeLine{01941\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (msg.known\_blocks.mode\ ==\ \mbox{\hyperlink{namespacesysio_a3a283f786468e0f0e35b0177214ca59ea9b09221c2cc0fc2ea1d69a00b99ea58f}{catch\_up}})\ \{}
+\DoxyCodeLine{01942\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (msg.known\_blocks.ids.size()\ ==\ 0)\ \{}
+\DoxyCodeLine{01943\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{net__plugin_8cpp_a0237ff767d828f6a423a4728c65b11b8}{peer\_elog}}(\ c,\ \textcolor{stringliteral}{"{}got\ a\ catch\ up\ with\ ids\ size\ =\ 0"{}}\ );}
+\DoxyCodeLine{01944\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{01945\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha256}{block\_id\_type}}\&\ \textcolor{keywordtype}{id}\ =\ msg.known\_blocks.ids.back();}
+\DoxyCodeLine{01946\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{net__plugin_8cpp_ad909b2ce03eb19202983c88ae2abe9bd}{peer\_ilog}}(\ c,\ \textcolor{stringliteral}{"{}notice\_message,\ pending\ \$\{p\},\ blk\_num\ \$\{n\},\ id\ \$\{id\}..."{}},}
+\DoxyCodeLine{01947\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}p"{}},\ msg.known\_blocks.pending)(\textcolor{stringliteral}{"{}n"{}},\ \mbox{\hyperlink{structsysio_1_1chain_1_1block__header_a39d57e33ef8d3f6ba59b4c458f0ae375}{block\_header::num\_from\_id}}(\textcolor{keywordtype}{id}))(\textcolor{stringliteral}{"{}id"{}},\textcolor{keywordtype}{id}.str().substr(8,16))\ );}
+\DoxyCodeLine{01948\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !my\_impl-\/>\mbox{\hyperlink{classsysio_1_1net__plugin__impl_a5b302f8ed2594b44aa126082cd07d941}{dispatcher}}-\/>have\_block(\ \textcolor{keywordtype}{id}\ )\ )\ \{}
+\DoxyCodeLine{01949\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ verify\_catchup(\ c,\ msg.known\_blocks.pending,\ \textcolor{keywordtype}{id}\ );}
+\DoxyCodeLine{01950\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{01951\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ we\ already\ have\ the\ block,\ so\ update\ peer\ with\ our\ view\ of\ the\ world}}
+\DoxyCodeLine{01952\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ c-\/>send\_handshake();}
+\DoxyCodeLine{01953\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01954\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01955\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (msg.known\_blocks.mode\ ==\ \mbox{\hyperlink{namespacesysio_a3a283f786468e0f0e35b0177214ca59ea528a803ed30b308213498b10d8048e62}{last\_irr\_catch\_up}})\ \{}
+\DoxyCodeLine{01956\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01957\ \ \ \ \ \ \ \ \ \ \ \ \ std::lock\_guard<std::mutex>\ g\_conn(\ c-\/>conn\_mtx\ );}
+\DoxyCodeLine{01958\ \ \ \ \ \ \ \ \ \ \ \ \ c-\/>last\_handshake\_recv.last\_irreversible\_block\_num\ =\ msg.known\_trx.pending;}
+\DoxyCodeLine{01959\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01960\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1sync__manager_ab81caff4e1eae073cee42d0a16600fb0}{sync\_reset\_lib\_num}}(c,\ \textcolor{keyword}{false});}
+\DoxyCodeLine{01961\ \ \ \ \ \ \ \ \ \ start\_sync(c,\ msg.known\_trx.pending);}
+\DoxyCodeLine{01962\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01963\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1sync__manager_a4947bb9b1146d531ae706d4fc9d57025_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1sync__manager_ab81caff4e1eae073cee42d0a16600fb0}\index{sysio::sync\_manager@{sysio::sync\_manager}!sync\_reset\_lib\_num@{sync\_reset\_lib\_num}}
+\index{sync\_reset\_lib\_num@{sync\_reset\_lib\_num}!sysio::sync\_manager@{sysio::sync\_manager}}
+\doxysubsubsection{\texorpdfstring{sync\_reset\_lib\_num()}{sync\_reset\_lib\_num()}}
+{\footnotesize\ttfamily \label{classsysio_1_1sync__manager_ab81caff4e1eae073cee42d0a16600fb0} 
+void sysio\+::sync\+\_\+manager\+::sync\+\_\+reset\+\_\+lib\+\_\+num (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_aefc0023f14362306826da768553b8daf}{connection\+\_\+ptr}} \&}]{conn}{, }\item[{bool}]{closing}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l01566}{1566}} of file \mbox{\hyperlink{net__plugin_8cpp_source}{net\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01566\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01567\ \ \ \ \ \ \ std::unique\_lock<std::mutex>\ g(\ sync\_mtx\ );}
+\DoxyCodeLine{01568\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ sync\_state\ ==\ in\_sync\ )\ \{}
+\DoxyCodeLine{01569\ \ \ \ \ \ \ \ \ \ sync\_source.reset();}
+\DoxyCodeLine{01570\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01571\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !c\ )\ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{01572\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !closing\ )\ \{}
+\DoxyCodeLine{01573\ \ \ \ \ \ \ \ \ \ std::lock\_guard<std::mutex>\ g\_conn(\ c-\/>conn\_mtx\ );}
+\DoxyCodeLine{01574\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ c-\/>last\_handshake\_recv.last\_irreversible\_block\_num\ >\ sync\_known\_lib\_num\ )\ \{}
+\DoxyCodeLine{01575\ \ \ \ \ \ \ \ \ \ \ \ \ sync\_known\_lib\_num\ =\ c-\/>last\_handshake\_recv.last\_irreversible\_block\_num;}
+\DoxyCodeLine{01576\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01577\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{01578\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Closing\ connection,\ therefore\ its\ view\ of\ LIB\ can\ no\ longer\ be\ considered\ as\ we\ will\ no\ longer\ be\ connected.}}
+\DoxyCodeLine{01579\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Determine\ current\ LIB\ of\ remaining\ peers\ as\ our\ sync\_known\_lib\_num.}}
+\DoxyCodeLine{01580\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ highest\_lib\_num\ =\ 0;}
+\DoxyCodeLine{01581\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_a0369be74f29dbab1c8afd88c3f6d2858}{for\_each\_block\_connection}}(\ [\&highest\_lib\_num](\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ cc\ )\ \{}
+\DoxyCodeLine{01582\ \ \ \ \ \ \ \ \ \ \ \ \ std::lock\_guard<std::mutex>\ g\_conn(\ cc-\/>conn\_mtx\ );}
+\DoxyCodeLine{01583\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ cc-\/>current()\ \&\&\ cc-\/>last\_handshake\_recv.last\_irreversible\_block\_num\ >\ highest\_lib\_num\ )\ \{}
+\DoxyCodeLine{01584\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ highest\_lib\_num\ =\ cc-\/>last\_handshake\_recv.last\_irreversible\_block\_num;}
+\DoxyCodeLine{01585\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01586\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{01587\ \ \ \ \ \ \ \ \ \ \}\ );}
+\DoxyCodeLine{01588\ \ \ \ \ \ \ \ \ \ sync\_known\_lib\_num\ =\ highest\_lib\_num;}
+\DoxyCodeLine{01589\ }
+\DoxyCodeLine{01590\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ if\ closing\ the\ connection\ we\ are\ currently\ syncing\ from,\ then\ reset\ our\ last\ requested\ and\ next\ expected.}}
+\DoxyCodeLine{01591\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ c\ ==\ sync\_source\ )\ \{}
+\DoxyCodeLine{01592\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1sync__manager_a671900953bfaa2a06219f40687df4388}{reset\_last\_requested\_num}}(g);}
+\DoxyCodeLine{01593\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ if\ starting\ to\ sync\ need\ to\ always\ start\ from\ lib\ as\ we\ might\ be\ on\ our\ own\ fork}}
+\DoxyCodeLine{01594\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ lib\_num\ =\ 0;}
+\DoxyCodeLine{01595\ \ \ \ \ \ \ \ \ \ \ \ \ std::tie(\ lib\_num,\ std::ignore,\ std::ignore,\ std::ignore,\ std::ignore,\ std::ignore\ )\ =\ my\_impl-\/>\mbox{\hyperlink{classsysio_1_1net__plugin__impl_ab7de62c1cba9cb5a30060a687ef913e2}{get\_chain\_info}}();}
+\DoxyCodeLine{01596\ \ \ \ \ \ \ \ \ \ \ \ \ sync\_next\_expected\_num\ =\ lib\_num\ +\ 1;}
+\DoxyCodeLine{01597\ \ \ \ \ \ \ \ \ \ \ \ \ request\_next\_chunk(\ std::move(g)\ );}
+\DoxyCodeLine{01598\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01599\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01600\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1sync__manager_ab81caff4e1eae073cee42d0a16600fb0_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=334pt]{classsysio_1_1sync__manager_ab81caff4e1eae073cee42d0a16600fb0_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1sync__manager_af128876bbe4648c785d7a0905110186e}\index{sysio::sync\_manager@{sysio::sync\_manager}!sync\_update\_expected@{sync\_update\_expected}}
+\index{sync\_update\_expected@{sync\_update\_expected}!sysio::sync\_manager@{sysio::sync\_manager}}
+\doxysubsubsection{\texorpdfstring{sync\_update\_expected()}{sync\_update\_expected()}}
+{\footnotesize\ttfamily \label{classsysio_1_1sync__manager_af128876bbe4648c785d7a0905110186e} 
+void sysio\+::sync\+\_\+manager\+::sync\+\_\+update\+\_\+expected (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_aefc0023f14362306826da768553b8daf}{connection\+\_\+ptr}} \&}]{c}{, }\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{block\+\_\+id\+\_\+type}} \&}]{blk\+\_\+id}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{blk\+\_\+num}{, }\item[{bool}]{blk\+\_\+applied}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l01982}{1982}} of file \mbox{\hyperlink{net__plugin_8cpp_source}{net\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01982\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01983\ \ \ \ \ \ \ std::unique\_lock<std::mutex>\ g\_sync(\ sync\_mtx\ );}
+\DoxyCodeLine{01984\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ blk\_num\ <=\ sync\_last\_requested\_num\ )\ \{}
+\DoxyCodeLine{01985\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{net__plugin_8cpp_a051c62a0ec99dcd3e7a38fd03bec1fe0}{peer\_dlog}}(\ c,\ \textcolor{stringliteral}{"{}sync\_last\_requested\_num:\ \$\{r\},\ sync\_next\_expected\_num:\ \$\{e\},\ sync\_known\_lib\_num:\ \$\{k\},\ sync\_req\_span:\ \$\{s\}"{}},}
+\DoxyCodeLine{01986\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}r"{}},\ sync\_last\_requested\_num)(\textcolor{stringliteral}{"{}e"{}},\ sync\_next\_expected\_num)(\textcolor{stringliteral}{"{}k"{}},\ sync\_known\_lib\_num)(\textcolor{stringliteral}{"{}s"{}},\ sync\_req\_span)\ );}
+\DoxyCodeLine{01987\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (blk\_num\ !=\ sync\_next\_expected\_num\ \&\&\ !blk\_applied)\ \{}
+\DoxyCodeLine{01988\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ sync\_next\_expected\ =\ sync\_next\_expected\_num;}
+\DoxyCodeLine{01989\ \ \ \ \ \ \ \ \ \ \ \ \ g\_sync.unlock();}
+\DoxyCodeLine{01990\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{net__plugin_8cpp_a051c62a0ec99dcd3e7a38fd03bec1fe0}{peer\_dlog}}(\ c,\ \textcolor{stringliteral}{"{}expected\ block\ \$\{ne\}\ but\ got\ \$\{bn\}"{}},\ (\textcolor{stringliteral}{"{}ne"{}},\ sync\_next\_expected)(\textcolor{stringliteral}{"{}bn"{}},\ blk\_num)\ );}
+\DoxyCodeLine{01991\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{01992\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01993\ \ \ \ \ \ \ \ \ \ sync\_next\_expected\_num\ =\ blk\_num\ +\ 1;}
+\DoxyCodeLine{01994\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01995\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=348pt]{classsysio_1_1sync__manager_af128876bbe4648c785d7a0905110186e_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1sync__manager_aeaee19ed7ea8e42c21e1a70b1f7ac625}\index{sysio::sync\_manager@{sysio::sync\_manager}!syncing\_with\_peer@{syncing\_with\_peer}}
+\index{syncing\_with\_peer@{syncing\_with\_peer}!sysio::sync\_manager@{sysio::sync\_manager}}
+\doxysubsubsection{\texorpdfstring{syncing\_with\_peer()}{syncing\_with\_peer()}}
+{\footnotesize\ttfamily \label{classsysio_1_1sync__manager_aeaee19ed7ea8e42c21e1a70b1f7ac625} 
+bool sysio\+::sync\+\_\+manager\+::syncing\+\_\+with\+\_\+peer (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l00149}{149}} of file \mbox{\hyperlink{net__plugin_8cpp_source}{net\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00149\ \{\ \textcolor{keywordflow}{return}\ sync\_state\ ==\ lib\_catchup;\ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+plugins/net\+\_\+plugin/\mbox{\hyperlink{net__plugin_8cpp}{net\+\_\+plugin.\+cpp}}\end{DoxyCompactItemize}

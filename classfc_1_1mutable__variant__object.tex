@@ -1,0 +1,971 @@
+\doxysection{fc\+::mutable\+\_\+variant\+\_\+object Class Reference}
+\hypertarget{classfc_1_1mutable__variant__object}{}\label{classfc_1_1mutable__variant__object}\index{fc::mutable\_variant\_object@{fc::mutable\_variant\_object}}
+
+
+An order-\/preserving dictionary of variants.  
+
+
+
+
+{\ttfamily \#include $<$variant\+\_\+object.\+hpp$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{classfc_1_1variant__object_1_1entry}{variant\+\_\+object\+::entry}} \mbox{\hyperlink{classfc_1_1mutable__variant__object_a21fb2e36f93b22f7ab5a0678a460b1c6}{entry}}
+\begin{DoxyCompactList}\small\item\em a key/value pair \end{DoxyCompactList}\item 
+typedef std\+::vector$<$ \mbox{\hyperlink{classfc_1_1mutable__variant__object_a21fb2e36f93b22f7ab5a0678a460b1c6}{entry}} $>$\+::iterator \mbox{\hyperlink{classfc_1_1mutable__variant__object_a02dd19d9535d923354d390470b02b32a}{iterator}}
+\item 
+typedef std\+::vector$<$ \mbox{\hyperlink{classfc_1_1mutable__variant__object_a21fb2e36f93b22f7ab5a0678a460b1c6}{entry}} $>$\+::const\+\_\+iterator \mbox{\hyperlink{classfc_1_1mutable__variant__object_ae5a6817a1b301bd44addde7f9cf723f4}{const\+\_\+iterator}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1variant}{variant}} \& \mbox{\hyperlink{classfc_1_1mutable__variant__object_a686fa5ef8b868de88e082ac901b1bb63}{operator\mbox{[}$\,$\mbox{]}}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&key)
+\item 
+\mbox{\hyperlink{classfc_1_1variant}{variant}} \& \mbox{\hyperlink{classfc_1_1mutable__variant__object_ad35da3501e3996a3ee8e78dca04dcdf9}{operator\mbox{[}$\,$\mbox{]}}} (const char \texorpdfstring{$\ast$}{*}key)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename  = std\+::enable\+\_\+if\+\_\+t$<$!std\+::is\+\_\+base\+\_\+of$<$mutable\+\_\+variant\+\_\+object,                                                            std\+::decay\+\_\+t$<$\+T$>$$>$\+::value$>$$>$ }\\\mbox{\hyperlink{classfc_1_1mutable__variant__object_aeb47811d93555f823e2d531cc50f4c70}{mutable\+\_\+variant\+\_\+object}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\&v)
+\item 
+\mbox{\hyperlink{classfc_1_1mutable__variant__object_adc24cccf7326c637e3f3e5c294744ba5}{mutable\+\_\+variant\+\_\+object}} ()
+\item 
+\mbox{\hyperlink{classfc_1_1mutable__variant__object_aad0bfd86a84c14612685df931e43a67a}{mutable\+\_\+variant\+\_\+object}} (\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} key, \mbox{\hyperlink{classfc_1_1variant}{variant}} val)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{classfc_1_1mutable__variant__object_a0a04e324ffa2723ed554fbc563932427}{mutable\+\_\+variant\+\_\+object}} (\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} key, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\&val)
+\item 
+\mbox{\hyperlink{classfc_1_1mutable__variant__object_a092bf4693b06cbe867239410ea780818}{mutable\+\_\+variant\+\_\+object}} (\mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\+\_\+variant\+\_\+object}} \&\&)
+\item 
+\mbox{\hyperlink{classfc_1_1mutable__variant__object_ac73e3697d6dcf342320c88f393df2448}{mutable\+\_\+variant\+\_\+object}} (const \mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\+\_\+variant\+\_\+object}} \&)
+\item 
+\mbox{\hyperlink{classfc_1_1mutable__variant__object_a4b88482826637d229a717451aced2464}{mutable\+\_\+variant\+\_\+object}} (const \mbox{\hyperlink{classfc_1_1variant__object}{variant\+\_\+object}} \&)
+\item 
+\mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\+\_\+variant\+\_\+object}} \& \mbox{\hyperlink{classfc_1_1mutable__variant__object_a13c8383bf1636f5a8810cba585e571b9}{operator=}} (\mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\+\_\+variant\+\_\+object}} \&\&)
+\item 
+\mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\+\_\+variant\+\_\+object}} \& \mbox{\hyperlink{classfc_1_1mutable__variant__object_a9bd4cf377f1b73daba3b6ebdb85b0456}{operator=}} (const \mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\+\_\+variant\+\_\+object}} \&)
+\item 
+\mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\+\_\+variant\+\_\+object}} \& \mbox{\hyperlink{classfc_1_1mutable__variant__object_adfc6f75fd142cb8bc74cbdeb78437d59}{operator=}} (const \mbox{\hyperlink{classfc_1_1variant__object}{variant\+\_\+object}} \&)
+\end{DoxyCompactItemize}
+\begin{Indent}\textbf{ Immutable Interface}\par
+{\em Calling these methods will not result in copies of the underlying type. }\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1mutable__variant__object_a02dd19d9535d923354d390470b02b32a}{iterator}} \mbox{\hyperlink{classfc_1_1mutable__variant__object_a8c3f205309967abdb7fc54a6e87c2c76}{begin}} () const
+\item 
+\mbox{\hyperlink{classfc_1_1mutable__variant__object_a02dd19d9535d923354d390470b02b32a}{iterator}} \mbox{\hyperlink{classfc_1_1mutable__variant__object_a4d3913ee42df2e7d83a1a2f39f14b1fd}{end}} () const
+\item 
+\mbox{\hyperlink{classfc_1_1mutable__variant__object_a02dd19d9535d923354d390470b02b32a}{iterator}} \mbox{\hyperlink{classfc_1_1mutable__variant__object_adc3ed86b72879f95ffc2b9398a7995c8}{find}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&key) const
+\item 
+\mbox{\hyperlink{classfc_1_1mutable__variant__object_a02dd19d9535d923354d390470b02b32a}{iterator}} \mbox{\hyperlink{classfc_1_1mutable__variant__object_affd5b9ab3085b88e1f314da0affaabfb}{find}} (const char \texorpdfstring{$\ast$}{*}key) const
+\item 
+const \mbox{\hyperlink{classfc_1_1variant}{variant}} \& \mbox{\hyperlink{classfc_1_1mutable__variant__object_a87ac08a28b843cc6342adb343edc85f6}{operator\mbox{[}$\,$\mbox{]}}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&key) const
+\item 
+const \mbox{\hyperlink{classfc_1_1variant}{variant}} \& \mbox{\hyperlink{classfc_1_1mutable__variant__object_ae0d3415028e74c088642234907ece532}{operator\mbox{[}$\,$\mbox{]}}} (const char \texorpdfstring{$\ast$}{*}key) const
+\item 
+size\+\_\+t \mbox{\hyperlink{classfc_1_1mutable__variant__object_a0612732e6fcc4b2017dd7f15590d16bd}{size}} () const
+\end{DoxyCompactItemize}
+\end{Indent}
+\begin{Indent}\textbf{ mutable Interface}\par
+{\em Calling these methods will result in a copy of the underlying type being created if there is more than one reference to this object. }\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{classfc_1_1mutable__variant__object_a5da217a80318bf1587bae008741a0780}{reserve}} (size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\item 
+\mbox{\hyperlink{classfc_1_1mutable__variant__object_a02dd19d9535d923354d390470b02b32a}{iterator}} \mbox{\hyperlink{classfc_1_1mutable__variant__object_a009f002bdff54a6bd6ac507f04052e53}{begin}} ()
+\item 
+\mbox{\hyperlink{classfc_1_1mutable__variant__object_a02dd19d9535d923354d390470b02b32a}{iterator}} \mbox{\hyperlink{classfc_1_1mutable__variant__object_aba444f933d42d3c21facfbad1ecd45e0}{end}} ()
+\item 
+void \mbox{\hyperlink{classfc_1_1mutable__variant__object_ada38caab5cc7624046cc61fcd033c4db}{erase}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&key)
+\item 
+\mbox{\hyperlink{classfc_1_1mutable__variant__object_a02dd19d9535d923354d390470b02b32a}{iterator}} \mbox{\hyperlink{classfc_1_1mutable__variant__object_ae3b38166303f37671545d2a35ba23dc6}{find}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&key)
+\item 
+\mbox{\hyperlink{classfc_1_1mutable__variant__object_a02dd19d9535d923354d390470b02b32a}{iterator}} \mbox{\hyperlink{classfc_1_1mutable__variant__object_a1236a6f2ce7aa5f42245bd7ee7335ac5}{find}} (const char \texorpdfstring{$\ast$}{*}key)
+\item 
+\mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\+\_\+variant\+\_\+object}} \& \mbox{\hyperlink{classfc_1_1mutable__variant__object_a06be150aaba8110230fb1f6da342a555}{set}} (\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} key, \mbox{\hyperlink{classfc_1_1variant}{variant}} var) \&
+\item 
+\mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\+\_\+variant\+\_\+object}} \mbox{\hyperlink{classfc_1_1mutable__variant__object_ab39e7a4932a7e9682a1facca13b55459}{set}} (\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} key, \mbox{\hyperlink{classfc_1_1variant}{variant}} var) \&\&
+\item 
+\mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\+\_\+variant\+\_\+object}} \& \mbox{\hyperlink{classfc_1_1mutable__variant__object_a829fdf50473fd92da6f523a346096824}{operator()}} (\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} key, \mbox{\hyperlink{classfc_1_1variant}{variant}} var) \&
+\item 
+\mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\+\_\+variant\+\_\+object}} \mbox{\hyperlink{classfc_1_1mutable__variant__object_ab4e0947714f8f65ab4a740f346383506}{operator()}} (\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} key, \mbox{\hyperlink{classfc_1_1variant}{variant}} var) \&\&
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\+\_\+variant\+\_\+object}} \& \mbox{\hyperlink{classfc_1_1mutable__variant__object_a5983d81a6a7be35850b57f99c91510ae}{operator()}} (\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} key, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\&var) \&
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\+\_\+variant\+\_\+object}} \mbox{\hyperlink{classfc_1_1mutable__variant__object_aa3f8abcbc1e103e9b479721f174044ce}{operator()}} (\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} key, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\&var) \&\&
+\item 
+\mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\+\_\+variant\+\_\+object}} \& \mbox{\hyperlink{classfc_1_1mutable__variant__object_ae6af24b5766969b623e3771aaddf60f7}{operator()}} (const \mbox{\hyperlink{classfc_1_1variant__object}{variant\+\_\+object}} \&vo) \&
+\item 
+\mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\+\_\+variant\+\_\+object}} \mbox{\hyperlink{classfc_1_1mutable__variant__object_a7087d8a261b09797d158a7f43d8b3e6b}{operator()}} (const \mbox{\hyperlink{classfc_1_1variant__object}{variant\+\_\+object}} \&vo) \&\&
+\item 
+\mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\+\_\+variant\+\_\+object}} \& \mbox{\hyperlink{classfc_1_1mutable__variant__object_ad94e8b18d963059354a3ad99f37edf65}{operator()}} (const \mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\+\_\+variant\+\_\+object}} \&mvo) \&
+\item 
+\mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\+\_\+variant\+\_\+object}} \mbox{\hyperlink{classfc_1_1mutable__variant__object_ab3785bda2f66e115636f1db2d3e30eca}{operator()}} (const \mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\+\_\+variant\+\_\+object}} \&mvo) \&\&
+\end{DoxyCompactItemize}
+\end{Indent}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classfc_1_1mutable__variant__object_a5176d6f7f43fdd9dbd614ce9b8f4b1fe}{variant\+\_\+object}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Keys are kept in the order they are inserted. This dictionary implements copy-\/on-\/write
+
+\begin{DoxyNote}{Note}
+This class is not optimized for random-\/access on large sets of key-\/value pairs. 
+\end{DoxyNote}
+
+
+Definition at line \mbox{\hyperlink{variant__object_8hpp_source_l00117}{117}} of file \mbox{\hyperlink{variant__object_8hpp_source}{variant\+\_\+object.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classfc_1_1mutable__variant__object_ae5a6817a1b301bd44addde7f9cf723f4}\index{fc::mutable\_variant\_object@{fc::mutable\_variant\_object}!const\_iterator@{const\_iterator}}
+\index{const\_iterator@{const\_iterator}!fc::mutable\_variant\_object@{fc::mutable\_variant\_object}}
+\doxysubsubsection{\texorpdfstring{const\_iterator}{const\_iterator}}
+{\footnotesize\ttfamily \label{classfc_1_1mutable__variant__object_ae5a6817a1b301bd44addde7f9cf723f4} 
+std\+::vector$<$\mbox{\hyperlink{classfc_1_1mutable__variant__object_a21fb2e36f93b22f7ab5a0678a460b1c6}{entry}}$>$\+::const\+\_\+iterator \mbox{\hyperlink{classfc_1_1mutable__variant__object_ae5a6817a1b301bd44addde7f9cf723f4}{fc\+::mutable\+\_\+variant\+\_\+object\+::const\+\_\+iterator}}}
+
+
+
+Definition at line \mbox{\hyperlink{variant__object_8hpp_source_l00124}{124}} of file \mbox{\hyperlink{variant__object_8hpp_source}{variant\+\_\+object.\+hpp}}.
+
+\Hypertarget{classfc_1_1mutable__variant__object_a21fb2e36f93b22f7ab5a0678a460b1c6}\index{fc::mutable\_variant\_object@{fc::mutable\_variant\_object}!entry@{entry}}
+\index{entry@{entry}!fc::mutable\_variant\_object@{fc::mutable\_variant\_object}}
+\doxysubsubsection{\texorpdfstring{entry}{entry}}
+{\footnotesize\ttfamily \label{classfc_1_1mutable__variant__object_a21fb2e36f93b22f7ab5a0678a460b1c6} 
+\mbox{\hyperlink{classfc_1_1variant__object_1_1entry}{variant\+\_\+object\+::entry}} \mbox{\hyperlink{classfc_1_1mutable__variant__object_a21fb2e36f93b22f7ab5a0678a460b1c6}{fc\+::mutable\+\_\+variant\+\_\+object\+::entry}}}
+
+
+
+Definition at line \mbox{\hyperlink{variant__object_8hpp_source_l00121}{121}} of file \mbox{\hyperlink{variant__object_8hpp_source}{variant\+\_\+object.\+hpp}}.
+
+\Hypertarget{classfc_1_1mutable__variant__object_a02dd19d9535d923354d390470b02b32a}\index{fc::mutable\_variant\_object@{fc::mutable\_variant\_object}!iterator@{iterator}}
+\index{iterator@{iterator}!fc::mutable\_variant\_object@{fc::mutable\_variant\_object}}
+\doxysubsubsection{\texorpdfstring{iterator}{iterator}}
+{\footnotesize\ttfamily \label{classfc_1_1mutable__variant__object_a02dd19d9535d923354d390470b02b32a} 
+std\+::vector$<$\mbox{\hyperlink{classfc_1_1mutable__variant__object_a21fb2e36f93b22f7ab5a0678a460b1c6}{entry}}$>$\+::iterator \mbox{\hyperlink{classfc_1_1mutable__variant__object_a02dd19d9535d923354d390470b02b32a}{fc\+::mutable\+\_\+variant\+\_\+object\+::iterator}}}
+
+
+
+Definition at line \mbox{\hyperlink{variant__object_8hpp_source_l00123}{123}} of file \mbox{\hyperlink{variant__object_8hpp_source}{variant\+\_\+object.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1mutable__variant__object_aeb47811d93555f823e2d531cc50f4c70}\index{fc::mutable\_variant\_object@{fc::mutable\_variant\_object}!mutable\_variant\_object@{mutable\_variant\_object}}
+\index{mutable\_variant\_object@{mutable\_variant\_object}!fc::mutable\_variant\_object@{fc::mutable\_variant\_object}}
+\doxysubsubsection{\texorpdfstring{mutable\_variant\_object()}{mutable\_variant\_object()}\hspace{0.1cm}{\footnotesize\ttfamily [1/7]}}
+{\footnotesize\ttfamily \label{classfc_1_1mutable__variant__object_aeb47811d93555f823e2d531cc50f4c70} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename  = std\+::enable\+\_\+if\+\_\+t$<$!std\+::is\+\_\+base\+\_\+of$<$mutable\+\_\+variant\+\_\+object,                                                            std\+::decay\+\_\+t$<$\+T$>$$>$\+::value$>$$>$ \\
+fc\+::mutable\+\_\+variant\+\_\+object\+::mutable\+\_\+variant\+\_\+object (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\&}]{v}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{variant__object_8hpp_source_l00212}{212}} of file \mbox{\hyperlink{variant__object_8hpp_source}{variant\+\_\+object.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ :\_key\_value(\ \textcolor{keyword}{new}\ std::vector<entry>()\ )}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \ \ \ \ *\textcolor{keyword}{this}\ =\ variant(fc::forward<T>(v)).get\_object();}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1mutable__variant__object_aeb47811d93555f823e2d531cc50f4c70_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1mutable__variant__object_adc24cccf7326c637e3f3e5c294744ba5}\index{fc::mutable\_variant\_object@{fc::mutable\_variant\_object}!mutable\_variant\_object@{mutable\_variant\_object}}
+\index{mutable\_variant\_object@{mutable\_variant\_object}!fc::mutable\_variant\_object@{fc::mutable\_variant\_object}}
+\doxysubsubsection{\texorpdfstring{mutable\_variant\_object()}{mutable\_variant\_object()}\hspace{0.1cm}{\footnotesize\ttfamily [2/7]}}
+{\footnotesize\ttfamily \label{classfc_1_1mutable__variant__object_adc24cccf7326c637e3f3e5c294744ba5} 
+fc\+::mutable\+\_\+variant\+\_\+object\+::mutable\+\_\+variant\+\_\+object (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{variant__object_8cpp_source_l00273}{273}} of file \mbox{\hyperlink{variant__object_8cpp_source}{variant\+\_\+object.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00274\ \ \ \ \ \ \ :\_key\_value(\textcolor{keyword}{new}\ std::vector<entry>)}
+\DoxyCodeLine{00275\ \ \ \ \{}
+\DoxyCodeLine{00276\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1mutable__variant__object_aad0bfd86a84c14612685df931e43a67a}\index{fc::mutable\_variant\_object@{fc::mutable\_variant\_object}!mutable\_variant\_object@{mutable\_variant\_object}}
+\index{mutable\_variant\_object@{mutable\_variant\_object}!fc::mutable\_variant\_object@{fc::mutable\_variant\_object}}
+\doxysubsubsection{\texorpdfstring{mutable\_variant\_object()}{mutable\_variant\_object()}\hspace{0.1cm}{\footnotesize\ttfamily [3/7]}}
+{\footnotesize\ttfamily \label{classfc_1_1mutable__variant__object_aad0bfd86a84c14612685df931e43a67a} 
+fc\+::mutable\+\_\+variant\+\_\+object\+::mutable\+\_\+variant\+\_\+object (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}}}]{key}{, }\item[{\mbox{\hyperlink{classfc_1_1variant}{variant}}}]{val}{}\end{DoxyParamCaption})}
+
+initializes the first key/value pair in the object 
+
+Definition at line \mbox{\hyperlink{variant__object_8cpp_source_l00278}{278}} of file \mbox{\hyperlink{variant__object_8cpp_source}{variant\+\_\+object.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00279\ \ \ \ \ \ \ :\ \_key\_value(\textcolor{keyword}{new}\ std::vector<entry>())}
+\DoxyCodeLine{00280\ \ \ \ \{}
+\DoxyCodeLine{00281\ \ \ \ \ \ \ \ \_key\_value-\/>push\_back(\mbox{\hyperlink{classfc_1_1mutable__variant__object_a21fb2e36f93b22f7ab5a0678a460b1c6}{entry}}(fc::move(key),\ fc::move(val)));}
+\DoxyCodeLine{00282\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1mutable__variant__object_a0a04e324ffa2723ed554fbc563932427}\index{fc::mutable\_variant\_object@{fc::mutable\_variant\_object}!mutable\_variant\_object@{mutable\_variant\_object}}
+\index{mutable\_variant\_object@{mutable\_variant\_object}!fc::mutable\_variant\_object@{fc::mutable\_variant\_object}}
+\doxysubsubsection{\texorpdfstring{mutable\_variant\_object()}{mutable\_variant\_object()}\hspace{0.1cm}{\footnotesize\ttfamily [4/7]}}
+{\footnotesize\ttfamily \label{classfc_1_1mutable__variant__object_a0a04e324ffa2723ed554fbc563932427} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+fc\+::mutable\+\_\+variant\+\_\+object\+::mutable\+\_\+variant\+\_\+object (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}}}]{key}{, }\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\&}]{val}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{variant__object_8hpp_source_l00223}{223}} of file \mbox{\hyperlink{variant__object_8hpp_source}{variant\+\_\+object.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ :\_key\_value(\ \textcolor{keyword}{new}\ std::vector<entry>()\ )}
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00226\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a893468abdce45d586a5b659094a25e6c}{set}}(\ std::move(key),\ variant(forward<T>(val))\ );}
+\DoxyCodeLine{00227\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1mutable__variant__object_a092bf4693b06cbe867239410ea780818}\index{fc::mutable\_variant\_object@{fc::mutable\_variant\_object}!mutable\_variant\_object@{mutable\_variant\_object}}
+\index{mutable\_variant\_object@{mutable\_variant\_object}!fc::mutable\_variant\_object@{fc::mutable\_variant\_object}}
+\doxysubsubsection{\texorpdfstring{mutable\_variant\_object()}{mutable\_variant\_object()}\hspace{0.1cm}{\footnotesize\ttfamily [5/7]}}
+{\footnotesize\ttfamily \label{classfc_1_1mutable__variant__object_a092bf4693b06cbe867239410ea780818} 
+fc\+::mutable\+\_\+variant\+\_\+object\+::mutable\+\_\+variant\+\_\+object (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\+\_\+variant\+\_\+object}} \&\&}]{obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{variant__object_8cpp_source_l00294}{294}} of file \mbox{\hyperlink{variant__object_8cpp_source}{variant\+\_\+object.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00295\ \ \ \ \ \ \ :\ \_key\_value(fc::move(obj.\_key\_value))}
+\DoxyCodeLine{00296\ \ \ \ \{}
+\DoxyCodeLine{00297\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1mutable__variant__object_ac73e3697d6dcf342320c88f393df2448}\index{fc::mutable\_variant\_object@{fc::mutable\_variant\_object}!mutable\_variant\_object@{mutable\_variant\_object}}
+\index{mutable\_variant\_object@{mutable\_variant\_object}!fc::mutable\_variant\_object@{fc::mutable\_variant\_object}}
+\doxysubsubsection{\texorpdfstring{mutable\_variant\_object()}{mutable\_variant\_object()}\hspace{0.1cm}{\footnotesize\ttfamily [6/7]}}
+{\footnotesize\ttfamily \label{classfc_1_1mutable__variant__object_ac73e3697d6dcf342320c88f393df2448} 
+fc\+::mutable\+\_\+variant\+\_\+object\+::mutable\+\_\+variant\+\_\+object (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\+\_\+variant\+\_\+object}} \&}]{obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{variant__object_8cpp_source_l00289}{289}} of file \mbox{\hyperlink{variant__object_8cpp_source}{variant\+\_\+object.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00290\ \ \ \ \ \ \ :\ \_key\_value(\ \textcolor{keyword}{new}\ std::vector<entry>(*obj.\_key\_value)\ )}
+\DoxyCodeLine{00291\ \ \ \ \{}
+\DoxyCodeLine{00292\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1mutable__variant__object_a4b88482826637d229a717451aced2464}\index{fc::mutable\_variant\_object@{fc::mutable\_variant\_object}!mutable\_variant\_object@{mutable\_variant\_object}}
+\index{mutable\_variant\_object@{mutable\_variant\_object}!fc::mutable\_variant\_object@{fc::mutable\_variant\_object}}
+\doxysubsubsection{\texorpdfstring{mutable\_variant\_object()}{mutable\_variant\_object()}\hspace{0.1cm}{\footnotesize\ttfamily [7/7]}}
+{\footnotesize\ttfamily \label{classfc_1_1mutable__variant__object_a4b88482826637d229a717451aced2464} 
+fc\+::mutable\+\_\+variant\+\_\+object\+::mutable\+\_\+variant\+\_\+object (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1variant__object}{variant\+\_\+object}} \&}]{obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{variant__object_8cpp_source_l00284}{284}} of file \mbox{\hyperlink{variant__object_8cpp_source}{variant\+\_\+object.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00285\ \ \ \ \ \ \ :\ \_key\_value(\ \textcolor{keyword}{new}\ std::vector<entry>(*obj.\_key\_value)\ )}
+\DoxyCodeLine{00286\ \ \ \ \{}
+\DoxyCodeLine{00287\ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1mutable__variant__object_a009f002bdff54a6bd6ac507f04052e53}\index{fc::mutable\_variant\_object@{fc::mutable\_variant\_object}!begin@{begin}}
+\index{begin@{begin}!fc::mutable\_variant\_object@{fc::mutable\_variant\_object}}
+\doxysubsubsection{\texorpdfstring{begin()}{begin()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1mutable__variant__object_a009f002bdff54a6bd6ac507f04052e53} 
+\mbox{\hyperlink{classfc_1_1mutable__variant__object_a02dd19d9535d923354d390470b02b32a}{mutable\+\_\+variant\+\_\+object\+::iterator}} fc\+::mutable\+\_\+variant\+\_\+object\+::begin (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{variant__object_8cpp_source_l00190}{190}} of file \mbox{\hyperlink{variant__object_8cpp_source}{variant\+\_\+object.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00191\ \ \ \ \{}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \_key\_value-\/>begin();}
+\DoxyCodeLine{00193\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1mutable__variant__object_a8c3f205309967abdb7fc54a6e87c2c76}\index{fc::mutable\_variant\_object@{fc::mutable\_variant\_object}!begin@{begin}}
+\index{begin@{begin}!fc::mutable\_variant\_object@{fc::mutable\_variant\_object}}
+\doxysubsubsection{\texorpdfstring{begin()}{begin()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1mutable__variant__object_a8c3f205309967abdb7fc54a6e87c2c76} 
+\mbox{\hyperlink{classfc_1_1mutable__variant__object_a02dd19d9535d923354d390470b02b32a}{mutable\+\_\+variant\+\_\+object\+::iterator}} fc\+::mutable\+\_\+variant\+\_\+object\+::begin (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{variant__object_8cpp_source_l00200}{200}} of file \mbox{\hyperlink{variant__object_8cpp_source}{variant\+\_\+object.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00201\ \ \ \ \{}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \_key\_value-\/>begin();}
+\DoxyCodeLine{00203\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1mutable__variant__object_a8c3f205309967abdb7fc54a6e87c2c76_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1mutable__variant__object_aba444f933d42d3c21facfbad1ecd45e0}\index{fc::mutable\_variant\_object@{fc::mutable\_variant\_object}!end@{end}}
+\index{end@{end}!fc::mutable\_variant\_object@{fc::mutable\_variant\_object}}
+\doxysubsubsection{\texorpdfstring{end()}{end()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1mutable__variant__object_aba444f933d42d3c21facfbad1ecd45e0} 
+\mbox{\hyperlink{classfc_1_1mutable__variant__object_a02dd19d9535d923354d390470b02b32a}{mutable\+\_\+variant\+\_\+object\+::iterator}} fc\+::mutable\+\_\+variant\+\_\+object\+::end (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{variant__object_8cpp_source_l00195}{195}} of file \mbox{\hyperlink{variant__object_8cpp_source}{variant\+\_\+object.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00196\ \ \ \ \{}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \_key\_value-\/>end();}
+\DoxyCodeLine{00198\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1mutable__variant__object_aba444f933d42d3c21facfbad1ecd45e0_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1mutable__variant__object_a4d3913ee42df2e7d83a1a2f39f14b1fd}\index{fc::mutable\_variant\_object@{fc::mutable\_variant\_object}!end@{end}}
+\index{end@{end}!fc::mutable\_variant\_object@{fc::mutable\_variant\_object}}
+\doxysubsubsection{\texorpdfstring{end()}{end()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1mutable__variant__object_a4d3913ee42df2e7d83a1a2f39f14b1fd} 
+\mbox{\hyperlink{classfc_1_1mutable__variant__object_a02dd19d9535d923354d390470b02b32a}{mutable\+\_\+variant\+\_\+object\+::iterator}} fc\+::mutable\+\_\+variant\+\_\+object\+::end (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{variant__object_8cpp_source_l00205}{205}} of file \mbox{\hyperlink{variant__object_8cpp_source}{variant\+\_\+object.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00206\ \ \ \ \{}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \_key\_value-\/>end();}
+\DoxyCodeLine{00208\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1mutable__variant__object_a4d3913ee42df2e7d83a1a2f39f14b1fd_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1mutable__variant__object_ada38caab5cc7624046cc61fcd033c4db}\index{fc::mutable\_variant\_object@{fc::mutable\_variant\_object}!erase@{erase}}
+\index{erase@{erase}!fc::mutable\_variant\_object@{fc::mutable\_variant\_object}}
+\doxysubsubsection{\texorpdfstring{erase()}{erase()}}
+{\footnotesize\ttfamily \label{classfc_1_1mutable__variant__object_ada38caab5cc7624046cc61fcd033c4db} 
+void fc\+::mutable\+\_\+variant\+\_\+object\+::erase (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&}]{key}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{variant__object_8cpp_source_l00328}{328}} of file \mbox{\hyperlink{variant__object_8cpp_source}{variant\+\_\+object.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00329\ \ \ \ \{}
+\DoxyCodeLine{00330\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\ itr\ =\ \mbox{\hyperlink{classfc_1_1mutable__variant__object_a8c3f205309967abdb7fc54a6e87c2c76}{begin}}();\ itr\ !=\ \mbox{\hyperlink{classfc_1_1mutable__variant__object_a4d3913ee42df2e7d83a1a2f39f14b1fd}{end}}();\ ++itr\ )}
+\DoxyCodeLine{00331\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00332\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr-\/>key()\ ==\ key\ )}
+\DoxyCodeLine{00333\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00334\ \ \ \ \ \ \ \ \ \ \ \ \ \_key\_value-\/>erase(itr);}
+\DoxyCodeLine{00335\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00336\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00337\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00338\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=315pt]{classfc_1_1mutable__variant__object_ada38caab5cc7624046cc61fcd033c4db_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=312pt]{classfc_1_1mutable__variant__object_ada38caab5cc7624046cc61fcd033c4db_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1mutable__variant__object_a1236a6f2ce7aa5f42245bd7ee7335ac5}\index{fc::mutable\_variant\_object@{fc::mutable\_variant\_object}!find@{find}}
+\index{find@{find}!fc::mutable\_variant\_object@{fc::mutable\_variant\_object}}
+\doxysubsubsection{\texorpdfstring{find()}{find()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{classfc_1_1mutable__variant__object_a1236a6f2ce7aa5f42245bd7ee7335ac5} 
+\mbox{\hyperlink{classfc_1_1mutable__variant__object_a02dd19d9535d923354d390470b02b32a}{mutable\+\_\+variant\+\_\+object\+::iterator}} fc\+::mutable\+\_\+variant\+\_\+object\+::find (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{key}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{variant__object_8cpp_source_l00232}{232}} of file \mbox{\hyperlink{variant__object_8cpp_source}{variant\+\_\+object.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00233\ \ \ \ \{}
+\DoxyCodeLine{00234\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\ itr\ =\ \mbox{\hyperlink{classfc_1_1mutable__variant__object_a8c3f205309967abdb7fc54a6e87c2c76}{begin}}();\ itr\ !=\ \mbox{\hyperlink{classfc_1_1mutable__variant__object_a4d3913ee42df2e7d83a1a2f39f14b1fd}{end}}();\ ++itr\ )}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr-\/>key()\ ==\ key\ )}
+\DoxyCodeLine{00237\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00238\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ itr;}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00241\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1mutable__variant__object_a4d3913ee42df2e7d83a1a2f39f14b1fd}{end}}();}
+\DoxyCodeLine{00242\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=315pt]{classfc_1_1mutable__variant__object_a1236a6f2ce7aa5f42245bd7ee7335ac5_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1mutable__variant__object_affd5b9ab3085b88e1f314da0affaabfb}\index{fc::mutable\_variant\_object@{fc::mutable\_variant\_object}!find@{find}}
+\index{find@{find}!fc::mutable\_variant\_object@{fc::mutable\_variant\_object}}
+\doxysubsubsection{\texorpdfstring{find()}{find()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{classfc_1_1mutable__variant__object_affd5b9ab3085b88e1f314da0affaabfb} 
+\mbox{\hyperlink{classfc_1_1mutable__variant__object_a02dd19d9535d923354d390470b02b32a}{mutable\+\_\+variant\+\_\+object\+::iterator}} fc\+::mutable\+\_\+variant\+\_\+object\+::find (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{key}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{variant__object_8cpp_source_l00215}{215}} of file \mbox{\hyperlink{variant__object_8cpp_source}{variant\+\_\+object.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00216\ \ \ \ \{}
+\DoxyCodeLine{00217\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\ itr\ =\ \mbox{\hyperlink{classfc_1_1mutable__variant__object_a8c3f205309967abdb7fc54a6e87c2c76}{begin}}();\ itr\ !=\ \mbox{\hyperlink{classfc_1_1mutable__variant__object_a4d3913ee42df2e7d83a1a2f39f14b1fd}{end}}();\ ++itr\ )}
+\DoxyCodeLine{00218\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr-\/>key()\ ==\ key\ )}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ itr;}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1mutable__variant__object_a4d3913ee42df2e7d83a1a2f39f14b1fd}{end}}();}
+\DoxyCodeLine{00225\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=315pt]{classfc_1_1mutable__variant__object_affd5b9ab3085b88e1f314da0affaabfb_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1mutable__variant__object_ae3b38166303f37671545d2a35ba23dc6}\index{fc::mutable\_variant\_object@{fc::mutable\_variant\_object}!find@{find}}
+\index{find@{find}!fc::mutable\_variant\_object@{fc::mutable\_variant\_object}}
+\doxysubsubsection{\texorpdfstring{find()}{find()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{classfc_1_1mutable__variant__object_ae3b38166303f37671545d2a35ba23dc6} 
+\mbox{\hyperlink{classfc_1_1mutable__variant__object_a02dd19d9535d923354d390470b02b32a}{mutable\+\_\+variant\+\_\+object\+::iterator}} fc\+::mutable\+\_\+variant\+\_\+object\+::find (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&}]{key}{}\end{DoxyParamCaption})}
+
+\begin{DoxyReturn}{Returns}
+\doxylink{classfc_1_1mutable__variant__object_a4d3913ee42df2e7d83a1a2f39f14b1fd}{end()} if key is not found 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{variant__object_8cpp_source_l00227}{227}} of file \mbox{\hyperlink{variant__object_8cpp_source}{variant\+\_\+object.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00228\ \ \ \ \{}
+\DoxyCodeLine{00229\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1mutable__variant__object_adc3ed86b72879f95ffc2b9398a7995c8}{find}}(\ key.c\_str()\ );}
+\DoxyCodeLine{00230\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=315pt]{classfc_1_1mutable__variant__object_ae3b38166303f37671545d2a35ba23dc6_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1mutable__variant__object_adc3ed86b72879f95ffc2b9398a7995c8}\index{fc::mutable\_variant\_object@{fc::mutable\_variant\_object}!find@{find}}
+\index{find@{find}!fc::mutable\_variant\_object@{fc::mutable\_variant\_object}}
+\doxysubsubsection{\texorpdfstring{find()}{find()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{classfc_1_1mutable__variant__object_adc3ed86b72879f95ffc2b9398a7995c8} 
+\mbox{\hyperlink{classfc_1_1mutable__variant__object_a02dd19d9535d923354d390470b02b32a}{mutable\+\_\+variant\+\_\+object\+::iterator}} fc\+::mutable\+\_\+variant\+\_\+object\+::find (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&}]{key}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{variant__object_8cpp_source_l00210}{210}} of file \mbox{\hyperlink{variant__object_8cpp_source}{variant\+\_\+object.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00211\ \ \ \ \{}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1mutable__variant__object_adc3ed86b72879f95ffc2b9398a7995c8}{find}}(\ key.c\_str()\ );}
+\DoxyCodeLine{00213\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=179pt]{classfc_1_1mutable__variant__object_adc3ed86b72879f95ffc2b9398a7995c8_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=315pt]{classfc_1_1mutable__variant__object_adc3ed86b72879f95ffc2b9398a7995c8_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1mutable__variant__object_ad94e8b18d963059354a3ad99f37edf65}\index{fc::mutable\_variant\_object@{fc::mutable\_variant\_object}!operator()@{operator()}}
+\index{operator()@{operator()}!fc::mutable\_variant\_object@{fc::mutable\_variant\_object}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}\hspace{0.1cm}{\footnotesize\ttfamily [1/8]}}
+{\footnotesize\ttfamily \label{classfc_1_1mutable__variant__object_ad94e8b18d963059354a3ad99f37edf65} 
+\mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\+\_\+variant\+\_\+object}} \& fc\+::mutable\+\_\+variant\+\_\+object\+::operator() (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\+\_\+variant\+\_\+object}} \&}]{mvo}{}\end{DoxyParamCaption}) \&}
+
+Copy another \doxylink{classfc_1_1mutable__variant__object}{mutable\+\_\+variant\+\_\+object} into this \doxylink{classfc_1_1mutable__variant__object}{mutable\+\_\+variant\+\_\+object}. 
+
+Definition at line \mbox{\hyperlink{variant__object_8cpp_source_l00398}{398}} of file \mbox{\hyperlink{variant__object_8cpp_source}{variant\+\_\+object.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00399\ \ \ \ \{}
+\DoxyCodeLine{00400\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \&mvo\ ==\ \textcolor{keyword}{this}\ )\ \ \ \ \ \textcolor{comment}{//\ mvo(mvo)\ is\ no-\/op}}
+\DoxyCodeLine{00401\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00402\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1mutable__variant__object_a21fb2e36f93b22f7ab5a0678a460b1c6}{mutable\_variant\_object::entry}}\&\ e\ :\ mvo\ )}
+\DoxyCodeLine{00403\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a893468abdce45d586a5b659094a25e6c}{set}}(\ e.key(),\ e.value()\ );}
+\DoxyCodeLine{00404\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00405\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1mutable__variant__object_ab3785bda2f66e115636f1db2d3e30eca}\index{fc::mutable\_variant\_object@{fc::mutable\_variant\_object}!operator()@{operator()}}
+\index{operator()@{operator()}!fc::mutable\_variant\_object@{fc::mutable\_variant\_object}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}\hspace{0.1cm}{\footnotesize\ttfamily [2/8]}}
+{\footnotesize\ttfamily \label{classfc_1_1mutable__variant__object_ab3785bda2f66e115636f1db2d3e30eca} 
+\mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\+\_\+variant\+\_\+object}} fc\+::mutable\+\_\+variant\+\_\+object\+::operator() (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\+\_\+variant\+\_\+object}} \&}]{mvo}{}\end{DoxyParamCaption}) \&\&}
+
+
+
+Definition at line \mbox{\hyperlink{variant__object_8cpp_source_l00407}{407}} of file \mbox{\hyperlink{variant__object_8cpp_source}{variant\+\_\+object.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00408\ \ \ \ \{}
+\DoxyCodeLine{00409\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1mutable__variant__object_a21fb2e36f93b22f7ab5a0678a460b1c6}{mutable\_variant\_object::entry}}\&\ e\ :\ mvo\ )}
+\DoxyCodeLine{00410\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a893468abdce45d586a5b659094a25e6c}{set}}(\ e.key(),\ e.value()\ );}
+\DoxyCodeLine{00411\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::move(*\textcolor{keyword}{this});}
+\DoxyCodeLine{00412\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1mutable__variant__object_ae6af24b5766969b623e3771aaddf60f7}\index{fc::mutable\_variant\_object@{fc::mutable\_variant\_object}!operator()@{operator()}}
+\index{operator()@{operator()}!fc::mutable\_variant\_object@{fc::mutable\_variant\_object}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}\hspace{0.1cm}{\footnotesize\ttfamily [3/8]}}
+{\footnotesize\ttfamily \label{classfc_1_1mutable__variant__object_ae6af24b5766969b623e3771aaddf60f7} 
+\mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\+\_\+variant\+\_\+object}} \& fc\+::mutable\+\_\+variant\+\_\+object\+::operator() (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1variant__object}{variant\+\_\+object}} \&}]{vo}{}\end{DoxyParamCaption}) \&}
+
+Copy a \doxylink{classfc_1_1variant__object}{variant\+\_\+object} into this \doxylink{classfc_1_1mutable__variant__object}{mutable\+\_\+variant\+\_\+object}. 
+
+Definition at line \mbox{\hyperlink{variant__object_8cpp_source_l00384}{384}} of file \mbox{\hyperlink{variant__object_8cpp_source}{variant\+\_\+object.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00385\ \ \ \ \{}
+\DoxyCodeLine{00386\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{const}\ variant\_object::entry\&\ e\ :\ vo\ )}
+\DoxyCodeLine{00387\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a893468abdce45d586a5b659094a25e6c}{set}}(\ e.key(),\ e.value()\ );}
+\DoxyCodeLine{00388\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00389\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1mutable__variant__object_a7087d8a261b09797d158a7f43d8b3e6b}\index{fc::mutable\_variant\_object@{fc::mutable\_variant\_object}!operator()@{operator()}}
+\index{operator()@{operator()}!fc::mutable\_variant\_object@{fc::mutable\_variant\_object}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}\hspace{0.1cm}{\footnotesize\ttfamily [4/8]}}
+{\footnotesize\ttfamily \label{classfc_1_1mutable__variant__object_a7087d8a261b09797d158a7f43d8b3e6b} 
+\mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\+\_\+variant\+\_\+object}} fc\+::mutable\+\_\+variant\+\_\+object\+::operator() (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1variant__object}{variant\+\_\+object}} \&}]{vo}{}\end{DoxyParamCaption}) \&\&}
+
+
+
+Definition at line \mbox{\hyperlink{variant__object_8cpp_source_l00391}{391}} of file \mbox{\hyperlink{variant__object_8cpp_source}{variant\+\_\+object.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00392\ \ \ \ \{}
+\DoxyCodeLine{00393\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{const}\ variant\_object::entry\&\ e\ :\ vo\ )}
+\DoxyCodeLine{00394\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a893468abdce45d586a5b659094a25e6c}{set}}(\ e.key(),\ e.value()\ );}
+\DoxyCodeLine{00395\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::move(*\textcolor{keyword}{this});}
+\DoxyCodeLine{00396\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1mutable__variant__object_a5983d81a6a7be35850b57f99c91510ae}\index{fc::mutable\_variant\_object@{fc::mutable\_variant\_object}!operator()@{operator()}}
+\index{operator()@{operator()}!fc::mutable\_variant\_object@{fc::mutable\_variant\_object}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}\hspace{0.1cm}{\footnotesize\ttfamily [5/8]}}
+{\footnotesize\ttfamily \label{classfc_1_1mutable__variant__object_a5983d81a6a7be35850b57f99c91510ae} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\+\_\+variant\+\_\+object}} \& fc\+::mutable\+\_\+variant\+\_\+object\+::operator() (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}}}]{key}{, }\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\&}]{var}{}\end{DoxyParamCaption}) \&\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{variant__object_8hpp_source_l00185}{185}} of file \mbox{\hyperlink{variant__object_8hpp_source}{variant\+\_\+object.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a893468abdce45d586a5b659094a25e6c}{set}}(std::move(key),\ variant(\ fc::forward<T>(var)\ )\ );}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1mutable__variant__object_aa3f8abcbc1e103e9b479721f174044ce}\index{fc::mutable\_variant\_object@{fc::mutable\_variant\_object}!operator()@{operator()}}
+\index{operator()@{operator()}!fc::mutable\_variant\_object@{fc::mutable\_variant\_object}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}\hspace{0.1cm}{\footnotesize\ttfamily [6/8]}}
+{\footnotesize\ttfamily \label{classfc_1_1mutable__variant__object_aa3f8abcbc1e103e9b479721f174044ce} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\+\_\+variant\+\_\+object}} fc\+::mutable\+\_\+variant\+\_\+object\+::operator() (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}}}]{key}{, }\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\&}]{var}{}\end{DoxyParamCaption}) \&\&\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{variant__object_8hpp_source_l00191}{191}} of file \mbox{\hyperlink{variant__object_8hpp_source}{variant\+\_\+object.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a893468abdce45d586a5b659094a25e6c}{set}}(std::move(key),\ variant(\ fc::forward<T>(var)\ )\ );}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::move(*\textcolor{keyword}{this});}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1mutable__variant__object_a829fdf50473fd92da6f523a346096824}\index{fc::mutable\_variant\_object@{fc::mutable\_variant\_object}!operator()@{operator()}}
+\index{operator()@{operator()}!fc::mutable\_variant\_object@{fc::mutable\_variant\_object}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}\hspace{0.1cm}{\footnotesize\ttfamily [7/8]}}
+{\footnotesize\ttfamily \label{classfc_1_1mutable__variant__object_a829fdf50473fd92da6f523a346096824} 
+\mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\+\_\+variant\+\_\+object}} \& fc\+::mutable\+\_\+variant\+\_\+object\+::operator() (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}}}]{key}{, }\item[{\mbox{\hyperlink{classfc_1_1variant}{variant}}}]{var}{}\end{DoxyParamCaption}) \&}
+
+Appends {\itshape key} and {\itshape var} without checking for duplicates, designed to simplify construction of dictionaries using (key,val)(key2,val2) syntax Convenience method to simplify the manual construction of variant\+\_\+objects
+
+Instead of\+: {\ttfamily \doxylink{classfc_1_1mutable__variant__object}{mutable\+\_\+variant\+\_\+object}("{}c"{},c).set("{}a"{},a).set("{}b"{},b);}
+
+You can use\+: {\ttfamily \doxylink{classfc_1_1mutable__variant__object}{mutable\+\_\+variant\+\_\+object}( "{}c"{}, c )( "{}b"{}, b)( "{}c"{},c )}
+
+\begin{DoxyReturn}{Returns}
+\texorpdfstring{$\ast$}{*}this;
+\end{DoxyReturn}
+Appends {\itshape key} and {\itshape var} without checking for duplicates, designed to simplify construction of dictionaries using (key,val)(key2,val2) syntax 
+
+Definition at line \mbox{\hyperlink{variant__object_8cpp_source_l00372}{372}} of file \mbox{\hyperlink{variant__object_8cpp_source}{variant\+\_\+object.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00373\ \ \ \ \{}
+\DoxyCodeLine{00374\ \ \ \ \ \ \ \_key\_value-\/>push\_back(\ \mbox{\hyperlink{classfc_1_1mutable__variant__object_a21fb2e36f93b22f7ab5a0678a460b1c6}{entry}}(\ fc::move(key),\ fc::move(var)\ )\ );}
+\DoxyCodeLine{00375\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00376\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1mutable__variant__object_ab4e0947714f8f65ab4a740f346383506}\index{fc::mutable\_variant\_object@{fc::mutable\_variant\_object}!operator()@{operator()}}
+\index{operator()@{operator()}!fc::mutable\_variant\_object@{fc::mutable\_variant\_object}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}\hspace{0.1cm}{\footnotesize\ttfamily [8/8]}}
+{\footnotesize\ttfamily \label{classfc_1_1mutable__variant__object_ab4e0947714f8f65ab4a740f346383506} 
+\mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\+\_\+variant\+\_\+object}} fc\+::mutable\+\_\+variant\+\_\+object\+::operator() (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}}}]{key}{, }\item[{\mbox{\hyperlink{classfc_1_1variant}{variant}}}]{var}{}\end{DoxyParamCaption}) \&\&}
+
+
+
+Definition at line \mbox{\hyperlink{variant__object_8cpp_source_l00378}{378}} of file \mbox{\hyperlink{variant__object_8cpp_source}{variant\+\_\+object.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00379\ \ \ \ \{}
+\DoxyCodeLine{00380\ \ \ \ \ \ \ \_key\_value-\/>push\_back(\ \mbox{\hyperlink{classfc_1_1mutable__variant__object_a21fb2e36f93b22f7ab5a0678a460b1c6}{entry}}(\ fc::move(key),\ fc::move(var)\ )\ );}
+\DoxyCodeLine{00381\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::move(*\textcolor{keyword}{this});}
+\DoxyCodeLine{00382\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1mutable__variant__object_a9bd4cf377f1b73daba3b6ebdb85b0456}\index{fc::mutable\_variant\_object@{fc::mutable\_variant\_object}!operator=@{operator=}}
+\index{operator=@{operator=}!fc::mutable\_variant\_object@{fc::mutable\_variant\_object}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{classfc_1_1mutable__variant__object_a9bd4cf377f1b73daba3b6ebdb85b0456} 
+\mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\+\_\+variant\+\_\+object}} \& fc\+::mutable\+\_\+variant\+\_\+object\+::operator= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\+\_\+variant\+\_\+object}} \&}]{obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{variant__object_8cpp_source_l00314}{314}} of file \mbox{\hyperlink{variant__object_8cpp_source}{variant\+\_\+object.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00315\ \ \ \ \{}
+\DoxyCodeLine{00316\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{this}\ !=\ \&obj)}
+\DoxyCodeLine{00317\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00318\ \ \ \ \ \ \ \ \ \ *\_key\_value\ =\ *obj.\_key\_value;}
+\DoxyCodeLine{00319\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00320\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00321\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1mutable__variant__object_adfc6f75fd142cb8bc74cbdeb78437d59}\index{fc::mutable\_variant\_object@{fc::mutable\_variant\_object}!operator=@{operator=}}
+\index{operator=@{operator=}!fc::mutable\_variant\_object@{fc::mutable\_variant\_object}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{classfc_1_1mutable__variant__object_adfc6f75fd142cb8bc74cbdeb78437d59} 
+\mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\+\_\+variant\+\_\+object}} \& fc\+::mutable\+\_\+variant\+\_\+object\+::operator= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1variant__object}{variant\+\_\+object}} \&}]{obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{variant__object_8cpp_source_l00299}{299}} of file \mbox{\hyperlink{variant__object_8cpp_source}{variant\+\_\+object.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00300\ \ \ \ \{}
+\DoxyCodeLine{00301\ \ \ \ \ \ \ *\_key\_value\ =\ *obj.\_key\_value;}
+\DoxyCodeLine{00302\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00303\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1mutable__variant__object_a13c8383bf1636f5a8810cba585e571b9}\index{fc::mutable\_variant\_object@{fc::mutable\_variant\_object}!operator=@{operator=}}
+\index{operator=@{operator=}!fc::mutable\_variant\_object@{fc::mutable\_variant\_object}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{classfc_1_1mutable__variant__object_a13c8383bf1636f5a8810cba585e571b9} 
+\mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\+\_\+variant\+\_\+object}} \& fc\+::mutable\+\_\+variant\+\_\+object\+::operator= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\+\_\+variant\+\_\+object}} \&\&}]{obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{variant__object_8cpp_source_l00305}{305}} of file \mbox{\hyperlink{variant__object_8cpp_source}{variant\+\_\+object.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00306\ \ \ \ \{}
+\DoxyCodeLine{00307\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{this}\ !=\ \&obj)}
+\DoxyCodeLine{00308\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00309\ \ \ \ \ \ \ \ \ \ \_key\_value\ =\ fc::move(obj.\_key\_value);}
+\DoxyCodeLine{00310\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00311\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00312\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1mutable__variant__object_ad35da3501e3996a3ee8e78dca04dcdf9}\index{fc::mutable\_variant\_object@{fc::mutable\_variant\_object}!operator\mbox{[}\mbox{]}@{operator[]}}
+\index{operator\mbox{[}\mbox{]}@{operator[]}!fc::mutable\_variant\_object@{fc::mutable\_variant\_object}}
+\doxysubsubsection{\texorpdfstring{operator[]()}{operator[]()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{classfc_1_1mutable__variant__object_ad35da3501e3996a3ee8e78dca04dcdf9} 
+\mbox{\hyperlink{classfc_1_1variant}{variant}} \& fc\+::mutable\+\_\+variant\+\_\+object\+::operator\mbox{[}$\,$\mbox{]} (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{key}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{variant__object_8cpp_source_l00260}{260}} of file \mbox{\hyperlink{variant__object_8cpp_source}{variant\+\_\+object.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00261\ \ \ \ \{}
+\DoxyCodeLine{00262\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ \mbox{\hyperlink{classfc_1_1mutable__variant__object_adc3ed86b72879f95ffc2b9398a7995c8}{find}}(\ key\ );}
+\DoxyCodeLine{00263\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr\ !=\ \mbox{\hyperlink{classfc_1_1mutable__variant__object_a4d3913ee42df2e7d83a1a2f39f14b1fd}{end}}()\ )\ \textcolor{keywordflow}{return}\ itr-\/>value();}
+\DoxyCodeLine{00264\ \ \ \ \ \ \ \_key\_value-\/>emplace\_back(\mbox{\hyperlink{classfc_1_1mutable__variant__object_a21fb2e36f93b22f7ab5a0678a460b1c6}{entry}}(key,\ variant()));}
+\DoxyCodeLine{00265\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \_key\_value-\/>back().value();}
+\DoxyCodeLine{00266\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=315pt]{classfc_1_1mutable__variant__object_ad35da3501e3996a3ee8e78dca04dcdf9_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1mutable__variant__object_ae0d3415028e74c088642234907ece532}\index{fc::mutable\_variant\_object@{fc::mutable\_variant\_object}!operator\mbox{[}\mbox{]}@{operator[]}}
+\index{operator\mbox{[}\mbox{]}@{operator[]}!fc::mutable\_variant\_object@{fc::mutable\_variant\_object}}
+\doxysubsubsection{\texorpdfstring{operator[]()}{operator[]()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{classfc_1_1mutable__variant__object_ae0d3415028e74c088642234907ece532} 
+const \mbox{\hyperlink{classfc_1_1variant}{variant}} \& fc\+::mutable\+\_\+variant\+\_\+object\+::operator\mbox{[}$\,$\mbox{]} (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{key}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{variant__object_8cpp_source_l00249}{249}} of file \mbox{\hyperlink{variant__object_8cpp_source}{variant\+\_\+object.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00250\ \ \ \ \{}
+\DoxyCodeLine{00251\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ \mbox{\hyperlink{classfc_1_1mutable__variant__object_adc3ed86b72879f95ffc2b9398a7995c8}{find}}(\ key\ );}
+\DoxyCodeLine{00252\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr\ !=\ \mbox{\hyperlink{classfc_1_1mutable__variant__object_a4d3913ee42df2e7d83a1a2f39f14b1fd}{end}}()\ )\ \textcolor{keywordflow}{return}\ itr-\/>value();}
+\DoxyCodeLine{00253\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ key\_not\_found\_exception,\ \textcolor{stringliteral}{"{}Key\ \$\{key\}"{}},\ (\textcolor{stringliteral}{"{}key"{}},key)\ );}
+\DoxyCodeLine{00254\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=315pt]{classfc_1_1mutable__variant__object_ae0d3415028e74c088642234907ece532_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1mutable__variant__object_a686fa5ef8b868de88e082ac901b1bb63}\index{fc::mutable\_variant\_object@{fc::mutable\_variant\_object}!operator\mbox{[}\mbox{]}@{operator[]}}
+\index{operator\mbox{[}\mbox{]}@{operator[]}!fc::mutable\_variant\_object@{fc::mutable\_variant\_object}}
+\doxysubsubsection{\texorpdfstring{operator[]()}{operator[]()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{classfc_1_1mutable__variant__object_a686fa5ef8b868de88e082ac901b1bb63} 
+\mbox{\hyperlink{classfc_1_1variant}{variant}} \& fc\+::mutable\+\_\+variant\+\_\+object\+::operator\mbox{[}$\,$\mbox{]} (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&}]{key}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{variant__object_8cpp_source_l00255}{255}} of file \mbox{\hyperlink{variant__object_8cpp_source}{variant\+\_\+object.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00256\ \ \ \ \{}
+\DoxyCodeLine{00257\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (*\textcolor{keyword}{this})[key.c\_str()];}
+\DoxyCodeLine{00258\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1mutable__variant__object_a87ac08a28b843cc6342adb343edc85f6}\index{fc::mutable\_variant\_object@{fc::mutable\_variant\_object}!operator\mbox{[}\mbox{]}@{operator[]}}
+\index{operator\mbox{[}\mbox{]}@{operator[]}!fc::mutable\_variant\_object@{fc::mutable\_variant\_object}}
+\doxysubsubsection{\texorpdfstring{operator[]()}{operator[]()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{classfc_1_1mutable__variant__object_a87ac08a28b843cc6342adb343edc85f6} 
+const \mbox{\hyperlink{classfc_1_1variant}{variant}} \& fc\+::mutable\+\_\+variant\+\_\+object\+::operator\mbox{[}$\,$\mbox{]} (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&}]{key}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{variant__object_8cpp_source_l00244}{244}} of file \mbox{\hyperlink{variant__object_8cpp_source}{variant\+\_\+object.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00245\ \ \ \ \{}
+\DoxyCodeLine{00246\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (*\textcolor{keyword}{this})[key.c\_str()];}
+\DoxyCodeLine{00247\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1mutable__variant__object_a5da217a80318bf1587bae008741a0780}\index{fc::mutable\_variant\_object@{fc::mutable\_variant\_object}!reserve@{reserve}}
+\index{reserve@{reserve}!fc::mutable\_variant\_object@{fc::mutable\_variant\_object}}
+\doxysubsubsection{\texorpdfstring{reserve()}{reserve()}}
+{\footnotesize\ttfamily \label{classfc_1_1mutable__variant__object_a5da217a80318bf1587bae008741a0780} 
+void fc\+::mutable\+\_\+variant\+\_\+object\+::reserve (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{s}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{variant__object_8cpp_source_l00323}{323}} of file \mbox{\hyperlink{variant__object_8cpp_source}{variant\+\_\+object.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00324\ \ \ \ \{}
+\DoxyCodeLine{00325\ \ \ \ \ \ \ \_key\_value-\/>reserve(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{00326\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=299pt]{classfc_1_1mutable__variant__object_a5da217a80318bf1587bae008741a0780_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1mutable__variant__object_a06be150aaba8110230fb1f6da342a555}\index{fc::mutable\_variant\_object@{fc::mutable\_variant\_object}!set@{set}}
+\index{set@{set}!fc::mutable\_variant\_object@{fc::mutable\_variant\_object}}
+\doxysubsubsection{\texorpdfstring{set()}{set()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1mutable__variant__object_a06be150aaba8110230fb1f6da342a555} 
+\mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\+\_\+variant\+\_\+object}} \& fc\+::mutable\+\_\+variant\+\_\+object\+::set (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}}}]{key}{, }\item[{\mbox{\hyperlink{classfc_1_1variant}{variant}}}]{var}{}\end{DoxyParamCaption}) \&}
+
+replaces the value at {\itshape key} with {\itshape var} or inserts {\itshape key} if not found
+
+replaces the value at {\itshape key} with {\itshape var} or insert\textquotesingle{}s {\itshape key} if not found 
+
+Definition at line \mbox{\hyperlink{variant__object_8cpp_source_l00341}{341}} of file \mbox{\hyperlink{variant__object_8cpp_source}{variant\+\_\+object.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00342\ \ \ \ \{}
+\DoxyCodeLine{00343\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ \mbox{\hyperlink{classfc_1_1mutable__variant__object_adc3ed86b72879f95ffc2b9398a7995c8}{find}}(\ key.c\_str()\ );}
+\DoxyCodeLine{00344\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr\ !=\ \mbox{\hyperlink{classfc_1_1mutable__variant__object_a4d3913ee42df2e7d83a1a2f39f14b1fd}{end}}()\ )}
+\DoxyCodeLine{00345\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00346\ \ \ \ \ \ \ \ \ \ itr-\/>set(\ fc::move(var)\ );}
+\DoxyCodeLine{00347\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00348\ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00349\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00350\ \ \ \ \ \ \ \ \ \ \_key\_value-\/>push\_back(\ \mbox{\hyperlink{classfc_1_1mutable__variant__object_a21fb2e36f93b22f7ab5a0678a460b1c6}{entry}}(\ fc::move(key),\ fc::move(var)\ )\ );}
+\DoxyCodeLine{00351\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00352\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00353\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=299pt]{classfc_1_1mutable__variant__object_a06be150aaba8110230fb1f6da342a555_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1mutable__variant__object_ab39e7a4932a7e9682a1facca13b55459}\index{fc::mutable\_variant\_object@{fc::mutable\_variant\_object}!set@{set}}
+\index{set@{set}!fc::mutable\_variant\_object@{fc::mutable\_variant\_object}}
+\doxysubsubsection{\texorpdfstring{set()}{set()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1mutable__variant__object_ab39e7a4932a7e9682a1facca13b55459} 
+\mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\+\_\+variant\+\_\+object}} fc\+::mutable\+\_\+variant\+\_\+object\+::set (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}}}]{key}{, }\item[{\mbox{\hyperlink{classfc_1_1variant}{variant}}}]{var}{}\end{DoxyParamCaption}) \&\&}
+
+
+
+Definition at line \mbox{\hyperlink{variant__object_8cpp_source_l00355}{355}} of file \mbox{\hyperlink{variant__object_8cpp_source}{variant\+\_\+object.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00356\ \ \ \ \{}
+\DoxyCodeLine{00357\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ \mbox{\hyperlink{classfc_1_1mutable__variant__object_adc3ed86b72879f95ffc2b9398a7995c8}{find}}(\ key.c\_str()\ );}
+\DoxyCodeLine{00358\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr\ !=\ \mbox{\hyperlink{classfc_1_1mutable__variant__object_a4d3913ee42df2e7d83a1a2f39f14b1fd}{end}}()\ )}
+\DoxyCodeLine{00359\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00360\ \ \ \ \ \ \ \ \ \ itr-\/>set(\ fc::move(var)\ );}
+\DoxyCodeLine{00361\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00362\ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00363\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00364\ \ \ \ \ \ \ \ \ \ \_key\_value-\/>push\_back(\ \mbox{\hyperlink{classfc_1_1mutable__variant__object_a21fb2e36f93b22f7ab5a0678a460b1c6}{entry}}(\ fc::move(key),\ fc::move(var)\ )\ );}
+\DoxyCodeLine{00365\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00366\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::move(*\textcolor{keyword}{this});}
+\DoxyCodeLine{00367\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1mutable__variant__object_a0612732e6fcc4b2017dd7f15590d16bd}\index{fc::mutable\_variant\_object@{fc::mutable\_variant\_object}!size@{size}}
+\index{size@{size}!fc::mutable\_variant\_object@{fc::mutable\_variant\_object}}
+\doxysubsubsection{\texorpdfstring{size()}{size()}}
+{\footnotesize\ttfamily \label{classfc_1_1mutable__variant__object_a0612732e6fcc4b2017dd7f15590d16bd} 
+size\+\_\+t fc\+::mutable\+\_\+variant\+\_\+object\+::size (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{variant__object_8cpp_source_l00268}{268}} of file \mbox{\hyperlink{variant__object_8cpp_source}{variant\+\_\+object.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00269\ \ \ \ \{}
+\DoxyCodeLine{00270\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \_key\_value-\/>size();}
+\DoxyCodeLine{00271\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1mutable__variant__object_a0612732e6fcc4b2017dd7f15590d16bd_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{classfc_1_1mutable__variant__object_a5176d6f7f43fdd9dbd614ce9b8f4b1fe}\index{fc::mutable\_variant\_object@{fc::mutable\_variant\_object}!variant\_object@{variant\_object}}
+\index{variant\_object@{variant\_object}!fc::mutable\_variant\_object@{fc::mutable\_variant\_object}}
+\doxysubsubsection{\texorpdfstring{variant\_object}{variant\_object}}
+{\footnotesize\ttfamily \label{classfc_1_1mutable__variant__object_a5176d6f7f43fdd9dbd614ce9b8f4b1fe} 
+friend \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classfc_1_1variant__object}{variant\+\_\+object}}\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{variant__object_8hpp_source_l00238}{238}} of file \mbox{\hyperlink{variant__object_8hpp_source}{variant\+\_\+object.\+hpp}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/\mbox{\hyperlink{variant__object_8hpp}{variant\+\_\+object.\+hpp}}\item 
+libraries/fc/src/\mbox{\hyperlink{variant__object_8cpp}{variant\+\_\+object.\+cpp}}\end{DoxyCompactItemize}

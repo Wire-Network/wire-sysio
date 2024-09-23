@@ -1,0 +1,5 @@
+<map id="sysio::chain::account_delta" name="sysio::chain::account_delta">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,94,151,135"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1name.html" title="Immutable except for fc::from_variant." alt="" coords="12,5,144,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="81,46,81,93,75,93,75,46"/>
+</map>

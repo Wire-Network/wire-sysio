@@ -1,0 +1,9 @@
+<map id="sysio::chain::webassembly::SYS_VM_PRECONDITION" name="sysio::chain::webassembly::SYS_VM_PRECONDITION">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,35,200,75"/>
+<area shape="rect" id="Node000002" href="$namespacesysio_1_1vm.html#aed9320a398dcef98dbf672e5a58afb73" title=" " alt="" coords="265,13,410,38"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="200,40,249,34,250,39,201,45"/>
+<area shape="rect" id="Node000004" href="$namespacesysio_1_1chain_1_1webassembly_1_1detail.html#af8d3aa34707698f98daa3878b5fdb284" title=" " alt="" coords="248,63,427,103"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="201,64,233,68,232,73,200,69"/>
+<area shape="rect" id="Node000003" href="$namespacesysio_1_1vm_1_1detail.html#a9d6b630794608691f1cb5d2861810b82" title=" " alt="" coords="475,5,600,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="411,23,459,23,459,28,411,28"/>
+</map>

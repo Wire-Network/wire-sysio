@@ -1,0 +1,84 @@
+\doxysection{schemavalidator.\+cpp}
+\hypertarget{schemavalidator_8cpp_source}{}\label{schemavalidator_8cpp_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/example/schemavalidator/schemavalidator.cpp@{libraries/fc/include/fc/crypto/webauthn\_json/example/schemavalidator/schemavalidator.cpp}}
+\mbox{\hyperlink{schemavalidator_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00001}00001\ \textcolor{comment}{//\ Schema\ Validator\ example}}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00003}00003\ \textcolor{comment}{//\ The\ example\ validates\ JSON\ text\ from\ stdin\ with\ a\ JSON\ schema\ specified\ in\ the\ argument.}}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{en_8h}{rapidjson/error/en.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{filereadstream_8h}{rapidjson/filereadstream.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{schema_8h}{rapidjson/schema.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{stringbuffer_8h}{rapidjson/stringbuffer.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{prettywriter_8h}{rapidjson/prettywriter.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00011}00011\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacerapidjson}{rapidjson}};}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00013}\mbox{\hyperlink{schemavalidator_8cpp_a0ddf1224851353fc92bfbff6f499fa97}{00013}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}(\textcolor{keywordtype}{int}\ argc,\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[])\ \{}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00014}00014\ \ \ \ \ \textcolor{keywordflow}{if}\ (argc\ !=\ 2)\ \{}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00015}00015\ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Usage:\ schemavalidator\ schema.json\ <\ input.json\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00016}00016\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ EXIT\_FAILURE;}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00017}00017\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00019}00019\ \ \ \ \ \textcolor{comment}{//\ Read\ a\ JSON\ schema\ from\ file\ into\ Document}}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00020}00020\ \ \ \ \ \mbox{\hyperlink{class_generic_document}{Document}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}};}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00021}00021\ \ \ \ \ \textcolor{keywordtype}{char}\ buffer[4096];}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00023}00023\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00024}00024\ \ \ \ \ \ \ \ \ FILE\ *fp\ =\ fopen(\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[1],\ \textcolor{stringliteral}{"{}r"{}});}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00025}00025\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!fp)\ \{}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00026}00026\ \ \ \ \ \ \ \ \ \ \ \ \ printf(\textcolor{stringliteral}{"{}Schema\ file\ '\%s'\ not\ found\(\backslash\)n"{}},\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[1]);}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00027}00027\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ -\/1;}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00028}00028\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00029}00029\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_file_read_stream}{FileReadStream}}\ fs(fp,\ buffer,\ \textcolor{keyword}{sizeof}(buffer));}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00030}00030\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.ParseStream(fs);}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00031}00031\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.HasParseError())\ \{}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00032}00032\ \ \ \ \ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Schema\ file\ '\%s'\ is\ not\ a\ valid\ JSON\(\backslash\)n"{}},\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[1]);}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00033}00033\ \ \ \ \ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Error(offset\ \%u):\ \%s\(\backslash\)n"{}},}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00034}00034\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\textcolor{keyword}{>}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.GetErrorOffset()),}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00035}00035\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_ga28835eb93d2c3c07bbea13515eb31415}{GetParseError\_En}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.GetParseError()));}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00036}00036\ \ \ \ \ \ \ \ \ \ \ \ \ fclose(fp);}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00037}00037\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ EXIT\_FAILURE;}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00038}00038\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00039}00039\ \ \ \ \ \ \ \ \ fclose(fp);}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00040}00040\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00041}00041\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00042}00042\ \ \ \ \ \textcolor{comment}{//\ Then\ convert\ the\ Document\ into\ SchemaDocument}}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00043}00043\ \ \ \ \ \mbox{\hyperlink{class_generic_schema_document}{SchemaDocument}}\ sd(\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}});}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00045}00045\ \ \ \ \ \textcolor{comment}{//\ Use\ reader\ to\ parse\ the\ JSON\ in\ stdin,\ and\ forward\ SAX\ events\ to\ validator}}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00046}00046\ \ \ \ \ \mbox{\hyperlink{class_generic_schema_validator}{SchemaValidator}}\ validator(sd);}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00047}00047\ \ \ \ \ \mbox{\hyperlink{class_generic_reader}{Reader}}\ reader;}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00048}00048\ \ \ \ \ \mbox{\hyperlink{class_file_read_stream}{FileReadStream}}\ is(stdin,\ buffer,\ \textcolor{keyword}{sizeof}(buffer));}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00049}00049\ \ \ \ \ \textcolor{keywordflow}{if}\ (!reader.\mbox{\hyperlink{class_generic_reader_a0c450620d14ff1824e58bb7bd9b42099}{Parse}}(is,\ validator)\ \&\&\ reader.\mbox{\hyperlink{class_generic_reader_a937bf90919f50e1c370b312cee5833e8}{GetParseErrorCode}}()\ !=\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_gga8d4b32dfc45840bca189ade2bbcb6ba7a6fed2d9a15f88540a1ba785f0de2cbe6}{kParseErrorTermination}})\ \{}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00050}00050\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Schema\ validator\ error\ would\ cause\ kParseErrorTermination,\ which\ will\ handle\ it\ in\ next\ step.}}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00051}00051\ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Input\ is\ not\ a\ valid\ JSON\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00052}00052\ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Error(offset\ \%u):\ \%s\(\backslash\)n"{}},}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\textcolor{keyword}{>}(reader.\mbox{\hyperlink{class_generic_reader_ae9008523ccd06d839a57335835cb4091}{GetErrorOffset}}()),}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_ga28835eb93d2c3c07bbea13515eb31415}{GetParseError\_En}}(reader.\mbox{\hyperlink{class_generic_reader_a937bf90919f50e1c370b312cee5833e8}{GetParseErrorCode}}()));}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00055}00055\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00057}00057\ \ \ \ \ \textcolor{comment}{//\ Check\ the\ validation\ result}}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00058}00058\ \ \ \ \ \textcolor{keywordflow}{if}\ (validator.\mbox{\hyperlink{class_generic_schema_validator_a8ebda4da3d8b1fc41e57f15dd62e8f19}{IsValid}}())\ \{}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00059}00059\ \ \ \ \ \ \ \ \ printf(\textcolor{stringliteral}{"{}Input\ JSON\ is\ valid.\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00060}00060\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ EXIT\_SUCCESS;}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00061}00061\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00062}00062\ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00063}00063\ \ \ \ \ \ \ \ \ printf(\textcolor{stringliteral}{"{}Input\ JSON\ is\ invalid.\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00064}00064\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_string_buffer}{StringBuffer}}\ sb;}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00065}00065\ \ \ \ \ \ \ \ \ validator.\mbox{\hyperlink{class_generic_schema_validator_a5b8f2d5c466b2a362e2e4c3bcfbfc5a8}{GetInvalidSchemaPointer}}().StringifyUriFragment(sb);}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00066}00066\ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Invalid\ schema:\ \%s\(\backslash\)n"{}},\ sb.\mbox{\hyperlink{class_generic_string_buffer_a42079865bab1deb930c6cff7d491c719}{GetString}}());}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00067}00067\ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Invalid\ keyword:\ \%s\(\backslash\)n"{}},\ validator.\mbox{\hyperlink{class_generic_schema_validator_ab5980d72c786b81ab907526fdf4172f3}{GetInvalidSchemaKeyword}}());}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00068}00068\ \ \ \ \ \ \ \ \ sb.\mbox{\hyperlink{class_generic_string_buffer_a42f15c959046d899cb74c3120a6995f9}{Clear}}();}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00069}00069\ \ \ \ \ \ \ \ \ validator.\mbox{\hyperlink{class_generic_schema_validator_ac10a88c4dc138bbdbe2afd041658a3b0}{GetInvalidDocumentPointer}}().StringifyUriFragment(sb);}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00070}00070\ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Invalid\ document:\ \%s\(\backslash\)n"{}},\ sb.\mbox{\hyperlink{class_generic_string_buffer_a42079865bab1deb930c6cff7d491c719}{GetString}}());}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00071}00071\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Detailed\ violation\ report\ is\ available\ as\ a\ JSON\ value}}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00072}00072\ \ \ \ \ \ \ \ \ sb.\mbox{\hyperlink{class_generic_string_buffer_a42f15c959046d899cb74c3120a6995f9}{Clear}}();}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00073}00073\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_pretty_writer}{PrettyWriter<StringBuffer>}}\ w(sb);}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00074}00074\ \ \ \ \ \ \ \ \ validator.\mbox{\hyperlink{class_generic_schema_validator_a21c0ad159e91398d222bab4d91d4c5dd}{GetError}}().Accept(w);}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00075}00075\ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Error\ report:\(\backslash\)n\%s\(\backslash\)n"{}},\ sb.\mbox{\hyperlink{class_generic_string_buffer_a42079865bab1deb930c6cff7d491c719}{GetString}}());}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00076}00076\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ EXIT\_FAILURE;}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00077}00077\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{schemavalidator_8cpp_source_l00078}00078\ \}}
+
+\end{DoxyCode}

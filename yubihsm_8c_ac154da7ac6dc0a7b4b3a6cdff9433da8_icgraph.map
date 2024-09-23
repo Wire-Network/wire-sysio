@@ -1,0 +1,17 @@
+<map id="yh_util_import_authentication_key" name="yh_util_import_authentication_key">
+<area shape="rect" id="Node000001" title=" " alt="" coords="763,55,981,80"/>
+<area shape="rect" id="Node000002" href="$yubihsm_8c.html#a80b4c4caeb9c768737c2dbf46d9352e4" title=" " alt="" coords="524,47,715,88"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="747,70,715,70,715,65,747,65"/>
+<area shape="rect" id="Node000003" href="$change__authkey_8c.html#a840291bc02cba5474a4cb46a9b9566fe" title=" " alt="" coords="362,5,411,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="509,47,411,26,412,21,510,42"/>
+<area shape="rect" id="Node000004" href="$commands_8c.html#ae2e50929acc6085cd395d0bd4ddb02db" title=" " alt="" coords="317,55,455,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="509,70,456,70,456,65,509,65"/>
+<area shape="rect" id="Node000007" href="$commands_8c.html#a3bd17c302789958013e50a2ad9738aea" title=" " alt="" coords="296,104,476,130"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="510,93,451,106,450,101,509,88"/>
+<area shape="rect" id="Node000005" href="$src_2main_8c.html#a34a9e8c400dcf19e771e884636316060" title=" " alt="" coords="103,55,248,80"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="302,70,249,70,249,65,302,65"/>
+<area shape="rect" id="Node000006" href="$src_2main_8c.html#a0ddf1224851353fc92bfbff6f499fa97" title=" " alt="" coords="5,80,55,106"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="88,85,55,91,54,86,87,80"/>
+<area shape="poly" id="edge7_Node000007_Node000005" title=" " alt="" coords="312,102,233,84,234,78,314,97"/>
+<area shape="poly" id="edge8_Node000007_Node000006" title=" " alt="" coords="281,112,55,97,55,92,281,107"/>
+</map>

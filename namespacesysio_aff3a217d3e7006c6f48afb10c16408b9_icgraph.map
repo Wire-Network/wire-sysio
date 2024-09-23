@@ -1,0 +1,8 @@
+<map id="sysio::clear_directory_contents" name="sysio::clear_directory_contents">
+<area shape="rect" id="Node000001" title=" " alt="" coords="366,35,511,75"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1chain__plugin.html#a408e8154def42cdb8be9832b602e0046" title=" " alt="" coords="186,5,318,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="350,44,318,39,319,33,351,39"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1chain__plugin.html#a0192ac61f3f59d4fdf2dcbbd2c7104ca" title=" " alt="" coords="5,35,138,75"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="350,60,318,60,186,60,138,59,138,54,186,55,318,55,350,55"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="171,42,138,47,138,42,170,36"/>
+</map>

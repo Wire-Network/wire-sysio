@@ -1,0 +1,7 @@
+<map id="websocketpp::config::debug_core" name="websocketpp::config::debug_core">
+<area shape="rect" id="Node000001" title="Client/Server debug config with iostream transport." alt="" coords="49,139,191,180"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,51,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="24,46,21,80,24,98,31,114,42,126,56,136,53,141,39,130,27,116,19,99,16,80,19,45"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="185,5,242,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="213,47,204,82,186,117,160,140,156,137,182,113,199,80,207,46"/>
+</map>

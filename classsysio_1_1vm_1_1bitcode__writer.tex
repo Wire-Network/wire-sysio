@@ -1,0 +1,1352 @@
+\doxysection{sysio\+::vm\+::bitcode\+\_\+writer Class Reference}
+\hypertarget{classsysio_1_1vm_1_1bitcode__writer}{}\label{classsysio_1_1vm_1_1bitcode__writer}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+
+
+{\ttfamily \#include $<$bitcode\+\_\+writer.\+hpp$>$}
+
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1bitcode__writer_1_1br__table__parser}{br\+\_\+table\+\_\+parser}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_afdcd089e2f7d7c2e6977231ad602ef83}{bitcode\+\_\+writer}} (\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator}{growable\+\_\+allocator}} \&alloc, std\+::size\+\_\+t source\+\_\+bytes, \mbox{\hyperlink{structsysio_1_1vm_1_1module}{module}} \&mod)
+\item 
+\mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_adea070c388103d2252e4435187d8ac22}{\texorpdfstring{$\sim$}{\string~}bitcode\+\_\+writer}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_af73cd50ca93e12e930a26f1786bf6253}{emit\+\_\+unreachable}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_ac6ca7c0c176d103c26af2f3d6a167cc2}{emit\+\_\+nop}} ()
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_ac9975344433da6ee4f744970384d362b}{emit\+\_\+end}} ()
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_af2df56948c13567acd8420bd3005c1e3}{emit\+\_\+return}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} depth\+\_\+change)
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_afd485f2a7fa8fcfa087aa2c69a23e498}{emit\+\_\+block}} ()
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_a7ed89066a2c715dde18ee3771aed8f66}{emit\+\_\+loop}} ()
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_a8215d8d275e92d349d657117ec456498}{emit\+\_\+if}} ()
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_acd8eab099374e892a1237a6e1e949115}{emit\+\_\+else}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*}if\+\_\+loc)
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_ac07293a572703045be3045dab111fc6f}{emit\+\_\+br}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} depth\+\_\+change)
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_aeb23ef21253294a5ee4aaec2ab2e1681}{emit\+\_\+br\+\_\+if}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} depth\+\_\+change)
+\item 
+auto \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_aca73eb1c213b14defde822d618788a03}{emit\+\_\+br\+\_\+table}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} table\+\_\+size)
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_a7323d06fee2417cf7f67653998886765}{emit\+\_\+call}} (const \mbox{\hyperlink{structsysio_1_1vm_1_1func__type}{func\+\_\+type}} \&ft, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} funcnum)
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_a7d3315b531b477504d267b0bcc484602}{emit\+\_\+call\+\_\+indirect}} (const \mbox{\hyperlink{structsysio_1_1vm_1_1func__type}{func\+\_\+type}} \&ft, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} functypeidx)
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_a18356aa55b68ea9bef3390b1a181193a}{emit\+\_\+drop}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_acecbe90a02181ce946be9fa6f9a68a6f}{emit\+\_\+select}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_a179149056f836ec3fdb770dc919bb02d}{emit\+\_\+get\+\_\+local}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} localidx)
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_a947b269cdc5da587a17e35f7392d9426}{emit\+\_\+set\+\_\+local}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} localidx)
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_a6b338fe08aba6055d6410c490d611674}{emit\+\_\+tee\+\_\+local}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} localidx)
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_aed37dacc27a014e6444998b62d76b910}{emit\+\_\+get\+\_\+global}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} localidx)
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_a1fedef06e59534477dc397b0c8cb1186}{emit\+\_\+set\+\_\+global}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} localidx)
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_a068a95e28f0cadc39d017933420e4c50}{emit\+\_\+current\+\_\+memory}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_aa03f9a827db1f4393b643a92469c3068}{emit\+\_\+grow\+\_\+memory}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_a6e3575b372c228dd807221eec95a3828}{emit\+\_\+i32\+\_\+const}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_ad2d73d173c6fee51d53d1e718f9bc7f6}{emit\+\_\+i64\+\_\+const}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_a6fc714c869a8dc139c40e0822b3f652a}{emit\+\_\+f32\+\_\+const}} (float \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_afabae60fe5d4f25cbe41937f38f14ed4}{emit\+\_\+f64\+\_\+const}} (double \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_a30b7eab83a75f3f302e3da3cb5a4af6b}{emit\+\_\+error}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_aa2dccf54d099c4fcd1a89f6dc473ecf9}{fix\+\_\+branch}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*}branch, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} target)
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_a150f3bb44f8dcc7750350aec303ad296}{emit\+\_\+prologue}} (const \mbox{\hyperlink{structsysio_1_1vm_1_1func__type}{func\+\_\+type}} \&ft, const \mbox{\hyperlink{namespacesysio_1_1vm_a4e7c9f9a80391b4f980c64238a1feaaf}{guarded\+\_\+vector}}$<$ \mbox{\hyperlink{structsysio_1_1vm_1_1local__entry}{local\+\_\+entry}} $>$ \&, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} idx)
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_af43340ef2dc2909e5c45b256ffb09499}{emit\+\_\+epilogue}} (const \mbox{\hyperlink{structsysio_1_1vm_1_1func__type}{func\+\_\+type}} \&ft, const \mbox{\hyperlink{namespacesysio_1_1vm_a4e7c9f9a80391b4f980c64238a1feaaf}{guarded\+\_\+vector}}$<$ \mbox{\hyperlink{structsysio_1_1vm_1_1local__entry}{local\+\_\+entry}} $>$ \&\mbox{\hyperlink{namespacesysio_1_1vm_abc94c8e9af7289dc068a502c63ad98d4a65004f81079422462f2162dcf38954f3}{locals}}, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} idx)
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_af1277c482b1fe1d7ce95dd619429bc78}{finalize}} (\mbox{\hyperlink{structsysio_1_1vm_1_1function__body}{function\+\_\+body}} \&body)
+\item 
+const void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_a9df76ab09cf06a31589dcaaac3d83f5f}{get\+\_\+addr}} () const
+\item 
+const void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_a1655f517469d8bdd6205af5de8c1eff8}{get\+\_\+base\+\_\+addr}} () const
+\item 
+\mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_afdcd089e2f7d7c2e6977231ad602ef83}{bitcode\+\_\+writer}} (\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator}{growable\+\_\+allocator}} \&alloc, std\+::size\+\_\+t source\+\_\+bytes, \mbox{\hyperlink{structsysio_1_1vm_1_1module}{module}} \&mod)
+\item 
+\mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_adea070c388103d2252e4435187d8ac22}{\texorpdfstring{$\sim$}{\string~}bitcode\+\_\+writer}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_af73cd50ca93e12e930a26f1786bf6253}{emit\+\_\+unreachable}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_ac6ca7c0c176d103c26af2f3d6a167cc2}{emit\+\_\+nop}} ()
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_ac9975344433da6ee4f744970384d362b}{emit\+\_\+end}} ()
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_af2df56948c13567acd8420bd3005c1e3}{emit\+\_\+return}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} depth\+\_\+change)
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_afd485f2a7fa8fcfa087aa2c69a23e498}{emit\+\_\+block}} ()
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_a7ed89066a2c715dde18ee3771aed8f66}{emit\+\_\+loop}} ()
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_a8215d8d275e92d349d657117ec456498}{emit\+\_\+if}} ()
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_acd8eab099374e892a1237a6e1e949115}{emit\+\_\+else}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*}if\+\_\+loc)
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_ac07293a572703045be3045dab111fc6f}{emit\+\_\+br}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} depth\+\_\+change)
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_aeb23ef21253294a5ee4aaec2ab2e1681}{emit\+\_\+br\+\_\+if}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} depth\+\_\+change)
+\item 
+auto \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_aca73eb1c213b14defde822d618788a03}{emit\+\_\+br\+\_\+table}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} table\+\_\+size)
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_a7323d06fee2417cf7f67653998886765}{emit\+\_\+call}} (const \mbox{\hyperlink{structsysio_1_1vm_1_1func__type}{func\+\_\+type}} \&ft, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} funcnum)
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_a7d3315b531b477504d267b0bcc484602}{emit\+\_\+call\+\_\+indirect}} (const \mbox{\hyperlink{structsysio_1_1vm_1_1func__type}{func\+\_\+type}} \&ft, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} functypeidx)
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_a18356aa55b68ea9bef3390b1a181193a}{emit\+\_\+drop}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_acecbe90a02181ce946be9fa6f9a68a6f}{emit\+\_\+select}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_a179149056f836ec3fdb770dc919bb02d}{emit\+\_\+get\+\_\+local}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} localidx)
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_a947b269cdc5da587a17e35f7392d9426}{emit\+\_\+set\+\_\+local}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} localidx)
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_a6b338fe08aba6055d6410c490d611674}{emit\+\_\+tee\+\_\+local}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} localidx)
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_aed37dacc27a014e6444998b62d76b910}{emit\+\_\+get\+\_\+global}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} localidx)
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_a1fedef06e59534477dc397b0c8cb1186}{emit\+\_\+set\+\_\+global}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} localidx)
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_a068a95e28f0cadc39d017933420e4c50}{emit\+\_\+current\+\_\+memory}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_aa03f9a827db1f4393b643a92469c3068}{emit\+\_\+grow\+\_\+memory}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_a6e3575b372c228dd807221eec95a3828}{emit\+\_\+i32\+\_\+const}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_ad2d73d173c6fee51d53d1e718f9bc7f6}{emit\+\_\+i64\+\_\+const}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_a6fc714c869a8dc139c40e0822b3f652a}{emit\+\_\+f32\+\_\+const}} (float \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_afabae60fe5d4f25cbe41937f38f14ed4}{emit\+\_\+f64\+\_\+const}} (double \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_a30b7eab83a75f3f302e3da3cb5a4af6b}{emit\+\_\+error}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_aa2dccf54d099c4fcd1a89f6dc473ecf9}{fix\+\_\+branch}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*}branch, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} target)
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_a150f3bb44f8dcc7750350aec303ad296}{emit\+\_\+prologue}} (const \mbox{\hyperlink{structsysio_1_1vm_1_1func__type}{func\+\_\+type}} \&ft, const \mbox{\hyperlink{namespacesysio_1_1vm_a4e7c9f9a80391b4f980c64238a1feaaf}{guarded\+\_\+vector}}$<$ \mbox{\hyperlink{structsysio_1_1vm_1_1local__entry}{local\+\_\+entry}} $>$ \&, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} idx)
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_af43340ef2dc2909e5c45b256ffb09499}{emit\+\_\+epilogue}} (const \mbox{\hyperlink{structsysio_1_1vm_1_1func__type}{func\+\_\+type}} \&ft, const \mbox{\hyperlink{namespacesysio_1_1vm_a4e7c9f9a80391b4f980c64238a1feaaf}{guarded\+\_\+vector}}$<$ \mbox{\hyperlink{structsysio_1_1vm_1_1local__entry}{local\+\_\+entry}} $>$ \&\mbox{\hyperlink{namespacesysio_1_1vm_abc94c8e9af7289dc068a502c63ad98d4a65004f81079422462f2162dcf38954f3}{locals}}, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} idx)
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_af1277c482b1fe1d7ce95dd619429bc78}{finalize}} (\mbox{\hyperlink{structsysio_1_1vm_1_1function__body}{function\+\_\+body}} \&body)
+\item 
+const void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_a9df76ab09cf06a31589dcaaac3d83f5f}{get\+\_\+addr}} () const
+\item 
+const void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_a1655f517469d8bdd6205af5de8c1eff8}{get\+\_\+base\+\_\+addr}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_a17419b78313e438d4cf281d23d92b794}{br\+\_\+table\+\_\+parser}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source_l00014}{14}} of file \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_afdcd089e2f7d7c2e6977231ad602ef83}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!bitcode\_writer@{bitcode\_writer}}
+\index{bitcode\_writer@{bitcode\_writer}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{bitcode\_writer()}{bitcode\_writer()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_afdcd089e2f7d7c2e6977231ad602ef83} 
+sysio\+::vm\+::bitcode\+\_\+writer\+::bitcode\+\_\+writer (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator}{growable\+\_\+allocator}} \&}]{alloc}{, }\item[{std\+::size\+\_\+t}]{source\+\_\+bytes}{, }\item[{\mbox{\hyperlink{structsysio_1_1vm_1_1module}{module}} \&}]{mod}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source_l00022}{22}} of file \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \ \_allocator(alloc),}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \ \_code\_segment\_base(alloc.start\_code()),}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \ fb(alloc,\ source\_bytes),}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \_mod(\&mod)\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_adea070c388103d2252e4435187d8ac22}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!````~bitcode\_writer@{\texorpdfstring{$\sim$}{\string~}bitcode\_writer}}
+\index{````~bitcode\_writer@{\texorpdfstring{$\sim$}{\string~}bitcode\_writer}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}bitcode\_writer()}{\string~bitcode\_writer()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_adea070c388103d2252e4435187d8ac22} 
+sysio\+::vm\+::bitcode\+\_\+writer\+::\texorpdfstring{$\sim$}{\string~}bitcode\+\_\+writer (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source_l00027}{27}} of file \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00027\ \{\ \_allocator.\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_af145745e6a5b2238fa56d6a2f422be51}{end\_code}}<\textcolor{keyword}{false}>(\_code\_segment\_base);\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1vm_1_1bitcode__writer_adea070c388103d2252e4435187d8ac22_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_afdcd089e2f7d7c2e6977231ad602ef83}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!bitcode\_writer@{bitcode\_writer}}
+\index{bitcode\_writer@{bitcode\_writer}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{bitcode\_writer()}{bitcode\_writer()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_afdcd089e2f7d7c2e6977231ad602ef83} 
+sysio\+::vm\+::bitcode\+\_\+writer\+::bitcode\+\_\+writer (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator}{growable\+\_\+allocator}} \&}]{alloc}{, }\item[{std\+::size\+\_\+t}]{source\+\_\+bytes}{, }\item[{\mbox{\hyperlink{structsysio_1_1vm_1_1module}{module}} \&}]{mod}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source_l00022}{22}} of file \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \ \_allocator(alloc),}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \ \_code\_segment\_base(alloc.start\_code()),}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \ fb(alloc,\ source\_bytes),}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \_mod(\&mod)\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_adea070c388103d2252e4435187d8ac22}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!````~bitcode\_writer@{\texorpdfstring{$\sim$}{\string~}bitcode\_writer}}
+\index{````~bitcode\_writer@{\texorpdfstring{$\sim$}{\string~}bitcode\_writer}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}bitcode\_writer()}{\string~bitcode\_writer()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_adea070c388103d2252e4435187d8ac22} 
+sysio\+::vm\+::bitcode\+\_\+writer\+::\texorpdfstring{$\sim$}{\string~}bitcode\+\_\+writer (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source_l00027}{27}} of file \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00027\ \{\ \_allocator.\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_af145745e6a5b2238fa56d6a2f422be51}{end\_code}}<\textcolor{keyword}{false}>(\_code\_segment\_base);\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1vm_1_1bitcode__writer_adea070c388103d2252e4435187d8ac22_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_afd485f2a7fa8fcfa087aa2c69a23e498}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!emit\_block@{emit\_block}}
+\index{emit\_block@{emit\_block}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{emit\_block()}{emit\_block()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_afd485f2a7fa8fcfa087aa2c69a23e498} 
+void sysio\+::vm\+::bitcode\+\_\+writer\+::emit\+\_\+block (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source_l00034}{34}} of file \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00034\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_afd485f2a7fa8fcfa087aa2c69a23e498}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!emit\_block@{emit\_block}}
+\index{emit\_block@{emit\_block}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{emit\_block()}{emit\_block()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_afd485f2a7fa8fcfa087aa2c69a23e498} 
+void sysio\+::vm\+::bitcode\+\_\+writer\+::emit\+\_\+block (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source_l00034}{34}} of file \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00034\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_ac07293a572703045be3045dab111fc6f}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!emit\_br@{emit\_br}}
+\index{emit\_br@{emit\_br}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{emit\_br()}{emit\_br()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_ac07293a572703045be3045dab111fc6f} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*} sysio\+::vm\+::bitcode\+\_\+writer\+::emit\+\_\+br (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{depth\+\_\+change}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source_l00045}{45}} of file \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ instr\ =\ append\_instr(br\_t\{\});}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ instr.data\ =\ depth\_change;}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \&instr.pc;}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=312pt]{classsysio_1_1vm_1_1bitcode__writer_ac07293a572703045be3045dab111fc6f_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_ac07293a572703045be3045dab111fc6f}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!emit\_br@{emit\_br}}
+\index{emit\_br@{emit\_br}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{emit\_br()}{emit\_br()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_ac07293a572703045be3045dab111fc6f} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*} sysio\+::vm\+::bitcode\+\_\+writer\+::emit\+\_\+br (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{depth\+\_\+change}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source_l00045}{45}} of file \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ instr\ =\ append\_instr(br\_t\{\});}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ instr.data\ =\ depth\_change;}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \&instr.pc;}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_aeb23ef21253294a5ee4aaec2ab2e1681}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!emit\_br\_if@{emit\_br\_if}}
+\index{emit\_br\_if@{emit\_br\_if}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{emit\_br\_if()}{emit\_br\_if()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_aeb23ef21253294a5ee4aaec2ab2e1681} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*} sysio\+::vm\+::bitcode\+\_\+writer\+::emit\+\_\+br\+\_\+if (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{depth\+\_\+change}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source_l00050}{50}} of file \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ instr\ =\ append\_instr(br\_if\_t\{\});}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ instr.data\ =\ depth\_change;}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \&instr.pc;}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_aeb23ef21253294a5ee4aaec2ab2e1681}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!emit\_br\_if@{emit\_br\_if}}
+\index{emit\_br\_if@{emit\_br\_if}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{emit\_br\_if()}{emit\_br\_if()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_aeb23ef21253294a5ee4aaec2ab2e1681} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*} sysio\+::vm\+::bitcode\+\_\+writer\+::emit\+\_\+br\+\_\+if (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{depth\+\_\+change}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source_l00050}{50}} of file \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ instr\ =\ append\_instr(br\_if\_t\{\});}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ instr.data\ =\ depth\_change;}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \&instr.pc;}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_aca73eb1c213b14defde822d618788a03}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!emit\_br\_table@{emit\_br\_table}}
+\index{emit\_br\_table@{emit\_br\_table}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{emit\_br\_table()}{emit\_br\_table()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_aca73eb1c213b14defde822d618788a03} 
+auto sysio\+::vm\+::bitcode\+\_\+writer\+::emit\+\_\+br\+\_\+table (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{table\+\_\+size}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source_l00091}{91}} of file \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00091\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_a17419b78313e438d4cf281d23d92b794}{br\_table\_parser}}\{\ *\textcolor{keyword}{this},\ table\_size\ \};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_aca73eb1c213b14defde822d618788a03}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!emit\_br\_table@{emit\_br\_table}}
+\index{emit\_br\_table@{emit\_br\_table}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{emit\_br\_table()}{emit\_br\_table()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_aca73eb1c213b14defde822d618788a03} 
+auto sysio\+::vm\+::bitcode\+\_\+writer\+::emit\+\_\+br\+\_\+table (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{table\+\_\+size}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source_l00091}{91}} of file \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00091\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_a17419b78313e438d4cf281d23d92b794}{br\_table\_parser}}\{\ *\textcolor{keyword}{this},\ table\_size\ \};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_a7323d06fee2417cf7f67653998886765}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!emit\_call@{emit\_call}}
+\index{emit\_call@{emit\_call}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{emit\_call()}{emit\_call()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_a7323d06fee2417cf7f67653998886765} 
+void sysio\+::vm\+::bitcode\+\_\+writer\+::emit\+\_\+call (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1vm_1_1func__type}{func\+\_\+type}} \&}]{ft}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{funcnum}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source_l00092}{92}} of file \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00092\ \{\ fb[op\_index++]\ =\ call\_t\{\ funcnum\ \};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_a7323d06fee2417cf7f67653998886765}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!emit\_call@{emit\_call}}
+\index{emit\_call@{emit\_call}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{emit\_call()}{emit\_call()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_a7323d06fee2417cf7f67653998886765} 
+void sysio\+::vm\+::bitcode\+\_\+writer\+::emit\+\_\+call (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1vm_1_1func__type}{func\+\_\+type}} \&}]{ft}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{funcnum}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source_l00092}{92}} of file \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00092\ \{\ fb[op\_index++]\ =\ call\_t\{\ funcnum\ \};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_a7d3315b531b477504d267b0bcc484602}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!emit\_call\_indirect@{emit\_call\_indirect}}
+\index{emit\_call\_indirect@{emit\_call\_indirect}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{emit\_call\_indirect()}{emit\_call\_indirect()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_a7d3315b531b477504d267b0bcc484602} 
+void sysio\+::vm\+::bitcode\+\_\+writer\+::emit\+\_\+call\+\_\+indirect (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1vm_1_1func__type}{func\+\_\+type}} \&}]{ft}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{functypeidx}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source_l00093}{93}} of file \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00093\ \{\ fb[op\_index++]\ =\ call\_indirect\_t\{\ functypeidx\ \};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_a7d3315b531b477504d267b0bcc484602}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!emit\_call\_indirect@{emit\_call\_indirect}}
+\index{emit\_call\_indirect@{emit\_call\_indirect}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{emit\_call\_indirect()}{emit\_call\_indirect()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_a7d3315b531b477504d267b0bcc484602} 
+void sysio\+::vm\+::bitcode\+\_\+writer\+::emit\+\_\+call\+\_\+indirect (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1vm_1_1func__type}{func\+\_\+type}} \&}]{ft}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{functypeidx}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source_l00093}{93}} of file \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00093\ \{\ fb[op\_index++]\ =\ call\_indirect\_t\{\ functypeidx\ \};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_a068a95e28f0cadc39d017933420e4c50}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!emit\_current\_memory@{emit\_current\_memory}}
+\index{emit\_current\_memory@{emit\_current\_memory}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{emit\_current\_memory()}{emit\_current\_memory()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_a068a95e28f0cadc39d017933420e4c50} 
+void sysio\+::vm\+::bitcode\+\_\+writer\+::emit\+\_\+current\+\_\+memory (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source_l00135}{135}} of file \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00135\ \{\ fb[op\_index++]\ =\ current\_memory\_t\{\};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_a068a95e28f0cadc39d017933420e4c50}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!emit\_current\_memory@{emit\_current\_memory}}
+\index{emit\_current\_memory@{emit\_current\_memory}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{emit\_current\_memory()}{emit\_current\_memory()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_a068a95e28f0cadc39d017933420e4c50} 
+void sysio\+::vm\+::bitcode\+\_\+writer\+::emit\+\_\+current\+\_\+memory (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source_l00135}{135}} of file \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00135\ \{\ fb[op\_index++]\ =\ current\_memory\_t\{\};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_a18356aa55b68ea9bef3390b1a181193a}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!emit\_drop@{emit\_drop}}
+\index{emit\_drop@{emit\_drop}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{emit\_drop()}{emit\_drop()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_a18356aa55b68ea9bef3390b1a181193a} 
+void sysio\+::vm\+::bitcode\+\_\+writer\+::emit\+\_\+drop (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source_l00096}{96}} of file \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00096\ \{\ fb[op\_index++]\ =\ drop\_t\{\};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_a18356aa55b68ea9bef3390b1a181193a}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!emit\_drop@{emit\_drop}}
+\index{emit\_drop@{emit\_drop}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{emit\_drop()}{emit\_drop()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_a18356aa55b68ea9bef3390b1a181193a} 
+void sysio\+::vm\+::bitcode\+\_\+writer\+::emit\+\_\+drop (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source_l00096}{96}} of file \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00096\ \{\ fb[op\_index++]\ =\ drop\_t\{\};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_acd8eab099374e892a1237a6e1e949115}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!emit\_else@{emit\_else}}
+\index{emit\_else@{emit\_else}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{emit\_else()}{emit\_else()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_acd8eab099374e892a1237a6e1e949115} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*} sysio\+::vm\+::bitcode\+\_\+writer\+::emit\+\_\+else (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{if\+\_\+loc}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source_l00040}{40}} of file \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ else\_\ =\ append\_instr(else\_t\{\});}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ *if\_loc\ =\ \_base\_offset\ +\ op\_index;}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \&else\_.pc;}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_acd8eab099374e892a1237a6e1e949115}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!emit\_else@{emit\_else}}
+\index{emit\_else@{emit\_else}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{emit\_else()}{emit\_else()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_acd8eab099374e892a1237a6e1e949115} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*} sysio\+::vm\+::bitcode\+\_\+writer\+::emit\+\_\+else (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{if\+\_\+loc}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source_l00040}{40}} of file \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ else\_\ =\ append\_instr(else\_t\{\});}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ *if\_loc\ =\ \_base\_offset\ +\ op\_index;}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \&else\_.pc;}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_ac9975344433da6ee4f744970384d362b}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!emit\_end@{emit\_end}}
+\index{emit\_end@{emit\_end}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{emit\_end()}{emit\_end()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_ac9975344433da6ee4f744970384d362b} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::vm\+::bitcode\+\_\+writer\+::emit\+\_\+end (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source_l00030}{30}} of file \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00030\ \{\ \textcolor{keywordflow}{return}\ op\_index;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_ac9975344433da6ee4f744970384d362b}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!emit\_end@{emit\_end}}
+\index{emit\_end@{emit\_end}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{emit\_end()}{emit\_end()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_ac9975344433da6ee4f744970384d362b} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::vm\+::bitcode\+\_\+writer\+::emit\+\_\+end (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source_l00030}{30}} of file \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00030\ \{\ \textcolor{keywordflow}{return}\ op\_index;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_af43340ef2dc2909e5c45b256ffb09499}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!emit\_epilogue@{emit\_epilogue}}
+\index{emit\_epilogue@{emit\_epilogue}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{emit\_epilogue()}{emit\_epilogue()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_af43340ef2dc2909e5c45b256ffb09499} 
+void sysio\+::vm\+::bitcode\+\_\+writer\+::emit\+\_\+epilogue (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1vm_1_1func__type}{func\+\_\+type}} \&}]{ft}{, }\item[{const \mbox{\hyperlink{namespacesysio_1_1vm_a4e7c9f9a80391b4f980c64238a1feaaf}{guarded\+\_\+vector}}$<$ \mbox{\hyperlink{structsysio_1_1vm_1_1local__entry}{local\+\_\+entry}} $>$ \&}]{locals}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{idx}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source_l00288}{288}} of file \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00288\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00289\ \ \ \ \ \ \ \ \ \ fb.resize(op\_index\ +\ 1);}
+\DoxyCodeLine{00290\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ locals\_count\ =\ 0;}
+\DoxyCodeLine{00291\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{namespacesysio_1_1vm_abc94c8e9af7289dc068a502c63ad98d4a65004f81079422462f2162dcf38954f3}{locals}}.size();\ ++i)\ \{}
+\DoxyCodeLine{00292\ \ \ \ \ \ \ \ \ \ \ \ \ locals\_count\ +=\ \mbox{\hyperlink{namespacesysio_1_1vm_abc94c8e9af7289dc068a502c63ad98d4a65004f81079422462f2162dcf38954f3}{locals}}[i].count;}
+\DoxyCodeLine{00293\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00294\ \ \ \ \ \ \ \ \ \ fb[fb.size()\ -\/\ 1]\ =\ return\_t\{\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\textcolor{keyword}{>}(locals\_count\ +\ ft.param\_types.size()),\ ft.return\_count,\ 0,\ 0\ \};}
+\DoxyCodeLine{00295\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_af43340ef2dc2909e5c45b256ffb09499}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!emit\_epilogue@{emit\_epilogue}}
+\index{emit\_epilogue@{emit\_epilogue}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{emit\_epilogue()}{emit\_epilogue()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_af43340ef2dc2909e5c45b256ffb09499} 
+void sysio\+::vm\+::bitcode\+\_\+writer\+::emit\+\_\+epilogue (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1vm_1_1func__type}{func\+\_\+type}} \&}]{ft}{, }\item[{const \mbox{\hyperlink{namespacesysio_1_1vm_a4e7c9f9a80391b4f980c64238a1feaaf}{guarded\+\_\+vector}}$<$ \mbox{\hyperlink{structsysio_1_1vm_1_1local__entry}{local\+\_\+entry}} $>$ \&}]{locals}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{idx}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source_l00288}{288}} of file \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00288\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00289\ \ \ \ \ \ \ \ \ \ fb.resize(op\_index\ +\ 1);}
+\DoxyCodeLine{00290\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ locals\_count\ =\ 0;}
+\DoxyCodeLine{00291\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{namespacesysio_1_1vm_abc94c8e9af7289dc068a502c63ad98d4a65004f81079422462f2162dcf38954f3}{locals}}.size();\ ++i)\ \{}
+\DoxyCodeLine{00292\ \ \ \ \ \ \ \ \ \ \ \ \ locals\_count\ +=\ \mbox{\hyperlink{namespacesysio_1_1vm_abc94c8e9af7289dc068a502c63ad98d4a65004f81079422462f2162dcf38954f3}{locals}}[i].count;}
+\DoxyCodeLine{00293\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00294\ \ \ \ \ \ \ \ \ \ fb[fb.size()\ -\/\ 1]\ =\ return\_t\{\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\textcolor{keyword}{>}(locals\_count\ +\ ft.param\_types.size()),\ ft.return\_count,\ 0,\ 0\ \};}
+\DoxyCodeLine{00295\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_a30b7eab83a75f3f302e3da3cb5a4af6b}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!emit\_error@{emit\_error}}
+\index{emit\_error@{emit\_error}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{emit\_error()}{emit\_error()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_a30b7eab83a75f3f302e3da3cb5a4af6b} 
+void sysio\+::vm\+::bitcode\+\_\+writer\+::emit\+\_\+error (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source_l00280}{280}} of file \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00280\ \{\ fb[op\_index++]\ =\ error\_t\{\};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_a30b7eab83a75f3f302e3da3cb5a4af6b}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!emit\_error@{emit\_error}}
+\index{emit\_error@{emit\_error}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{emit\_error()}{emit\_error()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_a30b7eab83a75f3f302e3da3cb5a4af6b} 
+void sysio\+::vm\+::bitcode\+\_\+writer\+::emit\+\_\+error (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source_l00280}{280}} of file \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00280\ \{\ fb[op\_index++]\ =\ error\_t\{\};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_a6fc714c869a8dc139c40e0822b3f652a}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!emit\_f32\_const@{emit\_f32\_const}}
+\index{emit\_f32\_const@{emit\_f32\_const}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{emit\_f32\_const()}{emit\_f32\_const()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_a6fc714c869a8dc139c40e0822b3f652a} 
+void sysio\+::vm\+::bitcode\+\_\+writer\+::emit\+\_\+f32\+\_\+const (\begin{DoxyParamCaption}\item[{float}]{value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source_l00140}{140}} of file \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00140\ \{\ fb[op\_index++]\ =\ f32\_const\_t\{\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ \};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_a6fc714c869a8dc139c40e0822b3f652a}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!emit\_f32\_const@{emit\_f32\_const}}
+\index{emit\_f32\_const@{emit\_f32\_const}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{emit\_f32\_const()}{emit\_f32\_const()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_a6fc714c869a8dc139c40e0822b3f652a} 
+void sysio\+::vm\+::bitcode\+\_\+writer\+::emit\+\_\+f32\+\_\+const (\begin{DoxyParamCaption}\item[{float}]{value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source_l00140}{140}} of file \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00140\ \{\ fb[op\_index++]\ =\ f32\_const\_t\{\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ \};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_afabae60fe5d4f25cbe41937f38f14ed4}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!emit\_f64\_const@{emit\_f64\_const}}
+\index{emit\_f64\_const@{emit\_f64\_const}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{emit\_f64\_const()}{emit\_f64\_const()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_afabae60fe5d4f25cbe41937f38f14ed4} 
+void sysio\+::vm\+::bitcode\+\_\+writer\+::emit\+\_\+f64\+\_\+const (\begin{DoxyParamCaption}\item[{double}]{value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source_l00141}{141}} of file \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00141\ \{\ fb[op\_index++]\ =\ f64\_const\_t\{\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ \};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_afabae60fe5d4f25cbe41937f38f14ed4}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!emit\_f64\_const@{emit\_f64\_const}}
+\index{emit\_f64\_const@{emit\_f64\_const}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{emit\_f64\_const()}{emit\_f64\_const()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_afabae60fe5d4f25cbe41937f38f14ed4} 
+void sysio\+::vm\+::bitcode\+\_\+writer\+::emit\+\_\+f64\+\_\+const (\begin{DoxyParamCaption}\item[{double}]{value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source_l00141}{141}} of file \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00141\ \{\ fb[op\_index++]\ =\ f64\_const\_t\{\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ \};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_aed37dacc27a014e6444998b62d76b910}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!emit\_get\_global@{emit\_get\_global}}
+\index{emit\_get\_global@{emit\_get\_global}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{emit\_get\_global()}{emit\_get\_global()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_aed37dacc27a014e6444998b62d76b910} 
+void sysio\+::vm\+::bitcode\+\_\+writer\+::emit\+\_\+get\+\_\+global (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{localidx}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source_l00101}{101}} of file \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00101\ \{\ fb[op\_index++]\ =\ get\_global\_t\{localidx\};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_aed37dacc27a014e6444998b62d76b910}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!emit\_get\_global@{emit\_get\_global}}
+\index{emit\_get\_global@{emit\_get\_global}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{emit\_get\_global()}{emit\_get\_global()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_aed37dacc27a014e6444998b62d76b910} 
+void sysio\+::vm\+::bitcode\+\_\+writer\+::emit\+\_\+get\+\_\+global (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{localidx}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source_l00101}{101}} of file \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00101\ \{\ fb[op\_index++]\ =\ get\_global\_t\{localidx\};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_a179149056f836ec3fdb770dc919bb02d}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!emit\_get\_local@{emit\_get\_local}}
+\index{emit\_get\_local@{emit\_get\_local}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{emit\_get\_local()}{emit\_get\_local()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_a179149056f836ec3fdb770dc919bb02d} 
+void sysio\+::vm\+::bitcode\+\_\+writer\+::emit\+\_\+get\+\_\+local (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{localidx}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source_l00098}{98}} of file \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00098\ \{\ fb[op\_index++]\ =\ get\_local\_t\{localidx\};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_a179149056f836ec3fdb770dc919bb02d}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!emit\_get\_local@{emit\_get\_local}}
+\index{emit\_get\_local@{emit\_get\_local}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{emit\_get\_local()}{emit\_get\_local()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_a179149056f836ec3fdb770dc919bb02d} 
+void sysio\+::vm\+::bitcode\+\_\+writer\+::emit\+\_\+get\+\_\+local (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{localidx}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source_l00098}{98}} of file \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00098\ \{\ fb[op\_index++]\ =\ get\_local\_t\{localidx\};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_aa03f9a827db1f4393b643a92469c3068}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!emit\_grow\_memory@{emit\_grow\_memory}}
+\index{emit\_grow\_memory@{emit\_grow\_memory}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{emit\_grow\_memory()}{emit\_grow\_memory()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_aa03f9a827db1f4393b643a92469c3068} 
+void sysio\+::vm\+::bitcode\+\_\+writer\+::emit\+\_\+grow\+\_\+memory (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source_l00136}{136}} of file \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00136\ \{\ fb[op\_index++]\ =\ grow\_memory\_t\{\};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_aa03f9a827db1f4393b643a92469c3068}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!emit\_grow\_memory@{emit\_grow\_memory}}
+\index{emit\_grow\_memory@{emit\_grow\_memory}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{emit\_grow\_memory()}{emit\_grow\_memory()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_aa03f9a827db1f4393b643a92469c3068} 
+void sysio\+::vm\+::bitcode\+\_\+writer\+::emit\+\_\+grow\+\_\+memory (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source_l00136}{136}} of file \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00136\ \{\ fb[op\_index++]\ =\ grow\_memory\_t\{\};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_a6e3575b372c228dd807221eec95a3828}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!emit\_i32\_const@{emit\_i32\_const}}
+\index{emit\_i32\_const@{emit\_i32\_const}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{emit\_i32\_const()}{emit\_i32\_const()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_a6e3575b372c228dd807221eec95a3828} 
+void sysio\+::vm\+::bitcode\+\_\+writer\+::emit\+\_\+i32\+\_\+const (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source_l00138}{138}} of file \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00138\ \{\ fb[op\_index++]\ =\ i32\_const\_t\{\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ \};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_a6e3575b372c228dd807221eec95a3828}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!emit\_i32\_const@{emit\_i32\_const}}
+\index{emit\_i32\_const@{emit\_i32\_const}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{emit\_i32\_const()}{emit\_i32\_const()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_a6e3575b372c228dd807221eec95a3828} 
+void sysio\+::vm\+::bitcode\+\_\+writer\+::emit\+\_\+i32\+\_\+const (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source_l00138}{138}} of file \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00138\ \{\ fb[op\_index++]\ =\ i32\_const\_t\{\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ \};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_ad2d73d173c6fee51d53d1e718f9bc7f6}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!emit\_i64\_const@{emit\_i64\_const}}
+\index{emit\_i64\_const@{emit\_i64\_const}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{emit\_i64\_const()}{emit\_i64\_const()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_ad2d73d173c6fee51d53d1e718f9bc7f6} 
+void sysio\+::vm\+::bitcode\+\_\+writer\+::emit\+\_\+i64\+\_\+const (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source_l00139}{139}} of file \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00139\ \{\ fb[op\_index++]\ =\ i64\_const\_t\{\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ \};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_ad2d73d173c6fee51d53d1e718f9bc7f6}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!emit\_i64\_const@{emit\_i64\_const}}
+\index{emit\_i64\_const@{emit\_i64\_const}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{emit\_i64\_const()}{emit\_i64\_const()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_ad2d73d173c6fee51d53d1e718f9bc7f6} 
+void sysio\+::vm\+::bitcode\+\_\+writer\+::emit\+\_\+i64\+\_\+const (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source_l00139}{139}} of file \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00139\ \{\ fb[op\_index++]\ =\ i64\_const\_t\{\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ \};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_a8215d8d275e92d349d657117ec456498}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!emit\_if@{emit\_if}}
+\index{emit\_if@{emit\_if}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{emit\_if()}{emit\_if()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_a8215d8d275e92d349d657117ec456498} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*} sysio\+::vm\+::bitcode\+\_\+writer\+::emit\+\_\+if (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source_l00036}{36}} of file \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ }
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ if\_t\&\ instr\ =\ append\_instr(if\_t\{\});}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \&instr.pc;}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_a8215d8d275e92d349d657117ec456498}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!emit\_if@{emit\_if}}
+\index{emit\_if@{emit\_if}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{emit\_if()}{emit\_if()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_a8215d8d275e92d349d657117ec456498} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*} sysio\+::vm\+::bitcode\+\_\+writer\+::emit\+\_\+if (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source_l00036}{36}} of file \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ }
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ if\_t\&\ instr\ =\ append\_instr(if\_t\{\});}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \&instr.pc;}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_a7ed89066a2c715dde18ee3771aed8f66}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!emit\_loop@{emit\_loop}}
+\index{emit\_loop@{emit\_loop}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{emit\_loop()}{emit\_loop()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_a7ed89066a2c715dde18ee3771aed8f66} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::vm\+::bitcode\+\_\+writer\+::emit\+\_\+loop (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source_l00035}{35}} of file \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00035\ \{\ \textcolor{keywordflow}{return}\ op\_index;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_a7ed89066a2c715dde18ee3771aed8f66}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!emit\_loop@{emit\_loop}}
+\index{emit\_loop@{emit\_loop}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{emit\_loop()}{emit\_loop()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_a7ed89066a2c715dde18ee3771aed8f66} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::vm\+::bitcode\+\_\+writer\+::emit\+\_\+loop (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source_l00035}{35}} of file \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00035\ \{\ \textcolor{keywordflow}{return}\ op\_index;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_ac6ca7c0c176d103c26af2f3d6a167cc2}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!emit\_nop@{emit\_nop}}
+\index{emit\_nop@{emit\_nop}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{emit\_nop()}{emit\_nop()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_ac6ca7c0c176d103c26af2f3d6a167cc2} 
+void sysio\+::vm\+::bitcode\+\_\+writer\+::emit\+\_\+nop (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source_l00029}{29}} of file \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00029\ \{\ fb[op\_index++]\ =\ nop\_t\{\};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_ac6ca7c0c176d103c26af2f3d6a167cc2}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!emit\_nop@{emit\_nop}}
+\index{emit\_nop@{emit\_nop}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{emit\_nop()}{emit\_nop()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_ac6ca7c0c176d103c26af2f3d6a167cc2} 
+void sysio\+::vm\+::bitcode\+\_\+writer\+::emit\+\_\+nop (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source_l00029}{29}} of file \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00029\ \{\ fb[op\_index++]\ =\ nop\_t\{\};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_a150f3bb44f8dcc7750350aec303ad296}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!emit\_prologue@{emit\_prologue}}
+\index{emit\_prologue@{emit\_prologue}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{emit\_prologue()}{emit\_prologue()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_a150f3bb44f8dcc7750350aec303ad296} 
+void sysio\+::vm\+::bitcode\+\_\+writer\+::emit\+\_\+prologue (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1vm_1_1func__type}{func\+\_\+type}} \&}]{ft}{, }\item[{const \mbox{\hyperlink{namespacesysio_1_1vm_a4e7c9f9a80391b4f980c64238a1feaaf}{guarded\+\_\+vector}}$<$ \mbox{\hyperlink{structsysio_1_1vm_1_1local__entry}{local\+\_\+entry}} $>$ \&}]{}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{idx}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source_l00283}{283}} of file \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00283\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00284\ \ \ \ \ \ \ \ \ \ op\_index\ =\ 0;}
+\DoxyCodeLine{00285\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ pre-\/allocate\ for\ the\ function\ body\ code,\ so\ we\ have\ a\ big\ blob\ of\ memory\ to\ work\ with\ during\ function\ code\ parsing}}
+\DoxyCodeLine{00286\ \ \ \ \ \ \ \ \ \ fb\ =\ \mbox{\hyperlink{namespacesysio_1_1vm_a4e7c9f9a80391b4f980c64238a1feaaf}{guarded\_vector<opcode>}}\{\_allocator,\ \_mod-\/>\mbox{\hyperlink{structsysio_1_1vm_1_1module_ad3e101bc4e1e2c50ecee2c3eb7b049f3}{code}}[\mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}].size\ \};}
+\DoxyCodeLine{00287\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_a150f3bb44f8dcc7750350aec303ad296}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!emit\_prologue@{emit\_prologue}}
+\index{emit\_prologue@{emit\_prologue}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{emit\_prologue()}{emit\_prologue()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_a150f3bb44f8dcc7750350aec303ad296} 
+void sysio\+::vm\+::bitcode\+\_\+writer\+::emit\+\_\+prologue (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1vm_1_1func__type}{func\+\_\+type}} \&}]{ft}{, }\item[{const \mbox{\hyperlink{namespacesysio_1_1vm_a4e7c9f9a80391b4f980c64238a1feaaf}{guarded\+\_\+vector}}$<$ \mbox{\hyperlink{structsysio_1_1vm_1_1local__entry}{local\+\_\+entry}} $>$ \&}]{}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{idx}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source_l00283}{283}} of file \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00283\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00284\ \ \ \ \ \ \ \ \ \ op\_index\ =\ 0;}
+\DoxyCodeLine{00285\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ pre-\/allocate\ for\ the\ function\ body\ code,\ so\ we\ have\ a\ big\ blob\ of\ memory\ to\ work\ with\ during\ function\ code\ parsing}}
+\DoxyCodeLine{00286\ \ \ \ \ \ \ \ \ \ fb\ =\ \mbox{\hyperlink{namespacesysio_1_1vm_a4e7c9f9a80391b4f980c64238a1feaaf}{guarded\_vector<opcode>}}\{\_allocator,\ \_mod-\/>\mbox{\hyperlink{structsysio_1_1vm_1_1module_ad3e101bc4e1e2c50ecee2c3eb7b049f3}{code}}[\mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}].size\ \};}
+\DoxyCodeLine{00287\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_af2df56948c13567acd8420bd3005c1e3}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!emit\_return@{emit\_return}}
+\index{emit\_return@{emit\_return}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{emit\_return()}{emit\_return()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_af2df56948c13567acd8420bd3005c1e3} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*} sysio\+::vm\+::bitcode\+\_\+writer\+::emit\+\_\+return (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{depth\+\_\+change}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source_l00031}{31}} of file \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_ac07293a572703045be3045dab111fc6f}{emit\_br}}(depth\_change);}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=312pt]{classsysio_1_1vm_1_1bitcode__writer_af2df56948c13567acd8420bd3005c1e3_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_af2df56948c13567acd8420bd3005c1e3}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!emit\_return@{emit\_return}}
+\index{emit\_return@{emit\_return}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{emit\_return()}{emit\_return()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_af2df56948c13567acd8420bd3005c1e3} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*} sysio\+::vm\+::bitcode\+\_\+writer\+::emit\+\_\+return (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{depth\+\_\+change}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source_l00031}{31}} of file \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer_ac07293a572703045be3045dab111fc6f}{emit\_br}}(depth\_change);}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=312pt]{classsysio_1_1vm_1_1bitcode__writer_af2df56948c13567acd8420bd3005c1e3_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_acecbe90a02181ce946be9fa6f9a68a6f}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!emit\_select@{emit\_select}}
+\index{emit\_select@{emit\_select}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{emit\_select()}{emit\_select()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_acecbe90a02181ce946be9fa6f9a68a6f} 
+void sysio\+::vm\+::bitcode\+\_\+writer\+::emit\+\_\+select (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source_l00097}{97}} of file \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00097\ \{\ fb[op\_index++]\ =\ select\_t\{\};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_acecbe90a02181ce946be9fa6f9a68a6f}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!emit\_select@{emit\_select}}
+\index{emit\_select@{emit\_select}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{emit\_select()}{emit\_select()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_acecbe90a02181ce946be9fa6f9a68a6f} 
+void sysio\+::vm\+::bitcode\+\_\+writer\+::emit\+\_\+select (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source_l00097}{97}} of file \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00097\ \{\ fb[op\_index++]\ =\ select\_t\{\};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_a1fedef06e59534477dc397b0c8cb1186}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!emit\_set\_global@{emit\_set\_global}}
+\index{emit\_set\_global@{emit\_set\_global}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{emit\_set\_global()}{emit\_set\_global()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_a1fedef06e59534477dc397b0c8cb1186} 
+void sysio\+::vm\+::bitcode\+\_\+writer\+::emit\+\_\+set\+\_\+global (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{localidx}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source_l00102}{102}} of file \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00102\ \{\ fb[op\_index++]\ =\ set\_global\_t\{localidx\};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_a1fedef06e59534477dc397b0c8cb1186}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!emit\_set\_global@{emit\_set\_global}}
+\index{emit\_set\_global@{emit\_set\_global}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{emit\_set\_global()}{emit\_set\_global()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_a1fedef06e59534477dc397b0c8cb1186} 
+void sysio\+::vm\+::bitcode\+\_\+writer\+::emit\+\_\+set\+\_\+global (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{localidx}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source_l00102}{102}} of file \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00102\ \{\ fb[op\_index++]\ =\ set\_global\_t\{localidx\};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_a947b269cdc5da587a17e35f7392d9426}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!emit\_set\_local@{emit\_set\_local}}
+\index{emit\_set\_local@{emit\_set\_local}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{emit\_set\_local()}{emit\_set\_local()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_a947b269cdc5da587a17e35f7392d9426} 
+void sysio\+::vm\+::bitcode\+\_\+writer\+::emit\+\_\+set\+\_\+local (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{localidx}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source_l00099}{99}} of file \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00099\ \{\ fb[op\_index++]\ =\ set\_local\_t\{localidx\};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_a947b269cdc5da587a17e35f7392d9426}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!emit\_set\_local@{emit\_set\_local}}
+\index{emit\_set\_local@{emit\_set\_local}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{emit\_set\_local()}{emit\_set\_local()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_a947b269cdc5da587a17e35f7392d9426} 
+void sysio\+::vm\+::bitcode\+\_\+writer\+::emit\+\_\+set\+\_\+local (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{localidx}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source_l00099}{99}} of file \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00099\ \{\ fb[op\_index++]\ =\ set\_local\_t\{localidx\};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_a6b338fe08aba6055d6410c490d611674}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!emit\_tee\_local@{emit\_tee\_local}}
+\index{emit\_tee\_local@{emit\_tee\_local}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{emit\_tee\_local()}{emit\_tee\_local()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_a6b338fe08aba6055d6410c490d611674} 
+void sysio\+::vm\+::bitcode\+\_\+writer\+::emit\+\_\+tee\+\_\+local (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{localidx}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source_l00100}{100}} of file \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00100\ \{\ fb[op\_index++]\ =\ tee\_local\_t\{localidx\};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_a6b338fe08aba6055d6410c490d611674}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!emit\_tee\_local@{emit\_tee\_local}}
+\index{emit\_tee\_local@{emit\_tee\_local}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{emit\_tee\_local()}{emit\_tee\_local()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_a6b338fe08aba6055d6410c490d611674} 
+void sysio\+::vm\+::bitcode\+\_\+writer\+::emit\+\_\+tee\+\_\+local (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{localidx}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source_l00100}{100}} of file \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00100\ \{\ fb[op\_index++]\ =\ tee\_local\_t\{localidx\};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_af73cd50ca93e12e930a26f1786bf6253}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!emit\_unreachable@{emit\_unreachable}}
+\index{emit\_unreachable@{emit\_unreachable}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{emit\_unreachable()}{emit\_unreachable()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_af73cd50ca93e12e930a26f1786bf6253} 
+void sysio\+::vm\+::bitcode\+\_\+writer\+::emit\+\_\+unreachable (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source_l00028}{28}} of file \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00028\ \{\ fb[op\_index++]\ =\ unreachable\_t\{\};\ \};}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_af73cd50ca93e12e930a26f1786bf6253}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!emit\_unreachable@{emit\_unreachable}}
+\index{emit\_unreachable@{emit\_unreachable}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{emit\_unreachable()}{emit\_unreachable()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_af73cd50ca93e12e930a26f1786bf6253} 
+void sysio\+::vm\+::bitcode\+\_\+writer\+::emit\+\_\+unreachable (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source_l00028}{28}} of file \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00028\ \{\ fb[op\_index++]\ =\ unreachable\_t\{\};\ \};}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_af1277c482b1fe1d7ce95dd619429bc78}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!finalize@{finalize}}
+\index{finalize@{finalize}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{finalize()}{finalize()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_af1277c482b1fe1d7ce95dd619429bc78} 
+void sysio\+::vm\+::bitcode\+\_\+writer\+::finalize (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1vm_1_1function__body}{function\+\_\+body}} \&}]{body}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source_l00297}{297}} of file \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00297\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00298\ \ \ \ \ \ \ \ \ \ op\_index++;}
+\DoxyCodeLine{00299\ \ \ \ \ \ \ \ \ \ fb.resize(op\_index);}
+\DoxyCodeLine{00300\ \ \ \ \ \ \ \ \ \ body.code\ =\ fb.raw();}
+\DoxyCodeLine{00301\ \ \ \ \ \ \ \ \ \ body.size\ =\ op\_index;}
+\DoxyCodeLine{00302\ \ \ \ \ \ \ \ \ \ \_base\_offset\ +=\ body.size;}
+\DoxyCodeLine{00303\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_af1277c482b1fe1d7ce95dd619429bc78}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!finalize@{finalize}}
+\index{finalize@{finalize}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{finalize()}{finalize()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_af1277c482b1fe1d7ce95dd619429bc78} 
+void sysio\+::vm\+::bitcode\+\_\+writer\+::finalize (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1vm_1_1function__body}{function\+\_\+body}} \&}]{body}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source_l00297}{297}} of file \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00297\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00298\ \ \ \ \ \ \ \ \ \ op\_index++;}
+\DoxyCodeLine{00299\ \ \ \ \ \ \ \ \ \ fb.resize(op\_index);}
+\DoxyCodeLine{00300\ \ \ \ \ \ \ \ \ \ body.code\ =\ fb.raw();}
+\DoxyCodeLine{00301\ \ \ \ \ \ \ \ \ \ body.size\ =\ op\_index;}
+\DoxyCodeLine{00302\ \ \ \ \ \ \ \ \ \ \_base\_offset\ +=\ body.size;}
+\DoxyCodeLine{00303\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_aa2dccf54d099c4fcd1a89f6dc473ecf9}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!fix\_branch@{fix\_branch}}
+\index{fix\_branch@{fix\_branch}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{fix\_branch()}{fix\_branch()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_aa2dccf54d099c4fcd1a89f6dc473ecf9} 
+void sysio\+::vm\+::bitcode\+\_\+writer\+::fix\+\_\+branch (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{branch}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{target}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source_l00282}{282}} of file \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00282\ \{\ \textcolor{keywordflow}{if}(branch)\ *branch\ =\ \_base\_offset\ +\ target;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_aa2dccf54d099c4fcd1a89f6dc473ecf9}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!fix\_branch@{fix\_branch}}
+\index{fix\_branch@{fix\_branch}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{fix\_branch()}{fix\_branch()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_aa2dccf54d099c4fcd1a89f6dc473ecf9} 
+void sysio\+::vm\+::bitcode\+\_\+writer\+::fix\+\_\+branch (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{branch}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{target}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source_l00282}{282}} of file \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00282\ \{\ \textcolor{keywordflow}{if}(branch)\ *branch\ =\ \_base\_offset\ +\ target;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_a9df76ab09cf06a31589dcaaac3d83f5f}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!get\_addr@{get\_addr}}
+\index{get\_addr@{get\_addr}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{get\_addr()}{get\_addr()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_a9df76ab09cf06a31589dcaaac3d83f5f} 
+const void \texorpdfstring{$\ast$}{*} sysio\+::vm\+::bitcode\+\_\+writer\+::get\+\_\+addr (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source_l00305}{305}} of file \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00305\ \{\ \textcolor{keywordflow}{return}\ fb.raw()\ +\ op\_index;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_a9df76ab09cf06a31589dcaaac3d83f5f}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!get\_addr@{get\_addr}}
+\index{get\_addr@{get\_addr}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{get\_addr()}{get\_addr()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_a9df76ab09cf06a31589dcaaac3d83f5f} 
+const void \texorpdfstring{$\ast$}{*} sysio\+::vm\+::bitcode\+\_\+writer\+::get\+\_\+addr (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source_l00305}{305}} of file \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00305\ \{\ \textcolor{keywordflow}{return}\ fb.raw()\ +\ op\_index;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_a1655f517469d8bdd6205af5de8c1eff8}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!get\_base\_addr@{get\_base\_addr}}
+\index{get\_base\_addr@{get\_base\_addr}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{get\_base\_addr()}{get\_base\_addr()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_a1655f517469d8bdd6205af5de8c1eff8} 
+const void \texorpdfstring{$\ast$}{*} sysio\+::vm\+::bitcode\+\_\+writer\+::get\+\_\+base\+\_\+addr (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source_l00306}{306}} of file \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00306\ \{\ \textcolor{keywordflow}{return}\ \_code\_segment\_base;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_a1655f517469d8bdd6205af5de8c1eff8}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!get\_base\_addr@{get\_base\_addr}}
+\index{get\_base\_addr@{get\_base\_addr}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{get\_base\_addr()}{get\_base\_addr()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_a1655f517469d8bdd6205af5de8c1eff8} 
+const void \texorpdfstring{$\ast$}{*} sysio\+::vm\+::bitcode\+\_\+writer\+::get\+\_\+base\+\_\+addr (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source_l00306}{306}} of file \mbox{\hyperlink{vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00306\ \{\ \textcolor{keywordflow}{return}\ \_code\_segment\_base;\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{classsysio_1_1vm_1_1bitcode__writer_a17419b78313e438d4cf281d23d92b794}\index{sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}!br\_table\_parser@{br\_table\_parser}}
+\index{br\_table\_parser@{br\_table\_parser}!sysio::vm::bitcode\_writer@{sysio::vm::bitcode\_writer}}
+\doxysubsubsection{\texorpdfstring{br\_table\_parser}{br\_table\_parser}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1bitcode__writer_a17419b78313e438d4cf281d23d92b794} 
+br\+\_\+table\+\_\+parser\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source_l00057}{57}} of file \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/include/sysio/sysio/vm/\mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp}{bitcode\+\_\+writer.\+hpp}}\item 
+libraries/sys-\/vm/include/sysio/vm/\mbox{\hyperlink{vm_2bitcode__writer_8hpp}{bitcode\+\_\+writer.\+hpp}}\end{DoxyCompactItemize}

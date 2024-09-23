@@ -1,0 +1,175 @@
+\doxysection{zipkin.\+hpp}
+\hypertarget{zipkin_8hpp_source}{}\label{zipkin_8hpp_source}\index{libraries/fc/include/fc/log/zipkin.hpp@{libraries/fc/include/fc/log/zipkin.hpp}}
+\mbox{\hyperlink{zipkin_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{logger_8hpp}{fc/log/logger.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <type\_traits>}}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00007}00007\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}\ \{}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00022}00022\ \textcolor{keyword}{class\ }zipkin;}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00024}00024\ \textcolor{keyword}{class\ }\mbox{\hyperlink{namespacesysio_1_1chain__apis_aec57a2129d91283b7cf3b735009cb546}{sha256}};}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00026}\mbox{\hyperlink{classfc_1_1zipkin__config}{00026}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classfc_1_1zipkin__config}{zipkin\_config}}\ \{}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00027}00027\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00029}\mbox{\hyperlink{classfc_1_1zipkin__config_a9556dacb1a00643aecbf33b1f1e889d0}{00029}}\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classfc_1_1zipkin__config_a9556dacb1a00643aecbf33b1f1e889d0}{is\_enabled}}()\ \{\ \textcolor{keywordflow}{return}\ get\_zipkin\_()\ !=\ \textcolor{keyword}{nullptr};\ \}}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00035}00035\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{lib_8h_a02fd73d861ef2e4aabb38c0c9ff82947}{init}}(\ \textcolor{keyword}{const}\ std::string\&\ \mbox{\hyperlink{classfc_1_1url}{url}},\ \textcolor{keyword}{const}\ std::string\&\ service\_name,\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ timeout\_us\ );}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00039}00039\ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classfc_1_1zipkin}{zipkin}}\&\ \mbox{\hyperlink{classfc_1_1zipkin__config_ae0348c29d052b3060150e3b379e8e9ce}{get\_zipkin}}();}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00043}00043\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1zipkin__config_a0e20fd8eda4ad99190e5330645ab4890}{shutdown}}();}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00046}00046\ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{classfc_1_1zipkin__config_a7fafc95d1ae8f71f714e1b444d6cbc87}{get\_next\_unique\_id}}();}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00048}00048\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00052}00052\ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classfc_1_1zipkin}{zipkin}}*\ get\_zipkin\_()\ \{\ \textcolor{keywordflow}{return}\ get().zip.get();\ \};}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00054}00054\ \ \ \ \textcolor{keyword}{static}\ zipkin\_config\&\ get();}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00056}00056\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00057}00057\ \ \ \ std::unique\_ptr<zipkin>\ zip;}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00058}00058\ \};}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00060}\mbox{\hyperlink{structfc_1_1zipkin__span}{00060}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structfc_1_1zipkin__span}{zipkin\_span}}\ \{}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00061}\mbox{\hyperlink{structfc_1_1zipkin__span_af2027d101bc566ffa50c6f2cd26a9ae2}{00061}}\ \ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{structfc_1_1zipkin__span_af2027d101bc566ffa50c6f2cd26a9ae2}{zipkin\_span}}(\ std::string\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ parent\_id\ =\ 0\ )}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00062}00062\ \ \ \ \ \ \ \ \ \ :\ data(\ \mbox{\hyperlink{namespacestd}{std}}::move(\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ ),\ parent\_id\ )\ \{\}}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00064}\mbox{\hyperlink{structfc_1_1zipkin__span_a45eefc5bd1076ae87a629cac8a812836}{00064}}\ \ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{structfc_1_1zipkin__span_a45eefc5bd1076ae87a629cac8a812836}{zipkin\_span}}(\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \textcolor{keywordtype}{id},\ std::string\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ parent\_id\ =\ 0\ )}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00065}00065\ \ \ \ \ \ \ \ \ \ :\ data(\ \mbox{\hyperlink{code__cache_8cpp_aa0efefe21f4700d78692edc823e763be}{id}},\ \mbox{\hyperlink{namespacestd}{std}}::move(\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ ),\ parent\_id\ )\ \{\}}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00067}\mbox{\hyperlink{structfc_1_1zipkin__span_ada4ef13a09e1fe9b824bea29a458c971}{00067}}\ \ \ \ \mbox{\hyperlink{structfc_1_1zipkin__span_ada4ef13a09e1fe9b824bea29a458c971}{zipkin\_span}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structfc_1_1zipkin__span}{zipkin\_span}}\&\ )\ =\ \textcolor{keyword}{delete};}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00068}\mbox{\hyperlink{structfc_1_1zipkin__span_accd101de29cf4a57de07a4638bab0e15}{00068}}\ \ \ \ \mbox{\hyperlink{structfc_1_1zipkin__span}{zipkin\_span}}\&\ \mbox{\hyperlink{structfc_1_1zipkin__span_accd101de29cf4a57de07a4638bab0e15}{operator=}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structfc_1_1zipkin__span}{zipkin\_span}}\&\ )\ =\ \textcolor{keyword}{delete};}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00069}\mbox{\hyperlink{structfc_1_1zipkin__span_a16d91220ce80b4ff3b0daef4737bb7e6}{00069}}\ \ \ \ \mbox{\hyperlink{structfc_1_1zipkin__span}{zipkin\_span}}\&\ \mbox{\hyperlink{structfc_1_1zipkin__span_a16d91220ce80b4ff3b0daef4737bb7e6}{operator=}}(\ \mbox{\hyperlink{structfc_1_1zipkin__span}{zipkin\_span}}\&\&\ )\ =\ \textcolor{keyword}{delete};}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00071}\mbox{\hyperlink{structfc_1_1zipkin__span_a4918a3757250d97f1b3f0b51855783bd}{00071}}\ \ \ \ \mbox{\hyperlink{structfc_1_1zipkin__span_a4918a3757250d97f1b3f0b51855783bd}{zipkin\_span}}(\ \mbox{\hyperlink{structfc_1_1zipkin__span}{zipkin\_span}}\&\&\ rhs\ )\ noexcept}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00072}00072\ \ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{structfc_1_1zipkin__span_a9e8a0a3042c5b85417025b182dce8d8d}{data}}(\ std::move(\ rhs.data\ )\ )\ \{}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00073}00073\ \ \ \ \ \ \ rhs.data.\mbox{\hyperlink{structfc_1_1zipkin__span_1_1span__data_a8f6cfdba8a16bfe950b45da04d7bf278}{id}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00074}00074\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00075}00075\ }
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00076}00076\ \ \ \ \mbox{\hyperlink{structfc_1_1zipkin__span_ae3fef6e20268796fac93c736a3e51a57}{\string~zipkin\_span}}();}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00077}00077\ }
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00078}\mbox{\hyperlink{structfc_1_1zipkin__span_ad54039ec426609667c4a8e3ee5a38489}{00078}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structfc_1_1zipkin__span_ad54039ec426609667c4a8e3ee5a38489}{add\_tag}}(\ \textcolor{keyword}{const}\ std::string\&\ key,\ \textcolor{keyword}{const}\ std::string\&\ var\ )\ \{}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00079}00079\ \ \ \ \ \ \ \textcolor{comment}{//\ zipkin\ tags\ are\ required\ to\ be\ strings}}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00080}00080\ \ \ \ \ \ \ data.tags(\ key,\ var\ );}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00081}00081\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00083}\mbox{\hyperlink{structfc_1_1zipkin__span_a5d609899b2de96ba8c9ae131971a141e}{00083}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structfc_1_1zipkin__span_a5d609899b2de96ba8c9ae131971a141e}{add\_tag}}(\ \textcolor{keyword}{const}\ std::string\&\ key,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ var\ )\ \{}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00084}00084\ \ \ \ \ \ \ \textcolor{comment}{//\ zipkin\ tags\ are\ required\ to\ be\ strings}}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00085}00085\ \ \ \ \ \ \ data.tags(\ key,\ var\ );}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00086}00086\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00087}00087\ }
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00088}\mbox{\hyperlink{structfc_1_1zipkin__span_a62a094a768f90e2936046205ed11613a}{00088}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structfc_1_1zipkin__span_a62a094a768f90e2936046205ed11613a}{add\_tag}}(\ \textcolor{keyword}{const}\ std::string\&\ key,\ \textcolor{keywordtype}{bool}\ v\ )\ \{}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00089}00089\ \ \ \ \ \ \ \textcolor{comment}{//\ zipkin\ tags\ are\ required\ to\ be\ strings}}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00090}00090\ \ \ \ \ \ \ data.tags(\ key,\ v\ ?\ \textcolor{stringliteral}{"{}true"{}}\ :\ \textcolor{stringliteral}{"{}false"{}}\ );}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00091}00091\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00092}00092\ }
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00093}00093\ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00094}00094\ \ \ \ std::enable\_if\_t<std::is\_arithmetic\_v<std::remove\_reference\_t<T>>,\ \textcolor{keywordtype}{void}>}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00095}\mbox{\hyperlink{structfc_1_1zipkin__span_ad16186a20092fe65c58a473d715ec6ab}{00095}}\ \ \ \ \mbox{\hyperlink{structfc_1_1zipkin__span_ad16186a20092fe65c58a473d715ec6ab}{add\_tag}}(\ \textcolor{keyword}{const}\ std::string\&\ key,\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\&\ var\ )\ \{}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00096}00096\ \ \ \ \ \ \ data.tags(\ key,\ std::to\_string(\ std::forward<T>(\ var\ )\ )\ );}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00097}00097\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00098}00098\ }
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00099}00099\ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00100}00100\ \ \ \ std::enable\_if\_t<!std::is\_arithmetic\_v<std::remove\_reference\_t<T>>,\ \textcolor{keywordtype}{void}>}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00101}\mbox{\hyperlink{structfc_1_1zipkin__span_a555fe0c21d9fdb8073bc3fb153f92cde}{00101}}\ \ \ \ \mbox{\hyperlink{structfc_1_1zipkin__span_a555fe0c21d9fdb8073bc3fb153f92cde}{add\_tag}}(\ \textcolor{keyword}{const}\ std::string\&\ key,\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\&\ var\ )\ \{}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00102}00102\ \ \ \ \ \ \ data.tags(\ key,\ (std::string)\ var\ );}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00103}00103\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00104}00104\ }
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00105}\mbox{\hyperlink{structfc_1_1zipkin__span_1_1token}{00105}}\ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structfc_1_1zipkin__span_1_1token}{token}}\ \{}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00106}\mbox{\hyperlink{structfc_1_1zipkin__span_1_1token_a0536fa45832540e0dbb2addbbe28e478}{00106}}\ \ \ \ \ \ \ \textcolor{keyword}{friend}\ \mbox{\hyperlink{structfc_1_1zipkin__span_1_1token_a0536fa45832540e0dbb2addbbe28e478}{zipkin\_span}};}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00107}\mbox{\hyperlink{structfc_1_1zipkin__span_1_1token_acefae11812c03d7b9057eac42ae346e4}{00107}}\ \ \ \ \ \ \ \textcolor{keyword}{friend}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structfc_1_1zipkin__trace}{zipkin\_trace}};}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00108}\mbox{\hyperlink{structfc_1_1zipkin__span_1_1token_af087a191979a4c5ecc05b5a14e6d3822}{00108}}\ \ \ \ \ \ \ \textcolor{keyword}{friend}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structfc_1_1optional__trace}{optional\_trace}};}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00109}\mbox{\hyperlink{structfc_1_1zipkin__span_1_1token_a68f9ad8e14b6e5f6c1a5df6ab5821990}{00109}}\ \ \ \ \ \ \ \textcolor{keyword}{constexpr}\ \textcolor{keyword}{explicit}\ \textcolor{keyword}{operator}\ bool()\ const\ noexcept\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keywordtype}{id}\ !=\ 0;\ \}}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00110}00110\ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00111}00111\ \ \ \ \ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{structfc_1_1zipkin__span_1_1token}{token}}(\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \textcolor{keywordtype}{id}\ )}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00112}00112\ \ \ \ \ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{code__cache_8cpp_aa0efefe21f4700d78692edc823e763be}{id}}(\ \mbox{\hyperlink{code__cache_8cpp_aa0efefe21f4700d78692edc823e763be}{id}}\ )\ \{\}}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00113}00113\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{code__cache_8cpp_aa0efefe21f4700d78692edc823e763be}{id}};}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00114}00114\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00115}00115\ }
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00116}\mbox{\hyperlink{structfc_1_1zipkin__span_ab982c2f5aa6b04fbbbbafe23d5cbe2b5}{00116}}\ \ \ \ \mbox{\hyperlink{structfc_1_1zipkin__span_1_1token}{token}}\ \mbox{\hyperlink{structfc_1_1zipkin__span_ab982c2f5aa6b04fbbbbafe23d5cbe2b5}{get\_token}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structfc_1_1zipkin__span_1_1token}{token}}\{data.id\};\ \};}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00117}00117\ }
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00118}00118\ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{structfc_1_1zipkin__span_a1e1aa1cb977283138fa30280158384a7}{to\_id}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha256}{fc::sha256}}\&\ \textcolor{keywordtype}{id}\ );}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00119}00119\ }
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00120}00120\ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00121}\mbox{\hyperlink{structfc_1_1zipkin__span_a8b1a316dff6439327b75649d3e4c0ad5}{00121}}\ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{structfc_1_1zipkin__span_a8b1a316dff6439327b75649d3e4c0ad5}{to\_id}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ \textcolor{keywordtype}{id}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00122}00122\ \ \ \ \ \ \ \textcolor{keyword}{static\_assert}(\ std::is\_same\_v<\textcolor{keyword}{decltype}(\ \textcolor{keywordtype}{id}.data()\ ),\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}*>,\ \textcolor{stringliteral}{"{}expected\ uint64\_t"{}}\ );}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00123}00123\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keywordtype}{id}.data()[3];}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00124}00124\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00125}00125\ }
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00126}\mbox{\hyperlink{structfc_1_1zipkin__span_1_1span__data}{00126}}\ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structfc_1_1zipkin__span_1_1span__data}{span\_data}}\ \{}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00127}\mbox{\hyperlink{structfc_1_1zipkin__span_1_1span__data_a8fc044f1ec2f7abac2d532b74dbd6354}{00127}}\ \ \ \ \ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{structfc_1_1zipkin__span_1_1span__data_a8fc044f1ec2f7abac2d532b74dbd6354}{span\_data}}(\ std::string\ \mbox{\hyperlink{structfc_1_1zipkin__span_1_1span__data_a1a6a00887ff20777bbf04e418f32eb49}{name}},\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{structfc_1_1zipkin__span_1_1span__data_a1fb2e2de51c228b0c66aaf7c63ad8827}{parent\_id}}\ =\ 0\ )}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00128}00128\ \ \ \ \ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{structfc_1_1zipkin__span_1_1span__data_a8f6cfdba8a16bfe950b45da04d7bf278}{id}}(\ \mbox{\hyperlink{classfc_1_1zipkin__config}{zipkin\_config}}::get\_next\_unique\_id()\ ),\ \mbox{\hyperlink{structfc_1_1zipkin__span_1_1span__data_a1fb2e2de51c228b0c66aaf7c63ad8827}{parent\_id}}(\ \mbox{\hyperlink{structfc_1_1zipkin__span_1_1span__data_a1fb2e2de51c228b0c66aaf7c63ad8827}{parent\_id}}\ ),}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00129}00129\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1zipkin__span_1_1span__data_a946e842e1209c90e747eff20ee00dd91}{start}}(\ \mbox{\hyperlink{classfc_1_1time__point}{time\_point}}::now()\ ),\ \mbox{\hyperlink{structfc_1_1zipkin__span_1_1span__data_a1a6a00887ff20777bbf04e418f32eb49}{name}}(\ \mbox{\hyperlink{namespacestd}{std}}::move(\ \mbox{\hyperlink{structfc_1_1zipkin__span_1_1span__data_a1a6a00887ff20777bbf04e418f32eb49}{name}}\ )\ )\ \{\}}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00130}00130\ }
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00131}\mbox{\hyperlink{structfc_1_1zipkin__span_1_1span__data_a70e8f796ec4ec61f96c95586199b06d1}{00131}}\ \ \ \ \ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{structfc_1_1zipkin__span_1_1span__data_a70e8f796ec4ec61f96c95586199b06d1}{span\_data}}(\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \textcolor{keywordtype}{id},\ std::string\ \mbox{\hyperlink{structfc_1_1zipkin__span_1_1span__data_a1a6a00887ff20777bbf04e418f32eb49}{name}},\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{structfc_1_1zipkin__span_1_1span__data_a1fb2e2de51c228b0c66aaf7c63ad8827}{parent\_id}}\ =\ 0\ )}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00132}00132\ \ \ \ \ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{structfc_1_1zipkin__span_1_1span__data_a8f6cfdba8a16bfe950b45da04d7bf278}{id}}(\ \mbox{\hyperlink{structfc_1_1zipkin__span_1_1span__data_a8f6cfdba8a16bfe950b45da04d7bf278}{id}}\ ),\ \mbox{\hyperlink{structfc_1_1zipkin__span_1_1span__data_a1fb2e2de51c228b0c66aaf7c63ad8827}{parent\_id}}(\ \mbox{\hyperlink{structfc_1_1zipkin__span_1_1span__data_a1fb2e2de51c228b0c66aaf7c63ad8827}{parent\_id}}\ ),\ \mbox{\hyperlink{structfc_1_1zipkin__span_1_1span__data_a946e842e1209c90e747eff20ee00dd91}{start}}(\ \mbox{\hyperlink{classfc_1_1time__point}{time\_point}}::now()\ ),\ \mbox{\hyperlink{structfc_1_1zipkin__span_1_1span__data_a1a6a00887ff20777bbf04e418f32eb49}{name}}(\ \mbox{\hyperlink{namespacestd}{std}}::move(\ \mbox{\hyperlink{structfc_1_1zipkin__span_1_1span__data_a1a6a00887ff20777bbf04e418f32eb49}{name}}\ )\ )\ \{\}}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00133}00133\ }
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00134}\mbox{\hyperlink{structfc_1_1zipkin__span_1_1span__data_a046427729259b2399bcf72e0392d9672}{00134}}\ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1zipkin__span_1_1span__data_a046427729259b2399bcf72e0392d9672}{span\_data}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structfc_1_1zipkin__span_1_1span__data}{span\_data}}\&\ )\ =\ \textcolor{keyword}{delete};}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00135}\mbox{\hyperlink{structfc_1_1zipkin__span_1_1span__data_a8edf483fc9f2aa874a4e0e397f676935}{00135}}\ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1zipkin__span_1_1span__data}{span\_data}}\&\ \mbox{\hyperlink{structfc_1_1zipkin__span_1_1span__data_a8edf483fc9f2aa874a4e0e397f676935}{operator=}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structfc_1_1zipkin__span_1_1span__data}{span\_data}}\&\ )\ =\ \textcolor{keyword}{delete};}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00136}\mbox{\hyperlink{structfc_1_1zipkin__span_1_1span__data_a52aaf88d7bd980c6d7fa96117204a7ba}{00136}}\ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1zipkin__span_1_1span__data}{span\_data}}\&\ \mbox{\hyperlink{structfc_1_1zipkin__span_1_1span__data_a52aaf88d7bd980c6d7fa96117204a7ba}{operator=}}(\ \mbox{\hyperlink{structfc_1_1zipkin__span_1_1span__data}{span\_data}}\&\&\ )\ =\ \textcolor{keyword}{delete};}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00137}\mbox{\hyperlink{structfc_1_1zipkin__span_1_1span__data_a15c0732ea82d8ded4585d4edf06086f1}{00137}}\ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1zipkin__span_1_1span__data_a15c0732ea82d8ded4585d4edf06086f1}{span\_data}}(\ \mbox{\hyperlink{structfc_1_1zipkin__span_1_1span__data}{span\_data}}\&\&\ rhs\ )\ =\ \textcolor{keywordflow}{default};}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00138}00138\ }
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00139}\mbox{\hyperlink{structfc_1_1zipkin__span_1_1span__data_a8f6cfdba8a16bfe950b45da04d7bf278}{00139}}\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{structfc_1_1zipkin__span_1_1span__data_a8f6cfdba8a16bfe950b45da04d7bf278}{id}};}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00140}00140\ \ \ \ \ \ \ \textcolor{comment}{//\ zipkin\ traceId\ and\ parentId\ are\ same\ (when\ parent\_id\ set)\ since\ only\ allowing\ trace\ with\ span\ children.}}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00141}00141\ \ \ \ \ \ \ \textcolor{comment}{//\ Not\ currently\ supporting\ spans\ with\ children,\ only\ trace\ with\ children\ spans.}}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00142}\mbox{\hyperlink{structfc_1_1zipkin__span_1_1span__data_a1fb2e2de51c228b0c66aaf7c63ad8827}{00142}}\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{structfc_1_1zipkin__span_1_1span__data_a1fb2e2de51c228b0c66aaf7c63ad8827}{parent\_id}};}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00143}\mbox{\hyperlink{structfc_1_1zipkin__span_1_1span__data_a946e842e1209c90e747eff20ee00dd91}{00143}}\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1time__point}{fc::time\_point}}\ \mbox{\hyperlink{structfc_1_1zipkin__span_1_1span__data_a946e842e1209c90e747eff20ee00dd91}{start}};}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00144}\mbox{\hyperlink{structfc_1_1zipkin__span_1_1span__data_afe337f259aae2d1eea67ae595dcbe107}{00144}}\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1time__point}{fc::time\_point}}\ \mbox{\hyperlink{structfc_1_1zipkin__span_1_1span__data_afe337f259aae2d1eea67ae595dcbe107}{stop}};}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00145}\mbox{\hyperlink{structfc_1_1zipkin__span_1_1span__data_a1a6a00887ff20777bbf04e418f32eb49}{00145}}\ \ \ \ \ \ \ std::string\ \mbox{\hyperlink{structfc_1_1zipkin__span_1_1span__data_a1a6a00887ff20777bbf04e418f32eb49}{name}};}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00146}\mbox{\hyperlink{structfc_1_1zipkin__span_1_1span__data_a01df3be5e8d4c836ec98178ecf077011}{00146}}\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}\ \mbox{\hyperlink{structfc_1_1zipkin__span_1_1span__data_a01df3be5e8d4c836ec98178ecf077011}{tags}};}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00147}00147\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00148}00148\ }
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00149}\mbox{\hyperlink{structfc_1_1zipkin__span_a9e8a0a3042c5b85417025b182dce8d8d}{00149}}\ \ \ \ \mbox{\hyperlink{structfc_1_1zipkin__span_1_1span__data}{span\_data}}\ \mbox{\hyperlink{structfc_1_1zipkin__span_a9e8a0a3042c5b85417025b182dce8d8d}{data}};}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00150}00150\ \};}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00151}00151\ }
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00152}\mbox{\hyperlink{structfc_1_1zipkin__trace}{00152}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structfc_1_1zipkin__trace}{zipkin\_trace}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{structfc_1_1zipkin__span}{zipkin\_span}}\ \{}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00153}00153\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{structfc_1_1zipkin__span_af2027d101bc566ffa50c6f2cd26a9ae2}{zipkin\_span::zipkin\_span}};}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00154}00154\ }
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00155}\mbox{\hyperlink{structfc_1_1zipkin__trace_a5908d7ea3d27a6f696f72224f983735b}{00155}}\ \ \ \ [[nodiscard]]\ std::optional<zipkin\_span>\ \mbox{\hyperlink{structfc_1_1zipkin__trace_a5908d7ea3d27a6f696f72224f983735b}{create\_span}}(\ std::string\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ )\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00156}00156\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structfc_1_1zipkin__span}{zipkin\_span}}\{std::move(\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ ),\ \mbox{\hyperlink{structfc_1_1zipkin__span_ab982c2f5aa6b04fbbbbafe23d5cbe2b5}{get\_token}}().id\};}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00157}00157\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00158}00158\ }
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00159}00159\ \ \ \ [[nodiscard]]\ \textcolor{keyword}{static}\ std::optional<zipkin\_span>}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00160}\mbox{\hyperlink{structfc_1_1zipkin__trace_a90ed1bbf2670b5f4ccce83893c79030a}{00160}}\ \ \ \ \mbox{\hyperlink{structfc_1_1zipkin__trace_a90ed1bbf2670b5f4ccce83893c79030a}{create\_span\_from\_token}}(\ \mbox{\hyperlink{structfc_1_1zipkin__span_1_1token}{zipkin\_span::token}}\ \mbox{\hyperlink{structfc_1_1zipkin__span_1_1token}{token}},\ std::string\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00161}00161\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structfc_1_1zipkin__span}{zipkin\_span}}\{std::move(\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ ),\ \mbox{\hyperlink{structfc_1_1zipkin__span_1_1token}{token}}.id\};}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00162}00162\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00163}00163\ \};}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00164}00164\ }
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00165}\mbox{\hyperlink{structfc_1_1optional__trace}{00165}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structfc_1_1optional__trace}{optional\_trace}}\ \{}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00166}\mbox{\hyperlink{structfc_1_1optional__trace_abe9636e187d56a747e5e9e1ac20de583}{00166}}\ \ \ \ std::optional<zipkin\_trace>\ \mbox{\hyperlink{structfc_1_1optional__trace_abe9636e187d56a747e5e9e1ac20de583}{opt}};}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00167}00167\ }
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00168}\mbox{\hyperlink{structfc_1_1optional__trace_a8c310b735013f0e80f3cc8952715fcf2}{00168}}\ \ \ \ \textcolor{keyword}{constexpr}\ \textcolor{keyword}{explicit}\ \textcolor{keyword}{operator}\ bool()\ const\ noexcept\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structfc_1_1optional__trace_abe9636e187d56a747e5e9e1ac20de583}{opt}}.has\_value();\ \}}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00169}00169\ }
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00170}\mbox{\hyperlink{structfc_1_1optional__trace_a001c1b5c3837bbe24765392fdf1f4bbf}{00170}}\ \ \ \ [[nodiscard]]\ \mbox{\hyperlink{structfc_1_1zipkin__span_1_1token}{zipkin\_span::token}}\ \mbox{\hyperlink{structfc_1_1optional__trace_a001c1b5c3837bbe24765392fdf1f4bbf}{get\_token}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00171}00171\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structfc_1_1optional__trace_abe9636e187d56a747e5e9e1ac20de583}{opt}}\ ?\ \mbox{\hyperlink{structfc_1_1optional__trace_abe9636e187d56a747e5e9e1ac20de583}{opt}}-\/>get\_token()\ :\ \mbox{\hyperlink{structfc_1_1zipkin__span_1_1token}{zipkin\_span::token}}(\ 0\ );}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00172}00172\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00173}00173\ \};}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00174}00174\ }
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00175}\mbox{\hyperlink{classfc_1_1zipkin}{00175}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classfc_1_1zipkin}{zipkin}}\ \{}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00176}00176\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00177}00177\ \ \ \ \mbox{\hyperlink{classfc_1_1zipkin_a5a7ddffbc11b0e87d400d10598d20068}{zipkin}}(\ \textcolor{keyword}{const}\ std::string\&\ \mbox{\hyperlink{classfc_1_1url}{url}},\ \textcolor{keyword}{const}\ std::string\&\ service\_name,\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ timeout\_us\ );}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00178}00178\ }
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00180}\mbox{\hyperlink{classfc_1_1zipkin_a2f2ac15dcaccdc9909b8ed8e07c7a256}{00180}}\ \ \ \ \mbox{\hyperlink{classfc_1_1zipkin_a2f2ac15dcaccdc9909b8ed8e07c7a256}{\string~zipkin}}()\ =\ \textcolor{keywordflow}{default};}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00181}00181\ }
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00183}00183\ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{classfc_1_1zipkin_a2bdc0402247151c979cca1632fb7f32d}{get\_next\_unique\_id}}();}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00184}00184\ }
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00185}00185\ \ \ \ \textcolor{comment}{//\ finish\ logging\ all\ queued\ up\ spans,\ not\ restartable}}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00186}00186\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1zipkin_a52c10520244a0443f30961ef040baf1d}{shutdown}}();}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00187}00187\ }
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00188}00188\ \ \ \ \textcolor{comment}{//\ Logs\ zipkin\ json\ via\ http\ on\ separate\ thread}}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00189}00189\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1zipkin_a0f15921f7cb4ccefe0684bf656dbe6e6}{log}}(\ \mbox{\hyperlink{structfc_1_1zipkin__span_1_1span__data}{zipkin\_span::span\_data}}\&\&\ span\ );}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00190}00190\ }
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00191}00191\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00192}00192\ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classfc_1_1zipkin_1_1impl}{impl}};}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00193}00193\ \ \ \ std::unique\_ptr<impl>\ my;}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00194}00194\ \};}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00195}00195\ }
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00196}00196\ \}\ \textcolor{comment}{//\ namespace\ fc}}
+\DoxyCodeLine{\Hypertarget{zipkin_8hpp_source_l00197}00197\ }
+
+\end{DoxyCode}

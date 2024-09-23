@@ -1,0 +1,11 @@
+<map id="sysio::chain::is_intrinsic_whitelisted" name="sysio::chain::is_intrinsic_whitelisted">
+<area shape="rect" id="Node000001" title=" " alt="" coords="593,39,755,79"/>
+<area shape="rect" id="Node000002" href="$namespacesysio_1_1chain_1_1webassembly_1_1eos__vm__runtime.html#a9cd22b0e9d05f910358f809fcd29ffec" title=" " alt="" coords="366,5,545,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="578,47,545,42,546,37,578,42"/>
+<area shape="rect" id="Node000003" href="$namespacesysio_1_1chain_1_1webassembly_1_1eos__vm__runtime.html#a78d9d364a9ab60de8d18b4660f592d5f" title=" " alt="" coords="366,71,545,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="578,76,546,80,545,75,578,70"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1chain_1_1wasm__interface.html#a0748761343232176fe57ede67dd254ae" title=" " alt="" coords="184,71,318,111"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="351,94,318,94,318,88,351,88"/>
+<area shape="rect" id="Node000005" href="$group__native__action__handlers.html#ga88394625fa30b19cd99bb0e89cda07dd" title=" " alt="" coords="5,71,136,111"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="168,94,136,94,136,88,168,88"/>
+</map>

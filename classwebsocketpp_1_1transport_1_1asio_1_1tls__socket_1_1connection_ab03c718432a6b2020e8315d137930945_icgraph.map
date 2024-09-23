@@ -1,0 +1,5 @@
+<map id="websocketpp::transport::asio::tls_socket::connection::get_shared" name="websocketpp::transport::asio::tls_socket::connection::get_shared">
+<area shape="rect" id="Node000001" title="Get a shared pointer to this component." alt="" coords="246,5,438,61"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1transport_1_1asio_1_1tls__socket_1_1connection.html#aac77e88754c55f2cd67a90adf47fc2f0" title="Post&#45;initialize security policy." alt="" coords="5,5,198,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="230,36,198,36,198,30,230,30"/>
+</map>

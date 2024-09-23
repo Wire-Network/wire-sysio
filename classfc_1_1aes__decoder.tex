@@ -1,0 +1,96 @@
+\doxysection{fc\+::aes\+\_\+decoder Class Reference}
+\hypertarget{classfc_1_1aes__decoder}{}\label{classfc_1_1aes__decoder}\index{fc::aes\_decoder@{fc::aes\_decoder}}
+
+
+{\ttfamily \#include $<$aes.\+hpp$>$}
+
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structfc_1_1aes__decoder_1_1impl}{impl}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{classfc_1_1aes__decoder_a5c7a4afa8000d639708a4956ae78fe35}{init}} (const \mbox{\hyperlink{classfc_1_1sha256}{fc\+::sha256}} \&key, const \mbox{\hyperlink{classfc_1_1uint128}{fc\+::uint128}} \&init\+\_\+value)
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classfc_1_1aes__decoder_a5466676d345dbd29d90d9c8785bf93e8}{decode}} (const char \texorpdfstring{$\ast$}{*}ciphertxt, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}, char \texorpdfstring{$\ast$}{*}plaintext)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{aes_8hpp_source_l00022}{22}} of file \mbox{\hyperlink{aes_8hpp_source}{aes.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1aes__decoder_a5466676d345dbd29d90d9c8785bf93e8}\index{fc::aes\_decoder@{fc::aes\_decoder}!decode@{decode}}
+\index{decode@{decode}!fc::aes\_decoder@{fc::aes\_decoder}}
+\doxysubsubsection{\texorpdfstring{decode()}{decode()}}
+{\footnotesize\ttfamily \label{classfc_1_1aes__decoder_a5466676d345dbd29d90d9c8785bf93e8} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} fc\+::aes\+\_\+decoder\+::decode (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{ciphertxt}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{len}{, }\item[{char \texorpdfstring{$\ast$}{*}}]{plaintext}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{aes_8cpp_source_l00116}{116}} of file \mbox{\hyperlink{aes_8cpp_source}{aes.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00117\ \{}
+\DoxyCodeLine{00118\ \ \ \ \ \textcolor{keywordtype}{int}\ plaintext\_len\ =\ 0;}
+\DoxyCodeLine{00119\ \ \ \ \ \textcolor{comment}{/*\ Provide\ the\ message\ to\ be\ decrypted,\ and\ obtain\ the\ decrypted\ output.}}
+\DoxyCodeLine{00120\ \textcolor{comment}{\ \ \ \ *\ \ \ \ *\ EVP\_DecryptUpdate\ can\ be\ called\ multiple\ times\ if\ necessary}}
+\DoxyCodeLine{00121\ \textcolor{comment}{\ \ \ \ *\ \ \ \ \ \ \ */}}
+\DoxyCodeLine{00122\ \ \ \ \ \textcolor{keywordflow}{if}\ (1\ !=\ EVP\_DecryptUpdate(my-\/>ctx,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)plaintext,\ \&plaintext\_len,\ (\textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)ciphertxt,\ ciphertxt\_len))}
+\DoxyCodeLine{00123\ \ \ \ \ \{}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ aes\_exception,\ \textcolor{stringliteral}{"{}error\ during\ aes\ 256\ cbc\ decryption\ update"{}},\ }
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}s"{}},\ ERR\_error\_string(\ ERR\_get\_error(),\ \textcolor{keyword}{nullptr})\ )\ );}
+\DoxyCodeLine{00126\ \ \ \ \ \}}
+\DoxyCodeLine{00127\ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ ciphertxt\_len\ ==\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\textcolor{keyword}{>}(plaintext\_len),\ \textcolor{stringliteral}{"{}"{}},\ (\textcolor{stringliteral}{"{}ciphertxt\_len"{}},ciphertxt\_len)(\textcolor{stringliteral}{"{}plaintext\_len"{}},plaintext\_len)\ );}
+\DoxyCodeLine{00128\ \ \ \ \ \textcolor{keywordflow}{return}\ plaintext\_len;}
+\DoxyCodeLine{00129\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1aes__decoder_a5c7a4afa8000d639708a4956ae78fe35}\index{fc::aes\_decoder@{fc::aes\_decoder}!init@{init}}
+\index{init@{init}!fc::aes\_decoder@{fc::aes\_decoder}}
+\doxysubsubsection{\texorpdfstring{init()}{init()}}
+{\footnotesize\ttfamily \label{classfc_1_1aes__decoder_a5c7a4afa8000d639708a4956ae78fe35} 
+void fc\+::aes\+\_\+decoder\+::init (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1sha256}{fc\+::sha256}} \&}]{key}{, }\item[{const \mbox{\hyperlink{classfc_1_1uint128}{fc\+::uint128}} \&}]{init\+\_\+value}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{aes_8cpp_source_l00093}{93}} of file \mbox{\hyperlink{aes_8cpp_source}{aes.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00094\ \{}
+\DoxyCodeLine{00095\ \ \ \ \ my-\/>ctx.obj\ =\ EVP\_CIPHER\_CTX\_new();}
+\DoxyCodeLine{00096\ \ \ \ \ \textcolor{comment}{/*\ Create\ and\ initialise\ the\ context\ */}}
+\DoxyCodeLine{00097\ \ \ \ \ \textcolor{keywordflow}{if}(!my-\/>ctx)}
+\DoxyCodeLine{00098\ \ \ \ \ \{}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ aes\_exception,\ \textcolor{stringliteral}{"{}error\ allocating\ evp\ cipher\ context"{}},\ }
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}s"{}},\ ERR\_error\_string(\ ERR\_get\_error(),\ \textcolor{keyword}{nullptr})\ )\ );}
+\DoxyCodeLine{00101\ \ \ \ \ \}}
+\DoxyCodeLine{00102\ }
+\DoxyCodeLine{00103\ \ \ \ \ \textcolor{comment}{/*\ Initialise\ the\ encryption\ operation.\ IMPORTANT\ -\/\ ensure\ you\ use\ a\ key}}
+\DoxyCodeLine{00104\ \textcolor{comment}{\ \ \ \ *\ \ \ \ and\ IV\ size\ appropriate\ for\ your\ cipher}}
+\DoxyCodeLine{00105\ \textcolor{comment}{\ \ \ \ *\ \ \ \ In\ this\ example\ we\ are\ using\ 256\ bit\ AES\ (i.e.\ a\ 256\ bit\ key).\ The}}
+\DoxyCodeLine{00106\ \textcolor{comment}{\ \ \ \ *\ \ \ \ IV\ size\ for\ *most*\ modes\ is\ the\ same\ as\ the\ block\ size.\ For\ AES\ this}}
+\DoxyCodeLine{00107\ \textcolor{comment}{\ \ \ \ *\ \ \ \ is\ 128\ bits\ */}}
+\DoxyCodeLine{00108\ \ \ \ \ \textcolor{keywordflow}{if}(1\ !=\ EVP\_DecryptInit\_ex(my-\/>ctx,\ EVP\_aes\_256\_cbc(),\ NULL,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)\&key,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)\&init\_value))}
+\DoxyCodeLine{00109\ \ \ \ \ \{}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ aes\_exception,\ \textcolor{stringliteral}{"{}error\ during\ aes\ 256\ cbc\ encryption\ init"{}},\ }
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}s"{}},\ ERR\_error\_string(\ ERR\_get\_error(),\ \textcolor{keyword}{nullptr})\ )\ );}
+\DoxyCodeLine{00112\ \ \ \ \ \}}
+\DoxyCodeLine{00113\ \ \ \ \ EVP\_CIPHER\_CTX\_set\_padding(\ my-\/>ctx,\ 0\ );}
+\DoxyCodeLine{00114\ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/\mbox{\hyperlink{aes_8hpp}{aes.\+hpp}}\item 
+libraries/fc/src/crypto/\mbox{\hyperlink{aes_8cpp}{aes.\+cpp}}\end{DoxyCompactItemize}

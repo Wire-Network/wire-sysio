@@ -1,0 +1,560 @@
+\doxysection{Iterative\+Parsing\+Reader\+Handler\texorpdfstring{$<$}{<} Encoding \texorpdfstring{$>$}{>} Struct Template Reference}
+\hypertarget{struct_iterative_parsing_reader_handler}{}\label{struct_iterative_parsing_reader_handler}\index{IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}}
+
+
+Inheritance diagram for Iterative\+Parsing\+Reader\+Handler\texorpdfstring{$<$}{<} Encoding \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_iterative_parsing_reader_handler__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Iterative\+Parsing\+Reader\+Handler\texorpdfstring{$<$}{<} Encoding \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=230pt]{struct_iterative_parsing_reader_handler__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef Encoding\+::\+Ch \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a43d131b209115ff4a38c2dd2937a27fd}{Ch}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_iterative_parsing_reader_handler_ab1b40c3fcbc2f53c641124b99b0cf023}{Iterative\+Parsing\+Reader\+Handler}} ()
+\item 
+bool \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a749649db75f791e04833c9aa82eb93ea}{Null}} ()
+\item 
+bool \mbox{\hyperlink{struct_iterative_parsing_reader_handler_ab45ff8f39b4537568aa0f7d25669d569}{Bool}} (bool)
+\item 
+bool \mbox{\hyperlink{struct_iterative_parsing_reader_handler_ab2e5476c61b710ee8cced770297ced2b}{Int}} (int)
+\item 
+bool \mbox{\hyperlink{struct_iterative_parsing_reader_handler_ac25635362ab5139ccb8aea0fa5403d9d}{Uint}} (unsigned)
+\item 
+bool \mbox{\hyperlink{struct_iterative_parsing_reader_handler_ab1a990b65daec328c99059a086001ccf}{Int64}} (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}})
+\item 
+bool \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a4a68c6855ba60b33b6b2bcb8bf6f0891}{Uint64}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}})
+\item 
+bool \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a509a1218da0724dd76979d071f9cff38}{Double}} (double)
+\item 
+bool \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a8fced3aa6a40040123a0408098986624}{Raw\+Number}} (const \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a43d131b209115ff4a38c2dd2937a27fd}{Ch}} \texorpdfstring{$\ast$}{*}, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}, bool)
+\item 
+bool \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a05dcb37660a1083a044756bcab92a05c}{String}} (const \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a43d131b209115ff4a38c2dd2937a27fd}{Ch}} \texorpdfstring{$\ast$}{*}, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}, bool)
+\item 
+bool \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a6190db7ad16ce10cf0dbcae3788decf0}{Start\+Object}} ()
+\item 
+bool \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a0966244f2ac26fbf6e806317a1472d3f}{Key}} (const \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a43d131b209115ff4a38c2dd2937a27fd}{Ch}} \texorpdfstring{$\ast$}{*}, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}, bool)
+\item 
+bool \mbox{\hyperlink{struct_iterative_parsing_reader_handler_aee1c9b5a18ec7e0c8aba23b35bfd8c2d}{End\+Object}} (\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} c)
+\item 
+bool \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a144a7b777ddab8498549a992d7556b05}{Start\+Array}} ()
+\item 
+bool \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a799522d5e138c61dd035276f6dbf4edf}{End\+Array}} (\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} c)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a7da230a69a88a61db94554d9daf84884}{Logs}} \mbox{[}\mbox{\hyperlink{struct_iterative_parsing_reader_handler_a986e60bf01c4ec57208ea008c63dfac5}{Log\+Capacity}}\mbox{]}
+\item 
+size\+\_\+t \mbox{\hyperlink{struct_iterative_parsing_reader_handler_ac7a98465a273a5fc081ff896add09d6d}{Log\+Count}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a3c096cea45af81e09675b0954f9df5b1}{LOG\+\_\+\+NULL}} = 0x10000000
+\item 
+static const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a1cec7d66e55f8d8dc1f60f78502b6058}{LOG\+\_\+\+BOOL}} = 0x20000000
+\item 
+static const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a580d89f73e2a327bdba873a3c68b550a}{LOG\+\_\+\+INT}} = 0x30000000
+\item 
+static const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a6c21e30374cb3b8aa0030d0920a03131}{LOG\+\_\+\+UINT}} = 0x40000000
+\item 
+static const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a23450d62f01eb0951379e3b03d4fc340}{LOG\+\_\+\+INT64}} = 0x50000000
+\item 
+static const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a3c53bd31348781d8138a96a1ae67b54f}{LOG\+\_\+\+UINT64}} = 0x60000000
+\item 
+static const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a1a30c03ff10fc96c5d0bc35aa9e2704a}{LOG\+\_\+\+DOUBLE}} = 0x70000000
+\item 
+static const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a931864e899c8da14a11446b180f09502}{LOG\+\_\+\+STRING}} = 0x80000000
+\item 
+static const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{struct_iterative_parsing_reader_handler_ab488e7de7961b7b234bd5a315594b1cc}{LOG\+\_\+\+STARTOBJECT}} = 0x90000000
+\item 
+static const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a940ea6a3d815546e8bc2707795bb927c}{LOG\+\_\+\+KEY}} = 0x\+A0000000
+\item 
+static const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a952f68ebc1bb8b6852e71c76dfaf518b}{LOG\+\_\+\+ENDOBJECT}} = 0x\+B0000000
+\item 
+static const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{struct_iterative_parsing_reader_handler_ad1c867965c72e99e85d98b43ed86cfdd}{LOG\+\_\+\+STARTARRAY}} = 0x\+C0000000
+\item 
+static const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{struct_iterative_parsing_reader_handler_af4a9abe34b336931c1624e07409c8365}{LOG\+\_\+\+ENDARRAY}} = 0x\+D0000000
+\item 
+static const size\+\_\+t \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a986e60bf01c4ec57208ea008c63dfac5}{Log\+Capacity}} = 256
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} = UTF8$<$$>$$>$\newline
+struct Iterative\+Parsing\+Reader\+Handler$<$ Encoding $>$}
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01454}{1454}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{struct_iterative_parsing_reader_handler_a43d131b209115ff4a38c2dd2937a27fd}\index{IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}!Ch@{Ch}}
+\index{Ch@{Ch}!IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}}
+\doxysubsubsection{\texorpdfstring{Ch}{Ch}}
+{\footnotesize\ttfamily \label{struct_iterative_parsing_reader_handler_a43d131b209115ff4a38c2dd2937a27fd} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}  = UTF8$<$$>$$>$ \\
+Encoding\+::\+Ch \mbox{\hyperlink{struct_iterative_parsing_reader_handler}{Iterative\+Parsing\+Reader\+Handler}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$\+::\+Ch}
+
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01455}{1455}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{struct_iterative_parsing_reader_handler_ab1b40c3fcbc2f53c641124b99b0cf023}\index{IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}!IterativeParsingReaderHandler@{IterativeParsingReaderHandler}}
+\index{IterativeParsingReaderHandler@{IterativeParsingReaderHandler}!IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}}
+\doxysubsubsection{\texorpdfstring{IterativeParsingReaderHandler()}{IterativeParsingReaderHandler()}}
+{\footnotesize\ttfamily \label{struct_iterative_parsing_reader_handler_ab1b40c3fcbc2f53c641124b99b0cf023} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}  = UTF8$<$$>$$>$ \\
+\mbox{\hyperlink{struct_iterative_parsing_reader_handler}{Iterative\+Parsing\+Reader\+Handler}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$\mbox{\hyperlink{struct_iterative_parsing_reader_handler}{\+::\+Iterative\+Parsing\+Reader\+Handler}} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01475}{1475}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01475\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{struct_iterative_parsing_reader_handler_ac7a98465a273a5fc081ff896add09d6d}{LogCount}}(0)\ \{}
+\DoxyCodeLine{01476\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_iterative_parsing_reader_handler_ab45ff8f39b4537568aa0f7d25669d569}\index{IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}!Bool@{Bool}}
+\index{Bool@{Bool}!IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}}
+\doxysubsubsection{\texorpdfstring{Bool()}{Bool()}}
+{\footnotesize\ttfamily \label{struct_iterative_parsing_reader_handler_ab45ff8f39b4537568aa0f7d25669d569} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}  = UTF8$<$$>$$>$ \\
+bool \mbox{\hyperlink{struct_iterative_parsing_reader_handler}{Iterative\+Parsing\+Reader\+Handler}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$\mbox{\hyperlink{struct_bool}{\+::\+Bool}} (\begin{DoxyParamCaption}\item[{bool}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01480}{1480}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01480\ \{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\mbox{\hyperlink{struct_iterative_parsing_reader_handler_ac7a98465a273a5fc081ff896add09d6d}{LogCount}}\ <\ \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a986e60bf01c4ec57208ea008c63dfac5}{LogCapacity}});\ \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a7da230a69a88a61db94554d9daf84884}{Logs}}[\mbox{\hyperlink{struct_iterative_parsing_reader_handler_ac7a98465a273a5fc081ff896add09d6d}{LogCount}}++]\ =\ \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a1cec7d66e55f8d8dc1f60f78502b6058}{LOG\_BOOL}};\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_iterative_parsing_reader_handler_a509a1218da0724dd76979d071f9cff38}\index{IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}!Double@{Double}}
+\index{Double@{Double}!IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}}
+\doxysubsubsection{\texorpdfstring{Double()}{Double()}}
+{\footnotesize\ttfamily \label{struct_iterative_parsing_reader_handler_a509a1218da0724dd76979d071f9cff38} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}  = UTF8$<$$>$$>$ \\
+bool \mbox{\hyperlink{struct_iterative_parsing_reader_handler}{Iterative\+Parsing\+Reader\+Handler}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$\+::\+Double (\begin{DoxyParamCaption}\item[{double}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01490}{1490}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01490\ \{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\mbox{\hyperlink{struct_iterative_parsing_reader_handler_ac7a98465a273a5fc081ff896add09d6d}{LogCount}}\ <\ \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a986e60bf01c4ec57208ea008c63dfac5}{LogCapacity}});\ \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a7da230a69a88a61db94554d9daf84884}{Logs}}[\mbox{\hyperlink{struct_iterative_parsing_reader_handler_ac7a98465a273a5fc081ff896add09d6d}{LogCount}}++]\ =\ \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a1a30c03ff10fc96c5d0bc35aa9e2704a}{LOG\_DOUBLE}};\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_iterative_parsing_reader_handler_a799522d5e138c61dd035276f6dbf4edf}\index{IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}!EndArray@{EndArray}}
+\index{EndArray@{EndArray}!IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}}
+\doxysubsubsection{\texorpdfstring{EndArray()}{EndArray()}}
+{\footnotesize\ttfamily \label{struct_iterative_parsing_reader_handler_a799522d5e138c61dd035276f6dbf4edf} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}  = UTF8$<$$>$$>$ \\
+bool \mbox{\hyperlink{struct_iterative_parsing_reader_handler}{Iterative\+Parsing\+Reader\+Handler}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$\+::\+End\+Array (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{c}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01509}{1509}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01509\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01510\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\mbox{\hyperlink{struct_iterative_parsing_reader_handler_ac7a98465a273a5fc081ff896add09d6d}{LogCount}}\ <\ \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a986e60bf01c4ec57208ea008c63dfac5}{LogCapacity}});}
+\DoxyCodeLine{01511\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}((\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\textcolor{keyword}{>}(c)\ \&\ 0xF0000000)\ ==\ 0);}
+\DoxyCodeLine{01512\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a7da230a69a88a61db94554d9daf84884}{Logs}}[\mbox{\hyperlink{struct_iterative_parsing_reader_handler_ac7a98465a273a5fc081ff896add09d6d}{LogCount}}++]\ =\ \mbox{\hyperlink{struct_iterative_parsing_reader_handler_af4a9abe34b336931c1624e07409c8365}{LOG\_ENDARRAY}}\ |\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\textcolor{keyword}{>}(c);}
+\DoxyCodeLine{01513\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{01514\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_iterative_parsing_reader_handler_aee1c9b5a18ec7e0c8aba23b35bfd8c2d}\index{IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}!EndObject@{EndObject}}
+\index{EndObject@{EndObject}!IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}}
+\doxysubsubsection{\texorpdfstring{EndObject()}{EndObject()}}
+{\footnotesize\ttfamily \label{struct_iterative_parsing_reader_handler_aee1c9b5a18ec7e0c8aba23b35bfd8c2d} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}  = UTF8$<$$>$$>$ \\
+bool \mbox{\hyperlink{struct_iterative_parsing_reader_handler}{Iterative\+Parsing\+Reader\+Handler}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$\+::\+End\+Object (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{c}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01500}{1500}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01500\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01501\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\mbox{\hyperlink{struct_iterative_parsing_reader_handler_ac7a98465a273a5fc081ff896add09d6d}{LogCount}}\ <\ \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a986e60bf01c4ec57208ea008c63dfac5}{LogCapacity}});}
+\DoxyCodeLine{01502\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}((\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\textcolor{keyword}{>}(c)\ \&\ 0xF0000000)\ ==\ 0);}
+\DoxyCodeLine{01503\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a7da230a69a88a61db94554d9daf84884}{Logs}}[\mbox{\hyperlink{struct_iterative_parsing_reader_handler_ac7a98465a273a5fc081ff896add09d6d}{LogCount}}++]\ =\ \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a952f68ebc1bb8b6852e71c76dfaf518b}{LOG\_ENDOBJECT}}\ |\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\textcolor{keyword}{>}(c);}
+\DoxyCodeLine{01504\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{01505\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_iterative_parsing_reader_handler_ab2e5476c61b710ee8cced770297ced2b}\index{IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}!Int@{Int}}
+\index{Int@{Int}!IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}}
+\doxysubsubsection{\texorpdfstring{Int()}{Int()}}
+{\footnotesize\ttfamily \label{struct_iterative_parsing_reader_handler_ab2e5476c61b710ee8cced770297ced2b} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}  = UTF8$<$$>$$>$ \\
+bool \mbox{\hyperlink{struct_iterative_parsing_reader_handler}{Iterative\+Parsing\+Reader\+Handler}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$\+::\+Int (\begin{DoxyParamCaption}\item[{int}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01482}{1482}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01482\ \{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\mbox{\hyperlink{struct_iterative_parsing_reader_handler_ac7a98465a273a5fc081ff896add09d6d}{LogCount}}\ <\ \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a986e60bf01c4ec57208ea008c63dfac5}{LogCapacity}});\ \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a7da230a69a88a61db94554d9daf84884}{Logs}}[\mbox{\hyperlink{struct_iterative_parsing_reader_handler_ac7a98465a273a5fc081ff896add09d6d}{LogCount}}++]\ =\ \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a580d89f73e2a327bdba873a3c68b550a}{LOG\_INT}};\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_iterative_parsing_reader_handler_ab1a990b65daec328c99059a086001ccf}\index{IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}!Int64@{Int64}}
+\index{Int64@{Int64}!IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}}
+\doxysubsubsection{\texorpdfstring{Int64()}{Int64()}}
+{\footnotesize\ttfamily \label{struct_iterative_parsing_reader_handler_ab1a990b65daec328c99059a086001ccf} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}  = UTF8$<$$>$$>$ \\
+bool \mbox{\hyperlink{struct_iterative_parsing_reader_handler}{Iterative\+Parsing\+Reader\+Handler}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$\+::\+Int64 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01486}{1486}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01486\ \{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\mbox{\hyperlink{struct_iterative_parsing_reader_handler_ac7a98465a273a5fc081ff896add09d6d}{LogCount}}\ <\ \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a986e60bf01c4ec57208ea008c63dfac5}{LogCapacity}});\ \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a7da230a69a88a61db94554d9daf84884}{Logs}}[\mbox{\hyperlink{struct_iterative_parsing_reader_handler_ac7a98465a273a5fc081ff896add09d6d}{LogCount}}++]\ =\ \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a23450d62f01eb0951379e3b03d4fc340}{LOG\_INT64}};\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_iterative_parsing_reader_handler_a0966244f2ac26fbf6e806317a1472d3f}\index{IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}!Key@{Key}}
+\index{Key@{Key}!IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}}
+\doxysubsubsection{\texorpdfstring{Key()}{Key()}}
+{\footnotesize\ttfamily \label{struct_iterative_parsing_reader_handler_a0966244f2ac26fbf6e806317a1472d3f} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}  = UTF8$<$$>$$>$ \\
+bool \mbox{\hyperlink{struct_iterative_parsing_reader_handler}{Iterative\+Parsing\+Reader\+Handler}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$\+::\+Key (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a43d131b209115ff4a38c2dd2937a27fd}{Ch}} \texorpdfstring{$\ast$}{*}}]{}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{}{, }\item[{bool}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01498}{1498}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01498\ \{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\mbox{\hyperlink{struct_iterative_parsing_reader_handler_ac7a98465a273a5fc081ff896add09d6d}{LogCount}}\ <\ \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a986e60bf01c4ec57208ea008c63dfac5}{LogCapacity}});\ \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a7da230a69a88a61db94554d9daf84884}{Logs}}[\mbox{\hyperlink{struct_iterative_parsing_reader_handler_ac7a98465a273a5fc081ff896add09d6d}{LogCount}}++]\ =\ \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a940ea6a3d815546e8bc2707795bb927c}{LOG\_KEY}};\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_iterative_parsing_reader_handler_a749649db75f791e04833c9aa82eb93ea}\index{IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}!Null@{Null}}
+\index{Null@{Null}!IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}}
+\doxysubsubsection{\texorpdfstring{Null()}{Null()}}
+{\footnotesize\ttfamily \label{struct_iterative_parsing_reader_handler_a749649db75f791e04833c9aa82eb93ea} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}  = UTF8$<$$>$$>$ \\
+bool \mbox{\hyperlink{struct_iterative_parsing_reader_handler}{Iterative\+Parsing\+Reader\+Handler}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$\+::\+Null (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01478}{1478}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01478\ \{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\mbox{\hyperlink{struct_iterative_parsing_reader_handler_ac7a98465a273a5fc081ff896add09d6d}{LogCount}}\ <\ \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a986e60bf01c4ec57208ea008c63dfac5}{LogCapacity}});\ \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a7da230a69a88a61db94554d9daf84884}{Logs}}[\mbox{\hyperlink{struct_iterative_parsing_reader_handler_ac7a98465a273a5fc081ff896add09d6d}{LogCount}}++]\ =\ \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a3c096cea45af81e09675b0954f9df5b1}{LOG\_NULL}};\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_iterative_parsing_reader_handler_a8fced3aa6a40040123a0408098986624}\index{IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}!RawNumber@{RawNumber}}
+\index{RawNumber@{RawNumber}!IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}}
+\doxysubsubsection{\texorpdfstring{RawNumber()}{RawNumber()}}
+{\footnotesize\ttfamily \label{struct_iterative_parsing_reader_handler_a8fced3aa6a40040123a0408098986624} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}  = UTF8$<$$>$$>$ \\
+bool \mbox{\hyperlink{struct_iterative_parsing_reader_handler}{Iterative\+Parsing\+Reader\+Handler}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$\+::\+Raw\+Number (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a43d131b209115ff4a38c2dd2937a27fd}{Ch}} \texorpdfstring{$\ast$}{*}}]{}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{}{, }\item[{bool}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01492}{1492}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01492\ \{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\mbox{\hyperlink{struct_iterative_parsing_reader_handler_ac7a98465a273a5fc081ff896add09d6d}{LogCount}}\ <\ \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a986e60bf01c4ec57208ea008c63dfac5}{LogCapacity}});\ \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a7da230a69a88a61db94554d9daf84884}{Logs}}[\mbox{\hyperlink{struct_iterative_parsing_reader_handler_ac7a98465a273a5fc081ff896add09d6d}{LogCount}}++]\ =\ \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a931864e899c8da14a11446b180f09502}{LOG\_STRING}};\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_iterative_parsing_reader_handler_a144a7b777ddab8498549a992d7556b05}\index{IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}!StartArray@{StartArray}}
+\index{StartArray@{StartArray}!IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}}
+\doxysubsubsection{\texorpdfstring{StartArray()}{StartArray()}}
+{\footnotesize\ttfamily \label{struct_iterative_parsing_reader_handler_a144a7b777ddab8498549a992d7556b05} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}  = UTF8$<$$>$$>$ \\
+bool \mbox{\hyperlink{struct_iterative_parsing_reader_handler}{Iterative\+Parsing\+Reader\+Handler}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$\+::\+Start\+Array (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01507}{1507}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01507\ \{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\mbox{\hyperlink{struct_iterative_parsing_reader_handler_ac7a98465a273a5fc081ff896add09d6d}{LogCount}}\ <\ \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a986e60bf01c4ec57208ea008c63dfac5}{LogCapacity}});\ \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a7da230a69a88a61db94554d9daf84884}{Logs}}[\mbox{\hyperlink{struct_iterative_parsing_reader_handler_ac7a98465a273a5fc081ff896add09d6d}{LogCount}}++]\ =\ \mbox{\hyperlink{struct_iterative_parsing_reader_handler_ad1c867965c72e99e85d98b43ed86cfdd}{LOG\_STARTARRAY}};\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_iterative_parsing_reader_handler_a6190db7ad16ce10cf0dbcae3788decf0}\index{IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}!StartObject@{StartObject}}
+\index{StartObject@{StartObject}!IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}}
+\doxysubsubsection{\texorpdfstring{StartObject()}{StartObject()}}
+{\footnotesize\ttfamily \label{struct_iterative_parsing_reader_handler_a6190db7ad16ce10cf0dbcae3788decf0} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}  = UTF8$<$$>$$>$ \\
+bool \mbox{\hyperlink{struct_iterative_parsing_reader_handler}{Iterative\+Parsing\+Reader\+Handler}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$\+::\+Start\+Object (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01496}{1496}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01496\ \{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\mbox{\hyperlink{struct_iterative_parsing_reader_handler_ac7a98465a273a5fc081ff896add09d6d}{LogCount}}\ <\ \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a986e60bf01c4ec57208ea008c63dfac5}{LogCapacity}});\ \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a7da230a69a88a61db94554d9daf84884}{Logs}}[\mbox{\hyperlink{struct_iterative_parsing_reader_handler_ac7a98465a273a5fc081ff896add09d6d}{LogCount}}++]\ =\ \mbox{\hyperlink{struct_iterative_parsing_reader_handler_ab488e7de7961b7b234bd5a315594b1cc}{LOG\_STARTOBJECT}};\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_iterative_parsing_reader_handler_a05dcb37660a1083a044756bcab92a05c}\index{IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}!String@{String}}
+\index{String@{String}!IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}}
+\doxysubsubsection{\texorpdfstring{String()}{String()}}
+{\footnotesize\ttfamily \label{struct_iterative_parsing_reader_handler_a05dcb37660a1083a044756bcab92a05c} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}  = UTF8$<$$>$$>$ \\
+bool \mbox{\hyperlink{struct_iterative_parsing_reader_handler}{Iterative\+Parsing\+Reader\+Handler}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$\+::\+String (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a43d131b209115ff4a38c2dd2937a27fd}{Ch}} \texorpdfstring{$\ast$}{*}}]{}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{}{, }\item[{bool}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01494}{1494}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01494\ \{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\mbox{\hyperlink{struct_iterative_parsing_reader_handler_ac7a98465a273a5fc081ff896add09d6d}{LogCount}}\ <\ \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a986e60bf01c4ec57208ea008c63dfac5}{LogCapacity}});\ \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a7da230a69a88a61db94554d9daf84884}{Logs}}[\mbox{\hyperlink{struct_iterative_parsing_reader_handler_ac7a98465a273a5fc081ff896add09d6d}{LogCount}}++]\ =\ \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a931864e899c8da14a11446b180f09502}{LOG\_STRING}};\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_iterative_parsing_reader_handler_ac25635362ab5139ccb8aea0fa5403d9d}\index{IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}!Uint@{Uint}}
+\index{Uint@{Uint}!IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}}
+\doxysubsubsection{\texorpdfstring{Uint()}{Uint()}}
+{\footnotesize\ttfamily \label{struct_iterative_parsing_reader_handler_ac25635362ab5139ccb8aea0fa5403d9d} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}  = UTF8$<$$>$$>$ \\
+bool \mbox{\hyperlink{struct_iterative_parsing_reader_handler}{Iterative\+Parsing\+Reader\+Handler}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$\+::\+Uint (\begin{DoxyParamCaption}\item[{unsigned}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01484}{1484}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01484\ \{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\mbox{\hyperlink{struct_iterative_parsing_reader_handler_ac7a98465a273a5fc081ff896add09d6d}{LogCount}}\ <\ \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a986e60bf01c4ec57208ea008c63dfac5}{LogCapacity}});\ \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a7da230a69a88a61db94554d9daf84884}{Logs}}[\mbox{\hyperlink{struct_iterative_parsing_reader_handler_ac7a98465a273a5fc081ff896add09d6d}{LogCount}}++]\ =\ \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a580d89f73e2a327bdba873a3c68b550a}{LOG\_INT}};\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_iterative_parsing_reader_handler_a4a68c6855ba60b33b6b2bcb8bf6f0891}\index{IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}!Uint64@{Uint64}}
+\index{Uint64@{Uint64}!IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}}
+\doxysubsubsection{\texorpdfstring{Uint64()}{Uint64()}}
+{\footnotesize\ttfamily \label{struct_iterative_parsing_reader_handler_a4a68c6855ba60b33b6b2bcb8bf6f0891} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}  = UTF8$<$$>$$>$ \\
+bool \mbox{\hyperlink{struct_iterative_parsing_reader_handler}{Iterative\+Parsing\+Reader\+Handler}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$\+::\+Uint64 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01488}{1488}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01488\ \{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\mbox{\hyperlink{struct_iterative_parsing_reader_handler_ac7a98465a273a5fc081ff896add09d6d}{LogCount}}\ <\ \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a986e60bf01c4ec57208ea008c63dfac5}{LogCapacity}});\ \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a7da230a69a88a61db94554d9daf84884}{Logs}}[\mbox{\hyperlink{struct_iterative_parsing_reader_handler_ac7a98465a273a5fc081ff896add09d6d}{LogCount}}++]\ =\ \mbox{\hyperlink{struct_iterative_parsing_reader_handler_a3c53bd31348781d8138a96a1ae67b54f}{LOG\_UINT64}};\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_iterative_parsing_reader_handler_a1cec7d66e55f8d8dc1f60f78502b6058}\index{IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}!LOG\_BOOL@{LOG\_BOOL}}
+\index{LOG\_BOOL@{LOG\_BOOL}!IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}}
+\doxysubsubsection{\texorpdfstring{LOG\_BOOL}{LOG\_BOOL}}
+{\footnotesize\ttfamily \label{struct_iterative_parsing_reader_handler_a1cec7d66e55f8d8dc1f60f78502b6058} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}  = UTF8$<$$>$$>$ \\
+const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{struct_iterative_parsing_reader_handler}{Iterative\+Parsing\+Reader\+Handler}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$\+::\+LOG\+\_\+\+BOOL = 0x20000000\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01458}{1458}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+\Hypertarget{struct_iterative_parsing_reader_handler_a1a30c03ff10fc96c5d0bc35aa9e2704a}\index{IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}!LOG\_DOUBLE@{LOG\_DOUBLE}}
+\index{LOG\_DOUBLE@{LOG\_DOUBLE}!IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}}
+\doxysubsubsection{\texorpdfstring{LOG\_DOUBLE}{LOG\_DOUBLE}}
+{\footnotesize\ttfamily \label{struct_iterative_parsing_reader_handler_a1a30c03ff10fc96c5d0bc35aa9e2704a} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}  = UTF8$<$$>$$>$ \\
+const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{struct_iterative_parsing_reader_handler}{Iterative\+Parsing\+Reader\+Handler}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$\+::\+LOG\+\_\+\+DOUBLE = 0x70000000\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01463}{1463}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+\Hypertarget{struct_iterative_parsing_reader_handler_af4a9abe34b336931c1624e07409c8365}\index{IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}!LOG\_ENDARRAY@{LOG\_ENDARRAY}}
+\index{LOG\_ENDARRAY@{LOG\_ENDARRAY}!IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}}
+\doxysubsubsection{\texorpdfstring{LOG\_ENDARRAY}{LOG\_ENDARRAY}}
+{\footnotesize\ttfamily \label{struct_iterative_parsing_reader_handler_af4a9abe34b336931c1624e07409c8365} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}  = UTF8$<$$>$$>$ \\
+const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{struct_iterative_parsing_reader_handler}{Iterative\+Parsing\+Reader\+Handler}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$\+::\+LOG\+\_\+\+ENDARRAY = 0x\+D0000000\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01469}{1469}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+\Hypertarget{struct_iterative_parsing_reader_handler_a952f68ebc1bb8b6852e71c76dfaf518b}\index{IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}!LOG\_ENDOBJECT@{LOG\_ENDOBJECT}}
+\index{LOG\_ENDOBJECT@{LOG\_ENDOBJECT}!IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}}
+\doxysubsubsection{\texorpdfstring{LOG\_ENDOBJECT}{LOG\_ENDOBJECT}}
+{\footnotesize\ttfamily \label{struct_iterative_parsing_reader_handler_a952f68ebc1bb8b6852e71c76dfaf518b} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}  = UTF8$<$$>$$>$ \\
+const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{struct_iterative_parsing_reader_handler}{Iterative\+Parsing\+Reader\+Handler}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$\+::\+LOG\+\_\+\+ENDOBJECT = 0x\+B0000000\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01467}{1467}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+\Hypertarget{struct_iterative_parsing_reader_handler_a580d89f73e2a327bdba873a3c68b550a}\index{IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}!LOG\_INT@{LOG\_INT}}
+\index{LOG\_INT@{LOG\_INT}!IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}}
+\doxysubsubsection{\texorpdfstring{LOG\_INT}{LOG\_INT}}
+{\footnotesize\ttfamily \label{struct_iterative_parsing_reader_handler_a580d89f73e2a327bdba873a3c68b550a} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}  = UTF8$<$$>$$>$ \\
+const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{struct_iterative_parsing_reader_handler}{Iterative\+Parsing\+Reader\+Handler}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$\+::\+LOG\+\_\+\+INT = 0x30000000\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01459}{1459}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+\Hypertarget{struct_iterative_parsing_reader_handler_a23450d62f01eb0951379e3b03d4fc340}\index{IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}!LOG\_INT64@{LOG\_INT64}}
+\index{LOG\_INT64@{LOG\_INT64}!IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}}
+\doxysubsubsection{\texorpdfstring{LOG\_INT64}{LOG\_INT64}}
+{\footnotesize\ttfamily \label{struct_iterative_parsing_reader_handler_a23450d62f01eb0951379e3b03d4fc340} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}  = UTF8$<$$>$$>$ \\
+const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{struct_iterative_parsing_reader_handler}{Iterative\+Parsing\+Reader\+Handler}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$\+::\+LOG\+\_\+\+INT64 = 0x50000000\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01461}{1461}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+\Hypertarget{struct_iterative_parsing_reader_handler_a940ea6a3d815546e8bc2707795bb927c}\index{IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}!LOG\_KEY@{LOG\_KEY}}
+\index{LOG\_KEY@{LOG\_KEY}!IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}}
+\doxysubsubsection{\texorpdfstring{LOG\_KEY}{LOG\_KEY}}
+{\footnotesize\ttfamily \label{struct_iterative_parsing_reader_handler_a940ea6a3d815546e8bc2707795bb927c} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}  = UTF8$<$$>$$>$ \\
+const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{struct_iterative_parsing_reader_handler}{Iterative\+Parsing\+Reader\+Handler}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$\+::\+LOG\+\_\+\+KEY = 0x\+A0000000\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01466}{1466}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+\Hypertarget{struct_iterative_parsing_reader_handler_a3c096cea45af81e09675b0954f9df5b1}\index{IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}!LOG\_NULL@{LOG\_NULL}}
+\index{LOG\_NULL@{LOG\_NULL}!IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}}
+\doxysubsubsection{\texorpdfstring{LOG\_NULL}{LOG\_NULL}}
+{\footnotesize\ttfamily \label{struct_iterative_parsing_reader_handler_a3c096cea45af81e09675b0954f9df5b1} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}  = UTF8$<$$>$$>$ \\
+const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{struct_iterative_parsing_reader_handler}{Iterative\+Parsing\+Reader\+Handler}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$\+::\+LOG\+\_\+\+NULL = 0x10000000\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01457}{1457}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+\Hypertarget{struct_iterative_parsing_reader_handler_ad1c867965c72e99e85d98b43ed86cfdd}\index{IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}!LOG\_STARTARRAY@{LOG\_STARTARRAY}}
+\index{LOG\_STARTARRAY@{LOG\_STARTARRAY}!IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}}
+\doxysubsubsection{\texorpdfstring{LOG\_STARTARRAY}{LOG\_STARTARRAY}}
+{\footnotesize\ttfamily \label{struct_iterative_parsing_reader_handler_ad1c867965c72e99e85d98b43ed86cfdd} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}  = UTF8$<$$>$$>$ \\
+const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{struct_iterative_parsing_reader_handler}{Iterative\+Parsing\+Reader\+Handler}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$\+::\+LOG\+\_\+\+STARTARRAY = 0x\+C0000000\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01468}{1468}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+\Hypertarget{struct_iterative_parsing_reader_handler_ab488e7de7961b7b234bd5a315594b1cc}\index{IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}!LOG\_STARTOBJECT@{LOG\_STARTOBJECT}}
+\index{LOG\_STARTOBJECT@{LOG\_STARTOBJECT}!IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}}
+\doxysubsubsection{\texorpdfstring{LOG\_STARTOBJECT}{LOG\_STARTOBJECT}}
+{\footnotesize\ttfamily \label{struct_iterative_parsing_reader_handler_ab488e7de7961b7b234bd5a315594b1cc} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}  = UTF8$<$$>$$>$ \\
+const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{struct_iterative_parsing_reader_handler}{Iterative\+Parsing\+Reader\+Handler}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$\+::\+LOG\+\_\+\+STARTOBJECT = 0x90000000\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01465}{1465}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+\Hypertarget{struct_iterative_parsing_reader_handler_a931864e899c8da14a11446b180f09502}\index{IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}!LOG\_STRING@{LOG\_STRING}}
+\index{LOG\_STRING@{LOG\_STRING}!IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}}
+\doxysubsubsection{\texorpdfstring{LOG\_STRING}{LOG\_STRING}}
+{\footnotesize\ttfamily \label{struct_iterative_parsing_reader_handler_a931864e899c8da14a11446b180f09502} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}  = UTF8$<$$>$$>$ \\
+const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{struct_iterative_parsing_reader_handler}{Iterative\+Parsing\+Reader\+Handler}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$\+::\+LOG\+\_\+\+STRING = 0x80000000\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01464}{1464}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+\Hypertarget{struct_iterative_parsing_reader_handler_a6c21e30374cb3b8aa0030d0920a03131}\index{IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}!LOG\_UINT@{LOG\_UINT}}
+\index{LOG\_UINT@{LOG\_UINT}!IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}}
+\doxysubsubsection{\texorpdfstring{LOG\_UINT}{LOG\_UINT}}
+{\footnotesize\ttfamily \label{struct_iterative_parsing_reader_handler_a6c21e30374cb3b8aa0030d0920a03131} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}  = UTF8$<$$>$$>$ \\
+const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{struct_iterative_parsing_reader_handler}{Iterative\+Parsing\+Reader\+Handler}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$\+::\+LOG\+\_\+\+UINT = 0x40000000\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01460}{1460}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+\Hypertarget{struct_iterative_parsing_reader_handler_a3c53bd31348781d8138a96a1ae67b54f}\index{IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}!LOG\_UINT64@{LOG\_UINT64}}
+\index{LOG\_UINT64@{LOG\_UINT64}!IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}}
+\doxysubsubsection{\texorpdfstring{LOG\_UINT64}{LOG\_UINT64}}
+{\footnotesize\ttfamily \label{struct_iterative_parsing_reader_handler_a3c53bd31348781d8138a96a1ae67b54f} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}  = UTF8$<$$>$$>$ \\
+const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{struct_iterative_parsing_reader_handler}{Iterative\+Parsing\+Reader\+Handler}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$\+::\+LOG\+\_\+\+UINT64 = 0x60000000\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01462}{1462}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+\Hypertarget{struct_iterative_parsing_reader_handler_a986e60bf01c4ec57208ea008c63dfac5}\index{IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}!LogCapacity@{LogCapacity}}
+\index{LogCapacity@{LogCapacity}!IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}}
+\doxysubsubsection{\texorpdfstring{LogCapacity}{LogCapacity}}
+{\footnotesize\ttfamily \label{struct_iterative_parsing_reader_handler_a986e60bf01c4ec57208ea008c63dfac5} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}  = UTF8$<$$>$$>$ \\
+const size\+\_\+t \mbox{\hyperlink{struct_iterative_parsing_reader_handler}{Iterative\+Parsing\+Reader\+Handler}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$\+::\+Log\+Capacity = 256\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01471}{1471}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+\Hypertarget{struct_iterative_parsing_reader_handler_ac7a98465a273a5fc081ff896add09d6d}\index{IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}!LogCount@{LogCount}}
+\index{LogCount@{LogCount}!IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}}
+\doxysubsubsection{\texorpdfstring{LogCount}{LogCount}}
+{\footnotesize\ttfamily \label{struct_iterative_parsing_reader_handler_ac7a98465a273a5fc081ff896add09d6d} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}  = UTF8$<$$>$$>$ \\
+size\+\_\+t \mbox{\hyperlink{struct_iterative_parsing_reader_handler}{Iterative\+Parsing\+Reader\+Handler}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$\+::\+Log\+Count}
+
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01473}{1473}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+\Hypertarget{struct_iterative_parsing_reader_handler_a7da230a69a88a61db94554d9daf84884}\index{IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}!Logs@{Logs}}
+\index{Logs@{Logs}!IterativeParsingReaderHandler$<$ Encoding $>$@{IterativeParsingReaderHandler$<$ Encoding $>$}}
+\doxysubsubsection{\texorpdfstring{Logs}{Logs}}
+{\footnotesize\ttfamily \label{struct_iterative_parsing_reader_handler_a7da230a69a88a61db94554d9daf84884} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}  = UTF8$<$$>$$>$ \\
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{struct_iterative_parsing_reader_handler}{Iterative\+Parsing\+Reader\+Handler}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$\+::\+Logs\mbox{[}\mbox{\hyperlink{struct_iterative_parsing_reader_handler_a986e60bf01c4ec57208ea008c63dfac5}{Log\+Capacity}}\mbox{]}}
+
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01472}{1472}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/test/unittest/\mbox{\hyperlink{readertest_8cpp}{readertest.\+cpp}}\end{DoxyCompactItemize}

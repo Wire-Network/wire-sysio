@@ -1,0 +1,107 @@
+\doxysection{libraries/fc/libraries/ff/depends/ate-\/pairing/test/test\+\_\+point.hpp File Reference}
+\hypertarget{test__point_8hpp}{}\label{test__point_8hpp}\index{libraries/fc/libraries/ff/depends/ate-\/pairing/test/test\_point.hpp@{libraries/fc/libraries/ff/depends/ate-\/pairing/test/test\_point.hpp}}
+{\ttfamily \#include "{}bn.\+h"{}}\newline
+Include dependency graph for test\+\_\+point.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__point_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__point_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_point}{Point}}
+\item 
+struct \mbox{\hyperlink{struct_point_1_1_g2}{Point\+::\+G2}}
+\item 
+struct \mbox{\hyperlink{struct_point_1_1_g1}{Point\+::\+G1}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{test__point_8hpp_af1474931d5774e22c1c9894d7bb3f6b3}{PUT}}(x)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+const \mbox{\hyperlink{struct_point}{Point}} \& \mbox{\hyperlink{test__point_8hpp_ae46abcc83c05232be0ecaf52ed4a3f76}{select\+Point}} (const \mbox{\hyperlink{structbn_1_1_curve_param}{bn\+::\+Curve\+Param}} \&cp)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+const struct \mbox{\hyperlink{struct_point}{Point}} \mbox{\hyperlink{test__point_8hpp_a4aa0faadfd770285f9997dd6e6202fd5}{g\+\_\+point\+Tbl}} \mbox{[}$\,$\mbox{]}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{test__point_8hpp_af1474931d5774e22c1c9894d7bb3f6b3}\index{test\_point.hpp@{test\_point.hpp}!PUT@{PUT}}
+\index{PUT@{PUT}!test\_point.hpp@{test\_point.hpp}}
+\doxysubsubsection{\texorpdfstring{PUT}{PUT}}
+{\footnotesize\ttfamily \label{test__point_8hpp_af1474931d5774e22c1c9894d7bb3f6b3} 
+\#define PUT(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{std::cout\ <<\ \#x\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)t="{}}\ <<\ (x)\ <<\ std::endl;}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{test__point_8hpp_source_l00004}{4}} of file \mbox{\hyperlink{test__point_8hpp_source}{test\+\_\+point.\+hpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{test__point_8hpp_ae46abcc83c05232be0ecaf52ed4a3f76}\index{test\_point.hpp@{test\_point.hpp}!selectPoint@{selectPoint}}
+\index{selectPoint@{selectPoint}!test\_point.hpp@{test\_point.hpp}}
+\doxysubsubsection{\texorpdfstring{selectPoint()}{selectPoint()}}
+{\footnotesize\ttfamily \label{test__point_8hpp_ae46abcc83c05232be0ecaf52ed4a3f76} 
+const \mbox{\hyperlink{struct_point}{Point}} \& select\+Point (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structbn_1_1_curve_param}{bn\+::\+Curve\+Param}} \&}]{cp}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{test__point_8hpp_source_l00059}{59}} of file \mbox{\hyperlink{test__point_8hpp_source}{test\+\_\+point.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00060\ \{}
+\DoxyCodeLine{00061\ \textcolor{preprocessor}{\#ifdef\ BN\_SUPPORT\_SNARK}}
+\DoxyCodeLine{00062\ \ \ \ \ \textcolor{keywordflow}{if}\ (cp.\mbox{\hyperlink{structbn_1_1_curve_param_aac649328a96cc37f3c9fc66ade0b8831}{b}}\ !=\ 3\ \&\&\ cp.\mbox{\hyperlink{structbn_1_1_curve_param_aac649328a96cc37f3c9fc66ade0b8831}{b}}\ !=\ 82)\ \{}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}not\ support\ point\ for\ b=\%d\(\backslash\)n"{}},\ cp.\mbox{\hyperlink{structbn_1_1_curve_param_aac649328a96cc37f3c9fc66ade0b8831}{b}});}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ exit(1);}
+\DoxyCodeLine{00065\ \ \ \ \ \}}
+\DoxyCodeLine{00066\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{test__point_8hpp_a4aa0faadfd770285f9997dd6e6202fd5}{g\_pointTbl}}[cp.\mbox{\hyperlink{structbn_1_1_curve_param_aac649328a96cc37f3c9fc66ade0b8831}{b}}\ ==\ 3\ ?\ 0\ :\ 1];}
+\DoxyCodeLine{00067\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00068\ \ \ \ \ \textcolor{keywordflow}{if}\ (cp\ !=\ \mbox{\hyperlink{namespacebn_a79a7b30048022e75b4f8d886fe5224a0}{bn::CurveFp254BNb}})\ \{}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}not\ support\ except\ for\ CurveFp254BNb"{}});}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ exit(1);}
+\DoxyCodeLine{00071\ \ \ \ \ \}}
+\DoxyCodeLine{00072\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{test__point_8hpp_a4aa0faadfd770285f9997dd6e6202fd5}{g\_pointTbl}}[0];}
+\DoxyCodeLine{00073\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00074\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=313pt]{test__point_8hpp_ae46abcc83c05232be0ecaf52ed4a3f76_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{test__point_8hpp_a4aa0faadfd770285f9997dd6e6202fd5}\index{test\_point.hpp@{test\_point.hpp}!g\_pointTbl@{g\_pointTbl}}
+\index{g\_pointTbl@{g\_pointTbl}!test\_point.hpp@{test\_point.hpp}}
+\doxysubsubsection{\texorpdfstring{g\_pointTbl}{g\_pointTbl}}
+{\footnotesize\ttfamily \label{test__point_8hpp_a4aa0faadfd770285f9997dd6e6202fd5} 
+const struct \mbox{\hyperlink{struct_point}{Point}} g\+\_\+point\+Tbl\mbox{[}$\,$\mbox{]}}
+

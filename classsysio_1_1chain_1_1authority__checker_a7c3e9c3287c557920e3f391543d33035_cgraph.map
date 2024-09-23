@@ -1,0 +1,10 @@
+<map id="sysio::chain::authority_checker::satisfied" name="sysio::chain::authority_checker::satisfied">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,29,155,70"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1chain_1_1authority__checker.html#a40cf1f7624ce4c22f5bb1ce26723ad1f" title=" " alt="" coords="203,29,352,70"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="155,47,187,47,187,52,155,52"/>
+<area shape="poly" id="edge4_Node000002_Node000002" title=" " alt="" coords="240,29,238,19,244,10,257,5,277,3,299,5,312,11,309,16,297,10,277,8,259,10,247,15,243,20,245,28"/>
+<area shape="rect" id="Node000003" href="$integration_8cpp.html#a6e9635897de7740b7389a391f613626b" title=" " alt="" coords="448,12,501,37"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="352,37,433,27,434,32,353,43"/>
+<area shape="rect" id="Node000004" href="$namespacefc.html#a23d89b54a8ffd84f7e7efeb21747d846" title=" " alt="" coords="400,61,549,86"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="353,56,385,60,384,65,352,61"/>
+</map>

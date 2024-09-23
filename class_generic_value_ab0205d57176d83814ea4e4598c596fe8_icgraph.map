@@ -1,0 +1,5 @@
+<map id="GenericValue::GenericValue" name="GenericValue::GenericValue">
+<area shape="rect" id="Node000001" title="Default constructor creates a null value." alt="" coords="237,5,420,31"/>
+<area shape="rect" id="Node000002" href="$class_generic_value.html#a76c68b72723a06045776dbd425f9e8b6" title="Explicit copy constructor (with allocator)" alt="" coords="5,5,189,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="221,21,189,21,189,16,221,16"/>
+</map>

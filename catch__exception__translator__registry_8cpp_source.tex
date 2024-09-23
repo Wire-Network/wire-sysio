@@ -1,0 +1,95 @@
+\doxysection{catch\+\_\+exception\+\_\+translator\+\_\+registry.\+cpp}
+\hypertarget{catch__exception__translator__registry_8cpp_source}{}\label{catch__exception__translator__registry_8cpp_source}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_exception\_translator\_registry.cpp@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_exception\_translator\_registry.cpp}}
+\mbox{\hyperlink{catch__exception__translator__registry_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00002}00002\ \textcolor{comment}{\ *\ \ Created\ by\ Phil\ on\ 20/04/2011.}}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00003}00003\ \textcolor{comment}{\ *\ \ Copyright\ 2011\ Two\ Blue\ Cubes\ Ltd.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00004}00004\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00005}00005\ \textcolor{comment}{\ *\ \ Distributed\ under\ the\ Boost\ Software\ License,\ Version\ 1.0.\ (See\ accompanying}}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00006}00006\ \textcolor{comment}{\ *\ \ file\ LICENSE\_1\_0.txt\ or\ copy\ at\ http://www.boost.org/LICENSE\_1\_0.txt)}}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00007}00007\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__exception__translator__registry_8h}{catch\_exception\_translator\_registry.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__assertionhandler_8h}{catch\_assertionhandler.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00011}00011\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__compiler__capabilities_8h}{catch\_compiler\_capabilities.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00012}00012\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__enforce_8h}{catch\_enforce.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00014}00014\ \textcolor{preprocessor}{\#ifdef\ \_\_OBJC\_\_}}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00015}00015\ \textcolor{preprocessor}{\#import\ "{}Foundation/Foundation.h"{}}}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00016}00016\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00018}00018\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00020}\mbox{\hyperlink{class_catch_1_1_exception_translator_registry_a80970dbd74a32ea94d11618eeef59493}{00020}}\ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_exception_translator_registry_a80970dbd74a32ea94d11618eeef59493}{ExceptionTranslatorRegistry::\string~ExceptionTranslatorRegistry}}()\ \{}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00021}00021\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00023}\mbox{\hyperlink{class_catch_1_1_exception_translator_registry_a556a77deb4690677d774f682e1b90caa}{00023}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_exception_translator_registry_a556a77deb4690677d774f682e1b90caa}{ExceptionTranslatorRegistry::registerTranslator}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_catch_1_1_i_exception_translator}{IExceptionTranslator}}*\ translator\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00024}00024\ \ \ \ \ \ \ \ \ m\_translators.push\_back(\ std::unique\_ptr<const\ IExceptionTranslator>(\ translator\ )\ );}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00025}00025\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00027}00027\ \textcolor{preprocessor}{\#if\ !defined(CATCH\_CONFIG\_DISABLE\_EXCEPTIONS)}}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00028}00028\ \ \ \ \ std::string\ \mbox{\hyperlink{class_catch_1_1_exception_translator_registry_a20708aa96760c083f5fd4ee0c894802e}{ExceptionTranslatorRegistry::translateActiveException}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00029}00029\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00030}00030\ \textcolor{preprocessor}{\#ifdef\ \_\_OBJC\_\_}}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00031}00031\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ In\ Objective-\/C\ try\ objective-\/c\ exceptions\ first}}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00032}00032\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{@try}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00033}00033\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_catch_1_1_exception_translator_registry_ab99cec0e802db0327362c576bedd4377}{tryTranslators}}();}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00034}00034\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00035}00035\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{@catch}\ (NSException\ *exception)\ \{}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00036}00036\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{Catch::Detail::stringify}}(\ [exception\ description]\ );}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00037}00037\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00038}00038\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00039}00039\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Compiling\ a\ mixed\ mode\ project\ with\ MSVC\ means\ that\ CLR}}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00040}00040\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ exceptions\ will\ be\ caught\ in\ (...)\ as\ well.\ However,\ these}}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00041}00041\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ do\ not\ fill-\/in\ std::current\_exception\ and\ thus\ lead\ to\ crash}}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00042}00042\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ when\ attempting\ rethrow.}}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00043}00043\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ /EHa\ switch\ also\ causes\ structured\ exceptions\ to\ be\ caught}}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00044}00044\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ here,\ but\ they\ fill-\/in\ current\_exception\ properly,\ so}}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00045}00045\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ at\ worst\ the\ output\ should\ be\ a\ little\ weird,\ instead\ of}}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00046}00046\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ causing\ a\ crash.}}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00047}00047\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (std::current\_exception()\ ==\ \textcolor{keyword}{nullptr})\ \{}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Non\ C++\ exception.\ Possibly\ a\ CLR\ exception."{}};}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00050}00050\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_catch_1_1_exception_translator_registry_ab99cec0e802db0327362c576bedd4377}{tryTranslators}}();}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00051}00051\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00052}00052\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{catch}(\ TestFailureException\&\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \ \ \ std::rethrow\_exception(std::current\_exception());}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00055}00055\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00056}00056\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{catch}(\ std::exception\&\ ex\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ex.what();}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00058}00058\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00059}00059\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{catch}(\ std::string\&\ msg\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ msg;}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00061}00061\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00062}00062\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{catch}(\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ msg\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ msg;}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00064}00064\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00065}00065\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{catch}(...)\ \{}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00066}00066\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Unknown\ exception"{}};}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00067}00067\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00068}00068\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00069}00069\ }
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00070}00070\ \ \ \ \ std::string\ \mbox{\hyperlink{class_catch_1_1_exception_translator_registry_ab99cec0e802db0327362c576bedd4377}{ExceptionTranslatorRegistry::tryTranslators}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00071}00071\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (m\_translators.empty())\ \{}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \ \ \ std::rethrow\_exception(std::current\_exception());}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00073}00073\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00074}00074\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_translators[0]-\/>translate(m\_translators.begin()\ +\ 1,\ m\_translators.end());}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00075}00075\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00076}00076\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00077}00077\ }
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00078}00078\ \textcolor{preprocessor}{\#else\ }\textcolor{comment}{//\ \string^\string^\ Exceptions\ are\ enabled\ //\ Exceptions\ are\ disabled\ vv}}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00079}\mbox{\hyperlink{class_catch_1_1_exception_translator_registry_a20708aa96760c083f5fd4ee0c894802e}{00079}}\ \ \ \ \ std::string\ \mbox{\hyperlink{class_catch_1_1_exception_translator_registry_a20708aa96760c083f5fd4ee0c894802e}{ExceptionTranslatorRegistry::translateActiveException}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00080}00080\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{catch__enforce_8h_a05b6c8a530fa2e5b397add8966522777}{CATCH\_INTERNAL\_ERROR}}(\textcolor{stringliteral}{"{}Attempted\ to\ translate\ active\ exception\ under\ CATCH\_CONFIG\_DISABLE\_EXCEPTIONS!"{}});}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00081}00081\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00083}\mbox{\hyperlink{class_catch_1_1_exception_translator_registry_ab99cec0e802db0327362c576bedd4377}{00083}}\ \ \ \ \ std::string\ \mbox{\hyperlink{class_catch_1_1_exception_translator_registry_ab99cec0e802db0327362c576bedd4377}{ExceptionTranslatorRegistry::tryTranslators}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00084}00084\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{catch__enforce_8h_a05b6c8a530fa2e5b397add8966522777}{CATCH\_INTERNAL\_ERROR}}(\textcolor{stringliteral}{"{}Attempted\ to\ use\ exception\ translators\ under\ CATCH\_CONFIG\_DISABLE\_EXCEPTIONS!"{}});}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00085}00085\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00086}00086\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00087}00087\ }
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00088}00088\ }
+\DoxyCodeLine{\Hypertarget{catch__exception__translator__registry_8cpp_source_l00089}00089\ \}}
+
+\end{DoxyCode}

@@ -1,0 +1,85 @@
+\doxysection{libraries/fc/include/fc/crypto/elliptic\+\_\+em.hpp File Reference}
+\hypertarget{elliptic__em_8hpp}{}\label{elliptic__em_8hpp}\index{libraries/fc/include/fc/crypto/elliptic\_em.hpp@{libraries/fc/include/fc/crypto/elliptic\_em.hpp}}
+{\ttfamily \#include $<$fc/crypto/bigint.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/crypto/common.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/crypto/openssl.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/crypto/sha256.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/crypto/sha512.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/crypto/keccak256.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/fwd.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/array.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/io/raw\+\_\+fwd.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/crypto/elliptic.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/reflect/reflect.\+hpp$>$}\newline
+Include dependency graph for elliptic\+\_\+em.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{elliptic__em_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{elliptic__em_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classfc_1_1em_1_1public__key}{fc\+::em\+::public\+\_\+key}}
+\begin{DoxyCompactList}\small\item\em contains only the public point of an elliptic curve key. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{classfc_1_1em_1_1private__key}{fc\+::em\+::private\+\_\+key}}
+\begin{DoxyCompactList}\small\item\em an elliptic curve private key. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{structfc_1_1em_1_1public__key__shim}{fc\+::em\+::public\+\_\+key\+\_\+shim}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1em_1_1signature__shim}{fc\+::em\+::signature\+\_\+shim}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1em_1_1private__key__shim}{fc\+::em\+::private\+\_\+key\+\_\+shim}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacefc}{fc}}
+\begin{DoxyCompactList}\small\item\em namespace \doxylink{namespacesysio_1_1chain}{sysio\+::chain} \end{DoxyCompactList}\item 
+namespace \mbox{\hyperlink{namespacefc_1_1em}{fc\+::em}}
+\item 
+namespace \mbox{\hyperlink{namespacefc_1_1em_1_1detail}{fc\+::em\+::detail}}
+\item 
+namespace \mbox{\hyperlink{namespacefc_1_1raw}{fc\+::raw}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{classfc_1_1array}{fc\+::array}}$<$ char, 33 $>$ \mbox{\hyperlink{namespacefc_1_1em_a90da93579f68f1975632a80bbea418ac}{fc\+::em\+::commitment\+\_\+type}}
+\item 
+typedef \mbox{\hyperlink{classfc_1_1array}{fc\+::array}}$<$ char, 33 $>$ \mbox{\hyperlink{namespacefc_1_1em_a1627d67937daf81f9156f8e630b6578c}{fc\+::em\+::public\+\_\+key\+\_\+data}}
+\item 
+typedef \mbox{\hyperlink{classfc_1_1array}{fc\+::array}}$<$ char, 65 $>$ \mbox{\hyperlink{namespacefc_1_1em_a27669d7ea0ac768205147513ff5f09ac}{fc\+::em\+::public\+\_\+key\+\_\+point\+\_\+data}}
+\begin{DoxyCompactList}\small\item\em the full non-\/compressed version of the ECC point \end{DoxyCompactList}\item 
+typedef \mbox{\hyperlink{classfc_1_1array}{fc\+::array}}$<$ char, 72 $>$ \mbox{\hyperlink{namespacefc_1_1em_a225728ffa9b9bc76ab9b0679fc1ac00a}{fc\+::em\+::signature}}
+\item 
+typedef \mbox{\hyperlink{classfc_1_1array}{fc\+::array}}$<$ unsigned char, 65 $>$ \mbox{\hyperlink{namespacefc_1_1em_a7a9ffecb82035de40514a105d8ca7ff3}{fc\+::em\+::compact\+\_\+signature}}
+\item 
+typedef \mbox{\hyperlink{classfc_1_1array}{fc\+::array}}$<$ char, 78 $>$ \mbox{\hyperlink{namespacefc_1_1em_a88b6b5690e9f6ed0f00a9cf71efe1e2c}{fc\+::em\+::extended\+\_\+key\+\_\+data}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{namespacefc_a61d89d3b2913f40f8a94aed7c241011a}{fc\+::to\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1em_1_1private__key}{em\+::private\+\_\+key}} \&var, \mbox{\hyperlink{classfc_1_1variant}{variant}} \&vo)
+\item 
+void \mbox{\hyperlink{namespacefc_aaf71cf15f468f78447911bc96f281f03}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{variant}} \&var, \mbox{\hyperlink{classfc_1_1em_1_1private__key}{em\+::private\+\_\+key}} \&vo)
+\item 
+void \mbox{\hyperlink{namespacefc_a38400bca4e54bbb859ad1c9aaaf0a6e8}{fc\+::to\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1em_1_1public__key}{em\+::public\+\_\+key}} \&var, \mbox{\hyperlink{classfc_1_1variant}{variant}} \&vo)
+\item 
+void \mbox{\hyperlink{namespacefc_aafd2377171149c102be2b1b693ea8787}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{variant}} \&var, \mbox{\hyperlink{classfc_1_1em_1_1public__key}{em\+::public\+\_\+key}} \&vo)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_a4dac40efc6d650ac388b600ece158356}{fc\+::raw\+::unpack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, \mbox{\hyperlink{classfc_1_1em_1_1public__key}{fc\+::em\+::public\+\_\+key}} \&pk)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_a8f4cdc90cae47c4e4484a16ee7395f9f}{fc\+::raw\+::pack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, const \mbox{\hyperlink{classfc_1_1em_1_1public__key}{fc\+::em\+::public\+\_\+key}} \&pk)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_a5c7866e25c040b2000f928e951b6b096}{fc\+::raw\+::unpack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, \mbox{\hyperlink{classfc_1_1em_1_1private__key}{fc\+::em\+::private\+\_\+key}} \&pk)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_a1236216bc1debc567f3eaba1471f92ed}{fc\+::raw\+::pack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, const \mbox{\hyperlink{classfc_1_1em_1_1private__key}{fc\+::em\+::private\+\_\+key}} \&pk)
+\end{DoxyCompactItemize}

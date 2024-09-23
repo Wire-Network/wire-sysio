@@ -1,0 +1,136 @@
+\doxysection{sysio\+::chain\+::wasm\+\_\+validations\+::nested\+\_\+validator Struct Reference}
+\hypertarget{structsysio_1_1chain_1_1wasm__validations_1_1nested__validator}{}\label{structsysio_1_1chain_1_1wasm__validations_1_1nested__validator}\index{sysio::chain::wasm\_validations::nested\_validator@{sysio::chain::wasm\_validations::nested\_validator}}
+
+
+{\ttfamily \#include $<$wasm\+\_\+sysio\+\_\+validation.\+hpp$>$}
+
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static void \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__validations_1_1nested__validator_a1c8367f631b914969a818fef8486e1ab}{init}} (bool disable)
+\item 
+static void \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__validations_1_1nested__validator_a877002b843b9d0e62f9c0de10d2be065}{accept}} (\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1instr}{wasm\+\_\+ops\+::instr}} \texorpdfstring{$\ast$}{*}inst, \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1visitor__arg}{wasm\+\_\+ops\+::visitor\+\_\+arg}} \&arg)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static constexpr bool \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__validations_1_1nested__validator_aa5224ac2bd1406d609eb4099de227fb6}{kills}} = false
+\item 
+static constexpr bool \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__validations_1_1nested__validator_a26ec83fa0fc2d18bbcd8289d88e52aa9}{post}} = false
+\item 
+static bool \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__validations_1_1nested__validator_a3caa5046706fa3999a912d5ddb126ba4}{disabled}} = false
+\item 
+static \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__validations_1_1nested__validator_a41f8dca91446cf7a8e2b8b245aa6fa28}{depth}} = 0
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__validation_8hpp_source_l00103}{103}} of file \mbox{\hyperlink{wasm__sysio__validation_8hpp_source}{wasm\+\_\+sysio\+\_\+validation.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1chain_1_1wasm__validations_1_1nested__validator_a877002b843b9d0e62f9c0de10d2be065}\index{sysio::chain::wasm\_validations::nested\_validator@{sysio::chain::wasm\_validations::nested\_validator}!accept@{accept}}
+\index{accept@{accept}!sysio::chain::wasm\_validations::nested\_validator@{sysio::chain::wasm\_validations::nested\_validator}}
+\doxysubsubsection{\texorpdfstring{accept()}{accept()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__validations_1_1nested__validator_a877002b843b9d0e62f9c0de10d2be065} 
+static void sysio\+::chain\+::wasm\+\_\+validations\+::nested\+\_\+validator\+::accept (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1instr}{wasm\+\_\+ops\+::instr}} \texorpdfstring{$\ast$}{*}}]{inst}{, }\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1visitor__arg}{wasm\+\_\+ops\+::visitor\+\_\+arg}} \&}]{arg}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__validation_8hpp_source_l00109}{109}} of file \mbox{\hyperlink{wasm__sysio__validation_8hpp_source}{wasm\+\_\+sysio\+\_\+validation.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__validations_1_1nested__validator_a3caa5046706fa3999a912d5ddb126ba4}{disabled}})\ \{}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ inst-\/>get\_code()\ ==\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ad951b3ebb4c8884270ad419e2b9c537c}{wasm\_ops::end\_code}}\ \&\&\ depth\ >\ 0\ )\ \{}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ depth-\/-\/;}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \ \ \ depth++;}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(depth\ <\ 1024,\ wasm\_execution\_error,\ \textcolor{stringliteral}{"{}Nested\ depth\ exceeded"{}});}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=327pt]{structsysio_1_1chain_1_1wasm__validations_1_1nested__validator_a877002b843b9d0e62f9c0de10d2be065_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1wasm__validations_1_1nested__validator_a1c8367f631b914969a818fef8486e1ab}\index{sysio::chain::wasm\_validations::nested\_validator@{sysio::chain::wasm\_validations::nested\_validator}!init@{init}}
+\index{init@{init}!sysio::chain::wasm\_validations::nested\_validator@{sysio::chain::wasm\_validations::nested\_validator}}
+\doxysubsubsection{\texorpdfstring{init()}{init()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__validations_1_1nested__validator_a1c8367f631b914969a818fef8486e1ab} 
+static void sysio\+::chain\+::wasm\+\_\+validations\+::nested\+\_\+validator\+::init (\begin{DoxyParamCaption}\item[{bool}]{disable}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__validation_8hpp_source_l00108}{108}} of file \mbox{\hyperlink{wasm__sysio__validation_8hpp_source}{wasm\+\_\+sysio\+\_\+validation.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00108\ \{\ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__validations_1_1nested__validator_a3caa5046706fa3999a912d5ddb126ba4}{disabled}}\ =\ disable;\ depth\ =\ 0;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1wasm__validations_1_1nested__validator_a1c8367f631b914969a818fef8486e1ab_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1chain_1_1wasm__validations_1_1nested__validator_a41f8dca91446cf7a8e2b8b245aa6fa28}\index{sysio::chain::wasm\_validations::nested\_validator@{sysio::chain::wasm\_validations::nested\_validator}!depth@{depth}}
+\index{depth@{depth}!sysio::chain::wasm\_validations::nested\_validator@{sysio::chain::wasm\_validations::nested\_validator}}
+\doxysubsubsection{\texorpdfstring{depth}{depth}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__validations_1_1nested__validator_a41f8dca91446cf7a8e2b8b245aa6fa28} 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} sysio\+::chain\+::wasm\+\_\+validations\+::nested\+\_\+validator\+::depth = 0\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__validation_8hpp_source_l00107}{107}} of file \mbox{\hyperlink{wasm__sysio__validation_8hpp_source}{wasm\+\_\+sysio\+\_\+validation.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__validations_1_1nested__validator_a3caa5046706fa3999a912d5ddb126ba4}\index{sysio::chain::wasm\_validations::nested\_validator@{sysio::chain::wasm\_validations::nested\_validator}!disabled@{disabled}}
+\index{disabled@{disabled}!sysio::chain::wasm\_validations::nested\_validator@{sysio::chain::wasm\_validations::nested\_validator}}
+\doxysubsubsection{\texorpdfstring{disabled}{disabled}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__validations_1_1nested__validator_a3caa5046706fa3999a912d5ddb126ba4} 
+bool sysio\+::chain\+::wasm\+\_\+validations\+::nested\+\_\+validator\+::disabled = false\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__validation_8hpp_source_l00106}{106}} of file \mbox{\hyperlink{wasm__sysio__validation_8hpp_source}{wasm\+\_\+sysio\+\_\+validation.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__validations_1_1nested__validator_aa5224ac2bd1406d609eb4099de227fb6}\index{sysio::chain::wasm\_validations::nested\_validator@{sysio::chain::wasm\_validations::nested\_validator}!kills@{kills}}
+\index{kills@{kills}!sysio::chain::wasm\_validations::nested\_validator@{sysio::chain::wasm\_validations::nested\_validator}}
+\doxysubsubsection{\texorpdfstring{kills}{kills}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__validations_1_1nested__validator_aa5224ac2bd1406d609eb4099de227fb6} 
+bool sysio\+::chain\+::wasm\+\_\+validations\+::nested\+\_\+validator\+::kills = false\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__validation_8hpp_source_l00104}{104}} of file \mbox{\hyperlink{wasm__sysio__validation_8hpp_source}{wasm\+\_\+sysio\+\_\+validation.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__validations_1_1nested__validator_a26ec83fa0fc2d18bbcd8289d88e52aa9}\index{sysio::chain::wasm\_validations::nested\_validator@{sysio::chain::wasm\_validations::nested\_validator}!post@{post}}
+\index{post@{post}!sysio::chain::wasm\_validations::nested\_validator@{sysio::chain::wasm\_validations::nested\_validator}}
+\doxysubsubsection{\texorpdfstring{post}{post}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__validations_1_1nested__validator_a26ec83fa0fc2d18bbcd8289d88e52aa9} 
+bool sysio\+::chain\+::wasm\+\_\+validations\+::nested\+\_\+validator\+::post = false\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__validation_8hpp_source_l00105}{105}} of file \mbox{\hyperlink{wasm__sysio__validation_8hpp_source}{wasm\+\_\+sysio\+\_\+validation.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{wasm__sysio__validation_8hpp}{wasm\+\_\+sysio\+\_\+validation.\+hpp}}\item 
+libraries/chain/\mbox{\hyperlink{wasm__sysio__validation_8cpp}{wasm\+\_\+sysio\+\_\+validation.\+cpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,42 @@
+\doxysection{pkcs11y.\+h}
+\hypertarget{pkcs11y_8h_source}{}\label{pkcs11y_8h_source}\index{libraries/yubihsm/pkcs11/pkcs11y.h@{libraries/yubihsm/pkcs11/pkcs11y.h}}
+\mbox{\hyperlink{pkcs11y_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{pkcs11y_8h_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{pkcs11y_8h_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ 2015-\/2018\ Yubico\ AB}}
+\DoxyCodeLine{\Hypertarget{pkcs11y_8h_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{pkcs11y_8h_source_l00004}00004\ \textcolor{comment}{\ *\ Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{\Hypertarget{pkcs11y_8h_source_l00005}00005\ \textcolor{comment}{\ *\ you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{pkcs11y_8h_source_l00006}00006\ \textcolor{comment}{\ *\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{\Hypertarget{pkcs11y_8h_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{pkcs11y_8h_source_l00008}00008\ \textcolor{comment}{\ *\ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{\Hypertarget{pkcs11y_8h_source_l00009}00009\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{pkcs11y_8h_source_l00010}00010\ \textcolor{comment}{\ *\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{\Hypertarget{pkcs11y_8h_source_l00011}00011\ \textcolor{comment}{\ *\ distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{\Hypertarget{pkcs11y_8h_source_l00012}00012\ \textcolor{comment}{\ *\ WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{\Hypertarget{pkcs11y_8h_source_l00013}00013\ \textcolor{comment}{\ *\ See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{\Hypertarget{pkcs11y_8h_source_l00014}00014\ \textcolor{comment}{\ *\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{pkcs11y_8h_source_l00015}00015\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{pkcs11y_8h_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{pkcs11y_8h_source_l00017}00017\ \textcolor{preprocessor}{\#ifndef\ PKCS11Y\_H}}
+\DoxyCodeLine{\Hypertarget{pkcs11y_8h_source_l00018}00018\ \textcolor{preprocessor}{\#define\ PKCS11Y\_H}}
+\DoxyCodeLine{\Hypertarget{pkcs11y_8h_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{pkcs11y_8h_source_l00020}00020\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{pkcs11_8h}{pkcs11.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{pkcs11y_8h_source_l00021}00021\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{yubihsm_8h}{yubihsm.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{pkcs11y_8h_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{pkcs11y_8h_source_l00023}00023\ \textcolor{comment}{/*\ This\ is\ an\ offset\ for\ the\ vendor\ definitions\ to\ avoid\ clashes\ */}}
+\DoxyCodeLine{\Hypertarget{pkcs11y_8h_source_l00024}\mbox{\hyperlink{pkcs11y_8h_a66af97709ad77b21720fd232118bf991}{00024}}\ \textcolor{preprocessor}{\#define\ YUBICO\_BASE\_VENDOR\ 0x59554200}}
+\DoxyCodeLine{\Hypertarget{pkcs11y_8h_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{pkcs11y_8h_source_l00026}\mbox{\hyperlink{pkcs11y_8h_a36836c45477aa90c29f687876a41adfa}{00026}}\ \textcolor{preprocessor}{\#define\ CKK\_YUBICO\_AES128\_CCM\_WRAP\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{pkcs11y_8h_source_l00027}00027\ \textcolor{preprocessor}{\ \ (CKK\_VENDOR\_DEFINED\ |\ YUBICO\_BASE\_VENDOR\ |\ YH\_ALGO\_AES128\_CCM\_WRAP)}}
+\DoxyCodeLine{\Hypertarget{pkcs11y_8h_source_l00028}\mbox{\hyperlink{pkcs11y_8h_a07bf1488ce6df0de33db1d1f9a259e73}{00028}}\ \textcolor{preprocessor}{\#define\ CKK\_YUBICO\_AES192\_CCM\_WRAP\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{pkcs11y_8h_source_l00029}00029\ \textcolor{preprocessor}{\ \ (CKK\_VENDOR\_DEFINED\ |\ YUBICO\_BASE\_VENDOR\ |\ YH\_ALGO\_AES192\_CCM\_WRAP)}}
+\DoxyCodeLine{\Hypertarget{pkcs11y_8h_source_l00030}\mbox{\hyperlink{pkcs11y_8h_ab413327578ae9fe0b157678ef2e9a571}{00030}}\ \textcolor{preprocessor}{\#define\ CKK\_YUBICO\_AES256\_CCM\_WRAP\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{pkcs11y_8h_source_l00031}00031\ \textcolor{preprocessor}{\ \ (CKK\_VENDOR\_DEFINED\ |\ YUBICO\_BASE\_VENDOR\ |\ YH\_ALGO\_AES256\_CCM\_WRAP)}}
+\DoxyCodeLine{\Hypertarget{pkcs11y_8h_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{pkcs11y_8h_source_l00033}\mbox{\hyperlink{pkcs11y_8h_a631efbda997696a7f7ce71df0e3e779a}{00033}}\ \textcolor{preprocessor}{\#define\ CKM\_YUBICO\_AES\_CCM\_WRAP\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{pkcs11y_8h_source_l00034}00034\ \textcolor{preprocessor}{\ \ (CKM\_VENDOR\_DEFINED\ |\ YUBICO\_BASE\_VENDOR\ |\ YH\_WRAP\_KEY)}}
+\DoxyCodeLine{\Hypertarget{pkcs11y_8h_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{pkcs11y_8h_source_l00036}00036\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

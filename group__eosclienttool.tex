@@ -1,0 +1,63 @@
+\doxysection{Eosclienttool}
+\hypertarget{group__eosclienttool}{}\label{group__eosclienttool}\index{Eosclienttool@{Eosclienttool}}
+\hypertarget{group__eosclienttool_intro}{}\doxysubsection{\texorpdfstring{Introduction to clio}{Introduction to clio}}\label{group__eosclienttool_intro}
+{\ttfamily clio} is a command line tool that interfaces with the REST api exposed by nodeop. In order to use {\ttfamily clio} you will need to have a local copy of {\ttfamily nodeop} running and configured to load the \textquotesingle{}\doxylink{classsysio_1_1chain__api__plugin}{sysio\+::chain\+\_\+api\+\_\+plugin}\textquotesingle{}.
+
+clio contains documentation for all of its commands. For a list of all commands known to clio, simply run it with no arguments\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$\ ./clio}
+\DoxyCodeLine{\mbox{\hyperlink{struct_command}{Command}}\ Line\ \mbox{\hyperlink{class_interface}{Interface}}\ to\ SYSIO\ Client}
+\DoxyCodeLine{Usage:\ programs/clio/clio\ [OPTIONS]\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_aba10771e3ff645fe1305be4cae517573ac4fb22412f02354dbe5574e37caf50a7}{SUBCOMMAND}}}
+\DoxyCodeLine{}
+\DoxyCodeLine{Options:}
+\DoxyCodeLine{\ \ -\/h,-\/-\/\mbox{\hyperlink{bench_8c_afbf64c5800dd79a07f48d4efc37c4262}{help}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1gtest__printers__test_ab1fefdb330a473343afa3cc6d46a65f6}{Print}}\ \textcolor{keyword}{this}\ \mbox{\hyperlink{bench_8c_afbf64c5800dd79a07f48d4efc37c4262}{help}}\ message\ and\ exit}
+\DoxyCodeLine{\ \ -\/u,-\/-\/\mbox{\hyperlink{programs_2clio_2main_8cpp_aa03c1ef4c41f36b048cf58d5aade7653}{url}}\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea35faaee264826923566fc05bdfd76b72}{TEXT}}=http:\textcolor{comment}{//localhost:8888/}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ the\ http/https\ URL\ where\ nodeop\ is\ running}
+\DoxyCodeLine{\ \ -\/-\/wallet-\/\mbox{\hyperlink{programs_2clio_2main_8cpp_aa03c1ef4c41f36b048cf58d5aade7653}{url}}\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea35faaee264826923566fc05bdfd76b72}{TEXT}}=http:\textcolor{comment}{//localhost:8888/}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ the\ http/https\ URL\ where\ kiod\ is\ running}
+\DoxyCodeLine{\ \ -\/\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},-\/-\/header\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ pass\ specific\ HTTP\ header,\ repeat\ \textcolor{keyword}{this}\ \mbox{\hyperlink{yubihsm_8h_a023826538a428f5f8c53aaef5e9aec02}{option}}\ to\ pass\ multiple\ \mbox{\hyperlink{programs_2clio_2main_8cpp_ada0dceaafe07cdbb1a3ac6762c0e4540}{headers}}}
+\DoxyCodeLine{\ \ -\/n,-\/-\/no-\/\mbox{\hyperlink{minitest_8cpp_a61de80d82d023076dac637b6a50f0a6e}{verify}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ don\textcolor{stringliteral}{'t\ verify\ peer\ certificate\ when\ using\ HTTPS}}
+\DoxyCodeLine{\textcolor{stringliteral}{\ \ -\/v,-\/-\/verbose\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ output\ verbose\ errors\ and\ action\ output}}
+\DoxyCodeLine{\textcolor{stringliteral}{}}
+\DoxyCodeLine{\textcolor{stringliteral}{Subcommands:}}
+\DoxyCodeLine{\textcolor{stringliteral}{\ \ version\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Retrieve\ version\ information}}
+\DoxyCodeLine{\textcolor{stringliteral}{\ \ create\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Create\ various\ items,\ on\ and\ off\ the\ blockchain}}
+\DoxyCodeLine{\textcolor{stringliteral}{\ \ get\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Retrieve\ various\ items\ and\ information\ from\ the\ blockchain}}
+\DoxyCodeLine{\textcolor{stringliteral}{\ \ set\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Set\ or\ update\ blockchain\ state}}
+\DoxyCodeLine{\textcolor{stringliteral}{\ \ transfer\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Transfer\ tokens\ from\ account\ to\ account}}
+\DoxyCodeLine{\textcolor{stringliteral}{\ \ net\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Interact\ with\ local\ p2p\ network\ connections}}
+\DoxyCodeLine{\textcolor{stringliteral}{\ \ wallet\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Interact\ with\ local\ wallet}}
+\DoxyCodeLine{\textcolor{stringliteral}{\ \ sign\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Sign\ a\ transaction}}
+\DoxyCodeLine{\textcolor{stringliteral}{\ \ push\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Push\ arbitrary\ transactions\ to\ the\ blockchain}}
+\DoxyCodeLine{\textcolor{stringliteral}{\ \ multisig\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Multisig\ contract\ commands}}
+
+\end{DoxyCode}
+ To get help with any particular subcommand, run it with no arguments as well\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$\ ./clio\ create}
+\DoxyCodeLine{Create\ various\ items,\ on\ and\ off\ the\ blockchain}
+\DoxyCodeLine{Usage:\ ./clio\ create\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_aba10771e3ff645fe1305be4cae517573ac4fb22412f02354dbe5574e37caf50a7}{SUBCOMMAND}}}
+\DoxyCodeLine{}
+\DoxyCodeLine{Subcommands:}
+\DoxyCodeLine{\ \ key\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Create\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ \textcolor{keyword}{new}\ keypair\ and\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}\ the\ \textcolor{keyword}{public}\ and\ \textcolor{keyword}{private}\ keys}
+\DoxyCodeLine{\ \ account\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Create\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ \textcolor{keyword}{new}\ account\ on\ the\ blockchain\ (assumes\ system\ contract\ does\ not\ restrict\ RAM\ usage)}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$\ ./clio\ create\ account}
+\DoxyCodeLine{Create\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ \textcolor{keyword}{new}\ account\ on\ the\ blockchain\ (assumes\ system\ contract\ does\ not\ restrict\ RAM\ usage)}
+\DoxyCodeLine{Usage:\ ./clio\ create\ account\ [OPTIONS]\ creator\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ OwnerKey\ ActiveKey}
+\DoxyCodeLine{}
+\DoxyCodeLine{Positionals:}
+\DoxyCodeLine{\ \ creator\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea35faaee264826923566fc05bdfd76b72}{TEXT}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ The\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ of\ the\ account\ creating\ the\ \textcolor{keyword}{new}\ account}
+\DoxyCodeLine{\ \ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea35faaee264826923566fc05bdfd76b72}{TEXT}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ The\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ of\ the\ \textcolor{keyword}{new}\ account}
+\DoxyCodeLine{\ \ OwnerKey\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea35faaee264826923566fc05bdfd76b72}{TEXT}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ The\ owner\ \textcolor{keyword}{public}\ key\ \textcolor{keywordflow}{for}\ the\ \textcolor{keyword}{new}\ account}
+\DoxyCodeLine{\ \ ActiveKey\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea35faaee264826923566fc05bdfd76b72}{TEXT}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ The\ active\ \textcolor{keyword}{public}\ key\ \textcolor{keywordflow}{for}\ the\ \textcolor{keyword}{new}\ account}
+\DoxyCodeLine{}
+\DoxyCodeLine{Options:}
+\DoxyCodeLine{\ \ -\/x,-\/-\/expiration\ \ \ \ \ \ \ \ \ \ \ \ \ set\ the\ time\ in\ seconds\ before\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ transaction\ expires,\ defaults\ to\ 30\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}}
+\DoxyCodeLine{\ \ -\/\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}},-\/-\/force-\/unique\ \ \ \ \ \ \ \ \ \ \ force\ the\ transaction\ to\ be\ unique.\ \textcolor{keyword}{this}\ will\ consume\ extra\ bandwidth\ and\ \mbox{\hyperlink{namespacefc_a0db76f35dc060918029b16de918b1e84}{remove}}\ \mbox{\hyperlink{namespacefc_a8b03fb95276f683bde05b7715d9f0014}{any}}\ protections\ against\ accidently\ issuing\ the\ same\ transaction\ multiple\ times}
+\DoxyCodeLine{\ \ -\/\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},-\/-\/skip-\/sign\ \ \ \ \ \ \ \ \ \ \ \ \ \ Specify\ \textcolor{keywordflow}{if}\ unlocked\ wallet\ keys\ should\ be\ used\ to\ sign\ transaction}
+\DoxyCodeLine{\ \ -\/\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}},-\/-\/dont-\/broadcast\ \ \ \ \ \ \ \ \ don\textcolor{stringliteral}{'t\ broadcast\ transaction\ to\ the\ network\ (just\ print\ to\ stdout)}}
+\DoxyCodeLine{\textcolor{stringliteral}{\ \ -\/p,-\/-\/permission\ TEXT\ ...\ \ \ \ An\ account\ and\ permission\ level\ to\ authorize,\ as\ in\ '}account@permission\textcolor{stringliteral}{'\ (defaults\ to\ '}creator@active\textcolor{stringliteral}{')}}
+
+\end{DoxyCode}
+ 

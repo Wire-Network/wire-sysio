@@ -1,0 +1,57 @@
+\doxysection{Catch\+::String\+Maker\texorpdfstring{$<$}{<} wchar\+\_\+t \texorpdfstring{$\ast$}{*} \texorpdfstring{$>$}{>} Struct Reference}
+\hypertarget{struct_catch_1_1_string_maker_3_01wchar__t_01_5_01_4}{}\label{struct_catch_1_1_string_maker_3_01wchar__t_01_5_01_4}\index{Catch::StringMaker$<$ wchar\_t \texorpdfstring{$\ast$}{*} $>$@{Catch::StringMaker$<$ wchar\_t \texorpdfstring{$\ast$}{*} $>$}}
+
+
+{\ttfamily \#include $<$catch\+\_\+tostring.\+h$>$}
+
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static std\+::string \mbox{\hyperlink{struct_catch_1_1_string_maker_3_01wchar__t_01_5_01_4_a115c02e329e190323caf6a4060fc40dd}{convert}} (wchar\+\_\+t \texorpdfstring{$\ast$}{*}str)
+\item 
+static std\+::string \mbox{\hyperlink{struct_catch_1_1_string_maker_3_01wchar__t_01_5_01_4_a6112fe324da2a0b3a690071a228ecd71}{convert}} (wchar\+\_\+t \texorpdfstring{$\ast$}{*}str)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source_l01377}{1377}} of file \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source}{catch.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_catch_1_1_string_maker_3_01wchar__t_01_5_01_4_a115c02e329e190323caf6a4060fc40dd}\index{Catch::StringMaker$<$ wchar\_t \texorpdfstring{$\ast$}{*} $>$@{Catch::StringMaker$<$ wchar\_t \texorpdfstring{$\ast$}{*} $>$}!convert@{convert}}
+\index{convert@{convert}!Catch::StringMaker$<$ wchar\_t \texorpdfstring{$\ast$}{*} $>$@{Catch::StringMaker$<$ wchar\_t \texorpdfstring{$\ast$}{*} $>$}}
+\doxysubsubsection{\texorpdfstring{convert()}{convert()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_string_maker_3_01wchar__t_01_5_01_4_a115c02e329e190323caf6a4060fc40dd} 
+std\+::string \mbox{\hyperlink{struct_catch_1_1_string_maker}{Catch\+::\+String\+Maker}}$<$ wchar\+\_\+t \texorpdfstring{$\ast$}{*} $>$\+::convert (\begin{DoxyParamCaption}\item[{wchar\+\_\+t \texorpdfstring{$\ast$}{*}}]{str}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__tostring_8cpp_source_l00164}{164}} of file \mbox{\hyperlink{catch__tostring_8cpp_source}{catch\+\_\+tostring.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00165\ \ \ \ \ \textcolor{keywordflow}{if}\ (str)\ \{}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ return\ ::Catch::Detail::stringify(std::wstring\{\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}\ \});}
+\DoxyCodeLine{00167\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\{\ \textcolor{stringliteral}{"{}\{null\ string\}"{}}\ \};}
+\DoxyCodeLine{00169\ \ \ \ \ \}}
+\DoxyCodeLine{00170\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_catch_1_1_string_maker_3_01wchar__t_01_5_01_4_a6112fe324da2a0b3a690071a228ecd71}\index{Catch::StringMaker$<$ wchar\_t \texorpdfstring{$\ast$}{*} $>$@{Catch::StringMaker$<$ wchar\_t \texorpdfstring{$\ast$}{*} $>$}!convert@{convert}}
+\index{convert@{convert}!Catch::StringMaker$<$ wchar\_t \texorpdfstring{$\ast$}{*} $>$@{Catch::StringMaker$<$ wchar\_t \texorpdfstring{$\ast$}{*} $>$}}
+\doxysubsubsection{\texorpdfstring{convert()}{convert()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_string_maker_3_01wchar__t_01_5_01_4_a6112fe324da2a0b3a690071a228ecd71} 
+static std\+::string \mbox{\hyperlink{struct_catch_1_1_string_maker}{Catch\+::\+String\+Maker}}$<$ wchar\+\_\+t \texorpdfstring{$\ast$}{*} $>$\+::convert (\begin{DoxyParamCaption}\item[{wchar\+\_\+t \texorpdfstring{$\ast$}{*}}]{str}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__tostring_8h}{catch\+\_\+tostring.\+h}}\item 
+libraries/sys-\/vm/external/\+Catch2/single\+\_\+include/catch2/\mbox{\hyperlink{single__include_2catch2_2catch_8hpp}{catch.\+hpp}}\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__tostring_8cpp}{catch\+\_\+tostring.\+cpp}}\end{DoxyCompactItemize}

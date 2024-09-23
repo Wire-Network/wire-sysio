@@ -1,0 +1,65 @@
+\doxysection{libraries/chain/include/sysio/chain/wasm\+\_\+interface\+\_\+private.hpp File Reference}
+\hypertarget{wasm__interface__private_8hpp}{}\label{wasm__interface__private_8hpp}\index{libraries/chain/include/sysio/chain/wasm\_interface\_private.hpp@{libraries/chain/include/sysio/chain/wasm\_interface\_private.hpp}}
+{\ttfamily \#include $<$sysio/chain/wasm\+\_\+interface.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/webassembly/runtime\+\_\+interface.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/wasm\+\_\+sysio\+\_\+injection.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/transaction\+\_\+context.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/code\+\_\+object.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/global\+\_\+property\+\_\+object.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/exceptions.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/scoped\+\_\+exit.\+hpp$>$}\newline
+{\ttfamily \#include "{}IR/\+Module.\+h"{}}\newline
+{\ttfamily \#include "{}Runtime/\+Intrinsics.\+h"{}}\newline
+{\ttfamily \#include "{}Platform/\+Platform.\+h"{}}\newline
+{\ttfamily \#include "{}WAST/\+WAST.\+h"{}}\newline
+{\ttfamily \#include "{}IR/\+Validate.\+h"{}}\newline
+{\ttfamily \#include $<$sysio/chain/webassembly/sys-\/vm.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/vm/allocator.\+hpp$>$}\newline
+Include dependency graph for wasm\+\_\+interface\+\_\+private.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{wasm__interface__private_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=221pt]{wasm__interface__private_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl}{sysio\+::chain\+::wasm\+\_\+interface\+\_\+impl}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl_1_1wasm__cache__entry}{sysio\+::chain\+::wasm\+\_\+interface\+\_\+impl\+::wasm\+\_\+cache\+\_\+entry}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain}{sysio\+::chain}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc}{sysio\+::chain\+::eosvmoc}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{wasm__interface__private_8hpp_a8b814e46a32d6bfbed00c7c7d87fda23}{\+\_\+\+REGISTER\+\_\+\+SYSVMOC\+\_\+\+INTRINSIC}}(CLS,  MOD,  METHOD,  WASM\+\_\+\+SIG,  \mbox{\hyperlink{pointertest_8cpp_a59c7737920212dcb3bb9df58d7062de4}{NAME}},  SIG)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{wasm__interface__private_8hpp_a8b814e46a32d6bfbed00c7c7d87fda23}\index{wasm\_interface\_private.hpp@{wasm\_interface\_private.hpp}!\_REGISTER\_SYSVMOC\_INTRINSIC@{\_REGISTER\_SYSVMOC\_INTRINSIC}}
+\index{\_REGISTER\_SYSVMOC\_INTRINSIC@{\_REGISTER\_SYSVMOC\_INTRINSIC}!wasm\_interface\_private.hpp@{wasm\_interface\_private.hpp}}
+\doxysubsubsection{\texorpdfstring{\_REGISTER\_SYSVMOC\_INTRINSIC}{\_REGISTER\_SYSVMOC\_INTRINSIC}}
+{\footnotesize\ttfamily \label{wasm__interface__private_8hpp_a8b814e46a32d6bfbed00c7c7d87fda23} 
+\#define \+\_\+\+REGISTER\+\_\+\+SYSVMOC\+\_\+\+INTRINSIC(\begin{DoxyParamCaption}\item[{}]{CLS}{, }\item[{}]{MOD}{, }\item[{}]{METHOD}{, }\item[{}]{WASM\+\_\+\+SIG}{, }\item[{}]{\mbox{\hyperlink{pointertest_8cpp_a59c7737920212dcb3bb9df58d7062de4}{NAME}}}{, }\item[{}]{SIG}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__interface__private_8hpp_source_l00007}{7}} of file \mbox{\hyperlink{wasm__interface__private_8hpp_source}{wasm\+\_\+interface\+\_\+private.\+hpp}}.
+

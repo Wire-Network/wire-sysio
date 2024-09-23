@@ -1,0 +1,10 @@
+<map id="upload.VersionControlSystem.IsImage" name="upload.VersionControlSystem.IsImage">
+<area shape="rect" id="Node000001" title=" " alt="" coords="520,27,718,68"/>
+<area shape="rect" id="Node000002" href="$classupload_1_1_mercurial_v_c_s.html#a7bd835c63bb09c3f01fb24fce4657f4c" title=" " alt="" coords="252,5,472,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="504,37,472,33,473,28,505,32"/>
+<area shape="rect" id="Node000004" href="$classupload_1_1_subversion_v_c_s.html#af842b536e7d9aad2be83562c01c03d12" title=" " alt="" coords="271,55,452,96"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="505,63,453,68,453,63,504,57"/>
+<area shape="rect" id="Node000003" href="$classupload_1_1_version_control_system.html#a426cb9d4ad9f94754c9122653e3aa24f" title=" " alt="" coords="5,27,204,68"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="236,35,204,39,204,34,236,30"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="256,67,204,61,204,56,256,61"/>
+</map>

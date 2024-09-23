@@ -1,0 +1,8 @@
+<map id="tcp_echo_server::handle_accept" name="tcp_echo_server::handle_accept">
+<area shape="rect" id="Node000001" title=" " alt="" coords="396,5,559,46"/>
+<area shape="rect" id="Node000002" href="$structtcp__echo__server.html#aba350094250187e9e05031512d2db771" title=" " alt="" coords="197,5,348,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="380,37,348,37,348,32,380,32"/>
+<area shape="poly" id="edge2_Node000002_Node000001" title=" " alt="" coords="363,14,396,14,396,20,363,19"/>
+<area shape="rect" id="Node000003" href="$structtcp__echo__server.html#a20bcbc728243d24b258bc44dce10ba43" title=" " alt="" coords="5,5,149,46"/>
+<area shape="poly" id="edge3_Node000002_Node000003" title=" " alt="" coords="181,28,149,28,149,23,181,23"/>
+</map>

@@ -1,0 +1,239 @@
+\doxysection{testing\+::Action\texorpdfstring{$<$}{<} F \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classtesting_1_1_action}{}\label{classtesting_1_1_action}\index{testing::Action$<$ F $>$@{testing::Action$<$ F $>$}}
+
+
+{\ttfamily \#include $<$gmock-\/actions.\+h$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{structtesting_1_1internal_1_1_function}{internal\+::\+Function}}$<$ F $>$\+::\+Result \mbox{\hyperlink{classtesting_1_1_action_ac6aa7068b7fd491c0de1df1f93764775}{Result}}
+\item 
+typedef \mbox{\hyperlink{structtesting_1_1internal_1_1_function}{internal\+::\+Function}}$<$ F $>$\+::\+Argument\+Tuple \mbox{\hyperlink{classtesting_1_1_action_aece7a66009c18d264094f2f0110f197a}{Argument\+Tuple}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1_action_a967772922a39dd7098bee429d749f277}{Action}} ()
+\item 
+\mbox{\hyperlink{classtesting_1_1_action_a5ce44c673e3f91378777b954d88917cd}{Action}} (\mbox{\hyperlink{classtesting_1_1_action_interface}{Action\+Interface}}$<$ F $>$ \texorpdfstring{$\ast$}{*}impl)
+\item 
+{\footnotesize template$<$typename Func $>$ }\\\mbox{\hyperlink{classtesting_1_1_action_a806bacddaa1f1daf61f89674564bdf0f}{Action}} (const \mbox{\hyperlink{classtesting_1_1_action}{Action}}$<$ Func $>$ \&\mbox{\hyperlink{structaction}{action}})
+\item 
+bool \mbox{\hyperlink{classtesting_1_1_action_a4468ca2ea5e9f7363271145992d09dba}{Is\+Do\+Default}} () const
+\item 
+\mbox{\hyperlink{classtesting_1_1_action_ac6aa7068b7fd491c0de1df1f93764775}{Result}} \mbox{\hyperlink{classtesting_1_1_action_a5489a68def1d82eb61df819eae52dc8f}{Perform}} (\mbox{\hyperlink{classtesting_1_1_action_aece7a66009c18d264094f2f0110f197a}{Argument\+Tuple}} args) const
+\item 
+{\footnotesize template$<$typename From $>$ }\\\mbox{\hyperlink{classtesting_1_1_action_af23eef2fff5a92d8ff2ed7ac7a542005}{Action}} (const \mbox{\hyperlink{classtesting_1_1_action}{Action}}$<$ From $>$ \&from)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename F1 , typename F2 $>$ }\\\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classtesting_1_1_action_a66fe4f9c9b9d020273151aa6054b491e}{internal\+::\+Action\+Adaptor}}
+\item 
+{\footnotesize template$<$typename G $>$ }\\\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classtesting_1_1_action_a62bc48ff11968b6e45d21c4b49f349fb}{Action}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename F$>$\newline
+class testing\+::\+Action$<$ F $>$}
+
+
+Definition at line \mbox{\hyperlink{gmock-actions_8h_source_l00356}{356}} of file \mbox{\hyperlink{gmock-actions_8h_source}{gmock-\/actions.\+h}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classtesting_1_1_action_aece7a66009c18d264094f2f0110f197a}\index{testing::Action$<$ F $>$@{testing::Action$<$ F $>$}!ArgumentTuple@{ArgumentTuple}}
+\index{ArgumentTuple@{ArgumentTuple}!testing::Action$<$ F $>$@{testing::Action$<$ F $>$}}
+\doxysubsubsection{\texorpdfstring{ArgumentTuple}{ArgumentTuple}}
+{\footnotesize\ttfamily \label{classtesting_1_1_action_aece7a66009c18d264094f2f0110f197a} 
+template$<$typename F $>$ \\
+\mbox{\hyperlink{structtesting_1_1internal_1_1_function}{internal\+::\+Function}}$<$F$>$\+::\+Argument\+Tuple \mbox{\hyperlink{classtesting_1_1_action}{testing\+::\+Action}}$<$ F $>$\+::\+Argument\+Tuple}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-actions_8h_source_l00359}{359}} of file \mbox{\hyperlink{gmock-actions_8h_source}{gmock-\/actions.\+h}}.
+
+\Hypertarget{classtesting_1_1_action_ac6aa7068b7fd491c0de1df1f93764775}\index{testing::Action$<$ F $>$@{testing::Action$<$ F $>$}!Result@{Result}}
+\index{Result@{Result}!testing::Action$<$ F $>$@{testing::Action$<$ F $>$}}
+\doxysubsubsection{\texorpdfstring{Result}{Result}}
+{\footnotesize\ttfamily \label{classtesting_1_1_action_ac6aa7068b7fd491c0de1df1f93764775} 
+template$<$typename F $>$ \\
+\mbox{\hyperlink{structtesting_1_1internal_1_1_function}{internal\+::\+Function}}$<$F$>$\+::\+Result \mbox{\hyperlink{classtesting_1_1_action}{testing\+::\+Action}}$<$ F $>$\+::\+Result}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-actions_8h_source_l00358}{358}} of file \mbox{\hyperlink{gmock-actions_8h_source}{gmock-\/actions.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1_action_a967772922a39dd7098bee429d749f277}\index{testing::Action$<$ F $>$@{testing::Action$<$ F $>$}!Action@{Action}}
+\index{Action@{Action}!testing::Action$<$ F $>$@{testing::Action$<$ F $>$}}
+\doxysubsubsection{\texorpdfstring{Action()}{Action()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{classtesting_1_1_action_a967772922a39dd7098bee429d749f277} 
+template$<$typename F $>$ \\
+\mbox{\hyperlink{classtesting_1_1_action}{testing\+::\+Action}}$<$ F $>$\+::\+Action (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-actions_8h_source_l00363}{363}} of file \mbox{\hyperlink{gmock-actions_8h_source}{gmock-\/actions.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00363\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1_action_a5ce44c673e3f91378777b954d88917cd}\index{testing::Action$<$ F $>$@{testing::Action$<$ F $>$}!Action@{Action}}
+\index{Action@{Action}!testing::Action$<$ F $>$@{testing::Action$<$ F $>$}}
+\doxysubsubsection{\texorpdfstring{Action()}{Action()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{classtesting_1_1_action_a5ce44c673e3f91378777b954d88917cd} 
+template$<$typename F $>$ \\
+\mbox{\hyperlink{classtesting_1_1_action}{testing\+::\+Action}}$<$ F $>$\+::\+Action (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classtesting_1_1_action_interface}{Action\+Interface}}$<$ F $>$ \texorpdfstring{$\ast$}{*}}]{impl}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-actions_8h_source_l00376}{376}} of file \mbox{\hyperlink{gmock-actions_8h_source}{gmock-\/actions.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00376\ :\ impl\_(impl)\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1_action_a806bacddaa1f1daf61f89674564bdf0f}\index{testing::Action$<$ F $>$@{testing::Action$<$ F $>$}!Action@{Action}}
+\index{Action@{Action}!testing::Action$<$ F $>$@{testing::Action$<$ F $>$}}
+\doxysubsubsection{\texorpdfstring{Action()}{Action()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{classtesting_1_1_action_a806bacddaa1f1daf61f89674564bdf0f} 
+template$<$typename F $>$ \\
+template$<$typename Func $>$ \\
+\mbox{\hyperlink{classtesting_1_1_action}{testing\+::\+Action}}$<$ F $>$\+::\+Action (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classtesting_1_1_action}{Action}}$<$ Func $>$ \&}]{action}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [explicit]}}
+
+\Hypertarget{classtesting_1_1_action_af23eef2fff5a92d8ff2ed7ac7a542005}\index{testing::Action$<$ F $>$@{testing::Action$<$ F $>$}!Action@{Action}}
+\index{Action@{Action}!testing::Action$<$ F $>$@{testing::Action$<$ F $>$}}
+\doxysubsubsection{\texorpdfstring{Action()}{Action()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{classtesting_1_1_action_af23eef2fff5a92d8ff2ed7ac7a542005} 
+template$<$typename F $>$ \\
+template$<$typename From $>$ \\
+\mbox{\hyperlink{classtesting_1_1_action}{testing\+::\+Action}}$<$ F $>$\+::\+Action (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classtesting_1_1_action}{Action}}$<$ From $>$ \&}]{from}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-actions_8h_source_l01105}{1105}} of file \mbox{\hyperlink{gmock-actions_8h_source}{gmock-\/actions.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01106\ \ \ \ \ :}
+\DoxyCodeLine{01107\ \textcolor{preprocessor}{\#if\ GTEST\_LANG\_CXX11}}
+\DoxyCodeLine{01108\ \ \ \ \ \ \ fun\_(from.fun\_),}
+\DoxyCodeLine{01109\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{01110\ \ \ \ \ \ \ impl\_(from.impl\_\ ==\ NULL\ ?\ NULL}
+\DoxyCodeLine{01111\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \textcolor{keyword}{new}\ internal::ActionAdaptor<To,\ From>(from))\ \{}
+\DoxyCodeLine{01112\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1_action_a4468ca2ea5e9f7363271145992d09dba}\index{testing::Action$<$ F $>$@{testing::Action$<$ F $>$}!IsDoDefault@{IsDoDefault}}
+\index{IsDoDefault@{IsDoDefault}!testing::Action$<$ F $>$@{testing::Action$<$ F $>$}}
+\doxysubsubsection{\texorpdfstring{IsDoDefault()}{IsDoDefault()}}
+{\footnotesize\ttfamily \label{classtesting_1_1_action_a4468ca2ea5e9f7363271145992d09dba} 
+template$<$typename F $>$ \\
+bool \mbox{\hyperlink{classtesting_1_1_action}{testing\+::\+Action}}$<$ F $>$\+::\+Is\+Do\+Default (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-actions_8h_source_l00386}{386}} of file \mbox{\hyperlink{gmock-actions_8h_source}{gmock-\/actions.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00386\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00387\ \textcolor{preprocessor}{\#if\ GTEST\_LANG\_CXX11}}
+\DoxyCodeLine{00388\ \ \ \ \ \textcolor{keywordflow}{return}\ impl\_\ ==\ \textcolor{keyword}{nullptr}\ \&\&\ fun\_\ ==\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00389\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00390\ \ \ \ \ \textcolor{keywordflow}{return}\ impl\_\ ==\ NULL;}
+\DoxyCodeLine{00391\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00392\ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{classtesting_1_1_action_a4468ca2ea5e9f7363271145992d09dba_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1_action_a5489a68def1d82eb61df819eae52dc8f}\index{testing::Action$<$ F $>$@{testing::Action$<$ F $>$}!Perform@{Perform}}
+\index{Perform@{Perform}!testing::Action$<$ F $>$@{testing::Action$<$ F $>$}}
+\doxysubsubsection{\texorpdfstring{Perform()}{Perform()}}
+{\footnotesize\ttfamily \label{classtesting_1_1_action_a5489a68def1d82eb61df819eae52dc8f} 
+template$<$typename F $>$ \\
+\mbox{\hyperlink{classtesting_1_1_action_ac6aa7068b7fd491c0de1df1f93764775}{Result}} \mbox{\hyperlink{classtesting_1_1_action}{testing\+::\+Action}}$<$ F $>$\+::\+Perform (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classtesting_1_1_action_aece7a66009c18d264094f2f0110f197a}{Argument\+Tuple}}}]{args}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-actions_8h_source_l00400}{400}} of file \mbox{\hyperlink{gmock-actions_8h_source}{gmock-\/actions.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00400\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00401\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classtesting_1_1_action_a4468ca2ea5e9f7363271145992d09dba}{IsDoDefault}}())\ \{}
+\DoxyCodeLine{00402\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_aa67e1e9d28122eedffbb7b6636824f2d}{internal::IllegalDoDefault}}(\_\_FILE\_\_,\ \_\_LINE\_\_);}
+\DoxyCodeLine{00403\ \ \ \ \ \}}
+\DoxyCodeLine{00404\ \textcolor{preprocessor}{\#if\ GTEST\_LANG\_CXX11}}
+\DoxyCodeLine{00405\ \ \ \ \ \textcolor{keywordflow}{if}\ (fun\_\ !=\ \textcolor{keyword}{nullptr})\ \{}
+\DoxyCodeLine{00406\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ internal::Apply(fun\_,\ ::std::move(args));}
+\DoxyCodeLine{00407\ \ \ \ \ \}}
+\DoxyCodeLine{00408\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00409\ \ \ \ \ \textcolor{keywordflow}{return}\ impl\_-\/>Perform(args);}
+\DoxyCodeLine{00410\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1_action_a5489a68def1d82eb61df819eae52dc8f_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{classtesting_1_1_action_a5489a68def1d82eb61df819eae52dc8f_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{classtesting_1_1_action_a62bc48ff11968b6e45d21c4b49f349fb}\index{testing::Action$<$ F $>$@{testing::Action$<$ F $>$}!Action@{Action}}
+\index{Action@{Action}!testing::Action$<$ F $>$@{testing::Action$<$ F $>$}}
+\doxysubsubsection{\texorpdfstring{Action}{Action}}
+{\footnotesize\ttfamily \label{classtesting_1_1_action_a62bc48ff11968b6e45d21c4b49f349fb} 
+template$<$typename F $>$ \\
+template$<$typename G $>$ \\
+friend \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classtesting_1_1_action}{Action}}\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-actions_8h_source_l00417}{417}} of file \mbox{\hyperlink{gmock-actions_8h_source}{gmock-\/actions.\+h}}.
+
+\Hypertarget{classtesting_1_1_action_a66fe4f9c9b9d020273151aa6054b491e}\index{testing::Action$<$ F $>$@{testing::Action$<$ F $>$}!internal::ActionAdaptor@{internal::ActionAdaptor}}
+\index{internal::ActionAdaptor@{internal::ActionAdaptor}!testing::Action$<$ F $>$@{testing::Action$<$ F $>$}}
+\doxysubsubsection{\texorpdfstring{internal::ActionAdaptor}{internal::ActionAdaptor}}
+{\footnotesize\ttfamily \label{classtesting_1_1_action_a66fe4f9c9b9d020273151aa6054b491e} 
+template$<$typename F $>$ \\
+template$<$typename F1 , typename F2 $>$ \\
+friend \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classtesting_1_1internal_1_1_action_adaptor}{internal\+::\+Action\+Adaptor}}\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-actions_8h_source_l00414}{414}} of file \mbox{\hyperlink{gmock-actions_8h_source}{gmock-\/actions.\+h}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/include/gmock/\mbox{\hyperlink{gmock-actions_8h}{gmock-\/actions.\+h}}\end{DoxyCompactItemize}

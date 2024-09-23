@@ -1,0 +1,105 @@
+\doxysection{libraries/sys-\/vm/external/\+Catch2/examples/020-\/\+Test\+Case-\/2.cpp File Reference}
+\hypertarget{020-_test_case-2_8cpp}{}\label{020-_test_case-2_8cpp}\index{libraries/sys-\/vm/external/Catch2/examples/020-\/TestCase-\/2.cpp@{libraries/sys-\/vm/external/Catch2/examples/020-\/TestCase-\/2.cpp}}
+{\ttfamily \#include $<$catch2/catch.\+hpp$>$}\newline
+Include dependency graph for 020-\/Test\+Case-\/2.cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{020-_test_case-2_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{020-_test_case-2_8cpp_add2051c05ae0af82b9f85a7aed140679}{Factorial}} (int number)
+\item 
+\mbox{\hyperlink{020-_test_case-2_8cpp_a4a40313d0fbb58ba60bec971f3f51bd2}{TEST\+\_\+\+CASE}} ("{}2\+: Factorial of 0 is 1 (fail)"{}, "{}\mbox{[}\mbox{\hyperlink{sample_8cpp_ae5436c312b3470f1d24c886d2036038d}{multi}}-\/file\+:2\mbox{]}"{})
+\item 
+\mbox{\hyperlink{020-_test_case-2_8cpp_abdd1a01d2d531b217927995c08737172}{TEST\+\_\+\+CASE}} ("{}2\+: Factorials of 1 and higher are computed (pass)"{}, "{}\mbox{[}\mbox{\hyperlink{sample_8cpp_ae5436c312b3470f1d24c886d2036038d}{multi}}-\/file\+:2\mbox{]}"{})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{020-_test_case-2_8cpp_add2051c05ae0af82b9f85a7aed140679}\index{020-\/TestCase-\/2.cpp@{020-\/TestCase-\/2.cpp}!Factorial@{Factorial}}
+\index{Factorial@{Factorial}!020-\/TestCase-\/2.cpp@{020-\/TestCase-\/2.cpp}}
+\doxysubsubsection{\texorpdfstring{Factorial()}{Factorial()}}
+{\footnotesize\ttfamily \label{020-_test_case-2_8cpp_add2051c05ae0af82b9f85a7aed140679} 
+int Factorial (\begin{DoxyParamCaption}\item[{int}]{number}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{020-_test_case-2_8cpp_source_l00007}{7}} of file \mbox{\hyperlink{020-_test_case-2_8cpp_source}{020-\/\+Test\+Case-\/2.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00007\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00008\ \ \ \ \textcolor{keywordflow}{return}\ number\ <=\ 1\ ?\ number\ :\ \mbox{\hyperlink{020-_test_case-2_8cpp_add2051c05ae0af82b9f85a7aed140679}{Factorial}}(\ number\ -\/\ 1\ )\ *\ number;\ \ \textcolor{comment}{//\ fail}}
+\DoxyCodeLine{00009\ \textcolor{comment}{//\ return\ number\ <=\ 1\ ?\ 1\ \ \ \ \ \ :\ Factorial(\ number\ -\/\ 1\ )\ *\ number;\ \ //\ pass}}
+\DoxyCodeLine{00010\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=134pt]{020-_test_case-2_8cpp_add2051c05ae0af82b9f85a7aed140679_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=244pt]{020-_test_case-2_8cpp_add2051c05ae0af82b9f85a7aed140679_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{020-_test_case-2_8cpp_a4a40313d0fbb58ba60bec971f3f51bd2}\index{020-\/TestCase-\/2.cpp@{020-\/TestCase-\/2.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!020-\/TestCase-\/2.cpp@{020-\/TestCase-\/2.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{020-_test_case-2_8cpp_a4a40313d0fbb58ba60bec971f3f51bd2} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}2\+: Factorial of 0 is 1 (fail)"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}multi-\/file\+:2\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{020-_test_case-2_8cpp_source_l00012}{12}} of file \mbox{\hyperlink{020-_test_case-2_8cpp_source}{020-\/\+Test\+Case-\/2.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00012\ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{020-_test_case-2_8cpp_add2051c05ae0af82b9f85a7aed140679}{Factorial}}\ of\ 0\ is\ 1\ (fail)\textcolor{stringliteral}{"{},\ "{}}[\mbox{\hyperlink{sample_8cpp_ae5436c312b3470f1d24c886d2036038d}{multi}}-\/file:2]\textcolor{stringliteral}{"{}\ )\ \{}}
+\DoxyCodeLine{00013\ \textcolor{stringliteral}{\ \ \ \ REQUIRE(\ Factorial(0)\ ==\ 1\ );}}
+\DoxyCodeLine{00014\ \textcolor{stringliteral}{\}}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=244pt]{020-_test_case-2_8cpp_a4a40313d0fbb58ba60bec971f3f51bd2_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{020-_test_case-2_8cpp_abdd1a01d2d531b217927995c08737172}\index{020-\/TestCase-\/2.cpp@{020-\/TestCase-\/2.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!020-\/TestCase-\/2.cpp@{020-\/TestCase-\/2.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{020-_test_case-2_8cpp_abdd1a01d2d531b217927995c08737172} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}2\+: Factorials of 1 and higher are computed (pass)"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}multi-\/file\+:2\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{020-_test_case-2_8cpp_source_l00016}{16}} of file \mbox{\hyperlink{020-_test_case-2_8cpp_source}{020-\/\+Test\+Case-\/2.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ Factorials\ of\ 1\ and\ higher\ are\ computed\ (pass)\textcolor{stringliteral}{"{},\ "{}}[\mbox{\hyperlink{sample_8cpp_ae5436c312b3470f1d24c886d2036038d}{multi}}-\/file:2]\textcolor{stringliteral}{"{}\ )\ \{}}
+\DoxyCodeLine{00017\ \textcolor{stringliteral}{\ \ \ \ REQUIRE(\ Factorial(1)\ ==\ 1\ );}}
+\DoxyCodeLine{00018\ \textcolor{stringliteral}{\ \ \ \ REQUIRE(\ Factorial(2)\ ==\ 2\ );}}
+\DoxyCodeLine{00019\ \textcolor{stringliteral}{\ \ \ \ REQUIRE(\ Factorial(3)\ ==\ 6\ );}}
+\DoxyCodeLine{00020\ \textcolor{stringliteral}{\ \ \ \ REQUIRE(\ Factorial(10)\ ==\ 3628800\ );}}
+\DoxyCodeLine{00021\ \textcolor{stringliteral}{\}}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=244pt]{020-_test_case-2_8cpp_abdd1a01d2d531b217927995c08737172_cgraph}
+\end{center}
+\end{figure}

@@ -1,0 +1,47 @@
+\doxysection{libraries/chain/platform\+\_\+timer\+\_\+posix\+\_\+test.c File Reference}
+\hypertarget{platform__timer__posix__test_8c}{}\label{platform__timer__posix__test_8c}\index{libraries/chain/platform\_timer\_posix\_test.c@{libraries/chain/platform\_timer\_posix\_test.c}}
+{\ttfamily \#include $<$signal.\+h$>$}\newline
+{\ttfamily \#include $<$sys/time.\+h$>$}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+Include dependency graph for platform\+\_\+timer\+\_\+posix\+\_\+test.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=276pt]{platform__timer__posix__test_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}\index{platform\_timer\_posix\_test.c@{platform\_timer\_posix\_test.c}!main@{main}}
+\index{main@{main}!platform\_timer\_posix\_test.c@{platform\_timer\_posix\_test.c}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4} 
+int main (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{platform__timer__posix__test_8c_source_l00005}{5}} of file \mbox{\hyperlink{platform__timer__posix__test_8c_source}{platform\+\_\+timer\+\_\+posix\+\_\+test.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00005\ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00006\ \ \ \ \textcolor{keyword}{struct\ }itimerval\ enable\ =\ \{\{0,\ 0\},\ \{0,\ 1000u\}\};}
+\DoxyCodeLine{00007\ \ \ \ \textcolor{keywordflow}{if}(setitimer(ITIMER\_REAL,\ \&enable,\ NULL))}
+\DoxyCodeLine{00008\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{00009\ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00010\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=270pt]{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4_icgraph}
+\end{center}
+\end{figure}

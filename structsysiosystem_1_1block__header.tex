@@ -1,0 +1,141 @@
+\doxysection{sysiosystem\+::block\+\_\+header Struct Reference}
+\hypertarget{structsysiosystem_1_1block__header}{}\label{structsysiosystem_1_1block__header}\index{sysiosystem::block\_header@{sysiosystem::block\_header}}
+
+
+{\ttfamily \#include $<$native.\+hpp$>$}
+
+
+
+Collaboration diagram for sysiosystem\+::block\+\_\+header\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=303pt]{structsysiosystem_1_1block__header__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1block__header_a0edcc78e5b6fb92996f4a7bb699a578b}{timestamp}}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \mbox{\hyperlink{structsysiosystem_1_1block__header_acb68e262139570d35651e7c556da51da}{producer}}
+\item 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1block__header_a476005461c416324b15b805d1627dc36}{confirmed}} = 0
+\item 
+checksum256 \mbox{\hyperlink{structsysiosystem_1_1block__header_a7433d65581d672a1a489680d2e695d33}{previous}}
+\item 
+checksum256 \mbox{\hyperlink{structsysiosystem_1_1block__header_a5f87e3994c5c3ba20148ea7dfc423259}{transaction\+\_\+mroot}}
+\item 
+checksum256 \mbox{\hyperlink{structsysiosystem_1_1block__header_a47d436b17bd02789ba6385255ee91a97}{action\+\_\+mroot}}
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1block__header_acad2852d29a99213f45f746221123258}{schedule\+\_\+version}} = 0
+\item 
+std\+::optional$<$ sysio\+::producer\+\_\+schedule $>$ \mbox{\hyperlink{structsysiosystem_1_1block__header_abd7eeb7979d14e3ba45ac25f28bd2c3d}{new\+\_\+producers}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Blockchain block header.
+
+\doxylink{struct_a}{A} block header is defined by\+:
+\begin{DoxyItemize}
+\item a timestamp,
+\item the producer that created it,
+\item a confirmed flag default as zero,
+\item a link to previous block,
+\item a link to the transaction merkel root,
+\item a link to action root,
+\item a schedule version,
+\item and a producers\textquotesingle{} schedule. 
+\end{DoxyItemize}
+
+Definition at line \mbox{\hyperlink{native_8hpp_source_l00094}{94}} of file \mbox{\hyperlink{native_8hpp_source}{native.\+hpp}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysiosystem_1_1block__header_a47d436b17bd02789ba6385255ee91a97}\index{sysiosystem::block\_header@{sysiosystem::block\_header}!action\_mroot@{action\_mroot}}
+\index{action\_mroot@{action\_mroot}!sysiosystem::block\_header@{sysiosystem::block\_header}}
+\doxysubsubsection{\texorpdfstring{action\_mroot}{action\_mroot}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1block__header_a47d436b17bd02789ba6385255ee91a97} 
+checksum256 sysiosystem\+::block\+\_\+header\+::action\+\_\+mroot}
+
+
+
+Definition at line \mbox{\hyperlink{native_8hpp_source_l00100}{100}} of file \mbox{\hyperlink{native_8hpp_source}{native.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1block__header_a476005461c416324b15b805d1627dc36}\index{sysiosystem::block\_header@{sysiosystem::block\_header}!confirmed@{confirmed}}
+\index{confirmed@{confirmed}!sysiosystem::block\_header@{sysiosystem::block\_header}}
+\doxysubsubsection{\texorpdfstring{confirmed}{confirmed}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1block__header_a476005461c416324b15b805d1627dc36} 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} sysiosystem\+::block\+\_\+header\+::confirmed = 0}
+
+
+
+Definition at line \mbox{\hyperlink{native_8hpp_source_l00097}{97}} of file \mbox{\hyperlink{native_8hpp_source}{native.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1block__header_abd7eeb7979d14e3ba45ac25f28bd2c3d}\index{sysiosystem::block\_header@{sysiosystem::block\_header}!new\_producers@{new\_producers}}
+\index{new\_producers@{new\_producers}!sysiosystem::block\_header@{sysiosystem::block\_header}}
+\doxysubsubsection{\texorpdfstring{new\_producers}{new\_producers}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1block__header_abd7eeb7979d14e3ba45ac25f28bd2c3d} 
+std\+::optional$<$sysio\+::producer\+\_\+schedule$>$ sysiosystem\+::block\+\_\+header\+::new\+\_\+producers}
+
+
+
+Definition at line \mbox{\hyperlink{native_8hpp_source_l00102}{102}} of file \mbox{\hyperlink{native_8hpp_source}{native.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1block__header_a7433d65581d672a1a489680d2e695d33}\index{sysiosystem::block\_header@{sysiosystem::block\_header}!previous@{previous}}
+\index{previous@{previous}!sysiosystem::block\_header@{sysiosystem::block\_header}}
+\doxysubsubsection{\texorpdfstring{previous}{previous}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1block__header_a7433d65581d672a1a489680d2e695d33} 
+checksum256 sysiosystem\+::block\+\_\+header\+::previous}
+
+
+
+Definition at line \mbox{\hyperlink{native_8hpp_source_l00098}{98}} of file \mbox{\hyperlink{native_8hpp_source}{native.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1block__header_acb68e262139570d35651e7c556da51da}\index{sysiosystem::block\_header@{sysiosystem::block\_header}!producer@{producer}}
+\index{producer@{producer}!sysiosystem::block\_header@{sysiosystem::block\_header}}
+\doxysubsubsection{\texorpdfstring{producer}{producer}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1block__header_acb68e262139570d35651e7c556da51da} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} sysiosystem\+::block\+\_\+header\+::producer}
+
+
+
+Definition at line \mbox{\hyperlink{native_8hpp_source_l00096}{96}} of file \mbox{\hyperlink{native_8hpp_source}{native.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1block__header_acad2852d29a99213f45f746221123258}\index{sysiosystem::block\_header@{sysiosystem::block\_header}!schedule\_version@{schedule\_version}}
+\index{schedule\_version@{schedule\_version}!sysiosystem::block\_header@{sysiosystem::block\_header}}
+\doxysubsubsection{\texorpdfstring{schedule\_version}{schedule\_version}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1block__header_acad2852d29a99213f45f746221123258} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysiosystem\+::block\+\_\+header\+::schedule\+\_\+version = 0}
+
+
+
+Definition at line \mbox{\hyperlink{native_8hpp_source_l00101}{101}} of file \mbox{\hyperlink{native_8hpp_source}{native.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1block__header_a0edcc78e5b6fb92996f4a7bb699a578b}\index{sysiosystem::block\_header@{sysiosystem::block\_header}!timestamp@{timestamp}}
+\index{timestamp@{timestamp}!sysiosystem::block\_header@{sysiosystem::block\_header}}
+\doxysubsubsection{\texorpdfstring{timestamp}{timestamp}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1block__header_a0edcc78e5b6fb92996f4a7bb699a578b} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysiosystem\+::block\+\_\+header\+::timestamp}
+
+
+
+Definition at line \mbox{\hyperlink{native_8hpp_source_l00095}{95}} of file \mbox{\hyperlink{native_8hpp_source}{native.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1block__header_a5f87e3994c5c3ba20148ea7dfc423259}\index{sysiosystem::block\_header@{sysiosystem::block\_header}!transaction\_mroot@{transaction\_mroot}}
+\index{transaction\_mroot@{transaction\_mroot}!sysiosystem::block\_header@{sysiosystem::block\_header}}
+\doxysubsubsection{\texorpdfstring{transaction\_mroot}{transaction\_mroot}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1block__header_a5f87e3994c5c3ba20148ea7dfc423259} 
+checksum256 sysiosystem\+::block\+\_\+header\+::transaction\+\_\+mroot}
+
+
+
+Definition at line \mbox{\hyperlink{native_8hpp_source_l00099}{99}} of file \mbox{\hyperlink{native_8hpp_source}{native.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/svetlasyrimis/\+Desktop/wire-\/network/\+WN-\/org/wire-\/system-\/contracts/contracts/sysio.\+system/include/sysio.\+system/\mbox{\hyperlink{native_8hpp}{native.\+hpp}}\end{DoxyCompactItemize}

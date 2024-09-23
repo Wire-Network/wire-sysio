@@ -1,0 +1,107 @@
+\doxysection{libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/stringbuffer.h File Reference}
+\hypertarget{stringbuffer_8h}{}\label{stringbuffer_8h}\index{libraries/fc/include/fc/crypto/webauthn\_json/include/rapidjson/stringbuffer.h@{libraries/fc/include/fc/crypto/webauthn\_json/include/rapidjson/stringbuffer.h}}
+{\ttfamily \#include "{}stream.\+h"{}}\newline
+{\ttfamily \#include "{}internal/stack.\+h"{}}\newline
+Include dependency graph for stringbuffer.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{stringbuffer_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{stringbuffer_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{class_generic_string_buffer}{Generic\+String\+Buffer$<$ Encoding, Allocator $>$}}
+\begin{DoxyCompactList}\small\item\em Represents an in-\/memory output stream. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{class_generic_string_buffer}{Generic\+String\+Buffer}}$<$ \mbox{\hyperlink{struct_u_t_f8}{UTF8}}$<$$>$ $>$ \mbox{\hyperlink{stringbuffer_8h_a88f2d61781c8daefde48a81bdeac6ecd}{String\+Buffer}}
+\begin{DoxyCompactList}\small\item\em String buffer with \doxylink{struct_u_t_f8}{UTF8} encoding. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ }\\void \mbox{\hyperlink{stringbuffer_8h_a76f1b69abd71a248a55c8a55792dfd69}{Put\+Reserve}} (\mbox{\hyperlink{class_generic_string_buffer}{Generic\+String\+Buffer}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \&stream, size\+\_\+t \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ }\\void \mbox{\hyperlink{stringbuffer_8h_a2ff92a4ec7c5995738cfaf39fe99f31a}{Put\+Unsafe}} (\mbox{\hyperlink{class_generic_string_buffer}{Generic\+String\+Buffer}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \&stream, typename \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Encoding\+::\+Ch}} c)
+\item 
+template$<$$>$ void \mbox{\hyperlink{stringbuffer_8h_a4bcf83273503d7b834ec530e84914f8c}{PutN}} (\mbox{\hyperlink{class_generic_string_buffer}{Generic\+String\+Buffer}}$<$ \mbox{\hyperlink{struct_u_t_f8}{UTF8}}$<$$>$ $>$ \&stream, char c, size\+\_\+t n)
+\begin{DoxyCompactList}\small\item\em Implement specialized version of \doxylink{stringbuffer_8h_a4bcf83273503d7b834ec530e84914f8c}{Put\+N()} with \doxylink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset()} for better performance. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{stringbuffer_8h_a88f2d61781c8daefde48a81bdeac6ecd}\index{stringbuffer.h@{stringbuffer.h}!StringBuffer@{StringBuffer}}
+\index{StringBuffer@{StringBuffer}!stringbuffer.h@{stringbuffer.h}}
+\doxysubsubsection{\texorpdfstring{StringBuffer}{StringBuffer}}
+{\footnotesize\ttfamily \label{stringbuffer_8h_a88f2d61781c8daefde48a81bdeac6ecd} 
+typedef \mbox{\hyperlink{class_generic_string_buffer}{Generic\+String\+Buffer}}$<$\mbox{\hyperlink{struct_u_t_f8}{UTF8}}$<$$>$ $>$ \mbox{\hyperlink{fwd_8h_ab956b6537825abf8aac4112e81cfad7e}{String\+Buffer}}}
+
+
+
+Definition at line \mbox{\hyperlink{stringbuffer_8h_source_l00097}{97}} of file \mbox{\hyperlink{stringbuffer_8h_source}{stringbuffer.\+h}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{stringbuffer_8h_a4bcf83273503d7b834ec530e84914f8c}\index{stringbuffer.h@{stringbuffer.h}!PutN@{PutN}}
+\index{PutN@{PutN}!stringbuffer.h@{stringbuffer.h}}
+\doxysubsubsection{\texorpdfstring{PutN()}{PutN()}}
+{\footnotesize\ttfamily \label{stringbuffer_8h_a4bcf83273503d7b834ec530e84914f8c} 
+template$<$$>$ \\
+void PutN (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_generic_string_buffer}{Generic\+String\+Buffer}}$<$ \mbox{\hyperlink{struct_u_t_f8}{UTF8}}$<$$>$ $>$ \&}]{stream}{, }\item[{char}]{c}{, }\item[{size\+\_\+t}]{n}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{stringbuffer_8h_source_l00111}{111}} of file \mbox{\hyperlink{stringbuffer_8h_source}{stringbuffer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00112\ \ \ \ \ std::memset(stream.stack\_.Push<\textcolor{keywordtype}{char}>(n),\ c,\ n\ *\ \textcolor{keyword}{sizeof}(c));}
+\DoxyCodeLine{00113\ \}}
+
+\end{DoxyCode}
+\Hypertarget{stringbuffer_8h_a76f1b69abd71a248a55c8a55792dfd69}\index{stringbuffer.h@{stringbuffer.h}!PutReserve@{PutReserve}}
+\index{PutReserve@{PutReserve}!stringbuffer.h@{stringbuffer.h}}
+\doxysubsubsection{\texorpdfstring{PutReserve()}{PutReserve()}}
+{\footnotesize\ttfamily \label{stringbuffer_8h_a76f1b69abd71a248a55c8a55792dfd69} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+void Put\+Reserve (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_generic_string_buffer}{Generic\+String\+Buffer}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \&}]{stream}{, }\item[{size\+\_\+t}]{count}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{stringbuffer_8h_source_l00100}{100}} of file \mbox{\hyperlink{stringbuffer_8h_source}{stringbuffer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00101\ \ \ \ \ stream.Reserve(\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}});}
+\DoxyCodeLine{00102\ \}}
+
+\end{DoxyCode}
+\Hypertarget{stringbuffer_8h_a2ff92a4ec7c5995738cfaf39fe99f31a}\index{stringbuffer.h@{stringbuffer.h}!PutUnsafe@{PutUnsafe}}
+\index{PutUnsafe@{PutUnsafe}!stringbuffer.h@{stringbuffer.h}}
+\doxysubsubsection{\texorpdfstring{PutUnsafe()}{PutUnsafe()}}
+{\footnotesize\ttfamily \label{stringbuffer_8h_a2ff92a4ec7c5995738cfaf39fe99f31a} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+void Put\+Unsafe (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_generic_string_buffer}{Generic\+String\+Buffer}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \&}]{stream}{, }\item[{typename \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Encoding\+::\+Ch}}}]{c}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{stringbuffer_8h_source_l00105}{105}} of file \mbox{\hyperlink{stringbuffer_8h_source}{stringbuffer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00106\ \ \ \ \ stream.PutUnsafe(c);}
+\DoxyCodeLine{00107\ \}}
+
+\end{DoxyCode}

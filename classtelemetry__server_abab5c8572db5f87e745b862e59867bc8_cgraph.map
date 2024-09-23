@@ -1,0 +1,11 @@
+<map id="telemetry_server::on_http" name="telemetry_server::on_http">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,46,175,72"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1endpoint.html#a1d9163813aa02ed32100f443b4ddbd8e" title="Get reference to access logger." alt="" coords="223,5,378,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="175,43,207,38,208,43,176,48"/>
+<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1endpoint.html#a0fe4457427d4124abe7ca022ba7afbb4" title="Retrieves a connection_ptr from a connection_hdl (exception free)" alt="" coords="223,71,378,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="176,69,208,74,207,80,175,75"/>
+<area shape="rect" id="Node000004" href="$namespacewebsocketpp_1_1error.html#a3344622df8c36e8ae03c59164e7b5e89" title=" " alt="" coords="426,71,558,111"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="379,88,410,88,410,94,379,94"/>
+<area shape="rect" id="Node000005" href="$namespacewebsocketpp_1_1error.html#ac1acac2bfb24bbd2b1791db80993b0c2" title=" " alt="" coords="606,71,739,111"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="559,88,591,88,591,94,559,94"/>
+</map>

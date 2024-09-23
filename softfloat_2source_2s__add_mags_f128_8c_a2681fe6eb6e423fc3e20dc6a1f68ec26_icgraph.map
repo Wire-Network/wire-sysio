@@ -1,0 +1,11 @@
+<map id="softfloat_addMagsF128" name="softfloat_addMagsF128">
+<area shape="rect" id="Node000001" title=" " alt="" coords="355,46,512,72"/>
+<area shape="rect" id="Node000002" href="$softfloat_2source_2f128__add_8c.html#a8b4344a6b47b637e10bb107e2e21b7a9" title=" " alt="" coords="233,17,307,42"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="343,45,307,39,308,34,344,40"/>
+<area shape="rect" id="Node000004" href="$softfloat_2source_2f128__sub_8c.html#a6935924c5babd46735eb6fbf58c6f42a" title=" " alt="" coords="233,70,307,96"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="340,75,308,80,307,75,339,70"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1chain_1_1webassembly_1_1interface.html#ad0bb1020e4276da8607f3a6dcc00fd52" title=" " alt="" coords="5,5,185,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="217,31,185,30,185,25,217,26"/>
+<area shape="rect" id="Node000005" href="$classsysio_1_1chain_1_1webassembly_1_1interface.html#a221ddffe03a2cf3d3614d024bc50dcb4" title=" " alt="" coords="5,71,185,111"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="217,88,185,90,185,84,217,83"/>
+</map>

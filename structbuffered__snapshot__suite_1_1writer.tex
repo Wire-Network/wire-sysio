@@ -1,0 +1,110 @@
+\doxysection{buffered\+\_\+snapshot\+\_\+suite\+::writer Struct Reference}
+\hypertarget{structbuffered__snapshot__suite_1_1writer}{}\label{structbuffered__snapshot__suite_1_1writer}\index{buffered\_snapshot\_suite::writer@{buffered\_snapshot\_suite::writer}}
+
+
+{\ttfamily \#include $<$snapshot\+\_\+suites.\+hpp$>$}
+
+
+
+Inheritance diagram for buffered\+\_\+snapshot\+\_\+suite\+::writer\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=203pt]{structbuffered__snapshot__suite_1_1writer__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for buffered\+\_\+snapshot\+\_\+suite\+::writer\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=203pt]{structbuffered__snapshot__suite_1_1writer__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structbuffered__snapshot__suite_1_1writer_aee9ac2a938d03de2f0f9b64c86dde971}{writer}} (const std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{structbuffered__snapshot__suite_ac99fd20690e062aba1d09940a0f10c83}{write\+\_\+storage\+\_\+t}} $>$ \&\mbox{\hyperlink{structbuffered__snapshot__suite_1_1writer_ad599a352caaaf959c39cf7c5c270c5e4}{storage}})
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classsysio_1_1chain_1_1ostream__snapshot__writer}{sysio\+::chain\+::ostream\+\_\+snapshot\+\_\+writer}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classsysio_1_1chain_1_1ostream__snapshot__writer_af494b72fd2e0fa081d9bcf132c000783}{ostream\+\_\+snapshot\+\_\+writer}} (std\+::ostream \&snapshot)
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1ostream__snapshot__writer_acaef3693ad5a1874f90e95dcd785c48b}{write\+\_\+start\+\_\+section}} (const std\+::string \&section\+\_\+name) override
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1ostream__snapshot__writer_a43c9836b76e5cea6f8ad0dc88927bcc8}{write\+\_\+row}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1detail_1_1abstract__snapshot__row__writer}{detail\+::abstract\+\_\+snapshot\+\_\+row\+\_\+writer}} \&row\+\_\+writer) override
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1ostream__snapshot__writer_a82619c2e196ed6b314e84a94745218d7}{write\+\_\+end\+\_\+section}} () override
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1ostream__snapshot__writer_a4730bfd011414ba5539975806368c16c}{finalize}} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classsysio_1_1chain_1_1snapshot__writer}{sysio\+::chain\+::snapshot\+\_\+writer}}}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename F $>$ }\\void \mbox{\hyperlink{classsysio_1_1chain_1_1snapshot__writer_a8eb110456e3221522be3d095e68d6d43}{write\+\_\+section}} (const std\+::string section\+\_\+name, F \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename F $>$ }\\void \mbox{\hyperlink{classsysio_1_1chain_1_1snapshot__writer_a92884590724e01a98600ed66e2556bee}{write\+\_\+section}} (F \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})
+\item 
+virtual \mbox{\hyperlink{classsysio_1_1chain_1_1snapshot__writer_afb82a81ead45c6b1835e00c5629caa5d}{\texorpdfstring{$\sim$}{\string~}snapshot\+\_\+writer}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{structbuffered__snapshot__suite_ac99fd20690e062aba1d09940a0f10c83}{write\+\_\+storage\+\_\+t}} $>$ \mbox{\hyperlink{structbuffered__snapshot__suite_1_1writer_ad599a352caaaf959c39cf7c5c270c5e4}{storage}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Static Public Attributes inherited from \mbox{\hyperlink{classsysio_1_1chain_1_1ostream__snapshot__writer}{sysio\+::chain\+::ostream\+\_\+snapshot\+\_\+writer}}}
+\begin{DoxyCompactItemize}
+\item 
+static const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classsysio_1_1chain_1_1ostream__snapshot__writer_a2f2f35cd6182a03d8b26f5518f6f2fe6}{magic\+\_\+number}} = 0x30510550
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Member Functions inherited from \mbox{\hyperlink{classsysio_1_1chain_1_1snapshot__writer}{sysio\+::chain\+::snapshot\+\_\+writer}}}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{snapshot__suites_8hpp_source_l00064}{64}} of file \mbox{\hyperlink{snapshot__suites_8hpp_source}{snapshot\+\_\+suites.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structbuffered__snapshot__suite_1_1writer_aee9ac2a938d03de2f0f9b64c86dde971}\index{buffered\_snapshot\_suite::writer@{buffered\_snapshot\_suite::writer}!writer@{writer}}
+\index{writer@{writer}!buffered\_snapshot\_suite::writer@{buffered\_snapshot\_suite::writer}}
+\doxysubsubsection{\texorpdfstring{writer()}{writer()}}
+{\footnotesize\ttfamily \label{structbuffered__snapshot__suite_1_1writer_aee9ac2a938d03de2f0f9b64c86dde971} 
+buffered\+\_\+snapshot\+\_\+suite\+::writer\+::writer (\begin{DoxyParamCaption}\item[{const std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{structbuffered__snapshot__suite_ac99fd20690e062aba1d09940a0f10c83}{write\+\_\+storage\+\_\+t}} $>$ \&}]{storage}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{snapshot__suites_8hpp_source_l00065}{65}} of file \mbox{\hyperlink{snapshot__suites_8hpp_source}{snapshot\+\_\+suites.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ :\mbox{\hyperlink{structbuffered__snapshot__suite_ae765ad2156bfe6739d42e273daf1bd5a}{writer\_t}}(*\mbox{\hyperlink{structbuffered__snapshot__suite_1_1writer_ad599a352caaaf959c39cf7c5c270c5e4}{storage}})}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ ,\mbox{\hyperlink{structbuffered__snapshot__suite_1_1writer_ad599a352caaaf959c39cf7c5c270c5e4}{storage}}(\mbox{\hyperlink{structbuffered__snapshot__suite_1_1writer_ad599a352caaaf959c39cf7c5c270c5e4}{storage}})}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00069\ }
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structbuffered__snapshot__suite_1_1writer_ad599a352caaaf959c39cf7c5c270c5e4}\index{buffered\_snapshot\_suite::writer@{buffered\_snapshot\_suite::writer}!storage@{storage}}
+\index{storage@{storage}!buffered\_snapshot\_suite::writer@{buffered\_snapshot\_suite::writer}}
+\doxysubsubsection{\texorpdfstring{storage}{storage}}
+{\footnotesize\ttfamily \label{structbuffered__snapshot__suite_1_1writer_ad599a352caaaf959c39cf7c5c270c5e4} 
+std\+::shared\+\_\+ptr$<$\mbox{\hyperlink{structbuffered__snapshot__suite_ac99fd20690e062aba1d09940a0f10c83}{write\+\_\+storage\+\_\+t}}$>$ buffered\+\_\+snapshot\+\_\+suite\+::writer\+::storage}
+
+
+
+Definition at line \mbox{\hyperlink{snapshot__suites_8hpp_source_l00072}{72}} of file \mbox{\hyperlink{snapshot__suites_8hpp_source}{snapshot\+\_\+suites.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/testing/include/sysio/testing/\mbox{\hyperlink{snapshot__suites_8hpp}{snapshot\+\_\+suites.\+hpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,5 @@
+<map id="system_contracts::testing::test_contracts::blockinfo_tester::latest_block_batch_info_result" name="system_contracts::testing::test_contracts::blockinfo_tester::latest_block_batch_info_result">
+<area shape="rect" id="Node000001" title="Output data structure for get_latest_block_batch_info RPC." alt="" coords="5,94,184,165"/>
+<area shape="rect" id="Node000002" href="$structfc_1_1unsigned__int.html" title=" " alt="" coords="38,5,151,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="97,47,97,94,92,94,92,47"/>
+</map>

@@ -1,0 +1,20 @@
+\doxysection{llvm\+WARshim.\+cpp}
+\hypertarget{llvm_w_a_rshim_8cpp_source}{}\label{llvm_w_a_rshim_8cpp_source}\index{libraries/chain/webassembly/runtimes/sys-\/vm-\/oc/llvmWARshim.cpp@{libraries/chain/webassembly/runtimes/sys-\/vm-\/oc/llvmWARshim.cpp}}
+\mbox{\hyperlink{llvm_w_a_rshim_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{llvm_w_a_rshim_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <llvm/IR/IRBuilder.h>}}
+\DoxyCodeLine{\Hypertarget{llvm_w_a_rshim_8cpp_source_l00002}00002\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{\ \textcolor{keyword}{namespace\ }chain\ \{\ \textcolor{keyword}{namespace\ }eosvmoc\ \{}
+\DoxyCodeLine{\Hypertarget{llvm_w_a_rshim_8cpp_source_l00003}00003\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_l_l_v_m_j_i_t}{LLVMJIT}}\ \{}
+\DoxyCodeLine{\Hypertarget{llvm_w_a_rshim_8cpp_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{llvm_w_a_rshim_8cpp_source_l00005}\mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_af795eedea4eeeb05c14888495c44958d}{00005}}\ llvm::Value*\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_af795eedea4eeeb05c14888495c44958d}{CreateInBoundsGEPWAR}}(llvm::IRBuilder<>\&\ irBuilder,\ llvm::Value*\ Ptr,\ llvm::Value*\ v1,\ llvm::Value*\ v2)\ \{}
+\DoxyCodeLine{\Hypertarget{llvm_w_a_rshim_8cpp_source_l00006}00006\ \ \ \ \textcolor{keywordflow}{if}(!v2)}
+\DoxyCodeLine{\Hypertarget{llvm_w_a_rshim_8cpp_source_l00007}00007\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ irBuilder.CreateInBoundsGEP(Ptr,\ v1);}
+\DoxyCodeLine{\Hypertarget{llvm_w_a_rshim_8cpp_source_l00008}00008\ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{llvm_w_a_rshim_8cpp_source_l00009}00009\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ irBuilder.CreateInBoundsGEP(Ptr,\ \{v1,\ v2\});}
+\DoxyCodeLine{\Hypertarget{llvm_w_a_rshim_8cpp_source_l00010}00010\ \}}
+\DoxyCodeLine{\Hypertarget{llvm_w_a_rshim_8cpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{llvm_w_a_rshim_8cpp_source_l00012}00012\ \}}
+\DoxyCodeLine{\Hypertarget{llvm_w_a_rshim_8cpp_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{llvm_w_a_rshim_8cpp_source_l00014}00014\ \}\}\}}
+
+\end{DoxyCode}

@@ -1,0 +1,16 @@
+<map id="mie::Fp::Dbl::getDirect" name="mie::Fp::Dbl::getDirect">
+<area shape="rect" id="Node000001" title=" " alt="" coords="808,43,962,68"/>
+<area shape="rect" id="Node000002" href="$bn_8cpp.html#a2d703c5c63de6e11b3f1916e76fdbc19" title=" " alt="" coords="655,5,718,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="797,42,718,27,719,21,798,37"/>
+<area shape="rect" id="Node000004" href="$structmie_1_1_fp_1_1_dbl.html#a4203623e48a0fde37880a6780c8aded3" title=" " alt="" coords="613,79,760,104"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="796,74,761,81,760,76,795,69"/>
+<area shape="rect" id="Node000003" href="$bn_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97" title=" " alt="" coords="464,5,514,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="639,21,514,21,514,16,639,16"/>
+<area shape="poly" id="edge7_Node000004_Node000004" title=" " alt="" coords="721,66,709,60,686,57,666,59,655,64,652,69,658,77,653,80,647,70,651,60,664,54,687,52,711,55,723,62"/>
+<area shape="rect" id="Node000005" href="$structbn_1_1_fp2_t_1_1_dbl.html#a2ec2cd6dcbaee5638152c92709146805" title=" " alt="" coords="413,79,565,104"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="597,94,566,94,566,89,597,89"/>
+<area shape="rect" id="Node000006" href="$structbn_1_1_fp6_t_1_1_dbl.html#adc3e5388f65dbe65e379d1fa368488ae" title=" " alt="" coords="213,79,365,104"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="397,94,365,94,365,89,397,89"/>
+<area shape="rect" id="Node000007" href="$structbn_1_1_fp12_t_1_1_dbl.html#a4f6a5aa543e4af3c663a05a33ceb33cd" title=" " alt="" coords="5,79,165,104"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="197,94,165,94,165,89,197,89"/>
+</map>

@@ -1,0 +1,286 @@
+\doxysection{fc\+::mock\+\_\+time\+\_\+traits Class Reference}
+\hypertarget{classfc_1_1mock__time__traits}{}\label{classfc_1_1mock__time__traits}\index{fc::mock\_time\_traits@{fc::mock\_time\_traits}}
+
+
+mock out \doxylink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{fc\+::time\+\_\+point\+::now()} and provide a mock deadline timer  
+
+
+
+
+{\ttfamily \#include $<$mock\+\_\+time.\+hpp$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef source\+\_\+traits\+::time\+\_\+type \mbox{\hyperlink{classfc_1_1mock__time__traits_a42a56c9a52cd289340b7e7be8b663e5e}{time\+\_\+type}}
+\item 
+typedef source\+\_\+traits\+::duration\+\_\+type \mbox{\hyperlink{classfc_1_1mock__time__traits_a4533ad89c70bf284cf7ff4fc830a547b}{duration\+\_\+type}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static \mbox{\hyperlink{classfc_1_1mock__time__traits_a42a56c9a52cd289340b7e7be8b663e5e}{time\+\_\+type}} \mbox{\hyperlink{classfc_1_1mock__time__traits_a0d7245b32fd62b3bc712f658250cc4db}{now}} () noexcept
+\item 
+static void \mbox{\hyperlink{classfc_1_1mock__time__traits_a374e695ad10b80d8a13e7955cf5abbd8}{set\+\_\+now}} (\mbox{\hyperlink{classfc_1_1mock__time__traits_a42a56c9a52cd289340b7e7be8b663e5e}{time\+\_\+type}} t)
+\item 
+static void \mbox{\hyperlink{classfc_1_1mock__time__traits_a2a79913fee9b93caacb54de778ac4690}{set\+\_\+now}} (const \mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}} \&\mbox{\hyperlink{classfc_1_1mock__time__traits_a0d7245b32fd62b3bc712f658250cc4db}{now}})
+\item 
+static bool \mbox{\hyperlink{classfc_1_1mock__time__traits_adddeebdf472c33f927827c111ddbf0b1}{is\+\_\+set}} ()
+\item 
+static \mbox{\hyperlink{classfc_1_1mock__time__traits_a42a56c9a52cd289340b7e7be8b663e5e}{time\+\_\+type}} \mbox{\hyperlink{classfc_1_1mock__time__traits_a29ebf3e988a19e4f80a4fdc1e268d0cd}{add}} (\mbox{\hyperlink{classfc_1_1mock__time__traits_a42a56c9a52cd289340b7e7be8b663e5e}{time\+\_\+type}} t, \mbox{\hyperlink{classfc_1_1mock__time__traits_a4533ad89c70bf284cf7ff4fc830a547b}{duration\+\_\+type}} d)
+\item 
+static \mbox{\hyperlink{classfc_1_1mock__time__traits_a4533ad89c70bf284cf7ff4fc830a547b}{duration\+\_\+type}} \mbox{\hyperlink{classfc_1_1mock__time__traits_aa63b04683676b62d9f4ca0059947d88b}{subtract}} (\mbox{\hyperlink{classfc_1_1mock__time__traits_a42a56c9a52cd289340b7e7be8b663e5e}{time\+\_\+type}} t1, \mbox{\hyperlink{classfc_1_1mock__time__traits_a42a56c9a52cd289340b7e7be8b663e5e}{time\+\_\+type}} t2)
+\item 
+static bool \mbox{\hyperlink{classfc_1_1mock__time__traits_afabcb84f88b9367b7d6a10a8627713f6}{less\+\_\+than}} (\mbox{\hyperlink{classfc_1_1mock__time__traits_a42a56c9a52cd289340b7e7be8b663e5e}{time\+\_\+type}} t1, \mbox{\hyperlink{classfc_1_1mock__time__traits_a42a56c9a52cd289340b7e7be8b663e5e}{time\+\_\+type}} t2)
+\item 
+static boost\+::posix\+\_\+time\+::time\+\_\+duration \mbox{\hyperlink{classfc_1_1mock__time__traits_a437da363274d8347260118d349d69b20}{to\+\_\+posix\+\_\+duration}} (\mbox{\hyperlink{classfc_1_1mock__time__traits_a4533ad89c70bf284cf7ff4fc830a547b}{duration\+\_\+type}} d)
+\item 
+static \mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}} \mbox{\hyperlink{classfc_1_1mock__time__traits_a0bed781012a73b8c15882648397b56be}{fc\+\_\+now}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{mock__time_8hpp_source_l00009}{9}} of file \mbox{\hyperlink{mock__time_8hpp_source}{mock\+\_\+time.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classfc_1_1mock__time__traits_a4533ad89c70bf284cf7ff4fc830a547b}\index{fc::mock\_time\_traits@{fc::mock\_time\_traits}!duration\_type@{duration\_type}}
+\index{duration\_type@{duration\_type}!fc::mock\_time\_traits@{fc::mock\_time\_traits}}
+\doxysubsubsection{\texorpdfstring{duration\_type}{duration\_type}}
+{\footnotesize\ttfamily \label{classfc_1_1mock__time__traits_a4533ad89c70bf284cf7ff4fc830a547b} 
+source\+\_\+traits\+::duration\+\_\+type \mbox{\hyperlink{classfc_1_1mock__time__traits_a4533ad89c70bf284cf7ff4fc830a547b}{fc\+::mock\+\_\+time\+\_\+traits\+::duration\+\_\+type}}}
+
+
+
+Definition at line \mbox{\hyperlink{mock__time_8hpp_source_l00013}{13}} of file \mbox{\hyperlink{mock__time_8hpp_source}{mock\+\_\+time.\+hpp}}.
+
+\Hypertarget{classfc_1_1mock__time__traits_a42a56c9a52cd289340b7e7be8b663e5e}\index{fc::mock\_time\_traits@{fc::mock\_time\_traits}!time\_type@{time\_type}}
+\index{time\_type@{time\_type}!fc::mock\_time\_traits@{fc::mock\_time\_traits}}
+\doxysubsubsection{\texorpdfstring{time\_type}{time\_type}}
+{\footnotesize\ttfamily \label{classfc_1_1mock__time__traits_a42a56c9a52cd289340b7e7be8b663e5e} 
+source\+\_\+traits\+::time\+\_\+type \mbox{\hyperlink{classfc_1_1mock__time__traits_a42a56c9a52cd289340b7e7be8b663e5e}{fc\+::mock\+\_\+time\+\_\+traits\+::time\+\_\+type}}}
+
+
+
+Definition at line \mbox{\hyperlink{mock__time_8hpp_source_l00012}{12}} of file \mbox{\hyperlink{mock__time_8hpp_source}{mock\+\_\+time.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1mock__time__traits_a29ebf3e988a19e4f80a4fdc1e268d0cd}\index{fc::mock\_time\_traits@{fc::mock\_time\_traits}!add@{add}}
+\index{add@{add}!fc::mock\_time\_traits@{fc::mock\_time\_traits}}
+\doxysubsubsection{\texorpdfstring{add()}{add()}}
+{\footnotesize\ttfamily \label{classfc_1_1mock__time__traits_a29ebf3e988a19e4f80a4fdc1e268d0cd} 
+static \mbox{\hyperlink{classfc_1_1mock__time__traits_a42a56c9a52cd289340b7e7be8b663e5e}{time\+\_\+type}} fc\+::mock\+\_\+time\+\_\+traits\+::add (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1mock__time__traits_a42a56c9a52cd289340b7e7be8b663e5e}{time\+\_\+type}}}]{t}{, }\item[{\mbox{\hyperlink{classfc_1_1mock__time__traits_a4533ad89c70bf284cf7ff4fc830a547b}{duration\+\_\+type}}}]{d}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{mock__time_8hpp_source_l00025}{25}} of file \mbox{\hyperlink{mock__time_8hpp_source}{mock\+\_\+time.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00025\ \{\ \textcolor{keywordflow}{return}\ source\_traits::add(\ t,\ d\ );\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1mock__time__traits_a29ebf3e988a19e4f80a4fdc1e268d0cd_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1mock__time__traits_a0bed781012a73b8c15882648397b56be}\index{fc::mock\_time\_traits@{fc::mock\_time\_traits}!fc\_now@{fc\_now}}
+\index{fc\_now@{fc\_now}!fc::mock\_time\_traits@{fc::mock\_time\_traits}}
+\doxysubsubsection{\texorpdfstring{fc\_now()}{fc\_now()}}
+{\footnotesize\ttfamily \label{classfc_1_1mock__time__traits_a0bed781012a73b8c15882648397b56be} 
+\mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}} fc\+::mock\+\_\+time\+\_\+traits\+::fc\+\_\+now (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{mock__time_8cpp_source_l00029}{29}} of file \mbox{\hyperlink{mock__time_8cpp_source}{mock\+\_\+time.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00030\ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1time__point}{fc::time\_point}}(\ \mbox{\hyperlink{classfc_1_1microseconds}{fc::microseconds}}(\ (\ \mbox{\hyperlink{classfc_1_1mock__time__traits_a0d7245b32fd62b3bc712f658250cc4db}{mock\_time\_traits::now}}()\ -\/\ epoch\_\ ).total\_microseconds()\ )\ );}
+\DoxyCodeLine{00031\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1mock__time__traits_a0bed781012a73b8c15882648397b56be_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{classfc_1_1mock__time__traits_a0bed781012a73b8c15882648397b56be_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1mock__time__traits_adddeebdf472c33f927827c111ddbf0b1}\index{fc::mock\_time\_traits@{fc::mock\_time\_traits}!is\_set@{is\_set}}
+\index{is\_set@{is\_set}!fc::mock\_time\_traits@{fc::mock\_time\_traits}}
+\doxysubsubsection{\texorpdfstring{is\_set()}{is\_set()}}
+{\footnotesize\ttfamily \label{classfc_1_1mock__time__traits_adddeebdf472c33f927827c111ddbf0b1} 
+static bool fc\+::mock\+\_\+time\+\_\+traits\+::is\+\_\+set (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{mock__time_8hpp_source_l00023}{23}} of file \mbox{\hyperlink{mock__time_8hpp_source}{mock\+\_\+time.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00023\ \{\ \textcolor{keywordflow}{return}\ mock\_enabled\_;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{classfc_1_1mock__time__traits_adddeebdf472c33f927827c111ddbf0b1_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1mock__time__traits_afabcb84f88b9367b7d6a10a8627713f6}\index{fc::mock\_time\_traits@{fc::mock\_time\_traits}!less\_than@{less\_than}}
+\index{less\_than@{less\_than}!fc::mock\_time\_traits@{fc::mock\_time\_traits}}
+\doxysubsubsection{\texorpdfstring{less\_than()}{less\_than()}}
+{\footnotesize\ttfamily \label{classfc_1_1mock__time__traits_afabcb84f88b9367b7d6a10a8627713f6} 
+static bool fc\+::mock\+\_\+time\+\_\+traits\+::less\+\_\+than (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1mock__time__traits_a42a56c9a52cd289340b7e7be8b663e5e}{time\+\_\+type}}}]{t1}{, }\item[{\mbox{\hyperlink{classfc_1_1mock__time__traits_a42a56c9a52cd289340b7e7be8b663e5e}{time\+\_\+type}}}]{t2}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{mock__time_8hpp_source_l00027}{27}} of file \mbox{\hyperlink{mock__time_8hpp_source}{mock\+\_\+time.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00027\ \{\ \textcolor{keywordflow}{return}\ source\_traits::less\_than(\ t1,\ t2\ );\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1mock__time__traits_a0d7245b32fd62b3bc712f658250cc4db}\index{fc::mock\_time\_traits@{fc::mock\_time\_traits}!now@{now}}
+\index{now@{now}!fc::mock\_time\_traits@{fc::mock\_time\_traits}}
+\doxysubsubsection{\texorpdfstring{now()}{now()}}
+{\footnotesize\ttfamily \label{classfc_1_1mock__time__traits_a0d7245b32fd62b3bc712f658250cc4db} 
+\mbox{\hyperlink{classfc_1_1mock__time__traits_a42a56c9a52cd289340b7e7be8b663e5e}{mock\+\_\+time\+\_\+traits\+::time\+\_\+type}} fc\+::mock\+\_\+time\+\_\+traits\+::now (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{mock__time_8cpp_source_l00010}{10}} of file \mbox{\hyperlink{mock__time_8cpp_source}{mock\+\_\+time.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00010\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00011\ \ \ \ \textcolor{keywordflow}{return}\ epoch\_\ +\ boost::posix\_time::microseconds(\ now\_.load()\ );}
+\DoxyCodeLine{00012\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{classfc_1_1mock__time__traits_a0d7245b32fd62b3bc712f658250cc4db_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1mock__time__traits_a2a79913fee9b93caacb54de778ac4690}\index{fc::mock\_time\_traits@{fc::mock\_time\_traits}!set\_now@{set\_now}}
+\index{set\_now@{set\_now}!fc::mock\_time\_traits@{fc::mock\_time\_traits}}
+\doxysubsubsection{\texorpdfstring{set\_now()}{set\_now()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1mock__time__traits_a2a79913fee9b93caacb54de778ac4690} 
+void fc\+::mock\+\_\+time\+\_\+traits\+::set\+\_\+now (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}} \&}]{now}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{mock__time_8cpp_source_l00019}{19}} of file \mbox{\hyperlink{mock__time_8cpp_source}{mock\+\_\+time.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00020\ \ \ \ now\_\ =\ \mbox{\hyperlink{classfc_1_1mock__time__traits_a0d7245b32fd62b3bc712f658250cc4db}{now}}.time\_since\_epoch().count();}
+\DoxyCodeLine{00021\ \ \ \ \textcolor{keywordflow}{if}(\ !mock\_enabled\_\ )\ mock\_enabled\_\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00022\ }
+\DoxyCodeLine{00023\ \ \ \ \textcolor{comment}{//\ After\ modifying\ the\ clock,\ we\ need\ to\ sleep\ the\ thread\ to\ give\ the\ io\_service}}
+\DoxyCodeLine{00024\ \ \ \ \textcolor{comment}{//\ the\ opportunity\ to\ poll\ and\ notice\ the\ change\ in\ clock\ time.}}
+\DoxyCodeLine{00025\ \ \ \ \textcolor{comment}{//\ See\ to\_posix\_duration()}}
+\DoxyCodeLine{00026\ \ \ \ std::this\_thread::sleep\_for(\ std::chrono::milliseconds(\ 2\ )\ );}
+\DoxyCodeLine{00027\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1mock__time__traits_a2a79913fee9b93caacb54de778ac4690_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1mock__time__traits_a374e695ad10b80d8a13e7955cf5abbd8}\index{fc::mock\_time\_traits@{fc::mock\_time\_traits}!set\_now@{set\_now}}
+\index{set\_now@{set\_now}!fc::mock\_time\_traits@{fc::mock\_time\_traits}}
+\doxysubsubsection{\texorpdfstring{set\_now()}{set\_now()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1mock__time__traits_a374e695ad10b80d8a13e7955cf5abbd8} 
+void fc\+::mock\+\_\+time\+\_\+traits\+::set\+\_\+now (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1mock__time__traits_a42a56c9a52cd289340b7e7be8b663e5e}{time\+\_\+type}}}]{t}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{mock__time_8cpp_source_l00014}{14}} of file \mbox{\hyperlink{mock__time_8cpp_source}{mock\+\_\+time.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00014\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00015\ \ \ \ \mbox{\hyperlink{classfc_1_1time__point}{fc::time\_point}}\ \mbox{\hyperlink{classfc_1_1mock__time__traits_a0d7245b32fd62b3bc712f658250cc4db}{now}}(\ \mbox{\hyperlink{classfc_1_1microseconds}{fc::microseconds}}(\ (t\ -\/\ epoch\_).total\_microseconds()\ )\ );}
+\DoxyCodeLine{00016\ \ \ \ \mbox{\hyperlink{classfc_1_1mock__time__traits_a374e695ad10b80d8a13e7955cf5abbd8}{set\_now}}(\ \mbox{\hyperlink{classfc_1_1mock__time__traits_a0d7245b32fd62b3bc712f658250cc4db}{now}}\ );}
+\DoxyCodeLine{00017\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1mock__time__traits_a374e695ad10b80d8a13e7955cf5abbd8_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1mock__time__traits_a374e695ad10b80d8a13e7955cf5abbd8_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1mock__time__traits_aa63b04683676b62d9f4ca0059947d88b}\index{fc::mock\_time\_traits@{fc::mock\_time\_traits}!subtract@{subtract}}
+\index{subtract@{subtract}!fc::mock\_time\_traits@{fc::mock\_time\_traits}}
+\doxysubsubsection{\texorpdfstring{subtract()}{subtract()}}
+{\footnotesize\ttfamily \label{classfc_1_1mock__time__traits_aa63b04683676b62d9f4ca0059947d88b} 
+static \mbox{\hyperlink{classfc_1_1mock__time__traits_a4533ad89c70bf284cf7ff4fc830a547b}{duration\+\_\+type}} fc\+::mock\+\_\+time\+\_\+traits\+::subtract (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1mock__time__traits_a42a56c9a52cd289340b7e7be8b663e5e}{time\+\_\+type}}}]{t1}{, }\item[{\mbox{\hyperlink{classfc_1_1mock__time__traits_a42a56c9a52cd289340b7e7be8b663e5e}{time\+\_\+type}}}]{t2}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{mock__time_8hpp_source_l00026}{26}} of file \mbox{\hyperlink{mock__time_8hpp_source}{mock\+\_\+time.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00026\ \{\ \textcolor{keywordflow}{return}\ source\_traits::subtract(\ t1,\ t2\ );\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1mock__time__traits_a437da363274d8347260118d349d69b20}\index{fc::mock\_time\_traits@{fc::mock\_time\_traits}!to\_posix\_duration@{to\_posix\_duration}}
+\index{to\_posix\_duration@{to\_posix\_duration}!fc::mock\_time\_traits@{fc::mock\_time\_traits}}
+\doxysubsubsection{\texorpdfstring{to\_posix\_duration()}{to\_posix\_duration()}}
+{\footnotesize\ttfamily \label{classfc_1_1mock__time__traits_a437da363274d8347260118d349d69b20} 
+static boost\+::posix\+\_\+time\+::time\+\_\+duration fc\+::mock\+\_\+time\+\_\+traits\+::to\+\_\+posix\+\_\+duration (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1mock__time__traits_a4533ad89c70bf284cf7ff4fc830a547b}{duration\+\_\+type}}}]{d}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{mock__time_8hpp_source_l00032}{32}} of file \mbox{\hyperlink{mock__time_8hpp_source}{mock\+\_\+time.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ <\ boost::posix\_time::milliseconds(\ 1\ )\ ?\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ :\ boost::posix\_time::milliseconds(\ 1\ );}
+\DoxyCodeLine{00034\ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/\mbox{\hyperlink{mock__time_8hpp}{mock\+\_\+time.\+hpp}}\item 
+libraries/fc/src/\mbox{\hyperlink{mock__time_8cpp}{mock\+\_\+time.\+cpp}}\end{DoxyCompactItemize}

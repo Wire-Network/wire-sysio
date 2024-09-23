@@ -1,0 +1,147 @@
+\doxysection{libff\+::edwards\+\_\+\+Fq3\+\_\+conic\+\_\+coefficients Struct Reference}
+\hypertarget{structlibff_1_1edwards___fq3__conic__coefficients}{}\label{structlibff_1_1edwards___fq3__conic__coefficients}\index{libff::edwards\_Fq3\_conic\_coefficients@{libff::edwards\_Fq3\_conic\_coefficients}}
+
+
+{\ttfamily \#include $<$edwards\+\_\+pairing.\+hpp$>$}
+
+
+
+Collaboration diagram for libff\+::edwards\+\_\+\+Fq3\+\_\+conic\+\_\+coefficients\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structlibff_1_1edwards___fq3__conic__coefficients__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{structlibff_1_1edwards___fq3__conic__coefficients_a3b50fcc1b97d0048768193529f5d3884}{operator==}} (const \mbox{\hyperlink{structlibff_1_1edwards___fq3__conic__coefficients}{edwards\+\_\+\+Fq3\+\_\+conic\+\_\+coefficients}} \&other) const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\+\_\+\+Fq3}} \mbox{\hyperlink{structlibff_1_1edwards___fq3__conic__coefficients_ae4570f7970565c695f0368298c321451}{c\+\_\+\+ZZ}}
+\item 
+\mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\+\_\+\+Fq3}} \mbox{\hyperlink{structlibff_1_1edwards___fq3__conic__coefficients_ad715d9ce591ae83797b8af85e0ca5396}{c\+\_\+\+XY}}
+\item 
+\mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\+\_\+\+Fq3}} \mbox{\hyperlink{structlibff_1_1edwards___fq3__conic__coefficients_a770808ca45f1ca38a20dbe86ac94d30e}{c\+\_\+\+XZ}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+std\+::ostream \& \mbox{\hyperlink{structlibff_1_1edwards___fq3__conic__coefficients_ab2e3ec9babe344580391fe0d39e20a8c}{operator$<$$<$}} (std\+::ostream \&out, const \mbox{\hyperlink{structlibff_1_1edwards___fq3__conic__coefficients}{edwards\+\_\+\+Fq3\+\_\+conic\+\_\+coefficients}} \&cc)
+\item 
+std\+::istream \& \mbox{\hyperlink{structlibff_1_1edwards___fq3__conic__coefficients_afba6080304f33ca7db1d6569c1c6aa90}{operator$>$$>$}} (std\+::istream \&in, \mbox{\hyperlink{structlibff_1_1edwards___fq3__conic__coefficients}{edwards\+\_\+\+Fq3\+\_\+conic\+\_\+coefficients}} \&cc)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{edwards__pairing_8hpp_source_l00061}{61}} of file \mbox{\hyperlink{edwards__pairing_8hpp_source}{edwards\+\_\+pairing.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structlibff_1_1edwards___fq3__conic__coefficients_a3b50fcc1b97d0048768193529f5d3884}\index{libff::edwards\_Fq3\_conic\_coefficients@{libff::edwards\_Fq3\_conic\_coefficients}!operator==@{operator==}}
+\index{operator==@{operator==}!libff::edwards\_Fq3\_conic\_coefficients@{libff::edwards\_Fq3\_conic\_coefficients}}
+\doxysubsubsection{\texorpdfstring{operator==()}{operator==()}}
+{\footnotesize\ttfamily \label{structlibff_1_1edwards___fq3__conic__coefficients_a3b50fcc1b97d0048768193529f5d3884} 
+bool libff\+::edwards\+\_\+\+Fq3\+\_\+conic\+\_\+coefficients\+::operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structlibff_1_1edwards___fq3__conic__coefficients}{edwards\+\_\+\+Fq3\+\_\+conic\+\_\+coefficients}} \&}]{other}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__pairing_8cpp_source_l00093}{93}} of file \mbox{\hyperlink{edwards__pairing_8cpp_source}{edwards\+\_\+pairing.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00094\ \{}
+\DoxyCodeLine{00095\ \ \ \ \ \textcolor{keywordflow}{return}\ (this-\/>\mbox{\hyperlink{structlibff_1_1edwards___fq3__conic__coefficients_ae4570f7970565c695f0368298c321451}{c\_ZZ}}\ ==\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.c\_ZZ\ \&\&}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \ \ \ this-\/>c\_XY\ ==\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.c\_XY\ \&\&}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \ \ \ this-\/>c\_XZ\ ==\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.c\_XZ);}
+\DoxyCodeLine{00098\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{structlibff_1_1edwards___fq3__conic__coefficients_ab2e3ec9babe344580391fe0d39e20a8c}\index{libff::edwards\_Fq3\_conic\_coefficients@{libff::edwards\_Fq3\_conic\_coefficients}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!libff::edwards\_Fq3\_conic\_coefficients@{libff::edwards\_Fq3\_conic\_coefficients}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$}{operator<<}}
+{\footnotesize\ttfamily \label{structlibff_1_1edwards___fq3__conic__coefficients_ab2e3ec9babe344580391fe0d39e20a8c} 
+std\+::ostream \& operator$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{out}{, }\item[{const \mbox{\hyperlink{structlibff_1_1edwards___fq3__conic__coefficients}{edwards\+\_\+\+Fq3\+\_\+conic\+\_\+coefficients}} \&}]{cc}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__pairing_8cpp_source_l00100}{100}} of file \mbox{\hyperlink{edwards__pairing_8cpp_source}{edwards\+\_\+pairing.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00101\ \{}
+\DoxyCodeLine{00102\ \ \ \ \ out\ <<\ cc.c\_ZZ\ <<\ \mbox{\hyperlink{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_ad80cfbe7456c7d029544e8bc2cec16c8}{OUTPUT\_SEPARATOR}}\ <<\ cc.c\_XY\ <<\ \mbox{\hyperlink{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_ad80cfbe7456c7d029544e8bc2cec16c8}{OUTPUT\_SEPARATOR}}\ <<\ cc.c\_XZ;}
+\DoxyCodeLine{00103\ \ \ \ \ \textcolor{keywordflow}{return}\ out;}
+\DoxyCodeLine{00104\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structlibff_1_1edwards___fq3__conic__coefficients_afba6080304f33ca7db1d6569c1c6aa90}\index{libff::edwards\_Fq3\_conic\_coefficients@{libff::edwards\_Fq3\_conic\_coefficients}!operator$>$$>$@{operator$>$$>$}}
+\index{operator$>$$>$@{operator$>$$>$}!libff::edwards\_Fq3\_conic\_coefficients@{libff::edwards\_Fq3\_conic\_coefficients}}
+\doxysubsubsection{\texorpdfstring{operator$>$$>$}{operator>>}}
+{\footnotesize\ttfamily \label{structlibff_1_1edwards___fq3__conic__coefficients_afba6080304f33ca7db1d6569c1c6aa90} 
+std\+::istream \& operator$>$$>$ (\begin{DoxyParamCaption}\item[{std\+::istream \&}]{in}{, }\item[{\mbox{\hyperlink{structlibff_1_1edwards___fq3__conic__coefficients}{edwards\+\_\+\+Fq3\+\_\+conic\+\_\+coefficients}} \&}]{cc}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__pairing_8cpp_source_l00106}{106}} of file \mbox{\hyperlink{edwards__pairing_8cpp_source}{edwards\+\_\+pairing.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00107\ \{}
+\DoxyCodeLine{00108\ \ \ \ \ in\ >>\ cc.c\_ZZ;}
+\DoxyCodeLine{00109\ \ \ \ \ \mbox{\hyperlink{namespacelibff_a3b7a446329c9be967e16ab1c04f260e6}{consume\_OUTPUT\_SEPARATOR}}(in);}
+\DoxyCodeLine{00110\ \ \ \ \ in\ >>\ cc.c\_XY;}
+\DoxyCodeLine{00111\ \ \ \ \ \mbox{\hyperlink{namespacelibff_a3b7a446329c9be967e16ab1c04f260e6}{consume\_OUTPUT\_SEPARATOR}}(in);}
+\DoxyCodeLine{00112\ \ \ \ \ in\ >>\ cc.c\_XZ;}
+\DoxyCodeLine{00113\ \ \ \ \ \textcolor{keywordflow}{return}\ in;}
+\DoxyCodeLine{00114\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structlibff_1_1edwards___fq3__conic__coefficients_ad715d9ce591ae83797b8af85e0ca5396}\index{libff::edwards\_Fq3\_conic\_coefficients@{libff::edwards\_Fq3\_conic\_coefficients}!c\_XY@{c\_XY}}
+\index{c\_XY@{c\_XY}!libff::edwards\_Fq3\_conic\_coefficients@{libff::edwards\_Fq3\_conic\_coefficients}}
+\doxysubsubsection{\texorpdfstring{c\_XY}{c\_XY}}
+{\footnotesize\ttfamily \label{structlibff_1_1edwards___fq3__conic__coefficients_ad715d9ce591ae83797b8af85e0ca5396} 
+\mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\+\_\+\+Fq3}} libff\+::edwards\+\_\+\+Fq3\+\_\+conic\+\_\+coefficients\+::c\+\_\+\+XY}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__pairing_8hpp_source_l00063}{63}} of file \mbox{\hyperlink{edwards__pairing_8hpp_source}{edwards\+\_\+pairing.\+hpp}}.
+
+\Hypertarget{structlibff_1_1edwards___fq3__conic__coefficients_a770808ca45f1ca38a20dbe86ac94d30e}\index{libff::edwards\_Fq3\_conic\_coefficients@{libff::edwards\_Fq3\_conic\_coefficients}!c\_XZ@{c\_XZ}}
+\index{c\_XZ@{c\_XZ}!libff::edwards\_Fq3\_conic\_coefficients@{libff::edwards\_Fq3\_conic\_coefficients}}
+\doxysubsubsection{\texorpdfstring{c\_XZ}{c\_XZ}}
+{\footnotesize\ttfamily \label{structlibff_1_1edwards___fq3__conic__coefficients_a770808ca45f1ca38a20dbe86ac94d30e} 
+\mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\+\_\+\+Fq3}} libff\+::edwards\+\_\+\+Fq3\+\_\+conic\+\_\+coefficients\+::c\+\_\+\+XZ}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__pairing_8hpp_source_l00064}{64}} of file \mbox{\hyperlink{edwards__pairing_8hpp_source}{edwards\+\_\+pairing.\+hpp}}.
+
+\Hypertarget{structlibff_1_1edwards___fq3__conic__coefficients_ae4570f7970565c695f0368298c321451}\index{libff::edwards\_Fq3\_conic\_coefficients@{libff::edwards\_Fq3\_conic\_coefficients}!c\_ZZ@{c\_ZZ}}
+\index{c\_ZZ@{c\_ZZ}!libff::edwards\_Fq3\_conic\_coefficients@{libff::edwards\_Fq3\_conic\_coefficients}}
+\doxysubsubsection{\texorpdfstring{c\_ZZ}{c\_ZZ}}
+{\footnotesize\ttfamily \label{structlibff_1_1edwards___fq3__conic__coefficients_ae4570f7970565c695f0368298c321451} 
+\mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\+\_\+\+Fq3}} libff\+::edwards\+\_\+\+Fq3\+\_\+conic\+\_\+coefficients\+::c\+\_\+\+ZZ}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__pairing_8hpp_source_l00062}{62}} of file \mbox{\hyperlink{edwards__pairing_8hpp_source}{edwards\+\_\+pairing.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/libraries/ff/libff/algebra/curves/edwards/\mbox{\hyperlink{edwards__pairing_8hpp}{edwards\+\_\+pairing.\+hpp}}\item 
+libraries/fc/libraries/ff/libff/algebra/curves/edwards/\mbox{\hyperlink{edwards__pairing_8cpp}{edwards\+\_\+pairing.\+cpp}}\end{DoxyCompactItemize}

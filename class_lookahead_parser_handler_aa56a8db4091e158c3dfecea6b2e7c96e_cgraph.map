@@ -1,0 +1,19 @@
+<map id="LookaheadParserHandler::LookaheadParserHandler" name="LookaheadParserHandler::LookaheadParserHandler">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,39,181,79"/>
+<area shape="rect" id="Node000002" href="$class_generic_reader.html#a7de472eda2ad9de13cfd8c1de74f1754" title="Initialize JSON text token&#45;by&#45;token parsing." alt="" coords="231,5,394,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="181,43,215,38,215,43,182,48"/>
+<area shape="rect" id="Node000005" href="$class_lookahead_parser_handler.html#a7d0cc7887e9e0c37e645e27744a5b356" title=" " alt="" coords="229,71,396,111"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="182,69,214,74,213,79,181,74"/>
+<area shape="rect" id="Node000003" href="$struct_parse_result.html#a88b6d44f052a19e6436ae6aadc2c40b4" title="Reset error code." alt="" coords="479,13,611,38"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="394,23,463,23,463,28,394,28"/>
+<area shape="rect" id="Node000004" href="$struct_parse_result.html#aa81b4a7b776b77216cb752385203a8c1" title="Update error code and offset." alt="" coords="706,13,827,38"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="612,23,690,23,690,28,612,28"/>
+<area shape="rect" id="Node000006" href="$class_generic_reader.html#ac417441794477ea747b63adb6d3653a9" title="Whether a parse error has occurred in the last parsing." alt="" coords="444,70,646,96"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="396,85,428,84,428,90,396,91"/>
+<area shape="rect" id="Node000008" href="$class_generic_reader.html#a257891331e0c259903e7066fb4cebf92" title="Parse one token from JSON text." alt="" coords="464,120,627,161"/>
+<area shape="poly" id="edge7_Node000005_Node000008" title=" " alt="" coords="397,106,449,117,448,122,396,111"/>
+<area shape="rect" id="Node000007" href="$struct_parse_result.html#adfe0ef5b994e82f8aa9ebf0b30c924b1" title="Whether the result is an error." alt="" coords="696,70,837,96"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="647,80,681,80,681,86,647,86"/>
+<area shape="rect" id="Node000009" href="$classinternal_1_1_stack.html#a02da31665a372738e81ded2f7b7d598e" title=" " alt="" coords="694,128,839,153"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="627,138,678,138,678,143,627,143"/>
+</map>

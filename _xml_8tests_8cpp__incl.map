@@ -1,0 +1,23 @@
+<map id="libraries/sys&#45;vm/external/Catch2/projects/SelfTest/IntrospectiveTests/Xml.tests.cpp" name="libraries/sys&#45;vm/external/Catch2/projects/SelfTest/IntrospectiveTests/Xml.tests.cpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="212,5,429,61"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="133,109,212,135"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="275,64,207,103,205,99,273,59"/>
+<area shape="rect" id="Node000003" href="$catch__xmlwriter_8h.html" title=" " alt="" coords="236,109,405,135"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="323,61,323,93,318,93,318,61"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="429,109,497,135"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="366,59,431,98,429,103,364,64"/>
+<area shape="rect" id="Node000004" href="$catch__stream_8h.html" title=" " alt="" coords="81,183,192,208"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="290,138,183,179,181,174,288,133"/>
+<area shape="rect" id="Node000008" href="$catch__compiler__capabilities_8h.html" title=" " alt="" coords="224,183,416,208"/>
+<area shape="poly" id="edge7_Node000003_Node000008" title=" " alt="" coords="323,135,323,167,318,167,318,135"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="441,183,498,208"/>
+<area shape="poly" id="edge9_Node000003_Node000010" title=" " alt="" coords="347,133,432,173,429,178,345,138"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="5,256,65,282"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="121,211,66,249,63,245,118,207"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="88,256,152,282"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="136,209,129,241,124,240,131,208"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="177,256,245,282"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="151,207,190,244,186,248,147,211"/>
+<area shape="rect" id="Node000009" href="$catch__platform_8h.html" title=" " alt="" coords="269,256,388,282"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="324,208,328,241,323,241,319,209"/>
+</map>

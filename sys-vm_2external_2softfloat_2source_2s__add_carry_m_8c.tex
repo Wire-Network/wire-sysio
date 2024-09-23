@@ -1,0 +1,58 @@
+\doxysection{libraries/sys-\/vm/external/softfloat/source/s\+\_\+add\+CarryM.c File Reference}
+\hypertarget{sys-vm_2external_2softfloat_2source_2s__add_carry_m_8c}{}\label{sys-vm_2external_2softfloat_2source_2s__add_carry_m_8c}\index{libraries/sys-\/vm/external/softfloat/source/s\_addCarryM.c@{libraries/sys-\/vm/external/softfloat/source/s\_addCarryM.c}}
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include "{}platform.\+h"{}}\newline
+{\ttfamily \#include "{}primitive\+Types.\+h"{}}\newline
+Include dependency graph for s\+\_\+add\+Carry\+M.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=343pt]{sys-vm_2external_2softfloat_2source_2s__add_carry_m_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_ad0fca8b15c218d2c687f8c373a71d228}{uint\+\_\+fast8\+\_\+t}} \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2s__add_carry_m_8c_a809b9a8162426c1ca4462a60fa19f1be}{softfloat\+\_\+add\+CarryM}} (\mbox{\hyperlink{stdint_8h_ad0fca8b15c218d2c687f8c373a71d228}{uint\+\_\+fast8\+\_\+t}} size\+\_\+words, const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*}a\+Ptr, const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*}b\+Ptr, \mbox{\hyperlink{stdint_8h_ad0fca8b15c218d2c687f8c373a71d228}{uint\+\_\+fast8\+\_\+t}} carry, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*}z\+Ptr)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{sys-vm_2external_2softfloat_2source_2s__add_carry_m_8c_a809b9a8162426c1ca4462a60fa19f1be}\index{s\_addCarryM.c@{s\_addCarryM.c}!softfloat\_addCarryM@{softfloat\_addCarryM}}
+\index{softfloat\_addCarryM@{softfloat\_addCarryM}!s\_addCarryM.c@{s\_addCarryM.c}}
+\doxysubsubsection{\texorpdfstring{softfloat\_addCarryM()}{softfloat\_addCarryM()}}
+{\footnotesize\ttfamily \label{sys-vm_2external_2softfloat_2source_2s__add_carry_m_8c_a809b9a8162426c1ca4462a60fa19f1be} 
+\mbox{\hyperlink{stdint_8h_ad0fca8b15c218d2c687f8c373a71d228}{uint\+\_\+fast8\+\_\+t}} softfloat\+\_\+add\+CarryM (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_ad0fca8b15c218d2c687f8c373a71d228}{uint\+\_\+fast8\+\_\+t}}}]{size\+\_\+words}{, }\item[{const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{a\+Ptr}{, }\item[{const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{b\+Ptr}{, }\item[{\mbox{\hyperlink{stdint_8h_ad0fca8b15c218d2c687f8c373a71d228}{uint\+\_\+fast8\+\_\+t}}}]{carry}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{z\+Ptr}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2s__add_carry_m_8c_source_l00044}{44}} of file \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2s__add_carry_m_8c_source}{s\+\_\+add\+Carry\+M.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00051\ \{}
+\DoxyCodeLine{00052\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ index,\ lastIndex;}
+\DoxyCodeLine{00053\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ wordA,\ wordZ;}
+\DoxyCodeLine{00054\ }
+\DoxyCodeLine{00055\ \ \ \ \ index\ =\ \mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a28a8ad1b8455a20d428c59cf01e36a66}{indexWordLo}}(\ size\_words\ );}
+\DoxyCodeLine{00056\ \ \ \ \ lastIndex\ =\ \mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_aa3af452dd34ad7a607f4ad31c234fda7}{indexWordHi}}(\ size\_words\ );}
+\DoxyCodeLine{00057\ \ \ \ \ \textcolor{keywordflow}{for}\ (;;)\ \{}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ wordA\ =\ aPtr[index];}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ wordZ\ =\ wordA\ +\ bPtr[index]\ +\ carry;}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ zPtr[index]\ =\ wordZ;}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ wordZ\ !=\ wordA\ )\ carry\ =\ (wordZ\ <\ wordA);}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ index\ ==\ lastIndex\ )\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ index\ +=\ \mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a22ffd10aefa829eef57da03cff970e45}{wordIncr}};}
+\DoxyCodeLine{00064\ \ \ \ \ \}}
+\DoxyCodeLine{00065\ \ \ \ \ \textcolor{keywordflow}{return}\ carry;}
+\DoxyCodeLine{00066\ }
+\DoxyCodeLine{00067\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sys-vm_2external_2softfloat_2source_2s__add_carry_m_8c_a809b9a8162426c1ca4462a60fa19f1be_icgraph}
+\end{center}
+\end{figure}

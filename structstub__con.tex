@@ -1,0 +1,575 @@
+\doxysection{stub\+\_\+con Struct Reference}
+\hypertarget{structstub__con}{}\label{structstub__con}\index{stub\_con@{stub\_con}}
+
+
+Inheritance diagram for stub\+\_\+con\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=227pt]{structstub__con__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for stub\+\_\+con\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structstub__con__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{structstub__con}{stub\+\_\+con}} \mbox{\hyperlink{structstub__con_a5e6687afa2772901e6205324c14b838e}{type}}
+\item 
+typedef websocketpp\+::lib\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{structstub__con_a5e6687afa2772901e6205324c14b838e}{type}} $>$ \mbox{\hyperlink{structstub__con_a8dc06cf0843531c67a375c6d9837bf95}{ptr}}
+\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_aa993f99a9b31b42fe3ef1ec471cbc2e8}{iostream\+\_\+con\+::timer\+\_\+ptr}} \mbox{\hyperlink{structstub__con_adf832bb6ebe2a6527dae78dc651f9f15}{timer\+\_\+ptr}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Types inherited from \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection}{websocketpp\+::transport\+::iostream\+::connection$<$ config $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection}{connection}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_afda32ed083d4e272e378e75225e6e26e}{type}}
+\begin{DoxyCompactList}\small\item\em Type of this connection transport component. \end{DoxyCompactList}\item 
+typedef lib\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_afda32ed083d4e272e378e75225e6e26e}{type}} $>$ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a5edb16646621ff775f2529c2a6910c82}{ptr}}
+\begin{DoxyCompactList}\small\item\em Type of a shared pointer to this connection transport component. \end{DoxyCompactList}\item 
+typedef config\+::concurrency\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a24d7deb9e9bdd0f7c48d3c5ff435914d}{concurrency\+\_\+type}}
+\begin{DoxyCompactList}\small\item\em transport concurrency policy \end{DoxyCompactList}\item 
+typedef config\+::alog\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a69b22a7cce2e247dca483bb22805c1be}{alog\+\_\+type}}
+\begin{DoxyCompactList}\small\item\em Type of this transport\textquotesingle{}s access logging policy. \end{DoxyCompactList}\item 
+typedef config\+::elog\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a4d6d7400af7585fb72507c40a2575434}{elog\+\_\+type}}
+\begin{DoxyCompactList}\small\item\em Type of this transport\textquotesingle{}s error logging policy. \end{DoxyCompactList}\item 
+typedef concurrency\+\_\+type\+::scoped\+\_\+lock\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_af12d059c4beaffe3c4e4685a7f121a3e}{scoped\+\_\+lock\+\_\+type}}
+\item 
+typedef concurrency\+\_\+type\+::mutex\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a5e7456b9b53e4c7a8497fc1ee53836ca}{mutex\+\_\+type}}
+\item 
+typedef lib\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{structwebsocketpp_1_1transport_1_1iostream_1_1timer}{timer}} $>$ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_aa993f99a9b31b42fe3ef1ec471cbc2e8}{timer\+\_\+ptr}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structstub__con_a7ad39065d251d72c86178e4a1bf4f9f1}{stub\+\_\+con}} (bool is\+\_\+server, config\+::alog\+\_\+type \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, config\+::elog\+\_\+type \&e)
+\item 
+\mbox{\hyperlink{structstub__con_a8dc06cf0843531c67a375c6d9837bf95}{ptr}} \mbox{\hyperlink{structstub__con_adc3b613da536874da64369433eceaf19}{get\+\_\+shared}} ()
+\begin{DoxyCompactList}\small\item\em Get a shared pointer to this component. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{structstub__con_a66c12a3d422977b7a278020b94d7611b}{write}} (std\+::string msg)
+\item 
+void \mbox{\hyperlink{structstub__con_a14e97604627969cec94295201745f893}{write}} (std\+::vector$<$ \mbox{\hyperlink{structwebsocketpp_1_1transport_1_1buffer}{websocketpp\+::transport\+::buffer}} $>$ \&bufs)
+\item 
+void \mbox{\hyperlink{structstub__con_a3ada58523e3f8e28cf501dc97c16444f}{async\+\_\+read\+\_\+at\+\_\+least}} (size\+\_\+t num\+\_\+bytes, char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}, size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})
+\item 
+void \mbox{\hyperlink{structstub__con_a95bfb56bec27e86ba2e30af2bca1c213}{handle\+\_\+op}} (websocketpp\+::lib\+::error\+\_\+code const \&e)
+\item 
+void \mbox{\hyperlink{structstub__con_adce6bc3610b7465c5a3fca87ae02cda1}{async\+\_\+read\+\_\+indef}} (size\+\_\+t num\+\_\+bytes, char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}, size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})
+\item 
+void \mbox{\hyperlink{structstub__con_a122900a3be17dcbd6cc693ef8c025358}{indef\+\_\+read}} ()
+\item 
+void \mbox{\hyperlink{structstub__con_a054f8943e3032fe19b3d9bf48bdf0039}{handle\+\_\+indef}} (websocketpp\+::lib\+::error\+\_\+code const \&e, size\+\_\+t amt\+\_\+read)
+\item 
+void \mbox{\hyperlink{structstub__con_a206b67c35da3da4fed8bfb2e2e783993}{shutdown}} ()
+\item 
+void \mbox{\hyperlink{structstub__con_ab1acd168c2d28834e21ff352759f9c66}{handle\+\_\+async\+\_\+shutdown}} (websocketpp\+::lib\+::error\+\_\+code const \&e)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection}{websocketpp\+::transport\+::iostream\+::connection$<$ config $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a737fcfe26dfda316d9908b819d3580b0}{connection}} (bool is\+\_\+server, \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a69b22a7cce2e247dca483bb22805c1be}{alog\+\_\+type}} \&alog, \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a4d6d7400af7585fb72507c40a2575434}{elog\+\_\+type}} \&\mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}})
+\item 
+\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a5edb16646621ff775f2529c2a6910c82}{ptr}} \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_afab9454b5af00a8edb494fdd2e32a41e}{get\+\_\+shared}} ()
+\begin{DoxyCompactList}\small\item\em Get a shared pointer to this component. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_ad0d1f64845818bb6bebe43fe057e4da2}{register\+\_\+ostream}} (std\+::ostream \texorpdfstring{$\ast$}{*}o)
+\begin{DoxyCompactList}\small\item\em Register a std\+::ostream with the transport for writing output. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a0f5d21e86961b0f3d75c417d5f45d4ac}{set\+\_\+uri}} (\mbox{\hyperlink{namespacewebsocketpp_aae370ea5ac83a8ece7712cb39fc23f5b}{uri\+\_\+ptr}})
+\begin{DoxyCompactList}\small\item\em Set uri hook. \end{DoxyCompactList}\item 
+size\+\_\+t \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a4616555cbee050aec84da1e39a3c34a8}{read\+\_\+some}} (char const \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}, size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})
+\begin{DoxyCompactList}\small\item\em Manual input supply (read some) \end{DoxyCompactList}\item 
+size\+\_\+t \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a4a492425587bf02f557d8f03b8be8dc8}{read\+\_\+all}} (char const \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}, size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})
+\begin{DoxyCompactList}\small\item\em Manual input supply (read all) \end{DoxyCompactList}\item 
+size\+\_\+t \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a72f532fb0a8d339371b8ca112fdd3f66}{readsome}} (char const \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}, size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})
+\begin{DoxyCompactList}\small\item\em Manual input supply (DEPRECATED) \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a88529f4130f75beed493c84c861e66cf}{eof}} ()
+\begin{DoxyCompactList}\small\item\em Signal EOF. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a3fdd2b1f005daafa73bffe45063a7750}{fatal\+\_\+error}} ()
+\begin{DoxyCompactList}\small\item\em Signal transport error. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a34443f9921e85115607304397d43cc8f}{set\+\_\+secure}} (bool \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\begin{DoxyCompactList}\small\item\em Set whether or not this connection is secure. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_aae6fa1869211e9dc8a18d609292bd833}{is\+\_\+secure}} () const
+\begin{DoxyCompactList}\small\item\em Tests whether or not the underlying transport is secure. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a846340a41ebbce1a6a1cecfd9026c2e9}{set\+\_\+remote\+\_\+endpoint}} (std\+::string \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\begin{DoxyCompactList}\small\item\em Set human readable remote endpoint address. \end{DoxyCompactList}\item 
+std\+::string \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_ac1c63528e36a2a60c0efc01a1c17584e}{get\+\_\+remote\+\_\+endpoint}} () const
+\begin{DoxyCompactList}\small\item\em Get human readable remote endpoint address. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}} \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a06d23eee9c6c1bd1a48f7cf8a081bda9}{get\+\_\+handle}} () const
+\begin{DoxyCompactList}\small\item\em Get the connection handle. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_aa993f99a9b31b42fe3ef1ec471cbc2e8}{timer\+\_\+ptr}} \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a7852f9c0dc64d6e51b57b4a28302a602}{set\+\_\+timer}} (long, \mbox{\hyperlink{namespacewebsocketpp_1_1transport_a946cc56ff41139f3002149c15fd87bc9}{timer\+\_\+handler}})
+\begin{DoxyCompactList}\small\item\em \doxylink{struct_call}{Call} back a function after a period of time. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a32740c33406e5484da7f030fb106ae22}{set\+\_\+write\+\_\+handler}} (\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1iostream_abc22b834c2d0c698d6c87e51d5bfad2c}{write\+\_\+handler}} h)
+\begin{DoxyCompactList}\small\item\em Sets the write handler. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_aa035dc6275c5babb99c0cbada8521b5c}{set\+\_\+vector\+\_\+write\+\_\+handler}} (\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1iostream_a21982146513c0b5580786c3af5dd2878}{vector\+\_\+write\+\_\+handler}} h)
+\begin{DoxyCompactList}\small\item\em Sets the vectored write handler. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a37bb9ef90b3d183c238a32cf9f056d4b}{set\+\_\+shutdown\+\_\+handler}} (\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1iostream_a3563ce2cca06b1466f7d76ecb8eb4a0b}{shutdown\+\_\+handler}} h)
+\begin{DoxyCompactList}\small\item\em Sets the shutdown handler. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+websocketpp\+::lib\+::error\+\_\+code \mbox{\hyperlink{structstub__con_a9e791dd7df34a3c59adb1255bf8ad531}{ec}}
+\item 
+size\+\_\+t \mbox{\hyperlink{structstub__con_a7874b39f63070e3f8d638ec08833fa32}{indef\+\_\+read\+\_\+size}}
+\item 
+char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structstub__con_a7c30a1651bfeda92ba5798f37fbab4e0}{indef\+\_\+read\+\_\+buf}}
+\item 
+size\+\_\+t \mbox{\hyperlink{structstub__con_a259aa44e4b056988d48838539a134db9}{indef\+\_\+read\+\_\+len}}
+\item 
+size\+\_\+t \mbox{\hyperlink{structstub__con_adc048dddd9b964b03e937c69fbce1c8e}{indef\+\_\+read\+\_\+total}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Protected Member Functions inherited from \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection}{websocketpp\+::transport\+::iostream\+::connection$<$ config $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a771203b134cc012188a07c471907fc76}{init}} (\mbox{\hyperlink{namespacewebsocketpp_1_1transport_aeae75e675c1a334b3b33ab7120b480a5}{init\+\_\+handler}} handler)
+\begin{DoxyCompactList}\small\item\em Initialize the connection transport. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_ad66fa146a7cdc19bfca3e32da23b9c60}{async\+\_\+read\+\_\+at\+\_\+least}} (size\+\_\+t num\+\_\+bytes, char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}, size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}, \mbox{\hyperlink{namespacewebsocketpp_1_1transport_a3a9b2ed54dfcc6ebe7d7e6b4c02f53fb}{read\+\_\+handler}} handler)
+\begin{DoxyCompactList}\small\item\em Initiate an async\+\_\+read for at least num\+\_\+bytes bytes into buf. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a6bc18b4c6b20bb9bc5d0c41cad53d602}{async\+\_\+write}} (char const \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}, size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}, \mbox{\hyperlink{namespacewebsocketpp_1_1transport_addf5d728159e7aa2bce2a0df947b1560}{transport\+::write\+\_\+handler}} handler)
+\begin{DoxyCompactList}\small\item\em Asyncronous Transport Write. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_adcc51157786a27f08ffea25025b6d4f8}{async\+\_\+write}} (std\+::vector$<$ \mbox{\hyperlink{structwebsocketpp_1_1transport_1_1buffer}{buffer}} $>$ const \&bufs, \mbox{\hyperlink{namespacewebsocketpp_1_1transport_addf5d728159e7aa2bce2a0df947b1560}{transport\+::write\+\_\+handler}} handler)
+\begin{DoxyCompactList}\small\item\em Asyncronous Transport Write (scatter-\/gather) \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_ac565af9c7f9e86972fd1c20bc369f06d}{set\+\_\+handle}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}} hdl)
+\begin{DoxyCompactList}\small\item\em Set Connection Handle. \end{DoxyCompactList}\item 
+lib\+::error\+\_\+code \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a0c31a1546701021f547ae2f21126a473}{dispatch}} (\mbox{\hyperlink{namespacewebsocketpp_1_1transport_a6658447b2e10f4c712dd792aad0e0c78}{dispatch\+\_\+handler}} handler)
+\begin{DoxyCompactList}\small\item\em \doxylink{struct_call}{Call} given handler back within the transport\textquotesingle{}s event system (if present) \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a2db617fadc96d53034eae1d0f3f1a68a}{async\+\_\+shutdown}} (\mbox{\hyperlink{namespacewebsocketpp_1_1transport_af39aff6fc4cb76f7df0d5322b734d156}{transport\+::shutdown\+\_\+handler}} handler)
+\begin{DoxyCompactList}\small\item\em Perform cleanup on socket shutdown\+\_\+handler. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2connection_8cpp_source_l00056}{56}} of file \mbox{\hyperlink{transport_2iostream_2connection_8cpp_source}{connection.\+cpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{structstub__con_a8dc06cf0843531c67a375c6d9837bf95}\index{stub\_con@{stub\_con}!ptr@{ptr}}
+\index{ptr@{ptr}!stub\_con@{stub\_con}}
+\doxysubsubsection{\texorpdfstring{ptr}{ptr}}
+{\footnotesize\ttfamily \label{structstub__con_a8dc06cf0843531c67a375c6d9837bf95} 
+websocketpp\+::lib\+::shared\+\_\+ptr$<$\mbox{\hyperlink{structstub__con_a5e6687afa2772901e6205324c14b838e}{type}}$>$ \mbox{\hyperlink{structstub__con_a8dc06cf0843531c67a375c6d9837bf95}{stub\+\_\+con\+::ptr}}}
+
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2connection_8cpp_source_l00058}{58}} of file \mbox{\hyperlink{transport_2iostream_2connection_8cpp_source}{connection.\+cpp}}.
+
+\Hypertarget{structstub__con_adf832bb6ebe2a6527dae78dc651f9f15}\index{stub\_con@{stub\_con}!timer\_ptr@{timer\_ptr}}
+\index{timer\_ptr@{timer\_ptr}!stub\_con@{stub\_con}}
+\doxysubsubsection{\texorpdfstring{timer\_ptr}{timer\_ptr}}
+{\footnotesize\ttfamily \label{structstub__con_adf832bb6ebe2a6527dae78dc651f9f15} 
+\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_aa993f99a9b31b42fe3ef1ec471cbc2e8}{iostream\+\_\+con\+::timer\+\_\+ptr}} \mbox{\hyperlink{structstub__con_adf832bb6ebe2a6527dae78dc651f9f15}{stub\+\_\+con\+::timer\+\_\+ptr}}}
+
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2connection_8cpp_source_l00059}{59}} of file \mbox{\hyperlink{transport_2iostream_2connection_8cpp_source}{connection.\+cpp}}.
+
+\Hypertarget{structstub__con_a5e6687afa2772901e6205324c14b838e}\index{stub\_con@{stub\_con}!type@{type}}
+\index{type@{type}!stub\_con@{stub\_con}}
+\doxysubsubsection{\texorpdfstring{type}{type}}
+{\footnotesize\ttfamily \label{structstub__con_a5e6687afa2772901e6205324c14b838e} 
+\mbox{\hyperlink{structstub__con}{stub\+\_\+con}} \mbox{\hyperlink{structstub__con_a5e6687afa2772901e6205324c14b838e}{stub\+\_\+con\+::type}}}
+
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2connection_8cpp_source_l00057}{57}} of file \mbox{\hyperlink{transport_2iostream_2connection_8cpp_source}{connection.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structstub__con_a7ad39065d251d72c86178e4a1bf4f9f1}\index{stub\_con@{stub\_con}!stub\_con@{stub\_con}}
+\index{stub\_con@{stub\_con}!stub\_con@{stub\_con}}
+\doxysubsubsection{\texorpdfstring{stub\_con()}{stub\_con()}}
+{\footnotesize\ttfamily \label{structstub__con_a7ad39065d251d72c86178e4a1bf4f9f1} 
+stub\+\_\+con\+::stub\+\_\+con (\begin{DoxyParamCaption}\item[{bool}]{is\+\_\+server}{, }\item[{config\+::alog\+\_\+type \&}]{a}{, }\item[{config\+::elog\+\_\+type \&}]{e}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2connection_8cpp_source_l00061}{61}} of file \mbox{\hyperlink{transport_2iostream_2connection_8cpp_source}{connection.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{transport_2iostream_2connection_8cpp_a7f963466ab1e19b852c26b966f998dcc}{iostream\_con}}(is\_server,\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},e)}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Set\ the\ error\ to\ a\ known\ code\ that\ is\ unused\ by\ the\ library}}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ This\ way\ we\ can\ easily\ confirm\ that\ the\ handler\ was\ run\ at\ all.}}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ ,\ \mbox{\hyperlink{structstub__con_a9e791dd7df34a3c59adb1255bf8ad531}{ec}}(\mbox{\hyperlink{namespacewebsocketpp_1_1error_a3344622df8c36e8ae03c59164e7b5e89}{websocketpp::error::make\_error\_code}}(\mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68daee5b74d2be31ca48e104578d6c2b7425}{websocketpp::error::test}}))}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ ,\ \mbox{\hyperlink{structstub__con_adc048dddd9b964b03e937c69fbce1c8e}{indef\_read\_total}}(0)}
+\DoxyCodeLine{00067\ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structstub__con_a3ada58523e3f8e28cf501dc97c16444f}\index{stub\_con@{stub\_con}!async\_read\_at\_least@{async\_read\_at\_least}}
+\index{async\_read\_at\_least@{async\_read\_at\_least}!stub\_con@{stub\_con}}
+\doxysubsubsection{\texorpdfstring{async\_read\_at\_least()}{async\_read\_at\_least()}}
+{\footnotesize\ttfamily \label{structstub__con_a3ada58523e3f8e28cf501dc97c16444f} 
+void stub\+\_\+con\+::async\+\_\+read\+\_\+at\+\_\+least (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{num\+\_\+bytes}{, }\item[{char \texorpdfstring{$\ast$}{*}}]{buf}{, }\item[{size\+\_\+t}]{len}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2connection_8cpp_source_l00097}{97}} of file \mbox{\hyperlink{transport_2iostream_2connection_8cpp_source}{connection.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00098\ \ \ \ \ \{}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_ad66fa146a7cdc19bfca3e32da23b9c60}{iostream\_con::async\_read\_at\_least}}(}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ \ \ \ num\_bytes,}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \ \ \ websocketpp::lib::bind(}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{structstub__con_a95bfb56bec27e86ba2e30af2bca1c213}{stub\_con::handle\_op}},}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstub__con_adc3b613da536874da64369433eceaf19}{type::get\_shared}}(),}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ websocketpp::lib::placeholders::\_1}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00109\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structstub__con_a3ada58523e3f8e28cf501dc97c16444f_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structstub__con_adce6bc3610b7465c5a3fca87ae02cda1}\index{stub\_con@{stub\_con}!async\_read\_indef@{async\_read\_indef}}
+\index{async\_read\_indef@{async\_read\_indef}!stub\_con@{stub\_con}}
+\doxysubsubsection{\texorpdfstring{async\_read\_indef()}{async\_read\_indef()}}
+{\footnotesize\ttfamily \label{structstub__con_adce6bc3610b7465c5a3fca87ae02cda1} 
+void stub\+\_\+con\+::async\+\_\+read\+\_\+indef (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{num\+\_\+bytes}{, }\item[{char \texorpdfstring{$\ast$}{*}}]{buf}{, }\item[{size\+\_\+t}]{len}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2connection_8cpp_source_l00115}{115}} of file \mbox{\hyperlink{transport_2iostream_2connection_8cpp_source}{connection.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00116\ \ \ \ \ \{}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstub__con_a7874b39f63070e3f8d638ec08833fa32}{indef\_read\_size}}\ =\ num\_bytes;}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstub__con_a7c30a1651bfeda92ba5798f37fbab4e0}{indef\_read\_buf}}\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}};}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstub__con_a259aa44e4b056988d48838539a134db9}{indef\_read\_len}}\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}};}
+\DoxyCodeLine{00120\ }
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstub__con_a122900a3be17dcbd6cc693ef8c025358}{indef\_read}}();}
+\DoxyCodeLine{00122\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structstub__con_adce6bc3610b7465c5a3fca87ae02cda1_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structstub__con_adc3b613da536874da64369433eceaf19}\index{stub\_con@{stub\_con}!get\_shared@{get\_shared}}
+\index{get\_shared@{get\_shared}!stub\_con@{stub\_con}}
+\doxysubsubsection{\texorpdfstring{get\_shared()}{get\_shared()}}
+{\footnotesize\ttfamily \label{structstub__con_adc3b613da536874da64369433eceaf19} 
+\mbox{\hyperlink{structstub__con_a8dc06cf0843531c67a375c6d9837bf95}{ptr}} stub\+\_\+con\+::get\+\_\+shared (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2connection_8cpp_source_l00070}{70}} of file \mbox{\hyperlink{transport_2iostream_2connection_8cpp_source}{connection.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ websocketpp::lib::static\_pointer\_cast<type>(\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_afab9454b5af00a8edb494fdd2e32a41e}{iostream\_con::get\_shared}}());}
+\DoxyCodeLine{00072\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=344pt]{structstub__con_adc3b613da536874da64369433eceaf19_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structstub__con_adc3b613da536874da64369433eceaf19_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structstub__con_ab1acd168c2d28834e21ff352759f9c66}\index{stub\_con@{stub\_con}!handle\_async\_shutdown@{handle\_async\_shutdown}}
+\index{handle\_async\_shutdown@{handle\_async\_shutdown}!stub\_con@{stub\_con}}
+\doxysubsubsection{\texorpdfstring{handle\_async\_shutdown()}{handle\_async\_shutdown()}}
+{\footnotesize\ttfamily \label{structstub__con_ab1acd168c2d28834e21ff352759f9c66} 
+void stub\+\_\+con\+::handle\+\_\+async\+\_\+shutdown (\begin{DoxyParamCaption}\item[{websocketpp\+::lib\+::error\+\_\+code const \&}]{e}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2connection_8cpp_source_l00155}{155}} of file \mbox{\hyperlink{transport_2iostream_2connection_8cpp_source}{connection.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstub__con_a9e791dd7df34a3c59adb1255bf8ad531}{ec}}\ =\ e;}
+\DoxyCodeLine{00157\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=342pt]{structstub__con_ab1acd168c2d28834e21ff352759f9c66_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structstub__con_a054f8943e3032fe19b3d9bf48bdf0039}\index{stub\_con@{stub\_con}!handle\_indef@{handle\_indef}}
+\index{handle\_indef@{handle\_indef}!stub\_con@{stub\_con}}
+\doxysubsubsection{\texorpdfstring{handle\_indef()}{handle\_indef()}}
+{\footnotesize\ttfamily \label{structstub__con_a054f8943e3032fe19b3d9bf48bdf0039} 
+void stub\+\_\+con\+::handle\+\_\+indef (\begin{DoxyParamCaption}\item[{websocketpp\+::lib\+::error\+\_\+code const \&}]{e}{, }\item[{size\+\_\+t}]{amt\+\_\+read}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2connection_8cpp_source_l00138}{138}} of file \mbox{\hyperlink{transport_2iostream_2connection_8cpp_source}{connection.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstub__con_a9e791dd7df34a3c59adb1255bf8ad531}{ec}}\ =\ e;}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstub__con_adc048dddd9b964b03e937c69fbce1c8e}{indef\_read\_total}}\ +=\ amt\_read;}
+\DoxyCodeLine{00141\ }
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstub__con_a122900a3be17dcbd6cc693ef8c025358}{indef\_read}}();}
+\DoxyCodeLine{00143\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structstub__con_a054f8943e3032fe19b3d9bf48bdf0039_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structstub__con_a054f8943e3032fe19b3d9bf48bdf0039_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structstub__con_a95bfb56bec27e86ba2e30af2bca1c213}\index{stub\_con@{stub\_con}!handle\_op@{handle\_op}}
+\index{handle\_op@{handle\_op}!stub\_con@{stub\_con}}
+\doxysubsubsection{\texorpdfstring{handle\_op()}{handle\_op()}}
+{\footnotesize\ttfamily \label{structstub__con_a95bfb56bec27e86ba2e30af2bca1c213} 
+void stub\+\_\+con\+::handle\+\_\+op (\begin{DoxyParamCaption}\item[{websocketpp\+::lib\+::error\+\_\+code const \&}]{e}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2connection_8cpp_source_l00111}{111}} of file \mbox{\hyperlink{transport_2iostream_2connection_8cpp_source}{connection.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstub__con_a9e791dd7df34a3c59adb1255bf8ad531}{ec}}\ =\ e;}
+\DoxyCodeLine{00113\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=334pt]{structstub__con_a95bfb56bec27e86ba2e30af2bca1c213_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structstub__con_a122900a3be17dcbd6cc693ef8c025358}\index{stub\_con@{stub\_con}!indef\_read@{indef\_read}}
+\index{indef\_read@{indef\_read}!stub\_con@{stub\_con}}
+\doxysubsubsection{\texorpdfstring{indef\_read()}{indef\_read()}}
+{\footnotesize\ttfamily \label{structstub__con_a122900a3be17dcbd6cc693ef8c025358} 
+void stub\+\_\+con\+::indef\+\_\+read (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2connection_8cpp_source_l00124}{124}} of file \mbox{\hyperlink{transport_2iostream_2connection_8cpp_source}{connection.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_ad66fa146a7cdc19bfca3e32da23b9c60}{iostream\_con::async\_read\_at\_least}}(}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstub__con_a7874b39f63070e3f8d638ec08833fa32}{indef\_read\_size}},}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstub__con_a7c30a1651bfeda92ba5798f37fbab4e0}{indef\_read\_buf}},}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstub__con_a259aa44e4b056988d48838539a134db9}{indef\_read\_len}},}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \ \ \ websocketpp::lib::bind(}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{structstub__con_a054f8943e3032fe19b3d9bf48bdf0039}{stub\_con::handle\_indef}},}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstub__con_adc3b613da536874da64369433eceaf19}{type::get\_shared}}(),}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ websocketpp::lib::placeholders::\_1,}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ websocketpp::lib::placeholders::\_2}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00136\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structstub__con_a122900a3be17dcbd6cc693ef8c025358_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=339pt]{structstub__con_a122900a3be17dcbd6cc693ef8c025358_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structstub__con_a206b67c35da3da4fed8bfb2e2e783993}\index{stub\_con@{stub\_con}!shutdown@{shutdown}}
+\index{shutdown@{shutdown}!stub\_con@{stub\_con}}
+\doxysubsubsection{\texorpdfstring{shutdown()}{shutdown()}}
+{\footnotesize\ttfamily \label{structstub__con_a206b67c35da3da4fed8bfb2e2e783993} 
+void stub\+\_\+con\+::shutdown (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2connection_8cpp_source_l00145}{145}} of file \mbox{\hyperlink{transport_2iostream_2connection_8cpp_source}{connection.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a2db617fadc96d53034eae1d0f3f1a68a}{iostream\_con::async\_shutdown}}(}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \ \ \ \ websocketpp::lib::bind(}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{structstub__con_ab1acd168c2d28834e21ff352759f9c66}{stub\_con::handle\_async\_shutdown}},}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstub__con_adc3b613da536874da64369433eceaf19}{type::get\_shared}}(),}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ websocketpp::lib::placeholders::\_1}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00153\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structstub__con_a206b67c35da3da4fed8bfb2e2e783993_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structstub__con_a66c12a3d422977b7a278020b94d7611b}\index{stub\_con@{stub\_con}!write@{write}}
+\index{write@{write}!stub\_con@{stub\_con}}
+\doxysubsubsection{\texorpdfstring{write()}{write()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structstub__con_a66c12a3d422977b7a278020b94d7611b} 
+void stub\+\_\+con\+::write (\begin{DoxyParamCaption}\item[{std\+::string}]{msg}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2connection_8cpp_source_l00074}{74}} of file \mbox{\hyperlink{transport_2iostream_2connection_8cpp_source}{connection.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a6bc18b4c6b20bb9bc5d0c41cad53d602}{iostream\_con::async\_write}}(}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ msg.data(),}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ \ \ \ msg.size(),}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \ \ \ websocketpp::lib::bind(}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{structstub__con_a95bfb56bec27e86ba2e30af2bca1c213}{stub\_con::handle\_op}},}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstub__con_adc3b613da536874da64369433eceaf19}{type::get\_shared}}(),}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ websocketpp::lib::placeholders::\_1}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00084\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structstub__con_a66c12a3d422977b7a278020b94d7611b_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structstub__con_a14e97604627969cec94295201745f893}\index{stub\_con@{stub\_con}!write@{write}}
+\index{write@{write}!stub\_con@{stub\_con}}
+\doxysubsubsection{\texorpdfstring{write()}{write()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structstub__con_a14e97604627969cec94295201745f893} 
+void stub\+\_\+con\+::write (\begin{DoxyParamCaption}\item[{std\+::vector$<$ \mbox{\hyperlink{structwebsocketpp_1_1transport_1_1buffer}{websocketpp\+::transport\+::buffer}} $>$ \&}]{bufs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2connection_8cpp_source_l00086}{86}} of file \mbox{\hyperlink{transport_2iostream_2connection_8cpp_source}{connection.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection_a6bc18b4c6b20bb9bc5d0c41cad53d602}{iostream\_con::async\_write}}(}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \ \ \ bufs,}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \ websocketpp::lib::bind(}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{structstub__con_a95bfb56bec27e86ba2e30af2bca1c213}{stub\_con::handle\_op}},}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstub__con_adc3b613da536874da64369433eceaf19}{type::get\_shared}}(),}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ websocketpp::lib::placeholders::\_1}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00095\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structstub__con_a14e97604627969cec94295201745f893_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structstub__con_a9e791dd7df34a3c59adb1255bf8ad531}\index{stub\_con@{stub\_con}!ec@{ec}}
+\index{ec@{ec}!stub\_con@{stub\_con}}
+\doxysubsubsection{\texorpdfstring{ec}{ec}}
+{\footnotesize\ttfamily \label{structstub__con_a9e791dd7df34a3c59adb1255bf8ad531} 
+websocketpp\+::lib\+::error\+\_\+code stub\+\_\+con\+::ec}
+
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2connection_8cpp_source_l00159}{159}} of file \mbox{\hyperlink{transport_2iostream_2connection_8cpp_source}{connection.\+cpp}}.
+
+\Hypertarget{structstub__con_a7c30a1651bfeda92ba5798f37fbab4e0}\index{stub\_con@{stub\_con}!indef\_read\_buf@{indef\_read\_buf}}
+\index{indef\_read\_buf@{indef\_read\_buf}!stub\_con@{stub\_con}}
+\doxysubsubsection{\texorpdfstring{indef\_read\_buf}{indef\_read\_buf}}
+{\footnotesize\ttfamily \label{structstub__con_a7c30a1651bfeda92ba5798f37fbab4e0} 
+char\texorpdfstring{$\ast$}{*} stub\+\_\+con\+::indef\+\_\+read\+\_\+buf}
+
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2connection_8cpp_source_l00161}{161}} of file \mbox{\hyperlink{transport_2iostream_2connection_8cpp_source}{connection.\+cpp}}.
+
+\Hypertarget{structstub__con_a259aa44e4b056988d48838539a134db9}\index{stub\_con@{stub\_con}!indef\_read\_len@{indef\_read\_len}}
+\index{indef\_read\_len@{indef\_read\_len}!stub\_con@{stub\_con}}
+\doxysubsubsection{\texorpdfstring{indef\_read\_len}{indef\_read\_len}}
+{\footnotesize\ttfamily \label{structstub__con_a259aa44e4b056988d48838539a134db9} 
+size\+\_\+t stub\+\_\+con\+::indef\+\_\+read\+\_\+len}
+
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2connection_8cpp_source_l00162}{162}} of file \mbox{\hyperlink{transport_2iostream_2connection_8cpp_source}{connection.\+cpp}}.
+
+\Hypertarget{structstub__con_a7874b39f63070e3f8d638ec08833fa32}\index{stub\_con@{stub\_con}!indef\_read\_size@{indef\_read\_size}}
+\index{indef\_read\_size@{indef\_read\_size}!stub\_con@{stub\_con}}
+\doxysubsubsection{\texorpdfstring{indef\_read\_size}{indef\_read\_size}}
+{\footnotesize\ttfamily \label{structstub__con_a7874b39f63070e3f8d638ec08833fa32} 
+size\+\_\+t stub\+\_\+con\+::indef\+\_\+read\+\_\+size}
+
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2connection_8cpp_source_l00160}{160}} of file \mbox{\hyperlink{transport_2iostream_2connection_8cpp_source}{connection.\+cpp}}.
+
+\Hypertarget{structstub__con_adc048dddd9b964b03e937c69fbce1c8e}\index{stub\_con@{stub\_con}!indef\_read\_total@{indef\_read\_total}}
+\index{indef\_read\_total@{indef\_read\_total}!stub\_con@{stub\_con}}
+\doxysubsubsection{\texorpdfstring{indef\_read\_total}{indef\_read\_total}}
+{\footnotesize\ttfamily \label{structstub__con_adc048dddd9b964b03e937c69fbce1c8e} 
+size\+\_\+t stub\+\_\+con\+::indef\+\_\+read\+\_\+total}
+
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2connection_8cpp_source_l00163}{163}} of file \mbox{\hyperlink{transport_2iostream_2connection_8cpp_source}{connection.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/vendor/websocketpp/test/transport/iostream/\mbox{\hyperlink{transport_2iostream_2connection_8cpp}{connection.\+cpp}}\end{DoxyCompactItemize}

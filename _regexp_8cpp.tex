@@ -1,0 +1,165 @@
+\doxysection{libraries/wasm-\/jit/\+Source/\+WAST/\+Regexp.cpp File Reference}
+\hypertarget{_regexp_8cpp}{}\label{_regexp_8cpp}\index{libraries/wasm-\/jit/Source/WAST/Regexp.cpp@{libraries/wasm-\/jit/Source/WAST/Regexp.cpp}}
+{\ttfamily \#include "{}Inline/\+Basic\+Types.\+h"{}}\newline
+{\ttfamily \#include "{}Inline/\+Errors.\+h"{}}\newline
+{\ttfamily \#include "{}Regexp.\+h"{}}\newline
+{\ttfamily \#include "{}NFA.\+h"{}}\newline
+{\ttfamily \#include $<$assert.\+h$>$}\newline
+Include dependency graph for Regexp.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{_regexp_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_node}{Node}}
+\item 
+struct \mbox{\hyperlink{struct_lit}{Lit}}
+\item 
+struct \mbox{\hyperlink{struct_unary}{Unary$<$ in\+Type $>$}}
+\item 
+struct \mbox{\hyperlink{struct_binary}{Binary$<$ in\+Type $>$}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespace_regexp}{Regexp}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{struct_unary}{Unary}}$<$ \mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4a77d6109f8802447a9223690829168071}{Node\+Type\+::zero\+Or\+More}} $>$ \mbox{\hyperlink{_regexp_8cpp_ab2f8476ad871178175a5966ce193498f}{Zero\+Or\+More}}
+\item 
+typedef \mbox{\hyperlink{struct_unary}{Unary}}$<$ \mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4a22d65e6655e324ddadaa0a522c1b549e}{Node\+Type\+::one\+Or\+More}} $>$ \mbox{\hyperlink{_regexp_8cpp_ab1330681406120f58c2a9cdbdc9ab0a0}{One\+Or\+More}}
+\item 
+typedef \mbox{\hyperlink{struct_unary}{Unary}}$<$ \mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4ad57c24f3fe52d16e7169b912dd647f0d}{Node\+Type\+::optional}} $>$ \mbox{\hyperlink{_regexp_8cpp_a14e38f4a8adc8f3150baff82db66dbdd}{Optional}}
+\item 
+typedef \mbox{\hyperlink{struct_binary}{Binary}}$<$ \mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4a34823136d0dd91d0f5d22db740f7679c}{Node\+Type\+::alt}} $>$ \mbox{\hyperlink{_regexp_8cpp_a5a887ac128ddf629616f8429bf78f30a}{Alt}}
+\item 
+typedef \mbox{\hyperlink{struct_binary}{Binary}}$<$ \mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4ae068c2de26d760f20cf10afc4b87ef0f}{Node\+Type\+::seq}} $>$ \mbox{\hyperlink{_regexp_8cpp_ac5c1a9d4c11d6f747a5340bd710a2656}{Seq}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum class \mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4}{Node\+Type}} \+: U8 \{ \newline
+\mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4aef28f869b241b00b879922832b14da10}{lit}}
+, \mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4a77d6109f8802447a9223690829168071}{zero\+Or\+More}}
+, \mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4a22d65e6655e324ddadaa0a522c1b549e}{one\+Or\+More}}
+, \mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4ad57c24f3fe52d16e7169b912dd647f0d}{optional}}
+, \newline
+\mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4a34823136d0dd91d0f5d22db740f7679c}{alt}}
+, \mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4ae068c2de26d760f20cf10afc4b87ef0f}{seq}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{namespace_regexp_aadd46f06c56abd08dd3844b0eac3d28e}{Regexp\+::add\+To\+NFA}} (const char \texorpdfstring{$\ast$}{*}regexp\+String, \mbox{\hyperlink{struct_n_f_a_1_1_builder}{NFA\+::\+Builder}} \texorpdfstring{$\ast$}{*}nfa\+Builder, \mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{NFA\+::\+State\+Index}} initial\+State, \mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{NFA\+::\+State\+Index}} final\+State)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{_regexp_8cpp_a5a887ac128ddf629616f8429bf78f30a}\index{Regexp.cpp@{Regexp.cpp}!Alt@{Alt}}
+\index{Alt@{Alt}!Regexp.cpp@{Regexp.cpp}}
+\doxysubsubsection{\texorpdfstring{Alt}{Alt}}
+{\footnotesize\ttfamily \label{_regexp_8cpp_a5a887ac128ddf629616f8429bf78f30a} 
+typedef \mbox{\hyperlink{struct_binary}{Binary}}$<$\mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4a34823136d0dd91d0f5d22db740f7679c}{Node\+Type\+::alt}}$>$ \mbox{\hyperlink{_regexp_8cpp_a5a887ac128ddf629616f8429bf78f30a}{Alt}}}
+
+
+
+Definition at line \mbox{\hyperlink{_regexp_8cpp_source_l00054}{54}} of file \mbox{\hyperlink{_regexp_8cpp_source}{Regexp.\+cpp}}.
+
+\Hypertarget{_regexp_8cpp_ab1330681406120f58c2a9cdbdc9ab0a0}\index{Regexp.cpp@{Regexp.cpp}!OneOrMore@{OneOrMore}}
+\index{OneOrMore@{OneOrMore}!Regexp.cpp@{Regexp.cpp}}
+\doxysubsubsection{\texorpdfstring{OneOrMore}{OneOrMore}}
+{\footnotesize\ttfamily \label{_regexp_8cpp_ab1330681406120f58c2a9cdbdc9ab0a0} 
+typedef \mbox{\hyperlink{struct_unary}{Unary}}$<$\mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4a22d65e6655e324ddadaa0a522c1b549e}{Node\+Type\+::one\+Or\+More}}$>$ \mbox{\hyperlink{_regexp_8cpp_ab1330681406120f58c2a9cdbdc9ab0a0}{One\+Or\+More}}}
+
+
+
+Definition at line \mbox{\hyperlink{_regexp_8cpp_source_l00052}{52}} of file \mbox{\hyperlink{_regexp_8cpp_source}{Regexp.\+cpp}}.
+
+\Hypertarget{_regexp_8cpp_a14e38f4a8adc8f3150baff82db66dbdd}\index{Regexp.cpp@{Regexp.cpp}!Optional@{Optional}}
+\index{Optional@{Optional}!Regexp.cpp@{Regexp.cpp}}
+\doxysubsubsection{\texorpdfstring{Optional}{Optional}}
+{\footnotesize\ttfamily \label{_regexp_8cpp_a14e38f4a8adc8f3150baff82db66dbdd} 
+typedef \mbox{\hyperlink{struct_unary}{Unary}}$<$\mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4ad57c24f3fe52d16e7169b912dd647f0d}{Node\+Type\+::optional}}$>$ \mbox{\hyperlink{_regexp_8cpp_a14e38f4a8adc8f3150baff82db66dbdd}{Optional}}}
+
+
+
+Definition at line \mbox{\hyperlink{_regexp_8cpp_source_l00053}{53}} of file \mbox{\hyperlink{_regexp_8cpp_source}{Regexp.\+cpp}}.
+
+\Hypertarget{_regexp_8cpp_ac5c1a9d4c11d6f747a5340bd710a2656}\index{Regexp.cpp@{Regexp.cpp}!Seq@{Seq}}
+\index{Seq@{Seq}!Regexp.cpp@{Regexp.cpp}}
+\doxysubsubsection{\texorpdfstring{Seq}{Seq}}
+{\footnotesize\ttfamily \label{_regexp_8cpp_ac5c1a9d4c11d6f747a5340bd710a2656} 
+typedef \mbox{\hyperlink{struct_binary}{Binary}}$<$\mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4ae068c2de26d760f20cf10afc4b87ef0f}{Node\+Type\+::seq}}$>$ \mbox{\hyperlink{_regexp_8cpp_ac5c1a9d4c11d6f747a5340bd710a2656}{Seq}}}
+
+
+
+Definition at line \mbox{\hyperlink{_regexp_8cpp_source_l00055}{55}} of file \mbox{\hyperlink{_regexp_8cpp_source}{Regexp.\+cpp}}.
+
+\Hypertarget{_regexp_8cpp_ab2f8476ad871178175a5966ce193498f}\index{Regexp.cpp@{Regexp.cpp}!ZeroOrMore@{ZeroOrMore}}
+\index{ZeroOrMore@{ZeroOrMore}!Regexp.cpp@{Regexp.cpp}}
+\doxysubsubsection{\texorpdfstring{ZeroOrMore}{ZeroOrMore}}
+{\footnotesize\ttfamily \label{_regexp_8cpp_ab2f8476ad871178175a5966ce193498f} 
+typedef \mbox{\hyperlink{struct_unary}{Unary}}$<$\mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4a77d6109f8802447a9223690829168071}{Node\+Type\+::zero\+Or\+More}}$>$ \mbox{\hyperlink{_regexp_8cpp_ab2f8476ad871178175a5966ce193498f}{Zero\+Or\+More}}}
+
+
+
+Definition at line \mbox{\hyperlink{_regexp_8cpp_source_l00051}{51}} of file \mbox{\hyperlink{_regexp_8cpp_source}{Regexp.\+cpp}}.
+
+
+
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4}\index{Regexp.cpp@{Regexp.cpp}!NodeType@{NodeType}}
+\index{NodeType@{NodeType}!Regexp.cpp@{Regexp.cpp}}
+\doxysubsubsection{\texorpdfstring{NodeType}{NodeType}}
+{\footnotesize\ttfamily \label{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4} 
+enum \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4}{Node\+Type}} \+: \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}\hspace{0.3cm}{\ttfamily [strong]}}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{lit@{lit}!Regexp.cpp@{Regexp.cpp}}\index{Regexp.cpp@{Regexp.cpp}!lit@{lit}}}\Hypertarget{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4aef28f869b241b00b879922832b14da10}\label{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4} 
+lit&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{zeroOrMore@{zeroOrMore}!Regexp.cpp@{Regexp.cpp}}\index{Regexp.cpp@{Regexp.cpp}!zeroOrMore@{zeroOrMore}}}\Hypertarget{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4a77d6109f8802447a9223690829168071}\label{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4} 
+zero\+Or\+More&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{oneOrMore@{oneOrMore}!Regexp.cpp@{Regexp.cpp}}\index{Regexp.cpp@{Regexp.cpp}!oneOrMore@{oneOrMore}}}\Hypertarget{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4a22d65e6655e324ddadaa0a522c1b549e}\label{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4} 
+one\+Or\+More&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{optional@{optional}!Regexp.cpp@{Regexp.cpp}}\index{Regexp.cpp@{Regexp.cpp}!optional@{optional}}}\Hypertarget{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4ad57c24f3fe52d16e7169b912dd647f0d}\label{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4} 
+optional&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{alt@{alt}!Regexp.cpp@{Regexp.cpp}}\index{Regexp.cpp@{Regexp.cpp}!alt@{alt}}}\Hypertarget{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4a34823136d0dd91d0f5d22db740f7679c}\label{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4} 
+alt&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{seq@{seq}!Regexp.cpp@{Regexp.cpp}}\index{Regexp.cpp@{Regexp.cpp}!seq@{seq}}}\Hypertarget{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4ae068c2de26d760f20cf10afc4b87ef0f}\label{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4} 
+seq&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{_regexp_8cpp_source_l00008}{8}} of file \mbox{\hyperlink{_regexp_8cpp_source}{Regexp.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00009\ \{}
+\DoxyCodeLine{00010\ \ \ \ \ \mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4aef28f869b241b00b879922832b14da10}{lit}},}
+\DoxyCodeLine{00011\ \ \ \ \ \mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4a77d6109f8802447a9223690829168071}{zeroOrMore}},}
+\DoxyCodeLine{00012\ \ \ \ \ \mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4a22d65e6655e324ddadaa0a522c1b549e}{oneOrMore}},}
+\DoxyCodeLine{00013\ \ \ \ \ \mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4ad57c24f3fe52d16e7169b912dd647f0d}{optional}},}
+\DoxyCodeLine{00014\ \ \ \ \ \mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4a34823136d0dd91d0f5d22db740f7679c}{alt}},}
+\DoxyCodeLine{00015\ \ \ \ \ \mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4ae068c2de26d760f20cf10afc4b87ef0f}{seq}},}
+\DoxyCodeLine{00016\ \};}
+
+\end{DoxyCode}

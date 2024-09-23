@@ -1,0 +1,772 @@
+\doxysection{Catch\+::String\+Ref Class Reference}
+\hypertarget{class_catch_1_1_string_ref}{}\label{class_catch_1_1_string_ref}\index{Catch::StringRef@{Catch::StringRef}}
+
+
+{\ttfamily \#include $<$catch\+\_\+stringref.\+h$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{class_catch_1_1_string_ref_af692c52f6846750283341163b0c7f5e2}{size\+\_\+type}} = std\+::size\+\_\+t
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_catch_1_1_string_ref_a94319c75df6542327c93a312c6a80754}{String\+Ref}} () noexcept
+\item 
+\mbox{\hyperlink{class_catch_1_1_string_ref_a2f287267c3a988b288bfd910667c1cfc}{String\+Ref}} (\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} const \&other) noexcept
+\item 
+\mbox{\hyperlink{class_catch_1_1_string_ref_a407d5737b94e5a374add5c2794589733}{String\+Ref}} (\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} \&\&other) noexcept
+\item 
+\mbox{\hyperlink{class_catch_1_1_string_ref_aea45f5089c53adac362bff6bd7c40943}{String\+Ref}} (char const \texorpdfstring{$\ast$}{*}raw\+Chars) noexcept
+\item 
+\mbox{\hyperlink{class_catch_1_1_string_ref_a320bf235274ebb90dd6af80485af2797}{String\+Ref}} (char const \texorpdfstring{$\ast$}{*}raw\+Chars, \mbox{\hyperlink{class_catch_1_1_string_ref_af692c52f6846750283341163b0c7f5e2}{size\+\_\+type}} \mbox{\hyperlink{class_catch_1_1_string_ref_ae084d72cb2952cee61a63ef36611d0ad}{size}}) noexcept
+\item 
+\mbox{\hyperlink{class_catch_1_1_string_ref_a7fe41469048f906e9a847798cd335f23}{String\+Ref}} (std\+::string const \&std\+String) noexcept
+\item 
+\mbox{\hyperlink{class_catch_1_1_string_ref_a387795c6d883d7281befe5e82920faf8}{\texorpdfstring{$\sim$}{\string~}\+String\+Ref}} () noexcept
+\item 
+auto \mbox{\hyperlink{class_catch_1_1_string_ref_a14d5a1983e33c51c6b5fd33bffbebabb}{operator=}} (\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} const \&other) noexcept -\/$>$ \mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} \&
+\item 
+\mbox{\hyperlink{class_catch_1_1_string_ref_ad9fde21785affacc32d7da7a70d74e93}{operator std\+::string}} () const
+\item 
+void \mbox{\hyperlink{class_catch_1_1_string_ref_a8a843e39ad3560d10a80524ed926ed63}{swap}} (\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} \&other) noexcept
+\item 
+auto \mbox{\hyperlink{class_catch_1_1_string_ref_aabb30149ab961187e4b3ff3394bf6e73}{operator==}} (\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} const \&other) const noexcept -\/$>$ bool
+\item 
+auto \mbox{\hyperlink{class_catch_1_1_string_ref_aaa6c8bf61c4628034c19763d1c8ad215}{operator!=}} (\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} const \&other) const noexcept -\/$>$ bool
+\item 
+auto \mbox{\hyperlink{class_catch_1_1_string_ref_a4ba2e01eec1f0f56c257d213c796ab3b}{operator\mbox{[}$\,$\mbox{]}}} (\mbox{\hyperlink{class_catch_1_1_string_ref_af692c52f6846750283341163b0c7f5e2}{size\+\_\+type}} index) const noexcept -\/$>$ char
+\item 
+auto \mbox{\hyperlink{class_catch_1_1_string_ref_ac6b68b9dc1e1dec69e884e3f7be581bd}{empty}} () const noexcept -\/$>$ bool
+\item 
+auto \mbox{\hyperlink{class_catch_1_1_string_ref_ae084d72cb2952cee61a63ef36611d0ad}{size}} () const noexcept -\/$>$ \mbox{\hyperlink{class_catch_1_1_string_ref_af692c52f6846750283341163b0c7f5e2}{size\+\_\+type}}
+\item 
+auto \mbox{\hyperlink{class_catch_1_1_string_ref_a6a6cac7430e626ffdd7550a081e8168f}{number\+Of\+Characters}} () const noexcept -\/$>$ \mbox{\hyperlink{class_catch_1_1_string_ref_af692c52f6846750283341163b0c7f5e2}{size\+\_\+type}}
+\item 
+auto \mbox{\hyperlink{class_catch_1_1_string_ref_a1669cb2765e820ca258159676cbd82a5}{c\+\_\+str}} () const -\/$>$ char const \texorpdfstring{$\ast$}{*}
+\item 
+auto \mbox{\hyperlink{class_catch_1_1_string_ref_a248568b467cf6599320903ae613c8eee}{substr}} (\mbox{\hyperlink{class_catch_1_1_string_ref_af692c52f6846750283341163b0c7f5e2}{size\+\_\+type}} start, \mbox{\hyperlink{class_catch_1_1_string_ref_af692c52f6846750283341163b0c7f5e2}{size\+\_\+type}} \mbox{\hyperlink{class_catch_1_1_string_ref_ae084d72cb2952cee61a63ef36611d0ad}{size}}) const noexcept -\/$>$ \mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}}
+\item 
+auto \mbox{\hyperlink{class_catch_1_1_string_ref_aee240387305ca8b249169d79f36e7002}{current\+Data}} () const noexcept -\/$>$ char const \texorpdfstring{$\ast$}{*}
+\item 
+\mbox{\hyperlink{class_catch_1_1_string_ref_a94319c75df6542327c93a312c6a80754}{String\+Ref}} () noexcept
+\item 
+\mbox{\hyperlink{class_catch_1_1_string_ref_a2f287267c3a988b288bfd910667c1cfc}{String\+Ref}} (\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} const \&other) noexcept
+\item 
+\mbox{\hyperlink{class_catch_1_1_string_ref_a407d5737b94e5a374add5c2794589733}{String\+Ref}} (\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} \&\&other) noexcept
+\item 
+\mbox{\hyperlink{class_catch_1_1_string_ref_aea45f5089c53adac362bff6bd7c40943}{String\+Ref}} (char const \texorpdfstring{$\ast$}{*}raw\+Chars) noexcept
+\item 
+\mbox{\hyperlink{class_catch_1_1_string_ref_a320bf235274ebb90dd6af80485af2797}{String\+Ref}} (char const \texorpdfstring{$\ast$}{*}raw\+Chars, \mbox{\hyperlink{class_catch_1_1_string_ref_af692c52f6846750283341163b0c7f5e2}{size\+\_\+type}} \mbox{\hyperlink{class_catch_1_1_string_ref_ae084d72cb2952cee61a63ef36611d0ad}{size}}) noexcept
+\item 
+\mbox{\hyperlink{class_catch_1_1_string_ref_a7fe41469048f906e9a847798cd335f23}{String\+Ref}} (std\+::string const \&std\+String) noexcept
+\item 
+\mbox{\hyperlink{class_catch_1_1_string_ref_a387795c6d883d7281befe5e82920faf8}{\texorpdfstring{$\sim$}{\string~}\+String\+Ref}} () noexcept
+\item 
+auto \mbox{\hyperlink{class_catch_1_1_string_ref_a14d5a1983e33c51c6b5fd33bffbebabb}{operator=}} (\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} const \&other) noexcept -\/$>$ \mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} \&
+\item 
+\mbox{\hyperlink{class_catch_1_1_string_ref_ad9fde21785affacc32d7da7a70d74e93}{operator std\+::string}} () const
+\item 
+void \mbox{\hyperlink{class_catch_1_1_string_ref_a8a843e39ad3560d10a80524ed926ed63}{swap}} (\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} \&other) noexcept
+\item 
+auto \mbox{\hyperlink{class_catch_1_1_string_ref_aabb30149ab961187e4b3ff3394bf6e73}{operator==}} (\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} const \&other) const noexcept -\/$>$ bool
+\item 
+auto \mbox{\hyperlink{class_catch_1_1_string_ref_aaa6c8bf61c4628034c19763d1c8ad215}{operator!=}} (\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} const \&other) const noexcept -\/$>$ bool
+\item 
+auto \mbox{\hyperlink{class_catch_1_1_string_ref_a4ba2e01eec1f0f56c257d213c796ab3b}{operator\mbox{[}$\,$\mbox{]}}} (\mbox{\hyperlink{class_catch_1_1_string_ref_af692c52f6846750283341163b0c7f5e2}{size\+\_\+type}} index) const noexcept -\/$>$ char
+\item 
+auto \mbox{\hyperlink{class_catch_1_1_string_ref_ac6b68b9dc1e1dec69e884e3f7be581bd}{empty}} () const noexcept -\/$>$ bool
+\item 
+auto \mbox{\hyperlink{class_catch_1_1_string_ref_ae084d72cb2952cee61a63ef36611d0ad}{size}} () const noexcept -\/$>$ \mbox{\hyperlink{class_catch_1_1_string_ref_af692c52f6846750283341163b0c7f5e2}{size\+\_\+type}}
+\item 
+auto \mbox{\hyperlink{class_catch_1_1_string_ref_a6a6cac7430e626ffdd7550a081e8168f}{number\+Of\+Characters}} () const noexcept -\/$>$ \mbox{\hyperlink{class_catch_1_1_string_ref_af692c52f6846750283341163b0c7f5e2}{size\+\_\+type}}
+\item 
+auto \mbox{\hyperlink{class_catch_1_1_string_ref_a1669cb2765e820ca258159676cbd82a5}{c\+\_\+str}} () const -\/$>$ char const \texorpdfstring{$\ast$}{*}
+\item 
+auto \mbox{\hyperlink{class_catch_1_1_string_ref_a248568b467cf6599320903ae613c8eee}{substr}} (\mbox{\hyperlink{class_catch_1_1_string_ref_af692c52f6846750283341163b0c7f5e2}{size\+\_\+type}} start, \mbox{\hyperlink{class_catch_1_1_string_ref_af692c52f6846750283341163b0c7f5e2}{size\+\_\+type}} \mbox{\hyperlink{class_catch_1_1_string_ref_ae084d72cb2952cee61a63ef36611d0ad}{size}}) const noexcept -\/$>$ \mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}}
+\item 
+auto \mbox{\hyperlink{class_catch_1_1_string_ref_aee240387305ca8b249169d79f36e7002}{current\+Data}} () const noexcept -\/$>$ char const \texorpdfstring{$\ast$}{*}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{class_catch_1_1_string_ref_a923324f930c2eff7664ee1c6d3a1c483}{String\+Ref\+Test\+Access}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\doxylink{struct_a}{A} non-\/owning string class (similar to the forthcoming std\+::string\+\_\+view) Note that, because a \doxylink{class_catch_1_1_string_ref}{String\+Ref} may be a substring of another string, it may not be null terminated. \doxylink{class_catch_1_1_string_ref_a1669cb2765e820ca258159676cbd82a5}{c\+\_\+str()} must return a null terminated string, however, and so the \doxylink{class_catch_1_1_string_ref}{String\+Ref} will internally take ownership (taking a copy), if necessary. In theory this ownership is not externally visible -\/ but it does mean (substring) String\+Refs should not be shared between threads. 
+
+Definition at line \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source_l00522}{522}} of file \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source}{catch.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{class_catch_1_1_string_ref_af692c52f6846750283341163b0c7f5e2}\index{Catch::StringRef@{Catch::StringRef}!size\_type@{size\_type}}
+\index{size\_type@{size\_type}!Catch::StringRef@{Catch::StringRef}}
+\doxysubsubsection{\texorpdfstring{size\_type}{size\_type}}
+{\footnotesize\ttfamily \label{class_catch_1_1_string_ref_af692c52f6846750283341163b0c7f5e2} 
+typedef std\+::size\+\_\+t \mbox{\hyperlink{class_catch_1_1_string_ref_af692c52f6846750283341163b0c7f5e2}{Catch\+::\+String\+Ref\+::size\+\_\+type}} = std\+::size\+\_\+t}
+
+
+
+Definition at line \mbox{\hyperlink{catch__stringref_8h_source_l00025}{25}} of file \mbox{\hyperlink{catch__stringref_8h_source}{catch\+\_\+stringref.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_catch_1_1_string_ref_a94319c75df6542327c93a312c6a80754}\index{Catch::StringRef@{Catch::StringRef}!StringRef@{StringRef}}
+\index{StringRef@{StringRef}!Catch::StringRef@{Catch::StringRef}}
+\doxysubsubsection{\texorpdfstring{StringRef()}{StringRef()}\hspace{0.1cm}{\footnotesize\ttfamily [1/12]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_string_ref_a94319c75df6542327c93a312c6a80754} 
+Catch\+::\+String\+Ref\+::\+String\+Ref (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__stringref_8h_source_l00040}{40}} of file \mbox{\hyperlink{catch__stringref_8h_source}{catch\+\_\+stringref.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ :\ \ \ \mbox{\hyperlink{class_catch_1_1_string_ref_a94319c75df6542327c93a312c6a80754}{StringRef}}(\ s\_empty,\ 0\ )}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_string_ref_a94319c75df6542327c93a312c6a80754_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_string_ref_a2f287267c3a988b288bfd910667c1cfc}\index{Catch::StringRef@{Catch::StringRef}!StringRef@{StringRef}}
+\index{StringRef@{StringRef}!Catch::StringRef@{Catch::StringRef}}
+\doxysubsubsection{\texorpdfstring{StringRef()}{StringRef()}\hspace{0.1cm}{\footnotesize\ttfamily [2/12]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_string_ref_a2f287267c3a988b288bfd910667c1cfc} 
+Catch\+::\+String\+Ref\+::\+String\+Ref (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} const \&}]{other}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__stringref_8h_source_l00044}{44}} of file \mbox{\hyperlink{catch__stringref_8h_source}{catch\+\_\+stringref.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ :\ \ \ m\_start(\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.m\_start\ ),}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \ \ \ m\_size(\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.m\_size\ )}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_string_ref_a407d5737b94e5a374add5c2794589733}\index{Catch::StringRef@{Catch::StringRef}!StringRef@{StringRef}}
+\index{StringRef@{StringRef}!Catch::StringRef@{Catch::StringRef}}
+\doxysubsubsection{\texorpdfstring{StringRef()}{StringRef()}\hspace{0.1cm}{\footnotesize\ttfamily [3/12]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_string_ref_a407d5737b94e5a374add5c2794589733} 
+Catch\+::\+String\+Ref\+::\+String\+Ref (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} \&\&}]{other}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__stringref_8h_source_l00049}{49}} of file \mbox{\hyperlink{catch__stringref_8h_source}{catch\+\_\+stringref.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ :\ \ \ m\_start(\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.m\_start\ ),}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ m\_size(\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.m\_size\ ),}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \ \ m\_data(\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.m\_data\ )}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.m\_data\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_string_ref_aea45f5089c53adac362bff6bd7c40943}\index{Catch::StringRef@{Catch::StringRef}!StringRef@{StringRef}}
+\index{StringRef@{StringRef}!Catch::StringRef@{Catch::StringRef}}
+\doxysubsubsection{\texorpdfstring{StringRef()}{StringRef()}\hspace{0.1cm}{\footnotesize\ttfamily [4/12]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_string_ref_aea45f5089c53adac362bff6bd7c40943} 
+Catch\+::\+String\+Ref\+::\+String\+Ref (\begin{DoxyParamCaption}\item[{char const \texorpdfstring{$\ast$}{*}}]{raw\+Chars}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__stringref_8cpp_source_l00027}{27}} of file \mbox{\hyperlink{catch__stringref_8cpp_source}{catch\+\_\+stringref.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00028\ \ \ \ \ :\ \mbox{\hyperlink{class_catch_1_1_string_ref_a94319c75df6542327c93a312c6a80754}{StringRef}}(\ rawChars,\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{class_catch_1_1_string_ref_af692c52f6846750283341163b0c7f5e2}{StringRef::size\_type}}\textcolor{keyword}{>}(std::strlen(rawChars)\ )\ )}
+\DoxyCodeLine{00029\ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_string_ref_a320bf235274ebb90dd6af80485af2797}\index{Catch::StringRef@{Catch::StringRef}!StringRef@{StringRef}}
+\index{StringRef@{StringRef}!Catch::StringRef@{Catch::StringRef}}
+\doxysubsubsection{\texorpdfstring{StringRef()}{StringRef()}\hspace{0.1cm}{\footnotesize\ttfamily [5/12]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_string_ref_a320bf235274ebb90dd6af80485af2797} 
+Catch\+::\+String\+Ref\+::\+String\+Ref (\begin{DoxyParamCaption}\item[{char const \texorpdfstring{$\ast$}{*}}]{raw\+Chars}{, }\item[{\mbox{\hyperlink{class_catch_1_1_string_ref_af692c52f6846750283341163b0c7f5e2}{size\+\_\+type}}}]{size}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__stringref_8h_source_l00059}{59}} of file \mbox{\hyperlink{catch__stringref_8h_source}{catch\+\_\+stringref.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ :\ \ \ m\_start(\ rawChars\ ),}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \ \ \ \ m\_size(\ \mbox{\hyperlink{class_catch_1_1_string_ref_ae084d72cb2952cee61a63ef36611d0ad}{size}}\ )}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_string_ref_a7fe41469048f906e9a847798cd335f23}\index{Catch::StringRef@{Catch::StringRef}!StringRef@{StringRef}}
+\index{StringRef@{StringRef}!Catch::StringRef@{Catch::StringRef}}
+\doxysubsubsection{\texorpdfstring{StringRef()}{StringRef()}\hspace{0.1cm}{\footnotesize\ttfamily [6/12]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_string_ref_a7fe41469048f906e9a847798cd335f23} 
+Catch\+::\+String\+Ref\+::\+String\+Ref (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{std\+String}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__stringref_8h_source_l00064}{64}} of file \mbox{\hyperlink{catch__stringref_8h_source}{catch\+\_\+stringref.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ :\ \ \ m\_start(\ stdString.c\_str()\ ),}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ \ \ m\_size(\ stdString.size()\ )}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_string_ref_a387795c6d883d7281befe5e82920faf8}\index{Catch::StringRef@{Catch::StringRef}!````~StringRef@{\texorpdfstring{$\sim$}{\string~}StringRef}}
+\index{````~StringRef@{\texorpdfstring{$\sim$}{\string~}StringRef}!Catch::StringRef@{Catch::StringRef}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}StringRef()}{\string~StringRef()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_string_ref_a387795c6d883d7281befe5e82920faf8} 
+Catch\+::\+String\+Ref\+::\texorpdfstring{$\sim$}{\string~}\+String\+Ref (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__stringref_8h_source_l00069}{69}} of file \mbox{\hyperlink{catch__stringref_8h_source}{catch\+\_\+stringref.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{delete}[]\ m\_data;}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_string_ref_a94319c75df6542327c93a312c6a80754}\index{Catch::StringRef@{Catch::StringRef}!StringRef@{StringRef}}
+\index{StringRef@{StringRef}!Catch::StringRef@{Catch::StringRef}}
+\doxysubsubsection{\texorpdfstring{StringRef()}{StringRef()}\hspace{0.1cm}{\footnotesize\ttfamily [7/12]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_string_ref_a94319c75df6542327c93a312c6a80754} 
+Catch\+::\+String\+Ref\+::\+String\+Ref (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source_l00539}{539}} of file \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source}{catch.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00540\ \ \ \ \ \ \ \ \ :\ \ \ \mbox{\hyperlink{class_catch_1_1_string_ref_a94319c75df6542327c93a312c6a80754}{StringRef}}(\ s\_empty,\ 0\ )}
+\DoxyCodeLine{00541\ \ \ \ \ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_string_ref_a2f287267c3a988b288bfd910667c1cfc}\index{Catch::StringRef@{Catch::StringRef}!StringRef@{StringRef}}
+\index{StringRef@{StringRef}!Catch::StringRef@{Catch::StringRef}}
+\doxysubsubsection{\texorpdfstring{StringRef()}{StringRef()}\hspace{0.1cm}{\footnotesize\ttfamily [8/12]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_string_ref_a2f287267c3a988b288bfd910667c1cfc} 
+Catch\+::\+String\+Ref\+::\+String\+Ref (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} const \&}]{other}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source_l00543}{543}} of file \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source}{catch.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00544\ \ \ \ \ \ \ \ \ :\ \ \ m\_start(\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.m\_start\ ),}
+\DoxyCodeLine{00545\ \ \ \ \ \ \ \ \ \ \ \ \ m\_size(\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.m\_size\ )}
+\DoxyCodeLine{00546\ \ \ \ \ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_string_ref_a407d5737b94e5a374add5c2794589733}\index{Catch::StringRef@{Catch::StringRef}!StringRef@{StringRef}}
+\index{StringRef@{StringRef}!Catch::StringRef@{Catch::StringRef}}
+\doxysubsubsection{\texorpdfstring{StringRef()}{StringRef()}\hspace{0.1cm}{\footnotesize\ttfamily [9/12]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_string_ref_a407d5737b94e5a374add5c2794589733} 
+Catch\+::\+String\+Ref\+::\+String\+Ref (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} \&\&}]{other}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source_l00548}{548}} of file \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source}{catch.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00549\ \ \ \ \ \ \ \ \ :\ \ \ m\_start(\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.m\_start\ ),}
+\DoxyCodeLine{00550\ \ \ \ \ \ \ \ \ \ \ \ \ m\_size(\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.m\_size\ ),}
+\DoxyCodeLine{00551\ \ \ \ \ \ \ \ \ \ \ \ \ m\_data(\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.m\_data\ )}
+\DoxyCodeLine{00552\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00553\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.m\_data\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00554\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_string_ref_aea45f5089c53adac362bff6bd7c40943}\index{Catch::StringRef@{Catch::StringRef}!StringRef@{StringRef}}
+\index{StringRef@{StringRef}!Catch::StringRef@{Catch::StringRef}}
+\doxysubsubsection{\texorpdfstring{StringRef()}{StringRef()}\hspace{0.1cm}{\footnotesize\ttfamily [10/12]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_string_ref_aea45f5089c53adac362bff6bd7c40943} 
+Catch\+::\+String\+Ref\+::\+String\+Ref (\begin{DoxyParamCaption}\item[{char const \texorpdfstring{$\ast$}{*}}]{raw\+Chars}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [noexcept]}}
+
+\Hypertarget{class_catch_1_1_string_ref_a320bf235274ebb90dd6af80485af2797}\index{Catch::StringRef@{Catch::StringRef}!StringRef@{StringRef}}
+\index{StringRef@{StringRef}!Catch::StringRef@{Catch::StringRef}}
+\doxysubsubsection{\texorpdfstring{StringRef()}{StringRef()}\hspace{0.1cm}{\footnotesize\ttfamily [11/12]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_string_ref_a320bf235274ebb90dd6af80485af2797} 
+Catch\+::\+String\+Ref\+::\+String\+Ref (\begin{DoxyParamCaption}\item[{char const \texorpdfstring{$\ast$}{*}}]{raw\+Chars}{, }\item[{\mbox{\hyperlink{class_catch_1_1_string_ref_af692c52f6846750283341163b0c7f5e2}{size\+\_\+type}}}]{size}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source_l00558}{558}} of file \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source}{catch.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00559\ \ \ \ \ \ \ \ \ :\ \ \ m\_start(\ rawChars\ ),}
+\DoxyCodeLine{00560\ \ \ \ \ \ \ \ \ \ \ \ \ m\_size(\ \mbox{\hyperlink{class_catch_1_1_string_ref_ae084d72cb2952cee61a63ef36611d0ad}{size}}\ )}
+\DoxyCodeLine{00561\ \ \ \ \ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_string_ref_a7fe41469048f906e9a847798cd335f23}\index{Catch::StringRef@{Catch::StringRef}!StringRef@{StringRef}}
+\index{StringRef@{StringRef}!Catch::StringRef@{Catch::StringRef}}
+\doxysubsubsection{\texorpdfstring{StringRef()}{StringRef()}\hspace{0.1cm}{\footnotesize\ttfamily [12/12]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_string_ref_a7fe41469048f906e9a847798cd335f23} 
+Catch\+::\+String\+Ref\+::\+String\+Ref (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{std\+String}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source_l00563}{563}} of file \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source}{catch.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00564\ \ \ \ \ \ \ \ \ :\ \ \ m\_start(\ stdString.c\_str()\ ),}
+\DoxyCodeLine{00565\ \ \ \ \ \ \ \ \ \ \ \ \ m\_size(\ stdString.size()\ )}
+\DoxyCodeLine{00566\ \ \ \ \ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_string_ref_a387795c6d883d7281befe5e82920faf8}\index{Catch::StringRef@{Catch::StringRef}!````~StringRef@{\texorpdfstring{$\sim$}{\string~}StringRef}}
+\index{````~StringRef@{\texorpdfstring{$\sim$}{\string~}StringRef}!Catch::StringRef@{Catch::StringRef}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}StringRef()}{\string~StringRef()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_string_ref_a387795c6d883d7281befe5e82920faf8} 
+Catch\+::\+String\+Ref\+::\texorpdfstring{$\sim$}{\string~}\+String\+Ref (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source_l00568}{568}} of file \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source}{catch.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00568\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00569\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{delete}[]\ m\_data;}
+\DoxyCodeLine{00570\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_catch_1_1_string_ref_a1669cb2765e820ca258159676cbd82a5}\index{Catch::StringRef@{Catch::StringRef}!c\_str@{c\_str}}
+\index{c\_str@{c\_str}!Catch::StringRef@{Catch::StringRef}}
+\doxysubsubsection{\texorpdfstring{c\_str()}{c\_str()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_string_ref_a1669cb2765e820ca258159676cbd82a5} 
+auto Catch\+::\+String\+Ref\+::c\+\_\+str (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const -\/$>$ char const\texorpdfstring{$\ast$}{*}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__stringref_8cpp_source_l00041}{41}} of file \mbox{\hyperlink{catch__stringref_8cpp_source}{catch\+\_\+stringref.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ isSubstring()\ )}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const\_cast<}\mbox{\hyperlink{class_catch_1_1_string_ref_a94319c75df6542327c93a312c6a80754}{StringRef}}*\textcolor{keyword}{>}(\ this\ )-\/>takeOwnership();}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_start;}
+\DoxyCodeLine{00045\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_string_ref_a1669cb2765e820ca258159676cbd82a5}\index{Catch::StringRef@{Catch::StringRef}!c\_str@{c\_str}}
+\index{c\_str@{c\_str}!Catch::StringRef@{Catch::StringRef}}
+\doxysubsubsection{\texorpdfstring{c\_str()}{c\_str()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_string_ref_a1669cb2765e820ca258159676cbd82a5} 
+auto Catch\+::\+String\+Ref\+::c\+\_\+str (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const -\/$>$  char const \texorpdfstring{$\ast$}{*}}
+
+\Hypertarget{class_catch_1_1_string_ref_aee240387305ca8b249169d79f36e7002}\index{Catch::StringRef@{Catch::StringRef}!currentData@{currentData}}
+\index{currentData@{currentData}!Catch::StringRef@{Catch::StringRef}}
+\doxysubsubsection{\texorpdfstring{currentData()}{currentData()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_string_ref_aee240387305ca8b249169d79f36e7002} 
+auto Catch\+::\+String\+Ref\+::current\+Data (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const -\/$>$ char const\texorpdfstring{$\ast$}{*}\hspace{0.3cm}{\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__stringref_8cpp_source_l00046}{46}} of file \mbox{\hyperlink{catch__stringref_8cpp_source}{catch\+\_\+stringref.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_start;}
+\DoxyCodeLine{00048\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_string_ref_aee240387305ca8b249169d79f36e7002}\index{Catch::StringRef@{Catch::StringRef}!currentData@{currentData}}
+\index{currentData@{currentData}!Catch::StringRef@{Catch::StringRef}}
+\doxysubsubsection{\texorpdfstring{currentData()}{currentData()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_string_ref_aee240387305ca8b249169d79f36e7002} 
+auto Catch\+::\+String\+Ref\+::current\+Data (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const -\/$>$  char const \texorpdfstring{$\ast$}{*}\hspace{0.3cm}{\ttfamily [noexcept]}}
+
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_string_ref_aee240387305ca8b249169d79f36e7002_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_string_ref_ac6b68b9dc1e1dec69e884e3f7be581bd}\index{Catch::StringRef@{Catch::StringRef}!empty@{empty}}
+\index{empty@{empty}!Catch::StringRef@{Catch::StringRef}}
+\doxysubsubsection{\texorpdfstring{empty()}{empty()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_string_ref_ac6b68b9dc1e1dec69e884e3f7be581bd} 
+auto Catch\+::\+String\+Ref\+::empty (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const -\/$>$ bool \hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__stringref_8h_source_l00092}{92}} of file \mbox{\hyperlink{catch__stringref_8h_source}{catch\+\_\+stringref.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_size\ ==\ 0;}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_string_ref_ac6b68b9dc1e1dec69e884e3f7be581bd}\index{Catch::StringRef@{Catch::StringRef}!empty@{empty}}
+\index{empty@{empty}!Catch::StringRef@{Catch::StringRef}}
+\doxysubsubsection{\texorpdfstring{empty()}{empty()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_string_ref_ac6b68b9dc1e1dec69e884e3f7be581bd} 
+auto Catch\+::\+String\+Ref\+::empty (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const -\/$>$ bool \hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source_l00591}{591}} of file \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source}{catch.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00591\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00592\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_size\ ==\ 0;}
+\DoxyCodeLine{00593\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_string_ref_a6a6cac7430e626ffdd7550a081e8168f}\index{Catch::StringRef@{Catch::StringRef}!numberOfCharacters@{numberOfCharacters}}
+\index{numberOfCharacters@{numberOfCharacters}!Catch::StringRef@{Catch::StringRef}}
+\doxysubsubsection{\texorpdfstring{numberOfCharacters()}{numberOfCharacters()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_string_ref_a6a6cac7430e626ffdd7550a081e8168f} 
+auto Catch\+::\+String\+Ref\+::number\+Of\+Characters (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const -\/$>$ \mbox{\hyperlink{class_catch_1_1_string_ref_af692c52f6846750283341163b0c7f5e2}{size\+\_\+type}}\hspace{0.3cm}{\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__stringref_8cpp_source_l00084}{84}} of file \mbox{\hyperlink{catch__stringref_8cpp_source}{catch\+\_\+stringref.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_string_ref_af692c52f6846750283341163b0c7f5e2}{size\_type}}\ noChars\ =\ m\_size;}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Make\ adjustments\ for\ uft\ encodings}}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \mbox{\hyperlink{class_catch_1_1_string_ref_af692c52f6846750283341163b0c7f5e2}{size\_type}}\ i=0;\ i\ <\ m\_size;\ ++i\ )\ \{}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ c\ =\ m\_start[i];}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ (\ c\ \&\ byte\_2\_lead\ )\ ==\ byte\_2\_lead\ )\ \{}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ noChars-\/-\/;}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((\ c\ \&\ byte\_3\_lead\ )\ ==\ byte\_3\_lead\ )}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ noChars-\/-\/;}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ (\ c\ \&\ byte\_4\_lead\ )\ ==\ byte\_4\_lead\ )}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ noChars-\/-\/;}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ noChars;}
+\DoxyCodeLine{00098\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_string_ref_a6a6cac7430e626ffdd7550a081e8168f}\index{Catch::StringRef@{Catch::StringRef}!numberOfCharacters@{numberOfCharacters}}
+\index{numberOfCharacters@{numberOfCharacters}!Catch::StringRef@{Catch::StringRef}}
+\doxysubsubsection{\texorpdfstring{numberOfCharacters()}{numberOfCharacters()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_string_ref_a6a6cac7430e626ffdd7550a081e8168f} 
+auto Catch\+::\+String\+Ref\+::number\+Of\+Characters (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const -\/$>$  \mbox{\hyperlink{class_catch_1_1_string_ref_af692c52f6846750283341163b0c7f5e2}{size\+\_\+type}}\hspace{0.3cm}{\ttfamily [noexcept]}}
+
+\Hypertarget{class_catch_1_1_string_ref_ad9fde21785affacc32d7da7a70d74e93}\index{Catch::StringRef@{Catch::StringRef}!operator std::string@{operator std::string}}
+\index{operator std::string@{operator std::string}!Catch::StringRef@{Catch::StringRef}}
+\doxysubsubsection{\texorpdfstring{operator std::string()}{operator std::string()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_string_ref_ad9fde21785affacc32d7da7a70d74e93} 
+Catch\+::\+String\+Ref\+::operator std\+::string (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{catch__stringref_8cpp_source_l00031}{31}} of file \mbox{\hyperlink{catch__stringref_8cpp_source}{catch\+\_\+stringref.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::string(\ m\_start,\ m\_size\ );}
+\DoxyCodeLine{00033\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_string_ref_ad9fde21785affacc32d7da7a70d74e93_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_string_ref_ad9fde21785affacc32d7da7a70d74e93}\index{Catch::StringRef@{Catch::StringRef}!operator std::string@{operator std::string}}
+\index{operator std::string@{operator std::string}!Catch::StringRef@{Catch::StringRef}}
+\doxysubsubsection{\texorpdfstring{operator std::string()}{operator std::string()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_string_ref_ad9fde21785affacc32d7da7a70d74e93} 
+Catch\+::\+String\+Ref\+::operator std\+::string (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_string_ref_ad9fde21785affacc32d7da7a70d74e93_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_string_ref_aaa6c8bf61c4628034c19763d1c8ad215}\index{Catch::StringRef@{Catch::StringRef}!operator"!=@{operator"!=}}
+\index{operator"!=@{operator"!=}!Catch::StringRef@{Catch::StringRef}}
+\doxysubsubsection{\texorpdfstring{operator"!=()}{operator!=()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_string_ref_aaa6c8bf61c4628034c19763d1c8ad215} 
+auto Catch\+::\+String\+Ref\+::operator!= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} const \&}]{other}{}\end{DoxyParamCaption}) const -\/$>$ bool\hspace{0.3cm}{\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__stringref_8cpp_source_l00076}{76}} of file \mbox{\hyperlink{catch__stringref_8cpp_source}{catch\+\_\+stringref.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !\mbox{\hyperlink{class_catch_1_1_string_ref_aabb30149ab961187e4b3ff3394bf6e73}{operator==}}(\ other\ );}
+\DoxyCodeLine{00078\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=319pt]{class_catch_1_1_string_ref_aaa6c8bf61c4628034c19763d1c8ad215_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_string_ref_aaa6c8bf61c4628034c19763d1c8ad215}\index{Catch::StringRef@{Catch::StringRef}!operator"!=@{operator"!=}}
+\index{operator"!=@{operator"!=}!Catch::StringRef@{Catch::StringRef}}
+\doxysubsubsection{\texorpdfstring{operator"!=()}{operator!=()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_string_ref_aaa6c8bf61c4628034c19763d1c8ad215} 
+auto Catch\+::\+String\+Ref\+::operator!= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} const \&}]{other}{}\end{DoxyParamCaption}) const -\/$>$  bool\hspace{0.3cm}{\ttfamily [noexcept]}}
+
+\Hypertarget{class_catch_1_1_string_ref_a14d5a1983e33c51c6b5fd33bffbebabb}\index{Catch::StringRef@{Catch::StringRef}!operator=@{operator=}}
+\index{operator=@{operator=}!Catch::StringRef@{Catch::StringRef}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_string_ref_a14d5a1983e33c51c6b5fd33bffbebabb} 
+auto Catch\+::\+String\+Ref\+::operator= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} const \&}]{other}{}\end{DoxyParamCaption}) -\/$>$ \mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}}\& \hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__stringref_8h_source_l00073}{73}} of file \mbox{\hyperlink{catch__stringref_8h_source}{catch\+\_\+stringref.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{delete}[]\ m\_data;}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \ \ \ m\_data\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ m\_start\ =\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.m\_start;}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ \ \ \ m\_size\ =\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.m\_size;}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_string_ref_a14d5a1983e33c51c6b5fd33bffbebabb}\index{Catch::StringRef@{Catch::StringRef}!operator=@{operator=}}
+\index{operator=@{operator=}!Catch::StringRef@{Catch::StringRef}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_string_ref_a14d5a1983e33c51c6b5fd33bffbebabb} 
+auto Catch\+::\+String\+Ref\+::operator= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} const \&}]{other}{}\end{DoxyParamCaption}) -\/$>$ \mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}}\& \hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source_l00572}{572}} of file \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source}{catch.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00572\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00573\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{delete}[]\ m\_data;}
+\DoxyCodeLine{00574\ \ \ \ \ \ \ \ \ \ \ \ \ m\_data\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00575\ \ \ \ \ \ \ \ \ \ \ \ \ m\_start\ =\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.m\_start;}
+\DoxyCodeLine{00576\ \ \ \ \ \ \ \ \ \ \ \ \ m\_size\ =\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.m\_size;}
+\DoxyCodeLine{00577\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00578\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_string_ref_aabb30149ab961187e4b3ff3394bf6e73}\index{Catch::StringRef@{Catch::StringRef}!operator==@{operator==}}
+\index{operator==@{operator==}!Catch::StringRef@{Catch::StringRef}}
+\doxysubsubsection{\texorpdfstring{operator==()}{operator==()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_string_ref_aabb30149ab961187e4b3ff3394bf6e73} 
+auto Catch\+::\+String\+Ref\+::operator== (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} const \&}]{other}{}\end{DoxyParamCaption}) const -\/$>$ bool\hspace{0.3cm}{\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__stringref_8cpp_source_l00071}{71}} of file \mbox{\hyperlink{catch__stringref_8cpp_source}{catch\+\_\+stringref.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_string_ref_ae084d72cb2952cee61a63ef36611d0ad}{size}}()\ ==\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.size()\ \&\&}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \ \ \ (std::strncmp(\ m\_start,\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.m\_start,\ \mbox{\hyperlink{class_catch_1_1_string_ref_ae084d72cb2952cee61a63ef36611d0ad}{size}}()\ )\ ==\ 0);}
+\DoxyCodeLine{00075\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_string_ref_aabb30149ab961187e4b3ff3394bf6e73}\index{Catch::StringRef@{Catch::StringRef}!operator==@{operator==}}
+\index{operator==@{operator==}!Catch::StringRef@{Catch::StringRef}}
+\doxysubsubsection{\texorpdfstring{operator==()}{operator==()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_string_ref_aabb30149ab961187e4b3ff3394bf6e73} 
+auto Catch\+::\+String\+Ref\+::operator== (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} const \&}]{other}{}\end{DoxyParamCaption}) const -\/$>$  bool\hspace{0.3cm}{\ttfamily [noexcept]}}
+
+\Hypertarget{class_catch_1_1_string_ref_a4ba2e01eec1f0f56c257d213c796ab3b}\index{Catch::StringRef@{Catch::StringRef}!operator\mbox{[}\mbox{]}@{operator[]}}
+\index{operator\mbox{[}\mbox{]}@{operator[]}!Catch::StringRef@{Catch::StringRef}}
+\doxysubsubsection{\texorpdfstring{operator[]()}{operator[]()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_string_ref_a4ba2e01eec1f0f56c257d213c796ab3b} 
+auto Catch\+::\+String\+Ref\+::operator\mbox{[}$\,$\mbox{]} (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_catch_1_1_string_ref_af692c52f6846750283341163b0c7f5e2}{size\+\_\+type}}}]{index}{}\end{DoxyParamCaption}) const -\/$>$ char\hspace{0.3cm}{\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__stringref_8cpp_source_l00080}{80}} of file \mbox{\hyperlink{catch__stringref_8cpp_source}{catch\+\_\+stringref.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_start[index];}
+\DoxyCodeLine{00082\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_string_ref_a4ba2e01eec1f0f56c257d213c796ab3b}\index{Catch::StringRef@{Catch::StringRef}!operator\mbox{[}\mbox{]}@{operator[]}}
+\index{operator\mbox{[}\mbox{]}@{operator[]}!Catch::StringRef@{Catch::StringRef}}
+\doxysubsubsection{\texorpdfstring{operator[]()}{operator[]()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_string_ref_a4ba2e01eec1f0f56c257d213c796ab3b} 
+auto Catch\+::\+String\+Ref\+::operator\mbox{[}$\,$\mbox{]} (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_catch_1_1_string_ref_af692c52f6846750283341163b0c7f5e2}{size\+\_\+type}}}]{index}{}\end{DoxyParamCaption}) const -\/$>$  char\hspace{0.3cm}{\ttfamily [noexcept]}}
+
+\Hypertarget{class_catch_1_1_string_ref_ae084d72cb2952cee61a63ef36611d0ad}\index{Catch::StringRef@{Catch::StringRef}!size@{size}}
+\index{size@{size}!Catch::StringRef@{Catch::StringRef}}
+\doxysubsubsection{\texorpdfstring{size()}{size()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_string_ref_ae084d72cb2952cee61a63ef36611d0ad} 
+auto Catch\+::\+String\+Ref\+::size (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const -\/$>$ \mbox{\hyperlink{class_catch_1_1_string_ref_af692c52f6846750283341163b0c7f5e2}{size\+\_\+type}} \hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__stringref_8h_source_l00095}{95}} of file \mbox{\hyperlink{catch__stringref_8h_source}{catch\+\_\+stringref.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_size;}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_string_ref_ae084d72cb2952cee61a63ef36611d0ad_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_string_ref_ae084d72cb2952cee61a63ef36611d0ad}\index{Catch::StringRef@{Catch::StringRef}!size@{size}}
+\index{size@{size}!Catch::StringRef@{Catch::StringRef}}
+\doxysubsubsection{\texorpdfstring{size()}{size()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_string_ref_ae084d72cb2952cee61a63ef36611d0ad} 
+auto Catch\+::\+String\+Ref\+::size (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const -\/$>$ \mbox{\hyperlink{class_catch_1_1_string_ref_af692c52f6846750283341163b0c7f5e2}{size\+\_\+type}} \hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source_l00594}{594}} of file \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source}{catch.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00594\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00595\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_size;}
+\DoxyCodeLine{00596\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_string_ref_a248568b467cf6599320903ae613c8eee}\index{Catch::StringRef@{Catch::StringRef}!substr@{substr}}
+\index{substr@{substr}!Catch::StringRef@{Catch::StringRef}}
+\doxysubsubsection{\texorpdfstring{substr()}{substr()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_string_ref_a248568b467cf6599320903ae613c8eee} 
+auto Catch\+::\+String\+Ref\+::substr (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_catch_1_1_string_ref_af692c52f6846750283341163b0c7f5e2}{size\+\_\+type}}}]{start}{, }\item[{\mbox{\hyperlink{class_catch_1_1_string_ref_af692c52f6846750283341163b0c7f5e2}{size\+\_\+type}}}]{size}{}\end{DoxyParamCaption}) const -\/$>$ \mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}}\hspace{0.3cm}{\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__stringref_8cpp_source_l00065}{65}} of file \mbox{\hyperlink{catch__stringref_8cpp_source}{catch\+\_\+stringref.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ start\ <\ m\_size\ )}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_catch_1_1_string_ref_a94319c75df6542327c93a312c6a80754}{StringRef}}(\ m\_start+start,\ \mbox{\hyperlink{class_catch_1_1_string_ref_ae084d72cb2952cee61a63ef36611d0ad}{size}}\ );}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_catch_1_1_string_ref_a94319c75df6542327c93a312c6a80754}{StringRef}}();}
+\DoxyCodeLine{00070\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=296pt]{class_catch_1_1_string_ref_a248568b467cf6599320903ae613c8eee_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_string_ref_a248568b467cf6599320903ae613c8eee_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_string_ref_a248568b467cf6599320903ae613c8eee}\index{Catch::StringRef@{Catch::StringRef}!substr@{substr}}
+\index{substr@{substr}!Catch::StringRef@{Catch::StringRef}}
+\doxysubsubsection{\texorpdfstring{substr()}{substr()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_string_ref_a248568b467cf6599320903ae613c8eee} 
+auto Catch\+::\+String\+Ref\+::substr (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_catch_1_1_string_ref_af692c52f6846750283341163b0c7f5e2}{size\+\_\+type}}}]{start}{, }\item[{\mbox{\hyperlink{class_catch_1_1_string_ref_af692c52f6846750283341163b0c7f5e2}{size\+\_\+type}}}]{size}{}\end{DoxyParamCaption}) const -\/$>$  \mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}}\hspace{0.3cm}{\ttfamily [noexcept]}}
+
+\Hypertarget{class_catch_1_1_string_ref_a8a843e39ad3560d10a80524ed926ed63}\index{Catch::StringRef@{Catch::StringRef}!swap@{swap}}
+\index{swap@{swap}!Catch::StringRef@{Catch::StringRef}}
+\doxysubsubsection{\texorpdfstring{swap()}{swap()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_string_ref_a8a843e39ad3560d10a80524ed926ed63} 
+void Catch\+::\+String\+Ref\+::swap (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} \&}]{other}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__stringref_8cpp_source_l00035}{35}} of file \mbox{\hyperlink{catch__stringref_8cpp_source}{catch\+\_\+stringref.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacestd_abb7e41c7063536ff6eeee4bb5f66de6c}{std::swap}}(\ m\_start,\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.m\_start\ );}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacestd_abb7e41c7063536ff6eeee4bb5f66de6c}{std::swap}}(\ m\_size,\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.m\_size\ );}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacestd_abb7e41c7063536ff6eeee4bb5f66de6c}{std::swap}}(\ m\_data,\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.m\_data\ );}
+\DoxyCodeLine{00039\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_string_ref_a8a843e39ad3560d10a80524ed926ed63_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_string_ref_a8a843e39ad3560d10a80524ed926ed63}\index{Catch::StringRef@{Catch::StringRef}!swap@{swap}}
+\index{swap@{swap}!Catch::StringRef@{Catch::StringRef}}
+\doxysubsubsection{\texorpdfstring{swap()}{swap()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_string_ref_a8a843e39ad3560d10a80524ed926ed63} 
+void Catch\+::\+String\+Ref\+::swap (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} \&}]{other}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [noexcept]}}
+
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{class_catch_1_1_string_ref_a923324f930c2eff7664ee1c6d3a1c483}\index{Catch::StringRef@{Catch::StringRef}!StringRefTestAccess@{StringRefTestAccess}}
+\index{StringRefTestAccess@{StringRefTestAccess}!Catch::StringRef@{Catch::StringRef}}
+\doxysubsubsection{\texorpdfstring{StringRefTestAccess}{StringRefTestAccess}}
+{\footnotesize\ttfamily \label{class_catch_1_1_string_ref_a923324f930c2eff7664ee1c6d3a1c483} 
+\mbox{\hyperlink{struct_catch_1_1_string_ref_test_access}{String\+Ref\+Test\+Access}}\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__stringref_8h_source_l00028}{28}} of file \mbox{\hyperlink{catch__stringref_8h_source}{catch\+\_\+stringref.\+h}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__stringref_8h}{catch\+\_\+stringref.\+h}}\item 
+libraries/sys-\/vm/external/\+Catch2/single\+\_\+include/catch2/\mbox{\hyperlink{single__include_2catch2_2catch_8hpp}{catch.\+hpp}}\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__stringref_8cpp}{catch\+\_\+stringref.\+cpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,4 @@
+var structinternal_1_1_type_helper_3_01_value_type_00_01typename_01_value_type_1_1_const_object_01_4 =
+[
+    [ "ObjectType", "structinternal_1_1_type_helper_3_01_value_type_00_01typename_01_value_type_1_1_const_object_01_4.html#ab5f5cc1fcc766f245f7aec2e88dcad7f", null ]
+];

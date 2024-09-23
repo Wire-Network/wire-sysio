@@ -1,0 +1,7 @@
+<map id="sysio::chain::action_base" name="sysio::chain::action_base">
+<area shape="rect" id="Node000001" title=" " alt="" coords="73,109,242,135"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1name.html" title="Immutable except for fc::from_variant." alt="" coords="5,13,137,38"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="94,48,148,107,145,110,90,52"/>
+<area shape="rect" id="Node000003" href="$classfc_1_1vector.html" title=" " alt="" coords="161,5,330,46"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="219,59,171,111,167,107,215,55"/>
+</map>

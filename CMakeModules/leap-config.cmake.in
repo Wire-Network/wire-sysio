@@ -1,3 +1,0 @@
-list(APPEND CMAKE_MODULE_PATH @SYS_ROOT_DIR@/cmake/wire_sysio)
-include(SysioTester)
-include(SysioCheckVersion)

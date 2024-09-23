@@ -1,0 +1,14 @@
+<map id="run_benchmark" name="run_benchmark">
+<area shape="rect" id="Node000001" title=" " alt="" coords="299,57,409,82"/>
+<area shape="rect" id="Node000002" href="$bench_8c.html#a3c04138a5bfe5d72780bb7e82a18e627" title=" " alt="" coords="5,57,55,82"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="319,51,286,34,250,21,209,12,176,8,144,11,104,21,72,38,46,58,43,54,69,33,102,16,143,6,176,3,210,7,252,16,288,29,321,46"/>
+<area shape="rect" id="Node000003" href="$ecdh_2bench__impl_8h.html#a1eef60b8d94696b31bdaea3e0469e687" title=" " alt="" coords="119,31,235,57"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="283,62,235,55,236,50,284,57"/>
+<area shape="rect" id="Node000004" href="$recovery_2bench__impl_8h.html#afdec90f8eb6e571e672bdbca7a4b4e89" title=" " alt="" coords="108,81,246,106"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="284,82,247,87,246,81,283,76"/>
+<area shape="rect" id="Node000005" href="$schnorrsig_2bench__impl_8h.html#af4b484aa697df8bb3e5dff5c5b12f06b" title=" " alt="" coords="103,130,251,156"/>
+<area shape="poly" id="edge6_Node000001_Node000005" title=" " alt="" coords="315,92,252,121,223,132,221,127,250,116,313,87"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="104,59,56,68,55,63,103,54"/>
+<area shape="poly" id="edge5_Node000004_Node000002" title=" " alt="" coords="92,82,55,76,56,71,93,77"/>
+<area shape="poly" id="edge7_Node000005_Node000002" title=" " alt="" coords="113,126,101,121,46,85,49,80,104,116,115,122"/>
+</map>

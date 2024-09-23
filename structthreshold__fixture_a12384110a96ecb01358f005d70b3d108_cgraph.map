@@ -1,0 +1,19 @@
+<map id="threshold_fixture::test_threshold_common" name="threshold_fixture::test_threshold_common">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,137,166,178"/>
+<area shape="rect" id="Node000002" href="$structthreshold__fixture.html#a62923953a5ed42843dbef6af9645bb27" title=" " alt="" coords="244,21,370,62"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="121,134,212,83,245,66,248,71,215,88,123,139"/>
+<area shape="rect" id="Node000004" href="$structthreshold__fixture.html#ad36b722388f251e4b012964b2d8eb071" title=" " alt="" coords="230,97,384,138"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="165,140,214,131,215,136,166,145"/>
+<area shape="rect" id="Node000006" href="$structthreshold__fixture.html#a0bca421cfd5a6c19b72a0c665aefe86d" title=" " alt="" coords="214,169,400,210"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="166,166,199,171,198,176,165,171"/>
+<area shape="rect" id="Node000008" href="$structthreshold__fixture.html#a394c4e5f3651186aa2b82bb2a0fe67b9" title=" " alt="" coords="244,241,370,282"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="128,176,215,219,243,232,241,237,213,224,125,180"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1resource__monitor_1_1file__space__handler.html#a6a5e01f3f35cab4c846640e060b91b63" title=" " alt="" coords="461,5,621,61"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="370,36,445,34,445,39,370,42"/>
+<area shape="rect" id="Node000005" href="$classsysio_1_1resource__monitor_1_1file__space__handler.html#a3571fc8484a45f62857dcbe29d73aa28" title=" " alt="" coords="461,85,621,141"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="385,113,445,112,445,117,385,119"/>
+<area shape="rect" id="Node000007" href="$classsysio_1_1resource__monitor_1_1file__space__handler.html#ac0f510cb0298b9cefe68102772fc5db7" title=" " alt="" coords="448,165,634,221"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="400,188,433,189,432,194,400,193"/>
+<area shape="rect" id="Node000009" href="$classsysio_1_1resource__monitor_1_1file__space__handler.html#a51eaff9443b1a88e06cbbd1344a78071" title=" " alt="" coords="461,245,621,301"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="370,262,445,266,445,271,370,267"/>
+</map>

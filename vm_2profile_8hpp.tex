@@ -1,0 +1,52 @@
+\doxysection{libraries/sys-\/vm/include/sysio/vm/profile.hpp File Reference}
+\hypertarget{vm_2profile_8hpp}{}\label{vm_2profile_8hpp}\index{libraries/sys-\/vm/include/sysio/vm/profile.hpp@{libraries/sys-\/vm/include/sysio/vm/profile.hpp}}
+{\ttfamily \#include $<$sysio/vm/exceptions.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/vm/utils.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/vm/debug\+\_\+info.\+hpp$>$}\newline
+{\ttfamily \#include $<$vector$>$}\newline
+{\ttfamily \#include $<$algorithm$>$}\newline
+{\ttfamily \#include $<$atomic$>$}\newline
+{\ttfamily \#include $<$thread$>$}\newline
+{\ttfamily \#include $<$condition\+\_\+variable$>$}\newline
+{\ttfamily \#include $<$signal.\+h$>$}\newline
+{\ttfamily \#include $<$unistd.\+h$>$}\newline
+{\ttfamily \#include $<$fcntl.\+h$>$}\newline
+{\ttfamily \#include $<$sys/types.\+h$>$}\newline
+Include dependency graph for profile.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{vm_2profile_8hpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1profile__data}{sysio\+::vm\+::profile\+\_\+data}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1profile__data_1_1list__header}{sysio\+::vm\+::profile\+\_\+data\+::list\+\_\+header}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1profile__data_1_1item}{sysio\+::vm\+::profile\+\_\+data\+::item}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1profile__manager}{sysio\+::vm\+::profile\+\_\+manager}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1vm_1_1scoped__profile}{sysio\+::vm\+::scoped\+\_\+profile}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1vm}{sysio\+::vm}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{namespacesysio_1_1vm_a04f2ca5cd59cf8032ca5d8c221e0c64f}{sysio\+::vm\+::profile\+\_\+handler}} (int sig, siginfo\+\_\+t \texorpdfstring{$\ast$}{*}info, void \texorpdfstring{$\ast$}{*})
+\item 
+void \mbox{\hyperlink{namespacesysio_1_1vm_a6122ff8c14e0a69248ee037ef03c28ad}{sysio\+::vm\+::register\+\_\+profile\+\_\+signal\+\_\+handler\+\_\+impl}} ()
+\item 
+void \mbox{\hyperlink{namespacesysio_1_1vm_a069fc506d558bd9390d7989f7866fa0e}{sysio\+::vm\+::register\+\_\+profile\+\_\+signal\+\_\+handler}} ()
+\item 
+void \mbox{\hyperlink{namespacesysio_1_1vm_adaaff21cfdbe1f41d62269f7117a69b0}{sysio\+::vm\+::set\+\_\+profile\+\_\+interval\+\_\+us}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\end{DoxyCompactItemize}

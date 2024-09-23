@@ -1,0 +1,75 @@
+\doxysection{fc\+::appender Class Reference}
+\hypertarget{classfc_1_1appender}{}\label{classfc_1_1appender}\index{fc::appender@{fc::appender}}
+
+
+{\ttfamily \#include $<$appender.\+hpp$>$}
+
+
+
+Inheritance diagram for fc\+::appender\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1appender__inherit__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classfc_1_1appender}{appender}} $>$ \mbox{\hyperlink{classfc_1_1appender_a860a005f416319eee3b733bb375308c9}{ptr}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual void \mbox{\hyperlink{classfc_1_1appender_ae86b4e5cfde6548556295692ba2badca}{initialize}} (boost\+::asio\+::io\+\_\+service \&io\+\_\+service)=0
+\item 
+virtual void \mbox{\hyperlink{classfc_1_1appender_a2c7c23788e18c882ced73b8a6f24e3c9}{log}} (const \mbox{\hyperlink{classfc_1_1log__message}{log\+\_\+message}} \&m)=0
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{appender_8hpp_source_l00035}{35}} of file \mbox{\hyperlink{appender_8hpp_source}{appender.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classfc_1_1appender_a860a005f416319eee3b733bb375308c9}\index{fc::appender@{fc::appender}!ptr@{ptr}}
+\index{ptr@{ptr}!fc::appender@{fc::appender}}
+\doxysubsubsection{\texorpdfstring{ptr}{ptr}}
+{\footnotesize\ttfamily \label{classfc_1_1appender_a860a005f416319eee3b733bb375308c9} 
+std\+::shared\+\_\+ptr$<$\mbox{\hyperlink{classfc_1_1appender}{appender}}$>$ \mbox{\hyperlink{classfc_1_1appender_a860a005f416319eee3b733bb375308c9}{fc\+::appender\+::ptr}}}
+
+
+
+Definition at line \mbox{\hyperlink{appender_8hpp_source_l00037}{37}} of file \mbox{\hyperlink{appender_8hpp_source}{appender.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1appender_ae86b4e5cfde6548556295692ba2badca}\index{fc::appender@{fc::appender}!initialize@{initialize}}
+\index{initialize@{initialize}!fc::appender@{fc::appender}}
+\doxysubsubsection{\texorpdfstring{initialize()}{initialize()}}
+{\footnotesize\ttfamily \label{classfc_1_1appender_ae86b4e5cfde6548556295692ba2badca} 
+virtual void fc\+::appender\+::initialize (\begin{DoxyParamCaption}\item[{boost\+::asio\+::io\+\_\+service \&}]{io\+\_\+service}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{classfc_1_1console__appender_ae574bfa08cf3f563f81baa2d05de9eba}{fc\+::console\+\_\+appender}}, \mbox{\hyperlink{classfc_1_1dmlog__appender_a1ed404efec9f684dcfdbe56cfc3821fc}{fc\+::dmlog\+\_\+appender}}, and \mbox{\hyperlink{classfc_1_1gelf__appender_ab6509d82a033f86a7066849841465ff0}{fc\+::gelf\+\_\+appender}}.
+
+\Hypertarget{classfc_1_1appender_a2c7c23788e18c882ced73b8a6f24e3c9}\index{fc::appender@{fc::appender}!log@{log}}
+\index{log@{log}!fc::appender@{fc::appender}}
+\doxysubsubsection{\texorpdfstring{log()}{log()}}
+{\footnotesize\ttfamily \label{classfc_1_1appender_a2c7c23788e18c882ced73b8a6f24e3c9} 
+virtual void fc\+::appender\+::log (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1log__message}{log\+\_\+message}} \&}]{m}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{classfc_1_1console__appender_a0c8bd1b4b2058a5760e926065ac37437}{fc\+::console\+\_\+appender}}, \mbox{\hyperlink{classfc_1_1dmlog__appender_a7ad23d287447893ca7ee30059fbffe9b}{fc\+::dmlog\+\_\+appender}}, and \mbox{\hyperlink{classfc_1_1gelf__appender_a2f41c751b1f98f809b5305df6d6a6ffc}{fc\+::gelf\+\_\+appender}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/log/\mbox{\hyperlink{appender_8hpp}{appender.\+hpp}}\end{DoxyCompactItemize}

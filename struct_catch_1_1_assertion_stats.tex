@@ -1,0 +1,158 @@
+\doxysection{Catch\+::Assertion\+Stats Struct Reference}
+\hypertarget{struct_catch_1_1_assertion_stats}{}\label{struct_catch_1_1_assertion_stats}\index{Catch::AssertionStats@{Catch::AssertionStats}}
+
+
+{\ttfamily \#include $<$catch\+\_\+interfaces\+\_\+reporter.\+h$>$}
+
+
+
+Collaboration diagram for Catch\+::Assertion\+Stats\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_catch_1_1_assertion_stats__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_catch_1_1_assertion_stats_a683d4c44ba214b9091cef80f4ee97967}{Assertion\+Stats}} (\mbox{\hyperlink{class_catch_1_1_assertion_result}{Assertion\+Result}} const \&\+\_\+assertion\+Result, std\+::vector$<$ \mbox{\hyperlink{struct_catch_1_1_message_info}{Message\+Info}} $>$ const \&\+\_\+info\+Messages, \mbox{\hyperlink{struct_catch_1_1_totals}{Totals}} const \&\+\_\+totals)
+\item 
+\mbox{\hyperlink{struct_catch_1_1_assertion_stats_a9e424e9e8d0d8b3f94acb07a299ed8a5}{Assertion\+Stats}} (\mbox{\hyperlink{struct_catch_1_1_assertion_stats}{Assertion\+Stats}} const \&)=default
+\item 
+\mbox{\hyperlink{struct_catch_1_1_assertion_stats_a17657b89a0301935338ca6ab63dece06}{Assertion\+Stats}} (\mbox{\hyperlink{struct_catch_1_1_assertion_stats}{Assertion\+Stats}} \&\&)=default
+\item 
+\mbox{\hyperlink{struct_catch_1_1_assertion_stats}{Assertion\+Stats}} \& \mbox{\hyperlink{struct_catch_1_1_assertion_stats_a4aee13796b50b5aa7fa84d5670c5dc3f}{operator=}} (\mbox{\hyperlink{struct_catch_1_1_assertion_stats}{Assertion\+Stats}} const \&)=delete
+\item 
+\mbox{\hyperlink{struct_catch_1_1_assertion_stats}{Assertion\+Stats}} \& \mbox{\hyperlink{struct_catch_1_1_assertion_stats_a337df6a1cbe2687f55323393e4abba15}{operator=}} (\mbox{\hyperlink{struct_catch_1_1_assertion_stats}{Assertion\+Stats}} \&\&)=delete
+\item 
+virtual \mbox{\hyperlink{struct_catch_1_1_assertion_stats_aa7a2d3927c649494f0e006e914db6832}{\texorpdfstring{$\sim$}{\string~}\+Assertion\+Stats}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_catch_1_1_assertion_result}{Assertion\+Result}} \mbox{\hyperlink{struct_catch_1_1_assertion_stats_a9f983a85332251f464efb4efba021b89}{assertion\+Result}}
+\item 
+std\+::vector$<$ \mbox{\hyperlink{struct_catch_1_1_message_info}{Message\+Info}} $>$ \mbox{\hyperlink{struct_catch_1_1_assertion_stats_a12a032fa1f6e0fa8711946625758e6bb}{info\+Messages}}
+\item 
+\mbox{\hyperlink{struct_catch_1_1_totals}{Totals}} \mbox{\hyperlink{struct_catch_1_1_assertion_stats_a1cb537d44b8be3b19663f5fd1c25ce7a}{totals}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{catch__interfaces__reporter_8h_source_l00076}{76}} of file \mbox{\hyperlink{catch__interfaces__reporter_8h_source}{catch\+\_\+interfaces\+\_\+reporter.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{struct_catch_1_1_assertion_stats_a683d4c44ba214b9091cef80f4ee97967}\index{Catch::AssertionStats@{Catch::AssertionStats}!AssertionStats@{AssertionStats}}
+\index{AssertionStats@{AssertionStats}!Catch::AssertionStats@{Catch::AssertionStats}}
+\doxysubsubsection{\texorpdfstring{AssertionStats()}{AssertionStats()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_assertion_stats_a683d4c44ba214b9091cef80f4ee97967} 
+Catch\+::\+Assertion\+Stats\+::\+Assertion\+Stats (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_catch_1_1_assertion_result}{Assertion\+Result}} const \&}]{\+\_\+assertion\+Result}{, }\item[{std\+::vector$<$ \mbox{\hyperlink{struct_catch_1_1_message_info}{Message\+Info}} $>$ const \&}]{\+\_\+info\+Messages}{, }\item[{\mbox{\hyperlink{struct_catch_1_1_totals}{Totals}} const \&}]{\+\_\+totals}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{include_2internal_2catch__interfaces__reporter_8cpp_source_l00033}{33}} of file \mbox{\hyperlink{include_2internal_2catch__interfaces__reporter_8cpp_source}{catch\+\_\+interfaces\+\_\+reporter.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00036\ \ \ \ \ :\ \ \ \mbox{\hyperlink{struct_catch_1_1_assertion_stats_a9f983a85332251f464efb4efba021b89}{assertionResult}}(\ \_assertionResult\ ),}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_assertion_stats_a12a032fa1f6e0fa8711946625758e6bb}{infoMessages}}(\ \_infoMessages\ ),}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_assertion_stats_a1cb537d44b8be3b19663f5fd1c25ce7a}{totals}}(\ \_totals\ )}
+\DoxyCodeLine{00039\ \ \ \ \ \{}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_assertion_stats_a9f983a85332251f464efb4efba021b89}{assertionResult}}.\mbox{\hyperlink{class_catch_1_1_assertion_result_add3455b8bbedb0d643e18da67c66b4f7}{m\_resultData}}.\mbox{\hyperlink{struct_catch_1_1_assertion_result_data_ad20fe728af4ef4aef8b9aea522ffe8b3}{lazyExpression}}.m\_transientExpression\ =\ \_assertionResult.m\_resultData.lazyExpression.m\_transientExpression;}
+\DoxyCodeLine{00041\ }
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{struct_catch_1_1_assertion_stats_a9f983a85332251f464efb4efba021b89}{assertionResult}}.\mbox{\hyperlink{class_catch_1_1_assertion_result_aae37064b401919fa8ac480ef86cca924}{hasMessage}}()\ )\ \{}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Copy\ message\ into\ messages\ list.}}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ !TBD\ This\ should\ have\ been\ done\ earlier,\ somewhere}}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \ \ \ MessageBuilder\ builder(\ \mbox{\hyperlink{struct_catch_1_1_assertion_stats_a9f983a85332251f464efb4efba021b89}{assertionResult}}.\mbox{\hyperlink{class_catch_1_1_assertion_result_a06dd13522bd42af8402bb3903787d844}{getTestMacroName}}(),\ \mbox{\hyperlink{struct_catch_1_1_assertion_stats_a9f983a85332251f464efb4efba021b89}{assertionResult}}.\mbox{\hyperlink{class_catch_1_1_assertion_result_aa4d3fdbfe276a69a035762dbb790800f}{getSourceInfo}}(),\ \mbox{\hyperlink{struct_catch_1_1_assertion_stats_a9f983a85332251f464efb4efba021b89}{assertionResult}}.\mbox{\hyperlink{class_catch_1_1_assertion_result_ac810750194e1722489d2fd16e8c6a4a8}{getResultType}}()\ );}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \ \ \ builder\ <<\ \mbox{\hyperlink{struct_catch_1_1_assertion_stats_a9f983a85332251f464efb4efba021b89}{assertionResult}}.\mbox{\hyperlink{class_catch_1_1_assertion_result_ae730943beed46921b09383c673e35786}{getMessage}}();}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \ \ \ builder.m\_info.message\ =\ builder.m\_stream.str();}
+\DoxyCodeLine{00048\ }
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_assertion_stats_a12a032fa1f6e0fa8711946625758e6bb}{infoMessages}}.push\_back(\ builder.m\_info\ );}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00051\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=347pt]{struct_catch_1_1_assertion_stats_a683d4c44ba214b9091cef80f4ee97967_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_catch_1_1_assertion_stats_a9e424e9e8d0d8b3f94acb07a299ed8a5}\index{Catch::AssertionStats@{Catch::AssertionStats}!AssertionStats@{AssertionStats}}
+\index{AssertionStats@{AssertionStats}!Catch::AssertionStats@{Catch::AssertionStats}}
+\doxysubsubsection{\texorpdfstring{AssertionStats()}{AssertionStats()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_assertion_stats_a9e424e9e8d0d8b3f94acb07a299ed8a5} 
+Catch\+::\+Assertion\+Stats\+::\+Assertion\+Stats (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_assertion_stats}{Assertion\+Stats}} const \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [default]}}
+
+\Hypertarget{struct_catch_1_1_assertion_stats_a17657b89a0301935338ca6ab63dece06}\index{Catch::AssertionStats@{Catch::AssertionStats}!AssertionStats@{AssertionStats}}
+\index{AssertionStats@{AssertionStats}!Catch::AssertionStats@{Catch::AssertionStats}}
+\doxysubsubsection{\texorpdfstring{AssertionStats()}{AssertionStats()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_assertion_stats_a17657b89a0301935338ca6ab63dece06} 
+Catch\+::\+Assertion\+Stats\+::\+Assertion\+Stats (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_assertion_stats}{Assertion\+Stats}} \&\&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [default]}}
+
+\Hypertarget{struct_catch_1_1_assertion_stats_aa7a2d3927c649494f0e006e914db6832}\index{Catch::AssertionStats@{Catch::AssertionStats}!````~AssertionStats@{\texorpdfstring{$\sim$}{\string~}AssertionStats}}
+\index{````~AssertionStats@{\texorpdfstring{$\sim$}{\string~}AssertionStats}!Catch::AssertionStats@{Catch::AssertionStats}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}AssertionStats()}{\string~AssertionStats()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_assertion_stats_aa7a2d3927c649494f0e006e914db6832} 
+Catch\+::\+Assertion\+Stats\+::\texorpdfstring{$\sim$}{\string~}\+Assertion\+Stats (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}, {\ttfamily [default]}}
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_catch_1_1_assertion_stats_a337df6a1cbe2687f55323393e4abba15}\index{Catch::AssertionStats@{Catch::AssertionStats}!operator=@{operator=}}
+\index{operator=@{operator=}!Catch::AssertionStats@{Catch::AssertionStats}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_assertion_stats_a337df6a1cbe2687f55323393e4abba15} 
+\mbox{\hyperlink{struct_catch_1_1_assertion_stats}{Assertion\+Stats}} \& Catch\+::\+Assertion\+Stats\+::operator= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_assertion_stats}{Assertion\+Stats}} \&\&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [delete]}}
+
+\Hypertarget{struct_catch_1_1_assertion_stats_a4aee13796b50b5aa7fa84d5670c5dc3f}\index{Catch::AssertionStats@{Catch::AssertionStats}!operator=@{operator=}}
+\index{operator=@{operator=}!Catch::AssertionStats@{Catch::AssertionStats}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_assertion_stats_a4aee13796b50b5aa7fa84d5670c5dc3f} 
+\mbox{\hyperlink{struct_catch_1_1_assertion_stats}{Assertion\+Stats}} \& Catch\+::\+Assertion\+Stats\+::operator= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_assertion_stats}{Assertion\+Stats}} const \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [delete]}}
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_catch_1_1_assertion_stats_a9f983a85332251f464efb4efba021b89}\index{Catch::AssertionStats@{Catch::AssertionStats}!assertionResult@{assertionResult}}
+\index{assertionResult@{assertionResult}!Catch::AssertionStats@{Catch::AssertionStats}}
+\doxysubsubsection{\texorpdfstring{assertionResult}{assertionResult}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_assertion_stats_a9f983a85332251f464efb4efba021b89} 
+\mbox{\hyperlink{class_catch_1_1_assertion_result}{Assertion\+Result}} Catch\+::\+Assertion\+Stats\+::assertion\+Result}
+
+
+
+Definition at line \mbox{\hyperlink{catch__interfaces__reporter_8h_source_l00087}{87}} of file \mbox{\hyperlink{catch__interfaces__reporter_8h_source}{catch\+\_\+interfaces\+\_\+reporter.\+h}}.
+
+\Hypertarget{struct_catch_1_1_assertion_stats_a12a032fa1f6e0fa8711946625758e6bb}\index{Catch::AssertionStats@{Catch::AssertionStats}!infoMessages@{infoMessages}}
+\index{infoMessages@{infoMessages}!Catch::AssertionStats@{Catch::AssertionStats}}
+\doxysubsubsection{\texorpdfstring{infoMessages}{infoMessages}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_assertion_stats_a12a032fa1f6e0fa8711946625758e6bb} 
+std\+::vector$<$\mbox{\hyperlink{struct_catch_1_1_message_info}{Message\+Info}}$>$ Catch\+::\+Assertion\+Stats\+::info\+Messages}
+
+
+
+Definition at line \mbox{\hyperlink{catch__interfaces__reporter_8h_source_l00088}{88}} of file \mbox{\hyperlink{catch__interfaces__reporter_8h_source}{catch\+\_\+interfaces\+\_\+reporter.\+h}}.
+
+\Hypertarget{struct_catch_1_1_assertion_stats_a1cb537d44b8be3b19663f5fd1c25ce7a}\index{Catch::AssertionStats@{Catch::AssertionStats}!totals@{totals}}
+\index{totals@{totals}!Catch::AssertionStats@{Catch::AssertionStats}}
+\doxysubsubsection{\texorpdfstring{totals}{totals}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_assertion_stats_a1cb537d44b8be3b19663f5fd1c25ce7a} 
+\mbox{\hyperlink{struct_catch_1_1_totals}{Totals}} Catch\+::\+Assertion\+Stats\+::totals}
+
+
+
+Definition at line \mbox{\hyperlink{catch__interfaces__reporter_8h_source_l00089}{89}} of file \mbox{\hyperlink{catch__interfaces__reporter_8h_source}{catch\+\_\+interfaces\+\_\+reporter.\+h}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__interfaces__reporter_8h}{catch\+\_\+interfaces\+\_\+reporter.\+h}}\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{include_2internal_2catch__interfaces__reporter_8cpp}{catch\+\_\+interfaces\+\_\+reporter.\+cpp}}\end{DoxyCompactItemize}

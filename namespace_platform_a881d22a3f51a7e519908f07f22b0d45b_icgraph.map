@@ -1,0 +1,11 @@
+<map id="Platform::countLeadingZeroes" name="Platform::countLeadingZeroes">
+<area shape="rect" id="Node000001" title=" " alt="" coords="393,31,588,56"/>
+<area shape="rect" id="Node000002" href="$namespace_platform.html#a4f3d15d0115fe31b0bcdb65a24ed24ef" title=" " alt="" coords="197,5,345,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="378,33,345,29,346,24,378,28"/>
+<area shape="rect" id="Node000003" href="$namespace_platform.html#aa618d555db82f8b59b0eeeac8d9a946a" title=" " alt="" coords="197,55,345,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="378,58,346,62,345,57,378,53"/>
+<area shape="rect" id="Node000004" href="$namespace_platform.html#aae9e96348b025c85ff9dff116169a4e4" title=" " alt="" coords="5,29,149,55"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="181,58,149,54,150,49,182,53"/>
+<area shape="rect" id="Node000005" href="$namespace_platform.html#aa87d100a441e9a04d55cb742410cdd48" title=" " alt="" coords="5,79,149,104"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="182,81,150,85,149,80,181,76"/>
+</map>

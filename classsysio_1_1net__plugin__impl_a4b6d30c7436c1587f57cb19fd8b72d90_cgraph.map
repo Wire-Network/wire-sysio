@@ -1,0 +1,13 @@
+<map id="sysio::net_plugin_impl::authenticate_peer" name="sysio::net_plugin_impl::authenticate_peer">
+<area shape="rect" id="Node000001" title="Determine if a peer is allowed to connect." alt="" coords="5,67,156,107"/>
+<area shape="rect" id="Node000002" href="$classfc_1_1sha256.html#a474784de7d6213b855abd7e952df5e36" title=" " alt="" coords="220,45,338,70"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="156,73,204,66,205,71,156,79"/>
+<area shape="rect" id="Node000006" href="$classsysio_1_1producer__plugin.html#a92b46a0e84fb207a04f56d4a75538381" title=" " alt="" coords="204,95,355,135"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="156,95,188,100,188,105,156,100"/>
+<area shape="rect" id="Node000003" href="$classfc_1_1sha256_1_1encoder.html#a4d8b8181e912194cf98a56164671adf8" title=" " alt="" coords="403,5,539,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="339,45,387,37,388,42,339,50"/>
+<area shape="rect" id="Node000005" href="$classfc_1_1sha256_1_1encoder.html#a4a246dfb33e3eb78ba167446bee92e30" title=" " alt="" coords="403,71,539,111"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="339,65,388,74,387,79,339,71"/>
+<area shape="rect" id="Node000004" href="$classfc_1_1sha256.html#ab897537f6c524085b28049be51ed370d" title=" " alt="" coords="587,13,703,38"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="540,23,571,23,571,28,540,28"/>
+</map>

@@ -1,0 +1,88 @@
+\doxysection{plugins/db\+\_\+size\+\_\+api\+\_\+plugin/db\+\_\+size\+\_\+api\+\_\+plugin.cpp File Reference}
+\hypertarget{db__size__api__plugin_8cpp}{}\label{db__size__api__plugin_8cpp}\index{plugins/db\_size\_api\_plugin/db\_size\_api\_plugin.cpp@{plugins/db\_size\_api\_plugin/db\_size\_api\_plugin.cpp}}
+{\ttfamily \#include $<$fc/variant.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/io/json.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/db\+\_\+size\+\_\+api\+\_\+plugin/db\+\_\+size\+\_\+api\+\_\+plugin.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/http\+\_\+plugin/http\+\_\+plugin.\+hpp$>$}\newline
+Include dependency graph for db\+\_\+size\+\_\+api\+\_\+plugin.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{db__size__api__plugin_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{db__size__api__plugin_8cpp_afb00f07822ae80766057c9439f2d8118}{CALL\+\_\+\+WITH\+\_\+400}}(api\+\_\+name,  api\+\_\+handle,  call\+\_\+name,  INVOKE,  http\+\_\+response\+\_\+code)
+\item 
+\#define \mbox{\hyperlink{db__size__api__plugin_8cpp_a57be4224a1ade2bd8b3923d6a344d98b}{INVOKE\+\_\+\+R\+\_\+V}}(api\+\_\+handle,  call\+\_\+name)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{db__size__api__plugin_8cpp_afb00f07822ae80766057c9439f2d8118}\index{db\_size\_api\_plugin.cpp@{db\_size\_api\_plugin.cpp}!CALL\_WITH\_400@{CALL\_WITH\_400}}
+\index{CALL\_WITH\_400@{CALL\_WITH\_400}!db\_size\_api\_plugin.cpp@{db\_size\_api\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{CALL\_WITH\_400}{CALL\_WITH\_400}}
+{\footnotesize\ttfamily \label{db__size__api__plugin_8cpp_afb00f07822ae80766057c9439f2d8118} 
+\#define CALL\+\_\+\+WITH\+\_\+400(\begin{DoxyParamCaption}\item[{}]{api\+\_\+name}{, }\item[{}]{api\+\_\+handle}{, }\item[{}]{call\+\_\+name}{, }\item[{}]{INVOKE}{, }\item[{}]{http\+\_\+response\+\_\+code}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\{std::string(\textcolor{stringliteral}{"{}/v1/"{}}\ \#api\_name\ \textcolor{stringliteral}{"{}/"{}}\ \#call\_name),\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ [api\_handle](string,\ \textcolor{keywordtype}{string}\ body,\ url\_response\_callback\ cb)\ \textcolor{keyword}{mutable}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ body\ =\ parse\_params<std::string,\ http\_params\_types::no\_params>(body);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ INVOKE\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ cb(http\_response\_code,\ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}(result));\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ http\_plugin::handle\_exception(\#api\_name,\ \#call\_name,\ body,\ cb);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \}\}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{db__size__api__plugin_8cpp_source_l00012}{12}} of file \mbox{\hyperlink{db__size__api__plugin_8cpp_source}{db\+\_\+size\+\_\+api\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00012\ \textcolor{preprocessor}{\#define\ CALL\_WITH\_400(api\_name,\ api\_handle,\ call\_name,\ INVOKE,\ http\_response\_code)\ \(\backslash\)}}
+\DoxyCodeLine{00013\ \textcolor{preprocessor}{\{std::string("{}/v1/"{}\ \#api\_name\ "{}/"{}\ \#call\_name),\ \(\backslash\)}}
+\DoxyCodeLine{00014\ \textcolor{preprocessor}{\ \ \ [api\_handle](string,\ string\ body,\ url\_response\_callback\ cb)\ mutable\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ try\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ body\ =\ parse\_params<std::string,\ http\_params\_types::no\_params>(body);\ \(\backslash\)}}
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ INVOKE\ \(\backslash\)}}
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ cb(http\_response\_code,\ fc::variant(result));\ \(\backslash\)}}
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \}\ catch\ (...)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ http\_plugin::handle\_exception(\#api\_name,\ \#call\_name,\ body,\ cb);\ \(\backslash\)}}
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \}\}}}
+
+\end{DoxyCode}
+\Hypertarget{db__size__api__plugin_8cpp_a57be4224a1ade2bd8b3923d6a344d98b}\index{db\_size\_api\_plugin.cpp@{db\_size\_api\_plugin.cpp}!INVOKE\_R\_V@{INVOKE\_R\_V}}
+\index{INVOKE\_R\_V@{INVOKE\_R\_V}!db\_size\_api\_plugin.cpp@{db\_size\_api\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{INVOKE\_R\_V}{INVOKE\_R\_V}}
+{\footnotesize\ttfamily \label{db__size__api__plugin_8cpp_a57be4224a1ade2bd8b3923d6a344d98b} 
+\#define INVOKE\+\_\+\+R\+\_\+V(\begin{DoxyParamCaption}\item[{}]{api\+\_\+handle}{, }\item[{}]{call\+\_\+name}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \textcolor{keyword}{auto}\ result\ =\ api\_handle-\/>call\_name();}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{db__size__api__plugin_8cpp_source_l00024}{24}} of file \mbox{\hyperlink{db__size__api__plugin_8cpp_source}{db\+\_\+size\+\_\+api\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#define\ INVOKE\_R\_V(api\_handle,\ call\_name)\ \(\backslash\)}}
+\DoxyCodeLine{00025\ \textcolor{preprocessor}{\ \ \ \ \ auto\ result\ =\ api\_handle-\/>call\_name();}}
+
+\end{DoxyCode}

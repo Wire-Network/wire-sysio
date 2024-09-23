@@ -1,0 +1,61 @@
+\doxysection{libraries/chain/platform\+\_\+timer\+\_\+accuracy.cpp File Reference}
+\hypertarget{platform__timer__accuracy_8cpp}{}\label{platform__timer__accuracy_8cpp}\index{libraries/chain/platform\_timer\_accuracy.cpp@{libraries/chain/platform\_timer\_accuracy.cpp}}
+{\ttfamily \#include $<$sysio/chain/platform\+\_\+timer\+\_\+accuracy.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/platform\+\_\+timer.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/time.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/log/logger.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/accumulators/accumulators.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/accumulators/statistics/stats.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/accumulators/statistics/min.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/accumulators/statistics/max.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/accumulators/statistics/weighted\+\_\+mean.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/accumulators/statistics/weighted\+\_\+variance.\+hpp$>$}\newline
+{\ttfamily \#include $<$chrono$>$}\newline
+{\ttfamily \#include $<$mutex$>$}\newline
+Include dependency graph for platform\+\_\+timer\+\_\+accuracy.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{platform__timer__accuracy_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain}{sysio\+::chain}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{platform__timer__accuracy_8cpp_a6d9c433052001dc87714847199e7c966}{TIMER\+\_\+\+STATS\+\_\+\+FORMAT}}~"{}min\+:\$\{min\}us max\+:\$\{max\}us mean\+:\$\{mean\}us stddev\+:\$\{stddev\}us"{}
+\item 
+\#define \mbox{\hyperlink{platform__timer__accuracy_8cpp_aff98bcd1b25850038da047eaf995487d}{TIMER\+\_\+\+STATS}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{namespacesysio_1_1chain_ae7932098515897c80ae49b0d569441ba}{sysio\+::chain\+::compute\+\_\+and\+\_\+print\+\_\+timer\+\_\+accuracy}} (\mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer}{platform\+\_\+timer}} \&t)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{platform__timer__accuracy_8cpp_aff98bcd1b25850038da047eaf995487d}\index{platform\_timer\_accuracy.cpp@{platform\_timer\_accuracy.cpp}!TIMER\_STATS@{TIMER\_STATS}}
+\index{TIMER\_STATS@{TIMER\_STATS}!platform\_timer\_accuracy.cpp@{platform\_timer\_accuracy.cpp}}
+\doxysubsubsection{\texorpdfstring{TIMER\_STATS}{TIMER\_STATS}}
+{\footnotesize\ttfamily \label{platform__timer__accuracy_8cpp_aff98bcd1b25850038da047eaf995487d} 
+\#define TIMER\+\_\+\+STATS}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ (\textcolor{stringliteral}{"{}min"{}},\ bacc::min(samples))(\textcolor{stringliteral}{"{}max"{}},\ bacc::max(samples))\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ (\textcolor{stringliteral}{"{}mean"{}},\ (int)bacc::mean(samples))(\textcolor{stringliteral}{"{}stddev"{}},\ (\textcolor{keywordtype}{int})sqrt(bacc::variance(samples)))}
+
+\end{DoxyCode}
+\Hypertarget{platform__timer__accuracy_8cpp_a6d9c433052001dc87714847199e7c966}\index{platform\_timer\_accuracy.cpp@{platform\_timer\_accuracy.cpp}!TIMER\_STATS\_FORMAT@{TIMER\_STATS\_FORMAT}}
+\index{TIMER\_STATS\_FORMAT@{TIMER\_STATS\_FORMAT}!platform\_timer\_accuracy.cpp@{platform\_timer\_accuracy.cpp}}
+\doxysubsubsection{\texorpdfstring{TIMER\_STATS\_FORMAT}{TIMER\_STATS\_FORMAT}}
+{\footnotesize\ttfamily \label{platform__timer__accuracy_8cpp_a6d9c433052001dc87714847199e7c966} 
+\#define TIMER\+\_\+\+STATS\+\_\+\+FORMAT~"{}min\+:\$\{min\}us max\+:\$\{max\}us mean\+:\$\{mean\}us stddev\+:\$\{stddev\}us"{}}
+

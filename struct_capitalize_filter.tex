@@ -1,0 +1,346 @@
+\doxysection{Capitalize\+Filter\texorpdfstring{$<$}{<} Output\+Handler \texorpdfstring{$>$}{>} Struct Template Reference}
+\hypertarget{struct_capitalize_filter}{}\label{struct_capitalize_filter}\index{CapitalizeFilter$<$ OutputHandler $>$@{CapitalizeFilter$<$ OutputHandler $>$}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_capitalize_filter_afe978f33a2f30a84a9e69cc91fe2da6d}{Capitalize\+Filter}} (Output\+Handler \&out)
+\item 
+bool \mbox{\hyperlink{struct_capitalize_filter_a8638839428a447d47711a4b367dc13a4}{Null}} ()
+\item 
+bool \mbox{\hyperlink{struct_capitalize_filter_a957038be10025563a35ad32ab9d78418}{Bool}} (bool b)
+\item 
+bool \mbox{\hyperlink{struct_capitalize_filter_a5eec489885ed7f982ea66caf8d557210}{Int}} (int i)
+\item 
+bool \mbox{\hyperlink{struct_capitalize_filter_a0e1d475eec0129d65fd7b2c06878e445}{Uint}} (unsigned u)
+\item 
+bool \mbox{\hyperlink{struct_capitalize_filter_a5ab3ec8eba2a56f595bf10e2f63c0446}{Int64}} (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} i)
+\item 
+bool \mbox{\hyperlink{struct_capitalize_filter_a603a8c709c0009d7b21dbb20a570bac7}{Uint64}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} u)
+\item 
+bool \mbox{\hyperlink{struct_capitalize_filter_a1c21df7948456b3ae679db9d1a190249}{Double}} (double d)
+\item 
+bool \mbox{\hyperlink{struct_capitalize_filter_a471c199da18ca411550e703a6256abd8}{Raw\+Number}} (const char \texorpdfstring{$\ast$}{*}str, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} length, bool copy)
+\item 
+bool \mbox{\hyperlink{struct_capitalize_filter_a9888a3eadb5297cc06b76df470767b48}{String}} (const char \texorpdfstring{$\ast$}{*}str, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} length, bool)
+\item 
+bool \mbox{\hyperlink{struct_capitalize_filter_ab21677e0794b7414ff0fec27f6599095}{Start\+Object}} ()
+\item 
+bool \mbox{\hyperlink{struct_capitalize_filter_abe3c83f43cbb9ff7ff0e5fdabee79b21}{Key}} (const char \texorpdfstring{$\ast$}{*}str, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} length, bool copy)
+\item 
+bool \mbox{\hyperlink{struct_capitalize_filter_aea1d83e92b986264e04314ea2259207d}{End\+Object}} (\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} member\+Count)
+\item 
+bool \mbox{\hyperlink{struct_capitalize_filter_ac6c50b5828bb848fbc98b92c2f432e9f}{Start\+Array}} ()
+\item 
+bool \mbox{\hyperlink{struct_capitalize_filter_a3d7092e115d0b3f0a277da8487eff4d4}{End\+Array}} (\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} element\+Count)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+Output\+Handler \& \mbox{\hyperlink{struct_capitalize_filter_a76bff3d685698cd6ab2e4cbb84bbf011}{out\+\_\+}}
+\item 
+std\+::vector$<$ char $>$ \mbox{\hyperlink{struct_capitalize_filter_a6e05d2941c11423da2dbb3ab8eb2367d}{buffer\+\_\+}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Output\+Handler$>$\newline
+struct Capitalize\+Filter$<$ Output\+Handler $>$}
+
+
+Definition at line \mbox{\hyperlink{capitalize_8cpp_source_l00017}{17}} of file \mbox{\hyperlink{capitalize_8cpp_source}{capitalize.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{struct_capitalize_filter_afe978f33a2f30a84a9e69cc91fe2da6d}\index{CapitalizeFilter$<$ OutputHandler $>$@{CapitalizeFilter$<$ OutputHandler $>$}!CapitalizeFilter@{CapitalizeFilter}}
+\index{CapitalizeFilter@{CapitalizeFilter}!CapitalizeFilter$<$ OutputHandler $>$@{CapitalizeFilter$<$ OutputHandler $>$}}
+\doxysubsubsection{\texorpdfstring{CapitalizeFilter()}{CapitalizeFilter()}}
+{\footnotesize\ttfamily \label{struct_capitalize_filter_afe978f33a2f30a84a9e69cc91fe2da6d} 
+template$<$typename Output\+Handler $>$ \\
+\mbox{\hyperlink{struct_capitalize_filter}{Capitalize\+Filter}}$<$ Output\+Handler $>$\mbox{\hyperlink{struct_capitalize_filter}{\+::\+Capitalize\+Filter}} (\begin{DoxyParamCaption}\item[{Output\+Handler \&}]{out}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{capitalize_8cpp_source_l00018}{18}} of file \mbox{\hyperlink{capitalize_8cpp_source}{capitalize.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00018\ :\ \mbox{\hyperlink{struct_capitalize_filter_a76bff3d685698cd6ab2e4cbb84bbf011}{out\_}}(out),\ \mbox{\hyperlink{struct_capitalize_filter_a6e05d2941c11423da2dbb3ab8eb2367d}{buffer\_}}()\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_capitalize_filter_a957038be10025563a35ad32ab9d78418}\index{CapitalizeFilter$<$ OutputHandler $>$@{CapitalizeFilter$<$ OutputHandler $>$}!Bool@{Bool}}
+\index{Bool@{Bool}!CapitalizeFilter$<$ OutputHandler $>$@{CapitalizeFilter$<$ OutputHandler $>$}}
+\doxysubsubsection{\texorpdfstring{Bool()}{Bool()}}
+{\footnotesize\ttfamily \label{struct_capitalize_filter_a957038be10025563a35ad32ab9d78418} 
+template$<$typename Output\+Handler $>$ \\
+bool \mbox{\hyperlink{struct_capitalize_filter}{Capitalize\+Filter}}$<$ Output\+Handler $>$\mbox{\hyperlink{struct_bool}{\+::\+Bool}} (\begin{DoxyParamCaption}\item[{bool}]{b}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{capitalize_8cpp_source_l00021}{21}} of file \mbox{\hyperlink{capitalize_8cpp_source}{capitalize.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00021\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_capitalize_filter_a76bff3d685698cd6ab2e4cbb84bbf011}{out\_}}.Bool(b);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_capitalize_filter_a1c21df7948456b3ae679db9d1a190249}\index{CapitalizeFilter$<$ OutputHandler $>$@{CapitalizeFilter$<$ OutputHandler $>$}!Double@{Double}}
+\index{Double@{Double}!CapitalizeFilter$<$ OutputHandler $>$@{CapitalizeFilter$<$ OutputHandler $>$}}
+\doxysubsubsection{\texorpdfstring{Double()}{Double()}}
+{\footnotesize\ttfamily \label{struct_capitalize_filter_a1c21df7948456b3ae679db9d1a190249} 
+template$<$typename Output\+Handler $>$ \\
+bool \mbox{\hyperlink{struct_capitalize_filter}{Capitalize\+Filter}}$<$ Output\+Handler $>$\+::\+Double (\begin{DoxyParamCaption}\item[{double}]{d}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{capitalize_8cpp_source_l00026}{26}} of file \mbox{\hyperlink{capitalize_8cpp_source}{capitalize.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00026\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_capitalize_filter_a76bff3d685698cd6ab2e4cbb84bbf011}{out\_}}.Double(d);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_capitalize_filter_a3d7092e115d0b3f0a277da8487eff4d4}\index{CapitalizeFilter$<$ OutputHandler $>$@{CapitalizeFilter$<$ OutputHandler $>$}!EndArray@{EndArray}}
+\index{EndArray@{EndArray}!CapitalizeFilter$<$ OutputHandler $>$@{CapitalizeFilter$<$ OutputHandler $>$}}
+\doxysubsubsection{\texorpdfstring{EndArray()}{EndArray()}}
+{\footnotesize\ttfamily \label{struct_capitalize_filter_a3d7092e115d0b3f0a277da8487eff4d4} 
+template$<$typename Output\+Handler $>$ \\
+bool \mbox{\hyperlink{struct_capitalize_filter}{Capitalize\+Filter}}$<$ Output\+Handler $>$\+::\+End\+Array (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{element\+Count}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{capitalize_8cpp_source_l00038}{38}} of file \mbox{\hyperlink{capitalize_8cpp_source}{capitalize.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00038\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_capitalize_filter_a76bff3d685698cd6ab2e4cbb84bbf011}{out\_}}.EndArray(elementCount);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_capitalize_filter_aea1d83e92b986264e04314ea2259207d}\index{CapitalizeFilter$<$ OutputHandler $>$@{CapitalizeFilter$<$ OutputHandler $>$}!EndObject@{EndObject}}
+\index{EndObject@{EndObject}!CapitalizeFilter$<$ OutputHandler $>$@{CapitalizeFilter$<$ OutputHandler $>$}}
+\doxysubsubsection{\texorpdfstring{EndObject()}{EndObject()}}
+{\footnotesize\ttfamily \label{struct_capitalize_filter_aea1d83e92b986264e04314ea2259207d} 
+template$<$typename Output\+Handler $>$ \\
+bool \mbox{\hyperlink{struct_capitalize_filter}{Capitalize\+Filter}}$<$ Output\+Handler $>$\+::\+End\+Object (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{member\+Count}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{capitalize_8cpp_source_l00036}{36}} of file \mbox{\hyperlink{capitalize_8cpp_source}{capitalize.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00036\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_capitalize_filter_a76bff3d685698cd6ab2e4cbb84bbf011}{out\_}}.EndObject(memberCount);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_capitalize_filter_a5eec489885ed7f982ea66caf8d557210}\index{CapitalizeFilter$<$ OutputHandler $>$@{CapitalizeFilter$<$ OutputHandler $>$}!Int@{Int}}
+\index{Int@{Int}!CapitalizeFilter$<$ OutputHandler $>$@{CapitalizeFilter$<$ OutputHandler $>$}}
+\doxysubsubsection{\texorpdfstring{Int()}{Int()}}
+{\footnotesize\ttfamily \label{struct_capitalize_filter_a5eec489885ed7f982ea66caf8d557210} 
+template$<$typename Output\+Handler $>$ \\
+bool \mbox{\hyperlink{struct_capitalize_filter}{Capitalize\+Filter}}$<$ Output\+Handler $>$\+::\+Int (\begin{DoxyParamCaption}\item[{int}]{i}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{capitalize_8cpp_source_l00022}{22}} of file \mbox{\hyperlink{capitalize_8cpp_source}{capitalize.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00022\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_capitalize_filter_a76bff3d685698cd6ab2e4cbb84bbf011}{out\_}}.Int(i);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_capitalize_filter_a5ab3ec8eba2a56f595bf10e2f63c0446}\index{CapitalizeFilter$<$ OutputHandler $>$@{CapitalizeFilter$<$ OutputHandler $>$}!Int64@{Int64}}
+\index{Int64@{Int64}!CapitalizeFilter$<$ OutputHandler $>$@{CapitalizeFilter$<$ OutputHandler $>$}}
+\doxysubsubsection{\texorpdfstring{Int64()}{Int64()}}
+{\footnotesize\ttfamily \label{struct_capitalize_filter_a5ab3ec8eba2a56f595bf10e2f63c0446} 
+template$<$typename Output\+Handler $>$ \\
+bool \mbox{\hyperlink{struct_capitalize_filter}{Capitalize\+Filter}}$<$ Output\+Handler $>$\+::\+Int64 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}}]{i}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{capitalize_8cpp_source_l00024}{24}} of file \mbox{\hyperlink{capitalize_8cpp_source}{capitalize.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00024\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_capitalize_filter_a76bff3d685698cd6ab2e4cbb84bbf011}{out\_}}.Int64(i);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_capitalize_filter_abe3c83f43cbb9ff7ff0e5fdabee79b21}\index{CapitalizeFilter$<$ OutputHandler $>$@{CapitalizeFilter$<$ OutputHandler $>$}!Key@{Key}}
+\index{Key@{Key}!CapitalizeFilter$<$ OutputHandler $>$@{CapitalizeFilter$<$ OutputHandler $>$}}
+\doxysubsubsection{\texorpdfstring{Key()}{Key()}}
+{\footnotesize\ttfamily \label{struct_capitalize_filter_abe3c83f43cbb9ff7ff0e5fdabee79b21} 
+template$<$typename Output\+Handler $>$ \\
+bool \mbox{\hyperlink{struct_capitalize_filter}{Capitalize\+Filter}}$<$ Output\+Handler $>$\+::\+Key (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{str}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{length}{, }\item[{bool}]{copy}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{capitalize_8cpp_source_l00035}{35}} of file \mbox{\hyperlink{capitalize_8cpp_source}{capitalize.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00035\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_capitalize_filter_a9888a3eadb5297cc06b76df470767b48}{String}}(str,\ length,\ copy);\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=333pt]{struct_capitalize_filter_abe3c83f43cbb9ff7ff0e5fdabee79b21_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_capitalize_filter_a8638839428a447d47711a4b367dc13a4}\index{CapitalizeFilter$<$ OutputHandler $>$@{CapitalizeFilter$<$ OutputHandler $>$}!Null@{Null}}
+\index{Null@{Null}!CapitalizeFilter$<$ OutputHandler $>$@{CapitalizeFilter$<$ OutputHandler $>$}}
+\doxysubsubsection{\texorpdfstring{Null()}{Null()}}
+{\footnotesize\ttfamily \label{struct_capitalize_filter_a8638839428a447d47711a4b367dc13a4} 
+template$<$typename Output\+Handler $>$ \\
+bool \mbox{\hyperlink{struct_capitalize_filter}{Capitalize\+Filter}}$<$ Output\+Handler $>$\+::\+Null (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{capitalize_8cpp_source_l00020}{20}} of file \mbox{\hyperlink{capitalize_8cpp_source}{capitalize.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00020\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_capitalize_filter_a76bff3d685698cd6ab2e4cbb84bbf011}{out\_}}.Null();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_capitalize_filter_a471c199da18ca411550e703a6256abd8}\index{CapitalizeFilter$<$ OutputHandler $>$@{CapitalizeFilter$<$ OutputHandler $>$}!RawNumber@{RawNumber}}
+\index{RawNumber@{RawNumber}!CapitalizeFilter$<$ OutputHandler $>$@{CapitalizeFilter$<$ OutputHandler $>$}}
+\doxysubsubsection{\texorpdfstring{RawNumber()}{RawNumber()}}
+{\footnotesize\ttfamily \label{struct_capitalize_filter_a471c199da18ca411550e703a6256abd8} 
+template$<$typename Output\+Handler $>$ \\
+bool \mbox{\hyperlink{struct_capitalize_filter}{Capitalize\+Filter}}$<$ Output\+Handler $>$\+::\+Raw\+Number (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{str}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{length}{, }\item[{bool}]{copy}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{capitalize_8cpp_source_l00027}{27}} of file \mbox{\hyperlink{capitalize_8cpp_source}{capitalize.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00027\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_capitalize_filter_a76bff3d685698cd6ab2e4cbb84bbf011}{out\_}}.RawNumber(str,\ length,\ copy);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_capitalize_filter_ac6c50b5828bb848fbc98b92c2f432e9f}\index{CapitalizeFilter$<$ OutputHandler $>$@{CapitalizeFilter$<$ OutputHandler $>$}!StartArray@{StartArray}}
+\index{StartArray@{StartArray}!CapitalizeFilter$<$ OutputHandler $>$@{CapitalizeFilter$<$ OutputHandler $>$}}
+\doxysubsubsection{\texorpdfstring{StartArray()}{StartArray()}}
+{\footnotesize\ttfamily \label{struct_capitalize_filter_ac6c50b5828bb848fbc98b92c2f432e9f} 
+template$<$typename Output\+Handler $>$ \\
+bool \mbox{\hyperlink{struct_capitalize_filter}{Capitalize\+Filter}}$<$ Output\+Handler $>$\+::\+Start\+Array (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{capitalize_8cpp_source_l00037}{37}} of file \mbox{\hyperlink{capitalize_8cpp_source}{capitalize.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00037\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_capitalize_filter_a76bff3d685698cd6ab2e4cbb84bbf011}{out\_}}.StartArray();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_capitalize_filter_ab21677e0794b7414ff0fec27f6599095}\index{CapitalizeFilter$<$ OutputHandler $>$@{CapitalizeFilter$<$ OutputHandler $>$}!StartObject@{StartObject}}
+\index{StartObject@{StartObject}!CapitalizeFilter$<$ OutputHandler $>$@{CapitalizeFilter$<$ OutputHandler $>$}}
+\doxysubsubsection{\texorpdfstring{StartObject()}{StartObject()}}
+{\footnotesize\ttfamily \label{struct_capitalize_filter_ab21677e0794b7414ff0fec27f6599095} 
+template$<$typename Output\+Handler $>$ \\
+bool \mbox{\hyperlink{struct_capitalize_filter}{Capitalize\+Filter}}$<$ Output\+Handler $>$\+::\+Start\+Object (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{capitalize_8cpp_source_l00034}{34}} of file \mbox{\hyperlink{capitalize_8cpp_source}{capitalize.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00034\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_capitalize_filter_a76bff3d685698cd6ab2e4cbb84bbf011}{out\_}}.StartObject();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_capitalize_filter_a9888a3eadb5297cc06b76df470767b48}\index{CapitalizeFilter$<$ OutputHandler $>$@{CapitalizeFilter$<$ OutputHandler $>$}!String@{String}}
+\index{String@{String}!CapitalizeFilter$<$ OutputHandler $>$@{CapitalizeFilter$<$ OutputHandler $>$}}
+\doxysubsubsection{\texorpdfstring{String()}{String()}}
+{\footnotesize\ttfamily \label{struct_capitalize_filter_a9888a3eadb5297cc06b76df470767b48} 
+template$<$typename Output\+Handler $>$ \\
+bool \mbox{\hyperlink{struct_capitalize_filter}{Capitalize\+Filter}}$<$ Output\+Handler $>$\+::\+String (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{str}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{length}{, }\item[{bool}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{capitalize_8cpp_source_l00028}{28}} of file \mbox{\hyperlink{capitalize_8cpp_source}{capitalize.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_capitalize_filter_a6e05d2941c11423da2dbb3ab8eb2367d}{buffer\_}}.clear();}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\ i\ =\ 0;\ i\ <\ length;\ i++)}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_capitalize_filter_a6e05d2941c11423da2dbb3ab8eb2367d}{buffer\_}}.push\_back(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{char}\textcolor{keyword}{>}(std::toupper(str[i])));}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_capitalize_filter_a76bff3d685698cd6ab2e4cbb84bbf011}{out\_}}.String(\&\mbox{\hyperlink{struct_capitalize_filter_a6e05d2941c11423da2dbb3ab8eb2367d}{buffer\_}}.front(),\ length,\ \textcolor{keyword}{true});\ \textcolor{comment}{//\ true\ =\ output\ handler\ need\ to\ copy\ the\ string}}
+\DoxyCodeLine{00033\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=333pt]{struct_capitalize_filter_a9888a3eadb5297cc06b76df470767b48_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_capitalize_filter_a0e1d475eec0129d65fd7b2c06878e445}\index{CapitalizeFilter$<$ OutputHandler $>$@{CapitalizeFilter$<$ OutputHandler $>$}!Uint@{Uint}}
+\index{Uint@{Uint}!CapitalizeFilter$<$ OutputHandler $>$@{CapitalizeFilter$<$ OutputHandler $>$}}
+\doxysubsubsection{\texorpdfstring{Uint()}{Uint()}}
+{\footnotesize\ttfamily \label{struct_capitalize_filter_a0e1d475eec0129d65fd7b2c06878e445} 
+template$<$typename Output\+Handler $>$ \\
+bool \mbox{\hyperlink{struct_capitalize_filter}{Capitalize\+Filter}}$<$ Output\+Handler $>$\+::\+Uint (\begin{DoxyParamCaption}\item[{unsigned}]{u}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{capitalize_8cpp_source_l00023}{23}} of file \mbox{\hyperlink{capitalize_8cpp_source}{capitalize.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00023\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_capitalize_filter_a76bff3d685698cd6ab2e4cbb84bbf011}{out\_}}.Uint(u);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_capitalize_filter_a603a8c709c0009d7b21dbb20a570bac7}\index{CapitalizeFilter$<$ OutputHandler $>$@{CapitalizeFilter$<$ OutputHandler $>$}!Uint64@{Uint64}}
+\index{Uint64@{Uint64}!CapitalizeFilter$<$ OutputHandler $>$@{CapitalizeFilter$<$ OutputHandler $>$}}
+\doxysubsubsection{\texorpdfstring{Uint64()}{Uint64()}}
+{\footnotesize\ttfamily \label{struct_capitalize_filter_a603a8c709c0009d7b21dbb20a570bac7} 
+template$<$typename Output\+Handler $>$ \\
+bool \mbox{\hyperlink{struct_capitalize_filter}{Capitalize\+Filter}}$<$ Output\+Handler $>$\+::\+Uint64 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{u}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{capitalize_8cpp_source_l00025}{25}} of file \mbox{\hyperlink{capitalize_8cpp_source}{capitalize.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00025\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_capitalize_filter_a76bff3d685698cd6ab2e4cbb84bbf011}{out\_}}.Uint64(u);\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_capitalize_filter_a6e05d2941c11423da2dbb3ab8eb2367d}\index{CapitalizeFilter$<$ OutputHandler $>$@{CapitalizeFilter$<$ OutputHandler $>$}!buffer\_@{buffer\_}}
+\index{buffer\_@{buffer\_}!CapitalizeFilter$<$ OutputHandler $>$@{CapitalizeFilter$<$ OutputHandler $>$}}
+\doxysubsubsection{\texorpdfstring{buffer\_}{buffer\_}}
+{\footnotesize\ttfamily \label{struct_capitalize_filter_a6e05d2941c11423da2dbb3ab8eb2367d} 
+template$<$typename Output\+Handler $>$ \\
+std\+::vector$<$char$>$ \mbox{\hyperlink{struct_capitalize_filter}{Capitalize\+Filter}}$<$ Output\+Handler $>$\+::buffer\+\_\+}
+
+
+
+Definition at line \mbox{\hyperlink{capitalize_8cpp_source_l00041}{41}} of file \mbox{\hyperlink{capitalize_8cpp_source}{capitalize.\+cpp}}.
+
+\Hypertarget{struct_capitalize_filter_a76bff3d685698cd6ab2e4cbb84bbf011}\index{CapitalizeFilter$<$ OutputHandler $>$@{CapitalizeFilter$<$ OutputHandler $>$}!out\_@{out\_}}
+\index{out\_@{out\_}!CapitalizeFilter$<$ OutputHandler $>$@{CapitalizeFilter$<$ OutputHandler $>$}}
+\doxysubsubsection{\texorpdfstring{out\_}{out\_}}
+{\footnotesize\ttfamily \label{struct_capitalize_filter_a76bff3d685698cd6ab2e4cbb84bbf011} 
+template$<$typename Output\+Handler $>$ \\
+Output\+Handler\& \mbox{\hyperlink{struct_capitalize_filter}{Capitalize\+Filter}}$<$ Output\+Handler $>$\+::out\+\_\+}
+
+
+
+Definition at line \mbox{\hyperlink{capitalize_8cpp_source_l00040}{40}} of file \mbox{\hyperlink{capitalize_8cpp_source}{capitalize.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/example/capitalize/\mbox{\hyperlink{capitalize_8cpp}{capitalize.\+cpp}}\end{DoxyCompactItemize}

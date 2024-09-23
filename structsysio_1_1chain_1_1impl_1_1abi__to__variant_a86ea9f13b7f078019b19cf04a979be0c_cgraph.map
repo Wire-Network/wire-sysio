@@ -1,0 +1,18 @@
+<map id="sysio::chain::impl::abi_to_variant::add_special_logging" name="sysio::chain::impl::abi_to_variant::add_special_logging">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,72,145,127"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1action.html#a5402a24d19c7337ad098c2464d9a2721" title=" " alt="" coords="201,22,335,62"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="144,76,185,64,187,69,146,81"/>
+<area shape="rect" id="Node000004" href="$classfc_1_1sha256.html#a474784de7d6213b855abd7e952df5e36" title=" " alt="" coords="209,87,327,112"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="145,97,194,97,194,102,145,102"/>
+<area shape="rect" id="Node000008" href="$structsysio_1_1chain_1_1impl_1_1abi__traverse__context.html#a67577173dee66292b915086399c288c1" title=" " alt="" coords="193,137,343,193"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="146,121,179,132,177,137,144,126"/>
+<area shape="rect" id="Node000003" href="$namespacefc_1_1raw.html#a0b442d98ceb22dd5a6ae84745e43ffab" title=" " alt="" coords="404,29,515,55"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="335,40,388,40,388,45,335,45"/>
+<area shape="poly" id="edge3_Node000003_Node000003" title=" " alt="" coords="430,30,424,21,427,11,440,5,459,3,480,5,491,12,489,16,479,10,459,8,441,10,431,15,429,20,434,28"/>
+<area shape="rect" id="Node000005" href="$classfc_1_1sha256_1_1encoder.html#a4d8b8181e912194cf98a56164671adf8" title=" " alt="" coords="391,79,527,120"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="327,97,375,97,375,102,327,102"/>
+<area shape="rect" id="Node000007" href="$classfc_1_1sha256_1_1encoder.html#a4a246dfb33e3eb78ba167446bee92e30" title=" " alt="" coords="391,144,527,185"/>
+<area shape="poly" id="edge7_Node000004_Node000007" title=" " alt="" coords="309,110,344,122,385,136,383,142,342,127,307,115"/>
+<area shape="rect" id="Node000006" href="$classfc_1_1sha256.html#ab897537f6c524085b28049be51ed370d" title=" " alt="" coords="575,87,691,112"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="528,97,559,97,559,102,528,102"/>
+</map>

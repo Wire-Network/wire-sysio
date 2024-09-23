@@ -1,0 +1,114 @@
+\doxysection{get\+\_\+transaction\+\_\+id\+\_\+subcommand Struct Reference}
+\hypertarget{structget__transaction__id__subcommand}{}\label{structget__transaction__id__subcommand}\index{get\_transaction\_id\_subcommand@{get\_transaction\_id\_subcommand}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structget__transaction__id__subcommand_a92055028cd9a74a28b7ff52a270492e7}{get\+\_\+transaction\+\_\+id\+\_\+subcommand}} (\mbox{\hyperlink{class_c_l_i_1_1_app}{CLI\+::\+App}} \texorpdfstring{$\ast$}{*}action\+Root)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structget__transaction__id__subcommand_a6bba7f54480566e99d4b502bc6166f95}{trx\+\_\+to\+\_\+check}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01464}{1464}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structget__transaction__id__subcommand_a92055028cd9a74a28b7ff52a270492e7}\index{get\_transaction\_id\_subcommand@{get\_transaction\_id\_subcommand}!get\_transaction\_id\_subcommand@{get\_transaction\_id\_subcommand}}
+\index{get\_transaction\_id\_subcommand@{get\_transaction\_id\_subcommand}!get\_transaction\_id\_subcommand@{get\_transaction\_id\_subcommand}}
+\doxysubsubsection{\texorpdfstring{get\_transaction\_id\_subcommand()}{get\_transaction\_id\_subcommand()}}
+{\footnotesize\ttfamily \label{structget__transaction__id__subcommand_a92055028cd9a74a28b7ff52a270492e7} 
+get\+\_\+transaction\+\_\+id\+\_\+subcommand\+::get\+\_\+transaction\+\_\+id\+\_\+subcommand (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_c_l_i_1_1_app}{CLI\+::\+App}} \texorpdfstring{$\ast$}{*}}]{action\+Root}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01467}{1467}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01467\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01468\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ get\_transaction\_id\ =\ actionRoot-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_a8b461d2233ec4121259011b5ed24b336}{add\_subcommand}}(\textcolor{stringliteral}{"{}transaction\_id"{}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}Get\ transaction\ id\ given\ transaction\ object"{}}));}
+\DoxyCodeLine{01469\ \ \ \ \ \ \ get\_transaction\_id-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_a8c812d42c7720ecb5cd0aec41b5aa941}{add\_option}}(\textcolor{stringliteral}{"{}transaction"{}},\ \mbox{\hyperlink{structget__transaction__id__subcommand_a6bba7f54480566e99d4b502bc6166f95}{trx\_to\_check}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}The\ JSON\ string\ or\ filename\ defining\ the\ transaction\ which\ transaction\ id\ we\ want\ to\ retrieve"{}}))-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a}{required}}();}
+\DoxyCodeLine{01470\ }
+\DoxyCodeLine{01471\ \ \ \ \ \ \ get\_transaction\_id-\/>callback([\&]\ \{}
+\DoxyCodeLine{01472\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{01473\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}\ trx\_var\ =\ \mbox{\hyperlink{programs_2clio_2main_8cpp_ade93bfc68e3231a2ade354b3728a299b}{json\_from\_file\_or\_string}}(\mbox{\hyperlink{structget__transaction__id__subcommand_a6bba7f54480566e99d4b502bc6166f95}{trx\_to\_check}});}
+\DoxyCodeLine{01474\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ trx\_var.\mbox{\hyperlink{classfc_1_1variant_aa542b555ee260a07e61a2d38ff765d87}{is\_object}}()\ )\ \{}
+\DoxyCodeLine{01475\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant__object}{fc::variant\_object}}\&\ vo\ =\ trx\_var.\mbox{\hyperlink{classfc_1_1variant_a17a7054a10963360c6a14d60f6e30128}{get\_object}}();}
+\DoxyCodeLine{01476\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ if\ actions.data\ \&\ actions.hex\_data\ provided,\ use\ the\ hex\_data\ since\ only\ currently\ support\ unexploded\ data}}
+\DoxyCodeLine{01477\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ vo.\mbox{\hyperlink{classfc_1_1variant__object_ae4ed31b7cb6bc6e1d2873f9121049589}{contains}}(\textcolor{stringliteral}{"{}actions"{}})\ )\ \{}
+\DoxyCodeLine{01478\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ vo[\textcolor{stringliteral}{"{}actions"{}}].is\_array()\ )\ \{}
+\DoxyCodeLine{01479\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}\ mvo\ =\ vo;}
+\DoxyCodeLine{01480\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{fc::variants}}\&\ action\_variants\ =\ mvo[\textcolor{stringliteral}{"{}actions"{}}].get\_array();}
+\DoxyCodeLine{01481\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\&\ action\_v\ :\ action\_variants\ )\ \{}
+\DoxyCodeLine{01482\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !action\_v.is\_object()\ )\ \{}
+\DoxyCodeLine{01483\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}Empty\ 'action'\ in\ transaction"{}}\ <<\ endl;}
+\DoxyCodeLine{01484\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{01485\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01486\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant__object}{fc::variant\_object}}\&\ action\_vo\ =\ action\_v.get\_object();}
+\DoxyCodeLine{01487\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ action\_vo.\mbox{\hyperlink{classfc_1_1variant__object_ae4ed31b7cb6bc6e1d2873f9121049589}{contains}}(\ \textcolor{stringliteral}{"{}data"{}}\ )\ \&\&\ action\_vo.\mbox{\hyperlink{classfc_1_1variant__object_ae4ed31b7cb6bc6e1d2873f9121049589}{contains}}(\ \textcolor{stringliteral}{"{}hex\_data"{}}\ )\ )\ \{}
+\DoxyCodeLine{01488\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}\ maction\_vo\ =\ action\_vo;}
+\DoxyCodeLine{01489\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ maction\_vo[\textcolor{stringliteral}{"{}data"{}}]\ =\ maction\_vo[\textcolor{stringliteral}{"{}hex\_data"{}}];}
+\DoxyCodeLine{01490\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ action\_vo\ =\ maction\_vo;}
+\DoxyCodeLine{01491\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ vo\ =\ mvo;}
+\DoxyCodeLine{01492\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(\ action\_vo.\mbox{\hyperlink{classfc_1_1variant__object_ae4ed31b7cb6bc6e1d2873f9121049589}{contains}}(\ \textcolor{stringliteral}{"{}data"{}}\ )\ )\ \{}
+\DoxyCodeLine{01493\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !action\_vo[\textcolor{stringliteral}{"{}data"{}}].is\_string()\ )\ \{}
+\DoxyCodeLine{01494\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}get\ transaction\_id\ only\ supports\ un-\/exploded\ 'data'\ (hex\ form)"{}}\ <<\ std::endl;}
+\DoxyCodeLine{01495\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{01496\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01497\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01498\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01499\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{01500\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}transaction\ JSON\ 'actions'\ is\ not\ an\ array"{}}\ <<\ std::endl;}
+\DoxyCodeLine{01501\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{01502\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01503\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{01504\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}transaction\ JSON\ does\ not\ include\ 'actions'"{}}\ <<\ std::endl;}
+\DoxyCodeLine{01505\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{01506\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01507\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ trx\ =\ trx\_var.\mbox{\hyperlink{classfc_1_1variant_a82edd1f33199355d3a1f19bbb92909cc}{as}}<\mbox{\hyperlink{structsysio_1_1chain_1_1transaction}{transaction}}>();}
+\DoxyCodeLine{01508\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1sha256}{transaction\_id\_type}}\ \textcolor{keywordtype}{id}\ =\ trx.id();}
+\DoxyCodeLine{01509\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \textcolor{keywordtype}{id}\ ==\ \mbox{\hyperlink{structsysio_1_1chain_1_1transaction}{transaction}}().\textcolor{keywordtype}{id}()\ )\ \{}
+\DoxyCodeLine{01510\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}file/string\ does\ not\ represent\ a\ transaction"{}}\ <<\ std::endl;}
+\DoxyCodeLine{01511\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{01512\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}}(\ \textcolor{keywordtype}{id}\ )\ <<\ std::endl;}
+\DoxyCodeLine{01513\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01514\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{01515\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}file/string\ does\ not\ represent\ a\ transaction"{}}\ <<\ std::endl;}
+\DoxyCodeLine{01516\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01517\ \ \ \ \ \ \ \ \ \ \}\ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a43bd817895cb757183fcecafc6ae7dc1}{SYS\_RETHROW\_EXCEPTIONS}}(transaction\_type\_exception,\ \textcolor{stringliteral}{"{}Fail\ to\ parse\ transaction\ JSON\ '\$\{data\}'"{}},\ (\textcolor{stringliteral}{"{}data"{}},\mbox{\hyperlink{structget__transaction__id__subcommand_a6bba7f54480566e99d4b502bc6166f95}{trx\_to\_check}}))}
+\DoxyCodeLine{01518\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{01519\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structget__transaction__id__subcommand_a92055028cd9a74a28b7ff52a270492e7_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structget__transaction__id__subcommand_a6bba7f54480566e99d4b502bc6166f95}\index{get\_transaction\_id\_subcommand@{get\_transaction\_id\_subcommand}!trx\_to\_check@{trx\_to\_check}}
+\index{trx\_to\_check@{trx\_to\_check}!get\_transaction\_id\_subcommand@{get\_transaction\_id\_subcommand}}
+\doxysubsubsection{\texorpdfstring{trx\_to\_check}{trx\_to\_check}}
+{\footnotesize\ttfamily \label{structget__transaction__id__subcommand_a6bba7f54480566e99d4b502bc6166f95} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} get\+\_\+transaction\+\_\+id\+\_\+subcommand\+::trx\+\_\+to\+\_\+check}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01465}{1465}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+programs/clio/\mbox{\hyperlink{programs_2clio_2main_8cpp}{main.\+cpp}}\end{DoxyCompactItemize}

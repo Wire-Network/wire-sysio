@@ -1,0 +1,243 @@
+\doxysection{sysio\+::msg\+\_\+handler Struct Reference}
+\hypertarget{structsysio_1_1msg__handler}{}\label{structsysio_1_1msg__handler}\index{sysio::msg\_handler@{sysio::msg\_handler}}
+
+
+Inheritance diagram for sysio\+::msg\+\_\+handler\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=181pt]{structsysio_1_1msg__handler__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for sysio\+::msg\+\_\+handler\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=181pt]{structsysio_1_1msg__handler__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1msg__handler_a756e55a52a9b68de9a071cda28e98d7c}{msg\+\_\+handler}} (const \mbox{\hyperlink{namespacesysio_aefc0023f14362306826da768553b8daf}{connection\+\_\+ptr}} \&conn)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{structsysio_1_1msg__handler_a604f597fd5dbf2d83ec91bfb5af27762}{operator()}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&) const
+\item 
+void \mbox{\hyperlink{structsysio_1_1msg__handler_a1a1144831650bb92ccc04f700f667350}{operator()}} (const \mbox{\hyperlink{structsysio_1_1handshake__message}{handshake\+\_\+message}} \&msg) const
+\item 
+void \mbox{\hyperlink{structsysio_1_1msg__handler_a6d0525ab3ed502bac6f49b9c3acd98b0}{operator()}} (const \mbox{\hyperlink{structsysio_1_1chain__size__message}{chain\+\_\+size\+\_\+message}} \&msg) const
+\item 
+void \mbox{\hyperlink{structsysio_1_1msg__handler_ad569047ec0e9b6066a0d0817362a3b5c}{operator()}} (const \mbox{\hyperlink{structsysio_1_1go__away__message}{go\+\_\+away\+\_\+message}} \&msg) const
+\item 
+void \mbox{\hyperlink{structsysio_1_1msg__handler_af301b90fcb7a290198bb078e9082ebe6}{operator()}} (const \mbox{\hyperlink{structsysio_1_1time__message}{time\+\_\+message}} \&msg) const
+\item 
+void \mbox{\hyperlink{structsysio_1_1msg__handler_af3e9e9954bad7dfce56ba0daf31d6926}{operator()}} (const \mbox{\hyperlink{structsysio_1_1notice__message}{notice\+\_\+message}} \&msg) const
+\item 
+void \mbox{\hyperlink{structsysio_1_1msg__handler_a6c1f4010823630ebc4ea8e3115c78171}{operator()}} (const \mbox{\hyperlink{structsysio_1_1request__message}{request\+\_\+message}} \&msg) const
+\item 
+void \mbox{\hyperlink{structsysio_1_1msg__handler_ae0f3f4a141219ed5ae251de9c45c516f}{operator()}} (const \mbox{\hyperlink{structsysio_1_1sync__request__message}{sync\+\_\+request\+\_\+message}} \&msg) const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacesysio_aefc0023f14362306826da768553b8daf}{connection\+\_\+ptr}} \mbox{\hyperlink{structsysio_1_1msg__handler_a7c5d1d9e8e86696137116019801eb4f7}{c}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l00807}{807}} of file \mbox{\hyperlink{net__plugin_8cpp_source}{net\+\_\+plugin.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structsysio_1_1msg__handler_a756e55a52a9b68de9a071cda28e98d7c}\index{sysio::msg\_handler@{sysio::msg\_handler}!msg\_handler@{msg\_handler}}
+\index{msg\_handler@{msg\_handler}!sysio::msg\_handler@{sysio::msg\_handler}}
+\doxysubsubsection{\texorpdfstring{msg\_handler()}{msg\_handler()}}
+{\footnotesize\ttfamily \label{structsysio_1_1msg__handler_a756e55a52a9b68de9a071cda28e98d7c} 
+sysio\+::msg\+\_\+handler\+::msg\+\_\+handler (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_aefc0023f14362306826da768553b8daf}{connection\+\_\+ptr}} \&}]{conn}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l00809}{809}} of file \mbox{\hyperlink{net__plugin_8cpp_source}{net\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00809\ :\ \mbox{\hyperlink{structsysio_1_1msg__handler_a7c5d1d9e8e86696137116019801eb4f7}{c}}(conn)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1msg__handler_a6d0525ab3ed502bac6f49b9c3acd98b0}\index{sysio::msg\_handler@{sysio::msg\_handler}!operator()@{operator()}}
+\index{operator()@{operator()}!sysio::msg\_handler@{sysio::msg\_handler}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}\hspace{0.1cm}{\footnotesize\ttfamily [1/8]}}
+{\footnotesize\ttfamily \label{structsysio_1_1msg__handler_a6d0525ab3ed502bac6f49b9c3acd98b0} 
+void sysio\+::msg\+\_\+handler\+::operator() (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain__size__message}{chain\+\_\+size\+\_\+message}} \&}]{msg}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l00822}{822}} of file \mbox{\hyperlink{net__plugin_8cpp_source}{net\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00822\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00823\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ continue\ call\ to\ handle\_message\ on\ connection\ strand}}
+\DoxyCodeLine{00824\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{net__plugin_8cpp_a051c62a0ec99dcd3e7a38fd03bec1fe0}{peer\_dlog}}(\ \mbox{\hyperlink{structsysio_1_1msg__handler_a7c5d1d9e8e86696137116019801eb4f7}{c}},\ \textcolor{stringliteral}{"{}handle\ chain\_size\_message"{}}\ );}
+\DoxyCodeLine{00825\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1msg__handler_a7c5d1d9e8e86696137116019801eb4f7}{c}}-\/>handle\_message(\ msg\ );}
+\DoxyCodeLine{00826\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1msg__handler_ad569047ec0e9b6066a0d0817362a3b5c}\index{sysio::msg\_handler@{sysio::msg\_handler}!operator()@{operator()}}
+\index{operator()@{operator()}!sysio::msg\_handler@{sysio::msg\_handler}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}\hspace{0.1cm}{\footnotesize\ttfamily [2/8]}}
+{\footnotesize\ttfamily \label{structsysio_1_1msg__handler_ad569047ec0e9b6066a0d0817362a3b5c} 
+void sysio\+::msg\+\_\+handler\+::operator() (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1go__away__message}{go\+\_\+away\+\_\+message}} \&}]{msg}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l00828}{828}} of file \mbox{\hyperlink{net__plugin_8cpp_source}{net\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00828\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00829\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ continue\ call\ to\ handle\_message\ on\ connection\ strand}}
+\DoxyCodeLine{00830\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{net__plugin_8cpp_a051c62a0ec99dcd3e7a38fd03bec1fe0}{peer\_dlog}}(\ \mbox{\hyperlink{structsysio_1_1msg__handler_a7c5d1d9e8e86696137116019801eb4f7}{c}},\ \textcolor{stringliteral}{"{}handle\ go\_away\_message"{}}\ );}
+\DoxyCodeLine{00831\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1msg__handler_a7c5d1d9e8e86696137116019801eb4f7}{c}}-\/>handle\_message(\ msg\ );}
+\DoxyCodeLine{00832\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1msg__handler_a1a1144831650bb92ccc04f700f667350}\index{sysio::msg\_handler@{sysio::msg\_handler}!operator()@{operator()}}
+\index{operator()@{operator()}!sysio::msg\_handler@{sysio::msg\_handler}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}\hspace{0.1cm}{\footnotesize\ttfamily [3/8]}}
+{\footnotesize\ttfamily \label{structsysio_1_1msg__handler_a1a1144831650bb92ccc04f700f667350} 
+void sysio\+::msg\+\_\+handler\+::operator() (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1handshake__message}{handshake\+\_\+message}} \&}]{msg}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l00816}{816}} of file \mbox{\hyperlink{net__plugin_8cpp_source}{net\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00816\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00817\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ continue\ call\ to\ handle\_message\ on\ connection\ strand}}
+\DoxyCodeLine{00818\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{net__plugin_8cpp_a051c62a0ec99dcd3e7a38fd03bec1fe0}{peer\_dlog}}(\ \mbox{\hyperlink{structsysio_1_1msg__handler_a7c5d1d9e8e86696137116019801eb4f7}{c}},\ \textcolor{stringliteral}{"{}handle\ handshake\_message"{}}\ );}
+\DoxyCodeLine{00819\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1msg__handler_a7c5d1d9e8e86696137116019801eb4f7}{c}}-\/>handle\_message(\ msg\ );}
+\DoxyCodeLine{00820\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1msg__handler_af3e9e9954bad7dfce56ba0daf31d6926}\index{sysio::msg\_handler@{sysio::msg\_handler}!operator()@{operator()}}
+\index{operator()@{operator()}!sysio::msg\_handler@{sysio::msg\_handler}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}\hspace{0.1cm}{\footnotesize\ttfamily [4/8]}}
+{\footnotesize\ttfamily \label{structsysio_1_1msg__handler_af3e9e9954bad7dfce56ba0daf31d6926} 
+void sysio\+::msg\+\_\+handler\+::operator() (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1notice__message}{notice\+\_\+message}} \&}]{msg}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l00840}{840}} of file \mbox{\hyperlink{net__plugin_8cpp_source}{net\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00840\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00841\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ continue\ call\ to\ handle\_message\ on\ connection\ strand}}
+\DoxyCodeLine{00842\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{net__plugin_8cpp_a051c62a0ec99dcd3e7a38fd03bec1fe0}{peer\_dlog}}(\ \mbox{\hyperlink{structsysio_1_1msg__handler_a7c5d1d9e8e86696137116019801eb4f7}{c}},\ \textcolor{stringliteral}{"{}handle\ notice\_message"{}}\ );}
+\DoxyCodeLine{00843\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1msg__handler_a7c5d1d9e8e86696137116019801eb4f7}{c}}-\/>handle\_message(\ msg\ );}
+\DoxyCodeLine{00844\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1msg__handler_a6c1f4010823630ebc4ea8e3115c78171}\index{sysio::msg\_handler@{sysio::msg\_handler}!operator()@{operator()}}
+\index{operator()@{operator()}!sysio::msg\_handler@{sysio::msg\_handler}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}\hspace{0.1cm}{\footnotesize\ttfamily [5/8]}}
+{\footnotesize\ttfamily \label{structsysio_1_1msg__handler_a6c1f4010823630ebc4ea8e3115c78171} 
+void sysio\+::msg\+\_\+handler\+::operator() (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1request__message}{request\+\_\+message}} \&}]{msg}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l00846}{846}} of file \mbox{\hyperlink{net__plugin_8cpp_source}{net\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00846\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00847\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ continue\ call\ to\ handle\_message\ on\ connection\ strand}}
+\DoxyCodeLine{00848\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{net__plugin_8cpp_a051c62a0ec99dcd3e7a38fd03bec1fe0}{peer\_dlog}}(\ \mbox{\hyperlink{structsysio_1_1msg__handler_a7c5d1d9e8e86696137116019801eb4f7}{c}},\ \textcolor{stringliteral}{"{}handle\ request\_message"{}}\ );}
+\DoxyCodeLine{00849\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1msg__handler_a7c5d1d9e8e86696137116019801eb4f7}{c}}-\/>handle\_message(\ msg\ );}
+\DoxyCodeLine{00850\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1msg__handler_ae0f3f4a141219ed5ae251de9c45c516f}\index{sysio::msg\_handler@{sysio::msg\_handler}!operator()@{operator()}}
+\index{operator()@{operator()}!sysio::msg\_handler@{sysio::msg\_handler}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}\hspace{0.1cm}{\footnotesize\ttfamily [6/8]}}
+{\footnotesize\ttfamily \label{structsysio_1_1msg__handler_ae0f3f4a141219ed5ae251de9c45c516f} 
+void sysio\+::msg\+\_\+handler\+::operator() (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1sync__request__message}{sync\+\_\+request\+\_\+message}} \&}]{msg}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l00852}{852}} of file \mbox{\hyperlink{net__plugin_8cpp_source}{net\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00852\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00853\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ continue\ call\ to\ handle\_message\ on\ connection\ strand}}
+\DoxyCodeLine{00854\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{net__plugin_8cpp_a051c62a0ec99dcd3e7a38fd03bec1fe0}{peer\_dlog}}(\ \mbox{\hyperlink{structsysio_1_1msg__handler_a7c5d1d9e8e86696137116019801eb4f7}{c}},\ \textcolor{stringliteral}{"{}handle\ sync\_request\_message"{}}\ );}
+\DoxyCodeLine{00855\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1msg__handler_a7c5d1d9e8e86696137116019801eb4f7}{c}}-\/>handle\_message(\ msg\ );}
+\DoxyCodeLine{00856\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1msg__handler_a604f597fd5dbf2d83ec91bfb5af27762}\index{sysio::msg\_handler@{sysio::msg\_handler}!operator()@{operator()}}
+\index{operator()@{operator()}!sysio::msg\_handler@{sysio::msg\_handler}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}\hspace{0.1cm}{\footnotesize\ttfamily [7/8]}}
+{\footnotesize\ttfamily \label{structsysio_1_1msg__handler_a604f597fd5dbf2d83ec91bfb5af27762} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+void sysio\+::msg\+\_\+handler\+::operator() (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l00812}{812}} of file \mbox{\hyperlink{net__plugin_8cpp_source}{net\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00812\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00813\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ \textcolor{keyword}{false},\ plugin\_config\_exception,\ \textcolor{stringliteral}{"{}Not\ implemented,\ call\ handle\_message\ directly\ instead"{}}\ );}
+\DoxyCodeLine{00814\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1msg__handler_af301b90fcb7a290198bb078e9082ebe6}\index{sysio::msg\_handler@{sysio::msg\_handler}!operator()@{operator()}}
+\index{operator()@{operator()}!sysio::msg\_handler@{sysio::msg\_handler}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}\hspace{0.1cm}{\footnotesize\ttfamily [8/8]}}
+{\footnotesize\ttfamily \label{structsysio_1_1msg__handler_af301b90fcb7a290198bb078e9082ebe6} 
+void sysio\+::msg\+\_\+handler\+::operator() (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1time__message}{time\+\_\+message}} \&}]{msg}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l00834}{834}} of file \mbox{\hyperlink{net__plugin_8cpp_source}{net\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00834\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00835\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ continue\ call\ to\ handle\_message\ on\ connection\ strand}}
+\DoxyCodeLine{00836\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{net__plugin_8cpp_a051c62a0ec99dcd3e7a38fd03bec1fe0}{peer\_dlog}}(\ \mbox{\hyperlink{structsysio_1_1msg__handler_a7c5d1d9e8e86696137116019801eb4f7}{c}},\ \textcolor{stringliteral}{"{}handle\ time\_message"{}}\ );}
+\DoxyCodeLine{00837\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1msg__handler_a7c5d1d9e8e86696137116019801eb4f7}{c}}-\/>handle\_message(\ msg\ );}
+\DoxyCodeLine{00838\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1msg__handler_a7c5d1d9e8e86696137116019801eb4f7}\index{sysio::msg\_handler@{sysio::msg\_handler}!c@{c}}
+\index{c@{c}!sysio::msg\_handler@{sysio::msg\_handler}}
+\doxysubsubsection{\texorpdfstring{c}{c}}
+{\footnotesize\ttfamily \label{structsysio_1_1msg__handler_a7c5d1d9e8e86696137116019801eb4f7} 
+\mbox{\hyperlink{namespacesysio_aefc0023f14362306826da768553b8daf}{connection\+\_\+ptr}} sysio\+::msg\+\_\+handler\+::c}
+
+
+
+Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l00808}{808}} of file \mbox{\hyperlink{net__plugin_8cpp_source}{net\+\_\+plugin.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+plugins/net\+\_\+plugin/\mbox{\hyperlink{net__plugin_8cpp}{net\+\_\+plugin.\+cpp}}\end{DoxyCompactItemize}

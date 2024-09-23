@@ -1,0 +1,536 @@
+\chapter{SAX}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2sax}{}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2sax}\index{SAX@{SAX}}
+The term "{}\+SAX"{} originated from \href{http://en.wikipedia.org/wiki/Simple_API_for_XML}{\texttt{ Simple API for XML}}. We borrowed this term for JSON parsing and generation.
+
+In Rapid\+JSON, {\ttfamily Reader} (typedef of {\ttfamily \doxylink{class_generic_reader}{Generic\+Reader}\texorpdfstring{$<$}{<}...\texorpdfstring{$>$}{>}}) is the SAX-\/style parser for JSON, and {\ttfamily \doxylink{class_writer}{Writer}} (typedef of {\ttfamily Generic\+Writer\texorpdfstring{$<$}{<}...\texorpdfstring{$>$}{>}}) is the SAX-\/style generator for JSON.\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2sax_8zh-cn_Reader}{}\doxysection{\texorpdfstring{Reader}{Reader}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2sax_8zh-cn_Reader}
+{\ttfamily Reader} parses a JSON from a stream. While it reads characters from the stream, it analyzes the characters according to the syntax of JSON, and publishes events to a handler.
+
+For example, here is a JSON.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\{}
+\DoxyCodeLine{\ \ \ \ "{}hello"{}:\ "{}world"{},}
+\DoxyCodeLine{\ \ \ \ "{}t"{}:\ true\ ,}
+\DoxyCodeLine{\ \ \ \ "{}f"{}:\ false,}
+\DoxyCodeLine{\ \ \ \ "{}n"{}:\ null,}
+\DoxyCodeLine{\ \ \ \ "{}i"{}:\ 123,}
+\DoxyCodeLine{\ \ \ \ "{}pi"{}:\ 3.1416,}
+\DoxyCodeLine{\ \ \ \ "{}a"{}:\ [1,\ 2,\ 3,\ 4]}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+When a {\ttfamily Reader} parses this JSON, it publishes the following events to the handler sequentially\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{StartObject()}
+\DoxyCodeLine{Key("{}hello"{},\ 5,\ true)}
+\DoxyCodeLine{String("{}world"{},\ 5,\ true)}
+\DoxyCodeLine{Key("{}t"{},\ 1,\ true)}
+\DoxyCodeLine{Bool(true)}
+\DoxyCodeLine{Key("{}f"{},\ 1,\ true)}
+\DoxyCodeLine{Bool(false)}
+\DoxyCodeLine{Key("{}n"{},\ 1,\ true)}
+\DoxyCodeLine{Null()}
+\DoxyCodeLine{Key("{}i"{})}
+\DoxyCodeLine{UInt(123)}
+\DoxyCodeLine{Key("{}pi"{})}
+\DoxyCodeLine{Double(3.1416)}
+\DoxyCodeLine{Key("{}a"{})}
+\DoxyCodeLine{StartArray()}
+\DoxyCodeLine{Uint(1)}
+\DoxyCodeLine{Uint(2)}
+\DoxyCodeLine{Uint(3)}
+\DoxyCodeLine{Uint(4)}
+\DoxyCodeLine{EndArray(4)}
+\DoxyCodeLine{EndObject(7)}
+
+\end{DoxyCode}
+
+
+These events can be easily matched with the JSON, but some event parameters need further explanation. Let\textquotesingle{}s see the {\ttfamily simplereader} example which produces exactly the same output as above\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{reader_8h}{rapidjson/reader.h}}"{}}}
+\DoxyCodeLine{\textcolor{preprocessor}{\#include\ <iostream>}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacerapidjson}{rapidjson}};}
+\DoxyCodeLine{\textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacestd}{std}};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_my_handler}{MyHandler}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{struct_base_reader_handler}{BaseReaderHandler}}<UTF8<>,\ MyHandler>\ \{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_my_handler_a73b14891ee0ab44fc336b3e2044e3153}{Null}}()\ \{\ cout\ <<\ \textcolor{stringliteral}{"{}Null()"{}}\ <<\ endl;\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_my_handler_a29eeca8918d0966a0551adb23c8a2b15}{Bool}}(\textcolor{keywordtype}{bool}\ b)\ \{\ cout\ <<\ \textcolor{stringliteral}{"{}Bool("{}}\ <<\ boolalpha\ <<\ b\ <<\ \textcolor{stringliteral}{"{})"{}}\ <<\ endl;\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_my_handler_aa7cda8307f15dd8f4a09947e527d56cf}{Int}}(\textcolor{keywordtype}{int}\ i)\ \{\ cout\ <<\ \textcolor{stringliteral}{"{}Int("{}}\ <<\ i\ <<\ \textcolor{stringliteral}{"{})"{}}\ <<\ endl;\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_my_handler_a469684e51df996bab87e0c22c0ea64fd}{Uint}}(\textcolor{keywordtype}{unsigned}\ u)\ \{\ cout\ <<\ \textcolor{stringliteral}{"{}Uint("{}}\ <<\ u\ <<\ \textcolor{stringliteral}{"{})"{}}\ <<\ endl;\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_my_handler_a5676446b090d3c71386aec6a39dbb188}{Int64}}(\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ i)\ \{\ cout\ <<\ \textcolor{stringliteral}{"{}Int64("{}}\ <<\ i\ <<\ \textcolor{stringliteral}{"{})"{}}\ <<\ endl;\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_my_handler_a87b2d8341b4e3a38d405a89fe0d848ad}{Uint64}}(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ u)\ \{\ cout\ <<\ \textcolor{stringliteral}{"{}Uint64("{}}\ <<\ u\ <<\ \textcolor{stringliteral}{"{})"{}}\ <<\ endl;\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_my_handler_a5ff39ea10f682eab1943480b020c6f5a}{Double}}(\textcolor{keywordtype}{double}\ d)\ \{\ cout\ <<\ \textcolor{stringliteral}{"{}Double("{}}\ <<\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ <<\ \textcolor{stringliteral}{"{})"{}}\ <<\ endl;\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_my_handler_a5f46e8498869668d70e23453126a7b12}{String}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ str,\ \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\ length,\ \textcolor{keywordtype}{bool}\ copy)\ \{\ }
+\DoxyCodeLine{\ \ \ \ \ \ \ \ cout\ <<\ \textcolor{stringliteral}{"{}String("{}}\ <<\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}\ <<\ \textcolor{stringliteral}{"{},\ "{}}\ <<\ length\ <<\ \textcolor{stringliteral}{"{},\ "{}}\ <<\ boolalpha\ <<\ \mbox{\hyperlink{namespacefc_a79771837fffd80fcc4bc658ee2fc4b2b}{copy}}\ <<\ \textcolor{stringliteral}{"{})"{}}\ <<\ endl;}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_my_handler_afc0da4321f0a06e3cd351e573c435ffe}{StartObject}}()\ \{\ cout\ <<\ \textcolor{stringliteral}{"{}StartObject()"{}}\ <<\ endl;\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_my_handler_afca1a3a16289baf03128fa7d63081526}{Key}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ str,\ \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\ length,\ \textcolor{keywordtype}{bool}\ copy)\ \{\ }
+\DoxyCodeLine{\ \ \ \ \ \ \ \ cout\ <<\ \textcolor{stringliteral}{"{}Key("{}}\ <<\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}\ <<\ \textcolor{stringliteral}{"{},\ "{}}\ <<\ length\ <<\ \textcolor{stringliteral}{"{},\ "{}}\ <<\ boolalpha\ <<\ \mbox{\hyperlink{namespacefc_a79771837fffd80fcc4bc658ee2fc4b2b}{copy}}\ <<\ \textcolor{stringliteral}{"{})"{}}\ <<\ endl;}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_my_handler_a3eb4011dcba95939e5f08e71c1596395}{EndObject}}(\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\ memberCount)\ \{\ cout\ <<\ \textcolor{stringliteral}{"{}EndObject("{}}\ <<\ memberCount\ <<\ \textcolor{stringliteral}{"{})"{}}\ <<\ endl;\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_my_handler_a1e794a6439658520bda0de14f661fc50}{StartArray}}()\ \{\ cout\ <<\ \textcolor{stringliteral}{"{}StartArray()"{}}\ <<\ endl;\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_my_handler_a8654e16efc52d41397ce1a9af98bcb80}{EndArray}}(\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\ elementCount)\ \{\ cout\ <<\ \textcolor{stringliteral}{"{}EndArray("{}}\ <<\ elementCount\ <<\ \textcolor{stringliteral}{"{})"{}}\ <<\ endl;\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \}}
+\DoxyCodeLine{\};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keywordtype}{void}\ \mbox{\hyperlink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}()\ \{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ json[]\ =\ \textcolor{stringliteral}{"{}\ \{\ \(\backslash\)"{}hello\(\backslash\)"{}\ :\ \(\backslash\)"{}world\(\backslash\)"{},\ \(\backslash\)"{}t\(\backslash\)"{}\ :\ true\ ,\ \(\backslash\)"{}f\(\backslash\)"{}\ :\ false,\ \(\backslash\)"{}n\(\backslash\)"{}:\ null,\ \(\backslash\)"{}i\(\backslash\)"{}:123,\ \(\backslash\)"{}pi\(\backslash\)"{}:\ 3.1416,\ \(\backslash\)"{}a\(\backslash\)"{}:[1,\ 2,\ 3,\ 4]\ \}\ "{}};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{struct_my_handler}{MyHandler}}\ handler;}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{class_generic_reader}{Reader}}\ reader;}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{struct_generic_string_stream}{StringStream}}\ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}(json);}
+\DoxyCodeLine{\ \ \ \ reader.\mbox{\hyperlink{class_generic_reader_a0c450620d14ff1824e58bb7bd9b42099}{Parse}}(ss,\ handler);}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+Note that Rapid\+JSON uses templates to statically bind the {\ttfamily Reader} type and the handler type, instead of using classes with virtual functions. This paradigm can improve performance by inlining functions.\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2sax_8zh-cn_Handler}{}\doxysubsection{\texorpdfstring{Handler}{Handler}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2sax_8zh-cn_Handler}
+As shown in the previous example, the user needs to implement a handler which consumes the events (via function calls) from the {\ttfamily Reader}. The handler must contain the following member functions.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{class\ }\mbox{\hyperlink{classrapidjson_1_1_handler}{Handler}}\ \{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{bool}\ Null();}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_bool}{Bool}}(\textcolor{keywordtype}{bool}\ b);}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacefc_1_1raw_a9aa92d9373bd4df708101483c4edd662}{Int}}(\textcolor{keywordtype}{int}\ i);}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{bool}\ Uint(\textcolor{keywordtype}{unsigned}\ i);}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacetesting_1_1internal_a271c563fec38b804ddab0677f51f70a8}{Int64}}(\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ i);}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{bool}\ Uint64(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ i);}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacetesting_1_1internal_a66a7579b1893b260c31dad577f7a5c48}{Double}}(\textcolor{keywordtype}{double}\ d);}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{bool}\ RawNumber(\textcolor{keyword}{const}\ \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}*\ str,\ \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\ length,\ \textcolor{keywordtype}{bool}\ copy);}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{bool}\ String(\textcolor{keyword}{const}\ \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}*\ str,\ \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\ length,\ \textcolor{keywordtype}{bool}\ copy);}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{bool}\ StartObject();}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{bool}\ Key(\textcolor{keyword}{const}\ \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}*\ str,\ \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\ length,\ \textcolor{keywordtype}{bool}\ copy);}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{bool}\ EndObject(\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\ memberCount);}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{bool}\ StartArray();}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{bool}\ EndArray(\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\ elementCount);}
+\DoxyCodeLine{\};}
+
+\end{DoxyCode}
+
+
+{\ttfamily Null()} is called when the {\ttfamily Reader} encounters a JSON null value.
+
+{\ttfamily \doxylink{struct_bool}{Bool(bool)}} is called when the {\ttfamily Reader} encounters a JSON true or false value.
+
+When the {\ttfamily Reader} encounters a JSON number, it chooses a suitable C++ type mapping. And then it calls {\itshape one} function out of {\ttfamily Int(int)}, {\ttfamily Uint(unsigned)}, {\ttfamily Int64(int64\+\_\+t)}, {\ttfamily Uint64(uint64\+\_\+t)} and {\ttfamily Double(double)}. If {\ttfamily k\+Parse\+Numbers\+As\+Strings} is enabled, {\ttfamily Reader} will always calls {\ttfamily Raw\+Number()} instead.
+
+{\ttfamily String(const char\texorpdfstring{$\ast$}{*} str, Size\+Type length, bool copy)} is called when the {\ttfamily Reader} encounters a string. The first parameter is pointer to the string. The second parameter is the length of the string (excluding the null terminator). Note that Rapid\+JSON supports null character {\ttfamily \textbackslash{}0} inside a string. If such situation happens, {\ttfamily strlen(str) \texorpdfstring{$<$}{<} length}. The last {\ttfamily copy} indicates whether the handler needs to make a copy of the string. For normal parsing, {\ttfamily copy = true}. Only when {\itshape insitu} parsing is used, {\ttfamily copy = false}. And be aware that the character type depends on the target encoding, which will be explained later.
+
+When the {\ttfamily Reader} encounters the beginning of an object, it calls {\ttfamily Start\+Object()}. An object in JSON is a set of name-\/value pairs. If the object contains members it first calls {\ttfamily Key()} for the name of member, and then calls functions depending on the type of the value. These calls of name-\/value pairs repeat until calling {\ttfamily End\+Object(\+Size\+Type member\+Count)}. Note that the {\ttfamily member\+Count} parameter is just an aid for the handler; users who do not need this parameter may ignore it.
+
+Arrays are similar to objects, but simpler. At the beginning of an array, the {\ttfamily Reader} calls {\ttfamily Begin\+Array()}. If there is elements, it calls functions according to the types of element. Similarly, in the last call {\ttfamily End\+Array(\+Size\+Type element\+Count)}, the parameter {\ttfamily element\+Count} is just an aid for the handler.
+
+Every handler function returns a {\ttfamily bool}. Normally it should return {\ttfamily true}. If the handler encounters an error, it can return {\ttfamily false} to notify the event publisher to stop further processing.
+
+For example, when we parse a JSON with {\ttfamily Reader} and the handler detects that the JSON does not conform to the required schema, the handler can return {\ttfamily false} and let the {\ttfamily Reader} stop further parsing. This will place the {\ttfamily Reader} in an error state, with error code {\ttfamily k\+Parse\+Error\+Termination}.\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2sax_8zh-cn_GenericReader}{}\doxysubsection{\texorpdfstring{Generic\+Reader}{Generic\+Reader}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2sax_8zh-cn_GenericReader}
+As mentioned before, {\ttfamily Reader} is a typedef of a template class {\ttfamily \doxylink{class_generic_reader}{Generic\+Reader}}\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacerapidjson}{rapidjson}}\ \{}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ SourceEncoding,\ \textcolor{keyword}{typename}\ TargetEncoding,\ \textcolor{keyword}{typename}\ Allocator\ =\ MemoryPoolAllocator<>\ >}
+\DoxyCodeLine{\textcolor{keyword}{class\ }\mbox{\hyperlink{class_generic_reader}{GenericReader}}\ \{}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ ...}}
+\DoxyCodeLine{\};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{typedef}\ \mbox{\hyperlink{class_generic_reader}{GenericReader<UTF8<>}},\ \mbox{\hyperlink{struct_u_t_f8}{UTF8<>}}\ >\ \mbox{\hyperlink{fwd_8h_ab7f1c1207749ff25c0d7f0cc88e62788}{Reader}};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\}\ \textcolor{comment}{//\ namespace\ rapidjson}}
+
+\end{DoxyCode}
+
+
+The {\ttfamily Reader} uses UTF-\/8 as both source and target encoding. The source encoding means the encoding in the JSON stream. The target encoding means the encoding of the {\ttfamily str} parameter in {\ttfamily String()} calls. For example, to parse a UTF-\/8 stream and output UTF-\/16 string events, you can define a reader by\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_reader}{GenericReader<UTF8<>}},\ \mbox{\hyperlink{struct_u_t_f16}{UTF16<>}}\ >\ reader;}
+
+\end{DoxyCode}
+
+
+Note that, the default character type of {\ttfamily \doxylink{struct_u_t_f16}{UTF16}} is {\ttfamily wchar\+\_\+t}. So this {\ttfamily reader} needs to call {\ttfamily String(const wchar\+\_\+t\texorpdfstring{$\ast$}{*}, Size\+Type, bool)} of the handler.
+
+The third template parameter {\ttfamily Allocator} is the allocator type for internal data structure (actually a stack).\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_8zh-cn_SaxParsing}{}\doxysubsection{\texorpdfstring{Parsing}{Parsing}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_8zh-cn_SaxParsing}
+The main function of {\ttfamily Reader} is used to parse JSON.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{template}\ <\textcolor{keywordtype}{unsigned}\ parseFlags,\ \textcolor{keyword}{typename}\ InputStream,\ \textcolor{keyword}{typename}\ Handler>}
+\DoxyCodeLine{\textcolor{keywordtype}{bool}\ Parse(InputStream\&\ is,\ \mbox{\hyperlink{classrapidjson_1_1_handler}{Handler}}\&\ handler);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ with\ parseFlags\ =\ kDefaultParseFlags}}
+\DoxyCodeLine{\textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ InputStream,\ \textcolor{keyword}{typename}\ Handler>}
+\DoxyCodeLine{\textcolor{keywordtype}{bool}\ Parse(InputStream\&\ is,\ \mbox{\hyperlink{classrapidjson_1_1_handler}{Handler}}\&\ handler);}
+
+\end{DoxyCode}
+
+
+If an error occurs during parsing, it will return {\ttfamily false}. User can also call {\ttfamily bool Has\+Parse\+Error()}, {\ttfamily Parse\+Error\+Code Get\+Parse\+Error\+Code()} and {\ttfamily size\+\_\+t Get\+Error\+Offset()} to obtain the error states. In fact, {\ttfamily Document} uses these {\ttfamily Reader} functions to obtain parse errors. Please refer to \doxylink{dom_8md}{DOM} for details about parse errors.\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2sax_TokenByTokenParsing}{}\doxysubsection{\texorpdfstring{Token-\/by-\/\+Token Parsing}{Token-\/by-\/\+Token Parsing}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2sax_TokenByTokenParsing}
+Some users may wish to parse a JSON input stream a single token at a time, instead of immediately parsing an entire document without stopping. To parse JSON this way, instead of calling {\ttfamily Parse}, you can use the {\ttfamily Iterative\+Parse} set of functions\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordtype}{void}\ IterativeParseInit();}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{template}\ <\textcolor{keywordtype}{unsigned}\ parseFlags,\ \textcolor{keyword}{typename}\ InputStream,\ \textcolor{keyword}{typename}\ Handler>}
+\DoxyCodeLine{\textcolor{keywordtype}{bool}\ IterativeParseNext(InputStream\&\ is,\ \mbox{\hyperlink{classrapidjson_1_1_handler}{Handler}}\&\ handler);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keywordtype}{bool}\ IterativeParseComplete();}
+
+\end{DoxyCode}
+
+
+Here is an example of iteratively parsing JSON, token by token\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{reader.\mbox{\hyperlink{class_generic_reader_a7de472eda2ad9de13cfd8c1de74f1754}{IterativeParseInit}}();}
+\DoxyCodeLine{\textcolor{keywordflow}{while}\ (!reader.\mbox{\hyperlink{class_generic_reader_aa1e9e1eef614fde971550ed2f955151d}{IterativeParseComplete}}())\ \{}
+\DoxyCodeLine{\ \ \ \ reader.\mbox{\hyperlink{class_generic_reader_a257891331e0c259903e7066fb4cebf92}{IterativeParseNext}}<\mbox{\hyperlink{reader_8h_ab7be7dabe6ffcba60fad441505583450a9104b0946d648e9467cb7a967401ec80}{kParseDefaultFlags}}>(is,\ handler);}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ Your\ handler\ has\ been\ called\ once.}}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2sax_8zh-cn_Writer}{}\doxysection{\texorpdfstring{Writer}{Writer}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2sax_8zh-cn_Writer}
+{\ttfamily Reader} converts (parses) JSON into events. {\ttfamily \doxylink{class_writer}{Writer}} does exactly the opposite. It converts events into JSON.
+
+{\ttfamily \doxylink{class_writer}{Writer}} is very easy to use. If your application only need to converts some data into JSON, it may be a good choice to use {\ttfamily \doxylink{class_writer}{Writer}} directly, instead of building a {\ttfamily Document} and then stringifying it with a {\ttfamily \doxylink{class_writer}{Writer}}.
+
+In {\ttfamily simplewriter} example, we do exactly the reverse of {\ttfamily simplereader}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{writer_8h}{rapidjson/writer.h}}"{}}}
+\DoxyCodeLine{\textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{stringbuffer_8h}{rapidjson/stringbuffer.h}}"{}}}
+\DoxyCodeLine{\textcolor{preprocessor}{\#include\ <iostream>}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacerapidjson}{rapidjson}};}
+\DoxyCodeLine{\textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacestd}{std}};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keywordtype}{void}\ \mbox{\hyperlink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}()\ \{}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{class_generic_string_buffer}{StringBuffer}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{class_writer}{Writer<StringBuffer>}}\ writer(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{\ \ \ \ }
+\DoxyCodeLine{\ \ \ \ writer.StartObject();}
+\DoxyCodeLine{\ \ \ \ writer.Key(\textcolor{stringliteral}{"{}hello"{}});}
+\DoxyCodeLine{\ \ \ \ writer.String(\textcolor{stringliteral}{"{}world"{}});}
+\DoxyCodeLine{\ \ \ \ writer.Key(\textcolor{stringliteral}{"{}t"{}});}
+\DoxyCodeLine{\ \ \ \ writer.Bool(\textcolor{keyword}{true});}
+\DoxyCodeLine{\ \ \ \ writer.Key(\textcolor{stringliteral}{"{}f"{}});}
+\DoxyCodeLine{\ \ \ \ writer.Bool(\textcolor{keyword}{false});}
+\DoxyCodeLine{\ \ \ \ writer.Key(\textcolor{stringliteral}{"{}n"{}});}
+\DoxyCodeLine{\ \ \ \ writer.Null();}
+\DoxyCodeLine{\ \ \ \ writer.Key(\textcolor{stringliteral}{"{}i"{}});}
+\DoxyCodeLine{\ \ \ \ writer.Uint(123);}
+\DoxyCodeLine{\ \ \ \ writer.Key(\textcolor{stringliteral}{"{}pi"{}});}
+\DoxyCodeLine{\ \ \ \ writer.Double(3.1416);}
+\DoxyCodeLine{\ \ \ \ writer.Key(\textcolor{stringliteral}{"{}a"{}});}
+\DoxyCodeLine{\ \ \ \ writer.StartArray();}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{unsigned}\ i\ =\ 0;\ i\ <\ 4;\ i++)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ writer.Uint(i);}
+\DoxyCodeLine{\ \ \ \ writer.EndArray();}
+\DoxyCodeLine{\ \ \ \ writer.EndObject();}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ cout\ <<\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.GetString()\ <<\ endl;}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\{"{}hello"{}:"{}world"{},"{}t"{}:true,"{}f"{}:false,"{}n"{}:null,"{}i"{}:123,"{}pi"{}:3.1416,"{}a"{}:[0,1,2,3]\}}
+
+\end{DoxyCode}
+
+
+There are two {\ttfamily String()} and {\ttfamily Key()} overloads. One is the same as defined in handler concept with 3 parameters. It can handle string with null characters. Another one is the simpler version used in the above example.
+
+Note that, the example code does not pass any parameters in {\ttfamily End\+Array()} and {\ttfamily End\+Object()}. An {\ttfamily Size\+Type} can be passed but it will be simply ignored by {\ttfamily \doxylink{class_writer}{Writer}}.
+
+You may doubt that, why not just using {\ttfamily sprintf()} or {\ttfamily std\+::stringstream} to build a JSON?
+
+There are various reasons\+:
+\begin{DoxyEnumerate}
+\item {\ttfamily \doxylink{class_writer}{Writer}} must output a well-\/formed JSON. If there is incorrect event sequence (e.\+g. {\ttfamily Int()} just after {\ttfamily Start\+Object()}), it generates assertion fail in debug mode.
+\item {\ttfamily \doxylink{class_writer_a8b4dc44f471403a83c9959575796ceab}{Writer\+::\+String()}} can handle string escaping (e.\+g. converting code point {\ttfamily U+000A} to {\ttfamily \textbackslash{}n}) and Unicode transcoding.
+\item {\ttfamily \doxylink{class_writer}{Writer}} handles number output consistently.
+\item {\ttfamily \doxylink{class_writer}{Writer}} implements the event handler concept. It can be used to handle events from {\ttfamily Reader}, {\ttfamily Document} or other event publisher.
+\item {\ttfamily \doxylink{class_writer}{Writer}} can be optimized for different platforms.
+\end{DoxyEnumerate}
+
+Anyway, using {\ttfamily \doxylink{class_writer}{Writer}} API is even simpler than generating a JSON by ad hoc methods.\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2sax_8zh-cn_WriterTemplate}{}\doxysubsection{\texorpdfstring{Template}{Template}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2sax_8zh-cn_WriterTemplate}
+{\ttfamily \doxylink{class_writer}{Writer}} has a minor design difference to {\ttfamily Reader}. {\ttfamily \doxylink{class_writer}{Writer}} is a template class, not a typedef. There is no {\ttfamily Generic\+Writer}. The following is the declaration.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacerapidjson}{rapidjson}}\ \{}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{template}<\textcolor{keyword}{typename}\ OutputStream,\ \textcolor{keyword}{typename}\ SourceEncoding\ =\ UTF8<>,\ \textcolor{keyword}{typename}\ TargetEncoding\ =\ UTF8<>,\ \textcolor{keyword}{typename}\ Allocator\ =\ CrtAllocator<>,\ \textcolor{keywordtype}{unsigned}\ writeFlags\ =\ kWriteDefaultFlags>}
+\DoxyCodeLine{\textcolor{keyword}{class\ }\mbox{\hyperlink{class_writer}{Writer}}\ \{}
+\DoxyCodeLine{\textcolor{keyword}{public}:}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{class_writer}{Writer}}(OutputStream\&\ os,\ \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}*\ allocator\ =\ 0,\ \textcolor{keywordtype}{size\_t}\ levelDepth\ =\ kDefaultLevelDepth)}
+\DoxyCodeLine{\textcolor{comment}{//\ ...}}
+\DoxyCodeLine{\};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\}\ \textcolor{comment}{//\ namespace\ rapidjson}}
+
+\end{DoxyCode}
+
+
+The {\ttfamily Output\+Stream} template parameter is the type of output stream. It cannot be deduced and must be specified by user.
+
+The {\ttfamily Source\+Encoding} template parameter specifies the encoding to be used in {\ttfamily String(const Ch\texorpdfstring{$\ast$}{*}, ...)}.
+
+The {\ttfamily Target\+Encoding} template parameter specifies the encoding in the output stream.
+
+The {\ttfamily Allocator} is the type of allocator, which is used for allocating internal data structure (a stack).
+
+The {\ttfamily write\+Flags} are combination of the following bit-\/flags\+:
+
+\tabulinesep=1mm
+\begin{longtabu}spread 0pt [c]{*{2}{|X[-1]}|}
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Parse flags   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Meaning    }\\\cline{1-2}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Parse flags   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Meaning    }\\\cline{1-2}
+\endhead
+{\ttfamily k\+Write\+No\+Flags}   &No flag is set.    \\\cline{1-2}
+{\ttfamily k\+Write\+Default\+Flags}   &Default write flags. It is equal to macro {\ttfamily RAPIDJSON\+\_\+\+WRITE\+\_\+\+DEFAULT\+\_\+\+FLAGS}, which is defined as {\ttfamily k\+Write\+No\+Flags}.    \\\cline{1-2}
+{\ttfamily k\+Write\+Validate\+Encoding\+Flag}   &Validate encoding of JSON strings.    \\\cline{1-2}
+{\ttfamily k\+Write\+Nan\+And\+Inf\+Flag}   &Allow writing of {\ttfamily Infinity}, {\ttfamily -\/Infinity} and {\ttfamily NaN}.   \\\cline{1-2}
+\end{longtabu}
+
+
+Besides, the constructor of {\ttfamily \doxylink{class_writer}{Writer}} has a {\ttfamily level\+Depth} parameter. This parameter affects the initial memory allocated for storing information per hierarchy level.\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2sax_8zh-cn_PrettyWriter}{}\doxysubsection{\texorpdfstring{Pretty\+Writer}{Pretty\+Writer}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2sax_8zh-cn_PrettyWriter}
+While the output of {\ttfamily \doxylink{class_writer}{Writer}} is the most condensed JSON without white-\/spaces, suitable for network transfer or storage, it is not easily readable by human.
+
+Therefore, Rapid\+JSON provides a {\ttfamily \doxylink{class_pretty_writer}{Pretty\+Writer}}, which adds indentation and line feeds in the output.
+
+The usage of {\ttfamily \doxylink{class_pretty_writer}{Pretty\+Writer}} is exactly the same as {\ttfamily \doxylink{class_writer}{Writer}}, expect that {\ttfamily \doxylink{class_pretty_writer}{Pretty\+Writer}} provides a {\ttfamily Set\+Indent(\+Ch indent\+Char, unsigned indent\+Char\+Count)} function. The default is 4 spaces.\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2sax_8zh-cn_CompletenessReset}{}\doxysubsection{\texorpdfstring{Completeness and Reset}{Completeness and Reset}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2sax_8zh-cn_CompletenessReset}
+\doxylink{struct_a}{A} {\ttfamily \doxylink{class_writer}{Writer}} can only output a single JSON, which can be any JSON type at the root. Once the singular event for root (e.\+g. {\ttfamily String()}), or the last matching {\ttfamily End\+Object()} or {\ttfamily End\+Array()} event, is handled, the output JSON is well-\/formed and complete. User can detect this state by calling {\ttfamily \doxylink{class_writer_a07d74d36dd3191b06e0aab678c246157}{Writer\+::\+Is\+Complete()}}.
+
+When a JSON is complete, the {\ttfamily \doxylink{class_writer}{Writer}} cannot accept any new events. Otherwise the output will be invalid (i.\+e. having more than one root). To reuse the {\ttfamily \doxylink{class_writer}{Writer}} object, user can call {\ttfamily \doxylink{class_writer_a8b53e8f137f7fcf694f5500711b3f58d}{Writer\+::\+Reset}(Output\+Stream\& os)} to reset all internal states of the {\ttfamily \doxylink{class_writer}{Writer}} with a new output stream.\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2sax_8zh-cn_SaxTechniques}{}\doxysection{\texorpdfstring{Techniques}{Techniques}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2sax_8zh-cn_SaxTechniques}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2sax_8zh-cn_CustomDataStructure}{}\doxysubsection{\texorpdfstring{Parsing JSON to Custom Data Structure}{Parsing JSON to Custom Data Structure}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2sax_8zh-cn_CustomDataStructure}
+{\ttfamily Document}\textquotesingle{}s parsing capability is completely based on {\ttfamily Reader}. Actually {\ttfamily Document} is a handler which receives events from a reader to build a DOM during parsing.
+
+User may uses {\ttfamily Reader} to build other data structures directly. This eliminates building of DOM, thus reducing memory and improving performance.
+
+In the following {\ttfamily messagereader} example, {\ttfamily Parse\+Messages()} parses a JSON which should be an object with key-\/string pairs.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{reader_8h}{rapidjson/reader.h}}"{}}}
+\DoxyCodeLine{\textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{en_8h}{rapidjson/error/en.h}}"{}}}
+\DoxyCodeLine{\textcolor{preprocessor}{\#include\ <iostream>}}
+\DoxyCodeLine{\textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{\textcolor{preprocessor}{\#include\ <map>}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacestd}{std}};}
+\DoxyCodeLine{\textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacerapidjson}{rapidjson}};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{typedef}\ map<string,\ string>\ \mbox{\hyperlink{messagereader_8cpp_ae2c5980b5eb04369faa7f72447e6d664}{MessageMap}};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_message_handler}{MessageHandler}}}
+\DoxyCodeLine{\ \ \ \ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{struct_base_reader_handler}{BaseReaderHandler}}<UTF8<>,\ MessageHandler>\ \{}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{struct_message_handler_a4f6165a34fa3a4de7021e7e5cd7fd4f6}{MessageHandler}}()\ :\ \mbox{\hyperlink{struct_message_handler_a927d3ae4618ed37e3904ff673fdd3768}{state\_}}(\mbox{\hyperlink{struct_message_handler_a704e2a1bc5f7a4644998112cba61db2ca43d4b1361a039d9a3223b2407ed5b506}{kExpectObjectStart}})\ \{}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_message_handler_a3d7e691831748287252e10ced02061f5}{StartObject}}()\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (\mbox{\hyperlink{struct_message_handler_a927d3ae4618ed37e3904ff673fdd3768}{state\_}})\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{struct_message_handler_a704e2a1bc5f7a4644998112cba61db2ca43d4b1361a039d9a3223b2407ed5b506}{kExpectObjectStart}}:}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_message_handler_a927d3ae4618ed37e3904ff673fdd3768}{state\_}}\ =\ \mbox{\hyperlink{struct_message_handler_a704e2a1bc5f7a4644998112cba61db2ca70008d18048772c50a2226a6e592c7db}{kExpectNameOrObjectEnd}};}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_message_handler_ab9de0f0bd0666b805563cb3f86ef3fc0}{String}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ str,\ \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\ length,\ \textcolor{keywordtype}{bool})\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (\mbox{\hyperlink{struct_message_handler_a927d3ae4618ed37e3904ff673fdd3768}{state\_}})\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{struct_message_handler_a704e2a1bc5f7a4644998112cba61db2ca70008d18048772c50a2226a6e592c7db}{kExpectNameOrObjectEnd}}:}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_message_handler_a7a61cf6c752b8829eb9c058341617c69}{name\_}}\ =\ string(str,\ length);}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_message_handler_a927d3ae4618ed37e3904ff673fdd3768}{state\_}}\ =\ \mbox{\hyperlink{struct_message_handler_a704e2a1bc5f7a4644998112cba61db2ca6f46eb7d062c953ecb1a28a471908568}{kExpectValue}};}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{struct_message_handler_a704e2a1bc5f7a4644998112cba61db2ca6f46eb7d062c953ecb1a28a471908568}{kExpectValue}}:}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_message_handler_a628b5a49349a2027c84ffb4f6249fa51}{messages\_}}.insert(MessageMap::value\_type(\mbox{\hyperlink{struct_message_handler_a7a61cf6c752b8829eb9c058341617c69}{name\_}},\ \textcolor{keywordtype}{string}(str,\ length)));}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_message_handler_a927d3ae4618ed37e3904ff673fdd3768}{state\_}}\ =\ \mbox{\hyperlink{struct_message_handler_a704e2a1bc5f7a4644998112cba61db2ca70008d18048772c50a2226a6e592c7db}{kExpectNameOrObjectEnd}};}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_message_handler_ab423864fd5ca806d4211c03acbdad67b}{EndObject}}(\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}})\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_message_handler_a927d3ae4618ed37e3904ff673fdd3768}{state\_}}\ ==\ \mbox{\hyperlink{struct_message_handler_a704e2a1bc5f7a4644998112cba61db2ca70008d18048772c50a2226a6e592c7db}{kExpectNameOrObjectEnd}};\ \}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_message_handler_a3ab79ae50d26d5b3fb62a9bab58c21bb}{Default}}()\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};\ \}\ \textcolor{comment}{//\ All\ other\ events\ are\ invalid.}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{messagereader_8cpp_ae2c5980b5eb04369faa7f72447e6d664}{MessageMap}}\ \mbox{\hyperlink{struct_message_handler_a628b5a49349a2027c84ffb4f6249fa51}{messages\_}};}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{enum}\ State\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_message_handler_a704e2a1bc5f7a4644998112cba61db2ca43d4b1361a039d9a3223b2407ed5b506}{kExpectObjectStart}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_message_handler_a704e2a1bc5f7a4644998112cba61db2ca70008d18048772c50a2226a6e592c7db}{kExpectNameOrObjectEnd}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_message_handler_a704e2a1bc5f7a4644998112cba61db2ca6f46eb7d062c953ecb1a28a471908568}{kExpectValue}},}
+\DoxyCodeLine{\ \ \ \ \}\mbox{\hyperlink{struct_message_handler_a927d3ae4618ed37e3904ff673fdd3768}{state\_}};}
+\DoxyCodeLine{\ \ \ \ std::string\ \mbox{\hyperlink{struct_message_handler_a7a61cf6c752b8829eb9c058341617c69}{name\_}};}
+\DoxyCodeLine{\};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keywordtype}{void}\ ParseMessages(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ json,\ \mbox{\hyperlink{messagereader_8cpp_ae2c5980b5eb04369faa7f72447e6d664}{MessageMap}}\&\ messages)\ \{}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{class_generic_reader}{Reader}}\ reader;}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{struct_message_handler}{MessageHandler}}\ handler;}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{struct_generic_string_stream}{StringStream}}\ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}(json);}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{if}\ (reader.\mbox{\hyperlink{class_generic_reader_a0c450620d14ff1824e58bb7bd9b42099}{Parse}}(ss,\ handler))}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ messages.swap(handler.\mbox{\hyperlink{struct_message_handler_a628b5a49349a2027c84ffb4f6249fa51}{messages\_}});\ \ \ \textcolor{comment}{//\ Only\ change\ it\ if\ success.}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_ga8d4b32dfc45840bca189ade2bbcb6ba7}{ParseErrorCode}}\ e\ =\ reader.\mbox{\hyperlink{class_generic_reader_a937bf90919f50e1c370b312cee5833e8}{GetParseErrorCode}}();}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ o\ =\ reader.\mbox{\hyperlink{class_generic_reader_ae9008523ccd06d839a57335835cb4091}{GetErrorOffset}}();}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ cout\ <<\ \textcolor{stringliteral}{"{}Error:\ "{}}\ <<\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_ga28835eb93d2c3c07bbea13515eb31415}{GetParseError\_En}}(e)\ <<\ endl;;}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ cout\ <<\ \textcolor{stringliteral}{"{}\ at\ offset\ "{}}\ <<\ o\ <<\ \textcolor{stringliteral}{"{}\ near\ '"{}}\ <<\ string(json).substr(o,\ 10)\ <<\ \textcolor{stringliteral}{"{}...'"{}}\ <<\ endl;}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{\}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keywordtype}{int}\ \mbox{\hyperlink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}()\ \{}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{messagereader_8cpp_ae2c5980b5eb04369faa7f72447e6d664}{MessageMap}}\ messages;}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ json1\ =\ \textcolor{stringliteral}{"{}\{\ \(\backslash\)"{}greeting\(\backslash\)"{}\ :\ \(\backslash\)"{}Hello!\(\backslash\)"{},\ \(\backslash\)"{}farewell\(\backslash\)"{}\ :\ \(\backslash\)"{}bye-\/bye!\(\backslash\)"{}\ \}"{}};}
+\DoxyCodeLine{\ \ \ \ cout\ <<\ json1\ <<\ endl;}
+\DoxyCodeLine{\ \ \ \ ParseMessages(json1,\ messages);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{for}\ (MessageMap::const\_iterator\ itr\ =\ messages.begin();\ itr\ !=\ messages.end();\ ++itr)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ cout\ <<\ itr-\/>first\ <<\ \textcolor{stringliteral}{"{}:\ "{}}\ <<\ itr-\/>second\ <<\ endl;}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ cout\ <<\ endl\ <<\ \textcolor{stringliteral}{"{}Parse\ a\ JSON\ with\ invalid\ schema."{}}\ <<\ endl;}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ json2\ =\ \textcolor{stringliteral}{"{}\{\ \(\backslash\)"{}greeting\(\backslash\)"{}\ :\ \(\backslash\)"{}Hello!\(\backslash\)"{},\ \(\backslash\)"{}farewell\(\backslash\)"{}\ :\ \(\backslash\)"{}bye-\/bye!\(\backslash\)"{},\ \(\backslash\)"{}foo\(\backslash\)"{}\ :\ \{\}\ \}"{}};}
+\DoxyCodeLine{\ \ \ \ cout\ <<\ json2\ <<\ endl;}
+\DoxyCodeLine{\ \ \ \ ParseMessages(json2,\ messages);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\{\ "{}greeting"{}\ :\ "{}Hello!"{},\ "{}farewell"{}\ :\ "{}bye-\/bye!"{}\ \}}
+\DoxyCodeLine{farewell:\ bye-\/bye!}
+\DoxyCodeLine{greeting:\ Hello!}
+\DoxyCodeLine{}
+\DoxyCodeLine{Parse\ a\ JSON\ with\ invalid\ schema.}
+\DoxyCodeLine{\{\ "{}greeting"{}\ :\ "{}Hello!"{},\ "{}farewell"{}\ :\ "{}bye-\/bye!"{},\ "{}foo"{}\ :\ \{\}\ \}}
+\DoxyCodeLine{Error:\ Terminate\ parsing\ due\ to\ Handler\ error.}
+\DoxyCodeLine{\ at\ offset\ 59\ near\ '\}\ \}...'}
+
+\end{DoxyCode}
+
+
+The first JSON ({\ttfamily json1}) was successfully parsed into {\ttfamily Message\+Map}. Since {\ttfamily Message\+Map} is a {\ttfamily std\+::map}, the printing order are sorted by the key. This order is different from the JSON\textquotesingle{}s order.
+
+In the second JSON ({\ttfamily json2}), {\ttfamily foo}\textquotesingle{}s value is an empty object. As it is an object, {\ttfamily \doxylink{struct_message_handler_a3d7e691831748287252e10ced02061f5}{Message\+Handler\+::\+Start\+Object()}} will be called. However, at that moment {\ttfamily state\+\_\+ = k\+Expect\+Value}, so that function returns {\ttfamily false} and cause the parsing process be terminated. The error code is {\ttfamily k\+Parse\+Error\+Termination}.\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2sax_8zh-cn_Filtering}{}\doxysubsection{\texorpdfstring{Filtering of JSON}{Filtering of JSON}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2sax_8zh-cn_Filtering}
+As mentioned earlier, {\ttfamily \doxylink{class_writer}{Writer}} can handle the events published by {\ttfamily Reader}. {\ttfamily condense} example simply set a {\ttfamily \doxylink{class_writer}{Writer}} as handler of a {\ttfamily Reader}, so it can remove all white-\/spaces in JSON. {\ttfamily pretty} example uses the same relationship, but replacing {\ttfamily \doxylink{class_writer}{Writer}} by {\ttfamily \doxylink{class_pretty_writer}{Pretty\+Writer}}. So {\ttfamily pretty} can be used to reformat a JSON with indentation and line feed.
+
+Actually, we can add intermediate layer(s) to filter the contents of JSON via these SAX-\/style API. For example, {\ttfamily capitalize} example capitalize all strings in a JSON.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{reader_8h}{rapidjson/reader.h}}"{}}}
+\DoxyCodeLine{\textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{writer_8h}{rapidjson/writer.h}}"{}}}
+\DoxyCodeLine{\textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{filereadstream_8h}{rapidjson/filereadstream.h}}"{}}}
+\DoxyCodeLine{\textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{filewritestream_8h}{rapidjson/filewritestream.h}}"{}}}
+\DoxyCodeLine{\textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{en_8h}{rapidjson/error/en.h}}"{}}}
+\DoxyCodeLine{\textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{\textcolor{preprocessor}{\#include\ <cctype>}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacerapidjson}{rapidjson}};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{template}<\textcolor{keyword}{typename}\ OutputHandler>}
+\DoxyCodeLine{\textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_capitalize_filter}{CapitalizeFilter}}\ \{}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{struct_capitalize_filter_afe978f33a2f30a84a9e69cc91fe2da6d}{CapitalizeFilter}}(OutputHandler\&\ out)\ :\ \mbox{\hyperlink{struct_capitalize_filter_a76bff3d685698cd6ab2e4cbb84bbf011}{out\_}}(out),\ \mbox{\hyperlink{struct_capitalize_filter_a6e05d2941c11423da2dbb3ab8eb2367d}{buffer\_}}()\ \{}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_capitalize_filter_a8638839428a447d47711a4b367dc13a4}{Null}}()\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_capitalize_filter_a76bff3d685698cd6ab2e4cbb84bbf011}{out\_}}.Null();\ \}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_capitalize_filter_a957038be10025563a35ad32ab9d78418}{Bool}}(\textcolor{keywordtype}{bool}\ b)\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_capitalize_filter_a76bff3d685698cd6ab2e4cbb84bbf011}{out\_}}.Bool(b);\ \}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_capitalize_filter_a5eec489885ed7f982ea66caf8d557210}{Int}}(\textcolor{keywordtype}{int}\ i)\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_capitalize_filter_a76bff3d685698cd6ab2e4cbb84bbf011}{out\_}}.Int(i);\ \}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_capitalize_filter_a0e1d475eec0129d65fd7b2c06878e445}{Uint}}(\textcolor{keywordtype}{unsigned}\ u)\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_capitalize_filter_a76bff3d685698cd6ab2e4cbb84bbf011}{out\_}}.Uint(u);\ \}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_capitalize_filter_a5ab3ec8eba2a56f595bf10e2f63c0446}{Int64}}(\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ i)\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_capitalize_filter_a76bff3d685698cd6ab2e4cbb84bbf011}{out\_}}.Int64(i);\ \}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_capitalize_filter_a603a8c709c0009d7b21dbb20a570bac7}{Uint64}}(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ u)\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_capitalize_filter_a76bff3d685698cd6ab2e4cbb84bbf011}{out\_}}.Uint64(u);\ \}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_capitalize_filter_a1c21df7948456b3ae679db9d1a190249}{Double}}(\textcolor{keywordtype}{double}\ d)\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_capitalize_filter_a76bff3d685698cd6ab2e4cbb84bbf011}{out\_}}.Double(d);\ \}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_capitalize_filter_a471c199da18ca411550e703a6256abd8}{RawNumber}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ str,\ \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\ length,\ \textcolor{keywordtype}{bool}\ copy)\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_capitalize_filter_a76bff3d685698cd6ab2e4cbb84bbf011}{out\_}}.RawNumber(str,\ length,\ copy);\ \}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_capitalize_filter_a9888a3eadb5297cc06b76df470767b48}{String}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ str,\ \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\ length,\ \textcolor{keywordtype}{bool})\ \{\ }
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_capitalize_filter_a6e05d2941c11423da2dbb3ab8eb2367d}{buffer\_}}.clear();}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\ i\ =\ 0;\ i\ <\ length;\ i++)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_capitalize_filter_a6e05d2941c11423da2dbb3ab8eb2367d}{buffer\_}}.push\_back(std::toupper(str[i]));}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_capitalize_filter_a76bff3d685698cd6ab2e4cbb84bbf011}{out\_}}.String(\&\mbox{\hyperlink{struct_capitalize_filter_a6e05d2941c11423da2dbb3ab8eb2367d}{buffer\_}}.front(),\ length,\ \textcolor{keyword}{true});\ \textcolor{comment}{//\ true\ =\ output\ handler\ need\ to\ copy\ the\ string}}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_capitalize_filter_ab21677e0794b7414ff0fec27f6599095}{StartObject}}()\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_capitalize_filter_a76bff3d685698cd6ab2e4cbb84bbf011}{out\_}}.StartObject();\ \}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_capitalize_filter_abe3c83f43cbb9ff7ff0e5fdabee79b21}{Key}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ str,\ \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\ length,\ \textcolor{keywordtype}{bool}\ copy)\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_capitalize_filter_a9888a3eadb5297cc06b76df470767b48}{String}}(str,\ length,\ copy);\ \}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_capitalize_filter_aea1d83e92b986264e04314ea2259207d}{EndObject}}(\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\ memberCount)\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_capitalize_filter_a76bff3d685698cd6ab2e4cbb84bbf011}{out\_}}.EndObject(memberCount);\ \}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_capitalize_filter_ac6c50b5828bb848fbc98b92c2f432e9f}{StartArray}}()\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_capitalize_filter_a76bff3d685698cd6ab2e4cbb84bbf011}{out\_}}.StartArray();\ \}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_capitalize_filter_a3d7092e115d0b3f0a277da8487eff4d4}{EndArray}}(\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\ elementCount)\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_capitalize_filter_a76bff3d685698cd6ab2e4cbb84bbf011}{out\_}}.EndArray(elementCount);\ \}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ OutputHandler\&\ \mbox{\hyperlink{struct_capitalize_filter_a76bff3d685698cd6ab2e4cbb84bbf011}{out\_}};}
+\DoxyCodeLine{\ \ \ \ std::vector<char>\ \mbox{\hyperlink{struct_capitalize_filter_a6e05d2941c11423da2dbb3ab8eb2367d}{buffer\_}};}
+\DoxyCodeLine{\};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keywordtype}{int}\ \mbox{\hyperlink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}(\textcolor{keywordtype}{int},\ \textcolor{keywordtype}{char}*[])\ \{}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ Prepare\ JSON\ reader\ and\ input\ stream.}}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{class_generic_reader}{Reader}}\ reader;}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{char}\ readBuffer[65536];}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{class_file_read_stream}{FileReadStream}}\ is(stdin,\ readBuffer,\ \textcolor{keyword}{sizeof}(readBuffer));}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ Prepare\ JSON\ writer\ and\ output\ stream.}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{char}\ writeBuffer[65536];}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{class_file_write_stream}{FileWriteStream}}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}(stdout,\ writeBuffer,\ \textcolor{keyword}{sizeof}(writeBuffer));}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{class_writer}{Writer<FileWriteStream>}}\ writer(os);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ JSON\ reader\ parse\ from\ the\ input\ stream\ and\ let\ writer\ generate\ the\ output.}}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{struct_capitalize_filter}{CapitalizeFilter<Writer<FileWriteStream>}}\ >\ filter(writer);}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{if}\ (!reader.\mbox{\hyperlink{class_generic_reader_a0c450620d14ff1824e58bb7bd9b42099}{Parse}}(is,\ filter))\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}\(\backslash\)nError(\%u):\ \%s\(\backslash\)n"{}},\ (\textcolor{keywordtype}{unsigned})reader.\mbox{\hyperlink{class_generic_reader_ae9008523ccd06d839a57335835cb4091}{GetErrorOffset}}(),\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_ga28835eb93d2c3c07bbea13515eb31415}{GetParseError\_En}}(reader.\mbox{\hyperlink{class_generic_reader_a937bf90919f50e1c370b312cee5833e8}{GetParseErrorCode}}()));}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+Note that, it is incorrect to simply capitalize the JSON as a string. For example\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{["{}Hello\(\backslash\)nWorld"{}]}
+
+\end{DoxyCode}
+
+
+Simply capitalizing the whole JSON would contain incorrect escape character\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{["{}HELLO\(\backslash\)NWORLD"{}]}
+
+\end{DoxyCode}
+
+
+The correct result by {\ttfamily capitalize}\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{["{}HELLO\(\backslash\)nWORLD"{}]}
+
+\end{DoxyCode}
+
+
+More complicated filters can be developed. However, since SAX-\/style API can only provide information about a single event at a time, user may need to book-\/keeping the contextual information (e.\+g. the path from root value, storage of other related values). Some processing may be easier to be implemented in DOM than SAX. 

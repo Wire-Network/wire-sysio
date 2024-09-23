@@ -1,0 +1,59 @@
+\doxysection{libraries/sys-\/vm/external/\+Catch2/include/internal/catch\+\_\+benchmark.h File Reference}
+\hypertarget{catch__benchmark_8h}{}\label{catch__benchmark_8h}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_benchmark.h@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_benchmark.h}}
+{\ttfamily \#include "{}catch\+\_\+stringref.\+h"{}}\newline
+{\ttfamily \#include "{}catch\+\_\+timer.\+h"{}}\newline
+{\ttfamily \#include $<$cstdint$>$}\newline
+{\ttfamily \#include $<$string$>$}\newline
+Include dependency graph for catch\+\_\+benchmark.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{catch__benchmark_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{catch__benchmark_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{class_catch_1_1_benchmark_looper}{Catch\+::\+Benchmark\+Looper}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespace_catch}{Catch}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{catch__benchmark_8h_aaba0eec6ef0736ca2b022a98a7c855e4}{BENCHMARK}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{catch__benchmark_8h_aaba0eec6ef0736ca2b022a98a7c855e4}\index{catch\_benchmark.h@{catch\_benchmark.h}!BENCHMARK@{BENCHMARK}}
+\index{BENCHMARK@{BENCHMARK}!catch\_benchmark.h@{catch\_benchmark.h}}
+\doxysubsubsection{\texorpdfstring{BENCHMARK}{BENCHMARK}}
+{\footnotesize\ttfamily \label{catch__benchmark_8h_aaba0eec6ef0736ca2b022a98a7c855e4} 
+\#define BENCHMARK(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{for}(\ \mbox{\hyperlink{class_catch_1_1_benchmark_looper}{Catch::BenchmarkLooper}}\ looper(\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ );\ looper;\ looper.\mbox{\hyperlink{class_catch_1_1_benchmark_looper_a210552aff5b19408637444d4bb35d59c}{increment}}()\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__benchmark_8h_source_l00054}{54}} of file \mbox{\hyperlink{catch__benchmark_8h_source}{catch\+\_\+benchmark.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00054\ \textcolor{preprocessor}{\#define\ BENCHMARK(\ name\ )\ \(\backslash\)}}
+\DoxyCodeLine{00055\ \textcolor{preprocessor}{\ \ \ \ for(\ Catch::BenchmarkLooper\ looper(\ name\ );\ looper;\ looper.increment()\ )}}
+
+\end{DoxyCode}

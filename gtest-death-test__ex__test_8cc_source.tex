@@ -1,0 +1,99 @@
+\doxysection{gtest-\/death-\/test\+\_\+ex\+\_\+test.cc}
+\hypertarget{gtest-death-test__ex__test_8cc_source}{}\label{gtest-death-test__ex__test_8cc_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/test/gtest-\/death-\/test\_ex\_test.cc@{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/test/gtest-\/death-\/test\_ex\_test.cc}}
+\mbox{\hyperlink{gtest-death-test__ex__test_8cc}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00001}00001\ \textcolor{comment}{//\ Copyright\ 2010,\ Google\ Inc.}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00002}00002\ \textcolor{comment}{//\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00003}00003\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00004}00004\ \textcolor{comment}{//\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00005}00005\ \textcolor{comment}{//\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00006}00006\ \textcolor{comment}{//\ met:}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00007}00007\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00008}00008\ \textcolor{comment}{//\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00009}00009\ \textcolor{comment}{//\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00010}00010\ \textcolor{comment}{//\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00011}00011\ \textcolor{comment}{//\ copyright\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00012}00012\ \textcolor{comment}{//\ in\ the\ documentation\ and/or\ other\ materials\ provided\ with\ the}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00013}00013\ \textcolor{comment}{//\ distribution.}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00014}00014\ \textcolor{comment}{//\ \ \ \ \ *\ Neither\ the\ name\ of\ Google\ Inc.\ nor\ the\ names\ of\ its}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00015}00015\ \textcolor{comment}{//\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products\ derived\ from}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00016}00016\ \textcolor{comment}{//\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00017}00017\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00018}00018\ \textcolor{comment}{//\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00019}00019\ \textcolor{comment}{//\ "{}AS\ IS"{}\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00020}00020\ \textcolor{comment}{//\ LIMITED\ TO,\ THE\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00021}00021\ \textcolor{comment}{//\ A\ PARTICULAR\ PURPOSE\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ THE\ COPYRIGHT}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00022}00022\ \textcolor{comment}{//\ OWNER\ OR\ CONTRIBUTORS\ BE\ LIABLE\ FOR\ ANY\ DIRECT,\ INDIRECT,\ INCIDENTAL,}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00023}00023\ \textcolor{comment}{//\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES\ (INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00024}00024\ \textcolor{comment}{//\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;\ LOSS\ OF\ USE,}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00025}00025\ \textcolor{comment}{//\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND\ ON\ ANY}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00026}00026\ \textcolor{comment}{//\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00027}00027\ \textcolor{comment}{//\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00028}00028\ \textcolor{comment}{//\ OF\ THIS\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00029}00029\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00030}00030\ \textcolor{comment}{//\ Author:\ vladl@google.com\ (Vlad\ Losev)}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00031}00031\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00032}00032\ \textcolor{comment}{//\ Tests\ that\ verify\ interaction\ of\ exceptions\ and\ death\ tests.}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00034}00034\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{gtest-death-test_8h}{gtest/gtest-\/death-\/test.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00035}00035\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{gtest_8h}{gtest/gtest.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00037}00037\ \textcolor{preprocessor}{\#if\ GTEST\_HAS\_DEATH\_TEST}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00039}00039\ \textcolor{preprocessor}{\#\ if\ GTEST\_HAS\_SEH}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00040}00040\ \textcolor{preprocessor}{\#\ \ include\ <windows.h>}\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ For\ RaiseException().}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00041}00041\ \textcolor{preprocessor}{\#\ endif}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00043}00043\ \textcolor{preprocessor}{\#\ include\ "{}\mbox{\hyperlink{gtest-spi_8h}{gtest/gtest-\/spi.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00045}00045\ \textcolor{preprocessor}{\#\ if\ GTEST\_HAS\_EXCEPTIONS}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00047}00047\ \textcolor{preprocessor}{\#\ \ include\ <exception>}\ \ \textcolor{comment}{//\ For\ std::exception.}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00049}00049\ \textcolor{comment}{//\ Tests\ that\ death\ tests\ report\ thrown\ exceptions\ as\ failures\ and\ that\ the}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00050}00050\ \textcolor{comment}{//\ exceptions\ do\ not\ escape\ death\ test\ macros.}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00051}00051\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(CxxExceptionDeathTest,\ ExceptionIsFailure)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00052}00052\ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00053}00053\ \ \ \ \ \mbox{\hyperlink{gtest-spi_8h_a8376fd6821bd88fd806697355e79e138}{EXPECT\_NONFATAL\_FAILURE}}(EXPECT\_DEATH(\textcolor{keywordflow}{throw}\ 1,\ \textcolor{stringliteral}{"{}"{}}),\ \textcolor{stringliteral}{"{}threw\ an\ exception"{}});}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00054}00054\ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{\ \ \textcolor{comment}{//\ NOLINT}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00055}00055\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a3e26a8d27caa386ed0ea7ce9d5b7c4ed}{FAIL}}()\ <<\ \textcolor{stringliteral}{"{}An\ exception\ escaped\ a\ death\ test\ macro\ invocation\ "{}}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}with\ catch\_exceptions\ "{}}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \ \ <<\ (testing::GTEST\_FLAG(catch\_exceptions)\ ?\ \textcolor{stringliteral}{"{}enabled"{}}\ :\ \textcolor{stringliteral}{"{}disabled"{}});}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00058}00058\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00059}00059\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00061}00061\ \textcolor{keyword}{class\ }TestException\ :\ \textcolor{keyword}{public}\ std::exception\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00062}00062\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00063}00063\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ what()\ \textcolor{keyword}{const}\ throw()\ \{\ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}exceptional\ message"{}};\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00064}00064\ \};}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00066}00066\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(CxxExceptionDeathTest,\ PrintsMessageForStdExceptions)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00067}00067\ \ \ \textcolor{comment}{//\ Verifies\ that\ the\ exception\ message\ is\ quoted\ in\ the\ failure\ text.}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00068}00068\ \ \ \mbox{\hyperlink{gtest-spi_8h_a8376fd6821bd88fd806697355e79e138}{EXPECT\_NONFATAL\_FAILURE}}(EXPECT\_DEATH(\textcolor{keywordflow}{throw}\ TestException(),\ \textcolor{stringliteral}{"{}"{}}),}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}exceptional\ message"{}});}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00070}00070\ \ \ \textcolor{comment}{//\ Verifies\ that\ the\ location\ is\ mentioned\ in\ the\ failure\ text.}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00071}00071\ \ \ \mbox{\hyperlink{gtest-spi_8h_a8376fd6821bd88fd806697355e79e138}{EXPECT\_NONFATAL\_FAILURE}}(EXPECT\_DEATH(\textcolor{keywordflow}{throw}\ TestException(),\ \textcolor{stringliteral}{"{}"{}}),}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}gtest-\/death-\/test\_ex\_test.cc"{}});}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00073}00073\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00074}00074\ \textcolor{preprocessor}{\#\ endif\ \ }\textcolor{comment}{//\ GTEST\_HAS\_EXCEPTIONS}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00075}00075\ }
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00076}00076\ \textcolor{preprocessor}{\#\ if\ GTEST\_HAS\_SEH}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00077}00077\ \textcolor{comment}{//\ Tests\ that\ enabling\ interception\ of\ SEH\ exceptions\ with\ the}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00078}00078\ \textcolor{comment}{//\ catch\_exceptions\ flag\ does\ not\ interfere\ with\ SEH\ exceptions\ being}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00079}00079\ \textcolor{comment}{//\ treated\ as\ death\ by\ death\ tests.}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00080}00080\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(SehExceptionDeasTest,\ CatchExceptionsDoesNotInterfere)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00081}00081\ \ \ EXPECT\_DEATH(RaiseException(42,\ 0x0,\ 0,\ NULL),\ \textcolor{stringliteral}{"{}"{}})}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00082}00082\ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}with\ catch\_exceptions\ "{}}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00083}00083\ \ \ \ \ \ \ <<\ (testing::GTEST\_FLAG(catch\_exceptions)\ ?\ \textcolor{stringliteral}{"{}enabled"{}}\ :\ \textcolor{stringliteral}{"{}disabled"{}});}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00084}00084\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00085}00085\ \textcolor{preprocessor}{\#\ endif}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00086}00086\ }
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00087}00087\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_HAS\_DEATH\_TEST}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00088}00088\ }
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00089}\mbox{\hyperlink{gtest-death-test__ex__test_8cc_a3c04138a5bfe5d72780bb7e82a18e627}{00089}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}(\textcolor{keywordtype}{int}\ argc,\ \textcolor{keywordtype}{char}**\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}})\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00090}00090\ \ \ \mbox{\hyperlink{namespacetesting_afd726ae08c9bd16dc52f78c822d9946b}{testing::InitGoogleTest}}(\&argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}});}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00091}00091\ \ \ testing::GTEST\_FLAG(catch\_exceptions)\ =\ GTEST\_ENABLE\_CATCH\_EXCEPTIONS\_\ !=\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00092}00092\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{gtest_8h_a853a3792807489591d3d4a2f2ff9359f}{RUN\_ALL\_TESTS}}();}
+\DoxyCodeLine{\Hypertarget{gtest-death-test__ex__test_8cc_source_l00093}00093\ \}}
+
+\end{DoxyCode}

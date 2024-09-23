@@ -1,0 +1,11 @@
+<map id="fc::canonical" name="fc::canonical">
+<area shape="rect" id="Node000001" title=" " alt="" coords="544,35,640,60"/>
+<area shape="rect" id="Node000002" href="$programs_2clio_2main_8cpp.html#a3c04138a5bfe5d72780bb7e82a18e627" title=" " alt="" coords="406,5,456,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="529,39,456,25,457,20,530,33"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1chain_1_1block__log.html#a28d7828f2ef978077453c8b0f97f5c04" title=" " alt="" coords="366,55,496,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="530,61,497,67,496,61,529,56"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1chain__plugin.html#a408e8154def42cdb8be9832b602e0046" title=" " alt="" coords="186,55,318,96"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="351,78,318,78,318,73,351,73"/>
+<area shape="rect" id="Node000005" href="$classsysio_1_1chain__plugin.html#a0192ac61f3f59d4fdf2dcbbd2c7104ca" title=" " alt="" coords="5,55,138,96"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="170,78,138,78,138,73,170,73"/>
+</map>

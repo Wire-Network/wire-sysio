@@ -1,0 +1,87 @@
+\doxysection{Unique\+Tests\+Fixture Class Reference}
+\hypertarget{class_unique_tests_fixture}{}\label{class_unique_tests_fixture}\index{UniqueTestsFixture@{UniqueTestsFixture}}
+
+
+Collaboration diagram for Unique\+Tests\+Fixture\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=181pt]{class_unique_tests_fixture__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_unique_tests_fixture_a7769fdf9704ce07346805bcce2f4edd3}{Unique\+Tests\+Fixture}} ()
+\item 
+int \mbox{\hyperlink{class_unique_tests_fixture_a568a055498dd4bc33cb677cb5a4554ac}{get\+ID}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_d_b_connection}{DBConnection}} \mbox{\hyperlink{class_unique_tests_fixture_af0b83657315f31035cc886b245dd9542}{conn}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{110-_fix-_class_fixture_8cpp_source_l00026}{26}} of file \mbox{\hyperlink{110-_fix-_class_fixture_8cpp_source}{110-\/\+Fix-\/\+Class\+Fixture.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_unique_tests_fixture_a7769fdf9704ce07346805bcce2f4edd3}\index{UniqueTestsFixture@{UniqueTestsFixture}!UniqueTestsFixture@{UniqueTestsFixture}}
+\index{UniqueTestsFixture@{UniqueTestsFixture}!UniqueTestsFixture@{UniqueTestsFixture}}
+\doxysubsubsection{\texorpdfstring{UniqueTestsFixture()}{UniqueTestsFixture()}}
+{\footnotesize\ttfamily \label{class_unique_tests_fixture_a7769fdf9704ce07346805bcce2f4edd3} 
+Unique\+Tests\+Fixture\+::\+Unique\+Tests\+Fixture (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{110-_fix-_class_fixture_8cpp_source_l00029}{29}} of file \mbox{\hyperlink{110-_fix-_class_fixture_8cpp_source}{110-\/\+Fix-\/\+Class\+Fixture.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00030\ \ \ \ \ :\ \mbox{\hyperlink{class_unique_tests_fixture_af0b83657315f31035cc886b245dd9542}{conn}}(\ \mbox{\hyperlink{class_d_b_connection_a39977c08d5ef2abb24d6f3d9e6d3d12d}{DBConnection::createConnection}}(\ \textcolor{stringliteral}{"{}myDB"{}}\ )\ )}
+\DoxyCodeLine{00031\ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_unique_tests_fixture_a568a055498dd4bc33cb677cb5a4554ac}\index{UniqueTestsFixture@{UniqueTestsFixture}!getID@{getID}}
+\index{getID@{getID}!UniqueTestsFixture@{UniqueTestsFixture}}
+\doxysubsubsection{\texorpdfstring{getID()}{getID()}}
+{\footnotesize\ttfamily \label{class_unique_tests_fixture_a568a055498dd4bc33cb677cb5a4554ac} 
+int Unique\+Tests\+Fixture\+::get\+ID (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{110-_fix-_class_fixture_8cpp_source_l00033}{33}} of file \mbox{\hyperlink{110-_fix-_class_fixture_8cpp_source}{110-\/\+Fix-\/\+Class\+Fixture.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ++uniqueID;}
+\DoxyCodeLine{00035\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{class_unique_tests_fixture_af0b83657315f31035cc886b245dd9542}\index{UniqueTestsFixture@{UniqueTestsFixture}!conn@{conn}}
+\index{conn@{conn}!UniqueTestsFixture@{UniqueTestsFixture}}
+\doxysubsubsection{\texorpdfstring{conn}{conn}}
+{\footnotesize\ttfamily \label{class_unique_tests_fixture_af0b83657315f31035cc886b245dd9542} 
+\mbox{\hyperlink{class_d_b_connection}{DBConnection}} Unique\+Tests\+Fixture\+::conn\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{110-_fix-_class_fixture_8cpp_source_l00038}{38}} of file \mbox{\hyperlink{110-_fix-_class_fixture_8cpp_source}{110-\/\+Fix-\/\+Class\+Fixture.\+cpp}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/examples/\mbox{\hyperlink{110-_fix-_class_fixture_8cpp}{110-\/\+Fix-\/\+Class\+Fixture.\+cpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,95 @@
+\doxysection{libraries/chain/include/sysio/chain/protocol\+\_\+feature\+\_\+manager.hpp File Reference}
+\hypertarget{protocol__feature__manager_8hpp}{}\label{protocol__feature__manager_8hpp}\index{libraries/chain/include/sysio/chain/protocol\_feature\_manager.hpp@{libraries/chain/include/sysio/chain/protocol\_feature\_manager.hpp}}
+{\ttfamily \#include $<$sysio/chain/types.\+hpp$>$}\newline
+{\ttfamily \#include $<$iterator$>$}\newline
+Include dependency graph for protocol\+\_\+feature\+\_\+manager.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{protocol__feature__manager_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{protocol__feature__manager_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature__subjective__restrictions}{sysio\+::chain\+::protocol\+\_\+feature\+\_\+subjective\+\_\+restrictions}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1builtin__protocol__feature__spec}{sysio\+::chain\+::builtin\+\_\+protocol\+\_\+feature\+\_\+spec}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1chain_1_1protocol__feature__base}{sysio\+::chain\+::protocol\+\_\+feature\+\_\+base}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1chain_1_1builtin__protocol__feature}{sysio\+::chain\+::builtin\+\_\+protocol\+\_\+feature}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature}{sysio\+::chain\+::protocol\+\_\+feature}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1chain_1_1protocol__feature__set}{sysio\+::chain\+::protocol\+\_\+feature\+\_\+set}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1chain_1_1protocol__feature__set_1_1const__iterator}{sysio\+::chain\+::protocol\+\_\+feature\+\_\+set\+::const\+\_\+iterator}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1chain_1_1protocol__feature__manager}{sysio\+::chain\+::protocol\+\_\+feature\+\_\+manager}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1chain_1_1protocol__feature__manager_1_1const__iterator}{sysio\+::chain\+::protocol\+\_\+feature\+\_\+manager\+::const\+\_\+iterator}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature__manager_1_1protocol__feature__entry}{sysio\+::chain\+::protocol\+\_\+feature\+\_\+manager\+::protocol\+\_\+feature\+\_\+entry}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature__manager_1_1builtin__protocol__feature__entry}{sysio\+::chain\+::protocol\+\_\+feature\+\_\+manager\+::builtin\+\_\+protocol\+\_\+feature\+\_\+entry}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain}{sysio\+::chain}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum class \mbox{\hyperlink{namespacesysio_1_1chain_a79711a8423e0cac251836e278123c802}{sysio\+::chain\+::protocol\+\_\+feature\+\_\+t}} \+: uint32\+\_\+t \{ \mbox{\hyperlink{namespacesysio_1_1chain_a79711a8423e0cac251836e278123c802a388d33adeb7f579156ee4a0c86777760}{sysio\+::chain\+::builtin}}
+ \}
+\item 
+enum class \mbox{\hyperlink{namespacesysio_1_1chain_a406d45a184cdba0af316b5bf34bf56cf}{sysio\+::chain\+::builtin\+\_\+protocol\+\_\+feature\+\_\+t}} \+: uint32\+\_\+t \{ \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_a406d45a184cdba0af316b5bf34bf56cfa26c81486f55acca0e2de7ec342d97105}{sysio\+::chain\+::preactivate\+\_\+feature}} = 0
+, \mbox{\hyperlink{namespacesysio_1_1chain_a406d45a184cdba0af316b5bf34bf56cfafd5ab90d29301cc920319ccd0b03a630}{sysio\+::chain\+::only\+\_\+link\+\_\+to\+\_\+existing\+\_\+permission}} = 1
+, \mbox{\hyperlink{namespacesysio_1_1chain_a406d45a184cdba0af316b5bf34bf56cfa6c9cdecb5279149c0f09980e3161e501}{sysio\+::chain\+::replace\+\_\+deferred}} = 2
+, \mbox{\hyperlink{namespacesysio_1_1chain_a406d45a184cdba0af316b5bf34bf56cfa1e0a5b7203c3f4124dc8c1880b04e36b}{sysio\+::chain\+::no\+\_\+duplicate\+\_\+deferred\+\_\+id}} = 3
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_a406d45a184cdba0af316b5bf34bf56cfaa1c8246337a0813da762617fa567c3e5}{sysio\+::chain\+::fix\+\_\+linkauth\+\_\+restriction}} = 4
+, \mbox{\hyperlink{namespacesysio_1_1chain_a406d45a184cdba0af316b5bf34bf56cfa65ea05874d490a8ea760dd8b76c2c504}{sysio\+::chain\+::disallow\+\_\+empty\+\_\+producer\+\_\+schedule}} = 5
+, \mbox{\hyperlink{namespacesysio_1_1chain_a406d45a184cdba0af316b5bf34bf56cfaf0765905ee88dc2bfbdd738872b1b6f8}{sysio\+::chain\+::restrict\+\_\+action\+\_\+to\+\_\+self}} = 6
+, \mbox{\hyperlink{namespacesysio_1_1chain_a406d45a184cdba0af316b5bf34bf56cfa700666c7a46dcff8da36b5b05d23e094}{sysio\+::chain\+::only\+\_\+bill\+\_\+first\+\_\+authorizer}} = 7
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_a406d45a184cdba0af316b5bf34bf56cfa9be6e49b9731de43d53e394e3ed5e25b}{sysio\+::chain\+::forward\+\_\+setcode}} = 8
+, \mbox{\hyperlink{namespacesysio_1_1chain_a406d45a184cdba0af316b5bf34bf56cfa2a240784a064c3db8c7ad2e2fe2ec400}{sysio\+::chain\+::get\+\_\+sender}} = 9
+, \mbox{\hyperlink{namespacesysio_1_1chain_a406d45a184cdba0af316b5bf34bf56cfa5b1659352f17eb75b45e13054aaf1521}{sysio\+::chain\+::ram\+\_\+restrictions}} = 10
+, \mbox{\hyperlink{namespacesysio_1_1chain_a406d45a184cdba0af316b5bf34bf56cfa287b0681ac43902b000af3a406328d3a}{sysio\+::chain\+::webauthn\+\_\+key}} = 11
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_a406d45a184cdba0af316b5bf34bf56cfa7b954b3171199b0f02767ac3556e7f0f}{sysio\+::chain\+::wtmsig\+\_\+block\+\_\+signatures}} = 12
+, \mbox{\hyperlink{namespacesysio_1_1chain_a406d45a184cdba0af316b5bf34bf56cfa7d76bd2f931e7c1f1c2b7413c93a25b0}{sysio\+::chain\+::action\+\_\+return\+\_\+value}} = 13
+, \mbox{\hyperlink{namespacesysio_1_1chain_a406d45a184cdba0af316b5bf34bf56cfa24c022a0c7545d91d229687098a03986}{sysio\+::chain\+::blockchain\+\_\+parameters}} = 16
+, \mbox{\hyperlink{namespacesysio_1_1chain_a406d45a184cdba0af316b5bf34bf56cfa47b372aeb97f49fd5861d48bd3f94a38}{sysio\+::chain\+::get\+\_\+code\+\_\+hash}} = 17
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_a406d45a184cdba0af316b5bf34bf56cfa3afd605f2e67ff58dfd806199c86cd5c}{sysio\+::chain\+::configurable\+\_\+wasm\+\_\+limits}} = 18
+, \mbox{\hyperlink{namespacesysio_1_1chain_a406d45a184cdba0af316b5bf34bf56cfa94b635fc657f5ca33e13e277ac8ab5ba}{sysio\+::chain\+::crypto\+\_\+primitives}} = 19
+, \mbox{\hyperlink{namespacesysio_1_1chain_a406d45a184cdba0af316b5bf34bf56cfa0673242d5f29c0e22cd667613434e0c6}{sysio\+::chain\+::get\+\_\+block\+\_\+num}} = 20
+, \mbox{\hyperlink{namespacesysio_1_1chain_a406d45a184cdba0af316b5bf34bf56cfad7e96f08df0090835a179d7435564141}{sysio\+::chain\+::em\+\_\+key}} = 21
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_a406d45a184cdba0af316b5bf34bf56cfa8e7141b028f764e4fc140f0587e20052}{sysio\+::chain\+::reserved\+\_\+private\+\_\+fork\+\_\+protocol\+\_\+features}} = 500000
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacesysio_1_1chain_a98d0965c543569bc5e49006c54964ba4}{sysio\+::chain\+::builtin\+\_\+protocol\+\_\+feature\+\_\+codename}} (\mbox{\hyperlink{namespacesysio_1_1chain_a406d45a184cdba0af316b5bf34bf56cf}{builtin\+\_\+protocol\+\_\+feature\+\_\+t}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+const std\+::unordered\+\_\+map$<$ \mbox{\hyperlink{namespacesysio_1_1chain_a406d45a184cdba0af316b5bf34bf56cf}{builtin\+\_\+protocol\+\_\+feature\+\_\+t}}, \mbox{\hyperlink{structsysio_1_1chain_1_1builtin__protocol__feature__spec}{builtin\+\_\+protocol\+\_\+feature\+\_\+spec}}, \mbox{\hyperlink{structsysio_1_1chain_1_1enum__hash}{enum\+\_\+hash}}$<$ \mbox{\hyperlink{namespacesysio_1_1chain_a406d45a184cdba0af316b5bf34bf56cf}{builtin\+\_\+protocol\+\_\+feature\+\_\+t}} $>$ $>$ \mbox{\hyperlink{namespacesysio_1_1chain_a0375f528818d520a3504da1020ff1d28}{sysio\+::chain\+::builtin\+\_\+protocol\+\_\+feature\+\_\+codenames}}
+\end{DoxyCompactItemize}

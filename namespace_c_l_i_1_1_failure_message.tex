@@ -1,0 +1,76 @@
+\doxysection{CLI\+::Failure\+Message Namespace Reference}
+\hypertarget{namespace_c_l_i_1_1_failure_message}{}\label{namespace_c_l_i_1_1_failure_message}\index{CLI::FailureMessage@{CLI::FailureMessage}}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+std\+::string \mbox{\hyperlink{namespace_c_l_i_1_1_failure_message_ab2a36cd7fb3b91628be43f31647f3c38}{simple}} (const \mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \texorpdfstring{$\ast$}{*}app, const \mbox{\hyperlink{class_c_l_i_1_1_error}{Error}} \&e)
+\begin{DoxyCompactList}\small\item\em Printout a clean, simple message on error (the default in CLI11 1.\+5+) \end{DoxyCompactList}\item 
+std\+::string \mbox{\hyperlink{namespace_c_l_i_1_1_failure_message_aa7e418b32b7d6f28aee8c4e5ad0bbc95}{help}} (const \mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \texorpdfstring{$\ast$}{*}app, const \mbox{\hyperlink{class_c_l_i_1_1_error}{Error}} \&e)
+\begin{DoxyCompactList}\small\item\em Printout the full help string on error (if this fn is set, the old default for CLI11) \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespace_c_l_i_1_1_failure_message_aa7e418b32b7d6f28aee8c4e5ad0bbc95}\index{CLI::FailureMessage@{CLI::FailureMessage}!help@{help}}
+\index{help@{help}!CLI::FailureMessage@{CLI::FailureMessage}}
+\doxysubsubsection{\texorpdfstring{help()}{help()}}
+{\footnotesize\ttfamily \label{namespace_c_l_i_1_1_failure_message_aa7e418b32b7d6f28aee8c4e5ad0bbc95} 
+std\+::string CLI\+::\+Failure\+Message\+::help (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \texorpdfstring{$\ast$}{*}}]{app}{, }\item[{const \mbox{\hyperlink{class_c_l_i_1_1_error}{Error}} \&}]{e}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l07593}{7593}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{07593\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{07594\ \ \ \ \ std::string\ header\ =\ std::string(\textcolor{stringliteral}{"{}ERROR:\ "{}})\ +\ e.\mbox{\hyperlink{class_c_l_i_1_1_error_a725f16d721c2320ba75b4d6c99d2056a}{get\_name}}()\ +\ \textcolor{stringliteral}{"{}:\ "{}}\ +\ e.what()\ +\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{07595\ \ \ \ \ header\ +=\ app-\/>help();}
+\DoxyCodeLine{07596\ \ \ \ \ \textcolor{keywordflow}{return}\ header;}
+\DoxyCodeLine{07597\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=330pt]{namespace_c_l_i_1_1_failure_message_aa7e418b32b7d6f28aee8c4e5ad0bbc95_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_c_l_i_1_1_failure_message_ab2a36cd7fb3b91628be43f31647f3c38}\index{CLI::FailureMessage@{CLI::FailureMessage}!simple@{simple}}
+\index{simple@{simple}!CLI::FailureMessage@{CLI::FailureMessage}}
+\doxysubsubsection{\texorpdfstring{simple()}{simple()}}
+{\footnotesize\ttfamily \label{namespace_c_l_i_1_1_failure_message_ab2a36cd7fb3b91628be43f31647f3c38} 
+std\+::string CLI\+::\+Failure\+Message\+::simple (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \texorpdfstring{$\ast$}{*}}]{app}{, }\item[{const \mbox{\hyperlink{class_c_l_i_1_1_error}{Error}} \&}]{e}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l07574}{7574}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{07574\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{07575\ \ \ \ \ std::string\ header\ =\ std::string(e.what())\ +\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{07576\ \ \ \ \ std::vector<std::string>\ names;}
+\DoxyCodeLine{07577\ }
+\DoxyCodeLine{07578\ \ \ \ \ \textcolor{comment}{//\ Collect\ names}}
+\DoxyCodeLine{07579\ \ \ \ \ \textcolor{keywordflow}{if}(app-\/>get\_help\_ptr()\ !=\ \textcolor{keyword}{nullptr})}
+\DoxyCodeLine{07580\ \ \ \ \ \ \ \ \ names.push\_back(app-\/>get\_help\_ptr()-\/>get\_name());}
+\DoxyCodeLine{07581\ }
+\DoxyCodeLine{07582\ \ \ \ \ \textcolor{keywordflow}{if}(app-\/>get\_help\_all\_ptr()\ !=\ \textcolor{keyword}{nullptr})}
+\DoxyCodeLine{07583\ \ \ \ \ \ \ \ \ names.push\_back(app-\/>get\_help\_all\_ptr()-\/>get\_name());}
+\DoxyCodeLine{07584\ }
+\DoxyCodeLine{07585\ \ \ \ \ \textcolor{comment}{//\ If\ any\ names\ found,\ suggest\ those}}
+\DoxyCodeLine{07586\ \ \ \ \ \textcolor{keywordflow}{if}(!names.empty())}
+\DoxyCodeLine{07587\ \ \ \ \ \ \ \ \ header\ +=\ \textcolor{stringliteral}{"{}Run\ with\ "{}}\ +\ detail::join(names,\ \textcolor{stringliteral}{"{}\ or\ "{}})\ +\ \textcolor{stringliteral}{"{}\ for\ more\ information.\(\backslash\)n"{}};}
+\DoxyCodeLine{07588\ }
+\DoxyCodeLine{07589\ \ \ \ \ \textcolor{keywordflow}{return}\ header;}
+\DoxyCodeLine{07590\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=305pt]{namespace_c_l_i_1_1_failure_message_ab2a36cd7fb3b91628be43f31647f3c38_cgraph}
+\end{center}
+\end{figure}

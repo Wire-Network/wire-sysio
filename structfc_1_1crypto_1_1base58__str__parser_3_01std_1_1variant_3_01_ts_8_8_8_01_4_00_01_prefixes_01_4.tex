@@ -1,0 +1,73 @@
+\doxysection{fc\+::crypto\+::base58\+\_\+str\+\_\+parser\texorpdfstring{$<$}{<} std\+::variant\texorpdfstring{$<$}{<} Ts... \texorpdfstring{$>$}{>}, Prefixes \texorpdfstring{$>$}{>} Struct Template Reference}
+\hypertarget{structfc_1_1crypto_1_1base58__str__parser_3_01std_1_1variant_3_01_ts_8_8_8_01_4_00_01_prefixes_01_4}{}\label{structfc_1_1crypto_1_1base58__str__parser_3_01std_1_1variant_3_01_ts_8_8_8_01_4_00_01_prefixes_01_4}\index{fc::crypto::base58\_str\_parser$<$ std::variant$<$ Ts... $>$, Prefixes $>$@{fc::crypto::base58\_str\_parser$<$ std::variant$<$ Ts... $>$, Prefixes $>$}}
+
+
+{\ttfamily \#include $<$common.\+hpp$>$}
+
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static std\+::variant$<$ Ts... $>$ \mbox{\hyperlink{structfc_1_1crypto_1_1base58__str__parser_3_01std_1_1variant_3_01_ts_8_8_8_01_4_00_01_prefixes_01_4_ad51f58f59353bc2fe888284905110fa6}{apply}} (const std\+::string \&base58str)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$const char \texorpdfstring{$\ast$}{*}const \texorpdfstring{$\ast$}{*} Prefixes, typename ... Ts$>$\newline
+struct fc\+::crypto\+::base58\+\_\+str\+\_\+parser$<$ std\+::variant$<$ Ts... $>$, Prefixes $>$}
+Destructure a variant and call the parse\+\_\+base58str on it 
+\begin{DoxyTemplParams}{Template Parameters}
+{\em Ts} & \\
+\hline
+\end{DoxyTemplParams}
+
+\begin{DoxyParams}{Parameters}
+{\em base58str} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{libraries_2fc_2include_2fc_2crypto_2common_8hpp_source_l00075}{75}} of file \mbox{\hyperlink{libraries_2fc_2include_2fc_2crypto_2common_8hpp_source}{common.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structfc_1_1crypto_1_1base58__str__parser_3_01std_1_1variant_3_01_ts_8_8_8_01_4_00_01_prefixes_01_4_ad51f58f59353bc2fe888284905110fa6}\index{fc::crypto::base58\_str\_parser$<$ std::variant$<$ Ts... $>$, Prefixes $>$@{fc::crypto::base58\_str\_parser$<$ std::variant$<$ Ts... $>$, Prefixes $>$}!apply@{apply}}
+\index{apply@{apply}!fc::crypto::base58\_str\_parser$<$ std::variant$<$ Ts... $>$, Prefixes $>$@{fc::crypto::base58\_str\_parser$<$ std::variant$<$ Ts... $>$, Prefixes $>$}}
+\doxysubsubsection{\texorpdfstring{apply()}{apply()}}
+{\footnotesize\ttfamily \label{structfc_1_1crypto_1_1base58__str__parser_3_01std_1_1variant_3_01_ts_8_8_8_01_4_00_01_prefixes_01_4_ad51f58f59353bc2fe888284905110fa6} 
+template$<$const char \texorpdfstring{$\ast$}{*}const \texorpdfstring{$\ast$}{*} Prefixes, typename ... Ts$>$ \\
+static std\+::variant$<$ Ts... $>$ \mbox{\hyperlink{structfc_1_1crypto_1_1base58__str__parser}{fc\+::crypto\+::base58\+\_\+str\+\_\+parser}}$<$ std\+::variant$<$ Ts... $>$, Prefixes $>$\+::apply (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{base58str}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{libraries_2fc_2include_2fc_2crypto_2common_8hpp_source_l00076}{76}} of file \mbox{\hyperlink{libraries_2fc_2include_2fc_2crypto_2common_8hpp_source}{common.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ pivot\ =\ base58str.find(\textcolor{charliteral}{'\_'});}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(pivot\ !=\ std::string::npos,\ \textcolor{stringliteral}{"{}No\ delimiter\ in\ data,\ cannot\ determine\ suite\ type:\ \$\{str\}"{}},\ (\textcolor{stringliteral}{"{}str"{}},\ base58str));}
+\DoxyCodeLine{00079\ }
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ prefix\_str\ =\ base58str.substr(0,\ pivot);}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ data\_str\ =\ base58str.substr(pivot\ +\ 1);}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(!data\_str.empty(),\ \textcolor{stringliteral}{"{}Data\ only\ has\ suite\ type\ prefix:\ \$\{str\}"{}},\ (\textcolor{stringliteral}{"{}str"{}},\ base58str));}
+\DoxyCodeLine{00083\ }
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ base58\_str\_parser\_impl<std::variant<Ts...>,\ Prefixes,\ 0,\ Ts...>\mbox{\hyperlink{structfc_1_1crypto_1_1base58__str__parser_3_01std_1_1variant_3_01_ts_8_8_8_01_4_00_01_prefixes_01_4_ad51f58f59353bc2fe888284905110fa6}{::apply}}(prefix\_str,\ data\_str);}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=288pt]{structfc_1_1crypto_1_1base58__str__parser_3_01std_1_1variant_3_01_ts_8_8_8_01_4_00_01_prefixes_01_4_ad51f58f59353bc2fe888284905110fa6_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/\mbox{\hyperlink{libraries_2fc_2include_2fc_2crypto_2common_8hpp}{common.\+hpp}}\end{DoxyCompactItemize}

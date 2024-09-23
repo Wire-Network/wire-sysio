@@ -1,0 +1,211 @@
+\doxysection{libraries/fc/secp256k1/secp256k1/src/valgrind\+\_\+ctime\+\_\+test.c File Reference}
+\hypertarget{valgrind__ctime__test_8c}{}\label{valgrind__ctime__test_8c}\index{libraries/fc/secp256k1/secp256k1/src/valgrind\_ctime\_test.c@{libraries/fc/secp256k1/secp256k1/src/valgrind\_ctime\_test.c}}
+{\ttfamily \#include $<$valgrind/memcheck.\+h$>$}\newline
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include "{}../include/secp256k1.\+h"{}}\newline
+{\ttfamily \#include "{}assumptions.\+h"{}}\newline
+{\ttfamily \#include "{}util.\+h"{}}\newline
+Include dependency graph for valgrind\+\_\+ctime\+\_\+test.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{valgrind__ctime__test_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{valgrind__ctime__test_8c_af23de73dba8dc1c56af0f46f6af3f2de}{run\+\_\+tests}} (\mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}ctx, unsigned char \texorpdfstring{$\ast$}{*}key)
+\item 
+int \mbox{\hyperlink{valgrind__ctime__test_8c_a840291bc02cba5474a4cb46a9b9566fe}{main}} (void)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{valgrind__ctime__test_8c_a840291bc02cba5474a4cb46a9b9566fe}\index{valgrind\_ctime\_test.c@{valgrind\_ctime\_test.c}!main@{main}}
+\index{main@{main}!valgrind\_ctime\_test.c@{valgrind\_ctime\_test.c}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{valgrind__ctime__test_8c_a840291bc02cba5474a4cb46a9b9566fe} 
+int main (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+In theory, testing with a single secret input should be sufficient\+: If control flow depended on secrets the tool would generate an error.
+
+Definition at line \mbox{\hyperlink{valgrind__ctime__test_8c_source_l00032}{32}} of file \mbox{\hyperlink{valgrind__ctime__test_8c_source}{valgrind\+\_\+ctime\+\_\+test.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00033\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__context__struct}{secp256k1\_context}}*\ ctx;}
+\DoxyCodeLine{00034\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ key[32];}
+\DoxyCodeLine{00035\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}},\ i;}
+\DoxyCodeLine{00036\ }
+\DoxyCodeLine{00037\ \ \ \ \ \textcolor{keywordflow}{if}\ (!RUNNING\_ON\_VALGRIND)\ \{}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}This\ test\ can\ only\ usefully\ be\ run\ inside\ valgrind.\(\backslash\)n"{}});}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Usage:\ libtool\ -\/-\/mode=execute\ valgrind\ ./valgrind\_ctime\_test\(\backslash\)n"{}});}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{00041\ \ \ \ \ \}}
+\DoxyCodeLine{00042\ \ \ \ \ ctx\ =\ \mbox{\hyperlink{secp256k1_8h_a3aaa9fcc3ab67bc8f841779a049069c5}{secp256k1\_context\_create}}(\mbox{\hyperlink{secp256k1_8h_a0d34fe6baa73d3145f2e376e43de0b15}{SECP256K1\_CONTEXT\_SIGN}}}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ \mbox{\hyperlink{secp256k1_8h_add20a6c320e247ca7bd524cbc4259d64}{SECP256K1\_CONTEXT\_VERIFY}}}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ \mbox{\hyperlink{secp256k1_8h_a1e5474a8f84fc650461e92e853f06a2b}{SECP256K1\_CONTEXT\_DECLASSIFY}});}
+\DoxyCodeLine{00048\ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ 32;\ i++)\ \{}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ key[i]\ =\ i\ +\ 65;}
+\DoxyCodeLine{00050\ \ \ \ \ \}}
+\DoxyCodeLine{00051\ }
+\DoxyCodeLine{00052\ \ \ \ \ \mbox{\hyperlink{valgrind__ctime__test_8c_af23de73dba8dc1c56af0f46f6af3f2de}{run\_tests}}(ctx,\ key);}
+\DoxyCodeLine{00053\ }
+\DoxyCodeLine{00054\ \ \ \ \ \textcolor{comment}{/*\ Test\ context\ randomisation.\ Do\ this\ last\ because\ it\ leaves\ the\ context}}
+\DoxyCodeLine{00055\ \textcolor{comment}{\ \ \ \ \ *\ tainted.\ */}}
+\DoxyCodeLine{00056\ \ \ \ \ VALGRIND\_MAKE\_MEM\_UNDEFINED(key,\ 32);}
+\DoxyCodeLine{00057\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{secp256k1_8h_a1b81d70feb6ed24dc902cbbd5ba569e7}{secp256k1\_context\_randomize}}(ctx,\ key);}
+\DoxyCodeLine{00058\ \ \ \ \ VALGRIND\_MAKE\_MEM\_DEFINED(\&\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}},\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}));}
+\DoxyCodeLine{00059\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}});}
+\DoxyCodeLine{00060\ }
+\DoxyCodeLine{00061\ \ \ \ \ \mbox{\hyperlink{secp256k1_8h_a026db914e3723531825ecf25a0cbd699}{secp256k1\_context\_destroy}}(ctx);}
+\DoxyCodeLine{00062\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00063\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{valgrind__ctime__test_8c_a840291bc02cba5474a4cb46a9b9566fe_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{valgrind__ctime__test_8c_af23de73dba8dc1c56af0f46f6af3f2de}\index{valgrind\_ctime\_test.c@{valgrind\_ctime\_test.c}!run\_tests@{run\_tests}}
+\index{run\_tests@{run\_tests}!valgrind\_ctime\_test.c@{valgrind\_ctime\_test.c}}
+\doxysubsubsection{\texorpdfstring{run\_tests()}{run\_tests()}}
+{\footnotesize\ttfamily \label{valgrind__ctime__test_8c_af23de73dba8dc1c56af0f46f6af3f2de} 
+void run\+\_\+tests (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}}]{ctx}{, }\item[{unsigned char \texorpdfstring{$\ast$}{*}}]{key}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{valgrind__ctime__test_8c_source_l00065}{65}} of file \mbox{\hyperlink{valgrind__ctime__test_8c_source}{valgrind\+\_\+ctime\+\_\+test.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00066\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__ecdsa__signature}{secp256k1\_ecdsa\_signature}}\ \mbox{\hyperlink{namespacefc_1_1ecc_a7c10bdf37d2fad7c122133f284e47f3e}{signature}};}
+\DoxyCodeLine{00067\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__pubkey}{secp256k1\_pubkey}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}};}
+\DoxyCodeLine{00068\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_ab1e511987bdbd6d6a843beff7fbafa8d}{siglen}}\ =\ 74;}
+\DoxyCodeLine{00069\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ outputlen\ =\ 33;}
+\DoxyCodeLine{00070\ \ \ \ \ \textcolor{keywordtype}{int}\ i;}
+\DoxyCodeLine{00071\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00072\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ msg[32];}
+\DoxyCodeLine{00073\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ sig[74];}
+\DoxyCodeLine{00074\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ spubkey[33];}
+\DoxyCodeLine{00075\ \textcolor{preprocessor}{\#ifdef\ ENABLE\_MODULE\_RECOVERY}}
+\DoxyCodeLine{00076\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__ecdsa__recoverable__signature}{secp256k1\_ecdsa\_recoverable\_signature}}\ recoverable\_signature;}
+\DoxyCodeLine{00077\ \ \ \ \ \textcolor{keywordtype}{int}\ recid;}
+\DoxyCodeLine{00078\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00079\ \textcolor{preprocessor}{\#ifdef\ ENABLE\_MODULE\_EXTRAKEYS}}
+\DoxyCodeLine{00080\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__keypair}{secp256k1\_keypair}}\ keypair;}
+\DoxyCodeLine{00081\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00082\ }
+\DoxyCodeLine{00083\ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ 32;\ i++)\ \{}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ msg[i]\ =\ i\ +\ 1;}
+\DoxyCodeLine{00085\ \ \ \ \ \}}
+\DoxyCodeLine{00086\ }
+\DoxyCodeLine{00087\ \ \ \ \ \textcolor{comment}{/*\ Test\ keygen.\ */}}
+\DoxyCodeLine{00088\ \ \ \ \ VALGRIND\_MAKE\_MEM\_UNDEFINED(key,\ 32);}
+\DoxyCodeLine{00089\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{secp256k1_8h_a7438071aa8a6dc4697abe4f4659f2161}{secp256k1\_ec\_pubkey\_create}}(ctx,\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}},\ key);}
+\DoxyCodeLine{00090\ \ \ \ \ VALGRIND\_MAKE\_MEM\_DEFINED(\&\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}},\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{structsecp256k1__pubkey}{secp256k1\_pubkey}}));}
+\DoxyCodeLine{00091\ \ \ \ \ VALGRIND\_MAKE\_MEM\_DEFINED(\&\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}},\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}));}
+\DoxyCodeLine{00092\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}});}
+\DoxyCodeLine{00093\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{secp256k1_8h_a34977bf00322e510e881160c421836d7}{secp256k1\_ec\_pubkey\_serialize}}(ctx,\ spubkey,\ \&outputlen,\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}},\ \mbox{\hyperlink{secp256k1_8h_a7b8f642c65e8b5c81fa4421b7c42ab57}{SECP256K1\_EC\_COMPRESSED}})\ ==\ 1);}
+\DoxyCodeLine{00094\ }
+\DoxyCodeLine{00095\ \ \ \ \ \textcolor{comment}{/*\ Test\ signing.\ */}}
+\DoxyCodeLine{00096\ \ \ \ \ VALGRIND\_MAKE\_MEM\_UNDEFINED(key,\ 32);}
+\DoxyCodeLine{00097\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{secp256k1_8h_a4185cc9a9de502e52cfe5350f7dc8438}{secp256k1\_ecdsa\_sign}}(ctx,\ \&signature,\ msg,\ key,\ NULL,\ NULL);}
+\DoxyCodeLine{00098\ \ \ \ \ VALGRIND\_MAKE\_MEM\_DEFINED(\&signature,\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{structsecp256k1__ecdsa__signature}{secp256k1\_ecdsa\_signature}}));}
+\DoxyCodeLine{00099\ \ \ \ \ VALGRIND\_MAKE\_MEM\_DEFINED(\&\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}},\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}));}
+\DoxyCodeLine{00100\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}});}
+\DoxyCodeLine{00101\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{secp256k1_8h_ac07809ca872ec967ab4d3b1a95eafe0b}{secp256k1\_ecdsa\_signature\_serialize\_der}}(ctx,\ sig,\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_ab1e511987bdbd6d6a843beff7fbafa8d}{siglen}},\ \&signature));}
+\DoxyCodeLine{00102\ }
+\DoxyCodeLine{00103\ \textcolor{preprocessor}{\#ifdef\ ENABLE\_MODULE\_ECDH}}
+\DoxyCodeLine{00104\ \ \ \ \ \textcolor{comment}{/*\ Test\ ECDH.\ */}}
+\DoxyCodeLine{00105\ \ \ \ \ VALGRIND\_MAKE\_MEM\_UNDEFINED(key,\ 32);}
+\DoxyCodeLine{00106\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{secp256k1__ecdh_8h_a4386914d0dce8b04f056ce3fae9a37a8}{secp256k1\_ecdh}}(ctx,\ msg,\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}},\ key,\ NULL,\ NULL);}
+\DoxyCodeLine{00107\ \ \ \ \ VALGRIND\_MAKE\_MEM\_DEFINED(\&\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}},\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}));}
+\DoxyCodeLine{00108\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ ==\ 1);}
+\DoxyCodeLine{00109\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00110\ }
+\DoxyCodeLine{00111\ \textcolor{preprocessor}{\#ifdef\ ENABLE\_MODULE\_RECOVERY}}
+\DoxyCodeLine{00112\ \ \ \ \ \textcolor{comment}{/*\ Test\ signing\ a\ recoverable\ signature.\ */}}
+\DoxyCodeLine{00113\ \ \ \ \ VALGRIND\_MAKE\_MEM\_UNDEFINED(key,\ 32);}
+\DoxyCodeLine{00114\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{secp256k1__recovery_8h_a7868accd4760afcaeaa0ff3d239afc2a}{secp256k1\_ecdsa\_sign\_recoverable}}(ctx,\ \&recoverable\_signature,\ msg,\ key,\ NULL,\ NULL);}
+\DoxyCodeLine{00115\ \ \ \ \ VALGRIND\_MAKE\_MEM\_DEFINED(\&recoverable\_signature,\ \textcolor{keyword}{sizeof}(recoverable\_signature));}
+\DoxyCodeLine{00116\ \ \ \ \ VALGRIND\_MAKE\_MEM\_DEFINED(\&\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}},\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}));}
+\DoxyCodeLine{00117\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}});}
+\DoxyCodeLine{00118\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{secp256k1__recovery_8h_a12f08c89ceb61949c6a4ec6eb2511185}{secp256k1\_ecdsa\_recoverable\_signature\_serialize\_compact}}(ctx,\ sig,\ \&recid,\ \&recoverable\_signature));}
+\DoxyCodeLine{00119\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(recid\ >=\ 0\ \&\&\ recid\ <=\ 3);}
+\DoxyCodeLine{00120\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00121\ }
+\DoxyCodeLine{00122\ \ \ \ \ VALGRIND\_MAKE\_MEM\_UNDEFINED(key,\ 32);}
+\DoxyCodeLine{00123\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{secp256k1_8h_a366f922fc0c787351e82ff8e3a95f652}{secp256k1\_ec\_seckey\_verify}}(ctx,\ key);}
+\DoxyCodeLine{00124\ \ \ \ \ VALGRIND\_MAKE\_MEM\_DEFINED(\&\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}},\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}));}
+\DoxyCodeLine{00125\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ ==\ 1);}
+\DoxyCodeLine{00126\ }
+\DoxyCodeLine{00127\ \ \ \ \ VALGRIND\_MAKE\_MEM\_UNDEFINED(key,\ 32);}
+\DoxyCodeLine{00128\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{secp256k1_8h_a1eb33149d14095c8480319441b2477a8}{secp256k1\_ec\_seckey\_negate}}(ctx,\ key);}
+\DoxyCodeLine{00129\ \ \ \ \ VALGRIND\_MAKE\_MEM\_DEFINED(\&\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}},\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}));}
+\DoxyCodeLine{00130\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ ==\ 1);}
+\DoxyCodeLine{00131\ }
+\DoxyCodeLine{00132\ \ \ \ \ VALGRIND\_MAKE\_MEM\_UNDEFINED(key,\ 32);}
+\DoxyCodeLine{00133\ \ \ \ \ VALGRIND\_MAKE\_MEM\_UNDEFINED(msg,\ 32);}
+\DoxyCodeLine{00134\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{secp256k1_8h_af190f597732ce69f0829c40cda6854b8}{secp256k1\_ec\_seckey\_tweak\_add}}(ctx,\ key,\ msg);}
+\DoxyCodeLine{00135\ \ \ \ \ VALGRIND\_MAKE\_MEM\_DEFINED(\&\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}},\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}));}
+\DoxyCodeLine{00136\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ ==\ 1);}
+\DoxyCodeLine{00137\ }
+\DoxyCodeLine{00138\ \ \ \ \ VALGRIND\_MAKE\_MEM\_UNDEFINED(key,\ 32);}
+\DoxyCodeLine{00139\ \ \ \ \ VALGRIND\_MAKE\_MEM\_UNDEFINED(msg,\ 32);}
+\DoxyCodeLine{00140\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{secp256k1_8h_a034600fa5f0174c0d11a991a842e4edc}{secp256k1\_ec\_seckey\_tweak\_mul}}(ctx,\ key,\ msg);}
+\DoxyCodeLine{00141\ \ \ \ \ VALGRIND\_MAKE\_MEM\_DEFINED(\&\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}},\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}));}
+\DoxyCodeLine{00142\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ ==\ 1);}
+\DoxyCodeLine{00143\ }
+\DoxyCodeLine{00144\ \ \ \ \ \textcolor{comment}{/*\ Test\ keypair\_create\ and\ keypair\_xonly\_tweak\_add.\ */}}
+\DoxyCodeLine{00145\ \textcolor{preprocessor}{\#ifdef\ ENABLE\_MODULE\_EXTRAKEYS}}
+\DoxyCodeLine{00146\ \ \ \ \ VALGRIND\_MAKE\_MEM\_UNDEFINED(key,\ 32);}
+\DoxyCodeLine{00147\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{secp256k1__extrakeys_8h_a61b1362ada2435ab10240e52ff738476}{secp256k1\_keypair\_create}}(ctx,\ \&keypair,\ key);}
+\DoxyCodeLine{00148\ \ \ \ \ VALGRIND\_MAKE\_MEM\_DEFINED(\&\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}},\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}));}
+\DoxyCodeLine{00149\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ ==\ 1);}
+\DoxyCodeLine{00150\ }
+\DoxyCodeLine{00151\ \ \ \ \ \textcolor{comment}{/*\ The\ tweak\ is\ not\ treated\ as\ a\ secret\ in\ keypair\_tweak\_add\ */}}
+\DoxyCodeLine{00152\ \ \ \ \ VALGRIND\_MAKE\_MEM\_DEFINED(msg,\ 32);}
+\DoxyCodeLine{00153\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{secp256k1__extrakeys_8h_aa99a68bfe473704d08eac556915883b6}{secp256k1\_keypair\_xonly\_tweak\_add}}(ctx,\ \&keypair,\ msg);}
+\DoxyCodeLine{00154\ \ \ \ \ VALGRIND\_MAKE\_MEM\_DEFINED(\&\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}},\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}));}
+\DoxyCodeLine{00155\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ ==\ 1);}
+\DoxyCodeLine{00156\ }
+\DoxyCodeLine{00157\ \ \ \ \ VALGRIND\_MAKE\_MEM\_UNDEFINED(key,\ 32);}
+\DoxyCodeLine{00158\ \ \ \ \ VALGRIND\_MAKE\_MEM\_UNDEFINED(\&keypair,\ \textcolor{keyword}{sizeof}(keypair));}
+\DoxyCodeLine{00159\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{secp256k1__extrakeys_8h_a39b3678ca32b950618267bfd1082a6a3}{secp256k1\_keypair\_sec}}(ctx,\ key,\ \&keypair);}
+\DoxyCodeLine{00160\ \ \ \ \ VALGRIND\_MAKE\_MEM\_DEFINED(\&\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}},\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}));}
+\DoxyCodeLine{00161\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ ==\ 1);}
+\DoxyCodeLine{00162\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00163\ }
+\DoxyCodeLine{00164\ \textcolor{preprocessor}{\#ifdef\ ENABLE\_MODULE\_SCHNORRSIG}}
+\DoxyCodeLine{00165\ \ \ \ \ VALGRIND\_MAKE\_MEM\_UNDEFINED(key,\ 32);}
+\DoxyCodeLine{00166\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{secp256k1__extrakeys_8h_a61b1362ada2435ab10240e52ff738476}{secp256k1\_keypair\_create}}(ctx,\ \&keypair,\ key);}
+\DoxyCodeLine{00167\ \ \ \ \ VALGRIND\_MAKE\_MEM\_DEFINED(\&\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}},\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}));}
+\DoxyCodeLine{00168\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ ==\ 1);}
+\DoxyCodeLine{00169\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{secp256k1__schnorrsig_8h_a562fe7745d3c285d64ef8b88ab70d7e1}{secp256k1\_schnorrsig\_sign32}}(ctx,\ sig,\ msg,\ \&keypair,\ NULL);}
+\DoxyCodeLine{00170\ \ \ \ \ VALGRIND\_MAKE\_MEM\_DEFINED(\&\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}},\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}));}
+\DoxyCodeLine{00171\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ ==\ 1);}
+\DoxyCodeLine{00172\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00173\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{valgrind__ctime__test_8c_af23de73dba8dc1c56af0f46f6af3f2de_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=210pt]{valgrind__ctime__test_8c_af23de73dba8dc1c56af0f46f6af3f2de_icgraph}
+\end{center}
+\end{figure}

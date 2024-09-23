@@ -1,0 +1,21 @@
+<map id="libraries/fc/secp256k1/secp256k1/src/group.h" name="libraries/fc/secp256k1/secp256k1/src/group.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="24,5,181,46"/>
+<area shape="rect" id="Node000002" href="$field_8h.html" title=" " alt="" coords="74,94,131,120"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="105,46,105,78,100,78,100,46"/>
+<area shape="rect" id="Node000003" href="$fc_2secp256k1_2secp256k1_2src_2util_8h.html" title=" " alt="" coords="127,168,176,193"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="113,118,137,153,133,156,108,121"/>
+<area shape="rect" id="Node000009" href="$field__10x26_8h.html" title=" " alt="" coords="5,168,104,193"/>
+<area shape="poly" id="edge9_Node000002_Node000009" title=" " alt="" coords="97,121,73,156,69,153,92,118"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="111,241,174,267"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="153,194,149,226,143,226,148,193"/>
+<area shape="rect" id="Node000005" href="$stdint_8h.html" title=" " alt="" coords="22,241,87,267"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="137,196,84,234,81,230,134,192"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="146,315,209,341"/>
+<area shape="poly" id="edge8_Node000003_Node000006" title=" " alt="" coords="164,192,178,214,189,241,192,272,188,301,182,300,186,272,184,242,173,216,159,195"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="250,241,310,267"/>
+<area shape="poly" id="edge7_Node000003_Node000008" title=" " alt="" coords="175,192,246,231,243,236,172,196"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="77,265,145,305,142,309,74,270"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="21,315,88,341"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="57,267,57,299,52,299,52,267"/>
+<area shape="poly" id="edge10_Node000009_Node000005" title=" " alt="" coords="57,194,57,226,52,226,52,194"/>
+</map>

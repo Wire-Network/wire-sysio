@@ -1,0 +1,66 @@
+\doxysection{memory.\+cpp}
+\hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source}{}\label{runtimes_2sys-vm-oc_2memory_8cpp_source}\index{libraries/chain/webassembly/runtimes/sys-\/vm-\/oc/memory.cpp@{libraries/chain/webassembly/runtimes/sys-\/vm-\/oc/memory.cpp}}
+\mbox{\hyperlink{runtimes_2sys-vm-oc_2memory_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{chain_2include_2sysio_2chain_2webassembly_2sys-vm-oc_2memory_8hpp}{sysio/chain/webassembly/sys-\/vm-\/oc/memory.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{intrinsic_8hpp}{sysio/chain/webassembly/sys-\/vm-\/oc/intrinsic.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{intrinsic__mapping_8hpp}{sysio/chain/webassembly/sys-\/vm-\/oc/intrinsic\_mapping.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{scoped__exit_8hpp}{fc/scoped\_exit.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <unistd.h>}}
+\DoxyCodeLine{\Hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <sys/syscall.h>}}
+\DoxyCodeLine{\Hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ <sys/mman.h>}}
+\DoxyCodeLine{\Hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <linux/memfd.h>}}
+\DoxyCodeLine{\Hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source_l00012}00012\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{\ \textcolor{keyword}{namespace\ }chain\ \{\ \textcolor{keyword}{namespace\ }eosvmoc\ \{}
+\DoxyCodeLine{\Hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source_l00014}\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1memory_a3258c330efc6f8bccffdf348f0225e26}{00014}}\ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1memory_a3258c330efc6f8bccffdf348f0225e26}{memory::memory}}(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ max\_pages)\ \{}
+\DoxyCodeLine{\Hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source_l00015}00015\ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ number\_slices\ =\ max\_pages\ +\ 1;}
+\DoxyCodeLine{\Hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source_l00016}00016\ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ wasm\_memory\_size\ =\ max\_pages\ *\ wasm\_constraints::wasm\_page\_size;}
+\DoxyCodeLine{\Hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source_l00017}00017\ \ \ \ \textcolor{keywordtype}{int}\ fd\ =\ syscall(SYS\_memfd\_create,\ \textcolor{stringliteral}{"{}eosvmoc\_mem"{}},\ MFD\_CLOEXEC);}
+\DoxyCodeLine{\Hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source_l00018}00018\ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(fd\ >=\ 0,\ \textcolor{stringliteral}{"{}Failed\ to\ create\ memory\ memfd"{}});}
+\DoxyCodeLine{\Hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source_l00019}00019\ \ \ \ \textcolor{keyword}{auto}\ cleanup\_fd\ =\ \mbox{\hyperlink{namespacefc_a23d89b54a8ffd84f7e7efeb21747d846}{fc::make\_scoped\_exit}}([\&fd]()\{\mbox{\hyperlink{integration_8cpp_af5b66d867a040d002fb57d645cae3fb4}{close}}(fd);\});}
+\DoxyCodeLine{\Hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source_l00020}00020\ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ ftruncate(fd,\ wasm\_memory\_size+memory\_prologue\_size);}
+\DoxyCodeLine{\Hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source_l00021}00021\ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(!\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}},\ \textcolor{stringliteral}{"{}Failed\ to\ grow\ memory\ memfd"{}});}
+\DoxyCodeLine{\Hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source_l00023}00023\ \ \ \ mapsize\ =\ total\_memory\_per\_slice*number\_slices;}
+\DoxyCodeLine{\Hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source_l00024}00024\ \ \ \ mapbase\ =\ (\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}*)mmap(\textcolor{keyword}{nullptr},\ mapsize,\ PROT\_NONE,\ MAP\_PRIVATE|MAP\_ANON,\ 0,\ 0);}
+\DoxyCodeLine{\Hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source_l00025}00025\ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(mapbase\ !=\ MAP\_FAILED,\ \textcolor{stringliteral}{"{}Failed\ to\ mmap\ memory"{}});}
+\DoxyCodeLine{\Hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source_l00027}00027\ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}*\ next\_slice\ =\ mapbase;}
+\DoxyCodeLine{\Hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source_l00028}00028\ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}*\ last;}
+\DoxyCodeLine{\Hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source_l00030}00030\ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ 0;\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ <\ number\_slices;\ ++\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})\ \{}
+\DoxyCodeLine{\Hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source_l00031}00031\ \ \ \ \ \ \ last\ =\ (\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}*)mmap(next\_slice,\ memory\_prologue\_size+64u*1024u*\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\ PROT\_READ|PROT\_WRITE,\ MAP\_SHARED|MAP\_FIXED,\ fd,\ 0);}
+\DoxyCodeLine{\Hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source_l00032}00032\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(last\ !=\ MAP\_FAILED,\ \textcolor{stringliteral}{"{}Failed\ to\ mmap\ memory"{}});}
+\DoxyCodeLine{\Hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source_l00033}00033\ \ \ \ \ \ \ next\_slice\ +=\ total\_memory\_per\_slice;}
+\DoxyCodeLine{\Hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source_l00034}00034\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source_l00036}00036\ \ \ \ zeropage\_base\ =\ mapbase\ +\ memory\_prologue\_size;}
+\DoxyCodeLine{\Hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source_l00037}00037\ \ \ \ fullpage\_base\ =\ last\ +\ memory\_prologue\_size;}
+\DoxyCodeLine{\Hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source_l00039}00039\ \ \ \ \textcolor{comment}{//layout\ the\ intrinsic\ jump\ table}}
+\DoxyCodeLine{\Hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source_l00040}00040\ \ \ \ \mbox{\hyperlink{stdint_8h_a31b85deecb45924320becd11d3ee16ce}{uintptr\_t}}*\ \textcolor{keyword}{const}\ intrinsic\_jump\_table\ =\ \textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{stdint_8h_a31b85deecb45924320becd11d3ee16ce}{uintptr\_t}}*\ const\textcolor{keyword}{>}(zeropage\_base\ -\/\ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1memory_a3ca9186ab4cbb5e78898f09b3b4ef349}{first\_intrinsic\_offset}});}
+\DoxyCodeLine{\Hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source_l00041}00041\ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_af63b1d984c58d1e5445a96eae8eccb59}{intrinsic\_map\_t}}\&\ intrinsics\ =\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_abe43c1d3ddfb344db0cd7dd5ab25f48c}{get\_intrinsic\_map}}();}
+\DoxyCodeLine{\Hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source_l00042}00042\ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1intrinsic}{intrinsic}}\ :\ intrinsics)}
+\DoxyCodeLine{\Hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source_l00043}00043\ \ \ \ \ \ \ intrinsic\_jump\_table[-\/\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1intrinsic}{intrinsic}}.second.ordinal]\ =\ (\mbox{\hyperlink{stdint_8h_a31b85deecb45924320becd11d3ee16ce}{uintptr\_t}})\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1intrinsic}{intrinsic}}.second.function\_ptr;}
+\DoxyCodeLine{\Hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source_l00044}00044\ \}}
+\DoxyCodeLine{\Hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source_l00046}\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1memory_aa335f7f165983f34b047eae68394d2d0}{00046}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1memory_aa335f7f165983f34b047eae68394d2d0}{memory::reset}}(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ max\_pages)\ \{}
+\DoxyCodeLine{\Hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source_l00047}00047\ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ old\_max\_pages\ =\ mapsize\ /\ memory::total\_memory\_per\_slice\ -\/\ 1;}
+\DoxyCodeLine{\Hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source_l00048}00048\ \ \ \ \textcolor{keywordflow}{if}(max\_pages\ ==\ old\_max\_pages)\ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source_l00049}00049\ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1memory}{memory}}\ new\_memory\{max\_pages\};}
+\DoxyCodeLine{\Hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source_l00050}00050\ \ \ \ \mbox{\hyperlink{namespacestd_abb7e41c7063536ff6eeee4bb5f66de6c}{std::swap}}(mapbase,\ new\_memory.mapbase);}
+\DoxyCodeLine{\Hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source_l00051}00051\ \ \ \ \mbox{\hyperlink{namespacestd_abb7e41c7063536ff6eeee4bb5f66de6c}{std::swap}}(mapsize,\ new\_memory.mapsize);}
+\DoxyCodeLine{\Hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source_l00052}00052\ \ \ \ \mbox{\hyperlink{namespacestd_abb7e41c7063536ff6eeee4bb5f66de6c}{std::swap}}(zeropage\_base,\ new\_memory.zeropage\_base);}
+\DoxyCodeLine{\Hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source_l00053}00053\ \ \ \ \mbox{\hyperlink{namespacestd_abb7e41c7063536ff6eeee4bb5f66de6c}{std::swap}}(fullpage\_base,\ new\_memory.fullpage\_base);}
+\DoxyCodeLine{\Hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source_l00054}00054\ \}}
+\DoxyCodeLine{\Hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source_l00056}\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1memory_a3bbd0e1e3622c07576fd61895fd8b8e4}{00056}}\ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1memory_a3bbd0e1e3622c07576fd61895fd8b8e4}{memory::\string~memory}}()\ \{}
+\DoxyCodeLine{\Hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source_l00057}00057\ \ \ \ munmap(mapbase,\ mapsize);}
+\DoxyCodeLine{\Hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source_l00058}00058\ \}}
+\DoxyCodeLine{\Hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{runtimes_2sys-vm-oc_2memory_8cpp_source_l00060}00060\ \}\}\}}
+
+\end{DoxyCode}

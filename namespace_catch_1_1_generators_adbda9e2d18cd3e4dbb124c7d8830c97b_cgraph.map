@@ -1,0 +1,21 @@
+<map id="Catch::Generators::generate" name="Catch::Generators::generate">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,144,142,185"/>
+<area shape="poly" id="edge7_Node000001_Node000001" title=" " alt="" coords="35,144,33,134,40,125,53,119,74,117,95,120,108,126,106,131,94,125,73,123,54,125,43,129,39,135,41,143"/>
+<area shape="rect" id="Node000002" href="$namespace_catch_1_1_generators.html#a36413e3baec520d89d21bea23b7bea5b" title=" " alt="" coords="192,45,356,86"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="108,141,188,97,203,90,205,95,191,101,110,146"/>
+<area shape="rect" id="Node000007" href="$struct_catch_1_1_i_generator_tracker.html#a23be942fc51672598bfa02c678c3078a" title=" " alt="" coords="190,111,359,151"/>
+<area shape="poly" id="edge8_Node000001_Node000007" title=" " alt="" coords="141,150,174,145,175,150,142,156"/>
+<area shape="rect" id="Node000008" href="$struct_catch_1_1_i_generator_tracker.html#ae88084f9af27c8b9a5d5775b9c148498" title=" " alt="" coords="190,176,359,217"/>
+<area shape="poly" id="edge9_Node000001_Node000008" title=" " alt="" coords="142,173,175,178,174,183,141,178"/>
+<area shape="rect" id="Node000009" href="$struct_catch_1_1_i_generator_tracker.html#a9945eff42219edc5a7071eebd8b0419e" title=" " alt="" coords="190,241,359,282"/>
+<area shape="poly" id="edge10_Node000001_Node000009" title=" " alt="" coords="111,183,191,226,205,232,203,237,188,231,108,187"/>
+<area shape="rect" id="Node000003" href="$struct_catch_1_1_i_result_capture.html#ab020d111e29ad1cabe1227dcfda712ef" title=" " alt="" coords="407,5,579,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="356,48,391,42,392,47,357,53"/>
+<area shape="rect" id="Node000004" href="$namespace_catch.html#af718eeab870712f292ed8dc6ee3f6488" title=" " alt="" coords="410,94,576,120"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="357,79,407,88,406,93,356,84"/>
+<area shape="poly" id="edge6_Node000004_Node000004" title=" " alt="" coords="457,95,450,86,454,76,469,70,493,68,520,70,534,77,531,82,518,75,493,73,470,75,458,80,455,85,461,92"/>
+<area shape="rect" id="Node000005" href="$namespace_catch.html#a228a625318bb6183842e394eeba17d50" title=" " alt="" coords="627,94,799,120"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="577,104,612,104,612,110,577,110"/>
+<area shape="rect" id="Node000006" href="$namespace_catch.html#a710841d4732b86c06f816bd4822bd425" title=" " alt="" coords="847,87,1018,127"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="799,104,831,104,831,110,799,110"/>
+</map>

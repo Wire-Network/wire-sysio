@@ -1,0 +1,41 @@
+\doxysection{udp\+\_\+socket.\+hpp}
+\hypertarget{udp__socket_8hpp_source}{}\label{udp__socket_8hpp_source}\index{libraries/fc/include/fc/network/udp\_socket.hpp@{libraries/fc/include/fc/network/udp\_socket.hpp}}
+\mbox{\hyperlink{udp__socket_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{udp__socket_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{udp__socket_8hpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{utility_8hpp}{fc/utility.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{udp__socket_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <memory>}}
+\DoxyCodeLine{\Hypertarget{udp__socket_8hpp_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{udp__socket_8hpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <boost/asio.hpp>}}
+\DoxyCodeLine{\Hypertarget{udp__socket_8hpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{udp__socket_8hpp_source_l00007}00007\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}\ \{}
+\DoxyCodeLine{\Hypertarget{udp__socket_8hpp_source_l00008}00008\ \ \ \textcolor{keyword}{namespace\ }ip\ \{}
+\DoxyCodeLine{\Hypertarget{udp__socket_8hpp_source_l00009}00009\ \ \ \ \ \textcolor{keyword}{class\ }endpoint;}
+\DoxyCodeLine{\Hypertarget{udp__socket_8hpp_source_l00010}00010\ \ \ \ \ \textcolor{keyword}{class\ }address;}
+\DoxyCodeLine{\Hypertarget{udp__socket_8hpp_source_l00011}00011\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{udp__socket_8hpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{udp__socket_8hpp_source_l00017}\mbox{\hyperlink{classfc_1_1udp__socket}{00017}}\ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classfc_1_1udp__socket}{udp\_socket}}\ \{}
+\DoxyCodeLine{\Hypertarget{udp__socket_8hpp_source_l00018}00018\ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{udp__socket_8hpp_source_l00019}00019\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1udp__socket_a2df5a8406c77e5e10e102b47eff97038}{udp\_socket}}();}
+\DoxyCodeLine{\Hypertarget{udp__socket_8hpp_source_l00020}\mbox{\hyperlink{classfc_1_1udp__socket_a9ff80cf2ec65a3c887f8e00e79cf8f98}{00020}}\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1udp__socket_a9ff80cf2ec65a3c887f8e00e79cf8f98}{udp\_socket}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1udp__socket}{udp\_socket}}\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ );}
+\DoxyCodeLine{\Hypertarget{udp__socket_8hpp_source_l00021}00021\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1udp__socket_af8942060d2c3b249d63c93d56ba7d6d8}{\string~udp\_socket}}();}
+\DoxyCodeLine{\Hypertarget{udp__socket_8hpp_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{udp__socket_8hpp_source_l00023}00023\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1udp__socket_ad9f0cf8cf36cf5948be0fc7f3664fd28}{initialize}}(boost::asio::io\_service\ \&);}
+\DoxyCodeLine{\Hypertarget{udp__socket_8hpp_source_l00024}00024\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1udp__socket_ae38731361b74a2841f4691066ac31d86}{open}}();}
+\DoxyCodeLine{\Hypertarget{udp__socket_8hpp_source_l00025}00025\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1udp__socket_a99f7b46a3566de47d7977ce10b674fe1}{send\_to}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ b,\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}},\ boost::asio::ip::udp::endpoint\ \&to);}
+\DoxyCodeLine{\Hypertarget{udp__socket_8hpp_source_l00026}00026\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1udp__socket_a99f7b46a3566de47d7977ce10b674fe1}{send\_to}}(\textcolor{keyword}{const}\ std::shared\_ptr<const\ char>\&\ b,\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}},\ boost::asio::ip::udp::endpoint\ \&to);}
+\DoxyCodeLine{\Hypertarget{udp__socket_8hpp_source_l00027}00027\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1udp__socket_a7be64e6fda2524b07192ca354559bbcd}{close}}();}
+\DoxyCodeLine{\Hypertarget{udp__socket_8hpp_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{udp__socket_8hpp_source_l00029}00029\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1udp__socket_a65856d35d2beda8da40ab9f916705f21}{set\_reuse\_address}}(\textcolor{keywordtype}{bool});}
+\DoxyCodeLine{\Hypertarget{udp__socket_8hpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{udp__socket_8hpp_source_l00031}00031\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1udp__socket_acd2fec7ae0595eb52ec1241998ac90ed}{connect}}(\textcolor{keyword}{const}\ boost::asio::ip::udp::endpoint\&\ e);}
+\DoxyCodeLine{\Hypertarget{udp__socket_8hpp_source_l00032}00032\ \ \ \ \ \ \ \textcolor{keyword}{const}\ boost::asio::ip::udp::endpoint\ \mbox{\hyperlink{classfc_1_1udp__socket_a315ceb1d2edbec581dbffe676784ff05}{local\_endpoint}}()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{udp__socket_8hpp_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{udp__socket_8hpp_source_l00034}00034\ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{udp__socket_8hpp_source_l00035}00035\ \ \ \ \ \ \ \textcolor{keyword}{class\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }\mbox{\hyperlink{classfc_1_1udp__socket_1_1impl}{impl}};}
+\DoxyCodeLine{\Hypertarget{udp__socket_8hpp_source_l00036}00036\ \ \ \ \ \ \ std::shared\_ptr<impl>\ my;}
+\DoxyCodeLine{\Hypertarget{udp__socket_8hpp_source_l00037}00037\ \ \ \};}
+\DoxyCodeLine{\Hypertarget{udp__socket_8hpp_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{udp__socket_8hpp_source_l00039}00039\ \}}
+
+\end{DoxyCode}

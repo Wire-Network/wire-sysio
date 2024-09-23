@@ -1,0 +1,592 @@
+\doxysection{sysio\+::wallet\+::detail\+::soft\+\_\+wallet\+\_\+impl Class Reference}
+\hypertarget{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl}{}\label{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl}\index{sysio::wallet::detail::soft\_wallet\_impl@{sysio::wallet::detail::soft\_wallet\_impl}}
+
+
+Collaboration diagram for sysio\+::wallet\+::detail\+::soft\+\_\+wallet\+\_\+impl\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a6b3ccae9545bd7e0e9db831bdc10ef7f}{soft\+\_\+wallet\+\_\+impl}} (\mbox{\hyperlink{classsysio_1_1wallet_1_1soft__wallet}{soft\+\_\+wallet}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, const \mbox{\hyperlink{structsysio_1_1wallet_1_1wallet__data}{wallet\+\_\+data}} \&initial\+\_\+data)
+\item 
+virtual \mbox{\hyperlink{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a97d1f28fc3ca5b3a092b27dff0cb10a1}{\texorpdfstring{$\sim$}{\string~}soft\+\_\+wallet\+\_\+impl}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a90036b5b55f9231d0e3cebca29d89b2f}{encrypt\+\_\+keys}} ()
+\item 
+bool \mbox{\hyperlink{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a9fde3e274668891c6f9bdaa1b98c04f2}{copy\+\_\+wallet\+\_\+file}} (\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} destination\+\_\+filename)
+\item 
+bool \mbox{\hyperlink{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_aad845509f4f1ceb87851c530a138a701}{is\+\_\+locked}} () const
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a9c7494e373a54b6d595b744e8468d949}{get\+\_\+wallet\+\_\+filename}} () const
+\item 
+std\+::optional$<$ \mbox{\hyperlink{namespacesysio_1_1chain_ac31c0e1bc25b7e5fcf2b3c7f41a23fd6}{private\+\_\+key\+\_\+type}} $>$ \mbox{\hyperlink{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_adaffb0c6a3d0c98ac767d7c56bd46dc4}{try\+\_\+get\+\_\+private\+\_\+key}} (const \mbox{\hyperlink{namespacesysio_1_1chain_a0628a11f388cd2e43b1ccc1260a1042f}{public\+\_\+key\+\_\+type}} \&\mbox{\hyperlink{code__cache_8cpp_aa0efefe21f4700d78692edc823e763be}{id}}) const
+\item 
+std\+::optional$<$ \mbox{\hyperlink{namespacesysio_1_1chain_af141a69eb789b86fa0eb93c2d263f0df}{signature\+\_\+type}} $>$ \mbox{\hyperlink{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_aef32d03f79f436f35e3b56ea119818f1}{try\+\_\+sign\+\_\+digest}} (const \mbox{\hyperlink{namespacesysio_1_1chain_a357fd9478475457e5bb386a3143079b6}{digest\+\_\+type}} \mbox{\hyperlink{namespacefc_a150ca4cd9c0318ca45dc0dc7df5d58b9}{digest}}, const \mbox{\hyperlink{namespacesysio_1_1chain_a0628a11f388cd2e43b1ccc1260a1042f}{public\+\_\+key\+\_\+type}} \mbox{\hyperlink{classfc_1_1crypto_1_1r1_1_1public__key}{public\+\_\+key}})
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_ac31c0e1bc25b7e5fcf2b3c7f41a23fd6}{private\+\_\+key\+\_\+type}} \mbox{\hyperlink{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a98eed05f5989104caddd4041f4c8a3f7}{get\+\_\+private\+\_\+key}} (const \mbox{\hyperlink{namespacesysio_1_1chain_a0628a11f388cd2e43b1ccc1260a1042f}{public\+\_\+key\+\_\+type}} \&\mbox{\hyperlink{code__cache_8cpp_aa0efefe21f4700d78692edc823e763be}{id}}) const
+\item 
+bool \mbox{\hyperlink{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a209e66b1b230dc9ff609f55e6d2fc8d0}{import\+\_\+key}} (\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} wif\+\_\+key)
+\item 
+bool \mbox{\hyperlink{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_aa6e7f0634d8c04604796de007f8a6630}{remove\+\_\+key}} (\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} key)
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_ac0bb6e717959f085c38a2c165b7ed8f8}{create\+\_\+key}} (\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{yubihsm__pkcs11_8c_afa4592d59d085cf06cad9000120eba84}{key\+\_\+type}})
+\item 
+bool \mbox{\hyperlink{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_ab8e31b2bea3effe502bbff09d2b99391}{load\+\_\+wallet\+\_\+file}} (\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} wallet\+\_\+filename="{}"{})
+\item 
+void \mbox{\hyperlink{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a234afd2d0b84979c77abac087f6cdbb8}{save\+\_\+wallet\+\_\+file}} (\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} wallet\+\_\+filename="{}"{})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classsysio_1_1wallet_1_1soft__wallet}{soft\+\_\+wallet}} \& \mbox{\hyperlink{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_aa38e161a23de4e7cafa0272aa7b027e3}{self}}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a6adc9142b347747ca572b0249caa4ae0}{\+\_\+wallet\+\_\+filename}}
+\item 
+\mbox{\hyperlink{structsysio_1_1wallet_1_1wallet__data}{wallet\+\_\+data}} \mbox{\hyperlink{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a6194fdd9762a99a00e9996418da213d1}{\+\_\+wallet}}
+\item 
+map$<$ \mbox{\hyperlink{namespacesysio_1_1chain_a0628a11f388cd2e43b1ccc1260a1042f}{public\+\_\+key\+\_\+type}}, \mbox{\hyperlink{namespacesysio_1_1chain_ac31c0e1bc25b7e5fcf2b3c7f41a23fd6}{private\+\_\+key\+\_\+type}} $>$ \mbox{\hyperlink{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a97ad2429e6492c429d82b58a2649957e}{\+\_\+keys}}
+\item 
+\mbox{\hyperlink{classfc_1_1sha512}{fc\+::sha512}} \mbox{\hyperlink{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_aff82677211a7c5b1ddc8f133826f36dc}{\+\_\+checksum}}
+\item 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_ab2e481e447545f90d5bededb1b7753b5}{\+\_\+wallet\+\_\+filename\+\_\+extension}} = "{}.wallet"{}
+\item 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_ae219ed9080138909091875e974af73f9}{\+\_\+default\+\_\+key\+\_\+type}} = "{}K1"{}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{wallet_8cpp_source_l00041}{41}} of file \mbox{\hyperlink{wallet_8cpp_source}{wallet.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a6b3ccae9545bd7e0e9db831bdc10ef7f}\index{sysio::wallet::detail::soft\_wallet\_impl@{sysio::wallet::detail::soft\_wallet\_impl}!soft\_wallet\_impl@{soft\_wallet\_impl}}
+\index{soft\_wallet\_impl@{soft\_wallet\_impl}!sysio::wallet::detail::soft\_wallet\_impl@{sysio::wallet::detail::soft\_wallet\_impl}}
+\doxysubsubsection{\texorpdfstring{soft\_wallet\_impl()}{soft\_wallet\_impl()}}
+{\footnotesize\ttfamily \label{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a6b3ccae9545bd7e0e9db831bdc10ef7f} 
+sysio\+::wallet\+::detail\+::soft\+\_\+wallet\+\_\+impl\+::soft\+\_\+wallet\+\_\+impl (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classsysio_1_1wallet_1_1soft__wallet}{soft\+\_\+wallet}} \&}]{s}{, }\item[{const \mbox{\hyperlink{structsysio_1_1wallet_1_1wallet__data}{wallet\+\_\+data}} \&}]{initial\+\_\+data}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{wallet_8cpp_source_l00058}{58}} of file \mbox{\hyperlink{wallet_8cpp_source}{wallet.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ :\ \mbox{\hyperlink{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_aa38e161a23de4e7cafa0272aa7b027e3}{self}}(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ )}
+\DoxyCodeLine{00060\ \ \ \ \{}
+\DoxyCodeLine{00061\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a97d1f28fc3ca5b3a092b27dff0cb10a1}\index{sysio::wallet::detail::soft\_wallet\_impl@{sysio::wallet::detail::soft\_wallet\_impl}!````~soft\_wallet\_impl@{\texorpdfstring{$\sim$}{\string~}soft\_wallet\_impl}}
+\index{````~soft\_wallet\_impl@{\texorpdfstring{$\sim$}{\string~}soft\_wallet\_impl}!sysio::wallet::detail::soft\_wallet\_impl@{sysio::wallet::detail::soft\_wallet\_impl}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}soft\_wallet\_impl()}{\string~soft\_wallet\_impl()}}
+{\footnotesize\ttfamily \label{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a97d1f28fc3ca5b3a092b27dff0cb10a1} 
+virtual sysio\+::wallet\+::detail\+::soft\+\_\+wallet\+\_\+impl\+::\texorpdfstring{$\sim$}{\string~}soft\+\_\+wallet\+\_\+impl (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{wallet_8cpp_source_l00063}{63}} of file \mbox{\hyperlink{wallet_8cpp_source}{wallet.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00064\ \ \ \ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a9fde3e274668891c6f9bdaa1b98c04f2}\index{sysio::wallet::detail::soft\_wallet\_impl@{sysio::wallet::detail::soft\_wallet\_impl}!copy\_wallet\_file@{copy\_wallet\_file}}
+\index{copy\_wallet\_file@{copy\_wallet\_file}!sysio::wallet::detail::soft\_wallet\_impl@{sysio::wallet::detail::soft\_wallet\_impl}}
+\doxysubsubsection{\texorpdfstring{copy\_wallet\_file()}{copy\_wallet\_file()}}
+{\footnotesize\ttfamily \label{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a9fde3e274668891c6f9bdaa1b98c04f2} 
+bool sysio\+::wallet\+::detail\+::soft\+\_\+wallet\+\_\+impl\+::copy\+\_\+wallet\+\_\+file (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}}}]{destination\+\_\+filename}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{wallet_8cpp_source_l00078}{78}} of file \mbox{\hyperlink{wallet_8cpp_source}{wallet.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00079\ \ \ \ \{}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1path}{fc::path}}\ src\_path\ =\ \mbox{\hyperlink{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a9c7494e373a54b6d595b744e8468d949}{get\_wallet\_filename}}();}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !\mbox{\hyperlink{namespacefc_a3fcf0d920aea28014aacae50a51d8485}{fc::exists}}(\ src\_path\ )\ )}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1path}{fc::path}}\ dest\_path\ =\ destination\_filename\ +\ \mbox{\hyperlink{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_ab2e481e447545f90d5bededb1b7753b5}{\_wallet\_filename\_extension}};}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ suffix\ =\ 0;}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\ \mbox{\hyperlink{namespacefc_a3fcf0d920aea28014aacae50a51d8485}{fc::exists}}(dest\_path)\ )}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \ ++suffix;}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ dest\_path\ =\ destination\_filename\ +\ \textcolor{stringliteral}{"{}-\/"{}}\ +\ std::to\_string(\ suffix\ )\ +\ \mbox{\hyperlink{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_ab2e481e447545f90d5bededb1b7753b5}{\_wallet\_filename\_extension}};}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a1759e5c9691d8ad754bdf5eff8bb23ac}{wlog}}(\ \textcolor{stringliteral}{"{}backing\ up\ wallet\ \$\{src\}\ to\ \$\{dest\}"{}},}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}src"{}},\ src\_path)}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}dest"{}},\ dest\_path)\ );}
+\DoxyCodeLine{00093\ }
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1path}{fc::path}}\ dest\_parent\ =\ \mbox{\hyperlink{namespacefc_ab76ad94ec93db365293a67053393fbb4}{fc::absolute}}(dest\_path).\mbox{\hyperlink{classfc_1_1path_a10985bab813b9197980458e4345d0f36}{parent\_path}}();}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \textcolor{keywordflow}{try}}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ enable\_umask\_protection();}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !\mbox{\hyperlink{namespacefc_a3fcf0d920aea28014aacae50a51d8485}{fc::exists}}(\ dest\_parent\ )\ )}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a76b0787468a9f403087b71a894c07ce2}{fc::create\_directories}}(\ dest\_parent\ );}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a79771837fffd80fcc4bc658ee2fc4b2b}{fc::copy}}(\ src\_path,\ dest\_path\ );}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ disable\_umask\_protection();}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \textcolor{keywordflow}{catch}(...)}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ disable\_umask\_protection();}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw};}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00109\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a9fde3e274668891c6f9bdaa1b98c04f2_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_ac0bb6e717959f085c38a2c165b7ed8f8}\index{sysio::wallet::detail::soft\_wallet\_impl@{sysio::wallet::detail::soft\_wallet\_impl}!create\_key@{create\_key}}
+\index{create\_key@{create\_key}!sysio::wallet::detail::soft\_wallet\_impl@{sysio::wallet::detail::soft\_wallet\_impl}}
+\doxysubsubsection{\texorpdfstring{create\_key()}{create\_key()}}
+{\footnotesize\ttfamily \label{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_ac0bb6e717959f085c38a2c165b7ed8f8} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::wallet\+::detail\+::soft\+\_\+wallet\+\_\+impl\+::create\+\_\+key (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}}}]{key\+\_\+type}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{wallet_8cpp_source_l00172}{172}} of file \mbox{\hyperlink{wallet_8cpp_source}{wallet.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00173\ \ \ \ \{}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{yubihsm__pkcs11_8c_afa4592d59d085cf06cad9000120eba84}{key\_type}}.empty())}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_afa4592d59d085cf06cad9000120eba84}{key\_type}}\ =\ \mbox{\hyperlink{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_ae219ed9080138909091875e974af73f9}{\_default\_key\_type}};}
+\DoxyCodeLine{00176\ }
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1crypto_1_1private__key}{private\_key\_type}}\ priv\_key;}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{yubihsm__pkcs11_8c_afa4592d59d085cf06cad9000120eba84}{key\_type}}\ ==\ \textcolor{stringliteral}{"{}K1"{}})}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \ priv\_key\ =\ \mbox{\hyperlink{classfc_1_1crypto_1_1private__key_a54177eb6dda9421bb6e9661478f29807}{fc::crypto::private\_key::generate<fc::ecc::private\_key\_shim>}}();}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(\mbox{\hyperlink{yubihsm__pkcs11_8c_afa4592d59d085cf06cad9000120eba84}{key\_type}}\ ==\ \textcolor{stringliteral}{"{}R1"{}})}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ \ priv\_key\ =\ \mbox{\hyperlink{classfc_1_1crypto_1_1private__key_a54177eb6dda9421bb6e9661478f29807}{fc::crypto::private\_key::generate<fc::crypto::r1::private\_key\_shim>}}();}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a1bfa656552ea0534b2c91ee0fe33f850}{SYS\_THROW}}(chain::unsupported\_key\_type\_exception,\ \textcolor{stringliteral}{"{}Key\ type\ \(\backslash\)"{}\$\{kt\}\(\backslash\)"{}\ not\ supported\ by\ software\ wallet"{}},\ (\textcolor{stringliteral}{"{}kt"{}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_afa4592d59d085cf06cad9000120eba84}{key\_type}}));}
+\DoxyCodeLine{00184\ }
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a209e66b1b230dc9ff609f55e6d2fc8d0}{import\_key}}(priv\_key.\mbox{\hyperlink{classfc_1_1crypto_1_1private__key_a0430a98b68f76afaf991723d6b0ff925}{to\_string}}());}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ priv\_key.\mbox{\hyperlink{classfc_1_1crypto_1_1private__key_a5beb3f9004f8fe3e4d5bfe7256e55bdd}{get\_public\_key}}().\mbox{\hyperlink{classfc_1_1crypto_1_1public__key_ada5158a385e0d407268feb4790ba8646}{to\_string}}();}
+\DoxyCodeLine{00187\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_ac0bb6e717959f085c38a2c165b7ed8f8_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a90036b5b55f9231d0e3cebca29d89b2f}\index{sysio::wallet::detail::soft\_wallet\_impl@{sysio::wallet::detail::soft\_wallet\_impl}!encrypt\_keys@{encrypt\_keys}}
+\index{encrypt\_keys@{encrypt\_keys}!sysio::wallet::detail::soft\_wallet\_impl@{sysio::wallet::detail::soft\_wallet\_impl}}
+\doxysubsubsection{\texorpdfstring{encrypt\_keys()}{encrypt\_keys()}}
+{\footnotesize\ttfamily \label{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a90036b5b55f9231d0e3cebca29d89b2f} 
+void sysio\+::wallet\+::detail\+::soft\+\_\+wallet\+\_\+impl\+::encrypt\+\_\+keys (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{wallet_8cpp_source_l00066}{66}} of file \mbox{\hyperlink{wallet_8cpp_source}{wallet.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00067\ \ \ \ \{}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !\mbox{\hyperlink{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_aad845509f4f1ceb87851c530a138a701}{is\_locked}}()\ )}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ plain\_keys\ data;}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ data.keys\ =\ \mbox{\hyperlink{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a97ad2429e6492c429d82b58a2649957e}{\_keys}};}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ data.checksum\ =\ \mbox{\hyperlink{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_aff82677211a7c5b1ddc8f133826f36dc}{\_checksum}};}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ plain\_txt\ =\ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(data);}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a6194fdd9762a99a00e9996418da213d1}{\_wallet}}.\mbox{\hyperlink{structsysio_1_1wallet_1_1wallet__data_afb9c5ca94c3f457a184efa2c10a5751c}{cipher\_keys}}\ =\ \mbox{\hyperlink{namespacefc_a71eea521fccf7c6c7a01402d66de6a3f}{fc::aes\_encrypt}}(\ data.checksum,\ plain\_txt\ );}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00076\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a90036b5b55f9231d0e3cebca29d89b2f_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a90036b5b55f9231d0e3cebca29d89b2f_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a98eed05f5989104caddd4041f4c8a3f7}\index{sysio::wallet::detail::soft\_wallet\_impl@{sysio::wallet::detail::soft\_wallet\_impl}!get\_private\_key@{get\_private\_key}}
+\index{get\_private\_key@{get\_private\_key}!sysio::wallet::detail::soft\_wallet\_impl@{sysio::wallet::detail::soft\_wallet\_impl}}
+\doxysubsubsection{\texorpdfstring{get\_private\_key()}{get\_private\_key()}}
+{\footnotesize\ttfamily \label{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a98eed05f5989104caddd4041f4c8a3f7} 
+\mbox{\hyperlink{namespacesysio_1_1chain_ac31c0e1bc25b7e5fcf2b3c7f41a23fd6}{private\+\_\+key\+\_\+type}} sysio\+::wallet\+::detail\+::soft\+\_\+wallet\+\_\+impl\+::get\+\_\+private\+\_\+key (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_a0628a11f388cd2e43b1ccc1260a1042f}{public\+\_\+key\+\_\+type}} \&}]{id}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{wallet_8cpp_source_l00133}{133}} of file \mbox{\hyperlink{wallet_8cpp_source}{wallet.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00134\ \ \ \ \{}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ has\_key\ =\ \mbox{\hyperlink{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_adaffb0c6a3d0c98ac767d7c56bd46dc4}{try\_get\_private\_key}}(\ \textcolor{keywordtype}{id}\ );}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ has\_key,\ chain::key\_nonexistent\_exception,\ \textcolor{stringliteral}{"{}Key\ doesn't\ exist!"{}}\ );}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *has\_key;}
+\DoxyCodeLine{00138\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=338pt]{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a98eed05f5989104caddd4041f4c8a3f7_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a9c7494e373a54b6d595b744e8468d949}\index{sysio::wallet::detail::soft\_wallet\_impl@{sysio::wallet::detail::soft\_wallet\_impl}!get\_wallet\_filename@{get\_wallet\_filename}}
+\index{get\_wallet\_filename@{get\_wallet\_filename}!sysio::wallet::detail::soft\_wallet\_impl@{sysio::wallet::detail::soft\_wallet\_impl}}
+\doxysubsubsection{\texorpdfstring{get\_wallet\_filename()}{get\_wallet\_filename()}}
+{\footnotesize\ttfamily \label{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a9c7494e373a54b6d595b744e8468d949} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::wallet\+::detail\+::soft\+\_\+wallet\+\_\+impl\+::get\+\_\+wallet\+\_\+filename (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{wallet_8cpp_source_l00116}{116}} of file \mbox{\hyperlink{wallet_8cpp_source}{wallet.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00116\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a6adc9142b347747ca572b0249caa4ae0}{\_wallet\_filename}};\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=348pt]{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a9c7494e373a54b6d595b744e8468d949_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a209e66b1b230dc9ff609f55e6d2fc8d0}\index{sysio::wallet::detail::soft\_wallet\_impl@{sysio::wallet::detail::soft\_wallet\_impl}!import\_key@{import\_key}}
+\index{import\_key@{import\_key}!sysio::wallet::detail::soft\_wallet\_impl@{sysio::wallet::detail::soft\_wallet\_impl}}
+\doxysubsubsection{\texorpdfstring{import\_key()}{import\_key()}}
+{\footnotesize\ttfamily \label{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a209e66b1b230dc9ff609f55e6d2fc8d0} 
+bool sysio\+::wallet\+::detail\+::soft\+\_\+wallet\+\_\+impl\+::import\+\_\+key (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}}}]{wif\+\_\+key}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{wallet_8cpp_source_l00145}{145}} of file \mbox{\hyperlink{wallet_8cpp_source}{wallet.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00146\ \ \ \ \{}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1crypto_1_1private__key}{private\_key\_type}}\ priv(wif\_key);}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1crypto_1_1public__key}{sysio::chain::public\_key\_type}}\ wif\_pub\_key\ =\ priv.get\_public\_key();}
+\DoxyCodeLine{00149\ }
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ \mbox{\hyperlink{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a97ad2429e6492c429d82b58a2649957e}{\_keys}}.find(wif\_pub\_key);}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr\ ==\ \mbox{\hyperlink{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a97ad2429e6492c429d82b58a2649957e}{\_keys}}.end()\ )\ \{}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a97ad2429e6492c429d82b58a2649957e}{\_keys}}[wif\_pub\_key]\ =\ priv;}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a1bfa656552ea0534b2c91ee0fe33f850}{SYS\_THROW}}(\ chain::key\_exist\_exception,\ \textcolor{stringliteral}{"{}Key\ already\ in\ wallet"{}}\ );}
+\DoxyCodeLine{00156\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a209e66b1b230dc9ff609f55e6d2fc8d0_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a209e66b1b230dc9ff609f55e6d2fc8d0_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_aad845509f4f1ceb87851c530a138a701}\index{sysio::wallet::detail::soft\_wallet\_impl@{sysio::wallet::detail::soft\_wallet\_impl}!is\_locked@{is\_locked}}
+\index{is\_locked@{is\_locked}!sysio::wallet::detail::soft\_wallet\_impl@{sysio::wallet::detail::soft\_wallet\_impl}}
+\doxysubsubsection{\texorpdfstring{is\_locked()}{is\_locked()}}
+{\footnotesize\ttfamily \label{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_aad845509f4f1ceb87851c530a138a701} 
+bool sysio\+::wallet\+::detail\+::soft\+\_\+wallet\+\_\+impl\+::is\+\_\+locked (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{wallet_8cpp_source_l00111}{111}} of file \mbox{\hyperlink{wallet_8cpp_source}{wallet.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00112\ \ \ \ \{}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_aff82677211a7c5b1ddc8f133826f36dc}{\_checksum}}\ ==\ \mbox{\hyperlink{classfc_1_1sha512}{fc::sha512}}();}
+\DoxyCodeLine{00114\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_aad845509f4f1ceb87851c530a138a701_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_ab8e31b2bea3effe502bbff09d2b99391}\index{sysio::wallet::detail::soft\_wallet\_impl@{sysio::wallet::detail::soft\_wallet\_impl}!load\_wallet\_file@{load\_wallet\_file}}
+\index{load\_wallet\_file@{load\_wallet\_file}!sysio::wallet::detail::soft\_wallet\_impl@{sysio::wallet::detail::soft\_wallet\_impl}}
+\doxysubsubsection{\texorpdfstring{load\_wallet\_file()}{load\_wallet\_file()}}
+{\footnotesize\ttfamily \label{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_ab8e31b2bea3effe502bbff09d2b99391} 
+bool sysio\+::wallet\+::detail\+::soft\+\_\+wallet\+\_\+impl\+::load\+\_\+wallet\+\_\+file (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}}}]{wallet\+\_\+filename}{ = {\ttfamily "{}"{}}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{wallet_8cpp_source_l00189}{189}} of file \mbox{\hyperlink{wallet_8cpp_source}{wallet.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00190\ \ \ \ \{}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \textcolor{comment}{//\ TODO:\ \ Merge\ imported\ wallet\ with\ existing\ wallet,}}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \textcolor{comment}{//\ \ \ \ \ \ \ \ instead\ of\ replacing\ it}}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ wallet\_filename\ ==\ \textcolor{stringliteral}{"{}"{}}\ )}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ \ wallet\_filename\ =\ \mbox{\hyperlink{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a6adc9142b347747ca572b0249caa4ae0}{\_wallet\_filename}};}
+\DoxyCodeLine{00195\ }
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !\ \mbox{\hyperlink{namespacefc_a3fcf0d920aea28014aacae50a51d8485}{fc::exists}}(\ wallet\_filename\ )\ )}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00198\ }
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a6194fdd9762a99a00e9996418da213d1}{\_wallet}}\ =\ \mbox{\hyperlink{classfc_1_1json_a0b324722ac4eb4541d50ddaeed2dcb65}{fc::json::from\_file}}(\ wallet\_filename\ ).\mbox{\hyperlink{classfc_1_1variant_a82edd1f33199355d3a1f19bbb92909cc}{as}}<\ wallet\_data\ >();}
+\DoxyCodeLine{00200\ }
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00202\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_ab8e31b2bea3effe502bbff09d2b99391_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_aa6e7f0634d8c04604796de007f8a6630}\index{sysio::wallet::detail::soft\_wallet\_impl@{sysio::wallet::detail::soft\_wallet\_impl}!remove\_key@{remove\_key}}
+\index{remove\_key@{remove\_key}!sysio::wallet::detail::soft\_wallet\_impl@{sysio::wallet::detail::soft\_wallet\_impl}}
+\doxysubsubsection{\texorpdfstring{remove\_key()}{remove\_key()}}
+{\footnotesize\ttfamily \label{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_aa6e7f0634d8c04604796de007f8a6630} 
+bool sysio\+::wallet\+::detail\+::soft\+\_\+wallet\+\_\+impl\+::remove\+\_\+key (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}}}]{key}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{wallet_8cpp_source_l00161}{161}} of file \mbox{\hyperlink{wallet_8cpp_source}{wallet.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00162\ \ \ \ \{}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1crypto_1_1public__key}{public\_key\_type}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3037ff69dd24c6e34aee6fdd45269f13}{pub}}(key);}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ \mbox{\hyperlink{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a97ad2429e6492c429d82b58a2649957e}{\_keys}}.find(pub);}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr\ !=\ \mbox{\hyperlink{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a97ad2429e6492c429d82b58a2649957e}{\_keys}}.end()\ )\ \{}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a97ad2429e6492c429d82b58a2649957e}{\_keys}}.erase(pub);}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a1bfa656552ea0534b2c91ee0fe33f850}{SYS\_THROW}}(\ chain::key\_nonexistent\_exception,\ \textcolor{stringliteral}{"{}Key\ not\ in\ wallet"{}}\ );}
+\DoxyCodeLine{00170\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a234afd2d0b84979c77abac087f6cdbb8}\index{sysio::wallet::detail::soft\_wallet\_impl@{sysio::wallet::detail::soft\_wallet\_impl}!save\_wallet\_file@{save\_wallet\_file}}
+\index{save\_wallet\_file@{save\_wallet\_file}!sysio::wallet::detail::soft\_wallet\_impl@{sysio::wallet::detail::soft\_wallet\_impl}}
+\doxysubsubsection{\texorpdfstring{save\_wallet\_file()}{save\_wallet\_file()}}
+{\footnotesize\ttfamily \label{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a234afd2d0b84979c77abac087f6cdbb8} 
+void sysio\+::wallet\+::detail\+::soft\+\_\+wallet\+\_\+impl\+::save\+\_\+wallet\+\_\+file (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}}}]{wallet\+\_\+filename}{ = {\ttfamily "{}"{}}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{wallet_8cpp_source_l00204}{204}} of file \mbox{\hyperlink{wallet_8cpp_source}{wallet.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00205\ \ \ \ \{}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ \textcolor{comment}{//\ Serialize\ in\ memory,\ then\ save\ to\ disk}}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \textcolor{comment}{//\ This\ approach\ lessens\ the\ risk\ of\ a\ partially\ written\ wallet}}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \textcolor{comment}{//\ if\ exceptions\ are\ thrown\ in\ serialization}}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00212\ }
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a90036b5b55f9231d0e3cebca29d89b2f}{encrypt\_keys}}();}
+\DoxyCodeLine{00214\ }
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ wallet\_filename\ ==\ \textcolor{stringliteral}{"{}"{}}\ )}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ \ wallet\_filename\ =\ \mbox{\hyperlink{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a6adc9142b347747ca572b0249caa4ae0}{\_wallet\_filename}};}
+\DoxyCodeLine{00217\ }
+\DoxyCodeLine{00218\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a1759e5c9691d8ad754bdf5eff8bb23ac}{wlog}}(\ \textcolor{stringliteral}{"{}saving\ wallet\ to\ file\ \$\{fn\}"{}},\ (\textcolor{stringliteral}{"{}fn"{}},\ wallet\_filename)\ );}
+\DoxyCodeLine{00219\ }
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ data\ =\ \mbox{\hyperlink{classfc_1_1json_ae6c022ab581a9552ae2c97ff5d73aaf8}{fc::json::to\_pretty\_string}}(\ \mbox{\hyperlink{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a6194fdd9762a99a00e9996418da213d1}{\_wallet}}\ );}
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \textcolor{keywordflow}{try}}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \ \ \ enable\_umask\_protection();}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Parentheses\ on\ the\ following\ declaration\ fails\ to\ compile,}}
+\DoxyCodeLine{00226\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ due\ to\ the\ Most\ Vexing\ Parse.\ \ Thanks,\ C++}}
+\DoxyCodeLine{00227\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00228\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ http://en.wikipedia.org/wiki/Most\_vexing\_parse}}
+\DoxyCodeLine{00229\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00230\ \ \ \ \ \ \ \ \ \ ofstream\ outfile\{\ wallet\_filename\ \};}
+\DoxyCodeLine{00231\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!outfile)\ \{}
+\DoxyCodeLine{00232\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}}(\textcolor{stringliteral}{"{}Unable\ to\ open\ file:\ \$\{fn\}"{}},\ (\textcolor{stringliteral}{"{}fn"{}},\ wallet\_filename));}
+\DoxyCodeLine{00233\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a1bfa656552ea0534b2c91ee0fe33f850}{SYS\_THROW}}(wallet\_exception,\ \textcolor{stringliteral}{"{}Unable\ to\ open\ file:\ \$\{fn\}"{}},\ (\textcolor{stringliteral}{"{}fn"{}},\ wallet\_filename));}
+\DoxyCodeLine{00234\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \ \ \ outfile.write(\ data.c\_str(),\ data.length()\ );}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ \ outfile.flush();}
+\DoxyCodeLine{00237\ \ \ \ \ \ \ \ \ \ outfile.close();}
+\DoxyCodeLine{00238\ \ \ \ \ \ \ \ \ \ disable\_umask\_protection();}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \textcolor{keywordflow}{catch}(...)}
+\DoxyCodeLine{00241\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00242\ \ \ \ \ \ \ \ \ \ disable\_umask\_protection();}
+\DoxyCodeLine{00243\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw};}
+\DoxyCodeLine{00244\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00245\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a234afd2d0b84979c77abac087f6cdbb8_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_adaffb0c6a3d0c98ac767d7c56bd46dc4}\index{sysio::wallet::detail::soft\_wallet\_impl@{sysio::wallet::detail::soft\_wallet\_impl}!try\_get\_private\_key@{try\_get\_private\_key}}
+\index{try\_get\_private\_key@{try\_get\_private\_key}!sysio::wallet::detail::soft\_wallet\_impl@{sysio::wallet::detail::soft\_wallet\_impl}}
+\doxysubsubsection{\texorpdfstring{try\_get\_private\_key()}{try\_get\_private\_key()}}
+{\footnotesize\ttfamily \label{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_adaffb0c6a3d0c98ac767d7c56bd46dc4} 
+std\+::optional$<$ \mbox{\hyperlink{namespacesysio_1_1chain_ac31c0e1bc25b7e5fcf2b3c7f41a23fd6}{private\+\_\+key\+\_\+type}} $>$ sysio\+::wallet\+::detail\+::soft\+\_\+wallet\+\_\+impl\+::try\+\_\+get\+\_\+private\+\_\+key (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_a0628a11f388cd2e43b1ccc1260a1042f}{public\+\_\+key\+\_\+type}} \&}]{id}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{wallet_8cpp_source_l00118}{118}} of file \mbox{\hyperlink{wallet_8cpp_source}{wallet.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00119\ \ \ \ \{}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ it\ =\ \mbox{\hyperlink{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a97ad2429e6492c429d82b58a2649957e}{\_keys}}.find(\textcolor{keywordtype}{id});}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ it\ !=\ \mbox{\hyperlink{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a97ad2429e6492c429d82b58a2649957e}{\_keys}}.end()\ )}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \ it-\/>second;}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::optional<private\_key\_type>();}
+\DoxyCodeLine{00124\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=338pt]{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_adaffb0c6a3d0c98ac767d7c56bd46dc4_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_aef32d03f79f436f35e3b56ea119818f1}\index{sysio::wallet::detail::soft\_wallet\_impl@{sysio::wallet::detail::soft\_wallet\_impl}!try\_sign\_digest@{try\_sign\_digest}}
+\index{try\_sign\_digest@{try\_sign\_digest}!sysio::wallet::detail::soft\_wallet\_impl@{sysio::wallet::detail::soft\_wallet\_impl}}
+\doxysubsubsection{\texorpdfstring{try\_sign\_digest()}{try\_sign\_digest()}}
+{\footnotesize\ttfamily \label{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_aef32d03f79f436f35e3b56ea119818f1} 
+std\+::optional$<$ \mbox{\hyperlink{namespacesysio_1_1chain_af141a69eb789b86fa0eb93c2d263f0df}{signature\+\_\+type}} $>$ sysio\+::wallet\+::detail\+::soft\+\_\+wallet\+\_\+impl\+::try\+\_\+sign\+\_\+digest (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_a357fd9478475457e5bb386a3143079b6}{digest\+\_\+type}}}]{digest}{, }\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_a0628a11f388cd2e43b1ccc1260a1042f}{public\+\_\+key\+\_\+type}}}]{public\+\_\+key}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{wallet_8cpp_source_l00126}{126}} of file \mbox{\hyperlink{wallet_8cpp_source}{wallet.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ it\ =\ \mbox{\hyperlink{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a97ad2429e6492c429d82b58a2649957e}{\_keys}}.find(\mbox{\hyperlink{classfc_1_1public__key}{public\_key}});}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ it\ ==\ \mbox{\hyperlink{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a97ad2429e6492c429d82b58a2649957e}{\_keys}}.end()\ )}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::optional<signature\_type>();}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ it-\/>second.sign(\mbox{\hyperlink{namespacefc_a150ca4cd9c0318ca45dc0dc7df5d58b9}{digest}});}
+\DoxyCodeLine{00131\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_aef32d03f79f436f35e3b56ea119818f1_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_aff82677211a7c5b1ddc8f133826f36dc}\index{sysio::wallet::detail::soft\_wallet\_impl@{sysio::wallet::detail::soft\_wallet\_impl}!\_checksum@{\_checksum}}
+\index{\_checksum@{\_checksum}!sysio::wallet::detail::soft\_wallet\_impl@{sysio::wallet::detail::soft\_wallet\_impl}}
+\doxysubsubsection{\texorpdfstring{\_checksum}{\_checksum}}
+{\footnotesize\ttfamily \label{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_aff82677211a7c5b1ddc8f133826f36dc} 
+\mbox{\hyperlink{classfc_1_1sha512}{fc\+::sha512}} sysio\+::wallet\+::detail\+::soft\+\_\+wallet\+\_\+impl\+::\+\_\+checksum}
+
+
+
+Definition at line \mbox{\hyperlink{wallet_8cpp_source_l00251}{251}} of file \mbox{\hyperlink{wallet_8cpp_source}{wallet.\+cpp}}.
+
+\Hypertarget{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_ae219ed9080138909091875e974af73f9}\index{sysio::wallet::detail::soft\_wallet\_impl@{sysio::wallet::detail::soft\_wallet\_impl}!\_default\_key\_type@{\_default\_key\_type}}
+\index{\_default\_key\_type@{\_default\_key\_type}!sysio::wallet::detail::soft\_wallet\_impl@{sysio::wallet::detail::soft\_wallet\_impl}}
+\doxysubsubsection{\texorpdfstring{\_default\_key\_type}{\_default\_key\_type}}
+{\footnotesize\ttfamily \label{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_ae219ed9080138909091875e974af73f9} 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::wallet\+::detail\+::soft\+\_\+wallet\+\_\+impl\+::\+\_\+default\+\_\+key\+\_\+type = "{}K1"{}}
+
+
+
+Definition at line \mbox{\hyperlink{wallet_8cpp_source_l00257}{257}} of file \mbox{\hyperlink{wallet_8cpp_source}{wallet.\+cpp}}.
+
+\Hypertarget{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a97ad2429e6492c429d82b58a2649957e}\index{sysio::wallet::detail::soft\_wallet\_impl@{sysio::wallet::detail::soft\_wallet\_impl}!\_keys@{\_keys}}
+\index{\_keys@{\_keys}!sysio::wallet::detail::soft\_wallet\_impl@{sysio::wallet::detail::soft\_wallet\_impl}}
+\doxysubsubsection{\texorpdfstring{\_keys}{\_keys}}
+{\footnotesize\ttfamily \label{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a97ad2429e6492c429d82b58a2649957e} 
+map$<$\mbox{\hyperlink{namespacesysio_1_1chain_a0628a11f388cd2e43b1ccc1260a1042f}{public\+\_\+key\+\_\+type}},\mbox{\hyperlink{namespacesysio_1_1chain_ac31c0e1bc25b7e5fcf2b3c7f41a23fd6}{private\+\_\+key\+\_\+type}}$>$ sysio\+::wallet\+::detail\+::soft\+\_\+wallet\+\_\+impl\+::\+\_\+keys}
+
+
+
+Definition at line \mbox{\hyperlink{wallet_8cpp_source_l00250}{250}} of file \mbox{\hyperlink{wallet_8cpp_source}{wallet.\+cpp}}.
+
+\Hypertarget{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a6194fdd9762a99a00e9996418da213d1}\index{sysio::wallet::detail::soft\_wallet\_impl@{sysio::wallet::detail::soft\_wallet\_impl}!\_wallet@{\_wallet}}
+\index{\_wallet@{\_wallet}!sysio::wallet::detail::soft\_wallet\_impl@{sysio::wallet::detail::soft\_wallet\_impl}}
+\doxysubsubsection{\texorpdfstring{\_wallet}{\_wallet}}
+{\footnotesize\ttfamily \label{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a6194fdd9762a99a00e9996418da213d1} 
+\mbox{\hyperlink{structsysio_1_1wallet_1_1wallet__data}{wallet\+\_\+data}} sysio\+::wallet\+::detail\+::soft\+\_\+wallet\+\_\+impl\+::\+\_\+wallet}
+
+
+
+Definition at line \mbox{\hyperlink{wallet_8cpp_source_l00248}{248}} of file \mbox{\hyperlink{wallet_8cpp_source}{wallet.\+cpp}}.
+
+\Hypertarget{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a6adc9142b347747ca572b0249caa4ae0}\index{sysio::wallet::detail::soft\_wallet\_impl@{sysio::wallet::detail::soft\_wallet\_impl}!\_wallet\_filename@{\_wallet\_filename}}
+\index{\_wallet\_filename@{\_wallet\_filename}!sysio::wallet::detail::soft\_wallet\_impl@{sysio::wallet::detail::soft\_wallet\_impl}}
+\doxysubsubsection{\texorpdfstring{\_wallet\_filename}{\_wallet\_filename}}
+{\footnotesize\ttfamily \label{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_a6adc9142b347747ca572b0249caa4ae0} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::wallet\+::detail\+::soft\+\_\+wallet\+\_\+impl\+::\+\_\+wallet\+\_\+filename}
+
+
+
+Definition at line \mbox{\hyperlink{wallet_8cpp_source_l00247}{247}} of file \mbox{\hyperlink{wallet_8cpp_source}{wallet.\+cpp}}.
+
+\Hypertarget{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_ab2e481e447545f90d5bededb1b7753b5}\index{sysio::wallet::detail::soft\_wallet\_impl@{sysio::wallet::detail::soft\_wallet\_impl}!\_wallet\_filename\_extension@{\_wallet\_filename\_extension}}
+\index{\_wallet\_filename\_extension@{\_wallet\_filename\_extension}!sysio::wallet::detail::soft\_wallet\_impl@{sysio::wallet::detail::soft\_wallet\_impl}}
+\doxysubsubsection{\texorpdfstring{\_wallet\_filename\_extension}{\_wallet\_filename\_extension}}
+{\footnotesize\ttfamily \label{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_ab2e481e447545f90d5bededb1b7753b5} 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::wallet\+::detail\+::soft\+\_\+wallet\+\_\+impl\+::\+\_\+wallet\+\_\+filename\+\_\+extension = "{}.wallet"{}}
+
+
+
+Definition at line \mbox{\hyperlink{wallet_8cpp_source_l00256}{256}} of file \mbox{\hyperlink{wallet_8cpp_source}{wallet.\+cpp}}.
+
+\Hypertarget{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_aa38e161a23de4e7cafa0272aa7b027e3}\index{sysio::wallet::detail::soft\_wallet\_impl@{sysio::wallet::detail::soft\_wallet\_impl}!self@{self}}
+\index{self@{self}!sysio::wallet::detail::soft\_wallet\_impl@{sysio::wallet::detail::soft\_wallet\_impl}}
+\doxysubsubsection{\texorpdfstring{self}{self}}
+{\footnotesize\ttfamily \label{classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl_aa38e161a23de4e7cafa0272aa7b027e3} 
+\mbox{\hyperlink{classsysio_1_1wallet_1_1soft__wallet}{soft\+\_\+wallet}}\& sysio\+::wallet\+::detail\+::soft\+\_\+wallet\+\_\+impl\+::self}
+
+
+
+Definition at line \mbox{\hyperlink{wallet_8cpp_source_l00057}{57}} of file \mbox{\hyperlink{wallet_8cpp_source}{wallet.\+cpp}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+plugins/wallet\+\_\+plugin/\mbox{\hyperlink{wallet_8cpp}{wallet.\+cpp}}\end{DoxyCompactItemize}

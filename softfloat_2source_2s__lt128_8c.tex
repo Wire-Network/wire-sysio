@@ -1,0 +1,46 @@
+\doxysection{libraries/softfloat/source/s\+\_\+lt128.c File Reference}
+\hypertarget{softfloat_2source_2s__lt128_8c}{}\label{softfloat_2source_2s__lt128_8c}\index{libraries/softfloat/source/s\_lt128.c@{libraries/softfloat/source/s\_lt128.c}}
+{\ttfamily \#include $<$stdbool.\+h$>$}\newline
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include "{}platform.\+h"{}}\newline
+Include dependency graph for s\+\_\+lt128.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=280pt]{softfloat_2source_2s__lt128_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{softfloat_2source_2s__lt128_8c_ab45fc65949b6cb4fb871a4e3e1761406}{softfloat\+\_\+lt128}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} a64, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} a0, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} b64, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} b0)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{softfloat_2source_2s__lt128_8c_ab45fc65949b6cb4fb871a4e3e1761406}\index{s\_lt128.c@{s\_lt128.c}!softfloat\_lt128@{softfloat\_lt128}}
+\index{softfloat\_lt128@{softfloat\_lt128}!s\_lt128.c@{s\_lt128.c}}
+\doxysubsubsection{\texorpdfstring{softfloat\_lt128()}{softfloat\_lt128()}}
+{\footnotesize\ttfamily \label{softfloat_2source_2s__lt128_8c_ab45fc65949b6cb4fb871a4e3e1761406} 
+bool softfloat\+\_\+lt128 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{a64}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{a0}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{b64}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{b0}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2s__lt128_8c_source_l00043}{43}} of file \mbox{\hyperlink{softfloat_2source_2s__lt128_8c_source}{s\+\_\+lt128.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00044\ \{}
+\DoxyCodeLine{00045\ }
+\DoxyCodeLine{00046\ \ \ \ \ \textcolor{keywordflow}{return}\ (a64\ <\ b64)\ ||\ ((a64\ ==\ b64)\ \&\&\ (a0\ <\ b0));}
+\DoxyCodeLine{00047\ }
+\DoxyCodeLine{00048\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{softfloat_2source_2s__lt128_8c_ab45fc65949b6cb4fb871a4e3e1761406_icgraph}
+\end{center}
+\end{figure}

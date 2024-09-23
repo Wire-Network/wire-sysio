@@ -1,0 +1,8 @@
+<map id="sysio::chain::eosvmoc::memory::reset" name="sysio::chain::eosvmoc::memory::reset">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,158,46"/>
+<area shape="rect" id="Node000002" href="$namespacestd.html#abb7e41c7063536ff6eeee4bb5f66de6c" title=" " alt="" coords="206,13,284,38"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="158,23,190,23,190,28,158,28"/>
+<area shape="rect" id="Node000003" href="$classpicojson_1_1value.html#a6c948adb3a5c55091bfd16a84437199c" title=" " alt="" coords="332,13,479,38"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="285,31,317,32,316,37,284,36"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="332,19,300,20,300,14,332,14"/>
+</map>

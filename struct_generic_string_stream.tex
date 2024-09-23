@@ -1,0 +1,233 @@
+\doxysection{Generic\+String\+Stream\texorpdfstring{$<$}{<} Encoding \texorpdfstring{$>$}{>} Struct Template Reference}
+\hypertarget{struct_generic_string_stream}{}\label{struct_generic_string_stream}\index{GenericStringStream$<$ Encoding $>$@{GenericStringStream$<$ Encoding $>$}}
+
+
+Read-\/only string stream.  
+
+
+
+
+{\ttfamily \#include $<$stream.\+h$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef Encoding\+::\+Ch \mbox{\hyperlink{struct_generic_string_stream_ad4bd711cc72d70a6cfa1b68c88574627}{Ch}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_generic_string_stream_a6b20885ed64e33f5d081a1e83b07da06}{Generic\+String\+Stream}} (const \mbox{\hyperlink{struct_generic_string_stream_ad4bd711cc72d70a6cfa1b68c88574627}{Ch}} \texorpdfstring{$\ast$}{*}src)
+\item 
+\mbox{\hyperlink{struct_generic_string_stream_ad4bd711cc72d70a6cfa1b68c88574627}{Ch}} \mbox{\hyperlink{struct_generic_string_stream_a0c8fea9c2740c2953af9b3bb28bd469b}{Peek}} () const
+\item 
+\mbox{\hyperlink{struct_generic_string_stream_ad4bd711cc72d70a6cfa1b68c88574627}{Ch}} \mbox{\hyperlink{struct_generic_string_stream_a0d26e3e77e4fca64a87c2d71f48ac5e5}{Take}} ()
+\item 
+size\+\_\+t \mbox{\hyperlink{struct_generic_string_stream_abc73d04baf4c7c58f383bc52536e8ac4}{Tell}} () const
+\item 
+\mbox{\hyperlink{struct_generic_string_stream_ad4bd711cc72d70a6cfa1b68c88574627}{Ch}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{struct_generic_string_stream_a546c370fa1ea14a89a0bd717e1932c06}{Put\+Begin}} ()
+\item 
+void \mbox{\hyperlink{struct_generic_string_stream_aaa59dc5313151a4125bf7840f87a33eb}{Put}} (\mbox{\hyperlink{struct_generic_string_stream_ad4bd711cc72d70a6cfa1b68c88574627}{Ch}})
+\item 
+void \mbox{\hyperlink{struct_generic_string_stream_a5ff1a870d9334cd054cf4ca34c86ddc3}{Flush}} ()
+\item 
+size\+\_\+t \mbox{\hyperlink{struct_generic_string_stream_a07b942bacda494afb3b2f7629cef14af}{Put\+End}} (\mbox{\hyperlink{struct_generic_string_stream_ad4bd711cc72d70a6cfa1b68c88574627}{Ch}} \texorpdfstring{$\ast$}{*})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+const \mbox{\hyperlink{struct_generic_string_stream_ad4bd711cc72d70a6cfa1b68c88574627}{Ch}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{struct_generic_string_stream_aeda813798e3f2d6bfdac86afc11b6b80}{src\+\_\+}}
+\begin{DoxyCompactList}\small\item\em Current read position. \end{DoxyCompactList}\item 
+const \mbox{\hyperlink{struct_generic_string_stream_ad4bd711cc72d70a6cfa1b68c88574627}{Ch}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{struct_generic_string_stream_a3c86ef1e1f0655028cb8a3afce11ee4f}{head\+\_\+}}
+\begin{DoxyCompactList}\small\item\em Original head of the string. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}$>$\newline
+struct Generic\+String\+Stream$<$ Encoding $>$}
+\begin{DoxyNote}{Note}
+implements Stream concept 
+\end{DoxyNote}
+
+
+Definition at line \mbox{\hyperlink{stream_8h_source_l00154}{154}} of file \mbox{\hyperlink{stream_8h_source}{stream.\+h}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{struct_generic_string_stream_ad4bd711cc72d70a6cfa1b68c88574627}\index{GenericStringStream$<$ Encoding $>$@{GenericStringStream$<$ Encoding $>$}!Ch@{Ch}}
+\index{Ch@{Ch}!GenericStringStream$<$ Encoding $>$@{GenericStringStream$<$ Encoding $>$}}
+\doxysubsubsection{\texorpdfstring{Ch}{Ch}}
+{\footnotesize\ttfamily \label{struct_generic_string_stream_ad4bd711cc72d70a6cfa1b68c88574627} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$ \\
+Encoding\+::\+Ch \mbox{\hyperlink{struct_generic_string_stream}{Generic\+String\+Stream}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$\+::\+Ch}
+
+
+
+Definition at line \mbox{\hyperlink{stream_8h_source_l00155}{155}} of file \mbox{\hyperlink{stream_8h_source}{stream.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{struct_generic_string_stream_a6b20885ed64e33f5d081a1e83b07da06}\index{GenericStringStream$<$ Encoding $>$@{GenericStringStream$<$ Encoding $>$}!GenericStringStream@{GenericStringStream}}
+\index{GenericStringStream@{GenericStringStream}!GenericStringStream$<$ Encoding $>$@{GenericStringStream$<$ Encoding $>$}}
+\doxysubsubsection{\texorpdfstring{GenericStringStream()}{GenericStringStream()}}
+{\footnotesize\ttfamily \label{struct_generic_string_stream_a6b20885ed64e33f5d081a1e83b07da06} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$ \\
+\mbox{\hyperlink{struct_generic_string_stream}{Generic\+String\+Stream}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$\mbox{\hyperlink{struct_generic_string_stream}{\+::\+Generic\+String\+Stream}} (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct_generic_string_stream_ad4bd711cc72d70a6cfa1b68c88574627}{Ch}} \texorpdfstring{$\ast$}{*}}]{src}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{stream_8h_source_l00157}{157}} of file \mbox{\hyperlink{stream_8h_source}{stream.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00157\ :\ \mbox{\hyperlink{struct_generic_string_stream_aeda813798e3f2d6bfdac86afc11b6b80}{src\_}}(src),\ \mbox{\hyperlink{struct_generic_string_stream_a3c86ef1e1f0655028cb8a3afce11ee4f}{head\_}}(src)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_generic_string_stream_a5ff1a870d9334cd054cf4ca34c86ddc3}\index{GenericStringStream$<$ Encoding $>$@{GenericStringStream$<$ Encoding $>$}!Flush@{Flush}}
+\index{Flush@{Flush}!GenericStringStream$<$ Encoding $>$@{GenericStringStream$<$ Encoding $>$}}
+\doxysubsubsection{\texorpdfstring{Flush()}{Flush()}}
+{\footnotesize\ttfamily \label{struct_generic_string_stream_a5ff1a870d9334cd054cf4ca34c86ddc3} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$ \\
+void \mbox{\hyperlink{struct_generic_string_stream}{Generic\+String\+Stream}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$\+::\+Flush (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{stream_8h_source_l00165}{165}} of file \mbox{\hyperlink{stream_8h_source}{stream.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00165\ \{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\textcolor{keyword}{false});\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_generic_string_stream_a0c8fea9c2740c2953af9b3bb28bd469b}\index{GenericStringStream$<$ Encoding $>$@{GenericStringStream$<$ Encoding $>$}!Peek@{Peek}}
+\index{Peek@{Peek}!GenericStringStream$<$ Encoding $>$@{GenericStringStream$<$ Encoding $>$}}
+\doxysubsubsection{\texorpdfstring{Peek()}{Peek()}}
+{\footnotesize\ttfamily \label{struct_generic_string_stream_a0c8fea9c2740c2953af9b3bb28bd469b} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$ \\
+\mbox{\hyperlink{struct_generic_string_stream_ad4bd711cc72d70a6cfa1b68c88574627}{Ch}} \mbox{\hyperlink{struct_generic_string_stream}{Generic\+String\+Stream}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$\+::\+Peek (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{stream_8h_source_l00159}{159}} of file \mbox{\hyperlink{stream_8h_source}{stream.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00159\ \{\ \textcolor{keywordflow}{return}\ *\mbox{\hyperlink{struct_generic_string_stream_aeda813798e3f2d6bfdac86afc11b6b80}{src\_}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_generic_string_stream_aaa59dc5313151a4125bf7840f87a33eb}\index{GenericStringStream$<$ Encoding $>$@{GenericStringStream$<$ Encoding $>$}!Put@{Put}}
+\index{Put@{Put}!GenericStringStream$<$ Encoding $>$@{GenericStringStream$<$ Encoding $>$}}
+\doxysubsubsection{\texorpdfstring{Put()}{Put()}}
+{\footnotesize\ttfamily \label{struct_generic_string_stream_aaa59dc5313151a4125bf7840f87a33eb} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$ \\
+void \mbox{\hyperlink{struct_generic_string_stream}{Generic\+String\+Stream}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$\+::\+Put (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_generic_string_stream_ad4bd711cc72d70a6cfa1b68c88574627}{Ch}}}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{stream_8h_source_l00164}{164}} of file \mbox{\hyperlink{stream_8h_source}{stream.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00164\ \{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\textcolor{keyword}{false});\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_generic_string_stream_a546c370fa1ea14a89a0bd717e1932c06}\index{GenericStringStream$<$ Encoding $>$@{GenericStringStream$<$ Encoding $>$}!PutBegin@{PutBegin}}
+\index{PutBegin@{PutBegin}!GenericStringStream$<$ Encoding $>$@{GenericStringStream$<$ Encoding $>$}}
+\doxysubsubsection{\texorpdfstring{PutBegin()}{PutBegin()}}
+{\footnotesize\ttfamily \label{struct_generic_string_stream_a546c370fa1ea14a89a0bd717e1932c06} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$ \\
+\mbox{\hyperlink{struct_generic_string_stream_ad4bd711cc72d70a6cfa1b68c88574627}{Ch}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{struct_generic_string_stream}{Generic\+String\+Stream}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$\+::\+Put\+Begin (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{stream_8h_source_l00163}{163}} of file \mbox{\hyperlink{stream_8h_source}{stream.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00163\ \{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\textcolor{keyword}{false});\ \textcolor{keywordflow}{return}\ 0;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_generic_string_stream_a07b942bacda494afb3b2f7629cef14af}\index{GenericStringStream$<$ Encoding $>$@{GenericStringStream$<$ Encoding $>$}!PutEnd@{PutEnd}}
+\index{PutEnd@{PutEnd}!GenericStringStream$<$ Encoding $>$@{GenericStringStream$<$ Encoding $>$}}
+\doxysubsubsection{\texorpdfstring{PutEnd()}{PutEnd()}}
+{\footnotesize\ttfamily \label{struct_generic_string_stream_a07b942bacda494afb3b2f7629cef14af} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$ \\
+size\+\_\+t \mbox{\hyperlink{struct_generic_string_stream}{Generic\+String\+Stream}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$\+::\+Put\+End (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_generic_string_stream_ad4bd711cc72d70a6cfa1b68c88574627}{Ch}} \texorpdfstring{$\ast$}{*}}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{stream_8h_source_l00166}{166}} of file \mbox{\hyperlink{stream_8h_source}{stream.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00166\ \{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\textcolor{keyword}{false});\ \textcolor{keywordflow}{return}\ 0;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_generic_string_stream_a0d26e3e77e4fca64a87c2d71f48ac5e5}\index{GenericStringStream$<$ Encoding $>$@{GenericStringStream$<$ Encoding $>$}!Take@{Take}}
+\index{Take@{Take}!GenericStringStream$<$ Encoding $>$@{GenericStringStream$<$ Encoding $>$}}
+\doxysubsubsection{\texorpdfstring{Take()}{Take()}}
+{\footnotesize\ttfamily \label{struct_generic_string_stream_a0d26e3e77e4fca64a87c2d71f48ac5e5} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$ \\
+\mbox{\hyperlink{struct_generic_string_stream_ad4bd711cc72d70a6cfa1b68c88574627}{Ch}} \mbox{\hyperlink{struct_generic_string_stream}{Generic\+String\+Stream}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$\+::\+Take (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{stream_8h_source_l00160}{160}} of file \mbox{\hyperlink{stream_8h_source}{stream.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00160\ \{\ \textcolor{keywordflow}{return}\ *\mbox{\hyperlink{struct_generic_string_stream_aeda813798e3f2d6bfdac86afc11b6b80}{src\_}}++;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_generic_string_stream_abc73d04baf4c7c58f383bc52536e8ac4}\index{GenericStringStream$<$ Encoding $>$@{GenericStringStream$<$ Encoding $>$}!Tell@{Tell}}
+\index{Tell@{Tell}!GenericStringStream$<$ Encoding $>$@{GenericStringStream$<$ Encoding $>$}}
+\doxysubsubsection{\texorpdfstring{Tell()}{Tell()}}
+{\footnotesize\ttfamily \label{struct_generic_string_stream_abc73d04baf4c7c58f383bc52536e8ac4} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$ \\
+size\+\_\+t \mbox{\hyperlink{struct_generic_string_stream}{Generic\+String\+Stream}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$\+::\+Tell (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{stream_8h_source_l00161}{161}} of file \mbox{\hyperlink{stream_8h_source}{stream.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00161\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(\mbox{\hyperlink{struct_generic_string_stream_aeda813798e3f2d6bfdac86afc11b6b80}{src\_}}\ -\/\ \mbox{\hyperlink{struct_generic_string_stream_a3c86ef1e1f0655028cb8a3afce11ee4f}{head\_}});\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_generic_string_stream_a3c86ef1e1f0655028cb8a3afce11ee4f}\index{GenericStringStream$<$ Encoding $>$@{GenericStringStream$<$ Encoding $>$}!head\_@{head\_}}
+\index{head\_@{head\_}!GenericStringStream$<$ Encoding $>$@{GenericStringStream$<$ Encoding $>$}}
+\doxysubsubsection{\texorpdfstring{head\_}{head\_}}
+{\footnotesize\ttfamily \label{struct_generic_string_stream_a3c86ef1e1f0655028cb8a3afce11ee4f} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$ \\
+const \mbox{\hyperlink{struct_generic_string_stream_ad4bd711cc72d70a6cfa1b68c88574627}{Ch}}\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{struct_generic_string_stream}{Generic\+String\+Stream}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$\+::head\+\_\+}
+
+
+
+Definition at line \mbox{\hyperlink{stream_8h_source_l00169}{169}} of file \mbox{\hyperlink{stream_8h_source}{stream.\+h}}.
+
+\Hypertarget{struct_generic_string_stream_aeda813798e3f2d6bfdac86afc11b6b80}\index{GenericStringStream$<$ Encoding $>$@{GenericStringStream$<$ Encoding $>$}!src\_@{src\_}}
+\index{src\_@{src\_}!GenericStringStream$<$ Encoding $>$@{GenericStringStream$<$ Encoding $>$}}
+\doxysubsubsection{\texorpdfstring{src\_}{src\_}}
+{\footnotesize\ttfamily \label{struct_generic_string_stream_aeda813798e3f2d6bfdac86afc11b6b80} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$ \\
+const \mbox{\hyperlink{struct_generic_string_stream_ad4bd711cc72d70a6cfa1b68c88574627}{Ch}}\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{struct_generic_string_stream}{Generic\+String\+Stream}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$\+::src\+\_\+}
+
+
+
+Definition at line \mbox{\hyperlink{stream_8h_source_l00168}{168}} of file \mbox{\hyperlink{stream_8h_source}{stream.\+h}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/\mbox{\hyperlink{fwd_8h}{fwd.\+h}}\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/\mbox{\hyperlink{stream_8h}{stream.\+h}}\end{DoxyCompactItemize}

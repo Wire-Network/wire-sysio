@@ -1,0 +1,5 @@
+<map id="NFA::StateTransitionsByChar" name="NFA::StateTransitionsByChar">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,109,201,135"/>
+<area shape="rect" id="Node000002" href="$struct_pointer_int_helper.html" title=" " alt="" coords="22,5,184,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="106,61,106,109,100,109,100,61"/>
+</map>

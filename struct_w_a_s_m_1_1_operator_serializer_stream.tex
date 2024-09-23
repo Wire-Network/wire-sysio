@@ -1,0 +1,77 @@
+\doxysection{WASM\+::Operator\+Serializer\+Stream Struct Reference}
+\hypertarget{struct_w_a_s_m_1_1_operator_serializer_stream}{}\label{struct_w_a_s_m_1_1_operator_serializer_stream}\index{WASM::OperatorSerializerStream@{WASM::OperatorSerializerStream}}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef void \mbox{\hyperlink{struct_w_a_s_m_1_1_operator_serializer_stream_ac5d53dc45be02a6289798c2aa5ef2d9e}{Result}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_w_a_s_m_1_1_operator_serializer_stream_a5a7d2c973f3da20f91303c66c7c7cf69}{Operator\+Serializer\+Stream}} (\mbox{\hyperlink{struct_serialization_1_1_output_stream}{Serialization\+::\+Output\+Stream}} \&in\+Byte\+Stream, \mbox{\hyperlink{struct_i_r_1_1_function_def}{Function\+Def}} \&in\+Function\+Def)
+\item 
+void \mbox{\hyperlink{struct_w_a_s_m_1_1_operator_serializer_stream_aeabb0aa581b4f0236ec7b35e6ee1aaa8}{unknown}} (\mbox{\hyperlink{namespace_i_r_a59653fd60bb296de971e5f945c66933a}{Opcode}} opcode)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{_w_a_s_m_serialization_8cpp_source_l00420}{420}} of file \mbox{\hyperlink{_w_a_s_m_serialization_8cpp_source}{WASMSerialization.\+cpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{struct_w_a_s_m_1_1_operator_serializer_stream_ac5d53dc45be02a6289798c2aa5ef2d9e}\index{WASM::OperatorSerializerStream@{WASM::OperatorSerializerStream}!Result@{Result}}
+\index{Result@{Result}!WASM::OperatorSerializerStream@{WASM::OperatorSerializerStream}}
+\doxysubsubsection{\texorpdfstring{Result}{Result}}
+{\footnotesize\ttfamily \label{struct_w_a_s_m_1_1_operator_serializer_stream_ac5d53dc45be02a6289798c2aa5ef2d9e} 
+void \mbox{\hyperlink{struct_w_a_s_m_1_1_operator_serializer_stream_ac5d53dc45be02a6289798c2aa5ef2d9e}{WASM\+::\+Operator\+Serializer\+Stream\+::\+Result}}}
+
+
+
+Definition at line \mbox{\hyperlink{_w_a_s_m_serialization_8cpp_source_l00422}{422}} of file \mbox{\hyperlink{_w_a_s_m_serialization_8cpp_source}{WASMSerialization.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{struct_w_a_s_m_1_1_operator_serializer_stream_a5a7d2c973f3da20f91303c66c7c7cf69}\index{WASM::OperatorSerializerStream@{WASM::OperatorSerializerStream}!OperatorSerializerStream@{OperatorSerializerStream}}
+\index{OperatorSerializerStream@{OperatorSerializerStream}!WASM::OperatorSerializerStream@{WASM::OperatorSerializerStream}}
+\doxysubsubsection{\texorpdfstring{OperatorSerializerStream()}{OperatorSerializerStream()}}
+{\footnotesize\ttfamily \label{struct_w_a_s_m_1_1_operator_serializer_stream_a5a7d2c973f3da20f91303c66c7c7cf69} 
+WASM\+::\+Operator\+Serializer\+Stream\+::\+Operator\+Serializer\+Stream (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_serialization_1_1_output_stream}{Serialization\+::\+Output\+Stream}} \&}]{in\+Byte\+Stream}{, }\item[{\mbox{\hyperlink{struct_i_r_1_1_function_def}{Function\+Def}} \&}]{in\+Function\+Def}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_w_a_s_m_serialization_8cpp_source_l00424}{424}} of file \mbox{\hyperlink{_w_a_s_m_serialization_8cpp_source}{WASMSerialization.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00425\ \ \ \ \ \ \ \ \ :\ byteStream(inByteStream),\ functionDef(inFunctionDef)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_w_a_s_m_1_1_operator_serializer_stream_aeabb0aa581b4f0236ec7b35e6ee1aaa8}\index{WASM::OperatorSerializerStream@{WASM::OperatorSerializerStream}!unknown@{unknown}}
+\index{unknown@{unknown}!WASM::OperatorSerializerStream@{WASM::OperatorSerializerStream}}
+\doxysubsubsection{\texorpdfstring{unknown()}{unknown()}}
+{\footnotesize\ttfamily \label{struct_w_a_s_m_1_1_operator_serializer_stream_aeabb0aa581b4f0236ec7b35e6ee1aaa8} 
+void WASM\+::\+Operator\+Serializer\+Stream\+::unknown (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespace_i_r_a59653fd60bb296de971e5f945c66933a}{Opcode}}}]{opcode}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_w_a_s_m_serialization_8cpp_source_l00437}{437}} of file \mbox{\hyperlink{_w_a_s_m_serialization_8cpp_source}{WASMSerialization.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00438\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00439\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{struct_serialization_1_1_fatal_serialization_exception}{FatalSerializationException}}(\textcolor{stringliteral}{"{}unknown\ opcode"{}});}
+\DoxyCodeLine{00440\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/wasm-\/jit/\+Source/\+WASM/\mbox{\hyperlink{_w_a_s_m_serialization_8cpp}{WASMSerialization.\+cpp}}\end{DoxyCompactItemize}

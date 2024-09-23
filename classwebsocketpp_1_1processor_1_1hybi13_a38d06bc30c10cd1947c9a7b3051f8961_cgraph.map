@@ -1,0 +1,21 @@
+<map id="websocketpp::processor::hybi13::prepare_ping" name="websocketpp::processor::hybi13::prepare_ping">
+<area shape="rect" id="Node000001" title="Get URI." alt="" coords="5,71,169,111"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1processor_1_1hybi13.html#a5aa8f27959beeeef73997a80c2560663" title="Generic prepare control frame with opcode and payload." alt="" coords="217,71,381,111"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="169,88,201,88,201,94,169,94"/>
+<area shape="rect" id="Node000003" href="$namespacewebsocketpp_1_1frame_1_1opcode.html#aa5e7f94a35f8fb59a925fa01636f08ad" title="Check if an opcode is for a control frame." alt="" coords="441,5,580,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="366,68,427,49,429,54,368,73"/>
+<area shape="rect" id="Node000004" href="$classwebsocketpp_1_1processor_1_1hybi13.html#a888318b2773af49d458313a96a817a7a" title="Copy and mask/unmask in one operation." alt="" coords="429,71,592,111"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="382,88,413,88,413,94,382,94"/>
+<area shape="rect" id="Node000006" href="$namespacewebsocketpp_1_1frame.html#ae63c3e01399a6787ed09b710853344a4" title="Generate a properly sized contiguous string that encodes a full frame header." alt="" coords="441,136,580,177"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="368,109,429,128,427,133,366,114"/>
+<area shape="rect" id="Node000005" href="$namespacewebsocketpp_1_1frame.html#a417650d76aa2433163942d6a13334a6a" title="Byte by byte mask/unmask." alt="" coords="640,71,780,111"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="593,88,625,88,625,94,593,94"/>
+<area shape="rect" id="Node000007" href="$namespacewebsocketpp_1_1frame.html#abd4f23c906cc48fb3b34603fd4284b01" title="Calculates the full length of the header based on the first bytes." alt="" coords="640,136,780,177"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="581,154,625,154,625,159,581,159"/>
+<area shape="rect" id="Node000008" href="$namespacewebsocketpp_1_1frame.html#a4e8cf8ae88a7a8fdb2b3ea86623d01d2" title="check whether the frame is masked" alt="" coords="844,103,983,143"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="779,142,828,134,829,140,780,148"/>
+<area shape="rect" id="Node000009" href="$namespacewebsocketpp_1_1frame.html#a001d6c5e538d5eb1ef5ddc21aeb61ee3" title="Calculate the offset location of the masking key within the extended header." alt="" coords="828,168,999,209"/>
+<area shape="poly" id="edge8_Node000007_Node000009" title=" " alt="" coords="780,165,813,170,812,175,779,170"/>
+<area shape="rect" id="Node000010" href="$namespacewebsocketpp_1_1frame.html#a2ceb63e6a2fe19964d13363ba2bb9e15" title="Extracts the raw payload length specified in the basic header." alt="" coords="1047,168,1186,209"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="999,186,1032,186,1032,191,999,191"/>
+</map>

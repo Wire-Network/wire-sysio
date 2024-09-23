@@ -1,0 +1,18 @@
+<map id="libraries/fc/secp256k1/secp256k1/include/secp256k1_recovery.h" name="libraries/fc/secp256k1/secp256k1/include/secp256k1_recovery.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="395,5,595,61"/>
+<area shape="rect" id="Node000002" href="$recovery_2main__impl_8h.html" title=" " alt="" coords="5,109,169,165"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="380,64,188,112,169,116,168,111,186,106,379,59"/>
+<area shape="rect" id="Node000003" href="$recovery_2tests__exhaustive__impl_8h.html" title=" " alt="" coords="36,213,256,268"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="381,51,304,73,267,90,233,111,208,134,187,161,159,213,154,211,183,158,204,130,229,107,264,85,302,68,380,46"/>
+<area shape="rect" id="Node000004" href="$elliptic__em_8cpp.html" title=" " alt="" coords="243,116,387,157"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="435,71,351,118,348,114,432,67"/>
+<area shape="rect" id="Node000005" href="$elliptic__em__impl__priv_8cpp.html" title=" " alt="" coords="410,116,580,157"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="498,77,498,116,492,116,492,77"/>
+<area shape="rect" id="Node000006" href="$elliptic__impl__priv_8cpp.html" title=" " alt="" coords="604,116,748,157"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="558,67,643,114,640,118,555,71"/>
+<area shape="rect" id="Node000007" href="$elliptic__secp256k1_8cpp.html" title=" " alt="" coords="772,116,930,157"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="607,63,761,106,785,113,783,118,760,112,606,68"/>
+<area shape="rect" id="Node000008" href="$k1__recover_8cpp.html" title=" " alt="" coords="954,116,1097,157"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="611,47,769,71,942,106,968,113,967,118,941,112,768,76,610,52"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="113,177,132,211,128,213,108,180"/>
+</map>

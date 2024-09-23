@@ -1,0 +1,301 @@
+\doxysection{testing\+::internal\+::Parameterized\+Test\+Case\+Info\texorpdfstring{$<$}{<} Test\+Case \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classtesting_1_1internal_1_1_parameterized_test_case_info}{}\label{classtesting_1_1internal_1_1_parameterized_test_case_info}\index{testing::internal::ParameterizedTestCaseInfo$<$ TestCase $>$@{testing::internal::ParameterizedTestCaseInfo$<$ TestCase $>$}}
+
+
+{\ttfamily \#include $<$gtest-\/param-\/util.\+h$>$}
+
+
+
+Inheritance diagram for testing\+::internal\+::Parameterized\+Test\+Case\+Info\texorpdfstring{$<$}{<} Test\+Case \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=240pt]{classtesting_1_1internal_1_1_parameterized_test_case_info__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for testing\+::internal\+::Parameterized\+Test\+Case\+Info\texorpdfstring{$<$}{<} Test\+Case \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=240pt]{classtesting_1_1internal_1_1_parameterized_test_case_info__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef Test\+Case\+::\+Param\+Type \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_a76f4dbc1c6d695c4beeedd2acfe8455f}{Param\+Type}}
+\item 
+typedef \mbox{\hyperlink{structtesting_1_1internal_1_1_param_name_gen_func}{Param\+Name\+Gen\+Func}}$<$ \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_a76f4dbc1c6d695c4beeedd2acfe8455f}{Param\+Type}} $>$\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{\+::\+Type}} \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_a69934b21930d71c0b99d10a36ad08306}{Param\+Name\+Generator\+Func}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_a2f6a423f7ae8c7ac24b468538693aa26}{Param\+Generator}} (Generator\+Creation\+Func)()
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_a6d19f368428260bd5c6e608b4d3fc6af}{Parameterized\+Test\+Case\+Info}} (const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}, \mbox{\hyperlink{structtesting_1_1internal_1_1_code_location}{Code\+Location}} code\+\_\+location)
+\item 
+virtual const std\+::string \& \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_a95de02dac8135a6f1b6599a1f79c09c0}{Get\+Test\+Case\+Name}} () const
+\item 
+virtual \mbox{\hyperlink{namespacetesting_1_1internal_ab1114197d3c657d8b7f8e0c5caa12d00}{Type\+Id}} \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_a16ed77e95a6042c722d0029744acfc33}{Get\+Test\+Case\+Type\+Id}} () const
+\item 
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_a3e557c888ec5e23b138c2ff254db15e5}{Add\+Test\+Pattern}} (const char \texorpdfstring{$\ast$}{*}test\+\_\+case\+\_\+name, const char \texorpdfstring{$\ast$}{*}test\+\_\+base\+\_\+name, \mbox{\hyperlink{classtesting_1_1internal_1_1_test_meta_factory_base}{Test\+Meta\+Factory\+Base}}$<$ \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_a76f4dbc1c6d695c4beeedd2acfe8455f}{Param\+Type}} $>$ \texorpdfstring{$\ast$}{*}meta\+\_\+factory)
+\item 
+int \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_adefded091e3f20ac3a758029caea3eab}{Add\+Test\+Case\+Instantiation}} (const std\+::string \&instantiation\+\_\+name, Generator\+Creation\+Func \texorpdfstring{$\ast$}{*}func, \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_a69934b21930d71c0b99d10a36ad08306}{Param\+Name\+Generator\+Func}} \texorpdfstring{$\ast$}{*}name\+\_\+func, const char \texorpdfstring{$\ast$}{*}file, int line)
+\item 
+virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_a7e118820b3074ce70c0440e2e49a50a1}{Register\+Tests}} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_base}{testing\+::internal\+::\+Parameterized\+Test\+Case\+Info\+Base}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_base_affae85e908f0901a8f0f1f9576843e35}{\texorpdfstring{$\sim$}{\string~}\+Parameterized\+Test\+Case\+Info\+Base}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Protected Member Functions inherited from \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_base}{testing\+::internal\+::\+Parameterized\+Test\+Case\+Info\+Base}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_base_a48d0d6c661d0d5b6b404f1add3704aaf}{Parameterized\+Test\+Case\+Info\+Base}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classtesting_1_1_test_case}{Test\+Case}}$>$\newline
+class testing\+::internal\+::\+Parameterized\+Test\+Case\+Info$<$ Test\+Case $>$}
+
+
+Definition at line \mbox{\hyperlink{gtest-param-util_8h_source_l00494}{494}} of file \mbox{\hyperlink{gtest-param-util_8h_source}{gtest-\/param-\/util.\+h}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_parameterized_test_case_info_a69934b21930d71c0b99d10a36ad08306}\index{testing::internal::ParameterizedTestCaseInfo$<$ TestCase $>$@{testing::internal::ParameterizedTestCaseInfo$<$ TestCase $>$}!ParamNameGeneratorFunc@{ParamNameGeneratorFunc}}
+\index{ParamNameGeneratorFunc@{ParamNameGeneratorFunc}!testing::internal::ParameterizedTestCaseInfo$<$ TestCase $>$@{testing::internal::ParameterizedTestCaseInfo$<$ TestCase $>$}}
+\doxysubsubsection{\texorpdfstring{ParamNameGeneratorFunc}{ParamNameGeneratorFunc}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_parameterized_test_case_info_a69934b21930d71c0b99d10a36ad08306} 
+template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classtesting_1_1_test_case}{Test\+Case}} $>$ \\
+\mbox{\hyperlink{structtesting_1_1internal_1_1_param_name_gen_func}{Param\+Name\+Gen\+Func}}$<$\mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_a76f4dbc1c6d695c4beeedd2acfe8455f}{Param\+Type}}$>$\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{\+::\+Type}} \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info}{testing\+::internal\+::\+Parameterized\+Test\+Case\+Info}}$<$ \mbox{\hyperlink{classtesting_1_1_test_case}{Test\+Case}} $>$\+::\+Param\+Name\+Generator\+Func}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-param-util_8h_source_l00502}{502}} of file \mbox{\hyperlink{gtest-param-util_8h_source}{gtest-\/param-\/util.\+h}}.
+
+\Hypertarget{classtesting_1_1internal_1_1_parameterized_test_case_info_a76f4dbc1c6d695c4beeedd2acfe8455f}\index{testing::internal::ParameterizedTestCaseInfo$<$ TestCase $>$@{testing::internal::ParameterizedTestCaseInfo$<$ TestCase $>$}!ParamType@{ParamType}}
+\index{ParamType@{ParamType}!testing::internal::ParameterizedTestCaseInfo$<$ TestCase $>$@{testing::internal::ParameterizedTestCaseInfo$<$ TestCase $>$}}
+\doxysubsubsection{\texorpdfstring{ParamType}{ParamType}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_parameterized_test_case_info_a76f4dbc1c6d695c4beeedd2acfe8455f} 
+template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classtesting_1_1_test_case}{Test\+Case}} $>$ \\
+Test\+Case\+::\+Param\+Type \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info}{testing\+::internal\+::\+Parameterized\+Test\+Case\+Info}}$<$ \mbox{\hyperlink{classtesting_1_1_test_case}{Test\+Case}} $>$\+::\+Param\+Type}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-param-util_8h_source_l00499}{499}} of file \mbox{\hyperlink{gtest-param-util_8h_source}{gtest-\/param-\/util.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_parameterized_test_case_info_a6d19f368428260bd5c6e608b4d3fc6af}\index{testing::internal::ParameterizedTestCaseInfo$<$ TestCase $>$@{testing::internal::ParameterizedTestCaseInfo$<$ TestCase $>$}!ParameterizedTestCaseInfo@{ParameterizedTestCaseInfo}}
+\index{ParameterizedTestCaseInfo@{ParameterizedTestCaseInfo}!testing::internal::ParameterizedTestCaseInfo$<$ TestCase $>$@{testing::internal::ParameterizedTestCaseInfo$<$ TestCase $>$}}
+\doxysubsubsection{\texorpdfstring{ParameterizedTestCaseInfo()}{ParameterizedTestCaseInfo()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_parameterized_test_case_info_a6d19f368428260bd5c6e608b4d3fc6af} 
+template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classtesting_1_1_test_case}{Test\+Case}} $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info}{testing\+::internal\+::\+Parameterized\+Test\+Case\+Info}}$<$ \mbox{\hyperlink{classtesting_1_1_test_case}{Test\+Case}} $>$\+::\+Parameterized\+Test\+Case\+Info (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{name}{, }\item[{\mbox{\hyperlink{structtesting_1_1internal_1_1_code_location}{Code\+Location}}}]{code\+\_\+location}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-param-util_8h_source_l00504}{504}} of file \mbox{\hyperlink{gtest-param-util_8h_source}{gtest-\/param-\/util.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00506\ \ \ \ \ \ \ :\ test\_case\_name\_(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}),\ code\_location\_(code\_location)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_parameterized_test_case_info_adefded091e3f20ac3a758029caea3eab}\index{testing::internal::ParameterizedTestCaseInfo$<$ TestCase $>$@{testing::internal::ParameterizedTestCaseInfo$<$ TestCase $>$}!AddTestCaseInstantiation@{AddTestCaseInstantiation}}
+\index{AddTestCaseInstantiation@{AddTestCaseInstantiation}!testing::internal::ParameterizedTestCaseInfo$<$ TestCase $>$@{testing::internal::ParameterizedTestCaseInfo$<$ TestCase $>$}}
+\doxysubsubsection{\texorpdfstring{AddTestCaseInstantiation()}{AddTestCaseInstantiation()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_parameterized_test_case_info_adefded091e3f20ac3a758029caea3eab} 
+template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classtesting_1_1_test_case}{Test\+Case}} $>$ \\
+int \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info}{testing\+::internal\+::\+Parameterized\+Test\+Case\+Info}}$<$ \mbox{\hyperlink{classtesting_1_1_test_case}{Test\+Case}} $>$\+::\+Add\+Test\+Case\+Instantiation (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{instantiation\+\_\+name}{, }\item[{Generator\+Creation\+Func \texorpdfstring{$\ast$}{*}}]{func}{, }\item[{\mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_a69934b21930d71c0b99d10a36ad08306}{Param\+Name\+Generator\+Func}} \texorpdfstring{$\ast$}{*}}]{name\+\_\+func}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{file}{, }\item[{int}]{line}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-param-util_8h_source_l00527}{527}} of file \mbox{\hyperlink{gtest-param-util_8h_source}{gtest-\/param-\/util.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00530\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00531\ \ \ \ \ instantiations\_.push\_back(}
+\DoxyCodeLine{00532\ \ \ \ \ \ \ \ \ InstantiationInfo(instantiation\_name,\ func,\ name\_func,\ file,\ line));}
+\DoxyCodeLine{00533\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;\ \ \textcolor{comment}{//\ Return\ value\ used\ only\ to\ run\ this\ method\ in\ namespace\ scope.}}
+\DoxyCodeLine{00534\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1internal_1_1_parameterized_test_case_info_a3e557c888ec5e23b138c2ff254db15e5}\index{testing::internal::ParameterizedTestCaseInfo$<$ TestCase $>$@{testing::internal::ParameterizedTestCaseInfo$<$ TestCase $>$}!AddTestPattern@{AddTestPattern}}
+\index{AddTestPattern@{AddTestPattern}!testing::internal::ParameterizedTestCaseInfo$<$ TestCase $>$@{testing::internal::ParameterizedTestCaseInfo$<$ TestCase $>$}}
+\doxysubsubsection{\texorpdfstring{AddTestPattern()}{AddTestPattern()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_parameterized_test_case_info_a3e557c888ec5e23b138c2ff254db15e5} 
+template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classtesting_1_1_test_case}{Test\+Case}} $>$ \\
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info}{testing\+::internal\+::\+Parameterized\+Test\+Case\+Info}}$<$ \mbox{\hyperlink{classtesting_1_1_test_case}{Test\+Case}} $>$\+::\+Add\+Test\+Pattern (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{test\+\_\+case\+\_\+name}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{test\+\_\+base\+\_\+name}{, }\item[{\mbox{\hyperlink{classtesting_1_1internal_1_1_test_meta_factory_base}{Test\+Meta\+Factory\+Base}}$<$ \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_a76f4dbc1c6d695c4beeedd2acfe8455f}{Param\+Type}} $>$ \texorpdfstring{$\ast$}{*}}]{meta\+\_\+factory}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-param-util_8h_source_l00518}{518}} of file \mbox{\hyperlink{gtest-param-util_8h_source}{gtest-\/param-\/util.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00520\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00521\ \ \ \ \ tests\_.push\_back(linked\_ptr<TestInfo>(\textcolor{keyword}{new}\ TestInfo(test\_case\_name,}
+\DoxyCodeLine{00522\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ test\_base\_name,}
+\DoxyCodeLine{00523\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ meta\_factory)));}
+\DoxyCodeLine{00524\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1internal_1_1_parameterized_test_case_info_a95de02dac8135a6f1b6599a1f79c09c0}\index{testing::internal::ParameterizedTestCaseInfo$<$ TestCase $>$@{testing::internal::ParameterizedTestCaseInfo$<$ TestCase $>$}!GetTestCaseName@{GetTestCaseName}}
+\index{GetTestCaseName@{GetTestCaseName}!testing::internal::ParameterizedTestCaseInfo$<$ TestCase $>$@{testing::internal::ParameterizedTestCaseInfo$<$ TestCase $>$}}
+\doxysubsubsection{\texorpdfstring{GetTestCaseName()}{GetTestCaseName()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_parameterized_test_case_info_a95de02dac8135a6f1b6599a1f79c09c0} 
+template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classtesting_1_1_test_case}{Test\+Case}} $>$ \\
+virtual const std\+::string \& \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info}{testing\+::internal\+::\+Parameterized\+Test\+Case\+Info}}$<$ \mbox{\hyperlink{classtesting_1_1_test_case}{Test\+Case}} $>$\+::\+Get\+Test\+Case\+Name (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_base_a4ac04cf62eae09017f6b1350037c5d7f}{testing\+::internal\+::\+Parameterized\+Test\+Case\+Info\+Base}}.
+
+
+
+Definition at line \mbox{\hyperlink{gtest-param-util_8h_source_l00509}{509}} of file \mbox{\hyperlink{gtest-param-util_8h_source}{gtest-\/param-\/util.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00509\ \{\ \textcolor{keywordflow}{return}\ test\_case\_name\_;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1internal_1_1_parameterized_test_case_info_a16ed77e95a6042c722d0029744acfc33}\index{testing::internal::ParameterizedTestCaseInfo$<$ TestCase $>$@{testing::internal::ParameterizedTestCaseInfo$<$ TestCase $>$}!GetTestCaseTypeId@{GetTestCaseTypeId}}
+\index{GetTestCaseTypeId@{GetTestCaseTypeId}!testing::internal::ParameterizedTestCaseInfo$<$ TestCase $>$@{testing::internal::ParameterizedTestCaseInfo$<$ TestCase $>$}}
+\doxysubsubsection{\texorpdfstring{GetTestCaseTypeId()}{GetTestCaseTypeId()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_parameterized_test_case_info_a16ed77e95a6042c722d0029744acfc33} 
+template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classtesting_1_1_test_case}{Test\+Case}} $>$ \\
+virtual \mbox{\hyperlink{namespacetesting_1_1internal_ab1114197d3c657d8b7f8e0c5caa12d00}{Type\+Id}} \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info}{testing\+::internal\+::\+Parameterized\+Test\+Case\+Info}}$<$ \mbox{\hyperlink{classtesting_1_1_test_case}{Test\+Case}} $>$\+::\+Get\+Test\+Case\+Type\+Id (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_base_a932b4a9185a72d5bdfa5fd84fc06cbca}{testing\+::internal\+::\+Parameterized\+Test\+Case\+Info\+Base}}.
+
+
+
+Definition at line \mbox{\hyperlink{gtest-param-util_8h_source_l00511}{511}} of file \mbox{\hyperlink{gtest-param-util_8h_source}{gtest-\/param-\/util.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00511\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetesting_1_1internal_a6b108e56fdc68ea937ffb3759fb55ab0}{GetTypeId<TestCase>}}();\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=342pt]{classtesting_1_1internal_1_1_parameterized_test_case_info_a16ed77e95a6042c722d0029744acfc33_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_parameterized_test_case_info_a16ed77e95a6042c722d0029744acfc33_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_parameterized_test_case_info_a2f6a423f7ae8c7ac24b468538693aa26}\index{testing::internal::ParameterizedTestCaseInfo$<$ TestCase $>$@{testing::internal::ParameterizedTestCaseInfo$<$ TestCase $>$}!ParamGenerator@{ParamGenerator}}
+\index{ParamGenerator@{ParamGenerator}!testing::internal::ParameterizedTestCaseInfo$<$ TestCase $>$@{testing::internal::ParameterizedTestCaseInfo$<$ TestCase $>$}}
+\doxysubsubsection{\texorpdfstring{ParamGenerator()}{ParamGenerator()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_parameterized_test_case_info_a2f6a423f7ae8c7ac24b468538693aa26} 
+template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classtesting_1_1_test_case}{Test\+Case}} $>$ \\
+typedef \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info}{testing\+::internal\+::\+Parameterized\+Test\+Case\+Info}}$<$ \mbox{\hyperlink{classtesting_1_1_test_case}{Test\+Case}} $>$\+::\+Param\+Generator (\begin{DoxyParamCaption}\item[{Generator\+Creation\+Func}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{classtesting_1_1internal_1_1_parameterized_test_case_info_a7e118820b3074ce70c0440e2e49a50a1}\index{testing::internal::ParameterizedTestCaseInfo$<$ TestCase $>$@{testing::internal::ParameterizedTestCaseInfo$<$ TestCase $>$}!RegisterTests@{RegisterTests}}
+\index{RegisterTests@{RegisterTests}!testing::internal::ParameterizedTestCaseInfo$<$ TestCase $>$@{testing::internal::ParameterizedTestCaseInfo$<$ TestCase $>$}}
+\doxysubsubsection{\texorpdfstring{RegisterTests()}{RegisterTests()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_parameterized_test_case_info_a7e118820b3074ce70c0440e2e49a50a1} 
+template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classtesting_1_1_test_case}{Test\+Case}} $>$ \\
+virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info}{testing\+::internal\+::\+Parameterized\+Test\+Case\+Info}}$<$ \mbox{\hyperlink{classtesting_1_1_test_case}{Test\+Case}} $>$\+::\+Register\+Tests (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_base_a92baca6c64c822c2e7043217f7903ef2}{testing\+::internal\+::\+Parameterized\+Test\+Case\+Info\+Base}}.
+
+
+
+Definition at line \mbox{\hyperlink{gtest-param-util_8h_source_l00540}{540}} of file \mbox{\hyperlink{gtest-param-util_8h_source}{gtest-\/param-\/util.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00540\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00541\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{typename}\ TestInfoContainer::iterator\ test\_it\ =\ tests\_.begin();}
+\DoxyCodeLine{00542\ \ \ \ \ \ \ \ \ \ test\_it\ !=\ tests\_.end();\ ++test\_it)\ \{}
+\DoxyCodeLine{00543\ \ \ \ \ \ \ linked\_ptr<TestInfo>\ test\_info\ =\ *test\_it;}
+\DoxyCodeLine{00544\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{typename}\ InstantiationContainer::iterator\ gen\_it\ =}
+\DoxyCodeLine{00545\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ instantiations\_.begin();\ gen\_it\ !=\ instantiations\_.end();}
+\DoxyCodeLine{00546\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++gen\_it)\ \{}
+\DoxyCodeLine{00547\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::string\&\ instantiation\_name\ =\ gen\_it-\/>name;}
+\DoxyCodeLine{00548\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_a2f6a423f7ae8c7ac24b468538693aa26}{ParamGenerator<ParamType>}}\ generator((*gen\_it-\/>generator)());}
+\DoxyCodeLine{00549\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_a69934b21930d71c0b99d10a36ad08306}{ParamNameGeneratorFunc}}*\ name\_func\ =\ gen\_it-\/>name\_func;}
+\DoxyCodeLine{00550\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ file\ =\ gen\_it-\/>file;}
+\DoxyCodeLine{00551\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}\ =\ gen\_it-\/>line;}
+\DoxyCodeLine{00552\ }
+\DoxyCodeLine{00553\ \ \ \ \ \ \ \ \ std::string\ test\_case\_name;}
+\DoxyCodeLine{00554\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ !instantiation\_name.empty()\ )}
+\DoxyCodeLine{00555\ \ \ \ \ \ \ \ \ \ \ test\_case\_name\ =\ instantiation\_name\ +\ \textcolor{stringliteral}{"{}/"{}};}
+\DoxyCodeLine{00556\ \ \ \ \ \ \ \ \ test\_case\_name\ +=\ test\_info-\/>test\_case\_base\_name;}
+\DoxyCodeLine{00557\ }
+\DoxyCodeLine{00558\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ i\ =\ 0;}
+\DoxyCodeLine{00559\ \ \ \ \ \ \ \ \ std::set<std::string>\ test\_param\_names;}
+\DoxyCodeLine{00560\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{typename}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator_a9ef0754cb27db32142d1b6af028c09d8}{ParamGenerator<ParamType>::iterator}}\ param\_it\ =}
+\DoxyCodeLine{00561\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ generator.begin();}
+\DoxyCodeLine{00562\ \ \ \ \ \ \ \ \ \ \ \ \ \ param\_it\ !=\ generator.end();\ ++param\_it,\ ++i)\ \{}
+\DoxyCodeLine{00563\ \ \ \ \ \ \ \ \ \ \ Message\ test\_name\_stream;}
+\DoxyCodeLine{00564\ }
+\DoxyCodeLine{00565\ \ \ \ \ \ \ \ \ \ \ std::string\ param\_name\ =\ name\_func(}
+\DoxyCodeLine{00566\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ TestParamInfo<ParamType>(*param\_it,\ i));}
+\DoxyCodeLine{00567\ }
+\DoxyCodeLine{00568\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_ab54343f0a36dc4cb0ce8a478dd7847b8}{GTEST\_CHECK\_}}(IsValidParamName(param\_name))}
+\DoxyCodeLine{00569\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}Parameterized\ test\ name\ '"{}}\ <<\ param\_name}
+\DoxyCodeLine{00570\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}'\ is\ invalid,\ in\ "{}}\ <<\ file}
+\DoxyCodeLine{00571\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\ line\ "{}}\ <<\ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}\ <<\ std::endl;}
+\DoxyCodeLine{00572\ }
+\DoxyCodeLine{00573\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_ab54343f0a36dc4cb0ce8a478dd7847b8}{GTEST\_CHECK\_}}(test\_param\_names.count(param\_name)\ ==\ 0)}
+\DoxyCodeLine{00574\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}Duplicate\ parameterized\ test\ name\ '"{}}\ <<\ param\_name}
+\DoxyCodeLine{00575\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}',\ in\ "{}}\ <<\ file\ <<\ \textcolor{stringliteral}{"{}\ line\ "{}}\ <<\ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}\ <<\ std::endl;}
+\DoxyCodeLine{00576\ }
+\DoxyCodeLine{00577\ \ \ \ \ \ \ \ \ \ \ test\_param\_names.insert(param\_name);}
+\DoxyCodeLine{00578\ }
+\DoxyCodeLine{00579\ \ \ \ \ \ \ \ \ \ \ test\_name\_stream\ <<\ test\_info-\/>test\_base\_name\ <<\ \textcolor{stringliteral}{"{}/"{}}\ <<\ param\_name;}
+\DoxyCodeLine{00580\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a7f2e4e46c969fcae9d801d93a3e932fd}{MakeAndRegisterTestInfo}}(}
+\DoxyCodeLine{00581\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ test\_case\_name.c\_str(),}
+\DoxyCodeLine{00582\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ test\_name\_stream.GetString().c\_str(),}
+\DoxyCodeLine{00583\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ NULL,\ \ \textcolor{comment}{//\ No\ type\ parameter.}}
+\DoxyCodeLine{00584\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ PrintToString(*param\_it).c\_str(),}
+\DoxyCodeLine{00585\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ code\_location\_,}
+\DoxyCodeLine{00586\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_a16ed77e95a6042c722d0029744acfc33}{GetTestCaseTypeId}}(),}
+\DoxyCodeLine{00587\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ TestCase::SetUpTestCase,}
+\DoxyCodeLine{00588\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ TestCase::TearDownTestCase,}
+\DoxyCodeLine{00589\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ test\_info-\/>test\_meta\_factory-\/>CreateTestFactory(*param\_it));}
+\DoxyCodeLine{00590\ \ \ \ \ \ \ \ \ \}\ \ \textcolor{comment}{//\ for\ param\_it}}
+\DoxyCodeLine{00591\ \ \ \ \ \ \ \}\ \ \textcolor{comment}{//\ for\ gen\_it}}
+\DoxyCodeLine{00592\ \ \ \ \ \}\ \ \textcolor{comment}{//\ for\ test\_it}}
+\DoxyCodeLine{00593\ \ \ \}\ \ \textcolor{comment}{//\ RegisterTests}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_parameterized_test_case_info_a7e118820b3074ce70c0440e2e49a50a1_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/include/gtest/internal/\mbox{\hyperlink{gtest-param-util_8h}{gtest-\/param-\/util.\+h}}\end{DoxyCompactItemize}

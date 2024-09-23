@@ -1,0 +1,781 @@
+\doxysection{testing\+::internal\+::File\+Path Class Reference}
+\hypertarget{classtesting_1_1internal_1_1_file_path}{}\label{classtesting_1_1internal_1_1_file_path}\index{testing::internal::FilePath@{testing::internal::FilePath}}
+
+
+{\ttfamily \#include $<$gtest-\/filepath.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a3504a51accbca78a52fe586133ea5499}{File\+Path}} ()
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_ae9efd0fee56c6e3e2d659b464250b112}{File\+Path}} (const \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{File\+Path}} \&rhs)
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a9fc072b140aa0652a7022fb809fe3abe}{File\+Path}} (const std\+::string \&pathname)
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{File\+Path}} \& \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a941c80c76954e0103d865aba35a10a1b}{operator=}} (const \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{File\+Path}} \&rhs)
+\item 
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a15a42de7518e89254e0640dd9317d5f7}{Set}} (const \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{File\+Path}} \&rhs)
+\item 
+const std\+::string \& \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a44649e2fb65454648a9494a89a970d85}{string}} () const
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a60a30c518a0298affcc262f5904cf308}{c\+\_\+str}} () const
+\item 
+bool \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a2c165c5510e8705ade547849a9234a6e}{Is\+Empty}} () const
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{File\+Path}} \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_ab47ada111cc940cf2359f6533bada6ca}{Remove\+Trailing\+Path\+Separator}} () const
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{File\+Path}} \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a6b61ede2c81ecd870b8220c04aec3060}{Remove\+Directory\+Name}} () const
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{File\+Path}} \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a49e030b5a62ca7dcc7f920a63a96fa55}{Remove\+File\+Name}} () const
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{File\+Path}} \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_aab20b631705b90044d04c67205f2256f}{Remove\+Extension}} (const char \texorpdfstring{$\ast$}{*}extension) const
+\item 
+bool \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a26790e530dd738f7fc8202c1ce718406}{Create\+Directories\+Recursively}} () const
+\item 
+bool \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_ae3a455e7c9fc967c2443b703e958f8bd}{Create\+Folder}} () const
+\item 
+bool \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a105bd8fc3adff8fcb4a593532842fb68}{File\+Or\+Directory\+Exists}} () const
+\item 
+bool \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a74ba8435e822d77f79f137c38de9bfeb}{Directory\+Exists}} () const
+\item 
+bool \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a73fc042ad65e85bbecb956eb4603a6f2}{Is\+Directory}} () const
+\item 
+bool \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a0661adf59aec40c40c8e39b888d68142}{Is\+Root\+Directory}} () const
+\item 
+bool \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_ae17e5581e7996021e598851fe947df9c}{Is\+Absolute\+Path}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{File\+Path}} \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_aaff39ccd7bfb7a1c09c0220a64326387}{Get\+Current\+Dir}} ()
+\item 
+static \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{File\+Path}} \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_aa8c102da670261eb4fa8e2f2481df139}{Make\+File\+Name}} (const \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{File\+Path}} \&directory, const \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{File\+Path}} \&base\+\_\+name, int number, const char \texorpdfstring{$\ast$}{*}extension)
+\item 
+static \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{File\+Path}} \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_ac9d57987f60ac43f0c57b89e333e531e}{Concat\+Paths}} (const \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{File\+Path}} \&directory, const \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{File\+Path}} \&relative\+\_\+path)
+\item 
+static \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{File\+Path}} \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a2280a77adb394cf80bb5f73fc292e8c8}{Generate\+Unique\+File\+Name}} (const \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{File\+Path}} \&directory, const \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{File\+Path}} \&base\+\_\+name, const char \texorpdfstring{$\ast$}{*}extension)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{gtest-filepath_8h_source_l00058}{58}} of file \mbox{\hyperlink{gtest-filepath_8h_source}{gtest-\/filepath.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_file_path_a3504a51accbca78a52fe586133ea5499}\index{testing::internal::FilePath@{testing::internal::FilePath}!FilePath@{FilePath}}
+\index{FilePath@{FilePath}!testing::internal::FilePath@{testing::internal::FilePath}}
+\doxysubsubsection{\texorpdfstring{FilePath()}{FilePath()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_file_path_a3504a51accbca78a52fe586133ea5499} 
+testing\+::internal\+::\+File\+Path\+::\+File\+Path (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-filepath_8h_source_l00060}{60}} of file \mbox{\hyperlink{gtest-filepath_8h_source}{gtest-\/filepath.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00060\ :\ pathname\_(\textcolor{stringliteral}{"{}"{}})\ \{\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_file_path_a3504a51accbca78a52fe586133ea5499_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_file_path_ae9efd0fee56c6e3e2d659b464250b112}\index{testing::internal::FilePath@{testing::internal::FilePath}!FilePath@{FilePath}}
+\index{FilePath@{FilePath}!testing::internal::FilePath@{testing::internal::FilePath}}
+\doxysubsubsection{\texorpdfstring{FilePath()}{FilePath()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_file_path_ae9efd0fee56c6e3e2d659b464250b112} 
+testing\+::internal\+::\+File\+Path\+::\+File\+Path (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{File\+Path}} \&}]{rhs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-filepath_8h_source_l00061}{61}} of file \mbox{\hyperlink{gtest-filepath_8h_source}{gtest-\/filepath.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00061\ :\ pathname\_(rhs.pathname\_)\ \{\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1internal_1_1_file_path_a9fc072b140aa0652a7022fb809fe3abe}\index{testing::internal::FilePath@{testing::internal::FilePath}!FilePath@{FilePath}}
+\index{FilePath@{FilePath}!testing::internal::FilePath@{testing::internal::FilePath}}
+\doxysubsubsection{\texorpdfstring{FilePath()}{FilePath()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_file_path_a9fc072b140aa0652a7022fb809fe3abe} 
+testing\+::internal\+::\+File\+Path\+::\+File\+Path (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{pathname}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-filepath_8h_source_l00063}{63}} of file \mbox{\hyperlink{gtest-filepath_8h_source}{gtest-\/filepath.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ pathname\_(pathname)\ \{}
+\DoxyCodeLine{00064\ \ \ \ \ Normalize();}
+\DoxyCodeLine{00065\ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_file_path_a60a30c518a0298affcc262f5904cf308}\index{testing::internal::FilePath@{testing::internal::FilePath}!c\_str@{c\_str}}
+\index{c\_str@{c\_str}!testing::internal::FilePath@{testing::internal::FilePath}}
+\doxysubsubsection{\texorpdfstring{c\_str()}{c\_str()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_file_path_a60a30c518a0298affcc262f5904cf308} 
+const char \texorpdfstring{$\ast$}{*} testing\+::internal\+::\+File\+Path\+::c\+\_\+str (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-filepath_8h_source_l00077}{77}} of file \mbox{\hyperlink{gtest-filepath_8h_source}{gtest-\/filepath.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00077\ \{\ \textcolor{keywordflow}{return}\ pathname\_.c\_str();\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_file_path_a60a30c518a0298affcc262f5904cf308_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_file_path_ac9d57987f60ac43f0c57b89e333e531e}\index{testing::internal::FilePath@{testing::internal::FilePath}!ConcatPaths@{ConcatPaths}}
+\index{ConcatPaths@{ConcatPaths}!testing::internal::FilePath@{testing::internal::FilePath}}
+\doxysubsubsection{\texorpdfstring{ConcatPaths()}{ConcatPaths()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_file_path_ac9d57987f60ac43f0c57b89e333e531e} 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{File\+Path}} testing\+::internal\+::\+File\+Path\+::\+Concat\+Paths (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{File\+Path}} \&}]{directory}{, }\item[{const \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{File\+Path}} \&}]{relative\+\_\+path}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-filepath_8cc_source_l00197}{197}} of file \mbox{\hyperlink{gtest-filepath_8cc_source}{gtest-\/filepath.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00199\ \ \ \textcolor{keywordflow}{if}\ (directory.IsEmpty())}
+\DoxyCodeLine{00200\ \ \ \ \ \textcolor{keywordflow}{return}\ relative\_path;}
+\DoxyCodeLine{00201\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a3504a51accbca78a52fe586133ea5499}{FilePath}}\ dir(directory.RemoveTrailingPathSeparator());}
+\DoxyCodeLine{00202\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a3504a51accbca78a52fe586133ea5499}{FilePath}}(dir.string()\ +\ \mbox{\hyperlink{namespacetesting_1_1internal_afcd71adaa9d1e6df7b282a17fc48125c}{kPathSeparator}}\ +\ relative\_path.string());}
+\DoxyCodeLine{00203\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=325pt]{classtesting_1_1internal_1_1_file_path_ac9d57987f60ac43f0c57b89e333e531e_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_file_path_ac9d57987f60ac43f0c57b89e333e531e_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_file_path_a26790e530dd738f7fc8202c1ce718406}\index{testing::internal::FilePath@{testing::internal::FilePath}!CreateDirectoriesRecursively@{CreateDirectoriesRecursively}}
+\index{CreateDirectoriesRecursively@{CreateDirectoriesRecursively}!testing::internal::FilePath@{testing::internal::FilePath}}
+\doxysubsubsection{\texorpdfstring{CreateDirectoriesRecursively()}{CreateDirectoriesRecursively()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_file_path_a26790e530dd738f7fc8202c1ce718406} 
+bool testing\+::internal\+::\+File\+Path\+::\+Create\+Directories\+Recursively (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-filepath_8cc_source_l00306}{306}} of file \mbox{\hyperlink{gtest-filepath_8cc_source}{gtest-\/filepath.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00306\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00307\ \ \ \textcolor{keywordflow}{if}\ (!this-\/>\mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a73fc042ad65e85bbecb956eb4603a6f2}{IsDirectory}}())\ \{}
+\DoxyCodeLine{00308\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00309\ \ \ \}}
+\DoxyCodeLine{00310\ }
+\DoxyCodeLine{00311\ \ \ \textcolor{keywordflow}{if}\ (pathname\_.length()\ ==\ 0\ ||\ this-\/>DirectoryExists())\ \{}
+\DoxyCodeLine{00312\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00313\ \ \ \}}
+\DoxyCodeLine{00314\ }
+\DoxyCodeLine{00315\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a3504a51accbca78a52fe586133ea5499}{FilePath}}\ parent(this-\/>\mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_ab47ada111cc940cf2359f6533bada6ca}{RemoveTrailingPathSeparator}}().\mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a49e030b5a62ca7dcc7f920a63a96fa55}{RemoveFileName}}());}
+\DoxyCodeLine{00316\ \ \ \textcolor{keywordflow}{return}\ parent.CreateDirectoriesRecursively()\ \&\&\ this-\/>\mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_ae3a455e7c9fc967c2443b703e958f8bd}{CreateFolder}}();}
+\DoxyCodeLine{00317\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_file_path_a26790e530dd738f7fc8202c1ce718406_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=215pt]{classtesting_1_1internal_1_1_file_path_a26790e530dd738f7fc8202c1ce718406_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_file_path_ae3a455e7c9fc967c2443b703e958f8bd}\index{testing::internal::FilePath@{testing::internal::FilePath}!CreateFolder@{CreateFolder}}
+\index{CreateFolder@{CreateFolder}!testing::internal::FilePath@{testing::internal::FilePath}}
+\doxysubsubsection{\texorpdfstring{CreateFolder()}{CreateFolder()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_file_path_ae3a455e7c9fc967c2443b703e958f8bd} 
+bool testing\+::internal\+::\+File\+Path\+::\+Create\+Folder (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-filepath_8cc_source_l00323}{323}} of file \mbox{\hyperlink{gtest-filepath_8cc_source}{gtest-\/filepath.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00323\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00324\ \textcolor{preprocessor}{\#if\ GTEST\_OS\_WINDOWS\_MOBILE}}
+\DoxyCodeLine{00325\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a3504a51accbca78a52fe586133ea5499}{FilePath}}\ removed\_sep(this-\/>\mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_ab47ada111cc940cf2359f6533bada6ca}{RemoveTrailingPathSeparator}}());}
+\DoxyCodeLine{00326\ \ \ LPCWSTR\ unicode\ =\ String::AnsiToUtf16(removed\_sep.c\_str());}
+\DoxyCodeLine{00327\ \ \ \textcolor{keywordtype}{int}\ result\ =\ CreateDirectory(unicode,\ NULL)\ ?\ 0\ :\ -\/1;}
+\DoxyCodeLine{00328\ \ \ \textcolor{keyword}{delete}\ []\ unicode;}
+\DoxyCodeLine{00329\ \textcolor{preprocessor}{\#elif\ GTEST\_OS\_WINDOWS}}
+\DoxyCodeLine{00330\ \ \ \textcolor{keywordtype}{int}\ result\ =\ \_mkdir(pathname\_.c\_str());}
+\DoxyCodeLine{00331\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00332\ \ \ \textcolor{keywordtype}{int}\ result\ =\ mkdir(pathname\_.c\_str(),\ 0777);}
+\DoxyCodeLine{00333\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_OS\_WINDOWS\_MOBILE}}
+\DoxyCodeLine{00334\ }
+\DoxyCodeLine{00335\ \ \ \textcolor{keywordflow}{if}\ (result\ ==\ -\/1)\ \{}
+\DoxyCodeLine{00336\ \ \ \ \ \textcolor{keywordflow}{return}\ this-\/>\mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a74ba8435e822d77f79f137c38de9bfeb}{DirectoryExists}}();\ \ \textcolor{comment}{//\ An\ error\ is\ OK\ if\ the\ directory\ exists.}}
+\DoxyCodeLine{00337\ \ \ \}}
+\DoxyCodeLine{00338\ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \ \textcolor{comment}{//\ No\ error.}}
+\DoxyCodeLine{00339\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_file_path_ae3a455e7c9fc967c2443b703e958f8bd_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_file_path_ae3a455e7c9fc967c2443b703e958f8bd_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_file_path_a74ba8435e822d77f79f137c38de9bfeb}\index{testing::internal::FilePath@{testing::internal::FilePath}!DirectoryExists@{DirectoryExists}}
+\index{DirectoryExists@{DirectoryExists}!testing::internal::FilePath@{testing::internal::FilePath}}
+\doxysubsubsection{\texorpdfstring{DirectoryExists()}{DirectoryExists()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_file_path_a74ba8435e822d77f79f137c38de9bfeb} 
+bool testing\+::internal\+::\+File\+Path\+::\+Directory\+Exists (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-filepath_8cc_source_l00221}{221}} of file \mbox{\hyperlink{gtest-filepath_8cc_source}{gtest-\/filepath.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00222\ \ \ \textcolor{keywordtype}{bool}\ result\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00223\ \textcolor{preprocessor}{\#if\ GTEST\_OS\_WINDOWS}}
+\DoxyCodeLine{00224\ \ \ \textcolor{comment}{//\ Don't\ strip\ off\ trailing\ separator\ if\ path\ is\ a\ root\ directory\ on}}
+\DoxyCodeLine{00225\ \ \ \textcolor{comment}{//\ Windows\ (like\ "{}C:\(\backslash\)\(\backslash\)"{}).}}
+\DoxyCodeLine{00226\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a3504a51accbca78a52fe586133ea5499}{FilePath}}\&\ path(\mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a0661adf59aec40c40c8e39b888d68142}{IsRootDirectory}}()\ ?\ *\textcolor{keyword}{this}\ :}
+\DoxyCodeLine{00227\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_ab47ada111cc940cf2359f6533bada6ca}{RemoveTrailingPathSeparator}}());}
+\DoxyCodeLine{00228\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00229\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a3504a51accbca78a52fe586133ea5499}{FilePath}}\&\ path(*\textcolor{keyword}{this});}
+\DoxyCodeLine{00230\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00231\ }
+\DoxyCodeLine{00232\ \textcolor{preprocessor}{\#if\ GTEST\_OS\_WINDOWS\_MOBILE}}
+\DoxyCodeLine{00233\ \ \ LPCWSTR\ unicode\ =\ String::AnsiToUtf16(path.c\_str());}
+\DoxyCodeLine{00234\ \ \ \textcolor{keyword}{const}\ DWORD\ attributes\ =\ GetFileAttributes(unicode);}
+\DoxyCodeLine{00235\ \ \ \textcolor{keyword}{delete}\ []\ unicode;}
+\DoxyCodeLine{00236\ \ \ \textcolor{keywordflow}{if}\ ((attributes\ !=\ kInvalidFileAttributes)\ \&\&}
+\DoxyCodeLine{00237\ \ \ \ \ \ \ (attributes\ \&\ FILE\_ATTRIBUTE\_DIRECTORY))\ \{}
+\DoxyCodeLine{00238\ \ \ \ \ result\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00239\ \ \ \}}
+\DoxyCodeLine{00240\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00241\ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_1_1posix_a8eb9f08d3af29941c2d2a964cfff3ecb}{posix::StatStruct}}\ file\_stat;}
+\DoxyCodeLine{00242\ \ \ result\ =\ \mbox{\hyperlink{namespacetesting_1_1internal_1_1posix_a2b87b7ff647a128614daf50667eb9304}{posix::Stat}}(path.c\_str(),\ \&file\_stat)\ ==\ 0\ \&\&}
+\DoxyCodeLine{00243\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_1_1posix_af0d04ed5baeed28353fa38742748a421}{posix::IsDir}}(file\_stat);}
+\DoxyCodeLine{00244\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_OS\_WINDOWS\_MOBILE}}
+\DoxyCodeLine{00245\ }
+\DoxyCodeLine{00246\ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00247\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_file_path_a74ba8435e822d77f79f137c38de9bfeb_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_file_path_a74ba8435e822d77f79f137c38de9bfeb_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_file_path_a105bd8fc3adff8fcb4a593532842fb68}\index{testing::internal::FilePath@{testing::internal::FilePath}!FileOrDirectoryExists@{FileOrDirectoryExists}}
+\index{FileOrDirectoryExists@{FileOrDirectoryExists}!testing::internal::FilePath@{testing::internal::FilePath}}
+\doxysubsubsection{\texorpdfstring{FileOrDirectoryExists()}{FileOrDirectoryExists()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_file_path_a105bd8fc3adff8fcb4a593532842fb68} 
+bool testing\+::internal\+::\+File\+Path\+::\+File\+Or\+Directory\+Exists (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-filepath_8cc_source_l00207}{207}} of file \mbox{\hyperlink{gtest-filepath_8cc_source}{gtest-\/filepath.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00208\ \textcolor{preprocessor}{\#if\ GTEST\_OS\_WINDOWS\_MOBILE}}
+\DoxyCodeLine{00209\ \ \ LPCWSTR\ unicode\ =\ String::AnsiToUtf16(pathname\_.c\_str());}
+\DoxyCodeLine{00210\ \ \ \textcolor{keyword}{const}\ DWORD\ attributes\ =\ GetFileAttributes(unicode);}
+\DoxyCodeLine{00211\ \ \ \textcolor{keyword}{delete}\ []\ unicode;}
+\DoxyCodeLine{00212\ \ \ \textcolor{keywordflow}{return}\ attributes\ !=\ kInvalidFileAttributes;}
+\DoxyCodeLine{00213\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00214\ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_1_1posix_a8eb9f08d3af29941c2d2a964cfff3ecb}{posix::StatStruct}}\ file\_stat;}
+\DoxyCodeLine{00215\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetesting_1_1internal_1_1posix_a2b87b7ff647a128614daf50667eb9304}{posix::Stat}}(pathname\_.c\_str(),\ \&file\_stat)\ ==\ 0;}
+\DoxyCodeLine{00216\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_OS\_WINDOWS\_MOBILE}}
+\DoxyCodeLine{00217\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_file_path_a105bd8fc3adff8fcb4a593532842fb68_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_file_path_a105bd8fc3adff8fcb4a593532842fb68_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_file_path_a2280a77adb394cf80bb5f73fc292e8c8}\index{testing::internal::FilePath@{testing::internal::FilePath}!GenerateUniqueFileName@{GenerateUniqueFileName}}
+\index{GenerateUniqueFileName@{GenerateUniqueFileName}!testing::internal::FilePath@{testing::internal::FilePath}}
+\doxysubsubsection{\texorpdfstring{GenerateUniqueFileName()}{GenerateUniqueFileName()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_file_path_a2280a77adb394cf80bb5f73fc292e8c8} 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{File\+Path}} testing\+::internal\+::\+File\+Path\+::\+Generate\+Unique\+File\+Name (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{File\+Path}} \&}]{directory}{, }\item[{const \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{File\+Path}} \&}]{base\+\_\+name}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{extension}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-filepath_8cc_source_l00284}{284}} of file \mbox{\hyperlink{gtest-filepath_8cc_source}{gtest-\/filepath.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00286\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00287\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a3504a51accbca78a52fe586133ea5499}{FilePath}}\ full\_pathname;}
+\DoxyCodeLine{00288\ \ \ \textcolor{keywordtype}{int}\ number\ =\ 0;}
+\DoxyCodeLine{00289\ \ \ \textcolor{keywordflow}{do}\ \{}
+\DoxyCodeLine{00290\ \ \ \ \ full\_pathname.Set(\mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_aa8c102da670261eb4fa8e2f2481df139}{MakeFileName}}(directory,\ base\_name,\ number++,\ extension));}
+\DoxyCodeLine{00291\ \ \ \}\ \textcolor{keywordflow}{while}\ (full\_pathname.FileOrDirectoryExists());}
+\DoxyCodeLine{00292\ \ \ \textcolor{keywordflow}{return}\ full\_pathname;}
+\DoxyCodeLine{00293\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_file_path_a2280a77adb394cf80bb5f73fc292e8c8_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_file_path_a2280a77adb394cf80bb5f73fc292e8c8_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_file_path_aaff39ccd7bfb7a1c09c0220a64326387}\index{testing::internal::FilePath@{testing::internal::FilePath}!GetCurrentDir@{GetCurrentDir}}
+\index{GetCurrentDir@{GetCurrentDir}!testing::internal::FilePath@{testing::internal::FilePath}}
+\doxysubsubsection{\texorpdfstring{GetCurrentDir()}{GetCurrentDir()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_file_path_aaff39ccd7bfb7a1c09c0220a64326387} 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{File\+Path}} testing\+::internal\+::\+File\+Path\+::\+Get\+Current\+Dir (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-filepath_8cc_source_l00097}{97}} of file \mbox{\hyperlink{gtest-filepath_8cc_source}{gtest-\/filepath.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00098\ \textcolor{preprocessor}{\#if\ GTEST\_OS\_WINDOWS\_MOBILE\ ||\ GTEST\_OS\_WINDOWS\_PHONE\ ||\ GTEST\_OS\_WINDOWS\_RT}}
+\DoxyCodeLine{00099\ \ \ \textcolor{comment}{//\ Windows\ CE\ doesn't\ have\ a\ current\ directory,\ so\ we\ just\ return}}
+\DoxyCodeLine{00100\ \ \ \textcolor{comment}{//\ something\ reasonable.}}
+\DoxyCodeLine{00101\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a3504a51accbca78a52fe586133ea5499}{FilePath}}(\mbox{\hyperlink{namespacetesting_1_1internal_a23a8e9527d0e544e7df2d64ad549ce3e}{kCurrentDirectoryString}});}
+\DoxyCodeLine{00102\ \textcolor{preprocessor}{\#elif\ GTEST\_OS\_WINDOWS}}
+\DoxyCodeLine{00103\ \ \ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{xbyak__mnemonic_8h_a036d1ff12a53fcf0da2199ff5e8e787c}{cwd}}[\mbox{\hyperlink{gtest-filepath_8cc_ad9d445747785a9271a57cf1d392b89ad}{GTEST\_PATH\_MAX\_}}\ +\ 1]\ =\ \{\ \textcolor{charliteral}{'\(\backslash\)0'}\ \};}
+\DoxyCodeLine{00104\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a3504a51accbca78a52fe586133ea5499}{FilePath}}(\_getcwd(\mbox{\hyperlink{xbyak__mnemonic_8h_a036d1ff12a53fcf0da2199ff5e8e787c}{cwd}},\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{xbyak__mnemonic_8h_a036d1ff12a53fcf0da2199ff5e8e787c}{cwd}}))\ ==\ NULL\ ?\ \textcolor{stringliteral}{"{}"{}}\ :\ \mbox{\hyperlink{xbyak__mnemonic_8h_a036d1ff12a53fcf0da2199ff5e8e787c}{cwd}});}
+\DoxyCodeLine{00105\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00106\ \ \ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{xbyak__mnemonic_8h_a036d1ff12a53fcf0da2199ff5e8e787c}{cwd}}[\mbox{\hyperlink{gtest-filepath_8cc_ad9d445747785a9271a57cf1d392b89ad}{GTEST\_PATH\_MAX\_}}\ +\ 1]\ =\ \{\ \textcolor{charliteral}{'\(\backslash\)0'}\ \};}
+\DoxyCodeLine{00107\ \ \ \textcolor{keywordtype}{char}*\ result\ =\ getcwd(\mbox{\hyperlink{xbyak__mnemonic_8h_a036d1ff12a53fcf0da2199ff5e8e787c}{cwd}},\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{xbyak__mnemonic_8h_a036d1ff12a53fcf0da2199ff5e8e787c}{cwd}}));}
+\DoxyCodeLine{00108\ \textcolor{preprocessor}{\#\ if\ GTEST\_OS\_NACL}}
+\DoxyCodeLine{00109\ \ \ \textcolor{comment}{//\ getcwd\ will\ likely\ fail\ in\ NaCl\ due\ to\ the\ sandbox,\ so\ return\ something}}
+\DoxyCodeLine{00110\ \ \ \textcolor{comment}{//\ reasonable.\ The\ user\ may\ have\ provided\ a\ shim\ implementation\ for\ getcwd,}}
+\DoxyCodeLine{00111\ \ \ \textcolor{comment}{//\ however,\ so\ fallback\ only\ when\ failure\ is\ detected.}}
+\DoxyCodeLine{00112\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a3504a51accbca78a52fe586133ea5499}{FilePath}}(result\ ==\ NULL\ ?\ \mbox{\hyperlink{namespacetesting_1_1internal_a23a8e9527d0e544e7df2d64ad549ce3e}{kCurrentDirectoryString}}\ :\ \mbox{\hyperlink{xbyak__mnemonic_8h_a036d1ff12a53fcf0da2199ff5e8e787c}{cwd}});}
+\DoxyCodeLine{00113\ \textcolor{preprocessor}{\#\ endif\ \ }\textcolor{comment}{//\ GTEST\_OS\_NACL}}
+\DoxyCodeLine{00114\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a3504a51accbca78a52fe586133ea5499}{FilePath}}(result\ ==\ NULL\ ?\ \textcolor{stringliteral}{"{}"{}}\ :\ \mbox{\hyperlink{xbyak__mnemonic_8h_a036d1ff12a53fcf0da2199ff5e8e787c}{cwd}});}
+\DoxyCodeLine{00115\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_OS\_WINDOWS\_MOBILE}}
+\DoxyCodeLine{00116\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=329pt]{classtesting_1_1internal_1_1_file_path_aaff39ccd7bfb7a1c09c0220a64326387_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_file_path_ae17e5581e7996021e598851fe947df9c}\index{testing::internal::FilePath@{testing::internal::FilePath}!IsAbsolutePath@{IsAbsolutePath}}
+\index{IsAbsolutePath@{IsAbsolutePath}!testing::internal::FilePath@{testing::internal::FilePath}}
+\doxysubsubsection{\texorpdfstring{IsAbsolutePath()}{IsAbsolutePath()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_file_path_ae17e5581e7996021e598851fe947df9c} 
+bool testing\+::internal\+::\+File\+Path\+::\+Is\+Absolute\+Path (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-filepath_8cc_source_l00263}{263}} of file \mbox{\hyperlink{gtest-filepath_8cc_source}{gtest-\/filepath.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00263\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00264\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \textcolor{keyword}{const}\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ =\ pathname\_.c\_str();}
+\DoxyCodeLine{00265\ \textcolor{preprocessor}{\#if\ GTEST\_OS\_WINDOWS}}
+\DoxyCodeLine{00266\ \ \ \textcolor{keywordflow}{return}\ pathname\_.length()\ >=\ 3\ \&\&}
+\DoxyCodeLine{00267\ \ \ \ \ \ ((\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}[0]\ >=\ \textcolor{charliteral}{'a'}\ \&\&\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}[0]\ <=\ \textcolor{charliteral}{'z'})\ ||}
+\DoxyCodeLine{00268\ \ \ \ \ \ \ (\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}[0]\ >=\ \textcolor{charliteral}{'A'}\ \&\&\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}[0]\ <=\ \textcolor{charliteral}{'Z'}))\ \&\&}
+\DoxyCodeLine{00269\ \ \ \ \ \ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}[1]\ ==\ \textcolor{charliteral}{':'}\ \&\&}
+\DoxyCodeLine{00270\ \ \ \ \ \ IsPathSeparator(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}[2]);}
+\DoxyCodeLine{00271\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00272\ \ \ \textcolor{keywordflow}{return}\ IsPathSeparator(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}[0]);}
+\DoxyCodeLine{00273\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00274\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_file_path_ae17e5581e7996021e598851fe947df9c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_file_path_a73fc042ad65e85bbecb956eb4603a6f2}\index{testing::internal::FilePath@{testing::internal::FilePath}!IsDirectory@{IsDirectory}}
+\index{IsDirectory@{IsDirectory}!testing::internal::FilePath@{testing::internal::FilePath}}
+\doxysubsubsection{\texorpdfstring{IsDirectory()}{IsDirectory()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_file_path_a73fc042ad65e85bbecb956eb4603a6f2} 
+bool testing\+::internal\+::\+File\+Path\+::\+Is\+Directory (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-filepath_8cc_source_l00298}{298}} of file \mbox{\hyperlink{gtest-filepath_8cc_source}{gtest-\/filepath.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00298\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00299\ \ \ \textcolor{keywordflow}{return}\ !pathname\_.empty()\ \&\&}
+\DoxyCodeLine{00300\ \ \ \ \ \ \ \ \ \ IsPathSeparator(pathname\_.c\_str()[pathname\_.length()\ -\/\ 1]);}
+\DoxyCodeLine{00301\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_file_path_a73fc042ad65e85bbecb956eb4603a6f2_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_file_path_a2c165c5510e8705ade547849a9234a6e}\index{testing::internal::FilePath@{testing::internal::FilePath}!IsEmpty@{IsEmpty}}
+\index{IsEmpty@{IsEmpty}!testing::internal::FilePath@{testing::internal::FilePath}}
+\doxysubsubsection{\texorpdfstring{IsEmpty()}{IsEmpty()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_file_path_a2c165c5510e8705ade547849a9234a6e} 
+bool testing\+::internal\+::\+File\+Path\+::\+Is\+Empty (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-filepath_8h_source_l00110}{110}} of file \mbox{\hyperlink{gtest-filepath_8h_source}{gtest-\/filepath.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00110\ \{\ \textcolor{keywordflow}{return}\ pathname\_.empty();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1internal_1_1_file_path_a0661adf59aec40c40c8e39b888d68142}\index{testing::internal::FilePath@{testing::internal::FilePath}!IsRootDirectory@{IsRootDirectory}}
+\index{IsRootDirectory@{IsRootDirectory}!testing::internal::FilePath@{testing::internal::FilePath}}
+\doxysubsubsection{\texorpdfstring{IsRootDirectory()}{IsRootDirectory()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_file_path_a0661adf59aec40c40c8e39b888d68142} 
+bool testing\+::internal\+::\+File\+Path\+::\+Is\+Root\+Directory (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-filepath_8cc_source_l00251}{251}} of file \mbox{\hyperlink{gtest-filepath_8cc_source}{gtest-\/filepath.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00251\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00252\ \textcolor{preprocessor}{\#if\ GTEST\_OS\_WINDOWS}}
+\DoxyCodeLine{00253\ \ \ \textcolor{comment}{//\ TODO(wan@google.com):\ on\ Windows\ a\ network\ share\ like}}
+\DoxyCodeLine{00254\ \ \ \textcolor{comment}{//\ \(\backslash\)\(\backslash\)server\(\backslash\)share\ can\ be\ a\ root\ directory,\ although\ it\ cannot\ be\ the}}
+\DoxyCodeLine{00255\ \ \ \textcolor{comment}{//\ current\ directory.\ \ Handle\ this\ properly.}}
+\DoxyCodeLine{00256\ \ \ \textcolor{keywordflow}{return}\ pathname\_.length()\ ==\ 3\ \&\&\ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_ae17e5581e7996021e598851fe947df9c}{IsAbsolutePath}}();}
+\DoxyCodeLine{00257\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00258\ \ \ \textcolor{keywordflow}{return}\ pathname\_.length()\ ==\ 1\ \&\&\ IsPathSeparator(pathname\_.c\_str()[0]);}
+\DoxyCodeLine{00259\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00260\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_file_path_a0661adf59aec40c40c8e39b888d68142_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_file_path_a0661adf59aec40c40c8e39b888d68142_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_file_path_aa8c102da670261eb4fa8e2f2481df139}\index{testing::internal::FilePath@{testing::internal::FilePath}!MakeFileName@{MakeFileName}}
+\index{MakeFileName@{MakeFileName}!testing::internal::FilePath@{testing::internal::FilePath}}
+\doxysubsubsection{\texorpdfstring{MakeFileName()}{MakeFileName()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_file_path_aa8c102da670261eb4fa8e2f2481df139} 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{File\+Path}} testing\+::internal\+::\+File\+Path\+::\+Make\+File\+Name (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{File\+Path}} \&}]{directory}{, }\item[{const \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{File\+Path}} \&}]{base\+\_\+name}{, }\item[{int}]{number}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{extension}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-filepath_8cc_source_l00181}{181}} of file \mbox{\hyperlink{gtest-filepath_8cc_source}{gtest-\/filepath.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00185\ \ \ std::string\ file;}
+\DoxyCodeLine{00186\ \ \ \textcolor{keywordflow}{if}\ (number\ ==\ 0)\ \{}
+\DoxyCodeLine{00187\ \ \ \ \ file\ =\ base\_name.string()\ +\ \textcolor{stringliteral}{"{}."{}}\ +\ \mbox{\hyperlink{namespacevalidate__reflection_a34a4c51cfedb3b3cad290fcb3a1945cc}{extension}};}
+\DoxyCodeLine{00188\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00189\ \ \ \ \ file\ =\ base\_name.string()\ +\ \textcolor{stringliteral}{"{}\_"{}}\ +\ \mbox{\hyperlink{namespacetesting_1_1internal_aad4beed95d0846e6ffc5da0978ef3bb9}{StreamableToString}}(number)}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ +\ \textcolor{stringliteral}{"{}."{}}\ +\ \mbox{\hyperlink{namespacevalidate__reflection_a34a4c51cfedb3b3cad290fcb3a1945cc}{extension}};}
+\DoxyCodeLine{00191\ \ \ \}}
+\DoxyCodeLine{00192\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_ac9d57987f60ac43f0c57b89e333e531e}{ConcatPaths}}(directory,\ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a3504a51accbca78a52fe586133ea5499}{FilePath}}(file));}
+\DoxyCodeLine{00193\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_file_path_aa8c102da670261eb4fa8e2f2481df139_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_file_path_aa8c102da670261eb4fa8e2f2481df139_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_file_path_a941c80c76954e0103d865aba35a10a1b}\index{testing::internal::FilePath@{testing::internal::FilePath}!operator=@{operator=}}
+\index{operator=@{operator=}!testing::internal::FilePath@{testing::internal::FilePath}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_file_path_a941c80c76954e0103d865aba35a10a1b} 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{File\+Path}} \& testing\+::internal\+::\+File\+Path\+::operator= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{File\+Path}} \&}]{rhs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-filepath_8h_source_l00067}{67}} of file \mbox{\hyperlink{gtest-filepath_8h_source}{gtest-\/filepath.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00068\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a15a42de7518e89254e0640dd9317d5f7}{Set}}(rhs);}
+\DoxyCodeLine{00069\ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00070\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1internal_1_1_file_path_a6b61ede2c81ecd870b8220c04aec3060}\index{testing::internal::FilePath@{testing::internal::FilePath}!RemoveDirectoryName@{RemoveDirectoryName}}
+\index{RemoveDirectoryName@{RemoveDirectoryName}!testing::internal::FilePath@{testing::internal::FilePath}}
+\doxysubsubsection{\texorpdfstring{RemoveDirectoryName()}{RemoveDirectoryName()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_file_path_a6b61ede2c81ecd870b8220c04aec3060} 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{File\+Path}} testing\+::internal\+::\+File\+Path\+::\+Remove\+Directory\+Name (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-filepath_8cc_source_l00153}{153}} of file \mbox{\hyperlink{gtest-filepath_8cc_source}{gtest-\/filepath.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00154\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \textcolor{keyword}{const}\ last\_sep\ =\ FindLastPathSeparator();}
+\DoxyCodeLine{00155\ \ \ \textcolor{keywordflow}{return}\ last\_sep\ ?\ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a3504a51accbca78a52fe586133ea5499}{FilePath}}(last\_sep\ +\ 1)\ :\ *this;}
+\DoxyCodeLine{00156\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_file_path_a6b61ede2c81ecd870b8220c04aec3060_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_file_path_aab20b631705b90044d04c67205f2256f}\index{testing::internal::FilePath@{testing::internal::FilePath}!RemoveExtension@{RemoveExtension}}
+\index{RemoveExtension@{RemoveExtension}!testing::internal::FilePath@{testing::internal::FilePath}}
+\doxysubsubsection{\texorpdfstring{RemoveExtension()}{RemoveExtension()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_file_path_aab20b631705b90044d04c67205f2256f} 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{File\+Path}} testing\+::internal\+::\+File\+Path\+::\+Remove\+Extension (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{extension}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-filepath_8cc_source_l00122}{122}} of file \mbox{\hyperlink{gtest-filepath_8cc_source}{gtest-\/filepath.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00123\ \ \ \textcolor{keyword}{const}\ std::string\ dot\_extension\ =\ std::string(\textcolor{stringliteral}{"{}."{}})\ +\ \mbox{\hyperlink{namespacevalidate__reflection_a34a4c51cfedb3b3cad290fcb3a1945cc}{extension}};}
+\DoxyCodeLine{00124\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classtesting_1_1internal_1_1_string_a968f242b709f8c7c0ed5ecf246553321}{String::EndsWithCaseInsensitive}}(pathname\_,\ dot\_extension))\ \{}
+\DoxyCodeLine{00125\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a3504a51accbca78a52fe586133ea5499}{FilePath}}(pathname\_.substr(}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ 0,\ pathname\_.length()\ -\/\ dot\_extension.length()));}
+\DoxyCodeLine{00127\ \ \ \}}
+\DoxyCodeLine{00128\ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00129\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_file_path_aab20b631705b90044d04c67205f2256f_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_file_path_a49e030b5a62ca7dcc7f920a63a96fa55}\index{testing::internal::FilePath@{testing::internal::FilePath}!RemoveFileName@{RemoveFileName}}
+\index{RemoveFileName@{RemoveFileName}!testing::internal::FilePath@{testing::internal::FilePath}}
+\doxysubsubsection{\texorpdfstring{RemoveFileName()}{RemoveFileName()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_file_path_a49e030b5a62ca7dcc7f920a63a96fa55} 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{File\+Path}} testing\+::internal\+::\+File\+Path\+::\+Remove\+File\+Name (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-filepath_8cc_source_l00164}{164}} of file \mbox{\hyperlink{gtest-filepath_8cc_source}{gtest-\/filepath.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00165\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \textcolor{keyword}{const}\ last\_sep\ =\ FindLastPathSeparator();}
+\DoxyCodeLine{00166\ \ \ std::string\ dir;}
+\DoxyCodeLine{00167\ \ \ \textcolor{keywordflow}{if}\ (last\_sep)\ \{}
+\DoxyCodeLine{00168\ \ \ \ \ dir\ =\ std::string(\mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a60a30c518a0298affcc262f5904cf308}{c\_str}}(),\ last\_sep\ +\ 1\ -\/\ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a60a30c518a0298affcc262f5904cf308}{c\_str}}());}
+\DoxyCodeLine{00169\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00170\ \ \ \ \ dir\ =\ \mbox{\hyperlink{namespacetesting_1_1internal_a23a8e9527d0e544e7df2d64ad549ce3e}{kCurrentDirectoryString}};}
+\DoxyCodeLine{00171\ \ \ \}}
+\DoxyCodeLine{00172\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a3504a51accbca78a52fe586133ea5499}{FilePath}}(dir);}
+\DoxyCodeLine{00173\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=347pt]{classtesting_1_1internal_1_1_file_path_a49e030b5a62ca7dcc7f920a63a96fa55_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_file_path_a49e030b5a62ca7dcc7f920a63a96fa55_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_file_path_ab47ada111cc940cf2359f6533bada6ca}\index{testing::internal::FilePath@{testing::internal::FilePath}!RemoveTrailingPathSeparator@{RemoveTrailingPathSeparator}}
+\index{RemoveTrailingPathSeparator@{RemoveTrailingPathSeparator}!testing::internal::FilePath@{testing::internal::FilePath}}
+\doxysubsubsection{\texorpdfstring{RemoveTrailingPathSeparator()}{RemoveTrailingPathSeparator()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_file_path_ab47ada111cc940cf2359f6533bada6ca} 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{File\+Path}} testing\+::internal\+::\+File\+Path\+::\+Remove\+Trailing\+Path\+Separator (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-filepath_8cc_source_l00344}{344}} of file \mbox{\hyperlink{gtest-filepath_8cc_source}{gtest-\/filepath.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00344\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00345\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a73fc042ad65e85bbecb956eb4603a6f2}{IsDirectory}}()}
+\DoxyCodeLine{00346\ \ \ \ \ \ \ ?\ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a3504a51accbca78a52fe586133ea5499}{FilePath}}(pathname\_.substr(0,\ pathname\_.length()\ -\/\ 1))}
+\DoxyCodeLine{00347\ \ \ \ \ \ \ :\ *this;}
+\DoxyCodeLine{00348\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_file_path_ab47ada111cc940cf2359f6533bada6ca_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_file_path_ab47ada111cc940cf2359f6533bada6ca_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_file_path_a15a42de7518e89254e0640dd9317d5f7}\index{testing::internal::FilePath@{testing::internal::FilePath}!Set@{Set}}
+\index{Set@{Set}!testing::internal::FilePath@{testing::internal::FilePath}}
+\doxysubsubsection{\texorpdfstring{Set()}{Set()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_file_path_a15a42de7518e89254e0640dd9317d5f7} 
+void testing\+::internal\+::\+File\+Path\+::\+Set (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{File\+Path}} \&}]{rhs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-filepath_8h_source_l00072}{72}} of file \mbox{\hyperlink{gtest-filepath_8h_source}{gtest-\/filepath.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00073\ \ \ \ \ pathname\_\ =\ rhs.pathname\_;}
+\DoxyCodeLine{00074\ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_file_path_a15a42de7518e89254e0640dd9317d5f7_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_file_path_a44649e2fb65454648a9494a89a970d85}\index{testing::internal::FilePath@{testing::internal::FilePath}!string@{string}}
+\index{string@{string}!testing::internal::FilePath@{testing::internal::FilePath}}
+\doxysubsubsection{\texorpdfstring{string()}{string()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_file_path_a44649e2fb65454648a9494a89a970d85} 
+const std\+::string \& testing\+::internal\+::\+File\+Path\+::string (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-filepath_8h_source_l00076}{76}} of file \mbox{\hyperlink{gtest-filepath_8h_source}{gtest-\/filepath.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00076\ \{\ \textcolor{keywordflow}{return}\ pathname\_;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_file_path_a44649e2fb65454648a9494a89a970d85_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/include/gtest/internal/\mbox{\hyperlink{gtest-filepath_8h}{gtest-\/filepath.\+h}}\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/src/\mbox{\hyperlink{gtest-filepath_8cc}{gtest-\/filepath.\+cc}}\end{DoxyCompactItemize}

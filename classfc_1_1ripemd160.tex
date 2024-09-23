@@ -1,0 +1,521 @@
+\doxysection{fc\+::ripemd160 Class Reference}
+\hypertarget{classfc_1_1ripemd160}{}\label{classfc_1_1ripemd160}\index{fc::ripemd160@{fc::ripemd160}}
+
+
+{\ttfamily \#include $<$ripemd160.\+hpp$>$}
+
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classfc_1_1ripemd160_1_1encoder}{encoder}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1ripemd160_aacd9081b859459fa293823c9904f7e6d}{ripemd160}} ()
+\item 
+\mbox{\hyperlink{classfc_1_1ripemd160_a9a50c30c2453a35ea8f69568deff0e1d}{ripemd160}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&hex\+\_\+str)
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{classfc_1_1ripemd160_a29a1cf31cf487f8e18447ecde6fef5ca}{str}} () const
+\item 
+\mbox{\hyperlink{classfc_1_1ripemd160_a49a10ca063f02f4302a5e2a8fc1a8a22}{operator string}} () const
+\item 
+char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classfc_1_1ripemd160_a774d4a3de0048d37778673674b2fd586}{data}} () const
+\item 
+size\+\_\+t \mbox{\hyperlink{classfc_1_1ripemd160_a87a0af76c90caff452e3a97414dd09ac}{data\+\_\+size}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}} \mbox{\hyperlink{classfc_1_1ripemd160_a7d43ada80e62a7a73ca472365138f863}{hash}} (const \mbox{\hyperlink{classfc_1_1sha512}{fc\+::sha512}} \&h)
+\item 
+static \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}} \mbox{\hyperlink{classfc_1_1ripemd160_a9f1851cbd437458dc4752d5e81d818e4}{hash}} (const \mbox{\hyperlink{classfc_1_1sha256}{fc\+::sha256}} \&h)
+\item 
+static \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}} \mbox{\hyperlink{classfc_1_1ripemd160_ae724e52158d78c76d86897c0adc9d28b}{hash}} (const char \texorpdfstring{$\ast$}{*}d, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} dlen)
+\item 
+static \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}} \mbox{\hyperlink{classfc_1_1ripemd160_a6d82c9d0104ad7131aa0d1078059cb69}{hash}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\static \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}} \mbox{\hyperlink{classfc_1_1ripemd160_a0b3145328b23dedde9c34cd44bd99454}{hash}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&t)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classfc_1_1ripemd160_a67956103e03592e90d20654798c44f28}{\+\_\+hash}} \mbox{[}5\mbox{]}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classfc_1_1ripemd160_ac481b58ba6001638af1f74ee4cd0b808}{operator$<$$<$}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&ds, const \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}} \&ep)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classfc_1_1ripemd160_a6752245cf8cbaf90965058b887c3de71}{operator$>$$>$}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&ds, \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}} \&ep)
+\item 
+\mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}} \mbox{\hyperlink{classfc_1_1ripemd160_a7faa73e7ef78c12cbe81588836dc0079}{operator$<$$<$}} (const \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}} \&h1, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} i)
+\item 
+bool \mbox{\hyperlink{classfc_1_1ripemd160_a9ea7160188d70a1495c72fa44e7f29e2}{operator==}} (const \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}} \&h1, const \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}} \&h2)
+\item 
+bool \mbox{\hyperlink{classfc_1_1ripemd160_a2cb9ea7e7765c6bee46e3ca686faa136}{operator!=}} (const \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}} \&h1, const \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}} \&h2)
+\item 
+\mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}} \mbox{\hyperlink{classfc_1_1ripemd160_a57e0a68fee04485bd3e833fdda26104b}{operator\texorpdfstring{$^\wedge$}{\string^}}} (const \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}} \&h1, const \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}} \&h2)
+\item 
+bool \mbox{\hyperlink{classfc_1_1ripemd160_a3914f7a44533d04fefe88df4020042bc}{operator$>$=}} (const \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}} \&h1, const \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}} \&h2)
+\item 
+bool \mbox{\hyperlink{classfc_1_1ripemd160_a25b1386a28903dfa8b3ffcf275feb2c1}{operator$>$}} (const \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}} \&h1, const \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}} \&h2)
+\item 
+bool \mbox{\hyperlink{classfc_1_1ripemd160_a3ef6c695d63dd7d636c8540e40f96d08}{operator$<$}} (const \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}} \&h1, const \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}} \&h2)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{ripemd160_8hpp_source_l00011}{11}} of file \mbox{\hyperlink{ripemd160_8hpp_source}{ripemd160.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1ripemd160_aacd9081b859459fa293823c9904f7e6d}\index{fc::ripemd160@{fc::ripemd160}!ripemd160@{ripemd160}}
+\index{ripemd160@{ripemd160}!fc::ripemd160@{fc::ripemd160}}
+\doxysubsubsection{\texorpdfstring{ripemd160()}{ripemd160()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1ripemd160_aacd9081b859459fa293823c9904f7e6d} 
+fc\+::ripemd160\+::ripemd160 (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{ripemd160_8cpp_source_l00016}{16}} of file \mbox{\hyperlink{ripemd160_8cpp_source}{ripemd160.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00016\ \{\ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(\ \mbox{\hyperlink{classfc_1_1ripemd160_a67956103e03592e90d20654798c44f28}{\_hash}},\ 0,\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{classfc_1_1ripemd160_a67956103e03592e90d20654798c44f28}{\_hash}})\ );\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=294pt]{classfc_1_1ripemd160_aacd9081b859459fa293823c9904f7e6d_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1ripemd160_a9a50c30c2453a35ea8f69568deff0e1d}\index{fc::ripemd160@{fc::ripemd160}!ripemd160@{ripemd160}}
+\index{ripemd160@{ripemd160}!fc::ripemd160@{fc::ripemd160}}
+\doxysubsubsection{\texorpdfstring{ripemd160()}{ripemd160()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1ripemd160_a9a50c30c2453a35ea8f69568deff0e1d} 
+fc\+::ripemd160\+::ripemd160 (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&}]{hex\+\_\+str}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{ripemd160_8cpp_source_l00017}{17}} of file \mbox{\hyperlink{ripemd160_8cpp_source}{ripemd160.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00017\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00018\ \ \ \ \textcolor{keyword}{auto}\ bytes\_written\ =\ \mbox{\hyperlink{namespacefc_a6a0fb5b79914774be4ab66462362b292}{fc::from\_hex}}(\ hex\_str,\ (\textcolor{keywordtype}{char}*)\mbox{\hyperlink{classfc_1_1ripemd160_a67956103e03592e90d20654798c44f28}{\_hash}},\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{classfc_1_1ripemd160_a67956103e03592e90d20654798c44f28}{\_hash}})\ );}
+\DoxyCodeLine{00019\ \ \ \ \textcolor{keywordflow}{if}(\ bytes\_written\ <\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{classfc_1_1ripemd160_a67956103e03592e90d20654798c44f28}{\_hash}})\ )}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(\ (\textcolor{keywordtype}{char}*)\mbox{\hyperlink{classfc_1_1ripemd160_a67956103e03592e90d20654798c44f28}{\_hash}}\ +\ bytes\_written,\ 0,\ (\textcolor{keyword}{sizeof}(\mbox{\hyperlink{classfc_1_1ripemd160_a67956103e03592e90d20654798c44f28}{\_hash}})\ -\/\ bytes\_written)\ );}
+\DoxyCodeLine{00021\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=313pt]{classfc_1_1ripemd160_a9a50c30c2453a35ea8f69568deff0e1d_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1ripemd160_a774d4a3de0048d37778673674b2fd586}\index{fc::ripemd160@{fc::ripemd160}!data@{data}}
+\index{data@{data}!fc::ripemd160@{fc::ripemd160}}
+\doxysubsubsection{\texorpdfstring{data()}{data()}}
+{\footnotesize\ttfamily \label{classfc_1_1ripemd160_a774d4a3de0048d37778673674b2fd586} 
+char \texorpdfstring{$\ast$}{*} fc\+::ripemd160\+::data (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{ripemd160_8cpp_source_l00028}{28}} of file \mbox{\hyperlink{ripemd160_8cpp_source}{ripemd160.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00028\ \{\ \textcolor{keywordflow}{return}\ (\textcolor{keywordtype}{char}*)\&\mbox{\hyperlink{classfc_1_1ripemd160_a67956103e03592e90d20654798c44f28}{\_hash}}[0];\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1ripemd160_a774d4a3de0048d37778673674b2fd586_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1ripemd160_a87a0af76c90caff452e3a97414dd09ac}\index{fc::ripemd160@{fc::ripemd160}!data\_size@{data\_size}}
+\index{data\_size@{data\_size}!fc::ripemd160@{fc::ripemd160}}
+\doxysubsubsection{\texorpdfstring{data\_size()}{data\_size()}}
+{\footnotesize\ttfamily \label{classfc_1_1ripemd160_a87a0af76c90caff452e3a97414dd09ac} 
+size\+\_\+t fc\+::ripemd160\+::data\+\_\+size (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{ripemd160_8hpp_source_l00021}{21}} of file \mbox{\hyperlink{ripemd160_8hpp_source}{ripemd160.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00021\ \{\ \textcolor{keywordflow}{return}\ 160/8;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1ripemd160_ae724e52158d78c76d86897c0adc9d28b}\index{fc::ripemd160@{fc::ripemd160}!hash@{hash}}
+\index{hash@{hash}!fc::ripemd160@{fc::ripemd160}}
+\doxysubsubsection{\texorpdfstring{hash()}{hash()}\hspace{0.1cm}{\footnotesize\ttfamily [1/5]}}
+{\footnotesize\ttfamily \label{classfc_1_1ripemd160_ae724e52158d78c76d86897c0adc9d28b} 
+\mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}} fc\+::ripemd160\+::hash (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{d}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{dlen}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{ripemd160_8cpp_source_l00052}{52}} of file \mbox{\hyperlink{ripemd160_8cpp_source}{ripemd160.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00053\ \ \ encoder\ e;}
+\DoxyCodeLine{00054\ \ \ e.write(d,dlen);}
+\DoxyCodeLine{00055\ \ \ \textcolor{keywordflow}{return}\ e.result();}
+\DoxyCodeLine{00056\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1ripemd160_ae724e52158d78c76d86897c0adc9d28b_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1ripemd160_a9f1851cbd437458dc4752d5e81d818e4}\index{fc::ripemd160@{fc::ripemd160}!hash@{hash}}
+\index{hash@{hash}!fc::ripemd160@{fc::ripemd160}}
+\doxysubsubsection{\texorpdfstring{hash()}{hash()}\hspace{0.1cm}{\footnotesize\ttfamily [2/5]}}
+{\footnotesize\ttfamily \label{classfc_1_1ripemd160_a9f1851cbd437458dc4752d5e81d818e4} 
+\mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}} fc\+::ripemd160\+::hash (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1sha256}{fc\+::sha256}} \&}]{h}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{ripemd160_8cpp_source_l00048}{48}} of file \mbox{\hyperlink{ripemd160_8cpp_source}{ripemd160.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00049\ \{}
+\DoxyCodeLine{00050\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1ripemd160_a7d43ada80e62a7a73ca472365138f863}{hash}}(\ (\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*)\&h,\ \textcolor{keyword}{sizeof}(h)\ );}
+\DoxyCodeLine{00051\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=321pt]{classfc_1_1ripemd160_a9f1851cbd437458dc4752d5e81d818e4_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1ripemd160_a7d43ada80e62a7a73ca472365138f863}\index{fc::ripemd160@{fc::ripemd160}!hash@{hash}}
+\index{hash@{hash}!fc::ripemd160@{fc::ripemd160}}
+\doxysubsubsection{\texorpdfstring{hash()}{hash()}\hspace{0.1cm}{\footnotesize\ttfamily [3/5]}}
+{\footnotesize\ttfamily \label{classfc_1_1ripemd160_a7d43ada80e62a7a73ca472365138f863} 
+\mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}} fc\+::ripemd160\+::hash (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1sha512}{fc\+::sha512}} \&}]{h}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{ripemd160_8cpp_source_l00044}{44}} of file \mbox{\hyperlink{ripemd160_8cpp_source}{ripemd160.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00045\ \{}
+\DoxyCodeLine{00046\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1ripemd160_a7d43ada80e62a7a73ca472365138f863}{hash}}(\ (\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*)\&h,\ \textcolor{keyword}{sizeof}(h)\ );}
+\DoxyCodeLine{00047\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=182pt]{classfc_1_1ripemd160_a7d43ada80e62a7a73ca472365138f863_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1ripemd160_a7d43ada80e62a7a73ca472365138f863_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1ripemd160_a6d82c9d0104ad7131aa0d1078059cb69}\index{fc::ripemd160@{fc::ripemd160}!hash@{hash}}
+\index{hash@{hash}!fc::ripemd160@{fc::ripemd160}}
+\doxysubsubsection{\texorpdfstring{hash()}{hash()}\hspace{0.1cm}{\footnotesize\ttfamily [4/5]}}
+{\footnotesize\ttfamily \label{classfc_1_1ripemd160_a6d82c9d0104ad7131aa0d1078059cb69} 
+\mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}} fc\+::ripemd160\+::hash (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&}]{s}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{ripemd160_8cpp_source_l00057}{57}} of file \mbox{\hyperlink{ripemd160_8cpp_source}{ripemd160.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00058\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1ripemd160_a7d43ada80e62a7a73ca472365138f863}{hash}}(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.c\_str(),\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.size()\ );}
+\DoxyCodeLine{00059\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=321pt]{classfc_1_1ripemd160_a6d82c9d0104ad7131aa0d1078059cb69_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1ripemd160_a0b3145328b23dedde9c34cd44bd99454}\index{fc::ripemd160@{fc::ripemd160}!hash@{hash}}
+\index{hash@{hash}!fc::ripemd160@{fc::ripemd160}}
+\doxysubsubsection{\texorpdfstring{hash()}{hash()}\hspace{0.1cm}{\footnotesize\ttfamily [5/5]}}
+{\footnotesize\ttfamily \label{classfc_1_1ripemd160_a0b3145328b23dedde9c34cd44bd99454} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+static \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}} fc\+::ripemd160\+::hash (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{t}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{ripemd160_8hpp_source_l00029}{29}} of file \mbox{\hyperlink{ripemd160_8hpp_source}{ripemd160.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00030\ \ \ \ \ \{\ }
+\DoxyCodeLine{00031\ \ \ \ \ \ \ ripemd160::encoder\ e;\ }
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(e,t);}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ e.result();\ }
+\DoxyCodeLine{00034\ \ \ \ \ \}\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1ripemd160_a0b3145328b23dedde9c34cd44bd99454_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1ripemd160_a49a10ca063f02f4302a5e2a8fc1a8a22}\index{fc::ripemd160@{fc::ripemd160}!operator string@{operator string}}
+\index{operator string@{operator string}!fc::ripemd160@{fc::ripemd160}}
+\doxysubsubsection{\texorpdfstring{operator string()}{operator string()}}
+{\footnotesize\ttfamily \label{classfc_1_1ripemd160_a49a10ca063f02f4302a5e2a8fc1a8a22} 
+fc\+::ripemd160\+::operator \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{ripemd160_8cpp_source_l00026}{26}} of file \mbox{\hyperlink{ripemd160_8cpp_source}{ripemd160.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00026\ \{\ \textcolor{keywordflow}{return}\ \ \mbox{\hyperlink{classfc_1_1ripemd160_a29a1cf31cf487f8e18447ecde6fef5ca}{str}}();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1ripemd160_a29a1cf31cf487f8e18447ecde6fef5ca}\index{fc::ripemd160@{fc::ripemd160}!str@{str}}
+\index{str@{str}!fc::ripemd160@{fc::ripemd160}}
+\doxysubsubsection{\texorpdfstring{str()}{str()}}
+{\footnotesize\ttfamily \label{classfc_1_1ripemd160_a29a1cf31cf487f8e18447ecde6fef5ca} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} fc\+::ripemd160\+::str (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{ripemd160_8cpp_source_l00023}{23}} of file \mbox{\hyperlink{ripemd160_8cpp_source}{ripemd160.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00024\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_aab567c89004d329f560014d9943afcd6}{fc::to\_hex}}(\ (\textcolor{keywordtype}{char}*)\mbox{\hyperlink{classfc_1_1ripemd160_a67956103e03592e90d20654798c44f28}{\_hash}},\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{classfc_1_1ripemd160_a67956103e03592e90d20654798c44f28}{\_hash}})\ );}
+\DoxyCodeLine{00025\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=268pt]{classfc_1_1ripemd160_a29a1cf31cf487f8e18447ecde6fef5ca_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{classfc_1_1ripemd160_a2cb9ea7e7765c6bee46e3ca686faa136}\index{fc::ripemd160@{fc::ripemd160}!operator"!=@{operator"!=}}
+\index{operator"!=@{operator"!=}!fc::ripemd160@{fc::ripemd160}}
+\doxysubsubsection{\texorpdfstring{operator"!=}{operator!=}}
+{\footnotesize\ttfamily \label{classfc_1_1ripemd160_a2cb9ea7e7765c6bee46e3ca686faa136} 
+bool \mbox{\hyperlink{namespacefc_a40c368ac88294ae47b064cad937fdbf6}{operator!}}= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}} \&}]{h1}{, }\item[{const \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}} \&}]{h2}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{ripemd160_8cpp_source_l00096}{96}} of file \mbox{\hyperlink{ripemd160_8cpp_source}{ripemd160.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00097\ \ \ \textcolor{keywordflow}{return}\ memcmp(\ h1.\_hash,\ h2.\_hash,\ \textcolor{keyword}{sizeof}(h1.\_hash)\ )\ !=\ 0;}
+\DoxyCodeLine{00098\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1ripemd160_a3ef6c695d63dd7d636c8540e40f96d08}\index{fc::ripemd160@{fc::ripemd160}!operator$<$@{operator$<$}}
+\index{operator$<$@{operator$<$}!fc::ripemd160@{fc::ripemd160}}
+\doxysubsubsection{\texorpdfstring{operator$<$}{operator<}}
+{\footnotesize\ttfamily \label{classfc_1_1ripemd160_a3ef6c695d63dd7d636c8540e40f96d08} 
+bool operator$<$ (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}} \&}]{h1}{, }\item[{const \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}} \&}]{h2}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{ripemd160_8cpp_source_l00093}{93}} of file \mbox{\hyperlink{ripemd160_8cpp_source}{ripemd160.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00094\ \ \ \textcolor{keywordflow}{return}\ memcmp(\ h1.\_hash,\ h2.\_hash,\ \textcolor{keyword}{sizeof}(h1.\_hash)\ )\ <\ 0;}
+\DoxyCodeLine{00095\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1ripemd160_a7faa73e7ef78c12cbe81588836dc0079}\index{fc::ripemd160@{fc::ripemd160}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!fc::ripemd160@{fc::ripemd160}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$}{operator<<}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1ripemd160_a7faa73e7ef78c12cbe81588836dc0079} 
+\mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}} operator$<$$<$ (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}} \&}]{h1}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{i}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{ripemd160_8cpp_source_l00073}{73}} of file \mbox{\hyperlink{ripemd160_8cpp_source}{ripemd160.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00074\ \ \ \mbox{\hyperlink{classfc_1_1ripemd160_aacd9081b859459fa293823c9904f7e6d}{ripemd160}}\ result;}
+\DoxyCodeLine{00075\ \ \ fc::detail::shift\_l(\ h1.data(),\ result.data(),\ result.data\_size(),\ i\ );}
+\DoxyCodeLine{00076\ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00077\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1ripemd160_ac481b58ba6001638af1f74ee4cd0b808}\index{fc::ripemd160@{fc::ripemd160}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!fc::ripemd160@{fc::ripemd160}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$}{operator<<}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1ripemd160_ac481b58ba6001638af1f74ee4cd0b808} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& operator$<$$<$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{ds}{, }\item[{const \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}} \&}]{ep}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{ripemd160_8hpp_source_l00053}{53}} of file \mbox{\hyperlink{ripemd160_8hpp_source}{ripemd160.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_a4b2aef26182d21706896022467868f7c}{ds}}.write(\ ep.data(),\ \textcolor{keyword}{sizeof}(ep)\ );}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_xbyak_1_1util_a4b2aef26182d21706896022467868f7c}{ds}};}
+\DoxyCodeLine{00056\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1ripemd160_a9ea7160188d70a1495c72fa44e7f29e2}\index{fc::ripemd160@{fc::ripemd160}!operator==@{operator==}}
+\index{operator==@{operator==}!fc::ripemd160@{fc::ripemd160}}
+\doxysubsubsection{\texorpdfstring{operator==}{operator==}}
+{\footnotesize\ttfamily \label{classfc_1_1ripemd160_a9ea7160188d70a1495c72fa44e7f29e2} 
+bool operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}} \&}]{h1}{, }\item[{const \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}} \&}]{h2}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{ripemd160_8cpp_source_l00099}{99}} of file \mbox{\hyperlink{ripemd160_8cpp_source}{ripemd160.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00100\ \ \ \textcolor{keywordflow}{return}\ memcmp(\ h1.\_hash,\ h2.\_hash,\ \textcolor{keyword}{sizeof}(h1.\_hash)\ )\ ==\ 0;}
+\DoxyCodeLine{00101\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1ripemd160_a25b1386a28903dfa8b3ffcf275feb2c1}\index{fc::ripemd160@{fc::ripemd160}!operator$>$@{operator$>$}}
+\index{operator$>$@{operator$>$}!fc::ripemd160@{fc::ripemd160}}
+\doxysubsubsection{\texorpdfstring{operator$>$}{operator>}}
+{\footnotesize\ttfamily \label{classfc_1_1ripemd160_a25b1386a28903dfa8b3ffcf275feb2c1} 
+bool operator$>$ (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}} \&}]{h1}{, }\item[{const \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}} \&}]{h2}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{ripemd160_8cpp_source_l00090}{90}} of file \mbox{\hyperlink{ripemd160_8cpp_source}{ripemd160.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00091\ \ \ \textcolor{keywordflow}{return}\ memcmp(\ h1.\_hash,\ h2.\_hash,\ \textcolor{keyword}{sizeof}(h1.\_hash)\ )\ >\ 0;}
+\DoxyCodeLine{00092\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1ripemd160_a3914f7a44533d04fefe88df4020042bc}\index{fc::ripemd160@{fc::ripemd160}!operator$>$=@{operator$>$=}}
+\index{operator$>$=@{operator$>$=}!fc::ripemd160@{fc::ripemd160}}
+\doxysubsubsection{\texorpdfstring{operator$>$=}{operator>=}}
+{\footnotesize\ttfamily \label{classfc_1_1ripemd160_a3914f7a44533d04fefe88df4020042bc} 
+bool operator$>$= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}} \&}]{h1}{, }\item[{const \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}} \&}]{h2}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{ripemd160_8cpp_source_l00087}{87}} of file \mbox{\hyperlink{ripemd160_8cpp_source}{ripemd160.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00088\ \ \ \textcolor{keywordflow}{return}\ memcmp(\ h1.\_hash,\ h2.\_hash,\ \textcolor{keyword}{sizeof}(h1.\_hash)\ )\ >=\ 0;}
+\DoxyCodeLine{00089\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1ripemd160_a6752245cf8cbaf90965058b887c3de71}\index{fc::ripemd160@{fc::ripemd160}!operator$>$$>$@{operator$>$$>$}}
+\index{operator$>$$>$@{operator$>$$>$}!fc::ripemd160@{fc::ripemd160}}
+\doxysubsubsection{\texorpdfstring{operator$>$$>$}{operator>>}}
+{\footnotesize\ttfamily \label{classfc_1_1ripemd160_a6752245cf8cbaf90965058b887c3de71} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& operator$>$$>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{ds}{, }\item[{\mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}} \&}]{ep}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{ripemd160_8hpp_source_l00059}{59}} of file \mbox{\hyperlink{ripemd160_8hpp_source}{ripemd160.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_a4b2aef26182d21706896022467868f7c}{ds}}.read(\ ep.data(),\ \textcolor{keyword}{sizeof}(ep)\ );}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_xbyak_1_1util_a4b2aef26182d21706896022467868f7c}{ds}};}
+\DoxyCodeLine{00062\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1ripemd160_a57e0a68fee04485bd3e833fdda26104b}\index{fc::ripemd160@{fc::ripemd160}!operator\texorpdfstring{$^\wedge$}{\string^}@{operator\texorpdfstring{$^\wedge$}{\string^}}}
+\index{operator\texorpdfstring{$^\wedge$}{\string^}@{operator\texorpdfstring{$^\wedge$}{\string^}}!fc::ripemd160@{fc::ripemd160}}
+\doxysubsubsection{\texorpdfstring{operator\texorpdfstring{$^\wedge$}{\string^}}{operator\string^}}
+{\footnotesize\ttfamily \label{classfc_1_1ripemd160_a57e0a68fee04485bd3e833fdda26104b} 
+\mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}} operator\texorpdfstring{$^\wedge$}{\string^} (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}} \&}]{h1}{, }\item[{const \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}} \&}]{h2}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{ripemd160_8cpp_source_l00078}{78}} of file \mbox{\hyperlink{ripemd160_8cpp_source}{ripemd160.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00079\ \ \ \mbox{\hyperlink{classfc_1_1ripemd160_aacd9081b859459fa293823c9904f7e6d}{ripemd160}}\ result;}
+\DoxyCodeLine{00080\ \ \ result.\_hash[0]\ =\ h1.\_hash[0]\ \string^\ h2.\_hash[0];}
+\DoxyCodeLine{00081\ \ \ result.\_hash[1]\ =\ h1.\_hash[1]\ \string^\ h2.\_hash[1];}
+\DoxyCodeLine{00082\ \ \ result.\_hash[2]\ =\ h1.\_hash[2]\ \string^\ h2.\_hash[2];}
+\DoxyCodeLine{00083\ \ \ result.\_hash[3]\ =\ h1.\_hash[3]\ \string^\ h2.\_hash[3];}
+\DoxyCodeLine{00084\ \ \ result.\_hash[4]\ =\ h1.\_hash[4]\ \string^\ h2.\_hash[4];}
+\DoxyCodeLine{00085\ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00086\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classfc_1_1ripemd160_a67956103e03592e90d20654798c44f28}\index{fc::ripemd160@{fc::ripemd160}!\_hash@{\_hash}}
+\index{\_hash@{\_hash}!fc::ripemd160@{fc::ripemd160}}
+\doxysubsubsection{\texorpdfstring{\_hash}{\_hash}}
+{\footnotesize\ttfamily \label{classfc_1_1ripemd160_a67956103e03592e90d20654798c44f28} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} fc\+::ripemd160\+::\+\_\+hash\mbox{[}5\mbox{]}}
+
+
+
+Definition at line \mbox{\hyperlink{ripemd160_8hpp_source_l00071}{71}} of file \mbox{\hyperlink{ripemd160_8hpp_source}{ripemd160.\+hpp}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/\mbox{\hyperlink{ripemd160_8hpp}{ripemd160.\+hpp}}\item 
+libraries/fc/src/crypto/\mbox{\hyperlink{ripemd160_8cpp}{ripemd160.\+cpp}}\end{DoxyCompactItemize}

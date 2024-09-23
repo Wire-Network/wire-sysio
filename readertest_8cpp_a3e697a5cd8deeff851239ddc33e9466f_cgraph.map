@@ -1,0 +1,9 @@
+<map id="TestInsituMultipleRoot" name="TestInsituMultipleRoot">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,157,31"/>
+<area shape="rect" id="Node000002" href="$class_generic_reader.html#a0c450620d14ff1824e58bb7bd9b42099" title="Parse JSON text." alt="" coords="205,5,355,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="157,16,189,16,189,21,157,21"/>
+<area shape="rect" id="Node000003" href="$struct_parse_result.html#a88b6d44f052a19e6436ae6aadc2c40b4" title="Reset error code." alt="" coords="403,5,535,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="355,16,387,16,387,21,355,21"/>
+<area shape="rect" id="Node000004" href="$struct_parse_result.html#aa81b4a7b776b77216cb752385203a8c1" title="Update error code and offset." alt="" coords="583,5,705,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="536,16,568,16,568,21,536,21"/>
+</map>

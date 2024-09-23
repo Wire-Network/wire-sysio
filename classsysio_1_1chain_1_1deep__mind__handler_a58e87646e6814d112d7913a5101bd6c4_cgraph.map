@@ -1,0 +1,9 @@
+<map id="sysio::chain::deep_mind_handler::on_accepted_block" name="sysio::chain::deep_mind_handler::on_accepted_block">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,59,231,100"/>
+<area shape="rect" id="Node000002" href="$namespacefc_1_1raw.html#a3a18d8161aa5b4f4f02b6fcfdff5e5d1" title=" " alt="" coords="279,29,376,55"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="231,57,263,51,264,56,232,62"/>
+<area shape="rect" id="Node000003" href="$namespacefc.html#aab567c89004d329f560014d9943afcd6" title=" " alt="" coords="288,103,367,128"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="232,96,273,104,272,109,231,102"/>
+<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="292,31,286,21,290,11,304,5,327,3,353,5,366,12,364,17,351,10,327,8,305,10,293,15,291,20,297,27"/>
+<area shape="poly" id="edge4_Node000003_Node000003" title=" " alt="" coords="292,104,286,94,290,84,304,78,327,76,353,79,366,86,364,90,351,84,327,81,305,83,293,88,291,93,297,101"/>
+</map>

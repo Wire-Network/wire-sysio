@@ -1,0 +1,16 @@
+<map id="yh_util_get_object_info" name="yh_util_get_object_info">
+<area shape="rect" id="Node000001" title=" " alt="" coords="506,88,661,114"/>
+<area shape="rect" id="Node000002" href="$util__pkcs11_8c.html#a85589628d7732ef01a3f80a25d217c8c" title=" " alt="" coords="319,5,435,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="542,83,457,45,427,34,428,29,459,40,545,78"/>
+<area shape="rect" id="Node000003" href="$logs_8c.html#a840291bc02cba5474a4cb46a9b9566fe" title=" " alt="" coords="352,55,402,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="490,89,402,74,403,69,491,83"/>
+<area shape="rect" id="Node000004" href="$structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl.html#a00ee0ac7ac4a819d0b8755bf4f442263" title=" " alt="" coords="302,105,452,161"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="491,118,453,124,453,118,491,113"/>
+<area shape="rect" id="Node000005" href="$commands_8c.html#afa7330c81148ba6f4d5c53f7c370ed41" title=" " alt="" coords="296,185,458,211"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="551,125,508,150,459,175,428,187,426,182,457,170,506,146,548,120"/>
+<area shape="rect" id="Node000006" href="$src_2main_8c.html#a34a9e8c400dcf19e771e884636316060" title=" " alt="" coords="103,160,248,186"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="280,189,248,185,249,179,281,183"/>
+<area shape="rect" id="Node000007" href="$src_2main_8c.html#a0ddf1224851353fc92bfbff6f499fa97" title=" " alt="" coords="5,185,55,211"/>
+<area shape="poly" id="edge7_Node000005_Node000007" title=" " alt="" coords="280,201,55,201,55,196,280,196"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="88,191,55,197,54,191,87,186"/>
+</map>

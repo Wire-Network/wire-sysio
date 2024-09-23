@@ -1,0 +1,11 @@
+<map id="clara::detail::BoundFlagRefBase" name="clara::detail::BoundFlagRefBase">
+<area shape="rect" id="Node000001" title=" " alt="" coords="101,153,260,193"/>
+<area shape="rect" id="Node000004" href="$structclara_1_1detail_1_1_bound_flag_lambda.html" title=" " alt="" coords="5,241,164,282"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="149,206,108,243,104,239,146,202"/>
+<area shape="rect" id="Node000005" href="$structclara_1_1detail_1_1_bound_flag_ref.html" title=" " alt="" coords="188,249,368,274"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="216,202,266,247,263,251,212,206"/>
+<area shape="rect" id="Node000002" href="$structclara_1_1detail_1_1_bound_ref.html" title=" " alt="" coords="103,79,258,105"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="183,120,183,152,178,152,178,120"/>
+<area shape="rect" id="Node000003" href="$structclara_1_1detail_1_1_non_copyable.html" title=" " alt="" coords="93,5,268,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="183,46,183,79,178,79,178,46"/>
+</map>

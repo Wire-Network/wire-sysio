@@ -1,0 +1,325 @@
+\doxysection{sysio\+::chain\+::variant\+\_\+snapshot\+\_\+reader Class Reference}
+\hypertarget{classsysio_1_1chain_1_1variant__snapshot__reader}{}\label{classsysio_1_1chain_1_1variant__snapshot__reader}\index{sysio::chain::variant\_snapshot\_reader@{sysio::chain::variant\_snapshot\_reader}}
+
+
+{\ttfamily \#include $<$snapshot.\+hpp$>$}
+
+
+
+Inheritance diagram for sysio\+::chain\+::variant\+\_\+snapshot\+\_\+reader\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=197pt]{classsysio_1_1chain_1_1variant__snapshot__reader__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for sysio\+::chain\+::variant\+\_\+snapshot\+\_\+reader\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=194pt]{classsysio_1_1chain_1_1variant__snapshot__reader__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classsysio_1_1chain_1_1variant__snapshot__reader_a9a9ccb34b2f921b0c7197e0a16d9cfb0}{variant\+\_\+snapshot\+\_\+reader}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&snapshot)
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1variant__snapshot__reader_a7787b60b558f9094eceff708eec16244}{validate}} () const override
+\item 
+bool \mbox{\hyperlink{classsysio_1_1chain_1_1variant__snapshot__reader_a07a07fe31702de4269b8cdec8345addc}{has\+\_\+section}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&section\+\_\+name) override
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1variant__snapshot__reader_a75135197484b6fc056e9bab83afc1b00}{set\+\_\+section}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&section\+\_\+name) override
+\item 
+bool \mbox{\hyperlink{classsysio_1_1chain_1_1variant__snapshot__reader_aeb25ba34a2c1671b67553a71a76b7149}{read\+\_\+row}} (\mbox{\hyperlink{structsysio_1_1chain_1_1detail_1_1abstract__snapshot__row__reader}{detail\+::abstract\+\_\+snapshot\+\_\+row\+\_\+reader}} \&row\+\_\+reader) override
+\item 
+bool \mbox{\hyperlink{classsysio_1_1chain_1_1variant__snapshot__reader_a0e845cd9dfa70165417ec7d8bd037e3d}{empty}} () override
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1variant__snapshot__reader_a01fb0caac49a159ee15791cb7c1a5c53}{clear\+\_\+section}} () override
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1variant__snapshot__reader_a1a16c282b9e9ad7adbde1a86dbf549f5}{return\+\_\+to\+\_\+header}} () override
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classsysio_1_1chain_1_1snapshot__reader}{sysio\+::chain\+::snapshot\+\_\+reader}}}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename F $>$ }\\void \mbox{\hyperlink{classsysio_1_1chain_1_1snapshot__reader_ab72cf60edc3de08fd2bf10b10ae72261}{read\+\_\+section}} (const std\+::string \&section\+\_\+name, F \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename F $>$ }\\void \mbox{\hyperlink{classsysio_1_1chain_1_1snapshot__reader_a328258773a7f5852fb70fd9f96617776}{read\+\_\+section}} (F \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\bool \mbox{\hyperlink{classsysio_1_1chain_1_1snapshot__reader_a14583acf5c7c41d9f2d1b27dd55c4875}{has\+\_\+section}} (const std\+::string \&suffix=std\+::string())
+\item 
+virtual \mbox{\hyperlink{classsysio_1_1chain_1_1snapshot__reader_a0d68be7e8d00f8d6e4615586e2a66564}{\texorpdfstring{$\sim$}{\string~}snapshot\+\_\+reader}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Protected Member Functions inherited from \mbox{\hyperlink{classsysio_1_1chain_1_1snapshot__reader}{sysio\+::chain\+::snapshot\+\_\+reader}}}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{snapshot_8hpp_source_l00311}{311}} of file \mbox{\hyperlink{snapshot_8hpp_source}{snapshot.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classsysio_1_1chain_1_1variant__snapshot__reader_a9a9ccb34b2f921b0c7197e0a16d9cfb0}\index{sysio::chain::variant\_snapshot\_reader@{sysio::chain::variant\_snapshot\_reader}!variant\_snapshot\_reader@{variant\_snapshot\_reader}}
+\index{variant\_snapshot\_reader@{variant\_snapshot\_reader}!sysio::chain::variant\_snapshot\_reader@{sysio::chain::variant\_snapshot\_reader}}
+\doxysubsubsection{\texorpdfstring{variant\_snapshot\_reader()}{variant\_snapshot\_reader()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1variant__snapshot__reader_a9a9ccb34b2f921b0c7197e0a16d9cfb0} 
+sysio\+::chain\+::variant\+\_\+snapshot\+\_\+reader\+::variant\+\_\+snapshot\+\_\+reader (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&}]{snapshot}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{snapshot_8cpp_source_l00031}{31}} of file \mbox{\hyperlink{snapshot_8cpp_source}{snapshot.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00032\ :snapshot(snapshot)}
+\DoxyCodeLine{00033\ ,cur\_section(\textcolor{keyword}{nullptr})}
+\DoxyCodeLine{00034\ ,cur\_row(0)}
+\DoxyCodeLine{00035\ \{}
+\DoxyCodeLine{00036\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1chain_1_1variant__snapshot__reader_a01fb0caac49a159ee15791cb7c1a5c53}\index{sysio::chain::variant\_snapshot\_reader@{sysio::chain::variant\_snapshot\_reader}!clear\_section@{clear\_section}}
+\index{clear\_section@{clear\_section}!sysio::chain::variant\_snapshot\_reader@{sysio::chain::variant\_snapshot\_reader}}
+\doxysubsubsection{\texorpdfstring{clear\_section()}{clear\_section()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1variant__snapshot__reader_a01fb0caac49a159ee15791cb7c1a5c53} 
+void sysio\+::chain\+::variant\+\_\+snapshot\+\_\+reader\+::clear\+\_\+section (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classsysio_1_1chain_1_1snapshot__reader_a194ab1bdd3d46de815b40f7ba45cca0f}{sysio\+::chain\+::snapshot\+\_\+reader}}.
+
+
+
+Definition at line \mbox{\hyperlink{snapshot_8cpp_source_l00113}{113}} of file \mbox{\hyperlink{snapshot_8cpp_source}{snapshot.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00114\ \ \ \ cur\_section\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00115\ \ \ \ cur\_row\ =\ 0;}
+\DoxyCodeLine{00116\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1variant__snapshot__reader_a01fb0caac49a159ee15791cb7c1a5c53_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1variant__snapshot__reader_a0e845cd9dfa70165417ec7d8bd037e3d}\index{sysio::chain::variant\_snapshot\_reader@{sysio::chain::variant\_snapshot\_reader}!empty@{empty}}
+\index{empty@{empty}!sysio::chain::variant\_snapshot\_reader@{sysio::chain::variant\_snapshot\_reader}}
+\doxysubsubsection{\texorpdfstring{empty()}{empty()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1variant__snapshot__reader_a0e845cd9dfa70165417ec7d8bd037e3d} 
+bool sysio\+::chain\+::variant\+\_\+snapshot\+\_\+reader\+::empty (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classsysio_1_1chain_1_1snapshot__reader_aad8b2699aff63c854dfb9bea7f30e542}{sysio\+::chain\+::snapshot\+\_\+reader}}.
+
+
+
+Definition at line \mbox{\hyperlink{snapshot_8cpp_source_l00108}{108}} of file \mbox{\hyperlink{snapshot_8cpp_source}{snapshot.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00109\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ rows\ =\ (*cur\_section)[\textcolor{stringliteral}{"{}rows"{}}].get\_array();}
+\DoxyCodeLine{00110\ \ \ \ \textcolor{keywordflow}{return}\ rows.empty();}
+\DoxyCodeLine{00111\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1variant__snapshot__reader_a07a07fe31702de4269b8cdec8345addc}\index{sysio::chain::variant\_snapshot\_reader@{sysio::chain::variant\_snapshot\_reader}!has\_section@{has\_section}}
+\index{has\_section@{has\_section}!sysio::chain::variant\_snapshot\_reader@{sysio::chain::variant\_snapshot\_reader}}
+\doxysubsubsection{\texorpdfstring{has\_section()}{has\_section()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1variant__snapshot__reader_a07a07fe31702de4269b8cdec8345addc} 
+bool sysio\+::chain\+::variant\+\_\+snapshot\+\_\+reader\+::has\+\_\+section (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&}]{section\+\_\+name}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classsysio_1_1chain_1_1snapshot__reader_a6ada1a8ca4afabb553f536d0899b2872}{sysio\+::chain\+::snapshot\+\_\+reader}}.
+
+
+
+Definition at line \mbox{\hyperlink{snapshot_8cpp_source_l00079}{79}} of file \mbox{\hyperlink{snapshot_8cpp_source}{snapshot.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00080\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ sections\ =\ snapshot[\textcolor{stringliteral}{"{}sections"{}}].get\_array();}
+\DoxyCodeLine{00081\ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ section:\ sections\ )\ \{}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (section[\textcolor{stringliteral}{"{}name"{}}].as\_string()\ ==\ section\_name)\ \{}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00085\ \ \ \ \}}
+\DoxyCodeLine{00086\ }
+\DoxyCodeLine{00087\ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00088\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1variant__snapshot__reader_aeb25ba34a2c1671b67553a71a76b7149}\index{sysio::chain::variant\_snapshot\_reader@{sysio::chain::variant\_snapshot\_reader}!read\_row@{read\_row}}
+\index{read\_row@{read\_row}!sysio::chain::variant\_snapshot\_reader@{sysio::chain::variant\_snapshot\_reader}}
+\doxysubsubsection{\texorpdfstring{read\_row()}{read\_row()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1variant__snapshot__reader_aeb25ba34a2c1671b67553a71a76b7149} 
+bool sysio\+::chain\+::variant\+\_\+snapshot\+\_\+reader\+::read\+\_\+row (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1detail_1_1abstract__snapshot__row__reader}{detail\+::abstract\+\_\+snapshot\+\_\+row\+\_\+reader}} \&}]{row\+\_\+reader}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classsysio_1_1chain_1_1snapshot__reader_ae29552ab0cebe263c9a3d790d9f54bd3}{sysio\+::chain\+::snapshot\+\_\+reader}}.
+
+
+
+Definition at line \mbox{\hyperlink{snapshot_8cpp_source_l00102}{102}} of file \mbox{\hyperlink{snapshot_8cpp_source}{snapshot.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00103\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ rows\ =\ (*cur\_section)[\textcolor{stringliteral}{"{}rows"{}}].get\_array();}
+\DoxyCodeLine{00104\ \ \ \ row\_reader.provide(rows.at(cur\_row++));}
+\DoxyCodeLine{00105\ \ \ \ \textcolor{keywordflow}{return}\ cur\_row\ <\ rows.size();}
+\DoxyCodeLine{00106\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1variant__snapshot__reader_aeb25ba34a2c1671b67553a71a76b7149_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1variant__snapshot__reader_a1a16c282b9e9ad7adbde1a86dbf549f5}\index{sysio::chain::variant\_snapshot\_reader@{sysio::chain::variant\_snapshot\_reader}!return\_to\_header@{return\_to\_header}}
+\index{return\_to\_header@{return\_to\_header}!sysio::chain::variant\_snapshot\_reader@{sysio::chain::variant\_snapshot\_reader}}
+\doxysubsubsection{\texorpdfstring{return\_to\_header()}{return\_to\_header()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1variant__snapshot__reader_a1a16c282b9e9ad7adbde1a86dbf549f5} 
+void sysio\+::chain\+::variant\+\_\+snapshot\+\_\+reader\+::return\+\_\+to\+\_\+header (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classsysio_1_1chain_1_1snapshot__reader_acbe6c51be2b77a80487c949419f940b3}{sysio\+::chain\+::snapshot\+\_\+reader}}.
+
+
+
+Definition at line \mbox{\hyperlink{snapshot_8cpp_source_l00118}{118}} of file \mbox{\hyperlink{snapshot_8cpp_source}{snapshot.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00119\ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1variant__snapshot__reader_a01fb0caac49a159ee15791cb7c1a5c53}{clear\_section}}();}
+\DoxyCodeLine{00120\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1variant__snapshot__reader_a1a16c282b9e9ad7adbde1a86dbf549f5_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1variant__snapshot__reader_a75135197484b6fc056e9bab83afc1b00}\index{sysio::chain::variant\_snapshot\_reader@{sysio::chain::variant\_snapshot\_reader}!set\_section@{set\_section}}
+\index{set\_section@{set\_section}!sysio::chain::variant\_snapshot\_reader@{sysio::chain::variant\_snapshot\_reader}}
+\doxysubsubsection{\texorpdfstring{set\_section()}{set\_section()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1variant__snapshot__reader_a75135197484b6fc056e9bab83afc1b00} 
+void sysio\+::chain\+::variant\+\_\+snapshot\+\_\+reader\+::set\+\_\+section (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&}]{section\+\_\+name}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classsysio_1_1chain_1_1snapshot__reader_a89aba1b95084222a1b9bf40dc4e57cc4}{sysio\+::chain\+::snapshot\+\_\+reader}}.
+
+
+
+Definition at line \mbox{\hyperlink{snapshot_8cpp_source_l00090}{90}} of file \mbox{\hyperlink{snapshot_8cpp_source}{snapshot.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00091\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ sections\ =\ snapshot[\textcolor{stringliteral}{"{}sections"{}}].get\_array();}
+\DoxyCodeLine{00092\ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ section:\ sections\ )\ \{}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (section[\textcolor{stringliteral}{"{}name"{}}].as\_string()\ ==\ section\_name)\ \{}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ cur\_section\ =\ \&section.get\_object();}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00097\ \ \ \ \}}
+\DoxyCodeLine{00098\ }
+\DoxyCodeLine{00099\ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a1bfa656552ea0534b2c91ee0fe33f850}{SYS\_THROW}}(snapshot\_exception,\ \textcolor{stringliteral}{"{}Variant\ snapshot\ has\ no\ section\ named\ \$\{n\}"{}},\ (\textcolor{stringliteral}{"{}n"{}},\ section\_name));}
+\DoxyCodeLine{00100\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1variant__snapshot__reader_a7787b60b558f9094eceff708eec16244}\index{sysio::chain::variant\_snapshot\_reader@{sysio::chain::variant\_snapshot\_reader}!validate@{validate}}
+\index{validate@{validate}!sysio::chain::variant\_snapshot\_reader@{sysio::chain::variant\_snapshot\_reader}}
+\doxysubsubsection{\texorpdfstring{validate()}{validate()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1variant__snapshot__reader_a7787b60b558f9094eceff708eec16244} 
+void sysio\+::chain\+::variant\+\_\+snapshot\+\_\+reader\+::validate (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classsysio_1_1chain_1_1snapshot__reader_a99792622cdecf77e938bce927541b581}{sysio\+::chain\+::snapshot\+\_\+reader}}.
+
+
+
+Definition at line \mbox{\hyperlink{snapshot_8cpp_source_l00038}{38}} of file \mbox{\hyperlink{snapshot_8cpp_source}{snapshot.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00039\ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(snapshot.is\_object(),\ snapshot\_validation\_exception,}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Variant\ snapshot\ is\ not\ an\ object"{}});}
+\DoxyCodeLine{00041\ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1variant__object}{fc::variant\_object}}\&\ o\ =\ snapshot.get\_object();}
+\DoxyCodeLine{00042\ }
+\DoxyCodeLine{00043\ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(o.\mbox{\hyperlink{classfc_1_1variant__object_ae4ed31b7cb6bc6e1d2873f9121049589}{contains}}(\textcolor{stringliteral}{"{}version"{}}),\ snapshot\_validation\_exception,}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Variant\ snapshot\ has\ no\ version"{}});}
+\DoxyCodeLine{00045\ }
+\DoxyCodeLine{00046\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1state_a12f378e0c6dbf373781e7988ee4a0853a08c88a938bc459c7997b48f74248752f}{version}}\ =\ o[\textcolor{stringliteral}{"{}version"{}}];}
+\DoxyCodeLine{00047\ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1state_a12f378e0c6dbf373781e7988ee4a0853a08c88a938bc459c7997b48f74248752f}{version}}.is\_integer(),\ snapshot\_validation\_exception,}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Variant\ snapshot\ version\ is\ not\ an\ integer"{}});}
+\DoxyCodeLine{00049\ }
+\DoxyCodeLine{00050\ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1state_a12f378e0c6dbf373781e7988ee4a0853a08c88a938bc459c7997b48f74248752f}{version}}.as\_uint64()\ ==\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})current\_snapshot\_version,\ snapshot\_validation\_exception,}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Variant\ snapshot\ is\ an\ unsuppored\ version.\ \ Expected\ :\ \$\{expected\},\ Got:\ \$\{actual\}"{}},}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}expected"{}},\ current\_snapshot\_version)(\textcolor{stringliteral}{"{}actual"{}},o[\textcolor{stringliteral}{"{}version"{}}].as\_uint64()));}
+\DoxyCodeLine{00053\ }
+\DoxyCodeLine{00054\ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(o.\mbox{\hyperlink{classfc_1_1variant__object_ae4ed31b7cb6bc6e1d2873f9121049589}{contains}}(\textcolor{stringliteral}{"{}sections"{}}),\ snapshot\_validation\_exception,}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Variant\ snapshot\ has\ no\ sections"{}});}
+\DoxyCodeLine{00056\ }
+\DoxyCodeLine{00057\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ sections\ =\ o[\textcolor{stringliteral}{"{}sections"{}}];}
+\DoxyCodeLine{00058\ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(sections.is\_array(),\ snapshot\_validation\_exception,\ \textcolor{stringliteral}{"{}Variant\ snapshot\ sections\ is\ not\ an\ array"{}});}
+\DoxyCodeLine{00059\ }
+\DoxyCodeLine{00060\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ section\_array\ =\ sections.get\_array();}
+\DoxyCodeLine{00061\ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ section:\ section\_array\ )\ \{}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(section.is\_object(),\ snapshot\_validation\_exception,\ \textcolor{stringliteral}{"{}Variant\ snapshot\ section\ is\ not\ an\ object"{}});}
+\DoxyCodeLine{00063\ }
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ so\ =\ section.get\_object();}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(so.contains(\textcolor{stringliteral}{"{}name"{}}),\ snapshot\_validation\_exception,}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Variant\ snapshot\ section\ has\ no\ name"{}});}
+\DoxyCodeLine{00067\ }
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(so[\textcolor{stringliteral}{"{}name"{}}].is\_string(),\ snapshot\_validation\_exception,}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Variant\ snapshot\ section\ name\ is\ not\ a\ string"{}});}
+\DoxyCodeLine{00070\ }
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(so.contains(\textcolor{stringliteral}{"{}rows"{}}),\ snapshot\_validation\_exception,}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Variant\ snapshot\ section\ has\ no\ rows"{}});}
+\DoxyCodeLine{00073\ }
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(so[\textcolor{stringliteral}{"{}rows"{}}].is\_array(),\ snapshot\_validation\_exception,}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Variant\ snapshot\ section\ rows\ is\ not\ an\ array"{}});}
+\DoxyCodeLine{00076\ \ \ \ \}}
+\DoxyCodeLine{00077\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1variant__snapshot__reader_a7787b60b558f9094eceff708eec16244_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{snapshot_8hpp}{snapshot.\+hpp}}\item 
+libraries/chain/\mbox{\hyperlink{snapshot_8cpp}{snapshot.\+cpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,82 @@
+\doxysection{test\+\_\+pbkdf2.\+c}
+\hypertarget{test__pbkdf2_8c_source}{}\label{test__pbkdf2_8c_source}\index{libraries/yubihsm/lib/tests/test\_pbkdf2.c@{libraries/yubihsm/lib/tests/test\_pbkdf2.c}}
+\mbox{\hyperlink{test__pbkdf2_8c}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ 2015-\/2018\ Yubico\ AB}}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00004}00004\ \textcolor{comment}{\ *\ Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00005}00005\ \textcolor{comment}{\ *\ you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00006}00006\ \textcolor{comment}{\ *\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00008}00008\ \textcolor{comment}{\ *\ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00009}00009\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00010}00010\ \textcolor{comment}{\ *\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00011}00011\ \textcolor{comment}{\ *\ distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00012}00012\ \textcolor{comment}{\ *\ WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00013}00013\ \textcolor{comment}{\ *\ See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00014}00014\ \textcolor{comment}{\ *\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00015}00015\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00017}00017\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{stdint_8h}{stdint.h}}>}}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00018}00018\ \textcolor{preprocessor}{\#ifdef\ NDEBUG}}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00019}00019\ \textcolor{preprocessor}{\#undef\ NDEBUG}}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00020}00020\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00021}00021\ \textcolor{preprocessor}{\#include\ <assert.h>}}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00022}00022\ \textcolor{preprocessor}{\#include\ <string.h>}}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00024}00024\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{pkcs5_8h}{../../common/pkcs5.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00026}00026\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ test\_pbkdf2\_vectors(\textcolor{keywordtype}{void})\ \{}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00027}00027\ \ \ \textcolor{keyword}{struct\ }vector\ \{}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00028}00028\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *\mbox{\hyperlink{attest_8c_abd7f8a696584d8ab4b9f4d1e1970be37}{password}};}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00029}00029\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ password\_len;}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00030}00030\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *salt;}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00031}00031\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ salt\_len;}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00032}00032\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ iterations;}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00033}00033\ \ \ \ \ \mbox{\hyperlink{yubihsm_2common_2hash_8h_a488906826f8aaf7e850c35889d560089}{hash\_t}}\ hash;}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00034}00034\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *output;}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00035}00035\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ size;}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00036}00036\ \ \ \}\ vectors[]\ =\ \{}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00037}00037\ \ \ \ \ \{(\textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *)\ \textcolor{stringliteral}{"{}password"{}},\ 8,\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *)\ \textcolor{stringliteral}{"{}salt"{}},\ 4,\ 1,\ \mbox{\hyperlink{yubihsm_2common_2hash_8h_a488906826f8aaf7e850c35889d560089a970f17bf10faf2a31f535116e97f6b4a}{\_SHA1}},}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00038}00038\ \ \ \ \ \ (\textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *)\ \textcolor{stringliteral}{"{}\(\backslash\)x0c\(\backslash\)x60\(\backslash\)xc8\(\backslash\)x0f\(\backslash\)x96\(\backslash\)x1f\(\backslash\)x0e\(\backslash\)x71\(\backslash\)xf3\(\backslash\)xa9\(\backslash\)xb5\(\backslash\)x24\(\backslash\)xaf"{}}}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00039}00039\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)x60\(\backslash\)x12\(\backslash\)x06\(\backslash\)x2f\(\backslash\)xe0\(\backslash\)x37\(\backslash\)xa6"{}},}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00040}00040\ \ \ \ \ \ 20\},}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00041}00041\ \ \ \ \ \{(\textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *)\ \textcolor{stringliteral}{"{}password"{}},\ 8,\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *)\ \textcolor{stringliteral}{"{}salt"{}},\ 4,\ 2,\ \mbox{\hyperlink{yubihsm_2common_2hash_8h_a488906826f8aaf7e850c35889d560089a970f17bf10faf2a31f535116e97f6b4a}{\_SHA1}},}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00042}00042\ \ \ \ \ \ (\textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *)\ \textcolor{stringliteral}{"{}\(\backslash\)xea\(\backslash\)x6c\(\backslash\)x01\(\backslash\)x4d\(\backslash\)xc7\(\backslash\)x2d\(\backslash\)x6f\(\backslash\)x8c\(\backslash\)xcd\(\backslash\)x1e\(\backslash\)xd9\(\backslash\)x2a\(\backslash\)xce"{}}}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00043}00043\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)x1d\(\backslash\)x41\(\backslash\)xf0\(\backslash\)xd8\(\backslash\)xde\(\backslash\)x89\(\backslash\)x57"{}},}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00044}00044\ \ \ \ \ \ 20\},}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00045}00045\ \ \ \ \ \{(\textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *)\ \textcolor{stringliteral}{"{}password"{}},\ 8,\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *)\ \textcolor{stringliteral}{"{}salt"{}},\ 4,\ 4096,\ \mbox{\hyperlink{yubihsm_2common_2hash_8h_a488906826f8aaf7e850c35889d560089a970f17bf10faf2a31f535116e97f6b4a}{\_SHA1}},}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00046}00046\ \ \ \ \ \ (\textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *)\ \textcolor{stringliteral}{"{}\(\backslash\)x4b\(\backslash\)x00\(\backslash\)x79\(\backslash\)x01\(\backslash\)xb7\(\backslash\)x65\(\backslash\)x48\(\backslash\)x9a\(\backslash\)xbe\(\backslash\)xad\(\backslash\)x49\(\backslash\)xd9\(\backslash\)x26"{}}}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00047}00047\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)xf7\(\backslash\)x21\(\backslash\)xd0\(\backslash\)x65\(\backslash\)xa4\(\backslash\)x29\(\backslash\)xc1"{}},}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00048}00048\ \ \ \ \ \ 20\},}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00049}00049\ \ \ \ \ \textcolor{comment}{//\{(const\ uint8\_t*)"{}password"{},\ 8,\ (const\ uint8\_t*)"{}salt"{},\ 4,\ 16777216,}}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00050}00050\ \ \ \ \ \textcolor{comment}{//\_SHA1,\ (const}}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00051}00051\ \ \ \ \ \textcolor{comment}{//\ uint8\_t*)"{}\(\backslash\)xee\(\backslash\)xfe\(\backslash\)x3d\(\backslash\)x61\(\backslash\)xcd\(\backslash\)x4d\(\backslash\)xa4\(\backslash\)xe4\(\backslash\)xe9\(\backslash\)x94\(\backslash\)x5b\(\backslash\)x3d\(\backslash\)x6b\(\backslash\)xa2\(\backslash\)x15\(\backslash\)x8c\(\backslash\)x26\(\backslash\)x34\(\backslash\)xe9\(\backslash\)x84"{},}}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00052}00052\ \ \ \ \ \textcolor{comment}{//\ 20\},}}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00053}00053\ \ \ \ \ \{(\textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *)\ \textcolor{stringliteral}{"{}passwordPASSWORDpassword"{}},\ 24,}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00054}00054\ \ \ \ \ \ (\textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *)\ \textcolor{stringliteral}{"{}saltSALTsaltSALTsaltSALTsaltSALTsalt"{}},\ 36,\ 4096,\ \mbox{\hyperlink{yubihsm_2common_2hash_8h_a488906826f8aaf7e850c35889d560089a970f17bf10faf2a31f535116e97f6b4a}{\_SHA1}},}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00055}00055\ \ \ \ \ \ (\textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *)\ \textcolor{stringliteral}{"{}\(\backslash\)x3d\(\backslash\)x2e\(\backslash\)xec\(\backslash\)x4f\(\backslash\)xe4\(\backslash\)x1c\(\backslash\)x84\(\backslash\)x9b\(\backslash\)x80\(\backslash\)xc8\(\backslash\)xd8\(\backslash\)x36\(\backslash\)x62"{}}}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)xc0\(\backslash\)xe4\(\backslash\)x4a\(\backslash\)x8b\(\backslash\)x29\(\backslash\)x1a\(\backslash\)x96\(\backslash\)x4c\(\backslash\)xf2\(\backslash\)xf0\(\backslash\)x70\(\backslash\)x38"{}},}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00057}00057\ \ \ \ \ \ 25\},}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00058}00058\ \ \ \ \ \{(\textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *)\ \textcolor{stringliteral}{"{}pass\(\backslash\)0word"{}},\ 9,\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *)\ \textcolor{stringliteral}{"{}sa\(\backslash\)0lt"{}},\ 5,\ 4096,}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00059}00059\ \ \ \ \ \ \mbox{\hyperlink{yubihsm_2common_2hash_8h_a488906826f8aaf7e850c35889d560089a970f17bf10faf2a31f535116e97f6b4a}{\_SHA1}},}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00060}00060\ \ \ \ \ \ (\textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00061}00061\ \ \ \ \ \ \ \ \ *)\ \textcolor{stringliteral}{"{}\(\backslash\)x56\(\backslash\)xfa\(\backslash\)x6a\(\backslash\)xa7\(\backslash\)x55\(\backslash\)x48\(\backslash\)x09\(\backslash\)x9d\(\backslash\)xcc\(\backslash\)x37\(\backslash\)xd7\(\backslash\)xf0\(\backslash\)x34\(\backslash\)x25\(\backslash\)xe0\(\backslash\)xc3"{}},}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00062}00062\ \ \ \ \ \ 16\},}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00063}00063\ \ \ \};}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00065}00065\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ \textcolor{keyword}{sizeof}(vectors)\ /\ \textcolor{keyword}{sizeof}(vectors[0]);\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00066}00066\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ key[256];}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00067}00067\ \ \ \ \ \textcolor{keywordtype}{bool}\ res\ =\ \mbox{\hyperlink{pkcs5_8c_ada697ff717a4c947866f025d6d2bfc3a}{pkcs5\_pbkdf2\_hmac}}(vectors[i].password,\ vectors[i].password\_len,}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ vectors[i].salt,\ vectors[i].salt\_len,}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ vectors[i].iterations,\ vectors[i].hash,\ key,}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ vectors[i].size);}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00071}00071\ \ \ \ \ assert(res\ ==\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00072}00072\ \ \ \ \ assert(memcmp(key,\ vectors[i].output,\ vectors[i].size)\ ==\ 0);}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00073}00073\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00074}00074\ \}}
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00075}00075\ }
+\DoxyCodeLine{\Hypertarget{test__pbkdf2_8c_source_l00076}\mbox{\hyperlink{test__pbkdf2_8c_a840291bc02cba5474a4cb46a9b9566fe}{00076}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{test__pbkdf2_8c_a840291bc02cba5474a4cb46a9b9566fe}{main}}(\textcolor{keywordtype}{void})\ \{\ test\_pbkdf2\_vectors();\ \}}
+
+\end{DoxyCode}

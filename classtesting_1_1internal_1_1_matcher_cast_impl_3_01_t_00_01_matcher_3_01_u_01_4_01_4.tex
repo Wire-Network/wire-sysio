@@ -1,0 +1,46 @@
+\doxysection{testing\+::internal\+::Matcher\+Cast\+Impl\texorpdfstring{$<$}{<} T, Matcher\texorpdfstring{$<$}{<} U \texorpdfstring{$>$}{>} \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classtesting_1_1internal_1_1_matcher_cast_impl_3_01_t_00_01_matcher_3_01_u_01_4_01_4}{}\label{classtesting_1_1internal_1_1_matcher_cast_impl_3_01_t_00_01_matcher_3_01_u_01_4_01_4}\index{testing::internal::MatcherCastImpl$<$ T, Matcher$<$ U $>$ $>$@{testing::internal::MatcherCastImpl$<$ T, Matcher$<$ U $>$ $>$}}
+
+
+{\ttfamily \#include $<$gmock-\/matchers.\+h$>$}
+
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static \mbox{\hyperlink{classtesting_1_1_matcher}{Matcher}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \mbox{\hyperlink{classtesting_1_1internal_1_1_matcher_cast_impl_3_01_t_00_01_matcher_3_01_u_01_4_01_4_a1f71e846eb96d4f6ae3d965bfee58539}{Cast}} (const \mbox{\hyperlink{classtesting_1_1_matcher}{Matcher}}$<$ \mbox{\hyperlink{union_u}{U}} $>$ \&source\+\_\+matcher)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, typename \mbox{\hyperlink{union_u}{U}}$>$\newline
+class testing\+::internal\+::\+Matcher\+Cast\+Impl$<$ T, Matcher$<$ U $>$ $>$}
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l00714}{714}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_matcher_cast_impl_3_01_t_00_01_matcher_3_01_u_01_4_01_4_a1f71e846eb96d4f6ae3d965bfee58539}\index{testing::internal::MatcherCastImpl$<$ T, Matcher$<$ U $>$ $>$@{testing::internal::MatcherCastImpl$<$ T, Matcher$<$ U $>$ $>$}!Cast@{Cast}}
+\index{Cast@{Cast}!testing::internal::MatcherCastImpl$<$ T, Matcher$<$ U $>$ $>$@{testing::internal::MatcherCastImpl$<$ T, Matcher$<$ U $>$ $>$}}
+\doxysubsubsection{\texorpdfstring{Cast()}{Cast()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_matcher_cast_impl_3_01_t_00_01_matcher_3_01_u_01_4_01_4_a1f71e846eb96d4f6ae3d965bfee58539} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{union_u}{U}} $>$ \\
+static \mbox{\hyperlink{classtesting_1_1_matcher}{Matcher}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \mbox{\hyperlink{classtesting_1_1internal_1_1_matcher_cast_impl}{testing\+::internal\+::\+Matcher\+Cast\+Impl}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classtesting_1_1_matcher}{Matcher}}$<$ \mbox{\hyperlink{union_u}{U}} $>$ $>$\+::\+Cast (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classtesting_1_1_matcher}{Matcher}}$<$ \mbox{\hyperlink{union_u}{U}} $>$ \&}]{source\+\_\+matcher}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l00716}{716}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00716\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00717\ \ \ \ \ \textcolor{keywordflow}{return}\ Matcher<T>(\textcolor{keyword}{new}\ Impl(source\_matcher));}
+\DoxyCodeLine{00718\ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/include/gmock/\mbox{\hyperlink{gmock-matchers_8h}{gmock-\/matchers.\+h}}\end{DoxyCompactItemize}

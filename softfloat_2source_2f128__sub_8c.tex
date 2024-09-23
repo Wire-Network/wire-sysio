@@ -1,0 +1,84 @@
+\doxysection{libraries/softfloat/source/f128\+\_\+sub.c File Reference}
+\hypertarget{softfloat_2source_2f128__sub_8c}{}\label{softfloat_2source_2f128__sub_8c}\index{libraries/softfloat/source/f128\_sub.c@{libraries/softfloat/source/f128\_sub.c}}
+{\ttfamily \#include $<$stdbool.\+h$>$}\newline
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include "{}platform.\+h"{}}\newline
+{\ttfamily \#include "{}internals.\+h"{}}\newline
+{\ttfamily \#include "{}softfloat.\+h"{}}\newline
+Include dependency graph for f128\+\_\+sub.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{softfloat_2source_2f128__sub_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structfloat128__t}{float128\+\_\+t}} \mbox{\hyperlink{softfloat_2source_2f128__sub_8c_a6935924c5babd46735eb6fbf58c6f42a}{f128\+\_\+sub}} (\mbox{\hyperlink{structfloat128__t}{float128\+\_\+t}} \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, \mbox{\hyperlink{structfloat128__t}{float128\+\_\+t}} b)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{softfloat_2source_2f128__sub_8c_a6935924c5babd46735eb6fbf58c6f42a}\index{f128\_sub.c@{f128\_sub.c}!f128\_sub@{f128\_sub}}
+\index{f128\_sub@{f128\_sub}!f128\_sub.c@{f128\_sub.c}}
+\doxysubsubsection{\texorpdfstring{f128\_sub()}{f128\_sub()}}
+{\footnotesize\ttfamily \label{softfloat_2source_2f128__sub_8c_a6935924c5babd46735eb6fbf58c6f42a} 
+\mbox{\hyperlink{structfloat128__t}{float128\+\_\+t}} f128\+\_\+sub (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structfloat128__t}{float128\+\_\+t}}}]{a}{, }\item[{\mbox{\hyperlink{structfloat128__t}{float128\+\_\+t}}}]{b}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2f128__sub_8c_source_l00043}{43}} of file \mbox{\hyperlink{softfloat_2source_2f128__sub_8c_source}{f128\+\_\+sub.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00044\ \{}
+\DoxyCodeLine{00045\ \ \ \ \ \textcolor{keyword}{union\ }ui128\_f128\ uA;}
+\DoxyCodeLine{00046\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\_fast64\_t}}\ uiA64,\ uiA0;}
+\DoxyCodeLine{00047\ \ \ \ \ \textcolor{keywordtype}{bool}\ signA;}
+\DoxyCodeLine{00048\ \ \ \ \ \textcolor{keyword}{union\ }ui128\_f128\ uB;}
+\DoxyCodeLine{00049\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\_fast64\_t}}\ uiB64,\ uiB0;}
+\DoxyCodeLine{00050\ \ \ \ \ \textcolor{keywordtype}{bool}\ signB;}
+\DoxyCodeLine{00051\ \textcolor{preprocessor}{\#if\ !\ defined\ INLINE\_LEVEL\ ||\ (INLINE\_LEVEL\ <\ 2)}}
+\DoxyCodeLine{00052\ \ \ \ \ \mbox{\hyperlink{structfloat128__t}{float128\_t}}}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ (*magsFuncPtr)(}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\_fast64\_t}},\ \mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\_fast64\_t}},\ \mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\_fast64\_t}},\ \mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\_fast64\_t}},\ bool\ );}
+\DoxyCodeLine{00055\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00056\ }
+\DoxyCodeLine{00057\ \ \ \ \ uA.f\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}};}
+\DoxyCodeLine{00058\ \ \ \ \ uiA64\ =\ uA.ui.v64;}
+\DoxyCodeLine{00059\ \ \ \ \ uiA0\ \ =\ uA.ui.v0;}
+\DoxyCodeLine{00060\ \ \ \ \ signA\ =\ signF128UI64(\ uiA64\ );}
+\DoxyCodeLine{00061\ \ \ \ \ uB.f\ =\ b;}
+\DoxyCodeLine{00062\ \ \ \ \ uiB64\ =\ uB.ui.v64;}
+\DoxyCodeLine{00063\ \ \ \ \ uiB0\ \ =\ uB.ui.v0;}
+\DoxyCodeLine{00064\ \ \ \ \ signB\ =\ signF128UI64(\ uiB64\ );}
+\DoxyCodeLine{00065\ \textcolor{preprocessor}{\#if\ defined\ INLINE\_LEVEL\ \&\&\ (2\ <=\ INLINE\_LEVEL)}}
+\DoxyCodeLine{00066\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ signA\ ==\ signB\ )\ \{}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{softfloat_2source_2s__sub_mags_f128_8c_aa8f8efc3ac52d996ea1d9f10253b0fbc}{softfloat\_subMagsF128}}(\ uiA64,\ uiA0,\ uiB64,\ uiB0,\ signA\ );}
+\DoxyCodeLine{00068\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{softfloat_2source_2s__add_mags_f128_8c_a2681fe6eb6e423fc3e20dc6a1f68ec26}{softfloat\_addMagsF128}}(\ uiA64,\ uiA0,\ uiB64,\ uiB0,\ signA\ );}
+\DoxyCodeLine{00070\ \ \ \ \ \}}
+\DoxyCodeLine{00071\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00072\ \ \ \ \ magsFuncPtr\ =}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ (signA\ ==\ signB)\ ?\ \mbox{\hyperlink{softfloat_2source_2s__sub_mags_f128_8c_aa8f8efc3ac52d996ea1d9f10253b0fbc}{softfloat\_subMagsF128}}\ :\ \mbox{\hyperlink{softfloat_2source_2s__add_mags_f128_8c_a2681fe6eb6e423fc3e20dc6a1f68ec26}{softfloat\_addMagsF128}};}
+\DoxyCodeLine{00074\ \ \ \ \ \textcolor{keywordflow}{return}\ (*magsFuncPtr)(\ uiA64,\ uiA0,\ uiB64,\ uiB0,\ signA\ );}
+\DoxyCodeLine{00075\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00076\ }
+\DoxyCodeLine{00077\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{softfloat_2source_2f128__sub_8c_a6935924c5babd46735eb6fbf58c6f42a_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=306pt]{softfloat_2source_2f128__sub_8c_a6935924c5babd46735eb6fbf58c6f42a_icgraph}
+\end{center}
+\end{figure}

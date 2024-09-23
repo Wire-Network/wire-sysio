@@ -1,0 +1,54 @@
+\doxysection{testing\+::internal\+::Universal\+Terse\+Printer\texorpdfstring{$<$}{<} const char \texorpdfstring{$\ast$}{*} \texorpdfstring{$>$}{>} Class Reference}
+\hypertarget{classtesting_1_1internal_1_1_universal_terse_printer_3_01const_01char_01_5_01_4}{}\label{classtesting_1_1internal_1_1_universal_terse_printer_3_01const_01char_01_5_01_4}\index{testing::internal::UniversalTersePrinter$<$ const char \texorpdfstring{$\ast$}{*} $>$@{testing::internal::UniversalTersePrinter$<$ const char \texorpdfstring{$\ast$}{*} $>$}}
+
+
+{\ttfamily \#include $<$gtest-\/printers.\+h$>$}
+
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static void \mbox{\hyperlink{classtesting_1_1internal_1_1_universal_terse_printer_3_01const_01char_01_5_01_4_a37a3be2d26dc07b24d16c2b5eb88ecda}{Print}} (const char \texorpdfstring{$\ast$}{*}str, \+::std\+::ostream \texorpdfstring{$\ast$}{*}os)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{gtest-printers_8h_source_l00881}{881}} of file \mbox{\hyperlink{gtest-printers_8h_source}{gtest-\/printers.\+h}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_universal_terse_printer_3_01const_01char_01_5_01_4_a37a3be2d26dc07b24d16c2b5eb88ecda}\index{testing::internal::UniversalTersePrinter$<$ const char \texorpdfstring{$\ast$}{*} $>$@{testing::internal::UniversalTersePrinter$<$ const char \texorpdfstring{$\ast$}{*} $>$}!Print@{Print}}
+\index{Print@{Print}!testing::internal::UniversalTersePrinter$<$ const char \texorpdfstring{$\ast$}{*} $>$@{testing::internal::UniversalTersePrinter$<$ const char \texorpdfstring{$\ast$}{*} $>$}}
+\doxysubsubsection{\texorpdfstring{Print()}{Print()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_universal_terse_printer_3_01const_01char_01_5_01_4_a37a3be2d26dc07b24d16c2b5eb88ecda} 
+static void \mbox{\hyperlink{classtesting_1_1internal_1_1_universal_terse_printer}{testing\+::internal\+::\+Universal\+Terse\+Printer}}$<$ const char \texorpdfstring{$\ast$}{*} $>$\+::\+Print (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{str}{, }\item[{\+::std\+::ostream \texorpdfstring{$\ast$}{*}}]{os}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-printers_8h_source_l00883}{883}} of file \mbox{\hyperlink{gtest-printers_8h_source}{gtest-\/printers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00883\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00884\ \ \ \ \ \textcolor{keywordflow}{if}\ (str\ ==\ NULL)\ \{}
+\DoxyCodeLine{00885\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}NULL"{}};}
+\DoxyCodeLine{00886\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00887\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a30708fa2bacf11895b03bdb21eb72309}{UniversalPrint}}(std::string(str),\ os);}
+\DoxyCodeLine{00888\ \ \ \ \ \}}
+\DoxyCodeLine{00889\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_universal_terse_printer_3_01const_01char_01_5_01_4_a37a3be2d26dc07b24d16c2b5eb88ecda_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/include/gtest/\mbox{\hyperlink{gtest-printers_8h}{gtest-\/printers.\+h}}\end{DoxyCompactItemize}

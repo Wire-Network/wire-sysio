@@ -1,0 +1,9 @@
+<map id="sysio::chain::snapshot_writer::write_section" name="sysio::chain::snapshot_writer::write_section">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,39,158,79"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1chain_1_1snapshot__writer.html#a8eb110456e3221522be3d095e68d6d43" title=" " alt="" coords="206,39,358,79"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="158,56,190,56,190,62,158,62"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1chain_1_1snapshot__writer.html#a63e5c6a3a65227e92e3ba7909ef30ca6" title=" " alt="" coords="408,5,582,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="358,44,393,39,393,44,359,50"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1chain_1_1snapshot__writer.html#a4abda90a8815f5f65b7b2e92f889ed87" title=" " alt="" coords="406,71,584,111"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="359,68,391,73,390,78,358,73"/>
+</map>

@@ -1,0 +1,82 @@
+\doxysection{libraries/fc/include/fc/crypto/webauthn\+\_\+json/example/filterkeydom/filterkeydom.cpp File Reference}
+\hypertarget{filterkeydom_8cpp}{}\label{filterkeydom_8cpp}\index{libraries/fc/include/fc/crypto/webauthn\_json/example/filterkeydom/filterkeydom.cpp@{libraries/fc/include/fc/crypto/webauthn\_json/example/filterkeydom/filterkeydom.cpp}}
+{\ttfamily \#include "{}rapidjson/document.\+h"{}}\newline
+{\ttfamily \#include "{}rapidjson/writer.\+h"{}}\newline
+{\ttfamily \#include "{}rapidjson/filereadstream.\+h"{}}\newline
+{\ttfamily \#include "{}rapidjson/filewritestream.\+h"{}}\newline
+{\ttfamily \#include "{}rapidjson/error/en.\+h"{}}\newline
+{\ttfamily \#include $<$stack$>$}\newline
+Include dependency graph for filterkeydom.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{filterkeydom_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{class_filter_key_handler}{Filter\+Key\+Handler$<$ Output\+Handler $>$}}
+\item 
+class \mbox{\hyperlink{class_filter_key_reader}{Filter\+Key\+Reader$<$ Input\+Stream $>$}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{filterkeydom_8cpp_a0ddf1224851353fc92bfbff6f499fa97}{main}} (int argc, char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}\mbox{[}$\,$\mbox{]})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{filterkeydom_8cpp_a0ddf1224851353fc92bfbff6f499fa97}\index{filterkeydom.cpp@{filterkeydom.cpp}!main@{main}}
+\index{main@{main}!filterkeydom.cpp@{filterkeydom.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{filterkeydom_8cpp_a0ddf1224851353fc92bfbff6f499fa97} 
+int main (\begin{DoxyParamCaption}\item[{int}]{argc}{, }\item[{char \texorpdfstring{$\ast$}{*}}]{argv}{\mbox{[}$\,$\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{filterkeydom_8cpp_source_l00140}{140}} of file \mbox{\hyperlink{filterkeydom_8cpp_source}{filterkeydom.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00141\ \ \ \ \ \textcolor{keywordflow}{if}\ (argc\ !=\ 2)\ \{}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}filterkeydom\ key\ <\ input.json\ >\ output.json\(\backslash\)n"{}});}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{00144\ \ \ \ \ \}}
+\DoxyCodeLine{00145\ }
+\DoxyCodeLine{00146\ \ \ \ \ \textcolor{comment}{//\ Prepare\ input\ stream.}}
+\DoxyCodeLine{00147\ \ \ \ \ \textcolor{keywordtype}{char}\ readBuffer[65536];}
+\DoxyCodeLine{00148\ \ \ \ \ \mbox{\hyperlink{class_file_read_stream}{FileReadStream}}\ is(stdin,\ readBuffer,\ \textcolor{keyword}{sizeof}(readBuffer));}
+\DoxyCodeLine{00149\ }
+\DoxyCodeLine{00150\ \ \ \ \ \textcolor{comment}{//\ Prepare\ Filter}}
+\DoxyCodeLine{00151\ \ \ \ \ \mbox{\hyperlink{class_filter_key_reader}{FilterKeyReader<FileReadStream>}}\ reader(is,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[1],\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\textcolor{keyword}{>}(strlen(\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[1])));}
+\DoxyCodeLine{00152\ }
+\DoxyCodeLine{00153\ \ \ \ \ \textcolor{comment}{//\ Populates\ the\ filtered\ events\ from\ reader}}
+\DoxyCodeLine{00154\ \ \ \ \ \mbox{\hyperlink{class_generic_document}{Document}}\ document;}
+\DoxyCodeLine{00155\ \ \ \ \ document.\mbox{\hyperlink{class_generic_document_ac30b4e8887974060b695be20c3ceb02c}{Populate}}(reader);}
+\DoxyCodeLine{00156\ \ \ \ \ \mbox{\hyperlink{struct_parse_result}{ParseResult}}\ pr\ =\ reader.GetParseResult();}
+\DoxyCodeLine{00157\ \ \ \ \ \textcolor{keywordflow}{if}\ (!pr)\ \{}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}\(\backslash\)nError(\%u):\ \%s\(\backslash\)n"{}},\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\textcolor{keyword}{>}(pr.\mbox{\hyperlink{struct_parse_result_afbe762766ac21b2aae266105f1dfa643}{Offset}}()),\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_ga28835eb93d2c3c07bbea13515eb31415}{GetParseError\_En}}(pr.\mbox{\hyperlink{struct_parse_result_a2aae3c2f42b31cc2409ee1e03bc4852e}{Code}}()));}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{00160\ \ \ \ \ \}}
+\DoxyCodeLine{00161\ }
+\DoxyCodeLine{00162\ \ \ \ \ \textcolor{comment}{//\ Prepare\ JSON\ writer\ and\ output\ stream.}}
+\DoxyCodeLine{00163\ \ \ \ \ \textcolor{keywordtype}{char}\ writeBuffer[65536];}
+\DoxyCodeLine{00164\ \ \ \ \ \mbox{\hyperlink{class_file_write_stream}{FileWriteStream}}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}(stdout,\ writeBuffer,\ \textcolor{keyword}{sizeof}(writeBuffer));}
+\DoxyCodeLine{00165\ \ \ \ \ \mbox{\hyperlink{class_writer}{Writer<FileWriteStream>}}\ writer(os);}
+\DoxyCodeLine{00166\ }
+\DoxyCodeLine{00167\ \ \ \ \ \textcolor{comment}{//\ Write\ the\ document\ to\ standard\ output}}
+\DoxyCodeLine{00168\ \ \ \ \ document.Accept(writer);}
+\DoxyCodeLine{00169\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00170\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{filterkeydom_8cpp_a0ddf1224851353fc92bfbff6f499fa97_cgraph}
+\end{center}
+\end{figure}

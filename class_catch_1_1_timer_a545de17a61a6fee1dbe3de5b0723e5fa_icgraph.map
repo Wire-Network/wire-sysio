@@ -1,0 +1,15 @@
+<map id="Catch::Timer::getElapsedMicroseconds" name="Catch::Timer::getElapsedMicroseconds">
+<area shape="rect" id="Node000001" title=" " alt="" coords="442,72,612,113"/>
+<area shape="rect" id="Node000002" href="$class_catch_1_1_timer.html#a30aaf458dbb59dd8ac8971c9c62e0eac" title=" " alt="" coords="224,23,394,63"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="427,72,394,65,395,60,428,67"/>
+<area shape="rect" id="Node000004" href="$class_catch_1_1_timer.html#a065e37e3c9eb16bd4dcf41971d8deedc" title=" " alt="" coords="224,104,394,145"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="427,110,395,114,394,109,426,104"/>
+<area shape="rect" id="Node000003" href="$struct_catch_1_1_team_city_reporter.html#ab2a5007071e489a4e4c8ee8e84585ef8" title=" " alt="" coords="5,5,176,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="208,38,176,35,177,30,209,32"/>
+<area shape="rect" id="Node000005" href="$class_catch_1_1_xml_reporter.html#ab641ec7e115cb94efa02f85e9d91de0f" title=" " alt="" coords="22,71,159,111"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="208,112,159,104,160,99,209,106"/>
+<area shape="rect" id="Node000006" href="$class_catch_1_1_junit_reporter.html#aa91e71b824c3a7733993821668fe7e6e" title=" " alt="" coords="19,136,162,177"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="209,142,162,149,162,143,208,136"/>
+<area shape="rect" id="Node000007" href="$class_catch_1_1_section.html#aa1422edd68a77aa578b5cc6b8b69f86f" title=" " alt="" coords="6,201,175,226"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="256,155,177,191,142,203,140,198,175,186,254,150"/>
+</map>

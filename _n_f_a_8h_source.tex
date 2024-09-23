@@ -1,0 +1,95 @@
+\doxysection{NFA.\+h}
+\hypertarget{_n_f_a_8h_source}{}\label{_n_f_a_8h_source}\index{libraries/wasm-\/jit/Source/WAST/NFA.h@{libraries/wasm-\/jit/Source/WAST/NFA.h}}
+\mbox{\hyperlink{_n_f_a_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00003}00003\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_basic_types_8h}{Inline/BasicTypes.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00004}00004\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_dense_static_int_set_8h}{Inline/DenseStaticIntSet.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00008}00008\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_n_f_a}{NFA}}}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00009}00009\ \{}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00010}00010\ \ \ \ \ \textcolor{comment}{//\ A\ set\ of\ characters.}}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00011}\mbox{\hyperlink{namespace_n_f_a_aab46c702df98598c70d9290d164ffa99}{00011}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{struct_dense_static_int_set}{DenseStaticIntSet<U8,256>}}\ \mbox{\hyperlink{namespace_n_f_a_aab46c702df98598c70d9290d164ffa99}{CharSet}};}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00013}00013\ \ \ \ \ \textcolor{comment}{//\ An\ index\ of\ a\ DFA\ state.\ A\ negative\ index\ indicates\ an\ "{}accepting"{}\ or\ terminal\ state.}}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00014}\mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{00014}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{_basic_types_8h_a393f3d55b6dd420b4ec0482d11fb0d9b}{I16}}\ \mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{StateIndex}};}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00016}00016\ \ \ \ \ \textcolor{keyword}{enum}}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00017}00017\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00018}\mbox{\hyperlink{namespace_n_f_a_ad9fb95d6afb96fea8750c3543ee293a1ab7afa25e880146b8ce78efc4cb221274}{00018}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_n_f_a_ad9fb95d6afb96fea8750c3543ee293a1ab7afa25e880146b8ce78efc4cb221274}{edgeDoesntConsumeInputFlag}}\ =\ (\mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{StateIndex}})0x4000,\ \textcolor{comment}{//\ A\ flag\ that's\ set\ on\ terminal\ DFA\ state\ transitions\ that\ don't\ consume\ any\ input}}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00019}\mbox{\hyperlink{namespace_n_f_a_ad9fb95d6afb96fea8750c3543ee293a1ac83c0f7e053c5efc232f432bba1ab6c6}{00019}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_n_f_a_ad9fb95d6afb96fea8750c3543ee293a1ac83c0f7e053c5efc232f432bba1ab6c6}{unmatchedCharacterTerminal}}\ =\ (\mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{StateIndex}})0x8000,\ \textcolor{comment}{//\ An\ implicit\ terminal\ state\ that\ indicates\ the\ DFA\ didn't\ recognize\ the\ input}}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00020}\mbox{\hyperlink{namespace_n_f_a_ad9fb95d6afb96fea8750c3543ee293a1a6df9f5bfcb1889079b46027cf7bdac15}{00020}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_n_f_a_ad9fb95d6afb96fea8750c3543ee293a1a6df9f5bfcb1889079b46027cf7bdac15}{maximumTerminalStateIndex}}\ =\ (\mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{StateIndex}})0xbfff,\ \textcolor{comment}{//\ Should\ be\ the\ largest\ negative\ number\ that\ doesn't\ have\ edgeDoesntConsumeInputFlag\ set.}}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00021}00021\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00023}00023\ \ \ \ \ \textcolor{comment}{//\ Creates\ an\ abstract\ object\ that\ holds\ the\ state\ of\ an\ under-\/construction\ BFA.}}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00024}00024\ \ \ \ \ \textcolor{keyword}{struct\ }Builder;}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00025}00025\ \ \ \ \ Builder*\ \mbox{\hyperlink{namespace_n_f_a_adf36678137843faef3c32d8f0a9dcb25}{createBuilder}}();}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00027}00027\ \ \ \ \ \textcolor{comment}{//\ Functions\ to\ add\ states\ and\ edges\ to\ the\ under-\/construction\ DFA.}}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00028}00028\ \ \ \ \ \mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{StateIndex}}\ \mbox{\hyperlink{namespace_n_f_a_aa1fa2de1cb3ea820ec7ae1994d624803}{addState}}(Builder*\ builder);}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00029}00029\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespace_n_f_a_a7fcfabbb0aaf904f594a4c6d72e9e54c}{addEdge}}(Builder*\ builder,\mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{StateIndex}}\ initialState,\textcolor{keyword}{const}\ \mbox{\hyperlink{namespace_n_f_a_aab46c702df98598c70d9290d164ffa99}{CharSet}}\&\ predicate,\mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{StateIndex}}\ nextState);}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00030}00030\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespace_n_f_a_acfdce2879b3ebd805fc8512239d7dd44}{addEpsilonEdge}}(Builder*\ builder,\mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{StateIndex}}\ initialState,\mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{StateIndex}}\ nextState);}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00031}00031\ \ \ \ \ \mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{StateIndex}}\ \mbox{\hyperlink{namespace_n_f_a_ad1e9e5dd3c2cdbefdf6ba97f12d26eae}{getNonTerminalEdge}}(Builder*\ builder,\mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{StateIndex}}\ initialState,\textcolor{keywordtype}{char}\ c);}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00033}00033\ \ \ \ \ \textcolor{comment}{//\ Dumps\ the\ NFA's\ states\ and\ edges\ to\ the\ GraphViz\ .dot\ format.}}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00034}00034\ \ \ \ \ std::string\ \mbox{\hyperlink{namespace_n_f_a_ad2bae1dc95f748e75ed2ef3d06b38868}{dumpNFAGraphViz}}(\textcolor{keyword}{const}\ Builder*\ builder);}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00036}00036\ \ \ \ \ \textcolor{comment}{//\ Encapsulates\ a\ NFA\ that\ has\ been\ translated\ into\ a\ DFA\ that\ can\ be\ efficiently\ executed.}}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00037}\mbox{\hyperlink{struct_n_f_a_1_1_machine}{00037}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_n_f_a_1_1_machine}{Machine}}}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00038}00038\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00039}\mbox{\hyperlink{struct_n_f_a_1_1_machine_ac5223ffa60d4222530e7be978c22de7e}{00039}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_n_f_a_1_1_machine_ac5223ffa60d4222530e7be978c22de7e}{Machine}}():\ stateAndOffsetToNextStateMap(nullptr),\ numClasses(0),\ numStates(0)\ \{\}}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00040}00040\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_n_f_a_1_1_machine_a6cd7c806296f5b9c0b19d9ce3f231442}{\string~Machine}}();}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00041}00041\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00042}\mbox{\hyperlink{struct_n_f_a_1_1_machine_a3c0894e9d58ea05fd1f661f62ba1977e}{00042}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_n_f_a_1_1_machine_a3c0894e9d58ea05fd1f661f62ba1977e}{Machine}}(\mbox{\hyperlink{struct_n_f_a_1_1_machine}{Machine}}\&\&\ inMachine)\ \{\ moveFrom(std::move(inMachine));\ \}}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00043}\mbox{\hyperlink{struct_n_f_a_1_1_machine_a55bd24b045cbffa05e7a1f42f10e27bf}{00043}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_n_f_a_1_1_machine_a55bd24b045cbffa05e7a1f42f10e27bf}{operator=}}(\mbox{\hyperlink{struct_n_f_a_1_1_machine}{Machine}}\&\&\ inMachine)\ \{\ moveFrom(std::move(inMachine));\ \}}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00045}00045\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Constructs\ a\ DFA\ from\ the\ abstract\ builder\ object\ (which\ is\ destroyed).}}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00046}00046\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_n_f_a_1_1_machine_ac5223ffa60d4222530e7be978c22de7e}{Machine}}(\mbox{\hyperlink{struct_n_f_a_1_1_builder}{Builder}}*\ inBuilder);}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00047}00047\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00048}00048\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Feeds\ characters\ into\ the\ DFA\ until\ it\ reaches\ a\ terminal\ state.}}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00049}00049\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Upon\ reaching\ a\ terminal\ state,\ the\ state\ is\ returned,\ and\ the\ nextChar\ pointer}}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00050}00050\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ is\ updated\ to\ point\ to\ the\ first\ character\ not\ consumed\ by\ the\ DFA.}}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00051}\mbox{\hyperlink{struct_n_f_a_1_1_machine_ac25347ea5e9d318f6ac499af40e7b77b}{00051}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{inline}\ \mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{StateIndex}}\ \mbox{\hyperlink{struct_n_f_a_1_1_machine_ac25347ea5e9d318f6ac499af40e7b77b}{feed}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\&\ nextChar)\textcolor{keyword}{\ const}}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00052}00052\ \textcolor{keyword}{\ \ \ \ \ \ \ \ }\{}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_aadfe637f5e04b575f76f744f6fdd7e27}{Iptr}}\ \mbox{\hyperlink{structstate}{state}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{do}}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}\ =\ stateAndOffsetToNextStateMap[\mbox{\hyperlink{structstate}{state}}\ +\ charToOffsetMap[(\mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}})nextChar[0]]];}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{structstate}{state}}\ <\ 0)\ \{\ nextChar\ +=\ 1;\ \textcolor{keywordflow}{break};\ \}}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}\ =\ stateAndOffsetToNextStateMap[\mbox{\hyperlink{structstate}{state}}\ +\ charToOffsetMap[(\mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}})nextChar[1]]];}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00059}00059\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{structstate}{state}}\ <\ 0)\ \{\ nextChar\ +=\ 2;\ \textcolor{keywordflow}{break};\ \}}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}\ =\ stateAndOffsetToNextStateMap[\mbox{\hyperlink{structstate}{state}}\ +\ charToOffsetMap[(\mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}})nextChar[2]]];}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00061}00061\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{structstate}{state}}\ <\ 0)\ \{\ nextChar\ +=\ 3;\ \textcolor{keywordflow}{break};\ \}}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00062}00062\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}\ =\ stateAndOffsetToNextStateMap[\mbox{\hyperlink{structstate}{state}}\ +\ charToOffsetMap[(\mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}})nextChar[3]]];}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ nextChar\ +=\ 4;}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00064}00064\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00065}00065\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\mbox{\hyperlink{structstate}{state}}\ >=\ 0);}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00066}00066\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{structstate}{state}}\ \&\ \mbox{\hyperlink{namespace_n_f_a_ad9fb95d6afb96fea8750c3543ee293a1ab7afa25e880146b8ce78efc4cb221274}{edgeDoesntConsumeInputFlag}})}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00067}00067\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/-\/nextChar;}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}\ \&=\ \string~edgeDoesntConsumeInputFlag;}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00071}00071\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (\mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{StateIndex}})\mbox{\hyperlink{structstate}{state}};}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00072}00072\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00073}00073\ }
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00074}00074\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Dumps\ the\ DFA's\ states\ and\ edges\ to\ the\ GraphViz\ .dot\ format.}}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00075}00075\ \ \ \ \ \ \ \ \ std::string\ \mbox{\hyperlink{struct_n_f_a_1_1_machine_a97de1223997c8844b4b56e9e24884e87}{dumpDFAGraphViz}}()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00076}00076\ }
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00077}00077\ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00079}00079\ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{_basic_types_8h_a393f3d55b6dd420b4ec0482d11fb0d9b}{I16}}\ InternalStateIndex;}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00080}00080\ \ \ \ \ \ \ \ \ \textcolor{keyword}{enum}\ \{\ internalMaxStates\ =\ \mbox{\hyperlink{stdint_8h_ac58f2c111cc9989c86db2a7dc4fd84ca}{INT16\_MAX}}\ \};}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00081}00081\ }
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00082}00082\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}\ charToOffsetMap[256];}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00083}00083\ \ \ \ \ \ \ \ \ InternalStateIndex*\ stateAndOffsetToNextStateMap;}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00084}00084\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ numClasses;}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00085}00085\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ numStates;}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00086}00086\ }
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00087}00087\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ moveFrom(\mbox{\hyperlink{struct_n_f_a_1_1_machine_ac5223ffa60d4222530e7be978c22de7e}{Machine}}\&\&\ inMachine);}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00088}00088\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_n_f_a_8h_source_l00089}00089\ \}}
+
+\end{DoxyCode}

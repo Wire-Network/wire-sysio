@@ -1,0 +1,62 @@
+\doxysection{limit\+\_\+auth\+\_\+changes.\+cpp}
+\hypertarget{limit__auth__changes_8cpp_source}{}\label{limit__auth__changes_8cpp_source}\index{/Users/svetlasyrimis/Desktop/wire-\/network/WN-\/org/wire-\/system-\/contracts/contracts/sysio.system/src/limit\_auth\_changes.cpp@{/Users/svetlasyrimis/Desktop/wire-\/network/WN-\/org/wire-\/system-\/contracts/contracts/sysio.system/src/limit\_auth\_changes.cpp}}
+\mbox{\hyperlink{limit__auth__changes_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{limit__auth__changes_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{limit__auth__changes_8hpp}{sysio.system/limit\_auth\_changes.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{limit__auth__changes_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{sysio_8system_8hpp}{sysio.system/sysio.system.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{limit__auth__changes_8cpp_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{limit__auth__changes_8cpp_source_l00004}00004\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysiosystem}{sysiosystem}}\ \{}
+\DoxyCodeLine{\Hypertarget{limit__auth__changes_8cpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{limit__auth__changes_8cpp_source_l00006}\mbox{\hyperlink{classsysiosystem_1_1system__contract_acf003e2c76677abb057acedd6db1a2c6}{00006}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_acf003e2c76677abb057acedd6db1a2c6}{system\_contract::limitauthchg}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\&\ account,\ \textcolor{keyword}{const}\ std::vector<name>\&\ allow\_perms,}
+\DoxyCodeLine{\Hypertarget{limit__auth__changes_8cpp_source_l00007}00007\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::vector<name>\&\ disallow\_perms)\ \{}
+\DoxyCodeLine{\Hypertarget{limit__auth__changes_8cpp_source_l00008}00008\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysiosystem_a7202a293f65ab06976b1f9d692df9508}{limit\_auth\_change\_table}}\ table(get\_self(),\ get\_self().\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}});}
+\DoxyCodeLine{\Hypertarget{limit__auth__changes_8cpp_source_l00009}00009\ \ \ \ \ \ \ require\_auth(account);}
+\DoxyCodeLine{\Hypertarget{limit__auth__changes_8cpp_source_l00010}00010\ \ \ \ \ \ \ sysio::check(allow\_perms.empty()\ ||\ disallow\_perms.empty(),\ \textcolor{stringliteral}{"{}either\ allow\_perms\ or\ disallow\_perms\ must\ be\ empty"{}});}
+\DoxyCodeLine{\Hypertarget{limit__auth__changes_8cpp_source_l00011}00011\ \ \ \ \ \ \ sysio::check(allow\_perms.empty()\ ||}
+\DoxyCodeLine{\Hypertarget{limit__auth__changes_8cpp_source_l00012}00012\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::find(allow\_perms.begin(),\ allow\_perms.end(),\ \textcolor{stringliteral}{"{}owner"{}}\_n)\ !=\ allow\_perms.end(),}
+\DoxyCodeLine{\Hypertarget{limit__auth__changes_8cpp_source_l00013}00013\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}allow\_perms\ does\ not\ contain\ owner"{}});}
+\DoxyCodeLine{\Hypertarget{limit__auth__changes_8cpp_source_l00014}00014\ \ \ \ \ \ \ sysio::check(disallow\_perms.empty()\ ||}
+\DoxyCodeLine{\Hypertarget{limit__auth__changes_8cpp_source_l00015}00015\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::find(disallow\_perms.begin(),\ disallow\_perms.end(),\ \textcolor{stringliteral}{"{}owner"{}}\_n)\ ==\ disallow\_perms.end(),}
+\DoxyCodeLine{\Hypertarget{limit__auth__changes_8cpp_source_l00016}00016\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}disallow\_perms\ contains\ owner"{}});}
+\DoxyCodeLine{\Hypertarget{limit__auth__changes_8cpp_source_l00017}00017\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ it\ =\ table.find(account.value);}
+\DoxyCodeLine{\Hypertarget{limit__auth__changes_8cpp_source_l00018}00018\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!allow\_perms.empty()\ ||\ !disallow\_perms.empty())\ \{}
+\DoxyCodeLine{\Hypertarget{limit__auth__changes_8cpp_source_l00019}00019\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(it\ ==\ table.end())\ \{}
+\DoxyCodeLine{\Hypertarget{limit__auth__changes_8cpp_source_l00020}00020\ \ \ \ \ \ \ \ \ \ \ \ \ table.emplace(account,\ [\&](\textcolor{keyword}{auto}\&\ row)\{}
+\DoxyCodeLine{\Hypertarget{limit__auth__changes_8cpp_source_l00021}00021\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ row.account\ =\ account;}
+\DoxyCodeLine{\Hypertarget{limit__auth__changes_8cpp_source_l00022}00022\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ row.allow\_perms\ =\ allow\_perms;}
+\DoxyCodeLine{\Hypertarget{limit__auth__changes_8cpp_source_l00023}00023\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ row.disallow\_perms\ =\ disallow\_perms;}
+\DoxyCodeLine{\Hypertarget{limit__auth__changes_8cpp_source_l00024}00024\ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{limit__auth__changes_8cpp_source_l00025}00025\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{limit__auth__changes_8cpp_source_l00026}00026\ \ \ \ \ \ \ \ \ \ \ \ \ table.modify(it,\ account,\ [\&](\textcolor{keyword}{auto}\&\ row)\{}
+\DoxyCodeLine{\Hypertarget{limit__auth__changes_8cpp_source_l00027}00027\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ row.allow\_perms\ =\ allow\_perms;}
+\DoxyCodeLine{\Hypertarget{limit__auth__changes_8cpp_source_l00028}00028\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ row.disallow\_perms\ =\ disallow\_perms;}
+\DoxyCodeLine{\Hypertarget{limit__auth__changes_8cpp_source_l00029}00029\ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{limit__auth__changes_8cpp_source_l00030}00030\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{limit__auth__changes_8cpp_source_l00031}00031\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{limit__auth__changes_8cpp_source_l00032}00032\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(it\ !=\ table.end())}
+\DoxyCodeLine{\Hypertarget{limit__auth__changes_8cpp_source_l00033}00033\ \ \ \ \ \ \ \ \ \ \ \ \ table.erase(it);}
+\DoxyCodeLine{\Hypertarget{limit__auth__changes_8cpp_source_l00034}00034\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{limit__auth__changes_8cpp_source_l00035}00035\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{limit__auth__changes_8cpp_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{limit__auth__changes_8cpp_source_l00037}\mbox{\hyperlink{namespacesysiosystem_a5de3a548ea8323b8a776a119bd5bb724}{00037}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacesysiosystem_a5de3a548ea8323b8a776a119bd5bb724}{check\_auth\_change}}(\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\ contract,\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\ account,\ \textcolor{keyword}{const}\ binary\_extension<name>\&\ authorized\_by)\ \{}
+\DoxyCodeLine{\Hypertarget{limit__auth__changes_8cpp_source_l00038}00038\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\ by(authorized\_by.has\_value()\ ?\ authorized\_by.value().value\ :\ 0);}
+\DoxyCodeLine{\Hypertarget{limit__auth__changes_8cpp_source_l00039}00039\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(by.value)}
+\DoxyCodeLine{\Hypertarget{limit__auth__changes_8cpp_source_l00040}00040\ \ \ \ \ \ \ \ \ \ sysio::require\_auth(\{account,\ by\});}
+\DoxyCodeLine{\Hypertarget{limit__auth__changes_8cpp_source_l00041}00041\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysiosystem_a7202a293f65ab06976b1f9d692df9508}{limit\_auth\_change\_table}}\ table(contract,\ contract.value);}
+\DoxyCodeLine{\Hypertarget{limit__auth__changes_8cpp_source_l00042}00042\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ it\ =\ table.find(account.value);}
+\DoxyCodeLine{\Hypertarget{limit__auth__changes_8cpp_source_l00043}00043\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(it\ ==\ table.end())}
+\DoxyCodeLine{\Hypertarget{limit__auth__changes_8cpp_source_l00044}00044\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{limit__auth__changes_8cpp_source_l00045}00045\ \ \ \ \ \ \ sysio::check(by.value,\ \textcolor{stringliteral}{"{}authorized\_by\ is\ required\ for\ this\ account"{}});}
+\DoxyCodeLine{\Hypertarget{limit__auth__changes_8cpp_source_l00046}00046\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!it-\/>allow\_perms.empty())}
+\DoxyCodeLine{\Hypertarget{limit__auth__changes_8cpp_source_l00047}00047\ \ \ \ \ \ \ \ \ \ sysio::check(}
+\DoxyCodeLine{\Hypertarget{limit__auth__changes_8cpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \ \ \ std::find(it-\/>allow\_perms.begin(),\ it-\/>allow\_perms.end(),\ by)\ !=\ it-\/>allow\_perms.end(),}
+\DoxyCodeLine{\Hypertarget{limit__auth__changes_8cpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}authorized\_by\ does\ not\ appear\ in\ allow\_perms"{}});}
+\DoxyCodeLine{\Hypertarget{limit__auth__changes_8cpp_source_l00050}00050\ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{limit__auth__changes_8cpp_source_l00051}00051\ \ \ \ \ \ \ \ \ \ sysio::check(}
+\DoxyCodeLine{\Hypertarget{limit__auth__changes_8cpp_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \ \ \ std::find(it-\/>disallow\_perms.begin(),\ it-\/>disallow\_perms.end(),\ by)\ ==\ it-\/>disallow\_perms.end(),}
+\DoxyCodeLine{\Hypertarget{limit__auth__changes_8cpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}authorized\_by\ appears\ in\ disallow\_perms"{}});}
+\DoxyCodeLine{\Hypertarget{limit__auth__changes_8cpp_source_l00054}00054\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{limit__auth__changes_8cpp_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{limit__auth__changes_8cpp_source_l00056}00056\ \}\ \textcolor{comment}{//\ namespace\ sysiosystem}}
+
+\end{DoxyCode}

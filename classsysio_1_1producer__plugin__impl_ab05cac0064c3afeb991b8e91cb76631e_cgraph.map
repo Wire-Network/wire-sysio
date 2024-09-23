@@ -1,0 +1,17 @@
+<map id="sysio::producer_plugin_impl::block_is_exhausted" name="sysio::producer_plugin_impl::block_is_exhausted">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,77,181,118"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1chain__plugin.html#a14a5e77b31ecf267c8062267d03440ae" title=" " alt="" coords="263,5,396,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="161,74,247,48,249,53,163,79"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager.html#a59c1ce742daefcf8e370e844ed49f955" title=" " alt="" coords="229,70,430,126"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="181,95,213,95,213,100,181,100"/>
+<area shape="rect" id="Node000007" href="$classsysio_1_1chain_1_1controller.html#af096f331aa6ac6b3fe3aa71b3768daa8" title="controller_impl" alt="" coords="230,149,429,190"/>
+<area shape="poly" id="edge8_Node000001_Node000007" title=" " alt="" coords="163,116,246,142,245,147,161,121"/>
+<area shape="rect" id="Node000004" href="$classchainbase_1_1database.html#afcfe00f81a526c1376d4f51197dd3a9a" title=" " alt="" coords="478,85,645,110"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="430,95,462,95,462,100,430,100"/>
+<area shape="rect" id="Node000005" href="$classchainbase_1_1database.html#aa5a2ca0da0092693ac49b36b7ec6817a" title=" " alt="" coords="693,77,835,118"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="646,104,678,104,678,109,646,109"/>
+<area shape="poly" id="edge5_Node000005_Node000004" title=" " alt="" coords="693,92,661,91,661,86,693,86"/>
+<area shape="rect" id="Node000006" href="$classchainbase_1_1database.html#a4d5297635dcf70be481d9b600da9bc13" title=" " alt="" coords="883,107,1024,147"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="835,106,868,111,867,116,834,111"/>
+<area shape="poly" id="edge7_Node000006_Node000004" title=" " alt="" coords="883,132,835,132,764,135,693,132,621,118,622,113,694,127,764,130,835,127,882,126"/>
+</map>

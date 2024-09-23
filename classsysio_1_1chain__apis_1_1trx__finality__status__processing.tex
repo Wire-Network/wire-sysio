@@ -1,0 +1,285 @@
+\doxysection{sysio\+::chain\+\_\+apis\+::trx\+\_\+finality\+\_\+status\+\_\+processing Class Reference}
+\hypertarget{classsysio_1_1chain__apis_1_1trx__finality__status__processing}{}\label{classsysio_1_1chain__apis_1_1trx__finality__status__processing}\index{sysio::chain\_apis::trx\_finality\_status\_processing@{sysio::chain\_apis::trx\_finality\_status\_processing}}
+
+
+{\ttfamily \#include $<$trx\+\_\+finality\+\_\+status\+\_\+processing.\+hpp$>$}
+
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain__apis_1_1trx__finality__status__processing_1_1chain__state}{chain\+\_\+state}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain__apis_1_1trx__finality__status__processing_1_1trx__state}{trx\+\_\+state}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classsysio_1_1chain__apis_1_1trx__finality__status__processing_a56d782ee67ef2d95ef1e979d3ed132fe}{trx\+\_\+finality\+\_\+status\+\_\+processing}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} max\+\_\+storage, const \mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}} \&success\+\_\+duration, const \mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}} \&failure\+\_\+duration)
+\item 
+\mbox{\hyperlink{classsysio_1_1chain__apis_1_1trx__finality__status__processing_ac098137950b6a6813b3bd12ad2687406}{\texorpdfstring{$\sim$}{\string~}trx\+\_\+finality\+\_\+status\+\_\+processing}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain__apis_1_1trx__finality__status__processing_a497d4f66156523b19e6b93d72264996e}{signal\+\_\+applied\+\_\+transaction}} (const \mbox{\hyperlink{namespacesysio_1_1chain_a4ee2867a6bec961c7a78b203cfd76be9}{chain\+::transaction\+\_\+trace\+\_\+ptr}} \&trace, const \mbox{\hyperlink{namespacesysio_1_1chain_a7041c0316bd294d0866609ab3e0cc7a7}{chain\+::packed\+\_\+transaction\+\_\+ptr}} \&ptrx)
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain__apis_1_1trx__finality__status__processing_a678364d6ca4f830032d132157bb90e75}{signal\+\_\+accepted\+\_\+block}} (const \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{chain\+::block\+\_\+state\+\_\+ptr}} \&bsp)
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain__apis_1_1trx__finality__status__processing_a9ce87be9e53254558a22c5f485477d62}{signal\+\_\+irreversible\+\_\+block}} (const \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{chain\+::block\+\_\+state\+\_\+ptr}} \&bsp)
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain__apis_1_1trx__finality__status__processing_a020c0c2f18f96d776ceba64e84d62bfe}{signal\+\_\+block\+\_\+start}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} block\+\_\+num)
+\item 
+\mbox{\hyperlink{structsysio_1_1chain__apis_1_1trx__finality__status__processing_1_1chain__state}{chain\+\_\+state}} \mbox{\hyperlink{classsysio_1_1chain__apis_1_1trx__finality__status__processing_af01637ac02a44792fd55e8c1f7d4c631}{get\+\_\+chain\+\_\+state}} () const
+\item 
+std\+::optional$<$ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1trx__finality__status__processing_1_1trx__state}{trx\+\_\+state}} $>$ \mbox{\hyperlink{classsysio_1_1chain__apis_1_1trx__finality__status__processing_a7cc0444455cdef3c9190a42075401b73}{get\+\_\+trx\+\_\+state}} (const \mbox{\hyperlink{namespacesysio_1_1chain_aa85a3b49b3b219d1e3840567579e7e63}{chain\+::transaction\+\_\+id\+\_\+type}} \&\mbox{\hyperlink{code__cache_8cpp_aa0efefe21f4700d78692edc823e763be}{id}}) const
+\item 
+size\+\_\+t \mbox{\hyperlink{classsysio_1_1chain__apis_1_1trx__finality__status__processing_a732e6994e895af082e0c019686803b29}{get\+\_\+storage\+\_\+memory\+\_\+size}} () const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+This class manages the processing related to the transaction finality status feature. 
+
+Definition at line \mbox{\hyperlink{trx__finality__status__processing_8hpp_source_l00016}{16}} of file \mbox{\hyperlink{trx__finality__status__processing_8hpp_source}{trx\+\_\+finality\+\_\+status\+\_\+processing.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classsysio_1_1chain__apis_1_1trx__finality__status__processing_a56d782ee67ef2d95ef1e979d3ed132fe}\index{sysio::chain\_apis::trx\_finality\_status\_processing@{sysio::chain\_apis::trx\_finality\_status\_processing}!trx\_finality\_status\_processing@{trx\_finality\_status\_processing}}
+\index{trx\_finality\_status\_processing@{trx\_finality\_status\_processing}!sysio::chain\_apis::trx\_finality\_status\_processing@{sysio::chain\_apis::trx\_finality\_status\_processing}}
+\doxysubsubsection{\texorpdfstring{trx\_finality\_status\_processing()}{trx\_finality\_status\_processing()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain__apis_1_1trx__finality__status__processing_a56d782ee67ef2d95ef1e979d3ed132fe} 
+sysio\+::chain\+\_\+apis\+::trx\+\_\+finality\+\_\+status\+\_\+processing\+::trx\+\_\+finality\+\_\+status\+\_\+processing (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{max\+\_\+storage}{, }\item[{const \mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}} \&}]{success\+\_\+duration}{, }\item[{const \mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}} \&}]{failure\+\_\+duration}{}\end{DoxyParamCaption})}
+
+Instantiate a new transaction retry processor 
+\begin{DoxyParams}{Parameters}
+{\em max\+\_\+storage} & -\/ the maximum storage allotted to this feature \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{trx__finality__status__processing_8cpp_source_l00043}{43}} of file \mbox{\hyperlink{trx__finality__status__processing_8cpp_source}{trx\+\_\+finality\+\_\+status\+\_\+processing.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00044\ \ \ \ :\ \_my(\textcolor{keyword}{new}\ trx\_finality\_status\_processing\_impl(max\_storage,\ success\_duration,\ failure\_duration))}
+\DoxyCodeLine{00045\ \ \ \ \{}
+\DoxyCodeLine{00046\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain__apis_1_1trx__finality__status__processing_ac098137950b6a6813b3bd12ad2687406}\index{sysio::chain\_apis::trx\_finality\_status\_processing@{sysio::chain\_apis::trx\_finality\_status\_processing}!````~trx\_finality\_status\_processing@{\texorpdfstring{$\sim$}{\string~}trx\_finality\_status\_processing}}
+\index{````~trx\_finality\_status\_processing@{\texorpdfstring{$\sim$}{\string~}trx\_finality\_status\_processing}!sysio::chain\_apis::trx\_finality\_status\_processing@{sysio::chain\_apis::trx\_finality\_status\_processing}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}trx\_finality\_status\_processing()}{\string~trx\_finality\_status\_processing()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain__apis_1_1trx__finality__status__processing_ac098137950b6a6813b3bd12ad2687406} 
+sysio\+::chain\+\_\+apis\+::trx\+\_\+finality\+\_\+status\+\_\+processing\+::\texorpdfstring{$\sim$}{\string~}trx\+\_\+finality\+\_\+status\+\_\+processing (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [default]}}
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1chain__apis_1_1trx__finality__status__processing_af01637ac02a44792fd55e8c1f7d4c631}\index{sysio::chain\_apis::trx\_finality\_status\_processing@{sysio::chain\_apis::trx\_finality\_status\_processing}!get\_chain\_state@{get\_chain\_state}}
+\index{get\_chain\_state@{get\_chain\_state}!sysio::chain\_apis::trx\_finality\_status\_processing@{sysio::chain\_apis::trx\_finality\_status\_processing}}
+\doxysubsubsection{\texorpdfstring{get\_chain\_state()}{get\_chain\_state()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain__apis_1_1trx__finality__status__processing_af01637ac02a44792fd55e8c1f7d4c631} 
+\mbox{\hyperlink{structsysio_1_1chain__apis_1_1trx__finality__status__processing_1_1chain__state}{trx\+\_\+finality\+\_\+status\+\_\+processing\+::chain\+\_\+state}} sysio\+::chain\+\_\+apis\+::trx\+\_\+finality\+\_\+status\+\_\+processing\+::get\+\_\+chain\+\_\+state (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{trx__finality__status__processing_8cpp_source_l00306}{306}} of file \mbox{\hyperlink{trx__finality__status__processing_8cpp_source}{trx\+\_\+finality\+\_\+status\+\_\+processing.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00306\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00307\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{\ .head\_id\ =\ \_my-\/>\_head\_block\_id,\ .head\_block\_timestamp\ =\ \_my-\/>\_head\_block\_timestamp,\ .irr\_id\ =\ \_my-\/>\_irr\_block\_id,\ .irr\_block\_timestamp\ =\ \_my-\/>\_irr\_block\_timestamp,\ .earliest\_tracked\_block\_id\ =\ \_my-\/>\_earliest\_tracked\_block\_id\ \};}
+\DoxyCodeLine{00308\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain__apis_1_1trx__finality__status__processing_af01637ac02a44792fd55e8c1f7d4c631_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain__apis_1_1trx__finality__status__processing_a732e6994e895af082e0c019686803b29}\index{sysio::chain\_apis::trx\_finality\_status\_processing@{sysio::chain\_apis::trx\_finality\_status\_processing}!get\_storage\_memory\_size@{get\_storage\_memory\_size}}
+\index{get\_storage\_memory\_size@{get\_storage\_memory\_size}!sysio::chain\_apis::trx\_finality\_status\_processing@{sysio::chain\_apis::trx\_finality\_status\_processing}}
+\doxysubsubsection{\texorpdfstring{get\_storage\_memory\_size()}{get\_storage\_memory\_size()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain__apis_1_1trx__finality__status__processing_a732e6994e895af082e0c019686803b29} 
+size\+\_\+t sysio\+::chain\+\_\+apis\+::trx\+\_\+finality\+\_\+status\+\_\+processing\+::get\+\_\+storage\+\_\+memory\+\_\+size (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{trx__finality__status__processing_8cpp_source_l00333}{333}} of file \mbox{\hyperlink{trx__finality__status__processing_8cpp_source}{trx\+\_\+finality\+\_\+status\+\_\+processing.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00333\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00334\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \_my-\/>\_storage.memory\_size();}
+\DoxyCodeLine{00335\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain__apis_1_1trx__finality__status__processing_a732e6994e895af082e0c019686803b29_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain__apis_1_1trx__finality__status__processing_a7cc0444455cdef3c9190a42075401b73}\index{sysio::chain\_apis::trx\_finality\_status\_processing@{sysio::chain\_apis::trx\_finality\_status\_processing}!get\_trx\_state@{get\_trx\_state}}
+\index{get\_trx\_state@{get\_trx\_state}!sysio::chain\_apis::trx\_finality\_status\_processing@{sysio::chain\_apis::trx\_finality\_status\_processing}}
+\doxysubsubsection{\texorpdfstring{get\_trx\_state()}{get\_trx\_state()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain__apis_1_1trx__finality__status__processing_a7cc0444455cdef3c9190a42075401b73} 
+std\+::optional$<$ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1trx__finality__status__processing_1_1trx__state}{trx\+\_\+finality\+\_\+status\+\_\+processing\+::trx\+\_\+state}} $>$ sysio\+::chain\+\_\+apis\+::trx\+\_\+finality\+\_\+status\+\_\+processing\+::get\+\_\+trx\+\_\+state (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_aa85a3b49b3b219d1e3840567579e7e63}{chain\+::transaction\+\_\+id\+\_\+type}} \&}]{id}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{trx__finality__status__processing_8cpp_source_l00310}{310}} of file \mbox{\hyperlink{trx__finality__status__processing_8cpp_source}{trx\+\_\+finality\+\_\+status\+\_\+processing.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00310\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00311\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ iter\ =\ \_my-\/>\_storage.find(\textcolor{keywordtype}{id});}
+\DoxyCodeLine{00312\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (iter\ ==\ \_my-\/>\_storage.index().cend())\ \{}
+\DoxyCodeLine{00313\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{\};}
+\DoxyCodeLine{00314\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00315\ }
+\DoxyCodeLine{00316\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ status;}
+\DoxyCodeLine{00317\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!iter-\/>is\_in\_block())\ \{}
+\DoxyCodeLine{00318\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{fc::time\_point::now}}()\ >=\ iter-\/>trx\_expiry)\ \{}
+\DoxyCodeLine{00319\ \ \ \ \ \ \ \ \ \ \ \ \ status\ =\ \textcolor{stringliteral}{"{}FAILED"{}};}
+\DoxyCodeLine{00320\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00321\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00322\ \ \ \ \ \ \ \ \ \ \ \ \ status\ =\ iter-\/>forked\_out\ ?\ \textcolor{stringliteral}{"{}FORKED\_OUT"{}}\ :\ \textcolor{stringliteral}{"{}LOCALLY\_APPLIED"{}};}
+\DoxyCodeLine{00323\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00324\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00325\ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00326\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ block\_num\ =\ iter-\/>block\_num();}
+\DoxyCodeLine{00327\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ lib\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1block__header_a39d57e33ef8d3f6ba59b4c458f0ae375}{chain::block\_header::num\_from\_id}}(\_my-\/>\_irr\_block\_id);}
+\DoxyCodeLine{00328\ \ \ \ \ \ \ \ \ \ status\ =\ (block\_num\ >\ lib)\ ?\ \textcolor{stringliteral}{"{}IN\_BLOCK"{}}\ :\ \textcolor{stringliteral}{"{}IRREVERSIBLE"{}};}
+\DoxyCodeLine{00329\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00330\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ trx\_finality\_status\_processing::trx\_state\{\ .block\_id\ =\ iter-\/>block\_id,\ .block\_timestamp\ =\ iter-\/>block\_timestamp,\ .received\ =\ iter-\/>received,\ .expiration\ =\ iter-\/>trx\_expiry,\ .status\ =\ status\ \};}
+\DoxyCodeLine{00331\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain__apis_1_1trx__finality__status__processing_a7cc0444455cdef3c9190a42075401b73_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain__apis_1_1trx__finality__status__processing_a7cc0444455cdef3c9190a42075401b73_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain__apis_1_1trx__finality__status__processing_a678364d6ca4f830032d132157bb90e75}\index{sysio::chain\_apis::trx\_finality\_status\_processing@{sysio::chain\_apis::trx\_finality\_status\_processing}!signal\_accepted\_block@{signal\_accepted\_block}}
+\index{signal\_accepted\_block@{signal\_accepted\_block}!sysio::chain\_apis::trx\_finality\_status\_processing@{sysio::chain\_apis::trx\_finality\_status\_processing}}
+\doxysubsubsection{\texorpdfstring{signal\_accepted\_block()}{signal\_accepted\_block()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain__apis_1_1trx__finality__status__processing_a678364d6ca4f830032d132157bb90e75} 
+void sysio\+::chain\+\_\+apis\+::trx\+\_\+finality\+\_\+status\+\_\+processing\+::signal\+\_\+accepted\+\_\+block (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{chain\+::block\+\_\+state\+\_\+ptr}} \&}]{bsp}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{trx__finality__status__processing_8cpp_source_l00070}{70}} of file \mbox{\hyperlink{trx__finality__status__processing_8cpp_source}{trx\+\_\+finality\+\_\+status\+\_\+processing.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ \_my-\/>signal\_accepted\_block(bsp);}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \}\ \mbox{\hyperlink{exception_8hpp_aed56aa2593b6f6fc6a839b7cb5c6e8e3}{FC\_LOG\_AND\_DROP}}((\textcolor{stringliteral}{"{}Failed\ to\ signal\ accepted\ block\ for\ finality\ status"{}}));}
+\DoxyCodeLine{00074\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain__apis_1_1trx__finality__status__processing_a678364d6ca4f830032d132157bb90e75_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain__apis_1_1trx__finality__status__processing_a497d4f66156523b19e6b93d72264996e}\index{sysio::chain\_apis::trx\_finality\_status\_processing@{sysio::chain\_apis::trx\_finality\_status\_processing}!signal\_applied\_transaction@{signal\_applied\_transaction}}
+\index{signal\_applied\_transaction@{signal\_applied\_transaction}!sysio::chain\_apis::trx\_finality\_status\_processing@{sysio::chain\_apis::trx\_finality\_status\_processing}}
+\doxysubsubsection{\texorpdfstring{signal\_applied\_transaction()}{signal\_applied\_transaction()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain__apis_1_1trx__finality__status__processing_a497d4f66156523b19e6b93d72264996e} 
+void sysio\+::chain\+\_\+apis\+::trx\+\_\+finality\+\_\+status\+\_\+processing\+::signal\+\_\+applied\+\_\+transaction (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_a4ee2867a6bec961c7a78b203cfd76be9}{chain\+::transaction\+\_\+trace\+\_\+ptr}} \&}]{trace}{, }\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_a7041c0316bd294d0866609ab3e0cc7a7}{chain\+::packed\+\_\+transaction\+\_\+ptr}} \&}]{ptrx}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{trx__finality__status__processing_8cpp_source_l00064}{64}} of file \mbox{\hyperlink{trx__finality__status__processing_8cpp_source}{trx\+\_\+finality\+\_\+status\+\_\+processing.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \_my-\/>signal\_applied\_transaction(trace,\ ptrx);}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \}\ \mbox{\hyperlink{exception_8hpp_aed56aa2593b6f6fc6a839b7cb5c6e8e3}{FC\_LOG\_AND\_DROP}}((\textcolor{stringliteral}{"{}Failed\ to\ signal\ applied\ transaction\ for\ finality\ status"{}}));}
+\DoxyCodeLine{00068\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain__apis_1_1trx__finality__status__processing_a497d4f66156523b19e6b93d72264996e_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain__apis_1_1trx__finality__status__processing_a020c0c2f18f96d776ceba64e84d62bfe}\index{sysio::chain\_apis::trx\_finality\_status\_processing@{sysio::chain\_apis::trx\_finality\_status\_processing}!signal\_block\_start@{signal\_block\_start}}
+\index{signal\_block\_start@{signal\_block\_start}!sysio::chain\_apis::trx\_finality\_status\_processing@{sysio::chain\_apis::trx\_finality\_status\_processing}}
+\doxysubsubsection{\texorpdfstring{signal\_block\_start()}{signal\_block\_start()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain__apis_1_1trx__finality__status__processing_a020c0c2f18f96d776ceba64e84d62bfe} 
+void sysio\+::chain\+\_\+apis\+::trx\+\_\+finality\+\_\+status\+\_\+processing\+::signal\+\_\+block\+\_\+start (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{block\+\_\+num}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{trx__finality__status__processing_8cpp_source_l00057}{57}} of file \mbox{\hyperlink{trx__finality__status__processing_8cpp_source}{trx\+\_\+finality\+\_\+status\+\_\+processing.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ since\ a\ new\ block\ is\ started,\ no\ block\ state\ was\ received,\ so\ the\ speculative\ block\ did\ not\ get\ eventually\ produced}}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \ \_my-\/>\_speculative\_trxs.clear();}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \}\ \mbox{\hyperlink{exception_8hpp_aed56aa2593b6f6fc6a839b7cb5c6e8e3}{FC\_LOG\_AND\_DROP}}((\textcolor{stringliteral}{"{}Failed\ to\ signal\ block\ start\ for\ finality\ status"{}}));}
+\DoxyCodeLine{00062\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain__apis_1_1trx__finality__status__processing_a020c0c2f18f96d776ceba64e84d62bfe_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain__apis_1_1trx__finality__status__processing_a9ce87be9e53254558a22c5f485477d62}\index{sysio::chain\_apis::trx\_finality\_status\_processing@{sysio::chain\_apis::trx\_finality\_status\_processing}!signal\_irreversible\_block@{signal\_irreversible\_block}}
+\index{signal\_irreversible\_block@{signal\_irreversible\_block}!sysio::chain\_apis::trx\_finality\_status\_processing@{sysio::chain\_apis::trx\_finality\_status\_processing}}
+\doxysubsubsection{\texorpdfstring{signal\_irreversible\_block()}{signal\_irreversible\_block()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain__apis_1_1trx__finality__status__processing_a9ce87be9e53254558a22c5f485477d62} 
+void sysio\+::chain\+\_\+apis\+::trx\+\_\+finality\+\_\+status\+\_\+processing\+::signal\+\_\+irreversible\+\_\+block (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{chain\+::block\+\_\+state\+\_\+ptr}} \&}]{bsp}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{trx__finality__status__processing_8cpp_source_l00050}{50}} of file \mbox{\hyperlink{trx__finality__status__processing_8cpp_source}{trx\+\_\+finality\+\_\+status\+\_\+processing.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \_my-\/>\_irr\_block\_id\ =\ bsp-\/>id;}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \_my-\/>\_irr\_block\_timestamp\ =\ bsp-\/>block-\/>timestamp;}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \}\ \mbox{\hyperlink{exception_8hpp_aed56aa2593b6f6fc6a839b7cb5c6e8e3}{FC\_LOG\_AND\_DROP}}((\textcolor{stringliteral}{"{}Failed\ to\ signal\ irreversible\ block\ for\ finality\ status"{}}));}
+\DoxyCodeLine{00055\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain__apis_1_1trx__finality__status__processing_a9ce87be9e53254558a22c5f485477d62_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+plugins/chain\+\_\+plugin/include/sysio/chain\+\_\+plugin/\mbox{\hyperlink{trx__finality__status__processing_8hpp}{trx\+\_\+finality\+\_\+status\+\_\+processing.\+hpp}}\item 
+plugins/chain\+\_\+plugin/\mbox{\hyperlink{trx__finality__status__processing_8cpp}{trx\+\_\+finality\+\_\+status\+\_\+processing.\+cpp}}\end{DoxyCompactItemize}

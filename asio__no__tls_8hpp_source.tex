@@ -1,0 +1,78 @@
+\doxysection{asio\+\_\+no\+\_\+tls.\+hpp}
+\hypertarget{asio__no__tls_8hpp_source}{}\label{asio__no__tls_8hpp_source}\index{libraries/fc/vendor/websocketpp/websocketpp/config/asio\_no\_tls.hpp@{libraries/fc/vendor/websocketpp/websocketpp/config/asio\_no\_tls.hpp}}
+\mbox{\hyperlink{asio__no__tls_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2014,\ Peter\ Thorson.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00004}00004\ \textcolor{comment}{\ *\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00005}00005\ \textcolor{comment}{\ *\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are\ met:}}
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00006}00006\ \textcolor{comment}{\ *\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00007}00007\ \textcolor{comment}{\ *\ \ \ \ \ \ \ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00008}00008\ \textcolor{comment}{\ *\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00009}00009\ \textcolor{comment}{\ *\ \ \ \ \ \ \ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer\ in\ the}}
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00010}00010\ \textcolor{comment}{\ *\ \ \ \ \ \ \ documentation\ and/or\ other\ materials\ provided\ with\ the\ distribution.}}
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00011}00011\ \textcolor{comment}{\ *\ \ \ \ \ *\ Neither\ the\ name\ of\ the\ WebSocket++\ Project\ nor\ the}}
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00012}00012\ \textcolor{comment}{\ *\ \ \ \ \ \ \ names\ of\ its\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products}}
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00013}00013\ \textcolor{comment}{\ *\ \ \ \ \ \ \ derived\ from\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00014}00014\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00015}00015\ \textcolor{comment}{\ *\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS\ "{}AS\ IS"{}}}
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00016}00016\ \textcolor{comment}{\ *\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ THE}}
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00017}00017\ \textcolor{comment}{\ *\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR\ A\ PARTICULAR\ PURPOSE}}
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00018}00018\ \textcolor{comment}{\ *\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ PETER\ THORSON\ BE\ LIABLE\ FOR\ ANY}}
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00019}00019\ \textcolor{comment}{\ *\ DIRECT,\ INDIRECT,\ INCIDENTAL,\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES}}
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00020}00020\ \textcolor{comment}{\ *\ (INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;}}
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00021}00021\ \textcolor{comment}{\ *\ LOSS\ OF\ USE,\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND}}
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00022}00022\ \textcolor{comment}{\ *\ ON\ ANY\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00023}00023\ \textcolor{comment}{\ *\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE\ OF\ THIS}}
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00024}00024\ \textcolor{comment}{\ *\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00025}00025\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00026}00026\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00028}00028\ \textcolor{preprocessor}{\#ifndef\ WEBSOCKETPP\_CONFIG\_ASIO\_HPP}}
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00029}00029\ \textcolor{preprocessor}{\#define\ WEBSOCKETPP\_CONFIG\_ASIO\_HPP}}
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00031}00031\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{core_8hpp}{websocketpp/config/core.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00032}00032\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{transport_2asio_2endpoint_8hpp}{websocketpp/transport/asio/endpoint.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00034}00034\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacewebsocketpp}{websocketpp}}\ \{}
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00035}00035\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{classconfig}{config}}\ \{}
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00038}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio}{00038}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{namespacewebsocketpp_1_1lib_1_1asio}{asio}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1core}{core}}\ \{}
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00039}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio_a4b3e4e47bcc028b9c9d09cd98302fab2}{00039}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{namespacewebsocketpp_1_1lib_1_1asio}{asio}}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio_a4b3e4e47bcc028b9c9d09cd98302fab2}{type}};}
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00040}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio_ac5198c6ce588ed1ee3f8cef1c10a3a6a}{00040}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1core}{core}}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio_ac5198c6ce588ed1ee3f8cef1c10a3a6a}{base}};}
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00042}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio_aab284d77d4be086427ebfb078717056a}{00042}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1concurrency_1_1basic}{base::concurrency\_type}}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio_aab284d77d4be086427ebfb078717056a}{concurrency\_type}};}
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00044}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio_a95128d06f636fbd8456737edfaf6ec75}{00044}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1request}{base::request\_type}}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio_a95128d06f636fbd8456737edfaf6ec75}{request\_type}};}
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00045}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio_a2803cf2ac9f96cbb54eb00dde1b42a0b}{00045}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1response}{base::response\_type}}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio_a2803cf2ac9f96cbb54eb00dde1b42a0b}{response\_type}};}
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00047}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio_a6ada271dba1b4ba5dc2e064e13724a35}{00047}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message}{base::message\_type}}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio_a6ada271dba1b4ba5dc2e064e13724a35}{message\_type}};}
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00048}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio_a51dab6c3ff4d6f12926a080228620f50}{00048}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1alloc_1_1con__msg__manager}{base::con\_msg\_manager\_type}}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio_a51dab6c3ff4d6f12926a080228620f50}{con\_msg\_manager\_type}};}
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00049}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio_a1b0a408748f8d252cc09b3f198e130e3}{00049}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1alloc_1_1endpoint__msg__manager}{base::endpoint\_msg\_manager\_type}}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio_a1b0a408748f8d252cc09b3f198e130e3}{endpoint\_msg\_manager\_type}};}
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00051}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio_a16d39595b8d77a47f7d8319dc258911d}{00051}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic}{base::alog\_type}}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio_a16d39595b8d77a47f7d8319dc258911d}{alog\_type}};}
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00052}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio_ae08ea430d431bff13f865cf7d5edde8f}{00052}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic}{base::elog\_type}}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio_ae08ea430d431bff13f865cf7d5edde8f}{elog\_type}};}
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00054}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio_a200dfc34aeb1e248423f4e4b76ea6726}{00054}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1random_1_1none_1_1int__generator}{base::rng\_type}}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio_a200dfc34aeb1e248423f4e4b76ea6726}{rng\_type}};}
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00056}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio_1_1transport__config}{00056}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio_1_1transport__config}{transport\_config}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1core_1_1transport__config}{base::transport\_config}}\ \{}
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00057}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio_1_1transport__config_acb4206cf37b7523cb8d81dfab6a553af}{00057}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1concurrency_1_1basic}{type::concurrency\_type}}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio_1_1transport__config_acb4206cf37b7523cb8d81dfab6a553af}{concurrency\_type}};}
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00058}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio_1_1transport__config_a99cf6c2d54a6f60bb01708cf98af572f}{00058}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic}{type::alog\_type}}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio_1_1transport__config_a99cf6c2d54a6f60bb01708cf98af572f}{alog\_type}};}
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00059}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio_1_1transport__config_aa95cd901d6e26400b8766f9ad47add1b}{00059}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic}{type::elog\_type}}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio_1_1transport__config_aa95cd901d6e26400b8766f9ad47add1b}{elog\_type}};}
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00060}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio_1_1transport__config_a2d6b85953ab67f39996c2593d7d35a0a}{00060}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1request}{type::request\_type}}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio_1_1transport__config_a2d6b85953ab67f39996c2593d7d35a0a}{request\_type}};}
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00061}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio_1_1transport__config_a9a403819d2ec2e0a54828d9af2c3e648}{00061}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1response}{type::response\_type}}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio_1_1transport__config_a9a403819d2ec2e0a54828d9af2c3e648}{response\_type}};}
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00062}00062\ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1basic__socket_1_1endpoint}{websocketpp::transport::asio::basic\_socket::endpoint}}}
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00063}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio_1_1transport__config_ace8c6db4f2cb0557f60bd57ac6c46990}{00063}}\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio_1_1transport__config_ace8c6db4f2cb0557f60bd57ac6c46990}{socket\_type}};}
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00064}00064\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00066}00066\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1endpoint}{websocketpp::transport::asio::endpoint<transport\_config>}}}
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00067}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio_ae71946fd6a004a02f0511a49979ed542}{00067}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio_ae71946fd6a004a02f0511a49979ed542}{transport\_type}};}
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00068}00068\ \};}
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00069}00069\ }
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00070}00070\ \}\ \textcolor{comment}{//\ namespace\ config}}
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00071}00071\ \}\ \textcolor{comment}{//\ namespace\ websocketpp}}
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{asio__no__tls_8hpp_source_l00073}00073\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ WEBSOCKETPP\_CONFIG\_ASIO\_HPP}}
+
+\end{DoxyCode}

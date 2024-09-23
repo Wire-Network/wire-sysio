@@ -1,0 +1,66 @@
+\doxysection{libraries/fc/src/thread/asio/detail/yield.hpp File Reference}
+\hypertarget{detail_2yield_8hpp}{}\label{detail_2yield_8hpp}\index{libraries/fc/src/thread/asio/detail/yield.hpp@{libraries/fc/src/thread/asio/detail/yield.hpp}}
+{\ttfamily \#include $<$boost/asio/async\+\_\+result.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/asio/detail/config.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/asio/handler\+\_\+type.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/system/error\+\_\+code.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/system/system\+\_\+error.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/throw\+\_\+exception.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/assert.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/fiber/all.\+hpp$>$}\newline
+{\ttfamily \#include $<$mutex$>$}\newline
+Include dependency graph for yield.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{detail_2yield_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=189pt]{detail_2yield_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structboost_1_1fibers_1_1asio_1_1detail_1_1yield__completion}{boost\+::fibers\+::asio\+::detail\+::yield\+\_\+completion}}
+\item 
+class \mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1detail_1_1yield__handler__base}{boost\+::fibers\+::asio\+::detail\+::yield\+\_\+handler\+\_\+base}}
+\item 
+class \mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1detail_1_1yield__handler}{boost\+::fibers\+::asio\+::detail\+::yield\+\_\+handler$<$ T $>$}}
+\item 
+class \mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1detail_1_1yield__handler_3_01void_01_4}{boost\+::fibers\+::asio\+::detail\+::yield\+\_\+handler$<$ void $>$}}
+\item 
+class \mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1detail_1_1async__result__base}{boost\+::fibers\+::asio\+::detail\+::async\+\_\+result\+\_\+base}}
+\item 
+class \mbox{\hyperlink{classboost_1_1asio_1_1async__result_3_01boost_1_1fibers_1_1asio_1_1detail_1_1yield__handler_3_01_t_01_4_01_4}{boost\+::asio\+::async\+\_\+result$<$ boost\+::fibers\+::asio\+::detail\+::yield\+\_\+handler$<$ T $>$ $>$}}
+\item 
+class \mbox{\hyperlink{classboost_1_1asio_1_1async__result_3_01boost_1_1fibers_1_1asio_1_1detail_1_1yield__handler_3_01void_01_4_01_4}{boost\+::asio\+::async\+\_\+result$<$ boost\+::fibers\+::asio\+::detail\+::yield\+\_\+handler$<$ void $>$ $>$}}
+\item 
+struct \mbox{\hyperlink{structboost_1_1asio_1_1handler__type_3_01fibers_1_1asio_1_1yield__t_00_01_return_type_07_arg1_08_01_4}{boost\+::asio\+::handler\+\_\+type$<$ fibers\+::asio\+::yield\+\_\+t, Return\+Type(\+Arg1) $>$}}
+\item 
+struct \mbox{\hyperlink{structboost_1_1asio_1_1handler__type_3_01fibers_1_1asio_1_1yield__t_00_01_return_type_07boost_1_1system_1_1error__code_08_01_4}{boost\+::asio\+::handler\+\_\+type$<$ fibers\+::asio\+::yield\+\_\+t, Return\+Type(boost\+::system\+::error\+\_\+code) $>$}}
+\item 
+struct \mbox{\hyperlink{structboost_1_1asio_1_1handler__type_3_01fibers_1_1asio_1_1yield__t_00_01_return_type_07boost_1_dec09fad67bd9ca4754be75bf1feab34}{boost\+::asio\+::handler\+\_\+type$<$ fibers\+::asio\+::yield\+\_\+t, Return\+Type(boost\+::system\+::error\+\_\+code, Arg2) $>$}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespaceboost}{boost}}
+\item 
+namespace \mbox{\hyperlink{namespaceboost_1_1fibers}{boost\+::fibers}}
+\item 
+namespace \mbox{\hyperlink{namespaceboost_1_1fibers_1_1asio}{boost\+::fibers\+::asio}}
+\item 
+namespace \mbox{\hyperlink{namespaceboost_1_1fibers_1_1asio_1_1detail}{boost\+::fibers\+::asio\+::detail}}
+\item 
+namespace \mbox{\hyperlink{namespaceboost_1_1asio}{boost\+::asio}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename Fn , typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{namespaceboost_1_1fibers_1_1asio_1_1detail_adb81115fad133c48b59bc462bbdc3065}{boost\+::fibers\+::asio\+::detail\+::asio\+\_\+handler\+\_\+invoke}} (Fn fn, \mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1detail_1_1yield__handler}{yield\+\_\+handler}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \texorpdfstring{$\ast$}{*}h)
+\end{DoxyCompactItemize}

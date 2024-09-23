@@ -1,0 +1,67 @@
+\doxysection{platform\+\_\+timer.\+hpp}
+\hypertarget{platform__timer_8hpp_source}{}\label{platform__timer_8hpp_source}\index{libraries/chain/include/sysio/chain/platform\_timer.hpp@{libraries/chain/include/sysio/chain/platform\_timer.hpp}}
+\mbox{\hyperlink{platform__timer_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{include_2fc_2time_8hpp}{fc/time.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{fwd_8hpp}{fc/fwd.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{scoped__exit_8hpp}{fc/scoped\_exit.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp}{sysio/chain/exceptions.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <atomic>}}
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <signal.h>}}
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00012}00012\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{\ \textcolor{keyword}{namespace\ }chain\ \{}
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00014}\mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer}{00014}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer}{platform\_timer}}\ \{}
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00015}00015\ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_a73955c69921017b77b595476e8de4eea}{platform\_timer}}();}
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00016}00016\ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_ab241e03e3055f290f13d6b367d8447b7}{\string~platform\_timer}}();}
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00018}00018\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_a8396e86c6a626dd2632cb075bd254ad4}{start}}(\mbox{\hyperlink{classfc_1_1time__point}{fc::time\_point}}\ tp);}
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00019}00019\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_a5cb70a095755d00bf02d37d31b6e46af}{stop}}();}
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00021}00021\ \ \ \ \textcolor{comment}{/*\ Sets\ a\ callback\ for\ when\ timer\ expires.\ Be\ aware\ this\ could\ might\ fire\ from\ a\ signal\ handling\ context\ and/or}}
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00022}00022\ \textcolor{comment}{\ \ \ \ \ \ on\ any\ particular\ thread.\ Only\ a\ single\ callback\ can\ be\ registered\ at\ once;\ trying\ to\ register\ more\ will}}
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00023}00023\ \textcolor{comment}{\ \ \ \ \ \ result\ in\ an\ exception.\ Setting\ to\ nullptr\ disables\ any\ current\ set\ callback\ */}}
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00024}\mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_a5fd5d9852eeb86bed7975076db770b10}{00024}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_a5fd5d9852eeb86bed7975076db770b10}{set\_expiration\_callback}}(\textcolor{keywordtype}{void}(*func)(\textcolor{keywordtype}{void}*),\ \textcolor{keywordtype}{void}*\ user)\ \{}
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00025}00025\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ expect\_false\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00026}00026\ \ \ \ \ \ \ \textcolor{keywordflow}{while}(!atomic\_compare\_exchange\_strong(\&\_callback\_variables\_busy,\ \&expect\_false,\ \textcolor{keyword}{true}))}
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00027}00027\ \ \ \ \ \ \ \ \ \ expect\_false\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00028}00028\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ reset\_busy\ =\ \mbox{\hyperlink{namespacefc_a23d89b54a8ffd84f7e7efeb21747d846}{fc::make\_scoped\_exit}}([\textcolor{keyword}{this}]()\ \{}
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00029}00029\ \ \ \ \ \ \ \ \ \ \_callback\_variables\_busy.store(\textcolor{keyword}{false},\ std::memory\_order\_release);}
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00030}00030\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00031}00031\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(!(func\ \&\&\ \_expiration\_callback),\ misc\_exception,\ \textcolor{stringliteral}{"{}Setting\ a\ platform\_timer\ callback\ when\ one\ already\ exists"{}});}
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00033}00033\ \ \ \ \ \ \ \_expiration\_callback\ =\ func;}
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00034}00034\ \ \ \ \ \ \ \_expiration\_callback\_data\ =\ user;}
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00035}00035\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00037}\mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_a801fb6084f296f86fdc1dedd980ac643}{00037}}\ \ \ \ std::atomic\_bool\ \mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_a801fb6084f296f86fdc1dedd980ac643}{expired}}\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00039}00039\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00040}00040\ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_1_1impl}{impl}};}
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00041}00041\ \ \ \ \textcolor{keyword}{constexpr}\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{size\_t}\ fwd\_size\ =\ 8;}
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00042}00042\ \ \ \ \mbox{\hyperlink{classfc_1_1fwd}{fc::fwd<impl,fwd\_size>}}\ my;}
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00044}00044\ \ \ \ \textcolor{keywordtype}{void}\ call\_expiration\_callback()\ \{}
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00045}00045\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ expect\_false\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00046}00046\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(atomic\_compare\_exchange\_strong(\&\_callback\_variables\_busy,\ \&expect\_false,\ \textcolor{keyword}{true}))\ \{}
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00047}00047\ \ \ \ \ \ \ \ \ \ void(*cb)(\textcolor{keywordtype}{void}*)\ =\ \_expiration\_callback;}
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}*\ cb\_data\ =\ \_expiration\_callback\_data;}
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(cb)\ \{}
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00050}00050\ \ \ \ \ \ \ \ \ \ \ \ \ cb(cb\_data);}
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00051}00051\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \_callback\_variables\_busy.store(\textcolor{keyword}{false},\ std::memory\_order\_release);}
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00053}00053\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00054}00054\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00056}00056\ \ \ \ std::atomic\_bool\ \_callback\_variables\_busy\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00057}00057\ \ \ \ void(*\_expiration\_callback)(\textcolor{keywordtype}{void}*)\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00058}00058\ \ \ \ \textcolor{keywordtype}{void}*\ \_expiration\_callback\_data;}
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00059}00059\ \};}
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{platform__timer_8hpp_source_l00061}00061\ \}\}}
+
+\end{DoxyCode}

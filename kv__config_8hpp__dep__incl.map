@@ -1,0 +1,44 @@
+<map id="libraries/chain/include/sysio/chain/kv_config.hpp" name="libraries/chain/include/sysio/chain/kv_config.hpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="1251,5,1427,46"/>
+<area shape="rect" id="Node000002" href="$global__property__object_8hpp.html" title=" " alt="" coords="1247,94,1430,150"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1342,61,1342,93,1336,93,1336,61"/>
+<area shape="rect" id="Node000003" href="$apply__context_8cpp.html" title=" " alt="" coords="5,205,142,246"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="1232,129,986,138,675,153,373,174,249,186,154,200,127,207,126,202,153,195,248,181,373,168,675,148,986,133,1232,124"/>
+<area shape="rect" id="Node000004" href="$authorization__manager_8cpp.html" title=" " alt="" coords="165,205,344,246"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="1232,128,1063,134,845,146,602,168,358,200,325,207,324,202,357,195,601,162,845,141,1063,128,1232,122"/>
+<area shape="rect" id="Node000005" href="$controller_8cpp.html" title=" " alt="" coords="369,213,551,238"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="1232,131,930,153,746,173,563,200,501,215,500,210,562,195,746,168,929,148,1232,125"/>
+<area shape="rect" id="Node000006" href="$deep__mind_8cpp.html" title=" " alt="" coords="575,205,708,246"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="1232,132,996,154,858,174,721,200,696,207,694,202,720,195,857,169,995,149,1231,127"/>
+<area shape="rect" id="Node000007" href="$wasm__interface__private_8hpp.html" title=" " alt="" coords="732,198,919,253"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="1232,144,938,200,920,204,919,199,937,195,1231,139"/>
+<area shape="rect" id="Node000008" href="$wasm__interface_8cpp.html" title=" " alt="" coords="821,309,961,350"/>
+<area shape="poly" id="edge10_Node000002_Node000008" title=" " alt="" coords="1232,128,1171,135,1107,148,1042,169,983,200,965,218,943,247,904,310,900,307,939,245,961,215,980,196,1040,164,1105,143,1171,129,1231,122"/>
+<area shape="rect" id="Node000009" href="$sysio__contract_8cpp.html" title=" " alt="" coords="993,205,1130,246"/>
+<area shape="poly" id="edge8_Node000002_Node000009" title=" " alt="" coords="1251,158,1116,207,1114,202,1249,153"/>
+<area shape="rect" id="Node000010" href="$transaction__context_8cpp.html" title=" " alt="" coords="1154,205,1324,246"/>
+<area shape="poly" id="edge9_Node000002_Node000010" title=" " alt="" coords="1303,163,1260,207,1256,203,1300,159"/>
+<area shape="rect" id="Node000011" href="$action_8cpp.html" title=" " alt="" coords="1348,205,1533,246"/>
+<area shape="poly" id="edge11_Node000002_Node000011" title=" " alt="" coords="1378,159,1423,203,1419,207,1375,163"/>
+<area shape="rect" id="Node000012" href="$privileged_8cpp.html" title=" " alt="" coords="1557,205,1742,246"/>
+<area shape="poly" id="edge12_Node000002_Node000012" title=" " alt="" coords="1437,152,1590,202,1588,207,1436,157"/>
+<area shape="rect" id="Node000013" href="$sys-vm-oc_8cpp.html" title=" " alt="" coords="1766,205,1952,246"/>
+<area shape="poly" id="edge13_Node000002_Node000013" title=" " alt="" coords="1446,137,1593,163,1755,195,1785,202,1784,207,1754,200,1592,168,1445,143"/>
+<area shape="rect" id="Node000014" href="$executor_8cpp.html" title=" " alt="" coords="1975,205,2193,246"/>
+<area shape="poly" id="edge14_Node000002_Node000014" title=" " alt="" coords="1446,130,1684,155,1965,195,2001,202,2000,207,1964,200,1684,161,1446,135"/>
+<area shape="rect" id="Node000015" href="$sys-vm_8cpp.html" title=" " alt="" coords="2217,205,2402,246"/>
+<area shape="poly" id="edge15_Node000002_Node000015" title=" " alt="" coords="1446,124,1595,132,1785,145,1996,165,2206,195,2240,202,2239,207,2205,200,1995,171,1785,150,1595,137,1445,129"/>
+<area shape="rect" id="Node000016" href="$webassembly_2transaction_8cpp.html" title=" " alt="" coords="2426,205,2612,246"/>
+<area shape="poly" id="edge16_Node000002_Node000016" title=" " alt="" coords="1446,122,1630,126,1872,138,2143,160,2281,176,2415,195,2450,202,2449,207,2414,200,2280,181,2142,165,1871,144,1630,132,1446,127"/>
+<area shape="rect" id="Node000017" href="$state__history_2include_2sysio_2state__history_2serialization_8hpp.html" title=" " alt="" coords="2635,198,2816,253"/>
+<area shape="poly" id="edge17_Node000002_Node000017" title=" " alt="" coords="1446,120,1663,122,1956,131,2289,154,2459,172,2625,195,2636,197,2635,202,2624,200,2458,177,2288,160,1956,137,1662,127,1446,125"/>
+<area shape="rect" id="Node000021" href="$producer__plugin_8cpp.html" title=" " alt="" coords="2840,205,2998,246"/>
+<area shape="poly" id="edge21_Node000002_Node000021" title=" " alt="" coords="1446,123,1749,130,2148,144,2542,166,2705,179,2829,195,2860,202,2859,207,2828,200,2704,185,2541,171,2148,150,1749,136,1446,128"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="854,265,881,307,876,310,849,268"/>
+<area shape="rect" id="Node000018" href="$create__deltas_8cpp.html" title=" " alt="" coords="2484,309,2629,350"/>
+<area shape="poly" id="edge18_Node000017_Node000018" title=" " alt="" coords="2669,264,2590,311,2587,306,2666,259"/>
+<area shape="rect" id="Node000019" href="$trace__converter_8cpp.html" title=" " alt="" coords="2653,309,2798,350"/>
+<area shape="poly" id="edge19_Node000017_Node000019" title=" " alt="" coords="2728,269,2728,309,2723,309,2723,269"/>
+<area shape="rect" id="Node000020" href="$state__history__plugin_8cpp.html" title=" " alt="" coords="2823,301,2964,357"/>
+<area shape="poly" id="edge20_Node000017_Node000020" title=" " alt="" coords="2785,259,2850,298,2847,303,2782,264"/>
+</map>

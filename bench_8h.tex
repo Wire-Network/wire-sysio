@@ -1,0 +1,338 @@
+\doxysection{libraries/fc/secp256k1/secp256k1/src/bench.h File Reference}
+\hypertarget{bench_8h}{}\label{bench_8h}\index{libraries/fc/secp256k1/secp256k1/src/bench.h@{libraries/fc/secp256k1/secp256k1/src/bench.h}}
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include "{}sys/time.\+h"{}}\newline
+Include dependency graph for bench.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{bench_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{bench_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{bench_8h_a473b076a923ce92a97f95be4dd10d3fd}{FP\+\_\+\+EXP}}~(6)
+\item 
+\#define \mbox{\hyperlink{bench_8h_a92391c628f2c57418422a94cc8712c51}{FP\+\_\+\+MULT}}~(1000000\+LL)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{bench_8h_a75b5cae79d48e5e21e3b9dee987531c3}{print\+\_\+number}} (const \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} x)
+\item 
+void \mbox{\hyperlink{bench_8h_aabcd2ce2b43c96bd396b30f8ecb79a17}{run\+\_\+benchmark}} (char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}, void(\texorpdfstring{$\ast$}{*}benchmark)(void \texorpdfstring{$\ast$}{*}, int), void(\texorpdfstring{$\ast$}{*}setup)(void \texorpdfstring{$\ast$}{*}), void(\texorpdfstring{$\ast$}{*}teardown)(void \texorpdfstring{$\ast$}{*}, int), void \texorpdfstring{$\ast$}{*}data, int \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}, int iter)
+\item 
+int \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\+\_\+flag}} (int argc, char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}, char \texorpdfstring{$\ast$}{*}flag)
+\item 
+int \mbox{\hyperlink{bench_8h_a8e26ecdf7f0d912f5b7b017794b603bc}{have\+\_\+invalid\+\_\+args}} (int argc, char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}, char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}valid\+\_\+args, size\+\_\+t n)
+\item 
+int \mbox{\hyperlink{bench_8h_a451eb25db60dd3d4abedc8a41aecd204}{get\+\_\+iters}} (int default\+\_\+iters)
+\item 
+void \mbox{\hyperlink{bench_8h_a02fea1a81d22421b858db710e6850482}{print\+\_\+output\+\_\+table\+\_\+header\+\_\+row}} (void)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{bench_8h_a473b076a923ce92a97f95be4dd10d3fd}\index{bench.h@{bench.h}!FP\_EXP@{FP\_EXP}}
+\index{FP\_EXP@{FP\_EXP}!bench.h@{bench.h}}
+\doxysubsubsection{\texorpdfstring{FP\_EXP}{FP\_EXP}}
+{\footnotesize\ttfamily \label{bench_8h_a473b076a923ce92a97f95be4dd10d3fd} 
+\#define FP\+\_\+\+EXP~(6)}
+
+
+
+Definition at line \mbox{\hyperlink{bench_8h_source_l00021}{21}} of file \mbox{\hyperlink{bench_8h_source}{bench.\+h}}.
+
+\Hypertarget{bench_8h_a92391c628f2c57418422a94cc8712c51}\index{bench.h@{bench.h}!FP\_MULT@{FP\_MULT}}
+\index{FP\_MULT@{FP\_MULT}!bench.h@{bench.h}}
+\doxysubsubsection{\texorpdfstring{FP\_MULT}{FP\_MULT}}
+{\footnotesize\ttfamily \label{bench_8h_a92391c628f2c57418422a94cc8712c51} 
+\#define FP\+\_\+\+MULT~(1000000\+LL)}
+
+
+
+Definition at line \mbox{\hyperlink{bench_8h_source_l00022}{22}} of file \mbox{\hyperlink{bench_8h_source}{bench.\+h}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{bench_8h_a451eb25db60dd3d4abedc8a41aecd204}\index{bench.h@{bench.h}!get\_iters@{get\_iters}}
+\index{get\_iters@{get\_iters}!bench.h@{bench.h}}
+\doxysubsubsection{\texorpdfstring{get\_iters()}{get\_iters()}}
+{\footnotesize\ttfamily \label{bench_8h_a451eb25db60dd3d4abedc8a41aecd204} 
+int get\+\_\+iters (\begin{DoxyParamCaption}\item[{int}]{default\+\_\+iters}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bench_8h_source_l00154}{154}} of file \mbox{\hyperlink{bench_8h_source}{bench.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00155\ \ \ \ \ \textcolor{keywordtype}{char}*\ env\ =\ getenv(\textcolor{stringliteral}{"{}SECP256K1\_BENCH\_ITERS"{}});}
+\DoxyCodeLine{00156\ \ \ \ \ \textcolor{keywordflow}{if}\ (env)\ \{}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ strtol(env,\ NULL,\ 0);}
+\DoxyCodeLine{00158\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ default\_iters;}
+\DoxyCodeLine{00160\ \ \ \ \ \}}
+\DoxyCodeLine{00161\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=207pt]{bench_8h_a451eb25db60dd3d4abedc8a41aecd204_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{bench_8h_a11ad6602b2858a905ba935d8002639db}\index{bench.h@{bench.h}!have\_flag@{have\_flag}}
+\index{have\_flag@{have\_flag}!bench.h@{bench.h}}
+\doxysubsubsection{\texorpdfstring{have\_flag()}{have\_flag()}}
+{\footnotesize\ttfamily \label{bench_8h_a11ad6602b2858a905ba935d8002639db} 
+int have\+\_\+flag (\begin{DoxyParamCaption}\item[{int}]{argc}{, }\item[{char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{argv}{, }\item[{char \texorpdfstring{$\ast$}{*}}]{flag}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bench_8h_source_l00116}{116}} of file \mbox{\hyperlink{bench_8h_source}{bench.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00117\ \ \ \ \ \textcolor{keywordtype}{char}**\ argm\ =\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}\ +\ argc;}
+\DoxyCodeLine{00118\ \ \ \ \ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}++;}
+\DoxyCodeLine{00119\ \ \ \ \ \textcolor{keywordflow}{while}\ (\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}\ !=\ argm)\ \{}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (strcmp(*\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ flag)\ ==\ 0)\ \{}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}++;}
+\DoxyCodeLine{00124\ \ \ \ \ \}}
+\DoxyCodeLine{00125\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00126\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{bench_8h_a11ad6602b2858a905ba935d8002639db_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{bench_8h_a8e26ecdf7f0d912f5b7b017794b603bc}\index{bench.h@{bench.h}!have\_invalid\_args@{have\_invalid\_args}}
+\index{have\_invalid\_args@{have\_invalid\_args}!bench.h@{bench.h}}
+\doxysubsubsection{\texorpdfstring{have\_invalid\_args()}{have\_invalid\_args()}}
+{\footnotesize\ttfamily \label{bench_8h_a8e26ecdf7f0d912f5b7b017794b603bc} 
+int have\+\_\+invalid\+\_\+args (\begin{DoxyParamCaption}\item[{int}]{argc}{, }\item[{char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{argv}{, }\item[{char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{valid\+\_\+args}{, }\item[{size\+\_\+t}]{n}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bench_8h_source_l00132}{132}} of file \mbox{\hyperlink{bench_8h_source}{bench.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00133\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ i;}
+\DoxyCodeLine{00134\ \ \ \ \ \textcolor{keywordtype}{int}\ found\_valid;}
+\DoxyCodeLine{00135\ \ \ \ \ \textcolor{keywordtype}{char}**\ argm\ =\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}\ +\ argc;}
+\DoxyCodeLine{00136\ \ \ \ \ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}++;}
+\DoxyCodeLine{00137\ }
+\DoxyCodeLine{00138\ \ \ \ \ \textcolor{keywordflow}{while}\ (\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}\ !=\ argm)\ \{}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ found\_valid\ =\ 0;}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ n;\ i++)\ \{}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (strcmp(*\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ valid\_args[i])\ ==\ 0)\ \{}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ found\_valid\ =\ 1;\ \textcolor{comment}{/*\ user\ entered\ a\ valid\ arg\ from\ the\ list\ */}}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (found\_valid\ ==\ 0)\ \{}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;\ \textcolor{comment}{/*\ invalid\ arg\ found\ */}}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}++;}
+\DoxyCodeLine{00150\ \ \ \ \ \}}
+\DoxyCodeLine{00151\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00152\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=247pt]{bench_8h_a8e26ecdf7f0d912f5b7b017794b603bc_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{bench_8h_a75b5cae79d48e5e21e3b9dee987531c3}\index{bench.h@{bench.h}!print\_number@{print\_number}}
+\index{print\_number@{print\_number}!bench.h@{bench.h}}
+\doxysubsubsection{\texorpdfstring{print\_number()}{print\_number()}}
+{\footnotesize\ttfamily \label{bench_8h_a75b5cae79d48e5e21e3b9dee987531c3} 
+void print\+\_\+number (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}}]{x}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bench_8h_source_l00025}{25}} of file \mbox{\hyperlink{bench_8h_source}{bench.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00026\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ x\_abs,\ \mbox{\hyperlink{namespacefc_ab199a7c94624123911206db59ebe45da}{y}};}
+\DoxyCodeLine{00027\ \ \ \ \ \textcolor{keywordtype}{int}\ c,\ i,\ rounding,\ g;\ \textcolor{comment}{/*\ g\ =\ integer\ part\ size,\ c\ =\ fractional\ part\ size\ */}}
+\DoxyCodeLine{00028\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ ptr;}
+\DoxyCodeLine{00029\ \ \ \ \ \textcolor{keywordtype}{char}\ buffer[30];}
+\DoxyCodeLine{00030\ }
+\DoxyCodeLine{00031\ \ \ \ \ \textcolor{keywordflow}{if}\ (x\ ==\ \mbox{\hyperlink{stdint_8h_ab21f12f372f67b8ff0aa3432336ede67}{INT64\_MIN}})\ \{}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ Prevent\ UB.\ */}}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}ERR"{}});}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00035\ \ \ \ \ \}}
+\DoxyCodeLine{00036\ \ \ \ \ x\_abs\ =\ x\ <\ 0\ ?\ -\/x\ :\ x;}
+\DoxyCodeLine{00037\ }
+\DoxyCodeLine{00038\ \ \ \ \ \textcolor{comment}{/*\ Determine\ how\ many\ decimals\ we\ want\ to\ show\ (more\ than\ FP\_EXP\ makes\ no}}
+\DoxyCodeLine{00039\ \textcolor{comment}{\ \ \ \ \ *\ sense).\ */}}
+\DoxyCodeLine{00040\ \ \ \ \ \mbox{\hyperlink{namespacefc_ab199a7c94624123911206db59ebe45da}{y}}\ =\ x\_abs;}
+\DoxyCodeLine{00041\ \ \ \ \ c\ =\ 0;}
+\DoxyCodeLine{00042\ \ \ \ \ \textcolor{keywordflow}{while}\ (y\ >\ 0LL\ \&\&\ y\ <\ 100LL\ *\ \mbox{\hyperlink{bench_8h_a92391c628f2c57418422a94cc8712c51}{FP\_MULT}}\ \&\&\ c\ <\ \mbox{\hyperlink{bench_8h_a473b076a923ce92a97f95be4dd10d3fd}{FP\_EXP}})\ \{}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_ab199a7c94624123911206db59ebe45da}{y}}\ *=\ 10LL;}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ c++;}
+\DoxyCodeLine{00045\ \ \ \ \ \}}
+\DoxyCodeLine{00046\ }
+\DoxyCodeLine{00047\ \ \ \ \ \textcolor{comment}{/*\ Round\ to\ 'c'\ decimals.\ */}}
+\DoxyCodeLine{00048\ \ \ \ \ \mbox{\hyperlink{namespacefc_ab199a7c94624123911206db59ebe45da}{y}}\ =\ x\_abs;}
+\DoxyCodeLine{00049\ \ \ \ \ rounding\ =\ 0;}
+\DoxyCodeLine{00050\ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ c;\ i\ <\ \mbox{\hyperlink{bench_8h_a473b076a923ce92a97f95be4dd10d3fd}{FP\_EXP}};\ ++i)\ \{}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ rounding\ =\ (\mbox{\hyperlink{namespacefc_ab199a7c94624123911206db59ebe45da}{y}}\ \%\ 10)\ >=\ 5;}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_ab199a7c94624123911206db59ebe45da}{y}}\ /=\ 10;}
+\DoxyCodeLine{00053\ \ \ \ \ \}}
+\DoxyCodeLine{00054\ \ \ \ \ \mbox{\hyperlink{namespacefc_ab199a7c94624123911206db59ebe45da}{y}}\ +=\ rounding;}
+\DoxyCodeLine{00055\ }
+\DoxyCodeLine{00056\ \ \ \ \ \textcolor{comment}{/*\ Format\ and\ print\ the\ number.\ */}}
+\DoxyCodeLine{00057\ \ \ \ \ ptr\ =\ \textcolor{keyword}{sizeof}(buffer)\ -\/\ 1;}
+\DoxyCodeLine{00058\ \ \ \ \ buffer[ptr]\ =\ 0;}
+\DoxyCodeLine{00059\ \ \ \ \ g\ =\ 0;}
+\DoxyCodeLine{00060\ \ \ \ \ \textcolor{keywordflow}{if}\ (c\ !=\ 0)\ \{\ \textcolor{comment}{/*\ non\ zero\ fractional\ part\ */}}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ c;\ ++i)\ \{}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \ \ \ buffer[-\/-\/ptr]\ =\ \textcolor{charliteral}{'0'}\ +\ (\mbox{\hyperlink{namespacefc_ab199a7c94624123911206db59ebe45da}{y}}\ \%\ 10);}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_ab199a7c94624123911206db59ebe45da}{y}}\ /=\ 10;}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00065\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (c\ ==\ 0)\ \{\ \textcolor{comment}{/*\ fractional\ part\ is\ 0\ */}}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ buffer[-\/-\/ptr]\ =\ \textcolor{charliteral}{'0'};\ }
+\DoxyCodeLine{00067\ \ \ \ \ \}}
+\DoxyCodeLine{00068\ \ \ \ \ buffer[-\/-\/ptr]\ =\ \textcolor{charliteral}{'.'};}
+\DoxyCodeLine{00069\ \ \ \ \ \textcolor{keywordflow}{do}\ \{}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ buffer[-\/-\/ptr]\ =\ \textcolor{charliteral}{'0'}\ +\ (\mbox{\hyperlink{namespacefc_ab199a7c94624123911206db59ebe45da}{y}}\ \%\ 10);}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_ab199a7c94624123911206db59ebe45da}{y}}\ /=\ 10;}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ g++;}
+\DoxyCodeLine{00073\ \ \ \ \ \}\ \textcolor{keywordflow}{while}\ (y\ !=\ 0);}
+\DoxyCodeLine{00074\ \ \ \ \ \textcolor{keywordflow}{if}\ (x\ <\ 0)\ \{}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ buffer[-\/-\/ptr]\ =\ \textcolor{charliteral}{'-\/'};}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ g++;}
+\DoxyCodeLine{00077\ \ \ \ \ \}}
+\DoxyCodeLine{00078\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\%5.*s"{}},\ g,\ \&buffer[ptr]);\ \textcolor{comment}{/*\ Prints\ integer\ part\ */}}
+\DoxyCodeLine{00079\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\%-\/*s"{}},\ \mbox{\hyperlink{bench_8h_a473b076a923ce92a97f95be4dd10d3fd}{FP\_EXP}},\ \&buffer[ptr\ +\ g]);\ \textcolor{comment}{/*\ Prints\ fractional\ part\ */}}
+\DoxyCodeLine{00080\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{bench_8h_a75b5cae79d48e5e21e3b9dee987531c3_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{bench_8h_a02fea1a81d22421b858db710e6850482}\index{bench.h@{bench.h}!print\_output\_table\_header\_row@{print\_output\_table\_header\_row}}
+\index{print\_output\_table\_header\_row@{print\_output\_table\_header\_row}!bench.h@{bench.h}}
+\doxysubsubsection{\texorpdfstring{print\_output\_table\_header\_row()}{print\_output\_table\_header\_row()}}
+{\footnotesize\ttfamily \label{bench_8h_a02fea1a81d22421b858db710e6850482} 
+void print\+\_\+output\+\_\+table\+\_\+header\+\_\+row (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bench_8h_source_l00163}{163}} of file \mbox{\hyperlink{bench_8h_source}{bench.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00164\ \ \ \ \ \textcolor{keywordtype}{char}*\ bench\_str\ =\ \textcolor{stringliteral}{"{}Benchmark"{}};\ \ \ \ \ \textcolor{comment}{/*\ left\ justified\ */}}
+\DoxyCodeLine{00165\ \ \ \ \ \textcolor{keywordtype}{char}*\ min\_str\ =\ \textcolor{stringliteral}{"{}\ \ \ \ Min(us)\ \ \ \ "{}};\ \textcolor{comment}{/*\ center\ alignment\ */}}
+\DoxyCodeLine{00166\ \ \ \ \ \textcolor{keywordtype}{char}*\ avg\_str\ =\ \textcolor{stringliteral}{"{}\ \ \ \ Avg(us)\ \ \ \ "{}};}
+\DoxyCodeLine{00167\ \ \ \ \ \textcolor{keywordtype}{char}*\ max\_str\ =\ \textcolor{stringliteral}{"{}\ \ \ \ Max(us)\ \ \ \ "{}};}
+\DoxyCodeLine{00168\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\%-\/30s,\%-\/15s,\%-\/15s,\%-\/15s\(\backslash\)n"{}},\ bench\_str,\ min\_str,\ avg\_str,\ max\_str);}
+\DoxyCodeLine{00169\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{00170\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=246pt]{bench_8h_a02fea1a81d22421b858db710e6850482_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{bench_8h_aabcd2ce2b43c96bd396b30f8ecb79a17}\index{bench.h@{bench.h}!run\_benchmark@{run\_benchmark}}
+\index{run\_benchmark@{run\_benchmark}!bench.h@{bench.h}}
+\doxysubsubsection{\texorpdfstring{run\_benchmark()}{run\_benchmark()}}
+{\footnotesize\ttfamily \label{bench_8h_aabcd2ce2b43c96bd396b30f8ecb79a17} 
+void run\+\_\+benchmark (\begin{DoxyParamCaption}\item[{char \texorpdfstring{$\ast$}{*}}]{name}{, }\item[{void(\texorpdfstring{$\ast$}{*}}]{benchmark~}{)(void \texorpdfstring{$\ast$}{*}, int), }\item[{void(\texorpdfstring{$\ast$}{*}}]{setup~}{)(void \texorpdfstring{$\ast$}{*}), }\item[{void(\texorpdfstring{$\ast$}{*}}]{teardown~}{)(void \texorpdfstring{$\ast$}{*}, int), }\item[{void \texorpdfstring{$\ast$}{*}}]{data}{, }\item[{int}]{count}{, }\item[{int}]{iter}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bench_8h_source_l00082}{82}} of file \mbox{\hyperlink{bench_8h_source}{bench.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00083\ \ \ \ \ \textcolor{keywordtype}{int}\ i;}
+\DoxyCodeLine{00084\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ \mbox{\hyperlink{namespacefc_aa3ea11c18de71ec23b19c3cc571fb8ff}{min}}\ =\ \mbox{\hyperlink{stdint_8h_ad0d744f05898e32d01f73f8af3cd2071}{INT64\_MAX}};}
+\DoxyCodeLine{00085\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ sum\ =\ 0;}
+\DoxyCodeLine{00086\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ max\ =\ 0;}
+\DoxyCodeLine{00087\ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}};\ i++)\ \{}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ begin,\ total;}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (setup\ !=\ NULL)\ \{}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ \ \ \ setup(data);}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ begin\ =\ gettime\_i64();}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacebenchmark_compile_ad29a9c658be0bfc9585b6e6eedd783c4}{benchmark}}(data,\ iter);}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ total\ =\ gettime\_i64()\ -\/\ begin;}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (teardown\ !=\ NULL)\ \{}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \ \ \ teardown(data,\ iter);}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (total\ <\ min)\ \{}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_aa3ea11c18de71ec23b19c3cc571fb8ff}{min}}\ =\ total;}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (total\ >\ max)\ \{}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \ \ \ max\ =\ total;}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ sum\ +=\ total;}
+\DoxyCodeLine{00105\ \ \ \ \ \}}
+\DoxyCodeLine{00106\ \ \ \ \ \textcolor{comment}{/*\ ','\ is\ used\ as\ a\ column\ delimiter\ */}}
+\DoxyCodeLine{00107\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\%-\/30s,\ "{}},\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}});}
+\DoxyCodeLine{00108\ \ \ \ \ \mbox{\hyperlink{bench_8h_a75b5cae79d48e5e21e3b9dee987531c3}{print\_number}}(min\ *\ \mbox{\hyperlink{bench_8h_a92391c628f2c57418422a94cc8712c51}{FP\_MULT}}\ /\ iter);}
+\DoxyCodeLine{00109\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\ \ \ ,\ "{}});}
+\DoxyCodeLine{00110\ \ \ \ \ \mbox{\hyperlink{bench_8h_a75b5cae79d48e5e21e3b9dee987531c3}{print\_number}}(((sum\ *\ \mbox{\hyperlink{bench_8h_a92391c628f2c57418422a94cc8712c51}{FP\_MULT}})\ /\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}})\ /\ iter);}
+\DoxyCodeLine{00111\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\ \ \ ,\ "{}});}
+\DoxyCodeLine{00112\ \ \ \ \ \mbox{\hyperlink{bench_8h_a75b5cae79d48e5e21e3b9dee987531c3}{print\_number}}(max\ *\ \mbox{\hyperlink{bench_8h_a92391c628f2c57418422a94cc8712c51}{FP\_MULT}}\ /\ iter);}
+\DoxyCodeLine{00113\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{00114\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=271pt]{bench_8h_aabcd2ce2b43c96bd396b30f8ecb79a17_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{bench_8h_aabcd2ce2b43c96bd396b30f8ecb79a17_icgraph}
+\end{center}
+\end{figure}

@@ -1,0 +1,75 @@
+\doxysection{fc\+::reflector\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>} Struct Template Reference}
+\hypertarget{structfc_1_1reflector}{}\label{structfc_1_1reflector}\index{fc::reflector$<$ T $>$@{fc::reflector$<$ T $>$}}
+
+
+defines visit functions for T Unless this is specialized, visit() will not be defined for T.  
+
+
+
+
+{\ttfamily \#include $<$reflect.\+hpp$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{structfc_1_1reflector_a2ab82a950a3f3d5ea6884428e0d4b442}{type}}
+\item 
+typedef \mbox{\hyperlink{structfc_1_1false__type}{fc\+::false\+\_\+type}} \mbox{\hyperlink{structfc_1_1reflector_a7b958f4c6630e69f0157476481446b4c}{is\+\_\+defined}}
+\item 
+typedef \mbox{\hyperlink{structfc_1_1false__type}{fc\+::false\+\_\+type}} \mbox{\hyperlink{structfc_1_1reflector_ab955c8262ae2b8dfb8db04fd840b5f6a}{is\+\_\+enum}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$\newline
+struct fc\+::reflector$<$ T $>$}
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em T} & -\/ the type that will be visited.\\
+\hline
+\end{DoxyTemplParams}
+The \doxylink{reflect_8hpp_a2ace850e636b1ca0b18fe3177e413d99}{FC\+\_\+\+REFLECT(\+TYPE,\+MEMBERS)} or FC\+\_\+\+STATIC\+\_\+\+REFLECT\+\_\+\+DERIVED(\+TYPE,\+BASES,\+MEMBERS) macro is used to specialize this class for your type. 
+
+Definition at line \mbox{\hyperlink{reflect_8hpp_source_l00033}{33}} of file \mbox{\hyperlink{reflect_8hpp_source}{reflect.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{structfc_1_1reflector_a7b958f4c6630e69f0157476481446b4c}\index{fc::reflector$<$ T $>$@{fc::reflector$<$ T $>$}!is\_defined@{is\_defined}}
+\index{is\_defined@{is\_defined}!fc::reflector$<$ T $>$@{fc::reflector$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{is\_defined}{is\_defined}}
+{\footnotesize\ttfamily \label{structfc_1_1reflector_a7b958f4c6630e69f0157476481446b4c} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{structfc_1_1false__type}{fc\+::false\+\_\+type}} \mbox{\hyperlink{structfc_1_1reflector}{fc\+::reflector}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::is\+\_\+defined}
+
+
+
+Definition at line \mbox{\hyperlink{reflect_8hpp_source_l00035}{35}} of file \mbox{\hyperlink{reflect_8hpp_source}{reflect.\+hpp}}.
+
+\Hypertarget{structfc_1_1reflector_ab955c8262ae2b8dfb8db04fd840b5f6a}\index{fc::reflector$<$ T $>$@{fc::reflector$<$ T $>$}!is\_enum@{is\_enum}}
+\index{is\_enum@{is\_enum}!fc::reflector$<$ T $>$@{fc::reflector$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{is\_enum}{is\_enum}}
+{\footnotesize\ttfamily \label{structfc_1_1reflector_ab955c8262ae2b8dfb8db04fd840b5f6a} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{structfc_1_1false__type}{fc\+::false\+\_\+type}} \mbox{\hyperlink{structfc_1_1reflector}{fc\+::reflector}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::is\+\_\+enum}
+
+
+
+Definition at line \mbox{\hyperlink{reflect_8hpp_source_l00036}{36}} of file \mbox{\hyperlink{reflect_8hpp_source}{reflect.\+hpp}}.
+
+\Hypertarget{structfc_1_1reflector_a2ab82a950a3f3d5ea6884428e0d4b442}\index{fc::reflector$<$ T $>$@{fc::reflector$<$ T $>$}!type@{type}}
+\index{type@{type}!fc::reflector$<$ T $>$@{fc::reflector$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{type}{type}}
+{\footnotesize\ttfamily \label{structfc_1_1reflector_a2ab82a950a3f3d5ea6884428e0d4b442} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{structfc_1_1reflector}{fc\+::reflector}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::type}
+
+
+
+Definition at line \mbox{\hyperlink{reflect_8hpp_source_l00034}{34}} of file \mbox{\hyperlink{reflect_8hpp_source}{reflect.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/reflect/\mbox{\hyperlink{reflect_8hpp}{reflect.\+hpp}}\end{DoxyCompactItemize}

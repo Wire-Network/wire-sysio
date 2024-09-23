@@ -1,0 +1,14 @@
+<map id="Timing::logRatePerSecond" name="Timing::logRatePerSecond">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,55,183,80"/>
+<area shape="rect" id="Node000002" href="$struct_timing_1_1_timer.html#ae6ed9f702858e72d8a5b3df42b35537a" title=" " alt="" coords="231,5,430,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="159,51,250,32,251,37,160,57"/>
+<area shape="rect" id="Node000005" href="$struct_timing_1_1_timer.html#a3c7d59a2483864e161bd18d0b66e4d06" title=" " alt="" coords="241,55,420,80"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="183,65,226,65,226,70,183,70"/>
+<area shape="rect" id="Node000006" href="$namespace_log.html#a83926634a3916d0927abca4aca58a60a" title=" " alt="" coords="291,104,370,130"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="160,78,276,103,275,108,159,84"/>
+<area shape="rect" id="Node000003" href="$struct_timing_1_1_timer.html#ac760ddd9eabf7c5b14bba1e792ec5ed6" title=" " alt="" coords="478,31,686,56"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="431,26,463,29,462,34,430,31"/>
+<area shape="rect" id="Node000004" href="$struct_timing_1_1_timer.html#a4603a572adbb48e1cadcf95c5846de75" title=" " alt="" coords="734,31,869,56"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="687,41,719,41,719,46,687,46"/>
+<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="420,56,462,52,463,58,420,62"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="fc::detail::log_message_impl" name="fc::detail::log_message_impl">
+<area shape="rect" id="Node000001" title=" " alt="" coords="69,94,257,120"/>
+<area shape="rect" id="Node000002" href="$classfc_1_1log__context.html" title="provides information about where and when a log message was generated." alt="" coords="5,5,113,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="82,40,112,68,145,91,142,96,109,72,78,44"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="136,5,190,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="166,47,166,94,160,94,160,47"/>
+<area shape="rect" id="Node000004" href="$classfc_1_1variant__object.html" title="An order&#45;preserving dictionary of variants." alt="" coords="214,5,336,31"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="249,43,211,72,181,95,177,91,208,68,246,39"/>
+</map>

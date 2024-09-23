@@ -1,0 +1,225 @@
+\doxysection{testing\+::Cardinality Class Reference}
+\hypertarget{classtesting_1_1_cardinality}{}\label{classtesting_1_1_cardinality}\index{testing::Cardinality@{testing::Cardinality}}
+
+
+{\ttfamily \#include $<$gmock-\/cardinalities.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1_cardinality_ab4b4066d7f5e9e3c7f851e49ab892cd9}{Cardinality}} ()
+\item 
+\mbox{\hyperlink{classtesting_1_1_cardinality_a10aed768b8a22d27110587444733771f}{Cardinality}} (const \mbox{\hyperlink{classtesting_1_1_cardinality_interface}{Cardinality\+Interface}} \texorpdfstring{$\ast$}{*}impl)
+\item 
+int \mbox{\hyperlink{classtesting_1_1_cardinality_ac1785ee5c466c2524f36b9ffb5f46c79}{Conservative\+Lower\+Bound}} () const
+\item 
+int \mbox{\hyperlink{classtesting_1_1_cardinality_acb42e3683f99b986f3ac538b5eefbc31}{Conservative\+Upper\+Bound}} () const
+\item 
+bool \mbox{\hyperlink{classtesting_1_1_cardinality_a6c5e2bd2887ff06e20e6fcc4255a0c1c}{Is\+Satisfied\+By\+Call\+Count}} (int call\+\_\+count) const
+\item 
+bool \mbox{\hyperlink{classtesting_1_1_cardinality_a57128ba46931e24a2b39af177e3346f8}{Is\+Saturated\+By\+Call\+Count}} (int call\+\_\+count) const
+\item 
+bool \mbox{\hyperlink{classtesting_1_1_cardinality_a9b6a55179f6dcc8fadec26e6d93f3e88}{Is\+Over\+Saturated\+By\+Call\+Count}} (int call\+\_\+count) const
+\item 
+void \mbox{\hyperlink{classtesting_1_1_cardinality_a2955f4b65022c422f56e79b767c4fa71}{Describe\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}os) const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static void \mbox{\hyperlink{classtesting_1_1_cardinality_a7cbea339e2f3072a98367e087aa296e8}{Describe\+Actual\+Call\+Count\+To}} (int actual\+\_\+call\+\_\+count, \+::std\+::ostream \texorpdfstring{$\ast$}{*}os)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{gmock-cardinalities_8h_source_l00083}{83}} of file \mbox{\hyperlink{gmock-cardinalities_8h_source}{gmock-\/cardinalities.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1_cardinality_ab4b4066d7f5e9e3c7f851e49ab892cd9}\index{testing::Cardinality@{testing::Cardinality}!Cardinality@{Cardinality}}
+\index{Cardinality@{Cardinality}!testing::Cardinality@{testing::Cardinality}}
+\doxysubsubsection{\texorpdfstring{Cardinality()}{Cardinality()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classtesting_1_1_cardinality_ab4b4066d7f5e9e3c7f851e49ab892cd9} 
+testing\+::\+Cardinality\+::\+Cardinality (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-cardinalities_8h_source_l00087}{87}} of file \mbox{\hyperlink{gmock-cardinalities_8h_source}{gmock-\/cardinalities.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00087\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1_cardinality_a10aed768b8a22d27110587444733771f}\index{testing::Cardinality@{testing::Cardinality}!Cardinality@{Cardinality}}
+\index{Cardinality@{Cardinality}!testing::Cardinality@{testing::Cardinality}}
+\doxysubsubsection{\texorpdfstring{Cardinality()}{Cardinality()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classtesting_1_1_cardinality_a10aed768b8a22d27110587444733771f} 
+testing\+::\+Cardinality\+::\+Cardinality (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classtesting_1_1_cardinality_interface}{Cardinality\+Interface}} \texorpdfstring{$\ast$}{*}}]{impl}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-cardinalities_8h_source_l00090}{90}} of file \mbox{\hyperlink{gmock-cardinalities_8h_source}{gmock-\/cardinalities.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00090\ :\ impl\_(impl)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1_cardinality_ac1785ee5c466c2524f36b9ffb5f46c79}\index{testing::Cardinality@{testing::Cardinality}!ConservativeLowerBound@{ConservativeLowerBound}}
+\index{ConservativeLowerBound@{ConservativeLowerBound}!testing::Cardinality@{testing::Cardinality}}
+\doxysubsubsection{\texorpdfstring{ConservativeLowerBound()}{ConservativeLowerBound()}}
+{\footnotesize\ttfamily \label{classtesting_1_1_cardinality_ac1785ee5c466c2524f36b9ffb5f46c79} 
+int testing\+::\+Cardinality\+::\+Conservative\+Lower\+Bound (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-cardinalities_8h_source_l00094}{94}} of file \mbox{\hyperlink{gmock-cardinalities_8h_source}{gmock-\/cardinalities.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00094\ \{\ \textcolor{keywordflow}{return}\ impl\_-\/>ConservativeLowerBound();\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1_cardinality_ac1785ee5c466c2524f36b9ffb5f46c79_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1_cardinality_acb42e3683f99b986f3ac538b5eefbc31}\index{testing::Cardinality@{testing::Cardinality}!ConservativeUpperBound@{ConservativeUpperBound}}
+\index{ConservativeUpperBound@{ConservativeUpperBound}!testing::Cardinality@{testing::Cardinality}}
+\doxysubsubsection{\texorpdfstring{ConservativeUpperBound()}{ConservativeUpperBound()}}
+{\footnotesize\ttfamily \label{classtesting_1_1_cardinality_acb42e3683f99b986f3ac538b5eefbc31} 
+int testing\+::\+Cardinality\+::\+Conservative\+Upper\+Bound (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-cardinalities_8h_source_l00095}{95}} of file \mbox{\hyperlink{gmock-cardinalities_8h_source}{gmock-\/cardinalities.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00095\ \{\ \textcolor{keywordflow}{return}\ impl\_-\/>ConservativeUpperBound();\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1_cardinality_acb42e3683f99b986f3ac538b5eefbc31_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1_cardinality_a7cbea339e2f3072a98367e087aa296e8}\index{testing::Cardinality@{testing::Cardinality}!DescribeActualCallCountTo@{DescribeActualCallCountTo}}
+\index{DescribeActualCallCountTo@{DescribeActualCallCountTo}!testing::Cardinality@{testing::Cardinality}}
+\doxysubsubsection{\texorpdfstring{DescribeActualCallCountTo()}{DescribeActualCallCountTo()}}
+{\footnotesize\ttfamily \label{classtesting_1_1_cardinality_a7cbea339e2f3072a98367e087aa296e8} 
+void testing\+::\+Cardinality\+::\+Describe\+Actual\+Call\+Count\+To (\begin{DoxyParamCaption}\item[{int}]{actual\+\_\+call\+\_\+count}{, }\item[{\+::std\+::ostream \texorpdfstring{$\ast$}{*}}]{os}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-cardinalities_8cc_source_l00130}{130}} of file \mbox{\hyperlink{gmock-cardinalities_8cc_source}{gmock-\/cardinalities.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00132\ \ \ \textcolor{keywordflow}{if}\ (actual\_call\_count\ >\ 0)\ \{}
+\DoxyCodeLine{00133\ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}called\ "{}}\ <<\ FormatTimes(actual\_call\_count);}
+\DoxyCodeLine{00134\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00135\ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}never\ called"{}};}
+\DoxyCodeLine{00136\ \ \ \}}
+\DoxyCodeLine{00137\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1_cardinality_a7cbea339e2f3072a98367e087aa296e8_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1_cardinality_a2955f4b65022c422f56e79b767c4fa71}\index{testing::Cardinality@{testing::Cardinality}!DescribeTo@{DescribeTo}}
+\index{DescribeTo@{DescribeTo}!testing::Cardinality@{testing::Cardinality}}
+\doxysubsubsection{\texorpdfstring{DescribeTo()}{DescribeTo()}}
+{\footnotesize\ttfamily \label{classtesting_1_1_cardinality_a2955f4b65022c422f56e79b767c4fa71} 
+void testing\+::\+Cardinality\+::\+Describe\+To (\begin{DoxyParamCaption}\item[{\+::std\+::ostream \texorpdfstring{$\ast$}{*}}]{os}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-cardinalities_8h_source_l00115}{115}} of file \mbox{\hyperlink{gmock-cardinalities_8h_source}{gmock-\/cardinalities.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00115\ \{\ impl\_-\/>DescribeTo(os);\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1_cardinality_a2955f4b65022c422f56e79b767c4fa71_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1_cardinality_a9b6a55179f6dcc8fadec26e6d93f3e88}\index{testing::Cardinality@{testing::Cardinality}!IsOverSaturatedByCallCount@{IsOverSaturatedByCallCount}}
+\index{IsOverSaturatedByCallCount@{IsOverSaturatedByCallCount}!testing::Cardinality@{testing::Cardinality}}
+\doxysubsubsection{\texorpdfstring{IsOverSaturatedByCallCount()}{IsOverSaturatedByCallCount()}}
+{\footnotesize\ttfamily \label{classtesting_1_1_cardinality_a9b6a55179f6dcc8fadec26e6d93f3e88} 
+bool testing\+::\+Cardinality\+::\+Is\+Over\+Saturated\+By\+Call\+Count (\begin{DoxyParamCaption}\item[{int}]{call\+\_\+count}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-cardinalities_8h_source_l00109}{109}} of file \mbox{\hyperlink{gmock-cardinalities_8h_source}{gmock-\/cardinalities.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00110\ \ \ \ \ \textcolor{keywordflow}{return}\ impl\_-\/>IsSaturatedByCallCount(call\_count)\ \&\&}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ !impl\_-\/>IsSatisfiedByCallCount(call\_count);}
+\DoxyCodeLine{00112\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1_cardinality_a6c5e2bd2887ff06e20e6fcc4255a0c1c}\index{testing::Cardinality@{testing::Cardinality}!IsSatisfiedByCallCount@{IsSatisfiedByCallCount}}
+\index{IsSatisfiedByCallCount@{IsSatisfiedByCallCount}!testing::Cardinality@{testing::Cardinality}}
+\doxysubsubsection{\texorpdfstring{IsSatisfiedByCallCount()}{IsSatisfiedByCallCount()}}
+{\footnotesize\ttfamily \label{classtesting_1_1_cardinality_a6c5e2bd2887ff06e20e6fcc4255a0c1c} 
+bool testing\+::\+Cardinality\+::\+Is\+Satisfied\+By\+Call\+Count (\begin{DoxyParamCaption}\item[{int}]{call\+\_\+count}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-cardinalities_8h_source_l00098}{98}} of file \mbox{\hyperlink{gmock-cardinalities_8h_source}{gmock-\/cardinalities.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00099\ \ \ \ \ \textcolor{keywordflow}{return}\ impl\_-\/>IsSatisfiedByCallCount(call\_count);}
+\DoxyCodeLine{00100\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1_cardinality_a57128ba46931e24a2b39af177e3346f8}\index{testing::Cardinality@{testing::Cardinality}!IsSaturatedByCallCount@{IsSaturatedByCallCount}}
+\index{IsSaturatedByCallCount@{IsSaturatedByCallCount}!testing::Cardinality@{testing::Cardinality}}
+\doxysubsubsection{\texorpdfstring{IsSaturatedByCallCount()}{IsSaturatedByCallCount()}}
+{\footnotesize\ttfamily \label{classtesting_1_1_cardinality_a57128ba46931e24a2b39af177e3346f8} 
+bool testing\+::\+Cardinality\+::\+Is\+Saturated\+By\+Call\+Count (\begin{DoxyParamCaption}\item[{int}]{call\+\_\+count}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-cardinalities_8h_source_l00103}{103}} of file \mbox{\hyperlink{gmock-cardinalities_8h_source}{gmock-\/cardinalities.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00104\ \ \ \ \ \textcolor{keywordflow}{return}\ impl\_-\/>IsSaturatedByCallCount(call\_count);}
+\DoxyCodeLine{00105\ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/include/gmock/\mbox{\hyperlink{gmock-cardinalities_8h}{gmock-\/cardinalities.\+h}}\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/src/\mbox{\hyperlink{gmock-cardinalities_8cc}{gmock-\/cardinalities.\+cc}}\end{DoxyCompactItemize}

@@ -1,0 +1,20 @@
+<map id="sysio::state_history_plugin_impl::session::send_update" name="sysio::state_history_plugin_impl::session::send_update">
+<area shape="rect" id="Node000001" title=" " alt="" coords="466,157,612,213"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1state__history__plugin__impl_1_1session.html#a57b7afe6688f1c54848a58349a45047c" title=" " alt="" coords="254,5,400,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="501,148,462,111,417,75,397,64,399,59,419,71,465,107,504,144"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1state__history__plugin__impl_1_1session.html#a3f2b52fad830aec966bcf5a7bc84ae2a" title=" " alt="" coords="254,85,400,141"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="451,158,400,141,401,135,452,153"/>
+<area shape="rect" id="Node000004" href="$structsysio_1_1state__history__plugin__impl_1_1session.html#a75102a1a12cdf641267a4ad44813503a" title=" " alt="" coords="236,165,418,206"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="450,197,419,197,419,191,450,191"/>
+<area shape="rect" id="Node000008" href="$structsysio_1_1state__history__plugin__impl_1_1session.html#aa4fee32d71ab41e65315338411c3748c" title=" " alt="" coords="254,229,400,285"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="452,217,401,235,400,230,451,212"/>
+<area shape="rect" id="Node000009" href="$structsysio_1_1state__history__plugin__impl_1_1session.html#a5e595a743feb07936a8ddba0131bc856" title=" " alt="" coords="254,309,400,365"/>
+<area shape="poly" id="edge9_Node000001_Node000009" title=" " alt="" coords="504,226,465,264,419,299,399,311,397,307,417,295,462,260,501,222"/>
+<area shape="poly" id="edge7_Node000004_Node000001" title=" " alt="" coords="434,174,466,174,466,179,434,179"/>
+<area shape="rect" id="Node000005" href="$structsysio_1_1state__history__plugin__impl_1_1session.html#a8a04f269bddae7be304148383eb5f841" title=" " alt="" coords="23,85,170,141"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="244,162,170,139,171,134,246,157"/>
+<area shape="rect" id="Node000006" href="$structsysio_1_1state__history__plugin__impl_1_1session.html#a43d48af2140f59121b87b1cb59a83368" title=" " alt="" coords="5,165,188,206"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="220,188,188,188,188,182,220,182"/>
+<area shape="rect" id="Node000007" href="$structsysio_1_1state__history__plugin__impl_1_1session.html#ac14c4a6544d49506a065e86c0f3bf2b3" title=" " alt="" coords="5,230,188,271"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="239,213,172,232,170,227,238,208"/>
+</map>

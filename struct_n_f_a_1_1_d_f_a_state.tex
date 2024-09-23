@@ -1,0 +1,60 @@
+\doxysection{NFA\+::DFAState Struct Reference}
+\hypertarget{struct_n_f_a_1_1_d_f_a_state}{}\label{struct_n_f_a_1_1_d_f_a_state}\index{NFA::DFAState@{NFA::DFAState}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_n_f_a_1_1_d_f_a_state_accd20385316bff5b350d734de429e5cc}{DFAState}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{State\+Index}} \mbox{\hyperlink{struct_n_f_a_1_1_d_f_a_state_a083307996063d9b16394c352067d7a42}{next\+State\+By\+Char}} \mbox{[}256\mbox{]}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{_n_f_a_8cpp_source_l00078}{78}} of file \mbox{\hyperlink{_n_f_a_8cpp_source}{NFA.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{struct_n_f_a_1_1_d_f_a_state_accd20385316bff5b350d734de429e5cc}\index{NFA::DFAState@{NFA::DFAState}!DFAState@{DFAState}}
+\index{DFAState@{DFAState}!NFA::DFAState@{NFA::DFAState}}
+\doxysubsubsection{\texorpdfstring{DFAState()}{DFAState()}}
+{\footnotesize\ttfamily \label{struct_n_f_a_1_1_d_f_a_state_accd20385316bff5b350d734de429e5cc} 
+NFA\+::\+DFAState\+::\+DFAState (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_n_f_a_8cpp_source_l00081}{81}} of file \mbox{\hyperlink{_n_f_a_8cpp_source}{NFA.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ charIndex\ =\ 0;charIndex\ <\ 256;++charIndex)}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_n_f_a_1_1_d_f_a_state_a083307996063d9b16394c352067d7a42}{nextStateByChar}}[charIndex]\ =\ \mbox{\hyperlink{namespace_n_f_a_ad9fb95d6afb96fea8750c3543ee293a1ac83c0f7e053c5efc232f432bba1ab6c6}{unmatchedCharacterTerminal}}\ |\ \mbox{\hyperlink{namespace_n_f_a_ad9fb95d6afb96fea8750c3543ee293a1ab7afa25e880146b8ce78efc4cb221274}{edgeDoesntConsumeInputFlag}};}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_n_f_a_1_1_d_f_a_state_a083307996063d9b16394c352067d7a42}\index{NFA::DFAState@{NFA::DFAState}!nextStateByChar@{nextStateByChar}}
+\index{nextStateByChar@{nextStateByChar}!NFA::DFAState@{NFA::DFAState}}
+\doxysubsubsection{\texorpdfstring{nextStateByChar}{nextStateByChar}}
+{\footnotesize\ttfamily \label{struct_n_f_a_1_1_d_f_a_state_a083307996063d9b16394c352067d7a42} 
+\mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{State\+Index}} NFA\+::\+DFAState\+::next\+State\+By\+Char\mbox{[}256\mbox{]}}
+
+
+
+Definition at line \mbox{\hyperlink{_n_f_a_8cpp_source_l00080}{80}} of file \mbox{\hyperlink{_n_f_a_8cpp_source}{NFA.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/wasm-\/jit/\+Source/\+WAST/\mbox{\hyperlink{_n_f_a_8cpp}{NFA.\+cpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,7 @@
+<map id="websocketpp::connection::close" name="websocketpp::connection::close">
+<area shape="rect" id="Node000001" title="Close the connection." alt="" coords="223,39,392,79"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1connection.html#a525947d8d33ee1e410d02706246ffe94" title=" " alt="" coords="5,5,175,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="207,46,175,41,175,36,208,41"/>
+<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1connection.html#a29900da403dbafab8095c0989104be90" title="Add a message to the outgoing send queue." alt="" coords="5,71,175,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="208,76,175,81,175,76,207,71"/>
+</map>

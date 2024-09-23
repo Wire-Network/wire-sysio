@@ -1,0 +1,75 @@
+\doxysection{security.\+cpp}
+\hypertarget{security_8cpp_source}{}\label{security_8cpp_source}\index{libraries/fc/vendor/websocketpp/test/transport/asio/security.cpp@{libraries/fc/vendor/websocketpp/test/transport/asio/security.cpp}}
+\mbox{\hyperlink{security_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2015,\ Peter\ Thorson.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00004}00004\ \textcolor{comment}{\ *\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00005}00005\ \textcolor{comment}{\ *\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are\ met:}}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00006}00006\ \textcolor{comment}{\ *\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00007}00007\ \textcolor{comment}{\ *\ \ \ \ \ \ \ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00008}00008\ \textcolor{comment}{\ *\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00009}00009\ \textcolor{comment}{\ *\ \ \ \ \ \ \ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer\ in\ the}}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00010}00010\ \textcolor{comment}{\ *\ \ \ \ \ \ \ documentation\ and/or\ other\ materials\ provided\ with\ the\ distribution.}}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00011}00011\ \textcolor{comment}{\ *\ \ \ \ \ *\ Neither\ the\ name\ of\ the\ WebSocket++\ Project\ nor\ the}}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00012}00012\ \textcolor{comment}{\ *\ \ \ \ \ \ \ names\ of\ its\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products}}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00013}00013\ \textcolor{comment}{\ *\ \ \ \ \ \ \ derived\ from\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00014}00014\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00015}00015\ \textcolor{comment}{\ *\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS\ "{}AS\ IS"{}}}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00016}00016\ \textcolor{comment}{\ *\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ THE}}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00017}00017\ \textcolor{comment}{\ *\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR\ A\ PARTICULAR\ PURPOSE}}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00018}00018\ \textcolor{comment}{\ *\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ PETER\ THORSON\ BE\ LIABLE\ FOR\ ANY}}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00019}00019\ \textcolor{comment}{\ *\ DIRECT,\ INDIRECT,\ INCIDENTAL,\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES}}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00020}00020\ \textcolor{comment}{\ *\ (INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;}}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00021}00021\ \textcolor{comment}{\ *\ LOSS\ OF\ USE,\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND}}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00022}00022\ \textcolor{comment}{\ *\ ON\ ANY\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00023}00023\ \textcolor{comment}{\ *\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE\ OF\ THIS}}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00024}00024\ \textcolor{comment}{\ *\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00025}00025\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00026}00026\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00027}00027\ \textcolor{comment}{//\#define\ BOOST\_TEST\_DYN\_LINK}}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00028}\mbox{\hyperlink{security_8cpp_a6b2a3852db8bb19ab6909bac01859985}{00028}}\ \textcolor{preprocessor}{\#define\ BOOST\_TEST\_MODULE\ transport\_asio\_base}}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00029}00029\ \textcolor{preprocessor}{\#include\ <boost/test/unit\_test.hpp>}}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00031}00031\ \textcolor{preprocessor}{\#include\ <iostream>}}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00033}00033\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{type__traits_8hpp}{websocketpp/common/type\_traits.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00035}00035\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{transport_2asio_2security_2none_8hpp}{websocketpp/transport/asio/security/none.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00036}00036\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{tls_8hpp}{websocketpp/transport/asio/security/tls.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00038}00038\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ base>}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00039}\mbox{\hyperlink{structdummy__con}{00039}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structdummy__con}{dummy\_con}}\ :\ \textcolor{keyword}{public}\ base\ \{}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00040}\mbox{\hyperlink{structdummy__con_af921f87ae93817faa94cd48085a39ca1}{00040}}\ \ \ \ \ websocketpp::lib::error\_code\ \mbox{\hyperlink{structdummy__con_af921f87ae93817faa94cd48085a39ca1}{test}}()\ \{}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00041}00041\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ this-\/>translate\_ec(websocketpp::lib::asio::error\_code());}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00042}00042\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00043}00043\ \};}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00045}\mbox{\hyperlink{security_8cpp_a97b65c98d81d6e4bfabc28a932dd7260}{00045}}\ \mbox{\hyperlink{security_8cpp_a97b65c98d81d6e4bfabc28a932dd7260}{BOOST\_AUTO\_TEST\_CASE}}(\ translated\_ec\_none\ )\ \{}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00046}00046\ \ \ \ \ \mbox{\hyperlink{structdummy__con}{dummy\_con<websocketpp::transport::asio::basic\_socket::connection>}}\ tscon;}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00048}00048\ \ \ \ \ \textcolor{comment}{//\ If\ the\ current\ configuration\ settings\ result\ in\ the\ library\ error\ type\ and\ the\ asio}}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00049}00049\ \ \ \ \ \textcolor{comment}{//\ error\ type\ being\ the\ same,\ then\ the\ code\ should\ pass\ through\ natively.\ Otherwise}}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00050}00050\ \ \ \ \ \textcolor{comment}{//\ we\ should\ get\ a\ generic\ pass\ through\ error.}}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00051}00051\ \ \ \ \ \textcolor{keywordflow}{if}(websocketpp::lib::is\_same<websocketpp::lib::error\_code,websocketpp::lib::asio::error\_code>::value)\ \{}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00052}00052\ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ tscon.\mbox{\hyperlink{structdummy__con_af921f87ae93817faa94cd48085a39ca1}{test}}(),\ websocketpp::lib::error\_code()\ );}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00053}00053\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00054}00054\ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ tscon.\mbox{\hyperlink{structdummy__con_af921f87ae93817faa94cd48085a39ca1}{test}}(),\ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1error_a7e7e335d77a9007c14af4d941a2baa93}{websocketpp::transport::error::make\_error\_code}}(\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0a6a7cb8ef776c9eabe2324a529e991732}{websocketpp::transport::error::pass\_through}})\ );}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00055}00055\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00056}00056\ \}}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00058}\mbox{\hyperlink{security_8cpp_ac081dcda1da88931c62d3dda523d612d}{00058}}\ \mbox{\hyperlink{security_8cpp_a97b65c98d81d6e4bfabc28a932dd7260}{BOOST\_AUTO\_TEST\_CASE}}(\ translated\_ec\_tls\ )\ \{}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00059}00059\ \ \ \ \ \mbox{\hyperlink{structdummy__con}{dummy\_con<websocketpp::transport::asio::tls\_socket::connection>}}\ tscon;}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00061}00061\ \ \ \ \ \textcolor{comment}{//\ If\ the\ current\ configuration\ settings\ result\ in\ the\ library\ error\ type\ and\ the\ asio}}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00062}00062\ \ \ \ \ \textcolor{comment}{//\ error\ type\ being\ the\ same,\ then\ the\ code\ should\ pass\ through\ natively.\ Otherwise}}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00063}00063\ \ \ \ \ \textcolor{comment}{//\ we\ should\ get\ a\ generic\ pass\ through\ error.}}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00064}00064\ \ \ \ \ \textcolor{keywordflow}{if}(websocketpp::lib::is\_same<websocketpp::lib::error\_code,websocketpp::lib::asio::error\_code>::value)\ \{}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00065}00065\ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ tscon.\mbox{\hyperlink{structdummy__con_af921f87ae93817faa94cd48085a39ca1}{test}}(),\ websocketpp::lib::error\_code()\ );}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00066}00066\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00067}00067\ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ tscon.\mbox{\hyperlink{structdummy__con_af921f87ae93817faa94cd48085a39ca1}{test}}(),\ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1error_a7e7e335d77a9007c14af4d941a2baa93}{websocketpp::transport::error::make\_error\_code}}(\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0a6a7cb8ef776c9eabe2324a529e991732}{websocketpp::transport::error::pass\_through}})\ );}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00068}00068\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{security_8cpp_source_l00069}00069\ \}}
+
+\end{DoxyCode}

@@ -1,0 +1,142 @@
+\doxysection{libraries/sys-\/vm/tests/max\+\_\+mutable\+\_\+globals\+\_\+tests.cpp File Reference}
+\hypertarget{max__mutable__globals__tests_8cpp}{}\label{max__mutable__globals__tests_8cpp}\index{libraries/sys-\/vm/tests/max\_mutable\_globals\_tests.cpp@{libraries/sys-\/vm/tests/max\_mutable\_globals\_tests.cpp}}
+{\ttfamily \#include $<$sysio/vm/backend.\+hpp$>$}\newline
+{\ttfamily \#include "{}utils.\+hpp"{}}\newline
+{\ttfamily \#include $<$catch2/catch.\+hpp$>$}\newline
+Include dependency graph for max\+\_\+mutable\+\_\+globals\+\_\+tests.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{max__mutable__globals__tests_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{max__mutable__globals__tests_8cpp_ab3970588134b544fd070f116c29d31ef}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Test max\+\_\+mutable\+\_\+global\+\_\+bytes default"{}, "{}\mbox{[}max\+\_\+mutable\+\_\+global\+\_\+bytes\+\_\+test\mbox{]}"{})
+\item 
+\mbox{\hyperlink{max__mutable__globals__tests_8cpp_ae9a865cd90b2cfb05e3fad74c02274db}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Test max\+\_\+mutable\+\_\+global\+\_\+bytes static"{}, "{}\mbox{[}max\+\_\+mutable\+\_\+global\+\_\+bytes\+\_\+test\mbox{]}"{})
+\item 
+\mbox{\hyperlink{max__mutable__globals__tests_8cpp_ac4d8713ef901371d3f1ce58ae5fffa6b}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Test max\+\_\+mutable\+\_\+global\+\_\+bytes unlimited"{}, "{}\mbox{[}max\+\_\+mutable\+\_\+global\+\_\+bytes\+\_\+test\mbox{]}"{})
+\item 
+\mbox{\hyperlink{max__mutable__globals__tests_8cpp_a60b1de6f5c958669659277f97fb64c8d}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Test max\+\_\+mutable\+\_\+global\+\_\+bytes dynamic"{}, "{}\mbox{[}max\+\_\+mutable\+\_\+global\+\_\+bytes\+\_\+test\mbox{]}"{})
+\item 
+\mbox{\hyperlink{max__mutable__globals__tests_8cpp_a084f62efb55517ce055321d5e80ab70b}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Test max\+\_\+mutable\+\_\+global\+\_\+bytes small"{}, "{}\mbox{[}max\+\_\+mutable\+\_\+global\+\_\+bytes\+\_\+test\mbox{]}"{})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+wasm\+\_\+allocator \mbox{\hyperlink{max__mutable__globals__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{max__mutable__globals__tests_8cpp_ab3970588134b544fd070f116c29d31ef}\index{max\_mutable\_globals\_tests.cpp@{max\_mutable\_globals\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!max\_mutable\_globals\_tests.cpp@{max\_mutable\_globals\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/5]}}
+{\footnotesize\ttfamily \label{max__mutable__globals__tests_8cpp_ab3970588134b544fd070f116c29d31ef} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Test max\+\_\+mutable\+\_\+global\+\_\+bytes default"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}max\+\_\+mutable\+\_\+global\+\_\+bytes\+\_\+test\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{max__mutable__globals__tests_8cpp_source_l00590}{590}} of file \mbox{\hyperlink{max__mutable__globals__tests_8cpp_source}{max\+\_\+mutable\+\_\+globals\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00590\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00591\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType>}};}
+\DoxyCodeLine{00592\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend1024(\_1024\_bytes\_mixed\_wasm,\ \&\mbox{\hyperlink{max__mutable__globals__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00593\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend1028(\_1028\_bytes\_mixed\_wasm,\ \&\mbox{\hyperlink{max__mutable__globals__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00594\ \}}
+
+\end{DoxyCode}
+\Hypertarget{max__mutable__globals__tests_8cpp_a60b1de6f5c958669659277f97fb64c8d}\index{max\_mutable\_globals\_tests.cpp@{max\_mutable\_globals\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!max\_mutable\_globals\_tests.cpp@{max\_mutable\_globals\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/5]}}
+{\footnotesize\ttfamily \label{max__mutable__globals__tests_8cpp_a60b1de6f5c958669659277f97fb64c8d} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Test max\+\_\+mutable\+\_\+global\+\_\+bytes dynamic"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}max\+\_\+mutable\+\_\+global\+\_\+bytes\+\_\+test\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{max__mutable__globals__tests_8cpp_source_l00608}{608}} of file \mbox{\hyperlink{max__mutable__globals__tests_8cpp_source}{max\+\_\+mutable\+\_\+globals\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00608\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00609\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ dynamic\_options>}};}
+\DoxyCodeLine{00610\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend1024(\_1024\_bytes\_mixed\_wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\{1024\});}
+\DoxyCodeLine{00611\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(\_1028\_bytes\_mixed\_wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\{1024\}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{00612\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend1028(\_1028\_bytes\_mixed\_wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\{1028\});}
+\DoxyCodeLine{00613\ \}}
+
+\end{DoxyCode}
+\Hypertarget{max__mutable__globals__tests_8cpp_a084f62efb55517ce055321d5e80ab70b}\index{max\_mutable\_globals\_tests.cpp@{max\_mutable\_globals\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!max\_mutable\_globals\_tests.cpp@{max\_mutable\_globals\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [3/5]}}
+{\footnotesize\ttfamily \label{max__mutable__globals__tests_8cpp_a084f62efb55517ce055321d5e80ab70b} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Test max\+\_\+mutable\+\_\+global\+\_\+bytes small"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}max\+\_\+mutable\+\_\+global\+\_\+bytes\+\_\+test\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{max__mutable__globals__tests_8cpp_source_l00615}{615}} of file \mbox{\hyperlink{max__mutable__globals__tests_8cpp_source}{max\+\_\+mutable\+\_\+globals\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00615\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00616\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ small\_options>}};}
+\DoxyCodeLine{00617\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(\_1024\_bytes\_mixed\_wasm,\ \&\mbox{\hyperlink{max__mutable__globals__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{00618\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(\_1028\_bytes\_mixed\_wasm,\ \&\mbox{\hyperlink{max__mutable__globals__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{00619\ \}}
+
+\end{DoxyCode}
+\Hypertarget{max__mutable__globals__tests_8cpp_ae9a865cd90b2cfb05e3fad74c02274db}\index{max\_mutable\_globals\_tests.cpp@{max\_mutable\_globals\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!max\_mutable\_globals\_tests.cpp@{max\_mutable\_globals\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [4/5]}}
+{\footnotesize\ttfamily \label{max__mutable__globals__tests_8cpp_ae9a865cd90b2cfb05e3fad74c02274db} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Test max\+\_\+mutable\+\_\+global\+\_\+bytes static"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}max\+\_\+mutable\+\_\+global\+\_\+bytes\+\_\+test\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{max__mutable__globals__tests_8cpp_source_l00596}{596}} of file \mbox{\hyperlink{max__mutable__globals__tests_8cpp_source}{max\+\_\+mutable\+\_\+globals\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00596\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00597\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ static\_options>}};}
+\DoxyCodeLine{00598\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend}}(\_1024\_bytes\_mixed\_wasm,\ \&\mbox{\hyperlink{max__mutable__globals__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00599\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(\_1028\_bytes\_mixed\_wasm,\ \&\mbox{\hyperlink{max__mutable__globals__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{00600\ \}}
+
+\end{DoxyCode}
+\Hypertarget{max__mutable__globals__tests_8cpp_ac4d8713ef901371d3f1ce58ae5fffa6b}\index{max\_mutable\_globals\_tests.cpp@{max\_mutable\_globals\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!max\_mutable\_globals\_tests.cpp@{max\_mutable\_globals\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [5/5]}}
+{\footnotesize\ttfamily \label{max__mutable__globals__tests_8cpp_ac4d8713ef901371d3f1ce58ae5fffa6b} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Test max\+\_\+mutable\+\_\+global\+\_\+bytes unlimited"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}max\+\_\+mutable\+\_\+global\+\_\+bytes\+\_\+test\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{max__mutable__globals__tests_8cpp_source_l00602}{602}} of file \mbox{\hyperlink{max__mutable__globals__tests_8cpp_source}{max\+\_\+mutable\+\_\+globals\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00602\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00603\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ empty\_options>}};}
+\DoxyCodeLine{00604\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend1024(\_1024\_bytes\_mixed\_wasm,\ \&\mbox{\hyperlink{max__mutable__globals__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00605\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend1028(\_1028\_bytes\_mixed\_wasm,\ \&\mbox{\hyperlink{max__mutable__globals__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00606\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{max__mutable__globals__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}\index{max\_mutable\_globals\_tests.cpp@{max\_mutable\_globals\_tests.cpp}!wa@{wa}}
+\index{wa@{wa}!max\_mutable\_globals\_tests.cpp@{max\_mutable\_globals\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{wa}{wa}}
+{\footnotesize\ttfamily \label{max__mutable__globals__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89} 
+wasm\+\_\+allocator wa\hspace{0.3cm}{\ttfamily [extern]}}
+
+
+
+Definition at line \mbox{\hyperlink{libraries_2sys-vm_2tests_2main_8cpp_source_l00010}{10}} of file \mbox{\hyperlink{libraries_2sys-vm_2tests_2main_8cpp_source}{main.\+cpp}}.
+

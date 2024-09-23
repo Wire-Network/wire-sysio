@@ -1,0 +1,317 @@
+\doxysection{gtest-\/listener\+\_\+test.cc}
+\hypertarget{gtest-listener__test_8cc_source}{}\label{gtest-listener__test_8cc_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/test/gtest-\/listener\_test.cc@{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/test/gtest-\/listener\_test.cc}}
+\mbox{\hyperlink{gtest-listener__test_8cc}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00001}00001\ \textcolor{comment}{//\ Copyright\ 2009\ Google\ Inc.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00002}00002\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00003}00003\ \textcolor{comment}{//\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00004}00004\ \textcolor{comment}{//\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00005}00005\ \textcolor{comment}{//\ met:}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00006}00006\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00007}00007\ \textcolor{comment}{//\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00008}00008\ \textcolor{comment}{//\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00009}00009\ \textcolor{comment}{//\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00010}00010\ \textcolor{comment}{//\ copyright\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00011}00011\ \textcolor{comment}{//\ in\ the\ documentation\ and/or\ other\ materials\ provided\ with\ the}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00012}00012\ \textcolor{comment}{//\ distribution.}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00013}00013\ \textcolor{comment}{//\ \ \ \ \ *\ Neither\ the\ name\ of\ Google\ Inc.\ nor\ the\ names\ of\ its}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00014}00014\ \textcolor{comment}{//\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products\ derived\ from}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00015}00015\ \textcolor{comment}{//\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00016}00016\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00017}00017\ \textcolor{comment}{//\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00018}00018\ \textcolor{comment}{//\ "{}AS\ IS"{}\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00019}00019\ \textcolor{comment}{//\ LIMITED\ TO,\ THE\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00020}00020\ \textcolor{comment}{//\ A\ PARTICULAR\ PURPOSE\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ THE\ COPYRIGHT}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00021}00021\ \textcolor{comment}{//\ OWNER\ OR\ CONTRIBUTORS\ BE\ LIABLE\ FOR\ ANY\ DIRECT,\ INDIRECT,\ INCIDENTAL,}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00022}00022\ \textcolor{comment}{//\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES\ (INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00023}00023\ \textcolor{comment}{//\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;\ LOSS\ OF\ USE,}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00024}00024\ \textcolor{comment}{//\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND\ ON\ ANY}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00025}00025\ \textcolor{comment}{//\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00026}00026\ \textcolor{comment}{//\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00027}00027\ \textcolor{comment}{//\ OF\ THIS\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00028}00028\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00029}00029\ \textcolor{comment}{//\ Author:\ vladl@google.com\ (Vlad\ Losev)}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00030}00030\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00031}00031\ \textcolor{comment}{//\ The\ Google\ C++\ Testing\ and\ Mocking\ Framework\ (Google\ Test)}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00032}00032\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00033}00033\ \textcolor{comment}{//\ This\ file\ verifies\ Google\ Test\ event\ listeners\ receive\ events\ at\ the}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00034}00034\ \textcolor{comment}{//\ right\ times.}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00036}00036\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{gtest_8h}{gtest/gtest.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00037}00037\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00039}00039\ using\ ::testing::AddGlobalTestEnvironment;}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00040}00040\ using\ ::testing::Environment;}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00041}00041\ using\ ::testing::InitGoogleTest;}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00042}00042\ using\ ::testing::Test;}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00043}00043\ using\ ::testing::TestCase;}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00044}00044\ using\ ::testing::TestEventListener;}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00045}00045\ using\ ::testing::TestInfo;}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00046}00046\ using\ ::testing::TestPartResult;}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00047}00047\ using\ ::testing::UnitTest;}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00049}00049\ \textcolor{comment}{//\ Used\ by\ tests\ to\ register\ their\ events.}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00050}\mbox{\hyperlink{gtest-listener__test_8cc_a32a264046f3603db11e6fcdaea5fb094}{00050}}\ std::vector<std::string>*\ \mbox{\hyperlink{gtest-listener__test_8cc_a32a264046f3603db11e6fcdaea5fb094}{g\_events}}\ =\ NULL;}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00052}00052\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetesting}{testing}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00053}00053\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceinternal}{internal}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00054}00054\ }
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00055}\mbox{\hyperlink{classtesting_1_1internal_1_1_event_recording_listener}{00055}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classtesting_1_1internal_1_1_event_recording_listener}{EventRecordingListener}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1_test_event_listener}{TestEventListener}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00056}00056\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00057}\mbox{\hyperlink{classtesting_1_1internal_1_1_event_recording_listener_a7b0254c15d6b8468e1441ee572fee707}{00057}}\ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_event_recording_listener_a7b0254c15d6b8468e1441ee572fee707}{EventRecordingListener}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})\ :\ name\_(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00059}00059\ \ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00060}\mbox{\hyperlink{classtesting_1_1internal_1_1_event_recording_listener_aff89fdd3ae889a54a2ba2f3d4c98d3f6}{00060}}\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_event_recording_listener_aff89fdd3ae889a54a2ba2f3d4c98d3f6}{OnTestProgramStart}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1_unit_test}{UnitTest}}\&\ \textcolor{comment}{/*unit\_test*/})\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00061}00061\ \ \ \ \ \mbox{\hyperlink{gtest-listener__test_8cc_a32a264046f3603db11e6fcdaea5fb094}{g\_events}}-\/>push\_back(GetFullMethodName(\textcolor{stringliteral}{"{}OnTestProgramStart"{}}));}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00062}00062\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00064}\mbox{\hyperlink{classtesting_1_1internal_1_1_event_recording_listener_a0bfa276def9594b2a119c2c370f59281}{00064}}\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_event_recording_listener_a0bfa276def9594b2a119c2c370f59281}{OnTestIterationStart}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1_unit_test}{UnitTest}}\&\ \textcolor{comment}{/*unit\_test*/},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00065}00065\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ iteration)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00066}00066\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1_message}{Message}}\ message;}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00067}00067\ \ \ \ \ message\ <<\ GetFullMethodName(\textcolor{stringliteral}{"{}OnTestIterationStart"{}})}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}("{}}\ <<\ iteration\ <<\ \textcolor{stringliteral}{"{})"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00069}00069\ \ \ \ \ \mbox{\hyperlink{gtest-listener__test_8cc_a32a264046f3603db11e6fcdaea5fb094}{g\_events}}-\/>push\_back(message.GetString());}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00070}00070\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00072}\mbox{\hyperlink{classtesting_1_1internal_1_1_event_recording_listener_add61e6e7ebffb8afc90ccabcdc9f9982}{00072}}\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_event_recording_listener_add61e6e7ebffb8afc90ccabcdc9f9982}{OnEnvironmentsSetUpStart}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1_unit_test}{UnitTest}}\&\ \textcolor{comment}{/*unit\_test*/})\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00073}00073\ \ \ \ \ \mbox{\hyperlink{gtest-listener__test_8cc_a32a264046f3603db11e6fcdaea5fb094}{g\_events}}-\/>push\_back(GetFullMethodName(\textcolor{stringliteral}{"{}OnEnvironmentsSetUpStart"{}}));}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00074}00074\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00075}00075\ }
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00076}\mbox{\hyperlink{classtesting_1_1internal_1_1_event_recording_listener_a40b4c5e05abd1aa11a030f999f6adb8f}{00076}}\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_event_recording_listener_a40b4c5e05abd1aa11a030f999f6adb8f}{OnEnvironmentsSetUpEnd}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1_unit_test}{UnitTest}}\&\ \textcolor{comment}{/*unit\_test*/})\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00077}00077\ \ \ \ \ \mbox{\hyperlink{gtest-listener__test_8cc_a32a264046f3603db11e6fcdaea5fb094}{g\_events}}-\/>push\_back(GetFullMethodName(\textcolor{stringliteral}{"{}OnEnvironmentsSetUpEnd"{}}));}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00078}00078\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00080}\mbox{\hyperlink{classtesting_1_1internal_1_1_event_recording_listener_a18c28e1d1c3a1e74e225966456786f8e}{00080}}\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_event_recording_listener_a18c28e1d1c3a1e74e225966456786f8e}{OnTestCaseStart}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1_test_case}{TestCase}}\&\ \textcolor{comment}{/*test\_case*/})\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00081}00081\ \ \ \ \ \mbox{\hyperlink{gtest-listener__test_8cc_a32a264046f3603db11e6fcdaea5fb094}{g\_events}}-\/>push\_back(GetFullMethodName(\textcolor{stringliteral}{"{}OnTestCaseStart"{}}));}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00082}00082\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00083}00083\ }
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00084}\mbox{\hyperlink{classtesting_1_1internal_1_1_event_recording_listener_aebd488b780fc172d6058ca07ca8f7145}{00084}}\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_event_recording_listener_aebd488b780fc172d6058ca07ca8f7145}{OnTestStart}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1_test_info}{TestInfo}}\&\ \textcolor{comment}{/*test\_info*/})\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00085}00085\ \ \ \ \ \mbox{\hyperlink{gtest-listener__test_8cc_a32a264046f3603db11e6fcdaea5fb094}{g\_events}}-\/>push\_back(GetFullMethodName(\textcolor{stringliteral}{"{}OnTestStart"{}}));}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00086}00086\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00087}00087\ }
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00088}\mbox{\hyperlink{classtesting_1_1internal_1_1_event_recording_listener_a4a6685d894923f1691ad9c6a4311470e}{00088}}\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_event_recording_listener_a4a6685d894923f1691ad9c6a4311470e}{OnTestPartResult}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1_test_part_result}{TestPartResult}}\&\ \textcolor{comment}{/*test\_part\_result*/})\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00089}00089\ \ \ \ \ \mbox{\hyperlink{gtest-listener__test_8cc_a32a264046f3603db11e6fcdaea5fb094}{g\_events}}-\/>push\_back(GetFullMethodName(\textcolor{stringliteral}{"{}OnTestPartResult"{}}));}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00090}00090\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00091}00091\ }
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00092}\mbox{\hyperlink{classtesting_1_1internal_1_1_event_recording_listener_adb076f145cc20d9b27441b9c75da4b81}{00092}}\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_event_recording_listener_adb076f145cc20d9b27441b9c75da4b81}{OnTestEnd}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1_test_info}{TestInfo}}\&\ \textcolor{comment}{/*test\_info*/})\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00093}00093\ \ \ \ \ \mbox{\hyperlink{gtest-listener__test_8cc_a32a264046f3603db11e6fcdaea5fb094}{g\_events}}-\/>push\_back(GetFullMethodName(\textcolor{stringliteral}{"{}OnTestEnd"{}}));}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00094}00094\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00095}00095\ }
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00096}\mbox{\hyperlink{classtesting_1_1internal_1_1_event_recording_listener_a4d0cb8a389c7339bce0aa6128291529f}{00096}}\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_event_recording_listener_a4d0cb8a389c7339bce0aa6128291529f}{OnTestCaseEnd}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1_test_case}{TestCase}}\&\ \textcolor{comment}{/*test\_case*/})\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00097}00097\ \ \ \ \ \mbox{\hyperlink{gtest-listener__test_8cc_a32a264046f3603db11e6fcdaea5fb094}{g\_events}}-\/>push\_back(GetFullMethodName(\textcolor{stringliteral}{"{}OnTestCaseEnd"{}}));}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00098}00098\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00099}00099\ }
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00100}\mbox{\hyperlink{classtesting_1_1internal_1_1_event_recording_listener_a17eebd7bb5cc6bab53b20794919ca5ae}{00100}}\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_event_recording_listener_a17eebd7bb5cc6bab53b20794919ca5ae}{OnEnvironmentsTearDownStart}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1_unit_test}{UnitTest}}\&\ \textcolor{comment}{/*unit\_test*/})\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00101}00101\ \ \ \ \ \mbox{\hyperlink{gtest-listener__test_8cc_a32a264046f3603db11e6fcdaea5fb094}{g\_events}}-\/>push\_back(GetFullMethodName(\textcolor{stringliteral}{"{}OnEnvironmentsTearDownStart"{}}));}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00102}00102\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00103}00103\ }
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00104}\mbox{\hyperlink{classtesting_1_1internal_1_1_event_recording_listener_acd5a3dc070265166a7da68222031fd61}{00104}}\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_event_recording_listener_acd5a3dc070265166a7da68222031fd61}{OnEnvironmentsTearDownEnd}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1_unit_test}{UnitTest}}\&\ \textcolor{comment}{/*unit\_test*/})\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00105}00105\ \ \ \ \ \mbox{\hyperlink{gtest-listener__test_8cc_a32a264046f3603db11e6fcdaea5fb094}{g\_events}}-\/>push\_back(GetFullMethodName(\textcolor{stringliteral}{"{}OnEnvironmentsTearDownEnd"{}}));}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00106}00106\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00107}00107\ }
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00108}\mbox{\hyperlink{classtesting_1_1internal_1_1_event_recording_listener_ab0cc007bcfaf06cd383d574c88f62aea}{00108}}\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_event_recording_listener_ab0cc007bcfaf06cd383d574c88f62aea}{OnTestIterationEnd}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1_unit_test}{UnitTest}}\&\ \textcolor{comment}{/*unit\_test*/},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00109}00109\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ iteration)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00110}00110\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1_message}{Message}}\ message;}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00111}00111\ \ \ \ \ message\ <<\ GetFullMethodName(\textcolor{stringliteral}{"{}OnTestIterationEnd"{}})}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00112}00112\ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}("{}}\ \ <<\ iteration\ <<\ \textcolor{stringliteral}{"{})"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00113}00113\ \ \ \ \ \mbox{\hyperlink{gtest-listener__test_8cc_a32a264046f3603db11e6fcdaea5fb094}{g\_events}}-\/>push\_back(message.GetString());}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00114}00114\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00115}00115\ }
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00116}\mbox{\hyperlink{classtesting_1_1internal_1_1_event_recording_listener_a21fe9c3c519c4599a48b16ddfb734aa3}{00116}}\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_event_recording_listener_a21fe9c3c519c4599a48b16ddfb734aa3}{OnTestProgramEnd}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1_unit_test}{UnitTest}}\&\ \textcolor{comment}{/*unit\_test*/})\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00117}00117\ \ \ \ \ \mbox{\hyperlink{gtest-listener__test_8cc_a32a264046f3603db11e6fcdaea5fb094}{g\_events}}-\/>push\_back(GetFullMethodName(\textcolor{stringliteral}{"{}OnTestProgramEnd"{}}));}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00118}00118\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00119}00119\ }
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00120}00120\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00121}00121\ \ \ std::string\ GetFullMethodName(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00122}00122\ \ \ \ \ \textcolor{keywordflow}{return}\ name\_\ +\ \textcolor{stringliteral}{"{}."{}}\ +\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}};}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00123}00123\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00124}00124\ }
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00125}00125\ \ \ std::string\ name\_;}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00126}00126\ \};}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00127}00127\ }
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00128}\mbox{\hyperlink{classtesting_1_1internal_1_1_environment_invocation_catcher}{00128}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classtesting_1_1internal_1_1_environment_invocation_catcher}{EnvironmentInvocationCatcher}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1_environment}{Environment}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00129}00129\ \ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00130}\mbox{\hyperlink{classtesting_1_1internal_1_1_environment_invocation_catcher_a325365b0ecfa71a4a767d7a1817c9663}{00130}}\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_environment_invocation_catcher_a325365b0ecfa71a4a767d7a1817c9663}{SetUp}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00131}00131\ \ \ \ \ \mbox{\hyperlink{gtest-listener__test_8cc_a32a264046f3603db11e6fcdaea5fb094}{g\_events}}-\/>push\_back(\textcolor{stringliteral}{"{}Environment::SetUp"{}});}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00132}00132\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00133}00133\ }
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00134}\mbox{\hyperlink{classtesting_1_1internal_1_1_environment_invocation_catcher_afc89ee0a8e32e6746a89fcc1682f62e9}{00134}}\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_environment_invocation_catcher_afc89ee0a8e32e6746a89fcc1682f62e9}{TearDown}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00135}00135\ \ \ \ \ \mbox{\hyperlink{gtest-listener__test_8cc_a32a264046f3603db11e6fcdaea5fb094}{g\_events}}-\/>push\_back(\textcolor{stringliteral}{"{}Environment::TearDown"{}});}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00136}00136\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00137}00137\ \};}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00138}00138\ }
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00139}\mbox{\hyperlink{classtesting_1_1internal_1_1_listener_test}{00139}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classtesting_1_1internal_1_1_listener_test}{ListenerTest}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1_test}{Test}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00140}00140\ \ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00141}\mbox{\hyperlink{classtesting_1_1internal_1_1_listener_test_a7cbc298576e584b4021d0375204b7391}{00141}}\ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_listener_test_a7cbc298576e584b4021d0375204b7391}{SetUpTestCase}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00142}00142\ \ \ \ \ \mbox{\hyperlink{gtest-listener__test_8cc_a32a264046f3603db11e6fcdaea5fb094}{g\_events}}-\/>push\_back(\textcolor{stringliteral}{"{}ListenerTest::SetUpTestCase"{}});}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00143}00143\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00144}00144\ }
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00145}\mbox{\hyperlink{classtesting_1_1internal_1_1_listener_test_aa35b5f1c6235f0fe98aa2c7f35bb8fe1}{00145}}\ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_listener_test_aa35b5f1c6235f0fe98aa2c7f35bb8fe1}{TearDownTestCase}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00146}00146\ \ \ \ \ \mbox{\hyperlink{gtest-listener__test_8cc_a32a264046f3603db11e6fcdaea5fb094}{g\_events}}-\/>push\_back(\textcolor{stringliteral}{"{}ListenerTest::TearDownTestCase"{}});}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00147}00147\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00148}00148\ }
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00149}\mbox{\hyperlink{classtesting_1_1internal_1_1_listener_test_ace3dbe36b705ddf320518e6cdd919bc8}{00149}}\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_listener_test_ace3dbe36b705ddf320518e6cdd919bc8}{SetUp}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00150}00150\ \ \ \ \ \mbox{\hyperlink{gtest-listener__test_8cc_a32a264046f3603db11e6fcdaea5fb094}{g\_events}}-\/>push\_back(\textcolor{stringliteral}{"{}ListenerTest::SetUp"{}});}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00151}00151\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00152}00152\ }
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00153}\mbox{\hyperlink{classtesting_1_1internal_1_1_listener_test_ad112535025d668e3ea14e71d8741c810}{00153}}\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_listener_test_ad112535025d668e3ea14e71d8741c810}{TearDown}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00154}00154\ \ \ \ \ \mbox{\hyperlink{gtest-listener__test_8cc_a32a264046f3603db11e6fcdaea5fb094}{g\_events}}-\/>push\_back(\textcolor{stringliteral}{"{}ListenerTest::TearDown"{}});}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00155}00155\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00156}00156\ \};}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00157}00157\ }
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00158}\mbox{\hyperlink{namespacetesting_1_1internal_a7e113e9c70d45d89fe1703e58ff083b9}{00158}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{classtesting_1_1internal_1_1_listener_test}{ListenerTest}},\ DoesFoo)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00159}00159\ \ \ \textcolor{comment}{//\ Test\ execution\ order\ within\ a\ test\ case\ is\ not\ guaranteed\ so\ we\ are\ not}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00160}00160\ \ \ \textcolor{comment}{//\ recording\ the\ test\ name.}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00161}00161\ \ \ \mbox{\hyperlink{gtest-listener__test_8cc_a32a264046f3603db11e6fcdaea5fb094}{g\_events}}-\/>push\_back(\textcolor{stringliteral}{"{}ListenerTest::*\ Test\ Body"{}});}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00162}00162\ \ \ \mbox{\hyperlink{gtest_8h_a75adcdf89f69b0b615e395daafc315af}{SUCCEED}}();\ \ \textcolor{comment}{//\ Triggers\ OnTestPartResult.}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00163}00163\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00164}00164\ }
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00165}\mbox{\hyperlink{namespacetesting_1_1internal_a02cef32090020d164460dd3d9f8e2852}{00165}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{classtesting_1_1internal_1_1_listener_test}{ListenerTest}},\ DoesBar)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00166}00166\ \ \ \mbox{\hyperlink{gtest-listener__test_8cc_a32a264046f3603db11e6fcdaea5fb094}{g\_events}}-\/>push\_back(\textcolor{stringliteral}{"{}ListenerTest::*\ Test\ Body"{}});}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00167}00167\ \ \ \mbox{\hyperlink{gtest_8h_a75adcdf89f69b0b615e395daafc315af}{SUCCEED}}();\ \ \textcolor{comment}{//\ Triggers\ OnTestPartResult.}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00168}00168\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00169}00169\ }
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00170}00170\ \}\ \ \textcolor{comment}{//\ namespace\ internal}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00171}00171\ }
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00172}00172\ \}\ \ \textcolor{comment}{//\ namespace\ testing}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00173}00173\ }
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00174}00174\ using\ ::testing::internal::EnvironmentInvocationCatcher;}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00175}00175\ using\ ::testing::internal::EventRecordingListener;}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00176}00176\ }
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00177}\mbox{\hyperlink{gtest-listener__test_8cc_ab9d583cd17d35925ad3d12f864d57fe9}{00177}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{gtest-listener__test_8cc_ab9d583cd17d35925ad3d12f864d57fe9}{VerifyResults}}(\textcolor{keyword}{const}\ std::vector<std::string>\&\ data,}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00178}00178\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \textcolor{keyword}{const}*\ expected\_data,}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00179}00179\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ expected\_data\_size)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00180}00180\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ actual\_size\ =\ data.size();}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00181}00181\ \ \ \textcolor{comment}{//\ If\ the\ following\ assertion\ fails,\ a\ new\ entry\ will\ be\ appended\ to}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00182}00182\ \ \ \textcolor{comment}{//\ data.\ \ Hence\ we\ save\ data.size()\ first.}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00183}00183\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(expected\_data\_size,\ actual\_size);}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00184}00184\ }
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00185}00185\ \ \ \textcolor{comment}{//\ Compares\ the\ common\ prefix.}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00186}00186\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ shorter\_size\ =\ expected\_data\_size\ <=\ actual\_size\ ?}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00187}00187\ \ \ \ \ \ \ expected\_data\_size\ :\ actual\_size;}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00188}00188\ \ \ \textcolor{keywordtype}{size\_t}\ i\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00189}00189\ \ \ \textcolor{keywordflow}{for}\ (;\ i\ <\ shorter\_size;\ ++i)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00190}00190\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a74f4189ea570bab9a65d47104659ef9c}{ASSERT\_STREQ}}(expected\_data[i],\ data[i].c\_str())}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00191}00191\ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}at\ position\ "{}}\ <<\ i;}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00192}00192\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00193}00193\ }
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00194}00194\ \ \ \textcolor{comment}{//\ Prints\ extra\ elements\ in\ the\ actual\ data.}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00195}00195\ \ \ \textcolor{keywordflow}{for}\ (;\ i\ <\ actual\_size;\ ++i)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00196}00196\ \ \ \ \ printf(\textcolor{stringliteral}{"{}\ \ Actual\ event\ \#\%lu:\ \%s\(\backslash\)n"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00197}00197\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\textcolor{keyword}{>}(i),\ data[i].c\_str());}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00198}00198\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00199}00199\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00200}00200\ }
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00201}\mbox{\hyperlink{gtest-listener__test_8cc_a3c04138a5bfe5d72780bb7e82a18e627}{00201}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}(\textcolor{keywordtype}{int}\ argc,\ \textcolor{keywordtype}{char}\ **\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}})\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00202}00202\ \ \ std::vector<std::string>\ events;}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00203}00203\ \ \ \mbox{\hyperlink{gtest-listener__test_8cc_a32a264046f3603db11e6fcdaea5fb094}{g\_events}}\ =\ \&events;}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00204}00204\ \ \ InitGoogleTest(\&argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}});}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00205}00205\ }
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00206}00206\ \ \ UnitTest::GetInstance()-\/>listeners().Append(}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00207}00207\ \ \ \ \ \ \ \textcolor{keyword}{new}\ EventRecordingListener(\textcolor{stringliteral}{"{}1st"{}}));}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00208}00208\ \ \ UnitTest::GetInstance()-\/>listeners().Append(}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00209}00209\ \ \ \ \ \ \ \textcolor{keyword}{new}\ EventRecordingListener(\textcolor{stringliteral}{"{}2nd"{}}));}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00210}00210\ }
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00211}00211\ \ \ AddGlobalTestEnvironment(\textcolor{keyword}{new}\ EnvironmentInvocationCatcher);}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00212}00212\ }
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00213}00213\ \ \ \mbox{\hyperlink{gtest-port_8h_ab54343f0a36dc4cb0ce8a478dd7847b8}{GTEST\_CHECK\_}}(events.size()\ ==\ 0)}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00214}00214\ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}AddGlobalTestEnvironment\ should\ not\ generate\ any\ events\ itself."{}};}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00215}00215\ }
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00216}00216\ \ \ ::testing::GTEST\_FLAG(repeat)\ =\ 2;}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00217}00217\ \ \ \textcolor{keywordtype}{int}\ ret\_val\ =\ \mbox{\hyperlink{gtest_8h_a853a3792807489591d3d4a2f2ff9359f}{RUN\_ALL\_TESTS}}();}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00218}00218\ }
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00219}00219\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \textcolor{keyword}{const}\ expected\_events[]\ =\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00220}00220\ \ \ \ \ \textcolor{stringliteral}{"{}1st.OnTestProgramStart"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00221}00221\ \ \ \ \ \textcolor{stringliteral}{"{}2nd.OnTestProgramStart"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00222}00222\ \ \ \ \ \textcolor{stringliteral}{"{}1st.OnTestIterationStart(0)"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00223}00223\ \ \ \ \ \textcolor{stringliteral}{"{}2nd.OnTestIterationStart(0)"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00224}00224\ \ \ \ \ \textcolor{stringliteral}{"{}1st.OnEnvironmentsSetUpStart"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00225}00225\ \ \ \ \ \textcolor{stringliteral}{"{}2nd.OnEnvironmentsSetUpStart"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00226}00226\ \ \ \ \ \textcolor{stringliteral}{"{}Environment::SetUp"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00227}00227\ \ \ \ \ \textcolor{stringliteral}{"{}2nd.OnEnvironmentsSetUpEnd"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00228}00228\ \ \ \ \ \textcolor{stringliteral}{"{}1st.OnEnvironmentsSetUpEnd"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00229}00229\ \ \ \ \ \textcolor{stringliteral}{"{}1st.OnTestCaseStart"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00230}00230\ \ \ \ \ \textcolor{stringliteral}{"{}2nd.OnTestCaseStart"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00231}00231\ \ \ \ \ \textcolor{stringliteral}{"{}ListenerTest::SetUpTestCase"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00232}00232\ \ \ \ \ \textcolor{stringliteral}{"{}1st.OnTestStart"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00233}00233\ \ \ \ \ \textcolor{stringliteral}{"{}2nd.OnTestStart"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00234}00234\ \ \ \ \ \textcolor{stringliteral}{"{}ListenerTest::SetUp"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00235}00235\ \ \ \ \ \textcolor{stringliteral}{"{}ListenerTest::*\ Test\ Body"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00236}00236\ \ \ \ \ \textcolor{stringliteral}{"{}1st.OnTestPartResult"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00237}00237\ \ \ \ \ \textcolor{stringliteral}{"{}2nd.OnTestPartResult"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00238}00238\ \ \ \ \ \textcolor{stringliteral}{"{}ListenerTest::TearDown"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00239}00239\ \ \ \ \ \textcolor{stringliteral}{"{}2nd.OnTestEnd"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00240}00240\ \ \ \ \ \textcolor{stringliteral}{"{}1st.OnTestEnd"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00241}00241\ \ \ \ \ \textcolor{stringliteral}{"{}1st.OnTestStart"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00242}00242\ \ \ \ \ \textcolor{stringliteral}{"{}2nd.OnTestStart"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00243}00243\ \ \ \ \ \textcolor{stringliteral}{"{}ListenerTest::SetUp"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00244}00244\ \ \ \ \ \textcolor{stringliteral}{"{}ListenerTest::*\ Test\ Body"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00245}00245\ \ \ \ \ \textcolor{stringliteral}{"{}1st.OnTestPartResult"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00246}00246\ \ \ \ \ \textcolor{stringliteral}{"{}2nd.OnTestPartResult"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00247}00247\ \ \ \ \ \textcolor{stringliteral}{"{}ListenerTest::TearDown"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00248}00248\ \ \ \ \ \textcolor{stringliteral}{"{}2nd.OnTestEnd"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00249}00249\ \ \ \ \ \textcolor{stringliteral}{"{}1st.OnTestEnd"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00250}00250\ \ \ \ \ \textcolor{stringliteral}{"{}ListenerTest::TearDownTestCase"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00251}00251\ \ \ \ \ \textcolor{stringliteral}{"{}2nd.OnTestCaseEnd"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00252}00252\ \ \ \ \ \textcolor{stringliteral}{"{}1st.OnTestCaseEnd"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00253}00253\ \ \ \ \ \textcolor{stringliteral}{"{}1st.OnEnvironmentsTearDownStart"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00254}00254\ \ \ \ \ \textcolor{stringliteral}{"{}2nd.OnEnvironmentsTearDownStart"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00255}00255\ \ \ \ \ \textcolor{stringliteral}{"{}Environment::TearDown"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00256}00256\ \ \ \ \ \textcolor{stringliteral}{"{}2nd.OnEnvironmentsTearDownEnd"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00257}00257\ \ \ \ \ \textcolor{stringliteral}{"{}1st.OnEnvironmentsTearDownEnd"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00258}00258\ \ \ \ \ \textcolor{stringliteral}{"{}2nd.OnTestIterationEnd(0)"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00259}00259\ \ \ \ \ \textcolor{stringliteral}{"{}1st.OnTestIterationEnd(0)"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00260}00260\ \ \ \ \ \textcolor{stringliteral}{"{}1st.OnTestIterationStart(1)"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00261}00261\ \ \ \ \ \textcolor{stringliteral}{"{}2nd.OnTestIterationStart(1)"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00262}00262\ \ \ \ \ \textcolor{stringliteral}{"{}1st.OnEnvironmentsSetUpStart"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00263}00263\ \ \ \ \ \textcolor{stringliteral}{"{}2nd.OnEnvironmentsSetUpStart"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00264}00264\ \ \ \ \ \textcolor{stringliteral}{"{}Environment::SetUp"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00265}00265\ \ \ \ \ \textcolor{stringliteral}{"{}2nd.OnEnvironmentsSetUpEnd"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00266}00266\ \ \ \ \ \textcolor{stringliteral}{"{}1st.OnEnvironmentsSetUpEnd"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00267}00267\ \ \ \ \ \textcolor{stringliteral}{"{}1st.OnTestCaseStart"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00268}00268\ \ \ \ \ \textcolor{stringliteral}{"{}2nd.OnTestCaseStart"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00269}00269\ \ \ \ \ \textcolor{stringliteral}{"{}ListenerTest::SetUpTestCase"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00270}00270\ \ \ \ \ \textcolor{stringliteral}{"{}1st.OnTestStart"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00271}00271\ \ \ \ \ \textcolor{stringliteral}{"{}2nd.OnTestStart"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00272}00272\ \ \ \ \ \textcolor{stringliteral}{"{}ListenerTest::SetUp"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00273}00273\ \ \ \ \ \textcolor{stringliteral}{"{}ListenerTest::*\ Test\ Body"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00274}00274\ \ \ \ \ \textcolor{stringliteral}{"{}1st.OnTestPartResult"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00275}00275\ \ \ \ \ \textcolor{stringliteral}{"{}2nd.OnTestPartResult"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00276}00276\ \ \ \ \ \textcolor{stringliteral}{"{}ListenerTest::TearDown"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00277}00277\ \ \ \ \ \textcolor{stringliteral}{"{}2nd.OnTestEnd"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00278}00278\ \ \ \ \ \textcolor{stringliteral}{"{}1st.OnTestEnd"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00279}00279\ \ \ \ \ \textcolor{stringliteral}{"{}1st.OnTestStart"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00280}00280\ \ \ \ \ \textcolor{stringliteral}{"{}2nd.OnTestStart"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00281}00281\ \ \ \ \ \textcolor{stringliteral}{"{}ListenerTest::SetUp"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00282}00282\ \ \ \ \ \textcolor{stringliteral}{"{}ListenerTest::*\ Test\ Body"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00283}00283\ \ \ \ \ \textcolor{stringliteral}{"{}1st.OnTestPartResult"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00284}00284\ \ \ \ \ \textcolor{stringliteral}{"{}2nd.OnTestPartResult"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00285}00285\ \ \ \ \ \textcolor{stringliteral}{"{}ListenerTest::TearDown"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00286}00286\ \ \ \ \ \textcolor{stringliteral}{"{}2nd.OnTestEnd"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00287}00287\ \ \ \ \ \textcolor{stringliteral}{"{}1st.OnTestEnd"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00288}00288\ \ \ \ \ \textcolor{stringliteral}{"{}ListenerTest::TearDownTestCase"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00289}00289\ \ \ \ \ \textcolor{stringliteral}{"{}2nd.OnTestCaseEnd"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00290}00290\ \ \ \ \ \textcolor{stringliteral}{"{}1st.OnTestCaseEnd"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00291}00291\ \ \ \ \ \textcolor{stringliteral}{"{}1st.OnEnvironmentsTearDownStart"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00292}00292\ \ \ \ \ \textcolor{stringliteral}{"{}2nd.OnEnvironmentsTearDownStart"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00293}00293\ \ \ \ \ \textcolor{stringliteral}{"{}Environment::TearDown"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00294}00294\ \ \ \ \ \textcolor{stringliteral}{"{}2nd.OnEnvironmentsTearDownEnd"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00295}00295\ \ \ \ \ \textcolor{stringliteral}{"{}1st.OnEnvironmentsTearDownEnd"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00296}00296\ \ \ \ \ \textcolor{stringliteral}{"{}2nd.OnTestIterationEnd(1)"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00297}00297\ \ \ \ \ \textcolor{stringliteral}{"{}1st.OnTestIterationEnd(1)"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00298}00298\ \ \ \ \ \textcolor{stringliteral}{"{}2nd.OnTestProgramEnd"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00299}00299\ \ \ \ \ \textcolor{stringliteral}{"{}1st.OnTestProgramEnd"{}}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00300}00300\ \ \ \};}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00301}00301\ \ \ \mbox{\hyperlink{gtest-listener__test_8cc_ab9d583cd17d35925ad3d12f864d57fe9}{VerifyResults}}(events,}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00302}00302\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ expected\_events,}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00303}00303\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{sizeof}(expected\_events)/\textcolor{keyword}{sizeof}(expected\_events[0]));}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00304}00304\ }
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00305}00305\ \ \ \textcolor{comment}{//\ We\ need\ to\ check\ manually\ for\ ad\ hoc\ test\ failures\ that\ happen\ after}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00306}00306\ \ \ \textcolor{comment}{//\ RUN\_ALL\_TESTS\ finishes.}}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00307}00307\ \ \ \textcolor{keywordflow}{if}\ (UnitTest::GetInstance()-\/>Failed())}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00308}00308\ \ \ \ \ ret\_val\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00309}00309\ }
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00310}00310\ \ \ \textcolor{keywordflow}{return}\ ret\_val;}
+\DoxyCodeLine{\Hypertarget{gtest-listener__test_8cc_source_l00311}00311\ \}}
+
+\end{DoxyCode}

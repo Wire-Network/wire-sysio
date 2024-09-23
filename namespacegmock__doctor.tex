@@ -1,0 +1,1046 @@
+\doxysection{gmock\+\_\+doctor Namespace Reference}
+\hypertarget{namespacegmock__doctor}{}\label{namespacegmock__doctor}\index{gmock\_doctor@{gmock\_doctor}}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacegmock__doctor_a9b603b6f6c415df5d7e439460742cc74}{\+\_\+\+Find\+All\+Matches}} (regex, \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\item 
+\mbox{\hyperlink{namespacegmock__doctor_a8f0f58a7a15703c3cb7884a5ab0d7e94}{\+\_\+\+Generic\+Diagnoser}} (short\+\_\+name, long\+\_\+name, diagnoses, msg)
+\item 
+\mbox{\hyperlink{namespacegmock__doctor_a318414e5137f3b36d544253413a85539}{\+\_\+\+Need\+To\+Return\+Reference\+Diagnoser}} (msg)
+\item 
+\mbox{\hyperlink{namespacegmock__doctor_af21e6056d13fcce7f25290f02239f4a7}{\+\_\+\+Need\+To\+Return\+Something\+Diagnoser}} (msg)
+\item 
+\mbox{\hyperlink{namespacegmock__doctor_abfe338e6df7ab93a894ebf73fc30851c}{\+\_\+\+Need\+To\+Return\+Nothing\+Diagnoser}} (msg)
+\item 
+\mbox{\hyperlink{namespacegmock__doctor_aa51ea2ce20a39ee6236cd75cfb50a45f}{\+\_\+\+Incomplete\+By\+Reference\+Argument\+Diagnoser}} (msg)
+\item 
+\mbox{\hyperlink{namespacegmock__doctor_a4c60b8d2153e815b3f5a9e17a2b7ed3f}{\+\_\+\+Overloaded\+Function\+Matcher\+Diagnoser}} (msg)
+\item 
+\mbox{\hyperlink{namespacegmock__doctor_a5f4d253b280ab21b2c649bdb1ce8cc58}{\+\_\+\+Overloaded\+Function\+Action\+Diagnoser}} (msg)
+\item 
+\mbox{\hyperlink{namespacegmock__doctor_aef440407054f259f8b189dd151e29de2}{\+\_\+\+Overloaded\+Method\+Action\+Diagnoser}} (msg)
+\item 
+\mbox{\hyperlink{namespacegmock__doctor_a4e3d89cec702f55d02891f0c0bf9c059}{\+\_\+\+Mock\+Object\+Pointer\+Diagnoser}} (msg)
+\item 
+\mbox{\hyperlink{namespacegmock__doctor_a027b909d515156fe0752095ac94b9956}{\+\_\+\+Need\+To\+Use\+Symbol\+Diagnoser}} (msg)
+\item 
+\mbox{\hyperlink{namespacegmock__doctor_ac6d76fd7dc849f454edd8049785afa85}{\+\_\+\+Need\+To\+Use\+Return\+Null\+Diagnoser}} (msg)
+\item 
+\mbox{\hyperlink{namespacegmock__doctor_a3d3ae858175093d8617335de08dbc994}{\+\_\+\+Type\+In\+Templated\+Base\+Diagnoser}} (msg)
+\item 
+\mbox{\hyperlink{namespacegmock__doctor_a6d63df81946ff5bf99d9ad102b8a1bf3}{\+\_\+\+Wrong\+Mock\+Method\+Macro\+Diagnoser}} (msg)
+\item 
+\mbox{\hyperlink{namespacegmock__doctor_af40f5986cb4753c3e519eef44b2522d0}{\+\_\+\+Wrong\+Paren\+Position\+Diagnoser}} (msg)
+\item 
+\mbox{\hyperlink{namespacegmock__doctor_aabf870deb293ec78b589b2dd2823e6ab}{Diagnose}} (msg)
+\item 
+\mbox{\hyperlink{namespacegmock__doctor_afbdc79a012ced22e32a9f3c60346a691}{main}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+str \mbox{\hyperlink{namespacegmock__doctor_ab4e0eb0462b9ad647e7d4fa4410cc850}{\+\_\+\+VERSION}} = \textquotesingle{}1.\+0.\+3\textquotesingle{}
+\item 
+str \mbox{\hyperlink{namespacegmock__doctor_a0d618777e3731fa03b16f71a92ec88c1}{\+\_\+\+EMAIL}} = \textquotesingle{}googlemock@googlegroups.\+com\textquotesingle{}
+\item 
+list \mbox{\hyperlink{namespacegmock__doctor_ac704a49399e603fba5104e490f17fce3}{\+\_\+\+COMMON\+\_\+\+GMOCK\+\_\+\+SYMBOLS}}
+\item 
+str \mbox{\hyperlink{namespacegmock__doctor_a0ee127f27caa5f988c477e6e9ea47373}{\+\_\+\+GCC\+\_\+\+FILE\+\_\+\+LINE\+\_\+\+RE}} = \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\textquotesingle{}(?\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}}$<$file$>$.\texorpdfstring{$\ast$}{*})\+:(?\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}}$<$line$>$\textbackslash{}d+)\+:(\textbackslash{}d+\+:)?\textbackslash{}\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}+\textquotesingle{}
+\item 
+str \mbox{\hyperlink{namespacegmock__doctor_a6a622bfba6ba59dc6bcbbeb5f324baf1}{\+\_\+\+CLANG\+\_\+\+FILE\+\_\+\+LINE\+\_\+\+RE}} = \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\textquotesingle{}(?\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}}$<$file$>$.\texorpdfstring{$\ast$}{*})\+:(?\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}}$<$line$>$\textbackslash{}d+)\+:(?\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}}$<$column$>$\textbackslash{}d+)\+:\textbackslash{}\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}+\textquotesingle{}
+\item 
+tuple \mbox{\hyperlink{namespacegmock__doctor_a54b24983d4a31b34337e0ef6fdf4fe91}{\+\_\+\+CLANG\+\_\+\+NON\+\_\+\+GMOCK\+\_\+\+FILE\+\_\+\+LINE\+\_\+\+RE}}
+\item 
+list \mbox{\hyperlink{namespacegmock__doctor_ad8d4f979dbf1b3c8edb226d124571b4e}{\+\_\+\+DIAGNOSERS}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\begin{DoxyVerb}Converts compiler's errors in code using Google Mock to plain English.\end{DoxyVerb}
+ 
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacegmock__doctor_a9b603b6f6c415df5d7e439460742cc74}\index{gmock\_doctor@{gmock\_doctor}!\_FindAllMatches@{\_FindAllMatches}}
+\index{\_FindAllMatches@{\_FindAllMatches}!gmock\_doctor@{gmock\_doctor}}
+\doxysubsubsection{\texorpdfstring{\_FindAllMatches()}{\_FindAllMatches()}}
+{\footnotesize\ttfamily \label{namespacegmock__doctor_a9b603b6f6c415df5d7e439460742cc74} 
+gmock\+\_\+doctor.\+\_\+\+Find\+All\+Matches (\begin{DoxyParamCaption}\item[{}]{regex}{, }\item[{}]{s}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+\begin{DoxyVerb}Generates all matches of regex in string s.\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{gmock__doctor_8py_source_l00137}{137}} of file \mbox{\hyperlink{gmock__doctor_8py_source}{gmock\+\_\+doctor.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00137\ \textcolor{keyword}{def\ }\_FindAllMatches(regex,\ s):}
+\DoxyCodeLine{00138\ \ \ \textcolor{stringliteral}{"{}"{}"{}Generates\ all\ matches\ of\ regex\ in\ string\ s."{}"{}"{}}}
+\DoxyCodeLine{00139\ }
+\DoxyCodeLine{00140\ \ \ r\ =\ re.compile(regex)}
+\DoxyCodeLine{00141\ \ \ \textcolor{keywordflow}{return}\ r.finditer(s)}
+\DoxyCodeLine{00142\ }
+\DoxyCodeLine{00143\ }
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacegmock__doctor_a9b603b6f6c415df5d7e439460742cc74_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacegmock__doctor_a8f0f58a7a15703c3cb7884a5ab0d7e94}\index{gmock\_doctor@{gmock\_doctor}!\_GenericDiagnoser@{\_GenericDiagnoser}}
+\index{\_GenericDiagnoser@{\_GenericDiagnoser}!gmock\_doctor@{gmock\_doctor}}
+\doxysubsubsection{\texorpdfstring{\_GenericDiagnoser()}{\_GenericDiagnoser()}}
+{\footnotesize\ttfamily \label{namespacegmock__doctor_a8f0f58a7a15703c3cb7884a5ab0d7e94} 
+gmock\+\_\+doctor.\+\_\+\+Generic\+Diagnoser (\begin{DoxyParamCaption}\item[{}]{short\+\_\+name}{, }\item[{}]{long\+\_\+name}{, }\item[{}]{diagnoses}{, }\item[{}]{msg}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+\begin{DoxyVerb}Diagnoses the given disease by pattern matching.
+
+Can provide different diagnoses for different patterns.
+
+Args:
+  short_name: Short name of the disease.
+  long_name:  Long name of the disease.
+  diagnoses:  A list of pairs (regex, pattern for formatting the diagnosis
+              for matching regex).
+  msg:        Compiler's error messages.
+Yields:
+  Tuples of the form
+    (short name of disease, long name of disease, diagnosis).
+\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{gmock__doctor_8py_source_l00144}{144}} of file \mbox{\hyperlink{gmock__doctor_8py_source}{gmock\+\_\+doctor.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00144\ \textcolor{keyword}{def\ }\_GenericDiagnoser(short\_name,\ long\_name,\ diagnoses,\ msg):}
+\DoxyCodeLine{00145\ \ \ \textcolor{stringliteral}{"{}"{}"{}Diagnoses\ the\ given\ disease\ by\ pattern\ matching.}}
+\DoxyCodeLine{00146\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00147\ \textcolor{stringliteral}{\ \ Can\ provide\ different\ diagnoses\ for\ different\ patterns.}}
+\DoxyCodeLine{00148\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00149\ \textcolor{stringliteral}{\ \ Args:}}
+\DoxyCodeLine{00150\ \textcolor{stringliteral}{\ \ \ \ short\_name:\ Short\ name\ of\ the\ disease.}}
+\DoxyCodeLine{00151\ \textcolor{stringliteral}{\ \ \ \ long\_name:\ \ Long\ name\ of\ the\ disease.}}
+\DoxyCodeLine{00152\ \textcolor{stringliteral}{\ \ \ \ diagnoses:\ \ A\ list\ of\ pairs\ (regex,\ pattern\ for\ formatting\ the\ diagnosis}}
+\DoxyCodeLine{00153\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ for\ matching\ regex).}}
+\DoxyCodeLine{00154\ \textcolor{stringliteral}{\ \ \ \ msg:\ \ \ \ \ \ \ \ Compiler's\ error\ messages.}}
+\DoxyCodeLine{00155\ \textcolor{stringliteral}{\ \ Yields:}}
+\DoxyCodeLine{00156\ \textcolor{stringliteral}{\ \ \ \ Tuples\ of\ the\ form}}
+\DoxyCodeLine{00157\ \textcolor{stringliteral}{\ \ \ \ \ \ (short\ name\ of\ disease,\ long\ name\ of\ disease,\ diagnosis).}}
+\DoxyCodeLine{00158\ \textcolor{stringliteral}{\ \ "{}"{}"{}}}
+\DoxyCodeLine{00159\ \ \ \textcolor{keywordflow}{for}\ regex,\ diagnosis\ \textcolor{keywordflow}{in}\ diagnoses:}
+\DoxyCodeLine{00160\ \ \ \ \ \textcolor{keywordflow}{if}\ re.search(regex,\ msg):}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ diagnosis\ =\ \textcolor{stringliteral}{'\%(file)s:\%(line)s:'}\ +\ diagnosis}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ m\ \textcolor{keywordflow}{in}\ \_FindAllMatches(regex,\ msg):}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{yield}\ (short\_name,\ long\_name,\ diagnosis\ \%\ m.groupdict())}
+\DoxyCodeLine{00164\ }
+\DoxyCodeLine{00165\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacegmock__doctor_a8f0f58a7a15703c3cb7884a5ab0d7e94_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacegmock__doctor_a8f0f58a7a15703c3cb7884a5ab0d7e94_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacegmock__doctor_aa51ea2ce20a39ee6236cd75cfb50a45f}\index{gmock\_doctor@{gmock\_doctor}!\_IncompleteByReferenceArgumentDiagnoser@{\_IncompleteByReferenceArgumentDiagnoser}}
+\index{\_IncompleteByReferenceArgumentDiagnoser@{\_IncompleteByReferenceArgumentDiagnoser}!gmock\_doctor@{gmock\_doctor}}
+\doxysubsubsection{\texorpdfstring{\_IncompleteByReferenceArgumentDiagnoser()}{\_IncompleteByReferenceArgumentDiagnoser()}}
+{\footnotesize\ttfamily \label{namespacegmock__doctor_aa51ea2ce20a39ee6236cd75cfb50a45f} 
+gmock\+\_\+doctor.\+\_\+\+Incomplete\+By\+Reference\+Argument\+Diagnoser (\begin{DoxyParamCaption}\item[{}]{msg}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+\begin{DoxyVerb}Diagnoses the IBRA disease, given the error messages by the compiler.\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{gmock__doctor_8py_source_l00255}{255}} of file \mbox{\hyperlink{gmock__doctor_8py_source}{gmock\+\_\+doctor.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00255\ \textcolor{keyword}{def\ }\_IncompleteByReferenceArgumentDiagnoser(msg):}
+\DoxyCodeLine{00256\ \ \ \textcolor{stringliteral}{"{}"{}"{}Diagnoses\ the\ IBRA\ disease,\ given\ the\ error\ messages\ by\ the\ compiler."{}"{}"{}}}
+\DoxyCodeLine{00257\ }
+\DoxyCodeLine{00258\ \ \ gcc\_regex\ =\ (\_GCC\_FILE\_LINE\_RE\ +\ \textcolor{stringliteral}{r'instantiated\ from\ here\(\backslash\)n'}}
+\DoxyCodeLine{00259\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'.*gtest-\/printers\(\backslash\).h.*error:\ invalid\ application\ of\ '}}
+\DoxyCodeLine{00260\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'\(\backslash\)'sizeof\(\backslash\)'\ to\ incomplete\ type\ \(\backslash\)'(?P<type>.*)\(\backslash\)''})}
+\DoxyCodeLine{00261\ }
+\DoxyCodeLine{00262\ \ \ clang\_regex\ =\ (\textcolor{stringliteral}{r'.*gtest-\/printers\(\backslash\).h.*error:\ invalid\ application\ of\ '}}
+\DoxyCodeLine{00263\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'\(\backslash\)'sizeof\(\backslash\)'\ to\ an\ incomplete\ type\ '}}
+\DoxyCodeLine{00264\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'\(\backslash\)'(?P<type>.*)(\ const)?\(\backslash\)'\(\backslash\)r?\(\backslash\)n'}}
+\DoxyCodeLine{00265\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'(.*\(\backslash\)n)*?'}\ +}
+\DoxyCodeLine{00266\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_CLANG\_NON\_GMOCK\_FILE\_LINE\_RE\ +}
+\DoxyCodeLine{00267\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'note:\ in\ instantiation\ of\ member\ function\ '}}
+\DoxyCodeLine{00268\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'\(\backslash\)'testing::internal2::TypeWithoutFormatter<.*>::'}}
+\DoxyCodeLine{00269\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'PrintValue\(\backslash\)'\ requested\ here'})}
+\DoxyCodeLine{00270\ \ \ diagnosis\ =\ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{00271\ \textcolor{stringliteral}{In\ order\ to\ mock\ this\ function,\ Google\ Mock\ needs\ to\ see\ the\ definition}}
+\DoxyCodeLine{00272\ \textcolor{stringliteral}{of\ type\ "{}\%(type)s"{}\ -\/\ declaration\ alone\ is\ not\ enough.\ \ Either\ \#include}}
+\DoxyCodeLine{00273\ \textcolor{stringliteral}{the\ header\ that\ defines\ it,\ or\ change\ the\ argument\ to\ be\ passed}}
+\DoxyCodeLine{00274\ \textcolor{stringliteral}{by\ pointer."{}"{}"{}}}
+\DoxyCodeLine{00275\ }
+\DoxyCodeLine{00276\ \ \ \textcolor{keywordflow}{return}\ \_GenericDiagnoser(\textcolor{stringliteral}{'IBRA'},\ \textcolor{stringliteral}{'Incomplete\ By-\/Reference\ Argument\ Type'},}
+\DoxyCodeLine{00277\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [(gcc\_regex,\ diagnosis),}
+\DoxyCodeLine{00278\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (clang\_regex,\ diagnosis)],}
+\DoxyCodeLine{00279\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ msg)}
+\DoxyCodeLine{00280\ }
+\DoxyCodeLine{00281\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacegmock__doctor_aa51ea2ce20a39ee6236cd75cfb50a45f_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacegmock__doctor_a4e3d89cec702f55d02891f0c0bf9c059}\index{gmock\_doctor@{gmock\_doctor}!\_MockObjectPointerDiagnoser@{\_MockObjectPointerDiagnoser}}
+\index{\_MockObjectPointerDiagnoser@{\_MockObjectPointerDiagnoser}!gmock\_doctor@{gmock\_doctor}}
+\doxysubsubsection{\texorpdfstring{\_MockObjectPointerDiagnoser()}{\_MockObjectPointerDiagnoser()}}
+{\footnotesize\ttfamily \label{namespacegmock__doctor_a4e3d89cec702f55d02891f0c0bf9c059} 
+gmock\+\_\+doctor.\+\_\+\+Mock\+Object\+Pointer\+Diagnoser (\begin{DoxyParamCaption}\item[{}]{msg}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+\begin{DoxyVerb}Diagnoses the MOP disease, given the error messages by the compiler.\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{gmock__doctor_8py_source_l00357}{357}} of file \mbox{\hyperlink{gmock__doctor_8py_source}{gmock\+\_\+doctor.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00357\ \textcolor{keyword}{def\ }\_MockObjectPointerDiagnoser(msg):}
+\DoxyCodeLine{00358\ \ \ \textcolor{stringliteral}{"{}"{}"{}Diagnoses\ the\ MOP\ disease,\ given\ the\ error\ messages\ by\ the\ compiler."{}"{}"{}}}
+\DoxyCodeLine{00359\ }
+\DoxyCodeLine{00360\ \ \ gcc\_regex\ =\ (\_GCC\_FILE\_LINE\_RE\ +\ \textcolor{stringliteral}{r'error:\ request\ for\ member\ '}}
+\DoxyCodeLine{00361\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'\(\backslash\)'gmock\_(?P<method>.+)\(\backslash\)'\ in\ \(\backslash\)'(?P<mock\_object>.+)\(\backslash\)',\ '}}
+\DoxyCodeLine{00362\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'which\ is\ of\ non-\/class\ type\ \(\backslash\)'(.*::)*(?P<class\_name>.+)\(\backslash\)*\(\backslash\)''})}
+\DoxyCodeLine{00363\ \ \ clang\_regex\ =\ (\_CLANG\_FILE\_LINE\_RE\ +\ \textcolor{stringliteral}{r'error:\ member\ reference\ type\ '}}
+\DoxyCodeLine{00364\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'\(\backslash\)'(?P<class\_name>.*?)\ *\(\backslash\)'\ is\ a\ pointer;\ '}}
+\DoxyCodeLine{00365\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'(did\ you\ mean|maybe\ you\ meant)\ to\ use\ \(\backslash\)'-\/>\(\backslash\)'\(\backslash\)?'})}
+\DoxyCodeLine{00366\ \ \ diagnosis\ =\ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{00367\ \textcolor{stringliteral}{The\ first\ argument\ to\ ON\_CALL()\ and\ EXPECT\_CALL()\ must\ be\ a\ mock\ *object*,}}
+\DoxyCodeLine{00368\ \textcolor{stringliteral}{not\ a\ *pointer*\ to\ it.\ \ Please\ write\ '*(\%(mock\_object)s)'\ instead\ of}}
+\DoxyCodeLine{00369\ \textcolor{stringliteral}{'\%(mock\_object)s'\ as\ your\ first\ argument.}}
+\DoxyCodeLine{00370\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00371\ \textcolor{stringliteral}{For\ example,\ given\ the\ mock\ class:}}
+\DoxyCodeLine{00372\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00373\ \textcolor{stringliteral}{\ \ class\ \%(class\_name)s\ :\ public\ ...\ \{}}
+\DoxyCodeLine{00374\ \textcolor{stringliteral}{\ \ \ \ ...}}
+\DoxyCodeLine{00375\ \textcolor{stringliteral}{\ \ \ \ MOCK\_METHOD0(\%(method)s,\ ...);}}
+\DoxyCodeLine{00376\ \textcolor{stringliteral}{\ \ \};}}
+\DoxyCodeLine{00377\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00378\ \textcolor{stringliteral}{and\ the\ following\ mock\ instance:}}
+\DoxyCodeLine{00379\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00380\ \textcolor{stringliteral}{\ \ \%(class\_name)s*\ mock\_ptr\ =\ ...}}
+\DoxyCodeLine{00381\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00382\ \textcolor{stringliteral}{you\ should\ use\ the\ EXPECT\_CALL\ like\ this:}}
+\DoxyCodeLine{00383\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00384\ \textcolor{stringliteral}{\ \ EXPECT\_CALL(*mock\_ptr,\ \%(method)s(...));"{}"{}"{}}}
+\DoxyCodeLine{00385\ }
+\DoxyCodeLine{00386\ \ \ \textcolor{keywordflow}{return}\ \_GenericDiagnoser(}
+\DoxyCodeLine{00387\ \ \ \ \ \ \ \textcolor{stringliteral}{'MOP'},}
+\DoxyCodeLine{00388\ \ \ \ \ \ \ \textcolor{stringliteral}{'Mock\ Object\ Pointer'},}
+\DoxyCodeLine{00389\ \ \ \ \ \ \ [(gcc\_regex,\ diagnosis),}
+\DoxyCodeLine{00390\ \ \ \ \ \ \ \ (clang\_regex,\ diagnosis\ \%\ \{\textcolor{stringliteral}{'mock\_object'}:\ \textcolor{stringliteral}{'mock\_object'},}
+\DoxyCodeLine{00391\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'method'}:\ \textcolor{stringliteral}{'method'},}
+\DoxyCodeLine{00392\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'class\_name'}:\ \textcolor{stringliteral}{'\%(class\_name)s'}\})],}
+\DoxyCodeLine{00393\ \ \ \ \ \ \ \ msg)}
+\DoxyCodeLine{00394\ }
+\DoxyCodeLine{00395\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacegmock__doctor_a4e3d89cec702f55d02891f0c0bf9c059_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacegmock__doctor_abfe338e6df7ab93a894ebf73fc30851c}\index{gmock\_doctor@{gmock\_doctor}!\_NeedToReturnNothingDiagnoser@{\_NeedToReturnNothingDiagnoser}}
+\index{\_NeedToReturnNothingDiagnoser@{\_NeedToReturnNothingDiagnoser}!gmock\_doctor@{gmock\_doctor}}
+\doxysubsubsection{\texorpdfstring{\_NeedToReturnNothingDiagnoser()}{\_NeedToReturnNothingDiagnoser()}}
+{\footnotesize\ttfamily \label{namespacegmock__doctor_abfe338e6df7ab93a894ebf73fc30851c} 
+gmock\+\_\+doctor.\+\_\+\+Need\+To\+Return\+Nothing\+Diagnoser (\begin{DoxyParamCaption}\item[{}]{msg}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+\begin{DoxyVerb}Diagnoses the NRN disease, given the error messages by the compiler.\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{gmock__doctor_8py_source_l00218}{218}} of file \mbox{\hyperlink{gmock__doctor_8py_source}{gmock\+\_\+doctor.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00218\ \textcolor{keyword}{def\ }\_NeedToReturnNothingDiagnoser(msg):}
+\DoxyCodeLine{00219\ \ \ \textcolor{stringliteral}{"{}"{}"{}Diagnoses\ the\ NRN\ disease,\ given\ the\ error\ messages\ by\ the\ compiler."{}"{}"{}}}
+\DoxyCodeLine{00220\ }
+\DoxyCodeLine{00221\ \ \ gcc\_regex\ =\ (\_GCC\_FILE\_LINE\_RE\ +\ \textcolor{stringliteral}{r'instantiated\ from\ here\(\backslash\)n'}}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'.*gmock-\/actions\(\backslash\).h.*error:\ instantiation\ of\ '}}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'\(\backslash\)'testing::internal::ReturnAction<R>::Impl<F>::value\_\(\backslash\)'\ '}}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'as\ type\ \(\backslash\)'void\(\backslash\)''})}
+\DoxyCodeLine{00225\ \ \ clang\_regex1\ =\ (\textcolor{stringliteral}{r'error:\ field\ has\ incomplete\ type\ '}}
+\DoxyCodeLine{00226\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'\(\backslash\)'Result\(\backslash\)'\ \(\backslash\)(aka\ \(\backslash\)'void\(\backslash\)'\(\backslash\))(\(\backslash\)r)?\(\backslash\)n'}}
+\DoxyCodeLine{00227\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'(.*\(\backslash\)n)*?'}\ +}
+\DoxyCodeLine{00228\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_CLANG\_NON\_GMOCK\_FILE\_LINE\_RE\ +\ \textcolor{stringliteral}{r'note:\ in\ instantiation\ '}}
+\DoxyCodeLine{00229\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'of\ function\ template\ specialization\ '}}
+\DoxyCodeLine{00230\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'\(\backslash\)'testing::internal::ReturnAction<(?P<return\_type>.*)>'}}
+\DoxyCodeLine{00231\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'::operator\ Action<void\ \(\backslash\)(.*\(\backslash\))>\(\backslash\)'\ requested\ here'})}
+\DoxyCodeLine{00232\ \ \ clang\_regex2\ =\ (\textcolor{stringliteral}{r'error:\ field\ has\ incomplete\ type\ '}}
+\DoxyCodeLine{00233\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'\(\backslash\)'Result\(\backslash\)'\ \(\backslash\)(aka\ \(\backslash\)'void\(\backslash\)'\(\backslash\))(\(\backslash\)r)?\(\backslash\)n'}}
+\DoxyCodeLine{00234\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'(.*\(\backslash\)n)*?'}\ +}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_CLANG\_NON\_GMOCK\_FILE\_LINE\_RE\ +\ \textcolor{stringliteral}{r'note:\ in\ instantiation\ '}}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'of\ function\ template\ specialization\ '}}
+\DoxyCodeLine{00237\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'\(\backslash\)'testing::internal::DoBothAction<.*>'}}
+\DoxyCodeLine{00238\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'::operator\ Action<(?P<return\_type>.*)\ \(\backslash\)(.*\(\backslash\))>\(\backslash\)'\ '}}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'requested\ here'})}
+\DoxyCodeLine{00240\ \ \ diagnosis\ =\ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{00241\ \textcolor{stringliteral}{You\ are\ using\ an\ action\ that\ returns\ \%(return\_type)s,\ but\ it\ needs\ to\ return}}
+\DoxyCodeLine{00242\ \textcolor{stringliteral}{void.\ \ Please\ use\ a\ void-\/returning\ action\ instead.}}
+\DoxyCodeLine{00243\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00244\ \textcolor{stringliteral}{All\ actions\ but\ the\ last\ in\ DoAll(...)\ must\ return\ void.\ \ Perhaps\ you\ need}}
+\DoxyCodeLine{00245\ \textcolor{stringliteral}{to\ re-\/arrange\ the\ order\ of\ actions\ in\ a\ DoAll(),\ if\ you\ are\ using\ one?"{}"{}"{}}}
+\DoxyCodeLine{00246\ \ \ \textcolor{keywordflow}{return}\ \_GenericDiagnoser(}
+\DoxyCodeLine{00247\ \ \ \ \ \ \ \textcolor{stringliteral}{'NRN'},}
+\DoxyCodeLine{00248\ \ \ \ \ \ \ \textcolor{stringliteral}{'Need\ to\ Return\ Nothing'},}
+\DoxyCodeLine{00249\ \ \ \ \ \ \ [(gcc\_regex,\ diagnosis\ \%\ \{\textcolor{stringliteral}{'return\_type'}:\ \textcolor{stringliteral}{'*something*'}\}),}
+\DoxyCodeLine{00250\ \ \ \ \ \ \ \ (clang\_regex1,\ diagnosis),}
+\DoxyCodeLine{00251\ \ \ \ \ \ \ \ (clang\_regex2,\ diagnosis)],}
+\DoxyCodeLine{00252\ \ \ \ \ \ \ msg)}
+\DoxyCodeLine{00253\ }
+\DoxyCodeLine{00254\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacegmock__doctor_abfe338e6df7ab93a894ebf73fc30851c_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacegmock__doctor_a318414e5137f3b36d544253413a85539}\index{gmock\_doctor@{gmock\_doctor}!\_NeedToReturnReferenceDiagnoser@{\_NeedToReturnReferenceDiagnoser}}
+\index{\_NeedToReturnReferenceDiagnoser@{\_NeedToReturnReferenceDiagnoser}!gmock\_doctor@{gmock\_doctor}}
+\doxysubsubsection{\texorpdfstring{\_NeedToReturnReferenceDiagnoser()}{\_NeedToReturnReferenceDiagnoser()}}
+{\footnotesize\ttfamily \label{namespacegmock__doctor_a318414e5137f3b36d544253413a85539} 
+gmock\+\_\+doctor.\+\_\+\+Need\+To\+Return\+Reference\+Diagnoser (\begin{DoxyParamCaption}\item[{}]{msg}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+\begin{DoxyVerb}Diagnoses the NRR disease, given the error messages by the compiler.\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{gmock__doctor_8py_source_l00166}{166}} of file \mbox{\hyperlink{gmock__doctor_8py_source}{gmock\+\_\+doctor.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00166\ \textcolor{keyword}{def\ }\_NeedToReturnReferenceDiagnoser(msg):}
+\DoxyCodeLine{00167\ \ \ \textcolor{stringliteral}{"{}"{}"{}Diagnoses\ the\ NRR\ disease,\ given\ the\ error\ messages\ by\ the\ compiler."{}"{}"{}}}
+\DoxyCodeLine{00168\ }
+\DoxyCodeLine{00169\ \ \ gcc\_regex\ =\ (\textcolor{stringliteral}{r'In\ member\ function\ \(\backslash\)'testing::internal::ReturnAction<R>.*\(\backslash\)n'}}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ +\ \_GCC\_FILE\_LINE\_RE\ +\ \textcolor{stringliteral}{r'instantiated\ from\ here\(\backslash\)n'}}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'.*gmock-\/actions\(\backslash\).h.*error:\ creating\ array\ with\ negative\ size'})}
+\DoxyCodeLine{00172\ \ \ clang\_regex\ =\ (\textcolor{stringliteral}{r'error:.*array.*negative.*\(\backslash\)r?\(\backslash\)n'}}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'(.*\(\backslash\)n)*?'}\ +}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_CLANG\_NON\_GMOCK\_FILE\_LINE\_RE\ +}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'note:\ in\ instantiation\ of\ function\ template\ specialization\ '}}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'\(\backslash\)'testing::internal::ReturnAction<(?P<type>.*)>'}}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'::operator\ Action<.*>\(\backslash\)'\ requested\ here'})}
+\DoxyCodeLine{00178\ \ \ clang11\_re\ =\ (\textcolor{stringliteral}{r'use\_ReturnRef\_instead\_of\_Return\_to\_return\_a\_reference.*'}}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'(.*\(\backslash\)n)*?'}\ +\ \_CLANG\_NON\_GMOCK\_FILE\_LINE\_RE)}
+\DoxyCodeLine{00180\ }
+\DoxyCodeLine{00181\ \ \ diagnosis\ =\ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{00182\ \textcolor{stringliteral}{You\ are\ using\ a\ Return()\ action\ in\ a\ function\ that\ returns\ a\ reference\ to}}
+\DoxyCodeLine{00183\ \textcolor{stringliteral}{\%(type)s.\ \ Please\ use\ ReturnRef()\ instead."{}"{}"{}}}
+\DoxyCodeLine{00184\ \ \ \textcolor{keywordflow}{return}\ \_GenericDiagnoser(\textcolor{stringliteral}{'NRR'},\ \textcolor{stringliteral}{'Need\ to\ Return\ Reference'},}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [(clang\_regex,\ diagnosis),}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (clang11\_re,\ diagnosis\ \%\ \{\textcolor{stringliteral}{'type'}:\ \textcolor{stringliteral}{'a\ type'}\}),}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (gcc\_regex,\ diagnosis\ \%\ \{\textcolor{stringliteral}{'type'}:\ \textcolor{stringliteral}{'a\ type'}\})],}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ msg)}
+\DoxyCodeLine{00189\ }
+\DoxyCodeLine{00190\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacegmock__doctor_a318414e5137f3b36d544253413a85539_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacegmock__doctor_af21e6056d13fcce7f25290f02239f4a7}\index{gmock\_doctor@{gmock\_doctor}!\_NeedToReturnSomethingDiagnoser@{\_NeedToReturnSomethingDiagnoser}}
+\index{\_NeedToReturnSomethingDiagnoser@{\_NeedToReturnSomethingDiagnoser}!gmock\_doctor@{gmock\_doctor}}
+\doxysubsubsection{\texorpdfstring{\_NeedToReturnSomethingDiagnoser()}{\_NeedToReturnSomethingDiagnoser()}}
+{\footnotesize\ttfamily \label{namespacegmock__doctor_af21e6056d13fcce7f25290f02239f4a7} 
+gmock\+\_\+doctor.\+\_\+\+Need\+To\+Return\+Something\+Diagnoser (\begin{DoxyParamCaption}\item[{}]{msg}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+\begin{DoxyVerb}Diagnoses the NRS disease, given the error messages by the compiler.\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{gmock__doctor_8py_source_l00191}{191}} of file \mbox{\hyperlink{gmock__doctor_8py_source}{gmock\+\_\+doctor.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00191\ \textcolor{keyword}{def\ }\_NeedToReturnSomethingDiagnoser(msg):}
+\DoxyCodeLine{00192\ \ \ \textcolor{stringliteral}{"{}"{}"{}Diagnoses\ the\ NRS\ disease,\ given\ the\ error\ messages\ by\ the\ compiler."{}"{}"{}}}
+\DoxyCodeLine{00193\ }
+\DoxyCodeLine{00194\ \ \ gcc\_regex\ =\ (\_GCC\_FILE\_LINE\_RE\ +\ \textcolor{stringliteral}{r'(instantiated\ from\ here\(\backslash\)n.'}}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'*gmock.*actions\(\backslash\).h.*error:\ void\ value\ not\ ignored)'}}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'|(error:\ control\ reaches\ end\ of\ non-\/void\ function)'})}
+\DoxyCodeLine{00197\ \ \ clang\_regex1\ =\ (\_CLANG\_FILE\_LINE\_RE\ +}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'error:\ cannot\ initialize\ return\ object\ '}}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'of\ type\ \(\backslash\)'Result\(\backslash\)'\ \(\backslash\)(aka\ \(\backslash\)'(?P<return\_type>.*)\(\backslash\)'\(\backslash\))\ '}}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'with\ an\ rvalue\ of\ type\ \(\backslash\)'void\(\backslash\)''})}
+\DoxyCodeLine{00201\ \ \ clang\_regex2\ =\ (\_CLANG\_FILE\_LINE\_RE\ +}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'error:\ cannot\ initialize\ return\ object\ '}}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'of\ type\ \(\backslash\)'(?P<return\_type>.*)\(\backslash\)'\ '}}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'with\ an\ rvalue\ of\ type\ \(\backslash\)'void\(\backslash\)''})}
+\DoxyCodeLine{00205\ \ \ diagnosis\ =\ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{00206\ \textcolor{stringliteral}{You\ are\ using\ an\ action\ that\ returns\ void,\ but\ it\ needs\ to\ return}}
+\DoxyCodeLine{00207\ \textcolor{stringliteral}{\%(return\_type)s.\ \ Please\ tell\ it\ *what*\ to\ return.\ \ Perhaps\ you\ can\ use}}
+\DoxyCodeLine{00208\ \textcolor{stringliteral}{the\ pattern\ DoAll(some\_action,\ Return(some\_value))?"{}"{}"{}}}
+\DoxyCodeLine{00209\ \ \ \textcolor{keywordflow}{return}\ \_GenericDiagnoser(}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \textcolor{stringliteral}{'NRS'},}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \textcolor{stringliteral}{'Need\ to\ Return\ Something'},}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ [(gcc\_regex,\ diagnosis\ \%\ \{\textcolor{stringliteral}{'return\_type'}:\ \textcolor{stringliteral}{'*something*'}\}),}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \ (clang\_regex1,\ diagnosis),}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ (clang\_regex2,\ diagnosis)],}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ msg)}
+\DoxyCodeLine{00216\ }
+\DoxyCodeLine{00217\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacegmock__doctor_af21e6056d13fcce7f25290f02239f4a7_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacegmock__doctor_ac6d76fd7dc849f454edd8049785afa85}\index{gmock\_doctor@{gmock\_doctor}!\_NeedToUseReturnNullDiagnoser@{\_NeedToUseReturnNullDiagnoser}}
+\index{\_NeedToUseReturnNullDiagnoser@{\_NeedToUseReturnNullDiagnoser}!gmock\_doctor@{gmock\_doctor}}
+\doxysubsubsection{\texorpdfstring{\_NeedToUseReturnNullDiagnoser()}{\_NeedToUseReturnNullDiagnoser()}}
+{\footnotesize\ttfamily \label{namespacegmock__doctor_ac6d76fd7dc849f454edd8049785afa85} 
+gmock\+\_\+doctor.\+\_\+\+Need\+To\+Use\+Return\+Null\+Diagnoser (\begin{DoxyParamCaption}\item[{}]{msg}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+\begin{DoxyVerb}Diagnoses the NRNULL disease, given the error messages by the compiler.\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{gmock__doctor_8py_source_l00416}{416}} of file \mbox{\hyperlink{gmock__doctor_8py_source}{gmock\+\_\+doctor.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00416\ \textcolor{keyword}{def\ }\_NeedToUseReturnNullDiagnoser(msg):}
+\DoxyCodeLine{00417\ \ \ \textcolor{stringliteral}{"{}"{}"{}Diagnoses\ the\ NRNULL\ disease,\ given\ the\ error\ messages\ by\ the\ compiler."{}"{}"{}}}
+\DoxyCodeLine{00418\ }
+\DoxyCodeLine{00419\ \ \ gcc\_regex\ =\ (\textcolor{stringliteral}{'instantiated\ from\ \(\backslash\)'testing::internal::ReturnAction<R>'}}
+\DoxyCodeLine{00420\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'::operator\ testing::Action<Func>\(\backslash\)(\(\backslash\))\ const.*\(\backslash\)n'}\ +}
+\DoxyCodeLine{00421\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_GCC\_FILE\_LINE\_RE\ +\ \textcolor{stringliteral}{r'instantiated\ from\ here\(\backslash\)n'}}
+\DoxyCodeLine{00422\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'.*error:\ no\ matching\ function\ for\ call\ to\ \(\backslash\)'ImplicitCast\_\(\backslash\)('}}
+\DoxyCodeLine{00423\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'(:?long\ )?int\&\(\backslash\))'})}
+\DoxyCodeLine{00424\ \ \ clang\_regex\ =\ (\textcolor{stringliteral}{r'\(\backslash\)bgmock-\/actions.h:.*\ error:\ no\ matching\ function\ for\ '}}
+\DoxyCodeLine{00425\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'call\ to\ \(\backslash\)'ImplicitCast\_\(\backslash\)'\(\backslash\)r?\(\backslash\)n'}}
+\DoxyCodeLine{00426\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'(.*\(\backslash\)n)*?'}\ +}
+\DoxyCodeLine{00427\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_CLANG\_NON\_GMOCK\_FILE\_LINE\_RE\ +\ \textcolor{stringliteral}{r'note:\ in\ instantiation\ '}}
+\DoxyCodeLine{00428\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'of\ function\ template\ specialization\ '}}
+\DoxyCodeLine{00429\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'\(\backslash\)'testing::internal::ReturnAction<(int|long)>::operator\ '}}
+\DoxyCodeLine{00430\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'Action<(?P<type>.*)\(\backslash\)(\(\backslash\))>\(\backslash\)'\ requested\ here'})}
+\DoxyCodeLine{00431\ \ \ diagnosis\ =\ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{00432\ \textcolor{stringliteral}{You\ are\ probably\ calling\ Return(NULL)\ and\ the\ compiler\ isn't\ sure\ how\ to\ turn}}
+\DoxyCodeLine{00433\ \textcolor{stringliteral}{NULL\ into\ \%(type)s.\ Use\ ReturnNull()\ instead.}}
+\DoxyCodeLine{00434\ \textcolor{stringliteral}{Note:\ the\ line\ number\ may\ be\ off;\ please\ fix\ all\ instances\ of\ Return(NULL)."{}"{}"{}}}
+\DoxyCodeLine{00435\ \ \ \textcolor{keywordflow}{return}\ \_GenericDiagnoser(}
+\DoxyCodeLine{00436\ \ \ \ \ \ \ \textcolor{stringliteral}{'NRNULL'},\ \textcolor{stringliteral}{'Need\ to\ use\ ReturnNull'},}
+\DoxyCodeLine{00437\ \ \ \ \ \ \ [(clang\_regex,\ diagnosis),}
+\DoxyCodeLine{00438\ \ \ \ \ \ \ \ (gcc\_regex,\ diagnosis\ \%\ \{\textcolor{stringliteral}{'type'}:\ \textcolor{stringliteral}{'the\ right\ type'}\})],}
+\DoxyCodeLine{00439\ \ \ \ \ \ \ msg)}
+\DoxyCodeLine{00440\ }
+\DoxyCodeLine{00441\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacegmock__doctor_ac6d76fd7dc849f454edd8049785afa85_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacegmock__doctor_a027b909d515156fe0752095ac94b9956}\index{gmock\_doctor@{gmock\_doctor}!\_NeedToUseSymbolDiagnoser@{\_NeedToUseSymbolDiagnoser}}
+\index{\_NeedToUseSymbolDiagnoser@{\_NeedToUseSymbolDiagnoser}!gmock\_doctor@{gmock\_doctor}}
+\doxysubsubsection{\texorpdfstring{\_NeedToUseSymbolDiagnoser()}{\_NeedToUseSymbolDiagnoser()}}
+{\footnotesize\ttfamily \label{namespacegmock__doctor_a027b909d515156fe0752095ac94b9956} 
+gmock\+\_\+doctor.\+\_\+\+Need\+To\+Use\+Symbol\+Diagnoser (\begin{DoxyParamCaption}\item[{}]{msg}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+\begin{DoxyVerb}Diagnoses the NUS disease, given the error messages by the compiler.\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{gmock__doctor_8py_source_l00396}{396}} of file \mbox{\hyperlink{gmock__doctor_8py_source}{gmock\+\_\+doctor.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00396\ \textcolor{keyword}{def\ }\_NeedToUseSymbolDiagnoser(msg):}
+\DoxyCodeLine{00397\ \ \ \textcolor{stringliteral}{"{}"{}"{}Diagnoses\ the\ NUS\ disease,\ given\ the\ error\ messages\ by\ the\ compiler."{}"{}"{}}}
+\DoxyCodeLine{00398\ }
+\DoxyCodeLine{00399\ \ \ gcc\_regex\ =\ (\_GCC\_FILE\_LINE\_RE\ +\ \textcolor{stringliteral}{r'error:\ \(\backslash\)'(?P<symbol>.+)\(\backslash\)'\ '}}
+\DoxyCodeLine{00400\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'(was\ not\ declared\ in\ this\ scope|has\ not\ been\ declared)'})}
+\DoxyCodeLine{00401\ \ \ clang\_regex\ =\ (\_CLANG\_FILE\_LINE\_RE\ +}
+\DoxyCodeLine{00402\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'error:\ (use\ of\ undeclared\ identifier|unknown\ type\ name|'}}
+\DoxyCodeLine{00403\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'no\ template\ named)\ \(\backslash\)'(?P<symbol>[\string^\(\backslash\)']+)\(\backslash\)''})}
+\DoxyCodeLine{00404\ \ \ diagnosis\ =\ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{00405\ \textcolor{stringliteral}{'\%(symbol)s'\ is\ defined\ by\ Google\ Mock\ in\ the\ testing\ namespace.}}
+\DoxyCodeLine{00406\ \textcolor{stringliteral}{Did\ you\ forget\ to\ write}}
+\DoxyCodeLine{00407\ \textcolor{stringliteral}{\ \ using\ testing::\%(symbol)s;}}
+\DoxyCodeLine{00408\ \textcolor{stringliteral}{?"{}"{}"{}}}
+\DoxyCodeLine{00409\ \ \ \textcolor{keywordflow}{for}\ m\ \textcolor{keywordflow}{in}\ (list(\_FindAllMatches(gcc\_regex,\ msg))\ +}
+\DoxyCodeLine{00410\ \ \ \ \ \ \ \ \ \ \ \ \ list(\_FindAllMatches(clang\_regex,\ msg))):}
+\DoxyCodeLine{00411\ \ \ \ \ symbol\ =\ m.groupdict()[\textcolor{stringliteral}{'symbol'}]}
+\DoxyCodeLine{00412\ \ \ \ \ \textcolor{keywordflow}{if}\ symbol\ \textcolor{keywordflow}{in}\ \_COMMON\_GMOCK\_SYMBOLS:}
+\DoxyCodeLine{00413\ \ \ \ \ \ \ \textcolor{keywordflow}{yield}\ (\textcolor{stringliteral}{'NUS'},\ \textcolor{stringliteral}{'Need\ to\ Use\ Symbol'},\ diagnosis\ \%\ m.groupdict())}
+\DoxyCodeLine{00414\ }
+\DoxyCodeLine{00415\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacegmock__doctor_a027b909d515156fe0752095ac94b9956_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacegmock__doctor_a5f4d253b280ab21b2c649bdb1ce8cc58}\index{gmock\_doctor@{gmock\_doctor}!\_OverloadedFunctionActionDiagnoser@{\_OverloadedFunctionActionDiagnoser}}
+\index{\_OverloadedFunctionActionDiagnoser@{\_OverloadedFunctionActionDiagnoser}!gmock\_doctor@{gmock\_doctor}}
+\doxysubsubsection{\texorpdfstring{\_OverloadedFunctionActionDiagnoser()}{\_OverloadedFunctionActionDiagnoser()}}
+{\footnotesize\ttfamily \label{namespacegmock__doctor_a5f4d253b280ab21b2c649bdb1ce8cc58} 
+gmock\+\_\+doctor.\+\_\+\+Overloaded\+Function\+Action\+Diagnoser (\begin{DoxyParamCaption}\item[{}]{msg}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+\begin{DoxyVerb}Diagnoses the OFA disease, given the error messages by the compiler.\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{gmock__doctor_8py_source_l00303}{303}} of file \mbox{\hyperlink{gmock__doctor_8py_source}{gmock\+\_\+doctor.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00303\ \textcolor{keyword}{def\ }\_OverloadedFunctionActionDiagnoser(msg):}
+\DoxyCodeLine{00304\ \ \ \textcolor{stringliteral}{"{}"{}"{}Diagnoses\ the\ OFA\ disease,\ given\ the\ error\ messages\ by\ the\ compiler."{}"{}"{}}}
+\DoxyCodeLine{00305\ }
+\DoxyCodeLine{00306\ \ \ gcc\_regex\ =\ (\_GCC\_FILE\_LINE\_RE\ +\ \textcolor{stringliteral}{r'error:\ no\ matching\ function\ for\ call\ to\ '}}
+\DoxyCodeLine{00307\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'\(\backslash\)'Invoke\(\backslash\)(<unresolved\ overloaded\ function\ type>'})}
+\DoxyCodeLine{00308\ \ \ clang\_regex\ =\ (\_CLANG\_FILE\_LINE\_RE\ +\ \textcolor{stringliteral}{r'error:\ no\ matching\ '}}
+\DoxyCodeLine{00309\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'function\ for\ call\ to\ \(\backslash\)'Invoke\(\backslash\)'\(\backslash\)r?\(\backslash\)n'}}
+\DoxyCodeLine{00310\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'(.*\(\backslash\)n)*?'}}
+\DoxyCodeLine{00311\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'.*\(\backslash\)bgmock-\/generated-\/actions\(\backslash\).h:\(\backslash\)d+:\(\backslash\)d+:\(\backslash\)s+'}}
+\DoxyCodeLine{00312\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'note:\ candidate\ template\ ignored:\(\backslash\)s+'}}
+\DoxyCodeLine{00313\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'couldn\(\backslash\)'t\ infer\ template\ argument\ \(\backslash\)'FunctionImpl\(\backslash\)''})}
+\DoxyCodeLine{00314\ \ \ diagnosis\ =\ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{00315\ \textcolor{stringliteral}{Function\ you\ are\ passing\ to\ Invoke\ is\ overloaded.\ \ Please\ tell\ your\ compiler}}
+\DoxyCodeLine{00316\ \textcolor{stringliteral}{which\ overloaded\ version\ you\ want\ to\ use.}}
+\DoxyCodeLine{00317\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00318\ \textcolor{stringliteral}{For\ example,\ if\ you\ want\ to\ use\ the\ version\ whose\ signature\ is}}
+\DoxyCodeLine{00319\ \textcolor{stringliteral}{\ \ bool\ MyFunction(int\ n,\ double\ x);}}
+\DoxyCodeLine{00320\ \textcolor{stringliteral}{you\ should\ write\ something\ like}}
+\DoxyCodeLine{00321\ \textcolor{stringliteral}{\ \ Invoke(static\_cast<bool\ (*)(int\ n,\ double\ x)>(MyFunction))"{}"{}"{}}}
+\DoxyCodeLine{00322\ \ \ \textcolor{keywordflow}{return}\ \_GenericDiagnoser(\textcolor{stringliteral}{'OFA'},\ \textcolor{stringliteral}{'Overloaded\ Function\ Action'},}
+\DoxyCodeLine{00323\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [(gcc\_regex,\ diagnosis),}
+\DoxyCodeLine{00324\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (clang\_regex,\ diagnosis)],}
+\DoxyCodeLine{00325\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ msg)}
+\DoxyCodeLine{00326\ }
+\DoxyCodeLine{00327\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacegmock__doctor_a5f4d253b280ab21b2c649bdb1ce8cc58_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacegmock__doctor_a4c60b8d2153e815b3f5a9e17a2b7ed3f}\index{gmock\_doctor@{gmock\_doctor}!\_OverloadedFunctionMatcherDiagnoser@{\_OverloadedFunctionMatcherDiagnoser}}
+\index{\_OverloadedFunctionMatcherDiagnoser@{\_OverloadedFunctionMatcherDiagnoser}!gmock\_doctor@{gmock\_doctor}}
+\doxysubsubsection{\texorpdfstring{\_OverloadedFunctionMatcherDiagnoser()}{\_OverloadedFunctionMatcherDiagnoser()}}
+{\footnotesize\ttfamily \label{namespacegmock__doctor_a4c60b8d2153e815b3f5a9e17a2b7ed3f} 
+gmock\+\_\+doctor.\+\_\+\+Overloaded\+Function\+Matcher\+Diagnoser (\begin{DoxyParamCaption}\item[{}]{msg}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+\begin{DoxyVerb}Diagnoses the OFM disease, given the error messages by the compiler.\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{gmock__doctor_8py_source_l00282}{282}} of file \mbox{\hyperlink{gmock__doctor_8py_source}{gmock\+\_\+doctor.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00282\ \textcolor{keyword}{def\ }\_OverloadedFunctionMatcherDiagnoser(msg):}
+\DoxyCodeLine{00283\ \ \ \textcolor{stringliteral}{"{}"{}"{}Diagnoses\ the\ OFM\ disease,\ given\ the\ error\ messages\ by\ the\ compiler."{}"{}"{}}}
+\DoxyCodeLine{00284\ }
+\DoxyCodeLine{00285\ \ \ gcc\_regex\ =\ (\_GCC\_FILE\_LINE\_RE\ +\ \textcolor{stringliteral}{r'error:\ no\ matching\ function\ for\ '}}
+\DoxyCodeLine{00286\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'call\ to\ \(\backslash\)'Truly\(\backslash\)(<unresolved\ overloaded\ function\ type>\(\backslash\))'})}
+\DoxyCodeLine{00287\ \ \ clang\_regex\ =\ (\_CLANG\_FILE\_LINE\_RE\ +\ \textcolor{stringliteral}{r'error:\ no\ matching\ function\ for\ '}}
+\DoxyCodeLine{00288\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'call\ to\ \(\backslash\)'Truly'})}
+\DoxyCodeLine{00289\ \ \ diagnosis\ =\ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{00290\ \textcolor{stringliteral}{The\ argument\ you\ gave\ to\ Truly()\ is\ an\ overloaded\ function.\ \ Please\ tell}}
+\DoxyCodeLine{00291\ \textcolor{stringliteral}{your\ compiler\ which\ overloaded\ version\ you\ want\ to\ use.}}
+\DoxyCodeLine{00292\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00293\ \textcolor{stringliteral}{For\ example,\ if\ you\ want\ to\ use\ the\ version\ whose\ signature\ is}}
+\DoxyCodeLine{00294\ \textcolor{stringliteral}{\ \ bool\ Foo(int\ n);}}
+\DoxyCodeLine{00295\ \textcolor{stringliteral}{you\ should\ write}}
+\DoxyCodeLine{00296\ \textcolor{stringliteral}{\ \ Truly(static\_cast<bool\ (*)(int\ n)>(Foo))"{}"{}"{}}}
+\DoxyCodeLine{00297\ \ \ \textcolor{keywordflow}{return}\ \_GenericDiagnoser(\textcolor{stringliteral}{'OFM'},\ \textcolor{stringliteral}{'Overloaded\ Function\ Matcher'},}
+\DoxyCodeLine{00298\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [(gcc\_regex,\ diagnosis),}
+\DoxyCodeLine{00299\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (clang\_regex,\ diagnosis)],}
+\DoxyCodeLine{00300\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ msg)}
+\DoxyCodeLine{00301\ }
+\DoxyCodeLine{00302\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacegmock__doctor_a4c60b8d2153e815b3f5a9e17a2b7ed3f_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacegmock__doctor_aef440407054f259f8b189dd151e29de2}\index{gmock\_doctor@{gmock\_doctor}!\_OverloadedMethodActionDiagnoser@{\_OverloadedMethodActionDiagnoser}}
+\index{\_OverloadedMethodActionDiagnoser@{\_OverloadedMethodActionDiagnoser}!gmock\_doctor@{gmock\_doctor}}
+\doxysubsubsection{\texorpdfstring{\_OverloadedMethodActionDiagnoser()}{\_OverloadedMethodActionDiagnoser()}}
+{\footnotesize\ttfamily \label{namespacegmock__doctor_aef440407054f259f8b189dd151e29de2} 
+gmock\+\_\+doctor.\+\_\+\+Overloaded\+Method\+Action\+Diagnoser (\begin{DoxyParamCaption}\item[{}]{msg}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+\begin{DoxyVerb}Diagnoses the OMA disease, given the error messages by the compiler.\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{gmock__doctor_8py_source_l00328}{328}} of file \mbox{\hyperlink{gmock__doctor_8py_source}{gmock\+\_\+doctor.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00328\ \textcolor{keyword}{def\ }\_OverloadedMethodActionDiagnoser(msg):}
+\DoxyCodeLine{00329\ \ \ \textcolor{stringliteral}{"{}"{}"{}Diagnoses\ the\ OMA\ disease,\ given\ the\ error\ messages\ by\ the\ compiler."{}"{}"{}}}
+\DoxyCodeLine{00330\ }
+\DoxyCodeLine{00331\ \ \ gcc\_regex\ =\ (\_GCC\_FILE\_LINE\_RE\ +\ \textcolor{stringliteral}{r'error:\ no\ matching\ function\ for\ '}}
+\DoxyCodeLine{00332\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'call\ to\ \(\backslash\)'Invoke\(\backslash\)(.+,\ <unresolved\ overloaded\ function\ '}}
+\DoxyCodeLine{00333\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'type>\(\backslash\))'})}
+\DoxyCodeLine{00334\ \ \ clang\_regex\ =\ (\_CLANG\_FILE\_LINE\_RE\ +\ \textcolor{stringliteral}{r'error:\ no\ matching\ function\ '}}
+\DoxyCodeLine{00335\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'for\ call\ to\ \(\backslash\)'Invoke\(\backslash\)'\(\backslash\)r?\(\backslash\)n'}}
+\DoxyCodeLine{00336\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'(.*\(\backslash\)n)*?'}}
+\DoxyCodeLine{00337\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'.*\(\backslash\)bgmock-\/generated-\/actions\(\backslash\).h:\(\backslash\)d+:\(\backslash\)d+:\ '}}
+\DoxyCodeLine{00338\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'note:\ candidate\ function\ template\ not\ viable:\ '}}
+\DoxyCodeLine{00339\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'requires\ .*,\ but\ 2\ (arguments\ )?were\ provided'})}
+\DoxyCodeLine{00340\ \ \ diagnosis\ =\ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{00341\ \textcolor{stringliteral}{The\ second\ argument\ you\ gave\ to\ Invoke()\ is\ an\ overloaded\ method.\ \ Please}}
+\DoxyCodeLine{00342\ \textcolor{stringliteral}{tell\ your\ compiler\ which\ overloaded\ version\ you\ want\ to\ use.}}
+\DoxyCodeLine{00343\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00344\ \textcolor{stringliteral}{For\ example,\ if\ you\ want\ to\ use\ the\ version\ whose\ signature\ is}}
+\DoxyCodeLine{00345\ \textcolor{stringliteral}{\ \ class\ Foo\ \{}}
+\DoxyCodeLine{00346\ \textcolor{stringliteral}{\ \ \ \ ...}}
+\DoxyCodeLine{00347\ \textcolor{stringliteral}{\ \ \ \ bool\ Bar(int\ n,\ double\ x);}}
+\DoxyCodeLine{00348\ \textcolor{stringliteral}{\ \ \};}}
+\DoxyCodeLine{00349\ \textcolor{stringliteral}{you\ should\ write\ something\ like}}
+\DoxyCodeLine{00350\ \textcolor{stringliteral}{\ \ Invoke(foo,\ static\_cast<bool\ (Foo::*)(int\ n,\ double\ x)>(\&Foo::Bar))"{}"{}"{}}}
+\DoxyCodeLine{00351\ \ \ \textcolor{keywordflow}{return}\ \_GenericDiagnoser(\textcolor{stringliteral}{'OMA'},\ \textcolor{stringliteral}{'Overloaded\ Method\ Action'},}
+\DoxyCodeLine{00352\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [(gcc\_regex,\ diagnosis),}
+\DoxyCodeLine{00353\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (clang\_regex,\ diagnosis)],}
+\DoxyCodeLine{00354\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ msg)}
+\DoxyCodeLine{00355\ }
+\DoxyCodeLine{00356\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacegmock__doctor_aef440407054f259f8b189dd151e29de2_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacegmock__doctor_a3d3ae858175093d8617335de08dbc994}\index{gmock\_doctor@{gmock\_doctor}!\_TypeInTemplatedBaseDiagnoser@{\_TypeInTemplatedBaseDiagnoser}}
+\index{\_TypeInTemplatedBaseDiagnoser@{\_TypeInTemplatedBaseDiagnoser}!gmock\_doctor@{gmock\_doctor}}
+\doxysubsubsection{\texorpdfstring{\_TypeInTemplatedBaseDiagnoser()}{\_TypeInTemplatedBaseDiagnoser()}}
+{\footnotesize\ttfamily \label{namespacegmock__doctor_a3d3ae858175093d8617335de08dbc994} 
+gmock\+\_\+doctor.\+\_\+\+Type\+In\+Templated\+Base\+Diagnoser (\begin{DoxyParamCaption}\item[{}]{msg}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+\begin{DoxyVerb}Diagnoses the TTB disease, given the error messages by the compiler.\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{gmock__doctor_8py_source_l00442}{442}} of file \mbox{\hyperlink{gmock__doctor_8py_source}{gmock\+\_\+doctor.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00442\ \textcolor{keyword}{def\ }\_TypeInTemplatedBaseDiagnoser(msg):}
+\DoxyCodeLine{00443\ \ \ \textcolor{stringliteral}{"{}"{}"{}Diagnoses\ the\ TTB\ disease,\ given\ the\ error\ messages\ by\ the\ compiler."{}"{}"{}}}
+\DoxyCodeLine{00444\ }
+\DoxyCodeLine{00445\ \ \ \textcolor{comment}{\#\ This\ version\ works\ when\ the\ type\ is\ used\ as\ the\ mock\ function's\ return}}
+\DoxyCodeLine{00446\ \ \ \textcolor{comment}{\#\ type.}}
+\DoxyCodeLine{00447\ \ \ gcc\_4\_3\_1\_regex\_type\_in\_retval\ =\ (}
+\DoxyCodeLine{00448\ \ \ \ \ \ \ \textcolor{stringliteral}{r'In\ member\ function\ \(\backslash\)'int\ .*\(\backslash\)n'}\ +\ \_GCC\_FILE\_LINE\_RE\ +}
+\DoxyCodeLine{00449\ \ \ \ \ \ \ \textcolor{stringliteral}{r'error:\ a\ function\ call\ cannot\ appear\ in\ a\ constant-\/expression'})}
+\DoxyCodeLine{00450\ \ \ gcc\_4\_4\_0\_regex\_type\_in\_retval\ =\ (}
+\DoxyCodeLine{00451\ \ \ \ \ \ \ \textcolor{stringliteral}{r'error:\ a\ function\ call\ cannot\ appear\ in\ a\ constant-\/expression'}}
+\DoxyCodeLine{00452\ \ \ \ \ \ \ +\ \_GCC\_FILE\_LINE\_RE\ +\ \textcolor{stringliteral}{r'error:\ template\ argument\ 1\ is\ invalid\(\backslash\)n'})}
+\DoxyCodeLine{00453\ \ \ \textcolor{comment}{\#\ This\ version\ works\ when\ the\ type\ is\ used\ as\ the\ mock\ function's\ sole}}
+\DoxyCodeLine{00454\ \ \ \textcolor{comment}{\#\ parameter\ type.}}
+\DoxyCodeLine{00455\ \ \ gcc\_regex\_type\_of\_sole\_param\ =\ (}
+\DoxyCodeLine{00456\ \ \ \ \ \ \ \_GCC\_FILE\_LINE\_RE\ +}
+\DoxyCodeLine{00457\ \ \ \ \ \ \ \textcolor{stringliteral}{r'error:\ \(\backslash\)'(?P<type>.+)\(\backslash\)'\ was\ not\ declared\ in\ this\ scope\(\backslash\)n'}}
+\DoxyCodeLine{00458\ \ \ \ \ \ \ \textcolor{stringliteral}{r'.*error:\ template\ argument\ 1\ is\ invalid\(\backslash\)n'})}
+\DoxyCodeLine{00459\ \ \ \textcolor{comment}{\#\ This\ version\ works\ when\ the\ type\ is\ used\ as\ a\ parameter\ of\ a\ mock}}
+\DoxyCodeLine{00460\ \ \ \textcolor{comment}{\#\ function\ that\ has\ multiple\ parameters.}}
+\DoxyCodeLine{00461\ \ \ gcc\_regex\_type\_of\_a\_param\ =\ (}
+\DoxyCodeLine{00462\ \ \ \ \ \ \ \textcolor{stringliteral}{r'error:\ expected\ \`{};\(\backslash\)'\ before\ \(\backslash\)'::\(\backslash\)'\ token\(\backslash\)n'}}
+\DoxyCodeLine{00463\ \ \ \ \ \ \ +\ \_GCC\_FILE\_LINE\_RE\ +}
+\DoxyCodeLine{00464\ \ \ \ \ \ \ \textcolor{stringliteral}{r'error:\ \(\backslash\)'(?P<type>.+)\(\backslash\)'\ was\ not\ declared\ in\ this\ scope\(\backslash\)n'}}
+\DoxyCodeLine{00465\ \ \ \ \ \ \ \textcolor{stringliteral}{r'.*error:\ template\ argument\ 1\ is\ invalid\(\backslash\)n'}}
+\DoxyCodeLine{00466\ \ \ \ \ \ \ \textcolor{stringliteral}{r'.*error:\ \(\backslash\)'.+\(\backslash\)'\ was\ not\ declared\ in\ this\ scope'})}
+\DoxyCodeLine{00467\ \ \ clang\_regex\_type\_of\_retval\_or\_sole\_param\ =\ (}
+\DoxyCodeLine{00468\ \ \ \ \ \ \ \_CLANG\_FILE\_LINE\_RE\ +}
+\DoxyCodeLine{00469\ \ \ \ \ \ \ \textcolor{stringliteral}{r'error:\ use\ of\ undeclared\ identifier\ \(\backslash\)'(?P<type>.*)\(\backslash\)'\(\backslash\)n'}}
+\DoxyCodeLine{00470\ \ \ \ \ \ \ \textcolor{stringliteral}{r'(.*\(\backslash\)n)*?'}}
+\DoxyCodeLine{00471\ \ \ \ \ \ \ \textcolor{stringliteral}{r'(?P=file):(?P=line):\(\backslash\)d+:\ error:\ '}}
+\DoxyCodeLine{00472\ \ \ \ \ \ \ \textcolor{stringliteral}{r'non-\/friend\ class\ member\ \(\backslash\)'Result\(\backslash\)'\ cannot\ have\ a\ qualified\ name'}}
+\DoxyCodeLine{00473\ \ \ \ \ \ \ )}
+\DoxyCodeLine{00474\ \ \ clang\_regex\_type\_of\_a\_param\ =\ (}
+\DoxyCodeLine{00475\ \ \ \ \ \ \ \_CLANG\_FILE\_LINE\_RE\ +}
+\DoxyCodeLine{00476\ \ \ \ \ \ \ \textcolor{stringliteral}{r'error:\ C\(\backslash\)+\(\backslash\)+\ requires\ a\ type\ specifier\ for\ all\ declarations\(\backslash\)n'}}
+\DoxyCodeLine{00477\ \ \ \ \ \ \ \textcolor{stringliteral}{r'(.*\(\backslash\)n)*?'}}
+\DoxyCodeLine{00478\ \ \ \ \ \ \ \textcolor{stringliteral}{r'(?P=file):(?P=line):(?P=column):\ error:\ '}}
+\DoxyCodeLine{00479\ \ \ \ \ \ \ \textcolor{stringliteral}{r'C\(\backslash\)+\(\backslash\)+\ requires\ a\ type\ specifier\ for\ all\ declarations'}}
+\DoxyCodeLine{00480\ \ \ \ \ \ \ )}
+\DoxyCodeLine{00481\ \ \ clang\_regex\_unknown\_type\ =\ (}
+\DoxyCodeLine{00482\ \ \ \ \ \ \ \_CLANG\_FILE\_LINE\_RE\ +}
+\DoxyCodeLine{00483\ \ \ \ \ \ \ \textcolor{stringliteral}{r'error:\ unknown\ type\ name\ \(\backslash\)'(?P<type>[\string^\(\backslash\)']+)\(\backslash\)''}}
+\DoxyCodeLine{00484\ \ \ \ \ \ \ )}
+\DoxyCodeLine{00485\ }
+\DoxyCodeLine{00486\ \ \ diagnosis\ =\ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{00487\ \textcolor{stringliteral}{In\ a\ mock\ class\ template,\ types\ or\ typedefs\ defined\ in\ the\ base\ class}}
+\DoxyCodeLine{00488\ \textcolor{stringliteral}{template\ are\ *not*\ automatically\ visible.\ \ This\ is\ how\ C++\ works.\ \ Before}}
+\DoxyCodeLine{00489\ \textcolor{stringliteral}{you\ can\ use\ a\ type\ or\ typedef\ named\ \%(type)s\ defined\ in\ base\ class\ Base<T>,\ you}}
+\DoxyCodeLine{00490\ \textcolor{stringliteral}{need\ to\ make\ it\ visible.\ \ One\ way\ to\ do\ it\ is:}}
+\DoxyCodeLine{00491\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00492\ \textcolor{stringliteral}{\ \ typedef\ typename\ Base<T>::\%(type)s\ \%(type)s;"{}"{}"{}}}
+\DoxyCodeLine{00493\ }
+\DoxyCodeLine{00494\ \ \ \textcolor{keywordflow}{for}\ diag\ \textcolor{keywordflow}{in}\ \_GenericDiagnoser(}
+\DoxyCodeLine{00495\ \ \ \ \ \ \ \textcolor{stringliteral}{'TTB'},\ \textcolor{stringliteral}{'Type\ in\ Template\ Base'},}
+\DoxyCodeLine{00496\ \ \ \ \ \ \ [(gcc\_4\_3\_1\_regex\_type\_in\_retval,\ diagnosis\ \%\ \{\textcolor{stringliteral}{'type'}:\ \textcolor{stringliteral}{'Foo'}\}),}
+\DoxyCodeLine{00497\ \ \ \ \ \ \ \ (gcc\_4\_4\_0\_regex\_type\_in\_retval,\ diagnosis\ \%\ \{\textcolor{stringliteral}{'type'}:\ \textcolor{stringliteral}{'Foo'}\}),}
+\DoxyCodeLine{00498\ \ \ \ \ \ \ \ (gcc\_regex\_type\_of\_sole\_param,\ diagnosis),}
+\DoxyCodeLine{00499\ \ \ \ \ \ \ \ (gcc\_regex\_type\_of\_a\_param,\ diagnosis),}
+\DoxyCodeLine{00500\ \ \ \ \ \ \ \ (clang\_regex\_type\_of\_retval\_or\_sole\_param,\ diagnosis),}
+\DoxyCodeLine{00501\ \ \ \ \ \ \ \ (clang\_regex\_type\_of\_a\_param,\ diagnosis\ \%\ \{\textcolor{stringliteral}{'type'}:\ \textcolor{stringliteral}{'Foo'}\})],}
+\DoxyCodeLine{00502\ \ \ \ \ \ \ msg):}
+\DoxyCodeLine{00503\ \ \ \ \ \textcolor{keywordflow}{yield}\ diag}
+\DoxyCodeLine{00504\ \ \ \textcolor{comment}{\#\ Avoid\ overlap\ with\ the\ NUS\ pattern.}}
+\DoxyCodeLine{00505\ \ \ \textcolor{keywordflow}{for}\ m\ \textcolor{keywordflow}{in}\ \_FindAllMatches(clang\_regex\_unknown\_type,\ msg):}
+\DoxyCodeLine{00506\ \ \ \ \ type\_\ =\ m.groupdict()[\textcolor{stringliteral}{'type'}]}
+\DoxyCodeLine{00507\ \ \ \ \ \textcolor{keywordflow}{if}\ type\_\ \textcolor{keywordflow}{not}\ \textcolor{keywordflow}{in}\ \_COMMON\_GMOCK\_SYMBOLS:}
+\DoxyCodeLine{00508\ \ \ \ \ \ \ \textcolor{keywordflow}{yield}\ (\textcolor{stringliteral}{'TTB'},\ \textcolor{stringliteral}{'Type\ in\ Template\ Base'},\ diagnosis\ \%\ m.groupdict())}
+\DoxyCodeLine{00509\ }
+\DoxyCodeLine{00510\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacegmock__doctor_a3d3ae858175093d8617335de08dbc994_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacegmock__doctor_a6d63df81946ff5bf99d9ad102b8a1bf3}\index{gmock\_doctor@{gmock\_doctor}!\_WrongMockMethodMacroDiagnoser@{\_WrongMockMethodMacroDiagnoser}}
+\index{\_WrongMockMethodMacroDiagnoser@{\_WrongMockMethodMacroDiagnoser}!gmock\_doctor@{gmock\_doctor}}
+\doxysubsubsection{\texorpdfstring{\_WrongMockMethodMacroDiagnoser()}{\_WrongMockMethodMacroDiagnoser()}}
+{\footnotesize\ttfamily \label{namespacegmock__doctor_a6d63df81946ff5bf99d9ad102b8a1bf3} 
+gmock\+\_\+doctor.\+\_\+\+Wrong\+Mock\+Method\+Macro\+Diagnoser (\begin{DoxyParamCaption}\item[{}]{msg}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+\begin{DoxyVerb}Diagnoses the WMM disease, given the error messages by the compiler.\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{gmock__doctor_8py_source_l00511}{511}} of file \mbox{\hyperlink{gmock__doctor_8py_source}{gmock\+\_\+doctor.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00511\ \textcolor{keyword}{def\ }\_WrongMockMethodMacroDiagnoser(msg):}
+\DoxyCodeLine{00512\ \ \ \textcolor{stringliteral}{"{}"{}"{}Diagnoses\ the\ WMM\ disease,\ given\ the\ error\ messages\ by\ the\ compiler."{}"{}"{}}}
+\DoxyCodeLine{00513\ }
+\DoxyCodeLine{00514\ \ \ gcc\_regex\ =\ (\_GCC\_FILE\_LINE\_RE\ +}
+\DoxyCodeLine{00515\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'.*this\_method\_does\_not\_take\_(?P<wrong\_args>\(\backslash\)d+)\_argument.*\(\backslash\)n'}}
+\DoxyCodeLine{00516\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'.*\(\backslash\)n'}}
+\DoxyCodeLine{00517\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'.*candidates\ are.*FunctionMocker<[\string^>]+A(?P<args>\(\backslash\)d+)\(\backslash\))>'})}
+\DoxyCodeLine{00518\ \ \ clang\_regex\ =\ (\_CLANG\_NON\_GMOCK\_FILE\_LINE\_RE\ +}
+\DoxyCodeLine{00519\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'error:.*array.*negative.*r?\(\backslash\)n'}}
+\DoxyCodeLine{00520\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'(.*\(\backslash\)n)*?'}}
+\DoxyCodeLine{00521\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'(?P=file):(?P=line):(?P=column):\ error:\ too\ few\ arguments\ '}}
+\DoxyCodeLine{00522\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'to\ function\ call,\ expected\ (?P<args>\(\backslash\)d+),\ '}}
+\DoxyCodeLine{00523\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'have\ (?P<wrong\_args>\(\backslash\)d+)'})}
+\DoxyCodeLine{00524\ \ \ clang11\_re\ =\ (\_CLANG\_NON\_GMOCK\_FILE\_LINE\_RE\ +}
+\DoxyCodeLine{00525\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'.*this\_method\_does\_not\_take\_'}}
+\DoxyCodeLine{00526\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'(?P<wrong\_args>\(\backslash\)d+)\_argument.*'})}
+\DoxyCodeLine{00527\ \ \ diagnosis\ =\ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{00528\ \textcolor{stringliteral}{You\ are\ using\ MOCK\_METHOD\%(wrong\_args)s\ to\ define\ a\ mock\ method\ that\ has}}
+\DoxyCodeLine{00529\ \textcolor{stringliteral}{\%(args)s\ arguments.\ Use\ MOCK\_METHOD\%(args)s\ (or\ MOCK\_CONST\_METHOD\%(args)s,}}
+\DoxyCodeLine{00530\ \textcolor{stringliteral}{MOCK\_METHOD\%(args)s\_T,\ MOCK\_CONST\_METHOD\%(args)s\_T\ as\ appropriate)\ instead."{}"{}"{}}}
+\DoxyCodeLine{00531\ \ \ \textcolor{keywordflow}{return}\ \_GenericDiagnoser(\textcolor{stringliteral}{'WMM'},\ \textcolor{stringliteral}{'Wrong\ MOCK\_METHODn\ Macro'},}
+\DoxyCodeLine{00532\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [(gcc\_regex,\ diagnosis),}
+\DoxyCodeLine{00533\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (clang11\_re,\ diagnosis\ \%\ \{\textcolor{stringliteral}{'wrong\_args'}:\ \textcolor{stringliteral}{'m'},}
+\DoxyCodeLine{00534\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'args'}:\ \textcolor{stringliteral}{'n'}\}),}
+\DoxyCodeLine{00535\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (clang\_regex,\ diagnosis)],}
+\DoxyCodeLine{00536\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ msg)}
+\DoxyCodeLine{00537\ }
+\DoxyCodeLine{00538\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacegmock__doctor_a6d63df81946ff5bf99d9ad102b8a1bf3_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacegmock__doctor_af40f5986cb4753c3e519eef44b2522d0}\index{gmock\_doctor@{gmock\_doctor}!\_WrongParenPositionDiagnoser@{\_WrongParenPositionDiagnoser}}
+\index{\_WrongParenPositionDiagnoser@{\_WrongParenPositionDiagnoser}!gmock\_doctor@{gmock\_doctor}}
+\doxysubsubsection{\texorpdfstring{\_WrongParenPositionDiagnoser()}{\_WrongParenPositionDiagnoser()}}
+{\footnotesize\ttfamily \label{namespacegmock__doctor_af40f5986cb4753c3e519eef44b2522d0} 
+gmock\+\_\+doctor.\+\_\+\+Wrong\+Paren\+Position\+Diagnoser (\begin{DoxyParamCaption}\item[{}]{msg}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+\begin{DoxyVerb}Diagnoses the WPP disease, given the error messages by the compiler.\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{gmock__doctor_8py_source_l00539}{539}} of file \mbox{\hyperlink{gmock__doctor_8py_source}{gmock\+\_\+doctor.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00539\ \textcolor{keyword}{def\ }\_WrongParenPositionDiagnoser(msg):}
+\DoxyCodeLine{00540\ \ \ \textcolor{stringliteral}{"{}"{}"{}Diagnoses\ the\ WPP\ disease,\ given\ the\ error\ messages\ by\ the\ compiler."{}"{}"{}}}
+\DoxyCodeLine{00541\ }
+\DoxyCodeLine{00542\ \ \ gcc\_regex\ =\ (\_GCC\_FILE\_LINE\_RE\ +}
+\DoxyCodeLine{00543\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'error:.*testing::internal::MockSpec<.*\ has\ no\ member\ named\ \(\backslash\)''}}
+\DoxyCodeLine{00544\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'(?P<method>\(\backslash\)w+)\(\backslash\)''})}
+\DoxyCodeLine{00545\ \ \ clang\_regex\ =\ (\_CLANG\_NON\_GMOCK\_FILE\_LINE\_RE\ +}
+\DoxyCodeLine{00546\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'error:\ no\ member\ named\ \(\backslash\)'(?P<method>\(\backslash\)w+)\(\backslash\)'\ in\ '}}
+\DoxyCodeLine{00547\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'\(\backslash\)'testing::internal::MockSpec<.*>\(\backslash\)''})}
+\DoxyCodeLine{00548\ \ \ diagnosis\ =\ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{00549\ \textcolor{stringliteral}{The\ closing\ parenthesis\ of\ ON\_CALL\ or\ EXPECT\_CALL\ should\ be\ *before*}}
+\DoxyCodeLine{00550\ \textcolor{stringliteral}{"{}.\%(method)s"{}.\ \ For\ example,\ you\ should\ write:}}
+\DoxyCodeLine{00551\ \textcolor{stringliteral}{\ \ EXPECT\_CALL(my\_mock,\ Foo(\_)).\%(method)s(...);}}
+\DoxyCodeLine{00552\ \textcolor{stringliteral}{instead\ of:}}
+\DoxyCodeLine{00553\ \textcolor{stringliteral}{\ \ EXPECT\_CALL(my\_mock,\ Foo(\_).\%(method)s(...));"{}"{}"{}}}
+\DoxyCodeLine{00554\ \ \ \textcolor{keywordflow}{return}\ \_GenericDiagnoser(\textcolor{stringliteral}{'WPP'},\ \textcolor{stringliteral}{'Wrong\ Parenthesis\ Position'},}
+\DoxyCodeLine{00555\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [(gcc\_regex,\ diagnosis),}
+\DoxyCodeLine{00556\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (clang\_regex,\ diagnosis)],}
+\DoxyCodeLine{00557\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ msg)}
+\DoxyCodeLine{00558\ }
+\DoxyCodeLine{00559\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacegmock__doctor_af40f5986cb4753c3e519eef44b2522d0_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacegmock__doctor_aabf870deb293ec78b589b2dd2823e6ab}\index{gmock\_doctor@{gmock\_doctor}!Diagnose@{Diagnose}}
+\index{Diagnose@{Diagnose}!gmock\_doctor@{gmock\_doctor}}
+\doxysubsubsection{\texorpdfstring{Diagnose()}{Diagnose()}}
+{\footnotesize\ttfamily \label{namespacegmock__doctor_aabf870deb293ec78b589b2dd2823e6ab} 
+gmock\+\_\+doctor.\+Diagnose (\begin{DoxyParamCaption}\item[{}]{msg}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Generates all possible diagnoses given the compiler error message.\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{gmock__doctor_8py_source_l00577}{577}} of file \mbox{\hyperlink{gmock__doctor_8py_source}{gmock\+\_\+doctor.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00577\ \textcolor{keyword}{def\ }Diagnose(msg):}
+\DoxyCodeLine{00578\ \ \ \textcolor{stringliteral}{"{}"{}"{}Generates\ all\ possible\ diagnoses\ given\ the\ compiler\ error\ message."{}"{}"{}}}
+\DoxyCodeLine{00579\ }
+\DoxyCodeLine{00580\ \ \ msg\ =\ re.sub(\textcolor{stringliteral}{r'\(\backslash\)x1b\(\backslash\)[[\string^m]*m'},\ \textcolor{stringliteral}{''},\ msg)\ \ \textcolor{comment}{\#\ Strips\ all\ color\ formatting.}}
+\DoxyCodeLine{00581\ \ \ \textcolor{comment}{\#\ Assuming\ the\ string\ is\ using\ the\ UTF-\/8\ encoding,\ replaces\ the\ left\ and}}
+\DoxyCodeLine{00582\ \ \ \textcolor{comment}{\#\ the\ right\ single\ quote\ characters\ with\ apostrophes.}}
+\DoxyCodeLine{00583\ \ \ msg\ =\ re.sub(\textcolor{stringliteral}{r'(\(\backslash\)xe2\(\backslash\)x80\(\backslash\)x98|\(\backslash\)xe2\(\backslash\)x80\(\backslash\)x99)'},\ \textcolor{stringliteral}{"{}'"{}},\ msg)}
+\DoxyCodeLine{00584\ }
+\DoxyCodeLine{00585\ \ \ diagnoses\ =\ []}
+\DoxyCodeLine{00586\ \ \ \textcolor{keywordflow}{for}\ diagnoser\ \textcolor{keywordflow}{in}\ \_DIAGNOSERS:}
+\DoxyCodeLine{00587\ \ \ \ \ \textcolor{keywordflow}{for}\ diag\ \textcolor{keywordflow}{in}\ diagnoser(msg):}
+\DoxyCodeLine{00588\ \ \ \ \ \ \ diagnosis\ =\ \textcolor{stringliteral}{'[\%s\ -\/\ \%s]\(\backslash\)n\%s'}\ \%\ diag}
+\DoxyCodeLine{00589\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keywordflow}{not}\ diagnosis\ \textcolor{keywordflow}{in}\ diagnoses:}
+\DoxyCodeLine{00590\ \ \ \ \ \ \ \ \ diagnoses.append(diagnosis)}
+\DoxyCodeLine{00591\ \ \ \textcolor{keywordflow}{return}\ diagnoses}
+\DoxyCodeLine{00592\ }
+\DoxyCodeLine{00593\ }
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=338pt]{namespacegmock__doctor_aabf870deb293ec78b589b2dd2823e6ab_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacegmock__doctor_afbdc79a012ced22e32a9f3c60346a691}\index{gmock\_doctor@{gmock\_doctor}!main@{main}}
+\index{main@{main}!gmock\_doctor@{gmock\_doctor}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{namespacegmock__doctor_afbdc79a012ced22e32a9f3c60346a691} 
+gmock\+\_\+doctor.\+main (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gmock__doctor_8py_source_l00594}{594}} of file \mbox{\hyperlink{gmock__doctor_8py_source}{gmock\+\_\+doctor.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00594\ \textcolor{keyword}{def\ }\mbox{\hyperlink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}():}
+\DoxyCodeLine{00595\ \ \ \textcolor{keywordflow}{print}\ (\textcolor{stringliteral}{'Google\ Mock\ Doctor\ v\%s\ -\/\ '}}
+\DoxyCodeLine{00596\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'diagnoses\ problems\ in\ code\ using\ Google\ Mock.'}\ \%\ \_VERSION)}
+\DoxyCodeLine{00597\ }
+\DoxyCodeLine{00598\ \ \ \textcolor{keywordflow}{if}\ sys.stdin.isatty():}
+\DoxyCodeLine{00599\ \ \ \ \ \textcolor{keywordflow}{print}\ (\textcolor{stringliteral}{'Please\ copy\ and\ paste\ the\ compiler\ errors\ here.\ \ Press\ c-\/D\ when\ '}}
+\DoxyCodeLine{00600\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'you\ are\ done:'})}
+\DoxyCodeLine{00601\ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{00602\ \ \ \ \ \textcolor{keywordflow}{print}\ (\textcolor{stringliteral}{'Waiting\ for\ compiler\ errors\ on\ stdin\ .\ .\ .'})}
+\DoxyCodeLine{00603\ }
+\DoxyCodeLine{00604\ \ \ msg\ =\ sys.stdin.read().strip()}
+\DoxyCodeLine{00605\ \ \ diagnoses\ =\ Diagnose(msg)}
+\DoxyCodeLine{00606\ \ \ count\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}(diagnoses)}
+\DoxyCodeLine{00607\ \ \ \textcolor{keywordflow}{if}\ \textcolor{keywordflow}{not}\ count:}
+\DoxyCodeLine{00608\ \ \ \ \ \textcolor{keywordflow}{print}\ (\textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{00609\ \textcolor{stringliteral}{Your\ compiler\ complained:}}
+\DoxyCodeLine{00610\ \textcolor{stringliteral}{8<-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{00611\ \textcolor{stringliteral}{\%s}}
+\DoxyCodeLine{00612\ \textcolor{stringliteral}{-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/>8}}
+\DoxyCodeLine{00613\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00614\ \textcolor{stringliteral}{Uh-\/oh,\ I'm\ not\ smart\ enough\ to\ figure\ out\ what\ the\ problem\ is.\ :-\/(}}
+\DoxyCodeLine{00615\ \textcolor{stringliteral}{However...}}
+\DoxyCodeLine{00616\ \textcolor{stringliteral}{If\ you\ send\ your\ source\ code\ and\ the\ compiler's\ error\ messages\ to}}
+\DoxyCodeLine{00617\ \textcolor{stringliteral}{\%s,\ you\ can\ be\ helped\ and\ I\ can\ get\ smarter\ -\/-\/}}
+\DoxyCodeLine{00618\ \textcolor{stringliteral}{win-\/win\ for\ us!"{}"{}"{}}\ \%\ (msg,\ \_EMAIL))}
+\DoxyCodeLine{00619\ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{00620\ \ \ \ \ \textcolor{keywordflow}{print}\ (\textcolor{stringliteral}{'-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/'})}
+\DoxyCodeLine{00621\ \ \ \ \ \textcolor{keywordflow}{print}\ (\textcolor{stringliteral}{'Your\ code\ appears\ to\ have\ the\ following'},)}
+\DoxyCodeLine{00622\ \ \ \ \ \textcolor{keywordflow}{if}\ count\ >\ 1:}
+\DoxyCodeLine{00623\ \ \ \ \ \ \ \textcolor{keywordflow}{print}\ (\textcolor{stringliteral}{'\%s\ diseases:'}\ \%\ (count,))}
+\DoxyCodeLine{00624\ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{00625\ \ \ \ \ \ \ \textcolor{keywordflow}{print}\ (\textcolor{stringliteral}{'disease:'})}
+\DoxyCodeLine{00626\ \ \ \ \ i\ =\ 0}
+\DoxyCodeLine{00627\ \ \ \ \ \textcolor{keywordflow}{for}\ d\ \textcolor{keywordflow}{in}\ diagnoses:}
+\DoxyCodeLine{00628\ \ \ \ \ \ \ i\ +=\ 1}
+\DoxyCodeLine{00629\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ count\ >\ 1:}
+\DoxyCodeLine{00630\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{print}\ (\textcolor{stringliteral}{'\(\backslash\)n\#\%s:'}\ \%\ (i,))}
+\DoxyCodeLine{00631\ \ \ \ \ \ \ \textcolor{keywordflow}{print}\ (d)}
+\DoxyCodeLine{00632\ \ \ \ \ \textcolor{keywordflow}{print}\ (\textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{00633\ \textcolor{stringliteral}{How\ did\ I\ do?\ \ If\ you\ think\ I'm\ wrong\ or\ unhelpful,\ please\ send\ your}}
+\DoxyCodeLine{00634\ \textcolor{stringliteral}{source\ code\ and\ the\ compiler's\ error\ messages\ to\ \%s.}}
+\DoxyCodeLine{00635\ \textcolor{stringliteral}{Then\ you\ can\ be\ helped\ and\ I\ can\ get\ smarter\ -\/-\/\ I\ promise\ I\ won't\ be\ upset!"{}"{}"{}}\ \%}
+\DoxyCodeLine{00636\ \ \ \ \ \ \ \ \ \ \ \ \_EMAIL)}
+\DoxyCodeLine{00637\ }
+\DoxyCodeLine{00638\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=338pt]{namespacegmock__doctor_afbdc79a012ced22e32a9f3c60346a691_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=181pt]{namespacegmock__doctor_afbdc79a012ced22e32a9f3c60346a691_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{namespacegmock__doctor_a6a622bfba6ba59dc6bcbbeb5f324baf1}\index{gmock\_doctor@{gmock\_doctor}!\_CLANG\_FILE\_LINE\_RE@{\_CLANG\_FILE\_LINE\_RE}}
+\index{\_CLANG\_FILE\_LINE\_RE@{\_CLANG\_FILE\_LINE\_RE}!gmock\_doctor@{gmock\_doctor}}
+\doxysubsubsection{\texorpdfstring{\_CLANG\_FILE\_LINE\_RE}{\_CLANG\_FILE\_LINE\_RE}}
+{\footnotesize\ttfamily \label{namespacegmock__doctor_a6a622bfba6ba59dc6bcbbeb5f324baf1} 
+str gmock\+\_\+doctor.\+\_\+\+CLANG\+\_\+\+FILE\+\_\+\+LINE\+\_\+\+RE = \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\textquotesingle{}(?\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}}$<$file$>$.\texorpdfstring{$\ast$}{*})\+:(?\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}}$<$line$>$\textbackslash{}d+)\+:(?\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}}$<$column$>$\textbackslash{}d+)\+:\textbackslash{}\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}+\textquotesingle{}\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock__doctor_8py_source_l00132}{132}} of file \mbox{\hyperlink{gmock__doctor_8py_source}{gmock\+\_\+doctor.\+py}}.
+
+\Hypertarget{namespacegmock__doctor_a54b24983d4a31b34337e0ef6fdf4fe91}\index{gmock\_doctor@{gmock\_doctor}!\_CLANG\_NON\_GMOCK\_FILE\_LINE\_RE@{\_CLANG\_NON\_GMOCK\_FILE\_LINE\_RE}}
+\index{\_CLANG\_NON\_GMOCK\_FILE\_LINE\_RE@{\_CLANG\_NON\_GMOCK\_FILE\_LINE\_RE}!gmock\_doctor@{gmock\_doctor}}
+\doxysubsubsection{\texorpdfstring{\_CLANG\_NON\_GMOCK\_FILE\_LINE\_RE}{\_CLANG\_NON\_GMOCK\_FILE\_LINE\_RE}}
+{\footnotesize\ttfamily \label{namespacegmock__doctor_a54b24983d4a31b34337e0ef6fdf4fe91} 
+tuple gmock\+\_\+doctor.\+\_\+\+CLANG\+\_\+\+NON\+\_\+\+GMOCK\+\_\+\+FILE\+\_\+\+LINE\+\_\+\+RE\hspace{0.3cm}{\ttfamily [protected]}}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ =\ \ (}
+\DoxyCodeLine{00002\ \ \ \ \ \textcolor{stringliteral}{r'(?P<file>.*[/\(\backslash\)\(\backslash\)\string^](?!gmock-\/)[\string^/\(\backslash\)\(\backslash\)]+):(?P<line>\(\backslash\)d+):(?P<column>\(\backslash\)d+):\(\backslash\)s+'})}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{gmock__doctor_8py_source_l00133}{133}} of file \mbox{\hyperlink{gmock__doctor_8py_source}{gmock\+\_\+doctor.\+py}}.
+
+\Hypertarget{namespacegmock__doctor_ac704a49399e603fba5104e490f17fce3}\index{gmock\_doctor@{gmock\_doctor}!\_COMMON\_GMOCK\_SYMBOLS@{\_COMMON\_GMOCK\_SYMBOLS}}
+\index{\_COMMON\_GMOCK\_SYMBOLS@{\_COMMON\_GMOCK\_SYMBOLS}!gmock\_doctor@{gmock\_doctor}}
+\doxysubsubsection{\texorpdfstring{\_COMMON\_GMOCK\_SYMBOLS}{\_COMMON\_GMOCK\_SYMBOLS}}
+{\footnotesize\ttfamily \label{namespacegmock__doctor_ac704a49399e603fba5104e490f17fce3} 
+list gmock\+\_\+doctor.\+\_\+\+COMMON\+\_\+\+GMOCK\+\_\+\+SYMBOLS\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock__doctor_8py_source_l00043}{43}} of file \mbox{\hyperlink{gmock__doctor_8py_source}{gmock\+\_\+doctor.\+py}}.
+
+\Hypertarget{namespacegmock__doctor_ad8d4f979dbf1b3c8edb226d124571b4e}\index{gmock\_doctor@{gmock\_doctor}!\_DIAGNOSERS@{\_DIAGNOSERS}}
+\index{\_DIAGNOSERS@{\_DIAGNOSERS}!gmock\_doctor@{gmock\_doctor}}
+\doxysubsubsection{\texorpdfstring{\_DIAGNOSERS}{\_DIAGNOSERS}}
+{\footnotesize\ttfamily \label{namespacegmock__doctor_ad8d4f979dbf1b3c8edb226d124571b4e} 
+list gmock\+\_\+doctor.\+\_\+\+DIAGNOSERS\hspace{0.3cm}{\ttfamily [protected]}}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ =\ \ [}
+\DoxyCodeLine{00002\ \ \ \ \ \_IncompleteByReferenceArgumentDiagnoser,}
+\DoxyCodeLine{00003\ \ \ \ \ \_MockObjectPointerDiagnoser,}
+\DoxyCodeLine{00004\ \ \ \ \ \_NeedToReturnNothingDiagnoser,}
+\DoxyCodeLine{00005\ \ \ \ \ \_NeedToReturnReferenceDiagnoser,}
+\DoxyCodeLine{00006\ \ \ \ \ \_NeedToReturnSomethingDiagnoser,}
+\DoxyCodeLine{00007\ \ \ \ \ \_NeedToUseReturnNullDiagnoser,}
+\DoxyCodeLine{00008\ \ \ \ \ \_NeedToUseSymbolDiagnoser,}
+\DoxyCodeLine{00009\ \ \ \ \ \_OverloadedFunctionActionDiagnoser,}
+\DoxyCodeLine{00010\ \ \ \ \ \_OverloadedFunctionMatcherDiagnoser,}
+\DoxyCodeLine{00011\ \ \ \ \ \_OverloadedMethodActionDiagnoser,}
+\DoxyCodeLine{00012\ \ \ \ \ \_TypeInTemplatedBaseDiagnoser,}
+\DoxyCodeLine{00013\ \ \ \ \ \_WrongMockMethodMacroDiagnoser,}
+\DoxyCodeLine{00014\ \ \ \ \ \_WrongParenPositionDiagnoser,}
+\DoxyCodeLine{00015\ \ \ \ \ ]}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{gmock__doctor_8py_source_l00560}{560}} of file \mbox{\hyperlink{gmock__doctor_8py_source}{gmock\+\_\+doctor.\+py}}.
+
+\Hypertarget{namespacegmock__doctor_a0d618777e3731fa03b16f71a92ec88c1}\index{gmock\_doctor@{gmock\_doctor}!\_EMAIL@{\_EMAIL}}
+\index{\_EMAIL@{\_EMAIL}!gmock\_doctor@{gmock\_doctor}}
+\doxysubsubsection{\texorpdfstring{\_EMAIL}{\_EMAIL}}
+{\footnotesize\ttfamily \label{namespacegmock__doctor_a0d618777e3731fa03b16f71a92ec88c1} 
+str gmock\+\_\+doctor.\+\_\+\+EMAIL = \textquotesingle{}googlemock@googlegroups.\+com\textquotesingle{}\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock__doctor_8py_source_l00041}{41}} of file \mbox{\hyperlink{gmock__doctor_8py_source}{gmock\+\_\+doctor.\+py}}.
+
+\Hypertarget{namespacegmock__doctor_a0ee127f27caa5f988c477e6e9ea47373}\index{gmock\_doctor@{gmock\_doctor}!\_GCC\_FILE\_LINE\_RE@{\_GCC\_FILE\_LINE\_RE}}
+\index{\_GCC\_FILE\_LINE\_RE@{\_GCC\_FILE\_LINE\_RE}!gmock\_doctor@{gmock\_doctor}}
+\doxysubsubsection{\texorpdfstring{\_GCC\_FILE\_LINE\_RE}{\_GCC\_FILE\_LINE\_RE}}
+{\footnotesize\ttfamily \label{namespacegmock__doctor_a0ee127f27caa5f988c477e6e9ea47373} 
+str gmock\+\_\+doctor.\+\_\+\+GCC\+\_\+\+FILE\+\_\+\+LINE\+\_\+\+RE = \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\textquotesingle{}(?\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}}$<$file$>$.\texorpdfstring{$\ast$}{*})\+:(?\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}}$<$line$>$\textbackslash{}d+)\+:(\textbackslash{}d+\+:)?\textbackslash{}\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}+\textquotesingle{}\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock__doctor_8py_source_l00131}{131}} of file \mbox{\hyperlink{gmock__doctor_8py_source}{gmock\+\_\+doctor.\+py}}.
+
+\Hypertarget{namespacegmock__doctor_ab4e0eb0462b9ad647e7d4fa4410cc850}\index{gmock\_doctor@{gmock\_doctor}!\_VERSION@{\_VERSION}}
+\index{\_VERSION@{\_VERSION}!gmock\_doctor@{gmock\_doctor}}
+\doxysubsubsection{\texorpdfstring{\_VERSION}{\_VERSION}}
+{\footnotesize\ttfamily \label{namespacegmock__doctor_ab4e0eb0462b9ad647e7d4fa4410cc850} 
+str gmock\+\_\+doctor.\+\_\+\+VERSION = \textquotesingle{}1.\+0.\+3\textquotesingle{}\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock__doctor_8py_source_l00039}{39}} of file \mbox{\hyperlink{gmock__doctor_8py_source}{gmock\+\_\+doctor.\+py}}.
+

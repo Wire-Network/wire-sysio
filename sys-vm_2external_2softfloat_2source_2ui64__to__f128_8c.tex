@@ -1,0 +1,74 @@
+\doxysection{libraries/sys-\/vm/external/softfloat/source/ui64\+\_\+to\+\_\+f128.c File Reference}
+\hypertarget{sys-vm_2external_2softfloat_2source_2ui64__to__f128_8c}{}\label{sys-vm_2external_2softfloat_2source_2ui64__to__f128_8c}\index{libraries/sys-\/vm/external/softfloat/source/ui64\_to\_f128.c@{libraries/sys-\/vm/external/softfloat/source/ui64\_to\_f128.c}}
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include "{}platform.\+h"{}}\newline
+{\ttfamily \#include "{}internals.\+h"{}}\newline
+{\ttfamily \#include "{}softfloat.\+h"{}}\newline
+Include dependency graph for ui64\+\_\+to\+\_\+f128.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sys-vm_2external_2softfloat_2source_2ui64__to__f128_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structfloat128__t}{float128\+\_\+t}} \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2ui64__to__f128_8c_aae316d97c139127521e05dc7ca0b3d83}{ui64\+\_\+to\+\_\+f128}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{sys-vm_2external_2softfloat_2source_2ui64__to__f128_8c_aae316d97c139127521e05dc7ca0b3d83}\index{ui64\_to\_f128.c@{ui64\_to\_f128.c}!ui64\_to\_f128@{ui64\_to\_f128}}
+\index{ui64\_to\_f128@{ui64\_to\_f128}!ui64\_to\_f128.c@{ui64\_to\_f128.c}}
+\doxysubsubsection{\texorpdfstring{ui64\_to\_f128()}{ui64\_to\_f128()}}
+{\footnotesize\ttfamily \label{sys-vm_2external_2softfloat_2source_2ui64__to__f128_8c_aae316d97c139127521e05dc7ca0b3d83} 
+\mbox{\hyperlink{structfloat128__t}{float128\+\_\+t}} ui64\+\_\+to\+\_\+f128 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{a}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2ui64__to__f128_8c_source_l00042}{42}} of file \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2ui64__to__f128_8c_source}{ui64\+\_\+to\+\_\+f128.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00043\ \{}
+\DoxyCodeLine{00044\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\_fast64\_t}}\ uiZ64,\ uiZ0;}
+\DoxyCodeLine{00045\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a880ed9ceb8621521452c81d03bd08cfb}{int\_fast8\_t}}\ shiftDist;}
+\DoxyCodeLine{00046\ \ \ \ \ \textcolor{keyword}{struct\ }uint128\ zSig;}
+\DoxyCodeLine{00047\ \ \ \ \ \textcolor{keyword}{union\ }ui128\_f128\ uZ;}
+\DoxyCodeLine{00048\ }
+\DoxyCodeLine{00049\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ !\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ )\ \{}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ uiZ64\ =\ 0;}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ uiZ0\ \ =\ 0;}
+\DoxyCodeLine{00052\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ shiftDist\ =\ \mbox{\hyperlink{softfloat_2source_2s__count_leading_zeros64_8c_aa7f029cdc05ad078461581da52b91bef}{softfloat\_countLeadingZeros64}}(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ )\ +\ 49;}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ 64\ <=\ shiftDist\ )\ \{}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \ \ \ zSig.v64\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}<<(shiftDist\ -\/\ 64);}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ \ \ \ zSig.v0\ \ =\ 0;}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \ \ \ zSig\ =\ \mbox{\hyperlink{softfloat_2source_2s__short_shift_left128_8c_a5813c1cdc091451e4bcbf3227ebc0632}{softfloat\_shortShiftLeft128}}(\ 0,\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ shiftDist\ );}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ uiZ64\ =\ packToF128UI64(\ 0,\ 0x406E\ -\/\ shiftDist,\ zSig.v64\ );}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ uiZ0\ \ =\ zSig.v0;}
+\DoxyCodeLine{00062\ \ \ \ \ \}}
+\DoxyCodeLine{00063\ \ \ \ \ uZ.ui.v64\ =\ uiZ64;}
+\DoxyCodeLine{00064\ \ \ \ \ uZ.ui.v0\ \ =\ uiZ0;}
+\DoxyCodeLine{00065\ \ \ \ \ \textcolor{keywordflow}{return}\ uZ.f;}
+\DoxyCodeLine{00066\ }
+\DoxyCodeLine{00067\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=318pt]{sys-vm_2external_2softfloat_2source_2ui64__to__f128_8c_aae316d97c139127521e05dc7ca0b3d83_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=322pt]{sys-vm_2external_2softfloat_2source_2ui64__to__f128_8c_aae316d97c139127521e05dc7ca0b3d83_icgraph}
+\end{center}
+\end{figure}

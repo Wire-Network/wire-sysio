@@ -1,0 +1,19 @@
+<map id="Catch::clog" name="Catch::clog">
+<area shape="rect" id="Node000001" title=" " alt="" coords="787,55,875,80"/>
+<area shape="rect" id="Node000002" href="$namespace_catch.html#a54c1ce08041448d684ae8edc14162cd2" title=" " alt="" coords="652,55,739,80"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="771,70,739,70,739,65,771,65"/>
+<area shape="rect" id="Node000003" href="$class_catch_1_1_session.html#af890db02c69e36356ac9f8be4084c464" title=" " alt="" coords="370,5,604,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="637,53,604,45,557,34,558,29,605,40,638,48"/>
+<area shape="rect" id="Node000006" href="$class_catch_1_1_session.html#a4564992e2b028770e38a1dcc6fff8b34" title=" " alt="" coords="404,55,570,80"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="637,70,571,70,571,65,637,65"/>
+<area shape="rect" id="Node000007" href="$namespace_catch.html#a3cbceeab9252d1b752f66a2826e92548" title=" " alt="" coords="408,104,567,130"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="638,87,605,95,558,106,557,101,604,90,637,82"/>
+<area shape="rect" id="Node000004" href="$class_catch_1_1_session.html#a8c82b89613ebd99f1ba1a3f7b634e571" title=" " alt="" coords="144,5,281,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="354,21,282,21,282,16,354,16"/>
+<area shape="rect" id="Node000005" href="$catch__default__main_8hpp.html#a0ddf1224851353fc92bfbff6f499fa97" title=" " alt="" coords="5,5,55,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="128,21,55,21,55,16,128,16"/>
+<area shape="rect" id="Node000008" href="$class_catch_1_1_generators_1_1_chunk_generator.html#a50c334d00cde3166d71e9b90ebc2d2e3" title=" " alt="" coords="103,75,322,116"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="392,112,322,107,323,101,392,107"/>
+<area shape="rect" id="Node000009" href="$struct_catch_1_1_i_generator_tracker.html#a9945eff42219edc5a7071eebd8b0419e" title=" " alt="" coords="128,140,297,181"/>
+<area shape="poly" id="edge8_Node000007_Node000009" title=" " alt="" coords="393,135,298,150,297,145,392,129"/>
+</map>

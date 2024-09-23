@@ -1,0 +1,304 @@
+\doxysection{sysio\+::pending\+\_\+snapshot Class Reference}
+\hypertarget{classsysio_1_1pending__snapshot}{}\label{classsysio_1_1pending__snapshot}\index{sysio::pending\_snapshot@{sysio::pending\_snapshot}}
+
+
+Collaboration diagram for sysio\+::pending\+\_\+snapshot\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=225pt]{classsysio_1_1pending__snapshot__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{classsysio_1_1pending__snapshot_a1915f67e4cb854b7614890e223c6d8de}{next\+\_\+t}} = \mbox{\hyperlink{classsysio_1_1producer__plugin_aa0f4bf0b390688408224d4bc36b74e27}{producer\+\_\+plugin\+::next\+\_\+function}}$<$\mbox{\hyperlink{structsysio_1_1producer__plugin_1_1snapshot__information}{producer\+\_\+plugin\+::snapshot\+\_\+information}}$>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classsysio_1_1pending__snapshot_a701da57e23f9da21fb2128ef097d41e0}{pending\+\_\+snapshot}} (const \mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{block\+\_\+id\+\_\+type}} \&\mbox{\hyperlink{classsysio_1_1pending__snapshot_a79a20762863821f28c0a9c58fe28a498}{block\+\_\+id}}, \mbox{\hyperlink{classsysio_1_1pending__snapshot_a1915f67e4cb854b7614890e223c6d8de}{next\+\_\+t}} \&\mbox{\hyperlink{classsysio_1_1pending__snapshot_a0a38893f527797a40a857997faa24965}{next}}, std\+::string \mbox{\hyperlink{classsysio_1_1pending__snapshot_aa485b681ff792ae2faf5f4ab70165599}{pending\+\_\+path}}, std\+::string \mbox{\hyperlink{classsysio_1_1pending__snapshot_adcaa3a5c35a2dfbc55136ff2ffa8df52}{final\+\_\+path}})
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classsysio_1_1pending__snapshot_a480efe5391047b60fd1b192b80784537}{get\+\_\+height}} () const
+\item 
+\mbox{\hyperlink{structsysio_1_1producer__plugin_1_1snapshot__information}{producer\+\_\+plugin\+::snapshot\+\_\+information}} \mbox{\hyperlink{classsysio_1_1pending__snapshot_a746d5d6ce681a9cda250a36e25f8781a}{finalize}} (const \mbox{\hyperlink{classsysio_1_1chain_1_1controller}{chain\+::controller}} \&chain) const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static bfs\+::path \mbox{\hyperlink{classsysio_1_1pending__snapshot_a79fc9801d0442d3b7f58833f23d6c9f9}{get\+\_\+final\+\_\+path}} (const \mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{block\+\_\+id\+\_\+type}} \&\mbox{\hyperlink{classsysio_1_1pending__snapshot_a79a20762863821f28c0a9c58fe28a498}{block\+\_\+id}}, const bfs\+::path \&snapshots\+\_\+dir)
+\item 
+static bfs\+::path \mbox{\hyperlink{classsysio_1_1pending__snapshot_a44c77e2240938dc9116890df2818bf4b}{get\+\_\+pending\+\_\+path}} (const \mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{block\+\_\+id\+\_\+type}} \&\mbox{\hyperlink{classsysio_1_1pending__snapshot_a79a20762863821f28c0a9c58fe28a498}{block\+\_\+id}}, const bfs\+::path \&snapshots\+\_\+dir)
+\item 
+static bfs\+::path \mbox{\hyperlink{classsysio_1_1pending__snapshot_a5c1d883bec4e7ed86c903ad81d4301cd}{get\+\_\+temp\+\_\+path}} (const \mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{block\+\_\+id\+\_\+type}} \&\mbox{\hyperlink{classsysio_1_1pending__snapshot_a79a20762863821f28c0a9c58fe28a498}{block\+\_\+id}}, const bfs\+::path \&snapshots\+\_\+dir)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{block\+\_\+id\+\_\+type}} \mbox{\hyperlink{classsysio_1_1pending__snapshot_a79a20762863821f28c0a9c58fe28a498}{block\+\_\+id}}
+\item 
+\mbox{\hyperlink{classsysio_1_1pending__snapshot_a1915f67e4cb854b7614890e223c6d8de}{next\+\_\+t}} \mbox{\hyperlink{classsysio_1_1pending__snapshot_a0a38893f527797a40a857997faa24965}{next}}
+\item 
+std\+::string \mbox{\hyperlink{classsysio_1_1pending__snapshot_aa485b681ff792ae2faf5f4ab70165599}{pending\+\_\+path}}
+\item 
+std\+::string \mbox{\hyperlink{classsysio_1_1pending__snapshot_adcaa3a5c35a2dfbc55136ff2ffa8df52}{final\+\_\+path}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{producer__plugin_8cpp_source_l00122}{122}} of file \mbox{\hyperlink{producer__plugin_8cpp_source}{producer\+\_\+plugin.\+cpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classsysio_1_1pending__snapshot_a1915f67e4cb854b7614890e223c6d8de}\index{sysio::pending\_snapshot@{sysio::pending\_snapshot}!next\_t@{next\_t}}
+\index{next\_t@{next\_t}!sysio::pending\_snapshot@{sysio::pending\_snapshot}}
+\doxysubsubsection{\texorpdfstring{next\_t}{next\_t}}
+{\footnotesize\ttfamily \label{classsysio_1_1pending__snapshot_a1915f67e4cb854b7614890e223c6d8de} 
+using \mbox{\hyperlink{classsysio_1_1pending__snapshot_a1915f67e4cb854b7614890e223c6d8de}{sysio\+::pending\+\_\+snapshot\+::next\+\_\+t}} = \mbox{\hyperlink{classsysio_1_1producer__plugin_aa0f4bf0b390688408224d4bc36b74e27}{producer\+\_\+plugin\+::next\+\_\+function}}$<$\mbox{\hyperlink{structsysio_1_1producer__plugin_1_1snapshot__information}{producer\+\_\+plugin\+::snapshot\+\_\+information}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{producer__plugin_8cpp_source_l00124}{124}} of file \mbox{\hyperlink{producer__plugin_8cpp_source}{producer\+\_\+plugin.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classsysio_1_1pending__snapshot_a701da57e23f9da21fb2128ef097d41e0}\index{sysio::pending\_snapshot@{sysio::pending\_snapshot}!pending\_snapshot@{pending\_snapshot}}
+\index{pending\_snapshot@{pending\_snapshot}!sysio::pending\_snapshot@{sysio::pending\_snapshot}}
+\doxysubsubsection{\texorpdfstring{pending\_snapshot()}{pending\_snapshot()}}
+{\footnotesize\ttfamily \label{classsysio_1_1pending__snapshot_a701da57e23f9da21fb2128ef097d41e0} 
+sysio\+::pending\+\_\+snapshot\+::pending\+\_\+snapshot (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{block\+\_\+id\+\_\+type}} \&}]{block\+\_\+id}{, }\item[{\mbox{\hyperlink{classsysio_1_1pending__snapshot_a1915f67e4cb854b7614890e223c6d8de}{next\+\_\+t}} \&}]{next}{, }\item[{std\+::string}]{pending\+\_\+path}{, }\item[{std\+::string}]{final\+\_\+path}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{producer__plugin_8cpp_source_l00126}{126}} of file \mbox{\hyperlink{producer__plugin_8cpp_source}{producer\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00127\ \ \ \ :\ \mbox{\hyperlink{classsysio_1_1pending__snapshot_a79a20762863821f28c0a9c58fe28a498}{block\_id}}(\mbox{\hyperlink{classsysio_1_1pending__snapshot_a79a20762863821f28c0a9c58fe28a498}{block\_id}})}
+\DoxyCodeLine{00128\ \ \ \ ,\ \mbox{\hyperlink{classsysio_1_1pending__snapshot_a0a38893f527797a40a857997faa24965}{next}}(\mbox{\hyperlink{classsysio_1_1pending__snapshot_a0a38893f527797a40a857997faa24965}{next}})}
+\DoxyCodeLine{00129\ \ \ \ ,\ \mbox{\hyperlink{classsysio_1_1pending__snapshot_aa485b681ff792ae2faf5f4ab70165599}{pending\_path}}(\mbox{\hyperlink{classsysio_1_1pending__snapshot_aa485b681ff792ae2faf5f4ab70165599}{pending\_path}})}
+\DoxyCodeLine{00130\ \ \ \ ,\ \mbox{\hyperlink{classsysio_1_1pending__snapshot_adcaa3a5c35a2dfbc55136ff2ffa8df52}{final\_path}}(\mbox{\hyperlink{classsysio_1_1pending__snapshot_adcaa3a5c35a2dfbc55136ff2ffa8df52}{final\_path}})}
+\DoxyCodeLine{00131\ \ \ \ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1pending__snapshot_a746d5d6ce681a9cda250a36e25f8781a}\index{sysio::pending\_snapshot@{sysio::pending\_snapshot}!finalize@{finalize}}
+\index{finalize@{finalize}!sysio::pending\_snapshot@{sysio::pending\_snapshot}}
+\doxysubsubsection{\texorpdfstring{finalize()}{finalize()}}
+{\footnotesize\ttfamily \label{classsysio_1_1pending__snapshot_a746d5d6ce681a9cda250a36e25f8781a} 
+\mbox{\hyperlink{structsysio_1_1producer__plugin_1_1snapshot__information}{producer\+\_\+plugin\+::snapshot\+\_\+information}} sysio\+::pending\+\_\+snapshot\+::finalize (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classsysio_1_1chain_1_1controller}{chain\+::controller}} \&}]{chain}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{producer__plugin_8cpp_source_l00149}{149}} of file \mbox{\hyperlink{producer__plugin_8cpp_source}{producer\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ block\_ptr\ =\ chain.fetch\_block\_by\_id(\ \mbox{\hyperlink{classsysio_1_1pending__snapshot_a79a20762863821f28c0a9c58fe28a498}{block\_id}}\ );}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ in\_chain\ =\ (bool)block\_ptr;}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ boost::system::error\_code\ ec;}
+\DoxyCodeLine{00153\ }
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!in\_chain)\ \{}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \ bfs::remove(bfs::path(\mbox{\hyperlink{classsysio_1_1pending__snapshot_aa485b681ff792ae2faf5f4ab70165599}{pending\_path}}),\ ec);}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a1bfa656552ea0534b2c91ee0fe33f850}{SYS\_THROW}}(snapshot\_finalization\_exception,}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Snapshotted\ block\ was\ forked\ out\ of\ the\ chain.\ \ ID:\ \$\{block\_id\}"{}},}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}block\_id"{}},\ \mbox{\hyperlink{classsysio_1_1pending__snapshot_a79a20762863821f28c0a9c58fe28a498}{block\_id}}));}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00160\ }
+\DoxyCodeLine{00161\ \ \ \ \ \ \ bfs::rename(bfs::path(\mbox{\hyperlink{classsysio_1_1pending__snapshot_aa485b681ff792ae2faf5f4ab70165599}{pending\_path}}),\ bfs::path(\mbox{\hyperlink{classsysio_1_1pending__snapshot_adcaa3a5c35a2dfbc55136ff2ffa8df52}{final\_path}}),\ ec);}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(!ec,\ snapshot\_finalization\_exception,}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Unable\ to\ finalize\ valid\ snapshot\ of\ block\ number\ \$\{bn\}:\ [code:\ \$\{ec\}]\ \$\{message\}"{}},}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}bn"{}},\ \mbox{\hyperlink{classsysio_1_1pending__snapshot_a480efe5391047b60fd1b192b80784537}{get\_height}}())}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}ec"{}},\ ec.value())}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}message"{}},\ ec.message()));}
+\DoxyCodeLine{00167\ }
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{\mbox{\hyperlink{classsysio_1_1pending__snapshot_a79a20762863821f28c0a9c58fe28a498}{block\_id}},\ block\_ptr-\/>block\_num(),\ block\_ptr-\/>timestamp,\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__snapshot__header_ad7357c9cee48e084e060efb76dce03e4}{chain\_snapshot\_header::current\_version}},\ \mbox{\hyperlink{classsysio_1_1pending__snapshot_adcaa3a5c35a2dfbc55136ff2ffa8df52}{final\_path}}\};}
+\DoxyCodeLine{00169\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1pending__snapshot_a746d5d6ce681a9cda250a36e25f8781a_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1pending__snapshot_a79fc9801d0442d3b7f58833f23d6c9f9}\index{sysio::pending\_snapshot@{sysio::pending\_snapshot}!get\_final\_path@{get\_final\_path}}
+\index{get\_final\_path@{get\_final\_path}!sysio::pending\_snapshot@{sysio::pending\_snapshot}}
+\doxysubsubsection{\texorpdfstring{get\_final\_path()}{get\_final\_path()}}
+{\footnotesize\ttfamily \label{classsysio_1_1pending__snapshot_a79fc9801d0442d3b7f58833f23d6c9f9} 
+static bfs\+::path sysio\+::pending\+\_\+snapshot\+::get\+\_\+final\+\_\+path (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{block\+\_\+id\+\_\+type}} \&}]{block\+\_\+id}{, }\item[{const bfs\+::path \&}]{snapshots\+\_\+dir}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{producer__plugin_8cpp_source_l00137}{137}} of file \mbox{\hyperlink{producer__plugin_8cpp_source}{producer\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ snapshots\_dir\ /\ \mbox{\hyperlink{namespacefc_acd5129981ae93fce3154d3fed6f6acbc}{fc::format\_string}}(\textcolor{stringliteral}{"{}snapshot-\/\$\{id\}.bin"{}},\ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}()(\textcolor{stringliteral}{"{}id"{}},\ \mbox{\hyperlink{classsysio_1_1pending__snapshot_a79a20762863821f28c0a9c58fe28a498}{block\_id}}));}
+\DoxyCodeLine{00139\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1pending__snapshot_a79fc9801d0442d3b7f58833f23d6c9f9_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1pending__snapshot_a79fc9801d0442d3b7f58833f23d6c9f9_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1pending__snapshot_a480efe5391047b60fd1b192b80784537}\index{sysio::pending\_snapshot@{sysio::pending\_snapshot}!get\_height@{get\_height}}
+\index{get\_height@{get\_height}!sysio::pending\_snapshot@{sysio::pending\_snapshot}}
+\doxysubsubsection{\texorpdfstring{get\_height()}{get\_height()}}
+{\footnotesize\ttfamily \label{classsysio_1_1pending__snapshot_a480efe5391047b60fd1b192b80784537} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::pending\+\_\+snapshot\+::get\+\_\+height (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{producer__plugin_8cpp_source_l00133}{133}} of file \mbox{\hyperlink{producer__plugin_8cpp_source}{producer\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1chain_1_1block__header_a39d57e33ef8d3f6ba59b4c458f0ae375}{block\_header::num\_from\_id}}(\mbox{\hyperlink{classsysio_1_1pending__snapshot_a79a20762863821f28c0a9c58fe28a498}{block\_id}});}
+\DoxyCodeLine{00135\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1pending__snapshot_a480efe5391047b60fd1b192b80784537_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1pending__snapshot_a480efe5391047b60fd1b192b80784537_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1pending__snapshot_a44c77e2240938dc9116890df2818bf4b}\index{sysio::pending\_snapshot@{sysio::pending\_snapshot}!get\_pending\_path@{get\_pending\_path}}
+\index{get\_pending\_path@{get\_pending\_path}!sysio::pending\_snapshot@{sysio::pending\_snapshot}}
+\doxysubsubsection{\texorpdfstring{get\_pending\_path()}{get\_pending\_path()}}
+{\footnotesize\ttfamily \label{classsysio_1_1pending__snapshot_a44c77e2240938dc9116890df2818bf4b} 
+static bfs\+::path sysio\+::pending\+\_\+snapshot\+::get\+\_\+pending\+\_\+path (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{block\+\_\+id\+\_\+type}} \&}]{block\+\_\+id}{, }\item[{const bfs\+::path \&}]{snapshots\+\_\+dir}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{producer__plugin_8cpp_source_l00141}{141}} of file \mbox{\hyperlink{producer__plugin_8cpp_source}{producer\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ snapshots\_dir\ /\ \mbox{\hyperlink{namespacefc_acd5129981ae93fce3154d3fed6f6acbc}{fc::format\_string}}(\textcolor{stringliteral}{"{}.pending-\/snapshot-\/\$\{id\}.bin"{}},\ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}()(\textcolor{stringliteral}{"{}id"{}},\ \mbox{\hyperlink{classsysio_1_1pending__snapshot_a79a20762863821f28c0a9c58fe28a498}{block\_id}}));}
+\DoxyCodeLine{00143\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1pending__snapshot_a44c77e2240938dc9116890df2818bf4b_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1pending__snapshot_a44c77e2240938dc9116890df2818bf4b_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1pending__snapshot_a5c1d883bec4e7ed86c903ad81d4301cd}\index{sysio::pending\_snapshot@{sysio::pending\_snapshot}!get\_temp\_path@{get\_temp\_path}}
+\index{get\_temp\_path@{get\_temp\_path}!sysio::pending\_snapshot@{sysio::pending\_snapshot}}
+\doxysubsubsection{\texorpdfstring{get\_temp\_path()}{get\_temp\_path()}}
+{\footnotesize\ttfamily \label{classsysio_1_1pending__snapshot_a5c1d883bec4e7ed86c903ad81d4301cd} 
+static bfs\+::path sysio\+::pending\+\_\+snapshot\+::get\+\_\+temp\+\_\+path (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{block\+\_\+id\+\_\+type}} \&}]{block\+\_\+id}{, }\item[{const bfs\+::path \&}]{snapshots\+\_\+dir}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{producer__plugin_8cpp_source_l00145}{145}} of file \mbox{\hyperlink{producer__plugin_8cpp_source}{producer\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ snapshots\_dir\ /\ \mbox{\hyperlink{namespacefc_acd5129981ae93fce3154d3fed6f6acbc}{fc::format\_string}}(\textcolor{stringliteral}{"{}.incomplete-\/snapshot-\/\$\{id\}.bin"{}},\ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}()(\textcolor{stringliteral}{"{}id"{}},\ \mbox{\hyperlink{classsysio_1_1pending__snapshot_a79a20762863821f28c0a9c58fe28a498}{block\_id}}));}
+\DoxyCodeLine{00147\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1pending__snapshot_a5c1d883bec4e7ed86c903ad81d4301cd_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1pending__snapshot_a5c1d883bec4e7ed86c903ad81d4301cd_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classsysio_1_1pending__snapshot_a79a20762863821f28c0a9c58fe28a498}\index{sysio::pending\_snapshot@{sysio::pending\_snapshot}!block\_id@{block\_id}}
+\index{block\_id@{block\_id}!sysio::pending\_snapshot@{sysio::pending\_snapshot}}
+\doxysubsubsection{\texorpdfstring{block\_id}{block\_id}}
+{\footnotesize\ttfamily \label{classsysio_1_1pending__snapshot_a79a20762863821f28c0a9c58fe28a498} 
+\mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{block\+\_\+id\+\_\+type}} sysio\+::pending\+\_\+snapshot\+::block\+\_\+id}
+
+
+
+Definition at line \mbox{\hyperlink{producer__plugin_8cpp_source_l00171}{171}} of file \mbox{\hyperlink{producer__plugin_8cpp_source}{producer\+\_\+plugin.\+cpp}}.
+
+\Hypertarget{classsysio_1_1pending__snapshot_adcaa3a5c35a2dfbc55136ff2ffa8df52}\index{sysio::pending\_snapshot@{sysio::pending\_snapshot}!final\_path@{final\_path}}
+\index{final\_path@{final\_path}!sysio::pending\_snapshot@{sysio::pending\_snapshot}}
+\doxysubsubsection{\texorpdfstring{final\_path}{final\_path}}
+{\footnotesize\ttfamily \label{classsysio_1_1pending__snapshot_adcaa3a5c35a2dfbc55136ff2ffa8df52} 
+std\+::string sysio\+::pending\+\_\+snapshot\+::final\+\_\+path}
+
+
+
+Definition at line \mbox{\hyperlink{producer__plugin_8cpp_source_l00174}{174}} of file \mbox{\hyperlink{producer__plugin_8cpp_source}{producer\+\_\+plugin.\+cpp}}.
+
+\Hypertarget{classsysio_1_1pending__snapshot_a0a38893f527797a40a857997faa24965}\index{sysio::pending\_snapshot@{sysio::pending\_snapshot}!next@{next}}
+\index{next@{next}!sysio::pending\_snapshot@{sysio::pending\_snapshot}}
+\doxysubsubsection{\texorpdfstring{next}{next}}
+{\footnotesize\ttfamily \label{classsysio_1_1pending__snapshot_a0a38893f527797a40a857997faa24965} 
+\mbox{\hyperlink{classsysio_1_1pending__snapshot_a1915f67e4cb854b7614890e223c6d8de}{next\+\_\+t}} sysio\+::pending\+\_\+snapshot\+::next}
+
+
+
+Definition at line \mbox{\hyperlink{producer__plugin_8cpp_source_l00172}{172}} of file \mbox{\hyperlink{producer__plugin_8cpp_source}{producer\+\_\+plugin.\+cpp}}.
+
+\Hypertarget{classsysio_1_1pending__snapshot_aa485b681ff792ae2faf5f4ab70165599}\index{sysio::pending\_snapshot@{sysio::pending\_snapshot}!pending\_path@{pending\_path}}
+\index{pending\_path@{pending\_path}!sysio::pending\_snapshot@{sysio::pending\_snapshot}}
+\doxysubsubsection{\texorpdfstring{pending\_path}{pending\_path}}
+{\footnotesize\ttfamily \label{classsysio_1_1pending__snapshot_aa485b681ff792ae2faf5f4ab70165599} 
+std\+::string sysio\+::pending\+\_\+snapshot\+::pending\+\_\+path}
+
+
+
+Definition at line \mbox{\hyperlink{producer__plugin_8cpp_source_l00173}{173}} of file \mbox{\hyperlink{producer__plugin_8cpp_source}{producer\+\_\+plugin.\+cpp}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+plugins/producer\+\_\+plugin/\mbox{\hyperlink{producer__plugin_8cpp}{producer\+\_\+plugin.\+cpp}}\end{DoxyCompactItemize}

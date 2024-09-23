@@ -1,0 +1,53 @@
+\doxysection{To\+String\+Tuple.\+tests.\+cpp}
+\hypertarget{_to_string_tuple_8tests_8cpp_source}{}\label{_to_string_tuple_8tests_8cpp_source}\index{libraries/sys-\/vm/external/Catch2/projects/SelfTest/UsageTests/ToStringTuple.tests.cpp@{libraries/sys-\/vm/external/Catch2/projects/SelfTest/UsageTests/ToStringTuple.tests.cpp}}
+\mbox{\hyperlink{_to_string_tuple_8tests_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_to_string_tuple_8tests_8cpp_source_l00001}\mbox{\hyperlink{_to_string_tuple_8tests_8cpp_a6ae28aaa2edef037031518939f42dd7d}{00001}}\ \textcolor{preprocessor}{\#define\ CATCH\_CONFIG\_ENABLE\_TUPLE\_STRINGMAKER}}
+\DoxyCodeLine{\Hypertarget{_to_string_tuple_8tests_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ "{}catch.hpp"{}}}
+\DoxyCodeLine{\Hypertarget{_to_string_tuple_8tests_8cpp_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{_to_string_tuple_8tests_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <tuple>}}
+\DoxyCodeLine{\Hypertarget{_to_string_tuple_8tests_8cpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{_to_string_tuple_8tests_8cpp_source_l00006}\mbox{\hyperlink{_to_string_tuple_8tests_8cpp_a0c6195a124a84acc61ef17939d637bcd}{00006}}\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\ \textcolor{stringliteral}{"{}tuple<>"{}},\ \textcolor{stringliteral}{"{}[toString][tuple]"{}}\ )}
+\DoxyCodeLine{\Hypertarget{_to_string_tuple_8tests_8cpp_source_l00007}00007\ \{}
+\DoxyCodeLine{\Hypertarget{_to_string_tuple_8tests_8cpp_source_l00008}00008\ \ \ \ \ \textcolor{keyword}{typedef}\ std::tuple<>\ \mbox{\hyperlink{yubihsm_8h_a1d127017fb298b889f4ba24752d08b8e}{type}};}
+\DoxyCodeLine{\Hypertarget{_to_string_tuple_8tests_8cpp_source_l00009}00009\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ \textcolor{stringliteral}{"{}\{\ \}"{}}\ ==\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(type\{\})\ );}
+\DoxyCodeLine{\Hypertarget{_to_string_tuple_8tests_8cpp_source_l00010}00010\ \ \ \ \ type\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ \{\};}
+\DoxyCodeLine{\Hypertarget{_to_string_tuple_8tests_8cpp_source_l00011}00011\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ \textcolor{stringliteral}{"{}\{\ \}"{}}\ ==\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})\ );}
+\DoxyCodeLine{\Hypertarget{_to_string_tuple_8tests_8cpp_source_l00012}00012\ \}}
+\DoxyCodeLine{\Hypertarget{_to_string_tuple_8tests_8cpp_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{_to_string_tuple_8tests_8cpp_source_l00014}\mbox{\hyperlink{_to_string_tuple_8tests_8cpp_a77441294aeb2ab977465ce03991da0bc}{00014}}\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\ \textcolor{stringliteral}{"{}tuple<int>"{}},\ \textcolor{stringliteral}{"{}[toString][tuple]"{}}\ )}
+\DoxyCodeLine{\Hypertarget{_to_string_tuple_8tests_8cpp_source_l00015}00015\ \{}
+\DoxyCodeLine{\Hypertarget{_to_string_tuple_8tests_8cpp_source_l00016}00016\ \ \ \ \ \textcolor{keyword}{typedef}\ std::tuple<int>\ \mbox{\hyperlink{yubihsm_8h_a1d127017fb298b889f4ba24752d08b8e}{type}};}
+\DoxyCodeLine{\Hypertarget{_to_string_tuple_8tests_8cpp_source_l00017}00017\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ \textcolor{stringliteral}{"{}\{\ 0\ \}"{}}\ ==\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(type\{0\})\ );}
+\DoxyCodeLine{\Hypertarget{_to_string_tuple_8tests_8cpp_source_l00018}00018\ \}}
+\DoxyCodeLine{\Hypertarget{_to_string_tuple_8tests_8cpp_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{_to_string_tuple_8tests_8cpp_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{_to_string_tuple_8tests_8cpp_source_l00021}\mbox{\hyperlink{_to_string_tuple_8tests_8cpp_a9152445c082d36ca61b0b76295c5564c}{00021}}\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\ \textcolor{stringliteral}{"{}tuple<float,int>"{}},\ \textcolor{stringliteral}{"{}[toString][tuple]"{}}\ )}
+\DoxyCodeLine{\Hypertarget{_to_string_tuple_8tests_8cpp_source_l00022}00022\ \{}
+\DoxyCodeLine{\Hypertarget{_to_string_tuple_8tests_8cpp_source_l00023}00023\ \ \ \ \ \textcolor{keyword}{typedef}\ std::tuple<float,int>\ \mbox{\hyperlink{yubihsm_8h_a1d127017fb298b889f4ba24752d08b8e}{type}};}
+\DoxyCodeLine{\Hypertarget{_to_string_tuple_8tests_8cpp_source_l00024}00024\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ \textcolor{stringliteral}{"{}1.2f"{}}\ ==\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(\textcolor{keywordtype}{float}(1.2))\ );}
+\DoxyCodeLine{\Hypertarget{_to_string_tuple_8tests_8cpp_source_l00025}00025\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ \textcolor{stringliteral}{"{}\{\ 1.2f,\ 0\ \}"{}}\ ==\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(type\{1.2f,0\})\ );}
+\DoxyCodeLine{\Hypertarget{_to_string_tuple_8tests_8cpp_source_l00026}00026\ \}}
+\DoxyCodeLine{\Hypertarget{_to_string_tuple_8tests_8cpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{_to_string_tuple_8tests_8cpp_source_l00028}\mbox{\hyperlink{_to_string_tuple_8tests_8cpp_a28d3fce982101c0bfe5bf1af48c2002b}{00028}}\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\ \textcolor{stringliteral}{"{}tuple<string,string>"{}},\ \textcolor{stringliteral}{"{}[toString][tuple]"{}}\ )}
+\DoxyCodeLine{\Hypertarget{_to_string_tuple_8tests_8cpp_source_l00029}00029\ \{}
+\DoxyCodeLine{\Hypertarget{_to_string_tuple_8tests_8cpp_source_l00030}00030\ \ \ \ \ \textcolor{keyword}{typedef}\ std::tuple<std::string,std::string>\ \mbox{\hyperlink{yubihsm_8h_a1d127017fb298b889f4ba24752d08b8e}{type}};}
+\DoxyCodeLine{\Hypertarget{_to_string_tuple_8tests_8cpp_source_l00031}00031\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ \textcolor{stringliteral}{"{}\{\ \(\backslash\)"{}hello\(\backslash\)"{},\ \(\backslash\)"{}world\(\backslash\)"{}\ \}"{}}\ ==\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(type\{\textcolor{stringliteral}{"{}hello"{}},\textcolor{stringliteral}{"{}world"{}}\})\ );}
+\DoxyCodeLine{\Hypertarget{_to_string_tuple_8tests_8cpp_source_l00032}00032\ \}}
+\DoxyCodeLine{\Hypertarget{_to_string_tuple_8tests_8cpp_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{_to_string_tuple_8tests_8cpp_source_l00034}\mbox{\hyperlink{_to_string_tuple_8tests_8cpp_a9b0de3bf3a8886e5e3ad0c0ce15b4f02}{00034}}\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\ \textcolor{stringliteral}{"{}tuple<tuple<int>,tuple<>,float>"{}},\ \textcolor{stringliteral}{"{}[toString][tuple]"{}}\ )}
+\DoxyCodeLine{\Hypertarget{_to_string_tuple_8tests_8cpp_source_l00035}00035\ \{}
+\DoxyCodeLine{\Hypertarget{_to_string_tuple_8tests_8cpp_source_l00036}00036\ \ \ \ \ \textcolor{keyword}{typedef}\ std::tuple<std::tuple<int>,std::tuple<>,\textcolor{keywordtype}{float}>\ \mbox{\hyperlink{yubihsm_8h_a1d127017fb298b889f4ba24752d08b8e}{type}};}
+\DoxyCodeLine{\Hypertarget{_to_string_tuple_8tests_8cpp_source_l00037}00037\ \ \ \ \ type\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ \{\ std::tuple<int>\{42\},\ \{\},\ 1.2f\ \};}
+\DoxyCodeLine{\Hypertarget{_to_string_tuple_8tests_8cpp_source_l00038}00038\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ \textcolor{stringliteral}{"{}\{\ \{\ 42\ \},\ \{\ \},\ 1.2f\ \}"{}}\ ==\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})\ );}
+\DoxyCodeLine{\Hypertarget{_to_string_tuple_8tests_8cpp_source_l00039}00039\ \}}
+\DoxyCodeLine{\Hypertarget{_to_string_tuple_8tests_8cpp_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{_to_string_tuple_8tests_8cpp_source_l00041}\mbox{\hyperlink{_to_string_tuple_8tests_8cpp_a1b26bd9e134c9c6eea6272f87a626768}{00041}}\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\ \textcolor{stringliteral}{"{}tuple<nullptr,int,const\ char\ *>"{}},\ \textcolor{stringliteral}{"{}[toString][tuple]"{}}\ )}
+\DoxyCodeLine{\Hypertarget{_to_string_tuple_8tests_8cpp_source_l00042}00042\ \{}
+\DoxyCodeLine{\Hypertarget{_to_string_tuple_8tests_8cpp_source_l00043}00043\ \ \ \ \ \textcolor{keyword}{typedef}\ std::tuple<std::nullptr\_t,int,const\ char\ *>\ \mbox{\hyperlink{yubihsm_8h_a1d127017fb298b889f4ba24752d08b8e}{type}};}
+\DoxyCodeLine{\Hypertarget{_to_string_tuple_8tests_8cpp_source_l00044}00044\ \ \ \ \ type\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ \{\ \textcolor{keyword}{nullptr},\ 42,\ \textcolor{stringliteral}{"{}Catch\ me"{}}\ \};}
+\DoxyCodeLine{\Hypertarget{_to_string_tuple_8tests_8cpp_source_l00045}00045\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ \textcolor{stringliteral}{"{}\{\ nullptr,\ 42,\ \(\backslash\)"{}Catch\ me\(\backslash\)"{}\ \}"{}}\ ==\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})\ );}
+\DoxyCodeLine{\Hypertarget{_to_string_tuple_8tests_8cpp_source_l00046}00046\ \}}
+\DoxyCodeLine{\Hypertarget{_to_string_tuple_8tests_8cpp_source_l00047}00047\ }
+
+\end{DoxyCode}

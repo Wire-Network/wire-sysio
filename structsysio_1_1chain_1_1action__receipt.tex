@@ -1,0 +1,157 @@
+\doxysection{sysio\+::chain\+::action\+\_\+receipt Struct Reference}
+\hypertarget{structsysio_1_1chain_1_1action__receipt}{}\label{structsysio_1_1chain_1_1action__receipt}\index{sysio::chain::action\_receipt@{sysio::chain::action\_receipt}}
+
+
+{\ttfamily \#include $<$action\+\_\+receipt.\+hpp$>$}
+
+
+
+Collaboration diagram for sysio\+::chain\+::action\+\_\+receipt\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1action__receipt__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_a357fd9478475457e5bb386a3143079b6}{digest\+\_\+type}} \mbox{\hyperlink{structsysio_1_1chain_1_1action__receipt_afd518b774c41df313848a10822807efa}{digest}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} \mbox{\hyperlink{structsysio_1_1chain_1_1action__receipt_a874fdb38683d0c0648fd6ff90e0aba3c}{receiver}}
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_a357fd9478475457e5bb386a3143079b6}{digest\+\_\+type}} \mbox{\hyperlink{structsysio_1_1chain_1_1action__receipt_aa1dcb6dde098183c92b2441f27af6772}{act\+\_\+digest}}
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1action__receipt_a72d6c9144f30f6b3ea18d4c81df2dc18}{global\+\_\+sequence}} = 0
+\begin{DoxyCompactList}\small\item\em total number of actions dispatched since genesis \end{DoxyCompactList}\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1action__receipt_a53e036ff814a8418ea4fd213df922066}{recv\+\_\+sequence}} = 0
+\begin{DoxyCompactList}\small\item\em total number of actions with this receiver since genesis \end{DoxyCompactList}\item 
+flat\+\_\+map$<$ \mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}}, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} $>$ \mbox{\hyperlink{structsysio_1_1chain_1_1action__receipt_a7e2c6cd7b03d7451ef4a9233c990dd91}{auth\+\_\+sequence}}
+\item 
+\mbox{\hyperlink{structfc_1_1unsigned__int}{fc\+::unsigned\+\_\+int}} \mbox{\hyperlink{structsysio_1_1chain_1_1action__receipt_a8f317f5b64bf35f25bd410bc347a5966}{code\+\_\+sequence}} = 0
+\begin{DoxyCompactList}\small\item\em total number of setcodes \end{DoxyCompactList}\item 
+\mbox{\hyperlink{structfc_1_1unsigned__int}{fc\+::unsigned\+\_\+int}} \mbox{\hyperlink{structsysio_1_1chain_1_1action__receipt_ab3a9408241afd8c145188c9062e401ce}{abi\+\_\+sequence}} = 0
+\begin{DoxyCompactList}\small\item\em total number of setabis \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+For each action dispatched this receipt is generated 
+
+Definition at line \mbox{\hyperlink{action__receipt_8hpp_source_l00010}{10}} of file \mbox{\hyperlink{action__receipt_8hpp_source}{action\+\_\+receipt.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1chain_1_1action__receipt_afd518b774c41df313848a10822807efa}\index{sysio::chain::action\_receipt@{sysio::chain::action\_receipt}!digest@{digest}}
+\index{digest@{digest}!sysio::chain::action\_receipt@{sysio::chain::action\_receipt}}
+\doxysubsubsection{\texorpdfstring{digest()}{digest()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1action__receipt_afd518b774c41df313848a10822807efa} 
+\mbox{\hyperlink{namespacesysio_1_1chain_a357fd9478475457e5bb386a3143079b6}{digest\+\_\+type}} sysio\+::chain\+::action\+\_\+receipt\+::digest (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{action__receipt_8hpp_source_l00019}{19}} of file \mbox{\hyperlink{action__receipt_8hpp_source}{action\+\_\+receipt.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \ digest\_type::encoder\ e;}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(e,\ \mbox{\hyperlink{structsysio_1_1chain_1_1action__receipt_a874fdb38683d0c0648fd6ff90e0aba3c}{receiver}});}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(e,\ \mbox{\hyperlink{structsysio_1_1chain_1_1action__receipt_aa1dcb6dde098183c92b2441f27af6772}{act\_digest}});}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(e,\ \mbox{\hyperlink{structsysio_1_1chain_1_1action__receipt_a72d6c9144f30f6b3ea18d4c81df2dc18}{global\_sequence}});}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(e,\ \mbox{\hyperlink{structsysio_1_1chain_1_1action__receipt_a53e036ff814a8418ea4fd213df922066}{recv\_sequence}});}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(e,\ \mbox{\hyperlink{structsysio_1_1chain_1_1action__receipt_a7e2c6cd7b03d7451ef4a9233c990dd91}{auth\_sequence}});}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(e,\ \mbox{\hyperlink{structsysio_1_1chain_1_1action__receipt_a8f317f5b64bf35f25bd410bc347a5966}{code\_sequence}});}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(e,\ \mbox{\hyperlink{structsysio_1_1chain_1_1action__receipt_ab3a9408241afd8c145188c9062e401ce}{abi\_sequence}});}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ e.result();}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1action__receipt_afd518b774c41df313848a10822807efa_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1chain_1_1action__receipt_ab3a9408241afd8c145188c9062e401ce}\index{sysio::chain::action\_receipt@{sysio::chain::action\_receipt}!abi\_sequence@{abi\_sequence}}
+\index{abi\_sequence@{abi\_sequence}!sysio::chain::action\_receipt@{sysio::chain::action\_receipt}}
+\doxysubsubsection{\texorpdfstring{abi\_sequence}{abi\_sequence}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1action__receipt_ab3a9408241afd8c145188c9062e401ce} 
+\mbox{\hyperlink{structfc_1_1unsigned__int}{fc\+::unsigned\+\_\+int}} sysio\+::chain\+::action\+\_\+receipt\+::abi\+\_\+sequence = 0}
+
+
+
+Definition at line \mbox{\hyperlink{action__receipt_8hpp_source_l00017}{17}} of file \mbox{\hyperlink{action__receipt_8hpp_source}{action\+\_\+receipt.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1action__receipt_aa1dcb6dde098183c92b2441f27af6772}\index{sysio::chain::action\_receipt@{sysio::chain::action\_receipt}!act\_digest@{act\_digest}}
+\index{act\_digest@{act\_digest}!sysio::chain::action\_receipt@{sysio::chain::action\_receipt}}
+\doxysubsubsection{\texorpdfstring{act\_digest}{act\_digest}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1action__receipt_aa1dcb6dde098183c92b2441f27af6772} 
+\mbox{\hyperlink{namespacesysio_1_1chain_a357fd9478475457e5bb386a3143079b6}{digest\+\_\+type}} sysio\+::chain\+::action\+\_\+receipt\+::act\+\_\+digest}
+
+
+
+Definition at line \mbox{\hyperlink{action__receipt_8hpp_source_l00012}{12}} of file \mbox{\hyperlink{action__receipt_8hpp_source}{action\+\_\+receipt.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1action__receipt_a7e2c6cd7b03d7451ef4a9233c990dd91}\index{sysio::chain::action\_receipt@{sysio::chain::action\_receipt}!auth\_sequence@{auth\_sequence}}
+\index{auth\_sequence@{auth\_sequence}!sysio::chain::action\_receipt@{sysio::chain::action\_receipt}}
+\doxysubsubsection{\texorpdfstring{auth\_sequence}{auth\_sequence}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1action__receipt_a7e2c6cd7b03d7451ef4a9233c990dd91} 
+flat\+\_\+map$<$\mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}},\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}$>$ sysio\+::chain\+::action\+\_\+receipt\+::auth\+\_\+sequence}
+
+
+
+Definition at line \mbox{\hyperlink{action__receipt_8hpp_source_l00015}{15}} of file \mbox{\hyperlink{action__receipt_8hpp_source}{action\+\_\+receipt.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1action__receipt_a8f317f5b64bf35f25bd410bc347a5966}\index{sysio::chain::action\_receipt@{sysio::chain::action\_receipt}!code\_sequence@{code\_sequence}}
+\index{code\_sequence@{code\_sequence}!sysio::chain::action\_receipt@{sysio::chain::action\_receipt}}
+\doxysubsubsection{\texorpdfstring{code\_sequence}{code\_sequence}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1action__receipt_a8f317f5b64bf35f25bd410bc347a5966} 
+\mbox{\hyperlink{structfc_1_1unsigned__int}{fc\+::unsigned\+\_\+int}} sysio\+::chain\+::action\+\_\+receipt\+::code\+\_\+sequence = 0}
+
+
+
+Definition at line \mbox{\hyperlink{action__receipt_8hpp_source_l00016}{16}} of file \mbox{\hyperlink{action__receipt_8hpp_source}{action\+\_\+receipt.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1action__receipt_a72d6c9144f30f6b3ea18d4c81df2dc18}\index{sysio::chain::action\_receipt@{sysio::chain::action\_receipt}!global\_sequence@{global\_sequence}}
+\index{global\_sequence@{global\_sequence}!sysio::chain::action\_receipt@{sysio::chain::action\_receipt}}
+\doxysubsubsection{\texorpdfstring{global\_sequence}{global\_sequence}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1action__receipt_a72d6c9144f30f6b3ea18d4c81df2dc18} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} sysio\+::chain\+::action\+\_\+receipt\+::global\+\_\+sequence = 0}
+
+
+
+Definition at line \mbox{\hyperlink{action__receipt_8hpp_source_l00013}{13}} of file \mbox{\hyperlink{action__receipt_8hpp_source}{action\+\_\+receipt.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1action__receipt_a874fdb38683d0c0648fd6ff90e0aba3c}\index{sysio::chain::action\_receipt@{sysio::chain::action\_receipt}!receiver@{receiver}}
+\index{receiver@{receiver}!sysio::chain::action\_receipt@{sysio::chain::action\_receipt}}
+\doxysubsubsection{\texorpdfstring{receiver}{receiver}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1action__receipt_a874fdb38683d0c0648fd6ff90e0aba3c} 
+\mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} sysio\+::chain\+::action\+\_\+receipt\+::receiver}
+
+
+
+Definition at line \mbox{\hyperlink{action__receipt_8hpp_source_l00011}{11}} of file \mbox{\hyperlink{action__receipt_8hpp_source}{action\+\_\+receipt.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1action__receipt_a53e036ff814a8418ea4fd213df922066}\index{sysio::chain::action\_receipt@{sysio::chain::action\_receipt}!recv\_sequence@{recv\_sequence}}
+\index{recv\_sequence@{recv\_sequence}!sysio::chain::action\_receipt@{sysio::chain::action\_receipt}}
+\doxysubsubsection{\texorpdfstring{recv\_sequence}{recv\_sequence}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1action__receipt_a53e036ff814a8418ea4fd213df922066} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} sysio\+::chain\+::action\+\_\+receipt\+::recv\+\_\+sequence = 0}
+
+
+
+Definition at line \mbox{\hyperlink{action__receipt_8hpp_source_l00014}{14}} of file \mbox{\hyperlink{action__receipt_8hpp_source}{action\+\_\+receipt.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{action__receipt_8hpp}{action\+\_\+receipt.\+hpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,11 @@
+<map id="sysio::chain::genesis_state" name="sysio::chain::genesis_state">
+<area shape="rect" id="Node000001" title=" " alt="" coords="322,100,466,141"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1chain__config__v0.html" title="Producer&#45;voted blockchain configuration parameters." alt="" coords="13,5,144,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="160,31,228,43,299,63,333,79,364,97,361,102,331,84,297,68,227,48,159,36"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1chain_1_1wasm__config.html" title=" " alt="" coords="11,71,146,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="161,96,322,111,321,116,161,101"/>
+<area shape="rect" id="Node000004" href="$classfc_1_1time__point.html" title=" " alt="" coords="28,136,129,161"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="144,143,297,133,321,130,321,135,298,138,145,149"/>
+<area shape="rect" id="Node000005" href="$classfc_1_1crypto_1_1public__key.html" title=" " alt="" coords="5,185,152,210"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="167,188,231,178,297,162,353,139,355,144,298,167,232,183,168,193"/>
+</map>

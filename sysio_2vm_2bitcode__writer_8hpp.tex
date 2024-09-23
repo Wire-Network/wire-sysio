@@ -1,0 +1,130 @@
+\doxysection{libraries/sys-\/vm/include/sysio/sysio/vm/bitcode\+\_\+writer.hpp File Reference}
+\hypertarget{sysio_2vm_2bitcode__writer_8hpp}{}\label{sysio_2vm_2bitcode__writer_8hpp}\index{libraries/sys-\/vm/include/sysio/sysio/vm/bitcode\_writer.hpp@{libraries/sys-\/vm/include/sysio/sysio/vm/bitcode\_writer.hpp}}
+{\ttfamily \#include $<$sysio/vm/allocator.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/vm/opcodes.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/vm/types.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/vm/vector.\+hpp$>$}\newline
+{\ttfamily \#include $<$cstddef$>$}\newline
+{\ttfamily \#include $<$cstdint$>$}\newline
+{\ttfamily \#include $<$type\+\_\+traits$>$}\newline
+Include dependency graph for bitcode\+\_\+writer.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sysio_2vm_2bitcode__writer_8hpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classsysio_1_1vm_1_1bitcode__writer}{sysio\+::vm\+::bitcode\+\_\+writer}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1bitcode__writer_1_1br__table__parser}{sysio\+::vm\+::bitcode\+\_\+writer\+::br\+\_\+table\+\_\+parser}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1vm}{sysio\+::vm}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_a1ad42ec264f7178947e0a7cfa1418251}{MEM\+\_\+\+OP}}(op\+\_\+name)
+\item 
+\#define \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_a8542ffa9bd5736e237524f49c6734fac}{LOAD\+\_\+\+OP}}~\mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_a1ad42ec264f7178947e0a7cfa1418251}{MEM\+\_\+\+OP}}
+\item 
+\#define \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_a926bcb1ed90c78a9bc071ca9229f4512}{STORE\+\_\+\+OP}}~\mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_a1ad42ec264f7178947e0a7cfa1418251}{MEM\+\_\+\+OP}}
+\item 
+\#define \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_a95c6de750b0756fab562e81ef6306c2b}{OP}}(opname)
+\item 
+\#define \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_a74f00b85915cd1e0afd54074617570aa}{UNOP}}~\mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_a95c6de750b0756fab562e81ef6306c2b}{OP}}
+\item 
+\#define \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_ad20b11a627c6ce1fab0f446c6a2766aa}{BINOP}}~\mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_a95c6de750b0756fab562e81ef6306c2b}{OP}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{sysio_2vm_2bitcode__writer_8hpp_ad20b11a627c6ce1fab0f446c6a2766aa}\index{bitcode\_writer.hpp@{bitcode\_writer.hpp}!BINOP@{BINOP}}
+\index{BINOP@{BINOP}!bitcode\_writer.hpp@{bitcode\_writer.hpp}}
+\doxysubsubsection{\texorpdfstring{BINOP}{BINOP}}
+{\footnotesize\ttfamily \label{sysio_2vm_2bitcode__writer_8hpp_ad20b11a627c6ce1fab0f446c6a2766aa} 
+\#define BINOP~\mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_a95c6de750b0756fab562e81ef6306c2b}{OP}}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source_l00146}{146}} of file \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+\Hypertarget{sysio_2vm_2bitcode__writer_8hpp_a8542ffa9bd5736e237524f49c6734fac}\index{bitcode\_writer.hpp@{bitcode\_writer.hpp}!LOAD\_OP@{LOAD\_OP}}
+\index{LOAD\_OP@{LOAD\_OP}!bitcode\_writer.hpp@{bitcode\_writer.hpp}}
+\doxysubsubsection{\texorpdfstring{LOAD\_OP}{LOAD\_OP}}
+{\footnotesize\ttfamily \label{sysio_2vm_2bitcode__writer_8hpp_a8542ffa9bd5736e237524f49c6734fac} 
+\#define LOAD\+\_\+\+OP~\mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_a1ad42ec264f7178947e0a7cfa1418251}{MEM\+\_\+\+OP}}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source_l00106}{106}} of file \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+\Hypertarget{sysio_2vm_2bitcode__writer_8hpp_a1ad42ec264f7178947e0a7cfa1418251}\index{bitcode\_writer.hpp@{bitcode\_writer.hpp}!MEM\_OP@{MEM\_OP}}
+\index{MEM\_OP@{MEM\_OP}!bitcode\_writer.hpp@{bitcode\_writer.hpp}}
+\doxysubsubsection{\texorpdfstring{MEM\_OP}{MEM\_OP}}
+{\footnotesize\ttfamily \label{sysio_2vm_2bitcode__writer_8hpp_a1ad42ec264f7178947e0a7cfa1418251} 
+\#define MEM\+\_\+\+OP(\begin{DoxyParamCaption}\item[{}]{op\+\_\+name}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keywordtype}{void}\ emit\_\ \#\#\ op\_name(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ offset,\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ alignment)\ \{\ fb[op\_index++]\ =\ op\_name\ \#\#\ \_t\{\ offset,\ alignment\ \};\ \}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source_l00104}{104}} of file \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00104\ \textcolor{preprocessor}{\#define\ MEM\_OP(op\_name)\ \(\backslash\)}}
+\DoxyCodeLine{00105\ \textcolor{preprocessor}{\ \ \ \ \ \ void\ emit\_\ \#\#\ op\_name(uint32\_t\ offset,\ uint32\_t\ alignment)\ \{\ fb[op\_index++]\ =\ op\_name\ \#\#\ \_t\{\ offset,\ alignment\ \};\ \}}}
+
+\end{DoxyCode}
+\Hypertarget{sysio_2vm_2bitcode__writer_8hpp_a95c6de750b0756fab562e81ef6306c2b}\index{bitcode\_writer.hpp@{bitcode\_writer.hpp}!OP@{OP}}
+\index{OP@{OP}!bitcode\_writer.hpp@{bitcode\_writer.hpp}}
+\doxysubsubsection{\texorpdfstring{OP}{OP}}
+{\footnotesize\ttfamily \label{sysio_2vm_2bitcode__writer_8hpp_a95c6de750b0756fab562e81ef6306c2b} 
+\#define OP(\begin{DoxyParamCaption}\item[{}]{opname}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keywordtype}{void}\ emit\_\ \#\#\ opname()\ \{\ fb[op\_index++]\ =\ opname\ \#\#\ \_t\{\};\ \}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source_l00143}{143}} of file \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00143\ \textcolor{preprocessor}{\#define\ OP(opname)\ \(\backslash\)}}
+\DoxyCodeLine{00144\ \textcolor{preprocessor}{\ \ \ \ \ \ void\ emit\_\ \#\#\ opname()\ \{\ fb[op\_index++]\ =\ opname\ \#\#\ \_t\{\};\ \}}}
+
+\end{DoxyCode}
+\Hypertarget{sysio_2vm_2bitcode__writer_8hpp_a926bcb1ed90c78a9bc071ca9229f4512}\index{bitcode\_writer.hpp@{bitcode\_writer.hpp}!STORE\_OP@{STORE\_OP}}
+\index{STORE\_OP@{STORE\_OP}!bitcode\_writer.hpp@{bitcode\_writer.hpp}}
+\doxysubsubsection{\texorpdfstring{STORE\_OP}{STORE\_OP}}
+{\footnotesize\ttfamily \label{sysio_2vm_2bitcode__writer_8hpp_a926bcb1ed90c78a9bc071ca9229f4512} 
+\#define STORE\+\_\+\+OP~\mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_a1ad42ec264f7178947e0a7cfa1418251}{MEM\+\_\+\+OP}}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source_l00107}{107}} of file \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+
+\Hypertarget{sysio_2vm_2bitcode__writer_8hpp_a74f00b85915cd1e0afd54074617570aa}\index{bitcode\_writer.hpp@{bitcode\_writer.hpp}!UNOP@{UNOP}}
+\index{UNOP@{UNOP}!bitcode\_writer.hpp@{bitcode\_writer.hpp}}
+\doxysubsubsection{\texorpdfstring{UNOP}{UNOP}}
+{\footnotesize\ttfamily \label{sysio_2vm_2bitcode__writer_8hpp_a74f00b85915cd1e0afd54074617570aa} 
+\#define UNOP~\mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_a95c6de750b0756fab562e81ef6306c2b}{OP}}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source_l00145}{145}} of file \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_source}{bitcode\+\_\+writer.\+hpp}}.
+

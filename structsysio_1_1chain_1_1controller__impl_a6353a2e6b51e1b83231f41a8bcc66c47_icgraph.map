@@ -1,0 +1,13 @@
+<map id="sysio::chain::controller_impl::extract_legacy_genesis_state" name="sysio::chain::controller_impl::extract_legacy_genesis_state">
+<area shape="rect" id="Node000001" title=" " alt="" coords="432,104,665,145"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1chain_1_1controller.html#a2c8b0888cae831840ac03980e206c874" title=" " alt="" coords="219,71,371,111"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="416,110,371,104,372,98,417,104"/>
+<area shape="rect" id="Node000005" href="$structsysio_1_1chain_1_1controller__impl.html#a247c87d241e707c5e482c3d6d8872a7f" title=" " alt="" coords="206,136,384,177"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="417,144,385,148,384,142,416,138"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1testing_1_1base__tester.html#aa94514bfa2c9891911d4bf3d03da3cc8" title=" " alt="" coords="14,5,149,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="211,68,149,49,151,44,212,63"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1chain__plugin.html#a0192ac61f3f59d4fdf2dcbbd2c7104ca" title=" " alt="" coords="15,71,148,111"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="203,94,148,94,148,88,203,88"/>
+<area shape="rect" id="Node000006" href="$structsysio_1_1chain_1_1controller__impl.html#a18bcf25847599b0f9caa6566364bb0ac" title=" " alt="" coords="5,136,158,177"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="190,159,158,159,158,154,190,154"/>
+</map>

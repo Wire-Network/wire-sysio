@@ -1,0 +1,11 @@
+<map id="sysio::chain::transaction_trace" name="sysio::chain::transaction_trace">
+<area shape="rect" id="Node000001" title=" " alt="" coords="318,106,481,146"/>
+<area shape="rect" id="Node000002" href="$classfc_1_1sha256.html" title=" " alt="" coords="55,5,138,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="154,29,189,40,276,71,352,103,350,108,274,76,187,45,152,34"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1chain_1_1block__timestamp.html" title=" " alt="" coords="5,55,188,126"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="204,100,318,114,317,119,203,105"/>
+<area shape="rect" id="Node000004" href="$classfc_1_1microseconds.html" title=" " alt="" coords="36,149,157,175"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="172,151,317,133,318,138,173,156"/>
+<area shape="rect" id="Node000005" href="$classfc_1_1vector.html" title=" " alt="" coords="25,199,168,240"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="183,198,293,167,350,145,352,150,295,172,184,203"/>
+</map>

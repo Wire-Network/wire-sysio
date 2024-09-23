@@ -1,0 +1,93 @@
+\doxysection{sysio\+::chain\+::eosvmoc\+::compile\+\_\+monitor\+\_\+trampoline Struct Reference}
+\hypertarget{structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor__trampoline}{}\label{structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor__trampoline}\index{sysio::chain::eosvmoc::compile\_monitor\_trampoline@{sysio::chain::eosvmoc::compile\_monitor\_trampoline}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor__trampoline_a63b95ad40fc14a208d56c3a687ef9b92}{start}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+pid\+\_\+t \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor__trampoline_a4b4636c16b0c1ec81239d8d4205d2392}{compile\+\_\+manager\+\_\+pid}} = -\/1
+\item 
+int \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor__trampoline_aa147232d9f0344f71c41d1fe3069bd51}{compile\+\_\+manager\+\_\+fd}} = -\/1
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{compile__monitor_8cpp_source_l00278}{278}} of file \mbox{\hyperlink{compile__monitor_8cpp_source}{compile\+\_\+monitor.\+cpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor__trampoline_a63b95ad40fc14a208d56c3a687ef9b92}\index{sysio::chain::eosvmoc::compile\_monitor\_trampoline@{sysio::chain::eosvmoc::compile\_monitor\_trampoline}!start@{start}}
+\index{start@{start}!sysio::chain::eosvmoc::compile\_monitor\_trampoline@{sysio::chain::eosvmoc::compile\_monitor\_trampoline}}
+\doxysubsubsection{\texorpdfstring{start()}{start()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor__trampoline_a63b95ad40fc14a208d56c3a687ef9b92} 
+void sysio\+::chain\+::eosvmoc\+::compile\+\_\+monitor\+\_\+trampoline\+::start (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{compile__monitor_8cpp_source_l00279}{279}} of file \mbox{\hyperlink{compile__monitor_8cpp_source}{compile\+\_\+monitor.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00279\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00280\ \ \ \ \ \ \ \textcolor{comment}{//create\ communication\ socket;\ let's\ hold\ off\ on\ asio\ usage\ until\ all\ forks\ are\ done}}
+\DoxyCodeLine{00281\ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ socks[2];}
+\DoxyCodeLine{00282\ \ \ \ \ \ \ socketpair(AF\_UNIX,\ SOCK\_SEQPACKET\ |\ SOCK\_CLOEXEC,\ 0,\ socks);}
+\DoxyCodeLine{00283\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor__trampoline_aa147232d9f0344f71c41d1fe3069bd51}{compile\_manager\_fd}}\ =\ socks[0];}
+\DoxyCodeLine{00284\ }
+\DoxyCodeLine{00285\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor__trampoline_a4b4636c16b0c1ec81239d8d4205d2392}{compile\_manager\_pid}}\ =\ fork();}
+\DoxyCodeLine{00286\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor__trampoline_a4b4636c16b0c1ec81239d8d4205d2392}{compile\_manager\_pid}}\ ==\ 0)\ \{}
+\DoxyCodeLine{00287\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{integration_8cpp_af5b66d867a040d002fb57d645cae3fb4}{close}}(socks[0]);}
+\DoxyCodeLine{00288\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a12ffc07ce81ac9d9d6aea564a6574a6d}{launch\_compile\_monitor}}(socks[1]);}
+\DoxyCodeLine{00289\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00290\ \ \ \ \ \ \ \mbox{\hyperlink{integration_8cpp_af5b66d867a040d002fb57d645cae3fb4}{close}}(socks[1]);}
+\DoxyCodeLine{00291\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor__trampoline_a63b95ad40fc14a208d56c3a687ef9b92_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor__trampoline_a63b95ad40fc14a208d56c3a687ef9b92_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor__trampoline_aa147232d9f0344f71c41d1fe3069bd51}\index{sysio::chain::eosvmoc::compile\_monitor\_trampoline@{sysio::chain::eosvmoc::compile\_monitor\_trampoline}!compile\_manager\_fd@{compile\_manager\_fd}}
+\index{compile\_manager\_fd@{compile\_manager\_fd}!sysio::chain::eosvmoc::compile\_monitor\_trampoline@{sysio::chain::eosvmoc::compile\_monitor\_trampoline}}
+\doxysubsubsection{\texorpdfstring{compile\_manager\_fd}{compile\_manager\_fd}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor__trampoline_aa147232d9f0344f71c41d1fe3069bd51} 
+int sysio\+::chain\+::eosvmoc\+::compile\+\_\+monitor\+\_\+trampoline\+::compile\+\_\+manager\+\_\+fd = -\/1}
+
+
+
+Definition at line \mbox{\hyperlink{compile__monitor_8cpp_source_l00294}{294}} of file \mbox{\hyperlink{compile__monitor_8cpp_source}{compile\+\_\+monitor.\+cpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor__trampoline_a4b4636c16b0c1ec81239d8d4205d2392}\index{sysio::chain::eosvmoc::compile\_monitor\_trampoline@{sysio::chain::eosvmoc::compile\_monitor\_trampoline}!compile\_manager\_pid@{compile\_manager\_pid}}
+\index{compile\_manager\_pid@{compile\_manager\_pid}!sysio::chain::eosvmoc::compile\_monitor\_trampoline@{sysio::chain::eosvmoc::compile\_monitor\_trampoline}}
+\doxysubsubsection{\texorpdfstring{compile\_manager\_pid}{compile\_manager\_pid}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor__trampoline_a4b4636c16b0c1ec81239d8d4205d2392} 
+pid\+\_\+t sysio\+::chain\+::eosvmoc\+::compile\+\_\+monitor\+\_\+trampoline\+::compile\+\_\+manager\+\_\+pid = -\/1}
+
+
+
+Definition at line \mbox{\hyperlink{compile__monitor_8cpp_source_l00293}{293}} of file \mbox{\hyperlink{compile__monitor_8cpp_source}{compile\+\_\+monitor.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/webassembly/runtimes/sys-\/vm-\/oc/\mbox{\hyperlink{compile__monitor_8cpp}{compile\+\_\+monitor.\+cpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,276 @@
+\doxysection{libraries/testing/include/sysio/testing/tester.hpp File Reference}
+\hypertarget{tester_8hpp}{}\label{tester_8hpp}\index{libraries/testing/include/sysio/testing/tester.hpp@{libraries/testing/include/sysio/testing/tester.hpp}}
+{\ttfamily \#include $<$sysio/chain/controller.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/asset.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/contract\+\_\+table\+\_\+objects.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/account\+\_\+object.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/abi\+\_\+serializer.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/unapplied\+\_\+transaction\+\_\+queue.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/io/json.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/test/unit\+\_\+test.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/tuple/tuple\+\_\+io.\+hpp$>$}\newline
+{\ttfamily \#include $<$iosfwd$>$}\newline
+{\ttfamily \#include $<$optional$>$}\newline
+Include dependency graph for tester.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{tester_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{tester_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structboost_1_1test__tools_1_1tt__detail_1_1print__log__value_3_01fc_1_1variant_01_4}{boost\+::test\+\_\+tools\+::tt\+\_\+detail\+::print\+\_\+log\+\_\+value$<$ fc\+::variant $>$}}
+\item 
+struct \mbox{\hyperlink{structboost_1_1test__tools_1_1tt__detail_1_1print__log__value_3_01fc_1_1variant__object_01_4}{boost\+::test\+\_\+tools\+::tt\+\_\+detail\+::print\+\_\+log\+\_\+value$<$ fc\+::variant\+\_\+object $>$}}
+\item 
+struct \mbox{\hyperlink{structboost_1_1test__tools_1_1tt__detail_1_1print__log__value_3_01fc_1_1variant__object_1_1entry_01_4}{boost\+::test\+\_\+tools\+::tt\+\_\+detail\+::print\+\_\+log\+\_\+value$<$ fc\+::variant\+\_\+object\+::entry $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1testing_1_1mock_1_1webauthn__private__key}{sysio\+::testing\+::mock\+::webauthn\+\_\+private\+\_\+key}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1testing_1_1base__tester}{sysio\+::testing\+::base\+\_\+tester}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1testing_1_1tester}{sysio\+::testing\+::tester}}
+\begin{DoxyCompactList}\small\item\em provides utility function to simplify the creation of unit tests \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{classsysio_1_1testing_1_1validating__tester}{sysio\+::testing\+::validating\+\_\+tester}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1testing_1_1fc__exception__message__is}{sysio\+::testing\+::fc\+\_\+exception\+\_\+message\+\_\+is}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1testing_1_1fc__exception__message__starts__with}{sysio\+::testing\+::fc\+\_\+exception\+\_\+message\+\_\+starts\+\_\+with}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1testing_1_1fc__assert__exception__message__is}{sysio\+::testing\+::fc\+\_\+assert\+\_\+exception\+\_\+message\+\_\+is}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1testing_1_1fc__assert__exception__message__starts__with}{sysio\+::testing\+::fc\+\_\+assert\+\_\+exception\+\_\+message\+\_\+starts\+\_\+with}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1testing_1_1sysio__assert__message__is}{sysio\+::testing\+::sysio\+\_\+assert\+\_\+message\+\_\+is}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1testing_1_1sysio__assert__message__starts__with}{sysio\+::testing\+::sysio\+\_\+assert\+\_\+message\+\_\+starts\+\_\+with}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1testing_1_1sysio__assert__code__is}{sysio\+::testing\+::sysio\+\_\+assert\+\_\+code\+\_\+is}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespaceboost}{boost}}
+\item 
+namespace \mbox{\hyperlink{namespaceboost_1_1test__tools}{boost\+::test\+\_\+tools}}
+\item 
+namespace \mbox{\hyperlink{namespaceboost_1_1test__tools_1_1tt__detail}{boost\+::test\+\_\+tools\+::tt\+\_\+detail}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1testing}{sysio\+::testing}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1testing_1_1mock}{sysio\+::testing\+::mock}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{tester_8hpp_a543047c49868e8aafb9544f40bb98f9f}{REQUIRE\+\_\+\+EQUAL\+\_\+\+OBJECTS}}(left,  right)
+\item 
+\#define \mbox{\hyperlink{tester_8hpp_a593ec9c61c5a8be4039af2350b178929}{REQUIRE\+\_\+\+MATCHING\+\_\+\+OBJECT}}(left,  right)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1testing_acae96fe90b772011e89845ed8d97bf29}{sysio\+::testing\+::subjective\+\_\+restriction\+\_\+map}} = std\+::map$<$\mbox{\hyperlink{namespacesysio_1_1chain_a406d45a184cdba0af316b5bf34bf56cf}{builtin\+\_\+protocol\+\_\+feature\+\_\+t}}, \mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature__subjective__restrictions}{protocol\+\_\+feature\+\_\+subjective\+\_\+restrictions}}$>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum class \mbox{\hyperlink{namespacesysio_1_1testing_abbcb96725af015f540fdd36473336baf}{sysio\+::testing\+::setup\+\_\+policy}} \{ \newline
+\mbox{\hyperlink{namespacesysio_1_1testing_abbcb96725af015f540fdd36473336bafa334c4a4c42fdb79d7ebc3e73b517e6f8}{sysio\+::testing\+::none}}
+, \mbox{\hyperlink{namespacesysio_1_1testing_abbcb96725af015f540fdd36473336bafa0683f49f54a666d50a178dcbb1bb3aab}{sysio\+::testing\+::old\+\_\+bios\+\_\+only}}
+, \mbox{\hyperlink{namespacesysio_1_1testing_abbcb96725af015f540fdd36473336bafa037d51f77b132305d732d6e196c33e37}{sysio\+::testing\+::preactivate\+\_\+feature\+\_\+only}}
+, \mbox{\hyperlink{namespacesysio_1_1testing_abbcb96725af015f540fdd36473336bafaa0aae2fff4ea32f362e16bec17dfe53e}{sysio\+::testing\+::preactivate\+\_\+feature\+\_\+and\+\_\+new\+\_\+bios}}
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1testing_abbcb96725af015f540fdd36473336bafa03596874c3502399ae3e2755b9852953}{sysio\+::testing\+::old\+\_\+wasm\+\_\+parser}}
+, \mbox{\hyperlink{namespacesysio_1_1testing_abbcb96725af015f540fdd36473336bafae9dc924f238fa6cc29465942875fe8f0}{sysio\+::testing\+::full}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+std\+::ostream \& \mbox{\hyperlink{tester_8hpp_a3256503a2bf41f6a5547d7dafc3832c4}{operator$<$$<$}} (std\+::ostream \&osm, const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&v)
+\begin{DoxyCompactList}\small\item\em \doxylink{namespacesysio_1_1testing}{sysio\+::testing} \end{DoxyCompactList}\item 
+std\+::ostream \& \mbox{\hyperlink{tester_8hpp_a4ff42d717f021c8ef935ed1c8dcd5a0c}{operator$<$$<$}} (std\+::ostream \&osm, const \mbox{\hyperlink{classfc_1_1variant__object}{fc\+::variant\+\_\+object}} \&v)
+\item 
+std\+::ostream \& \mbox{\hyperlink{tester_8hpp_afd98dd59fe676698874fc546d0dfb574}{operator$<$$<$}} (std\+::ostream \&osm, const \mbox{\hyperlink{classfc_1_1variant__object_1_1entry}{fc\+::variant\+\_\+object\+::entry}} \&e)
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1asset}{sysio\+::chain\+::asset}} \mbox{\hyperlink{tester_8hpp_a0e37ca5eb2c90419b316a842a3c83ef7}{core\+\_\+from\+\_\+string}} (const std\+::string \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\item 
+std\+::vector$<$ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} $>$ \mbox{\hyperlink{namespacesysio_1_1testing_ad245f01ccab429ec3c5407ff0266b17e}{sysio\+::testing\+::read\+\_\+wasm}} (const char \texorpdfstring{$\ast$}{*}fn)
+\item 
+std\+::vector$<$ char $>$ \mbox{\hyperlink{namespacesysio_1_1testing_ada90805bcbce429144d11f16b057999c}{sysio\+::testing\+::read\+\_\+abi}} (const char \texorpdfstring{$\ast$}{*}fn)
+\item 
+std\+::string \mbox{\hyperlink{namespacesysio_1_1testing_a5c80e405e617f9c628fc6c0381fe35d7}{sysio\+::testing\+::read\+\_\+wast}} (const char \texorpdfstring{$\ast$}{*}fn)
+\item 
+std\+::string \mbox{\hyperlink{namespacesysio_1_1testing_a966343fcad2e104d6fdeb2c748ac073b}{sysio\+::testing\+::read\+\_\+binary\+\_\+snapshot}} (const char \texorpdfstring{$\ast$}{*}fn)
+\item 
+\mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \mbox{\hyperlink{namespacesysio_1_1testing_a6de7af83b0ca849f8dc2d189d0a78488}{sysio\+::testing\+::read\+\_\+json\+\_\+snapshot}} (const char \texorpdfstring{$\ast$}{*}fn)
+\item 
+\mbox{\hyperlink{classfc_1_1variant__object}{fc\+::variant\+\_\+object}} \mbox{\hyperlink{namespacesysio_1_1testing_acbc32a23f9b171377a23b0b1d10f18b3}{sysio\+::testing\+::filter\+\_\+fields}} (const \mbox{\hyperlink{classfc_1_1variant__object}{fc\+::variant\+\_\+object}} \&filter, const \mbox{\hyperlink{classfc_1_1variant__object}{fc\+::variant\+\_\+object}} \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+void \mbox{\hyperlink{namespacesysio_1_1testing_a320161d2a9dbf7248cef595b30dc742b}{sysio\+::testing\+::copy\+\_\+row}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1key__value__object}{chain\+::key\+\_\+value\+\_\+object}} \&obj, \mbox{\hyperlink{classfc_1_1vector}{vector}}$<$ char $>$ \&data)
+\item 
+bool \mbox{\hyperlink{namespacesysio_1_1testing_ab79cbc2e7941e60c4be70914ebbe56c9}{sysio\+::testing\+::expect\+\_\+assert\+\_\+message}} (const \mbox{\hyperlink{classfc_1_1exception}{fc\+::exception}} \&ex, \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} expected)
+\item 
+\mbox{\hyperlink{classsysio_1_1chain_1_1protocol__feature__set}{protocol\+\_\+feature\+\_\+set}} \mbox{\hyperlink{namespacesysio_1_1testing_aa1bac177b89467d958f2093f30295960}{sysio\+::testing\+::make\+\_\+protocol\+\_\+feature\+\_\+set}} (const \mbox{\hyperlink{namespacesysio_1_1testing_acae96fe90b772011e89845ed8d97bf29}{subjective\+\_\+restriction\+\_\+map}} \&custom\+\_\+subjective\+\_\+restrictions=\{\})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{tester_8hpp_a543047c49868e8aafb9544f40bb98f9f}\index{tester.hpp@{tester.hpp}!REQUIRE\_EQUAL\_OBJECTS@{REQUIRE\_EQUAL\_OBJECTS}}
+\index{REQUIRE\_EQUAL\_OBJECTS@{REQUIRE\_EQUAL\_OBJECTS}!tester.hpp@{tester.hpp}}
+\doxysubsubsection{\texorpdfstring{REQUIRE\_EQUAL\_OBJECTS}{REQUIRE\_EQUAL\_OBJECTS}}
+{\footnotesize\ttfamily \label{tester_8hpp_a543047c49868e8aafb9544f40bb98f9f} 
+\#define REQUIRE\+\_\+\+EQUAL\+\_\+\+OBJECTS(\begin{DoxyParamCaption}\item[{}]{left}{, }\item[{}]{right}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \{\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ =\ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}(\ left\ );\ \textcolor{keyword}{auto}\ b\ =\ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}(\ right\ );\ BOOST\_REQUIRE\_EQUAL(\ \textcolor{keyword}{true},\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.is\_object()\ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ BOOST\_REQUIRE\_EQUAL(\ \textcolor{keyword}{true},\ b.is\_object()\ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ BOOST\_REQUIRE\_EQUAL\_COLLECTIONS(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.get\_object().begin(),\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.get\_object().end(),\ b.get\_object().begin(),\ b.get\_object().end()\ );\ \}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{tester_8hpp_source_l00015}{15}} of file \mbox{\hyperlink{tester_8hpp_source}{tester.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\#define\ REQUIRE\_EQUAL\_OBJECTS(left,\ right)\ \{\ auto\ a\ =\ fc::variant(\ left\ );\ auto\ b\ =\ fc::variant(\ right\ );\ BOOST\_REQUIRE\_EQUAL(\ true,\ a.is\_object()\ );\ \(\backslash\)}}
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\ \ \ BOOST\_REQUIRE\_EQUAL(\ true,\ b.is\_object()\ );\ \(\backslash\)}}
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\ \ \ BOOST\_REQUIRE\_EQUAL\_COLLECTIONS(\ a.get\_object().begin(),\ a.get\_object().end(),\ b.get\_object().begin(),\ b.get\_object().end()\ );\ \}}}
+
+\end{DoxyCode}
+\Hypertarget{tester_8hpp_a593ec9c61c5a8be4039af2350b178929}\index{tester.hpp@{tester.hpp}!REQUIRE\_MATCHING\_OBJECT@{REQUIRE\_MATCHING\_OBJECT}}
+\index{REQUIRE\_MATCHING\_OBJECT@{REQUIRE\_MATCHING\_OBJECT}!tester.hpp@{tester.hpp}}
+\doxysubsubsection{\texorpdfstring{REQUIRE\_MATCHING\_OBJECT}{REQUIRE\_MATCHING\_OBJECT}}
+{\footnotesize\ttfamily \label{tester_8hpp_a593ec9c61c5a8be4039af2350b178929} 
+\#define REQUIRE\+\_\+\+MATCHING\+\_\+\+OBJECT(\begin{DoxyParamCaption}\item[{}]{left}{, }\item[{}]{right}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \{\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ =\ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}(\ left\ );\ \textcolor{keyword}{auto}\ b\ =\ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}(\ right\ );\ BOOST\_REQUIRE\_EQUAL(\ \textcolor{keyword}{true},\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.is\_object()\ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ BOOST\_REQUIRE\_EQUAL(\ \textcolor{keyword}{true},\ b.is\_object()\ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \textcolor{keyword}{auto}\ filtered\ =\ \mbox{\hyperlink{namespacesysio_1_1testing_acbc32a23f9b171377a23b0b1d10f18b3}{::sysio::testing::filter\_fields}}(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.get\_object(),\ b.get\_object()\ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ BOOST\_REQUIRE\_EQUAL\_COLLECTIONS(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.get\_object().begin(),\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.get\_object().end(),\ filtered.begin(),\ filtered.end()\ );\ \}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{tester_8hpp_source_l00019}{19}} of file \mbox{\hyperlink{tester_8hpp_source}{tester.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#define\ REQUIRE\_MATCHING\_OBJECT(left,\ right)\ \{\ auto\ a\ =\ fc::variant(\ left\ );\ auto\ b\ =\ fc::variant(\ right\ );\ BOOST\_REQUIRE\_EQUAL(\ true,\ a.is\_object()\ );\ \(\backslash\)}}
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\ \ \ BOOST\_REQUIRE\_EQUAL(\ true,\ b.is\_object()\ );\ \(\backslash\)}}
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\ \ \ auto\ filtered\ =\ ::sysio::testing::filter\_fields(\ a.get\_object(),\ b.get\_object()\ );\ \(\backslash\)}}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\ \ \ BOOST\_REQUIRE\_EQUAL\_COLLECTIONS(\ a.get\_object().begin(),\ a.get\_object().end(),\ filtered.begin(),\ filtered.end()\ );\ \}}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{tester_8hpp_a0e37ca5eb2c90419b316a842a3c83ef7}\index{tester.hpp@{tester.hpp}!core\_from\_string@{core\_from\_string}}
+\index{core\_from\_string@{core\_from\_string}!tester.hpp@{tester.hpp}}
+\doxysubsubsection{\texorpdfstring{core\_from\_string()}{core\_from\_string()}}
+{\footnotesize\ttfamily \label{tester_8hpp_a0e37ca5eb2c90419b316a842a3c83ef7} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1asset}{sysio\+::chain\+::asset}} core\+\_\+from\+\_\+string (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{s}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{tester_8cpp_source_l00018}{18}} of file \mbox{\hyperlink{tester_8cpp_source}{tester.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00019\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset_aad314ec30220438cbed1dda47af3356e}{sysio::chain::asset::from\_string}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ +\ \textcolor{stringliteral}{"{}\ "{}}\ CORE\_SYMBOL\_NAME);}
+\DoxyCodeLine{00020\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{tester_8hpp_a0e37ca5eb2c90419b316a842a3c83ef7_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{tester_8hpp_a3256503a2bf41f6a5547d7dafc3832c4}\index{tester.hpp@{tester.hpp}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!tester.hpp@{tester.hpp}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{tester_8hpp_a3256503a2bf41f6a5547d7dafc3832c4} 
+std\+::ostream \& operator$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{osm}{, }\item[{const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&}]{v}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{tester_8cpp_source_l01277}{1277}} of file \mbox{\hyperlink{tester_8cpp_source}{tester.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01277\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01278\ \ \ \ \textcolor{comment}{//fc::json::to\_stream(\ osm,\ v\ );}}
+\DoxyCodeLine{01279\ \ \ \ osm\ <<\ \mbox{\hyperlink{classfc_1_1json_ae6c022ab581a9552ae2c97ff5d73aaf8}{fc::json::to\_pretty\_string}}(\ v\ );}
+\DoxyCodeLine{01280\ \ \ \ \textcolor{keywordflow}{return}\ osm;}
+\DoxyCodeLine{01281\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{tester_8hpp_a3256503a2bf41f6a5547d7dafc3832c4_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{tester_8hpp_a4ff42d717f021c8ef935ed1c8dcd5a0c}\index{tester.hpp@{tester.hpp}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!tester.hpp@{tester.hpp}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{tester_8hpp_a4ff42d717f021c8ef935ed1c8dcd5a0c} 
+std\+::ostream \& operator$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{osm}{, }\item[{const \mbox{\hyperlink{classfc_1_1variant__object}{fc\+::variant\+\_\+object}} \&}]{v}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{tester_8cpp_source_l01283}{1283}} of file \mbox{\hyperlink{tester_8cpp_source}{tester.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01283\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01284\ \ \ \ osm\ <<\ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}(v);}
+\DoxyCodeLine{01285\ \ \ \ \textcolor{keywordflow}{return}\ osm;}
+\DoxyCodeLine{01286\ \}}
+
+\end{DoxyCode}
+\Hypertarget{tester_8hpp_afd98dd59fe676698874fc546d0dfb574}\index{tester.hpp@{tester.hpp}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!tester.hpp@{tester.hpp}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{tester_8hpp_afd98dd59fe676698874fc546d0dfb574} 
+std\+::ostream \& operator$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{osm}{, }\item[{const \mbox{\hyperlink{classfc_1_1variant__object_1_1entry}{fc\+::variant\+\_\+object\+::entry}} \&}]{e}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{tester_8cpp_source_l01288}{1288}} of file \mbox{\hyperlink{tester_8cpp_source}{tester.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01288\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01289\ \ \ \ osm\ <<\ \textcolor{stringliteral}{"{}\{\ "{}}\ <<\ e.\mbox{\hyperlink{classfc_1_1variant__object_1_1entry_a0c9975aa4bfbef22a038e0f967714fd8}{key}}()\ <<\ \textcolor{stringliteral}{"{}:\ "{}}\ <<\ e.\mbox{\hyperlink{classfc_1_1variant__object_1_1entry_a9e4a6a38effeda2cc26edfada07fd967}{value}}()\ <<\ \textcolor{stringliteral}{"{}\ \}"{}};}
+\DoxyCodeLine{01290\ \ \ \ \textcolor{keywordflow}{return}\ osm;}
+\DoxyCodeLine{01291\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=270pt]{tester_8hpp_afd98dd59fe676698874fc546d0dfb574_cgraph}
+\end{center}
+\end{figure}

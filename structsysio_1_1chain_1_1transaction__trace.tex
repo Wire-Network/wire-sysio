@@ -1,0 +1,201 @@
+\doxysection{sysio\+::chain\+::transaction\+\_\+trace Struct Reference}
+\hypertarget{structsysio_1_1chain_1_1transaction__trace}{}\label{structsysio_1_1chain_1_1transaction__trace}\index{sysio::chain::transaction\_trace@{sysio::chain::transaction\_trace}}
+
+
+{\ttfamily \#include $<$trace.\+hpp$>$}
+
+
+
+Collaboration diagram for sysio\+::chain\+::transaction\+\_\+trace\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1transaction__trace__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_aa85a3b49b3b219d1e3840567579e7e63}{transaction\+\_\+id\+\_\+type}} \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__trace_a158bbdc0237090443e91571e18b15c1d}{id}}
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__trace_a47252d7ebba059d7f5aff19d01210c38}{block\+\_\+num}} = 0
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_a11965fc424809ea1802175f8b36ae4e5}{block\+\_\+timestamp\+\_\+type}} \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__trace_a488f1490bc86b2ff90a58d83934ae0f4}{block\+\_\+time}}
+\item 
+std\+::optional$<$ \mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{block\+\_\+id\+\_\+type}} $>$ \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__trace_a9c37ceba0951a14dda19cada7110c136}{producer\+\_\+block\+\_\+id}}
+\item 
+std\+::optional$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__receipt__header}{transaction\+\_\+receipt\+\_\+header}} $>$ \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__trace_a10c86df1e1eb4ab4925af51c3d940188}{receipt}}
+\item 
+\mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}} \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__trace_a217c19d97f4897cc8332ac10063c473f}{elapsed}}
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__trace_a594bae7e6c08711f873feadf6c64df8b}{net\+\_\+usage}} = 0
+\item 
+bool \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__trace_ab07501beef6e25a4abb413f34019799c}{scheduled}} = false
+\item 
+\mbox{\hyperlink{classfc_1_1vector}{vector}}$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1action__trace}{action\+\_\+trace}} $>$ \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__trace_ab1bb67b82dbb145bcb27d8dcbff5d251}{action\+\_\+traces}}
+\item 
+std\+::optional$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1account__delta}{account\+\_\+delta}} $>$ \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__trace_a86dfe5d8a21e66aa950439048bd59336}{account\+\_\+ram\+\_\+delta}}
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_a4ee2867a6bec961c7a78b203cfd76be9}{transaction\+\_\+trace\+\_\+ptr}} \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__trace_a6d3536ef263c73d7aae0d984387a5e29}{failed\+\_\+dtrx\+\_\+trace}}
+\item 
+std\+::optional$<$ \mbox{\hyperlink{classfc_1_1exception}{fc\+::exception}} $>$ \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__trace_a095eb653083dde54ef2458f2323f9256}{except}}
+\item 
+std\+::optional$<$ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} $>$ \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__trace_ad802c62193ce947e54db10caf3ae32e3}{error\+\_\+code}}
+\item 
+std\+::exception\+\_\+ptr \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__trace_ae9acd8b753dfbb0d2aa74aa0a8528ca3}{except\+\_\+ptr}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2trace_8hpp_source_l00050}{50}} of file \mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2trace_8hpp_source}{trace.\+hpp}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1chain_1_1transaction__trace_a86dfe5d8a21e66aa950439048bd59336}\index{sysio::chain::transaction\_trace@{sysio::chain::transaction\_trace}!account\_ram\_delta@{account\_ram\_delta}}
+\index{account\_ram\_delta@{account\_ram\_delta}!sysio::chain::transaction\_trace@{sysio::chain::transaction\_trace}}
+\doxysubsubsection{\texorpdfstring{account\_ram\_delta}{account\_ram\_delta}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1transaction__trace_a86dfe5d8a21e66aa950439048bd59336} 
+std\+::optional$<$\mbox{\hyperlink{structsysio_1_1chain_1_1account__delta}{account\+\_\+delta}}$>$ sysio\+::chain\+::transaction\+\_\+trace\+::account\+\_\+ram\+\_\+delta}
+
+
+
+Definition at line \mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2trace_8hpp_source_l00060}{60}} of file \mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2trace_8hpp_source}{trace.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1transaction__trace_ab1bb67b82dbb145bcb27d8dcbff5d251}\index{sysio::chain::transaction\_trace@{sysio::chain::transaction\_trace}!action\_traces@{action\_traces}}
+\index{action\_traces@{action\_traces}!sysio::chain::transaction\_trace@{sysio::chain::transaction\_trace}}
+\doxysubsubsection{\texorpdfstring{action\_traces}{action\_traces}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1transaction__trace_ab1bb67b82dbb145bcb27d8dcbff5d251} 
+\mbox{\hyperlink{classfc_1_1vector}{vector}}$<$\mbox{\hyperlink{structsysio_1_1chain_1_1action__trace}{action\+\_\+trace}}$>$ sysio\+::chain\+::transaction\+\_\+trace\+::action\+\_\+traces}
+
+
+
+Definition at line \mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2trace_8hpp_source_l00059}{59}} of file \mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2trace_8hpp_source}{trace.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1transaction__trace_a47252d7ebba059d7f5aff19d01210c38}\index{sysio::chain::transaction\_trace@{sysio::chain::transaction\_trace}!block\_num@{block\_num}}
+\index{block\_num@{block\_num}!sysio::chain::transaction\_trace@{sysio::chain::transaction\_trace}}
+\doxysubsubsection{\texorpdfstring{block\_num}{block\_num}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1transaction__trace_a47252d7ebba059d7f5aff19d01210c38} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::chain\+::transaction\+\_\+trace\+::block\+\_\+num = 0}
+
+
+
+Definition at line \mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2trace_8hpp_source_l00052}{52}} of file \mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2trace_8hpp_source}{trace.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1transaction__trace_a488f1490bc86b2ff90a58d83934ae0f4}\index{sysio::chain::transaction\_trace@{sysio::chain::transaction\_trace}!block\_time@{block\_time}}
+\index{block\_time@{block\_time}!sysio::chain::transaction\_trace@{sysio::chain::transaction\_trace}}
+\doxysubsubsection{\texorpdfstring{block\_time}{block\_time}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1transaction__trace_a488f1490bc86b2ff90a58d83934ae0f4} 
+\mbox{\hyperlink{namespacesysio_1_1chain_a11965fc424809ea1802175f8b36ae4e5}{block\+\_\+timestamp\+\_\+type}} sysio\+::chain\+::transaction\+\_\+trace\+::block\+\_\+time}
+
+
+
+Definition at line \mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2trace_8hpp_source_l00053}{53}} of file \mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2trace_8hpp_source}{trace.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1transaction__trace_a217c19d97f4897cc8332ac10063c473f}\index{sysio::chain::transaction\_trace@{sysio::chain::transaction\_trace}!elapsed@{elapsed}}
+\index{elapsed@{elapsed}!sysio::chain::transaction\_trace@{sysio::chain::transaction\_trace}}
+\doxysubsubsection{\texorpdfstring{elapsed}{elapsed}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1transaction__trace_a217c19d97f4897cc8332ac10063c473f} 
+\mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}} sysio\+::chain\+::transaction\+\_\+trace\+::elapsed}
+
+
+
+Definition at line \mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2trace_8hpp_source_l00056}{56}} of file \mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2trace_8hpp_source}{trace.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1transaction__trace_ad802c62193ce947e54db10caf3ae32e3}\index{sysio::chain::transaction\_trace@{sysio::chain::transaction\_trace}!error\_code@{error\_code}}
+\index{error\_code@{error\_code}!sysio::chain::transaction\_trace@{sysio::chain::transaction\_trace}}
+\doxysubsubsection{\texorpdfstring{error\_code}{error\_code}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1transaction__trace_ad802c62193ce947e54db10caf3ae32e3} 
+std\+::optional$<$\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}$>$ sysio\+::chain\+::transaction\+\_\+trace\+::error\+\_\+code}
+
+
+
+Definition at line \mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2trace_8hpp_source_l00064}{64}} of file \mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2trace_8hpp_source}{trace.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1transaction__trace_a095eb653083dde54ef2458f2323f9256}\index{sysio::chain::transaction\_trace@{sysio::chain::transaction\_trace}!except@{except}}
+\index{except@{except}!sysio::chain::transaction\_trace@{sysio::chain::transaction\_trace}}
+\doxysubsubsection{\texorpdfstring{except}{except}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1transaction__trace_a095eb653083dde54ef2458f2323f9256} 
+std\+::optional$<$\mbox{\hyperlink{classfc_1_1exception}{fc\+::exception}}$>$ sysio\+::chain\+::transaction\+\_\+trace\+::except}
+
+
+
+Definition at line \mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2trace_8hpp_source_l00063}{63}} of file \mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2trace_8hpp_source}{trace.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1transaction__trace_ae9acd8b753dfbb0d2aa74aa0a8528ca3}\index{sysio::chain::transaction\_trace@{sysio::chain::transaction\_trace}!except\_ptr@{except\_ptr}}
+\index{except\_ptr@{except\_ptr}!sysio::chain::transaction\_trace@{sysio::chain::transaction\_trace}}
+\doxysubsubsection{\texorpdfstring{except\_ptr}{except\_ptr}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1transaction__trace_ae9acd8b753dfbb0d2aa74aa0a8528ca3} 
+std\+::exception\+\_\+ptr sysio\+::chain\+::transaction\+\_\+trace\+::except\+\_\+ptr}
+
+
+
+Definition at line \mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2trace_8hpp_source_l00065}{65}} of file \mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2trace_8hpp_source}{trace.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1transaction__trace_a6d3536ef263c73d7aae0d984387a5e29}\index{sysio::chain::transaction\_trace@{sysio::chain::transaction\_trace}!failed\_dtrx\_trace@{failed\_dtrx\_trace}}
+\index{failed\_dtrx\_trace@{failed\_dtrx\_trace}!sysio::chain::transaction\_trace@{sysio::chain::transaction\_trace}}
+\doxysubsubsection{\texorpdfstring{failed\_dtrx\_trace}{failed\_dtrx\_trace}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1transaction__trace_a6d3536ef263c73d7aae0d984387a5e29} 
+\mbox{\hyperlink{namespacesysio_1_1chain_a4ee2867a6bec961c7a78b203cfd76be9}{transaction\+\_\+trace\+\_\+ptr}} sysio\+::chain\+::transaction\+\_\+trace\+::failed\+\_\+dtrx\+\_\+trace}
+
+
+
+Definition at line \mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2trace_8hpp_source_l00062}{62}} of file \mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2trace_8hpp_source}{trace.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1transaction__trace_a158bbdc0237090443e91571e18b15c1d}\index{sysio::chain::transaction\_trace@{sysio::chain::transaction\_trace}!id@{id}}
+\index{id@{id}!sysio::chain::transaction\_trace@{sysio::chain::transaction\_trace}}
+\doxysubsubsection{\texorpdfstring{id}{id}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1transaction__trace_a158bbdc0237090443e91571e18b15c1d} 
+\mbox{\hyperlink{namespacesysio_1_1chain_aa85a3b49b3b219d1e3840567579e7e63}{transaction\+\_\+id\+\_\+type}} sysio\+::chain\+::transaction\+\_\+trace\+::id}
+
+
+
+Definition at line \mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2trace_8hpp_source_l00051}{51}} of file \mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2trace_8hpp_source}{trace.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1transaction__trace_a594bae7e6c08711f873feadf6c64df8b}\index{sysio::chain::transaction\_trace@{sysio::chain::transaction\_trace}!net\_usage@{net\_usage}}
+\index{net\_usage@{net\_usage}!sysio::chain::transaction\_trace@{sysio::chain::transaction\_trace}}
+\doxysubsubsection{\texorpdfstring{net\_usage}{net\_usage}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1transaction__trace_a594bae7e6c08711f873feadf6c64df8b} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} sysio\+::chain\+::transaction\+\_\+trace\+::net\+\_\+usage = 0}
+
+
+
+Definition at line \mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2trace_8hpp_source_l00057}{57}} of file \mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2trace_8hpp_source}{trace.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1transaction__trace_a9c37ceba0951a14dda19cada7110c136}\index{sysio::chain::transaction\_trace@{sysio::chain::transaction\_trace}!producer\_block\_id@{producer\_block\_id}}
+\index{producer\_block\_id@{producer\_block\_id}!sysio::chain::transaction\_trace@{sysio::chain::transaction\_trace}}
+\doxysubsubsection{\texorpdfstring{producer\_block\_id}{producer\_block\_id}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1transaction__trace_a9c37ceba0951a14dda19cada7110c136} 
+std\+::optional$<$\mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{block\+\_\+id\+\_\+type}}$>$ sysio\+::chain\+::transaction\+\_\+trace\+::producer\+\_\+block\+\_\+id}
+
+
+
+Definition at line \mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2trace_8hpp_source_l00054}{54}} of file \mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2trace_8hpp_source}{trace.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1transaction__trace_a10c86df1e1eb4ab4925af51c3d940188}\index{sysio::chain::transaction\_trace@{sysio::chain::transaction\_trace}!receipt@{receipt}}
+\index{receipt@{receipt}!sysio::chain::transaction\_trace@{sysio::chain::transaction\_trace}}
+\doxysubsubsection{\texorpdfstring{receipt}{receipt}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1transaction__trace_a10c86df1e1eb4ab4925af51c3d940188} 
+std\+::optional$<$\mbox{\hyperlink{structsysio_1_1chain_1_1transaction__receipt__header}{transaction\+\_\+receipt\+\_\+header}}$>$ sysio\+::chain\+::transaction\+\_\+trace\+::receipt}
+
+
+
+Definition at line \mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2trace_8hpp_source_l00055}{55}} of file \mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2trace_8hpp_source}{trace.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1transaction__trace_ab07501beef6e25a4abb413f34019799c}\index{sysio::chain::transaction\_trace@{sysio::chain::transaction\_trace}!scheduled@{scheduled}}
+\index{scheduled@{scheduled}!sysio::chain::transaction\_trace@{sysio::chain::transaction\_trace}}
+\doxysubsubsection{\texorpdfstring{scheduled}{scheduled}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1transaction__trace_ab07501beef6e25a4abb413f34019799c} 
+bool sysio\+::chain\+::transaction\+\_\+trace\+::scheduled = false}
+
+
+
+Definition at line \mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2trace_8hpp_source_l00058}{58}} of file \mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2trace_8hpp_source}{trace.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2trace_8hpp}{trace.\+hpp}}\end{DoxyCompactItemize}

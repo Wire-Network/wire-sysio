@@ -1,0 +1,7 @@
+<map id="sysio::chain::block_log::repair_log" name="sysio::chain::block_log::repair_log">
+<area shape="rect" id="Node000001" title=" " alt="" coords="366,5,496,46"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1chain__plugin.html#a408e8154def42cdb8be9832b602e0046" title=" " alt="" coords="186,5,318,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="351,28,318,28,318,23,351,23"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1chain__plugin.html#a0192ac61f3f59d4fdf2dcbbd2c7104ca" title=" " alt="" coords="5,5,138,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="170,28,138,28,138,23,170,23"/>
+</map>

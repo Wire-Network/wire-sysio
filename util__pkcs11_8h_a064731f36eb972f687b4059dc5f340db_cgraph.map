@@ -1,0 +1,13 @@
+<map id="get_mechanism_list" name="get_mechanism_list">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,143,31"/>
+<area shape="rect" id="Node000002" href="$yubihsm__pkcs11_8c.html#ae785d5badbf1f08b491af31f32a135a1" title=" " alt="" coords="586,7,658,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="143,15,532,16,571,16,571,21,532,21,143,21"/>
+<area shape="rect" id="Node000003" href="$yubihsm_8c.html#a6ab558e1426359cc78e7a362f8b3acd9" title=" " alt="" coords="191,31,348,56"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="144,24,175,29,175,34,143,30"/>
+<area shape="rect" id="Node000004" href="$yubihsm_8c.html#a799e299be8d4c13dfa2112a60d05480d" title=" " alt="" coords="396,31,532,56"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="348,41,380,41,380,46,348,46"/>
+<area shape="rect" id="Node000005" href="$lib_2error_8c.html#a238eedb1e27dbff2a0ab9a3932eb3f8b" title=" " alt="" coords="580,56,664,82"/>
+<area shape="poly" id="edge6_Node000003_Node000005" title=" " alt="" coords="326,54,396,66,485,71,565,69,565,75,485,76,396,71,325,60"/>
+<area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="532,30,571,25,571,30,533,36"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="533,52,565,57,565,62,532,57"/>
+</map>

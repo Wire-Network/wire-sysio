@@ -1,0 +1,119 @@
+\doxysection{libraries/fc/libraries/ff/libff/algebra/curves/edwards/edwards\+\_\+pairing.cpp File Reference}
+\hypertarget{edwards__pairing_8cpp}{}\label{edwards__pairing_8cpp}\index{libraries/fc/libraries/ff/libff/algebra/curves/edwards/edwards\_pairing.cpp@{libraries/fc/libraries/ff/libff/algebra/curves/edwards/edwards\_pairing.cpp}}
+{\ttfamily \#include $<$cassert$>$}\newline
+{\ttfamily \#include $<$libff/algebra/curves/edwards/edwards\+\_\+g1.\+hpp$>$}\newline
+{\ttfamily \#include $<$libff/algebra/curves/edwards/edwards\+\_\+g2.\+hpp$>$}\newline
+{\ttfamily \#include $<$libff/algebra/curves/edwards/edwards\+\_\+init.\+hpp$>$}\newline
+{\ttfamily \#include $<$libff/algebra/curves/edwards/edwards\+\_\+pairing.\+hpp$>$}\newline
+{\ttfamily \#include $<$libff/common/profiling.\+hpp$>$}\newline
+Include dependency graph for edwards\+\_\+pairing.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{edwards__pairing_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structlibff_1_1extended__edwards___g1__projective}{libff\+::extended\+\_\+edwards\+\_\+\+G1\+\_\+projective}}
+\item 
+struct \mbox{\hyperlink{structlibff_1_1extended__edwards___g2__projective}{libff\+::extended\+\_\+edwards\+\_\+\+G2\+\_\+projective}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacelibff}{libff}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+std\+::ostream \& \mbox{\hyperlink{namespacelibff_a70b980961443889e949463968a9c7bdc}{libff\+::operator$<$$<$}} (std\+::ostream \&out, const \mbox{\hyperlink{structlibff_1_1edwards___fq__conic__coefficients}{edwards\+\_\+\+Fq\+\_\+conic\+\_\+coefficients}} \&cc)
+\item 
+std\+::istream \& \mbox{\hyperlink{namespacelibff_a455bb0f49d23724fb496d9bca62f6b20}{libff\+::operator$>$$>$}} (std\+::istream \&in, \mbox{\hyperlink{structlibff_1_1edwards___fq__conic__coefficients}{edwards\+\_\+\+Fq\+\_\+conic\+\_\+coefficients}} \&cc)
+\item 
+std\+::ostream \& \mbox{\hyperlink{namespacelibff_a2646636466b09af2868ce23cf2a102fa}{libff\+::operator$<$$<$}} (std\+::ostream \&out, const \mbox{\hyperlink{namespacelibff_a1b1c8fd5ff765ca03f1fabdfebe5b30d}{edwards\+\_\+tate\+\_\+\+G1\+\_\+precomp}} \&prec\+\_\+P)
+\item 
+std\+::istream \& \mbox{\hyperlink{namespacelibff_a8b7344d2c62d57e060e2cd1f7286ed07}{libff\+::operator$>$$>$}} (std\+::istream \&in, \mbox{\hyperlink{namespacelibff_a1b1c8fd5ff765ca03f1fabdfebe5b30d}{edwards\+\_\+tate\+\_\+\+G1\+\_\+precomp}} \&prec\+\_\+P)
+\item 
+std\+::ostream \& \mbox{\hyperlink{namespacelibff_a53423ee5df1c7ddaa8c6224968693672}{libff\+::operator$<$$<$}} (std\+::ostream \&out, const \mbox{\hyperlink{structlibff_1_1edwards__tate___g2__precomp}{edwards\+\_\+tate\+\_\+\+G2\+\_\+precomp}} \&prec\+\_\+Q)
+\item 
+std\+::istream \& \mbox{\hyperlink{namespacelibff_a4b502dd3127cf459443974225f151019}{libff\+::operator$>$$>$}} (std\+::istream \&in, \mbox{\hyperlink{structlibff_1_1edwards__tate___g2__precomp}{edwards\+\_\+tate\+\_\+\+G2\+\_\+precomp}} \&prec\+\_\+Q)
+\item 
+std\+::ostream \& \mbox{\hyperlink{namespacelibff_a452d4e022ca49c2688459b8916dec4be}{libff\+::operator$<$$<$}} (std\+::ostream \&out, const \mbox{\hyperlink{structlibff_1_1edwards___fq3__conic__coefficients}{edwards\+\_\+\+Fq3\+\_\+conic\+\_\+coefficients}} \&cc)
+\item 
+std\+::istream \& \mbox{\hyperlink{namespacelibff_a4b6434b6d596faf02c97d7556f793636}{libff\+::operator$>$$>$}} (std\+::istream \&in, \mbox{\hyperlink{structlibff_1_1edwards___fq3__conic__coefficients}{edwards\+\_\+\+Fq3\+\_\+conic\+\_\+coefficients}} \&cc)
+\item 
+std\+::ostream \& \mbox{\hyperlink{namespacelibff_a201bf451a3b3c5cee9e7030dbf493f2d}{libff\+::operator$<$$<$}} (std\+::ostream \&out, const \mbox{\hyperlink{namespacelibff_abe532b6dcbd455f48694cbee34a037e5}{edwards\+\_\+ate\+\_\+\+G2\+\_\+precomp}} \&prec\+\_\+Q)
+\item 
+std\+::istream \& \mbox{\hyperlink{namespacelibff_adabe57bf32c4d799379b94fae5c670f7}{libff\+::operator$>$$>$}} (std\+::istream \&in, \mbox{\hyperlink{namespacelibff_abe532b6dcbd455f48694cbee34a037e5}{edwards\+\_\+ate\+\_\+\+G2\+\_\+precomp}} \&prec\+\_\+Q)
+\item 
+std\+::ostream \& \mbox{\hyperlink{namespacelibff_a871df71568c97a34b55e91f8a773e1b0}{libff\+::operator$<$$<$}} (std\+::ostream \&out, const \mbox{\hyperlink{structlibff_1_1edwards__ate___g1__precomp}{edwards\+\_\+ate\+\_\+\+G1\+\_\+precomp}} \&prec\+\_\+P)
+\item 
+std\+::istream \& \mbox{\hyperlink{namespacelibff_ace5670a8a7b4483d8317ea8b7899f00f}{libff\+::operator$>$$>$}} (std\+::istream \&in, \mbox{\hyperlink{structlibff_1_1edwards__ate___g1__precomp}{edwards\+\_\+ate\+\_\+\+G1\+\_\+precomp}} \&prec\+\_\+P)
+\item 
+\mbox{\hyperlink{namespacelibff_a94775cf76b7e294e46c8e6b8f9c3de87}{edwards\+\_\+\+Fq6}} \mbox{\hyperlink{namespacelibff_ada61ece18b57a61e3bb3943e0a5183af}{libff\+::edwards\+\_\+final\+\_\+exponentiation\+\_\+last\+\_\+chunk}} (const \mbox{\hyperlink{namespacelibff_a94775cf76b7e294e46c8e6b8f9c3de87}{edwards\+\_\+\+Fq6}} \&elt, const \mbox{\hyperlink{namespacelibff_a94775cf76b7e294e46c8e6b8f9c3de87}{edwards\+\_\+\+Fq6}} \&elt\+\_\+inv)
+\item 
+\mbox{\hyperlink{namespacelibff_a94775cf76b7e294e46c8e6b8f9c3de87}{edwards\+\_\+\+Fq6}} \mbox{\hyperlink{namespacelibff_a1776aa3a82b421746336f8c6488997f8}{libff\+::edwards\+\_\+final\+\_\+exponentiation\+\_\+first\+\_\+chunk}} (const \mbox{\hyperlink{namespacelibff_a94775cf76b7e294e46c8e6b8f9c3de87}{edwards\+\_\+\+Fq6}} \&elt, const \mbox{\hyperlink{namespacelibff_a94775cf76b7e294e46c8e6b8f9c3de87}{edwards\+\_\+\+Fq6}} \&elt\+\_\+inv)
+\item 
+\mbox{\hyperlink{namespacelibff_aed4ac2e5b330c64e83968be0a29791e4}{edwards\+\_\+\+GT}} \mbox{\hyperlink{namespacelibff_a85284345b22dbc9f312fa9ff3422879c}{libff\+::edwards\+\_\+final\+\_\+exponentiation}} (const \mbox{\hyperlink{namespacelibff_a94775cf76b7e294e46c8e6b8f9c3de87}{edwards\+\_\+\+Fq6}} \&elt)
+\item 
+\mbox{\hyperlink{structlibff_1_1edwards__tate___g2__precomp}{edwards\+\_\+tate\+\_\+\+G2\+\_\+precomp}} \mbox{\hyperlink{namespacelibff_a1e6b6773e228ad4e687304b8725bec6a}{libff\+::edwards\+\_\+tate\+\_\+precompute\+\_\+\+G2}} (const \mbox{\hyperlink{classlibff_1_1edwards___g2}{edwards\+\_\+\+G2}} \&Q)
+\item 
+void \mbox{\hyperlink{namespacelibff_a43c553ff3e92e640871280b2aeff30ae}{libff\+::doubling\+\_\+step\+\_\+for\+\_\+miller\+\_\+loop}} (\mbox{\hyperlink{structlibff_1_1extended__edwards___g1__projective}{extended\+\_\+edwards\+\_\+\+G1\+\_\+projective}} \&current, \mbox{\hyperlink{structlibff_1_1edwards___fq__conic__coefficients}{edwards\+\_\+\+Fq\+\_\+conic\+\_\+coefficients}} \&cc)
+\item 
+void \mbox{\hyperlink{namespacelibff_a2280b60faca0d10dc23370c4a88166c0}{libff\+::full\+\_\+addition\+\_\+step\+\_\+for\+\_\+miller\+\_\+loop}} (const \mbox{\hyperlink{structlibff_1_1extended__edwards___g1__projective}{extended\+\_\+edwards\+\_\+\+G1\+\_\+projective}} \&base, \mbox{\hyperlink{structlibff_1_1extended__edwards___g1__projective}{extended\+\_\+edwards\+\_\+\+G1\+\_\+projective}} \&current, \mbox{\hyperlink{structlibff_1_1edwards___fq__conic__coefficients}{edwards\+\_\+\+Fq\+\_\+conic\+\_\+coefficients}} \&cc)
+\item 
+void \mbox{\hyperlink{namespacelibff_a035af1f4dfa7e5183adaadffbf36c86c}{libff\+::mixed\+\_\+addition\+\_\+step\+\_\+for\+\_\+miller\+\_\+loop}} (const \mbox{\hyperlink{structlibff_1_1extended__edwards___g1__projective}{extended\+\_\+edwards\+\_\+\+G1\+\_\+projective}} \&base, \mbox{\hyperlink{structlibff_1_1extended__edwards___g1__projective}{extended\+\_\+edwards\+\_\+\+G1\+\_\+projective}} \&current, \mbox{\hyperlink{structlibff_1_1edwards___fq__conic__coefficients}{edwards\+\_\+\+Fq\+\_\+conic\+\_\+coefficients}} \&cc)
+\item 
+\mbox{\hyperlink{namespacelibff_a1b1c8fd5ff765ca03f1fabdfebe5b30d}{edwards\+\_\+tate\+\_\+\+G1\+\_\+precomp}} \mbox{\hyperlink{namespacelibff_a3f622531109816611bae155c7d634c9e}{libff\+::edwards\+\_\+tate\+\_\+precompute\+\_\+\+G1}} (const \mbox{\hyperlink{classlibff_1_1edwards___g1}{edwards\+\_\+\+G1}} \&\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}})
+\item 
+\mbox{\hyperlink{namespacelibff_a94775cf76b7e294e46c8e6b8f9c3de87}{edwards\+\_\+\+Fq6}} \mbox{\hyperlink{namespacelibff_aa5e05803eced44cc5d2bcb4eb44140aa}{libff\+::edwards\+\_\+tate\+\_\+miller\+\_\+loop}} (const \mbox{\hyperlink{namespacelibff_a1b1c8fd5ff765ca03f1fabdfebe5b30d}{edwards\+\_\+tate\+\_\+\+G1\+\_\+precomp}} \&prec\+\_\+P, const \mbox{\hyperlink{structlibff_1_1edwards__tate___g2__precomp}{edwards\+\_\+tate\+\_\+\+G2\+\_\+precomp}} \&prec\+\_\+Q)
+\item 
+\mbox{\hyperlink{namespacelibff_a94775cf76b7e294e46c8e6b8f9c3de87}{edwards\+\_\+\+Fq6}} \mbox{\hyperlink{namespacelibff_a8896fe6a389e4c2d592346a6db8b02d8}{libff\+::edwards\+\_\+tate\+\_\+pairing}} (const \mbox{\hyperlink{classlibff_1_1edwards___g1}{edwards\+\_\+\+G1}} \&\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}}, const \mbox{\hyperlink{classlibff_1_1edwards___g2}{edwards\+\_\+\+G2}} \&Q)
+\item 
+\mbox{\hyperlink{namespacelibff_aed4ac2e5b330c64e83968be0a29791e4}{edwards\+\_\+\+GT}} \mbox{\hyperlink{namespacelibff_a5829ad3615475ac4408c731f7e98e99a}{libff\+::edwards\+\_\+tate\+\_\+reduced\+\_\+pairing}} (const \mbox{\hyperlink{classlibff_1_1edwards___g1}{edwards\+\_\+\+G1}} \&\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}}, const \mbox{\hyperlink{classlibff_1_1edwards___g2}{edwards\+\_\+\+G2}} \&Q)
+\item 
+void \mbox{\hyperlink{namespacelibff_a45d690a04489d653d6409908a814590f}{libff\+::doubling\+\_\+step\+\_\+for\+\_\+flipped\+\_\+miller\+\_\+loop}} (\mbox{\hyperlink{structlibff_1_1extended__edwards___g2__projective}{extended\+\_\+edwards\+\_\+\+G2\+\_\+projective}} \&current, \mbox{\hyperlink{structlibff_1_1edwards___fq3__conic__coefficients}{edwards\+\_\+\+Fq3\+\_\+conic\+\_\+coefficients}} \&cc)
+\item 
+void \mbox{\hyperlink{namespacelibff_a910c9ef3f40398f367ad077206f89096}{libff\+::full\+\_\+addition\+\_\+step\+\_\+for\+\_\+flipped\+\_\+miller\+\_\+loop}} (const \mbox{\hyperlink{structlibff_1_1extended__edwards___g2__projective}{extended\+\_\+edwards\+\_\+\+G2\+\_\+projective}} \&base, \mbox{\hyperlink{structlibff_1_1extended__edwards___g2__projective}{extended\+\_\+edwards\+\_\+\+G2\+\_\+projective}} \&current, \mbox{\hyperlink{structlibff_1_1edwards___fq3__conic__coefficients}{edwards\+\_\+\+Fq3\+\_\+conic\+\_\+coefficients}} \&cc)
+\item 
+void \mbox{\hyperlink{namespacelibff_a95b898109d6b48bf7b09d78d1de7bb60}{libff\+::mixed\+\_\+addition\+\_\+step\+\_\+for\+\_\+flipped\+\_\+miller\+\_\+loop}} (const \mbox{\hyperlink{structlibff_1_1extended__edwards___g2__projective}{extended\+\_\+edwards\+\_\+\+G2\+\_\+projective}} \&base, \mbox{\hyperlink{structlibff_1_1extended__edwards___g2__projective}{extended\+\_\+edwards\+\_\+\+G2\+\_\+projective}} \&current, \mbox{\hyperlink{structlibff_1_1edwards___fq3__conic__coefficients}{edwards\+\_\+\+Fq3\+\_\+conic\+\_\+coefficients}} \&cc)
+\item 
+\mbox{\hyperlink{structlibff_1_1edwards__ate___g1__precomp}{edwards\+\_\+ate\+\_\+\+G1\+\_\+precomp}} \mbox{\hyperlink{namespacelibff_a1e8681b4f66413f6ecbb52b28010f4d0}{libff\+::edwards\+\_\+ate\+\_\+precompute\+\_\+\+G1}} (const \mbox{\hyperlink{classlibff_1_1edwards___g1}{edwards\+\_\+\+G1}} \&\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}})
+\item 
+\mbox{\hyperlink{namespacelibff_abe532b6dcbd455f48694cbee34a037e5}{edwards\+\_\+ate\+\_\+\+G2\+\_\+precomp}} \mbox{\hyperlink{namespacelibff_a14f89201ecdd4f18a812c3cab388023b}{libff\+::edwards\+\_\+ate\+\_\+precompute\+\_\+\+G2}} (const \mbox{\hyperlink{classlibff_1_1edwards___g2}{edwards\+\_\+\+G2}} \&Q)
+\item 
+\mbox{\hyperlink{namespacelibff_a94775cf76b7e294e46c8e6b8f9c3de87}{edwards\+\_\+\+Fq6}} \mbox{\hyperlink{namespacelibff_a043ba92a9726654aaffde2f3b766561e}{libff\+::edwards\+\_\+ate\+\_\+miller\+\_\+loop}} (const \mbox{\hyperlink{structlibff_1_1edwards__ate___g1__precomp}{edwards\+\_\+ate\+\_\+\+G1\+\_\+precomp}} \&prec\+\_\+P, const \mbox{\hyperlink{namespacelibff_abe532b6dcbd455f48694cbee34a037e5}{edwards\+\_\+ate\+\_\+\+G2\+\_\+precomp}} \&prec\+\_\+Q)
+\item 
+\mbox{\hyperlink{namespacelibff_a94775cf76b7e294e46c8e6b8f9c3de87}{edwards\+\_\+\+Fq6}} \mbox{\hyperlink{namespacelibff_a2705662b679ab8c8121e4d4279275e89}{libff\+::edwards\+\_\+ate\+\_\+double\+\_\+miller\+\_\+loop}} (const \mbox{\hyperlink{structlibff_1_1edwards__ate___g1__precomp}{edwards\+\_\+ate\+\_\+\+G1\+\_\+precomp}} \&prec\+\_\+\+P1, const \mbox{\hyperlink{namespacelibff_abe532b6dcbd455f48694cbee34a037e5}{edwards\+\_\+ate\+\_\+\+G2\+\_\+precomp}} \&prec\+\_\+\+Q1, const \mbox{\hyperlink{structlibff_1_1edwards__ate___g1__precomp}{edwards\+\_\+ate\+\_\+\+G1\+\_\+precomp}} \&prec\+\_\+\+P2, const \mbox{\hyperlink{namespacelibff_abe532b6dcbd455f48694cbee34a037e5}{edwards\+\_\+ate\+\_\+\+G2\+\_\+precomp}} \&prec\+\_\+\+Q2)
+\item 
+\mbox{\hyperlink{namespacelibff_a94775cf76b7e294e46c8e6b8f9c3de87}{edwards\+\_\+\+Fq6}} \mbox{\hyperlink{namespacelibff_a987c91300773a3209d9ad66bf9a20b99}{libff\+::edwards\+\_\+ate\+\_\+pairing}} (const \mbox{\hyperlink{classlibff_1_1edwards___g1}{edwards\+\_\+\+G1}} \&\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}}, const \mbox{\hyperlink{classlibff_1_1edwards___g2}{edwards\+\_\+\+G2}} \&Q)
+\item 
+\mbox{\hyperlink{namespacelibff_aed4ac2e5b330c64e83968be0a29791e4}{edwards\+\_\+\+GT}} \mbox{\hyperlink{namespacelibff_a457b556111bdae0f9e425b6339b126ec}{libff\+::edwards\+\_\+ate\+\_\+reduced\+\_\+pairing}} (const \mbox{\hyperlink{classlibff_1_1edwards___g1}{edwards\+\_\+\+G1}} \&\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}}, const \mbox{\hyperlink{classlibff_1_1edwards___g2}{edwards\+\_\+\+G2}} \&Q)
+\item 
+\mbox{\hyperlink{namespacelibff_a4668ba8c54218548bac9c3b0da19564e}{edwards\+\_\+\+G1\+\_\+precomp}} \mbox{\hyperlink{namespacelibff_a565f7d8220d055a87eec02c2e994d2f4}{libff\+::edwards\+\_\+precompute\+\_\+\+G1}} (const \mbox{\hyperlink{classlibff_1_1edwards___g1}{edwards\+\_\+\+G1}} \&\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}})
+\item 
+\mbox{\hyperlink{namespacelibff_a594453bfc131198bab02308d75bc407f}{edwards\+\_\+\+G2\+\_\+precomp}} \mbox{\hyperlink{namespacelibff_ae01f87b36128cd2a51ed19f9a6201e74}{libff\+::edwards\+\_\+precompute\+\_\+\+G2}} (const \mbox{\hyperlink{classlibff_1_1edwards___g2}{edwards\+\_\+\+G2}} \&Q)
+\item 
+\mbox{\hyperlink{namespacelibff_a94775cf76b7e294e46c8e6b8f9c3de87}{edwards\+\_\+\+Fq6}} \mbox{\hyperlink{namespacelibff_a4b1f136e47bf3d30af588778c84dd064}{libff\+::edwards\+\_\+miller\+\_\+loop}} (const \mbox{\hyperlink{namespacelibff_a4668ba8c54218548bac9c3b0da19564e}{edwards\+\_\+\+G1\+\_\+precomp}} \&prec\+\_\+P, const \mbox{\hyperlink{namespacelibff_a594453bfc131198bab02308d75bc407f}{edwards\+\_\+\+G2\+\_\+precomp}} \&prec\+\_\+Q)
+\item 
+\mbox{\hyperlink{namespacelibff_a94775cf76b7e294e46c8e6b8f9c3de87}{edwards\+\_\+\+Fq6}} \mbox{\hyperlink{namespacelibff_a871736f4388a0c5d0b84e6b6d2c57e2b}{libff\+::edwards\+\_\+double\+\_\+miller\+\_\+loop}} (const \mbox{\hyperlink{namespacelibff_a4668ba8c54218548bac9c3b0da19564e}{edwards\+\_\+\+G1\+\_\+precomp}} \&prec\+\_\+\+P1, const \mbox{\hyperlink{namespacelibff_a594453bfc131198bab02308d75bc407f}{edwards\+\_\+\+G2\+\_\+precomp}} \&prec\+\_\+\+Q1, const \mbox{\hyperlink{namespacelibff_a4668ba8c54218548bac9c3b0da19564e}{edwards\+\_\+\+G1\+\_\+precomp}} \&prec\+\_\+\+P2, const \mbox{\hyperlink{namespacelibff_a594453bfc131198bab02308d75bc407f}{edwards\+\_\+\+G2\+\_\+precomp}} \&prec\+\_\+\+Q2)
+\item 
+\mbox{\hyperlink{namespacelibff_a94775cf76b7e294e46c8e6b8f9c3de87}{edwards\+\_\+\+Fq6}} \mbox{\hyperlink{namespacelibff_a8c17e4985eaee6405f4ec75c9e49580f}{libff\+::edwards\+\_\+pairing}} (const \mbox{\hyperlink{classlibff_1_1edwards___g1}{edwards\+\_\+\+G1}} \&\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}}, const \mbox{\hyperlink{classlibff_1_1edwards___g2}{edwards\+\_\+\+G2}} \&Q)
+\item 
+\mbox{\hyperlink{namespacelibff_aed4ac2e5b330c64e83968be0a29791e4}{edwards\+\_\+\+GT}} \mbox{\hyperlink{namespacelibff_abc470ab32b6db3ec5b31fdccb691dcdd}{libff\+::edwards\+\_\+reduced\+\_\+pairing}} (const \mbox{\hyperlink{classlibff_1_1edwards___g1}{edwards\+\_\+\+G1}} \&\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}}, const \mbox{\hyperlink{classlibff_1_1edwards___g2}{edwards\+\_\+\+G2}} \&Q)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\begin{DoxyAuthor}{Author}
+This file is part of libff, developed by SCIPR Lab and contributors (see AUTHORS). 
+\end{DoxyAuthor}
+\begin{DoxyCopyright}{Copyright}
+MIT license (see LICENSE file) 
+\end{DoxyCopyright}
+
+
+Definition in file \mbox{\hyperlink{edwards__pairing_8cpp_source}{edwards\+\_\+pairing.\+cpp}}.
+

@@ -1,0 +1,35 @@
+\doxysection{resource\+\_\+monitor\+\_\+plugin.\+hpp}
+\hypertarget{resource__monitor__plugin_8hpp_source}{}\label{resource__monitor__plugin_8hpp_source}\index{plugins/resource\_monitor\_plugin/include/sysio/resource\_monitor\_plugin/resource\_monitor\_plugin.hpp@{plugins/resource\_monitor\_plugin/include/sysio/resource\_monitor\_plugin/resource\_monitor\_plugin.hpp}}
+\mbox{\hyperlink{resource__monitor__plugin_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8hpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{application_8hpp}{appbase/application.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{chain__plugin_8hpp}{sysio/chain\_plugin/chain\_plugin.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8hpp_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8hpp_source_l00005}00005\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8hpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8hpp_source_l00007}00007\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespaceappbase}{appbase}};}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8hpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8hpp_source_l00009}\mbox{\hyperlink{classsysio_1_1resource__monitor__plugin}{00009}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1resource__monitor__plugin}{resource\_monitor\_plugin}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classappbase_1_1plugin}{appbase::plugin}}<resource\_monitor\_plugin>\ \{}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8hpp_source_l00010}00010\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8hpp_source_l00011}00011\ \ \ \ \mbox{\hyperlink{classsysio_1_1resource__monitor__plugin_a90e0286a4d611b80f01ef62efa3a9a0c}{resource\_monitor\_plugin}}(\ );}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8hpp_source_l00012}00012\ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classsysio_1_1resource__monitor__plugin_a8b93e10a48ce2ead30ffb21c06db7713}{\string~resource\_monitor\_plugin}}();}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8hpp_source_l00013}00013\ \ }
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8hpp_source_l00014}00014\ \ \ \ \mbox{\hyperlink{plugin_8hpp_ae81793dd38463b82491d75a9ccd209e1}{APPBASE\_PLUGIN\_REQUIRES}}(\ (\mbox{\hyperlink{classsysio_1_1chain__plugin}{chain\_plugin}})\ )}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8hpp_source_l00015}00015\ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1resource__monitor__plugin_a6d82af2b00041a1f160d7268c1b454b7}{set\_program\_options}}(options\_description\&,\ options\_description\&\ cfg)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8hpp_source_l00016}00016\ \ }
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8hpp_source_l00017}00017\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1resource__monitor__plugin_a8aa338848d9b4ea7f0af24674fb9afe3}{plugin\_initialize}}(\textcolor{keyword}{const}\ variables\_map\&\ options);}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8hpp_source_l00018}00018\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1resource__monitor__plugin_a9450b8a934658e7baa38d0b581c98812}{plugin\_startup}}();}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8hpp_source_l00019}00019\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1resource__monitor__plugin_aec66e2d4bf2493717a81701b2504e138}{plugin\_shutdown}}();}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8hpp_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8hpp_source_l00021}00021\ \ \ \ \textcolor{comment}{//\ Called\ by\ plugins\ and\ other\ components\ to\ request}}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8hpp_source_l00022}00022\ \ \ \ \textcolor{comment}{//\ directory\ monitoring}}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8hpp_source_l00023}00023\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1resource__monitor__plugin_a756d8d52fe7acf391a9e11e27a1a482b}{monitor\_directory}}(\textcolor{keyword}{const}\ bfs::path\&\ \mbox{\hyperlink{classfc_1_1path}{path}});}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8hpp_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8hpp_source_l00025}00025\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8hpp_source_l00026}00026\ \ \ \ std::unique\_ptr<class\ resource\_monitor\_plugin\_impl>\ my;}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8hpp_source_l00027}00027\ \};}
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8hpp_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{resource__monitor__plugin_8hpp_source_l00029}00029\ \}}
+
+\end{DoxyCode}

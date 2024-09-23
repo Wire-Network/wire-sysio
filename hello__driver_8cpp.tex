@@ -1,0 +1,244 @@
+\doxysection{libraries/sys-\/vm/tools/hello\+\_\+driver.cpp File Reference}
+\hypertarget{hello__driver_8cpp}{}\label{hello__driver_8cpp}\index{libraries/sys-\/vm/tools/hello\_driver.cpp@{libraries/sys-\/vm/tools/hello\_driver.cpp}}
+{\ttfamily \#include $<$sysio/vm/backend.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/vm/error\+\_\+codes.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/vm/host\+\_\+function.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/vm/watchdog.\+hpp$>$}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$string$>$}\newline
+{\ttfamily \#include "{}hello.\+wasm.\+hpp"{}}\newline
+Include dependency graph for hello\+\_\+driver.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{hello__driver_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structexample__host__methods}{example\+\_\+host\+\_\+methods}}
+\item 
+struct \mbox{\hyperlink{structcnv}{cnv}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{hello__driver_8cpp_aadb2815fd78380a040e937d86fa70dcf}{rhf\+\_\+t}} = \mbox{\hyperlink{structsysio_1_1vm_1_1registered__host__functions}{sysio\+::vm\+::registered\+\_\+host\+\_\+functions}}$<$\mbox{\hyperlink{structexample__host__methods}{example\+\_\+host\+\_\+methods}}, \mbox{\hyperlink{structsysio_1_1vm_1_1execution__interface}{execution\+\_\+interface}}, \mbox{\hyperlink{structcnv}{cnv}}$>$
+\item 
+using \mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\+\_\+t}} = \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio\+::vm\+::backend}}$<$\mbox{\hyperlink{hello__driver_8cpp_aadb2815fd78380a040e937d86fa70dcf}{rhf\+\_\+t}}$>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{hello__driver_8cpp_a2abd2eb320174c8ccc5019ef3edaac9c}{SYS\+\_\+\+VM\+\_\+\+PRECONDITION}} (test\+\_\+name, \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_a576aca63e32e4cbf42537c5876c0d95b}{SYS\+\_\+\+VM\+\_\+\+INVOKE\+\_\+\+ON}}(const char \texorpdfstring{$\ast$}{*}, \mbox{[}\&\mbox{]}(auto \&\&nm, auto \&\&... rest) \{ std\+::string \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}=nm;\mbox{\hyperlink{yubihsm__pkcs11_8c_a75d8898b07aafc20a48a415a1c6e7bf0}{if}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}=="{}sys-\/vm2"{}) throw "{}failure"{};\})) int \mbox{\hyperlink{libraries_2appbase_2examples_2main_8cpp_a3c04138a5bfe5d72780bb7e82a18e627}{main}}(int argc
+\item 
+\mbox{\hyperlink{hello__driver_8cpp_a5354fbb1716540e99aace1a46e72056b}{rhf\+\_\+t\+::add$<$\&example\+\_\+host\+\_\+methods\+::print\+\_\+num $>$}} ("{}env"{}, "{}print\+\_\+num"{})
+\item 
+\mbox{\hyperlink{hello__driver_8cpp_a4b09478ef1e9684c386e6893b6f3b8cc}{rhf\+\_\+t\+::add$<$\&example\+\_\+host\+\_\+methods\+::sysio\+\_\+assert $>$}} ("{}env"{}, "{}sysio\+\_\+assert"{})
+\item 
+\mbox{\hyperlink{hello__driver_8cpp_ab997ff643c98de1631bc10b46ce2e5d9}{rhf\+\_\+t\+::add$<$\&example\+\_\+host\+\_\+methods\+::print\+\_\+name, test\+\_\+name $>$}} ("{}env"{}, "{}print\+\_\+name"{})
+\item 
+\mbox{\hyperlink{hello__driver_8cpp_aa420d1607067f256490ad6b753d53285}{rhf\+\_\+t\+::add$<$\&example\+\_\+host\+\_\+methods\+::memset $>$}} ("{}env"{}, "{}memset"{})
+\item 
+\mbox{\hyperlink{hello__driver_8cpp_af56e05b54f28e4f03648d5b239a4a102}{rhf\+\_\+t\+::add$<$\&example\+\_\+host\+\_\+methods\+::print\+\_\+span $>$}} ("{}env"{}, "{}print\+\_\+span"{})
+\item 
+\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\+\_\+t}} \mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}} (\mbox{\hyperlink{hello_8wasm_8hpp_aefb57c647ba161305295c1038f86b7b8}{hello\+\_\+wasm}}, ehm, \&\mbox{\hyperlink{allow__code__after__function__end__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}})
+\item 
+\mbox{\hyperlink{hello__driver_8cpp_a008263978d442dedd79e31cecee41f42}{bkend}} (ehm, "{}env"{}, "{}apply"{},(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}) std\+::atoi(\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}\mbox{[}1\mbox{]}),(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}) std\+::atoi(\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}\mbox{[}2\mbox{]}),(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}) std\+::atoi(\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}\mbox{[}3\mbox{]}))
+\item 
+\mbox{\hyperlink{hello__driver_8cpp_a1204fa6444ae7174767e202a6d39b815}{catch}} (...)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}
+\item 
+\mbox{\hyperlink{classsysio_1_1vm_1_1watchdog}{watchdog}} \mbox{\hyperlink{hello__driver_8cpp_aa199bff2581e446e3865732d06d873f0}{wd}} \{std\+::chrono\+::seconds(3)\}
+\item 
+\mbox{\hyperlink{hello__driver_8cpp_abe4cc9788f52e49485473dc699537388}{try}}
+\item 
+ehm \mbox{\hyperlink{hello__driver_8cpp_a0b6f424d9a532680c6b2ca5c119c938b}{field}} = "{}testing"{}
+\item 
+\mbox{\hyperlink{hello__driver_8cpp_a9717e7bbecb906637e86cef6da3d83c2}{return}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}\index{hello\_driver.cpp@{hello\_driver.cpp}!backend\_t@{backend\_t}}
+\index{backend\_t@{backend\_t}!hello\_driver.cpp@{hello\_driver.cpp}}
+\doxysubsubsection{\texorpdfstring{backend\_t}{backend\_t}}
+{\footnotesize\ttfamily \label{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b} 
+using \mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\+\_\+t}} = \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio\+::vm\+::backend}}$<$\mbox{\hyperlink{hello__driver_8cpp_aadb2815fd78380a040e937d86fa70dcf}{rhf\+\_\+t}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{hello__driver_8cpp_source_l00061}{61}} of file \mbox{\hyperlink{hello__driver_8cpp_source}{hello\+\_\+driver.\+cpp}}.
+
+\Hypertarget{hello__driver_8cpp_aadb2815fd78380a040e937d86fa70dcf}\index{hello\_driver.cpp@{hello\_driver.cpp}!rhf\_t@{rhf\_t}}
+\index{rhf\_t@{rhf\_t}!hello\_driver.cpp@{hello\_driver.cpp}}
+\doxysubsubsection{\texorpdfstring{rhf\_t}{rhf\_t}}
+{\footnotesize\ttfamily \label{hello__driver_8cpp_aadb2815fd78380a040e937d86fa70dcf} 
+using \mbox{\hyperlink{hello__driver_8cpp_aadb2815fd78380a040e937d86fa70dcf}{rhf\+\_\+t}} = \mbox{\hyperlink{structsysio_1_1vm_1_1registered__host__functions}{sysio\+::vm\+::registered\+\_\+host\+\_\+functions}}$<$\mbox{\hyperlink{structexample__host__methods}{example\+\_\+host\+\_\+methods}}, \mbox{\hyperlink{structsysio_1_1vm_1_1execution__interface}{execution\+\_\+interface}}, \mbox{\hyperlink{structcnv}{cnv}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{hello__driver_8cpp_source_l00060}{60}} of file \mbox{\hyperlink{hello__driver_8cpp_source}{hello\+\_\+driver.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{hello__driver_8cpp_a008263978d442dedd79e31cecee41f42}\index{hello\_driver.cpp@{hello\_driver.cpp}!bkend@{bkend}}
+\index{bkend@{bkend}!hello\_driver.cpp@{hello\_driver.cpp}}
+\doxysubsubsection{\texorpdfstring{bkend()}{bkend()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{hello__driver_8cpp_a008263978d442dedd79e31cecee41f42} 
+bkend (\begin{DoxyParamCaption}\item[{ehm}]{}{, }\item[{"{}env"{}}]{}{, }\item[{"{}apply"{}}]{}{, }\item[{(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}) std\+::atoi(\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}\mbox{[}1\mbox{]})}]{}{, }\item[{(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}) std\+::atoi(\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}\mbox{[}2\mbox{]})}]{}{, }\item[{(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}) std\+::atoi(\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}\mbox{[}3\mbox{]})}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}\index{hello\_driver.cpp@{hello\_driver.cpp}!bkend@{bkend}}
+\index{bkend@{bkend}!hello\_driver.cpp@{hello\_driver.cpp}}
+\doxysubsubsection{\texorpdfstring{bkend()}{bkend()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b} 
+\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\+\_\+t}} bkend (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{hello_8wasm_8hpp_aefb57c647ba161305295c1038f86b7b8}{hello\+\_\+wasm}}}]{}{, }\item[{ehm}]{}{, }\item[{\&}]{wa}{}\end{DoxyParamCaption})}
+
+\Hypertarget{hello__driver_8cpp_a1204fa6444ae7174767e202a6d39b815}\index{hello\_driver.cpp@{hello\_driver.cpp}!catch@{catch}}
+\index{catch@{catch}!hello\_driver.cpp@{hello\_driver.cpp}}
+\doxysubsubsection{\texorpdfstring{catch()}{catch()}}
+{\footnotesize\ttfamily \label{hello__driver_8cpp_a1204fa6444ae7174767e202a6d39b815} 
+catch (\begin{DoxyParamCaption}\item[{}]{...}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{hello__driver_8cpp_source_l00085}{85}} of file \mbox{\hyperlink{hello__driver_8cpp_source}{hello\+\_\+driver.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00085\ \{\ std::cerr\ <<\ \textcolor{stringliteral}{"{}sys-\/vm\ interpreter\ error\(\backslash\)n"{}};\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{hello__driver_8cpp_a1204fa6444ae7174767e202a6d39b815_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{hello__driver_8cpp_aa420d1607067f256490ad6b753d53285}\index{hello\_driver.cpp@{hello\_driver.cpp}!rhf\_t::add$<$\&example\_host\_methods::memset $>$@{rhf\_t::add$<$\&example\_host\_methods::memset $>$}}
+\index{rhf\_t::add$<$\&example\_host\_methods::memset $>$@{rhf\_t::add$<$\&example\_host\_methods::memset $>$}!hello\_driver.cpp@{hello\_driver.cpp}}
+\doxysubsubsection{\texorpdfstring{rhf\_t::add$<$\&example\_host\_methods::memset $>$()}{rhf\_t::add<\&example\_host\_methods::memset >()}}
+{\footnotesize\ttfamily \label{hello__driver_8cpp_aa420d1607067f256490ad6b753d53285} 
+\mbox{\hyperlink{static__buf_8cpp_aa99823a0fc8313c9c32541ce768fb801}{rhf\+\_\+t\+::add}}$<$\&\mbox{\hyperlink{structexample__host__methods_af69f9804f8f8a31ddd1831eff5da931a}{example\+\_\+host\+\_\+methods\+::memset}} $>$ (\begin{DoxyParamCaption}\item[{"{}env"{}}]{}{, }\item[{"{}memset"{}}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{hello__driver_8cpp_ab997ff643c98de1631bc10b46ce2e5d9}\index{hello\_driver.cpp@{hello\_driver.cpp}!rhf\_t::add$<$\&example\_host\_methods::print\_name, test\_name $>$@{rhf\_t::add$<$\&example\_host\_methods::print\_name, test\_name $>$}}
+\index{rhf\_t::add$<$\&example\_host\_methods::print\_name, test\_name $>$@{rhf\_t::add$<$\&example\_host\_methods::print\_name, test\_name $>$}!hello\_driver.cpp@{hello\_driver.cpp}}
+\doxysubsubsection{\texorpdfstring{rhf\_t::add$<$\&example\_host\_methods::print\_name, test\_name $>$()}{rhf\_t::add<\&example\_host\_methods::print\_name, test\_name >()}}
+{\footnotesize\ttfamily \label{hello__driver_8cpp_ab997ff643c98de1631bc10b46ce2e5d9} 
+\mbox{\hyperlink{static__buf_8cpp_aa99823a0fc8313c9c32541ce768fb801}{rhf\+\_\+t\+::add}}$<$\&\mbox{\hyperlink{structexample__host__methods_a7410c320366b22a9359913b4b9ec98f9}{example\+\_\+host\+\_\+methods\+::print\+\_\+name}}, test\+\_\+name $>$ (\begin{DoxyParamCaption}\item[{"{}env"{}}]{}{, }\item[{"{}print\+\_\+name"{}}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{hello__driver_8cpp_a5354fbb1716540e99aace1a46e72056b}\index{hello\_driver.cpp@{hello\_driver.cpp}!rhf\_t::add$<$\&example\_host\_methods::print\_num $>$@{rhf\_t::add$<$\&example\_host\_methods::print\_num $>$}}
+\index{rhf\_t::add$<$\&example\_host\_methods::print\_num $>$@{rhf\_t::add$<$\&example\_host\_methods::print\_num $>$}!hello\_driver.cpp@{hello\_driver.cpp}}
+\doxysubsubsection{\texorpdfstring{rhf\_t::add$<$\&example\_host\_methods::print\_num $>$()}{rhf\_t::add<\&example\_host\_methods::print\_num >()}}
+{\footnotesize\ttfamily \label{hello__driver_8cpp_a5354fbb1716540e99aace1a46e72056b} 
+\mbox{\hyperlink{static__buf_8cpp_aa99823a0fc8313c9c32541ce768fb801}{rhf\+\_\+t\+::add}}$<$\&\mbox{\hyperlink{structexample__host__methods_aafe26636e9ac62100c1bf20a45fabf89}{example\+\_\+host\+\_\+methods\+::print\+\_\+num}} $>$ (\begin{DoxyParamCaption}\item[{"{}env"{}}]{}{, }\item[{"{}print\+\_\+num"{}}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{hello__driver_8cpp_af56e05b54f28e4f03648d5b239a4a102}\index{hello\_driver.cpp@{hello\_driver.cpp}!rhf\_t::add$<$\&example\_host\_methods::print\_span $>$@{rhf\_t::add$<$\&example\_host\_methods::print\_span $>$}}
+\index{rhf\_t::add$<$\&example\_host\_methods::print\_span $>$@{rhf\_t::add$<$\&example\_host\_methods::print\_span $>$}!hello\_driver.cpp@{hello\_driver.cpp}}
+\doxysubsubsection{\texorpdfstring{rhf\_t::add$<$\&example\_host\_methods::print\_span $>$()}{rhf\_t::add<\&example\_host\_methods::print\_span >()}}
+{\footnotesize\ttfamily \label{hello__driver_8cpp_af56e05b54f28e4f03648d5b239a4a102} 
+\mbox{\hyperlink{static__buf_8cpp_aa99823a0fc8313c9c32541ce768fb801}{rhf\+\_\+t\+::add}}$<$\&\mbox{\hyperlink{structexample__host__methods_a935fb22c9cdbd90d5b11b5610396169e}{example\+\_\+host\+\_\+methods\+::print\+\_\+span}} $>$ (\begin{DoxyParamCaption}\item[{"{}env"{}}]{}{, }\item[{"{}print\+\_\+span"{}}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{hello__driver_8cpp_a4b09478ef1e9684c386e6893b6f3b8cc}\index{hello\_driver.cpp@{hello\_driver.cpp}!rhf\_t::add$<$\&example\_host\_methods::sysio\_assert $>$@{rhf\_t::add$<$\&example\_host\_methods::sysio\_assert $>$}}
+\index{rhf\_t::add$<$\&example\_host\_methods::sysio\_assert $>$@{rhf\_t::add$<$\&example\_host\_methods::sysio\_assert $>$}!hello\_driver.cpp@{hello\_driver.cpp}}
+\doxysubsubsection{\texorpdfstring{rhf\_t::add$<$\&example\_host\_methods::sysio\_assert $>$()}{rhf\_t::add<\&example\_host\_methods::sysio\_assert >()}}
+{\footnotesize\ttfamily \label{hello__driver_8cpp_a4b09478ef1e9684c386e6893b6f3b8cc} 
+\mbox{\hyperlink{static__buf_8cpp_aa99823a0fc8313c9c32541ce768fb801}{rhf\+\_\+t\+::add}}$<$\&\mbox{\hyperlink{structexample__host__methods_aaeab9f9f56aa8c95e137eea0fdc5bdae}{example\+\_\+host\+\_\+methods\+::sysio\+\_\+assert}} $>$ (\begin{DoxyParamCaption}\item[{"{}env"{}}]{}{, }\item[{"{}sysio\+\_\+assert"{}}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{hello__driver_8cpp_a2abd2eb320174c8ccc5019ef3edaac9c}\index{hello\_driver.cpp@{hello\_driver.cpp}!SYS\_VM\_PRECONDITION@{SYS\_VM\_PRECONDITION}}
+\index{SYS\_VM\_PRECONDITION@{SYS\_VM\_PRECONDITION}!hello\_driver.cpp@{hello\_driver.cpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_PRECONDITION()}{SYS\_VM\_PRECONDITION()}}
+{\footnotesize\ttfamily \label{hello__driver_8cpp_a2abd2eb320174c8ccc5019ef3edaac9c} 
+SYS\+\_\+\+VM\+\_\+\+PRECONDITION (\begin{DoxyParamCaption}\item[{test\+\_\+name}]{}{, }\item[{\mbox{\hyperlink{sysio_2vm_2host__function_8hpp_a576aca63e32e4cbf42537c5876c0d95b}{SYS\+\_\+\+VM\+\_\+\+INVOKE\+\_\+\+ON}}(const char \texorpdfstring{$\ast$}{*},\mbox{[}\&\mbox{]}(auto \&\&nm, auto \&\&... rest) \{ std\+::string \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}=nm; \mbox{\hyperlink{yubihsm__pkcs11_8c_a75d8898b07aafc20a48a415a1c6e7bf0}{if}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}=="{}sys-\/vm2"{}) throw "{}failure"{}; \})}]{}{}\end{DoxyParamCaption})}
+
+Simple implementation of an interpreter using sys-\/vm. 
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}\index{hello\_driver.cpp@{hello\_driver.cpp}!argv@{argv}}
+\index{argv@{argv}!hello\_driver.cpp@{hello\_driver.cpp}}
+\doxysubsubsection{\texorpdfstring{argv}{argv}}
+{\footnotesize\ttfamily \label{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0} 
+char\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*} argv}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\{}
+\DoxyCodeLine{\ \ \ \textcolor{keywordflow}{if}\ (argc\ <\ 4)\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}Please\ enter\ three\ numbers\(\backslash\)n"{}};}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keywordflow}{return}\ -\/1;}
+\DoxyCodeLine{\ \ \ \}}
+\DoxyCodeLine{\ \ \ }
+\DoxyCodeLine{\ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator}{wasm\_allocator}}\ \mbox{\hyperlink{allow__code__after__function__end__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{hello__driver_8cpp_source_l00052}{52}} of file \mbox{\hyperlink{hello__driver_8cpp_source}{hello\+\_\+driver.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00053\ \ \ \ \textcolor{keywordflow}{if}\ (argc\ <\ 4)\ \{}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}Please\ enter\ three\ numbers\(\backslash\)n"{}};}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ -\/1;}
+\DoxyCodeLine{00056\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{hello__driver_8cpp_a0b6f424d9a532680c6b2ca5c119c938b}\index{hello\_driver.cpp@{hello\_driver.cpp}!field@{field}}
+\index{field@{field}!hello\_driver.cpp@{hello\_driver.cpp}}
+\doxysubsubsection{\texorpdfstring{field}{field}}
+{\footnotesize\ttfamily \label{hello__driver_8cpp_a0b6f424d9a532680c6b2ca5c119c938b} 
+ehm field = "{}testing"{}}
+
+
+
+Definition at line \mbox{\hyperlink{hello__driver_8cpp_source_l00080}{80}} of file \mbox{\hyperlink{hello__driver_8cpp_source}{hello\+\_\+driver.\+cpp}}.
+
+\Hypertarget{hello__driver_8cpp_a9717e7bbecb906637e86cef6da3d83c2}\index{hello\_driver.cpp@{hello\_driver.cpp}!return@{return}}
+\index{return@{return}!hello\_driver.cpp@{hello\_driver.cpp}}
+\doxysubsubsection{\texorpdfstring{return}{return}}
+{\footnotesize\ttfamily \label{hello__driver_8cpp_a9717e7bbecb906637e86cef6da3d83c2} 
+return}
+
+
+
+Definition at line \mbox{\hyperlink{hello__driver_8cpp_source_l00086}{86}} of file \mbox{\hyperlink{hello__driver_8cpp_source}{hello\+\_\+driver.\+cpp}}.
+
+\Hypertarget{hello__driver_8cpp_abe4cc9788f52e49485473dc699537388}\index{hello\_driver.cpp@{hello\_driver.cpp}!try@{try}}
+\index{try@{try}!hello\_driver.cpp@{hello\_driver.cpp}}
+\doxysubsubsection{\texorpdfstring{try}{try}}
+{\footnotesize\ttfamily \label{hello__driver_8cpp_abe4cc9788f52e49485473dc699537388} 
+try}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\{}
+\DoxyCodeLine{\ \ \ \ \ \ \mbox{\hyperlink{structexample__host__methods}{example\_host\_methods}}\ ehm}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{hello__driver_8cpp_source_l00074}{74}} of file \mbox{\hyperlink{hello__driver_8cpp_source}{hello\+\_\+driver.\+cpp}}.
+
+\Hypertarget{hello__driver_8cpp_aa199bff2581e446e3865732d06d873f0}\index{hello\_driver.cpp@{hello\_driver.cpp}!wd@{wd}}
+\index{wd@{wd}!hello\_driver.cpp@{hello\_driver.cpp}}
+\doxysubsubsection{\texorpdfstring{wd}{wd}}
+{\footnotesize\ttfamily \label{hello__driver_8cpp_aa199bff2581e446e3865732d06d873f0} 
+\mbox{\hyperlink{classsysio_1_1vm_1_1watchdog}{watchdog}} wd \{std\+::chrono\+::seconds(3)\}}
+
+
+
+Definition at line \mbox{\hyperlink{hello__driver_8cpp_source_l00073}{73}} of file \mbox{\hyperlink{hello__driver_8cpp_source}{hello\+\_\+driver.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00073\ \{std::chrono::seconds(3)\};}
+
+\end{DoxyCode}

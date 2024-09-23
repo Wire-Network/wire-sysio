@@ -1,0 +1,190 @@
+\doxysection{libraries/fc/include/fc/api.hpp File Reference}
+\hypertarget{api_8hpp}{}\label{api_8hpp}\index{libraries/fc/include/fc/api.hpp@{libraries/fc/include/fc/api.hpp}}
+{\ttfamily \#include $<$fc/thread/future.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/any.\+hpp$>$}\newline
+{\ttfamily \#include $<$functional$>$}\newline
+{\ttfamily \#include $<$boost/config.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/preprocessor/repeat.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/preprocessor/repetition/enum\+\_\+binary\+\_\+params.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/preprocessor/repetition/enum\+\_\+params.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/preprocessor/repetition/enum\+\_\+trailing\+\_\+params.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/preprocessor/facilities/empty.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/preprocessor/seq/for\+\_\+each.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/preprocessor/stringize.\+hpp$>$}\newline
+Include dependency graph for api.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{api_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{api_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structfc_1_1identity__member}{fc\+::identity\+\_\+member}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1vtable}{fc\+::vtable$<$ Interface, Transform $>$}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1vtable__copy__visitor}{fc\+::vtable\+\_\+copy\+\_\+visitor$<$ Other\+Type $>$}}
+\item 
+class \mbox{\hyperlink{classfc_1_1api__base}{fc\+::api\+\_\+base}}
+\item 
+class \mbox{\hyperlink{classfc_1_1api}{fc\+::api$<$ Interface, Transform $>$}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacefc}{fc}}
+\begin{DoxyCompactList}\small\item\em namespace \doxylink{namespacesysio_1_1chain}{sysio\+::chain} \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{api_8hpp_ae02d776534813ddce29fb1d978eaf4fa}{FC\+\_\+\+CALL\+\_\+\+MEMBER\+\_\+\+TEMPLATE\+\_\+\+KEYWORD}}~\mbox{\hyperlink{yubihsm__pkcs11_8c_a53ef06e29c840024a683512c1acd791a}{template}}
+\item 
+\#define \mbox{\hyperlink{api_8hpp_a6c552d37d1537b71a94be8c5c09785b6}{FC\+\_\+\+API\+\_\+\+VTABLE\+\_\+\+DEFINE\+\_\+\+MEMBER}}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},  data,  elem)
+\item 
+\#define \mbox{\hyperlink{api_8hpp_a802f3c76beea2c07584d9725b6a150ae}{FC\+\_\+\+API\+\_\+\+VTABLE\+\_\+\+DEFINE\+\_\+\+VISIT\+\_\+\+OTHER}}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},  data,  elem)
+\item 
+\#define \mbox{\hyperlink{api_8hpp_a496866640ae62dfb29364c74994b1b97}{FC\+\_\+\+API\+\_\+\+VTABLE\+\_\+\+DEFINE\+\_\+\+VISIT}}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},  data,  elem)
+\item 
+\#define \mbox{\hyperlink{api_8hpp_a5fa35b6e46680bd8d98771c5aa2bec0b}{FC\+\_\+\+API}}(CLASS,  METHODS)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{namespacefc_a18e9e0bd9c0a52896425ae1172bc4e2b}{fc\+::api\+\_\+id\+\_\+type}}
+\item 
+typedef std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classfc_1_1api__base}{api\+\_\+base}} $>$ \mbox{\hyperlink{namespacefc_abc7fa69d18531d7645307d15b3102886}{fc\+::api\+\_\+ptr}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{api_8hpp_a5fa35b6e46680bd8d98771c5aa2bec0b}\index{api.hpp@{api.hpp}!FC\_API@{FC\_API}}
+\index{FC\_API@{FC\_API}!api.hpp@{api.hpp}}
+\doxysubsubsection{\texorpdfstring{FC\_API}{FC\_API}}
+{\footnotesize\ttfamily \label{api_8hpp_a5fa35b6e46680bd8d98771c5aa2bec0b} 
+\#define FC\+\_\+\+API(\begin{DoxyParamCaption}\item[{}]{CLASS}{, }\item[{}]{METHODS}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ Transform>\ \(\backslash\)}
+\DoxyCodeLine{\ \ \textcolor{keyword}{struct\ }vtable<CLASS,Transform>\ :\ \textcolor{keyword}{public}\ std::enable\_shared\_from\_this<vtable<CLASS,Transform>>\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ BOOST\_PP\_SEQ\_FOR\_EACH(\ \mbox{\hyperlink{api_8hpp_a6c552d37d1537b71a94be8c5c09785b6}{FC\_API\_VTABLE\_DEFINE\_MEMBER}},\ CLASS,\ METHODS\ )\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ Visitor>\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keywordtype}{void}\ visit\_other(\ Visitor\&\&\ v\ )\{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ BOOST\_PP\_SEQ\_FOR\_EACH(\ \mbox{\hyperlink{api_8hpp_a802f3c76beea2c07584d9725b6a150ae}{FC\_API\_VTABLE\_DEFINE\_VISIT\_OTHER}},\ CLASS,\ METHODS\ )\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ Visitor>\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keywordtype}{void}\ visit(\ Visitor\&\&\ v\ )\{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ BOOST\_PP\_SEQ\_FOR\_EACH(\ \mbox{\hyperlink{api_8hpp_a496866640ae62dfb29364c74994b1b97}{FC\_API\_VTABLE\_DEFINE\_VISIT}},\ CLASS,\ METHODS\ )\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \};\ \(\backslash\)}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{api_8hpp_source_l00119}{119}} of file \mbox{\hyperlink{api_8hpp_source}{api.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00119\ \textcolor{preprocessor}{\#define\ FC\_API(\ CLASS,\ METHODS\ )\ \(\backslash\)}}
+\DoxyCodeLine{00120\ \textcolor{preprocessor}{namespace\ fc\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00121\ \textcolor{preprocessor}{\ \ template<typename\ Transform>\ \(\backslash\)}}
+\DoxyCodeLine{00122\ \textcolor{preprocessor}{\ \ struct\ vtable<CLASS,Transform>\ :\ public\ std::enable\_shared\_from\_this<vtable<CLASS,Transform>>\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00123\ \textcolor{preprocessor}{\ \ \ \ \ \ BOOST\_PP\_SEQ\_FOR\_EACH(\ FC\_API\_VTABLE\_DEFINE\_MEMBER,\ CLASS,\ METHODS\ )\ \(\backslash\)}}
+\DoxyCodeLine{00124\ \textcolor{preprocessor}{\ \ \ \ \ \ template<typename\ Visitor>\ \(\backslash\)}}
+\DoxyCodeLine{00125\ \textcolor{preprocessor}{\ \ \ \ \ \ void\ visit\_other(\ Visitor\&\&\ v\ )\{\ \(\backslash\)}}
+\DoxyCodeLine{00126\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ BOOST\_PP\_SEQ\_FOR\_EACH(\ FC\_API\_VTABLE\_DEFINE\_VISIT\_OTHER,\ CLASS,\ METHODS\ )\ \(\backslash\)}}
+\DoxyCodeLine{00127\ \textcolor{preprocessor}{\ \ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00128\ \textcolor{preprocessor}{\ \ \ \ \ \ template<typename\ Visitor>\ \(\backslash\)}}
+\DoxyCodeLine{00129\ \textcolor{preprocessor}{\ \ \ \ \ \ void\ visit(\ Visitor\&\&\ v\ )\{\ \(\backslash\)}}
+\DoxyCodeLine{00130\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ BOOST\_PP\_SEQ\_FOR\_EACH(\ FC\_API\_VTABLE\_DEFINE\_VISIT,\ CLASS,\ METHODS\ )\ \(\backslash\)}}
+\DoxyCodeLine{00131\ \textcolor{preprocessor}{\ \ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00132\ \textcolor{preprocessor}{\ \ \};\ \(\backslash\)}}
+\DoxyCodeLine{00133\ \textcolor{preprocessor}{\}\ \ }}
+
+\end{DoxyCode}
+\Hypertarget{api_8hpp_a6c552d37d1537b71a94be8c5c09785b6}\index{api.hpp@{api.hpp}!FC\_API\_VTABLE\_DEFINE\_MEMBER@{FC\_API\_VTABLE\_DEFINE\_MEMBER}}
+\index{FC\_API\_VTABLE\_DEFINE\_MEMBER@{FC\_API\_VTABLE\_DEFINE\_MEMBER}!api.hpp@{api.hpp}}
+\doxysubsubsection{\texorpdfstring{FC\_API\_VTABLE\_DEFINE\_MEMBER}{FC\_API\_VTABLE\_DEFINE\_MEMBER}}
+{\footnotesize\ttfamily \label{api_8hpp_a6c552d37d1537b71a94be8c5c09785b6} 
+\#define FC\+\_\+\+API\+\_\+\+VTABLE\+\_\+\+DEFINE\+\_\+\+MEMBER(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}}{, }\item[{}]{data}{, }\item[{}]{elem}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keyword}{decltype}(Transform::functor(\ (data*)\textcolor{keyword}{nullptr},\ \&data::elem))\ elem;}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{api_8hpp_source_l00111}{111}} of file \mbox{\hyperlink{api_8hpp_source}{api.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00111\ \textcolor{preprocessor}{\#define\ FC\_API\_VTABLE\_DEFINE\_MEMBER(\ r,\ data,\ elem\ )\ \(\backslash\)}}
+\DoxyCodeLine{00112\ \textcolor{preprocessor}{\ \ \ \ \ \ decltype(Transform::functor(\ (data*)nullptr,\ \&data::elem))\ elem;\ }}
+
+\end{DoxyCode}
+\Hypertarget{api_8hpp_a496866640ae62dfb29364c74994b1b97}\index{api.hpp@{api.hpp}!FC\_API\_VTABLE\_DEFINE\_VISIT@{FC\_API\_VTABLE\_DEFINE\_VISIT}}
+\index{FC\_API\_VTABLE\_DEFINE\_VISIT@{FC\_API\_VTABLE\_DEFINE\_VISIT}!api.hpp@{api.hpp}}
+\doxysubsubsection{\texorpdfstring{FC\_API\_VTABLE\_DEFINE\_VISIT}{FC\_API\_VTABLE\_DEFINE\_VISIT}}
+{\footnotesize\ttfamily \label{api_8hpp_a496866640ae62dfb29364c74994b1b97} 
+\#define FC\+\_\+\+API\+\_\+\+VTABLE\+\_\+\+DEFINE\+\_\+\+VISIT(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}}{, }\item[{}]{data}{, }\item[{}]{elem}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ v(\ BOOST\_PP\_STRINGIZE(elem),\ elem\ );}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{api_8hpp_source_l00116}{116}} of file \mbox{\hyperlink{api_8hpp_source}{api.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00116\ \textcolor{preprocessor}{\#define\ FC\_API\_VTABLE\_DEFINE\_VISIT(\ r,\ data,\ elem\ )\ \(\backslash\)}}
+\DoxyCodeLine{00117\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ v(\ BOOST\_PP\_STRINGIZE(elem),\ elem\ );\ }}
+
+\end{DoxyCode}
+\Hypertarget{api_8hpp_a802f3c76beea2c07584d9725b6a150ae}\index{api.hpp@{api.hpp}!FC\_API\_VTABLE\_DEFINE\_VISIT\_OTHER@{FC\_API\_VTABLE\_DEFINE\_VISIT\_OTHER}}
+\index{FC\_API\_VTABLE\_DEFINE\_VISIT\_OTHER@{FC\_API\_VTABLE\_DEFINE\_VISIT\_OTHER}!api.hpp@{api.hpp}}
+\doxysubsubsection{\texorpdfstring{FC\_API\_VTABLE\_DEFINE\_VISIT\_OTHER}{FC\_API\_VTABLE\_DEFINE\_VISIT\_OTHER}}
+{\footnotesize\ttfamily \label{api_8hpp_a802f3c76beea2c07584d9725b6a150ae} 
+\#define FC\+\_\+\+API\+\_\+\+VTABLE\+\_\+\+DEFINE\+\_\+\+VISIT\+\_\+\+OTHER(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}}{, }\item[{}]{data}{, }\item[{}]{elem}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \{\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{typename}\ Visitor::other\_type\ OtherType;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ v(\ BOOST\_PP\_STRINGIZE(elem),\ elem,\ \&OtherType::elem\ );\ \}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{api_8hpp_source_l00113}{113}} of file \mbox{\hyperlink{api_8hpp_source}{api.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00113\ \textcolor{preprocessor}{\#define\ FC\_API\_VTABLE\_DEFINE\_VISIT\_OTHER(\ r,\ data,\ elem\ )\ \(\backslash\)}}
+\DoxyCodeLine{00114\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \{\ typedef\ typename\ Visitor::other\_type\ OtherType;\ \(\backslash\)}}
+\DoxyCodeLine{00115\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ v(\ BOOST\_PP\_STRINGIZE(elem),\ elem,\ \&OtherType::elem\ );\ \}}}
+
+\end{DoxyCode}
+\Hypertarget{api_8hpp_ae02d776534813ddce29fb1d978eaf4fa}\index{api.hpp@{api.hpp}!FC\_CALL\_MEMBER\_TEMPLATE\_KEYWORD@{FC\_CALL\_MEMBER\_TEMPLATE\_KEYWORD}}
+\index{FC\_CALL\_MEMBER\_TEMPLATE\_KEYWORD@{FC\_CALL\_MEMBER\_TEMPLATE\_KEYWORD}!api.hpp@{api.hpp}}
+\doxysubsubsection{\texorpdfstring{FC\_CALL\_MEMBER\_TEMPLATE\_KEYWORD}{FC\_CALL\_MEMBER\_TEMPLATE\_KEYWORD}}
+{\footnotesize\ttfamily \label{api_8hpp_ae02d776534813ddce29fb1d978eaf4fa} 
+\#define FC\+\_\+\+CALL\+\_\+\+MEMBER\+\_\+\+TEMPLATE\+\_\+\+KEYWORD~\mbox{\hyperlink{yubihsm__pkcs11_8c_a53ef06e29c840024a683512c1acd791a}{template}}}
+
+
+
+Definition at line \mbox{\hyperlink{api_8hpp_source_l00012}{12}} of file \mbox{\hyperlink{api_8hpp_source}{api.\+hpp}}.
+

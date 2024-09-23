@@ -1,0 +1,112 @@
+\doxysection{sellrex\+\_\+subcommand Struct Reference}
+\hypertarget{structsellrex__subcommand}{}\label{structsellrex__subcommand}\index{sellrex\_subcommand@{sellrex\_subcommand}}
+
+
+Collaboration diagram for sellrex\+\_\+subcommand\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=188pt]{structsellrex__subcommand__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsellrex__subcommand_aecf86f109f12f61f6297c5c6b8cbd519}{sellrex\+\_\+subcommand}} (\mbox{\hyperlink{class_c_l_i_1_1_app}{CLI\+::\+App}} \texorpdfstring{$\ast$}{*}action\+Root)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structsellrex__subcommand_ab3e259dacaad351b879e23a7f2aaaf43}{from\+\_\+str}}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structsellrex__subcommand_ae339a20ecf3308f1677fb1d825b55fa4}{rex\+\_\+str}}
+\item 
+const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \mbox{\hyperlink{structsellrex__subcommand_a7e3783ab12c32354002e791c6b93278e}{act\+\_\+name}} \{ "{}sellrex"{}\+\_\+n \}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01923}{1923}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structsellrex__subcommand_aecf86f109f12f61f6297c5c6b8cbd519}\index{sellrex\_subcommand@{sellrex\_subcommand}!sellrex\_subcommand@{sellrex\_subcommand}}
+\index{sellrex\_subcommand@{sellrex\_subcommand}!sellrex\_subcommand@{sellrex\_subcommand}}
+\doxysubsubsection{\texorpdfstring{sellrex\_subcommand()}{sellrex\_subcommand()}}
+{\footnotesize\ttfamily \label{structsellrex__subcommand_aecf86f109f12f61f6297c5c6b8cbd519} 
+sellrex\+\_\+subcommand\+::sellrex\+\_\+subcommand (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_c_l_i_1_1_app}{CLI\+::\+App}} \texorpdfstring{$\ast$}{*}}]{action\+Root}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01928}{1928}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01928\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01929\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ sellrex\ =\ actionRoot-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_a8b461d2233ec4121259011b5ed24b336}{add\_subcommand}}(\textcolor{stringliteral}{"{}sellrex"{}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}Sell\ REX\ tokens"{}}));}
+\DoxyCodeLine{01930\ \ \ \ \ \ \ sellrex-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_a8c812d42c7720ecb5cd0aec41b5aa941}{add\_option}}(\textcolor{stringliteral}{"{}from"{}},\ \mbox{\hyperlink{structsellrex__subcommand_ab3e259dacaad351b879e23a7f2aaaf43}{from\_str}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}Account\ selling\ REX\ tokens"{}}))-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a}{required}}();}
+\DoxyCodeLine{01931\ \ \ \ \ \ \ sellrex-\/>add\_option(\textcolor{stringliteral}{"{}rex"{}},\ \ \mbox{\hyperlink{structsellrex__subcommand_ae339a20ecf3308f1677fb1d825b55fa4}{rex\_str}},\ \ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}Amount\ of\ REX\ tokens\ to\ be\ sold"{}}))-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a}{required}}();}
+\DoxyCodeLine{01932\ \ \ \ \ \ \ \mbox{\hyperlink{programs_2clio_2main_8cpp_aa5d53f41b83b5323c73622fbbb15e9cd}{add\_standard\_transaction\_options}}(sellrex,\ \textcolor{stringliteral}{"{}from@active"{}});}
+\DoxyCodeLine{01933\ \ \ \ \ \ \ sellrex-\/>callback([\textcolor{keyword}{this}]\ \{}
+\DoxyCodeLine{01934\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}\ act\_payload\ =\ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}()}
+\DoxyCodeLine{01935\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}from"{}},\ \mbox{\hyperlink{structsellrex__subcommand_ab3e259dacaad351b879e23a7f2aaaf43}{from\_str}})}
+\DoxyCodeLine{01936\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}rex"{}},\ \ \mbox{\hyperlink{structsellrex__subcommand_ae339a20ecf3308f1677fb1d825b55fa4}{rex\_str}});}
+\DoxyCodeLine{01937\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ accountPermissions\ =\ \mbox{\hyperlink{programs_2clio_2main_8cpp_a2b91ca5dbe7cc4ab287d0e44c3037552}{get\_account\_permissions}}(\mbox{\hyperlink{programs_2clio_2main_8cpp_ad552924cb151dcd5b60c73856d1ff706}{tx\_permission}},\ \{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(\mbox{\hyperlink{structsellrex__subcommand_ab3e259dacaad351b879e23a7f2aaaf43}{from\_str}}),\ config::active\_name\});}
+\DoxyCodeLine{01938\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{programs_2clio_2main_8cpp_aaf784434864a29e4835be7465173d1ab}{send\_actions}}(\{\mbox{\hyperlink{programs_2clio_2main_8cpp_a067e20df5f65333b0c3cf5840bc37dea}{create\_action}}(accountPermissions,\ config::system\_account\_name,\ \mbox{\hyperlink{structsellrex__subcommand_a7e3783ab12c32354002e791c6b93278e}{act\_name}},\ act\_payload)\});}
+\DoxyCodeLine{01939\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{01940\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsellrex__subcommand_aecf86f109f12f61f6297c5c6b8cbd519_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsellrex__subcommand_a7e3783ab12c32354002e791c6b93278e}\index{sellrex\_subcommand@{sellrex\_subcommand}!act\_name@{act\_name}}
+\index{act\_name@{act\_name}!sellrex\_subcommand@{sellrex\_subcommand}}
+\doxysubsubsection{\texorpdfstring{act\_name}{act\_name}}
+{\footnotesize\ttfamily \label{structsellrex__subcommand_a7e3783ab12c32354002e791c6b93278e} 
+const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} sellrex\+\_\+subcommand\+::act\+\_\+name \{ "{}sellrex"{}\+\_\+n \}}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01926}{1926}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01926\ \{\ \textcolor{stringliteral}{"{}sellrex"{}}\_n\ \};}
+
+\end{DoxyCode}
+\Hypertarget{structsellrex__subcommand_ab3e259dacaad351b879e23a7f2aaaf43}\index{sellrex\_subcommand@{sellrex\_subcommand}!from\_str@{from\_str}}
+\index{from\_str@{from\_str}!sellrex\_subcommand@{sellrex\_subcommand}}
+\doxysubsubsection{\texorpdfstring{from\_str}{from\_str}}
+{\footnotesize\ttfamily \label{structsellrex__subcommand_ab3e259dacaad351b879e23a7f2aaaf43} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sellrex\+\_\+subcommand\+::from\+\_\+str}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01924}{1924}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{structsellrex__subcommand_ae339a20ecf3308f1677fb1d825b55fa4}\index{sellrex\_subcommand@{sellrex\_subcommand}!rex\_str@{rex\_str}}
+\index{rex\_str@{rex\_str}!sellrex\_subcommand@{sellrex\_subcommand}}
+\doxysubsubsection{\texorpdfstring{rex\_str}{rex\_str}}
+{\footnotesize\ttfamily \label{structsellrex__subcommand_ae339a20ecf3308f1677fb1d825b55fa4} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sellrex\+\_\+subcommand\+::rex\+\_\+str}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01925}{1925}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+programs/clio/\mbox{\hyperlink{programs_2clio_2main_8cpp}{main.\+cpp}}\end{DoxyCompactItemize}

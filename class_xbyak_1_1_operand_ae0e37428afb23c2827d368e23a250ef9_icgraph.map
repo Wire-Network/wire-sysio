@@ -1,0 +1,11 @@
+<map id="Xbyak::Operand::isExtIdx" name="Xbyak::Operand::isExtIdx">
+<area shape="rect" id="Node000001" title=" " alt="" coords="222,80,393,106"/>
+<area shape="rect" id="Node000002" href="$class_xbyak_1_1_reg.html#ade8f58e5ece3423f552408ec9bf82a84" title=" " alt="" coords="15,5,164,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="258,76,173,45,139,34,140,29,175,40,260,71"/>
+<area shape="rect" id="Node000003" href="$class_xbyak_1_1_reg.html#addd2fc0f5a32496fb06343b121acf62c" title=" " alt="" coords="14,55,165,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="206,84,165,79,166,74,207,78"/>
+<area shape="rect" id="Node000004" href="$class_xbyak_1_1_reg.html#a95aef03c473024b08fea9dd74d2ed38e" title=" " alt="" coords="15,104,164,130"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="207,107,165,111,164,106,206,101"/>
+<area shape="rect" id="Node000005" href="$class_xbyak_1_1_operand.html#af45f32fe9206c761ea3c230b5e049548" title=" " alt="" coords="5,153,174,179"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="259,114,175,145,140,155,139,150,173,140,257,109"/>
+</map>

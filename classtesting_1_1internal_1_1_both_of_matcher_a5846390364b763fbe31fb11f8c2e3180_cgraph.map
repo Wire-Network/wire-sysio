@@ -1,0 +1,11 @@
+<map id="testing::internal::BothOfMatcher::operator Matcher&lt; T &gt;" name="testing::internal::BothOfMatcher::operator Matcher&lt; T &gt;">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,16,170,71"/>
+<area shape="rect" id="Node000002" href="$namespacetesting_1_1internal.html#aa1114d84589bd22f45d443527528cb35" title=" " alt="" coords="228,5,378,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="170,31,212,26,212,31,170,36"/>
+<area shape="rect" id="Node000003" href="$namespacetesting.html#ad49d22f0e87778e2b97a88ee851dcea3" title=" " alt="" coords="218,55,388,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="170,50,202,54,202,59,170,55"/>
+<area shape="rect" id="Node000004" href="$classtesting_1_1_safe_matcher_cast_impl.html#a12a394142de16c0ef98fef69ae694a47" title=" " alt="" coords="436,47,606,88"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="388,65,420,65,420,70,388,70"/>
+<area shape="rect" id="Node000005" href="$classtesting_1_1internal_1_1_matcher_cast_impl.html#a3060220a0ff6b449dcc0be874e0a7dc0" title=" " alt="" coords="654,47,812,88"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="607,65,639,65,639,70,607,70"/>
+</map>

@@ -1,0 +1,19 @@
+var sys_vm_2include_2sysio_2vm_2variant_8hpp =
+[
+    [ "sysio::vm::detail::dispatcher< false, Ret >", "structsysio_1_1vm_1_1detail_1_1dispatcher_3_01false_00_01_ret_01_4.html", null ],
+    [ "sysio::vm::detail::dispatcher< true, Ret >", "structsysio_1_1vm_1_1detail_1_1dispatcher_3_01true_00_01_ret_01_4.html", null ],
+    [ "sysio::vm::detail::variant_storage< T0, T1, T2, T3, T... >", "unionsysio_1_1vm_1_1detail_1_1variant__storage_3_01_t0_00_01_t1_00_01_t2_00_01_t3_00_01_t_8_8_8_01_4.html", "unionsysio_1_1vm_1_1detail_1_1variant__storage_3_01_t0_00_01_t1_00_01_t2_00_01_t3_00_01_t_8_8_8_01_4" ],
+    [ "sysio::vm::detail::variant_storage< T0 >", "unionsysio_1_1vm_1_1detail_1_1variant__storage_3_01_t0_01_4.html", null ],
+    [ "sysio::vm::detail::variant_storage< T0, T1 >", "unionsysio_1_1vm_1_1detail_1_1variant__storage_3_01_t0_00_01_t1_01_4.html", null ],
+    [ "sysio::vm::detail::variant_storage< T0, T1, T2 >", "unionsysio_1_1vm_1_1detail_1_1variant__storage_3_01_t0_00_01_t1_00_01_t2_01_4.html", null ],
+    [ "sysio::vm::detail::variant_storage< T0, T1, T2, T3 >", "unionsysio_1_1vm_1_1detail_1_1variant__storage_3_01_t0_00_01_t1_00_01_t2_00_01_t3_01_4.html", null ],
+    [ "sysio::vm::variant< Alternatives >", "classsysio_1_1vm_1_1variant.html", "classsysio_1_1vm_1_1variant" ],
+    [ "V0", "sys-vm_2include_2sysio_2vm_2variant_8hpp.html#a2074b9a2c1c6a3190319241fd96ebdd5", null ],
+    [ "V1", "sys-vm_2include_2sysio_2vm_2variant_8hpp.html#ae21a9518b4dd62d2baeab430c89a657a", null ],
+    [ "V2", "sys-vm_2include_2sysio_2vm_2variant_8hpp.html#a9173468f90b474471bfff59f8487cbc1", null ],
+    [ "V3", "sys-vm_2include_2sysio_2vm_2variant_8hpp.html#ae9d1b8ccb8498c1a9f5de1702017cefc", null ],
+    [ "V4", "sys-vm_2include_2sysio_2vm_2variant_8hpp.html#af119c39c6d0d1bc78dc7aeef443e81a9", null ],
+    [ "V_ELEM", "sys-vm_2include_2sysio_2vm_2variant_8hpp.html#a02172ffe3edf80728a9dabe83d72f83e", null ],
+    [ "variant_storage_get", "sys-vm_2include_2sysio_2vm_2variant_8hpp.html#a40bec98a962ef909354fcecae263abe9", null ],
+    [ "visit", "sys-vm_2include_2sysio_2vm_2variant_8hpp.html#a1419a3e0b38f21f92401fe8acde2ef0e", null ]
+];

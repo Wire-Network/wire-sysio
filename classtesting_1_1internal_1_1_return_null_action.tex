@@ -1,0 +1,50 @@
+\doxysection{testing\+::internal\+::Return\+Null\+Action Class Reference}
+\hypertarget{classtesting_1_1internal_1_1_return_null_action}{}\label{classtesting_1_1internal_1_1_return_null_action}\index{testing::internal::ReturnNullAction@{testing::internal::ReturnNullAction}}
+
+
+{\ttfamily \#include $<$gmock-\/actions.\+h$>$}
+
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename Result , typename Argument\+Tuple $>$ }\\static Result \mbox{\hyperlink{classtesting_1_1internal_1_1_return_null_action_a6ce1fba236686df93070320b399e4f32}{Perform}} (const Argument\+Tuple \&)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{gmock-actions_8h_source_l00652}{652}} of file \mbox{\hyperlink{gmock-actions_8h_source}{gmock-\/actions.\+h}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_return_null_action_a6ce1fba236686df93070320b399e4f32}\index{testing::internal::ReturnNullAction@{testing::internal::ReturnNullAction}!Perform@{Perform}}
+\index{Perform@{Perform}!testing::internal::ReturnNullAction@{testing::internal::ReturnNullAction}}
+\doxysubsubsection{\texorpdfstring{Perform()}{Perform()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_return_null_action_a6ce1fba236686df93070320b399e4f32} 
+template$<$typename Result , typename Argument\+Tuple $>$ \\
+static Result testing\+::internal\+::\+Return\+Null\+Action\+::\+Perform (\begin{DoxyParamCaption}\item[{const Argument\+Tuple \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-actions_8h_source_l00658}{658}} of file \mbox{\hyperlink{gmock-actions_8h_source}{gmock-\/actions.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00658\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00659\ \textcolor{preprocessor}{\#if\ GTEST\_LANG\_CXX11}}
+\DoxyCodeLine{00660\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00661\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00662\ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_ae1f37dc71d5daa6fb49ca1b6047d4a8c}{GTEST\_COMPILE\_ASSERT\_}}(\mbox{\hyperlink{structtesting_1_1internal_1_1bool__constant_a499fba6576296b04d99690a486424b32}{internal::is\_pointer<Result>::value}},}
+\DoxyCodeLine{00663\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ReturnNull\_can\_be\_used\_to\_return\_a\_pointer\_only);}
+\DoxyCodeLine{00664\ \ \ \ \ \textcolor{keywordflow}{return}\ NULL;}
+\DoxyCodeLine{00665\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_LANG\_CXX11}}
+\DoxyCodeLine{00666\ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/include/gmock/\mbox{\hyperlink{gmock-actions_8h}{gmock-\/actions.\+h}}\end{DoxyCompactItemize}

@@ -1,0 +1,155 @@
+\doxysection{libraries/fc/include/fc/crypto/webauthn\+\_\+json/test/unittest/encodedstreamtest.cpp File Reference}
+\hypertarget{encodedstreamtest_8cpp}{}\label{encodedstreamtest_8cpp}\index{libraries/fc/include/fc/crypto/webauthn\_json/test/unittest/encodedstreamtest.cpp@{libraries/fc/include/fc/crypto/webauthn\_json/test/unittest/encodedstreamtest.cpp}}
+{\ttfamily \#include "{}unittest.\+h"{}}\newline
+{\ttfamily \#include "{}rapidjson/filereadstream.\+h"{}}\newline
+{\ttfamily \#include "{}rapidjson/filewritestream.\+h"{}}\newline
+{\ttfamily \#include "{}rapidjson/encodedstream.\+h"{}}\newline
+{\ttfamily \#include "{}rapidjson/stringbuffer.\+h"{}}\newline
+{\ttfamily \#include "{}rapidjson/memorystream.\+h"{}}\newline
+{\ttfamily \#include "{}rapidjson/memorybuffer.\+h"{}}\newline
+Include dependency graph for encodedstreamtest.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{encodedstreamtest_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{class_encoded_stream_test}{Encoded\+Stream\+Test}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{encodedstreamtest_8cpp_abbae03ac8b19b0f54ab90ef411b75e6d}{TEST\+\_\+F}} (\mbox{\hyperlink{class_encoded_stream_test}{Encoded\+Stream\+Test}}, \mbox{\hyperlink{class_encoded_input_stream}{Encoded\+Input\+Stream}})
+\item 
+\mbox{\hyperlink{encodedstreamtest_8cpp_a28ed31b89a5e812d8cb1b1c26f70b7ab}{TEST\+\_\+F}} (\mbox{\hyperlink{class_encoded_stream_test}{Encoded\+Stream\+Test}}, \mbox{\hyperlink{class_auto_u_t_f_input_stream}{Auto\+UTFInput\+Stream}})
+\item 
+\mbox{\hyperlink{encodedstreamtest_8cpp_a00306913ca181d454308ff9510432613}{TEST\+\_\+F}} (\mbox{\hyperlink{class_encoded_stream_test}{Encoded\+Stream\+Test}}, \mbox{\hyperlink{class_encoded_output_stream}{Encoded\+Output\+Stream}})
+\item 
+\mbox{\hyperlink{encodedstreamtest_8cpp_ad99a94cbc1072731b2ea18af3715796b}{TEST\+\_\+F}} (\mbox{\hyperlink{class_encoded_stream_test}{Encoded\+Stream\+Test}}, \mbox{\hyperlink{class_auto_u_t_f_output_stream}{Auto\+UTFOutput\+Stream}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{encodedstreamtest_8cpp_a28ed31b89a5e812d8cb1b1c26f70b7ab}\index{encodedstreamtest.cpp@{encodedstreamtest.cpp}!TEST\_F@{TEST\_F}}
+\index{TEST\_F@{TEST\_F}!encodedstreamtest.cpp@{encodedstreamtest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_F()}{TEST\_F()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{encodedstreamtest_8cpp_a28ed31b89a5e812d8cb1b1c26f70b7ab} 
+TEST\+\_\+F (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_encoded_stream_test}{Encoded\+Stream\+Test}}}]{}{, }\item[{\mbox{\hyperlink{class_auto_u_t_f_input_stream}{Auto\+UTFInput\+Stream}}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{encodedstreamtest_8cpp_source_l00267}{267}} of file \mbox{\hyperlink{encodedstreamtest_8cpp_source}{encodedstreamtest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00267\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00268\ \ \ \ \ TestAutoUTFInputStream(\textcolor{stringliteral}{"{}utf8.json"{}},\ \ \ \ \ \ \textcolor{keyword}{false});}
+\DoxyCodeLine{00269\ \ \ \ \ TestAutoUTFInputStream(\textcolor{stringliteral}{"{}utf8bom.json"{}},\ \ \ \textcolor{keyword}{true});}
+\DoxyCodeLine{00270\ \ \ \ \ TestAutoUTFInputStream(\textcolor{stringliteral}{"{}utf16le.json"{}},\ \ \ \textcolor{keyword}{false});}
+\DoxyCodeLine{00271\ \ \ \ \ TestAutoUTFInputStream(\textcolor{stringliteral}{"{}utf16lebom.json"{}},\textcolor{keyword}{true});}
+\DoxyCodeLine{00272\ \ \ \ \ TestAutoUTFInputStream(\textcolor{stringliteral}{"{}utf16be.json"{}},\ \ \ \textcolor{keyword}{false});}
+\DoxyCodeLine{00273\ \ \ \ \ TestAutoUTFInputStream(\textcolor{stringliteral}{"{}utf16bebom.json"{}},\textcolor{keyword}{true});}
+\DoxyCodeLine{00274\ \ \ \ \ TestAutoUTFInputStream(\textcolor{stringliteral}{"{}utf32le.json"{}},\ \ \ \textcolor{keyword}{false});}
+\DoxyCodeLine{00275\ \ \ \ \ TestAutoUTFInputStream(\textcolor{stringliteral}{"{}utf32lebom.json"{}},\textcolor{keyword}{true});}
+\DoxyCodeLine{00276\ \ \ \ \ TestAutoUTFInputStream(\textcolor{stringliteral}{"{}utf32be.json"{}},\ \ \ \textcolor{keyword}{false});}
+\DoxyCodeLine{00277\ \ \ \ \ TestAutoUTFInputStream(\textcolor{stringliteral}{"{}utf32bebom.json"{}},\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00278\ }
+\DoxyCodeLine{00279\ \ \ \ \ \{}
+\DoxyCodeLine{00280\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Auto\ detection\ fail,\ use\ user\ defined\ UTF\ type}}
+\DoxyCodeLine{00281\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ json[]\ =\ \textcolor{stringliteral}{"{}\{\ \}"{}};}
+\DoxyCodeLine{00282\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_memory_stream}{MemoryStream}}\ ms(json,\ \textcolor{keyword}{sizeof}(json));}
+\DoxyCodeLine{00283\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_auto_u_t_f_input_stream}{AutoUTFInputStream<unsigned,\ MemoryStream>}}\ eis(ms,\ \mbox{\hyperlink{encodings_8h_ac9448aedf514a5bb509bae73a9ce4e58a7fd9945f1c494a4a4ee9446017e790f1}{kUTF8}});}
+\DoxyCodeLine{00284\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(eis.HasBOM());}
+\DoxyCodeLine{00285\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\mbox{\hyperlink{encodings_8h_ac9448aedf514a5bb509bae73a9ce4e58a7fd9945f1c494a4a4ee9446017e790f1}{kUTF8}},\ eis.GetType());}
+\DoxyCodeLine{00286\ \ \ \ \ \}}
+\DoxyCodeLine{00287\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=278pt]{encodedstreamtest_8cpp_a28ed31b89a5e812d8cb1b1c26f70b7ab_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{encodedstreamtest_8cpp_ad99a94cbc1072731b2ea18af3715796b}\index{encodedstreamtest.cpp@{encodedstreamtest.cpp}!TEST\_F@{TEST\_F}}
+\index{TEST\_F@{TEST\_F}!encodedstreamtest.cpp@{encodedstreamtest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_F()}{TEST\_F()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{encodedstreamtest_8cpp_ad99a94cbc1072731b2ea18af3715796b} 
+TEST\+\_\+F (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_encoded_stream_test}{Encoded\+Stream\+Test}}}]{}{, }\item[{\mbox{\hyperlink{class_auto_u_t_f_output_stream}{Auto\+UTFOutput\+Stream}}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{encodedstreamtest_8cpp_source_l00302}{302}} of file \mbox{\hyperlink{encodedstreamtest_8cpp_source}{encodedstreamtest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00302\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00303\ \ \ \ \ TestAutoUTFOutputStream(\mbox{\hyperlink{encodings_8h_ac9448aedf514a5bb509bae73a9ce4e58a7fd9945f1c494a4a4ee9446017e790f1}{kUTF8}},\ \ \ \ \ \ \textcolor{keyword}{false},\ \ \textcolor{stringliteral}{"{}utf8.json"{}});}
+\DoxyCodeLine{00304\ \ \ \ \ TestAutoUTFOutputStream(\mbox{\hyperlink{encodings_8h_ac9448aedf514a5bb509bae73a9ce4e58a7fd9945f1c494a4a4ee9446017e790f1}{kUTF8}},\ \ \ \ \ \ \textcolor{keyword}{true},\ \ \ \textcolor{stringliteral}{"{}utf8bom.json"{}});}
+\DoxyCodeLine{00305\ \ \ \ \ TestAutoUTFOutputStream(\mbox{\hyperlink{encodings_8h_ac9448aedf514a5bb509bae73a9ce4e58ab72f5865db6af4e33757ee52ddad9fda}{kUTF16LE}},\ \ \ \textcolor{keyword}{false},\ \ \textcolor{stringliteral}{"{}utf16le.json"{}});}
+\DoxyCodeLine{00306\ \ \ \ \ TestAutoUTFOutputStream(\mbox{\hyperlink{encodings_8h_ac9448aedf514a5bb509bae73a9ce4e58ab72f5865db6af4e33757ee52ddad9fda}{kUTF16LE}},\ \ \ \textcolor{keyword}{true},\ \ \ \textcolor{stringliteral}{"{}utf16lebom.json"{}});}
+\DoxyCodeLine{00307\ \ \ \ \ TestAutoUTFOutputStream(\mbox{\hyperlink{encodings_8h_ac9448aedf514a5bb509bae73a9ce4e58a1a455c6e8be641e715de9aa8ffa6cea0}{kUTF16BE}},\ \ \ \textcolor{keyword}{false},\ \ \textcolor{stringliteral}{"{}utf16be.json"{}});}
+\DoxyCodeLine{00308\ \ \ \ \ TestAutoUTFOutputStream(\mbox{\hyperlink{encodings_8h_ac9448aedf514a5bb509bae73a9ce4e58a1a455c6e8be641e715de9aa8ffa6cea0}{kUTF16BE}},\ \ \ \textcolor{keyword}{true},\ \ \ \textcolor{stringliteral}{"{}utf16bebom.json"{}});}
+\DoxyCodeLine{00309\ \ \ \ \ TestAutoUTFOutputStream(\mbox{\hyperlink{encodings_8h_ac9448aedf514a5bb509bae73a9ce4e58a885dec757d256c427be6759296d482e0}{kUTF32LE}},\ \ \ \textcolor{keyword}{false},\ \ \textcolor{stringliteral}{"{}utf32le.json"{}});}
+\DoxyCodeLine{00310\ \ \ \ \ TestAutoUTFOutputStream(\mbox{\hyperlink{encodings_8h_ac9448aedf514a5bb509bae73a9ce4e58a885dec757d256c427be6759296d482e0}{kUTF32LE}},\ \ \ \textcolor{keyword}{true},\ \ \ \textcolor{stringliteral}{"{}utf32lebom.json"{}});}
+\DoxyCodeLine{00311\ \ \ \ \ TestAutoUTFOutputStream(\mbox{\hyperlink{encodings_8h_ac9448aedf514a5bb509bae73a9ce4e58a14da8da33c9f9aa904bf0d1aac3fa76e}{kUTF32BE}},\ \ \ \textcolor{keyword}{false},\ \ \textcolor{stringliteral}{"{}utf32be.json"{}});}
+\DoxyCodeLine{00312\ \ \ \ \ TestAutoUTFOutputStream(\mbox{\hyperlink{encodings_8h_ac9448aedf514a5bb509bae73a9ce4e58a14da8da33c9f9aa904bf0d1aac3fa76e}{kUTF32BE}},\ \ \ \textcolor{keyword}{true},\ \ \ \textcolor{stringliteral}{"{}utf32bebom.json"{}});}
+\DoxyCodeLine{00313\ \}}
+
+\end{DoxyCode}
+\Hypertarget{encodedstreamtest_8cpp_abbae03ac8b19b0f54ab90ef411b75e6d}\index{encodedstreamtest.cpp@{encodedstreamtest.cpp}!TEST\_F@{TEST\_F}}
+\index{TEST\_F@{TEST\_F}!encodedstreamtest.cpp@{encodedstreamtest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_F()}{TEST\_F()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{encodedstreamtest_8cpp_abbae03ac8b19b0f54ab90ef411b75e6d} 
+TEST\+\_\+F (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_encoded_stream_test}{Encoded\+Stream\+Test}}}]{}{, }\item[{\mbox{\hyperlink{class_encoded_input_stream}{Encoded\+Input\+Stream}}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{encodedstreamtest_8cpp_source_l00254}{254}} of file \mbox{\hyperlink{encodedstreamtest_8cpp_source}{encodedstreamtest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00254\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00255\ \ \ \ \ TestEncodedInputStream<UTF8<>,\ \ \ \ \mbox{\hyperlink{struct_u_t_f8}{UTF8<>}}\ \ >(\textcolor{stringliteral}{"{}utf8.json"{}});}
+\DoxyCodeLine{00256\ \ \ \ \ TestEncodedInputStream<UTF8<>,\ \ \ \ \mbox{\hyperlink{struct_u_t_f8}{UTF8<>}}\ \ >(\textcolor{stringliteral}{"{}utf8bom.json"{}});}
+\DoxyCodeLine{00257\ \ \ \ \ TestEncodedInputStream<UTF16LE<>,\ \mbox{\hyperlink{struct_u_t_f16}{UTF16<>}}\ >(\textcolor{stringliteral}{"{}utf16le.json"{}});}
+\DoxyCodeLine{00258\ \ \ \ \ TestEncodedInputStream<UTF16LE<>,\ \mbox{\hyperlink{struct_u_t_f16}{UTF16<>}}\ >(\textcolor{stringliteral}{"{}utf16lebom.json"{}});}
+\DoxyCodeLine{00259\ \ \ \ \ TestEncodedInputStream<UTF16BE<>,\ \mbox{\hyperlink{struct_u_t_f16}{UTF16<>}}\ >(\textcolor{stringliteral}{"{}utf16be.json"{}});}
+\DoxyCodeLine{00260\ \ \ \ \ TestEncodedInputStream<UTF16BE<>,\ \mbox{\hyperlink{struct_u_t_f16}{UTF16<>}}\ >(\textcolor{stringliteral}{"{}utf16bebom.json"{}});}
+\DoxyCodeLine{00261\ \ \ \ \ TestEncodedInputStream<UTF32LE<>,\ \mbox{\hyperlink{struct_u_t_f32}{UTF32<>}}\ >(\textcolor{stringliteral}{"{}utf32le.json"{}});}
+\DoxyCodeLine{00262\ \ \ \ \ TestEncodedInputStream<UTF32LE<>,\ \mbox{\hyperlink{struct_u_t_f32}{UTF32<>}}\ >(\textcolor{stringliteral}{"{}utf32lebom.json"{}});}
+\DoxyCodeLine{00263\ \ \ \ \ TestEncodedInputStream<UTF32BE<>,\ \mbox{\hyperlink{struct_u_t_f32}{UTF32<>}}\ >(\textcolor{stringliteral}{"{}utf32be.json"{}});}
+\DoxyCodeLine{00264\ \ \ \ \ TestEncodedInputStream<UTF32BE<>,\ \mbox{\hyperlink{struct_u_t_f32}{UTF32<>}}\ >(\textcolor{stringliteral}{"{}utf32bebom.json"{}});}
+\DoxyCodeLine{00265\ \}}
+
+\end{DoxyCode}
+\Hypertarget{encodedstreamtest_8cpp_a00306913ca181d454308ff9510432613}\index{encodedstreamtest.cpp@{encodedstreamtest.cpp}!TEST\_F@{TEST\_F}}
+\index{TEST\_F@{TEST\_F}!encodedstreamtest.cpp@{encodedstreamtest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_F()}{TEST\_F()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{encodedstreamtest_8cpp_a00306913ca181d454308ff9510432613} 
+TEST\+\_\+F (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_encoded_stream_test}{Encoded\+Stream\+Test}}}]{}{, }\item[{\mbox{\hyperlink{class_encoded_output_stream}{Encoded\+Output\+Stream}}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{encodedstreamtest_8cpp_source_l00289}{289}} of file \mbox{\hyperlink{encodedstreamtest_8cpp_source}{encodedstreamtest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00289\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00290\ \ \ \ \ TestEncodedOutputStream<UTF8<>,\ \ \ \ \ \mbox{\hyperlink{struct_u_t_f8}{UTF8<>}}\ \ >(\textcolor{stringliteral}{"{}utf8.json"{}},\ \ \ \ \ \ \textcolor{keyword}{false});}
+\DoxyCodeLine{00291\ \ \ \ \ TestEncodedOutputStream<UTF8<>,\ \ \ \ \ \mbox{\hyperlink{struct_u_t_f8}{UTF8<>}}\ \ >(\textcolor{stringliteral}{"{}utf8bom.json"{}},\ \ \ \textcolor{keyword}{true});}
+\DoxyCodeLine{00292\ \ \ \ \ TestEncodedOutputStream<UTF16LE<>,\ \ \mbox{\hyperlink{struct_u_t_f16}{UTF16<>}}\ >(\textcolor{stringliteral}{"{}utf16le.json"{}},\ \ \ \textcolor{keyword}{false});}
+\DoxyCodeLine{00293\ \ \ \ \ TestEncodedOutputStream<UTF16LE<>,\ \ \mbox{\hyperlink{struct_u_t_f16}{UTF16<>}}\ >(\textcolor{stringliteral}{"{}utf16lebom.json"{}},\textcolor{keyword}{true});}
+\DoxyCodeLine{00294\ \ \ \ \ TestEncodedOutputStream<UTF16BE<>,\ \ \mbox{\hyperlink{struct_u_t_f16}{UTF16<>}}\ >(\textcolor{stringliteral}{"{}utf16be.json"{}},\ \ \ \textcolor{keyword}{false});}
+\DoxyCodeLine{00295\ \ \ \ \ TestEncodedOutputStream<UTF16BE<>,\ \ \mbox{\hyperlink{struct_u_t_f16}{UTF16<>}}\ >(\textcolor{stringliteral}{"{}utf16bebom.json"{}},\textcolor{keyword}{true});}
+\DoxyCodeLine{00296\ \ \ \ \ TestEncodedOutputStream<UTF32LE<>,\ \ \mbox{\hyperlink{struct_u_t_f32}{UTF32<>}}\ >(\textcolor{stringliteral}{"{}utf32le.json"{}},\ \ \ \textcolor{keyword}{false});}
+\DoxyCodeLine{00297\ \ \ \ \ TestEncodedOutputStream<UTF32LE<>,\ \ \mbox{\hyperlink{struct_u_t_f32}{UTF32<>}}\ >(\textcolor{stringliteral}{"{}utf32lebom.json"{}},\textcolor{keyword}{true});}
+\DoxyCodeLine{00298\ \ \ \ \ TestEncodedOutputStream<UTF32BE<>,\ \ \mbox{\hyperlink{struct_u_t_f32}{UTF32<>}}\ >(\textcolor{stringliteral}{"{}utf32be.json"{}},\ \ \ \textcolor{keyword}{false});}
+\DoxyCodeLine{00299\ \ \ \ \ TestEncodedOutputStream<UTF32BE<>,\ \ \mbox{\hyperlink{struct_u_t_f32}{UTF32<>}}\ >(\textcolor{stringliteral}{"{}utf32bebom.json"{}},\textcolor{keyword}{true});}
+\DoxyCodeLine{00300\ \}}
+
+\end{DoxyCode}

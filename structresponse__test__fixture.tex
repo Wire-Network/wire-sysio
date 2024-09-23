@@ -1,0 +1,213 @@
+\doxysection{response\+\_\+test\+\_\+fixture Struct Reference}
+\hypertarget{structresponse__test__fixture}{}\label{structresponse__test__fixture}\index{response\_test\_fixture@{response\_test\_fixture}}
+
+
+Collaboration diagram for response\+\_\+test\+\_\+fixture\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structresponse__test__fixture__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structresponse__test__fixture_1_1mock__data__handler__provider}{mock\+\_\+data\+\_\+handler\+\_\+provider}}
+\item 
+struct \mbox{\hyperlink{structresponse__test__fixture_1_1mock__logfile__provider}{mock\+\_\+logfile\+\_\+provider}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{structresponse__test__fixture_ae1dc0c9cf1c2a6753b3d6cbb13791847}{response\+\_\+impl\+\_\+type}} = \mbox{\hyperlink{classsysio_1_1trace__api_1_1request__handler}{request\+\_\+handler}}$<$\mbox{\hyperlink{structresponse__test__fixture_1_1mock__logfile__provider}{mock\+\_\+logfile\+\_\+provider}}, \mbox{\hyperlink{structresponse__test__fixture_1_1mock__data__handler__provider}{mock\+\_\+data\+\_\+handler\+\_\+provider}}$>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structresponse__test__fixture_a952dd2ed5ac1f938f27a95fbb42e100f}{response\+\_\+test\+\_\+fixture}} ()
+\item 
+\mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \mbox{\hyperlink{structresponse__test__fixture_ac1418754bb5be9a8ef8019454b07dcaa}{get\+\_\+block\+\_\+trace}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} block\+\_\+height, const \mbox{\hyperlink{namespacesysio_1_1trace__api_a24d1d2b642518b3d627011e7ef39ae9a}{yield\+\_\+function}} \&yield=\{\})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::function$<$ \mbox{\hyperlink{namespacesysio_1_1trace__api_a4fe812fd823fbfebfe869a30ef75a248}{get\+\_\+block\+\_\+t}}(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}, const \mbox{\hyperlink{namespacesysio_1_1trace__api_a24d1d2b642518b3d627011e7ef39ae9a}{yield\+\_\+function}} \&)$>$ \mbox{\hyperlink{structresponse__test__fixture_ac06be021bdeb4334dfbc8dacda756279}{mock\+\_\+get\+\_\+block}}
+\item 
+std\+::function$<$ std\+::tuple$<$ \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}}, std\+::optional$<$ \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} $>$ $>$(const \mbox{\hyperlink{structsysio_1_1trace__api_1_1action__trace__v0}{action\+\_\+trace\+\_\+v0}} \&, const \mbox{\hyperlink{namespacesysio_1_1trace__api_a24d1d2b642518b3d627011e7ef39ae9a}{yield\+\_\+function}} \&)$>$ \mbox{\hyperlink{structresponse__test__fixture_a9c9ae6076361a7eaad8bf773897f67e4}{mock\+\_\+data\+\_\+handler\+\_\+v0}} = \mbox{\hyperlink{structresponse__test__fixture_a96d43bd6dadb563a6c1c94bfc0ee4377}{default\+\_\+mock\+\_\+data\+\_\+handler\+\_\+v0}}
+\item 
+std\+::function$<$ std\+::tuple$<$ \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}}, std\+::optional$<$ \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} $>$ $>$(const \mbox{\hyperlink{structsysio_1_1trace__api_1_1action__trace__v1}{action\+\_\+trace\+\_\+v1}} \&, const \mbox{\hyperlink{namespacesysio_1_1trace__api_a24d1d2b642518b3d627011e7ef39ae9a}{yield\+\_\+function}} \&)$>$ \mbox{\hyperlink{structresponse__test__fixture_a1e8bf5db5d2c7f2f08b91a649b7d29f4}{mock\+\_\+data\+\_\+handler\+\_\+v1}} = \mbox{\hyperlink{structresponse__test__fixture_a232f5a2ea35a53f80ec51e46e799e19f}{default\+\_\+mock\+\_\+data\+\_\+handler\+\_\+v1}}
+\item 
+\mbox{\hyperlink{structresponse__test__fixture_ae1dc0c9cf1c2a6753b3d6cbb13791847}{response\+\_\+impl\+\_\+type}} \mbox{\hyperlink{structresponse__test__fixture_a052fb72e93663f57e055060a5b89a722}{response\+\_\+impl}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static constexpr auto \mbox{\hyperlink{structresponse__test__fixture_a96d43bd6dadb563a6c1c94bfc0ee4377}{default\+\_\+mock\+\_\+data\+\_\+handler\+\_\+v0}}
+\item 
+static constexpr auto \mbox{\hyperlink{structresponse__test__fixture_a232f5a2ea35a53f80ec51e46e799e19f}{default\+\_\+mock\+\_\+data\+\_\+handler\+\_\+v1}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{test__responses_8cpp_source_l00013}{13}} of file \mbox{\hyperlink{test__responses_8cpp_source}{test\+\_\+responses.\+cpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{structresponse__test__fixture_ae1dc0c9cf1c2a6753b3d6cbb13791847}\index{response\_test\_fixture@{response\_test\_fixture}!response\_impl\_type@{response\_impl\_type}}
+\index{response\_impl\_type@{response\_impl\_type}!response\_test\_fixture@{response\_test\_fixture}}
+\doxysubsubsection{\texorpdfstring{response\_impl\_type}{response\_impl\_type}}
+{\footnotesize\ttfamily \label{structresponse__test__fixture_ae1dc0c9cf1c2a6753b3d6cbb13791847} 
+using \mbox{\hyperlink{structresponse__test__fixture_ae1dc0c9cf1c2a6753b3d6cbb13791847}{response\+\_\+test\+\_\+fixture\+::response\+\_\+impl\+\_\+type}} = \mbox{\hyperlink{classsysio_1_1trace__api_1_1request__handler}{request\+\_\+handler}}$<$\mbox{\hyperlink{structresponse__test__fixture_1_1mock__logfile__provider}{mock\+\_\+logfile\+\_\+provider}}, \mbox{\hyperlink{structresponse__test__fixture_1_1mock__data__handler__provider}{mock\+\_\+data\+\_\+handler\+\_\+provider}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{test__responses_8cpp_source_l00061}{61}} of file \mbox{\hyperlink{test__responses_8cpp_source}{test\+\_\+responses.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structresponse__test__fixture_a952dd2ed5ac1f938f27a95fbb42e100f}\index{response\_test\_fixture@{response\_test\_fixture}!response\_test\_fixture@{response\_test\_fixture}}
+\index{response\_test\_fixture@{response\_test\_fixture}!response\_test\_fixture@{response\_test\_fixture}}
+\doxysubsubsection{\texorpdfstring{response\_test\_fixture()}{response\_test\_fixture()}}
+{\footnotesize\ttfamily \label{structresponse__test__fixture_a952dd2ed5ac1f938f27a95fbb42e100f} 
+response\+\_\+test\+\_\+fixture\+::response\+\_\+test\+\_\+fixture (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+TODO\+: initialize extraction implementation here with {\ttfamily \doxylink{structresponse__test__fixture_1_1mock__logfile__provider}{mock\+\_\+logfile\+\_\+provider}} as template param 
+
+Definition at line \mbox{\hyperlink{test__responses_8cpp_source_l00065}{65}} of file \mbox{\hyperlink{test__responses_8cpp_source}{test\+\_\+responses.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00066\ \ \ \ :\ \mbox{\hyperlink{structresponse__test__fixture_a052fb72e93663f57e055060a5b89a722}{response\_impl}}(mock\_logfile\_provider(*\textcolor{keyword}{this}),\ mock\_data\_handler\_provider(*\textcolor{keyword}{this}),}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [](\textcolor{keyword}{const}\ std::string\&\ msg\ )\{\ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\ \mbox{\hyperlink{classfc_1_1logger_a4e12ef2e794551d593e497b4b90601ab}{fc::logger::get}}(\mbox{\hyperlink{logger_8hpp_a8c7a288fea519c7e895518f8dff4888f}{DEFAULT\_LOGGER}}),\ msg\ );\})}
+\DoxyCodeLine{00068\ \ \ \ \{}
+\DoxyCodeLine{00069\ }
+\DoxyCodeLine{00070\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structresponse__test__fixture_a952dd2ed5ac1f938f27a95fbb42e100f_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structresponse__test__fixture_ac1418754bb5be9a8ef8019454b07dcaa}\index{response\_test\_fixture@{response\_test\_fixture}!get\_block\_trace@{get\_block\_trace}}
+\index{get\_block\_trace@{get\_block\_trace}!response\_test\_fixture@{response\_test\_fixture}}
+\doxysubsubsection{\texorpdfstring{get\_block\_trace()}{get\_block\_trace()}}
+{\footnotesize\ttfamily \label{structresponse__test__fixture_ac1418754bb5be9a8ef8019454b07dcaa} 
+\mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} response\+\_\+test\+\_\+fixture\+::get\+\_\+block\+\_\+trace (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{block\+\_\+height}{, }\item[{const \mbox{\hyperlink{namespacesysio_1_1trace__api_a24d1d2b642518b3d627011e7ef39ae9a}{yield\+\_\+function}} \&}]{yield}{ = {\ttfamily \{\}}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{test__responses_8cpp_source_l00072}{72}} of file \mbox{\hyperlink{test__responses_8cpp_source}{test\+\_\+responses.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\}\ )\ \{}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structresponse__test__fixture_a052fb72e93663f57e055060a5b89a722}{response\_impl}}.\mbox{\hyperlink{classsysio_1_1trace__api_1_1request__handler_a8c834f0e13d54dd42ac3c6d2e978793f}{get\_block\_trace}}(\ block\_height,\ yield\ );}
+\DoxyCodeLine{00074\ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structresponse__test__fixture_a96d43bd6dadb563a6c1c94bfc0ee4377}\index{response\_test\_fixture@{response\_test\_fixture}!default\_mock\_data\_handler\_v0@{default\_mock\_data\_handler\_v0}}
+\index{default\_mock\_data\_handler\_v0@{default\_mock\_data\_handler\_v0}!response\_test\_fixture@{response\_test\_fixture}}
+\doxysubsubsection{\texorpdfstring{default\_mock\_data\_handler\_v0}{default\_mock\_data\_handler\_v0}}
+{\footnotesize\ttfamily \label{structresponse__test__fixture_a96d43bd6dadb563a6c1c94bfc0ee4377} 
+auto response\+\_\+test\+\_\+fixture\+::default\+\_\+mock\+\_\+data\+\_\+handler\+\_\+v0\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=\ [](\textcolor{keyword}{const}\ action\_trace\_v0\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1trace__api_a24d1d2b642518b3d627011e7ef39ae9a}{yield\_function}}\&)\ -\/>std::tuple<\mbox{\hyperlink{classfc_1_1variant}{fc::variant}},\ std::optional<fc::variant>>\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{\mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}()(\textcolor{stringliteral}{"{}hex"{}}\ ,\ \mbox{\hyperlink{namespacefc_aab567c89004d329f560014d9943afcd6}{fc::to\_hex}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.data.data(),\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.data.size())),\{\}\};}
+\DoxyCodeLine{\ \ \ \}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{test__responses_8cpp_source_l00035}{35}} of file \mbox{\hyperlink{test__responses_8cpp_source}{test\+\_\+responses.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{\mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}()(\textcolor{stringliteral}{"{}hex"{}}\ ,\ \mbox{\hyperlink{namespacefc_aab567c89004d329f560014d9943afcd6}{fc::to\_hex}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.data.data(),\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.data.size())),\{\}\};}
+\DoxyCodeLine{00037\ \ \ \ \};}
+
+\end{DoxyCode}
+\Hypertarget{structresponse__test__fixture_a232f5a2ea35a53f80ec51e46e799e19f}\index{response\_test\_fixture@{response\_test\_fixture}!default\_mock\_data\_handler\_v1@{default\_mock\_data\_handler\_v1}}
+\index{default\_mock\_data\_handler\_v1@{default\_mock\_data\_handler\_v1}!response\_test\_fixture@{response\_test\_fixture}}
+\doxysubsubsection{\texorpdfstring{default\_mock\_data\_handler\_v1}{default\_mock\_data\_handler\_v1}}
+{\footnotesize\ttfamily \label{structresponse__test__fixture_a232f5a2ea35a53f80ec51e46e799e19f} 
+auto response\+\_\+test\+\_\+fixture\+::default\+\_\+mock\+\_\+data\+\_\+handler\+\_\+v1\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=\ [](\textcolor{keyword}{const}\ action\_trace\_v1\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1trace__api_a24d1d2b642518b3d627011e7ef39ae9a}{yield\_function}}\&)\ -\/>\ std::tuple<\mbox{\hyperlink{classfc_1_1variant}{fc::variant}},\ std::optional<fc::variant>>\{}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{\mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}()(\textcolor{stringliteral}{"{}hex"{}}\ ,\ \mbox{\hyperlink{namespacefc_aab567c89004d329f560014d9943afcd6}{fc::to\_hex}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.data.data(),\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.data.size())),\ \{\mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}()(\textcolor{stringliteral}{"{}hex"{}}\ ,\ \mbox{\hyperlink{namespacefc_aab567c89004d329f560014d9943afcd6}{fc::to\_hex}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.return\_value.data(),\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.return\_value.size()))\}\};}
+\DoxyCodeLine{\ \ \ \}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{test__responses_8cpp_source_l00039}{39}} of file \mbox{\hyperlink{test__responses_8cpp_source}{test\+\_\+responses.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{\mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}()(\textcolor{stringliteral}{"{}hex"{}}\ ,\ \mbox{\hyperlink{namespacefc_aab567c89004d329f560014d9943afcd6}{fc::to\_hex}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.data.data(),\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.data.size())),\ \{\mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}()(\textcolor{stringliteral}{"{}hex"{}}\ ,\ \mbox{\hyperlink{namespacefc_aab567c89004d329f560014d9943afcd6}{fc::to\_hex}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.return\_value.data(),\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.return\_value.size()))\}\};}
+\DoxyCodeLine{00041\ \ \ \ \};}
+
+\end{DoxyCode}
+\Hypertarget{structresponse__test__fixture_a9c9ae6076361a7eaad8bf773897f67e4}\index{response\_test\_fixture@{response\_test\_fixture}!mock\_data\_handler\_v0@{mock\_data\_handler\_v0}}
+\index{mock\_data\_handler\_v0@{mock\_data\_handler\_v0}!response\_test\_fixture@{response\_test\_fixture}}
+\doxysubsubsection{\texorpdfstring{mock\_data\_handler\_v0}{mock\_data\_handler\_v0}}
+{\footnotesize\ttfamily \label{structresponse__test__fixture_a9c9ae6076361a7eaad8bf773897f67e4} 
+std\+::function$<$std\+::tuple$<$\mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}}, std\+::optional$<$\mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}}$>$ $>$(const \mbox{\hyperlink{structsysio_1_1trace__api_1_1action__trace__v0}{action\+\_\+trace\+\_\+v0}}\&, const \mbox{\hyperlink{namespacesysio_1_1trace__api_a24d1d2b642518b3d627011e7ef39ae9a}{yield\+\_\+function}}\&)$>$ response\+\_\+test\+\_\+fixture\+::mock\+\_\+data\+\_\+handler\+\_\+v0 = \mbox{\hyperlink{structresponse__test__fixture_a96d43bd6dadb563a6c1c94bfc0ee4377}{default\+\_\+mock\+\_\+data\+\_\+handler\+\_\+v0}}}
+
+
+
+Definition at line \mbox{\hyperlink{test__responses_8cpp_source_l00078}{78}} of file \mbox{\hyperlink{test__responses_8cpp_source}{test\+\_\+responses.\+cpp}}.
+
+\Hypertarget{structresponse__test__fixture_a1e8bf5db5d2c7f2f08b91a649b7d29f4}\index{response\_test\_fixture@{response\_test\_fixture}!mock\_data\_handler\_v1@{mock\_data\_handler\_v1}}
+\index{mock\_data\_handler\_v1@{mock\_data\_handler\_v1}!response\_test\_fixture@{response\_test\_fixture}}
+\doxysubsubsection{\texorpdfstring{mock\_data\_handler\_v1}{mock\_data\_handler\_v1}}
+{\footnotesize\ttfamily \label{structresponse__test__fixture_a1e8bf5db5d2c7f2f08b91a649b7d29f4} 
+std\+::function$<$std\+::tuple$<$\mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}}, std\+::optional$<$\mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}}$>$ $>$(const \mbox{\hyperlink{structsysio_1_1trace__api_1_1action__trace__v1}{action\+\_\+trace\+\_\+v1}}\&, const \mbox{\hyperlink{namespacesysio_1_1trace__api_a24d1d2b642518b3d627011e7ef39ae9a}{yield\+\_\+function}}\&)$>$ response\+\_\+test\+\_\+fixture\+::mock\+\_\+data\+\_\+handler\+\_\+v1 = \mbox{\hyperlink{structresponse__test__fixture_a232f5a2ea35a53f80ec51e46e799e19f}{default\+\_\+mock\+\_\+data\+\_\+handler\+\_\+v1}}}
+
+
+
+Definition at line \mbox{\hyperlink{test__responses_8cpp_source_l00079}{79}} of file \mbox{\hyperlink{test__responses_8cpp_source}{test\+\_\+responses.\+cpp}}.
+
+\Hypertarget{structresponse__test__fixture_ac06be021bdeb4334dfbc8dacda756279}\index{response\_test\_fixture@{response\_test\_fixture}!mock\_get\_block@{mock\_get\_block}}
+\index{mock\_get\_block@{mock\_get\_block}!response\_test\_fixture@{response\_test\_fixture}}
+\doxysubsubsection{\texorpdfstring{mock\_get\_block}{mock\_get\_block}}
+{\footnotesize\ttfamily \label{structresponse__test__fixture_ac06be021bdeb4334dfbc8dacda756279} 
+std\+::function$<$\mbox{\hyperlink{namespacesysio_1_1trace__api_a4fe812fd823fbfebfe869a30ef75a248}{get\+\_\+block\+\_\+t}}(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}, const \mbox{\hyperlink{namespacesysio_1_1trace__api_a24d1d2b642518b3d627011e7ef39ae9a}{yield\+\_\+function}}\&)$>$ response\+\_\+test\+\_\+fixture\+::mock\+\_\+get\+\_\+block}
+
+
+
+Definition at line \mbox{\hyperlink{test__responses_8cpp_source_l00077}{77}} of file \mbox{\hyperlink{test__responses_8cpp_source}{test\+\_\+responses.\+cpp}}.
+
+\Hypertarget{structresponse__test__fixture_a052fb72e93663f57e055060a5b89a722}\index{response\_test\_fixture@{response\_test\_fixture}!response\_impl@{response\_impl}}
+\index{response\_impl@{response\_impl}!response\_test\_fixture@{response\_test\_fixture}}
+\doxysubsubsection{\texorpdfstring{response\_impl}{response\_impl}}
+{\footnotesize\ttfamily \label{structresponse__test__fixture_a052fb72e93663f57e055060a5b89a722} 
+\mbox{\hyperlink{structresponse__test__fixture_ae1dc0c9cf1c2a6753b3d6cbb13791847}{response\+\_\+impl\+\_\+type}} response\+\_\+test\+\_\+fixture\+::response\+\_\+impl}
+
+
+
+Definition at line \mbox{\hyperlink{test__responses_8cpp_source_l00081}{81}} of file \mbox{\hyperlink{test__responses_8cpp_source}{test\+\_\+responses.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+plugins/trace\+\_\+api\+\_\+plugin/test/\mbox{\hyperlink{test__responses_8cpp}{test\+\_\+responses.\+cpp}}\end{DoxyCompactItemize}

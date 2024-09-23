@@ -1,0 +1,27 @@
+\doxysection{rand.\+cpp}
+\hypertarget{rand_8cpp_source}{}\label{rand_8cpp_source}\index{libraries/fc/src/crypto/rand.cpp@{libraries/fc/src/crypto/rand.cpp}}
+\mbox{\hyperlink{rand_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{rand_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <openssl/rand.h>}}
+\DoxyCodeLine{\Hypertarget{rand_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{openssl_8hpp}{fc/crypto/openssl.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{rand_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{exception_8hpp}{fc/exception/exception.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{rand_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{fwd__impl_8hpp}{fc/fwd\_impl.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{rand_8cpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{rand_8cpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{rand_8cpp_source_l00007}00007\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}\ \{}
+\DoxyCodeLine{\Hypertarget{rand_8cpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{rand_8cpp_source_l00009}\mbox{\hyperlink{namespacefc_a76f700374df97faaacb54ebe324ca384}{00009}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefc_a76f700374df97faaacb54ebe324ca384}{rand\_bytes}}(\textcolor{keywordtype}{char}*\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}})}
+\DoxyCodeLine{\Hypertarget{rand_8cpp_source_l00010}00010\ \{}
+\DoxyCodeLine{\Hypertarget{rand_8cpp_source_l00011}00011\ \ \ \textcolor{keywordtype}{int}\ result\ =\ RAND\_bytes((\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}});}
+\DoxyCodeLine{\Hypertarget{rand_8cpp_source_l00012}00012\ \ \ \textcolor{keywordflow}{if}\ (result\ !=\ 1)}
+\DoxyCodeLine{\Hypertarget{rand_8cpp_source_l00013}00013\ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a3a1fa84768603c99866fe61af96c9f36}{FC\_THROW}}(\textcolor{stringliteral}{"{}Error\ calling\ OpenSSL's\ RAND\_bytes():\ \$\{code\}"{}},\ (\textcolor{stringliteral}{"{}code"{}},\ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})ERR\_get\_error()));}
+\DoxyCodeLine{\Hypertarget{rand_8cpp_source_l00014}00014\ \}}
+\DoxyCodeLine{\Hypertarget{rand_8cpp_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{rand_8cpp_source_l00016}\mbox{\hyperlink{namespacefc_a8d34c190d618b348d9fa25849d2ff5c7}{00016}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefc_a8d34c190d618b348d9fa25849d2ff5c7}{rand\_pseudo\_bytes}}(\textcolor{keywordtype}{char}*\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}})}
+\DoxyCodeLine{\Hypertarget{rand_8cpp_source_l00017}00017\ \{}
+\DoxyCodeLine{\Hypertarget{rand_8cpp_source_l00018}00018\ \ \ \mbox{\hyperlink{namespacefc_a76f700374df97faaacb54ebe324ca384}{rand\_bytes}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}});}
+\DoxyCodeLine{\Hypertarget{rand_8cpp_source_l00019}00019\ \}}
+\DoxyCodeLine{\Hypertarget{rand_8cpp_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{rand_8cpp_source_l00021}00021\ \}\ \ \textcolor{comment}{//\ namespace\ fc}}
+
+\end{DoxyCode}

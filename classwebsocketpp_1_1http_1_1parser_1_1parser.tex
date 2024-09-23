@@ -1,0 +1,875 @@
+\doxysection{websocketpp\+::http\+::parser\+::parser Class Reference}
+\hypertarget{classwebsocketpp_1_1http_1_1parser_1_1parser}{}\label{classwebsocketpp_1_1http_1_1parser_1_1parser}\index{websocketpp::http::parser::parser@{websocketpp::http::parser::parser}}
+
+
+\doxylink{class_base}{Base} HTTP parser.  
+
+
+
+
+{\ttfamily \#include $<$parser.\+hpp$>$}
+
+
+
+Inheritance diagram for websocketpp\+::http\+::parser\+::parser\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=302pt]{classwebsocketpp_1_1http_1_1parser_1_1parser__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for websocketpp\+::http\+::parser\+::parser\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=259pt]{classwebsocketpp_1_1http_1_1parser_1_1parser__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a11bc97bfd504dd56ad7b8262a940a9c5}{parser}} ()
+\item 
+std\+::string const \& \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_aed5c11161d518d01856b1a88a3eee9ee}{get\+\_\+version}} () const
+\begin{DoxyCompactList}\small\item\em Get the HTTP version string. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a5c2e0e2bc0b2769db5a785b7d47a66ee}{set\+\_\+version}} (std\+::string const \&version)
+\begin{DoxyCompactList}\small\item\em Set HTTP parser Version. \end{DoxyCompactList}\item 
+std\+::string const \& \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_ae8a8f833c3fb01f1553a26e77f380367}{get\+\_\+header}} (std\+::string const \&key) const
+\begin{DoxyCompactList}\small\item\em Get the value of an HTTP header. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a42ab85c14bef2028d1e6f050af1140ce}{get\+\_\+header\+\_\+as\+\_\+plist}} (std\+::string const \&key, \mbox{\hyperlink{namespacewebsocketpp_1_1http_a2c285bc959df5a63bf962bed842fccfb}{parameter\+\_\+list}} \&out) const
+\begin{DoxyCompactList}\small\item\em Extract an HTTP parameter list from a parser header. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_abd39762de5ec467a29a537d79602b603}{append\+\_\+header}} (std\+::string const \&key, std\+::string const \&val)
+\begin{DoxyCompactList}\small\item\em Append a value to an existing HTTP header. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_aba2991b2aa41ca60d9427950502b0b93}{replace\+\_\+header}} (std\+::string const \&key, std\+::string const \&val)
+\begin{DoxyCompactList}\small\item\em Set a value for an HTTP header, replacing an existing value. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a64ff49a6a1ddbf70b9767874ffdd513e}{remove\+\_\+header}} (std\+::string const \&key)
+\begin{DoxyCompactList}\small\item\em Remove a header from the parser. \end{DoxyCompactList}\item 
+std\+::string const \& \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a41150a80d6c955b9bdac86dbd9b3d8e6}{get\+\_\+body}} () const
+\begin{DoxyCompactList}\small\item\em Get HTTP body. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a71a4989eaa0ca802cf77678d0ca2d70d}{set\+\_\+body}} (std\+::string const \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\begin{DoxyCompactList}\small\item\em Set body content. \end{DoxyCompactList}\item 
+size\+\_\+t \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_afa455a5f6dca3989ccd56a87181119f2}{get\+\_\+max\+\_\+body\+\_\+size}} () const
+\begin{DoxyCompactList}\small\item\em Get body size limit. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_ab6583e865254d1608732498d839d8385}{set\+\_\+max\+\_\+body\+\_\+size}} (size\+\_\+t \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\begin{DoxyCompactList}\small\item\em Set body size limit. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_af903e5538e362d9ac0aeaea3064aed0c}{parse\+\_\+parameter\+\_\+list}} (std\+::string const \&in, \mbox{\hyperlink{namespacewebsocketpp_1_1http_a2c285bc959df5a63bf962bed842fccfb}{parameter\+\_\+list}} \&out) const
+\begin{DoxyCompactList}\small\item\em Extract an HTTP parameter list from a string. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a4dbb443fd916f8b4306e7afdb2e8ff45}{process\+\_\+header}} (std\+::string\+::iterator begin, std\+::string\+::iterator end)
+\begin{DoxyCompactList}\small\item\em Process a header line. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_aabf5f8c33cad9202520337f8e2ed7aa5}{prepare\+\_\+body}} ()
+\begin{DoxyCompactList}\small\item\em Prepare the parser to begin parsing body data. \end{DoxyCompactList}\item 
+size\+\_\+t \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a3dc340d076f732092aed32c42d277503}{process\+\_\+body}} (char const \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}, size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})
+\begin{DoxyCompactList}\small\item\em Process body data. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a7d5eb3a888a59570d2b9cfcc3939bbd0}{body\+\_\+ready}} () const
+\begin{DoxyCompactList}\small\item\em Check if the parser is done parsing the body. \end{DoxyCompactList}\item 
+std\+::string \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_ad38cb09ac5ad2a2d9de65c6d34bb5875}{raw\+\_\+headers}} () const
+\begin{DoxyCompactList}\small\item\em Generate and return the HTTP headers as a string. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::string \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a3e8026fc40c96ca8bfa46a533e00d6a6}{m\+\_\+version}}
+\item 
+\mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_a4bb5b2821dab6a182bfe4c5415229e6e}{header\+\_\+list}} \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_ae75e1e6acd17cc5a5543f818a5355a50}{m\+\_\+headers}}
+\item 
+size\+\_\+t \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_ae82ee117b729da521de60401cd17f8d4}{m\+\_\+header\+\_\+bytes}}
+\item 
+std\+::string \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a2a552a4581ae26674fd6d566e5b332ee}{m\+\_\+body}}
+\item 
+size\+\_\+t \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a89e6a7583bee97f30c60dc88b4cd29dd}{m\+\_\+body\+\_\+bytes\+\_\+needed}}
+\item 
+size\+\_\+t \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a85613c9d20e308ff343449852b7e769f}{m\+\_\+body\+\_\+bytes\+\_\+max}}
+\item 
+\mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1body__encoding_a489de0413246f2f6d2d6a6605af16653}{body\+\_\+encoding\+::value}} \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a286e19d30028f6dbc295ad578e8e50d3}{m\+\_\+body\+\_\+encoding}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Includes methods and data elements common to all types of HTTP messages such as headers, versions, bodies, etc. 
+
+Definition at line \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00398}{398}} of file \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classwebsocketpp_1_1http_1_1parser_1_1parser_a11bc97bfd504dd56ad7b8262a940a9c5}\index{websocketpp::http::parser::parser@{websocketpp::http::parser::parser}!parser@{parser}}
+\index{parser@{parser}!websocketpp::http::parser::parser@{websocketpp::http::parser::parser}}
+\doxysubsubsection{\texorpdfstring{parser()}{parser()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1http_1_1parser_1_1parser_a11bc97bfd504dd56ad7b8262a940a9c5} 
+websocketpp\+::http\+::parser\+::parser\+::parser (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00400}{400}} of file \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00401\ \ \ \ \ \ \ :\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_ae82ee117b729da521de60401cd17f8d4}{m\_header\_bytes}}(0)}
+\DoxyCodeLine{00402\ \ \ \ \ \ \ ,\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a89e6a7583bee97f30c60dc88b4cd29dd}{m\_body\_bytes\_needed}}(0)}
+\DoxyCodeLine{00403\ \ \ \ \ \ \ ,\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a85613c9d20e308ff343449852b7e769f}{m\_body\_bytes\_max}}(\mbox{\hyperlink{namespacewebsocketpp_1_1http_a0cc54432842e22de04c4985cba23f54f}{max\_body\_size}})}
+\DoxyCodeLine{00404\ \ \ \ \ \ \ ,\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a286e19d30028f6dbc295ad578e8e50d3}{m\_body\_encoding}}(\mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1body__encoding_a489de0413246f2f6d2d6a6605af16653ac8ecc94a1f7b48372ee0e3b1d4f56aee}{body\_encoding::unknown}})\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classwebsocketpp_1_1http_1_1parser_1_1parser_abd39762de5ec467a29a537d79602b603}\index{websocketpp::http::parser::parser@{websocketpp::http::parser::parser}!append\_header@{append\_header}}
+\index{append\_header@{append\_header}!websocketpp::http::parser::parser@{websocketpp::http::parser::parser}}
+\doxysubsubsection{\texorpdfstring{append\_header()}{append\_header()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1http_1_1parser_1_1parser_abd39762de5ec467a29a537d79602b603} 
+void websocketpp\+::http\+::parser\+::parser\+::append\+\_\+header (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{key}{, }\item[{std\+::string const \&}]{val}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+This method will set the value of the HTTP header {\ttfamily key} with the indicated value. If a header with the name {\ttfamily key} already exists, {\ttfamily val} will be appended to the existing value.
+
+\begin{DoxyRefDesc}{Todo}
+\item[\mbox{\hyperlink{todo__todo000017}{Todo}}]Make this method case insensitive. 
+
+Should there be any restrictions on which keys are allowed? 
+
+Exception free varient\end{DoxyRefDesc}
+
+
+\begin{DoxySeeAlso}{See also}
+\doxylink{classwebsocketpp_1_1http_1_1parser_1_1parser_aba2991b2aa41ca60d9427950502b0b93}{replace\+\_\+header}
+\end{DoxySeeAlso}
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em key} & The name/key of the header to append to. \\
+\hline
+\mbox{\texttt{ in}}  & {\em val} & The value to append. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2impl_2parser_8hpp_source_l00067}{67}} of file \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2impl_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00069\ \{}
+\DoxyCodeLine{00070\ \ \ \ \ \textcolor{keywordflow}{if}\ (std::find\_if(key.begin(),key.end(),\mbox{\hyperlink{namespacewebsocketpp_1_1http_a45a9b60b72b68de7b32fb75d89ad4c04}{is\_not\_token\_char}})\ !=\ key.end())\ \{}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ exception(\textcolor{stringliteral}{"{}Invalid\ header\ name"{}},\mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1status__code_ae0d61c309e053ee5673517b54e2886c6a089057bc2b6afc67f712c9888e2553a3}{status\_code::bad\_request}});}
+\DoxyCodeLine{00072\ \ \ \ \ \}}
+\DoxyCodeLine{00073\ }
+\DoxyCodeLine{00074\ \ \ \ \ \textcolor{keywordflow}{if}\ (this-\/>\mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_ae8a8f833c3fb01f1553a26e77f380367}{get\_header}}(key).empty())\ \{}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_ae75e1e6acd17cc5a5543f818a5355a50}{m\_headers}}[\mbox{\hyperlink{yubico__otp_8c_a9246c20bb98ad2b4c60313c053c70f08}{key}}]\ =\ val;}
+\DoxyCodeLine{00076\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_ae75e1e6acd17cc5a5543f818a5355a50}{m\_headers}}[\mbox{\hyperlink{yubico__otp_8c_a9246c20bb98ad2b4c60313c053c70f08}{key}}]\ +=\ \textcolor{stringliteral}{"{},\ "{}}\ +\ val;}
+\DoxyCodeLine{00078\ \ \ \ \ \}}
+\DoxyCodeLine{00079\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=332pt]{classwebsocketpp_1_1http_1_1parser_1_1parser_abd39762de5ec467a29a537d79602b603_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1http_1_1parser_1_1parser_abd39762de5ec467a29a537d79602b603_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1http_1_1parser_1_1parser_a7d5eb3a888a59570d2b9cfcc3939bbd0}\index{websocketpp::http::parser::parser@{websocketpp::http::parser::parser}!body\_ready@{body\_ready}}
+\index{body\_ready@{body\_ready}!websocketpp::http::parser::parser@{websocketpp::http::parser::parser}}
+\doxysubsubsection{\texorpdfstring{body\_ready()}{body\_ready()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1http_1_1parser_1_1parser_a7d5eb3a888a59570d2b9cfcc3939bbd0} 
+bool websocketpp\+::http\+::parser\+::parser\+::body\+\_\+ready (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+Behavior before a call to {\ttfamily prepare\+\_\+body} is undefined.
+
+\begin{DoxySince}{Since}
+0.\+5.\+0
+\end{DoxySince}
+\begin{DoxyReturn}{Returns}
+True if the message body has been completed loaded. 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00589}{589}} of file \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00589\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00590\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (\mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a89e6a7583bee97f30c60dc88b4cd29dd}{m\_body\_bytes\_needed}}\ ==\ 0);}
+\DoxyCodeLine{00591\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1http_1_1parser_1_1parser_a7d5eb3a888a59570d2b9cfcc3939bbd0_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1http_1_1parser_1_1parser_a41150a80d6c955b9bdac86dbd9b3d8e6}\index{websocketpp::http::parser::parser@{websocketpp::http::parser::parser}!get\_body@{get\_body}}
+\index{get\_body@{get\_body}!websocketpp::http::parser::parser@{websocketpp::http::parser::parser}}
+\doxysubsubsection{\texorpdfstring{get\_body()}{get\_body()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1http_1_1parser_1_1parser_a41150a80d6c955b9bdac86dbd9b3d8e6} 
+std\+::string const  \& websocketpp\+::http\+::parser\+::parser\+::get\+\_\+body (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+Gets the body of the HTTP object
+
+\begin{DoxyReturn}{Returns}
+The body of the HTTP message. 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00495}{495}} of file \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00495\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00496\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a2a552a4581ae26674fd6d566e5b332ee}{m\_body}};}
+\DoxyCodeLine{00497\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1http_1_1parser_1_1parser_ae8a8f833c3fb01f1553a26e77f380367}\index{websocketpp::http::parser::parser@{websocketpp::http::parser::parser}!get\_header@{get\_header}}
+\index{get\_header@{get\_header}!websocketpp::http::parser::parser@{websocketpp::http::parser::parser}}
+\doxysubsubsection{\texorpdfstring{get\_header()}{get\_header()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1http_1_1parser_1_1parser_ae8a8f833c3fb01f1553a26e77f380367} 
+std\+::string const  \& websocketpp\+::http\+::parser\+::parser\+::get\+\_\+header (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{key}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+\begin{DoxyRefDesc}{Todo}
+\item[\mbox{\hyperlink{todo__todo000016}{Todo}}]Make this method case insensitive.\end{DoxyRefDesc}
+
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em key} & The name/key of the header to get. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The value associated with the given HTTP header key. 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2impl_2parser_8hpp_source_l00045}{45}} of file \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2impl_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00046\ \ \ \ \ header\_list::const\_iterator\ h\ =\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_ae75e1e6acd17cc5a5543f818a5355a50}{m\_headers}}.find(key);}
+\DoxyCodeLine{00047\ }
+\DoxyCodeLine{00048\ \ \ \ \ \textcolor{keywordflow}{if}\ (h\ ==\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_ae75e1e6acd17cc5a5543f818a5355a50}{m\_headers}}.end())\ \{}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ empty\_header;}
+\DoxyCodeLine{00050\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ h-\/>second;}
+\DoxyCodeLine{00052\ \ \ \ \ \}}
+\DoxyCodeLine{00053\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1http_1_1parser_1_1parser_ae8a8f833c3fb01f1553a26e77f380367_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1http_1_1parser_1_1parser_a42ab85c14bef2028d1e6f050af1140ce}\index{websocketpp::http::parser::parser@{websocketpp::http::parser::parser}!get\_header\_as\_plist@{get\_header\_as\_plist}}
+\index{get\_header\_as\_plist@{get\_header\_as\_plist}!websocketpp::http::parser::parser@{websocketpp::http::parser::parser}}
+\doxysubsubsection{\texorpdfstring{get\_header\_as\_plist()}{get\_header\_as\_plist()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1http_1_1parser_1_1parser_a42ab85c14bef2028d1e6f050af1140ce} 
+bool websocketpp\+::http\+::parser\+::parser\+::get\+\_\+header\+\_\+as\+\_\+plist (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{key}{, }\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1http_a2c285bc959df5a63bf962bed842fccfb}{parameter\+\_\+list}} \&}]{out}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+If the header requested doesn\textquotesingle{}t exist or exists and is empty the parameter list is valid (but empty).
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em key} & The name/key of the HTTP header to use as input. \\
+\hline
+\mbox{\texttt{ out}}  & {\em out} & The parameter list to store extracted parameters in. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Whether or not the input was a valid parameter list. 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2impl_2parser_8hpp_source_l00055}{55}} of file \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2impl_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00057\ \{}
+\DoxyCodeLine{00058\ \ \ \ \ header\_list::const\_iterator\ it\ =\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_ae75e1e6acd17cc5a5543f818a5355a50}{m\_headers}}.find(key);}
+\DoxyCodeLine{00059\ }
+\DoxyCodeLine{00060\ \ \ \ \ \textcolor{keywordflow}{if}\ (it\ ==\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_ae75e1e6acd17cc5a5543f818a5355a50}{m\_headers}}.end()\ ||\ it-\/>second.size()\ ==\ 0)\ \{}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00062\ \ \ \ \ \}}
+\DoxyCodeLine{00063\ }
+\DoxyCodeLine{00064\ \ \ \ \ \textcolor{keywordflow}{return}\ this-\/>\mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_af903e5538e362d9ac0aeaea3064aed0c}{parse\_parameter\_list}}(it-\/>second,out);}
+\DoxyCodeLine{00065\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1http_1_1parser_1_1parser_a42ab85c14bef2028d1e6f050af1140ce_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1http_1_1parser_1_1parser_afa455a5f6dca3989ccd56a87181119f2}\index{websocketpp::http::parser::parser@{websocketpp::http::parser::parser}!get\_max\_body\_size@{get\_max\_body\_size}}
+\index{get\_max\_body\_size@{get\_max\_body\_size}!websocketpp::http::parser::parser@{websocketpp::http::parser::parser}}
+\doxysubsubsection{\texorpdfstring{get\_max\_body\_size()}{get\_max\_body\_size()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1http_1_1parser_1_1parser_afa455a5f6dca3989ccd56a87181119f2} 
+size\+\_\+t websocketpp\+::http\+::parser\+::parser\+::get\+\_\+max\+\_\+body\+\_\+size (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+Retrieves the maximum number of bytes to parse \& buffer before canceling a request.
+
+\begin{DoxySince}{Since}
+0.\+5.\+0
+\end{DoxySince}
+\begin{DoxyReturn}{Returns}
+The maximum length of a message body. 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00519}{519}} of file \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00519\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00520\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a85613c9d20e308ff343449852b7e769f}{m\_body\_bytes\_max}};}
+\DoxyCodeLine{00521\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1http_1_1parser_1_1parser_aed5c11161d518d01856b1a88a3eee9ee}\index{websocketpp::http::parser::parser@{websocketpp::http::parser::parser}!get\_version@{get\_version}}
+\index{get\_version@{get\_version}!websocketpp::http::parser::parser@{websocketpp::http::parser::parser}}
+\doxysubsubsection{\texorpdfstring{get\_version()}{get\_version()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1http_1_1parser_1_1parser_aed5c11161d518d01856b1a88a3eee9ee} 
+std\+::string const  \& websocketpp\+::http\+::parser\+::parser\+::get\+\_\+version (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+\begin{DoxyReturn}{Returns}
+The version string for this parser 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00410}{410}} of file \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00410\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00411\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a3e8026fc40c96ca8bfa46a533e00d6a6}{m\_version}};}
+\DoxyCodeLine{00412\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=348pt]{classwebsocketpp_1_1http_1_1parser_1_1parser_aed5c11161d518d01856b1a88a3eee9ee_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1http_1_1parser_1_1parser_af903e5538e362d9ac0aeaea3064aed0c}\index{websocketpp::http::parser::parser@{websocketpp::http::parser::parser}!parse\_parameter\_list@{parse\_parameter\_list}}
+\index{parse\_parameter\_list@{parse\_parameter\_list}!websocketpp::http::parser::parser@{websocketpp::http::parser::parser}}
+\doxysubsubsection{\texorpdfstring{parse\_parameter\_list()}{parse\_parameter\_list()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1http_1_1parser_1_1parser_af903e5538e362d9ac0aeaea3064aed0c} 
+bool websocketpp\+::http\+::parser\+::parser\+::parse\+\_\+parameter\+\_\+list (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{in}{, }\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1http_a2c285bc959df5a63bf962bed842fccfb}{parameter\+\_\+list}} \&}]{out}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em in} & The input string. \\
+\hline
+\mbox{\texttt{ out}}  & {\em out} & The parameter list to store extracted parameters in. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Whether or not the input was a valid parameter list. 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2impl_2parser_8hpp_source_l00107}{107}} of file \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2impl_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00109\ \{}
+\DoxyCodeLine{00110\ \ \ \ \ \textcolor{keywordflow}{if}\ (in.size()\ ==\ 0)\ \{}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00112\ \ \ \ \ \}}
+\DoxyCodeLine{00113\ }
+\DoxyCodeLine{00114\ \ \ \ \ std::string::const\_iterator\ it;}
+\DoxyCodeLine{00115\ \ \ \ \ it\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_adabfd491d364be43bee4c7cad63e7e08}{extract\_parameters}}(in.begin(),in.end(),out);}
+\DoxyCodeLine{00116\ \ \ \ \ \textcolor{keywordflow}{return}\ (it\ ==\ in.begin());}
+\DoxyCodeLine{00117\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1http_1_1parser_1_1parser_af903e5538e362d9ac0aeaea3064aed0c_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=324pt]{classwebsocketpp_1_1http_1_1parser_1_1parser_af903e5538e362d9ac0aeaea3064aed0c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1http_1_1parser_1_1parser_aabf5f8c33cad9202520337f8e2ed7aa5}\index{websocketpp::http::parser::parser@{websocketpp::http::parser::parser}!prepare\_body@{prepare\_body}}
+\index{prepare\_body@{prepare\_body}!websocketpp::http::parser::parser@{websocketpp::http::parser::parser}}
+\doxysubsubsection{\texorpdfstring{prepare\_body()}{prepare\_body()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1http_1_1parser_1_1parser_aabf5f8c33cad9202520337f8e2ed7aa5} 
+bool websocketpp\+::http\+::parser\+::parser\+::prepare\+\_\+body (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+Inspects headers to determine if the message has a body that needs to be read. If so, sets up the necessary state, otherwise returns false. If this method returns true and loading the message body is desired call {\ttfamily process\+\_\+body} until it returns zero bytes or an error.
+
+Must not be called until after all headers have been processed.
+
+\begin{DoxySince}{Since}
+0.\+5.\+0
+\end{DoxySince}
+\begin{DoxyReturn}{Returns}
+True if more bytes are needed to load the body, false otherwise. 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2impl_2parser_8hpp_source_l00119}{119}} of file \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2impl_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00120\ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_ae8a8f833c3fb01f1553a26e77f380367}{get\_header}}(\textcolor{stringliteral}{"{}Content-\/Length"{}}).empty())\ \{}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ std::string\ \textcolor{keyword}{const}\ \&\ cl\_header\ =\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_ae8a8f833c3fb01f1553a26e77f380367}{get\_header}}(\textcolor{stringliteral}{"{}Content-\/Length"{}});}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ *\ end;}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ TODO:\ not\ 100\%\ sure\ what\ the\ compatibility\ of\ this\ method\ is.\ Also,}}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ I\ believe\ this\ will\ only\ work\ up\ to\ 32bit\ sizes.\ Is\ there\ a\ need\ for}}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ >\ 4GiB\ HTTP\ payloads?}}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a89e6a7583bee97f30c60dc88b4cd29dd}{m\_body\_bytes\_needed}}\ =\ std::strtoul(cl\_header.c\_str(),\&end,10);}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a89e6a7583bee97f30c60dc88b4cd29dd}{m\_body\_bytes\_needed}}\ >\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a85613c9d20e308ff343449852b7e769f}{m\_body\_bytes\_max}})\ \{}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ exception(\textcolor{stringliteral}{"{}HTTP\ message\ body\ too\ large"{}},}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1status__code_ae0d61c309e053ee5673517b54e2886c6a2be6cb895a653d5953623fbd2ede900a}{status\_code::request\_entity\_too\_large}});}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a286e19d30028f6dbc295ad578e8e50d3}{m\_body\_encoding}}\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1body__encoding_a489de0413246f2f6d2d6a6605af16653a4944f60330d88e9721ffff0aa499e243}{body\_encoding::plain}};}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00136\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_ae8a8f833c3fb01f1553a26e77f380367}{get\_header}}(\textcolor{stringliteral}{"{}Transfer-\/Encoding"{}})\ ==\ \textcolor{stringliteral}{"{}chunked"{}})\ \{}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ TODO}}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \textcolor{comment}{//m\_body\_encoding\ =\ body\_encoding::chunked;}}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00140\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00142\ \ \ \ \ \}}
+\DoxyCodeLine{00143\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1http_1_1parser_1_1parser_aabf5f8c33cad9202520337f8e2ed7aa5_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1http_1_1parser_1_1parser_aabf5f8c33cad9202520337f8e2ed7aa5_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1http_1_1parser_1_1parser_a3dc340d076f732092aed32c42d277503}\index{websocketpp::http::parser::parser@{websocketpp::http::parser::parser}!process\_body@{process\_body}}
+\index{process\_body@{process\_body}!websocketpp::http::parser::parser@{websocketpp::http::parser::parser}}
+\doxysubsubsection{\texorpdfstring{process\_body()}{process\_body()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1http_1_1parser_1_1parser_a3dc340d076f732092aed32c42d277503} 
+size\+\_\+t websocketpp\+::http\+::parser\+::parser\+::process\+\_\+body (\begin{DoxyParamCaption}\item[{char const \texorpdfstring{$\ast$}{*}}]{buf}{, }\item[{size\+\_\+t}]{len}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+Parses body data.
+
+\begin{DoxySince}{Since}
+0.\+5.\+0
+\end{DoxySince}
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em begin} & An iterator to the beginning of the sequence. \\
+\hline
+\mbox{\texttt{ in}}  & {\em end} & An iterator to the end of the sequence. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The number of bytes processed 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2impl_2parser_8hpp_source_l00145}{145}} of file \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2impl_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00146\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a286e19d30028f6dbc295ad578e8e50d3}{m\_body\_encoding}}\ ==\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1body__encoding_a489de0413246f2f6d2d6a6605af16653a4944f60330d88e9721ffff0aa499e243}{body\_encoding::plain}})\ \{}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ processed\ =\ (std::min)(\mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a89e6a7583bee97f30c60dc88b4cd29dd}{m\_body\_bytes\_needed}},\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}});}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a2a552a4581ae26674fd6d566e5b332ee}{m\_body}}.append(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},processed);}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a89e6a7583bee97f30c60dc88b4cd29dd}{m\_body\_bytes\_needed}}\ -\/=\ processed;}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ processed;}
+\DoxyCodeLine{00151\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a286e19d30028f6dbc295ad578e8e50d3}{m\_body\_encoding}}\ ==\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1body__encoding_a489de0413246f2f6d2d6a6605af16653a2a886acf8fdd62685b0e6f9ab43c7381}{body\_encoding::chunked}})\ \{}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ TODO:\ }}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ exception(\textcolor{stringliteral}{"{}Unexpected\ body\ encoding"{}},}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1status__code_ae0d61c309e053ee5673517b54e2886c6aff5b07f0195981e0c62dbe9a82bc7dc0}{status\_code::internal\_server\_error}});}
+\DoxyCodeLine{00155\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ exception(\textcolor{stringliteral}{"{}Unexpected\ body\ encoding"{}},}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1status__code_ae0d61c309e053ee5673517b54e2886c6aff5b07f0195981e0c62dbe9a82bc7dc0}{status\_code::internal\_server\_error}});}
+\DoxyCodeLine{00158\ \ \ \ \ \}}
+\DoxyCodeLine{00159\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1http_1_1parser_1_1parser_a3dc340d076f732092aed32c42d277503_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1http_1_1parser_1_1parser_a4dbb443fd916f8b4306e7afdb2e8ff45}\index{websocketpp::http::parser::parser@{websocketpp::http::parser::parser}!process\_header@{process\_header}}
+\index{process\_header@{process\_header}!websocketpp::http::parser::parser@{websocketpp::http::parser::parser}}
+\doxysubsubsection{\texorpdfstring{process\_header()}{process\_header()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1http_1_1parser_1_1parser_a4dbb443fd916f8b4306e7afdb2e8ff45} 
+void websocketpp\+::http\+::parser\+::parser\+::process\+\_\+header (\begin{DoxyParamCaption}\item[{std\+::string\+::iterator}]{begin}{, }\item[{std\+::string\+::iterator}]{end}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+\begin{DoxyRefDesc}{Todo}
+\item[\mbox{\hyperlink{todo__todo000020}{Todo}}]Update this method to be exception free.\end{DoxyRefDesc}
+
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em begin} & An iterator to the beginning of the sequence. \\
+\hline
+\mbox{\texttt{ in}}  & {\em end} & An iterator to the end of the sequence. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2impl_2parser_8hpp_source_l00161}{161}} of file \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2impl_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00163\ \{}
+\DoxyCodeLine{00164\ \ \ \ \ std::string::iterator\ cursor\ =\ std::search(}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ begin,}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ end,}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \ \ header\_separator,}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ header\_separator\ +\ \textcolor{keyword}{sizeof}(header\_separator)\ -\/\ 1}
+\DoxyCodeLine{00169\ \ \ \ \ );}
+\DoxyCodeLine{00170\ }
+\DoxyCodeLine{00171\ \ \ \ \ \textcolor{keywordflow}{if}\ (cursor\ ==\ end)\ \{}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ exception(\textcolor{stringliteral}{"{}Invalid\ header\ line"{}},\mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1status__code_ae0d61c309e053ee5673517b54e2886c6a089057bc2b6afc67f712c9888e2553a3}{status\_code::bad\_request}});}
+\DoxyCodeLine{00173\ \ \ \ \ \}}
+\DoxyCodeLine{00174\ }
+\DoxyCodeLine{00175\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_abd39762de5ec467a29a537d79602b603}{append\_header}}(\mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_ae656f7130716b25fb2a34cee77a0444e}{strip\_lws}}(std::string(begin,cursor)),}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_ae656f7130716b25fb2a34cee77a0444e}{strip\_lws}}(std::string(cursor+\textcolor{keyword}{sizeof}(header\_separator)-\/1,end)));}
+\DoxyCodeLine{00177\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1http_1_1parser_1_1parser_a4dbb443fd916f8b4306e7afdb2e8ff45_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1http_1_1parser_1_1parser_a4dbb443fd916f8b4306e7afdb2e8ff45_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1http_1_1parser_1_1parser_ad38cb09ac5ad2a2d9de65c6d34bb5875}\index{websocketpp::http::parser::parser@{websocketpp::http::parser::parser}!raw\_headers@{raw\_headers}}
+\index{raw\_headers@{raw\_headers}!websocketpp::http::parser::parser@{websocketpp::http::parser::parser}}
+\doxysubsubsection{\texorpdfstring{raw\_headers()}{raw\_headers()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1http_1_1parser_1_1parser_ad38cb09ac5ad2a2d9de65c6d34bb5875} 
+std\+::string websocketpp\+::http\+::parser\+::parser\+::raw\+\_\+headers (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+Each headers will be followed by the \textbackslash{}r~\newline
+ sequence including the last one. \doxylink{struct_a}{A} second \textbackslash{}r~\newline
+ sequence (blank header) is not appended by this method
+
+\begin{DoxyReturn}{Returns}
+The HTTP headers as a string. 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2impl_2parser_8hpp_source_l00179}{179}} of file \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2impl_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00180\ \ \ \ \ std::stringstream\ raw;}
+\DoxyCodeLine{00181\ }
+\DoxyCodeLine{00182\ \ \ \ \ header\_list::const\_iterator\ it;}
+\DoxyCodeLine{00183\ \ \ \ \ \textcolor{keywordflow}{for}\ (it\ =\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_ae75e1e6acd17cc5a5543f818a5355a50}{m\_headers}}.begin();\ it\ !=\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_ae75e1e6acd17cc5a5543f818a5355a50}{m\_headers}}.end();\ it++)\ \{}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ raw\ <<\ it-\/>first\ <<\ \textcolor{stringliteral}{"{}:\ "{}}\ <<\ it-\/>second\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)r\(\backslash\)n"{}};}
+\DoxyCodeLine{00185\ \ \ \ \ \}}
+\DoxyCodeLine{00186\ }
+\DoxyCodeLine{00187\ \ \ \ \ \textcolor{keywordflow}{return}\ raw.str();}
+\DoxyCodeLine{00188\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=348pt]{classwebsocketpp_1_1http_1_1parser_1_1parser_ad38cb09ac5ad2a2d9de65c6d34bb5875_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1http_1_1parser_1_1parser_a64ff49a6a1ddbf70b9767874ffdd513e}\index{websocketpp::http::parser::parser@{websocketpp::http::parser::parser}!remove\_header@{remove\_header}}
+\index{remove\_header@{remove\_header}!websocketpp::http::parser::parser@{websocketpp::http::parser::parser}}
+\doxysubsubsection{\texorpdfstring{remove\_header()}{remove\_header()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1http_1_1parser_1_1parser_a64ff49a6a1ddbf70b9767874ffdd513e} 
+void websocketpp\+::http\+::parser\+::parser\+::remove\+\_\+header (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{key}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Removes the header entirely from the parser. This is different than setting the value of the header to blank.
+
+\begin{DoxyRefDesc}{Todo}
+\item[\mbox{\hyperlink{todo__todo000019}{Todo}}]Make this method case insensitive.\end{DoxyRefDesc}
+
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em key} & The name/key of the header to remove. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2impl_2parser_8hpp_source_l00087}{87}} of file \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2impl_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00088\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_ae75e1e6acd17cc5a5543f818a5355a50}{m\_headers}}.erase(key);}
+\DoxyCodeLine{00089\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1http_1_1parser_1_1parser_a64ff49a6a1ddbf70b9767874ffdd513e_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1http_1_1parser_1_1parser_aba2991b2aa41ca60d9427950502b0b93}\index{websocketpp::http::parser::parser@{websocketpp::http::parser::parser}!replace\_header@{replace\_header}}
+\index{replace\_header@{replace\_header}!websocketpp::http::parser::parser@{websocketpp::http::parser::parser}}
+\doxysubsubsection{\texorpdfstring{replace\_header()}{replace\_header()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1http_1_1parser_1_1parser_aba2991b2aa41ca60d9427950502b0b93} 
+void websocketpp\+::http\+::parser\+::parser\+::replace\+\_\+header (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{key}{, }\item[{std\+::string const \&}]{val}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+This method will set the value of the HTTP header {\ttfamily key} with the indicated value. If a header with the name {\ttfamily key} already exists, {\ttfamily val} will replace the existing value.
+
+\begin{DoxyRefDesc}{Todo}
+\item[\mbox{\hyperlink{todo__todo000018}{Todo}}]Make this method case insensitive. 
+
+Should there be any restrictions on which keys are allowed? 
+
+Exception free varient\end{DoxyRefDesc}
+
+
+\begin{DoxySeeAlso}{See also}
+\doxylink{classwebsocketpp_1_1http_1_1parser_1_1parser_abd39762de5ec467a29a537d79602b603}{append\+\_\+header}
+\end{DoxySeeAlso}
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em key} & The name/key of the header to append to. \\
+\hline
+\mbox{\texttt{ in}}  & {\em val} & The value to append. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2impl_2parser_8hpp_source_l00081}{81}} of file \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2impl_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00083\ \{}
+\DoxyCodeLine{00084\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_ae75e1e6acd17cc5a5543f818a5355a50}{m\_headers}}[\mbox{\hyperlink{yubico__otp_8c_a9246c20bb98ad2b4c60313c053c70f08}{key}}]\ =\ val;}
+\DoxyCodeLine{00085\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1http_1_1parser_1_1parser_aba2991b2aa41ca60d9427950502b0b93_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1http_1_1parser_1_1parser_a71a4989eaa0ca802cf77678d0ca2d70d}\index{websocketpp::http::parser::parser@{websocketpp::http::parser::parser}!set\_body@{set\_body}}
+\index{set\_body@{set\_body}!websocketpp::http::parser::parser@{websocketpp::http::parser::parser}}
+\doxysubsubsection{\texorpdfstring{set\_body()}{set\_body()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1http_1_1parser_1_1parser_a71a4989eaa0ca802cf77678d0ca2d70d} 
+void websocketpp\+::http\+::parser\+::parser\+::set\+\_\+body (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Set the body content of the HTTP response to the parameter string. Note set\+\_\+body will also set the Content-\/\+Length HTTP header to the appropriate value. If you want the Content-\/\+Length header to be something else, do so via replace\+\_\+header("{}\+Content-\/\+Length"{}) after calling \doxylink{classwebsocketpp_1_1http_1_1parser_1_1parser_a71a4989eaa0ca802cf77678d0ca2d70d}{set\+\_\+body()}
+
+
+\begin{DoxyParams}{Parameters}
+{\em value} & String data to include as the body content. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2impl_2parser_8hpp_source_l00091}{91}} of file \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2impl_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00092\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}.size()\ ==\ 0)\ \{}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a64ff49a6a1ddbf70b9767874ffdd513e}{remove\_header}}(\textcolor{stringliteral}{"{}Content-\/Length"{}});}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a2a552a4581ae26674fd6d566e5b332ee}{m\_body}}.clear();}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00096\ \ \ \ \ \}}
+\DoxyCodeLine{00097\ }
+\DoxyCodeLine{00098\ \ \ \ \ \textcolor{comment}{//\ TODO:\ should\ this\ method\ respect\ the\ max\ size?\ If\ so\ how\ should\ errors}}
+\DoxyCodeLine{00099\ \ \ \ \ \textcolor{comment}{//\ be\ indicated?}}
+\DoxyCodeLine{00100\ }
+\DoxyCodeLine{00101\ \ \ \ \ std::stringstream\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}};}
+\DoxyCodeLine{00102\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ <<\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}.size();}
+\DoxyCodeLine{00103\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_aba2991b2aa41ca60d9427950502b0b93}{replace\_header}}(\textcolor{stringliteral}{"{}Content-\/Length"{}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}.str());}
+\DoxyCodeLine{00104\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a2a552a4581ae26674fd6d566e5b332ee}{m\_body}}\ =\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}};}
+\DoxyCodeLine{00105\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1http_1_1parser_1_1parser_a71a4989eaa0ca802cf77678d0ca2d70d_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1http_1_1parser_1_1parser_ab6583e865254d1608732498d839d8385}\index{websocketpp::http::parser::parser@{websocketpp::http::parser::parser}!set\_max\_body\_size@{set\_max\_body\_size}}
+\index{set\_max\_body\_size@{set\_max\_body\_size}!websocketpp::http::parser::parser@{websocketpp::http::parser::parser}}
+\doxysubsubsection{\texorpdfstring{set\_max\_body\_size()}{set\_max\_body\_size()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1http_1_1parser_1_1parser_ab6583e865254d1608732498d839d8385} 
+void websocketpp\+::http\+::parser\+::parser\+::set\+\_\+max\+\_\+body\+\_\+size (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Set the maximum number of bytes to parse and buffer before canceling a request.
+
+\begin{DoxySince}{Since}
+0.\+5.\+0
+\end{DoxySince}
+
+\begin{DoxyParams}{Parameters}
+{\em value} & The size to set the max body length to. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00532}{532}} of file \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00532\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00533\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a85613c9d20e308ff343449852b7e769f}{m\_body\_bytes\_max}}\ =\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}};}
+\DoxyCodeLine{00534\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1http_1_1parser_1_1parser_a5c2e0e2bc0b2769db5a785b7d47a66ee}\index{websocketpp::http::parser::parser@{websocketpp::http::parser::parser}!set\_version@{set\_version}}
+\index{set\_version@{set\_version}!websocketpp::http::parser::parser@{websocketpp::http::parser::parser}}
+\doxysubsubsection{\texorpdfstring{set\_version()}{set\_version()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1http_1_1parser_1_1parser_a5c2e0e2bc0b2769db5a785b7d47a66ee} 
+void websocketpp\+::http\+::parser\+::parser\+::set\+\_\+version (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{version}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Input should be in format\+: HTTP/x.\+y where x and y are positive integers. \begin{DoxyRefDesc}{Todo}
+\item[\mbox{\hyperlink{todo__todo000015}{Todo}}]Does this method need any validation?\end{DoxyRefDesc}
+
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em version} & The value to set the HTTP version to. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2impl_2parser_8hpp_source_l00041}{41}} of file \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2impl_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00042\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a3e8026fc40c96ca8bfa46a533e00d6a6}{m\_version}}\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1state_a12f378e0c6dbf373781e7988ee4a0853a08c88a938bc459c7997b48f74248752f}{version}};}
+\DoxyCodeLine{00043\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classwebsocketpp_1_1http_1_1parser_1_1parser_a2a552a4581ae26674fd6d566e5b332ee}\index{websocketpp::http::parser::parser@{websocketpp::http::parser::parser}!m\_body@{m\_body}}
+\index{m\_body@{m\_body}!websocketpp::http::parser::parser@{websocketpp::http::parser::parser}}
+\doxysubsubsection{\texorpdfstring{m\_body}{m\_body}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1http_1_1parser_1_1parser_a2a552a4581ae26674fd6d566e5b332ee} 
+std\+::string websocketpp\+::http\+::parser\+::parser\+::m\+\_\+body\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00607}{607}} of file \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source}{parser.\+hpp}}.
+
+\Hypertarget{classwebsocketpp_1_1http_1_1parser_1_1parser_a85613c9d20e308ff343449852b7e769f}\index{websocketpp::http::parser::parser@{websocketpp::http::parser::parser}!m\_body\_bytes\_max@{m\_body\_bytes\_max}}
+\index{m\_body\_bytes\_max@{m\_body\_bytes\_max}!websocketpp::http::parser::parser@{websocketpp::http::parser::parser}}
+\doxysubsubsection{\texorpdfstring{m\_body\_bytes\_max}{m\_body\_bytes\_max}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1http_1_1parser_1_1parser_a85613c9d20e308ff343449852b7e769f} 
+size\+\_\+t websocketpp\+::http\+::parser\+::parser\+::m\+\_\+body\+\_\+bytes\+\_\+max\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00609}{609}} of file \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source}{parser.\+hpp}}.
+
+\Hypertarget{classwebsocketpp_1_1http_1_1parser_1_1parser_a89e6a7583bee97f30c60dc88b4cd29dd}\index{websocketpp::http::parser::parser@{websocketpp::http::parser::parser}!m\_body\_bytes\_needed@{m\_body\_bytes\_needed}}
+\index{m\_body\_bytes\_needed@{m\_body\_bytes\_needed}!websocketpp::http::parser::parser@{websocketpp::http::parser::parser}}
+\doxysubsubsection{\texorpdfstring{m\_body\_bytes\_needed}{m\_body\_bytes\_needed}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1http_1_1parser_1_1parser_a89e6a7583bee97f30c60dc88b4cd29dd} 
+size\+\_\+t websocketpp\+::http\+::parser\+::parser\+::m\+\_\+body\+\_\+bytes\+\_\+needed\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00608}{608}} of file \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source}{parser.\+hpp}}.
+
+\Hypertarget{classwebsocketpp_1_1http_1_1parser_1_1parser_a286e19d30028f6dbc295ad578e8e50d3}\index{websocketpp::http::parser::parser@{websocketpp::http::parser::parser}!m\_body\_encoding@{m\_body\_encoding}}
+\index{m\_body\_encoding@{m\_body\_encoding}!websocketpp::http::parser::parser@{websocketpp::http::parser::parser}}
+\doxysubsubsection{\texorpdfstring{m\_body\_encoding}{m\_body\_encoding}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1http_1_1parser_1_1parser_a286e19d30028f6dbc295ad578e8e50d3} 
+\mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1body__encoding_a489de0413246f2f6d2d6a6605af16653}{body\+\_\+encoding\+::value}} websocketpp\+::http\+::parser\+::parser\+::m\+\_\+body\+\_\+encoding\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00610}{610}} of file \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source}{parser.\+hpp}}.
+
+\Hypertarget{classwebsocketpp_1_1http_1_1parser_1_1parser_ae82ee117b729da521de60401cd17f8d4}\index{websocketpp::http::parser::parser@{websocketpp::http::parser::parser}!m\_header\_bytes@{m\_header\_bytes}}
+\index{m\_header\_bytes@{m\_header\_bytes}!websocketpp::http::parser::parser@{websocketpp::http::parser::parser}}
+\doxysubsubsection{\texorpdfstring{m\_header\_bytes}{m\_header\_bytes}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1http_1_1parser_1_1parser_ae82ee117b729da521de60401cd17f8d4} 
+size\+\_\+t websocketpp\+::http\+::parser\+::parser\+::m\+\_\+header\+\_\+bytes\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00605}{605}} of file \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source}{parser.\+hpp}}.
+
+\Hypertarget{classwebsocketpp_1_1http_1_1parser_1_1parser_ae75e1e6acd17cc5a5543f818a5355a50}\index{websocketpp::http::parser::parser@{websocketpp::http::parser::parser}!m\_headers@{m\_headers}}
+\index{m\_headers@{m\_headers}!websocketpp::http::parser::parser@{websocketpp::http::parser::parser}}
+\doxysubsubsection{\texorpdfstring{m\_headers}{m\_headers}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1http_1_1parser_1_1parser_ae75e1e6acd17cc5a5543f818a5355a50} 
+\mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_a4bb5b2821dab6a182bfe4c5415229e6e}{header\+\_\+list}} websocketpp\+::http\+::parser\+::parser\+::m\+\_\+headers\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00603}{603}} of file \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source}{parser.\+hpp}}.
+
+\Hypertarget{classwebsocketpp_1_1http_1_1parser_1_1parser_a3e8026fc40c96ca8bfa46a533e00d6a6}\index{websocketpp::http::parser::parser@{websocketpp::http::parser::parser}!m\_version@{m\_version}}
+\index{m\_version@{m\_version}!websocketpp::http::parser::parser@{websocketpp::http::parser::parser}}
+\doxysubsubsection{\texorpdfstring{m\_version}{m\_version}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1http_1_1parser_1_1parser_a3e8026fc40c96ca8bfa46a533e00d6a6} 
+std\+::string websocketpp\+::http\+::parser\+::parser\+::m\+\_\+version\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00602}{602}} of file \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/vendor/websocketpp/websocketpp/http/\mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp}{parser.\+hpp}}\item 
+libraries/fc/vendor/websocketpp/websocketpp/http/impl/\mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2impl_2parser_8hpp}{parser.\+hpp}}\end{DoxyCompactItemize}

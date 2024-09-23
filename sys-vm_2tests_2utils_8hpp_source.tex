@@ -1,0 +1,67 @@
+\doxysection{utils.\+hpp}
+\hypertarget{sys-vm_2tests_2utils_8hpp_source}{}\label{sys-vm_2tests_2utils_8hpp_source}\index{libraries/sys-\/vm/tests/utils.hpp@{libraries/sys-\/vm/tests/utils.hpp}}
+\mbox{\hyperlink{sys-vm_2tests_2utils_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <algorithm>}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <cmath>}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <cstdlib>}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <cstring>}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <fstream>}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <iterator>}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ <sysio/vm/allocator.hpp>}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <sysio/vm/stack\_elem.hpp>}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00011}00011\ \textcolor{preprocessor}{\#include\ <sysio/vm/utils.hpp>}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00013}\mbox{\hyperlink{structtype__converter32}{00013}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structtype__converter32}{type\_converter32}}\ \{}
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00014}00014\ \ \ \ \textcolor{keyword}{union\ }\{}
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00015}\mbox{\hyperlink{structtype__converter32_a769663d644520e35c9eeeb2f8de46dc8}{00015}}\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{structtype__converter32_a769663d644520e35c9eeeb2f8de46dc8}{ui}};}
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00016}\mbox{\hyperlink{structtype__converter32_a92d90de0e50346249eec7df1adb1ab65}{00016}}\ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ \ \ \ \mbox{\hyperlink{structtype__converter32_a92d90de0e50346249eec7df1adb1ab65}{f}};}
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00017}\mbox{\hyperlink{structtype__converter32_a9cd13f24b1d7f0ec68e03e6a769cf7e6}{00017}}\ \ \ \ \}\ \mbox{\hyperlink{structtype__converter32_a9cd13f24b1d7f0ec68e03e6a769cf7e6}{\_data}};}
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00018}\mbox{\hyperlink{structtype__converter32_a6c877f4cb28f778695055d6beba56297}{00018}}\ \ \ \ \mbox{\hyperlink{structtype__converter32_a6c877f4cb28f778695055d6beba56297}{type\_converter32}}(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ n)\ \{\ \mbox{\hyperlink{structtype__converter32_a9cd13f24b1d7f0ec68e03e6a769cf7e6}{\_data}}.ui\ =\ n;\ \}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00019}\mbox{\hyperlink{structtype__converter32_aa044e01070fd01d45d818ad32565ac16}{00019}}\ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{structtype__converter32_aa044e01070fd01d45d818ad32565ac16}{to\_ui}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structtype__converter32_a9cd13f24b1d7f0ec68e03e6a769cf7e6}{\_data}}.ui;\ \}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00020}\mbox{\hyperlink{structtype__converter32_a4ed1eb2324c5110e2b80bbe5dc1a9b18}{00020}}\ \ \ \ \textcolor{keywordtype}{float}\ \ \ \ \mbox{\hyperlink{structtype__converter32_a4ed1eb2324c5110e2b80bbe5dc1a9b18}{to\_f}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structtype__converter32_a9cd13f24b1d7f0ec68e03e6a769cf7e6}{\_data}}.f;\ \}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00021}00021\ \};}
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00023}\mbox{\hyperlink{structtype__converter64}{00023}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structtype__converter64}{type\_converter64}}\ \{}
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00024}00024\ \ \ \ \textcolor{keyword}{union\ }\{}
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00025}\mbox{\hyperlink{structtype__converter64_a817f89e6475165e49e1b6031073444ca}{00025}}\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{structtype__converter64_a817f89e6475165e49e1b6031073444ca}{ui}};}
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00026}\mbox{\hyperlink{structtype__converter64_a4a2a3a5d12ab2cde9b750b2fdc61cbde}{00026}}\ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ \ \ \mbox{\hyperlink{structtype__converter64_a4a2a3a5d12ab2cde9b750b2fdc61cbde}{f}};}
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00027}\mbox{\hyperlink{structtype__converter64_a85efbf6b8e923ea925748d463116f02d}{00027}}\ \ \ \ \}\ \mbox{\hyperlink{structtype__converter64_a85efbf6b8e923ea925748d463116f02d}{\_data}};}
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00028}\mbox{\hyperlink{structtype__converter64_a10bd90d5ffd63822cb5b5a2b786fcda2}{00028}}\ \ \ \ \mbox{\hyperlink{structtype__converter64_a10bd90d5ffd63822cb5b5a2b786fcda2}{type\_converter64}}(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ n)\ \{\ \mbox{\hyperlink{structtype__converter64_a85efbf6b8e923ea925748d463116f02d}{\_data}}.ui\ =\ n;\ \}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00029}\mbox{\hyperlink{structtype__converter64_aaa4850e1ded0c201c71c46c5da34b0dd}{00029}}\ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{structtype__converter64_aaa4850e1ded0c201c71c46c5da34b0dd}{to\_ui}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structtype__converter64_a85efbf6b8e923ea925748d463116f02d}{\_data}}.ui;\ \}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00030}\mbox{\hyperlink{structtype__converter64_a5514d3932eeedbf81c56df3ec05fd1a6}{00030}}\ \ \ \ \textcolor{keywordtype}{double}\ \ \ \mbox{\hyperlink{structtype__converter64_a5514d3932eeedbf81c56df3ec05fd1a6}{to\_f}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structtype__converter64_a85efbf6b8e923ea925748d463116f02d}{\_data}}.f;\ \}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00031}00031\ \};}
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00033}00033\ \textcolor{comment}{//\ C++20:\ using\ std::bit\_cast;}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00034}00034\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T,\ \textcolor{keyword}{typename}\ U>}
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00035}\mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_a5e92cc8f53d748fa129bb1525cea7806}{00035}}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_a5e92cc8f53d748fa129bb1525cea7806}{bit\_cast}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{union_u}{U}}\&\ u)\ \{}
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00036}00036\ \ \ \ \textcolor{keyword}{static\_assert}(\textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}})\ ==\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{union_u}{U}}),\ \textcolor{stringliteral}{"{}bitcast\ requires\ identical\ sizes."{}});}
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00037}00037\ \ \ \ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ result;}
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00038}00038\ \ \ \ std::memcpy(\&result,\ \&u,\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}));}
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00039}00039\ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00040}00040\ \}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00043}\mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_a1d16c5ddf845abd894adeaafd2cb9c25}{00043}}\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_a1d16c5ddf845abd894adeaafd2cb9c25}{check\_nan}}(\textcolor{keyword}{const}\ std::optional<sysio::vm::operand\_stack\_elem>\&\ v)\ \{}
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00044}00044\ \ \ \ \textcolor{keywordflow}{return}\ visit(\mbox{\hyperlink{structsysio_1_1vm_1_1overloaded}{sysio::vm::overloaded}}\{[](sysio::vm::i32\_const\_t)\{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};\ \},}
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00045}00045\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [](sysio::vm::i64\_const\_t)\{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};\ \},}
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00046}00046\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [](sysio::vm::f32\_const\_t\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})\ \{\ \textcolor{keywordflow}{return}\ std::isnan(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}.data.f);\ \},}
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00047}00047\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [](sysio::vm::f64\_const\_t\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})\ \{\ \textcolor{keywordflow}{return}\ std::isnan(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}.data.f);\ \}\},\ *v);}
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00048}00048\ \}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00050}\mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_a4c503c4f3ca9f4afce322078d5a33f3e}{00050}}\ \textcolor{keyword}{inline}\ \mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator}{sysio::vm::wasm\_allocator}}*\ \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_a4c503c4f3ca9f4afce322078d5a33f3e}{get\_wasm\_allocator}}()\ \{}
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00051}00051\ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator}{sysio::vm::wasm\_allocator}}\ alloc;}
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00052}00052\ \ \ \ \textcolor{keywordflow}{return}\ \&alloc;}
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00053}00053\ \}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00054}00054\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00055}00055\ \textcolor{preprocessor}{\#ifdef\ \_\_x86\_64\_\_}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00056}00056\ \textcolor{preprocessor}{\#define\ BACKEND\_TEST\_CASE(name,\ tags)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00057}00057\ \textcolor{preprocessor}{\ \ TEMPLATE\_TEST\_CASE(name,\ tags,\ sysio::vm::interpreter,\ sysio::vm::jit)}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00058}00058\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00059}\mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_a3e5f265967cb6d730cad8ca15e807ac2}{00059}}\ \textcolor{preprocessor}{\#define\ BACKEND\_TEST\_CASE(name,\ tags)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00060}00060\ \textcolor{preprocessor}{\ \ TEMPLATE\_TEST\_CASE(name,\ tags,\ sysio::vm::interpreter)}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2tests_2utils_8hpp_source_l00061}00061\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

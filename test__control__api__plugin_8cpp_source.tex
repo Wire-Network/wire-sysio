@@ -1,0 +1,65 @@
+\doxysection{test\+\_\+control\+\_\+api\+\_\+plugin.\+cpp}
+\hypertarget{test__control__api__plugin_8cpp_source}{}\label{test__control__api__plugin_8cpp_source}\index{plugins/test\_control\_api\_plugin/test\_control\_api\_plugin.cpp@{plugins/test\_control\_api\_plugin/test\_control\_api\_plugin.cpp}}
+\mbox{\hyperlink{test__control__api__plugin_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{test__control__api__plugin_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{test__control__api__plugin_8hpp}{sysio/test\_control\_api\_plugin/test\_control\_api\_plugin.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{test__control__api__plugin_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp}{sysio/chain/exceptions.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{test__control__api__plugin_8cpp_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{test__control__api__plugin_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{json_8hpp}{fc/io/json.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{test__control__api__plugin_8cpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{test__control__api__plugin_8cpp_source_l00006}00006\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{}
+\DoxyCodeLine{\Hypertarget{test__control__api__plugin_8cpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{test__control__api__plugin_8cpp_source_l00008}00008\ \textcolor{keyword}{static}\ \mbox{\hyperlink{classappbase_1_1abstract__plugin}{appbase::abstract\_plugin}}\&\ \_test\_control\_api\_plugin\ =\ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_a87e84549150056c56c0327cc4976cc2a}{register\_plugin}}<test\_control\_api\_plugin>();}
+\DoxyCodeLine{\Hypertarget{test__control__api__plugin_8cpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{test__control__api__plugin_8cpp_source_l00010}00010\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}};}
+\DoxyCodeLine{\Hypertarget{test__control__api__plugin_8cpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{test__control__api__plugin_8cpp_source_l00012}\mbox{\hyperlink{classsysio_1_1test__control__api__plugin__impl}{00012}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1test__control__api__plugin__impl}{test\_control\_api\_plugin\_impl}}\ \{}
+\DoxyCodeLine{\Hypertarget{test__control__api__plugin_8cpp_source_l00013}00013\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{test__control__api__plugin_8cpp_source_l00014}\mbox{\hyperlink{classsysio_1_1test__control__api__plugin__impl_ac4a881eb6555d823205cb3c9f053c5b1}{00014}}\ \ \ \ \mbox{\hyperlink{classsysio_1_1test__control__api__plugin__impl_ac4a881eb6555d823205cb3c9f053c5b1}{test\_control\_api\_plugin\_impl}}(\mbox{\hyperlink{classsysio_1_1chain_1_1controller}{controller}}\&\ \mbox{\hyperlink{classsysio_1_1test__control__api__plugin__impl_a49ac165fbc001f13aef7a86052250ef0}{db}})}
+\DoxyCodeLine{\Hypertarget{test__control__api__plugin_8cpp_source_l00015}00015\ \ \ \ \ \ \ :\ \mbox{\hyperlink{classsysio_1_1test__control__api__plugin__impl_a49ac165fbc001f13aef7a86052250ef0}{db}}(\mbox{\hyperlink{classsysio_1_1test__control__api__plugin__impl_a49ac165fbc001f13aef7a86052250ef0}{db}})\ \{\}}
+\DoxyCodeLine{\Hypertarget{test__control__api__plugin_8cpp_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{test__control__api__plugin_8cpp_source_l00017}\mbox{\hyperlink{classsysio_1_1test__control__api__plugin__impl_a49ac165fbc001f13aef7a86052250ef0}{00017}}\ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1controller}{controller}}\&\ \mbox{\hyperlink{classsysio_1_1test__control__api__plugin__impl_a49ac165fbc001f13aef7a86052250ef0}{db}};}
+\DoxyCodeLine{\Hypertarget{test__control__api__plugin_8cpp_source_l00018}00018\ \};}
+\DoxyCodeLine{\Hypertarget{test__control__api__plugin_8cpp_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{test__control__api__plugin_8cpp_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{test__control__api__plugin_8cpp_source_l00021}00021\ test\_control\_api\_plugin::test\_control\_api\_plugin()\{\}}
+\DoxyCodeLine{\Hypertarget{test__control__api__plugin_8cpp_source_l00022}\mbox{\hyperlink{classsysio_1_1test__control__api__plugin_a2f2e2a528c3a5986924266c323930e7c}{00022}}\ \mbox{\hyperlink{classsysio_1_1test__control__api__plugin_a2f2e2a528c3a5986924266c323930e7c}{test\_control\_api\_plugin::\string~test\_control\_api\_plugin}}()\{\}}
+\DoxyCodeLine{\Hypertarget{test__control__api__plugin_8cpp_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{test__control__api__plugin_8cpp_source_l00024}\mbox{\hyperlink{classsysio_1_1test__control__api__plugin_a92572099f7148b13406d6ba3182b7b26}{00024}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1test__control__api__plugin_a92572099f7148b13406d6ba3182b7b26}{test\_control\_api\_plugin::set\_program\_options}}(options\_description\&,\ options\_description\&)\ \{\}}
+\DoxyCodeLine{\Hypertarget{test__control__api__plugin_8cpp_source_l00025}\mbox{\hyperlink{classsysio_1_1test__control__api__plugin_ab1a539582fbd131b17f7909afd6efd00}{00025}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1test__control__api__plugin_ab1a539582fbd131b17f7909afd6efd00}{test\_control\_api\_plugin::plugin\_initialize}}(\textcolor{keyword}{const}\ variables\_map\&)\ \{\}}
+\DoxyCodeLine{\Hypertarget{test__control__api__plugin_8cpp_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{test__control__api__plugin_8cpp_source_l00027}\mbox{\hyperlink{structsysio_1_1async__result__visitor}{00027}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structsysio_1_1async__result__visitor}{async\_result\_visitor}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{structfc_1_1visitor}{fc::visitor}}<std::string>\ \{}
+\DoxyCodeLine{\Hypertarget{test__control__api__plugin_8cpp_source_l00028}00028\ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{test__control__api__plugin_8cpp_source_l00029}\mbox{\hyperlink{structsysio_1_1async__result__visitor_a130195ced86d4db40562ce4219698b77}{00029}}\ \ \ \ std::string\ \mbox{\hyperlink{structsysio_1_1async__result__visitor_a130195ced86d4db40562ce4219698b77}{operator()}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ v)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{test__control__api__plugin_8cpp_source_l00030}00030\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1json_aa6541960d7f05567559b866cfaf88dfa}{fc::json::to\_string}}(v);}
+\DoxyCodeLine{\Hypertarget{test__control__api__plugin_8cpp_source_l00031}00031\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__control__api__plugin_8cpp_source_l00032}00032\ \};}
+\DoxyCodeLine{\Hypertarget{test__control__api__plugin_8cpp_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{test__control__api__plugin_8cpp_source_l00034}\mbox{\hyperlink{test__control__api__plugin_8cpp_adadf85cde0ceefdda8d298df0e961f02}{00034}}\ \textcolor{preprocessor}{\#define\ CALL\_WITH\_API\_400(api\_name,\ api\_handle,\ api\_namespace,\ call\_name,\ http\_response\_code,\ params\_type)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{test__control__api__plugin_8cpp_source_l00035}00035\ \textcolor{preprocessor}{\{std::string("{}/v1/"{}\ \#api\_name\ "{}/"{}\ \#call\_name),\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{test__control__api__plugin_8cpp_source_l00036}00036\ \textcolor{preprocessor}{\ \ \ [api\_handle](string,\ string\ body,\ url\_response\_callback\ cb)\ mutable\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{test__control__api__plugin_8cpp_source_l00037}00037\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ try\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{test__control__api__plugin_8cpp_source_l00038}00038\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ auto\ params\ =\ parse\_params<api\_namespace::call\_name\ \#\#\ \_params,\ params\_type>(body);\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{test__control__api__plugin_8cpp_source_l00039}00039\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ fc::variant\ result(\ api\_handle.call\_name(\ std::move(params)\ )\ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{test__control__api__plugin_8cpp_source_l00040}00040\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ cb(http\_response\_code,\ std::move(result));\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{test__control__api__plugin_8cpp_source_l00041}00041\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \}\ catch\ (...)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{test__control__api__plugin_8cpp_source_l00042}00042\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ http\_plugin::handle\_exception(\#api\_name,\ \#call\_name,\ body,\ cb);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{test__control__api__plugin_8cpp_source_l00043}00043\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{test__control__api__plugin_8cpp_source_l00044}00044\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \}\}}}
+\DoxyCodeLine{\Hypertarget{test__control__api__plugin_8cpp_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{test__control__api__plugin_8cpp_source_l00046}\mbox{\hyperlink{test__control__api__plugin_8cpp_adeb8711f048b492b66404f144f9ea61f}{00046}}\ \textcolor{preprocessor}{\#define\ TEST\_CONTROL\_RW\_CALL(call\_name,\ http\_response\_code,\ params\_type)\ CALL\_WITH\_API\_400(test\_control,\ rw\_api,\ test\_control\_apis::read\_write,\ call\_name,\ http\_response\_code,\ params\_type)}}
+\DoxyCodeLine{\Hypertarget{test__control__api__plugin_8cpp_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{test__control__api__plugin_8cpp_source_l00048}\mbox{\hyperlink{classsysio_1_1test__control__api__plugin_a3c2673eb358c5a82a299c076dd58d2e6}{00048}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1test__control__api__plugin_a3c2673eb358c5a82a299c076dd58d2e6}{test\_control\_api\_plugin::plugin\_startup}}()\ \{}
+\DoxyCodeLine{\Hypertarget{test__control__api__plugin_8cpp_source_l00049}00049\ \ \ \ my.reset(\textcolor{keyword}{new}\ \mbox{\hyperlink{classsysio_1_1test__control__api__plugin__impl}{test\_control\_api\_plugin\_impl}}(\mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().get\_plugin<chain\_plugin>().chain()));}
+\DoxyCodeLine{\Hypertarget{test__control__api__plugin_8cpp_source_l00050}00050\ \ \ \ \textcolor{keyword}{auto}\ rw\_api\ =\ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_a3c4b68a0667942b58f1369f454ce0ce3}{get\_plugin}}<\mbox{\hyperlink{classsysio_1_1test__control__plugin}{test\_control\_plugin}}>().get\_read\_write\_api();}
+\DoxyCodeLine{\Hypertarget{test__control__api__plugin_8cpp_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{test__control__api__plugin_8cpp_source_l00052}00052\ \ \ \ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_a3c4b68a0667942b58f1369f454ce0ce3}{get\_plugin}}<\mbox{\hyperlink{classsysio_1_1http__plugin}{http\_plugin}}>().add\_api(\{}
+\DoxyCodeLine{\Hypertarget{test__control__api__plugin_8cpp_source_l00053}00053\ \ \ \ \ \ \ \mbox{\hyperlink{test__control__api__plugin_8cpp_adeb8711f048b492b66404f144f9ea61f}{TEST\_CONTROL\_RW\_CALL}}(kill\_node\_on\_producer,\ 202,\ \mbox{\hyperlink{namespacesysio_abf4a5fc3ea13f713d0a43bdbc8788cd7af4df8f1e5079096ea1bf20ed4616ebdf}{http\_params\_types::params\_required}})}
+\DoxyCodeLine{\Hypertarget{test__control__api__plugin_8cpp_source_l00054}00054\ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{test__control__api__plugin_8cpp_source_l00055}00055\ \}}
+\DoxyCodeLine{\Hypertarget{test__control__api__plugin_8cpp_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{test__control__api__plugin_8cpp_source_l00057}\mbox{\hyperlink{classsysio_1_1test__control__api__plugin_a5075157f9eae442ce35de8374cdbad8b}{00057}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1test__control__api__plugin_a5075157f9eae442ce35de8374cdbad8b}{test\_control\_api\_plugin::plugin\_shutdown}}()\ \{\}}
+\DoxyCodeLine{\Hypertarget{test__control__api__plugin_8cpp_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{test__control__api__plugin_8cpp_source_l00059}00059\ \}}
+
+\end{DoxyCode}

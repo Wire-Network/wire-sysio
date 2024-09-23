@@ -1,0 +1,132 @@
+\doxysection{Json\+Reader\+Stack\+Item Struct Reference}
+\hypertarget{struct_json_reader_stack_item}{}\label{struct_json_reader_stack_item}\index{JsonReaderStackItem@{JsonReaderStackItem}}
+
+
+Collaboration diagram for Json\+Reader\+Stack\+Item\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=194pt]{struct_json_reader_stack_item__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{struct_json_reader_stack_item_a8991221ff1014c18a98f7e77b95dc84b}{State}} \{ \mbox{\hyperlink{struct_json_reader_stack_item_a8991221ff1014c18a98f7e77b95dc84ba10ec2367e219f3362c89b7827378fcf2}{Before\+Start}}
+, \mbox{\hyperlink{struct_json_reader_stack_item_a8991221ff1014c18a98f7e77b95dc84bae70fa0797c3380eb79ebe9891ba5ceba}{Started}}
+, \mbox{\hyperlink{struct_json_reader_stack_item_a8991221ff1014c18a98f7e77b95dc84bac7d47991adc39d56c513ceef870cb1c5}{Closed}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_json_reader_stack_item_a4a12d84e3f931ed0a80bd5eab2cf3c55}{Json\+Reader\+Stack\+Item}} (const \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{struct_json_reader_stack_item_afcfc0316d2ce6dc94fe717eaee47d1e5}{value}}, \mbox{\hyperlink{struct_json_reader_stack_item_a8991221ff1014c18a98f7e77b95dc84b}{State}} \mbox{\hyperlink{structstate}{state}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+const \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{struct_json_reader_stack_item_afcfc0316d2ce6dc94fe717eaee47d1e5}{value}}
+\item 
+\mbox{\hyperlink{struct_json_reader_stack_item_a8991221ff1014c18a98f7e77b95dc84b}{State}} \mbox{\hyperlink{struct_json_reader_stack_item_a466090e1c5041303191ad97ea2d95ce2}{state}}
+\item 
+\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} \mbox{\hyperlink{struct_json_reader_stack_item_afc277464cf461da2fc0b7a9bf779219b}{index}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{archiver_8cpp_source_l00010}{10}} of file \mbox{\hyperlink{archiver_8cpp_source}{archiver.\+cpp}}.
+
+
+
+\doxysubsection{Member Enumeration Documentation}
+\Hypertarget{struct_json_reader_stack_item_a8991221ff1014c18a98f7e77b95dc84b}\index{JsonReaderStackItem@{JsonReaderStackItem}!State@{State}}
+\index{State@{State}!JsonReaderStackItem@{JsonReaderStackItem}}
+\doxysubsubsection{\texorpdfstring{State}{State}}
+{\footnotesize\ttfamily \label{struct_json_reader_stack_item_a8991221ff1014c18a98f7e77b95dc84b} 
+enum \mbox{\hyperlink{struct_json_reader_stack_item_a8991221ff1014c18a98f7e77b95dc84b}{Json\+Reader\+Stack\+Item\+::\+State}}}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{BeforeStart@{BeforeStart}!JsonReaderStackItem@{JsonReaderStackItem}}\index{JsonReaderStackItem@{JsonReaderStackItem}!BeforeStart@{BeforeStart}}}\Hypertarget{struct_json_reader_stack_item_a8991221ff1014c18a98f7e77b95dc84ba10ec2367e219f3362c89b7827378fcf2}\label{struct_json_reader_stack_item_a8991221ff1014c18a98f7e77b95dc84b} 
+Before\+Start&An object/array is in the stack but it is not yet called by Start\+Object()/\+Start\+Array(). \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Started@{Started}!JsonReaderStackItem@{JsonReaderStackItem}}\index{JsonReaderStackItem@{JsonReaderStackItem}!Started@{Started}}}\Hypertarget{struct_json_reader_stack_item_a8991221ff1014c18a98f7e77b95dc84bae70fa0797c3380eb79ebe9891ba5ceba}\label{struct_json_reader_stack_item_a8991221ff1014c18a98f7e77b95dc84b} 
+Started&An object/array is called by Start\+Object()/\+Start\+Array(). \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Closed@{Closed}!JsonReaderStackItem@{JsonReaderStackItem}}\index{JsonReaderStackItem@{JsonReaderStackItem}!Closed@{Closed}}}\Hypertarget{struct_json_reader_stack_item_a8991221ff1014c18a98f7e77b95dc84bac7d47991adc39d56c513ceef870cb1c5}\label{struct_json_reader_stack_item_a8991221ff1014c18a98f7e77b95dc84b} 
+Closed&An array is closed after read all element, but before End\+Array(). \\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{archiver_8cpp_source_l00011}{11}} of file \mbox{\hyperlink{archiver_8cpp_source}{archiver.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00011\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00012\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_json_reader_stack_item_a8991221ff1014c18a98f7e77b95dc84ba10ec2367e219f3362c89b7827378fcf2}{BeforeStart}},\ \ \ \ }
+\DoxyCodeLine{00013\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_json_reader_stack_item_a8991221ff1014c18a98f7e77b95dc84bae70fa0797c3380eb79ebe9891ba5ceba}{Started}},\ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00014\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_json_reader_stack_item_a8991221ff1014c18a98f7e77b95dc84bac7d47991adc39d56c513ceef870cb1c5}{Closed}}\ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00015\ \ \ \ \ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{struct_json_reader_stack_item_a4a12d84e3f931ed0a80bd5eab2cf3c55}\index{JsonReaderStackItem@{JsonReaderStackItem}!JsonReaderStackItem@{JsonReaderStackItem}}
+\index{JsonReaderStackItem@{JsonReaderStackItem}!JsonReaderStackItem@{JsonReaderStackItem}}
+\doxysubsubsection{\texorpdfstring{JsonReaderStackItem()}{JsonReaderStackItem()}}
+{\footnotesize\ttfamily \label{struct_json_reader_stack_item_a4a12d84e3f931ed0a80bd5eab2cf3c55} 
+Json\+Reader\+Stack\+Item\+::\+Json\+Reader\+Stack\+Item (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} \texorpdfstring{$\ast$}{*}}]{value}{, }\item[{\mbox{\hyperlink{struct_json_reader_stack_item_a8991221ff1014c18a98f7e77b95dc84b}{State}}}]{state}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{archiver_8cpp_source_l00017}{17}} of file \mbox{\hyperlink{archiver_8cpp_source}{archiver.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00017\ :\ \mbox{\hyperlink{struct_json_reader_stack_item_afcfc0316d2ce6dc94fe717eaee47d1e5}{value}}(\mbox{\hyperlink{struct_json_reader_stack_item_afcfc0316d2ce6dc94fe717eaee47d1e5}{value}}),\ \mbox{\hyperlink{struct_json_reader_stack_item_a466090e1c5041303191ad97ea2d95ce2}{state}}(\mbox{\hyperlink{structstate}{state}}),\ \mbox{\hyperlink{struct_json_reader_stack_item_afc277464cf461da2fc0b7a9bf779219b}{index}}()\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_json_reader_stack_item_afc277464cf461da2fc0b7a9bf779219b}\index{JsonReaderStackItem@{JsonReaderStackItem}!index@{index}}
+\index{index@{index}!JsonReaderStackItem@{JsonReaderStackItem}}
+\doxysubsubsection{\texorpdfstring{index}{index}}
+{\footnotesize\ttfamily \label{struct_json_reader_stack_item_afc277464cf461da2fc0b7a9bf779219b} 
+\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} Json\+Reader\+Stack\+Item\+::index}
+
+
+
+Definition at line \mbox{\hyperlink{archiver_8cpp_source_l00021}{21}} of file \mbox{\hyperlink{archiver_8cpp_source}{archiver.\+cpp}}.
+
+\Hypertarget{struct_json_reader_stack_item_a466090e1c5041303191ad97ea2d95ce2}\index{JsonReaderStackItem@{JsonReaderStackItem}!state@{state}}
+\index{state@{state}!JsonReaderStackItem@{JsonReaderStackItem}}
+\doxysubsubsection{\texorpdfstring{state}{state}}
+{\footnotesize\ttfamily \label{struct_json_reader_stack_item_a466090e1c5041303191ad97ea2d95ce2} 
+\mbox{\hyperlink{struct_json_reader_stack_item_a8991221ff1014c18a98f7e77b95dc84b}{State}} Json\+Reader\+Stack\+Item\+::state}
+
+
+
+Definition at line \mbox{\hyperlink{archiver_8cpp_source_l00020}{20}} of file \mbox{\hyperlink{archiver_8cpp_source}{archiver.\+cpp}}.
+
+\Hypertarget{struct_json_reader_stack_item_afcfc0316d2ce6dc94fe717eaee47d1e5}\index{JsonReaderStackItem@{JsonReaderStackItem}!value@{value}}
+\index{value@{value}!JsonReaderStackItem@{JsonReaderStackItem}}
+\doxysubsubsection{\texorpdfstring{value}{value}}
+{\footnotesize\ttfamily \label{struct_json_reader_stack_item_afcfc0316d2ce6dc94fe717eaee47d1e5} 
+const \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}}\texorpdfstring{$\ast$}{*} Json\+Reader\+Stack\+Item\+::value}
+
+
+
+Definition at line \mbox{\hyperlink{archiver_8cpp_source_l00019}{19}} of file \mbox{\hyperlink{archiver_8cpp_source}{archiver.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/example/archiver/\mbox{\hyperlink{archiver_8cpp}{archiver.\+cpp}}\end{DoxyCompactItemize}

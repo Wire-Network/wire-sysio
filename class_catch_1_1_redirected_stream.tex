@@ -1,0 +1,66 @@
+\doxysection{Catch\+::Redirected\+Stream Class Reference}
+\hypertarget{class_catch_1_1_redirected_stream}{}\label{class_catch_1_1_redirected_stream}\index{Catch::RedirectedStream@{Catch::RedirectedStream}}
+
+
+{\ttfamily \#include $<$catch\+\_\+output\+\_\+redirect.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_catch_1_1_redirected_stream_af71b305daa0eae351db5c26bca67b11e}{Redirected\+Stream}} (std\+::ostream \&original\+Stream, std\+::ostream \&redirection\+Stream)
+\item 
+\mbox{\hyperlink{class_catch_1_1_redirected_stream_a48ccdbd48da7edc540d4a4b672430ab8}{\texorpdfstring{$\sim$}{\string~}\+Redirected\+Stream}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{catch__output__redirect_8h_source_l00019}{19}} of file \mbox{\hyperlink{catch__output__redirect_8h_source}{catch\+\_\+output\+\_\+redirect.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_catch_1_1_redirected_stream_af71b305daa0eae351db5c26bca67b11e}\index{Catch::RedirectedStream@{Catch::RedirectedStream}!RedirectedStream@{RedirectedStream}}
+\index{RedirectedStream@{RedirectedStream}!Catch::RedirectedStream@{Catch::RedirectedStream}}
+\doxysubsubsection{\texorpdfstring{RedirectedStream()}{RedirectedStream()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_redirected_stream_af71b305daa0eae351db5c26bca67b11e} 
+Catch\+::\+Redirected\+Stream\+::\+Redirected\+Stream (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{original\+Stream}{, }\item[{std\+::ostream \&}]{redirection\+Stream}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__output__redirect_8cpp_source_l00031}{31}} of file \mbox{\hyperlink{catch__output__redirect_8cpp_source}{catch\+\_\+output\+\_\+redirect.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00032\ \ \ \ \ :\ \ \ m\_originalStream(\ originalStream\ ),}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ m\_redirectionStream(\ redirectionStream\ ),}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ m\_prevBuf(\ m\_originalStream.rdbuf()\ )}
+\DoxyCodeLine{00035\ \ \ \ \ \{}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ m\_originalStream.rdbuf(\ m\_redirectionStream.rdbuf()\ );}
+\DoxyCodeLine{00037\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_redirected_stream_a48ccdbd48da7edc540d4a4b672430ab8}\index{Catch::RedirectedStream@{Catch::RedirectedStream}!````~RedirectedStream@{\texorpdfstring{$\sim$}{\string~}RedirectedStream}}
+\index{````~RedirectedStream@{\texorpdfstring{$\sim$}{\string~}RedirectedStream}!Catch::RedirectedStream@{Catch::RedirectedStream}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}RedirectedStream()}{\string~RedirectedStream()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_redirected_stream_a48ccdbd48da7edc540d4a4b672430ab8} 
+Catch\+::\+Redirected\+Stream\+::\texorpdfstring{$\sim$}{\string~}\+Redirected\+Stream (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__output__redirect_8cpp_source_l00039}{39}} of file \mbox{\hyperlink{catch__output__redirect_8cpp_source}{catch\+\_\+output\+\_\+redirect.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ m\_originalStream.rdbuf(\ m\_prevBuf\ );}
+\DoxyCodeLine{00041\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__output__redirect_8h}{catch\+\_\+output\+\_\+redirect.\+h}}\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__output__redirect_8cpp}{catch\+\_\+output\+\_\+redirect.\+cpp}}\end{DoxyCompactItemize}

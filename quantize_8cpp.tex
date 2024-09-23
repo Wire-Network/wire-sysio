@@ -1,0 +1,209 @@
+\doxysection{libraries/fc/libraries/ff/depends/xbyak/sample/quantize.cpp File Reference}
+\hypertarget{quantize_8cpp}{}\label{quantize_8cpp}\index{libraries/fc/libraries/ff/depends/xbyak/sample/quantize.cpp@{libraries/fc/libraries/ff/depends/xbyak/sample/quantize.cpp}}
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$time.\+h$>$}\newline
+{\ttfamily \#include "{}xbyak/xbyak.\+h"{}}\newline
+Include dependency graph for quantize.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{quantize_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{class_quantize}{Quantize}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{quantize_8cpp_a3ede98665532cce0e33f614fac5150f9}{XBYAK\+\_\+\+NO\+\_\+\+OP\+\_\+\+NAMES}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{Xbyak\+::uint64}} \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}}
+\item 
+typedef \mbox{\hyperlink{namespace_xbyak_a880d0e902046fa68ba57ae3fbc4acdf3}{Xbyak\+::uint32}} \mbox{\hyperlink{quantize_8cpp_adc6d195cb6337a3d1d86db3f0947a3b8}{uint32}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{quantize_8cpp_a94a8660c2acc75eab65b9b8ee501901c}{quantize}} (\mbox{\hyperlink{quantize_8cpp_adc6d195cb6337a3d1d86db3f0947a3b8}{uint32}} dest\mbox{[}64\mbox{]}, const \mbox{\hyperlink{quantize_8cpp_adc6d195cb6337a3d1d86db3f0947a3b8}{uint32}} src\mbox{[}64\mbox{]}, const \mbox{\hyperlink{quantize_8cpp_adc6d195cb6337a3d1d86db3f0947a3b8}{uint32}} q\+Tbl\mbox{[}64\mbox{]})
+\item 
+int \mbox{\hyperlink{quantize_8cpp_a0ddf1224851353fc92bfbff6f499fa97}{main}} (int argc, char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}\mbox{[}$\,$\mbox{]})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+const int \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}} = 64
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{quantize_8cpp_a3ede98665532cce0e33f614fac5150f9}\index{quantize.cpp@{quantize.cpp}!XBYAK\_NO\_OP\_NAMES@{XBYAK\_NO\_OP\_NAMES}}
+\index{XBYAK\_NO\_OP\_NAMES@{XBYAK\_NO\_OP\_NAMES}!quantize.cpp@{quantize.cpp}}
+\doxysubsubsection{\texorpdfstring{XBYAK\_NO\_OP\_NAMES}{XBYAK\_NO\_OP\_NAMES}}
+{\footnotesize\ttfamily \label{quantize_8cpp_a3ede98665532cce0e33f614fac5150f9} 
+\#define XBYAK\+\_\+\+NO\+\_\+\+OP\+\_\+\+NAMES}
+
+
+
+Definition at line \mbox{\hyperlink{quantize_8cpp_source_l00045}{45}} of file \mbox{\hyperlink{quantize_8cpp_source}{quantize.\+cpp}}.
+
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{quantize_8cpp_adc6d195cb6337a3d1d86db3f0947a3b8}\index{quantize.cpp@{quantize.cpp}!uint32@{uint32}}
+\index{uint32@{uint32}!quantize.cpp@{quantize.cpp}}
+\doxysubsubsection{\texorpdfstring{uint32}{uint32}}
+{\footnotesize\ttfamily \label{quantize_8cpp_adc6d195cb6337a3d1d86db3f0947a3b8} 
+typedef \mbox{\hyperlink{namespace_xbyak_a880d0e902046fa68ba57ae3fbc4acdf3}{Xbyak\+::uint32}} \mbox{\hyperlink{quantize_8cpp_adc6d195cb6337a3d1d86db3f0947a3b8}{uint32}}}
+
+
+
+Definition at line \mbox{\hyperlink{quantize_8cpp_source_l00052}{52}} of file \mbox{\hyperlink{quantize_8cpp_source}{quantize.\+cpp}}.
+
+\Hypertarget{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}\index{quantize.cpp@{quantize.cpp}!uint64@{uint64}}
+\index{uint64@{uint64}!quantize.cpp@{quantize.cpp}}
+\doxysubsubsection{\texorpdfstring{uint64}{uint64}}
+{\footnotesize\ttfamily \label{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88} 
+typedef \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{Xbyak\+::uint64}} \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}}}
+
+
+
+Definition at line \mbox{\hyperlink{quantize_8cpp_source_l00051}{51}} of file \mbox{\hyperlink{quantize_8cpp_source}{quantize.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{quantize_8cpp_a0ddf1224851353fc92bfbff6f499fa97}\index{quantize.cpp@{quantize.cpp}!main@{main}}
+\index{main@{main}!quantize.cpp@{quantize.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{quantize_8cpp_a0ddf1224851353fc92bfbff6f499fa97} 
+int main (\begin{DoxyParamCaption}\item[{int}]{argc}{, }\item[{char \texorpdfstring{$\ast$}{*}}]{argv}{\mbox{[}$\,$\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{quantize_8cpp_source_l00160}{160}} of file \mbox{\hyperlink{quantize_8cpp_source}{quantize.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00161\ \{}
+\DoxyCodeLine{00162\ \ \ \ \ \textcolor{keywordtype}{int}\ q;}
+\DoxyCodeLine{00163\ \ \ \ \ \textcolor{keywordflow}{if}\ (argc\ >\ 1)\ \{}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ q\ =\ atoi(\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[1]);}
+\DoxyCodeLine{00165\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}input\ quantize="{}});}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (scanf(\textcolor{stringliteral}{"{}\%d"{}},\ \&q)\ !=\ 1)\ \{}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}bad\ number\(\backslash\)n"{}});}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00171\ \ \ \ \ \}}
+\DoxyCodeLine{00172\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}q=\%d\(\backslash\)n"{}},\ q);}
+\DoxyCodeLine{00173\ \ \ \ \ \mbox{\hyperlink{quantize_8cpp_adc6d195cb6337a3d1d86db3f0947a3b8}{uint32}}\ qTbl[]\ =\ \{}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ 16,\ 11,\ 10,\ 16,\ 24,\ 40,\ 51,\ 61,}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ 12,\ 12,\ 14,\ 19,\ 26,\ 58,\ 60,\ 55,}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ 14,\ 13,\ 16,\ 24,\ 40,\ 57,\ 69,\ 56,}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ 14,\ 17,\ 22,\ 29,\ 51,\ 87,\ 80,\ 62,}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ 18,\ 22,\ 37,\ 56,\ 68,\ 109,\ 103,\ 77,}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ 24,\ 35,\ 55,\ 64,\ 81,\ 104,\ 113,\ 92,}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ 49,\ 64,\ 78,\ 87,\ 103,\ 121,\ 120,\ 101,}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ 72,\ 92,\ 95,\ 98,\ 112,\ 100,\ 103,\ 99}
+\DoxyCodeLine{00182\ \ \ \ \ \};}
+\DoxyCodeLine{00183\ }
+\DoxyCodeLine{00184\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}};\ i++)\ \{}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \ \ qTbl[i]\ /=\ q;}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (qTbl[i]\ ==\ 0)\ qTbl[i]\ =\ 1;}
+\DoxyCodeLine{00187\ \ \ \ \ \}}
+\DoxyCodeLine{00188\ }
+\DoxyCodeLine{00189\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{quantize_8cpp_adc6d195cb6337a3d1d86db3f0947a3b8}{uint32}}\ src[\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}];}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{quantize_8cpp_adc6d195cb6337a3d1d86db3f0947a3b8}{uint32}}\ \mbox{\hyperlink{namespaceupload_a770d9c7b49b1fede80de6078d5e49af7}{dest}}[\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}];}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{quantize_8cpp_adc6d195cb6337a3d1d86db3f0947a3b8}{uint32}}\ dest2[\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}];}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}};\ i++)\ \{}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ \ \ \ \ src[i]\ =\ rand()\ \%\ 2048;}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00196\ }
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_quantize}{Quantize}}\ jit(qTbl);}
+\DoxyCodeLine{00198\ \textcolor{comment}{//printf("{}jit\ size=\%d,\ ptr=\%p\(\backslash\)n"{},\ jit.getSize(),\ jit.getCode());}}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ void\ (*quantize2)(\mbox{\hyperlink{quantize_8cpp_adc6d195cb6337a3d1d86db3f0947a3b8}{uint32}}*,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{quantize_8cpp_adc6d195cb6337a3d1d86db3f0947a3b8}{uint32}}*,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{quantize_8cpp_adc6d195cb6337a3d1d86db3f0947a3b8}{uint32}}\ *)\ =\ jit.getCode<void\ (*)(\mbox{\hyperlink{quantize_8cpp_adc6d195cb6337a3d1d86db3f0947a3b8}{uint32}}*,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{quantize_8cpp_adc6d195cb6337a3d1d86db3f0947a3b8}{uint32}}*,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{quantize_8cpp_adc6d195cb6337a3d1d86db3f0947a3b8}{uint32}}\ *)>();}
+\DoxyCodeLine{00200\ }
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{quantize_8cpp_a94a8660c2acc75eab65b9b8ee501901c}{quantize}}(dest,\ src,\ qTbl);}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \ \ quantize2(dest2,\ src,\ qTbl);}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}};\ i++)\ \{}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (dest[i]\ !=\ dest2[i])\ \{}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}err[\%d]\ \%d\ \%d\(\backslash\)n"{}},\ i,\ dest[i],\ dest2[i]);}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00208\ }
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ =\ 10000000;}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ begin;}
+\DoxyCodeLine{00211\ }
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \ \ begin\ =\ clock();}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}};\ i++)\ \{}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{quantize_8cpp_a94a8660c2acc75eab65b9b8ee501901c}{quantize}}(dest,\ src,\ qTbl);}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}time=\%.1fsec\(\backslash\)n"{}},\ (clock()\ -\/\ begin)\ /\ \textcolor{keywordtype}{double}(CLOCKS\_PER\_SEC));}
+\DoxyCodeLine{00217\ }
+\DoxyCodeLine{00218\ \ \ \ \ \ \ \ \ begin\ =\ clock();}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}};\ i++)\ \{}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \ \ \ \ \ \ quantize2(dest,\ src,\ qTbl);}
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}time=\%.1fsec\(\backslash\)n"{}},\ (clock()\ -\/\ begin)\ /\ \textcolor{keywordtype}{double}(CLOCKS\_PER\_SEC));}
+\DoxyCodeLine{00223\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (std::exception\&\ e)\ \{}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}ERR:\%s\(\backslash\)n"{}},\ e.what());}
+\DoxyCodeLine{00225\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{}
+\DoxyCodeLine{00226\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}unknown\ error\(\backslash\)n"{}});}
+\DoxyCodeLine{00227\ \ \ \ \ \}}
+\DoxyCodeLine{00228\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=292pt]{quantize_8cpp_a0ddf1224851353fc92bfbff6f499fa97_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{quantize_8cpp_a94a8660c2acc75eab65b9b8ee501901c}\index{quantize.cpp@{quantize.cpp}!quantize@{quantize}}
+\index{quantize@{quantize}!quantize.cpp@{quantize.cpp}}
+\doxysubsubsection{\texorpdfstring{quantize()}{quantize()}}
+{\footnotesize\ttfamily \label{quantize_8cpp_a94a8660c2acc75eab65b9b8ee501901c} 
+void quantize (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{quantize_8cpp_adc6d195cb6337a3d1d86db3f0947a3b8}{uint32}}}]{dest}{\mbox{[}64\mbox{]}, }\item[{const \mbox{\hyperlink{quantize_8cpp_adc6d195cb6337a3d1d86db3f0947a3b8}{uint32}}}]{src}{\mbox{[}64\mbox{]}, }\item[{const \mbox{\hyperlink{quantize_8cpp_adc6d195cb6337a3d1d86db3f0947a3b8}{uint32}}}]{q\+Tbl}{\mbox{[}64\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{quantize_8cpp_source_l00146}{146}} of file \mbox{\hyperlink{quantize_8cpp_source}{quantize.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00147\ \{}
+\DoxyCodeLine{00148\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}};\ i++)\ \{}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceupload_a770d9c7b49b1fede80de6078d5e49af7}{dest}}[i]\ =\ src[i]\ /\ qTbl[i];}
+\DoxyCodeLine{00150\ \ \ \ \ \}}
+\DoxyCodeLine{00151\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=206pt]{quantize_8cpp_a94a8660c2acc75eab65b9b8ee501901c_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}\index{quantize.cpp@{quantize.cpp}!N@{N}}
+\index{N@{N}!quantize.cpp@{quantize.cpp}}
+\doxysubsubsection{\texorpdfstring{N}{N}}
+{\footnotesize\ttfamily \label{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59} 
+const int N = 64}
+
+
+
+Definition at line \mbox{\hyperlink{quantize_8cpp_source_l00054}{54}} of file \mbox{\hyperlink{quantize_8cpp_source}{quantize.\+cpp}}.
+

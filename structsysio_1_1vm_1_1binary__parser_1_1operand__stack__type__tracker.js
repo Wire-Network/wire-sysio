@@ -1,0 +1,28 @@
+var structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker =
+[
+    [ "operand_stack_type_tracker", "structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker.html#a8f88afbef502c7060c930b962d5a2b61", null ],
+    [ "operand_stack_type_tracker", "structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker.html#a8f88afbef502c7060c930b962d5a2b61", null ],
+    [ "depth", "structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker.html#a22bd096d07d5c5e17b43c0866ff561e1", null ],
+    [ "depth", "structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker.html#a22bd096d07d5c5e17b43c0866ff561e1", null ],
+    [ "finish", "structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker.html#aafc1eb91b54fa4558534986a9c67a87b", null ],
+    [ "finish", "structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker.html#aafc1eb91b54fa4558534986a9c67a87b", null ],
+    [ "pop", "structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker.html#adaddc3a866ee287d6f9a223ddef98e3d", null ],
+    [ "pop", "structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker.html#adaddc3a866ee287d6f9a223ddef98e3d", null ],
+    [ "pop", "structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker.html#a55a8a910aa884c6ded25f2e5b818ebad", null ],
+    [ "pop", "structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker.html#a55a8a910aa884c6ded25f2e5b818ebad", null ],
+    [ "pop_scope", "structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker.html#acc8fb187cb37fc4923597cc7b190aed7", null ],
+    [ "pop_scope", "structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker.html#acc8fb187cb37fc4923597cc7b190aed7", null ],
+    [ "push", "structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker.html#aebac9a4a77db42a9a4a6eafc0800e90b", null ],
+    [ "push", "structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker.html#aebac9a4a77db42a9a4a6eafc0800e90b", null ],
+    [ "push_scope", "structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker.html#a5d7689b9c817c1483a3e8397f55c0fb5", null ],
+    [ "push_scope", "structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker.html#a5d7689b9c817c1483a3e8397f55c0fb5", null ],
+    [ "start_unreachable", "structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker.html#a2e46720d4a76f569e3b671873c76c7b8", null ],
+    [ "start_unreachable", "structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker.html#a2e46720d4a76f569e3b671873c76c7b8", null ],
+    [ "top", "structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker.html#a520e4229e5669b7ea6251a4cb33a6bb0", null ],
+    [ "top", "structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker.html#a520e4229e5669b7ea6251a4cb33a6bb0", null ],
+    [ "local_bytes_checker", "structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker.html#aa92d24c24e09799001a154c415a7e5d5", null ],
+    [ "maximum_operand_depth", "structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker.html#a2bf2d13eac304d198c07ec5d37aec97b", null ],
+    [ "operand_depth", "structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker.html#a325d66e5e83c656eadca3481a98f8d10", null ],
+    [ "options", "structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker.html#a76ff0b6002a68f55667c8e51800317d9", null ],
+    [ "state", "structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker.html#abbf0ab8cb9eb86b8678378c97d8f397a", null ]
+];

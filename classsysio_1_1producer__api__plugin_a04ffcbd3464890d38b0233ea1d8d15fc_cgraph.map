@@ -1,0 +1,12 @@
+<map id="sysio::producer_api_plugin::plugin_initialize" name="sysio::producer_api_plugin::plugin_initialize">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,51,164,91"/>
+<area shape="rect" id="Node000002" href="$namespaceappbase.html#a99374dc23934f008a09f2f79be9eae40" title=" " alt="" coords="232,21,332,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="163,53,216,43,217,49,164,59"/>
+<area shape="rect" id="Node000004" href="$classappbase_1_1application.html#a3c4b68a0667942b58f1369f454ce0ce3" title=" " alt="" coords="212,79,352,119"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="164,80,197,84,196,90,164,85"/>
+<area shape="rect" id="Node000003" href="$classappbase_1_1application.html#ac874b2659b400fe254f1ae4260d06ecf" title=" " alt="" coords="400,5,540,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="332,29,384,27,385,32,332,34"/>
+<area shape="rect" id="Node000005" href="$classappbase_1_1application.html#add09ef243c90b8f86636c9ee592db739" title=" " alt="" coords="400,95,540,135"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="353,102,385,105,384,110,352,108"/>
+<area shape="poly" id="edge5_Node000005_Node000005" title=" " alt="" coords="434,95,432,85,438,76,451,70,470,68,491,70,503,77,501,81,489,76,470,73,452,75,442,80,438,86,439,93"/>
+</map>

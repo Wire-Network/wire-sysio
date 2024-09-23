@@ -1,0 +1,189 @@
+\doxysection{gmock\+\_\+output\+\_\+test.\+py}
+\hypertarget{gmock__output__test_8py_source}{}\label{gmock__output__test_8py_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googlemock/test/gmock\_output\_test.py@{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googlemock/test/gmock\_output\_test.py}}
+\mbox{\hyperlink{gmock__output__test_8py}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00001}\mbox{\hyperlink{namespacegmock__output__test}{00001}}\ \textcolor{comment}{\#!/usr/bin/env\ python}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00002}00002\ \textcolor{comment}{\#}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00003}00003\ \textcolor{comment}{\#\ Copyright\ 2008,\ Google\ Inc.}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00004}00004\ \textcolor{comment}{\#\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00005}00005\ \textcolor{comment}{\#}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00006}00006\ \textcolor{comment}{\#\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00007}00007\ \textcolor{comment}{\#\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00008}00008\ \textcolor{comment}{\#\ met:}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00009}00009\ \textcolor{comment}{\#}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00010}00010\ \textcolor{comment}{\#\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00011}00011\ \textcolor{comment}{\#\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00012}00012\ \textcolor{comment}{\#\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00013}00013\ \textcolor{comment}{\#\ copyright\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00014}00014\ \textcolor{comment}{\#\ in\ the\ documentation\ and/or\ other\ materials\ provided\ with\ the}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00015}00015\ \textcolor{comment}{\#\ distribution.}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00016}00016\ \textcolor{comment}{\#\ \ \ \ \ *\ Neither\ the\ name\ of\ Google\ Inc.\ nor\ the\ names\ of\ its}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00017}00017\ \textcolor{comment}{\#\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products\ derived\ from}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00018}00018\ \textcolor{comment}{\#\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00019}00019\ \textcolor{comment}{\#}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00020}00020\ \textcolor{comment}{\#\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00021}00021\ \textcolor{comment}{\#\ "{}AS\ IS"{}\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00022}00022\ \textcolor{comment}{\#\ LIMITED\ TO,\ THE\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00023}00023\ \textcolor{comment}{\#\ A\ PARTICULAR\ PURPOSE\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ THE\ COPYRIGHT}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00024}00024\ \textcolor{comment}{\#\ OWNER\ OR\ CONTRIBUTORS\ BE\ LIABLE\ FOR\ ANY\ DIRECT,\ INDIRECT,\ INCIDENTAL,}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00025}00025\ \textcolor{comment}{\#\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES\ (INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00026}00026\ \textcolor{comment}{\#\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;\ LOSS\ OF\ USE,}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00027}00027\ \textcolor{comment}{\#\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND\ ON\ ANY}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00028}00028\ \textcolor{comment}{\#\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00029}00029\ \textcolor{comment}{\#\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00030}00030\ \textcolor{comment}{\#\ OF\ THIS\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00032}00032\ \textcolor{stringliteral}{"{}"{}"{}Tests\ the\ text\ output\ of\ Google\ C++\ Mocking\ Framework.}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00033}00033\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00034}00034\ \textcolor{stringliteral}{To\ update\ the\ golden\ file:}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00035}00035\ \textcolor{stringliteral}{gmock\_output\_test.py\ -\/-\/build\_dir=BUILD/DIR\ -\/-\/gengolden}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00036}00036\ \textcolor{stringliteral}{\#\ where\ BUILD/DIR\ contains\ the\ built\ gmock\_output\_test\_\ file.}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00037}00037\ \textcolor{stringliteral}{gmock\_output\_test.py\ -\/-\/gengolden}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00038}00038\ \textcolor{stringliteral}{gmock\_output\_test.py}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00039}00039\ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00041}00041\ \_\_author\_\_\ =\ \textcolor{stringliteral}{'wan@google.com\ (Zhanyong\ Wan)'}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00043}00043\ \textcolor{keyword}{import}\ os}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00044}00044\ \textcolor{keyword}{import}\ re}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00045}00045\ \textcolor{keyword}{import}\ sys}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00047}00047\ \textcolor{keyword}{import}\ gmock\_test\_utils}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00050}00050\ \textcolor{comment}{\#\ The\ flag\ for\ generating\ the\ golden\ file}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00051}\mbox{\hyperlink{namespacegmock__output__test_a9e134c4683d56599acb0c0dba23cb7be}{00051}}\ GENGOLDEN\_FLAG\ =\ \textcolor{stringliteral}{'-\/-\/gengolden'}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00052}00052\ }
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00053}\mbox{\hyperlink{namespacegmock__output__test_a03aac0fac952a0b3648340f529af7f59}{00053}}\ PROGRAM\_PATH\ =\ \mbox{\hyperlink{namespacegmock__test__utils_a3965eb0947849f247899f6edff7051f7}{gmock\_test\_utils.GetTestExecutablePath}}(\textcolor{stringliteral}{'gmock\_output\_test\_'})}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00054}\mbox{\hyperlink{namespacegmock__output__test_a33f8ca97d99711e23517962ca4c729af}{00054}}\ COMMAND\ =\ [PROGRAM\_PATH,\ \textcolor{stringliteral}{'-\/-\/gtest\_stack\_trace\_depth=0'},\ \textcolor{stringliteral}{'-\/-\/gtest\_print\_time=0'}]}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00055}\mbox{\hyperlink{namespacegmock__output__test_aa31e25f8ef83e9d1e44929139a08e580}{00055}}\ GOLDEN\_NAME\ =\ \textcolor{stringliteral}{'gmock\_output\_test\_golden.txt'}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00056}\mbox{\hyperlink{namespacegmock__output__test_a632c0fbf08500e4ed3c0e33f5e2ac771}{00056}}\ GOLDEN\_PATH\ =\ os.path.join(\mbox{\hyperlink{namespacegmock__test__utils_ae6b4256fed63c744d722ecdf0f217529}{gmock\_test\_utils.GetSourceDir}}(),\ GOLDEN\_NAME)}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00059}\mbox{\hyperlink{namespacegmock__output__test_ad1551135ee8755834a46528d836f9e26}{00059}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacegmock__output__test_ad1551135ee8755834a46528d836f9e26}{ToUnixLineEnding}}(s):}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00060}00060\ \ \ \textcolor{stringliteral}{"{}"{}"{}Changes\ all\ Windows/Mac\ line\ endings\ in\ s\ to\ UNIX\ line\ endings."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00062}00062\ \ \ \textcolor{keywordflow}{return}\ s.replace(\textcolor{stringliteral}{'\(\backslash\)r\(\backslash\)n'},\ \textcolor{stringliteral}{'\(\backslash\)n'}).replace(\textcolor{stringliteral}{'\(\backslash\)r'},\ \textcolor{stringliteral}{'\(\backslash\)n'})}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00065}\mbox{\hyperlink{namespacegmock__output__test_acb06643e5e0d0eb85a3bc067e09e56f9}{00065}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacegmock__output__test_acb06643e5e0d0eb85a3bc067e09e56f9}{RemoveReportHeaderAndFooter}}(output):}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00066}00066\ \ \ \textcolor{stringliteral}{"{}"{}"{}Removes\ Google\ Test\ result\ report's\ header\ and\ footer\ from\ the\ output."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00067}00067\ }
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00068}00068\ \ \ output\ =\ re.sub(\textcolor{stringliteral}{r'.*gtest\_main.*\(\backslash\)n'},\ \textcolor{stringliteral}{''},\ output)}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00069}00069\ \ \ output\ =\ re.sub(\textcolor{stringliteral}{r'\(\backslash\)[.*\(\backslash\)d+\ tests.*\(\backslash\)n'},\ \textcolor{stringliteral}{''},\ output)}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00070}00070\ \ \ output\ =\ re.sub(\textcolor{stringliteral}{r'\(\backslash\)[.*\ test\ environment\ .*\(\backslash\)n'},\ \textcolor{stringliteral}{''},\ output)}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00071}00071\ \ \ output\ =\ re.sub(\textcolor{stringliteral}{r'\(\backslash\)[=+\(\backslash\)]\ \(\backslash\)d+\ tests\ .*\ ran.*'},\ \textcolor{stringliteral}{''},\ output)}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00072}00072\ \ \ output\ =\ re.sub(\textcolor{stringliteral}{r'.*\ FAILED\ TESTS\(\backslash\)n'},\ \textcolor{stringliteral}{''},\ output)}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00073}00073\ \ \ \textcolor{keywordflow}{return}\ output}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00074}00074\ }
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00075}00075\ }
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00076}\mbox{\hyperlink{namespacegmock__output__test_a59c40167b074a2ef04aecc79a0273f13}{00076}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacegmock__output__test_a59c40167b074a2ef04aecc79a0273f13}{RemoveLocations}}(output):}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00077}00077\ \ \ \textcolor{stringliteral}{"{}"{}"{}Removes\ all\ file\ location\ info\ from\ a\ Google\ Test\ program's\ output.}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00078}00078\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00079}00079\ \textcolor{stringliteral}{\ \ Args:}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00080}00080\ \textcolor{stringliteral}{\ \ \ \ \ \ \ output:\ \ the\ output\ of\ a\ Google\ Test\ program.}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00081}00081\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00082}00082\ \textcolor{stringliteral}{\ \ Returns:}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00083}00083\ \textcolor{stringliteral}{\ \ \ \ \ \ \ output\ with\ all\ file\ location\ info\ (in\ the\ form\ of}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00084}00084\ \textcolor{stringliteral}{\ \ \ \ \ \ \ 'DIRECTORY/FILE\_NAME:LINE\_NUMBER:\ 'or}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00085}00085\ \textcolor{stringliteral}{\ \ \ \ \ \ \ 'DIRECTORY\(\backslash\)\(\backslash\)FILE\_NAME(LINE\_NUMBER):\ ')\ replaced\ by}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00086}00086\ \textcolor{stringliteral}{\ \ \ \ \ \ \ 'FILE:\#:\ '.}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00087}00087\ \textcolor{stringliteral}{\ \ "{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00088}00088\ }
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00089}00089\ \ \ \textcolor{keywordflow}{return}\ re.sub(\textcolor{stringliteral}{r'.*[/\(\backslash\)\(\backslash\)](.+)(\(\backslash\):\(\backslash\)d+|\(\backslash\)(\(\backslash\)d+\(\backslash\)))\(\backslash\):'},\ \textcolor{stringliteral}{'FILE:\#:'},\ output)}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00090}00090\ }
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00091}00091\ }
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00092}\mbox{\hyperlink{namespacegmock__output__test_aeeb22f52d3bf1ba7dbda8f8847faa103}{00092}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacegmock__output__test_aeeb22f52d3bf1ba7dbda8f8847faa103}{NormalizeErrorMarker}}(output):}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00093}00093\ \ \ \textcolor{stringliteral}{"{}"{}"{}Normalizes\ the\ error\ marker,\ which\ is\ different\ on\ Windows\ vs\ on\ Linux."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00094}00094\ }
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00095}00095\ \ \ \textcolor{keywordflow}{return}\ re.sub(\textcolor{stringliteral}{r'\ error:\ '},\ \textcolor{stringliteral}{'\ Failure\(\backslash\)n'},\ output)}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00096}00096\ }
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00097}00097\ }
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00098}\mbox{\hyperlink{namespacegmock__output__test_ac16c3c4b4875becf250dd73beb381a82}{00098}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacegmock__output__test_ac16c3c4b4875becf250dd73beb381a82}{RemoveMemoryAddresses}}(output):}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00099}00099\ \ \ \textcolor{stringliteral}{"{}"{}"{}Removes\ memory\ addresses\ from\ the\ test\ output."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00100}00100\ }
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00101}00101\ \ \ \textcolor{keywordflow}{return}\ re.sub(\textcolor{stringliteral}{r'@\(\backslash\)w+'},\ \textcolor{stringliteral}{'@0x\#'},\ output)}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00102}00102\ }
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00103}00103\ }
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00104}\mbox{\hyperlink{namespacegmock__output__test_ad0a9e9474fb8cb1729c20bc51222c46e}{00104}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacegmock__output__test_ad0a9e9474fb8cb1729c20bc51222c46e}{RemoveTestNamesOfLeakedMocks}}(output):}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00105}00105\ \ \ \textcolor{stringliteral}{"{}"{}"{}Removes\ the\ test\ names\ of\ leaked\ mock\ objects\ from\ the\ test\ output."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00106}00106\ }
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00107}00107\ \ \ \textcolor{keywordflow}{return}\ re.sub(\textcolor{stringliteral}{r'\(\backslash\)(used\ in\ test\ .+\(\backslash\))\ '},\ \textcolor{stringliteral}{''},\ output)}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00108}00108\ }
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00109}00109\ }
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00110}\mbox{\hyperlink{namespacegmock__output__test_a771f708605426dc1bb45c4a9be5aff50}{00110}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacegmock__output__test_a771f708605426dc1bb45c4a9be5aff50}{GetLeakyTests}}(output):}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00111}00111\ \ \ \textcolor{stringliteral}{"{}"{}"{}Returns\ a\ list\ of\ test\ names\ that\ leak\ mock\ objects."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00112}00112\ }
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00113}00113\ \ \ \textcolor{comment}{\#\ findall()\ returns\ a\ list\ of\ all\ matches\ of\ the\ regex\ in\ output.}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00114}00114\ \ \ \textcolor{comment}{\#\ For\ example,\ if\ '(used\ in\ test\ FooTest.Bar)'\ is\ in\ output,\ the}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00115}00115\ \ \ \textcolor{comment}{\#\ list\ will\ contain\ 'FooTest.Bar'.}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00116}00116\ \ \ \textcolor{keywordflow}{return}\ re.findall(\textcolor{stringliteral}{r'\(\backslash\)(used\ in\ test\ (.+)\(\backslash\))'},\ output)}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00117}00117\ }
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00118}00118\ }
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00119}\mbox{\hyperlink{namespacegmock__output__test_ab651959dfea607ed29d7215488ff8022}{00119}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacegmock__output__test_ab651959dfea607ed29d7215488ff8022}{GetNormalizedOutputAndLeakyTests}}(output):}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00120}00120\ \ \ \textcolor{stringliteral}{"{}"{}"{}Normalizes\ the\ output\ of\ gmock\_output\_test\_.}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00121}00121\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00122}00122\ \textcolor{stringliteral}{\ \ Args:}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00123}00123\ \textcolor{stringliteral}{\ \ \ \ output:\ The\ test\ output.}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00124}00124\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00125}00125\ \textcolor{stringliteral}{\ \ Returns:}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00126}00126\ \textcolor{stringliteral}{\ \ \ \ A\ tuple\ (the\ normalized\ test\ output,\ the\ list\ of\ test\ names\ that\ have}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00127}00127\ \textcolor{stringliteral}{\ \ \ \ leaked\ mocks).}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00128}00128\ \textcolor{stringliteral}{\ \ "{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00129}00129\ }
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00130}00130\ \ \ output\ =\ \mbox{\hyperlink{namespacegmock__output__test_ad1551135ee8755834a46528d836f9e26}{ToUnixLineEnding}}(output)}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00131}00131\ \ \ output\ =\ \mbox{\hyperlink{namespacegmock__output__test_acb06643e5e0d0eb85a3bc067e09e56f9}{RemoveReportHeaderAndFooter}}(output)}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00132}00132\ \ \ output\ =\ \mbox{\hyperlink{namespacegmock__output__test_aeeb22f52d3bf1ba7dbda8f8847faa103}{NormalizeErrorMarker}}(output)}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00133}00133\ \ \ output\ =\ \mbox{\hyperlink{namespacegmock__output__test_a59c40167b074a2ef04aecc79a0273f13}{RemoveLocations}}(output)}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00134}00134\ \ \ output\ =\ \mbox{\hyperlink{namespacegmock__output__test_ac16c3c4b4875becf250dd73beb381a82}{RemoveMemoryAddresses}}(output)}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00135}00135\ \ \ \textcolor{keywordflow}{return}\ (\mbox{\hyperlink{namespacegmock__output__test_ad0a9e9474fb8cb1729c20bc51222c46e}{RemoveTestNamesOfLeakedMocks}}(output),\ \mbox{\hyperlink{namespacegmock__output__test_a771f708605426dc1bb45c4a9be5aff50}{GetLeakyTests}}(output))}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00136}00136\ }
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00137}00137\ }
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00138}\mbox{\hyperlink{namespacegmock__output__test_ac834577ccc464c386e01ca1d940ac470}{00138}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacegmock__output__test_ac834577ccc464c386e01ca1d940ac470}{GetShellCommandOutput}}(cmd):}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00139}00139\ \ \ \textcolor{stringliteral}{"{}"{}"{}Runs\ a\ command\ in\ a\ sub-\/process,\ and\ returns\ its\ STDOUT\ in\ a\ string."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00140}00140\ }
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00141}00141\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacegmock__test__utils_a31a0e33565ec805d314cb0a4eb8317e6}{gmock\_test\_utils.Subprocess}}(cmd,\ capture\_stderr=\textcolor{keyword}{False}).output}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00142}00142\ }
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00143}00143\ }
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00144}\mbox{\hyperlink{namespacegmock__output__test_ae1fc1dce5d5cc9a66997127b146e5616}{00144}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacegmock__output__test_ae1fc1dce5d5cc9a66997127b146e5616}{GetNormalizedCommandOutputAndLeakyTests}}(cmd):}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00145}00145\ \ \ \textcolor{stringliteral}{"{}"{}"{}Runs\ a\ command\ and\ returns\ its\ normalized\ output\ and\ a\ list\ of\ leaky\ tests.}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00146}00146\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00147}00147\ \textcolor{stringliteral}{\ \ Args:}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00148}00148\ \textcolor{stringliteral}{\ \ \ \ cmd:\ \ the\ shell\ command.}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00149}00149\ \textcolor{stringliteral}{\ \ "{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00150}00150\ }
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00151}00151\ \ \ \textcolor{comment}{\#\ Disables\ exception\ pop-\/ups\ on\ Windows.}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00152}00152\ \ \ os.environ[\textcolor{stringliteral}{'GTEST\_CATCH\_EXCEPTIONS'}]\ =\ \textcolor{stringliteral}{'1'}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00153}00153\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacegmock__output__test_ab651959dfea607ed29d7215488ff8022}{GetNormalizedOutputAndLeakyTests}}(\mbox{\hyperlink{namespacegmock__output__test_ac834577ccc464c386e01ca1d940ac470}{GetShellCommandOutput}}(cmd))}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00154}00154\ }
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00155}00155\ }
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00156}\mbox{\hyperlink{classgmock__output__test_1_1_g_mock_output_test}{00156}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classgmock__output__test_1_1_g_mock_output_test}{GMockOutputTest}}(\mbox{\hyperlink{namespacegmock__test__utils_a959c5af591e4d49b6d35745205b64509}{gmock\_test\_utils.TestCase}}):}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00157}\mbox{\hyperlink{classgmock__output__test_1_1_g_mock_output_test_a911366567ae86c545c5726755e1dc2dd}{00157}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classgmock__output__test_1_1_g_mock_output_test_a911366567ae86c545c5726755e1dc2dd}{testOutput}}(self):}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00158}00158\ \ \ \ \ (output,\ leaky\_tests)\ =\ \mbox{\hyperlink{namespacegmock__output__test_ae1fc1dce5d5cc9a66997127b146e5616}{GetNormalizedCommandOutputAndLeakyTests}}(COMMAND)}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00159}00159\ \ \ \ \ golden\_file\ =\ open(GOLDEN\_PATH,\ \textcolor{stringliteral}{'rb'})}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00160}00160\ \ \ \ \ golden\ =\ golden\_file.read()}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00161}00161\ \ \ \ \ golden\_file.close()}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00162}00162\ }
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00163}00163\ \ \ \ \ \textcolor{comment}{\#\ The\ normalized\ output\ should\ match\ the\ golden\ file.}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00164}00164\ \ \ \ \ self.assertEquals(golden,\ output)}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00165}00165\ }
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00166}00166\ \ \ \ \ \textcolor{comment}{\#\ The\ raw\ output\ should\ contain\ 2\ leaked\ mock\ object\ errors\ for}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00167}00167\ \ \ \ \ \textcolor{comment}{\#\ test\ GMockOutputTest.CatchesLeakedMocks.}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00168}00168\ \ \ \ \ self.assertEquals([\textcolor{stringliteral}{'GMockOutputTest.CatchesLeakedMocks'},}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00169}00169\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'GMockOutputTest.CatchesLeakedMocks'}],}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00170}00170\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ leaky\_tests)}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00171}00171\ }
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00172}00172\ }
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00173}00173\ \textcolor{keywordflow}{if}\ \_\_name\_\_\ ==\ \textcolor{stringliteral}{'\_\_main\_\_'}:}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00174}00174\ \ \ \textcolor{keywordflow}{if}\ sys.argv[1:]\ ==\ [GENGOLDEN\_FLAG]:}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00175}\mbox{\hyperlink{namespacegmock__output__test_acd6befb6031f17f78a4425c90b1f5b19}{00175}}\ \ \ \ \ (output,\ \_)\ =\ \mbox{\hyperlink{namespacegmock__output__test_ae1fc1dce5d5cc9a66997127b146e5616}{GetNormalizedCommandOutputAndLeakyTests}}(COMMAND)}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00176}\mbox{\hyperlink{namespacegmock__output__test_aa592d26826a4dabf494fc2dd3c5c8b1e}{00176}}\ \ \ \ \ golden\_file\ =\ open(GOLDEN\_PATH,\ \textcolor{stringliteral}{'wb'})}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00177}00177\ \ \ \ \ golden\_file.write(output)}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00178}00178\ \ \ \ \ golden\_file.close()}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00179}00179\ \ \ \ \ \textcolor{comment}{\#\ Suppress\ the\ error\ "{}googletest\ was\ imported\ but\ a\ call\ to\ its\ main()}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00180}00180\ \ \ \ \ \textcolor{comment}{\#\ was\ never\ detected."{}}}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00181}00181\ \ \ \ \ os.\_exit(0)}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00182}00182\ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{gmock__output__test_8py_source_l00183}00183\ \ \ \ \ \mbox{\hyperlink{namespacegmock__test__utils_ab436e920b5feb62a33936b0d839702e7}{gmock\_test\_utils.Main}}()}
+
+\end{DoxyCode}

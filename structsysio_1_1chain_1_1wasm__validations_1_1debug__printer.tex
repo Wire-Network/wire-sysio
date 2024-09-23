@@ -1,0 +1,97 @@
+\doxysection{sysio\+::chain\+::wasm\+\_\+validations\+::debug\+\_\+printer Struct Reference}
+\hypertarget{structsysio_1_1chain_1_1wasm__validations_1_1debug__printer}{}\label{structsysio_1_1chain_1_1wasm__validations_1_1debug__printer}\index{sysio::chain::wasm\_validations::debug\_printer@{sysio::chain::wasm\_validations::debug\_printer}}
+
+
+{\ttfamily \#include $<$wasm\+\_\+sysio\+\_\+validation.\+hpp$>$}
+
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static void \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__validations_1_1debug__printer_af0fad245e9eecc2f1701a42e34623d6e}{init}} ()
+\item 
+static void \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__validations_1_1debug__printer_a9365f736c14ba1d83795cbfc811954c9}{accept}} (\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1instr}{wasm\+\_\+ops\+::instr}} \texorpdfstring{$\ast$}{*}inst, \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1visitor__arg}{wasm\+\_\+ops\+::visitor\+\_\+arg}} \&arg)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static constexpr bool \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__validations_1_1debug__printer_a93090056194702f4b390bda63c90666a}{kills}} = false
+\item 
+static constexpr bool \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__validations_1_1debug__printer_a0b098d857e373ad5e5d3176d3823cb4e}{post}} = false
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__validation_8hpp_source_l00080}{80}} of file \mbox{\hyperlink{wasm__sysio__validation_8hpp_source}{wasm\+\_\+sysio\+\_\+validation.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1chain_1_1wasm__validations_1_1debug__printer_a9365f736c14ba1d83795cbfc811954c9}\index{sysio::chain::wasm\_validations::debug\_printer@{sysio::chain::wasm\_validations::debug\_printer}!accept@{accept}}
+\index{accept@{accept}!sysio::chain::wasm\_validations::debug\_printer@{sysio::chain::wasm\_validations::debug\_printer}}
+\doxysubsubsection{\texorpdfstring{accept()}{accept()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__validations_1_1debug__printer_a9365f736c14ba1d83795cbfc811954c9} 
+static void sysio\+::chain\+::wasm\+\_\+validations\+::debug\+\_\+printer\+::accept (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1instr}{wasm\+\_\+ops\+::instr}} \texorpdfstring{$\ast$}{*}}]{inst}{, }\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1visitor__arg}{wasm\+\_\+ops\+::visitor\+\_\+arg}} \&}]{arg}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__validation_8hpp_source_l00084}{84}} of file \mbox{\hyperlink{wasm__sysio__validation_8hpp_source}{wasm\+\_\+sysio\+\_\+validation.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}INSTRUCTION\ :\ "{}}\ <<\ inst-\/>to\_string()\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=322pt]{structsysio_1_1chain_1_1wasm__validations_1_1debug__printer_a9365f736c14ba1d83795cbfc811954c9_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1wasm__validations_1_1debug__printer_af0fad245e9eecc2f1701a42e34623d6e}\index{sysio::chain::wasm\_validations::debug\_printer@{sysio::chain::wasm\_validations::debug\_printer}!init@{init}}
+\index{init@{init}!sysio::chain::wasm\_validations::debug\_printer@{sysio::chain::wasm\_validations::debug\_printer}}
+\doxysubsubsection{\texorpdfstring{init()}{init()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__validations_1_1debug__printer_af0fad245e9eecc2f1701a42e34623d6e} 
+static void sysio\+::chain\+::wasm\+\_\+validations\+::debug\+\_\+printer\+::init (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__validation_8hpp_source_l00083}{83}} of file \mbox{\hyperlink{wasm__sysio__validation_8hpp_source}{wasm\+\_\+sysio\+\_\+validation.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00083\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1chain_1_1wasm__validations_1_1debug__printer_a93090056194702f4b390bda63c90666a}\index{sysio::chain::wasm\_validations::debug\_printer@{sysio::chain::wasm\_validations::debug\_printer}!kills@{kills}}
+\index{kills@{kills}!sysio::chain::wasm\_validations::debug\_printer@{sysio::chain::wasm\_validations::debug\_printer}}
+\doxysubsubsection{\texorpdfstring{kills}{kills}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__validations_1_1debug__printer_a93090056194702f4b390bda63c90666a} 
+bool sysio\+::chain\+::wasm\+\_\+validations\+::debug\+\_\+printer\+::kills = false\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__validation_8hpp_source_l00081}{81}} of file \mbox{\hyperlink{wasm__sysio__validation_8hpp_source}{wasm\+\_\+sysio\+\_\+validation.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__validations_1_1debug__printer_a0b098d857e373ad5e5d3176d3823cb4e}\index{sysio::chain::wasm\_validations::debug\_printer@{sysio::chain::wasm\_validations::debug\_printer}!post@{post}}
+\index{post@{post}!sysio::chain::wasm\_validations::debug\_printer@{sysio::chain::wasm\_validations::debug\_printer}}
+\doxysubsubsection{\texorpdfstring{post}{post}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__validations_1_1debug__printer_a0b098d857e373ad5e5d3176d3823cb4e} 
+bool sysio\+::chain\+::wasm\+\_\+validations\+::debug\+\_\+printer\+::post = false\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__validation_8hpp_source_l00082}{82}} of file \mbox{\hyperlink{wasm__sysio__validation_8hpp_source}{wasm\+\_\+sysio\+\_\+validation.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{wasm__sysio__validation_8hpp}{wasm\+\_\+sysio\+\_\+validation.\+hpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,83 @@
+\doxysection{libraries/chain/include/sysio/chain/webassembly/preconditions.hpp File Reference}
+\hypertarget{preconditions_8hpp}{}\label{preconditions_8hpp}\index{libraries/chain/include/sysio/chain/webassembly/preconditions.hpp@{libraries/chain/include/sysio/chain/webassembly/preconditions.hpp}}
+{\ttfamily \#include $<$sysio/chain/types.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/webassembly/common.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/webassembly/sys-\/vm.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/vm/backend.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/vm/host\+\_\+function.\+hpp$>$}\newline
+Include dependency graph for preconditions.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{preconditions_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{preconditions_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1webassembly_1_1detail_1_1is__whitelisted__legacy__type}{sysio\+::chain\+::webassembly\+::detail\+::is\+\_\+whitelisted\+\_\+legacy\+\_\+type$<$ T $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1webassembly_1_1detail_1_1is__whitelisted__type}{sysio\+::chain\+::webassembly\+::detail\+::is\+\_\+whitelisted\+\_\+type$<$ T $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1webassembly_1_1detail_1_1is__whitelisted__type_3_01vm_1_1span_3_01_t_01_4_01_4}{sysio\+::chain\+::webassembly\+::detail\+::is\+\_\+whitelisted\+\_\+type$<$ vm\+::span$<$ T $>$ $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1webassembly_1_1detail_1_1is__whitelisted__type_3_01vm_1_1argument__proxy_3_01_t_01_5_00_010_01_4_01_4}{sysio\+::chain\+::webassembly\+::detail\+::is\+\_\+whitelisted\+\_\+type$<$ vm\+::argument\+\_\+proxy$<$ T \texorpdfstring{$\ast$}{*}, 0 $>$ $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1webassembly_1_1remove__argument__proxy}{sysio\+::chain\+::webassembly\+::remove\+\_\+argument\+\_\+proxy$<$ T $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1webassembly_1_1remove__argument__proxy_3_01vm_1_1argument__proxy_3_01_t_01_5_00_01_a_01_4_01_4}{sysio\+::chain\+::webassembly\+::remove\+\_\+argument\+\_\+proxy$<$ vm\+::argument\+\_\+proxy$<$ T \texorpdfstring{$\ast$}{*}, A $>$ $>$}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain}{sysio\+::chain}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly}{sysio\+::chain\+::webassembly}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_1_1detail}{sysio\+::chain\+::webassembly\+::detail}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t A$>$ }\\constexpr std\+::integral\+\_\+constant$<$ bool, \mbox{\hyperlink{struct_a}{A}} !=0 $>$ \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_1_1detail_ae0a52ff73e647b1f409f6e3eab3ec761}{sysio\+::chain\+::webassembly\+::detail\+::is\+\_\+legacy\+\_\+ptr}} (\mbox{\hyperlink{namespacesysio_1_1chain_adaac58ba7cbf7caade7008a8778c2464}{legacy\+\_\+ptr}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{struct_a}{A}} $>$)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\constexpr std\+::false\+\_\+type \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_1_1detail_a98de40c54528832d7ef13b5dd459a578}{sysio\+::chain\+::webassembly\+::detail\+::is\+\_\+legacy\+\_\+ptr}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t A$>$ }\\constexpr std\+::integral\+\_\+constant$<$ bool, \mbox{\hyperlink{struct_a}{A}} !=0 $>$ \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_1_1detail_af33105f82d960a1d6347441cec05dbd5}{sysio\+::chain\+::webassembly\+::detail\+::is\+\_\+legacy\+\_\+span}} (\mbox{\hyperlink{namespacesysio_1_1chain_a2058365f8ef9bc59b7205f8b8c0aab50}{legacy\+\_\+span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{struct_a}{A}} $>$)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\constexpr std\+::false\+\_\+type \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_1_1detail_a0842c4545cef8c56645dade9d3372e70}{sysio\+::chain\+::webassembly\+::detail\+::is\+\_\+legacy\+\_\+span}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}})
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a4ab171276362a06f529e1565dcb403b0}{sysio\+::chain\+::webassembly\+::\+SYS\+\_\+\+VM\+\_\+\+PRECONDITION}} (context\+\_\+free\+\_\+check, \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_a1ddb4f842ec1c70bcd410d65e586a1ad}{SYS\+\_\+\+VM\+\_\+\+INVOKE\+\_\+\+ONCE}}(\mbox{[}\&\mbox{]}(auto \&\&...) \{ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\+\_\+\+ASSERT}}(ctx.\+get\+\_\+host().get\+\_\+context().is\+\_\+context\+\_\+free(), unaccessible\+\_\+api, "{}this API may only be called from context\+\_\+free apply"{});\}))
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_aab2eb63330d856e30bbd81712e5cd42f}{sysio\+::chain\+::webassembly\+::\+SYS\+\_\+\+VM\+\_\+\+PRECONDITION}} (context\+\_\+aware\+\_\+check, \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_a1ddb4f842ec1c70bcd410d65e586a1ad}{SYS\+\_\+\+VM\+\_\+\+INVOKE\+\_\+\+ONCE}}(\mbox{[}\&\mbox{]}(auto \&\&...) \{ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\+\_\+\+ASSERT}}(!ctx.\+get\+\_\+host().get\+\_\+context().is\+\_\+context\+\_\+free(), unaccessible\+\_\+api, "{}only \mbox{\hyperlink{structcontext}{context}} free \mbox{\hyperlink{classfc_1_1api}{api}}\textquotesingle{}\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}} can be used in this context"{});\}))
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_aa573ef7c0cdd6391dc69e51cf8441639}{sysio\+::chain\+::webassembly\+::\+SYS\+\_\+\+VM\+\_\+\+PRECONDITION}} (privileged\+\_\+check, \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_a1ddb4f842ec1c70bcd410d65e586a1ad}{SYS\+\_\+\+VM\+\_\+\+INVOKE\+\_\+\+ONCE}}(\mbox{[}\&\mbox{]}(auto \&\&...) \{ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\+\_\+\+ASSERT}}(ctx.\+get\+\_\+host().get\+\_\+context().is\+\_\+privileged(), unaccessible\+\_\+api, "{}\$\{code\} does not have permission to \mbox{\hyperlink{programs_2clio_2main_8cpp_af931af8e9f099860a2670931f8d3ad2c}{call}} this API"{},("{}code"{}, ctx.\+get\+\_\+host().get\+\_\+context().get\+\_\+receiver()));\}))
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{classsysio_1_1vm_1_1span}{vm\+::span}}$<$ const char $>$ \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_1_1detail_af8d3aa34707698f98daa3878b5fdb284}{sysio\+::chain\+::webassembly\+::detail\+::to\+\_\+span}} (const \mbox{\hyperlink{structsysio_1_1vm_1_1argument__proxy}{vm\+::argument\+\_\+proxy}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} $>$ \&val)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{classsysio_1_1vm_1_1span}{vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_1_1detail_a74403d14f60e4270f546d502d0dfd646}{sysio\+::chain\+::webassembly\+::detail\+::to\+\_\+span}} (const \mbox{\hyperlink{classsysio_1_1vm_1_1span}{vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&val)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a3fd1ecb960bfc158413e2358e0fff9ba}{sysio\+::chain\+::webassembly\+::\+SYS\+\_\+\+VM\+\_\+\+PRECONDITION}} (core\+\_\+precondition, \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_a27c519adc3a74a176aba34c519f8d409}{SYS\+\_\+\+VM\+\_\+\+INVOKE\+\_\+\+ON\+\_\+\+ALL}}((\mbox{[}\&\mbox{]}(auto \&\&arg, auto \&\&... rest) \{ using namespace sysio\+::vm;using arg\+\_\+t=std\+::decay\+\_\+t$<$ decltype(arg)$>$;static\+\_\+assert(is\+\_\+whitelisted\+\_\+type\+\_\+v$<$ arg\+\_\+t $>$, "{}whitelisted type violation"{});\mbox{\hyperlink{yubihsm__pkcs11_8c_a75d8898b07aafc20a48a415a1c6e7bf0}{if}} constexpr(is\+\_\+span\+\_\+type\+\_\+v$<$ arg\+\_\+t $>$\texorpdfstring{$\vert$}{|}\texorpdfstring{$\vert$}{|}vm\+::is\+\_\+argument\+\_\+proxy\+\_\+type\+\_\+v$<$ arg\+\_\+t $>$) \{ \mbox{\hyperlink{namespacesysio_1_1vm_aed9320a398dcef98dbf672e5a58afb73}{sysio\+::vm\+::invoke\+\_\+on}}$<$ false, \mbox{\hyperlink{structsysio_1_1vm_1_1invoke__on__all__t}{sysio\+::vm\+::invoke\+\_\+on\+\_\+all\+\_\+t}} $>$(\mbox{[}\&arg\mbox{]}(auto \&\&narg, auto \&\&... nrest) \{ using nested\+\_\+arg\+\_\+t=std\+::decay\+\_\+t$<$ decltype(narg)$>$;\mbox{\hyperlink{yubihsm__pkcs11_8c_a75d8898b07aafc20a48a415a1c6e7bf0}{if}} constexpr(sysio\+::vm\+::is\+\_\+span\+\_\+type\+\_\+v$<$ nested\+\_\+arg\+\_\+t $>$\texorpdfstring{$\vert$}{|}\texorpdfstring{$\vert$}{|}vm\+::is\+\_\+argument\+\_\+proxy\+\_\+type\+\_\+v$<$ nested\+\_\+arg\+\_\+t $>$) \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\+\_\+\+ASSERT}}(!is\+\_\+aliasing(\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_1_1detail_af8d3aa34707698f98daa3878b5fdb284}{detail\+::to\+\_\+span}}(arg), \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_1_1detail_af8d3aa34707698f98daa3878b5fdb284}{detail\+::to\+\_\+span}}(narg)), \mbox{\hyperlink{namespacesysio_1_1chain_a489ddfe76234ed9479deafde7d26c2b9}{wasm\+\_\+exception}}, "{}pointers not allowed to alias"{});\}, rest...);\} \})))
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_ae8959dd64f4eccb4f46ea7bc2092aac8}{sysio\+::chain\+::webassembly\+::\+SYS\+\_\+\+VM\+\_\+\+PRECONDITION}} (is\+\_\+nan\+\_\+check, \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_a27c519adc3a74a176aba34c519f8d409}{SYS\+\_\+\+VM\+\_\+\+INVOKE\+\_\+\+ON\+\_\+\+ALL}}(\mbox{[}\&\mbox{]}(auto \&\&arg, auto \&\&... rest) \{ \mbox{\hyperlink{yubihsm__pkcs11_8c_a75d8898b07aafc20a48a415a1c6e7bf0}{if}} constexpr(\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a6324ce0651772e7b720a5e01c9fb0d4e}{should\+\_\+check\+\_\+nan\+\_\+v}}$<$ std\+::remove\+\_\+cv\+\_\+t$<$ typename \mbox{\hyperlink{structsysio_1_1chain_1_1webassembly_1_1remove__argument__proxy}{remove\+\_\+argument\+\_\+proxy}}$<$ std\+::decay\+\_\+t$<$ decltype(arg)$>$ $>$\+::type $>$ $>$) \{ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\+\_\+\+ASSERT}}(!webassembly\+::is\+\_\+nan(\texorpdfstring{$\ast$}{*}arg), \mbox{\hyperlink{namespacesysio_1_1chain_a5dfe17906469eaf079c180c1afb4ad94}{transaction\+\_\+exception}}, "{}NaN is not an allowed \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}} for \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}} secondary key"{});\} \}))
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a289f4ff15afe4bd690ac511cd9f28732}{sysio\+::chain\+::webassembly\+::\+SYS\+\_\+\+VM\+\_\+\+PRECONDITION}} (legacy\+\_\+static\+\_\+check\+\_\+wl\+\_\+args, \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_a1ddb4f842ec1c70bcd410d65e586a1ad}{SYS\+\_\+\+VM\+\_\+\+INVOKE\+\_\+\+ONCE}}(\mbox{[}\&\mbox{]}(auto \&\&... args) \{ static\+\_\+assert(are\+\_\+whitelisted\+\_\+legacy\+\_\+types\+\_\+v$<$ std\+::decay\+\_\+t$<$ decltype(args)$>$... $>$, "{}legacy whitelisted type violation"{});\}))
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\constexpr bool \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_1_1detail_ab6cb6093e0f6b729d28158da62d08247}{sysio\+::chain\+::webassembly\+::detail\+::is\+\_\+softfloat\+\_\+type\+\_\+v}}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\constexpr bool \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_1_1detail_abbc8f78657b994f62d142f7a81d0174b}{sysio\+::chain\+::webassembly\+::detail\+::is\+\_\+wasm\+\_\+arithmetic\+\_\+type\+\_\+v}}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\constexpr bool \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a6324ce0651772e7b720a5e01c9fb0d4e}{sysio\+::chain\+::webassembly\+::should\+\_\+check\+\_\+nan\+\_\+v}}
+\end{DoxyCompactItemize}

@@ -1,0 +1,16 @@
+<map id="secp256k1_ecdsa_signature_serialize_compact" name="secp256k1_ecdsa_signature_serialize_compact">
+<area shape="rect" id="Node000001" title=" " alt="" coords="519,47,706,88"/>
+<area shape="rect" id="Node000002" href="$ecdsa_8c.html#a840291bc02cba5474a4cb46a9b9566fe" title=" " alt="" coords="366,5,415,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="504,46,415,26,416,21,505,41"/>
+<area shape="rect" id="Node000003" href="$tests_8c.html#a1cb741ffd2cea46124f7abc2c506717a" title=" " alt="" coords="316,55,465,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="504,70,465,70,465,65,504,65"/>
+<area shape="rect" id="Node000006" href="$tests_8c.html#abbcb27d1eb13654db9b2e281ffce021e" title=" " alt="" coords="309,104,471,130"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="505,94,452,106,451,101,504,89"/>
+<area shape="rect" id="Node000004" href="$tests_8c.html#aed8d29b89e89ae8bf370483684b1f7d2" title=" " alt="" coords="109,55,254,80"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="300,70,255,70,255,65,300,65"/>
+<area shape="rect" id="Node000005" href="$tests_8c.html#a3c04138a5bfe5d72780bb7e82a18e627" title=" " alt="" coords="5,80,55,106"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="94,85,56,91,55,86,93,80"/>
+<area shape="rect" id="Node000007" href="$tests_8c.html#ad6c8109b62ea1d0ed1b382678a2a08b1" title=" " alt="" coords="103,104,261,130"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="294,120,261,120,261,114,294,114"/>
+<area shape="poly" id="edge7_Node000007_Node000005" title=" " alt="" coords="87,105,55,99,56,94,88,99"/>
+</map>

@@ -1,0 +1,11 @@
+<map id="CLI::TriggerOff" name="CLI::TriggerOff">
+<area shape="rect" id="Node000001" title="Helper function to disable one option group/subcommand when another is used." alt="" coords="5,96,114,122"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_app.html#af5104a0ae06292a8cef25e428ce533c8" title="Disable the subcommand or option group." alt="" coords="171,5,300,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="77,93,115,67,160,41,175,35,177,39,163,46,117,72,80,98"/>
+<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_app.html#a1d4af11ac48929ee486482ea7b2cfe4f" title="Set the subcommand to be disabled by default, so on clear(), at the start of each parse it is disable..." alt="" coords="171,55,300,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="114,96,155,88,156,93,115,101"/>
+<area shape="rect" id="Node000004" href="$class_c_l_i_1_1_app.html#a7d58a9da106a0fb723eda4bd56017523" title=" " alt="" coords="162,120,309,161"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="115,116,147,122,146,127,114,121"/>
+<area shape="rect" id="Node000005" href="$class_c_l_i_1_1_app.html#a94045b9a983dd80d8fa1b477422c7849" title=" " alt="" coords="170,186,301,226"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="81,120,163,171,174,176,171,181,160,175,79,124"/>
+</map>

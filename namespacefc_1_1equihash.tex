@@ -1,0 +1,51 @@
+\doxysection{fc\+::equihash Namespace Reference}
+\hypertarget{namespacefc_1_1equihash}{}\label{namespacefc_1_1equihash}\index{fc::equihash@{fc::equihash}}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structfc_1_1equihash_1_1proof}{proof}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\+\_\+\+POW\+::\+Seed \mbox{\hyperlink{namespacefc_1_1equihash_aa8a67c1db57b7ca94f4fad558d83fd4d}{sha\+\_\+to\+\_\+seed}} (\mbox{\hyperlink{classfc_1_1sha256}{sha256}} seed)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacefc_1_1equihash_aa8a67c1db57b7ca94f4fad558d83fd4d}\index{fc::equihash@{fc::equihash}!sha\_to\_seed@{sha\_to\_seed}}
+\index{sha\_to\_seed@{sha\_to\_seed}!fc::equihash@{fc::equihash}}
+\doxysubsubsection{\texorpdfstring{sha\_to\_seed()}{sha\_to\_seed()}}
+{\footnotesize\ttfamily \label{namespacefc_1_1equihash_aa8a67c1db57b7ca94f4fad558d83fd4d} 
+\+\_\+\+POW\+::\+Seed fc\+::equihash\+::sha\+\_\+to\+\_\+seed (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1sha256}{sha256}}}]{seed}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{equihash_8cpp_source_l00009}{9}} of file \mbox{\hyperlink{equihash_8cpp_source}{equihash.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00010\ \ \ \ \{}
+\DoxyCodeLine{00011\ \ \ \ \ \ \ \_POW::Seed\ new\_seed;}
+\DoxyCodeLine{00012\ }
+\DoxyCodeLine{00013\ \ \ \ \ \ \ \textcolor{comment}{//\ Seed\ is\ 128\ bits.\ Half\ of\ sha256\ to\ create\ seed.\ Should\ still\ have\ enough\ randomness}}
+\DoxyCodeLine{00014\ \ \ \ \ \ \ new\_seed.v[0]\ =\ \ (\textcolor{keywordtype}{unsigned}\ int)\ \ seed.\mbox{\hyperlink{classfc_1_1sha256_ac933820516182c134a6473227db0e7da}{\_hash}}[0];}
+\DoxyCodeLine{00015\ \ \ \ \ \ \ new\_seed.v[0]\ \string^=\ (\textcolor{keywordtype}{unsigned}\ int)\ \ seed.\mbox{\hyperlink{classfc_1_1sha256_ac933820516182c134a6473227db0e7da}{\_hash}}[2];}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ new\_seed.v[1]\ =\ \ (\textcolor{keywordtype}{unsigned}\ int)(\ seed.\mbox{\hyperlink{classfc_1_1sha256_ac933820516182c134a6473227db0e7da}{\_hash}}[0]\ >>\ 32\ );}
+\DoxyCodeLine{00017\ \ \ \ \ \ \ new\_seed.v[1]\ \string^=\ (\textcolor{keywordtype}{unsigned}\ int)(\ seed.\mbox{\hyperlink{classfc_1_1sha256_ac933820516182c134a6473227db0e7da}{\_hash}}[2]\ >>\ 32\ );}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ new\_seed.v[2]\ =\ \ (\textcolor{keywordtype}{unsigned}\ int)\ \ seed.\mbox{\hyperlink{classfc_1_1sha256_ac933820516182c134a6473227db0e7da}{\_hash}}[1];}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ new\_seed.v[2]\ \string^=\ (\textcolor{keywordtype}{unsigned}\ int)\ \ seed.\mbox{\hyperlink{classfc_1_1sha256_ac933820516182c134a6473227db0e7da}{\_hash}}[3];}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ new\_seed.v[3]\ =\ \ (\textcolor{keywordtype}{unsigned}\ int)(\ seed.\mbox{\hyperlink{classfc_1_1sha256_ac933820516182c134a6473227db0e7da}{\_hash}}[1]\ >>\ 32\ );}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ new\_seed.v[3]\ \string^=\ (\textcolor{keywordtype}{unsigned}\ int)(\ seed.\mbox{\hyperlink{classfc_1_1sha256_ac933820516182c134a6473227db0e7da}{\_hash}}[3]\ >>\ 32\ );}
+\DoxyCodeLine{00022\ }
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ new\_seed;}
+\DoxyCodeLine{00024\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=344pt]{namespacefc_1_1equihash_aa8a67c1db57b7ca94f4fad558d83fd4d_icgraph}
+\end{center}
+\end{figure}

@@ -1,0 +1,101 @@
+\doxysection{WAST\+::Module\+Action Struct Reference}
+\hypertarget{struct_w_a_s_t_1_1_module_action}{}\label{struct_w_a_s_t_1_1_module_action}\index{WAST::ModuleAction@{WAST::ModuleAction}}
+
+
+{\ttfamily \#include $<$Test\+Script.\+h$>$}
+
+
+
+Inheritance diagram for WAST\+::Module\+Action\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=188pt]{struct_w_a_s_t_1_1_module_action__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for WAST\+::Module\+Action\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=260pt]{struct_w_a_s_t_1_1_module_action__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_w_a_s_t_1_1_module_action_a80d63693ea423d1a513892227bdb78ad}{Module\+Action}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_text_file_locus}{Text\+File\+Locus}} \&\&in\+Locus, std\+::string \&\&in\+Internal\+Module\+Name, \mbox{\hyperlink{struct_i_r_1_1_module}{IR\+::\+Module}} \texorpdfstring{$\ast$}{*}in\+Module)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{struct_w_a_s_t_1_1_action}{WAST\+::\+Action}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_w_a_s_t_1_1_action_aac7d30058fa131ab6f8827980f079a10}{Action}} (\mbox{\hyperlink{namespace_w_a_s_t_a054762705d8542a796362ce7f711b628}{Action\+Type}} in\+Type, \mbox{\hyperlink{struct_w_a_s_t_1_1_text_file_locus}{Text\+File\+Locus}} \&\&in\+Locus)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::string \mbox{\hyperlink{struct_w_a_s_t_1_1_module_action_ac89b7027827aa97c470fb8712a2f8249}{internal\+Module\+Name}}
+\item 
+std\+::unique\+\_\+ptr$<$ \mbox{\hyperlink{struct_i_r_1_1_module}{IR\+::\+Module}} $>$ \mbox{\hyperlink{struct_w_a_s_t_1_1_module_action_a8e38660ba4cf568e155d955df76af629}{module}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes inherited from \mbox{\hyperlink{struct_w_a_s_t_1_1_action}{WAST\+::\+Action}}}
+\begin{DoxyCompactItemize}
+\item 
+const \mbox{\hyperlink{namespace_w_a_s_t_a054762705d8542a796362ce7f711b628}{Action\+Type}} \mbox{\hyperlink{struct_w_a_s_t_1_1_action_a67e4f46e3021e93b3d38a97cc86254cc}{type}}
+\item 
+const \mbox{\hyperlink{struct_w_a_s_t_1_1_text_file_locus}{Text\+File\+Locus}} \mbox{\hyperlink{struct_w_a_s_t_1_1_action_af67c1490eebb9ee56eeba36960cfe4d7}{locus}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{_test_script_8h_source_l00056}{56}} of file \mbox{\hyperlink{_test_script_8h_source}{Test\+Script.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{struct_w_a_s_t_1_1_module_action_a80d63693ea423d1a513892227bdb78ad}\index{WAST::ModuleAction@{WAST::ModuleAction}!ModuleAction@{ModuleAction}}
+\index{ModuleAction@{ModuleAction}!WAST::ModuleAction@{WAST::ModuleAction}}
+\doxysubsubsection{\texorpdfstring{ModuleAction()}{ModuleAction()}}
+{\footnotesize\ttfamily \label{struct_w_a_s_t_1_1_module_action_a80d63693ea423d1a513892227bdb78ad} 
+WAST\+::\+Module\+Action\+::\+Module\+Action (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_w_a_s_t_1_1_text_file_locus}{Text\+File\+Locus}} \&\&}]{in\+Locus}{, }\item[{std\+::string \&\&}]{in\+Internal\+Module\+Name}{, }\item[{\mbox{\hyperlink{struct_i_r_1_1_module}{IR\+::\+Module}} \texorpdfstring{$\ast$}{*}}]{in\+Module}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_test_script_8h_source_l00060}{60}} of file \mbox{\hyperlink{_test_script_8h_source}{Test\+Script.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{struct_w_a_s_t_1_1_action_aac7d30058fa131ab6f8827980f079a10}{Action}}(\mbox{\hyperlink{namespace_w_a_s_t_a054762705d8542a796362ce7f711b628a0aca8c24dbd30a4ddf273908d06d135d}{ActionType::\_module}},std::move(inLocus)),\ \mbox{\hyperlink{struct_w_a_s_t_1_1_module_action_ac89b7027827aa97c470fb8712a2f8249}{internalModuleName}}(inInternalModuleName),\ \mbox{\hyperlink{struct_w_a_s_t_1_1_module_action_a8e38660ba4cf568e155d955df76af629}{module}}(inModule)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_w_a_s_t_1_1_module_action_ac89b7027827aa97c470fb8712a2f8249}\index{WAST::ModuleAction@{WAST::ModuleAction}!internalModuleName@{internalModuleName}}
+\index{internalModuleName@{internalModuleName}!WAST::ModuleAction@{WAST::ModuleAction}}
+\doxysubsubsection{\texorpdfstring{internalModuleName}{internalModuleName}}
+{\footnotesize\ttfamily \label{struct_w_a_s_t_1_1_module_action_ac89b7027827aa97c470fb8712a2f8249} 
+std\+::string WAST\+::\+Module\+Action\+::internal\+Module\+Name}
+
+
+
+Definition at line \mbox{\hyperlink{_test_script_8h_source_l00058}{58}} of file \mbox{\hyperlink{_test_script_8h_source}{Test\+Script.\+h}}.
+
+\Hypertarget{struct_w_a_s_t_1_1_module_action_a8e38660ba4cf568e155d955df76af629}\index{WAST::ModuleAction@{WAST::ModuleAction}!module@{module}}
+\index{module@{module}!WAST::ModuleAction@{WAST::ModuleAction}}
+\doxysubsubsection{\texorpdfstring{module}{module}}
+{\footnotesize\ttfamily \label{struct_w_a_s_t_1_1_module_action_a8e38660ba4cf568e155d955df76af629} 
+std\+::unique\+\_\+ptr$<$\mbox{\hyperlink{struct_i_r_1_1_module}{IR\+::\+Module}}$>$ WAST\+::\+Module\+Action\+::module}
+
+
+
+Definition at line \mbox{\hyperlink{_test_script_8h_source_l00059}{59}} of file \mbox{\hyperlink{_test_script_8h_source}{Test\+Script.\+h}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/wasm-\/jit/\+Include/\+WAST/\mbox{\hyperlink{_test_script_8h}{Test\+Script.\+h}}\end{DoxyCompactItemize}

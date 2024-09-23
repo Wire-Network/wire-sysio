@@ -1,0 +1,7 @@
+<map id="websocketpp::config::core_client::transport_config" name="websocketpp::config::core_client::transport_config">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,45,157,101"/>
+<area shape="rect" id="Node000002" href="$structwebsocketpp_1_1config_1_1asio__client_1_1transport__config.html" title=" " alt="" coords="215,5,366,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="171,53,214,45,215,50,172,58"/>
+<area shape="rect" id="Node000003" href="$structwebsocketpp_1_1config_1_1asio__tls__client_1_1transport__config.html" title=" " alt="" coords="205,85,376,141"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="172,88,205,94,204,99,171,93"/>
+</map>

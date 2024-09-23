@@ -1,0 +1,78 @@
+\doxysection{testing\+::internal\+::Either\+Of\+Matcher\texorpdfstring{$<$}{<} Matcher1, Matcher2 \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classtesting_1_1internal_1_1_either_of_matcher}{}\label{classtesting_1_1internal_1_1_either_of_matcher}\index{testing::internal::EitherOfMatcher$<$ Matcher1, Matcher2 $>$@{testing::internal::EitherOfMatcher$<$ Matcher1, Matcher2 $>$}}
+
+
+{\ttfamily \#include $<$gmock-\/matchers.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_either_of_matcher_a5ae2361f20a0460870b72b83fcc0c643}{Either\+Of\+Matcher}} (Matcher1 matcher1, Matcher2 matcher2)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{classtesting_1_1internal_1_1_either_of_matcher_aef76a8b45451ec7abf845a2b9dd74bfb}{operator Matcher$<$ T $>$}} () const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Matcher1, typename Matcher2$>$\newline
+class testing\+::internal\+::\+Either\+Of\+Matcher$<$ Matcher1, Matcher2 $>$}
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l01927}{1927}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_either_of_matcher_a5ae2361f20a0460870b72b83fcc0c643}\index{testing::internal::EitherOfMatcher$<$ Matcher1, Matcher2 $>$@{testing::internal::EitherOfMatcher$<$ Matcher1, Matcher2 $>$}!EitherOfMatcher@{EitherOfMatcher}}
+\index{EitherOfMatcher@{EitherOfMatcher}!testing::internal::EitherOfMatcher$<$ Matcher1, Matcher2 $>$@{testing::internal::EitherOfMatcher$<$ Matcher1, Matcher2 $>$}}
+\doxysubsubsection{\texorpdfstring{EitherOfMatcher()}{EitherOfMatcher()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_either_of_matcher_a5ae2361f20a0460870b72b83fcc0c643} 
+template$<$typename Matcher1 , typename Matcher2 $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_either_of_matcher}{testing\+::internal\+::\+Either\+Of\+Matcher}}$<$ Matcher1, Matcher2 $>$\+::\+Either\+Of\+Matcher (\begin{DoxyParamCaption}\item[{Matcher1}]{matcher1}{, }\item[{Matcher2}]{matcher2}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l01929}{1929}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01930\ \ \ \ \ \ \ :\ matcher1\_(matcher1),\ matcher2\_(matcher2)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_either_of_matcher_aef76a8b45451ec7abf845a2b9dd74bfb}\index{testing::internal::EitherOfMatcher$<$ Matcher1, Matcher2 $>$@{testing::internal::EitherOfMatcher$<$ Matcher1, Matcher2 $>$}!operator Matcher$<$ T $>$@{operator Matcher$<$ T $>$}}
+\index{operator Matcher$<$ T $>$@{operator Matcher$<$ T $>$}!testing::internal::EitherOfMatcher$<$ Matcher1, Matcher2 $>$@{testing::internal::EitherOfMatcher$<$ Matcher1, Matcher2 $>$}}
+\doxysubsubsection{\texorpdfstring{operator Matcher$<$ T $>$()}{operator Matcher< T >()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_either_of_matcher_aef76a8b45451ec7abf845a2b9dd74bfb} 
+template$<$typename Matcher1 , typename Matcher2 $>$ \\
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_either_of_matcher}{testing\+::internal\+::\+Either\+Of\+Matcher}}$<$ Matcher1, Matcher2 $>$\+::operator \mbox{\hyperlink{classtesting_1_1_matcher}{Matcher}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l01936}{1936}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01936\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01937\ \ \ \ \ std::vector<Matcher<T>\ >\ \mbox{\hyperlink{namespace_catch_1_1_generators_aff55717239311a0e8352a4de5d29967f}{values}};}
+\DoxyCodeLine{01938\ \ \ \ \ \mbox{\hyperlink{namespace_catch_1_1_generators_aff55717239311a0e8352a4de5d29967f}{values}}.push\_back(\mbox{\hyperlink{namespacetesting_ad49d22f0e87778e2b97a88ee851dcea3}{SafeMatcherCast<T>}}(matcher1\_));}
+\DoxyCodeLine{01939\ \ \ \ \ \mbox{\hyperlink{namespace_catch_1_1_generators_aff55717239311a0e8352a4de5d29967f}{values}}.push\_back(\mbox{\hyperlink{namespacetesting_ad49d22f0e87778e2b97a88ee851dcea3}{SafeMatcherCast<T>}}(matcher2\_));}
+\DoxyCodeLine{01940\ \ \ \ \ \textcolor{keywordflow}{return}\ Matcher<T>(\textcolor{keyword}{new}\ AnyOfMatcherImpl<T>(\mbox{\hyperlink{namespacetesting_1_1internal_aa1114d84589bd22f45d443527528cb35}{internal::move}}(values)));}
+\DoxyCodeLine{01941\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_either_of_matcher_aef76a8b45451ec7abf845a2b9dd74bfb_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/include/gmock/\mbox{\hyperlink{gmock-matchers_8h}{gmock-\/matchers.\+h}}\end{DoxyCompactItemize}

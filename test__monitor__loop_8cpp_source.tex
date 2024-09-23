@@ -1,0 +1,165 @@
+\doxysection{test\+\_\+monitor\+\_\+loop.\+cpp}
+\hypertarget{test__monitor__loop_8cpp_source}{}\label{test__monitor__loop_8cpp_source}\index{plugins/resource\_monitor\_plugin/test/test\_monitor\_loop.cpp@{plugins/resource\_monitor\_plugin/test/test\_monitor\_loop.cpp}}
+\mbox{\hyperlink{test__monitor__loop_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00001}\mbox{\hyperlink{test__monitor__loop_8cpp_a6b2a3852db8bb19ab6909bac01859985}{00001}}\ \textcolor{preprocessor}{\#define\ BOOST\_TEST\_MODULE\ monitor\_loop}}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <boost/test/included/unit\_test.hpp>}}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{variant__object_8hpp}{fc/variant\_object.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{file__space__handler_8hpp}{sysio/resource\_monitor\_plugin/file\_space\_handler.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00008}00008\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}};}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00009}00009\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacesysio_1_1resource__monitor}{sysio::resource\_monitor}};}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00010}00010\ \textcolor{keyword}{using\ namespace\ }boost::system;}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00012}\mbox{\hyperlink{structspace__handler__fixture}{00012}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structspace__handler__fixture}{space\_handler\_fixture}}\ \{}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00013}\mbox{\hyperlink{structspace__handler__fixture_1_1mock__space__provider}{00013}}\ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structspace__handler__fixture_1_1mock__space__provider}{mock\_space\_provider}}\ \{}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00014}\mbox{\hyperlink{structspace__handler__fixture_1_1mock__space__provider_a9183e7b9d5d6c01692572c8042b95fcf}{00014}}\ \ \ \ \ \ \ \mbox{\hyperlink{structspace__handler__fixture_1_1mock__space__provider_a9183e7b9d5d6c01692572c8042b95fcf}{mock\_space\_provider}}(\mbox{\hyperlink{structspace__handler__fixture}{space\_handler\_fixture}}\&\ \mbox{\hyperlink{structspace__handler__fixture_1_1mock__space__provider_af96453f1e14c09423a9f81a344d1a3fc}{fixture}})}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00015}00015\ \ \ \ \ \ \ :\mbox{\hyperlink{structspace__handler__fixture_1_1mock__space__provider_af96453f1e14c09423a9f81a344d1a3fc}{fixture}}(\mbox{\hyperlink{structspace__handler__fixture_1_1mock__space__provider_af96453f1e14c09423a9f81a344d1a3fc}{fixture}})}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00016}00016\ \ \ \ \ \ \ \{\}}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00018}\mbox{\hyperlink{structspace__handler__fixture_1_1mock__space__provider_ac157495b706f703b5ddcaad37ea26af0}{00018}}\ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{structspace__handler__fixture_1_1mock__space__provider_ac157495b706f703b5ddcaad37ea26af0}{get\_stat}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{classfc_1_1path}{path}},\ \textcolor{keyword}{struct}\ stat\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}})\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00019}00019\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structspace__handler__fixture_1_1mock__space__provider_af96453f1e14c09423a9f81a344d1a3fc}{fixture}}.\mbox{\hyperlink{structspace__handler__fixture_aaed95bf56a9e058f61563a91ffc63110}{mock\_get\_stat}}(\mbox{\hyperlink{classfc_1_1path}{path}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}});}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00020}00020\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00022}\mbox{\hyperlink{structspace__handler__fixture_1_1mock__space__provider_a892568f4c061c344de64606018b15345}{00022}}\ \ \ \ \ \ \ bfs::space\_info\ \mbox{\hyperlink{structspace__handler__fixture_1_1mock__space__provider_a892568f4c061c344de64606018b15345}{get\_space}}(\textcolor{keyword}{const}\ bfs::path\&\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\ boost::system::error\_code\&\ ec)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00023}00023\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structspace__handler__fixture_1_1mock__space__provider_af96453f1e14c09423a9f81a344d1a3fc}{fixture}}.\mbox{\hyperlink{structspace__handler__fixture_a0247eddaeaccec1c4769d917cefcee1d}{mock\_get\_space}}(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\ ec);}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00024}00024\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00026}\mbox{\hyperlink{structspace__handler__fixture_1_1mock__space__provider_af96453f1e14c09423a9f81a344d1a3fc}{00026}}\ \ \ \ \ \ \ \mbox{\hyperlink{structspace__handler__fixture}{space\_handler\_fixture}}\&\ \mbox{\hyperlink{structspace__handler__fixture_1_1mock__space__provider_af96453f1e14c09423a9f81a344d1a3fc}{fixture}};}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00027}00027\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00029}\mbox{\hyperlink{structspace__handler__fixture_a5395bcf563cb89b24de3e9da782d8505}{00029}}\ \ \ \ boost::asio::io\_context\ \mbox{\hyperlink{structspace__handler__fixture_a5395bcf563cb89b24de3e9da782d8505}{ctx}};}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00031}\mbox{\hyperlink{structspace__handler__fixture_ac2e81ae9d83e0fc08dfdede83873dcae}{00031}}\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler}{file\_space\_handler\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler}{file\_space\_handler<mock\_space\_provider>}};}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00032}\mbox{\hyperlink{structspace__handler__fixture_a9cf4275b442b55ac01fb8cb7c3cdeb11}{00032}}\ \ \ \ \mbox{\hyperlink{structspace__handler__fixture_a9cf4275b442b55ac01fb8cb7c3cdeb11}{space\_handler\_fixture}}()}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00033}00033\ \ \ \ :\ \mbox{\hyperlink{structspace__handler__fixture_ada3f693c49157e4cffa9ec4faaf60d69}{space\_handler}}(\mbox{\hyperlink{structspace__handler__fixture_1_1mock__space__provider}{mock\_space\_provider}}(\ *this\ ),\ \mbox{\hyperlink{structspace__handler__fixture_a5395bcf563cb89b24de3e9da782d8505}{ctx}})}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00034}00034\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00035}00035\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00037}\mbox{\hyperlink{structspace__handler__fixture_a6ca65640a8148ac9e60879dd2dc356e6}{00037}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structspace__handler__fixture_a6ca65640a8148ac9e60879dd2dc356e6}{add\_file\_system}}(\textcolor{keyword}{const}\ bfs::path\&\ path\_name)\ \{}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00038}00038\ \ \ \ \ \ \ \mbox{\hyperlink{structspace__handler__fixture_ada3f693c49157e4cffa9ec4faaf60d69}{space\_handler}}.\mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler_a6a5e01f3f35cab4c846640e060b91b63}{add\_file\_system}}(\ path\_name\ );}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00039}00039\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00041}\mbox{\hyperlink{structspace__handler__fixture_a261e57182e180fe87777a52c6d657e0d}{00041}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structspace__handler__fixture_a261e57182e180fe87777a52c6d657e0d}{set\_threshold}}(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ threshold,\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ warning\_threshold)\ \{}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00042}00042\ \ \ \ \ \ \ \mbox{\hyperlink{structspace__handler__fixture_ada3f693c49157e4cffa9ec4faaf60d69}{space\_handler}}.\mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler_a51eaff9443b1a88e06cbbd1344a78071}{set\_threshold}}(\ threshold,\ warning\_threshold\ );}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00043}00043\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00045}\mbox{\hyperlink{structspace__handler__fixture_a307c90555c5d6ece20697d3a3347e4e9}{00045}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structspace__handler__fixture_a307c90555c5d6ece20697d3a3347e4e9}{set\_sleep\_time}}(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ sleep\_time)\ \{}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00046}00046\ \ \ \ \ \ \ \mbox{\hyperlink{structspace__handler__fixture_ada3f693c49157e4cffa9ec4faaf60d69}{space\_handler}}.\mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler_af1ad683111aac7f94733e3866db0149e}{set\_sleep\_time}}(\ sleep\_time\ );}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00047}00047\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00049}\mbox{\hyperlink{structspace__handler__fixture_a4be39f2c915543cb5eba815e01201bbf}{00049}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structspace__handler__fixture_a4be39f2c915543cb5eba815e01201bbf}{set\_shutdown\_on\_exceeded}}(\textcolor{keywordtype}{bool}\ shutdown\_on\_exceeded)\ \{}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00050}00050\ \ \ \ \ \ \ \mbox{\hyperlink{structspace__handler__fixture_ada3f693c49157e4cffa9ec4faaf60d69}{space\_handler}}.\mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler_ac0f510cb0298b9cefe68102772fc5db7}{set\_shutdown\_on\_exceeded}}(shutdown\_on\_exceeded);}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00051}00051\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00052}00052\ }
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00053}\mbox{\hyperlink{structspace__handler__fixture_ae8dd009166a506ec3386360a5c8e2897}{00053}}\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{structspace__handler__fixture_ae8dd009166a506ec3386360a5c8e2897}{is\_threshold\_exceeded}}()\ \{}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00054}00054\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structspace__handler__fixture_ada3f693c49157e4cffa9ec4faaf60d69}{space\_handler}}.\mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler_a3571fc8484a45f62857dcbe29d73aa28}{is\_threshold\_exceeded}}();}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00055}00055\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00057}\mbox{\hyperlink{structspace__handler__fixture_acdb08c8ee2a829f47b5b992ab73f5364}{00057}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structspace__handler__fixture_acdb08c8ee2a829f47b5b992ab73f5364}{space\_monitor\_loop}}()\ \{}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00058}00058\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structspace__handler__fixture_ada3f693c49157e4cffa9ec4faaf60d69}{space\_handler}}.\mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler_a6faa30d2db31020b3db4886a554e147a}{space\_monitor\_loop}}();}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00059}00059\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00061}\mbox{\hyperlink{structspace__handler__fixture_a2f88ee3184e87f67f178e4c4074be6f3}{00061}}\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{structspace__handler__fixture_a2f88ee3184e87f67f178e4c4074be6f3}{test\_loop\_common}}(\textcolor{keywordtype}{int}\ num\_loops,\ \textcolor{keywordtype}{int}\ interval)}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00062}00062\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00063}00063\ \ \ \ \ \ \ \mbox{\hyperlink{structspace__handler__fixture_a0247eddaeaccec1c4769d917cefcee1d}{mock\_get\_space}}\ =\ [\ i\ =\ 0,\ num\_loops\ ](\ \textcolor{keyword}{const}\ bfs::path\&\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\ boost::system::error\_code\&\ ec)\ \textcolor{keyword}{mutable}\ -\/>\ bfs::space\_info\ \{}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00064}00064\ \ \ \ \ \ \ \ \ \ ec\ =\ boost::system::errc::make\_error\_code(errc::success);}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00066}00066\ \ \ \ \ \ \ \ \ \ bfs::space\_info\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}};}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00067}00067\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}}.capacity\ \ =\ 1000000;}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ i\ <\ num\_loops\ +\ 1\ )\ \{\ \ \textcolor{comment}{//\ "{}+\ 1"{}\ for\ the\ get\_space\ in\ add\_file\_system}}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}}.available\ =\ 300000;}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00071}00071\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}}.available\ =\ 100000;}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00073}00073\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00074}00074\ }
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00075}00075\ \ \ \ \ \ \ \ \ \ i++;}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00076}00076\ }
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}};}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00078}00078\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00080}00080\ \ \ \ \ \ \ \mbox{\hyperlink{structspace__handler__fixture_aaed95bf56a9e058f61563a91ffc63110}{mock\_get\_stat}}\ =\ [](\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{classfc_1_1path}{path}},\ \textcolor{keyword}{struct\ }stat\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}\ )\ -\/>\ \textcolor{keywordtype}{int}\ \{}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00081}00081\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}-\/>st\_dev\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00082}00082\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00083}00083\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00084}00084\ }
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00085}00085\ \ \ \ \ \ \ \mbox{\hyperlink{structspace__handler__fixture_a261e57182e180fe87777a52c6d657e0d}{set\_threshold}}(80,\ 75);}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00086}00086\ \ \ \ \ \ \ \mbox{\hyperlink{structspace__handler__fixture_a4be39f2c915543cb5eba815e01201bbf}{set\_shutdown\_on\_exceeded}}(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00087}00087\ \ \ \ \ \ \ \mbox{\hyperlink{structspace__handler__fixture_a307c90555c5d6ece20697d3a3347e4e9}{set\_sleep\_time}}(interval);}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00088}00088\ \ \ \ \ \ \ \mbox{\hyperlink{structspace__handler__fixture_a6ca65640a8148ac9e60879dd2dc356e6}{add\_file\_system}}(\textcolor{stringliteral}{"{}/test"{}});}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00089}00089\ }
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00090}00090\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ start\ =\ std::chrono::system\_clock::now();}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00091}00091\ }
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00092}00092\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ monitor\_thread\ =\ std::thread(\ [\textcolor{keyword}{this}]\ \{}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00093}00093\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structspace__handler__fixture_acdb08c8ee2a829f47b5b992ab73f5364}{space\_monitor\_loop}}();}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00094}00094\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structspace__handler__fixture_a5395bcf563cb89b24de3e9da782d8505}{ctx}}.run();}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00095}00095\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00096}00096\ }
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00097}00097\ \ \ \ \ \ \ monitor\_thread.join();}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00098}00098\ }
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00099}00099\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ end\ =\ std::chrono::system\_clock::now();}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00100}00100\ \ \ \ \ \ \ std::chrono::duration<double>\ test\_duration\ =\ end\ -\/\ start;}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00101}00101\ }
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00102}00102\ \ \ \ \ \ \ \textcolor{comment}{//\ For\ tests\ to\ be\ repeatable\ on\ any\ platforms\ under\ any\ loads,}}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00103}00103\ \ \ \ \ \ \ \textcolor{comment}{//\ particularly\ for\ longer\ runs,}}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00104}00104\ \ \ \ \ \ \ \textcolor{comment}{//\ we\ just\ make\ sure\ the\ test\ duration\ is\ longer\ than\ a\ margin}}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00105}00105\ \ \ \ \ \ \ \textcolor{comment}{//\ of\ theroretical\ duration.\ }}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00106}00106\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ finished\_in\_time\ =\ (test\_duration\ >=\ std::chrono::duration<double>((num\_loops\ -\/\ 1)\ *\ interval));}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00107}00107\ }
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00108}00108\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ finished\_in\_time;}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00109}00109\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00110}00110\ }
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00111}00111\ \ \ \ \textcolor{comment}{//\ fixture\ data\ and\ methods}}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00112}\mbox{\hyperlink{structspace__handler__fixture_a0247eddaeaccec1c4769d917cefcee1d}{00112}}\ \ \ \ std::function<bfs::space\_info(\textcolor{keyword}{const}\ bfs::path\&\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\ boost::system::error\_code\&\ ec)>\ \mbox{\hyperlink{structspace__handler__fixture_a0247eddaeaccec1c4769d917cefcee1d}{mock\_get\_space}};}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00113}\mbox{\hyperlink{structspace__handler__fixture_aaed95bf56a9e058f61563a91ffc63110}{00113}}\ \ \ \ std::function<int(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{classfc_1_1path}{path}},\ \textcolor{keyword}{struct}\ stat\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}})>\ \mbox{\hyperlink{structspace__handler__fixture_aaed95bf56a9e058f61563a91ffc63110}{mock\_get\_stat}};}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00114}00114\ }
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00115}\mbox{\hyperlink{structspace__handler__fixture_ada3f693c49157e4cffa9ec4faaf60d69}{00115}}\ \ \ \ \mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler}{file\_space\_handler\_t}}\ \mbox{\hyperlink{structspace__handler__fixture_ada3f693c49157e4cffa9ec4faaf60d69}{space\_handler}};}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00116}00116\ \};}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00117}00117\ }
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00118}00118\ BOOST\_AUTO\_TEST\_SUITE(monitor\_loop\_tests)}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00119}\mbox{\hyperlink{test__monitor__loop_8cpp_a661d9a1ec8301321ca0ef24be50eac27}{00119}}\ \ \ \ \mbox{\hyperlink{test__monitor__loop_8cpp_a661d9a1ec8301321ca0ef24be50eac27}{BOOST\_FIXTURE\_TEST\_CASE}}(zero\_loop,\ \mbox{\hyperlink{structspace__handler__fixture}{space\_handler\_fixture}})}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00120}00120\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00121}00121\ \ \ \ \ \ \ BOOST\_TEST(\ test\_loop\_common(0,\ 1)\ );}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00122}00122\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00123}00123\ }
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00124}\mbox{\hyperlink{test__monitor__loop_8cpp_a1ae2d0e9e865330f9b06e1863159c704}{00124}}\ \ \ \ \mbox{\hyperlink{test__monitor__loop_8cpp_a661d9a1ec8301321ca0ef24be50eac27}{BOOST\_FIXTURE\_TEST\_CASE}}(one\_loop\_1\_secs\_interval,\ \mbox{\hyperlink{structspace__handler__fixture}{space\_handler\_fixture}})}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00125}00125\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00126}00126\ \ \ \ \ \ BOOST\_TEST(\ test\_loop\_common(1,\ 1)\ );}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00127}00127\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00128}00128\ }
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00129}\mbox{\hyperlink{test__monitor__loop_8cpp_a64402128c0e7b932a2080f2b34443d9c}{00129}}\ \ \ \ \mbox{\hyperlink{test__monitor__loop_8cpp_a661d9a1ec8301321ca0ef24be50eac27}{BOOST\_FIXTURE\_TEST\_CASE}}(two\_loops\_1\_sec\_interval,\ \mbox{\hyperlink{structspace__handler__fixture}{space\_handler\_fixture}})}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00130}00130\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00131}00131\ \ \ \ \ \ \ BOOST\_TEST(\ test\_loop\_common(2,\ 1)\ );}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00132}00132\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00133}00133\ }
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00134}\mbox{\hyperlink{test__monitor__loop_8cpp_a86c7129af9f5c238099f186fe9e68e1c}{00134}}\ \ \ \ \mbox{\hyperlink{test__monitor__loop_8cpp_a661d9a1ec8301321ca0ef24be50eac27}{BOOST\_FIXTURE\_TEST\_CASE}}(ten\_loops\_1\_sec\_interval,\ \mbox{\hyperlink{structspace__handler__fixture}{space\_handler\_fixture}})}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00135}00135\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00136}00136\ \ \ \ \ \ \ BOOST\_TEST(\ test\_loop\_common(10,\ 1)\ );}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00137}00137\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00138}00138\ }
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00139}\mbox{\hyperlink{test__monitor__loop_8cpp_ae6d2f716820ddf34a07a1fb9897be344}{00139}}\ \ \ \ \mbox{\hyperlink{test__monitor__loop_8cpp_a661d9a1ec8301321ca0ef24be50eac27}{BOOST\_FIXTURE\_TEST\_CASE}}(one\_loop\_5\_secs\_interval,\ \mbox{\hyperlink{structspace__handler__fixture}{space\_handler\_fixture}})}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00140}00140\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00141}00141\ \ \ \ \ \ \ BOOST\_TEST(\ test\_loop\_common(1,\ 5)\ );}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00142}00142\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00143}00143\ }
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00144}\mbox{\hyperlink{test__monitor__loop_8cpp_af7ff6f6bc7bdb247644313cef4f90549}{00144}}\ \ \ \ \mbox{\hyperlink{test__monitor__loop_8cpp_a661d9a1ec8301321ca0ef24be50eac27}{BOOST\_FIXTURE\_TEST\_CASE}}(two\_loops\_5\_sec\_interval,\ \mbox{\hyperlink{structspace__handler__fixture}{space\_handler\_fixture}})}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00145}00145\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00146}00146\ \ \ \ \ \ \ BOOST\_TEST(\ test\_loop\_common(2,\ 5)\ );}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00147}00147\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00148}00148\ }
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00149}\mbox{\hyperlink{test__monitor__loop_8cpp_abbc4fbb221a1b566e40c88827d774c71}{00149}}\ \ \ \ \mbox{\hyperlink{test__monitor__loop_8cpp_a661d9a1ec8301321ca0ef24be50eac27}{BOOST\_FIXTURE\_TEST\_CASE}}(ten\_loops\_5\_sec\_interval,\ \mbox{\hyperlink{structspace__handler__fixture}{space\_handler\_fixture}})}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00150}00150\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00151}00151\ \ \ \ \ \ \ BOOST\_TEST(\ test\_loop\_common(10,\ 5)\ );}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00152}00152\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00153}00153\ }
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00154}\mbox{\hyperlink{test__monitor__loop_8cpp_a7b3ea7d8e308f3feb243806e426cd21d}{00154}}\ \ \ \ \mbox{\hyperlink{test__monitor__loop_8cpp_a661d9a1ec8301321ca0ef24be50eac27}{BOOST\_FIXTURE\_TEST\_CASE}}(one\_hundred\_twenty\_loops\_1\_sec\_interval,\ \mbox{\hyperlink{structspace__handler__fixture}{space\_handler\_fixture}})}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00155}00155\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00156}00156\ \ \ \ \ \ \ BOOST\_TEST(\ test\_loop\_common(120,\ 1)\ );}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00157}00157\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00158}00158\ }
+\DoxyCodeLine{\Hypertarget{test__monitor__loop_8cpp_source_l00159}00159\ BOOST\_AUTO\_TEST\_SUITE\_END()}
+
+\end{DoxyCode}

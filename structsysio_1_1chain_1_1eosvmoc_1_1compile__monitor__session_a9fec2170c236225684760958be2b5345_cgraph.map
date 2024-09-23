@@ -1,0 +1,9 @@
+<map id="sysio::chain::eosvmoc::compile_monitor_session::read_message_from_compile_task" name="sysio::chain::eosvmoc::compile_monitor_session::read_message_from_compile_task">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,67,237,123"/>
+<area shape="rect" id="Node000002" href="$namespacesysio_1_1chain_1_1eosvmoc.html#aa65c4d6c02a0823262c6627a86cc74bc" title=" " alt="" coords="286,29,456,70"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="237,71,270,65,271,70,238,77"/>
+<area shape="rect" id="Node000003" href="$namespacesysio_1_1chain_1_1eosvmoc.html#a8715d32fd2e6a4a668578ca0d946b58b" title=" " alt="" coords="285,119,458,159"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="238,113,270,118,269,124,237,118"/>
+<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="324,29,322,19,330,10,346,5,371,3,398,5,414,11,412,16,397,10,371,8,347,10,333,15,327,21,330,28"/>
+<area shape="poly" id="edge4_Node000003_Node000003" title=" " alt="" coords="324,119,322,109,330,100,346,94,371,92,398,94,414,101,412,106,397,100,371,97,347,99,333,104,327,110,330,117"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="fc::exception" name="fc::exception">
+<area shape="rect" id="Node000001" title="Used to generate a useful error report when an exception is thrown." alt="" coords="140,79,237,105"/>
+<area shape="rect" id="Node000003" href="$classfc_1_1std__exception__wrapper.html" title="wrapper for std::exception" alt="" coords="5,153,180,178"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="162,116,110,154,107,150,159,112"/>
+<area shape="rect" id="Node000004" href="$classfc_1_1unhandled__exception.html" title="re&#45;thrown whenever an unhandled exception is caught.Any exceptions thrown by 3rd party libraries that..." alt="" coords="203,153,366,178"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="218,112,270,150,267,154,215,116"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="137,5,240,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="191,46,191,79,186,79,186,46"/>
+</map>

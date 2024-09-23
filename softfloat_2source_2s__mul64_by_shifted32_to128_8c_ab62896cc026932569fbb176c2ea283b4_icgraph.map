@@ -1,0 +1,11 @@
+<map id="softfloat_mul64ByShifted32To128" name="softfloat_mul64ByShifted32To128">
+<area shape="rect" id="Node000001" title=" " alt="" coords="144,72,325,113"/>
+<area shape="rect" id="Node000002" href="$softfloat_2source_2ext_f80__div_8c.html#a741eedfa7d22ef1c630729f0ec3097af" title=" " alt="" coords="8,5,93,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="167,69,83,34,85,29,169,64"/>
+<area shape="rect" id="Node000003" href="$softfloat_2source_2ext_f80__rem_8c.html#ac6cadb3a4da28083b97be0f0393b4dc2" title=" " alt="" coords="5,55,96,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="128,81,96,76,97,71,129,76"/>
+<area shape="rect" id="Node000004" href="$softfloat_2source_2ext_f80__sqrt_8c.html#a7b37fc99ef9354c647f7fb1047614e21" title=" " alt="" coords="5,104,96,130"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="129,109,97,114,96,108,128,104"/>
+<area shape="rect" id="Node000005" href="$softfloat_2source_2f128__sqrt_8c.html#ae2d66508e90a450d258c67046d4c7d43" title=" " alt="" coords="13,153,88,179"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="168,122,86,155,84,150,166,117"/>
+</map>

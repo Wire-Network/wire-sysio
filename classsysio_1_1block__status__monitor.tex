@@ -1,0 +1,220 @@
+\doxysection{sysio\+::block\+\_\+status\+\_\+monitor Class Reference}
+\hypertarget{classsysio_1_1block__status__monitor}{}\label{classsysio_1_1block__status__monitor}\index{sysio::block\_status\_monitor@{sysio::block\_status\_monitor}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classsysio_1_1block__status__monitor_a618437e3046fe87fc6fa432af10c8f9f}{block\+\_\+status\+\_\+monitor}} (\mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}} window\+\_\+size=\mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}}(2 \texorpdfstring{$\ast$}{*}1000), \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} max\+\_\+rejected\+\_\+windows=13)
+\item 
+\mbox{\hyperlink{classsysio_1_1block__status__monitor_a7bcc3421298ca65eea3636e1d70a0929}{block\+\_\+status\+\_\+monitor}} (const \mbox{\hyperlink{classsysio_1_1block__status__monitor}{block\+\_\+status\+\_\+monitor}} \&)=delete
+\item 
+\mbox{\hyperlink{classsysio_1_1block__status__monitor_af24a9e6fe86ea0fc97b0da9b530e08cd}{block\+\_\+status\+\_\+monitor}} (\mbox{\hyperlink{classsysio_1_1block__status__monitor}{block\+\_\+status\+\_\+monitor}} \&\&)=delete
+\item 
+\mbox{\hyperlink{classsysio_1_1block__status__monitor_ac53053745d9ea2699a642bcdab8b4248}{\texorpdfstring{$\sim$}{\string~}block\+\_\+status\+\_\+monitor}} ()=default
+\item 
+void \mbox{\hyperlink{classsysio_1_1block__status__monitor_aa76046b80f88bdc6de0e1bf55778b7db}{reset}} ()
+\begin{DoxyCompactList}\small\item\em reset to initial state \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classsysio_1_1block__status__monitor_a55c26a4ba12f3d4a8f1d9bb406d0bebb}{accepted}} ()
+\begin{DoxyCompactList}\small\item\em called when a block is accepted (sync\+\_\+recv\+\_\+block) \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classsysio_1_1block__status__monitor_ad9b6501fa2a084ad54c753044c7b7748}{rejected}} ()
+\begin{DoxyCompactList}\small\item\em called when a block is rejected \end{DoxyCompactList}\item 
+auto \mbox{\hyperlink{classsysio_1_1block__status__monitor_a2f4da5c22ddc9442446a4974fa3ac54c}{events}} () const
+\begin{DoxyCompactList}\small\item\em returns number of consecutive rbws \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classsysio_1_1block__status__monitor_abbb9c79ef9cd6f3ed8c1003b9205295b}{max\+\_\+events\+\_\+violated}} () const
+\begin{DoxyCompactList}\small\item\em indicates if the max number of consecutive rbws has been reached or exceeded \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classsysio_1_1block__status__monitor}{block\+\_\+status\+\_\+monitor}} \& \mbox{\hyperlink{classsysio_1_1block__status__monitor_a87d668fcd7ef8b5a0ec527d4e82d7a01}{operator=}} (const \mbox{\hyperlink{classsysio_1_1block__status__monitor}{block\+\_\+status\+\_\+monitor}} \&)=delete
+\begin{DoxyCompactList}\small\item\em assignment not allowed \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classsysio_1_1block__status__monitor}{block\+\_\+status\+\_\+monitor}} \& \mbox{\hyperlink{classsysio_1_1block__status__monitor_a5896b65c0687412fa02cd12495baaa56}{operator=}} (\mbox{\hyperlink{classsysio_1_1block__status__monitor}{block\+\_\+status\+\_\+monitor}} \&\&)=delete
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+monitors the status of blocks as to whether a block is accepted (sync\textquotesingle{}d) or rejected. It groups consecutive rejected blocks in a (configurable) time window (rbw) and maintains a metric of the number of consecutive rejected block time windows (rbws). 
+
+Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l00546}{546}} of file \mbox{\hyperlink{net__plugin_8cpp_source}{net\+\_\+plugin.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classsysio_1_1block__status__monitor_a618437e3046fe87fc6fa432af10c8f9f}\index{sysio::block\_status\_monitor@{sysio::block\_status\_monitor}!block\_status\_monitor@{block\_status\_monitor}}
+\index{block\_status\_monitor@{block\_status\_monitor}!sysio::block\_status\_monitor@{sysio::block\_status\_monitor}}
+\doxysubsubsection{\texorpdfstring{block\_status\_monitor()}{block\_status\_monitor()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{classsysio_1_1block__status__monitor_a618437e3046fe87fc6fa432af10c8f9f} 
+sysio\+::block\+\_\+status\+\_\+monitor\+::block\+\_\+status\+\_\+monitor (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}}}]{window\+\_\+size}{ = {\ttfamily \mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}}(2\texorpdfstring{$\ast$}{*}1000)}, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{max\+\_\+rejected\+\_\+windows}{ = {\ttfamily 13}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+ctor
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em window\+\_\+size} & The time, in microseconds, of the rejected block window \\
+\hline
+\mbox{\texttt{ in}}  & {\em max\+\_\+rejected\+\_\+windows} & The max consecutive number of rejected block windows \\
+\hline
+\end{DoxyParams}
+\begin{DoxyNote}{Note}
+Copy ctor is not allowed 
+\end{DoxyNote}
+
+
+Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l00560}{560}} of file \mbox{\hyperlink{net__plugin_8cpp_source}{net\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00561\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :}
+\DoxyCodeLine{00562\ \ \ \ \ \ \ \ \ \ window\_size\_(window\_size)\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1block__status__monitor_a7bcc3421298ca65eea3636e1d70a0929}\index{sysio::block\_status\_monitor@{sysio::block\_status\_monitor}!block\_status\_monitor@{block\_status\_monitor}}
+\index{block\_status\_monitor@{block\_status\_monitor}!sysio::block\_status\_monitor@{sysio::block\_status\_monitor}}
+\doxysubsubsection{\texorpdfstring{block\_status\_monitor()}{block\_status\_monitor()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{classsysio_1_1block__status__monitor_a7bcc3421298ca65eea3636e1d70a0929} 
+sysio\+::block\+\_\+status\+\_\+monitor\+::block\+\_\+status\+\_\+monitor (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classsysio_1_1block__status__monitor}{block\+\_\+status\+\_\+monitor}} \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [delete]}}
+
+\Hypertarget{classsysio_1_1block__status__monitor_af24a9e6fe86ea0fc97b0da9b530e08cd}\index{sysio::block\_status\_monitor@{sysio::block\_status\_monitor}!block\_status\_monitor@{block\_status\_monitor}}
+\index{block\_status\_monitor@{block\_status\_monitor}!sysio::block\_status\_monitor@{sysio::block\_status\_monitor}}
+\doxysubsubsection{\texorpdfstring{block\_status\_monitor()}{block\_status\_monitor()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{classsysio_1_1block__status__monitor_af24a9e6fe86ea0fc97b0da9b530e08cd} 
+sysio\+::block\+\_\+status\+\_\+monitor\+::block\+\_\+status\+\_\+monitor (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classsysio_1_1block__status__monitor}{block\+\_\+status\+\_\+monitor}} \&\&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [delete]}}
+
+\Hypertarget{classsysio_1_1block__status__monitor_ac53053745d9ea2699a642bcdab8b4248}\index{sysio::block\_status\_monitor@{sysio::block\_status\_monitor}!````~block\_status\_monitor@{\texorpdfstring{$\sim$}{\string~}block\_status\_monitor}}
+\index{````~block\_status\_monitor@{\texorpdfstring{$\sim$}{\string~}block\_status\_monitor}!sysio::block\_status\_monitor@{sysio::block\_status\_monitor}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}block\_status\_monitor()}{\string~block\_status\_monitor()}}
+{\footnotesize\ttfamily \label{classsysio_1_1block__status__monitor_ac53053745d9ea2699a642bcdab8b4248} 
+sysio\+::block\+\_\+status\+\_\+monitor\+::\texorpdfstring{$\sim$}{\string~}block\+\_\+status\+\_\+monitor (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [default]}}
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1block__status__monitor_a55c26a4ba12f3d4a8f1d9bb406d0bebb}\index{sysio::block\_status\_monitor@{sysio::block\_status\_monitor}!accepted@{accepted}}
+\index{accepted@{accepted}!sysio::block\_status\_monitor@{sysio::block\_status\_monitor}}
+\doxysubsubsection{\texorpdfstring{accepted()}{accepted()}}
+{\footnotesize\ttfamily \label{classsysio_1_1block__status__monitor_a55c26a4ba12f3d4a8f1d9bb406d0bebb} 
+void sysio\+::block\+\_\+status\+\_\+monitor\+::accepted (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l00569}{569}} of file \mbox{\hyperlink{net__plugin_8cpp_source}{net\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00569\ \{\ \mbox{\hyperlink{classsysio_1_1block__status__monitor_aa76046b80f88bdc6de0e1bf55778b7db}{reset}}();\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=318pt]{classsysio_1_1block__status__monitor_a55c26a4ba12f3d4a8f1d9bb406d0bebb_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1block__status__monitor_a2f4da5c22ddc9442446a4974fa3ac54c}\index{sysio::block\_status\_monitor@{sysio::block\_status\_monitor}!events@{events}}
+\index{events@{events}!sysio::block\_status\_monitor@{sysio::block\_status\_monitor}}
+\doxysubsubsection{\texorpdfstring{events()}{events()}}
+{\footnotesize\ttfamily \label{classsysio_1_1block__status__monitor_a2f4da5c22ddc9442446a4974fa3ac54c} 
+auto sysio\+::block\+\_\+status\+\_\+monitor\+::events (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l00573}{573}} of file \mbox{\hyperlink{net__plugin_8cpp_source}{net\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00573\ \{\ \textcolor{keywordflow}{return}\ events\_;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1block__status__monitor_abbb9c79ef9cd6f3ed8c1003b9205295b}\index{sysio::block\_status\_monitor@{sysio::block\_status\_monitor}!max\_events\_violated@{max\_events\_violated}}
+\index{max\_events\_violated@{max\_events\_violated}!sysio::block\_status\_monitor@{sysio::block\_status\_monitor}}
+\doxysubsubsection{\texorpdfstring{max\_events\_violated()}{max\_events\_violated()}}
+{\footnotesize\ttfamily \label{classsysio_1_1block__status__monitor_abbb9c79ef9cd6f3ed8c1003b9205295b} 
+bool sysio\+::block\+\_\+status\+\_\+monitor\+::max\+\_\+events\+\_\+violated (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l00575}{575}} of file \mbox{\hyperlink{net__plugin_8cpp_source}{net\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00575\ \{\ \textcolor{keywordflow}{return}\ events\_\ >=\ max\_consecutive\_rejected\_windows\_;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1block__status__monitor_a5896b65c0687412fa02cd12495baaa56}\index{sysio::block\_status\_monitor@{sysio::block\_status\_monitor}!operator=@{operator=}}
+\index{operator=@{operator=}!sysio::block\_status\_monitor@{sysio::block\_status\_monitor}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1block__status__monitor_a5896b65c0687412fa02cd12495baaa56} 
+\mbox{\hyperlink{classsysio_1_1block__status__monitor}{block\+\_\+status\+\_\+monitor}} \& sysio\+::block\+\_\+status\+\_\+monitor\+::operator= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classsysio_1_1block__status__monitor}{block\+\_\+status\+\_\+monitor}} \&\&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [delete]}}
+
+\Hypertarget{classsysio_1_1block__status__monitor_a87d668fcd7ef8b5a0ec527d4e82d7a01}\index{sysio::block\_status\_monitor@{sysio::block\_status\_monitor}!operator=@{operator=}}
+\index{operator=@{operator=}!sysio::block\_status\_monitor@{sysio::block\_status\_monitor}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1block__status__monitor_a87d668fcd7ef8b5a0ec527d4e82d7a01} 
+\mbox{\hyperlink{classsysio_1_1block__status__monitor}{block\+\_\+status\+\_\+monitor}} \& sysio\+::block\+\_\+status\+\_\+monitor\+::operator= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classsysio_1_1block__status__monitor}{block\+\_\+status\+\_\+monitor}} \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [delete]}}
+
+\Hypertarget{classsysio_1_1block__status__monitor_ad9b6501fa2a084ad54c753044c7b7748}\index{sysio::block\_status\_monitor@{sysio::block\_status\_monitor}!rejected@{rejected}}
+\index{rejected@{rejected}!sysio::block\_status\_monitor@{sysio::block\_status\_monitor}}
+\doxysubsubsection{\texorpdfstring{rejected()}{rejected()}}
+{\footnotesize\ttfamily \label{classsysio_1_1block__status__monitor_ad9b6501fa2a084ad54c753044c7b7748} 
+void sysio\+::block\+\_\+status\+\_\+monitor\+::rejected (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l01516}{1516}} of file \mbox{\hyperlink{net__plugin_8cpp_source}{net\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01516\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01517\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ now\ =\ \mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{fc::time\_point::now}}();}
+\DoxyCodeLine{01518\ }
+\DoxyCodeLine{01519\ \ \ \ \ \ \ \textcolor{comment}{//\ in\ rejected\ state}}
+\DoxyCodeLine{01520\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!in\_accepted\_state\_)\ \{}
+\DoxyCodeLine{01521\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ elapsed\ =\ now\ -\/\ window\_start\_;}
+\DoxyCodeLine{01522\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ elapsed\ <\ window\_size\_\ )\ \{}
+\DoxyCodeLine{01523\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{01524\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01525\ \ \ \ \ \ \ \ \ \ ++events\_;}
+\DoxyCodeLine{01526\ \ \ \ \ \ \ \ \ \ window\_start\_\ =\ now;}
+\DoxyCodeLine{01527\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{01528\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01529\ }
+\DoxyCodeLine{01530\ \ \ \ \ \ \ \textcolor{comment}{//\ switching\ to\ rejected\ state}}
+\DoxyCodeLine{01531\ \ \ \ \ \ \ in\_accepted\_state\_\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{01532\ \ \ \ \ \ \ window\_start\_\ =\ now;}
+\DoxyCodeLine{01533\ \ \ \ \ \ \ events\_\ =\ 0;}
+\DoxyCodeLine{01534\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1block__status__monitor_ad9b6501fa2a084ad54c753044c7b7748_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1block__status__monitor_aa76046b80f88bdc6de0e1bf55778b7db}\index{sysio::block\_status\_monitor@{sysio::block\_status\_monitor}!reset@{reset}}
+\index{reset@{reset}!sysio::block\_status\_monitor@{sysio::block\_status\_monitor}}
+\doxysubsubsection{\texorpdfstring{reset()}{reset()}}
+{\footnotesize\ttfamily \label{classsysio_1_1block__status__monitor_aa76046b80f88bdc6de0e1bf55778b7db} 
+void sysio\+::block\+\_\+status\+\_\+monitor\+::reset (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l01511}{1511}} of file \mbox{\hyperlink{net__plugin_8cpp_source}{net\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01511\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01512\ \ \ \ \ \ \ in\_accepted\_state\_\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{01513\ \ \ \ \ \ \ events\_\ =\ 0;}
+\DoxyCodeLine{01514\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=318pt]{classsysio_1_1block__status__monitor_aa76046b80f88bdc6de0e1bf55778b7db_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+plugins/net\+\_\+plugin/\mbox{\hyperlink{net__plugin_8cpp}{net\+\_\+plugin.\+cpp}}\end{DoxyCompactItemize}

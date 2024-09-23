@@ -1,0 +1,125 @@
+\doxysection{sysio\+::vm\+::watchdog Class Reference}
+\hypertarget{classsysio_1_1vm_1_1watchdog}{}\label{classsysio_1_1vm_1_1watchdog}\index{sysio::vm::watchdog@{sysio::vm::watchdog}}
+
+
+Triggers a callback after a given time elapses.  
+
+
+
+
+{\ttfamily \#include $<$watchdog.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename Time\+Units $>$ }\\\mbox{\hyperlink{classsysio_1_1vm_1_1watchdog_adde1058f7ddf2e05fbc4b88aedff358f}{watchdog}} (const Time\+Units \&duration)
+\item 
+{\footnotesize template$<$typename F $>$ }\\guard \mbox{\hyperlink{classsysio_1_1vm_1_1watchdog_ad5c68209f9c3174da6785c6c9afc084d}{scoped\+\_\+run}} (F \&\&callback)
+\item 
+{\footnotesize template$<$typename Time\+Units $>$ }\\\mbox{\hyperlink{classsysio_1_1vm_1_1watchdog_adde1058f7ddf2e05fbc4b88aedff358f}{watchdog}} (const Time\+Units \&duration)
+\item 
+{\footnotesize template$<$typename F $>$ }\\guard \mbox{\hyperlink{classsysio_1_1vm_1_1watchdog_ad5c68209f9c3174da6785c6c9afc084d}{scoped\+\_\+run}} (F \&\&callback)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{vm_2watchdog_8hpp_source_l00013}{13}} of file \mbox{\hyperlink{vm_2watchdog_8hpp_source}{watchdog.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classsysio_1_1vm_1_1watchdog_adde1058f7ddf2e05fbc4b88aedff358f}\index{sysio::vm::watchdog@{sysio::vm::watchdog}!watchdog@{watchdog}}
+\index{watchdog@{watchdog}!sysio::vm::watchdog@{sysio::vm::watchdog}}
+\doxysubsubsection{\texorpdfstring{watchdog()}{watchdog()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1watchdog_adde1058f7ddf2e05fbc4b88aedff358f} 
+template$<$typename Time\+Units $>$ \\
+sysio\+::vm\+::watchdog\+::watchdog (\begin{DoxyParamCaption}\item[{const Time\+Units \&}]{duration}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em Time\+Units} & must be a chrono duration type \\
+\hline
+\end{DoxyTemplParams}
+\begin{DoxyPrecond}{Precondition}
+duration must be a non-\/negative value. 
+\end{DoxyPrecond}
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2watchdog_8hpp_source_l00019}{19}} of file \mbox{\hyperlink{sysio_2vm_2watchdog_8hpp_source}{watchdog.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00019\ :\ \_duration(duration)\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1watchdog_adde1058f7ddf2e05fbc4b88aedff358f}\index{sysio::vm::watchdog@{sysio::vm::watchdog}!watchdog@{watchdog}}
+\index{watchdog@{watchdog}!sysio::vm::watchdog@{sysio::vm::watchdog}}
+\doxysubsubsection{\texorpdfstring{watchdog()}{watchdog()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1watchdog_adde1058f7ddf2e05fbc4b88aedff358f} 
+template$<$typename Time\+Units $>$ \\
+sysio\+::vm\+::watchdog\+::watchdog (\begin{DoxyParamCaption}\item[{const Time\+Units \&}]{duration}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em Time\+Units} & must be a chrono duration type \\
+\hline
+\end{DoxyTemplParams}
+\begin{DoxyPrecond}{Precondition}
+duration must be a non-\/negative value. 
+\end{DoxyPrecond}
+
+
+Definition at line \mbox{\hyperlink{vm_2watchdog_8hpp_source_l00019}{19}} of file \mbox{\hyperlink{vm_2watchdog_8hpp_source}{watchdog.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00019\ :\ \_duration(duration)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1vm_1_1watchdog_ad5c68209f9c3174da6785c6c9afc084d}\index{sysio::vm::watchdog@{sysio::vm::watchdog}!scoped\_run@{scoped\_run}}
+\index{scoped\_run@{scoped\_run}!sysio::vm::watchdog@{sysio::vm::watchdog}}
+\doxysubsubsection{\texorpdfstring{scoped\_run()}{scoped\_run()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1watchdog_ad5c68209f9c3174da6785c6c9afc084d} 
+template$<$typename F $>$ \\
+guard sysio\+::vm\+::watchdog\+::scoped\+\_\+run (\begin{DoxyParamCaption}\item[{F \&\&}]{callback}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [nodiscard]}}
+
+Starts the timer. If the timer expires during the lifetime of the returned object, the callback will be executed. The callback is executed asynchronously. If invoking the callback throws an exception, terminate will be called. 
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2watchdog_8hpp_source_l00026}{26}} of file \mbox{\hyperlink{sysio_2vm_2watchdog_8hpp_source}{watchdog.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ guard(\_duration,\ \textcolor{keyword}{static\_cast<}F\&\&\textcolor{keyword}{>}(callback));}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1watchdog_ad5c68209f9c3174da6785c6c9afc084d}\index{sysio::vm::watchdog@{sysio::vm::watchdog}!scoped\_run@{scoped\_run}}
+\index{scoped\_run@{scoped\_run}!sysio::vm::watchdog@{sysio::vm::watchdog}}
+\doxysubsubsection{\texorpdfstring{scoped\_run()}{scoped\_run()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1watchdog_ad5c68209f9c3174da6785c6c9afc084d} 
+template$<$typename F $>$ \\
+guard sysio\+::vm\+::watchdog\+::scoped\+\_\+run (\begin{DoxyParamCaption}\item[{F \&\&}]{callback}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [nodiscard]}}
+
+Starts the timer. If the timer expires during the lifetime of the returned object, the callback will be executed. The callback is executed asynchronously. If invoking the callback throws an exception, terminate will be called. 
+
+Definition at line \mbox{\hyperlink{vm_2watchdog_8hpp_source_l00026}{26}} of file \mbox{\hyperlink{vm_2watchdog_8hpp_source}{watchdog.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ guard(\_duration,\ \textcolor{keyword}{static\_cast<}F\&\&\textcolor{keyword}{>}(callback));}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/include/sysio/sysio/vm/\mbox{\hyperlink{sysio_2vm_2watchdog_8hpp}{watchdog.\+hpp}}\item 
+libraries/sys-\/vm/include/sysio/vm/\mbox{\hyperlink{vm_2watchdog_8hpp}{watchdog.\+hpp}}\end{DoxyCompactItemize}

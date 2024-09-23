@@ -1,0 +1,9 @@
+<map id="sysio::chain::packed_transaction::get_signed_transaction" name="sysio::chain::packed_transaction::get_signed_transaction">
+<area shape="rect" id="Node000001" title=" " alt="" coords="224,71,387,126"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1chain_1_1apply__context.html#a4e7c7a187705892ae97250316ca9b38f" title=" " alt="" coords="17,5,164,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="208,72,164,58,166,53,209,67"/>
+<area shape="rect" id="Node000003" href="$programs_2clio_2main_8cpp.html#a3c04138a5bfe5d72780bb7e82a18e627" title=" " alt="" coords="66,86,115,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="208,101,116,101,116,96,208,96"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1chain_1_1deep__mind__handler.html#a40b9a2c20e4a3fddfea8411b9101e99d" title=" " alt="" coords="5,136,176,192"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="209,130,177,140,176,135,208,125"/>
+</map>

@@ -1,0 +1,83 @@
+\doxysection{Floats Namespace Reference}
+\hypertarget{namespace_floats}{}\label{namespace_floats}\index{Floats@{Floats}}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_floats_1_1_float_components}{Float\+Components}}
+\item 
+struct \mbox{\hyperlink{struct_floats_1_1_float_components_3_01_f32_01_4}{Float\+Components$<$ F32 $>$}}
+\item 
+struct \mbox{\hyperlink{struct_floats_1_1_float_components_3_01_f64_01_4}{Float\+Components$<$ F64 $>$}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename Float $>$ }\\std\+::string \mbox{\hyperlink{namespace_floats_a910e7e5ea7e4d10bf994fc3fcd2fe52b}{as\+String}} (Float \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespace_floats_a910e7e5ea7e4d10bf994fc3fcd2fe52b}\index{Floats@{Floats}!asString@{asString}}
+\index{asString@{asString}!Floats@{Floats}}
+\doxysubsubsection{\texorpdfstring{asString()}{asString()}}
+{\footnotesize\ttfamily \label{namespace_floats_a910e7e5ea7e4d10bf994fc3fcd2fe52b} 
+template$<$typename Float $>$ \\
+std\+::string Floats\+::as\+String (\begin{DoxyParamCaption}\item[{Float}]{f}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_floats_8h_source_l00084}{84}} of file \mbox{\hyperlink{_floats_8h_source}{Floats.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00085\ \ \ \ \ \{}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_floats_1_1_float_components}{FloatComponents<Float>}}\ components;}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ components.value\ =\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}};}
+\DoxyCodeLine{00088\ \ \ \ \ }
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ sign\ =\ std::string(components.bits.sign\ ?\ \textcolor{stringliteral}{"{}-\/"{}}\ :\ \textcolor{stringliteral}{"{}+"{}});}
+\DoxyCodeLine{00090\ }
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(components.bits.exponent\ ==\ \mbox{\hyperlink{struct_floats_1_1_float_components}{FloatComponents<Float>::maxExponentBits}})}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Handle\ infinity.}}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(components.bits.significand\ ==\ 0)\ \{\ \textcolor{keywordflow}{return}\ sign\ +\ \textcolor{stringliteral}{"{}infinity"{}};\ \}}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Handle\ NaN.}}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ significandString[FloatComponents<Float>::numSignificandHexits\ +\ 1];}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ hexitIndex\ =\ 0;hexitIndex\ <\ FloatComponents<Float>::numSignificandHexits;++hexitIndex)}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ hexitValue\ =\ char((components.bits.significand\ >>\ ((FloatComponents<Float>::numSignificandHexits\ -\/\ hexitIndex\ -\/\ 1)\ *\ 4))\ \&\ 0xf);}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ significandString[hexitIndex]\ =\ hexitValue\ >=\ 10\ ?\ (\textcolor{charliteral}{'a'}\ +\ hexitValue\ -\/\ 10)\ :\ (\textcolor{stringliteral}{'0'}\ +\ hexitValue);}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ significandString[FloatComponents<Float>::numSignificandHexits]\ =\ 0;}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ sign\ +\ \textcolor{stringliteral}{"{}nan:0x"{}}\ +\ significandString\ +\ \textcolor{stringliteral}{"{}"{}};}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ it's\ not\ infinite\ or\ NaN,\ just\ use\ the\ STL\ hexadecimal\ float\ printing.}}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ buffer[32];}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ numChars\ =\ std::sprintf(buffer,FloatComponents<Float>::numSignificandHexits\ ==\ 6\ ?\ \textcolor{stringliteral}{"{}\%.6a"{}}\ :\ \textcolor{stringliteral}{"{}\%.13a"{}},\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}});}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\textcolor{keywordtype}{unsigned}(numChars)\ +\ 1\ >\ \textcolor{keyword}{sizeof}(buffer))}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_errors_aee5daf469584435300f91503f83b09fe}{Errors::fatal}}(\textcolor{stringliteral}{"{}not\ enough\ space\ in\ Floats::asString\ buffer"{}});}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ buffer;}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00119\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_floats_a910e7e5ea7e4d10bf994fc3fcd2fe52b_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_floats_a910e7e5ea7e4d10bf994fc3fcd2fe52b_icgraph}
+\end{center}
+\end{figure}

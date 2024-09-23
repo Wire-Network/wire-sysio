@@ -1,0 +1,135 @@
+\doxysection{UTF8 Namespace Reference}
+\hypertarget{namespace_u_t_f8}{}\label{namespace_u_t_f8}\index{UTF8@{UTF8}}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+const \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_u_t_f8_a837f952e9b17947ad305fe3641fec87e}{validate\+String}} (const \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} \texorpdfstring{$\ast$}{*}next\+Char, const \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} \texorpdfstring{$\ast$}{*}end\+Char)
+\item 
+{\footnotesize template$<$typename String $>$ }\\void \mbox{\hyperlink{namespace_u_t_f8_a0a4fab2ea1977988ab39f8d6c3899108}{encode\+Codepoint}} (\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}} codepoint, String \&out\+String)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespace_u_t_f8_a0a4fab2ea1977988ab39f8d6c3899108}\index{UTF8@{UTF8}!encodeCodepoint@{encodeCodepoint}}
+\index{encodeCodepoint@{encodeCodepoint}!UTF8@{UTF8}}
+\doxysubsubsection{\texorpdfstring{encodeCodepoint()}{encodeCodepoint()}}
+{\footnotesize\ttfamily \label{namespace_u_t_f8_a0a4fab2ea1977988ab39f8d6c3899108} 
+template$<$typename String $>$ \\
+void UTF8\+::encode\+Codepoint (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}}]{codepoint}{, }\item[{String \&}]{out\+String}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_u_t_f8_8h_source_l00073}{73}} of file \mbox{\hyperlink{_u_t_f8_8h_source}{UTF8.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00074\ \ \ \ \ \{}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(codepoint\ <\ 0x80)}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ \ \ \ outString\ +=\ char(codepoint);}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(codepoint\ <\ 0x800)}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \ \ \ outString\ +=\ char((codepoint\ >>\ 6)\ \&\ 0x1F)\ |\ 0xC0;}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \ \ \ outString\ +=\ char((codepoint\ \&\ 0x3F)\ |\ 0x80);}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(codepoint\ <\ 0x10000)}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \ \ \ \ outString\ +=\ char((codepoint\ >>\ 12)\ \&\ 0x0F)\ |\ 0xE0;}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \ \ \ \ outString\ +=\ char((codepoint\ >>\ 6)\ \&\ 0x3F)\ |\ 0x80;}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \ \ \ outString\ +=\ char((codepoint\ \&\ 0x3F)\ |\ 0x80);}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_errors_8h_a03bec6af3af0dd492e348b40cbe40a46}{WAVM\_ASSERT\_THROW}}(codepoint\ <\ 0x200000);}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \ \ outString\ +=\ char((codepoint\ >>\ 18)\ \&\ 0x07)\ |\ 0xF0;}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \ \ \ outString\ +=\ char((codepoint\ >>\ 12)\ \&\ 0x3F)\ |\ 0x80;}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \ \ \ outString\ +=\ char((codepoint\ >>\ 6)\ \&\ 0x3F)\ |\ 0x80;}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \ \ \ outString\ +=\ char((codepoint\ \&\ 0x3F)\ |\ 0x80);}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00098\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespace_u_t_f8_a837f952e9b17947ad305fe3641fec87e}\index{UTF8@{UTF8}!validateString@{validateString}}
+\index{validateString@{validateString}!UTF8@{UTF8}}
+\doxysubsubsection{\texorpdfstring{validateString()}{validateString()}}
+{\footnotesize\ttfamily \label{namespace_u_t_f8_a837f952e9b17947ad305fe3641fec87e} 
+const \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} \texorpdfstring{$\ast$}{*} UTF8\+::validate\+String (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} \texorpdfstring{$\ast$}{*}}]{next\+Char}{, }\item[{const \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} \texorpdfstring{$\ast$}{*}}]{end\+Char}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_u_t_f8_8h_source_l00008}{8}} of file \mbox{\hyperlink{_u_t_f8_8h_source}{UTF8.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00009\ \ \ \ \ \{}
+\DoxyCodeLine{00010\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Check\ that\ the\ string\ is\ a\ valid\ UTF-\/8\ encoding.}}
+\DoxyCodeLine{00011\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ The\ valid\ ranges\ are\ taken\ from\ table\ 3-\/7\ in\ the\ Unicode\ Standard\ 9.0:}}
+\DoxyCodeLine{00012\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ "{}Well-\/Formed\ UTF-\/8\ Byte\ Sequences"{}}}
+\DoxyCodeLine{00013\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(nextChar\ !=\ endChar)}
+\DoxyCodeLine{00014\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(*nextChar\ <\ 0x80)\ \{\ ++nextChar;\ \}}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(*nextChar\ >=\ 0xc2\ \&\&\ *nextChar\ <=\ 0xdf)}
+\DoxyCodeLine{00017\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(nextChar\ +\ 1\ >=\ endChar}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ||\ nextChar[1]\ <\ 0x80\ ||\ nextChar[1]\ >\ 0xbf)\ \{\ \textcolor{keywordflow}{break};\ \}}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ nextChar\ +=\ 2;}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(*nextChar\ ==\ 0xe0)}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(nextChar\ +\ 2\ >=\ endChar}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ||\ nextChar[1]\ <\ 0xa0\ ||\ nextChar[1]\ >\ 0xbf}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ||\ nextChar[2]\ <\ 0x80\ ||\ nextChar[2]\ >\ 0xbf)\ \{\ \textcolor{keywordflow}{break};\ \}}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ nextChar\ +=\ 3;}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(*nextChar\ ==\ 0xed)}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(nextChar\ +\ 2\ >=\ endChar}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ||\ nextChar[1]\ <\ 0xa0\ ||\ nextChar[1]\ >\ 0x9f}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ||\ nextChar[2]\ <\ 0x80\ ||\ nextChar[2]\ >\ 0xbf)\ \{\ \textcolor{keywordflow}{break};\ \}}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ nextChar\ +=\ 3;}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(*nextChar\ >=\ 0xe1\ \&\&\ *nextChar\ <=\ 0xef)}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(nextChar\ +\ 2\ >=\ endChar}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ||\ nextChar[1]\ <\ 0x80\ ||\ nextChar[1]\ >\ 0xbf}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ||\ nextChar[2]\ <\ 0x80\ ||\ nextChar[2]\ >\ 0xbf)\ \{\ \textcolor{keywordflow}{break};\ \}}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ nextChar\ +=\ 3;}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(*nextChar\ ==\ 0xf0)}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(nextChar\ +\ 3\ >=\ endChar}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ||\ nextChar[1]\ <\ 0x90\ ||\ nextChar[1]\ >\ 0xbf}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ||\ nextChar[2]\ <\ 0x80\ ||\ nextChar[2]\ >\ 0xbf}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ||\ nextChar[3]\ <\ 0x80\ ||\ nextChar[3]\ >\ 0xbf)\ \{\ \textcolor{keywordflow}{break};\ \}}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ nextChar\ +=\ 4;}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(*nextChar\ >=\ 0xf1\ \&\&\ *nextChar\ <=\ 0xf3)}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(nextChar\ +\ 3\ >=\ endChar}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ||\ nextChar[1]\ <\ 0x80\ ||\ nextChar[1]\ >\ 0xbf}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ||\ nextChar[2]\ <\ 0x80\ ||\ nextChar[2]\ >\ 0xbf}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ||\ nextChar[3]\ <\ 0x80\ ||\ nextChar[3]\ >\ 0xbf)\ \{\ \textcolor{keywordflow}{break};\ \}}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ nextChar\ +=\ 4;}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(*nextChar\ ==\ 0xf4)}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(nextChar\ +\ 3\ >=\ endChar}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ||\ nextChar[1]\ <\ 0x80\ ||\ nextChar[1]\ >\ 0x8f}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ||\ nextChar[2]\ <\ 0x80\ ||\ nextChar[2]\ >\ 0xbf}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ||\ nextChar[3]\ <\ 0x80\ ||\ nextChar[3]\ >\ 0xbf)\ \{\ \textcolor{keywordflow}{break};\ \}}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ nextChar\ +=\ 4;}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{\ \textcolor{keywordflow}{break};\ \}}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ nextChar;}
+\DoxyCodeLine{00070\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=345pt]{namespace_u_t_f8_a837f952e9b17947ad305fe3641fec87e_icgraph}
+\end{center}
+\end{figure}

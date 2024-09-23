@@ -1,0 +1,84 @@
+\doxysection{test\+\_\+mmx.\+cpp}
+\hypertarget{test__mmx_8cpp_source}{}\label{test__mmx_8cpp_source}\index{libraries/fc/libraries/ff/depends/xbyak/test/test\_mmx.cpp@{libraries/fc/libraries/ff/depends/xbyak/test/test\_mmx.cpp}}
+\mbox{\hyperlink{test__mmx_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#if\ defined(\_MSC\_VER)\ \&\&\ (\_MSC\_VER\ <=\ 1200)}}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\ \ \ \ \#pragma\ warning(disable:4514)}}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\ \ \ \ \#pragma\ warning(disable:4786)}}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <stdio.h>}}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <stdlib.h>}}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ "{}../../include.mie/mie\_thread.h"{}}}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{xbyak_8h}{xbyak/xbyak.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00010}\mbox{\hyperlink{class_write_m_m_x}{00010}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_write_m_m_x}{WriteMMX}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{class_xbyak_1_1_code_generator}{Xbyak::CodeGenerator}}\ \{}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00011}00011\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00012}\mbox{\hyperlink{class_write_m_m_x_a9aec814ce67ff7e7fcfadf27e27bcddc}{00012}}\ \ \ \ \ \mbox{\hyperlink{class_write_m_m_x_a9aec814ce67ff7e7fcfadf27e27bcddc}{WriteMMX}}()}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00013}00013\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00014}00014\ \textcolor{preprocessor}{\#ifdef\ XBYAK32}}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00015}00015\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_code_generator_ac01f285f4da251eb2fa144d5c49c9e3e}{mov}}(\mbox{\hyperlink{class_xbyak_1_1_code_generator_a7afdbb52d9aa5c1fb0a9e42181e79621}{ecx}},\ \mbox{\hyperlink{class_xbyak_1_1_code_generator_afed7c06309f882ffc109dd9136eb3ee1}{ptr}}\ [\mbox{\hyperlink{class_xbyak_1_1_code_generator_a677a65f34079fe5e53c397f0fb00e018}{esp}}\ +\ 4]);}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00016}00016\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00017}00017\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_code_generator_a765286962095bd3f73da66ccaaeba70c}{movd}}(\mbox{\hyperlink{class_xbyak_1_1_code_generator_ac37512d6ae6c58e6626628286f3e04a3}{mm0}},\ \mbox{\hyperlink{class_xbyak_1_1_code_generator_a7afdbb52d9aa5c1fb0a9e42181e79621}{ecx}});}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00018}00018\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}();}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00019}00019\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00020}\mbox{\hyperlink{class_write_m_m_x_acb4f66687f88355db739b2c740f63df7}{00020}}\ \ \ \ \ void\ (*\mbox{\hyperlink{class_write_m_m_x_acb4f66687f88355db739b2c740f63df7}{set}}()\ \textcolor{keyword}{const})(\textcolor{keywordtype}{int}\ x)\ \{\ \textcolor{keywordflow}{return}\ (\textcolor{keywordtype}{void}\ (*)(\textcolor{keywordtype}{int}\ x))\mbox{\hyperlink{class_xbyak_1_1_code_array_a9ad8a38842d1e0de9045338e460f58ce}{getCode}}();\ \}}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00021}00021\ \};}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00023}\mbox{\hyperlink{class_read_m_m_x}{00023}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_read_m_m_x}{ReadMMX}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{class_xbyak_1_1_code_generator}{Xbyak::CodeGenerator}}\ \{}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00024}00024\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00025}\mbox{\hyperlink{class_read_m_m_x_a30f93166cf1d9d1efb61b352d96616d6}{00025}}\ \ \ \ \ \mbox{\hyperlink{class_read_m_m_x_a30f93166cf1d9d1efb61b352d96616d6}{ReadMMX}}()}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00026}00026\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00027}00027\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_code_generator_a765286962095bd3f73da66ccaaeba70c}{movd}}(\mbox{\hyperlink{class_xbyak_1_1_code_generator_a682bca64626bf98c33660e1e245392d1}{eax}},\ \mbox{\hyperlink{class_xbyak_1_1_code_generator_ac37512d6ae6c58e6626628286f3e04a3}{mm0}});}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00028}00028\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}();}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00029}00029\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00030}\mbox{\hyperlink{class_read_m_m_x_a169cdb528ce4ab46e6e78aeae2ded2dc}{00030}}\ \ \ \ \ int\ (*\mbox{\hyperlink{class_read_m_m_x_a169cdb528ce4ab46e6e78aeae2ded2dc}{get}}()\ \textcolor{keyword}{const})()\ \{\ \textcolor{keywordflow}{return}\ (\textcolor{keywordtype}{int}\ (*)())\mbox{\hyperlink{class_xbyak_1_1_code_array_a9ad8a38842d1e0de9045338e460f58ce}{getCode}}();\ \}}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00031}00031\ \};}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00033}00033\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_test}{Test}}\ :\ \textcolor{keyword}{public}\ MIE::ThreadBase<Test>\ \{}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00034}00034\ \ \ \ \ \textcolor{keywordtype}{int}\ n\_;}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00035}00035\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00036}\mbox{\hyperlink{class_test_a1120f1328927a2b7b623bd2989904820}{00036}}\ \ \ \ \ \mbox{\hyperlink{class_test_a1120f1328927a2b7b623bd2989904820}{Test}}(\textcolor{keywordtype}{int}\ n)}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00037}00037\ \ \ \ \ \ \ \ \ :\ n\_(n)}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00038}00038\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00039}00039\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00040}\mbox{\hyperlink{class_test_a2e916f9b4e6e059902c66d5963f2d04f}{00040}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_test_a2e916f9b4e6e059902c66d5963f2d04f}{threadEntry}}()}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00041}00041\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00042}00042\ \ \ \ \ \ \ \ \ printf(\textcolor{stringliteral}{"{}n=\%d\(\backslash\)n"{}},\ n\_);}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00043}00043\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_write_m_m_x}{WriteMMX}}\ w;}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00044}00044\ \ \ \ \ \ \ \ \ w.\mbox{\hyperlink{class_write_m_m_x_acb4f66687f88355db739b2c740f63df7}{set}}()(n\_);}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00045}00045\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_read_m_m_x}{ReadMMX}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00046}00046\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (;;)\ \{}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00047}00047\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ b\ =\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get()();}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \ \ \ printf(\textcolor{stringliteral}{"{}b=\%d\(\backslash\)n"{}},\ b);}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (b\ !=\ n\_)\ \{}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00050}00050\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ printf(\textcolor{stringliteral}{"{}mm0\ has\ changed!\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00051}00051\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \ \ \ MIE::MIE\_Sleep(1000);}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00054}00054\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00055}\mbox{\hyperlink{class_test_a0d9ebf9e9ceabaa58e27a1a28928f2d5}{00055}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_test_a0d9ebf9e9ceabaa58e27a1a28928f2d5}{stopThread}}()\ \{\ \}}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00056}00056\ \};}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00058}\mbox{\hyperlink{test__mmx_8cpp_a0ddf1224851353fc92bfbff6f499fa97}{00058}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}(\textcolor{keywordtype}{int}\ argc,\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[])}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00059}00059\ \{}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00060}00060\ \textcolor{preprocessor}{\#ifdef\ XBYAK32}}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00061}00061\ \ \ \ \ puts(\textcolor{stringliteral}{"{}32bit"{}});}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00062}00062\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00063}00063\ \ \ \ \ puts(\textcolor{stringliteral}{"{}64bit"{}});}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00064}00064\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00065}00065\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00066}00066\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ n\ =\ atoi(argc\ ==\ 1\ ?\ \textcolor{stringliteral}{"{}1223"{}}\ :\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[1]);}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00067}00067\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_test}{Test}}\ test0(n),\ \mbox{\hyperlink{archivertest_8cpp_a1440a7779ac56f47a3f355ce4a8c7da0}{test1}}(n\ +\ 1);}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00068}00068\ \ \ \ \ \ \ \ \ test0.beginThread();}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00069}00069\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{archivertest_8cpp_a1440a7779ac56f47a3f355ce4a8c7da0}{test1}}.beginThread();}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00071}00071\ \ \ \ \ \ \ \ \ test0.joinThread();}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00072}00072\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{archivertest_8cpp_a1440a7779ac56f47a3f355ce4a8c7da0}{test1}}.joinThread();}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00073}00073\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (std::exception\&\ e)\ \{}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00074}00074\ \ \ \ \ \ \ \ \ printf(\textcolor{stringliteral}{"{}ERR:\%s\(\backslash\)n"{}},\ e.what());}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00075}00075\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00076}00076\ \ \ \ \ \ \ \ \ printf(\textcolor{stringliteral}{"{}unknown\ error\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00077}00077\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__mmx_8cpp_source_l00078}00078\ \}}
+
+\end{DoxyCode}

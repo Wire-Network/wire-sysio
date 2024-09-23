@@ -1,0 +1,160 @@
+\doxysection{fc\+::temp\+\_\+directory Class Reference}
+\hypertarget{classfc_1_1temp__directory}{}\label{classfc_1_1temp__directory}\index{fc::temp\_directory@{fc::temp\_directory}}
+
+
+{\ttfamily \#include $<$filesystem.\+hpp$>$}
+
+
+
+Inheritance diagram for fc\+::temp\+\_\+directory\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=176pt]{classfc_1_1temp__directory__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for fc\+::temp\+\_\+directory\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=176pt]{classfc_1_1temp__directory__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1temp__directory_acba404aa7b5eaa97376d006abe3b06c5}{temp\+\_\+directory}} (\mbox{\hyperlink{classfc_1_1temp__directory}{temp\+\_\+directory}} \&\&other)
+\item 
+\mbox{\hyperlink{classfc_1_1temp__directory}{temp\+\_\+directory}} \& \mbox{\hyperlink{classfc_1_1temp__directory_acc19b932765f7e89457b6936ae4a9060}{operator=}} (\mbox{\hyperlink{classfc_1_1temp__directory}{temp\+\_\+directory}} \&\&other)
+\item 
+\mbox{\hyperlink{classfc_1_1temp__directory_a48c295b6996e5e87a7a05e7003a0dbcb}{temp\+\_\+directory}} (const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&temp\+Folder=\mbox{\hyperlink{namespacefc_afe3ee0e7b733d87469a967ac456302dc}{fc\+::temp\+\_\+directory\+\_\+path}}())
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classfc_1_1temp__file__base}{fc\+::temp\+\_\+file\+\_\+base}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1temp__file__base_acf7639227d072df2429583113725db83}{\texorpdfstring{$\sim$}{\string~}temp\+\_\+file\+\_\+base}} ()
+\item 
+\mbox{\hyperlink{classfc_1_1temp__file__base_acaeded53c182bd84c6f76ebbf38f76ce}{operator bool}} () const
+\item 
+bool \mbox{\hyperlink{classfc_1_1temp__file__base_aa22f86ff2cd875a66bd61f6dbececed7}{operator!}} () const
+\item 
+const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \& \mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}} () const
+\item 
+void \mbox{\hyperlink{classfc_1_1temp__file__base_a11fa97c029408fca1d14dfc5ca81be26}{remove}} ()
+\item 
+void \mbox{\hyperlink{classfc_1_1temp__file__base_af4d8e3fc0f2dc6d9574492d1e23caffe}{release}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Protected Types inherited from \mbox{\hyperlink{classfc_1_1temp__file__base}{fc\+::temp\+\_\+file\+\_\+base}}}
+\begin{DoxyCompactItemize}
+\item 
+typedef std\+::optional$<$ \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} $>$ \mbox{\hyperlink{classfc_1_1temp__file__base_a97f86dd5f12980173ded6f5ba55f54e9}{path\+\_\+t}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Member Functions inherited from \mbox{\hyperlink{classfc_1_1temp__file__base}{fc\+::temp\+\_\+file\+\_\+base}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1temp__file__base_ac2787d85b196125fe5de7f22cb3a5dd1}{temp\+\_\+file\+\_\+base}} (const \mbox{\hyperlink{classfc_1_1temp__file__base_a97f86dd5f12980173ded6f5ba55f54e9}{path\+\_\+t}} \&\mbox{\hyperlink{classfc_1_1path}{path}})
+\item 
+\mbox{\hyperlink{classfc_1_1temp__file__base_a2b5342fec6fb8fcc4042c353378805d8}{temp\+\_\+file\+\_\+base}} (\mbox{\hyperlink{classfc_1_1temp__file__base_a97f86dd5f12980173ded6f5ba55f54e9}{path\+\_\+t}} \&\&\mbox{\hyperlink{classfc_1_1path}{path}})
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Attributes inherited from \mbox{\hyperlink{classfc_1_1temp__file__base}{fc\+::temp\+\_\+file\+\_\+base}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1temp__file__base_a97f86dd5f12980173ded6f5ba55f54e9}{path\+\_\+t}} \mbox{\hyperlink{classfc_1_1temp__file__base_a69e1eb6507b6d0a7fef8280235cbe0bd}{\+\_\+path}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Class which creates a temporary directory inside an existing temporary directory. 
+
+Definition at line \mbox{\hyperlink{filesystem_8hpp_source_l00223}{223}} of file \mbox{\hyperlink{filesystem_8hpp_source}{filesystem.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1temp__directory_acba404aa7b5eaa97376d006abe3b06c5}\index{fc::temp\_directory@{fc::temp\_directory}!temp\_directory@{temp\_directory}}
+\index{temp\_directory@{temp\_directory}!fc::temp\_directory@{fc::temp\_directory}}
+\doxysubsubsection{\texorpdfstring{temp\_directory()}{temp\_directory()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1temp__directory_acba404aa7b5eaa97376d006abe3b06c5} 
+fc\+::temp\+\_\+directory\+::temp\+\_\+directory (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1temp__directory}{temp\+\_\+directory}} \&\&}]{other}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{filesystem_8cpp_source_l00426}{426}} of file \mbox{\hyperlink{filesystem_8cpp_source}{filesystem.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00427\ \ \ \ \ \ \ :\ \mbox{\hyperlink{classfc_1_1temp__file__base_ac2787d85b196125fe5de7f22cb3a5dd1}{temp\_file\_base}}(std::move(\mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.\_path))}
+\DoxyCodeLine{00428\ \ \ \ \{}
+\DoxyCodeLine{00429\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1temp__directory_a48c295b6996e5e87a7a05e7003a0dbcb}\index{fc::temp\_directory@{fc::temp\_directory}!temp\_directory@{temp\_directory}}
+\index{temp\_directory@{temp\_directory}!fc::temp\_directory@{fc::temp\_directory}}
+\doxysubsubsection{\texorpdfstring{temp\_directory()}{temp\_directory()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1temp__directory_a48c295b6996e5e87a7a05e7003a0dbcb} 
+fc\+::temp\+\_\+directory\+::temp\+\_\+directory (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&}]{temp\+Folder}{ = {\ttfamily \mbox{\hyperlink{namespacefc_afe3ee0e7b733d87469a967ac456302dc}{fc\+::temp\+\_\+directory\+\_\+path}}()}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{filesystem_8cpp_source_l00416}{416}} of file \mbox{\hyperlink{filesystem_8cpp_source}{filesystem.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00417\ \ \ \ :\ \mbox{\hyperlink{classfc_1_1temp__file__base_ac2787d85b196125fe5de7f22cb3a5dd1}{temp\_file\_base}}(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ /\ \mbox{\hyperlink{namespacefc_a887060cd05d29b1ed9dec83ec97ee8e5}{fc::unique\_path}}())}
+\DoxyCodeLine{00418\ \ \ \ \{}
+\DoxyCodeLine{00419\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacefc_a3fcf0d920aea28014aacae50a51d8485}{fc::exists}}(*\mbox{\hyperlink{classfc_1_1temp__file__base_a69e1eb6507b6d0a7fef8280235cbe0bd}{\_path}}))}
+\DoxyCodeLine{00420\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00421\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a3a1fa84768603c99866fe61af96c9f36}{FC\_THROW}}(\ \textcolor{stringliteral}{"{}Name\ collision:\ \$\{path\}"{}},\ (\textcolor{stringliteral}{"{}path"{}},\ \mbox{\hyperlink{classfc_1_1temp__file__base_a69e1eb6507b6d0a7fef8280235cbe0bd}{\_path}}-\/>string())\ );}
+\DoxyCodeLine{00422\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00423\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a76b0787468a9f403087b71a894c07ce2}{fc::create\_directories}}(*\mbox{\hyperlink{classfc_1_1temp__file__base_a69e1eb6507b6d0a7fef8280235cbe0bd}{\_path}});}
+\DoxyCodeLine{00424\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1temp__directory_a48c295b6996e5e87a7a05e7003a0dbcb_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1temp__directory_acc19b932765f7e89457b6936ae4a9060}\index{fc::temp\_directory@{fc::temp\_directory}!operator=@{operator=}}
+\index{operator=@{operator=}!fc::temp\_directory@{fc::temp\_directory}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}}
+{\footnotesize\ttfamily \label{classfc_1_1temp__directory_acc19b932765f7e89457b6936ae4a9060} 
+\mbox{\hyperlink{classfc_1_1temp__directory}{temp\+\_\+directory}} \& fc\+::temp\+\_\+directory\+::operator= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1temp__directory}{temp\+\_\+directory}} \&\&}]{other}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{filesystem_8cpp_source_l00431}{431}} of file \mbox{\hyperlink{filesystem_8cpp_source}{filesystem.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00432\ \ \ \ \{}
+\DoxyCodeLine{00433\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{this}\ !=\ \&other)}
+\DoxyCodeLine{00434\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00435\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1temp__file__base_a11fa97c029408fca1d14dfc5ca81be26}{remove}}();}
+\DoxyCodeLine{00436\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1temp__file__base_a69e1eb6507b6d0a7fef8280235cbe0bd}{\_path}}\ =\ std::move(\mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.\_path);}
+\DoxyCodeLine{00437\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00438\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00439\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1temp__directory_acc19b932765f7e89457b6936ae4a9060_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/\mbox{\hyperlink{filesystem_8hpp}{filesystem.\+hpp}}\item 
+libraries/fc/src/\mbox{\hyperlink{filesystem_8cpp}{filesystem.\+cpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,274 @@
+\doxysection{libraries/sys-\/vm/external/\+Catch2/projects/\+Self\+Test/\+Usage\+Tests/\+To\+String\+General.tests.\+cpp File Reference}
+\hypertarget{_to_string_general_8tests_8cpp}{}\label{_to_string_general_8tests_8cpp}\index{libraries/sys-\/vm/external/Catch2/projects/SelfTest/UsageTests/ToStringGeneral.tests.cpp@{libraries/sys-\/vm/external/Catch2/projects/SelfTest/UsageTests/ToStringGeneral.tests.cpp}}
+{\ttfamily \#include "{}catch.\+hpp"{}}\newline
+{\ttfamily \#include $<$map$>$}\newline
+{\ttfamily \#include $<$set$>$}\newline
+Include dependency graph for To\+String\+General.\+tests.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=268pt]{_to_string_general_8tests_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_catch_1_1_string_maker_3_01_string_maker_exception_01_4}{Catch\+::\+String\+Maker$<$ String\+Maker\+Exception $>$}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespace_catch}{Catch}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{_to_string_general_8tests_8cpp_abcb2983dc4daef90b1d3f703d21071ac}{CATCH\+\_\+\+CONFIG\+\_\+\+ENABLE\+\_\+\+PAIR\+\_\+\+STRINGMAKER}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{_to_string_general_8tests_8cpp_ae6b8aa69244716cea91dc5bcd58f380d}{TEST\+\_\+\+CASE}} ("{}Character pretty printing"{})
+\item 
+\mbox{\hyperlink{_to_string_general_8tests_8cpp_aa1a1a3ef493b122586e458903cb4b7dc}{TEST\+\_\+\+CASE}} ("{}Capture and info messages"{})
+\item 
+\mbox{\hyperlink{_to_string_general_8tests_8cpp_a460f3bdff9e456dd6e944292b3c2e65d}{TEST\+\_\+\+CASE}} ("{}std\+::map is convertible string"{}, "{}\mbox{[}to\+String\mbox{]}"{})
+\item 
+\mbox{\hyperlink{_to_string_general_8tests_8cpp_ac0b70ac633229712751fb7a26637f8b0}{TEST\+\_\+\+CASE}} ("{}std\+::set is convertible string"{}, "{}\mbox{[}to\+String\mbox{]}"{})
+\item 
+\mbox{\hyperlink{_to_string_general_8tests_8cpp_ac2a39f908247f54e5f85560e0971adac}{TEST\+\_\+\+CASE}} ("{}Static arrays are convertible to string"{}, "{}\mbox{[}to\+String\mbox{]}"{})
+\item 
+\mbox{\hyperlink{_to_string_general_8tests_8cpp_a17d7a1e8eb83d5675815c66c3e4ea592}{TEST\+\_\+\+CASE}} ("{}Exception as \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}} (e.\+g. in \mbox{\hyperlink{include_2catch_8hpp_a54473a48ac2ac55bfe1165b69e1b8010}{REQUIRE\+\_\+\+THROWS\+\_\+\+MATCHES}}) can be stringified"{}, "{}\mbox{[}to\+String\mbox{]}\mbox{[}exception\mbox{]}"{})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{_to_string_general_8tests_8cpp_abcb2983dc4daef90b1d3f703d21071ac}\index{ToStringGeneral.tests.cpp@{ToStringGeneral.tests.cpp}!CATCH\_CONFIG\_ENABLE\_PAIR\_STRINGMAKER@{CATCH\_CONFIG\_ENABLE\_PAIR\_STRINGMAKER}}
+\index{CATCH\_CONFIG\_ENABLE\_PAIR\_STRINGMAKER@{CATCH\_CONFIG\_ENABLE\_PAIR\_STRINGMAKER}!ToStringGeneral.tests.cpp@{ToStringGeneral.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{CATCH\_CONFIG\_ENABLE\_PAIR\_STRINGMAKER}{CATCH\_CONFIG\_ENABLE\_PAIR\_STRINGMAKER}}
+{\footnotesize\ttfamily \label{_to_string_general_8tests_8cpp_abcb2983dc4daef90b1d3f703d21071ac} 
+\#define CATCH\+\_\+\+CONFIG\+\_\+\+ENABLE\+\_\+\+PAIR\+\_\+\+STRINGMAKER}
+
+
+
+Definition at line \mbox{\hyperlink{_to_string_general_8tests_8cpp_source_l00008}{8}} of file \mbox{\hyperlink{_to_string_general_8tests_8cpp_source}{To\+String\+General.\+tests.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{_to_string_general_8tests_8cpp_aa1a1a3ef493b122586e458903cb4b7dc}\index{ToStringGeneral.tests.cpp@{ToStringGeneral.tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!ToStringGeneral.tests.cpp@{ToStringGeneral.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/6]}}
+{\footnotesize\ttfamily \label{_to_string_general_8tests_8cpp_aa1a1a3ef493b122586e458903cb4b7dc} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Capture and info messages"{}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_to_string_general_8tests_8cpp_source_l00045}{45}} of file \mbox{\hyperlink{_to_string_general_8tests_8cpp_source}{To\+String\+General.\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00046\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\textcolor{stringliteral}{"{}Capture\ should\ stringify\ like\ assertions"{}})\ \{}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ i\ =\ 2;}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_aaf9fe43c53965ff8d94bbd522fd1fd7a}{CAPTURE}}(i);}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\textcolor{keyword}{true});}
+\DoxyCodeLine{00050\ \ \ \ \ \}}
+\DoxyCodeLine{00051\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\textcolor{stringliteral}{"{}Info\ should\ NOT\ stringify\ the\ way\ assertions\ do"{}})\ \{}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ i\ =\ 3;}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a3ae64706314066fdc8b6c8029a915aa7}{INFO}}(i);}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\textcolor{keyword}{true});}
+\DoxyCodeLine{00055\ \ \ \ \ \}}
+\DoxyCodeLine{00056\ \}}
+
+\end{DoxyCode}
+\Hypertarget{_to_string_general_8tests_8cpp_ae6b8aa69244716cea91dc5bcd58f380d}\index{ToStringGeneral.tests.cpp@{ToStringGeneral.tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!ToStringGeneral.tests.cpp@{ToStringGeneral.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/6]}}
+{\footnotesize\ttfamily \label{_to_string_general_8tests_8cpp_ae6b8aa69244716cea91dc5bcd58f380d} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Character pretty printing"{}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_to_string_general_8tests_8cpp_source_l00014}{14}} of file \mbox{\hyperlink{_to_string_general_8tests_8cpp_source}{To\+String\+General.\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00014\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00015\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\textcolor{stringliteral}{"{}Specifically\ escaped"{}})\{}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ tab\ =\ \textcolor{charliteral}{'\(\backslash\)t'};}
+\DoxyCodeLine{00017\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ newline\ =\ \textcolor{charliteral}{'\(\backslash\)n'};}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ carr\_return\ =\ \textcolor{charliteral}{'\(\backslash\)r'};}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ form\_feed\ =\ \textcolor{charliteral}{'\(\backslash\)f'};}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(tab\ ==\ \textcolor{charliteral}{'\(\backslash\)t'});}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(newline\ ==\ \textcolor{charliteral}{'\(\backslash\)n'});}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(carr\_return\ ==\ \textcolor{charliteral}{'\(\backslash\)r'});}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(form\_feed\ ==\ \textcolor{charliteral}{'\(\backslash\)f'});}
+\DoxyCodeLine{00024\ \ \ \ \ \}}
+\DoxyCodeLine{00025\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\textcolor{stringliteral}{"{}General\ chars"{}})\{}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ space\ =\ \textcolor{charliteral}{'\ '};}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(space\ ==\ \textcolor{charliteral}{'\ '});}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ chars[]\ =\ \{\textcolor{charliteral}{'a'},\ \textcolor{charliteral}{'z'},\ \textcolor{charliteral}{'A'},\ \textcolor{charliteral}{'Z'}\};}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ 4;\ ++i)\{}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ c\ =\ chars[i];}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(c\ ==\ chars[i]);}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00033\ \ \ \ \ \}}
+\DoxyCodeLine{00034\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\textcolor{stringliteral}{"{}Low\ ASCII"{}})\{}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ null\_terminator\ =\ \textcolor{charliteral}{'\(\backslash\)0'};}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(null\_terminator\ ==\ \textcolor{charliteral}{'\(\backslash\)0'});}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 2;\ i\ <\ 6;\ ++i)\{}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ c\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{char}\textcolor{keyword}{>}(i);}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(c\ ==\ i);}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00041\ \ \ \ \ \}}
+\DoxyCodeLine{00042\ \}}
+
+\end{DoxyCode}
+\Hypertarget{_to_string_general_8tests_8cpp_a17d7a1e8eb83d5675815c66c3e4ea592}\index{ToStringGeneral.tests.cpp@{ToStringGeneral.tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!ToStringGeneral.tests.cpp@{ToStringGeneral.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [3/6]}}
+{\footnotesize\ttfamily \label{_to_string_general_8tests_8cpp_a17d7a1e8eb83d5675815c66c3e4ea592} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Exception as \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}} (e.\+g. in \mbox{\hyperlink{include_2catch_8hpp_a54473a48ac2ac55bfe1165b69e1b8010}{REQUIRE\+\_\+\+THROWS\+\_\+\+MATCHES}}) can be stringified"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}to\+String\mbox{]}\mbox{[}exception\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_to_string_general_8tests_8cpp_source_l00172}{172}} of file \mbox{\hyperlink{_to_string_general_8tests_8cpp_source}{To\+String\+General.\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00173\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(WhatException\{\})\ ==\ \textcolor{stringliteral}{"{}This\ exception\ has\ overridden\ what()\ method"{}});}
+\DoxyCodeLine{00174\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(OperatorException\{\})\ ==\ \textcolor{stringliteral}{"{}OperatorException"{}});}
+\DoxyCodeLine{00175\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(StringMakerException\{\})\ ==\ \textcolor{stringliteral}{"{}StringMakerException"{}});}
+\DoxyCodeLine{00176\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=305pt]{_to_string_general_8tests_8cpp_a17d7a1e8eb83d5675815c66c3e4ea592_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{_to_string_general_8tests_8cpp_ac2a39f908247f54e5f85560e0971adac}\index{ToStringGeneral.tests.cpp@{ToStringGeneral.tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!ToStringGeneral.tests.cpp@{ToStringGeneral.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [4/6]}}
+{\footnotesize\ttfamily \label{_to_string_general_8tests_8cpp_ac2a39f908247f54e5f85560e0971adac} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Static arrays are convertible to string"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}to\+String\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_to_string_general_8tests_8cpp_source_l00104}{104}} of file \mbox{\hyperlink{_to_string_general_8tests_8cpp_source}{To\+String\+General.\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00105\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\textcolor{stringliteral}{"{}Single\ item"{}})\ \{}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ singular[1]\ =\ \{\ 1\ \};}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{Catch::Detail::stringify}}(singular)\ ==\ \textcolor{stringliteral}{"{}\{\ 1\ \}"{}});}
+\DoxyCodeLine{00108\ \ \ \ \ \}}
+\DoxyCodeLine{00109\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\textcolor{stringliteral}{"{}Multiple"{}})\ \{}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ arr[3]\ =\ \{\ 3,\ 2,\ 1\ \};}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{Catch::Detail::stringify}}(arr)\ ==\ \textcolor{stringliteral}{"{}\{\ 3,\ 2,\ 1\ \}"{}});}
+\DoxyCodeLine{00112\ \ \ \ \ \}}
+\DoxyCodeLine{00113\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\textcolor{stringliteral}{"{}Non-\/trivial\ inner\ items"{}})\ \{}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ std::vector<std::string>\ arr[2]\ =\ \{\ \{\textcolor{stringliteral}{"{}1:1"{}},\ \textcolor{stringliteral}{"{}1:2"{}},\ \textcolor{stringliteral}{"{}1:3"{}}\},\ \{\textcolor{stringliteral}{"{}2:1"{}},\ \textcolor{stringliteral}{"{}2:2"{}}\}\ \};}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{Catch::Detail::stringify}}(arr)\ ==\ R\textcolor{stringliteral}{"{}(\{\ \{\ "{}1:1"{},\ "{}1:2"{},\ "{}1:3"{}\ \},\ \{\ "{}2:1"{},\ "{}2:2"{}\ \}\ \})"{});}}
+\DoxyCodeLine{00116\ \textcolor{stringliteral}{\ \ \ \ \}}}
+\DoxyCodeLine{00117\ \textcolor{stringliteral}{\}}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=305pt]{_to_string_general_8tests_8cpp_ac2a39f908247f54e5f85560e0971adac_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{_to_string_general_8tests_8cpp_a460f3bdff9e456dd6e944292b3c2e65d}\index{ToStringGeneral.tests.cpp@{ToStringGeneral.tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!ToStringGeneral.tests.cpp@{ToStringGeneral.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [5/6]}}
+{\footnotesize\ttfamily \label{_to_string_general_8tests_8cpp_a460f3bdff9e456dd6e944292b3c2e65d} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}std\+::map is convertible string"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}to\+String\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_to_string_general_8tests_8cpp_source_l00058}{58}} of file \mbox{\hyperlink{_to_string_general_8tests_8cpp_source}{To\+String\+General.\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00059\ }
+\DoxyCodeLine{00060\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\ \textcolor{stringliteral}{"{}empty"{}}\ )\ \{}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ std::map<std::string,\ int>\ emptyMap;}
+\DoxyCodeLine{00062\ }
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{Catch::Detail::stringify}}(\ emptyMap\ )\ ==\ \textcolor{stringliteral}{"{}\{\ \ \}"{}}\ );}
+\DoxyCodeLine{00064\ \ \ \ \ \}}
+\DoxyCodeLine{00065\ }
+\DoxyCodeLine{00066\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\ \textcolor{stringliteral}{"{}single\ item"{}}\ )\ \{}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ std::map<std::string,\ int>\ map\ =\ \{\ \{\ \textcolor{stringliteral}{"{}one"{}},\ 1\ \}\ \};}
+\DoxyCodeLine{00068\ }
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{Catch::Detail::stringify}}(\ map\ )\ ==\ \textcolor{stringliteral}{"{}\{\ \{\ \(\backslash\)"{}one\(\backslash\)"{},\ 1\ \}\ \}"{}}\ );}
+\DoxyCodeLine{00070\ \ \ \ \ \}}
+\DoxyCodeLine{00071\ }
+\DoxyCodeLine{00072\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\ \textcolor{stringliteral}{"{}several\ items"{}}\ )\ \{}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ std::map<std::string,\ int>\ map\ =\ \{}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ \textcolor{stringliteral}{"{}abc"{}},\ 1\ \},}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ \textcolor{stringliteral}{"{}def"{}},\ 2\ \},}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ \textcolor{stringliteral}{"{}ghi"{}},\ 3\ \}}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00078\ }
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{Catch::Detail::stringify}}(\ map\ )\ ==\ \textcolor{stringliteral}{"{}\{\ \{\ \(\backslash\)"{}abc\(\backslash\)"{},\ 1\ \},\ \{\ \(\backslash\)"{}def\(\backslash\)"{},\ 2\ \},\ \{\ \(\backslash\)"{}ghi\(\backslash\)"{},\ 3\ \}\ \}"{}}\ );}
+\DoxyCodeLine{00080\ \ \ \ \ \}}
+\DoxyCodeLine{00081\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=305pt]{_to_string_general_8tests_8cpp_a460f3bdff9e456dd6e944292b3c2e65d_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{_to_string_general_8tests_8cpp_ac0b70ac633229712751fb7a26637f8b0}\index{ToStringGeneral.tests.cpp@{ToStringGeneral.tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!ToStringGeneral.tests.cpp@{ToStringGeneral.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [6/6]}}
+{\footnotesize\ttfamily \label{_to_string_general_8tests_8cpp_ac0b70ac633229712751fb7a26637f8b0} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}std\+::set is convertible string"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}to\+String\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_to_string_general_8tests_8cpp_source_l00083}{83}} of file \mbox{\hyperlink{_to_string_general_8tests_8cpp_source}{To\+String\+General.\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00084\ }
+\DoxyCodeLine{00085\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\ \textcolor{stringliteral}{"{}empty"{}}\ )\ \{}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ std::set<std::string>\ emptySet;}
+\DoxyCodeLine{00087\ }
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{Catch::Detail::stringify}}(\ emptySet\ )\ ==\ \textcolor{stringliteral}{"{}\{\ \ \}"{}}\ );}
+\DoxyCodeLine{00089\ \ \ \ \ \}}
+\DoxyCodeLine{00090\ }
+\DoxyCodeLine{00091\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\ \textcolor{stringliteral}{"{}single\ item"{}}\ )\ \{}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ std::set<std::string>\ set\ =\ \{\ \textcolor{stringliteral}{"{}one"{}}\ \};}
+\DoxyCodeLine{00093\ }
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{Catch::Detail::stringify}}(\ set\ )\ ==\ \textcolor{stringliteral}{"{}\{\ \(\backslash\)"{}one\(\backslash\)"{}\ \}"{}}\ );}
+\DoxyCodeLine{00095\ \ \ \ \ \}}
+\DoxyCodeLine{00096\ }
+\DoxyCodeLine{00097\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\ \textcolor{stringliteral}{"{}several\ items"{}}\ )\ \{}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ std::set<std::string>\ set\ =\ \{\ \textcolor{stringliteral}{"{}abc"{}},\ \textcolor{stringliteral}{"{}def"{}},\ \textcolor{stringliteral}{"{}ghi"{}}\ \};}
+\DoxyCodeLine{00099\ }
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{Catch::Detail::stringify}}(\ set\ )\ ==\ \textcolor{stringliteral}{"{}\{\ \(\backslash\)"{}abc\(\backslash\)"{},\ \(\backslash\)"{}def\(\backslash\)"{},\ \(\backslash\)"{}ghi\(\backslash\)"{}\ \}"{}}\ );}
+\DoxyCodeLine{00101\ \ \ \ \ \}}
+\DoxyCodeLine{00102\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=305pt]{_to_string_general_8tests_8cpp_ac0b70ac633229712751fb7a26637f8b0_cgraph}
+\end{center}
+\end{figure}

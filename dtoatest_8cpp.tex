@@ -1,0 +1,151 @@
+\doxysection{libraries/fc/include/fc/crypto/webauthn\+\_\+json/test/unittest/dtoatest.cpp File Reference}
+\hypertarget{dtoatest_8cpp}{}\label{dtoatest_8cpp}\index{libraries/fc/include/fc/crypto/webauthn\_json/test/unittest/dtoatest.cpp@{libraries/fc/include/fc/crypto/webauthn\_json/test/unittest/dtoatest.cpp}}
+{\ttfamily \#include "{}unittest.\+h"{}}\newline
+{\ttfamily \#include "{}rapidjson/internal/dtoa.\+h"{}}\newline
+Include dependency graph for dtoatest.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{dtoatest_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{dtoatest_8cpp_add4e1974c9415c6cfc9775d76c5ff3dd}{TEST\+\_\+\+DTOA}}(d,  \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})
+\item 
+\#define \mbox{\hyperlink{dtoatest_8cpp_a295865929de3f12e637da8204b21c80e}{TEST\+\_\+\+DTOA}}(m,  d,  \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{dtoatest_8cpp_a40866331adac6778a611e253ee27ed12}{TEST}} (\mbox{\hyperlink{_parse_numbers_8cpp_a83ce04ec4679df87effdf9fcecd8048f}{dtoa}}, normal)
+\item 
+\mbox{\hyperlink{dtoatest_8cpp_a9a5b7aec1f712627fc1009234a407a4f}{TEST}} (\mbox{\hyperlink{_parse_numbers_8cpp_a83ce04ec4679df87effdf9fcecd8048f}{dtoa}}, max\+Decimal\+Places)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{dtoatest_8cpp_add4e1974c9415c6cfc9775d76c5ff3dd}\index{dtoatest.cpp@{dtoatest.cpp}!TEST\_DTOA@{TEST\_DTOA}}
+\index{TEST\_DTOA@{TEST\_DTOA}!dtoatest.cpp@{dtoatest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_DTOA}{TEST\_DTOA}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{dtoatest_8cpp_add4e1974c9415c6cfc9775d76c5ff3dd} 
+\#define TEST\+\_\+\+DTOA(\begin{DoxyParamCaption}\item[{}]{d}{, }\item[{}]{\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ *\mbox{\hyperlink{_parse_numbers_8cpp_a83ce04ec4679df87effdf9fcecd8048f}{dtoa}}(d,\ buffer)\ =\ \textcolor{charliteral}{'\(\backslash\)0'};\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ EXPECT\_STREQ(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ buffer)}
+
+\end{DoxyCode}
+\Hypertarget{dtoatest_8cpp_a295865929de3f12e637da8204b21c80e}\index{dtoatest.cpp@{dtoatest.cpp}!TEST\_DTOA@{TEST\_DTOA}}
+\index{TEST\_DTOA@{TEST\_DTOA}!dtoatest.cpp@{dtoatest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_DTOA}{TEST\_DTOA}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{dtoatest_8cpp_a295865929de3f12e637da8204b21c80e} 
+\#define TEST\+\_\+\+DTOA(\begin{DoxyParamCaption}\item[{}]{m}{, }\item[{}]{d}{, }\item[{}]{\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ *\mbox{\hyperlink{_parse_numbers_8cpp_a83ce04ec4679df87effdf9fcecd8048f}{dtoa}}(d,\ buffer,\ m)\ =\ \textcolor{charliteral}{'\(\backslash\)0'};\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ EXPECT\_STREQ(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ buffer)}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{dtoatest_8cpp_a9a5b7aec1f712627fc1009234a407a4f}\index{dtoatest.cpp@{dtoatest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!dtoatest.cpp@{dtoatest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{dtoatest_8cpp_a9a5b7aec1f712627fc1009234a407a4f} 
+TEST (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{_parse_numbers_8cpp_a83ce04ec4679df87effdf9fcecd8048f}{dtoa}}}]{}{, }\item[{max\+Decimal\+Places}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{dtoatest_8cpp_source_l00053}{53}} of file \mbox{\hyperlink{dtoatest_8cpp_source}{dtoatest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00054\ \ \ \ \ \textcolor{keywordtype}{char}\ buffer[30];}
+\DoxyCodeLine{00055\ }
+\DoxyCodeLine{00056\ \textcolor{preprocessor}{\#define\ TEST\_DTOA(m,\ d,\ a)\(\backslash\)}}
+\DoxyCodeLine{00057\ \textcolor{preprocessor}{\ \ \ \ *dtoa(d,\ buffer,\ m)\ =\ '\(\backslash\)0';\(\backslash\)}}
+\DoxyCodeLine{00058\ \textcolor{preprocessor}{\ \ \ \ EXPECT\_STREQ(a,\ buffer)}}
+\DoxyCodeLine{00059\ }
+\DoxyCodeLine{00060\ \ \ \ \ \mbox{\hyperlink{dtoatest_8cpp_add4e1974c9415c6cfc9775d76c5ff3dd}{TEST\_DTOA}}(3,\ 0.0,\ \textcolor{stringliteral}{"{}0.0"{}});}
+\DoxyCodeLine{00061\ \ \ \ \ \mbox{\hyperlink{dtoatest_8cpp_add4e1974c9415c6cfc9775d76c5ff3dd}{TEST\_DTOA}}(1,\ 0.0,\ \textcolor{stringliteral}{"{}0.0"{}});}
+\DoxyCodeLine{00062\ \ \ \ \ \mbox{\hyperlink{dtoatest_8cpp_add4e1974c9415c6cfc9775d76c5ff3dd}{TEST\_DTOA}}(3,\ -\/0.0,\ \textcolor{stringliteral}{"{}-\/0.0"{}});}
+\DoxyCodeLine{00063\ \ \ \ \ \mbox{\hyperlink{dtoatest_8cpp_add4e1974c9415c6cfc9775d76c5ff3dd}{TEST\_DTOA}}(3,\ 1.0,\ \textcolor{stringliteral}{"{}1.0"{}});}
+\DoxyCodeLine{00064\ \ \ \ \ \mbox{\hyperlink{dtoatest_8cpp_add4e1974c9415c6cfc9775d76c5ff3dd}{TEST\_DTOA}}(3,\ -\/1.0,\ \textcolor{stringliteral}{"{}-\/1.0"{}});}
+\DoxyCodeLine{00065\ \ \ \ \ \mbox{\hyperlink{dtoatest_8cpp_add4e1974c9415c6cfc9775d76c5ff3dd}{TEST\_DTOA}}(3,\ 1.2345,\ \textcolor{stringliteral}{"{}1.234"{}});}
+\DoxyCodeLine{00066\ \ \ \ \ \mbox{\hyperlink{dtoatest_8cpp_add4e1974c9415c6cfc9775d76c5ff3dd}{TEST\_DTOA}}(2,\ 1.2345,\ \textcolor{stringliteral}{"{}1.23"{}});}
+\DoxyCodeLine{00067\ \ \ \ \ \mbox{\hyperlink{dtoatest_8cpp_add4e1974c9415c6cfc9775d76c5ff3dd}{TEST\_DTOA}}(1,\ 1.2345,\ \textcolor{stringliteral}{"{}1.2"{}});}
+\DoxyCodeLine{00068\ \ \ \ \ \mbox{\hyperlink{dtoatest_8cpp_add4e1974c9415c6cfc9775d76c5ff3dd}{TEST\_DTOA}}(3,\ 1.2345678,\ \textcolor{stringliteral}{"{}1.234"{}});}
+\DoxyCodeLine{00069\ \ \ \ \ \mbox{\hyperlink{dtoatest_8cpp_add4e1974c9415c6cfc9775d76c5ff3dd}{TEST\_DTOA}}(3,\ 1.0001,\ \textcolor{stringliteral}{"{}1.0"{}});}
+\DoxyCodeLine{00070\ \ \ \ \ \mbox{\hyperlink{dtoatest_8cpp_add4e1974c9415c6cfc9775d76c5ff3dd}{TEST\_DTOA}}(2,\ 1.0001,\ \textcolor{stringliteral}{"{}1.0"{}});}
+\DoxyCodeLine{00071\ \ \ \ \ \mbox{\hyperlink{dtoatest_8cpp_add4e1974c9415c6cfc9775d76c5ff3dd}{TEST\_DTOA}}(1,\ 1.0001,\ \textcolor{stringliteral}{"{}1.0"{}});}
+\DoxyCodeLine{00072\ \ \ \ \ \mbox{\hyperlink{dtoatest_8cpp_add4e1974c9415c6cfc9775d76c5ff3dd}{TEST\_DTOA}}(3,\ 0.123456789012,\ \textcolor{stringliteral}{"{}0.123"{}});}
+\DoxyCodeLine{00073\ \ \ \ \ \mbox{\hyperlink{dtoatest_8cpp_add4e1974c9415c6cfc9775d76c5ff3dd}{TEST\_DTOA}}(2,\ 0.123456789012,\ \textcolor{stringliteral}{"{}0.12"{}});}
+\DoxyCodeLine{00074\ \ \ \ \ \mbox{\hyperlink{dtoatest_8cpp_add4e1974c9415c6cfc9775d76c5ff3dd}{TEST\_DTOA}}(1,\ 0.123456789012,\ \textcolor{stringliteral}{"{}0.1"{}});}
+\DoxyCodeLine{00075\ \ \ \ \ \mbox{\hyperlink{dtoatest_8cpp_add4e1974c9415c6cfc9775d76c5ff3dd}{TEST\_DTOA}}(4,\ 0.0001,\ \textcolor{stringliteral}{"{}0.0001"{}});}
+\DoxyCodeLine{00076\ \ \ \ \ \mbox{\hyperlink{dtoatest_8cpp_add4e1974c9415c6cfc9775d76c5ff3dd}{TEST\_DTOA}}(3,\ 0.0001,\ \textcolor{stringliteral}{"{}0.0"{}});}
+\DoxyCodeLine{00077\ \ \ \ \ \mbox{\hyperlink{dtoatest_8cpp_add4e1974c9415c6cfc9775d76c5ff3dd}{TEST\_DTOA}}(2,\ 0.0001,\ \textcolor{stringliteral}{"{}0.0"{}});}
+\DoxyCodeLine{00078\ \ \ \ \ \mbox{\hyperlink{dtoatest_8cpp_add4e1974c9415c6cfc9775d76c5ff3dd}{TEST\_DTOA}}(1,\ 0.0001,\ \textcolor{stringliteral}{"{}0.0"{}});}
+\DoxyCodeLine{00079\ \ \ \ \ \mbox{\hyperlink{dtoatest_8cpp_add4e1974c9415c6cfc9775d76c5ff3dd}{TEST\_DTOA}}(3,\ 1234567.8,\ \textcolor{stringliteral}{"{}1234567.8"{}});}
+\DoxyCodeLine{00080\ \ \ \ \ \mbox{\hyperlink{dtoatest_8cpp_add4e1974c9415c6cfc9775d76c5ff3dd}{TEST\_DTOA}}(3,\ 1e30,\ \textcolor{stringliteral}{"{}1e30"{}});}
+\DoxyCodeLine{00081\ \ \ \ \ \mbox{\hyperlink{dtoatest_8cpp_add4e1974c9415c6cfc9775d76c5ff3dd}{TEST\_DTOA}}(3,\ 5e-\/324,\ \textcolor{stringliteral}{"{}0.0"{}});\ \textcolor{comment}{//\ Min\ subnormal\ positive\ double}}
+\DoxyCodeLine{00082\ \ \ \ \ \mbox{\hyperlink{dtoatest_8cpp_add4e1974c9415c6cfc9775d76c5ff3dd}{TEST\_DTOA}}(3,\ 2.225073858507201e-\/308,\ \textcolor{stringliteral}{"{}0.0"{}});\ \textcolor{comment}{//\ Max\ subnormal\ positive\ double}}
+\DoxyCodeLine{00083\ \ \ \ \ \mbox{\hyperlink{dtoatest_8cpp_add4e1974c9415c6cfc9775d76c5ff3dd}{TEST\_DTOA}}(3,\ 2.2250738585072014e-\/308,\ \textcolor{stringliteral}{"{}0.0"{}});\ \textcolor{comment}{//\ Min\ normal\ positive\ double}}
+\DoxyCodeLine{00084\ \ \ \ \ \mbox{\hyperlink{dtoatest_8cpp_add4e1974c9415c6cfc9775d76c5ff3dd}{TEST\_DTOA}}(3,\ 1.7976931348623157e308,\ \textcolor{stringliteral}{"{}1.7976931348623157e308"{}});\ \textcolor{comment}{//\ Max\ double}}
+\DoxyCodeLine{00085\ \ \ \ \ \mbox{\hyperlink{dtoatest_8cpp_add4e1974c9415c6cfc9775d76c5ff3dd}{TEST\_DTOA}}(5,\ -\/0.14000000000000001,\ \textcolor{stringliteral}{"{}-\/0.14"{}});}
+\DoxyCodeLine{00086\ \ \ \ \ \mbox{\hyperlink{dtoatest_8cpp_add4e1974c9415c6cfc9775d76c5ff3dd}{TEST\_DTOA}}(4,\ -\/0.14000000000000001,\ \textcolor{stringliteral}{"{}-\/0.14"{}});}
+\DoxyCodeLine{00087\ \ \ \ \ \mbox{\hyperlink{dtoatest_8cpp_add4e1974c9415c6cfc9775d76c5ff3dd}{TEST\_DTOA}}(3,\ -\/0.14000000000000001,\ \textcolor{stringliteral}{"{}-\/0.14"{}});}
+\DoxyCodeLine{00088\ \ \ \ \ \mbox{\hyperlink{dtoatest_8cpp_add4e1974c9415c6cfc9775d76c5ff3dd}{TEST\_DTOA}}(3,\ -\/0.10000000000000001,\ \textcolor{stringliteral}{"{}-\/0.1"{}});}
+\DoxyCodeLine{00089\ \ \ \ \ \mbox{\hyperlink{dtoatest_8cpp_add4e1974c9415c6cfc9775d76c5ff3dd}{TEST\_DTOA}}(2,\ -\/0.10000000000000001,\ \textcolor{stringliteral}{"{}-\/0.1"{}});}
+\DoxyCodeLine{00090\ \ \ \ \ \mbox{\hyperlink{dtoatest_8cpp_add4e1974c9415c6cfc9775d76c5ff3dd}{TEST\_DTOA}}(1,\ -\/0.10000000000000001,\ \textcolor{stringliteral}{"{}-\/0.1"{}});}
+\DoxyCodeLine{00091\ }
+\DoxyCodeLine{00092\ \textcolor{preprocessor}{\#undef\ TEST\_DTOA}}
+\DoxyCodeLine{00093\ \}}
+
+\end{DoxyCode}
+\Hypertarget{dtoatest_8cpp_a40866331adac6778a611e253ee27ed12}\index{dtoatest.cpp@{dtoatest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!dtoatest.cpp@{dtoatest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{dtoatest_8cpp_a40866331adac6778a611e253ee27ed12} 
+TEST (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{_parse_numbers_8cpp_a83ce04ec4679df87effdf9fcecd8048f}{dtoa}}}]{}{, }\item[{normal}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{dtoatest_8cpp_source_l00025}{25}} of file \mbox{\hyperlink{dtoatest_8cpp_source}{dtoatest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00026\ \ \ \ \ \textcolor{keywordtype}{char}\ buffer[30];}
+\DoxyCodeLine{00027\ }
+\DoxyCodeLine{00028\ \textcolor{preprocessor}{\#define\ TEST\_DTOA(d,\ a)\(\backslash\)}}
+\DoxyCodeLine{00029\ \textcolor{preprocessor}{\ \ \ \ *dtoa(d,\ buffer)\ =\ '\(\backslash\)0';\(\backslash\)}}
+\DoxyCodeLine{00030\ \textcolor{preprocessor}{\ \ \ \ EXPECT\_STREQ(a,\ buffer)}}
+\DoxyCodeLine{00031\ }
+\DoxyCodeLine{00032\ \ \ \ \ \mbox{\hyperlink{dtoatest_8cpp_add4e1974c9415c6cfc9775d76c5ff3dd}{TEST\_DTOA}}(0.0,\ \textcolor{stringliteral}{"{}0.0"{}});}
+\DoxyCodeLine{00033\ \ \ \ \ \mbox{\hyperlink{dtoatest_8cpp_add4e1974c9415c6cfc9775d76c5ff3dd}{TEST\_DTOA}}(-\/0.0,\ \textcolor{stringliteral}{"{}-\/0.0"{}});}
+\DoxyCodeLine{00034\ \ \ \ \ \mbox{\hyperlink{dtoatest_8cpp_add4e1974c9415c6cfc9775d76c5ff3dd}{TEST\_DTOA}}(1.0,\ \textcolor{stringliteral}{"{}1.0"{}});}
+\DoxyCodeLine{00035\ \ \ \ \ \mbox{\hyperlink{dtoatest_8cpp_add4e1974c9415c6cfc9775d76c5ff3dd}{TEST\_DTOA}}(-\/1.0,\ \textcolor{stringliteral}{"{}-\/1.0"{}});}
+\DoxyCodeLine{00036\ \ \ \ \ \mbox{\hyperlink{dtoatest_8cpp_add4e1974c9415c6cfc9775d76c5ff3dd}{TEST\_DTOA}}(1.2345,\ \textcolor{stringliteral}{"{}1.2345"{}});}
+\DoxyCodeLine{00037\ \ \ \ \ \mbox{\hyperlink{dtoatest_8cpp_add4e1974c9415c6cfc9775d76c5ff3dd}{TEST\_DTOA}}(1.2345678,\ \textcolor{stringliteral}{"{}1.2345678"{}});}
+\DoxyCodeLine{00038\ \ \ \ \ \mbox{\hyperlink{dtoatest_8cpp_add4e1974c9415c6cfc9775d76c5ff3dd}{TEST\_DTOA}}(0.123456789012,\ \textcolor{stringliteral}{"{}0.123456789012"{}});}
+\DoxyCodeLine{00039\ \ \ \ \ \mbox{\hyperlink{dtoatest_8cpp_add4e1974c9415c6cfc9775d76c5ff3dd}{TEST\_DTOA}}(1234567.8,\ \textcolor{stringliteral}{"{}1234567.8"{}});}
+\DoxyCodeLine{00040\ \ \ \ \ \mbox{\hyperlink{dtoatest_8cpp_add4e1974c9415c6cfc9775d76c5ff3dd}{TEST\_DTOA}}(-\/79.39773355813419,\ \textcolor{stringliteral}{"{}-\/79.39773355813419"{}});}
+\DoxyCodeLine{00041\ \ \ \ \ \mbox{\hyperlink{dtoatest_8cpp_add4e1974c9415c6cfc9775d76c5ff3dd}{TEST\_DTOA}}(0.000001,\ \textcolor{stringliteral}{"{}0.000001"{}});}
+\DoxyCodeLine{00042\ \ \ \ \ \mbox{\hyperlink{dtoatest_8cpp_add4e1974c9415c6cfc9775d76c5ff3dd}{TEST\_DTOA}}(0.0000001,\ \textcolor{stringliteral}{"{}1e-\/7"{}});}
+\DoxyCodeLine{00043\ \ \ \ \ \mbox{\hyperlink{dtoatest_8cpp_add4e1974c9415c6cfc9775d76c5ff3dd}{TEST\_DTOA}}(1e30,\ \textcolor{stringliteral}{"{}1e30"{}});}
+\DoxyCodeLine{00044\ \ \ \ \ \mbox{\hyperlink{dtoatest_8cpp_add4e1974c9415c6cfc9775d76c5ff3dd}{TEST\_DTOA}}(1.234567890123456e30,\ \textcolor{stringliteral}{"{}1.234567890123456e30"{}});}
+\DoxyCodeLine{00045\ \ \ \ \ \mbox{\hyperlink{dtoatest_8cpp_add4e1974c9415c6cfc9775d76c5ff3dd}{TEST\_DTOA}}(5e-\/324,\ \textcolor{stringliteral}{"{}5e-\/324"{}});\ \textcolor{comment}{//\ Min\ subnormal\ positive\ double}}
+\DoxyCodeLine{00046\ \ \ \ \ \mbox{\hyperlink{dtoatest_8cpp_add4e1974c9415c6cfc9775d76c5ff3dd}{TEST\_DTOA}}(2.225073858507201e-\/308,\ \textcolor{stringliteral}{"{}2.225073858507201e-\/308"{}});\ \textcolor{comment}{//\ Max\ subnormal\ positive\ double}}
+\DoxyCodeLine{00047\ \ \ \ \ \mbox{\hyperlink{dtoatest_8cpp_add4e1974c9415c6cfc9775d76c5ff3dd}{TEST\_DTOA}}(2.2250738585072014e-\/308,\ \textcolor{stringliteral}{"{}2.2250738585072014e-\/308"{}});\ \textcolor{comment}{//\ Min\ normal\ positive\ double}}
+\DoxyCodeLine{00048\ \ \ \ \ \mbox{\hyperlink{dtoatest_8cpp_add4e1974c9415c6cfc9775d76c5ff3dd}{TEST\_DTOA}}(1.7976931348623157e308,\ \textcolor{stringliteral}{"{}1.7976931348623157e308"{}});\ \textcolor{comment}{//\ Max\ double}}
+\DoxyCodeLine{00049\ }
+\DoxyCodeLine{00050\ \textcolor{preprocessor}{\#undef\ TEST\_DTOA}}
+\DoxyCodeLine{00051\ \}}
+
+\end{DoxyCode}

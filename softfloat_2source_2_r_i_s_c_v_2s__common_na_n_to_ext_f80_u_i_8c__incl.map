@@ -1,0 +1,20 @@
+<map id="libraries/softfloat/source/RISCV/s_commonNaNToExtF80UI.c" name="libraries/softfloat/source/RISCV/s_commonNaNToExtF80UI.c">
+<area shape="rect" id="Node000001" title=" " alt="" coords="13,5,232,61"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,109,85,135"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="100,63,68,99,64,95,96,59"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="46,183,162,208"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="122,62,109,168,104,167,117,61"/>
+<area shape="rect" id="Node000004" href="$softfloat_2source_2_r_i_s_c_v_2specialize_8h.html" title=" " alt="" coords="178,109,269,135"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="156,59,200,97,196,101,152,63"/>
+<area shape="poly" id="edge8_Node000004_Node000003" title=" " alt="" coords="205,138,138,177,136,172,202,133"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="186,183,261,208"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="226,135,226,167,221,167,221,135"/>
+<area shape="rect" id="Node000006" href="$stdint_8h.html" title=" " alt="" coords="285,183,349,208"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="241,133,291,171,288,175,238,137"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="373,183,453,208"/>
+<area shape="poly" id="edge9_Node000004_Node000009" title=" " alt="" coords="257,133,368,174,366,179,255,138"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="240,256,303,282"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="312,210,290,245,285,242,307,207"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="328,256,394,282"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="327,207,348,241,343,244,322,210"/>
+</map>

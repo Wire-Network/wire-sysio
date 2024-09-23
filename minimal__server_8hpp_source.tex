@@ -1,0 +1,180 @@
+\doxysection{minimal\+\_\+server.\+hpp}
+\hypertarget{minimal__server_8hpp_source}{}\label{minimal__server_8hpp_source}\index{libraries/fc/vendor/websocketpp/websocketpp/config/minimal\_server.hpp@{libraries/fc/vendor/websocketpp/websocketpp/config/minimal\_server.hpp}}
+\mbox{\hyperlink{minimal__server_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2014,\ Peter\ Thorson.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00004}00004\ \textcolor{comment}{\ *\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00005}00005\ \textcolor{comment}{\ *\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are\ met:}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00006}00006\ \textcolor{comment}{\ *\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00007}00007\ \textcolor{comment}{\ *\ \ \ \ \ \ \ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00008}00008\ \textcolor{comment}{\ *\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00009}00009\ \textcolor{comment}{\ *\ \ \ \ \ \ \ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer\ in\ the}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00010}00010\ \textcolor{comment}{\ *\ \ \ \ \ \ \ documentation\ and/or\ other\ materials\ provided\ with\ the\ distribution.}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00011}00011\ \textcolor{comment}{\ *\ \ \ \ \ *\ Neither\ the\ name\ of\ the\ WebSocket++\ Project\ nor\ the}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00012}00012\ \textcolor{comment}{\ *\ \ \ \ \ \ \ names\ of\ its\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00013}00013\ \textcolor{comment}{\ *\ \ \ \ \ \ \ derived\ from\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00014}00014\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00015}00015\ \textcolor{comment}{\ *\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS\ "{}AS\ IS"{}}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00016}00016\ \textcolor{comment}{\ *\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ THE}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00017}00017\ \textcolor{comment}{\ *\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR\ A\ PARTICULAR\ PURPOSE}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00018}00018\ \textcolor{comment}{\ *\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ PETER\ THORSON\ BE\ LIABLE\ FOR\ ANY}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00019}00019\ \textcolor{comment}{\ *\ DIRECT,\ INDIRECT,\ INCIDENTAL,\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00020}00020\ \textcolor{comment}{\ *\ (INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00021}00021\ \textcolor{comment}{\ *\ LOSS\ OF\ USE,\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00022}00022\ \textcolor{comment}{\ *\ ON\ ANY\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00023}00023\ \textcolor{comment}{\ *\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE\ OF\ THIS}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00024}00024\ \textcolor{comment}{\ *\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00025}00025\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00026}00026\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00028}00028\ \textcolor{preprocessor}{\#ifndef\ WEBSOCKETPP\_CONFIG\_MINIMAL\_HPP}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00029}00029\ \textcolor{preprocessor}{\#define\ WEBSOCKETPP\_CONFIG\_MINIMAL\_HPP}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00031}00031\ \textcolor{comment}{//\ Non-\/Policy\ common\ stuff}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00032}00032\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{platforms_8hpp}{websocketpp/common/platforms.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00033}00033\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{cpp11_8hpp}{websocketpp/common/cpp11.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00034}00034\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{stdint_8hpp}{websocketpp/common/stdint.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00036}00036\ \textcolor{comment}{//\ Concurrency}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00037}00037\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{concurrency_2none_8hpp}{websocketpp/concurrency/none.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00039}00039\ \textcolor{comment}{//\ Transport}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00040}00040\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{transport_2stub_2endpoint_8hpp}{websocketpp/transport/stub/endpoint.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00042}00042\ \textcolor{comment}{//\ HTTP}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00043}00043\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{request_8hpp}{websocketpp/http/request.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00044}00044\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{response_8hpp}{websocketpp/http/response.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00046}00046\ \textcolor{comment}{//\ Messages}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00047}00047\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{message_8hpp}{websocketpp/message\_buffer/message.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00048}00048\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{alloc_8hpp}{websocketpp/message\_buffer/alloc.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00050}00050\ \textcolor{comment}{//\ Loggers}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00051}00051\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{stub_8hpp}{websocketpp/logger/stub.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00052}00052\ }
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00053}00053\ \textcolor{comment}{//\ RNG}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00054}00054\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{random_2none_8hpp}{websocketpp/random/none.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00056}00056\ \textcolor{comment}{//\ User\ stub\ base\ classes}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00057}00057\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{endpoint__base_8hpp}{websocketpp/endpoint\_base.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00058}00058\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{connection__base_8hpp}{websocketpp/connection\_base.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00060}00060\ \textcolor{comment}{//\ Extensions}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00061}00061\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{disabled_8hpp}{websocketpp/extensions/permessage\_deflate/disabled.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00062}00062\ }
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00063}00063\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacewebsocketpp}{websocketpp}}\ \{}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00064}00064\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{classconfig}{config}}\ \{}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00067}00067\ }
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00096}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server}{00096}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server}{minimal\_server}}\ \{}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00097}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_a0789d659beb10d5549aa7bdc89015f3c}{00097}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server}{minimal\_server}}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_a0789d659beb10d5549aa7bdc89015f3c}{type}};}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00098}00098\ }
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00099}00099\ \ \ \ \ \textcolor{comment}{//\ Concurrency\ policy}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00100}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_a2cef1c57641432ac0a60b6ae0abda42e}{00100}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1concurrency_1_1none}{websocketpp::concurrency::none}}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_a2cef1c57641432ac0a60b6ae0abda42e}{concurrency\_type}};}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00101}00101\ }
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00102}00102\ \ \ \ \ \textcolor{comment}{//\ HTTP\ Parser\ Policies}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00103}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_a1896b2905137429e6b59816911ffbe29}{00103}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1request}{http::parser::request}}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_a1896b2905137429e6b59816911ffbe29}{request\_type}};}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00104}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_a9417f75484c402992f6504f193f88fa1}{00104}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1response}{http::parser::response}}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_a9417f75484c402992f6504f193f88fa1}{response\_type}};}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00105}00105\ }
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00106}00106\ \ \ \ \ \textcolor{comment}{//\ Message\ Policies}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00107}00107\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message}{message\_buffer::message<message\_buffer::alloc::con\_msg\_manager>}}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00108}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_a95576e3cdc7ff872c019bd9acdfe49ae}{00108}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_a95576e3cdc7ff872c019bd9acdfe49ae}{message\_type}};}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00109}00109\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1alloc_1_1con__msg__manager}{message\_buffer::alloc::con\_msg\_manager<message\_type>}}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00110}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_a241ac25ee630b0936d1038dde71cf1c8}{00110}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_a241ac25ee630b0936d1038dde71cf1c8}{con\_msg\_manager\_type}};}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00111}00111\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1alloc_1_1endpoint__msg__manager}{message\_buffer::alloc::endpoint\_msg\_manager<con\_msg\_manager\_type>}}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00112}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_a080feea5d98dccde04961e2fc034c2bb}{00112}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_a080feea5d98dccde04961e2fc034c2bb}{endpoint\_msg\_manager\_type}};}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00113}00113\ }
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00115}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_a3c6db150101a5a90d00c7d851aafb41b}{00115}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1log_1_1stub}{websocketpp::log::stub}}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_a3c6db150101a5a90d00c7d851aafb41b}{elog\_type}};}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00116}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_ad806b185ecdf63aae41ae6c8149ddef6}{00116}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1log_1_1stub}{websocketpp::log::stub}}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_ad806b185ecdf63aae41ae6c8149ddef6}{alog\_type}};}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00117}00117\ }
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00119}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_aaef143e04e70cb87d01018a31d1fd02e}{00119}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1random_1_1none_1_1int__generator}{websocketpp::random::none::int\_generator<uint32\_t>}}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_aaef143e04e70cb87d01018a31d1fd02e}{rng\_type}};}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00120}00120\ }
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00124}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_a671a693af60cb11d9526d58aedce515c}{00124}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{bool}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_a671a693af60cb11d9526d58aedce515c}{enable\_multithreading}}\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00125}00125\ }
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00126}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_1_1transport__config}{00126}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_1_1transport__config}{transport\_config}}\ \{}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00127}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_1_1transport__config_a58227b36a712190368ecba79220f38d9}{00127}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1concurrency_1_1none}{type::concurrency\_type}}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_1_1transport__config_a58227b36a712190368ecba79220f38d9}{concurrency\_type}};}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00128}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_1_1transport__config_a053822c1066c9f3222111a16cae5d77f}{00128}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1log_1_1stub}{type::elog\_type}}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_1_1transport__config_a053822c1066c9f3222111a16cae5d77f}{elog\_type}};}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00129}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_1_1transport__config_ae962cc97b97c3796b4d8521bf79096d9}{00129}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1log_1_1stub}{type::alog\_type}}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_1_1transport__config_ae962cc97b97c3796b4d8521bf79096d9}{alog\_type}};}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00130}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_1_1transport__config_a3791eb318d8fc987ff2fd6fb46f493a5}{00130}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1request}{type::request\_type}}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_1_1transport__config_a3791eb318d8fc987ff2fd6fb46f493a5}{request\_type}};}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00131}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_1_1transport__config_adbbd769bbea8700230a028cdb1f70d13}{00131}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1response}{type::response\_type}}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_1_1transport__config_adbbd769bbea8700230a028cdb1f70d13}{response\_type}};}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00132}00132\ }
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00136}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_1_1transport__config_a5103f390ba217818bc49b2509650c04a}{00136}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{bool}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_1_1transport__config_a5103f390ba217818bc49b2509650c04a}{enable\_multithreading}}\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00137}00137\ }
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00139}00139\ }
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00141}00141\ }
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00144}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_1_1transport__config_abe0f95c0e47d16ff3b316910fed6e5f1}{00144}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_1_1transport__config_abe0f95c0e47d16ff3b316910fed6e5f1}{timeout\_socket\_pre\_init}}\ =\ 5000;}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00145}00145\ }
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00147}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_1_1transport__config_a1082d008bb545885253eaff90fcd58f6}{00147}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_1_1transport__config_a1082d008bb545885253eaff90fcd58f6}{timeout\_proxy}}\ =\ 5000;}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00148}00148\ }
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00150}00150\ }
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00154}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_1_1transport__config_a8ff9307f4d8d33cd07c8d94afed18ca5}{00154}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_1_1transport__config_a8ff9307f4d8d33cd07c8d94afed18ca5}{timeout\_socket\_post\_init}}\ =\ 5000;}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00155}00155\ }
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00157}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_1_1transport__config_a0f5cb2ea153d5f06b02b183364f7b11e}{00157}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_1_1transport__config_a0f5cb2ea153d5f06b02b183364f7b11e}{timeout\_dns\_resolve}}\ =\ 5000;}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00158}00158\ }
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00160}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_1_1transport__config_addfe5947be3138e84b1773b5be2ad49c}{00160}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_1_1transport__config_addfe5947be3138e84b1773b5be2ad49c}{timeout\_connect}}\ =\ 5000;}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00161}00161\ }
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00163}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_1_1transport__config_a100202545acd0d397d0462eb87e61b6c}{00163}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_1_1transport__config_a100202545acd0d397d0462eb87e61b6c}{timeout\_socket\_shutdown}}\ =\ 5000;}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00164}00164\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00165}00165\ }
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00167}00167\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1stub_1_1endpoint}{websocketpp::transport::stub::endpoint<transport\_config>}}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00168}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_a46653e35c43b0d719c5172265692af9e}{00168}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_a46653e35c43b0d719c5172265692af9e}{transport\_type}};}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00169}00169\ }
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00171}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_a012b2b572029510cd54de49399d1e6cd}{00171}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1endpoint__base}{websocketpp::endpoint\_base}}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_a012b2b572029510cd54de49399d1e6cd}{endpoint\_base}};}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00173}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_a514489d3bba8b2adca5ed1c64c292ca1}{00173}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1connection__base}{websocketpp::connection\_base}}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_a514489d3bba8b2adca5ed1c64c292ca1}{connection\_base}};}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00174}00174\ }
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00176}00176\ }
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00178}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_a5ea3c55d3cd784ef8cfb8c371a7ec209}{00178}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_a5ea3c55d3cd784ef8cfb8c371a7ec209}{timeout\_open\_handshake}}\ =\ 5000;}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00180}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_aaad75d432962b0a059f2ae7a6378b4e2}{00180}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_aaad75d432962b0a059f2ae7a6378b4e2}{timeout\_close\_handshake}}\ =\ 5000;}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00182}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_ad1b8ef6ef509976f2d5e05840d641626}{00182}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_ad1b8ef6ef509976f2d5e05840d641626}{timeout\_pong}}\ =\ 5000;}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00183}00183\ }
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00185}00185\ }
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00190}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_a186c68735f459a3242d68821c82551bc}{00190}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_a186c68735f459a3242d68821c82551bc}{client\_version}}\ =\ 13;\ \textcolor{comment}{//\ RFC6455}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00191}00191\ }
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00193}00193\ }
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00202}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_a3682c9c0dc879a125eff396be7babf4e}{00202}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{websocketpp::log::level}}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_a3682c9c0dc879a125eff396be7babf4e}{elog\_level}}\ =}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00203}00203\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structwebsocketpp_1_1log_1_1elevel_ae86395aa26ec2089e07fd63b62a549fa}{websocketpp::log::elevel::none}};}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00204}00204\ }
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00206}00206\ }
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00215}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_ae71d1728a8d49acd97ec29a6fdfd440c}{00215}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{websocketpp::log::level}}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_ae71d1728a8d49acd97ec29a6fdfd440c}{alog\_level}}\ =}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00216}00216\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a4cf0520816094999975fe73081cf30f2}{websocketpp::log::alevel::none}};}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00217}00217\ }
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00219}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_a8fe8ba843966319a144337f8620648f3}{00219}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_a8fe8ba843966319a144337f8620648f3}{connection\_read\_buffer\_size}}\ =\ 16384;}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00220}00220\ }
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00222}00222\ }
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00228}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_aab09bf45ad78310426a04636ad64c2bd}{00228}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_aab09bf45ad78310426a04636ad64c2bd}{drop\_on\_protocol\_error}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00229}00229\ }
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00231}00231\ }
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00243}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_a2628ceea7ff3671afac22317f979e9c1}{00243}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_a2628ceea7ff3671afac22317f979e9c1}{silent\_close}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00244}00244\ }
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00246}00246\ }
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00255}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_adfad5099419b8e2090c3667d17e10008}{00255}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_adfad5099419b8e2090c3667d17e10008}{max\_message\_size}}\ =\ 32000000;}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00256}00256\ }
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00258}00258\ }
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00267}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_a56756239e0904949156e630c1f48d95e}{00267}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_a56756239e0904949156e630c1f48d95e}{max\_http\_body\_size}}\ =\ 32000000;}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00268}00268\ }
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00270}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_ae25bd7e239136a81b9756d6be0818466}{00270}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_ae25bd7e239136a81b9756d6be0818466}{enable\_extensions}}\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00271}00271\ }
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00273}00273\ }
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00275}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_1_1permessage__deflate__config}{00275}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_1_1permessage__deflate__config}{permessage\_deflate\_config}}\ \{}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00276}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_1_1permessage__deflate__config_a559cd0c12e63b0ac222b80cdf5648cf0}{00276}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1request}{core::request\_type}}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_1_1permessage__deflate__config_a559cd0c12e63b0ac222b80cdf5648cf0}{request\_type}};}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00277}00277\ }
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00280}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_1_1permessage__deflate__config_a6e01239ebe19410d4214db6bd1b83d53}{00280}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_1_1permessage__deflate__config_a6e01239ebe19410d4214db6bd1b83d53}{allow\_disabling\_context\_takeover}}\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00281}00281\ }
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00287}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_1_1permessage__deflate__config_a6faed3e781638f77c451d003578d5ca2}{00287}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_1_1permessage__deflate__config_a6faed3e781638f77c451d003578d5ca2}{minimum\_outgoing\_window\_bits}}\ =\ 8;}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00288}00288\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00289}00289\ }
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00290}00290\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1disabled}{websocketpp::extensions::permessage\_deflate::disabled}}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00291}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_a42caf7cbf8ea5bf43bc62742916ef1b4}{00291}}\ \ \ \ \ \ \ \ \ <\mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_1_1permessage__deflate__config}{permessage\_deflate\_config}}>\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1minimal__server_a42caf7cbf8ea5bf43bc62742916ef1b4}{permessage\_deflate\_type}};}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00292}00292\ }
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00294}00294\ }
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00306}00306\ \ \ \ \ \textcolor{comment}{//static\ const\ bool\ autonegotiate\_compression\ =\ false;}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00307}00307\ \};}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00308}00308\ }
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00309}00309\ \}\ \textcolor{comment}{//\ namespace\ config}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00310}00310\ \}\ \textcolor{comment}{//\ namespace\ websocketpp}}
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00311}00311\ }
+\DoxyCodeLine{\Hypertarget{minimal__server_8hpp_source_l00312}00312\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ WEBSOCKETPP\_CONFIG\_MINIMAL\_HPP}}
+
+\end{DoxyCode}

@@ -1,0 +1,9 @@
+<map id="cpp.ast._GenericDeclaration._TypeStringHelper" name="cpp.ast._GenericDeclaration._TypeStringHelper">
+<area shape="rect" id="Node000001" title=" " alt="" coords="215,71,405,111"/>
+<area shape="rect" id="Node000002" href="$classcpp_1_1ast_1_1___nested_type.html#a944c5478ca7586a71d1d10bfcc7be1bb" title=" " alt="" coords="11,5,161,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="223,68,158,49,159,44,224,63"/>
+<area shape="rect" id="Node000003" href="$classcpp_1_1ast_1_1_function.html#a61e8eadca35b3848183554f62acf0ffb" title=" " alt="" coords="21,71,151,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="199,94,151,94,151,88,199,88"/>
+<area shape="rect" id="Node000004" href="$classcpp_1_1ast_1_1_typedef.html#ac461b1e6209716f39cc06baa5d726f56" title=" " alt="" coords="5,136,167,161"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="214,118,140,137,139,132,213,113"/>
+</map>

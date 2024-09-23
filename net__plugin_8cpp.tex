@@ -1,0 +1,295 @@
+\doxysection{plugins/net\+\_\+plugin/net\+\_\+plugin.cpp File Reference}
+\hypertarget{net__plugin_8cpp}{}\label{net__plugin_8cpp}\index{plugins/net\_plugin/net\_plugin.cpp@{plugins/net\_plugin/net\_plugin.cpp}}
+{\ttfamily \#include $<$sysio/chain/types.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/net\+\_\+plugin/net\+\_\+plugin.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/net\+\_\+plugin/protocol.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/controller.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/exceptions.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/block.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/plugin\+\_\+interface.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/thread\+\_\+utils.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/producer\+\_\+plugin/producer\+\_\+plugin.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/contract\+\_\+types.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/network/message\+\_\+buffer.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/network/ip.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/io/json.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/io/raw.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/log/appender.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/log/logger\+\_\+config.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/log/trace.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/reflect/variant.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/crypto/rand.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/exception/exception.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/asio/ip/tcp.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/asio/ip/host\+\_\+name.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/asio/steady\+\_\+timer.\+hpp$>$}\newline
+{\ttfamily \#include $<$atomic$>$}\newline
+{\ttfamily \#include $<$shared\+\_\+mutex$>$}\newline
+Include dependency graph for net\+\_\+plugin.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{net__plugin_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1node__transaction__state}{sysio\+::node\+\_\+transaction\+\_\+state}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1peer__block__state}{sysio\+::peer\+\_\+block\+\_\+state}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1sync__manager}{sysio\+::sync\+\_\+manager}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1dispatch__manager}{sysio\+::dispatch\+\_\+manager}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1net__plugin__impl}{sysio\+::net\+\_\+plugin\+\_\+impl}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1peer__sync__state}{sysio\+::peer\+\_\+sync\+\_\+state}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1queued__buffer}{sysio\+::queued\+\_\+buffer}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1block__status__monitor}{sysio\+::block\+\_\+status\+\_\+monitor}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1connection}{sysio\+::connection}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1msg__handler}{sysio\+::msg\+\_\+handler}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1buffer__factory}{sysio\+::buffer\+\_\+factory}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1block__buffer__factory}{sysio\+::block\+\_\+buffer\+\_\+factory}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1trx__buffer__factory}{sysio\+::trx\+\_\+buffer\+\_\+factory}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{net__plugin_8cpp_a051c62a0ec99dcd3e7a38fd03bec1fe0}{peer\+\_\+dlog}}(PEER,  FORMAT, ...)
+\item 
+\#define \mbox{\hyperlink{net__plugin_8cpp_ad909b2ce03eb19202983c88ae2abe9bd}{peer\+\_\+ilog}}(PEER,  FORMAT, ...)
+\item 
+\#define \mbox{\hyperlink{net__plugin_8cpp_af53787454493a30650fdab0193037465}{peer\+\_\+wlog}}(PEER,  FORMAT, ...)
+\item 
+\#define \mbox{\hyperlink{net__plugin_8cpp_a0237ff767d828f6a423a4728c65b11b8}{peer\+\_\+elog}}(PEER,  FORMAT, ...)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{namespacesysio_aefc0023f14362306826da768553b8daf}{sysio\+::connection\+\_\+ptr}} = std\+::shared\+\_\+ptr$<$\mbox{\hyperlink{classsysio_1_1connection}{connection}}$>$
+\item 
+using \mbox{\hyperlink{namespacesysio_a6a48b685d0bf226f8d96c5cbbd648945}{sysio\+::connection\+\_\+wptr}} = std\+::weak\+\_\+ptr$<$\mbox{\hyperlink{classsysio_1_1connection}{connection}}$>$
+\item 
+typedef multi\+\_\+index\+\_\+container$<$ \mbox{\hyperlink{structsysio_1_1node__transaction__state}{node\+\_\+transaction\+\_\+state}}, indexed\+\_\+by$<$ ordered\+\_\+unique$<$ tag$<$ by\+\_\+id $>$, composite\+\_\+key$<$ \mbox{\hyperlink{structsysio_1_1node__transaction__state}{node\+\_\+transaction\+\_\+state}}, member$<$ \mbox{\hyperlink{structsysio_1_1node__transaction__state}{node\+\_\+transaction\+\_\+state}}, \mbox{\hyperlink{namespacesysio_1_1chain_aa85a3b49b3b219d1e3840567579e7e63}{transaction\+\_\+id\+\_\+type}}, \&\mbox{\hyperlink{structsysio_1_1node__transaction__state_a4e2627b963427883fd0aef22ad038d16}{node\+\_\+transaction\+\_\+state\+::id}} $>$, member$<$ \mbox{\hyperlink{structsysio_1_1node__transaction__state}{node\+\_\+transaction\+\_\+state}}, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}, \&\mbox{\hyperlink{structsysio_1_1node__transaction__state_a34b5d97a88351452b07eeb5f0b278676}{node\+\_\+transaction\+\_\+state\+::connection\+\_\+id}} $>$ $>$, composite\+\_\+key\+\_\+compare$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1sha256__less}{sha256\+\_\+less}}, std\+::less$<$ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} $>$ $>$ $>$, ordered\+\_\+non\+\_\+unique$<$ tag$<$ by\+\_\+expiry $>$, member$<$ \mbox{\hyperlink{structsysio_1_1node__transaction__state}{node\+\_\+transaction\+\_\+state}}, \mbox{\hyperlink{classfc_1_1time__point__sec}{fc\+::time\+\_\+point\+\_\+sec}}, \&\mbox{\hyperlink{structsysio_1_1node__transaction__state_a222dbba680e43c0f1f1d8d3efd563ec7}{node\+\_\+transaction\+\_\+state\+::expires}} $>$ $>$ $>$ $>$ \mbox{\hyperlink{namespacesysio_a5dacfba6131b36fe303df579ce244e07}{sysio\+::node\+\_\+transaction\+\_\+index}}
+\item 
+typedef multi\+\_\+index\+\_\+container$<$ \mbox{\hyperlink{structsysio_1_1peer__block__state}{sysio\+::peer\+\_\+block\+\_\+state}}, indexed\+\_\+by$<$ ordered\+\_\+unique$<$ tag$<$ by\+\_\+id $>$, composite\+\_\+key$<$ \mbox{\hyperlink{structsysio_1_1peer__block__state}{peer\+\_\+block\+\_\+state}}, member$<$ \mbox{\hyperlink{structsysio_1_1peer__block__state}{peer\+\_\+block\+\_\+state}}, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}, \&\mbox{\hyperlink{structsysio_1_1peer__block__state_aac8be546d3abaff30adfbd14698a0de2}{sysio\+::peer\+\_\+block\+\_\+state\+::connection\+\_\+id}} $>$, member$<$ \mbox{\hyperlink{structsysio_1_1peer__block__state}{peer\+\_\+block\+\_\+state}}, \mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{block\+\_\+id\+\_\+type}}, \&\mbox{\hyperlink{structsysio_1_1peer__block__state_aaa4bf1bad9bac6343ba7aacb3730fb7d}{sysio\+::peer\+\_\+block\+\_\+state\+::id}} $>$ $>$, composite\+\_\+key\+\_\+compare$<$ std\+::less$<$ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} $>$, \mbox{\hyperlink{structsysio_1_1chain_1_1sha256__less}{sha256\+\_\+less}} $>$ $>$, ordered\+\_\+non\+\_\+unique$<$ tag$<$ by\+\_\+peer\+\_\+block\+\_\+id $>$, composite\+\_\+key$<$ \mbox{\hyperlink{structsysio_1_1peer__block__state}{peer\+\_\+block\+\_\+state}}, member$<$ \mbox{\hyperlink{structsysio_1_1peer__block__state}{peer\+\_\+block\+\_\+state}}, \mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{block\+\_\+id\+\_\+type}}, \&\mbox{\hyperlink{structsysio_1_1peer__block__state_aaa4bf1bad9bac6343ba7aacb3730fb7d}{sysio\+::peer\+\_\+block\+\_\+state\+::id}} $>$, member$<$ \mbox{\hyperlink{structsysio_1_1peer__block__state}{peer\+\_\+block\+\_\+state}}, bool, \&\mbox{\hyperlink{structsysio_1_1peer__block__state_af1abce771bbbeb8f0abf8dc0f770023b}{sysio\+::peer\+\_\+block\+\_\+state\+::have\+\_\+block}} $>$ $>$, composite\+\_\+key\+\_\+compare$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1sha256__less}{sha256\+\_\+less}}, std\+::greater$<$ bool $>$ $>$ $>$, ordered\+\_\+non\+\_\+unique$<$ tag$<$ by\+\_\+block\+\_\+num $>$, member$<$ \mbox{\hyperlink{structsysio_1_1peer__block__state}{sysio\+::peer\+\_\+block\+\_\+state}}, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}, \&\mbox{\hyperlink{structsysio_1_1peer__block__state_a3a7665327d96b5c8c0bd46e678f63f87}{sysio\+::peer\+\_\+block\+\_\+state\+::block\+\_\+num}} $>$ $>$ $>$ $>$ \mbox{\hyperlink{namespacesysio_a67bc301b97c7a806eea9a68b8fa70888}{sysio\+::peer\+\_\+block\+\_\+state\+\_\+index}}
+\item 
+using \mbox{\hyperlink{namespacesysio_a4a604ada505f8ee61ec551331a35e99e}{sysio\+::send\+\_\+buffer\+\_\+type}} = std\+::shared\+\_\+ptr$<$std\+::vector$<$char$>$$>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename Strand $>$ }\\void \mbox{\hyperlink{namespacesysio_a19cc0c616331757f980d857722b4e07e}{sysio\+::verify\+\_\+strand\+\_\+in\+\_\+this\+\_\+thread}} (const Strand \&strand, const char \texorpdfstring{$\ast$}{*}func, int line)
+\item 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} \mbox{\hyperlink{namespacesysio_ad66b67a8dd0a897a0a5b89f954fd3ade}{sysio\+::logger\+\_\+name}} ("{}net\+\_\+plugin\+\_\+impl"{})
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classfc_1_1enum__type}{enum\+\_\+type}} , \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}}  = typename std\+::enable\+\_\+if$<$std\+::is\+\_\+enum$<$enum\+\_\+type$>$\+::value$>$\+::type$>$ }\\\mbox{\hyperlink{classfc_1_1enum__type}{enum\+\_\+type}} \& \mbox{\hyperlink{namespacesysio_a13dfcd4f76973d5f4f07c718e654fcb6}{sysio\+::operator\texorpdfstring{$\vert$}{|}=}} (\mbox{\hyperlink{classfc_1_1enum__type}{enum\+\_\+type}} \&lhs, const \mbox{\hyperlink{classfc_1_1enum__type}{enum\+\_\+type}} \&rhs)
+\item 
+{\footnotesize template$<$typename Function $>$ }\\void \mbox{\hyperlink{namespacesysio_af36f44203d6675615cf012396bcef424}{sysio\+::for\+\_\+each\+\_\+connection}} (Function \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})
+\item 
+{\footnotesize template$<$typename Function $>$ }\\void \mbox{\hyperlink{namespacesysio_a0369be74f29dbab1c8afd88c3f6d2858}{sysio\+::for\+\_\+each\+\_\+block\+\_\+connection}} (Function \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})
+\item 
+size\+\_\+t \mbox{\hyperlink{namespacesysio_a2194dd4e6a446fc52f18df8563e8e9b4}{sysio\+::calc\+\_\+trx\+\_\+size}} (const \mbox{\hyperlink{namespacesysio_1_1chain_a7041c0316bd294d0866609ab3e0cc7a7}{packed\+\_\+transaction\+\_\+ptr}} \&trx)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{namespacesysio_a57a25df07ccdce01a63d0b026d80ea5f}{sysio\+::dejsonify}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+constexpr auto \mbox{\hyperlink{namespacesysio_a719ab8627e817b9a66e9507d62f1b7d7}{sysio\+::def\+\_\+send\+\_\+buffer\+\_\+size\+\_\+mb}} = 4
+\item 
+constexpr auto \mbox{\hyperlink{namespacesysio_a95d09aabadb97a4b0486d6568319c5b1}{sysio\+::def\+\_\+send\+\_\+buffer\+\_\+size}} = 1024\texorpdfstring{$\ast$}{*}1024\texorpdfstring{$\ast$}{*}\mbox{\hyperlink{namespacesysio_a719ab8627e817b9a66e9507d62f1b7d7}{def\+\_\+send\+\_\+buffer\+\_\+size\+\_\+mb}}
+\item 
+constexpr auto \mbox{\hyperlink{namespacesysio_abb93a5792d3705e475c32a3d63c459ce}{sysio\+::def\+\_\+max\+\_\+write\+\_\+queue\+\_\+size}} = \mbox{\hyperlink{namespacesysio_a95d09aabadb97a4b0486d6568319c5b1}{def\+\_\+send\+\_\+buffer\+\_\+size}}\texorpdfstring{$\ast$}{*}10
+\item 
+constexpr auto \mbox{\hyperlink{namespacesysio_a9affc1b74483cff4e8a99ba6c6fc4583}{sysio\+::def\+\_\+max\+\_\+trx\+\_\+in\+\_\+progress\+\_\+size}} = 100\texorpdfstring{$\ast$}{*}1024\texorpdfstring{$\ast$}{*}1024
+\item 
+constexpr auto \mbox{\hyperlink{namespacesysio_af0f31e2c265e7bd2813fff241cd5cfcb}{sysio\+::def\+\_\+max\+\_\+consecutive\+\_\+immediate\+\_\+connection\+\_\+close}} = 9
+\item 
+constexpr auto \mbox{\hyperlink{namespacesysio_a4c580263afe97f821cf14f1efa36d8ad}{sysio\+::def\+\_\+max\+\_\+clients}} = 25
+\item 
+constexpr auto \mbox{\hyperlink{namespacesysio_aabe9d7844fd19babd601de863fcdd62e}{sysio\+::def\+\_\+max\+\_\+nodes\+\_\+per\+\_\+host}} = 1
+\item 
+constexpr auto \mbox{\hyperlink{namespacesysio_ad510eeca842188809da8e40c2d866fd9}{sysio\+::def\+\_\+conn\+\_\+retry\+\_\+wait}} = 30
+\item 
+constexpr auto \mbox{\hyperlink{namespacesysio_ad1d3c8f07448b49a782d5fcd4640aa42}{sysio\+::def\+\_\+txn\+\_\+expire\+\_\+wait}} = std\+::chrono\+::seconds(3)
+\item 
+constexpr auto \mbox{\hyperlink{namespacesysio_ab32afcbe569174291edb4f3f98d8ccc8}{sysio\+::def\+\_\+resp\+\_\+expected\+\_\+wait}} = std\+::chrono\+::seconds(5)
+\item 
+constexpr auto \mbox{\hyperlink{namespacesysio_a97922a44726c4dc8950962803950a0ef}{sysio\+::def\+\_\+sync\+\_\+fetch\+\_\+span}} = 100
+\item 
+constexpr auto \mbox{\hyperlink{namespacesysio_abc26639460234641b6403139e74422ed}{sysio\+::def\+\_\+keepalive\+\_\+interval}} = 10000
+\item 
+constexpr auto \mbox{\hyperlink{namespacesysio_a00c50092ca42151d17c3e24f7649e607}{sysio\+::message\+\_\+header\+\_\+size}} = \mbox{\hyperlink{yubihsm__pkcs11_8c_af82555d15fc1c126f72a5c0566b5389a}{sizeof}}(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}})
+\item 
+constexpr \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{namespacesysio_a5de954c7c7410bb1d52eaee6c5d7013a}{sysio\+::signed\+\_\+block\+\_\+which}} = \mbox{\hyperlink{namespacefc_ae009b19d1fecf5979996e9f326cd98c3}{fc\+::get\+\_\+index}}$<$\mbox{\hyperlink{namespacesysio_a783ade47a6f13a71a9b75cd2c68d9965}{net\+\_\+message}}, \mbox{\hyperlink{structsysio_1_1chain_1_1signed__block}{signed\+\_\+block}}$>$()
+\item 
+constexpr \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{namespacesysio_a922327bb5b4eede65613bb5dc4b1eb60}{sysio\+::packed\+\_\+transaction\+\_\+which}} = \mbox{\hyperlink{namespacefc_ae009b19d1fecf5979996e9f326cd98c3}{fc\+::get\+\_\+index}}$<$\mbox{\hyperlink{namespacesysio_a783ade47a6f13a71a9b75cd2c68d9965}{net\+\_\+message}}, \mbox{\hyperlink{structsysio_1_1chain_1_1packed__transaction}{packed\+\_\+transaction}}$>$()
+\item 
+\mbox{\hyperlink{classfc_1_1logger}{fc\+::logger}} \mbox{\hyperlink{namespacesysio_a6f5e3e21259b1b0b6d4f035e8c7d5a4e}{sysio\+::logger}}
+\item 
+std\+::string \mbox{\hyperlink{namespacesysio_a4f30e0f4812705f23bf9b5bbd3eba7fc}{sysio\+::peer\+\_\+log\+\_\+format}}
+\item 
+constexpr \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{namespacesysio_ab1d8e7b4e61cb77ed927e0a76decaabb}{sysio\+::net\+\_\+version\+\_\+base}} = 0x04b5
+\item 
+constexpr \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{namespacesysio_aadf1c5b131021643fec392a46ee06fb2}{sysio\+::net\+\_\+version\+\_\+range}} = 106
+\item 
+constexpr \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{namespacesysio_a29c84c78972f13f77601781f98d2283b}{sysio\+::proto\+\_\+base}} = 0
+\item 
+constexpr \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{namespacesysio_a1956cf3e030fe2e14e12eed6c6c3e280}{sysio\+::proto\+\_\+explicit\+\_\+sync}} = 1
+\item 
+constexpr \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{namespacesysio_a6626837f53cb849567b0b017bb399891}{sysio\+::proto\+\_\+block\+\_\+id\+\_\+notify}} = 2
+\item 
+constexpr \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{namespacesysio_a68820bfe4ab6dbec0857c904974a3a7c}{sysio\+::proto\+\_\+pruned\+\_\+types}} = 3
+\item 
+constexpr \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{namespacesysio_a74441481225e5ab1afb85bc0e2f7a5c4}{sysio\+::proto\+\_\+heartbeat\+\_\+interval}} = 4
+\item 
+constexpr \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{namespacesysio_a2320831a5974b3edbe0aca875c583156}{sysio\+::proto\+\_\+dup\+\_\+goaway\+\_\+resolution}} = 5
+\item 
+constexpr \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{namespacesysio_ae452afac6c86798086b2c3f4fbbc16a0}{sysio\+::proto\+\_\+dup\+\_\+node\+\_\+id\+\_\+goaway}} = 6
+\item 
+constexpr \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{namespacesysio_a2ae0513ec4067dff1493f977f6c3cb39}{sysio\+::proto\+\_\+wire\+\_\+sysio\+\_\+initial}} = 7
+\item 
+constexpr \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{namespacesysio_a0d4d33daf7d396995fc2eb0d016bd1d2}{sysio\+::net\+\_\+version\+\_\+max}} = \mbox{\hyperlink{namespacesysio_a2ae0513ec4067dff1493f977f6c3cb39}{proto\+\_\+wire\+\_\+sysio\+\_\+initial}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{net__plugin_8cpp_a051c62a0ec99dcd3e7a38fd03bec1fe0}\index{net\_plugin.cpp@{net\_plugin.cpp}!peer\_dlog@{peer\_dlog}}
+\index{peer\_dlog@{peer\_dlog}!net\_plugin.cpp@{net\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{peer\_dlog}{peer\_dlog}}
+{\footnotesize\ttfamily \label{net__plugin_8cpp_a051c62a0ec99dcd3e7a38fd03bec1fe0} 
+\#define peer\+\_\+dlog(\begin{DoxyParamCaption}\item[{}]{PEER}{, }\item[{}]{FORMAT}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ FC\_MULTILINE\_MACRO\_BEGIN\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ if(\ \mbox{\hyperlink{classfc_1_1logger}{logger}}.\mbox{\hyperlink{classfc_1_1logger_afbae9b6cd7f4f604f654a4c1914677ac}{is\_enabled}}(\ \mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4a30d2de77e71beb8d09d530cac04efa25}{fc::log\_level::debug}}\ )\ )\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ verify\_strand\_in\_this\_thread(\ PEER-\/>strand,\ \mbox{\hyperlink{log__message_8hpp_a7d6e1cf1a8d53f38471e9e9db3faf740}{\_\_func\_\_}},\ \_\_LINE\_\_\ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1logger}{logger}}.\mbox{\hyperlink{classfc_1_1logger_a8699bbd7c059f568f456b1446b97b0e4}{log}}(\ \mbox{\hyperlink{log__message_8hpp_a4a4df4bb5cffbe07aadf7d29fd44c75e}{FC\_LOG\_MESSAGE}}(\ \mbox{\hyperlink{environment_8hpp_a398527b3e9e358c345c5047b16871957}{debug}},\ peer\_log\_format\ +\ FORMAT,\ \_\_VA\_ARGS\_\_\ (PEER-\/>get\_logger\_variant())\ )\ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \mbox{\hyperlink{logger_8hpp_a593df1a27f2ade3ef3418a67bae4ee9e}{FC\_MULTILINE\_MACRO\_END}}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l00359}{359}} of file \mbox{\hyperlink{net__plugin_8cpp_source}{net\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00359\ \textcolor{preprocessor}{\#define\ peer\_dlog(\ PEER,\ FORMAT,\ ...\ )\ \(\backslash\)}}
+\DoxyCodeLine{00360\ \textcolor{preprocessor}{\ \ FC\_MULTILINE\_MACRO\_BEGIN\ \(\backslash\)}}
+\DoxyCodeLine{00361\ \textcolor{preprocessor}{\ \ \ if(\ logger.is\_enabled(\ fc::log\_level::debug\ )\ )\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00362\ \textcolor{preprocessor}{\ \ \ \ \ \ verify\_strand\_in\_this\_thread(\ PEER-\/>strand,\ \_\_func\_\_,\ \_\_LINE\_\_\ );\ \(\backslash\)}}
+\DoxyCodeLine{00363\ \textcolor{preprocessor}{\ \ \ \ \ \ logger.log(\ FC\_LOG\_MESSAGE(\ debug,\ peer\_log\_format\ +\ FORMAT,\ \_\_VA\_ARGS\_\_\ (PEER-\/>get\_logger\_variant())\ )\ );\ \(\backslash\)}}
+\DoxyCodeLine{00364\ \textcolor{preprocessor}{\ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00365\ \textcolor{preprocessor}{\ \ FC\_MULTILINE\_MACRO\_END}}
+
+\end{DoxyCode}
+\Hypertarget{net__plugin_8cpp_a0237ff767d828f6a423a4728c65b11b8}\index{net\_plugin.cpp@{net\_plugin.cpp}!peer\_elog@{peer\_elog}}
+\index{peer\_elog@{peer\_elog}!net\_plugin.cpp@{net\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{peer\_elog}{peer\_elog}}
+{\footnotesize\ttfamily \label{net__plugin_8cpp_a0237ff767d828f6a423a4728c65b11b8} 
+\#define peer\+\_\+elog(\begin{DoxyParamCaption}\item[{}]{PEER}{, }\item[{}]{FORMAT}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ FC\_MULTILINE\_MACRO\_BEGIN\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ if(\ \mbox{\hyperlink{classfc_1_1logger}{logger}}.\mbox{\hyperlink{classfc_1_1logger_afbae9b6cd7f4f604f654a4c1914677ac}{is\_enabled}}(\ \mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4a836fc8bbd6f9c9445879679eb512df49}{fc::log\_level::error}}\ )\ )\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ verify\_strand\_in\_this\_thread(\ PEER-\/>strand,\ \mbox{\hyperlink{log__message_8hpp_a7d6e1cf1a8d53f38471e9e9db3faf740}{\_\_func\_\_}},\ \_\_LINE\_\_\ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1logger}{logger}}.\mbox{\hyperlink{classfc_1_1logger_a8699bbd7c059f568f456b1446b97b0e4}{log}}(\ \mbox{\hyperlink{log__message_8hpp_a4a4df4bb5cffbe07aadf7d29fd44c75e}{FC\_LOG\_MESSAGE}}(\ error,\ peer\_log\_format\ +\ FORMAT,\ \_\_VA\_ARGS\_\_\ (PEER-\/>get\_logger\_variant())\ )\ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \mbox{\hyperlink{logger_8hpp_a593df1a27f2ade3ef3418a67bae4ee9e}{FC\_MULTILINE\_MACRO\_END}}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l00383}{383}} of file \mbox{\hyperlink{net__plugin_8cpp_source}{net\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00383\ \textcolor{preprocessor}{\#define\ peer\_elog(\ PEER,\ FORMAT,\ ...\ )\ \(\backslash\)}}
+\DoxyCodeLine{00384\ \textcolor{preprocessor}{\ \ FC\_MULTILINE\_MACRO\_BEGIN\ \(\backslash\)}}
+\DoxyCodeLine{00385\ \textcolor{preprocessor}{\ \ \ if(\ logger.is\_enabled(\ fc::log\_level::error\ )\ )\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00386\ \textcolor{preprocessor}{\ \ \ \ \ \ verify\_strand\_in\_this\_thread(\ PEER-\/>strand,\ \_\_func\_\_,\ \_\_LINE\_\_\ );\ \(\backslash\)}}
+\DoxyCodeLine{00387\ \textcolor{preprocessor}{\ \ \ \ \ \ logger.log(\ FC\_LOG\_MESSAGE(\ error,\ peer\_log\_format\ +\ FORMAT,\ \_\_VA\_ARGS\_\_\ (PEER-\/>get\_logger\_variant())\ )\ );\ \(\backslash\)}}
+\DoxyCodeLine{00388\ \textcolor{preprocessor}{\ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00389\ \textcolor{preprocessor}{\ \ FC\_MULTILINE\_MACRO\_END}}
+
+\end{DoxyCode}
+\Hypertarget{net__plugin_8cpp_ad909b2ce03eb19202983c88ae2abe9bd}\index{net\_plugin.cpp@{net\_plugin.cpp}!peer\_ilog@{peer\_ilog}}
+\index{peer\_ilog@{peer\_ilog}!net\_plugin.cpp@{net\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{peer\_ilog}{peer\_ilog}}
+{\footnotesize\ttfamily \label{net__plugin_8cpp_ad909b2ce03eb19202983c88ae2abe9bd} 
+\#define peer\+\_\+ilog(\begin{DoxyParamCaption}\item[{}]{PEER}{, }\item[{}]{FORMAT}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ FC\_MULTILINE\_MACRO\_BEGIN\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ if(\ \mbox{\hyperlink{classfc_1_1logger}{logger}}.\mbox{\hyperlink{classfc_1_1logger_afbae9b6cd7f4f604f654a4c1914677ac}{is\_enabled}}(\ \mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4afe6da1f3a75c3911b0b59bffaea070e1}{fc::log\_level::info}}\ )\ )\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ verify\_strand\_in\_this\_thread(\ PEER-\/>strand,\ \mbox{\hyperlink{log__message_8hpp_a7d6e1cf1a8d53f38471e9e9db3faf740}{\_\_func\_\_}},\ \_\_LINE\_\_\ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1logger}{logger}}.\mbox{\hyperlink{classfc_1_1logger_a8699bbd7c059f568f456b1446b97b0e4}{log}}(\ \mbox{\hyperlink{log__message_8hpp_a4a4df4bb5cffbe07aadf7d29fd44c75e}{FC\_LOG\_MESSAGE}}(\ info,\ peer\_log\_format\ +\ FORMAT,\ \_\_VA\_ARGS\_\_\ (PEER-\/>get\_logger\_variant())\ )\ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \mbox{\hyperlink{logger_8hpp_a593df1a27f2ade3ef3418a67bae4ee9e}{FC\_MULTILINE\_MACRO\_END}}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l00367}{367}} of file \mbox{\hyperlink{net__plugin_8cpp_source}{net\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00367\ \textcolor{preprocessor}{\#define\ peer\_ilog(\ PEER,\ FORMAT,\ ...\ )\ \(\backslash\)}}
+\DoxyCodeLine{00368\ \textcolor{preprocessor}{\ \ FC\_MULTILINE\_MACRO\_BEGIN\ \(\backslash\)}}
+\DoxyCodeLine{00369\ \textcolor{preprocessor}{\ \ \ if(\ logger.is\_enabled(\ fc::log\_level::info\ )\ )\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00370\ \textcolor{preprocessor}{\ \ \ \ \ \ verify\_strand\_in\_this\_thread(\ PEER-\/>strand,\ \_\_func\_\_,\ \_\_LINE\_\_\ );\ \(\backslash\)}}
+\DoxyCodeLine{00371\ \textcolor{preprocessor}{\ \ \ \ \ \ logger.log(\ FC\_LOG\_MESSAGE(\ info,\ peer\_log\_format\ +\ FORMAT,\ \_\_VA\_ARGS\_\_\ (PEER-\/>get\_logger\_variant())\ )\ );\ \(\backslash\)}}
+\DoxyCodeLine{00372\ \textcolor{preprocessor}{\ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00373\ \textcolor{preprocessor}{\ \ FC\_MULTILINE\_MACRO\_END}}
+
+\end{DoxyCode}
+\Hypertarget{net__plugin_8cpp_af53787454493a30650fdab0193037465}\index{net\_plugin.cpp@{net\_plugin.cpp}!peer\_wlog@{peer\_wlog}}
+\index{peer\_wlog@{peer\_wlog}!net\_plugin.cpp@{net\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{peer\_wlog}{peer\_wlog}}
+{\footnotesize\ttfamily \label{net__plugin_8cpp_af53787454493a30650fdab0193037465} 
+\#define peer\+\_\+wlog(\begin{DoxyParamCaption}\item[{}]{PEER}{, }\item[{}]{FORMAT}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ FC\_MULTILINE\_MACRO\_BEGIN\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ if(\ \mbox{\hyperlink{classfc_1_1logger}{logger}}.\mbox{\hyperlink{classfc_1_1logger_afbae9b6cd7f4f604f654a4c1914677ac}{is\_enabled}}(\ \mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4a890c8f6993efee47d617cf72e6b19583}{fc::log\_level::warn}}\ )\ )\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ verify\_strand\_in\_this\_thread(\ PEER-\/>strand,\ \mbox{\hyperlink{log__message_8hpp_a7d6e1cf1a8d53f38471e9e9db3faf740}{\_\_func\_\_}},\ \_\_LINE\_\_\ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1logger}{logger}}.\mbox{\hyperlink{classfc_1_1logger_a8699bbd7c059f568f456b1446b97b0e4}{log}}(\ \mbox{\hyperlink{log__message_8hpp_a4a4df4bb5cffbe07aadf7d29fd44c75e}{FC\_LOG\_MESSAGE}}(\ warn,\ peer\_log\_format\ +\ FORMAT,\ \_\_VA\_ARGS\_\_\ (PEER-\/>get\_logger\_variant())\ )\ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \mbox{\hyperlink{logger_8hpp_a593df1a27f2ade3ef3418a67bae4ee9e}{FC\_MULTILINE\_MACRO\_END}}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l00375}{375}} of file \mbox{\hyperlink{net__plugin_8cpp_source}{net\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00375\ \textcolor{preprocessor}{\#define\ peer\_wlog(\ PEER,\ FORMAT,\ ...\ )\ \(\backslash\)}}
+\DoxyCodeLine{00376\ \textcolor{preprocessor}{\ \ FC\_MULTILINE\_MACRO\_BEGIN\ \(\backslash\)}}
+\DoxyCodeLine{00377\ \textcolor{preprocessor}{\ \ \ if(\ logger.is\_enabled(\ fc::log\_level::warn\ )\ )\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00378\ \textcolor{preprocessor}{\ \ \ \ \ \ verify\_strand\_in\_this\_thread(\ PEER-\/>strand,\ \_\_func\_\_,\ \_\_LINE\_\_\ );\ \(\backslash\)}}
+\DoxyCodeLine{00379\ \textcolor{preprocessor}{\ \ \ \ \ \ logger.log(\ FC\_LOG\_MESSAGE(\ warn,\ peer\_log\_format\ +\ FORMAT,\ \_\_VA\_ARGS\_\_\ (PEER-\/>get\_logger\_variant())\ )\ );\ \(\backslash\)}}
+\DoxyCodeLine{00380\ \textcolor{preprocessor}{\ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00381\ \textcolor{preprocessor}{\ \ FC\_MULTILINE\_MACRO\_END}}
+
+\end{DoxyCode}

@@ -1,0 +1,276 @@
+\doxysection{sysio\+::producer\+\_\+api\+\_\+plugin Class Reference}
+\hypertarget{classsysio_1_1producer__api__plugin}{}\label{classsysio_1_1producer__api__plugin}\index{sysio::producer\_api\_plugin@{sysio::producer\_api\_plugin}}
+
+
+{\ttfamily \#include $<$producer\+\_\+api\+\_\+plugin.\+hpp$>$}
+
+
+
+Inheritance diagram for sysio\+::producer\+\_\+api\+\_\+plugin\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=211pt]{classsysio_1_1producer__api__plugin__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for sysio\+::producer\+\_\+api\+\_\+plugin\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=211pt]{classsysio_1_1producer__api__plugin__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classsysio_1_1producer__api__plugin_ab1a71b9d80d45bb4090ee275ae3523ae}{APPBASE\+\_\+\+PLUGIN\+\_\+\+REQUIRES}} ((\mbox{\hyperlink{classsysio_1_1producer__plugin}{producer\+\_\+plugin}})(\mbox{\hyperlink{classsysio_1_1http__plugin}{http\+\_\+plugin}})) \mbox{\hyperlink{classsysio_1_1producer__api__plugin}{producer\+\_\+api\+\_\+plugin}}()=default
+\item 
+\mbox{\hyperlink{classsysio_1_1producer__api__plugin_a40304cf6d861da4ead3ff5b43683f9ec}{producer\+\_\+api\+\_\+plugin}} (const \mbox{\hyperlink{classsysio_1_1producer__api__plugin}{producer\+\_\+api\+\_\+plugin}} \&)=delete
+\item 
+\mbox{\hyperlink{classsysio_1_1producer__api__plugin_a4c157cd3e73b9562e61aa68fb0492f25}{producer\+\_\+api\+\_\+plugin}} (\mbox{\hyperlink{classsysio_1_1producer__api__plugin}{producer\+\_\+api\+\_\+plugin}} \&\&)=delete
+\item 
+\mbox{\hyperlink{classsysio_1_1producer__api__plugin}{producer\+\_\+api\+\_\+plugin}} \& \mbox{\hyperlink{classsysio_1_1producer__api__plugin_aa15ed403ebdb21bd10c50d17b86f881f}{operator=}} (const \mbox{\hyperlink{classsysio_1_1producer__api__plugin}{producer\+\_\+api\+\_\+plugin}} \&)=delete
+\item 
+\mbox{\hyperlink{classsysio_1_1producer__api__plugin}{producer\+\_\+api\+\_\+plugin}} \& \mbox{\hyperlink{classsysio_1_1producer__api__plugin_ad24b9f173349cc58c30616df80caa2c7}{operator=}} (\mbox{\hyperlink{classsysio_1_1producer__api__plugin}{producer\+\_\+api\+\_\+plugin}} \&\&)=delete
+\item 
+virtual \mbox{\hyperlink{classsysio_1_1producer__api__plugin_ac3fb53b61055aaea8ec4f5dcced722d4}{\texorpdfstring{$\sim$}{\string~}producer\+\_\+api\+\_\+plugin}} () override=default
+\item 
+virtual void \mbox{\hyperlink{classsysio_1_1producer__api__plugin_a0efb7e1ff9c817bc6b54293beeeb6107}{set\+\_\+program\+\_\+options}} (options\+\_\+description \&\mbox{\hyperlink{xbyak__mnemonic_8h_a4229a9b84f8b8673326f12bd41acd27c}{cli}}, options\+\_\+description \&cfg) override
+\item 
+void \mbox{\hyperlink{classsysio_1_1producer__api__plugin_a04ffcbd3464890d38b0233ea1d8d15fc}{plugin\+\_\+initialize}} (const variables\+\_\+map \&vm)
+\item 
+void \mbox{\hyperlink{classsysio_1_1producer__api__plugin_ab0f26110eb4a8bc3585ba6b5f24c3b51}{plugin\+\_\+startup}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1producer__api__plugin_ad50469f3dfb53227593ae93ca0404c06}{plugin\+\_\+shutdown}} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classappbase_1_1plugin}{appbase\+::plugin$<$ producer\+\_\+api\+\_\+plugin $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classappbase_1_1plugin_a3cf5509f2854ffb274018dca8606c50a}{plugin}} ()
+\item 
+virtual \mbox{\hyperlink{classappbase_1_1plugin_a6c83bcf2c8ee3de87593824da807e4ba}{\texorpdfstring{$\sim$}{\string~}plugin}} ()
+\item 
+virtual \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408}{state}} \mbox{\hyperlink{classappbase_1_1plugin_a857288c2424b57a898c0579d25dacbb0}{get\+\_\+state}} () const override
+\item 
+virtual const std\+::string \& \mbox{\hyperlink{classappbase_1_1plugin_a274f072d2f7f37d43ae74e01edd0ba62}{name}} () const override
+\item 
+virtual void \mbox{\hyperlink{classappbase_1_1plugin_a6a0cd7ccc873527ebb5e6716b249ea17}{register\+\_\+dependencies}} ()
+\item 
+virtual void \mbox{\hyperlink{classappbase_1_1plugin_ac28755a82831d41e5d0ef0ce56b10fa9}{initialize}} (const variables\+\_\+map \&options) override
+\item 
+virtual void \mbox{\hyperlink{classappbase_1_1plugin_ab314bd778e71a91de584cd9b8a999867}{handle\+\_\+sighup}} () override
+\item 
+virtual void \mbox{\hyperlink{classappbase_1_1plugin_a10e4e1c582bfadf67f510df76d87abfd}{startup}} () override
+\item 
+virtual void \mbox{\hyperlink{classappbase_1_1plugin_a21e5be5587fca41fbc91367d449b8f27}{shutdown}} () override
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classappbase_1_1abstract__plugin}{appbase\+::abstract\+\_\+plugin}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4643a2618ac94aa2ef56e59fe363f828}{\texorpdfstring{$\sim$}{\string~}abstract\+\_\+plugin}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Public Types inherited from \mbox{\hyperlink{classappbase_1_1abstract__plugin}{appbase\+::abstract\+\_\+plugin}}}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408}{state}} \{ \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408ac712ce3482a78b8bf87080aefd77cf7d}{registered}}
+, \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408a9ae208bba76e9c0eab1cac52953f947b}{initialized}}
+, \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408a808ebbf475942017567644697eca3224}{started}}
+, \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408a320c2eebb5306f385aebfca07336d29e}{stopped}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Member Functions inherited from \mbox{\hyperlink{classappbase_1_1plugin}{appbase\+::plugin$<$ producer\+\_\+api\+\_\+plugin $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classappbase_1_1plugin_a51f43c3c64ab8524928698a72a186822}{plugin}} (const string \&\mbox{\hyperlink{classappbase_1_1plugin_a274f072d2f7f37d43ae74e01edd0ba62}{name}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{producer__api__plugin_8hpp_source_l00012}{12}} of file \mbox{\hyperlink{producer__api__plugin_8hpp_source}{producer\+\_\+api\+\_\+plugin.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classsysio_1_1producer__api__plugin_a40304cf6d861da4ead3ff5b43683f9ec}\index{sysio::producer\_api\_plugin@{sysio::producer\_api\_plugin}!producer\_api\_plugin@{producer\_api\_plugin}}
+\index{producer\_api\_plugin@{producer\_api\_plugin}!sysio::producer\_api\_plugin@{sysio::producer\_api\_plugin}}
+\doxysubsubsection{\texorpdfstring{producer\_api\_plugin()}{producer\_api\_plugin()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1producer__api__plugin_a40304cf6d861da4ead3ff5b43683f9ec} 
+sysio\+::producer\+\_\+api\+\_\+plugin\+::producer\+\_\+api\+\_\+plugin (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classsysio_1_1producer__api__plugin}{producer\+\_\+api\+\_\+plugin}} \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [delete]}}
+
+\Hypertarget{classsysio_1_1producer__api__plugin_a4c157cd3e73b9562e61aa68fb0492f25}\index{sysio::producer\_api\_plugin@{sysio::producer\_api\_plugin}!producer\_api\_plugin@{producer\_api\_plugin}}
+\index{producer\_api\_plugin@{producer\_api\_plugin}!sysio::producer\_api\_plugin@{sysio::producer\_api\_plugin}}
+\doxysubsubsection{\texorpdfstring{producer\_api\_plugin()}{producer\_api\_plugin()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1producer__api__plugin_a4c157cd3e73b9562e61aa68fb0492f25} 
+sysio\+::producer\+\_\+api\+\_\+plugin\+::producer\+\_\+api\+\_\+plugin (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classsysio_1_1producer__api__plugin}{producer\+\_\+api\+\_\+plugin}} \&\&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [delete]}}
+
+\Hypertarget{classsysio_1_1producer__api__plugin_ac3fb53b61055aaea8ec4f5dcced722d4}\index{sysio::producer\_api\_plugin@{sysio::producer\_api\_plugin}!````~producer\_api\_plugin@{\texorpdfstring{$\sim$}{\string~}producer\_api\_plugin}}
+\index{````~producer\_api\_plugin@{\texorpdfstring{$\sim$}{\string~}producer\_api\_plugin}!sysio::producer\_api\_plugin@{sysio::producer\_api\_plugin}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}producer\_api\_plugin()}{\string~producer\_api\_plugin()}}
+{\footnotesize\ttfamily \label{classsysio_1_1producer__api__plugin_ac3fb53b61055aaea8ec4f5dcced722d4} 
+virtual sysio\+::producer\+\_\+api\+\_\+plugin\+::\texorpdfstring{$\sim$}{\string~}producer\+\_\+api\+\_\+plugin (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}, {\ttfamily [default]}}
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1producer__api__plugin_ab1a71b9d80d45bb4090ee275ae3523ae}\index{sysio::producer\_api\_plugin@{sysio::producer\_api\_plugin}!APPBASE\_PLUGIN\_REQUIRES@{APPBASE\_PLUGIN\_REQUIRES}}
+\index{APPBASE\_PLUGIN\_REQUIRES@{APPBASE\_PLUGIN\_REQUIRES}!sysio::producer\_api\_plugin@{sysio::producer\_api\_plugin}}
+\doxysubsubsection{\texorpdfstring{APPBASE\_PLUGIN\_REQUIRES()}{APPBASE\_PLUGIN\_REQUIRES()}}
+{\footnotesize\ttfamily \label{classsysio_1_1producer__api__plugin_ab1a71b9d80d45bb4090ee275ae3523ae} 
+sysio\+::producer\+\_\+api\+\_\+plugin\+::\+APPBASE\+\_\+\+PLUGIN\+\_\+\+REQUIRES (\begin{DoxyParamCaption}\item[{(\mbox{\hyperlink{classsysio_1_1producer__plugin}{producer\+\_\+plugin}})(\mbox{\hyperlink{classsysio_1_1http__plugin}{http\+\_\+plugin}})}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [default]}}
+
+\Hypertarget{classsysio_1_1producer__api__plugin_aa15ed403ebdb21bd10c50d17b86f881f}\index{sysio::producer\_api\_plugin@{sysio::producer\_api\_plugin}!operator=@{operator=}}
+\index{operator=@{operator=}!sysio::producer\_api\_plugin@{sysio::producer\_api\_plugin}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1producer__api__plugin_aa15ed403ebdb21bd10c50d17b86f881f} 
+\mbox{\hyperlink{classsysio_1_1producer__api__plugin}{producer\+\_\+api\+\_\+plugin}} \& sysio\+::producer\+\_\+api\+\_\+plugin\+::operator= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classsysio_1_1producer__api__plugin}{producer\+\_\+api\+\_\+plugin}} \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [delete]}}
+
+\Hypertarget{classsysio_1_1producer__api__plugin_ad24b9f173349cc58c30616df80caa2c7}\index{sysio::producer\_api\_plugin@{sysio::producer\_api\_plugin}!operator=@{operator=}}
+\index{operator=@{operator=}!sysio::producer\_api\_plugin@{sysio::producer\_api\_plugin}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1producer__api__plugin_ad24b9f173349cc58c30616df80caa2c7} 
+\mbox{\hyperlink{classsysio_1_1producer__api__plugin}{producer\+\_\+api\+\_\+plugin}} \& sysio\+::producer\+\_\+api\+\_\+plugin\+::operator= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classsysio_1_1producer__api__plugin}{producer\+\_\+api\+\_\+plugin}} \&\&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [delete]}}
+
+\Hypertarget{classsysio_1_1producer__api__plugin_a04ffcbd3464890d38b0233ea1d8d15fc}\index{sysio::producer\_api\_plugin@{sysio::producer\_api\_plugin}!plugin\_initialize@{plugin\_initialize}}
+\index{plugin\_initialize@{plugin\_initialize}!sysio::producer\_api\_plugin@{sysio::producer\_api\_plugin}}
+\doxysubsubsection{\texorpdfstring{plugin\_initialize()}{plugin\_initialize()}}
+{\footnotesize\ttfamily \label{classsysio_1_1producer__api__plugin_a04ffcbd3464890d38b0233ea1d8d15fc} 
+void sysio\+::producer\+\_\+api\+\_\+plugin\+::plugin\+\_\+initialize (\begin{DoxyParamCaption}\item[{const variables\+\_\+map \&}]{vm}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{producer__api__plugin_8cpp_source_l00128}{128}} of file \mbox{\hyperlink{producer__api__plugin_8cpp_source}{producer\+\_\+api\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00129\ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \_http\_plugin\ =\ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_a3c4b68a0667942b58f1369f454ce0ce3}{get\_plugin}}<http\_plugin>();}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !\_http\_plugin.is\_on\_loopback())\ \{}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a1759e5c9691d8ad754bdf5eff8bb23ac}{wlog}}(\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}**********SECURITY\ WARNING**********\(\backslash\)n"{}}}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}*\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *\(\backslash\)n"{}}}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}*\ -\/-\/\ \ \ \ \ \ \ \ Producer\ API\ \ \ \ \ \ \ \ -\/-\/\ *\(\backslash\)n"{}}}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}*\ -\/\ EXPOSED\ to\ the\ LOCAL\ NETWORK\ -\/\ *\(\backslash\)n"{}}}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}*\ -\/\ USE\ ONLY\ ON\ SECURE\ NETWORKS!\ -\/\ *\(\backslash\)n"{}}}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}*\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *\(\backslash\)n"{}}}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}************************************\(\backslash\)n"{}}\ );}
+\DoxyCodeLine{00140\ }
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00142\ \ \ \ \}\ \mbox{\hyperlink{exception_8hpp_ae70bfa24f5a3bc0917382b3c17fc033c}{FC\_LOG\_AND\_RETHROW}}()}
+\DoxyCodeLine{00143\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1producer__api__plugin_a04ffcbd3464890d38b0233ea1d8d15fc_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1producer__api__plugin_ad50469f3dfb53227593ae93ca0404c06}\index{sysio::producer\_api\_plugin@{sysio::producer\_api\_plugin}!plugin\_shutdown@{plugin\_shutdown}}
+\index{plugin\_shutdown@{plugin\_shutdown}!sysio::producer\_api\_plugin@{sysio::producer\_api\_plugin}}
+\doxysubsubsection{\texorpdfstring{plugin\_shutdown()}{plugin\_shutdown()}}
+{\footnotesize\ttfamily \label{classsysio_1_1producer__api__plugin_ad50469f3dfb53227593ae93ca0404c06} 
+void sysio\+::producer\+\_\+api\+\_\+plugin\+::plugin\+\_\+shutdown (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{producer__api__plugin_8hpp_source_l00026}{26}} of file \mbox{\hyperlink{producer__api__plugin_8hpp_source}{producer\+\_\+api\+\_\+plugin.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00026\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1producer__api__plugin_ab0f26110eb4a8bc3585ba6b5f24c3b51}\index{sysio::producer\_api\_plugin@{sysio::producer\_api\_plugin}!plugin\_startup@{plugin\_startup}}
+\index{plugin\_startup@{plugin\_startup}!sysio::producer\_api\_plugin@{sysio::producer\_api\_plugin}}
+\doxysubsubsection{\texorpdfstring{plugin\_startup()}{plugin\_startup()}}
+{\footnotesize\ttfamily \label{classsysio_1_1producer__api__plugin_ab0f26110eb4a8bc3585ba6b5f24c3b51} 
+void sysio\+::producer\+\_\+api\+\_\+plugin\+::plugin\+\_\+startup (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{producer__api__plugin_8cpp_source_l00086}{86}} of file \mbox{\hyperlink{producer__api__plugin_8cpp_source}{producer\+\_\+api\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00087\ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\textcolor{stringliteral}{"{}starting\ producer\_api\_plugin"{}});}
+\DoxyCodeLine{00088\ \ \ \ \textcolor{comment}{//\ lifetime\ of\ plugin\ is\ lifetime\ of\ application}}
+\DoxyCodeLine{00089\ \ \ \ \textcolor{keyword}{auto}\&\ producer\ =\ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_a3c4b68a0667942b58f1369f454ce0ce3}{get\_plugin}}<producer\_plugin>();}
+\DoxyCodeLine{00090\ }
+\DoxyCodeLine{00091\ \ \ \ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_a3c4b68a0667942b58f1369f454ce0ce3}{get\_plugin}}<http\_plugin>().add\_api(\{}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \mbox{\hyperlink{chain__api__plugin_8cpp_ab9297a5c7b7f085c77cad8641f734ba6}{CALL\_WITH\_400}}(producer,\ producer,\ \mbox{\hyperlink{xbyak__mnemonic_8h_a7167f5c196fc5e167bfabde1a730e81d}{pause}},}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{net__api__plugin_8cpp_a54f8b56aff9e470dbebbddd544256b8f}{INVOKE\_V\_V}}(producer,\ \mbox{\hyperlink{xbyak__mnemonic_8h_a7167f5c196fc5e167bfabde1a730e81d}{pause}}),\ 201),}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \mbox{\hyperlink{chain__api__plugin_8cpp_ab9297a5c7b7f085c77cad8641f734ba6}{CALL\_WITH\_400}}(producer,\ producer,\ resume,}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{net__api__plugin_8cpp_a54f8b56aff9e470dbebbddd544256b8f}{INVOKE\_V\_V}}(producer,\ resume),\ 201),}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \mbox{\hyperlink{chain__api__plugin_8cpp_ab9297a5c7b7f085c77cad8641f734ba6}{CALL\_WITH\_400}}(producer,\ producer,\ paused,}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{db__size__api__plugin_8cpp_a57be4224a1ade2bd8b3923d6a344d98b}{INVOKE\_R\_V}}(producer,\ paused),\ 201),}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \mbox{\hyperlink{chain__api__plugin_8cpp_ab9297a5c7b7f085c77cad8641f734ba6}{CALL\_WITH\_400}}(producer,\ producer,\ get\_runtime\_options,}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{db__size__api__plugin_8cpp_a57be4224a1ade2bd8b3923d6a344d98b}{INVOKE\_R\_V}}(producer,\ get\_runtime\_options),\ 201),}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \mbox{\hyperlink{chain__api__plugin_8cpp_ab9297a5c7b7f085c77cad8641f734ba6}{CALL\_WITH\_400}}(producer,\ producer,\ update\_runtime\_options,}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{net__api__plugin_8cpp_a4dc31462f24aaa120af888e8e9358800}{INVOKE\_V\_R}}(producer,\ update\_runtime\_options,\ producer\_plugin::runtime\_options),\ 201),}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \mbox{\hyperlink{chain__api__plugin_8cpp_ab9297a5c7b7f085c77cad8641f734ba6}{CALL\_WITH\_400}}(producer,\ producer,\ add\_greylist\_accounts,}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{net__api__plugin_8cpp_a4dc31462f24aaa120af888e8e9358800}{INVOKE\_V\_R}}(producer,\ add\_greylist\_accounts,\ producer\_plugin::greylist\_params),\ 201),}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \mbox{\hyperlink{chain__api__plugin_8cpp_ab9297a5c7b7f085c77cad8641f734ba6}{CALL\_WITH\_400}}(producer,\ producer,\ remove\_greylist\_accounts,}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{net__api__plugin_8cpp_a4dc31462f24aaa120af888e8e9358800}{INVOKE\_V\_R}}(producer,\ remove\_greylist\_accounts,\ producer\_plugin::greylist\_params),\ 201),}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \mbox{\hyperlink{chain__api__plugin_8cpp_ab9297a5c7b7f085c77cad8641f734ba6}{CALL\_WITH\_400}}(producer,\ producer,\ get\_greylist,}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{db__size__api__plugin_8cpp_a57be4224a1ade2bd8b3923d6a344d98b}{INVOKE\_R\_V}}(producer,\ get\_greylist),\ 201),}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \mbox{\hyperlink{chain__api__plugin_8cpp_ab9297a5c7b7f085c77cad8641f734ba6}{CALL\_WITH\_400}}(producer,\ producer,\ get\_whitelist\_blacklist,}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{db__size__api__plugin_8cpp_a57be4224a1ade2bd8b3923d6a344d98b}{INVOKE\_R\_V}}(producer,\ get\_whitelist\_blacklist),\ 201),}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \mbox{\hyperlink{chain__api__plugin_8cpp_ab9297a5c7b7f085c77cad8641f734ba6}{CALL\_WITH\_400}}(producer,\ producer,\ set\_whitelist\_blacklist,}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{net__api__plugin_8cpp_a4dc31462f24aaa120af888e8e9358800}{INVOKE\_V\_R}}(producer,\ set\_whitelist\_blacklist,\ producer\_plugin::whitelist\_blacklist),\ 201),}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \mbox{\hyperlink{chain__api__plugin_8cpp_ab9297a5c7b7f085c77cad8641f734ba6}{CALL\_WITH\_400}}(producer,\ producer,\ get\_integrity\_hash,}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{db__size__api__plugin_8cpp_a57be4224a1ade2bd8b3923d6a344d98b}{INVOKE\_R\_V}}(producer,\ get\_integrity\_hash),\ 201),}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \mbox{\hyperlink{producer__api__plugin_8cpp_a94fd379ad97a4c52fed601f7daa23ba7}{CALL\_ASYNC}}(producer,\ producer,\ create\_snapshot,\ producer\_plugin::snapshot\_information,}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{producer__api__plugin_8cpp_a2b8c9ef956ac2e9faf88e806a7c6b3f0}{INVOKE\_R\_V\_ASYNC}}(producer,\ create\_snapshot),\ 201),}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \mbox{\hyperlink{chain__api__plugin_8cpp_ab9297a5c7b7f085c77cad8641f734ba6}{CALL\_WITH\_400}}(producer,\ producer,\ get\_scheduled\_protocol\_feature\_activations,}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{db__size__api__plugin_8cpp_a57be4224a1ade2bd8b3923d6a344d98b}{INVOKE\_R\_V}}(producer,\ get\_scheduled\_protocol\_feature\_activations),\ 201),}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \mbox{\hyperlink{chain__api__plugin_8cpp_ab9297a5c7b7f085c77cad8641f734ba6}{CALL\_WITH\_400}}(producer,\ producer,\ schedule\_protocol\_feature\_activations,}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{net__api__plugin_8cpp_a4dc31462f24aaa120af888e8e9358800}{INVOKE\_V\_R}}(producer,\ schedule\_protocol\_feature\_activations,\ producer\_plugin::scheduled\_protocol\_feature\_activations),\ 201),}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \mbox{\hyperlink{chain__api__plugin_8cpp_ab9297a5c7b7f085c77cad8641f734ba6}{CALL\_WITH\_400}}(producer,\ producer,\ get\_supported\_protocol\_features,}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{producer__api__plugin_8cpp_a2403e9c3e2d0983ad83a325a7e54ae00}{INVOKE\_R\_R\_II}}(producer,\ get\_supported\_protocol\_features,}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ producer\_plugin::get\_supported\_protocol\_features\_params),\ 201),}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \mbox{\hyperlink{chain__api__plugin_8cpp_ab9297a5c7b7f085c77cad8641f734ba6}{CALL\_WITH\_400}}(producer,\ producer,\ get\_account\_ram\_corrections,}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{net__api__plugin_8cpp_afab796843c5c67526de271f4207fcd37}{INVOKE\_R\_R}}(producer,\ get\_account\_ram\_corrections,\ producer\_plugin::get\_account\_ram\_corrections\_params),\ 201),}
+\DoxyCodeLine{00125\ \ \ \ \},\ \mbox{\hyperlink{structappbase_1_1priority_a5cbe06c2c3aa611d5f2966789572c9d7}{appbase::priority::medium\_high}});}
+\DoxyCodeLine{00126\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1producer__api__plugin_ab0f26110eb4a8bc3585ba6b5f24c3b51_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1producer__api__plugin_a0efb7e1ff9c817bc6b54293beeeb6107}\index{sysio::producer\_api\_plugin@{sysio::producer\_api\_plugin}!set\_program\_options@{set\_program\_options}}
+\index{set\_program\_options@{set\_program\_options}!sysio::producer\_api\_plugin@{sysio::producer\_api\_plugin}}
+\doxysubsubsection{\texorpdfstring{set\_program\_options()}{set\_program\_options()}}
+{\footnotesize\ttfamily \label{classsysio_1_1producer__api__plugin_a0efb7e1ff9c817bc6b54293beeeb6107} 
+virtual void sysio\+::producer\+\_\+api\+\_\+plugin\+::set\+\_\+program\+\_\+options (\begin{DoxyParamCaption}\item[{options\+\_\+description \&}]{cli}{, }\item[{options\+\_\+description \&}]{cfg}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classappbase_1_1abstract__plugin_a274a3c7462de3c699a8eb23741ed7655}{appbase\+::abstract\+\_\+plugin}}.
+
+
+
+Definition at line \mbox{\hyperlink{producer__api__plugin_8hpp_source_l00023}{23}} of file \mbox{\hyperlink{producer__api__plugin_8hpp_source}{producer\+\_\+api\+\_\+plugin.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00023\ \{\}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+plugins/producer\+\_\+api\+\_\+plugin/include/sysio/producer\+\_\+api\+\_\+plugin/\mbox{\hyperlink{producer__api__plugin_8hpp}{producer\+\_\+api\+\_\+plugin.\+hpp}}\item 
+plugins/producer\+\_\+api\+\_\+plugin/\mbox{\hyperlink{producer__api__plugin_8cpp}{producer\+\_\+api\+\_\+plugin.\+cpp}}\end{DoxyCompactItemize}

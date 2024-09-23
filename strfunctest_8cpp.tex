@@ -1,0 +1,43 @@
+\doxysection{libraries/fc/include/fc/crypto/webauthn\+\_\+json/test/unittest/strfunctest.cpp File Reference}
+\hypertarget{strfunctest_8cpp}{}\label{strfunctest_8cpp}\index{libraries/fc/include/fc/crypto/webauthn\_json/test/unittest/strfunctest.cpp@{libraries/fc/include/fc/crypto/webauthn\_json/test/unittest/strfunctest.cpp}}
+{\ttfamily \#include "{}unittest.\+h"{}}\newline
+{\ttfamily \#include "{}rapidjson/internal/strfunc.\+h"{}}\newline
+Include dependency graph for strfunctest.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{strfunctest_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{strfunctest_8cpp_ad9bf8bab3d79889b1e716384e7ae1abb}{TEST}} (Str\+Func, Count\+String\+Code\+Point)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{strfunctest_8cpp_ad9bf8bab3d79889b1e716384e7ae1abb}\index{strfunctest.cpp@{strfunctest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!strfunctest.cpp@{strfunctest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}}
+{\footnotesize\ttfamily \label{strfunctest_8cpp_ad9bf8bab3d79889b1e716384e7ae1abb} 
+TEST (\begin{DoxyParamCaption}\item[{Str\+Func}]{}{, }\item[{Count\+String\+Code\+Point}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{strfunctest_8cpp_source_l00021}{21}} of file \mbox{\hyperlink{strfunctest_8cpp_source}{strfunctest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00022\ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}};}
+\DoxyCodeLine{00023\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(CountStringCodePoint<\mbox{\hyperlink{struct_u_t_f8}{UTF8<>}}\ >(\textcolor{stringliteral}{"{}"{}},\ 0,\ \&\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}));}
+\DoxyCodeLine{00024\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0u,\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}});}
+\DoxyCodeLine{00025\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(CountStringCodePoint<\mbox{\hyperlink{struct_u_t_f8}{UTF8<>}}\ >(\textcolor{stringliteral}{"{}Hello"{}},\ 5,\ \&\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}));}
+\DoxyCodeLine{00026\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(5u,\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}});}
+\DoxyCodeLine{00027\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(CountStringCodePoint<\mbox{\hyperlink{struct_u_t_f8}{UTF8<>}}\ >(\textcolor{stringliteral}{"{}\(\backslash\)xC2\(\backslash\)xA2\(\backslash\)xE2\(\backslash\)x82\(\backslash\)xAC\(\backslash\)xF0\(\backslash\)x9D\(\backslash\)x84\(\backslash\)x9E"{}},\ 9,\ \&\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}));\ \textcolor{comment}{//\ cents\ euro\ G-\/clef}}
+\DoxyCodeLine{00028\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(3u,\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}});}
+\DoxyCodeLine{00029\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(CountStringCodePoint<\mbox{\hyperlink{struct_u_t_f8}{UTF8<>}}\ >(\textcolor{stringliteral}{"{}\(\backslash\)xC2\(\backslash\)xA2\(\backslash\)xE2\(\backslash\)x82\(\backslash\)xAC\(\backslash\)xF0\(\backslash\)x9D\(\backslash\)x84\(\backslash\)x9E\(\backslash\)x80"{}},\ 10,\ \&\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}));}
+\DoxyCodeLine{00030\ \}}
+
+\end{DoxyCode}

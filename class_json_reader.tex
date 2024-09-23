@@ -1,0 +1,472 @@
+\doxysection{Json\+Reader Class Reference}
+\hypertarget{class_json_reader}{}\label{class_json_reader}\index{JsonReader@{JsonReader}}
+
+
+Represents a JSON reader which implements \doxylink{class_archiver}{Archiver} concept.  
+
+
+
+
+{\ttfamily \#include $<$archiver.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_json_reader_a6606d8c5985be77bd8c145c36abdcc8a}{Json\+Reader}} (const char \texorpdfstring{$\ast$}{*}json)
+\begin{DoxyCompactList}\small\item\em Constructor. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_json_reader_a328c859a306bfe59ee7a103586b1619a}{\texorpdfstring{$\sim$}{\string~}\+Json\+Reader}} ()
+\begin{DoxyCompactList}\small\item\em Destructor. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_json_reader_af8ad23ebe9094b79eeddc94f37097567}{operator bool}} () const
+\item 
+\mbox{\hyperlink{class_json_reader}{Json\+Reader}} \& \mbox{\hyperlink{class_json_reader_af4d4cdc4f7c61cad2b538c10ff365828}{Start\+Object}} ()
+\item 
+\mbox{\hyperlink{class_json_reader}{Json\+Reader}} \& \mbox{\hyperlink{class_json_reader_aac2abcffd65cc5b538c2b5e79a3c4e56}{Member}} (const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})
+\item 
+bool \mbox{\hyperlink{class_json_reader_a2aa30506e4bd5edd882252d9e9a26a69}{Has\+Member}} (const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}) const
+\item 
+\mbox{\hyperlink{class_json_reader}{Json\+Reader}} \& \mbox{\hyperlink{class_json_reader_a7f3d3ebf4b2b2feb1b96642804eefdf4}{End\+Object}} ()
+\item 
+\mbox{\hyperlink{class_json_reader}{Json\+Reader}} \& \mbox{\hyperlink{class_json_reader_a3b3ccc8ba94677a49c738600b4746efe}{Start\+Array}} (size\+\_\+t \texorpdfstring{$\ast$}{*}size=0)
+\item 
+\mbox{\hyperlink{class_json_reader}{Json\+Reader}} \& \mbox{\hyperlink{class_json_reader_a123ea8c466a6a9b0647168b0494aac98}{End\+Array}} ()
+\item 
+\mbox{\hyperlink{class_json_reader}{Json\+Reader}} \& \mbox{\hyperlink{class_json_reader_a8a5856ab4923dd1f3444bfeb5051f9e0}{operator\&}} (bool \&b)
+\item 
+\mbox{\hyperlink{class_json_reader}{Json\+Reader}} \& \mbox{\hyperlink{class_json_reader_a75af40eb6320ff920111dea1e4c07a76}{operator\&}} (unsigned \&u)
+\item 
+\mbox{\hyperlink{class_json_reader}{Json\+Reader}} \& \mbox{\hyperlink{class_json_reader_ae0fe0081090697a6ec84471f316c6395}{operator\&}} (int \&i)
+\item 
+\mbox{\hyperlink{class_json_reader}{Json\+Reader}} \& \mbox{\hyperlink{class_json_reader_a8815e6d8f9c1ce99b19575fe4ddf9d23}{operator\&}} (double \&d)
+\item 
+\mbox{\hyperlink{class_json_reader}{Json\+Reader}} \& \mbox{\hyperlink{class_json_reader_a1eb4ac3c615c5ca72755a0034a13ddcf}{operator\&}} (std\+::string \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\item 
+\mbox{\hyperlink{class_json_reader}{Json\+Reader}} \& \mbox{\hyperlink{class_json_reader_af36c05eb087b1e452996fc72d6302b3e}{Set\+Null}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static const bool \mbox{\hyperlink{class_json_reader_a76d04e4b6e88a33f50faa08ce74b5758}{Is\+Reader}} = true
+\item 
+static const bool \mbox{\hyperlink{class_json_reader_aec930ca2b0468e4bb9c7d139a3b3da26}{Is\+Writer}} = !\mbox{\hyperlink{class_json_reader_a76d04e4b6e88a33f50faa08ce74b5758}{Is\+Reader}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{archiver_8h_source_l00056}{56}} of file \mbox{\hyperlink{archiver_8h_source}{archiver.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_json_reader_a6606d8c5985be77bd8c145c36abdcc8a}\index{JsonReader@{JsonReader}!JsonReader@{JsonReader}}
+\index{JsonReader@{JsonReader}!JsonReader@{JsonReader}}
+\doxysubsubsection{\texorpdfstring{JsonReader()}{JsonReader()}}
+{\footnotesize\ttfamily \label{class_json_reader_a6606d8c5985be77bd8c145c36abdcc8a} 
+Json\+Reader\+::\+Json\+Reader (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{json}{}\end{DoxyParamCaption})}
+
+
+\begin{DoxyParams}{Parameters}
+{\em json} & \doxylink{struct_a}{A} non-\/const source json string for in-\/situ parsing. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyNote}{Note}
+in-\/situ means the source JSON string will be modified after parsing. 
+\end{DoxyNote}
+
+
+Definition at line \mbox{\hyperlink{archiver_8cpp_source_l00031}{31}} of file \mbox{\hyperlink{archiver_8cpp_source}{archiver.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ mDocument(),\ mStack(),\ mError(\textcolor{keyword}{false})\ \{}
+\DoxyCodeLine{00032\ \ \ \ \ mDocument\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{document_8h_ac6ea5b168e3fe8c7fa532450fc9391f7}{Document}};}
+\DoxyCodeLine{00033\ \ \ \ \ \mbox{\hyperlink{archiver_8cpp_a149b55eb821bfd8722c37788381acd09}{DOCUMENT}}-\/>\mbox{\hyperlink{class_generic_document_a901db1678f99a1b550003eed75bc380a}{Parse}}(json);}
+\DoxyCodeLine{00034\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{archiver_8cpp_a149b55eb821bfd8722c37788381acd09}{DOCUMENT}}-\/>HasParseError())}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ mError\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00036\ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ mStack\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{archiver_8cpp_ae895071c91568125917165b3aa4a9708}{JsonReaderStack}};}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{archiver_8cpp_a2cc8f2d83039de1aef6590f9782921ee}{STACK}}-\/>push(\mbox{\hyperlink{struct_json_reader_stack_item}{JsonReaderStackItem}}(\mbox{\hyperlink{archiver_8cpp_a149b55eb821bfd8722c37788381acd09}{DOCUMENT}},\ \mbox{\hyperlink{struct_json_reader_stack_item_a8991221ff1014c18a98f7e77b95dc84ba10ec2367e219f3362c89b7827378fcf2}{JsonReaderStackItem::BeforeStart}}));}
+\DoxyCodeLine{00039\ \ \ \ \ \}}
+\DoxyCodeLine{00040\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_json_reader_a6606d8c5985be77bd8c145c36abdcc8a_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_json_reader_a328c859a306bfe59ee7a103586b1619a}\index{JsonReader@{JsonReader}!````~JsonReader@{\texorpdfstring{$\sim$}{\string~}JsonReader}}
+\index{````~JsonReader@{\texorpdfstring{$\sim$}{\string~}JsonReader}!JsonReader@{JsonReader}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}JsonReader()}{\string~JsonReader()}}
+{\footnotesize\ttfamily \label{class_json_reader_a328c859a306bfe59ee7a103586b1619a} 
+Json\+Reader\+::\texorpdfstring{$\sim$}{\string~}\+Json\+Reader (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{archiver_8cpp_source_l00042}{42}} of file \mbox{\hyperlink{archiver_8cpp_source}{archiver.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00043\ \ \ \ \ \textcolor{keyword}{delete}\ \mbox{\hyperlink{archiver_8cpp_a149b55eb821bfd8722c37788381acd09}{DOCUMENT}};}
+\DoxyCodeLine{00044\ \ \ \ \ \textcolor{keyword}{delete}\ \mbox{\hyperlink{archiver_8cpp_a2cc8f2d83039de1aef6590f9782921ee}{STACK}};}
+\DoxyCodeLine{00045\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_json_reader_a123ea8c466a6a9b0647168b0494aac98}\index{JsonReader@{JsonReader}!EndArray@{EndArray}}
+\index{EndArray@{EndArray}!JsonReader@{JsonReader}}
+\doxysubsubsection{\texorpdfstring{EndArray()}{EndArray()}}
+{\footnotesize\ttfamily \label{class_json_reader_a123ea8c466a6a9b0647168b0494aac98} 
+\mbox{\hyperlink{class_json_reader}{Json\+Reader}} \& Json\+Reader\+::\+End\+Array (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{archiver_8cpp_source_l00109}{109}} of file \mbox{\hyperlink{archiver_8cpp_source}{archiver.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00110\ \ \ \ \ \textcolor{keywordflow}{if}\ (!mError)\ \{}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{archiver_8cpp_a1f957b762e025dae67967a36c86dcfc1}{CURRENT}}.IsArray()\ \&\&\ \mbox{\hyperlink{archiver_8cpp_afc0eef637f1016e8786e45e106a4881e}{TOP}}.state\ ==\ \mbox{\hyperlink{struct_json_reader_stack_item_a8991221ff1014c18a98f7e77b95dc84bac7d47991adc39d56c513ceef870cb1c5}{JsonReaderStackItem::Closed}})}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \ \ \ \ Next();}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \ \ \ \ mError\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00115\ \ \ \ \ \}}
+\DoxyCodeLine{00116\ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00117\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_json_reader_a7f3d3ebf4b2b2feb1b96642804eefdf4}\index{JsonReader@{JsonReader}!EndObject@{EndObject}}
+\index{EndObject@{EndObject}!JsonReader@{JsonReader}}
+\doxysubsubsection{\texorpdfstring{EndObject()}{EndObject()}}
+{\footnotesize\ttfamily \label{class_json_reader_a7f3d3ebf4b2b2feb1b96642804eefdf4} 
+\mbox{\hyperlink{class_json_reader}{Json\+Reader}} \& Json\+Reader\+::\+End\+Object (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{archiver_8cpp_source_l00058}{58}} of file \mbox{\hyperlink{archiver_8cpp_source}{archiver.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00059\ \ \ \ \ \textcolor{keywordflow}{if}\ (!mError)\ \{}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{archiver_8cpp_a1f957b762e025dae67967a36c86dcfc1}{CURRENT}}.IsObject()\ \&\&\ \mbox{\hyperlink{archiver_8cpp_afc0eef637f1016e8786e45e106a4881e}{TOP}}.state\ ==\ \mbox{\hyperlink{struct_json_reader_stack_item_a8991221ff1014c18a98f7e77b95dc84bae70fa0797c3380eb79ebe9891ba5ceba}{JsonReaderStackItem::Started}})}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \ \ \ \ Next();}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ mError\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00064\ \ \ \ \ \}}
+\DoxyCodeLine{00065\ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00066\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_json_reader_a2aa30506e4bd5edd882252d9e9a26a69}\index{JsonReader@{JsonReader}!HasMember@{HasMember}}
+\index{HasMember@{HasMember}!JsonReader@{JsonReader}}
+\doxysubsubsection{\texorpdfstring{HasMember()}{HasMember()}}
+{\footnotesize\ttfamily \label{class_json_reader_a2aa30506e4bd5edd882252d9e9a26a69} 
+bool Json\+Reader\+::\+Has\+Member (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{name}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{archiver_8cpp_source_l00083}{83}} of file \mbox{\hyperlink{archiver_8cpp_source}{archiver.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00084\ \ \ \ \ \textcolor{keywordflow}{if}\ (!mError\ \&\&\ \mbox{\hyperlink{archiver_8cpp_a1f957b762e025dae67967a36c86dcfc1}{CURRENT}}.IsObject()\ \&\&\ \mbox{\hyperlink{archiver_8cpp_afc0eef637f1016e8786e45e106a4881e}{TOP}}.state\ ==\ \mbox{\hyperlink{struct_json_reader_stack_item_a8991221ff1014c18a98f7e77b95dc84bae70fa0797c3380eb79ebe9891ba5ceba}{JsonReaderStackItem::Started}})}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{archiver_8cpp_a1f957b762e025dae67967a36c86dcfc1}{CURRENT}}.HasMember(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}});}
+\DoxyCodeLine{00086\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00087\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=208pt]{class_json_reader_a2aa30506e4bd5edd882252d9e9a26a69_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=208pt]{class_json_reader_a2aa30506e4bd5edd882252d9e9a26a69_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_json_reader_aac2abcffd65cc5b538c2b5e79a3c4e56}\index{JsonReader@{JsonReader}!Member@{Member}}
+\index{Member@{Member}!JsonReader@{JsonReader}}
+\doxysubsubsection{\texorpdfstring{Member()}{Member()}}
+{\footnotesize\ttfamily \label{class_json_reader_aac2abcffd65cc5b538c2b5e79a3c4e56} 
+\mbox{\hyperlink{class_json_reader}{Json\+Reader}} \& Json\+Reader\+::\+Member (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{name}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{archiver_8cpp_source_l00068}{68}} of file \mbox{\hyperlink{archiver_8cpp_source}{archiver.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00069\ \ \ \ \ \textcolor{keywordflow}{if}\ (!mError)\ \{}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{archiver_8cpp_a1f957b762e025dae67967a36c86dcfc1}{CURRENT}}.IsObject()\ \&\&\ \mbox{\hyperlink{archiver_8cpp_afc0eef637f1016e8786e45e106a4881e}{TOP}}.state\ ==\ \mbox{\hyperlink{struct_json_reader_stack_item_a8991221ff1014c18a98f7e77b95dc84bae70fa0797c3380eb79ebe9891ba5ceba}{JsonReaderStackItem::Started}})\ \{}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_member_iterator}{Value::ConstMemberIterator}}\ memberItr\ =\ \mbox{\hyperlink{archiver_8cpp_a1f957b762e025dae67967a36c86dcfc1}{CURRENT}}.FindMember(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}});}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (memberItr\ !=\ \mbox{\hyperlink{archiver_8cpp_a1f957b762e025dae67967a36c86dcfc1}{CURRENT}}.MemberEnd())\ }
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{archiver_8cpp_a2cc8f2d83039de1aef6590f9782921ee}{STACK}}-\/>push(\mbox{\hyperlink{struct_json_reader_stack_item}{JsonReaderStackItem}}(\&memberItr-\/>value,\ \mbox{\hyperlink{struct_json_reader_stack_item_a8991221ff1014c18a98f7e77b95dc84ba10ec2367e219f3362c89b7827378fcf2}{JsonReaderStackItem::BeforeStart}}));}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ mError\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \ \ \ mError\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00079\ \ \ \ \ \}}
+\DoxyCodeLine{00080\ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00081\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_json_reader_af8ad23ebe9094b79eeddc94f37097567}\index{JsonReader@{JsonReader}!operator bool@{operator bool}}
+\index{operator bool@{operator bool}!JsonReader@{JsonReader}}
+\doxysubsubsection{\texorpdfstring{operator bool()}{operator bool()}}
+{\footnotesize\ttfamily \label{class_json_reader_af8ad23ebe9094b79eeddc94f37097567} 
+Json\+Reader\+::operator bool (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{archiver_8h_source_l00070}{70}} of file \mbox{\hyperlink{archiver_8h_source}{archiver.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00070\ \{\ \textcolor{keywordflow}{return}\ !mError;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_json_reader_a8a5856ab4923dd1f3444bfeb5051f9e0}\index{JsonReader@{JsonReader}!operator\&@{operator\&}}
+\index{operator\&@{operator\&}!JsonReader@{JsonReader}}
+\doxysubsubsection{\texorpdfstring{operator\&()}{operator\&()}\hspace{0.1cm}{\footnotesize\ttfamily [1/5]}}
+{\footnotesize\ttfamily \label{class_json_reader_a8a5856ab4923dd1f3444bfeb5051f9e0} 
+\mbox{\hyperlink{class_json_reader}{Json\+Reader}} \& Json\+Reader\+::operator\& (\begin{DoxyParamCaption}\item[{bool \&}]{b}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{archiver_8cpp_source_l00119}{119}} of file \mbox{\hyperlink{archiver_8cpp_source}{archiver.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00120\ \ \ \ \ \textcolor{keywordflow}{if}\ (!mError)\ \{}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{archiver_8cpp_a1f957b762e025dae67967a36c86dcfc1}{CURRENT}}.IsBool())\ \{}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \ \ \ \ b\ =\ \mbox{\hyperlink{archiver_8cpp_a1f957b762e025dae67967a36c86dcfc1}{CURRENT}}.GetBool();}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \ \ \ \ Next();}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \ \ \ mError\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00127\ \ \ \ \ \}}
+\DoxyCodeLine{00128\ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00129\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_json_reader_a8815e6d8f9c1ce99b19575fe4ddf9d23}\index{JsonReader@{JsonReader}!operator\&@{operator\&}}
+\index{operator\&@{operator\&}!JsonReader@{JsonReader}}
+\doxysubsubsection{\texorpdfstring{operator\&()}{operator\&()}\hspace{0.1cm}{\footnotesize\ttfamily [2/5]}}
+{\footnotesize\ttfamily \label{class_json_reader_a8815e6d8f9c1ce99b19575fe4ddf9d23} 
+\mbox{\hyperlink{class_json_reader}{Json\+Reader}} \& Json\+Reader\+::operator\& (\begin{DoxyParamCaption}\item[{double \&}]{d}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{archiver_8cpp_source_l00155}{155}} of file \mbox{\hyperlink{archiver_8cpp_source}{archiver.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00156\ \ \ \ \ \textcolor{keywordflow}{if}\ (!mError)\ \{}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{archiver_8cpp_a1f957b762e025dae67967a36c86dcfc1}{CURRENT}}.IsNumber())\ \{}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ =\ \mbox{\hyperlink{archiver_8cpp_a1f957b762e025dae67967a36c86dcfc1}{CURRENT}}.GetDouble();}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \ \ \ \ Next();}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \ \ \ \ \ \ mError\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00163\ \ \ \ \ \}}
+\DoxyCodeLine{00164\ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00165\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_json_reader_ae0fe0081090697a6ec84471f316c6395}\index{JsonReader@{JsonReader}!operator\&@{operator\&}}
+\index{operator\&@{operator\&}!JsonReader@{JsonReader}}
+\doxysubsubsection{\texorpdfstring{operator\&()}{operator\&()}\hspace{0.1cm}{\footnotesize\ttfamily [3/5]}}
+{\footnotesize\ttfamily \label{class_json_reader_ae0fe0081090697a6ec84471f316c6395} 
+\mbox{\hyperlink{class_json_reader}{Json\+Reader}} \& Json\+Reader\+::operator\& (\begin{DoxyParamCaption}\item[{int \&}]{i}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{archiver_8cpp_source_l00143}{143}} of file \mbox{\hyperlink{archiver_8cpp_source}{archiver.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00144\ \ \ \ \ \textcolor{keywordflow}{if}\ (!mError)\ \{}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{archiver_8cpp_a1f957b762e025dae67967a36c86dcfc1}{CURRENT}}.IsInt())\ \{}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \ \ \ \ i\ =\ \mbox{\hyperlink{archiver_8cpp_a1f957b762e025dae67967a36c86dcfc1}{CURRENT}}.GetInt();}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \ \ \ \ Next();}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \ \ \ \ mError\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00151\ \ \ \ \ \}}
+\DoxyCodeLine{00152\ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00153\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_json_reader_a1eb4ac3c615c5ca72755a0034a13ddcf}\index{JsonReader@{JsonReader}!operator\&@{operator\&}}
+\index{operator\&@{operator\&}!JsonReader@{JsonReader}}
+\doxysubsubsection{\texorpdfstring{operator\&()}{operator\&()}\hspace{0.1cm}{\footnotesize\ttfamily [4/5]}}
+{\footnotesize\ttfamily \label{class_json_reader_a1eb4ac3c615c5ca72755a0034a13ddcf} 
+\mbox{\hyperlink{class_json_reader}{Json\+Reader}} \& Json\+Reader\+::operator\& (\begin{DoxyParamCaption}\item[{std\+::string \&}]{s}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{archiver_8cpp_source_l00167}{167}} of file \mbox{\hyperlink{archiver_8cpp_source}{archiver.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00168\ \ \ \ \ \textcolor{keywordflow}{if}\ (!mError)\ \{}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{archiver_8cpp_a1f957b762e025dae67967a36c86dcfc1}{CURRENT}}.IsString())\ \{}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ =\ \mbox{\hyperlink{archiver_8cpp_a1f957b762e025dae67967a36c86dcfc1}{CURRENT}}.GetString();}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \ \ \ \ Next();}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ \ \ \ \ mError\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00175\ \ \ \ \ \}}
+\DoxyCodeLine{00176\ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00177\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_json_reader_a75af40eb6320ff920111dea1e4c07a76}\index{JsonReader@{JsonReader}!operator\&@{operator\&}}
+\index{operator\&@{operator\&}!JsonReader@{JsonReader}}
+\doxysubsubsection{\texorpdfstring{operator\&()}{operator\&()}\hspace{0.1cm}{\footnotesize\ttfamily [5/5]}}
+{\footnotesize\ttfamily \label{class_json_reader_a75af40eb6320ff920111dea1e4c07a76} 
+\mbox{\hyperlink{class_json_reader}{Json\+Reader}} \& Json\+Reader\+::operator\& (\begin{DoxyParamCaption}\item[{unsigned \&}]{u}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{archiver_8cpp_source_l00131}{131}} of file \mbox{\hyperlink{archiver_8cpp_source}{archiver.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00132\ \ \ \ \ \textcolor{keywordflow}{if}\ (!mError)\ \{}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{archiver_8cpp_a1f957b762e025dae67967a36c86dcfc1}{CURRENT}}.IsUint())\ \{}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \ \ \ \ u\ =\ \mbox{\hyperlink{archiver_8cpp_a1f957b762e025dae67967a36c86dcfc1}{CURRENT}}.GetUint();}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \ \ \ \ Next();}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \ \ \ \ mError\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00139\ \ \ \ \ \}}
+\DoxyCodeLine{00140\ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00141\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_json_reader_af36c05eb087b1e452996fc72d6302b3e}\index{JsonReader@{JsonReader}!SetNull@{SetNull}}
+\index{SetNull@{SetNull}!JsonReader@{JsonReader}}
+\doxysubsubsection{\texorpdfstring{SetNull()}{SetNull()}}
+{\footnotesize\ttfamily \label{class_json_reader_af36c05eb087b1e452996fc72d6302b3e} 
+\mbox{\hyperlink{class_json_reader}{Json\+Reader}} \& Json\+Reader\+::\+Set\+Null (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{archiver_8cpp_source_l00179}{179}} of file \mbox{\hyperlink{archiver_8cpp_source}{archiver.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00180\ \ \ \ \ \textcolor{comment}{//\ This\ function\ is\ for\ JsonWriter\ only.}}
+\DoxyCodeLine{00181\ \ \ \ \ mError\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00182\ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00183\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_json_reader_a3b3ccc8ba94677a49c738600b4746efe}\index{JsonReader@{JsonReader}!StartArray@{StartArray}}
+\index{StartArray@{StartArray}!JsonReader@{JsonReader}}
+\doxysubsubsection{\texorpdfstring{StartArray()}{StartArray()}}
+{\footnotesize\ttfamily \label{class_json_reader_a3b3ccc8ba94677a49c738600b4746efe} 
+\mbox{\hyperlink{class_json_reader}{Json\+Reader}} \& Json\+Reader\+::\+Start\+Array (\begin{DoxyParamCaption}\item[{size\+\_\+t \texorpdfstring{$\ast$}{*}}]{size}{ = {\ttfamily 0}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{archiver_8cpp_source_l00089}{89}} of file \mbox{\hyperlink{archiver_8cpp_source}{archiver.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00090\ \ \ \ \ \textcolor{keywordflow}{if}\ (!mError)\ \{}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{archiver_8cpp_a1f957b762e025dae67967a36c86dcfc1}{CURRENT}}.IsArray()\ \&\&\ \mbox{\hyperlink{archiver_8cpp_afc0eef637f1016e8786e45e106a4881e}{TOP}}.state\ ==\ \mbox{\hyperlink{struct_json_reader_stack_item_a8991221ff1014c18a98f7e77b95dc84ba10ec2367e219f3362c89b7827378fcf2}{JsonReaderStackItem::BeforeStart}})\ \{}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{archiver_8cpp_afc0eef637f1016e8786e45e106a4881e}{TOP}}.state\ =\ \mbox{\hyperlink{struct_json_reader_stack_item_a8991221ff1014c18a98f7e77b95dc84bae70fa0797c3380eb79ebe9891ba5ceba}{JsonReaderStackItem::Started}};}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (size)}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *size\ =\ \mbox{\hyperlink{archiver_8cpp_a1f957b762e025dae67967a36c86dcfc1}{CURRENT}}.Size();}
+\DoxyCodeLine{00095\ }
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{archiver_8cpp_a1f957b762e025dae67967a36c86dcfc1}{CURRENT}}.Empty())\ \{}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_generic_value}{Value}}*\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ =\ \&\mbox{\hyperlink{archiver_8cpp_a1f957b762e025dae67967a36c86dcfc1}{CURRENT}}[\mbox{\hyperlink{archiver_8cpp_afc0eef637f1016e8786e45e106a4881e}{TOP}}.index];}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{archiver_8cpp_a2cc8f2d83039de1aef6590f9782921ee}{STACK}}-\/>push(\mbox{\hyperlink{struct_json_reader_stack_item}{JsonReaderStackItem}}(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\ \mbox{\hyperlink{struct_json_reader_stack_item_a8991221ff1014c18a98f7e77b95dc84ba10ec2367e219f3362c89b7827378fcf2}{JsonReaderStackItem::BeforeStart}}));}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{archiver_8cpp_afc0eef637f1016e8786e45e106a4881e}{TOP}}.state\ =\ \mbox{\hyperlink{struct_json_reader_stack_item_a8991221ff1014c18a98f7e77b95dc84bac7d47991adc39d56c513ceef870cb1c5}{JsonReaderStackItem::Closed}};}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ \ \ \ mError\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00105\ \ \ \ \ \}}
+\DoxyCodeLine{00106\ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00107\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_json_reader_af4d4cdc4f7c61cad2b538c10ff365828}\index{JsonReader@{JsonReader}!StartObject@{StartObject}}
+\index{StartObject@{StartObject}!JsonReader@{JsonReader}}
+\doxysubsubsection{\texorpdfstring{StartObject()}{StartObject()}}
+{\footnotesize\ttfamily \label{class_json_reader_af4d4cdc4f7c61cad2b538c10ff365828} 
+\mbox{\hyperlink{class_json_reader}{Json\+Reader}} \& Json\+Reader\+::\+Start\+Object (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{archiver_8cpp_source_l00048}{48}} of file \mbox{\hyperlink{archiver_8cpp_source}{archiver.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00049\ \ \ \ \ \textcolor{keywordflow}{if}\ (!mError)\ \{}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{archiver_8cpp_a1f957b762e025dae67967a36c86dcfc1}{CURRENT}}.IsObject()\ \&\&\ \mbox{\hyperlink{archiver_8cpp_afc0eef637f1016e8786e45e106a4881e}{TOP}}.state\ ==\ \mbox{\hyperlink{struct_json_reader_stack_item_a8991221ff1014c18a98f7e77b95dc84ba10ec2367e219f3362c89b7827378fcf2}{JsonReaderStackItem::BeforeStart}})}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{archiver_8cpp_afc0eef637f1016e8786e45e106a4881e}{TOP}}.state\ =\ \mbox{\hyperlink{struct_json_reader_stack_item_a8991221ff1014c18a98f7e77b95dc84bae70fa0797c3380eb79ebe9891ba5ceba}{JsonReaderStackItem::Started}};}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \ mError\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00054\ \ \ \ \ \}}
+\DoxyCodeLine{00055\ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00056\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{class_json_reader_a76d04e4b6e88a33f50faa08ce74b5758}\index{JsonReader@{JsonReader}!IsReader@{IsReader}}
+\index{IsReader@{IsReader}!JsonReader@{JsonReader}}
+\doxysubsubsection{\texorpdfstring{IsReader}{IsReader}}
+{\footnotesize\ttfamily \label{class_json_reader_a76d04e4b6e88a33f50faa08ce74b5758} 
+const bool Json\+Reader\+::\+Is\+Reader = true\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{archiver_8h_source_l00088}{88}} of file \mbox{\hyperlink{archiver_8h_source}{archiver.\+h}}.
+
+\Hypertarget{class_json_reader_aec930ca2b0468e4bb9c7d139a3b3da26}\index{JsonReader@{JsonReader}!IsWriter@{IsWriter}}
+\index{IsWriter@{IsWriter}!JsonReader@{JsonReader}}
+\doxysubsubsection{\texorpdfstring{IsWriter}{IsWriter}}
+{\footnotesize\ttfamily \label{class_json_reader_aec930ca2b0468e4bb9c7d139a3b3da26} 
+const bool Json\+Reader\+::\+Is\+Writer = !\mbox{\hyperlink{class_json_reader_a76d04e4b6e88a33f50faa08ce74b5758}{Is\+Reader}}\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{archiver_8h_source_l00089}{89}} of file \mbox{\hyperlink{archiver_8h_source}{archiver.\+h}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/example/archiver/\mbox{\hyperlink{archiver_8h}{archiver.\+h}}\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/example/archiver/\mbox{\hyperlink{archiver_8cpp}{archiver.\+cpp}}\end{DoxyCompactItemize}

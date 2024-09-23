@@ -1,0 +1,9 @@
+<map id="testing::internal::FloatingPoint::exponent_bits" name="testing::internal::FloatingPoint::exponent_bits">
+<area shape="rect" id="Node000001" title=" " alt="" coords="431,41,617,82"/>
+<area shape="rect" id="Node000002" href="$classtesting_1_1internal_1_1_floating_point.html#a1fc654fd206efa98e480aa1e034f30d5" title=" " alt="" coords="240,41,383,82"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="415,64,383,64,383,59,415,59"/>
+<area shape="rect" id="Node000003" href="$classtesting_1_1internal_1_1_floating_point.html#a965214c1af2f9ac5adb1393794aa81e5" title=" " alt="" coords="5,5,192,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="224,50,192,44,193,39,225,44"/>
+<area shape="rect" id="Node000004" href="$classtesting_1_1internal_1_1_floating_eq_matcher_1_1_impl.html#a4ce47c481fdc4973ed671a492f455f99" title=" " alt="" coords="17,70,180,126"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="225,79,181,86,180,81,224,74"/>
+</map>

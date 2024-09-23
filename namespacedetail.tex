@@ -1,0 +1,107 @@
+\doxysection{detail Namespace Reference}
+\hypertarget{namespacedetail}{}\label{namespacedetail}\index{detail@{detail}}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structfc_1_1logging__config}{fc\+::logging\+\_\+config}} \& \mbox{\hyperlink{namespacedetail_a7ccce9b35f2d32d6af42af40a302d36e}{add\+\_\+deep\+\_\+mind\+\_\+logger}} (\mbox{\hyperlink{structfc_1_1logging__config}{fc\+::logging\+\_\+config}} \&\mbox{\hyperlink{classconfig}{config}})
+\item 
+void \mbox{\hyperlink{namespacedetail_a9de2cd0b6fb14bad597633a8c5e01a73}{configure\+\_\+logging}} (const bfs\+::path \&config\+\_\+path)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacedetail_a7ccce9b35f2d32d6af42af40a302d36e}\index{detail@{detail}!add\_deep\_mind\_logger@{add\_deep\_mind\_logger}}
+\index{add\_deep\_mind\_logger@{add\_deep\_mind\_logger}!detail@{detail}}
+\doxysubsubsection{\texorpdfstring{add\_deep\_mind\_logger()}{add\_deep\_mind\_logger()}}
+{\footnotesize\ttfamily \label{namespacedetail_a7ccce9b35f2d32d6af42af40a302d36e} 
+\mbox{\hyperlink{structfc_1_1logging__config}{fc\+::logging\+\_\+config}} \& detail\+::add\+\_\+deep\+\_\+mind\+\_\+logger (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structfc_1_1logging__config}{fc\+::logging\+\_\+config}} \&}]{config}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2nodeop_2main_8cpp_source_l00025}{25}} of file \mbox{\hyperlink{programs_2nodeop_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00026\ \ \ \ \mbox{\hyperlink{classconfig}{config}}.appenders.push\_back(}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1appender__config}{fc::appender\_config}}(\ \textcolor{stringliteral}{"{}deep-\/mind"{}},\ \textcolor{stringliteral}{"{}dmlog"{}}\ )}
+\DoxyCodeLine{00028\ \ \ \ );}
+\DoxyCodeLine{00029\ }
+\DoxyCodeLine{00030\ \ \ \ \mbox{\hyperlink{structfc_1_1logger__config}{fc::logger\_config}}\ dmlc;}
+\DoxyCodeLine{00031\ \ \ \ dmlc.\mbox{\hyperlink{structfc_1_1logger__config_a2300ca629d573fdfcb81f9031fb1b09d}{name}}\ =\ \textcolor{stringliteral}{"{}deep-\/mind"{}};}
+\DoxyCodeLine{00032\ \ \ \ dmlc.\mbox{\hyperlink{structfc_1_1logger__config_aea5ff2cbde269be19fa4c2d7b6cdda8b}{level}}\ =\ \mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4a30d2de77e71beb8d09d530cac04efa25}{fc::log\_level::debug}};}
+\DoxyCodeLine{00033\ \ \ \ dmlc.\mbox{\hyperlink{structfc_1_1logger__config_a1279327c0d6062c6d863da1e8b1b0dca}{enabled}}\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00034\ \ \ \ dmlc.\mbox{\hyperlink{structfc_1_1logger__config_a7133e5fedacf584ae96416dc5659e8c7}{appenders}}.push\_back(\textcolor{stringliteral}{"{}deep-\/mind"{}});}
+\DoxyCodeLine{00035\ }
+\DoxyCodeLine{00036\ \ \ \ \mbox{\hyperlink{classconfig}{config}}.loggers.push\_back(\ dmlc\ );}
+\DoxyCodeLine{00037\ }
+\DoxyCodeLine{00038\ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classconfig}{config}};}
+\DoxyCodeLine{00039\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=194pt]{namespacedetail_a7ccce9b35f2d32d6af42af40a302d36e_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacedetail_a7ccce9b35f2d32d6af42af40a302d36e_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacedetail_a9de2cd0b6fb14bad597633a8c5e01a73}\index{detail@{detail}!configure\_logging@{configure\_logging}}
+\index{configure\_logging@{configure\_logging}!detail@{detail}}
+\doxysubsubsection{\texorpdfstring{configure\_logging()}{configure\_logging()}}
+{\footnotesize\ttfamily \label{namespacedetail_a9de2cd0b6fb14bad597633a8c5e01a73} 
+void detail\+::configure\+\_\+logging (\begin{DoxyParamCaption}\item[{const bfs\+::path \&}]{config\+\_\+path}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2nodeop_2main_8cpp_source_l00041}{41}} of file \mbox{\hyperlink{programs_2nodeop_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00042\ \{}
+\DoxyCodeLine{00043\ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{namespacefc_a3fcf0d920aea28014aacae50a51d8485}{fc::exists}}(\ config\_path\ )\ )\ \{}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_ad64fa786e47f4f646fb607f1a039c680}{fc::configure\_logging}}(\ config\_path\ );}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ cfg\ =\ \mbox{\hyperlink{structfc_1_1logging__config_a8af01d185dda6259354f127c526902d5}{fc::logging\_config::default\_config}}();}
+\DoxyCodeLine{00049\ }
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_ad64fa786e47f4f646fb607f1a039c680}{fc::configure\_logging}}(\ \mbox{\hyperlink{namespacedetail_a7ccce9b35f2d32d6af42af40a302d36e}{::detail::add\_deep\_mind\_logger}}(cfg)\ );}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}}(\textcolor{stringliteral}{"{}Error\ reloading\ logging.json"{}});}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw};}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00056\ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1exception}{fc::exception}}\&\ e)\ \{}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}}(\textcolor{stringliteral}{"{}\$\{e\}"{}},\ (\textcolor{stringliteral}{"{}e"{}},e.\mbox{\hyperlink{classfc_1_1exception_a7611ea8fbe25dde56649b685c2298a37}{to\_detail\_string}}()));}
+\DoxyCodeLine{00058\ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\textcolor{keyword}{const}\ boost::exception\&\ e)\ \{}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}}(\textcolor{stringliteral}{"{}\$\{e\}"{}},\ (\textcolor{stringliteral}{"{}e"{}},boost::diagnostic\_information(e)));}
+\DoxyCodeLine{00060\ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\textcolor{keyword}{const}\ std::exception\&\ e)\ \{}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}}(\textcolor{stringliteral}{"{}\$\{e\}"{}},\ (\textcolor{stringliteral}{"{}e"{}},e.what()));}
+\DoxyCodeLine{00062\ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \textcolor{comment}{//\ empty}}
+\DoxyCodeLine{00064\ \ \ \ \}}
+\DoxyCodeLine{00065\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacedetail_a9de2cd0b6fb14bad597633a8c5e01a73_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacedetail_a9de2cd0b6fb14bad597633a8c5e01a73_icgraph}
+\end{center}
+\end{figure}

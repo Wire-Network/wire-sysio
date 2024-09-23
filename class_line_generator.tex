@@ -1,0 +1,147 @@
+\doxysection{Line\+Generator Class Reference}
+\hypertarget{class_line_generator}{}\label{class_line_generator}\index{LineGenerator@{LineGenerator}}
+
+
+Inheritance diagram for Line\+Generator\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=203pt]{class_line_generator__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Line\+Generator\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=203pt]{class_line_generator__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_line_generator_a1a1a6dc1f84aea5c441a5b4bd9bd3bd6}{Line\+Generator}} ()
+\item 
+std\+::string const \& \mbox{\hyperlink{class_line_generator_a98ac9b2242abe590e6014287957465f3}{get}} () const override
+\item 
+bool \mbox{\hyperlink{class_line_generator_a6de004837a1c1965f9e8d8164b47332a}{next}} () override
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{struct_catch_1_1_generators_1_1_i_generator}{Catch\+::\+Generators\+::\+IGenerator$<$ std\+::string $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{struct_catch_1_1_generators_1_1_i_generator_afe5b6eecbbd735e69748d68574611747}{\texorpdfstring{$\sim$}{\string~}\+IGenerator}} ()=default
+\item 
+virtual \mbox{\hyperlink{struct_catch_1_1_generators_1_1_i_generator_afe5b6eecbbd735e69748d68574611747}{\texorpdfstring{$\sim$}{\string~}\+IGenerator}} ()=default
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{class_catch_1_1_generators_1_1_generator_untyped_base}{Catch\+::\+Generators\+::\+Generator\+Untyped\+Base}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_catch_1_1_generators_1_1_generator_untyped_base_a00ff0179d739c3016756b6cf56fabbad}{Generator\+Untyped\+Base}} ()=default
+\item 
+virtual \mbox{\hyperlink{class_catch_1_1_generators_1_1_generator_untyped_base_a3e9065352141a8706eafeb3ffb3b662e}{\texorpdfstring{$\sim$}{\string~}\+Generator\+Untyped\+Base}} ()
+\item 
+\mbox{\hyperlink{class_catch_1_1_generators_1_1_generator_untyped_base_a00ff0179d739c3016756b6cf56fabbad}{Generator\+Untyped\+Base}} ()=default
+\item 
+virtual \mbox{\hyperlink{class_catch_1_1_generators_1_1_generator_untyped_base_a6f05f8099fdc5744a7aff68aa8c09c7f}{\texorpdfstring{$\sim$}{\string~}\+Generator\+Untyped\+Base}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Public Types inherited from \mbox{\hyperlink{struct_catch_1_1_generators_1_1_i_generator}{Catch\+::\+Generators\+::\+IGenerator$<$ std\+::string $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{struct_catch_1_1_generators_1_1_i_generator_acbb6642f67ee8d8aeae1f79ae5e16504}{type}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{301-_gen-_map_type_conversion_8cpp_source_l00014}{14}} of file \mbox{\hyperlink{301-_gen-_map_type_conversion_8cpp_source}{301-\/\+Gen-\/\+Map\+Type\+Conversion.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_line_generator_a1a1a6dc1f84aea5c441a5b4bd9bd3bd6}\index{LineGenerator@{LineGenerator}!LineGenerator@{LineGenerator}}
+\index{LineGenerator@{LineGenerator}!LineGenerator@{LineGenerator}}
+\doxysubsubsection{\texorpdfstring{LineGenerator()}{LineGenerator()}}
+{\footnotesize\ttfamily \label{class_line_generator_a1a1a6dc1f84aea5c441a5b4bd9bd3bd6} 
+Line\+Generator\+::\+Line\+Generator (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{301-_gen-_map_type_conversion_8cpp_source_l00018}{18}} of file \mbox{\hyperlink{301-_gen-_map_type_conversion_8cpp_source}{301-\/\+Gen-\/\+Map\+Type\+Conversion.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ m\_stream.str(\textcolor{stringliteral}{"{}1\(\backslash\)n2\(\backslash\)n3\(\backslash\)n4\(\backslash\)n"{}});}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{class_line_generator_a6de004837a1c1965f9e8d8164b47332a}{next}}())\ \{}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{class_catch_1_1_generator_exception}{Catch::GeneratorException}}(\textcolor{stringliteral}{"{}Couldn't\ read\ a\ single\ line"{}});}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00023\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_line_generator_a1a1a6dc1f84aea5c441a5b4bd9bd3bd6_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_line_generator_a98ac9b2242abe590e6014287957465f3}\index{LineGenerator@{LineGenerator}!get@{get}}
+\index{get@{get}!LineGenerator@{LineGenerator}}
+\doxysubsubsection{\texorpdfstring{get()}{get()}}
+{\footnotesize\ttfamily \label{class_line_generator_a98ac9b2242abe590e6014287957465f3} 
+std\+::string const  \& Line\+Generator\+::get (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_generators_1_1_i_generator_a0fb6da789cda5b4e90f036737db82485}{Catch\+::\+Generators\+::\+IGenerator$<$ std\+::string $>$}}.
+
+
+
+Definition at line \mbox{\hyperlink{301-_gen-_map_type_conversion_8cpp_source_l00025}{25}} of file \mbox{\hyperlink{301-_gen-_map_type_conversion_8cpp_source}{301-\/\+Gen-\/\+Map\+Type\+Conversion.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_line;}
+\DoxyCodeLine{00027\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_line_generator_a6de004837a1c1965f9e8d8164b47332a}\index{LineGenerator@{LineGenerator}!next@{next}}
+\index{next@{next}!LineGenerator@{LineGenerator}}
+\doxysubsubsection{\texorpdfstring{next()}{next()}}
+{\footnotesize\ttfamily \label{class_line_generator_a6de004837a1c1965f9e8d8164b47332a} 
+bool Line\+Generator\+::next (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{class_catch_1_1_generators_1_1_generator_untyped_base_aeed3c0cd6233c5f553549e453b8d6638}{Catch\+::\+Generators\+::\+Generator\+Untyped\+Base}}.
+
+
+
+Definition at line \mbox{\hyperlink{301-_gen-_map_type_conversion_8cpp_source_l00029}{29}} of file \mbox{\hyperlink{301-_gen-_map_type_conversion_8cpp_source}{301-\/\+Gen-\/\+Map\+Type\+Conversion.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !!std::getline(m\_stream,\ m\_line);}
+\DoxyCodeLine{00031\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_line_generator_a6de004837a1c1965f9e8d8164b47332a_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/examples/\mbox{\hyperlink{301-_gen-_map_type_conversion_8cpp}{301-\/\+Gen-\/\+Map\+Type\+Conversion.\+cpp}}\end{DoxyCompactItemize}

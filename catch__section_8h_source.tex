@@ -1,0 +1,55 @@
+\doxysection{catch\+\_\+section.\+h}
+\hypertarget{catch__section_8h_source}{}\label{catch__section_8h_source}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_section.h@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_section.h}}
+\mbox{\hyperlink{catch__section_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{catch__section_8h_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{catch__section_8h_source_l00002}00002\ \textcolor{comment}{\ *\ \ Created\ by\ Phil\ on\ 03/12/2013.}}
+\DoxyCodeLine{\Hypertarget{catch__section_8h_source_l00003}00003\ \textcolor{comment}{\ *\ \ Copyright\ 2013\ Two\ Blue\ Cubes\ Ltd.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{catch__section_8h_source_l00004}00004\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{catch__section_8h_source_l00005}00005\ \textcolor{comment}{\ *\ \ Distributed\ under\ the\ Boost\ Software\ License,\ Version\ 1.0.\ (See\ accompanying}}
+\DoxyCodeLine{\Hypertarget{catch__section_8h_source_l00006}00006\ \textcolor{comment}{\ *\ \ file\ LICENSE\_1\_0.txt\ or\ copy\ at\ http://www.boost.org/LICENSE\_1\_0.txt)}}
+\DoxyCodeLine{\Hypertarget{catch__section_8h_source_l00007}00007\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{catch__section_8h_source_l00008}00008\ \textcolor{preprocessor}{\#ifndef\ TWOBLUECUBES\_CATCH\_SECTION\_H\_INCLUDED}}
+\DoxyCodeLine{\Hypertarget{catch__section_8h_source_l00009}00009\ \textcolor{preprocessor}{\#define\ TWOBLUECUBES\_CATCH\_SECTION\_H\_INCLUDED}}
+\DoxyCodeLine{\Hypertarget{catch__section_8h_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{catch__section_8h_source_l00011}00011\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__compiler__capabilities_8h}{catch\_compiler\_capabilities.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__section_8h_source_l00012}00012\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__section__info_8h}{catch\_section\_info.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__section_8h_source_l00013}00013\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__totals_8h}{catch\_totals.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__section_8h_source_l00014}00014\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__timer_8h}{catch\_timer.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__section_8h_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{catch__section_8h_source_l00016}00016\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{\Hypertarget{catch__section_8h_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{catch__section_8h_source_l00018}00018\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__section_8h_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{catch__section_8h_source_l00020}00020\ \ \ \ \ \textcolor{keyword}{class\ }Section\ :\ NonCopyable\ \{}
+\DoxyCodeLine{\Hypertarget{catch__section_8h_source_l00021}00021\ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{catch__section_8h_source_l00022}00022\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_section_a68fd4e51e8981aaa7ddb00d8a6abd099}{Section}}(\ SectionInfo\ \textcolor{keyword}{const}\&\ info\ );}
+\DoxyCodeLine{\Hypertarget{catch__section_8h_source_l00023}00023\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_section_aa1422edd68a77aa578b5cc6b8b69f86f}{\string~Section}}();}
+\DoxyCodeLine{\Hypertarget{catch__section_8h_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{catch__section_8h_source_l00025}00025\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ This\ indicates\ whether\ the\ section\ should\ be\ executed\ or\ not}}
+\DoxyCodeLine{\Hypertarget{catch__section_8h_source_l00026}00026\ \ \ \ \ \ \ \ \ \textcolor{keyword}{explicit}\ \textcolor{keyword}{operator}\ bool()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{catch__section_8h_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{catch__section_8h_source_l00028}00028\ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{catch__section_8h_source_l00029}00029\ \ \ \ \ \ \ \ \ SectionInfo\ m\_info;}
+\DoxyCodeLine{\Hypertarget{catch__section_8h_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{catch__section_8h_source_l00031}00031\ \ \ \ \ \ \ \ \ std::string\ m\_name;}
+\DoxyCodeLine{\Hypertarget{catch__section_8h_source_l00032}00032\ \ \ \ \ \ \ \ \ Counts\ m\_assertions;}
+\DoxyCodeLine{\Hypertarget{catch__section_8h_source_l00033}00033\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ m\_sectionIncluded;}
+\DoxyCodeLine{\Hypertarget{catch__section_8h_source_l00034}00034\ \ \ \ \ \ \ \ \ Timer\ m\_timer;}
+\DoxyCodeLine{\Hypertarget{catch__section_8h_source_l00035}00035\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{catch__section_8h_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{catch__section_8h_source_l00037}00037\ \}\ \textcolor{comment}{//\ end\ namespace\ Catch}}
+\DoxyCodeLine{\Hypertarget{catch__section_8h_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{catch__section_8h_source_l00039}\mbox{\hyperlink{catch__section_8h_a2969ec50cc661169e94b1b80ac799c07}{00039}}\ \textcolor{preprocessor}{\#define\ INTERNAL\_CATCH\_SECTION(\ ...\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{catch__section_8h_source_l00040}00040\ \textcolor{preprocessor}{\ \ \ \ CATCH\_INTERNAL\_SUPPRESS\_UNUSED\_WARNINGS\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{catch__section_8h_source_l00041}00041\ \textcolor{preprocessor}{\ \ \ \ if(\ Catch::Section\ const\&\ INTERNAL\_CATCH\_UNIQUE\_NAME(\ catch\_internal\_Section\ )\ =\ Catch::SectionInfo(\ CATCH\_INTERNAL\_LINEINFO,\ \_\_VA\_ARGS\_\_\ )\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{catch__section_8h_source_l00042}00042\ \textcolor{preprocessor}{\ \ \ \ CATCH\_INTERNAL\_UNSUPPRESS\_UNUSED\_WARNINGS}}
+\DoxyCodeLine{\Hypertarget{catch__section_8h_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{catch__section_8h_source_l00044}\mbox{\hyperlink{catch__section_8h_abe92a5063c83dec8143bf685e4b4a198}{00044}}\ \textcolor{preprocessor}{\#define\ INTERNAL\_CATCH\_DYNAMIC\_SECTION(\ ...\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{catch__section_8h_source_l00045}00045\ \textcolor{preprocessor}{\ \ \ \ CATCH\_INTERNAL\_SUPPRESS\_UNUSED\_WARNINGS\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{catch__section_8h_source_l00046}00046\ \textcolor{preprocessor}{\ \ \ \ if(\ Catch::Section\ const\&\ INTERNAL\_CATCH\_UNIQUE\_NAME(\ catch\_internal\_Section\ )\ =\ Catch::SectionInfo(\ CATCH\_INTERNAL\_LINEINFO,\ (Catch::ReusableStringStream()\ <<\ \_\_VA\_ARGS\_\_).str()\ )\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{catch__section_8h_source_l00047}00047\ \textcolor{preprocessor}{\ \ \ \ CATCH\_INTERNAL\_UNSUPPRESS\_UNUSED\_WARNINGS}}
+\DoxyCodeLine{\Hypertarget{catch__section_8h_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{catch__section_8h_source_l00049}00049\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ TWOBLUECUBES\_CATCH\_SECTION\_H\_INCLUDED}}
+
+\end{DoxyCode}

@@ -1,0 +1,228 @@
+\doxysection{Catch\+::Context Class Reference}
+\hypertarget{class_catch_1_1_context}{}\label{class_catch_1_1_context}\index{Catch::Context@{Catch::Context}}
+
+
+Inheritance diagram for Catch\+::Context\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=326pt]{class_catch_1_1_context__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Catch\+::Context\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=326pt]{class_catch_1_1_context__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_catch_1_1_i_result_capture}{IResult\+Capture}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_catch_1_1_context_a5cbeab8cb1992c69e767f8164dd7b044}{get\+Result\+Capture}} () override
+\item 
+\mbox{\hyperlink{struct_catch_1_1_i_runner}{IRunner}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_catch_1_1_context_a8a60b7b923b420091afc57084172b660}{get\+Runner}} () override
+\item 
+\mbox{\hyperlink{namespace_catch_a961f6f5f07e265684c220a8ae014d7d6}{IConfig\+Ptr}} const \& \mbox{\hyperlink{class_catch_1_1_context_afb0c6fa0afe09db4e941aa6afd011ef4}{get\+Config}} () const override
+\item 
+\mbox{\hyperlink{class_catch_1_1_context_a23ffac113ebe737d5e4d718d5ccd0b5e}{\texorpdfstring{$\sim$}{\string~}\+Context}} () override
+\item 
+void \mbox{\hyperlink{class_catch_1_1_context_a3845fb318b9d6ee96961d9013ee8c0ef}{set\+Result\+Capture}} (\mbox{\hyperlink{struct_catch_1_1_i_result_capture}{IResult\+Capture}} \texorpdfstring{$\ast$}{*}result\+Capture) override
+\item 
+void \mbox{\hyperlink{class_catch_1_1_context_ab689f97687dd626f89e8a208c4903f97}{set\+Runner}} (\mbox{\hyperlink{struct_catch_1_1_i_runner}{IRunner}} \texorpdfstring{$\ast$}{*}runner) override
+\item 
+void \mbox{\hyperlink{class_catch_1_1_context_a8db4712ae6ccb6e1d447e86d256e879d}{set\+Config}} (\mbox{\hyperlink{namespace_catch_a961f6f5f07e265684c220a8ae014d7d6}{IConfig\+Ptr}} const \&\mbox{\hyperlink{classconfig}{config}}) override
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{struct_catch_1_1_i_mutable_context}{Catch\+::\+IMutable\+Context}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{struct_catch_1_1_i_mutable_context_a98bd9be08438c2a02a4152c6554ca53e}{\texorpdfstring{$\sim$}{\string~}\+IMutable\+Context}} ()
+\item 
+virtual \mbox{\hyperlink{struct_catch_1_1_i_mutable_context_a93f32b2ab6d0fb83637059240be799ab}{\texorpdfstring{$\sim$}{\string~}\+IMutable\+Context}} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{struct_catch_1_1_i_context}{Catch\+::\+IContext}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{struct_catch_1_1_i_context_adb4b6e8f1357f7ea414e22c162721f02}{\texorpdfstring{$\sim$}{\string~}\+IContext}} ()
+\item 
+virtual \mbox{\hyperlink{struct_catch_1_1_i_context_aeb17355c1be6c2ced5407cad7202628d}{\texorpdfstring{$\sim$}{\string~}\+IContext}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_catch_1_1_i_mutable_context}{IMutable\+Context}} \& \mbox{\hyperlink{class_catch_1_1_context_ad22507c2e4bc58f80a205db9756b8e29}{get\+Current\+Mutable\+Context}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{catch__context_8cpp_source_l00013}{13}} of file \mbox{\hyperlink{catch__context_8cpp_source}{catch\+\_\+context.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_catch_1_1_context_a23ffac113ebe737d5e4d718d5ccd0b5e}\index{Catch::Context@{Catch::Context}!````~Context@{\texorpdfstring{$\sim$}{\string~}Context}}
+\index{````~Context@{\texorpdfstring{$\sim$}{\string~}Context}!Catch::Context@{Catch::Context}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}Context()}{\string~Context()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_context_a23ffac113ebe737d5e4d718d5ccd0b5e} 
+Catch\+::\+Context\+::\texorpdfstring{$\sim$}{\string~}\+Context (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [default]}}
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_catch_1_1_context_afb0c6fa0afe09db4e941aa6afd011ef4}\index{Catch::Context@{Catch::Context}!getConfig@{getConfig}}
+\index{getConfig@{getConfig}!Catch::Context@{Catch::Context}}
+\doxysubsubsection{\texorpdfstring{getConfig()}{getConfig()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_context_afb0c6fa0afe09db4e941aa6afd011ef4} 
+\mbox{\hyperlink{namespace_catch_a961f6f5f07e265684c220a8ae014d7d6}{IConfig\+Ptr}} const  \& Catch\+::\+Context\+::get\+Config (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_i_context_ad72743ae753feab0a6f5505f26f79ced}{Catch\+::\+IContext}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__context_8cpp_source_l00023}{23}} of file \mbox{\hyperlink{catch__context_8cpp_source}{catch\+\_\+context.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_config;}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_context_a5cbeab8cb1992c69e767f8164dd7b044}\index{Catch::Context@{Catch::Context}!getResultCapture@{getResultCapture}}
+\index{getResultCapture@{getResultCapture}!Catch::Context@{Catch::Context}}
+\doxysubsubsection{\texorpdfstring{getResultCapture()}{getResultCapture()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_context_a5cbeab8cb1992c69e767f8164dd7b044} 
+\mbox{\hyperlink{struct_catch_1_1_i_result_capture}{IResult\+Capture}} \texorpdfstring{$\ast$}{*} Catch\+::\+Context\+::get\+Result\+Capture (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_i_context_a950f10a5f6d3c9385f9493ba6298b174}{Catch\+::\+IContext}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__context_8cpp_source_l00016}{16}} of file \mbox{\hyperlink{catch__context_8cpp_source}{catch\+\_\+context.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00017\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_resultCapture;}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_context_a8a60b7b923b420091afc57084172b660}\index{Catch::Context@{Catch::Context}!getRunner@{getRunner}}
+\index{getRunner@{getRunner}!Catch::Context@{Catch::Context}}
+\doxysubsubsection{\texorpdfstring{getRunner()}{getRunner()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_context_a8a60b7b923b420091afc57084172b660} 
+\mbox{\hyperlink{struct_catch_1_1_i_runner}{IRunner}} \texorpdfstring{$\ast$}{*} Catch\+::\+Context\+::get\+Runner (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_i_context_ace6ece997b27c76d70563272f9e93f2f}{Catch\+::\+IContext}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__context_8cpp_source_l00019}{19}} of file \mbox{\hyperlink{catch__context_8cpp_source}{catch\+\_\+context.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_runner;}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_context_a8db4712ae6ccb6e1d447e86d256e879d}\index{Catch::Context@{Catch::Context}!setConfig@{setConfig}}
+\index{setConfig@{setConfig}!Catch::Context@{Catch::Context}}
+\doxysubsubsection{\texorpdfstring{setConfig()}{setConfig()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_context_a8db4712ae6ccb6e1d447e86d256e879d} 
+void Catch\+::\+Context\+::set\+Config (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespace_catch_a961f6f5f07e265684c220a8ae014d7d6}{IConfig\+Ptr}} const \&}]{config}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_i_mutable_context_aa81ba080fce084e9482f20338bc88531}{Catch\+::\+IMutable\+Context}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__context_8cpp_source_l00036}{36}} of file \mbox{\hyperlink{catch__context_8cpp_source}{catch\+\_\+context.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ m\_config\ =\ \mbox{\hyperlink{classconfig}{config}};}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_context_a3845fb318b9d6ee96961d9013ee8c0ef}\index{Catch::Context@{Catch::Context}!setResultCapture@{setResultCapture}}
+\index{setResultCapture@{setResultCapture}!Catch::Context@{Catch::Context}}
+\doxysubsubsection{\texorpdfstring{setResultCapture()}{setResultCapture()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_context_a3845fb318b9d6ee96961d9013ee8c0ef} 
+void Catch\+::\+Context\+::set\+Result\+Capture (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_i_result_capture}{IResult\+Capture}} \texorpdfstring{$\ast$}{*}}]{result\+Capture}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_i_mutable_context_a4a80afd0525b7def21bee8d9b48f2d39}{Catch\+::\+IMutable\+Context}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__context_8cpp_source_l00030}{30}} of file \mbox{\hyperlink{catch__context_8cpp_source}{catch\+\_\+context.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \ \ \ m\_resultCapture\ =\ resultCapture;}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_context_ab689f97687dd626f89e8a208c4903f97}\index{Catch::Context@{Catch::Context}!setRunner@{setRunner}}
+\index{setRunner@{setRunner}!Catch::Context@{Catch::Context}}
+\doxysubsubsection{\texorpdfstring{setRunner()}{setRunner()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_context_ab689f97687dd626f89e8a208c4903f97} 
+void Catch\+::\+Context\+::set\+Runner (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_i_runner}{IRunner}} \texorpdfstring{$\ast$}{*}}]{runner}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_i_mutable_context_af2e53b1dea4527a2587cff266a730f6e}{Catch\+::\+IMutable\+Context}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__context_8cpp_source_l00033}{33}} of file \mbox{\hyperlink{catch__context_8cpp_source}{catch\+\_\+context.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \ \ \ m\_runner\ =\ runner;}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{class_catch_1_1_context_ad22507c2e4bc58f80a205db9756b8e29}\index{Catch::Context@{Catch::Context}!getCurrentMutableContext@{getCurrentMutableContext}}
+\index{getCurrentMutableContext@{getCurrentMutableContext}!Catch::Context@{Catch::Context}}
+\doxysubsubsection{\texorpdfstring{getCurrentMutableContext}{getCurrentMutableContext}}
+{\footnotesize\ttfamily \label{class_catch_1_1_context_ad22507c2e4bc58f80a205db9756b8e29} 
+\mbox{\hyperlink{struct_catch_1_1_i_mutable_context}{IMutable\+Context}} \& get\+Current\+Mutable\+Context (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__context_8h_source_l00045}{45}} of file \mbox{\hyperlink{catch__context_8h_source}{catch\+\_\+context.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00046\ \ \ \ \ \{}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !IMutableContext::currentContext\ )}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \ \ \ IMutableContext::createContext();}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *IMutableContext::currentContext;}
+\DoxyCodeLine{00050\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__context_8cpp}{catch\+\_\+context.\+cpp}}\end{DoxyCompactItemize}

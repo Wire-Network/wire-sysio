@@ -1,0 +1,196 @@
+\doxysection{sysio\+::chain\+::wasm\+\_\+config Struct Reference}
+\hypertarget{structsysio_1_1chain_1_1wasm__config}{}\label{structsysio_1_1chain_1_1wasm__config}\index{sysio::chain::wasm\_config@{sysio::chain::wasm\_config}}
+
+
+{\ttfamily \#include $<$wasm\+\_\+config.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_ab0237cb4af348d20ab9b509c6e19e83d}{validate}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::uint32\+\_\+t \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_aac3373d413a918e87214821a2d46c6fd}{max\+\_\+mutable\+\_\+global\+\_\+bytes}}
+\item 
+std\+::uint32\+\_\+t \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_a20a5ed65c27d5b99fb8f34faa4ad1ec7}{max\+\_\+table\+\_\+elements}}
+\item 
+std\+::uint32\+\_\+t \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_a40cd48e3034b328fe4f9694f9d49b8f4}{max\+\_\+section\+\_\+elements}}
+\item 
+std\+::uint32\+\_\+t \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_a10f26fadecb0acd707c88858931737f3}{max\+\_\+linear\+\_\+memory\+\_\+init}}
+\item 
+std\+::uint32\+\_\+t \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_a26926533af2db9739612fcc42268b6b7}{max\+\_\+func\+\_\+local\+\_\+bytes}}
+\item 
+std\+::uint32\+\_\+t \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_a76f94e2c8b5e6a17e8d6ccc3be4eeadf}{max\+\_\+nested\+\_\+structures}}
+\item 
+std\+::uint32\+\_\+t \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_a0bab877f4f8877793f2fe1079fac6b44}{max\+\_\+symbol\+\_\+bytes}}
+\item 
+std\+::uint32\+\_\+t \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_a9babd37977ef9c65c151773743dda59a}{max\+\_\+module\+\_\+bytes}}
+\item 
+std\+::uint32\+\_\+t \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_af87fa79dbb232ad9512984b68c5068e2}{max\+\_\+code\+\_\+bytes}}
+\item 
+std\+::uint32\+\_\+t \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_a3bf7b3aba9d090887ff190d23c7b6510}{max\+\_\+pages}}
+\item 
+std\+::uint32\+\_\+t \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_a6b45f20640aff5bd336e8f2b70c8f8c1}{max\+\_\+call\+\_\+depth}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{wasm__config_8hpp_source_l00009}{9}} of file \mbox{\hyperlink{wasm__config_8hpp_source}{wasm\+\_\+config.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1chain_1_1wasm__config_ab0237cb4af348d20ab9b509c6e19e83d}\index{sysio::chain::wasm\_config@{sysio::chain::wasm\_config}!validate@{validate}}
+\index{validate@{validate}!sysio::chain::wasm\_config@{sysio::chain::wasm\_config}}
+\doxysubsubsection{\texorpdfstring{validate()}{validate()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__config_ab0237cb4af348d20ab9b509c6e19e83d} 
+void wasm\+\_\+config\+::validate (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__config_8cpp_source_l00006}{6}} of file \mbox{\hyperlink{wasm__config_8cpp_source}{wasm\+\_\+config.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00006\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00007\ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_a40cd48e3034b328fe4f9694f9d49b8f4}{max\_section\_elements}}\ >=\ 4,\ \mbox{\hyperlink{namespacesysio_1_1chain_a764b50974b9b72a0e233e72176913d6b}{action\_validate\_exception}},\ \textcolor{stringliteral}{"{}max\_section\_elements\ cannot\ be\ less\ than\ 4"{}});}
+\DoxyCodeLine{00008\ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_a26926533af2db9739612fcc42268b6b7}{max\_func\_local\_bytes}}\ >=\ 8,\ \mbox{\hyperlink{namespacesysio_1_1chain_a764b50974b9b72a0e233e72176913d6b}{action\_validate\_exception}},\ \textcolor{stringliteral}{"{}max\_func\_local\_bytes\ cannot\ be\ less\ than\ 8"{}});}
+\DoxyCodeLine{00009\ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_a76f94e2c8b5e6a17e8d6ccc3be4eeadf}{max\_nested\_structures}}\ >=\ 1,\ \mbox{\hyperlink{namespacesysio_1_1chain_a764b50974b9b72a0e233e72176913d6b}{action\_validate\_exception}},\ \textcolor{stringliteral}{"{}max\_nested\_structures\ cannot\ be\ less\ than\ 1"{}});}
+\DoxyCodeLine{00010\ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_a0bab877f4f8877793f2fe1079fac6b44}{max\_symbol\_bytes}}\ >=\ 32,\ \mbox{\hyperlink{namespacesysio_1_1chain_a764b50974b9b72a0e233e72176913d6b}{action\_validate\_exception}},\ \textcolor{stringliteral}{"{}max\_symbol\_bytes\ cannot\ be\ less\ than\ 32"{}});}
+\DoxyCodeLine{00011\ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_a9babd37977ef9c65c151773743dda59a}{max\_module\_bytes}}\ >=\ 256,\ \mbox{\hyperlink{namespacesysio_1_1chain_a764b50974b9b72a0e233e72176913d6b}{action\_validate\_exception}},\ \textcolor{stringliteral}{"{}max\_module\_bytes\ cannot\ be\ less\ than\ 256"{}});}
+\DoxyCodeLine{00012\ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_af87fa79dbb232ad9512984b68c5068e2}{max\_code\_bytes}}\ >=\ 32,\ \mbox{\hyperlink{namespacesysio_1_1chain_a764b50974b9b72a0e233e72176913d6b}{action\_validate\_exception}},\ \textcolor{stringliteral}{"{}max\_code\_bytes\ cannot\ be\ less\ than\ 32"{}});}
+\DoxyCodeLine{00013\ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_a3bf7b3aba9d090887ff190d23c7b6510}{max\_pages}}\ >=\ 1,\ \mbox{\hyperlink{namespacesysio_1_1chain_a764b50974b9b72a0e233e72176913d6b}{action\_validate\_exception}},\ \textcolor{stringliteral}{"{}max\_pages\ cannot\ be\ less\ than\ 1"{}});}
+\DoxyCodeLine{00014\ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_a6b45f20640aff5bd336e8f2b70c8f8c1}{max\_call\_depth}}\ >=\ 2,\ \mbox{\hyperlink{namespacesysio_1_1chain_a764b50974b9b72a0e233e72176913d6b}{action\_validate\_exception}},\ \textcolor{stringliteral}{"{}max\_call\_depth\ cannot\ be\ less\ than\ 2"{}});}
+\DoxyCodeLine{00015\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1wasm__config_ab0237cb4af348d20ab9b509c6e19e83d_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1chain_1_1wasm__config_a6b45f20640aff5bd336e8f2b70c8f8c1}\index{sysio::chain::wasm\_config@{sysio::chain::wasm\_config}!max\_call\_depth@{max\_call\_depth}}
+\index{max\_call\_depth@{max\_call\_depth}!sysio::chain::wasm\_config@{sysio::chain::wasm\_config}}
+\doxysubsubsection{\texorpdfstring{max\_call\_depth}{max\_call\_depth}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__config_a6b45f20640aff5bd336e8f2b70c8f8c1} 
+std\+::uint32\+\_\+t sysio\+::chain\+::wasm\+\_\+config\+::max\+\_\+call\+\_\+depth}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__config_8hpp_source_l00020}{20}} of file \mbox{\hyperlink{wasm__config_8hpp_source}{wasm\+\_\+config.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__config_af87fa79dbb232ad9512984b68c5068e2}\index{sysio::chain::wasm\_config@{sysio::chain::wasm\_config}!max\_code\_bytes@{max\_code\_bytes}}
+\index{max\_code\_bytes@{max\_code\_bytes}!sysio::chain::wasm\_config@{sysio::chain::wasm\_config}}
+\doxysubsubsection{\texorpdfstring{max\_code\_bytes}{max\_code\_bytes}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__config_af87fa79dbb232ad9512984b68c5068e2} 
+std\+::uint32\+\_\+t sysio\+::chain\+::wasm\+\_\+config\+::max\+\_\+code\+\_\+bytes}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__config_8hpp_source_l00018}{18}} of file \mbox{\hyperlink{wasm__config_8hpp_source}{wasm\+\_\+config.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__config_a26926533af2db9739612fcc42268b6b7}\index{sysio::chain::wasm\_config@{sysio::chain::wasm\_config}!max\_func\_local\_bytes@{max\_func\_local\_bytes}}
+\index{max\_func\_local\_bytes@{max\_func\_local\_bytes}!sysio::chain::wasm\_config@{sysio::chain::wasm\_config}}
+\doxysubsubsection{\texorpdfstring{max\_func\_local\_bytes}{max\_func\_local\_bytes}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__config_a26926533af2db9739612fcc42268b6b7} 
+std\+::uint32\+\_\+t sysio\+::chain\+::wasm\+\_\+config\+::max\+\_\+func\+\_\+local\+\_\+bytes}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__config_8hpp_source_l00014}{14}} of file \mbox{\hyperlink{wasm__config_8hpp_source}{wasm\+\_\+config.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__config_a10f26fadecb0acd707c88858931737f3}\index{sysio::chain::wasm\_config@{sysio::chain::wasm\_config}!max\_linear\_memory\_init@{max\_linear\_memory\_init}}
+\index{max\_linear\_memory\_init@{max\_linear\_memory\_init}!sysio::chain::wasm\_config@{sysio::chain::wasm\_config}}
+\doxysubsubsection{\texorpdfstring{max\_linear\_memory\_init}{max\_linear\_memory\_init}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__config_a10f26fadecb0acd707c88858931737f3} 
+std\+::uint32\+\_\+t sysio\+::chain\+::wasm\+\_\+config\+::max\+\_\+linear\+\_\+memory\+\_\+init}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__config_8hpp_source_l00013}{13}} of file \mbox{\hyperlink{wasm__config_8hpp_source}{wasm\+\_\+config.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__config_a9babd37977ef9c65c151773743dda59a}\index{sysio::chain::wasm\_config@{sysio::chain::wasm\_config}!max\_module\_bytes@{max\_module\_bytes}}
+\index{max\_module\_bytes@{max\_module\_bytes}!sysio::chain::wasm\_config@{sysio::chain::wasm\_config}}
+\doxysubsubsection{\texorpdfstring{max\_module\_bytes}{max\_module\_bytes}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__config_a9babd37977ef9c65c151773743dda59a} 
+std\+::uint32\+\_\+t sysio\+::chain\+::wasm\+\_\+config\+::max\+\_\+module\+\_\+bytes}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__config_8hpp_source_l00017}{17}} of file \mbox{\hyperlink{wasm__config_8hpp_source}{wasm\+\_\+config.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__config_aac3373d413a918e87214821a2d46c6fd}\index{sysio::chain::wasm\_config@{sysio::chain::wasm\_config}!max\_mutable\_global\_bytes@{max\_mutable\_global\_bytes}}
+\index{max\_mutable\_global\_bytes@{max\_mutable\_global\_bytes}!sysio::chain::wasm\_config@{sysio::chain::wasm\_config}}
+\doxysubsubsection{\texorpdfstring{max\_mutable\_global\_bytes}{max\_mutable\_global\_bytes}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__config_aac3373d413a918e87214821a2d46c6fd} 
+std\+::uint32\+\_\+t sysio\+::chain\+::wasm\+\_\+config\+::max\+\_\+mutable\+\_\+global\+\_\+bytes}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__config_8hpp_source_l00010}{10}} of file \mbox{\hyperlink{wasm__config_8hpp_source}{wasm\+\_\+config.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__config_a76f94e2c8b5e6a17e8d6ccc3be4eeadf}\index{sysio::chain::wasm\_config@{sysio::chain::wasm\_config}!max\_nested\_structures@{max\_nested\_structures}}
+\index{max\_nested\_structures@{max\_nested\_structures}!sysio::chain::wasm\_config@{sysio::chain::wasm\_config}}
+\doxysubsubsection{\texorpdfstring{max\_nested\_structures}{max\_nested\_structures}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__config_a76f94e2c8b5e6a17e8d6ccc3be4eeadf} 
+std\+::uint32\+\_\+t sysio\+::chain\+::wasm\+\_\+config\+::max\+\_\+nested\+\_\+structures}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__config_8hpp_source_l00015}{15}} of file \mbox{\hyperlink{wasm__config_8hpp_source}{wasm\+\_\+config.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__config_a3bf7b3aba9d090887ff190d23c7b6510}\index{sysio::chain::wasm\_config@{sysio::chain::wasm\_config}!max\_pages@{max\_pages}}
+\index{max\_pages@{max\_pages}!sysio::chain::wasm\_config@{sysio::chain::wasm\_config}}
+\doxysubsubsection{\texorpdfstring{max\_pages}{max\_pages}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__config_a3bf7b3aba9d090887ff190d23c7b6510} 
+std\+::uint32\+\_\+t sysio\+::chain\+::wasm\+\_\+config\+::max\+\_\+pages}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__config_8hpp_source_l00019}{19}} of file \mbox{\hyperlink{wasm__config_8hpp_source}{wasm\+\_\+config.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__config_a40cd48e3034b328fe4f9694f9d49b8f4}\index{sysio::chain::wasm\_config@{sysio::chain::wasm\_config}!max\_section\_elements@{max\_section\_elements}}
+\index{max\_section\_elements@{max\_section\_elements}!sysio::chain::wasm\_config@{sysio::chain::wasm\_config}}
+\doxysubsubsection{\texorpdfstring{max\_section\_elements}{max\_section\_elements}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__config_a40cd48e3034b328fe4f9694f9d49b8f4} 
+std\+::uint32\+\_\+t sysio\+::chain\+::wasm\+\_\+config\+::max\+\_\+section\+\_\+elements}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__config_8hpp_source_l00012}{12}} of file \mbox{\hyperlink{wasm__config_8hpp_source}{wasm\+\_\+config.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__config_a0bab877f4f8877793f2fe1079fac6b44}\index{sysio::chain::wasm\_config@{sysio::chain::wasm\_config}!max\_symbol\_bytes@{max\_symbol\_bytes}}
+\index{max\_symbol\_bytes@{max\_symbol\_bytes}!sysio::chain::wasm\_config@{sysio::chain::wasm\_config}}
+\doxysubsubsection{\texorpdfstring{max\_symbol\_bytes}{max\_symbol\_bytes}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__config_a0bab877f4f8877793f2fe1079fac6b44} 
+std\+::uint32\+\_\+t sysio\+::chain\+::wasm\+\_\+config\+::max\+\_\+symbol\+\_\+bytes}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__config_8hpp_source_l00016}{16}} of file \mbox{\hyperlink{wasm__config_8hpp_source}{wasm\+\_\+config.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__config_a20a5ed65c27d5b99fb8f34faa4ad1ec7}\index{sysio::chain::wasm\_config@{sysio::chain::wasm\_config}!max\_table\_elements@{max\_table\_elements}}
+\index{max\_table\_elements@{max\_table\_elements}!sysio::chain::wasm\_config@{sysio::chain::wasm\_config}}
+\doxysubsubsection{\texorpdfstring{max\_table\_elements}{max\_table\_elements}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__config_a20a5ed65c27d5b99fb8f34faa4ad1ec7} 
+std\+::uint32\+\_\+t sysio\+::chain\+::wasm\+\_\+config\+::max\+\_\+table\+\_\+elements}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__config_8hpp_source_l00011}{11}} of file \mbox{\hyperlink{wasm__config_8hpp_source}{wasm\+\_\+config.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{wasm__config_8hpp}{wasm\+\_\+config.\+hpp}}\item 
+libraries/chain/\mbox{\hyperlink{wasm__config_8cpp}{wasm\+\_\+config.\+cpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,32 @@
+\doxysection{Logging.\+h}
+\hypertarget{_logging_8h_source}{}\label{_logging_8h_source}\index{libraries/wasm-\/jit/Include/Logging/Logging.h@{libraries/wasm-\/jit/Include/Logging/Logging.h}}
+\mbox{\hyperlink{_logging_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_logging_8h_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{_logging_8h_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_logging_8h_source_l00003}00003\ \textcolor{preprocessor}{\#ifndef\ LOGGING\_API}}
+\DoxyCodeLine{\Hypertarget{_logging_8h_source_l00004}\mbox{\hyperlink{_logging_8h_acc3b7214ce9c503bcca745b8f13063c1}{00004}}\ \textcolor{preprocessor}{\ \ \ \ \#define\ LOGGING\_API\ DLL\_IMPORT}}
+\DoxyCodeLine{\Hypertarget{_logging_8h_source_l00005}00005\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{_logging_8h_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{_logging_8h_source_l00007}00007\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_basic_types_8h}{Inline/BasicTypes.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_logging_8h_source_l00008}00008\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h}{Platform/Platform.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_logging_8h_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{_logging_8h_source_l00010}00010\ \textcolor{comment}{//\ Debug\ logging.}}
+\DoxyCodeLine{\Hypertarget{_logging_8h_source_l00011}\mbox{\hyperlink{namespace_log}{00011}}\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_log}{Log}}}
+\DoxyCodeLine{\Hypertarget{_logging_8h_source_l00012}00012\ \{}
+\DoxyCodeLine{\Hypertarget{_logging_8h_source_l00013}00013\ \ \ \ \ \textcolor{comment}{//\ Allow\ filtering\ the\ logging\ by\ category.}}
+\DoxyCodeLine{\Hypertarget{_logging_8h_source_l00014}\mbox{\hyperlink{namespace_log_a1f055cc08a2ed074aa74f9d99c8a0901}{00014}}\ \ \ \ \ \textcolor{keyword}{enum\ class}\ \mbox{\hyperlink{namespace_log_a1f055cc08a2ed074aa74f9d99c8a0901}{Category}}}
+\DoxyCodeLine{\Hypertarget{_logging_8h_source_l00015}00015\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_logging_8h_source_l00016}00016\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a1f055cc08a2ed074aa74f9d99c8a0901acb5e100e5a9a3e7f6d1fd97512215282}{error}},}
+\DoxyCodeLine{\Hypertarget{_logging_8h_source_l00017}00017\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a1f055cc08a2ed074aa74f9d99c8a0901aad42f6697b035b7580e4fef93be20b4d}{debug}},}
+\DoxyCodeLine{\Hypertarget{_logging_8h_source_l00018}00018\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a1f055cc08a2ed074aa74f9d99c8a0901aaa59d67c2123f094d0d6798ffe651c4d}{metrics}},}
+\DoxyCodeLine{\Hypertarget{_logging_8h_source_l00019}00019\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a1f055cc08a2ed074aa74f9d99c8a0901a0fc3cfbc27e91ea60a787de13dae3e3c}{num}}}
+\DoxyCodeLine{\Hypertarget{_logging_8h_source_l00020}00020\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_logging_8h_source_l00021}00021\ \ \ \ \ \mbox{\hyperlink{_logging_8h_acc3b7214ce9c503bcca745b8f13063c1}{LOGGING\_API}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespace_log_a606363a3c198ebb5e5843cde96282a47}{setCategoryEnabled}}(\mbox{\hyperlink{namespace_log_a1f055cc08a2ed074aa74f9d99c8a0901}{Category}}\ category,\textcolor{keywordtype}{bool}\ enable);}
+\DoxyCodeLine{\Hypertarget{_logging_8h_source_l00022}00022\ \ \ \ \ \mbox{\hyperlink{_logging_8h_acc3b7214ce9c503bcca745b8f13063c1}{LOGGING\_API}}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespace_log_a2f2e440d94d04f480e2258096241f07f}{isCategoryEnabled}}(\mbox{\hyperlink{namespace_log_a1f055cc08a2ed074aa74f9d99c8a0901}{Category}}\ category);}
+\DoxyCodeLine{\Hypertarget{_logging_8h_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{_logging_8h_source_l00024}00024\ \ \ \ \ \textcolor{comment}{//\ Print\ some\ categorized,\ formatted\ string,\ and\ flush\ the\ output.\ Newline\ is\ not\ included.}}
+\DoxyCodeLine{\Hypertarget{_logging_8h_source_l00025}00025\ \ \ \ \ \mbox{\hyperlink{_logging_8h_acc3b7214ce9c503bcca745b8f13063c1}{LOGGING\_API}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\mbox{\hyperlink{namespace_log_a1f055cc08a2ed074aa74f9d99c8a0901}{Category}}\ category,\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}},...);}
+\DoxyCodeLine{\Hypertarget{_logging_8h_source_l00026}00026\ \};}
+
+\end{DoxyCode}

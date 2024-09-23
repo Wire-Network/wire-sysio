@@ -1,0 +1,62 @@
+\doxysection{sysio\+::chain\+\_\+apis\+::resolver\+\_\+factory Struct Reference}
+\hypertarget{structsysio_1_1chain__apis_1_1resolver__factory}{}\label{structsysio_1_1chain__apis_1_1resolver__factory}\index{sysio::chain\_apis::resolver\_factory@{sysio::chain\_apis::resolver\_factory}}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static auto \mbox{\hyperlink{structsysio_1_1chain__apis_1_1resolver__factory_a1beb8a75295e98a03a1fb2496887156b}{make}} (const \mbox{\hyperlink{classsysio_1_1chain_1_1controller}{controller}} \&control, \mbox{\hyperlink{structsysio_1_1chain_1_1abi__serializer_ac81c8efe132df6ebffcfa61fb2a6959e}{abi\+\_\+serializer\+::yield\+\_\+function\+\_\+t}} yield)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{chain__plugin_8cpp_source_l01949}{1949}} of file \mbox{\hyperlink{chain__plugin_8cpp_source}{chain\+\_\+plugin.\+cpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1chain__apis_1_1resolver__factory_a1beb8a75295e98a03a1fb2496887156b}\index{sysio::chain\_apis::resolver\_factory@{sysio::chain\_apis::resolver\_factory}!make@{make}}
+\index{make@{make}!sysio::chain\_apis::resolver\_factory@{sysio::chain\_apis::resolver\_factory}}
+\doxysubsubsection{\texorpdfstring{make()}{make()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain__apis_1_1resolver__factory_a1beb8a75295e98a03a1fb2496887156b} 
+static auto sysio\+::chain\+\_\+apis\+::resolver\+\_\+factory\+::make (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classsysio_1_1chain_1_1controller}{controller}} \&}]{control}{, }\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1abi__serializer_ac81c8efe132df6ebffcfa61fb2a6959e}{abi\+\_\+serializer\+::yield\+\_\+function\+\_\+t}}}]{yield}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{chain__plugin_8cpp_source_l01950}{1950}} of file \mbox{\hyperlink{chain__plugin_8cpp_source}{chain\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01950\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01951\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [\&control,\ \mbox{\hyperlink{namespaceboost_1_1fibers_1_1asio_a65142b77539b20ba6d2abb35a0d4f5d2}{yield}}\{std::move(yield)\}](\textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\_name}}\ \&\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})\ -\/>\ std::optional<abi\_serializer>\ \{}
+\DoxyCodeLine{01952\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}*\ accnt\ =\ control.db().template\ find<account\_object,\ by\_name>(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}});}
+\DoxyCodeLine{01953\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (accnt\ !=\ \textcolor{keyword}{nullptr})\ \{}
+\DoxyCodeLine{01954\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ abi\_def\ abi;}
+\DoxyCodeLine{01955\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structsysio_1_1chain_1_1abi__serializer_a551ed3dd188f2a751a4edf81c76502c2}{abi\_serializer::to\_abi}}(accnt-\/>abi,\ abi))\ \{}
+\DoxyCodeLine{01956\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ abi\_serializer(abi,\ yield);}
+\DoxyCodeLine{01957\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01958\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01959\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::optional<abi\_serializer>();}
+\DoxyCodeLine{01960\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{01961\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain__apis_1_1resolver__factory_a1beb8a75295e98a03a1fb2496887156b_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain__apis_1_1resolver__factory_a1beb8a75295e98a03a1fb2496887156b_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+plugins/chain\+\_\+plugin/\mbox{\hyperlink{chain__plugin_8cpp}{chain\+\_\+plugin.\+cpp}}\end{DoxyCompactItemize}

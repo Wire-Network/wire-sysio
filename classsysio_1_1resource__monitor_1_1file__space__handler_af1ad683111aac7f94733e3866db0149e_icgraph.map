@@ -1,0 +1,9 @@
+<map id="sysio::resource_monitor::file_space_handler::set_sleep_time" name="sysio::resource_monitor::file_space_handler::set_sleep_time">
+<area shape="rect" id="Node000001" title=" " alt="" coords="439,31,599,87"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1resource__monitor__plugin__impl.html#a0660c265b1bb7600e647c61087be62da" title=" " alt="" coords="202,5,391,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="423,47,391,43,392,37,424,42"/>
+<area shape="rect" id="Node000003" href="$structspace__handler__fixture.html#a307c90555c5d6ece20697d3a3347e4e9" title=" " alt="" coords="222,71,370,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="424,75,371,83,370,78,423,70"/>
+<area shape="rect" id="Node000004" href="$structspace__handler__fixture.html#a2f88ee3184e87f67f178e4c4074be6f3" title=" " alt="" coords="5,71,154,111"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="207,94,154,94,154,88,207,88"/>
+</map>

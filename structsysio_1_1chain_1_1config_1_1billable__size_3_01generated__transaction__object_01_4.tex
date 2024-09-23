@@ -1,0 +1,48 @@
+\doxysection{sysio\+::chain\+::config\+::billable\+\_\+size\texorpdfstring{$<$}{<} generated\+\_\+transaction\+\_\+object \texorpdfstring{$>$}{>} Struct Reference}
+\hypertarget{structsysio_1_1chain_1_1config_1_1billable__size_3_01generated__transaction__object_01_4}{}\label{structsysio_1_1chain_1_1config_1_1billable__size_3_01generated__transaction__object_01_4}\index{sysio::chain::config::billable\_size$<$ generated\_transaction\_object $>$@{sysio::chain::config::billable\_size$<$ generated\_transaction\_object $>$}}
+
+
+{\ttfamily \#include $<$generated\+\_\+transaction\+\_\+object.\+hpp$>$}
+
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static const \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1config_1_1billable__size_3_01generated__transaction__object_01_4_af926faf71b8216e7b2b69512382b8336}{overhead}} = overhead\+\_\+per\+\_\+row\+\_\+per\+\_\+index\+\_\+ram\+\_\+bytes \texorpdfstring{$\ast$}{*} 5
+\begin{DoxyCompactList}\small\item\em overhead for 5x indices internal-\/key, txid, expiration, delay, sender\+\_\+id \end{DoxyCompactList}\item 
+static const \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1config_1_1billable__size_3_01generated__transaction__object_01_4_a035bd45f980589e3a2018b7960b6f121}{value}} = 96 + 4 + \mbox{\hyperlink{structsysio_1_1chain_1_1config_1_1billable__size_3_01generated__transaction__object_01_4_af926faf71b8216e7b2b69512382b8336}{overhead}}
+\begin{DoxyCompactList}\small\item\em 96 bytes for our constant size fields, 4 bytes for a varint for packed\+\_\+trx size and 96 bytes of implementation overhead \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{generated__transaction__object_8hpp_source_l00108}{108}} of file \mbox{\hyperlink{generated__transaction__object_8hpp_source}{generated\+\_\+transaction\+\_\+object.\+hpp}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1chain_1_1config_1_1billable__size_3_01generated__transaction__object_01_4_af926faf71b8216e7b2b69512382b8336}\index{sysio::chain::config::billable\_size$<$ generated\_transaction\_object $>$@{sysio::chain::config::billable\_size$<$ generated\_transaction\_object $>$}!overhead@{overhead}}
+\index{overhead@{overhead}!sysio::chain::config::billable\_size$<$ generated\_transaction\_object $>$@{sysio::chain::config::billable\_size$<$ generated\_transaction\_object $>$}}
+\doxysubsubsection{\texorpdfstring{overhead}{overhead}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1config_1_1billable__size_3_01generated__transaction__object_01_4_af926faf71b8216e7b2b69512382b8336} 
+const \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1config_1_1billable__size}{sysio\+::chain\+::config\+::billable\+\_\+size}}$<$ \mbox{\hyperlink{classsysio_1_1chain_1_1generated__transaction__object}{generated\+\_\+transaction\+\_\+object}} $>$\+::overhead = overhead\+\_\+per\+\_\+row\+\_\+per\+\_\+index\+\_\+ram\+\_\+bytes \texorpdfstring{$\ast$}{*} 5\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{generated__transaction__object_8hpp_source_l00109}{109}} of file \mbox{\hyperlink{generated__transaction__object_8hpp_source}{generated\+\_\+transaction\+\_\+object.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1config_1_1billable__size_3_01generated__transaction__object_01_4_a035bd45f980589e3a2018b7960b6f121}\index{sysio::chain::config::billable\_size$<$ generated\_transaction\_object $>$@{sysio::chain::config::billable\_size$<$ generated\_transaction\_object $>$}!value@{value}}
+\index{value@{value}!sysio::chain::config::billable\_size$<$ generated\_transaction\_object $>$@{sysio::chain::config::billable\_size$<$ generated\_transaction\_object $>$}}
+\doxysubsubsection{\texorpdfstring{value}{value}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1config_1_1billable__size_3_01generated__transaction__object_01_4_a035bd45f980589e3a2018b7960b6f121} 
+const \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1config_1_1billable__size}{sysio\+::chain\+::config\+::billable\+\_\+size}}$<$ \mbox{\hyperlink{classsysio_1_1chain_1_1generated__transaction__object}{generated\+\_\+transaction\+\_\+object}} $>$\+::value = 96 + 4 + \mbox{\hyperlink{structsysio_1_1chain_1_1config_1_1billable__size_3_01generated__transaction__object_01_4_af926faf71b8216e7b2b69512382b8336}{overhead}}\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{generated__transaction__object_8hpp_source_l00110}{110}} of file \mbox{\hyperlink{generated__transaction__object_8hpp_source}{generated\+\_\+transaction\+\_\+object.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{generated__transaction__object_8hpp}{generated\+\_\+transaction\+\_\+object.\+hpp}}\end{DoxyCompactItemize}

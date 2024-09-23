@@ -1,0 +1,105 @@
+\doxysection{Catch\+::Oc\+Method Class Reference}
+\hypertarget{class_catch_1_1_oc_method}{}\label{class_catch_1_1_oc_method}\index{Catch::OcMethod@{Catch::OcMethod}}
+
+
+{\ttfamily \#include $<$catch\+\_\+objc.\+hpp$>$}
+
+
+
+Inheritance diagram for Catch\+::Oc\+Method\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=182pt]{class_catch_1_1_oc_method__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Catch\+::Oc\+Method\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=182pt]{class_catch_1_1_oc_method__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Instance Methods}
+\begin{DoxyCompactItemize}
+\item 
+() -\/ \mbox{\hyperlink{class_catch_1_1_oc_method_a2f6a821f6dec3915e9ce9b8a6a6a488c}{Oc\+Method}}
+\item 
+(virtual void) -\/ \mbox{\hyperlink{class_catch_1_1_oc_method_a6146e17328d69b0815c1b635e3f8d01f}{invoke}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Instance Methods inherited from \mbox{\hyperlink{struct_catch_1_1_i_test_invoker}{Catch\+::\+ITest\+Invoker}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{struct_catch_1_1_i_test_invoker_a99f1c750e08df86e117995ea75b5dd9d}{\texorpdfstring{$\sim$}{\string~}\+ITest\+Invoker}} ()
+\item 
+virtual \mbox{\hyperlink{struct_catch_1_1_i_test_invoker_a2c89f3eece5b1b677243766e409bd831}{\texorpdfstring{$\sim$}{\string~}\+ITest\+Invoker}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{catch__objc_8hpp_source_l00038}{38}} of file \mbox{\hyperlink{catch__objc_8hpp_source}{catch\+\_\+objc.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_catch_1_1_oc_method_a2f6a821f6dec3915e9ce9b8a6a6a488c}\index{Catch::OcMethod@{Catch::OcMethod}!OcMethod@{OcMethod}}
+\index{OcMethod@{OcMethod}!Catch::OcMethod@{Catch::OcMethod}}
+\doxysubsubsection{\texorpdfstring{OcMethod}{OcMethod}}
+{\footnotesize\ttfamily \label{class_catch_1_1_oc_method_a2f6a821f6dec3915e9ce9b8a6a6a488c} 
+-\/ Oc\+Method\+: \begin{DoxyParamCaption}\item[{(Class)}]{cls}{}\item[{(SEL)}]{sel}{}\end{DoxyParamCaption}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__objc_8hpp_source_l00041}{41}} of file \mbox{\hyperlink{catch__objc_8hpp_source}{catch\+\_\+objc.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00041\ :\ m\_cls(\ cls\ ),\ m\_sel(\ sel\ )\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Method Documentation}
+\Hypertarget{class_catch_1_1_oc_method_a6146e17328d69b0815c1b635e3f8d01f}\index{Catch::OcMethod@{Catch::OcMethod}!invoke@{invoke}}
+\index{invoke@{invoke}!Catch::OcMethod@{Catch::OcMethod}}
+\doxysubsubsection{\texorpdfstring{invoke}{invoke}}
+{\footnotesize\ttfamily \label{class_catch_1_1_oc_method_a6146e17328d69b0815c1b635e3f8d01f} 
+-\/ (virtual void) Oc\+Method\+: \begin{DoxyParamCaption}{}{}\end{DoxyParamCaption} const}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_i_test_invoker_a6fcd5c5b67d6d5ade6491ff33411ca7f}{Catch\+::\+ITest\+Invoker}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__objc_8hpp_source_l00043}{43}} of file \mbox{\hyperlink{catch__objc_8hpp_source}{catch\+\_\+objc.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{id}\ obj\ =\ [[m\_cls\ alloc]\ init];}
+\DoxyCodeLine{00045\ }
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{catch__objc__arc_8hpp_a2e982f858537aef4c41489fee41bdd91}{performOptionalSelector}}(\ obj,\ \textcolor{keyword}{@selector}(setUp)\ \ );}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{catch__objc__arc_8hpp_a2e982f858537aef4c41489fee41bdd91}{performOptionalSelector}}(\ obj,\ m\_sel\ );}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{catch__objc__arc_8hpp_a2e982f858537aef4c41489fee41bdd91}{performOptionalSelector}}(\ obj,\ \textcolor{keyword}{@selector}(tearDown)\ \ );}
+\DoxyCodeLine{00049\ }
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{catch__objc__arc_8hpp_a1f6b4a44e1eaaa87534d1f28669897dc}{arcSafeRelease}}(\ obj\ );}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_oc_method_a6146e17328d69b0815c1b635e3f8d01f_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__objc_8hpp}{catch\+\_\+objc.\+hpp}}\end{DoxyCompactItemize}

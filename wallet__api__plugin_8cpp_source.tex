@@ -1,0 +1,166 @@
+\doxysection{wallet\+\_\+api\+\_\+plugin.\+cpp}
+\hypertarget{wallet__api__plugin_8cpp_source}{}\label{wallet__api__plugin_8cpp_source}\index{plugins/wallet\_api\_plugin/wallet\_api\_plugin.cpp@{plugins/wallet\_api\_plugin/wallet\_api\_plugin.cpp}}
+\mbox{\hyperlink{wallet__api__plugin_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{wallet__api__plugin_8hpp}{sysio/wallet\_api\_plugin/wallet\_api\_plugin.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{wallet__manager_8hpp}{sysio/wallet\_plugin/wallet\_manager.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp}{sysio/chain/exceptions.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{transaction_8hpp}{sysio/chain/transaction.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{fc_2include_2fc_2variant_8hpp}{fc/variant.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{json_8hpp}{fc/io/json.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ <chrono>}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00011}00011\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacedetail}{detail}}\ \{}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00012}\mbox{\hyperlink{structsysio_1_1detail_1_1wallet__api__plugin__empty}{00012}}\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structsysio_1_1detail_1_1wallet__api__plugin__empty}{wallet\_api\_plugin\_empty}}\ \{\};}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00013}00013\ \}\}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00015}\mbox{\hyperlink{wallet__api__plugin_8cpp_a7ba6b01b2e12a455ca90219af6634101}{00015}}\ \mbox{\hyperlink{reflect_8hpp_a2ace850e636b1ca0b18fe3177e413d99}{FC\_REFLECT}}(\mbox{\hyperlink{structsysio_1_1detail_1_1wallet__api__plugin__empty}{sysio::detail::wallet\_api\_plugin\_empty}},\ );}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00017}00017\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00019}00019\ \textcolor{keyword}{static}\ \mbox{\hyperlink{classappbase_1_1abstract__plugin}{appbase::abstract\_plugin}}\&\ \_wallet\_api\_plugin\ =\ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_a87e84549150056c56c0327cc4976cc2a}{register\_plugin}}<wallet\_api\_plugin>();}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00021}00021\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}};}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00023}\mbox{\hyperlink{wallet__api__plugin_8cpp_afb00f07822ae80766057c9439f2d8118}{00023}}\ \textcolor{preprocessor}{\#define\ CALL\_WITH\_400(api\_name,\ api\_handle,\ call\_name,\ INVOKE,\ http\_response\_code)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00024}00024\ \textcolor{preprocessor}{\{std::string("{}/v1/"{}\ \#api\_name\ "{}/"{}\ \#call\_name),\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00025}00025\ \textcolor{preprocessor}{\ \ \ [\&api\_handle](string,\ string\ body,\ url\_response\_callback\ cb)\ mutable\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00026}00026\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ try\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00027}00027\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ INVOKE\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00028}00028\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ cb(http\_response\_code,\ fc::variant(result));\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00029}00029\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \}\ catch\ (...)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00030}00030\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ http\_plugin::handle\_exception(\#api\_name,\ \#call\_name,\ body,\ cb);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00031}00031\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00032}00032\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \}\}}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00034}\mbox{\hyperlink{wallet__api__plugin_8cpp_afab796843c5c67526de271f4207fcd37}{00034}}\ \textcolor{preprocessor}{\#define\ INVOKE\_R\_R(api\_handle,\ call\_name,\ in\_param)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00035}00035\ \textcolor{preprocessor}{\ \ \ \ \ auto\ params\ =\ parse\_params<in\_param,\ http\_params\_types::params\_required>(body);\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00036}00036\ \textcolor{preprocessor}{\ \ \ \ \ auto\ result\ =\ api\_handle.call\_name(\ std::move(params)\ );}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00038}\mbox{\hyperlink{wallet__api__plugin_8cpp_a3169252a7a000e497d9cfbac32461c2e}{00038}}\ \textcolor{preprocessor}{\#define\ INVOKE\_R\_R\_R(api\_handle,\ call\_name,\ in\_param0,\ in\_param1)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00039}00039\ \textcolor{preprocessor}{\ \ \ \ \ const\ auto\&\ params\ =\ parse\_params<fc::variants,\ http\_params\_types::params\_required>(body);\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00040}00040\ \textcolor{preprocessor}{\ \ \ \ \ if\ (params.size()\ !=\ 2)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00041}00041\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ SYS\_THROW(chain::invalid\_http\_request,\ "{}Missing\ valid\ input\ from\ POST\ body"{});\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00042}00042\ \textcolor{preprocessor}{\ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00043}00043\ \textcolor{preprocessor}{\ \ \ \ \ auto\ result\ =\ api\_handle.call\_name(params.at(0).as<in\_param0>(),\ params.at(1).as<in\_param1>());}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00045}00045\ \textcolor{comment}{//\ chain\_id\_type\ does\ not\ have\ default\ constructor,\ keep\ it\ unchanged}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00046}\mbox{\hyperlink{wallet__api__plugin_8cpp_a13ce85c1c960b23c926f782666868b0a}{00046}}\ \textcolor{preprocessor}{\#define\ INVOKE\_R\_R\_R\_R(api\_handle,\ call\_name,\ in\_param0,\ in\_param1,\ in\_param2)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00047}00047\ \textcolor{preprocessor}{\ \ \ \ \ const\ auto\&\ params\ =\ parse\_params<fc::variants,\ http\_params\_types::params\_required>(body);\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00048}00048\ \textcolor{preprocessor}{\ \ \ \ \ if\ (params.size()\ !=\ 3)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00049}00049\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ SYS\_THROW(chain::invalid\_http\_request,\ "{}Missing\ valid\ input\ from\ POST\ body"{});\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00050}00050\ \textcolor{preprocessor}{\ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00051}00051\ \textcolor{preprocessor}{\ \ \ \ \ auto\ result\ =\ api\_handle.call\_name(params.at(0).as<in\_param0>(),\ params.at(1).as<in\_param1>(),\ params.at(2).as<in\_param2>());}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00052}00052\ }
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00053}\mbox{\hyperlink{wallet__api__plugin_8cpp_a57be4224a1ade2bd8b3923d6a344d98b}{00053}}\ \textcolor{preprocessor}{\#define\ INVOKE\_R\_V(api\_handle,\ call\_name)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00054}00054\ \textcolor{preprocessor}{\ \ \ \ \ body\ =\ parse\_params<std::string,\ http\_params\_types::no\_params>(body);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00055}00055\ \textcolor{preprocessor}{\ \ \ \ \ auto\ result\ =\ api\_handle.call\_name();}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00057}\mbox{\hyperlink{wallet__api__plugin_8cpp_a4dc31462f24aaa120af888e8e9358800}{00057}}\ \textcolor{preprocessor}{\#define\ INVOKE\_V\_R(api\_handle,\ call\_name,\ in\_param)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00058}00058\ \textcolor{preprocessor}{\ \ \ \ \ auto\ params\ =\ parse\_params<in\_param,\ http\_params\_types::params\_required>(body);\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00059}00059\ \textcolor{preprocessor}{\ \ \ \ \ api\_handle.call\_name(\ std::move(params)\ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00060}00060\ \textcolor{preprocessor}{\ \ \ \ \ sysio::detail::wallet\_api\_plugin\_empty\ result;}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00062}\mbox{\hyperlink{wallet__api__plugin_8cpp_a653b6a13b0cc13bed8565f0d19aa8e03}{00062}}\ \textcolor{preprocessor}{\#define\ INVOKE\_V\_R\_R(api\_handle,\ call\_name,\ in\_param0,\ in\_param1)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00063}00063\ \textcolor{preprocessor}{\ \ \ \ \ const\ auto\&\ params\ =\ parse\_params<fc::variants,\ http\_params\_types::params\_required>(body);\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00064}00064\ \textcolor{preprocessor}{\ \ \ \ \ if\ (params.size()\ !=\ 2)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00065}00065\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ SYS\_THROW(chain::invalid\_http\_request,\ "{}Missing\ valid\ input\ from\ POST\ body"{});\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00066}00066\ \textcolor{preprocessor}{\ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00067}00067\ \textcolor{preprocessor}{\ \ \ \ \ api\_handle.call\_name(params.at(0).as<in\_param0>(),\ params.at(1).as<in\_param1>());\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00068}00068\ \textcolor{preprocessor}{\ \ \ \ \ sysio::detail::wallet\_api\_plugin\_empty\ result;}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00069}00069\ }
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00070}\mbox{\hyperlink{wallet__api__plugin_8cpp_a0e00cd8085030cd38c1fd93a92ea8e7a}{00070}}\ \textcolor{preprocessor}{\#define\ INVOKE\_V\_R\_R\_R(api\_handle,\ call\_name,\ in\_param0,\ in\_param1,\ in\_param2)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00071}00071\ \textcolor{preprocessor}{\ \ \ \ \ const\ auto\&\ params\ =\ parse\_params<fc::variants,\ http\_params\_types::params\_required>(body);\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00072}00072\ \textcolor{preprocessor}{\ \ \ \ \ if\ (params.size()\ !=\ 3)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00073}00073\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ SYS\_THROW(chain::invalid\_http\_request,\ "{}Missing\ valid\ input\ from\ POST\ body"{});\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00074}00074\ \textcolor{preprocessor}{\ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00075}00075\ \textcolor{preprocessor}{\ \ \ \ \ api\_handle.call\_name(params.at(0).as<in\_param0>(),\ params.at(1).as<in\_param1>(),\ params.at(2).as<in\_param2>());\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00076}00076\ \textcolor{preprocessor}{\ \ \ \ \ sysio::detail::wallet\_api\_plugin\_empty\ result;}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00077}00077\ }
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00078}\mbox{\hyperlink{wallet__api__plugin_8cpp_a54f8b56aff9e470dbebbddd544256b8f}{00078}}\ \textcolor{preprocessor}{\#define\ INVOKE\_V\_V(api\_handle,\ call\_name)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00079}00079\ \textcolor{preprocessor}{\ \ \ \ \ body\ =\ parse\_params<std::string,\ http\_params\_types::no\_params>(body);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00080}00080\ \textcolor{preprocessor}{\ \ \ \ \ api\_handle.call\_name();\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00081}00081\ \textcolor{preprocessor}{\ \ \ \ \ sysio::detail::wallet\_api\_plugin\_empty\ result;}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00083}\mbox{\hyperlink{classsysio_1_1wallet__api__plugin_aedfa4e0e73e8366a11b7215abbde7a76}{00083}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1wallet__api__plugin_aedfa4e0e73e8366a11b7215abbde7a76}{wallet\_api\_plugin::plugin\_startup}}()\ \{}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00084}00084\ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\textcolor{stringliteral}{"{}starting\ wallet\_api\_plugin"{}});}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00085}00085\ \ \ \ \textcolor{comment}{//\ lifetime\ of\ plugin\ is\ lifetime\ of\ application}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00086}00086\ \ \ \ \textcolor{keyword}{auto}\&\ wallet\_mgr\ =\ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_a3c4b68a0667942b58f1369f454ce0ce3}{get\_plugin}}<\mbox{\hyperlink{classsysio_1_1wallet__plugin}{wallet\_plugin}}>().get\_wallet\_manager();}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00087}00087\ }
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00088}00088\ \ \ \ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_a3c4b68a0667942b58f1369f454ce0ce3}{get\_plugin}}<\mbox{\hyperlink{classsysio_1_1http__plugin}{http\_plugin}}>().add\_api(\{}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00089}00089\ \ \ \ \ \ \ \ \mbox{\hyperlink{chain__api__plugin_8cpp_ab9297a5c7b7f085c77cad8641f734ba6}{CALL\_WITH\_400}}(wallet,\ wallet\_mgr,\ set\_timeout,}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00090}00090\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{net__api__plugin_8cpp_a4dc31462f24aaa120af888e8e9358800}{INVOKE\_V\_R}}(wallet\_mgr,\ set\_timeout,\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}),\ 200),}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00091}00091\ \ \ \ \ \ \ \ \textcolor{comment}{//\ \ chain::chain\_id\_type\ has\ an\ inaccessible\ default\ constructor}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00092}00092\ \ \ \ \ \ \ \ \mbox{\hyperlink{chain__api__plugin_8cpp_ab9297a5c7b7f085c77cad8641f734ba6}{CALL\_WITH\_400}}(wallet,\ wallet\_mgr,\ \mbox{\hyperlink{programs_2clio_2main_8cpp_a240824165e34e327e32abf12138d10e6}{sign\_transaction}},}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00093}00093\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{wallet__api__plugin_8cpp_a13ce85c1c960b23c926f782666868b0a}{INVOKE\_R\_R\_R\_R}}(wallet\_mgr,\ \mbox{\hyperlink{programs_2clio_2main_8cpp_a240824165e34e327e32abf12138d10e6}{sign\_transaction}},\ \mbox{\hyperlink{structsysio_1_1chain_1_1signed__transaction}{chain::signed\_transaction}},\ chain::flat\_set<public\_key\_type>,\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__id__type}{chain::chain\_id\_type}}),\ 201),}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00094}00094\ \ \ \ \ \ \ \ \mbox{\hyperlink{chain__api__plugin_8cpp_ab9297a5c7b7f085c77cad8641f734ba6}{CALL\_WITH\_400}}(wallet,\ wallet\_mgr,\ sign\_digest,}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00095}00095\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{wallet__api__plugin_8cpp_a3169252a7a000e497d9cfbac32461c2e}{INVOKE\_R\_R\_R}}(wallet\_mgr,\ sign\_digest,\ \mbox{\hyperlink{classfc_1_1sha256}{chain::digest\_type}},\ \mbox{\hyperlink{classfc_1_1crypto_1_1public__key}{public\_key\_type}}),\ 201),}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00096}00096\ \ \ \ \ \ \ \ \mbox{\hyperlink{chain__api__plugin_8cpp_ab9297a5c7b7f085c77cad8641f734ba6}{CALL\_WITH\_400}}(wallet,\ wallet\_mgr,\ create,}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00097}00097\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{net__api__plugin_8cpp_afab796843c5c67526de271f4207fcd37}{INVOKE\_R\_R}}(wallet\_mgr,\ create,\ std::string),\ 201),}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00098}00098\ \ \ \ \ \ \ \ \mbox{\hyperlink{chain__api__plugin_8cpp_ab9297a5c7b7f085c77cad8641f734ba6}{CALL\_WITH\_400}}(wallet,\ wallet\_mgr,\ open,}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00099}00099\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{net__api__plugin_8cpp_a4dc31462f24aaa120af888e8e9358800}{INVOKE\_V\_R}}(wallet\_mgr,\ open,\ std::string),\ 200),}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00100}00100\ \ \ \ \ \ \ \ \mbox{\hyperlink{chain__api__plugin_8cpp_ab9297a5c7b7f085c77cad8641f734ba6}{CALL\_WITH\_400}}(wallet,\ wallet\_mgr,\ lock\_all,}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00101}00101\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{net__api__plugin_8cpp_a54f8b56aff9e470dbebbddd544256b8f}{INVOKE\_V\_V}}(wallet\_mgr,\ lock\_all),\ 200),}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00102}00102\ \ \ \ \ \ \ \ \mbox{\hyperlink{chain__api__plugin_8cpp_ab9297a5c7b7f085c77cad8641f734ba6}{CALL\_WITH\_400}}(wallet,\ wallet\_mgr,\ lock,}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00103}00103\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{net__api__plugin_8cpp_a4dc31462f24aaa120af888e8e9358800}{INVOKE\_V\_R}}(wallet\_mgr,\ lock,\ std::string),\ 200),}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00104}00104\ \ \ \ \ \ \ \ \mbox{\hyperlink{chain__api__plugin_8cpp_ab9297a5c7b7f085c77cad8641f734ba6}{CALL\_WITH\_400}}(wallet,\ wallet\_mgr,\ unlock,}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00105}00105\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{txn__test__gen__plugin_8cpp_a653b6a13b0cc13bed8565f0d19aa8e03}{INVOKE\_V\_R\_R}}(wallet\_mgr,\ unlock,\ std::string,\ std::string),\ 200),}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00106}00106\ \ \ \ \ \ \ \ \mbox{\hyperlink{chain__api__plugin_8cpp_ab9297a5c7b7f085c77cad8641f734ba6}{CALL\_WITH\_400}}(wallet,\ wallet\_mgr,\ import\_key,}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00107}00107\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{txn__test__gen__plugin_8cpp_a653b6a13b0cc13bed8565f0d19aa8e03}{INVOKE\_V\_R\_R}}(wallet\_mgr,\ import\_key,\ std::string,\ std::string),\ 201),}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00108}00108\ \ \ \ \ \ \ \ \mbox{\hyperlink{chain__api__plugin_8cpp_ab9297a5c7b7f085c77cad8641f734ba6}{CALL\_WITH\_400}}(wallet,\ wallet\_mgr,\ remove\_key,}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00109}00109\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{txn__test__gen__plugin_8cpp_a0e00cd8085030cd38c1fd93a92ea8e7a}{INVOKE\_V\_R\_R\_R}}(wallet\_mgr,\ remove\_key,\ std::string,\ std::string,\ std::string),\ 201),}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00110}00110\ \ \ \ \ \ \ \ \mbox{\hyperlink{chain__api__plugin_8cpp_ab9297a5c7b7f085c77cad8641f734ba6}{CALL\_WITH\_400}}(wallet,\ wallet\_mgr,\ create\_key,}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00111}00111\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{wallet__api__plugin_8cpp_a3169252a7a000e497d9cfbac32461c2e}{INVOKE\_R\_R\_R}}(wallet\_mgr,\ create\_key,\ std::string,\ std::string),\ 201),}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00112}00112\ \ \ \ \ \ \ \ \mbox{\hyperlink{chain__api__plugin_8cpp_ab9297a5c7b7f085c77cad8641f734ba6}{CALL\_WITH\_400}}(wallet,\ wallet\_mgr,\ list\_wallets,}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00113}00113\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{db__size__api__plugin_8cpp_a57be4224a1ade2bd8b3923d6a344d98b}{INVOKE\_R\_V}}(wallet\_mgr,\ list\_wallets),\ 200),}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00114}00114\ \ \ \ \ \ \ \ \mbox{\hyperlink{chain__api__plugin_8cpp_ab9297a5c7b7f085c77cad8641f734ba6}{CALL\_WITH\_400}}(wallet,\ wallet\_mgr,\ list\_keys,}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00115}00115\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{wallet__api__plugin_8cpp_a3169252a7a000e497d9cfbac32461c2e}{INVOKE\_R\_R\_R}}(wallet\_mgr,\ list\_keys,\ std::string,\ std::string),\ 200),}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00116}00116\ \ \ \ \ \ \ \ \mbox{\hyperlink{chain__api__plugin_8cpp_ab9297a5c7b7f085c77cad8641f734ba6}{CALL\_WITH\_400}}(wallet,\ wallet\_mgr,\ get\_public\_keys,}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00117}00117\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{db__size__api__plugin_8cpp_a57be4224a1ade2bd8b3923d6a344d98b}{INVOKE\_R\_V}}(wallet\_mgr,\ get\_public\_keys),\ 200)}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00118}00118\ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00119}00119\ \}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00120}00120\ }
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00121}\mbox{\hyperlink{classsysio_1_1wallet__api__plugin_acb6eca84e0f2b148b971873db6807f90}{00121}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1wallet__api__plugin_acb6eca84e0f2b148b971873db6807f90}{wallet\_api\_plugin::plugin\_initialize}}(\textcolor{keyword}{const}\ variables\_map\&\ options)\ \{}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00122}00122\ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00123}00123\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \_http\_plugin\ =\ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_a3c4b68a0667942b58f1369f454ce0ce3}{get\_plugin}}<\mbox{\hyperlink{classsysio_1_1http__plugin}{http\_plugin}}>();}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00124}00124\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !\_http\_plugin.is\_on\_loopback())\ \{}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00125}00125\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !\_http\_plugin.is\_secure())\ \{}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00126}00126\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}}(\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00127}00127\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}********!!!SECURITY\ ERROR!!!********\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00128}00128\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}*\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00129}00129\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}*\ -\/-\/\ \ \ \ \ \ \ Wallet\ API\ \ \ \ \ \ \ \ \ \ \ -\/-\/\ *\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00130}00130\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}*\ -\/\ EXPOSED\ to\ the\ LOCAL\ NETWORK\ -\/\ *\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00131}00131\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}*\ -\/\ \ HTTP\ RPC\ is\ NOT\ encrypted\ \ \ -\/\ *\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00132}00132\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}*\ -\/\ Password\ and/or\ Private\ Keys\ -\/\ *\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00133}00133\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}*\ -\/\ are\ at\ HIGH\ risk\ of\ exposure\ -\/\ *\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00134}00134\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}*\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00135}00135\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}************************************\(\backslash\)n"{}}\ );}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00136}00136\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00137}00137\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a1759e5c9691d8ad754bdf5eff8bb23ac}{wlog}}(\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00138}00138\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}**********SECURITY\ WARNING**********\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00139}00139\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}*\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00140}00140\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}*\ -\/-\/\ \ \ \ \ \ \ Wallet\ API\ \ \ \ \ \ \ \ \ \ \ -\/-\/\ *\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00141}00141\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}*\ -\/\ EXPOSED\ to\ the\ LOCAL\ NETWORK\ -\/\ *\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00142}00142\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}*\ -\/\ Password\ and/or\ Private\ Keys\ -\/\ *\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00143}00143\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}*\ -\/\ \ \ are\ at\ risk\ of\ exposure\ \ \ \ -\/\ *\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00144}00144\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}*\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00145}00145\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}************************************\(\backslash\)n"{}}\ );}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00146}00146\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00147}00147\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00148}00148\ \ \ \ \}\ \mbox{\hyperlink{exception_8hpp_ae70bfa24f5a3bc0917382b3c17fc033c}{FC\_LOG\_AND\_RETHROW}}()}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00149}00149\ \}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00150}00150\ }
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00151}00151\ }
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00152}00152\ \textcolor{preprocessor}{\#undef\ INVOKE\_R\_R}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00153}00153\ \textcolor{preprocessor}{\#undef\ INVOKE\_R\_R\_R\_R}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00154}00154\ \textcolor{preprocessor}{\#undef\ INVOKE\_R\_V}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00155}00155\ \textcolor{preprocessor}{\#undef\ INVOKE\_V\_R}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00156}00156\ \textcolor{preprocessor}{\#undef\ INVOKE\_V\_R\_R}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00157}00157\ \textcolor{preprocessor}{\#undef\ INVOKE\_V\_V}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00158}00158\ \textcolor{preprocessor}{\#undef\ CALL}}
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00159}00159\ }
+\DoxyCodeLine{\Hypertarget{wallet__api__plugin_8cpp_source_l00160}00160\ \}}
+
+\end{DoxyCode}

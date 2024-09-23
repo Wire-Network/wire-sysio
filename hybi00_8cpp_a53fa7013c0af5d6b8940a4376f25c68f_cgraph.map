@@ -1,0 +1,13 @@
+<map id="BOOST_AUTO_TEST_CASE" name="BOOST_AUTO_TEST_CASE">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,112,202,137"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1processor_1_1hybi00.html#a9e3f451bd48b1072a377108eba0cf0f5" title="Get the protocol version of this processor." alt="" coords="263,5,426,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="132,108,249,57,267,49,269,54,251,61,134,113"/>
+<area shape="rect" id="Node000003" href="$namespacewebsocketpp_1_1processor.html#a1a0e5e7b10b24ff5ab836dc543826934" title="Extract the version from a WebSocket handshake request." alt="" coords="262,71,428,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="201,108,246,102,247,107,202,114"/>
+<area shape="rect" id="Node000004" href="$namespacewebsocketpp_1_1processor.html#a9ff3159b48cf4be2e7cb79c81b155d53" title="Determine whether or not a generic HTTP request is a WebSocket handshake." alt="" coords="255,136,434,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="203,135,240,140,239,145,202,140"/>
+<area shape="rect" id="Node000006" href="$classwebsocketpp_1_1processor_1_1hybi00.html#a9458e35fabf2b39bd9e09523ad60c22c" title="validate a WebSocket handshake request for this version" alt="" coords="250,201,440,242"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="134,135,251,186,270,193,268,198,249,191,132,140"/>
+<area shape="rect" id="Node000005" href="$namespacewebsocketpp_1_1utility.html#a484f1287b93cf58cc6514e46eed41568" title="Find substring (case insensitive)" alt="" coords="488,136,625,177"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="435,154,472,154,472,159,435,159"/>
+</map>

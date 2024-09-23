@@ -1,0 +1,74 @@
+\doxysection{websocketpp\+::random\+::none\+::int\+\_\+generator\texorpdfstring{$<$}{<} int\+\_\+type \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classwebsocketpp_1_1random_1_1none_1_1int__generator}{}\label{classwebsocketpp_1_1random_1_1none_1_1int__generator}\index{websocketpp::random::none::int\_generator$<$ int\_type $>$@{websocketpp::random::none::int\_generator$<$ int\_type $>$}}
+
+
+Thread safe stub "{}random"{} integer generator.  
+
+
+
+
+{\ttfamily \#include $<$none.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classwebsocketpp_1_1random_1_1none_1_1int__generator_a74f4d568cdcfbd159819cb94b0932b70}{int\+\_\+generator}} ()
+\item 
+int\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1random_1_1none_1_1int__generator_aecc2404c6eef19dbb5e585344bdd9069}{operator()}} ()
+\begin{DoxyCompactList}\small\item\em advances the engine\textquotesingle{}s state and returns the generated value \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename int\+\_\+type$>$\newline
+class websocketpp\+::random\+::none\+::int\+\_\+generator$<$ int\+\_\+type $>$}
+This template class provides a random integer stub. The interface mimics the Web\+Socket++ RNG generator classes but the generater function always returns zero. This can be used to stub out the RNG for unit and performance testing.
+
+\doxylink{struct_call}{Call} operator() to generate the next number 
+
+Definition at line \mbox{\hyperlink{random_2none_8hpp_source_l00046}{46}} of file \mbox{\hyperlink{random_2none_8hpp_source}{none.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classwebsocketpp_1_1random_1_1none_1_1int__generator_a74f4d568cdcfbd159819cb94b0932b70}\index{websocketpp::random::none::int\_generator$<$ int\_type $>$@{websocketpp::random::none::int\_generator$<$ int\_type $>$}!int\_generator@{int\_generator}}
+\index{int\_generator@{int\_generator}!websocketpp::random::none::int\_generator$<$ int\_type $>$@{websocketpp::random::none::int\_generator$<$ int\_type $>$}}
+\doxysubsubsection{\texorpdfstring{int\_generator()}{int\_generator()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1random_1_1none_1_1int__generator_a74f4d568cdcfbd159819cb94b0932b70} 
+template$<$typename int\+\_\+type $>$ \\
+\mbox{\hyperlink{classwebsocketpp_1_1random_1_1none_1_1int__generator}{websocketpp\+::random\+::none\+::int\+\_\+generator}}$<$ int\+\_\+type $>$\+::int\+\_\+generator (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{random_2none_8hpp_source_l00048}{48}} of file \mbox{\hyperlink{random_2none_8hpp_source}{none.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00048\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classwebsocketpp_1_1random_1_1none_1_1int__generator_aecc2404c6eef19dbb5e585344bdd9069}\index{websocketpp::random::none::int\_generator$<$ int\_type $>$@{websocketpp::random::none::int\_generator$<$ int\_type $>$}!operator()@{operator()}}
+\index{operator()@{operator()}!websocketpp::random::none::int\_generator$<$ int\_type $>$@{websocketpp::random::none::int\_generator$<$ int\_type $>$}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1random_1_1none_1_1int__generator_aecc2404c6eef19dbb5e585344bdd9069} 
+template$<$typename int\+\_\+type $>$ \\
+int\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1random_1_1none_1_1int__generator}{websocketpp\+::random\+::none\+::int\+\_\+generator}}$<$ int\+\_\+type $>$\+::operator() (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{random_2none_8hpp_source_l00051}{51}} of file \mbox{\hyperlink{random_2none_8hpp_source}{none.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/vendor/websocketpp/websocketpp/random/\mbox{\hyperlink{random_2none_8hpp}{none.\+hpp}}\end{DoxyCompactItemize}

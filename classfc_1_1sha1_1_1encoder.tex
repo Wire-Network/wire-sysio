@@ -1,0 +1,173 @@
+\doxysection{fc\+::sha1\+::encoder Class Reference}
+\hypertarget{classfc_1_1sha1_1_1encoder}{}\label{classfc_1_1sha1_1_1encoder}\index{fc::sha1::encoder@{fc::sha1::encoder}}
+
+
+{\ttfamily \#include $<$sha1.\+hpp$>$}
+
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structfc_1_1sha1_1_1encoder_1_1impl}{impl}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1sha1_1_1encoder_a674eb9f77fe5435b983d74042680a3f9}{encoder}} ()
+\item 
+\mbox{\hyperlink{classfc_1_1sha1_1_1encoder_a9076de37b929f03d6c13d68ee0e79d39}{\texorpdfstring{$\sim$}{\string~}encoder}} ()
+\item 
+void \mbox{\hyperlink{classfc_1_1sha1_1_1encoder_a3fe2406bfa6f78ce37482c742a697601}{write}} (const char \texorpdfstring{$\ast$}{*}d, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} dlen)
+\item 
+void \mbox{\hyperlink{classfc_1_1sha1_1_1encoder_a6f1fc5ccfa1c4f484f0bf2edeaa027b2}{put}} (char c)
+\item 
+void \mbox{\hyperlink{classfc_1_1sha1_1_1encoder_a22e2c6649fae5316337ccd1836779aaf}{reset}} ()
+\item 
+\mbox{\hyperlink{classfc_1_1sha1}{sha1}} \mbox{\hyperlink{classfc_1_1sha1_1_1encoder_ad17eb3cf6315b803ba7d73edd704d44c}{result}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{include_2fc_2crypto_2sha1_8hpp_source_l00031}{31}} of file \mbox{\hyperlink{include_2fc_2crypto_2sha1_8hpp_source}{sha1.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1sha1_1_1encoder_a674eb9f77fe5435b983d74042680a3f9}\index{fc::sha1::encoder@{fc::sha1::encoder}!encoder@{encoder}}
+\index{encoder@{encoder}!fc::sha1::encoder@{fc::sha1::encoder}}
+\doxysubsubsection{\texorpdfstring{encoder()}{encoder()}}
+{\footnotesize\ttfamily \label{classfc_1_1sha1_1_1encoder_a674eb9f77fe5435b983d74042680a3f9} 
+fc\+::sha1\+::encoder\+::encoder (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{src_2crypto_2sha1_8cpp_source_l00034}{34}} of file \mbox{\hyperlink{src_2crypto_2sha1_8cpp_source}{sha1.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00035\ \ \ \mbox{\hyperlink{classfc_1_1sha1_1_1encoder_a22e2c6649fae5316337ccd1836779aaf}{reset}}();}
+\DoxyCodeLine{00036\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1sha1_1_1encoder_a9076de37b929f03d6c13d68ee0e79d39}\index{fc::sha1::encoder@{fc::sha1::encoder}!````~encoder@{\texorpdfstring{$\sim$}{\string~}encoder}}
+\index{````~encoder@{\texorpdfstring{$\sim$}{\string~}encoder}!fc::sha1::encoder@{fc::sha1::encoder}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}encoder()}{\string~encoder()}}
+{\footnotesize\ttfamily \label{classfc_1_1sha1_1_1encoder_a9076de37b929f03d6c13d68ee0e79d39} 
+fc\+::sha1\+::encoder\+::\texorpdfstring{$\sim$}{\string~}encoder (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{src_2crypto_2sha1_8cpp_source_l00033}{33}} of file \mbox{\hyperlink{src_2crypto_2sha1_8cpp_source}{sha1.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00033\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1sha1_1_1encoder_a6f1fc5ccfa1c4f484f0bf2edeaa027b2}\index{fc::sha1::encoder@{fc::sha1::encoder}!put@{put}}
+\index{put@{put}!fc::sha1::encoder@{fc::sha1::encoder}}
+\doxysubsubsection{\texorpdfstring{put()}{put()}}
+{\footnotesize\ttfamily \label{classfc_1_1sha1_1_1encoder_a6f1fc5ccfa1c4f484f0bf2edeaa027b2} 
+void fc\+::sha1\+::encoder\+::put (\begin{DoxyParamCaption}\item[{char}]{c}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{include_2fc_2crypto_2sha1_8hpp_source_l00038}{38}} of file \mbox{\hyperlink{include_2fc_2crypto_2sha1_8hpp_source}{sha1.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00038\ \{\ \mbox{\hyperlink{classfc_1_1sha1_1_1encoder_a3fe2406bfa6f78ce37482c742a697601}{write}}(\ \&c,\ 1\ );\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=325pt]{classfc_1_1sha1_1_1encoder_a6f1fc5ccfa1c4f484f0bf2edeaa027b2_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1sha1_1_1encoder_a22e2c6649fae5316337ccd1836779aaf}\index{fc::sha1::encoder@{fc::sha1::encoder}!reset@{reset}}
+\index{reset@{reset}!fc::sha1::encoder@{fc::sha1::encoder}}
+\doxysubsubsection{\texorpdfstring{reset()}{reset()}}
+{\footnotesize\ttfamily \label{classfc_1_1sha1_1_1encoder_a22e2c6649fae5316337ccd1836779aaf} 
+void fc\+::sha1\+::encoder\+::reset (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{src_2crypto_2sha1_8cpp_source_l00055}{55}} of file \mbox{\hyperlink{src_2crypto_2sha1_8cpp_source}{sha1.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00056\ \ \ SHA1\_Init(\ \&my-\/>ctx);}
+\DoxyCodeLine{00057\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1sha1_1_1encoder_ad17eb3cf6315b803ba7d73edd704d44c}\index{fc::sha1::encoder@{fc::sha1::encoder}!result@{result}}
+\index{result@{result}!fc::sha1::encoder@{fc::sha1::encoder}}
+\doxysubsubsection{\texorpdfstring{result()}{result()}}
+{\footnotesize\ttfamily \label{classfc_1_1sha1_1_1encoder_ad17eb3cf6315b803ba7d73edd704d44c} 
+\mbox{\hyperlink{classfc_1_1sha1}{sha1}} fc\+::sha1\+::encoder\+::result (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{src_2crypto_2sha1_8cpp_source_l00050}{50}} of file \mbox{\hyperlink{src_2crypto_2sha1_8cpp_source}{sha1.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00051\ \ \ \mbox{\hyperlink{classfc_1_1sha1_abeafa42dce486001a3d483ac01a59a15}{sha1}}\ h;}
+\DoxyCodeLine{00052\ \ \ SHA1\_Final((\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}*)h.data(),\ \&my-\/>ctx\ );}
+\DoxyCodeLine{00053\ \ \ \textcolor{keywordflow}{return}\ h;}
+\DoxyCodeLine{00054\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=290pt]{classfc_1_1sha1_1_1encoder_ad17eb3cf6315b803ba7d73edd704d44c_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1sha1_1_1encoder_ad17eb3cf6315b803ba7d73edd704d44c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1sha1_1_1encoder_a3fe2406bfa6f78ce37482c742a697601}\index{fc::sha1::encoder@{fc::sha1::encoder}!write@{write}}
+\index{write@{write}!fc::sha1::encoder@{fc::sha1::encoder}}
+\doxysubsubsection{\texorpdfstring{write()}{write()}}
+{\footnotesize\ttfamily \label{classfc_1_1sha1_1_1encoder_a3fe2406bfa6f78ce37482c742a697601} 
+void fc\+::sha1\+::encoder\+::write (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{d}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{dlen}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{src_2crypto_2sha1_8cpp_source_l00047}{47}} of file \mbox{\hyperlink{src_2crypto_2sha1_8cpp_source}{sha1.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00048\ \ \ SHA1\_Update(\ \&my-\/>ctx,\ d,\ dlen);}
+\DoxyCodeLine{00049\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1sha1_1_1encoder_a3fe2406bfa6f78ce37482c742a697601_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/\mbox{\hyperlink{include_2fc_2crypto_2sha1_8hpp}{sha1.\+hpp}}\item 
+libraries/fc/src/crypto/\mbox{\hyperlink{src_2crypto_2sha1_8cpp}{sha1.\+cpp}}\end{DoxyCompactItemize}

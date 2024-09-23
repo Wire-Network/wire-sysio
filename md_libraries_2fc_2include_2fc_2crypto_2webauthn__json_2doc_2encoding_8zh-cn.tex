@@ -1,0 +1,141 @@
+\chapter{编码}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2encoding_8zh-cn}{}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2encoding_8zh-cn}\index{编码@{编码}}
+根据 \href{http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf}{\texttt{ ECMA-\/404}}：
+
+\begin{quote}
+(in Introduction) JSON text is a sequence of Unicode code points.
+
+翻译：\+JSON 文本是 Unicode 码点的序列。 \end{quote}
+较早的 \href{http://www.ietf.org/rfc/rfc4627.txt}{\texttt{ RFC4627}} 申明：
+
+\begin{quote}
+(in §3) JSON text SHALL be encoded in Unicode. The default encoding is UTF-\/8.
+
+翻译：\+JSON 文本应该以 Unicode 编码。缺省的编码为 UTF-\/8。 \end{quote}
+\begin{quote}
+(in §6) JSON may be represented using UTF-\/8, UTF-\/16, or UTF-\/32. When JSON is written in UTF-\/8, JSON is 8bit compatible. When JSON is written in UTF-\/16 or UTF-\/32, the binary content-\/transfer-\/encoding must be used.
+
+翻译：\+JSON 可使用 UTF-\/8、\+UTF-\/16 或 UTF-\/32 表示。当 JSON 以 UTF-\/8 写入，该 JSON 是 8 位兼容的。当 JSON 以 UTF-\/16 或 UTF-\/32 写入，就必须使用二进制的内容传送编码。 \end{quote}
+Rapid\+JSON 支持多种编码。它也能检查 JSON 的编码，以及在不同编码中进行转码。所有这些功能都是在内部实现，无需使用外部的程序库（如 \href{http://site.icu-project.org/}{\texttt{ ICU}}）。\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2encoding_8zh-cn_Unicode}{}\doxysection{\texorpdfstring{Unicode}{Unicode}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2encoding_8zh-cn_Unicode}
+根据 \href{http://www.unicode.org/standard/translations/t-chinese.html}{\texttt{ Unicode 的官方网站}}： \texorpdfstring{$>$}{>}Unicode 给每个字符提供了一个唯一的数字， 不论是什么平台、 不论是什么程序、 不论是什么语言。
+
+这些唯一数字称为码点（code point），其范围介乎 {\ttfamily 0x0} 至 {\ttfamily 0x10\+FFFF} 之间。\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2encoding_8zh-cn_UTF}{}\doxysubsection{\texorpdfstring{Unicode Transformation Format}{Unicode Transformation Format}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2encoding_8zh-cn_UTF}
+存储 Unicode 码点有多种编码方式。这些称为 Unicode 转换格式（\+Unicode Transformation Format, UTF）。\+Rapid\+JSON 支持最常用的 UTF，包括：
+
+
+\begin{DoxyItemize}
+\item UTF-\/8：8 位可变长度编码。它把一个码点映射至 1 至 4 个字节。
+\item UTF-\/16：16 位可变长度编码。它把一个码点映射至 1 至 2 个 16 位编码单元（即 2 至 4 个字节）。
+\item UTF-\/32：32 位固定长度编码。它直接把码点映射至单个 32 位编码单元（即 4 字节）。
+\end{DoxyItemize}
+
+对于 UTF-\/16 及 UTF-\/32 来说，字节序（endianness）是有影响的。在内存中，它们通常都是以该计算机的字节序来存储。然而，当要储存在文件中或在网上传输，我们需要指明字节序列的字节序，是小端（little endian, LE）还是大端（big-\/endian, BE）。
+
+Rapid\+JSON 通过 {\ttfamily \doxylink{encodings_8h}{rapidjson/encodings.\+h}} 中的 struct 去提供各种编码：
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacerapidjson}{rapidjson}}\ \{}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{template}<\textcolor{keyword}{typename}\ CharType\ =\ \textcolor{keywordtype}{char}>}
+\DoxyCodeLine{\textcolor{keyword}{struct\ }\mbox{\hyperlink{namespace_u_t_f8}{UTF8}};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{template}<\textcolor{keyword}{typename}\ CharType\ =\ \textcolor{keywordtype}{wchar\_t}>}
+\DoxyCodeLine{\textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_u_t_f16}{UTF16}};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{template}<\textcolor{keyword}{typename}\ CharType\ =\ \textcolor{keywordtype}{wchar\_t}>}
+\DoxyCodeLine{\textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_u_t_f16_l_e}{UTF16LE}};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{template}<\textcolor{keyword}{typename}\ CharType\ =\ \textcolor{keywordtype}{wchar\_t}>}
+\DoxyCodeLine{\textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_u_t_f16_b_e}{UTF16BE}};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{template}<\textcolor{keyword}{typename}\ CharType\ =\ \textcolor{keywordtype}{unsigned}>}
+\DoxyCodeLine{\textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_u_t_f32}{UTF32}};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{template}<\textcolor{keyword}{typename}\ CharType\ =\ \textcolor{keywordtype}{unsigned}>}
+\DoxyCodeLine{\textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_u_t_f32_l_e}{UTF32LE}};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{template}<\textcolor{keyword}{typename}\ CharType\ =\ \textcolor{keywordtype}{unsigned}>}
+\DoxyCodeLine{\textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_u_t_f32_b_e}{UTF32BE}};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\}\ \textcolor{comment}{//\ namespace\ rapidjson}}
+
+\end{DoxyCode}
+
+
+对于在内存中的文本，我们正常会使用 {\ttfamily \doxylink{struct_u_t_f8}{UTF8}}、{\ttfamily \doxylink{struct_u_t_f16}{UTF16}} 或 {\ttfamily \doxylink{struct_u_t_f32}{UTF32}}。对于处理经过 I/O 的文本，我们可使用 {\ttfamily \doxylink{struct_u_t_f8}{UTF8}}、{\ttfamily \doxylink{struct_u_t_f16_l_e}{UTF16\+LE}}、{\ttfamily \doxylink{struct_u_t_f16_b_e}{UTF16\+BE}}、{\ttfamily \doxylink{struct_u_t_f32_l_e}{UTF32\+LE}} 或 {\ttfamily \doxylink{struct_u_t_f32_b_e}{UTF32\+BE}}。
+
+当使用 DOM 风格的 API，{\ttfamily \doxylink{class_generic_value}{Generic\+Value}\texorpdfstring{$<$}{<}Encoding\texorpdfstring{$>$}{>}} 及 {\ttfamily \doxylink{class_generic_document}{Generic\+Document}\texorpdfstring{$<$}{<}Encoding\texorpdfstring{$>$}{>}} 里的 {\ttfamily Encoding} 模板参数是用于指明内存中存储的 JSON 字符串使用哪种编码。因此通常我们会在此参数中使用 {\ttfamily \doxylink{struct_u_t_f8}{UTF8}}、{\ttfamily \doxylink{struct_u_t_f16}{UTF16}} 或 {\ttfamily \doxylink{struct_u_t_f32}{UTF32}}。如何选择，视乎应用软件所使用的操作系统及其他程序库。例如，\+Windows API 使用 UTF-\/16 表示 Unicode 字符，而多数的 Linux 发行版本及应用软件则更喜欢 UTF-\/8。
+
+使用 UTF-\/16 的 DOM 声明例子：
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{typedef}\ \mbox{\hyperlink{class_generic_document}{GenericDocument<UTF16<>}}\ >\ WDocument;}
+\DoxyCodeLine{\textcolor{keyword}{typedef}\ \mbox{\hyperlink{class_generic_value}{GenericValue<UTF16<>}}\ >\ WValue;}
+
+\end{DoxyCode}
+
+
+可以在 \doxylink{stream_8zh-cn_8md}{DOM\textquotesingle{}s Encoding} 一节看到更详细的使用例子。\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2encoding_8zh-cn_CharacterType}{}\doxysubsection{\texorpdfstring{Character Type}{Character Type}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2encoding_8zh-cn_CharacterType}
+从之前的声明中可以看到，每个编码都有一个 {\ttfamily Char\+Type} 模板参数。这可能比较容易混淆，实际上，每个 {\ttfamily Char\+Type} 存储一个编码单元，而不是一个字符（码点）。如之前所谈及，在 UTF-\/8 中一个码点可能会编码成 1 至 4 个编码单元。
+
+对于 {\ttfamily \doxylink{struct_u_t_f16}{UTF16}(LE\texorpdfstring{$\vert$}{|}\+BE)} 及 {\ttfamily \doxylink{struct_u_t_f32}{UTF32}(LE\texorpdfstring{$\vert$}{|}\+BE)} 来说，{\ttfamily Char\+Type} 必须分别是一个至少 2 及 4 字节的整数类型。
+
+注意 C++11 新添了 {\ttfamily char16\+\_\+t} 及 {\ttfamily char32\+\_\+t} 类型，也可分别用于 {\ttfamily \doxylink{struct_u_t_f16}{UTF16}} 及 {\ttfamily \doxylink{struct_u_t_f32}{UTF32}}。\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2encoding_8zh-cn_AutoUTF}{}\doxysubsection{\texorpdfstring{Auto\+UTF}{Auto\+UTF}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2encoding_8zh-cn_AutoUTF}
+上述所介绍的编码都是在编译期静态挷定的。换句话说，使用者必须知道内存或流之中使用了哪种编码。然而，有时候我们可能需要读写不同编码的文件，而且这些编码需要在运行时才能决定。
+
+{\ttfamily \doxylink{struct_auto_u_t_f}{Auto\+UTF}} 是为此而设计的编码。它根据输入或输出流来选择使用哪种编码。目前它应该与 {\ttfamily \doxylink{class_encoded_input_stream}{Encoded\+Input\+Stream}} 及 {\ttfamily \doxylink{class_encoded_output_stream}{Encoded\+Output\+Stream}} 结合使用。\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2encoding_8zh-cn_ASCII}{}\doxysubsection{\texorpdfstring{ASCII}{ASCII}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2encoding_8zh-cn_ASCII}
+虽然 JSON 标准并未提及 \href{http://en.wikipedia.org/wiki/ASCII}{\texttt{ ASCII}}，有时候我们希望写入 7 位的 \doxylink{struct_a_s_c_i_i}{ASCII} JSON，以供未能处理 UTF-\/8 的应用程序使用。由于任 JSON 都可以把 Unicode 字符表示为 {\ttfamily \textbackslash{}u\+XXXX} 转义序列，\+JSON 总是可用 \doxylink{struct_a_s_c_i_i}{ASCII} 来编码。
+
+以下的例子把 UTF-\/8 的 DOM 写成 \doxylink{struct_a_s_c_i_i}{ASCII} 的 JSON：
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacerapidjson}{rapidjson}};}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_document}{Document}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}};\ \textcolor{comment}{//\ UTF8<>}}
+\DoxyCodeLine{\textcolor{comment}{//\ ...}}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_string_buffer}{StringBuffer}}\ buffer;}
+\DoxyCodeLine{\mbox{\hyperlink{class_writer}{Writer<StringBuffer,\ Document::EncodingType,\ ASCII<>}}\ >\ writer(buffer);}
+\DoxyCodeLine{\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.Accept(writer);}
+\DoxyCodeLine{std::cout\ <<\ buffer.\mbox{\hyperlink{class_generic_string_buffer_a42079865bab1deb930c6cff7d491c719}{GetString}}();}
+
+\end{DoxyCode}
+
+
+\doxylink{struct_a_s_c_i_i}{ASCII} 可用于输入流。当输入流包含大于 127 的字节，就会导致 {\ttfamily k\+Parse\+Error\+String\+Invalid\+Encoding} 错误。
+
+\doxylink{struct_a_s_c_i_i}{ASCII} \texorpdfstring{$\ast$}{*} 不能 \texorpdfstring{$\ast$}{*} 用于内存（{\ttfamily Document} 的编码，或 {\ttfamily Reader} 的目标编码)，因为它不能表示 Unicode 码点。\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2encoding_8zh-cn_ValidationTranscoding}{}\doxysection{\texorpdfstring{Validation \& Transcoding}{Validation \& Transcoding}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2encoding_8zh-cn_ValidationTranscoding}
+当 Rapid\+JSON 解析一个 JSON 时，它能校验输入 JSON，判断它是否所标明编码的合法序列。要开启此选项，请把 {\ttfamily k\+Parse\+Validate\+Encoding\+Flag} 加入 {\ttfamily parse\+Flags} 模板参数。
+
+若输入编码和输出编码并不相同，{\ttfamily Reader} 及 {\ttfamily \doxylink{class_writer}{Writer}} 会算把文本转码。在这种情况下，并不需要 {\ttfamily k\+Parse\+Validate\+Encoding\+Flag}，因为它必须解码输入序列。若序列不能被解码，它必然是不合法的。\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2encoding_8zh-cn_Transcoder}{}\doxysubsection{\texorpdfstring{Transcoder}{Transcoder}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2encoding_8zh-cn_Transcoder}
+虽然 Rapid\+JSON 的编码功能是为 JSON 解析／生成而设计，使用者也可以“滥用”它们来为非 JSON 字符串转码。
+
+以下的例子把 UTF-\/8 字符串转码成 UTF-\/16：
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{encodings_8h}{rapidjson/encodings.h}}"{}}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacerapidjson}{rapidjson}};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ =\ \textcolor{stringliteral}{"{}..."{}};\ \textcolor{comment}{//\ UTF-\/8\ string}}
+\DoxyCodeLine{\mbox{\hyperlink{struct_generic_string_stream}{StringStream}}\ \mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_string_buffer}{GenericStringBuffer<UTF16<>}}\ >\ target;}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keywordtype}{bool}\ hasError\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\textcolor{keywordflow}{while}\ (\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}}.Peek()\ !=\ \textcolor{charliteral}{'\(\backslash\)0'})}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{struct_transcoder}{Transcoder}}<\mbox{\hyperlink{struct_u_t_f8}{UTF8<>}},\ \mbox{\hyperlink{struct_u_t_f16}{UTF16<>}}\ >::Transcode(\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}},\ target))\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ hasError\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keywordflow}{if}\ (!hasError)\ \{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{wchar\_t}*\ t\ =\ target.\mbox{\hyperlink{class_generic_string_buffer_a42079865bab1deb930c6cff7d491c719}{GetString}}();}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ ...}}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+你也可以用 {\ttfamily \doxylink{struct_auto_u_t_f}{Auto\+UTF}} 及对应的流来在运行时设置内源／目的之编码。 

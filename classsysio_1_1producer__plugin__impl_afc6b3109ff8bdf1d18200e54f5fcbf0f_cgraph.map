@@ -1,0 +1,19 @@
+<map id="sysio::producer_plugin_impl::calculate_pending_block_time" name="sysio::producer_plugin_impl::calculate_pending_block_time">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,63,170,119"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1chain__plugin.html#a14a5e77b31ecf267c8062267d03440ae" title=" " alt="" coords="228,5,360,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="169,62,212,49,214,54,171,68"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1chain_1_1controller.html#aea3612e7cb52dfcaa2e6afdc1b3e2f51" title=" " alt="" coords="218,71,370,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="170,88,202,88,202,94,170,94"/>
+<area shape="rect" id="Node000004" href="$classfc_1_1time__point.html#aa164ff1268a16d4b32afcff181f6100e" title=" " alt="" coords="228,136,360,161"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="171,111,231,128,230,133,169,116"/>
+<area shape="rect" id="Node000005" href="$classfc_1_1mock__time__traits.html#a0bed781012a73b8c15882648397b56be" title=" " alt="" coords="418,29,558,70"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="342,132,369,121,393,102,416,81,425,75,428,80,420,85,396,106,371,125,344,137"/>
+<area shape="rect" id="Node000007" href="$classfc_1_1mock__time__traits.html#adddeebdf472c33f927827c111ddbf0b1" title=" " alt="" coords="418,95,558,135"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="360,134,402,127,403,132,361,140"/>
+<area shape="rect" id="Node000008" href="$classfc_1_1time__point.html#ab46781dcaab4880902bc136f36e39e5e" title=" " alt="" coords="422,160,555,201"/>
+<area shape="poly" id="edge7_Node000004_Node000008" title=" " alt="" coords="361,157,407,164,406,169,360,162"/>
+<area shape="rect" id="Node000009" href="$classfc_1_1time__point.html#abfea5efbe9ef58024cda814395ee9945" title=" " alt="" coords="422,225,555,266"/>
+<area shape="poly" id="edge8_Node000004_Node000009" title=" " alt="" coords="322,159,419,210,431,216,428,221,417,215,319,164"/>
+<area shape="rect" id="Node000006" href="$classfc_1_1mock__time__traits.html#a0d7245b32fd62b3bc712f658250cc4db" title=" " alt="" coords="606,37,779,62"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="559,47,591,47,591,52,559,52"/>
+</map>

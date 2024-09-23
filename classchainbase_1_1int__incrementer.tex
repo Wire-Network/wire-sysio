@@ -1,0 +1,83 @@
+\doxysection{chainbase\+::int\+\_\+incrementer Class Reference}
+\hypertarget{classchainbase_1_1int__incrementer}{}\label{classchainbase_1_1int__incrementer}\index{chainbase::int\_incrementer@{chainbase::int\_incrementer}}
+
+
+{\ttfamily \#include $<$chainbase.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classchainbase_1_1int__incrementer_aaaca8550f525722150a6ab6429979c00}{int\+\_\+incrementer}} (\mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\+\_\+t}} \&target)
+\item 
+\mbox{\hyperlink{classchainbase_1_1int__incrementer_aee17ebfacd10ab40a1c77debbf99bb8e}{\texorpdfstring{$\sim$}{\string~}int\+\_\+incrementer}} ()
+\item 
+\mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\+\_\+t}} \mbox{\hyperlink{classchainbase_1_1int__incrementer_a820e57f55564be8450cd2597147da56f}{get}} () const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+The code we want to implement is this\+:
+
+++target; try \{ ... \} finally \{ --target \}
+
+In C++ the only way to implement finally is to create a class with a destructor, so that\textquotesingle{}s what we do here. 
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00120}{120}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classchainbase_1_1int__incrementer_aaaca8550f525722150a6ab6429979c00}\index{chainbase::int\_incrementer@{chainbase::int\_incrementer}!int\_incrementer@{int\_incrementer}}
+\index{int\_incrementer@{int\_incrementer}!chainbase::int\_incrementer@{chainbase::int\_incrementer}}
+\doxysubsubsection{\texorpdfstring{int\_incrementer()}{int\_incrementer()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1int__incrementer_aaaca8550f525722150a6ab6429979c00} 
+chainbase\+::int\+\_\+incrementer\+::int\+\_\+incrementer (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\+\_\+t}} \&}]{target}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00123}{123}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \_target(target)}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \ \{\ ++\_target;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classchainbase_1_1int__incrementer_aee17ebfacd10ab40a1c77debbf99bb8e}\index{chainbase::int\_incrementer@{chainbase::int\_incrementer}!````~int\_incrementer@{\texorpdfstring{$\sim$}{\string~}int\_incrementer}}
+\index{````~int\_incrementer@{\texorpdfstring{$\sim$}{\string~}int\_incrementer}!chainbase::int\_incrementer@{chainbase::int\_incrementer}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}int\_incrementer()}{\string~int\_incrementer()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1int__incrementer_aee17ebfacd10ab40a1c77debbf99bb8e} 
+chainbase\+::int\+\_\+incrementer\+::\texorpdfstring{$\sim$}{\string~}int\+\_\+incrementer (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00125}{125}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \{\ -\/-\/\_target;\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classchainbase_1_1int__incrementer_a820e57f55564be8450cd2597147da56f}\index{chainbase::int\_incrementer@{chainbase::int\_incrementer}!get@{get}}
+\index{get@{get}!chainbase::int\_incrementer@{chainbase::int\_incrementer}}
+\doxysubsubsection{\texorpdfstring{get()}{get()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1int__incrementer_a820e57f55564be8450cd2597147da56f} 
+\mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\+\_\+t}} chainbase\+::int\+\_\+incrementer\+::get (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00128}{128}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \{\ \textcolor{keywordflow}{return}\ \_target;\ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chainbase/include/chainbase/\mbox{\hyperlink{chainbase_8hpp}{chainbase.\+hpp}}\end{DoxyCompactItemize}

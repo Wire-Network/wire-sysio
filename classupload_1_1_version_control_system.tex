@@ -1,0 +1,755 @@
+\doxysection{upload.\+Version\+Control\+System Class Reference}
+\hypertarget{classupload_1_1_version_control_system}{}\label{classupload_1_1_version_control_system}\index{upload.VersionControlSystem@{upload.VersionControlSystem}}
+
+
+Inheritance diagram for upload.\+Version\+Control\+System\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classupload_1_1_version_control_system__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for upload.\+Version\+Control\+System\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=226pt]{classupload_1_1_version_control_system__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classupload_1_1_version_control_system_ab2a3da53878c9d8bdfbd0fc03091ce1b}{\+\_\+\+\_\+init\+\_\+\+\_\+}} (self, \mbox{\hyperlink{classupload_1_1_version_control_system_a4d57d043bc408887b94269fe4cea9556}{options}})
+\item 
+\mbox{\hyperlink{classupload_1_1_version_control_system_a64aa85ea51b6f34918309a733fb58a97}{Generate\+Diff}} (self, args)
+\item 
+\mbox{\hyperlink{classupload_1_1_version_control_system_a500344e5ca80b8fb29773ebe8aac4844}{Get\+Unknown\+Files}} (self)
+\item 
+\mbox{\hyperlink{classupload_1_1_version_control_system_aed703e2def2bc9505f182de7b753499d}{Check\+For\+Unknown\+Files}} (self)
+\item 
+\mbox{\hyperlink{classupload_1_1_version_control_system_adf8a0253323a47c6a12e235c9160bb38}{Get\+Base\+File}} (self, filename)
+\item 
+\mbox{\hyperlink{classupload_1_1_version_control_system_a426cb9d4ad9f94754c9122653e3aa24f}{Get\+Base\+Files}} (self, \mbox{\hyperlink{jmp_8cpp_aca9876635a5afd01576dae38f10dc723}{diff}})
+\item 
+\mbox{\hyperlink{classupload_1_1_version_control_system_ac1549d3e1616a01a27581a03ee754189}{Upload\+Base\+Files}} (self, issue, rpc\+\_\+server, patch\+\_\+list, patchset, \mbox{\hyperlink{classupload_1_1_version_control_system_a4d57d043bc408887b94269fe4cea9556}{options}}, files)
+\item 
+\mbox{\hyperlink{classupload_1_1_version_control_system_a8d49726fefa641c183d210889491396c}{Is\+Image}} (self, filename)
+\item 
+\mbox{\hyperlink{classupload_1_1_version_control_system_ab2a3da53878c9d8bdfbd0fc03091ce1b}{\+\_\+\+\_\+init\+\_\+\+\_\+}} (self, \mbox{\hyperlink{classupload_1_1_version_control_system_a4d57d043bc408887b94269fe4cea9556}{options}})
+\item 
+\mbox{\hyperlink{classupload_1_1_version_control_system_a64aa85ea51b6f34918309a733fb58a97}{Generate\+Diff}} (self, args)
+\item 
+\mbox{\hyperlink{classupload_1_1_version_control_system_a500344e5ca80b8fb29773ebe8aac4844}{Get\+Unknown\+Files}} (self)
+\item 
+\mbox{\hyperlink{classupload_1_1_version_control_system_aed703e2def2bc9505f182de7b753499d}{Check\+For\+Unknown\+Files}} (self)
+\item 
+\mbox{\hyperlink{classupload_1_1_version_control_system_adf8a0253323a47c6a12e235c9160bb38}{Get\+Base\+File}} (self, filename)
+\item 
+\mbox{\hyperlink{classupload_1_1_version_control_system_a426cb9d4ad9f94754c9122653e3aa24f}{Get\+Base\+Files}} (self, \mbox{\hyperlink{jmp_8cpp_aca9876635a5afd01576dae38f10dc723}{diff}})
+\item 
+\mbox{\hyperlink{classupload_1_1_version_control_system_ac1549d3e1616a01a27581a03ee754189}{Upload\+Base\+Files}} (self, issue, rpc\+\_\+server, patch\+\_\+list, patchset, \mbox{\hyperlink{classupload_1_1_version_control_system_a4d57d043bc408887b94269fe4cea9556}{options}}, files)
+\item 
+\mbox{\hyperlink{classupload_1_1_version_control_system_a8d49726fefa641c183d210889491396c}{Is\+Image}} (self, filename)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classupload_1_1_version_control_system_a4d57d043bc408887b94269fe4cea9556}{options}} = options
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\begin{DoxyVerb}Abstract base class providing an interface to the VCS.\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{googletest_2scripts_2upload_8py_source_l00588}{588}} of file \mbox{\hyperlink{googletest_2scripts_2upload_8py_source}{upload.\+py}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classupload_1_1_version_control_system_ab2a3da53878c9d8bdfbd0fc03091ce1b}\index{upload.VersionControlSystem@{upload.VersionControlSystem}!\_\_init\_\_@{\_\_init\_\_}}
+\index{\_\_init\_\_@{\_\_init\_\_}!upload.VersionControlSystem@{upload.VersionControlSystem}}
+\doxysubsubsection{\texorpdfstring{\_\_init\_\_()}{\_\_init\_\_()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classupload_1_1_version_control_system_ab2a3da53878c9d8bdfbd0fc03091ce1b} 
+upload.\+Version\+Control\+System.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self}{, }\item[{}]{options}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Constructor.
+
+Args:
+  options: Command line options.
+\end{DoxyVerb}
+ 
+
+Reimplemented in \mbox{\hyperlink{classupload_1_1_git_v_c_s_a324d85469c965db1ada15350c9892c72}{upload.\+Git\+VCS}}, \mbox{\hyperlink{classupload_1_1_git_v_c_s_a324d85469c965db1ada15350c9892c72}{upload.\+Git\+VCS}}, \mbox{\hyperlink{classupload_1_1_mercurial_v_c_s_a68e4fc1308e45b9929b6c08b1df19f9f}{upload.\+Mercurial\+VCS}}, \mbox{\hyperlink{classupload_1_1_mercurial_v_c_s_a68e4fc1308e45b9929b6c08b1df19f9f}{upload.\+Mercurial\+VCS}}, \mbox{\hyperlink{classupload_1_1_subversion_v_c_s_ad30faeba90b6d8f6ae8605a7991abe01}{upload.\+Subversion\+VCS}}, and \mbox{\hyperlink{classupload_1_1_subversion_v_c_s_ad30faeba90b6d8f6ae8605a7991abe01}{upload.\+Subversion\+VCS}}.
+
+
+
+Definition at line \mbox{\hyperlink{googlemock_2scripts_2upload_8py_source_l00591}{591}} of file \mbox{\hyperlink{googlemock_2scripts_2upload_8py_source}{upload.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00591\ \ \ \textcolor{keyword}{def\ }\_\_init\_\_(self,\ options):}
+\DoxyCodeLine{00592\ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Constructor.}}
+\DoxyCodeLine{00593\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00594\ \textcolor{stringliteral}{\ \ \ \ Args:}}
+\DoxyCodeLine{00595\ \textcolor{stringliteral}{\ \ \ \ \ \ options:\ Command\ line\ options.}}
+\DoxyCodeLine{00596\ \textcolor{stringliteral}{\ \ \ \ "{}"{}"{}}}
+\DoxyCodeLine{00597\ \ \ \ \ self.options\ =\ options}
+\DoxyCodeLine{00598\ }
+
+\end{DoxyCode}
+\Hypertarget{classupload_1_1_version_control_system_ab2a3da53878c9d8bdfbd0fc03091ce1b}\index{upload.VersionControlSystem@{upload.VersionControlSystem}!\_\_init\_\_@{\_\_init\_\_}}
+\index{\_\_init\_\_@{\_\_init\_\_}!upload.VersionControlSystem@{upload.VersionControlSystem}}
+\doxysubsubsection{\texorpdfstring{\_\_init\_\_()}{\_\_init\_\_()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classupload_1_1_version_control_system_ab2a3da53878c9d8bdfbd0fc03091ce1b} 
+upload.\+Version\+Control\+System.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self}{, }\item[{}]{options}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Constructor.
+
+Args:
+  options: Command line options.
+\end{DoxyVerb}
+ 
+
+Reimplemented in \mbox{\hyperlink{classupload_1_1_git_v_c_s_a324d85469c965db1ada15350c9892c72}{upload.\+Git\+VCS}}, \mbox{\hyperlink{classupload_1_1_git_v_c_s_a324d85469c965db1ada15350c9892c72}{upload.\+Git\+VCS}}, \mbox{\hyperlink{classupload_1_1_mercurial_v_c_s_a68e4fc1308e45b9929b6c08b1df19f9f}{upload.\+Mercurial\+VCS}}, \mbox{\hyperlink{classupload_1_1_mercurial_v_c_s_a68e4fc1308e45b9929b6c08b1df19f9f}{upload.\+Mercurial\+VCS}}, \mbox{\hyperlink{classupload_1_1_subversion_v_c_s_ad30faeba90b6d8f6ae8605a7991abe01}{upload.\+Subversion\+VCS}}, and \mbox{\hyperlink{classupload_1_1_subversion_v_c_s_ad30faeba90b6d8f6ae8605a7991abe01}{upload.\+Subversion\+VCS}}.
+
+
+
+Definition at line \mbox{\hyperlink{googletest_2scripts_2upload_8py_source_l00591}{591}} of file \mbox{\hyperlink{googletest_2scripts_2upload_8py_source}{upload.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00591\ \ \ \textcolor{keyword}{def\ }\_\_init\_\_(self,\ options):}
+\DoxyCodeLine{00592\ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Constructor.}}
+\DoxyCodeLine{00593\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00594\ \textcolor{stringliteral}{\ \ \ \ Args:}}
+\DoxyCodeLine{00595\ \textcolor{stringliteral}{\ \ \ \ \ \ options:\ Command\ line\ options.}}
+\DoxyCodeLine{00596\ \textcolor{stringliteral}{\ \ \ \ "{}"{}"{}}}
+\DoxyCodeLine{00597\ \ \ \ \ self.options\ =\ options}
+\DoxyCodeLine{00598\ }
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classupload_1_1_version_control_system_aed703e2def2bc9505f182de7b753499d}\index{upload.VersionControlSystem@{upload.VersionControlSystem}!CheckForUnknownFiles@{CheckForUnknownFiles}}
+\index{CheckForUnknownFiles@{CheckForUnknownFiles}!upload.VersionControlSystem@{upload.VersionControlSystem}}
+\doxysubsubsection{\texorpdfstring{CheckForUnknownFiles()}{CheckForUnknownFiles()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classupload_1_1_version_control_system_aed703e2def2bc9505f182de7b753499d} 
+upload.\+Version\+Control\+System.\+Check\+For\+Unknown\+Files (\begin{DoxyParamCaption}\item[{}]{self}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Show an "are you sure?" prompt if there are unknown files.\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{googlemock_2scripts_2upload_8py_source_l00613}{613}} of file \mbox{\hyperlink{googlemock_2scripts_2upload_8py_source}{upload.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00613\ \ \ \textcolor{keyword}{def\ }CheckForUnknownFiles(self):}
+\DoxyCodeLine{00614\ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Show\ an\ "{}are\ you\ sure?"{}\ prompt\ if\ there\ are\ unknown\ files."{}"{}"{}}}
+\DoxyCodeLine{00615\ \ \ \ \ unknown\_files\ =\ self.GetUnknownFiles()}
+\DoxyCodeLine{00616\ \ \ \ \ \textcolor{keywordflow}{if}\ unknown\_files:}
+\DoxyCodeLine{00617\ \ \ \ \ \ \ \textcolor{keywordflow}{print}\ \textcolor{stringliteral}{"{}The\ following\ files\ are\ not\ added\ to\ version\ control:"{}}}
+\DoxyCodeLine{00618\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ line\ \textcolor{keywordflow}{in}\ unknown\_files:}
+\DoxyCodeLine{00619\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{print}\ line}
+\DoxyCodeLine{00620\ \ \ \ \ \ \ prompt\ =\ \textcolor{stringliteral}{"{}Are\ you\ sure\ to\ continue?(y/N)\ "{}}}
+\DoxyCodeLine{00621\ \ \ \ \ \ \ answer\ =\ raw\_input(prompt).strip()}
+\DoxyCodeLine{00622\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ answer\ !=\ \textcolor{stringliteral}{"{}y"{}}:}
+\DoxyCodeLine{00623\ \ \ \ \ \ \ \ \ ErrorExit(\textcolor{stringliteral}{"{}User\ aborted"{}})}
+\DoxyCodeLine{00624\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classupload_1_1_version_control_system_aed703e2def2bc9505f182de7b753499d_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classupload_1_1_version_control_system_aed703e2def2bc9505f182de7b753499d}\index{upload.VersionControlSystem@{upload.VersionControlSystem}!CheckForUnknownFiles@{CheckForUnknownFiles}}
+\index{CheckForUnknownFiles@{CheckForUnknownFiles}!upload.VersionControlSystem@{upload.VersionControlSystem}}
+\doxysubsubsection{\texorpdfstring{CheckForUnknownFiles()}{CheckForUnknownFiles()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classupload_1_1_version_control_system_aed703e2def2bc9505f182de7b753499d} 
+upload.\+Version\+Control\+System.\+Check\+For\+Unknown\+Files (\begin{DoxyParamCaption}\item[{}]{self}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Show an "are you sure?" prompt if there are unknown files.\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{googletest_2scripts_2upload_8py_source_l00613}{613}} of file \mbox{\hyperlink{googletest_2scripts_2upload_8py_source}{upload.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00613\ \ \ \textcolor{keyword}{def\ }CheckForUnknownFiles(self):}
+\DoxyCodeLine{00614\ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Show\ an\ "{}are\ you\ sure?"{}\ prompt\ if\ there\ are\ unknown\ files."{}"{}"{}}}
+\DoxyCodeLine{00615\ \ \ \ \ unknown\_files\ =\ self.GetUnknownFiles()}
+\DoxyCodeLine{00616\ \ \ \ \ \textcolor{keywordflow}{if}\ unknown\_files:}
+\DoxyCodeLine{00617\ \ \ \ \ \ \ \textcolor{keywordflow}{print}\ \textcolor{stringliteral}{"{}The\ following\ files\ are\ not\ added\ to\ version\ control:"{}}}
+\DoxyCodeLine{00618\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ line\ \textcolor{keywordflow}{in}\ unknown\_files:}
+\DoxyCodeLine{00619\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{print}\ line}
+\DoxyCodeLine{00620\ \ \ \ \ \ \ prompt\ =\ \textcolor{stringliteral}{"{}Are\ you\ sure\ to\ continue?(y/N)\ "{}}}
+\DoxyCodeLine{00621\ \ \ \ \ \ \ answer\ =\ raw\_input(prompt).strip()}
+\DoxyCodeLine{00622\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ answer\ !=\ \textcolor{stringliteral}{"{}y"{}}:}
+\DoxyCodeLine{00623\ \ \ \ \ \ \ \ \ ErrorExit(\textcolor{stringliteral}{"{}User\ aborted"{}})}
+\DoxyCodeLine{00624\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classupload_1_1_version_control_system_aed703e2def2bc9505f182de7b753499d_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classupload_1_1_version_control_system_a64aa85ea51b6f34918309a733fb58a97}\index{upload.VersionControlSystem@{upload.VersionControlSystem}!GenerateDiff@{GenerateDiff}}
+\index{GenerateDiff@{GenerateDiff}!upload.VersionControlSystem@{upload.VersionControlSystem}}
+\doxysubsubsection{\texorpdfstring{GenerateDiff()}{GenerateDiff()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classupload_1_1_version_control_system_a64aa85ea51b6f34918309a733fb58a97} 
+upload.\+Version\+Control\+System.\+Generate\+Diff (\begin{DoxyParamCaption}\item[{}]{self}{, }\item[{}]{args}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Return the current diff as a string.
+
+Args:
+  args: Extra arguments to pass to the diff command.
+\end{DoxyVerb}
+ 
+
+Reimplemented in \mbox{\hyperlink{classupload_1_1_git_v_c_s_a4336325497c1aa6cfeac30868b732a63}{upload.\+Git\+VCS}}, \mbox{\hyperlink{classupload_1_1_git_v_c_s_a4336325497c1aa6cfeac30868b732a63}{upload.\+Git\+VCS}}, \mbox{\hyperlink{classupload_1_1_mercurial_v_c_s_a00d1227902572ac557e054b9c9c33791}{upload.\+Mercurial\+VCS}}, \mbox{\hyperlink{classupload_1_1_mercurial_v_c_s_a00d1227902572ac557e054b9c9c33791}{upload.\+Mercurial\+VCS}}, \mbox{\hyperlink{classupload_1_1_subversion_v_c_s_a072f68748f33344489532bb1c8764289}{upload.\+Subversion\+VCS}}, and \mbox{\hyperlink{classupload_1_1_subversion_v_c_s_a072f68748f33344489532bb1c8764289}{upload.\+Subversion\+VCS}}.
+
+
+
+Definition at line \mbox{\hyperlink{googlemock_2scripts_2upload_8py_source_l00599}{599}} of file \mbox{\hyperlink{googlemock_2scripts_2upload_8py_source}{upload.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00599\ \ \ \textcolor{keyword}{def\ }GenerateDiff(self,\ args):}
+\DoxyCodeLine{00600\ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Return\ the\ current\ diff\ as\ a\ string.}}
+\DoxyCodeLine{00601\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00602\ \textcolor{stringliteral}{\ \ \ \ Args:}}
+\DoxyCodeLine{00603\ \textcolor{stringliteral}{\ \ \ \ \ \ args:\ Extra\ arguments\ to\ pass\ to\ the\ diff\ command.}}
+\DoxyCodeLine{00604\ \textcolor{stringliteral}{\ \ \ \ "{}"{}"{}}}
+\DoxyCodeLine{00605\ \ \ \ \ \textcolor{keywordflow}{raise}\ NotImplementedError(}
+\DoxyCodeLine{00606\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}abstract\ method\ -\/-\/\ subclass\ \%s\ must\ override"{}}\ \%\ self.\_\_class\_\_)}
+\DoxyCodeLine{00607\ }
+
+\end{DoxyCode}
+\Hypertarget{classupload_1_1_version_control_system_a64aa85ea51b6f34918309a733fb58a97}\index{upload.VersionControlSystem@{upload.VersionControlSystem}!GenerateDiff@{GenerateDiff}}
+\index{GenerateDiff@{GenerateDiff}!upload.VersionControlSystem@{upload.VersionControlSystem}}
+\doxysubsubsection{\texorpdfstring{GenerateDiff()}{GenerateDiff()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classupload_1_1_version_control_system_a64aa85ea51b6f34918309a733fb58a97} 
+upload.\+Version\+Control\+System.\+Generate\+Diff (\begin{DoxyParamCaption}\item[{}]{self}{, }\item[{}]{args}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Return the current diff as a string.
+
+Args:
+  args: Extra arguments to pass to the diff command.
+\end{DoxyVerb}
+ 
+
+Reimplemented in \mbox{\hyperlink{classupload_1_1_git_v_c_s_a4336325497c1aa6cfeac30868b732a63}{upload.\+Git\+VCS}}, \mbox{\hyperlink{classupload_1_1_git_v_c_s_a4336325497c1aa6cfeac30868b732a63}{upload.\+Git\+VCS}}, \mbox{\hyperlink{classupload_1_1_mercurial_v_c_s_a00d1227902572ac557e054b9c9c33791}{upload.\+Mercurial\+VCS}}, \mbox{\hyperlink{classupload_1_1_mercurial_v_c_s_a00d1227902572ac557e054b9c9c33791}{upload.\+Mercurial\+VCS}}, \mbox{\hyperlink{classupload_1_1_subversion_v_c_s_a072f68748f33344489532bb1c8764289}{upload.\+Subversion\+VCS}}, and \mbox{\hyperlink{classupload_1_1_subversion_v_c_s_a072f68748f33344489532bb1c8764289}{upload.\+Subversion\+VCS}}.
+
+
+
+Definition at line \mbox{\hyperlink{googletest_2scripts_2upload_8py_source_l00599}{599}} of file \mbox{\hyperlink{googletest_2scripts_2upload_8py_source}{upload.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00599\ \ \ \textcolor{keyword}{def\ }GenerateDiff(self,\ args):}
+\DoxyCodeLine{00600\ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Return\ the\ current\ diff\ as\ a\ string.}}
+\DoxyCodeLine{00601\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00602\ \textcolor{stringliteral}{\ \ \ \ Args:}}
+\DoxyCodeLine{00603\ \textcolor{stringliteral}{\ \ \ \ \ \ args:\ Extra\ arguments\ to\ pass\ to\ the\ diff\ command.}}
+\DoxyCodeLine{00604\ \textcolor{stringliteral}{\ \ \ \ "{}"{}"{}}}
+\DoxyCodeLine{00605\ \ \ \ \ \textcolor{keywordflow}{raise}\ NotImplementedError(}
+\DoxyCodeLine{00606\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}abstract\ method\ -\/-\/\ subclass\ \%s\ must\ override"{}}\ \%\ self.\_\_class\_\_)}
+\DoxyCodeLine{00607\ }
+
+\end{DoxyCode}
+\Hypertarget{classupload_1_1_version_control_system_adf8a0253323a47c6a12e235c9160bb38}\index{upload.VersionControlSystem@{upload.VersionControlSystem}!GetBaseFile@{GetBaseFile}}
+\index{GetBaseFile@{GetBaseFile}!upload.VersionControlSystem@{upload.VersionControlSystem}}
+\doxysubsubsection{\texorpdfstring{GetBaseFile()}{GetBaseFile()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classupload_1_1_version_control_system_adf8a0253323a47c6a12e235c9160bb38} 
+upload.\+Version\+Control\+System.\+Get\+Base\+File (\begin{DoxyParamCaption}\item[{}]{self}{, }\item[{}]{filename}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Get the content of the upstream version of a file.
+
+Returns:
+  A tuple (base_content, new_content, is_binary, status)
+    base_content: The contents of the base file.
+    new_content: For text files, this is empty.  For binary files, this is
+      the contents of the new file, since the diff output won't contain
+      information to reconstruct the current file.
+    is_binary: True iff the file is binary.
+    status: The status of the file.
+\end{DoxyVerb}
+ 
+
+Reimplemented in \mbox{\hyperlink{classupload_1_1_git_v_c_s_ad38b27f3c3b0d341a21edd9d393683f3}{upload.\+Git\+VCS}}, \mbox{\hyperlink{classupload_1_1_git_v_c_s_ad38b27f3c3b0d341a21edd9d393683f3}{upload.\+Git\+VCS}}, \mbox{\hyperlink{classupload_1_1_mercurial_v_c_s_a7bd835c63bb09c3f01fb24fce4657f4c}{upload.\+Mercurial\+VCS}}, \mbox{\hyperlink{classupload_1_1_mercurial_v_c_s_a7bd835c63bb09c3f01fb24fce4657f4c}{upload.\+Mercurial\+VCS}}, \mbox{\hyperlink{classupload_1_1_subversion_v_c_s_af842b536e7d9aad2be83562c01c03d12}{upload.\+Subversion\+VCS}}, and \mbox{\hyperlink{classupload_1_1_subversion_v_c_s_af842b536e7d9aad2be83562c01c03d12}{upload.\+Subversion\+VCS}}.
+
+
+
+Definition at line \mbox{\hyperlink{googlemock_2scripts_2upload_8py_source_l00625}{625}} of file \mbox{\hyperlink{googlemock_2scripts_2upload_8py_source}{upload.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00625\ \ \ \textcolor{keyword}{def\ }GetBaseFile(self,\ filename):}
+\DoxyCodeLine{00626\ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Get\ the\ content\ of\ the\ upstream\ version\ of\ a\ file.}}
+\DoxyCodeLine{00627\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00628\ \textcolor{stringliteral}{\ \ \ \ Returns:}}
+\DoxyCodeLine{00629\ \textcolor{stringliteral}{\ \ \ \ \ \ A\ tuple\ (base\_content,\ new\_content,\ is\_binary,\ status)}}
+\DoxyCodeLine{00630\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ base\_content:\ The\ contents\ of\ the\ base\ file.}}
+\DoxyCodeLine{00631\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ new\_content:\ For\ text\ files,\ this\ is\ empty.\ \ For\ binary\ files,\ this\ is}}
+\DoxyCodeLine{00632\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ the\ contents\ of\ the\ new\ file,\ since\ the\ diff\ output\ won't\ contain}}
+\DoxyCodeLine{00633\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ information\ to\ reconstruct\ the\ current\ file.}}
+\DoxyCodeLine{00634\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ is\_binary:\ True\ iff\ the\ file\ is\ binary.}}
+\DoxyCodeLine{00635\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ status:\ The\ status\ of\ the\ file.}}
+\DoxyCodeLine{00636\ \textcolor{stringliteral}{\ \ \ \ "{}"{}"{}}}
+\DoxyCodeLine{00637\ }
+\DoxyCodeLine{00638\ \ \ \ \ \textcolor{keywordflow}{raise}\ NotImplementedError(}
+\DoxyCodeLine{00639\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}abstract\ method\ -\/-\/\ subclass\ \%s\ must\ override"{}}\ \%\ self.\_\_class\_\_)}
+\DoxyCodeLine{00640\ }
+\DoxyCodeLine{00641\ }
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classupload_1_1_version_control_system_adf8a0253323a47c6a12e235c9160bb38_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classupload_1_1_version_control_system_adf8a0253323a47c6a12e235c9160bb38}\index{upload.VersionControlSystem@{upload.VersionControlSystem}!GetBaseFile@{GetBaseFile}}
+\index{GetBaseFile@{GetBaseFile}!upload.VersionControlSystem@{upload.VersionControlSystem}}
+\doxysubsubsection{\texorpdfstring{GetBaseFile()}{GetBaseFile()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classupload_1_1_version_control_system_adf8a0253323a47c6a12e235c9160bb38} 
+upload.\+Version\+Control\+System.\+Get\+Base\+File (\begin{DoxyParamCaption}\item[{}]{self}{, }\item[{}]{filename}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Get the content of the upstream version of a file.
+
+Returns:
+  A tuple (base_content, new_content, is_binary, status)
+    base_content: The contents of the base file.
+    new_content: For text files, this is empty.  For binary files, this is
+      the contents of the new file, since the diff output won't contain
+      information to reconstruct the current file.
+    is_binary: True iff the file is binary.
+    status: The status of the file.
+\end{DoxyVerb}
+ 
+
+Reimplemented in \mbox{\hyperlink{classupload_1_1_git_v_c_s_ad38b27f3c3b0d341a21edd9d393683f3}{upload.\+Git\+VCS}}, \mbox{\hyperlink{classupload_1_1_git_v_c_s_ad38b27f3c3b0d341a21edd9d393683f3}{upload.\+Git\+VCS}}, \mbox{\hyperlink{classupload_1_1_mercurial_v_c_s_a7bd835c63bb09c3f01fb24fce4657f4c}{upload.\+Mercurial\+VCS}}, \mbox{\hyperlink{classupload_1_1_mercurial_v_c_s_a7bd835c63bb09c3f01fb24fce4657f4c}{upload.\+Mercurial\+VCS}}, \mbox{\hyperlink{classupload_1_1_subversion_v_c_s_af842b536e7d9aad2be83562c01c03d12}{upload.\+Subversion\+VCS}}, and \mbox{\hyperlink{classupload_1_1_subversion_v_c_s_af842b536e7d9aad2be83562c01c03d12}{upload.\+Subversion\+VCS}}.
+
+
+
+Definition at line \mbox{\hyperlink{googletest_2scripts_2upload_8py_source_l00625}{625}} of file \mbox{\hyperlink{googletest_2scripts_2upload_8py_source}{upload.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00625\ \ \ \textcolor{keyword}{def\ }GetBaseFile(self,\ filename):}
+\DoxyCodeLine{00626\ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Get\ the\ content\ of\ the\ upstream\ version\ of\ a\ file.}}
+\DoxyCodeLine{00627\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00628\ \textcolor{stringliteral}{\ \ \ \ Returns:}}
+\DoxyCodeLine{00629\ \textcolor{stringliteral}{\ \ \ \ \ \ A\ tuple\ (base\_content,\ new\_content,\ is\_binary,\ status)}}
+\DoxyCodeLine{00630\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ base\_content:\ The\ contents\ of\ the\ base\ file.}}
+\DoxyCodeLine{00631\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ new\_content:\ For\ text\ files,\ this\ is\ empty.\ \ For\ binary\ files,\ this\ is}}
+\DoxyCodeLine{00632\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ the\ contents\ of\ the\ new\ file,\ since\ the\ diff\ output\ won't\ contain}}
+\DoxyCodeLine{00633\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ information\ to\ reconstruct\ the\ current\ file.}}
+\DoxyCodeLine{00634\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ is\_binary:\ True\ iff\ the\ file\ is\ binary.}}
+\DoxyCodeLine{00635\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ status:\ The\ status\ of\ the\ file.}}
+\DoxyCodeLine{00636\ \textcolor{stringliteral}{\ \ \ \ "{}"{}"{}}}
+\DoxyCodeLine{00637\ }
+\DoxyCodeLine{00638\ \ \ \ \ \textcolor{keywordflow}{raise}\ NotImplementedError(}
+\DoxyCodeLine{00639\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}abstract\ method\ -\/-\/\ subclass\ \%s\ must\ override"{}}\ \%\ self.\_\_class\_\_)}
+\DoxyCodeLine{00640\ }
+\DoxyCodeLine{00641\ }
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classupload_1_1_version_control_system_adf8a0253323a47c6a12e235c9160bb38_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classupload_1_1_version_control_system_a426cb9d4ad9f94754c9122653e3aa24f}\index{upload.VersionControlSystem@{upload.VersionControlSystem}!GetBaseFiles@{GetBaseFiles}}
+\index{GetBaseFiles@{GetBaseFiles}!upload.VersionControlSystem@{upload.VersionControlSystem}}
+\doxysubsubsection{\texorpdfstring{GetBaseFiles()}{GetBaseFiles()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classupload_1_1_version_control_system_a426cb9d4ad9f94754c9122653e3aa24f} 
+upload.\+Version\+Control\+System.\+Get\+Base\+Files (\begin{DoxyParamCaption}\item[{}]{self}{, }\item[{}]{diff}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Helper that calls GetBase file for each file in the patch.
+
+Returns:
+  A dictionary that maps from filename to GetBaseFile's tuple.  Filenames
+  are retrieved based on lines that start with "Index:" or
+  "Property changes on:".
+\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{googlemock_2scripts_2upload_8py_source_l00642}{642}} of file \mbox{\hyperlink{googlemock_2scripts_2upload_8py_source}{upload.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00642\ \ \ \textcolor{keyword}{def\ }GetBaseFiles(self,\ diff):}
+\DoxyCodeLine{00643\ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Helper\ that\ calls\ GetBase\ file\ for\ each\ file\ in\ the\ patch.}}
+\DoxyCodeLine{00644\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00645\ \textcolor{stringliteral}{\ \ \ \ Returns:}}
+\DoxyCodeLine{00646\ \textcolor{stringliteral}{\ \ \ \ \ \ A\ dictionary\ that\ maps\ from\ filename\ to\ GetBaseFile's\ tuple.\ \ Filenames}}
+\DoxyCodeLine{00647\ \textcolor{stringliteral}{\ \ \ \ \ \ are\ retrieved\ based\ on\ lines\ that\ start\ with\ "{}Index:"{}\ or}}
+\DoxyCodeLine{00648\ \textcolor{stringliteral}{\ \ \ \ \ \ "{}Property\ changes\ on:"{}.}}
+\DoxyCodeLine{00649\ \textcolor{stringliteral}{\ \ \ \ "{}"{}"{}}}
+\DoxyCodeLine{00650\ \ \ \ \ files\ =\ \{\}}
+\DoxyCodeLine{00651\ \ \ \ \ \textcolor{keywordflow}{for}\ line\ \textcolor{keywordflow}{in}\ diff.splitlines(\textcolor{keyword}{True}):}
+\DoxyCodeLine{00652\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ line.startswith(\textcolor{stringliteral}{'Index:'})\ \textcolor{keywordflow}{or}\ line.startswith(\textcolor{stringliteral}{'Property\ changes\ on:'}):}
+\DoxyCodeLine{00653\ \ \ \ \ \ \ \ \ unused,\ filename\ =\ line.split(\textcolor{stringliteral}{':'},\ 1)}
+\DoxyCodeLine{00654\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ On\ Windows\ if\ a\ file\ has\ property\ changes\ its\ filename\ uses\ '\(\backslash\)'}}
+\DoxyCodeLine{00655\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ instead\ of\ '/'.}}
+\DoxyCodeLine{00656\ \ \ \ \ \ \ \ \ filename\ =\ filename.strip().replace(\textcolor{stringliteral}{'\(\backslash\)\(\backslash\)'},\ \textcolor{stringliteral}{'/'})}
+\DoxyCodeLine{00657\ \ \ \ \ \ \ \ \ files[filename]\ =\ self.GetBaseFile(filename)}
+\DoxyCodeLine{00658\ \ \ \ \ \textcolor{keywordflow}{return}\ files}
+\DoxyCodeLine{00659\ }
+\DoxyCodeLine{00660\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classupload_1_1_version_control_system_a426cb9d4ad9f94754c9122653e3aa24f_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classupload_1_1_version_control_system_a426cb9d4ad9f94754c9122653e3aa24f}\index{upload.VersionControlSystem@{upload.VersionControlSystem}!GetBaseFiles@{GetBaseFiles}}
+\index{GetBaseFiles@{GetBaseFiles}!upload.VersionControlSystem@{upload.VersionControlSystem}}
+\doxysubsubsection{\texorpdfstring{GetBaseFiles()}{GetBaseFiles()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classupload_1_1_version_control_system_a426cb9d4ad9f94754c9122653e3aa24f} 
+upload.\+Version\+Control\+System.\+Get\+Base\+Files (\begin{DoxyParamCaption}\item[{}]{self}{, }\item[{}]{diff}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Helper that calls GetBase file for each file in the patch.
+
+Returns:
+  A dictionary that maps from filename to GetBaseFile's tuple.  Filenames
+  are retrieved based on lines that start with "Index:" or
+  "Property changes on:".
+\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{googletest_2scripts_2upload_8py_source_l00642}{642}} of file \mbox{\hyperlink{googletest_2scripts_2upload_8py_source}{upload.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00642\ \ \ \textcolor{keyword}{def\ }GetBaseFiles(self,\ diff):}
+\DoxyCodeLine{00643\ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Helper\ that\ calls\ GetBase\ file\ for\ each\ file\ in\ the\ patch.}}
+\DoxyCodeLine{00644\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00645\ \textcolor{stringliteral}{\ \ \ \ Returns:}}
+\DoxyCodeLine{00646\ \textcolor{stringliteral}{\ \ \ \ \ \ A\ dictionary\ that\ maps\ from\ filename\ to\ GetBaseFile's\ tuple.\ \ Filenames}}
+\DoxyCodeLine{00647\ \textcolor{stringliteral}{\ \ \ \ \ \ are\ retrieved\ based\ on\ lines\ that\ start\ with\ "{}Index:"{}\ or}}
+\DoxyCodeLine{00648\ \textcolor{stringliteral}{\ \ \ \ \ \ "{}Property\ changes\ on:"{}.}}
+\DoxyCodeLine{00649\ \textcolor{stringliteral}{\ \ \ \ "{}"{}"{}}}
+\DoxyCodeLine{00650\ \ \ \ \ files\ =\ \{\}}
+\DoxyCodeLine{00651\ \ \ \ \ \textcolor{keywordflow}{for}\ line\ \textcolor{keywordflow}{in}\ diff.splitlines(\textcolor{keyword}{True}):}
+\DoxyCodeLine{00652\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ line.startswith(\textcolor{stringliteral}{'Index:'})\ \textcolor{keywordflow}{or}\ line.startswith(\textcolor{stringliteral}{'Property\ changes\ on:'}):}
+\DoxyCodeLine{00653\ \ \ \ \ \ \ \ \ unused,\ filename\ =\ line.split(\textcolor{stringliteral}{':'},\ 1)}
+\DoxyCodeLine{00654\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ On\ Windows\ if\ a\ file\ has\ property\ changes\ its\ filename\ uses\ '\(\backslash\)'}}
+\DoxyCodeLine{00655\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ instead\ of\ '/'.}}
+\DoxyCodeLine{00656\ \ \ \ \ \ \ \ \ filename\ =\ filename.strip().replace(\textcolor{stringliteral}{'\(\backslash\)\(\backslash\)'},\ \textcolor{stringliteral}{'/'})}
+\DoxyCodeLine{00657\ \ \ \ \ \ \ \ \ files[filename]\ =\ self.GetBaseFile(filename)}
+\DoxyCodeLine{00658\ \ \ \ \ \textcolor{keywordflow}{return}\ files}
+\DoxyCodeLine{00659\ }
+\DoxyCodeLine{00660\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classupload_1_1_version_control_system_a426cb9d4ad9f94754c9122653e3aa24f_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classupload_1_1_version_control_system_a500344e5ca80b8fb29773ebe8aac4844}\index{upload.VersionControlSystem@{upload.VersionControlSystem}!GetUnknownFiles@{GetUnknownFiles}}
+\index{GetUnknownFiles@{GetUnknownFiles}!upload.VersionControlSystem@{upload.VersionControlSystem}}
+\doxysubsubsection{\texorpdfstring{GetUnknownFiles()}{GetUnknownFiles()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classupload_1_1_version_control_system_a500344e5ca80b8fb29773ebe8aac4844} 
+upload.\+Version\+Control\+System.\+Get\+Unknown\+Files (\begin{DoxyParamCaption}\item[{}]{self}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Return a list of files unknown to the VCS.\end{DoxyVerb}
+ 
+
+Reimplemented in \mbox{\hyperlink{classupload_1_1_git_v_c_s_a435002a80c0afb73fe388af93db1a7b1}{upload.\+Git\+VCS}}, \mbox{\hyperlink{classupload_1_1_git_v_c_s_a435002a80c0afb73fe388af93db1a7b1}{upload.\+Git\+VCS}}, \mbox{\hyperlink{classupload_1_1_mercurial_v_c_s_a453e37400923d6fdc6dbbe1203a097a1}{upload.\+Mercurial\+VCS}}, \mbox{\hyperlink{classupload_1_1_mercurial_v_c_s_a453e37400923d6fdc6dbbe1203a097a1}{upload.\+Mercurial\+VCS}}, \mbox{\hyperlink{classupload_1_1_subversion_v_c_s_a463e488be353b009fcc9a9ba04c1fa2a}{upload.\+Subversion\+VCS}}, and \mbox{\hyperlink{classupload_1_1_subversion_v_c_s_a463e488be353b009fcc9a9ba04c1fa2a}{upload.\+Subversion\+VCS}}.
+
+
+
+Definition at line \mbox{\hyperlink{googlemock_2scripts_2upload_8py_source_l00608}{608}} of file \mbox{\hyperlink{googlemock_2scripts_2upload_8py_source}{upload.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00608\ \ \ \textcolor{keyword}{def\ }GetUnknownFiles(self):}
+\DoxyCodeLine{00609\ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Return\ a\ list\ of\ files\ unknown\ to\ the\ VCS."{}"{}"{}}}
+\DoxyCodeLine{00610\ \ \ \ \ \textcolor{keywordflow}{raise}\ NotImplementedError(}
+\DoxyCodeLine{00611\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}abstract\ method\ -\/-\/\ subclass\ \%s\ must\ override"{}}\ \%\ self.\_\_class\_\_)}
+\DoxyCodeLine{00612\ }
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classupload_1_1_version_control_system_a500344e5ca80b8fb29773ebe8aac4844_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classupload_1_1_version_control_system_a500344e5ca80b8fb29773ebe8aac4844}\index{upload.VersionControlSystem@{upload.VersionControlSystem}!GetUnknownFiles@{GetUnknownFiles}}
+\index{GetUnknownFiles@{GetUnknownFiles}!upload.VersionControlSystem@{upload.VersionControlSystem}}
+\doxysubsubsection{\texorpdfstring{GetUnknownFiles()}{GetUnknownFiles()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classupload_1_1_version_control_system_a500344e5ca80b8fb29773ebe8aac4844} 
+upload.\+Version\+Control\+System.\+Get\+Unknown\+Files (\begin{DoxyParamCaption}\item[{}]{self}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Return a list of files unknown to the VCS.\end{DoxyVerb}
+ 
+
+Reimplemented in \mbox{\hyperlink{classupload_1_1_git_v_c_s_a435002a80c0afb73fe388af93db1a7b1}{upload.\+Git\+VCS}}, \mbox{\hyperlink{classupload_1_1_git_v_c_s_a435002a80c0afb73fe388af93db1a7b1}{upload.\+Git\+VCS}}, \mbox{\hyperlink{classupload_1_1_mercurial_v_c_s_a453e37400923d6fdc6dbbe1203a097a1}{upload.\+Mercurial\+VCS}}, \mbox{\hyperlink{classupload_1_1_mercurial_v_c_s_a453e37400923d6fdc6dbbe1203a097a1}{upload.\+Mercurial\+VCS}}, \mbox{\hyperlink{classupload_1_1_subversion_v_c_s_a463e488be353b009fcc9a9ba04c1fa2a}{upload.\+Subversion\+VCS}}, and \mbox{\hyperlink{classupload_1_1_subversion_v_c_s_a463e488be353b009fcc9a9ba04c1fa2a}{upload.\+Subversion\+VCS}}.
+
+
+
+Definition at line \mbox{\hyperlink{googletest_2scripts_2upload_8py_source_l00608}{608}} of file \mbox{\hyperlink{googletest_2scripts_2upload_8py_source}{upload.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00608\ \ \ \textcolor{keyword}{def\ }GetUnknownFiles(self):}
+\DoxyCodeLine{00609\ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Return\ a\ list\ of\ files\ unknown\ to\ the\ VCS."{}"{}"{}}}
+\DoxyCodeLine{00610\ \ \ \ \ \textcolor{keywordflow}{raise}\ NotImplementedError(}
+\DoxyCodeLine{00611\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}abstract\ method\ -\/-\/\ subclass\ \%s\ must\ override"{}}\ \%\ self.\_\_class\_\_)}
+\DoxyCodeLine{00612\ }
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classupload_1_1_version_control_system_a500344e5ca80b8fb29773ebe8aac4844_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classupload_1_1_version_control_system_a8d49726fefa641c183d210889491396c}\index{upload.VersionControlSystem@{upload.VersionControlSystem}!IsImage@{IsImage}}
+\index{IsImage@{IsImage}!upload.VersionControlSystem@{upload.VersionControlSystem}}
+\doxysubsubsection{\texorpdfstring{IsImage()}{IsImage()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classupload_1_1_version_control_system_a8d49726fefa641c183d210889491396c} 
+upload.\+Version\+Control\+System.\+Is\+Image (\begin{DoxyParamCaption}\item[{}]{self}{, }\item[{}]{filename}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Returns true if the filename has an image extension.\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{googlemock_2scripts_2upload_8py_source_l00713}{713}} of file \mbox{\hyperlink{googlemock_2scripts_2upload_8py_source}{upload.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00713\ \ \ \textcolor{keyword}{def\ }IsImage(self,\ filename):}
+\DoxyCodeLine{00714\ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Returns\ true\ if\ the\ filename\ has\ an\ image\ extension."{}"{}"{}}}
+\DoxyCodeLine{00715\ \ \ \ \ mimetype\ =\ \ mimetypes.guess\_type(filename)[0]}
+\DoxyCodeLine{00716\ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keywordflow}{not}\ mimetype:}
+\DoxyCodeLine{00717\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{False}}
+\DoxyCodeLine{00718\ \ \ \ \ \textcolor{keywordflow}{return}\ mimetype.startswith(\textcolor{stringliteral}{"{}image/"{}})}
+\DoxyCodeLine{00719\ }
+\DoxyCodeLine{00720\ }
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classupload_1_1_version_control_system_a8d49726fefa641c183d210889491396c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classupload_1_1_version_control_system_a8d49726fefa641c183d210889491396c}\index{upload.VersionControlSystem@{upload.VersionControlSystem}!IsImage@{IsImage}}
+\index{IsImage@{IsImage}!upload.VersionControlSystem@{upload.VersionControlSystem}}
+\doxysubsubsection{\texorpdfstring{IsImage()}{IsImage()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classupload_1_1_version_control_system_a8d49726fefa641c183d210889491396c} 
+upload.\+Version\+Control\+System.\+Is\+Image (\begin{DoxyParamCaption}\item[{}]{self}{, }\item[{}]{filename}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Returns true if the filename has an image extension.\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{googletest_2scripts_2upload_8py_source_l00713}{713}} of file \mbox{\hyperlink{googletest_2scripts_2upload_8py_source}{upload.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00713\ \ \ \textcolor{keyword}{def\ }IsImage(self,\ filename):}
+\DoxyCodeLine{00714\ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Returns\ true\ if\ the\ filename\ has\ an\ image\ extension."{}"{}"{}}}
+\DoxyCodeLine{00715\ \ \ \ \ mimetype\ =\ \ mimetypes.guess\_type(filename)[0]}
+\DoxyCodeLine{00716\ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keywordflow}{not}\ mimetype:}
+\DoxyCodeLine{00717\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{False}}
+\DoxyCodeLine{00718\ \ \ \ \ \textcolor{keywordflow}{return}\ mimetype.startswith(\textcolor{stringliteral}{"{}image/"{}})}
+\DoxyCodeLine{00719\ }
+\DoxyCodeLine{00720\ }
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classupload_1_1_version_control_system_a8d49726fefa641c183d210889491396c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classupload_1_1_version_control_system_ac1549d3e1616a01a27581a03ee754189}\index{upload.VersionControlSystem@{upload.VersionControlSystem}!UploadBaseFiles@{UploadBaseFiles}}
+\index{UploadBaseFiles@{UploadBaseFiles}!upload.VersionControlSystem@{upload.VersionControlSystem}}
+\doxysubsubsection{\texorpdfstring{UploadBaseFiles()}{UploadBaseFiles()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classupload_1_1_version_control_system_ac1549d3e1616a01a27581a03ee754189} 
+upload.\+Version\+Control\+System.\+Upload\+Base\+Files (\begin{DoxyParamCaption}\item[{}]{self}{, }\item[{}]{issue}{, }\item[{}]{rpc\+\_\+server}{, }\item[{}]{patch\+\_\+list}{, }\item[{}]{patchset}{, }\item[{}]{options}{, }\item[{}]{files}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Uploads the base files (and if necessary, the current ones as well).\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{googlemock_2scripts_2upload_8py_source_l00661}{661}} of file \mbox{\hyperlink{googlemock_2scripts_2upload_8py_source}{upload.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00662\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ files):}
+\DoxyCodeLine{00663\ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Uploads\ the\ base\ files\ (and\ if\ necessary,\ the\ current\ ones\ as\ well)."{}"{}"{}}}
+\DoxyCodeLine{00664\ }
+\DoxyCodeLine{00665\ \ \ \ \ \textcolor{keyword}{def\ }UploadFile(filename,\ file\_id,\ content,\ is\_binary,\ status,\ is\_base):}
+\DoxyCodeLine{00666\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Uploads\ a\ file\ to\ the\ server."{}"{}"{}}}
+\DoxyCodeLine{00667\ \ \ \ \ \ \ file\_too\_large\ =\ \textcolor{keyword}{False}}
+\DoxyCodeLine{00668\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ is\_base:}
+\DoxyCodeLine{00669\ \ \ \ \ \ \ \ \ type\ =\ \textcolor{stringliteral}{"{}base"{}}}
+\DoxyCodeLine{00670\ \ \ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{00671\ \ \ \ \ \ \ \ \ type\ =\ \textcolor{stringliteral}{"{}current"{}}}
+\DoxyCodeLine{00672\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}(content)\ >\ MAX\_UPLOAD\_SIZE:}
+\DoxyCodeLine{00673\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{print}\ (\textcolor{stringliteral}{"{}Not\ uploading\ the\ \%s\ file\ for\ \%s\ because\ it's\ too\ large."{}}\ \%}
+\DoxyCodeLine{00674\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (type,\ filename))}
+\DoxyCodeLine{00675\ \ \ \ \ \ \ \ \ file\_too\_large\ =\ \textcolor{keyword}{True}}
+\DoxyCodeLine{00676\ \ \ \ \ \ \ \ \ content\ =\ \textcolor{stringliteral}{"{}"{}}}
+\DoxyCodeLine{00677\ \ \ \ \ \ \ checksum\ =\ md5.new(content).hexdigest()}
+\DoxyCodeLine{00678\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ options.verbose\ >\ 0\ \textcolor{keywordflow}{and}\ \textcolor{keywordflow}{not}\ file\_too\_large:}
+\DoxyCodeLine{00679\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{print}\ \textcolor{stringliteral}{"{}Uploading\ \%s\ file\ for\ \%s"{}}\ \%\ (type,\ filename)}
+\DoxyCodeLine{00680\ \ \ \ \ \ \ url\ =\ \textcolor{stringliteral}{"{}/\%d/upload\_content/\%d/\%d"{}}\ \%\ (int(issue),\ int(patchset),\ file\_id)}
+\DoxyCodeLine{00681\ \ \ \ \ \ \ form\_fields\ =\ [(\textcolor{stringliteral}{"{}filename"{}},\ filename),}
+\DoxyCodeLine{00682\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}status"{}},\ status),}
+\DoxyCodeLine{00683\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}checksum"{}},\ checksum),}
+\DoxyCodeLine{00684\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}is\_binary"{}},\ str(is\_binary)),}
+\DoxyCodeLine{00685\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}is\_current"{}},\ str(\textcolor{keywordflow}{not}\ is\_base)),}
+\DoxyCodeLine{00686\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ]}
+\DoxyCodeLine{00687\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ file\_too\_large:}
+\DoxyCodeLine{00688\ \ \ \ \ \ \ \ \ form\_fields.append((\textcolor{stringliteral}{"{}file\_too\_large"{}},\ \textcolor{stringliteral}{"{}1"{}}))}
+\DoxyCodeLine{00689\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ options.email:}
+\DoxyCodeLine{00690\ \ \ \ \ \ \ \ \ form\_fields.append((\textcolor{stringliteral}{"{}user"{}},\ options.email))}
+\DoxyCodeLine{00691\ \ \ \ \ \ \ ctype,\ body\ =\ EncodeMultipartFormData(form\_fields,}
+\DoxyCodeLine{00692\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [(\textcolor{stringliteral}{"{}data"{}},\ filename,\ content)])}
+\DoxyCodeLine{00693\ \ \ \ \ \ \ response\_body\ =\ rpc\_server.Send(url,\ body,}
+\DoxyCodeLine{00694\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ content\_type=ctype)}
+\DoxyCodeLine{00695\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keywordflow}{not}\ response\_body.startswith(\textcolor{stringliteral}{"{}OK"{}}):}
+\DoxyCodeLine{00696\ \ \ \ \ \ \ \ \ StatusUpdate(\textcolor{stringliteral}{"{}\ \ -\/-\/>\ \%s"{}}\ \%\ response\_body)}
+\DoxyCodeLine{00697\ \ \ \ \ \ \ \ \ sys.exit(1)}
+\DoxyCodeLine{00698\ }
+\DoxyCodeLine{00699\ \ \ \ \ patches\ =\ dict()}
+\DoxyCodeLine{00700\ \ \ \ \ [patches.setdefault(v,\ k)\ \textcolor{keywordflow}{for}\ k,\ v\ \textcolor{keywordflow}{in}\ patch\_list]}
+\DoxyCodeLine{00701\ \ \ \ \ \textcolor{keywordflow}{for}\ filename\ \textcolor{keywordflow}{in}\ patches.keys():}
+\DoxyCodeLine{00702\ \ \ \ \ \ \ base\_content,\ new\_content,\ is\_binary,\ status\ =\ files[filename]}
+\DoxyCodeLine{00703\ \ \ \ \ \ \ file\_id\_str\ =\ patches.get(filename)}
+\DoxyCodeLine{00704\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ file\_id\_str.find(\textcolor{stringliteral}{"{}nobase"{}})\ !=\ -\/1:}
+\DoxyCodeLine{00705\ \ \ \ \ \ \ \ \ base\_content\ =\ \textcolor{keywordtype}{None}}
+\DoxyCodeLine{00706\ \ \ \ \ \ \ \ \ file\_id\_str\ =\ file\_id\_str[file\_id\_str.rfind(\textcolor{stringliteral}{"{}\_"{}})\ +\ 1:]}
+\DoxyCodeLine{00707\ \ \ \ \ \ \ file\_id\ =\ int(file\_id\_str)}
+\DoxyCodeLine{00708\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ base\_content\ !=\ \textcolor{keywordtype}{None}:}
+\DoxyCodeLine{00709\ \ \ \ \ \ \ \ \ UploadFile(filename,\ file\_id,\ base\_content,\ is\_binary,\ status,\ \textcolor{keyword}{True})}
+\DoxyCodeLine{00710\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ new\_content\ !=\ \textcolor{keywordtype}{None}:}
+\DoxyCodeLine{00711\ \ \ \ \ \ \ \ \ UploadFile(filename,\ file\_id,\ new\_content,\ is\_binary,\ status,\ \textcolor{keyword}{False})}
+\DoxyCodeLine{00712\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classupload_1_1_version_control_system_ac1549d3e1616a01a27581a03ee754189_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classupload_1_1_version_control_system_ac1549d3e1616a01a27581a03ee754189}\index{upload.VersionControlSystem@{upload.VersionControlSystem}!UploadBaseFiles@{UploadBaseFiles}}
+\index{UploadBaseFiles@{UploadBaseFiles}!upload.VersionControlSystem@{upload.VersionControlSystem}}
+\doxysubsubsection{\texorpdfstring{UploadBaseFiles()}{UploadBaseFiles()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classupload_1_1_version_control_system_ac1549d3e1616a01a27581a03ee754189} 
+upload.\+Version\+Control\+System.\+Upload\+Base\+Files (\begin{DoxyParamCaption}\item[{}]{self}{, }\item[{}]{issue}{, }\item[{}]{rpc\+\_\+server}{, }\item[{}]{patch\+\_\+list}{, }\item[{}]{patchset}{, }\item[{}]{options}{, }\item[{}]{files}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Uploads the base files (and if necessary, the current ones as well).\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{googletest_2scripts_2upload_8py_source_l00661}{661}} of file \mbox{\hyperlink{googletest_2scripts_2upload_8py_source}{upload.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00662\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ files):}
+\DoxyCodeLine{00663\ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Uploads\ the\ base\ files\ (and\ if\ necessary,\ the\ current\ ones\ as\ well)."{}"{}"{}}}
+\DoxyCodeLine{00664\ }
+\DoxyCodeLine{00665\ \ \ \ \ \textcolor{keyword}{def\ }UploadFile(filename,\ file\_id,\ content,\ is\_binary,\ status,\ is\_base):}
+\DoxyCodeLine{00666\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Uploads\ a\ file\ to\ the\ server."{}"{}"{}}}
+\DoxyCodeLine{00667\ \ \ \ \ \ \ file\_too\_large\ =\ \textcolor{keyword}{False}}
+\DoxyCodeLine{00668\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ is\_base:}
+\DoxyCodeLine{00669\ \ \ \ \ \ \ \ \ type\ =\ \textcolor{stringliteral}{"{}base"{}}}
+\DoxyCodeLine{00670\ \ \ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{00671\ \ \ \ \ \ \ \ \ type\ =\ \textcolor{stringliteral}{"{}current"{}}}
+\DoxyCodeLine{00672\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}(content)\ >\ MAX\_UPLOAD\_SIZE:}
+\DoxyCodeLine{00673\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{print}\ (\textcolor{stringliteral}{"{}Not\ uploading\ the\ \%s\ file\ for\ \%s\ because\ it's\ too\ large."{}}\ \%}
+\DoxyCodeLine{00674\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (type,\ filename))}
+\DoxyCodeLine{00675\ \ \ \ \ \ \ \ \ file\_too\_large\ =\ \textcolor{keyword}{True}}
+\DoxyCodeLine{00676\ \ \ \ \ \ \ \ \ content\ =\ \textcolor{stringliteral}{"{}"{}}}
+\DoxyCodeLine{00677\ \ \ \ \ \ \ checksum\ =\ md5.new(content).hexdigest()}
+\DoxyCodeLine{00678\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ options.verbose\ >\ 0\ \textcolor{keywordflow}{and}\ \textcolor{keywordflow}{not}\ file\_too\_large:}
+\DoxyCodeLine{00679\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{print}\ \textcolor{stringliteral}{"{}Uploading\ \%s\ file\ for\ \%s"{}}\ \%\ (type,\ filename)}
+\DoxyCodeLine{00680\ \ \ \ \ \ \ url\ =\ \textcolor{stringliteral}{"{}/\%d/upload\_content/\%d/\%d"{}}\ \%\ (int(issue),\ int(patchset),\ file\_id)}
+\DoxyCodeLine{00681\ \ \ \ \ \ \ form\_fields\ =\ [(\textcolor{stringliteral}{"{}filename"{}},\ filename),}
+\DoxyCodeLine{00682\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}status"{}},\ status),}
+\DoxyCodeLine{00683\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}checksum"{}},\ checksum),}
+\DoxyCodeLine{00684\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}is\_binary"{}},\ str(is\_binary)),}
+\DoxyCodeLine{00685\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}is\_current"{}},\ str(\textcolor{keywordflow}{not}\ is\_base)),}
+\DoxyCodeLine{00686\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ]}
+\DoxyCodeLine{00687\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ file\_too\_large:}
+\DoxyCodeLine{00688\ \ \ \ \ \ \ \ \ form\_fields.append((\textcolor{stringliteral}{"{}file\_too\_large"{}},\ \textcolor{stringliteral}{"{}1"{}}))}
+\DoxyCodeLine{00689\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ options.email:}
+\DoxyCodeLine{00690\ \ \ \ \ \ \ \ \ form\_fields.append((\textcolor{stringliteral}{"{}user"{}},\ options.email))}
+\DoxyCodeLine{00691\ \ \ \ \ \ \ ctype,\ body\ =\ EncodeMultipartFormData(form\_fields,}
+\DoxyCodeLine{00692\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [(\textcolor{stringliteral}{"{}data"{}},\ filename,\ content)])}
+\DoxyCodeLine{00693\ \ \ \ \ \ \ response\_body\ =\ rpc\_server.Send(url,\ body,}
+\DoxyCodeLine{00694\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ content\_type=ctype)}
+\DoxyCodeLine{00695\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keywordflow}{not}\ response\_body.startswith(\textcolor{stringliteral}{"{}OK"{}}):}
+\DoxyCodeLine{00696\ \ \ \ \ \ \ \ \ StatusUpdate(\textcolor{stringliteral}{"{}\ \ -\/-\/>\ \%s"{}}\ \%\ response\_body)}
+\DoxyCodeLine{00697\ \ \ \ \ \ \ \ \ sys.exit(1)}
+\DoxyCodeLine{00698\ }
+\DoxyCodeLine{00699\ \ \ \ \ patches\ =\ dict()}
+\DoxyCodeLine{00700\ \ \ \ \ [patches.setdefault(v,\ k)\ \textcolor{keywordflow}{for}\ k,\ v\ \textcolor{keywordflow}{in}\ patch\_list]}
+\DoxyCodeLine{00701\ \ \ \ \ \textcolor{keywordflow}{for}\ filename\ \textcolor{keywordflow}{in}\ patches.keys():}
+\DoxyCodeLine{00702\ \ \ \ \ \ \ base\_content,\ new\_content,\ is\_binary,\ status\ =\ files[filename]}
+\DoxyCodeLine{00703\ \ \ \ \ \ \ file\_id\_str\ =\ patches.get(filename)}
+\DoxyCodeLine{00704\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ file\_id\_str.find(\textcolor{stringliteral}{"{}nobase"{}})\ !=\ -\/1:}
+\DoxyCodeLine{00705\ \ \ \ \ \ \ \ \ base\_content\ =\ \textcolor{keywordtype}{None}}
+\DoxyCodeLine{00706\ \ \ \ \ \ \ \ \ file\_id\_str\ =\ file\_id\_str[file\_id\_str.rfind(\textcolor{stringliteral}{"{}\_"{}})\ +\ 1:]}
+\DoxyCodeLine{00707\ \ \ \ \ \ \ file\_id\ =\ int(file\_id\_str)}
+\DoxyCodeLine{00708\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ base\_content\ !=\ \textcolor{keywordtype}{None}:}
+\DoxyCodeLine{00709\ \ \ \ \ \ \ \ \ UploadFile(filename,\ file\_id,\ base\_content,\ is\_binary,\ status,\ \textcolor{keyword}{True})}
+\DoxyCodeLine{00710\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ new\_content\ !=\ \textcolor{keywordtype}{None}:}
+\DoxyCodeLine{00711\ \ \ \ \ \ \ \ \ UploadFile(filename,\ file\_id,\ new\_content,\ is\_binary,\ status,\ \textcolor{keyword}{False})}
+\DoxyCodeLine{00712\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classupload_1_1_version_control_system_ac1549d3e1616a01a27581a03ee754189_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classupload_1_1_version_control_system_a4d57d043bc408887b94269fe4cea9556}\index{upload.VersionControlSystem@{upload.VersionControlSystem}!options@{options}}
+\index{options@{options}!upload.VersionControlSystem@{upload.VersionControlSystem}}
+\doxysubsubsection{\texorpdfstring{options}{options}}
+{\footnotesize\ttfamily \label{classupload_1_1_version_control_system_a4d57d043bc408887b94269fe4cea9556} 
+upload.\+Version\+Control\+System.\+options = options}
+
+
+
+Definition at line \mbox{\hyperlink{googlemock_2scripts_2upload_8py_source_l00597}{597}} of file \mbox{\hyperlink{googlemock_2scripts_2upload_8py_source}{upload.\+py}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/scripts/\mbox{\hyperlink{googlemock_2scripts_2upload_8py}{upload.\+py}}\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/scripts/\mbox{\hyperlink{googletest_2scripts_2upload_8py}{upload.\+py}}\end{DoxyCompactItemize}

@@ -1,0 +1,168 @@
+\doxysection{plugins/resource\+\_\+monitor\+\_\+plugin/test/test\+\_\+add\+\_\+file\+\_\+system.cpp File Reference}
+\hypertarget{test__add__file__system_8cpp}{}\label{test__add__file__system_8cpp}\index{plugins/resource\_monitor\_plugin/test/test\_add\_file\_system.cpp@{plugins/resource\_monitor\_plugin/test/test\_add\_file\_system.cpp}}
+{\ttfamily \#include $<$boost/test/included/unit\+\_\+test.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/variant\+\_\+object.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/resource\+\_\+monitor\+\_\+plugin/file\+\_\+space\+\_\+handler.\+hpp$>$}\newline
+Include dependency graph for test\+\_\+add\+\_\+file\+\_\+system.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__add__file__system_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structadd__file__system__fixture}{add\+\_\+file\+\_\+system\+\_\+fixture}}
+\item 
+struct \mbox{\hyperlink{structadd__file__system__fixture_1_1mock__space__provider}{add\+\_\+file\+\_\+system\+\_\+fixture\+::mock\+\_\+space\+\_\+provider}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{test__add__file__system_8cpp_a6b2a3852db8bb19ab6909bac01859985}{BOOST\+\_\+\+TEST\+\_\+\+MODULE}}~add\+\_\+file\+\_\+system
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{test__add__file__system_8cpp_a14742f316a915dc1b5fe32f7242229b1}{BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE}} (get\+\_\+stat\+\_\+failure, \mbox{\hyperlink{structadd__file__system__fixture}{add\+\_\+file\+\_\+system\+\_\+fixture}})
+\item 
+\mbox{\hyperlink{test__add__file__system_8cpp_a2d16f38650a67b69def8c51b61594647}{BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE}} (get\+\_\+space\+\_\+failure, \mbox{\hyperlink{structadd__file__system__fixture}{add\+\_\+file\+\_\+system\+\_\+fixture}})
+\item 
+\mbox{\hyperlink{test__add__file__system_8cpp_aaa6265ef97547e866e7ac5bf66f8be5d}{BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE}} (different\+\_\+file\+\_\+systems, \mbox{\hyperlink{structadd__file__system__fixture}{add\+\_\+file\+\_\+system\+\_\+fixture}})
+\item 
+\mbox{\hyperlink{test__add__file__system_8cpp_aa3129b724212bb2a15a49c862f8976ef}{BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE}} (same\+\_\+file\+\_\+system, \mbox{\hyperlink{structadd__file__system__fixture}{add\+\_\+file\+\_\+system\+\_\+fixture}})
+\item 
+\mbox{\hyperlink{test__add__file__system_8cpp_ae89d4b2e66f83aa7ad2ef33fcc83c4f5}{BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE}} (mixed\+\_\+file\+\_\+systems, \mbox{\hyperlink{structadd__file__system__fixture}{add\+\_\+file\+\_\+system\+\_\+fixture}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{test__add__file__system_8cpp_a6b2a3852db8bb19ab6909bac01859985}\index{test\_add\_file\_system.cpp@{test\_add\_file\_system.cpp}!BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}}
+\index{BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}!test\_add\_file\_system.cpp@{test\_add\_file\_system.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_TEST\_MODULE}{BOOST\_TEST\_MODULE}}
+{\footnotesize\ttfamily \label{test__add__file__system_8cpp_a6b2a3852db8bb19ab6909bac01859985} 
+\#define BOOST\+\_\+\+TEST\+\_\+\+MODULE~add\+\_\+file\+\_\+system}
+
+
+
+Definition at line \mbox{\hyperlink{test__add__file__system_8cpp_source_l00001}{1}} of file \mbox{\hyperlink{test__add__file__system_8cpp_source}{test\+\_\+add\+\_\+file\+\_\+system.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{test__add__file__system_8cpp_aaa6265ef97547e866e7ac5bf66f8be5d}\index{test\_add\_file\_system.cpp@{test\_add\_file\_system.cpp}!BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}}
+\index{BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}!test\_add\_file\_system.cpp@{test\_add\_file\_system.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_FIXTURE\_TEST\_CASE()}{BOOST\_FIXTURE\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/5]}}
+{\footnotesize\ttfamily \label{test__add__file__system_8cpp_aaa6265ef97547e866e7ac5bf66f8be5d} 
+BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{different\+\_\+file\+\_\+systems}]{}{, }\item[{\mbox{\hyperlink{structadd__file__system__fixture}{add\+\_\+file\+\_\+system\+\_\+fixture}}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__add__file__system_8cpp_source_l00108}{108}} of file \mbox{\hyperlink{test__add__file__system_8cpp_source}{test\+\_\+add\+\_\+file\+\_\+system.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00109\ \ \ \ \{}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ std::vector<int>\ capacity\ \ \{1000000,\ 2000000,\ 3000000,\ 4000000\};}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ std::vector<int>\ available\ \{500000,\ \ 1500000,\ 2500000,\ 3500000\};}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ std::vector<int>\ devs\ \ \ \ \ \ \{0,\ \ \ \ \ \ \ 1,\ \ \ \ \ \ \ 2,\ \ \ \ \ \ \ 3\};}
+\DoxyCodeLine{00113\ }
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \textcolor{comment}{//\ As\ long\ as\ no\ exceptions,\ it\ is\ considered\ success.}}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ BOOST\_REQUIRE\_NO\_THROW(test\_add\_file\_systems\_common(capacity,\ available,\ devs));}
+\DoxyCodeLine{00116\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{test__add__file__system_8cpp_a2d16f38650a67b69def8c51b61594647}\index{test\_add\_file\_system.cpp@{test\_add\_file\_system.cpp}!BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}}
+\index{BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}!test\_add\_file\_system.cpp@{test\_add\_file\_system.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_FIXTURE\_TEST\_CASE()}{BOOST\_FIXTURE\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/5]}}
+{\footnotesize\ttfamily \label{test__add__file__system_8cpp_a2d16f38650a67b69def8c51b61594647} 
+BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{get\+\_\+space\+\_\+failure}]{}{, }\item[{\mbox{\hyperlink{structadd__file__system__fixture}{add\+\_\+file\+\_\+system\+\_\+fixture}}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__add__file__system_8cpp_source_l00092}{92}} of file \mbox{\hyperlink{test__add__file__system_8cpp_source}{test\+\_\+add\+\_\+file\+\_\+system.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00093\ \ \ \ \{}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ mock\_get\_space\ =\ [](\ \textcolor{keyword}{const}\ bfs::path\&\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\ boost::system::error\_code\&\ ec)\ -\/>\ bfs::space\_info\ \{}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ ec\ =\ boost::system::errc::make\_error\_code(errc::no\_such\_file\_or\_directory);}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ bfs::space\_info\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}};}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}};}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00099\ }
+\DoxyCodeLine{00100\ \ \ \ \ \ \ mock\_get\_stat\ =\ [](\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{classfc_1_1path}{path}},\ \textcolor{keyword}{struct\ }stat\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}\ )\ -\/>\ \textcolor{keywordtype}{int}\ \{}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}-\/>st\_dev\ =\ 0;}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00104\ }
+\DoxyCodeLine{00105\ \ \ \ \ \ \ BOOST\_REQUIRE\_THROW(add\_file\_system(\textcolor{stringliteral}{"{}/test"{}}),\ chain::plugin\_config\_exception);}
+\DoxyCodeLine{00106\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{test__add__file__system_8cpp_a14742f316a915dc1b5fe32f7242229b1}\index{test\_add\_file\_system.cpp@{test\_add\_file\_system.cpp}!BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}}
+\index{BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}!test\_add\_file\_system.cpp@{test\_add\_file\_system.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_FIXTURE\_TEST\_CASE()}{BOOST\_FIXTURE\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [3/5]}}
+{\footnotesize\ttfamily \label{test__add__file__system_8cpp_a14742f316a915dc1b5fe32f7242229b1} 
+BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{get\+\_\+stat\+\_\+failure}]{}{, }\item[{\mbox{\hyperlink{structadd__file__system__fixture}{add\+\_\+file\+\_\+system\+\_\+fixture}}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__add__file__system_8cpp_source_l00083}{83}} of file \mbox{\hyperlink{test__add__file__system_8cpp_source}{test\+\_\+add\+\_\+file\+\_\+system.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00084\ \ \ \ \{}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ mock\_get\_stat\ =\ [](\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{classfc_1_1path}{path}},\ \textcolor{keyword}{struct\ }stat\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}\ )\ -\/>\ \textcolor{keywordtype}{int}\ \{}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;\ \ \textcolor{comment}{//\ anything\ other\ than\ 0\ is\ an\ error\ in\ stat}}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00088\ }
+\DoxyCodeLine{00089\ \ \ \ \ \ \ BOOST\_REQUIRE\_THROW(add\_file\_system(\textcolor{stringliteral}{"{}/test"{}}),\ chain::plugin\_config\_exception);}
+\DoxyCodeLine{00090\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{test__add__file__system_8cpp_ae89d4b2e66f83aa7ad2ef33fcc83c4f5}\index{test\_add\_file\_system.cpp@{test\_add\_file\_system.cpp}!BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}}
+\index{BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}!test\_add\_file\_system.cpp@{test\_add\_file\_system.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_FIXTURE\_TEST\_CASE()}{BOOST\_FIXTURE\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [4/5]}}
+{\footnotesize\ttfamily \label{test__add__file__system_8cpp_ae89d4b2e66f83aa7ad2ef33fcc83c4f5} 
+BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{mixed\+\_\+file\+\_\+systems}]{}{, }\item[{\mbox{\hyperlink{structadd__file__system__fixture}{add\+\_\+file\+\_\+system\+\_\+fixture}}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__add__file__system_8cpp_source_l00128}{128}} of file \mbox{\hyperlink{test__add__file__system_8cpp_source}{test\+\_\+add\+\_\+file\+\_\+system.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00129\ \ \ \ \{}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ std::vector<int>\ capacity\ \ \{1000000,\ 2000000,\ 3000000,\ 4000000,\ 50000\};}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ std::vector<int>\ available\ \{500000,\ \ 1500000,\ 2500000,\ 3500000,\ 20000\};}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ std::vector<int>\ devs\ \ \ \ \ \ \{0,\ \ \ \ \ \ \ 2,\ \ \ \ \ \ \ 2,\ \ \ \ \ \ \ 0,\ \ \ \ \ \ \ 3\};}
+\DoxyCodeLine{00133\ }
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \textcolor{comment}{//\ As\ long\ as\ no\ exceptions,\ it\ is\ considered\ success.}}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ BOOST\_REQUIRE\_NO\_THROW(test\_add\_file\_systems\_common(capacity,\ available,\ devs));}
+\DoxyCodeLine{00136\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{test__add__file__system_8cpp_aa3129b724212bb2a15a49c862f8976ef}\index{test\_add\_file\_system.cpp@{test\_add\_file\_system.cpp}!BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}}
+\index{BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}!test\_add\_file\_system.cpp@{test\_add\_file\_system.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_FIXTURE\_TEST\_CASE()}{BOOST\_FIXTURE\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [5/5]}}
+{\footnotesize\ttfamily \label{test__add__file__system_8cpp_aa3129b724212bb2a15a49c862f8976ef} 
+BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{same\+\_\+file\+\_\+system}]{}{, }\item[{\mbox{\hyperlink{structadd__file__system__fixture}{add\+\_\+file\+\_\+system\+\_\+fixture}}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__add__file__system_8cpp_source_l00118}{118}} of file \mbox{\hyperlink{test__add__file__system_8cpp_source}{test\+\_\+add\+\_\+file\+\_\+system.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00119\ \ \ \ \{}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ std::vector<int>\ capacity\ \ \{1000000,\ 2000000,\ 3000000,\ 4000000\};}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ std::vector<int>\ available\ \{500000,\ \ 1500000,\ 2500000,\ 3500000\};}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ std::vector<int>\ devs\ \ \ \ \ \ \{0,\ \ \ \ \ \ \ 0,\ \ \ \ \ \ \ 0,\ \ \ \ \ \ \ 0\};}
+\DoxyCodeLine{00123\ }
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \textcolor{comment}{//\ As\ long\ as\ no\ exceptions,\ it\ is\ considered\ success.}}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ BOOST\_REQUIRE\_NO\_THROW(test\_add\_file\_systems\_common(capacity,\ available,\ devs));}
+\DoxyCodeLine{00126\ \ \ \ \}}
+
+\end{DoxyCode}

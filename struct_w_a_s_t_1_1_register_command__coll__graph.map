@@ -1,0 +1,10 @@
+<map id="WAST::RegisterCommand" name="WAST::RegisterCommand">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,273,180,298"/>
+<area shape="rect" id="Node000002" href="$struct_w_a_s_t_1_1_command.html" title=" " alt="" coords="116,198,242,223"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="155,235,108,274,105,270,152,231"/>
+<area shape="rect" id="Node000003" href="$struct_w_a_s_t_1_1_text_file_locus.html" title=" " alt="" coords="111,94,258,120"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="186,135,182,197,177,197,180,135"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="47,5,100,31"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="68,46,55,105,52,139,55,173,71,229,89,271,84,273,66,230,50,174,47,139,50,104,62,45"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="102,38,171,91,167,95,99,43"/>
+</map>

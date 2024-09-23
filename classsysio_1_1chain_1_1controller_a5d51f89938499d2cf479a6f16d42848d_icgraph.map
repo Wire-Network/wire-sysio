@@ -1,0 +1,13 @@
+<map id="sysio::chain::controller::fork_db_pending_head_block_num" name="sysio::chain::controller::fork_db_pending_head_block_num">
+<area shape="rect" id="Node000001" title=" " alt="" coords="418,96,577,152"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1net__plugin__impl.html#a00b5cfe0a24a0f3e67aab8a3d5952f7d" title=" " alt="" coords="220,104,370,145"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="403,127,371,127,371,122,403,122"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1net__plugin__impl.html#ab46c73d14b91feecb4ace2aafba45a1c" title=" " alt="" coords="13,5,164,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="243,99,171,61,142,49,145,44,173,57,245,94"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1net__plugin__impl.html#a822b599f0072017aaa53edaa3c381896" title=" " alt="" coords="13,71,164,111"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="204,112,164,106,165,101,205,107"/>
+<area shape="rect" id="Node000005" href="$classsysio_1_1net__plugin__impl.html#a64d690dbcd0e9773f2f966e3de3caa75" title=" " alt="" coords="5,136,172,177"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="205,141,173,146,172,141,204,136"/>
+<area shape="rect" id="Node000006" href="$classsysio_1_1connection.html#a6f592c3d4516eababd8ecbfac04c4b7e" title=" " alt="" coords="13,201,164,242"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="244,155,173,191,144,203,142,198,171,186,242,150"/>
+</map>

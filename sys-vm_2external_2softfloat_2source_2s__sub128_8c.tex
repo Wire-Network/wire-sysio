@@ -1,0 +1,42 @@
+\doxysection{libraries/sys-\/vm/external/softfloat/source/s\+\_\+sub128.c File Reference}
+\hypertarget{sys-vm_2external_2softfloat_2source_2s__sub128_8c}{}\label{sys-vm_2external_2softfloat_2source_2s__sub128_8c}\index{libraries/sys-\/vm/external/softfloat/source/s\_sub128.c@{libraries/sys-\/vm/external/softfloat/source/s\_sub128.c}}
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include "{}platform.\+h"{}}\newline
+{\ttfamily \#include "{}primitive\+Types.\+h"{}}\newline
+Include dependency graph for s\+\_\+sub128.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=343pt]{sys-vm_2external_2softfloat_2source_2s__sub128_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+struct uint128 \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2s__sub128_8c_a15654975c64d1a6d07cca588c0e145dd}{softfloat\+\_\+sub128}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} a64, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} a0, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} b64, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} b0)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{sys-vm_2external_2softfloat_2source_2s__sub128_8c_a15654975c64d1a6d07cca588c0e145dd}\index{s\_sub128.c@{s\_sub128.c}!softfloat\_sub128@{softfloat\_sub128}}
+\index{softfloat\_sub128@{softfloat\_sub128}!s\_sub128.c@{s\_sub128.c}}
+\doxysubsubsection{\texorpdfstring{softfloat\_sub128()}{softfloat\_sub128()}}
+{\footnotesize\ttfamily \label{sys-vm_2external_2softfloat_2source_2s__sub128_8c_a15654975c64d1a6d07cca588c0e145dd} 
+struct uint128 softfloat\+\_\+sub128 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{a64}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{a0}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{b64}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{b0}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2s__sub128_8c_source_l00044}{44}} of file \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2s__sub128_8c_source}{s\+\_\+sub128.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00045\ \{}
+\DoxyCodeLine{00046\ \ \ \ \ \textcolor{keyword}{struct\ }uint128\ z;}
+\DoxyCodeLine{00047\ }
+\DoxyCodeLine{00048\ \ \ \ \ z.v0\ =\ a0\ -\/\ b0;}
+\DoxyCodeLine{00049\ \ \ \ \ z.v64\ =\ a64\ -\/\ b64\ -\/\ (a0\ <\ b0);}
+\DoxyCodeLine{00050\ \ \ \ \ \textcolor{keywordflow}{return}\ z;}
+\DoxyCodeLine{00051\ }
+\DoxyCodeLine{00052\ \}}
+
+\end{DoxyCode}

@@ -1,0 +1,166 @@
+\doxysection{IR\+::Table\+Type Struct Reference}
+\hypertarget{struct_i_r_1_1_table_type}{}\label{struct_i_r_1_1_table_type}\index{IR::TableType@{IR::TableType}}
+
+
+{\ttfamily \#include $<$Types.\+h$>$}
+
+
+
+Collaboration diagram for IR\+::Table\+Type\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=182pt]{struct_i_r_1_1_table_type__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_i_r_1_1_table_type_afa1c209b76f2e0f91c60888ca6798173}{Table\+Type}} ()
+\item 
+\mbox{\hyperlink{struct_i_r_1_1_table_type_a0c15e231bcca256d1902b0efeb30c04d}{Table\+Type}} (\mbox{\hyperlink{namespace_i_r_a938516f231745a922740359bd3bdbc25}{Table\+Element\+Type}} in\+Element\+Type, bool in\+Is\+Shared, \mbox{\hyperlink{struct_i_r_1_1_size_constraints}{Size\+Constraints}} in\+Size)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespace_i_r_a938516f231745a922740359bd3bdbc25}{Table\+Element\+Type}} \mbox{\hyperlink{struct_i_r_1_1_table_type_a32ab498b4ae2c99ce0a3625b41f3dcfe}{element\+Type}}
+\item 
+bool \mbox{\hyperlink{struct_i_r_1_1_table_type_a9f3dfeabbf2074941c57b30832112f6b}{is\+Shared}}
+\item 
+\mbox{\hyperlink{struct_i_r_1_1_size_constraints}{Size\+Constraints}} \mbox{\hyperlink{struct_i_r_1_1_table_type_a345f002f5979ae4dd3b7b90ef512e334}{size}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{struct_i_r_1_1_table_type_ac088b078615d3c7cb48b0df2c7ee395d}{operator==}} (const \mbox{\hyperlink{struct_i_r_1_1_table_type}{Table\+Type}} \&left, const \mbox{\hyperlink{struct_i_r_1_1_table_type}{Table\+Type}} \&right)
+\item 
+bool \mbox{\hyperlink{struct_i_r_1_1_table_type_ac9b12a8a11e9b2c29d4957a75e29f2e2}{operator!=}} (const \mbox{\hyperlink{struct_i_r_1_1_table_type}{Table\+Type}} \&left, const \mbox{\hyperlink{struct_i_r_1_1_table_type}{Table\+Type}} \&right)
+\item 
+bool \mbox{\hyperlink{struct_i_r_1_1_table_type_a81d00b4d18a9b7342bb56c1e37625b41}{is\+Subset}} (const \mbox{\hyperlink{struct_i_r_1_1_table_type}{Table\+Type}} \&super, const \mbox{\hyperlink{struct_i_r_1_1_table_type}{Table\+Type}} \&\mbox{\hyperlink{xbyak__mnemonic_8h_ad8856ea517c970ed0584a251c3fdc94f}{sub}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{_types_8h_source_l00252}{252}} of file \mbox{\hyperlink{_types_8h_source}{Types.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{struct_i_r_1_1_table_type_afa1c209b76f2e0f91c60888ca6798173}\index{IR::TableType@{IR::TableType}!TableType@{TableType}}
+\index{TableType@{TableType}!IR::TableType@{IR::TableType}}
+\doxysubsubsection{\texorpdfstring{TableType()}{TableType()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_table_type_afa1c209b76f2e0f91c60888ca6798173} 
+IR\+::\+Table\+Type\+::\+Table\+Type (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_types_8h_source_l00258}{258}} of file \mbox{\hyperlink{_types_8h_source}{Types.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00258\ :\ \mbox{\hyperlink{struct_i_r_1_1_table_type_a32ab498b4ae2c99ce0a3625b41f3dcfe}{elementType}}(\mbox{\hyperlink{namespace_i_r_a938516f231745a922740359bd3bdbc25a5f210d506ab948d170c2e576c1866707}{TableElementType::anyfunc}}),\ \mbox{\hyperlink{struct_i_r_1_1_table_type_a9f3dfeabbf2074941c57b30832112f6b}{isShared}}(\textcolor{keyword}{false}),\ \mbox{\hyperlink{struct_i_r_1_1_table_type_a345f002f5979ae4dd3b7b90ef512e334}{size}}(\{0,\mbox{\hyperlink{stdint_8h_a30654b4b67d97c42ca3f9b6052dda916}{UINT64\_MAX}}\})\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{struct_i_r_1_1_table_type_a0c15e231bcca256d1902b0efeb30c04d}\index{IR::TableType@{IR::TableType}!TableType@{TableType}}
+\index{TableType@{TableType}!IR::TableType@{IR::TableType}}
+\doxysubsubsection{\texorpdfstring{TableType()}{TableType()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_table_type_a0c15e231bcca256d1902b0efeb30c04d} 
+IR\+::\+Table\+Type\+::\+Table\+Type (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespace_i_r_a938516f231745a922740359bd3bdbc25}{Table\+Element\+Type}}}]{in\+Element\+Type}{, }\item[{bool}]{in\+Is\+Shared}{, }\item[{\mbox{\hyperlink{struct_i_r_1_1_size_constraints}{Size\+Constraints}}}]{in\+Size}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_types_8h_source_l00259}{259}} of file \mbox{\hyperlink{_types_8h_source}{Types.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00260\ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{struct_i_r_1_1_table_type_a32ab498b4ae2c99ce0a3625b41f3dcfe}{elementType}}(inElementType),\ \mbox{\hyperlink{struct_i_r_1_1_table_type_a9f3dfeabbf2074941c57b30832112f6b}{isShared}}(inIsShared),\ \mbox{\hyperlink{struct_i_r_1_1_table_type_a345f002f5979ae4dd3b7b90ef512e334}{size}}(inSize)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{struct_i_r_1_1_table_type_a81d00b4d18a9b7342bb56c1e37625b41}\index{IR::TableType@{IR::TableType}!isSubset@{isSubset}}
+\index{isSubset@{isSubset}!IR::TableType@{IR::TableType}}
+\doxysubsubsection{\texorpdfstring{isSubset}{isSubset}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_table_type_a81d00b4d18a9b7342bb56c1e37625b41} 
+bool is\+Subset (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct_i_r_1_1_table_type}{Table\+Type}} \&}]{super}{, }\item[{const \mbox{\hyperlink{struct_i_r_1_1_table_type}{Table\+Type}} \&}]{sub}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{_types_8h_source_l00266}{266}} of file \mbox{\hyperlink{_types_8h_source}{Types.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00267\ \ \ \ \ \ \ \ \ \{\ \textcolor{keywordflow}{return}\ super.elementType\ ==\ \mbox{\hyperlink{xbyak__mnemonic_8h_ad8856ea517c970ed0584a251c3fdc94f}{sub}}.elementType\ \&\&\ super.isShared\ ==\ \mbox{\hyperlink{xbyak__mnemonic_8h_ad8856ea517c970ed0584a251c3fdc94f}{sub}}.isShared\ \&\&\ \mbox{\hyperlink{struct_i_r_1_1_table_type_a81d00b4d18a9b7342bb56c1e37625b41}{isSubset}}(super.size,\mbox{\hyperlink{xbyak__mnemonic_8h_ad8856ea517c970ed0584a251c3fdc94f}{sub}}.size);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_i_r_1_1_table_type_ac9b12a8a11e9b2c29d4957a75e29f2e2}\index{IR::TableType@{IR::TableType}!operator"!=@{operator"!=}}
+\index{operator"!=@{operator"!=}!IR::TableType@{IR::TableType}}
+\doxysubsubsection{\texorpdfstring{operator"!=}{operator!=}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_table_type_ac9b12a8a11e9b2c29d4957a75e29f2e2} 
+bool operator!= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct_i_r_1_1_table_type}{Table\+Type}} \&}]{left}{, }\item[{const \mbox{\hyperlink{struct_i_r_1_1_table_type}{Table\+Type}} \&}]{right}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{_types_8h_source_l00264}{264}} of file \mbox{\hyperlink{_types_8h_source}{Types.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00265\ \ \ \ \ \ \ \ \ \{\ \textcolor{keywordflow}{return}\ left.elementType\ !=\ right.elementType\ ||\ left.isShared\ !=\ right.isShared\ ||\ left.size\ !=\ right.size;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_i_r_1_1_table_type_ac088b078615d3c7cb48b0df2c7ee395d}\index{IR::TableType@{IR::TableType}!operator==@{operator==}}
+\index{operator==@{operator==}!IR::TableType@{IR::TableType}}
+\doxysubsubsection{\texorpdfstring{operator==}{operator==}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_table_type_ac088b078615d3c7cb48b0df2c7ee395d} 
+bool operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct_i_r_1_1_table_type}{Table\+Type}} \&}]{left}{, }\item[{const \mbox{\hyperlink{struct_i_r_1_1_table_type}{Table\+Type}} \&}]{right}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{_types_8h_source_l00262}{262}} of file \mbox{\hyperlink{_types_8h_source}{Types.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00263\ \ \ \ \ \ \ \ \ \{\ \textcolor{keywordflow}{return}\ left.elementType\ ==\ right.elementType\ \&\&\ left.isShared\ ==\ right.isShared\ \&\&\ left.size\ ==\ right.size;\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_i_r_1_1_table_type_a32ab498b4ae2c99ce0a3625b41f3dcfe}\index{IR::TableType@{IR::TableType}!elementType@{elementType}}
+\index{elementType@{elementType}!IR::TableType@{IR::TableType}}
+\doxysubsubsection{\texorpdfstring{elementType}{elementType}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_table_type_a32ab498b4ae2c99ce0a3625b41f3dcfe} 
+\mbox{\hyperlink{namespace_i_r_a938516f231745a922740359bd3bdbc25}{Table\+Element\+Type}} IR\+::\+Table\+Type\+::element\+Type}
+
+
+
+Definition at line \mbox{\hyperlink{_types_8h_source_l00254}{254}} of file \mbox{\hyperlink{_types_8h_source}{Types.\+h}}.
+
+\Hypertarget{struct_i_r_1_1_table_type_a9f3dfeabbf2074941c57b30832112f6b}\index{IR::TableType@{IR::TableType}!isShared@{isShared}}
+\index{isShared@{isShared}!IR::TableType@{IR::TableType}}
+\doxysubsubsection{\texorpdfstring{isShared}{isShared}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_table_type_a9f3dfeabbf2074941c57b30832112f6b} 
+bool IR\+::\+Table\+Type\+::is\+Shared}
+
+
+
+Definition at line \mbox{\hyperlink{_types_8h_source_l00255}{255}} of file \mbox{\hyperlink{_types_8h_source}{Types.\+h}}.
+
+\Hypertarget{struct_i_r_1_1_table_type_a345f002f5979ae4dd3b7b90ef512e334}\index{IR::TableType@{IR::TableType}!size@{size}}
+\index{size@{size}!IR::TableType@{IR::TableType}}
+\doxysubsubsection{\texorpdfstring{size}{size}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_table_type_a345f002f5979ae4dd3b7b90ef512e334} 
+\mbox{\hyperlink{struct_i_r_1_1_size_constraints}{Size\+Constraints}} IR\+::\+Table\+Type\+::size}
+
+
+
+Definition at line \mbox{\hyperlink{_types_8h_source_l00256}{256}} of file \mbox{\hyperlink{_types_8h_source}{Types.\+h}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/wasm-\/jit/\+Include/\+IR/\mbox{\hyperlink{_types_8h}{Types.\+h}}\end{DoxyCompactItemize}

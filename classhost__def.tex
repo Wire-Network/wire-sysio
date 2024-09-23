@@ -1,0 +1,389 @@
+\doxysection{host\+\_\+def Class Reference}
+\hypertarget{classhost__def}{}\label{classhost__def}\index{host\_def@{host\_def}}
+
+
+Collaboration diagram for host\+\_\+def\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=238pt]{classhost__def__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classhost__def_a041cba0d68caa0c7603a5bd0b595900e}{host\+\_\+def}} ()
+\item 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{classhost__def_a49d47ba5ca76ad18b09ca32901531635}{p2p\+\_\+port}} ()
+\item 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{classhost__def_a17cffb6914e7a4043c61edad887d6fd5}{http\+\_\+port}} ()
+\item 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{classhost__def_a07bacf8fc3c2ad46a12dd118fc65afdc}{p2p\+\_\+bios\+\_\+port}} ()
+\item 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{classhost__def_af4b3afa70decb059df5b4e936b361fba}{http\+\_\+bios\+\_\+port}} ()
+\item 
+bool \mbox{\hyperlink{classhost__def_aa7532e1e27b01b5aa6b1fc3e0be10e8f}{is\+\_\+local}} () const
+\item 
+const string \& \mbox{\hyperlink{classhost__def_a81d326383fb996f03ea46686215d1053}{dot\+\_\+label}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+string \mbox{\hyperlink{classhost__def_aee8feea4283d48463de633250b4d373f}{genesis}}
+\item 
+string \mbox{\hyperlink{classhost__def_afd21f506628e25aa790814fb87c82ce1}{ssh\+\_\+identity}}
+\item 
+string \mbox{\hyperlink{classhost__def_a6f687b402dd12c18a1a271229ca512cc}{ssh\+\_\+args}}
+\item 
+string \mbox{\hyperlink{classhost__def_a05a650155de6d615b8f7af68f5f19e54}{sysio\+\_\+home}}
+\item 
+string \mbox{\hyperlink{classhost__def_a2390479e008b3219330faeec62c0dd8d}{host\+\_\+name}}
+\item 
+string \mbox{\hyperlink{classhost__def_af3513833c3e552feacc7b868c2bd782d}{public\+\_\+name}}
+\item 
+string \mbox{\hyperlink{classhost__def_af52d66be013cc745053305b9662bc30e}{listen\+\_\+addr}}
+\item 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{classhost__def_a5510c0b43d1750bf6011853d813d0dc1}{base\+\_\+p2p\+\_\+port}}
+\item 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{classhost__def_a1c10b6580824b2f90eb531bb635462cf}{base\+\_\+http\+\_\+port}}
+\item 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{classhost__def_ad63399de51f510a467adaee242756d9e}{def\+\_\+file\+\_\+size}}
+\item 
+vector$<$ \mbox{\hyperlink{classeosd__def}{eosd\+\_\+def}} $>$ \mbox{\hyperlink{classhost__def_a68c08fd13b6026444cbd554d32241f1d}{instances}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{classhost__def_ac6aba69a59a5f446f68e1498e43e6111}{mk\+\_\+dot\+\_\+label}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source_l00116}{116}} of file \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classhost__def_a041cba0d68caa0c7603a5bd0b595900e}\index{host\_def@{host\_def}!host\_def@{host\_def}}
+\index{host\_def@{host\_def}!host\_def@{host\_def}}
+\doxysubsubsection{\texorpdfstring{host\_def()}{host\_def()}}
+{\footnotesize\ttfamily \label{classhost__def_a041cba0d68caa0c7603a5bd0b595900e} 
+host\+\_\+def\+::host\+\_\+def (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source_l00118}{118}} of file \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00119\ \ \ \ \ :\ \mbox{\hyperlink{classhost__def_aee8feea4283d48463de633250b4d373f}{genesis}}(\textcolor{stringliteral}{"{}genesis.json"{}}),}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \mbox{\hyperlink{classhost__def_afd21f506628e25aa790814fb87c82ce1}{ssh\_identity}}\ (\textcolor{stringliteral}{"{}"{}}),}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \mbox{\hyperlink{classhost__def_a6f687b402dd12c18a1a271229ca512cc}{ssh\_args}}\ (\textcolor{stringliteral}{"{}"{}}),}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \mbox{\hyperlink{classhost__def_a05a650155de6d615b8f7af68f5f19e54}{sysio\_home}}(),}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \mbox{\hyperlink{classhost__def_a2390479e008b3219330faeec62c0dd8d}{host\_name}}(\textcolor{stringliteral}{"{}127.0.0.1"{}}),}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \mbox{\hyperlink{classhost__def_af3513833c3e552feacc7b868c2bd782d}{public\_name}}(\textcolor{stringliteral}{"{}localhost"{}}),}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \mbox{\hyperlink{classhost__def_af52d66be013cc745053305b9662bc30e}{listen\_addr}}(\textcolor{stringliteral}{"{}0.0.0.0"{}}),}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \mbox{\hyperlink{classhost__def_a5510c0b43d1750bf6011853d813d0dc1}{base\_p2p\_port}}(9876),}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \mbox{\hyperlink{classhost__def_a1c10b6580824b2f90eb531bb635462cf}{base\_http\_port}}(8888),}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \mbox{\hyperlink{classhost__def_ad63399de51f510a467adaee242756d9e}{def\_file\_size}}(8192),}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \mbox{\hyperlink{classhost__def_a68c08fd13b6026444cbd554d32241f1d}{instances}}(),}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ p2p\_count(0),}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ http\_count(0),}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ dot\_label\_str()}
+\DoxyCodeLine{00133\ \ \ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classhost__def_a81d326383fb996f03ea46686215d1053}\index{host\_def@{host\_def}!dot\_label@{dot\_label}}
+\index{dot\_label@{dot\_label}!host\_def@{host\_def}}
+\doxysubsubsection{\texorpdfstring{dot\_label()}{dot\_label()}}
+{\footnotesize\ttfamily \label{classhost__def_a81d326383fb996f03ea46686215d1053} 
+const string \& host\+\_\+def\+::dot\+\_\+label (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source_l00167}{167}} of file \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00168\ \ \ \ \ \textcolor{keywordflow}{if}\ (dot\_label\_str.empty()\ )\ \{}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \mbox{\hyperlink{classhost__def_ac6aba69a59a5f446f68e1498e43e6111}{mk\_dot\_label}}();}
+\DoxyCodeLine{00170\ \ \ \ \ \}}
+\DoxyCodeLine{00171\ \ \ \ \ \textcolor{keywordflow}{return}\ dot\_label\_str;}
+\DoxyCodeLine{00172\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=332pt]{classhost__def_a81d326383fb996f03ea46686215d1053_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classhost__def_af4b3afa70decb059df5b4e936b361fba}\index{host\_def@{host\_def}!http\_bios\_port@{http\_bios\_port}}
+\index{http\_bios\_port@{http\_bios\_port}!host\_def@{host\_def}}
+\doxysubsubsection{\texorpdfstring{http\_bios\_port()}{http\_bios\_port()}}
+{\footnotesize\ttfamily \label{classhost__def_af4b3afa70decb059df5b4e936b361fba} 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} host\+\_\+def\+::http\+\_\+bios\+\_\+port (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source_l00159}{159}} of file \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00160\ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classhost__def_a1c10b6580824b2f90eb531bb635462cf}{base\_http\_port}}\ -\/\ 100;}
+\DoxyCodeLine{00161\ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classhost__def_af4b3afa70decb059df5b4e936b361fba_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classhost__def_a17cffb6914e7a4043c61edad887d6fd5}\index{host\_def@{host\_def}!http\_port@{http\_port}}
+\index{http\_port@{http\_port}!host\_def@{host\_def}}
+\doxysubsubsection{\texorpdfstring{http\_port()}{http\_port()}}
+{\footnotesize\ttfamily \label{classhost__def_a17cffb6914e7a4043c61edad887d6fd5} 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} host\+\_\+def\+::http\+\_\+port (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source_l00151}{151}} of file \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00152\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classhost__def_a1c10b6580824b2f90eb531bb635462cf}{base\_http\_port}}\ +\ http\_count++;}
+\DoxyCodeLine{00153\ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classhost__def_a17cffb6914e7a4043c61edad887d6fd5_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classhost__def_aa7532e1e27b01b5aa6b1fc3e0be10e8f}\index{host\_def@{host\_def}!is\_local@{is\_local}}
+\index{is\_local@{is\_local}!host\_def@{host\_def}}
+\doxysubsubsection{\texorpdfstring{is\_local()}{is\_local()}}
+{\footnotesize\ttfamily \label{classhost__def_aa7532e1e27b01b5aa6b1fc3e0be10e8f} 
+bool host\+\_\+def\+::is\+\_\+local (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source_l00163}{163}} of file \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00164\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a3b2140dc0a459ef22d3aaa4db00f7f38}{local\_id}}.contains(\ host\_name\ );}
+\DoxyCodeLine{00165\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classhost__def_ac6aba69a59a5f446f68e1498e43e6111}\index{host\_def@{host\_def}!mk\_dot\_label@{mk\_dot\_label}}
+\index{mk\_dot\_label@{mk\_dot\_label}!host\_def@{host\_def}}
+\doxysubsubsection{\texorpdfstring{mk\_dot\_label()}{mk\_dot\_label()}}
+{\footnotesize\ttfamily \label{classhost__def_ac6aba69a59a5f446f68e1498e43e6111} 
+void host\+\_\+def\+::mk\+\_\+dot\+\_\+label (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source_l00181}{181}} of file \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00182\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classhost__def_af3513833c3e552feacc7b868c2bd782d}{public\_name}}.empty())\ \{}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ dot\_label\_str\ =\ \mbox{\hyperlink{classhost__def_a2390479e008b3219330faeec62c0dd8d}{host\_name}};}
+\DoxyCodeLine{00184\ \ \ \ \ \}}
+\DoxyCodeLine{00185\ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (boost::iequals(\mbox{\hyperlink{classhost__def_af3513833c3e552feacc7b868c2bd782d}{public\_name}},host\_name))\ \{}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ dot\_label\_str\ =\ \mbox{\hyperlink{classhost__def_af3513833c3e552feacc7b868c2bd782d}{public\_name}};}
+\DoxyCodeLine{00187\ \ \ \ \ \}}
+\DoxyCodeLine{00188\ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ dot\_label\_str\ =\ \mbox{\hyperlink{classhost__def_af3513833c3e552feacc7b868c2bd782d}{public\_name}}\ +\ \textcolor{stringliteral}{"{}/"{}}\ +\ \mbox{\hyperlink{classhost__def_a2390479e008b3219330faeec62c0dd8d}{host\_name}};}
+\DoxyCodeLine{00190\ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=332pt]{classhost__def_ac6aba69a59a5f446f68e1498e43e6111_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classhost__def_a07bacf8fc3c2ad46a12dd118fc65afdc}\index{host\_def@{host\_def}!p2p\_bios\_port@{p2p\_bios\_port}}
+\index{p2p\_bios\_port@{p2p\_bios\_port}!host\_def@{host\_def}}
+\doxysubsubsection{\texorpdfstring{p2p\_bios\_port()}{p2p\_bios\_port()}}
+{\footnotesize\ttfamily \label{classhost__def_a07bacf8fc3c2ad46a12dd118fc65afdc} 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} host\+\_\+def\+::p2p\+\_\+bios\+\_\+port (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source_l00155}{155}} of file \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00156\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classhost__def_a5510c0b43d1750bf6011853d813d0dc1}{base\_p2p\_port}}\ -\/\ 100;}
+\DoxyCodeLine{00157\ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classhost__def_a07bacf8fc3c2ad46a12dd118fc65afdc_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classhost__def_a49d47ba5ca76ad18b09ca32901531635}\index{host\_def@{host\_def}!p2p\_port@{p2p\_port}}
+\index{p2p\_port@{p2p\_port}!host\_def@{host\_def}}
+\doxysubsubsection{\texorpdfstring{p2p\_port()}{p2p\_port()}}
+{\footnotesize\ttfamily \label{classhost__def_a49d47ba5ca76ad18b09ca32901531635} 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} host\+\_\+def\+::p2p\+\_\+port (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source_l00147}{147}} of file \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00148\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classhost__def_a5510c0b43d1750bf6011853d813d0dc1}{base\_p2p\_port}}\ +\ p2p\_count++;}
+\DoxyCodeLine{00149\ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classhost__def_a49d47ba5ca76ad18b09ca32901531635_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classhost__def_a1c10b6580824b2f90eb531bb635462cf}\index{host\_def@{host\_def}!base\_http\_port@{base\_http\_port}}
+\index{base\_http\_port@{base\_http\_port}!host\_def@{host\_def}}
+\doxysubsubsection{\texorpdfstring{base\_http\_port}{base\_http\_port}}
+{\footnotesize\ttfamily \label{classhost__def_a1c10b6580824b2f90eb531bb635462cf} 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} host\+\_\+def\+::base\+\_\+http\+\_\+port}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source_l00143}{143}} of file \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{classhost__def_a5510c0b43d1750bf6011853d813d0dc1}\index{host\_def@{host\_def}!base\_p2p\_port@{base\_p2p\_port}}
+\index{base\_p2p\_port@{base\_p2p\_port}!host\_def@{host\_def}}
+\doxysubsubsection{\texorpdfstring{base\_p2p\_port}{base\_p2p\_port}}
+{\footnotesize\ttfamily \label{classhost__def_a5510c0b43d1750bf6011853d813d0dc1} 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} host\+\_\+def\+::base\+\_\+p2p\+\_\+port}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source_l00142}{142}} of file \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{classhost__def_ad63399de51f510a467adaee242756d9e}\index{host\_def@{host\_def}!def\_file\_size@{def\_file\_size}}
+\index{def\_file\_size@{def\_file\_size}!host\_def@{host\_def}}
+\doxysubsubsection{\texorpdfstring{def\_file\_size}{def\_file\_size}}
+{\footnotesize\ttfamily \label{classhost__def_ad63399de51f510a467adaee242756d9e} 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} host\+\_\+def\+::def\+\_\+file\+\_\+size}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source_l00144}{144}} of file \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{classhost__def_aee8feea4283d48463de633250b4d373f}\index{host\_def@{host\_def}!genesis@{genesis}}
+\index{genesis@{genesis}!host\_def@{host\_def}}
+\doxysubsubsection{\texorpdfstring{genesis}{genesis}}
+{\footnotesize\ttfamily \label{classhost__def_aee8feea4283d48463de633250b4d373f} 
+string host\+\_\+def\+::genesis}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source_l00135}{135}} of file \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{classhost__def_a2390479e008b3219330faeec62c0dd8d}\index{host\_def@{host\_def}!host\_name@{host\_name}}
+\index{host\_name@{host\_name}!host\_def@{host\_def}}
+\doxysubsubsection{\texorpdfstring{host\_name}{host\_name}}
+{\footnotesize\ttfamily \label{classhost__def_a2390479e008b3219330faeec62c0dd8d} 
+string host\+\_\+def\+::host\+\_\+name}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source_l00139}{139}} of file \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{classhost__def_a68c08fd13b6026444cbd554d32241f1d}\index{host\_def@{host\_def}!instances@{instances}}
+\index{instances@{instances}!host\_def@{host\_def}}
+\doxysubsubsection{\texorpdfstring{instances}{instances}}
+{\footnotesize\ttfamily \label{classhost__def_a68c08fd13b6026444cbd554d32241f1d} 
+vector$<$\mbox{\hyperlink{classeosd__def}{eosd\+\_\+def}}$>$ host\+\_\+def\+::instances}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source_l00145}{145}} of file \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{classhost__def_af52d66be013cc745053305b9662bc30e}\index{host\_def@{host\_def}!listen\_addr@{listen\_addr}}
+\index{listen\_addr@{listen\_addr}!host\_def@{host\_def}}
+\doxysubsubsection{\texorpdfstring{listen\_addr}{listen\_addr}}
+{\footnotesize\ttfamily \label{classhost__def_af52d66be013cc745053305b9662bc30e} 
+string host\+\_\+def\+::listen\+\_\+addr}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source_l00141}{141}} of file \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{classhost__def_af3513833c3e552feacc7b868c2bd782d}\index{host\_def@{host\_def}!public\_name@{public\_name}}
+\index{public\_name@{public\_name}!host\_def@{host\_def}}
+\doxysubsubsection{\texorpdfstring{public\_name}{public\_name}}
+{\footnotesize\ttfamily \label{classhost__def_af3513833c3e552feacc7b868c2bd782d} 
+string host\+\_\+def\+::public\+\_\+name}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source_l00140}{140}} of file \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{classhost__def_a6f687b402dd12c18a1a271229ca512cc}\index{host\_def@{host\_def}!ssh\_args@{ssh\_args}}
+\index{ssh\_args@{ssh\_args}!host\_def@{host\_def}}
+\doxysubsubsection{\texorpdfstring{ssh\_args}{ssh\_args}}
+{\footnotesize\ttfamily \label{classhost__def_a6f687b402dd12c18a1a271229ca512cc} 
+string host\+\_\+def\+::ssh\+\_\+args}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source_l00137}{137}} of file \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{classhost__def_afd21f506628e25aa790814fb87c82ce1}\index{host\_def@{host\_def}!ssh\_identity@{ssh\_identity}}
+\index{ssh\_identity@{ssh\_identity}!host\_def@{host\_def}}
+\doxysubsubsection{\texorpdfstring{ssh\_identity}{ssh\_identity}}
+{\footnotesize\ttfamily \label{classhost__def_afd21f506628e25aa790814fb87c82ce1} 
+string host\+\_\+def\+::ssh\+\_\+identity}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source_l00136}{136}} of file \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{classhost__def_a05a650155de6d615b8f7af68f5f19e54}\index{host\_def@{host\_def}!sysio\_home@{sysio\_home}}
+\index{sysio\_home@{sysio\_home}!host\_def@{host\_def}}
+\doxysubsubsection{\texorpdfstring{sysio\_home}{sysio\_home}}
+{\footnotesize\ttfamily \label{classhost__def_a05a650155de6d615b8f7af68f5f19e54} 
+string host\+\_\+def\+::sysio\+\_\+home}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source_l00138}{138}} of file \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+programs/sysio-\/launcher/\mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp}{main.\+cpp}}\end{DoxyCompactItemize}

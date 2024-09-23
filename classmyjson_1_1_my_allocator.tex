@@ -1,0 +1,92 @@
+\doxysection{myjson\+::My\+Allocator Class Reference}
+\hypertarget{classmyjson_1_1_my_allocator}{}\label{classmyjson_1_1_my_allocator}\index{myjson::MyAllocator@{myjson::MyAllocator}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classmyjson_1_1_my_allocator_a969652f85ab8b4c63b0dd33f4b373448}{Malloc}} (size\+\_\+t \+\_\+size)
+\item 
+void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classmyjson_1_1_my_allocator_a6457176352eb9dbe010824414b603607}{Realloc}} (void \texorpdfstring{$\ast$}{*}\+\_\+org\+\_\+p, size\+\_\+t \+\_\+org\+\_\+size, size\+\_\+t \+\_\+new\+\_\+size)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static void \mbox{\hyperlink{classmyjson_1_1_my_allocator_a3638ad210868b5bb2d48f4839c06ef29}{Free}} (void \texorpdfstring{$\ast$}{*}\+\_\+p)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static const bool \mbox{\hyperlink{classmyjson_1_1_my_allocator_a6bce993410843339068ce5495e48eed2}{k\+Need\+Free}} = true
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{pointertest_8cpp_source_l01605}{1605}} of file \mbox{\hyperlink{pointertest_8cpp_source}{pointertest.\+cpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classmyjson_1_1_my_allocator_a3638ad210868b5bb2d48f4839c06ef29}\index{myjson::MyAllocator@{myjson::MyAllocator}!Free@{Free}}
+\index{Free@{Free}!myjson::MyAllocator@{myjson::MyAllocator}}
+\doxysubsubsection{\texorpdfstring{Free()}{Free()}}
+{\footnotesize\ttfamily \label{classmyjson_1_1_my_allocator_a3638ad210868b5bb2d48f4839c06ef29} 
+static void myjson\+::\+My\+Allocator\+::\+Free (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{\+\_\+p}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{pointertest_8cpp_source_l01611}{1611}} of file \mbox{\hyperlink{pointertest_8cpp_source}{pointertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01611\ \{\ \textcolor{keywordflow}{return}\ free(\_p);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classmyjson_1_1_my_allocator_a969652f85ab8b4c63b0dd33f4b373448}\index{myjson::MyAllocator@{myjson::MyAllocator}!Malloc@{Malloc}}
+\index{Malloc@{Malloc}!myjson::MyAllocator@{myjson::MyAllocator}}
+\doxysubsubsection{\texorpdfstring{Malloc()}{Malloc()}}
+{\footnotesize\ttfamily \label{classmyjson_1_1_my_allocator_a969652f85ab8b4c63b0dd33f4b373448} 
+void \texorpdfstring{$\ast$}{*} myjson\+::\+My\+Allocator\+::\+Malloc (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{\+\_\+size}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{pointertest_8cpp_source_l01609}{1609}} of file \mbox{\hyperlink{pointertest_8cpp_source}{pointertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01609\ \{\ \textcolor{keywordflow}{return}\ malloc(\_size);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classmyjson_1_1_my_allocator_a6457176352eb9dbe010824414b603607}\index{myjson::MyAllocator@{myjson::MyAllocator}!Realloc@{Realloc}}
+\index{Realloc@{Realloc}!myjson::MyAllocator@{myjson::MyAllocator}}
+\doxysubsubsection{\texorpdfstring{Realloc()}{Realloc()}}
+{\footnotesize\ttfamily \label{classmyjson_1_1_my_allocator_a6457176352eb9dbe010824414b603607} 
+void \texorpdfstring{$\ast$}{*} myjson\+::\+My\+Allocator\+::\+Realloc (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{\+\_\+org\+\_\+p}{, }\item[{size\+\_\+t}]{\+\_\+org\+\_\+size}{, }\item[{size\+\_\+t}]{\+\_\+new\+\_\+size}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{pointertest_8cpp_source_l01610}{1610}} of file \mbox{\hyperlink{pointertest_8cpp_source}{pointertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01610\ \{\ (void)\_org\_size;\ \textcolor{keywordflow}{return}\ realloc(\_org\_p,\ \_new\_size);\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classmyjson_1_1_my_allocator_a6bce993410843339068ce5495e48eed2}\index{myjson::MyAllocator@{myjson::MyAllocator}!kNeedFree@{kNeedFree}}
+\index{kNeedFree@{kNeedFree}!myjson::MyAllocator@{myjson::MyAllocator}}
+\doxysubsubsection{\texorpdfstring{kNeedFree}{kNeedFree}}
+{\footnotesize\ttfamily \label{classmyjson_1_1_my_allocator_a6bce993410843339068ce5495e48eed2} 
+const bool myjson\+::\+My\+Allocator\+::k\+Need\+Free = true\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{pointertest_8cpp_source_l01608}{1608}} of file \mbox{\hyperlink{pointertest_8cpp_source}{pointertest.\+cpp}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/test/unittest/\mbox{\hyperlink{pointertest_8cpp}{pointertest.\+cpp}}\end{DoxyCompactItemize}

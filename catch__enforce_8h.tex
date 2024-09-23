@@ -1,0 +1,151 @@
+\doxysection{libraries/sys-\/vm/external/\+Catch2/include/internal/catch\+\_\+enforce.h File Reference}
+\hypertarget{catch__enforce_8h}{}\label{catch__enforce_8h}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_enforce.h@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_enforce.h}}
+{\ttfamily \#include "{}catch\+\_\+common.\+h"{}}\newline
+{\ttfamily \#include "{}catch\+\_\+compiler\+\_\+capabilities.\+h"{}}\newline
+{\ttfamily \#include "{}catch\+\_\+stream.\+h"{}}\newline
+{\ttfamily \#include $<$stdexcept$>$}\newline
+Include dependency graph for catch\+\_\+enforce.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{catch__enforce_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{catch__enforce_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespace_catch}{Catch}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{catch__enforce_8h_a01cc18e13c75ec7b18d2a58bf074cd97}{CATCH\+\_\+\+PREPARE\+\_\+\+EXCEPTION}}(type,  msg)
+\item 
+\#define \mbox{\hyperlink{catch__enforce_8h_a05b6c8a530fa2e5b397add8966522777}{CATCH\+\_\+\+INTERNAL\+\_\+\+ERROR}}(msg)
+\item 
+\#define \mbox{\hyperlink{catch__enforce_8h_adc6e1c0661c7c34fbb6033de06ec4833}{CATCH\+\_\+\+ERROR}}(msg)
+\item 
+\#define \mbox{\hyperlink{catch__enforce_8h_a6274a54d9b6da60d7c6e9033b310d8b2}{CATCH\+\_\+\+RUNTIME\+\_\+\+ERROR}}(msg)
+\item 
+\#define \mbox{\hyperlink{catch__enforce_8h_aa4c5f453d4352f75712de56e5892849f}{CATCH\+\_\+\+ENFORCE}}(condition,  msg)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{namespace_catch_a3cbceeab9252d1b752f66a2826e92548}{Catch\+::throw\+\_\+exception}} (std\+::exception const \&e)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{catch__enforce_8h_aa4c5f453d4352f75712de56e5892849f}\index{catch\_enforce.h@{catch\_enforce.h}!CATCH\_ENFORCE@{CATCH\_ENFORCE}}
+\index{CATCH\_ENFORCE@{CATCH\_ENFORCE}!catch\_enforce.h@{catch\_enforce.h}}
+\doxysubsubsection{\texorpdfstring{CATCH\_ENFORCE}{CATCH\_ENFORCE}}
+{\footnotesize\ttfamily \label{catch__enforce_8h_aa4c5f453d4352f75712de56e5892849f} 
+\#define CATCH\+\_\+\+ENFORCE(\begin{DoxyParamCaption}\item[{}]{condition}{, }\item[{}]{msg}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\{\ \textcolor{keywordflow}{if}(\ !(condition)\ )\ \mbox{\hyperlink{catch__enforce_8h_adc6e1c0661c7c34fbb6033de06ec4833}{CATCH\_ERROR}}(\ msg\ );\ \}\ \textcolor{keywordflow}{while}(\textcolor{keyword}{false})}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__enforce_8h_source_l00038}{38}} of file \mbox{\hyperlink{catch__enforce_8h_source}{catch\+\_\+enforce.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00038\ \textcolor{preprocessor}{\#define\ CATCH\_ENFORCE(\ condition,\ msg\ )\ \(\backslash\)}}
+\DoxyCodeLine{00039\ \textcolor{preprocessor}{\ \ \ \ do\{\ if(\ !(condition)\ )\ CATCH\_ERROR(\ msg\ );\ \}\ while(false)}}
+
+\end{DoxyCode}
+\Hypertarget{catch__enforce_8h_adc6e1c0661c7c34fbb6033de06ec4833}\index{catch\_enforce.h@{catch\_enforce.h}!CATCH\_ERROR@{CATCH\_ERROR}}
+\index{CATCH\_ERROR@{CATCH\_ERROR}!catch\_enforce.h@{catch\_enforce.h}}
+\doxysubsubsection{\texorpdfstring{CATCH\_ERROR}{CATCH\_ERROR}}
+{\footnotesize\ttfamily \label{catch__enforce_8h_adc6e1c0661c7c34fbb6033de06ec4833} 
+\#define CATCH\+\_\+\+ERROR(\begin{DoxyParamCaption}\item[{}]{msg}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{namespace_catch_a3cbceeab9252d1b752f66a2826e92548}{Catch::throw\_exception}}(\mbox{\hyperlink{catch__enforce_8h_a01cc18e13c75ec7b18d2a58bf074cd97}{CATCH\_PREPARE\_EXCEPTION}}(\ std::domain\_error,\ msg\ ))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__enforce_8h_source_l00034}{34}} of file \mbox{\hyperlink{catch__enforce_8h_source}{catch\+\_\+enforce.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00034\ \textcolor{preprocessor}{\#define\ CATCH\_ERROR(\ msg\ )\ \(\backslash\)}}
+\DoxyCodeLine{00035\ \textcolor{preprocessor}{\ \ \ \ Catch::throw\_exception(CATCH\_PREPARE\_EXCEPTION(\ std::domain\_error,\ msg\ ))}}
+
+\end{DoxyCode}
+\Hypertarget{catch__enforce_8h_a05b6c8a530fa2e5b397add8966522777}\index{catch\_enforce.h@{catch\_enforce.h}!CATCH\_INTERNAL\_ERROR@{CATCH\_INTERNAL\_ERROR}}
+\index{CATCH\_INTERNAL\_ERROR@{CATCH\_INTERNAL\_ERROR}!catch\_enforce.h@{catch\_enforce.h}}
+\doxysubsubsection{\texorpdfstring{CATCH\_INTERNAL\_ERROR}{CATCH\_INTERNAL\_ERROR}}
+{\footnotesize\ttfamily \label{catch__enforce_8h_a05b6c8a530fa2e5b397add8966522777} 
+\#define CATCH\+\_\+\+INTERNAL\+\_\+\+ERROR(\begin{DoxyParamCaption}\item[{}]{msg}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{namespace_catch_a3cbceeab9252d1b752f66a2826e92548}{Catch::throw\_exception}}(\mbox{\hyperlink{catch__enforce_8h_a01cc18e13c75ec7b18d2a58bf074cd97}{CATCH\_PREPARE\_EXCEPTION}}(\ std::logic\_error,\ \mbox{\hyperlink{catch__common_8h_abc0b2405454c51748a31e0393d9ad5d1}{CATCH\_INTERNAL\_LINEINFO}}\ <<\ \textcolor{stringliteral}{"{}:\ Internal\ Catch\ error:\ "{}}\ <<\ msg))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__enforce_8h_source_l00032}{32}} of file \mbox{\hyperlink{catch__enforce_8h_source}{catch\+\_\+enforce.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00032\ \textcolor{preprocessor}{\#define\ CATCH\_INTERNAL\_ERROR(\ msg\ )\ \(\backslash\)}}
+\DoxyCodeLine{00033\ \textcolor{preprocessor}{\ \ \ \ Catch::throw\_exception(CATCH\_PREPARE\_EXCEPTION(\ std::logic\_error,\ CATCH\_INTERNAL\_LINEINFO\ <<\ "{}:\ Internal\ Catch\ error:\ "{}\ <<\ msg))}}
+
+\end{DoxyCode}
+\Hypertarget{catch__enforce_8h_a01cc18e13c75ec7b18d2a58bf074cd97}\index{catch\_enforce.h@{catch\_enforce.h}!CATCH\_PREPARE\_EXCEPTION@{CATCH\_PREPARE\_EXCEPTION}}
+\index{CATCH\_PREPARE\_EXCEPTION@{CATCH\_PREPARE\_EXCEPTION}!catch\_enforce.h@{catch\_enforce.h}}
+\doxysubsubsection{\texorpdfstring{CATCH\_PREPARE\_EXCEPTION}{CATCH\_PREPARE\_EXCEPTION}}
+{\footnotesize\ttfamily \label{catch__enforce_8h_a01cc18e13c75ec7b18d2a58bf074cd97} 
+\#define CATCH\+\_\+\+PREPARE\+\_\+\+EXCEPTION(\begin{DoxyParamCaption}\item[{}]{type}{, }\item[{}]{msg}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{yubihsm_8h_a1d127017fb298b889f4ba24752d08b8e}{type}}(\ (\ \mbox{\hyperlink{class_catch_1_1_reusable_string_stream}{Catch::ReusableStringStream}}()\ <<\ msg\ ).str()\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__enforce_8h_source_l00030}{30}} of file \mbox{\hyperlink{catch__enforce_8h_source}{catch\+\_\+enforce.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00030\ \textcolor{preprocessor}{\#define\ CATCH\_PREPARE\_EXCEPTION(\ type,\ msg\ )\ \(\backslash\)}}
+\DoxyCodeLine{00031\ \textcolor{preprocessor}{\ \ \ \ type(\ (\ Catch::ReusableStringStream()\ <<\ msg\ ).str()\ )}}
+
+\end{DoxyCode}
+\Hypertarget{catch__enforce_8h_a6274a54d9b6da60d7c6e9033b310d8b2}\index{catch\_enforce.h@{catch\_enforce.h}!CATCH\_RUNTIME\_ERROR@{CATCH\_RUNTIME\_ERROR}}
+\index{CATCH\_RUNTIME\_ERROR@{CATCH\_RUNTIME\_ERROR}!catch\_enforce.h@{catch\_enforce.h}}
+\doxysubsubsection{\texorpdfstring{CATCH\_RUNTIME\_ERROR}{CATCH\_RUNTIME\_ERROR}}
+{\footnotesize\ttfamily \label{catch__enforce_8h_a6274a54d9b6da60d7c6e9033b310d8b2} 
+\#define CATCH\+\_\+\+RUNTIME\+\_\+\+ERROR(\begin{DoxyParamCaption}\item[{}]{msg}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{namespace_catch_a3cbceeab9252d1b752f66a2826e92548}{Catch::throw\_exception}}(\mbox{\hyperlink{catch__enforce_8h_a01cc18e13c75ec7b18d2a58bf074cd97}{CATCH\_PREPARE\_EXCEPTION}}(\ std::runtime\_error,\ msg\ ))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__enforce_8h_source_l00036}{36}} of file \mbox{\hyperlink{catch__enforce_8h_source}{catch\+\_\+enforce.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00036\ \textcolor{preprocessor}{\#define\ CATCH\_RUNTIME\_ERROR(\ msg\ )\ \(\backslash\)}}
+\DoxyCodeLine{00037\ \textcolor{preprocessor}{\ \ \ \ Catch::throw\_exception(CATCH\_PREPARE\_EXCEPTION(\ std::runtime\_error,\ msg\ ))}}
+
+\end{DoxyCode}

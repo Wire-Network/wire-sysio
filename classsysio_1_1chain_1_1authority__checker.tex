@@ -1,0 +1,369 @@
+\doxysection{sysio\+::chain\+::authority\+\_\+checker\texorpdfstring{$<$}{<} Permission\+To\+Authority\+Func \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classsysio_1_1chain_1_1authority__checker}{}\label{classsysio_1_1chain_1_1authority__checker}\index{sysio::chain::authority\_checker$<$ PermissionToAuthorityFunc $>$@{sysio::chain::authority\_checker$<$ PermissionToAuthorityFunc $>$}}
+
+
+namespace detail  
+
+
+
+
+{\ttfamily \#include $<$authority\+\_\+checker.\+hpp$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{classsysio_1_1chain_1_1authority__checker_ac16d080f2093b68a14b1ce2099d3ec0d}{permission\+\_\+cache\+\_\+status}} \{ \mbox{\hyperlink{classsysio_1_1chain_1_1authority__checker_ac16d080f2093b68a14b1ce2099d3ec0da37b44fe1281de3cfce4b74a0831bca35}{being\+\_\+evaluated}}
+, \mbox{\hyperlink{classsysio_1_1chain_1_1authority__checker_ac16d080f2093b68a14b1ce2099d3ec0daac4c9b38ac9b5249c0f63c2eb1acec32}{permission\+\_\+unsatisfied}}
+, \mbox{\hyperlink{classsysio_1_1chain_1_1authority__checker_ac16d080f2093b68a14b1ce2099d3ec0dad78af6ee86d1c87467d377e9163f9356}{permission\+\_\+satisfied}}
+ \}
+\item 
+typedef map$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1permission__level}{permission\+\_\+level}}, \mbox{\hyperlink{classsysio_1_1chain_1_1authority__checker_ac16d080f2093b68a14b1ce2099d3ec0d}{permission\+\_\+cache\+\_\+status}} $>$ \mbox{\hyperlink{classsysio_1_1chain_1_1authority__checker_aa5c6deab96824435dbe758d355fbdca4}{permission\+\_\+cache\+\_\+type}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classsysio_1_1chain_1_1authority__checker_a1126eb5bbbf52d8d2076f68ec1acde07}{authority\+\_\+checker}} (Permission\+To\+Authority\+Func permission\+\_\+to\+\_\+authority, \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} recursion\+\_\+depth\+\_\+limit, const flat\+\_\+set$<$ \mbox{\hyperlink{namespacesysio_1_1chain_a0628a11f388cd2e43b1ccc1260a1042f}{public\+\_\+key\+\_\+type}} $>$ \&provided\+\_\+keys, const flat\+\_\+set$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1permission__level}{permission\+\_\+level}} $>$ \&provided\+\_\+permissions, \mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}} provided\+\_\+delay, const std\+::function$<$ void()$>$ \&checktime)
+\item 
+bool \mbox{\hyperlink{classsysio_1_1chain_1_1authority__checker_a40cf1f7624ce4c22f5bb1ce26723ad1f}{satisfied}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1permission__level}{permission\+\_\+level}} \&permission, \mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}} override\+\_\+provided\+\_\+delay, \mbox{\hyperlink{classsysio_1_1chain_1_1authority__checker_aa5c6deab96824435dbe758d355fbdca4}{permission\+\_\+cache\+\_\+type}} \texorpdfstring{$\ast$}{*}cached\+\_\+perms=nullptr)
+\item 
+bool \mbox{\hyperlink{classsysio_1_1chain_1_1authority__checker_a29908e5eb07926fb83a3db76a205c8d7}{satisfied}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1permission__level}{permission\+\_\+level}} \&permission, \mbox{\hyperlink{classsysio_1_1chain_1_1authority__checker_aa5c6deab96824435dbe758d355fbdca4}{permission\+\_\+cache\+\_\+type}} \texorpdfstring{$\ast$}{*}cached\+\_\+perms=nullptr)
+\item 
+{\footnotesize template$<$typename Authority\+Type $>$ }\\bool \mbox{\hyperlink{classsysio_1_1chain_1_1authority__checker_ab9d8b81e08dabce950899557fab3dadc}{satisfied}} (const Authority\+Type \&\mbox{\hyperlink{structsysio_1_1chain_1_1authority}{authority}}, \mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}} override\+\_\+provided\+\_\+delay, \mbox{\hyperlink{classsysio_1_1chain_1_1authority__checker_aa5c6deab96824435dbe758d355fbdca4}{permission\+\_\+cache\+\_\+type}} \texorpdfstring{$\ast$}{*}cached\+\_\+perms=nullptr)
+\item 
+{\footnotesize template$<$typename Authority\+Type $>$ }\\bool \mbox{\hyperlink{classsysio_1_1chain_1_1authority__checker_a7c3e9c3287c557920e3f391543d33035}{satisfied}} (const Authority\+Type \&\mbox{\hyperlink{structsysio_1_1chain_1_1authority}{authority}}, \mbox{\hyperlink{classsysio_1_1chain_1_1authority__checker_aa5c6deab96824435dbe758d355fbdca4}{permission\+\_\+cache\+\_\+type}} \texorpdfstring{$\ast$}{*}cached\+\_\+perms=nullptr)
+\item 
+bool \mbox{\hyperlink{classsysio_1_1chain_1_1authority__checker_a327a653b8def49e748fd2251594622b3}{all\+\_\+keys\+\_\+used}} () const
+\item 
+flat\+\_\+set$<$ \mbox{\hyperlink{namespacesysio_1_1chain_a0628a11f388cd2e43b1ccc1260a1042f}{public\+\_\+key\+\_\+type}} $>$ \mbox{\hyperlink{classsysio_1_1chain_1_1authority__checker_a8500b3bc501b5a1fc2f30e1091a1d2fe}{used\+\_\+keys}} () const
+\item 
+flat\+\_\+set$<$ \mbox{\hyperlink{namespacesysio_1_1chain_a0628a11f388cd2e43b1ccc1260a1042f}{public\+\_\+key\+\_\+type}} $>$ \mbox{\hyperlink{classsysio_1_1chain_1_1authority__checker_a2432f1140c5a55f21615dfb8e1ec054b}{unused\+\_\+keys}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static std\+::optional$<$ \mbox{\hyperlink{classsysio_1_1chain_1_1authority__checker_ac16d080f2093b68a14b1ce2099d3ec0d}{permission\+\_\+cache\+\_\+status}} $>$ \mbox{\hyperlink{classsysio_1_1chain_1_1authority__checker_a06a07b7c9ef05327a0d0bfa4222e7933}{permission\+\_\+status\+\_\+in\+\_\+cache}} (const \mbox{\hyperlink{classsysio_1_1chain_1_1authority__checker_aa5c6deab96824435dbe758d355fbdca4}{permission\+\_\+cache\+\_\+type}} \&permissions, const \mbox{\hyperlink{structsysio_1_1chain_1_1permission__level}{permission\+\_\+level}} \&level)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Permission\+To\+Authority\+Func$>$\newline
+class sysio\+::chain\+::authority\+\_\+checker$<$ Permission\+To\+Authority\+Func $>$}
+This class determines whether a set of signing keys are sufficient to satisfy an authority or not
+
+To determine whether an authority is satisfied or not, we first determine which keys have approved of a message, and then determine whether that list of keys is sufficient to satisfy the authority. This class takes a list of keys and provides the \doxylink{classsysio_1_1chain_1_1authority__checker_a40cf1f7624ce4c22f5bb1ce26723ad1f}{satisfied} method to determine whether that list of keys satisfies a provided authority.
+
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em F} & \doxylink{struct_a}{A} callable which takes a single argument of type Account\+Permission and returns the corresponding authority \\
+\hline
+\end{DoxyTemplParams}
+
+
+Definition at line \mbox{\hyperlink{authority__checker_8hpp_source_l00035}{35}} of file \mbox{\hyperlink{authority__checker_8hpp_source}{authority\+\_\+checker.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classsysio_1_1chain_1_1authority__checker_aa5c6deab96824435dbe758d355fbdca4}\index{sysio::chain::authority\_checker$<$ PermissionToAuthorityFunc $>$@{sysio::chain::authority\_checker$<$ PermissionToAuthorityFunc $>$}!permission\_cache\_type@{permission\_cache\_type}}
+\index{permission\_cache\_type@{permission\_cache\_type}!sysio::chain::authority\_checker$<$ PermissionToAuthorityFunc $>$@{sysio::chain::authority\_checker$<$ PermissionToAuthorityFunc $>$}}
+\doxysubsubsection{\texorpdfstring{permission\_cache\_type}{permission\_cache\_type}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1authority__checker_aa5c6deab96824435dbe758d355fbdca4} 
+template$<$typename Permission\+To\+Authority\+Func $>$ \\
+map$<$\mbox{\hyperlink{structsysio_1_1chain_1_1permission__level}{permission\+\_\+level}}, \mbox{\hyperlink{classsysio_1_1chain_1_1authority__checker_ac16d080f2093b68a14b1ce2099d3ec0d}{permission\+\_\+cache\+\_\+status}}$>$ \mbox{\hyperlink{classsysio_1_1chain_1_1authority__checker}{sysio\+::chain\+::authority\+\_\+checker}}$<$ Permission\+To\+Authority\+Func $>$\+::permission\+\_\+cache\+\_\+type}
+
+
+
+Definition at line \mbox{\hyperlink{authority__checker_8hpp_source_l00070}{70}} of file \mbox{\hyperlink{authority__checker_8hpp_source}{authority\+\_\+checker.\+hpp}}.
+
+
+
+\doxysubsection{Member Enumeration Documentation}
+\Hypertarget{classsysio_1_1chain_1_1authority__checker_ac16d080f2093b68a14b1ce2099d3ec0d}\index{sysio::chain::authority\_checker$<$ PermissionToAuthorityFunc $>$@{sysio::chain::authority\_checker$<$ PermissionToAuthorityFunc $>$}!permission\_cache\_status@{permission\_cache\_status}}
+\index{permission\_cache\_status@{permission\_cache\_status}!sysio::chain::authority\_checker$<$ PermissionToAuthorityFunc $>$@{sysio::chain::authority\_checker$<$ PermissionToAuthorityFunc $>$}}
+\doxysubsubsection{\texorpdfstring{permission\_cache\_status}{permission\_cache\_status}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1authority__checker_ac16d080f2093b68a14b1ce2099d3ec0d} 
+template$<$typename Permission\+To\+Authority\+Func $>$ \\
+enum \mbox{\hyperlink{classsysio_1_1chain_1_1authority__checker_ac16d080f2093b68a14b1ce2099d3ec0d}{sysio\+::chain\+::authority\+\_\+checker\+::permission\+\_\+cache\+\_\+status}}}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{being\_evaluated@{being\_evaluated}!sysio::chain::authority\_checker$<$ PermissionToAuthorityFunc $>$@{sysio::chain::authority\_checker$<$ PermissionToAuthorityFunc $>$}}\index{sysio::chain::authority\_checker$<$ PermissionToAuthorityFunc $>$@{sysio::chain::authority\_checker$<$ PermissionToAuthorityFunc $>$}!being\_evaluated@{being\_evaluated}}}\Hypertarget{classsysio_1_1chain_1_1authority__checker_ac16d080f2093b68a14b1ce2099d3ec0da37b44fe1281de3cfce4b74a0831bca35}\label{classsysio_1_1chain_1_1authority__checker_ac16d080f2093b68a14b1ce2099d3ec0d} 
+being\+\_\+evaluated&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{permission\_unsatisfied@{permission\_unsatisfied}!sysio::chain::authority\_checker$<$ PermissionToAuthorityFunc $>$@{sysio::chain::authority\_checker$<$ PermissionToAuthorityFunc $>$}}\index{sysio::chain::authority\_checker$<$ PermissionToAuthorityFunc $>$@{sysio::chain::authority\_checker$<$ PermissionToAuthorityFunc $>$}!permission\_unsatisfied@{permission\_unsatisfied}}}\Hypertarget{classsysio_1_1chain_1_1authority__checker_ac16d080f2093b68a14b1ce2099d3ec0daac4c9b38ac9b5249c0f63c2eb1acec32}\label{classsysio_1_1chain_1_1authority__checker_ac16d080f2093b68a14b1ce2099d3ec0d} 
+permission\+\_\+unsatisfied&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{permission\_satisfied@{permission\_satisfied}!sysio::chain::authority\_checker$<$ PermissionToAuthorityFunc $>$@{sysio::chain::authority\_checker$<$ PermissionToAuthorityFunc $>$}}\index{sysio::chain::authority\_checker$<$ PermissionToAuthorityFunc $>$@{sysio::chain::authority\_checker$<$ PermissionToAuthorityFunc $>$}!permission\_satisfied@{permission\_satisfied}}}\Hypertarget{classsysio_1_1chain_1_1authority__checker_ac16d080f2093b68a14b1ce2099d3ec0dad78af6ee86d1c87467d377e9163f9356}\label{classsysio_1_1chain_1_1authority__checker_ac16d080f2093b68a14b1ce2099d3ec0d} 
+permission\+\_\+satisfied&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{authority__checker_8hpp_source_l00064}{64}} of file \mbox{\hyperlink{authority__checker_8hpp_source}{authority\+\_\+checker.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1authority__checker_ac16d080f2093b68a14b1ce2099d3ec0da37b44fe1281de3cfce4b74a0831bca35}{being\_evaluated}},}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1authority__checker_ac16d080f2093b68a14b1ce2099d3ec0daac4c9b38ac9b5249c0f63c2eb1acec32}{permission\_unsatisfied}},}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1authority__checker_ac16d080f2093b68a14b1ce2099d3ec0dad78af6ee86d1c87467d377e9163f9356}{permission\_satisfied}}}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classsysio_1_1chain_1_1authority__checker_a1126eb5bbbf52d8d2076f68ec1acde07}\index{sysio::chain::authority\_checker$<$ PermissionToAuthorityFunc $>$@{sysio::chain::authority\_checker$<$ PermissionToAuthorityFunc $>$}!authority\_checker@{authority\_checker}}
+\index{authority\_checker@{authority\_checker}!sysio::chain::authority\_checker$<$ PermissionToAuthorityFunc $>$@{sysio::chain::authority\_checker$<$ PermissionToAuthorityFunc $>$}}
+\doxysubsubsection{\texorpdfstring{authority\_checker()}{authority\_checker()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1authority__checker_a1126eb5bbbf52d8d2076f68ec1acde07} 
+template$<$typename Permission\+To\+Authority\+Func $>$ \\
+\mbox{\hyperlink{classsysio_1_1chain_1_1authority__checker}{sysio\+::chain\+::authority\+\_\+checker}}$<$ Permission\+To\+Authority\+Func $>$\+::authority\+\_\+checker (\begin{DoxyParamCaption}\item[{Permission\+To\+Authority\+Func}]{permission\+\_\+to\+\_\+authority}{, }\item[{\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}}}]{recursion\+\_\+depth\+\_\+limit}{, }\item[{const flat\+\_\+set$<$ \mbox{\hyperlink{namespacesysio_1_1chain_a0628a11f388cd2e43b1ccc1260a1042f}{public\+\_\+key\+\_\+type}} $>$ \&}]{provided\+\_\+keys}{, }\item[{const flat\+\_\+set$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1permission__level}{permission\+\_\+level}} $>$ \&}]{provided\+\_\+permissions}{, }\item[{\mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}}}]{provided\+\_\+delay}{, }\item[{const std\+::function$<$ void()$>$ \&}]{checktime}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{authority__checker_8hpp_source_l00046}{46}} of file \mbox{\hyperlink{authority__checker_8hpp_source}{authority\+\_\+checker.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ :permission\_to\_authority(permission\_to\_authority)}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ ,checktime(\ checktime\ )}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ ,provided\_keys(provided\_keys.begin(),\ provided\_keys.end())}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ ,provided\_permissions(provided\_permissions)}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ ,\_used\_keys(provided\_keys.size(),\ \textcolor{keyword}{false})}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ ,provided\_delay(provided\_delay)}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ ,recursion\_depth\_limit(recursion\_depth\_limit)}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{bool}\textcolor{keyword}{>}(checktime),\ authorization\_exception,\ \textcolor{stringliteral}{"{}checktime\ cannot\ be\ empty"{}}\ );}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1chain_1_1authority__checker_a327a653b8def49e748fd2251594622b3}\index{sysio::chain::authority\_checker$<$ PermissionToAuthorityFunc $>$@{sysio::chain::authority\_checker$<$ PermissionToAuthorityFunc $>$}!all\_keys\_used@{all\_keys\_used}}
+\index{all\_keys\_used@{all\_keys\_used}!sysio::chain::authority\_checker$<$ PermissionToAuthorityFunc $>$@{sysio::chain::authority\_checker$<$ PermissionToAuthorityFunc $>$}}
+\doxysubsubsection{\texorpdfstring{all\_keys\_used()}{all\_keys\_used()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1authority__checker_a327a653b8def49e748fd2251594622b3} 
+template$<$typename Permission\+To\+Authority\+Func $>$ \\
+bool \mbox{\hyperlink{classsysio_1_1chain_1_1authority__checker}{sysio\+::chain\+::authority\+\_\+checker}}$<$ Permission\+To\+Authority\+Func $>$\+::all\+\_\+keys\+\_\+used (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{authority__checker_8hpp_source_l00121}{121}} of file \mbox{\hyperlink{authority__checker_8hpp_source}{authority\+\_\+checker.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00121\ \{\ \textcolor{keywordflow}{return}\ boost::algorithm::all\_of\_equal(\_used\_keys,\ \textcolor{keyword}{true});\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1authority__checker_a06a07b7c9ef05327a0d0bfa4222e7933}\index{sysio::chain::authority\_checker$<$ PermissionToAuthorityFunc $>$@{sysio::chain::authority\_checker$<$ PermissionToAuthorityFunc $>$}!permission\_status\_in\_cache@{permission\_status\_in\_cache}}
+\index{permission\_status\_in\_cache@{permission\_status\_in\_cache}!sysio::chain::authority\_checker$<$ PermissionToAuthorityFunc $>$@{sysio::chain::authority\_checker$<$ PermissionToAuthorityFunc $>$}}
+\doxysubsubsection{\texorpdfstring{permission\_status\_in\_cache()}{permission\_status\_in\_cache()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1authority__checker_a06a07b7c9ef05327a0d0bfa4222e7933} 
+template$<$typename Permission\+To\+Authority\+Func $>$ \\
+static std\+::optional$<$ \mbox{\hyperlink{classsysio_1_1chain_1_1authority__checker_ac16d080f2093b68a14b1ce2099d3ec0d}{permission\+\_\+cache\+\_\+status}} $>$ \mbox{\hyperlink{classsysio_1_1chain_1_1authority__checker}{sysio\+::chain\+::authority\+\_\+checker}}$<$ Permission\+To\+Authority\+Func $>$\+::permission\+\_\+status\+\_\+in\+\_\+cache (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classsysio_1_1chain_1_1authority__checker_aa5c6deab96824435dbe758d355fbdca4}{permission\+\_\+cache\+\_\+type}} \&}]{permissions}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1permission__level}{permission\+\_\+level}} \&}]{level}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{authority__checker_8hpp_source_l00133}{133}} of file \mbox{\hyperlink{authority__checker_8hpp_source}{authority\+\_\+checker.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ permissions.find(\ level\ );}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr\ !=\ permissions.end()\ )}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ itr-\/>second;}
+\DoxyCodeLine{00139\ }
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \ \ \ \ itr\ =\ permissions.find(\ \{\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}}.actor,\ \mbox{\hyperlink{namespacesysio_1_1chain_aacc541763fed17ee490b6ac42b7bb77a}{permission\_name}}()\}\ );}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr\ !=\ permissions.end()\ )}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ itr-\/>second;}
+\DoxyCodeLine{00143\ }
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::optional<permission\_cache\_status>();}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1authority__checker_ab9d8b81e08dabce950899557fab3dadc}\index{sysio::chain::authority\_checker$<$ PermissionToAuthorityFunc $>$@{sysio::chain::authority\_checker$<$ PermissionToAuthorityFunc $>$}!satisfied@{satisfied}}
+\index{satisfied@{satisfied}!sysio::chain::authority\_checker$<$ PermissionToAuthorityFunc $>$@{sysio::chain::authority\_checker$<$ PermissionToAuthorityFunc $>$}}
+\doxysubsubsection{\texorpdfstring{satisfied()}{satisfied()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1authority__checker_ab9d8b81e08dabce950899557fab3dadc} 
+template$<$typename Permission\+To\+Authority\+Func $>$ \\
+template$<$typename Authority\+Type $>$ \\
+bool \mbox{\hyperlink{classsysio_1_1chain_1_1authority__checker}{sysio\+::chain\+::authority\+\_\+checker}}$<$ Permission\+To\+Authority\+Func $>$\+::satisfied (\begin{DoxyParamCaption}\item[{const Authority\+Type \&}]{authority}{, }\item[{\mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}}}]{override\+\_\+provided\+\_\+delay}{, }\item[{\mbox{\hyperlink{classsysio_1_1chain_1_1authority__checker_aa5c6deab96824435dbe758d355fbdca4}{permission\+\_\+cache\+\_\+type}} \texorpdfstring{$\ast$}{*}}]{cached\+\_\+perms}{ = {\ttfamily nullptr}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{authority__checker_8hpp_source_l00097}{97}} of file \mbox{\hyperlink{authority__checker_8hpp_source}{authority\+\_\+checker.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ delay\_reverter\ =\ \mbox{\hyperlink{namespacefc_a23d89b54a8ffd84f7e7efeb21747d846}{fc::make\_scoped\_exit}}(\ [\textcolor{keyword}{this},\ delay\ =\ provided\_delay]\ ()\ \textcolor{keyword}{mutable}\ \{}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ provided\_delay\ =\ \mbox{\hyperlink{integration_8cpp_a6e9635897de7740b7389a391f613626b}{delay}};}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00105\ }
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \ \ \ \ provided\_delay\ =\ override\_provided\_delay;}
+\DoxyCodeLine{00107\ }
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1chain_1_1authority__checker_a40cf1f7624ce4c22f5bb1ce26723ad1f}{satisfied}}(\ authority,\ cached\_perms\ );}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1authority__checker_ab9d8b81e08dabce950899557fab3dadc_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1authority__checker_a7c3e9c3287c557920e3f391543d33035}\index{sysio::chain::authority\_checker$<$ PermissionToAuthorityFunc $>$@{sysio::chain::authority\_checker$<$ PermissionToAuthorityFunc $>$}!satisfied@{satisfied}}
+\index{satisfied@{satisfied}!sysio::chain::authority\_checker$<$ PermissionToAuthorityFunc $>$@{sysio::chain::authority\_checker$<$ PermissionToAuthorityFunc $>$}}
+\doxysubsubsection{\texorpdfstring{satisfied()}{satisfied()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1authority__checker_a7c3e9c3287c557920e3f391543d33035} 
+template$<$typename Permission\+To\+Authority\+Func $>$ \\
+template$<$typename Authority\+Type $>$ \\
+bool \mbox{\hyperlink{classsysio_1_1chain_1_1authority__checker}{sysio\+::chain\+::authority\+\_\+checker}}$<$ Permission\+To\+Authority\+Func $>$\+::satisfied (\begin{DoxyParamCaption}\item[{const Authority\+Type \&}]{authority}{, }\item[{\mbox{\hyperlink{classsysio_1_1chain_1_1authority__checker_aa5c6deab96824435dbe758d355fbdca4}{permission\+\_\+cache\+\_\+type}} \texorpdfstring{$\ast$}{*}}]{cached\+\_\+perms}{ = {\ttfamily nullptr}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{authority__checker_8hpp_source_l00112}{112}} of file \mbox{\hyperlink{authority__checker_8hpp_source}{authority\+\_\+checker.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1authority__checker_aa5c6deab96824435dbe758d355fbdca4}{permission\_cache\_type}}\ cached\_permissions;}
+\DoxyCodeLine{00114\ }
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ cached\_perms\ ==\ \textcolor{keyword}{nullptr}\ )}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ cached\_perms\ =\ initialize\_permission\_cache(\ cached\_permissions\ );}
+\DoxyCodeLine{00117\ }
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1chain_1_1authority__checker_a40cf1f7624ce4c22f5bb1ce26723ad1f}{satisfied}}(\ authority,\ *cached\_perms,\ 0\ );}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1authority__checker_a7c3e9c3287c557920e3f391543d33035_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1authority__checker_a40cf1f7624ce4c22f5bb1ce26723ad1f}\index{sysio::chain::authority\_checker$<$ PermissionToAuthorityFunc $>$@{sysio::chain::authority\_checker$<$ PermissionToAuthorityFunc $>$}!satisfied@{satisfied}}
+\index{satisfied@{satisfied}!sysio::chain::authority\_checker$<$ PermissionToAuthorityFunc $>$@{sysio::chain::authority\_checker$<$ PermissionToAuthorityFunc $>$}}
+\doxysubsubsection{\texorpdfstring{satisfied()}{satisfied()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1authority__checker_a40cf1f7624ce4c22f5bb1ce26723ad1f} 
+template$<$typename Permission\+To\+Authority\+Func $>$ \\
+bool \mbox{\hyperlink{classsysio_1_1chain_1_1authority__checker}{sysio\+::chain\+::authority\+\_\+checker}}$<$ Permission\+To\+Authority\+Func $>$\+::satisfied (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1permission__level}{permission\+\_\+level}} \&}]{permission}{, }\item[{\mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}}}]{override\+\_\+provided\+\_\+delay}{, }\item[{\mbox{\hyperlink{classsysio_1_1chain_1_1authority__checker_aa5c6deab96824435dbe758d355fbdca4}{permission\+\_\+cache\+\_\+type}} \texorpdfstring{$\ast$}{*}}]{cached\+\_\+perms}{ = {\ttfamily nullptr}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{authority__checker_8hpp_source_l00072}{72}} of file \mbox{\hyperlink{authority__checker_8hpp_source}{authority\+\_\+checker.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ delay\_reverter\ =\ \mbox{\hyperlink{namespacefc_a23d89b54a8ffd84f7e7efeb21747d846}{fc::make\_scoped\_exit}}(\ [\textcolor{keyword}{this},\ delay\ =\ provided\_delay]\ ()\ \textcolor{keyword}{mutable}\ \{}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ provided\_delay\ =\ \mbox{\hyperlink{integration_8cpp_a6e9635897de7740b7389a391f613626b}{delay}};}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00080\ }
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \ \ \ provided\_delay\ =\ override\_provided\_delay;}
+\DoxyCodeLine{00082\ }
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1chain_1_1authority__checker_a40cf1f7624ce4c22f5bb1ce26723ad1f}{satisfied}}(\ permission,\ cached\_perms\ );}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=340pt]{classsysio_1_1chain_1_1authority__checker_a40cf1f7624ce4c22f5bb1ce26723ad1f_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=340pt]{classsysio_1_1chain_1_1authority__checker_a40cf1f7624ce4c22f5bb1ce26723ad1f_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1authority__checker_a29908e5eb07926fb83a3db76a205c8d7}\index{sysio::chain::authority\_checker$<$ PermissionToAuthorityFunc $>$@{sysio::chain::authority\_checker$<$ PermissionToAuthorityFunc $>$}!satisfied@{satisfied}}
+\index{satisfied@{satisfied}!sysio::chain::authority\_checker$<$ PermissionToAuthorityFunc $>$@{sysio::chain::authority\_checker$<$ PermissionToAuthorityFunc $>$}}
+\doxysubsubsection{\texorpdfstring{satisfied()}{satisfied()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1authority__checker_a29908e5eb07926fb83a3db76a205c8d7} 
+template$<$typename Permission\+To\+Authority\+Func $>$ \\
+bool \mbox{\hyperlink{classsysio_1_1chain_1_1authority__checker}{sysio\+::chain\+::authority\+\_\+checker}}$<$ Permission\+To\+Authority\+Func $>$\+::satisfied (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1permission__level}{permission\+\_\+level}} \&}]{permission}{, }\item[{\mbox{\hyperlink{classsysio_1_1chain_1_1authority__checker_aa5c6deab96824435dbe758d355fbdca4}{permission\+\_\+cache\+\_\+type}} \texorpdfstring{$\ast$}{*}}]{cached\+\_\+perms}{ = {\ttfamily nullptr}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{authority__checker_8hpp_source_l00086}{86}} of file \mbox{\hyperlink{authority__checker_8hpp_source}{authority\+\_\+checker.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1authority__checker_aa5c6deab96824435dbe758d355fbdca4}{permission\_cache\_type}}\ cached\_permissions;}
+\DoxyCodeLine{00088\ }
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ cached\_perms\ ==\ \textcolor{keyword}{nullptr}\ )}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ cached\_perms\ =\ initialize\_permission\_cache(\ cached\_permissions\ );}
+\DoxyCodeLine{00091\ }
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ \ \ \ weight\_tally\_visitor\ visitor(*\textcolor{keyword}{this},\ *cached\_perms,\ 0);}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (\ visitor(permission\_level\_weight\{permission,\ 1\})\ >\ 0\ );}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1authority__checker_a2432f1140c5a55f21615dfb8e1ec054b}\index{sysio::chain::authority\_checker$<$ PermissionToAuthorityFunc $>$@{sysio::chain::authority\_checker$<$ PermissionToAuthorityFunc $>$}!unused\_keys@{unused\_keys}}
+\index{unused\_keys@{unused\_keys}!sysio::chain::authority\_checker$<$ PermissionToAuthorityFunc $>$@{sysio::chain::authority\_checker$<$ PermissionToAuthorityFunc $>$}}
+\doxysubsubsection{\texorpdfstring{unused\_keys()}{unused\_keys()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1authority__checker_a2432f1140c5a55f21615dfb8e1ec054b} 
+template$<$typename Permission\+To\+Authority\+Func $>$ \\
+flat\+\_\+set$<$ \mbox{\hyperlink{namespacesysio_1_1chain_a0628a11f388cd2e43b1ccc1260a1042f}{public\+\_\+key\+\_\+type}} $>$ \mbox{\hyperlink{classsysio_1_1chain_1_1authority__checker}{sysio\+::chain\+::authority\+\_\+checker}}$<$ Permission\+To\+Authority\+Func $>$\+::unused\+\_\+keys (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{authority__checker_8hpp_source_l00127}{127}} of file \mbox{\hyperlink{authority__checker_8hpp_source}{authority\+\_\+checker.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ range\ =\ \mbox{\hyperlink{namespacesysio_1_1chain_a673425e013b1d45337e8e10cdde4e0c5}{filter\_data\_by\_marker}}(provided\_keys,\ \_used\_keys,\ \textcolor{keyword}{false});}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{range.begin(),\ range.end()\};}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=329pt]{classsysio_1_1chain_1_1authority__checker_a2432f1140c5a55f21615dfb8e1ec054b_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1authority__checker_a8500b3bc501b5a1fc2f30e1091a1d2fe}\index{sysio::chain::authority\_checker$<$ PermissionToAuthorityFunc $>$@{sysio::chain::authority\_checker$<$ PermissionToAuthorityFunc $>$}!used\_keys@{used\_keys}}
+\index{used\_keys@{used\_keys}!sysio::chain::authority\_checker$<$ PermissionToAuthorityFunc $>$@{sysio::chain::authority\_checker$<$ PermissionToAuthorityFunc $>$}}
+\doxysubsubsection{\texorpdfstring{used\_keys()}{used\_keys()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1authority__checker_a8500b3bc501b5a1fc2f30e1091a1d2fe} 
+template$<$typename Permission\+To\+Authority\+Func $>$ \\
+flat\+\_\+set$<$ \mbox{\hyperlink{namespacesysio_1_1chain_a0628a11f388cd2e43b1ccc1260a1042f}{public\+\_\+key\+\_\+type}} $>$ \mbox{\hyperlink{classsysio_1_1chain_1_1authority__checker}{sysio\+::chain\+::authority\+\_\+checker}}$<$ Permission\+To\+Authority\+Func $>$\+::used\+\_\+keys (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{authority__checker_8hpp_source_l00123}{123}} of file \mbox{\hyperlink{authority__checker_8hpp_source}{authority\+\_\+checker.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ range\ =\ \mbox{\hyperlink{namespacesysio_1_1chain_a673425e013b1d45337e8e10cdde4e0c5}{filter\_data\_by\_marker}}(provided\_keys,\ \_used\_keys,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{range.begin(),\ range.end()\};}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=321pt]{classsysio_1_1chain_1_1authority__checker_a8500b3bc501b5a1fc2f30e1091a1d2fe_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{authority__checker_8hpp}{authority\+\_\+checker.\+hpp}}\end{DoxyCompactItemize}

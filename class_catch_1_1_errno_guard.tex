@@ -1,0 +1,59 @@
+\doxysection{Catch\+::Errno\+Guard Class Reference}
+\hypertarget{class_catch_1_1_errno_guard}{}\label{class_catch_1_1_errno_guard}\index{Catch::ErrnoGuard@{Catch::ErrnoGuard}}
+
+
+{\ttfamily \#include $<$catch\+\_\+errno\+\_\+guard.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_catch_1_1_errno_guard_a75ddc0096de4f3cccd2a1dd20c9c472d}{Errno\+Guard}} ()
+\item 
+\mbox{\hyperlink{class_catch_1_1_errno_guard_a84994b18990930afe547902cb95bb39c}{\texorpdfstring{$\sim$}{\string~}\+Errno\+Guard}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{catch__errno__guard_8h_source_l00012}{12}} of file \mbox{\hyperlink{catch__errno__guard_8h_source}{catch\+\_\+errno\+\_\+guard.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_catch_1_1_errno_guard_a75ddc0096de4f3cccd2a1dd20c9c472d}\index{Catch::ErrnoGuard@{Catch::ErrnoGuard}!ErrnoGuard@{ErrnoGuard}}
+\index{ErrnoGuard@{ErrnoGuard}!Catch::ErrnoGuard@{Catch::ErrnoGuard}}
+\doxysubsubsection{\texorpdfstring{ErrnoGuard()}{ErrnoGuard()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_errno_guard_a75ddc0096de4f3cccd2a1dd20c9c472d} 
+Catch\+::\+Errno\+Guard\+::\+Errno\+Guard (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__errno__guard_8cpp_source_l00013}{13}} of file \mbox{\hyperlink{catch__errno__guard_8cpp_source}{catch\+\_\+errno\+\_\+guard.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00013\ :m\_oldErrno(errno)\{\}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_errno_guard_a84994b18990930afe547902cb95bb39c}\index{Catch::ErrnoGuard@{Catch::ErrnoGuard}!````~ErrnoGuard@{\texorpdfstring{$\sim$}{\string~}ErrnoGuard}}
+\index{````~ErrnoGuard@{\texorpdfstring{$\sim$}{\string~}ErrnoGuard}!Catch::ErrnoGuard@{Catch::ErrnoGuard}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}ErrnoGuard()}{\string~ErrnoGuard()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_errno_guard_a84994b18990930afe547902cb95bb39c} 
+Catch\+::\+Errno\+Guard\+::\texorpdfstring{$\sim$}{\string~}\+Errno\+Guard (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__errno__guard_8cpp_source_l00014}{14}} of file \mbox{\hyperlink{catch__errno__guard_8cpp_source}{catch\+\_\+errno\+\_\+guard.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00014\ \{\ errno\ =\ m\_oldErrno;\ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__errno__guard_8h}{catch\+\_\+errno\+\_\+guard.\+h}}\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__errno__guard_8cpp}{catch\+\_\+errno\+\_\+guard.\+cpp}}\end{DoxyCompactItemize}

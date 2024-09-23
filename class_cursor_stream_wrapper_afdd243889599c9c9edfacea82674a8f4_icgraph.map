@@ -1,0 +1,23 @@
+<map id="CursorStreamWrapper::GetColumn" name="CursorStreamWrapper::GetColumn">
+<area shape="rect" id="Node000001" title="Get the error column number, if error exists." alt="" coords="228,195,378,236"/>
+<area shape="rect" id="Node000002" href="$cursorstreamwrappertest_8cpp.html#a275da0d1f29dba3630a7ba31e01101e2" title=" " alt="" coords="109,203,180,228"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="212,218,181,218,181,213,212,213"/>
+<area shape="rect" id="Node000003" href="$cursorstreamwrappertest_8cpp.html#ad7be74dba4df64b632deef663f49ee1d" title=" " alt="" coords="5,5,61,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="131,189,103,120,83,81,59,44,49,33,53,30,63,41,87,78,108,118,136,187"/>
+<area shape="rect" id="Node000004" href="$cursorstreamwrappertest_8cpp.html#aa928a9ee549a92b19b936232e5b80529" title=" " alt="" coords="5,55,61,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="126,190,96,144,59,93,48,82,52,79,63,90,101,141,130,187"/>
+<area shape="rect" id="Node000005" href="$cursorstreamwrappertest_8cpp.html#ad4f41f82ee5faf1e197735d085678b10" title=" " alt="" coords="5,104,61,130"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="116,194,47,132,51,128,119,190"/>
+<area shape="rect" id="Node000006" href="$cursorstreamwrappertest_8cpp.html#a540fcbc4d8110c5cf1e394bef973864e" title=" " alt="" coords="5,153,61,179"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="99,198,60,181,62,176,101,193"/>
+<area shape="rect" id="Node000007" href="$cursorstreamwrappertest_8cpp.html#ac4fb8d3acd98f897e36fa6bc9d54583d" title=" " alt="" coords="5,203,61,228"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="93,218,61,218,61,213,93,213"/>
+<area shape="rect" id="Node000008" href="$cursorstreamwrappertest_8cpp.html#ac4cf5478a8fa67307f2b5d2213aca3a8" title=" " alt="" coords="5,252,61,278"/>
+<area shape="poly" id="edge7_Node000002_Node000008" title=" " alt="" coords="101,238,62,255,60,250,99,233"/>
+<area shape="rect" id="Node000009" href="$cursorstreamwrappertest_8cpp.html#a6bd684af3886ac0848edf1a8bdfc5c66" title=" " alt="" coords="5,301,61,327"/>
+<area shape="poly" id="edge8_Node000002_Node000009" title=" " alt="" coords="119,241,51,303,47,299,116,237"/>
+<area shape="rect" id="Node000010" href="$cursorstreamwrappertest_8cpp.html#ae8b36851bf3b3305e4292794cdd52ddc" title=" " alt="" coords="5,351,61,376"/>
+<area shape="poly" id="edge9_Node000002_Node000010" title=" " alt="" coords="130,244,101,290,63,341,52,352,48,349,59,338,96,287,126,241"/>
+<area shape="rect" id="Node000011" href="$cursorstreamwrappertest_8cpp.html#a128a1978f9d76e5b8f33a73fb193cd69" title=" " alt="" coords="5,400,61,426"/>
+<area shape="poly" id="edge10_Node000002_Node000011" title=" " alt="" coords="136,244,108,313,87,353,63,390,53,401,49,398,59,387,83,350,103,311,131,242"/>
+</map>

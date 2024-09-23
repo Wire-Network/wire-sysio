@@ -1,0 +1,11 @@
+<map id="Catch::StreamingReporterBase::testRunEnded" name="Catch::StreamingReporterBase::testRunEnded">
+<area shape="rect" id="Node000001" title=" " alt="" coords="221,104,394,145"/>
+<area shape="rect" id="Node000002" href="$struct_catch_1_1_compact_reporter.html#abf31540bf74013cb7736f28291712d53" title=" " alt="" coords="5,5,173,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="251,99,172,61,143,49,145,44,174,57,253,94"/>
+<area shape="rect" id="Node000003" href="$struct_catch_1_1_console_reporter.html#a665c8005050d0f1745935e0dde76e280" title=" " alt="" coords="8,71,170,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="205,111,170,106,171,101,205,106"/>
+<area shape="rect" id="Node000004" href="$struct_catch_1_1_t_a_p_reporter.html#a991c5fc83855f65e11e840044335198a" title=" " alt="" coords="19,136,159,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="206,142,160,149,159,143,205,137"/>
+<area shape="rect" id="Node000005" href="$class_catch_1_1_xml_reporter.html#a2458c9f342a446f0b3a7480b53c93705" title=" " alt="" coords="20,201,158,242"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="252,154,174,191,144,203,142,198,172,186,250,149"/>
+</map>

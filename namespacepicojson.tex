@@ -1,0 +1,851 @@
+\doxysection{picojson Namespace Reference}
+\hypertarget{namespacepicojson}{}\label{namespacepicojson}\index{picojson@{picojson}}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classpicojson_1_1default__parse__context}{default\+\_\+parse\+\_\+context}}
+\item 
+class \mbox{\hyperlink{classpicojson_1_1deny__parse__context}{deny\+\_\+parse\+\_\+context}}
+\item 
+class \mbox{\hyperlink{classpicojson_1_1input}{input}}
+\item 
+struct \mbox{\hyperlink{structpicojson_1_1last__error__t}{last\+\_\+error\+\_\+t}}
+\item 
+struct \mbox{\hyperlink{structpicojson_1_1null}{null}}
+\item 
+class \mbox{\hyperlink{classpicojson_1_1null__parse__context}{null\+\_\+parse\+\_\+context}}
+\item 
+struct \mbox{\hyperlink{structpicojson_1_1serialize__str__char}{serialize\+\_\+str\+\_\+char}}
+\item 
+class \mbox{\hyperlink{classpicojson_1_1value}{value}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{classpicojson_1_1value_a26aaa1a58490c25822adba9f1760ba88}{value\+::array}} \mbox{\hyperlink{namespacepicojson_ac1e72166adfe3d96dc58cddc7ebd536a}{array}}
+\item 
+typedef \mbox{\hyperlink{classpicojson_1_1value_afaff3eacfcaa3816a1c3c05191c6a378}{value\+::object}} \mbox{\hyperlink{namespacepicojson_a3e769a5e2dbffd9a9309e1dc2d67975b}{object}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \{ \newline
+\mbox{\hyperlink{namespacepicojson_af3ab2711a04808a2f980e782e66ad17fa656199e709e1aaa684dc9b19f6d25f62}{null\+\_\+type}}
+, \mbox{\hyperlink{namespacepicojson_af3ab2711a04808a2f980e782e66ad17fae04a93ebe65786d1f8687430242df802}{boolean\+\_\+type}}
+, \mbox{\hyperlink{namespacepicojson_af3ab2711a04808a2f980e782e66ad17fa258b8cac17e3039fe54eadb2f3ebde96}{number\+\_\+type}}
+, \mbox{\hyperlink{namespacepicojson_af3ab2711a04808a2f980e782e66ad17fa3cb2900f95eb6459ee2fe4e9a111bef8}{string\+\_\+type}}
+, \newline
+\mbox{\hyperlink{namespacepicojson_af3ab2711a04808a2f980e782e66ad17fae1ccb83543a46349939ddf8ccf75d0f2}{array\+\_\+type}}
+, \mbox{\hyperlink{namespacepicojson_af3ab2711a04808a2f980e782e66ad17fa1fdd0252e9484bec7aea5dcb1a3f82e9}{object\+\_\+type}}
+ \}
+\item 
+enum \{ \mbox{\hyperlink{namespacepicojson_afcd27b66f151bf1d3c298701043ac667a2aee14a2b66d94b58c64c66edd8ed9b1}{INDENT\+\_\+\+WIDTH}} = 2
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename Iter $>$ }\\void \mbox{\hyperlink{namespacepicojson_abc2111aa71797805957a4296fdf9c66d}{copy}} (const std\+::string \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, Iter oi)
+\item 
+{\footnotesize template$<$typename Iter $>$ }\\void \mbox{\hyperlink{namespacepicojson_a11130e017d868857aeb016f5e3d29008}{serialize\+\_\+str}} (const std\+::string \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, Iter oi)
+\item 
+{\footnotesize template$<$typename Iter $>$ }\\int \mbox{\hyperlink{namespacepicojson_a92d4f60542bbdfe8203f10e1fcce9368}{\+\_\+parse\+\_\+quadhex}} (\mbox{\hyperlink{classpicojson_1_1input}{input}}$<$ Iter $>$ \&in)
+\item 
+{\footnotesize template$<$typename String , typename Iter $>$ }\\bool \mbox{\hyperlink{namespacepicojson_a05316c2614f3e7a4559ce1d1003eb051}{\+\_\+parse\+\_\+codepoint}} (String \&out, \mbox{\hyperlink{classpicojson_1_1input}{input}}$<$ Iter $>$ \&in)
+\item 
+{\footnotesize template$<$typename String , typename Iter $>$ }\\bool \mbox{\hyperlink{namespacepicojson_a9a1d94feb2718129796225d77c9e8d11}{\+\_\+parse\+\_\+string}} (String \&out, \mbox{\hyperlink{classpicojson_1_1input}{input}}$<$ Iter $>$ \&in)
+\item 
+{\footnotesize template$<$typename Context , typename Iter $>$ }\\bool \mbox{\hyperlink{namespacepicojson_adcae039b132c6c96d2b2d9e786a04a88}{\+\_\+parse\+\_\+array}} (Context \&ctx, \mbox{\hyperlink{classpicojson_1_1input}{input}}$<$ Iter $>$ \&in)
+\item 
+{\footnotesize template$<$typename Context , typename Iter $>$ }\\bool \mbox{\hyperlink{namespacepicojson_a480ed5e3461568672197a42e259a44c9}{\+\_\+parse\+\_\+object}} (Context \&ctx, \mbox{\hyperlink{classpicojson_1_1input}{input}}$<$ Iter $>$ \&in)
+\item 
+{\footnotesize template$<$typename Iter $>$ }\\std\+::string \mbox{\hyperlink{namespacepicojson_a771defe1d981b7091c2156bf4720625c}{\+\_\+parse\+\_\+number}} (\mbox{\hyperlink{classpicojson_1_1input}{input}}$<$ Iter $>$ \&in)
+\item 
+{\footnotesize template$<$typename Context , typename Iter $>$ }\\bool \mbox{\hyperlink{namespacepicojson_aed024a6a1c8d8982a38c4a7fcefde221}{\+\_\+parse}} (Context \&ctx, \mbox{\hyperlink{classpicojson_1_1input}{input}}$<$ Iter $>$ \&in)
+\item 
+{\footnotesize template$<$typename Iter $>$ }\\std\+::string \mbox{\hyperlink{namespacepicojson_a3aca598f5855bc130a92a3e08a0c6ebf}{parse}} (\mbox{\hyperlink{classpicojson_1_1value}{value}} \&out, Iter \&pos, const Iter \&last)
+\item 
+{\footnotesize template$<$typename Context , typename Iter $>$ }\\Iter \mbox{\hyperlink{namespacepicojson_a01c0a3f35d42282ba913375737c8e259}{\+\_\+parse}} (Context \&ctx, const Iter \&first, const Iter \&last, std\+::string \texorpdfstring{$\ast$}{*}err)
+\item 
+{\footnotesize template$<$typename Iter $>$ }\\Iter \mbox{\hyperlink{namespacepicojson_a21621c03c9c8c83dcf5bc604d1cafdf6}{parse}} (\mbox{\hyperlink{classpicojson_1_1value}{value}} \&out, const Iter \&first, const Iter \&last, std\+::string \texorpdfstring{$\ast$}{*}err)
+\item 
+std\+::string \mbox{\hyperlink{namespacepicojson_a522ebeba3ce386f1df0aba41ae3b7763}{parse}} (\mbox{\hyperlink{classpicojson_1_1value}{value}} \&out, const std\+::string \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\item 
+std\+::string \mbox{\hyperlink{namespacepicojson_a2ed8a3cba445c8ecbe3d6a3a3fbdabd3}{parse}} (\mbox{\hyperlink{classpicojson_1_1value}{value}} \&out, std\+::istream \&is)
+\item 
+void \mbox{\hyperlink{namespacepicojson_a509585c918611015ec995d4374fee4c9}{set\+\_\+last\+\_\+error}} (const std\+::string \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\item 
+const std\+::string \& \mbox{\hyperlink{namespacepicojson_a6c06b1390146361a5f1bbf540672e6b7}{get\+\_\+last\+\_\+error}} ()
+\item 
+bool \mbox{\hyperlink{namespacepicojson_a498fde71ce35268547d93068d9a756be}{operator==}} (const \mbox{\hyperlink{classpicojson_1_1value}{value}} \&x, const \mbox{\hyperlink{classpicojson_1_1value}{value}} \&y)
+\item 
+bool \mbox{\hyperlink{namespacepicojson_ae46de1e9659b427ea359e7fc00dd3ff1}{operator!=}} (const \mbox{\hyperlink{classpicojson_1_1value}{value}} \&x, const \mbox{\hyperlink{classpicojson_1_1value}{value}} \&y)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{namespacepicojson_ac1e72166adfe3d96dc58cddc7ebd536a}\index{picojson@{picojson}!array@{array}}
+\index{array@{array}!picojson@{picojson}}
+\doxysubsubsection{\texorpdfstring{array}{array}}
+{\footnotesize\ttfamily \label{namespacepicojson_ac1e72166adfe3d96dc58cddc7ebd536a} 
+typedef \mbox{\hyperlink{classpicojson_1_1value_a26aaa1a58490c25822adba9f1760ba88}{value\+::array}} \mbox{\hyperlink{namespacepicojson_ac1e72166adfe3d96dc58cddc7ebd536a}{picojson\+::array}}}
+
+
+
+Definition at line \mbox{\hyperlink{spec__test__generator_8cpp_source_l00221}{221}} of file \mbox{\hyperlink{spec__test__generator_8cpp_source}{spec\+\_\+test\+\_\+generator.\+cpp}}.
+
+\Hypertarget{namespacepicojson_a3e769a5e2dbffd9a9309e1dc2d67975b}\index{picojson@{picojson}!object@{object}}
+\index{object@{object}!picojson@{picojson}}
+\doxysubsubsection{\texorpdfstring{object}{object}}
+{\footnotesize\ttfamily \label{namespacepicojson_a3e769a5e2dbffd9a9309e1dc2d67975b} 
+typedef \mbox{\hyperlink{classpicojson_1_1value_afaff3eacfcaa3816a1c3c05191c6a378}{value\+::object}} \mbox{\hyperlink{namespacepicojson_a3e769a5e2dbffd9a9309e1dc2d67975b}{picojson\+::object}}}
+
+
+
+Definition at line \mbox{\hyperlink{spec__test__generator_8cpp_source_l00222}{222}} of file \mbox{\hyperlink{spec__test__generator_8cpp_source}{spec\+\_\+test\+\_\+generator.\+cpp}}.
+
+
+
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{namespacepicojson_af3ab2711a04808a2f980e782e66ad17f}\doxysubsubsection{\texorpdfstring{anonymous enum}{anonymous enum}}
+{\footnotesize\ttfamily \label{namespacepicojson_af3ab2711a04808a2f980e782e66ad17f} 
+anonymous enum}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{null\_type@{null\_type}!picojson@{picojson}}\index{picojson@{picojson}!null\_type@{null\_type}}}\Hypertarget{namespacepicojson_af3ab2711a04808a2f980e782e66ad17fa656199e709e1aaa684dc9b19f6d25f62}\label{namespacepicojson_af3ab2711a04808a2f980e782e66ad17f} 
+null\+\_\+type&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{boolean\_type@{boolean\_type}!picojson@{picojson}}\index{picojson@{picojson}!boolean\_type@{boolean\_type}}}\Hypertarget{namespacepicojson_af3ab2711a04808a2f980e782e66ad17fae04a93ebe65786d1f8687430242df802}\label{namespacepicojson_af3ab2711a04808a2f980e782e66ad17f} 
+boolean\+\_\+type&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{number\_type@{number\_type}!picojson@{picojson}}\index{picojson@{picojson}!number\_type@{number\_type}}}\Hypertarget{namespacepicojson_af3ab2711a04808a2f980e782e66ad17fa258b8cac17e3039fe54eadb2f3ebde96}\label{namespacepicojson_af3ab2711a04808a2f980e782e66ad17f} 
+number\+\_\+type&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{string\_type@{string\_type}!picojson@{picojson}}\index{picojson@{picojson}!string\_type@{string\_type}}}\Hypertarget{namespacepicojson_af3ab2711a04808a2f980e782e66ad17fa3cb2900f95eb6459ee2fe4e9a111bef8}\label{namespacepicojson_af3ab2711a04808a2f980e782e66ad17f} 
+string\+\_\+type&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{array\_type@{array\_type}!picojson@{picojson}}\index{picojson@{picojson}!array\_type@{array\_type}}}\Hypertarget{namespacepicojson_af3ab2711a04808a2f980e782e66ad17fae1ccb83543a46349939ddf8ccf75d0f2}\label{namespacepicojson_af3ab2711a04808a2f980e782e66ad17f} 
+array\+\_\+type&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{object\_type@{object\_type}!picojson@{picojson}}\index{picojson@{picojson}!object\_type@{object\_type}}}\Hypertarget{namespacepicojson_af3ab2711a04808a2f980e782e66ad17fa1fdd0252e9484bec7aea5dcb1a3f82e9}\label{namespacepicojson_af3ab2711a04808a2f980e782e66ad17f} 
+object\+\_\+type&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{spec__test__generator_8cpp_source_l00123}{123}} of file \mbox{\hyperlink{spec__test__generator_8cpp_source}{spec\+\_\+test\+\_\+generator.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00123\ \ \ \ \ \ \{}
+\DoxyCodeLine{00124\ \ \ \ \mbox{\hyperlink{namespacepicojson_af3ab2711a04808a2f980e782e66ad17fa656199e709e1aaa684dc9b19f6d25f62}{null\_type}},}
+\DoxyCodeLine{00125\ \ \ \ \mbox{\hyperlink{namespacepicojson_af3ab2711a04808a2f980e782e66ad17fae04a93ebe65786d1f8687430242df802}{boolean\_type}},}
+\DoxyCodeLine{00126\ \ \ \ \mbox{\hyperlink{namespacepicojson_af3ab2711a04808a2f980e782e66ad17fa258b8cac17e3039fe54eadb2f3ebde96}{number\_type}},}
+\DoxyCodeLine{00127\ \ \ \ \mbox{\hyperlink{namespacepicojson_af3ab2711a04808a2f980e782e66ad17fa3cb2900f95eb6459ee2fe4e9a111bef8}{string\_type}},}
+\DoxyCodeLine{00128\ \ \ \ \mbox{\hyperlink{namespacepicojson_af3ab2711a04808a2f980e782e66ad17fae1ccb83543a46349939ddf8ccf75d0f2}{array\_type}},}
+\DoxyCodeLine{00129\ \ \ \ object\_type}
+\DoxyCodeLine{00130\ \textcolor{preprocessor}{\#\ \ \ ifdef\ PICOJSON\_USE\_INT64}}
+\DoxyCodeLine{00131\ \ \ \ ,}
+\DoxyCodeLine{00132\ \ \ \ int64\_type}
+\DoxyCodeLine{00133\ \textcolor{preprocessor}{\#\ \ \ endif}}
+\DoxyCodeLine{00134\ \};}
+
+\end{DoxyCode}
+\Hypertarget{namespacepicojson_afcd27b66f151bf1d3c298701043ac667}\doxysubsubsection{\texorpdfstring{anonymous enum}{anonymous enum}}
+{\footnotesize\ttfamily \label{namespacepicojson_afcd27b66f151bf1d3c298701043ac667} 
+anonymous enum}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{INDENT\_WIDTH@{INDENT\_WIDTH}!picojson@{picojson}}\index{picojson@{picojson}!INDENT\_WIDTH@{INDENT\_WIDTH}}}\Hypertarget{namespacepicojson_afcd27b66f151bf1d3c298701043ac667a2aee14a2b66d94b58c64c66edd8ed9b1}\label{namespacepicojson_afcd27b66f151bf1d3c298701043ac667} 
+INDENT\+\_\+\+WIDTH&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{spec__test__generator_8cpp_source_l00136}{136}} of file \mbox{\hyperlink{spec__test__generator_8cpp_source}{spec\+\_\+test\+\_\+generator.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00136\ \{\ \mbox{\hyperlink{namespacepicojson_afcd27b66f151bf1d3c298701043ac667a2aee14a2b66d94b58c64c66edd8ed9b1}{INDENT\_WIDTH}}\ =\ 2\ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacepicojson_a01c0a3f35d42282ba913375737c8e259}\index{picojson@{picojson}!\_parse@{\_parse}}
+\index{\_parse@{\_parse}!picojson@{picojson}}
+\doxysubsubsection{\texorpdfstring{\_parse()}{\_parse()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{namespacepicojson_a01c0a3f35d42282ba913375737c8e259} 
+template$<$typename Context , typename Iter $>$ \\
+Iter picojson\+::\+\_\+parse (\begin{DoxyParamCaption}\item[{Context \&}]{ctx}{, }\item[{const Iter \&}]{first}{, }\item[{const Iter \&}]{last}{, }\item[{std\+::string \texorpdfstring{$\ast$}{*}}]{err}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{spec__test__generator_8cpp_source_l01022}{1022}} of file \mbox{\hyperlink{spec__test__generator_8cpp_source}{spec\+\_\+test\+\_\+generator.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01022\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01023\ \ \ \ \mbox{\hyperlink{classpicojson_1_1input}{input<Iter>}}\ in(first,\ last);}
+\DoxyCodeLine{01024\ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{namespacepicojson_aed024a6a1c8d8982a38c4a7fcefde221}{\_parse}}(ctx,\ in)\ \&\&\ err\ !=\ NULL)\ \{}
+\DoxyCodeLine{01025\ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}[64];}
+\DoxyCodeLine{01026\ \ \ \ \ \ \ \mbox{\hyperlink{spec__test__generator_8cpp_a770571e12ff9370899184528f4b4626d}{SNPRINTF}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}),\ \textcolor{stringliteral}{"{}syntax\ error\ at\ line\ \%d\ near:\ "{}},\ in.line());}
+\DoxyCodeLine{01027\ \ \ \ \ \ \ *err\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}};}
+\DoxyCodeLine{01028\ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (1)\ \{}
+\DoxyCodeLine{01029\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ ch\ =\ in.getc();}
+\DoxyCodeLine{01030\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ch\ ==\ -\/1\ ||\ ch\ ==\ \textcolor{charliteral}{'\(\backslash\)n'})\ \{}
+\DoxyCodeLine{01031\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{01032\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (ch\ >=\ \textcolor{charliteral}{'\ '})\ \{}
+\DoxyCodeLine{01033\ \ \ \ \ \ \ \ \ \ \ \ \ err-\/>push\_back(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{char}\textcolor{keyword}{>}(ch));}
+\DoxyCodeLine{01034\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01035\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01036\ \ \ \ \}}
+\DoxyCodeLine{01037\ \ \ \ \textcolor{keywordflow}{return}\ in.cur();}
+\DoxyCodeLine{01038\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacepicojson_a01c0a3f35d42282ba913375737c8e259_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacepicojson_aed024a6a1c8d8982a38c4a7fcefde221}\index{picojson@{picojson}!\_parse@{\_parse}}
+\index{\_parse@{\_parse}!picojson@{picojson}}
+\doxysubsubsection{\texorpdfstring{\_parse()}{\_parse()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{namespacepicojson_aed024a6a1c8d8982a38c4a7fcefde221} 
+template$<$typename Context , typename Iter $>$ \\
+bool picojson\+::\+\_\+parse (\begin{DoxyParamCaption}\item[{Context \&}]{ctx}{, }\item[{\mbox{\hyperlink{classpicojson_1_1input}{input}}$<$ Iter $>$ \&}]{in}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{spec__test__generator_8cpp_source_l00844}{844}} of file \mbox{\hyperlink{spec__test__generator_8cpp_source}{spec\+\_\+test\+\_\+generator.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00844\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00845\ \ \ \ in.skip\_ws();}
+\DoxyCodeLine{00846\ \ \ \ \textcolor{keywordtype}{int}\ ch\ =\ in.getc();}
+\DoxyCodeLine{00847\ \ \ \ \textcolor{keywordflow}{switch}\ (ch)\ \{}
+\DoxyCodeLine{00848\ \textcolor{preprocessor}{\#\ \ \ define\ IS(ch,\ text,\ op)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00849\ \textcolor{preprocessor}{\ \ \ \ \ \ case\ ch:\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00850\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ if\ (in.match(text)\ \&\&\ op)\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00851\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ return\ true;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00852\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \}\ else\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00853\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ return\ false;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00854\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \}}}
+\DoxyCodeLine{00855\ \ \ \ \ \ \ \mbox{\hyperlink{spec__test__generator_8cpp_a3786a4dad1b9709bb21424781ae17a4e}{IS}}(\textcolor{charliteral}{'n'},\ \textcolor{stringliteral}{"{}ull"{}},\ ctx.set\_null());}
+\DoxyCodeLine{00856\ \ \ \ \ \ \ \mbox{\hyperlink{spec__test__generator_8cpp_a3786a4dad1b9709bb21424781ae17a4e}{IS}}(\textcolor{charliteral}{'f'},\ \textcolor{stringliteral}{"{}alse"{}},\ ctx.set\_bool(\textcolor{keyword}{false}));}
+\DoxyCodeLine{00857\ \ \ \ \ \ \ \mbox{\hyperlink{spec__test__generator_8cpp_a3786a4dad1b9709bb21424781ae17a4e}{IS}}(\textcolor{charliteral}{'t'},\ \textcolor{stringliteral}{"{}rue"{}},\ ctx.set\_bool(\textcolor{keyword}{true}));}
+\DoxyCodeLine{00858\ \textcolor{preprocessor}{\#\ \ \ undef\ IS}}
+\DoxyCodeLine{00859\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'"{}'}:\ \textcolor{keywordflow}{return}\ ctx.parse\_string(in);}
+\DoxyCodeLine{00860\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'['}:\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacepicojson_adcae039b132c6c96d2b2d9e786a04a88}{\_parse\_array}}(ctx,\ in);}
+\DoxyCodeLine{00861\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\{'}:\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacepicojson_a480ed5e3461568672197a42e259a44c9}{\_parse\_object}}(ctx,\ in);}
+\DoxyCodeLine{00862\ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00863\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((\textcolor{charliteral}{'0'}\ <=\ ch\ \&\&\ ch\ <=\ \textcolor{charliteral}{'9'})\ ||\ ch\ ==\ \textcolor{charliteral}{'-\/'})\ \{}
+\DoxyCodeLine{00864\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}};}
+\DoxyCodeLine{00865\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}*\ \ endp;}
+\DoxyCodeLine{00866\ \ \ \ \ \ \ \ \ \ \ \ \ in.ungetc();}
+\DoxyCodeLine{00867\ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ num\_str(\mbox{\hyperlink{namespacepicojson_a771defe1d981b7091c2156bf4720625c}{\_parse\_number}}(in));}
+\DoxyCodeLine{00868\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (num\_str.empty())\ \{}
+\DoxyCodeLine{00869\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00870\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00871\ \textcolor{preprocessor}{\#\ \ \ ifdef\ PICOJSON\_USE\_INT64}}
+\DoxyCodeLine{00872\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00873\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ errno\ \ \ \ \ \ \ \ \ =\ 0;}
+\DoxyCodeLine{00874\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a036cd61bb4b30bb510b9538af4cebd1d}{intmax\_t}}\ ival\ =\ \mbox{\hyperlink{inttypes_8h_a6c62bc37cb56c347fa44835c4a0bf64c}{strtoimax}}(num\_str.c\_str(),\ \&endp,\ 10);}
+\DoxyCodeLine{00875\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (errno\ ==\ 0\ \&\&\ std::numeric\_limits<int64\_t>::min()\ <=\ ival\ \&\&}
+\DoxyCodeLine{00876\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ival\ <=\ std::numeric\_limits<int64\_t>::max()\ \&\&\ endp\ ==\ num\_str.c\_str()\ +\ num\_str.size())\ \{}
+\DoxyCodeLine{00877\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ctx.set\_int64(ival);}
+\DoxyCodeLine{00878\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00879\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00880\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00881\ \textcolor{preprocessor}{\#\ \ \ endif}}
+\DoxyCodeLine{00882\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}\ =\ \mbox{\hyperlink{_parse_numbers_8cpp_a20d704fe51ff7001184f5bec5e2f7f8d}{strtod}}(num\_str.c\_str(),\ \&endp);}
+\DoxyCodeLine{00883\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (endp\ ==\ num\_str.c\_str()\ +\ num\_str.size())\ \{}
+\DoxyCodeLine{00884\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ctx.set\_number(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}});}
+\DoxyCodeLine{00885\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00886\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00887\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00888\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00889\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00890\ \ \ \ \}}
+\DoxyCodeLine{00891\ \ \ \ in.ungetc();}
+\DoxyCodeLine{00892\ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00893\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacepicojson_aed024a6a1c8d8982a38c4a7fcefde221_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=342pt]{namespacepicojson_aed024a6a1c8d8982a38c4a7fcefde221_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacepicojson_adcae039b132c6c96d2b2d9e786a04a88}\index{picojson@{picojson}!\_parse\_array@{\_parse\_array}}
+\index{\_parse\_array@{\_parse\_array}!picojson@{picojson}}
+\doxysubsubsection{\texorpdfstring{\_parse\_array()}{\_parse\_array()}}
+{\footnotesize\ttfamily \label{namespacepicojson_adcae039b132c6c96d2b2d9e786a04a88} 
+template$<$typename Context , typename Iter $>$ \\
+bool picojson\+::\+\_\+parse\+\_\+array (\begin{DoxyParamCaption}\item[{Context \&}]{ctx}{, }\item[{\mbox{\hyperlink{classpicojson_1_1input}{input}}$<$ Iter $>$ \&}]{in}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{spec__test__generator_8cpp_source_l00785}{785}} of file \mbox{\hyperlink{spec__test__generator_8cpp_source}{spec\+\_\+test\+\_\+generator.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00785\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00786\ \ \ \ \textcolor{keywordflow}{if}\ (!ctx.parse\_array\_start())\ \{}
+\DoxyCodeLine{00787\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00788\ \ \ \ \}}
+\DoxyCodeLine{00789\ \ \ \ \textcolor{keywordtype}{size\_t}\ idx\ =\ 0;}
+\DoxyCodeLine{00790\ \ \ \ \textcolor{keywordflow}{if}\ (in.expect(\textcolor{charliteral}{']'}))\ \{}
+\DoxyCodeLine{00791\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ctx.parse\_array\_stop(idx);}
+\DoxyCodeLine{00792\ \ \ \ \}}
+\DoxyCodeLine{00793\ \ \ \ \textcolor{keywordflow}{do}\ \{}
+\DoxyCodeLine{00794\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!ctx.parse\_array\_item(in,\ idx))\ \{}
+\DoxyCodeLine{00795\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00796\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00797\ \ \ \ \ \ \ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}++;}
+\DoxyCodeLine{00798\ \ \ \ \}\ \textcolor{keywordflow}{while}\ (in.expect(\textcolor{charliteral}{','}));}
+\DoxyCodeLine{00799\ \ \ \ \textcolor{keywordflow}{return}\ in.expect(\textcolor{charliteral}{']'})\ \&\&\ ctx.parse\_array\_stop(idx);}
+\DoxyCodeLine{00800\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacepicojson_adcae039b132c6c96d2b2d9e786a04a88_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacepicojson_a05316c2614f3e7a4559ce1d1003eb051}\index{picojson@{picojson}!\_parse\_codepoint@{\_parse\_codepoint}}
+\index{\_parse\_codepoint@{\_parse\_codepoint}!picojson@{picojson}}
+\doxysubsubsection{\texorpdfstring{\_parse\_codepoint()}{\_parse\_codepoint()}}
+{\footnotesize\ttfamily \label{namespacepicojson_a05316c2614f3e7a4559ce1d1003eb051} 
+template$<$typename String , typename Iter $>$ \\
+bool picojson\+::\+\_\+parse\+\_\+codepoint (\begin{DoxyParamCaption}\item[{String \&}]{out}{, }\item[{\mbox{\hyperlink{classpicojson_1_1input}{input}}$<$ Iter $>$ \&}]{in}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{spec__test__generator_8cpp_source_l00704}{704}} of file \mbox{\hyperlink{spec__test__generator_8cpp_source}{spec\+\_\+test\+\_\+generator.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00704\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00705\ \ \ \ \textcolor{keywordtype}{int}\ uni\_ch;}
+\DoxyCodeLine{00706\ \ \ \ \textcolor{keywordflow}{if}\ ((uni\_ch\ =\ \mbox{\hyperlink{namespacepicojson_a92d4f60542bbdfe8203f10e1fcce9368}{\_parse\_quadhex}}(in))\ ==\ -\/1)\ \{}
+\DoxyCodeLine{00707\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00708\ \ \ \ \}}
+\DoxyCodeLine{00709\ \ \ \ \textcolor{keywordflow}{if}\ (0xd800\ <=\ uni\_ch\ \&\&\ uni\_ch\ <=\ 0xdfff)\ \{}
+\DoxyCodeLine{00710\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (0xdc00\ <=\ uni\_ch)\ \{}
+\DoxyCodeLine{00711\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ a\ second\ 16-\/bit\ of\ a\ surrogate\ pair\ appeared}}
+\DoxyCodeLine{00712\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00713\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00714\ \ \ \ \ \ \ \textcolor{comment}{//\ first\ 16-\/bit\ of\ surrogate\ pair,\ get\ the\ next\ one}}
+\DoxyCodeLine{00715\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (in.getc()\ !=\ \textcolor{charliteral}{'\(\backslash\)\(\backslash\)'}\ ||\ in.getc()\ !=\ \textcolor{charliteral}{'u'})\ \{}
+\DoxyCodeLine{00716\ \ \ \ \ \ \ \ \ \ in.ungetc();}
+\DoxyCodeLine{00717\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00718\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00719\ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ second\ =\ \mbox{\hyperlink{namespacepicojson_a92d4f60542bbdfe8203f10e1fcce9368}{\_parse\_quadhex}}(in);}
+\DoxyCodeLine{00720\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!(0xdc00\ <=\ second\ \&\&\ second\ <=\ 0xdfff))\ \{}
+\DoxyCodeLine{00721\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00722\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00723\ \ \ \ \ \ \ uni\_ch\ =\ ((uni\_ch\ -\/\ 0xd800)\ <<\ 10)\ |\ ((second\ -\/\ 0xdc00)\ \&\ 0x3ff);}
+\DoxyCodeLine{00724\ \ \ \ \ \ \ uni\_ch\ +=\ 0x10000;}
+\DoxyCodeLine{00725\ \ \ \ \}}
+\DoxyCodeLine{00726\ \ \ \ \textcolor{keywordflow}{if}\ (uni\_ch\ <\ 0x80)\ \{}
+\DoxyCodeLine{00727\ \ \ \ \ \ \ out.push\_back(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{char}\textcolor{keyword}{>}(uni\_ch));}
+\DoxyCodeLine{00728\ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00729\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (uni\_ch\ <\ 0x800)\ \{}
+\DoxyCodeLine{00730\ \ \ \ \ \ \ \ \ \ out.push\_back(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{char}\textcolor{keyword}{>}(0xc0\ |\ (uni\_ch\ >>\ 6)));}
+\DoxyCodeLine{00731\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00732\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (uni\_ch\ <\ 0x10000)\ \{}
+\DoxyCodeLine{00733\ \ \ \ \ \ \ \ \ \ \ \ \ out.push\_back(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{char}\textcolor{keyword}{>}(0xe0\ |\ (uni\_ch\ >>\ 12)));}
+\DoxyCodeLine{00734\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00735\ \ \ \ \ \ \ \ \ \ \ \ \ out.push\_back(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{char}\textcolor{keyword}{>}(0xf0\ |\ (uni\_ch\ >>\ 18)));}
+\DoxyCodeLine{00736\ \ \ \ \ \ \ \ \ \ \ \ \ out.push\_back(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{char}\textcolor{keyword}{>}(0x80\ |\ ((uni\_ch\ >>\ 12)\ \&\ 0x3f)));}
+\DoxyCodeLine{00737\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00738\ \ \ \ \ \ \ \ \ \ out.push\_back(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{char}\textcolor{keyword}{>}(0x80\ |\ ((uni\_ch\ >>\ 6)\ \&\ 0x3f)));}
+\DoxyCodeLine{00739\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00740\ \ \ \ \ \ \ out.push\_back(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{char}\textcolor{keyword}{>}(0x80\ |\ (uni\_ch\ \&\ 0x3f)));}
+\DoxyCodeLine{00741\ \ \ \ \}}
+\DoxyCodeLine{00742\ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00743\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacepicojson_a05316c2614f3e7a4559ce1d1003eb051_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacepicojson_a05316c2614f3e7a4559ce1d1003eb051_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacepicojson_a771defe1d981b7091c2156bf4720625c}\index{picojson@{picojson}!\_parse\_number@{\_parse\_number}}
+\index{\_parse\_number@{\_parse\_number}!picojson@{picojson}}
+\doxysubsubsection{\texorpdfstring{\_parse\_number()}{\_parse\_number()}}
+{\footnotesize\ttfamily \label{namespacepicojson_a771defe1d981b7091c2156bf4720625c} 
+template$<$typename Iter $>$ \\
+std\+::string picojson\+::\+\_\+parse\+\_\+number (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classpicojson_1_1input}{input}}$<$ Iter $>$ \&}]{in}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{spec__test__generator_8cpp_source_l00823}{823}} of file \mbox{\hyperlink{spec__test__generator_8cpp_source}{spec\+\_\+test\+\_\+generator.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00823\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00824\ \ \ \ std::string\ num\_str;}
+\DoxyCodeLine{00825\ \ \ \ \textcolor{keywordflow}{while}\ (1)\ \{}
+\DoxyCodeLine{00826\ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ ch\ =\ in.getc();}
+\DoxyCodeLine{00827\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((\textcolor{charliteral}{'0'}\ <=\ ch\ \&\&\ ch\ <=\ \textcolor{charliteral}{'9'})\ ||\ ch\ ==\ \textcolor{charliteral}{'+'}\ ||\ ch\ ==\ \textcolor{charliteral}{'-\/'}\ ||\ ch\ ==\ \textcolor{charliteral}{'e'}\ ||\ ch\ ==\ \textcolor{charliteral}{'E'})\ \{}
+\DoxyCodeLine{00828\ \ \ \ \ \ \ \ \ \ num\_str.push\_back(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{char}\textcolor{keyword}{>}(ch));}
+\DoxyCodeLine{00829\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (ch\ ==\ \textcolor{charliteral}{'.'})\ \{}
+\DoxyCodeLine{00830\ \textcolor{preprocessor}{\#\ \ \ if\ PICOJSON\_USE\_LOCALE}}
+\DoxyCodeLine{00831\ \ \ \ \ \ \ \ \ \ num\_str\ +=\ localeconv()-\/>decimal\_point;}
+\DoxyCodeLine{00832\ \textcolor{preprocessor}{\#\ \ \ else}}
+\DoxyCodeLine{00833\ \ \ \ \ \ \ \ \ \ num\_str.push\_back(\textcolor{charliteral}{'.'});}
+\DoxyCodeLine{00834\ \textcolor{preprocessor}{\#\ \ \ endif}}
+\DoxyCodeLine{00835\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00836\ \ \ \ \ \ \ \ \ \ in.ungetc();}
+\DoxyCodeLine{00837\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00838\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00839\ \ \ \ \}}
+\DoxyCodeLine{00840\ \ \ \ \textcolor{keywordflow}{return}\ num\_str;}
+\DoxyCodeLine{00841\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacepicojson_a771defe1d981b7091c2156bf4720625c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacepicojson_a480ed5e3461568672197a42e259a44c9}\index{picojson@{picojson}!\_parse\_object@{\_parse\_object}}
+\index{\_parse\_object@{\_parse\_object}!picojson@{picojson}}
+\doxysubsubsection{\texorpdfstring{\_parse\_object()}{\_parse\_object()}}
+{\footnotesize\ttfamily \label{namespacepicojson_a480ed5e3461568672197a42e259a44c9} 
+template$<$typename Context , typename Iter $>$ \\
+bool picojson\+::\+\_\+parse\+\_\+object (\begin{DoxyParamCaption}\item[{Context \&}]{ctx}{, }\item[{\mbox{\hyperlink{classpicojson_1_1input}{input}}$<$ Iter $>$ \&}]{in}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{spec__test__generator_8cpp_source_l00803}{803}} of file \mbox{\hyperlink{spec__test__generator_8cpp_source}{spec\+\_\+test\+\_\+generator.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00803\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00804\ \ \ \ \textcolor{keywordflow}{if}\ (!ctx.parse\_object\_start())\ \{}
+\DoxyCodeLine{00805\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00806\ \ \ \ \}}
+\DoxyCodeLine{00807\ \ \ \ \textcolor{keywordflow}{if}\ (in.expect(\textcolor{charliteral}{'\}'}))\ \{}
+\DoxyCodeLine{00808\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00809\ \ \ \ \}}
+\DoxyCodeLine{00810\ \ \ \ \textcolor{keywordflow}{do}\ \{}
+\DoxyCodeLine{00811\ \ \ \ \ \ \ std::string\ \mbox{\hyperlink{yubico__otp_8c_a9246c20bb98ad2b4c60313c053c70f08}{key}};}
+\DoxyCodeLine{00812\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!in.expect(\textcolor{charliteral}{'"{}'})\ ||\ !\mbox{\hyperlink{namespacepicojson_a9a1d94feb2718129796225d77c9e8d11}{\_parse\_string}}(key,\ in)\ ||\ !in.expect(\textcolor{charliteral}{':'}))\ \{}
+\DoxyCodeLine{00813\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00814\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00815\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!ctx.parse\_object\_item(in,\ key))\ \{}
+\DoxyCodeLine{00816\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00817\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00818\ \ \ \ \}\ \textcolor{keywordflow}{while}\ (in.expect(\textcolor{charliteral}{','}));}
+\DoxyCodeLine{00819\ \ \ \ \textcolor{keywordflow}{return}\ in.expect(\textcolor{charliteral}{'\}'});}
+\DoxyCodeLine{00820\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacepicojson_a480ed5e3461568672197a42e259a44c9_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacepicojson_a480ed5e3461568672197a42e259a44c9_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacepicojson_a92d4f60542bbdfe8203f10e1fcce9368}\index{picojson@{picojson}!\_parse\_quadhex@{\_parse\_quadhex}}
+\index{\_parse\_quadhex@{\_parse\_quadhex}!picojson@{picojson}}
+\doxysubsubsection{\texorpdfstring{\_parse\_quadhex()}{\_parse\_quadhex()}}
+{\footnotesize\ttfamily \label{namespacepicojson_a92d4f60542bbdfe8203f10e1fcce9368} 
+template$<$typename Iter $>$ \\
+int picojson\+::\+\_\+parse\+\_\+quadhex (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classpicojson_1_1input}{input}}$<$ Iter $>$ \&}]{in}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{spec__test__generator_8cpp_source_l00682}{682}} of file \mbox{\hyperlink{spec__test__generator_8cpp_source}{spec\+\_\+test\+\_\+generator.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00682\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00683\ \ \ \ \textcolor{keywordtype}{int}\ uni\_ch\ =\ 0,\ hex;}
+\DoxyCodeLine{00684\ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ 4;\ i++)\ \{}
+\DoxyCodeLine{00685\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((hex\ =\ in.getc())\ ==\ -\/1)\ \{}
+\DoxyCodeLine{00686\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ -\/1;}
+\DoxyCodeLine{00687\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00688\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{charliteral}{'0'}\ <=\ hex\ \&\&\ hex\ <=\ \textcolor{charliteral}{'9'})\ \{}
+\DoxyCodeLine{00689\ \ \ \ \ \ \ \ \ \ hex\ -\/=\ \textcolor{charliteral}{'0'};}
+\DoxyCodeLine{00690\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\textcolor{charliteral}{'A'}\ <=\ hex\ \&\&\ hex\ <=\ \textcolor{charliteral}{'F'})\ \{}
+\DoxyCodeLine{00691\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain__apis_a14107dc373dfcfea6980bc2f5fa80a83}{hex}}\ -\/=\ \textcolor{charliteral}{'A'}\ -\/\ 0xa;}
+\DoxyCodeLine{00692\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\textcolor{charliteral}{'a'}\ <=\ hex\ \&\&\ hex\ <=\ \textcolor{charliteral}{'f'})\ \{}
+\DoxyCodeLine{00693\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain__apis_a14107dc373dfcfea6980bc2f5fa80a83}{hex}}\ -\/=\ \textcolor{charliteral}{'a'}\ -\/\ 0xa;}
+\DoxyCodeLine{00694\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00695\ \ \ \ \ \ \ \ \ \ in.ungetc();}
+\DoxyCodeLine{00696\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ -\/1;}
+\DoxyCodeLine{00697\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00698\ \ \ \ \ \ \ uni\_ch\ =\ uni\_ch\ *\ 16\ +\ \mbox{\hyperlink{namespacesysio_1_1chain__apis_a14107dc373dfcfea6980bc2f5fa80a83}{hex}};}
+\DoxyCodeLine{00699\ \ \ \ \}}
+\DoxyCodeLine{00700\ \ \ \ \textcolor{keywordflow}{return}\ uni\_ch;}
+\DoxyCodeLine{00701\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacepicojson_a92d4f60542bbdfe8203f10e1fcce9368_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacepicojson_a9a1d94feb2718129796225d77c9e8d11}\index{picojson@{picojson}!\_parse\_string@{\_parse\_string}}
+\index{\_parse\_string@{\_parse\_string}!picojson@{picojson}}
+\doxysubsubsection{\texorpdfstring{\_parse\_string()}{\_parse\_string()}}
+{\footnotesize\ttfamily \label{namespacepicojson_a9a1d94feb2718129796225d77c9e8d11} 
+template$<$typename String , typename Iter $>$ \\
+bool picojson\+::\+\_\+parse\+\_\+string (\begin{DoxyParamCaption}\item[{String \&}]{out}{, }\item[{\mbox{\hyperlink{classpicojson_1_1input}{input}}$<$ Iter $>$ \&}]{in}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{spec__test__generator_8cpp_source_l00746}{746}} of file \mbox{\hyperlink{spec__test__generator_8cpp_source}{spec\+\_\+test\+\_\+generator.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00746\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00747\ \ \ \ \textcolor{keywordflow}{while}\ (1)\ \{}
+\DoxyCodeLine{00748\ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ ch\ =\ in.getc();}
+\DoxyCodeLine{00749\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ch\ <\ \textcolor{charliteral}{'\ '})\ \{}
+\DoxyCodeLine{00750\ \ \ \ \ \ \ \ \ \ in.ungetc();}
+\DoxyCodeLine{00751\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00752\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (ch\ ==\ \textcolor{charliteral}{'"{}'})\ \{}
+\DoxyCodeLine{00753\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00754\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (ch\ ==\ \textcolor{charliteral}{'\(\backslash\)\(\backslash\)'})\ \{}
+\DoxyCodeLine{00755\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((ch\ =\ in.getc())\ ==\ -\/1)\ \{}
+\DoxyCodeLine{00756\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00757\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00758\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (ch)\ \{}
+\DoxyCodeLine{00759\ \textcolor{preprocessor}{\#\ \ \ define\ MAP(sym,\ val)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00760\ \textcolor{preprocessor}{\ \ \ \ \ \ case\ sym:\ out.push\_back(val);\ break}}
+\DoxyCodeLine{00761\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{spec__test__generator_8cpp_a339491d48190a5857a36d35499b14c3e}{MAP}}(\textcolor{charliteral}{'"{}'},\ \textcolor{charliteral}{'\(\backslash\)"{}'});}
+\DoxyCodeLine{00762\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{spec__test__generator_8cpp_a339491d48190a5857a36d35499b14c3e}{MAP}}(\textcolor{charliteral}{'\(\backslash\)\(\backslash\)'},\ \textcolor{charliteral}{'\(\backslash\)\(\backslash\)'});}
+\DoxyCodeLine{00763\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{spec__test__generator_8cpp_a339491d48190a5857a36d35499b14c3e}{MAP}}(\textcolor{charliteral}{'/'},\ \textcolor{charliteral}{'/'});}
+\DoxyCodeLine{00764\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{spec__test__generator_8cpp_a339491d48190a5857a36d35499b14c3e}{MAP}}(\textcolor{charliteral}{'b'},\ \textcolor{charliteral}{'\(\backslash\)b'});}
+\DoxyCodeLine{00765\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{spec__test__generator_8cpp_a339491d48190a5857a36d35499b14c3e}{MAP}}(\textcolor{charliteral}{'f'},\ \textcolor{charliteral}{'\(\backslash\)f'});}
+\DoxyCodeLine{00766\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{spec__test__generator_8cpp_a339491d48190a5857a36d35499b14c3e}{MAP}}(\textcolor{charliteral}{'n'},\ \textcolor{charliteral}{'\(\backslash\)n'});}
+\DoxyCodeLine{00767\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{spec__test__generator_8cpp_a339491d48190a5857a36d35499b14c3e}{MAP}}(\textcolor{charliteral}{'r'},\ \textcolor{charliteral}{'\(\backslash\)r'});}
+\DoxyCodeLine{00768\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{spec__test__generator_8cpp_a339491d48190a5857a36d35499b14c3e}{MAP}}(\textcolor{charliteral}{'t'},\ \textcolor{charliteral}{'\(\backslash\)t'});}
+\DoxyCodeLine{00769\ \textcolor{preprocessor}{\#\ \ \ undef\ MAP}}
+\DoxyCodeLine{00770\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'u'}:}
+\DoxyCodeLine{00771\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{namespacepicojson_a05316c2614f3e7a4559ce1d1003eb051}{\_parse\_codepoint}}(out,\ in))\ \{}
+\DoxyCodeLine{00772\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00773\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00774\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00775\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00776\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00777\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00778\ \ \ \ \ \ \ \ \ \ out.push\_back(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{char}\textcolor{keyword}{>}(ch));}
+\DoxyCodeLine{00779\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00780\ \ \ \ \}}
+\DoxyCodeLine{00781\ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00782\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacepicojson_a9a1d94feb2718129796225d77c9e8d11_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacepicojson_a9a1d94feb2718129796225d77c9e8d11_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacepicojson_abc2111aa71797805957a4296fdf9c66d}\index{picojson@{picojson}!copy@{copy}}
+\index{copy@{copy}!picojson@{picojson}}
+\doxysubsubsection{\texorpdfstring{copy()}{copy()}}
+{\footnotesize\ttfamily \label{namespacepicojson_abc2111aa71797805957a4296fdf9c66d} 
+template$<$typename Iter $>$ \\
+void picojson\+::copy (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{s}{, }\item[{Iter}]{oi}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{spec__test__generator_8cpp_source_l00498}{498}} of file \mbox{\hyperlink{spec__test__generator_8cpp_source}{spec\+\_\+test\+\_\+generator.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00498\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00499\ \ \ \ std::copy(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.begin(),\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.end(),\ oi);}
+\DoxyCodeLine{00500\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=299pt]{namespacepicojson_abc2111aa71797805957a4296fdf9c66d_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacepicojson_a6c06b1390146361a5f1bbf540672e6b7}\index{picojson@{picojson}!get\_last\_error@{get\_last\_error}}
+\index{get\_last\_error@{get\_last\_error}!picojson@{picojson}}
+\doxysubsubsection{\texorpdfstring{get\_last\_error()}{get\_last\_error()}}
+{\footnotesize\ttfamily \label{namespacepicojson_a6c06b1390146361a5f1bbf540672e6b7} 
+const std\+::string \& picojson\+::get\+\_\+last\+\_\+error (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{spec__test__generator_8cpp_source_l01067}{1067}} of file \mbox{\hyperlink{spec__test__generator_8cpp_source}{spec\+\_\+test\+\_\+generator.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01067\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structpicojson_1_1last__error__t}{last\_error\_t<bool>::s}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacepicojson_ae46de1e9659b427ea359e7fc00dd3ff1}\index{picojson@{picojson}!operator"!=@{operator"!=}}
+\index{operator"!=@{operator"!=}!picojson@{picojson}}
+\doxysubsubsection{\texorpdfstring{operator"!=()}{operator!=()}}
+{\footnotesize\ttfamily \label{namespacepicojson_ae46de1e9659b427ea359e7fc00dd3ff1} 
+bool picojson\+::operator!= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classpicojson_1_1value}{value}} \&}]{x}{, }\item[{const \mbox{\hyperlink{classpicojson_1_1value}{value}} \&}]{y}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{spec__test__generator_8cpp_source_l01088}{1088}} of file \mbox{\hyperlink{spec__test__generator_8cpp_source}{spec\+\_\+test\+\_\+generator.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01088\ \{\ \textcolor{keywordflow}{return}\ !(x\ ==\ y);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacepicojson_a498fde71ce35268547d93068d9a756be}\index{picojson@{picojson}!operator==@{operator==}}
+\index{operator==@{operator==}!picojson@{picojson}}
+\doxysubsubsection{\texorpdfstring{operator==()}{operator==()}}
+{\footnotesize\ttfamily \label{namespacepicojson_a498fde71ce35268547d93068d9a756be} 
+bool picojson\+::operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classpicojson_1_1value}{value}} \&}]{x}{, }\item[{const \mbox{\hyperlink{classpicojson_1_1value}{value}} \&}]{y}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{spec__test__generator_8cpp_source_l01069}{1069}} of file \mbox{\hyperlink{spec__test__generator_8cpp_source}{spec\+\_\+test\+\_\+generator.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01070\ \ \ \ \textcolor{keywordflow}{if}\ (x.\mbox{\hyperlink{classpicojson_1_1value_afd038ffc8a714c5d2f4b59adaaaca4ce}{is}}<\mbox{\hyperlink{structpicojson_1_1null}{null}}>())}
+\DoxyCodeLine{01071\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ y.is<\mbox{\hyperlink{structpicojson_1_1null}{null}}>();}
+\DoxyCodeLine{01072\ \textcolor{preprocessor}{\#\ \ \ define\ PICOJSON\_CMP(type)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{01073\ \textcolor{preprocessor}{\ \ \ \ \ \ if\ (x.is<type>())\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{01074\ \textcolor{preprocessor}{\ \ \ \ \ \ return\ y.is<type>()\ \&\&\ x.get<type>()\ ==\ y.get<type>()}}
+\DoxyCodeLine{01075\ \ \ \ \mbox{\hyperlink{spec__test__generator_8cpp_af6b970af4f337ef1075f08f17784a23a}{PICOJSON\_CMP}}(\textcolor{keywordtype}{bool});}
+\DoxyCodeLine{01076\ \ \ \ \mbox{\hyperlink{spec__test__generator_8cpp_af6b970af4f337ef1075f08f17784a23a}{PICOJSON\_CMP}}(\textcolor{keywordtype}{double});}
+\DoxyCodeLine{01077\ \ \ \ \mbox{\hyperlink{spec__test__generator_8cpp_af6b970af4f337ef1075f08f17784a23a}{PICOJSON\_CMP}}(std::string);}
+\DoxyCodeLine{01078\ \ \ \ \mbox{\hyperlink{spec__test__generator_8cpp_af6b970af4f337ef1075f08f17784a23a}{PICOJSON\_CMP}}(\mbox{\hyperlink{namespacepicojson_ac1e72166adfe3d96dc58cddc7ebd536a}{array}});}
+\DoxyCodeLine{01079\ \ \ \ \mbox{\hyperlink{spec__test__generator_8cpp_af6b970af4f337ef1075f08f17784a23a}{PICOJSON\_CMP}}(\textcolor{keywordtype}{object});}
+\DoxyCodeLine{01080\ \textcolor{preprocessor}{\#\ \ \ undef\ PICOJSON\_CMP}}
+\DoxyCodeLine{01081\ \ \ \ \mbox{\hyperlink{spec__test__generator_8cpp_a0746b522f9bb442b3c2994dfd63a9d02}{PICOJSON\_ASSERT}}(0);}
+\DoxyCodeLine{01082\ \textcolor{preprocessor}{\#\ \ \ ifdef\ \_MSC\_VER}}
+\DoxyCodeLine{01083\ \ \ \ \_\_assume(0);}
+\DoxyCodeLine{01084\ \textcolor{preprocessor}{\#\ \ \ endif}}
+\DoxyCodeLine{01085\ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{01086\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=316pt]{namespacepicojson_a498fde71ce35268547d93068d9a756be_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacepicojson_a21621c03c9c8c83dcf5bc604d1cafdf6}\index{picojson@{picojson}!parse@{parse}}
+\index{parse@{parse}!picojson@{picojson}}
+\doxysubsubsection{\texorpdfstring{parse()}{parse()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{namespacepicojson_a21621c03c9c8c83dcf5bc604d1cafdf6} 
+template$<$typename Iter $>$ \\
+Iter picojson\+::parse (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classpicojson_1_1value}{value}} \&}]{out}{, }\item[{const Iter \&}]{first}{, }\item[{const Iter \&}]{last}{, }\item[{std\+::string \texorpdfstring{$\ast$}{*}}]{err}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{spec__test__generator_8cpp_source_l01041}{1041}} of file \mbox{\hyperlink{spec__test__generator_8cpp_source}{spec\+\_\+test\+\_\+generator.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01041\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01042\ \ \ \ \mbox{\hyperlink{classpicojson_1_1default__parse__context}{default\_parse\_context}}\ ctx(\&out);}
+\DoxyCodeLine{01043\ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacepicojson_aed024a6a1c8d8982a38c4a7fcefde221}{\_parse}}(ctx,\ first,\ last,\ err);}
+\DoxyCodeLine{01044\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacepicojson_a21621c03c9c8c83dcf5bc604d1cafdf6_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacepicojson_a522ebeba3ce386f1df0aba41ae3b7763}\index{picojson@{picojson}!parse@{parse}}
+\index{parse@{parse}!picojson@{picojson}}
+\doxysubsubsection{\texorpdfstring{parse()}{parse()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{namespacepicojson_a522ebeba3ce386f1df0aba41ae3b7763} 
+std\+::string picojson\+::parse (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classpicojson_1_1value}{value}} \&}]{out}{, }\item[{const std\+::string \&}]{s}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{spec__test__generator_8cpp_source_l01046}{1046}} of file \mbox{\hyperlink{spec__test__generator_8cpp_source}{spec\+\_\+test\+\_\+generator.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01046\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01047\ \ \ \ std::string\ err;}
+\DoxyCodeLine{01048\ \ \ \ parse(out,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.begin(),\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.end(),\ \&err);}
+\DoxyCodeLine{01049\ \ \ \ \textcolor{keywordflow}{return}\ err;}
+\DoxyCodeLine{01050\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=280pt]{namespacepicojson_a522ebeba3ce386f1df0aba41ae3b7763_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacepicojson_a3aca598f5855bc130a92a3e08a0c6ebf}\index{picojson@{picojson}!parse@{parse}}
+\index{parse@{parse}!picojson@{picojson}}
+\doxysubsubsection{\texorpdfstring{parse()}{parse()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{namespacepicojson_a3aca598f5855bc130a92a3e08a0c6ebf} 
+template$<$typename Iter $>$ \\
+std\+::string picojson\+::parse (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classpicojson_1_1value}{value}} \&}]{out}{, }\item[{Iter \&}]{pos}{, }\item[{const Iter \&}]{last}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{spec__test__generator_8cpp_source_l01015}{1015}} of file \mbox{\hyperlink{spec__test__generator_8cpp_source}{spec\+\_\+test\+\_\+generator.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01015\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01016\ \ \ \ std::string\ err;}
+\DoxyCodeLine{01017\ \ \ \ pos\ =\ parse(out,\ pos,\ last,\ \&err);}
+\DoxyCodeLine{01018\ \ \ \ \textcolor{keywordflow}{return}\ err;}
+\DoxyCodeLine{01019\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=162pt]{namespacepicojson_a3aca598f5855bc130a92a3e08a0c6ebf_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=280pt]{namespacepicojson_a3aca598f5855bc130a92a3e08a0c6ebf_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacepicojson_a2ed8a3cba445c8ecbe3d6a3a3fbdabd3}\index{picojson@{picojson}!parse@{parse}}
+\index{parse@{parse}!picojson@{picojson}}
+\doxysubsubsection{\texorpdfstring{parse()}{parse()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{namespacepicojson_a2ed8a3cba445c8ecbe3d6a3a3fbdabd3} 
+std\+::string picojson\+::parse (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classpicojson_1_1value}{value}} \&}]{out}{, }\item[{std\+::istream \&}]{is}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{spec__test__generator_8cpp_source_l01052}{1052}} of file \mbox{\hyperlink{spec__test__generator_8cpp_source}{spec\+\_\+test\+\_\+generator.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01052\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01053\ \ \ \ std::string\ err;}
+\DoxyCodeLine{01054\ \ \ \ parse(out,\ std::istreambuf\_iterator<char>(is.rdbuf()),\ std::istreambuf\_iterator<char>(),\ \&err);}
+\DoxyCodeLine{01055\ \ \ \ \textcolor{keywordflow}{return}\ err;}
+\DoxyCodeLine{01056\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=280pt]{namespacepicojson_a2ed8a3cba445c8ecbe3d6a3a3fbdabd3_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacepicojson_a11130e017d868857aeb016f5e3d29008}\index{picojson@{picojson}!serialize\_str@{serialize\_str}}
+\index{serialize\_str@{serialize\_str}!picojson@{picojson}}
+\doxysubsubsection{\texorpdfstring{serialize\_str()}{serialize\_str()}}
+{\footnotesize\ttfamily \label{namespacepicojson_a11130e017d868857aeb016f5e3d29008} 
+template$<$typename Iter $>$ \\
+void picojson\+::serialize\+\_\+str (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{s}{, }\item[{Iter}]{oi}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{spec__test__generator_8cpp_source_l00532}{532}} of file \mbox{\hyperlink{spec__test__generator_8cpp_source}{spec\+\_\+test\+\_\+generator.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00532\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00533\ \ \ \ *oi++\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{charliteral}{'"{}'};}
+\DoxyCodeLine{00534\ \ \ \ \mbox{\hyperlink{structpicojson_1_1serialize__str__char}{serialize\_str\_char<Iter>}}\ process\_char\ =\ \{\ oi\ \};}
+\DoxyCodeLine{00535\ \ \ \ std::for\_each(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.begin(),\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.end(),\ process\_char);}
+\DoxyCodeLine{00536\ \ \ \ *oi++\ =\ \textcolor{charliteral}{'"{}'};}
+\DoxyCodeLine{00537\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacepicojson_a509585c918611015ec995d4374fee4c9}\index{picojson@{picojson}!set\_last\_error@{set\_last\_error}}
+\index{set\_last\_error@{set\_last\_error}!picojson@{picojson}}
+\doxysubsubsection{\texorpdfstring{set\_last\_error()}{set\_last\_error()}}
+{\footnotesize\ttfamily \label{namespacepicojson_a509585c918611015ec995d4374fee4c9} 
+void picojson\+::set\+\_\+last\+\_\+error (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{s}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{spec__test__generator_8cpp_source_l01065}{1065}} of file \mbox{\hyperlink{spec__test__generator_8cpp_source}{spec\+\_\+test\+\_\+generator.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01065\ \{\ \mbox{\hyperlink{structpicojson_1_1last__error__t}{last\_error\_t<bool>::s}}\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=272pt]{namespacepicojson_a509585c918611015ec995d4374fee4c9_icgraph}
+\end{center}
+\end{figure}

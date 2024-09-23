@@ -1,0 +1,14 @@
+<map id="fc::em::detail::private_key_impl::private_key_impl" name="fc::em::detail::private_key_impl::private_key_impl">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,35,192,75"/>
+<area shape="rect" id="Node000002" href="$namespacefc_1_1em_1_1detail.html#a83076149ec3c9a6e0c1b351e2bb97068" title=" " alt="" coords="240,42,389,68"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="192,52,224,52,224,58,192,58"/>
+<area shape="rect" id="Node000003" href="$namespacefc_1_1em_1_1detail.html#a5a5e8870d6d526010b6908a624923129" title=" " alt="" coords="437,35,567,75"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="389,52,421,52,421,58,389,58"/>
+<area shape="rect" id="Node000004" href="$secp256k1_8c.html#a861ce6fc7ee5e9fc346a5fee7093adb1" title=" " alt="" coords="615,42,793,68"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="568,52,599,52,599,58,568,58"/>
+<area shape="rect" id="Node000005" href="$secp256k1_8c.html#af4866e9619f06679358fe6338ed42cd0" title=" " alt="" coords="841,5,1052,46"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="793,42,825,38,825,43,794,47"/>
+<area shape="rect" id="Node000006" href="$secp256k1_8c.html#a9f5faeec85b85bdaccd7ddda899dbfa2" title=" " alt="" coords="1100,42,1342,68"/>
+<area shape="poly" id="edge6_Node000004_Node000006" title=" " alt="" coords="793,54,841,55,1052,55,1085,55,1085,60,1052,60,841,60,793,60"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="1053,34,1085,38,1084,43,1052,40"/>
+</map>

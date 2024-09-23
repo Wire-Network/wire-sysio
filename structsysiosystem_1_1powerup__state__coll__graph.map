@@ -1,0 +1,14 @@
+<map id="sysiosystem::powerup_state" name="sysiosystem::powerup_state">
+<area shape="rect" id="Node000001" title=" " alt="" coords="240,318,392,358"/>
+<area shape="rect" id="Node000002" href="$structsysiosystem_1_1powerup__state__resource.html" title=" " alt="" coords="150,199,302,240"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="252,250,303,315,299,319,248,254"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,80,65,106"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="37,121,41,148,55,173,70,182,92,191,150,204,148,210,91,196,67,187,51,177,36,150,32,122"/>
+<area shape="rect" id="Node000004" href="$classfc_1_1time__point__sec.html" title=" " alt="" coords="104,80,232,106"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="166,121,165,148,172,174,192,197,188,200,167,176,160,148,160,121"/>
+<area shape="rect" id="Node000005" href="$structsysio_1_1chain_1_1asset.html" title=" " alt="" coords="297,80,429,106"/>
+<area shape="poly" id="edge6_Node000001_Node000005" title=" " alt="" coords="384,118,390,129,393,152,390,176,378,217,362,256,330,318,326,316,357,254,373,215,384,174,388,152,384,131,380,120"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="338,118,325,132,310,154,294,177,263,200,260,196,290,173,306,151,321,128,335,115"/>
+<area shape="rect" id="Node000006" href="$structfc_1_1reflect__init.html" title=" " alt="" coords="313,5,413,31"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="366,46,366,80,360,80,360,46"/>
+</map>

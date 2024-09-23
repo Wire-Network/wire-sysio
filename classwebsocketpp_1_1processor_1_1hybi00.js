@@ -1,0 +1,28 @@
+var classwebsocketpp_1_1processor_1_1hybi00 =
+[
+    [ "base", "classwebsocketpp_1_1processor_1_1hybi00.html#a41c473fade7f7f7fc627811946e16ce0", null ],
+    [ "message_ptr", "classwebsocketpp_1_1processor_1_1hybi00.html#a62f758e029b5a181c002de596ec05d09", null ],
+    [ "message_type", "classwebsocketpp_1_1processor_1_1hybi00.html#a8eb2edff157521d42a605e0668a65434", null ],
+    [ "msg_manager_ptr", "classwebsocketpp_1_1processor_1_1hybi00.html#a7aac660ced0c24ebbd563a4b98138bf7", null ],
+    [ "request_type", "classwebsocketpp_1_1processor_1_1hybi00.html#a0163cc1ded7282dcabc0813ffbc37d0d", null ],
+    [ "response_type", "classwebsocketpp_1_1processor_1_1hybi00.html#aae9a1c9b64c901309c412abaa0c70cb9", null ],
+    [ "hybi00", "classwebsocketpp_1_1processor_1_1hybi00.html#ac9e56c69bfab35accfa60867d49c90f5", null ],
+    [ "client_handshake_request", "classwebsocketpp_1_1processor_1_1hybi00.html#a5f88e94fc52da9be8ba718889b5c093f", null ],
+    [ "consume", "classwebsocketpp_1_1processor_1_1hybi00.html#a8065338a7a9c760a92ce24d736a3dff2", null ],
+    [ "extract_subprotocols", "classwebsocketpp_1_1processor_1_1hybi00.html#ab7b5ff7d3a174454404fe97314ed4717", null ],
+    [ "get_error", "classwebsocketpp_1_1processor_1_1hybi00.html#a86ed2943be17c9775153a9731289c16e", null ],
+    [ "get_key3", "classwebsocketpp_1_1processor_1_1hybi00.html#a684fe59a368d586593b1c9b97ac8526d", null ],
+    [ "get_message", "classwebsocketpp_1_1processor_1_1hybi00.html#af5f3b4bec38c586e31c0574b6c3f56b8", null ],
+    [ "get_origin", "classwebsocketpp_1_1processor_1_1hybi00.html#adbcfe29b171687a78b9cc563af886ee1", null ],
+    [ "get_raw", "classwebsocketpp_1_1processor_1_1hybi00.html#a100419fa981b2f464a9e102594b9e124", null ],
+    [ "get_uri", "classwebsocketpp_1_1processor_1_1hybi00.html#aa490b9d9905915023b5f2e42aac59127", null ],
+    [ "get_version", "classwebsocketpp_1_1processor_1_1hybi00.html#a9e3f451bd48b1072a377108eba0cf0f5", null ],
+    [ "prepare_close", "classwebsocketpp_1_1processor_1_1hybi00.html#a907203cad667afdf85359b6ebb68a866", null ],
+    [ "prepare_data_frame", "classwebsocketpp_1_1processor_1_1hybi00.html#a919aaed345cab679875be1d95c7302ec", null ],
+    [ "prepare_ping", "classwebsocketpp_1_1processor_1_1hybi00.html#a19b26fd77f07fb74cf654c5c6976cac3", null ],
+    [ "prepare_pong", "classwebsocketpp_1_1processor_1_1hybi00.html#a1c9e4bf4f5b73e61bee7950c439a77db", null ],
+    [ "process_handshake", "classwebsocketpp_1_1processor_1_1hybi00.html#a29c4300aa053e7028ee5a46601319afd", null ],
+    [ "ready", "classwebsocketpp_1_1processor_1_1hybi00.html#a8a0ebdb322dad95ea3c7aee8e5c56b9a", null ],
+    [ "validate_handshake", "classwebsocketpp_1_1processor_1_1hybi00.html#a9458e35fabf2b39bd9e09523ad60c22c", null ],
+    [ "validate_server_handshake_response", "classwebsocketpp_1_1processor_1_1hybi00.html#a8c7e9edc5eec497d908095ab7a848f2e", null ]
+];

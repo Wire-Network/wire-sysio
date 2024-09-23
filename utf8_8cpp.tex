@@ -1,0 +1,39 @@
+\doxysection{libraries/fc/src/utf8.cpp File Reference}
+\hypertarget{utf8_8cpp}{}\label{utf8_8cpp}\index{libraries/fc/src/utf8.cpp@{libraries/fc/src/utf8.cpp}}
+{\ttfamily \#include "{}fc/utf8.\+hpp"{}}\newline
+{\ttfamily \#include "{}utf8/checked.\+h"{}}\newline
+{\ttfamily \#include "{}utf8/core.\+h"{}}\newline
+{\ttfamily \#include $<$fc/log/logger.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/exception/exception.\+hpp$>$}\newline
+Include dependency graph for utf8.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{utf8_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacefc}{fc}}
+\begin{DoxyCompactList}\small\item\em namespace \doxylink{namespacesysio_1_1chain}{sysio\+::chain} \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{namespacefc_aaf4d63bbbb10975bd89ddfd661733f5f}{fc\+::is\+\_\+utf8}} (const std\+::string \&str)
+\item 
+{\footnotesize template$<$typename octet\+\_\+iterator $>$ }\\std\+::pair$<$ octet\+\_\+iterator, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} $>$ \mbox{\hyperlink{namespacefc_afdd13a1463953f18fde2fa891cb5231e}{fc\+::find\+\_\+invalid}} (octet\+\_\+iterator start, octet\+\_\+iterator end, const std\+::pair$<$ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} $>$ \&invalid\+\_\+range)
+\item 
+bool \mbox{\hyperlink{namespacefc_a47ce6fdd4f18f7f06601e820866d54ec}{fc\+::is\+\_\+valid\+\_\+utf8}} (const std\+::string\+\_\+view \&str)
+\item 
+std\+::string \mbox{\hyperlink{namespacefc_afdef7bae8756a2c4ba14524f5913d485}{fc\+::prune\+\_\+invalid\+\_\+utf8}} (const std\+::string\+\_\+view \&str)
+\item 
+void \mbox{\hyperlink{namespacefc_a440b80d7907f475f1380eb76f054ed05}{fc\+::decode\+Utf8}} (const std\+::string \&input, std\+::wstring \texorpdfstring{$\ast$}{*}storage)
+\item 
+void \mbox{\hyperlink{namespacefc_a929646b3a8b7feb5688409ddef1897c9}{fc\+::encode\+Utf8}} (const std\+::wstring \&input, std\+::string \texorpdfstring{$\ast$}{*}storage)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+constexpr char \mbox{\hyperlink{namespacefc_aee9c37dc6335ffdecd0fc7fc200320d8}{fc\+::hex\+\_\+digits}} \mbox{[}$\,$\mbox{]} = "{}0123456789abcdef"{}
+\end{DoxyCompactItemize}

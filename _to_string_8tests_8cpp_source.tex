@@ -1,0 +1,48 @@
+\doxysection{To\+String.\+tests.\+cpp}
+\hypertarget{_to_string_8tests_8cpp_source}{}\label{_to_string_8tests_8cpp_source}\index{libraries/sys-\/vm/external/Catch2/projects/SelfTest/IntrospectiveTests/ToString.tests.cpp@{libraries/sys-\/vm/external/Catch2/projects/SelfTest/IntrospectiveTests/ToString.tests.cpp}}
+\mbox{\hyperlink{_to_string_8tests_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_to_string_8tests_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ "{}catch.hpp"{}}}
+\DoxyCodeLine{\Hypertarget{_to_string_8tests_8cpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_to_string_8tests_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__enum__values__registry_8h}{internal/catch\_enum\_values\_registry.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_to_string_8tests_8cpp_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{_to_string_8tests_8cpp_source_l00005}\mbox{\hyperlink{_to_string_8tests_8cpp_ac017343e4e620bbb8069612fe5353941}{00005}}\ \textcolor{keyword}{enum\ class}\ \mbox{\hyperlink{_to_string_8tests_8cpp_ac017343e4e620bbb8069612fe5353941}{EnumClass3}}\ \{\ \mbox{\hyperlink{_to_string_8tests_8cpp_ac017343e4e620bbb8069612fe5353941a7ee5a281b28d7ca1fab06b43d0b7d8ac}{Value1}},\ \mbox{\hyperlink{_to_string_8tests_8cpp_ac017343e4e620bbb8069612fe5353941a0fe13ed1638da4d4b1ef316729f3bb32}{Value2}},\ \mbox{\hyperlink{_to_string_8tests_8cpp_ac017343e4e620bbb8069612fe5353941a121bcef76aa7694f7d8ef4d381b86dad}{Value3}},\ \mbox{\hyperlink{_to_string_8tests_8cpp_ac017343e4e620bbb8069612fe5353941a3cdf05413e72fd826ed3a2aa33cff022}{Value4}}\ \};}
+\DoxyCodeLine{\Hypertarget{_to_string_8tests_8cpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{_to_string_8tests_8cpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{_to_string_8tests_8cpp_source_l00008}\mbox{\hyperlink{_to_string_8tests_8cpp_a3143c1dbaba63b9e9b158940ff464b50}{00008}}\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\ \textcolor{stringliteral}{"{}parseEnums"{}},\ \textcolor{stringliteral}{"{}[Strings][enums]"{}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{_to_string_8tests_8cpp_source_l00009}00009\ \ \ \ \ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespace_catch_1_1_matchers}{Catch::Matchers}};}
+\DoxyCodeLine{\Hypertarget{_to_string_8tests_8cpp_source_l00010}00010\ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespace_catch_1_1_detail_a96ec2978e267cd753ef55dd734270334}{Catch::Detail::parseEnums}};}
+\DoxyCodeLine{\Hypertarget{_to_string_8tests_8cpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{_to_string_8tests_8cpp_source_l00012}00012\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\ \textcolor{stringliteral}{"{}No\ enums"{}}\ )}
+\DoxyCodeLine{\Hypertarget{_to_string_8tests_8cpp_source_l00013}00013\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a5b8c33c63e0804d4458e2c761370b75d}{CHECK\_THAT}}(\ parseEnums(\ \textcolor{stringliteral}{"{}"{}}\ ),\ Equals(\ std::vector<std::string>\{\}\ )\ );}
+\DoxyCodeLine{\Hypertarget{_to_string_8tests_8cpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{_to_string_8tests_8cpp_source_l00015}00015\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\ \textcolor{stringliteral}{"{}One\ enum\ value"{}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{_to_string_8tests_8cpp_source_l00016}00016\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a5b8c33c63e0804d4458e2c761370b75d}{CHECK\_THAT}}(\ parseEnums(\ \textcolor{stringliteral}{"{}ClassName::EnumName::Value1"{}}\ ),}
+\DoxyCodeLine{\Hypertarget{_to_string_8tests_8cpp_source_l00017}00017\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Equals(std::vector<std::string>\{\textcolor{stringliteral}{"{}Value1"{}}\}\ )\ );}
+\DoxyCodeLine{\Hypertarget{_to_string_8tests_8cpp_source_l00018}00018\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a5b8c33c63e0804d4458e2c761370b75d}{CHECK\_THAT}}(\ parseEnums(\ \textcolor{stringliteral}{"{}Value1"{}}\ ),}
+\DoxyCodeLine{\Hypertarget{_to_string_8tests_8cpp_source_l00019}00019\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Equals(\ std::vector<std::string>\{\textcolor{stringliteral}{"{}Value1"{}}\}\ )\ );}
+\DoxyCodeLine{\Hypertarget{_to_string_8tests_8cpp_source_l00020}00020\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a5b8c33c63e0804d4458e2c761370b75d}{CHECK\_THAT}}(\ parseEnums(\ \textcolor{stringliteral}{"{}EnumName::Value1"{}}\ ),}
+\DoxyCodeLine{\Hypertarget{_to_string_8tests_8cpp_source_l00021}00021\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Equals(std::vector<std::string>\{\textcolor{stringliteral}{"{}Value1"{}}\}\ )\ );}
+\DoxyCodeLine{\Hypertarget{_to_string_8tests_8cpp_source_l00022}00022\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_to_string_8tests_8cpp_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{_to_string_8tests_8cpp_source_l00024}00024\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\ \textcolor{stringliteral}{"{}Multiple\ enum\ values"{}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{_to_string_8tests_8cpp_source_l00025}00025\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a5b8c33c63e0804d4458e2c761370b75d}{CHECK\_THAT}}(\ parseEnums(\ \textcolor{stringliteral}{"{}ClassName::EnumName::Value1,\ ClassName::EnumName::Value2"{}}\ ),}
+\DoxyCodeLine{\Hypertarget{_to_string_8tests_8cpp_source_l00026}00026\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Equals(\ std::vector<std::string>\{\textcolor{stringliteral}{"{}Value1"{}},\ \textcolor{stringliteral}{"{}Value2"{}}\}\ )\ );}
+\DoxyCodeLine{\Hypertarget{_to_string_8tests_8cpp_source_l00027}00027\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a5b8c33c63e0804d4458e2c761370b75d}{CHECK\_THAT}}(\ parseEnums(\ \textcolor{stringliteral}{"{}ClassName::EnumName::Value1,\ ClassName::EnumName::Value2,\ ClassName::EnumName::Value3"{}}\ ),}
+\DoxyCodeLine{\Hypertarget{_to_string_8tests_8cpp_source_l00028}00028\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Equals(\ std::vector<std::string>\{\textcolor{stringliteral}{"{}Value1"{}},\ \textcolor{stringliteral}{"{}Value2"{}},\ \textcolor{stringliteral}{"{}Value3"{}}\}\ )\ );}
+\DoxyCodeLine{\Hypertarget{_to_string_8tests_8cpp_source_l00029}00029\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a5b8c33c63e0804d4458e2c761370b75d}{CHECK\_THAT}}(\ parseEnums(\ \textcolor{stringliteral}{"{}ClassName::EnumName::Value1,ClassName::EnumName::Value2\ ,\ ClassName::EnumName::Value3"{}}\ ),}
+\DoxyCodeLine{\Hypertarget{_to_string_8tests_8cpp_source_l00030}00030\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Equals(\ std::vector<std::string>\{\textcolor{stringliteral}{"{}Value1"{}},\ \textcolor{stringliteral}{"{}Value2"{}},\ \textcolor{stringliteral}{"{}Value3"{}}\}\ )\ );}
+\DoxyCodeLine{\Hypertarget{_to_string_8tests_8cpp_source_l00031}00031\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_to_string_8tests_8cpp_source_l00032}00032\ \}}
+\DoxyCodeLine{\Hypertarget{_to_string_8tests_8cpp_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{_to_string_8tests_8cpp_source_l00034}\mbox{\hyperlink{_to_string_8tests_8cpp_ad1f3e4ee7465238349cb915d5d3e7a59}{00034}}\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\ \textcolor{stringliteral}{"{}Directly\ creating\ an\ EnumInfo"{}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{_to_string_8tests_8cpp_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{_to_string_8tests_8cpp_source_l00036}00036\ \ \ \ \ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespace_catch_1_1_detail}{Catch::Detail}};}
+\DoxyCodeLine{\Hypertarget{_to_string_8tests_8cpp_source_l00037}00037\ \ \ \ \ std::unique\_ptr<EnumInfo>\ enumInfo\ =\ makeEnumInfo(\ \textcolor{stringliteral}{"{}EnumName"{}},\ \textcolor{stringliteral}{"{}EnumName::Value1,\ EnumName::Value2"{}},\ \{0,\ 1\}\ );}
+\DoxyCodeLine{\Hypertarget{_to_string_8tests_8cpp_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{_to_string_8tests_8cpp_source_l00039}00039\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ enumInfo-\/>lookup(0)\ ==\ \textcolor{stringliteral}{"{}Value1"{}}\ );}
+\DoxyCodeLine{\Hypertarget{_to_string_8tests_8cpp_source_l00040}00040\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ enumInfo-\/>lookup(1)\ ==\ \textcolor{stringliteral}{"{}Value2"{}}\ );}
+\DoxyCodeLine{\Hypertarget{_to_string_8tests_8cpp_source_l00041}00041\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ enumInfo-\/>lookup(3)\ ==\ \textcolor{stringliteral}{"{}\{**\ unexpected\ enum\ value\ **\}"{}}\ );}
+\DoxyCodeLine{\Hypertarget{_to_string_8tests_8cpp_source_l00042}00042\ \}}
+
+\end{DoxyCode}

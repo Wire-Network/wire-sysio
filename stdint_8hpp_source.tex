@@ -1,0 +1,79 @@
+\doxysection{stdint.\+hpp}
+\hypertarget{stdint_8hpp_source}{}\label{stdint_8hpp_source}\index{libraries/fc/vendor/websocketpp/websocketpp/common/stdint.hpp@{libraries/fc/vendor/websocketpp/websocketpp/common/stdint.hpp}}
+\mbox{\hyperlink{stdint_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2014,\ Peter\ Thorson.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00004}00004\ \textcolor{comment}{\ *\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00005}00005\ \textcolor{comment}{\ *\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are\ met:}}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00006}00006\ \textcolor{comment}{\ *\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00007}00007\ \textcolor{comment}{\ *\ \ \ \ \ \ \ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00008}00008\ \textcolor{comment}{\ *\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00009}00009\ \textcolor{comment}{\ *\ \ \ \ \ \ \ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer\ in\ the}}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00010}00010\ \textcolor{comment}{\ *\ \ \ \ \ \ \ documentation\ and/or\ other\ materials\ provided\ with\ the\ distribution.}}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00011}00011\ \textcolor{comment}{\ *\ \ \ \ \ *\ Neither\ the\ name\ of\ the\ WebSocket++\ Project\ nor\ the}}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00012}00012\ \textcolor{comment}{\ *\ \ \ \ \ \ \ names\ of\ its\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products}}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00013}00013\ \textcolor{comment}{\ *\ \ \ \ \ \ \ derived\ from\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00014}00014\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00015}00015\ \textcolor{comment}{\ *\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS\ "{}AS\ IS"{}}}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00016}00016\ \textcolor{comment}{\ *\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ THE}}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00017}00017\ \textcolor{comment}{\ *\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR\ A\ PARTICULAR\ PURPOSE}}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00018}00018\ \textcolor{comment}{\ *\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ PETER\ THORSON\ BE\ LIABLE\ FOR\ ANY}}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00019}00019\ \textcolor{comment}{\ *\ DIRECT,\ INDIRECT,\ INCIDENTAL,\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES}}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00020}00020\ \textcolor{comment}{\ *\ (INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;}}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00021}00021\ \textcolor{comment}{\ *\ LOSS\ OF\ USE,\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND}}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00022}00022\ \textcolor{comment}{\ *\ ON\ ANY\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00023}00023\ \textcolor{comment}{\ *\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE\ OF\ THIS}}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00024}00024\ \textcolor{comment}{\ *\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00025}00025\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00026}00026\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00028}00028\ \textcolor{preprocessor}{\#ifndef\ WEBSOCKETPP\_COMMON\_STDINT\_HPP}}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00029}00029\ \textcolor{preprocessor}{\#define\ WEBSOCKETPP\_COMMON\_STDINT\_HPP}}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00031}00031\ \textcolor{preprocessor}{\#ifndef\ \_\_STDC\_LIMIT\_MACROS}}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00032}\mbox{\hyperlink{stdint_8hpp_aeb7e7a856ab7a794b05b6b63ef36ea3e}{00032}}\ \textcolor{preprocessor}{\ \ \ \ \#define\ \_\_STDC\_LIMIT\_MACROS\ 1}}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00033}00033\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00035}00035\ \textcolor{preprocessor}{\#if\ defined\ (\_WIN32)\ \&\&\ defined\ (\_MSC\_VER)\ \&\&\ (\_MSC\_VER\ <\ 1600)}}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00036}00036\ \textcolor{preprocessor}{\ \ \ \ \#include\ <boost/cstdint.hpp>}}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00038}00038\ \ \ \ \ \textcolor{keyword}{using\ }boost::int8\_t;}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00039}00039\ \ \ \ \ \textcolor{keyword}{using\ }boost::int\_least8\_t;}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00040}00040\ \ \ \ \ \textcolor{keyword}{using\ }boost::int\_fast8\_t;}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00041}00041\ \ \ \ \ \textcolor{keyword}{using\ }boost::uint8\_t;}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00042}00042\ \ \ \ \ \textcolor{keyword}{using\ }boost::uint\_least8\_t;}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00043}00043\ \ \ \ \ \textcolor{keyword}{using\ }boost::uint\_fast8\_t;}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00045}00045\ \ \ \ \ \textcolor{keyword}{using\ }boost::int16\_t;}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00046}00046\ \ \ \ \ \textcolor{keyword}{using\ }boost::int\_least16\_t;}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00047}00047\ \ \ \ \ \textcolor{keyword}{using\ }boost::int\_fast16\_t;}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00048}00048\ \ \ \ \ \textcolor{keyword}{using\ }boost::uint16\_t;}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00049}00049\ \ \ \ \ \textcolor{keyword}{using\ }boost::uint\_least16\_t;}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00050}00050\ \ \ \ \ \textcolor{keyword}{using\ }boost::uint\_fast16\_t;}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00052}00052\ \ \ \ \ \textcolor{keyword}{using\ }boost::int32\_t;}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00053}00053\ \ \ \ \ \textcolor{keyword}{using\ }boost::int\_least32\_t;}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00054}00054\ \ \ \ \ \textcolor{keyword}{using\ }boost::int\_fast32\_t;}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00055}00055\ \ \ \ \ \textcolor{keyword}{using\ }boost::uint32\_t;}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00056}00056\ \ \ \ \ \textcolor{keyword}{using\ }boost::uint\_least32\_t;}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00057}00057\ \ \ \ \ \textcolor{keyword}{using\ }boost::uint\_fast32\_t;}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00059}00059\ \textcolor{preprocessor}{\ \ \ \ \#ifndef\ BOOST\_NO\_INT64\_T}}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00060}00060\ \ \ \ \ \textcolor{keyword}{using\ }boost::int64\_t;}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00061}00061\ \ \ \ \ \textcolor{keyword}{using\ }boost::int\_least64\_t;}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00062}00062\ \ \ \ \ \textcolor{keyword}{using\ }boost::int\_fast64\_t;}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00063}00063\ \ \ \ \ \textcolor{keyword}{using\ }boost::uint64\_t;}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00064}00064\ \ \ \ \ \textcolor{keyword}{using\ }boost::uint\_least64\_t;}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00065}00065\ \ \ \ \ \textcolor{keyword}{using\ }boost::uint\_fast64\_t;}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00066}00066\ \textcolor{preprocessor}{\ \ \ \ \#endif}}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00067}00067\ \ \ \ \ \textcolor{keyword}{using\ }boost::intmax\_t;}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00068}00068\ \ \ \ \ \textcolor{keyword}{using\ }boost::uintmax\_t;}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00069}00069\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00070}00070\ \textcolor{preprocessor}{\ \ \ \ \#include\ <\mbox{\hyperlink{stdint_8h}{stdint.h}}>}}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00071}00071\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{stdint_8hpp_source_l00073}00073\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ WEBSOCKETPP\_COMMON\_STDINT\_HPP}}
+
+\end{DoxyCode}

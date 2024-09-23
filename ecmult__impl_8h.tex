@@ -1,0 +1,203 @@
+\doxysection{libraries/fc/secp256k1/secp256k1/src/ecmult\+\_\+impl.h File Reference}
+\hypertarget{ecmult__impl_8h}{}\label{ecmult__impl_8h}\index{libraries/fc/secp256k1/secp256k1/src/ecmult\_impl.h@{libraries/fc/secp256k1/secp256k1/src/ecmult\_impl.h}}
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include "{}util.\+h"{}}\newline
+{\ttfamily \#include "{}group.\+h"{}}\newline
+{\ttfamily \#include "{}scalar.\+h"{}}\newline
+{\ttfamily \#include "{}ecmult.\+h"{}}\newline
+{\ttfamily \#include "{}precomputed\+\_\+ecmult.\+h"{}}\newline
+Include dependency graph for ecmult\+\_\+impl.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{ecmult__impl_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{ecmult__impl_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsecp256k1__strauss__point__state}{secp256k1\+\_\+strauss\+\_\+point\+\_\+state}}
+\item 
+struct \mbox{\hyperlink{structsecp256k1__strauss__state}{secp256k1\+\_\+strauss\+\_\+state}}
+\item 
+struct \mbox{\hyperlink{structsecp256k1__pippenger__point__state}{secp256k1\+\_\+pippenger\+\_\+point\+\_\+state}}
+\item 
+struct \mbox{\hyperlink{structsecp256k1__pippenger__state}{secp256k1\+\_\+pippenger\+\_\+state}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{ecmult__impl_8h_a6216c81c6adbb8796c55fe0c8d3b6718}{WINDOW\+\_\+A}}~5
+\item 
+\#define \mbox{\hyperlink{ecmult__impl_8h_a7ca5efdae3396a6261bcc836e4a32739}{WNAF\+\_\+\+BITS}}~128
+\item 
+\#define \mbox{\hyperlink{ecmult__impl_8h_ade3191685190c40779d2de9d0664216d}{WNAF\+\_\+\+SIZE\+\_\+\+BITS}}(bits,  w)
+\item 
+\#define \mbox{\hyperlink{ecmult__impl_8h_a23d9fb349265ae338b9977f7f7aab065}{WNAF\+\_\+\+SIZE}}(w)
+\item 
+\#define \mbox{\hyperlink{ecmult__impl_8h_a991c52a2d9fa18dd39f5a9fffe373922}{PIPPENGER\+\_\+\+SCRATCH\+\_\+\+OBJECTS}}~6
+\item 
+\#define \mbox{\hyperlink{ecmult__impl_8h_a0447eb99687dea95c58a48eb6b6e17e2}{STRAUSS\+\_\+\+SCRATCH\+\_\+\+OBJECTS}}~5
+\item 
+\#define \mbox{\hyperlink{ecmult__impl_8h_a9114820daf51f54afc1858640539ac6d}{PIPPENGER\+\_\+\+MAX\+\_\+\+BUCKET\+\_\+\+WINDOW}}~12
+\item 
+\#define \mbox{\hyperlink{ecmult__impl_8h_a71e7f4ad865cad35efddc0495b59fcf3}{ECMULT\+\_\+\+PIPPENGER\+\_\+\+THRESHOLD}}~88
+\item 
+\#define \mbox{\hyperlink{ecmult__impl_8h_a8be09901326f35f4390bb788d9fa2fea}{ECMULT\+\_\+\+MAX\+\_\+\+POINTS\+\_\+\+PER\+\_\+\+BATCH}}~5000000
+\item 
+\#define \mbox{\hyperlink{ecmult__impl_8h_a5d4fb351e4919c5933128215d871052e}{SECP256\+K1\+\_\+\+ECMULT\+\_\+\+TABLE\+\_\+\+VERIFY}}(n,  w)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef int(\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{ecmult__impl_8h_afedbad22c020fec93edb5823e9d385ed}{secp256k1\+\_\+ecmult\+\_\+multi\+\_\+func}}) (const \mbox{\hyperlink{structsecp256k1__callback}{secp256k1\+\_\+callback}} \texorpdfstring{$\ast$}{*}error\+\_\+callback, \mbox{\hyperlink{scratch_8h_a84bdf30f4ca993587d89471cf1ae8be7}{secp256k1\+\_\+scratch}} \texorpdfstring{$\ast$}{*}, \mbox{\hyperlink{structsecp256k1__gej}{secp256k1\+\_\+gej}} \texorpdfstring{$\ast$}{*}, const \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\+\_\+scalar}} \texorpdfstring{$\ast$}{*}, \mbox{\hyperlink{ecmult_8h_a0f127c89ba0f17e7992666f3d789e58e}{secp256k1\+\_\+ecmult\+\_\+multi\+\_\+callback}} cb, void \texorpdfstring{$\ast$}{*}, size\+\_\+t)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{ecmult__impl_8h_a8be09901326f35f4390bb788d9fa2fea}\index{ecmult\_impl.h@{ecmult\_impl.h}!ECMULT\_MAX\_POINTS\_PER\_BATCH@{ECMULT\_MAX\_POINTS\_PER\_BATCH}}
+\index{ECMULT\_MAX\_POINTS\_PER\_BATCH@{ECMULT\_MAX\_POINTS\_PER\_BATCH}!ecmult\_impl.h@{ecmult\_impl.h}}
+\doxysubsubsection{\texorpdfstring{ECMULT\_MAX\_POINTS\_PER\_BATCH}{ECMULT\_MAX\_POINTS\_PER\_BATCH}}
+{\footnotesize\ttfamily \label{ecmult__impl_8h_a8be09901326f35f4390bb788d9fa2fea} 
+\#define ECMULT\+\_\+\+MAX\+\_\+\+POINTS\+\_\+\+PER\+\_\+\+BATCH~5000000}
+
+
+
+Definition at line \mbox{\hyperlink{ecmult__impl_8h_source_l00057}{57}} of file \mbox{\hyperlink{ecmult__impl_8h_source}{ecmult\+\_\+impl.\+h}}.
+
+\Hypertarget{ecmult__impl_8h_a71e7f4ad865cad35efddc0495b59fcf3}\index{ecmult\_impl.h@{ecmult\_impl.h}!ECMULT\_PIPPENGER\_THRESHOLD@{ECMULT\_PIPPENGER\_THRESHOLD}}
+\index{ECMULT\_PIPPENGER\_THRESHOLD@{ECMULT\_PIPPENGER\_THRESHOLD}!ecmult\_impl.h@{ecmult\_impl.h}}
+\doxysubsubsection{\texorpdfstring{ECMULT\_PIPPENGER\_THRESHOLD}{ECMULT\_PIPPENGER\_THRESHOLD}}
+{\footnotesize\ttfamily \label{ecmult__impl_8h_a71e7f4ad865cad35efddc0495b59fcf3} 
+\#define ECMULT\+\_\+\+PIPPENGER\+\_\+\+THRESHOLD~88}
+
+
+
+Definition at line \mbox{\hyperlink{ecmult__impl_8h_source_l00055}{55}} of file \mbox{\hyperlink{ecmult__impl_8h_source}{ecmult\+\_\+impl.\+h}}.
+
+\Hypertarget{ecmult__impl_8h_a9114820daf51f54afc1858640539ac6d}\index{ecmult\_impl.h@{ecmult\_impl.h}!PIPPENGER\_MAX\_BUCKET\_WINDOW@{PIPPENGER\_MAX\_BUCKET\_WINDOW}}
+\index{PIPPENGER\_MAX\_BUCKET\_WINDOW@{PIPPENGER\_MAX\_BUCKET\_WINDOW}!ecmult\_impl.h@{ecmult\_impl.h}}
+\doxysubsubsection{\texorpdfstring{PIPPENGER\_MAX\_BUCKET\_WINDOW}{PIPPENGER\_MAX\_BUCKET\_WINDOW}}
+{\footnotesize\ttfamily \label{ecmult__impl_8h_a9114820daf51f54afc1858640539ac6d} 
+\#define PIPPENGER\+\_\+\+MAX\+\_\+\+BUCKET\+\_\+\+WINDOW~12}
+
+
+
+Definition at line \mbox{\hyperlink{ecmult__impl_8h_source_l00052}{52}} of file \mbox{\hyperlink{ecmult__impl_8h_source}{ecmult\+\_\+impl.\+h}}.
+
+\Hypertarget{ecmult__impl_8h_a991c52a2d9fa18dd39f5a9fffe373922}\index{ecmult\_impl.h@{ecmult\_impl.h}!PIPPENGER\_SCRATCH\_OBJECTS@{PIPPENGER\_SCRATCH\_OBJECTS}}
+\index{PIPPENGER\_SCRATCH\_OBJECTS@{PIPPENGER\_SCRATCH\_OBJECTS}!ecmult\_impl.h@{ecmult\_impl.h}}
+\doxysubsubsection{\texorpdfstring{PIPPENGER\_SCRATCH\_OBJECTS}{PIPPENGER\_SCRATCH\_OBJECTS}}
+{\footnotesize\ttfamily \label{ecmult__impl_8h_a991c52a2d9fa18dd39f5a9fffe373922} 
+\#define PIPPENGER\+\_\+\+SCRATCH\+\_\+\+OBJECTS~6}
+
+
+
+Definition at line \mbox{\hyperlink{ecmult__impl_8h_source_l00049}{49}} of file \mbox{\hyperlink{ecmult__impl_8h_source}{ecmult\+\_\+impl.\+h}}.
+
+\Hypertarget{ecmult__impl_8h_a5d4fb351e4919c5933128215d871052e}\index{ecmult\_impl.h@{ecmult\_impl.h}!SECP256K1\_ECMULT\_TABLE\_VERIFY@{SECP256K1\_ECMULT\_TABLE\_VERIFY}}
+\index{SECP256K1\_ECMULT\_TABLE\_VERIFY@{SECP256K1\_ECMULT\_TABLE\_VERIFY}!ecmult\_impl.h@{ecmult\_impl.h}}
+\doxysubsubsection{\texorpdfstring{SECP256K1\_ECMULT\_TABLE\_VERIFY}{SECP256K1\_ECMULT\_TABLE\_VERIFY}}
+{\footnotesize\ttfamily \label{ecmult__impl_8h_a5d4fb351e4919c5933128215d871052e} 
+\#define SECP256\+K1\+\_\+\+ECMULT\+\_\+\+TABLE\+\_\+\+VERIFY(\begin{DoxyParamCaption}\item[{}]{n}{, }\item[{}]{w}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(((n)\ \&\ 1)\ ==\ 1);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ VERIFY\_CHECK((n)\ >=\ -\/((1\ <<\ ((w)-\/1))\ -\/\ 1));\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ VERIFY\_CHECK((n)\ <=\ \ ((1\ <<\ ((w)-\/1))\ -\/\ 1));}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{ecmult__impl_8h_source_l00117}{117}} of file \mbox{\hyperlink{ecmult__impl_8h_source}{ecmult\+\_\+impl.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00117\ \textcolor{preprocessor}{\#define\ SECP256K1\_ECMULT\_TABLE\_VERIFY(n,w)\ \(\backslash\)}}
+\DoxyCodeLine{00118\ \textcolor{preprocessor}{\ \ \ \ VERIFY\_CHECK(((n)\ \&\ 1)\ ==\ 1);\ \(\backslash\)}}
+\DoxyCodeLine{00119\ \textcolor{preprocessor}{\ \ \ \ VERIFY\_CHECK((n)\ >=\ -\/((1\ <<\ ((w)-\/1))\ -\/\ 1));\ \(\backslash\)}}
+\DoxyCodeLine{00120\ \textcolor{preprocessor}{\ \ \ \ VERIFY\_CHECK((n)\ <=\ \ ((1\ <<\ ((w)-\/1))\ -\/\ 1));}}
+
+\end{DoxyCode}
+\Hypertarget{ecmult__impl_8h_a0447eb99687dea95c58a48eb6b6e17e2}\index{ecmult\_impl.h@{ecmult\_impl.h}!STRAUSS\_SCRATCH\_OBJECTS@{STRAUSS\_SCRATCH\_OBJECTS}}
+\index{STRAUSS\_SCRATCH\_OBJECTS@{STRAUSS\_SCRATCH\_OBJECTS}!ecmult\_impl.h@{ecmult\_impl.h}}
+\doxysubsubsection{\texorpdfstring{STRAUSS\_SCRATCH\_OBJECTS}{STRAUSS\_SCRATCH\_OBJECTS}}
+{\footnotesize\ttfamily \label{ecmult__impl_8h_a0447eb99687dea95c58a48eb6b6e17e2} 
+\#define STRAUSS\+\_\+\+SCRATCH\+\_\+\+OBJECTS~5}
+
+
+
+Definition at line \mbox{\hyperlink{ecmult__impl_8h_source_l00050}{50}} of file \mbox{\hyperlink{ecmult__impl_8h_source}{ecmult\+\_\+impl.\+h}}.
+
+\Hypertarget{ecmult__impl_8h_a6216c81c6adbb8796c55fe0c8d3b6718}\index{ecmult\_impl.h@{ecmult\_impl.h}!WINDOW\_A@{WINDOW\_A}}
+\index{WINDOW\_A@{WINDOW\_A}!ecmult\_impl.h@{ecmult\_impl.h}}
+\doxysubsubsection{\texorpdfstring{WINDOW\_A}{WINDOW\_A}}
+{\footnotesize\ttfamily \label{ecmult__impl_8h_a6216c81c6adbb8796c55fe0c8d3b6718} 
+\#define WINDOW\+\_\+A~5}
+
+
+
+Definition at line \mbox{\hyperlink{ecmult__impl_8h_source_l00032}{32}} of file \mbox{\hyperlink{ecmult__impl_8h_source}{ecmult\+\_\+impl.\+h}}.
+
+\Hypertarget{ecmult__impl_8h_a7ca5efdae3396a6261bcc836e4a32739}\index{ecmult\_impl.h@{ecmult\_impl.h}!WNAF\_BITS@{WNAF\_BITS}}
+\index{WNAF\_BITS@{WNAF\_BITS}!ecmult\_impl.h@{ecmult\_impl.h}}
+\doxysubsubsection{\texorpdfstring{WNAF\_BITS}{WNAF\_BITS}}
+{\footnotesize\ttfamily \label{ecmult__impl_8h_a7ca5efdae3396a6261bcc836e4a32739} 
+\#define WNAF\+\_\+\+BITS~128}
+
+Larger values for ECMULT\+\_\+\+WINDOW\+\_\+\+SIZE result in possibly better performance at the cost of an exponentially larger precomputed table. The exact table size is (1 \texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<} (WINDOW\+\_\+G -\/ 2)) \texorpdfstring{$\ast$}{*} sizeof(secp256k1\+\_\+ge\+\_\+storage) bytes, where sizeof(secp256k1\+\_\+ge\+\_\+storage) is typically 64 bytes but can be larger due to platform-\/specific padding and alignment. Two tables of this size are used (due to the endomorphism optimization). 
+
+Definition at line \mbox{\hyperlink{ecmult__impl_8h_source_l00044}{44}} of file \mbox{\hyperlink{ecmult__impl_8h_source}{ecmult\+\_\+impl.\+h}}.
+
+\Hypertarget{ecmult__impl_8h_a23d9fb349265ae338b9977f7f7aab065}\index{ecmult\_impl.h@{ecmult\_impl.h}!WNAF\_SIZE@{WNAF\_SIZE}}
+\index{WNAF\_SIZE@{WNAF\_SIZE}!ecmult\_impl.h@{ecmult\_impl.h}}
+\doxysubsubsection{\texorpdfstring{WNAF\_SIZE}{WNAF\_SIZE}}
+{\footnotesize\ttfamily \label{ecmult__impl_8h_a23d9fb349265ae338b9977f7f7aab065} 
+\#define WNAF\+\_\+\+SIZE(\begin{DoxyParamCaption}\item[{}]{w}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{ecmult__impl_8h_ade3191685190c40779d2de9d0664216d}{WNAF\_SIZE\_BITS}}(\mbox{\hyperlink{ecmult__impl_8h_a7ca5efdae3396a6261bcc836e4a32739}{WNAF\_BITS}},\ w)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{ecmult__impl_8h_source_l00046}{46}} of file \mbox{\hyperlink{ecmult__impl_8h_source}{ecmult\+\_\+impl.\+h}}.
+
+\Hypertarget{ecmult__impl_8h_ade3191685190c40779d2de9d0664216d}\index{ecmult\_impl.h@{ecmult\_impl.h}!WNAF\_SIZE\_BITS@{WNAF\_SIZE\_BITS}}
+\index{WNAF\_SIZE\_BITS@{WNAF\_SIZE\_BITS}!ecmult\_impl.h@{ecmult\_impl.h}}
+\doxysubsubsection{\texorpdfstring{WNAF\_SIZE\_BITS}{WNAF\_SIZE\_BITS}}
+{\footnotesize\ttfamily \label{ecmult__impl_8h_ade3191685190c40779d2de9d0664216d} 
+\#define WNAF\+\_\+\+SIZE\+\_\+\+BITS(\begin{DoxyParamCaption}\item[{}]{bits}{, }\item[{}]{w}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(((bits)\ +\ (w)\ -\/\ 1)\ /\ (w))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{ecmult__impl_8h_source_l00045}{45}} of file \mbox{\hyperlink{ecmult__impl_8h_source}{ecmult\+\_\+impl.\+h}}.
+
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{ecmult__impl_8h_afedbad22c020fec93edb5823e9d385ed}\index{ecmult\_impl.h@{ecmult\_impl.h}!secp256k1\_ecmult\_multi\_func@{secp256k1\_ecmult\_multi\_func}}
+\index{secp256k1\_ecmult\_multi\_func@{secp256k1\_ecmult\_multi\_func}!ecmult\_impl.h@{ecmult\_impl.h}}
+\doxysubsubsection{\texorpdfstring{secp256k1\_ecmult\_multi\_func}{secp256k1\_ecmult\_multi\_func}}
+{\footnotesize\ttfamily \label{ecmult__impl_8h_afedbad22c020fec93edb5823e9d385ed} 
+typedef int(\texorpdfstring{$\ast$}{*} secp256k1\+\_\+ecmult\+\_\+multi\+\_\+func) (const \mbox{\hyperlink{structsecp256k1__callback}{secp256k1\+\_\+callback}} \texorpdfstring{$\ast$}{*}error\+\_\+callback, \mbox{\hyperlink{scratch_8h_a84bdf30f4ca993587d89471cf1ae8be7}{secp256k1\+\_\+scratch}} \texorpdfstring{$\ast$}{*}, \mbox{\hyperlink{structsecp256k1__gej}{secp256k1\+\_\+gej}} \texorpdfstring{$\ast$}{*}, const \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\+\_\+scalar}} \texorpdfstring{$\ast$}{*}, \mbox{\hyperlink{ecmult_8h_a0f127c89ba0f17e7992666f3d789e58e}{secp256k1\+\_\+ecmult\+\_\+multi\+\_\+callback}} cb, void \texorpdfstring{$\ast$}{*}, size\+\_\+t)}
+
+
+
+Definition at line \mbox{\hyperlink{ecmult__impl_8h_source_l00810}{810}} of file \mbox{\hyperlink{ecmult__impl_8h_source}{ecmult\+\_\+impl.\+h}}.
+

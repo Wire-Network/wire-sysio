@@ -1,0 +1,57 @@
+\doxysection{cf\+\_\+system.\+cpp}
+\hypertarget{cf__system_8cpp_source}{}\label{cf__system_8cpp_source}\index{libraries/chain/webassembly/cf\_system.cpp@{libraries/chain/webassembly/cf\_system.cpp}}
+\mbox{\hyperlink{cf__system_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{cf__system_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{interface_8hpp}{sysio/chain/webassembly/interface.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{cf__system_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{apply__context_8hpp}{sysio/chain/apply\_context.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{cf__system_8cpp_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{cf__system_8cpp_source_l00004}00004\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{\ \textcolor{keyword}{namespace\ }chain\ \{\ \textcolor{keyword}{namespace\ }webassembly\ \{}
+\DoxyCodeLine{\Hypertarget{cf__system_8cpp_source_l00005}00005\ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{size\_t}\ max\_assert\_message\ =\ 1024;}
+\DoxyCodeLine{\Hypertarget{cf__system_8cpp_source_l00006}\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_a48c923d40fd1d00b48ea3b3d0b5f5432}{00006}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_a48c923d40fd1d00b48ea3b3d0b5f5432}{interface::abort}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{cf__system_8cpp_source_l00007}00007\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ \textcolor{keyword}{false},\ abort\_called,\ \textcolor{stringliteral}{"{}abort()\ called"{}}\ );}
+\DoxyCodeLine{\Hypertarget{cf__system_8cpp_source_l00008}00008\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{cf__system_8cpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{cf__system_8cpp_source_l00010}\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_afbe0d5a05ba2f4acb4f72932f474c5e1}{00010}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_afbe0d5a05ba2f4acb4f72932f474c5e1}{interface::sysio\_assert}}(\ \textcolor{keywordtype}{bool}\ condition,\ \mbox{\hyperlink{structsysio_1_1chain_1_1null__terminated__ptr}{null\_terminated\_ptr}}\ msg\ )\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{cf__system_8cpp_source_l00011}00011\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ BOOST\_UNLIKELY(\ !condition\ )\ )\ \{}
+\DoxyCodeLine{\Hypertarget{cf__system_8cpp_source_l00012}00012\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ sz\ =\ strnlen(\ msg.\mbox{\hyperlink{structsysio_1_1chain_1_1null__terminated__ptr_a6e8f40d769088179c50508bb1c90fe45}{data}}(),\ max\_assert\_message\ );}
+\DoxyCodeLine{\Hypertarget{cf__system_8cpp_source_l00013}00013\ \ \ \ \ \ \ \ \ \ std::string\ message(\ msg.\mbox{\hyperlink{structsysio_1_1chain_1_1null__terminated__ptr_a6e8f40d769088179c50508bb1c90fe45}{data}}(),\ sz\ );}
+\DoxyCodeLine{\Hypertarget{cf__system_8cpp_source_l00014}00014\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a1bfa656552ea0534b2c91ee0fe33f850}{SYS\_THROW}}(\ sysio\_assert\_message\_exception,\ \textcolor{stringliteral}{"{}assertion\ failure\ with\ message:\ \$\{s\}"{}},\ (\textcolor{stringliteral}{"{}s"{}},message)\ );}
+\DoxyCodeLine{\Hypertarget{cf__system_8cpp_source_l00015}00015\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{cf__system_8cpp_source_l00016}00016\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{cf__system_8cpp_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{cf__system_8cpp_source_l00018}\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_a86476fc51b03ea27d866783493abd434}{00018}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_a86476fc51b03ea27d866783493abd434}{interface::sysio\_assert\_message}}(\ \textcolor{keywordtype}{bool}\ condition,\ \mbox{\hyperlink{structsysio_1_1vm_1_1argument__proxy}{legacy\_span<const\ char>}}\ msg\ )\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{cf__system_8cpp_source_l00019}00019\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ BOOST\_UNLIKELY(\ !condition\ )\ )\ \{}
+\DoxyCodeLine{\Hypertarget{cf__system_8cpp_source_l00020}00020\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ sz\ =\ msg.size()\ >\ max\_assert\_message\ ?\ max\_assert\_message\ :\ msg.size();}
+\DoxyCodeLine{\Hypertarget{cf__system_8cpp_source_l00021}00021\ \ \ \ \ \ \ \ \ \ std::string\ message(\ msg.data(),\ sz\ );}
+\DoxyCodeLine{\Hypertarget{cf__system_8cpp_source_l00022}00022\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a1bfa656552ea0534b2c91ee0fe33f850}{SYS\_THROW}}(\ sysio\_assert\_message\_exception,\ \textcolor{stringliteral}{"{}assertion\ failure\ with\ message:\ \$\{s\}"{}},\ (\textcolor{stringliteral}{"{}s"{}},message)\ );}
+\DoxyCodeLine{\Hypertarget{cf__system_8cpp_source_l00023}00023\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{cf__system_8cpp_source_l00024}00024\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{cf__system_8cpp_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{cf__system_8cpp_source_l00026}\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_ae6d122e0e0b817c73a3f56d5871462b2}{00026}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_ae6d122e0e0b817c73a3f56d5871462b2}{interface::sysio\_assert\_code}}(\ \textcolor{keywordtype}{bool}\ condition,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ error\_code\ )\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{cf__system_8cpp_source_l00027}00027\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ BOOST\_UNLIKELY(\ !condition\ )\ )\ \{}
+\DoxyCodeLine{\Hypertarget{cf__system_8cpp_source_l00028}00028\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ error\_code\ >=\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\textcolor{keyword}{>}(\mbox{\hyperlink{namespacesysio_1_1chain_a8b5ff492474737d62d2b925435c687cfab6c5ca8c8a308fb98a68c0d3a83ce3bc}{system\_error\_code::generic\_system\_error}})\ )\ \{}
+\DoxyCodeLine{\Hypertarget{cf__system_8cpp_source_l00029}00029\ \ \ \ \ \ \ \ \ \ \ \ \ restricted\_error\_code\_exception\ e(\ \mbox{\hyperlink{log__message_8hpp_a4a4df4bb5cffbe07aadf7d29fd44c75e}{FC\_LOG\_MESSAGE}}(}
+\DoxyCodeLine{\Hypertarget{cf__system_8cpp_source_l00030}00030\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ error,}
+\DoxyCodeLine{\Hypertarget{cf__system_8cpp_source_l00031}00031\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_assert\_code\ called\ with\ reserved\ error\ code:\ \$\{error\_code\}"{}},}
+\DoxyCodeLine{\Hypertarget{cf__system_8cpp_source_l00032}00032\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}error\_code"{}},\ error\_code)}
+\DoxyCodeLine{\Hypertarget{cf__system_8cpp_source_l00033}00033\ \ \ \ \ \ \ \ \ \ \ \ \ )\ );}
+\DoxyCodeLine{\Hypertarget{cf__system_8cpp_source_l00034}00034\ \ \ \ \ \ \ \ \ \ \ \ \ e.error\_code\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\textcolor{keyword}{>}(\mbox{\hyperlink{namespacesysio_1_1chain_a8b5ff492474737d62d2b925435c687cfac15ec335cd842894968fb202462a8319}{system\_error\_code::contract\_restricted\_error\_code}});}
+\DoxyCodeLine{\Hypertarget{cf__system_8cpp_source_l00035}00035\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ e;}
+\DoxyCodeLine{\Hypertarget{cf__system_8cpp_source_l00036}00036\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{cf__system_8cpp_source_l00037}00037\ \ \ \ \ \ \ \ \ \ \ \ \ sysio\_assert\_code\_exception\ e(\ \mbox{\hyperlink{log__message_8hpp_a4a4df4bb5cffbe07aadf7d29fd44c75e}{FC\_LOG\_MESSAGE}}(}
+\DoxyCodeLine{\Hypertarget{cf__system_8cpp_source_l00038}00038\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ error,}
+\DoxyCodeLine{\Hypertarget{cf__system_8cpp_source_l00039}00039\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}assertion\ failure\ with\ error\ code:\ \$\{error\_code\}"{}},}
+\DoxyCodeLine{\Hypertarget{cf__system_8cpp_source_l00040}00040\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}error\_code"{}},\ error\_code)}
+\DoxyCodeLine{\Hypertarget{cf__system_8cpp_source_l00041}00041\ \ \ \ \ \ \ \ \ \ \ \ \ )\ );}
+\DoxyCodeLine{\Hypertarget{cf__system_8cpp_source_l00042}00042\ \ \ \ \ \ \ \ \ \ \ \ \ e.error\_code\ =\ error\_code;}
+\DoxyCodeLine{\Hypertarget{cf__system_8cpp_source_l00043}00043\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ e;}
+\DoxyCodeLine{\Hypertarget{cf__system_8cpp_source_l00044}00044\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{cf__system_8cpp_source_l00045}00045\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{cf__system_8cpp_source_l00046}00046\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{cf__system_8cpp_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{cf__system_8cpp_source_l00048}\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_a6399c09e5e6f11f29a5a75854c0783ba}{00048}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_a6399c09e5e6f11f29a5a75854c0783ba}{interface::sysio\_exit}}(\ \mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}}\ code\ )\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{cf__system_8cpp_source_l00049}00049\ \ \ \ \ \ \ \mbox{\hyperlink{structcontext}{context}}.control.get\_wasm\_interface().exit();}
+\DoxyCodeLine{\Hypertarget{cf__system_8cpp_source_l00050}00050\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{cf__system_8cpp_source_l00051}00051\ \}\}\}\ \textcolor{comment}{//\ ns\ sysio::chain::webassembly}}
+
+\end{DoxyCode}

@@ -1,0 +1,47 @@
+\doxysection{libraries/fc/include/fc/crypto/webauthn\+\_\+json/test/perftest/perftest.cpp File Reference}
+\hypertarget{perftest_8cpp}{}\label{perftest_8cpp}\index{libraries/fc/include/fc/crypto/webauthn\_json/test/perftest/perftest.cpp@{libraries/fc/include/fc/crypto/webauthn\_json/test/perftest/perftest.cpp}}
+{\ttfamily \#include "{}perftest.\+h"{}}\newline
+Include dependency graph for perftest.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=206pt]{perftest_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{perftest_8cpp_a3c04138a5bfe5d72780bb7e82a18e627}{main}} (int argc, char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{perftest_8cpp_a3c04138a5bfe5d72780bb7e82a18e627}\index{perftest.cpp@{perftest.cpp}!main@{main}}
+\index{main@{main}!perftest.cpp@{perftest.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{perftest_8cpp_a3c04138a5bfe5d72780bb7e82a18e627} 
+int main (\begin{DoxyParamCaption}\item[{int}]{argc}{, }\item[{char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{argv}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{perftest_8cpp_source_l00017}{17}} of file \mbox{\hyperlink{perftest_8cpp_source}{perftest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00017\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#if\ \_MSC\_VER}}
+\DoxyCodeLine{00019\ \ \ \ \ \_CrtSetDbgFlag\ (\ \_CRTDBG\_ALLOC\_MEM\_DF\ |\ \_CRTDBG\_LEAK\_CHECK\_DF\ );}
+\DoxyCodeLine{00020\ \ \ \ \ \textcolor{comment}{//void\ *testWhetherMemoryLeakDetectionWorks\ =\ malloc(1);}}
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00022\ \ \ \ \ \mbox{\hyperlink{namespacetesting_afd726ae08c9bd16dc52f78c822d9946b}{::testing::InitGoogleTest}}(\&argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}});}
+\DoxyCodeLine{00023\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{gtest_8h_a853a3792807489591d3d4a2f2ff9359f}{RUN\_ALL\_TESTS}}();}
+\DoxyCodeLine{00024\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{perftest_8cpp_a3c04138a5bfe5d72780bb7e82a18e627_cgraph}
+\end{center}
+\end{figure}

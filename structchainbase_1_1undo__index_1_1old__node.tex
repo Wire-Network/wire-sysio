@@ -1,0 +1,157 @@
+\doxysection{chainbase\+::undo\+\_\+index\texorpdfstring{$<$}{<} T, Allocator, Indices \texorpdfstring{$>$}{>}\+::old\+\_\+node Struct Reference}
+\hypertarget{structchainbase_1_1undo__index_1_1old__node}{}\label{structchainbase_1_1undo__index_1_1old__node}\index{chainbase::undo\_index$<$ T, Allocator, Indices $>$::old\_node@{chainbase::undo\_index$<$ T, Allocator, Indices $>$::old\_node}}
+
+
+{\ttfamily \#include $<$undo\+\_\+index.\+hpp$>$}
+
+
+
+Inheritance diagram for chainbase\+::undo\+\_\+index\texorpdfstring{$<$}{<} T, Allocator, Indices \texorpdfstring{$>$}{>}\+::old\+\_\+node\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=344pt]{structchainbase_1_1undo__index_1_1old__node__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for chainbase\+::undo\+\_\+index\texorpdfstring{$<$}{<} T, Allocator, Indices \texorpdfstring{$>$}{>}\+::old\+\_\+node\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=344pt]{structchainbase_1_1undo__index_1_1old__node__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{structchainbase_1_1undo__index_1_1old__node_a7f23928f7b691bf207b01ab4f05d8c3a}{value\+\_\+type}} = \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}
+\item 
+using \mbox{\hyperlink{structchainbase_1_1undo__index_1_1old__node_a8eb644aafbfff3983b398d17a9b87514}{allocator\+\_\+type}} = \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename... A$>$ }\\\mbox{\hyperlink{structchainbase_1_1undo__index_1_1old__node_acaae1ccdd8f2e4453b9ac75c9775aae8}{old\+\_\+node}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&t)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{structchainbase_1_1offset__node__base}{chainbase\+::offset\+\_\+node\+\_\+base$<$ Tag $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structchainbase_1_1offset__node__base_a35e3bdbf6bde56d7c1faa49319197f91}{offset\+\_\+node\+\_\+base}} ()=default
+\item 
+\mbox{\hyperlink{structchainbase_1_1offset__node__base_ac37f24fe2c44c7b9f7f27e4ee3bf76c3}{offset\+\_\+node\+\_\+base}} (const \mbox{\hyperlink{structchainbase_1_1offset__node__base}{offset\+\_\+node\+\_\+base}} \&)
+\item 
+constexpr \mbox{\hyperlink{structchainbase_1_1offset__node__base}{offset\+\_\+node\+\_\+base}} \& \mbox{\hyperlink{structchainbase_1_1offset__node__base_a95a79fcf6d72ef78f607b216b2b8cbea}{operator=}} (const \mbox{\hyperlink{structchainbase_1_1offset__node__base}{offset\+\_\+node\+\_\+base}} \&)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{structchainbase_1_1value__holder}{chainbase\+::value\+\_\+holder$<$ T $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename... A$>$ }\\\mbox{\hyperlink{structchainbase_1_1value__holder_a95d8cf52860c872b7208bf807e920256}{value\+\_\+holder}} (\mbox{\hyperlink{struct_a}{A}} \&\&... \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structchainbase_1_1undo__index_1_1old__node_a8e63d60010ce28c4fe78f80888606f2e}{\+\_\+mtime}} = 0
+\item 
+alloc\+\_\+traits\+::pointer \mbox{\hyperlink{structchainbase_1_1undo__index_1_1old__node_a0b1d42ec61f5b2d7f1076f99a44bdf28}{\+\_\+current}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes inherited from \mbox{\hyperlink{structchainbase_1_1offset__node__base}{chainbase\+::offset\+\_\+node\+\_\+base$<$ Tag $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+std\+::ptrdiff\+\_\+t \mbox{\hyperlink{structchainbase_1_1offset__node__base_a9e50daa5816929ce243544b56fa1218e}{\+\_\+parent}}
+\item 
+std\+::ptrdiff\+\_\+t \mbox{\hyperlink{structchainbase_1_1offset__node__base_aabcf8ded0e221e86063917aea6e90bc1}{\+\_\+left}}
+\item 
+std\+::ptrdiff\+\_\+t \mbox{\hyperlink{structchainbase_1_1offset__node__base_add09954cad5a792049766d53297edba6}{\+\_\+right}}
+\item 
+int \mbox{\hyperlink{structchainbase_1_1offset__node__base_a3e3bd480ac5ca93d2108c9fefc8a4d20}{\+\_\+color}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes inherited from \mbox{\hyperlink{structchainbase_1_1value__holder}{chainbase\+::value\+\_\+holder$<$ T $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{structchainbase_1_1value__holder_a7a1d9d6b131a5f11570188e681210635}{\+\_\+item}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}, typename... Indices$>$\newline
+struct chainbase\+::undo\+\_\+index$<$ T, Allocator, Indices $>$\+::old\+\_\+node}
+
+
+Definition at line \mbox{\hyperlink{undo__index_8hpp_source_l00274}{274}} of file \mbox{\hyperlink{undo__index_8hpp_source}{undo\+\_\+index.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{structchainbase_1_1undo__index_1_1old__node_a8eb644aafbfff3983b398d17a9b87514}\index{chainbase::undo\_index$<$ T, Allocator, Indices $>$::old\_node@{chainbase::undo\_index$<$ T, Allocator, Indices $>$::old\_node}!allocator\_type@{allocator\_type}}
+\index{allocator\_type@{allocator\_type}!chainbase::undo\_index$<$ T, Allocator, Indices $>$::old\_node@{chainbase::undo\_index$<$ T, Allocator, Indices $>$::old\_node}}
+\doxysubsubsection{\texorpdfstring{allocator\_type}{allocator\_type}}
+{\footnotesize\ttfamily \label{structchainbase_1_1undo__index_1_1old__node_a8eb644aafbfff3983b398d17a9b87514} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} , typename... Indices$>$ \\
+using \mbox{\hyperlink{classchainbase_1_1undo__index}{chainbase\+::undo\+\_\+index}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}, Indices $>$\+::old\+\_\+node\+::allocator\+\_\+type = \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}}
+
+
+
+Definition at line \mbox{\hyperlink{undo__index_8hpp_source_l00276}{276}} of file \mbox{\hyperlink{undo__index_8hpp_source}{undo\+\_\+index.\+hpp}}.
+
+\Hypertarget{structchainbase_1_1undo__index_1_1old__node_a7f23928f7b691bf207b01ab4f05d8c3a}\index{chainbase::undo\_index$<$ T, Allocator, Indices $>$::old\_node@{chainbase::undo\_index$<$ T, Allocator, Indices $>$::old\_node}!value\_type@{value\_type}}
+\index{value\_type@{value\_type}!chainbase::undo\_index$<$ T, Allocator, Indices $>$::old\_node@{chainbase::undo\_index$<$ T, Allocator, Indices $>$::old\_node}}
+\doxysubsubsection{\texorpdfstring{value\_type}{value\_type}}
+{\footnotesize\ttfamily \label{structchainbase_1_1undo__index_1_1old__node_a7f23928f7b691bf207b01ab4f05d8c3a} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} , typename... Indices$>$ \\
+using \mbox{\hyperlink{classchainbase_1_1undo__index}{chainbase\+::undo\+\_\+index}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}, Indices $>$\+::old\+\_\+node\+::value\+\_\+type = \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}}
+
+
+
+Definition at line \mbox{\hyperlink{undo__index_8hpp_source_l00275}{275}} of file \mbox{\hyperlink{undo__index_8hpp_source}{undo\+\_\+index.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structchainbase_1_1undo__index_1_1old__node_acaae1ccdd8f2e4453b9ac75c9775aae8}\index{chainbase::undo\_index$<$ T, Allocator, Indices $>$::old\_node@{chainbase::undo\_index$<$ T, Allocator, Indices $>$::old\_node}!old\_node@{old\_node}}
+\index{old\_node@{old\_node}!chainbase::undo\_index$<$ T, Allocator, Indices $>$::old\_node@{chainbase::undo\_index$<$ T, Allocator, Indices $>$::old\_node}}
+\doxysubsubsection{\texorpdfstring{old\_node()}{old\_node()}}
+{\footnotesize\ttfamily \label{structchainbase_1_1undo__index_1_1old__node_acaae1ccdd8f2e4453b9ac75c9775aae8} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} , typename... Indices$>$ \\
+template$<$typename... A$>$ \\
+\mbox{\hyperlink{classchainbase_1_1undo__index}{chainbase\+::undo\+\_\+index}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}, Indices $>$\+::old\+\_\+node\+::old\+\_\+node (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{t}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{undo__index_8hpp_source_l00278}{278}} of file \mbox{\hyperlink{undo__index_8hpp_source}{undo\+\_\+index.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00278\ :\ \mbox{\hyperlink{structchainbase_1_1value__holder_a95d8cf52860c872b7208bf807e920256}{value\_holder<T>}}\{t\}\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structchainbase_1_1undo__index_1_1old__node_a0b1d42ec61f5b2d7f1076f99a44bdf28}\index{chainbase::undo\_index$<$ T, Allocator, Indices $>$::old\_node@{chainbase::undo\_index$<$ T, Allocator, Indices $>$::old\_node}!\_current@{\_current}}
+\index{\_current@{\_current}!chainbase::undo\_index$<$ T, Allocator, Indices $>$::old\_node@{chainbase::undo\_index$<$ T, Allocator, Indices $>$::old\_node}}
+\doxysubsubsection{\texorpdfstring{\_current}{\_current}}
+{\footnotesize\ttfamily \label{structchainbase_1_1undo__index_1_1old__node_a0b1d42ec61f5b2d7f1076f99a44bdf28} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} , typename... Indices$>$ \\
+alloc\+\_\+traits\+::pointer \mbox{\hyperlink{classchainbase_1_1undo__index}{chainbase\+::undo\+\_\+index}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}, Indices $>$\+::old\+\_\+node\+::\+\_\+current}
+
+
+
+Definition at line \mbox{\hyperlink{undo__index_8hpp_source_l00280}{280}} of file \mbox{\hyperlink{undo__index_8hpp_source}{undo\+\_\+index.\+hpp}}.
+
+\Hypertarget{structchainbase_1_1undo__index_1_1old__node_a8e63d60010ce28c4fe78f80888606f2e}\index{chainbase::undo\_index$<$ T, Allocator, Indices $>$::old\_node@{chainbase::undo\_index$<$ T, Allocator, Indices $>$::old\_node}!\_mtime@{\_mtime}}
+\index{\_mtime@{\_mtime}!chainbase::undo\_index$<$ T, Allocator, Indices $>$::old\_node@{chainbase::undo\_index$<$ T, Allocator, Indices $>$::old\_node}}
+\doxysubsubsection{\texorpdfstring{\_mtime}{\_mtime}}
+{\footnotesize\ttfamily \label{structchainbase_1_1undo__index_1_1old__node_a8e63d60010ce28c4fe78f80888606f2e} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} , typename... Indices$>$ \\
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{classchainbase_1_1undo__index}{chainbase\+::undo\+\_\+index}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}, Indices $>$\+::old\+\_\+node\+::\+\_\+mtime = 0}
+
+
+
+Definition at line \mbox{\hyperlink{undo__index_8hpp_source_l00279}{279}} of file \mbox{\hyperlink{undo__index_8hpp_source}{undo\+\_\+index.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chainbase/include/chainbase/\mbox{\hyperlink{undo__index_8hpp}{undo\+\_\+index.\+hpp}}\end{DoxyCompactItemize}

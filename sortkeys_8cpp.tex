@@ -1,0 +1,79 @@
+\doxysection{libraries/fc/include/fc/crypto/webauthn\+\_\+json/example/sortkeys/sortkeys.cpp File Reference}
+\hypertarget{sortkeys_8cpp}{}\label{sortkeys_8cpp}\index{libraries/fc/include/fc/crypto/webauthn\_json/example/sortkeys/sortkeys.cpp@{libraries/fc/include/fc/crypto/webauthn\_json/example/sortkeys/sortkeys.cpp}}
+{\ttfamily \#include "{}rapidjson/document.\+h"{}}\newline
+{\ttfamily \#include "{}rapidjson/filewritestream.\+h"{}}\newline
+{\ttfamily \#include $<$rapidjson/prettywriter.\+h$>$}\newline
+{\ttfamily \#include $<$algorithm$>$}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+Include dependency graph for sortkeys.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sortkeys_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_name_comparator}{Name\+Comparator}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{sortkeys_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{sortkeys_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}\index{sortkeys.cpp@{sortkeys.cpp}!main@{main}}
+\index{main@{main}!sortkeys.cpp@{sortkeys.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{sortkeys_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4} 
+int main (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sortkeys_8cpp_source_l00025}{25}} of file \mbox{\hyperlink{sortkeys_8cpp_source}{sortkeys.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00026\ \ \ \ \ \mbox{\hyperlink{class_generic_document}{Document}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}(\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7a146f46700e905e8df96a6a90b5c7640f}{kObjectType}});}
+\DoxyCodeLine{00027\ \ \ \ \ \mbox{\hyperlink{class_memory_pool_allocator}{Document::AllocatorType}}\ \&\mbox{\hyperlink{namespacechainbase_add7d4cf66ab3f2808fe613e6b0343b89}{allocator}}\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.GetAllocator();}
+\DoxyCodeLine{00028\ }
+\DoxyCodeLine{00029\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.AddMember(\textcolor{stringliteral}{"{}zeta"{}},\ \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}}().SetBool(\textcolor{keyword}{false}),\ allocator);}
+\DoxyCodeLine{00030\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.AddMember(\textcolor{stringliteral}{"{}gama"{}},\ \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}}().SetString(\textcolor{stringliteral}{"{}test\ string"{}},\ allocator),\ allocator);}
+\DoxyCodeLine{00031\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.AddMember(\textcolor{stringliteral}{"{}delta"{}},\ \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}}().SetInt(123),\ allocator);}
+\DoxyCodeLine{00032\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.AddMember(\textcolor{stringliteral}{"{}alpha"{}},\ \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}}(\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7af41527d6925efa3c5c3dadb23dfef7c8}{kArrayType}}).Move(),\ allocator);}
+\DoxyCodeLine{00033\ }
+\DoxyCodeLine{00034\ \ \ \ \ printIt(d);}
+\DoxyCodeLine{00035\ }
+\DoxyCodeLine{00036\ \textcolor{comment}{/*}}
+\DoxyCodeLine{00037\ \textcolor{comment}{\{}}
+\DoxyCodeLine{00038\ \textcolor{comment}{\ \ \ \ "{}zeta"{}:\ false,}}
+\DoxyCodeLine{00039\ \textcolor{comment}{\ \ \ \ "{}gama"{}:\ "{}test\ string"{},}}
+\DoxyCodeLine{00040\ \textcolor{comment}{\ \ \ \ "{}delta"{}:\ 123,}}
+\DoxyCodeLine{00041\ \textcolor{comment}{\ \ \ \ "{}alpha"{}:\ []}}
+\DoxyCodeLine{00042\ \textcolor{comment}{\}}}
+\DoxyCodeLine{00043\ \textcolor{comment}{*/}}
+\DoxyCodeLine{00044\ }
+\DoxyCodeLine{00045\ \textcolor{comment}{//\ C++11\ supports\ std::move()\ of\ Value\ so\ it\ always\ have\ no\ problem\ for\ std::sort().}}
+\DoxyCodeLine{00046\ \textcolor{comment}{//\ Some\ C++03\ implementations\ of\ std::sort()\ requires\ copy\ constructor\ which\ causes\ compilation\ error.}}
+\DoxyCodeLine{00047\ \textcolor{comment}{//\ Needs\ a\ sorting\ function\ only\ depends\ on\ std::swap()\ instead.}}
+\DoxyCodeLine{00048\ \textcolor{preprocessor}{\#if\ \_\_cplusplus\ >=\ 201103L\ ||\ !defined(\_\_GLIBCXX\_\_)}}
+\DoxyCodeLine{00049\ \ \ \ \ std::sort(\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.MemberBegin(),\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.MemberEnd(),\ \mbox{\hyperlink{struct_name_comparator}{NameComparator}}());}
+\DoxyCodeLine{00050\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00051\ }
+\DoxyCodeLine{00052\ \ \ \ \ printIt(d);}
+\DoxyCodeLine{00053\ }
+\DoxyCodeLine{00054\ \textcolor{comment}{/*}}
+\DoxyCodeLine{00055\ \textcolor{comment}{\{}}
+\DoxyCodeLine{00056\ \textcolor{comment}{\ \ "{}alpha"{}:\ [],}}
+\DoxyCodeLine{00057\ \textcolor{comment}{\ \ "{}delta"{}:\ 123,}}
+\DoxyCodeLine{00058\ \textcolor{comment}{\ \ "{}gama"{}:\ "{}test\ string"{},}}
+\DoxyCodeLine{00059\ \textcolor{comment}{\ \ "{}zeta"{}:\ false}}
+\DoxyCodeLine{00060\ \textcolor{comment}{\}}}
+\DoxyCodeLine{00061\ \textcolor{comment}{*/}}
+\DoxyCodeLine{00062\ \}}
+
+\end{DoxyCode}

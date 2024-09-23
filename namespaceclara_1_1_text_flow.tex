@@ -1,0 +1,84 @@
+\doxysection{clara\+::Text\+Flow Namespace Reference}
+\hypertarget{namespaceclara_1_1_text_flow}{}\label{namespaceclara_1_1_text_flow}\index{clara::TextFlow@{clara::TextFlow}}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classclara_1_1_text_flow_1_1_column}{Column}}
+\item 
+class \mbox{\hyperlink{classclara_1_1_text_flow_1_1_columns}{Columns}}
+\item 
+class \mbox{\hyperlink{classclara_1_1_text_flow_1_1_spacer}{Spacer}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+auto \mbox{\hyperlink{namespaceclara_1_1_text_flow_afef6a49e0a83b3b6e8bba02196f50c9d}{is\+Whitespace}} (char c) -\/$>$ bool
+\item 
+auto \mbox{\hyperlink{namespaceclara_1_1_text_flow_a8feab057737f7f831088d401d2ce8352}{is\+Breakable\+Before}} (char c) -\/$>$ bool
+\item 
+auto \mbox{\hyperlink{namespaceclara_1_1_text_flow_ae41bbff61c6975c2fd5b655eaa8c5e59}{is\+Breakable\+After}} (char c) -\/$>$ bool
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespaceclara_1_1_text_flow_ae41bbff61c6975c2fd5b655eaa8c5e59}\index{clara::TextFlow@{clara::TextFlow}!isBreakableAfter@{isBreakableAfter}}
+\index{isBreakableAfter@{isBreakableAfter}!clara::TextFlow@{clara::TextFlow}}
+\doxysubsubsection{\texorpdfstring{isBreakableAfter()}{isBreakableAfter()}}
+{\footnotesize\ttfamily \label{namespaceclara_1_1_text_flow_ae41bbff61c6975c2fd5b655eaa8c5e59} 
+auto clara\+::\+Text\+Flow\+::is\+Breakable\+After (\begin{DoxyParamCaption}\item[{char}]{c}{}\end{DoxyParamCaption}) -\/$>$ bool \hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{third__party_2clara_8hpp_source_l00065}{65}} of file \mbox{\hyperlink{third__party_2clara_8hpp_source}{clara.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ std::string\ chars\ =\ \textcolor{stringliteral}{"{}])\}>.,:;*+-\/=\&/\(\backslash\)\(\backslash\)"{}};}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ chars.find(\ c\ )\ !=\ std::string::npos;}
+\DoxyCodeLine{00068\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespaceclara_1_1_text_flow_a8feab057737f7f831088d401d2ce8352}\index{clara::TextFlow@{clara::TextFlow}!isBreakableBefore@{isBreakableBefore}}
+\index{isBreakableBefore@{isBreakableBefore}!clara::TextFlow@{clara::TextFlow}}
+\doxysubsubsection{\texorpdfstring{isBreakableBefore()}{isBreakableBefore()}}
+{\footnotesize\ttfamily \label{namespaceclara_1_1_text_flow_a8feab057737f7f831088d401d2ce8352} 
+auto clara\+::\+Text\+Flow\+::is\+Breakable\+Before (\begin{DoxyParamCaption}\item[{char}]{c}{}\end{DoxyParamCaption}) -\/$>$ bool \hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{third__party_2clara_8hpp_source_l00061}{61}} of file \mbox{\hyperlink{third__party_2clara_8hpp_source}{clara.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ std::string\ chars\ =\ \textcolor{stringliteral}{"{}[(\{<|"{}};}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ chars.find(\ c\ )\ !=\ std::string::npos;}
+\DoxyCodeLine{00064\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespaceclara_1_1_text_flow_afef6a49e0a83b3b6e8bba02196f50c9d}\index{clara::TextFlow@{clara::TextFlow}!isWhitespace@{isWhitespace}}
+\index{isWhitespace@{isWhitespace}!clara::TextFlow@{clara::TextFlow}}
+\doxysubsubsection{\texorpdfstring{isWhitespace()}{isWhitespace()}}
+{\footnotesize\ttfamily \label{namespaceclara_1_1_text_flow_afef6a49e0a83b3b6e8bba02196f50c9d} 
+auto clara\+::\+Text\+Flow\+::is\+Whitespace (\begin{DoxyParamCaption}\item[{char}]{c}{}\end{DoxyParamCaption}) -\/$>$ bool \hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{third__party_2clara_8hpp_source_l00057}{57}} of file \mbox{\hyperlink{third__party_2clara_8hpp_source}{clara.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ std::string\ chars\ =\ \textcolor{stringliteral}{"{}\ \(\backslash\)t\(\backslash\)n\(\backslash\)r"{}};}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ chars.find(\ c\ )\ !=\ std::string::npos;}
+\DoxyCodeLine{00060\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespaceclara_1_1_text_flow_afef6a49e0a83b3b6e8bba02196f50c9d_icgraph}
+\end{center}
+\end{figure}

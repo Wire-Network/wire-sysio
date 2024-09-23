@@ -1,0 +1,114 @@
+\doxysection{websocketpp\+::extensions\+::error\+::category Class Reference}
+\hypertarget{classwebsocketpp_1_1extensions_1_1error_1_1category}{}\label{classwebsocketpp_1_1extensions_1_1error_1_1category}\index{websocketpp::extensions::error::category@{websocketpp::extensions::error::category}}
+
+
+{\ttfamily \#include $<$extension.\+hpp$>$}
+
+
+
+Inheritance diagram for websocketpp\+::extensions\+::error\+::category\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=207pt]{classwebsocketpp_1_1extensions_1_1error_1_1category__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for websocketpp\+::extensions\+::error\+::category\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=207pt]{classwebsocketpp_1_1extensions_1_1error_1_1category__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1error_1_1category_a044e36e73724d3245223225994e199dd}{category}} ()
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1error_1_1category_af7dde8336a9ae57e5ff28813d584538c}{name}} () const \mbox{\hyperlink{cpp11_8hpp_aa19747404a5f2fe9c9eb9e9d2e48f26c}{\+\_\+\+WEBSOCKETPP\+\_\+\+NOEXCEPT\+\_\+\+TOKEN\+\_\+}}
+\item 
+std\+::string \mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1error_1_1category_a33bf4e8370bf9ba17b30e33a391788ae}{message}} (int \mbox{\hyperlink{namespacewebsocketpp_1_1extensions_1_1error_a18c17e561b5a8e2dfc0d98437039f7bf}{value}}) const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{extension_8hpp_source_l00061}{61}} of file \mbox{\hyperlink{extension_8hpp_source}{extension.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classwebsocketpp_1_1extensions_1_1error_1_1category_a044e36e73724d3245223225994e199dd}\index{websocketpp::extensions::error::category@{websocketpp::extensions::error::category}!category@{category}}
+\index{category@{category}!websocketpp::extensions::error::category@{websocketpp::extensions::error::category}}
+\doxysubsubsection{\texorpdfstring{category()}{category()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1extensions_1_1error_1_1category_a044e36e73724d3245223225994e199dd} 
+websocketpp\+::extensions\+::error\+::category\+::category (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{extension_8hpp_source_l00063}{63}} of file \mbox{\hyperlink{extension_8hpp_source}{extension.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00063\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classwebsocketpp_1_1extensions_1_1error_1_1category_a33bf4e8370bf9ba17b30e33a391788ae}\index{websocketpp::extensions::error::category@{websocketpp::extensions::error::category}!message@{message}}
+\index{message@{message}!websocketpp::extensions::error::category@{websocketpp::extensions::error::category}}
+\doxysubsubsection{\texorpdfstring{message()}{message()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1extensions_1_1error_1_1category_a33bf4e8370bf9ba17b30e33a391788ae} 
+std\+::string websocketpp\+::extensions\+::error\+::category\+::message (\begin{DoxyParamCaption}\item[{int}]{value}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{extension_8hpp_source_l00069}{69}} of file \mbox{\hyperlink{extension_8hpp_source}{extension.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(\mbox{\hyperlink{namespacewebsocketpp_1_1extensions_1_1error_a18c17e561b5a8e2dfc0d98437039f7bf}{value}})\ \{}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacewebsocketpp_1_1extensions_1_1error_a18c17e561b5a8e2dfc0d98437039f7bfac39a76eafbc93ace07bae99c7a786583}{general}}:}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Generic\ extension\ error"{}};}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacewebsocketpp_1_1extensions_1_1error_a18c17e561b5a8e2dfc0d98437039f7bfa7e91bee498e79963a6fd48aac73bba5c}{disabled}}:}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Use\ of\ methods\ from\ disabled\ extension"{}};}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Unknown\ permessage-\/compress\ error"{}};}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00078\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1extensions_1_1error_1_1category_af7dde8336a9ae57e5ff28813d584538c}\index{websocketpp::extensions::error::category@{websocketpp::extensions::error::category}!name@{name}}
+\index{name@{name}!websocketpp::extensions::error::category@{websocketpp::extensions::error::category}}
+\doxysubsubsection{\texorpdfstring{name()}{name()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1extensions_1_1error_1_1category_af7dde8336a9ae57e5ff28813d584538c} 
+const char \texorpdfstring{$\ast$}{*} websocketpp\+::extensions\+::error\+::category\+::name (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{extension_8hpp_source_l00065}{65}} of file \mbox{\hyperlink{extension_8hpp_source}{extension.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}websocketpp.extension"{}};}
+\DoxyCodeLine{00067\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1extensions_1_1error_1_1category_af7dde8336a9ae57e5ff28813d584538c_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/vendor/websocketpp/websocketpp/extensions/\mbox{\hyperlink{extension_8hpp}{extension.\+hpp}}\end{DoxyCompactItemize}

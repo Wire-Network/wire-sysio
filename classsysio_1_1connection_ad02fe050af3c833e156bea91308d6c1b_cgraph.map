@@ -1,0 +1,30 @@
+<map id="sysio::connection::check_heartbeat" name="sysio::connection::check_heartbeat">
+<area shape="rect" id="Node000001" title="Check heartbeat time and send Time_message." alt="" coords="5,104,137,145"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1connection.html#a7fe7bb50b91bd69cdf56c7c09a868e29" title=" " alt="" coords="185,5,316,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="106,101,183,57,193,51,196,56,186,61,108,106"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1connection.html#aca3e3acacf8047c389e0bda758da197d" title=" " alt="" coords="185,71,316,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="137,109,169,103,170,109,138,115"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1connection.html#a55b561baeda5353d7c1a1e2a8a0c88e1" title=" " alt="" coords="185,136,316,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="138,133,170,139,169,145,137,139"/>
+<area shape="rect" id="Node000007" href="$classsysio_1_1connection.html#a1c134c29679142daab81ca9fe4a10996" title="Populate and queue time_message." alt="" coords="185,201,316,242"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="109,143,186,186,196,191,194,196,183,191,107,147"/>
+<area shape="rect" id="Node000005" href="$classfc_1_1sha256.html#a71ac4efc1d964d24fdf00aeffcf0a9c9" title=" " alt="" coords="377,144,482,169"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="316,154,362,154,362,159,316,159"/>
+<area shape="rect" id="Node000006" href="$namespacefc.html#aab567c89004d329f560014d9943afcd6" title=" " alt="" coords="574,144,653,169"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="483,154,558,154,558,159,483,159"/>
+<area shape="poly" id="edge6_Node000006_Node000006" title=" " alt="" coords="582,145,576,135,580,125,593,119,614,117,636,119,647,126,645,131,634,124,613,122,594,124,584,129,582,134,587,142"/>
+<area shape="rect" id="Node000008" href="$classsysio_1_1connection.html#ad6a1bcdfc4bd9d2c7ab2278240def6b6" title=" " alt="" coords="364,197,495,238"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="316,218,348,217,349,222,317,223"/>
+<area shape="rect" id="Node000014" href="$classsysio_1_1connection.html#aa74b147947e087bc084d72a3d892a06f" title="Read system time and convert to a 64 bit integer." alt="" coords="364,263,495,303"/>
+<area shape="poly" id="edge14_Node000007_Node000014" title=" " alt="" coords="313,240,355,255,353,260,311,245"/>
+<area shape="rect" id="Node000009" href="$structsysio_1_1buffer__factory.html#a480d021121170a01b8148078a6f4e29f" title="caches result for subsequent calls, only provide same net_message instance for each invocation" alt="" coords="543,193,684,234"/>
+<area shape="poly" id="edge9_Node000008_Node000009" title=" " alt="" coords="496,214,528,213,528,218,496,219"/>
+<area shape="rect" id="Node000010" href="$namespacesysio.html#a19cc0c616331757f980d857722b4e07e" title=" " alt="" coords="546,259,681,299"/>
+<area shape="poly" id="edge10_Node000008_Node000010" title=" " alt="" coords="494,236,537,251,535,256,492,241"/>
+<area shape="rect" id="Node000011" href="$namespaceappbase.html#a99374dc23934f008a09f2f79be9eae40" title=" " alt="" coords="752,237,852,262"/>
+<area shape="poly" id="edge11_Node000010_Node000011" title=" " alt="" coords="681,266,737,257,738,262,682,271"/>
+<area shape="rect" id="Node000013" href="$classappbase_1_1application.html#a81aa58d3f94570b7976145039155fc46" title=" " alt="" coords="732,287,872,327"/>
+<area shape="poly" id="edge13_Node000010_Node000013" title=" " alt="" coords="682,286,717,292,716,297,681,292"/>
+<area shape="rect" id="Node000012" href="$classappbase_1_1application.html#ac874b2659b400fe254f1ae4260d06ecf" title=" " alt="" coords="920,229,1060,270"/>
+<area shape="poly" id="edge12_Node000011_Node000012" title=" " alt="" coords="852,247,904,247,904,252,852,252"/>
+</map>

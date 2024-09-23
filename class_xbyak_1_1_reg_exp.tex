@@ -1,0 +1,369 @@
+\doxysection{Xbyak\+::Reg\+Exp Class Reference}
+\hypertarget{class_xbyak_1_1_reg_exp}{}\label{class_xbyak_1_1_reg_exp}\index{Xbyak::RegExp@{Xbyak::RegExp}}
+
+
+{\ttfamily \#include $<$xbyak.\+h$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \{ \mbox{\hyperlink{class_xbyak_1_1_reg_exp_af8c41835a6bd58e90ec7daef8c5e201ca8acada9d9e1122cd33799af36cf94957}{i32e}} = 32
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_xbyak_1_1_reg_exp_a11a3a5ab491486ff7cec69b06e5e52e6}{Reg\+Exp}} (size\+\_\+t disp=0)
+\item 
+\mbox{\hyperlink{class_xbyak_1_1_reg_exp_ae0c03acf5f3aed3d19db9cce70916afc}{Reg\+Exp}} (const \mbox{\hyperlink{class_xbyak_1_1_reg}{Reg}} \&\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}, int scale=1)
+\item 
+bool \mbox{\hyperlink{class_xbyak_1_1_reg_exp_a89d0581f1d51626ac332d08aed0ead7e}{is\+Vsib}} (int \mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}}=128\texorpdfstring{$\vert$}{|}256\texorpdfstring{$\vert$}{|}512) const
+\item 
+\mbox{\hyperlink{class_xbyak_1_1_reg_exp}{Reg\+Exp}} \mbox{\hyperlink{class_xbyak_1_1_reg_exp_a60c2a7f5b49f6c5cd7fae319f2c93018}{optimize}} () const
+\item 
+bool \mbox{\hyperlink{class_xbyak_1_1_reg_exp_a6dfcd3fdb2cefd41c4b32eca27efc6a5}{operator==}} (const \mbox{\hyperlink{class_xbyak_1_1_reg_exp}{Reg\+Exp}} \&rhs) const
+\item 
+const \mbox{\hyperlink{class_xbyak_1_1_reg}{Reg}} \& \mbox{\hyperlink{class_xbyak_1_1_reg_exp_a05a62626805e525926499d900adfbb04}{get\+Base}} () const
+\item 
+const \mbox{\hyperlink{class_xbyak_1_1_reg}{Reg}} \& \mbox{\hyperlink{class_xbyak_1_1_reg_exp_af884a8375c52991c759e48c7098ea9b6}{get\+Index}} () const
+\item 
+int \mbox{\hyperlink{class_xbyak_1_1_reg_exp_a209d568cb4e569e3a8b2c401365e57ef}{get\+Scale}} () const
+\item 
+size\+\_\+t \mbox{\hyperlink{class_xbyak_1_1_reg_exp_a4b3d96707764221679b0291f9d25e09a}{get\+Disp}} () const
+\item 
+void \mbox{\hyperlink{class_xbyak_1_1_reg_exp_ae8b2d0de703e57d91fce96c9997c41ad}{verify}} () const
+\item 
+\mbox{\hyperlink{normalize__prefix_8cpp_adde6aaee8457bee49c2a92621fe22b79}{uint8}} \mbox{\hyperlink{class_xbyak_1_1_reg_exp_a524d3abbe35d36ec69f30e5f60fe9abe}{get\+Rex}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_xbyak_1_1_reg_exp}{Reg\+Exp}} \mbox{\hyperlink{class_xbyak_1_1_reg_exp_a789f48550ba8275413455e7cfa20863a}{operator+}} (const \mbox{\hyperlink{class_xbyak_1_1_reg_exp}{Reg\+Exp}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, const \mbox{\hyperlink{class_xbyak_1_1_reg_exp}{Reg\+Exp}} \&b)
+\item 
+\mbox{\hyperlink{class_xbyak_1_1_reg_exp}{Reg\+Exp}} \mbox{\hyperlink{class_xbyak_1_1_reg_exp_a0c2dd2cf50ca9dc4b7bc2e2336c0a5aa}{operator-\/}} (const \mbox{\hyperlink{class_xbyak_1_1_reg_exp}{Reg\+Exp}} \&e, size\+\_\+t disp)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00690}{690}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+
+\doxysubsection{Member Enumeration Documentation}
+\Hypertarget{class_xbyak_1_1_reg_exp_af8c41835a6bd58e90ec7daef8c5e201c}\doxysubsubsection{\texorpdfstring{anonymous enum}{anonymous enum}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_reg_exp_af8c41835a6bd58e90ec7daef8c5e201c} 
+anonymous enum}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{i32e@{i32e}!Xbyak::RegExp@{Xbyak::RegExp}}\index{Xbyak::RegExp@{Xbyak::RegExp}!i32e@{i32e}}}\Hypertarget{class_xbyak_1_1_reg_exp_af8c41835a6bd58e90ec7daef8c5e201ca8acada9d9e1122cd33799af36cf94957}\label{class_xbyak_1_1_reg_exp_af8c41835a6bd58e90ec7daef8c5e201c} 
+i32e&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00695}{695}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00695\ \{\ \mbox{\hyperlink{class_xbyak_1_1_reg_exp_af8c41835a6bd58e90ec7daef8c5e201ca8acada9d9e1122cd33799af36cf94957}{i32e}}\ =\ 32\ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_xbyak_1_1_reg_exp_a11a3a5ab491486ff7cec69b06e5e52e6}\index{Xbyak::RegExp@{Xbyak::RegExp}!RegExp@{RegExp}}
+\index{RegExp@{RegExp}!Xbyak::RegExp@{Xbyak::RegExp}}
+\doxysubsubsection{\texorpdfstring{RegExp()}{RegExp()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_reg_exp_a11a3a5ab491486ff7cec69b06e5e52e6} 
+Xbyak\+::\+Reg\+Exp\+::\+Reg\+Exp (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{disp}{ = {\ttfamily 0}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00697}{697}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00697\ :\ scale\_(0),\ disp\_(disp)\ \{\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_xbyak_1_1_reg_exp_ae0c03acf5f3aed3d19db9cce70916afc}\index{Xbyak::RegExp@{Xbyak::RegExp}!RegExp@{RegExp}}
+\index{RegExp@{RegExp}!Xbyak::RegExp@{Xbyak::RegExp}}
+\doxysubsubsection{\texorpdfstring{RegExp()}{RegExp()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_reg_exp_ae0c03acf5f3aed3d19db9cce70916afc} 
+Xbyak\+::\+Reg\+Exp\+::\+Reg\+Exp (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_xbyak_1_1_reg}{Reg}} \&}]{r}{, }\item[{int}]{scale}{ = {\ttfamily 1}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00698}{698}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00699\ \ \ \ \ \ \ \ \ :\ scale\_(scale)}
+\DoxyCodeLine{00700\ \ \ \ \ \ \ \ \ ,\ disp\_(0)}
+\DoxyCodeLine{00701\ \ \ \ \ \{}
+\DoxyCodeLine{00702\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.isREG(\mbox{\hyperlink{class_xbyak_1_1_reg_exp_af8c41835a6bd58e90ec7daef8c5e201ca8acada9d9e1122cd33799af36cf94957}{i32e}})\ \&\&\ !\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.is(\mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933ba974504afdac8c2f752da0fc0df5f9ae2}{Reg::XMM}}|\mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933baa1754a37db134c90663f28c713a5ad04}{Reg::YMM}}|\mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933ba779c9b07696cb348f7b5768894569d4e}{Reg::ZMM}}))\ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{calc_8cpp_a2c3e4bb40f36b262a5214e2da2bca9c5}{Error}}(\mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a22bbe3522f8ea9a5c9fbd8a8ccd2e56a}{ERR\_BAD\_SIZE\_OF\_REGISTER}});}
+\DoxyCodeLine{00703\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (scale\ ==\ 0)\ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00704\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (scale\ !=\ 1\ \&\&\ scale\ !=\ 2\ \&\&\ scale\ !=\ 4\ \&\&\ scale\ !=\ 8)\ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{calc_8cpp_a2c3e4bb40f36b262a5214e2da2bca9c5}{Error}}(\mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a246caaa68df0ce2348c190bcd4051016}{ERR\_BAD\_SCALE}});}
+\DoxyCodeLine{00705\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.getBit()\ >=\ 128\ ||\ scale\ !=\ 1)\ \{\ \textcolor{comment}{//\ xmm/ymm\ is\ always\ index}}
+\DoxyCodeLine{00706\ \ \ \ \ \ \ \ \ \ \ \ \ index\_\ =\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};}
+\DoxyCodeLine{00707\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00708\ \ \ \ \ \ \ \ \ \ \ \ \ base\_\ =\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};}
+\DoxyCodeLine{00709\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00710\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_xbyak_1_1_reg_exp_a05a62626805e525926499d900adfbb04}\index{Xbyak::RegExp@{Xbyak::RegExp}!getBase@{getBase}}
+\index{getBase@{getBase}!Xbyak::RegExp@{Xbyak::RegExp}}
+\doxysubsubsection{\texorpdfstring{getBase()}{getBase()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_reg_exp_a05a62626805e525926499d900adfbb04} 
+const \mbox{\hyperlink{class_xbyak_1_1_reg}{Reg}} \& Xbyak\+::\+Reg\+Exp\+::get\+Base (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00726}{726}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00726\ \{\ \textcolor{keywordflow}{return}\ base\_;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{class_xbyak_1_1_reg_exp_a05a62626805e525926499d900adfbb04_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_xbyak_1_1_reg_exp_a4b3d96707764221679b0291f9d25e09a}\index{Xbyak::RegExp@{Xbyak::RegExp}!getDisp@{getDisp}}
+\index{getDisp@{getDisp}!Xbyak::RegExp@{Xbyak::RegExp}}
+\doxysubsubsection{\texorpdfstring{getDisp()}{getDisp()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_reg_exp_a4b3d96707764221679b0291f9d25e09a} 
+size\+\_\+t Xbyak\+::\+Reg\+Exp\+::get\+Disp (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00729}{729}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00729\ \{\ \textcolor{keywordflow}{return}\ disp\_;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{class_xbyak_1_1_reg_exp_a4b3d96707764221679b0291f9d25e09a_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_xbyak_1_1_reg_exp_af884a8375c52991c759e48c7098ea9b6}\index{Xbyak::RegExp@{Xbyak::RegExp}!getIndex@{getIndex}}
+\index{getIndex@{getIndex}!Xbyak::RegExp@{Xbyak::RegExp}}
+\doxysubsubsection{\texorpdfstring{getIndex()}{getIndex()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_reg_exp_af884a8375c52991c759e48c7098ea9b6} 
+const \mbox{\hyperlink{class_xbyak_1_1_reg}{Reg}} \& Xbyak\+::\+Reg\+Exp\+::get\+Index (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00727}{727}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00727\ \{\ \textcolor{keywordflow}{return}\ index\_;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{class_xbyak_1_1_reg_exp_af884a8375c52991c759e48c7098ea9b6_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_xbyak_1_1_reg_exp_a524d3abbe35d36ec69f30e5f60fe9abe}\index{Xbyak::RegExp@{Xbyak::RegExp}!getRex@{getRex}}
+\index{getRex@{getRex}!Xbyak::RegExp@{Xbyak::RegExp}}
+\doxysubsubsection{\texorpdfstring{getRex()}{getRex()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_reg_exp_a524d3abbe35d36ec69f30e5f60fe9abe} 
+\mbox{\hyperlink{normalize__prefix_8cpp_adde6aaee8457bee49c2a92621fe22b79}{uint8}} Xbyak\+::\+Reg\+Exp\+::get\+Rex (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00740}{740}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00741\ \ \ \ \ \{}
+\DoxyCodeLine{00742\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{normalize__prefix_8cpp_adde6aaee8457bee49c2a92621fe22b79}{uint8}}\ rex\ =\ index\_.\mbox{\hyperlink{class_xbyak_1_1_reg_a95aef03c473024b08fea9dd74d2ed38e}{getRexX}}()\ |\ base\_.\mbox{\hyperlink{class_xbyak_1_1_reg_ade8f58e5ece3423f552408ec9bf82a84}{getRexB}}();}
+\DoxyCodeLine{00743\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ rex\ ?\ \mbox{\hyperlink{normalize__prefix_8cpp_adde6aaee8457bee49c2a92621fe22b79}{uint8}}(rex\ |\ 0x40)\ :\ 0;}
+\DoxyCodeLine{00744\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_xbyak_1_1_reg_exp_a209d568cb4e569e3a8b2c401365e57ef}\index{Xbyak::RegExp@{Xbyak::RegExp}!getScale@{getScale}}
+\index{getScale@{getScale}!Xbyak::RegExp@{Xbyak::RegExp}}
+\doxysubsubsection{\texorpdfstring{getScale()}{getScale()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_reg_exp_a209d568cb4e569e3a8b2c401365e57ef} 
+int Xbyak\+::\+Reg\+Exp\+::get\+Scale (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00728}{728}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00728\ \{\ \textcolor{keywordflow}{return}\ scale\_;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_xbyak_1_1_reg_exp_a89d0581f1d51626ac332d08aed0ead7e}\index{Xbyak::RegExp@{Xbyak::RegExp}!isVsib@{isVsib}}
+\index{isVsib@{isVsib}!Xbyak::RegExp@{Xbyak::RegExp}}
+\doxysubsubsection{\texorpdfstring{isVsib()}{isVsib()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_reg_exp_a89d0581f1d51626ac332d08aed0ead7e} 
+bool Xbyak\+::\+Reg\+Exp\+::is\+Vsib (\begin{DoxyParamCaption}\item[{int}]{bit}{ = {\ttfamily 128~\texorpdfstring{$\vert$}{|}~256~\texorpdfstring{$\vert$}{|}~512}}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00711}{711}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00711\ \{\ \textcolor{keywordflow}{return}\ index\_.\mbox{\hyperlink{class_xbyak_1_1_operand_ab7597e16695f902c54b47f3e57d938b5}{isBit}}(\mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}});\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=346pt]{class_xbyak_1_1_reg_exp_a89d0581f1d51626ac332d08aed0ead7e_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_xbyak_1_1_reg_exp_a89d0581f1d51626ac332d08aed0ead7e_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_xbyak_1_1_reg_exp_a6dfcd3fdb2cefd41c4b32eca27efc6a5}\index{Xbyak::RegExp@{Xbyak::RegExp}!operator==@{operator==}}
+\index{operator==@{operator==}!Xbyak::RegExp@{Xbyak::RegExp}}
+\doxysubsubsection{\texorpdfstring{operator==()}{operator==()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_reg_exp_a6dfcd3fdb2cefd41c4b32eca27efc6a5} 
+bool Xbyak\+::\+Reg\+Exp\+::operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_xbyak_1_1_reg_exp}{Reg\+Exp}} \&}]{rhs}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00722}{722}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00723\ \ \ \ \ \{}
+\DoxyCodeLine{00724\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ base\_\ ==\ rhs.base\_\ \&\&\ index\_\ ==\ rhs.index\_\ \&\&\ disp\_\ ==\ rhs.disp\_\ \&\&\ scale\_\ ==\ rhs.scale\_;}
+\DoxyCodeLine{00725\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_xbyak_1_1_reg_exp_a60c2a7f5b49f6c5cd7fae319f2c93018}\index{Xbyak::RegExp@{Xbyak::RegExp}!optimize@{optimize}}
+\index{optimize@{optimize}!Xbyak::RegExp@{Xbyak::RegExp}}
+\doxysubsubsection{\texorpdfstring{optimize()}{optimize()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_reg_exp_a60c2a7f5b49f6c5cd7fae319f2c93018} 
+\mbox{\hyperlink{class_xbyak_1_1_reg_exp}{Reg\+Exp}} Xbyak\+::\+Reg\+Exp\+::optimize (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00712}{712}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00713\ \ \ \ \ \{}
+\DoxyCodeLine{00714\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_reg_exp_a11a3a5ab491486ff7cec69b06e5e52e6}{RegExp}}\ exp\ =\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00715\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ [reg\ *\ 2]\ =>\ [reg\ +\ reg]}}
+\DoxyCodeLine{00716\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (index\_.\mbox{\hyperlink{class_xbyak_1_1_operand_ab7597e16695f902c54b47f3e57d938b5}{isBit}}(\mbox{\hyperlink{class_xbyak_1_1_reg_exp_af8c41835a6bd58e90ec7daef8c5e201ca8acada9d9e1122cd33799af36cf94957}{i32e}})\ \&\&\ !base\_.\mbox{\hyperlink{class_xbyak_1_1_operand_ab855bd6658a3e238422d2bcf81f96873}{getBit}}()\ \&\&\ scale\_\ ==\ 2)\ \{}
+\DoxyCodeLine{00717\ \ \ \ \ \ \ \ \ \ \ \ \ exp.base\_\ =\ index\_;}
+\DoxyCodeLine{00718\ \ \ \ \ \ \ \ \ \ \ \ \ exp.scale\_\ =\ 1;}
+\DoxyCodeLine{00719\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00720\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ exp;}
+\DoxyCodeLine{00721\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_xbyak_1_1_reg_exp_ae8b2d0de703e57d91fce96c9997c41ad}\index{Xbyak::RegExp@{Xbyak::RegExp}!verify@{verify}}
+\index{verify@{verify}!Xbyak::RegExp@{Xbyak::RegExp}}
+\doxysubsubsection{\texorpdfstring{verify()}{verify()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_reg_exp_ae8b2d0de703e57d91fce96c9997c41ad} 
+void Xbyak\+::\+Reg\+Exp\+::verify (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00730}{730}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00731\ \ \ \ \ \{}
+\DoxyCodeLine{00732\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (base\_.\mbox{\hyperlink{class_xbyak_1_1_operand_ab855bd6658a3e238422d2bcf81f96873}{getBit}}()\ >=\ 128)\ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{calc_8cpp_a2c3e4bb40f36b262a5214e2da2bca9c5}{Error}}(\mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a22bbe3522f8ea9a5c9fbd8a8ccd2e56a}{ERR\_BAD\_SIZE\_OF\_REGISTER}});}
+\DoxyCodeLine{00733\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (index\_.\mbox{\hyperlink{class_xbyak_1_1_operand_ab855bd6658a3e238422d2bcf81f96873}{getBit}}()\ \&\&\ index\_.\mbox{\hyperlink{class_xbyak_1_1_operand_ab855bd6658a3e238422d2bcf81f96873}{getBit}}()\ <=\ 64)\ \{}
+\DoxyCodeLine{00734\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (index\_.\mbox{\hyperlink{class_xbyak_1_1_operand_a9722a98c75928e06e3be3198b7aaa426}{getIdx}}()\ ==\ \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a1027bc617f8f52395078e43b96d0bb5a}{Operand::ESP}})\ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{calc_8cpp_a2c3e4bb40f36b262a5214e2da2bca9c5}{Error}}(\mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06ade9914e9d4ec6a6a91c632bb6a883485}{ERR\_ESP\_CANT\_BE\_INDEX}});}
+\DoxyCodeLine{00735\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (base\_.\mbox{\hyperlink{class_xbyak_1_1_operand_ab855bd6658a3e238422d2bcf81f96873}{getBit}}()\ \&\&\ base\_.\mbox{\hyperlink{class_xbyak_1_1_operand_ab855bd6658a3e238422d2bcf81f96873}{getBit}}()\ !=\ index\_.\mbox{\hyperlink{class_xbyak_1_1_operand_ab855bd6658a3e238422d2bcf81f96873}{getBit}}())\ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{calc_8cpp_a2c3e4bb40f36b262a5214e2da2bca9c5}{Error}}(\mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a22bbe3522f8ea9a5c9fbd8a8ccd2e56a}{ERR\_BAD\_SIZE\_OF\_REGISTER}});}
+\DoxyCodeLine{00736\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00737\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{class_xbyak_1_1_reg_exp_a789f48550ba8275413455e7cfa20863a}\index{Xbyak::RegExp@{Xbyak::RegExp}!operator+@{operator+}}
+\index{operator+@{operator+}!Xbyak::RegExp@{Xbyak::RegExp}}
+\doxysubsubsection{\texorpdfstring{operator+}{operator+}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_reg_exp_a789f48550ba8275413455e7cfa20863a} 
+\mbox{\hyperlink{class_xbyak_1_1_reg_exp}{Reg\+Exp}} operator+ (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_xbyak_1_1_reg_exp}{Reg\+Exp}} \&}]{a}{, }\item[{const \mbox{\hyperlink{class_xbyak_1_1_reg_exp}{Reg\+Exp}} \&}]{b}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00756}{756}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00757\ \{}
+\DoxyCodeLine{00758\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.index\_.getBit()\ \&\&\ b.index\_.getBit())\ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{calc_8cpp_a2c3e4bb40f36b262a5214e2da2bca9c5}{Error}}(\mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a73b230b497459e850d1dfc4ad0019135}{ERR\_BAD\_ADDRESSING}});}
+\DoxyCodeLine{00759\ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_reg_exp_a11a3a5ab491486ff7cec69b06e5e52e6}{RegExp}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}};}
+\DoxyCodeLine{00760\ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.index\_.getBit())\ \{\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.index\_\ =\ b.index\_;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.scale\_\ =\ b.scale\_;\ \}}
+\DoxyCodeLine{00761\ \ \ \ \ \textcolor{keywordflow}{if}\ (b.base\_.getBit())\ \{}
+\DoxyCodeLine{00762\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.base\_.getBit())\ \{}
+\DoxyCodeLine{00763\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.index\_.getBit())\ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{calc_8cpp_a2c3e4bb40f36b262a5214e2da2bca9c5}{Error}}(\mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a73b230b497459e850d1dfc4ad0019135}{ERR\_BAD\_ADDRESSING}});}
+\DoxyCodeLine{00764\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ base\ +\ base\ =>\ base\ +\ index\ *\ 1}}
+\DoxyCodeLine{00765\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.index\_\ =\ b.base\_;}
+\DoxyCodeLine{00766\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ [reg\ +\ esp]\ =>\ [esp\ +\ reg]}}
+\DoxyCodeLine{00767\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.index\_.getIdx()\ ==\ \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a1027bc617f8f52395078e43b96d0bb5a}{Operand::ESP}})\ \mbox{\hyperlink{namespacestd_abb7e41c7063536ff6eeee4bb5f66de6c}{std::swap}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.base\_,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.index\_);}
+\DoxyCodeLine{00768\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.scale\_\ =\ 1;}
+\DoxyCodeLine{00769\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00770\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.base\_\ =\ b.base\_;}
+\DoxyCodeLine{00771\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00772\ \ \ \ \ \}}
+\DoxyCodeLine{00773\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.disp\_\ +=\ b.disp\_;}
+\DoxyCodeLine{00774\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00775\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_xbyak_1_1_reg_exp_a0c2dd2cf50ca9dc4b7bc2e2336c0a5aa}\index{Xbyak::RegExp@{Xbyak::RegExp}!operator-\/@{operator-\/}}
+\index{operator-\/@{operator-\/}!Xbyak::RegExp@{Xbyak::RegExp}}
+\doxysubsubsection{\texorpdfstring{operator-\/}{operator-}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_reg_exp_a0c2dd2cf50ca9dc4b7bc2e2336c0a5aa} 
+\mbox{\hyperlink{class_xbyak_1_1_reg_exp}{Reg\+Exp}} operator-\/ (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_xbyak_1_1_reg_exp}{Reg\+Exp}} \&}]{e}{, }\item[{size\+\_\+t}]{disp}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00780}{780}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00781\ \{}
+\DoxyCodeLine{00782\ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_reg_exp_a11a3a5ab491486ff7cec69b06e5e52e6}{RegExp}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ e;}
+\DoxyCodeLine{00783\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.disp\_\ -\/=\ disp;}
+\DoxyCodeLine{00784\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00785\ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/libraries/ff/depends/xbyak/xbyak/\mbox{\hyperlink{xbyak_8h}{xbyak.\+h}}\end{DoxyCompactItemize}

@@ -1,0 +1,97 @@
+\doxysection{IR\+::Index\+Space\texorpdfstring{$<$}{<} Definition, Type \texorpdfstring{$>$}{>} Struct Template Reference}
+\hypertarget{struct_i_r_1_1_index_space}{}\label{struct_i_r_1_1_index_space}\index{IR::IndexSpace$<$ Definition, Type $>$@{IR::IndexSpace$<$ Definition, Type $>$}}
+
+
+{\ttfamily \#include $<$Module.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} \mbox{\hyperlink{struct_i_r_1_1_index_space_acfa4fb37a2718a140eb1d63d11114379}{size}} () const
+\item 
+\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}} \mbox{\hyperlink{struct_i_r_1_1_index_space_a63f9f37ae170f21df54cc27ef4357577}{get\+Type}} (\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} index) const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::vector$<$ \mbox{\hyperlink{struct_i_r_1_1_import}{Import}}$<$ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}} $>$ $>$ \mbox{\hyperlink{struct_i_r_1_1_index_space_af7ac0286fd28c2a0b2357798b8a8b271}{imports}}
+\item 
+std\+::vector$<$ Definition $>$ \mbox{\hyperlink{struct_i_r_1_1_index_space_adebd6a6fe73b7fc49c99553da844088b}{defs}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Definition, typename \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}}$>$\newline
+struct IR\+::\+Index\+Space$<$ Definition, Type $>$}
+
+
+Definition at line \mbox{\hyperlink{_module_8h_source_l00115}{115}} of file \mbox{\hyperlink{_module_8h_source}{Module.\+h}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_i_r_1_1_index_space_a63f9f37ae170f21df54cc27ef4357577}\index{IR::IndexSpace$<$ Definition, Type $>$@{IR::IndexSpace$<$ Definition, Type $>$}!getType@{getType}}
+\index{getType@{getType}!IR::IndexSpace$<$ Definition, Type $>$@{IR::IndexSpace$<$ Definition, Type $>$}}
+\doxysubsubsection{\texorpdfstring{getType()}{getType()}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_index_space_a63f9f37ae170f21df54cc27ef4357577} 
+template$<$typename Definition , typename \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}} $>$ \\
+\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}} \mbox{\hyperlink{struct_i_r_1_1_index_space}{IR\+::\+Index\+Space}}$<$ Definition, \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}} $>$\+::get\+Type (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}}]{index}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_module_8h_source_l00121}{121}} of file \mbox{\hyperlink{_module_8h_source}{Module.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(index\ <\ \mbox{\hyperlink{struct_i_r_1_1_index_space_af7ac0286fd28c2a0b2357798b8a8b271}{imports}}.size())\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_i_r_1_1_index_space_af7ac0286fd28c2a0b2357798b8a8b271}{imports}}[index].type;\ \}}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_i_r_1_1_index_space_adebd6a6fe73b7fc49c99553da844088b}{defs}}[index\ -\/\ \mbox{\hyperlink{struct_i_r_1_1_index_space_af7ac0286fd28c2a0b2357798b8a8b271}{imports}}.size()].type;\ \}}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_i_r_1_1_index_space_acfa4fb37a2718a140eb1d63d11114379}\index{IR::IndexSpace$<$ Definition, Type $>$@{IR::IndexSpace$<$ Definition, Type $>$}!size@{size}}
+\index{size@{size}!IR::IndexSpace$<$ Definition, Type $>$@{IR::IndexSpace$<$ Definition, Type $>$}}
+\doxysubsubsection{\texorpdfstring{size()}{size()}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_index_space_acfa4fb37a2718a140eb1d63d11114379} 
+template$<$typename Definition , typename \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}} $>$ \\
+\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} \mbox{\hyperlink{struct_i_r_1_1_index_space}{IR\+::\+Index\+Space}}$<$ Definition, \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}} $>$\+::size (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_module_8h_source_l00120}{120}} of file \mbox{\hyperlink{_module_8h_source}{Module.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00120\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_i_r_1_1_index_space_af7ac0286fd28c2a0b2357798b8a8b271}{imports}}.size()\ +\ \mbox{\hyperlink{struct_i_r_1_1_index_space_adebd6a6fe73b7fc49c99553da844088b}{defs}}.size();\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_i_r_1_1_index_space_adebd6a6fe73b7fc49c99553da844088b}\index{IR::IndexSpace$<$ Definition, Type $>$@{IR::IndexSpace$<$ Definition, Type $>$}!defs@{defs}}
+\index{defs@{defs}!IR::IndexSpace$<$ Definition, Type $>$@{IR::IndexSpace$<$ Definition, Type $>$}}
+\doxysubsubsection{\texorpdfstring{defs}{defs}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_index_space_adebd6a6fe73b7fc49c99553da844088b} 
+template$<$typename Definition , typename \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}} $>$ \\
+std\+::vector$<$Definition$>$ \mbox{\hyperlink{struct_i_r_1_1_index_space}{IR\+::\+Index\+Space}}$<$ Definition, \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}} $>$\+::defs}
+
+
+
+Definition at line \mbox{\hyperlink{_module_8h_source_l00118}{118}} of file \mbox{\hyperlink{_module_8h_source}{Module.\+h}}.
+
+\Hypertarget{struct_i_r_1_1_index_space_af7ac0286fd28c2a0b2357798b8a8b271}\index{IR::IndexSpace$<$ Definition, Type $>$@{IR::IndexSpace$<$ Definition, Type $>$}!imports@{imports}}
+\index{imports@{imports}!IR::IndexSpace$<$ Definition, Type $>$@{IR::IndexSpace$<$ Definition, Type $>$}}
+\doxysubsubsection{\texorpdfstring{imports}{imports}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_index_space_af7ac0286fd28c2a0b2357798b8a8b271} 
+template$<$typename Definition , typename \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}} $>$ \\
+std\+::vector$<$\mbox{\hyperlink{struct_i_r_1_1_import}{Import}}$<$\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}}$>$ $>$ \mbox{\hyperlink{struct_i_r_1_1_index_space}{IR\+::\+Index\+Space}}$<$ Definition, \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}} $>$\+::imports}
+
+
+
+Definition at line \mbox{\hyperlink{_module_8h_source_l00117}{117}} of file \mbox{\hyperlink{_module_8h_source}{Module.\+h}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/wasm-\/jit/\+Include/\+IR/\mbox{\hyperlink{_module_8h}{Module.\+h}}\end{DoxyCompactItemize}

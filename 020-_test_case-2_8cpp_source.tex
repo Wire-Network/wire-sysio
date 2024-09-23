@@ -1,0 +1,39 @@
+\doxysection{020-\/Test\+Case-\/2.cpp}
+\hypertarget{020-_test_case-2_8cpp_source}{}\label{020-_test_case-2_8cpp_source}\index{libraries/sys-\/vm/external/Catch2/examples/020-\/TestCase-\/2.cpp@{libraries/sys-\/vm/external/Catch2/examples/020-\/TestCase-\/2.cpp}}
+\mbox{\hyperlink{020-_test_case-2_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{020-_test_case-2_8cpp_source_l00001}00001\ \textcolor{comment}{//\ 020-\/TestCase-\/2.cpp}}
+\DoxyCodeLine{\Hypertarget{020-_test_case-2_8cpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{020-_test_case-2_8cpp_source_l00003}00003\ \textcolor{comment}{//\ main()\ provided\ by\ Catch\ in\ file\ 020-\/TestCase-\/1.cpp.}}
+\DoxyCodeLine{\Hypertarget{020-_test_case-2_8cpp_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{020-_test_case-2_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{single__include_2catch2_2catch_8hpp}{catch2/catch.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{020-_test_case-2_8cpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{020-_test_case-2_8cpp_source_l00007}\mbox{\hyperlink{020-_test_case-2_8cpp_add2051c05ae0af82b9f85a7aed140679}{00007}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{020-_test_case-2_8cpp_add2051c05ae0af82b9f85a7aed140679}{Factorial}}(\ \textcolor{keywordtype}{int}\ number\ )\ \{}
+\DoxyCodeLine{\Hypertarget{020-_test_case-2_8cpp_source_l00008}00008\ \ \ \ \textcolor{keywordflow}{return}\ number\ <=\ 1\ ?\ number\ :\ \mbox{\hyperlink{020-_test_case-2_8cpp_add2051c05ae0af82b9f85a7aed140679}{Factorial}}(\ number\ -\/\ 1\ )\ *\ number;\ \ \textcolor{comment}{//\ fail}}
+\DoxyCodeLine{\Hypertarget{020-_test_case-2_8cpp_source_l00009}00009\ \textcolor{comment}{//\ return\ number\ <=\ 1\ ?\ 1\ \ \ \ \ \ :\ Factorial(\ number\ -\/\ 1\ )\ *\ number;\ \ //\ pass}}
+\DoxyCodeLine{\Hypertarget{020-_test_case-2_8cpp_source_l00010}00010\ \}}
+\DoxyCodeLine{\Hypertarget{020-_test_case-2_8cpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{020-_test_case-2_8cpp_source_l00012}\mbox{\hyperlink{020-_test_case-2_8cpp_a4a40313d0fbb58ba60bec971f3f51bd2}{00012}}\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\ \textcolor{stringliteral}{"{}2:\ Factorial\ of\ 0\ is\ 1\ (fail)"{}},\ \textcolor{stringliteral}{"{}[multi-\/file:2]"{}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{020-_test_case-2_8cpp_source_l00013}00013\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{020-_test_case-2_8cpp_add2051c05ae0af82b9f85a7aed140679}{Factorial}}(0)\ ==\ 1\ );}
+\DoxyCodeLine{\Hypertarget{020-_test_case-2_8cpp_source_l00014}00014\ \}}
+\DoxyCodeLine{\Hypertarget{020-_test_case-2_8cpp_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{020-_test_case-2_8cpp_source_l00016}\mbox{\hyperlink{020-_test_case-2_8cpp_abdd1a01d2d531b217927995c08737172}{00016}}\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\ \textcolor{stringliteral}{"{}2:\ Factorials\ of\ 1\ and\ higher\ are\ computed\ (pass)"{}},\ \textcolor{stringliteral}{"{}[multi-\/file:2]"{}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{020-_test_case-2_8cpp_source_l00017}00017\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{020-_test_case-2_8cpp_add2051c05ae0af82b9f85a7aed140679}{Factorial}}(1)\ ==\ 1\ );}
+\DoxyCodeLine{\Hypertarget{020-_test_case-2_8cpp_source_l00018}00018\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{020-_test_case-2_8cpp_add2051c05ae0af82b9f85a7aed140679}{Factorial}}(2)\ ==\ 2\ );}
+\DoxyCodeLine{\Hypertarget{020-_test_case-2_8cpp_source_l00019}00019\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{020-_test_case-2_8cpp_add2051c05ae0af82b9f85a7aed140679}{Factorial}}(3)\ ==\ 6\ );}
+\DoxyCodeLine{\Hypertarget{020-_test_case-2_8cpp_source_l00020}00020\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{020-_test_case-2_8cpp_add2051c05ae0af82b9f85a7aed140679}{Factorial}}(10)\ ==\ 3628800\ );}
+\DoxyCodeLine{\Hypertarget{020-_test_case-2_8cpp_source_l00021}00021\ \}}
+\DoxyCodeLine{\Hypertarget{020-_test_case-2_8cpp_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{020-_test_case-2_8cpp_source_l00023}00023\ \textcolor{comment}{//\ Compile:\ see\ 020-\/TestCase-\/1.cpp}}
+\DoxyCodeLine{\Hypertarget{020-_test_case-2_8cpp_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{020-_test_case-2_8cpp_source_l00025}00025\ \textcolor{comment}{//\ Expected\ compact\ output\ (all\ assertions):}}
+\DoxyCodeLine{\Hypertarget{020-_test_case-2_8cpp_source_l00026}00026\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{020-_test_case-2_8cpp_source_l00027}00027\ \textcolor{comment}{//\ prompt>\ 020-\/TestCase\ -\/-\/reporter\ compact\ -\/-\/success}}
+\DoxyCodeLine{\Hypertarget{020-_test_case-2_8cpp_source_l00028}00028\ \textcolor{comment}{//\ 020-\/TestCase-\/2.cpp:13:\ failed:\ Factorial(0)\ ==\ 1\ for:\ 0\ ==\ 1}}
+\DoxyCodeLine{\Hypertarget{020-_test_case-2_8cpp_source_l00029}00029\ \textcolor{comment}{//\ 020-\/TestCase-\/2.cpp:17:\ passed:\ Factorial(1)\ ==\ 1\ for:\ 1\ ==\ 1}}
+\DoxyCodeLine{\Hypertarget{020-_test_case-2_8cpp_source_l00030}00030\ \textcolor{comment}{//\ 020-\/TestCase-\/2.cpp:18:\ passed:\ Factorial(2)\ ==\ 2\ for:\ 2\ ==\ 2}}
+\DoxyCodeLine{\Hypertarget{020-_test_case-2_8cpp_source_l00031}00031\ \textcolor{comment}{//\ 020-\/TestCase-\/2.cpp:19:\ passed:\ Factorial(3)\ ==\ 6\ for:\ 6\ ==\ 6}}
+\DoxyCodeLine{\Hypertarget{020-_test_case-2_8cpp_source_l00032}00032\ \textcolor{comment}{//\ 020-\/TestCase-\/2.cpp:20:\ passed:\ Factorial(10)\ ==\ 3628800\ for:\ 3628800\ (0x375f00)\ ==\ 3628800\ (0x375f00)}}
+\DoxyCodeLine{\Hypertarget{020-_test_case-2_8cpp_source_l00033}00033\ \textcolor{comment}{//\ Failed\ 1\ test\ case,\ failed\ 1\ assertion.}}
+
+\end{DoxyCode}

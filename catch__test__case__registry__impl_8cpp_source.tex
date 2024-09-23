@@ -1,0 +1,120 @@
+\doxysection{catch\+\_\+test\+\_\+case\+\_\+registry\+\_\+impl.\+cpp}
+\hypertarget{catch__test__case__registry__impl_8cpp_source}{}\label{catch__test__case__registry__impl_8cpp_source}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_test\_case\_registry\_impl.cpp@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_test\_case\_registry\_impl.cpp}}
+\mbox{\hyperlink{catch__test__case__registry__impl_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00002}00002\ \textcolor{comment}{\ *\ \ Created\ by\ Martin\ on\ 25/07/2017}}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00004}00004\ \textcolor{comment}{\ *\ \ Distributed\ under\ the\ Boost\ Software\ License,\ Version\ 1.0.\ (See\ accompanying}}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00005}00005\ \textcolor{comment}{\ *\ \ file\ LICENSE\_1\_0.txt\ or\ copy\ at\ http://www.boost.org/LICENSE\_1\_0.txt)}}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00006}00006\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__test__case__registry__impl_8h}{catch\_test\_case\_registry\_impl.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__context_8h}{catch\_context.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00011}00011\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__enforce_8h}{catch\_enforce.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00012}00012\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__interfaces__registry__hub_8h}{catch\_interfaces\_registry\_hub.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00013}00013\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__random__number__generator_8h}{catch\_random\_number\_generator.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00014}00014\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__string__manip_8h}{catch\_string\_manip.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00015}00015\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__test__case__info_8h}{catch\_test\_case\_info.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00017}00017\ \textcolor{preprocessor}{\#include\ <sstream>}}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00019}00019\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00021}\mbox{\hyperlink{namespace_catch_aa94535d4e961ebfefc7f95cf25f949c4}{00021}}\ \ \ \ \ std::vector<TestCase>\ \mbox{\hyperlink{namespace_catch_aa94535d4e961ebfefc7f95cf25f949c4}{sortTests}}(\ \mbox{\hyperlink{struct_catch_1_1_i_config}{IConfig}}\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{classconfig}{config}},\ std::vector<TestCase>\ \textcolor{keyword}{const}\&\ unsortedTestCases\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00023}00023\ \ \ \ \ \ \ \ \ std::vector<TestCase>\ sorted\ =\ unsortedTestCases;}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00025}00025\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(\ \mbox{\hyperlink{classconfig}{config}}.runOrder()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00026}00026\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{struct_catch_1_1_run_tests_ab56bd851b1dd085869992d1a9d73dc5dac438de570b4c707baf342d6ac0bd1dea}{RunTests::InLexicographicalOrder}}:}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00027}00027\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::sort(\ sorted.begin(),\ sorted.end()\ );}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00028}00028\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00029}00029\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{struct_catch_1_1_run_tests_ab56bd851b1dd085869992d1a9d73dc5dab754fd982840d872056f23bf139cfc27}{RunTests::InRandomOrder}}:}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00030}00030\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_catch_a161400810eb0995394d6d8d3cae821ad}{seedRng}}(\ \mbox{\hyperlink{classconfig}{config}}\ );}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00031}00031\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::shuffle(\ sorted.begin(),\ sorted.end(),\ \mbox{\hyperlink{namespace_catch_adf13e77187ae9bc5d7cd1bb29c1ba7e9}{rng}}()\ );}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00032}00032\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00033}00033\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{struct_catch_1_1_run_tests_ab56bd851b1dd085869992d1a9d73dc5da2d560e5cdf23ef60d728a816e9b01c61}{RunTests::InDeclarationOrder}}:}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00034}00034\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ already\ in\ declaration\ order}}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00035}00035\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00036}00036\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00037}00037\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ sorted;}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00038}00038\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00039}\mbox{\hyperlink{namespace_catch_aadef80fbc6bc84589777a462770cef49}{00039}}\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespace_catch_aadef80fbc6bc84589777a462770cef49}{matchTest}}(\ \mbox{\hyperlink{class_catch_1_1_test_case}{TestCase}}\ \textcolor{keyword}{const}\&\ testCase,\ \mbox{\hyperlink{class_catch_1_1_test_spec}{TestSpec}}\ \textcolor{keyword}{const}\&\ testSpec,\ \mbox{\hyperlink{struct_catch_1_1_i_config}{IConfig}}\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{classconfig}{config}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00040}00040\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ testSpec.\mbox{\hyperlink{class_catch_1_1_test_spec_a2342df9eff2c7db0d26432c1ddef796f}{matches}}(\ testCase\ )\ \&\&\ (\ \mbox{\hyperlink{classconfig}{config}}.allowThrows()\ ||\ !testCase.\mbox{\hyperlink{struct_catch_1_1_test_case_info_afc70d4379a2070cc22b693ffe3932c1a}{throws}}()\ );}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00041}00041\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00043}\mbox{\hyperlink{namespace_catch_a71e3432f494f89c9e406cbd6e3baab38}{00043}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespace_catch_a71e3432f494f89c9e406cbd6e3baab38}{enforceNoDuplicateTestCases}}(\ std::vector<TestCase>\ \textcolor{keyword}{const}\&\ functions\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00044}00044\ \ \ \ \ \ \ \ \ std::set<TestCase>\ seenFunctions;}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00045}00045\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\ \textcolor{keyword}{const}\&\ function\ :\ functions\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00046}00046\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ prev\ =\ seenFunctions.insert(\ function\ );}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00047}00047\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{catch__enforce_8h_aa4c5f453d4352f75712de56e5892849f}{CATCH\_ENFORCE}}(\ prev.second,}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}error:\ TEST\_CASE(\ \(\backslash\)"{}"{}}\ <<\ function.name\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)"{}\ )\ already\ defined.\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\(\backslash\)tFirst\ seen\ at\ "{}}\ <<\ prev.first-\/>getTestCaseInfo().lineInfo\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00050}00050\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\(\backslash\)tRedefined\ at\ "{}}\ <<\ function.getTestCaseInfo().lineInfo\ );}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00051}00051\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00052}00052\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00054}\mbox{\hyperlink{namespace_catch_a105d5acdec8a6b401e12a592557c9dd1}{00054}}\ \ \ \ \ std::vector<TestCase>\ \mbox{\hyperlink{namespace_catch_a105d5acdec8a6b401e12a592557c9dd1}{filterTests}}(\ std::vector<TestCase>\ \textcolor{keyword}{const}\&\ testCases,\ \mbox{\hyperlink{class_catch_1_1_test_spec}{TestSpec}}\ \textcolor{keyword}{const}\&\ testSpec,\ \mbox{\hyperlink{struct_catch_1_1_i_config}{IConfig}}\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{classconfig}{config}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00055}00055\ \ \ \ \ \ \ \ \ std::vector<TestCase>\ filtered;}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00056}00056\ \ \ \ \ \ \ \ \ filtered.reserve(\ testCases.size()\ );}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00057}00057\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\ \textcolor{keyword}{const}\&\ testCase\ :\ testCases)\ \{}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((!testSpec.\mbox{\hyperlink{class_catch_1_1_test_spec_ac6d69b4a19677d95e46af0467fc72ecd}{hasFilters}}()\ \&\&\ !testCase.isHidden())\ ||}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00059}00059\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (testSpec.\mbox{\hyperlink{class_catch_1_1_test_spec_ac6d69b4a19677d95e46af0467fc72ecd}{hasFilters}}()\ \&\&\ \mbox{\hyperlink{namespace_catch_aadef80fbc6bc84589777a462770cef49}{matchTest}}(testCase,\ testSpec,\ \mbox{\hyperlink{classconfig}{config}})))\ \{}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ filtered.push\_back(testCase);}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00061}00061\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00062}00062\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00063}00063\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ filtered;}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00064}00064\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00065}\mbox{\hyperlink{namespace_catch_a97039bab95e97f059410f67425f1f2da}{00065}}\ \ \ \ \ std::vector<TestCase>\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{namespace_catch_a97039bab95e97f059410f67425f1f2da}{getAllTestCasesSorted}}(\ \mbox{\hyperlink{struct_catch_1_1_i_config}{IConfig}}\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{classconfig}{config}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00066}00066\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_catch_a5d328566cb8da87b48f1fac3f319ac7a}{getRegistryHub}}().\mbox{\hyperlink{struct_catch_1_1_i_registry_hub_a3016c8766e42bae7b021f02d1cbd356b}{getTestCaseRegistry}}().\mbox{\hyperlink{struct_catch_1_1_i_test_case_registry_a0aae66ca6ec1b6265a799134d6935127}{getAllTestsSorted}}(\ \mbox{\hyperlink{classconfig}{config}}\ );}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00067}00067\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00069}\mbox{\hyperlink{class_catch_1_1_test_registry_a439b8ba8e6a4d17eb20e82177edc8010}{00069}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_test_registry_a439b8ba8e6a4d17eb20e82177edc8010}{TestRegistry::registerTest}}(\ \mbox{\hyperlink{class_catch_1_1_test_case}{TestCase}}\ \textcolor{keyword}{const}\&\ testCase\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00070}00070\ \ \ \ \ \ \ \ \ std::string\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ =\ testCase.\mbox{\hyperlink{class_catch_1_1_test_case_a804d0a6a5dc92b219e724f1390c25c7f}{getTestCaseInfo}}().\mbox{\hyperlink{struct_catch_1_1_test_case_info_a463794e2f5cfead307c93efd134ade36}{name}};}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00071}00071\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}.empty()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_reusable_string_stream}{ReusableStringStream}}\ rss;}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00073}00073\ \ \ \ \ \ \ \ \ \ \ \ \ rss\ <<\ \textcolor{stringliteral}{"{}Anonymous\ test\ case\ "{}}\ <<\ ++m\_unnamedCount;}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00074}00074\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_catch_1_1_test_registry_a439b8ba8e6a4d17eb20e82177edc8010}{registerTest}}(\ testCase.\mbox{\hyperlink{class_catch_1_1_test_case_a0812e8a216d09b087d5874687009f0d6}{withName}}(\ rss.\mbox{\hyperlink{class_catch_1_1_reusable_string_stream_a0e9ecf260b2a5d35f4886ef0d51f6270}{str}}()\ )\ );}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00075}00075\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00076}00076\ \ \ \ \ \ \ \ \ m\_functions.push\_back(\ testCase\ );}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00077}00077\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00079}\mbox{\hyperlink{class_catch_1_1_test_registry_a24ea15a837bc860921dfa53fa4eae289}{00079}}\ \ \ \ \ std::vector<TestCase>\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{class_catch_1_1_test_registry_a24ea15a837bc860921dfa53fa4eae289}{TestRegistry::getAllTests}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00080}00080\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_functions;}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00081}00081\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00082}\mbox{\hyperlink{class_catch_1_1_test_registry_a46cd8be913627207b2dc11fdbd57a7bc}{00082}}\ \ \ \ \ std::vector<TestCase>\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{class_catch_1_1_test_registry_a46cd8be913627207b2dc11fdbd57a7bc}{TestRegistry::getAllTestsSorted}}(\ \mbox{\hyperlink{struct_catch_1_1_i_config}{IConfig}}\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{classconfig}{config}}\ )\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00083}00083\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ m\_sortedFunctions.empty()\ )}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00084}00084\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_catch_a71e3432f494f89c9e406cbd6e3baab38}{enforceNoDuplicateTestCases}}(\ m\_functions\ );}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00085}00085\ }
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00086}00086\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \ m\_currentSortOrder\ !=\ \mbox{\hyperlink{classconfig}{config}}.runOrder()\ ||\ m\_sortedFunctions.empty()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00087}00087\ \ \ \ \ \ \ \ \ \ \ \ \ m\_sortedFunctions\ =\ \mbox{\hyperlink{namespace_catch_aa94535d4e961ebfefc7f95cf25f949c4}{sortTests}}(\ \mbox{\hyperlink{classconfig}{config}},\ m\_functions\ );}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00088}00088\ \ \ \ \ \ \ \ \ \ \ \ \ m\_currentSortOrder\ =\ \mbox{\hyperlink{classconfig}{config}}.runOrder();}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00089}00089\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00090}00090\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_sortedFunctions;}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00091}00091\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00092}00092\ }
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00093}00093\ }
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00094}00094\ }
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00096}\mbox{\hyperlink{class_catch_1_1_test_invoker_as_function_a62fab15fdbbf55e45b8ab9c78b06027b}{00096}}\ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_test_invoker_as_function_a62fab15fdbbf55e45b8ab9c78b06027b}{TestInvokerAsFunction::TestInvokerAsFunction}}(\ \textcolor{keywordtype}{void}(*testAsFunction)()\ )\ noexcept\ :\ m\_testAsFunction(\ testAsFunction\ )\ \{\}}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00097}00097\ }
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00098}\mbox{\hyperlink{class_catch_1_1_test_invoker_as_function_ad71cb89f9b3ce57309ddda808e940e54}{00098}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_test_invoker_as_function_ad71cb89f9b3ce57309ddda808e940e54}{TestInvokerAsFunction::invoke}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00099}00099\ \ \ \ \ \ \ \ \ m\_testAsFunction();}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00100}00100\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00101}00101\ }
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00102}\mbox{\hyperlink{namespace_catch_a9e1cbffd90354d851c4ba6dff1e09fd7}{00102}}\ \ \ \ \ std::string\ \mbox{\hyperlink{namespace_catch_a9e1cbffd90354d851c4ba6dff1e09fd7}{extractClassName}}(\ \mbox{\hyperlink{class_catch_1_1_string_ref}{StringRef}}\ \textcolor{keyword}{const}\&\ classOrQualifiedMethodName\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00103}00103\ \ \ \ \ \ \ \ \ std::string\ className\ =\ classOrQualifiedMethodName;}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00104}00104\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{namespace_catch_a695f62327be0676e046291eeaae15110}{startsWith}}(\ className,\ \textcolor{charliteral}{'\&'}\ )\ )}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00105}00105\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00106}00106\ \ \ \ \ \ \ \ \ \ \ \ \ std::size\_t\ lastColons\ =\ className.rfind(\ \textcolor{stringliteral}{"{}::"{}}\ );}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00107}00107\ \ \ \ \ \ \ \ \ \ \ \ \ std::size\_t\ penultimateColons\ =\ className.rfind(\ \textcolor{stringliteral}{"{}::"{}},\ lastColons-\/1\ );}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00108}00108\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ penultimateColons\ ==\ std::string::npos\ )}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00109}00109\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ penultimateColons\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00110}00110\ \ \ \ \ \ \ \ \ \ \ \ \ className\ =\ className.substr(\ penultimateColons,\ lastColons-\/penultimateColons\ );}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00111}00111\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00112}00112\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ className;}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00113}00113\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00114}00114\ }
+\DoxyCodeLine{\Hypertarget{catch__test__case__registry__impl_8cpp_source_l00115}00115\ \}\ \textcolor{comment}{//\ end\ namespace\ Catch}}
+
+\end{DoxyCode}

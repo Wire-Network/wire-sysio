@@ -1,0 +1,1718 @@
+\doxysection{libraries/fc/secp256k1/secp256k1/src/secp256k1.c File Reference}
+\hypertarget{secp256k1_8c}{}\label{secp256k1_8c}\index{libraries/fc/secp256k1/secp256k1/src/secp256k1.c@{libraries/fc/secp256k1/secp256k1/src/secp256k1.c}}
+{\ttfamily \#include "{}../include/secp256k1.\+h"{}}\newline
+{\ttfamily \#include "{}../include/secp256k1\+\_\+preallocated.\+h"{}}\newline
+{\ttfamily \#include "{}assumptions.\+h"{}}\newline
+{\ttfamily \#include "{}util.\+h"{}}\newline
+{\ttfamily \#include "{}field\+\_\+impl.\+h"{}}\newline
+{\ttfamily \#include "{}scalar\+\_\+impl.\+h"{}}\newline
+{\ttfamily \#include "{}group\+\_\+impl.\+h"{}}\newline
+{\ttfamily \#include "{}ecmult\+\_\+impl.\+h"{}}\newline
+{\ttfamily \#include "{}ecmult\+\_\+const\+\_\+impl.\+h"{}}\newline
+{\ttfamily \#include "{}ecmult\+\_\+gen\+\_\+impl.\+h"{}}\newline
+{\ttfamily \#include "{}ecdsa\+\_\+impl.\+h"{}}\newline
+{\ttfamily \#include "{}eckey\+\_\+impl.\+h"{}}\newline
+{\ttfamily \#include "{}hash\+\_\+impl.\+h"{}}\newline
+{\ttfamily \#include "{}scratch\+\_\+impl.\+h"{}}\newline
+{\ttfamily \#include "{}selftest.\+h"{}}\newline
+Include dependency graph for secp256k1.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{secp256k1_8c__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{secp256k1_8c__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsecp256k1__context__struct}{secp256k1\+\_\+context\+\_\+struct}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{secp256k1_8c_a1c49db739b76634ccbd0db4233e6cd8a}{SECP256\+K1\+\_\+\+BUILD}}
+\item 
+\#define \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\+\_\+\+CHECK}}(cond)
+\item 
+\#define \mbox{\hyperlink{secp256k1_8c_aab3587a00b3cf74369ea1bbbaeb1c3fb}{ARG\+\_\+\+CHECK\+\_\+\+NO\+\_\+\+RETURN}}(cond)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+size\+\_\+t \mbox{\hyperlink{secp256k1_8c_a9f5faeec85b85bdaccd7ddda899dbfa2}{secp256k1\+\_\+context\+\_\+preallocated\+\_\+size}} (unsigned int \mbox{\hyperlink{yubihsm__pkcs11_8c_ae0ed371842ace71a7886a6134ecbcb62}{flags}})
+\item 
+size\+\_\+t \mbox{\hyperlink{secp256k1_8c_a5665930bf606d6a7262cebc936eda949}{secp256k1\+\_\+context\+\_\+preallocated\+\_\+clone\+\_\+size}} (const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}ctx)
+\item 
+\mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{secp256k1_8c_af4866e9619f06679358fe6338ed42cd0}{secp256k1\+\_\+context\+\_\+preallocated\+\_\+create}} (void \texorpdfstring{$\ast$}{*}prealloc, unsigned int \mbox{\hyperlink{yubihsm__pkcs11_8c_ae0ed371842ace71a7886a6134ecbcb62}{flags}})
+\item 
+\mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{secp256k1_8c_a861ce6fc7ee5e9fc346a5fee7093adb1}{secp256k1\+\_\+context\+\_\+create}} (unsigned int \mbox{\hyperlink{yubihsm__pkcs11_8c_ae0ed371842ace71a7886a6134ecbcb62}{flags}})
+\item 
+\mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{secp256k1_8c_a2a2e39dbcd6d55d8e6faaad194261a71}{secp256k1\+\_\+context\+\_\+preallocated\+\_\+clone}} (const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}ctx, void \texorpdfstring{$\ast$}{*}prealloc)
+\item 
+\mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{secp256k1_8c_adb5e8056701518fc6aac1738ff58fec1}{secp256k1\+\_\+context\+\_\+clone}} (const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}ctx)
+\item 
+void \mbox{\hyperlink{secp256k1_8c_a62b32b6a46f53b6aef01d3888496a79f}{secp256k1\+\_\+context\+\_\+preallocated\+\_\+destroy}} (\mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}ctx)
+\item 
+void \mbox{\hyperlink{secp256k1_8c_ac80c186f8ff22d87441240267a2c8100}{secp256k1\+\_\+context\+\_\+destroy}} (\mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}ctx)
+\item 
+void \mbox{\hyperlink{secp256k1_8c_a947ba36e0fe0bced91d4c9a7ef3b1f09}{secp256k1\+\_\+context\+\_\+set\+\_\+illegal\+\_\+callback}} (\mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}ctx, void(\texorpdfstring{$\ast$}{*}fun)(const char \texorpdfstring{$\ast$}{*}message, void \texorpdfstring{$\ast$}{*}data), const void \texorpdfstring{$\ast$}{*}data)
+\item 
+void \mbox{\hyperlink{secp256k1_8c_a7384d60163d08fae0c5e8d1e1fdef60a}{secp256k1\+\_\+context\+\_\+set\+\_\+error\+\_\+callback}} (\mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}ctx, void(\texorpdfstring{$\ast$}{*}fun)(const char \texorpdfstring{$\ast$}{*}message, void \texorpdfstring{$\ast$}{*}data), const void \texorpdfstring{$\ast$}{*}data)
+\item 
+\mbox{\hyperlink{secp256k1_8h_a13c17a5e196534c7df988c0aa6e5a6fa}{secp256k1\+\_\+scratch\+\_\+space}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{secp256k1_8c_aba5c99ecba24dd041f23c4cdebf6d7c9}{secp256k1\+\_\+scratch\+\_\+space\+\_\+create}} (const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}ctx, size\+\_\+t max\+\_\+size)
+\item 
+void \mbox{\hyperlink{secp256k1_8c_addc63f28c7f69289736875fae7ac429f}{secp256k1\+\_\+scratch\+\_\+space\+\_\+destroy}} (const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}ctx, \mbox{\hyperlink{secp256k1_8h_a13c17a5e196534c7df988c0aa6e5a6fa}{secp256k1\+\_\+scratch\+\_\+space}} \texorpdfstring{$\ast$}{*}scratch)
+\item 
+int \mbox{\hyperlink{secp256k1_8c_a4a359778a7faf65fba9d34db17642d20}{secp256k1\+\_\+ec\+\_\+pubkey\+\_\+parse}} (const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}ctx, \mbox{\hyperlink{structsecp256k1__pubkey}{secp256k1\+\_\+pubkey}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}}, const unsigned char \texorpdfstring{$\ast$}{*}input, size\+\_\+t inputlen)
+\item 
+int \mbox{\hyperlink{secp256k1_8c_a3b0440ba2ccd06e9262b94b41b680df1}{secp256k1\+\_\+ec\+\_\+pubkey\+\_\+serialize}} (const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}ctx, unsigned char \texorpdfstring{$\ast$}{*}output, size\+\_\+t \texorpdfstring{$\ast$}{*}outputlen, const \mbox{\hyperlink{structsecp256k1__pubkey}{secp256k1\+\_\+pubkey}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}}, unsigned int \mbox{\hyperlink{yubihsm__pkcs11_8c_ae0ed371842ace71a7886a6134ecbcb62}{flags}})
+\item 
+int \mbox{\hyperlink{secp256k1_8c_a88fd105847bf65f59db29fed819570c6}{secp256k1\+\_\+ec\+\_\+pubkey\+\_\+cmp}} (const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}ctx, const \mbox{\hyperlink{structsecp256k1__pubkey}{secp256k1\+\_\+pubkey}} \texorpdfstring{$\ast$}{*}pubkey0, const \mbox{\hyperlink{structsecp256k1__pubkey}{secp256k1\+\_\+pubkey}} \texorpdfstring{$\ast$}{*}pubkey1)
+\item 
+int \mbox{\hyperlink{secp256k1_8c_a7bd08fb7f758494d5011849b6ca0ef13}{secp256k1\+\_\+ecdsa\+\_\+signature\+\_\+parse\+\_\+der}} (const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}ctx, \mbox{\hyperlink{structsecp256k1__ecdsa__signature}{secp256k1\+\_\+ecdsa\+\_\+signature}} \texorpdfstring{$\ast$}{*}sig, const unsigned char \texorpdfstring{$\ast$}{*}input, size\+\_\+t inputlen)
+\item 
+int \mbox{\hyperlink{secp256k1_8c_a933083356e7171e174bc958b8233f758}{secp256k1\+\_\+ecdsa\+\_\+signature\+\_\+parse\+\_\+compact}} (const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}ctx, \mbox{\hyperlink{structsecp256k1__ecdsa__signature}{secp256k1\+\_\+ecdsa\+\_\+signature}} \texorpdfstring{$\ast$}{*}sig, const unsigned char \texorpdfstring{$\ast$}{*}input64)
+\item 
+int \mbox{\hyperlink{secp256k1_8c_a3f1fbd9cfe9bd6b6303bdd8f6c0687ba}{secp256k1\+\_\+ecdsa\+\_\+signature\+\_\+serialize\+\_\+der}} (const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}ctx, unsigned char \texorpdfstring{$\ast$}{*}output, size\+\_\+t \texorpdfstring{$\ast$}{*}outputlen, const \mbox{\hyperlink{structsecp256k1__ecdsa__signature}{secp256k1\+\_\+ecdsa\+\_\+signature}} \texorpdfstring{$\ast$}{*}sig)
+\item 
+int \mbox{\hyperlink{secp256k1_8c_ac369bdcc5f8d5ced129e84895bf739db}{secp256k1\+\_\+ecdsa\+\_\+signature\+\_\+serialize\+\_\+compact}} (const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}ctx, unsigned char \texorpdfstring{$\ast$}{*}output64, const \mbox{\hyperlink{structsecp256k1__ecdsa__signature}{secp256k1\+\_\+ecdsa\+\_\+signature}} \texorpdfstring{$\ast$}{*}sig)
+\item 
+int \mbox{\hyperlink{secp256k1_8c_a6ebd89d119f3da65e165947573ebd3ce}{secp256k1\+\_\+ecdsa\+\_\+signature\+\_\+normalize}} (const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}ctx, \mbox{\hyperlink{structsecp256k1__ecdsa__signature}{secp256k1\+\_\+ecdsa\+\_\+signature}} \texorpdfstring{$\ast$}{*}sigout, const \mbox{\hyperlink{structsecp256k1__ecdsa__signature}{secp256k1\+\_\+ecdsa\+\_\+signature}} \texorpdfstring{$\ast$}{*}sigin)
+\item 
+int \mbox{\hyperlink{secp256k1_8c_abd11af3da8d88984e87ec8f06fb0087a}{secp256k1\+\_\+ecdsa\+\_\+verify}} (const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}ctx, const \mbox{\hyperlink{structsecp256k1__ecdsa__signature}{secp256k1\+\_\+ecdsa\+\_\+signature}} \texorpdfstring{$\ast$}{*}sig, const unsigned char \texorpdfstring{$\ast$}{*}msghash32, const \mbox{\hyperlink{structsecp256k1__pubkey}{secp256k1\+\_\+pubkey}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}})
+\item 
+int \mbox{\hyperlink{secp256k1_8c_af5ff5bb2cad5c58e90c653092648c63a}{secp256k1\+\_\+ecdsa\+\_\+sign}} (const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}ctx, \mbox{\hyperlink{structsecp256k1__ecdsa__signature}{secp256k1\+\_\+ecdsa\+\_\+signature}} \texorpdfstring{$\ast$}{*}signature, const unsigned char \texorpdfstring{$\ast$}{*}msghash32, const unsigned char \texorpdfstring{$\ast$}{*}seckey, \mbox{\hyperlink{secp256k1_8h_a539882fd91bff672712fa19a4cfaeb98}{secp256k1\+\_\+nonce\+\_\+function}} noncefp, const void \texorpdfstring{$\ast$}{*}noncedata)
+\item 
+int \mbox{\hyperlink{secp256k1_8c_a6015346bdaee22c65e5ebca71693d9b1}{secp256k1\+\_\+ec\+\_\+seckey\+\_\+verify}} (const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}ctx, const unsigned char \texorpdfstring{$\ast$}{*}seckey)
+\item 
+int \mbox{\hyperlink{secp256k1_8c_ac5806cffd3278e64f863027eaa8e1284}{secp256k1\+\_\+ec\+\_\+pubkey\+\_\+create}} (const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}ctx, \mbox{\hyperlink{structsecp256k1__pubkey}{secp256k1\+\_\+pubkey}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}}, const unsigned char \texorpdfstring{$\ast$}{*}seckey)
+\item 
+int \mbox{\hyperlink{secp256k1_8c_a877d2d85643148d932a95868f5660e26}{secp256k1\+\_\+ec\+\_\+seckey\+\_\+negate}} (const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}ctx, unsigned char \texorpdfstring{$\ast$}{*}seckey)
+\item 
+int \mbox{\hyperlink{secp256k1_8c_a1f302f1c75085b4070f04e5a347ef9e6}{secp256k1\+\_\+ec\+\_\+privkey\+\_\+negate}} (const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}ctx, unsigned char \texorpdfstring{$\ast$}{*}seckey)
+\item 
+int \mbox{\hyperlink{secp256k1_8c_afb380139bce6f6722e35add4c375debb}{secp256k1\+\_\+ec\+\_\+pubkey\+\_\+negate}} (const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}ctx, \mbox{\hyperlink{structsecp256k1__pubkey}{secp256k1\+\_\+pubkey}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}})
+\item 
+int \mbox{\hyperlink{secp256k1_8c_a615cecca9de98d5f67333c76564ed6bf}{secp256k1\+\_\+ec\+\_\+seckey\+\_\+tweak\+\_\+add}} (const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}ctx, unsigned char \texorpdfstring{$\ast$}{*}seckey, const unsigned char \texorpdfstring{$\ast$}{*}tweak32)
+\item 
+int \mbox{\hyperlink{secp256k1_8c_a0c0adfadb899c6a150f0351d57b7a55f}{secp256k1\+\_\+ec\+\_\+privkey\+\_\+tweak\+\_\+add}} (const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}ctx, unsigned char \texorpdfstring{$\ast$}{*}seckey, const unsigned char \texorpdfstring{$\ast$}{*}tweak32)
+\item 
+int \mbox{\hyperlink{secp256k1_8c_a37cae594daf23e05431eda1b20610f73}{secp256k1\+\_\+ec\+\_\+pubkey\+\_\+tweak\+\_\+add}} (const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}ctx, \mbox{\hyperlink{structsecp256k1__pubkey}{secp256k1\+\_\+pubkey}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}}, const unsigned char \texorpdfstring{$\ast$}{*}tweak32)
+\item 
+int \mbox{\hyperlink{secp256k1_8c_a42895c7fad28c83d4373a40ba49323f1}{secp256k1\+\_\+ec\+\_\+seckey\+\_\+tweak\+\_\+mul}} (const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}ctx, unsigned char \texorpdfstring{$\ast$}{*}seckey, const unsigned char \texorpdfstring{$\ast$}{*}tweak32)
+\item 
+int \mbox{\hyperlink{secp256k1_8c_afc4a7b9d8e9fca8c8b12b3706329f6b2}{secp256k1\+\_\+ec\+\_\+privkey\+\_\+tweak\+\_\+mul}} (const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}ctx, unsigned char \texorpdfstring{$\ast$}{*}seckey, const unsigned char \texorpdfstring{$\ast$}{*}tweak32)
+\item 
+int \mbox{\hyperlink{secp256k1_8c_aef753193bf672b7c5e6156daa962bf55}{secp256k1\+\_\+ec\+\_\+pubkey\+\_\+tweak\+\_\+mul}} (const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}ctx, \mbox{\hyperlink{structsecp256k1__pubkey}{secp256k1\+\_\+pubkey}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}}, const unsigned char \texorpdfstring{$\ast$}{*}tweak32)
+\item 
+int \mbox{\hyperlink{secp256k1_8c_aba25f5f986a05a1cd06f5452b26ff868}{secp256k1\+\_\+context\+\_\+randomize}} (\mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}ctx, const unsigned char \texorpdfstring{$\ast$}{*}seed32)
+\item 
+int \mbox{\hyperlink{secp256k1_8c_a92498665c38198fc1943e463c017c140}{secp256k1\+\_\+ec\+\_\+pubkey\+\_\+combine}} (const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}ctx, \mbox{\hyperlink{structsecp256k1__pubkey}{secp256k1\+\_\+pubkey}} \texorpdfstring{$\ast$}{*}pubnonce, const \mbox{\hyperlink{structsecp256k1__pubkey}{secp256k1\+\_\+pubkey}} \texorpdfstring{$\ast$}{*}const \texorpdfstring{$\ast$}{*}pubnonces, size\+\_\+t n)
+\item 
+int \mbox{\hyperlink{secp256k1_8c_a364d53929192054916b1207a22e701ec}{secp256k1\+\_\+tagged\+\_\+sha256}} (const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}ctx, unsigned char \texorpdfstring{$\ast$}{*}hash32, const unsigned char \texorpdfstring{$\ast$}{*}tag, size\+\_\+t taglen, const unsigned char \texorpdfstring{$\ast$}{*}msg, size\+\_\+t msglen)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{secp256k1_8c_a608b4988c34455c40bb91eb38033db1a}{secp256k1\+\_\+context\+\_\+no\+\_\+precomp}} = \&secp256k1\+\_\+context\+\_\+no\+\_\+precomp\+\_\+
+\item 
+const \mbox{\hyperlink{secp256k1_8h_a539882fd91bff672712fa19a4cfaeb98}{secp256k1\+\_\+nonce\+\_\+function}} \mbox{\hyperlink{secp256k1_8c_a2ac052a733aac60ef5c19f1f79e3c1dd}{secp256k1\+\_\+nonce\+\_\+function\+\_\+rfc6979}} = nonce\+\_\+function\+\_\+rfc6979
+\item 
+const \mbox{\hyperlink{secp256k1_8h_a539882fd91bff672712fa19a4cfaeb98}{secp256k1\+\_\+nonce\+\_\+function}} \mbox{\hyperlink{secp256k1_8c_a28fc3fe2c4a63199be2fea7303f012a0}{secp256k1\+\_\+nonce\+\_\+function\+\_\+default}} = nonce\+\_\+function\+\_\+rfc6979
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}\index{secp256k1.c@{secp256k1.c}!ARG\_CHECK@{ARG\_CHECK}}
+\index{ARG\_CHECK@{ARG\_CHECK}!secp256k1.c@{secp256k1.c}}
+\doxysubsubsection{\texorpdfstring{ARG\_CHECK}{ARG\_CHECK}}
+{\footnotesize\ttfamily \label{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727} 
+\#define ARG\+\_\+\+CHECK(\begin{DoxyParamCaption}\item[{}]{cond}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ if\ (\mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_a76e8a689f16456e44a2cc438a6821025}{EXPECT}}(!(cond),\ 0))\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ secp256k1\_callback\_call(\&ctx-\/>illegal\_callback,\ \#cond);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\}\ \textcolor{keywordflow}{while}(0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{secp256k1_8c_source_l00034}{34}} of file \mbox{\hyperlink{secp256k1_8c_source}{secp256k1.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00034\ \textcolor{preprocessor}{\#define\ ARG\_CHECK(cond)\ do\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00035\ \textcolor{preprocessor}{\ \ \ \ if\ (EXPECT(!(cond),\ 0))\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00036\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ secp256k1\_callback\_call(\&ctx-\/>illegal\_callback,\ \#cond);\ \(\backslash\)}}
+\DoxyCodeLine{00037\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ return\ 0;\ \(\backslash\)}}
+\DoxyCodeLine{00038\ \textcolor{preprocessor}{\ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00039\ \textcolor{preprocessor}{\}\ while(0)}}
+
+\end{DoxyCode}
+\Hypertarget{secp256k1_8c_aab3587a00b3cf74369ea1bbbaeb1c3fb}\index{secp256k1.c@{secp256k1.c}!ARG\_CHECK\_NO\_RETURN@{ARG\_CHECK\_NO\_RETURN}}
+\index{ARG\_CHECK\_NO\_RETURN@{ARG\_CHECK\_NO\_RETURN}!secp256k1.c@{secp256k1.c}}
+\doxysubsubsection{\texorpdfstring{ARG\_CHECK\_NO\_RETURN}{ARG\_CHECK\_NO\_RETURN}}
+{\footnotesize\ttfamily \label{secp256k1_8c_aab3587a00b3cf74369ea1bbbaeb1c3fb} 
+\#define ARG\+\_\+\+CHECK\+\_\+\+NO\+\_\+\+RETURN(\begin{DoxyParamCaption}\item[{}]{cond}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ if\ (\mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_a76e8a689f16456e44a2cc438a6821025}{EXPECT}}(!(cond),\ 0))\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ secp256k1\_callback\_call(\&ctx-\/>illegal\_callback,\ \#cond);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\}\ \textcolor{keywordflow}{while}(0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{secp256k1_8c_source_l00041}{41}} of file \mbox{\hyperlink{secp256k1_8c_source}{secp256k1.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00041\ \textcolor{preprocessor}{\#define\ ARG\_CHECK\_NO\_RETURN(cond)\ do\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00042\ \textcolor{preprocessor}{\ \ \ \ if\ (EXPECT(!(cond),\ 0))\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00043\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ secp256k1\_callback\_call(\&ctx-\/>illegal\_callback,\ \#cond);\ \(\backslash\)}}
+\DoxyCodeLine{00044\ \textcolor{preprocessor}{\ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00045\ \textcolor{preprocessor}{\}\ while(0)}}
+
+\end{DoxyCode}
+\Hypertarget{secp256k1_8c_a1c49db739b76634ccbd0db4233e6cd8a}\index{secp256k1.c@{secp256k1.c}!SECP256K1\_BUILD@{SECP256K1\_BUILD}}
+\index{SECP256K1\_BUILD@{SECP256K1\_BUILD}!secp256k1.c@{secp256k1.c}}
+\doxysubsubsection{\texorpdfstring{SECP256K1\_BUILD}{SECP256K1\_BUILD}}
+{\footnotesize\ttfamily \label{secp256k1_8c_a1c49db739b76634ccbd0db4233e6cd8a} 
+\#define SECP256\+K1\+\_\+\+BUILD}
+
+
+
+Definition at line \mbox{\hyperlink{secp256k1_8c_source_l00007}{7}} of file \mbox{\hyperlink{secp256k1_8c_source}{secp256k1.\+c}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{secp256k1_8c_adb5e8056701518fc6aac1738ff58fec1}\index{secp256k1.c@{secp256k1.c}!secp256k1\_context\_clone@{secp256k1\_context\_clone}}
+\index{secp256k1\_context\_clone@{secp256k1\_context\_clone}!secp256k1.c@{secp256k1.c}}
+\doxysubsubsection{\texorpdfstring{secp256k1\_context\_clone()}{secp256k1\_context\_clone()}}
+{\footnotesize\ttfamily \label{secp256k1_8c_adb5e8056701518fc6aac1738ff58fec1} 
+\mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*} secp256k1\+\_\+context\+\_\+clone (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}}]{ctx}{}\end{DoxyParamCaption})}
+
+Copy a secp256k1 context object (into dynamically allocated memory).
+
+This function uses malloc to allocate memory. It is guaranteed that malloc is called at most once for every call of this function. If you need to avoid dynamic memory allocation entirely, see the functions in \doxylink{secp256k1__preallocated_8h}{secp256k1\+\_\+preallocated.\+h}.
+
+Returns\+: a newly created context object. Args\+: ctx\+: an existing context to copy 
+
+Definition at line \mbox{\hyperlink{secp256k1_8c_source_l00128}{128}} of file \mbox{\hyperlink{secp256k1_8c_source}{secp256k1.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00129\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__context__struct}{secp256k1\_context}}*\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00130\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ prealloc\_size;}
+\DoxyCodeLine{00131\ }
+\DoxyCodeLine{00132\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(ctx\ !=\ NULL);}
+\DoxyCodeLine{00133\ \ \ \ \ prealloc\_size\ =\ \mbox{\hyperlink{secp256k1_8c_a5665930bf606d6a7262cebc936eda949}{secp256k1\_context\_preallocated\_clone\_size}}(ctx);}
+\DoxyCodeLine{00134\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ (\mbox{\hyperlink{structsecp256k1__context__struct}{secp256k1\_context}}*)checked\_malloc(\&ctx-\/>\mbox{\hyperlink{structsecp256k1__context__struct_aa34a996f869676899e8625adfb6c6f1d}{error\_callback}},\ prealloc\_size);}
+\DoxyCodeLine{00135\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{secp256k1_8c_a2a2e39dbcd6d55d8e6faaad194261a71}{secp256k1\_context\_preallocated\_clone}}(ctx,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}});}
+\DoxyCodeLine{00136\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00137\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{secp256k1_8c_adb5e8056701518fc6aac1738ff58fec1_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{secp256k1_8c_adb5e8056701518fc6aac1738ff58fec1_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{secp256k1_8c_a861ce6fc7ee5e9fc346a5fee7093adb1}\index{secp256k1.c@{secp256k1.c}!secp256k1\_context\_create@{secp256k1\_context\_create}}
+\index{secp256k1\_context\_create@{secp256k1\_context\_create}!secp256k1.c@{secp256k1.c}}
+\doxysubsubsection{\texorpdfstring{secp256k1\_context\_create()}{secp256k1\_context\_create()}}
+{\footnotesize\ttfamily \label{secp256k1_8c_a861ce6fc7ee5e9fc346a5fee7093adb1} 
+\mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*} secp256k1\+\_\+context\+\_\+create (\begin{DoxyParamCaption}\item[{unsigned int}]{flags}{}\end{DoxyParamCaption})}
+
+Create a secp256k1 context object (in dynamically allocated memory).
+
+This function uses malloc to allocate memory. It is guaranteed that malloc is called at most once for every call of this function. If you need to avoid dynamic memory allocation entirely, see the functions in \doxylink{secp256k1__preallocated_8h}{secp256k1\+\_\+preallocated.\+h}.
+
+Returns\+: a newly created context object. In\+: flags\+: which parts of the context to initialize.
+
+See also secp256k1\+\_\+context\+\_\+randomize. 
+
+Definition at line \mbox{\hyperlink{secp256k1_8c_source_l00107}{107}} of file \mbox{\hyperlink{secp256k1_8c_source}{secp256k1.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00108\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \textcolor{keyword}{const}\ prealloc\_size\ =\ \mbox{\hyperlink{secp256k1_8c_a9f5faeec85b85bdaccd7ddda899dbfa2}{secp256k1\_context\_preallocated\_size}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_ae0ed371842ace71a7886a6134ecbcb62}{flags}});}
+\DoxyCodeLine{00109\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__context__struct}{secp256k1\_context}}*\ ctx\ =\ (\mbox{\hyperlink{structsecp256k1__context__struct}{secp256k1\_context}}*)checked\_malloc(\&default\_error\_callback,\ prealloc\_size);}
+\DoxyCodeLine{00110\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_a76e8a689f16456e44a2cc438a6821025}{EXPECT}}(\mbox{\hyperlink{secp256k1_8c_af4866e9619f06679358fe6338ed42cd0}{secp256k1\_context\_preallocated\_create}}(ctx,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae0ed371842ace71a7886a6134ecbcb62}{flags}})\ ==\ NULL,\ 0))\ \{}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ free(ctx);}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ NULL;}
+\DoxyCodeLine{00113\ \ \ \ \ \}}
+\DoxyCodeLine{00114\ }
+\DoxyCodeLine{00115\ \ \ \ \ \textcolor{keywordflow}{return}\ ctx;}
+\DoxyCodeLine{00116\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{secp256k1_8c_a861ce6fc7ee5e9fc346a5fee7093adb1_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{secp256k1_8c_a861ce6fc7ee5e9fc346a5fee7093adb1_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{secp256k1_8c_ac80c186f8ff22d87441240267a2c8100}\index{secp256k1.c@{secp256k1.c}!secp256k1\_context\_destroy@{secp256k1\_context\_destroy}}
+\index{secp256k1\_context\_destroy@{secp256k1\_context\_destroy}!secp256k1.c@{secp256k1.c}}
+\doxysubsubsection{\texorpdfstring{secp256k1\_context\_destroy()}{secp256k1\_context\_destroy()}}
+{\footnotesize\ttfamily \label{secp256k1_8c_ac80c186f8ff22d87441240267a2c8100} 
+void secp256k1\+\_\+context\+\_\+destroy (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}}]{ctx}{}\end{DoxyParamCaption})}
+
+Destroy a secp256k1 context object (created in dynamically allocated memory).
+
+The context pointer may not be used afterwards.
+
+The context to destroy must have been created using secp256k1\+\_\+context\+\_\+create or secp256k1\+\_\+context\+\_\+clone. If the context has instead been created using secp256k1\+\_\+context\+\_\+preallocated\+\_\+create or secp256k1\+\_\+context\+\_\+preallocated\+\_\+clone, the behaviour is undefined. In that case, secp256k1\+\_\+context\+\_\+preallocated\+\_\+destroy must be used instead.
+
+Args\+: ctx\+: an existing context to destroy, constructed using secp256k1\+\_\+context\+\_\+create or secp256k1\+\_\+context\+\_\+clone 
+
+Definition at line \mbox{\hyperlink{secp256k1_8c_source_l00146}{146}} of file \mbox{\hyperlink{secp256k1_8c_source}{secp256k1.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00147\ \ \ \ \ \textcolor{keywordflow}{if}\ (ctx\ !=\ NULL)\ \{}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a62b32b6a46f53b6aef01d3888496a79f}{secp256k1\_context\_preallocated\_destroy}}(ctx);}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ free(ctx);}
+\DoxyCodeLine{00150\ \ \ \ \ \}}
+\DoxyCodeLine{00151\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{secp256k1_8c_ac80c186f8ff22d87441240267a2c8100_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{secp256k1_8c_ac80c186f8ff22d87441240267a2c8100_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{secp256k1_8c_a2a2e39dbcd6d55d8e6faaad194261a71}\index{secp256k1.c@{secp256k1.c}!secp256k1\_context\_preallocated\_clone@{secp256k1\_context\_preallocated\_clone}}
+\index{secp256k1\_context\_preallocated\_clone@{secp256k1\_context\_preallocated\_clone}!secp256k1.c@{secp256k1.c}}
+\doxysubsubsection{\texorpdfstring{secp256k1\_context\_preallocated\_clone()}{secp256k1\_context\_preallocated\_clone()}}
+{\footnotesize\ttfamily \label{secp256k1_8c_a2a2e39dbcd6d55d8e6faaad194261a71} 
+\mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*} secp256k1\+\_\+context\+\_\+preallocated\+\_\+clone (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}}]{ctx}{, }\item[{void \texorpdfstring{$\ast$}{*}}]{prealloc}{}\end{DoxyParamCaption})}
+
+Copy a secp256k1 context object into caller-\/provided memory.
+
+The caller must provide a pointer to a rewritable contiguous block of memory of size at least secp256k1\+\_\+context\+\_\+preallocated\+\_\+size(flags) bytes, suitably aligned to hold an object of any type.
+
+The block of memory is exclusively owned by the created context object during the lifetime of this context object, see the description of secp256k1\+\_\+context\+\_\+preallocated\+\_\+create for details.
+
+Returns\+: a newly created context object. Args\+: ctx\+: an existing context to copy. In\+: prealloc\+: a pointer to a rewritable contiguous block of memory of size at least secp256k1\+\_\+context\+\_\+preallocated\+\_\+size(flags) bytes, as detailed above. 
+
+Definition at line \mbox{\hyperlink{secp256k1_8c_source_l00118}{118}} of file \mbox{\hyperlink{secp256k1_8c_source}{secp256k1.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00119\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__context__struct}{secp256k1\_context}}*\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00120\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(ctx\ !=\ NULL);}
+\DoxyCodeLine{00121\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(prealloc\ !=\ NULL);}
+\DoxyCodeLine{00122\ }
+\DoxyCodeLine{00123\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ (\mbox{\hyperlink{structsecp256k1__context__struct}{secp256k1\_context}}*)prealloc;}
+\DoxyCodeLine{00124\ \ \ \ \ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ *ctx;}
+\DoxyCodeLine{00125\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00126\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{secp256k1_8c_a2a2e39dbcd6d55d8e6faaad194261a71_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{secp256k1_8c_a5665930bf606d6a7262cebc936eda949}\index{secp256k1.c@{secp256k1.c}!secp256k1\_context\_preallocated\_clone\_size@{secp256k1\_context\_preallocated\_clone\_size}}
+\index{secp256k1\_context\_preallocated\_clone\_size@{secp256k1\_context\_preallocated\_clone\_size}!secp256k1.c@{secp256k1.c}}
+\doxysubsubsection{\texorpdfstring{secp256k1\_context\_preallocated\_clone\_size()}{secp256k1\_context\_preallocated\_clone\_size()}}
+{\footnotesize\ttfamily \label{secp256k1_8c_a5665930bf606d6a7262cebc936eda949} 
+size\+\_\+t secp256k1\+\_\+context\+\_\+preallocated\+\_\+clone\+\_\+size (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}}]{ctx}{}\end{DoxyParamCaption})}
+
+Determine the memory size of a secp256k1 context object to be copied into caller-\/provided memory.
+
+Returns\+: the required size of the caller-\/provided memory block. In\+: ctx\+: an existing context to copy. 
+
+Definition at line \mbox{\hyperlink{secp256k1_8c_source_l00076}{76}} of file \mbox{\hyperlink{secp256k1_8c_source}{secp256k1.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00077\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\_context}});}
+\DoxyCodeLine{00078\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(ctx\ !=\ NULL);}
+\DoxyCodeLine{00079\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00080\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{secp256k1_8c_a5665930bf606d6a7262cebc936eda949_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{secp256k1_8c_af4866e9619f06679358fe6338ed42cd0}\index{secp256k1.c@{secp256k1.c}!secp256k1\_context\_preallocated\_create@{secp256k1\_context\_preallocated\_create}}
+\index{secp256k1\_context\_preallocated\_create@{secp256k1\_context\_preallocated\_create}!secp256k1.c@{secp256k1.c}}
+\doxysubsubsection{\texorpdfstring{secp256k1\_context\_preallocated\_create()}{secp256k1\_context\_preallocated\_create()}}
+{\footnotesize\ttfamily \label{secp256k1_8c_af4866e9619f06679358fe6338ed42cd0} 
+\mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*} secp256k1\+\_\+context\+\_\+preallocated\+\_\+create (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{prealloc}{, }\item[{unsigned int}]{flags}{}\end{DoxyParamCaption})}
+
+Create a secp256k1 context object in caller-\/provided memory.
+
+The caller must provide a pointer to a rewritable contiguous block of memory of size at least secp256k1\+\_\+context\+\_\+preallocated\+\_\+size(flags) bytes, suitably aligned to hold an object of any type.
+
+The block of memory is exclusively owned by the created context object during the lifetime of this context object, which begins with the call to this function and ends when a call to secp256k1\+\_\+context\+\_\+preallocated\+\_\+destroy (which destroys the context object again) returns. During the lifetime of the context object, the caller is obligated not to access this block of memory, i.\+e., the caller may not read or write the memory, e.\+g., by copying the memory contents to a different location or trying to create a second context object in the memory. In simpler words, the prealloc pointer (or any pointer derived from it) should not be used during the lifetime of the context object.
+
+Returns\+: a newly created context object. In\+: prealloc\+: a pointer to a rewritable contiguous block of memory of size at least secp256k1\+\_\+context\+\_\+preallocated\+\_\+size(flags) bytes, as detailed above. flags\+: which parts of the context to initialize.
+
+See also secp256k1\+\_\+context\+\_\+randomize (in \doxylink{secp256k1_8h}{secp256k1.\+h}) and secp256k1\+\_\+context\+\_\+preallocated\+\_\+destroy. 
+
+Definition at line \mbox{\hyperlink{secp256k1_8c_source_l00082}{82}} of file \mbox{\hyperlink{secp256k1_8c_source}{secp256k1.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00083\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ prealloc\_size;}
+\DoxyCodeLine{00084\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__context__struct}{secp256k1\_context}}*\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00085\ }
+\DoxyCodeLine{00086\ \ \ \ \ \textcolor{keywordflow}{if}\ (!secp256k1\_selftest())\ \{}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ secp256k1\_callback\_call(\&default\_error\_callback,\ \textcolor{stringliteral}{"{}self\ test\ failed"{}});}
+\DoxyCodeLine{00088\ \ \ \ \ \}}
+\DoxyCodeLine{00089\ }
+\DoxyCodeLine{00090\ \ \ \ \ prealloc\_size\ =\ \mbox{\hyperlink{secp256k1_8c_a9f5faeec85b85bdaccd7ddda899dbfa2}{secp256k1\_context\_preallocated\_size}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_ae0ed371842ace71a7886a6134ecbcb62}{flags}});}
+\DoxyCodeLine{00091\ \ \ \ \ \textcolor{keywordflow}{if}\ (prealloc\_size\ ==\ 0)\ \{}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ NULL;}
+\DoxyCodeLine{00093\ \ \ \ \ \}}
+\DoxyCodeLine{00094\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(prealloc\ !=\ NULL);}
+\DoxyCodeLine{00095\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ (\mbox{\hyperlink{structsecp256k1__context__struct}{secp256k1\_context}}*)prealloc;}
+\DoxyCodeLine{00096\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}-\/>illegal\_callback\ =\ default\_illegal\_callback;}
+\DoxyCodeLine{00097\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}-\/>error\_callback\ =\ default\_error\_callback;}
+\DoxyCodeLine{00098\ }
+\DoxyCodeLine{00099\ \ \ \ \ \textcolor{comment}{/*\ Flags\ have\ been\ checked\ by\ secp256k1\_context\_preallocated\_size.\ */}}
+\DoxyCodeLine{00100\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}((\mbox{\hyperlink{yubihsm__pkcs11_8c_ae0ed371842ace71a7886a6134ecbcb62}{flags}}\ \&\ \mbox{\hyperlink{secp256k1_8h_ab2572c9f38f9a644f2933f7b74a5072f}{SECP256K1\_FLAGS\_TYPE\_MASK}})\ ==\ \mbox{\hyperlink{secp256k1_8h_ad96f13de52c4c94f5d11d53fd04c529f}{SECP256K1\_FLAGS\_TYPE\_CONTEXT}});}
+\DoxyCodeLine{00101\ \ \ \ \ secp256k1\_ecmult\_gen\_context\_build(\&\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}-\/>ecmult\_gen\_ctx);}
+\DoxyCodeLine{00102\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}-\/>declassify\ =\ !!(\mbox{\hyperlink{yubihsm__pkcs11_8c_ae0ed371842ace71a7886a6134ecbcb62}{flags}}\ \&\ \mbox{\hyperlink{secp256k1_8h_a459a70e8b474694c71f238f91a0d7921}{SECP256K1\_FLAGS\_BIT\_CONTEXT\_DECLASSIFY}});}
+\DoxyCodeLine{00103\ }
+\DoxyCodeLine{00104\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00105\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{secp256k1_8c_af4866e9619f06679358fe6338ed42cd0_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{secp256k1_8c_af4866e9619f06679358fe6338ed42cd0_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{secp256k1_8c_a62b32b6a46f53b6aef01d3888496a79f}\index{secp256k1.c@{secp256k1.c}!secp256k1\_context\_preallocated\_destroy@{secp256k1\_context\_preallocated\_destroy}}
+\index{secp256k1\_context\_preallocated\_destroy@{secp256k1\_context\_preallocated\_destroy}!secp256k1.c@{secp256k1.c}}
+\doxysubsubsection{\texorpdfstring{secp256k1\_context\_preallocated\_destroy()}{secp256k1\_context\_preallocated\_destroy()}}
+{\footnotesize\ttfamily \label{secp256k1_8c_a62b32b6a46f53b6aef01d3888496a79f} 
+void secp256k1\+\_\+context\+\_\+preallocated\+\_\+destroy (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}}]{ctx}{}\end{DoxyParamCaption})}
+
+Destroy a secp256k1 context object that has been created in caller-\/provided memory.
+
+The context pointer may not be used afterwards.
+
+The context to destroy must have been created using secp256k1\+\_\+context\+\_\+preallocated\+\_\+create or secp256k1\+\_\+context\+\_\+preallocated\+\_\+clone. If the context has instead been created using secp256k1\+\_\+context\+\_\+create or secp256k1\+\_\+context\+\_\+clone, the behaviour is undefined. In that case, secp256k1\+\_\+context\+\_\+destroy must be used instead.
+
+If required, it is the responsibility of the caller to deallocate the block of memory properly after this function returns, e.\+g., by calling free on the preallocated pointer given to secp256k1\+\_\+context\+\_\+preallocated\+\_\+create or secp256k1\+\_\+context\+\_\+preallocated\+\_\+clone.
+
+Args\+: ctx\+: an existing context to destroy, constructed using secp256k1\+\_\+context\+\_\+preallocated\+\_\+create or secp256k1\+\_\+context\+\_\+preallocated\+\_\+clone. 
+
+Definition at line \mbox{\hyperlink{secp256k1_8c_source_l00139}{139}} of file \mbox{\hyperlink{secp256k1_8c_source}{secp256k1.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00140\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_aab3587a00b3cf74369ea1bbbaeb1c3fb}{ARG\_CHECK\_NO\_RETURN}}(ctx\ !=\ \mbox{\hyperlink{secp256k1_8c_a608b4988c34455c40bb91eb38033db1a}{secp256k1\_context\_no\_precomp}});}
+\DoxyCodeLine{00141\ \ \ \ \ \textcolor{keywordflow}{if}\ (ctx\ !=\ NULL)\ \{}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ secp256k1\_ecmult\_gen\_context\_clear(\&ctx-\/>\mbox{\hyperlink{structsecp256k1__context__struct_aacc2071a68f9c5a6c05eb783f523b9eb}{ecmult\_gen\_ctx}});}
+\DoxyCodeLine{00143\ \ \ \ \ \}}
+\DoxyCodeLine{00144\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{secp256k1_8c_a62b32b6a46f53b6aef01d3888496a79f_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{secp256k1_8c_a9f5faeec85b85bdaccd7ddda899dbfa2}\index{secp256k1.c@{secp256k1.c}!secp256k1\_context\_preallocated\_size@{secp256k1\_context\_preallocated\_size}}
+\index{secp256k1\_context\_preallocated\_size@{secp256k1\_context\_preallocated\_size}!secp256k1.c@{secp256k1.c}}
+\doxysubsubsection{\texorpdfstring{secp256k1\_context\_preallocated\_size()}{secp256k1\_context\_preallocated\_size()}}
+{\footnotesize\ttfamily \label{secp256k1_8c_a9f5faeec85b85bdaccd7ddda899dbfa2} 
+size\+\_\+t secp256k1\+\_\+context\+\_\+preallocated\+\_\+size (\begin{DoxyParamCaption}\item[{unsigned int}]{flags}{}\end{DoxyParamCaption})}
+
+Determine the memory size of a secp256k1 context object to be created in caller-\/provided memory.
+
+The purpose of this function is to determine how much memory must be provided to secp256k1\+\_\+context\+\_\+preallocated\+\_\+create.
+
+Returns\+: the required size of the caller-\/provided memory block In\+: flags\+: which parts of the context to initialize. 
+
+Definition at line \mbox{\hyperlink{secp256k1_8c_source_l00062}{62}} of file \mbox{\hyperlink{secp256k1_8c_source}{secp256k1.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00063\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\_context}});}
+\DoxyCodeLine{00064\ \ \ \ \ \textcolor{comment}{/*\ A\ return\ value\ of\ 0\ is\ reserved\ as\ an\ indicator\ for\ errors\ when\ we\ call\ this\ function\ internally.\ */}}
+\DoxyCodeLine{00065\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ !=\ 0);}
+\DoxyCodeLine{00066\ }
+\DoxyCodeLine{00067\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_a76e8a689f16456e44a2cc438a6821025}{EXPECT}}((\mbox{\hyperlink{yubihsm__pkcs11_8c_ae0ed371842ace71a7886a6134ecbcb62}{flags}}\ \&\ \mbox{\hyperlink{secp256k1_8h_ab2572c9f38f9a644f2933f7b74a5072f}{SECP256K1\_FLAGS\_TYPE\_MASK}})\ !=\ \mbox{\hyperlink{secp256k1_8h_ad96f13de52c4c94f5d11d53fd04c529f}{SECP256K1\_FLAGS\_TYPE\_CONTEXT}},\ 0))\ \{}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \ \ \ secp256k1\_callback\_call(\&default\_illegal\_callback,}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Invalid\ flags"{}});}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00071\ \ \ \ \ \}}
+\DoxyCodeLine{00072\ }
+\DoxyCodeLine{00073\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00074\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{secp256k1_8c_a9f5faeec85b85bdaccd7ddda899dbfa2_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{secp256k1_8c_aba25f5f986a05a1cd06f5452b26ff868}\index{secp256k1.c@{secp256k1.c}!secp256k1\_context\_randomize@{secp256k1\_context\_randomize}}
+\index{secp256k1\_context\_randomize@{secp256k1\_context\_randomize}!secp256k1.c@{secp256k1.c}}
+\doxysubsubsection{\texorpdfstring{secp256k1\_context\_randomize()}{secp256k1\_context\_randomize()}}
+{\footnotesize\ttfamily \label{secp256k1_8c_aba25f5f986a05a1cd06f5452b26ff868} 
+int secp256k1\+\_\+context\+\_\+randomize (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}}]{ctx}{, }\item[{const unsigned char \texorpdfstring{$\ast$}{*}}]{seed32}{}\end{DoxyParamCaption})}
+
+Updates the context randomization to protect against side-\/channel leakage. Returns\+: 1\+: randomization successfully updated or nothing to randomize 0\+: error Args\+: ctx\+: pointer to a context object. In\+: seed32\+: pointer to a 32-\/byte random seed (NULL resets to initial state)
+
+While secp256k1 code is written to be constant-\/time no matter what secret values are, it\textquotesingle{}s possible that a future compiler may output code which isn\textquotesingle{}t, and also that the CPU may not emit the same radio frequencies or draw the same amount power for all values.
+
+This function provides a seed which is combined into the blinding value\+: that blinding value is added before each multiplication (and removed afterwards) so that it does not affect function results, but shields against attacks which rely on any input-\/dependent behaviour.
+
+This function has currently an effect only on contexts initialized for signing because randomization is currently used only for signing. However, this is not guaranteed and may change in the future. It is safe to call this function on contexts not initialized for signing; then it will have no effect and return 1.
+
+You should call this after secp256k1\+\_\+context\+\_\+create or secp256k1\+\_\+context\+\_\+clone (and secp256k1\+\_\+context\+\_\+preallocated\+\_\+create or secp256k1\+\_\+context\+\_\+clone, resp.), and you may call this repeatedly afterwards. 
+
+Definition at line \mbox{\hyperlink{secp256k1_8c_source_l00706}{706}} of file \mbox{\hyperlink{secp256k1_8c_source}{secp256k1.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00706\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00707\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(ctx\ !=\ NULL);}
+\DoxyCodeLine{00708\ \ \ \ \ \textcolor{keywordflow}{if}\ (secp256k1\_ecmult\_gen\_context\_is\_built(\&ctx-\/>\mbox{\hyperlink{structsecp256k1__context__struct_aacc2071a68f9c5a6c05eb783f523b9eb}{ecmult\_gen\_ctx}}))\ \{}
+\DoxyCodeLine{00709\ \ \ \ \ \ \ \ \ secp256k1\_ecmult\_gen\_blind(\&ctx-\/>\mbox{\hyperlink{structsecp256k1__context__struct_aacc2071a68f9c5a6c05eb783f523b9eb}{ecmult\_gen\_ctx}},\ seed32);}
+\DoxyCodeLine{00710\ \ \ \ \ \}}
+\DoxyCodeLine{00711\ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{00712\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{secp256k1_8c_aba25f5f986a05a1cd06f5452b26ff868_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{secp256k1_8c_a7384d60163d08fae0c5e8d1e1fdef60a}\index{secp256k1.c@{secp256k1.c}!secp256k1\_context\_set\_error\_callback@{secp256k1\_context\_set\_error\_callback}}
+\index{secp256k1\_context\_set\_error\_callback@{secp256k1\_context\_set\_error\_callback}!secp256k1.c@{secp256k1.c}}
+\doxysubsubsection{\texorpdfstring{secp256k1\_context\_set\_error\_callback()}{secp256k1\_context\_set\_error\_callback()}}
+{\footnotesize\ttfamily \label{secp256k1_8c_a7384d60163d08fae0c5e8d1e1fdef60a} 
+void secp256k1\+\_\+context\+\_\+set\+\_\+error\+\_\+callback (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}}]{ctx}{, }\item[{void(\texorpdfstring{$\ast$}{*}}]{fun~}{)(const char \texorpdfstring{$\ast$}{*}message, void \texorpdfstring{$\ast$}{*}data), }\item[{const void \texorpdfstring{$\ast$}{*}}]{data}{}\end{DoxyParamCaption})}
+
+Set a callback function to be called when an internal consistency check fails. The default is crashing.
+
+This can only trigger in case of a hardware failure, miscompilation, memory corruption, serious bug in the library, or other error would can otherwise result in undefined behaviour. It will not trigger due to mere incorrect usage of the API (see secp256k1\+\_\+context\+\_\+set\+\_\+illegal\+\_\+callback for that). After this callback returns, anything may happen, including crashing.
+
+Args\+: ctx\+: an existing context object. In\+: fun\+: a pointer to a function to call when an internal error occurs, taking a message and an opaque pointer (NULL restores the default handler, see secp256k1\+\_\+context\+\_\+set\+\_\+illegal\+\_\+callback for details). data\+: the opaque pointer to pass to fun above, must be NULL for the default handler.
+
+See also secp256k1\+\_\+context\+\_\+set\+\_\+illegal\+\_\+callback. 
+
+Definition at line \mbox{\hyperlink{secp256k1_8c_source_l00162}{162}} of file \mbox{\hyperlink{secp256k1_8c_source}{secp256k1.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00163\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_aab3587a00b3cf74369ea1bbbaeb1c3fb}{ARG\_CHECK\_NO\_RETURN}}(ctx\ !=\ \mbox{\hyperlink{secp256k1_8c_a608b4988c34455c40bb91eb38033db1a}{secp256k1\_context\_no\_precomp}});}
+\DoxyCodeLine{00164\ \ \ \ \ \textcolor{keywordflow}{if}\ (fun\ ==\ NULL)\ \{}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ fun\ =\ secp256k1\_default\_error\_callback\_fn;}
+\DoxyCodeLine{00166\ \ \ \ \ \}}
+\DoxyCodeLine{00167\ \ \ \ \ ctx-\/>\mbox{\hyperlink{structsecp256k1__context__struct_aa34a996f869676899e8625adfb6c6f1d}{error\_callback}}.\mbox{\hyperlink{structsecp256k1__callback_ab53dda8f586b668b302a0955de4de44c}{fn}}\ =\ fun;}
+\DoxyCodeLine{00168\ \ \ \ \ ctx-\/>\mbox{\hyperlink{structsecp256k1__context__struct_aa34a996f869676899e8625adfb6c6f1d}{error\_callback}}.\mbox{\hyperlink{structsecp256k1__callback_acd5a72114709ca9841ad31f88c1744bc}{data}}\ =\ data;}
+\DoxyCodeLine{00169\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{secp256k1_8c_a7384d60163d08fae0c5e8d1e1fdef60a_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{secp256k1_8c_a947ba36e0fe0bced91d4c9a7ef3b1f09}\index{secp256k1.c@{secp256k1.c}!secp256k1\_context\_set\_illegal\_callback@{secp256k1\_context\_set\_illegal\_callback}}
+\index{secp256k1\_context\_set\_illegal\_callback@{secp256k1\_context\_set\_illegal\_callback}!secp256k1.c@{secp256k1.c}}
+\doxysubsubsection{\texorpdfstring{secp256k1\_context\_set\_illegal\_callback()}{secp256k1\_context\_set\_illegal\_callback()}}
+{\footnotesize\ttfamily \label{secp256k1_8c_a947ba36e0fe0bced91d4c9a7ef3b1f09} 
+void secp256k1\+\_\+context\+\_\+set\+\_\+illegal\+\_\+callback (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}}]{ctx}{, }\item[{void(\texorpdfstring{$\ast$}{*}}]{fun~}{)(const char \texorpdfstring{$\ast$}{*}message, void \texorpdfstring{$\ast$}{*}data), }\item[{const void \texorpdfstring{$\ast$}{*}}]{data}{}\end{DoxyParamCaption})}
+
+Set a callback function to be called when an illegal argument is passed to an API call. It will only trigger for violations that are mentioned explicitly in the header.
+
+The philosophy is that these shouldn\textquotesingle{}t be dealt with through a specific return value, as calling code should not have branches to deal with the case that this code itself is broken.
+
+On the other hand, during debug stage, one would want to be informed about such mistakes, and the default (crashing) may be inadvisable. When this callback is triggered, the API function called is guaranteed not to cause a crash, though its return value and output arguments are undefined.
+
+When this function has not been called (or called with fn==NULL), then the default handler will be used. The library provides a default handler which writes the message to stderr and calls abort. This default handler can be replaced at link time if the preprocessor macro USE\+\_\+\+EXTERNAL\+\_\+\+DEFAULT\+\_\+\+CALLBACKS is defined, which is the case if the build has been configured with --enable-\/external-\/default-\/callbacks. Then the following two symbols must be provided to link against\+:
+\begin{DoxyItemize}
+\item void secp256k1\+\_\+default\+\_\+illegal\+\_\+callback\+\_\+fn(const char\texorpdfstring{$\ast$}{*} message, void\texorpdfstring{$\ast$}{*} data);
+\item void secp256k1\+\_\+default\+\_\+error\+\_\+callback\+\_\+fn(const char\texorpdfstring{$\ast$}{*} message, void\texorpdfstring{$\ast$}{*} data); The library can call these default handlers even before a proper callback data pointer could have been set using secp256k1\+\_\+context\+\_\+set\+\_\+illegal\+\_\+callback or secp256k1\+\_\+context\+\_\+set\+\_\+error\+\_\+callback, e.\+g., when the creation of a context fails. In this case, the corresponding default handler will be called with the data pointer argument set to NULL.
+\end{DoxyItemize}
+
+Args\+: ctx\+: an existing context object. In\+: fun\+: a pointer to a function to call when an illegal argument is passed to the API, taking a message and an opaque pointer. (NULL restores the default handler.) data\+: the opaque pointer to pass to fun above, must be NULL for the default handler.
+
+See also secp256k1\+\_\+context\+\_\+set\+\_\+error\+\_\+callback. 
+
+Definition at line \mbox{\hyperlink{secp256k1_8c_source_l00153}{153}} of file \mbox{\hyperlink{secp256k1_8c_source}{secp256k1.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00154\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_aab3587a00b3cf74369ea1bbbaeb1c3fb}{ARG\_CHECK\_NO\_RETURN}}(ctx\ !=\ \mbox{\hyperlink{secp256k1_8c_a608b4988c34455c40bb91eb38033db1a}{secp256k1\_context\_no\_precomp}});}
+\DoxyCodeLine{00155\ \ \ \ \ \textcolor{keywordflow}{if}\ (fun\ ==\ NULL)\ \{}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ fun\ =\ secp256k1\_default\_illegal\_callback\_fn;}
+\DoxyCodeLine{00157\ \ \ \ \ \}}
+\DoxyCodeLine{00158\ \ \ \ \ ctx-\/>\mbox{\hyperlink{structsecp256k1__context__struct_a6f73572b18e62b306c5699e9e1470ab5}{illegal\_callback}}.\mbox{\hyperlink{structsecp256k1__callback_ab53dda8f586b668b302a0955de4de44c}{fn}}\ =\ fun;}
+\DoxyCodeLine{00159\ \ \ \ \ ctx-\/>\mbox{\hyperlink{structsecp256k1__context__struct_a6f73572b18e62b306c5699e9e1470ab5}{illegal\_callback}}.\mbox{\hyperlink{structsecp256k1__callback_acd5a72114709ca9841ad31f88c1744bc}{data}}\ =\ data;}
+\DoxyCodeLine{00160\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{secp256k1_8c_a947ba36e0fe0bced91d4c9a7ef3b1f09_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{secp256k1_8c_a1f302f1c75085b4070f04e5a347ef9e6}\index{secp256k1.c@{secp256k1.c}!secp256k1\_ec\_privkey\_negate@{secp256k1\_ec\_privkey\_negate}}
+\index{secp256k1\_ec\_privkey\_negate@{secp256k1\_ec\_privkey\_negate}!secp256k1.c@{secp256k1.c}}
+\doxysubsubsection{\texorpdfstring{secp256k1\_ec\_privkey\_negate()}{secp256k1\_ec\_privkey\_negate()}}
+{\footnotesize\ttfamily \label{secp256k1_8c_a1f302f1c75085b4070f04e5a347ef9e6} 
+int secp256k1\+\_\+ec\+\_\+privkey\+\_\+negate (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}}]{ctx}{, }\item[{unsigned char \texorpdfstring{$\ast$}{*}}]{seckey}{}\end{DoxyParamCaption})}
+
+Same as secp256k1\+\_\+ec\+\_\+seckey\+\_\+negate, but DEPRECATED. Will be removed in future versions. 
+
+Definition at line \mbox{\hyperlink{secp256k1_8c_source_l00584}{584}} of file \mbox{\hyperlink{secp256k1_8c_source}{secp256k1.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00584\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00585\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{secp256k1_8c_a877d2d85643148d932a95868f5660e26}{secp256k1\_ec\_seckey\_negate}}(ctx,\ seckey);}
+\DoxyCodeLine{00586\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=348pt]{secp256k1_8c_a1f302f1c75085b4070f04e5a347ef9e6_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{secp256k1_8c_a1f302f1c75085b4070f04e5a347ef9e6_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{secp256k1_8c_a0c0adfadb899c6a150f0351d57b7a55f}\index{secp256k1.c@{secp256k1.c}!secp256k1\_ec\_privkey\_tweak\_add@{secp256k1\_ec\_privkey\_tweak\_add}}
+\index{secp256k1\_ec\_privkey\_tweak\_add@{secp256k1\_ec\_privkey\_tweak\_add}!secp256k1.c@{secp256k1.c}}
+\doxysubsubsection{\texorpdfstring{secp256k1\_ec\_privkey\_tweak\_add()}{secp256k1\_ec\_privkey\_tweak\_add()}}
+{\footnotesize\ttfamily \label{secp256k1_8c_a0c0adfadb899c6a150f0351d57b7a55f} 
+int secp256k1\+\_\+ec\+\_\+privkey\+\_\+tweak\+\_\+add (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}}]{ctx}{, }\item[{unsigned char \texorpdfstring{$\ast$}{*}}]{seckey}{, }\item[{const unsigned char \texorpdfstring{$\ast$}{*}}]{tweak32}{}\end{DoxyParamCaption})}
+
+Same as secp256k1\+\_\+ec\+\_\+seckey\+\_\+tweak\+\_\+add, but DEPRECATED. Will be removed in future versions. 
+
+Definition at line \mbox{\hyperlink{secp256k1_8c_source_l00631}{631}} of file \mbox{\hyperlink{secp256k1_8c_source}{secp256k1.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00631\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00632\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{secp256k1_8c_a615cecca9de98d5f67333c76564ed6bf}{secp256k1\_ec\_seckey\_tweak\_add}}(ctx,\ seckey,\ tweak32);}
+\DoxyCodeLine{00633\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=348pt]{secp256k1_8c_a0c0adfadb899c6a150f0351d57b7a55f_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{secp256k1_8c_a0c0adfadb899c6a150f0351d57b7a55f_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{secp256k1_8c_afc4a7b9d8e9fca8c8b12b3706329f6b2}\index{secp256k1.c@{secp256k1.c}!secp256k1\_ec\_privkey\_tweak\_mul@{secp256k1\_ec\_privkey\_tweak\_mul}}
+\index{secp256k1\_ec\_privkey\_tweak\_mul@{secp256k1\_ec\_privkey\_tweak\_mul}!secp256k1.c@{secp256k1.c}}
+\doxysubsubsection{\texorpdfstring{secp256k1\_ec\_privkey\_tweak\_mul()}{secp256k1\_ec\_privkey\_tweak\_mul()}}
+{\footnotesize\ttfamily \label{secp256k1_8c_afc4a7b9d8e9fca8c8b12b3706329f6b2} 
+int secp256k1\+\_\+ec\+\_\+privkey\+\_\+tweak\+\_\+mul (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}}]{ctx}{, }\item[{unsigned char \texorpdfstring{$\ast$}{*}}]{seckey}{, }\item[{const unsigned char \texorpdfstring{$\ast$}{*}}]{tweak32}{}\end{DoxyParamCaption})}
+
+Same as secp256k1\+\_\+ec\+\_\+seckey\+\_\+tweak\+\_\+mul, but DEPRECATED. Will be removed in future versions. 
+
+Definition at line \mbox{\hyperlink{secp256k1_8c_source_l00679}{679}} of file \mbox{\hyperlink{secp256k1_8c_source}{secp256k1.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00679\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00680\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{secp256k1_8c_a42895c7fad28c83d4373a40ba49323f1}{secp256k1\_ec\_seckey\_tweak\_mul}}(ctx,\ seckey,\ tweak32);}
+\DoxyCodeLine{00681\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=348pt]{secp256k1_8c_afc4a7b9d8e9fca8c8b12b3706329f6b2_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{secp256k1_8c_afc4a7b9d8e9fca8c8b12b3706329f6b2_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{secp256k1_8c_a88fd105847bf65f59db29fed819570c6}\index{secp256k1.c@{secp256k1.c}!secp256k1\_ec\_pubkey\_cmp@{secp256k1\_ec\_pubkey\_cmp}}
+\index{secp256k1\_ec\_pubkey\_cmp@{secp256k1\_ec\_pubkey\_cmp}!secp256k1.c@{secp256k1.c}}
+\doxysubsubsection{\texorpdfstring{secp256k1\_ec\_pubkey\_cmp()}{secp256k1\_ec\_pubkey\_cmp()}}
+{\footnotesize\ttfamily \label{secp256k1_8c_a88fd105847bf65f59db29fed819570c6} 
+int secp256k1\+\_\+ec\+\_\+pubkey\+\_\+cmp (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}}]{ctx}{, }\item[{const \mbox{\hyperlink{structsecp256k1__pubkey}{secp256k1\+\_\+pubkey}} \texorpdfstring{$\ast$}{*}}]{pubkey1}{, }\item[{const \mbox{\hyperlink{structsecp256k1__pubkey}{secp256k1\+\_\+pubkey}} \texorpdfstring{$\ast$}{*}}]{pubkey2}{}\end{DoxyParamCaption})}
+
+Compare two public keys using lexicographic (of compressed serialization) order
+
+Returns\+: \texorpdfstring{$<$}{<}0 if the first public key is less than the second \texorpdfstring{$>$}{>}0 if the first public key is greater than the second 0 if the two public keys are equal Args\+: ctx\+: a secp256k1 context object. In\+: pubkey1\+: first public key to compare pubkey2\+: second public key to compare 
+
+Definition at line \mbox{\hyperlink{secp256k1_8c_source_l00269}{269}} of file \mbox{\hyperlink{secp256k1_8c_source}{secp256k1.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00269\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00270\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ out[2][33];}
+\DoxyCodeLine{00271\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__pubkey}{secp256k1\_pubkey}}*\ pk[2];}
+\DoxyCodeLine{00272\ \ \ \ \ \textcolor{keywordtype}{int}\ i;}
+\DoxyCodeLine{00273\ }
+\DoxyCodeLine{00274\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(ctx\ !=\ NULL);}
+\DoxyCodeLine{00275\ \ \ \ \ pk[0]\ =\ pubkey0;\ pk[1]\ =\ pubkey1;}
+\DoxyCodeLine{00276\ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ 2;\ i++)\ \{}
+\DoxyCodeLine{00277\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ out\_size\ =\ \textcolor{keyword}{sizeof}(out[i]);}
+\DoxyCodeLine{00278\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ If\ the\ public\ key\ is\ NULL\ or\ invalid,\ ec\_pubkey\_serialize\ will\ call}}
+\DoxyCodeLine{00279\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ *\ the\ illegal\_callback\ and\ return\ 0.\ In\ that\ case\ we\ will\ serialize\ the}}
+\DoxyCodeLine{00280\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ *\ key\ as\ all\ zeros\ which\ is\ less\ than\ any\ valid\ public\ key.\ This}}
+\DoxyCodeLine{00281\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ *\ results\ in\ consistent\ comparisons\ even\ if\ NULL\ or\ invalid\ pubkeys\ are}}
+\DoxyCodeLine{00282\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ *\ involved\ and\ prevents\ edge\ cases\ such\ as\ sorting\ algorithms\ that\ use}}
+\DoxyCodeLine{00283\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ *\ this\ function\ and\ do\ not\ terminate\ as\ a\ result.\ */}}
+\DoxyCodeLine{00284\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{secp256k1_8c_a3b0440ba2ccd06e9262b94b41b680df1}{secp256k1\_ec\_pubkey\_serialize}}(ctx,\ out[i],\ \&out\_size,\ pk[i],\ \mbox{\hyperlink{secp256k1_8h_a7b8f642c65e8b5c81fa4421b7c42ab57}{SECP256K1\_EC\_COMPRESSED}}))\ \{}
+\DoxyCodeLine{00285\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ Note\ that\ ec\_pubkey\_serialize\ should\ already\ set\ the\ output\ to}}
+\DoxyCodeLine{00286\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ *\ zero\ in\ that\ case,\ but\ it's\ not\ guaranteed\ by\ the\ API,\ we\ can't}}
+\DoxyCodeLine{00287\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ *\ test\ it\ and\ writing\ a\ VERIFY\_CHECK\ is\ more\ complex\ than}}
+\DoxyCodeLine{00288\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ *\ explicitly\ memsetting\ (again).\ */}}
+\DoxyCodeLine{00289\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(out[i],\ 0,\ \textcolor{keyword}{sizeof}(out[i]));}
+\DoxyCodeLine{00290\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00291\ \ \ \ \ \}}
+\DoxyCodeLine{00292\ \ \ \ \ \textcolor{keywordflow}{return}\ secp256k1\_memcmp\_var(out[0],\ out[1],\ \textcolor{keyword}{sizeof}(out[0]));}
+\DoxyCodeLine{00293\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{secp256k1_8c_a88fd105847bf65f59db29fed819570c6_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{secp256k1_8c_a88fd105847bf65f59db29fed819570c6_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{secp256k1_8c_a92498665c38198fc1943e463c017c140}\index{secp256k1.c@{secp256k1.c}!secp256k1\_ec\_pubkey\_combine@{secp256k1\_ec\_pubkey\_combine}}
+\index{secp256k1\_ec\_pubkey\_combine@{secp256k1\_ec\_pubkey\_combine}!secp256k1.c@{secp256k1.c}}
+\doxysubsubsection{\texorpdfstring{secp256k1\_ec\_pubkey\_combine()}{secp256k1\_ec\_pubkey\_combine()}}
+{\footnotesize\ttfamily \label{secp256k1_8c_a92498665c38198fc1943e463c017c140} 
+int secp256k1\+\_\+ec\+\_\+pubkey\+\_\+combine (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}}]{ctx}{, }\item[{\mbox{\hyperlink{structsecp256k1__pubkey}{secp256k1\+\_\+pubkey}} \texorpdfstring{$\ast$}{*}}]{out}{, }\item[{const \mbox{\hyperlink{structsecp256k1__pubkey}{secp256k1\+\_\+pubkey}} \texorpdfstring{$\ast$}{*}const \texorpdfstring{$\ast$}{*}}]{ins}{, }\item[{size\+\_\+t}]{n}{}\end{DoxyParamCaption})}
+
+Add a number of public keys together.
+
+Returns\+: 1\+: the sum of the public keys is valid. 0\+: the sum of the public keys is not valid. Args\+: ctx\+: pointer to a context object. Out\+: out\+: pointer to a public key object for placing the resulting public key. In\+: ins\+: pointer to array of pointers to public keys. n\+: the number of public keys to add together (must be at least 1). 
+
+Definition at line \mbox{\hyperlink{secp256k1_8c_source_l00714}{714}} of file \mbox{\hyperlink{secp256k1_8c_source}{secp256k1.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00714\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00715\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ i;}
+\DoxyCodeLine{00716\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__gej}{secp256k1\_gej}}\ Qj;}
+\DoxyCodeLine{00717\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__ge}{secp256k1\_ge}}\ Q;}
+\DoxyCodeLine{00718\ }
+\DoxyCodeLine{00719\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(ctx\ !=\ NULL);}
+\DoxyCodeLine{00720\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(pubnonce\ !=\ NULL);}
+\DoxyCodeLine{00721\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(pubnonce,\ 0,\ \textcolor{keyword}{sizeof}(*pubnonce));}
+\DoxyCodeLine{00722\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(n\ >=\ 1);}
+\DoxyCodeLine{00723\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(pubnonces\ !=\ NULL);}
+\DoxyCodeLine{00724\ }
+\DoxyCodeLine{00725\ \ \ \ \ secp256k1\_gej\_set\_infinity(\&Qj);}
+\DoxyCodeLine{00726\ }
+\DoxyCodeLine{00727\ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ n;\ i++)\ \{}
+\DoxyCodeLine{00728\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(pubnonces[i]\ !=\ NULL);}
+\DoxyCodeLine{00729\ \ \ \ \ \ \ \ \ secp256k1\_pubkey\_load(ctx,\ \&Q,\ pubnonces[i]);}
+\DoxyCodeLine{00730\ \ \ \ \ \ \ \ \ secp256k1\_gej\_add\_ge(\&Qj,\ \&Qj,\ \&Q);}
+\DoxyCodeLine{00731\ \ \ \ \ \}}
+\DoxyCodeLine{00732\ \ \ \ \ \textcolor{keywordflow}{if}\ (secp256k1\_gej\_is\_infinity(\&Qj))\ \{}
+\DoxyCodeLine{00733\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00734\ \ \ \ \ \}}
+\DoxyCodeLine{00735\ \ \ \ \ secp256k1\_ge\_set\_gej(\&Q,\ \&Qj);}
+\DoxyCodeLine{00736\ \ \ \ \ secp256k1\_pubkey\_save(pubnonce,\ \&Q);}
+\DoxyCodeLine{00737\ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{00738\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=283pt]{secp256k1_8c_a92498665c38198fc1943e463c017c140_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{secp256k1_8c_a92498665c38198fc1943e463c017c140_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{secp256k1_8c_ac5806cffd3278e64f863027eaa8e1284}\index{secp256k1.c@{secp256k1.c}!secp256k1\_ec\_pubkey\_create@{secp256k1\_ec\_pubkey\_create}}
+\index{secp256k1\_ec\_pubkey\_create@{secp256k1\_ec\_pubkey\_create}!secp256k1.c@{secp256k1.c}}
+\doxysubsubsection{\texorpdfstring{secp256k1\_ec\_pubkey\_create()}{secp256k1\_ec\_pubkey\_create()}}
+{\footnotesize\ttfamily \label{secp256k1_8c_ac5806cffd3278e64f863027eaa8e1284} 
+int secp256k1\+\_\+ec\+\_\+pubkey\+\_\+create (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}}]{ctx}{, }\item[{\mbox{\hyperlink{structsecp256k1__pubkey}{secp256k1\+\_\+pubkey}} \texorpdfstring{$\ast$}{*}}]{pubkey}{, }\item[{const unsigned char \texorpdfstring{$\ast$}{*}}]{seckey}{}\end{DoxyParamCaption})}
+
+Compute the public key for a secret key.
+
+Returns\+: 1\+: secret was valid, public key stores. 0\+: secret was invalid, try again. Args\+: ctx\+: pointer to a context object, initialized for signing. Out\+: pubkey\+: pointer to the created public key. In\+: seckey\+: pointer to a 32-\/byte secret key. 
+
+Definition at line \mbox{\hyperlink{secp256k1_8c_source_l00551}{551}} of file \mbox{\hyperlink{secp256k1_8c_source}{secp256k1.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00551\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00552\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__ge}{secp256k1\_ge}}\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}};}
+\DoxyCodeLine{00553\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ seckey\_scalar;}
+\DoxyCodeLine{00554\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ 0;}
+\DoxyCodeLine{00555\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(ctx\ !=\ NULL);}
+\DoxyCodeLine{00556\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}}\ !=\ NULL);}
+\DoxyCodeLine{00557\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}},\ 0,\ \textcolor{keyword}{sizeof}(*\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}}));}
+\DoxyCodeLine{00558\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(secp256k1\_ecmult\_gen\_context\_is\_built(\&ctx-\/>\mbox{\hyperlink{structsecp256k1__context__struct_aacc2071a68f9c5a6c05eb783f523b9eb}{ecmult\_gen\_ctx}}));}
+\DoxyCodeLine{00559\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(seckey\ !=\ NULL);}
+\DoxyCodeLine{00560\ }
+\DoxyCodeLine{00561\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ secp256k1\_ec\_pubkey\_create\_helper(\&ctx-\/>\mbox{\hyperlink{structsecp256k1__context__struct_aacc2071a68f9c5a6c05eb783f523b9eb}{ecmult\_gen\_ctx}},\ \&seckey\_scalar,\ \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\ seckey);}
+\DoxyCodeLine{00562\ \ \ \ \ secp256k1\_pubkey\_save(\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}},\ \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}});}
+\DoxyCodeLine{00563\ \ \ \ \ secp256k1\_memczero(\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}},\ \textcolor{keyword}{sizeof}(*\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}}),\ !\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}});}
+\DoxyCodeLine{00564\ }
+\DoxyCodeLine{00565\ \ \ \ \ secp256k1\_scalar\_clear(\&seckey\_scalar);}
+\DoxyCodeLine{00566\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00567\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=283pt]{secp256k1_8c_ac5806cffd3278e64f863027eaa8e1284_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{secp256k1_8c_ac5806cffd3278e64f863027eaa8e1284_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{secp256k1_8c_afb380139bce6f6722e35add4c375debb}\index{secp256k1.c@{secp256k1.c}!secp256k1\_ec\_pubkey\_negate@{secp256k1\_ec\_pubkey\_negate}}
+\index{secp256k1\_ec\_pubkey\_negate@{secp256k1\_ec\_pubkey\_negate}!secp256k1.c@{secp256k1.c}}
+\doxysubsubsection{\texorpdfstring{secp256k1\_ec\_pubkey\_negate()}{secp256k1\_ec\_pubkey\_negate()}}
+{\footnotesize\ttfamily \label{secp256k1_8c_afb380139bce6f6722e35add4c375debb} 
+int secp256k1\+\_\+ec\+\_\+pubkey\+\_\+negate (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}}]{ctx}{, }\item[{\mbox{\hyperlink{structsecp256k1__pubkey}{secp256k1\+\_\+pubkey}} \texorpdfstring{$\ast$}{*}}]{pubkey}{}\end{DoxyParamCaption})}
+
+Negates a public key in place.
+
+Returns\+: 1 always Args\+: ctx\+: pointer to a context object In/\+Out\+: pubkey\+: pointer to the public key to be negated. 
+
+Definition at line \mbox{\hyperlink{secp256k1_8c_source_l00588}{588}} of file \mbox{\hyperlink{secp256k1_8c_source}{secp256k1.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00588\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00589\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ 0;}
+\DoxyCodeLine{00590\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__ge}{secp256k1\_ge}}\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}};}
+\DoxyCodeLine{00591\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(ctx\ !=\ NULL);}
+\DoxyCodeLine{00592\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}}\ !=\ NULL);}
+\DoxyCodeLine{00593\ }
+\DoxyCodeLine{00594\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ secp256k1\_pubkey\_load(ctx,\ \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}});}
+\DoxyCodeLine{00595\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}},\ 0,\ \textcolor{keyword}{sizeof}(*\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}}));}
+\DoxyCodeLine{00596\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}})\ \{}
+\DoxyCodeLine{00597\ \ \ \ \ \ \ \ \ secp256k1\_ge\_neg(\&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\ \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}});}
+\DoxyCodeLine{00598\ \ \ \ \ \ \ \ \ secp256k1\_pubkey\_save(\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}},\ \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}});}
+\DoxyCodeLine{00599\ \ \ \ \ \}}
+\DoxyCodeLine{00600\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00601\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=283pt]{secp256k1_8c_afb380139bce6f6722e35add4c375debb_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{secp256k1_8c_afb380139bce6f6722e35add4c375debb_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{secp256k1_8c_a4a359778a7faf65fba9d34db17642d20}\index{secp256k1.c@{secp256k1.c}!secp256k1\_ec\_pubkey\_parse@{secp256k1\_ec\_pubkey\_parse}}
+\index{secp256k1\_ec\_pubkey\_parse@{secp256k1\_ec\_pubkey\_parse}!secp256k1.c@{secp256k1.c}}
+\doxysubsubsection{\texorpdfstring{secp256k1\_ec\_pubkey\_parse()}{secp256k1\_ec\_pubkey\_parse()}}
+{\footnotesize\ttfamily \label{secp256k1_8c_a4a359778a7faf65fba9d34db17642d20} 
+int secp256k1\+\_\+ec\+\_\+pubkey\+\_\+parse (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}}]{ctx}{, }\item[{\mbox{\hyperlink{structsecp256k1__pubkey}{secp256k1\+\_\+pubkey}} \texorpdfstring{$\ast$}{*}}]{pubkey}{, }\item[{const unsigned char \texorpdfstring{$\ast$}{*}}]{input}{, }\item[{size\+\_\+t}]{inputlen}{}\end{DoxyParamCaption})}
+
+Parse a variable-\/length public key into the pubkey object.
+
+Returns\+: 1 if the public key was fully valid. 0 if the public key could not be parsed or is invalid. Args\+: ctx\+: a secp256k1 context object. Out\+: pubkey\+: pointer to a pubkey object. If 1 is returned, it is set to a parsed version of input. If not, its value is undefined. In\+: input\+: pointer to a serialized public key inputlen\+: length of the array pointed to by input
+
+This function supports parsing compressed (33 bytes, header byte 0x02 or 0x03), uncompressed (65 bytes, header byte 0x04), or hybrid (65 bytes, header byte 0x06 or 0x07) format public keys. 
+
+Definition at line \mbox{\hyperlink{secp256k1_8c_source_l00228}{228}} of file \mbox{\hyperlink{secp256k1_8c_source}{secp256k1.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00228\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00229\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__ge}{secp256k1\_ge}}\ Q;}
+\DoxyCodeLine{00230\ }
+\DoxyCodeLine{00231\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(ctx\ !=\ NULL);}
+\DoxyCodeLine{00232\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}}\ !=\ NULL);}
+\DoxyCodeLine{00233\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}},\ 0,\ \textcolor{keyword}{sizeof}(*\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}}));}
+\DoxyCodeLine{00234\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(input\ !=\ NULL);}
+\DoxyCodeLine{00235\ \ \ \ \ \textcolor{keywordflow}{if}\ (!secp256k1\_eckey\_pubkey\_parse(\&Q,\ input,\ inputlen))\ \{}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00237\ \ \ \ \ \}}
+\DoxyCodeLine{00238\ \ \ \ \ \textcolor{keywordflow}{if}\ (!secp256k1\_ge\_is\_in\_correct\_subgroup(\&Q))\ \{}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00240\ \ \ \ \ \}}
+\DoxyCodeLine{00241\ \ \ \ \ secp256k1\_pubkey\_save(\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}},\ \&Q);}
+\DoxyCodeLine{00242\ \ \ \ \ secp256k1\_ge\_clear(\&Q);}
+\DoxyCodeLine{00243\ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{00244\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=283pt]{secp256k1_8c_a4a359778a7faf65fba9d34db17642d20_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{secp256k1_8c_a4a359778a7faf65fba9d34db17642d20_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{secp256k1_8c_a3b0440ba2ccd06e9262b94b41b680df1}\index{secp256k1.c@{secp256k1.c}!secp256k1\_ec\_pubkey\_serialize@{secp256k1\_ec\_pubkey\_serialize}}
+\index{secp256k1\_ec\_pubkey\_serialize@{secp256k1\_ec\_pubkey\_serialize}!secp256k1.c@{secp256k1.c}}
+\doxysubsubsection{\texorpdfstring{secp256k1\_ec\_pubkey\_serialize()}{secp256k1\_ec\_pubkey\_serialize()}}
+{\footnotesize\ttfamily \label{secp256k1_8c_a3b0440ba2ccd06e9262b94b41b680df1} 
+int secp256k1\+\_\+ec\+\_\+pubkey\+\_\+serialize (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}}]{ctx}{, }\item[{unsigned char \texorpdfstring{$\ast$}{*}}]{output}{, }\item[{size\+\_\+t \texorpdfstring{$\ast$}{*}}]{outputlen}{, }\item[{const \mbox{\hyperlink{structsecp256k1__pubkey}{secp256k1\+\_\+pubkey}} \texorpdfstring{$\ast$}{*}}]{pubkey}{, }\item[{unsigned int}]{flags}{}\end{DoxyParamCaption})}
+
+Serialize a pubkey object into a serialized byte sequence.
+
+Returns\+: 1 always. Args\+: ctx\+: a secp256k1 context object. Out\+: output\+: a pointer to a 65-\/byte (if compressed==0) or 33-\/byte (if compressed==1) byte array to place the serialized key in. In/\+Out\+: outputlen\+: a pointer to an integer which is initially set to the size of output, and is overwritten with the written size. In\+: pubkey\+: a pointer to a \doxylink{structsecp256k1__pubkey}{secp256k1\+\_\+pubkey} containing an initialized public key. flags\+: SECP256\+K1\+\_\+\+EC\+\_\+\+COMPRESSED if serialization should be in compressed format, otherwise SECP256\+K1\+\_\+\+EC\+\_\+\+UNCOMPRESSED. 
+
+Definition at line \mbox{\hyperlink{secp256k1_8c_source_l00246}{246}} of file \mbox{\hyperlink{secp256k1_8c_source}{secp256k1.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00246\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00247\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__ge}{secp256k1\_ge}}\ Q;}
+\DoxyCodeLine{00248\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}};}
+\DoxyCodeLine{00249\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ 0;}
+\DoxyCodeLine{00250\ }
+\DoxyCodeLine{00251\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(ctx\ !=\ NULL);}
+\DoxyCodeLine{00252\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(outputlen\ !=\ NULL);}
+\DoxyCodeLine{00253\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(*outputlen\ >=\ ((\mbox{\hyperlink{yubihsm__pkcs11_8c_ae0ed371842ace71a7886a6134ecbcb62}{flags}}\ \&\ \mbox{\hyperlink{secp256k1_8h_ac26f7c3f665e6422a651d2eb910f1a03}{SECP256K1\_FLAGS\_BIT\_COMPRESSION}})\ ?\ 33u\ :\ 65u));}
+\DoxyCodeLine{00254\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ =\ *outputlen;}
+\DoxyCodeLine{00255\ \ \ \ \ *outputlen\ =\ 0;}
+\DoxyCodeLine{00256\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(output\ !=\ NULL);}
+\DoxyCodeLine{00257\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(output,\ 0,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}});}
+\DoxyCodeLine{00258\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}}\ !=\ NULL);}
+\DoxyCodeLine{00259\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}((\mbox{\hyperlink{yubihsm__pkcs11_8c_ae0ed371842ace71a7886a6134ecbcb62}{flags}}\ \&\ \mbox{\hyperlink{secp256k1_8h_ab2572c9f38f9a644f2933f7b74a5072f}{SECP256K1\_FLAGS\_TYPE\_MASK}})\ ==\ \mbox{\hyperlink{secp256k1_8h_af8d4e9ca93634062735b7f998ef9f68a}{SECP256K1\_FLAGS\_TYPE\_COMPRESSION}});}
+\DoxyCodeLine{00260\ \ \ \ \ \textcolor{keywordflow}{if}\ (secp256k1\_pubkey\_load(ctx,\ \&Q,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}}))\ \{}
+\DoxyCodeLine{00261\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ secp256k1\_eckey\_pubkey\_serialize(\&Q,\ output,\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae0ed371842ace71a7886a6134ecbcb62}{flags}}\ \&\ \mbox{\hyperlink{secp256k1_8h_ac26f7c3f665e6422a651d2eb910f1a03}{SECP256K1\_FLAGS\_BIT\_COMPRESSION}});}
+\DoxyCodeLine{00262\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}})\ \{}
+\DoxyCodeLine{00263\ \ \ \ \ \ \ \ \ \ \ \ \ *outputlen\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}};}
+\DoxyCodeLine{00264\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00265\ \ \ \ \ \}}
+\DoxyCodeLine{00266\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00267\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=283pt]{secp256k1_8c_a3b0440ba2ccd06e9262b94b41b680df1_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{secp256k1_8c_a3b0440ba2ccd06e9262b94b41b680df1_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{secp256k1_8c_a37cae594daf23e05431eda1b20610f73}\index{secp256k1.c@{secp256k1.c}!secp256k1\_ec\_pubkey\_tweak\_add@{secp256k1\_ec\_pubkey\_tweak\_add}}
+\index{secp256k1\_ec\_pubkey\_tweak\_add@{secp256k1\_ec\_pubkey\_tweak\_add}!secp256k1.c@{secp256k1.c}}
+\doxysubsubsection{\texorpdfstring{secp256k1\_ec\_pubkey\_tweak\_add()}{secp256k1\_ec\_pubkey\_tweak\_add()}}
+{\footnotesize\ttfamily \label{secp256k1_8c_a37cae594daf23e05431eda1b20610f73} 
+int secp256k1\+\_\+ec\+\_\+pubkey\+\_\+tweak\+\_\+add (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}}]{ctx}{, }\item[{\mbox{\hyperlink{structsecp256k1__pubkey}{secp256k1\+\_\+pubkey}} \texorpdfstring{$\ast$}{*}}]{pubkey}{, }\item[{const unsigned char \texorpdfstring{$\ast$}{*}}]{tweak32}{}\end{DoxyParamCaption})}
+
+Tweak a public key by adding tweak times the generator to it.
+
+Returns\+: 0 if the arguments are invalid or the resulting public key would be invalid (only when the tweak is the negation of the corresponding secret key). 1 otherwise. Args\+: ctx\+: pointer to a context object initialized for validation. In/\+Out\+: pubkey\+: pointer to a public key object. pubkey will be set to an invalid value if this function returns 0. In\+: tweak32\+: pointer to a 32-\/byte tweak. If the tweak is invalid according to secp256k1\+\_\+ec\+\_\+seckey\+\_\+verify, this function returns 0. For uniformly random 32-\/byte arrays the chance of being invalid is negligible (around 1 in 2\texorpdfstring{$^\wedge$}{\string^}128). 
+
+Definition at line \mbox{\hyperlink{secp256k1_8c_source_l00642}{642}} of file \mbox{\hyperlink{secp256k1_8c_source}{secp256k1.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00642\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00643\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__ge}{secp256k1\_ge}}\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}};}
+\DoxyCodeLine{00644\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ 0;}
+\DoxyCodeLine{00645\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(ctx\ !=\ NULL);}
+\DoxyCodeLine{00646\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}}\ !=\ NULL);}
+\DoxyCodeLine{00647\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(tweak32\ !=\ NULL);}
+\DoxyCodeLine{00648\ }
+\DoxyCodeLine{00649\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ secp256k1\_pubkey\_load(ctx,\ \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}});}
+\DoxyCodeLine{00650\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}},\ 0,\ \textcolor{keyword}{sizeof}(*\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}}));}
+\DoxyCodeLine{00651\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ \&\&\ secp256k1\_ec\_pubkey\_tweak\_add\_helper(\&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\ tweak32);}
+\DoxyCodeLine{00652\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}})\ \{}
+\DoxyCodeLine{00653\ \ \ \ \ \ \ \ \ secp256k1\_pubkey\_save(\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}},\ \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}});}
+\DoxyCodeLine{00654\ \ \ \ \ \}}
+\DoxyCodeLine{00655\ }
+\DoxyCodeLine{00656\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00657\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=283pt]{secp256k1_8c_a37cae594daf23e05431eda1b20610f73_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{secp256k1_8c_a37cae594daf23e05431eda1b20610f73_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{secp256k1_8c_aef753193bf672b7c5e6156daa962bf55}\index{secp256k1.c@{secp256k1.c}!secp256k1\_ec\_pubkey\_tweak\_mul@{secp256k1\_ec\_pubkey\_tweak\_mul}}
+\index{secp256k1\_ec\_pubkey\_tweak\_mul@{secp256k1\_ec\_pubkey\_tweak\_mul}!secp256k1.c@{secp256k1.c}}
+\doxysubsubsection{\texorpdfstring{secp256k1\_ec\_pubkey\_tweak\_mul()}{secp256k1\_ec\_pubkey\_tweak\_mul()}}
+{\footnotesize\ttfamily \label{secp256k1_8c_aef753193bf672b7c5e6156daa962bf55} 
+int secp256k1\+\_\+ec\+\_\+pubkey\+\_\+tweak\+\_\+mul (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}}]{ctx}{, }\item[{\mbox{\hyperlink{structsecp256k1__pubkey}{secp256k1\+\_\+pubkey}} \texorpdfstring{$\ast$}{*}}]{pubkey}{, }\item[{const unsigned char \texorpdfstring{$\ast$}{*}}]{tweak32}{}\end{DoxyParamCaption})}
+
+Tweak a public key by multiplying it by a tweak value.
+
+Returns\+: 0 if the arguments are invalid. 1 otherwise. Args\+: ctx\+: pointer to a context object initialized for validation. In/\+Out\+: pubkey\+: pointer to a public key object. pubkey will be set to an invalid value if this function returns 0. In\+: tweak32\+: pointer to a 32-\/byte tweak. If the tweak is invalid according to secp256k1\+\_\+ec\+\_\+seckey\+\_\+verify, this function returns 0. For uniformly random 32-\/byte arrays the chance of being invalid is negligible (around 1 in 2\texorpdfstring{$^\wedge$}{\string^}128). 
+
+Definition at line \mbox{\hyperlink{secp256k1_8c_source_l00683}{683}} of file \mbox{\hyperlink{secp256k1_8c_source}{secp256k1.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00683\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00684\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__ge}{secp256k1\_ge}}\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}};}
+\DoxyCodeLine{00685\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ factor;}
+\DoxyCodeLine{00686\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ 0;}
+\DoxyCodeLine{00687\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a49aa97067a36875627e1380c3fb3833d}{overflow}}\ =\ 0;}
+\DoxyCodeLine{00688\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(ctx\ !=\ NULL);}
+\DoxyCodeLine{00689\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}}\ !=\ NULL);}
+\DoxyCodeLine{00690\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(tweak32\ !=\ NULL);}
+\DoxyCodeLine{00691\ }
+\DoxyCodeLine{00692\ \ \ \ \ secp256k1\_scalar\_set\_b32(\&factor,\ tweak32,\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a49aa97067a36875627e1380c3fb3833d}{overflow}});}
+\DoxyCodeLine{00693\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ !\mbox{\hyperlink{yubihsm__pkcs11_8c_a49aa97067a36875627e1380c3fb3833d}{overflow}}\ \&\&\ secp256k1\_pubkey\_load(ctx,\ \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}});}
+\DoxyCodeLine{00694\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}},\ 0,\ \textcolor{keyword}{sizeof}(*\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}}));}
+\DoxyCodeLine{00695\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}})\ \{}
+\DoxyCodeLine{00696\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (secp256k1\_eckey\_pubkey\_tweak\_mul(\&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\ \&factor))\ \{}
+\DoxyCodeLine{00697\ \ \ \ \ \ \ \ \ \ \ \ \ secp256k1\_pubkey\_save(\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}},\ \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}});}
+\DoxyCodeLine{00698\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00699\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ 0;}
+\DoxyCodeLine{00700\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00701\ \ \ \ \ \}}
+\DoxyCodeLine{00702\ }
+\DoxyCodeLine{00703\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00704\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=283pt]{secp256k1_8c_aef753193bf672b7c5e6156daa962bf55_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{secp256k1_8c_aef753193bf672b7c5e6156daa962bf55_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{secp256k1_8c_a877d2d85643148d932a95868f5660e26}\index{secp256k1.c@{secp256k1.c}!secp256k1\_ec\_seckey\_negate@{secp256k1\_ec\_seckey\_negate}}
+\index{secp256k1\_ec\_seckey\_negate@{secp256k1\_ec\_seckey\_negate}!secp256k1.c@{secp256k1.c}}
+\doxysubsubsection{\texorpdfstring{secp256k1\_ec\_seckey\_negate()}{secp256k1\_ec\_seckey\_negate()}}
+{\footnotesize\ttfamily \label{secp256k1_8c_a877d2d85643148d932a95868f5660e26} 
+int secp256k1\+\_\+ec\+\_\+seckey\+\_\+negate (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}}]{ctx}{, }\item[{unsigned char \texorpdfstring{$\ast$}{*}}]{seckey}{}\end{DoxyParamCaption})}
+
+Negates a secret key in place.
+
+Returns\+: 0 if the given secret key is invalid according to secp256k1\+\_\+ec\+\_\+seckey\+\_\+verify. 1 otherwise Args\+: ctx\+: pointer to a context object In/\+Out\+: seckey\+: pointer to the 32-\/byte secret key to be negated. If the secret key is invalid according to secp256k1\+\_\+ec\+\_\+seckey\+\_\+verify, this function returns 0 and seckey will be set to some unspecified value. 
+
+Definition at line \mbox{\hyperlink{secp256k1_8c_source_l00569}{569}} of file \mbox{\hyperlink{secp256k1_8c_source}{secp256k1.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00569\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00570\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ sec;}
+\DoxyCodeLine{00571\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ 0;}
+\DoxyCodeLine{00572\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(ctx\ !=\ NULL);}
+\DoxyCodeLine{00573\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(seckey\ !=\ NULL);}
+\DoxyCodeLine{00574\ }
+\DoxyCodeLine{00575\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ secp256k1\_scalar\_set\_b32\_seckey(\&sec,\ seckey);}
+\DoxyCodeLine{00576\ \ \ \ \ secp256k1\_scalar\_cmov(\&sec,\ \&secp256k1\_scalar\_zero,\ !\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}});}
+\DoxyCodeLine{00577\ \ \ \ \ secp256k1\_scalar\_negate(\&sec,\ \&sec);}
+\DoxyCodeLine{00578\ \ \ \ \ secp256k1\_scalar\_get\_b32(seckey,\ \&sec);}
+\DoxyCodeLine{00579\ }
+\DoxyCodeLine{00580\ \ \ \ \ secp256k1\_scalar\_clear(\&sec);}
+\DoxyCodeLine{00581\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00582\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{secp256k1_8c_a877d2d85643148d932a95868f5660e26_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{secp256k1_8c_a615cecca9de98d5f67333c76564ed6bf}\index{secp256k1.c@{secp256k1.c}!secp256k1\_ec\_seckey\_tweak\_add@{secp256k1\_ec\_seckey\_tweak\_add}}
+\index{secp256k1\_ec\_seckey\_tweak\_add@{secp256k1\_ec\_seckey\_tweak\_add}!secp256k1.c@{secp256k1.c}}
+\doxysubsubsection{\texorpdfstring{secp256k1\_ec\_seckey\_tweak\_add()}{secp256k1\_ec\_seckey\_tweak\_add()}}
+{\footnotesize\ttfamily \label{secp256k1_8c_a615cecca9de98d5f67333c76564ed6bf} 
+int secp256k1\+\_\+ec\+\_\+seckey\+\_\+tweak\+\_\+add (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}}]{ctx}{, }\item[{unsigned char \texorpdfstring{$\ast$}{*}}]{seckey}{, }\item[{const unsigned char \texorpdfstring{$\ast$}{*}}]{tweak32}{}\end{DoxyParamCaption})}
+
+Tweak a secret key by adding tweak to it.
+
+Returns\+: 0 if the arguments are invalid or the resulting secret key would be invalid (only when the tweak is the negation of the secret key). 1 otherwise. Args\+: ctx\+: pointer to a context object. In/\+Out\+: seckey\+: pointer to a 32-\/byte secret key. If the secret key is invalid according to secp256k1\+\_\+ec\+\_\+seckey\+\_\+verify, this function returns 0. seckey will be set to some unspecified value if this function returns 0. In\+: tweak32\+: pointer to a 32-\/byte tweak. If the tweak is invalid according to secp256k1\+\_\+ec\+\_\+seckey\+\_\+verify, this function returns 0. For uniformly random 32-\/byte arrays the chance of being invalid is negligible (around 1 in 2\texorpdfstring{$^\wedge$}{\string^}128). 
+
+Definition at line \mbox{\hyperlink{secp256k1_8c_source_l00615}{615}} of file \mbox{\hyperlink{secp256k1_8c_source}{secp256k1.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00615\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00616\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ sec;}
+\DoxyCodeLine{00617\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ 0;}
+\DoxyCodeLine{00618\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(ctx\ !=\ NULL);}
+\DoxyCodeLine{00619\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(seckey\ !=\ NULL);}
+\DoxyCodeLine{00620\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(tweak32\ !=\ NULL);}
+\DoxyCodeLine{00621\ }
+\DoxyCodeLine{00622\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ secp256k1\_scalar\_set\_b32\_seckey(\&sec,\ seckey);}
+\DoxyCodeLine{00623\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ \&=\ secp256k1\_ec\_seckey\_tweak\_add\_helper(\&sec,\ tweak32);}
+\DoxyCodeLine{00624\ \ \ \ \ secp256k1\_scalar\_cmov(\&sec,\ \&secp256k1\_scalar\_zero,\ !\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}});}
+\DoxyCodeLine{00625\ \ \ \ \ secp256k1\_scalar\_get\_b32(seckey,\ \&sec);}
+\DoxyCodeLine{00626\ }
+\DoxyCodeLine{00627\ \ \ \ \ secp256k1\_scalar\_clear(\&sec);}
+\DoxyCodeLine{00628\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00629\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{secp256k1_8c_a615cecca9de98d5f67333c76564ed6bf_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{secp256k1_8c_a42895c7fad28c83d4373a40ba49323f1}\index{secp256k1.c@{secp256k1.c}!secp256k1\_ec\_seckey\_tweak\_mul@{secp256k1\_ec\_seckey\_tweak\_mul}}
+\index{secp256k1\_ec\_seckey\_tweak\_mul@{secp256k1\_ec\_seckey\_tweak\_mul}!secp256k1.c@{secp256k1.c}}
+\doxysubsubsection{\texorpdfstring{secp256k1\_ec\_seckey\_tweak\_mul()}{secp256k1\_ec\_seckey\_tweak\_mul()}}
+{\footnotesize\ttfamily \label{secp256k1_8c_a42895c7fad28c83d4373a40ba49323f1} 
+int secp256k1\+\_\+ec\+\_\+seckey\+\_\+tweak\+\_\+mul (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}}]{ctx}{, }\item[{unsigned char \texorpdfstring{$\ast$}{*}}]{seckey}{, }\item[{const unsigned char \texorpdfstring{$\ast$}{*}}]{tweak32}{}\end{DoxyParamCaption})}
+
+Tweak a secret key by multiplying it by a tweak.
+
+Returns\+: 0 if the arguments are invalid. 1 otherwise. Args\+: ctx\+: pointer to a context object. In/\+Out\+: seckey\+: pointer to a 32-\/byte secret key. If the secret key is invalid according to secp256k1\+\_\+ec\+\_\+seckey\+\_\+verify, this function returns 0. seckey will be set to some unspecified value if this function returns 0. In\+: tweak32\+: pointer to a 32-\/byte tweak. If the tweak is invalid according to secp256k1\+\_\+ec\+\_\+seckey\+\_\+verify, this function returns 0. For uniformly random 32-\/byte arrays the chance of being invalid is negligible (around 1 in 2\texorpdfstring{$^\wedge$}{\string^}128). 
+
+Definition at line \mbox{\hyperlink{secp256k1_8c_source_l00659}{659}} of file \mbox{\hyperlink{secp256k1_8c_source}{secp256k1.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00659\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00660\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ factor;}
+\DoxyCodeLine{00661\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ sec;}
+\DoxyCodeLine{00662\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ 0;}
+\DoxyCodeLine{00663\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a49aa97067a36875627e1380c3fb3833d}{overflow}}\ =\ 0;}
+\DoxyCodeLine{00664\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(ctx\ !=\ NULL);}
+\DoxyCodeLine{00665\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(seckey\ !=\ NULL);}
+\DoxyCodeLine{00666\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(tweak32\ !=\ NULL);}
+\DoxyCodeLine{00667\ }
+\DoxyCodeLine{00668\ \ \ \ \ secp256k1\_scalar\_set\_b32(\&factor,\ tweak32,\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a49aa97067a36875627e1380c3fb3833d}{overflow}});}
+\DoxyCodeLine{00669\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ secp256k1\_scalar\_set\_b32\_seckey(\&sec,\ seckey);}
+\DoxyCodeLine{00670\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ \&=\ (!\mbox{\hyperlink{yubihsm__pkcs11_8c_a49aa97067a36875627e1380c3fb3833d}{overflow}})\ \&\ secp256k1\_eckey\_privkey\_tweak\_mul(\&sec,\ \&factor);}
+\DoxyCodeLine{00671\ \ \ \ \ secp256k1\_scalar\_cmov(\&sec,\ \&secp256k1\_scalar\_zero,\ !\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}});}
+\DoxyCodeLine{00672\ \ \ \ \ secp256k1\_scalar\_get\_b32(seckey,\ \&sec);}
+\DoxyCodeLine{00673\ }
+\DoxyCodeLine{00674\ \ \ \ \ secp256k1\_scalar\_clear(\&sec);}
+\DoxyCodeLine{00675\ \ \ \ \ secp256k1\_scalar\_clear(\&factor);}
+\DoxyCodeLine{00676\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00677\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{secp256k1_8c_a42895c7fad28c83d4373a40ba49323f1_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{secp256k1_8c_a6015346bdaee22c65e5ebca71693d9b1}\index{secp256k1.c@{secp256k1.c}!secp256k1\_ec\_seckey\_verify@{secp256k1\_ec\_seckey\_verify}}
+\index{secp256k1\_ec\_seckey\_verify@{secp256k1\_ec\_seckey\_verify}!secp256k1.c@{secp256k1.c}}
+\doxysubsubsection{\texorpdfstring{secp256k1\_ec\_seckey\_verify()}{secp256k1\_ec\_seckey\_verify()}}
+{\footnotesize\ttfamily \label{secp256k1_8c_a6015346bdaee22c65e5ebca71693d9b1} 
+int secp256k1\+\_\+ec\+\_\+seckey\+\_\+verify (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}}]{ctx}{, }\item[{const unsigned char \texorpdfstring{$\ast$}{*}}]{seckey}{}\end{DoxyParamCaption})}
+
+Verify an ECDSA secret key.
+
+\doxylink{struct_a}{A} secret key is valid if it is not 0 and less than the secp256k1 curve order when interpreted as an integer (most significant byte first). The probability of choosing a 32-\/byte string uniformly at random which is an invalid secret key is negligible.
+
+Returns\+: 1\+: secret key is valid 0\+: secret key is invalid Args\+: ctx\+: pointer to a context object. In\+: seckey\+: pointer to a 32-\/byte secret key. 
+
+Definition at line \mbox{\hyperlink{secp256k1_8c_source_l00528}{528}} of file \mbox{\hyperlink{secp256k1_8c_source}{secp256k1.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00528\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00529\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ sec;}
+\DoxyCodeLine{00530\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00531\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(ctx\ !=\ NULL);}
+\DoxyCodeLine{00532\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(seckey\ !=\ NULL);}
+\DoxyCodeLine{00533\ }
+\DoxyCodeLine{00534\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ secp256k1\_scalar\_set\_b32\_seckey(\&sec,\ seckey);}
+\DoxyCodeLine{00535\ \ \ \ \ secp256k1\_scalar\_clear(\&sec);}
+\DoxyCodeLine{00536\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00537\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{secp256k1_8c_a6015346bdaee22c65e5ebca71693d9b1_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{secp256k1_8c_af5ff5bb2cad5c58e90c653092648c63a}\index{secp256k1.c@{secp256k1.c}!secp256k1\_ecdsa\_sign@{secp256k1\_ecdsa\_sign}}
+\index{secp256k1\_ecdsa\_sign@{secp256k1\_ecdsa\_sign}!secp256k1.c@{secp256k1.c}}
+\doxysubsubsection{\texorpdfstring{secp256k1\_ecdsa\_sign()}{secp256k1\_ecdsa\_sign()}}
+{\footnotesize\ttfamily \label{secp256k1_8c_af5ff5bb2cad5c58e90c653092648c63a} 
+int secp256k1\+\_\+ecdsa\+\_\+sign (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}}]{ctx}{, }\item[{\mbox{\hyperlink{structsecp256k1__ecdsa__signature}{secp256k1\+\_\+ecdsa\+\_\+signature}} \texorpdfstring{$\ast$}{*}}]{sig}{, }\item[{const unsigned char \texorpdfstring{$\ast$}{*}}]{msghash32}{, }\item[{const unsigned char \texorpdfstring{$\ast$}{*}}]{seckey}{, }\item[{\mbox{\hyperlink{secp256k1_8h_a539882fd91bff672712fa19a4cfaeb98}{secp256k1\+\_\+nonce\+\_\+function}}}]{noncefp}{, }\item[{const void \texorpdfstring{$\ast$}{*}}]{ndata}{}\end{DoxyParamCaption})}
+
+Create an ECDSA signature.
+
+Returns\+: 1\+: signature created 0\+: the nonce generation function failed, or the secret key was invalid. Args\+: ctx\+: pointer to a context object, initialized for signing. Out\+: sig\+: pointer to an array where the signature will be placed. In\+: msghash32\+: the 32-\/byte message hash being signed. seckey\+: pointer to a 32-\/byte secret key. noncefp\+: pointer to a nonce generation function. If NULL, secp256k1\+\_\+nonce\+\_\+function\+\_\+default is used. ndata\+: pointer to arbitrary data used by the nonce generation function (can be NULL). If it is non-\/\+NULL and secp256k1\+\_\+nonce\+\_\+function\+\_\+default is used, then ndata must be a pointer to 32-\/bytes of additional data.
+
+The created signature is always in lower-\/S form. See secp256k1\+\_\+ecdsa\+\_\+signature\+\_\+normalize for more details. 
+
+Definition at line \mbox{\hyperlink{secp256k1_8c_source_l00514}{514}} of file \mbox{\hyperlink{secp256k1_8c_source}{secp256k1.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00514\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00515\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{00516\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00517\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(ctx\ !=\ NULL);}
+\DoxyCodeLine{00518\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(secp256k1\_ecmult\_gen\_context\_is\_built(\&ctx-\/>\mbox{\hyperlink{structsecp256k1__context__struct_aacc2071a68f9c5a6c05eb783f523b9eb}{ecmult\_gen\_ctx}}));}
+\DoxyCodeLine{00519\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(msghash32\ !=\ NULL);}
+\DoxyCodeLine{00520\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(signature\ !=\ NULL);}
+\DoxyCodeLine{00521\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(seckey\ !=\ NULL);}
+\DoxyCodeLine{00522\ }
+\DoxyCodeLine{00523\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ secp256k1\_ecdsa\_sign\_inner(ctx,\ \&\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ NULL,\ msghash32,\ seckey,\ noncefp,\ noncedata);}
+\DoxyCodeLine{00524\ \ \ \ \ secp256k1\_ecdsa\_signature\_save(signature,\ \&\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{00525\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00526\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{secp256k1_8c_af5ff5bb2cad5c58e90c653092648c63a_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{secp256k1_8c_a6ebd89d119f3da65e165947573ebd3ce}\index{secp256k1.c@{secp256k1.c}!secp256k1\_ecdsa\_signature\_normalize@{secp256k1\_ecdsa\_signature\_normalize}}
+\index{secp256k1\_ecdsa\_signature\_normalize@{secp256k1\_ecdsa\_signature\_normalize}!secp256k1.c@{secp256k1.c}}
+\doxysubsubsection{\texorpdfstring{secp256k1\_ecdsa\_signature\_normalize()}{secp256k1\_ecdsa\_signature\_normalize()}}
+{\footnotesize\ttfamily \label{secp256k1_8c_a6ebd89d119f3da65e165947573ebd3ce} 
+int secp256k1\+\_\+ecdsa\+\_\+signature\+\_\+normalize (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}}]{ctx}{, }\item[{\mbox{\hyperlink{structsecp256k1__ecdsa__signature}{secp256k1\+\_\+ecdsa\+\_\+signature}} \texorpdfstring{$\ast$}{*}}]{sigout}{, }\item[{const \mbox{\hyperlink{structsecp256k1__ecdsa__signature}{secp256k1\+\_\+ecdsa\+\_\+signature}} \texorpdfstring{$\ast$}{*}}]{sigin}{}\end{DoxyParamCaption})}
+
+Convert a signature to a normalized lower-\/S form.
+
+Returns\+: 1 if sigin was not normalized, 0 if it already was. Args\+: ctx\+: a secp256k1 context object Out\+: sigout\+: a pointer to a signature to fill with the normalized form, or copy if the input was already normalized. (can be NULL if you\textquotesingle{}re only interested in whether the input was already normalized). In\+: sigin\+: a pointer to a signature to check/normalize (can be identical to sigout)
+
+With ECDSA a third-\/party can forge a second distinct signature of the same message, given a single initial signature, but without knowing the key. This is done by negating the \doxylink{struct_s}{S} value modulo the order of the curve, \textquotesingle{}flipping\textquotesingle{} the sign of the random point R which is not included in the signature.
+
+Forgery of the same message isn\textquotesingle{}t universally problematic, but in systems where message malleability or uniqueness of signatures is important this can cause issues. This forgery can be blocked by all verifiers forcing signers to use a normalized form.
+
+The lower-\/S form reduces the size of signatures slightly on average when variable length encodings (such as DER) are used and is cheap to verify, making it a good choice. Security of always using lower-\/S is assured because anyone can trivially modify a signature after the fact to enforce this property anyway.
+
+The lower \doxylink{struct_s}{S} value is always between 0x1 and 0x7\+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5\+D576\+E7357\+A4501\+DDFE92\+F46681\+B20\+A0, inclusive.
+
+No other forms of ECDSA malleability are known and none seem likely, but there is no formal proof that ECDSA, even with this additional restriction, is free of other malleability. Commonly used serialization schemes will also accept various non-\/unique encodings, so care should be taken when this property is required for an application.
+
+The secp256k1\+\_\+ecdsa\+\_\+sign function will by default create signatures in the lower-\/S form, and secp256k1\+\_\+ecdsa\+\_\+verify will not accept others. In case signatures come from a system that cannot enforce this property, secp256k1\+\_\+ecdsa\+\_\+signature\+\_\+normalize must be called before verification. 
+
+Definition at line \mbox{\hyperlink{secp256k1_8c_source_l00381}{381}} of file \mbox{\hyperlink{secp256k1_8c_source}{secp256k1.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00381\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00382\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{00383\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ 0;}
+\DoxyCodeLine{00384\ }
+\DoxyCodeLine{00385\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(ctx\ !=\ NULL);}
+\DoxyCodeLine{00386\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(sigin\ !=\ NULL);}
+\DoxyCodeLine{00387\ }
+\DoxyCodeLine{00388\ \ \ \ \ secp256k1\_ecdsa\_signature\_load(ctx,\ \&\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ sigin);}
+\DoxyCodeLine{00389\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ secp256k1\_scalar\_is\_high(\&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{00390\ \ \ \ \ \textcolor{keywordflow}{if}\ (sigout\ !=\ NULL)\ \{}
+\DoxyCodeLine{00391\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}})\ \{}
+\DoxyCodeLine{00392\ \ \ \ \ \ \ \ \ \ \ \ \ secp256k1\_scalar\_negate(\&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{00393\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00394\ \ \ \ \ \ \ \ \ secp256k1\_ecdsa\_signature\_save(sigout,\ \&\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{00395\ \ \ \ \ \}}
+\DoxyCodeLine{00396\ }
+\DoxyCodeLine{00397\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00398\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{secp256k1_8c_a6ebd89d119f3da65e165947573ebd3ce_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{secp256k1_8c_a933083356e7171e174bc958b8233f758}\index{secp256k1.c@{secp256k1.c}!secp256k1\_ecdsa\_signature\_parse\_compact@{secp256k1\_ecdsa\_signature\_parse\_compact}}
+\index{secp256k1\_ecdsa\_signature\_parse\_compact@{secp256k1\_ecdsa\_signature\_parse\_compact}!secp256k1.c@{secp256k1.c}}
+\doxysubsubsection{\texorpdfstring{secp256k1\_ecdsa\_signature\_parse\_compact()}{secp256k1\_ecdsa\_signature\_parse\_compact()}}
+{\footnotesize\ttfamily \label{secp256k1_8c_a933083356e7171e174bc958b8233f758} 
+int secp256k1\+\_\+ecdsa\+\_\+signature\+\_\+parse\+\_\+compact (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}}]{ctx}{, }\item[{\mbox{\hyperlink{structsecp256k1__ecdsa__signature}{secp256k1\+\_\+ecdsa\+\_\+signature}} \texorpdfstring{$\ast$}{*}}]{sig}{, }\item[{const unsigned char \texorpdfstring{$\ast$}{*}}]{input64}{}\end{DoxyParamCaption})}
+
+Parse an ECDSA signature in compact (64 bytes) format.
+
+Returns\+: 1 when the signature could be parsed, 0 otherwise. Args\+: ctx\+: a secp256k1 context object Out\+: sig\+: a pointer to a signature object In\+: input64\+: a pointer to the 64-\/byte array to parse
+
+The signature must consist of a 32-\/byte big endian R value, followed by a 32-\/byte big endian \doxylink{struct_s}{S} value. If R or \doxylink{struct_s}{S} fall outside of \mbox{[}0..order-\/1\mbox{]}, the encoding is invalid. R and \doxylink{struct_s}{S} with value 0 are allowed in the encoding.
+
+After the call, sig will always be initialized. If parsing failed or R or \doxylink{struct_s}{S} are zero, the resulting sig value is guaranteed to fail validation for any message and public key. 
+
+Definition at line \mbox{\hyperlink{secp256k1_8c_source_l00335}{335}} of file \mbox{\hyperlink{secp256k1_8c_source}{secp256k1.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00335\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00336\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{00337\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ 1;}
+\DoxyCodeLine{00338\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a49aa97067a36875627e1380c3fb3833d}{overflow}}\ =\ 0;}
+\DoxyCodeLine{00339\ }
+\DoxyCodeLine{00340\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(ctx\ !=\ NULL);}
+\DoxyCodeLine{00341\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(sig\ !=\ NULL);}
+\DoxyCodeLine{00342\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(input64\ !=\ NULL);}
+\DoxyCodeLine{00343\ }
+\DoxyCodeLine{00344\ \ \ \ \ secp256k1\_scalar\_set\_b32(\&\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \&input64[0],\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a49aa97067a36875627e1380c3fb3833d}{overflow}});}
+\DoxyCodeLine{00345\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ \&=\ !\mbox{\hyperlink{yubihsm__pkcs11_8c_a49aa97067a36875627e1380c3fb3833d}{overflow}};}
+\DoxyCodeLine{00346\ \ \ \ \ secp256k1\_scalar\_set\_b32(\&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ \&input64[32],\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a49aa97067a36875627e1380c3fb3833d}{overflow}});}
+\DoxyCodeLine{00347\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ \&=\ !\mbox{\hyperlink{yubihsm__pkcs11_8c_a49aa97067a36875627e1380c3fb3833d}{overflow}};}
+\DoxyCodeLine{00348\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}})\ \{}
+\DoxyCodeLine{00349\ \ \ \ \ \ \ \ \ secp256k1\_ecdsa\_signature\_save(sig,\ \&\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{00350\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00351\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(sig,\ 0,\ \textcolor{keyword}{sizeof}(*sig));}
+\DoxyCodeLine{00352\ \ \ \ \ \}}
+\DoxyCodeLine{00353\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00354\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=307pt]{secp256k1_8c_a933083356e7171e174bc958b8233f758_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{secp256k1_8c_a933083356e7171e174bc958b8233f758_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{secp256k1_8c_a7bd08fb7f758494d5011849b6ca0ef13}\index{secp256k1.c@{secp256k1.c}!secp256k1\_ecdsa\_signature\_parse\_der@{secp256k1\_ecdsa\_signature\_parse\_der}}
+\index{secp256k1\_ecdsa\_signature\_parse\_der@{secp256k1\_ecdsa\_signature\_parse\_der}!secp256k1.c@{secp256k1.c}}
+\doxysubsubsection{\texorpdfstring{secp256k1\_ecdsa\_signature\_parse\_der()}{secp256k1\_ecdsa\_signature\_parse\_der()}}
+{\footnotesize\ttfamily \label{secp256k1_8c_a7bd08fb7f758494d5011849b6ca0ef13} 
+int secp256k1\+\_\+ecdsa\+\_\+signature\+\_\+parse\+\_\+der (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}}]{ctx}{, }\item[{\mbox{\hyperlink{structsecp256k1__ecdsa__signature}{secp256k1\+\_\+ecdsa\+\_\+signature}} \texorpdfstring{$\ast$}{*}}]{sig}{, }\item[{const unsigned char \texorpdfstring{$\ast$}{*}}]{input}{, }\item[{size\+\_\+t}]{inputlen}{}\end{DoxyParamCaption})}
+
+Parse a DER ECDSA signature.
+
+Returns\+: 1 when the signature could be parsed, 0 otherwise. Args\+: ctx\+: a secp256k1 context object Out\+: sig\+: a pointer to a signature object In\+: input\+: a pointer to the signature to be parsed inputlen\+: the length of the array pointed to be input
+
+This function will accept any valid DER encoded signature, even if the encoded numbers are out of range.
+
+After the call, sig will always be initialized. If parsing failed or the encoded numbers are out of range, signature validation with it is guaranteed to fail for every message and public key. 
+
+Definition at line \mbox{\hyperlink{secp256k1_8c_source_l00319}{319}} of file \mbox{\hyperlink{secp256k1_8c_source}{secp256k1.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00319\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00320\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{00321\ }
+\DoxyCodeLine{00322\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(ctx\ !=\ NULL);}
+\DoxyCodeLine{00323\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(sig\ !=\ NULL);}
+\DoxyCodeLine{00324\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(input\ !=\ NULL);}
+\DoxyCodeLine{00325\ }
+\DoxyCodeLine{00326\ \ \ \ \ \textcolor{keywordflow}{if}\ (secp256k1\_ecdsa\_sig\_parse(\&\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ input,\ inputlen))\ \{}
+\DoxyCodeLine{00327\ \ \ \ \ \ \ \ \ secp256k1\_ecdsa\_signature\_save(sig,\ \&\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{00328\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{00329\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00330\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(sig,\ 0,\ \textcolor{keyword}{sizeof}(*sig));}
+\DoxyCodeLine{00331\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00332\ \ \ \ \ \}}
+\DoxyCodeLine{00333\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=307pt]{secp256k1_8c_a7bd08fb7f758494d5011849b6ca0ef13_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{secp256k1_8c_a7bd08fb7f758494d5011849b6ca0ef13_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{secp256k1_8c_ac369bdcc5f8d5ced129e84895bf739db}\index{secp256k1.c@{secp256k1.c}!secp256k1\_ecdsa\_signature\_serialize\_compact@{secp256k1\_ecdsa\_signature\_serialize\_compact}}
+\index{secp256k1\_ecdsa\_signature\_serialize\_compact@{secp256k1\_ecdsa\_signature\_serialize\_compact}!secp256k1.c@{secp256k1.c}}
+\doxysubsubsection{\texorpdfstring{secp256k1\_ecdsa\_signature\_serialize\_compact()}{secp256k1\_ecdsa\_signature\_serialize\_compact()}}
+{\footnotesize\ttfamily \label{secp256k1_8c_ac369bdcc5f8d5ced129e84895bf739db} 
+int secp256k1\+\_\+ecdsa\+\_\+signature\+\_\+serialize\+\_\+compact (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}}]{ctx}{, }\item[{unsigned char \texorpdfstring{$\ast$}{*}}]{output64}{, }\item[{const \mbox{\hyperlink{structsecp256k1__ecdsa__signature}{secp256k1\+\_\+ecdsa\+\_\+signature}} \texorpdfstring{$\ast$}{*}}]{sig}{}\end{DoxyParamCaption})}
+
+Serialize an ECDSA signature in compact (64 byte) format.
+
+Returns\+: 1 Args\+: ctx\+: a secp256k1 context object Out\+: output64\+: a pointer to a 64-\/byte array to store the compact serialization In\+: sig\+: a pointer to an initialized signature object
+
+See secp256k1\+\_\+ecdsa\+\_\+signature\+\_\+parse\+\_\+compact for details about the encoding. 
+
+Definition at line \mbox{\hyperlink{secp256k1_8c_source_l00368}{368}} of file \mbox{\hyperlink{secp256k1_8c_source}{secp256k1.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00368\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00369\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{00370\ }
+\DoxyCodeLine{00371\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(ctx\ !=\ NULL);}
+\DoxyCodeLine{00372\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(output64\ !=\ NULL);}
+\DoxyCodeLine{00373\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(sig\ !=\ NULL);}
+\DoxyCodeLine{00374\ }
+\DoxyCodeLine{00375\ \ \ \ \ secp256k1\_ecdsa\_signature\_load(ctx,\ \&\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ sig);}
+\DoxyCodeLine{00376\ \ \ \ \ secp256k1\_scalar\_get\_b32(\&output64[0],\ \&\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}});}
+\DoxyCodeLine{00377\ \ \ \ \ secp256k1\_scalar\_get\_b32(\&output64[32],\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{00378\ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{00379\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{secp256k1_8c_ac369bdcc5f8d5ced129e84895bf739db_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{secp256k1_8c_a3f1fbd9cfe9bd6b6303bdd8f6c0687ba}\index{secp256k1.c@{secp256k1.c}!secp256k1\_ecdsa\_signature\_serialize\_der@{secp256k1\_ecdsa\_signature\_serialize\_der}}
+\index{secp256k1\_ecdsa\_signature\_serialize\_der@{secp256k1\_ecdsa\_signature\_serialize\_der}!secp256k1.c@{secp256k1.c}}
+\doxysubsubsection{\texorpdfstring{secp256k1\_ecdsa\_signature\_serialize\_der()}{secp256k1\_ecdsa\_signature\_serialize\_der()}}
+{\footnotesize\ttfamily \label{secp256k1_8c_a3f1fbd9cfe9bd6b6303bdd8f6c0687ba} 
+int secp256k1\+\_\+ecdsa\+\_\+signature\+\_\+serialize\+\_\+der (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}}]{ctx}{, }\item[{unsigned char \texorpdfstring{$\ast$}{*}}]{output}{, }\item[{size\+\_\+t \texorpdfstring{$\ast$}{*}}]{outputlen}{, }\item[{const \mbox{\hyperlink{structsecp256k1__ecdsa__signature}{secp256k1\+\_\+ecdsa\+\_\+signature}} \texorpdfstring{$\ast$}{*}}]{sig}{}\end{DoxyParamCaption})}
+
+Serialize an ECDSA signature in DER format.
+
+Returns\+: 1 if enough space was available to serialize, 0 otherwise Args\+: ctx\+: a secp256k1 context object Out\+: output\+: a pointer to an array to store the DER serialization In/\+Out\+: outputlen\+: a pointer to a length integer. Initially, this integer should be set to the length of output. After the call it will be set to the length of the serialization (even if 0 was returned). In\+: sig\+: a pointer to an initialized signature object 
+
+Definition at line \mbox{\hyperlink{secp256k1_8c_source_l00356}{356}} of file \mbox{\hyperlink{secp256k1_8c_source}{secp256k1.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00356\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00357\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{00358\ }
+\DoxyCodeLine{00359\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(ctx\ !=\ NULL);}
+\DoxyCodeLine{00360\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(output\ !=\ NULL);}
+\DoxyCodeLine{00361\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(outputlen\ !=\ NULL);}
+\DoxyCodeLine{00362\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(sig\ !=\ NULL);}
+\DoxyCodeLine{00363\ }
+\DoxyCodeLine{00364\ \ \ \ \ secp256k1\_ecdsa\_signature\_load(ctx,\ \&\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ sig);}
+\DoxyCodeLine{00365\ \ \ \ \ \textcolor{keywordflow}{return}\ secp256k1\_ecdsa\_sig\_serialize(output,\ outputlen,\ \&\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{00366\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{secp256k1_8c_a3f1fbd9cfe9bd6b6303bdd8f6c0687ba_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{secp256k1_8c_abd11af3da8d88984e87ec8f06fb0087a}\index{secp256k1.c@{secp256k1.c}!secp256k1\_ecdsa\_verify@{secp256k1\_ecdsa\_verify}}
+\index{secp256k1\_ecdsa\_verify@{secp256k1\_ecdsa\_verify}!secp256k1.c@{secp256k1.c}}
+\doxysubsubsection{\texorpdfstring{secp256k1\_ecdsa\_verify()}{secp256k1\_ecdsa\_verify()}}
+{\footnotesize\ttfamily \label{secp256k1_8c_abd11af3da8d88984e87ec8f06fb0087a} 
+int secp256k1\+\_\+ecdsa\+\_\+verify (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}}]{ctx}{, }\item[{const \mbox{\hyperlink{structsecp256k1__ecdsa__signature}{secp256k1\+\_\+ecdsa\+\_\+signature}} \texorpdfstring{$\ast$}{*}}]{sig}{, }\item[{const unsigned char \texorpdfstring{$\ast$}{*}}]{msghash32}{, }\item[{const \mbox{\hyperlink{structsecp256k1__pubkey}{secp256k1\+\_\+pubkey}} \texorpdfstring{$\ast$}{*}}]{pubkey}{}\end{DoxyParamCaption})}
+
+Verify an ECDSA signature.
+
+Returns\+: 1\+: correct signature 0\+: incorrect or unparseable signature Args\+: ctx\+: a secp256k1 context object, initialized for verification. In\+: sig\+: the signature being verified. msghash32\+: the 32-\/byte message hash being verified. The verifier must make sure to apply a cryptographic hash function to the message by itself and not accept an msghash32 value directly. Otherwise, it would be easy to create a "{}valid"{} signature without knowledge of the secret key. See also \href{https://bitcoin.stackexchange.com/a/81116/35586}{\texttt{ https\+://bitcoin.\+stackexchange.\+com/a/81116/35586}} for more background on this topic. pubkey\+: pointer to an initialized public key to verify with.
+
+To avoid accepting malleable signatures, only ECDSA signatures in lower-\/S form are accepted.
+
+If you need to accept ECDSA signatures from sources that do not obey this rule, apply secp256k1\+\_\+ecdsa\+\_\+signature\+\_\+normalize to the signature prior to validation, but be aware that doing so results in malleable signatures.
+
+For details, see the comments for that function. 
+
+Definition at line \mbox{\hyperlink{secp256k1_8c_source_l00400}{400}} of file \mbox{\hyperlink{secp256k1_8c_source}{secp256k1.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00400\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00401\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__ge}{secp256k1\_ge}}\ q;}
+\DoxyCodeLine{00402\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{00403\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ m;}
+\DoxyCodeLine{00404\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(ctx\ !=\ NULL);}
+\DoxyCodeLine{00405\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(msghash32\ !=\ NULL);}
+\DoxyCodeLine{00406\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(sig\ !=\ NULL);}
+\DoxyCodeLine{00407\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}}\ !=\ NULL);}
+\DoxyCodeLine{00408\ }
+\DoxyCodeLine{00409\ \ \ \ \ secp256k1\_scalar\_set\_b32(\&m,\ msghash32,\ NULL);}
+\DoxyCodeLine{00410\ \ \ \ \ secp256k1\_ecdsa\_signature\_load(ctx,\ \&\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ sig);}
+\DoxyCodeLine{00411\ \ \ \ \ \textcolor{keywordflow}{return}\ (!secp256k1\_scalar\_is\_high(\&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})\ \&\&}
+\DoxyCodeLine{00412\ \ \ \ \ \ \ \ \ \ \ \ \ secp256k1\_pubkey\_load(ctx,\ \&q,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}})\ \&\&}
+\DoxyCodeLine{00413\ \ \ \ \ \ \ \ \ \ \ \ \ secp256k1\_ecdsa\_sig\_verify(\&\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ \&q,\ \&m));}
+\DoxyCodeLine{00414\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{secp256k1_8c_abd11af3da8d88984e87ec8f06fb0087a_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{secp256k1_8c_aba5c99ecba24dd041f23c4cdebf6d7c9}\index{secp256k1.c@{secp256k1.c}!secp256k1\_scratch\_space\_create@{secp256k1\_scratch\_space\_create}}
+\index{secp256k1\_scratch\_space\_create@{secp256k1\_scratch\_space\_create}!secp256k1.c@{secp256k1.c}}
+\doxysubsubsection{\texorpdfstring{secp256k1\_scratch\_space\_create()}{secp256k1\_scratch\_space\_create()}}
+{\footnotesize\ttfamily \label{secp256k1_8c_aba5c99ecba24dd041f23c4cdebf6d7c9} 
+\mbox{\hyperlink{secp256k1_8h_a13c17a5e196534c7df988c0aa6e5a6fa}{secp256k1\+\_\+scratch\+\_\+space}} \texorpdfstring{$\ast$}{*} secp256k1\+\_\+scratch\+\_\+space\+\_\+create (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}}]{ctx}{, }\item[{size\+\_\+t}]{size}{}\end{DoxyParamCaption})}
+
+Create a secp256k1 scratch space object.
+
+Returns\+: a newly created scratch space. Args\+: ctx\+: an existing context object. In\+: size\+: amount of memory to be available as scratch space. Some extra (\texorpdfstring{$<$}{<}100 bytes) will be allocated for extra accounting. 
+
+Definition at line \mbox{\hyperlink{secp256k1_8c_source_l00171}{171}} of file \mbox{\hyperlink{secp256k1_8c_source}{secp256k1.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00172\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(ctx\ !=\ NULL);}
+\DoxyCodeLine{00173\ \ \ \ \ \textcolor{keywordflow}{return}\ secp256k1\_scratch\_create(\&ctx-\/>\mbox{\hyperlink{structsecp256k1__context__struct_aa34a996f869676899e8625adfb6c6f1d}{error\_callback}},\ max\_size);}
+\DoxyCodeLine{00174\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{secp256k1_8c_aba5c99ecba24dd041f23c4cdebf6d7c9_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{secp256k1_8c_addc63f28c7f69289736875fae7ac429f}\index{secp256k1.c@{secp256k1.c}!secp256k1\_scratch\_space\_destroy@{secp256k1\_scratch\_space\_destroy}}
+\index{secp256k1\_scratch\_space\_destroy@{secp256k1\_scratch\_space\_destroy}!secp256k1.c@{secp256k1.c}}
+\doxysubsubsection{\texorpdfstring{secp256k1\_scratch\_space\_destroy()}{secp256k1\_scratch\_space\_destroy()}}
+{\footnotesize\ttfamily \label{secp256k1_8c_addc63f28c7f69289736875fae7ac429f} 
+void secp256k1\+\_\+scratch\+\_\+space\+\_\+destroy (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}}]{ctx}{, }\item[{\mbox{\hyperlink{secp256k1_8h_a13c17a5e196534c7df988c0aa6e5a6fa}{secp256k1\+\_\+scratch\+\_\+space}} \texorpdfstring{$\ast$}{*}}]{scratch}{}\end{DoxyParamCaption})}
+
+Destroy a secp256k1 scratch space.
+
+The pointer may not be used afterwards. Args\+: ctx\+: a secp256k1 context object. scratch\+: space to destroy 
+
+Definition at line \mbox{\hyperlink{secp256k1_8c_source_l00176}{176}} of file \mbox{\hyperlink{secp256k1_8c_source}{secp256k1.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00177\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(ctx\ !=\ NULL);}
+\DoxyCodeLine{00178\ \ \ \ \ secp256k1\_scratch\_destroy(\&ctx-\/>\mbox{\hyperlink{structsecp256k1__context__struct_aa34a996f869676899e8625adfb6c6f1d}{error\_callback}},\ scratch);}
+\DoxyCodeLine{00179\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{secp256k1_8c_addc63f28c7f69289736875fae7ac429f_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{secp256k1_8c_a364d53929192054916b1207a22e701ec}\index{secp256k1.c@{secp256k1.c}!secp256k1\_tagged\_sha256@{secp256k1\_tagged\_sha256}}
+\index{secp256k1\_tagged\_sha256@{secp256k1\_tagged\_sha256}!secp256k1.c@{secp256k1.c}}
+\doxysubsubsection{\texorpdfstring{secp256k1\_tagged\_sha256()}{secp256k1\_tagged\_sha256()}}
+{\footnotesize\ttfamily \label{secp256k1_8c_a364d53929192054916b1207a22e701ec} 
+int secp256k1\+\_\+tagged\+\_\+sha256 (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}}]{ctx}{, }\item[{unsigned char \texorpdfstring{$\ast$}{*}}]{hash32}{, }\item[{const unsigned char \texorpdfstring{$\ast$}{*}}]{tag}{, }\item[{size\+\_\+t}]{taglen}{, }\item[{const unsigned char \texorpdfstring{$\ast$}{*}}]{msg}{, }\item[{size\+\_\+t}]{msglen}{}\end{DoxyParamCaption})}
+
+Compute a tagged hash as defined in BIP-\/340.
+
+This is useful for creating a message hash and achieving domain separation through an application-\/specific tag. This function returns SHA256(SHA256(tag)\texorpdfstring{$\vert$}{|}\texorpdfstring{$\vert$}{|}\+SHA256(tag)\texorpdfstring{$\vert$}{|}\texorpdfstring{$\vert$}{|}msg). Therefore, tagged hash implementations optimized for a specific tag can precompute the SHA256 state after hashing the tag hashes.
+
+Returns\+: 1 always. Args\+: ctx\+: pointer to a context object Out\+: hash32\+: pointer to a 32-\/byte array to store the resulting hash In\+: tag\+: pointer to an array containing the tag taglen\+: length of the tag array msg\+: pointer to an array containing the message msglen\+: length of the message array 
+
+Definition at line \mbox{\hyperlink{secp256k1_8c_source_l00740}{740}} of file \mbox{\hyperlink{secp256k1_8c_source}{secp256k1.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00740\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00741\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__sha256}{secp256k1\_sha256}}\ sha;}
+\DoxyCodeLine{00742\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(ctx\ !=\ NULL);}
+\DoxyCodeLine{00743\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(hash32\ !=\ NULL);}
+\DoxyCodeLine{00744\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(tag\ !=\ NULL);}
+\DoxyCodeLine{00745\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(msg\ !=\ NULL);}
+\DoxyCodeLine{00746\ }
+\DoxyCodeLine{00747\ \ \ \ \ secp256k1\_sha256\_initialize\_tagged(\&sha,\ tag,\ taglen);}
+\DoxyCodeLine{00748\ \ \ \ \ secp256k1\_sha256\_write(\&sha,\ msg,\ msglen);}
+\DoxyCodeLine{00749\ \ \ \ \ secp256k1\_sha256\_finalize(\&sha,\ hash32);}
+\DoxyCodeLine{00750\ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{00751\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{secp256k1_8c_a364d53929192054916b1207a22e701ec_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{secp256k1_8c_a608b4988c34455c40bb91eb38033db1a}\index{secp256k1.c@{secp256k1.c}!secp256k1\_context\_no\_precomp@{secp256k1\_context\_no\_precomp}}
+\index{secp256k1\_context\_no\_precomp@{secp256k1\_context\_no\_precomp}!secp256k1.c@{secp256k1.c}}
+\doxysubsubsection{\texorpdfstring{secp256k1\_context\_no\_precomp}{secp256k1\_context\_no\_precomp}}
+{\footnotesize\ttfamily \label{secp256k1_8c_a608b4988c34455c40bb91eb38033db1a} 
+const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}}\texorpdfstring{$\ast$}{*} secp256k1\+\_\+context\+\_\+no\+\_\+precomp = \&secp256k1\+\_\+context\+\_\+no\+\_\+precomp\+\_\+}
+
+\doxylink{struct_a}{A} simple secp256k1 context object with no precomputed tables. These are useful for type serialization/parsing functions which require a context object to maintain API consistency, but currently do not require expensive precomputations or dynamic allocations. 
+
+Definition at line \mbox{\hyperlink{secp256k1_8c_source_l00060}{60}} of file \mbox{\hyperlink{secp256k1_8c_source}{secp256k1.\+c}}.
+
+\Hypertarget{secp256k1_8c_a28fc3fe2c4a63199be2fea7303f012a0}\index{secp256k1.c@{secp256k1.c}!secp256k1\_nonce\_function\_default@{secp256k1\_nonce\_function\_default}}
+\index{secp256k1\_nonce\_function\_default@{secp256k1\_nonce\_function\_default}!secp256k1.c@{secp256k1.c}}
+\doxysubsubsection{\texorpdfstring{secp256k1\_nonce\_function\_default}{secp256k1\_nonce\_function\_default}}
+{\footnotesize\ttfamily \label{secp256k1_8c_a28fc3fe2c4a63199be2fea7303f012a0} 
+const \mbox{\hyperlink{secp256k1_8h_a539882fd91bff672712fa19a4cfaeb98}{secp256k1\+\_\+nonce\+\_\+function}} secp256k1\+\_\+nonce\+\_\+function\+\_\+default = nonce\+\_\+function\+\_\+rfc6979}
+
+\doxylink{struct_a}{A} default safe nonce generation function (currently equal to secp256k1\+\_\+nonce\+\_\+function\+\_\+rfc6979). 
+
+Definition at line \mbox{\hyperlink{secp256k1_8c_source_l00456}{456}} of file \mbox{\hyperlink{secp256k1_8c_source}{secp256k1.\+c}}.
+
+\Hypertarget{secp256k1_8c_a2ac052a733aac60ef5c19f1f79e3c1dd}\index{secp256k1.c@{secp256k1.c}!secp256k1\_nonce\_function\_rfc6979@{secp256k1\_nonce\_function\_rfc6979}}
+\index{secp256k1\_nonce\_function\_rfc6979@{secp256k1\_nonce\_function\_rfc6979}!secp256k1.c@{secp256k1.c}}
+\doxysubsubsection{\texorpdfstring{secp256k1\_nonce\_function\_rfc6979}{secp256k1\_nonce\_function\_rfc6979}}
+{\footnotesize\ttfamily \label{secp256k1_8c_a2ac052a733aac60ef5c19f1f79e3c1dd} 
+const \mbox{\hyperlink{secp256k1_8h_a539882fd91bff672712fa19a4cfaeb98}{secp256k1\+\_\+nonce\+\_\+function}} secp256k1\+\_\+nonce\+\_\+function\+\_\+rfc6979 = nonce\+\_\+function\+\_\+rfc6979}
+
+An implementation of RFC6979 (using HMAC-\/\+SHA256) as nonce generation function. If a data pointer is passed, it is assumed to be a pointer to 32 bytes of extra entropy. 
+
+Definition at line \mbox{\hyperlink{secp256k1_8c_source_l00455}{455}} of file \mbox{\hyperlink{secp256k1_8c_source}{secp256k1.\+c}}.
+

@@ -1,0 +1,114 @@
+\doxysection{elliptic\+\_\+impl\+\_\+priv.\+cpp}
+\hypertarget{elliptic__impl__priv_8cpp_source}{}\label{elliptic__impl__priv_8cpp_source}\index{libraries/fc/src/crypto/elliptic\_impl\_priv.cpp@{libraries/fc/src/crypto/elliptic\_impl\_priv.cpp}}
+\mbox{\hyperlink{elliptic__impl__priv_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{fwd__impl_8hpp}{fc/fwd\_impl.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{secp256k1_8h}{secp256k1.h}}>}}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{secp256k1__recovery_8h}{secp256k1\_recovery.h}}>}}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{__elliptic__impl__priv_8hpp}{\_elliptic\_impl\_priv.hpp}}"{}}}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00008}00008\ \textcolor{comment}{/*\ used\ by\ mixed\ +\ secp256k1\ */}}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00010}00010\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}\ \{\ \textcolor{keyword}{namespace\ }ecc\ \{}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00011}00011\ \ \ \ \ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacedetail}{detail}}\ \{}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00013}\mbox{\hyperlink{classfc_1_1ecc_1_1detail_1_1private__key__impl_a45c0c167f628701059d9e8bbf86b4d72}{00013}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1ecc_1_1detail_1_1private__key__impl_a45c0c167f628701059d9e8bbf86b4d72}{private\_key\_impl::private\_key\_impl}}()\ BOOST\_NOEXCEPT}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00014}00014\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00015}00015\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1ecc_1_1detail_a71a18cd0920a238991d70c5dd2868570}{\_init\_lib}}();}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00016}00016\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00018}\mbox{\hyperlink{classfc_1_1ecc_1_1detail_1_1private__key__impl_aeb7ccb07feb9b8820b250c6b9c40028f}{00018}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1ecc_1_1detail_1_1private__key__impl_a45c0c167f628701059d9e8bbf86b4d72}{private\_key\_impl::private\_key\_impl}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1ecc_1_1detail_1_1private__key__impl}{private\_key\_impl}}\&\ cpy\ )\ BOOST\_NOEXCEPT}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00019}00019\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00020}00020\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1ecc_1_1detail_a71a18cd0920a238991d70c5dd2868570}{\_init\_lib}}();}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00021}00021\ \ \ \ \ \ \ \ \ \ \ \ \ this-\/>\_key\ =\ cpy.\_key;}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00022}00022\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00024}\mbox{\hyperlink{classfc_1_1ecc_1_1detail_1_1private__key__impl_a9a114d32d88f0621d7d280d7b627542d}{00024}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1ecc_1_1detail_1_1private__key__impl}{private\_key\_impl}}\&\ \mbox{\hyperlink{classfc_1_1ecc_1_1detail_1_1private__key__impl_a9a114d32d88f0621d7d280d7b627542d}{private\_key\_impl::operator=}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1ecc_1_1detail_1_1private__key__impl}{private\_key\_impl}}\&\ pk\ )\ BOOST\_NOEXCEPT}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00025}00025\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00026}00026\ \ \ \ \ \ \ \ \ \ \ \ \ \_key\ =\ pk.\_key;}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00027}00027\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00028}00028\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00029}00029\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00031}00031\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha256}{private\_key\_secret}}\ empty\_priv;}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00033}\mbox{\hyperlink{classfc_1_1ecc_1_1private__key_aee641a197bfa93b96eca0c79a348b4f4}{00033}}\ \ \ \ \ \mbox{\hyperlink{classfc_1_1ecc_1_1private__key_aee641a197bfa93b96eca0c79a348b4f4}{private\_key::private\_key}}()\ \{\}}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00035}\mbox{\hyperlink{classfc_1_1ecc_1_1private__key_a5f83d375d76ffc530accc51fd22a1c20}{00035}}\ \ \ \ \ \mbox{\hyperlink{classfc_1_1ecc_1_1private__key_aee641a197bfa93b96eca0c79a348b4f4}{private\_key::private\_key}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1ecc_1_1private__key}{private\_key}}\&\ pk\ )\ :\ my(\ pk.my\ )\ \{\}}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00037}\mbox{\hyperlink{classfc_1_1ecc_1_1private__key_af661dbffcc6ab52220a9d1ce1ed2cf52}{00037}}\ \ \ \ \ \mbox{\hyperlink{classfc_1_1ecc_1_1private__key_aee641a197bfa93b96eca0c79a348b4f4}{private\_key::private\_key}}(\ \mbox{\hyperlink{classfc_1_1ecc_1_1private__key}{private\_key}}\&\&\ pk\ )\ :\ my(\ \mbox{\hyperlink{namespacestd}{std}}::move(\ pk.my\ )\ )\ \{\}}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00039}\mbox{\hyperlink{classfc_1_1ecc_1_1private__key_ad34b09556c29b636ee5a5ddfb392069f}{00039}}\ \ \ \ \ \mbox{\hyperlink{classfc_1_1ecc_1_1private__key_ad34b09556c29b636ee5a5ddfb392069f}{private\_key::\string~private\_key}}()\ \{\}}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00041}\mbox{\hyperlink{classfc_1_1ecc_1_1private__key_a35e700049a1b301202a45bb4e46e8240}{00041}}\ \ \ \ \ \mbox{\hyperlink{classfc_1_1ecc_1_1private__key}{private\_key}}\&\ \mbox{\hyperlink{classfc_1_1ecc_1_1private__key_a35e700049a1b301202a45bb4e46e8240}{private\_key::operator=}}(\ \mbox{\hyperlink{classfc_1_1ecc_1_1private__key}{private\_key}}\&\&\ pk\ )}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00042}00042\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00043}00043\ \ \ \ \ \ \ \ \ my\ =\ std::move(\ pk.my\ );}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00044}00044\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00045}00045\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00047}\mbox{\hyperlink{classfc_1_1ecc_1_1private__key_a2cec7b462875dee7ccaa51d94185d9fa}{00047}}\ \ \ \ \ \mbox{\hyperlink{classfc_1_1ecc_1_1private__key}{private\_key}}\&\ \mbox{\hyperlink{classfc_1_1ecc_1_1private__key_a35e700049a1b301202a45bb4e46e8240}{private\_key::operator=}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1ecc_1_1private__key}{private\_key}}\&\ pk\ )}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00048}00048\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00049}00049\ \ \ \ \ \ \ \ \ my\ =\ pk.my;}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00050}00050\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00051}00051\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00052}00052\ }
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00053}\mbox{\hyperlink{classfc_1_1ecc_1_1private__key_abcc5312450e72cd78f78b7d2feb6c899}{00053}}\ \ \ \ \ \mbox{\hyperlink{classfc_1_1ecc_1_1private__key}{private\_key}}\ \mbox{\hyperlink{classfc_1_1ecc_1_1private__key_abcc5312450e72cd78f78b7d2feb6c899}{private\_key::regenerate}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha256}{fc::sha256}}\&\ secret\ )}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00054}00054\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00055}00055\ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1ecc_1_1private__key}{private\_key}}\ self;}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00056}00056\ \ \ \ \ \ \ \ self.my-\/>\_key\ =\ secret;}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00057}00057\ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ self;}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00058}00058\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00060}\mbox{\hyperlink{classfc_1_1ecc_1_1private__key_a24fb0ebbb99a8404323387fd06d5145f}{00060}}\ \ \ \ \ \mbox{\hyperlink{classfc_1_1sha256}{fc::sha256}}\ \mbox{\hyperlink{classfc_1_1ecc_1_1private__key_a24fb0ebbb99a8404323387fd06d5145f}{private\_key::get\_secret}}()\textcolor{keyword}{const}}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00061}00061\ \textcolor{keyword}{\ \ \ \ }\{}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00062}00062\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ my-\/>\_key;}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00063}00063\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00065}00065\ \ \ \ \ \mbox{\hyperlink{classfc_1_1ecc_1_1private__key_aee641a197bfa93b96eca0c79a348b4f4}{private\_key::private\_key}}(\ EC\_KEY*\ k\ )}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00066}00066\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00067}00067\ \ \ \ \ \ \ \ my-\/>\_key\ =\ \mbox{\hyperlink{classfc_1_1ecc_1_1private__key_a24fb0ebbb99a8404323387fd06d5145f}{get\_secret}}(\ k\ );}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00068}00068\ \ \ \ \ \ \ \ EC\_KEY\_free(k);}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00069}00069\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00071}\mbox{\hyperlink{classfc_1_1ecc_1_1private__key_a11ee154d3fd6f6e4c882fe965dee3d89}{00071}}\ \ \ \ \ \mbox{\hyperlink{classfc_1_1ecc_1_1public__key}{public\_key}}\ \mbox{\hyperlink{classfc_1_1ecc_1_1private__key_a11ee154d3fd6f6e4c882fe965dee3d89}{private\_key::get\_public\_key}}()\textcolor{keyword}{const}}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00072}00072\ \textcolor{keyword}{\ \ \ \ }\{}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00073}00073\ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ my-\/>\_key\ !=\ empty\_priv\ );}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00074}00074\ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1array}{public\_key\_data}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3037ff69dd24c6e34aee6fdd45269f13}{pub}};}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00075}00075\ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ pub\_len\ =\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3037ff69dd24c6e34aee6fdd45269f13}{pub}});}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00076}00076\ \ \ \ \ \ \ \ \mbox{\hyperlink{structsecp256k1__pubkey}{secp256k1\_pubkey}}\ secp\_pub;}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00077}00077\ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ \mbox{\hyperlink{secp256k1_8h_a7438071aa8a6dc4697abe4f4659f2161}{secp256k1\_ec\_pubkey\_create}}(\ \mbox{\hyperlink{namespacefc_1_1ecc_1_1detail_a977de2554ed3ebc5f128e486d161517d}{detail::\_get\_context}}(),\ \&secp\_pub,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)\ my-\/>\_key.data()\ )\ );}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00078}00078\ \ \ \ \ \ \ \ \mbox{\hyperlink{secp256k1_8h_a34977bf00322e510e881160c421836d7}{secp256k1\_ec\_pubkey\_serialize}}(\ \mbox{\hyperlink{namespacefc_1_1ecc_1_1detail_a977de2554ed3ebc5f128e486d161517d}{detail::\_get\_context}}(),\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)\&\mbox{\hyperlink{yubihsm__pkcs11_8c_a3037ff69dd24c6e34aee6fdd45269f13}{pub}},\ \&pub\_len,\ \&secp\_pub,\ \mbox{\hyperlink{secp256k1_8h_a7b8f642c65e8b5c81fa4421b7c42ab57}{SECP256K1\_EC\_COMPRESSED}}\ );}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00079}00079\ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ pub\_len\ ==\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3037ff69dd24c6e34aee6fdd45269f13}{pub}}.size()\ );}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00080}00080\ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1ecc_1_1public__key}{public\_key}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3037ff69dd24c6e34aee6fdd45269f13}{pub}});}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00081}00081\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00083}00083\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ extended\_nonce\_function(\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *nonce32,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *msg32,}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00084}00084\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *key32,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*\ algo16,}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00085}00085\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}*\ data,\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ attempt\ )\ \{}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00086}00086\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}*\ extra\ =\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}*)\ data;}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00087}00087\ \ \ \ \ \ \ \ \ (*extra)++;}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00088}00088\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{secp256k1_8h_a22f44df7786a1be5ad93aadfed75b932}{secp256k1\_nonce\_function\_default}}(\ nonce32,\ msg32,\ key32,\ algo16,\ \textcolor{keyword}{nullptr},\ *extra\ );}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00089}00089\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00090}00090\ }
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00091}\mbox{\hyperlink{classfc_1_1ecc_1_1private__key_a9641e922356152e449044813b029ea86}{00091}}\ \ \ \ \ \mbox{\hyperlink{classfc_1_1array}{compact\_signature}}\ \mbox{\hyperlink{classfc_1_1ecc_1_1private__key_a9641e922356152e449044813b029ea86}{private\_key::sign\_compact}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha256}{fc::sha256}}\&\ \mbox{\hyperlink{namespacefc_a150ca4cd9c0318ca45dc0dc7df5d58b9}{digest}},\ \textcolor{keywordtype}{bool}\ require\_canonical\ )\textcolor{keyword}{const}}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00092}00092\ \textcolor{keyword}{\ \ \ \ }\{}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00093}00093\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ my-\/>\_key\ !=\ empty\_priv\ );}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00094}00094\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1array}{compact\_signature}}\ result;}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00095}00095\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsecp256k1__ecdsa__recoverable__signature}{secp256k1\_ecdsa\_recoverable\_signature}}\ secp\_sig;}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00096}00096\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ recid;}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00097}00097\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ counter\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00098}00098\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{do}}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00099}00099\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00100}00100\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ \mbox{\hyperlink{secp256k1__recovery_8h_a7868accd4760afcaeaa0ff3d239afc2a}{secp256k1\_ecdsa\_sign\_recoverable}}(\ \mbox{\hyperlink{namespacefc_1_1ecc_1_1detail_a977de2554ed3ebc5f128e486d161517d}{detail::\_get\_context}}(),\ \&secp\_sig,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)\ \mbox{\hyperlink{namespacefc_a150ca4cd9c0318ca45dc0dc7df5d58b9}{digest}}.\mbox{\hyperlink{classfc_1_1sha256_ab897537f6c524085b28049be51ed370d}{data}}(),\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)\ my-\/>\_key.data(),\ extended\_nonce\_function,\ \&counter\ ));}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00101}00101\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{secp256k1__recovery_8h_a12f08c89ceb61949c6a4ec6eb2511185}{secp256k1\_ecdsa\_recoverable\_signature\_serialize\_compact}}(\ \mbox{\hyperlink{namespacefc_1_1ecc_1_1detail_a977de2554ed3ebc5f128e486d161517d}{detail::\_get\_context}}(),\ result.data\ +\ 1,\ \&recid,\ \&secp\_sig);}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00102}00102\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{while}(\ require\_canonical\ \&\&\ !public\_key::is\_canonical(\ result\ )\ );}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00103}00103\ }
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00104}00104\ \ \ \ \ \ \ \ \ result.begin()[0]\ =\ 27\ +\ 4\ +\ recid;}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00105}00105\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00106}00106\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00107}00107\ }
+\DoxyCodeLine{\Hypertarget{elliptic__impl__priv_8cpp_source_l00108}00108\ \}\}}
+
+\end{DoxyCode}

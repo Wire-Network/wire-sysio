@@ -1,0 +1,75 @@
+\doxysection{platform\+\_\+timer\+\_\+accuracy.\+cpp}
+\hypertarget{platform__timer__accuracy_8cpp_source}{}\label{platform__timer__accuracy_8cpp_source}\index{libraries/chain/platform\_timer\_accuracy.cpp@{libraries/chain/platform\_timer\_accuracy.cpp}}
+\mbox{\hyperlink{platform__timer__accuracy_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{platform__timer__accuracy_8hpp}{sysio/chain/platform\_timer\_accuracy.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{platform__timer_8hpp}{sysio/chain/platform\_timer.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{include_2fc_2time_8hpp}{fc/time.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{logger_8hpp}{fc/log/logger.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <boost/accumulators/accumulators.hpp>}}
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <boost/accumulators/statistics/stats.hpp>}}
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ <boost/accumulators/statistics/min.hpp>}}
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <boost/accumulators/statistics/max.hpp>}}
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00011}00011\ \textcolor{preprocessor}{\#include\ <boost/accumulators/statistics/weighted\_mean.hpp>}}
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00012}00012\ \textcolor{preprocessor}{\#include\ <boost/accumulators/statistics/weighted\_variance.hpp>}}
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00014}00014\ \textcolor{preprocessor}{\#include\ <chrono>}}
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00015}00015\ \textcolor{preprocessor}{\#include\ <mutex>}}
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00017}00017\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{\ \textcolor{keyword}{namespace\ }chain\ \{}
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00019}00019\ \textcolor{keyword}{namespace\ }bacc\ =\ boost::accumulators;}
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00021}\mbox{\hyperlink{namespacesysio_1_1chain_ae7932098515897c80ae49b0d569441ba}{00021}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacesysio_1_1chain_ae7932098515897c80ae49b0d569441ba}{compute\_and\_print\_timer\_accuracy}}(\mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer}{platform\_timer}}\&\ timer)\ \{}
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00022}00022\ \ \ \ \textcolor{keyword}{static}\ std::mutex\ m;}
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00023}00023\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{bool}\ once\_is\_enough;}
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00025}00025\ \ \ \ std::lock\_guard\ guard(m);}
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00027}00027\ \ \ \ \textcolor{keywordflow}{if}(once\_is\_enough)}
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00028}00028\ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00030}00030\ \ \ \ bacc::accumulator\_set<int,\ bacc::stats<bacc::tag::mean,\ bacc::tag::min,\ bacc::tag::max,\ bacc::tag::variance>,\ \textcolor{keywordtype}{float}>\ samples;}
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00032}00032\ \ \ \ \textcolor{comment}{//keep\ longest\ first\ in\ list.\ You're\ effectively\ going\ to\ take\ test\_intervals[0]*sizeof(test\_intervals[0])}}
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00033}00033\ \ \ \ \textcolor{comment}{//time\ to\ do\ the\ the\ test}}
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00034}00034\ \ \ \ \textcolor{keywordtype}{int}\ test\_intervals[]\ =\ \{50000,\ 10000,\ 5000,\ 1000,\ 500,\ 100,\ 50,\ 10\};}
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00036}00036\ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int}\&\ interval\ :\ test\_intervals)\ \{}
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00037}00037\ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ loops\ =\ test\_intervals[0]/interval;}
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00039}00039\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ loops;\ ++i)\ \{}
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00040}00040\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ start\ =\ std::chrono::high\_resolution\_clock::now();}
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00041}00041\ \ \ \ \ \ \ \ \ \ timer.\mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_a8396e86c6a626dd2632cb075bd254ad4}{start}}(\mbox{\hyperlink{classfc_1_1time__point}{fc::time\_point}}(\mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{fc::time\_point::now}}().time\_since\_epoch()\ +\ \mbox{\hyperlink{classfc_1_1microseconds}{fc::microseconds}}(interval)));}
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00042}00042\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(!timer.\mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_a801fb6084f296f86fdc1dedd980ac643}{expired}})\ \{\}}
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00043}00043\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ end\ =\ std::chrono::high\_resolution\_clock::now();}
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00044}00044\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ timer\_slop\ =\ std::chrono::duration\_cast<std::chrono::microseconds>(end-\/start).count()\ -\/\ interval;}
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00046}00046\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//since\ more\ samples\ are\ run\ for\ the\ shorter\ expirations,\ weigh\ the\ longer\ expirations\ accordingly.\ This}}
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00047}00047\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//helps\ to\ make\ a\ few\ results\ more\ fair.\ Two\ such\ examples:\ AWS\ c4\&i5\ xen\ instances\ being\ rather\ stable}}
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//down\ to\ 100us\ but\ then\ struggling\ with\ 50us\ and\ 10us.\ MacOS\ having\ performance\ that\ seems\ to\ correlate}}
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//with\ expiry\ length;\ that\ is,\ long\ expirations\ have\ high\ error,\ short\ expirations\ have\ low\ error.}}
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00050}00050\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//That\ said,\ for\ these\ platforms,\ a\ tighter\ tolerance\ may\ possibly\ be\ achieved\ by\ taking\ performance}}
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00051}00051\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//metrics\ in\ mulitple\ bins\ and\ appliying\ the\ slop\ based\ on\ which\ bin\ a\ deadline\ resides\ in.\ Not\ clear}}
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//if\ that's\ worth\ the\ extra\ complexity\ at\ this\ point.}}
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \ samples(timer\_slop,\ bacc::weight\ =\ interval/(\textcolor{keywordtype}{float})test\_intervals[0]);}
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00054}00054\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00055}00055\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00057}00057\ \textcolor{preprocessor}{\ \ \ \#define\ TIMER\_STATS\_FORMAT\ "{}min:\$\{min\}us\ max:\$\{max\}us\ mean:\$\{mean\}us\ stddev:\$\{stddev\}us"{}}}
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00058}00058\ \textcolor{preprocessor}{\ \ \ \#define\ TIMER\_STATS\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00059}00059\ \textcolor{preprocessor}{\ \ \ \ \ \ ("{}min"{},\ bacc::min(samples))("{}max"{},\ bacc::max(samples))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00060}00060\ \textcolor{preprocessor}{\ \ \ \ \ \ ("{}mean"{},\ (int)bacc::mean(samples))("{}stddev"{},\ (int)sqrt(bacc::variance(samples)))}}
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00062}00062\ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\textcolor{stringliteral}{"{}Checktime\ timer\ accuracy:\ "{}}\ \mbox{\hyperlink{platform__timer__accuracy_8cpp_a6d9c433052001dc87714847199e7c966}{TIMER\_STATS\_FORMAT}},\ \mbox{\hyperlink{platform__timer__accuracy_8cpp_aff98bcd1b25850038da047eaf995487d}{TIMER\_STATS}});}
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00063}00063\ \ \ \ \textcolor{keywordflow}{if}(bacc::mean(samples)\ +\ sqrt(bacc::variance(samples))*2\ >\ 250)}
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00064}00064\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a1759e5c9691d8ad754bdf5eff8bb23ac}{wlog}}(\textcolor{stringliteral}{"{}Checktime\ timer\ accuracy\ on\ this\ platform\ and\ hardware\ combination\ is\ poor;\ accuracy\ of\ subjective\ transaction\ deadline\ enforcement\ will\ suffer"{}});}
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00066}00066\ \ \ \ once\_is\_enough\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00067}00067\ \}}
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__accuracy_8cpp_source_l00069}00069\ \}\}}
+
+\end{DoxyCode}

@@ -1,0 +1,9 @@
+<map id="sysio::vm::global_variable" name="sysio::vm::global_variable">
+<area shape="rect" id="Node000001" title=" " alt="" coords="25,198,197,223"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1vm_1_1global__type.html" title=" " alt="" coords="5,94,158,120"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="92,134,110,196,105,198,87,135"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1vm_1_1init__expr.html" title=" " alt="" coords="182,94,317,120"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="222,131,129,199,126,195,219,127"/>
+<area shape="rect" id="Node000004" href="$unionsysio_1_1vm_1_1expr__value.html" title=" " alt="" coords="175,5,324,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="252,47,252,94,247,94,247,47"/>
+</map>

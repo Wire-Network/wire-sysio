@@ -1,0 +1,277 @@
+\doxysection{libraries/fc/secp256k1/secp256k1/src/util.h File Reference}
+\hypertarget{fc_2secp256k1_2secp256k1_2src_2util_8h}{}\label{fc_2secp256k1_2secp256k1_2src_2util_8h}\index{libraries/fc/secp256k1/secp256k1/src/util.h@{libraries/fc/secp256k1/secp256k1/src/util.h}}
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$limits.\+h$>$}\newline
+Include dependency graph for util.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=295pt]{fc_2secp256k1_2secp256k1_2src_2util_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{fc_2secp256k1_2secp256k1_2src_2util_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsecp256k1__callback}{secp256k1\+\_\+callback}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_ac39417c5a18bbf27875c39fcfc8b271b}{TEST\+\_\+\+FAILURE}}(msg)
+\item 
+\#define \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_a76e8a689f16456e44a2cc438a6821025}{EXPECT}}(x,  c)
+\item 
+\#define \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(cond)
+\item 
+\#define \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\+\_\+\+CHECK}}(cond)
+\item 
+\#define \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aa116d8999575e97182121de504f7a130}{VERIFY\+\_\+\+SETUP}}(stmt)
+\item 
+\#define \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_a6b8df892995b6bb70db94dbbd6988d20}{VG\+\_\+\+UNDEF}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_a4219659d3b30fc34dea25be22dccae04}{VG\+\_\+\+CHECK}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_a30c2919bb25654a7ff58814c3a004a86}{VG\+\_\+\+CHECK\+\_\+\+VERIFY}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_a450f9d8af07bfe2f313dbe3a78738a5e}{ALIGNMENT}}~16
+\item 
+\#define \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_a7a45c2decf18b109c399282bb64708da}{ROUND\+\_\+\+TO\+\_\+\+ALIGN}}(size)
+\item 
+\#define \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_ad3e284f8cb00286e85a753265f6b17b8}{SECP256\+K1\+\_\+\+RESTRICT}}
+\item 
+\#define \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_a125544a079312fb3a28a8d1a40ebc7e6}{I64\+FORMAT}}~"{}lld"{}
+\item 
+\#define \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aa4f83048799b3a95129ed0671519f456}{I64u\+FORMAT}}~"{}llu"{}
+\item 
+\#define \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_a5e4f61fb4fb994af091be33f413905bc}{SECP256\+K1\+\_\+\+GNUC\+\_\+\+EXT}}
+\item 
+\#define \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_a48e8f5f9b3e7a4e462cf3efac4a1ef56}{SECP256\+K1\+\_\+\+WIDEMUL\+\_\+\+INT64}}~1
+\item 
+\#define \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_a447121dcab4275b7839a56082b7a1ab8}{\+\_\+\+\_\+has\+\_\+builtin}}(x)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{fc_2secp256k1_2secp256k1_2src_2util_8h_a447121dcab4275b7839a56082b7a1ab8}\index{util.h@{util.h}!\_\_has\_builtin@{\_\_has\_builtin}}
+\index{\_\_has\_builtin@{\_\_has\_builtin}!util.h@{util.h}}
+\doxysubsubsection{\texorpdfstring{\_\_has\_builtin}{\_\_has\_builtin}}
+{\footnotesize\ttfamily \label{fc_2secp256k1_2secp256k1_2src_2util_8h_a447121dcab4275b7839a56082b7a1ab8} 
+\#define \+\_\+\+\_\+has\+\_\+builtin(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{0}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_source_l00252}{252}} of file \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_source}{util.\+h}}.
+
+\Hypertarget{fc_2secp256k1_2secp256k1_2src_2util_8h_a450f9d8af07bfe2f313dbe3a78738a5e}\index{util.h@{util.h}!ALIGNMENT@{ALIGNMENT}}
+\index{ALIGNMENT@{ALIGNMENT}!util.h@{util.h}}
+\doxysubsubsection{\texorpdfstring{ALIGNMENT}{ALIGNMENT}}
+{\footnotesize\ttfamily \label{fc_2secp256k1_2secp256k1_2src_2util_8h_a450f9d8af07bfe2f313dbe3a78738a5e} 
+\#define ALIGNMENT~16}
+
+
+
+Definition at line \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_source_l00140}{140}} of file \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_source}{util.\+h}}.
+
+\Hypertarget{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}\index{util.h@{util.h}!CHECK@{CHECK}}
+\index{CHECK@{CHECK}!util.h@{util.h}}
+\doxysubsubsection{\texorpdfstring{CHECK}{CHECK}}
+{\footnotesize\ttfamily \label{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467} 
+\#define CHECK(\begin{DoxyParamCaption}\item[{}]{cond}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ if\ (\mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_a76e8a689f16456e44a2cc438a6821025}{EXPECT}}(!(cond),\ 0))\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ TEST\_FAILURE(\textcolor{stringliteral}{"{}test\ condition\ failed:\ "{}}\ \#cond);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\}\ \textcolor{keywordflow}{while}(0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_source_l00080}{80}} of file \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_source}{util.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00080\ \textcolor{preprocessor}{\#define\ CHECK(cond)\ do\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00081\ \textcolor{preprocessor}{\ \ \ \ if\ (EXPECT(!(cond),\ 0))\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00082\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ TEST\_FAILURE("{}test\ condition\ failed:\ "{}\ \#cond);\ \(\backslash\)}}
+\DoxyCodeLine{00083\ \textcolor{preprocessor}{\ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00084\ \textcolor{preprocessor}{\}\ while(0)}}
+
+\end{DoxyCode}
+\Hypertarget{fc_2secp256k1_2secp256k1_2src_2util_8h_a76e8a689f16456e44a2cc438a6821025}\index{util.h@{util.h}!EXPECT@{EXPECT}}
+\index{EXPECT@{EXPECT}!util.h@{util.h}}
+\doxysubsubsection{\texorpdfstring{EXPECT}{EXPECT}}
+{\footnotesize\ttfamily \label{fc_2secp256k1_2secp256k1_2src_2util_8h_a76e8a689f16456e44a2cc438a6821025} 
+\#define EXPECT(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{c}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(x)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_source_l00070}{70}} of file \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_source}{util.\+h}}.
+
+\Hypertarget{fc_2secp256k1_2secp256k1_2src_2util_8h_a125544a079312fb3a28a8d1a40ebc7e6}\index{util.h@{util.h}!I64FORMAT@{I64FORMAT}}
+\index{I64FORMAT@{I64FORMAT}!util.h@{util.h}}
+\doxysubsubsection{\texorpdfstring{I64FORMAT}{I64FORMAT}}
+{\footnotesize\ttfamily \label{fc_2secp256k1_2secp256k1_2src_2util_8h_a125544a079312fb3a28a8d1a40ebc7e6} 
+\#define I64\+FORMAT~"{}lld"{}}
+
+
+
+Definition at line \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_source_l00166}{166}} of file \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_source}{util.\+h}}.
+
+\Hypertarget{fc_2secp256k1_2secp256k1_2src_2util_8h_aa4f83048799b3a95129ed0671519f456}\index{util.h@{util.h}!I64uFORMAT@{I64uFORMAT}}
+\index{I64uFORMAT@{I64uFORMAT}!util.h@{util.h}}
+\doxysubsubsection{\texorpdfstring{I64uFORMAT}{I64uFORMAT}}
+{\footnotesize\ttfamily \label{fc_2secp256k1_2secp256k1_2src_2util_8h_aa4f83048799b3a95129ed0671519f456} 
+\#define I64u\+FORMAT~"{}llu"{}}
+
+
+
+Definition at line \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_source_l00167}{167}} of file \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_source}{util.\+h}}.
+
+\Hypertarget{fc_2secp256k1_2secp256k1_2src_2util_8h_a7a45c2decf18b109c399282bb64708da}\index{util.h@{util.h}!ROUND\_TO\_ALIGN@{ROUND\_TO\_ALIGN}}
+\index{ROUND\_TO\_ALIGN@{ROUND\_TO\_ALIGN}!util.h@{util.h}}
+\doxysubsubsection{\texorpdfstring{ROUND\_TO\_ALIGN}{ROUND\_TO\_ALIGN}}
+{\footnotesize\ttfamily \label{fc_2secp256k1_2secp256k1_2src_2util_8h_a7a45c2decf18b109c399282bb64708da} 
+\#define ROUND\+\_\+\+TO\+\_\+\+ALIGN(\begin{DoxyParamCaption}\item[{}]{size}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((((size)\ +\ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_a450f9d8af07bfe2f313dbe3a78738a5e}{ALIGNMENT}}\ -\/\ 1)\ /\ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_a450f9d8af07bfe2f313dbe3a78738a5e}{ALIGNMENT}})\ *\ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_a450f9d8af07bfe2f313dbe3a78738a5e}{ALIGNMENT}})}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_source_l00143}{143}} of file \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_source}{util.\+h}}.
+
+\Hypertarget{fc_2secp256k1_2secp256k1_2src_2util_8h_a5e4f61fb4fb994af091be33f413905bc}\index{util.h@{util.h}!SECP256K1\_GNUC\_EXT@{SECP256K1\_GNUC\_EXT}}
+\index{SECP256K1\_GNUC\_EXT@{SECP256K1\_GNUC\_EXT}!util.h@{util.h}}
+\doxysubsubsection{\texorpdfstring{SECP256K1\_GNUC\_EXT}{SECP256K1\_GNUC\_EXT}}
+{\footnotesize\ttfamily \label{fc_2secp256k1_2secp256k1_2src_2util_8h_a5e4f61fb4fb994af091be33f413905bc} 
+\#define SECP256\+K1\+\_\+\+GNUC\+\_\+\+EXT}
+
+
+
+Definition at line \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_source_l00173}{173}} of file \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_source}{util.\+h}}.
+
+\Hypertarget{fc_2secp256k1_2secp256k1_2src_2util_8h_ad3e284f8cb00286e85a753265f6b17b8}\index{util.h@{util.h}!SECP256K1\_RESTRICT@{SECP256K1\_RESTRICT}}
+\index{SECP256K1\_RESTRICT@{SECP256K1\_RESTRICT}!util.h@{util.h}}
+\doxysubsubsection{\texorpdfstring{SECP256K1\_RESTRICT}{SECP256K1\_RESTRICT}}
+{\footnotesize\ttfamily \label{fc_2secp256k1_2secp256k1_2src_2util_8h_ad3e284f8cb00286e85a753265f6b17b8} 
+\#define SECP256\+K1\+\_\+\+RESTRICT}
+
+
+
+Definition at line \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_source_l00155}{155}} of file \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_source}{util.\+h}}.
+
+\Hypertarget{fc_2secp256k1_2secp256k1_2src_2util_8h_a48e8f5f9b3e7a4e462cf3efac4a1ef56}\index{util.h@{util.h}!SECP256K1\_WIDEMUL\_INT64@{SECP256K1\_WIDEMUL\_INT64}}
+\index{SECP256K1\_WIDEMUL\_INT64@{SECP256K1\_WIDEMUL\_INT64}!util.h@{util.h}}
+\doxysubsubsection{\texorpdfstring{SECP256K1\_WIDEMUL\_INT64}{SECP256K1\_WIDEMUL\_INT64}}
+{\footnotesize\ttfamily \label{fc_2secp256k1_2secp256k1_2src_2util_8h_a48e8f5f9b3e7a4e462cf3efac4a1ef56} 
+\#define SECP256\+K1\+\_\+\+WIDEMUL\+\_\+\+INT64~1}
+
+
+
+Definition at line \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_source_l00238}{238}} of file \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_source}{util.\+h}}.
+
+\Hypertarget{fc_2secp256k1_2secp256k1_2src_2util_8h_ac39417c5a18bbf27875c39fcfc8b271b}\index{util.h@{util.h}!TEST\_FAILURE@{TEST\_FAILURE}}
+\index{TEST\_FAILURE@{TEST\_FAILURE}!util.h@{util.h}}
+\doxysubsubsection{\texorpdfstring{TEST\_FAILURE}{TEST\_FAILURE}}
+{\footnotesize\ttfamily \label{fc_2secp256k1_2secp256k1_2src_2util_8h_ac39417c5a18bbf27875c39fcfc8b271b} 
+\#define TEST\+\_\+\+FAILURE(\begin{DoxyParamCaption}\item[{}]{msg}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}\%s:\%d:\ \%s\(\backslash\)n"{}},\ \_\_FILE\_\_,\ \_\_LINE\_\_,\ msg);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ abort();\ \(\backslash\)}
+\DoxyCodeLine{\}\ \textcolor{keywordflow}{while}(0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_source_l00061}{61}} of file \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_source}{util.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00061\ \textcolor{preprocessor}{\#define\ TEST\_FAILURE(msg)\ do\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00062\ \textcolor{preprocessor}{\ \ \ \ fprintf(stderr,\ "{}\%s:\%d:\ \%s\(\backslash\)n"{},\ \_\_FILE\_\_,\ \_\_LINE\_\_,\ msg);\ \(\backslash\)}}
+\DoxyCodeLine{00063\ \textcolor{preprocessor}{\ \ \ \ abort();\ \(\backslash\)}}
+\DoxyCodeLine{00064\ \textcolor{preprocessor}{\}\ while(0)}}
+
+\end{DoxyCode}
+\Hypertarget{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}\index{util.h@{util.h}!VERIFY\_CHECK@{VERIFY\_CHECK}}
+\index{VERIFY\_CHECK@{VERIFY\_CHECK}!util.h@{util.h}}
+\doxysubsubsection{\texorpdfstring{VERIFY\_CHECK}{VERIFY\_CHECK}}
+{\footnotesize\ttfamily \label{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b} 
+\#define VERIFY\+\_\+\+CHECK(\begin{DoxyParamCaption}\item[{}]{cond}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordflow}{do}\ \{\ (void)(cond);\ \}\ \textcolor{keywordflow}{while}(0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_source_l00095}{95}} of file \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_source}{util.\+h}}.
+
+\Hypertarget{fc_2secp256k1_2secp256k1_2src_2util_8h_aa116d8999575e97182121de504f7a130}\index{util.h@{util.h}!VERIFY\_SETUP@{VERIFY\_SETUP}}
+\index{VERIFY\_SETUP@{VERIFY\_SETUP}!util.h@{util.h}}
+\doxysubsubsection{\texorpdfstring{VERIFY\_SETUP}{VERIFY\_SETUP}}
+{\footnotesize\ttfamily \label{fc_2secp256k1_2secp256k1_2src_2util_8h_aa116d8999575e97182121de504f7a130} 
+\#define VERIFY\+\_\+\+SETUP(\begin{DoxyParamCaption}\item[{}]{stmt}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_source_l00096}{96}} of file \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_source}{util.\+h}}.
+
+\Hypertarget{fc_2secp256k1_2secp256k1_2src_2util_8h_a4219659d3b30fc34dea25be22dccae04}\index{util.h@{util.h}!VG\_CHECK@{VG\_CHECK}}
+\index{VG\_CHECK@{VG\_CHECK}!util.h@{util.h}}
+\doxysubsubsection{\texorpdfstring{VG\_CHECK}{VG\_CHECK}}
+{\footnotesize\ttfamily \label{fc_2secp256k1_2secp256k1_2src_2util_8h_a4219659d3b30fc34dea25be22dccae04} 
+\#define VG\+\_\+\+CHECK(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_source_l00107}{107}} of file \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_source}{util.\+h}}.
+
+\Hypertarget{fc_2secp256k1_2secp256k1_2src_2util_8h_a30c2919bb25654a7ff58814c3a004a86}\index{util.h@{util.h}!VG\_CHECK\_VERIFY@{VG\_CHECK\_VERIFY}}
+\index{VG\_CHECK\_VERIFY@{VG\_CHECK\_VERIFY}!util.h@{util.h}}
+\doxysubsubsection{\texorpdfstring{VG\_CHECK\_VERIFY}{VG\_CHECK\_VERIFY}}
+{\footnotesize\ttfamily \label{fc_2secp256k1_2secp256k1_2src_2util_8h_a30c2919bb25654a7ff58814c3a004a86} 
+\#define VG\+\_\+\+CHECK\+\_\+\+VERIFY(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_source_l00115}{115}} of file \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_source}{util.\+h}}.
+
+\Hypertarget{fc_2secp256k1_2secp256k1_2src_2util_8h_a6b8df892995b6bb70db94dbbd6988d20}\index{util.h@{util.h}!VG\_UNDEF@{VG\_UNDEF}}
+\index{VG\_UNDEF@{VG\_UNDEF}!util.h@{util.h}}
+\doxysubsubsection{\texorpdfstring{VG\_UNDEF}{VG\_UNDEF}}
+{\footnotesize\ttfamily \label{fc_2secp256k1_2secp256k1_2src_2util_8h_a6b8df892995b6bb70db94dbbd6988d20} 
+\#define VG\+\_\+\+UNDEF(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_source_l00106}{106}} of file \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_source}{util.\+h}}.
+

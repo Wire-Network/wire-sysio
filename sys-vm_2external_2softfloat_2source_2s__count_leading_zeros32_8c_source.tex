@@ -1,0 +1,70 @@
+\doxysection{s\+\_\+count\+Leading\+Zeros32.\+c}
+\hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source}{}\label{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source}\index{libraries/sys-\/vm/external/softfloat/source/s\_countLeadingZeros32.c@{libraries/sys-\/vm/external/softfloat/source/s\_countLeadingZeros32.c}}
+\mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00001}00001\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00002}00002\ \textcolor{comment}{/*============================================================================}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00003}00003\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00004}00004\ \textcolor{comment}{This\ C\ source\ file\ is\ part\ of\ the\ SoftFloat\ IEEE\ Floating-\/Point\ Arithmetic}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00005}00005\ \textcolor{comment}{Package,\ Release\ 3e,\ by\ John\ R.\ Hauser.}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00006}00006\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00007}00007\ \textcolor{comment}{Copyright\ 2011,\ 2012,\ 2013,\ 2014,\ 2015\ The\ Regents\ of\ the\ University\ of}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00008}00008\ \textcolor{comment}{California.\ \ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00009}00009\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00010}00010\ \textcolor{comment}{Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00011}00011\ \textcolor{comment}{modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are\ met:}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00012}00012\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00013}00013\ \textcolor{comment}{\ 1.\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright\ notice,}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00014}00014\ \textcolor{comment}{\ \ \ \ this\ list\ of\ conditions,\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00015}00015\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00016}00016\ \textcolor{comment}{\ 2.\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above\ copyright\ notice,}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00017}00017\ \textcolor{comment}{\ \ \ \ this\ list\ of\ conditions,\ and\ the\ following\ disclaimer\ in\ the\ documentation}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00018}00018\ \textcolor{comment}{\ \ \ \ and/or\ other\ materials\ provided\ with\ the\ distribution.}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00019}00019\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00020}00020\ \textcolor{comment}{\ 3.\ Neither\ the\ name\ of\ the\ University\ nor\ the\ names\ of\ its\ contributors\ may}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00021}00021\ \textcolor{comment}{\ \ \ \ be\ used\ to\ endorse\ or\ promote\ products\ derived\ from\ this\ software\ without}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00022}00022\ \textcolor{comment}{\ \ \ \ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00023}00023\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00024}00024\ \textcolor{comment}{THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ REGENTS\ AND\ CONTRIBUTORS\ "{}AS\ IS"{},\ AND\ ANY}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00025}00025\ \textcolor{comment}{EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ THE\ IMPLIED}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00026}00026\ \textcolor{comment}{WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR\ A\ PARTICULAR\ PURPOSE,\ ARE}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00027}00027\ \textcolor{comment}{DISCLAIMED.\ \ IN\ NO\ EVENT\ SHALL\ THE\ REGENTS\ OR\ CONTRIBUTORS\ BE\ LIABLE\ FOR\ ANY}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00028}00028\ \textcolor{comment}{DIRECT,\ INDIRECT,\ INCIDENTAL,\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00029}00029\ \textcolor{comment}{(INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00030}00030\ \textcolor{comment}{LOSS\ OF\ USE,\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00031}00031\ \textcolor{comment}{ON\ ANY\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00032}00032\ \textcolor{comment}{(INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE\ OF\ THIS}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00033}00033\ \textcolor{comment}{SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00034}00034\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00035}00035\ \textcolor{comment}{=============================================================================*/}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00037}00037\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{stdint_8h}{stdint.h}}>}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00038}00038\ \textcolor{preprocessor}{\#include\ "{}platform.h"{}}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00040}00040\ \textcolor{preprocessor}{\#ifndef\ softfloat\_countLeadingZeros32}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00042}\mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_a20e06c2785548bfc8a5351e7e241e351}{00042}}\ \textcolor{preprocessor}{\#define\ softfloat\_countLeadingZeros32\ softfloat\_countLeadingZeros32}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00043}00043\ \textcolor{preprocessor}{\#include\ "{}primitives.h"{}}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00045}\mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_a564e5f45c5b3e854e4bb106d42bfb813}{00045}}\ \mbox{\hyperlink{stdint_8h_ad0fca8b15c218d2c687f8c373a71d228}{uint\_fast8\_t}}\ \mbox{\hyperlink{softfloat_2source_2s__count_leading_zeros32_8c_a20e06c2785548bfc8a5351e7e241e351}{softfloat\_countLeadingZeros32}}(\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ )}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00046}00046\ \{}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00047}00047\ \ \ \ \ \mbox{\hyperlink{stdint_8h_ad0fca8b15c218d2c687f8c373a71d228}{uint\_fast8\_t}}\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}};}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00049}00049\ \ \ \ \ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00050}00050\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ <\ 0x10000\ )\ \{}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00051}00051\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ =\ 16;}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00052}00052\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ <<=\ 16;}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00053}00053\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00054}00054\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ <\ 0x1000000\ )\ \{}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00055}00055\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ +=\ 8;}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00056}00056\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ <<=\ 8;}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00057}00057\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00058}00058\ \ \ \ \ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ +=\ \mbox{\hyperlink{softfloat_2source_2include_2primitives_8h_add449f9f89da661b2c0da7546f2e7481}{softfloat\_countLeadingZeros8}}[\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}>>24];}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00059}00059\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}};}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00061}00061\ \}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00062}00062\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00063}00063\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__count_leading_zeros32_8c_source_l00064}00064\ }
+
+\end{DoxyCode}

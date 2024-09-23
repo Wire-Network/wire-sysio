@@ -1,0 +1,57 @@
+\doxysection{internal\+::Token\+Helper\texorpdfstring{$<$}{<} Stack, Ch \texorpdfstring{$>$}{>} Struct Template Reference}
+\hypertarget{structinternal_1_1_token_helper}{}\label{structinternal_1_1_token_helper}\index{internal::TokenHelper$<$ Stack, Ch $>$@{internal::TokenHelper$<$ Stack, Ch $>$}}
+
+
+{\ttfamily \#include $<$schema.\+h$>$}
+
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static RAPIDJSON\+\_\+\+FORCEINLINE void \mbox{\hyperlink{structinternal_1_1_token_helper_a7b1864bfe6d4014ba7a5114acb26b3ae}{Append\+Index\+Token}} (\mbox{\hyperlink{classinternal_1_1_stack}{Stack}} \&document\+Stack, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} index)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{classinternal_1_1_stack}{Stack}}, typename \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}$>$\newline
+struct internal\+::\+Token\+Helper$<$ Stack, Ch $>$}
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l01445}{1445}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structinternal_1_1_token_helper_a7b1864bfe6d4014ba7a5114acb26b3ae}\index{internal::TokenHelper$<$ Stack, Ch $>$@{internal::TokenHelper$<$ Stack, Ch $>$}!AppendIndexToken@{AppendIndexToken}}
+\index{AppendIndexToken@{AppendIndexToken}!internal::TokenHelper$<$ Stack, Ch $>$@{internal::TokenHelper$<$ Stack, Ch $>$}}
+\doxysubsubsection{\texorpdfstring{AppendIndexToken()}{AppendIndexToken()}}
+{\footnotesize\ttfamily \label{structinternal_1_1_token_helper_a7b1864bfe6d4014ba7a5114acb26b3ae} 
+template$<$typename \mbox{\hyperlink{classinternal_1_1_stack}{Stack}} , typename \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}} $>$ \\
+static RAPIDJSON\+\_\+\+FORCEINLINE void \mbox{\hyperlink{structinternal_1_1_token_helper}{internal\+::\+Token\+Helper}}$<$ \mbox{\hyperlink{classinternal_1_1_stack}{Stack}}, \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}} $>$\+::\+Append\+Index\+Token (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classinternal_1_1_stack}{Stack}} \&}]{document\+Stack}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{index}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l01446}{1446}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01446\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01447\ \ \ \ \ \ \ \ \ *documentStack.template\ Push<Ch>()\ =\ \textcolor{charliteral}{'/'};}
+\DoxyCodeLine{01448\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ buffer[21];}
+\DoxyCodeLine{01449\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ length\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}((\textcolor{keyword}{sizeof}(\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}})\ ==\ 4\ ?\ \mbox{\hyperlink{namespaceinternal_a90e3cb218b557548f361e99dc718b4b1}{u32toa}}(index,\ buffer)\ :\ \mbox{\hyperlink{namespaceinternal_a489150922c0320e4290b455bf3c6e36c}{u64toa}}(index,\ buffer))\ -\/\ buffer);}
+\DoxyCodeLine{01450\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ length;\ i++)}
+\DoxyCodeLine{01451\ \ \ \ \ \ \ \ \ \ \ \ \ *documentStack.template\ Push<Ch>()\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}\textcolor{keyword}{>}(buffer[i]);}
+\DoxyCodeLine{01452\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structinternal_1_1_token_helper_a7b1864bfe6d4014ba7a5114acb26b3ae_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/\mbox{\hyperlink{schema_8h}{schema.\+h}}\end{DoxyCompactItemize}

@@ -1,0 +1,53 @@
+\doxysection{libraries/fc/src/io/json.cpp File Reference}
+\hypertarget{json_8cpp}{}\label{json_8cpp}\index{libraries/fc/src/io/json.cpp@{libraries/fc/src/io/json.cpp}}
+{\ttfamily \#include $<$fc/io/json.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/log/logger.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/utf8.\+hpp$>$}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$fstream$>$}\newline
+{\ttfamily \#include $<$sstream$>$}\newline
+{\ttfamily \#include $<$boost/filesystem/fstream.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/io/json\+\_\+relaxed.\+hpp$>$}\newline
+Include dependency graph for json.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{json_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacefc}{fc}}
+\begin{DoxyCompactList}\small\item\em namespace \doxylink{namespacesysio_1_1chain}{sysio\+::chain} \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , \mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788}{json\+::parse\+\_\+type}} parser\+\_\+type$>$ }\\\mbox{\hyperlink{classfc_1_1variant}{variant}} \mbox{\hyperlink{namespacefc_aea26b5fef1951af5f8c449fb5c2b9ef3}{fc\+::variant\+\_\+from\+\_\+stream}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&in, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} max\+\_\+depth)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\char \mbox{\hyperlink{namespacefc_a14df350f499648f14f6314a87800f3c5}{fc\+::parse\+Escape}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&in)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\std\+::string \mbox{\hyperlink{namespacefc_a3a42171e4b78e7fb2dfab0eaf45dc762}{fc\+::string\+From\+Stream}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&in)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\bool \mbox{\hyperlink{namespacefc_aa2bf8a06a5740fdc38da162192bb1f5a}{fc\+::skip\+\_\+white\+\_\+space}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&in)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\std\+::string \mbox{\hyperlink{namespacefc_a233581b53962f2a0925100f06e89bfc1}{fc\+::string\+From\+Token}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&in)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , \mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788}{json\+::parse\+\_\+type}} parser\+\_\+type$>$ }\\\mbox{\hyperlink{classfc_1_1variant__object}{variant\+\_\+object}} \mbox{\hyperlink{namespacefc_a853baf1524aff74fc7d3c9666af6c7bd}{fc\+::object\+From\+Stream}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&in, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} max\+\_\+depth)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , \mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788}{json\+::parse\+\_\+type}} parser\+\_\+type$>$ }\\\mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}} \mbox{\hyperlink{namespacefc_ab9c4cf7a7f9ed120510d9a692ff914b4}{fc\+::array\+From\+Stream}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&in, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} max\+\_\+depth)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , \mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788}{json\+::parse\+\_\+type}} parser\+\_\+type$>$ }\\\mbox{\hyperlink{classfc_1_1variant}{variant}} \mbox{\hyperlink{namespacefc_a1a45bd4f160e97bde0e5460fd2984da6}{fc\+::number\+\_\+from\+\_\+stream}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&in)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{classfc_1_1variant}{variant}} \mbox{\hyperlink{namespacefc_ab330b9b42588c2bf0021cf177ee49ca6}{fc\+::token\+\_\+from\+\_\+stream}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&in)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{namespacefc_af9bea69c5790941ddc601fcd96cce071}{fc\+::to\+\_\+stream}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&os, const \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, const \mbox{\hyperlink{classfc_1_1json_ab3f3e006979a528f3f56acd4e43fe8bc}{json\+::yield\+\_\+function\+\_\+t}} \&yield, \mbox{\hyperlink{classfc_1_1json_afb6b3878fb58ad18c6c85f2f964bd998}{json\+::output\+\_\+formatting}} \mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{namespacefc_ad2f8ee5f972c1a1846475cfc8fc35d9a}{fc\+::to\+\_\+stream}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&os, const \mbox{\hyperlink{classfc_1_1variant__object}{variant\+\_\+object}} \&o, const \mbox{\hyperlink{classfc_1_1json_ab3f3e006979a528f3f56acd4e43fe8bc}{json\+::yield\+\_\+function\+\_\+t}} \&yield, \mbox{\hyperlink{classfc_1_1json_afb6b3878fb58ad18c6c85f2f964bd998}{json\+::output\+\_\+formatting}} \mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{namespacefc_affbbcfada72afda18a33a8c07fc97fb9}{fc\+::to\+\_\+stream}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&os, const \mbox{\hyperlink{classfc_1_1variant}{variant}} \&v, const \mbox{\hyperlink{classfc_1_1json_ab3f3e006979a528f3f56acd4e43fe8bc}{json\+::yield\+\_\+function\+\_\+t}} \&yield, \mbox{\hyperlink{classfc_1_1json_afb6b3878fb58ad18c6c85f2f964bd998}{json\+::output\+\_\+formatting}} \mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}})
+\item 
+std\+::string \mbox{\hyperlink{namespacefc_ac11f6266177ed5f42e899ccc37550181}{fc\+::pretty\+\_\+print}} (const std\+::string \&v, \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} indent)
+\item 
+std\+::string \mbox{\hyperlink{namespacefc_aee7bbe89bfe8d6273f5212938cc1d458}{fc\+::escape\+\_\+string}} (const std\+::string\+\_\+view \&str, const \mbox{\hyperlink{classfc_1_1json_ab3f3e006979a528f3f56acd4e43fe8bc}{json\+::yield\+\_\+function\+\_\+t}} \&yield, bool escape\+\_\+control\+\_\+chars=true)
+\end{DoxyCompactItemize}

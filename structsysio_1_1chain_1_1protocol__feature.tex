@@ -1,0 +1,253 @@
+\doxysection{sysio\+::chain\+::protocol\+\_\+feature Struct Reference}
+\hypertarget{structsysio_1_1chain_1_1protocol__feature}{}\label{structsysio_1_1chain_1_1protocol__feature}\index{sysio::chain::protocol\_feature@{sysio::chain::protocol\_feature}}
+
+
+{\ttfamily \#include $<$protocol\+\_\+feature\+\_\+manager.\+hpp$>$}
+
+
+
+Collaboration diagram for sysio\+::chain\+::protocol\+\_\+feature\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1protocol__feature__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature_a9dba9a84d3291260405658fa19f0296a}{to\+\_\+variant}} (bool include\+\_\+subjective\+\_\+restrictions=true, \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc\+::mutable\+\_\+variant\+\_\+object}} \texorpdfstring{$\ast$}{*}additional\+\_\+fields=nullptr) const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_a357fd9478475457e5bb386a3143079b6}{digest\+\_\+type}} \mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature_a4743db595022a0f1782a03d306458d2b}{feature\+\_\+digest}}
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_a357fd9478475457e5bb386a3143079b6}{digest\+\_\+type}} \mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature_ae1c9776fb6fae3fe395f9e76fe20ef02}{description\+\_\+digest}}
+\item 
+flat\+\_\+set$<$ \mbox{\hyperlink{namespacesysio_1_1chain_a357fd9478475457e5bb386a3143079b6}{digest\+\_\+type}} $>$ \mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature_a669a4c2e13653a74ae83bcd92710dd82}{dependencies}}
+\item 
+\mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} \mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature_aaf8901094e860c1802d19c02a54bb992}{earliest\+\_\+allowed\+\_\+activation\+\_\+time}}
+\item 
+bool \mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature_a38478e2ff657b32b2545f37de72914b8}{preactivation\+\_\+required}} = false
+\item 
+bool \mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature_ad7f33b49a8968d0ec69b3fbfadf6db72}{enabled}} = false
+\item 
+std\+::optional$<$ \mbox{\hyperlink{namespacesysio_1_1chain_a406d45a184cdba0af316b5bf34bf56cf}{builtin\+\_\+protocol\+\_\+feature\+\_\+t}} $>$ \mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature_a8b43a433a157d6206c443c59b88e3adc}{builtin\+\_\+feature}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature_a49e9f4a1b1882bdc2504d495b79050cc}{operator$<$}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature}{protocol\+\_\+feature}} \&lhs, const \mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature}{protocol\+\_\+feature}} \&rhs)
+\item 
+bool \mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature_a53c2b38afdf66a0fbfab0291aaee1246}{operator$<$}} (const \mbox{\hyperlink{namespacesysio_1_1chain_a357fd9478475457e5bb386a3143079b6}{digest\+\_\+type}} \&lhs, const \mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature}{protocol\+\_\+feature}} \&rhs)
+\item 
+bool \mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature_a4af4a8599bc3f50ded7790aa5b83a42e}{operator$<$}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature}{protocol\+\_\+feature}} \&lhs, const \mbox{\hyperlink{namespacesysio_1_1chain_a357fd9478475457e5bb386a3143079b6}{digest\+\_\+type}} \&rhs)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{protocol__feature__manager_8hpp_source_l00106}{106}} of file \mbox{\hyperlink{protocol__feature__manager_8hpp_source}{protocol\+\_\+feature\+\_\+manager.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1chain_1_1protocol__feature_a9dba9a84d3291260405658fa19f0296a}\index{sysio::chain::protocol\_feature@{sysio::chain::protocol\_feature}!to\_variant@{to\_variant}}
+\index{to\_variant@{to\_variant}!sysio::chain::protocol\_feature@{sysio::chain::protocol\_feature}}
+\doxysubsubsection{\texorpdfstring{to\_variant()}{to\_variant()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1protocol__feature_a9dba9a84d3291260405658fa19f0296a} 
+\mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} sysio\+::chain\+::protocol\+\_\+feature\+::to\+\_\+variant (\begin{DoxyParamCaption}\item[{bool}]{include\+\_\+subjective\+\_\+restrictions}{ = {\ttfamily true}, }\item[{\mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc\+::mutable\+\_\+variant\+\_\+object}} \texorpdfstring{$\ast$}{*}}]{additional\+\_\+fields}{ = {\ttfamily nullptr}}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{protocol__feature__manager_8cpp_source_l00364}{364}} of file \mbox{\hyperlink{protocol__feature__manager_8cpp_source}{protocol\+\_\+feature\+\_\+manager.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00366\ \ \ \ \{}
+\DoxyCodeLine{00367\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature_a8b43a433a157d6206c443c59b88e3adc}{builtin\_feature}},\ protocol\_feature\_exception,\ \textcolor{stringliteral}{"{}not\ a\ builtin\ protocol\ feature"{}}\ );}
+\DoxyCodeLine{00368\ }
+\DoxyCodeLine{00369\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}\ mvo;}
+\DoxyCodeLine{00370\ }
+\DoxyCodeLine{00371\ \ \ \ \ \ \ mvo(\ \textcolor{stringliteral}{"{}feature\_digest"{}},\ \mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature_a4743db595022a0f1782a03d306458d2b}{feature\_digest}}\ );}
+\DoxyCodeLine{00372\ }
+\DoxyCodeLine{00373\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ additional\_fields\ )\ \{}
+\DoxyCodeLine{00374\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ e\ :\ *additional\_fields\ )\ \{}
+\DoxyCodeLine{00375\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ e.key().compare(\ \textcolor{stringliteral}{"{}feature\_digest"{}}\ )\ !=\ 0\ )}
+\DoxyCodeLine{00376\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ mvo(\ e.key(),\ e.value()\ );}
+\DoxyCodeLine{00377\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00378\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00379\ }
+\DoxyCodeLine{00380\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ include\_subjective\_restrictions\ )\ \{}
+\DoxyCodeLine{00381\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}\ subjective\_restrictions;}
+\DoxyCodeLine{00382\ }
+\DoxyCodeLine{00383\ \ \ \ \ \ \ \ \ \ subjective\_restrictions(\ \textcolor{stringliteral}{"{}enabled"{}},\ \mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature_ad7f33b49a8968d0ec69b3fbfadf6db72}{enabled}}\ );}
+\DoxyCodeLine{00384\ \ \ \ \ \ \ \ \ \ subjective\_restrictions(\ \textcolor{stringliteral}{"{}preactivation\_required"{}},\ \mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature_a38478e2ff657b32b2545f37de72914b8}{preactivation\_required}}\ );}
+\DoxyCodeLine{00385\ \ \ \ \ \ \ \ \ \ subjective\_restrictions(\ \textcolor{stringliteral}{"{}earliest\_allowed\_activation\_time"{}},\ \mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature_aaf8901094e860c1802d19c02a54bb992}{earliest\_allowed\_activation\_time}}\ );}
+\DoxyCodeLine{00386\ }
+\DoxyCodeLine{00387\ \ \ \ \ \ \ \ \ \ mvo(\ \textcolor{stringliteral}{"{}subjective\_restrictions"{}},\ std::move(\ subjective\_restrictions\ )\ );}
+\DoxyCodeLine{00388\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00389\ }
+\DoxyCodeLine{00390\ \ \ \ \ \ \ mvo(\ \textcolor{stringliteral}{"{}description\_digest"{}},\ \mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature_ae1c9776fb6fae3fe395f9e76fe20ef02}{description\_digest}}\ );}
+\DoxyCodeLine{00391\ \ \ \ \ \ \ mvo(\ \textcolor{stringliteral}{"{}dependencies"{}},\ \mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature_a669a4c2e13653a74ae83bcd92710dd82}{dependencies}}\ );}
+\DoxyCodeLine{00392\ \ \ \ \ \ \ mvo(\ \textcolor{stringliteral}{"{}protocol\_feature\_type"{}},\ \mbox{\hyperlink{classsysio_1_1chain_1_1builtin__protocol__feature_aeb3f76dc2a5f66fae16afcceb1bc81b3}{builtin\_protocol\_feature::feature\_type\_string}}\ );}
+\DoxyCodeLine{00393\ }
+\DoxyCodeLine{00394\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{fc::variants}}\ specification;}
+\DoxyCodeLine{00395\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ add\_to\_specification\ =\ [\&specification](\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ key\_name,\ \textcolor{keyword}{auto}\&\&\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ )\ \{}
+\DoxyCodeLine{00396\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}\ obj;}
+\DoxyCodeLine{00397\ \ \ \ \ \ \ \ \ \ obj(\ \textcolor{stringliteral}{"{}name"{}},\ key\_name\ );}
+\DoxyCodeLine{00398\ \ \ \ \ \ \ \ \ \ obj(\ \textcolor{stringliteral}{"{}value"{}},\ std::forward<\textcolor{keyword}{decltype}(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})>(\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ )\ );}
+\DoxyCodeLine{00399\ \ \ \ \ \ \ \ \ \ specification.emplace\_back(\ std::move(obj)\ );}
+\DoxyCodeLine{00400\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00401\ }
+\DoxyCodeLine{00402\ }
+\DoxyCodeLine{00403\ \ \ \ \ \ \ add\_to\_specification(\ \textcolor{stringliteral}{"{}builtin\_feature\_codename"{}},\ \mbox{\hyperlink{namespacesysio_1_1chain_a98d0965c543569bc5e49006c54964ba4}{builtin\_protocol\_feature\_codename}}(\ *\mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature_a8b43a433a157d6206c443c59b88e3adc}{builtin\_feature}}\ )\ );}
+\DoxyCodeLine{00404\ }
+\DoxyCodeLine{00405\ \ \ \ \ \ \ mvo(\ \textcolor{stringliteral}{"{}specification"{}},\ std::move(\ specification\ )\ );}
+\DoxyCodeLine{00406\ }
+\DoxyCodeLine{00407\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}(\ std::move(mvo)\ );}
+\DoxyCodeLine{00408\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1protocol__feature_a9dba9a84d3291260405658fa19f0296a_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{structsysio_1_1chain_1_1protocol__feature_a53c2b38afdf66a0fbfab0291aaee1246}\index{sysio::chain::protocol\_feature@{sysio::chain::protocol\_feature}!operator$<$@{operator$<$}}
+\index{operator$<$@{operator$<$}!sysio::chain::protocol\_feature@{sysio::chain::protocol\_feature}}
+\doxysubsubsection{\texorpdfstring{operator$<$}{operator<}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1protocol__feature_a53c2b38afdf66a0fbfab0291aaee1246} 
+bool operator$<$ (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_a357fd9478475457e5bb386a3143079b6}{digest\+\_\+type}} \&}]{lhs}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature}{protocol\+\_\+feature}} \&}]{rhs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{protocol__feature__manager_8hpp_source_l00122}{122}} of file \mbox{\hyperlink{protocol__feature__manager_8hpp_source}{protocol\+\_\+feature\+\_\+manager.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ lhs\ <\ rhs.feature\_digest;}
+\DoxyCodeLine{00124\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1protocol__feature_a4af4a8599bc3f50ded7790aa5b83a42e}\index{sysio::chain::protocol\_feature@{sysio::chain::protocol\_feature}!operator$<$@{operator$<$}}
+\index{operator$<$@{operator$<$}!sysio::chain::protocol\_feature@{sysio::chain::protocol\_feature}}
+\doxysubsubsection{\texorpdfstring{operator$<$}{operator<}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1protocol__feature_a4af4a8599bc3f50ded7790aa5b83a42e} 
+bool operator$<$ (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature}{protocol\+\_\+feature}} \&}]{lhs}{, }\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_a357fd9478475457e5bb386a3143079b6}{digest\+\_\+type}} \&}]{rhs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{protocol__feature__manager_8hpp_source_l00126}{126}} of file \mbox{\hyperlink{protocol__feature__manager_8hpp_source}{protocol\+\_\+feature\+\_\+manager.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ lhs.feature\_digest\ <\ rhs;}
+\DoxyCodeLine{00128\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1protocol__feature_a49e9f4a1b1882bdc2504d495b79050cc}\index{sysio::chain::protocol\_feature@{sysio::chain::protocol\_feature}!operator$<$@{operator$<$}}
+\index{operator$<$@{operator$<$}!sysio::chain::protocol\_feature@{sysio::chain::protocol\_feature}}
+\doxysubsubsection{\texorpdfstring{operator$<$}{operator<}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1protocol__feature_a49e9f4a1b1882bdc2504d495b79050cc} 
+bool operator$<$ (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature}{protocol\+\_\+feature}} \&}]{lhs}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature}{protocol\+\_\+feature}} \&}]{rhs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{protocol__feature__manager_8hpp_source_l00118}{118}} of file \mbox{\hyperlink{protocol__feature__manager_8hpp_source}{protocol\+\_\+feature\+\_\+manager.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ lhs.feature\_digest\ <\ rhs.feature\_digest;}
+\DoxyCodeLine{00120\ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1chain_1_1protocol__feature_a8b43a433a157d6206c443c59b88e3adc}\index{sysio::chain::protocol\_feature@{sysio::chain::protocol\_feature}!builtin\_feature@{builtin\_feature}}
+\index{builtin\_feature@{builtin\_feature}!sysio::chain::protocol\_feature@{sysio::chain::protocol\_feature}}
+\doxysubsubsection{\texorpdfstring{builtin\_feature}{builtin\_feature}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1protocol__feature_a8b43a433a157d6206c443c59b88e3adc} 
+std\+::optional$<$\mbox{\hyperlink{namespacesysio_1_1chain_a406d45a184cdba0af316b5bf34bf56cf}{builtin\+\_\+protocol\+\_\+feature\+\_\+t}}$>$ sysio\+::chain\+::protocol\+\_\+feature\+::builtin\+\_\+feature}
+
+
+
+Definition at line \mbox{\hyperlink{protocol__feature__manager_8hpp_source_l00113}{113}} of file \mbox{\hyperlink{protocol__feature__manager_8hpp_source}{protocol\+\_\+feature\+\_\+manager.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1protocol__feature_a669a4c2e13653a74ae83bcd92710dd82}\index{sysio::chain::protocol\_feature@{sysio::chain::protocol\_feature}!dependencies@{dependencies}}
+\index{dependencies@{dependencies}!sysio::chain::protocol\_feature@{sysio::chain::protocol\_feature}}
+\doxysubsubsection{\texorpdfstring{dependencies}{dependencies}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1protocol__feature_a669a4c2e13653a74ae83bcd92710dd82} 
+flat\+\_\+set$<$\mbox{\hyperlink{namespacesysio_1_1chain_a357fd9478475457e5bb386a3143079b6}{digest\+\_\+type}}$>$ sysio\+::chain\+::protocol\+\_\+feature\+::dependencies}
+
+
+
+Definition at line \mbox{\hyperlink{protocol__feature__manager_8hpp_source_l00109}{109}} of file \mbox{\hyperlink{protocol__feature__manager_8hpp_source}{protocol\+\_\+feature\+\_\+manager.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1protocol__feature_ae1c9776fb6fae3fe395f9e76fe20ef02}\index{sysio::chain::protocol\_feature@{sysio::chain::protocol\_feature}!description\_digest@{description\_digest}}
+\index{description\_digest@{description\_digest}!sysio::chain::protocol\_feature@{sysio::chain::protocol\_feature}}
+\doxysubsubsection{\texorpdfstring{description\_digest}{description\_digest}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1protocol__feature_ae1c9776fb6fae3fe395f9e76fe20ef02} 
+\mbox{\hyperlink{namespacesysio_1_1chain_a357fd9478475457e5bb386a3143079b6}{digest\+\_\+type}} sysio\+::chain\+::protocol\+\_\+feature\+::description\+\_\+digest}
+
+
+
+Definition at line \mbox{\hyperlink{protocol__feature__manager_8hpp_source_l00108}{108}} of file \mbox{\hyperlink{protocol__feature__manager_8hpp_source}{protocol\+\_\+feature\+\_\+manager.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1protocol__feature_aaf8901094e860c1802d19c02a54bb992}\index{sysio::chain::protocol\_feature@{sysio::chain::protocol\_feature}!earliest\_allowed\_activation\_time@{earliest\_allowed\_activation\_time}}
+\index{earliest\_allowed\_activation\_time@{earliest\_allowed\_activation\_time}!sysio::chain::protocol\_feature@{sysio::chain::protocol\_feature}}
+\doxysubsubsection{\texorpdfstring{earliest\_allowed\_activation\_time}{earliest\_allowed\_activation\_time}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1protocol__feature_aaf8901094e860c1802d19c02a54bb992} 
+\mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} sysio\+::chain\+::protocol\+\_\+feature\+::earliest\+\_\+allowed\+\_\+activation\+\_\+time}
+
+
+
+Definition at line \mbox{\hyperlink{protocol__feature__manager_8hpp_source_l00110}{110}} of file \mbox{\hyperlink{protocol__feature__manager_8hpp_source}{protocol\+\_\+feature\+\_\+manager.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1protocol__feature_ad7f33b49a8968d0ec69b3fbfadf6db72}\index{sysio::chain::protocol\_feature@{sysio::chain::protocol\_feature}!enabled@{enabled}}
+\index{enabled@{enabled}!sysio::chain::protocol\_feature@{sysio::chain::protocol\_feature}}
+\doxysubsubsection{\texorpdfstring{enabled}{enabled}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1protocol__feature_ad7f33b49a8968d0ec69b3fbfadf6db72} 
+bool sysio\+::chain\+::protocol\+\_\+feature\+::enabled = false}
+
+
+
+Definition at line \mbox{\hyperlink{protocol__feature__manager_8hpp_source_l00112}{112}} of file \mbox{\hyperlink{protocol__feature__manager_8hpp_source}{protocol\+\_\+feature\+\_\+manager.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1protocol__feature_a4743db595022a0f1782a03d306458d2b}\index{sysio::chain::protocol\_feature@{sysio::chain::protocol\_feature}!feature\_digest@{feature\_digest}}
+\index{feature\_digest@{feature\_digest}!sysio::chain::protocol\_feature@{sysio::chain::protocol\_feature}}
+\doxysubsubsection{\texorpdfstring{feature\_digest}{feature\_digest}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1protocol__feature_a4743db595022a0f1782a03d306458d2b} 
+\mbox{\hyperlink{namespacesysio_1_1chain_a357fd9478475457e5bb386a3143079b6}{digest\+\_\+type}} sysio\+::chain\+::protocol\+\_\+feature\+::feature\+\_\+digest}
+
+
+
+Definition at line \mbox{\hyperlink{protocol__feature__manager_8hpp_source_l00107}{107}} of file \mbox{\hyperlink{protocol__feature__manager_8hpp_source}{protocol\+\_\+feature\+\_\+manager.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1protocol__feature_a38478e2ff657b32b2545f37de72914b8}\index{sysio::chain::protocol\_feature@{sysio::chain::protocol\_feature}!preactivation\_required@{preactivation\_required}}
+\index{preactivation\_required@{preactivation\_required}!sysio::chain::protocol\_feature@{sysio::chain::protocol\_feature}}
+\doxysubsubsection{\texorpdfstring{preactivation\_required}{preactivation\_required}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1protocol__feature_a38478e2ff657b32b2545f37de72914b8} 
+bool sysio\+::chain\+::protocol\+\_\+feature\+::preactivation\+\_\+required = false}
+
+
+
+Definition at line \mbox{\hyperlink{protocol__feature__manager_8hpp_source_l00111}{111}} of file \mbox{\hyperlink{protocol__feature__manager_8hpp_source}{protocol\+\_\+feature\+\_\+manager.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{protocol__feature__manager_8hpp}{protocol\+\_\+feature\+\_\+manager.\+hpp}}\item 
+libraries/chain/\mbox{\hyperlink{protocol__feature__manager_8cpp}{protocol\+\_\+feature\+\_\+manager.\+cpp}}\end{DoxyCompactItemize}

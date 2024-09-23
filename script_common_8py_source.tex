@@ -1,0 +1,37 @@
+\doxysection{script\+Common.\+py}
+\hypertarget{script_common_8py_source}{}\label{script_common_8py_source}\index{libraries/sys-\/vm/external/Catch2/scripts/scriptCommon.py@{libraries/sys-\/vm/external/Catch2/scripts/scriptCommon.py}}
+\mbox{\hyperlink{script_common_8py}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{script_common_8py_source_l00001}\mbox{\hyperlink{namespacescript_common}{00001}}\ \textcolor{keyword}{import}\ os}
+\DoxyCodeLine{\Hypertarget{script_common_8py_source_l00002}00002\ \textcolor{keyword}{import}\ sys}
+\DoxyCodeLine{\Hypertarget{script_common_8py_source_l00003}00003\ \textcolor{keyword}{import}\ subprocess}
+\DoxyCodeLine{\Hypertarget{script_common_8py_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{script_common_8py_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{script_common_8py_source_l00006}\mbox{\hyperlink{namespacescript_common_a28a4f9c1dd50365dbfb470340caa803f}{00006}}\ catchPath\ =\ os.path.dirname(os.path.realpath(\ os.path.dirname(sys.argv[0])))}
+\DoxyCodeLine{\Hypertarget{script_common_8py_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{script_common_8py_source_l00008}\mbox{\hyperlink{namespacescript_common_a7cc9ec3d9881a6e16d97207c46523893}{00008}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacescript_common_a7cc9ec3d9881a6e16d97207c46523893}{getBuildExecutable}}():}
+\DoxyCodeLine{\Hypertarget{script_common_8py_source_l00009}00009\ \ \ \ \ \textcolor{keywordflow}{if}\ os.name\ ==\ \textcolor{stringliteral}{'nt'}:}
+\DoxyCodeLine{\Hypertarget{script_common_8py_source_l00010}00010\ \ \ \ \ \ \ \ \ dir\ =\ os.environ.get(\textcolor{stringliteral}{'CATCH\_DEV\_OUT\_DIR'},\ \textcolor{stringliteral}{"{}cmake-\/build-\/debug/projects/SelfTest.exe"{}})}
+\DoxyCodeLine{\Hypertarget{script_common_8py_source_l00011}00011\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ dir}
+\DoxyCodeLine{\Hypertarget{script_common_8py_source_l00012}00012\ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{script_common_8py_source_l00013}00013\ \ \ \ \ \ \ \ \ dir\ =\ os.environ.get(\textcolor{stringliteral}{'CATCH\_DEV\_OUT\_DIR'},\ \textcolor{stringliteral}{"{}cmake-\/build-\/debug/projects/SelfTest"{}})}
+\DoxyCodeLine{\Hypertarget{script_common_8py_source_l00014}00014\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ dir}
+\DoxyCodeLine{\Hypertarget{script_common_8py_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{script_common_8py_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{script_common_8py_source_l00017}\mbox{\hyperlink{namespacescript_common_a1e69504cff209d8b38971c14421aa6fd}{00017}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacescript_common_a1e69504cff209d8b38971c14421aa6fd}{runAndCapture}}(\ args\ ):}
+\DoxyCodeLine{\Hypertarget{script_common_8py_source_l00018}00018\ \ \ \ \ child\ =\ subprocess.Popen(\textcolor{stringliteral}{"{}\ "{}}.join(\ args\ ),\ shell=\textcolor{keyword}{True},\ stdout=subprocess.PIPE)}
+\DoxyCodeLine{\Hypertarget{script_common_8py_source_l00019}00019\ \ \ \ \ lines\ =\ []}
+\DoxyCodeLine{\Hypertarget{script_common_8py_source_l00020}00020\ \ \ \ \ line\ =\ \textcolor{stringliteral}{"{}"{}}}
+\DoxyCodeLine{\Hypertarget{script_common_8py_source_l00021}00021\ \ \ \ \ \textcolor{keywordflow}{while}\ \textcolor{keyword}{True}:}
+\DoxyCodeLine{\Hypertarget{script_common_8py_source_l00022}00022\ \ \ \ \ \ \ \ \ out\ =\ child.stdout.read(1)}
+\DoxyCodeLine{\Hypertarget{script_common_8py_source_l00023}00023\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ out\ ==\ \textcolor{stringliteral}{''}\ \textcolor{keywordflow}{and}\ child.poll():}
+\DoxyCodeLine{\Hypertarget{script_common_8py_source_l00024}00024\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break}}
+\DoxyCodeLine{\Hypertarget{script_common_8py_source_l00025}00025\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ out\ !=\ \textcolor{stringliteral}{''}:}
+\DoxyCodeLine{\Hypertarget{script_common_8py_source_l00026}00026\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ out\ ==\ \textcolor{stringliteral}{'\(\backslash\)n'}:}
+\DoxyCodeLine{\Hypertarget{script_common_8py_source_l00027}00027\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lines.append(\ line\ )}
+\DoxyCodeLine{\Hypertarget{script_common_8py_source_l00028}00028\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ line\ =\ \textcolor{stringliteral}{"{}"{}}}
+\DoxyCodeLine{\Hypertarget{script_common_8py_source_l00029}00029\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{script_common_8py_source_l00030}00030\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ line\ =\ line\ +\ out}
+\DoxyCodeLine{\Hypertarget{script_common_8py_source_l00031}00031\ \ \ \ \ \textcolor{keywordflow}{return}\ lines}
+
+\end{DoxyCode}

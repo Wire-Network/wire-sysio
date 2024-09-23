@@ -1,0 +1,78 @@
+\doxysection{hybi08.\+hpp}
+\hypertarget{hybi08_8hpp_source}{}\label{hybi08_8hpp_source}\index{libraries/fc/vendor/websocketpp/websocketpp/processors/hybi08.hpp@{libraries/fc/vendor/websocketpp/websocketpp/processors/hybi08.hpp}}
+\mbox{\hyperlink{hybi08_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2014,\ Peter\ Thorson.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00004}00004\ \textcolor{comment}{\ *\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00005}00005\ \textcolor{comment}{\ *\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are\ met:}}
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00006}00006\ \textcolor{comment}{\ *\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00007}00007\ \textcolor{comment}{\ *\ \ \ \ \ \ \ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00008}00008\ \textcolor{comment}{\ *\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00009}00009\ \textcolor{comment}{\ *\ \ \ \ \ \ \ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer\ in\ the}}
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00010}00010\ \textcolor{comment}{\ *\ \ \ \ \ \ \ documentation\ and/or\ other\ materials\ provided\ with\ the\ distribution.}}
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00011}00011\ \textcolor{comment}{\ *\ \ \ \ \ *\ Neither\ the\ name\ of\ the\ WebSocket++\ Project\ nor\ the}}
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00012}00012\ \textcolor{comment}{\ *\ \ \ \ \ \ \ names\ of\ its\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products}}
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00013}00013\ \textcolor{comment}{\ *\ \ \ \ \ \ \ derived\ from\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00014}00014\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00015}00015\ \textcolor{comment}{\ *\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS\ "{}AS\ IS"{}}}
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00016}00016\ \textcolor{comment}{\ *\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ THE}}
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00017}00017\ \textcolor{comment}{\ *\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR\ A\ PARTICULAR\ PURPOSE}}
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00018}00018\ \textcolor{comment}{\ *\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ PETER\ THORSON\ BE\ LIABLE\ FOR\ ANY}}
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00019}00019\ \textcolor{comment}{\ *\ DIRECT,\ INDIRECT,\ INCIDENTAL,\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES}}
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00020}00020\ \textcolor{comment}{\ *\ (INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;}}
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00021}00021\ \textcolor{comment}{\ *\ LOSS\ OF\ USE,\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND}}
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00022}00022\ \textcolor{comment}{\ *\ ON\ ANY\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00023}00023\ \textcolor{comment}{\ *\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE\ OF\ THIS}}
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00024}00024\ \textcolor{comment}{\ *\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00025}00025\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00026}00026\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00028}00028\ \textcolor{preprocessor}{\#ifndef\ WEBSOCKETPP\_PROCESSOR\_HYBI08\_HPP}}
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00029}00029\ \textcolor{preprocessor}{\#define\ WEBSOCKETPP\_PROCESSOR\_HYBI08\_HPP}}
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00031}00031\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{hybi13_8hpp}{websocketpp/processors/hybi13.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00033}00033\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00034}00034\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00036}00036\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacewebsocketpp}{websocketpp}}\ \{}
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00037}00037\ \textcolor{keyword}{namespace\ }processor\ \{}
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00043}00043\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ config>}
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00044}\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi08}{00044}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi08}{hybi08}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi13}{hybi13}}<config>\ \{}
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00045}00045\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00046}\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi08_a96e3731a540da079e9ba003ecccb8597}{00046}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi08}{hybi08<config>}}\ \mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi08_a96e3731a540da079e9ba003ecccb8597}{type}};}
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00047}\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi08_a7ccf381d381762ae45d5ad52674759f5}{00047}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{typename}\ config::request\_type\ \mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi08_a7ccf381d381762ae45d5ad52674759f5}{request\_type}};}
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00049}\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi08_a5571b3577d2f63a3cb9f53ac3727e752}{00049}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{typename}\ config::con\_msg\_manager\_type::ptr\ \mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi08_a5571b3577d2f63a3cb9f53ac3727e752}{msg\_manager\_ptr}};}
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00050}\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi08_ab3d9b02769bee0435181043f8263ca26}{00050}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{typename}\ config::rng\_type\ \mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi08_ab3d9b02769bee0435181043f8263ca26}{rng\_type}};}
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00052}\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi08_aee51a54933474952a77d7dbe8ce1e06b}{00052}}\ \ \ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi08_aee51a54933474952a77d7dbe8ce1e06b}{hybi08}}(\textcolor{keywordtype}{bool}\ secure,\ \textcolor{keywordtype}{bool}\ p\_is\_server,\ \mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi08_a5571b3577d2f63a3cb9f53ac3727e752}{msg\_manager\_ptr}}\ manager,\ \mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi08_ab3d9b02769bee0435181043f8263ca26}{rng\_type}}\&\ rng)}
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00053}00053\ \ \ \ \ \ \ :\ \mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi13}{hybi13}}<\mbox{\hyperlink{classconfig}{config}}>(secure,\ p\_is\_server,\ manager,\ rng)\ \{\}}
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00054}00054\ }
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00064}\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi08_a9509cba08ab3a15ea2ff34276b2582cb}{00064}}\ \ \ \ \ lib::error\_code\ \mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi08_a9509cba08ab3a15ea2ff34276b2582cb}{client\_handshake\_request}}(\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi08_a7ccf381d381762ae45d5ad52674759f5}{request\_type}}\ \&,\ \mbox{\hyperlink{namespacewebsocketpp_aae370ea5ac83a8ece7712cb39fc23f5b}{uri\_ptr}},}
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00065}00065\ \ \ \ \ \ \ \ \ std::vector<std::string>\ \textcolor{keyword}{const}\ \&)\textcolor{keyword}{\ const}}
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00066}00066\ \textcolor{keyword}{\ \ \ \ }\{}
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00067}00067\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacewebsocketpp_1_1processor_1_1error_afc5fc4548656f87cfee89994c95bec9c}{error::make\_error\_code}}(\mbox{\hyperlink{namespacewebsocketpp_1_1processor_1_1error_ae6510ada6a25dcd7af258b6e374e3ca5ad6f8f6c052ec862243054e8985d13348}{error::no\_protocol\_support}});}
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00068}00068\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00069}00069\ }
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00070}\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi08_aec4ce6245dbbd2532513a0f9704e4d7a}{00070}}\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi08_aec4ce6245dbbd2532513a0f9704e4d7a}{get\_version}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00071}00071\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 8;}
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00072}00072\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00073}00073\ }
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00074}\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi08_ae92d4d8eafcb279df00b0701459e8e74}{00074}}\ \ \ \ \ std::string\ \textcolor{keyword}{const}\ \&\ \mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi08_ae92d4d8eafcb279df00b0701459e8e74}{get\_origin}}(\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi08_a7ccf381d381762ae45d5ad52674759f5}{request\_type}}\ \textcolor{keyword}{const}\ \&\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}})\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00075}00075\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}Sec-\/WebSocket-\/Origin"{}});}
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00076}00076\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00077}00077\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00078}00078\ \};}
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00080}00080\ \}\ \textcolor{comment}{//\ namespace\ processor}}
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00081}00081\ \}\ \textcolor{comment}{//\ namespace\ websocketpp}}
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{hybi08_8hpp_source_l00083}00083\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//WEBSOCKETPP\_PROCESSOR\_HYBI08\_HPP}}
+
+\end{DoxyCode}

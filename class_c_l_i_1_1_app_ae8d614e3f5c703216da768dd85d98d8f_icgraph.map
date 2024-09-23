@@ -1,0 +1,21 @@
+<map id="CLI::App::increment_parsed" name="CLI::App::increment_parsed">
+<area shape="rect" id="Node000001" title="Internal function to recursively increment the parsed counter on the current app as well unnamed subc..." alt="" coords="1119,42,1258,83"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_app.html#a26a92886a7d7f10a9afbd39b6535f42b" title="Internal parse function." alt="" coords="167,23,287,49"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1104,41,1071,33,927,12,782,8,583,8,422,16,287,30,287,25,422,10,583,3,782,3,928,7,1072,28,1106,35"/>
+<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_app.html#a241ba75a6c98b36349ae2f71a9137291" title="Internal parse function." alt="" coords="167,76,287,102"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="1106,90,1072,97,928,119,782,123,583,123,422,115,287,100,287,95,422,110,583,117,782,117,927,113,1071,92,1104,85"/>
+<area shape="rect" id="Node000006" href="$class_c_l_i_1_1_app.html#a1f7a70f4bc4c375a7de10073a5de709d" title="Fill in a single config option." alt="" coords="910,42,1071,83"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="1104,65,1072,65,1072,60,1104,60"/>
+<area shape="rect" id="Node000004" href="$class_c_l_i_1_1_app.html#a8ffb155a1153ee23d442c5bfed21225c" title="The real work is done here. Expects a reversed vector." alt="" coords="5,51,119,77"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="151,80,119,75,119,70,151,75"/>
+<area shape="rect" id="Node000005" href="$class_c_l_i_1_1_app.html#a878c1067ade7145aa11478d64f5173ed" title=" " alt="" coords="5,100,119,126"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="151,103,119,108,119,102,151,98"/>
+<area shape="rect" id="Node000007" href="$class_c_l_i_1_1_app.html#aee09795046c3b47948e6c2fa45349eca" title=" " alt="" coords="700,50,862,76"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="895,65,862,65,862,60,895,60"/>
+<area shape="rect" id="Node000008" href="$class_c_l_i_1_1_app.html#a7a15e5743d4a8eccac57955ed5a6a3b6" title="Read and process a configuration file (main app only)" alt="" coords="517,42,652,83"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="684,65,652,65,652,60,684,60"/>
+<area shape="rect" id="Node000009" href="$class_c_l_i_1_1_app.html#a0fec24c804daf5b458bb5762e4e75a73" title="Process callbacks and such." alt="" coords="335,50,469,76"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="502,65,470,65,470,60,502,60"/>
+<area shape="poly" id="edge9_Node000009_Node000002" title=" " alt="" coords="319,53,287,48,288,42,320,48"/>
+<area shape="poly" id="edge10_Node000009_Node000003" title=" " alt="" coords="320,78,288,83,287,78,319,73"/>
+</map>

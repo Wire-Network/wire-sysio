@@ -1,0 +1,221 @@
+\doxysection{Xbyak\+::util\+::Clock Class Reference}
+\hypertarget{class_xbyak_1_1util_1_1_clock}{}\label{class_xbyak_1_1util_1_1_clock}\index{Xbyak::util::Clock@{Xbyak::util::Clock}}
+
+
+{\ttfamily \#include $<$xbyak\+\_\+util.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_xbyak_1_1util_1_1_clock_a06355c8e866474d951f4036143e41c80}{Clock}} ()
+\item 
+void \mbox{\hyperlink{class_xbyak_1_1util_1_1_clock_aae54b05acf245bbffcb48c82864e84c0}{begin}} ()
+\item 
+void \mbox{\hyperlink{class_xbyak_1_1util_1_1_clock_a5f18bdb8e80de1a30482fc08dfe0a8e6}{end}} ()
+\item 
+int \mbox{\hyperlink{class_xbyak_1_1util_1_1_clock_a0077b9f92b41d91184dec62ad4f25c4e}{get\+Count}} () const
+\item 
+\mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_clock_ad12d8f28828f10e625616f4a8d824745}{get\+Clock}} () const
+\item 
+void \mbox{\hyperlink{class_xbyak_1_1util_1_1_clock_adec09272fc02d9465e2a00c8882fb481}{clear}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_clock_a8f2ad68983ab59e70382f171cf8623d6}{get\+Rdtsc}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00374}{374}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_xbyak_1_1util_1_1_clock_a06355c8e866474d951f4036143e41c80}\index{Xbyak::util::Clock@{Xbyak::util::Clock}!Clock@{Clock}}
+\index{Clock@{Clock}!Xbyak::util::Clock@{Xbyak::util::Clock}}
+\doxysubsubsection{\texorpdfstring{Clock()}{Clock()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_clock_a06355c8e866474d951f4036143e41c80} 
+Xbyak\+::util\+::\+Clock\+::\+Clock (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00386}{386}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00387\ \ \ \ \ \ \ \ \ :\ clock\_(0)}
+\DoxyCodeLine{00388\ \ \ \ \ \ \ \ \ ,\ count\_(0)}
+\DoxyCodeLine{00389\ \ \ \ \ \{}
+\DoxyCodeLine{00390\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_xbyak_1_1util_1_1_clock_aae54b05acf245bbffcb48c82864e84c0}\index{Xbyak::util::Clock@{Xbyak::util::Clock}!begin@{begin}}
+\index{begin@{begin}!Xbyak::util::Clock@{Xbyak::util::Clock}}
+\doxysubsubsection{\texorpdfstring{begin()}{begin()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_clock_aae54b05acf245bbffcb48c82864e84c0} 
+void Xbyak\+::util\+::\+Clock\+::begin (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00391}{391}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00392\ \ \ \ \ \{}
+\DoxyCodeLine{00393\ \ \ \ \ \ \ \ \ clock\_\ -\/=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_clock_a8f2ad68983ab59e70382f171cf8623d6}{getRdtsc}}();}
+\DoxyCodeLine{00394\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_xbyak_1_1util_1_1_clock_aae54b05acf245bbffcb48c82864e84c0_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=346pt]{class_xbyak_1_1util_1_1_clock_aae54b05acf245bbffcb48c82864e84c0_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_xbyak_1_1util_1_1_clock_adec09272fc02d9465e2a00c8882fb481}\index{Xbyak::util::Clock@{Xbyak::util::Clock}!clear@{clear}}
+\index{clear@{clear}!Xbyak::util::Clock@{Xbyak::util::Clock}}
+\doxysubsubsection{\texorpdfstring{clear()}{clear()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_clock_adec09272fc02d9465e2a00c8882fb481} 
+void Xbyak\+::util\+::\+Clock\+::clear (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00402}{402}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00402\ \{\ count\_\ =\ 0;\ clock\_\ =\ 0;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_xbyak_1_1util_1_1_clock_a5f18bdb8e80de1a30482fc08dfe0a8e6}\index{Xbyak::util::Clock@{Xbyak::util::Clock}!end@{end}}
+\index{end@{end}!Xbyak::util::Clock@{Xbyak::util::Clock}}
+\doxysubsubsection{\texorpdfstring{end()}{end()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_clock_a5f18bdb8e80de1a30482fc08dfe0a8e6} 
+void Xbyak\+::util\+::\+Clock\+::end (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00395}{395}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00396\ \ \ \ \ \{}
+\DoxyCodeLine{00397\ \ \ \ \ \ \ \ \ clock\_\ +=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_clock_a8f2ad68983ab59e70382f171cf8623d6}{getRdtsc}}();}
+\DoxyCodeLine{00398\ \ \ \ \ \ \ \ \ count\_++;}
+\DoxyCodeLine{00399\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_xbyak_1_1util_1_1_clock_a5f18bdb8e80de1a30482fc08dfe0a8e6_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_xbyak_1_1util_1_1_clock_a5f18bdb8e80de1a30482fc08dfe0a8e6_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_xbyak_1_1util_1_1_clock_ad12d8f28828f10e625616f4a8d824745}\index{Xbyak::util::Clock@{Xbyak::util::Clock}!getClock@{getClock}}
+\index{getClock@{getClock}!Xbyak::util::Clock@{Xbyak::util::Clock}}
+\doxysubsubsection{\texorpdfstring{getClock()}{getClock()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_clock_ad12d8f28828f10e625616f4a8d824745} 
+\mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}} Xbyak\+::util\+::\+Clock\+::get\+Clock (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00401}{401}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00401\ \{\ \textcolor{keywordflow}{return}\ clock\_;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=346pt]{class_xbyak_1_1util_1_1_clock_ad12d8f28828f10e625616f4a8d824745_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_xbyak_1_1util_1_1_clock_a0077b9f92b41d91184dec62ad4f25c4e}\index{Xbyak::util::Clock@{Xbyak::util::Clock}!getCount@{getCount}}
+\index{getCount@{getCount}!Xbyak::util::Clock@{Xbyak::util::Clock}}
+\doxysubsubsection{\texorpdfstring{getCount()}{getCount()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_clock_a0077b9f92b41d91184dec62ad4f25c4e} 
+int Xbyak\+::util\+::\+Clock\+::get\+Count (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00400}{400}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00400\ \{\ \textcolor{keywordflow}{return}\ count\_;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=247pt]{class_xbyak_1_1util_1_1_clock_a0077b9f92b41d91184dec62ad4f25c4e_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_xbyak_1_1util_1_1_clock_a8f2ad68983ab59e70382f171cf8623d6}\index{Xbyak::util::Clock@{Xbyak::util::Clock}!getRdtsc@{getRdtsc}}
+\index{getRdtsc@{getRdtsc}!Xbyak::util::Clock@{Xbyak::util::Clock}}
+\doxysubsubsection{\texorpdfstring{getRdtsc()}{getRdtsc()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_clock_a8f2ad68983ab59e70382f171cf8623d6} 
+static \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}} Xbyak\+::util\+::\+Clock\+::get\+Rdtsc (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00376}{376}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00377\ \ \ \ \ \{}
+\DoxyCodeLine{00378\ \textcolor{preprocessor}{\#ifdef\ \_MSC\_VER}}
+\DoxyCodeLine{00379\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \_\_rdtsc();}
+\DoxyCodeLine{00380\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00381\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ eax,\ \mbox{\hyperlink{namespace_xbyak_1_1util_a725c307c821a7e14594f383a190d3990}{edx}};}
+\DoxyCodeLine{00382\ \ \ \ \ \ \ \ \ \_\_asm\_\_\ \textcolor{keyword}{volatile}(\textcolor{stringliteral}{"{}rdtsc"{}}\ :\ \textcolor{stringliteral}{"{}=a"{}}(eax),\ \textcolor{stringliteral}{"{}=d"{}}(\mbox{\hyperlink{namespace_xbyak_1_1util_a725c307c821a7e14594f383a190d3990}{edx}}));}
+\DoxyCodeLine{00383\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ((\mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}})\mbox{\hyperlink{namespace_xbyak_1_1util_a725c307c821a7e14594f383a190d3990}{edx}}\ <<\ 32)\ |\ eax;}
+\DoxyCodeLine{00384\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00385\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=294pt]{class_xbyak_1_1util_1_1_clock_a8f2ad68983ab59e70382f171cf8623d6_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_xbyak_1_1util_1_1_clock_a8f2ad68983ab59e70382f171cf8623d6_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/libraries/ff/depends/xbyak/xbyak/\mbox{\hyperlink{xbyak__util_8h}{xbyak\+\_\+util.\+h}}\end{DoxyCompactItemize}

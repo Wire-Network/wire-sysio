@@ -1,0 +1,82 @@
+\doxysection{Timing Namespace Reference}
+\hypertarget{namespace_timing}{}\label{namespace_timing}\index{Timing@{Timing}}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_timing_1_1_timer}{Timer}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{namespace_timing_a13894b5d7cecb827bcef919187a66d94}{log\+Timer}} (const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{structcontext}{context}}, \mbox{\hyperlink{struct_timing_1_1_timer}{Timer}} \&timer)
+\item 
+void \mbox{\hyperlink{namespace_timing_a4f7cf4a3faa27612ba0ad6e4653651f8}{log\+Rate\+Per\+Second}} (const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{structcontext}{context}}, \mbox{\hyperlink{struct_timing_1_1_timer}{Timer}} \&timer, \mbox{\hyperlink{_basic_types_8h_adc9896ee12db3bb116fc63b3464c72c7}{F64}} numerator, const char \texorpdfstring{$\ast$}{*}numerator\+Unit)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespace_timing_a4f7cf4a3faa27612ba0ad6e4653651f8}\index{Timing@{Timing}!logRatePerSecond@{logRatePerSecond}}
+\index{logRatePerSecond@{logRatePerSecond}!Timing@{Timing}}
+\doxysubsubsection{\texorpdfstring{logRatePerSecond()}{logRatePerSecond()}}
+{\footnotesize\ttfamily \label{namespace_timing_a4f7cf4a3faa27612ba0ad6e4653651f8} 
+void Timing\+::log\+Rate\+Per\+Second (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{context}{, }\item[{\mbox{\hyperlink{struct_timing_1_1_timer}{Timer}} \&}]{timer}{, }\item[{\mbox{\hyperlink{_basic_types_8h_adc9896ee12db3bb116fc63b3464c72c7}{F64}}}]{numerator}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{numerator\+Unit}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_timing_8h_source_l00029}{29}} of file \mbox{\hyperlink{_timing_8h_source}{Timing.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00030\ \ \ \ \ \{}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{Log::printf}}(\mbox{\hyperlink{namespace_log_a1f055cc08a2ed074aa74f9d99c8a0901aaa59d67c2123f094d0d6798ffe651c4d}{Log::Category::metrics}},\textcolor{stringliteral}{"{}\%s\ in\ \%.2fms\ (\%f\ \%s/s)\(\backslash\)n"{}},}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structcontext}{context}},}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \ \ \ timer.\mbox{\hyperlink{struct_timing_1_1_timer_ae6ed9f702858e72d8a5b3df42b35537a}{getMilliseconds}}(),}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \ \ \ numerator\ /\ timer.\mbox{\hyperlink{struct_timing_1_1_timer_a3c7d59a2483864e161bd18d0b66e4d06}{getSeconds}}(),}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \ \ \ numeratorUnit}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00037\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_timing_a4f7cf4a3faa27612ba0ad6e4653651f8_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_timing_a4f7cf4a3faa27612ba0ad6e4653651f8_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_timing_a13894b5d7cecb827bcef919187a66d94}\index{Timing@{Timing}!logTimer@{logTimer}}
+\index{logTimer@{logTimer}!Timing@{Timing}}
+\doxysubsubsection{\texorpdfstring{logTimer()}{logTimer()}}
+{\footnotesize\ttfamily \label{namespace_timing_a13894b5d7cecb827bcef919187a66d94} 
+void Timing\+::log\+Timer (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{context}{, }\item[{\mbox{\hyperlink{struct_timing_1_1_timer}{Timer}} \&}]{timer}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_timing_8h_source_l00028}{28}} of file \mbox{\hyperlink{_timing_8h_source}{Timing.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00028\ \{\ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{Log::printf}}(\mbox{\hyperlink{namespace_log_a1f055cc08a2ed074aa74f9d99c8a0901aaa59d67c2123f094d0d6798ffe651c4d}{Log::Category::metrics}},\textcolor{stringliteral}{"{}\%s\ in\ \%.2fms\(\backslash\)n"{}},\mbox{\hyperlink{structcontext}{context}},timer.\mbox{\hyperlink{struct_timing_1_1_timer_ae6ed9f702858e72d8a5b3df42b35537a}{getMilliseconds}}());\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_timing_a13894b5d7cecb827bcef919187a66d94_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_timing_a13894b5d7cecb827bcef919187a66d94_icgraph}
+\end{center}
+\end{figure}

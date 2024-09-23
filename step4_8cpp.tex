@@ -1,0 +1,136 @@
+\doxysection{libraries/fc/vendor/websocketpp/tutorials/utility\+\_\+client/step4.cpp File Reference}
+\hypertarget{step4_8cpp}{}\label{step4_8cpp}\index{libraries/fc/vendor/websocketpp/tutorials/utility\_client/step4.cpp@{libraries/fc/vendor/websocketpp/tutorials/utility\_client/step4.cpp}}
+{\ttfamily \#include $<$websocketpp/config/asio\+\_\+no\+\_\+tls\+\_\+client.\+hpp$>$}\newline
+{\ttfamily \#include $<$websocketpp/client.\+hpp$>$}\newline
+{\ttfamily \#include $<$websocketpp/common/thread.\+hpp$>$}\newline
+{\ttfamily \#include $<$websocketpp/common/memory.\+hpp$>$}\newline
+{\ttfamily \#include $<$cstdlib$>$}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$map$>$}\newline
+{\ttfamily \#include $<$string$>$}\newline
+{\ttfamily \#include $<$sstream$>$}\newline
+Include dependency graph for step4.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{step4_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classconnection__metadata}{connection\+\_\+metadata}}
+\item 
+class \mbox{\hyperlink{classwebsocket__endpoint}{websocket\+\_\+endpoint}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1client}{websocketpp\+::client}}$<$ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio__client}{websocketpp\+::config\+::asio\+\_\+client}} $>$ \mbox{\hyperlink{step4_8cpp_aff8c62b83a9c8aefc476f96166656b76}{client}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+std\+::ostream \& \mbox{\hyperlink{step4_8cpp_a2aec4aeb2bb18764b4be4e1cfb033fb6}{operator$<$$<$}} (std\+::ostream \&out, \mbox{\hyperlink{classconnection__metadata}{connection\+\_\+metadata}} const \&data)
+\item 
+int \mbox{\hyperlink{step4_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{step4_8cpp_aff8c62b83a9c8aefc476f96166656b76}\index{step4.cpp@{step4.cpp}!client@{client}}
+\index{client@{client}!step4.cpp@{step4.cpp}}
+\doxysubsubsection{\texorpdfstring{client}{client}}
+{\footnotesize\ttfamily \label{step4_8cpp_aff8c62b83a9c8aefc476f96166656b76} 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1client}{websocketpp\+::client}}$<$\mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio__client}{websocketpp\+::config\+::asio\+\_\+client}}$>$ \mbox{\hyperlink{debug__client_8cpp_aff8c62b83a9c8aefc476f96166656b76}{client}}}
+
+
+
+Definition at line \mbox{\hyperlink{step4_8cpp_source_l00043}{43}} of file \mbox{\hyperlink{step4_8cpp_source}{step4.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{step4_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}\index{step4.cpp@{step4.cpp}!main@{main}}
+\index{main@{main}!step4.cpp@{step4.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{step4_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4} 
+int main (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{step4_8cpp_source_l00153}{153}} of file \mbox{\hyperlink{step4_8cpp_source}{step4.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00154\ \ \ \ \ \textcolor{keywordtype}{bool}\ done\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00155\ \ \ \ \ std::string\ input;}
+\DoxyCodeLine{00156\ \ \ \ \ \mbox{\hyperlink{classwebsocket__endpoint}{websocket\_endpoint}}\ endpoint;}
+\DoxyCodeLine{00157\ }
+\DoxyCodeLine{00158\ \ \ \ \ \textcolor{keywordflow}{while}\ (!done)\ \{}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}Enter\ Command:\ "{}};}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ std::getline(std::cin,\ input);}
+\DoxyCodeLine{00161\ }
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (input\ ==\ \textcolor{stringliteral}{"{}quit"{}})\ \{}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \ \ \ \ done\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (input\ ==\ \textcolor{stringliteral}{"{}help"{}})\ \{}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \ \ \ \ std::cout}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\(\backslash\)nCommand\ List:\(\backslash\)n"{}}}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}connect\ <ws\ uri>\(\backslash\)n"{}}}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}show\ <connection\ id>\(\backslash\)n"{}}}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}help:\ Display\ this\ help\ text\(\backslash\)n"{}}}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}quit:\ Exit\ the\ program\(\backslash\)n"{}}}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ std::endl;}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (input.substr(0,7)\ ==\ \textcolor{stringliteral}{"{}connect"{}})\ \{}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \textcolor{keywordtype}{id}\ =\ endpoint.\mbox{\hyperlink{classwebsocket__endpoint_a5850523b829e145793d42e137d5eb8c0}{connect}}(input.substr(8));}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keywordtype}{id}\ !=\ -\/1)\ \{}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}>\ Created\ connection\ with\ id\ "{}}\ <<\ \textcolor{keywordtype}{id}\ <<\ std::endl;}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (input.substr(0,4)\ ==\ \textcolor{stringliteral}{"{}show"{}})\ \{}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \textcolor{keywordtype}{id}\ =\ atoi(input.substr(5).c\_str());}
+\DoxyCodeLine{00179\ }
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classconnection__metadata_ada3ee69cbbc88df3cc5a74e8840671ac}{connection\_metadata::ptr}}\ metadata\ =\ endpoint.\mbox{\hyperlink{classwebsocket__endpoint_a5896c27213953d2d33b88e117b1971f6}{get\_metadata}}(\textcolor{keywordtype}{id});}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (metadata)\ \{}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ *metadata\ <<\ std::endl;}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}>\ Unknown\ connection\ id\ "{}}\ <<\ \textcolor{keywordtype}{id}\ <<\ std::endl;}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}>\ Unrecognized\ Command"{}}\ <<\ std::endl;}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00189\ \ \ \ \ \}}
+\DoxyCodeLine{00190\ }
+\DoxyCodeLine{00191\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00192\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{step4_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{step4_8cpp_a2aec4aeb2bb18764b4be4e1cfb033fb6}\index{step4.cpp@{step4.cpp}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!step4.cpp@{step4.cpp}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}}
+{\footnotesize\ttfamily \label{step4_8cpp_a2aec4aeb2bb18764b4be4e1cfb033fb6} 
+std\+::ostream \& operator$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{out}{, }\item[{\mbox{\hyperlink{classconnection__metadata}{connection\+\_\+metadata}} const \&}]{data}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{step4_8cpp_source_l00082}{82}} of file \mbox{\hyperlink{step4_8cpp_source}{step4.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00083\ \ \ \ \ out\ <<\ \textcolor{stringliteral}{"{}>\ URI:\ "{}}\ <<\ data.m\_uri\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}>\ Status:\ "{}}\ <<\ data.m\_status\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}>\ Remote\ Server:\ "{}}\ <<\ (data.m\_server.empty()\ ?\ \textcolor{stringliteral}{"{}None\ Specified"{}}\ :\ data.m\_server)\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}>\ Error/close\ reason:\ "{}}\ <<\ (data.m\_error\_reason.empty()\ ?\ \textcolor{stringliteral}{"{}N/A"{}}\ :\ data.m\_error\_reason);}
+\DoxyCodeLine{00087\ }
+\DoxyCodeLine{00088\ \ \ \ \ \textcolor{keywordflow}{return}\ out;}
+\DoxyCodeLine{00089\ \}}
+
+\end{DoxyCode}

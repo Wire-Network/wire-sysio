@@ -1,0 +1,77 @@
+\doxysection{libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/test/gmock\+\_\+stress\+\_\+test.cc File Reference}
+\hypertarget{gmock__stress__test_8cc}{}\label{gmock__stress__test_8cc}\index{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googlemock/test/gmock\_stress\_test.cc@{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googlemock/test/gmock\_stress\_test.cc}}
+{\ttfamily \#include "{}gmock/gmock.\+h"{}}\newline
+{\ttfamily \#include "{}gtest/gtest.\+h"{}}\newline
+Include dependency graph for gmock\+\_\+stress\+\_\+test.\+cc\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{gmock__stress__test_8cc__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacetesting}{testing}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{gmock__stress__test_8cc_a3c04138a5bfe5d72780bb7e82a18e627}{main}} (int argc, char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{gmock__stress__test_8cc_a3c04138a5bfe5d72780bb7e82a18e627}\index{gmock\_stress\_test.cc@{gmock\_stress\_test.cc}!main@{main}}
+\index{main@{main}!gmock\_stress\_test.cc@{gmock\_stress\_test.cc}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{gmock__stress__test_8cc_a3c04138a5bfe5d72780bb7e82a18e627} 
+int main (\begin{DoxyParamCaption}\item[{int}]{argc}{, }\item[{char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{argv}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gmock__stress__test_8cc_source_l00315}{315}} of file \mbox{\hyperlink{gmock__stress__test_8cc_source}{gmock\+\_\+stress\+\_\+test.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00315\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00316\ \ \ \mbox{\hyperlink{namespacetesting_a32b1c6db9ba5133ccabfa67616b3c041}{testing::InitGoogleMock}}(\&argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}});}
+\DoxyCodeLine{00317\ }
+\DoxyCodeLine{00318\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ exit\_code\ =\ \mbox{\hyperlink{gtest_8h_a853a3792807489591d3d4a2f2ff9359f}{RUN\_ALL\_TESTS}}();\ \ \textcolor{comment}{//\ Expected\ to\ fail.}}
+\DoxyCodeLine{00319\ \ \ \mbox{\hyperlink{gtest-port_8h_ab54343f0a36dc4cb0ce8a478dd7847b8}{GTEST\_CHECK\_}}(exit\_code\ !=\ 0)\ <<\ \textcolor{stringliteral}{"{}RUN\_ALL\_TESTS()\ did\ not\ fail\ as\ expected"{}};}
+\DoxyCodeLine{00320\ }
+\DoxyCodeLine{00321\ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\(\backslash\)nPASS\(\backslash\)n"{}});}
+\DoxyCodeLine{00322\ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00323\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{gmock__stress__test_8cc_a3c04138a5bfe5d72780bb7e82a18e627_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}\index{gmock\_stress\_test.cc@{gmock\_stress\_test.cc}!count@{count}}
+\index{count@{count}!gmock\_stress\_test.cc@{gmock\_stress\_test.cc}}
+\doxysubsubsection{\texorpdfstring{count}{count}}
+{\footnotesize\ttfamily \label{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752} 
+int\texorpdfstring{$\ast$}{*} count}
+
+
+
+Definition at line \mbox{\hyperlink{gmock__stress__test_8cc_source_l00177}{177}} of file \mbox{\hyperlink{gmock__stress__test_8cc_source}{gmock\+\_\+stress\+\_\+test.\+cc}}.
+
+\Hypertarget{gmock__stress__test_8cc_a356e01cb7dd3338b406f2905cfdc1107}\index{gmock\_stress\_test.cc@{gmock\_stress\_test.cc}!mock\_foo@{mock\_foo}}
+\index{mock\_foo@{mock\_foo}!gmock\_stress\_test.cc@{gmock\_stress\_test.cc}}
+\doxysubsubsection{\texorpdfstring{mock\_foo}{mock\_foo}}
+{\footnotesize\ttfamily \label{gmock__stress__test_8cc_a356e01cb7dd3338b406f2905cfdc1107} 
+\mbox{\hyperlink{class_mock_foo}{Mock\+Foo}}\texorpdfstring{$\ast$}{*} mock\+\_\+foo}
+
+
+
+Definition at line \mbox{\hyperlink{gmock__stress__test_8cc_source_l00176}{176}} of file \mbox{\hyperlink{gmock__stress__test_8cc_source}{gmock\+\_\+stress\+\_\+test.\+cc}}.
+

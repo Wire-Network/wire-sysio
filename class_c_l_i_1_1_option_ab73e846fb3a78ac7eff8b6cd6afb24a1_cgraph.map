@@ -1,0 +1,5 @@
+<map id="CLI::Option::operator bool" name="CLI::Option::operator bool">
+<area shape="rect" id="Node000001" title="This class is true if option is passed." alt="" coords="5,5,177,31"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_option.html#af5677ee4a55c2a85784f64198db6b452" title="True if the option was not passed." alt="" coords="225,5,357,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="177,16,209,16,209,21,177,21"/>
+</map>

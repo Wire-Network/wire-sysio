@@ -1,0 +1,113 @@
+\doxysection{pkcs5.\+c}
+\hypertarget{pkcs5_8c_source}{}\label{pkcs5_8c_source}\index{libraries/yubihsm/common/pkcs5.c@{libraries/yubihsm/common/pkcs5.c}}
+\mbox{\hyperlink{pkcs5_8c}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ 2015-\/2018\ Yubico\ AB}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00004}00004\ \textcolor{comment}{\ *\ Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00005}00005\ \textcolor{comment}{\ *\ you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00006}00006\ \textcolor{comment}{\ *\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00008}00008\ \textcolor{comment}{\ *\ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00009}00009\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00010}00010\ \textcolor{comment}{\ *\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00011}00011\ \textcolor{comment}{\ *\ distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00012}00012\ \textcolor{comment}{\ *\ WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00013}00013\ \textcolor{comment}{\ *\ See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00014}00014\ \textcolor{comment}{\ *\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00015}00015\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00017}00017\ \textcolor{preprocessor}{\#ifdef\ \_WIN32\_BCRYPT}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00018}00018\ \textcolor{preprocessor}{\#include\ <windows.h>}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00019}00019\ \textcolor{preprocessor}{\#include\ <bcrypt.h>}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00020}00020\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00021}00021\ \textcolor{preprocessor}{\#include\ <openssl/evp.h>}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00022}00022\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00024}00024\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{pkcs5_8h}{pkcs5.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00025}00025\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{yubihsm_2common_2hash_8h}{hash.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00027}\mbox{\hyperlink{pkcs5_8c_ada697ff717a4c947866f025d6d2bfc3a}{00027}}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{pkcs5_8c_ada697ff717a4c947866f025d6d2bfc3a}{pkcs5\_pbkdf2\_hmac}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *password,\ \textcolor{keywordtype}{size\_t}\ cb\_password,}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00028}00028\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *salt,\ \textcolor{keywordtype}{size\_t}\ cb\_salt,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ iterations,}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00029}00029\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm_2common_2hash_8h_a488906826f8aaf7e850c35889d560089}{hash\_t}}\ hash,\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *key,\ \textcolor{keywordtype}{size\_t}\ cb\_key)\ \{}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00030}00030\ \ \ \textcolor{keywordtype}{bool}\ res\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00032}00032\ \textcolor{preprocessor}{\#ifdef\ \_WIN32\_BCRYPT}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00033}00033\ \ \ NTSTATUS\ status\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00034}00034\ \ \ LPCWSTR\ alg\ =\ NULL;}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00035}00035\ \ \ BCRYPT\_ALG\_HANDLE\ hAlg\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00037}00037\ \ \ \textcolor{comment}{/*\ mingw64\ defines\ the\ BCryptDeriveKeyPBKDF2\ function,\ but\ its\ import\ library}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00038}00038\ \textcolor{comment}{\ \ \ *doesn't\ include\ the\ export.}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00039}00039\ \textcolor{comment}{\ \ \ **}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00040}00040\ \textcolor{comment}{\ \ \ **\ Once\ this\ is\ fixed,\ we\ can\ just\ call\ the\ function\ directly.\ \ Until\ then,}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00041}00041\ \textcolor{comment}{\ \ \ *we\ need\ to\ dynamically\ load\ the\ function.}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00042}00042\ \textcolor{comment}{\ \ \ */}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00044}00044\ \ \ \textcolor{keyword}{typedef}\ NTSTATUS\ WINAPI\ (}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00045}00045\ \ \ \ \ *PFN\_BCryptDeriveKeyPBKDF2)(BCRYPT\_ALG\_HANDLE\ hPrf,\ PUCHAR\ pbPassword,}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00046}00046\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ULONG\ cbPassword,\ PUCHAR\ pbSalt,\ ULONG\ cbSalt,}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00047}00047\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ULONGLONG\ cIterations,\ PUCHAR\ pbDerivedKey,}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ULONG\ cbDerivedKey,\ ULONG\ dwFlags);}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00049}00049\ \ \ HMODULE\ hBCrypt\ =\ NULL;}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00050}00050\ \ \ PFN\_BCryptDeriveKeyPBKDF2\ fnBCryptDeriveKeyPBKDF2\ =\ NULL;}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00052}00052\ \ \ \textcolor{keywordflow}{if}\ (!(hBCrypt\ =\ LoadLibrary(\textcolor{stringliteral}{"{}bcrypt.dll"{}})))\ \{}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00053}00053\ \ \ \ \ \textcolor{keywordflow}{goto}\ cleanup;}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00054}00054\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00056}00056\ \ \ \textcolor{keywordflow}{if}\ (!(fnBCryptDeriveKeyPBKDF2\ =\ (PFN\_BCryptDeriveKeyPBKDF2)(}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \ (\textcolor{keywordtype}{void}\ (*)(\textcolor{keywordtype}{void}))\ GetProcAddress(hBCrypt,\ \textcolor{stringliteral}{"{}BCryptDeriveKeyPBKDF2"{}}))))\ \{}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00058}00058\ \ \ \ \ \textcolor{keywordflow}{goto}\ cleanup;}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00059}00059\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00061}00061\ \ \ \textcolor{keywordflow}{if}\ (!(alg\ =\ \mbox{\hyperlink{hash_8c_a2de35447908a9afccca42825a87854fb}{get\_hash}}(hash)))\ \{}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00062}00062\ \ \ \ \ \textcolor{keywordflow}{goto}\ cleanup;}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00063}00063\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00065}00065\ \ \ \textcolor{keywordflow}{if}\ (!BCRYPT\_SUCCESS(}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00066}00066\ \ \ \ \ \ \ \ \ status\ =\ BCryptOpenAlgorithmProvider(\&hAlg,\ alg,\ NULL,}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00067}00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BCRYPT\_ALG\_HANDLE\_HMAC\_FLAG)))\ \{}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00068}00068\ \ \ \ \ \textcolor{keywordflow}{goto}\ cleanup;}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00069}00069\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00071}00071\ \ \ \textcolor{keywordflow}{if}\ (!BCRYPT\_SUCCESS(}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00072}00072\ \ \ \ \ \ \ \ \ status\ =}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00073}00073\ \ \ \ \ \ \ \ \ \ \ fnBCryptDeriveKeyPBKDF2(hAlg,\ (PUCHAR)\ password,\ (ULONG)\ cb\_password,}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00074}00074\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (PUCHAR)\ salt,\ (ULONG)\ cb\_salt,\ iterations,}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00075}00075\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ key,\ (ULONG)\ cb\_key,\ 0)))\ \{}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00076}00076\ \ \ \ \ \textcolor{keywordflow}{goto}\ cleanup;}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00077}00077\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00079}00079\ \ \ res\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00080}00080\ }
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00081}00081\ cleanup:}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00083}00083\ \ \ \textcolor{keywordflow}{if}\ (hAlg)\ \{}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00084}00084\ \ \ \ \ BCryptCloseAlgorithmProvider(hAlg,\ 0);}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00085}00085\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00086}00086\ \ \ \textcolor{keywordflow}{if}\ (hBCrypt)\ \{}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00087}00087\ \ \ \ \ FreeLibrary(hBCrypt);}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00088}00088\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00089}00089\ }
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00090}00090\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00091}00091\ \ \ \textcolor{keyword}{const}\ EVP\_MD\ *md\ =\ NULL;}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00092}00092\ }
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00093}00093\ \ \ \textcolor{keywordflow}{if}\ (!(md\ =\ \mbox{\hyperlink{hash_8c_a2de35447908a9afccca42825a87854fb}{get\_hash}}(hash)))\ \{}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00094}00094\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00095}00095\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00096}00096\ }
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00097}00097\ \ \ \textcolor{comment}{/*\ for\ some\ reason\ openssl\ always\ returns\ 1\ for\ PBKDF2\ */}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00098}00098\ \ \ \textcolor{keywordflow}{if}\ (1\ !=\ PKCS5\_PBKDF2\_HMAC((\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *)\ password,\ cb\_password,\ salt,}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00099}00099\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ cb\_salt,\ iterations,\ md,\ cb\_key,\ key))\ \{}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00100}00100\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00101}00101\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00102}00102\ }
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00103}00103\ \ \ res\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00104}00104\ }
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00105}00105\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00106}00106\ \ \ \textcolor{keywordflow}{return}\ res;}
+\DoxyCodeLine{\Hypertarget{pkcs5_8c_source_l00107}00107\ \}}
+
+\end{DoxyCode}

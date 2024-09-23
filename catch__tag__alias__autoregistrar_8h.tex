@@ -1,0 +1,60 @@
+\doxysection{libraries/sys-\/vm/external/\+Catch2/include/internal/catch\+\_\+tag\+\_\+alias\+\_\+autoregistrar.h File Reference}
+\hypertarget{catch__tag__alias__autoregistrar_8h}{}\label{catch__tag__alias__autoregistrar_8h}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_tag\_alias\_autoregistrar.h@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_tag\_alias\_autoregistrar.h}}
+{\ttfamily \#include "{}catch\+\_\+common.\+h"{}}\newline
+Include dependency graph for catch\+\_\+tag\+\_\+alias\+\_\+autoregistrar.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{catch__tag__alias__autoregistrar_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{catch__tag__alias__autoregistrar_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_catch_1_1_registrar_for_tag_aliases}{Catch\+::\+Registrar\+For\+Tag\+Aliases}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespace_catch}{Catch}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{catch__tag__alias__autoregistrar_8h_af7f9d4a12274e1ccf4b1021e5d35e0c5}{CATCH\+\_\+\+REGISTER\+\_\+\+TAG\+\_\+\+ALIAS}}(alias,  spec)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{catch__tag__alias__autoregistrar_8h_af7f9d4a12274e1ccf4b1021e5d35e0c5}\index{catch\_tag\_alias\_autoregistrar.h@{catch\_tag\_alias\_autoregistrar.h}!CATCH\_REGISTER\_TAG\_ALIAS@{CATCH\_REGISTER\_TAG\_ALIAS}}
+\index{CATCH\_REGISTER\_TAG\_ALIAS@{CATCH\_REGISTER\_TAG\_ALIAS}!catch\_tag\_alias\_autoregistrar.h@{catch\_tag\_alias\_autoregistrar.h}}
+\doxysubsubsection{\texorpdfstring{CATCH\_REGISTER\_TAG\_ALIAS}{CATCH\_REGISTER\_TAG\_ALIAS}}
+{\footnotesize\ttfamily \label{catch__tag__alias__autoregistrar_8h_af7f9d4a12274e1ccf4b1021e5d35e0c5} 
+\#define CATCH\+\_\+\+REGISTER\+\_\+\+TAG\+\_\+\+ALIAS(\begin{DoxyParamCaption}\item[{}]{alias}{, }\item[{}]{spec}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ CATCH\_INTERNAL\_SUPPRESS\_GLOBALS\_WARNINGS\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ namespace\{\ \mbox{\hyperlink{struct_catch_1_1_registrar_for_tag_aliases}{Catch::RegistrarForTagAliases}}\ \mbox{\hyperlink{catch__common_8h_afe320ceec108fc8c160f9ac3938f1bc8}{INTERNAL\_CATCH\_UNIQUE\_NAME}}(\ AutoRegisterTagAlias\ )(\ alias,\ spec,\ \mbox{\hyperlink{catch__common_8h_abc0b2405454c51748a31e0393d9ad5d1}{CATCH\_INTERNAL\_LINEINFO}}\ );\ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{catch__compiler__capabilities_8h_a957c9af2b374bd675e191cf3fd114f3f}{CATCH\_INTERNAL\_UNSUPPRESS\_GLOBALS\_WARNINGS}}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__tag__alias__autoregistrar_8h_source_l00020}{20}} of file \mbox{\hyperlink{catch__tag__alias__autoregistrar_8h_source}{catch\+\_\+tag\+\_\+alias\+\_\+autoregistrar.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#define\ CATCH\_REGISTER\_TAG\_ALIAS(\ alias,\ spec\ )\ \(\backslash\)}}
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\ \ \ \ CATCH\_INTERNAL\_SUPPRESS\_GLOBALS\_WARNINGS\ \(\backslash\)}}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\ \ \ \ namespace\{\ Catch::RegistrarForTagAliases\ INTERNAL\_CATCH\_UNIQUE\_NAME(\ AutoRegisterTagAlias\ )(\ alias,\ spec,\ CATCH\_INTERNAL\_LINEINFO\ );\ \}\ \(\backslash\)}}
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\ \ \ \ CATCH\_INTERNAL\_UNSUPPRESS\_GLOBALS\_WARNINGS}}
+
+\end{DoxyCode}

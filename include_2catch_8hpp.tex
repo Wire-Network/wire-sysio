@@ -1,0 +1,893 @@
+\doxysection{libraries/sys-\/vm/external/\+Catch2/include/catch.hpp File Reference}
+\hypertarget{include_2catch_8hpp}{}\label{include_2catch_8hpp}\index{libraries/sys-\/vm/external/Catch2/include/catch.hpp@{libraries/sys-\/vm/external/Catch2/include/catch.hpp}}
+{\ttfamily \#include "{}internal/catch\+\_\+suppress\+\_\+warnings.\+h"{}}\newline
+{\ttfamily \#include "{}internal/catch\+\_\+platform.\+h"{}}\newline
+{\ttfamily \#include "{}internal/catch\+\_\+user\+\_\+interfaces.\+h"{}}\newline
+{\ttfamily \#include "{}internal/catch\+\_\+tag\+\_\+alias\+\_\+autoregistrar.\+h"{}}\newline
+{\ttfamily \#include "{}internal/catch\+\_\+test\+\_\+registry.\+h"{}}\newline
+{\ttfamily \#include "{}internal/catch\+\_\+capture.\+hpp"{}}\newline
+{\ttfamily \#include "{}internal/catch\+\_\+section.\+h"{}}\newline
+{\ttfamily \#include "{}internal/catch\+\_\+benchmark.\+h"{}}\newline
+{\ttfamily \#include "{}internal/catch\+\_\+interfaces\+\_\+exception.\+h"{}}\newline
+{\ttfamily \#include "{}internal/catch\+\_\+approx.\+h"{}}\newline
+{\ttfamily \#include "{}internal/catch\+\_\+compiler\+\_\+capabilities.\+h"{}}\newline
+{\ttfamily \#include "{}internal/catch\+\_\+string\+\_\+manip.\+h"{}}\newline
+{\ttfamily \#include "{}internal/catch\+\_\+capture\+\_\+matchers.\+h"{}}\newline
+{\ttfamily \#include "{}internal/catch\+\_\+generators.\+hpp"{}}\newline
+{\ttfamily \#include "{}internal/catch\+\_\+generators\+\_\+generic.\+hpp"{}}\newline
+{\ttfamily \#include "{}internal/catch\+\_\+generators\+\_\+specific.\+hpp"{}}\newline
+{\ttfamily \#include "{}internal/catch\+\_\+test\+\_\+case\+\_\+info.\+h"{}}\newline
+{\ttfamily \#include "{}internal/catch\+\_\+interfaces\+\_\+runner.\+h"{}}\newline
+{\ttfamily \#include "{}internal/catch\+\_\+reenable\+\_\+warnings.\+h"{}}\newline
+Include dependency graph for catch.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{include_2catch_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=215pt]{include_2catch_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{include_2catch_8hpp_aed4b3022e5b389a59ee3e1633c0a70a8}{CATCH\+\_\+\+VERSION\+\_\+\+MAJOR}}~2
+\item 
+\#define \mbox{\hyperlink{include_2catch_8hpp_a7c36daa8f2e725fe5e1ff2a9c2559d4f}{CATCH\+\_\+\+VERSION\+\_\+\+MINOR}}~7
+\item 
+\#define \mbox{\hyperlink{include_2catch_8hpp_ab6adfb1d16a244d790dc1fe385831a52}{CATCH\+\_\+\+VERSION\+\_\+\+PATCH}}~2
+\item 
+\#define \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(...)
+\item 
+\#define \mbox{\hyperlink{include_2catch_8hpp_ada5065594bafc152162761ace47c1dcb}{REQUIRE\+\_\+\+FALSE}}(...)
+\item 
+\#define \mbox{\hyperlink{include_2catch_8hpp_ae3c33faa1d31a2bb0811dac74b994e3e}{REQUIRE\+\_\+\+THROWS}}(...)
+\item 
+\#define \mbox{\hyperlink{include_2catch_8hpp_ae24a059e3c28ff3eea69be48282f5f81}{REQUIRE\+\_\+\+THROWS\+\_\+\+AS}}(expr,  exception\+Type)
+\item 
+\#define \mbox{\hyperlink{include_2catch_8hpp_aa39a017db507132071d2819f087b2f28}{REQUIRE\+\_\+\+THROWS\+\_\+\+WITH}}(expr,  matcher)
+\item 
+\#define \mbox{\hyperlink{include_2catch_8hpp_a54473a48ac2ac55bfe1165b69e1b8010}{REQUIRE\+\_\+\+THROWS\+\_\+\+MATCHES}}(expr,  exception\+Type,  matcher)
+\item 
+\#define \mbox{\hyperlink{include_2catch_8hpp_ab0148f0dfca438f7aa01974e9c33216a}{REQUIRE\+\_\+\+NOTHROW}}(...)
+\item 
+\#define \mbox{\hyperlink{include_2catch_8hpp_a836cca6b6ed3a1706353f6d1bca0935f}{CHECK}}(...)
+\item 
+\#define \mbox{\hyperlink{include_2catch_8hpp_a7bf095d8512cb180f8ff3a2258a6eaac}{CHECK\+\_\+\+FALSE}}(...)
+\item 
+\#define \mbox{\hyperlink{include_2catch_8hpp_a354466c7b989ec55784c02d74013263c}{CHECKED\+\_\+\+IF}}(...)
+\item 
+\#define \mbox{\hyperlink{include_2catch_8hpp_a5fa42bb950a65e22eac778c86b27d832}{CHECKED\+\_\+\+ELSE}}(...)
+\item 
+\#define \mbox{\hyperlink{include_2catch_8hpp_a13c6feaf82c3c419104c50dbb8caa3ef}{CHECK\+\_\+\+NOFAIL}}(...)
+\item 
+\#define \mbox{\hyperlink{include_2catch_8hpp_a5c646dfe831e596b59073014c1c8b9e5}{CHECK\+\_\+\+THROWS}}(...)
+\item 
+\#define \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\+\_\+\+THROWS\+\_\+\+AS}}(expr,  exception\+Type)
+\item 
+\#define \mbox{\hyperlink{include_2catch_8hpp_a4903733490f526b58053836575e99066}{CHECK\+\_\+\+THROWS\+\_\+\+WITH}}(expr,  matcher)
+\item 
+\#define \mbox{\hyperlink{include_2catch_8hpp_a74fcc14d39e8cc35ff39f69c5b60e375}{CHECK\+\_\+\+THROWS\+\_\+\+MATCHES}}(expr,  exception\+Type,  matcher)
+\item 
+\#define \mbox{\hyperlink{include_2catch_8hpp_a78e70f011f20c4ade1d1ac2b8fd33626}{CHECK\+\_\+\+NOTHROW}}(...)
+\item 
+\#define \mbox{\hyperlink{include_2catch_8hpp_a5b8c33c63e0804d4458e2c761370b75d}{CHECK\+\_\+\+THAT}}(arg,  matcher)
+\item 
+\#define \mbox{\hyperlink{include_2catch_8hpp_ac1354db6f3e9c1e0a8eda0eea7ff1f0a}{REQUIRE\+\_\+\+THAT}}(arg,  matcher)
+\item 
+\#define \mbox{\hyperlink{include_2catch_8hpp_a3ae64706314066fdc8b6c8029a915aa7}{INFO}}(msg)
+\item 
+\#define \mbox{\hyperlink{include_2catch_8hpp_a8dd723bbdb751f1c2f3af8c4f264b7a3}{UNSCOPED\+\_\+\+INFO}}(msg)
+\item 
+\#define \mbox{\hyperlink{include_2catch_8hpp_a108d6c5c51dd46e82a62b262394f0242}{WARN}}(msg)
+\item 
+\#define \mbox{\hyperlink{include_2catch_8hpp_aaf9fe43c53965ff8d94bbd522fd1fd7a}{CAPTURE}}(...)
+\item 
+\#define \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\+\_\+\+CASE}}(...)
+\item 
+\#define \mbox{\hyperlink{include_2catch_8hpp_adf06142f54a9e271590fa0e270bc41d2}{TEST\+\_\+\+CASE\+\_\+\+METHOD}}(class\+Name, ...)
+\item 
+\#define \mbox{\hyperlink{include_2catch_8hpp_add790b4107e8b013f21b0272be7bcc76}{METHOD\+\_\+\+AS\+\_\+\+TEST\+\_\+\+CASE}}(method, ...)
+\item 
+\#define \mbox{\hyperlink{include_2catch_8hpp_a784b9192db328b4f21186f9b26e4146e}{REGISTER\+\_\+\+TEST\+\_\+\+CASE}}(Function, ...)
+\item 
+\#define \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(...)
+\item 
+\#define \mbox{\hyperlink{include_2catch_8hpp_aa1caa37b980555de35faefa9191b5128}{DYNAMIC\+\_\+\+SECTION}}(...)
+\item 
+\#define \mbox{\hyperlink{include_2catch_8hpp_ac8d1eaf65528f86b445cf6e45b2d72c9}{FAIL}}(...)
+\item 
+\#define \mbox{\hyperlink{include_2catch_8hpp_a3c2341a3238242fdc02d33a1968bd1d2}{FAIL\+\_\+\+CHECK}}(...)
+\item 
+\#define \mbox{\hyperlink{include_2catch_8hpp_a8e852a9421caf4fda4e1903d9f02bcf5}{SUCCEED}}(...)
+\item 
+\#define \mbox{\hyperlink{include_2catch_8hpp_ab41cb63be394c30d48fa579bf8352f18}{ANON\+\_\+\+TEST\+\_\+\+CASE}}()
+\item 
+\#define \mbox{\hyperlink{include_2catch_8hpp_a9a88d21bfca0d58782cc5f0811801303}{TEMPLATE\+\_\+\+TEST\+\_\+\+CASE}}(...)
+\item 
+\#define \mbox{\hyperlink{include_2catch_8hpp_a5922ee8a997f9f6c5016b186f148b73b}{TEMPLATE\+\_\+\+TEST\+\_\+\+CASE\+\_\+\+METHOD}}(class\+Name, ...)
+\item 
+\#define \mbox{\hyperlink{include_2catch_8hpp_a76578a19e481e4ccdb928e68a17478d5}{TEMPLATE\+\_\+\+PRODUCT\+\_\+\+TEST\+\_\+\+CASE}}(...)
+\item 
+\#define \mbox{\hyperlink{include_2catch_8hpp_a15aefc2b8f75059606bebf400a348870}{TEMPLATE\+\_\+\+PRODUCT\+\_\+\+TEST\+\_\+\+CASE\+\_\+\+METHOD}}(class\+Name, ...)
+\item 
+\#define \mbox{\hyperlink{include_2catch_8hpp_abad9ff23b730469f209b010e0ac4687c}{STATIC\+\_\+\+REQUIRE}}(...)
+\item 
+\#define \mbox{\hyperlink{include_2catch_8hpp_ae7506af68f12e7efdb22e951b911b5a0}{STATIC\+\_\+\+REQUIRE\+\_\+\+FALSE}}(...)
+\item 
+\#define \mbox{\hyperlink{include_2catch_8hpp_a094602ff56422c96e501eaaef1ef8c12}{CATCH\+\_\+\+TRANSLATE\+\_\+\+EXCEPTION}}(signature)
+\item 
+\#define \mbox{\hyperlink{include_2catch_8hpp_acf8f441c7b9d70251ccbb7ccd8b83183}{SCENARIO}}(...)
+\item 
+\#define \mbox{\hyperlink{include_2catch_8hpp_add17eb8f8d85412a08a8a048cd38f33b}{SCENARIO\+\_\+\+METHOD}}(class\+Name, ...)
+\item 
+\#define \mbox{\hyperlink{include_2catch_8hpp_a2b70c603786d759242856d883dbe93bd}{GIVEN}}(desc)
+\item 
+\#define \mbox{\hyperlink{include_2catch_8hpp_a89dcfbe509f3f81fd865d4acd1632b66}{AND\+\_\+\+GIVEN}}(desc)
+\item 
+\#define \mbox{\hyperlink{include_2catch_8hpp_ab09e9b8186233f676ce6a23aebe89d6e}{WHEN}}(desc)
+\item 
+\#define \mbox{\hyperlink{include_2catch_8hpp_a054a37584492a5dfbdb5ee0f2fc10b7a}{AND\+\_\+\+WHEN}}(desc)
+\item 
+\#define \mbox{\hyperlink{include_2catch_8hpp_a27987092139727fd7a471b5f74dc62de}{THEN}}(desc)
+\item 
+\#define \mbox{\hyperlink{include_2catch_8hpp_aafdc2a6cfbcecedec25e64bcbd6c09c6}{AND\+\_\+\+THEN}}(desc)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{include_2catch_8hpp_a89dcfbe509f3f81fd865d4acd1632b66}\index{catch.hpp@{catch.hpp}!AND\_GIVEN@{AND\_GIVEN}}
+\index{AND\_GIVEN@{AND\_GIVEN}!catch.hpp@{catch.hpp}}
+\doxysubsubsection{\texorpdfstring{AND\_GIVEN}{AND\_GIVEN}}
+{\footnotesize\ttfamily \label{include_2catch_8hpp_a89dcfbe509f3f81fd865d4acd1632b66} 
+\#define AND\+\_\+\+GIVEN(\begin{DoxyParamCaption}\item[{}]{desc}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__section_8h_abe92a5063c83dec8143bf685e4b4a198}{INTERNAL\_CATCH\_DYNAMIC\_SECTION}}(\ \textcolor{stringliteral}{"{}And\ given:\ "{}}\ <<\ desc\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{include_2catch_8hpp_source_l00263}{263}} of file \mbox{\hyperlink{include_2catch_8hpp_source}{catch.\+hpp}}.
+
+\Hypertarget{include_2catch_8hpp_aafdc2a6cfbcecedec25e64bcbd6c09c6}\index{catch.hpp@{catch.hpp}!AND\_THEN@{AND\_THEN}}
+\index{AND\_THEN@{AND\_THEN}!catch.hpp@{catch.hpp}}
+\doxysubsubsection{\texorpdfstring{AND\_THEN}{AND\_THEN}}
+{\footnotesize\ttfamily \label{include_2catch_8hpp_aafdc2a6cfbcecedec25e64bcbd6c09c6} 
+\#define AND\+\_\+\+THEN(\begin{DoxyParamCaption}\item[{}]{desc}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__section_8h_abe92a5063c83dec8143bf685e4b4a198}{INTERNAL\_CATCH\_DYNAMIC\_SECTION}}(\ \textcolor{stringliteral}{"{}\ \ \ \ \ \ And:\ "{}}\ <<\ desc\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{include_2catch_8hpp_source_l00267}{267}} of file \mbox{\hyperlink{include_2catch_8hpp_source}{catch.\+hpp}}.
+
+\Hypertarget{include_2catch_8hpp_a054a37584492a5dfbdb5ee0f2fc10b7a}\index{catch.hpp@{catch.hpp}!AND\_WHEN@{AND\_WHEN}}
+\index{AND\_WHEN@{AND\_WHEN}!catch.hpp@{catch.hpp}}
+\doxysubsubsection{\texorpdfstring{AND\_WHEN}{AND\_WHEN}}
+{\footnotesize\ttfamily \label{include_2catch_8hpp_a054a37584492a5dfbdb5ee0f2fc10b7a} 
+\#define AND\+\_\+\+WHEN(\begin{DoxyParamCaption}\item[{}]{desc}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__section_8h_abe92a5063c83dec8143bf685e4b4a198}{INTERNAL\_CATCH\_DYNAMIC\_SECTION}}(\ \textcolor{stringliteral}{"{}\ And\ when:\ "{}}\ <<\ desc\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{include_2catch_8hpp_source_l00265}{265}} of file \mbox{\hyperlink{include_2catch_8hpp_source}{catch.\+hpp}}.
+
+\Hypertarget{include_2catch_8hpp_ab41cb63be394c30d48fa579bf8352f18}\index{catch.hpp@{catch.hpp}!ANON\_TEST\_CASE@{ANON\_TEST\_CASE}}
+\index{ANON\_TEST\_CASE@{ANON\_TEST\_CASE}!catch.hpp@{catch.hpp}}
+\doxysubsubsection{\texorpdfstring{ANON\_TEST\_CASE}{ANON\_TEST\_CASE}}
+{\footnotesize\ttfamily \label{include_2catch_8hpp_ab41cb63be394c30d48fa579bf8352f18} 
+\#define ANON\+\_\+\+TEST\+\_\+\+CASE(\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__test__registry_8h_a83f221452b6494c1eb0ae9bab79faa3c}{INTERNAL\_CATCH\_TESTCASE}}()}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{include_2catch_8hpp_source_l00231}{231}} of file \mbox{\hyperlink{include_2catch_8hpp_source}{catch.\+hpp}}.
+
+\Hypertarget{include_2catch_8hpp_aaf9fe43c53965ff8d94bbd522fd1fd7a}\index{catch.hpp@{catch.hpp}!CAPTURE@{CAPTURE}}
+\index{CAPTURE@{CAPTURE}!catch.hpp@{catch.hpp}}
+\doxysubsubsection{\texorpdfstring{CAPTURE}{CAPTURE}}
+{\footnotesize\ttfamily \label{include_2catch_8hpp_aaf9fe43c53965ff8d94bbd522fd1fd7a} 
+\#define CAPTURE(\begin{DoxyParamCaption}\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__capture_8hpp_ad8c51fdad7ab7e39414cd1bf90a3ce06}{INTERNAL\_CATCH\_CAPTURE}}(\ \mbox{\hyperlink{catch__common_8h_afe320ceec108fc8c160f9ac3938f1bc8}{INTERNAL\_CATCH\_UNIQUE\_NAME}}(capturer),\ \textcolor{stringliteral}{"{}CAPTURE"{}},\_\_VA\_ARGS\_\_\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{include_2catch_8hpp_source_l00220}{220}} of file \mbox{\hyperlink{include_2catch_8hpp_source}{catch.\+hpp}}.
+
+\Hypertarget{include_2catch_8hpp_a094602ff56422c96e501eaaef1ef8c12}\index{catch.hpp@{catch.hpp}!CATCH\_TRANSLATE\_EXCEPTION@{CATCH\_TRANSLATE\_EXCEPTION}}
+\index{CATCH\_TRANSLATE\_EXCEPTION@{CATCH\_TRANSLATE\_EXCEPTION}!catch.hpp@{catch.hpp}}
+\doxysubsubsection{\texorpdfstring{CATCH\_TRANSLATE\_EXCEPTION}{CATCH\_TRANSLATE\_EXCEPTION}}
+{\footnotesize\ttfamily \label{include_2catch_8hpp_a094602ff56422c96e501eaaef1ef8c12} 
+\#define CATCH\+\_\+\+TRANSLATE\+\_\+\+EXCEPTION(\begin{DoxyParamCaption}\item[{}]{signature}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__interfaces__exception_8h_a109d814750b0a695e2b66e9c53e748c0}{INTERNAL\_CATCH\_TRANSLATE\_EXCEPTION}}(\ signature\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{include_2catch_8hpp_source_l00256}{256}} of file \mbox{\hyperlink{include_2catch_8hpp_source}{catch.\+hpp}}.
+
+\Hypertarget{include_2catch_8hpp_aed4b3022e5b389a59ee3e1633c0a70a8}\index{catch.hpp@{catch.hpp}!CATCH\_VERSION\_MAJOR@{CATCH\_VERSION\_MAJOR}}
+\index{CATCH\_VERSION\_MAJOR@{CATCH\_VERSION\_MAJOR}!catch.hpp@{catch.hpp}}
+\doxysubsubsection{\texorpdfstring{CATCH\_VERSION\_MAJOR}{CATCH\_VERSION\_MAJOR}}
+{\footnotesize\ttfamily \label{include_2catch_8hpp_aed4b3022e5b389a59ee3e1633c0a70a8} 
+\#define CATCH\+\_\+\+VERSION\+\_\+\+MAJOR~2}
+
+
+
+Definition at line \mbox{\hyperlink{include_2catch_8hpp_source_l00012}{12}} of file \mbox{\hyperlink{include_2catch_8hpp_source}{catch.\+hpp}}.
+
+\Hypertarget{include_2catch_8hpp_a7c36daa8f2e725fe5e1ff2a9c2559d4f}\index{catch.hpp@{catch.hpp}!CATCH\_VERSION\_MINOR@{CATCH\_VERSION\_MINOR}}
+\index{CATCH\_VERSION\_MINOR@{CATCH\_VERSION\_MINOR}!catch.hpp@{catch.hpp}}
+\doxysubsubsection{\texorpdfstring{CATCH\_VERSION\_MINOR}{CATCH\_VERSION\_MINOR}}
+{\footnotesize\ttfamily \label{include_2catch_8hpp_a7c36daa8f2e725fe5e1ff2a9c2559d4f} 
+\#define CATCH\+\_\+\+VERSION\+\_\+\+MINOR~7}
+
+
+
+Definition at line \mbox{\hyperlink{include_2catch_8hpp_source_l00013}{13}} of file \mbox{\hyperlink{include_2catch_8hpp_source}{catch.\+hpp}}.
+
+\Hypertarget{include_2catch_8hpp_ab6adfb1d16a244d790dc1fe385831a52}\index{catch.hpp@{catch.hpp}!CATCH\_VERSION\_PATCH@{CATCH\_VERSION\_PATCH}}
+\index{CATCH\_VERSION\_PATCH@{CATCH\_VERSION\_PATCH}!catch.hpp@{catch.hpp}}
+\doxysubsubsection{\texorpdfstring{CATCH\_VERSION\_PATCH}{CATCH\_VERSION\_PATCH}}
+{\footnotesize\ttfamily \label{include_2catch_8hpp_ab6adfb1d16a244d790dc1fe385831a52} 
+\#define CATCH\+\_\+\+VERSION\+\_\+\+PATCH~2}
+
+
+
+Definition at line \mbox{\hyperlink{include_2catch_8hpp_source_l00014}{14}} of file \mbox{\hyperlink{include_2catch_8hpp_source}{catch.\+hpp}}.
+
+\Hypertarget{include_2catch_8hpp_a836cca6b6ed3a1706353f6d1bca0935f}\index{catch.hpp@{catch.hpp}!CHECK@{CHECK}}
+\index{CHECK@{CHECK}!catch.hpp@{catch.hpp}}
+\doxysubsubsection{\texorpdfstring{CHECK}{CHECK}}
+{\footnotesize\ttfamily \label{include_2catch_8hpp_a836cca6b6ed3a1706353f6d1bca0935f} 
+\#define CHECK(\begin{DoxyParamCaption}\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__capture_8hpp_ac3284f56c2f755d2b79fdb663cf9fb72}{INTERNAL\_CATCH\_TEST}}(\ \textcolor{stringliteral}{"{}CHECK"{}},\ \mbox{\hyperlink{struct_catch_1_1_result_disposition_a3396cad6e2259af326b3aae93e23e9d8a5adbb8bdfe4bf14bf37cb297d8b18b64}{Catch::ResultDisposition::ContinueOnFailure}},\ \_\_VA\_ARGS\_\_\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{include_2catch_8hpp_source_l00196}{196}} of file \mbox{\hyperlink{include_2catch_8hpp_source}{catch.\+hpp}}.
+
+\Hypertarget{include_2catch_8hpp_a7bf095d8512cb180f8ff3a2258a6eaac}\index{catch.hpp@{catch.hpp}!CHECK\_FALSE@{CHECK\_FALSE}}
+\index{CHECK\_FALSE@{CHECK\_FALSE}!catch.hpp@{catch.hpp}}
+\doxysubsubsection{\texorpdfstring{CHECK\_FALSE}{CHECK\_FALSE}}
+{\footnotesize\ttfamily \label{include_2catch_8hpp_a7bf095d8512cb180f8ff3a2258a6eaac} 
+\#define CHECK\+\_\+\+FALSE(\begin{DoxyParamCaption}\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__capture_8hpp_ac3284f56c2f755d2b79fdb663cf9fb72}{INTERNAL\_CATCH\_TEST}}(\ \textcolor{stringliteral}{"{}CHECK\_FALSE"{}},\ \mbox{\hyperlink{struct_catch_1_1_result_disposition_a3396cad6e2259af326b3aae93e23e9d8a5adbb8bdfe4bf14bf37cb297d8b18b64}{Catch::ResultDisposition::ContinueOnFailure}}\ |\ \mbox{\hyperlink{struct_catch_1_1_result_disposition_a3396cad6e2259af326b3aae93e23e9d8ad9f2da3df9d8bad526ee088d5db6271a}{Catch::ResultDisposition::FalseTest}},\ \_\_VA\_ARGS\_\_\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{include_2catch_8hpp_source_l00197}{197}} of file \mbox{\hyperlink{include_2catch_8hpp_source}{catch.\+hpp}}.
+
+\Hypertarget{include_2catch_8hpp_a13c6feaf82c3c419104c50dbb8caa3ef}\index{catch.hpp@{catch.hpp}!CHECK\_NOFAIL@{CHECK\_NOFAIL}}
+\index{CHECK\_NOFAIL@{CHECK\_NOFAIL}!catch.hpp@{catch.hpp}}
+\doxysubsubsection{\texorpdfstring{CHECK\_NOFAIL}{CHECK\_NOFAIL}}
+{\footnotesize\ttfamily \label{include_2catch_8hpp_a13c6feaf82c3c419104c50dbb8caa3ef} 
+\#define CHECK\+\_\+\+NOFAIL(\begin{DoxyParamCaption}\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__capture_8hpp_ac3284f56c2f755d2b79fdb663cf9fb72}{INTERNAL\_CATCH\_TEST}}(\ \textcolor{stringliteral}{"{}CHECK\_NOFAIL"{}},\ \mbox{\hyperlink{struct_catch_1_1_result_disposition_a3396cad6e2259af326b3aae93e23e9d8a5adbb8bdfe4bf14bf37cb297d8b18b64}{Catch::ResultDisposition::ContinueOnFailure}}\ |\ \mbox{\hyperlink{struct_catch_1_1_result_disposition_a3396cad6e2259af326b3aae93e23e9d8ac6212775ec7a943e9c49e451f5ff5467}{Catch::ResultDisposition::SuppressFail}},\ \_\_VA\_ARGS\_\_\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{include_2catch_8hpp_source_l00200}{200}} of file \mbox{\hyperlink{include_2catch_8hpp_source}{catch.\+hpp}}.
+
+\Hypertarget{include_2catch_8hpp_a78e70f011f20c4ade1d1ac2b8fd33626}\index{catch.hpp@{catch.hpp}!CHECK\_NOTHROW@{CHECK\_NOTHROW}}
+\index{CHECK\_NOTHROW@{CHECK\_NOTHROW}!catch.hpp@{catch.hpp}}
+\doxysubsubsection{\texorpdfstring{CHECK\_NOTHROW}{CHECK\_NOTHROW}}
+{\footnotesize\ttfamily \label{include_2catch_8hpp_a78e70f011f20c4ade1d1ac2b8fd33626} 
+\#define CHECK\+\_\+\+NOTHROW(\begin{DoxyParamCaption}\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__capture_8hpp_ac340cc35716115abaec4dfbcb061da52}{INTERNAL\_CATCH\_NO\_THROW}}(\ \textcolor{stringliteral}{"{}CHECK\_NOTHROW"{}},\ \mbox{\hyperlink{struct_catch_1_1_result_disposition_a3396cad6e2259af326b3aae93e23e9d8a5adbb8bdfe4bf14bf37cb297d8b18b64}{Catch::ResultDisposition::ContinueOnFailure}},\ \_\_VA\_ARGS\_\_\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{include_2catch_8hpp_source_l00208}{208}} of file \mbox{\hyperlink{include_2catch_8hpp_source}{catch.\+hpp}}.
+
+\Hypertarget{include_2catch_8hpp_a5b8c33c63e0804d4458e2c761370b75d}\index{catch.hpp@{catch.hpp}!CHECK\_THAT@{CHECK\_THAT}}
+\index{CHECK\_THAT@{CHECK\_THAT}!catch.hpp@{catch.hpp}}
+\doxysubsubsection{\texorpdfstring{CHECK\_THAT}{CHECK\_THAT}}
+{\footnotesize\ttfamily \label{include_2catch_8hpp_a5b8c33c63e0804d4458e2c761370b75d} 
+\#define CHECK\+\_\+\+THAT(\begin{DoxyParamCaption}\item[{}]{arg}{, }\item[{}]{matcher}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__capture__matchers_8h_a877690adc04f1fbfe944df6bebe6f8b5}{INTERNAL\_CHECK\_THAT}}(\ \textcolor{stringliteral}{"{}CHECK\_THAT"{}},\ matcher,\ \mbox{\hyperlink{struct_catch_1_1_result_disposition_a3396cad6e2259af326b3aae93e23e9d8a5adbb8bdfe4bf14bf37cb297d8b18b64}{Catch::ResultDisposition::ContinueOnFailure}},\ arg\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{include_2catch_8hpp_source_l00212}{212}} of file \mbox{\hyperlink{include_2catch_8hpp_source}{catch.\+hpp}}.
+
+\Hypertarget{include_2catch_8hpp_a5c646dfe831e596b59073014c1c8b9e5}\index{catch.hpp@{catch.hpp}!CHECK\_THROWS@{CHECK\_THROWS}}
+\index{CHECK\_THROWS@{CHECK\_THROWS}!catch.hpp@{catch.hpp}}
+\doxysubsubsection{\texorpdfstring{CHECK\_THROWS}{CHECK\_THROWS}}
+{\footnotesize\ttfamily \label{include_2catch_8hpp_a5c646dfe831e596b59073014c1c8b9e5} 
+\#define CHECK\+\_\+\+THROWS(\begin{DoxyParamCaption}\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__capture_8hpp_a2f3028d4fd4510f2f47ddd20626cccae}{INTERNAL\_CATCH\_THROWS}}(\ \textcolor{stringliteral}{"{}CHECK\_THROWS"{}},\ \mbox{\hyperlink{struct_catch_1_1_result_disposition_a3396cad6e2259af326b3aae93e23e9d8a5adbb8bdfe4bf14bf37cb297d8b18b64}{Catch::ResultDisposition::ContinueOnFailure}},\ \_\_VA\_ARGS\_\_\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{include_2catch_8hpp_source_l00202}{202}} of file \mbox{\hyperlink{include_2catch_8hpp_source}{catch.\+hpp}}.
+
+\Hypertarget{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}\index{catch.hpp@{catch.hpp}!CHECK\_THROWS\_AS@{CHECK\_THROWS\_AS}}
+\index{CHECK\_THROWS\_AS@{CHECK\_THROWS\_AS}!catch.hpp@{catch.hpp}}
+\doxysubsubsection{\texorpdfstring{CHECK\_THROWS\_AS}{CHECK\_THROWS\_AS}}
+{\footnotesize\ttfamily \label{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2} 
+\#define CHECK\+\_\+\+THROWS\+\_\+\+AS(\begin{DoxyParamCaption}\item[{}]{expr}{, }\item[{}]{exception\+Type}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__capture_8hpp_a5e87b48ab40b7b128ae8428c14c25a91}{INTERNAL\_CATCH\_THROWS\_AS}}(\ \textcolor{stringliteral}{"{}CHECK\_THROWS\_AS"{}},\ exceptionType,\ \mbox{\hyperlink{struct_catch_1_1_result_disposition_a3396cad6e2259af326b3aae93e23e9d8a5adbb8bdfe4bf14bf37cb297d8b18b64}{Catch::ResultDisposition::ContinueOnFailure}},\ expr\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{include_2catch_8hpp_source_l00203}{203}} of file \mbox{\hyperlink{include_2catch_8hpp_source}{catch.\+hpp}}.
+
+\Hypertarget{include_2catch_8hpp_a74fcc14d39e8cc35ff39f69c5b60e375}\index{catch.hpp@{catch.hpp}!CHECK\_THROWS\_MATCHES@{CHECK\_THROWS\_MATCHES}}
+\index{CHECK\_THROWS\_MATCHES@{CHECK\_THROWS\_MATCHES}!catch.hpp@{catch.hpp}}
+\doxysubsubsection{\texorpdfstring{CHECK\_THROWS\_MATCHES}{CHECK\_THROWS\_MATCHES}}
+{\footnotesize\ttfamily \label{include_2catch_8hpp_a74fcc14d39e8cc35ff39f69c5b60e375} 
+\#define CHECK\+\_\+\+THROWS\+\_\+\+MATCHES(\begin{DoxyParamCaption}\item[{}]{expr}{, }\item[{}]{exception\+Type}{, }\item[{}]{matcher}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__capture__matchers_8h_ace8fc7b74db8a1b2916554ad64e5b036}{INTERNAL\_CATCH\_THROWS\_MATCHES}}(\ \textcolor{stringliteral}{"{}CHECK\_THROWS\_MATCHES"{}},\ exceptionType,\ \mbox{\hyperlink{struct_catch_1_1_result_disposition_a3396cad6e2259af326b3aae93e23e9d8a5adbb8bdfe4bf14bf37cb297d8b18b64}{Catch::ResultDisposition::ContinueOnFailure}},\ matcher,\ expr\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{include_2catch_8hpp_source_l00206}{206}} of file \mbox{\hyperlink{include_2catch_8hpp_source}{catch.\+hpp}}.
+
+\Hypertarget{include_2catch_8hpp_a4903733490f526b58053836575e99066}\index{catch.hpp@{catch.hpp}!CHECK\_THROWS\_WITH@{CHECK\_THROWS\_WITH}}
+\index{CHECK\_THROWS\_WITH@{CHECK\_THROWS\_WITH}!catch.hpp@{catch.hpp}}
+\doxysubsubsection{\texorpdfstring{CHECK\_THROWS\_WITH}{CHECK\_THROWS\_WITH}}
+{\footnotesize\ttfamily \label{include_2catch_8hpp_a4903733490f526b58053836575e99066} 
+\#define CHECK\+\_\+\+THROWS\+\_\+\+WITH(\begin{DoxyParamCaption}\item[{}]{expr}{, }\item[{}]{matcher}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__capture_8hpp_a4296ab989dbc1f6c52c24d60012144d6}{INTERNAL\_CATCH\_THROWS\_STR\_MATCHES}}(\ \textcolor{stringliteral}{"{}CHECK\_THROWS\_WITH"{}},\ \mbox{\hyperlink{struct_catch_1_1_result_disposition_a3396cad6e2259af326b3aae93e23e9d8a5adbb8bdfe4bf14bf37cb297d8b18b64}{Catch::ResultDisposition::ContinueOnFailure}},\ matcher,\ expr\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{include_2catch_8hpp_source_l00204}{204}} of file \mbox{\hyperlink{include_2catch_8hpp_source}{catch.\+hpp}}.
+
+\Hypertarget{include_2catch_8hpp_a5fa42bb950a65e22eac778c86b27d832}\index{catch.hpp@{catch.hpp}!CHECKED\_ELSE@{CHECKED\_ELSE}}
+\index{CHECKED\_ELSE@{CHECKED\_ELSE}!catch.hpp@{catch.hpp}}
+\doxysubsubsection{\texorpdfstring{CHECKED\_ELSE}{CHECKED\_ELSE}}
+{\footnotesize\ttfamily \label{include_2catch_8hpp_a5fa42bb950a65e22eac778c86b27d832} 
+\#define CHECKED\+\_\+\+ELSE(\begin{DoxyParamCaption}\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__capture_8hpp_aaf2139c8903264bfe442e4b23b6673a9}{INTERNAL\_CATCH\_ELSE}}(\ \textcolor{stringliteral}{"{}CHECKED\_ELSE"{}},\ \mbox{\hyperlink{struct_catch_1_1_result_disposition_a3396cad6e2259af326b3aae93e23e9d8a5adbb8bdfe4bf14bf37cb297d8b18b64}{Catch::ResultDisposition::ContinueOnFailure}},\ \_\_VA\_ARGS\_\_\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{include_2catch_8hpp_source_l00199}{199}} of file \mbox{\hyperlink{include_2catch_8hpp_source}{catch.\+hpp}}.
+
+\Hypertarget{include_2catch_8hpp_a354466c7b989ec55784c02d74013263c}\index{catch.hpp@{catch.hpp}!CHECKED\_IF@{CHECKED\_IF}}
+\index{CHECKED\_IF@{CHECKED\_IF}!catch.hpp@{catch.hpp}}
+\doxysubsubsection{\texorpdfstring{CHECKED\_IF}{CHECKED\_IF}}
+{\footnotesize\ttfamily \label{include_2catch_8hpp_a354466c7b989ec55784c02d74013263c} 
+\#define CHECKED\+\_\+\+IF(\begin{DoxyParamCaption}\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__capture_8hpp_abfd240b1bdcc699638464fb3c7131c1d}{INTERNAL\_CATCH\_IF}}(\ \textcolor{stringliteral}{"{}CHECKED\_IF"{}},\ \mbox{\hyperlink{struct_catch_1_1_result_disposition_a3396cad6e2259af326b3aae93e23e9d8a5adbb8bdfe4bf14bf37cb297d8b18b64}{Catch::ResultDisposition::ContinueOnFailure}},\ \_\_VA\_ARGS\_\_\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{include_2catch_8hpp_source_l00198}{198}} of file \mbox{\hyperlink{include_2catch_8hpp_source}{catch.\+hpp}}.
+
+\Hypertarget{include_2catch_8hpp_aa1caa37b980555de35faefa9191b5128}\index{catch.hpp@{catch.hpp}!DYNAMIC\_SECTION@{DYNAMIC\_SECTION}}
+\index{DYNAMIC\_SECTION@{DYNAMIC\_SECTION}!catch.hpp@{catch.hpp}}
+\doxysubsubsection{\texorpdfstring{DYNAMIC\_SECTION}{DYNAMIC\_SECTION}}
+{\footnotesize\ttfamily \label{include_2catch_8hpp_aa1caa37b980555de35faefa9191b5128} 
+\#define DYNAMIC\+\_\+\+SECTION(\begin{DoxyParamCaption}\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__section_8h_abe92a5063c83dec8143bf685e4b4a198}{INTERNAL\_CATCH\_DYNAMIC\_SECTION}}(\ \_\_VA\_ARGS\_\_\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{include_2catch_8hpp_source_l00227}{227}} of file \mbox{\hyperlink{include_2catch_8hpp_source}{catch.\+hpp}}.
+
+\Hypertarget{include_2catch_8hpp_ac8d1eaf65528f86b445cf6e45b2d72c9}\index{catch.hpp@{catch.hpp}!FAIL@{FAIL}}
+\index{FAIL@{FAIL}!catch.hpp@{catch.hpp}}
+\doxysubsubsection{\texorpdfstring{FAIL}{FAIL}}
+{\footnotesize\ttfamily \label{include_2catch_8hpp_ac8d1eaf65528f86b445cf6e45b2d72c9} 
+\#define FAIL(\begin{DoxyParamCaption}\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__capture_8hpp_ad1f7d83040ad9b09020dc72c57019638}{INTERNAL\_CATCH\_MSG}}(\ \textcolor{stringliteral}{"{}FAIL"{}},\ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa0c08e9a7cc2a689bfb86ca3a6cfc6444}{Catch::ResultWas::ExplicitFailure}},\ \mbox{\hyperlink{struct_catch_1_1_result_disposition_a3396cad6e2259af326b3aae93e23e9d8a3758aaf4ec26097b5fdfcc3fbfc76e46}{Catch::ResultDisposition::Normal}},\ \_\_VA\_ARGS\_\_\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{include_2catch_8hpp_source_l00228}{228}} of file \mbox{\hyperlink{include_2catch_8hpp_source}{catch.\+hpp}}.
+
+\Hypertarget{include_2catch_8hpp_a3c2341a3238242fdc02d33a1968bd1d2}\index{catch.hpp@{catch.hpp}!FAIL\_CHECK@{FAIL\_CHECK}}
+\index{FAIL\_CHECK@{FAIL\_CHECK}!catch.hpp@{catch.hpp}}
+\doxysubsubsection{\texorpdfstring{FAIL\_CHECK}{FAIL\_CHECK}}
+{\footnotesize\ttfamily \label{include_2catch_8hpp_a3c2341a3238242fdc02d33a1968bd1d2} 
+\#define FAIL\+\_\+\+CHECK(\begin{DoxyParamCaption}\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__capture_8hpp_ad1f7d83040ad9b09020dc72c57019638}{INTERNAL\_CATCH\_MSG}}(\ \textcolor{stringliteral}{"{}FAIL\_CHECK"{}},\ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa0c08e9a7cc2a689bfb86ca3a6cfc6444}{Catch::ResultWas::ExplicitFailure}},\ \mbox{\hyperlink{struct_catch_1_1_result_disposition_a3396cad6e2259af326b3aae93e23e9d8a5adbb8bdfe4bf14bf37cb297d8b18b64}{Catch::ResultDisposition::ContinueOnFailure}},\ \_\_VA\_ARGS\_\_\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{include_2catch_8hpp_source_l00229}{229}} of file \mbox{\hyperlink{include_2catch_8hpp_source}{catch.\+hpp}}.
+
+\Hypertarget{include_2catch_8hpp_a2b70c603786d759242856d883dbe93bd}\index{catch.hpp@{catch.hpp}!GIVEN@{GIVEN}}
+\index{GIVEN@{GIVEN}!catch.hpp@{catch.hpp}}
+\doxysubsubsection{\texorpdfstring{GIVEN}{GIVEN}}
+{\footnotesize\ttfamily \label{include_2catch_8hpp_a2b70c603786d759242856d883dbe93bd} 
+\#define GIVEN(\begin{DoxyParamCaption}\item[{}]{desc}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__section_8h_abe92a5063c83dec8143bf685e4b4a198}{INTERNAL\_CATCH\_DYNAMIC\_SECTION}}(\ \textcolor{stringliteral}{"{}\ \ \ \ Given:\ "{}}\ <<\ desc\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{include_2catch_8hpp_source_l00262}{262}} of file \mbox{\hyperlink{include_2catch_8hpp_source}{catch.\+hpp}}.
+
+\Hypertarget{include_2catch_8hpp_a3ae64706314066fdc8b6c8029a915aa7}\index{catch.hpp@{catch.hpp}!INFO@{INFO}}
+\index{INFO@{INFO}!catch.hpp@{catch.hpp}}
+\doxysubsubsection{\texorpdfstring{INFO}{INFO}}
+{\footnotesize\ttfamily \label{include_2catch_8hpp_a3ae64706314066fdc8b6c8029a915aa7} 
+\#define INFO(\begin{DoxyParamCaption}\item[{}]{msg}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__capture_8hpp_ab0eb5cfab90a80f3113f0ecb65c62a1c}{INTERNAL\_CATCH\_INFO}}(\ \textcolor{stringliteral}{"{}INFO"{}},\ msg\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{include_2catch_8hpp_source_l00217}{217}} of file \mbox{\hyperlink{include_2catch_8hpp_source}{catch.\+hpp}}.
+
+\Hypertarget{include_2catch_8hpp_add790b4107e8b013f21b0272be7bcc76}\index{catch.hpp@{catch.hpp}!METHOD\_AS\_TEST\_CASE@{METHOD\_AS\_TEST\_CASE}}
+\index{METHOD\_AS\_TEST\_CASE@{METHOD\_AS\_TEST\_CASE}!catch.hpp@{catch.hpp}}
+\doxysubsubsection{\texorpdfstring{METHOD\_AS\_TEST\_CASE}{METHOD\_AS\_TEST\_CASE}}
+{\footnotesize\ttfamily \label{include_2catch_8hpp_add790b4107e8b013f21b0272be7bcc76} 
+\#define METHOD\+\_\+\+AS\+\_\+\+TEST\+\_\+\+CASE(\begin{DoxyParamCaption}\item[{}]{method}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__test__registry_8h_af5bedfdbfc32cddf5287a77cf860f242}{INTERNAL\_CATCH\_METHOD\_AS\_TEST\_CASE}}(\ method,\ \_\_VA\_ARGS\_\_\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{include_2catch_8hpp_source_l00224}{224}} of file \mbox{\hyperlink{include_2catch_8hpp_source}{catch.\+hpp}}.
+
+\Hypertarget{include_2catch_8hpp_a784b9192db328b4f21186f9b26e4146e}\index{catch.hpp@{catch.hpp}!REGISTER\_TEST\_CASE@{REGISTER\_TEST\_CASE}}
+\index{REGISTER\_TEST\_CASE@{REGISTER\_TEST\_CASE}!catch.hpp@{catch.hpp}}
+\doxysubsubsection{\texorpdfstring{REGISTER\_TEST\_CASE}{REGISTER\_TEST\_CASE}}
+{\footnotesize\ttfamily \label{include_2catch_8hpp_a784b9192db328b4f21186f9b26e4146e} 
+\#define REGISTER\+\_\+\+TEST\+\_\+\+CASE(\begin{DoxyParamCaption}\item[{}]{Function}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__test__registry_8h_ad7fc9293cc800a6f2fde7a0a211533c8}{INTERNAL\_CATCH\_REGISTER\_TESTCASE}}(\ Function,\ \_\_VA\_ARGS\_\_\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{include_2catch_8hpp_source_l00225}{225}} of file \mbox{\hyperlink{include_2catch_8hpp_source}{catch.\+hpp}}.
+
+\Hypertarget{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}\index{catch.hpp@{catch.hpp}!REQUIRE@{REQUIRE}}
+\index{REQUIRE@{REQUIRE}!catch.hpp@{catch.hpp}}
+\doxysubsubsection{\texorpdfstring{REQUIRE}{REQUIRE}}
+{\footnotesize\ttfamily \label{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85} 
+\#define REQUIRE(\begin{DoxyParamCaption}\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__capture_8hpp_ac3284f56c2f755d2b79fdb663cf9fb72}{INTERNAL\_CATCH\_TEST}}(\ \textcolor{stringliteral}{"{}REQUIRE"{}},\ \mbox{\hyperlink{struct_catch_1_1_result_disposition_a3396cad6e2259af326b3aae93e23e9d8a3758aaf4ec26097b5fdfcc3fbfc76e46}{Catch::ResultDisposition::Normal}},\ \_\_VA\_ARGS\_\_\ \ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{include_2catch_8hpp_source_l00185}{185}} of file \mbox{\hyperlink{include_2catch_8hpp_source}{catch.\+hpp}}.
+
+\Hypertarget{include_2catch_8hpp_ada5065594bafc152162761ace47c1dcb}\index{catch.hpp@{catch.hpp}!REQUIRE\_FALSE@{REQUIRE\_FALSE}}
+\index{REQUIRE\_FALSE@{REQUIRE\_FALSE}!catch.hpp@{catch.hpp}}
+\doxysubsubsection{\texorpdfstring{REQUIRE\_FALSE}{REQUIRE\_FALSE}}
+{\footnotesize\ttfamily \label{include_2catch_8hpp_ada5065594bafc152162761ace47c1dcb} 
+\#define REQUIRE\+\_\+\+FALSE(\begin{DoxyParamCaption}\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__capture_8hpp_ac3284f56c2f755d2b79fdb663cf9fb72}{INTERNAL\_CATCH\_TEST}}(\ \textcolor{stringliteral}{"{}REQUIRE\_FALSE"{}},\ \mbox{\hyperlink{struct_catch_1_1_result_disposition_a3396cad6e2259af326b3aae93e23e9d8a3758aaf4ec26097b5fdfcc3fbfc76e46}{Catch::ResultDisposition::Normal}}\ |\ \mbox{\hyperlink{struct_catch_1_1_result_disposition_a3396cad6e2259af326b3aae93e23e9d8ad9f2da3df9d8bad526ee088d5db6271a}{Catch::ResultDisposition::FalseTest}},\ \_\_VA\_ARGS\_\_\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{include_2catch_8hpp_source_l00186}{186}} of file \mbox{\hyperlink{include_2catch_8hpp_source}{catch.\+hpp}}.
+
+\Hypertarget{include_2catch_8hpp_ab0148f0dfca438f7aa01974e9c33216a}\index{catch.hpp@{catch.hpp}!REQUIRE\_NOTHROW@{REQUIRE\_NOTHROW}}
+\index{REQUIRE\_NOTHROW@{REQUIRE\_NOTHROW}!catch.hpp@{catch.hpp}}
+\doxysubsubsection{\texorpdfstring{REQUIRE\_NOTHROW}{REQUIRE\_NOTHROW}}
+{\footnotesize\ttfamily \label{include_2catch_8hpp_ab0148f0dfca438f7aa01974e9c33216a} 
+\#define REQUIRE\+\_\+\+NOTHROW(\begin{DoxyParamCaption}\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__capture_8hpp_ac340cc35716115abaec4dfbcb061da52}{INTERNAL\_CATCH\_NO\_THROW}}(\ \textcolor{stringliteral}{"{}REQUIRE\_NOTHROW"{}},\ \mbox{\hyperlink{struct_catch_1_1_result_disposition_a3396cad6e2259af326b3aae93e23e9d8a3758aaf4ec26097b5fdfcc3fbfc76e46}{Catch::ResultDisposition::Normal}},\ \_\_VA\_ARGS\_\_\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{include_2catch_8hpp_source_l00194}{194}} of file \mbox{\hyperlink{include_2catch_8hpp_source}{catch.\+hpp}}.
+
+\Hypertarget{include_2catch_8hpp_ac1354db6f3e9c1e0a8eda0eea7ff1f0a}\index{catch.hpp@{catch.hpp}!REQUIRE\_THAT@{REQUIRE\_THAT}}
+\index{REQUIRE\_THAT@{REQUIRE\_THAT}!catch.hpp@{catch.hpp}}
+\doxysubsubsection{\texorpdfstring{REQUIRE\_THAT}{REQUIRE\_THAT}}
+{\footnotesize\ttfamily \label{include_2catch_8hpp_ac1354db6f3e9c1e0a8eda0eea7ff1f0a} 
+\#define REQUIRE\+\_\+\+THAT(\begin{DoxyParamCaption}\item[{}]{arg}{, }\item[{}]{matcher}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__capture__matchers_8h_a877690adc04f1fbfe944df6bebe6f8b5}{INTERNAL\_CHECK\_THAT}}(\ \textcolor{stringliteral}{"{}REQUIRE\_THAT"{}},\ matcher,\ \mbox{\hyperlink{struct_catch_1_1_result_disposition_a3396cad6e2259af326b3aae93e23e9d8a3758aaf4ec26097b5fdfcc3fbfc76e46}{Catch::ResultDisposition::Normal}},\ arg\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{include_2catch_8hpp_source_l00214}{214}} of file \mbox{\hyperlink{include_2catch_8hpp_source}{catch.\+hpp}}.
+
+\Hypertarget{include_2catch_8hpp_ae3c33faa1d31a2bb0811dac74b994e3e}\index{catch.hpp@{catch.hpp}!REQUIRE\_THROWS@{REQUIRE\_THROWS}}
+\index{REQUIRE\_THROWS@{REQUIRE\_THROWS}!catch.hpp@{catch.hpp}}
+\doxysubsubsection{\texorpdfstring{REQUIRE\_THROWS}{REQUIRE\_THROWS}}
+{\footnotesize\ttfamily \label{include_2catch_8hpp_ae3c33faa1d31a2bb0811dac74b994e3e} 
+\#define REQUIRE\+\_\+\+THROWS(\begin{DoxyParamCaption}\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__capture_8hpp_a2f3028d4fd4510f2f47ddd20626cccae}{INTERNAL\_CATCH\_THROWS}}(\ \textcolor{stringliteral}{"{}REQUIRE\_THROWS"{}},\ \mbox{\hyperlink{struct_catch_1_1_result_disposition_a3396cad6e2259af326b3aae93e23e9d8a3758aaf4ec26097b5fdfcc3fbfc76e46}{Catch::ResultDisposition::Normal}},\ \_\_VA\_ARGS\_\_\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{include_2catch_8hpp_source_l00188}{188}} of file \mbox{\hyperlink{include_2catch_8hpp_source}{catch.\+hpp}}.
+
+\Hypertarget{include_2catch_8hpp_ae24a059e3c28ff3eea69be48282f5f81}\index{catch.hpp@{catch.hpp}!REQUIRE\_THROWS\_AS@{REQUIRE\_THROWS\_AS}}
+\index{REQUIRE\_THROWS\_AS@{REQUIRE\_THROWS\_AS}!catch.hpp@{catch.hpp}}
+\doxysubsubsection{\texorpdfstring{REQUIRE\_THROWS\_AS}{REQUIRE\_THROWS\_AS}}
+{\footnotesize\ttfamily \label{include_2catch_8hpp_ae24a059e3c28ff3eea69be48282f5f81} 
+\#define REQUIRE\+\_\+\+THROWS\+\_\+\+AS(\begin{DoxyParamCaption}\item[{}]{expr}{, }\item[{}]{exception\+Type}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__capture_8hpp_a5e87b48ab40b7b128ae8428c14c25a91}{INTERNAL\_CATCH\_THROWS\_AS}}(\ \textcolor{stringliteral}{"{}REQUIRE\_THROWS\_AS"{}},\ exceptionType,\ \mbox{\hyperlink{struct_catch_1_1_result_disposition_a3396cad6e2259af326b3aae93e23e9d8a3758aaf4ec26097b5fdfcc3fbfc76e46}{Catch::ResultDisposition::Normal}},\ expr\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{include_2catch_8hpp_source_l00189}{189}} of file \mbox{\hyperlink{include_2catch_8hpp_source}{catch.\+hpp}}.
+
+\Hypertarget{include_2catch_8hpp_a54473a48ac2ac55bfe1165b69e1b8010}\index{catch.hpp@{catch.hpp}!REQUIRE\_THROWS\_MATCHES@{REQUIRE\_THROWS\_MATCHES}}
+\index{REQUIRE\_THROWS\_MATCHES@{REQUIRE\_THROWS\_MATCHES}!catch.hpp@{catch.hpp}}
+\doxysubsubsection{\texorpdfstring{REQUIRE\_THROWS\_MATCHES}{REQUIRE\_THROWS\_MATCHES}}
+{\footnotesize\ttfamily \label{include_2catch_8hpp_a54473a48ac2ac55bfe1165b69e1b8010} 
+\#define REQUIRE\+\_\+\+THROWS\+\_\+\+MATCHES(\begin{DoxyParamCaption}\item[{}]{expr}{, }\item[{}]{exception\+Type}{, }\item[{}]{matcher}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__capture__matchers_8h_ace8fc7b74db8a1b2916554ad64e5b036}{INTERNAL\_CATCH\_THROWS\_MATCHES}}(\ \textcolor{stringliteral}{"{}REQUIRE\_THROWS\_MATCHES"{}},\ exceptionType,\ \mbox{\hyperlink{struct_catch_1_1_result_disposition_a3396cad6e2259af326b3aae93e23e9d8a3758aaf4ec26097b5fdfcc3fbfc76e46}{Catch::ResultDisposition::Normal}},\ matcher,\ expr\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{include_2catch_8hpp_source_l00192}{192}} of file \mbox{\hyperlink{include_2catch_8hpp_source}{catch.\+hpp}}.
+
+\Hypertarget{include_2catch_8hpp_aa39a017db507132071d2819f087b2f28}\index{catch.hpp@{catch.hpp}!REQUIRE\_THROWS\_WITH@{REQUIRE\_THROWS\_WITH}}
+\index{REQUIRE\_THROWS\_WITH@{REQUIRE\_THROWS\_WITH}!catch.hpp@{catch.hpp}}
+\doxysubsubsection{\texorpdfstring{REQUIRE\_THROWS\_WITH}{REQUIRE\_THROWS\_WITH}}
+{\footnotesize\ttfamily \label{include_2catch_8hpp_aa39a017db507132071d2819f087b2f28} 
+\#define REQUIRE\+\_\+\+THROWS\+\_\+\+WITH(\begin{DoxyParamCaption}\item[{}]{expr}{, }\item[{}]{matcher}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__capture_8hpp_a4296ab989dbc1f6c52c24d60012144d6}{INTERNAL\_CATCH\_THROWS\_STR\_MATCHES}}(\ \textcolor{stringliteral}{"{}REQUIRE\_THROWS\_WITH"{}},\ \mbox{\hyperlink{struct_catch_1_1_result_disposition_a3396cad6e2259af326b3aae93e23e9d8a3758aaf4ec26097b5fdfcc3fbfc76e46}{Catch::ResultDisposition::Normal}},\ matcher,\ expr\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{include_2catch_8hpp_source_l00190}{190}} of file \mbox{\hyperlink{include_2catch_8hpp_source}{catch.\+hpp}}.
+
+\Hypertarget{include_2catch_8hpp_acf8f441c7b9d70251ccbb7ccd8b83183}\index{catch.hpp@{catch.hpp}!SCENARIO@{SCENARIO}}
+\index{SCENARIO@{SCENARIO}!catch.hpp@{catch.hpp}}
+\doxysubsubsection{\texorpdfstring{SCENARIO}{SCENARIO}}
+{\footnotesize\ttfamily \label{include_2catch_8hpp_acf8f441c7b9d70251ccbb7ccd8b83183} 
+\#define SCENARIO(\begin{DoxyParamCaption}\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\ \textcolor{stringliteral}{"{}Scenario:\ "{}}\ \_\_VA\_ARGS\_\_\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{include_2catch_8hpp_source_l00259}{259}} of file \mbox{\hyperlink{include_2catch_8hpp_source}{catch.\+hpp}}.
+
+\Hypertarget{include_2catch_8hpp_add17eb8f8d85412a08a8a048cd38f33b}\index{catch.hpp@{catch.hpp}!SCENARIO\_METHOD@{SCENARIO\_METHOD}}
+\index{SCENARIO\_METHOD@{SCENARIO\_METHOD}!catch.hpp@{catch.hpp}}
+\doxysubsubsection{\texorpdfstring{SCENARIO\_METHOD}{SCENARIO\_METHOD}}
+{\footnotesize\ttfamily \label{include_2catch_8hpp_add17eb8f8d85412a08a8a048cd38f33b} 
+\#define SCENARIO\+\_\+\+METHOD(\begin{DoxyParamCaption}\item[{}]{class\+Name}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__test__registry_8h_a4755a44f041605a731180e1e19e72bee}{INTERNAL\_CATCH\_TEST\_CASE\_METHOD}}(\ className,\ \textcolor{stringliteral}{"{}Scenario:\ "{}}\ \_\_VA\_ARGS\_\_\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{include_2catch_8hpp_source_l00260}{260}} of file \mbox{\hyperlink{include_2catch_8hpp_source}{catch.\+hpp}}.
+
+\Hypertarget{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}\index{catch.hpp@{catch.hpp}!SECTION@{SECTION}}
+\index{SECTION@{SECTION}!catch.hpp@{catch.hpp}}
+\doxysubsubsection{\texorpdfstring{SECTION}{SECTION}}
+{\footnotesize\ttfamily \label{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21} 
+\#define SECTION(\begin{DoxyParamCaption}\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__section_8h_a2969ec50cc661169e94b1b80ac799c07}{INTERNAL\_CATCH\_SECTION}}(\ \_\_VA\_ARGS\_\_\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{include_2catch_8hpp_source_l00226}{226}} of file \mbox{\hyperlink{include_2catch_8hpp_source}{catch.\+hpp}}.
+
+\Hypertarget{include_2catch_8hpp_abad9ff23b730469f209b010e0ac4687c}\index{catch.hpp@{catch.hpp}!STATIC\_REQUIRE@{STATIC\_REQUIRE}}
+\index{STATIC\_REQUIRE@{STATIC\_REQUIRE}!catch.hpp@{catch.hpp}}
+\doxysubsubsection{\texorpdfstring{STATIC\_REQUIRE}{STATIC\_REQUIRE}}
+{\footnotesize\ttfamily \label{include_2catch_8hpp_abad9ff23b730469f209b010e0ac4687c} 
+\#define STATIC\+\_\+\+REQUIRE(\begin{DoxyParamCaption}\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{static\_assert}(\ \ \ \_\_VA\_ARGS\_\_,\ \ \#\_\_VA\_ARGS\_\_\ );\ \mbox{\hyperlink{include_2catch_8hpp_a8e852a9421caf4fda4e1903d9f02bcf5}{SUCCEED}}(\ \#\_\_VA\_ARGS\_\_\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{include_2catch_8hpp_source_l00247}{247}} of file \mbox{\hyperlink{include_2catch_8hpp_source}{catch.\+hpp}}.
+
+\Hypertarget{include_2catch_8hpp_ae7506af68f12e7efdb22e951b911b5a0}\index{catch.hpp@{catch.hpp}!STATIC\_REQUIRE\_FALSE@{STATIC\_REQUIRE\_FALSE}}
+\index{STATIC\_REQUIRE\_FALSE@{STATIC\_REQUIRE\_FALSE}!catch.hpp@{catch.hpp}}
+\doxysubsubsection{\texorpdfstring{STATIC\_REQUIRE\_FALSE}{STATIC\_REQUIRE\_FALSE}}
+{\footnotesize\ttfamily \label{include_2catch_8hpp_ae7506af68f12e7efdb22e951b911b5a0} 
+\#define STATIC\+\_\+\+REQUIRE\+\_\+\+FALSE(\begin{DoxyParamCaption}\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{static\_assert}(\ !(\_\_VA\_ARGS\_\_),\ \textcolor{stringliteral}{"{}!("{}}\ \#\_\_VA\_ARGS\_\_\ \textcolor{stringliteral}{"{})"{}}\ );\ \mbox{\hyperlink{include_2catch_8hpp_a8e852a9421caf4fda4e1903d9f02bcf5}{SUCCEED}}(\ \textcolor{stringliteral}{"{}!("{}}\ \#\_\_VA\_ARGS\_\_\ \textcolor{stringliteral}{"{})"{}}\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{include_2catch_8hpp_source_l00248}{248}} of file \mbox{\hyperlink{include_2catch_8hpp_source}{catch.\+hpp}}.
+
+\Hypertarget{include_2catch_8hpp_a8e852a9421caf4fda4e1903d9f02bcf5}\index{catch.hpp@{catch.hpp}!SUCCEED@{SUCCEED}}
+\index{SUCCEED@{SUCCEED}!catch.hpp@{catch.hpp}}
+\doxysubsubsection{\texorpdfstring{SUCCEED}{SUCCEED}}
+{\footnotesize\ttfamily \label{include_2catch_8hpp_a8e852a9421caf4fda4e1903d9f02bcf5} 
+\#define SUCCEED(\begin{DoxyParamCaption}\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__capture_8hpp_ad1f7d83040ad9b09020dc72c57019638}{INTERNAL\_CATCH\_MSG}}(\ \textcolor{stringliteral}{"{}SUCCEED"{}},\ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efacff2783ae5a0ec92d7907d55233aa695}{Catch::ResultWas::Ok}},\ \mbox{\hyperlink{struct_catch_1_1_result_disposition_a3396cad6e2259af326b3aae93e23e9d8a5adbb8bdfe4bf14bf37cb297d8b18b64}{Catch::ResultDisposition::ContinueOnFailure}},\ \_\_VA\_ARGS\_\_\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{include_2catch_8hpp_source_l00230}{230}} of file \mbox{\hyperlink{include_2catch_8hpp_source}{catch.\+hpp}}.
+
+\Hypertarget{include_2catch_8hpp_a76578a19e481e4ccdb928e68a17478d5}\index{catch.hpp@{catch.hpp}!TEMPLATE\_PRODUCT\_TEST\_CASE@{TEMPLATE\_PRODUCT\_TEST\_CASE}}
+\index{TEMPLATE\_PRODUCT\_TEST\_CASE@{TEMPLATE\_PRODUCT\_TEST\_CASE}!catch.hpp@{catch.hpp}}
+\doxysubsubsection{\texorpdfstring{TEMPLATE\_PRODUCT\_TEST\_CASE}{TEMPLATE\_PRODUCT\_TEST\_CASE}}
+{\footnotesize\ttfamily \label{include_2catch_8hpp_a76578a19e481e4ccdb928e68a17478d5} 
+\#define TEMPLATE\+\_\+\+PRODUCT\+\_\+\+TEST\+\_\+\+CASE(\begin{DoxyParamCaption}\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__test__registry_8h_acd8f967bc841a9ab05774e8863cf9506}{INTERNAL\_CATCH\_TEMPLATE\_PRODUCT\_TEST\_CASE}}(\ \_\_VA\_ARGS\_\_\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{include_2catch_8hpp_source_l00236}{236}} of file \mbox{\hyperlink{include_2catch_8hpp_source}{catch.\+hpp}}.
+
+\Hypertarget{include_2catch_8hpp_a15aefc2b8f75059606bebf400a348870}\index{catch.hpp@{catch.hpp}!TEMPLATE\_PRODUCT\_TEST\_CASE\_METHOD@{TEMPLATE\_PRODUCT\_TEST\_CASE\_METHOD}}
+\index{TEMPLATE\_PRODUCT\_TEST\_CASE\_METHOD@{TEMPLATE\_PRODUCT\_TEST\_CASE\_METHOD}!catch.hpp@{catch.hpp}}
+\doxysubsubsection{\texorpdfstring{TEMPLATE\_PRODUCT\_TEST\_CASE\_METHOD}{TEMPLATE\_PRODUCT\_TEST\_CASE\_METHOD}}
+{\footnotesize\ttfamily \label{include_2catch_8hpp_a15aefc2b8f75059606bebf400a348870} 
+\#define TEMPLATE\+\_\+\+PRODUCT\+\_\+\+TEST\+\_\+\+CASE\+\_\+\+METHOD(\begin{DoxyParamCaption}\item[{}]{class\+Name}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__test__registry_8h_a1a4839fc44923f817dec5694f0bd1f33}{INTERNAL\_CATCH\_TEMPLATE\_PRODUCT\_TEST\_CASE\_METHOD}}(\ className,\ \_\_VA\_ARGS\_\_\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{include_2catch_8hpp_source_l00237}{237}} of file \mbox{\hyperlink{include_2catch_8hpp_source}{catch.\+hpp}}.
+
+\Hypertarget{include_2catch_8hpp_a9a88d21bfca0d58782cc5f0811801303}\index{catch.hpp@{catch.hpp}!TEMPLATE\_TEST\_CASE@{TEMPLATE\_TEST\_CASE}}
+\index{TEMPLATE\_TEST\_CASE@{TEMPLATE\_TEST\_CASE}!catch.hpp@{catch.hpp}}
+\doxysubsubsection{\texorpdfstring{TEMPLATE\_TEST\_CASE}{TEMPLATE\_TEST\_CASE}}
+{\footnotesize\ttfamily \label{include_2catch_8hpp_a9a88d21bfca0d58782cc5f0811801303} 
+\#define TEMPLATE\+\_\+\+TEST\+\_\+\+CASE(\begin{DoxyParamCaption}\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__test__registry_8h_a8190f00b563c3efb52f8057be41db45f}{INTERNAL\_CATCH\_TEMPLATE\_TEST\_CASE}}(\ \_\_VA\_ARGS\_\_\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{include_2catch_8hpp_source_l00234}{234}} of file \mbox{\hyperlink{include_2catch_8hpp_source}{catch.\+hpp}}.
+
+\Hypertarget{include_2catch_8hpp_a5922ee8a997f9f6c5016b186f148b73b}\index{catch.hpp@{catch.hpp}!TEMPLATE\_TEST\_CASE\_METHOD@{TEMPLATE\_TEST\_CASE\_METHOD}}
+\index{TEMPLATE\_TEST\_CASE\_METHOD@{TEMPLATE\_TEST\_CASE\_METHOD}!catch.hpp@{catch.hpp}}
+\doxysubsubsection{\texorpdfstring{TEMPLATE\_TEST\_CASE\_METHOD}{TEMPLATE\_TEST\_CASE\_METHOD}}
+{\footnotesize\ttfamily \label{include_2catch_8hpp_a5922ee8a997f9f6c5016b186f148b73b} 
+\#define TEMPLATE\+\_\+\+TEST\+\_\+\+CASE\+\_\+\+METHOD(\begin{DoxyParamCaption}\item[{}]{class\+Name}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__test__registry_8h_a582f90e5f7c36e9e69fff5f4c891ac29}{INTERNAL\_CATCH\_TEMPLATE\_TEST\_CASE\_METHOD}}(\ className,\ \_\_VA\_ARGS\_\_\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{include_2catch_8hpp_source_l00235}{235}} of file \mbox{\hyperlink{include_2catch_8hpp_source}{catch.\+hpp}}.
+
+\Hypertarget{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}\index{catch.hpp@{catch.hpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!catch.hpp@{catch.hpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE}{TEST\_CASE}}
+{\footnotesize\ttfamily \label{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f} 
+\#define TEST\+\_\+\+CASE(\begin{DoxyParamCaption}\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__test__registry_8h_a83f221452b6494c1eb0ae9bab79faa3c}{INTERNAL\_CATCH\_TESTCASE}}(\ \_\_VA\_ARGS\_\_\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{include_2catch_8hpp_source_l00222}{222}} of file \mbox{\hyperlink{include_2catch_8hpp_source}{catch.\+hpp}}.
+
+\Hypertarget{include_2catch_8hpp_adf06142f54a9e271590fa0e270bc41d2}\index{catch.hpp@{catch.hpp}!TEST\_CASE\_METHOD@{TEST\_CASE\_METHOD}}
+\index{TEST\_CASE\_METHOD@{TEST\_CASE\_METHOD}!catch.hpp@{catch.hpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE\_METHOD}{TEST\_CASE\_METHOD}}
+{\footnotesize\ttfamily \label{include_2catch_8hpp_adf06142f54a9e271590fa0e270bc41d2} 
+\#define TEST\+\_\+\+CASE\+\_\+\+METHOD(\begin{DoxyParamCaption}\item[{}]{class\+Name}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__test__registry_8h_a4755a44f041605a731180e1e19e72bee}{INTERNAL\_CATCH\_TEST\_CASE\_METHOD}}(\ className,\ \_\_VA\_ARGS\_\_\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{include_2catch_8hpp_source_l00223}{223}} of file \mbox{\hyperlink{include_2catch_8hpp_source}{catch.\+hpp}}.
+
+\Hypertarget{include_2catch_8hpp_a27987092139727fd7a471b5f74dc62de}\index{catch.hpp@{catch.hpp}!THEN@{THEN}}
+\index{THEN@{THEN}!catch.hpp@{catch.hpp}}
+\doxysubsubsection{\texorpdfstring{THEN}{THEN}}
+{\footnotesize\ttfamily \label{include_2catch_8hpp_a27987092139727fd7a471b5f74dc62de} 
+\#define THEN(\begin{DoxyParamCaption}\item[{}]{desc}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__section_8h_abe92a5063c83dec8143bf685e4b4a198}{INTERNAL\_CATCH\_DYNAMIC\_SECTION}}(\ \textcolor{stringliteral}{"{}\ \ \ \ \ Then:\ "{}}\ <<\ desc\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{include_2catch_8hpp_source_l00266}{266}} of file \mbox{\hyperlink{include_2catch_8hpp_source}{catch.\+hpp}}.
+
+\Hypertarget{include_2catch_8hpp_a8dd723bbdb751f1c2f3af8c4f264b7a3}\index{catch.hpp@{catch.hpp}!UNSCOPED\_INFO@{UNSCOPED\_INFO}}
+\index{UNSCOPED\_INFO@{UNSCOPED\_INFO}!catch.hpp@{catch.hpp}}
+\doxysubsubsection{\texorpdfstring{UNSCOPED\_INFO}{UNSCOPED\_INFO}}
+{\footnotesize\ttfamily \label{include_2catch_8hpp_a8dd723bbdb751f1c2f3af8c4f264b7a3} 
+\#define UNSCOPED\+\_\+\+INFO(\begin{DoxyParamCaption}\item[{}]{msg}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__capture_8hpp_ab268c09b68167db4b163234f9934463f}{INTERNAL\_CATCH\_UNSCOPED\_INFO}}(\ \textcolor{stringliteral}{"{}UNSCOPED\_INFO"{}},\ msg\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{include_2catch_8hpp_source_l00218}{218}} of file \mbox{\hyperlink{include_2catch_8hpp_source}{catch.\+hpp}}.
+
+\Hypertarget{include_2catch_8hpp_a108d6c5c51dd46e82a62b262394f0242}\index{catch.hpp@{catch.hpp}!WARN@{WARN}}
+\index{WARN@{WARN}!catch.hpp@{catch.hpp}}
+\doxysubsubsection{\texorpdfstring{WARN}{WARN}}
+{\footnotesize\ttfamily \label{include_2catch_8hpp_a108d6c5c51dd46e82a62b262394f0242} 
+\#define WARN(\begin{DoxyParamCaption}\item[{}]{msg}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__capture_8hpp_ad1f7d83040ad9b09020dc72c57019638}{INTERNAL\_CATCH\_MSG}}(\ \textcolor{stringliteral}{"{}WARN"{}},\ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa22806493991ee90456cfbd973ae8d1ab}{Catch::ResultWas::Warning}},\ \mbox{\hyperlink{struct_catch_1_1_result_disposition_a3396cad6e2259af326b3aae93e23e9d8a5adbb8bdfe4bf14bf37cb297d8b18b64}{Catch::ResultDisposition::ContinueOnFailure}},\ msg\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{include_2catch_8hpp_source_l00219}{219}} of file \mbox{\hyperlink{include_2catch_8hpp_source}{catch.\+hpp}}.
+
+\Hypertarget{include_2catch_8hpp_ab09e9b8186233f676ce6a23aebe89d6e}\index{catch.hpp@{catch.hpp}!WHEN@{WHEN}}
+\index{WHEN@{WHEN}!catch.hpp@{catch.hpp}}
+\doxysubsubsection{\texorpdfstring{WHEN}{WHEN}}
+{\footnotesize\ttfamily \label{include_2catch_8hpp_ab09e9b8186233f676ce6a23aebe89d6e} 
+\#define WHEN(\begin{DoxyParamCaption}\item[{}]{desc}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__section_8h_abe92a5063c83dec8143bf685e4b4a198}{INTERNAL\_CATCH\_DYNAMIC\_SECTION}}(\ \textcolor{stringliteral}{"{}\ \ \ \ \ When:\ "{}}\ <<\ desc\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{include_2catch_8hpp_source_l00264}{264}} of file \mbox{\hyperlink{include_2catch_8hpp_source}{catch.\+hpp}}.
+

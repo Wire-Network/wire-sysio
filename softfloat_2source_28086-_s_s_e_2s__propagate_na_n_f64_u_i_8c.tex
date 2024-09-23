@@ -1,0 +1,62 @@
+\doxysection{libraries/softfloat/source/8086-\/\+SSE/s\+\_\+propagate\+Na\+NF64\+UI.c File Reference}
+\hypertarget{softfloat_2source_28086-_s_s_e_2s__propagate_na_n_f64_u_i_8c}{}\label{softfloat_2source_28086-_s_s_e_2s__propagate_na_n_f64_u_i_8c}\index{libraries/softfloat/source/8086-\/SSE/s\_propagateNaNF64UI.c@{libraries/softfloat/source/8086-\/SSE/s\_propagateNaNF64UI.c}}
+{\ttfamily \#include $<$stdbool.\+h$>$}\newline
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include "{}platform.\+h"{}}\newline
+{\ttfamily \#include "{}internals.\+h"{}}\newline
+{\ttfamily \#include "{}specialize.\+h"{}}\newline
+{\ttfamily \#include "{}softfloat.\+h"{}}\newline
+Include dependency graph for s\+\_\+propagate\+Na\+NF64\+UI.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{softfloat_2source_28086-_s_s_e_2s__propagate_na_n_f64_u_i_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\+\_\+fast64\+\_\+t}} \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2s__propagate_na_n_f64_u_i_8c_a665c80620cd51560528db5435b02ef34}{softfloat\+\_\+propagate\+Na\+NF64\+UI}} (\mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\+\_\+fast64\+\_\+t}} uiA, \mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\+\_\+fast64\+\_\+t}} uiB)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{softfloat_2source_28086-_s_s_e_2s__propagate_na_n_f64_u_i_8c_a665c80620cd51560528db5435b02ef34}\index{s\_propagateNaNF64UI.c@{s\_propagateNaNF64UI.c}!softfloat\_propagateNaNF64UI@{softfloat\_propagateNaNF64UI}}
+\index{softfloat\_propagateNaNF64UI@{softfloat\_propagateNaNF64UI}!s\_propagateNaNF64UI.c@{s\_propagateNaNF64UI.c}}
+\doxysubsubsection{\texorpdfstring{softfloat\_propagateNaNF64UI()}{softfloat\_propagateNaNF64UI()}}
+{\footnotesize\ttfamily \label{softfloat_2source_28086-_s_s_e_2s__propagate_na_n_f64_u_i_8c_a665c80620cd51560528db5435b02ef34} 
+\mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\+\_\+fast64\+\_\+t}} softfloat\+\_\+propagate\+Na\+NF64\+UI (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\+\_\+fast64\+\_\+t}}}]{uiA}{, }\item[{\mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\+\_\+fast64\+\_\+t}}}]{uiB}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2s__propagate_na_n_f64_u_i_8c_source_l00051}{51}} of file \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2s__propagate_na_n_f64_u_i_8c_source}{s\+\_\+propagate\+Na\+NF64\+UI.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00052\ \{}
+\DoxyCodeLine{00053\ \ \ \ \ \textcolor{keywordtype}{bool}\ isSigNaNA;}
+\DoxyCodeLine{00054\ }
+\DoxyCodeLine{00055\ \ \ \ \ isSigNaNA\ =\ \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2specialize_8h_a894f3f1fcd86adbdd3c27fa55d7f7ee1}{softfloat\_isSigNaNF64UI}}(\ uiA\ );}
+\DoxyCodeLine{00056\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ isSigNaNA\ ||\ \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2specialize_8h_a894f3f1fcd86adbdd3c27fa55d7f7ee1}{softfloat\_isSigNaNF64UI}}(\ uiB\ )\ )\ \{}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2softfloat__raise_flags_8c_ac16bbf09eca0fe8ff91301d82c5a667f}{softfloat\_raiseFlags}}(\ \mbox{\hyperlink{softfloat_2source_2include_2softfloat_8h_a56a0f36da7f9eaaf54bd05cc2bf49173a191f069090c3d33752fb728272d9a4a9}{softfloat\_flag\_invalid}}\ );}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ isSigNaNA\ )\ \textcolor{keywordflow}{return}\ uiA\ |\ \mbox{\hyperlink{stdint_8h_a8da5373e041921aa34c2b6172ac3babc}{UINT64\_C}}(\ 0x0008000000000000\ );}
+\DoxyCodeLine{00059\ \ \ \ \ \}}
+\DoxyCodeLine{00060\ \ \ \ \ \textcolor{keywordflow}{return}\ (\mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a54cf847b77be110d616ac7048c1cc0cf}{isNaNF64UI}}(\ uiA\ )\ ?\ uiA\ :\ uiB)\ |\ \mbox{\hyperlink{stdint_8h_a8da5373e041921aa34c2b6172ac3babc}{UINT64\_C}}(\ 0x0008000000000000\ );}
+\DoxyCodeLine{00061\ }
+\DoxyCodeLine{00062\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{softfloat_2source_28086-_s_s_e_2s__propagate_na_n_f64_u_i_8c_a665c80620cd51560528db5435b02ef34_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{softfloat_2source_28086-_s_s_e_2s__propagate_na_n_f64_u_i_8c_a665c80620cd51560528db5435b02ef34_icgraph}
+\end{center}
+\end{figure}

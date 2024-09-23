@@ -1,0 +1,510 @@
+\doxysection{libraries/fc/libraries/ff/depends/xbyak/xbyak/xbyak.h File Reference}
+\hypertarget{xbyak_8h}{}\label{xbyak_8h}\index{libraries/fc/libraries/ff/depends/xbyak/xbyak/xbyak.h@{libraries/fc/libraries/ff/depends/xbyak/xbyak/xbyak.h}}
+
+
+\doxylink{namespace_xbyak}{Xbyak} ; JIT assembler for x86(\+IA32)/x64 by C++.  
+
+
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$assert.\+h$>$}\newline
+{\ttfamily \#include $<$list$>$}\newline
+{\ttfamily \#include $<$string$>$}\newline
+{\ttfamily \#include $<$algorithm$>$}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$map$>$}\newline
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include "{}xbyak\+\_\+mnemonic.\+h"{}}\newline
+Include dependency graph for xbyak.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{xbyak_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{xbyak_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{class_xbyak_1_1_error}{Xbyak\+::\+Error}}
+\item 
+struct \mbox{\hyperlink{struct_xbyak_1_1_allocator}{Xbyak\+::\+Allocator}}
+\item 
+class \mbox{\hyperlink{class_xbyak_1_1_operand}{Xbyak\+::\+Operand}}
+\item 
+class \mbox{\hyperlink{class_xbyak_1_1_reg}{Xbyak\+::\+Reg}}
+\item 
+struct \mbox{\hyperlink{struct_xbyak_1_1_reg8}{Xbyak\+::\+Reg8}}
+\item 
+struct \mbox{\hyperlink{struct_xbyak_1_1_reg16}{Xbyak\+::\+Reg16}}
+\item 
+struct \mbox{\hyperlink{struct_xbyak_1_1_mmx}{Xbyak\+::\+Mmx}}
+\item 
+struct \mbox{\hyperlink{struct_xbyak_1_1_evex_modifier_rounding}{Xbyak\+::\+Evex\+Modifier\+Rounding}}
+\item 
+struct \mbox{\hyperlink{struct_xbyak_1_1_evex_modifier_zero}{Xbyak\+::\+Evex\+Modifier\+Zero}}
+\item 
+struct \mbox{\hyperlink{struct_xbyak_1_1_xmm}{Xbyak\+::\+Xmm}}
+\item 
+struct \mbox{\hyperlink{struct_xbyak_1_1_ymm}{Xbyak\+::\+Ymm}}
+\item 
+struct \mbox{\hyperlink{struct_xbyak_1_1_zmm}{Xbyak\+::\+Zmm}}
+\item 
+struct \mbox{\hyperlink{struct_xbyak_1_1_opmask}{Xbyak\+::\+Opmask}}
+\item 
+struct \mbox{\hyperlink{struct_xbyak_1_1_bounds_reg}{Xbyak\+::\+Bounds\+Reg}}
+\item 
+struct \mbox{\hyperlink{struct_xbyak_1_1_fpu}{Xbyak\+::\+Fpu}}
+\item 
+struct \mbox{\hyperlink{struct_xbyak_1_1_reg32e}{Xbyak\+::\+Reg32e}}
+\item 
+struct \mbox{\hyperlink{struct_xbyak_1_1_reg32}{Xbyak\+::\+Reg32}}
+\item 
+class \mbox{\hyperlink{class_xbyak_1_1_segment}{Xbyak\+::\+Segment}}
+\item 
+class \mbox{\hyperlink{class_xbyak_1_1_reg_exp}{Xbyak\+::\+Reg\+Exp}}
+\item 
+class \mbox{\hyperlink{class_xbyak_1_1_code_array}{Xbyak\+::\+Code\+Array}}
+\item 
+class \mbox{\hyperlink{class_xbyak_1_1_address}{Xbyak\+::\+Address}}
+\item 
+class \mbox{\hyperlink{class_xbyak_1_1_address_frame}{Xbyak\+::\+Address\+Frame}}
+\item 
+struct \mbox{\hyperlink{struct_xbyak_1_1_jmp_label}{Xbyak\+::\+Jmp\+Label}}
+\item 
+class \mbox{\hyperlink{class_xbyak_1_1_label}{Xbyak\+::\+Label}}
+\item 
+class \mbox{\hyperlink{class_xbyak_1_1_label_manager}{Xbyak\+::\+Label\+Manager}}
+\item 
+class \mbox{\hyperlink{class_xbyak_1_1_code_generator}{Xbyak\+::\+Code\+Generator}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespace_xbyak}{Xbyak}}
+\item 
+namespace \mbox{\hyperlink{namespace_xbyak_1_1inner}{Xbyak\+::inner}}
+\item 
+namespace \mbox{\hyperlink{namespace_xbyak_1_1util}{Xbyak\+::util}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{xbyak_8h_a48f00ef589af475f537a88c7dbf72cc6}{XBYAK\+\_\+\+XBYAK\+\_\+\+H\+\_\+}}
+\item 
+\#define \mbox{\hyperlink{xbyak_8h_af4e7e15709e688c37ef28a0ea1dd91ed}{XBYAK\+\_\+\+GNUC\+\_\+\+PREREQ}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a5bd4e4c943762926c8f653b6224cced2}{major}},  \mbox{\hyperlink{yubihsm__pkcs11_8c_ae2f416b0a34b7beb4ed3873d791ac393}{minor}})
+\item 
+\#define \mbox{\hyperlink{xbyak_8h_a9ed494fdf4b55debd35e085087c46bb0}{XBYAK\+\_\+\+STD\+\_\+\+UNORDERED\+\_\+\+MAP}}~std\+::map
+\item 
+\#define \mbox{\hyperlink{xbyak_8h_a76936984000af07abcdffcc85ff3d50b}{XBYAK\+\_\+\+STD\+\_\+\+UNORDERED\+\_\+\+MULTIMAP}}~std\+::multimap
+\item 
+\#define \mbox{\hyperlink{xbyak_8h_a60fc2f7fc52f5c6239712b95537626ee}{XBYAK32}}
+\item 
+\#define \mbox{\hyperlink{xbyak_8h_a89277ceb757e541fe87da15406e8a121}{MIE\+\_\+\+INTEGER\+\_\+\+TYPE\+\_\+\+DEFINED}}
+\item 
+\#define \mbox{\hyperlink{xbyak_8h_a5cef5f7b5efee59e24361929a7257baf}{MIE\+\_\+\+ALIGN}}(x)
+\item 
+\#define \mbox{\hyperlink{xbyak_8h_a5d358aeb36b3c09983242cab3982963d}{MIE\+\_\+\+PACK}}(x,  y,  z,  w)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{Xbyak\+::uint64}}
+\item 
+typedef \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{namespace_xbyak_aa801f2c4184cd7654e2033d8977e2260}{Xbyak\+::sint64}}
+\item 
+typedef unsigned int \mbox{\hyperlink{namespace_xbyak_a880d0e902046fa68ba57ae3fbc4acdf3}{Xbyak\+::uint32}}
+\item 
+typedef unsigned short \mbox{\hyperlink{namespace_xbyak_a64c25188b50730813410b77ea2c17b83}{Xbyak\+::uint16}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \{ \mbox{\hyperlink{namespace_xbyak_a280f1cb4eeabb3077bb5a8d9e6523f53af9b54a9b5d61f3ff04f90e58798b3168}{Xbyak\+::\+DEFAULT\+\_\+\+MAX\+\_\+\+CODE\+\_\+\+SIZE}} = 4096
+, \mbox{\hyperlink{namespace_xbyak_a280f1cb4eeabb3077bb5a8d9e6523f53a208fbc4575805069e050f092ec735530}{Xbyak\+::\+VERSION}} = 0x5630
+ \}
+\item 
+enum \{ \newline
+\mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a0691a78e4bdd252daa8518c00af5b308}{Xbyak\+::\+ERR\+\_\+\+NONE}} = 0
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a73b230b497459e850d1dfc4ad0019135}{Xbyak\+::\+ERR\+\_\+\+BAD\+\_\+\+ADDRESSING}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06af61b35be85f1cbb5c73e05dad24e268d}{Xbyak\+::\+ERR\+\_\+\+CODE\+\_\+\+IS\+\_\+\+TOO\+\_\+\+BIG}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a246caaa68df0ce2348c190bcd4051016}{Xbyak\+::\+ERR\+\_\+\+BAD\+\_\+\+SCALE}}
+, \newline
+\mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06ade9914e9d4ec6a6a91c632bb6a883485}{Xbyak\+::\+ERR\+\_\+\+ESP\+\_\+\+CANT\+\_\+\+BE\+\_\+\+INDEX}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06aec974bb4fc18789afc47a32374b95c03}{Xbyak\+::\+ERR\+\_\+\+BAD\+\_\+\+COMBINATION}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a22bbe3522f8ea9a5c9fbd8a8ccd2e56a}{Xbyak\+::\+ERR\+\_\+\+BAD\+\_\+\+SIZE\+\_\+\+OF\+\_\+\+REGISTER}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06abb82cfe381ef1db43e601baecf5940ce}{Xbyak\+::\+ERR\+\_\+\+IMM\+\_\+\+IS\+\_\+\+TOO\+\_\+\+BIG}}
+, \newline
+\mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06ab3fa729fb0e76c07aa55417071cbef99}{Xbyak\+::\+ERR\+\_\+\+BAD\+\_\+\+ALIGN}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a807c8aaba38133effaf36b2572c7a855}{Xbyak\+::\+ERR\+\_\+\+LABEL\+\_\+\+IS\+\_\+\+REDEFINED}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a841cce0dc70a502cc8e23604b3afb1cf}{Xbyak\+::\+ERR\+\_\+\+LABEL\+\_\+\+IS\+\_\+\+TOO\+\_\+\+FAR}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06af75e8a7dafc9d2d75a4430d22338f5ac}{Xbyak\+::\+ERR\+\_\+\+LABEL\+\_\+\+IS\+\_\+\+NOT\+\_\+\+FOUND}}
+, \newline
+\mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a7a2042cbcaa57af973493cc80904ba6c}{Xbyak\+::\+ERR\+\_\+\+CODE\+\_\+\+ISNOT\+\_\+\+COPYABLE}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06ad95586d156d26087eb10d8c0d864beab}{Xbyak\+::\+ERR\+\_\+\+BAD\+\_\+\+PARAMETER}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a96d712d0e43db4fc53fcf8823812c26b}{Xbyak\+::\+ERR\+\_\+\+CANT\+\_\+\+PROTECT}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a9b68abb796f356f5d84f14cb37774495}{Xbyak\+::\+ERR\+\_\+\+CANT\+\_\+\+USE\+\_\+64\+BIT\+\_\+\+DISP}}
+, \newline
+\mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a72d4859ae850c52756e13d0c43cca4cf}{Xbyak\+::\+ERR\+\_\+\+OFFSET\+\_\+\+IS\+\_\+\+TOO\+\_\+\+BIG}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a064d616f77f3a2226524b33c436f4bb2}{Xbyak\+::\+ERR\+\_\+\+MEM\+\_\+\+SIZE\+\_\+\+IS\+\_\+\+NOT\+\_\+\+SPECIFIED}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a76ce3adbbb43865867090a6e5762ede6}{Xbyak\+::\+ERR\+\_\+\+BAD\+\_\+\+MEM\+\_\+\+SIZE}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06aa6c5fc0cf3e60088eb2000203ae8ebd1}{Xbyak\+::\+ERR\+\_\+\+BAD\+\_\+\+ST\+\_\+\+COMBINATION}}
+, \newline
+\mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06ad8b7909a2781d00f56ac0b28cee10b3f}{Xbyak\+::\+ERR\+\_\+\+OVER\+\_\+\+LOCAL\+\_\+\+LABEL}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06afd80235203c330292c8b6a13e3528db9}{Xbyak\+::\+ERR\+\_\+\+UNDER\+\_\+\+LOCAL\+\_\+\+LABEL}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a1afca0ea4f4af630386c184bcb1a528b}{Xbyak\+::\+ERR\+\_\+\+CANT\+\_\+\+ALLOC}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a0828f53595ac517c91bda86659fda8cf}{Xbyak\+::\+ERR\+\_\+\+ONLY\+\_\+\+T\+\_\+\+NEAR\+\_\+\+IS\+\_\+\+SUPPORTED\+\_\+\+IN\+\_\+\+AUTO\+\_\+\+GROW}}
+, \newline
+\mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a0ac8c0e0b16261976cd32b6400fc177d}{Xbyak\+::\+ERR\+\_\+\+BAD\+\_\+\+PROTECT\+\_\+\+MODE}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a6c4e5038c3ea250a9bd3ce2f52db03c6}{Xbyak\+::\+ERR\+\_\+\+BAD\+\_\+\+PNUM}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06acc9627281fa3e87754e20898cc691b50}{Xbyak\+::\+ERR\+\_\+\+BAD\+\_\+\+TNUM}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a24e875a48f33f3c5596b43105423d5d7}{Xbyak\+::\+ERR\+\_\+\+BAD\+\_\+\+VSIB\+\_\+\+ADDRESSING}}
+, \newline
+\mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a2b4641b294f3f1e2bc518fbbe640313a}{Xbyak\+::\+ERR\+\_\+\+CANT\+\_\+\+CONVERT}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a7670b0b6242a1acd2176dfb48b4e3eec}{Xbyak\+::\+ERR\+\_\+\+LABEL\+\_\+\+ISNOT\+\_\+\+SET\+\_\+\+BY\+\_\+L}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06ab5cabef7104ab6d8bd964e469cc647a8}{Xbyak\+::\+ERR\+\_\+\+LABEL\+\_\+\+IS\+\_\+\+ALREADY\+\_\+\+SET\+\_\+\+BY\+\_\+L}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a1bcd0cf493398ea6d89ee4aaf7e65632}{Xbyak\+::\+ERR\+\_\+\+BAD\+\_\+\+LABEL\+\_\+\+STR}}
+, \newline
+\mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06adf0441b7061eb6668a8720e58c92726b}{Xbyak\+::\+ERR\+\_\+\+MUNMAP}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a30e9e47e0cd3323bd4cb4fad462b8dd1}{Xbyak\+::\+ERR\+\_\+\+OPMASK\+\_\+\+IS\+\_\+\+ALREADY\+\_\+\+SET}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a3e9e698e685de7ab55bce7c6d4596b36}{Xbyak\+::\+ERR\+\_\+\+ROUNDING\+\_\+\+IS\+\_\+\+ALREADY\+\_\+\+SET}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06ad0dd5d1dafb007ac290a3bba4c61c94e}{Xbyak\+::\+ERR\+\_\+\+K0\+\_\+\+IS\+\_\+\+INVALID}}
+, \newline
+\mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06aae0a0a338652bc379f4e16d0dd72336f}{Xbyak\+::\+ERR\+\_\+\+EVEX\+\_\+\+IS\+\_\+\+INVALID}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a5284baa3dd2915263452a2e63f6f3e6d}{Xbyak\+::\+ERR\+\_\+\+SAE\+\_\+\+IS\+\_\+\+INVALID}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a841852a8eda37c1cb73ab10dd5fea2a3}{Xbyak\+::\+ERR\+\_\+\+ER\+\_\+\+IS\+\_\+\+INVALID}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a0b8f8d3791d848000830f4ca37ea124f}{Xbyak\+::\+ERR\+\_\+\+INVALID\+\_\+\+BROADCAST}}
+, \newline
+\mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06adbd2b83e7cd3f27d260605d2a1be3f7a}{Xbyak\+::\+ERR\+\_\+\+INVALID\+\_\+\+OPMASK\+\_\+\+WITH\+\_\+\+MEMORY}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a96d8537d1140d96d6a1d754ecb80b27c}{Xbyak\+::\+ERR\+\_\+\+INVALID\+\_\+\+ZERO}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06afb971fce27301c591063bdb1dba9f171}{Xbyak\+::\+ERR\+\_\+\+INVALID\+\_\+\+RIP\+\_\+\+IN\+\_\+\+AUTO\+\_\+\+GROW}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a9b82c2e8f7faac37dbdc80041f8e4a88}{Xbyak\+::\+ERR\+\_\+\+INVALID\+\_\+\+MIB\+\_\+\+ADDRESS}}
+, \newline
+\mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a50843e628314f8ee441d800a933b23e3}{Xbyak\+::\+ERR\+\_\+\+INTERNAL}}
+ \}
+\item 
+enum \mbox{\hyperlink{namespace_xbyak_1_1inner_a2221874ab1bb17e045d67f76345f4f09}{Xbyak\+::inner\+::\+Label\+Mode}} \{ \mbox{\hyperlink{namespace_xbyak_1_1inner_a2221874ab1bb17e045d67f76345f4f09a41fdc2297fba7a917b15409f61e9ff96}{Xbyak\+::inner\+::\+Las\+Is}}
+, \mbox{\hyperlink{namespace_xbyak_1_1inner_a2221874ab1bb17e045d67f76345f4f09ad38ecccf9b7954629ca7c9fc2d918999}{Xbyak\+::inner\+::\+Labs}}
+, \mbox{\hyperlink{namespace_xbyak_1_1inner_a2221874ab1bb17e045d67f76345f4f09a5cf3d2ef3ae7058e6a0835fe1523db87}{Xbyak\+::inner\+::\+Ladd\+Top}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_xbyak_a0a84bc0dd9c07a922876a48add1b6b0a}{Xbyak\+::\+Convert\+Error\+To\+String}} (const \mbox{\hyperlink{class_xbyak_1_1_error}{Error}} \&err)
+\item 
+void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_xbyak_acd5e5fdfad3f9247fe1fafc147c13f02}{Xbyak\+::\+Aligned\+Malloc}} (size\+\_\+t size, size\+\_\+t alignment)
+\item 
+void \mbox{\hyperlink{namespace_xbyak_a669e145d957208c83bfa93945998a2e8}{Xbyak\+::\+Aligned\+Free}} (void \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} To , \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} From $>$ }\\const To \mbox{\hyperlink{namespace_xbyak_ad60ea5f6215534109ed45a19f413a6f0}{Xbyak\+::\+Cast\+To}} (From \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})  throw ()
+\item 
+bool \mbox{\hyperlink{namespace_xbyak_1_1inner_afde48a33ad6ab225697e7248d28f939d}{Xbyak\+::inner\+::\+Is\+In\+Disp8}} (\mbox{\hyperlink{namespace_xbyak_a880d0e902046fa68ba57ae3fbc4acdf3}{uint32}} x)
+\item 
+bool \mbox{\hyperlink{namespace_xbyak_1_1inner_aa76d5f810af4c3069075ca2c93f8b896}{Xbyak\+::inner\+::\+Is\+In\+Int32}} (\mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}} x)
+\item 
+\mbox{\hyperlink{namespace_xbyak_a880d0e902046fa68ba57ae3fbc4acdf3}{uint32}} \mbox{\hyperlink{namespace_xbyak_1_1inner_a12e10e9b0005119235ddfc06b36dd55a}{Xbyak\+::inner\+::\+Verify\+In\+Int32}} (\mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}} x)
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{namespace_xbyak_ac2775aa479d15e5706271fe108ea5b1e}{Xbyak\+::operator\texorpdfstring{$\vert$}{|}}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&x, const \mbox{\hyperlink{struct_xbyak_1_1_opmask}{Opmask}} \&k)
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{namespace_xbyak_adedf5a47759006b2a8b58dc3566bcfe8}{Xbyak\+::operator\texorpdfstring{$\vert$}{|}}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&x, const \mbox{\hyperlink{struct_xbyak_1_1_evex_modifier_zero}{Evex\+Modifier\+Zero}} \&)
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{namespace_xbyak_adc8f16489a1ae9cbb86c3c95bcd170e2}{Xbyak\+::operator\texorpdfstring{$\vert$}{|}}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&x, const \mbox{\hyperlink{struct_xbyak_1_1_evex_modifier_rounding}{Evex\+Modifier\+Rounding}} \&emr)
+\item 
+\mbox{\hyperlink{class_xbyak_1_1_reg_exp}{Reg\+Exp}} \mbox{\hyperlink{namespace_xbyak_ad3279dbafd16eb38b9d9663820f08967}{Xbyak\+::operator+}} (const \mbox{\hyperlink{class_xbyak_1_1_reg_exp}{Reg\+Exp}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, const \mbox{\hyperlink{class_xbyak_1_1_reg_exp}{Reg\+Exp}} \&b)
+\item 
+\mbox{\hyperlink{class_xbyak_1_1_reg_exp}{Reg\+Exp}} \mbox{\hyperlink{namespace_xbyak_a53137b1404584ccb48ab44b7b30e5862}{Xbyak\+::operator\texorpdfstring{$\ast$}{*}}} (const \mbox{\hyperlink{class_xbyak_1_1_reg}{Reg}} \&\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}, int scale)
+\item 
+\mbox{\hyperlink{class_xbyak_1_1_reg_exp}{Reg\+Exp}} \mbox{\hyperlink{namespace_xbyak_a12d73a75b2efac72e5f7fc5c7fc889c6}{Xbyak\+::operator-\/}} (const \mbox{\hyperlink{class_xbyak_1_1_reg_exp}{Reg\+Exp}} \&e, size\+\_\+t disp)
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_mmx}{Mmx}} \mbox{\hyperlink{namespace_xbyak_1_1util_a1020f46d7164a2b600d9c5686dbc4b00}{Xbyak\+::util\+::mm1}} (1)
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_mmx}{Mmx}} \mbox{\hyperlink{namespace_xbyak_1_1util_a4636f680ae83228993ddafb41a4388c8}{Xbyak\+::util\+::mm2}} (2)
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_mmx}{Mmx}} \mbox{\hyperlink{namespace_xbyak_1_1util_acc2790c52a03324a302506061cefe617}{Xbyak\+::util\+::mm3}} (3)
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_mmx}{Mmx}} \mbox{\hyperlink{namespace_xbyak_1_1util_a64beb072323c61132f7166ae3cda7c55}{Xbyak\+::util\+::mm4}} (4)
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_mmx}{Mmx}} \mbox{\hyperlink{namespace_xbyak_1_1util_a3ec63c3e560f9abfed0a13cd5b481835}{Xbyak\+::util\+::mm5}} (5)
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_mmx}{Mmx}} \mbox{\hyperlink{namespace_xbyak_1_1util_a8342dfca06c508700857289033cfc50b}{Xbyak\+::util\+::mm6}} (6)
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_mmx}{Mmx}} \mbox{\hyperlink{namespace_xbyak_1_1util_a0a4aae771434c7986c695c59a18a9609}{Xbyak\+::util\+::mm7}} (7)
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_xmm}{Xmm}} \mbox{\hyperlink{namespace_xbyak_1_1util_a2a2c59351e588d0a7576034517d8c421}{Xbyak\+::util\+::xmm1}} (1)
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_xmm}{Xmm}} \mbox{\hyperlink{namespace_xbyak_1_1util_aafbc9009bf969915d0414b30bcdd2a23}{Xbyak\+::util\+::xmm2}} (2)
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_xmm}{Xmm}} \mbox{\hyperlink{namespace_xbyak_1_1util_ad814f09801af8e48d47b81b52d893e72}{Xbyak\+::util\+::xmm3}} (3)
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_xmm}{Xmm}} \mbox{\hyperlink{namespace_xbyak_1_1util_ae5ef2a331c055ad5f05cfc0d22a34dd8}{Xbyak\+::util\+::xmm4}} (4)
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_xmm}{Xmm}} \mbox{\hyperlink{namespace_xbyak_1_1util_a941e838ab814decd05287d97b1645233}{Xbyak\+::util\+::xmm5}} (5)
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_xmm}{Xmm}} \mbox{\hyperlink{namespace_xbyak_1_1util_a45eda33af925d6ed4092d5a7ddf3f667}{Xbyak\+::util\+::xmm6}} (6)
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_xmm}{Xmm}} \mbox{\hyperlink{namespace_xbyak_1_1util_a227e288082f1982becff9184b66c2a06}{Xbyak\+::util\+::xmm7}} (7)
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_ymm}{Ymm}} \mbox{\hyperlink{namespace_xbyak_1_1util_a3a81c26845d1ce493a6e4af165bcd83d}{Xbyak\+::util\+::ymm1}} (1)
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_ymm}{Ymm}} \mbox{\hyperlink{namespace_xbyak_1_1util_a25220f30d0d56068b823b11dd73f0532}{Xbyak\+::util\+::ymm2}} (2)
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_ymm}{Ymm}} \mbox{\hyperlink{namespace_xbyak_1_1util_a832b1622b7a92db2cbec71ba283fb6d0}{Xbyak\+::util\+::ymm3}} (3)
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_ymm}{Ymm}} \mbox{\hyperlink{namespace_xbyak_1_1util_add3871653c4102066115f735f9a525e5}{Xbyak\+::util\+::ymm4}} (4)
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_ymm}{Ymm}} \mbox{\hyperlink{namespace_xbyak_1_1util_ad71bef8ac035981fb4bca827feed12bd}{Xbyak\+::util\+::ymm5}} (5)
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_ymm}{Ymm}} \mbox{\hyperlink{namespace_xbyak_1_1util_a84b83056b54ba001d37f577d6e13f468}{Xbyak\+::util\+::ymm6}} (6)
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_ymm}{Ymm}} \mbox{\hyperlink{namespace_xbyak_1_1util_aaf52ad3e377ecd460dc3aa7d0c895f3e}{Xbyak\+::util\+::ymm7}} (7)
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_zmm}{Zmm}} \mbox{\hyperlink{namespace_xbyak_1_1util_a0861e2479095dbac17bf69fac4baa8c5}{Xbyak\+::util\+::zmm1}} (1)
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_zmm}{Zmm}} \mbox{\hyperlink{namespace_xbyak_1_1util_a758d51aacb5df68f0ba0bd992339a68a}{Xbyak\+::util\+::zmm2}} (2)
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_zmm}{Zmm}} \mbox{\hyperlink{namespace_xbyak_1_1util_afd3c9b99f268dd75b9be29bc32ccc32a}{Xbyak\+::util\+::zmm3}} (3)
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_zmm}{Zmm}} \mbox{\hyperlink{namespace_xbyak_1_1util_a98a44facdba9d30a5e0c205e4f20f48b}{Xbyak\+::util\+::zmm4}} (4)
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_zmm}{Zmm}} \mbox{\hyperlink{namespace_xbyak_1_1util_af6656acd7fa79829dfc9d42945391dc0}{Xbyak\+::util\+::zmm5}} (5)
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_zmm}{Zmm}} \mbox{\hyperlink{namespace_xbyak_1_1util_a050c714e5135d97e0afa2c46798c7e8a}{Xbyak\+::util\+::zmm6}} (6)
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_zmm}{Zmm}} \mbox{\hyperlink{namespace_xbyak_1_1util_a8b62b7090c4268d63f04ee47bd994d60}{Xbyak\+::util\+::zmm7}} (7)
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_reg32}{Reg32}} \mbox{\hyperlink{namespace_xbyak_1_1util_a581771969549e584184da12296fc3688}{Xbyak\+::util\+::ecx}} (\mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a0633f76397deb9e17330a08c7b410a8c}{Operand\+::\+ECX}})
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_reg32}{Reg32}} \mbox{\hyperlink{namespace_xbyak_1_1util_a725c307c821a7e14594f383a190d3990}{Xbyak\+::util\+::edx}} (\mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a8726c2f76163e0f35d2601750be37f12}{Operand\+::\+EDX}})
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_reg32}{Reg32}} \mbox{\hyperlink{namespace_xbyak_1_1util_aafa2e2c588e40db113891dc885a176ca}{Xbyak\+::util\+::ebx}} (\mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846ae4800c083bb2d2a087da1ff14990079a}{Operand\+::\+EBX}})
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_reg32}{Reg32}} \mbox{\hyperlink{namespace_xbyak_1_1util_a4737b53696965bcf85f05d7f2149970c}{Xbyak\+::util\+::esp}} (\mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a1027bc617f8f52395078e43b96d0bb5a}{Operand\+::\+ESP}})
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_reg32}{Reg32}} \mbox{\hyperlink{namespace_xbyak_1_1util_a331e2f6421b03ac808186ca056a62188}{Xbyak\+::util\+::ebp}} (\mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a47841e8c6ddcbad4f6ae4f437857e31d}{Operand\+::\+EBP}})
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_reg32}{Reg32}} \mbox{\hyperlink{namespace_xbyak_1_1util_ae4e9557620cc128278602fb7df6cca3a}{Xbyak\+::util\+::esi}} (\mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846aae18a2d599bea597e539fd7e1fb415cb}{Operand\+::\+ESI}})
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_reg32}{Reg32}} \mbox{\hyperlink{namespace_xbyak_1_1util_a64df810e1ca8a2eeb7638a1f941898f2}{Xbyak\+::util\+::edi}} (\mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846ae11bd14e6dd6ca1cb53693b4c2cd361e}{Operand\+::\+EDI}})
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_reg16}{Reg16}} \mbox{\hyperlink{namespace_xbyak_1_1util_aaa84ee98aa671172776c8473a9837472}{Xbyak\+::util\+::cx}} (\mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846af7097c7ec6f30389c72b0c6ac4f0a3d5}{Operand\+::\+CX}})
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_reg16}{Reg16}} \mbox{\hyperlink{namespace_xbyak_1_1util_a4b8a19bdaf2eb41759fdce5ab74aaa57}{Xbyak\+::util\+::dx}} (\mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846aa156e6e53bc2fd23aa8861a62e82f6b9}{Operand\+::\+DX}})
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_reg16}{Reg16}} \mbox{\hyperlink{namespace_xbyak_1_1util_ad6f3208a93d9b15fe6a6444b395862de}{Xbyak\+::util\+::bx}} (\mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a6d365ab314220693f54e50c007cfd754}{Operand\+::\+BX}})
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_reg16}{Reg16}} \mbox{\hyperlink{namespace_xbyak_1_1util_a9589ac8435a111d7f6b850217829e34c}{Xbyak\+::util\+::sp}} (\mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846ad64ca664228a615bd9ac634ec75c8298}{Operand\+::\+SP}})
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_reg16}{Reg16}} \mbox{\hyperlink{namespace_xbyak_1_1util_aa8a7e90a7fce7c382d20fa2a7895cda3}{Xbyak\+::util\+::bp}} (\mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a4b2755d2928db8d373758329652cc304}{Operand\+::\+BP}})
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_reg16}{Reg16}} \mbox{\hyperlink{namespace_xbyak_1_1util_a88ef5e8c539d624fe3082867208a05dc}{Xbyak\+::util\+::si}} (\mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846af7751921bd4a1b1a8e71d324cf259465}{Operand\+::\+SI}})
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_reg16}{Reg16}} \mbox{\hyperlink{namespace_xbyak_1_1util_a7fa42f3e2afda6ec4ebfce9056473c3c}{Xbyak\+::util\+::di}} (\mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846ad258a74b07663cf87b60db9f8d1c434b}{Operand\+::\+DI}})
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_reg8}{Reg8}} \mbox{\hyperlink{namespace_xbyak_1_1util_ac259fefa5467728caa0fc5a324c3d988}{Xbyak\+::util\+::cl}} (\mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a5fbb58c96231af5a3c9f1020f3e1373f}{Operand\+::\+CL}})
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_reg8}{Reg8}} \mbox{\hyperlink{namespace_xbyak_1_1util_a0f92d0a6d618816da82cb44c83f483ac}{Xbyak\+::util\+::dl}} (\mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a2df878df007d2207b8ea47f51ae867cb}{Operand\+::\+DL}})
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_reg8}{Reg8}} \mbox{\hyperlink{namespace_xbyak_1_1util_ab5af29f4e1d45ee51da87d37853590ef}{Xbyak\+::util\+::bl}} (\mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a3fd98f8da96f6918a6b872184444434a}{Operand\+::\+BL}})
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_reg8}{Reg8}} \mbox{\hyperlink{namespace_xbyak_1_1util_a51683cb384b04e24a645aa7151ac3cf8}{Xbyak\+::util\+::ah}} (\mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a7ed297782033727d617c17eacbd7f286}{Operand\+::\+AH}})
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_reg8}{Reg8}} \mbox{\hyperlink{namespace_xbyak_1_1util_a36c093c7b6cc66981a18fcbfebc2a225}{Xbyak\+::util\+::ch}} (\mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a1d9d0e733e8f9f0096bda6b23dd4145c}{Operand\+::\+CH}})
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_reg8}{Reg8}} \mbox{\hyperlink{namespace_xbyak_1_1util_a89660b620585363990da7271238c3d7f}{Xbyak\+::util\+::dh}} (\mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846ade9d568528a9b679fc4885ebf0ecaa88}{Operand\+::\+DH}})
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_reg8}{Reg8}} \mbox{\hyperlink{namespace_xbyak_1_1util_a9e90a2a9ab98a5658ae7b19641255d87}{Xbyak\+::util\+::bh}} (\mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846aebbcac94094b13a323ac2e1f327ba12e}{Operand\+::\+BH}})
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1_address_frame}{Address\+Frame}} \mbox{\hyperlink{namespace_xbyak_1_1util_aa32c2b65ee9fdc28f9ef245092e96352}{Xbyak\+::util\+::byte}} (8)
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1_address_frame}{Address\+Frame}} \mbox{\hyperlink{namespace_xbyak_1_1util_af9be2c9309c2ba27ab0b7dc29bd13e1c}{Xbyak\+::util\+::word}} (16)
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1_address_frame}{Address\+Frame}} \mbox{\hyperlink{namespace_xbyak_1_1util_a72ea8bd9de8e7a99f24a7f6e887d5a24}{Xbyak\+::util\+::dword}} (32)
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1_address_frame}{Address\+Frame}} \mbox{\hyperlink{namespace_xbyak_1_1util_a74b8f5251eda0c3dea8e8dd18384d5e5}{Xbyak\+::util\+::qword}} (64)
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1_address_frame}{Address\+Frame}} \mbox{\hyperlink{namespace_xbyak_1_1util_a9746e30650428b68246a5bd4656dfadf}{Xbyak\+::util\+::xword}} (128)
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1_address_frame}{Address\+Frame}} \mbox{\hyperlink{namespace_xbyak_1_1util_a18d80e3b4cfabe1e0e0145860d561a19}{Xbyak\+::util\+::yword}} (256)
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1_address_frame}{Address\+Frame}} \mbox{\hyperlink{namespace_xbyak_1_1util_ad2a15ecb8af8816514f22755b5b61d5d}{Xbyak\+::util\+::zword}} (512)
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1_address_frame}{Address\+Frame}} \mbox{\hyperlink{namespace_xbyak_1_1util_a743e68ec4242e31526364bf12278b045}{Xbyak\+::util\+::xword\+\_\+b}} (128, true)
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1_address_frame}{Address\+Frame}} \mbox{\hyperlink{namespace_xbyak_1_1util_aea31deb14fc16b5415757b475227a08c}{Xbyak\+::util\+::yword\+\_\+b}} (256, true)
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1_address_frame}{Address\+Frame}} \mbox{\hyperlink{namespace_xbyak_1_1util_a2b640f87aa4787306f5a7fbe55d8bb14}{Xbyak\+::util\+::zword\+\_\+b}} (512, true)
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_fpu}{Fpu}} \mbox{\hyperlink{namespace_xbyak_1_1util_a1367bf9c206f37c767776c6194c75f37}{Xbyak\+::util\+::st1}} (1)
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_fpu}{Fpu}} \mbox{\hyperlink{namespace_xbyak_1_1util_af5e620fb26e86747d29f6f0e1c866bdf}{Xbyak\+::util\+::st2}} (2)
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_fpu}{Fpu}} \mbox{\hyperlink{namespace_xbyak_1_1util_a454f544ea97401db74a8acc285f37253}{Xbyak\+::util\+::st3}} (3)
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_fpu}{Fpu}} \mbox{\hyperlink{namespace_xbyak_1_1util_a8569777c2aa43812a67a7167d91f2ae4}{Xbyak\+::util\+::st4}} (4)
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_fpu}{Fpu}} \mbox{\hyperlink{namespace_xbyak_1_1util_a1f3eb7a18e84f030e09275c0f9860efd}{Xbyak\+::util\+::st5}} (5)
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_fpu}{Fpu}} \mbox{\hyperlink{namespace_xbyak_1_1util_a3db4006c231b01097edce9999d29fab2}{Xbyak\+::util\+::st6}} (6)
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_fpu}{Fpu}} \mbox{\hyperlink{namespace_xbyak_1_1util_a1cb85e2b3545521dce84fb842f0053f3}{Xbyak\+::util\+::st7}} (7)
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_opmask}{Opmask}} \mbox{\hyperlink{namespace_xbyak_1_1util_af8470854aa90939d4da91289ed794592}{Xbyak\+::util\+::k1}} (1)
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_opmask}{Opmask}} \mbox{\hyperlink{namespace_xbyak_1_1util_ac0dde280b7bdf628e0817e4e7cf0a11f}{Xbyak\+::util\+::k2}} (2)
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_opmask}{Opmask}} \mbox{\hyperlink{namespace_xbyak_1_1util_a5c5fe0d5d511a86937012247ec0141dc}{Xbyak\+::util\+::k3}} (3)
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_opmask}{Opmask}} \mbox{\hyperlink{namespace_xbyak_1_1util_aa1885fef6531ac0218c592d1fa30ee51}{Xbyak\+::util\+::k4}} (4)
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_opmask}{Opmask}} \mbox{\hyperlink{namespace_xbyak_1_1util_afb3155f1fe45b95b432f5966e8833ea0}{Xbyak\+::util\+::k5}} (5)
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_opmask}{Opmask}} \mbox{\hyperlink{namespace_xbyak_1_1util_a3a06082d1ebe0a821dd1014f6815f25b}{Xbyak\+::util\+::k6}} (6)
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_opmask}{Opmask}} \mbox{\hyperlink{namespace_xbyak_1_1util_a44fc1132ca2332573108400b8544ff02}{Xbyak\+::util\+::k7}} (7)
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_bounds_reg}{Bounds\+Reg}} \mbox{\hyperlink{namespace_xbyak_1_1util_ab7c4310b3fadf478769bc0c72b635f6c}{Xbyak\+::util\+::bnd1}} (1)
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_bounds_reg}{Bounds\+Reg}} \mbox{\hyperlink{namespace_xbyak_1_1util_a87961d2a3d968bb16979086a3499bcbd}{Xbyak\+::util\+::bnd2}} (2)
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_bounds_reg}{Bounds\+Reg}} \mbox{\hyperlink{namespace_xbyak_1_1util_a955d70b320f21ef7ec3070ffdd842c10}{Xbyak\+::util\+::bnd3}} (3)
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_evex_modifier_rounding}{Evex\+Modifier\+Rounding}} \mbox{\hyperlink{namespace_xbyak_1_1util_a4d87aa8f3dfce3d73499b16dba61b8ad}{Xbyak\+::util\+::\+T\+\_\+rn\+\_\+sae}} (\mbox{\hyperlink{struct_xbyak_1_1_evex_modifier_rounding_a91f6cf8dbb901c3a0e769acab1b410b7a0ce3ab0da4f931c1096d9082d76a8d75}{Evex\+Modifier\+Rounding\+::\+T\+\_\+\+RN\+\_\+\+SAE}})
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_evex_modifier_rounding}{Evex\+Modifier\+Rounding}} \mbox{\hyperlink{namespace_xbyak_1_1util_a0e77bdf548a53dd05da329a18a699c4b}{Xbyak\+::util\+::\+T\+\_\+rd\+\_\+sae}} (\mbox{\hyperlink{struct_xbyak_1_1_evex_modifier_rounding_a91f6cf8dbb901c3a0e769acab1b410b7a0a83998720f4667ea369f03d8eeb67b6}{Evex\+Modifier\+Rounding\+::\+T\+\_\+\+RD\+\_\+\+SAE}})
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_evex_modifier_rounding}{Evex\+Modifier\+Rounding}} \mbox{\hyperlink{namespace_xbyak_1_1util_ac7f602b9c00e9d08bbaa0ab2ae01db4c}{Xbyak\+::util\+::\+T\+\_\+ru\+\_\+sae}} (\mbox{\hyperlink{struct_xbyak_1_1_evex_modifier_rounding_a91f6cf8dbb901c3a0e769acab1b410b7ac1c45ba78e9177ebea0d4c5fc276c37e}{Evex\+Modifier\+Rounding\+::\+T\+\_\+\+RU\+\_\+\+SAE}})
+\item 
+static const \mbox{\hyperlink{struct_xbyak_1_1_evex_modifier_rounding}{Evex\+Modifier\+Rounding}} \mbox{\hyperlink{namespace_xbyak_1_1util_a5aeae754dd0a3c29cb0151553c9386ac}{Xbyak\+::util\+::\+T\+\_\+rz\+\_\+sae}} (\mbox{\hyperlink{struct_xbyak_1_1_evex_modifier_rounding_a91f6cf8dbb901c3a0e769acab1b410b7a2dc408fd95dd373ab87378f9873642a5}{Evex\+Modifier\+Rounding\+::\+T\+\_\+\+RZ\+\_\+\+SAE}})
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1_segment}{Segment}} \mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{Xbyak\+::util\+::cs}} (Segment\+::cs)
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1_segment}{Segment}} \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{Xbyak\+::util\+::ss}} (Segment\+::ss)
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1_segment}{Segment}} \mbox{\hyperlink{namespace_xbyak_1_1util_a4b2aef26182d21706896022467868f7c}{Xbyak\+::util\+::ds}} (Segment\+::ds)
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1_segment}{Segment}} \mbox{\hyperlink{namespace_xbyak_1_1util_a15900ed04e2e3994c89596ee26c4462b}{Xbyak\+::util\+::fs}} (Segment\+::fs)
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1_segment}{Segment}} \mbox{\hyperlink{namespace_xbyak_1_1util_a051ad68b75c300988da81d4804273b56}{Xbyak\+::util\+::gs}} (Segment\+::gs)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+void \texorpdfstring{$\ast$}{*}const \mbox{\hyperlink{namespace_xbyak_ad5e0c45dcb6452fbb134519d796b0991}{Xbyak\+::\+Auto\+Grow}} = (void\texorpdfstring{$\ast$}{*})1
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\begin{DoxyAuthor}{Author}
+herumi @url \href{https://github.com/herumi/xbyak}{\texttt{ https\+://github.\+com/herumi/xbyak}} 
+\end{DoxyAuthor}
+\begin{DoxyNote}{Note}
+modified new BSD license \href{http://opensource.org/licenses/BSD-3-Clause}{\texttt{ http\+://opensource.\+org/licenses/\+BSD-\/3-\/\+Clause}} 
+\end{DoxyNote}
+
+
+Definition in file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{xbyak_8h_a5cef5f7b5efee59e24361929a7257baf}\index{xbyak.h@{xbyak.h}!MIE\_ALIGN@{MIE\_ALIGN}}
+\index{MIE\_ALIGN@{MIE\_ALIGN}!xbyak.h@{xbyak.h}}
+\doxysubsubsection{\texorpdfstring{MIE\_ALIGN}{MIE\_ALIGN}}
+{\footnotesize\ttfamily \label{xbyak_8h_a5cef5f7b5efee59e24361929a7257baf} 
+\#define MIE\+\_\+\+ALIGN(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\_\_attribute\_\_((aligned(x)))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00129}{129}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+\Hypertarget{xbyak_8h_a89277ceb757e541fe87da15406e8a121}\index{xbyak.h@{xbyak.h}!MIE\_INTEGER\_TYPE\_DEFINED@{MIE\_INTEGER\_TYPE\_DEFINED}}
+\index{MIE\_INTEGER\_TYPE\_DEFINED@{MIE\_INTEGER\_TYPE\_DEFINED}!xbyak.h@{xbyak.h}}
+\doxysubsubsection{\texorpdfstring{MIE\_INTEGER\_TYPE\_DEFINED}{MIE\_INTEGER\_TYPE\_DEFINED}}
+{\footnotesize\ttfamily \label{xbyak_8h_a89277ceb757e541fe87da15406e8a121} 
+\#define MIE\+\_\+\+INTEGER\+\_\+\+TYPE\+\_\+\+DEFINED}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00112}{112}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+\Hypertarget{xbyak_8h_a5d358aeb36b3c09983242cab3982963d}\index{xbyak.h@{xbyak.h}!MIE\_PACK@{MIE\_PACK}}
+\index{MIE\_PACK@{MIE\_PACK}!xbyak.h@{xbyak.h}}
+\doxysubsubsection{\texorpdfstring{MIE\_PACK}{MIE\_PACK}}
+{\footnotesize\ttfamily \label{xbyak_8h_a5d358aeb36b3c09983242cab3982963d} 
+\#define MIE\+\_\+\+PACK(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{, }\item[{}]{z}{, }\item[{}]{w}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x)\ *\ 64\ +\ (y)\ *\ 16\ +\ (z)\ *\ 4\ +\ (w))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00133}{133}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+\Hypertarget{xbyak_8h_a60fc2f7fc52f5c6239712b95537626ee}\index{xbyak.h@{xbyak.h}!XBYAK32@{XBYAK32}}
+\index{XBYAK32@{XBYAK32}!xbyak.h@{xbyak.h}}
+\doxysubsubsection{\texorpdfstring{XBYAK32}{XBYAK32}}
+{\footnotesize\ttfamily \label{xbyak_8h_a60fc2f7fc52f5c6239712b95537626ee} 
+\#define XBYAK32}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00088}{88}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+\Hypertarget{xbyak_8h_af4e7e15709e688c37ef28a0ea1dd91ed}\index{xbyak.h@{xbyak.h}!XBYAK\_GNUC\_PREREQ@{XBYAK\_GNUC\_PREREQ}}
+\index{XBYAK\_GNUC\_PREREQ@{XBYAK\_GNUC\_PREREQ}!xbyak.h@{xbyak.h}}
+\doxysubsubsection{\texorpdfstring{XBYAK\_GNUC\_PREREQ}{XBYAK\_GNUC\_PREREQ}}
+{\footnotesize\ttfamily \label{xbyak_8h_af4e7e15709e688c37ef28a0ea1dd91ed} 
+\#define XBYAK\+\_\+\+GNUC\+\_\+\+PREREQ(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{yubihsm__pkcs11_8c_a5bd4e4c943762926c8f653b6224cced2}{major}}}{, }\item[{}]{\mbox{\hyperlink{yubihsm__pkcs11_8c_ae2f416b0a34b7beb4ed3873d791ac393}{minor}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{0}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00037}{37}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+\Hypertarget{xbyak_8h_a9ed494fdf4b55debd35e085087c46bb0}\index{xbyak.h@{xbyak.h}!XBYAK\_STD\_UNORDERED\_MAP@{XBYAK\_STD\_UNORDERED\_MAP}}
+\index{XBYAK\_STD\_UNORDERED\_MAP@{XBYAK\_STD\_UNORDERED\_MAP}!xbyak.h@{xbyak.h}}
+\doxysubsubsection{\texorpdfstring{XBYAK\_STD\_UNORDERED\_MAP}{XBYAK\_STD\_UNORDERED\_MAP}}
+{\footnotesize\ttfamily \label{xbyak_8h_a9ed494fdf4b55debd35e085087c46bb0} 
+\#define XBYAK\+\_\+\+STD\+\_\+\+UNORDERED\+\_\+\+MAP~std\+::map}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00063}{63}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+\Hypertarget{xbyak_8h_a76936984000af07abcdffcc85ff3d50b}\index{xbyak.h@{xbyak.h}!XBYAK\_STD\_UNORDERED\_MULTIMAP@{XBYAK\_STD\_UNORDERED\_MULTIMAP}}
+\index{XBYAK\_STD\_UNORDERED\_MULTIMAP@{XBYAK\_STD\_UNORDERED\_MULTIMAP}!xbyak.h@{xbyak.h}}
+\doxysubsubsection{\texorpdfstring{XBYAK\_STD\_UNORDERED\_MULTIMAP}{XBYAK\_STD\_UNORDERED\_MULTIMAP}}
+{\footnotesize\ttfamily \label{xbyak_8h_a76936984000af07abcdffcc85ff3d50b} 
+\#define XBYAK\+\_\+\+STD\+\_\+\+UNORDERED\+\_\+\+MULTIMAP~std\+::multimap}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00064}{64}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+\Hypertarget{xbyak_8h_a48f00ef589af475f537a88c7dbf72cc6}\index{xbyak.h@{xbyak.h}!XBYAK\_XBYAK\_H\_@{XBYAK\_XBYAK\_H\_}}
+\index{XBYAK\_XBYAK\_H\_@{XBYAK\_XBYAK\_H\_}!xbyak.h@{xbyak.h}}
+\doxysubsubsection{\texorpdfstring{XBYAK\_XBYAK\_H\_}{XBYAK\_XBYAK\_H\_}}
+{\footnotesize\ttfamily \label{xbyak_8h_a48f00ef589af475f537a88c7dbf72cc6} 
+\#define XBYAK\+\_\+\+XBYAK\+\_\+\+H\+\_\+}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00003}{3}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+

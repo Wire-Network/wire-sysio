@@ -1,0 +1,417 @@
+\doxysection{parser.\+hpp}
+\hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source}{}\label{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source}\index{libraries/fc/vendor/websocketpp/websocketpp/http/parser.hpp@{libraries/fc/vendor/websocketpp/websocketpp/http/parser.hpp}}
+\mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2014,\ Peter\ Thorson.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00004}00004\ \textcolor{comment}{\ *\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00005}00005\ \textcolor{comment}{\ *\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are\ met:}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00006}00006\ \textcolor{comment}{\ *\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00007}00007\ \textcolor{comment}{\ *\ \ \ \ \ \ \ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00008}00008\ \textcolor{comment}{\ *\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00009}00009\ \textcolor{comment}{\ *\ \ \ \ \ \ \ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer\ in\ the}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00010}00010\ \textcolor{comment}{\ *\ \ \ \ \ \ \ documentation\ and/or\ other\ materials\ provided\ with\ the\ distribution.}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00011}00011\ \textcolor{comment}{\ *\ \ \ \ \ *\ Neither\ the\ name\ of\ the\ WebSocket++\ Project\ nor\ the}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00012}00012\ \textcolor{comment}{\ *\ \ \ \ \ \ \ names\ of\ its\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00013}00013\ \textcolor{comment}{\ *\ \ \ \ \ \ \ derived\ from\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00014}00014\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00015}00015\ \textcolor{comment}{\ *\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS\ "{}AS\ IS"{}}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00016}00016\ \textcolor{comment}{\ *\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ THE}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00017}00017\ \textcolor{comment}{\ *\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR\ A\ PARTICULAR\ PURPOSE}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00018}00018\ \textcolor{comment}{\ *\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ PETER\ THORSON\ BE\ LIABLE\ FOR\ ANY}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00019}00019\ \textcolor{comment}{\ *\ DIRECT,\ INDIRECT,\ INCIDENTAL,\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00020}00020\ \textcolor{comment}{\ *\ (INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00021}00021\ \textcolor{comment}{\ *\ LOSS\ OF\ USE,\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00022}00022\ \textcolor{comment}{\ *\ ON\ ANY\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00023}00023\ \textcolor{comment}{\ *\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE\ OF\ THIS}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00024}00024\ \textcolor{comment}{\ *\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00025}00025\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00026}00026\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00028}00028\ \textcolor{preprocessor}{\#ifndef\ HTTP\_PARSER\_HPP}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00029}00029\ \textcolor{preprocessor}{\#define\ HTTP\_PARSER\_HPP}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00031}00031\ \textcolor{preprocessor}{\#include\ <algorithm>}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00032}00032\ \textcolor{preprocessor}{\#include\ <map>}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00033}00033\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00034}00034\ \textcolor{preprocessor}{\#include\ <utility>}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00036}00036\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{utilities_8hpp}{websocketpp/utilities.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00037}00037\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2constants_8hpp}{websocketpp/http/constants.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00039}00039\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacewebsocketpp}{websocketpp}}\ \{}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00040}00040\ \textcolor{keyword}{namespace\ }http\ \{}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00041}00041\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceupload_af9e508d19dc2dd9cdb7c642dde0bdd21}{parser}}\ \{}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00043}\mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1state}{00043}}\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{structstate}{state}}\ \{}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00044}\mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1state_a12f378e0c6dbf373781e7988ee4a0853}{00044}}\ \ \ \ \ \textcolor{keyword}{enum}\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1state_a12f378e0c6dbf373781e7988ee4a0853}{value}}\ \{}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00045}\mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1state_a12f378e0c6dbf373781e7988ee4a0853a808f25179e5ccace33050c0f65571dee}{00045}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1state_a12f378e0c6dbf373781e7988ee4a0853a808f25179e5ccace33050c0f65571dee}{method}},}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00046}\mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1state_a12f378e0c6dbf373781e7988ee4a0853a2d924502c35c713b76e006eed381b5f9}{00046}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1state_a12f378e0c6dbf373781e7988ee4a0853a2d924502c35c713b76e006eed381b5f9}{resource}},}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00047}\mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1state_a12f378e0c6dbf373781e7988ee4a0853a08c88a938bc459c7997b48f74248752f}{00047}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1state_a12f378e0c6dbf373781e7988ee4a0853a08c88a938bc459c7997b48f74248752f}{version}},}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1state_a12f378e0c6dbf373781e7988ee4a0853aedc0802bf79725cb1bface3aabff7296}{headers}}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00049}\mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1state_a12f378e0c6dbf373781e7988ee4a0853aedc0802bf79725cb1bface3aabff7296}{00049}}\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00050}00050\ \}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00052}\mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1body__encoding}{00052}}\ \textcolor{keyword}{namespace\ }body\_encoding\ \{}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00053}\mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1body__encoding_a489de0413246f2f6d2d6a6605af16653}{00053}}\ \ \ \ \ \textcolor{keyword}{enum}\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1body__encoding_a489de0413246f2f6d2d6a6605af16653}{value}}\ \{}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00054}\mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1body__encoding_a489de0413246f2f6d2d6a6605af16653ac8ecc94a1f7b48372ee0e3b1d4f56aee}{00054}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1body__encoding_a489de0413246f2f6d2d6a6605af16653ac8ecc94a1f7b48372ee0e3b1d4f56aee}{unknown}},}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00055}\mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1body__encoding_a489de0413246f2f6d2d6a6605af16653a4944f60330d88e9721ffff0aa499e243}{00055}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1body__encoding_a489de0413246f2f6d2d6a6605af16653a4944f60330d88e9721ffff0aa499e243}{plain}},}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00056}00056\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1body__encoding_a489de0413246f2f6d2d6a6605af16653a2a886acf8fdd62685b0e6f9ab43c7381}{chunked}}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00057}\mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1body__encoding_a489de0413246f2f6d2d6a6605af16653a2a886acf8fdd62685b0e6f9ab43c7381}{00057}}\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00058}00058\ \}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00060}\mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_a4bb5b2821dab6a182bfe4c5415229e6e}{00060}}\ \textcolor{keyword}{typedef}\ std::map<std::string,\ std::string,\ utility::ci\_less\ >\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_a4bb5b2821dab6a182bfe4c5415229e6e}{header\_list}};}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00072}00072\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ InputIterator>}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00073}\mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_a6c56e2f70369551a1dcd9816f3d4d2eb}{00073}}\ std::pair<std::string,InputIterator>\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_a6c56e2f70369551a1dcd9816f3d4d2eb}{extract\_token}}(InputIterator\ begin,}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00074}00074\ \ \ \ \ InputIterator\ end)}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00075}00075\ \{}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00076}00076\ \ \ \ \ InputIterator\ it\ =\ std::find\_if(begin,end,\&\mbox{\hyperlink{namespacewebsocketpp_1_1http_a45a9b60b72b68de7b32fb75d89ad4c04}{is\_not\_token\_char}});}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00077}00077\ \ \ \ \ \textcolor{keywordflow}{return}\ std::make\_pair(std::string(begin,it),it);}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00078}00078\ \}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00081}00081\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00091}00091\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ InputIterator>}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00092}\mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_a2a35158d976b84679dda4fd4a4b237bc}{00092}}\ std::pair<std::string,InputIterator>\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_a2a35158d976b84679dda4fd4a4b237bc}{extract\_quoted\_string}}(InputIterator\ begin,}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00093}00093\ \ \ \ \ InputIterator\ end)}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00094}00094\ \{}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00095}00095\ \ \ \ \ std::string\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00096}00096\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00097}00097\ \ \ \ \ \textcolor{keywordflow}{if}\ (end\ ==\ begin)\ \{}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00098}00098\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::make\_pair(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},begin);}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00099}00099\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00100}00100\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00101}00101\ \ \ \ \ \textcolor{keywordflow}{if}\ (*begin\ !=\ \textcolor{charliteral}{'"{}'})\ \{}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00102}00102\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::make\_pair(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},begin);}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00103}00103\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00104}00104\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00105}00105\ \ \ \ \ InputIterator\ cursor\ =\ begin+1;}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00106}00106\ \ \ \ \ InputIterator\ marker\ =\ cursor;}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00107}00107\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00108}00108\ \ \ \ \ cursor\ =\ std::find(cursor,end,\textcolor{charliteral}{'"{}'});}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00109}00109\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00110}00110\ \ \ \ \ \textcolor{keywordflow}{while}\ (cursor\ !=\ end)\ \{}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00111}00111\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ either\ this\ is\ the\ end\ or\ a\ quoted\ string}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00112}00112\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (*(cursor-\/1)\ ==\ \textcolor{charliteral}{'\(\backslash\)\(\backslash\)'})\ \{}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00113}00113\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.append(marker,cursor-\/1);}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00114}00114\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.append(1,\textcolor{charliteral}{'"{}'});}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00115}00115\ \ \ \ \ \ \ \ \ \ \ \ \ ++cursor;}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00116}00116\ \ \ \ \ \ \ \ \ \ \ \ \ marker\ =\ cursor;}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00117}00117\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00118}00118\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.append(marker,cursor);}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00119}00119\ \ \ \ \ \ \ \ \ \ \ \ \ ++cursor;}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00120}00120\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::make\_pair(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},cursor);}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00121}00121\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00122}00122\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00123}00123\ \ \ \ \ \ \ \ \ cursor\ =\ std::find(cursor,end,\textcolor{charliteral}{'"{}'});}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00124}00124\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00125}00125\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00126}00126\ \ \ \ \ \textcolor{keywordflow}{return}\ std::make\_pair(\textcolor{stringliteral}{"{}"{}},begin);}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00127}00127\ \}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00128}00128\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00130}00130\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00138}00138\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ InputIterator>}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00139}\mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_a1dacef9abccd8e5b6c572447d9f5a3ab}{00139}}\ InputIterator\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_a1dacef9abccd8e5b6c572447d9f5a3ab}{extract\_lws}}(InputIterator\ begin,\ InputIterator\ end)\ \{}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00140}00140\ \ \ \ \ InputIterator\ it\ =\ begin;}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00141}00141\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00142}00142\ \ \ \ \ \textcolor{comment}{//\ strip\ leading\ CRLF}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00143}00143\ \ \ \ \ \textcolor{keywordflow}{if}\ (end-\/begin\ >\ 2\ \&\&\ *begin\ ==\ \textcolor{charliteral}{'\(\backslash\)r'}\ \&\&\ *(begin+1)\ ==\ \textcolor{charliteral}{'\(\backslash\)n'}\ \&\&}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00144}00144\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1http_a8ff7039dd19159bdbce3b98159c66ae2}{is\_whitespace\_char}}(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\textcolor{keyword}{>}(*(begin+2))))}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00145}00145\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00146}00146\ \ \ \ \ \ \ \ \ it+=3;}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00147}00147\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00148}00148\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00149}00149\ \ \ \ \ it\ =\ std::find\_if(it,end,\&\mbox{\hyperlink{namespacewebsocketpp_1_1http_a95df9e609616688298d34fee9ec34945}{is\_not\_whitespace\_char}});}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00150}00150\ \ \ \ \ \textcolor{keywordflow}{return}\ it;}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00151}00151\ \}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00152}00152\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00154}00154\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00163}00163\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ InputIterator>}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00164}\mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_a263c7c466bbed56948d5877b9c33c354}{00164}}\ InputIterator\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_a263c7c466bbed56948d5877b9c33c354}{extract\_all\_lws}}(InputIterator\ begin,\ InputIterator\ end)\ \{}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00165}00165\ \ \ \ \ InputIterator\ old\_it;}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00166}00166\ \ \ \ \ InputIterator\ new\_it\ =\ begin;}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00167}00167\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00168}00168\ \ \ \ \ \textcolor{keywordflow}{do}\ \{}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00169}00169\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Pull\ value\ from\ previous\ iteration}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00170}00170\ \ \ \ \ \ \ \ \ old\_it\ =\ new\_it;}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00171}00171\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00172}00172\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ look\ ahead\ another\ pass}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00173}00173\ \ \ \ \ \ \ \ \ new\_it\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_a1dacef9abccd8e5b6c572447d9f5a3ab}{extract\_lws}}(old\_it,end);}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00174}00174\ \ \ \ \ \}\ \textcolor{keywordflow}{while}\ (new\_it\ !=\ end\ \&\&\ old\_it\ !=\ new\_it);}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00175}00175\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00176}00176\ \ \ \ \ \textcolor{keywordflow}{return}\ new\_it;}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00177}00177\ \}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00178}00178\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00180}00180\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00194}00194\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ InputIterator>}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00195}\mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_ac13fb3aca2101c9e6d2ee14039f1a758}{00195}}\ InputIterator\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_ac13fb3aca2101c9e6d2ee14039f1a758}{extract\_attributes}}(InputIterator\ begin,\ InputIterator\ end,}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00196}00196\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1http_a9744f4104772b987aa9e86c35ce1357b}{attribute\_list}}\ \&\ attributes)}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00197}00197\ \{}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00198}00198\ \ \ \ \ InputIterator\ cursor;}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00199}00199\ \ \ \ \ \textcolor{keywordtype}{bool}\ first\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00200}00200\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00201}00201\ \ \ \ \ \textcolor{keywordflow}{if}\ (begin\ ==\ end)\ \{}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00202}00202\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ begin;}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00203}00203\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00204}00204\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00205}00205\ \ \ \ \ cursor\ =\ begin;}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00206}00206\ \ \ \ \ std::pair<std::string,InputIterator>\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00207}00207\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00208}00208\ \ \ \ \ \textcolor{keywordflow}{while}\ (cursor\ !=\ end)\ \{}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00209}00209\ \ \ \ \ \ \ \ \ std::string\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}};}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00210}00210\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00211}00211\ \ \ \ \ \ \ \ \ cursor\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_a263c7c466bbed56948d5877b9c33c354}{http::parser::extract\_all\_lws}}(cursor,end);}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00212}00212\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (cursor\ ==\ end)\ \{}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00213}00213\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00214}00214\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00215}00215\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00216}00216\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (first)\ \{}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00217}00217\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ ignore\ this\ check\ for\ the\ very\ first\ pass}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00218}00218\ \ \ \ \ \ \ \ \ \ \ \ \ first\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00219}00219\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00220}00220\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (*cursor\ ==\ \textcolor{charliteral}{';'})\ \{}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00221}00221\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ advance\ past\ the\ ';'}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00222}00222\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++cursor;}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00223}00223\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00224}00224\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ non-\/semicolon\ in\ this\ position\ indicates\ end\ end\ of\ the}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00225}00225\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ attribute\ list,\ break\ and\ return.}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00226}00226\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00227}00227\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00228}00228\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00229}00229\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00230}00230\ \ \ \ \ \ \ \ \ cursor\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_a263c7c466bbed56948d5877b9c33c354}{http::parser::extract\_all\_lws}}(cursor,end);}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00231}00231\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_a6c56e2f70369551a1dcd9816f3d4d2eb}{http::parser::extract\_token}}(cursor,end);}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00232}00232\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00233}00233\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.first.empty())\ \{}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00234}00234\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ error:\ expected\ a\ token}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00235}00235\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ begin;}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00236}00236\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00237}00237\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.first;}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00238}00238\ \ \ \ \ \ \ \ \ \ \ \ \ cursor\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.second;}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00239}00239\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00240}00240\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00241}00241\ \ \ \ \ \ \ \ \ cursor\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_a263c7c466bbed56948d5877b9c33c354}{http::parser::extract\_all\_lws}}(cursor,end);}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00242}00242\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (cursor\ ==\ end\ ||\ *cursor\ !=\ \textcolor{charliteral}{'='})\ \{}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00243}00243\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ if\ there\ is\ an\ equals\ sign,\ read\ the\ attribute\ value.\ Otherwise}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00244}00244\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ record\ a\ blank\ value\ and\ continue}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00245}00245\ \ \ \ \ \ \ \ \ \ \ \ \ attributes[\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}].clear();}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00246}00246\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00247}00247\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00248}00248\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00249}00249\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ advance\ past\ the\ '='}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00250}00250\ \ \ \ \ \ \ \ \ ++cursor;}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00251}00251\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00252}00252\ \ \ \ \ \ \ \ \ cursor\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_a263c7c466bbed56948d5877b9c33c354}{http::parser::extract\_all\_lws}}(cursor,end);}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00253}00253\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (cursor\ ==\ end)\ \{}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00254}00254\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ error:\ expected\ a\ token\ or\ quoted\ string}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00255}00255\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ begin;}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00256}00256\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00257}00257\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00258}00258\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_a2a35158d976b84679dda4fd4a4b237bc}{http::parser::extract\_quoted\_string}}(cursor,end);}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00259}00259\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.second\ !=\ cursor)\ \{}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00260}00260\ \ \ \ \ \ \ \ \ \ \ \ \ attributes[\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}]\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.first;}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00261}00261\ \ \ \ \ \ \ \ \ \ \ \ \ cursor\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.second;}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00262}00262\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00263}00263\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00264}00264\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00265}00265\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_a6c56e2f70369551a1dcd9816f3d4d2eb}{http::parser::extract\_token}}(cursor,end);}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00266}00266\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.first.empty())\ \{}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00267}00267\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ error\ :\ expected\ token\ or\ quoted\ string}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00268}00268\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ begin;}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00269}00269\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00270}00270\ \ \ \ \ \ \ \ \ \ \ \ \ attributes[\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}]\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.first;}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00271}00271\ \ \ \ \ \ \ \ \ \ \ \ \ cursor\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.second;}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00272}00272\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00273}00273\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00274}00274\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00275}00275\ \ \ \ \ \textcolor{keywordflow}{return}\ cursor;}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00276}00276\ \}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00277}00277\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00279}00279\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00292}00292\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ InputIterator>}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00293}\mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_adabfd491d364be43bee4c7cad63e7e08}{00293}}\ InputIterator\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_adabfd491d364be43bee4c7cad63e7e08}{extract\_parameters}}(InputIterator\ begin,\ InputIterator\ end,}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00294}00294\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1http_a2c285bc959df5a63bf962bed842fccfb}{parameter\_list}}\ \&parameters)}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00295}00295\ \{}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00296}00296\ \ \ \ \ InputIterator\ cursor;}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00297}00297\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00298}00298\ \ \ \ \ \textcolor{keywordflow}{if}\ (begin\ ==\ end)\ \{}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00299}00299\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ error:\ expected\ non-\/zero\ length\ range}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00300}00300\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ begin;}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00301}00301\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00302}00302\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00303}00303\ \ \ \ \ cursor\ =\ begin;}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00304}00304\ \ \ \ \ std::pair<std::string,InputIterator>\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00305}00305\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00314}00314\ \ \ \ \ \textcolor{keywordflow}{while}\ (cursor\ !=\ end)\ \{}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00315}00315\ \ \ \ \ \ \ \ \ std::string\ parameter\_name;}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00316}00316\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1http_a9744f4104772b987aa9e86c35ce1357b}{attribute\_list}}\ attributes;}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00317}00317\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00318}00318\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ extract\ any\ stray\ whitespace}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00319}00319\ \ \ \ \ \ \ \ \ cursor\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_a263c7c466bbed56948d5877b9c33c354}{http::parser::extract\_all\_lws}}(cursor,end);}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00320}00320\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (cursor\ ==\ end)\ \{\textcolor{keywordflow}{break};\}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00321}00321\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00322}00322\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_a6c56e2f70369551a1dcd9816f3d4d2eb}{http::parser::extract\_token}}(cursor,end);}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00323}00323\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00324}00324\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.first.empty())\ \{}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00325}00325\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ error:\ expected\ a\ token}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00326}00326\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ begin;}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00327}00327\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00328}00328\ \ \ \ \ \ \ \ \ \ \ \ \ parameter\_name\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.first;}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00329}00329\ \ \ \ \ \ \ \ \ \ \ \ \ cursor\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.second;}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00330}00330\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00331}00331\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00332}00332\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Safe\ break\ point,\ insert\ parameter\ with\ blank\ attributes\ and\ exit}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00333}00333\ \ \ \ \ \ \ \ \ cursor\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_a263c7c466bbed56948d5877b9c33c354}{http::parser::extract\_all\_lws}}(cursor,end);}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00334}00334\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (cursor\ ==\ end)\ \{}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00335}00335\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//parameters[parameter\_name]\ =\ attributes;}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00336}00336\ \ \ \ \ \ \ \ \ \ \ \ \ parameters.push\_back(std::make\_pair(parameter\_name,attributes));}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00337}00337\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00338}00338\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00339}00339\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00340}00340\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ there\ is\ an\ attribute\ list,\ read\ it\ in}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00341}00341\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (*cursor\ ==\ \textcolor{charliteral}{';'})\ \{}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00342}00342\ \ \ \ \ \ \ \ \ \ \ \ \ InputIterator\ acursor;}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00343}00343\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00344}00344\ \ \ \ \ \ \ \ \ \ \ \ \ ++cursor;}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00345}00345\ \ \ \ \ \ \ \ \ \ \ \ \ acursor\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_ac13fb3aca2101c9e6d2ee14039f1a758}{http::parser::extract\_attributes}}(cursor,end,attributes);}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00346}00346\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00347}00347\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (acursor\ ==\ cursor)\ \{}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00348}00348\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ attribute\ extraction\ ended\ in\ syntax\ error}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00349}00349\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ begin;}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00350}00350\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00351}00351\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00352}00352\ \ \ \ \ \ \ \ \ \ \ \ \ cursor\ =\ acursor;}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00353}00353\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00354}00354\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00355}00355\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ insert\ parameter\ into\ output\ list}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00356}00356\ \ \ \ \ \ \ \ \ \textcolor{comment}{//parameters[parameter\_name]\ =\ attributes;}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00357}00357\ \ \ \ \ \ \ \ \ parameters.push\_back(std::make\_pair(parameter\_name,attributes));}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00358}00358\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00359}00359\ \ \ \ \ \ \ \ \ cursor\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_a263c7c466bbed56948d5877b9c33c354}{http::parser::extract\_all\_lws}}(cursor,end);}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00360}00360\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (cursor\ ==\ end)\ \{\textcolor{keywordflow}{break};\}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00361}00361\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00362}00362\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ if\ next\ char\ is\ ','\ then\ read\ another\ parameter,\ else\ stop}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00363}00363\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (*cursor\ !=\ \textcolor{charliteral}{','})\ \{}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00364}00364\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00365}00365\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00366}00366\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00367}00367\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ advance\ past\ comma}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00368}00368\ \ \ \ \ \ \ \ \ ++cursor;}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00369}00369\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00370}00370\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (cursor\ ==\ end)\ \{}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00371}00371\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ expected\ more\ bytes\ after\ a\ comma}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00372}00372\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ begin;}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00373}00373\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00374}00374\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00375}00375\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00376}00376\ \ \ \ \ \textcolor{keywordflow}{return}\ cursor;}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00377}00377\ \}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00378}00378\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00379}\mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_ae656f7130716b25fb2a34cee77a0444e}{00379}}\ \textcolor{keyword}{inline}\ std::string\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_ae656f7130716b25fb2a34cee77a0444e}{strip\_lws}}(std::string\ \textcolor{keyword}{const}\ \&\ input)\ \{}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00380}00380\ \ \ \ \ std::string::const\_iterator\ begin\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_a263c7c466bbed56948d5877b9c33c354}{extract\_all\_lws}}(input.begin(),input.end());}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00381}00381\ \ \ \ \ \textcolor{keywordflow}{if}\ (begin\ ==\ input.end())\ \{}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00382}00382\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::string();}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00383}00383\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00384}00384\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00385}00385\ \ \ \ \ std::string::const\_reverse\_iterator\ rbegin\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_a263c7c466bbed56948d5877b9c33c354}{extract\_all\_lws}}(input.rbegin(),input.rend());}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00386}00386\ \ \ \ \ \textcolor{keywordflow}{if}\ (rbegin\ ==\ input.rend())\ \{}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00387}00387\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::string();}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00388}00388\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00389}00389\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00390}00390\ \ \ \ \ \textcolor{keywordflow}{return}\ std::string(begin,rbegin.base());}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00391}00391\ \}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00392}00392\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00394}00394\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00398}\mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser}{00398}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser}{parser}}\ \{}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00399}00399\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00400}\mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a11bc97bfd504dd56ad7b8262a940a9c5}{00400}}\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a11bc97bfd504dd56ad7b8262a940a9c5}{parser}}()}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00401}00401\ \ \ \ \ \ \ :\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_ae82ee117b729da521de60401cd17f8d4}{m\_header\_bytes}}(0)}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00402}00402\ \ \ \ \ \ \ ,\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a89e6a7583bee97f30c60dc88b4cd29dd}{m\_body\_bytes\_needed}}(0)}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00403}00403\ \ \ \ \ \ \ ,\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a85613c9d20e308ff343449852b7e769f}{m\_body\_bytes\_max}}(\mbox{\hyperlink{namespacewebsocketpp_1_1http_a0cc54432842e22de04c4985cba23f54f}{max\_body\_size}})}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00404}00404\ \ \ \ \ \ \ ,\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a286e19d30028f6dbc295ad578e8e50d3}{m\_body\_encoding}}(body\_encoding::\mbox{\hyperlink{yubihsm__pkcs11_8c_ac160cc61da581bdcf075273493b9f156}{unknown}})\ \{\}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00405}00405\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00407}00407\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00410}\mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_aed5c11161d518d01856b1a88a3eee9ee}{00410}}\ \ \ \ \ std::string\ \textcolor{keyword}{const}\ \&\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_aed5c11161d518d01856b1a88a3eee9ee}{get\_version}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00411}00411\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a3e8026fc40c96ca8bfa46a533e00d6a6}{m\_version}};}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00412}00412\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00413}00413\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00415}00415\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00421}00421\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a5c2e0e2bc0b2769db5a785b7d47a66ee}{set\_version}}(std::string\ \textcolor{keyword}{const}\ \&\ version);}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00422}00422\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00424}00424\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00430}00430\ \ \ \ \ std::string\ \textcolor{keyword}{const}\ \&\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_ae8a8f833c3fb01f1553a26e77f380367}{get\_header}}(std::string\ \textcolor{keyword}{const}\ \&\ key)\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00431}00431\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00433}00433\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00441}00441\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a42ab85c14bef2028d1e6f050af1140ce}{get\_header\_as\_plist}}(std::string\ \textcolor{keyword}{const}\ \&\ key,\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_a2c285bc959df5a63bf962bed842fccfb}{parameter\_list}}\ \&\ out)}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00442}00442\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00443}00443\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00445}00445\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00459}00459\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_abd39762de5ec467a29a537d79602b603}{append\_header}}(std::string\ \textcolor{keyword}{const}\ \&\ key,\ std::string\ \textcolor{keyword}{const}\ \&\ val);}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00460}00460\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00462}00462\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00476}00476\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_aba2991b2aa41ca60d9427950502b0b93}{replace\_header}}(std::string\ \textcolor{keyword}{const}\ \&\ key,\ std::string\ \textcolor{keyword}{const}\ \&\ val);}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00477}00477\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00479}00479\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00487}00487\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a64ff49a6a1ddbf70b9767874ffdd513e}{remove\_header}}(std::string\ \textcolor{keyword}{const}\ \&\ key);}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00488}00488\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00490}00490\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00495}\mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a41150a80d6c955b9bdac86dbd9b3d8e6}{00495}}\ \ \ \ \ std::string\ \textcolor{keyword}{const}\ \&\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a41150a80d6c955b9bdac86dbd9b3d8e6}{get\_body}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00496}00496\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a2a552a4581ae26674fd6d566e5b332ee}{m\_body}};}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00497}00497\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00498}00498\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00500}00500\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00508}00508\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a71a4989eaa0ca802cf77678d0ca2d70d}{set\_body}}(std::string\ \textcolor{keyword}{const}\ \&\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}});}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00509}00509\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00511}00511\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00519}\mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_afa455a5f6dca3989ccd56a87181119f2}{00519}}\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_afa455a5f6dca3989ccd56a87181119f2}{get\_max\_body\_size}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00520}00520\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a85613c9d20e308ff343449852b7e769f}{m\_body\_bytes\_max}};}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00521}00521\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00522}00522\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00524}00524\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00532}\mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_ab6583e865254d1608732498d839d8385}{00532}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_ab6583e865254d1608732498d839d8385}{set\_max\_body\_size}}(\textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})\ \{}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00533}00533\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a85613c9d20e308ff343449852b7e769f}{m\_body\_bytes\_max}}\ =\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}};}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00534}00534\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00535}00535\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00537}00537\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00542}00542\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_af903e5538e362d9ac0aeaea3064aed0c}{parse\_parameter\_list}}(std::string\ \textcolor{keyword}{const}\ \&\ in,\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_a2c285bc959df5a63bf962bed842fccfb}{parameter\_list}}\ \&\ out)}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00543}00543\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00544}00544\ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00546}00546\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00552}00552\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a4dbb443fd916f8b4306e7afdb2e8ff45}{process\_header}}(std::string::iterator\ begin,\ std::string::iterator\ end);}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00553}00553\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00555}00555\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00567}00567\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_aabf5f8c33cad9202520337f8e2ed7aa5}{prepare\_body}}();}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00568}00568\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00570}00570\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00579}00579\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a3dc340d076f732092aed32c42d277503}{process\_body}}(\textcolor{keywordtype}{char}\ \textcolor{keyword}{const}\ *\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}});}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00580}00580\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00582}00582\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00589}\mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a7d5eb3a888a59570d2b9cfcc3939bbd0}{00589}}\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a7d5eb3a888a59570d2b9cfcc3939bbd0}{body\_ready}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00590}00590\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (\mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a89e6a7583bee97f30c60dc88b4cd29dd}{m\_body\_bytes\_needed}}\ ==\ 0);}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00591}00591\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00592}00592\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00594}00594\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00600}00600\ \ \ \ \ std::string\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_ad38cb09ac5ad2a2d9de65c6d34bb5875}{raw\_headers}}()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00601}00601\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00602}\mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a3e8026fc40c96ca8bfa46a533e00d6a6}{00602}}\ \ \ \ \ std::string\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a3e8026fc40c96ca8bfa46a533e00d6a6}{m\_version}};}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00603}\mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_ae75e1e6acd17cc5a5543f818a5355a50}{00603}}\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_a4bb5b2821dab6a182bfe4c5415229e6e}{header\_list}}\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_ae75e1e6acd17cc5a5543f818a5355a50}{m\_headers}};}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00604}00604\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00605}\mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_ae82ee117b729da521de60401cd17f8d4}{00605}}\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_ae82ee117b729da521de60401cd17f8d4}{m\_header\_bytes}};}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00606}00606\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00607}\mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a2a552a4581ae26674fd6d566e5b332ee}{00607}}\ \ \ \ \ std::string\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a2a552a4581ae26674fd6d566e5b332ee}{m\_body}};}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00608}\mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a89e6a7583bee97f30c60dc88b4cd29dd}{00608}}\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a89e6a7583bee97f30c60dc88b4cd29dd}{m\_body\_bytes\_needed}};}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00609}\mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a85613c9d20e308ff343449852b7e769f}{00609}}\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a85613c9d20e308ff343449852b7e769f}{m\_body\_bytes\_max}};}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00610}\mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a286e19d30028f6dbc295ad578e8e50d3}{00610}}\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1body__encoding_a489de0413246f2f6d2d6a6605af16653}{body\_encoding::value}}\ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser_a286e19d30028f6dbc295ad578e8e50d3}{m\_body\_encoding}};}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00611}00611\ \};}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00612}00612\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00613}00613\ \}\ \textcolor{comment}{//\ namespace\ parser}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00614}00614\ \}\ \textcolor{comment}{//\ namespace\ http}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00615}00615\ \}\ \textcolor{comment}{//\ namespace\ websocketpp}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00616}00616\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00617}00617\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2impl_2parser_8hpp}{websocketpp/http/impl/parser.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00618}00618\ }
+\DoxyCodeLine{\Hypertarget{fc_2vendor_2websocketpp_2websocketpp_2http_2parser_8hpp_source_l00619}00619\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ HTTP\_PARSER\_HPP}}
+
+\end{DoxyCode}

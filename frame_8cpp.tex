@@ -1,0 +1,922 @@
+\doxysection{libraries/fc/vendor/websocketpp/test/utility/frame.cpp File Reference}
+\hypertarget{frame_8cpp}{}\label{frame_8cpp}\index{libraries/fc/vendor/websocketpp/test/utility/frame.cpp@{libraries/fc/vendor/websocketpp/test/utility/frame.cpp}}
+{\ttfamily \#include $<$boost/test/unit\+\_\+test.\+hpp$>$}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$string$>$}\newline
+{\ttfamily \#include $<$websocketpp/frame.\+hpp$>$}\newline
+{\ttfamily \#include $<$websocketpp/utilities.\+hpp$>$}\newline
+Include dependency graph for frame.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{frame_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{frame_8cpp_a6b2a3852db8bb19ab6909bac01859985}{BOOST\+\_\+\+TEST\+\_\+\+MODULE}}~frame
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{frame_8cpp_a028b5ea71d8ed44151c5a3df274446e1}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (basic\+\_\+bits)
+\item 
+\mbox{\hyperlink{frame_8cpp_a3cd85981c179494497755165261dde64}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (basic\+\_\+constructors)
+\item 
+\mbox{\hyperlink{frame_8cpp_abefd59ef5f5168134d2ef8d7024b836e}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (basic\+\_\+size)
+\item 
+\mbox{\hyperlink{frame_8cpp_a2eb593e91f71f541200821fa274712bb}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (basic\+\_\+header\+\_\+length)
+\item 
+\mbox{\hyperlink{frame_8cpp_ac89e9959cc8f8a4a50329762575fcae7}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (basic\+\_\+opcode)
+\item 
+\mbox{\hyperlink{frame_8cpp_a49175f9f030259fd8095b6bbc5d4c13a}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (extended\+\_\+header\+\_\+basics)
+\item 
+\mbox{\hyperlink{frame_8cpp_af5b647fe774b7eaf0fc4dab3acf39cb8}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (extended\+\_\+header\+\_\+extractors)
+\item 
+\mbox{\hyperlink{frame_8cpp_ac637036c7f3ba21c927cce7c9a9b0f26}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (header\+\_\+preparation)
+\item 
+\mbox{\hyperlink{frame_8cpp_ad85249cf07a2ae7b5923e990ff22afa0}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (prepare\+\_\+masking\+\_\+key)
+\item 
+\mbox{\hyperlink{frame_8cpp_a645b482dedfe131f3684c173f940fae5}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (prepare\+\_\+masking\+\_\+key2)
+\item 
+\mbox{\hyperlink{frame_8cpp_a4d0d690901bd2ff9b3ef80ca6692ed4b}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (circshift)
+\item 
+\mbox{\hyperlink{frame_8cpp_aa150be0b9587d995b1f826b3b9ac22fb}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (block\+\_\+byte\+\_\+mask)
+\item 
+\mbox{\hyperlink{frame_8cpp_a0f89287b396b53710be219f9bed03691}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (block\+\_\+byte\+\_\+mask\+\_\+inplace)
+\item 
+\mbox{\hyperlink{frame_8cpp_ab6f3ea7e7dd45293962fd27f75c675b0}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (block\+\_\+word\+\_\+mask)
+\item 
+\mbox{\hyperlink{frame_8cpp_aa1bcc2fe3f3562db5528d15d885c30c7}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (block\+\_\+word\+\_\+mask\+\_\+inplace)
+\item 
+\mbox{\hyperlink{frame_8cpp_ab305f4dce85b1e40c5b358aca8dc14d3}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (continuous\+\_\+word\+\_\+mask)
+\item 
+\mbox{\hyperlink{frame_8cpp_aa018ad4e0b15224ad277a57b67268b3f}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (continuous\+\_\+byte\+\_\+mask)
+\item 
+\mbox{\hyperlink{frame_8cpp_a28df57354b9f4ded6a15d93c4b49e582}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (continuous\+\_\+word\+\_\+mask\+\_\+inplace)
+\item 
+\mbox{\hyperlink{frame_8cpp_a46f3dc49b5bdbd03033c782f1863fcc8}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (continuous\+\_\+byte\+\_\+mask\+\_\+inplace)
+\item 
+\mbox{\hyperlink{frame_8cpp_a40dc3819858ee15daf92b3190b7e079a}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (continuous\+\_\+word\+\_\+mask2)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{frame_8cpp_a6b2a3852db8bb19ab6909bac01859985}\index{frame.cpp@{frame.cpp}!BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}}
+\index{BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}!frame.cpp@{frame.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_TEST\_MODULE}{BOOST\_TEST\_MODULE}}
+{\footnotesize\ttfamily \label{frame_8cpp_a6b2a3852db8bb19ab6909bac01859985} 
+\#define BOOST\+\_\+\+TEST\+\_\+\+MODULE~frame}
+
+
+
+Definition at line \mbox{\hyperlink{frame_8cpp_source_l00028}{28}} of file \mbox{\hyperlink{frame_8cpp_source}{frame.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{frame_8cpp_a028b5ea71d8ed44151c5a3df274446e1}\index{frame.cpp@{frame.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!frame.cpp@{frame.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/20]}}
+{\footnotesize\ttfamily \label{frame_8cpp_a028b5ea71d8ed44151c5a3df274446e1} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{basic\+\_\+bits}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{frame_8cpp_source_l00039}{39}} of file \mbox{\hyperlink{frame_8cpp_source}{frame.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00040\ \ \ \ \ \mbox{\hyperlink{structwebsocketpp_1_1frame_1_1basic__header}{frame::basic\_header}}\ h1(0x00,0x00);\ \textcolor{comment}{//\ all\ false}}
+\DoxyCodeLine{00041\ \ \ \ \ \mbox{\hyperlink{structwebsocketpp_1_1frame_1_1basic__header}{frame::basic\_header}}\ h2(0xF0,0x80);\ \textcolor{comment}{//\ all\ true}}
+\DoxyCodeLine{00042\ }
+\DoxyCodeLine{00043\ \ \ \ \ \textcolor{comment}{//\ Read\ Values}}
+\DoxyCodeLine{00044\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a66b39e273681d8509128e420cfaef6b0}{frame::get\_fin}}(h1)\ ==\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{00045\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a90556de9dd71c1f063153b791abeb81c}{frame::get\_rsv1}}(h1)\ ==\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{00046\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a531509bc14ee0a6641662b17d5670460}{frame::get\_rsv2}}(h1)\ ==\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{00047\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a4dc0cc35b38986b9b56120ef297dd795}{frame::get\_rsv3}}(h1)\ ==\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{00048\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a4e8cf8ae88a7a8fdb2b3ea86623d01d2}{frame::get\_masked}}(h1)\ ==\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{00049\ }
+\DoxyCodeLine{00050\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a66b39e273681d8509128e420cfaef6b0}{frame::get\_fin}}(h2)\ ==\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{00051\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a90556de9dd71c1f063153b791abeb81c}{frame::get\_rsv1}}(h2)\ ==\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{00052\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a531509bc14ee0a6641662b17d5670460}{frame::get\_rsv2}}(h2)\ ==\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{00053\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a4dc0cc35b38986b9b56120ef297dd795}{frame::get\_rsv3}}(h2)\ ==\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{00054\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a4e8cf8ae88a7a8fdb2b3ea86623d01d2}{frame::get\_masked}}(h2)\ ==\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{00055\ }
+\DoxyCodeLine{00056\ \ \ \ \ \textcolor{comment}{//\ Set\ Values}}
+\DoxyCodeLine{00057\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_abe746242507916e5d6ae2ca26bd9f69e}{frame::set\_fin}}(h1,\textcolor{keyword}{true});}
+\DoxyCodeLine{00058\ \ \ \ \ BOOST\_CHECK(\ h1.b0\ ==\ 0x80\ );}
+\DoxyCodeLine{00059\ }
+\DoxyCodeLine{00060\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_ab706b1d5ef7de377671547993eb35062}{frame::set\_rsv1}}(h1,\textcolor{keyword}{true});}
+\DoxyCodeLine{00061\ \ \ \ \ BOOST\_CHECK(\ h1.b0\ ==\ 0xC0\ );}
+\DoxyCodeLine{00062\ }
+\DoxyCodeLine{00063\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a0c97068961b3b3d2e1b83a9bd273c5cf}{frame::set\_rsv2}}(h1,\textcolor{keyword}{true});}
+\DoxyCodeLine{00064\ \ \ \ \ BOOST\_CHECK(\ h1.b0\ ==\ 0xE0\ );}
+\DoxyCodeLine{00065\ }
+\DoxyCodeLine{00066\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a293e2ed0dd6efa704f27c29a1e595715}{frame::set\_rsv3}}(h1,\textcolor{keyword}{true});}
+\DoxyCodeLine{00067\ \ \ \ \ BOOST\_CHECK(\ h1.b0\ ==\ 0xF0\ );}
+\DoxyCodeLine{00068\ }
+\DoxyCodeLine{00069\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a9adfd26ffa9dccf738e6b62b5dccf7f0}{frame::set\_masked}}(h1,\textcolor{keyword}{true});}
+\DoxyCodeLine{00070\ \ \ \ \ BOOST\_CHECK(\ h1.b1\ ==\ 0x80\ );}
+\DoxyCodeLine{00071\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{frame_8cpp_a028b5ea71d8ed44151c5a3df274446e1_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{frame_8cpp_a3cd85981c179494497755165261dde64}\index{frame.cpp@{frame.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!frame.cpp@{frame.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/20]}}
+{\footnotesize\ttfamily \label{frame_8cpp_a3cd85981c179494497755165261dde64} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{basic\+\_\+constructors}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{frame_8cpp_source_l00073}{73}} of file \mbox{\hyperlink{frame_8cpp_source}{frame.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00074\ \ \ \ \ \textcolor{comment}{//\ Read\ Values}}
+\DoxyCodeLine{00075\ \ \ \ \ \mbox{\hyperlink{structwebsocketpp_1_1frame_1_1basic__header}{frame::basic\_header}}\ h1(\mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea35faaee264826923566fc05bdfd76b72}{frame::opcode::TEXT}},12,\textcolor{keyword}{true},\textcolor{keyword}{false});}
+\DoxyCodeLine{00076\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a235192baaf86f38158dc33f178c04661}{frame::get\_opcode}}(h1)\ ==\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea35faaee264826923566fc05bdfd76b72}{frame::opcode::TEXT}}\ );}
+\DoxyCodeLine{00077\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a2ceb63e6a2fe19964d13363ba2bb9e15}{frame::get\_basic\_size}}(h1)\ ==\ 12\ );}
+\DoxyCodeLine{00078\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a66b39e273681d8509128e420cfaef6b0}{frame::get\_fin}}(h1)\ ==\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{00079\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a90556de9dd71c1f063153b791abeb81c}{frame::get\_rsv1}}(h1)\ ==\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{00080\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a531509bc14ee0a6641662b17d5670460}{frame::get\_rsv2}}(h1)\ ==\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{00081\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a4dc0cc35b38986b9b56120ef297dd795}{frame::get\_rsv3}}(h1)\ ==\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{00082\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a4e8cf8ae88a7a8fdb2b3ea86623d01d2}{frame::get\_masked}}(h1)\ ==\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{00083\ }
+\DoxyCodeLine{00084\ \ \ \ \ \mbox{\hyperlink{structwebsocketpp_1_1frame_1_1basic__header}{frame::basic\_header}}\ h2(\mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea64e5cad7d9f3971f1e42e41f9a2bf544}{frame::opcode::BINARY}},0,\textcolor{keyword}{false},\textcolor{keyword}{false},\textcolor{keyword}{false},\textcolor{keyword}{true});}
+\DoxyCodeLine{00085\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a235192baaf86f38158dc33f178c04661}{frame::get\_opcode}}(h2)\ ==\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea64e5cad7d9f3971f1e42e41f9a2bf544}{frame::opcode::BINARY}}\ );}
+\DoxyCodeLine{00086\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a2ceb63e6a2fe19964d13363ba2bb9e15}{frame::get\_basic\_size}}(h2)\ ==\ 0\ );}
+\DoxyCodeLine{00087\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a66b39e273681d8509128e420cfaef6b0}{frame::get\_fin}}(h2)\ ==\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{00088\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a90556de9dd71c1f063153b791abeb81c}{frame::get\_rsv1}}(h2)\ ==\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{00089\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a531509bc14ee0a6641662b17d5670460}{frame::get\_rsv2}}(h2)\ ==\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{00090\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a4dc0cc35b38986b9b56120ef297dd795}{frame::get\_rsv3}}(h2)\ ==\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{00091\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a4e8cf8ae88a7a8fdb2b3ea86623d01d2}{frame::get\_masked}}(h2)\ ==\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{00092\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{frame_8cpp_a3cd85981c179494497755165261dde64_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{frame_8cpp_a2eb593e91f71f541200821fa274712bb}\index{frame.cpp@{frame.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!frame.cpp@{frame.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [3/20]}}
+{\footnotesize\ttfamily \label{frame_8cpp_a2eb593e91f71f541200821fa274712bb} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{basic\+\_\+header\+\_\+length}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{frame_8cpp_source_l00125}{125}} of file \mbox{\hyperlink{frame_8cpp_source}{frame.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00126\ \ \ \ \ \mbox{\hyperlink{structwebsocketpp_1_1frame_1_1basic__header}{frame::basic\_header}}\ h1(0x82,0x00);\ \textcolor{comment}{//\ short\ binary\ frame,\ unmasked}}
+\DoxyCodeLine{00127\ \ \ \ \ \mbox{\hyperlink{structwebsocketpp_1_1frame_1_1basic__header}{frame::basic\_header}}\ h2(0x82,0x80);\ \textcolor{comment}{//\ short\ binary\ frame,\ masked}}
+\DoxyCodeLine{00128\ \ \ \ \ \mbox{\hyperlink{structwebsocketpp_1_1frame_1_1basic__header}{frame::basic\_header}}\ h3(0x82,0x7E);\ \textcolor{comment}{//\ medium\ binary\ frame,\ unmasked}}
+\DoxyCodeLine{00129\ \ \ \ \ \mbox{\hyperlink{structwebsocketpp_1_1frame_1_1basic__header}{frame::basic\_header}}\ h4(0x82,0xFE);\ \textcolor{comment}{//\ medium\ binary\ frame,\ masked}}
+\DoxyCodeLine{00130\ \ \ \ \ \mbox{\hyperlink{structwebsocketpp_1_1frame_1_1basic__header}{frame::basic\_header}}\ h5(0x82,0x7F);\ \textcolor{comment}{//\ jumbo\ binary\ frame,\ unmasked}}
+\DoxyCodeLine{00131\ \ \ \ \ \mbox{\hyperlink{structwebsocketpp_1_1frame_1_1basic__header}{frame::basic\_header}}\ h6(0x82,0xFF);\ \textcolor{comment}{//\ jumbo\ binary\ frame,\ masked}}
+\DoxyCodeLine{00132\ }
+\DoxyCodeLine{00133\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_abd4f23c906cc48fb3b34603fd4284b01}{frame::get\_header\_len}}(h1)\ ==\ 2);}
+\DoxyCodeLine{00134\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_abd4f23c906cc48fb3b34603fd4284b01}{frame::get\_header\_len}}(h2)\ ==\ 6);}
+\DoxyCodeLine{00135\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_abd4f23c906cc48fb3b34603fd4284b01}{frame::get\_header\_len}}(h3)\ ==\ 4);}
+\DoxyCodeLine{00136\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_abd4f23c906cc48fb3b34603fd4284b01}{frame::get\_header\_len}}(h4)\ ==\ 8);}
+\DoxyCodeLine{00137\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_abd4f23c906cc48fb3b34603fd4284b01}{frame::get\_header\_len}}(h5)\ ==\ 10);}
+\DoxyCodeLine{00138\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_abd4f23c906cc48fb3b34603fd4284b01}{frame::get\_header\_len}}(h6)\ ==\ 14);}
+\DoxyCodeLine{00139\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{frame_8cpp_a2eb593e91f71f541200821fa274712bb_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{frame_8cpp_ac89e9959cc8f8a4a50329762575fcae7}\index{frame.cpp@{frame.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!frame.cpp@{frame.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [4/20]}}
+{\footnotesize\ttfamily \label{frame_8cpp_ac89e9959cc8f8a4a50329762575fcae7} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{basic\+\_\+opcode}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{frame_8cpp_source_l00141}{141}} of file \mbox{\hyperlink{frame_8cpp_source}{frame.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00142\ \ \ \ \ \mbox{\hyperlink{structwebsocketpp_1_1frame_1_1basic__header}{frame::basic\_header}}\ h1(0x00,0x00);}
+\DoxyCodeLine{00143\ }
+\DoxyCodeLine{00144\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_aa5e7f94a35f8fb59a925fa01636f08ad}{is\_control}}(\mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea71e8a91139096779a7723c3cc85b5c2d}{frame::opcode::CONTINUATION}})\ ==\ \textcolor{keyword}{false});}
+\DoxyCodeLine{00145\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_aa5e7f94a35f8fb59a925fa01636f08ad}{is\_control}}(\mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea35faaee264826923566fc05bdfd76b72}{frame::opcode::TEXT}})\ ==\ \textcolor{keyword}{false});}
+\DoxyCodeLine{00146\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_aa5e7f94a35f8fb59a925fa01636f08ad}{is\_control}}(\mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea64e5cad7d9f3971f1e42e41f9a2bf544}{frame::opcode::BINARY}})\ ==\ \textcolor{keyword}{false});}
+\DoxyCodeLine{00147\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_aa5e7f94a35f8fb59a925fa01636f08ad}{is\_control}}(\mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5eafc878334b78f2baf96d5dbf9e9652066}{frame::opcode::CLOSE}})\ ==\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00148\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_aa5e7f94a35f8fb59a925fa01636f08ad}{is\_control}}(\mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea384ec7a09356db47fdf1646f954aa208}{frame::opcode::PING}})\ ==\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00149\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_aa5e7f94a35f8fb59a925fa01636f08ad}{is\_control}}(\mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea8674aa04d991121443c8f063e7144284}{frame::opcode::PONG}})\ ==\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00150\ }
+\DoxyCodeLine{00151\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a235192baaf86f38158dc33f178c04661}{frame::get\_opcode}}(h1)\ ==\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea71e8a91139096779a7723c3cc85b5c2d}{frame::opcode::CONTINUATION}}\ );}
+\DoxyCodeLine{00152\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{frame_8cpp_ac89e9959cc8f8a4a50329762575fcae7_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{frame_8cpp_abefd59ef5f5168134d2ef8d7024b836e}\index{frame.cpp@{frame.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!frame.cpp@{frame.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [5/20]}}
+{\footnotesize\ttfamily \label{frame_8cpp_abefd59ef5f5168134d2ef8d7024b836e} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{basic\+\_\+size}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{frame_8cpp_source_l00094}{94}} of file \mbox{\hyperlink{frame_8cpp_source}{frame.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00095\ \ \ \ \ \mbox{\hyperlink{structwebsocketpp_1_1frame_1_1basic__header}{frame::basic\_header}}\ h1(0x00,0x00);\ \textcolor{comment}{//\ length\ 0}}
+\DoxyCodeLine{00096\ \ \ \ \ \mbox{\hyperlink{structwebsocketpp_1_1frame_1_1basic__header}{frame::basic\_header}}\ h2(0x00,0x01);\ \textcolor{comment}{//\ length\ 1}}
+\DoxyCodeLine{00097\ \ \ \ \ \mbox{\hyperlink{structwebsocketpp_1_1frame_1_1basic__header}{frame::basic\_header}}\ h3(0x00,0x7D);\ \textcolor{comment}{//\ length\ 125}}
+\DoxyCodeLine{00098\ \ \ \ \ \mbox{\hyperlink{structwebsocketpp_1_1frame_1_1basic__header}{frame::basic\_header}}\ h4(0x00,0x7E);\ \textcolor{comment}{//\ length\ 126}}
+\DoxyCodeLine{00099\ \ \ \ \ \mbox{\hyperlink{structwebsocketpp_1_1frame_1_1basic__header}{frame::basic\_header}}\ h5(0x00,0x7F);\ \textcolor{comment}{//\ length\ 127}}
+\DoxyCodeLine{00100\ \ \ \ \ \mbox{\hyperlink{structwebsocketpp_1_1frame_1_1basic__header}{frame::basic\_header}}\ h6(0x00,0x80);\ \textcolor{comment}{//\ length\ 0,\ mask\ bit\ set}}
+\DoxyCodeLine{00101\ }
+\DoxyCodeLine{00102\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a2ceb63e6a2fe19964d13363ba2bb9e15}{frame::get\_basic\_size}}(h1)\ ==\ 0\ );}
+\DoxyCodeLine{00103\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a2ceb63e6a2fe19964d13363ba2bb9e15}{frame::get\_basic\_size}}(h2)\ ==\ 1\ );}
+\DoxyCodeLine{00104\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a2ceb63e6a2fe19964d13363ba2bb9e15}{frame::get\_basic\_size}}(h3)\ ==\ 125\ );}
+\DoxyCodeLine{00105\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a2ceb63e6a2fe19964d13363ba2bb9e15}{frame::get\_basic\_size}}(h4)\ ==\ 126\ );}
+\DoxyCodeLine{00106\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a2ceb63e6a2fe19964d13363ba2bb9e15}{frame::get\_basic\_size}}(h5)\ ==\ 127\ );}
+\DoxyCodeLine{00107\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a2ceb63e6a2fe19964d13363ba2bb9e15}{frame::get\_basic\_size}}(h6)\ ==\ 0\ );}
+\DoxyCodeLine{00108\ }
+\DoxyCodeLine{00109\ \ \ \ \ \textcolor{comment}{/*frame::set\_basic\_size(h1,1);}}
+\DoxyCodeLine{00110\ \textcolor{comment}{\ \ \ \ BOOST\_CHECK(\ h1.b1\ ==\ 0x01\ );}}
+\DoxyCodeLine{00111\ \textcolor{comment}{}}
+\DoxyCodeLine{00112\ \textcolor{comment}{\ \ \ \ frame::set\_basic\_size(h1,125);}}
+\DoxyCodeLine{00113\ \textcolor{comment}{\ \ \ \ BOOST\_CHECK(\ h1.b1\ ==\ 0x7D\ );}}
+\DoxyCodeLine{00114\ \textcolor{comment}{}}
+\DoxyCodeLine{00115\ \textcolor{comment}{\ \ \ \ frame::set\_basic\_size(h1,126);}}
+\DoxyCodeLine{00116\ \textcolor{comment}{\ \ \ \ BOOST\_CHECK(\ h1.b1\ ==\ 0x7E\ );}}
+\DoxyCodeLine{00117\ \textcolor{comment}{}}
+\DoxyCodeLine{00118\ \textcolor{comment}{\ \ \ \ frame::set\_basic\_size(h1,127);}}
+\DoxyCodeLine{00119\ \textcolor{comment}{\ \ \ \ BOOST\_CHECK(\ h1.b1\ ==\ 0x7F\ );}}
+\DoxyCodeLine{00120\ \textcolor{comment}{}}
+\DoxyCodeLine{00121\ \textcolor{comment}{\ \ \ \ frame::set\_basic\_size(h1,0);}}
+\DoxyCodeLine{00122\ \textcolor{comment}{\ \ \ \ BOOST\_CHECK(\ h1.b1\ ==\ 0x00\ );*/}}
+\DoxyCodeLine{00123\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{frame_8cpp_abefd59ef5f5168134d2ef8d7024b836e_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{frame_8cpp_aa150be0b9587d995b1f826b3b9ac22fb}\index{frame.cpp@{frame.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!frame.cpp@{frame.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [6/20]}}
+{\footnotesize\ttfamily \label{frame_8cpp_aa150be0b9587d995b1f826b3b9ac22fb} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{block\+\_\+byte\+\_\+mask}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{frame_8cpp_source_l00284}{284}} of file \mbox{\hyperlink{frame_8cpp_source}{frame.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00284\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00285\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ input[15]\ =\ \{0x00,\ 0x00,\ 0x00,\ 0x00,}
+\DoxyCodeLine{00286\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x00,\ 0x00,\ 0x00,\ 0x00,}
+\DoxyCodeLine{00287\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x00,\ 0x00,\ 0x00,\ 0x00,}
+\DoxyCodeLine{00288\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x00,\ 0x00,\ 0x00\};}
+\DoxyCodeLine{00289\ }
+\DoxyCodeLine{00290\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ output[15];}
+\DoxyCodeLine{00291\ }
+\DoxyCodeLine{00292\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ masked[15]\ =\ \{0x00,\ 0x01,\ 0x02,\ 0x03,}
+\DoxyCodeLine{00293\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x00,\ 0x01,\ 0x02,\ 0x03,}
+\DoxyCodeLine{00294\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x00,\ 0x01,\ 0x02,\ 0x03,}
+\DoxyCodeLine{00295\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x00,\ 0x01,\ 0x02\};}
+\DoxyCodeLine{00296\ }
+\DoxyCodeLine{00297\ \ \ \ \ \mbox{\hyperlink{unionwebsocketpp_1_1frame_1_1uint32__converter}{frame::masking\_key\_type}}\ \mbox{\hyperlink{yubico__otp_8c_a9246c20bb98ad2b4c60313c053c70f08}{key}};}
+\DoxyCodeLine{00298\ \ \ \ \ key.\mbox{\hyperlink{unionwebsocketpp_1_1frame_1_1uint32__converter_ad7e9db5dd4002d78e9aaf624d39fd69c}{c}}[0]\ =\ 0x00;}
+\DoxyCodeLine{00299\ \ \ \ \ key.c[1]\ =\ 0x01;}
+\DoxyCodeLine{00300\ \ \ \ \ key.c[2]\ =\ 0x02;}
+\DoxyCodeLine{00301\ \ \ \ \ key.c[3]\ =\ 0x03;}
+\DoxyCodeLine{00302\ }
+\DoxyCodeLine{00303\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a417650d76aa2433163942d6a13334a6a}{byte\_mask}}(input,input+15,output,key);}
+\DoxyCodeLine{00304\ }
+\DoxyCodeLine{00305\ \ \ \ \ BOOST\_CHECK(\ std::equal(output,output+15,masked)\ );}
+\DoxyCodeLine{00306\ \}}
+
+\end{DoxyCode}
+\Hypertarget{frame_8cpp_a0f89287b396b53710be219f9bed03691}\index{frame.cpp@{frame.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!frame.cpp@{frame.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [7/20]}}
+{\footnotesize\ttfamily \label{frame_8cpp_a0f89287b396b53710be219f9bed03691} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{block\+\_\+byte\+\_\+mask\+\_\+inplace}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{frame_8cpp_source_l00308}{308}} of file \mbox{\hyperlink{frame_8cpp_source}{frame.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00308\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00309\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ buffer[15]\ =\ \{0x00,\ 0x00,\ 0x00,\ 0x00,}
+\DoxyCodeLine{00310\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x00,\ 0x00,\ 0x00,\ 0x00,}
+\DoxyCodeLine{00311\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x00,\ 0x00,\ 0x00,\ 0x00,}
+\DoxyCodeLine{00312\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x00,\ 0x00,\ 0x00\};}
+\DoxyCodeLine{00313\ }
+\DoxyCodeLine{00314\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ masked[15]\ =\ \{0x00,\ 0x01,\ 0x02,\ 0x03,}
+\DoxyCodeLine{00315\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x00,\ 0x01,\ 0x02,\ 0x03,}
+\DoxyCodeLine{00316\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x00,\ 0x01,\ 0x02,\ 0x03,}
+\DoxyCodeLine{00317\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x00,\ 0x01,\ 0x02\};}
+\DoxyCodeLine{00318\ }
+\DoxyCodeLine{00319\ \ \ \ \ \mbox{\hyperlink{unionwebsocketpp_1_1frame_1_1uint32__converter}{frame::masking\_key\_type}}\ \mbox{\hyperlink{yubico__otp_8c_a9246c20bb98ad2b4c60313c053c70f08}{key}};}
+\DoxyCodeLine{00320\ \ \ \ \ key.\mbox{\hyperlink{unionwebsocketpp_1_1frame_1_1uint32__converter_ad7e9db5dd4002d78e9aaf624d39fd69c}{c}}[0]\ =\ 0x00;}
+\DoxyCodeLine{00321\ \ \ \ \ key.c[1]\ =\ 0x01;}
+\DoxyCodeLine{00322\ \ \ \ \ key.c[2]\ =\ 0x02;}
+\DoxyCodeLine{00323\ \ \ \ \ key.c[3]\ =\ 0x03;}
+\DoxyCodeLine{00324\ }
+\DoxyCodeLine{00325\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a417650d76aa2433163942d6a13334a6a}{byte\_mask}}(buffer,buffer+15,key);}
+\DoxyCodeLine{00326\ }
+\DoxyCodeLine{00327\ \ \ \ \ BOOST\_CHECK(\ std::equal(buffer,buffer+15,masked)\ );}
+\DoxyCodeLine{00328\ \}}
+
+\end{DoxyCode}
+\Hypertarget{frame_8cpp_ab6f3ea7e7dd45293962fd27f75c675b0}\index{frame.cpp@{frame.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!frame.cpp@{frame.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [8/20]}}
+{\footnotesize\ttfamily \label{frame_8cpp_ab6f3ea7e7dd45293962fd27f75c675b0} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{block\+\_\+word\+\_\+mask}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{frame_8cpp_source_l00330}{330}} of file \mbox{\hyperlink{frame_8cpp_source}{frame.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00330\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00331\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ input[15]\ =\ \ \{0x00,\ 0x00,\ 0x00,\ 0x00,}
+\DoxyCodeLine{00332\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x00,\ 0x00,\ 0x00,\ 0x00,}
+\DoxyCodeLine{00333\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x00,\ 0x00,\ 0x00,\ 0x00,}
+\DoxyCodeLine{00334\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x00,\ 0x00,\ 0x00\};}
+\DoxyCodeLine{00335\ }
+\DoxyCodeLine{00336\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ output[15];}
+\DoxyCodeLine{00337\ }
+\DoxyCodeLine{00338\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ masked[15]\ =\ \{0x00,\ 0x01,\ 0x02,\ 0x03,}
+\DoxyCodeLine{00339\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x00,\ 0x01,\ 0x02,\ 0x03,}
+\DoxyCodeLine{00340\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x00,\ 0x01,\ 0x02,\ 0x03,}
+\DoxyCodeLine{00341\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x00,\ 0x01,\ 0x02\};}
+\DoxyCodeLine{00342\ }
+\DoxyCodeLine{00343\ \ \ \ \ \mbox{\hyperlink{unionwebsocketpp_1_1frame_1_1uint32__converter}{frame::masking\_key\_type}}\ \mbox{\hyperlink{yubico__otp_8c_a9246c20bb98ad2b4c60313c053c70f08}{key}};}
+\DoxyCodeLine{00344\ \ \ \ \ key.\mbox{\hyperlink{unionwebsocketpp_1_1frame_1_1uint32__converter_ad7e9db5dd4002d78e9aaf624d39fd69c}{c}}[0]\ =\ 0x00;}
+\DoxyCodeLine{00345\ \ \ \ \ key.c[1]\ =\ 0x01;}
+\DoxyCodeLine{00346\ \ \ \ \ key.c[2]\ =\ 0x02;}
+\DoxyCodeLine{00347\ \ \ \ \ key.c[3]\ =\ 0x03;}
+\DoxyCodeLine{00348\ }
+\DoxyCodeLine{00349\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_acb2ccda66981a8a12a3b97fb4b179aa3}{word\_mask\_exact}}(input,output,15,key);}
+\DoxyCodeLine{00350\ }
+\DoxyCodeLine{00351\ \ \ \ \ BOOST\_CHECK(\ std::equal(output,output+15,masked)\ );}
+\DoxyCodeLine{00352\ \}}
+
+\end{DoxyCode}
+\Hypertarget{frame_8cpp_aa1bcc2fe3f3562db5528d15d885c30c7}\index{frame.cpp@{frame.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!frame.cpp@{frame.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [9/20]}}
+{\footnotesize\ttfamily \label{frame_8cpp_aa1bcc2fe3f3562db5528d15d885c30c7} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{block\+\_\+word\+\_\+mask\+\_\+inplace}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{frame_8cpp_source_l00354}{354}} of file \mbox{\hyperlink{frame_8cpp_source}{frame.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00354\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00355\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ buffer[15]\ =\ \{0x00,\ 0x00,\ 0x00,\ 0x00,}
+\DoxyCodeLine{00356\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x00,\ 0x00,\ 0x00,\ 0x00,}
+\DoxyCodeLine{00357\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x00,\ 0x00,\ 0x00,\ 0x00,}
+\DoxyCodeLine{00358\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x00,\ 0x00,\ 0x00\};}
+\DoxyCodeLine{00359\ }
+\DoxyCodeLine{00360\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ masked[15]\ =\ \{0x00,\ 0x01,\ 0x02,\ 0x03,}
+\DoxyCodeLine{00361\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x00,\ 0x01,\ 0x02,\ 0x03,}
+\DoxyCodeLine{00362\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x00,\ 0x01,\ 0x02,\ 0x03,}
+\DoxyCodeLine{00363\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x00,\ 0x01,\ 0x02\};}
+\DoxyCodeLine{00364\ }
+\DoxyCodeLine{00365\ \ \ \ \ \mbox{\hyperlink{unionwebsocketpp_1_1frame_1_1uint32__converter}{frame::masking\_key\_type}}\ \mbox{\hyperlink{yubico__otp_8c_a9246c20bb98ad2b4c60313c053c70f08}{key}};}
+\DoxyCodeLine{00366\ \ \ \ \ key.\mbox{\hyperlink{unionwebsocketpp_1_1frame_1_1uint32__converter_ad7e9db5dd4002d78e9aaf624d39fd69c}{c}}[0]\ =\ 0x00;}
+\DoxyCodeLine{00367\ \ \ \ \ key.c[1]\ =\ 0x01;}
+\DoxyCodeLine{00368\ \ \ \ \ key.c[2]\ =\ 0x02;}
+\DoxyCodeLine{00369\ \ \ \ \ key.c[3]\ =\ 0x03;}
+\DoxyCodeLine{00370\ }
+\DoxyCodeLine{00371\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_acb2ccda66981a8a12a3b97fb4b179aa3}{word\_mask\_exact}}(buffer,15,key);}
+\DoxyCodeLine{00372\ }
+\DoxyCodeLine{00373\ \ \ \ \ BOOST\_CHECK(\ std::equal(buffer,buffer+15,masked)\ );}
+\DoxyCodeLine{00374\ \}}
+
+\end{DoxyCode}
+\Hypertarget{frame_8cpp_a4d0d690901bd2ff9b3ef80ca6692ed4b}\index{frame.cpp@{frame.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!frame.cpp@{frame.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [10/20]}}
+{\footnotesize\ttfamily \label{frame_8cpp_a4d0d690901bd2ff9b3ef80ca6692ed4b} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{circshift}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{frame_8cpp_source_l00266}{266}} of file \mbox{\hyperlink{frame_8cpp_source}{frame.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00266\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00267\ \ \ \ \ \textcolor{comment}{/*if\ (sizeof(size\_t)\ ==\ 8)\ \{}}
+\DoxyCodeLine{00268\ \textcolor{comment}{\ \ \ \ \ \ \ \ size\_t\ test\ =\ 0x0123456789abcdef;}}
+\DoxyCodeLine{00269\ \textcolor{comment}{}}
+\DoxyCodeLine{00270\ \textcolor{comment}{\ \ \ \ \ \ \ \ BOOST\_CHECK(\ frame::circshift\_prepared\_key(test,0)\ ==\ 0x0123456789abcdef);}}
+\DoxyCodeLine{00271\ \textcolor{comment}{\ \ \ \ \ \ \ \ BOOST\_CHECK(\ frame::circshift\_prepared\_key(test,1)\ ==\ 0xef0123456789abcd);}}
+\DoxyCodeLine{00272\ \textcolor{comment}{\ \ \ \ \ \ \ \ BOOST\_CHECK(\ frame::circshift\_prepared\_key(test,2)\ ==\ 0xcdef0123456789ab);}}
+\DoxyCodeLine{00273\ \textcolor{comment}{\ \ \ \ \ \ \ \ BOOST\_CHECK(\ frame::circshift\_prepared\_key(test,3)\ ==\ 0xabcdef0123456789);}}
+\DoxyCodeLine{00274\ \textcolor{comment}{\ \ \ \ \}\ else\ \{}}
+\DoxyCodeLine{00275\ \textcolor{comment}{\ \ \ \ \ \ \ \ size\_t\ test\ =\ 0x01234567;}}
+\DoxyCodeLine{00276\ \textcolor{comment}{}}
+\DoxyCodeLine{00277\ \textcolor{comment}{\ \ \ \ \ \ \ \ BOOST\_CHECK(\ frame::circshift\_prepared\_key(test,0)\ ==\ 0x01234567);}}
+\DoxyCodeLine{00278\ \textcolor{comment}{\ \ \ \ \ \ \ \ BOOST\_CHECK(\ frame::circshift\_prepared\_key(test,1)\ ==\ 0x67012345);}}
+\DoxyCodeLine{00279\ \textcolor{comment}{\ \ \ \ \ \ \ \ BOOST\_CHECK(\ frame::circshift\_prepared\_key(test,2)\ ==\ 0x45670123);}}
+\DoxyCodeLine{00280\ \textcolor{comment}{\ \ \ \ \ \ \ \ BOOST\_CHECK(\ frame::circshift\_prepared\_key(test,3)\ ==\ 0x23456701);}}
+\DoxyCodeLine{00281\ \textcolor{comment}{\ \ \ \ \}*/}}
+\DoxyCodeLine{00282\ \}}
+
+\end{DoxyCode}
+\Hypertarget{frame_8cpp_aa018ad4e0b15224ad277a57b67268b3f}\index{frame.cpp@{frame.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!frame.cpp@{frame.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [11/20]}}
+{\footnotesize\ttfamily \label{frame_8cpp_aa018ad4e0b15224ad277a57b67268b3f} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{continuous\+\_\+byte\+\_\+mask}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{frame_8cpp_source_l00413}{413}} of file \mbox{\hyperlink{frame_8cpp_source}{frame.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00413\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00414\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ input[16];}
+\DoxyCodeLine{00415\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ output[16];}
+\DoxyCodeLine{00416\ }
+\DoxyCodeLine{00417\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ masked[16]\ =\ \{0x00,\ 0x01,\ 0x02,\ 0x03,}
+\DoxyCodeLine{00418\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x00,\ 0x01,\ 0x02,\ 0x03,}
+\DoxyCodeLine{00419\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x00,\ 0x01,\ 0x02,\ 0x03,}
+\DoxyCodeLine{00420\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x00,\ 0x01,\ 0x02,\ 0x00\};}
+\DoxyCodeLine{00421\ }
+\DoxyCodeLine{00422\ \ \ \ \ \mbox{\hyperlink{unionwebsocketpp_1_1frame_1_1uint32__converter}{frame::masking\_key\_type}}\ \mbox{\hyperlink{yubico__otp_8c_a9246c20bb98ad2b4c60313c053c70f08}{key}};}
+\DoxyCodeLine{00423\ \ \ \ \ key.\mbox{\hyperlink{unionwebsocketpp_1_1frame_1_1uint32__converter_ad7e9db5dd4002d78e9aaf624d39fd69c}{c}}[0]\ =\ 0x00;}
+\DoxyCodeLine{00424\ \ \ \ \ key.c[1]\ =\ 0x01;}
+\DoxyCodeLine{00425\ \ \ \ \ key.c[2]\ =\ 0x02;}
+\DoxyCodeLine{00426\ \ \ \ \ key.c[3]\ =\ 0x03;}
+\DoxyCodeLine{00427\ }
+\DoxyCodeLine{00428\ \ \ \ \ \textcolor{comment}{//\ One\ call}}
+\DoxyCodeLine{00429\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ pkey,pkey\_temp;}
+\DoxyCodeLine{00430\ \ \ \ \ pkey\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_af80eee705eb39fb533cf4ab3d7a6d3bb}{frame::prepare\_masking\_key}}(key);}
+\DoxyCodeLine{00431\ \ \ \ \ std::fill\_n(input,16,0x00);}
+\DoxyCodeLine{00432\ \ \ \ \ std::fill\_n(output,16,0x00);}
+\DoxyCodeLine{00433\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a3e0ba89b475df758d84dab352a76c3b3}{frame::byte\_mask\_circ}}(input,output,15,pkey);}
+\DoxyCodeLine{00434\ \ \ \ \ BOOST\_CHECK(\ std::equal(output,output+16,masked)\ );}
+\DoxyCodeLine{00435\ }
+\DoxyCodeLine{00436\ \ \ \ \ \textcolor{comment}{//\ calls\ not\ split\ on\ word\ boundaries}}
+\DoxyCodeLine{00437\ \ \ \ \ pkey\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_af80eee705eb39fb533cf4ab3d7a6d3bb}{frame::prepare\_masking\_key}}(key);}
+\DoxyCodeLine{00438\ \ \ \ \ std::fill\_n(input,16,0x00);}
+\DoxyCodeLine{00439\ \ \ \ \ std::fill\_n(output,16,0x00);}
+\DoxyCodeLine{00440\ }
+\DoxyCodeLine{00441\ \ \ \ \ pkey\_temp\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a3e0ba89b475df758d84dab352a76c3b3}{frame::byte\_mask\_circ}}(input,output,7,pkey);}
+\DoxyCodeLine{00442\ \ \ \ \ BOOST\_CHECK(\ std::equal(output,output+7,masked)\ );}
+\DoxyCodeLine{00443\ \ \ \ \ BOOST\_CHECK(\ pkey\_temp\ ==\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a76bf120d54d47d760eb8bd803572b004}{frame::circshift\_prepared\_key}}(pkey,3)\ );}
+\DoxyCodeLine{00444\ }
+\DoxyCodeLine{00445\ \ \ \ \ pkey\_temp\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a3e0ba89b475df758d84dab352a76c3b3}{frame::byte\_mask\_circ}}(input+7,output+7,8,pkey\_temp);}
+\DoxyCodeLine{00446\ \ \ \ \ BOOST\_CHECK(\ std::equal(output,output+16,masked)\ );}
+\DoxyCodeLine{00447\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ pkey\_temp,\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a76bf120d54d47d760eb8bd803572b004}{frame::circshift\_prepared\_key}}(pkey,3)\ );}
+\DoxyCodeLine{00448\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{frame_8cpp_aa018ad4e0b15224ad277a57b67268b3f_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{frame_8cpp_a46f3dc49b5bdbd03033c782f1863fcc8}\index{frame.cpp@{frame.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!frame.cpp@{frame.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [12/20]}}
+{\footnotesize\ttfamily \label{frame_8cpp_a46f3dc49b5bdbd03033c782f1863fcc8} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{continuous\+\_\+byte\+\_\+mask\+\_\+inplace}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{frame_8cpp_source_l00484}{484}} of file \mbox{\hyperlink{frame_8cpp_source}{frame.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00484\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00485\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ buffer[16];}
+\DoxyCodeLine{00486\ }
+\DoxyCodeLine{00487\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ masked[16]\ =\ \{0x00,\ 0x01,\ 0x02,\ 0x03,}
+\DoxyCodeLine{00488\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x00,\ 0x01,\ 0x02,\ 0x03,}
+\DoxyCodeLine{00489\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x00,\ 0x01,\ 0x02,\ 0x03,}
+\DoxyCodeLine{00490\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x00,\ 0x01,\ 0x02,\ 0x00\};}
+\DoxyCodeLine{00491\ }
+\DoxyCodeLine{00492\ \ \ \ \ \mbox{\hyperlink{unionwebsocketpp_1_1frame_1_1uint32__converter}{frame::masking\_key\_type}}\ \mbox{\hyperlink{yubico__otp_8c_a9246c20bb98ad2b4c60313c053c70f08}{key}};}
+\DoxyCodeLine{00493\ \ \ \ \ key.\mbox{\hyperlink{unionwebsocketpp_1_1frame_1_1uint32__converter_ad7e9db5dd4002d78e9aaf624d39fd69c}{c}}[0]\ =\ 0x00;}
+\DoxyCodeLine{00494\ \ \ \ \ key.c[1]\ =\ 0x01;}
+\DoxyCodeLine{00495\ \ \ \ \ key.c[2]\ =\ 0x02;}
+\DoxyCodeLine{00496\ \ \ \ \ key.c[3]\ =\ 0x03;}
+\DoxyCodeLine{00497\ }
+\DoxyCodeLine{00498\ \ \ \ \ \textcolor{comment}{//\ One\ call}}
+\DoxyCodeLine{00499\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ pkey,pkey\_temp;}
+\DoxyCodeLine{00500\ \ \ \ \ pkey\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_af80eee705eb39fb533cf4ab3d7a6d3bb}{frame::prepare\_masking\_key}}(key);}
+\DoxyCodeLine{00501\ \ \ \ \ std::fill\_n(buffer,16,0x00);}
+\DoxyCodeLine{00502\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a3e0ba89b475df758d84dab352a76c3b3}{frame::byte\_mask\_circ}}(buffer,15,pkey);}
+\DoxyCodeLine{00503\ \ \ \ \ BOOST\_CHECK(\ std::equal(buffer,buffer+16,masked)\ );}
+\DoxyCodeLine{00504\ }
+\DoxyCodeLine{00505\ \ \ \ \ \textcolor{comment}{//\ calls\ not\ split\ on\ word\ boundaries}}
+\DoxyCodeLine{00506\ \ \ \ \ pkey\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_af80eee705eb39fb533cf4ab3d7a6d3bb}{frame::prepare\_masking\_key}}(key);}
+\DoxyCodeLine{00507\ \ \ \ \ std::fill\_n(buffer,16,0x00);}
+\DoxyCodeLine{00508\ }
+\DoxyCodeLine{00509\ \ \ \ \ pkey\_temp\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a3e0ba89b475df758d84dab352a76c3b3}{frame::byte\_mask\_circ}}(buffer,7,pkey);}
+\DoxyCodeLine{00510\ \ \ \ \ BOOST\_CHECK(\ std::equal(buffer,buffer+7,masked)\ );}
+\DoxyCodeLine{00511\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ pkey\_temp,\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a76bf120d54d47d760eb8bd803572b004}{frame::circshift\_prepared\_key}}(pkey,3)\ );}
+\DoxyCodeLine{00512\ }
+\DoxyCodeLine{00513\ \ \ \ \ pkey\_temp\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a3e0ba89b475df758d84dab352a76c3b3}{frame::byte\_mask\_circ}}(buffer+7,8,pkey\_temp);}
+\DoxyCodeLine{00514\ \ \ \ \ BOOST\_CHECK(\ std::equal(buffer,buffer+16,masked)\ );}
+\DoxyCodeLine{00515\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ pkey\_temp,\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a76bf120d54d47d760eb8bd803572b004}{frame::circshift\_prepared\_key}}(pkey,3)\ );}
+\DoxyCodeLine{00516\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{frame_8cpp_a46f3dc49b5bdbd03033c782f1863fcc8_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{frame_8cpp_ab305f4dce85b1e40c5b358aca8dc14d3}\index{frame.cpp@{frame.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!frame.cpp@{frame.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [13/20]}}
+{\footnotesize\ttfamily \label{frame_8cpp_ab305f4dce85b1e40c5b358aca8dc14d3} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{continuous\+\_\+word\+\_\+mask}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{frame_8cpp_source_l00376}{376}} of file \mbox{\hyperlink{frame_8cpp_source}{frame.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00376\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00377\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ input[16];}
+\DoxyCodeLine{00378\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ output[16];}
+\DoxyCodeLine{00379\ }
+\DoxyCodeLine{00380\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ masked[16]\ =\ \{0x00,\ 0x01,\ 0x02,\ 0x03,}
+\DoxyCodeLine{00381\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x00,\ 0x01,\ 0x02,\ 0x03,}
+\DoxyCodeLine{00382\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x00,\ 0x01,\ 0x02,\ 0x03,}
+\DoxyCodeLine{00383\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x00,\ 0x01,\ 0x02,\ 0x00\};}
+\DoxyCodeLine{00384\ }
+\DoxyCodeLine{00385\ \ \ \ \ \mbox{\hyperlink{unionwebsocketpp_1_1frame_1_1uint32__converter}{frame::masking\_key\_type}}\ \mbox{\hyperlink{yubico__otp_8c_a9246c20bb98ad2b4c60313c053c70f08}{key}};}
+\DoxyCodeLine{00386\ \ \ \ \ key.\mbox{\hyperlink{unionwebsocketpp_1_1frame_1_1uint32__converter_ad7e9db5dd4002d78e9aaf624d39fd69c}{c}}[0]\ =\ 0x00;}
+\DoxyCodeLine{00387\ \ \ \ \ key.c[1]\ =\ 0x01;}
+\DoxyCodeLine{00388\ \ \ \ \ key.c[2]\ =\ 0x02;}
+\DoxyCodeLine{00389\ \ \ \ \ key.c[3]\ =\ 0x03;}
+\DoxyCodeLine{00390\ }
+\DoxyCodeLine{00391\ \ \ \ \ \textcolor{comment}{//\ One\ call}}
+\DoxyCodeLine{00392\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ pkey,pkey\_temp;}
+\DoxyCodeLine{00393\ \ \ \ \ pkey\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_af80eee705eb39fb533cf4ab3d7a6d3bb}{frame::prepare\_masking\_key}}(key);}
+\DoxyCodeLine{00394\ \ \ \ \ std::fill\_n(input,16,0x00);}
+\DoxyCodeLine{00395\ \ \ \ \ std::fill\_n(output,16,0x00);}
+\DoxyCodeLine{00396\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_aa3458068f08acb26e350e39375265085}{frame::word\_mask\_circ}}(input,output,15,pkey);}
+\DoxyCodeLine{00397\ \ \ \ \ BOOST\_CHECK(\ std::equal(output,output+16,masked)\ );}
+\DoxyCodeLine{00398\ }
+\DoxyCodeLine{00399\ \ \ \ \ \textcolor{comment}{//\ calls\ not\ split\ on\ word\ boundaries}}
+\DoxyCodeLine{00400\ \ \ \ \ pkey\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_af80eee705eb39fb533cf4ab3d7a6d3bb}{frame::prepare\_masking\_key}}(key);}
+\DoxyCodeLine{00401\ \ \ \ \ std::fill\_n(input,16,0x00);}
+\DoxyCodeLine{00402\ \ \ \ \ std::fill\_n(output,16,0x00);}
+\DoxyCodeLine{00403\ }
+\DoxyCodeLine{00404\ \ \ \ \ pkey\_temp\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_aa3458068f08acb26e350e39375265085}{frame::word\_mask\_circ}}(input,output,7,pkey);}
+\DoxyCodeLine{00405\ \ \ \ \ BOOST\_CHECK(\ std::equal(output,output+7,masked)\ );}
+\DoxyCodeLine{00406\ \ \ \ \ BOOST\_CHECK(\ pkey\_temp\ ==\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a76bf120d54d47d760eb8bd803572b004}{frame::circshift\_prepared\_key}}(pkey,3)\ );}
+\DoxyCodeLine{00407\ }
+\DoxyCodeLine{00408\ \ \ \ \ pkey\_temp\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_aa3458068f08acb26e350e39375265085}{frame::word\_mask\_circ}}(input+7,output+7,8,pkey\_temp);}
+\DoxyCodeLine{00409\ \ \ \ \ BOOST\_CHECK(\ std::equal(output,output+16,masked)\ );}
+\DoxyCodeLine{00410\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ pkey\_temp,\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a76bf120d54d47d760eb8bd803572b004}{frame::circshift\_prepared\_key}}(pkey,3)\ );}
+\DoxyCodeLine{00411\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{frame_8cpp_ab305f4dce85b1e40c5b358aca8dc14d3_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{frame_8cpp_a40dc3819858ee15daf92b3190b7e079a}\index{frame.cpp@{frame.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!frame.cpp@{frame.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [14/20]}}
+{\footnotesize\ttfamily \label{frame_8cpp_a40dc3819858ee15daf92b3190b7e079a} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{continuous\+\_\+word\+\_\+mask2}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{frame_8cpp_source_l00518}{518}} of file \mbox{\hyperlink{frame_8cpp_source}{frame.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00518\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00519\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ buffer[12]\ =\ \{0xA6,\ 0x15,\ 0x97,\ 0xB9,}
+\DoxyCodeLine{00520\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x81,\ 0x50,\ 0xAC,\ 0xBA,}
+\DoxyCodeLine{00521\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x9C,\ 0x1C,\ 0x9F,\ 0xF4\};}
+\DoxyCodeLine{00522\ }
+\DoxyCodeLine{00523\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ unmasked[12]\ =\ \{0x48,\ 0x65,\ 0x6C,\ 0x6C,}
+\DoxyCodeLine{00524\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x6F,\ 0x20,\ 0x57,\ 0x6F,}
+\DoxyCodeLine{00525\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x72,\ 0x6C,\ 0x64,\ 0x21\};}
+\DoxyCodeLine{00526\ }
+\DoxyCodeLine{00527\ \ \ \ \ \mbox{\hyperlink{unionwebsocketpp_1_1frame_1_1uint32__converter}{frame::masking\_key\_type}}\ \mbox{\hyperlink{yubico__otp_8c_a9246c20bb98ad2b4c60313c053c70f08}{key}};}
+\DoxyCodeLine{00528\ \ \ \ \ key.\mbox{\hyperlink{unionwebsocketpp_1_1frame_1_1uint32__converter_ad7e9db5dd4002d78e9aaf624d39fd69c}{c}}[0]\ =\ 0xEE;}
+\DoxyCodeLine{00529\ \ \ \ \ key.c[1]\ =\ 0x70;}
+\DoxyCodeLine{00530\ \ \ \ \ key.c[2]\ =\ 0xFB;}
+\DoxyCodeLine{00531\ \ \ \ \ key.c[3]\ =\ 0xD5;}
+\DoxyCodeLine{00532\ }
+\DoxyCodeLine{00533\ \ \ \ \ \textcolor{comment}{//\ One\ call}}
+\DoxyCodeLine{00534\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ pkey;}
+\DoxyCodeLine{00535\ \ \ \ \ pkey\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_af80eee705eb39fb533cf4ab3d7a6d3bb}{frame::prepare\_masking\_key}}(key);}
+\DoxyCodeLine{00536\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_aa3458068f08acb26e350e39375265085}{frame::word\_mask\_circ}}(buffer,12,pkey);}
+\DoxyCodeLine{00537\ \ \ \ \ BOOST\_CHECK(\ std::equal(buffer,buffer+12,unmasked)\ );}
+\DoxyCodeLine{00538\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{frame_8cpp_a40dc3819858ee15daf92b3190b7e079a_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{frame_8cpp_a28df57354b9f4ded6a15d93c4b49e582}\index{frame.cpp@{frame.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!frame.cpp@{frame.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [15/20]}}
+{\footnotesize\ttfamily \label{frame_8cpp_a28df57354b9f4ded6a15d93c4b49e582} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{continuous\+\_\+word\+\_\+mask\+\_\+inplace}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{frame_8cpp_source_l00450}{450}} of file \mbox{\hyperlink{frame_8cpp_source}{frame.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00450\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00451\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ buffer[16];}
+\DoxyCodeLine{00452\ }
+\DoxyCodeLine{00453\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ masked[16]\ =\ \{0x00,\ 0x01,\ 0x02,\ 0x03,}
+\DoxyCodeLine{00454\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x00,\ 0x01,\ 0x02,\ 0x03,}
+\DoxyCodeLine{00455\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x00,\ 0x01,\ 0x02,\ 0x03,}
+\DoxyCodeLine{00456\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x00,\ 0x01,\ 0x02,\ 0x00\};}
+\DoxyCodeLine{00457\ }
+\DoxyCodeLine{00458\ \ \ \ \ \mbox{\hyperlink{unionwebsocketpp_1_1frame_1_1uint32__converter}{frame::masking\_key\_type}}\ \mbox{\hyperlink{yubico__otp_8c_a9246c20bb98ad2b4c60313c053c70f08}{key}};}
+\DoxyCodeLine{00459\ \ \ \ \ key.\mbox{\hyperlink{unionwebsocketpp_1_1frame_1_1uint32__converter_ad7e9db5dd4002d78e9aaf624d39fd69c}{c}}[0]\ =\ 0x00;}
+\DoxyCodeLine{00460\ \ \ \ \ key.c[1]\ =\ 0x01;}
+\DoxyCodeLine{00461\ \ \ \ \ key.c[2]\ =\ 0x02;}
+\DoxyCodeLine{00462\ \ \ \ \ key.c[3]\ =\ 0x03;}
+\DoxyCodeLine{00463\ }
+\DoxyCodeLine{00464\ \ \ \ \ \textcolor{comment}{//\ One\ call}}
+\DoxyCodeLine{00465\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ pkey,pkey\_temp;}
+\DoxyCodeLine{00466\ \ \ \ \ pkey\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_af80eee705eb39fb533cf4ab3d7a6d3bb}{frame::prepare\_masking\_key}}(key);}
+\DoxyCodeLine{00467\ \ \ \ \ std::fill\_n(buffer,16,0x00);}
+\DoxyCodeLine{00468\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_aa3458068f08acb26e350e39375265085}{frame::word\_mask\_circ}}(buffer,15,pkey);}
+\DoxyCodeLine{00469\ \ \ \ \ BOOST\_CHECK(\ std::equal(buffer,buffer+16,masked)\ );}
+\DoxyCodeLine{00470\ }
+\DoxyCodeLine{00471\ \ \ \ \ \textcolor{comment}{//\ calls\ not\ split\ on\ word\ boundaries}}
+\DoxyCodeLine{00472\ \ \ \ \ pkey\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_af80eee705eb39fb533cf4ab3d7a6d3bb}{frame::prepare\_masking\_key}}(key);}
+\DoxyCodeLine{00473\ \ \ \ \ std::fill\_n(buffer,16,0x00);}
+\DoxyCodeLine{00474\ }
+\DoxyCodeLine{00475\ \ \ \ \ pkey\_temp\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_aa3458068f08acb26e350e39375265085}{frame::word\_mask\_circ}}(buffer,7,pkey);}
+\DoxyCodeLine{00476\ \ \ \ \ BOOST\_CHECK(\ std::equal(buffer,buffer+7,masked)\ );}
+\DoxyCodeLine{00477\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ pkey\_temp,\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a76bf120d54d47d760eb8bd803572b004}{frame::circshift\_prepared\_key}}(pkey,3)\ );}
+\DoxyCodeLine{00478\ }
+\DoxyCodeLine{00479\ \ \ \ \ pkey\_temp\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_aa3458068f08acb26e350e39375265085}{frame::word\_mask\_circ}}(buffer+7,8,pkey\_temp);}
+\DoxyCodeLine{00480\ \ \ \ \ BOOST\_CHECK(\ std::equal(buffer,buffer+16,masked)\ );}
+\DoxyCodeLine{00481\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ pkey\_temp,\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a76bf120d54d47d760eb8bd803572b004}{frame::circshift\_prepared\_key}}(pkey,3)\ );}
+\DoxyCodeLine{00482\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{frame_8cpp_a28df57354b9f4ded6a15d93c4b49e582_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{frame_8cpp_a49175f9f030259fd8095b6bbc5d4c13a}\index{frame.cpp@{frame.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!frame.cpp@{frame.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [16/20]}}
+{\footnotesize\ttfamily \label{frame_8cpp_a49175f9f030259fd8095b6bbc5d4c13a} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{extended\+\_\+header\+\_\+basics}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{frame_8cpp_source_l00154}{154}} of file \mbox{\hyperlink{frame_8cpp_source}{frame.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00155\ \ \ \ \ \mbox{\hyperlink{structwebsocketpp_1_1frame_1_1extended__header}{frame::extended\_header}}\ h1;}
+\DoxyCodeLine{00156\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ h1\_solution[12]\ =\ \{0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x00,}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x00\};}
+\DoxyCodeLine{00158\ }
+\DoxyCodeLine{00159\ \ \ \ \ \mbox{\hyperlink{structwebsocketpp_1_1frame_1_1extended__header}{frame::extended\_header}}\ h2(\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}(255));}
+\DoxyCodeLine{00160\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ h2\_solution[12]\ =\ \{0x00,\ 0xFF,\ 0x00,\ 0x00,\ 0x00,\ 0x00,}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x00\};}
+\DoxyCodeLine{00162\ }
+\DoxyCodeLine{00163\ \ \ \ \ \mbox{\hyperlink{structwebsocketpp_1_1frame_1_1extended__header}{frame::extended\_header}}\ h3(\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}(256),htonl(0x8040201));}
+\DoxyCodeLine{00164\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ h3\_solution[12]\ =\ \{0x01,\ 0x00,\ 0x08,\ 0x04,\ 0x02,\ 0x01,}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x00\};}
+\DoxyCodeLine{00166\ }
+\DoxyCodeLine{00167\ \ \ \ \ \mbox{\hyperlink{structwebsocketpp_1_1frame_1_1extended__header}{frame::extended\_header}}\ h4(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}(0x0807060504030201LL));}
+\DoxyCodeLine{00168\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ h4\_solution[12]\ =\ \{0x08,\ 0x07,\ 0x06,\ 0x05,\ 0x04,\ 0x03,}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x02,\ 0x01,\ 0x00,\ 0x00,\ 0x00,\ 0x00\};}
+\DoxyCodeLine{00170\ }
+\DoxyCodeLine{00171\ \ \ \ \ \mbox{\hyperlink{structwebsocketpp_1_1frame_1_1extended__header}{frame::extended\_header}}\ h5(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}(0x0807060504030201LL),htonl(0x8040201));}
+\DoxyCodeLine{00172\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ h5\_solution[12]\ =\ \{0x08,\ 0x07,\ 0x06,\ 0x05,\ 0x04,\ 0x03,}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x02,\ 0x01,\ 0x08,\ 0x04,\ 0x02,\ 0x01\};}
+\DoxyCodeLine{00174\ }
+\DoxyCodeLine{00175\ \ \ \ \ BOOST\_CHECK(\ std::equal(h1\_solution,h1\_solution+12,h1.\mbox{\hyperlink{structwebsocketpp_1_1frame_1_1extended__header_a64507c32b568d0894b2bf3a2513debd1}{bytes}})\ );}
+\DoxyCodeLine{00176\ \ \ \ \ BOOST\_CHECK(\ std::equal(h2\_solution,h2\_solution+12,h2.bytes)\ );}
+\DoxyCodeLine{00177\ \ \ \ \ BOOST\_CHECK(\ std::equal(h3\_solution,h3\_solution+12,h3.bytes)\ );}
+\DoxyCodeLine{00178\ \ \ \ \ BOOST\_CHECK(\ std::equal(h4\_solution,h4\_solution+12,h4.bytes)\ );}
+\DoxyCodeLine{00179\ \ \ \ \ BOOST\_CHECK(\ std::equal(h5\_solution,h5\_solution+12,h5.bytes)\ );}
+\DoxyCodeLine{00180\ \}}
+
+\end{DoxyCode}
+\Hypertarget{frame_8cpp_af5b647fe774b7eaf0fc4dab3acf39cb8}\index{frame.cpp@{frame.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!frame.cpp@{frame.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [17/20]}}
+{\footnotesize\ttfamily \label{frame_8cpp_af5b647fe774b7eaf0fc4dab3acf39cb8} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{extended\+\_\+header\+\_\+extractors}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{frame_8cpp_source_l00182}{182}} of file \mbox{\hyperlink{frame_8cpp_source}{frame.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00183\ \ \ \ \ \mbox{\hyperlink{structwebsocketpp_1_1frame_1_1basic__header}{frame::basic\_header}}\ h1(0x00,0x7E);}
+\DoxyCodeLine{00184\ \ \ \ \ \mbox{\hyperlink{structwebsocketpp_1_1frame_1_1extended__header}{frame::extended\_header}}\ e1(\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}(255));}
+\DoxyCodeLine{00185\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a5ae0cc87ac44bb78c5dc41983c43a0c4}{get\_extended\_size}}(e1)\ ==\ 255\ );}
+\DoxyCodeLine{00186\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a2ca0b9ba6077f201997da543d45b067f}{get\_payload\_size}}(h1,e1)\ ==\ 255\ );}
+\DoxyCodeLine{00187\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a001d6c5e538d5eb1ef5ddc21aeb61ee3}{get\_masking\_key\_offset}}(h1)\ ==\ 2\ );}
+\DoxyCodeLine{00188\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_aed7edd146ce3aa5b87adc9fcc5fcb10f}{get\_masking\_key}}(h1,e1).i\ ==\ 0\ );}
+\DoxyCodeLine{00189\ }
+\DoxyCodeLine{00190\ \ \ \ \ \mbox{\hyperlink{structwebsocketpp_1_1frame_1_1basic__header}{frame::basic\_header}}\ h2(0x00,0x7F);}
+\DoxyCodeLine{00191\ \ \ \ \ \mbox{\hyperlink{structwebsocketpp_1_1frame_1_1extended__header}{frame::extended\_header}}\ e2(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}(0x0807060504030201LL));}
+\DoxyCodeLine{00192\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_ac55b672bcd3baf4c5a074816f6eb035b}{get\_jumbo\_size}}(e2)\ ==\ 0x0807060504030201LL\ );}
+\DoxyCodeLine{00193\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a2ca0b9ba6077f201997da543d45b067f}{get\_payload\_size}}(h2,e2)\ ==\ 0x0807060504030201LL\ );}
+\DoxyCodeLine{00194\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a001d6c5e538d5eb1ef5ddc21aeb61ee3}{get\_masking\_key\_offset}}(h2)\ ==\ 8\ );}
+\DoxyCodeLine{00195\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_aed7edd146ce3aa5b87adc9fcc5fcb10f}{get\_masking\_key}}(h2,e2).i\ ==\ 0\ );}
+\DoxyCodeLine{00196\ }
+\DoxyCodeLine{00197\ \ \ \ \ \mbox{\hyperlink{structwebsocketpp_1_1frame_1_1basic__header}{frame::basic\_header}}\ h3(0x00,0xFE);}
+\DoxyCodeLine{00198\ \ \ \ \ \mbox{\hyperlink{structwebsocketpp_1_1frame_1_1extended__header}{frame::extended\_header}}\ e3(\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}(255),0x08040201);}
+\DoxyCodeLine{00199\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a5ae0cc87ac44bb78c5dc41983c43a0c4}{get\_extended\_size}}(e3)\ ==\ 255\ );}
+\DoxyCodeLine{00200\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a2ca0b9ba6077f201997da543d45b067f}{get\_payload\_size}}(h3,e3)\ ==\ 255\ );}
+\DoxyCodeLine{00201\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a001d6c5e538d5eb1ef5ddc21aeb61ee3}{get\_masking\_key\_offset}}(h3)\ ==\ 2\ );}
+\DoxyCodeLine{00202\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_aed7edd146ce3aa5b87adc9fcc5fcb10f}{get\_masking\_key}}(h3,e3).i\ ==\ 0x08040201\ );}
+\DoxyCodeLine{00203\ }
+\DoxyCodeLine{00204\ \ \ \ \ \mbox{\hyperlink{structwebsocketpp_1_1frame_1_1basic__header}{frame::basic\_header}}\ h4(0x00,0xFF);}
+\DoxyCodeLine{00205\ \ \ \ \ \mbox{\hyperlink{structwebsocketpp_1_1frame_1_1extended__header}{frame::extended\_header}}\ e4(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}(0x0807060504030201LL),0x08040201);}
+\DoxyCodeLine{00206\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_ac55b672bcd3baf4c5a074816f6eb035b}{get\_jumbo\_size}}(e4)\ ==\ 0x0807060504030201LL\ );}
+\DoxyCodeLine{00207\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a2ca0b9ba6077f201997da543d45b067f}{get\_payload\_size}}(h4,e4)\ ==\ 0x0807060504030201LL\ );}
+\DoxyCodeLine{00208\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a001d6c5e538d5eb1ef5ddc21aeb61ee3}{get\_masking\_key\_offset}}(h4)\ ==\ 8\ );}
+\DoxyCodeLine{00209\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_aed7edd146ce3aa5b87adc9fcc5fcb10f}{get\_masking\_key}}(h4,e4).i\ ==\ 0x08040201\ );}
+\DoxyCodeLine{00210\ }
+\DoxyCodeLine{00211\ \ \ \ \ \mbox{\hyperlink{structwebsocketpp_1_1frame_1_1basic__header}{frame::basic\_header}}\ h5(0x00,0x7D);}
+\DoxyCodeLine{00212\ \ \ \ \ \mbox{\hyperlink{structwebsocketpp_1_1frame_1_1extended__header}{frame::extended\_header}}\ e5;}
+\DoxyCodeLine{00213\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a2ca0b9ba6077f201997da543d45b067f}{get\_payload\_size}}(h5,e5)\ ==\ 125\ );}
+\DoxyCodeLine{00214\ \}}
+
+\end{DoxyCode}
+\Hypertarget{frame_8cpp_ac637036c7f3ba21c927cce7c9a9b0f26}\index{frame.cpp@{frame.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!frame.cpp@{frame.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [18/20]}}
+{\footnotesize\ttfamily \label{frame_8cpp_ac637036c7f3ba21c927cce7c9a9b0f26} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{header\+\_\+preparation}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{frame_8cpp_source_l00216}{216}} of file \mbox{\hyperlink{frame_8cpp_source}{frame.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00217\ \ \ \ \ \mbox{\hyperlink{structwebsocketpp_1_1frame_1_1basic__header}{frame::basic\_header}}\ h1(0x81,0xFF);\ \textcolor{comment}{//}}
+\DoxyCodeLine{00218\ \ \ \ \ \mbox{\hyperlink{structwebsocketpp_1_1frame_1_1extended__header}{frame::extended\_header}}\ e1(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}(0xFFFFFLL),htonl(0xD5FB70EE));}
+\DoxyCodeLine{00219\ \ \ \ \ std::string\ p1\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_ae63c3e01399a6787ed09b710853344a4}{prepare\_header}}(h1,\ e1);}
+\DoxyCodeLine{00220\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ s1[14]\ =\ \{0x81,\ 0xFF,}
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x0F,\ 0xFF,\ 0xFF,}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0xD5,\ 0xFB,\ 0x70,\ 0xEE\};}
+\DoxyCodeLine{00223\ }
+\DoxyCodeLine{00224\ \ \ \ \ BOOST\_CHECK(\ p1.size()\ ==\ 14);}
+\DoxyCodeLine{00225\ \ \ \ \ BOOST\_CHECK(\ std::equal(p1.begin(),p1.end(),\textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(s1))\ );}
+\DoxyCodeLine{00226\ }
+\DoxyCodeLine{00227\ \ \ \ \ \mbox{\hyperlink{structwebsocketpp_1_1frame_1_1basic__header}{frame::basic\_header}}\ h2(0x81,0x7E);\ \textcolor{comment}{//}}
+\DoxyCodeLine{00228\ \ \ \ \ \mbox{\hyperlink{structwebsocketpp_1_1frame_1_1extended__header}{frame::extended\_header}}\ e2(\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}(255));}
+\DoxyCodeLine{00229\ \ \ \ \ std::string\ p2\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_ae63c3e01399a6787ed09b710853344a4}{prepare\_header}}(h2,\ e2);}
+\DoxyCodeLine{00230\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ s2[4]\ =\ \{0x81,\ 0x7E,\ 0x00,\ 0xFF\};}
+\DoxyCodeLine{00231\ }
+\DoxyCodeLine{00232\ \ \ \ \ BOOST\_CHECK(\ p2.size()\ ==\ 4);}
+\DoxyCodeLine{00233\ \ \ \ \ BOOST\_CHECK(\ std::equal(p2.begin(),p2.end(),\textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(s2))\ );}
+\DoxyCodeLine{00234\ \}}
+
+\end{DoxyCode}
+\Hypertarget{frame_8cpp_ad85249cf07a2ae7b5923e990ff22afa0}\index{frame.cpp@{frame.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!frame.cpp@{frame.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [19/20]}}
+{\footnotesize\ttfamily \label{frame_8cpp_ad85249cf07a2ae7b5923e990ff22afa0} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{prepare\+\_\+masking\+\_\+key}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{frame_8cpp_source_l00236}{236}} of file \mbox{\hyperlink{frame_8cpp_source}{frame.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00237\ \ \ \ \ \mbox{\hyperlink{unionwebsocketpp_1_1frame_1_1uint32__converter}{frame::masking\_key\_type}}\ \mbox{\hyperlink{yubico__otp_8c_a9246c20bb98ad2b4c60313c053c70f08}{key}};}
+\DoxyCodeLine{00238\ }
+\DoxyCodeLine{00239\ \ \ \ \ key.\mbox{\hyperlink{unionwebsocketpp_1_1frame_1_1uint32__converter_a2bceb785be148d7c9b9ce11240595440}{i}}\ =\ htonl(0x12345678);}
+\DoxyCodeLine{00240\ }
+\DoxyCodeLine{00241\ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{sizeof}(\textcolor{keywordtype}{size\_t})\ ==\ 8)\ \{}
+\DoxyCodeLine{00242\ \ \ \ \ \ \ \ \ BOOST\_CHECK(}
+\DoxyCodeLine{00243\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_af80eee705eb39fb533cf4ab3d7a6d3bb}{frame::prepare\_masking\_key}}(key)\ ==\ \mbox{\hyperlink{namespacewebsocketpp_1_1lib_1_1net_ab3e62ef8d23c6e35b1d726fa1fa1c537}{lib::net::\_htonll}}(0x1234567812345678LL)}
+\DoxyCodeLine{00244\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00245\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00246\ \ \ \ \ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_af80eee705eb39fb533cf4ab3d7a6d3bb}{frame::prepare\_masking\_key}}(key)\ ==\ htonl(0x12345678)\ );}
+\DoxyCodeLine{00247\ \ \ \ \ \}}
+\DoxyCodeLine{00248\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{frame_8cpp_ad85249cf07a2ae7b5923e990ff22afa0_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{frame_8cpp_a645b482dedfe131f3684c173f940fae5}\index{frame.cpp@{frame.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!frame.cpp@{frame.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [20/20]}}
+{\footnotesize\ttfamily \label{frame_8cpp_a645b482dedfe131f3684c173f940fae5} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{prepare\+\_\+masking\+\_\+key2}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{frame_8cpp_source_l00250}{250}} of file \mbox{\hyperlink{frame_8cpp_source}{frame.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00250\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00251\ \ \ \ \ \mbox{\hyperlink{unionwebsocketpp_1_1frame_1_1uint32__converter}{frame::masking\_key\_type}}\ \mbox{\hyperlink{yubico__otp_8c_a9246c20bb98ad2b4c60313c053c70f08}{key}};}
+\DoxyCodeLine{00252\ }
+\DoxyCodeLine{00253\ \ \ \ \ key.\mbox{\hyperlink{unionwebsocketpp_1_1frame_1_1uint32__converter_a2bceb785be148d7c9b9ce11240595440}{i}}\ =\ htonl(0xD5FB70EE);}
+\DoxyCodeLine{00254\ }
+\DoxyCodeLine{00255\ \ \ \ \ \textcolor{comment}{//\ One\ call}}
+\DoxyCodeLine{00256\ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{sizeof}(\textcolor{keywordtype}{size\_t})\ ==\ 8)\ \{}
+\DoxyCodeLine{00257\ \ \ \ \ \ \ \ \ BOOST\_CHECK(}
+\DoxyCodeLine{00258\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_af80eee705eb39fb533cf4ab3d7a6d3bb}{frame::prepare\_masking\_key}}(key)\ ==\ \mbox{\hyperlink{namespacewebsocketpp_1_1lib_1_1net_ab3e62ef8d23c6e35b1d726fa1fa1c537}{lib::net::\_htonll}}(0xD5FB70EED5FB70EELL)}
+\DoxyCodeLine{00259\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00260\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00261\ \ \ \ \ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_af80eee705eb39fb533cf4ab3d7a6d3bb}{frame::prepare\_masking\_key}}(key)\ ==\ htonl(0xD5FB70EE)\ );}
+\DoxyCodeLine{00262\ \ \ \ \ \}}
+\DoxyCodeLine{00263\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{frame_8cpp_a645b482dedfe131f3684c173f940fae5_cgraph}
+\end{center}
+\end{figure}

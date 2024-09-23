@@ -1,0 +1,16 @@
+<map id="sysio::ship_magic" name="sysio::ship_magic">
+<area shape="rect" id="Node000001" title=" " alt="" coords="519,144,645,169"/>
+<area shape="rect" id="Node000002" href="$namespacesysio.html#a18132f8f1084f1195249e432f1d9329e" title=" " alt="" coords="297,5,440,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="557,134,518,97,470,61,440,47,442,42,472,57,522,93,561,130"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1state__history__log.html#a6d85c85a918a3a0a987ab3e25bb6b44c" title=" " alt="" coords="293,71,445,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="522,141,437,114,439,109,524,136"/>
+<area shape="rect" id="Node000004" href="$structsysio_1_1state__history__plugin__impl.html#abada9ce88fb6a33aa4ac4c9d4726bf67" title=" " alt="" coords="267,136,471,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="504,159,471,159,471,154,504,154"/>
+<area shape="rect" id="Node000006" href="$structsysio_1_1state__history__plugin__impl.html#a2074796cb93f0dda90a98f2d5ef143ee" title=" " alt="" coords="282,201,456,242"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="524,177,439,203,437,198,522,172"/>
+<area shape="rect" id="Node000007" href="$classsysio_1_1state__history__log.html#a8753293c4782af4d456ecfdc84808dff" title=" " alt="" coords="301,267,436,307"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="561,182,522,220,472,256,438,272,436,267,470,251,518,216,557,179"/>
+<area shape="rect" id="Node000005" href="$structsysio_1_1state__history__plugin__impl.html#aaa0729b45ec2388fbc2b5feefde76292" title=" " alt="" coords="5,169,219,210"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="252,174,220,178,219,173,251,169"/>
+<area shape="poly" id="edge6_Node000006_Node000005" title=" " alt="" coords="267,212,219,206,219,200,267,206"/>
+</map>

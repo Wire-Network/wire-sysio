@@ -1,0 +1,437 @@
+\doxysection{Catch\+::Xml\+Writer Class Reference}
+\hypertarget{class_catch_1_1_xml_writer}{}\label{class_catch_1_1_xml_writer}\index{Catch::XmlWriter@{Catch::XmlWriter}}
+
+
+{\ttfamily \#include $<$catch\+\_\+xmlwriter.\+h$>$}
+
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{class_catch_1_1_xml_writer_1_1_scoped_element}{Scoped\+Element}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_catch_1_1_xml_writer_a2a225ace22c50f160f57f026b68f949e}{Xml\+Writer}} (std\+::ostream \&os=\mbox{\hyperlink{namespace_catch_a0179d453617ba2296f2baa99a49e7264}{Catch\+::cout}}())
+\item 
+\mbox{\hyperlink{class_catch_1_1_xml_writer_ac8ad78245b9f7b2d34574a6903d15fc5}{\texorpdfstring{$\sim$}{\string~}\+Xml\+Writer}} ()
+\item 
+\mbox{\hyperlink{class_catch_1_1_xml_writer_a735da4465c68e34d099d8ae06a3e48d4}{Xml\+Writer}} (\mbox{\hyperlink{class_catch_1_1_xml_writer}{Xml\+Writer}} const \&)=delete
+\item 
+\mbox{\hyperlink{class_catch_1_1_xml_writer}{Xml\+Writer}} \& \mbox{\hyperlink{class_catch_1_1_xml_writer_a2023794f6be8e6297450c7291773fbff}{operator=}} (\mbox{\hyperlink{class_catch_1_1_xml_writer}{Xml\+Writer}} const \&)=delete
+\item 
+\mbox{\hyperlink{class_catch_1_1_xml_writer}{Xml\+Writer}} \& \mbox{\hyperlink{class_catch_1_1_xml_writer_a6114b9d8038cd4f159ccd016f12d4992}{start\+Element}} (std\+::string const \&\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})
+\item 
+\mbox{\hyperlink{class_catch_1_1_xml_writer_1_1_scoped_element}{Scoped\+Element}} \mbox{\hyperlink{class_catch_1_1_xml_writer_a48f1a53e3255938813ff91f9fec9b690}{scoped\+Element}} (std\+::string const \&\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})
+\item 
+\mbox{\hyperlink{class_catch_1_1_xml_writer}{Xml\+Writer}} \& \mbox{\hyperlink{class_catch_1_1_xml_writer_a8fcaa0821b6c2c1750c654af0b33c823}{end\+Element}} ()
+\item 
+\mbox{\hyperlink{class_catch_1_1_xml_writer}{Xml\+Writer}} \& \mbox{\hyperlink{class_catch_1_1_xml_writer_ad433310b59d30e0fedc7130dc11c563b}{write\+Attribute}} (std\+::string const \&\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}, std\+::string const \&attribute)
+\item 
+\mbox{\hyperlink{class_catch_1_1_xml_writer}{Xml\+Writer}} \& \mbox{\hyperlink{class_catch_1_1_xml_writer_aea247ebff47ef4d9271aa3230bdcbc79}{write\+Attribute}} (std\+::string const \&\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}, bool attribute)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{class_catch_1_1_xml_writer}{Xml\+Writer}} \& \mbox{\hyperlink{class_catch_1_1_xml_writer_a422011d117e5716aadf35eee9fad07ed}{write\+Attribute}} (std\+::string const \&\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const \&attribute)
+\item 
+\mbox{\hyperlink{class_catch_1_1_xml_writer}{Xml\+Writer}} \& \mbox{\hyperlink{class_catch_1_1_xml_writer_a4c49775bdf7b5bd870b34ab22af62a9c}{write\+Text}} (std\+::string const \&text, bool indent=true)
+\item 
+\mbox{\hyperlink{class_catch_1_1_xml_writer}{Xml\+Writer}} \& \mbox{\hyperlink{class_catch_1_1_xml_writer_a9b05f39e489ac0fcf011e689e05ce782}{write\+Comment}} (std\+::string const \&text)
+\item 
+void \mbox{\hyperlink{class_catch_1_1_xml_writer_a82beef2dcf4342d5b132236c96b4705e}{write\+Stylesheet\+Ref}} (std\+::string const \&\mbox{\hyperlink{programs_2clio_2main_8cpp_aa03c1ef4c41f36b048cf58d5aade7653}{url}})
+\item 
+\mbox{\hyperlink{class_catch_1_1_xml_writer}{Xml\+Writer}} \& \mbox{\hyperlink{class_catch_1_1_xml_writer_ad06be811a5bbfd730a4cfe575e246c33}{write\+Blank\+Line}} ()
+\item 
+void \mbox{\hyperlink{class_catch_1_1_xml_writer_aba98703d9852416e237de82aed4a9c4f}{ensure\+Tag\+Closed}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{catch__xmlwriter_8h_source_l00033}{33}} of file \mbox{\hyperlink{catch__xmlwriter_8h_source}{catch\+\_\+xmlwriter.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_catch_1_1_xml_writer_a2a225ace22c50f160f57f026b68f949e}\index{Catch::XmlWriter@{Catch::XmlWriter}!XmlWriter@{XmlWriter}}
+\index{XmlWriter@{XmlWriter}!Catch::XmlWriter@{Catch::XmlWriter}}
+\doxysubsubsection{\texorpdfstring{XmlWriter()}{XmlWriter()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_xml_writer_a2a225ace22c50f160f57f026b68f949e} 
+Catch\+::\+Xml\+Writer\+::\+Xml\+Writer (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{os}{ = {\ttfamily \mbox{\hyperlink{namespace_catch_a0179d453617ba2296f2baa99a49e7264}{Catch\+::cout}}()}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{include_2internal_2catch__xmlwriter_8cpp_source_l00188}{188}} of file \mbox{\hyperlink{include_2internal_2catch__xmlwriter_8cpp_source}{catch\+\_\+xmlwriter.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ m\_os(\ os\ )}
+\DoxyCodeLine{00189\ \ \ \ \ \{}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ writeDeclaration();}
+\DoxyCodeLine{00191\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_xml_writer_ac8ad78245b9f7b2d34574a6903d15fc5}\index{Catch::XmlWriter@{Catch::XmlWriter}!````~XmlWriter@{\texorpdfstring{$\sim$}{\string~}XmlWriter}}
+\index{````~XmlWriter@{\texorpdfstring{$\sim$}{\string~}XmlWriter}!Catch::XmlWriter@{Catch::XmlWriter}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}XmlWriter()}{\string~XmlWriter()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_xml_writer_ac8ad78245b9f7b2d34574a6903d15fc5} 
+Catch\+::\+Xml\+Writer\+::\texorpdfstring{$\sim$}{\string~}\+Xml\+Writer (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{include_2internal_2catch__xmlwriter_8cpp_source_l00193}{193}} of file \mbox{\hyperlink{include_2internal_2catch__xmlwriter_8cpp_source}{catch\+\_\+xmlwriter.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\ !m\_tags.empty()\ )}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_xml_writer_a8fcaa0821b6c2c1750c654af0b33c823}{endElement}}();}
+\DoxyCodeLine{00196\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_xml_writer_ac8ad78245b9f7b2d34574a6903d15fc5_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_xml_writer_a735da4465c68e34d099d8ae06a3e48d4}\index{Catch::XmlWriter@{Catch::XmlWriter}!XmlWriter@{XmlWriter}}
+\index{XmlWriter@{XmlWriter}!Catch::XmlWriter@{Catch::XmlWriter}}
+\doxysubsubsection{\texorpdfstring{XmlWriter()}{XmlWriter()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_xml_writer_a735da4465c68e34d099d8ae06a3e48d4} 
+Catch\+::\+Xml\+Writer\+::\+Xml\+Writer (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_catch_1_1_xml_writer}{Xml\+Writer}} const \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [delete]}}
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_catch_1_1_xml_writer_a8fcaa0821b6c2c1750c654af0b33c823}\index{Catch::XmlWriter@{Catch::XmlWriter}!endElement@{endElement}}
+\index{endElement@{endElement}!Catch::XmlWriter@{Catch::XmlWriter}}
+\doxysubsubsection{\texorpdfstring{endElement()}{endElement()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_xml_writer_a8fcaa0821b6c2c1750c654af0b33c823} 
+\mbox{\hyperlink{class_catch_1_1_xml_writer}{Xml\+Writer}} \& Catch\+::\+Xml\+Writer\+::end\+Element (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{include_2internal_2catch__xmlwriter_8cpp_source_l00214}{214}} of file \mbox{\hyperlink{include_2internal_2catch__xmlwriter_8cpp_source}{catch\+\_\+xmlwriter.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \ \ newlineIfNecessary();}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ m\_indent\ =\ m\_indent.substr(\ 0,\ m\_indent.size()-\/2\ );}
+\DoxyCodeLine{00217\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ m\_tagIsOpen\ )\ \{}
+\DoxyCodeLine{00218\ \ \ \ \ \ \ \ \ \ \ \ \ m\_os\ <<\ \textcolor{stringliteral}{"{}/>"{}};}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \ \ \ \ \ \ m\_tagIsOpen\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \ \ \ \ \ \ m\_os\ <<\ m\_indent\ <<\ \textcolor{stringliteral}{"{}</"{}}\ <<\ m\_tags.back()\ <<\ \textcolor{stringliteral}{"{}>"{}};}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \ \ m\_os\ <<\ std::endl;}
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \ \ m\_tags.pop\_back();}
+\DoxyCodeLine{00226\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00227\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_xml_writer_a8fcaa0821b6c2c1750c654af0b33c823_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_xml_writer_aba98703d9852416e237de82aed4a9c4f}\index{Catch::XmlWriter@{Catch::XmlWriter}!ensureTagClosed@{ensureTagClosed}}
+\index{ensureTagClosed@{ensureTagClosed}!Catch::XmlWriter@{Catch::XmlWriter}}
+\doxysubsubsection{\texorpdfstring{ensureTagClosed()}{ensureTagClosed()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_xml_writer_aba98703d9852416e237de82aed4a9c4f} 
+void Catch\+::\+Xml\+Writer\+::ensure\+Tag\+Closed (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{include_2internal_2catch__xmlwriter_8cpp_source_l00269}{269}} of file \mbox{\hyperlink{include_2internal_2catch__xmlwriter_8cpp_source}{catch\+\_\+xmlwriter.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00269\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00270\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ m\_tagIsOpen\ )\ \{}
+\DoxyCodeLine{00271\ \ \ \ \ \ \ \ \ \ \ \ \ m\_os\ <<\ \textcolor{stringliteral}{"{}>"{}}\ <<\ std::endl;}
+\DoxyCodeLine{00272\ \ \ \ \ \ \ \ \ \ \ \ \ m\_tagIsOpen\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00273\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00274\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_xml_writer_aba98703d9852416e237de82aed4a9c4f_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_xml_writer_a2023794f6be8e6297450c7291773fbff}\index{Catch::XmlWriter@{Catch::XmlWriter}!operator=@{operator=}}
+\index{operator=@{operator=}!Catch::XmlWriter@{Catch::XmlWriter}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_xml_writer_a2023794f6be8e6297450c7291773fbff} 
+\mbox{\hyperlink{class_catch_1_1_xml_writer}{Xml\+Writer}} \& Catch\+::\+Xml\+Writer\+::operator= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_catch_1_1_xml_writer}{Xml\+Writer}} const \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [delete]}}
+
+\Hypertarget{class_catch_1_1_xml_writer_a48f1a53e3255938813ff91f9fec9b690}\index{Catch::XmlWriter@{Catch::XmlWriter}!scopedElement@{scopedElement}}
+\index{scopedElement@{scopedElement}!Catch::XmlWriter@{Catch::XmlWriter}}
+\doxysubsubsection{\texorpdfstring{scopedElement()}{scopedElement()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_xml_writer_a48f1a53e3255938813ff91f9fec9b690} 
+\mbox{\hyperlink{class_catch_1_1_xml_writer_1_1_scoped_element}{Xml\+Writer\+::\+Scoped\+Element}} Catch\+::\+Xml\+Writer\+::scoped\+Element (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{name}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{include_2internal_2catch__xmlwriter_8cpp_source_l00208}{208}} of file \mbox{\hyperlink{include_2internal_2catch__xmlwriter_8cpp_source}{catch\+\_\+xmlwriter.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \ \ ScopedElement\ scoped(\ \textcolor{keyword}{this}\ );}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_xml_writer_a6114b9d8038cd4f159ccd016f12d4992}{startElement}}(\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ );}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ scoped;}
+\DoxyCodeLine{00212\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_xml_writer_a48f1a53e3255938813ff91f9fec9b690_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_xml_writer_a48f1a53e3255938813ff91f9fec9b690_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_xml_writer_a6114b9d8038cd4f159ccd016f12d4992}\index{Catch::XmlWriter@{Catch::XmlWriter}!startElement@{startElement}}
+\index{startElement@{startElement}!Catch::XmlWriter@{Catch::XmlWriter}}
+\doxysubsubsection{\texorpdfstring{startElement()}{startElement()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_xml_writer_a6114b9d8038cd4f159ccd016f12d4992} 
+\mbox{\hyperlink{class_catch_1_1_xml_writer}{Xml\+Writer}} \& Catch\+::\+Xml\+Writer\+::start\+Element (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{name}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{include_2internal_2catch__xmlwriter_8cpp_source_l00198}{198}} of file \mbox{\hyperlink{include_2internal_2catch__xmlwriter_8cpp_source}{catch\+\_\+xmlwriter.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_xml_writer_aba98703d9852416e237de82aed4a9c4f}{ensureTagClosed}}();}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ newlineIfNecessary();}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \ \ m\_os\ <<\ m\_indent\ <<\ \textcolor{charliteral}{'<'}\ <<\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}};}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \ \ m\_tags.push\_back(\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ );}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ \ \ m\_indent\ +=\ \textcolor{stringliteral}{"{}\ \ "{}};}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ m\_tagIsOpen\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00206\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_xml_writer_a6114b9d8038cd4f159ccd016f12d4992_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_xml_writer_a6114b9d8038cd4f159ccd016f12d4992_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_xml_writer_aea247ebff47ef4d9271aa3230bdcbc79}\index{Catch::XmlWriter@{Catch::XmlWriter}!writeAttribute@{writeAttribute}}
+\index{writeAttribute@{writeAttribute}!Catch::XmlWriter@{Catch::XmlWriter}}
+\doxysubsubsection{\texorpdfstring{writeAttribute()}{writeAttribute()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_xml_writer_aea247ebff47ef4d9271aa3230bdcbc79} 
+\mbox{\hyperlink{class_catch_1_1_xml_writer}{Xml\+Writer}} \& Catch\+::\+Xml\+Writer\+::write\+Attribute (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{name}{, }\item[{bool}]{attribute}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{include_2internal_2catch__xmlwriter_8cpp_source_l00235}{235}} of file \mbox{\hyperlink{include_2internal_2catch__xmlwriter_8cpp_source}{catch\+\_\+xmlwriter.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ m\_os\ <<\ \textcolor{charliteral}{'\ '}\ <<\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ <<\ \textcolor{stringliteral}{"{}=\(\backslash\)"{}"{}}\ <<\ (\ attribute\ ?\ \textcolor{stringliteral}{"{}true"{}}\ :\ \textcolor{stringliteral}{"{}false"{}}\ )\ <<\ \textcolor{charliteral}{'"{}'};}
+\DoxyCodeLine{00237\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00238\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_xml_writer_ad433310b59d30e0fedc7130dc11c563b}\index{Catch::XmlWriter@{Catch::XmlWriter}!writeAttribute@{writeAttribute}}
+\index{writeAttribute@{writeAttribute}!Catch::XmlWriter@{Catch::XmlWriter}}
+\doxysubsubsection{\texorpdfstring{writeAttribute()}{writeAttribute()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_xml_writer_ad433310b59d30e0fedc7130dc11c563b} 
+\mbox{\hyperlink{class_catch_1_1_xml_writer}{Xml\+Writer}} \& Catch\+::\+Xml\+Writer\+::write\+Attribute (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{name}{, }\item[{std\+::string const \&}]{attribute}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{include_2internal_2catch__xmlwriter_8cpp_source_l00229}{229}} of file \mbox{\hyperlink{include_2internal_2catch__xmlwriter_8cpp_source}{catch\+\_\+xmlwriter.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00229\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00230\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}.empty()\ \&\&\ !attribute.empty()\ )}
+\DoxyCodeLine{00231\ \ \ \ \ \ \ \ \ \ \ \ \ m\_os\ <<\ \textcolor{charliteral}{'\ '}\ <<\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ <<\ \textcolor{stringliteral}{"{}=\(\backslash\)"{}"{}}\ <<\ XmlEncode(\ attribute,\ \mbox{\hyperlink{class_catch_1_1_xml_encode_a81ed50fe458d1aae3481781b4d599b7aa3cdd995cc66ae405a4793a98db186005}{XmlEncode::ForAttributes}}\ )\ <<\ \textcolor{charliteral}{'"{}'};}
+\DoxyCodeLine{00232\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00233\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_xml_writer_ad433310b59d30e0fedc7130dc11c563b_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_xml_writer_a422011d117e5716aadf35eee9fad07ed}\index{Catch::XmlWriter@{Catch::XmlWriter}!writeAttribute@{writeAttribute}}
+\index{writeAttribute@{writeAttribute}!Catch::XmlWriter@{Catch::XmlWriter}}
+\doxysubsubsection{\texorpdfstring{writeAttribute()}{writeAttribute()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_xml_writer_a422011d117e5716aadf35eee9fad07ed} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{class_catch_1_1_xml_writer}{Xml\+Writer}} \& Catch\+::\+Xml\+Writer\+::write\+Attribute (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{name}{, }\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const \&}]{attribute}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__xmlwriter_8h_source_l00074}{74}} of file \mbox{\hyperlink{catch__xmlwriter_8h_source}{catch\+\_\+xmlwriter.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \ \ \ ReusableStringStream\ rss;}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ rss\ <<\ attribute;}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_catch_1_1_xml_writer_ad433310b59d30e0fedc7130dc11c563b}{writeAttribute}}(\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ rss.str()\ );}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_xml_writer_a422011d117e5716aadf35eee9fad07ed_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_xml_writer_ad06be811a5bbfd730a4cfe575e246c33}\index{Catch::XmlWriter@{Catch::XmlWriter}!writeBlankLine@{writeBlankLine}}
+\index{writeBlankLine@{writeBlankLine}!Catch::XmlWriter@{Catch::XmlWriter}}
+\doxysubsubsection{\texorpdfstring{writeBlankLine()}{writeBlankLine()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_xml_writer_ad06be811a5bbfd730a4cfe575e246c33} 
+\mbox{\hyperlink{class_catch_1_1_xml_writer}{Xml\+Writer}} \& Catch\+::\+Xml\+Writer\+::write\+Blank\+Line (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{include_2internal_2catch__xmlwriter_8cpp_source_l00263}{263}} of file \mbox{\hyperlink{include_2internal_2catch__xmlwriter_8cpp_source}{catch\+\_\+xmlwriter.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00263\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00264\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_xml_writer_aba98703d9852416e237de82aed4a9c4f}{ensureTagClosed}}();}
+\DoxyCodeLine{00265\ \ \ \ \ \ \ \ \ m\_os\ <<\ \textcolor{charliteral}{'\(\backslash\)n'};}
+\DoxyCodeLine{00266\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00267\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_xml_writer_ad06be811a5bbfd730a4cfe575e246c33_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_xml_writer_a9b05f39e489ac0fcf011e689e05ce782}\index{Catch::XmlWriter@{Catch::XmlWriter}!writeComment@{writeComment}}
+\index{writeComment@{writeComment}!Catch::XmlWriter@{Catch::XmlWriter}}
+\doxysubsubsection{\texorpdfstring{writeComment()}{writeComment()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_xml_writer_a9b05f39e489ac0fcf011e689e05ce782} 
+\mbox{\hyperlink{class_catch_1_1_xml_writer}{Xml\+Writer}} \& Catch\+::\+Xml\+Writer\+::write\+Comment (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{text}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{include_2internal_2catch__xmlwriter_8cpp_source_l00252}{252}} of file \mbox{\hyperlink{include_2internal_2catch__xmlwriter_8cpp_source}{catch\+\_\+xmlwriter.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00252\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00253\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_xml_writer_aba98703d9852416e237de82aed4a9c4f}{ensureTagClosed}}();}
+\DoxyCodeLine{00254\ \ \ \ \ \ \ \ \ m\_os\ <<\ m\_indent\ <<\ \textcolor{stringliteral}{"{}<!-\/-\/"{}}\ <<\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea6b65f28626b19b2eef447744c564e727}{text}}\ <<\ \textcolor{stringliteral}{"{}-\/-\/>"{}};}
+\DoxyCodeLine{00255\ \ \ \ \ \ \ \ \ m\_needsNewline\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00256\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00257\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_xml_writer_a9b05f39e489ac0fcf011e689e05ce782_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_xml_writer_a82beef2dcf4342d5b132236c96b4705e}\index{Catch::XmlWriter@{Catch::XmlWriter}!writeStylesheetRef@{writeStylesheetRef}}
+\index{writeStylesheetRef@{writeStylesheetRef}!Catch::XmlWriter@{Catch::XmlWriter}}
+\doxysubsubsection{\texorpdfstring{writeStylesheetRef()}{writeStylesheetRef()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_xml_writer_a82beef2dcf4342d5b132236c96b4705e} 
+void Catch\+::\+Xml\+Writer\+::write\+Stylesheet\+Ref (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{url}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{include_2internal_2catch__xmlwriter_8cpp_source_l00259}{259}} of file \mbox{\hyperlink{include_2internal_2catch__xmlwriter_8cpp_source}{catch\+\_\+xmlwriter.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00259\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00260\ \ \ \ \ \ \ \ \ m\_os\ <<\ \textcolor{stringliteral}{"{}<?xml-\/stylesheet\ type=\(\backslash\)"{}text/xsl\(\backslash\)"{}\ href=\(\backslash\)"{}"{}}\ <<\ \mbox{\hyperlink{programs_2clio_2main_8cpp_aa03c1ef4c41f36b048cf58d5aade7653}{url}}\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)"{}?>\(\backslash\)n"{}};}
+\DoxyCodeLine{00261\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_xml_writer_a82beef2dcf4342d5b132236c96b4705e_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_xml_writer_a4c49775bdf7b5bd870b34ab22af62a9c}\index{Catch::XmlWriter@{Catch::XmlWriter}!writeText@{writeText}}
+\index{writeText@{writeText}!Catch::XmlWriter@{Catch::XmlWriter}}
+\doxysubsubsection{\texorpdfstring{writeText()}{writeText()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_xml_writer_a4c49775bdf7b5bd870b34ab22af62a9c} 
+\mbox{\hyperlink{class_catch_1_1_xml_writer}{Xml\+Writer}} \& Catch\+::\+Xml\+Writer\+::write\+Text (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{text}{, }\item[{bool}]{indent}{ = {\ttfamily true}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{include_2internal_2catch__xmlwriter_8cpp_source_l00240}{240}} of file \mbox{\hyperlink{include_2internal_2catch__xmlwriter_8cpp_source}{catch\+\_\+xmlwriter.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00241\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !\mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea6b65f28626b19b2eef447744c564e727}{text}}.empty()\ )\{}
+\DoxyCodeLine{00242\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ tagWasOpen\ =\ m\_tagIsOpen;}
+\DoxyCodeLine{00243\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_xml_writer_aba98703d9852416e237de82aed4a9c4f}{ensureTagClosed}}();}
+\DoxyCodeLine{00244\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ tagWasOpen\ \&\&\ indent\ )}
+\DoxyCodeLine{00245\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_os\ <<\ m\_indent;}
+\DoxyCodeLine{00246\ \ \ \ \ \ \ \ \ \ \ \ \ m\_os\ <<\ XmlEncode(\ text\ );}
+\DoxyCodeLine{00247\ \ \ \ \ \ \ \ \ \ \ \ \ m\_needsNewline\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00248\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00249\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00250\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_xml_writer_a4c49775bdf7b5bd870b34ab22af62a9c_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_xml_writer_a4c49775bdf7b5bd870b34ab22af62a9c_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__xmlwriter_8h}{catch\+\_\+xmlwriter.\+h}}\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{include_2internal_2catch__xmlwriter_8cpp}{catch\+\_\+xmlwriter.\+cpp}}\end{DoxyCompactItemize}

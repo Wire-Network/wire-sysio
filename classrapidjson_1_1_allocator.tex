@@ -1,0 +1,45 @@
+\doxysection{Allocator Class Reference}
+\hypertarget{classrapidjson_1_1_allocator}{}\label{classrapidjson_1_1_allocator}\index{Allocator@{Allocator}}
+
+
+Concept for allocating, resizing and freeing memory block.  
+
+
+
+
+{\ttfamily \#include $<$allocators.\+h$>$}
+
+
+
+\doxysubsection{Detailed Description}
+Note that Malloc() and Realloc() are non-\/static but Free() is static.
+
+So if an allocator need to support Free(), it needs to put its pointer in the header of memory block.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{concept\ }\mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}\ \{}
+\DoxyCodeLine{\ \ \ \ static\ \mbox{\hyperlink{namespaceupload_a985aa9a71de3eb507344df65700c696d}{const}}\ bool\ kNeedFree;\ \ \ \ }
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ Allocate\ a\ memory\ block.}}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ \(\backslash\)param\ size\ of\ the\ memory\ block\ in\ bytes.}}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ \(\backslash\)returns\ pointer\ to\ the\ memory\ block.}}
+\DoxyCodeLine{\ \ \ \ void*\ Malloc(size\_t\ size);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ Resize\ a\ memory\ block.}}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ \(\backslash\)param\ originalPtr\ The\ pointer\ to\ current\ memory\ block.\ Null\ pointer\ is\ permitted.}}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ \(\backslash\)param\ originalSize\ The\ current\ size\ in\ bytes.\ (Design\ issue:\ since\ some\ allocator\ may\ not\ book-\/keep\ this,\ explicitly\ pass\ to\ it\ can\ save\ memory.)}}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ \(\backslash\)param\ newSize\ the\ new\ size\ in\ bytes.}}
+\DoxyCodeLine{\ \ \ \ void*\ Realloc(void*\ originalPtr,\ size\_t\ originalSize,\ size\_t\ newSize);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ Free\ a\ memory\ block.}}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ \(\backslash\)param\ pointer\ to\ the\ memory\ block.\ Null\ pointer\ is\ permitted.}}
+\DoxyCodeLine{\ \ \ \ static\ void\ Free(void\ *ptr);}
+\DoxyCodeLine{\};}
+
+\end{DoxyCode}
+ 
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/\mbox{\hyperlink{allocators_8h}{allocators.\+h}}\end{DoxyCompactItemize}

@@ -1,0 +1,9 @@
+<map id="test_exhaustive_verify" name="test_exhaustive_verify">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,55,158,80"/>
+<area shape="rect" id="Node000002" href="$yubihsm__pkcs11_8c.html#ae785d5badbf1f08b491af31f32a135a1" title=" " alt="" coords="253,5,324,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="138,51,237,28,238,33,139,57"/>
+<area shape="rect" id="Node000003" href="$tests__exhaustive_8c.html#a7dd4a0914c02450e646adfe4d6f28d54" title=" " alt="" coords="252,55,324,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="158,65,237,65,237,70,158,70"/>
+<area shape="rect" id="Node000004" href="$secp256k1_8c.html#abd11af3da8d88984e87ec8f06fb0087a" title=" " alt="" coords="206,104,371,130"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="139,78,217,97,216,102,138,84"/>
+</map>

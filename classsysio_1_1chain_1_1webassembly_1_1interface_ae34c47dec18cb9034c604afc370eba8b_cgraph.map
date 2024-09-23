@@ -1,0 +1,10 @@
+<map id="sysio::chain::webassembly::interface::transaction_size" name="sysio::chain::webassembly::interface::transaction_size">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,35,188,75"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1packed__transaction.html#ad193d26eb97cfd5b3f7d8b957eaa35a2" title=" " alt="" coords="236,5,425,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="188,41,220,37,220,42,188,46"/>
+<area shape="rect" id="Node000003" href="$namespacefc_1_1raw.html#a64937a5adc8041247f7007882224e225" title=" " alt="" coords="266,70,394,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="188,63,251,71,250,76,188,69"/>
+<area shape="rect" id="Node000004" href="$namespacefc_1_1raw.html#a3a18d8161aa5b4f4f02b6fcfdff5e5d1" title=" " alt="" coords="473,70,570,96"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="395,80,457,80,457,86,395,86"/>
+<area shape="poly" id="edge4_Node000004_Node000004" title=" " alt="" coords="490,71,483,62,487,52,500,46,522,44,545,46,557,53,554,57,543,51,522,49,502,51,491,56,489,61,494,68"/>
+</map>

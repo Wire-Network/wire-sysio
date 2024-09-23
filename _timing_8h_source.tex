@@ -1,0 +1,44 @@
+\doxysection{Timing.\+h}
+\hypertarget{_timing_8h_source}{}\label{_timing_8h_source}\index{libraries/wasm-\/jit/Include/Inline/Timing.h@{libraries/wasm-\/jit/Include/Inline/Timing.h}}
+\mbox{\hyperlink{_timing_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_timing_8h_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{_timing_8h_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_timing_8h_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <chrono>}}
+\DoxyCodeLine{\Hypertarget{_timing_8h_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{_timing_8h_source_l00005}00005\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_logging_8h}{Logging/Logging.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_timing_8h_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{_timing_8h_source_l00007}\mbox{\hyperlink{namespace_timing}{00007}}\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_timing}{Timing}}}
+\DoxyCodeLine{\Hypertarget{_timing_8h_source_l00008}00008\ \{}
+\DoxyCodeLine{\Hypertarget{_timing_8h_source_l00009}00009\ \ \ \ \ \textcolor{comment}{//\ Encapsulates\ a\ timer\ that\ starts\ when\ constructed\ and\ stops\ when\ read.}}
+\DoxyCodeLine{\Hypertarget{_timing_8h_source_l00010}\mbox{\hyperlink{struct_timing_1_1_timer}{00010}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_timing_1_1_timer}{Timer}}}
+\DoxyCodeLine{\Hypertarget{_timing_8h_source_l00011}00011\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_timing_8h_source_l00012}\mbox{\hyperlink{struct_timing_1_1_timer_a5a3bc617db2ac4678b75948f2342776f}{00012}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_timing_1_1_timer_a5a3bc617db2ac4678b75948f2342776f}{Timer}}():\ startTime(\mbox{\hyperlink{namespacestd}{std}}::chrono::high\_resolution\_clock::now()),\ isStopped(false)\ \{\}}
+\DoxyCodeLine{\Hypertarget{_timing_8h_source_l00013}\mbox{\hyperlink{struct_timing_1_1_timer_a4603a572adbb48e1cadcf95c5846de75}{00013}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_timing_1_1_timer_a4603a572adbb48e1cadcf95c5846de75}{stop}}()\ \{\ endTime\ =\ std::chrono::high\_resolution\_clock::now();\ \}}
+\DoxyCodeLine{\Hypertarget{_timing_8h_source_l00014}\mbox{\hyperlink{struct_timing_1_1_timer_ac760ddd9eabf7c5b14bba1e792ec5ed6}{00014}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}}\ \mbox{\hyperlink{struct_timing_1_1_timer_ac760ddd9eabf7c5b14bba1e792ec5ed6}{getMicroseconds}}()}
+\DoxyCodeLine{\Hypertarget{_timing_8h_source_l00015}00015\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_timing_8h_source_l00016}00016\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!isStopped)\ \{\ \mbox{\hyperlink{struct_timing_1_1_timer_a4603a572adbb48e1cadcf95c5846de75}{stop}}();\ \}}
+\DoxyCodeLine{\Hypertarget{_timing_8h_source_l00017}00017\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::chrono::duration\_cast<std::chrono::microseconds>(endTime\ -\/\ startTime).count();}
+\DoxyCodeLine{\Hypertarget{_timing_8h_source_l00018}00018\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_timing_8h_source_l00019}\mbox{\hyperlink{struct_timing_1_1_timer_ae6ed9f702858e72d8a5b3df42b35537a}{00019}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_adc9896ee12db3bb116fc63b3464c72c7}{F64}}\ \mbox{\hyperlink{struct_timing_1_1_timer_ae6ed9f702858e72d8a5b3df42b35537a}{getMilliseconds}}()\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_timing_1_1_timer_ac760ddd9eabf7c5b14bba1e792ec5ed6}{getMicroseconds}}()\ /\ 1000.0;\ \}}
+\DoxyCodeLine{\Hypertarget{_timing_8h_source_l00020}\mbox{\hyperlink{struct_timing_1_1_timer_a3c7d59a2483864e161bd18d0b66e4d06}{00020}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_adc9896ee12db3bb116fc63b3464c72c7}{F64}}\ \mbox{\hyperlink{struct_timing_1_1_timer_a3c7d59a2483864e161bd18d0b66e4d06}{getSeconds}}()\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_timing_1_1_timer_ac760ddd9eabf7c5b14bba1e792ec5ed6}{getMicroseconds}}()\ /\ 1000000.0;\ \}}
+\DoxyCodeLine{\Hypertarget{_timing_8h_source_l00021}00021\ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{_timing_8h_source_l00022}00022\ \ \ \ \ \ \ \ \ std::chrono::high\_resolution\_clock::time\_point\ startTime;}
+\DoxyCodeLine{\Hypertarget{_timing_8h_source_l00023}00023\ \ \ \ \ \ \ \ \ std::chrono::high\_resolution\_clock::time\_point\ endTime;}
+\DoxyCodeLine{\Hypertarget{_timing_8h_source_l00024}00024\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ isStopped;}
+\DoxyCodeLine{\Hypertarget{_timing_8h_source_l00025}00025\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_timing_8h_source_l00026}00026\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{_timing_8h_source_l00027}00027\ \ \ \ \ \textcolor{comment}{//\ Helpers\ for\ printing\ timers.}}
+\DoxyCodeLine{\Hypertarget{_timing_8h_source_l00028}\mbox{\hyperlink{namespace_timing_a13894b5d7cecb827bcef919187a66d94}{00028}}\ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespace_timing_a13894b5d7cecb827bcef919187a66d94}{logTimer}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{structcontext}{context}},\mbox{\hyperlink{struct_timing_1_1_timer}{Timer}}\&\ timer)\ \{\ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{Log::printf}}(\mbox{\hyperlink{namespace_log_a1f055cc08a2ed074aa74f9d99c8a0901aaa59d67c2123f094d0d6798ffe651c4d}{Log::Category::metrics}},\textcolor{stringliteral}{"{}\%s\ in\ \%.2fms\(\backslash\)n"{}},\mbox{\hyperlink{structcontext}{context}},timer.\mbox{\hyperlink{struct_timing_1_1_timer_ae6ed9f702858e72d8a5b3df42b35537a}{getMilliseconds}}());\ \}}
+\DoxyCodeLine{\Hypertarget{_timing_8h_source_l00029}\mbox{\hyperlink{namespace_timing_a4f7cf4a3faa27612ba0ad6e4653651f8}{00029}}\ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespace_timing_a4f7cf4a3faa27612ba0ad6e4653651f8}{logRatePerSecond}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{structcontext}{context}},\mbox{\hyperlink{struct_timing_1_1_timer}{Timer}}\&\ timer,\mbox{\hyperlink{_basic_types_8h_adc9896ee12db3bb116fc63b3464c72c7}{F64}}\ numerator,\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ numeratorUnit)}
+\DoxyCodeLine{\Hypertarget{_timing_8h_source_l00030}00030\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_timing_8h_source_l00031}00031\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{Log::printf}}(\mbox{\hyperlink{namespace_log_a1f055cc08a2ed074aa74f9d99c8a0901aaa59d67c2123f094d0d6798ffe651c4d}{Log::Category::metrics}},\textcolor{stringliteral}{"{}\%s\ in\ \%.2fms\ (\%f\ \%s/s)\(\backslash\)n"{}},}
+\DoxyCodeLine{\Hypertarget{_timing_8h_source_l00032}00032\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structcontext}{context}},}
+\DoxyCodeLine{\Hypertarget{_timing_8h_source_l00033}00033\ \ \ \ \ \ \ \ \ \ \ \ \ timer.\mbox{\hyperlink{struct_timing_1_1_timer_ae6ed9f702858e72d8a5b3df42b35537a}{getMilliseconds}}(),}
+\DoxyCodeLine{\Hypertarget{_timing_8h_source_l00034}00034\ \ \ \ \ \ \ \ \ \ \ \ \ numerator\ /\ timer.\mbox{\hyperlink{struct_timing_1_1_timer_a3c7d59a2483864e161bd18d0b66e4d06}{getSeconds}}(),}
+\DoxyCodeLine{\Hypertarget{_timing_8h_source_l00035}00035\ \ \ \ \ \ \ \ \ \ \ \ \ numeratorUnit}
+\DoxyCodeLine{\Hypertarget{_timing_8h_source_l00036}00036\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_timing_8h_source_l00037}00037\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_timing_8h_source_l00038}00038\ \}}
+
+\end{DoxyCode}

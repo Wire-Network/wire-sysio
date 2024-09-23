@@ -1,0 +1,5 @@
+var structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1get__latest__block__batch__info =
+[
+    [ "batch_size", "structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1get__latest__block__batch__info.html#a82ebd86affa47e2f8024b9083374ed8a", null ],
+    [ "batch_start_height_offset", "structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1get__latest__block__batch__info.html#ac601553260c24e5fe6ed17828e4a41ef", null ]
+];

@@ -1,0 +1,95 @@
+\doxysection{catch\+\_\+preprocessor.\+hpp}
+\hypertarget{catch__preprocessor_8hpp_source}{}\label{catch__preprocessor_8hpp_source}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_preprocessor.hpp@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_preprocessor.hpp}}
+\mbox{\hyperlink{catch__preprocessor_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00002}00002\ \textcolor{comment}{\ *\ \ Created\ by\ Jozef\ on\ 12/11/2018.}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00003}00003\ \textcolor{comment}{\ *\ \ Copyright\ 2017\ Two\ Blue\ Cubes\ Ltd.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00004}00004\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00005}00005\ \textcolor{comment}{\ *\ \ Distributed\ under\ the\ Boost\ Software\ License,\ Version\ 1.0.\ (See\ accompanying}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00006}00006\ \textcolor{comment}{\ *\ \ file\ LICENSE\_1\_0.txt\ or\ copy\ at\ http://www.boost.org/LICENSE\_1\_0.txt)}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00007}00007\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00009}00009\ \textcolor{preprocessor}{\#ifndef\ TWOBLUECUBES\_CATCH\_PREPROCESSOR\_HPP\_INCLUDED}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00010}00010\ \textcolor{preprocessor}{\#define\ TWOBLUECUBES\_CATCH\_PREPROCESSOR\_HPP\_INCLUDED}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00012}\mbox{\hyperlink{catch__preprocessor_8hpp_aedfa83a9b9671b2f3ce5d64207eab45f}{00012}}\ \textcolor{preprocessor}{\#define\ CATCH\_RECURSION\_LEVEL0(...)\ \_\_VA\_ARGS\_\_}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00013}\mbox{\hyperlink{catch__preprocessor_8hpp_ad1cc1127b3a8ed84d336fd86c25571a9}{00013}}\ \textcolor{preprocessor}{\#define\ CATCH\_RECURSION\_LEVEL1(...)\ CATCH\_RECURSION\_LEVEL0(CATCH\_RECURSION\_LEVEL0(CATCH\_RECURSION\_LEVEL0(\_\_VA\_ARGS\_\_)))}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00014}\mbox{\hyperlink{catch__preprocessor_8hpp_a2a7ccfd6ceda0c723d1c81ed0a8ea7aa}{00014}}\ \textcolor{preprocessor}{\#define\ CATCH\_RECURSION\_LEVEL2(...)\ CATCH\_RECURSION\_LEVEL1(CATCH\_RECURSION\_LEVEL1(CATCH\_RECURSION\_LEVEL1(\_\_VA\_ARGS\_\_)))}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00015}\mbox{\hyperlink{catch__preprocessor_8hpp_ac5ead3b79069ca9b5de9cad80029bc71}{00015}}\ \textcolor{preprocessor}{\#define\ CATCH\_RECURSION\_LEVEL3(...)\ CATCH\_RECURSION\_LEVEL2(CATCH\_RECURSION\_LEVEL2(CATCH\_RECURSION\_LEVEL2(\_\_VA\_ARGS\_\_)))}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00016}\mbox{\hyperlink{catch__preprocessor_8hpp_a7738534acacfd54ef5b9f89cf07fa16d}{00016}}\ \textcolor{preprocessor}{\#define\ CATCH\_RECURSION\_LEVEL4(...)\ CATCH\_RECURSION\_LEVEL3(CATCH\_RECURSION\_LEVEL3(CATCH\_RECURSION\_LEVEL3(\_\_VA\_ARGS\_\_)))}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00017}\mbox{\hyperlink{catch__preprocessor_8hpp_a761d2ca7a5b0393ae7a6edf086a9c3da}{00017}}\ \textcolor{preprocessor}{\#define\ CATCH\_RECURSION\_LEVEL5(...)\ CATCH\_RECURSION\_LEVEL4(CATCH\_RECURSION\_LEVEL4(CATCH\_RECURSION\_LEVEL4(\_\_VA\_ARGS\_\_)))}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00019}00019\ \textcolor{preprocessor}{\#ifdef\ CATCH\_CONFIG\_TRADITIONAL\_MSVC\_PREPROCESSOR}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00020}00020\ \textcolor{preprocessor}{\#define\ INTERNAL\_CATCH\_EXPAND\_VARGS(...)\ \_\_VA\_ARGS\_\_}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00021}00021\ \textcolor{comment}{//\ MSVC\ needs\ more\ evaluations}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00022}00022\ \textcolor{preprocessor}{\#define\ CATCH\_RECURSION\_LEVEL6(...)\ CATCH\_RECURSION\_LEVEL5(CATCH\_RECURSION\_LEVEL5(CATCH\_RECURSION\_LEVEL5(\_\_VA\_ARGS\_\_)))}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00023}00023\ \textcolor{preprocessor}{\#define\ CATCH\_RECURSE(...)\ \ CATCH\_RECURSION\_LEVEL6(CATCH\_RECURSION\_LEVEL6(\_\_VA\_ARGS\_\_))}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00024}00024\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00025}\mbox{\hyperlink{catch__preprocessor_8hpp_ae3ce5d9c8e50eba755111a19a62432e5}{00025}}\ \textcolor{preprocessor}{\#define\ CATCH\_RECURSE(...)\ \ CATCH\_RECURSION\_LEVEL5(\_\_VA\_ARGS\_\_)}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00026}00026\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00028}\mbox{\hyperlink{catch__preprocessor_8hpp_aebb9e7be881ac3dcd10db9fb45830649}{00028}}\ \textcolor{preprocessor}{\#define\ CATCH\_REC\_END(...)}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00029}\mbox{\hyperlink{catch__preprocessor_8hpp_ab469d9696504fd14e36fd1d8b6e47b7f}{00029}}\ \textcolor{preprocessor}{\#define\ CATCH\_REC\_OUT}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00031}\mbox{\hyperlink{catch__preprocessor_8hpp_a8ac224562b8423a7c07e368216d0f0e9}{00031}}\ \textcolor{preprocessor}{\#define\ CATCH\_EMPTY()}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00032}\mbox{\hyperlink{catch__preprocessor_8hpp_a83c1ab15f3d715f25fe504c114cf6144}{00032}}\ \textcolor{preprocessor}{\#define\ CATCH\_DEFER(id)\ id\ CATCH\_EMPTY()}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00034}\mbox{\hyperlink{catch__preprocessor_8hpp_aa335d39d6fdb7e20c94edaa4de21d1a3}{00034}}\ \textcolor{preprocessor}{\#define\ CATCH\_REC\_GET\_END2()\ 0,\ CATCH\_REC\_END}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00035}\mbox{\hyperlink{catch__preprocessor_8hpp_a476d332d716d4691f874195acea4931b}{00035}}\ \textcolor{preprocessor}{\#define\ CATCH\_REC\_GET\_END1(...)\ CATCH\_REC\_GET\_END2}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00036}\mbox{\hyperlink{catch__preprocessor_8hpp_a536dd24bc8e72ec8eb14c3676f20c778}{00036}}\ \textcolor{preprocessor}{\#define\ CATCH\_REC\_GET\_END(...)\ CATCH\_REC\_GET\_END1}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00037}\mbox{\hyperlink{catch__preprocessor_8hpp_ae25889c34b72704724f5797b6103c463}{00037}}\ \textcolor{preprocessor}{\#define\ CATCH\_REC\_NEXT0(test,\ next,\ ...)\ next\ CATCH\_REC\_OUT}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00038}\mbox{\hyperlink{catch__preprocessor_8hpp_a0ddf3b75cc3780765a2cb551d6536721}{00038}}\ \textcolor{preprocessor}{\#define\ CATCH\_REC\_NEXT1(test,\ next)\ CATCH\_DEFER\ (\ CATCH\_REC\_NEXT0\ )\ (\ test,\ next,\ 0)}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00039}\mbox{\hyperlink{catch__preprocessor_8hpp_abaddf93f755cea9e20aee254aa566adf}{00039}}\ \textcolor{preprocessor}{\#define\ CATCH\_REC\_NEXT(test,\ next)\ \ CATCH\_REC\_NEXT1(CATCH\_REC\_GET\_END\ test,\ next)}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00041}\mbox{\hyperlink{catch__preprocessor_8hpp_a3e07fd613c41bd44cb4bd14fccc3c388}{00041}}\ \textcolor{preprocessor}{\#define\ CATCH\_REC\_LIST0(f,\ x,\ peek,\ ...)\ ,\ f(x)\ CATCH\_DEFER\ (\ CATCH\_REC\_NEXT(peek,\ CATCH\_REC\_LIST1)\ )\ (\ f,\ peek,\ \_\_VA\_ARGS\_\_\ )}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00042}\mbox{\hyperlink{catch__preprocessor_8hpp_abedd1ae08e12478704233e9bf29e0fe9}{00042}}\ \textcolor{preprocessor}{\#define\ CATCH\_REC\_LIST1(f,\ x,\ peek,\ ...)\ ,\ f(x)\ CATCH\_DEFER\ (\ CATCH\_REC\_NEXT(peek,\ CATCH\_REC\_LIST0)\ )\ (\ f,\ peek,\ \_\_VA\_ARGS\_\_\ )}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00043}\mbox{\hyperlink{catch__preprocessor_8hpp_abe3c205d4ba8406d45439abb91366ce9}{00043}}\ \textcolor{preprocessor}{\#define\ CATCH\_REC\_LIST2(f,\ x,\ peek,\ ...)\ \ \ f(x)\ CATCH\_DEFER\ (\ CATCH\_REC\_NEXT(peek,\ CATCH\_REC\_LIST1)\ )\ (\ f,\ peek,\ \_\_VA\_ARGS\_\_\ )}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00045}\mbox{\hyperlink{catch__preprocessor_8hpp_aea894953d28c5ed83e59ce6c74d0a665}{00045}}\ \textcolor{preprocessor}{\#define\ CATCH\_REC\_LIST0\_UD(f,\ userdata,\ x,\ peek,\ ...)\ ,\ f(userdata,\ x)\ CATCH\_DEFER\ (\ CATCH\_REC\_NEXT(peek,\ CATCH\_REC\_LIST1\_UD)\ )\ (\ f,\ userdata,\ peek,\ \_\_VA\_ARGS\_\_\ )}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00046}\mbox{\hyperlink{catch__preprocessor_8hpp_abbcff29ced4d413bc121f7b761558c16}{00046}}\ \textcolor{preprocessor}{\#define\ CATCH\_REC\_LIST1\_UD(f,\ userdata,\ x,\ peek,\ ...)\ ,\ f(userdata,\ x)\ CATCH\_DEFER\ (\ CATCH\_REC\_NEXT(peek,\ CATCH\_REC\_LIST0\_UD)\ )\ (\ f,\ userdata,\ peek,\ \_\_VA\_ARGS\_\_\ )}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00047}\mbox{\hyperlink{catch__preprocessor_8hpp_a0c2dd548d178fbc2202ecd74ce4be91b}{00047}}\ \textcolor{preprocessor}{\#define\ CATCH\_REC\_LIST2\_UD(f,\ userdata,\ x,\ peek,\ ...)\ \ \ f(userdata,\ x)\ CATCH\_DEFER\ (\ CATCH\_REC\_NEXT(peek,\ CATCH\_REC\_LIST1\_UD)\ )\ (\ f,\ userdata,\ peek,\ \_\_VA\_ARGS\_\_\ )}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00049}00049\ \textcolor{comment}{//\ Applies\ the\ function\ macro\ \`{}f`\ to\ each\ of\ the\ remaining\ parameters,\ inserts\ commas\ between\ the\ results,}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00050}00050\ \textcolor{comment}{//\ and\ passes\ userdata\ as\ the\ first\ parameter\ to\ each\ invocation,}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00051}00051\ \textcolor{comment}{//\ e.g.\ CATCH\_REC\_LIST\_UD(f,\ x,\ a,\ b,\ c)\ evaluates\ to\ f(x,\ a),\ f(x,\ b),\ f(x,\ c)}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00052}\mbox{\hyperlink{catch__preprocessor_8hpp_a8e404d42a6d0402698c1d4d16e831d28}{00052}}\ \textcolor{preprocessor}{\#define\ CATCH\_REC\_LIST\_UD(f,\ userdata,\ ...)\ CATCH\_RECURSE(CATCH\_REC\_LIST2\_UD(f,\ userdata,\ \_\_VA\_ARGS\_\_,\ ()()(),\ ()()(),\ ()()(),\ 0))}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00054}\mbox{\hyperlink{catch__preprocessor_8hpp_a060f5fa141c247b4d07dfe9bf3c54079}{00054}}\ \textcolor{preprocessor}{\#define\ CATCH\_REC\_LIST(f,\ ...)\ CATCH\_RECURSE(CATCH\_REC\_LIST2(f,\ \_\_VA\_ARGS\_\_,\ ()()(),\ ()()(),\ ()()(),\ 0))}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00056}\mbox{\hyperlink{catch__preprocessor_8hpp_afec78f8054a97a6ecb38ff098f275efb}{00056}}\ \textcolor{preprocessor}{\#define\ INTERNAL\_CATCH\_EXPAND1(param)\ INTERNAL\_CATCH\_EXPAND2(param)}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00057}\mbox{\hyperlink{catch__preprocessor_8hpp_a163ac3d9bea0921d546f125ef5d58a2d}{00057}}\ \textcolor{preprocessor}{\#define\ INTERNAL\_CATCH\_EXPAND2(...)\ INTERNAL\_CATCH\_NO\#\#\ \_\_VA\_ARGS\_\_}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00058}\mbox{\hyperlink{catch__preprocessor_8hpp_a053610cf96d1be50463e9cb08e818ed1}{00058}}\ \textcolor{preprocessor}{\#define\ INTERNAL\_CATCH\_DEF(...)\ INTERNAL\_CATCH\_DEF\ \_\_VA\_ARGS\_\_}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00059}\mbox{\hyperlink{catch__preprocessor_8hpp_a6868a4eb7481605e628a3aaf0c1fbb01}{00059}}\ \textcolor{preprocessor}{\#define\ INTERNAL\_CATCH\_NOINTERNAL\_CATCH\_DEF}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00060}\mbox{\hyperlink{catch__preprocessor_8hpp_a13733e49e752d29b735e94d9e72c7d6b}{00060}}\ \textcolor{preprocessor}{\#define\ INTERNAL\_CATCH\_STRINGIZE(...)\ INTERNAL\_CATCH\_STRINGIZE2(\_\_VA\_ARGS\_\_)}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00061}00061\ \textcolor{preprocessor}{\#ifndef\ CATCH\_CONFIG\_TRADITIONAL\_MSVC\_PREPROCESSOR}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00062}\mbox{\hyperlink{catch__preprocessor_8hpp_a6fedc6934bac0e22dbbd13aabf81ad3f}{00062}}\ \textcolor{preprocessor}{\#define\ INTERNAL\_CATCH\_STRINGIZE2(...)\ \#\_\_VA\_ARGS\_\_}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00063}\mbox{\hyperlink{catch__preprocessor_8hpp_aa66562537dd49bc33e53f9aa01acedaf}{00063}}\ \textcolor{preprocessor}{\#define\ INTERNAL\_CATCH\_STRINGIZE\_WITHOUT\_PARENS(param)\ INTERNAL\_CATCH\_STRINGIZE(INTERNAL\_CATCH\_REMOVE\_PARENS(param))}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00064}00064\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00065}00065\ \textcolor{comment}{//\ MSVC\ is\ adding\ extra\ space\ and\ needs\ another\ indirection\ to\ expand\ INTERNAL\_CATCH\_NOINTERNAL\_CATCH\_DEF}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00066}00066\ \textcolor{preprocessor}{\#define\ INTERNAL\_CATCH\_STRINGIZE2(...)\ INTERNAL\_CATCH\_STRINGIZE3(\_\_VA\_ARGS\_\_)}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00067}00067\ \textcolor{preprocessor}{\#define\ INTERNAL\_CATCH\_STRINGIZE3(...)\ \#\_\_VA\_ARGS\_\_}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00068}00068\ \textcolor{preprocessor}{\#define\ INTERNAL\_CATCH\_STRINGIZE\_WITHOUT\_PARENS(param)\ (INTERNAL\_CATCH\_STRINGIZE(INTERNAL\_CATCH\_REMOVE\_PARENS(param))\ +\ 1)}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00069}00069\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00071}\mbox{\hyperlink{catch__preprocessor_8hpp_adf5ede19321b27ce635d01688551e782}{00071}}\ \textcolor{preprocessor}{\#define\ INTERNAL\_CATCH\_REMOVE\_PARENS(...)\ INTERNAL\_CATCH\_EXPAND1(INTERNAL\_CATCH\_DEF\ \_\_VA\_ARGS\_\_)}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00073}\mbox{\hyperlink{catch__preprocessor_8hpp_ab5904058e163fd663012ec59c9c15411}{00073}}\ \textcolor{preprocessor}{\#define\ INTERNAL\_CATCH\_TEMPLATE\_UNIQUE\_NAME2(Name,\ ...)\ INTERNAL\_CATCH\_TEMPLATE\_UNIQUE\_NAME3(Name,\ \_\_VA\_ARGS\_\_)}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00074}00074\ \textcolor{preprocessor}{\#ifndef\ CATCH\_CONFIG\_TRADITIONAL\_MSVC\_PREPROCESSOR}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00075}\mbox{\hyperlink{catch__preprocessor_8hpp_a148dd668623eff0bf6f121808708d403}{00075}}\ \textcolor{preprocessor}{\#define\ INTERNAL\_CATCH\_TEMPLATE\_UNIQUE\_NAME3(Name,...)\ Name\ "{}\ -\/\ "{}\ \#\_\_VA\_ARGS\_\_}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00076}\mbox{\hyperlink{catch__preprocessor_8hpp_a8943b350c92f4732c53db42264f463ab}{00076}}\ \textcolor{preprocessor}{\#define\ INTERNAL\_CATCH\_TEMPLATE\_UNIQUE\_NAME(Name,...)\ INTERNAL\_CATCH\_TEMPLATE\_UNIQUE\_NAME2(Name,\ INTERNAL\_CATCH\_REMOVE\_PARENS(\_\_VA\_ARGS\_\_))}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00077}00077\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00078}00078\ \textcolor{comment}{//\ MSVC\ is\ adding\ extra\ space\ and\ needs\ more\ calls\ to\ properly\ remove\ ()}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00079}00079\ \textcolor{preprocessor}{\#define\ INTERNAL\_CATCH\_TEMPLATE\_UNIQUE\_NAME3(Name,...)\ Name\ "{}\ -\/"{}\ \#\_\_VA\_ARGS\_\_}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00080}00080\ \textcolor{preprocessor}{\#define\ INTERNAL\_CATCH\_TEMPLATE\_UNIQUE\_NAME1(Name,\ ...)\ INTERNAL\_CATCH\_TEMPLATE\_UNIQUE\_NAME2(Name,\ \_\_VA\_ARGS\_\_)}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00081}00081\ \textcolor{preprocessor}{\#define\ INTERNAL\_CATCH\_TEMPLATE\_UNIQUE\_NAME(Name,\ ...)\ INTERNAL\_CATCH\_TEMPLATE\_UNIQUE\_NAME1(Name,\ INTERNAL\_CATCH\_EXPAND\_VARGS(INTERNAL\_CATCH\_REMOVE\_PARENS(\_\_VA\_ARGS\_\_)))}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00082}00082\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00083}00083\ }
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00084}\mbox{\hyperlink{catch__preprocessor_8hpp_aec759b1a62379a441b001169f2d6a2fe}{00084}}\ \textcolor{preprocessor}{\#define\ INTERNAL\_CATCH\_MAKE\_TYPE\_LIST(types)\ Catch::TypeList<INTERNAL\_CATCH\_REMOVE\_PARENS(types)>}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00085}00085\ }
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00086}\mbox{\hyperlink{catch__preprocessor_8hpp_aa48345a3d206462d571f98297654ca47}{00086}}\ \textcolor{preprocessor}{\#define\ INTERNAL\_CATCH\_MAKE\_TYPE\_LISTS\_FROM\_TYPES(types)\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00087}00087\ \textcolor{preprocessor}{\ \ \ \ CATCH\_REC\_LIST(INTERNAL\_CATCH\_MAKE\_TYPE\_LIST,INTERNAL\_CATCH\_REMOVE\_PARENS(types))}}
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00088}00088\ }
+\DoxyCodeLine{\Hypertarget{catch__preprocessor_8hpp_source_l00089}00089\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ TWOBLUECUBES\_CATCH\_PREPROCESSOR\_HPP\_INCLUDED}}
+
+\end{DoxyCode}

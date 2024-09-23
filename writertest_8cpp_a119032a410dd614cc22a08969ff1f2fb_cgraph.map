@@ -1,0 +1,17 @@
+<map id="TestTranscode" name="TestTranscode">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,140,113,166"/>
+<area shape="rect" id="Node000002" href="$class_generic_string_buffer.html#a42079865bab1deb930c6cff7d491c719" title=" " alt="" coords="168,103,304,144"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="113,141,152,135,153,140,114,147"/>
+<area shape="rect" id="Node000005" href="$class_generic_reader.html#a0c450620d14ff1824e58bb7bd9b42099" title="Parse JSON text." alt="" coords="161,168,311,194"/>
+<area shape="poly" id="edge6_Node000001_Node000005" title=" " alt="" coords="113,159,146,164,145,169,113,164"/>
+<area shape="rect" id="Node000003" href="$class_generic_string_buffer.html#a0038e53ba03c271bc4cbbac403ec4de4" title=" " alt="" coords="359,29,525,55"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="278,100,358,65,379,58,380,63,360,70,280,105"/>
+<area shape="rect" id="Node000004" href="$class_generic_string_buffer.html#a80af78c43da93126a940a40d1889278a" title=" " alt="" coords="374,103,510,144"/>
+<area shape="poly" id="edge4_Node000002_Node000004" title=" " alt="" coords="304,121,359,121,359,126,304,126"/>
+<area shape="poly" id="edge3_Node000003_Node000003" title=" " alt="" coords="410,30,404,21,407,11,421,5,442,3,466,5,478,12,475,17,464,10,442,8,422,10,411,15,409,20,414,27"/>
+<area shape="poly" id="edge5_Node000004_Node000004" title=" " alt="" coords="406,103,404,93,410,84,423,79,442,77,463,79,476,85,473,90,462,84,442,82,424,84,413,88,409,94,411,102"/>
+<area shape="rect" id="Node000006" href="$struct_parse_result.html#a88b6d44f052a19e6436ae6aadc2c40b4" title="Reset error code." alt="" coords="376,168,508,194"/>
+<area shape="poly" id="edge7_Node000005_Node000006" title=" " alt="" coords="311,178,361,178,361,184,311,184"/>
+<area shape="rect" id="Node000007" href="$struct_parse_result.html#aa81b4a7b776b77216cb752385203a8c1" title="Update error code and offset." alt="" coords="573,168,695,194"/>
+<area shape="poly" id="edge8_Node000006_Node000007" title=" " alt="" coords="509,178,558,178,558,184,509,184"/>
+</map>

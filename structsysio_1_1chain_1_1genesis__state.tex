@@ -1,0 +1,297 @@
+\doxysection{sysio\+::chain\+::genesis\+\_\+state Struct Reference}
+\hypertarget{structsysio_1_1chain_1_1genesis__state}{}\label{structsysio_1_1chain_1_1genesis__state}\index{sysio::chain::genesis\_state@{sysio::chain::genesis\_state}}
+
+
+{\ttfamily \#include $<$genesis\+\_\+state.\+hpp$>$}
+
+
+
+Collaboration diagram for sysio\+::chain\+::genesis\+\_\+state\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1genesis__state__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1genesis__state_ae6edda6568881643e9f05254828540f8}{genesis\+\_\+state}} ()
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1chain__id__type}{chain\+\_\+id\+\_\+type}} \mbox{\hyperlink{structsysio_1_1chain_1_1genesis__state_ad6e72f371108e814704865a7f1b4d708}{compute\+\_\+chain\+\_\+id}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0}{chain\+\_\+config\+\_\+v0}} \mbox{\hyperlink{structsysio_1_1chain_1_1genesis__state_ad8ce3c9c36d7e6110d41ff636f776219}{initial\+\_\+configuration}}
+\item 
+\mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} \mbox{\hyperlink{structsysio_1_1chain_1_1genesis__state_aa5ee7b68f2765bb346d9ef34cb4d93cc}{initial\+\_\+timestamp}}
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_a0628a11f388cd2e43b1ccc1260a1042f}{public\+\_\+key\+\_\+type}} \mbox{\hyperlink{structsysio_1_1chain_1_1genesis__state_a628c33067d45e34be5f71f402ba407e3}{initial\+\_\+key}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structsysio_1_1chain_1_1genesis__state_a477c82e4e1b6c19c35f3550f1a61f99b}{sysio\+\_\+root\+\_\+key}}
+\item 
+static constexpr \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config}{wasm\+\_\+config}} \mbox{\hyperlink{structsysio_1_1chain_1_1genesis__state_a3e6e5eb6e7b0107b1f105eb8a4dcca41}{default\+\_\+initial\+\_\+wasm\+\_\+configuration}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{structsysio_1_1chain_1_1genesis__state_a23576fc2b2dbe1d54fc6a19d9c756de4}{operator==}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1genesis__state}{genesis\+\_\+state}} \&lhs, const \mbox{\hyperlink{structsysio_1_1chain_1_1genesis__state}{genesis\+\_\+state}} \&rhs)
+\item 
+bool \mbox{\hyperlink{structsysio_1_1chain_1_1genesis__state_ac7fcd93dd5c28d5a3c32807c06bc7c8e}{operator!=}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1genesis__state}{genesis\+\_\+state}} \&lhs, const \mbox{\hyperlink{structsysio_1_1chain_1_1genesis__state}{genesis\+\_\+state}} \&rhs)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{genesis__state_8hpp_source_l00014}{14}} of file \mbox{\hyperlink{genesis__state_8hpp_source}{genesis\+\_\+state.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structsysio_1_1chain_1_1genesis__state_ae6edda6568881643e9f05254828540f8}\index{sysio::chain::genesis\_state@{sysio::chain::genesis\_state}!genesis\_state@{genesis\_state}}
+\index{genesis\_state@{genesis\_state}!sysio::chain::genesis\_state@{sysio::chain::genesis\_state}}
+\doxysubsubsection{\texorpdfstring{genesis\_state()}{genesis\_state()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1genesis__state_ae6edda6568881643e9f05254828540f8} 
+sysio\+::chain\+::genesis\+\_\+state\+::genesis\+\_\+state (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{genesis__state_8cpp_source_l00007}{7}} of file \mbox{\hyperlink{genesis__state_8cpp_source}{genesis\+\_\+state.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00007\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00008\ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1genesis__state_aa5ee7b68f2765bb346d9ef34cb4d93cc}{initial\_timestamp}}\ =\ \mbox{\hyperlink{classfc_1_1time__point_acf917831e171906dbbbd46b17bc6e0a5}{fc::time\_point::from\_iso\_string}}(\ \textcolor{stringliteral}{"{}2018-\/06-\/01T12:00:00"{}}\ );}
+\DoxyCodeLine{00009\ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1genesis__state_a628c33067d45e34be5f71f402ba407e3}{initial\_key}}\ =\ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}(\mbox{\hyperlink{structsysio_1_1chain_1_1genesis__state_a477c82e4e1b6c19c35f3550f1a61f99b}{sysio\_root\_key}}).\mbox{\hyperlink{classfc_1_1variant_a82edd1f33199355d3a1f19bbb92909cc}{as}}<\mbox{\hyperlink{namespacesysio_1_1chain_a0628a11f388cd2e43b1ccc1260a1042f}{public\_key\_type}}>();}
+\DoxyCodeLine{00010\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1genesis__state_ae6edda6568881643e9f05254828540f8_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1chain_1_1genesis__state_ad6e72f371108e814704865a7f1b4d708}\index{sysio::chain::genesis\_state@{sysio::chain::genesis\_state}!compute\_chain\_id@{compute\_chain\_id}}
+\index{compute\_chain\_id@{compute\_chain\_id}!sysio::chain::genesis\_state@{sysio::chain::genesis\_state}}
+\doxysubsubsection{\texorpdfstring{compute\_chain\_id()}{compute\_chain\_id()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1genesis__state_ad6e72f371108e814704865a7f1b4d708} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1chain__id__type}{chain\+::chain\+\_\+id\+\_\+type}} sysio\+::chain\+::genesis\+\_\+state\+::compute\+\_\+chain\+\_\+id (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+Get the chain\+\_\+id corresponding to this genesis state.
+
+This is the SHA256 serialization of the \doxylink{structsysio_1_1chain_1_1genesis__state}{genesis\+\_\+state}. 
+
+Definition at line \mbox{\hyperlink{genesis__state_8cpp_source_l00012}{12}} of file \mbox{\hyperlink{genesis__state_8cpp_source}{genesis\+\_\+state.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00012\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00013\ \ \ \ digest\_type::encoder\ enc;}
+\DoxyCodeLine{00014\ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(\ enc,\ *\textcolor{keyword}{this}\ );}
+\DoxyCodeLine{00015\ \ \ \ \textcolor{keywordflow}{return}\ chain\_id\_type\{enc.result()\};}
+\DoxyCodeLine{00016\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1genesis__state_ad6e72f371108e814704865a7f1b4d708_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1genesis__state_ad6e72f371108e814704865a7f1b4d708_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{structsysio_1_1chain_1_1genesis__state_ac7fcd93dd5c28d5a3c32807c06bc7c8e}\index{sysio::chain::genesis\_state@{sysio::chain::genesis\_state}!operator"!=@{operator"!=}}
+\index{operator"!=@{operator"!=}!sysio::chain::genesis\_state@{sysio::chain::genesis\_state}}
+\doxysubsubsection{\texorpdfstring{operator"!=}{operator!=}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1genesis__state_ac7fcd93dd5c28d5a3c32807c06bc7c8e} 
+bool \mbox{\hyperlink{namespacefc_a40c368ac88294ae47b064cad937fdbf6}{operator!}}= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1genesis__state}{genesis\+\_\+state}} \&}]{lhs}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1genesis__state}{genesis\+\_\+state}} \&}]{rhs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{genesis__state_8hpp_source_l00070}{70}} of file \mbox{\hyperlink{genesis__state_8hpp_source}{genesis\+\_\+state.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00070\ \{\ \textcolor{keywordflow}{return}\ !(lhs\ ==\ rhs);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1genesis__state_a23576fc2b2dbe1d54fc6a19d9c756de4}\index{sysio::chain::genesis\_state@{sysio::chain::genesis\_state}!operator==@{operator==}}
+\index{operator==@{operator==}!sysio::chain::genesis\_state@{sysio::chain::genesis\_state}}
+\doxysubsubsection{\texorpdfstring{operator==}{operator==}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1genesis__state_a23576fc2b2dbe1d54fc6a19d9c756de4} 
+bool operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1genesis__state}{genesis\+\_\+state}} \&}]{lhs}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1genesis__state}{genesis\+\_\+state}} \&}]{rhs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{genesis__state_8hpp_source_l00065}{65}} of file \mbox{\hyperlink{genesis__state_8hpp_source}{genesis\+\_\+state.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::tie(\ lhs.initial\_configuration,\ lhs.initial\_timestamp,\ lhs.initial\_key\ )}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ==\ std::tie(\ rhs.initial\_configuration,\ rhs.initial\_timestamp,\ rhs.initial\_key\ );}
+\DoxyCodeLine{00068\ \ \ \ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1chain_1_1genesis__state_a3e6e5eb6e7b0107b1f105eb8a4dcca41}\index{sysio::chain::genesis\_state@{sysio::chain::genesis\_state}!default\_initial\_wasm\_configuration@{default\_initial\_wasm\_configuration}}
+\index{default\_initial\_wasm\_configuration@{default\_initial\_wasm\_configuration}!sysio::chain::genesis\_state@{sysio::chain::genesis\_state}}
+\doxysubsubsection{\texorpdfstring{default\_initial\_wasm\_configuration}{default\_initial\_wasm\_configuration}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1genesis__state_a3e6e5eb6e7b0107b1f105eb8a4dcca41} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config}{wasm\+\_\+config}} sysio\+::chain\+::genesis\+\_\+state\+::default\+\_\+initial\+\_\+wasm\+\_\+configuration\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\{}
+\DoxyCodeLine{\ \ \ \ \ \ .max\_mutable\_global\_bytes\ =\ config::default\_max\_wasm\_mutable\_global\_bytes,}
+\DoxyCodeLine{\ \ \ \ \ \ .max\_table\_elements\ \ \ \ \ \ \ =\ config::default\_max\_wasm\_table\_elements,}
+\DoxyCodeLine{\ \ \ \ \ \ .max\_section\_elements\ \ \ \ \ =\ config::default\_max\_wasm\_section\_elements,}
+\DoxyCodeLine{\ \ \ \ \ \ .max\_linear\_memory\_init\ \ \ =\ config::default\_max\_wasm\_linear\_memory\_init,}
+\DoxyCodeLine{\ \ \ \ \ \ .max\_func\_local\_bytes\ \ \ \ \ =\ config::default\_max\_wasm\_func\_local\_bytes,}
+\DoxyCodeLine{\ \ \ \ \ \ .max\_nested\_structures\ \ \ \ =\ config::default\_max\_wasm\_nested\_structures,}
+\DoxyCodeLine{\ \ \ \ \ \ .max\_symbol\_bytes\ \ \ \ \ \ \ \ \ =\ config::default\_max\_wasm\_symbol\_bytes,}
+\DoxyCodeLine{\ \ \ \ \ \ .max\_module\_bytes\ \ \ \ \ \ \ \ \ =\ config::default\_max\_wasm\_module\_bytes,}
+\DoxyCodeLine{\ \ \ \ \ \ .max\_code\_bytes\ \ \ \ \ \ \ \ \ \ \ =\ config::default\_max\_wasm\_code\_bytes,}
+\DoxyCodeLine{\ \ \ \ \ \ .max\_pages\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ config::default\_max\_wasm\_pages,}
+\DoxyCodeLine{\ \ \ \ \ \ .max\_call\_depth\ \ \ \ \ \ \ \ \ \ \ =\ config::default\_max\_wasm\_call\_depth}
+\DoxyCodeLine{\ \ \ \}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{genesis__state_8hpp_source_l00041}{41}} of file \mbox{\hyperlink{genesis__state_8hpp_source}{genesis\+\_\+state.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ .max\_mutable\_global\_bytes\ =\ config::default\_max\_wasm\_mutable\_global\_bytes,}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ .max\_table\_elements\ \ \ \ \ \ \ =\ config::default\_max\_wasm\_table\_elements,}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ .max\_section\_elements\ \ \ \ \ =\ config::default\_max\_wasm\_section\_elements,}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ .max\_linear\_memory\_init\ \ \ =\ config::default\_max\_wasm\_linear\_memory\_init,}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ .max\_func\_local\_bytes\ \ \ \ \ =\ config::default\_max\_wasm\_func\_local\_bytes,}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ .max\_nested\_structures\ \ \ \ =\ config::default\_max\_wasm\_nested\_structures,}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ .max\_symbol\_bytes\ \ \ \ \ \ \ \ \ =\ config::default\_max\_wasm\_symbol\_bytes,}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ .max\_module\_bytes\ \ \ \ \ \ \ \ \ =\ config::default\_max\_wasm\_module\_bytes,}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ .max\_code\_bytes\ \ \ \ \ \ \ \ \ \ \ =\ config::default\_max\_wasm\_code\_bytes,}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ .max\_pages\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ config::default\_max\_wasm\_pages,}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ .max\_call\_depth\ \ \ \ \ \ \ \ \ \ \ =\ config::default\_max\_wasm\_call\_depth}
+\DoxyCodeLine{00053\ \ \ \ \};}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1genesis__state_ad8ce3c9c36d7e6110d41ff636f776219}\index{sysio::chain::genesis\_state@{sysio::chain::genesis\_state}!initial\_configuration@{initial\_configuration}}
+\index{initial\_configuration@{initial\_configuration}!sysio::chain::genesis\_state@{sysio::chain::genesis\_state}}
+\doxysubsubsection{\texorpdfstring{initial\_configuration}{initial\_configuration}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1genesis__state_ad8ce3c9c36d7e6110d41ff636f776219} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0}{chain\+\_\+config\+\_\+v0}} sysio\+::chain\+::genesis\+\_\+state\+::initial\+\_\+configuration}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ .max\_block\_net\_usage\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ config::default\_max\_block\_net\_usage,}
+\DoxyCodeLine{\ \ \ \ \ \ .target\_block\_net\_usage\_pct\ \ \ \ \ \ \ \ \ \ \ =\ config::default\_target\_block\_net\_usage\_pct,}
+\DoxyCodeLine{\ \ \ \ \ \ .max\_transaction\_net\_usage\ \ \ \ \ \ \ \ \ \ \ \ =\ config::default\_max\_transaction\_net\_usage,}
+\DoxyCodeLine{\ \ \ \ \ \ .base\_per\_transaction\_net\_usage\ \ \ \ \ \ \ =\ config::default\_base\_per\_transaction\_net\_usage,}
+\DoxyCodeLine{\ \ \ \ \ \ .net\_usage\_leeway\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ config::default\_net\_usage\_leeway,}
+\DoxyCodeLine{\ \ \ \ \ \ .context\_free\_discount\_net\_usage\_num\ \ =\ config::default\_context\_free\_discount\_net\_usage\_num,}
+\DoxyCodeLine{\ \ \ \ \ \ .context\_free\_discount\_net\_usage\_den\ \ =\ config::default\_context\_free\_discount\_net\_usage\_den,}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \ \ .max\_block\_cpu\_usage\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ config::default\_max\_block\_cpu\_usage,}
+\DoxyCodeLine{\ \ \ \ \ \ .target\_block\_cpu\_usage\_pct\ \ \ \ \ \ \ \ \ \ \ =\ config::default\_target\_block\_cpu\_usage\_pct,}
+\DoxyCodeLine{\ \ \ \ \ \ .max\_transaction\_cpu\_usage\ \ \ \ \ \ \ \ \ \ \ \ =\ config::default\_max\_transaction\_cpu\_usage,}
+\DoxyCodeLine{\ \ \ \ \ \ .min\_transaction\_cpu\_usage\ \ \ \ \ \ \ \ \ \ \ \ =\ config::default\_min\_transaction\_cpu\_usage,}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \ \ .max\_transaction\_lifetime\ \ \ \ \ \ \ \ \ \ \ \ \ =\ config::default\_max\_trx\_lifetime,}
+\DoxyCodeLine{\ \ \ \ \ \ .deferred\_trx\_expiration\_window\ \ \ \ \ \ \ =\ config::default\_deferred\_trx\_expiration\_window,}
+\DoxyCodeLine{\ \ \ \ \ \ .max\_transaction\_delay\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ config::default\_max\_trx\_delay,}
+\DoxyCodeLine{\ \ \ \ \ \ .max\_inline\_action\_size\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ config::default\_max\_inline\_action\_size,}
+\DoxyCodeLine{\ \ \ \ \ \ .max\_inline\_action\_depth\ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ config::default\_max\_inline\_action\_depth,}
+\DoxyCodeLine{\ \ \ \ \ \ .max\_authority\_depth\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ config::default\_max\_auth\_depth,}
+\DoxyCodeLine{\ \ \ \}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{genesis__state_8hpp_source_l00019}{19}} of file \mbox{\hyperlink{genesis__state_8hpp_source}{genesis\+\_\+state.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ .max\_block\_net\_usage\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ config::default\_max\_block\_net\_usage,}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ .target\_block\_net\_usage\_pct\ \ \ \ \ \ \ \ \ \ \ =\ config::default\_target\_block\_net\_usage\_pct,}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ .max\_transaction\_net\_usage\ \ \ \ \ \ \ \ \ \ \ \ =\ config::default\_max\_transaction\_net\_usage,}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ .base\_per\_transaction\_net\_usage\ \ \ \ \ \ \ =\ config::default\_base\_per\_transaction\_net\_usage,}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ .net\_usage\_leeway\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ config::default\_net\_usage\_leeway,}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ .context\_free\_discount\_net\_usage\_num\ \ =\ config::default\_context\_free\_discount\_net\_usage\_num,}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ .context\_free\_discount\_net\_usage\_den\ \ =\ config::default\_context\_free\_discount\_net\_usage\_den,}
+\DoxyCodeLine{00027\ }
+\DoxyCodeLine{00028\ \ \ \ \ \ \ .max\_block\_cpu\_usage\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ config::default\_max\_block\_cpu\_usage,}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ .target\_block\_cpu\_usage\_pct\ \ \ \ \ \ \ \ \ \ \ =\ config::default\_target\_block\_cpu\_usage\_pct,}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ .max\_transaction\_cpu\_usage\ \ \ \ \ \ \ \ \ \ \ \ =\ config::default\_max\_transaction\_cpu\_usage,}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ .min\_transaction\_cpu\_usage\ \ \ \ \ \ \ \ \ \ \ \ =\ config::default\_min\_transaction\_cpu\_usage,}
+\DoxyCodeLine{00032\ }
+\DoxyCodeLine{00033\ \ \ \ \ \ \ .max\_transaction\_lifetime\ \ \ \ \ \ \ \ \ \ \ \ \ =\ config::default\_max\_trx\_lifetime,}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ .deferred\_trx\_expiration\_window\ \ \ \ \ \ \ =\ config::default\_deferred\_trx\_expiration\_window,}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ .max\_transaction\_delay\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ config::default\_max\_trx\_delay,}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ .max\_inline\_action\_size\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ config::default\_max\_inline\_action\_size,}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ .max\_inline\_action\_depth\ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ config::default\_max\_inline\_action\_depth,}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ .max\_authority\_depth\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ config::default\_max\_auth\_depth,}
+\DoxyCodeLine{00039\ \ \ \ \};}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1genesis__state_a628c33067d45e34be5f71f402ba407e3}\index{sysio::chain::genesis\_state@{sysio::chain::genesis\_state}!initial\_key@{initial\_key}}
+\index{initial\_key@{initial\_key}!sysio::chain::genesis\_state@{sysio::chain::genesis\_state}}
+\doxysubsubsection{\texorpdfstring{initial\_key}{initial\_key}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1genesis__state_a628c33067d45e34be5f71f402ba407e3} 
+\mbox{\hyperlink{namespacesysio_1_1chain_a0628a11f388cd2e43b1ccc1260a1042f}{public\+\_\+key\+\_\+type}} sysio\+::chain\+::genesis\+\_\+state\+::initial\+\_\+key}
+
+
+
+Definition at line \mbox{\hyperlink{genesis__state_8hpp_source_l00056}{56}} of file \mbox{\hyperlink{genesis__state_8hpp_source}{genesis\+\_\+state.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1genesis__state_aa5ee7b68f2765bb346d9ef34cb4d93cc}\index{sysio::chain::genesis\_state@{sysio::chain::genesis\_state}!initial\_timestamp@{initial\_timestamp}}
+\index{initial\_timestamp@{initial\_timestamp}!sysio::chain::genesis\_state@{sysio::chain::genesis\_state}}
+\doxysubsubsection{\texorpdfstring{initial\_timestamp}{initial\_timestamp}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1genesis__state_aa5ee7b68f2765bb346d9ef34cb4d93cc} 
+\mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} sysio\+::chain\+::genesis\+\_\+state\+::initial\+\_\+timestamp}
+
+
+
+Definition at line \mbox{\hyperlink{genesis__state_8hpp_source_l00055}{55}} of file \mbox{\hyperlink{genesis__state_8hpp_source}{genesis\+\_\+state.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1genesis__state_a477c82e4e1b6c19c35f3550f1a61f99b}\index{sysio::chain::genesis\_state@{sysio::chain::genesis\_state}!sysio\_root\_key@{sysio\_root\_key}}
+\index{sysio\_root\_key@{sysio\_root\_key}!sysio::chain::genesis\_state@{sysio::chain::genesis\_state}}
+\doxysubsubsection{\texorpdfstring{sysio\_root\_key}{sysio\_root\_key}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1genesis__state_a477c82e4e1b6c19c35f3550f1a61f99b} 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::chain\+::genesis\+\_\+state\+::sysio\+\_\+root\+\_\+key\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{genesis__state_8hpp_source_l00017}{17}} of file \mbox{\hyperlink{genesis__state_8hpp_source}{genesis\+\_\+state.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{genesis__state_8hpp}{genesis\+\_\+state.\+hpp}}\item 
+libraries/chain/\mbox{\hyperlink{genesis__state_8cpp}{genesis\+\_\+state.\+cpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,10 @@
+<map id="sysio::chain::detail::block_log_impl::reset" name="sysio::chain::detail::block_log_impl::reset">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,71,158,112"/>
+<area shape="rect" id="Node000002" href="$integration_8cpp.html#af5b66d867a040d002fb57d645cae3fb4" title=" " alt="" coords="231,5,284,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="131,68,216,32,218,37,133,73"/>
+<area shape="rect" id="Node000003" href="$namespacefc_1_1raw.html#a3a18d8161aa5b4f4f02b6fcfdff5e5d1" title=" " alt="" coords="209,79,306,104"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="158,89,193,89,193,94,158,94"/>
+<area shape="rect" id="Node000004" href="$namespacefc.html#a50ad24e0099358d167967f9df2e368fc" title=" " alt="" coords="206,128,309,154"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="157,110,195,121,194,126,156,115"/>
+<area shape="poly" id="edge3_Node000003_Node000003" title=" " alt="" coords="228,80,222,70,225,60,237,54,257,52,279,55,290,61,287,66,277,60,257,57,239,59,229,64,227,69,232,77"/>
+</map>

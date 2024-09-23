@@ -1,0 +1,9 @@
+<map id="sysio::chain::secondary_index&lt; SecondaryKey, ObjectTypeId, SecondaryKeyLess &gt;::index_object" name="sysio::chain::secondary_index&lt; SecondaryKey, ObjectTypeId, SecondaryKeyLess &gt;::index_object">
+<area shape="rect" id="Node000001" title=" " alt="" coords="256,84,479,155"/>
+<area shape="rect" id="Node000002" href="$structchainbase_1_1object.html" title=" " alt="" coords="18,5,159,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="175,57,256,83,255,88,173,62"/>
+<area shape="rect" id="Node000003" href="$structchainbase_1_1object.html" title=" " alt="" coords="5,84,172,155"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="187,117,255,117,255,122,187,122"/>
+<area shape="rect" id="Node000004" href="$structsysio_1_1chain_1_1name.html" title="Immutable except for fc::from_variant." alt="" coords="23,179,154,205"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="155,172,255,146,256,151,156,177"/>
+</map>

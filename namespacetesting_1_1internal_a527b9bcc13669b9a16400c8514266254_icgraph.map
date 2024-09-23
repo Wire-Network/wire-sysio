@@ -1,0 +1,16 @@
+<map id="testing::internal::IsTrue" name="testing::internal::IsTrue">
+<area shape="rect" id="Node000001" title=" " alt="" coords="589,125,708,166"/>
+<area shape="rect" id="Node000002" href="$namespacetesting_1_1internal.html#a922c9da63cd4bf94fc473b9ecac76414" title=" " alt="" coords="421,92,539,133"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="573,134,539,127,540,121,575,128"/>
+<area shape="rect" id="Node000006" href="$classtesting_1_1internal_1_1scoped__ptr.html#acac03266a43359801aff0de5c990bec0" title=" " alt="" coords="419,157,541,198"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="574,162,542,169,541,163,573,157"/>
+<area shape="rect" id="Node000003" href="$namespacetesting_1_1internal.html#a4b24c851ab13569b1b15b3d259b60d2e" title=" " alt="" coords="229,5,348,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="418,87,334,49,336,44,420,83"/>
+<area shape="rect" id="Node000004" href="$namespacetesting_1_1internal.html#a26d00130a017a66d0d60dc5a02a13d25" title=" " alt="" coords="5,42,158,68"/>
+<area shape="poly" id="edge5_Node000002_Node000004" title=" " alt="" coords="405,104,158,69,158,63,406,99"/>
+<area shape="rect" id="Node000005" href="$namespacetesting_1_1internal.html#a8eb8eddf760375a490e007b20777ec56" title=" " alt="" coords="229,120,348,161"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="406,126,348,134,348,129,405,121"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="215,39,159,47,158,42,214,33"/>
+<area shape="rect" id="Node000007" href="$classtesting_1_1internal_1_1scoped__ptr.html#ab721de9bf4369f002fb563e82352ee36" title=" " alt="" coords="206,185,371,226"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="404,191,372,196,371,191,403,186"/>
+</map>

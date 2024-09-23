@@ -1,0 +1,122 @@
+\doxysection{Xbyak\+::inner Namespace Reference}
+\hypertarget{namespace_xbyak_1_1inner}{}\label{namespace_xbyak_1_1inner}\index{Xbyak::inner@{Xbyak::inner}}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{namespace_xbyak_1_1inner_a2221874ab1bb17e045d67f76345f4f09}{Label\+Mode}} \{ \mbox{\hyperlink{namespace_xbyak_1_1inner_a2221874ab1bb17e045d67f76345f4f09a41fdc2297fba7a917b15409f61e9ff96}{Las\+Is}}
+, \mbox{\hyperlink{namespace_xbyak_1_1inner_a2221874ab1bb17e045d67f76345f4f09ad38ecccf9b7954629ca7c9fc2d918999}{Labs}}
+, \mbox{\hyperlink{namespace_xbyak_1_1inner_a2221874ab1bb17e045d67f76345f4f09a5cf3d2ef3ae7058e6a0835fe1523db87}{Ladd\+Top}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{namespace_xbyak_1_1inner_afde48a33ad6ab225697e7248d28f939d}{Is\+In\+Disp8}} (\mbox{\hyperlink{namespace_xbyak_a880d0e902046fa68ba57ae3fbc4acdf3}{uint32}} x)
+\item 
+bool \mbox{\hyperlink{namespace_xbyak_1_1inner_aa76d5f810af4c3069075ca2c93f8b896}{Is\+In\+Int32}} (\mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}} x)
+\item 
+\mbox{\hyperlink{namespace_xbyak_a880d0e902046fa68ba57ae3fbc4acdf3}{uint32}} \mbox{\hyperlink{namespace_xbyak_1_1inner_a12e10e9b0005119235ddfc06b36dd55a}{Verify\+In\+Int32}} (\mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}} x)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{namespace_xbyak_1_1inner_a2221874ab1bb17e045d67f76345f4f09}\index{Xbyak::inner@{Xbyak::inner}!LabelMode@{LabelMode}}
+\index{LabelMode@{LabelMode}!Xbyak::inner@{Xbyak::inner}}
+\doxysubsubsection{\texorpdfstring{LabelMode}{LabelMode}}
+{\footnotesize\ttfamily \label{namespace_xbyak_1_1inner_a2221874ab1bb17e045d67f76345f4f09} 
+enum \mbox{\hyperlink{namespace_xbyak_1_1inner_a2221874ab1bb17e045d67f76345f4f09}{Xbyak\+::inner\+::\+Label\+Mode}}}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{LasIs@{LasIs}!Xbyak::inner@{Xbyak::inner}}\index{Xbyak::inner@{Xbyak::inner}!LasIs@{LasIs}}}\Hypertarget{namespace_xbyak_1_1inner_a2221874ab1bb17e045d67f76345f4f09a41fdc2297fba7a917b15409f61e9ff96}\label{namespace_xbyak_1_1inner_a2221874ab1bb17e045d67f76345f4f09} 
+Las\+Is&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Labs@{Labs}!Xbyak::inner@{Xbyak::inner}}\index{Xbyak::inner@{Xbyak::inner}!Labs@{Labs}}}\Hypertarget{namespace_xbyak_1_1inner_a2221874ab1bb17e045d67f76345f4f09ad38ecccf9b7954629ca7c9fc2d918999}\label{namespace_xbyak_1_1inner_a2221874ab1bb17e045d67f76345f4f09} 
+Labs&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{LaddTop@{LaddTop}!Xbyak::inner@{Xbyak::inner}}\index{Xbyak::inner@{Xbyak::inner}!LaddTop@{LaddTop}}}\Hypertarget{namespace_xbyak_1_1inner_a2221874ab1bb17e045d67f76345f4f09a5cf3d2ef3ae7058e6a0835fe1523db87}\label{namespace_xbyak_1_1inner_a2221874ab1bb17e045d67f76345f4f09} 
+Ladd\+Top&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00298}{298}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00298\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00299\ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1inner_a2221874ab1bb17e045d67f76345f4f09a41fdc2297fba7a917b15409f61e9ff96}{LasIs}},\ \textcolor{comment}{//\ as\ is}}
+\DoxyCodeLine{00300\ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1inner_a2221874ab1bb17e045d67f76345f4f09ad38ecccf9b7954629ca7c9fc2d918999}{Labs}},\ \textcolor{comment}{//\ absolute}}
+\DoxyCodeLine{00301\ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1inner_a2221874ab1bb17e045d67f76345f4f09a5cf3d2ef3ae7058e6a0835fe1523db87}{LaddTop}}\ \textcolor{comment}{//\ (addr\ +\ top)\ for\ mov(reg,\ label)\ with\ AutoGrow}}
+\DoxyCodeLine{00302\ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespace_xbyak_1_1inner_afde48a33ad6ab225697e7248d28f939d}\index{Xbyak::inner@{Xbyak::inner}!IsInDisp8@{IsInDisp8}}
+\index{IsInDisp8@{IsInDisp8}!Xbyak::inner@{Xbyak::inner}}
+\doxysubsubsection{\texorpdfstring{IsInDisp8()}{IsInDisp8()}}
+{\footnotesize\ttfamily \label{namespace_xbyak_1_1inner_afde48a33ad6ab225697e7248d28f939d} 
+bool Xbyak\+::inner\+::\+Is\+In\+Disp8 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespace_xbyak_a880d0e902046fa68ba57ae3fbc4acdf3}{uint32}}}]{x}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00287}{287}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00287\ \{\ \textcolor{keywordflow}{return}\ 0xFFFFFF80\ <=\ x\ ||\ x\ <=\ 0x7F;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_xbyak_1_1inner_afde48a33ad6ab225697e7248d28f939d_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_xbyak_1_1inner_aa76d5f810af4c3069075ca2c93f8b896}\index{Xbyak::inner@{Xbyak::inner}!IsInInt32@{IsInInt32}}
+\index{IsInInt32@{IsInInt32}!Xbyak::inner@{Xbyak::inner}}
+\doxysubsubsection{\texorpdfstring{IsInInt32()}{IsInInt32()}}
+{\footnotesize\ttfamily \label{namespace_xbyak_1_1inner_aa76d5f810af4c3069075ca2c93f8b896} 
+bool Xbyak\+::inner\+::\+Is\+In\+Int32 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}}}]{x}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00288}{288}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00288\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{\string~uint64}}(0x7fffffffu)\ <=\ x\ ||\ x\ <=\ 0x7FFFFFFFU;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_xbyak_1_1inner_aa76d5f810af4c3069075ca2c93f8b896_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_xbyak_1_1inner_a12e10e9b0005119235ddfc06b36dd55a}\index{Xbyak::inner@{Xbyak::inner}!VerifyInInt32@{VerifyInInt32}}
+\index{VerifyInInt32@{VerifyInInt32}!Xbyak::inner@{Xbyak::inner}}
+\doxysubsubsection{\texorpdfstring{VerifyInInt32()}{VerifyInInt32()}}
+{\footnotesize\ttfamily \label{namespace_xbyak_1_1inner_a12e10e9b0005119235ddfc06b36dd55a} 
+\mbox{\hyperlink{namespace_xbyak_a880d0e902046fa68ba57ae3fbc4acdf3}{uint32}} Xbyak\+::inner\+::\+Verify\+In\+Int32 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}}}]{x}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00290}{290}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00291\ \{}
+\DoxyCodeLine{00292\ \textcolor{preprocessor}{\#ifdef\ XBYAK64}}
+\DoxyCodeLine{00293\ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{namespace_xbyak_1_1inner_aa76d5f810af4c3069075ca2c93f8b896}{IsInInt32}}(x))\ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{calc_8cpp_a2c3e4bb40f36b262a5214e2da2bca9c5}{Error}}(ERR\_OFFSET\_IS\_TOO\_BIG);}
+\DoxyCodeLine{00294\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00295\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{namespace_xbyak_a880d0e902046fa68ba57ae3fbc4acdf3}{uint32}}\textcolor{keyword}{>}(x);}
+\DoxyCodeLine{00296\ \}}
+
+\end{DoxyCode}

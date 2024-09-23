@@ -1,0 +1,125 @@
+\doxysection{processor\+\_\+setup\+\_\+ext Struct Reference}
+\hypertarget{structprocessor__setup__ext}{}\label{structprocessor__setup__ext}\index{processor\_setup\_ext@{processor\_setup\_ext}}
+
+
+Collaboration diagram for processor\+\_\+setup\+\_\+ext\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structprocessor__setup__ext__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structprocessor__setup__ext_a7be679fcc1767117e9040bce609e59ab}{processor\+\_\+setup\+\_\+ext}} (bool \mbox{\hyperlink{docs_2simple__broadcast__server_8cpp_afc38239e3eef2a4200e324bff14d91d1}{server}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+websocketpp\+::lib\+::error\+\_\+code \mbox{\hyperlink{structprocessor__setup__ext_a500a49844ae879bb8189a58e89005cfa}{ec}}
+\item 
+con\+\_\+msg\+\_\+manager\+\_\+type\+::ptr \mbox{\hyperlink{structprocessor__setup__ext_a28f7642ffd000c87b1f6e1636fa89858}{msg\+\_\+manager}}
+\item 
+\mbox{\hyperlink{structstub__config_a8078a33b6ae688fb79664999e1373f74}{stub\+\_\+config\+::rng\+\_\+type}} \mbox{\hyperlink{structprocessor__setup__ext_a320e92e2721ed24ee02f04c103b78428}{rng}}
+\item 
+\mbox{\hyperlink{structstub__config_adf25cb289c00f17e0edde3ee14c7d513}{stub\+\_\+config\+::request\+\_\+type}} \mbox{\hyperlink{structprocessor__setup__ext_a3407743ef41e1a27cf5da82d467777d0}{req}}
+\item 
+\mbox{\hyperlink{structstub__config_af5bf09e5641cb374d09ca1cc57a3db68}{stub\+\_\+config\+::response\+\_\+type}} \mbox{\hyperlink{structprocessor__setup__ext_a92adbb5666a2e60851507757f1f36443}{res}}
+\item 
+\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi13}{websocketpp\+::processor\+::hybi13}}$<$ \mbox{\hyperlink{structstub__config__ext}{stub\+\_\+config\+\_\+ext}} $>$ \mbox{\hyperlink{structprocessor__setup__ext_a04ff04a58e537a96fc110d36928f828b}{p}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{hybi13_8cpp_source_l00107}{107}} of file \mbox{\hyperlink{hybi13_8cpp_source}{hybi13.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structprocessor__setup__ext_a7be679fcc1767117e9040bce609e59ab}\index{processor\_setup\_ext@{processor\_setup\_ext}!processor\_setup\_ext@{processor\_setup\_ext}}
+\index{processor\_setup\_ext@{processor\_setup\_ext}!processor\_setup\_ext@{processor\_setup\_ext}}
+\doxysubsubsection{\texorpdfstring{processor\_setup\_ext()}{processor\_setup\_ext()}}
+{\footnotesize\ttfamily \label{structprocessor__setup__ext_a7be679fcc1767117e9040bce609e59ab} 
+processor\+\_\+setup\+\_\+ext\+::processor\+\_\+setup\+\_\+ext (\begin{DoxyParamCaption}\item[{bool}]{server}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{hybi13_8cpp_source_l00108}{108}} of file \mbox{\hyperlink{hybi13_8cpp_source}{hybi13.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ :\ \mbox{\hyperlink{structprocessor__setup__ext_a28f7642ffd000c87b1f6e1636fa89858}{msg\_manager}}(\textcolor{keyword}{new}\ \mbox{\hyperlink{hybi13_8cpp_a13c41174dd3938337edbfb4ce0ba0644}{con\_msg\_manager\_type}}())}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ ,\ \mbox{\hyperlink{structprocessor__setup__ext_a04ff04a58e537a96fc110d36928f828b}{p}}(\textcolor{keyword}{false},\mbox{\hyperlink{classwebsocketpp_1_1server}{server}},\mbox{\hyperlink{structprocessor__setup__ext_a28f7642ffd000c87b1f6e1636fa89858}{msg\_manager}},\mbox{\hyperlink{structprocessor__setup__ext_a320e92e2721ed24ee02f04c103b78428}{rng}})\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structprocessor__setup__ext_a500a49844ae879bb8189a58e89005cfa}\index{processor\_setup\_ext@{processor\_setup\_ext}!ec@{ec}}
+\index{ec@{ec}!processor\_setup\_ext@{processor\_setup\_ext}}
+\doxysubsubsection{\texorpdfstring{ec}{ec}}
+{\footnotesize\ttfamily \label{structprocessor__setup__ext_a500a49844ae879bb8189a58e89005cfa} 
+websocketpp\+::lib\+::error\+\_\+code processor\+\_\+setup\+\_\+ext\+::ec}
+
+
+
+Definition at line \mbox{\hyperlink{hybi13_8cpp_source_l00112}{112}} of file \mbox{\hyperlink{hybi13_8cpp_source}{hybi13.\+cpp}}.
+
+\Hypertarget{structprocessor__setup__ext_a28f7642ffd000c87b1f6e1636fa89858}\index{processor\_setup\_ext@{processor\_setup\_ext}!msg\_manager@{msg\_manager}}
+\index{msg\_manager@{msg\_manager}!processor\_setup\_ext@{processor\_setup\_ext}}
+\doxysubsubsection{\texorpdfstring{msg\_manager}{msg\_manager}}
+{\footnotesize\ttfamily \label{structprocessor__setup__ext_a28f7642ffd000c87b1f6e1636fa89858} 
+con\+\_\+msg\+\_\+manager\+\_\+type\+::ptr processor\+\_\+setup\+\_\+ext\+::msg\+\_\+manager}
+
+
+
+Definition at line \mbox{\hyperlink{hybi13_8cpp_source_l00113}{113}} of file \mbox{\hyperlink{hybi13_8cpp_source}{hybi13.\+cpp}}.
+
+\Hypertarget{structprocessor__setup__ext_a04ff04a58e537a96fc110d36928f828b}\index{processor\_setup\_ext@{processor\_setup\_ext}!p@{p}}
+\index{p@{p}!processor\_setup\_ext@{processor\_setup\_ext}}
+\doxysubsubsection{\texorpdfstring{p}{p}}
+{\footnotesize\ttfamily \label{structprocessor__setup__ext_a04ff04a58e537a96fc110d36928f828b} 
+\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi13}{websocketpp\+::processor\+::hybi13}}$<$\mbox{\hyperlink{structstub__config__ext}{stub\+\_\+config\+\_\+ext}}$>$ processor\+\_\+setup\+\_\+ext\+::p}
+
+
+
+Definition at line \mbox{\hyperlink{hybi13_8cpp_source_l00117}{117}} of file \mbox{\hyperlink{hybi13_8cpp_source}{hybi13.\+cpp}}.
+
+\Hypertarget{structprocessor__setup__ext_a3407743ef41e1a27cf5da82d467777d0}\index{processor\_setup\_ext@{processor\_setup\_ext}!req@{req}}
+\index{req@{req}!processor\_setup\_ext@{processor\_setup\_ext}}
+\doxysubsubsection{\texorpdfstring{req}{req}}
+{\footnotesize\ttfamily \label{structprocessor__setup__ext_a3407743ef41e1a27cf5da82d467777d0} 
+\mbox{\hyperlink{structstub__config_adf25cb289c00f17e0edde3ee14c7d513}{stub\+\_\+config\+::request\+\_\+type}} processor\+\_\+setup\+\_\+ext\+::req}
+
+
+
+Definition at line \mbox{\hyperlink{hybi13_8cpp_source_l00115}{115}} of file \mbox{\hyperlink{hybi13_8cpp_source}{hybi13.\+cpp}}.
+
+\Hypertarget{structprocessor__setup__ext_a92adbb5666a2e60851507757f1f36443}\index{processor\_setup\_ext@{processor\_setup\_ext}!res@{res}}
+\index{res@{res}!processor\_setup\_ext@{processor\_setup\_ext}}
+\doxysubsubsection{\texorpdfstring{res}{res}}
+{\footnotesize\ttfamily \label{structprocessor__setup__ext_a92adbb5666a2e60851507757f1f36443} 
+\mbox{\hyperlink{structstub__config_af5bf09e5641cb374d09ca1cc57a3db68}{stub\+\_\+config\+::response\+\_\+type}} processor\+\_\+setup\+\_\+ext\+::res}
+
+
+
+Definition at line \mbox{\hyperlink{hybi13_8cpp_source_l00116}{116}} of file \mbox{\hyperlink{hybi13_8cpp_source}{hybi13.\+cpp}}.
+
+\Hypertarget{structprocessor__setup__ext_a320e92e2721ed24ee02f04c103b78428}\index{processor\_setup\_ext@{processor\_setup\_ext}!rng@{rng}}
+\index{rng@{rng}!processor\_setup\_ext@{processor\_setup\_ext}}
+\doxysubsubsection{\texorpdfstring{rng}{rng}}
+{\footnotesize\ttfamily \label{structprocessor__setup__ext_a320e92e2721ed24ee02f04c103b78428} 
+\mbox{\hyperlink{structstub__config_a8078a33b6ae688fb79664999e1373f74}{stub\+\_\+config\+::rng\+\_\+type}} processor\+\_\+setup\+\_\+ext\+::rng}
+
+
+
+Definition at line \mbox{\hyperlink{hybi13_8cpp_source_l00114}{114}} of file \mbox{\hyperlink{hybi13_8cpp_source}{hybi13.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/vendor/websocketpp/test/processors/\mbox{\hyperlink{hybi13_8cpp}{hybi13.\+cpp}}\end{DoxyCompactItemize}

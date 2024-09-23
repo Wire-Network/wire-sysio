@@ -1,0 +1,23 @@
+<map id="CLI::App::get_subcommand" name="CLI::App::get_subcommand">
+<area shape="rect" id="Node000001" title=" " alt="" coords="1142,88,1327,114"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_app.html#a1f7a70f4bc4c375a7de10073a5de709d" title="Fill in a single config option." alt="" coords="922,23,1083,64"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1164,86,1082,66,1084,61,1165,81"/>
+<area shape="rect" id="Node000010" href="$class_c_l_i_1_1_app.html#ad07c68d1fcede041fa7fed647e5e3d84" title="Check to see if given subcommand was selected." alt="" coords="910,88,1094,114"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="1126,104,1095,104,1095,98,1126,98"/>
+<area shape="rect" id="Node000011" href="$class_c_l_i_1_1_app.html#a5afd7a600223bae58b46aaff670e2d25" title="Check with name instead of pointer to see if subcommand was selected." alt="" coords="910,137,1094,163"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="1156,120,1067,139,1066,134,1155,115"/>
+<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_app.html#aee09795046c3b47948e6c2fa45349eca" title=" " alt="" coords="700,31,862,56"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="906,46,862,46,862,41,906,41"/>
+<area shape="rect" id="Node000004" href="$class_c_l_i_1_1_app.html#a7a15e5743d4a8eccac57955ed5a6a3b6" title="Read and process a configuration file (main app only)" alt="" coords="517,23,652,64"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="684,46,652,46,652,41,684,41"/>
+<area shape="rect" id="Node000005" href="$class_c_l_i_1_1_app.html#a0fec24c804daf5b458bb5762e4e75a73" title="Process callbacks and such." alt="" coords="335,31,469,56"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="502,46,470,46,470,41,502,41"/>
+<area shape="rect" id="Node000006" href="$class_c_l_i_1_1_app.html#a26a92886a7d7f10a9afbd39b6535f42b" title="Internal parse function." alt="" coords="167,5,287,31"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="319,34,287,29,288,24,320,29"/>
+<area shape="rect" id="Node000007" href="$class_c_l_i_1_1_app.html#a241ba75a6c98b36349ae2f71a9137291" title="Internal parse function." alt="" coords="167,55,287,80"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="320,57,288,62,287,57,319,52"/>
+<area shape="rect" id="Node000008" href="$class_c_l_i_1_1_app.html#a8ffb155a1153ee23d442c5bfed21225c" title="The real work is done here. Expects a reversed vector." alt="" coords="5,29,119,55"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="151,58,119,54,119,48,151,53"/>
+<area shape="rect" id="Node000009" href="$class_c_l_i_1_1_app.html#a878c1067ade7145aa11478d64f5173ed" title=" " alt="" coords="5,79,119,104"/>
+<area shape="poly" id="edge8_Node000007_Node000009" title=" " alt="" coords="151,81,119,86,119,81,151,76"/>
+</map>

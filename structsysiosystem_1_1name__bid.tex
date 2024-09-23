@@ -1,0 +1,132 @@
+\doxysection{sysiosystem\+::name\+\_\+bid Struct Reference}
+\hypertarget{structsysiosystem_1_1name__bid}{}\label{structsysiosystem_1_1name__bid}\index{sysiosystem::name\_bid@{sysiosystem::name\_bid}}
+
+
+{\ttfamily \#include $<$sysio.\+system.\+hpp$>$}
+
+
+
+Collaboration diagram for sysiosystem\+::name\+\_\+bid\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=285pt]{structsysiosystem_1_1name__bid__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1name__bid_ad2acf9f8722796bfa34a1f8ada70b91d}{primary\+\_\+key}} () const
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1name__bid_a3a645c20f866885024966c16c4e1278d}{by\+\_\+high\+\_\+bid}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \mbox{\hyperlink{structsysiosystem_1_1name__bid_aa7b73f79ba62c30adbad89692a604167}{newname}}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \mbox{\hyperlink{structsysiosystem_1_1name__bid_a4f01d71c060b0497b111a51785ea7a67}{high\+\_\+bidder}}
+\item 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1name__bid_a90ca222f7b091cd8bd7a11132709939c}{high\+\_\+bid}} = 0
+\begin{DoxyCompactList}\small\item\em negative high\+\_\+bid == closed auction waiting to be claimed \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} \mbox{\hyperlink{structsysiosystem_1_1name__bid_a45b672c1f35ede1062e409b6e8816aed}{last\+\_\+bid\+\_\+time}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+The {\ttfamily sysio.\+system} smart contract is provided by {\ttfamily block.\+one} as a sample system contract, and it defines the structures and actions needed for blockchain\textquotesingle{}s core functionality.
+
+Just like in the {\ttfamily sysio.\+bios} sample contract implementation, there are a few actions which are not implemented at the contract level ({\ttfamily newaccount}, {\ttfamily updateauth}, {\ttfamily deleteauth}, {\ttfamily linkauth}, {\ttfamily unlinkauth}, {\ttfamily canceldelay}, {\ttfamily onerror}, {\ttfamily setabi}, {\ttfamily setcode}), they are just declared in the contract so they will show in the contract\textquotesingle{}s ABI and users will be able to push those actions to the chain via the account holding the {\ttfamily sysio.\+system} contract, but the implementation is at the EOSIO core level. They are referred to as EOSIO native actions.
+
+
+\begin{DoxyItemize}
+\item Users can stake tokens for CPU and Network bandwidth, and then vote for producers or delegate their vote to a proxy.
+\item Producers register in order to be voted for, and can claim per-\/block and per-\/vote rewards.
+\item Users can buy and sell RAM at a market-\/determined price.
+\item Users can bid on premium names.
+\item \doxylink{struct_a}{A} resource exchange system (REX) allows token holders to lend their tokens, and users to rent CPU and Network resources in return for a market-\/determined fee. 
+\end{DoxyItemize}
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00115}{115}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysiosystem_1_1name__bid_a3a645c20f866885024966c16c4e1278d}\index{sysiosystem::name\_bid@{sysiosystem::name\_bid}!by\_high\_bid@{by\_high\_bid}}
+\index{by\_high\_bid@{by\_high\_bid}!sysiosystem::name\_bid@{sysiosystem::name\_bid}}
+\doxysubsubsection{\texorpdfstring{by\_high\_bid()}{by\_high\_bid()}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1name__bid_a3a645c20f866885024966c16c4e1278d} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} sysiosystem\+::name\+\_\+bid\+::by\+\_\+high\+\_\+bid (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00122}{122}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00122\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\textcolor{keyword}{>}(-\/\mbox{\hyperlink{structsysiosystem_1_1name__bid_a90ca222f7b091cd8bd7a11132709939c}{high\_bid}});\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysiosystem_1_1name__bid_ad2acf9f8722796bfa34a1f8ada70b91d}\index{sysiosystem::name\_bid@{sysiosystem::name\_bid}!primary\_key@{primary\_key}}
+\index{primary\_key@{primary\_key}!sysiosystem::name\_bid@{sysiosystem::name\_bid}}
+\doxysubsubsection{\texorpdfstring{primary\_key()}{primary\_key()}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1name__bid_ad2acf9f8722796bfa34a1f8ada70b91d} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} sysiosystem\+::name\+\_\+bid\+::primary\+\_\+key (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00121}{121}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00121\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysiosystem_1_1name__bid_aa7b73f79ba62c30adbad89692a604167}{newname}}.value;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysiosystem_1_1name__bid_a90ca222f7b091cd8bd7a11132709939c}\index{sysiosystem::name\_bid@{sysiosystem::name\_bid}!high\_bid@{high\_bid}}
+\index{high\_bid@{high\_bid}!sysiosystem::name\_bid@{sysiosystem::name\_bid}}
+\doxysubsubsection{\texorpdfstring{high\_bid}{high\_bid}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1name__bid_a90ca222f7b091cd8bd7a11132709939c} 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} sysiosystem\+::name\+\_\+bid\+::high\+\_\+bid = 0}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00118}{118}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1name__bid_a4f01d71c060b0497b111a51785ea7a67}\index{sysiosystem::name\_bid@{sysiosystem::name\_bid}!high\_bidder@{high\_bidder}}
+\index{high\_bidder@{high\_bidder}!sysiosystem::name\_bid@{sysiosystem::name\_bid}}
+\doxysubsubsection{\texorpdfstring{high\_bidder}{high\_bidder}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1name__bid_a4f01d71c060b0497b111a51785ea7a67} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} sysiosystem\+::name\+\_\+bid\+::high\+\_\+bidder}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00117}{117}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1name__bid_a45b672c1f35ede1062e409b6e8816aed}\index{sysiosystem::name\_bid@{sysiosystem::name\_bid}!last\_bid\_time@{last\_bid\_time}}
+\index{last\_bid\_time@{last\_bid\_time}!sysiosystem::name\_bid@{sysiosystem::name\_bid}}
+\doxysubsubsection{\texorpdfstring{last\_bid\_time}{last\_bid\_time}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1name__bid_a45b672c1f35ede1062e409b6e8816aed} 
+\mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} sysiosystem\+::name\+\_\+bid\+::last\+\_\+bid\+\_\+time}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00119}{119}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1name__bid_aa7b73f79ba62c30adbad89692a604167}\index{sysiosystem::name\_bid@{sysiosystem::name\_bid}!newname@{newname}}
+\index{newname@{newname}!sysiosystem::name\_bid@{sysiosystem::name\_bid}}
+\doxysubsubsection{\texorpdfstring{newname}{newname}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1name__bid_aa7b73f79ba62c30adbad89692a604167} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} sysiosystem\+::name\+\_\+bid\+::newname}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00116}{116}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/svetlasyrimis/\+Desktop/wire-\/network/\+WN-\/org/wire-\/system-\/contracts/contracts/sysio.\+system/include/sysio.\+system/\mbox{\hyperlink{sysio_8system_8hpp}{sysio.\+system.\+hpp}}\end{DoxyCompactItemize}

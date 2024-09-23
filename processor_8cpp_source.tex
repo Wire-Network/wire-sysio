@@ -1,0 +1,141 @@
+\doxysection{processor.\+cpp}
+\hypertarget{processor_8cpp_source}{}\label{processor_8cpp_source}\index{libraries/fc/vendor/websocketpp/test/processors/processor.cpp@{libraries/fc/vendor/websocketpp/test/processors/processor.cpp}}
+\mbox{\hyperlink{processor_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2011,\ Peter\ Thorson.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00004}00004\ \textcolor{comment}{\ *\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00005}00005\ \textcolor{comment}{\ *\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are\ met:}}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00006}00006\ \textcolor{comment}{\ *\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00007}00007\ \textcolor{comment}{\ *\ \ \ \ \ \ \ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00008}00008\ \textcolor{comment}{\ *\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00009}00009\ \textcolor{comment}{\ *\ \ \ \ \ \ \ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer\ in\ the}}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00010}00010\ \textcolor{comment}{\ *\ \ \ \ \ \ \ documentation\ and/or\ other\ materials\ provided\ with\ the\ distribution.}}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00011}00011\ \textcolor{comment}{\ *\ \ \ \ \ *\ Neither\ the\ name\ of\ the\ WebSocket++\ Project\ nor\ the}}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00012}00012\ \textcolor{comment}{\ *\ \ \ \ \ \ \ names\ of\ its\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products}}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00013}00013\ \textcolor{comment}{\ *\ \ \ \ \ \ \ derived\ from\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00014}00014\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00015}00015\ \textcolor{comment}{\ *\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS\ "{}AS\ IS"{}}}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00016}00016\ \textcolor{comment}{\ *\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ THE}}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00017}00017\ \textcolor{comment}{\ *\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR\ A\ PARTICULAR\ PURPOSE}}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00018}00018\ \textcolor{comment}{\ *\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ PETER\ THORSON\ BE\ LIABLE\ FOR\ ANY}}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00019}00019\ \textcolor{comment}{\ *\ DIRECT,\ INDIRECT,\ INCIDENTAL,\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES}}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00020}00020\ \textcolor{comment}{\ *\ (INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;}}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00021}00021\ \textcolor{comment}{\ *\ LOSS\ OF\ USE,\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND}}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00022}00022\ \textcolor{comment}{\ *\ ON\ ANY\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00023}00023\ \textcolor{comment}{\ *\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE\ OF\ THIS}}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00024}00024\ \textcolor{comment}{\ *\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00025}00025\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00026}00026\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00027}00027\ \textcolor{comment}{//\#define\ BOOST\_TEST\_DYN\_LINK}}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00028}\mbox{\hyperlink{processor_8cpp_a6b2a3852db8bb19ab6909bac01859985}{00028}}\ \textcolor{preprocessor}{\#define\ BOOST\_TEST\_MODULE\ processors}}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00029}00029\ \textcolor{preprocessor}{\#include\ <boost/test/unit\_test.hpp>}}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00031}00031\ \textcolor{preprocessor}{\#include\ <iostream>}}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00032}00032\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00034}00034\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{processor_8hpp}{websocketpp/processors/processor.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00035}00035\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{request_8hpp}{websocketpp/http/request.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00037}\mbox{\hyperlink{processor_8cpp_aa574a21bd8b369edb379ed3e0a61bb46}{00037}}\ \mbox{\hyperlink{processor_8cpp_aa574a21bd8b369edb379ed3e0a61bb46}{BOOST\_AUTO\_TEST\_CASE}}(\ exact\_match\ )\ \{}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00038}00038\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1request}{websocketpp::http::parser::request}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00040}00040\ \ \ \ \ std::string\ handshake\ =\ \textcolor{stringliteral}{"{}GET\ /\ HTTP/1.1\(\backslash\)r\(\backslash\)nHost:\ www.example.com\(\backslash\)r\(\backslash\)nConnection:\ upgrade\(\backslash\)r\(\backslash\)nUpgrade:\ websocket\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00042}00042\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.consume(handshake.c\_str(),handshake.size());}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00044}00044\ \ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespacewebsocketpp_1_1processor_a9ff3159b48cf4be2e7cb79c81b155d53}{websocketpp::processor::is\_websocket\_handshake}}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}));}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00045}00045\ \}}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00047}\mbox{\hyperlink{processor_8cpp_a921315900cbf9559621cf265b8358e8e}{00047}}\ \mbox{\hyperlink{processor_8cpp_aa574a21bd8b369edb379ed3e0a61bb46}{BOOST\_AUTO\_TEST\_CASE}}(\ non\_match\ )\ \{}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00048}00048\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1request}{websocketpp::http::parser::request}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00050}00050\ \ \ \ \ std::string\ handshake\ =\ \textcolor{stringliteral}{"{}GET\ /\ HTTP/1.1\(\backslash\)r\(\backslash\)nHost:\ www.example.com\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00052}00052\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.consume(handshake.c\_str(),handshake.size());}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00054}00054\ \ \ \ \ BOOST\_CHECK(!\mbox{\hyperlink{namespacewebsocketpp_1_1processor_a9ff3159b48cf4be2e7cb79c81b155d53}{websocketpp::processor::is\_websocket\_handshake}}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}));}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00055}00055\ \}}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00057}\mbox{\hyperlink{processor_8cpp_a7f2234f62072f4406543436a1b17b139}{00057}}\ \mbox{\hyperlink{processor_8cpp_aa574a21bd8b369edb379ed3e0a61bb46}{BOOST\_AUTO\_TEST\_CASE}}(\ ci\_exact\_match\ )\ \{}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00058}00058\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1request}{websocketpp::http::parser::request}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00060}00060\ \ \ \ \ std::string\ handshake\ =\ \textcolor{stringliteral}{"{}GET\ /\ HTTP/1.1\(\backslash\)r\(\backslash\)nHost:\ www.example.com\(\backslash\)r\(\backslash\)nConnection:\ UpGrAde\(\backslash\)r\(\backslash\)nUpgrade:\ WebSocket\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00062}00062\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.consume(handshake.c\_str(),handshake.size());}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00064}00064\ \ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespacewebsocketpp_1_1processor_a9ff3159b48cf4be2e7cb79c81b155d53}{websocketpp::processor::is\_websocket\_handshake}}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}));}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00065}00065\ \}}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00067}\mbox{\hyperlink{processor_8cpp_a0fc79d531d70e207bc189bc7994bb514}{00067}}\ \mbox{\hyperlink{processor_8cpp_aa574a21bd8b369edb379ed3e0a61bb46}{BOOST\_AUTO\_TEST\_CASE}}(\ non\_exact\_match1\ )\ \{}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00068}00068\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1request}{websocketpp::http::parser::request}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00069}00069\ }
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00070}00070\ \ \ \ \ std::string\ handshake\ =\ \textcolor{stringliteral}{"{}GET\ /\ HTTP/1.1\(\backslash\)r\(\backslash\)nHost:\ www.example.com\(\backslash\)r\(\backslash\)nConnection:\ upgrade,foo\(\backslash\)r\(\backslash\)nUpgrade:\ websocket,foo\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00072}00072\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.consume(handshake.c\_str(),handshake.size());}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00073}00073\ }
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00074}00074\ \ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespacewebsocketpp_1_1processor_a9ff3159b48cf4be2e7cb79c81b155d53}{websocketpp::processor::is\_websocket\_handshake}}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}));}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00075}00075\ \}}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00076}00076\ }
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00077}\mbox{\hyperlink{processor_8cpp_a62ecc8bcba5a091172e279e4f354d61f}{00077}}\ \mbox{\hyperlink{processor_8cpp_aa574a21bd8b369edb379ed3e0a61bb46}{BOOST\_AUTO\_TEST\_CASE}}(\ non\_exact\_match2\ )\ \{}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00078}00078\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1request}{websocketpp::http::parser::request}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00080}00080\ \ \ \ \ std::string\ handshake\ =\ \textcolor{stringliteral}{"{}GET\ /\ HTTP/1.1\(\backslash\)r\(\backslash\)nHost:\ www.example.com\(\backslash\)r\(\backslash\)nConnection:\ keep-\/alive,Upgrade,foo\(\backslash\)r\(\backslash\)nUpgrade:\ foo,websocket,bar\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00081}00081\ }
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00082}00082\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.consume(handshake.c\_str(),handshake.size());}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00083}00083\ }
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00084}00084\ \ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespacewebsocketpp_1_1processor_a9ff3159b48cf4be2e7cb79c81b155d53}{websocketpp::processor::is\_websocket\_handshake}}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}));}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00085}00085\ \}}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00086}00086\ }
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00087}\mbox{\hyperlink{processor_8cpp_a05ef227a902efa191b90b476800dda69}{00087}}\ \mbox{\hyperlink{processor_8cpp_aa574a21bd8b369edb379ed3e0a61bb46}{BOOST\_AUTO\_TEST\_CASE}}(\ version\_blank\ )\ \{}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00088}00088\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1request}{websocketpp::http::parser::request}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00089}00089\ }
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00090}00090\ \ \ \ \ std::string\ handshake\ =\ \textcolor{stringliteral}{"{}GET\ /\ HTTP/1.1\(\backslash\)r\(\backslash\)nHost:\ www.example.com\(\backslash\)r\(\backslash\)nUpgrade:\ websocket\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00091}00091\ }
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00092}00092\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.consume(handshake.c\_str(),handshake.size());}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00093}00093\ }
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00094}00094\ \ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespacewebsocketpp_1_1processor_a1a0e5e7b10b24ff5ab836dc543826934}{websocketpp::processor::get\_websocket\_version}}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}})\ ==\ 0);}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00095}00095\ \}}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00096}00096\ }
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00097}\mbox{\hyperlink{processor_8cpp_a236ec9a1b8dbcca6bd51b6dbf0e7e14f}{00097}}\ \mbox{\hyperlink{processor_8cpp_aa574a21bd8b369edb379ed3e0a61bb46}{BOOST\_AUTO\_TEST\_CASE}}(\ version\_7\ )\ \{}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00098}00098\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1request}{websocketpp::http::parser::request}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00099}00099\ }
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00100}00100\ \ \ \ \ std::string\ handshake\ =\ \textcolor{stringliteral}{"{}GET\ /\ HTTP/1.1\(\backslash\)r\(\backslash\)nHost:\ www.example.com\(\backslash\)r\(\backslash\)nUpgrade:\ websocket\(\backslash\)r\(\backslash\)nSec-\/WebSocket-\/Version:\ 7\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00101}00101\ }
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00102}00102\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.consume(handshake.c\_str(),handshake.size());}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00103}00103\ }
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00104}00104\ \ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespacewebsocketpp_1_1processor_a1a0e5e7b10b24ff5ab836dc543826934}{websocketpp::processor::get\_websocket\_version}}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}})\ ==\ 7);}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00105}00105\ \}}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00106}00106\ }
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00107}\mbox{\hyperlink{processor_8cpp_a781522e1e89a953e38625c98cda5765a}{00107}}\ \mbox{\hyperlink{processor_8cpp_aa574a21bd8b369edb379ed3e0a61bb46}{BOOST\_AUTO\_TEST\_CASE}}(\ version\_8\ )\ \{}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00108}00108\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1request}{websocketpp::http::parser::request}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00109}00109\ }
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00110}00110\ \ \ \ \ std::string\ handshake\ =\ \textcolor{stringliteral}{"{}GET\ /\ HTTP/1.1\(\backslash\)r\(\backslash\)nHost:\ www.example.com\(\backslash\)r\(\backslash\)nUpgrade:\ websocket\(\backslash\)r\(\backslash\)nSec-\/WebSocket-\/Version:\ 8\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00111}00111\ }
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00112}00112\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.consume(handshake.c\_str(),handshake.size());}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00113}00113\ }
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00114}00114\ \ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespacewebsocketpp_1_1processor_a1a0e5e7b10b24ff5ab836dc543826934}{websocketpp::processor::get\_websocket\_version}}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}})\ ==\ 8);}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00115}00115\ \}}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00116}00116\ }
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00117}\mbox{\hyperlink{processor_8cpp_a62e7c41a4e1ee3ef99ac93918baf22a5}{00117}}\ \mbox{\hyperlink{processor_8cpp_aa574a21bd8b369edb379ed3e0a61bb46}{BOOST\_AUTO\_TEST\_CASE}}(\ version\_13\ )\ \{}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00118}00118\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1request}{websocketpp::http::parser::request}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00119}00119\ }
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00120}00120\ \ \ \ \ std::string\ handshake\ =\ \textcolor{stringliteral}{"{}GET\ /\ HTTP/1.1\(\backslash\)r\(\backslash\)nHost:\ www.example.com\(\backslash\)r\(\backslash\)nUpgrade:\ websocket\(\backslash\)r\(\backslash\)nSec-\/WebSocket-\/Version:\ 13\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00121}00121\ }
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00122}00122\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.consume(handshake.c\_str(),handshake.size());}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00123}00123\ }
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00124}00124\ \ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespacewebsocketpp_1_1processor_a1a0e5e7b10b24ff5ab836dc543826934}{websocketpp::processor::get\_websocket\_version}}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}})\ ==\ 13);}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00125}00125\ \}}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00126}00126\ }
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00127}\mbox{\hyperlink{processor_8cpp_a65842124c9a1d98d32b75f49f952a84c}{00127}}\ \mbox{\hyperlink{processor_8cpp_aa574a21bd8b369edb379ed3e0a61bb46}{BOOST\_AUTO\_TEST\_CASE}}(\ version\_non\_numeric\ )\ \{}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00128}00128\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1request}{websocketpp::http::parser::request}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00129}00129\ }
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00130}00130\ \ \ \ \ std::string\ handshake\ =\ \textcolor{stringliteral}{"{}GET\ /\ HTTP/1.1\(\backslash\)r\(\backslash\)nHost:\ www.example.com\(\backslash\)r\(\backslash\)nUpgrade:\ websocket\(\backslash\)r\(\backslash\)nSec-\/WebSocket-\/Version:\ abc\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00131}00131\ }
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00132}00132\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.consume(handshake.c\_str(),handshake.size());}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00133}00133\ }
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00134}00134\ \ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespacewebsocketpp_1_1processor_a1a0e5e7b10b24ff5ab836dc543826934}{websocketpp::processor::get\_websocket\_version}}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}})\ ==\ -\/1);}
+\DoxyCodeLine{\Hypertarget{processor_8cpp_source_l00135}00135\ \}}
+
+\end{DoxyCode}

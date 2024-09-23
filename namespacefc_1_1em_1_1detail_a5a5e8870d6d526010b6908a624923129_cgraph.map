@@ -1,0 +1,10 @@
+<map id="fc::em::detail::_get_context" name="fc::em::detail::_get_context">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,35,136,75"/>
+<area shape="rect" id="Node000002" href="$secp256k1_8c.html#a861ce6fc7ee5e9fc346a5fee7093adb1" title=" " alt="" coords="184,42,361,68"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="136,52,168,52,168,58,136,58"/>
+<area shape="rect" id="Node000003" href="$secp256k1_8c.html#af4866e9619f06679358fe6338ed42cd0" title=" " alt="" coords="409,5,620,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="361,42,393,38,394,43,362,47"/>
+<area shape="rect" id="Node000004" href="$secp256k1_8c.html#a9f5faeec85b85bdaccd7ddda899dbfa2" title=" " alt="" coords="668,42,911,68"/>
+<area shape="poly" id="edge4_Node000002_Node000004" title=" " alt="" coords="361,54,409,55,620,55,653,55,653,60,620,60,409,60,361,60"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="621,34,653,38,653,43,621,40"/>
+</map>

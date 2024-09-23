@@ -1,0 +1,273 @@
+\doxysection{sysio\+::http\+\_\+client\+\_\+plugin Class Reference}
+\hypertarget{classsysio_1_1http__client__plugin}{}\label{classsysio_1_1http__client__plugin}\index{sysio::http\_client\_plugin@{sysio::http\_client\_plugin}}
+
+
+{\ttfamily \#include $<$http\+\_\+client\+\_\+plugin.\+hpp$>$}
+
+
+
+Inheritance diagram for sysio\+::http\+\_\+client\+\_\+plugin\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=205pt]{classsysio_1_1http__client__plugin__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for sysio\+::http\+\_\+client\+\_\+plugin\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=205pt]{classsysio_1_1http__client__plugin__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classsysio_1_1http__client__plugin_a224e4bc3cf4e11f3be6c1c4e1dde2c07}{http\+\_\+client\+\_\+plugin}} ()
+\item 
+virtual \mbox{\hyperlink{classsysio_1_1http__client__plugin_a243118476e56deb7b23141e8b5577a04}{\texorpdfstring{$\sim$}{\string~}http\+\_\+client\+\_\+plugin}} ()
+\item 
+virtual void \mbox{\hyperlink{classsysio_1_1http__client__plugin_abb0ae20718a87fef0af9411e77fbd3d1}{set\+\_\+program\+\_\+options}} (options\+\_\+description \&, options\+\_\+description \&cfg) override
+\item 
+void \mbox{\hyperlink{classsysio_1_1http__client__plugin_ac623443157e7df3ac8e1eba0cc63e87b}{plugin\+\_\+initialize}} (const variables\+\_\+map \&options)
+\item 
+void \mbox{\hyperlink{classsysio_1_1http__client__plugin_afa82b5252e9d149678b234978874d60e}{plugin\+\_\+startup}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1http__client__plugin_ad6fa432359cd79a1bb4795cfcd78c0ec}{plugin\+\_\+shutdown}} ()
+\item 
+\mbox{\hyperlink{classfc_1_1http__client}{http\+\_\+client}} \& \mbox{\hyperlink{classsysio_1_1http__client__plugin_a234c853c76b5c0cb95e8f7aff169e50d}{get\+\_\+client}} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classappbase_1_1plugin}{appbase\+::plugin$<$ http\+\_\+client\+\_\+plugin $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classappbase_1_1plugin_a3cf5509f2854ffb274018dca8606c50a}{plugin}} ()
+\item 
+virtual \mbox{\hyperlink{classappbase_1_1plugin_a6c83bcf2c8ee3de87593824da807e4ba}{\texorpdfstring{$\sim$}{\string~}plugin}} ()
+\item 
+virtual \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408}{state}} \mbox{\hyperlink{classappbase_1_1plugin_a857288c2424b57a898c0579d25dacbb0}{get\+\_\+state}} () const override
+\item 
+virtual const std\+::string \& \mbox{\hyperlink{classappbase_1_1plugin_a274f072d2f7f37d43ae74e01edd0ba62}{name}} () const override
+\item 
+virtual void \mbox{\hyperlink{classappbase_1_1plugin_a6a0cd7ccc873527ebb5e6716b249ea17}{register\+\_\+dependencies}} ()
+\item 
+virtual void \mbox{\hyperlink{classappbase_1_1plugin_ac28755a82831d41e5d0ef0ce56b10fa9}{initialize}} (const variables\+\_\+map \&options) override
+\item 
+virtual void \mbox{\hyperlink{classappbase_1_1plugin_ab314bd778e71a91de584cd9b8a999867}{handle\+\_\+sighup}} () override
+\item 
+virtual void \mbox{\hyperlink{classappbase_1_1plugin_a10e4e1c582bfadf67f510df76d87abfd}{startup}} () override
+\item 
+virtual void \mbox{\hyperlink{classappbase_1_1plugin_a21e5be5587fca41fbc91367d449b8f27}{shutdown}} () override
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classappbase_1_1abstract__plugin}{appbase\+::abstract\+\_\+plugin}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4643a2618ac94aa2ef56e59fe363f828}{\texorpdfstring{$\sim$}{\string~}abstract\+\_\+plugin}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Public Types inherited from \mbox{\hyperlink{classappbase_1_1abstract__plugin}{appbase\+::abstract\+\_\+plugin}}}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408}{state}} \{ \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408ac712ce3482a78b8bf87080aefd77cf7d}{registered}}
+, \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408a9ae208bba76e9c0eab1cac52953f947b}{initialized}}
+, \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408a808ebbf475942017567644697eca3224}{started}}
+, \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408a320c2eebb5306f385aebfca07336d29e}{stopped}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Member Functions inherited from \mbox{\hyperlink{classappbase_1_1plugin}{appbase\+::plugin$<$ http\+\_\+client\+\_\+plugin $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classappbase_1_1plugin_a51f43c3c64ab8524928698a72a186822}{plugin}} (const string \&\mbox{\hyperlink{classappbase_1_1plugin_a274f072d2f7f37d43ae74e01edd0ba62}{name}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{http__client__plugin_8hpp_source_l00009}{9}} of file \mbox{\hyperlink{http__client__plugin_8hpp_source}{http\+\_\+client\+\_\+plugin.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classsysio_1_1http__client__plugin_a224e4bc3cf4e11f3be6c1c4e1dde2c07}\index{sysio::http\_client\_plugin@{sysio::http\_client\_plugin}!http\_client\_plugin@{http\_client\_plugin}}
+\index{http\_client\_plugin@{http\_client\_plugin}!sysio::http\_client\_plugin@{sysio::http\_client\_plugin}}
+\doxysubsubsection{\texorpdfstring{http\_client\_plugin()}{http\_client\_plugin()}}
+{\footnotesize\ttfamily \label{classsysio_1_1http__client__plugin_a224e4bc3cf4e11f3be6c1c4e1dde2c07} 
+sysio\+::http\+\_\+client\+\_\+plugin\+::http\+\_\+client\+\_\+plugin (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{http__client__plugin_8cpp_source_l00008}{8}} of file \mbox{\hyperlink{http__client__plugin_8cpp_source}{http\+\_\+client\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00008\ :my(\textcolor{keyword}{new}\ http\_client())\{\}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1http__client__plugin_a243118476e56deb7b23141e8b5577a04}\index{sysio::http\_client\_plugin@{sysio::http\_client\_plugin}!````~http\_client\_plugin@{\texorpdfstring{$\sim$}{\string~}http\_client\_plugin}}
+\index{````~http\_client\_plugin@{\texorpdfstring{$\sim$}{\string~}http\_client\_plugin}!sysio::http\_client\_plugin@{sysio::http\_client\_plugin}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}http\_client\_plugin()}{\string~http\_client\_plugin()}}
+{\footnotesize\ttfamily \label{classsysio_1_1http__client__plugin_a243118476e56deb7b23141e8b5577a04} 
+sysio\+::http\+\_\+client\+\_\+plugin\+::\texorpdfstring{$\sim$}{\string~}http\+\_\+client\+\_\+plugin (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{http__client__plugin_8cpp_source_l00009}{9}} of file \mbox{\hyperlink{http__client__plugin_8cpp_source}{http\+\_\+client\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00009\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1http__client__plugin_a234c853c76b5c0cb95e8f7aff169e50d}\index{sysio::http\_client\_plugin@{sysio::http\_client\_plugin}!get\_client@{get\_client}}
+\index{get\_client@{get\_client}!sysio::http\_client\_plugin@{sysio::http\_client\_plugin}}
+\doxysubsubsection{\texorpdfstring{get\_client()}{get\_client()}}
+{\footnotesize\ttfamily \label{classsysio_1_1http__client__plugin_a234c853c76b5c0cb95e8f7aff169e50d} 
+\mbox{\hyperlink{classfc_1_1http__client}{http\+\_\+client}} \& sysio\+::http\+\_\+client\+\_\+plugin\+::get\+\_\+client (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{http__client__plugin_8hpp_source_l00022}{22}} of file \mbox{\hyperlink{http__client__plugin_8hpp_source}{http\+\_\+client\+\_\+plugin.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *my;}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1http__client__plugin_ac623443157e7df3ac8e1eba0cc63e87b}\index{sysio::http\_client\_plugin@{sysio::http\_client\_plugin}!plugin\_initialize@{plugin\_initialize}}
+\index{plugin\_initialize@{plugin\_initialize}!sysio::http\_client\_plugin@{sysio::http\_client\_plugin}}
+\doxysubsubsection{\texorpdfstring{plugin\_initialize()}{plugin\_initialize()}}
+{\footnotesize\ttfamily \label{classsysio_1_1http__client__plugin_ac623443157e7df3ac8e1eba0cc63e87b} 
+void sysio\+::http\+\_\+client\+\_\+plugin\+::plugin\+\_\+initialize (\begin{DoxyParamCaption}\item[{const variables\+\_\+map \&}]{options}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{http__client__plugin_8cpp_source_l00021}{21}} of file \mbox{\hyperlink{http__client__plugin_8cpp_source}{http\+\_\+client\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00022\ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.count(\ \textcolor{stringliteral}{"{}https-\/client-\/root-\/cert"{}}\ ))\ \{}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::vector<std::string>\ root\_pems\ =\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}[\textcolor{stringliteral}{"{}https-\/client-\/root-\/cert"{}}].as<std::vector<std::string>>();}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ root\_pem\ :\ root\_pems\ )\ \{}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ pem\_str\ =\ root\_pem;}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !boost::algorithm::starts\_with(\ pem\_str,\ \textcolor{stringliteral}{"{}-\/-\/-\/-\/-\/BEGIN\ CERTIFICATE-\/-\/-\/-\/-\/\(\backslash\)n"{}}\ ))\ \{}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacetypes__types__array_a6a15abb8fc90c9264cf17d3465578387}{infile}}\ =\ std::ifstream(\ pem\_str\ );}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::stringstream\ sstr;}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sstr\ <<\ \mbox{\hyperlink{namespacetypes__types__array_a6a15abb8fc90c9264cf17d3465578387}{infile}}.rdbuf();}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ pem\_str\ =\ sstr.str();}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ boost::algorithm::starts\_with(\ pem\_str,\ \textcolor{stringliteral}{"{}-\/-\/-\/-\/-\/BEGIN\ CERTIFICATE-\/-\/-\/-\/-\/\(\backslash\)n"{}}\ ),}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ chain::invalid\_http\_client\_root\_cert,}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}File\ does\ not\ appear\ to\ be\ a\ PEM\ encoded\ certificate"{}}\ );}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\ \textcolor{keyword}{const}\ std::bad\_alloc\&\ )\ \{}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw};}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\ \textcolor{keyword}{const}\ boost::interprocess::bad\_alloc\&\ )\ \{}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw};}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1exception}{fc::exception}}\&\ e\ )\ \{}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}}(\ \textcolor{stringliteral}{"{}Failed\ to\ read\ PEM\ \$\{f\}\ :\ \$\{e\}"{}},\ (\textcolor{stringliteral}{"{}f"{}},\ root\_pem)(\ \textcolor{stringliteral}{"{}e"{}},\ e.\mbox{\hyperlink{classfc_1_1exception_a7611ea8fbe25dde56649b685c2298a37}{to\_detail\_string}}()));}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\ \textcolor{keyword}{const}\ std::exception\&\ e\ )\ \{}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}}(\ \textcolor{stringliteral}{"{}Failed\ to\ read\ PEM\ \$\{f\}\ :\ \$\{e\}"{}},\ (\textcolor{stringliteral}{"{}f"{}},\ root\_pem)(\ \textcolor{stringliteral}{"{}e"{}},\ \mbox{\hyperlink{classfc_1_1std__exception__wrapper_ae5ad64f84b1d373f5b92031566284c7c}{fc::std\_exception\_wrapper::from\_current\_exception}}(e).to\_detail\_string()));}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00046\ }
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ my-\/>add\_cert(\ pem\_str\ );}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\ \textcolor{keyword}{const}\ std::bad\_alloc\&\ )\ \{}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw};}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\ \textcolor{keyword}{const}\ boost::interprocess::bad\_alloc\&\ )\ \{}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw};}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1exception}{fc::exception}}\&\ e\ )\ \{}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}}(\ \textcolor{stringliteral}{"{}Failed\ to\ read\ PEM\ :\ \$\{e\}\ \(\backslash\)n\$\{pem\}\(\backslash\)n"{}},\ (\textcolor{stringliteral}{"{}pem"{}},\ pem\_str)(\ \textcolor{stringliteral}{"{}e"{}},\ e.\mbox{\hyperlink{classfc_1_1exception_a7611ea8fbe25dde56649b685c2298a37}{to\_detail\_string}}()));}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\ \textcolor{keyword}{const}\ std::exception\&\ e\ )\ \{}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}}(\ \textcolor{stringliteral}{"{}Failed\ to\ read\ PEM\ :\ \$\{e\}\ \(\backslash\)n\$\{pem\}\(\backslash\)n"{}},\ (\textcolor{stringliteral}{"{}pem"{}},\ pem\_str)(\ \textcolor{stringliteral}{"{}e"{}},\ \mbox{\hyperlink{classfc_1_1std__exception__wrapper_ae5ad64f84b1d373f5b92031566284c7c}{fc::std\_exception\_wrapper::from\_current\_exception}}(e).to\_detail\_string()));}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00060\ }
+\DoxyCodeLine{00061\ \ \ \ \ \ \ my-\/>set\_verify\_peers(\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.at(\ \textcolor{stringliteral}{"{}https-\/client-\/validate-\/peers"{}}\ ).as<\textcolor{keywordtype}{bool}>());}
+\DoxyCodeLine{00062\ \ \ \ \}\ \mbox{\hyperlink{exception_8hpp_ae70bfa24f5a3bc0917382b3c17fc033c}{FC\_LOG\_AND\_RETHROW}}()}
+\DoxyCodeLine{00063\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1http__client__plugin_ac623443157e7df3ac8e1eba0cc63e87b_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1http__client__plugin_ad6fa432359cd79a1bb4795cfcd78c0ec}\index{sysio::http\_client\_plugin@{sysio::http\_client\_plugin}!plugin\_shutdown@{plugin\_shutdown}}
+\index{plugin\_shutdown@{plugin\_shutdown}!sysio::http\_client\_plugin@{sysio::http\_client\_plugin}}
+\doxysubsubsection{\texorpdfstring{plugin\_shutdown()}{plugin\_shutdown()}}
+{\footnotesize\ttfamily \label{classsysio_1_1http__client__plugin_ad6fa432359cd79a1bb4795cfcd78c0ec} 
+void sysio\+::http\+\_\+client\+\_\+plugin\+::plugin\+\_\+shutdown (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{http__client__plugin_8cpp_source_l00069}{69}} of file \mbox{\hyperlink{http__client__plugin_8cpp_source}{http\+\_\+client\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00070\ }
+\DoxyCodeLine{00071\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1http__client__plugin_afa82b5252e9d149678b234978874d60e}\index{sysio::http\_client\_plugin@{sysio::http\_client\_plugin}!plugin\_startup@{plugin\_startup}}
+\index{plugin\_startup@{plugin\_startup}!sysio::http\_client\_plugin@{sysio::http\_client\_plugin}}
+\doxysubsubsection{\texorpdfstring{plugin\_startup()}{plugin\_startup()}}
+{\footnotesize\ttfamily \label{classsysio_1_1http__client__plugin_afa82b5252e9d149678b234978874d60e} 
+void sysio\+::http\+\_\+client\+\_\+plugin\+::plugin\+\_\+startup (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{http__client__plugin_8cpp_source_l00065}{65}} of file \mbox{\hyperlink{http__client__plugin_8cpp_source}{http\+\_\+client\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00066\ }
+\DoxyCodeLine{00067\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1http__client__plugin_abb0ae20718a87fef0af9411e77fbd3d1}\index{sysio::http\_client\_plugin@{sysio::http\_client\_plugin}!set\_program\_options@{set\_program\_options}}
+\index{set\_program\_options@{set\_program\_options}!sysio::http\_client\_plugin@{sysio::http\_client\_plugin}}
+\doxysubsubsection{\texorpdfstring{set\_program\_options()}{set\_program\_options()}}
+{\footnotesize\ttfamily \label{classsysio_1_1http__client__plugin_abb0ae20718a87fef0af9411e77fbd3d1} 
+void sysio\+::http\+\_\+client\+\_\+plugin\+::set\+\_\+program\+\_\+options (\begin{DoxyParamCaption}\item[{options\+\_\+description \&}]{}{, }\item[{options\+\_\+description \&}]{cfg}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classappbase_1_1abstract__plugin_a274a3c7462de3c699a8eb23741ed7655}{appbase\+::abstract\+\_\+plugin}}.
+
+
+
+Definition at line \mbox{\hyperlink{http__client__plugin_8cpp_source_l00011}{11}} of file \mbox{\hyperlink{http__client__plugin_8cpp_source}{http\+\_\+client\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00011\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00012\ \ \ \ cfg.add\_options()}
+\DoxyCodeLine{00013\ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}https-\/client-\/root-\/cert"{}},\ boost::program\_options::value<vector<string>>()-\/>composing()-\/>multitoken(),}
+\DoxyCodeLine{00014\ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}PEM\ encoded\ trusted\ root\ certificate\ (or\ path\ to\ file\ containing\ one)\ used\ to\ validate\ any\ TLS\ connections\ made.\ \ (may\ specify\ multiple\ times)\(\backslash\)n"{}})}
+\DoxyCodeLine{00015\ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}https-\/client-\/validate-\/peers"{}},\ boost::program\_options::value<bool>()-\/>default\_value(\textcolor{keyword}{true}),}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}true:\ validate\ that\ the\ peer\ certificates\ are\ valid\ and\ trusted,\ false:\ ignore\ cert\ errors"{}})}
+\DoxyCodeLine{00017\ \ \ \ \ \ \ ;}
+\DoxyCodeLine{00018\ }
+\DoxyCodeLine{00019\ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+plugins/http\+\_\+client\+\_\+plugin/include/sysio/http\+\_\+client\+\_\+plugin/\mbox{\hyperlink{http__client__plugin_8hpp}{http\+\_\+client\+\_\+plugin.\+hpp}}\item 
+plugins/http\+\_\+client\+\_\+plugin/\mbox{\hyperlink{http__client__plugin_8cpp}{http\+\_\+client\+\_\+plugin.\+cpp}}\end{DoxyCompactItemize}

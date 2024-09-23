@@ -1,0 +1,65 @@
+\doxysection{sysio\+::vm\+::host\+\_\+func\+\_\+pair\+\_\+hash Struct Reference}
+\hypertarget{structsysio_1_1vm_1_1host__func__pair__hash}{}\label{structsysio_1_1vm_1_1host__func__pair__hash}\index{sysio::vm::host\_func\_pair\_hash@{sysio::vm::host\_func\_pair\_hash}}
+
+
+{\ttfamily \#include $<$host\+\_\+function.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{union_u}{U}} $>$ }\\std\+::size\+\_\+t \mbox{\hyperlink{structsysio_1_1vm_1_1host__func__pair__hash_a208475fbc3075e9f4d231c43c1160103}{operator()}} (const std\+::pair$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{union_u}{U}} $>$ \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}) const
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{union_u}{U}} $>$ }\\std\+::size\+\_\+t \mbox{\hyperlink{structsysio_1_1vm_1_1host__func__pair__hash_a208475fbc3075e9f4d231c43c1160103}{operator()}} (const std\+::pair$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{union_u}{U}} $>$ \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}) const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{vm_2host__function_8hpp_source_l00411}{411}} of file \mbox{\hyperlink{vm_2host__function_8hpp_source}{host\+\_\+function.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1vm_1_1host__func__pair__hash_a208475fbc3075e9f4d231c43c1160103}\index{sysio::vm::host\_func\_pair\_hash@{sysio::vm::host\_func\_pair\_hash}!operator()@{operator()}}
+\index{operator()@{operator()}!sysio::vm::host\_func\_pair\_hash@{sysio::vm::host\_func\_pair\_hash}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1host__func__pair__hash_a208475fbc3075e9f4d231c43c1160103} 
+template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{union_u}{U}} $>$ \\
+std\+::size\+\_\+t sysio\+::vm\+::host\+\_\+func\+\_\+pair\+\_\+hash\+::operator() (\begin{DoxyParamCaption}\item[{const std\+::pair$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{union_u}{U}} $>$ \&}]{p}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_source_l00413}{413}} of file \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_source}{host\+\_\+function.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00413\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00414\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::hash<T>()(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.first)\ \string^\ std::hash<U>()(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.second);}
+\DoxyCodeLine{00415\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1vm_1_1host__func__pair__hash_a208475fbc3075e9f4d231c43c1160103}\index{sysio::vm::host\_func\_pair\_hash@{sysio::vm::host\_func\_pair\_hash}!operator()@{operator()}}
+\index{operator()@{operator()}!sysio::vm::host\_func\_pair\_hash@{sysio::vm::host\_func\_pair\_hash}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1host__func__pair__hash_a208475fbc3075e9f4d231c43c1160103} 
+template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{union_u}{U}} $>$ \\
+std\+::size\+\_\+t sysio\+::vm\+::host\+\_\+func\+\_\+pair\+\_\+hash\+::operator() (\begin{DoxyParamCaption}\item[{const std\+::pair$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{union_u}{U}} $>$ \&}]{p}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2host__function_8hpp_source_l00413}{413}} of file \mbox{\hyperlink{vm_2host__function_8hpp_source}{host\+\_\+function.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00413\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00414\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::hash<T>()(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.first)\ \string^\ std::hash<U>()(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.second);}
+\DoxyCodeLine{00415\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/include/sysio/sysio/vm/\mbox{\hyperlink{sysio_2vm_2host__function_8hpp}{host\+\_\+function.\+hpp}}\item 
+libraries/sys-\/vm/include/sysio/vm/\mbox{\hyperlink{vm_2host__function_8hpp}{host\+\_\+function.\+hpp}}\end{DoxyCompactItemize}

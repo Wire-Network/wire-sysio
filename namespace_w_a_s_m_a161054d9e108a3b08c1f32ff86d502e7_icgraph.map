@@ -1,0 +1,11 @@
+<map id="WASM::serializeGlobalSection" name="WASM::serializeGlobalSection">
+<area shape="rect" id="Node000001" title=" " alt="" coords="380,31,579,56"/>
+<area shape="rect" id="Node000002" href="$namespace_w_a_s_m.html#a4b9dd447416e75d8a61736f81f250e7a" title=" " alt="" coords="172,5,332,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="364,33,332,30,333,24,365,28"/>
+<area shape="rect" id="Node000003" href="$namespace_w_a_s_m.html#a33bbb5a7b429d0050a0a8b7615f9291b" title=" " alt="" coords="172,55,332,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="365,58,333,62,332,56,364,53"/>
+<area shape="rect" id="Node000004" href="$namespace_w_a_s_m.html#a68fb78f7c4e19b54892500f5111620dd" title=" " alt="" coords="5,29,124,55"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="156,57,124,53,124,47,157,52"/>
+<area shape="rect" id="Node000005" href="$namespace_w_a_s_m.html#ac6b513c420b9f3e7b1da89381a0a6bf4" title=" " alt="" coords="5,79,124,104"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="157,82,124,87,124,81,156,77"/>
+</map>

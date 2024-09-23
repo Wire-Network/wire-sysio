@@ -1,0 +1,21 @@
+\doxysection{000-\/Catch\+Main.\+cpp}
+\hypertarget{000-_catch_main_8cpp_source}{}\label{000-_catch_main_8cpp_source}\index{libraries/sys-\/vm/external/Catch2/examples/000-\/CatchMain.cpp@{libraries/sys-\/vm/external/Catch2/examples/000-\/CatchMain.cpp}}
+\mbox{\hyperlink{000-_catch_main_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{000-_catch_main_8cpp_source_l00001}00001\ \textcolor{comment}{//\ 000-\/CatchMain.cpp}}
+\DoxyCodeLine{\Hypertarget{000-_catch_main_8cpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{000-_catch_main_8cpp_source_l00003}00003\ \textcolor{comment}{//\ In\ a\ Catch\ project\ with\ multiple\ files,\ dedicate\ one\ file\ to\ compile\ the}}
+\DoxyCodeLine{\Hypertarget{000-_catch_main_8cpp_source_l00004}00004\ \textcolor{comment}{//\ source\ code\ of\ Catch\ itself\ and\ reuse\ the\ resulting\ object\ file\ for\ linking.}}
+\DoxyCodeLine{\Hypertarget{000-_catch_main_8cpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{000-_catch_main_8cpp_source_l00006}00006\ \textcolor{comment}{//\ Let\ Catch\ provide\ main():}}
+\DoxyCodeLine{\Hypertarget{000-_catch_main_8cpp_source_l00007}\mbox{\hyperlink{000-_catch_main_8cpp_a656eb5868e824d59f489f910db438420}{00007}}\ \textcolor{preprocessor}{\#define\ CATCH\_CONFIG\_MAIN}}
+\DoxyCodeLine{\Hypertarget{000-_catch_main_8cpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{000-_catch_main_8cpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{single__include_2catch2_2catch_8hpp}{catch2/catch.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{000-_catch_main_8cpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{000-_catch_main_8cpp_source_l00011}00011\ \textcolor{comment}{//\ That's\ it}}
+\DoxyCodeLine{\Hypertarget{000-_catch_main_8cpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{000-_catch_main_8cpp_source_l00013}00013\ \textcolor{comment}{//\ Compile\ implementation\ of\ Catch\ for\ use\ with\ files\ that\ do\ contain\ tests:}}
+\DoxyCodeLine{\Hypertarget{000-_catch_main_8cpp_source_l00014}00014\ \textcolor{comment}{//\ -\/\ g++\ -\/std=c++11\ -\/Wall\ -\/I\$(CATCH\_SINGLE\_INCLUDE)\ -\/c\ 000-\/CatchMain.cpp}}
+\DoxyCodeLine{\Hypertarget{000-_catch_main_8cpp_source_l00015}00015\ \textcolor{comment}{//\ -\/\ cl\ -\/EHsc\ -\/I\%CATCH\_SINGLE\_INCLUDE\%\ -\/c\ 000-\/CatchMain.cpp}}
+
+\end{DoxyCode}

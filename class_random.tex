@@ -1,0 +1,64 @@
+\doxysection{Random Class Reference}
+\hypertarget{class_random}{}\label{class_random}\index{Random@{Random}}
+
+
+{\ttfamily \#include $<$unittest.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_random_a17f563fcd03a81b31057b71b0bdcbcdb}{Random}} (unsigned seed=0)
+\item 
+unsigned \mbox{\hyperlink{class_random_a881e9afda6dd041defbf4473a28bcb56}{operator()}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{unittest_8h_source_l00127}{127}} of file \mbox{\hyperlink{unittest_8h_source}{unittest.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_random_a17f563fcd03a81b31057b71b0bdcbcdb}\index{Random@{Random}!Random@{Random}}
+\index{Random@{Random}!Random@{Random}}
+\doxysubsubsection{\texorpdfstring{Random()}{Random()}}
+{\footnotesize\ttfamily \label{class_random_a17f563fcd03a81b31057b71b0bdcbcdb} 
+Random\+::\+Random (\begin{DoxyParamCaption}\item[{unsigned}]{seed}{ = {\ttfamily 0}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{unittest_8h_source_l00129}{129}} of file \mbox{\hyperlink{unittest_8h_source}{unittest.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00129\ :\ mSeed(seed)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_random_a881e9afda6dd041defbf4473a28bcb56}\index{Random@{Random}!operator()@{operator()}}
+\index{operator()@{operator()}!Random@{Random}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}}
+{\footnotesize\ttfamily \label{class_random_a881e9afda6dd041defbf4473a28bcb56} 
+unsigned Random\+::operator() (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{unittest_8h_source_l00131}{131}} of file \mbox{\hyperlink{unittest_8h_source}{unittest.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ mSeed\ =\ 214013\ *\ mSeed\ +\ 2531011;}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ mSeed;}
+\DoxyCodeLine{00134\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/test/unittest/\mbox{\hyperlink{unittest_8h}{unittest.\+h}}\end{DoxyCompactItemize}

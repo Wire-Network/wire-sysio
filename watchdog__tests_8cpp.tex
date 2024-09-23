@@ -1,0 +1,69 @@
+\doxysection{libraries/sys-\/vm/tests/watchdog\+\_\+tests.cpp File Reference}
+\hypertarget{watchdog__tests_8cpp}{}\label{watchdog__tests_8cpp}\index{libraries/sys-\/vm/tests/watchdog\_tests.cpp@{libraries/sys-\/vm/tests/watchdog\_tests.cpp}}
+{\ttfamily \#include $<$sysio/vm/watchdog.\+hpp$>$}\newline
+{\ttfamily \#include $<$atomic$>$}\newline
+{\ttfamily \#include $<$chrono$>$}\newline
+{\ttfamily \#include $<$catch2/catch.\+hpp$>$}\newline
+Include dependency graph for watchdog\+\_\+tests.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{watchdog__tests_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{watchdog__tests_8cpp_a60eda682479efe74103b39538470499c}{TEST\+\_\+\+CASE}} ("{}watchdog interrupt"{}, "{}\mbox{[}watchdog\+\_\+interrupt\mbox{]}"{})
+\item 
+\mbox{\hyperlink{watchdog__tests_8cpp_a1cc62a2e41ec96612174a2caab347093}{TEST\+\_\+\+CASE}} ("{}watchdog no interrupt"{}, "{}\mbox{[}watchdog\+\_\+no\+\_\+interrupt\mbox{]}"{})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{watchdog__tests_8cpp_a60eda682479efe74103b39538470499c}\index{watchdog\_tests.cpp@{watchdog\_tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!watchdog\_tests.cpp@{watchdog\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{watchdog__tests_8cpp_a60eda682479efe74103b39538470499c} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}watchdog interrupt"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}watchdog\+\_\+interrupt\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{watchdog__tests_8cpp_source_l00009}{9}} of file \mbox{\hyperlink{watchdog__tests_8cpp_source}{watchdog\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00009\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00010\ \ \ std::atomic<bool>\ okay\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00011\ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1watchdog}{watchdog}}\ w\{std::chrono::milliseconds(50)\};}
+\DoxyCodeLine{00012\ \ \ \{}
+\DoxyCodeLine{00013\ \ \ \ \ \textcolor{keyword}{auto}\ g\ =\ w.scoped\_run([\&]()\ \{\ okay\ =\ \textcolor{keyword}{true};\ \});}
+\DoxyCodeLine{00014\ \ \ \ \ std::this\_thread::sleep\_for(std::chrono::milliseconds(100));}
+\DoxyCodeLine{00015\ \ \ \}}
+\DoxyCodeLine{00016\ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(okay);}
+\DoxyCodeLine{00017\ \}}
+
+\end{DoxyCode}
+\Hypertarget{watchdog__tests_8cpp_a1cc62a2e41ec96612174a2caab347093}\index{watchdog\_tests.cpp@{watchdog\_tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!watchdog\_tests.cpp@{watchdog\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{watchdog__tests_8cpp_a1cc62a2e41ec96612174a2caab347093} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}watchdog no interrupt"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}watchdog\+\_\+no\+\_\+interrupt\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{watchdog__tests_8cpp_source_l00019}{19}} of file \mbox{\hyperlink{watchdog__tests_8cpp_source}{watchdog\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00020\ \ \ std::atomic<bool>\ okay\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00021\ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1watchdog}{watchdog}}\ w\{std::chrono::milliseconds(50)\};}
+\DoxyCodeLine{00022\ \ \ \{}
+\DoxyCodeLine{00023\ \ \ \ \ \textcolor{keyword}{auto}\ g\ =\ w.scoped\_run([\&]()\ \{\ okay\ =\ \textcolor{keyword}{false};\ \});}
+\DoxyCodeLine{00024\ \ \ \}\ \textcolor{comment}{//\ the\ guard\ goes\ out\ of\ scope\ here,\ cancelling\ the\ timer}}
+\DoxyCodeLine{00025\ \ \ std::this\_thread::sleep\_for(std::chrono::milliseconds(100));}
+\DoxyCodeLine{00026\ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(okay);}
+\DoxyCodeLine{00027\ \}}
+
+\end{DoxyCode}

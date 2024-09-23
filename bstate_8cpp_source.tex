@@ -1,0 +1,75 @@
+\doxysection{bstate.\+cpp}
+\hypertarget{bstate_8cpp_source}{}\label{bstate_8cpp_source}\index{libraries/fc/src/rpc/bstate.cpp@{libraries/fc/src/rpc/bstate.cpp}}
+\mbox{\hyperlink{bstate_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <fc/rpc/bstate.hpp>}}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{fc_2include_2fc_2reflect_2variant_8hpp}{fc/reflect/variant.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{exception_8hpp}{fc/exception/exception.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00005}00005\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}\ \{\ \textcolor{keyword}{namespace\ }rpc\ \{}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00006}00006\ bstate::\string~bstate()}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00007}00007\ \{}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00008}00008\ \ \ \ \mbox{\hyperlink{integration_8cpp_af5b66d867a040d002fb57d645cae3fb4}{close}}();}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00009}00009\ \}}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00011}00011\ \textcolor{keywordtype}{void}\ bstate::add\_method(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc::string}}\&\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ method\ m\ )}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00012}00012\ \{}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00013}00013\ \ \ \ \_methods.emplace(std::pair<std::string,method>(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},fc::move(m)));}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00014}00014\ \}}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00016}00016\ \textcolor{keywordtype}{void}\ bstate::remove\_method(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc::string}}\&\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ )}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00017}00017\ \{}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00018}00018\ \ \ \ \_methods.erase(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}});}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00019}00019\ \}}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00021}00021\ result\_type\ bstate::local\_call(\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\&\ method\_name,\ \textcolor{keyword}{const}\ params\_type\&\ args\ )}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00022}00022\ \{}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00023}00023\ \ \ \ \textcolor{keyword}{auto}\ method\_itr\ =\ \_methods.find(method\_name);}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00024}00024\ \ \ \ \textcolor{keywordflow}{if}(\ method\_itr\ ==\ \_methods.end()\ \&\&\ \_unhandled\ )}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00025}00025\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \_unhandled(\ method\_name,\ args\ );}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00026}00026\ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ method\_itr\ !=\ \_methods.end(),\ \textcolor{stringliteral}{"{}Unknown\ Method:\ \$\{name\}"{}},\ (\textcolor{stringliteral}{"{}name"{}},method\_name)\ );}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00027}00027\ \ \ \ \textcolor{keywordflow}{return}\ method\_itr-\/>second(args);}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00028}00028\ \}}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00030}00030\ \textcolor{keywordtype}{void}\ \ bstate::handle\_reply(\ \textcolor{keyword}{const}\ bresponse\&\ bresponse\ )}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00031}00031\ \{}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00032}00032\ \ \ \ \textcolor{keyword}{auto}\ await\ =\ \_awaiting.find(\ bresponse.id\ );}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00033}00033\ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ await\ !=\ \_awaiting.end(),\ \textcolor{stringliteral}{"{}Unknown\ Response\ ID:\ \$\{id\}"{}},\ (\textcolor{stringliteral}{"{}id"{}},bresponse.id)(\textcolor{stringliteral}{"{}bresponse"{}},bresponse)\ );}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00034}00034\ \ \ \ \textcolor{keywordflow}{if}(\ bresponse.result\ )\ }
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00035}00035\ \ \ \ \ \ \ await-\/>second-\/>set\_value(\ *bresponse.result\ );}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00036}00036\ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(\ bresponse.error\ )}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00037}00037\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00038}00038\ \ \ \ \ \ \ await-\/>second-\/>set\_exception(\ std::make\_exception\_ptr(\ \mbox{\hyperlink{exception_8hpp_a327d3b5812f556b945bec03c3768f9f7}{FC\_EXCEPTION}}(\ exception,\ \textcolor{stringliteral}{"{}\$\{error\}"{}},\ (\textcolor{stringliteral}{"{}error"{}},bresponse.error-\/>message)(\textcolor{stringliteral}{"{}data"{}},bresponse)\ )\ )\ );}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00039}00039\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00040}00040\ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00041}00041\ \ \ \ \ \ \ await-\/>second-\/>set\_value(\ params\_type()\ );}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00042}00042\ \ \ \ \_awaiting.erase(await);}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00043}00043\ \}}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00045}00045\ brequest\ bstate::start\_remote\_call(\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\&\ method\_name,\ params\_type\ args\ )}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00046}00046\ \{}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00047}00047\ \ \ \ brequest\ brequest\{\ \_next\_id++,\ method\_name,\ std::move(args)\ \};}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00048}00048\ \ \ \ \_awaiting[*brequest.id].reset(\ \textcolor{keyword}{new}\ boost::fibers::promise<result\_type>()\ );}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00049}00049\ \ \ \ \textcolor{keywordflow}{return}\ brequest;}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00050}00050\ \}}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00051}00051\ result\_type\ bstate::wait\_for\_response(\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ request\_id\ )}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00052}00052\ \{}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00053}00053\ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ \_awaiting.find(request\_id);}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00054}00054\ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ itr\ !=\ \_awaiting.end()\ );}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00055}00055\ \ \ \ \textcolor{keyword}{auto}\ fut\ =\ itr-\/>second-\/>get\_future();}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00056}00056\ \ \ \ \textcolor{keywordflow}{return}\ fut.get();}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00057}00057\ \}}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00058}00058\ \textcolor{keywordtype}{void}\ bstate::close()}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00059}00059\ \{}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00060}00060\ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\&\ item\ :\ \_awaiting\ )}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00061}00061\ \ \ \ \ \ \ item.second-\/>set\_exception(\ std::make\_exception\_ptr(\ \ \mbox{\hyperlink{exception_8hpp_a327d3b5812f556b945bec03c3768f9f7}{FC\_EXCEPTION}}(\ eof\_exception,\ \textcolor{stringliteral}{"{}connection\ closed"{}}\ ))\ );}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00062}00062\ \ \ \ \_awaiting.clear();}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00063}00063\ \}}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00064}00064\ \textcolor{keywordtype}{void}\ bstate::on\_unhandled(\ \textcolor{keyword}{const}\ std::function<result\_type(\textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\&,\ \textcolor{keyword}{const}\ params\_type\&)>\&\ unhandled\ )}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00065}00065\ \{}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00066}00066\ \ \ \ \_unhandled\ =\ unhandled;}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00067}00067\ \}}
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{bstate_8cpp_source_l00069}00069\ \}\ \}\ \ \textcolor{comment}{//\ namespace\ fc::rpc}}
+
+\end{DoxyCode}

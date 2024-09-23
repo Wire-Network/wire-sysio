@@ -1,0 +1,5 @@
+<map id="websocketpp::lib::net::_ntohll" name="websocketpp::lib::net::_ntohll">
+<area shape="rect" id="Node000001" title="Convert 64 bit value to host byte order." alt="" coords="5,5,151,46"/>
+<area shape="rect" id="Node000002" href="$namespacewebsocketpp_1_1lib_1_1net.html#ab3e62ef8d23c6e35b1d726fa1fa1c537" title="Convert 64 bit value to network byte order." alt="" coords="199,5,344,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="151,23,183,23,183,28,151,28"/>
+</map>

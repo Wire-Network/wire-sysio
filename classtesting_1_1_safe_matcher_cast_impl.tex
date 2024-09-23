@@ -1,0 +1,107 @@
+\doxysection{testing\+::Safe\+Matcher\+Cast\+Impl\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classtesting_1_1_safe_matcher_cast_impl}{}\label{classtesting_1_1_safe_matcher_cast_impl}\index{testing::SafeMatcherCastImpl$<$ T $>$@{testing::SafeMatcherCastImpl$<$ T $>$}}
+
+
+{\ttfamily \#include $<$gmock-\/matchers.\+h$>$}
+
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename M $>$ }\\static \mbox{\hyperlink{classtesting_1_1_matcher}{Matcher}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \mbox{\hyperlink{classtesting_1_1_safe_matcher_cast_impl_a12a394142de16c0ef98fef69ae694a47}{Cast}} (const M \&polymorphic\+\_\+matcher\+\_\+or\+\_\+value)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{union_u}{U}} $>$ }\\static \mbox{\hyperlink{classtesting_1_1_matcher}{Matcher}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \mbox{\hyperlink{classtesting_1_1_safe_matcher_cast_impl_a953c5830cbd8370360b9ca07c3f70bd4}{Cast}} (const \mbox{\hyperlink{classtesting_1_1_matcher}{Matcher}}$<$ \mbox{\hyperlink{union_u}{U}} $>$ \&matcher)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$\newline
+class testing\+::\+Safe\+Matcher\+Cast\+Impl$<$ T $>$}
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l00789}{789}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1_safe_matcher_cast_impl_a12a394142de16c0ef98fef69ae694a47}\index{testing::SafeMatcherCastImpl$<$ T $>$@{testing::SafeMatcherCastImpl$<$ T $>$}!Cast@{Cast}}
+\index{Cast@{Cast}!testing::SafeMatcherCastImpl$<$ T $>$@{testing::SafeMatcherCastImpl$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{Cast()}{Cast()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classtesting_1_1_safe_matcher_cast_impl_a12a394142de16c0ef98fef69ae694a47} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+template$<$typename M $>$ \\
+static \mbox{\hyperlink{classtesting_1_1_matcher}{Matcher}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \mbox{\hyperlink{classtesting_1_1_safe_matcher_cast_impl}{testing\+::\+Safe\+Matcher\+Cast\+Impl}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::\+Cast (\begin{DoxyParamCaption}\item[{const M \&}]{polymorphic\+\_\+matcher\+\_\+or\+\_\+value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l00794}{794}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00794\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00795\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_matcher_cast_impl_a3060220a0ff6b449dcc0be874e0a7dc0}{internal::MatcherCastImpl<T,\ M>::Cast}}(polymorphic\_matcher\_or\_value);}
+\DoxyCodeLine{00796\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1_safe_matcher_cast_impl_a12a394142de16c0ef98fef69ae694a47_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{classtesting_1_1_safe_matcher_cast_impl_a12a394142de16c0ef98fef69ae694a47_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1_safe_matcher_cast_impl_a953c5830cbd8370360b9ca07c3f70bd4}\index{testing::SafeMatcherCastImpl$<$ T $>$@{testing::SafeMatcherCastImpl$<$ T $>$}!Cast@{Cast}}
+\index{Cast@{Cast}!testing::SafeMatcherCastImpl$<$ T $>$@{testing::SafeMatcherCastImpl$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{Cast()}{Cast()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classtesting_1_1_safe_matcher_cast_impl_a953c5830cbd8370360b9ca07c3f70bd4} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+template$<$typename \mbox{\hyperlink{union_u}{U}} $>$ \\
+static \mbox{\hyperlink{classtesting_1_1_matcher}{Matcher}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \mbox{\hyperlink{classtesting_1_1_safe_matcher_cast_impl}{testing\+::\+Safe\+Matcher\+Cast\+Impl}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::\+Cast (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classtesting_1_1_matcher}{Matcher}}$<$ \mbox{\hyperlink{union_u}{U}} $>$ \&}]{matcher}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l00808}{808}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00808\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00809\ \ \ \ \ \textcolor{comment}{//\ Enforce\ that\ T\ can\ be\ implicitly\ converted\ to\ U.}}
+\DoxyCodeLine{00810\ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_ae1f37dc71d5daa6fb49ca1b6047d4a8c}{GTEST\_COMPILE\_ASSERT\_}}((\mbox{\hyperlink{classtesting_1_1internal_1_1_implicitly_convertible_aea51cecabca681fb75659e224771b7b7}{internal::ImplicitlyConvertible<T,\ U>::value}}),}
+\DoxyCodeLine{00811\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ T\_must\_be\_implicitly\_convertible\_to\_U);}
+\DoxyCodeLine{00812\ \ \ \ \ \textcolor{comment}{//\ Enforce\ that\ we\ are\ not\ converting\ a\ non-\/reference\ type\ T\ to\ a\ reference}}
+\DoxyCodeLine{00813\ \ \ \ \ \textcolor{comment}{//\ type\ U.}}
+\DoxyCodeLine{00814\ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_ae1f37dc71d5daa6fb49ca1b6047d4a8c}{GTEST\_COMPILE\_ASSERT\_}}(}
+\DoxyCodeLine{00815\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structtesting_1_1internal_1_1bool__constant_a499fba6576296b04d99690a486424b32}{internal::is\_reference<T>::value}}\ ||\ !\mbox{\hyperlink{structtesting_1_1internal_1_1bool__constant_a499fba6576296b04d99690a486424b32}{internal::is\_reference<U>::value}},}
+\DoxyCodeLine{00816\ \ \ \ \ \ \ \ \ cannot\_convert\_non\_reference\_arg\_to\_reference);}
+\DoxyCodeLine{00817\ \ \ \ \ \textcolor{comment}{//\ In\ case\ both\ T\ and\ U\ are\ arithmetic\ types,\ enforce\ that\ the}}
+\DoxyCodeLine{00818\ \ \ \ \ \textcolor{comment}{//\ conversion\ is\ not\ lossy.}}
+\DoxyCodeLine{00819\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{gtest-internal_8h_a874567b176266188fabfffb8393267ce}{GTEST\_REMOVE\_REFERENCE\_AND\_CONST\_}}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}})\ RawT;}
+\DoxyCodeLine{00820\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{gtest-internal_8h_a874567b176266188fabfffb8393267ce}{GTEST\_REMOVE\_REFERENCE\_AND\_CONST\_}}(\mbox{\hyperlink{union_u}{U}})\ RawU;}
+\DoxyCodeLine{00821\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ kTIsOther\ =\ \mbox{\hyperlink{gmock-internal-utils_8h_a72b01bdd08b78e927270885ca880ead4}{GMOCK\_KIND\_OF\_}}(RawT)\ ==\ \mbox{\hyperlink{namespacetesting_1_1internal_aa8747bda20137c9aa7f846dee830e686ad47f29150ab7a9ec8ce2491f44537347}{internal::kOther}};}
+\DoxyCodeLine{00822\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ kUIsOther\ =\ \mbox{\hyperlink{gmock-internal-utils_8h_a72b01bdd08b78e927270885ca880ead4}{GMOCK\_KIND\_OF\_}}(RawU)\ ==\ \mbox{\hyperlink{namespacetesting_1_1internal_aa8747bda20137c9aa7f846dee830e686ad47f29150ab7a9ec8ce2491f44537347}{internal::kOther}};}
+\DoxyCodeLine{00823\ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_ae1f37dc71d5daa6fb49ca1b6047d4a8c}{GTEST\_COMPILE\_ASSERT\_}}(}
+\DoxyCodeLine{00824\ \ \ \ \ \ \ \ \ kTIsOther\ ||\ kUIsOther\ ||}
+\DoxyCodeLine{00825\ \ \ \ \ \ \ \ \ (internal::LosslessArithmeticConvertible<RawT,\ RawU>::value),}
+\DoxyCodeLine{00826\ \ \ \ \ \ \ \ \ conversion\_of\_arithmetic\_types\_must\_be\_lossless);}
+\DoxyCodeLine{00827\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetesting_ad2f5a342c05fd6806066682c234ca0bc}{MatcherCast<T>}}(matcher);}
+\DoxyCodeLine{00828\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1_safe_matcher_cast_impl_a953c5830cbd8370360b9ca07c3f70bd4_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/include/gmock/\mbox{\hyperlink{gmock-matchers_8h}{gmock-\/matchers.\+h}}\end{DoxyCompactItemize}

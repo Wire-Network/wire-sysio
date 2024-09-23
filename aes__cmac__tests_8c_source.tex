@@ -1,0 +1,234 @@
+\doxysection{aes\+\_\+cmac\+\_\+tests.\+c}
+\hypertarget{aes__cmac__tests_8c_source}{}\label{aes__cmac__tests_8c_source}\index{libraries/yubihsm/aes\_cmac/tests/aes\_cmac\_tests.c@{libraries/yubihsm/aes\_cmac/tests/aes\_cmac\_tests.c}}
+\mbox{\hyperlink{aes__cmac__tests_8c}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ 2015-\/2018\ Yubico\ AB}}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00004}00004\ \textcolor{comment}{\ *\ Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00005}00005\ \textcolor{comment}{\ *\ you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00006}00006\ \textcolor{comment}{\ *\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00008}00008\ \textcolor{comment}{\ *\ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00009}00009\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00010}00010\ \textcolor{comment}{\ *\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00011}00011\ \textcolor{comment}{\ *\ distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00012}00012\ \textcolor{comment}{\ *\ WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00013}00013\ \textcolor{comment}{\ *\ See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00014}00014\ \textcolor{comment}{\ *\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00015}00015\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00017}00017\ \textcolor{preprocessor}{\#include\ <stdio.h>}}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00018}00018\ \textcolor{preprocessor}{\#include\ <stdlib.h>}}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00019}00019\ \textcolor{preprocessor}{\#include\ <string.h>}}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00021}00021\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{aes__cmac_8h}{../aes\_cmac.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00023}\mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{00023}}\ \textcolor{preprocessor}{\#define\ asrt(c,\ e,\ m)\ \_asrt(\_\_LINE\_\_,\ c,\ e,\ m);}}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00025}00025\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \_asrt(\textcolor{keywordtype}{int}\ line,\ \textcolor{keywordtype}{int}\ check,\ \textcolor{keywordtype}{int}\ expected,\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *msg)\ \{}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00027}00027\ \ \ \textcolor{keywordflow}{if}\ (check\ ==\ expected)}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00028}00028\ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00030}00030\ \ \ fprintf(stderr,}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00031}00031\ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}<\%s>:\%d\ check\ failed\ with\ value\ \%d\ (0x\%x),\ expected\ \%d\ (0x\%x)\(\backslash\)n"{}},}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00032}00032\ \ \ \ \ \ \ \ \ \ \ msg,\ line,\ check,\ check,\ expected,\ expected);}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00034}00034\ \ \ exit(EXIT\_FAILURE);}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00035}00035\ \}}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00037}\mbox{\hyperlink{aes__cmac__tests_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{00037}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{aes__cmac__tests_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}()\ \{}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00038}00038\ \ \ \mbox{\hyperlink{structaes__cmac__context__t}{aes\_cmac\_context\_t}}\ ctx;}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00040}00040\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ mac[\mbox{\hyperlink{aes_8h_af19ab913a847ad1e91c5291215116de1}{AES\_BLOCK\_SIZE}}];}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00042}00042\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ m[]\ =\ \{0x6b,\ 0xc1,\ 0xbe,\ 0xe2,\ 0x2e,\ 0x40,\ 0x9f,\ 0x96,\ 0xe9,\ 0x3d,}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00043}00043\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x7e,\ 0x11,\ 0x73,\ 0x93,\ 0x17,\ 0x2a,\ 0xae,\ 0x2d,\ 0x8a,\ 0x57,}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00044}00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x1e,\ 0x03,\ 0xac,\ 0x9c,\ 0x9e,\ 0xb7,\ 0x6f,\ 0xac,\ 0x45,\ 0xaf,}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00045}00045\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x8e,\ 0x51,\ 0x30,\ 0xc8,\ 0x1c,\ 0x46,\ 0xa3,\ 0x5c,\ 0xe4,\ 0x11,}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00046}00046\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0xe5,\ 0xfb,\ 0xc1,\ 0x19,\ 0x1a,\ 0x0a,\ 0x52,\ 0xef,\ 0xf6,\ 0x9f,}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00047}00047\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x24,\ 0x45,\ 0xdf,\ 0x4f,\ 0x9b,\ 0x17,\ 0xad,\ 0x2b,\ 0x41,\ 0x7b,}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0xe6,\ 0x6c,\ 0x37,\ 0x10\};}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00050}00050\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ k\_128[]\ =\ \{0x2b,\ 0x7e,\ 0x15,\ 0x16,\ 0x28,\ 0xae,\ 0xd2,\ 0xa6,}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00051}00051\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0xab,\ 0xf7,\ 0x15,\ 0x88,\ 0x09,\ 0xcf,\ 0x4f,\ 0x3c\};}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00052}00052\ }
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00053}00053\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ k\_192[]\ =\ \{0x8e,\ 0x73,\ 0xb0,\ 0xf7,\ 0xda,\ 0x0e,\ 0x64,\ 0x52,}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0xc8,\ 0x10,\ 0xf3,\ 0x2b,\ 0x80,\ 0x90,\ 0x79,\ 0xe5,}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x62,\ 0xf8,\ 0xea,\ 0xd2,\ 0x52,\ 0x2c,\ 0x6b,\ 0x7b\};}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00057}00057\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ k\_256[]\ =\ \{0x60,\ 0x3d,\ 0xeb,\ 0x10,\ 0x15,\ 0xca,\ 0x71,\ 0xbe,}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x2b,\ 0x73,\ 0xae,\ 0xf0,\ 0x85,\ 0x7d,\ 0x77,\ 0x81,}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00059}00059\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x1f,\ 0x35,\ 0x2c,\ 0x07,\ 0x3b,\ 0x61,\ 0x08,\ 0xd7,}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x2d,\ 0x98,\ 0x10,\ 0xa3,\ 0x09,\ 0x14,\ 0xdf,\ 0xf4\};}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00062}00062\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ mac1[]\ =\ \{0xbb,\ 0x1d,\ 0x69,\ 0x29,\ 0xe9,\ 0x59,\ 0x37,\ 0x28,}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x7f,\ 0xa3,\ 0x7d,\ 0x12,\ 0x9b,\ 0x75,\ 0x67,\ 0x46\};}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00064}00064\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ mac2[]\ =\ \{0x07,\ 0x0a,\ 0x16,\ 0xb4,\ 0x6b,\ 0x4d,\ 0x41,\ 0x44,}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00065}00065\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0xf7,\ 0x9b,\ 0xdd,\ 0x9d,\ 0xd0,\ 0x4a,\ 0x28,\ 0x7c\};}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00066}00066\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ mac3[]\ =\ \{0xdf,\ 0xa6,\ 0x67,\ 0x47,\ 0xde,\ 0x9a,\ 0xe6,\ 0x30,}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00067}00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x30,\ 0xca,\ 0x32,\ 0x61,\ 0x14,\ 0x97,\ 0xc8,\ 0x27\};}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00068}00068\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ mac4[]\ =\ \{0x51,\ 0xf0,\ 0xbe,\ 0xbf,\ 0x7e,\ 0x3b,\ 0x9d,\ 0x92,}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0xfc,\ 0x49,\ 0x74,\ 0x17,\ 0x79,\ 0x36,\ 0x3c,\ 0xfe\};}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00070}00070\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ mac5[]\ =\ \{0xd1,\ 0x7d,\ 0xdf,\ 0x46,\ 0xad,\ 0xaa,\ 0xcd,\ 0xe5,}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00071}00071\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x31,\ 0xca,\ 0xc4,\ 0x83,\ 0xde,\ 0x7a,\ 0x93,\ 0x67\};}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00072}00072\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ mac6[]\ =\ \{0x9e,\ 0x99,\ 0xa7,\ 0xbf,\ 0x31,\ 0xe7,\ 0x10,\ 0x90,}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00073}00073\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x06,\ 0x62,\ 0xf6,\ 0x5e,\ 0x61,\ 0x7c,\ 0x51,\ 0x84\};}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00074}00074\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ mac7[]\ =\ \{0x8a,\ 0x1d,\ 0xe5,\ 0xbe,\ 0x2e,\ 0xb3,\ 0x1a,\ 0xad,}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00075}00075\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x08,\ 0x9a,\ 0x82,\ 0xe6,\ 0xee,\ 0x90,\ 0x8b,\ 0x0e\};}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00076}00076\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ mac8[]\ =\ \{0xa1,\ 0xd5,\ 0xdf,\ 0x0e,\ 0xed,\ 0x79,\ 0x0f,\ 0x79,}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x4d,\ 0x77,\ 0x58,\ 0x96,\ 0x59,\ 0xf3,\ 0x9a,\ 0x11\};}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00078}00078\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ mac9[]\ =\ \{0x02,\ 0x89,\ 0x62,\ 0xf6,\ 0x1b,\ 0x7b,\ 0xf8,\ 0x9e,}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0xfc,\ 0x6b,\ 0x55,\ 0x1f,\ 0x46,\ 0x67,\ 0xd9,\ 0x83\};}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00080}00080\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ mac10[]\ =\ \{0x28,\ 0xa7,\ 0x02,\ 0x3f,\ 0x45,\ 0x2e,\ 0x8f,\ 0x82,}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00081}00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0xbd,\ 0x4b,\ 0xf2,\ 0x8d,\ 0x8c,\ 0x37,\ 0xc3,\ 0x5c\};}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00082}00082\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ mac11[]\ =\ \{0xaa,\ 0xf3,\ 0xd8,\ 0xf1,\ 0xde,\ 0x56,\ 0x40,\ 0xc2,}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00083}00083\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x32,\ 0xf5,\ 0xb1,\ 0x69,\ 0xb9,\ 0xc9,\ 0x11,\ 0xe6\};}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00084}00084\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ mac12[]\ =\ \{0xe1,\ 0x99,\ 0x21,\ 0x90,\ 0x54,\ 0x9f,\ 0x6e,\ 0xd5,}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00085}00085\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x69,\ 0x6a,\ 0x2c,\ 0x05,\ 0x6c,\ 0x31,\ 0x54,\ 0x10\};}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00086}00086\ }
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00087}00087\ \ \ \mbox{\hyperlink{aes__cmac_8c_a014254770fc9e75faf1fce96d23c6bb3}{aes\_cmac\_init}}(k\_128,\ \textcolor{keyword}{sizeof}(k\_128),\ \&ctx);}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00088}00088\ \ \ \mbox{\hyperlink{aes__cmac_8c_a8ec41de97a9e100769dcd45529860540}{aes\_cmac\_encrypt}}(\&ctx,\ m,\ 0,\ mac);}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00089}00089\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(memcmp(mac,\ mac1,\ 16),\ 0,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}MAC1"{}});}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00090}00090\ \ \ \mbox{\hyperlink{aes__cmac_8c_a8ec41de97a9e100769dcd45529860540}{aes\_cmac\_encrypt}}(\&ctx,\ m,\ 16,\ mac);}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00091}00091\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(memcmp(mac,\ mac2,\ 16),\ 0,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}MAC2"{}});}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00092}00092\ \ \ \mbox{\hyperlink{aes__cmac_8c_a8ec41de97a9e100769dcd45529860540}{aes\_cmac\_encrypt}}(\&ctx,\ m,\ 40,\ mac);}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00093}00093\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(memcmp(mac,\ mac3,\ 16),\ 0,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}MAC3"{}});}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00094}00094\ \ \ \mbox{\hyperlink{aes__cmac_8c_a8ec41de97a9e100769dcd45529860540}{aes\_cmac\_encrypt}}(\&ctx,\ m,\ 64,\ mac);}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00095}00095\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(memcmp(mac,\ mac4,\ 16),\ 0,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}MAC4"{}});}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00096}00096\ }
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00097}00097\ \ \ \mbox{\hyperlink{aes__cmac_8c_a014254770fc9e75faf1fce96d23c6bb3}{aes\_cmac\_init}}(k\_192,\ \textcolor{keyword}{sizeof}(k\_192),\ \&ctx);}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00098}00098\ \ \ \mbox{\hyperlink{aes__cmac_8c_a8ec41de97a9e100769dcd45529860540}{aes\_cmac\_encrypt}}(\&ctx,\ m,\ 0,\ mac);}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00099}00099\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(memcmp(mac,\ mac5,\ 16),\ 0,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}MAC5"{}});}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00100}00100\ \ \ \mbox{\hyperlink{aes__cmac_8c_a8ec41de97a9e100769dcd45529860540}{aes\_cmac\_encrypt}}(\&ctx,\ m,\ 16,\ mac);}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00101}00101\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(memcmp(mac,\ mac6,\ 16),\ 0,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}MAC6"{}});}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00102}00102\ \ \ \mbox{\hyperlink{aes__cmac_8c_a8ec41de97a9e100769dcd45529860540}{aes\_cmac\_encrypt}}(\&ctx,\ m,\ 40,\ mac);}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00103}00103\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(memcmp(mac,\ mac7,\ 16),\ 0,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}MAC7"{}});}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00104}00104\ \ \ \mbox{\hyperlink{aes__cmac_8c_a8ec41de97a9e100769dcd45529860540}{aes\_cmac\_encrypt}}(\&ctx,\ m,\ 64,\ mac);}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00105}00105\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(memcmp(mac,\ mac8,\ 16),\ 0,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}MAC8"{}});}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00106}00106\ }
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00107}00107\ \ \ \mbox{\hyperlink{aes__cmac_8c_a014254770fc9e75faf1fce96d23c6bb3}{aes\_cmac\_init}}(k\_256,\ \textcolor{keyword}{sizeof}(k\_256),\ \&ctx);}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00108}00108\ \ \ \mbox{\hyperlink{aes__cmac_8c_a8ec41de97a9e100769dcd45529860540}{aes\_cmac\_encrypt}}(\&ctx,\ m,\ 0,\ mac);}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00109}00109\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(memcmp(mac,\ mac9,\ 16),\ 0,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}MAC9"{}});}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00110}00110\ \ \ \mbox{\hyperlink{aes__cmac_8c_a8ec41de97a9e100769dcd45529860540}{aes\_cmac\_encrypt}}(\&ctx,\ m,\ 16,\ mac);}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00111}00111\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(memcmp(mac,\ mac10,\ 16),\ 0,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}MAC10"{}});}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00112}00112\ \ \ \mbox{\hyperlink{aes__cmac_8c_a8ec41de97a9e100769dcd45529860540}{aes\_cmac\_encrypt}}(\&ctx,\ m,\ 40,\ mac);}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00113}00113\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(memcmp(mac,\ mac11,\ 16),\ 0,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}MAC11"{}});}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00114}00114\ \ \ \mbox{\hyperlink{aes__cmac_8c_a8ec41de97a9e100769dcd45529860540}{aes\_cmac\_encrypt}}(\&ctx,\ m,\ 64,\ mac);}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00115}00115\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(memcmp(mac,\ mac12,\ 16),\ 0,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}MAC12"{}});}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00116}00116\ }
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00117}00117\ \ \ \textcolor{comment}{//\ Padding\ tests}}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00118}00118\ }
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00119}00119\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}[48];}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00120}00120\ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}};}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00121}00121\ }
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00122}00122\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}\ =\ 3;}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00123}00123\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ 0xab,\ 48);}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00124}00124\ \ \ \mbox{\hyperlink{aes_8c_aaa9af377bef3418182bbb3b75dfc0652}{aes\_add\_padding}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}});}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00125}00125\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(memcmp(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00126}00126\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)x80\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00"{}}}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00127}00127\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)x00"{}},}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00128}00128\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 16),}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00129}00129\ \ \ \ \ \ \ \ 0,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}PADDING\ 1a"{}});}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00130}00130\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}},\ 16,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}PADDING\ 1b"{}});}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00131}00131\ \ \ \mbox{\hyperlink{aes_8c_a05f228376c0bbe57dd19a6300aca1731}{aes\_remove\_padding}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}});}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00132}00132\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(memcmp(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \textcolor{stringliteral}{"{}\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab"{}},\ 3),\ 0,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}PADDING\ 1c"{}});}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00133}00133\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}},\ 3,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}PADDING\ 1d"{}});}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00134}00134\ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00135}00135\ }
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00136}00136\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}\ =\ 15;}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00137}00137\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ 0xab,\ 48);}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00138}00138\ \ \ \mbox{\hyperlink{aes_8c_aaa9af377bef3418182bbb3b75dfc0652}{aes\_add\_padding}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}});}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00139}00139\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(memcmp(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00140}00140\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab"{}}}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00141}00141\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)x80"{}},}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00142}00142\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 16),}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00143}00143\ \ \ \ \ \ \ \ 0,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}PADDING\ 2a"{}});}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00144}00144\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}},\ 16,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}PADDING\ 2b"{}});}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00145}00145\ \ \ \mbox{\hyperlink{aes_8c_a05f228376c0bbe57dd19a6300aca1731}{aes\_remove\_padding}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}});}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00146}00146\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(memcmp(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00147}00147\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab"{}}}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00148}00148\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)xab"{}},}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00149}00149\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 15),}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00150}00150\ \ \ \ \ \ \ \ 0,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}PADDING\ 2c"{}});}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00151}00151\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}},\ 15,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}PADDING\ 2d"{}});}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00152}00152\ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00153}00153\ }
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00154}00154\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}\ =\ 16;}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00155}00155\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ 0xab,\ 48);}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00156}00156\ \ \ \mbox{\hyperlink{aes_8c_aaa9af377bef3418182bbb3b75dfc0652}{aes\_add\_padding}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}});}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00157}00157\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(memcmp(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00158}00158\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab"{}}}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00159}00159\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)xab\(\backslash\)x80\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00"{}}}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00160}00160\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)x00\(\backslash\)x00"{}},}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00161}00161\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 32),}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00162}00162\ \ \ \ \ \ \ \ 0,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}PADDING\ 3a"{}});}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00163}00163\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}},\ 32,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}PADDING\ 3b"{}});}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00164}00164\ \ \ \mbox{\hyperlink{aes_8c_a05f228376c0bbe57dd19a6300aca1731}{aes\_remove\_padding}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}});}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00165}00165\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(memcmp(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00166}00166\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab"{}}}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00167}00167\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)xab"{}},}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00168}00168\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 16),}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00169}00169\ \ \ \ \ \ \ \ 0,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}PADDING\ 3c"{}});}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00170}00170\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}},\ 16,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}PADDING\ 3d"{}});}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00171}00171\ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00172}00172\ }
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00173}00173\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}\ =\ 19;}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00174}00174\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ 0xab,\ 48);}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00175}00175\ \ \ \mbox{\hyperlink{aes_8c_aaa9af377bef3418182bbb3b75dfc0652}{aes\_add\_padding}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}});}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00176}00176\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(memcmp(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00177}00177\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab"{}}}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00178}00178\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)x80\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00"{}}}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00179}00179\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)x00\(\backslash\)x00"{}},}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00180}00180\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 32),}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00181}00181\ \ \ \ \ \ \ \ 0,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}PADDING\ 4a"{}});}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00182}00182\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}},\ 32,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}PADDING\ 4b"{}});}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00183}00183\ \ \ \mbox{\hyperlink{aes_8c_a05f228376c0bbe57dd19a6300aca1731}{aes\_remove\_padding}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}});}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00184}00184\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(memcmp(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00185}00185\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab"{}}}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00186}00186\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab"{}},}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00187}00187\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 19),}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00188}00188\ \ \ \ \ \ \ \ 0,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}PADDING\ 4c"{}});}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00189}00189\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}},\ 19,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}PADDING\ 4d"{}});}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00190}00190\ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00191}00191\ }
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00192}00192\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}\ =\ 32;}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00193}00193\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ 0xab,\ 48);}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00194}00194\ \ \ \mbox{\hyperlink{aes_8c_aaa9af377bef3418182bbb3b75dfc0652}{aes\_add\_padding}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}});}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00195}00195\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(memcmp(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00196}00196\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab"{}}}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00197}00197\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab"{}}}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00198}00198\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)xab\(\backslash\)xab\(\backslash\)x80\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00"{}}}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00199}00199\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00"{}},}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00200}00200\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 48),}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00201}00201\ \ \ \ \ \ \ \ 0,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}PADDING\ 5a"{}});}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00202}00202\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}},\ 48,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}PADDING\ 5b"{}});}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00203}00203\ \ \ \mbox{\hyperlink{aes_8c_a05f228376c0bbe57dd19a6300aca1731}{aes\_remove\_padding}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}});}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00204}00204\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(memcmp(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00205}00205\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab"{}}}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00206}00206\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab"{}}}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00207}00207\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)xab\(\backslash\)xab"{}},}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00208}00208\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 32),}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00209}00209\ \ \ \ \ \ \ \ 0,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}PADDING\ 5c"{}});}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00210}00210\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}},\ 32,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}PADDING\ 5d"{}});}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00211}00211\ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00212}00212\ }
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00213}00213\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00214}00214\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ 0xab,\ 48);}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00215}00215\ \ \ \mbox{\hyperlink{aes_8c_aaa9af377bef3418182bbb3b75dfc0652}{aes\_add\_padding}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}});}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00216}00216\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(memcmp(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00217}00217\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)x80\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00"{}}}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00218}00218\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)x00"{}},}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00219}00219\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 16),}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00220}00220\ \ \ \ \ \ \ \ 0,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}PADDING\ 6a"{}});}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00221}00221\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}},\ 16,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}PADDING\ 6b"{}});}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00222}00222\ \ \ \mbox{\hyperlink{aes_8c_a05f228376c0bbe57dd19a6300aca1731}{aes\_remove\_padding}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}});}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00223}00223\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(memcmp(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \textcolor{stringliteral}{"{}"{}},\ 0),\ 0,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}PADDING\ 6c"{}});}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00224}00224\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}},\ 0,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}PADDING\ 6d"{}});}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00225}00225\ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00226}00226\ }
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00227}00227\ \ \ \textcolor{keywordflow}{return}\ EXIT\_SUCCESS;}
+\DoxyCodeLine{\Hypertarget{aes__cmac__tests_8c_source_l00228}00228\ \}}
+
+\end{DoxyCode}

@@ -1,0 +1,30 @@
+\doxysection{catch\+\_\+capture\+\_\+matchers.\+cpp}
+\hypertarget{catch__capture__matchers_8cpp_source}{}\label{catch__capture__matchers_8cpp_source}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_capture\_matchers.cpp@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_capture\_matchers.cpp}}
+\mbox{\hyperlink{catch__capture__matchers_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8cpp_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8cpp_source_l00002}00002\ \textcolor{comment}{\ *\ \ Created\ by\ Phil\ on\ 9/8/2017.}}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8cpp_source_l00003}00003\ \textcolor{comment}{\ *\ \ Copyright\ 2017\ Two\ Blue\ Cubes\ Ltd.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8cpp_source_l00004}00004\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8cpp_source_l00005}00005\ \textcolor{comment}{\ *\ \ Distributed\ under\ the\ Boost\ Software\ License,\ Version\ 1.0.\ (See\ accompanying}}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8cpp_source_l00006}00006\ \textcolor{comment}{\ *\ \ file\ LICENSE\_1\_0.txt\ or\ copy\ at\ http://www.boost.org/LICENSE\_1\_0.txt)}}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8cpp_source_l00007}00007\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8cpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__capture__matchers_8h}{catch\_capture\_matchers.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8cpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__interfaces__registry__hub_8h}{catch\_interfaces\_registry\_hub.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8cpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8cpp_source_l00011}00011\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8cpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8cpp_source_l00013}\mbox{\hyperlink{namespace_catch_ac6c625d0cf5104ed11caf31d5105d46a}{00013}}\ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_matcher_base}{StringMatcher}}\ =\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_matcher_base}{Matchers::Impl::MatcherBase<std::string>}};}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8cpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8cpp_source_l00015}00015\ \ \ \ \ \textcolor{comment}{//\ This\ is\ the\ general\ overload\ that\ takes\ a\ any\ string\ matcher}}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8cpp_source_l00016}00016\ \ \ \ \ \textcolor{comment}{//\ There\ is\ another\ overload,\ in\ catch\_assertionhandler.h/.cpp,\ that\ only\ takes\ a\ string\ and\ infers}}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8cpp_source_l00017}00017\ \ \ \ \ \textcolor{comment}{//\ the\ Equals\ matcher\ (so\ the\ header\ does\ not\ mention\ matchers)}}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8cpp_source_l00018}\mbox{\hyperlink{namespace_catch_a3a96a82307107087642e22fc4be5844d}{00018}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespace_catch_aea6f8ff3b3838829d4a61694e4bc41ca}{handleExceptionMatchExpr}}(\ \mbox{\hyperlink{class_catch_1_1_assertion_handler}{AssertionHandler}}\&\ handler,\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_matcher_base}{StringMatcher}}\ \textcolor{keyword}{const}\&\ matcher,\ \mbox{\hyperlink{class_catch_1_1_string_ref}{StringRef}}\ \textcolor{keyword}{const}\&\ matcherString\ \ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8cpp_source_l00019}00019\ \ \ \ \ \ \ \ \ std::string\ exceptionMessage\ =\ \mbox{\hyperlink{namespace_catch_adafff91485eeeeb9e9333f317cc0e3b1}{Catch::translateActiveException}}();}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8cpp_source_l00020}00020\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_match_expr}{MatchExpr<std::string,\ StringMatcher\ const\&>}}\ expr(\ exceptionMessage,\ matcher,\ matcherString\ );}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8cpp_source_l00021}00021\ \ \ \ \ \ \ \ \ handler.\mbox{\hyperlink{class_catch_1_1_assertion_handler_a2ef387e567bad90ec6e4b5bf5c367388}{handleExpr}}(\ expr\ );}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8cpp_source_l00022}00022\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8cpp_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8cpp_source_l00024}00024\ \}\ \textcolor{comment}{//\ namespace\ Catch}}
+
+\end{DoxyCode}

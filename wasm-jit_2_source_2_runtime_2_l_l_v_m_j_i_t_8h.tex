@@ -1,0 +1,109 @@
+\doxysection{libraries/wasm-\/jit/\+Source/\+Runtime/\+LLVMJIT.h File Reference}
+\hypertarget{wasm-jit_2_source_2_runtime_2_l_l_v_m_j_i_t_8h}{}\label{wasm-jit_2_source_2_runtime_2_l_l_v_m_j_i_t_8h}\index{libraries/wasm-\/jit/Source/Runtime/LLVMJIT.h@{libraries/wasm-\/jit/Source/Runtime/LLVMJIT.h}}
+{\ttfamily \#include "{}Inline/\+Basic\+Types.\+h"{}}\newline
+{\ttfamily \#include "{}Platform/\+Platform.\+h"{}}\newline
+{\ttfamily \#include "{}Runtime\+Private.\+h"{}}\newline
+{\ttfamily \#include "{}Intrinsics.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+Analysis/\+Passes.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+Execution\+Engine/\+Execution\+Engine.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+Execution\+Engine/\+RTDyld\+Memory\+Manager.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+Execution\+Engine/\+Orc/\+Compile\+Utils.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+Execution\+Engine/\+Orc/\+IRCompile\+Layer.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+Execution\+Engine/\+Orc/\+Lambda\+Resolver.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+Execution\+Engine/\+Orc/\+RTDyld\+Object\+Linking\+Layer.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+IR/\+Data\+Layout.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+IR/\+Derived\+Types.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+IR/\+IRBuilder.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+IR/\+LLVMContext.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+IR/\+Legacy\+Pass\+Manager.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+IR/\+Module.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+IR/\+Intrinsics.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+IR/\+Verifier.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+IR/\+Value\+Handle.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+IR/\+Debug\+Loc.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+Object/\+Object\+File.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+Object/\+Symbol\+Size.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+Support/\+Debug.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+Support/\+Data\+Types.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+Support/\+Target\+Select.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+Support/\+Host.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+Support/\+Dynamic\+Library.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+Transforms/\+Scalar.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+IR/\+DIBuilder.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+Transforms/\+Inst\+Combine/\+Inst\+Combine.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+Transforms/\+Utils.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+Execution\+Engine/\+Orc/\+Null\+Resolver.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+Execution\+Engine/\+Orc/\+Core.\+h"{}}\newline
+{\ttfamily \#include $<$cctype$>$}\newline
+{\ttfamily \#include $<$string$>$}\newline
+{\ttfamily \#include $<$vector$>$}\newline
+Include dependency graph for LLVMJIT.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{wasm-jit_2_source_2_runtime_2_l_l_v_m_j_i_t_8h__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespace_l_l_v_m_j_i_t}{LLVMJIT}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+llvm\+::\+Type \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_l_l_v_m_j_i_t_ad0de84f0ffe9fef3d2a917c137483a28}{LLVMJIT\+::as\+LLVMType}} (\mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{Value\+Type}} type)
+\item 
+llvm\+::\+Type \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_l_l_v_m_j_i_t_a40f290694cefcf3cce0fa0b87e28df11}{LLVMJIT\+::as\+LLVMType}} (\mbox{\hyperlink{namespace_i_r_ac56fb5355b338ad4a167c48ec539b90b}{Result\+Type}} type)
+\item 
+llvm\+::\+Function\+Type \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_l_l_v_m_j_i_t_a80d1020ad6bd736cd04bf4d5320f77be}{LLVMJIT\+::as\+LLVMType}} (const \mbox{\hyperlink{struct_i_r_1_1_function_type}{Function\+Type}} \texorpdfstring{$\ast$}{*}function\+Type)
+\item 
+llvm\+::\+Constant\+Int \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_l_l_v_m_j_i_t_a9f27fec54f36fe148f0f4f93a3187731}{LLVMJIT\+::emit\+Literal}} (\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+llvm\+::\+Constant\+Int \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_l_l_v_m_j_i_t_a8d5541df0a9537ce560e27fced75b4a5}{LLVMJIT\+::emit\+Literal}} (\mbox{\hyperlink{_basic_types_8h_a2f1a62071dd7dc3f6ef85c1b7612dc35}{I32}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+llvm\+::\+Constant\+Int \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_l_l_v_m_j_i_t_a03802791997c0193c9e6d2f6ec50046d}{LLVMJIT\+::emit\+Literal}} (\mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+llvm\+::\+Constant\+Int \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_l_l_v_m_j_i_t_ae922970c9039176ca41ba5bce6525be1}{LLVMJIT\+::emit\+Literal}} (\mbox{\hyperlink{_basic_types_8h_a416b74ff5b1dc365af5713a3f48fb8b9}{I64}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+llvm\+::\+Constant \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_l_l_v_m_j_i_t_acb0f6f3c563ac799a370536f16094542}{LLVMJIT\+::emit\+Literal}} (\mbox{\hyperlink{_basic_types_8h_a841d3674577a1e86afdc2f4845f46c4b}{F32}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+llvm\+::\+Constant \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_l_l_v_m_j_i_t_a1229e23ac5a84d35419446359cf3d26c}{LLVMJIT\+::emit\+Literal}} (\mbox{\hyperlink{_basic_types_8h_adc9896ee12db3bb116fc63b3464c72c7}{F64}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+llvm\+::\+Constant \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_l_l_v_m_j_i_t_abddc8827f4bffa0a1a9e66a4c5772871}{LLVMJIT\+::emit\+Literal}} (bool \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+llvm\+::\+Constant \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_l_l_v_m_j_i_t_aa49f9b09f4e0a97300bcd3bafc7bcdbd}{LLVMJIT\+::emit\+Literal\+Pointer}} (const void \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}}, llvm\+::\+Type \texorpdfstring{$\ast$}{*}type)
+\item 
+std\+::string \mbox{\hyperlink{namespace_l_l_v_m_j_i_t_a9aaac6c03081640c238972c7b11f438d}{LLVMJIT\+::get\+External\+Function\+Name}} (\mbox{\hyperlink{struct_runtime_1_1_module_instance}{Module\+Instance}} \texorpdfstring{$\ast$}{*}module\+Instance, \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} function\+Def\+Index)
+\item 
+bool \mbox{\hyperlink{namespace_l_l_v_m_j_i_t_a90ee96812317fbee3872035d52143c42}{LLVMJIT\+::get\+Function\+Index\+From\+External\+Name}} (const char \texorpdfstring{$\ast$}{*}external\+Name, \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} \&out\+Function\+Def\+Index)
+\item 
+llvm\+::\+Module \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_l_l_v_m_j_i_t_a3d9475022360eac170246d57d87008c3}{LLVMJIT\+::emit\+Module}} (const \mbox{\hyperlink{struct_i_r_1_1_module}{IR\+::\+Module}} \&\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}, \mbox{\hyperlink{struct_runtime_1_1_module_instance}{Module\+Instance}} \texorpdfstring{$\ast$}{*}module\+Instance)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+llvm\+::\+LLVMContext \mbox{\hyperlink{namespace_l_l_v_m_j_i_t_a687253fce244b1f9aaca8fa53fbaa764}{LLVMJIT\+::context}}
+\item 
+llvm\+::\+Type \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_l_l_v_m_j_i_t_ab9d6c4daa33c78398f81ed1a2e6b4e0a}{LLVMJIT\+::llvm\+Result\+Types}} \mbox{[}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}) Result\+Type\+::num\mbox{]}
+\item 
+llvm\+::\+Type \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_l_l_v_m_j_i_t_a6e15ea9a6819179cbf120329059aa9d8}{LLVMJIT\+::llvm\+I8\+Type}}
+\item 
+llvm\+::\+Type \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_l_l_v_m_j_i_t_a9dcb99cf370fc243556fb7b370ffc504}{LLVMJIT\+::llvm\+I16\+Type}}
+\item 
+llvm\+::\+Type \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_l_l_v_m_j_i_t_a5b82697ca713f34625256dd14aaac751}{LLVMJIT\+::llvm\+I32\+Type}}
+\item 
+llvm\+::\+Type \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_l_l_v_m_j_i_t_aadef4496b5bbd3f37201f3210426cd6f}{LLVMJIT\+::llvm\+I64\+Type}}
+\item 
+llvm\+::\+Type \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_l_l_v_m_j_i_t_ac6a0079c36a1287ece2323192786e543}{LLVMJIT\+::llvm\+F32\+Type}}
+\item 
+llvm\+::\+Type \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_l_l_v_m_j_i_t_a495fe8eb355ae25f9b1e0cb96b53058b}{LLVMJIT\+::llvm\+F64\+Type}}
+\item 
+llvm\+::\+Type \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_l_l_v_m_j_i_t_a6a54d62779196f2d77cd668b6000b581}{LLVMJIT\+::llvm\+Void\+Type}}
+\item 
+llvm\+::\+Type \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_l_l_v_m_j_i_t_a2ce8a8d880528fe543174c728e3b66b8}{LLVMJIT\+::llvm\+Bool\+Type}}
+\item 
+llvm\+::\+Type \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_l_l_v_m_j_i_t_adf064b84ad35d5d6066744d5f731a410}{LLVMJIT\+::llvm\+I8\+Ptr\+Type}}
+\item 
+llvm\+::\+Constant \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_l_l_v_m_j_i_t_ad3209e5c8319f38367d2736733ad34eb}{LLVMJIT\+::typed\+Zero\+Constants}} \mbox{[}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}) Value\+Type\+::num\mbox{]}
+\end{DoxyCompactItemize}

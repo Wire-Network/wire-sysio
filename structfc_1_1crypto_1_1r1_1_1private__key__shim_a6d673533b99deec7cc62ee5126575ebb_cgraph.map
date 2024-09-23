@@ -1,0 +1,8 @@
+<map id="fc::crypto::r1::private_key_shim::get_public_key" name="fc::crypto::r1::private_key_shim::get_public_key">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,39,185,79"/>
+<area shape="poly" id="edge1_Node000001_Node000001" title=" " alt="" coords="54,39,51,29,58,20,73,14,95,12,119,14,133,21,131,26,117,20,95,17,74,19,61,24,57,30,59,37"/>
+<area shape="rect" id="Node000002" href="$classfc_1_1crypto_1_1r1_1_1private__key.html#abed020ddf6cc239edccce96dbbdb4238" title=" " alt="" coords="243,5,386,46"/>
+<area shape="poly" id="edge2_Node000001_Node000002" title=" " alt="" coords="185,43,227,36,228,41,185,48"/>
+<area shape="rect" id="Node000003" href="$structfc_1_1crypto_1_1shim.html#a4b5c1963c31a11f2415a0dcd481ec49a" title=" " alt="" coords="233,71,396,111"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="185,69,218,74,217,79,185,75"/>
+</map>

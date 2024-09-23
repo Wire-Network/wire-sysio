@@ -1,0 +1,178 @@
+\doxysection{sample3-\/inl.h}
+\hypertarget{sample3-inl_8h_source}{}\label{sample3-inl_8h_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/samples/sample3-\/inl.h@{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/samples/sample3-\/inl.h}}
+\mbox{\hyperlink{sample3-inl_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00001}\mbox{\hyperlink{class_queue_node_ad4336229b1d7c3626e4ba69f236b202d}{00001}}\ \textcolor{comment}{//\ Copyright\ 2005,\ Google\ Inc.}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00002}00002\ \textcolor{comment}{//\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00003}00003\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00004}00004\ \textcolor{comment}{//\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00005}00005\ \textcolor{comment}{//\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00006}00006\ \textcolor{comment}{//\ met:}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00007}00007\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00008}00008\ \textcolor{comment}{//\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00009}00009\ \textcolor{comment}{//\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00010}00010\ \textcolor{comment}{//\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00011}00011\ \textcolor{comment}{//\ copyright\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00012}00012\ \textcolor{comment}{//\ in\ the\ documentation\ and/or\ other\ materials\ provided\ with\ the}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00013}00013\ \textcolor{comment}{//\ distribution.}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00014}00014\ \textcolor{comment}{//\ \ \ \ \ *\ Neither\ the\ name\ of\ Google\ Inc.\ nor\ the\ names\ of\ its}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00015}00015\ \textcolor{comment}{//\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products\ derived\ from}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00016}00016\ \textcolor{comment}{//\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00017}00017\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00018}00018\ \textcolor{comment}{//\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00019}00019\ \textcolor{comment}{//\ "{}AS\ IS"{}\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00020}00020\ \textcolor{comment}{//\ LIMITED\ TO,\ THE\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00021}00021\ \textcolor{comment}{//\ A\ PARTICULAR\ PURPOSE\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ THE\ COPYRIGHT}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00022}00022\ \textcolor{comment}{//\ OWNER\ OR\ CONTRIBUTORS\ BE\ LIABLE\ FOR\ ANY\ DIRECT,\ INDIRECT,\ INCIDENTAL,}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00023}00023\ \textcolor{comment}{//\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES\ (INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00024}00024\ \textcolor{comment}{//\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;\ LOSS\ OF\ USE,}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00025}00025\ \textcolor{comment}{//\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND\ ON\ ANY}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00026}00026\ \textcolor{comment}{//\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00027}00027\ \textcolor{comment}{//\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00028}00028\ \textcolor{comment}{//\ OF\ THIS\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00030}00030\ \textcolor{comment}{//\ A\ sample\ program\ demonstrating\ using\ Google\ C++\ testing\ framework.}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00031}00031\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00032}00032\ \textcolor{comment}{//\ Author:\ wan@google.com\ (Zhanyong\ Wan)}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00034}00034\ \textcolor{preprocessor}{\#ifndef\ GTEST\_SAMPLES\_SAMPLE3\_INL\_H\_}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00035}00035\ \textcolor{preprocessor}{\#define\ GTEST\_SAMPLES\_SAMPLE3\_INL\_H\_}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00037}00037\ \textcolor{preprocessor}{\#include\ <stddef.h>}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00040}00040\ \textcolor{comment}{//\ Queue\ is\ a\ simple\ queue\ implemented\ as\ a\ singled-\/linked\ list.}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00041}00041\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00042}00042\ \textcolor{comment}{//\ The\ element\ type\ must\ support\ copy\ constructor.}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00043}00043\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ E>\ \ \textcolor{comment}{//\ E\ is\ the\ element\ type}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00044}00044\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_queue}{Queue}};}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00046}00046\ \textcolor{comment}{//\ QueueNode\ is\ a\ node\ in\ a\ Queue,\ which\ consists\ of\ an\ element\ of}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00047}00047\ \textcolor{comment}{//\ type\ E\ and\ a\ pointer\ to\ the\ next\ node.}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00048}00048\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ E>\ \ \textcolor{comment}{//\ E\ is\ the\ element\ type}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00049}\mbox{\hyperlink{class_queue_node}{00049}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_queue_node}{QueueNode}}\ \{}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00050}00050\ \ \ \textcolor{keyword}{friend}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_queue}{Queue}}<E>;}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00052}00052\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00053}00053\ \ \ \textcolor{comment}{//\ Gets\ the\ element\ in\ this\ node.}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00054}\mbox{\hyperlink{class_queue_node_ae1cc72046c97b37def7d434c5b3483d8}{00054}}\ \ \ \textcolor{keyword}{const}\ E\&\ \mbox{\hyperlink{class_queue_node_ae1cc72046c97b37def7d434c5b3483d8}{element}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ element\_;\ \}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00056}00056\ \ \ \textcolor{comment}{//\ Gets\ the\ next\ node\ in\ the\ queue.}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00057}\mbox{\hyperlink{class_queue_node_a55ab43663e363a44c7d8ccb511aa87e2}{00057}}\ \ \ \mbox{\hyperlink{class_queue_node}{QueueNode}}*\ \mbox{\hyperlink{class_queue_node_a55ab43663e363a44c7d8ccb511aa87e2}{next}}()\ \{\ \textcolor{keywordflow}{return}\ next\_;\ \}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00058}\mbox{\hyperlink{class_queue_node_a2a532c8aff8386948c5dd1a12fb57679}{00058}}\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_queue_node}{QueueNode}}*\ \mbox{\hyperlink{class_queue_node_a2a532c8aff8386948c5dd1a12fb57679}{next}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ next\_;\ \}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00060}00060\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00061}00061\ \ \ \textcolor{comment}{//\ Creates\ a\ node\ with\ a\ given\ element\ value.\ \ The\ next\ pointer\ is}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00062}00062\ \ \ \textcolor{comment}{//\ set\ to\ NULL.}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00063}00063\ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{class_queue_node}{QueueNode}}(\textcolor{keyword}{const}\ E\&\ an\_element)\ :\ element\_(an\_element),\ next\_(NULL)\ \{\}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00065}00065\ \ \ \textcolor{comment}{//\ We\ disable\ the\ default\ assignment\ operator\ and\ copy\ c'tor.}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00066}00066\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_queue_node}{QueueNode}}\&\ operator\ =\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{class_queue_node}{QueueNode}}\&);}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00067}00067\ \ \ \mbox{\hyperlink{class_queue_node}{QueueNode}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{class_queue_node}{QueueNode}}\&);}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00069}00069\ \ \ E\ element\_;}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00070}00070\ \ \ \mbox{\hyperlink{class_queue_node}{QueueNode}}*\ next\_;}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00071}00071\ \};}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00073}00073\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ E>\ \ \textcolor{comment}{//\ E\ is\ the\ element\ type.}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00074}\mbox{\hyperlink{class_queue}{00074}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_queue}{Queue}}\ \{}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00075}00075\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00076}00076\ \ \ \textcolor{comment}{//\ Creates\ an\ empty\ queue.}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00077}\mbox{\hyperlink{class_queue_ab09891e54b51dc677ee6efb350687ae4}{00077}}\ \ \ \mbox{\hyperlink{class_queue_ab09891e54b51dc677ee6efb350687ae4}{Queue}}()\ :\ head\_(NULL),\ last\_(NULL),\ size\_(0)\ \{\}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00079}00079\ \ \ \textcolor{comment}{//\ D'tor.\ \ Clears\ the\ queue.}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00080}\mbox{\hyperlink{class_queue_a49fe82adb8dc2fb62ab53876a6933d0f}{00080}}\ \ \ \mbox{\hyperlink{class_queue_a49fe82adb8dc2fb62ab53876a6933d0f}{\string~Queue}}()\ \{\ \mbox{\hyperlink{class_queue_acfdd5f9f7e936ca30dcf877370ef9510}{Clear}}();\ \}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00081}00081\ }
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00082}00082\ \ \ \textcolor{comment}{//\ Clears\ the\ queue.}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00083}\mbox{\hyperlink{class_queue_acfdd5f9f7e936ca30dcf877370ef9510}{00083}}\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_queue_acfdd5f9f7e936ca30dcf877370ef9510}{Clear}}()\ \{}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00084}00084\ \ \ \ \ \textcolor{keywordflow}{if}\ (size\_\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00085}00085\ \ \ \ \ \ \ \textcolor{comment}{//\ 1.\ Deletes\ every\ node.}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00086}00086\ \ \ \ \ \ \ \mbox{\hyperlink{class_queue_node}{QueueNode<E>}}*\ node\ =\ head\_;}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00087}00087\ \ \ \ \ \ \ \mbox{\hyperlink{class_queue_node}{QueueNode<E>}}*\ next\ =\ node-\/>\mbox{\hyperlink{class_queue_node_a55ab43663e363a44c7d8ccb511aa87e2}{next}}();}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00088}00088\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (;\ ;)\ \{}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00089}00089\ \ \ \ \ \ \ \ \ \textcolor{keyword}{delete}\ node;}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00090}00090\ \ \ \ \ \ \ \ \ node\ =\ next;}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00091}00091\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (node\ ==\ NULL)\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00092}00092\ \ \ \ \ \ \ \ \ next\ =\ node-\/>\mbox{\hyperlink{class_queue_node_a55ab43663e363a44c7d8ccb511aa87e2}{next}}();}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00093}00093\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00094}00094\ }
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00095}00095\ \ \ \ \ \ \ \textcolor{comment}{//\ 2.\ Resets\ the\ member\ variables.}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00096}00096\ \ \ \ \ \ \ head\_\ =\ last\_\ =\ NULL;}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00097}00097\ \ \ \ \ \ \ size\_\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00098}00098\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00099}00099\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00100}00100\ }
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00101}00101\ \ \ \textcolor{comment}{//\ Gets\ the\ number\ of\ elements.}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00102}\mbox{\hyperlink{class_queue_abc4d78b5f66041011c5590bf703847b0}{00102}}\ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{class_queue_abc4d78b5f66041011c5590bf703847b0}{Size}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ size\_;\ \}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00103}00103\ }
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00104}00104\ \ \ \textcolor{comment}{//\ Gets\ the\ first\ element\ of\ the\ queue,\ or\ NULL\ if\ the\ queue\ is\ empty.}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00105}\mbox{\hyperlink{class_queue_ae6bfe598d2ac848acf99055bbcfeb6df}{00105}}\ \ \ \mbox{\hyperlink{class_queue_node}{QueueNode<E>}}*\ \mbox{\hyperlink{class_queue_ae6bfe598d2ac848acf99055bbcfeb6df}{Head}}()\ \{\ \textcolor{keywordflow}{return}\ head\_;\ \}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00106}\mbox{\hyperlink{class_queue_a24e0568348020ee356981156e71007d0}{00106}}\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_queue_node}{QueueNode<E>}}*\ \mbox{\hyperlink{class_queue_a24e0568348020ee356981156e71007d0}{Head}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ head\_;\ \}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00107}00107\ }
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00108}00108\ \ \ \textcolor{comment}{//\ Gets\ the\ last\ element\ of\ the\ queue,\ or\ NULL\ if\ the\ queue\ is\ empty.}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00109}\mbox{\hyperlink{class_queue_a9ea23f0b64d8005eb032b17861b169dd}{00109}}\ \ \ \mbox{\hyperlink{class_queue_node}{QueueNode<E>}}*\ \mbox{\hyperlink{class_queue_a9ea23f0b64d8005eb032b17861b169dd}{Last}}()\ \{\ \textcolor{keywordflow}{return}\ last\_;\ \}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00110}\mbox{\hyperlink{class_queue_a8d1db3ed5d3d43dc76861ecc64b3e1df}{00110}}\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_queue_node}{QueueNode<E>}}*\ \mbox{\hyperlink{class_queue_a8d1db3ed5d3d43dc76861ecc64b3e1df}{Last}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ last\_;\ \}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00111}00111\ }
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00112}00112\ \ \ \textcolor{comment}{//\ Adds\ an\ element\ to\ the\ end\ of\ the\ queue.\ \ A\ copy\ of\ the\ element\ is}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00113}00113\ \ \ \textcolor{comment}{//\ created\ using\ the\ copy\ constructor,\ and\ then\ stored\ in\ the\ queue.}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00114}00114\ \ \ \textcolor{comment}{//\ Changes\ made\ to\ the\ element\ in\ the\ queue\ doesn't\ affect\ the\ source}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00115}00115\ \ \ \textcolor{comment}{//\ object,\ and\ vice\ versa.}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00116}\mbox{\hyperlink{class_queue_abaa2e7175457307bca74f5562cbdaaa9}{00116}}\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_queue_abaa2e7175457307bca74f5562cbdaaa9}{Enqueue}}(\textcolor{keyword}{const}\ E\&\ element)\ \{}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00117}00117\ \ \ \ \ \mbox{\hyperlink{class_queue_node}{QueueNode<E>}}*\ new\_node\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_queue_node}{QueueNode<E>}}(element);}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00118}00118\ }
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00119}00119\ \ \ \ \ \textcolor{keywordflow}{if}\ (size\_\ ==\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00120}00120\ \ \ \ \ \ \ head\_\ =\ last\_\ =\ new\_node;}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00121}00121\ \ \ \ \ \ \ size\_\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00122}00122\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00123}00123\ \ \ \ \ \ \ last\_-\/>next\_\ =\ new\_node;}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00124}00124\ \ \ \ \ \ \ last\_\ =\ new\_node;}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00125}00125\ \ \ \ \ \ \ size\_++;}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00126}00126\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00127}00127\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00128}00128\ }
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00129}00129\ \ \ \textcolor{comment}{//\ Removes\ the\ head\ of\ the\ queue\ and\ returns\ it.\ \ Returns\ NULL\ if}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00130}00130\ \ \ \textcolor{comment}{//\ the\ queue\ is\ empty.}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00131}\mbox{\hyperlink{class_queue_a42bb3a81cb3f6cd084da16a39d38eb03}{00131}}\ \ \ E*\ \mbox{\hyperlink{class_queue_a42bb3a81cb3f6cd084da16a39d38eb03}{Dequeue}}()\ \{}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00132}00132\ \ \ \ \ \textcolor{keywordflow}{if}\ (size\_\ ==\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00133}00133\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ NULL;}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00134}00134\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00135}00135\ }
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00136}00136\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_queue_node}{QueueNode<E>}}*\ \textcolor{keyword}{const}\ old\_head\ =\ head\_;}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00137}00137\ \ \ \ \ head\_\ =\ head\_-\/>next\_;}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00138}00138\ \ \ \ \ size\_-\/-\/;}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00139}00139\ \ \ \ \ \textcolor{keywordflow}{if}\ (size\_\ ==\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00140}00140\ \ \ \ \ \ \ last\_\ =\ NULL;}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00141}00141\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00142}00142\ }
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00143}00143\ \ \ \ \ E*\ element\ =\ \textcolor{keyword}{new}\ E(old\_head-\/>\mbox{\hyperlink{class_queue_node_ae1cc72046c97b37def7d434c5b3483d8}{element}}());}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00144}00144\ \ \ \ \ \textcolor{keyword}{delete}\ old\_head;}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00145}00145\ }
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00146}00146\ \ \ \ \ \textcolor{keywordflow}{return}\ element;}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00147}00147\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00148}00148\ }
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00149}00149\ \ \ \textcolor{comment}{//\ Applies\ a\ function/functor\ on\ each\ element\ of\ the\ queue,\ and}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00150}00150\ \ \ \textcolor{comment}{//\ returns\ the\ result\ in\ a\ new\ queue.\ \ The\ original\ queue\ is\ not}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00151}00151\ \ \ \textcolor{comment}{//\ affected.}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00152}00152\ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ F>}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00153}\mbox{\hyperlink{class_queue_a61c2800fd12a0ba74523c8763a86423b}{00153}}\ \ \ \mbox{\hyperlink{class_queue}{Queue}}*\ \mbox{\hyperlink{class_queue_a61c2800fd12a0ba74523c8763a86423b}{Map}}(F\ function)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00154}00154\ \ \ \ \ \mbox{\hyperlink{class_queue}{Queue}}*\ new\_queue\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_queue_ab09891e54b51dc677ee6efb350687ae4}{Queue}}();}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00155}00155\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{class_queue_node}{QueueNode<E>}}*\ node\ =\ head\_;\ node\ !=\ NULL;\ node\ =\ node-\/>next\_)\ \{}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00156}00156\ \ \ \ \ \ \ new\_queue-\/>\mbox{\hyperlink{class_queue_abaa2e7175457307bca74f5562cbdaaa9}{Enqueue}}(function(node-\/>element()));}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00157}00157\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00158}00158\ }
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00159}00159\ \ \ \ \ \textcolor{keywordflow}{return}\ new\_queue;}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00160}00160\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00161}00161\ }
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00162}00162\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00163}00163\ \ \ \mbox{\hyperlink{class_queue_node}{QueueNode<E>}}*\ head\_;\ \ \textcolor{comment}{//\ The\ first\ node\ of\ the\ queue.}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00164}00164\ \ \ \mbox{\hyperlink{class_queue_node}{QueueNode<E>}}*\ last\_;\ \ \textcolor{comment}{//\ The\ last\ node\ of\ the\ queue.}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00165}00165\ \ \ \textcolor{keywordtype}{size\_t}\ size\_;\ \ \textcolor{comment}{//\ The\ number\ of\ elements\ in\ the\ queue.}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00166}00166\ }
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00167}00167\ \ \ \textcolor{comment}{//\ We\ disallow\ copying\ a\ queue.}}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00168}00168\ \ \ \mbox{\hyperlink{class_queue_ab09891e54b51dc677ee6efb350687ae4}{Queue}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{class_queue}{Queue}}\&);}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00169}00169\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_queue}{Queue}}\&\ operator\ =\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{class_queue}{Queue}}\&);}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00170}00170\ \};}
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00171}00171\ }
+\DoxyCodeLine{\Hypertarget{sample3-inl_8h_source_l00172}00172\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_SAMPLES\_SAMPLE3\_INL\_H\_}}
+
+\end{DoxyCode}

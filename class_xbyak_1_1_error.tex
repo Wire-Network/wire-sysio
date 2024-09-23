@@ -1,0 +1,152 @@
+\doxysection{Xbyak\+::Error Class Reference}
+\hypertarget{class_xbyak_1_1_error}{}\label{class_xbyak_1_1_error}\index{Xbyak::Error@{Xbyak::Error}}
+
+
+{\ttfamily \#include $<$xbyak.\+h$>$}
+
+
+
+Inheritance diagram for Xbyak\+::Error\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=158pt]{class_xbyak_1_1_error__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Xbyak\+::Error\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=158pt]{class_xbyak_1_1_error__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_xbyak_1_1_error_a3c69519fa34e436d7f1c789d70b4ecd3}{Error}} (int err)
+\item 
+\mbox{\hyperlink{class_xbyak_1_1_error_a9d3531deefe87836ba1e2bdd84ea2711}{operator int}} () const
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_xbyak_1_1_error_a9c9d5a611b9bff74aea56de5b7ea87d4}{what}} () const  throw ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00184}{184}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_xbyak_1_1_error_a3c69519fa34e436d7f1c789d70b4ecd3}\index{Xbyak::Error@{Xbyak::Error}!Error@{Error}}
+\index{Error@{Error}!Xbyak::Error@{Xbyak::Error}}
+\doxysubsubsection{\texorpdfstring{Error()}{Error()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_error_a3c69519fa34e436d7f1c789d70b4ecd3} 
+Xbyak\+::\+Error\+::\+Error (\begin{DoxyParamCaption}\item[{int}]{err}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00187}{187}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ err\_(err)}
+\DoxyCodeLine{00188\ \ \ \ \ \{}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (err\_\ <\ 0\ ||\ err\_\ >\ \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a50843e628314f8ee441d800a933b23e3}{ERR\_INTERNAL}})\ \{}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}bad\ err=\%d\ in\ Xbyak::Error\(\backslash\)n"{}},\ err\_);}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ \ \ \ \ exit(1);}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00193\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_xbyak_1_1_error_a9d3531deefe87836ba1e2bdd84ea2711}\index{Xbyak::Error@{Xbyak::Error}!operator int@{operator int}}
+\index{operator int@{operator int}!Xbyak::Error@{Xbyak::Error}}
+\doxysubsubsection{\texorpdfstring{operator int()}{operator int()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_error_a9d3531deefe87836ba1e2bdd84ea2711} 
+Xbyak\+::\+Error\+::operator int (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00194}{194}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00194\ \{\ \textcolor{keywordflow}{return}\ err\_;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_xbyak_1_1_error_a9c9d5a611b9bff74aea56de5b7ea87d4}\index{Xbyak::Error@{Xbyak::Error}!what@{what}}
+\index{what@{what}!Xbyak::Error@{Xbyak::Error}}
+\doxysubsubsection{\texorpdfstring{what()}{what()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_error_a9c9d5a611b9bff74aea56de5b7ea87d4} 
+const char \texorpdfstring{$\ast$}{*} Xbyak\+::\+Error\+::what (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const throw ( ) \hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00195}{195}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00196\ \ \ \ \ \{}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *errTbl[]\ =\ \{}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}none"{}},}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}bad\ addressing"{}},}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}code\ is\ too\ big"{}},}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}bad\ scale"{}},}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}esp\ can't\ be\ index"{}},}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}bad\ combination"{}},}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}bad\ size\ of\ register"{}},}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}imm\ is\ too\ big"{}},}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}bad\ align"{}},}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}label\ is\ redefined"{}},}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}label\ is\ too\ far"{}},}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}label\ is\ not\ found"{}},}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}code\ is\ not\ copyable"{}},}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}bad\ parameter"{}},}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}can't\ protect"{}},}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}can't\ use\ 64bit\ disp(use\ (void*))"{}},}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}offset\ is\ too\ big"{}},}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}MEM\ size\ is\ not\ specified"{}},}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}bad\ mem\ size"{}},}
+\DoxyCodeLine{00217\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}bad\ st\ combination"{}},}
+\DoxyCodeLine{00218\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}over\ local\ label"{}},}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}under\ local\ label"{}},}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}can't\ alloc"{}},}
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}T\_SHORT\ is\ not\ supported\ in\ AutoGrow"{}},}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}bad\ protect\ mode"{}},}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}bad\ pNum"{}},}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}bad\ tNum"{}},}
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}bad\ vsib\ addressing"{}},}
+\DoxyCodeLine{00226\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}can't\ convert"{}},}
+\DoxyCodeLine{00227\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}label\ is\ not\ set\ by\ L()"{}},}
+\DoxyCodeLine{00228\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}label\ is\ already\ set\ by\ L()"{}},}
+\DoxyCodeLine{00229\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}bad\ label\ string"{}},}
+\DoxyCodeLine{00230\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}err\ munmap"{}},}
+\DoxyCodeLine{00231\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}opmask\ is\ already\ set"{}},}
+\DoxyCodeLine{00232\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}rounding\ is\ already\ set"{}},}
+\DoxyCodeLine{00233\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}k0\ is\ invalid"{}},}
+\DoxyCodeLine{00234\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}evex\ is\ invalid"{}},}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sae(suppress\ all\ exceptions)\ is\ invalid"{}},}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}er(embedded\ rounding)\ is\ invalid"{}},}
+\DoxyCodeLine{00237\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}invalid\ broadcast"{}},}
+\DoxyCodeLine{00238\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}invalid\ opmask\ with\ memory"{}},}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}invalid\ zero"{}},}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}invalid\ rip\ in\ AutoGrow"{}},}
+\DoxyCodeLine{00241\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}invalid\ mib\ address"{}},}
+\DoxyCodeLine{00242\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}internal\ error"{}},}
+\DoxyCodeLine{00243\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00244\ \ \ \ \ \ \ \ \ assert((\textcolor{keywordtype}{size\_t})err\_\ <\ \textcolor{keyword}{sizeof}(errTbl)\ /\ \textcolor{keyword}{sizeof}(*errTbl));}
+\DoxyCodeLine{00245\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ errTbl[err\_];}
+\DoxyCodeLine{00246\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/libraries/ff/depends/xbyak/xbyak/\mbox{\hyperlink{xbyak_8h}{xbyak.\+h}}\end{DoxyCompactItemize}

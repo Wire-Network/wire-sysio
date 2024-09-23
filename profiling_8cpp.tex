@@ -1,0 +1,114 @@
+\doxysection{libraries/fc/libraries/ff/libff/common/profiling.cpp File Reference}
+\hypertarget{profiling_8cpp}{}\label{profiling_8cpp}\index{libraries/fc/libraries/ff/libff/common/profiling.cpp@{libraries/fc/libraries/ff/libff/common/profiling.cpp}}
+{\ttfamily \#include $<$cassert$>$}\newline
+{\ttfamily \#include $<$chrono$>$}\newline
+{\ttfamily \#include $<$cstdio$>$}\newline
+{\ttfamily \#include $<$ctime$>$}\newline
+{\ttfamily \#include $<$list$>$}\newline
+{\ttfamily \#include $<$stdexcept$>$}\newline
+{\ttfamily \#include $<$vector$>$}\newline
+{\ttfamily \#include $<$libff/common/default\+\_\+types/ec\+\_\+pp.\+hpp$>$}\newline
+{\ttfamily \#include $<$libff/common/profiling.\+hpp$>$}\newline
+{\ttfamily \#include $<$libff/common/utils.\+hpp$>$}\newline
+{\ttfamily \#include $<$proc/readproc.\+h$>$}\newline
+Include dependency graph for profiling.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{profiling_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacelibff}{libff}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+long long \mbox{\hyperlink{namespacelibff_a81e225ed671a1a00f2dfe5753f89b6cf}{libff\+::get\+\_\+nsec\+\_\+time}} ()
+\item 
+long long \mbox{\hyperlink{namespacelibff_ae6b3bfb190fae875aec3e6174dddfb09}{libff\+::get\+\_\+nsec\+\_\+cpu\+\_\+time}} ()
+\item 
+void \mbox{\hyperlink{namespacelibff_a4bcbacbbf8d028be4c4b2a863d21f4c6}{libff\+::start\+\_\+profiling}} ()
+\item 
+void \mbox{\hyperlink{namespacelibff_a0c1ab4936e58a7a6736e8b372e13cb9a}{libff\+::clear\+\_\+profiling\+\_\+counters}} ()
+\item 
+void \mbox{\hyperlink{namespacelibff_a695d8da263c9ea66d57a62209bc5181d}{libff\+::print\+\_\+cumulative\+\_\+time\+\_\+entry}} (const std\+::string \&key, const long long factor)
+\item 
+void \mbox{\hyperlink{namespacelibff_a9c31079c49ebd33090e944ba3b5e4b3b}{libff\+::print\+\_\+cumulative\+\_\+times}} (const long long factor)
+\item 
+void \mbox{\hyperlink{namespacelibff_a55df5d0f12f359bed1088011015bc205}{libff\+::print\+\_\+cumulative\+\_\+op\+\_\+counts}} (const bool only\+\_\+fq)
+\item 
+void \mbox{\hyperlink{namespacelibff_a7e7bb713ec5b021db2031e0adffa8cce}{libff\+::print\+\_\+op\+\_\+profiling}} (const std\+::string \&msg)
+\item 
+void \mbox{\hyperlink{namespacelibff_a5c3a5ae8d92ef971f647fd95b7fc756a}{libff\+::print\+\_\+time}} (const char \texorpdfstring{$\ast$}{*}msg)
+\item 
+void \mbox{\hyperlink{namespacelibff_a6314933e7708a41140279a9c1a5c25c8}{libff\+::print\+\_\+header}} (const char \texorpdfstring{$\ast$}{*}msg)
+\item 
+void \mbox{\hyperlink{namespacelibff_af9fc78aab25c3773ef01a337a404e159}{libff\+::print\+\_\+indent}} ()
+\item 
+void \mbox{\hyperlink{namespacelibff_a8337aad2e070cab4f7426f9194f4b0cc}{libff\+::op\+\_\+profiling\+\_\+enter}} (const std\+::string \&msg)
+\item 
+void \mbox{\hyperlink{namespacelibff_a64168e59c1ced7a22a49f7d819c02794}{libff\+::enter\+\_\+block}} (const std\+::string \&msg, const bool indent)
+\item 
+void \mbox{\hyperlink{namespacelibff_ac68d4feb3f7413e9e7de86e06fe6ef1f}{libff\+::leave\+\_\+block}} (const std\+::string \&msg, const bool indent)
+\item 
+void \mbox{\hyperlink{namespacelibff_a342ad9a9ee415ba99e1cc3f56b739894}{libff\+::print\+\_\+mem}} (const std\+::string \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\item 
+void \mbox{\hyperlink{namespacelibff_ae2b657d337cbf53d4ce21b530b76efc5}{libff\+::print\+\_\+compilation\+\_\+info}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+long long \mbox{\hyperlink{namespacelibff_af8ae91a4bcbdd7c4e71db45703edaae3}{libff\+::start\+\_\+time}}
+\item 
+long long \mbox{\hyperlink{namespacelibff_a5772583358e536529669a5d71e4cead7}{libff\+::last\+\_\+time}}
+\item 
+long long \mbox{\hyperlink{namespacelibff_a3640583979f40306c2131bf6366b3585}{libff\+::start\+\_\+cpu\+\_\+time}}
+\item 
+long long \mbox{\hyperlink{namespacelibff_a21381431780ee083948003f8ce9f1b43}{libff\+::last\+\_\+cpu\+\_\+time}}
+\item 
+std\+::map$<$ std\+::string, size\+\_\+t $>$ \mbox{\hyperlink{namespacelibff_a1bdeb17f276c22e5b4a8c9d3aa99e9ad}{libff\+::invocation\+\_\+counts}}
+\item 
+std\+::map$<$ std\+::string, long long $>$ \mbox{\hyperlink{namespacelibff_a6163f13d0aeb8aa607cea6d4f0758093}{libff\+::enter\+\_\+times}}
+\item 
+std\+::map$<$ std\+::string, long long $>$ \mbox{\hyperlink{namespacelibff_aaf5a1ae5914029cc44ef5121bb077720}{libff\+::last\+\_\+times}}
+\item 
+std\+::map$<$ std\+::string, long long $>$ \mbox{\hyperlink{namespacelibff_a4bbfd7fd787aef2e1ed4f6769d7f6f66}{libff\+::cumulative\+\_\+times}}
+\item 
+std\+::map$<$ std\+::string, long long $>$ \mbox{\hyperlink{namespacelibff_aec4a073ac09c6e48c8fc8fdc6369f4b9}{libff\+::enter\+\_\+cpu\+\_\+times}}
+\item 
+std\+::map$<$ std\+::string, long long $>$ \mbox{\hyperlink{namespacelibff_a22f5baff84798b8678c23b1b77920775}{libff\+::last\+\_\+cpu\+\_\+times}}
+\item 
+std\+::map$<$ std\+::pair$<$ std\+::string, std\+::string $>$, long long $>$ \mbox{\hyperlink{namespacelibff_a8fd985ba27ab6bdc1cc28ee168538d02}{libff\+::op\+\_\+counts}}
+\item 
+std\+::map$<$ std\+::pair$<$ std\+::string, std\+::string $>$, long long $>$ \mbox{\hyperlink{namespacelibff_a4e3b6d879f517acc888ea666fd683d47}{libff\+::cumulative\+\_\+op\+\_\+counts}}
+\item 
+size\+\_\+t \mbox{\hyperlink{namespacelibff_af48788852de70eafb29b9f4d81859bcf}{libff\+::indentation}} = 0
+\item 
+std\+::vector$<$ std\+::string $>$ \mbox{\hyperlink{namespacelibff_a5e8c82d30e8ca74041ed5ea9f9bcfd1e}{libff\+::block\+\_\+names}}
+\item 
+std\+::list$<$ std\+::pair$<$ std\+::string, long long \texorpdfstring{$\ast$}{*} $>$ $>$ \mbox{\hyperlink{namespacelibff_a96f264b11d02cec779d5ef3e0db15d61}{libff\+::op\+\_\+data\+\_\+points}}
+\item 
+bool \mbox{\hyperlink{namespacelibff_a8cc234e790d9c373c3b401902d7c5851}{libff\+::inhibit\+\_\+profiling\+\_\+info}} = false
+\item 
+bool \mbox{\hyperlink{namespacelibff_ab90e4fc8e6d9a89f6f34aab68a382194}{libff\+::inhibit\+\_\+profiling\+\_\+counters}} = false
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Implementation of functions for profiling code blocks.
+
+See \doxylink{profiling_8hpp}{profiling.\+hpp} .
+
+\begin{DoxyAuthor}{Author}
+This file is part of libff, developed by SCIPR Lab and contributors (see AUTHORS). 
+\end{DoxyAuthor}
+\begin{DoxyCopyright}{Copyright}
+MIT license (see LICENSE file) 
+\end{DoxyCopyright}
+
+
+Definition in file \mbox{\hyperlink{profiling_8cpp_source}{profiling.\+cpp}}.
+

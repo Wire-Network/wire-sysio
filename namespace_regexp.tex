@@ -1,0 +1,36 @@
+\doxysection{Regexp Namespace Reference}
+\hypertarget{namespace_regexp}{}\label{namespace_regexp}\index{Regexp@{Regexp}}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{namespace_regexp_aadd46f06c56abd08dd3844b0eac3d28e}{add\+To\+NFA}} (const char \texorpdfstring{$\ast$}{*}regexp\+String, \mbox{\hyperlink{struct_n_f_a_1_1_builder}{NFA\+::\+Builder}} \texorpdfstring{$\ast$}{*}nfa\+Builder, \mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{NFA\+::\+State\+Index}} initial\+State, \mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{NFA\+::\+State\+Index}} final\+State)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespace_regexp_aadd46f06c56abd08dd3844b0eac3d28e}\index{Regexp@{Regexp}!addToNFA@{addToNFA}}
+\index{addToNFA@{addToNFA}!Regexp@{Regexp}}
+\doxysubsubsection{\texorpdfstring{addToNFA()}{addToNFA()}}
+{\footnotesize\ttfamily \label{namespace_regexp_aadd46f06c56abd08dd3844b0eac3d28e} 
+void Regexp\+::add\+To\+NFA (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{regexp\+String}{, }\item[{\mbox{\hyperlink{struct_n_f_a_1_1_builder}{NFA\+::\+Builder}} \texorpdfstring{$\ast$}{*}}]{nfa\+Builder}{, }\item[{\mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{NFA\+::\+State\+Index}}}]{initial\+State}{, }\item[{\mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{NFA\+::\+State\+Index}}}]{final\+State}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_regexp_8cpp_source_l00335}{335}} of file \mbox{\hyperlink{_regexp_8cpp_source}{Regexp.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00336\ \ \ \ \ \{}
+\DoxyCodeLine{00337\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_node}{Node}}*\ rootNode\ =\ parse(regexpString);}
+\DoxyCodeLine{00338\ \ \ \ \ \ \ \ \ createNFA(nfaBuilder,rootNode,initialState,finalState);}
+\DoxyCodeLine{00339\ \ \ \ \ \ \ \ \ \textcolor{keyword}{delete}\ rootNode;}
+\DoxyCodeLine{00340\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_regexp_aadd46f06c56abd08dd3844b0eac3d28e_icgraph}
+\end{center}
+\end{figure}

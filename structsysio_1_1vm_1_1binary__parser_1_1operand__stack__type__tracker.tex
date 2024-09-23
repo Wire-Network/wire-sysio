@@ -1,0 +1,685 @@
+\doxysection{sysio\+::vm\+::binary\+\_\+parser\texorpdfstring{$<$}{<} Writer, Options, Debug\+Info \texorpdfstring{$>$}{>}\+::operand\+\_\+stack\+\_\+type\+\_\+tracker Struct Reference}
+\hypertarget{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker}{}\label{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker}\index{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker}}
+
+
+{\ttfamily \#include $<$parser.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a8f88afbef502c7060c930b962d5a2b61}{operand\+\_\+stack\+\_\+type\+\_\+tracker}} (const \mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1max__func__local__bytes__stack__checker}{detail\+::max\+\_\+func\+\_\+local\+\_\+bytes\+\_\+stack\+\_\+checker}}$<$ Options $>$ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_aa92d24c24e09799001a154c415a7e5d5}{local\+\_\+bytes\+\_\+checker}}, const Options \&\mbox{\hyperlink{structsysio_1_1vm_1_1options}{options}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_aebac9a4a77db42a9a4a6eafc0800e90b}{push}} (\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} type)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a55a8a910aa884c6ded25f2e5b818ebad}{pop}} (\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} expected)
+\item 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_adaddc3a866ee287d6f9a223ddef98e3d}{pop}} ()
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a520e4229e5669b7ea6251a4cb33a6bb0}{top}} (\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} expected)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a2e46720d4a76f569e3b671873c76c7b8}{start\+\_\+unreachable}} ()
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a5d7689b9c817c1483a3e8397f55c0fb5}{push\+\_\+scope}} ()
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_acc8fb187cb37fc4923597cc7b190aed7}{pop\+\_\+scope}} (\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{ssh_8c_a2cd19dc464a5cf91cd7c2e717b9dffd7}{expected\+\_\+result}}=types\+::pseudo)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_aafc1eb91b54fa4558534986a9c67a87b}{finish}} ()
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a22bd096d07d5c5e17b43c0866ff561e1}{depth}} () const
+\item 
+\mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a8f88afbef502c7060c930b962d5a2b61}{operand\+\_\+stack\+\_\+type\+\_\+tracker}} (const \mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1max__func__local__bytes__stack__checker}{detail\+::max\+\_\+func\+\_\+local\+\_\+bytes\+\_\+stack\+\_\+checker}}$<$ Options $>$ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_aa92d24c24e09799001a154c415a7e5d5}{local\+\_\+bytes\+\_\+checker}}, const Options \&\mbox{\hyperlink{structsysio_1_1vm_1_1options}{options}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_aebac9a4a77db42a9a4a6eafc0800e90b}{push}} (\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} type)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a55a8a910aa884c6ded25f2e5b818ebad}{pop}} (\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} expected)
+\item 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_adaddc3a866ee287d6f9a223ddef98e3d}{pop}} ()
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a520e4229e5669b7ea6251a4cb33a6bb0}{top}} (\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} expected)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a2e46720d4a76f569e3b671873c76c7b8}{start\+\_\+unreachable}} ()
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a5d7689b9c817c1483a3e8397f55c0fb5}{push\+\_\+scope}} ()
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_acc8fb187cb37fc4923597cc7b190aed7}{pop\+\_\+scope}} (\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{ssh_8c_a2cd19dc464a5cf91cd7c2e717b9dffd7}{expected\+\_\+result}}=types\+::pseudo)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_aafc1eb91b54fa4558534986a9c67a87b}{finish}} ()
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a22bd096d07d5c5e17b43c0866ff561e1}{depth}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::vector$<$ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} $>$ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_abbf0ab8cb9eb86b8678378c97d8f397a}{state}} = \{ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_af31cb054fa61ea1816199fc76d31de89}{scope\+\_\+tag}} \}
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a325d66e5e83c656eadca3481a98f8d10}{operand\+\_\+depth}} = 0
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a2bf2d13eac304d198c07ec5d37aec97b}{maximum\+\_\+operand\+\_\+depth}} = 0
+\item 
+\mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1max__func__local__bytes__stack__checker}{detail\+::max\+\_\+func\+\_\+local\+\_\+bytes\+\_\+stack\+\_\+checker}}$<$ Options $>$ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_aa92d24c24e09799001a154c415a7e5d5}{local\+\_\+bytes\+\_\+checker}}
+\item 
+const Options \& \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a76ff0b6002a68f55667c8e51800317d9}{options}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static constexpr \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_ab04e67603efd1888e397cd625eb97dd7}{unreachable\+\_\+tag}} = 0x80
+\item 
+static constexpr \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_af31cb054fa61ea1816199fc76d31de89}{scope\+\_\+tag}} = 0x81
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{class_writer}{Writer}}, typename Options = default\+\_\+options, typename Debug\+Info = null\+\_\+debug\+\_\+info$>$\newline
+struct sysio\+::vm\+::binary\+\_\+parser$<$ Writer, Options, Debug\+Info $>$\+::operand\+\_\+stack\+\_\+type\+\_\+tracker}
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2parser_8hpp_source_l00624}{624}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a8f88afbef502c7060c930b962d5a2b61}\index{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker}!operand\_stack\_type\_tracker@{operand\_stack\_type\_tracker}}
+\index{operand\_stack\_type\_tracker@{operand\_stack\_type\_tracker}!sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker}}
+\doxysubsubsection{\texorpdfstring{operand\_stack\_type\_tracker()}{operand\_stack\_type\_tracker()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a8f88afbef502c7060c930b962d5a2b61} 
+template$<$typename \mbox{\hyperlink{class_writer}{Writer}} , typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1binary__parser}{sysio\+::vm\+::binary\+\_\+parser}}$<$ \mbox{\hyperlink{class_writer}{Writer}}, Options, Debug\+Info $>$\+::operand\+\_\+stack\+\_\+type\+\_\+tracker\+::operand\+\_\+stack\+\_\+type\+\_\+tracker (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1max__func__local__bytes__stack__checker}{detail\+::max\+\_\+func\+\_\+local\+\_\+bytes\+\_\+stack\+\_\+checker}}$<$ Options $>$}]{local\+\_\+bytes\+\_\+checker}{, }\item[{const Options \&}]{options}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_source_l00625}{625}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00626\ \ \ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_aa92d24c24e09799001a154c415a7e5d5}{local\_bytes\_checker}}(\mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_aa92d24c24e09799001a154c415a7e5d5}{local\_bytes\_checker}}),\ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a76ff0b6002a68f55667c8e51800317d9}{options}}(\mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a76ff0b6002a68f55667c8e51800317d9}{options}})\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a8f88afbef502c7060c930b962d5a2b61}\index{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker}!operand\_stack\_type\_tracker@{operand\_stack\_type\_tracker}}
+\index{operand\_stack\_type\_tracker@{operand\_stack\_type\_tracker}!sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker}}
+\doxysubsubsection{\texorpdfstring{operand\_stack\_type\_tracker()}{operand\_stack\_type\_tracker()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a8f88afbef502c7060c930b962d5a2b61} 
+template$<$typename \mbox{\hyperlink{class_writer}{Writer}} , typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1binary__parser}{sysio\+::vm\+::binary\+\_\+parser}}$<$ \mbox{\hyperlink{class_writer}{Writer}}, Options, Debug\+Info $>$\+::operand\+\_\+stack\+\_\+type\+\_\+tracker\+::operand\+\_\+stack\+\_\+type\+\_\+tracker (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1max__func__local__bytes__stack__checker}{detail\+::max\+\_\+func\+\_\+local\+\_\+bytes\+\_\+stack\+\_\+checker}}$<$ Options $>$}]{local\+\_\+bytes\+\_\+checker}{, }\item[{const Options \&}]{options}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2parser_8hpp_source_l00625}{625}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00626\ \ \ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_aa92d24c24e09799001a154c415a7e5d5}{local\_bytes\_checker}}(\mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_aa92d24c24e09799001a154c415a7e5d5}{local\_bytes\_checker}}),\ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a76ff0b6002a68f55667c8e51800317d9}{options}}(\mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a76ff0b6002a68f55667c8e51800317d9}{options}})\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a22bd096d07d5c5e17b43c0866ff561e1}\index{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker}!depth@{depth}}
+\index{depth@{depth}!sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker}}
+\doxysubsubsection{\texorpdfstring{depth()}{depth()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a22bd096d07d5c5e17b43c0866ff561e1} 
+template$<$typename \mbox{\hyperlink{class_writer}{Writer}} , typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classsysio_1_1vm_1_1binary__parser}{sysio\+::vm\+::binary\+\_\+parser}}$<$ \mbox{\hyperlink{class_writer}{Writer}}, Options, Debug\+Info $>$\+::operand\+\_\+stack\+\_\+type\+\_\+tracker\+::depth (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_source_l00702}{702}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00702\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a325d66e5e83c656eadca3481a98f8d10}{operand\_depth}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a22bd096d07d5c5e17b43c0866ff561e1}\index{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker}!depth@{depth}}
+\index{depth@{depth}!sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker}}
+\doxysubsubsection{\texorpdfstring{depth()}{depth()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a22bd096d07d5c5e17b43c0866ff561e1} 
+template$<$typename \mbox{\hyperlink{class_writer}{Writer}} , typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classsysio_1_1vm_1_1binary__parser}{sysio\+::vm\+::binary\+\_\+parser}}$<$ \mbox{\hyperlink{class_writer}{Writer}}, Options, Debug\+Info $>$\+::operand\+\_\+stack\+\_\+type\+\_\+tracker\+::depth (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2parser_8hpp_source_l00702}{702}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00702\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a325d66e5e83c656eadca3481a98f8d10}{operand\_depth}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_aafc1eb91b54fa4558534986a9c67a87b}\index{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker}!finish@{finish}}
+\index{finish@{finish}!sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker}}
+\doxysubsubsection{\texorpdfstring{finish()}{finish()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_aafc1eb91b54fa4558534986a9c67a87b} 
+template$<$typename \mbox{\hyperlink{class_writer}{Writer}} , typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+void \mbox{\hyperlink{classsysio_1_1vm_1_1binary__parser}{sysio\+::vm\+::binary\+\_\+parser}}$<$ \mbox{\hyperlink{class_writer}{Writer}}, Options, Debug\+Info $>$\+::operand\+\_\+stack\+\_\+type\+\_\+tracker\+::finish (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_source_l00696}{696}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00696\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00697\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{structstate}{state}}.empty()\ \&\&\ \mbox{\hyperlink{structstate}{state}}.back()\ ==\ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_ab04e67603efd1888e397cd625eb97dd7}{unreachable\_tag}})\ \{}
+\DoxyCodeLine{00698\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.pop\_back();}
+\DoxyCodeLine{00699\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00700\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(\mbox{\hyperlink{structstate}{state}}.empty(),\ wasm\_parse\_exception,\ \textcolor{stringliteral}{"{}stack\ not\ empty\ at\ scope\ end"{}});}
+\DoxyCodeLine{00701\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_aafc1eb91b54fa4558534986a9c67a87b}\index{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker}!finish@{finish}}
+\index{finish@{finish}!sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker}}
+\doxysubsubsection{\texorpdfstring{finish()}{finish()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_aafc1eb91b54fa4558534986a9c67a87b} 
+template$<$typename \mbox{\hyperlink{class_writer}{Writer}} , typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+void \mbox{\hyperlink{classsysio_1_1vm_1_1binary__parser}{sysio\+::vm\+::binary\+\_\+parser}}$<$ \mbox{\hyperlink{class_writer}{Writer}}, Options, Debug\+Info $>$\+::operand\+\_\+stack\+\_\+type\+\_\+tracker\+::finish (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2parser_8hpp_source_l00696}{696}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00696\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00697\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{structstate}{state}}.empty()\ \&\&\ \mbox{\hyperlink{structstate}{state}}.back()\ ==\ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_ab04e67603efd1888e397cd625eb97dd7}{unreachable\_tag}})\ \{}
+\DoxyCodeLine{00698\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.pop\_back();}
+\DoxyCodeLine{00699\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00700\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(\mbox{\hyperlink{structstate}{state}}.empty(),\ wasm\_parse\_exception,\ \textcolor{stringliteral}{"{}stack\ not\ empty\ at\ scope\ end"{}});}
+\DoxyCodeLine{00701\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_adaddc3a866ee287d6f9a223ddef98e3d}\index{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker}!pop@{pop}}
+\index{pop@{pop}!sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker}}
+\doxysubsubsection{\texorpdfstring{pop()}{pop()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_adaddc3a866ee287d6f9a223ddef98e3d} 
+template$<$typename \mbox{\hyperlink{class_writer}{Writer}} , typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{classsysio_1_1vm_1_1binary__parser}{sysio\+::vm\+::binary\+\_\+parser}}$<$ \mbox{\hyperlink{class_writer}{Writer}}, Options, Debug\+Info $>$\+::operand\+\_\+stack\+\_\+type\+\_\+tracker\+::pop (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_source_l00654}{654}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00654\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00655\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(!\mbox{\hyperlink{structstate}{state}}.empty()\ \&\&\ \mbox{\hyperlink{structstate}{state}}.back()\ !=\ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_af31cb054fa61ea1816199fc76d31de89}{scope\_tag}},\ wasm\_parse\_exception,\ \textcolor{stringliteral}{"{}unexpected\ pop"{}});}
+\DoxyCodeLine{00656\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structstate}{state}}.back()\ ==\ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_ab04e67603efd1888e397cd625eb97dd7}{unreachable\_tag}})}
+\DoxyCodeLine{00657\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1vm_1_1binary__parser_a9b9c7f72157ee3ac32591e04afa5f94e}{any\_type}};}
+\DoxyCodeLine{00658\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00659\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ result\ =\ \mbox{\hyperlink{structstate}{state}}.back();}
+\DoxyCodeLine{00660\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/-\/\mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a325d66e5e83c656eadca3481a98f8d10}{operand\_depth}};}
+\DoxyCodeLine{00661\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_aa92d24c24e09799001a154c415a7e5d5}{local\_bytes\_checker}}.pop\_stack(\mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a76ff0b6002a68f55667c8e51800317d9}{options}},\ result);}
+\DoxyCodeLine{00662\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.pop\_back();}
+\DoxyCodeLine{00663\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00664\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00665\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_adaddc3a866ee287d6f9a223ddef98e3d_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_adaddc3a866ee287d6f9a223ddef98e3d}\index{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker}!pop@{pop}}
+\index{pop@{pop}!sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker}}
+\doxysubsubsection{\texorpdfstring{pop()}{pop()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_adaddc3a866ee287d6f9a223ddef98e3d} 
+template$<$typename \mbox{\hyperlink{class_writer}{Writer}} , typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{classsysio_1_1vm_1_1binary__parser}{sysio\+::vm\+::binary\+\_\+parser}}$<$ \mbox{\hyperlink{class_writer}{Writer}}, Options, Debug\+Info $>$\+::operand\+\_\+stack\+\_\+type\+\_\+tracker\+::pop (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2parser_8hpp_source_l00654}{654}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00654\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00655\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(!\mbox{\hyperlink{structstate}{state}}.empty()\ \&\&\ \mbox{\hyperlink{structstate}{state}}.back()\ !=\ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_af31cb054fa61ea1816199fc76d31de89}{scope\_tag}},\ wasm\_parse\_exception,\ \textcolor{stringliteral}{"{}unexpected\ pop"{}});}
+\DoxyCodeLine{00656\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structstate}{state}}.back()\ ==\ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_ab04e67603efd1888e397cd625eb97dd7}{unreachable\_tag}})}
+\DoxyCodeLine{00657\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1vm_1_1binary__parser_a9b9c7f72157ee3ac32591e04afa5f94e}{any\_type}};}
+\DoxyCodeLine{00658\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00659\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ result\ =\ \mbox{\hyperlink{structstate}{state}}.back();}
+\DoxyCodeLine{00660\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/-\/\mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a325d66e5e83c656eadca3481a98f8d10}{operand\_depth}};}
+\DoxyCodeLine{00661\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_aa92d24c24e09799001a154c415a7e5d5}{local\_bytes\_checker}}.pop\_stack(\mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a76ff0b6002a68f55667c8e51800317d9}{options}},\ result);}
+\DoxyCodeLine{00662\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.pop\_back();}
+\DoxyCodeLine{00663\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00664\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00665\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_adaddc3a866ee287d6f9a223ddef98e3d_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a55a8a910aa884c6ded25f2e5b818ebad}\index{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker}!pop@{pop}}
+\index{pop@{pop}!sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker}}
+\doxysubsubsection{\texorpdfstring{pop()}{pop()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a55a8a910aa884c6ded25f2e5b818ebad} 
+template$<$typename \mbox{\hyperlink{class_writer}{Writer}} , typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+void \mbox{\hyperlink{classsysio_1_1vm_1_1binary__parser}{sysio\+::vm\+::binary\+\_\+parser}}$<$ \mbox{\hyperlink{class_writer}{Writer}}, Options, Debug\+Info $>$\+::operand\+\_\+stack\+\_\+type\+\_\+tracker\+::pop (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}}}]{expected}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_source_l00643}{643}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00643\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00644\ \ \ \ \ \ \ \ \ \ \ \ \ assert(expected\ !=\ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_ab04e67603efd1888e397cd625eb97dd7}{unreachable\_tag}}\ \&\&\ expected\ !=\ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_af31cb054fa61ea1816199fc76d31de89}{scope\_tag}});}
+\DoxyCodeLine{00645\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(expected\ ==\ types::pseudo)\ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00646\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(!\mbox{\hyperlink{structstate}{state}}.empty(),\ wasm\_parse\_exception,\ \textcolor{stringliteral}{"{}unexpected\ pop"{}});}
+\DoxyCodeLine{00647\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structstate}{state}}.back()\ !=\ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_ab04e67603efd1888e397cd625eb97dd7}{unreachable\_tag}})\ \{}
+\DoxyCodeLine{00648\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(\mbox{\hyperlink{structstate}{state}}.back()\ ==\ expected\ ||\ \mbox{\hyperlink{structstate}{state}}.back()\ ==\ \mbox{\hyperlink{classsysio_1_1vm_1_1binary__parser_a9b9c7f72157ee3ac32591e04afa5f94e}{any\_type}},\ wasm\_parse\_exception,\ \textcolor{stringliteral}{"{}wrong\ type"{}});}
+\DoxyCodeLine{00649\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_aa92d24c24e09799001a154c415a7e5d5}{local\_bytes\_checker}}.pop\_stack(\mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a76ff0b6002a68f55667c8e51800317d9}{options}},\ expected);}
+\DoxyCodeLine{00650\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/-\/\mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a325d66e5e83c656eadca3481a98f8d10}{operand\_depth}};}
+\DoxyCodeLine{00651\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.pop\_back();}
+\DoxyCodeLine{00652\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00653\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a55a8a910aa884c6ded25f2e5b818ebad_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a55a8a910aa884c6ded25f2e5b818ebad}\index{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker}!pop@{pop}}
+\index{pop@{pop}!sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker}}
+\doxysubsubsection{\texorpdfstring{pop()}{pop()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a55a8a910aa884c6ded25f2e5b818ebad} 
+template$<$typename \mbox{\hyperlink{class_writer}{Writer}} , typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+void \mbox{\hyperlink{classsysio_1_1vm_1_1binary__parser}{sysio\+::vm\+::binary\+\_\+parser}}$<$ \mbox{\hyperlink{class_writer}{Writer}}, Options, Debug\+Info $>$\+::operand\+\_\+stack\+\_\+type\+\_\+tracker\+::pop (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}}}]{expected}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2parser_8hpp_source_l00643}{643}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00643\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00644\ \ \ \ \ \ \ \ \ \ \ \ \ assert(expected\ !=\ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_ab04e67603efd1888e397cd625eb97dd7}{unreachable\_tag}}\ \&\&\ expected\ !=\ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_af31cb054fa61ea1816199fc76d31de89}{scope\_tag}});}
+\DoxyCodeLine{00645\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(expected\ ==\ types::pseudo)\ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00646\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(!\mbox{\hyperlink{structstate}{state}}.empty(),\ wasm\_parse\_exception,\ \textcolor{stringliteral}{"{}unexpected\ pop"{}});}
+\DoxyCodeLine{00647\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structstate}{state}}.back()\ !=\ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_ab04e67603efd1888e397cd625eb97dd7}{unreachable\_tag}})\ \{}
+\DoxyCodeLine{00648\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(\mbox{\hyperlink{structstate}{state}}.back()\ ==\ expected\ ||\ \mbox{\hyperlink{structstate}{state}}.back()\ ==\ \mbox{\hyperlink{classsysio_1_1vm_1_1binary__parser_a9b9c7f72157ee3ac32591e04afa5f94e}{any\_type}},\ wasm\_parse\_exception,\ \textcolor{stringliteral}{"{}wrong\ type"{}});}
+\DoxyCodeLine{00649\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_aa92d24c24e09799001a154c415a7e5d5}{local\_bytes\_checker}}.pop\_stack(\mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a76ff0b6002a68f55667c8e51800317d9}{options}},\ expected);}
+\DoxyCodeLine{00650\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/-\/\mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a325d66e5e83c656eadca3481a98f8d10}{operand\_depth}};}
+\DoxyCodeLine{00651\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.pop\_back();}
+\DoxyCodeLine{00652\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00653\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a55a8a910aa884c6ded25f2e5b818ebad_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_acc8fb187cb37fc4923597cc7b190aed7}\index{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker}!pop\_scope@{pop\_scope}}
+\index{pop\_scope@{pop\_scope}!sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker}}
+\doxysubsubsection{\texorpdfstring{pop\_scope()}{pop\_scope()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_acc8fb187cb37fc4923597cc7b190aed7} 
+template$<$typename \mbox{\hyperlink{class_writer}{Writer}} , typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+void \mbox{\hyperlink{classsysio_1_1vm_1_1binary__parser}{sysio\+::vm\+::binary\+\_\+parser}}$<$ \mbox{\hyperlink{class_writer}{Writer}}, Options, Debug\+Info $>$\+::operand\+\_\+stack\+\_\+type\+\_\+tracker\+::pop\+\_\+scope (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}}}]{expected\+\_\+result}{ = {\ttfamily types\+:\+:pseudo}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_source_l00683}{683}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00683\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00684\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_adaddc3a866ee287d6f9a223ddef98e3d}{pop}}(\mbox{\hyperlink{ssh_8c_a2cd19dc464a5cf91cd7c2e717b9dffd7}{expected\_result}});}
+\DoxyCodeLine{00685\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(!\mbox{\hyperlink{structstate}{state}}.empty(),\ wasm\_parse\_exception,\ \textcolor{stringliteral}{"{}unexpected\ end"{}});}
+\DoxyCodeLine{00686\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structstate}{state}}.back()\ ==\ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_ab04e67603efd1888e397cd625eb97dd7}{unreachable\_tag}})\ \{}
+\DoxyCodeLine{00687\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_aa92d24c24e09799001a154c415a7e5d5}{local\_bytes\_checker}}.pop\_unreachable();}
+\DoxyCodeLine{00688\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.pop\_back();}
+\DoxyCodeLine{00689\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00690\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(\mbox{\hyperlink{structstate}{state}}.back()\ ==\ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_af31cb054fa61ea1816199fc76d31de89}{scope\_tag}},\ wasm\_parse\_exception,\ \textcolor{stringliteral}{"{}unexpected\ end"{}});}
+\DoxyCodeLine{00691\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.pop\_back();}
+\DoxyCodeLine{00692\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ssh_8c_a2cd19dc464a5cf91cd7c2e717b9dffd7}{expected\_result}}\ !=\ types::pseudo)\ \{}
+\DoxyCodeLine{00693\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_aebac9a4a77db42a9a4a6eafc0800e90b}{push}}(\mbox{\hyperlink{ssh_8c_a2cd19dc464a5cf91cd7c2e717b9dffd7}{expected\_result}});}
+\DoxyCodeLine{00694\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00695\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_acc8fb187cb37fc4923597cc7b190aed7_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_acc8fb187cb37fc4923597cc7b190aed7}\index{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker}!pop\_scope@{pop\_scope}}
+\index{pop\_scope@{pop\_scope}!sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker}}
+\doxysubsubsection{\texorpdfstring{pop\_scope()}{pop\_scope()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_acc8fb187cb37fc4923597cc7b190aed7} 
+template$<$typename \mbox{\hyperlink{class_writer}{Writer}} , typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+void \mbox{\hyperlink{classsysio_1_1vm_1_1binary__parser}{sysio\+::vm\+::binary\+\_\+parser}}$<$ \mbox{\hyperlink{class_writer}{Writer}}, Options, Debug\+Info $>$\+::operand\+\_\+stack\+\_\+type\+\_\+tracker\+::pop\+\_\+scope (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}}}]{expected\+\_\+result}{ = {\ttfamily types\+:\+:pseudo}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2parser_8hpp_source_l00683}{683}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00683\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00684\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_adaddc3a866ee287d6f9a223ddef98e3d}{pop}}(\mbox{\hyperlink{ssh_8c_a2cd19dc464a5cf91cd7c2e717b9dffd7}{expected\_result}});}
+\DoxyCodeLine{00685\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(!\mbox{\hyperlink{structstate}{state}}.empty(),\ wasm\_parse\_exception,\ \textcolor{stringliteral}{"{}unexpected\ end"{}});}
+\DoxyCodeLine{00686\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structstate}{state}}.back()\ ==\ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_ab04e67603efd1888e397cd625eb97dd7}{unreachable\_tag}})\ \{}
+\DoxyCodeLine{00687\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_aa92d24c24e09799001a154c415a7e5d5}{local\_bytes\_checker}}.pop\_unreachable();}
+\DoxyCodeLine{00688\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.pop\_back();}
+\DoxyCodeLine{00689\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00690\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(\mbox{\hyperlink{structstate}{state}}.back()\ ==\ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_af31cb054fa61ea1816199fc76d31de89}{scope\_tag}},\ wasm\_parse\_exception,\ \textcolor{stringliteral}{"{}unexpected\ end"{}});}
+\DoxyCodeLine{00691\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.pop\_back();}
+\DoxyCodeLine{00692\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ssh_8c_a2cd19dc464a5cf91cd7c2e717b9dffd7}{expected\_result}}\ !=\ types::pseudo)\ \{}
+\DoxyCodeLine{00693\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_aebac9a4a77db42a9a4a6eafc0800e90b}{push}}(\mbox{\hyperlink{ssh_8c_a2cd19dc464a5cf91cd7c2e717b9dffd7}{expected\_result}});}
+\DoxyCodeLine{00694\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00695\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_acc8fb187cb37fc4923597cc7b190aed7_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_aebac9a4a77db42a9a4a6eafc0800e90b}\index{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker}!push@{push}}
+\index{push@{push}!sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker}}
+\doxysubsubsection{\texorpdfstring{push()}{push()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_aebac9a4a77db42a9a4a6eafc0800e90b} 
+template$<$typename \mbox{\hyperlink{class_writer}{Writer}} , typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+void \mbox{\hyperlink{classsysio_1_1vm_1_1binary__parser}{sysio\+::vm\+::binary\+\_\+parser}}$<$ \mbox{\hyperlink{class_writer}{Writer}}, Options, Debug\+Info $>$\+::operand\+\_\+stack\+\_\+type\+\_\+tracker\+::push (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}}}]{type}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_source_l00634}{634}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00634\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00635\ \ \ \ \ \ \ \ \ \ \ \ \ assert(type\ !=\ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_ab04e67603efd1888e397cd625eb97dd7}{unreachable\_tag}}\ \&\&\ type\ !=\ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_af31cb054fa61ea1816199fc76d31de89}{scope\_tag}});}
+\DoxyCodeLine{00636\ \ \ \ \ \ \ \ \ \ \ \ \ assert(type\ ==\ types::i32\ ||\ type\ ==\ types::i64\ ||\ type\ ==\ types::f32\ ||\ type\ ==\ types::f64\ ||\ type\ ==\ \mbox{\hyperlink{classsysio_1_1vm_1_1binary__parser_a9b9c7f72157ee3ac32591e04afa5f94e}{any\_type}});}
+\DoxyCodeLine{00637\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(\mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a325d66e5e83c656eadca3481a98f8d10}{operand\_depth}}\ <\ std::numeric\_limits<uint32\_t>::max(),\ wasm\_parse\_exception,\ \textcolor{stringliteral}{"{}integer\ overflow\ in\ operand\ depth"{}});}
+\DoxyCodeLine{00638\ \ \ \ \ \ \ \ \ \ \ \ \ ++\mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a325d66e5e83c656eadca3481a98f8d10}{operand\_depth}};}
+\DoxyCodeLine{00639\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a2bf2d13eac304d198c07ec5d37aec97b}{maximum\_operand\_depth}}\ =\ std::max(\mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a325d66e5e83c656eadca3481a98f8d10}{operand\_depth}},\ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a2bf2d13eac304d198c07ec5d37aec97b}{maximum\_operand\_depth}});}
+\DoxyCodeLine{00640\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.push\_back(type);}
+\DoxyCodeLine{00641\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_aa92d24c24e09799001a154c415a7e5d5}{local\_bytes\_checker}}.push\_stack(\mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a76ff0b6002a68f55667c8e51800317d9}{options}},\ type);}
+\DoxyCodeLine{00642\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_aebac9a4a77db42a9a4a6eafc0800e90b_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_aebac9a4a77db42a9a4a6eafc0800e90b}\index{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker}!push@{push}}
+\index{push@{push}!sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker}}
+\doxysubsubsection{\texorpdfstring{push()}{push()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_aebac9a4a77db42a9a4a6eafc0800e90b} 
+template$<$typename \mbox{\hyperlink{class_writer}{Writer}} , typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+void \mbox{\hyperlink{classsysio_1_1vm_1_1binary__parser}{sysio\+::vm\+::binary\+\_\+parser}}$<$ \mbox{\hyperlink{class_writer}{Writer}}, Options, Debug\+Info $>$\+::operand\+\_\+stack\+\_\+type\+\_\+tracker\+::push (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}}}]{type}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2parser_8hpp_source_l00634}{634}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00634\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00635\ \ \ \ \ \ \ \ \ \ \ \ \ assert(type\ !=\ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_ab04e67603efd1888e397cd625eb97dd7}{unreachable\_tag}}\ \&\&\ type\ !=\ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_af31cb054fa61ea1816199fc76d31de89}{scope\_tag}});}
+\DoxyCodeLine{00636\ \ \ \ \ \ \ \ \ \ \ \ \ assert(type\ ==\ types::i32\ ||\ type\ ==\ types::i64\ ||\ type\ ==\ types::f32\ ||\ type\ ==\ types::f64\ ||\ type\ ==\ \mbox{\hyperlink{classsysio_1_1vm_1_1binary__parser_a9b9c7f72157ee3ac32591e04afa5f94e}{any\_type}});}
+\DoxyCodeLine{00637\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(\mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a325d66e5e83c656eadca3481a98f8d10}{operand\_depth}}\ <\ std::numeric\_limits<uint32\_t>::max(),\ wasm\_parse\_exception,\ \textcolor{stringliteral}{"{}integer\ overflow\ in\ operand\ depth"{}});}
+\DoxyCodeLine{00638\ \ \ \ \ \ \ \ \ \ \ \ \ ++\mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a325d66e5e83c656eadca3481a98f8d10}{operand\_depth}};}
+\DoxyCodeLine{00639\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a2bf2d13eac304d198c07ec5d37aec97b}{maximum\_operand\_depth}}\ =\ std::max(\mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a325d66e5e83c656eadca3481a98f8d10}{operand\_depth}},\ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a2bf2d13eac304d198c07ec5d37aec97b}{maximum\_operand\_depth}});}
+\DoxyCodeLine{00640\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.push\_back(type);}
+\DoxyCodeLine{00641\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_aa92d24c24e09799001a154c415a7e5d5}{local\_bytes\_checker}}.push\_stack(\mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a76ff0b6002a68f55667c8e51800317d9}{options}},\ type);}
+\DoxyCodeLine{00642\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_aebac9a4a77db42a9a4a6eafc0800e90b_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a5d7689b9c817c1483a3e8397f55c0fb5}\index{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker}!push\_scope@{push\_scope}}
+\index{push\_scope@{push\_scope}!sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker}}
+\doxysubsubsection{\texorpdfstring{push\_scope()}{push\_scope()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a5d7689b9c817c1483a3e8397f55c0fb5} 
+template$<$typename \mbox{\hyperlink{class_writer}{Writer}} , typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+void \mbox{\hyperlink{classsysio_1_1vm_1_1binary__parser}{sysio\+::vm\+::binary\+\_\+parser}}$<$ \mbox{\hyperlink{class_writer}{Writer}}, Options, Debug\+Info $>$\+::operand\+\_\+stack\+\_\+type\+\_\+tracker\+::push\+\_\+scope (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_source_l00680}{680}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00680\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00681\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.push\_back(\mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_af31cb054fa61ea1816199fc76d31de89}{scope\_tag}});}
+\DoxyCodeLine{00682\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a5d7689b9c817c1483a3e8397f55c0fb5}\index{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker}!push\_scope@{push\_scope}}
+\index{push\_scope@{push\_scope}!sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker}}
+\doxysubsubsection{\texorpdfstring{push\_scope()}{push\_scope()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a5d7689b9c817c1483a3e8397f55c0fb5} 
+template$<$typename \mbox{\hyperlink{class_writer}{Writer}} , typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+void \mbox{\hyperlink{classsysio_1_1vm_1_1binary__parser}{sysio\+::vm\+::binary\+\_\+parser}}$<$ \mbox{\hyperlink{class_writer}{Writer}}, Options, Debug\+Info $>$\+::operand\+\_\+stack\+\_\+type\+\_\+tracker\+::push\+\_\+scope (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2parser_8hpp_source_l00680}{680}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00680\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00681\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.push\_back(\mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_af31cb054fa61ea1816199fc76d31de89}{scope\_tag}});}
+\DoxyCodeLine{00682\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a2e46720d4a76f569e3b671873c76c7b8}\index{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker}!start\_unreachable@{start\_unreachable}}
+\index{start\_unreachable@{start\_unreachable}!sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker}}
+\doxysubsubsection{\texorpdfstring{start\_unreachable()}{start\_unreachable()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a2e46720d4a76f569e3b671873c76c7b8} 
+template$<$typename \mbox{\hyperlink{class_writer}{Writer}} , typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+void \mbox{\hyperlink{classsysio_1_1vm_1_1binary__parser}{sysio\+::vm\+::binary\+\_\+parser}}$<$ \mbox{\hyperlink{class_writer}{Writer}}, Options, Debug\+Info $>$\+::operand\+\_\+stack\+\_\+type\+\_\+tracker\+::start\+\_\+unreachable (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_source_l00671}{671}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00671\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00672\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(!\mbox{\hyperlink{structstate}{state}}.empty()\ \&\&\ \mbox{\hyperlink{structstate}{state}}.back()\ !=\ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_af31cb054fa61ea1816199fc76d31de89}{scope\_tag}})\ \{}
+\DoxyCodeLine{00673\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structstate}{state}}.back()\ !=\ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_ab04e67603efd1888e397cd625eb97dd7}{unreachable\_tag}})}
+\DoxyCodeLine{00674\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/-\/\mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a325d66e5e83c656eadca3481a98f8d10}{operand\_depth}};}
+\DoxyCodeLine{00675\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.pop\_back();}
+\DoxyCodeLine{00676\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00677\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_aa92d24c24e09799001a154c415a7e5d5}{local\_bytes\_checker}}.push\_unreachable();}
+\DoxyCodeLine{00678\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.push\_back(\mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_ab04e67603efd1888e397cd625eb97dd7}{unreachable\_tag}});}
+\DoxyCodeLine{00679\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a2e46720d4a76f569e3b671873c76c7b8_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a2e46720d4a76f569e3b671873c76c7b8}\index{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker}!start\_unreachable@{start\_unreachable}}
+\index{start\_unreachable@{start\_unreachable}!sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker}}
+\doxysubsubsection{\texorpdfstring{start\_unreachable()}{start\_unreachable()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a2e46720d4a76f569e3b671873c76c7b8} 
+template$<$typename \mbox{\hyperlink{class_writer}{Writer}} , typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+void \mbox{\hyperlink{classsysio_1_1vm_1_1binary__parser}{sysio\+::vm\+::binary\+\_\+parser}}$<$ \mbox{\hyperlink{class_writer}{Writer}}, Options, Debug\+Info $>$\+::operand\+\_\+stack\+\_\+type\+\_\+tracker\+::start\+\_\+unreachable (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2parser_8hpp_source_l00671}{671}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00671\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00672\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(!\mbox{\hyperlink{structstate}{state}}.empty()\ \&\&\ \mbox{\hyperlink{structstate}{state}}.back()\ !=\ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_af31cb054fa61ea1816199fc76d31de89}{scope\_tag}})\ \{}
+\DoxyCodeLine{00673\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structstate}{state}}.back()\ !=\ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_ab04e67603efd1888e397cd625eb97dd7}{unreachable\_tag}})}
+\DoxyCodeLine{00674\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/-\/\mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a325d66e5e83c656eadca3481a98f8d10}{operand\_depth}};}
+\DoxyCodeLine{00675\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.pop\_back();}
+\DoxyCodeLine{00676\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00677\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_aa92d24c24e09799001a154c415a7e5d5}{local\_bytes\_checker}}.push\_unreachable();}
+\DoxyCodeLine{00678\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.push\_back(\mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_ab04e67603efd1888e397cd625eb97dd7}{unreachable\_tag}});}
+\DoxyCodeLine{00679\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a2e46720d4a76f569e3b671873c76c7b8_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a520e4229e5669b7ea6251a4cb33a6bb0}\index{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker}!top@{top}}
+\index{top@{top}!sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker}}
+\doxysubsubsection{\texorpdfstring{top()}{top()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a520e4229e5669b7ea6251a4cb33a6bb0} 
+template$<$typename \mbox{\hyperlink{class_writer}{Writer}} , typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+void \mbox{\hyperlink{classsysio_1_1vm_1_1binary__parser}{sysio\+::vm\+::binary\+\_\+parser}}$<$ \mbox{\hyperlink{class_writer}{Writer}}, Options, Debug\+Info $>$\+::operand\+\_\+stack\+\_\+type\+\_\+tracker\+::top (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}}}]{expected}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_source_l00666}{666}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00666\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00667\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Constrain\ the\ top\ of\ the\ stack\ if\ it\ was\ any\_type\ or\ unreachable\_tag.}}
+\DoxyCodeLine{00668\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_adaddc3a866ee287d6f9a223ddef98e3d}{pop}}(expected);}
+\DoxyCodeLine{00669\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_aebac9a4a77db42a9a4a6eafc0800e90b}{push}}(expected);}
+\DoxyCodeLine{00670\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a520e4229e5669b7ea6251a4cb33a6bb0}\index{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker}!top@{top}}
+\index{top@{top}!sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker}}
+\doxysubsubsection{\texorpdfstring{top()}{top()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a520e4229e5669b7ea6251a4cb33a6bb0} 
+template$<$typename \mbox{\hyperlink{class_writer}{Writer}} , typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+void \mbox{\hyperlink{classsysio_1_1vm_1_1binary__parser}{sysio\+::vm\+::binary\+\_\+parser}}$<$ \mbox{\hyperlink{class_writer}{Writer}}, Options, Debug\+Info $>$\+::operand\+\_\+stack\+\_\+type\+\_\+tracker\+::top (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}}}]{expected}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2parser_8hpp_source_l00666}{666}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00666\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00667\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Constrain\ the\ top\ of\ the\ stack\ if\ it\ was\ any\_type\ or\ unreachable\_tag.}}
+\DoxyCodeLine{00668\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_adaddc3a866ee287d6f9a223ddef98e3d}{pop}}(expected);}
+\DoxyCodeLine{00669\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_aebac9a4a77db42a9a4a6eafc0800e90b}{push}}(expected);}
+\DoxyCodeLine{00670\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_aa92d24c24e09799001a154c415a7e5d5}\index{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker}!local\_bytes\_checker@{local\_bytes\_checker}}
+\index{local\_bytes\_checker@{local\_bytes\_checker}!sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker}}
+\doxysubsubsection{\texorpdfstring{local\_bytes\_checker}{local\_bytes\_checker}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_aa92d24c24e09799001a154c415a7e5d5} 
+template$<$typename \mbox{\hyperlink{class_writer}{Writer}} , typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+\mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1max__func__local__bytes__stack__checker}{detail\+::max\+\_\+func\+\_\+local\+\_\+bytes\+\_\+stack\+\_\+checker}}$<$ Options $>$ \mbox{\hyperlink{classsysio_1_1vm_1_1binary__parser}{sysio\+::vm\+::binary\+\_\+parser}}$<$ \mbox{\hyperlink{class_writer}{Writer}}, Options, Debug\+Info $>$\+::operand\+\_\+stack\+\_\+type\+\_\+tracker\+::local\+\_\+bytes\+\_\+checker}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_source_l00632}{632}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_source}{parser.\+hpp}}.
+
+\Hypertarget{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a2bf2d13eac304d198c07ec5d37aec97b}\index{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker}!maximum\_operand\_depth@{maximum\_operand\_depth}}
+\index{maximum\_operand\_depth@{maximum\_operand\_depth}!sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker}}
+\doxysubsubsection{\texorpdfstring{maximum\_operand\_depth}{maximum\_operand\_depth}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a2bf2d13eac304d198c07ec5d37aec97b} 
+template$<$typename \mbox{\hyperlink{class_writer}{Writer}} , typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classsysio_1_1vm_1_1binary__parser}{sysio\+::vm\+::binary\+\_\+parser}}$<$ \mbox{\hyperlink{class_writer}{Writer}}, Options, Debug\+Info $>$\+::operand\+\_\+stack\+\_\+type\+\_\+tracker\+::maximum\+\_\+operand\+\_\+depth = 0}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_source_l00631}{631}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_source}{parser.\+hpp}}.
+
+\Hypertarget{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a325d66e5e83c656eadca3481a98f8d10}\index{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker}!operand\_depth@{operand\_depth}}
+\index{operand\_depth@{operand\_depth}!sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker}}
+\doxysubsubsection{\texorpdfstring{operand\_depth}{operand\_depth}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a325d66e5e83c656eadca3481a98f8d10} 
+template$<$typename \mbox{\hyperlink{class_writer}{Writer}} , typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classsysio_1_1vm_1_1binary__parser}{sysio\+::vm\+::binary\+\_\+parser}}$<$ \mbox{\hyperlink{class_writer}{Writer}}, Options, Debug\+Info $>$\+::operand\+\_\+stack\+\_\+type\+\_\+tracker\+::operand\+\_\+depth = 0}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_source_l00630}{630}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_source}{parser.\+hpp}}.
+
+\Hypertarget{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a76ff0b6002a68f55667c8e51800317d9}\index{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker}!options@{options}}
+\index{options@{options}!sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker}}
+\doxysubsubsection{\texorpdfstring{options}{options}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_a76ff0b6002a68f55667c8e51800317d9} 
+template$<$typename \mbox{\hyperlink{class_writer}{Writer}} , typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+const Options \& \mbox{\hyperlink{classsysio_1_1vm_1_1binary__parser}{sysio\+::vm\+::binary\+\_\+parser}}$<$ \mbox{\hyperlink{class_writer}{Writer}}, Options, Debug\+Info $>$\+::operand\+\_\+stack\+\_\+type\+\_\+tracker\+::options}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_source_l00633}{633}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_source}{parser.\+hpp}}.
+
+\Hypertarget{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_af31cb054fa61ea1816199fc76d31de89}\index{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker}!scope\_tag@{scope\_tag}}
+\index{scope\_tag@{scope\_tag}!sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker}}
+\doxysubsubsection{\texorpdfstring{scope\_tag}{scope\_tag}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_af31cb054fa61ea1816199fc76d31de89} 
+template$<$typename \mbox{\hyperlink{class_writer}{Writer}} , typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+static constexpr \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{classsysio_1_1vm_1_1binary__parser}{sysio\+::vm\+::binary\+\_\+parser}}$<$ \mbox{\hyperlink{class_writer}{Writer}}, Options, Debug\+Info $>$\+::operand\+\_\+stack\+\_\+type\+\_\+tracker\+::scope\+\_\+tag = 0x81\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_source_l00629}{629}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_source}{parser.\+hpp}}.
+
+\Hypertarget{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_abbf0ab8cb9eb86b8678378c97d8f397a}\index{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker}!state@{state}}
+\index{state@{state}!sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker}}
+\doxysubsubsection{\texorpdfstring{state}{state}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_abbf0ab8cb9eb86b8678378c97d8f397a} 
+template$<$typename \mbox{\hyperlink{class_writer}{Writer}} , typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+std\+::vector$<$ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} $>$ \mbox{\hyperlink{classsysio_1_1vm_1_1binary__parser}{sysio\+::vm\+::binary\+\_\+parser}}$<$ \mbox{\hyperlink{class_writer}{Writer}}, Options, Debug\+Info $>$\+::operand\+\_\+stack\+\_\+type\+\_\+tracker\+::state = \{ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_af31cb054fa61ea1816199fc76d31de89}{scope\+\_\+tag}} \}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_source_l00627}{627}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00627\ \{\ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_af31cb054fa61ea1816199fc76d31de89}{scope\_tag}}\ \};}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_ab04e67603efd1888e397cd625eb97dd7}\index{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker}!unreachable\_tag@{unreachable\_tag}}
+\index{unreachable\_tag@{unreachable\_tag}!sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::operand\_stack\_type\_tracker}}
+\doxysubsubsection{\texorpdfstring{unreachable\_tag}{unreachable\_tag}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker_ab04e67603efd1888e397cd625eb97dd7} 
+template$<$typename \mbox{\hyperlink{class_writer}{Writer}} , typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+static constexpr \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{classsysio_1_1vm_1_1binary__parser}{sysio\+::vm\+::binary\+\_\+parser}}$<$ \mbox{\hyperlink{class_writer}{Writer}}, Options, Debug\+Info $>$\+::operand\+\_\+stack\+\_\+type\+\_\+tracker\+::unreachable\+\_\+tag = 0x80\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_source_l00628}{628}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/include/sysio/sysio/vm/\mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp}{parser.\+hpp}}\item 
+libraries/sys-\/vm/include/sysio/vm/\mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2parser_8hpp}{parser.\+hpp}}\end{DoxyCompactItemize}

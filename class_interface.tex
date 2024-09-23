@@ -1,0 +1,160 @@
+\doxysection{Interface Class Reference}
+\hypertarget{class_interface}{}\label{class_interface}\index{Interface@{Interface}}
+
+
+{\ttfamily \#include $<$gmock\+\_\+link\+\_\+test.\+h$>$}
+
+
+
+Inheritance diagram for Interface\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=134pt]{class_interface__inherit__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{class_interface_a67eca71a4ef8d28dc959dd495e2b2b59}{\texorpdfstring{$\sim$}{\string~}\+Interface}} ()
+\item 
+virtual void \mbox{\hyperlink{class_interface_a65d6ae604e7e9a513aec72c9c94e0b97}{Void\+From\+String}} (char \texorpdfstring{$\ast$}{*}str)=0
+\item 
+virtual char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_interface_ab26cc619f7b08203bcd3840449b23f8d}{String\+From\+String}} (char \texorpdfstring{$\ast$}{*}str)=0
+\item 
+virtual int \mbox{\hyperlink{class_interface_ab34c8a5fd2236a6b009f86a4e5851b61}{Int\+From\+String}} (char \texorpdfstring{$\ast$}{*}str)=0
+\item 
+virtual int \& \mbox{\hyperlink{class_interface_a7ec1c3391dfd90b36f25a7eddabcf383}{Int\+Ref\+From\+String}} (char \texorpdfstring{$\ast$}{*}str)=0
+\item 
+virtual void \mbox{\hyperlink{class_interface_a7dab3c82b857a9a5f52b3ce6f7df547f}{Void\+From\+Func}} (void(\texorpdfstring{$\ast$}{*}func)(char \texorpdfstring{$\ast$}{*}str))=0
+\item 
+virtual void \mbox{\hyperlink{class_interface_aa43fb56650a57b6b3e7743e54e50cb86}{Void\+From\+Int\+Ref}} (int \&n)=0
+\item 
+virtual void \mbox{\hyperlink{class_interface_ae2b3e9411c893a45642d3af632752c66}{Void\+From\+Float}} (float n)=0
+\item 
+virtual void \mbox{\hyperlink{class_interface_aa56524017aabdbe46510648c711ab8a8}{Void\+From\+Double}} (double n)=0
+\item 
+virtual void \mbox{\hyperlink{class_interface_ae84fe7e53f881db2f823ad35d004927a}{Void\+From\+Vector}} (const std\+::vector$<$ int $>$ \&v)=0
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{gmock__link__test_8h_source_l00197}{197}} of file \mbox{\hyperlink{gmock__link__test_8h_source}{gmock\+\_\+link\+\_\+test.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_interface_a67eca71a4ef8d28dc959dd495e2b2b59}\index{Interface@{Interface}!````~Interface@{\texorpdfstring{$\sim$}{\string~}Interface}}
+\index{````~Interface@{\texorpdfstring{$\sim$}{\string~}Interface}!Interface@{Interface}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}Interface()}{\string~Interface()}}
+{\footnotesize\ttfamily \label{class_interface_a67eca71a4ef8d28dc959dd495e2b2b59} 
+virtual Interface\+::\texorpdfstring{$\sim$}{\string~}\+Interface (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock__link__test_8h_source_l00199}{199}} of file \mbox{\hyperlink{gmock__link__test_8h_source}{gmock\+\_\+link\+\_\+test.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00199\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_interface_ab34c8a5fd2236a6b009f86a4e5851b61}\index{Interface@{Interface}!IntFromString@{IntFromString}}
+\index{IntFromString@{IntFromString}!Interface@{Interface}}
+\doxysubsubsection{\texorpdfstring{IntFromString()}{IntFromString()}}
+{\footnotesize\ttfamily \label{class_interface_ab34c8a5fd2236a6b009f86a4e5851b61} 
+virtual int Interface\+::\+Int\+From\+String (\begin{DoxyParamCaption}\item[{char \texorpdfstring{$\ast$}{*}}]{str}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=277pt]{class_interface_ab34c8a5fd2236a6b009f86a4e5851b61_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_interface_a7ec1c3391dfd90b36f25a7eddabcf383}\index{Interface@{Interface}!IntRefFromString@{IntRefFromString}}
+\index{IntRefFromString@{IntRefFromString}!Interface@{Interface}}
+\doxysubsubsection{\texorpdfstring{IntRefFromString()}{IntRefFromString()}}
+{\footnotesize\ttfamily \label{class_interface_a7ec1c3391dfd90b36f25a7eddabcf383} 
+virtual int \& Interface\+::\+Int\+Ref\+From\+String (\begin{DoxyParamCaption}\item[{char \texorpdfstring{$\ast$}{*}}]{str}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=293pt]{class_interface_a7ec1c3391dfd90b36f25a7eddabcf383_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_interface_ab26cc619f7b08203bcd3840449b23f8d}\index{Interface@{Interface}!StringFromString@{StringFromString}}
+\index{StringFromString@{StringFromString}!Interface@{Interface}}
+\doxysubsubsection{\texorpdfstring{StringFromString()}{StringFromString()}}
+{\footnotesize\ttfamily \label{class_interface_ab26cc619f7b08203bcd3840449b23f8d} 
+virtual char \texorpdfstring{$\ast$}{*} Interface\+::\+String\+From\+String (\begin{DoxyParamCaption}\item[{char \texorpdfstring{$\ast$}{*}}]{str}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=291pt]{class_interface_ab26cc619f7b08203bcd3840449b23f8d_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_interface_aa56524017aabdbe46510648c711ab8a8}\index{Interface@{Interface}!VoidFromDouble@{VoidFromDouble}}
+\index{VoidFromDouble@{VoidFromDouble}!Interface@{Interface}}
+\doxysubsubsection{\texorpdfstring{VoidFromDouble()}{VoidFromDouble()}}
+{\footnotesize\ttfamily \label{class_interface_aa56524017aabdbe46510648c711ab8a8} 
+virtual void Interface\+::\+Void\+From\+Double (\begin{DoxyParamCaption}\item[{double}]{n}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+\Hypertarget{class_interface_ae2b3e9411c893a45642d3af632752c66}\index{Interface@{Interface}!VoidFromFloat@{VoidFromFloat}}
+\index{VoidFromFloat@{VoidFromFloat}!Interface@{Interface}}
+\doxysubsubsection{\texorpdfstring{VoidFromFloat()}{VoidFromFloat()}}
+{\footnotesize\ttfamily \label{class_interface_ae2b3e9411c893a45642d3af632752c66} 
+virtual void Interface\+::\+Void\+From\+Float (\begin{DoxyParamCaption}\item[{float}]{n}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+\Hypertarget{class_interface_a7dab3c82b857a9a5f52b3ce6f7df547f}\index{Interface@{Interface}!VoidFromFunc@{VoidFromFunc}}
+\index{VoidFromFunc@{VoidFromFunc}!Interface@{Interface}}
+\doxysubsubsection{\texorpdfstring{VoidFromFunc()}{VoidFromFunc()}}
+{\footnotesize\ttfamily \label{class_interface_a7dab3c82b857a9a5f52b3ce6f7df547f} 
+virtual void Interface\+::\+Void\+From\+Func (\begin{DoxyParamCaption}\item[{void(\texorpdfstring{$\ast$}{*}}]{func~}{)(char \texorpdfstring{$\ast$}{*}str)}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=282pt]{class_interface_a7dab3c82b857a9a5f52b3ce6f7df547f_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_interface_aa43fb56650a57b6b3e7743e54e50cb86}\index{Interface@{Interface}!VoidFromIntRef@{VoidFromIntRef}}
+\index{VoidFromIntRef@{VoidFromIntRef}!Interface@{Interface}}
+\doxysubsubsection{\texorpdfstring{VoidFromIntRef()}{VoidFromIntRef()}}
+{\footnotesize\ttfamily \label{class_interface_aa43fb56650a57b6b3e7743e54e50cb86} 
+virtual void Interface\+::\+Void\+From\+Int\+Ref (\begin{DoxyParamCaption}\item[{int \&}]{n}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+\Hypertarget{class_interface_a65d6ae604e7e9a513aec72c9c94e0b97}\index{Interface@{Interface}!VoidFromString@{VoidFromString}}
+\index{VoidFromString@{VoidFromString}!Interface@{Interface}}
+\doxysubsubsection{\texorpdfstring{VoidFromString()}{VoidFromString()}}
+{\footnotesize\ttfamily \label{class_interface_a65d6ae604e7e9a513aec72c9c94e0b97} 
+virtual void Interface\+::\+Void\+From\+String (\begin{DoxyParamCaption}\item[{char \texorpdfstring{$\ast$}{*}}]{str}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=285pt]{class_interface_a65d6ae604e7e9a513aec72c9c94e0b97_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_interface_ae84fe7e53f881db2f823ad35d004927a}\index{Interface@{Interface}!VoidFromVector@{VoidFromVector}}
+\index{VoidFromVector@{VoidFromVector}!Interface@{Interface}}
+\doxysubsubsection{\texorpdfstring{VoidFromVector()}{VoidFromVector()}}
+{\footnotesize\ttfamily \label{class_interface_ae84fe7e53f881db2f823ad35d004927a} 
+virtual void Interface\+::\+Void\+From\+Vector (\begin{DoxyParamCaption}\item[{const std\+::vector$<$ int $>$ \&}]{v}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/test/\mbox{\hyperlink{gmock__link__test_8h}{gmock\+\_\+link\+\_\+test.\+h}}\end{DoxyCompactItemize}

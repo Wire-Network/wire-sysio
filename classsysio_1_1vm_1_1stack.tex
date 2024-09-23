@@ -1,0 +1,714 @@
+\doxysection{sysio\+::vm\+::stack\texorpdfstring{$<$}{<} ElemT, Elem\+Sz, Allocator \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classsysio_1_1vm_1_1stack}{}\label{classsysio_1_1vm_1_1stack}\index{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}}
+
+
+{\ttfamily \#include $<$wasm\+\_\+stack.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename Alloc  = Allocator, typename  = std\+::enable\+\_\+if\+\_\+t$<$std\+::is\+\_\+same\+\_\+v$<$\+Alloc, std\+::nullptr\+\_\+t$>$, int$>$$>$ }\\\mbox{\hyperlink{classsysio_1_1vm_1_1stack_adeb53b4513bfc04a652492148f1b1792}{stack}} ()
+\item 
+{\footnotesize template$<$typename Alloc  = Allocator, typename  = std\+::enable\+\_\+if\+\_\+t$<$!std\+::is\+\_\+same\+\_\+v$<$\+Alloc, nullptr\+\_\+t$>$, int$>$$>$ }\\\mbox{\hyperlink{classsysio_1_1vm_1_1stack_a5cceaecd58d33b15e1095a8c1fea723c}{stack}} (Alloc \&\&alloc)
+\item 
+{\footnotesize template$<$typename Alloc  = Allocator, typename  = std\+::enable\+\_\+if\+\_\+t$<$!std\+::is\+\_\+same\+\_\+v$<$\+Alloc, nullptr\+\_\+t$>$, int$>$$>$ }\\\mbox{\hyperlink{classsysio_1_1vm_1_1stack_a57412b35f62a6138038785948fe4e39a}{stack}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} n, Alloc \&\&alloc)
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1stack_a6622e50cf34d892c701d2085faa53f8e}{push}} (ElemT \&\&e)
+\item 
+ElemT \mbox{\hyperlink{classsysio_1_1vm_1_1stack_ae9a715af8918e2e59bf5256632c6b7b1}{pop}} ()
+\item 
+ElemT \& \mbox{\hyperlink{classsysio_1_1vm_1_1stack_a210b5e6a0e8192d8f648a95355a1c993}{get}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} index) const
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1stack_a0393f31c92bd595ec39b2b6afa4fa3a4}{set}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} index, const ElemT \&el)
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1stack_a515d7dcc22ab5464d01db42c26123870}{eat}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} index)
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1stack_a30d9575d6cd028b9e177872c7505f1b8}{compact}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} index)
+\item 
+size\+\_\+t \mbox{\hyperlink{classsysio_1_1vm_1_1stack_a5651fcb15702086e2f71b26dee163762}{current\+\_\+index}} () const
+\item 
+ElemT \& \mbox{\hyperlink{classsysio_1_1vm_1_1stack_a48b925105ad1a8d21cc097a2aede7b10}{peek}} ()
+\item 
+const ElemT \& \mbox{\hyperlink{classsysio_1_1vm_1_1stack_a13aee6203ea75049d009cf2f5a7d521e}{peek}} () const
+\item 
+ElemT \& \mbox{\hyperlink{classsysio_1_1vm_1_1stack_a7fc7f1abbd43b2dd6d2d1e829171b7dc}{peek}} (size\+\_\+t i)
+\item 
+ElemT \& \mbox{\hyperlink{classsysio_1_1vm_1_1stack_a062d42c4ce4359ef87c6a53267796d4d}{get\+\_\+back}} (size\+\_\+t i)
+\item 
+const ElemT \& \mbox{\hyperlink{classsysio_1_1vm_1_1stack_a19946087d603ee67057b2c45b8c3f3b0}{get\+\_\+back}} (size\+\_\+t i) const
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1stack_adc4a93eafdcbf2f3526d11bdbe0cc126}{trim}} (size\+\_\+t amt)
+\item 
+size\+\_\+t \mbox{\hyperlink{classsysio_1_1vm_1_1stack_acee386572ddf55df79ab4f7e35eecc96}{size}} () const
+\item 
+size\+\_\+t \mbox{\hyperlink{classsysio_1_1vm_1_1stack_a37e6c72d62683bc2b77713010a51a56f}{capacity}} () const
+\item 
+{\footnotesize template$<$typename Alloc  = Allocator, typename  = std\+::enable\+\_\+if\+\_\+t$<$std\+::is\+\_\+same\+\_\+v$<$\+Alloc, std\+::nullptr\+\_\+t$>$, int$>$$>$ }\\\mbox{\hyperlink{classsysio_1_1vm_1_1stack_adeb53b4513bfc04a652492148f1b1792}{stack}} ()
+\item 
+{\footnotesize template$<$typename Alloc  = Allocator, typename  = std\+::enable\+\_\+if\+\_\+t$<$!std\+::is\+\_\+same\+\_\+v$<$\+Alloc, nullptr\+\_\+t$>$, int$>$$>$ }\\\mbox{\hyperlink{classsysio_1_1vm_1_1stack_a5cceaecd58d33b15e1095a8c1fea723c}{stack}} (Alloc \&\&alloc)
+\item 
+{\footnotesize template$<$typename Alloc  = Allocator, typename  = std\+::enable\+\_\+if\+\_\+t$<$!std\+::is\+\_\+same\+\_\+v$<$\+Alloc, nullptr\+\_\+t$>$, int$>$$>$ }\\\mbox{\hyperlink{classsysio_1_1vm_1_1stack_a57412b35f62a6138038785948fe4e39a}{stack}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} n, Alloc \&\&alloc)
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1stack_a6622e50cf34d892c701d2085faa53f8e}{push}} (ElemT \&\&e)
+\item 
+ElemT \mbox{\hyperlink{classsysio_1_1vm_1_1stack_ae9a715af8918e2e59bf5256632c6b7b1}{pop}} ()
+\item 
+ElemT \& \mbox{\hyperlink{classsysio_1_1vm_1_1stack_a210b5e6a0e8192d8f648a95355a1c993}{get}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} index) const
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1stack_a0393f31c92bd595ec39b2b6afa4fa3a4}{set}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} index, const ElemT \&el)
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1stack_a515d7dcc22ab5464d01db42c26123870}{eat}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} index)
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1stack_a30d9575d6cd028b9e177872c7505f1b8}{compact}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} index)
+\item 
+size\+\_\+t \mbox{\hyperlink{classsysio_1_1vm_1_1stack_a5651fcb15702086e2f71b26dee163762}{current\+\_\+index}} () const
+\item 
+ElemT \& \mbox{\hyperlink{classsysio_1_1vm_1_1stack_a48b925105ad1a8d21cc097a2aede7b10}{peek}} ()
+\item 
+const ElemT \& \mbox{\hyperlink{classsysio_1_1vm_1_1stack_a13aee6203ea75049d009cf2f5a7d521e}{peek}} () const
+\item 
+ElemT \& \mbox{\hyperlink{classsysio_1_1vm_1_1stack_a7fc7f1abbd43b2dd6d2d1e829171b7dc}{peek}} (size\+\_\+t i)
+\item 
+ElemT \& \mbox{\hyperlink{classsysio_1_1vm_1_1stack_a062d42c4ce4359ef87c6a53267796d4d}{get\+\_\+back}} (size\+\_\+t i)
+\item 
+const ElemT \& \mbox{\hyperlink{classsysio_1_1vm_1_1stack_a19946087d603ee67057b2c45b8c3f3b0}{get\+\_\+back}} (size\+\_\+t i) const
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1stack_adc4a93eafdcbf2f3526d11bdbe0cc126}{trim}} (size\+\_\+t amt)
+\item 
+size\+\_\+t \mbox{\hyperlink{classsysio_1_1vm_1_1stack_acee386572ddf55df79ab4f7e35eecc96}{size}} () const
+\item 
+size\+\_\+t \mbox{\hyperlink{classsysio_1_1vm_1_1stack_a37e6c72d62683bc2b77713010a51a56f}{capacity}} () const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename ElemT, size\+\_\+t Elem\+Sz, typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} = nullptr\+\_\+t$>$\newline
+class sysio\+::vm\+::stack$<$ Elem\+T, Elem\+Sz, Allocator $>$}
+
+
+Definition at line \mbox{\hyperlink{vm_2wasm__stack_8hpp_source_l00018}{18}} of file \mbox{\hyperlink{vm_2wasm__stack_8hpp_source}{wasm\+\_\+stack.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classsysio_1_1vm_1_1stack_adeb53b4513bfc04a652492148f1b1792}\index{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}!stack@{stack}}
+\index{stack@{stack}!sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{stack()}{stack()}\hspace{0.1cm}{\footnotesize\ttfamily [1/6]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1stack_adeb53b4513bfc04a652492148f1b1792} 
+template$<$typename ElemT , size\+\_\+t Elem\+Sz, typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = nullptr\+\_\+t$>$ \\
+template$<$typename Alloc  = Allocator, typename  = std\+::enable\+\_\+if\+\_\+t$<$std\+::is\+\_\+same\+\_\+v$<$\+Alloc, std\+::nullptr\+\_\+t$>$, int$>$$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1stack}{sysio\+::vm\+::stack}}$<$ ElemT, Elem\+Sz, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::stack (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2wasm__stack_8hpp_source_l00021}{21}} of file \mbox{\hyperlink{sysio_2vm_2wasm__stack_8hpp_source}{wasm\+\_\+stack.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \ :\ \_store(ElemSz)\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1stack_a5cceaecd58d33b15e1095a8c1fea723c}\index{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}!stack@{stack}}
+\index{stack@{stack}!sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{stack()}{stack()}\hspace{0.1cm}{\footnotesize\ttfamily [2/6]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1stack_a5cceaecd58d33b15e1095a8c1fea723c} 
+template$<$typename ElemT , size\+\_\+t Elem\+Sz, typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = nullptr\+\_\+t$>$ \\
+template$<$typename Alloc  = Allocator, typename  = std\+::enable\+\_\+if\+\_\+t$<$!std\+::is\+\_\+same\+\_\+v$<$\+Alloc, nullptr\+\_\+t$>$, int$>$$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1stack}{sysio\+::vm\+::stack}}$<$ ElemT, Elem\+Sz, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::stack (\begin{DoxyParamCaption}\item[{Alloc \&\&}]{alloc}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2wasm__stack_8hpp_source_l00025}{25}} of file \mbox{\hyperlink{sysio_2vm_2wasm__stack_8hpp_source}{wasm\+\_\+stack.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ :\ \_store(alloc,\ ElemSz)\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1stack_a57412b35f62a6138038785948fe4e39a}\index{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}!stack@{stack}}
+\index{stack@{stack}!sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{stack()}{stack()}\hspace{0.1cm}{\footnotesize\ttfamily [3/6]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1stack_a57412b35f62a6138038785948fe4e39a} 
+template$<$typename ElemT , size\+\_\+t Elem\+Sz, typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = nullptr\+\_\+t$>$ \\
+template$<$typename Alloc  = Allocator, typename  = std\+::enable\+\_\+if\+\_\+t$<$!std\+::is\+\_\+same\+\_\+v$<$\+Alloc, nullptr\+\_\+t$>$, int$>$$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1stack}{sysio\+::vm\+::stack}}$<$ ElemT, Elem\+Sz, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::stack (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{n}{, }\item[{Alloc \&\&}]{alloc}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2wasm__stack_8hpp_source_l00029}{29}} of file \mbox{\hyperlink{sysio_2vm_2wasm__stack_8hpp_source}{wasm\+\_\+stack.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ :\ \_store(alloc,\ n)\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1stack_adeb53b4513bfc04a652492148f1b1792}\index{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}!stack@{stack}}
+\index{stack@{stack}!sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{stack()}{stack()}\hspace{0.1cm}{\footnotesize\ttfamily [4/6]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1stack_adeb53b4513bfc04a652492148f1b1792} 
+template$<$typename ElemT , size\+\_\+t Elem\+Sz, typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = nullptr\+\_\+t$>$ \\
+template$<$typename Alloc  = Allocator, typename  = std\+::enable\+\_\+if\+\_\+t$<$std\+::is\+\_\+same\+\_\+v$<$\+Alloc, std\+::nullptr\+\_\+t$>$, int$>$$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1stack}{sysio\+::vm\+::stack}}$<$ ElemT, Elem\+Sz, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::stack (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2wasm__stack_8hpp_source_l00021}{21}} of file \mbox{\hyperlink{vm_2wasm__stack_8hpp_source}{wasm\+\_\+stack.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \ :\ \_store(ElemSz)\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1stack_a5cceaecd58d33b15e1095a8c1fea723c}\index{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}!stack@{stack}}
+\index{stack@{stack}!sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{stack()}{stack()}\hspace{0.1cm}{\footnotesize\ttfamily [5/6]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1stack_a5cceaecd58d33b15e1095a8c1fea723c} 
+template$<$typename ElemT , size\+\_\+t Elem\+Sz, typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = nullptr\+\_\+t$>$ \\
+template$<$typename Alloc  = Allocator, typename  = std\+::enable\+\_\+if\+\_\+t$<$!std\+::is\+\_\+same\+\_\+v$<$\+Alloc, nullptr\+\_\+t$>$, int$>$$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1stack}{sysio\+::vm\+::stack}}$<$ ElemT, Elem\+Sz, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::stack (\begin{DoxyParamCaption}\item[{Alloc \&\&}]{alloc}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2wasm__stack_8hpp_source_l00025}{25}} of file \mbox{\hyperlink{vm_2wasm__stack_8hpp_source}{wasm\+\_\+stack.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ :\ \_store(alloc,\ ElemSz)\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1stack_a57412b35f62a6138038785948fe4e39a}\index{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}!stack@{stack}}
+\index{stack@{stack}!sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{stack()}{stack()}\hspace{0.1cm}{\footnotesize\ttfamily [6/6]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1stack_a57412b35f62a6138038785948fe4e39a} 
+template$<$typename ElemT , size\+\_\+t Elem\+Sz, typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = nullptr\+\_\+t$>$ \\
+template$<$typename Alloc  = Allocator, typename  = std\+::enable\+\_\+if\+\_\+t$<$!std\+::is\+\_\+same\+\_\+v$<$\+Alloc, nullptr\+\_\+t$>$, int$>$$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1stack}{sysio\+::vm\+::stack}}$<$ ElemT, Elem\+Sz, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::stack (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{n}{, }\item[{Alloc \&\&}]{alloc}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2wasm__stack_8hpp_source_l00029}{29}} of file \mbox{\hyperlink{vm_2wasm__stack_8hpp_source}{wasm\+\_\+stack.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ :\ \_store(alloc,\ n)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1vm_1_1stack_a37e6c72d62683bc2b77713010a51a56f}\index{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}!capacity@{capacity}}
+\index{capacity@{capacity}!sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{capacity()}{capacity()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1stack_a37e6c72d62683bc2b77713010a51a56f} 
+template$<$typename ElemT , size\+\_\+t Elem\+Sz, typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = nullptr\+\_\+t$>$ \\
+size\+\_\+t \mbox{\hyperlink{classsysio_1_1vm_1_1stack}{sysio\+::vm\+::stack}}$<$ ElemT, Elem\+Sz, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::capacity (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2wasm__stack_8hpp_source_l00064}{64}} of file \mbox{\hyperlink{sysio_2vm_2wasm__stack_8hpp_source}{wasm\+\_\+stack.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00064\ \{\ \textcolor{keywordflow}{return}\ \_store.size();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1stack_a37e6c72d62683bc2b77713010a51a56f}\index{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}!capacity@{capacity}}
+\index{capacity@{capacity}!sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{capacity()}{capacity()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1stack_a37e6c72d62683bc2b77713010a51a56f} 
+template$<$typename ElemT , size\+\_\+t Elem\+Sz, typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = nullptr\+\_\+t$>$ \\
+size\+\_\+t \mbox{\hyperlink{classsysio_1_1vm_1_1stack}{sysio\+::vm\+::stack}}$<$ ElemT, Elem\+Sz, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::capacity (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2wasm__stack_8hpp_source_l00064}{64}} of file \mbox{\hyperlink{vm_2wasm__stack_8hpp_source}{wasm\+\_\+stack.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00064\ \{\ \textcolor{keywordflow}{return}\ \_store.size();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1stack_a30d9575d6cd028b9e177872c7505f1b8}\index{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}!compact@{compact}}
+\index{compact@{compact}!sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{compact()}{compact()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1stack_a30d9575d6cd028b9e177872c7505f1b8} 
+template$<$typename ElemT , size\+\_\+t Elem\+Sz, typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = nullptr\+\_\+t$>$ \\
+void \mbox{\hyperlink{classsysio_1_1vm_1_1stack}{sysio\+::vm\+::stack}}$<$ ElemT, Elem\+Sz, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::compact (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{index}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2wasm__stack_8hpp_source_l00052}{52}} of file \mbox{\hyperlink{sysio_2vm_2wasm__stack_8hpp_source}{wasm\+\_\+stack.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \_store[index]\ =\ \_store[\_index-\/1];}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \_index\ =\ index+1;}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1stack_a30d9575d6cd028b9e177872c7505f1b8}\index{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}!compact@{compact}}
+\index{compact@{compact}!sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{compact()}{compact()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1stack_a30d9575d6cd028b9e177872c7505f1b8} 
+template$<$typename ElemT , size\+\_\+t Elem\+Sz, typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = nullptr\+\_\+t$>$ \\
+void \mbox{\hyperlink{classsysio_1_1vm_1_1stack}{sysio\+::vm\+::stack}}$<$ ElemT, Elem\+Sz, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::compact (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{index}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2wasm__stack_8hpp_source_l00052}{52}} of file \mbox{\hyperlink{vm_2wasm__stack_8hpp_source}{wasm\+\_\+stack.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \_store[index]\ =\ \_store[\_index-\/1];}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \_index\ =\ index+1;}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1stack_a5651fcb15702086e2f71b26dee163762}\index{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}!current\_index@{current\_index}}
+\index{current\_index@{current\_index}!sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{current\_index()}{current\_index()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1stack_a5651fcb15702086e2f71b26dee163762} 
+template$<$typename ElemT , size\+\_\+t Elem\+Sz, typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = nullptr\+\_\+t$>$ \\
+size\+\_\+t \mbox{\hyperlink{classsysio_1_1vm_1_1stack}{sysio\+::vm\+::stack}}$<$ ElemT, Elem\+Sz, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::current\+\_\+index (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2wasm__stack_8hpp_source_l00056}{56}} of file \mbox{\hyperlink{sysio_2vm_2wasm__stack_8hpp_source}{wasm\+\_\+stack.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00056\ \{\ \textcolor{keywordflow}{return}\ \_index;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1stack_a5651fcb15702086e2f71b26dee163762}\index{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}!current\_index@{current\_index}}
+\index{current\_index@{current\_index}!sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{current\_index()}{current\_index()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1stack_a5651fcb15702086e2f71b26dee163762} 
+template$<$typename ElemT , size\+\_\+t Elem\+Sz, typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = nullptr\+\_\+t$>$ \\
+size\+\_\+t \mbox{\hyperlink{classsysio_1_1vm_1_1stack}{sysio\+::vm\+::stack}}$<$ ElemT, Elem\+Sz, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::current\+\_\+index (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2wasm__stack_8hpp_source_l00056}{56}} of file \mbox{\hyperlink{vm_2wasm__stack_8hpp_source}{wasm\+\_\+stack.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00056\ \{\ \textcolor{keywordflow}{return}\ \_index;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1stack_a515d7dcc22ab5464d01db42c26123870}\index{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}!eat@{eat}}
+\index{eat@{eat}!sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{eat()}{eat()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1stack_a515d7dcc22ab5464d01db42c26123870} 
+template$<$typename ElemT , size\+\_\+t Elem\+Sz, typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = nullptr\+\_\+t$>$ \\
+void \mbox{\hyperlink{classsysio_1_1vm_1_1stack}{sysio\+::vm\+::stack}}$<$ ElemT, Elem\+Sz, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::eat (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{index}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2wasm__stack_8hpp_source_l00050}{50}} of file \mbox{\hyperlink{sysio_2vm_2wasm__stack_8hpp_source}{wasm\+\_\+stack.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00050\ \{\ \_index\ =\ index;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1stack_a515d7dcc22ab5464d01db42c26123870}\index{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}!eat@{eat}}
+\index{eat@{eat}!sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{eat()}{eat()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1stack_a515d7dcc22ab5464d01db42c26123870} 
+template$<$typename ElemT , size\+\_\+t Elem\+Sz, typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = nullptr\+\_\+t$>$ \\
+void \mbox{\hyperlink{classsysio_1_1vm_1_1stack}{sysio\+::vm\+::stack}}$<$ ElemT, Elem\+Sz, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::eat (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{index}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2wasm__stack_8hpp_source_l00050}{50}} of file \mbox{\hyperlink{vm_2wasm__stack_8hpp_source}{wasm\+\_\+stack.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00050\ \{\ \_index\ =\ index;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1stack_a210b5e6a0e8192d8f648a95355a1c993}\index{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}!get@{get}}
+\index{get@{get}!sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{get()}{get()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1stack_a210b5e6a0e8192d8f648a95355a1c993} 
+template$<$typename ElemT , size\+\_\+t Elem\+Sz, typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = nullptr\+\_\+t$>$ \\
+ElemT \& \mbox{\hyperlink{classsysio_1_1vm_1_1stack}{sysio\+::vm\+::stack}}$<$ ElemT, Elem\+Sz, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::get (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{index}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2wasm__stack_8hpp_source_l00042}{42}} of file \mbox{\hyperlink{sysio_2vm_2wasm__stack_8hpp_source}{wasm\+\_\+stack.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(index\ <=\ \_index,\ wasm\_interpreter\_exception,\ \textcolor{stringliteral}{"{}invalid\ stack\ index"{}});}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (ElemT\&)\_store[index];}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1stack_a210b5e6a0e8192d8f648a95355a1c993}\index{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}!get@{get}}
+\index{get@{get}!sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{get()}{get()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1stack_a210b5e6a0e8192d8f648a95355a1c993} 
+template$<$typename ElemT , size\+\_\+t Elem\+Sz, typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = nullptr\+\_\+t$>$ \\
+ElemT \& \mbox{\hyperlink{classsysio_1_1vm_1_1stack}{sysio\+::vm\+::stack}}$<$ ElemT, Elem\+Sz, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::get (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{index}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2wasm__stack_8hpp_source_l00042}{42}} of file \mbox{\hyperlink{vm_2wasm__stack_8hpp_source}{wasm\+\_\+stack.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(index\ <=\ \_index,\ wasm\_interpreter\_exception,\ \textcolor{stringliteral}{"{}invalid\ stack\ index"{}});}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (ElemT\&)\_store[index];}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1stack_a062d42c4ce4359ef87c6a53267796d4d}\index{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}!get\_back@{get\_back}}
+\index{get\_back@{get\_back}!sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{get\_back()}{get\_back()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1stack_a062d42c4ce4359ef87c6a53267796d4d} 
+template$<$typename ElemT , size\+\_\+t Elem\+Sz, typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = nullptr\+\_\+t$>$ \\
+ElemT \& \mbox{\hyperlink{classsysio_1_1vm_1_1stack}{sysio\+::vm\+::stack}}$<$ ElemT, Elem\+Sz, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::get\+\_\+back (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{i}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2wasm__stack_8hpp_source_l00060}{60}} of file \mbox{\hyperlink{sysio_2vm_2wasm__stack_8hpp_source}{wasm\+\_\+stack.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00060\ \{\ \textcolor{keywordflow}{return}\ \_store[\_index\ -\/\ 1\ -\/\ i];\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1stack_a062d42c4ce4359ef87c6a53267796d4d}\index{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}!get\_back@{get\_back}}
+\index{get\_back@{get\_back}!sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{get\_back()}{get\_back()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1stack_a062d42c4ce4359ef87c6a53267796d4d} 
+template$<$typename ElemT , size\+\_\+t Elem\+Sz, typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = nullptr\+\_\+t$>$ \\
+ElemT \& \mbox{\hyperlink{classsysio_1_1vm_1_1stack}{sysio\+::vm\+::stack}}$<$ ElemT, Elem\+Sz, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::get\+\_\+back (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{i}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2wasm__stack_8hpp_source_l00060}{60}} of file \mbox{\hyperlink{vm_2wasm__stack_8hpp_source}{wasm\+\_\+stack.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00060\ \{\ \textcolor{keywordflow}{return}\ \_store[\_index\ -\/\ 1\ -\/\ i];\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1stack_a19946087d603ee67057b2c45b8c3f3b0}\index{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}!get\_back@{get\_back}}
+\index{get\_back@{get\_back}!sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{get\_back()}{get\_back()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1stack_a19946087d603ee67057b2c45b8c3f3b0} 
+template$<$typename ElemT , size\+\_\+t Elem\+Sz, typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = nullptr\+\_\+t$>$ \\
+const ElemT \& \mbox{\hyperlink{classsysio_1_1vm_1_1stack}{sysio\+::vm\+::stack}}$<$ ElemT, Elem\+Sz, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::get\+\_\+back (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{i}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2wasm__stack_8hpp_source_l00061}{61}} of file \mbox{\hyperlink{sysio_2vm_2wasm__stack_8hpp_source}{wasm\+\_\+stack.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00061\ \{\ \textcolor{keywordflow}{return}\ \_store[\_index\ -\/\ 1\ -\/\ i];\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1stack_a19946087d603ee67057b2c45b8c3f3b0}\index{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}!get\_back@{get\_back}}
+\index{get\_back@{get\_back}!sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{get\_back()}{get\_back()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1stack_a19946087d603ee67057b2c45b8c3f3b0} 
+template$<$typename ElemT , size\+\_\+t Elem\+Sz, typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = nullptr\+\_\+t$>$ \\
+const ElemT \& \mbox{\hyperlink{classsysio_1_1vm_1_1stack}{sysio\+::vm\+::stack}}$<$ ElemT, Elem\+Sz, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::get\+\_\+back (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{i}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2wasm__stack_8hpp_source_l00061}{61}} of file \mbox{\hyperlink{vm_2wasm__stack_8hpp_source}{wasm\+\_\+stack.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00061\ \{\ \textcolor{keywordflow}{return}\ \_store[\_index\ -\/\ 1\ -\/\ i];\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1stack_a48b925105ad1a8d21cc097a2aede7b10}\index{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}!peek@{peek}}
+\index{peek@{peek}!sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{peek()}{peek()}\hspace{0.1cm}{\footnotesize\ttfamily [1/6]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1stack_a48b925105ad1a8d21cc097a2aede7b10} 
+template$<$typename ElemT , size\+\_\+t Elem\+Sz, typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = nullptr\+\_\+t$>$ \\
+ElemT \& \mbox{\hyperlink{classsysio_1_1vm_1_1stack}{sysio\+::vm\+::stack}}$<$ ElemT, Elem\+Sz, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::peek (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2wasm__stack_8hpp_source_l00057}{57}} of file \mbox{\hyperlink{sysio_2vm_2wasm__stack_8hpp_source}{wasm\+\_\+stack.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00057\ \{\ \textcolor{keywordflow}{return}\ \_store[\_index\ -\/\ 1];\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1stack_a48b925105ad1a8d21cc097a2aede7b10}\index{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}!peek@{peek}}
+\index{peek@{peek}!sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{peek()}{peek()}\hspace{0.1cm}{\footnotesize\ttfamily [2/6]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1stack_a48b925105ad1a8d21cc097a2aede7b10} 
+template$<$typename ElemT , size\+\_\+t Elem\+Sz, typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = nullptr\+\_\+t$>$ \\
+ElemT \& \mbox{\hyperlink{classsysio_1_1vm_1_1stack}{sysio\+::vm\+::stack}}$<$ ElemT, Elem\+Sz, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::peek (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2wasm__stack_8hpp_source_l00057}{57}} of file \mbox{\hyperlink{vm_2wasm__stack_8hpp_source}{wasm\+\_\+stack.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00057\ \{\ \textcolor{keywordflow}{return}\ \_store[\_index\ -\/\ 1];\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1stack_a13aee6203ea75049d009cf2f5a7d521e}\index{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}!peek@{peek}}
+\index{peek@{peek}!sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{peek()}{peek()}\hspace{0.1cm}{\footnotesize\ttfamily [3/6]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1stack_a13aee6203ea75049d009cf2f5a7d521e} 
+template$<$typename ElemT , size\+\_\+t Elem\+Sz, typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = nullptr\+\_\+t$>$ \\
+const ElemT \& \mbox{\hyperlink{classsysio_1_1vm_1_1stack}{sysio\+::vm\+::stack}}$<$ ElemT, Elem\+Sz, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::peek (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2wasm__stack_8hpp_source_l00058}{58}} of file \mbox{\hyperlink{sysio_2vm_2wasm__stack_8hpp_source}{wasm\+\_\+stack.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00058\ \{\ \textcolor{keywordflow}{return}\ \_store[\_index\ -\/\ 1];\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1stack_a13aee6203ea75049d009cf2f5a7d521e}\index{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}!peek@{peek}}
+\index{peek@{peek}!sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{peek()}{peek()}\hspace{0.1cm}{\footnotesize\ttfamily [4/6]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1stack_a13aee6203ea75049d009cf2f5a7d521e} 
+template$<$typename ElemT , size\+\_\+t Elem\+Sz, typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = nullptr\+\_\+t$>$ \\
+const ElemT \& \mbox{\hyperlink{classsysio_1_1vm_1_1stack}{sysio\+::vm\+::stack}}$<$ ElemT, Elem\+Sz, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::peek (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2wasm__stack_8hpp_source_l00058}{58}} of file \mbox{\hyperlink{vm_2wasm__stack_8hpp_source}{wasm\+\_\+stack.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00058\ \{\ \textcolor{keywordflow}{return}\ \_store[\_index\ -\/\ 1];\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1stack_a7fc7f1abbd43b2dd6d2d1e829171b7dc}\index{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}!peek@{peek}}
+\index{peek@{peek}!sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{peek()}{peek()}\hspace{0.1cm}{\footnotesize\ttfamily [5/6]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1stack_a7fc7f1abbd43b2dd6d2d1e829171b7dc} 
+template$<$typename ElemT , size\+\_\+t Elem\+Sz, typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = nullptr\+\_\+t$>$ \\
+ElemT \& \mbox{\hyperlink{classsysio_1_1vm_1_1stack}{sysio\+::vm\+::stack}}$<$ ElemT, Elem\+Sz, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::peek (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{i}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2wasm__stack_8hpp_source_l00059}{59}} of file \mbox{\hyperlink{sysio_2vm_2wasm__stack_8hpp_source}{wasm\+\_\+stack.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00059\ \{\ \textcolor{keywordflow}{return}\ \_store[\_index\ -\/\ 1\ -\/\ i];\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1stack_a7fc7f1abbd43b2dd6d2d1e829171b7dc}\index{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}!peek@{peek}}
+\index{peek@{peek}!sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{peek()}{peek()}\hspace{0.1cm}{\footnotesize\ttfamily [6/6]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1stack_a7fc7f1abbd43b2dd6d2d1e829171b7dc} 
+template$<$typename ElemT , size\+\_\+t Elem\+Sz, typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = nullptr\+\_\+t$>$ \\
+ElemT \& \mbox{\hyperlink{classsysio_1_1vm_1_1stack}{sysio\+::vm\+::stack}}$<$ ElemT, Elem\+Sz, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::peek (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{i}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2wasm__stack_8hpp_source_l00059}{59}} of file \mbox{\hyperlink{vm_2wasm__stack_8hpp_source}{wasm\+\_\+stack.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00059\ \{\ \textcolor{keywordflow}{return}\ \_store[\_index\ -\/\ 1\ -\/\ i];\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1stack_ae9a715af8918e2e59bf5256632c6b7b1}\index{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}!pop@{pop}}
+\index{pop@{pop}!sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{pop()}{pop()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1stack_ae9a715af8918e2e59bf5256632c6b7b1} 
+template$<$typename ElemT , size\+\_\+t Elem\+Sz, typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = nullptr\+\_\+t$>$ \\
+ElemT \mbox{\hyperlink{classsysio_1_1vm_1_1stack}{sysio\+::vm\+::stack}}$<$ ElemT, Elem\+Sz, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::pop (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2wasm__stack_8hpp_source_l00040}{40}} of file \mbox{\hyperlink{sysio_2vm_2wasm__stack_8hpp_source}{wasm\+\_\+stack.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00040\ \{\ \textcolor{keywordflow}{return}\ \_store[-\/-\/\_index];\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1stack_ae9a715af8918e2e59bf5256632c6b7b1}\index{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}!pop@{pop}}
+\index{pop@{pop}!sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{pop()}{pop()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1stack_ae9a715af8918e2e59bf5256632c6b7b1} 
+template$<$typename ElemT , size\+\_\+t Elem\+Sz, typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = nullptr\+\_\+t$>$ \\
+ElemT \mbox{\hyperlink{classsysio_1_1vm_1_1stack}{sysio\+::vm\+::stack}}$<$ ElemT, Elem\+Sz, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::pop (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2wasm__stack_8hpp_source_l00040}{40}} of file \mbox{\hyperlink{vm_2wasm__stack_8hpp_source}{wasm\+\_\+stack.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00040\ \{\ \textcolor{keywordflow}{return}\ \_store[-\/-\/\_index];\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1stack_a6622e50cf34d892c701d2085faa53f8e}\index{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}!push@{push}}
+\index{push@{push}!sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{push()}{push()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1stack_a6622e50cf34d892c701d2085faa53f8e} 
+template$<$typename ElemT , size\+\_\+t Elem\+Sz, typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = nullptr\+\_\+t$>$ \\
+void \mbox{\hyperlink{classsysio_1_1vm_1_1stack}{sysio\+::vm\+::stack}}$<$ ElemT, Elem\+Sz, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::push (\begin{DoxyParamCaption}\item[{ElemT \&\&}]{e}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2wasm__stack_8hpp_source_l00032}{32}} of file \mbox{\hyperlink{sysio_2vm_2wasm__stack_8hpp_source}{wasm\+\_\+stack.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ }
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keyword}{constexpr}\ (std::is\_same\_v<Allocator,\ nullptr\_t>)\ \{}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\_index\ >=\ \_store.size())}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_store.resize(\_store.size()*2);}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \_store[\_index++]\ =\ std::forward<ElemT>(e);}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1stack_a6622e50cf34d892c701d2085faa53f8e}\index{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}!push@{push}}
+\index{push@{push}!sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{push()}{push()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1stack_a6622e50cf34d892c701d2085faa53f8e} 
+template$<$typename ElemT , size\+\_\+t Elem\+Sz, typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = nullptr\+\_\+t$>$ \\
+void \mbox{\hyperlink{classsysio_1_1vm_1_1stack}{sysio\+::vm\+::stack}}$<$ ElemT, Elem\+Sz, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::push (\begin{DoxyParamCaption}\item[{ElemT \&\&}]{e}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2wasm__stack_8hpp_source_l00032}{32}} of file \mbox{\hyperlink{vm_2wasm__stack_8hpp_source}{wasm\+\_\+stack.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ }
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keyword}{constexpr}\ (std::is\_same\_v<Allocator,\ nullptr\_t>)\ \{}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\_index\ >=\ \_store.size())}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_store.resize(\_store.size()*2);}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \_store[\_index++]\ =\ std::forward<ElemT>(e);}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1stack_a0393f31c92bd595ec39b2b6afa4fa3a4}\index{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}!set@{set}}
+\index{set@{set}!sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{set()}{set()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1stack_a0393f31c92bd595ec39b2b6afa4fa3a4} 
+template$<$typename ElemT , size\+\_\+t Elem\+Sz, typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = nullptr\+\_\+t$>$ \\
+void \mbox{\hyperlink{classsysio_1_1vm_1_1stack}{sysio\+::vm\+::stack}}$<$ ElemT, Elem\+Sz, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::set (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{index}{, }\item[{const ElemT \&}]{el}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2wasm__stack_8hpp_source_l00046}{46}} of file \mbox{\hyperlink{sysio_2vm_2wasm__stack_8hpp_source}{wasm\+\_\+stack.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(index\ <=\ \_index,\ wasm\_interpreter\_exception,\ \textcolor{stringliteral}{"{}invalid\ stack\ index"{}});}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \_store[index]\ =\ el;}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1stack_a0393f31c92bd595ec39b2b6afa4fa3a4}\index{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}!set@{set}}
+\index{set@{set}!sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{set()}{set()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1stack_a0393f31c92bd595ec39b2b6afa4fa3a4} 
+template$<$typename ElemT , size\+\_\+t Elem\+Sz, typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = nullptr\+\_\+t$>$ \\
+void \mbox{\hyperlink{classsysio_1_1vm_1_1stack}{sysio\+::vm\+::stack}}$<$ ElemT, Elem\+Sz, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::set (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{index}{, }\item[{const ElemT \&}]{el}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2wasm__stack_8hpp_source_l00046}{46}} of file \mbox{\hyperlink{vm_2wasm__stack_8hpp_source}{wasm\+\_\+stack.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(index\ <=\ \_index,\ wasm\_interpreter\_exception,\ \textcolor{stringliteral}{"{}invalid\ stack\ index"{}});}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \_store[index]\ =\ el;}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1stack_acee386572ddf55df79ab4f7e35eecc96}\index{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}!size@{size}}
+\index{size@{size}!sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{size()}{size()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1stack_acee386572ddf55df79ab4f7e35eecc96} 
+template$<$typename ElemT , size\+\_\+t Elem\+Sz, typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = nullptr\+\_\+t$>$ \\
+size\+\_\+t \mbox{\hyperlink{classsysio_1_1vm_1_1stack}{sysio\+::vm\+::stack}}$<$ ElemT, Elem\+Sz, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::size (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2wasm__stack_8hpp_source_l00063}{63}} of file \mbox{\hyperlink{sysio_2vm_2wasm__stack_8hpp_source}{wasm\+\_\+stack.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00063\ \{\ \textcolor{keywordflow}{return}\ \_index;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1stack_acee386572ddf55df79ab4f7e35eecc96}\index{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}!size@{size}}
+\index{size@{size}!sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{size()}{size()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1stack_acee386572ddf55df79ab4f7e35eecc96} 
+template$<$typename ElemT , size\+\_\+t Elem\+Sz, typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = nullptr\+\_\+t$>$ \\
+size\+\_\+t \mbox{\hyperlink{classsysio_1_1vm_1_1stack}{sysio\+::vm\+::stack}}$<$ ElemT, Elem\+Sz, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::size (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2wasm__stack_8hpp_source_l00063}{63}} of file \mbox{\hyperlink{vm_2wasm__stack_8hpp_source}{wasm\+\_\+stack.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00063\ \{\ \textcolor{keywordflow}{return}\ \_index;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1stack_adc4a93eafdcbf2f3526d11bdbe0cc126}\index{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}!trim@{trim}}
+\index{trim@{trim}!sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{trim()}{trim()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1stack_adc4a93eafdcbf2f3526d11bdbe0cc126} 
+template$<$typename ElemT , size\+\_\+t Elem\+Sz, typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = nullptr\+\_\+t$>$ \\
+void \mbox{\hyperlink{classsysio_1_1vm_1_1stack}{sysio\+::vm\+::stack}}$<$ ElemT, Elem\+Sz, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::trim (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{amt}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2wasm__stack_8hpp_source_l00062}{62}} of file \mbox{\hyperlink{sysio_2vm_2wasm__stack_8hpp_source}{wasm\+\_\+stack.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00062\ \{\ \_index\ -\/=\ amt;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1stack_adc4a93eafdcbf2f3526d11bdbe0cc126}\index{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}!trim@{trim}}
+\index{trim@{trim}!sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$@{sysio::vm::stack$<$ ElemT, ElemSz, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{trim()}{trim()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1stack_adc4a93eafdcbf2f3526d11bdbe0cc126} 
+template$<$typename ElemT , size\+\_\+t Elem\+Sz, typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = nullptr\+\_\+t$>$ \\
+void \mbox{\hyperlink{classsysio_1_1vm_1_1stack}{sysio\+::vm\+::stack}}$<$ ElemT, Elem\+Sz, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::trim (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{amt}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2wasm__stack_8hpp_source_l00062}{62}} of file \mbox{\hyperlink{vm_2wasm__stack_8hpp_source}{wasm\+\_\+stack.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00062\ \{\ \_index\ -\/=\ amt;\ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/include/sysio/sysio/vm/\mbox{\hyperlink{sysio_2vm_2wasm__stack_8hpp}{wasm\+\_\+stack.\+hpp}}\item 
+libraries/sys-\/vm/include/sysio/vm/\mbox{\hyperlink{vm_2wasm__stack_8hpp}{wasm\+\_\+stack.\+hpp}}\end{DoxyCompactItemize}

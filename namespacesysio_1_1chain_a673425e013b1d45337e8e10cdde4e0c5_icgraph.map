@@ -1,0 +1,7 @@
+<map id="sysio::chain::filter_data_by_marker" name="sysio::chain::filter_data_by_marker">
+<area shape="rect" id="Node000001" title="Return values in DataRange corresponding to matching Markers." alt="" coords="213,39,337,79"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1chain_1_1authority__checker.html#a2432f1140c5a55f21615dfb8e1ec054b" title=" " alt="" coords="5,5,165,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="197,48,165,42,166,37,198,43"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1chain_1_1authority__checker.html#a8500b3bc501b5a1fc2f30e1091a1d2fe" title=" " alt="" coords="10,71,160,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="198,75,161,81,160,76,197,69"/>
+</map>

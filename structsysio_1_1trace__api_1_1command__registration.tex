@@ -1,0 +1,126 @@
+\doxysection{sysio\+::trace\+\_\+api\+::command\+\_\+registration Struct Reference}
+\hypertarget{structsysio_1_1trace__api_1_1command__registration}{}\label{structsysio_1_1trace__api_1_1command__registration}\index{sysio::trace\_api::command\_registration@{sysio::trace\_api::command\_registration}}
+
+
+{\ttfamily \#include $<$cmd\+\_\+registration.\+hpp$>$}
+
+
+
+Collaboration diagram for sysio\+::trace\+\_\+api\+::command\+\_\+registration\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=256pt]{structsysio_1_1trace__api_1_1command__registration__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1trace__api_1_1command__registration_a170e950c44d1602a843683358c72c926}{command\+\_\+registration}} (std\+::string \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}, std\+::string \mbox{\hyperlink{structsysio_1_1trace__api_1_1command__registration_a8526bb7042d00d0a1b4c89e5c1493c7b}{slug}}, \mbox{\hyperlink{namespacesysio_1_1trace__api_ac8eb6442da5d5494700c3575a8641046}{command\+\_\+fn}} \mbox{\hyperlink{structsysio_1_1trace__api_1_1command__registration_a5c8e1c1bea3edfe4b9d79bd76b9855b8}{func}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::string \mbox{\hyperlink{structsysio_1_1trace__api_1_1command__registration_aba1c317cc4b2299a08dc2520a34d0cd6}{name}}
+\item 
+std\+::string \mbox{\hyperlink{structsysio_1_1trace__api_1_1command__registration_a8526bb7042d00d0a1b4c89e5c1493c7b}{slug}}
+\item 
+\mbox{\hyperlink{namespacesysio_1_1trace__api_ac8eb6442da5d5494700c3575a8641046}{command\+\_\+fn}} \mbox{\hyperlink{structsysio_1_1trace__api_1_1command__registration_a5c8e1c1bea3edfe4b9d79bd76b9855b8}{func}}
+\item 
+\mbox{\hyperlink{structsysio_1_1trace__api_1_1command__registration}{command\+\_\+registration}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structsysio_1_1trace__api_1_1command__registration_a612a39efc82b9fbadb057a9d9684301d}{\+\_\+next}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static \mbox{\hyperlink{structsysio_1_1trace__api_1_1command__registration}{command\+\_\+registration}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structsysio_1_1trace__api_1_1command__registration_a339cfdb3bfbfeadf6d06c2bbe5526091}{\+\_\+list}} = nullptr
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+basic initialization time linked list for registering commands 
+
+Definition at line \mbox{\hyperlink{cmd__registration_8hpp_source_l00020}{20}} of file \mbox{\hyperlink{cmd__registration_8hpp_source}{cmd\+\_\+registration.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structsysio_1_1trace__api_1_1command__registration_a170e950c44d1602a843683358c72c926}\index{sysio::trace\_api::command\_registration@{sysio::trace\_api::command\_registration}!command\_registration@{command\_registration}}
+\index{command\_registration@{command\_registration}!sysio::trace\_api::command\_registration@{sysio::trace\_api::command\_registration}}
+\doxysubsubsection{\texorpdfstring{command\_registration()}{command\_registration()}}
+{\footnotesize\ttfamily \label{structsysio_1_1trace__api_1_1command__registration_a170e950c44d1602a843683358c72c926} 
+sysio\+::trace\+\_\+api\+::command\+\_\+registration\+::command\+\_\+registration (\begin{DoxyParamCaption}\item[{std\+::string}]{name}{, }\item[{std\+::string}]{slug}{, }\item[{\mbox{\hyperlink{namespacesysio_1_1trace__api_ac8eb6442da5d5494700c3575a8641046}{command\+\_\+fn}}}]{func}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{cmd__registration_8hpp_source_l00021}{21}} of file \mbox{\hyperlink{cmd__registration_8hpp_source}{cmd\+\_\+registration.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ :\mbox{\hyperlink{structsysio_1_1trace__api_1_1command__registration_aba1c317cc4b2299a08dc2520a34d0cd6}{name}}(std::move(\mbox{\hyperlink{structsysio_1_1trace__api_1_1command__registration_aba1c317cc4b2299a08dc2520a34d0cd6}{name}}))}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ ,\mbox{\hyperlink{structsysio_1_1trace__api_1_1command__registration_a8526bb7042d00d0a1b4c89e5c1493c7b}{slug}}(std::move(\mbox{\hyperlink{structsysio_1_1trace__api_1_1command__registration_a8526bb7042d00d0a1b4c89e5c1493c7b}{slug}}))}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ ,\mbox{\hyperlink{structsysio_1_1trace__api_1_1command__registration_a5c8e1c1bea3edfe4b9d79bd76b9855b8}{func}}(std::move(\mbox{\hyperlink{structsysio_1_1trace__api_1_1command__registration_a5c8e1c1bea3edfe4b9d79bd76b9855b8}{func}}))}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1trace__api_1_1command__registration_a612a39efc82b9fbadb057a9d9684301d}{\_next}}\ =\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1command__registration_a339cfdb3bfbfeadf6d06c2bbe5526091}{\_list}};}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1trace__api_1_1command__registration_a339cfdb3bfbfeadf6d06c2bbe5526091}{\_list}}\ =\ \textcolor{keyword}{this};}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1trace__api_1_1command__registration_a339cfdb3bfbfeadf6d06c2bbe5526091}\index{sysio::trace\_api::command\_registration@{sysio::trace\_api::command\_registration}!\_list@{\_list}}
+\index{\_list@{\_list}!sysio::trace\_api::command\_registration@{sysio::trace\_api::command\_registration}}
+\doxysubsubsection{\texorpdfstring{\_list}{\_list}}
+{\footnotesize\ttfamily \label{structsysio_1_1trace__api_1_1command__registration_a339cfdb3bfbfeadf6d06c2bbe5526091} 
+\mbox{\hyperlink{structsysio_1_1trace__api_1_1command__registration}{command\+\_\+registration}} \texorpdfstring{$\ast$}{*} command\+\_\+registration\+::\+\_\+list = nullptr\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{cmd__registration_8hpp_source_l00035}{35}} of file \mbox{\hyperlink{cmd__registration_8hpp_source}{cmd\+\_\+registration.\+hpp}}.
+
+\Hypertarget{structsysio_1_1trace__api_1_1command__registration_a612a39efc82b9fbadb057a9d9684301d}\index{sysio::trace\_api::command\_registration@{sysio::trace\_api::command\_registration}!\_next@{\_next}}
+\index{\_next@{\_next}!sysio::trace\_api::command\_registration@{sysio::trace\_api::command\_registration}}
+\doxysubsubsection{\texorpdfstring{\_next}{\_next}}
+{\footnotesize\ttfamily \label{structsysio_1_1trace__api_1_1command__registration_a612a39efc82b9fbadb057a9d9684301d} 
+\mbox{\hyperlink{structsysio_1_1trace__api_1_1command__registration}{command\+\_\+registration}}\texorpdfstring{$\ast$}{*} sysio\+::trace\+\_\+api\+::command\+\_\+registration\+::\+\_\+next}
+
+
+
+Definition at line \mbox{\hyperlink{cmd__registration_8hpp_source_l00033}{33}} of file \mbox{\hyperlink{cmd__registration_8hpp_source}{cmd\+\_\+registration.\+hpp}}.
+
+\Hypertarget{structsysio_1_1trace__api_1_1command__registration_a5c8e1c1bea3edfe4b9d79bd76b9855b8}\index{sysio::trace\_api::command\_registration@{sysio::trace\_api::command\_registration}!func@{func}}
+\index{func@{func}!sysio::trace\_api::command\_registration@{sysio::trace\_api::command\_registration}}
+\doxysubsubsection{\texorpdfstring{func}{func}}
+{\footnotesize\ttfamily \label{structsysio_1_1trace__api_1_1command__registration_a5c8e1c1bea3edfe4b9d79bd76b9855b8} 
+\mbox{\hyperlink{namespacesysio_1_1trace__api_ac8eb6442da5d5494700c3575a8641046}{command\+\_\+fn}} sysio\+::trace\+\_\+api\+::command\+\_\+registration\+::func}
+
+
+
+Definition at line \mbox{\hyperlink{cmd__registration_8hpp_source_l00032}{32}} of file \mbox{\hyperlink{cmd__registration_8hpp_source}{cmd\+\_\+registration.\+hpp}}.
+
+\Hypertarget{structsysio_1_1trace__api_1_1command__registration_aba1c317cc4b2299a08dc2520a34d0cd6}\index{sysio::trace\_api::command\_registration@{sysio::trace\_api::command\_registration}!name@{name}}
+\index{name@{name}!sysio::trace\_api::command\_registration@{sysio::trace\_api::command\_registration}}
+\doxysubsubsection{\texorpdfstring{name}{name}}
+{\footnotesize\ttfamily \label{structsysio_1_1trace__api_1_1command__registration_aba1c317cc4b2299a08dc2520a34d0cd6} 
+std\+::string sysio\+::trace\+\_\+api\+::command\+\_\+registration\+::name}
+
+
+
+Definition at line \mbox{\hyperlink{cmd__registration_8hpp_source_l00030}{30}} of file \mbox{\hyperlink{cmd__registration_8hpp_source}{cmd\+\_\+registration.\+hpp}}.
+
+\Hypertarget{structsysio_1_1trace__api_1_1command__registration_a8526bb7042d00d0a1b4c89e5c1493c7b}\index{sysio::trace\_api::command\_registration@{sysio::trace\_api::command\_registration}!slug@{slug}}
+\index{slug@{slug}!sysio::trace\_api::command\_registration@{sysio::trace\_api::command\_registration}}
+\doxysubsubsection{\texorpdfstring{slug}{slug}}
+{\footnotesize\ttfamily \label{structsysio_1_1trace__api_1_1command__registration_a8526bb7042d00d0a1b4c89e5c1493c7b} 
+std\+::string sysio\+::trace\+\_\+api\+::command\+\_\+registration\+::slug}
+
+
+
+Definition at line \mbox{\hyperlink{cmd__registration_8hpp_source_l00031}{31}} of file \mbox{\hyperlink{cmd__registration_8hpp_source}{cmd\+\_\+registration.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+plugins/trace\+\_\+api\+\_\+plugin/utils/include/sysio/trace\+\_\+api/\mbox{\hyperlink{cmd__registration_8hpp}{cmd\+\_\+registration.\+hpp}}\item 
+plugins/trace\+\_\+api\+\_\+plugin/utils/\mbox{\hyperlink{trace__api__util_8cpp}{trace\+\_\+api\+\_\+util.\+cpp}}\end{DoxyCompactItemize}

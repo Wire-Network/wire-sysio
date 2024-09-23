@@ -1,0 +1,52 @@
+\doxysection{catch\+\_\+default\+\_\+main.\+hpp}
+\hypertarget{catch__default__main_8hpp_source}{}\label{catch__default__main_8hpp_source}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_default\_main.hpp@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_default\_main.hpp}}
+\mbox{\hyperlink{catch__default__main_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{catch__default__main_8hpp_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{catch__default__main_8hpp_source_l00002}00002\ \textcolor{comment}{\ *\ \ Created\ by\ Phil\ on\ 20/05/2011.}}
+\DoxyCodeLine{\Hypertarget{catch__default__main_8hpp_source_l00003}00003\ \textcolor{comment}{\ *\ \ Copyright\ 2011\ Two\ Blue\ Cubes\ Ltd.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{catch__default__main_8hpp_source_l00004}00004\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{catch__default__main_8hpp_source_l00005}00005\ \textcolor{comment}{\ *\ \ Distributed\ under\ the\ Boost\ Software\ License,\ Version\ 1.0.\ (See\ accompanying}}
+\DoxyCodeLine{\Hypertarget{catch__default__main_8hpp_source_l00006}00006\ \textcolor{comment}{\ *\ \ file\ LICENSE\_1\_0.txt\ or\ copy\ at\ http://www.boost.org/LICENSE\_1\_0.txt)}}
+\DoxyCodeLine{\Hypertarget{catch__default__main_8hpp_source_l00007}00007\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{catch__default__main_8hpp_source_l00008}00008\ \textcolor{preprocessor}{\#ifndef\ TWOBLUECUBES\_CATCH\_DEFAULT\_MAIN\_HPP\_INCLUDED}}
+\DoxyCodeLine{\Hypertarget{catch__default__main_8hpp_source_l00009}00009\ \textcolor{preprocessor}{\#define\ TWOBLUECUBES\_CATCH\_DEFAULT\_MAIN\_HPP\_INCLUDED}}
+\DoxyCodeLine{\Hypertarget{catch__default__main_8hpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{catch__default__main_8hpp_source_l00011}00011\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__session_8h}{catch\_session.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__default__main_8hpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{catch__default__main_8hpp_source_l00013}00013\ \textcolor{preprocessor}{\#ifndef\ \_\_OBJC\_\_}}
+\DoxyCodeLine{\Hypertarget{catch__default__main_8hpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{catch__default__main_8hpp_source_l00015}00015\ \textcolor{preprocessor}{\#if\ defined(CATCH\_CONFIG\_WCHAR)\ \&\&\ defined(WIN32)\ \&\&\ defined(\_UNICODE)\ \&\&\ !defined(DO\_NOT\_USE\_WMAIN)}}
+\DoxyCodeLine{\Hypertarget{catch__default__main_8hpp_source_l00016}00016\ \textcolor{comment}{//\ Standard\ C/C++\ Win32\ Unicode\ wmain\ entry\ point}}
+\DoxyCodeLine{\Hypertarget{catch__default__main_8hpp_source_l00017}00017\ \textcolor{keyword}{extern}\ \textcolor{stringliteral}{"{}C"{}}\ \textcolor{keywordtype}{int}\ wmain\ (\textcolor{keywordtype}{int}\ argc,\ \textcolor{keywordtype}{wchar\_t}\ *\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[],\ \textcolor{keywordtype}{wchar\_t}\ *\ [])\ \{}
+\DoxyCodeLine{\Hypertarget{catch__default__main_8hpp_source_l00018}00018\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{catch__default__main_8hpp_source_l00019}00019\ \textcolor{comment}{//\ Standard\ C/C++\ main\ entry\ point}}
+\DoxyCodeLine{\Hypertarget{catch__default__main_8hpp_source_l00020}\mbox{\hyperlink{catch__default__main_8hpp_a0ddf1224851353fc92bfbff6f499fa97}{00020}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}\ (\textcolor{keywordtype}{int}\ argc,\ \textcolor{keywordtype}{char}\ *\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[])\ \{}
+\DoxyCodeLine{\Hypertarget{catch__default__main_8hpp_source_l00021}00021\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{catch__default__main_8hpp_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{catch__default__main_8hpp_source_l00023}00023\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_catch_1_1_session}{Catch::Session}}().\mbox{\hyperlink{class_catch_1_1_session_a8c82b89613ebd99f1ba1a3f7b634e571}{run}}(\ argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}\ );}
+\DoxyCodeLine{\Hypertarget{catch__default__main_8hpp_source_l00024}00024\ \}}
+\DoxyCodeLine{\Hypertarget{catch__default__main_8hpp_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{catch__default__main_8hpp_source_l00026}00026\ \textcolor{preprocessor}{\#else\ }\textcolor{comment}{//\ \_\_OBJC\_\_}}
+\DoxyCodeLine{\Hypertarget{catch__default__main_8hpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{catch__default__main_8hpp_source_l00028}00028\ \textcolor{comment}{//\ Objective-\/C\ entry\ point}}
+\DoxyCodeLine{\Hypertarget{catch__default__main_8hpp_source_l00029}00029\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}\ (\textcolor{keywordtype}{int}\ argc,\ \textcolor{keywordtype}{char}\ *\ \textcolor{keyword}{const}\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[])\ \{}
+\DoxyCodeLine{\Hypertarget{catch__default__main_8hpp_source_l00030}00030\ \textcolor{preprocessor}{\#if\ !CATCH\_ARC\_ENABLED}}
+\DoxyCodeLine{\Hypertarget{catch__default__main_8hpp_source_l00031}00031\ \ \ \ \ NSAutoreleasePool\ *\ pool\ =\ [[NSAutoreleasePool\ alloc]\ \mbox{\hyperlink{lib_8h_a02fd73d861ef2e4aabb38c0c9ff82947}{init}}];}
+\DoxyCodeLine{\Hypertarget{catch__default__main_8hpp_source_l00032}00032\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{catch__default__main_8hpp_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{catch__default__main_8hpp_source_l00034}00034\ \ \ \ \ \mbox{\hyperlink{namespace_catch_ad0c3dd7b4c55aeb3a31a7a8b13c17cfb}{Catch::registerTestMethods}}();}
+\DoxyCodeLine{\Hypertarget{catch__default__main_8hpp_source_l00035}00035\ \ \ \ \ \textcolor{keywordtype}{int}\ result\ =\ \mbox{\hyperlink{class_catch_1_1_session}{Catch::Session}}().\mbox{\hyperlink{class_catch_1_1_session_a8c82b89613ebd99f1ba1a3f7b634e571}{run}}(\ argc,\ (\textcolor{keywordtype}{char}**)\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}\ );}
+\DoxyCodeLine{\Hypertarget{catch__default__main_8hpp_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{catch__default__main_8hpp_source_l00037}00037\ \textcolor{preprocessor}{\#if\ !CATCH\_ARC\_ENABLED}}
+\DoxyCodeLine{\Hypertarget{catch__default__main_8hpp_source_l00038}00038\ \ \ \ \ [pool\ drain];}
+\DoxyCodeLine{\Hypertarget{catch__default__main_8hpp_source_l00039}00039\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{catch__default__main_8hpp_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{catch__default__main_8hpp_source_l00041}00041\ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{catch__default__main_8hpp_source_l00042}00042\ \}}
+\DoxyCodeLine{\Hypertarget{catch__default__main_8hpp_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{catch__default__main_8hpp_source_l00044}00044\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ \_\_OBJC\_\_}}
+\DoxyCodeLine{\Hypertarget{catch__default__main_8hpp_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{catch__default__main_8hpp_source_l00046}00046\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ TWOBLUECUBES\_CATCH\_DEFAULT\_MAIN\_HPP\_INCLUDED}}
+
+\end{DoxyCode}

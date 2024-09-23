@@ -1,0 +1,5 @@
+<map id="GenericValue::ShortString::Usable" name="GenericValue::ShortString::Usable">
+<area shape="rect" id="Node000001" title=" " alt="" coords="241,5,412,46"/>
+<area shape="rect" id="Node000002" href="$class_generic_value.html#ad3d91db36dfdbfc1af40a79aae07723c" title="Initialize this value as copy string with initial data, without calling destructor." alt="" coords="5,13,193,38"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="225,28,193,28,193,23,225,23"/>
+</map>

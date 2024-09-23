@@ -1,0 +1,9 @@
+<map id="create_buyrambytes" name="create_buyrambytes">
+<area shape="rect" id="Node000001" title=" " alt="" coords="257,78,396,104"/>
+<area shape="rect" id="Node000002" href="$structbuyram__subcommand.html#aefe28771c949401bedb6bc69b1596421" title=" " alt="" coords="28,5,186,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="265,76,177,49,179,44,267,71"/>
+<area shape="rect" id="Node000003" href="$structcreate__account__subcommand.html#a46440dab55b6a8b52d22e14901e48e9e" title=" " alt="" coords="5,71,209,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="241,94,209,94,209,88,241,88"/>
+<area shape="rect" id="Node000004" href="$structdelegate__bandwidth__subcommand.html#a7ef09be51fd71407ca8206b70eae3816" title=" " alt="" coords="21,135,193,191"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="271,112,195,137,193,132,269,107"/>
+</map>

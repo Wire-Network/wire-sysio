@@ -1,0 +1,295 @@
+\doxysection{websocketpp\+::utility Namespace Reference}
+\hypertarget{namespacewebsocketpp_1_1utility}{}\label{namespacewebsocketpp_1_1utility}\index{websocketpp::utility@{websocketpp::utility}}
+
+
+Generic non-\/websocket specific utility functions and data structures.  
+
+
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structwebsocketpp_1_1utility_1_1ci__less}{ci\+\_\+less}}
+\begin{DoxyCompactList}\small\item\em Helper less than functor for case insensitive find. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{structwebsocketpp_1_1utility_1_1my__equal}{my\+\_\+equal}}
+\begin{DoxyCompactList}\small\item\em Helper functor for case insensitive find. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+std\+::string \mbox{\hyperlink{namespacewebsocketpp_1_1utility_aa96a743a4f0392aac39742c3e5dfd1cc}{to\+\_\+lower}} (std\+::string const \&in)
+\begin{DoxyCompactList}\small\item\em Convert a string to lowercase. \end{DoxyCompactList}\item 
+std\+::string \mbox{\hyperlink{namespacewebsocketpp_1_1utility_a26e5a26395d95d2f6bf3a9edb8d06dd2}{to\+\_\+hex}} (std\+::string const \&input)
+\begin{DoxyCompactList}\small\item\em Convert std\+::string to ascii printed string of hex digits. \end{DoxyCompactList}\item 
+std\+::string \mbox{\hyperlink{namespacewebsocketpp_1_1utility_a42132bbbc1632f7ba964bd87ac5f288f}{to\+\_\+hex}} (\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} const \texorpdfstring{$\ast$}{*}input, size\+\_\+t length)
+\begin{DoxyCompactList}\small\item\em Convert byte array (uint8\+\_\+t) to ascii printed string of hex digits. \end{DoxyCompactList}\item 
+std\+::string \mbox{\hyperlink{namespacewebsocketpp_1_1utility_a9f9ed51337c9b493abc97b639b0fbe2e}{to\+\_\+hex}} (char const \texorpdfstring{$\ast$}{*}input, size\+\_\+t length)
+\begin{DoxyCompactList}\small\item\em Convert char array to ascii printed string of hex digits. \end{DoxyCompactList}\item 
+std\+::string \mbox{\hyperlink{namespacewebsocketpp_1_1utility_a5d36afd6d8da4b22b5d634e035bfb450}{string\+\_\+replace\+\_\+all}} (std\+::string subject, std\+::string const \&search, std\+::string const \&replace)
+\begin{DoxyCompactList}\small\item\em Replace all occurrances of a substring with another. \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\T\+::const\+\_\+iterator \mbox{\hyperlink{namespacewebsocketpp_1_1utility_a484f1287b93cf58cc6514e46eed41568}{ci\+\_\+find\+\_\+substr}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const \&haystack, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const \&needle, std\+::locale const \&loc=std\+::locale())
+\begin{DoxyCompactList}\small\item\em Find substring (case insensitive) \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\T\+::const\+\_\+iterator \mbox{\hyperlink{namespacewebsocketpp_1_1utility_a90383b2decd273f7a66bbb87c66b5ddd}{ci\+\_\+find\+\_\+substr}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const \&haystack, typename T\+::value\+\_\+type const \texorpdfstring{$\ast$}{*}needle, typename T\+::size\+\_\+type size, std\+::locale const \&loc=std\+::locale())
+\begin{DoxyCompactList}\small\item\em Find substring (case insensitive) \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacewebsocketpp_1_1utility_a484f1287b93cf58cc6514e46eed41568}\index{websocketpp::utility@{websocketpp::utility}!ci\_find\_substr@{ci\_find\_substr}}
+\index{ci\_find\_substr@{ci\_find\_substr}!websocketpp::utility@{websocketpp::utility}}
+\doxysubsubsection{\texorpdfstring{ci\_find\_substr()}{ci\_find\_substr()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1utility_a484f1287b93cf58cc6514e46eed41568} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+T\+::const\+\_\+iterator websocketpp\+::utility\+::ci\+\_\+find\+\_\+substr (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const \&}]{haystack}{, }\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const \&}]{needle}{, }\item[{std\+::locale const \&}]{loc}{ = {\ttfamily std\+:\+:locale()}}\end{DoxyParamCaption})}
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em haystack} & The string to search in \\
+\hline
+\mbox{\texttt{ in}}  & {\em needle} & The string to search for \\
+\hline
+\mbox{\texttt{ in}}  & {\em loc} & The locale to use for determining the case of values. Defaults to the current locale. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+An iterator to the first element of the first occurrance of needle in haystack. If the sequence is not found, the function returns haystack.\+end() 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{utilities_8hpp_source_l00103}{103}} of file \mbox{\hyperlink{utilities_8hpp_source}{utilities.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00105\ \{}
+\DoxyCodeLine{00106\ \ \ \ \ \textcolor{keywordflow}{return}\ std::search(\ haystack.begin(),\ haystack.end(),}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ needle.begin(),\ needle.end(),\ \mbox{\hyperlink{structwebsocketpp_1_1utility_1_1my__equal}{my\_equal<typename\ T::value\_type>}}(loc)\ );}
+\DoxyCodeLine{00108\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacewebsocketpp_1_1utility_a484f1287b93cf58cc6514e46eed41568_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacewebsocketpp_1_1utility_a90383b2decd273f7a66bbb87c66b5ddd}\index{websocketpp::utility@{websocketpp::utility}!ci\_find\_substr@{ci\_find\_substr}}
+\index{ci\_find\_substr@{ci\_find\_substr}!websocketpp::utility@{websocketpp::utility}}
+\doxysubsubsection{\texorpdfstring{ci\_find\_substr()}{ci\_find\_substr()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1utility_a90383b2decd273f7a66bbb87c66b5ddd} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+T\+::const\+\_\+iterator websocketpp\+::utility\+::ci\+\_\+find\+\_\+substr (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const \&}]{haystack}{, }\item[{typename T\+::value\+\_\+type const \texorpdfstring{$\ast$}{*}}]{needle}{, }\item[{typename T\+::size\+\_\+type}]{size}{, }\item[{std\+::locale const \&}]{loc}{ = {\ttfamily std\+:\+:locale()}}\end{DoxyParamCaption})}
+
+\begin{DoxyRefDesc}{Todo}
+\item[\mbox{\hyperlink{todo__todo000023}{Todo}}]Is this still used? This method may not make sense.. should use iterators or be less generic. As is it is too tightly coupled to std\+::string\end{DoxyRefDesc}
+
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em haystack} & The string to search in \\
+\hline
+\mbox{\texttt{ in}}  & {\em needle} & The string to search for as a char array of values \\
+\hline
+\mbox{\texttt{ in}}  & {\em size} & Length of needle \\
+\hline
+\mbox{\texttt{ in}}  & {\em loc} & The locale to use for determining the case of values. Defaults to the current locale. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+An iterator to the first element of the first occurrance of needle in haystack. If the sequence is not found, the function returns haystack.\+end() 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{utilities_8hpp_source_l00125}{125}} of file \mbox{\hyperlink{utilities_8hpp_source}{utilities.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00128\ \{}
+\DoxyCodeLine{00129\ \ \ \ \ \textcolor{keywordflow}{return}\ std::search(\ haystack.begin(),\ haystack.end(),}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ needle,\ needle+size,\ \mbox{\hyperlink{structwebsocketpp_1_1utility_1_1my__equal}{my\_equal<typename\ T::value\_type>}}(loc)\ );}
+\DoxyCodeLine{00131\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacewebsocketpp_1_1utility_a5d36afd6d8da4b22b5d634e035bfb450}\index{websocketpp::utility@{websocketpp::utility}!string\_replace\_all@{string\_replace\_all}}
+\index{string\_replace\_all@{string\_replace\_all}!websocketpp::utility@{websocketpp::utility}}
+\doxysubsubsection{\texorpdfstring{string\_replace\_all()}{string\_replace\_all()}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1utility_a5d36afd6d8da4b22b5d634e035bfb450} 
+std\+::string websocketpp\+::utility\+::string\+\_\+replace\+\_\+all (\begin{DoxyParamCaption}\item[{std\+::string}]{subject}{, }\item[{std\+::string const \&}]{search}{, }\item[{std\+::string const \&}]{replace}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em subject} & The string to search in \\
+\hline
+\mbox{\texttt{ in}}  & {\em search} & The string to search for \\
+\hline
+\mbox{\texttt{ in}}  & {\em replace} & The string to replace with \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\doxylink{struct_a}{A} copy of {\ttfamily subject} with all occurances of {\ttfamily search} replaced with {\ttfamily replace} 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{utilities__impl_8hpp_source_l00073}{73}} of file \mbox{\hyperlink{utilities__impl_8hpp_source}{utilities\+\_\+impl.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00075\ \{}
+\DoxyCodeLine{00076\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ pos\ =\ 0;}
+\DoxyCodeLine{00077\ \ \ \ \ \textcolor{keywordflow}{while}((pos\ =\ subject.find(search,\ pos))\ !=\ std::string::npos)\ \{}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ subject.replace(pos,\ search.length(),\ replace);}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ pos\ +=\ replace.length();}
+\DoxyCodeLine{00080\ \ \ \ \ \}}
+\DoxyCodeLine{00081\ \ \ \ \ \textcolor{keywordflow}{return}\ subject;}
+\DoxyCodeLine{00082\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacewebsocketpp_1_1utility_a5d36afd6d8da4b22b5d634e035bfb450_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacewebsocketpp_1_1utility_a9f9ed51337c9b493abc97b639b0fbe2e}\index{websocketpp::utility@{websocketpp::utility}!to\_hex@{to\_hex}}
+\index{to\_hex@{to\_hex}!websocketpp::utility@{websocketpp::utility}}
+\doxysubsubsection{\texorpdfstring{to\_hex()}{to\_hex()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1utility_a9f9ed51337c9b493abc97b639b0fbe2e} 
+std\+::string websocketpp\+::utility\+::to\+\_\+hex (\begin{DoxyParamCaption}\item[{char const \texorpdfstring{$\ast$}{*}}]{input}{, }\item[{size\+\_\+t}]{length}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em input} & The char array to print \\
+\hline
+\mbox{\texttt{ in}}  & {\em length} & The length of input \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\doxylink{struct_a}{A} copy of {\ttfamily input} converted to the printable representation of the hex values of its data. 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{utilities__impl_8hpp_source_l00069}{69}} of file \mbox{\hyperlink{utilities__impl_8hpp_source}{utilities\+\_\+impl.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00070\ \ \ \ \ \textcolor{keywordflow}{return}\ to\_hex(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}*\textcolor{keyword}{>}(input),length);}
+\DoxyCodeLine{00071\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=322pt]{namespacewebsocketpp_1_1utility_a9f9ed51337c9b493abc97b639b0fbe2e_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacewebsocketpp_1_1utility_a26e5a26395d95d2f6bf3a9edb8d06dd2}\index{websocketpp::utility@{websocketpp::utility}!to\_hex@{to\_hex}}
+\index{to\_hex@{to\_hex}!websocketpp::utility@{websocketpp::utility}}
+\doxysubsubsection{\texorpdfstring{to\_hex()}{to\_hex()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1utility_a26e5a26395d95d2f6bf3a9edb8d06dd2} 
+std\+::string websocketpp\+::utility\+::to\+\_\+hex (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{input}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em input} & The string to print \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\doxylink{struct_a}{A} copy of {\ttfamily input} converted to the printable representation of the hex values of its data. 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{utilities__impl_8hpp_source_l00043}{43}} of file \mbox{\hyperlink{utilities__impl_8hpp_source}{utilities\+\_\+impl.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00044\ \ \ \ \ std::string\ output;}
+\DoxyCodeLine{00045\ \ \ \ \ std::string\ hex\ =\ \textcolor{stringliteral}{"{}0123456789ABCDEF"{}};}
+\DoxyCodeLine{00046\ }
+\DoxyCodeLine{00047\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ input.size();\ i++)\ \{}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ output\ +=\ hex[(input[i]\ \&\ 0xF0)\ >>\ 4];}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ output\ +=\ hex[input[i]\ \&\ 0x0F];}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ output\ +=\ \textcolor{stringliteral}{"{}\ "{}};}
+\DoxyCodeLine{00051\ \ \ \ \ \}}
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ \ \ \ \ \textcolor{keywordflow}{return}\ output;}
+\DoxyCodeLine{00054\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacewebsocketpp_1_1utility_a26e5a26395d95d2f6bf3a9edb8d06dd2_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacewebsocketpp_1_1utility_a42132bbbc1632f7ba964bd87ac5f288f}\index{websocketpp::utility@{websocketpp::utility}!to\_hex@{to\_hex}}
+\index{to\_hex@{to\_hex}!websocketpp::utility@{websocketpp::utility}}
+\doxysubsubsection{\texorpdfstring{to\_hex()}{to\_hex()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1utility_a42132bbbc1632f7ba964bd87ac5f288f} 
+std\+::string websocketpp\+::utility\+::to\+\_\+hex (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} const \texorpdfstring{$\ast$}{*}}]{input}{, }\item[{size\+\_\+t}]{length}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em input} & The byte array to print \\
+\hline
+\mbox{\texttt{ in}}  & {\em length} & The length of input \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\doxylink{struct_a}{A} copy of {\ttfamily input} converted to the printable representation of the hex values of its data. 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{utilities__impl_8hpp_source_l00056}{56}} of file \mbox{\hyperlink{utilities__impl_8hpp_source}{utilities\+\_\+impl.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00057\ \ \ \ \ std::string\ output;}
+\DoxyCodeLine{00058\ \ \ \ \ std::string\ hex\ =\ \textcolor{stringliteral}{"{}0123456789ABCDEF"{}};}
+\DoxyCodeLine{00059\ }
+\DoxyCodeLine{00060\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ length;\ i++)\ \{}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ output\ +=\ hex[(input[i]\ \&\ 0xF0)\ >>\ 4];}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ output\ +=\ hex[input[i]\ \&\ 0x0F];}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ output\ +=\ \textcolor{stringliteral}{"{}\ "{}};}
+\DoxyCodeLine{00064\ \ \ \ \ \}}
+\DoxyCodeLine{00065\ }
+\DoxyCodeLine{00066\ \ \ \ \ \textcolor{keywordflow}{return}\ output;}
+\DoxyCodeLine{00067\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacewebsocketpp_1_1utility_aa96a743a4f0392aac39742c3e5dfd1cc}\index{websocketpp::utility@{websocketpp::utility}!to\_lower@{to\_lower}}
+\index{to\_lower@{to\_lower}!websocketpp::utility@{websocketpp::utility}}
+\doxysubsubsection{\texorpdfstring{to\_lower()}{to\_lower()}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1utility_aa96a743a4f0392aac39742c3e5dfd1cc} 
+std\+::string websocketpp\+::utility\+::to\+\_\+lower (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{in}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em in} & The string to convert \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The converted string 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{utilities__impl_8hpp_source_l00037}{37}} of file \mbox{\hyperlink{utilities__impl_8hpp_source}{utilities\+\_\+impl.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00038\ \ \ \ \ std::string\ out\ =\ in;}
+\DoxyCodeLine{00039\ \ \ \ \ std::transform(out.begin(),out.end(),out.begin(),::tolower);}
+\DoxyCodeLine{00040\ \ \ \ \ \textcolor{keywordflow}{return}\ out;}
+\DoxyCodeLine{00041\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacewebsocketpp_1_1utility_aa96a743a4f0392aac39742c3e5dfd1cc_icgraph}
+\end{center}
+\end{figure}

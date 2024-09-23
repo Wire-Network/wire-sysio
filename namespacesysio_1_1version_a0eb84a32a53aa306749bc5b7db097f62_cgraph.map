@@ -1,0 +1,5 @@
+<map id="sysio::version::version_client" name="sysio::version::version_client">
+<area shape="rect" id="Node000001" title="&lt; Grab the basic version information of the client; example: v1.8.0&#45;rc1" alt="" coords="5,5,158,46"/>
+<area shape="rect" id="Node000002" href="$namespacesysio_1_1version.html#ab771a7ca59e7640f2e282ae4675f1155" title="&lt; Helper function for version_client()" alt="" coords="206,5,365,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="158,23,190,23,190,28,158,28"/>
+</map>

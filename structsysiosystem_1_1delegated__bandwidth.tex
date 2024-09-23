@@ -1,0 +1,121 @@
+\doxysection{sysiosystem\+::delegated\+\_\+bandwidth Struct Reference}
+\hypertarget{structsysiosystem_1_1delegated__bandwidth}{}\label{structsysiosystem_1_1delegated__bandwidth}\index{sysiosystem::delegated\_bandwidth@{sysiosystem::delegated\_bandwidth}}
+
+
+{\ttfamily \#include $<$sysio.\+system.\+hpp$>$}
+
+
+
+Collaboration diagram for sysiosystem\+::delegated\+\_\+bandwidth\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=296pt]{structsysiosystem_1_1delegated__bandwidth__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{structsysiosystem_1_1delegated__bandwidth_a5036a8fa1e1df30c5b1e090d2bced0ab}{is\+\_\+empty}} () const
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1delegated__bandwidth_a8d53fab99fa4e82582d727b7f70b923c}{primary\+\_\+key}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \mbox{\hyperlink{structsysiosystem_1_1delegated__bandwidth_a6826b0fcdb01f83f2e357f8ee524c5aa}{from}}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \mbox{\hyperlink{structsysiosystem_1_1delegated__bandwidth_a8d08d45b006e86b3a9230c91b0017571}{to}}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \mbox{\hyperlink{structsysiosystem_1_1delegated__bandwidth_a40fa50c8d7269b43ddaf6a49b98dac59}{net\+\_\+weight}}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \mbox{\hyperlink{structsysiosystem_1_1delegated__bandwidth_a79d185f182bc719658afd8dba134b99b}{cpu\+\_\+weight}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00355}{355}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysiosystem_1_1delegated__bandwidth_a5036a8fa1e1df30c5b1e090d2bced0ab}\index{sysiosystem::delegated\_bandwidth@{sysiosystem::delegated\_bandwidth}!is\_empty@{is\_empty}}
+\index{is\_empty@{is\_empty}!sysiosystem::delegated\_bandwidth@{sysiosystem::delegated\_bandwidth}}
+\doxysubsubsection{\texorpdfstring{is\_empty()}{is\_empty()}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1delegated__bandwidth_a5036a8fa1e1df30c5b1e090d2bced0ab} 
+bool sysiosystem\+::delegated\+\_\+bandwidth\+::is\+\_\+empty (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00361}{361}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00361\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysiosystem_1_1delegated__bandwidth_a40fa50c8d7269b43ddaf6a49b98dac59}{net\_weight}}.amount\ ==\ 0\ \&\&\ \mbox{\hyperlink{structsysiosystem_1_1delegated__bandwidth_a79d185f182bc719658afd8dba134b99b}{cpu\_weight}}.amount\ ==\ 0;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysiosystem_1_1delegated__bandwidth_a8d53fab99fa4e82582d727b7f70b923c}\index{sysiosystem::delegated\_bandwidth@{sysiosystem::delegated\_bandwidth}!primary\_key@{primary\_key}}
+\index{primary\_key@{primary\_key}!sysiosystem::delegated\_bandwidth@{sysiosystem::delegated\_bandwidth}}
+\doxysubsubsection{\texorpdfstring{primary\_key()}{primary\_key()}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1delegated__bandwidth_a8d53fab99fa4e82582d727b7f70b923c} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} sysiosystem\+::delegated\+\_\+bandwidth\+::primary\+\_\+key (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00362}{362}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00362\ \{\ \textcolor{keywordflow}{return}\ to.value;\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysiosystem_1_1delegated__bandwidth_a79d185f182bc719658afd8dba134b99b}\index{sysiosystem::delegated\_bandwidth@{sysiosystem::delegated\_bandwidth}!cpu\_weight@{cpu\_weight}}
+\index{cpu\_weight@{cpu\_weight}!sysiosystem::delegated\_bandwidth@{sysiosystem::delegated\_bandwidth}}
+\doxysubsubsection{\texorpdfstring{cpu\_weight}{cpu\_weight}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1delegated__bandwidth_a79d185f182bc719658afd8dba134b99b} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} sysiosystem\+::delegated\+\_\+bandwidth\+::cpu\+\_\+weight}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00359}{359}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1delegated__bandwidth_a6826b0fcdb01f83f2e357f8ee524c5aa}\index{sysiosystem::delegated\_bandwidth@{sysiosystem::delegated\_bandwidth}!from@{from}}
+\index{from@{from}!sysiosystem::delegated\_bandwidth@{sysiosystem::delegated\_bandwidth}}
+\doxysubsubsection{\texorpdfstring{from}{from}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1delegated__bandwidth_a6826b0fcdb01f83f2e357f8ee524c5aa} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} sysiosystem\+::delegated\+\_\+bandwidth\+::from}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00356}{356}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1delegated__bandwidth_a40fa50c8d7269b43ddaf6a49b98dac59}\index{sysiosystem::delegated\_bandwidth@{sysiosystem::delegated\_bandwidth}!net\_weight@{net\_weight}}
+\index{net\_weight@{net\_weight}!sysiosystem::delegated\_bandwidth@{sysiosystem::delegated\_bandwidth}}
+\doxysubsubsection{\texorpdfstring{net\_weight}{net\_weight}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1delegated__bandwidth_a40fa50c8d7269b43ddaf6a49b98dac59} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} sysiosystem\+::delegated\+\_\+bandwidth\+::net\+\_\+weight}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00358}{358}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1delegated__bandwidth_a8d08d45b006e86b3a9230c91b0017571}\index{sysiosystem::delegated\_bandwidth@{sysiosystem::delegated\_bandwidth}!to@{to}}
+\index{to@{to}!sysiosystem::delegated\_bandwidth@{sysiosystem::delegated\_bandwidth}}
+\doxysubsubsection{\texorpdfstring{to}{to}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1delegated__bandwidth_a8d08d45b006e86b3a9230c91b0017571} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} sysiosystem\+::delegated\+\_\+bandwidth\+::to}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00357}{357}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/svetlasyrimis/\+Desktop/wire-\/network/\+WN-\/org/wire-\/system-\/contracts/contracts/sysio.\+system/include/sysio.\+system/\mbox{\hyperlink{sysio_8system_8hpp}{sysio.\+system.\+hpp}}\end{DoxyCompactItemize}

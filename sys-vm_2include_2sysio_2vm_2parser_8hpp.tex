@@ -1,0 +1,311 @@
+\doxysection{libraries/sys-\/vm/include/sysio/vm/parser.hpp File Reference}
+\hypertarget{sys-vm_2include_2sysio_2vm_2parser_8hpp}{}\label{sys-vm_2include_2sysio_2vm_2parser_8hpp}\index{libraries/sys-\/vm/include/sysio/vm/parser.hpp@{libraries/sys-\/vm/include/sysio/vm/parser.hpp}}
+{\ttfamily \#include $<$sysio/vm/allocator.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/vm/constants.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/vm/exceptions.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/vm/leb128.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/vm/options.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/vm/sections.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/vm/types.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/vm/utils.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/vm/vector.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/vm/debug\+\_\+info.\+hpp$>$}\newline
+{\ttfamily \#include $<$algorithm$>$}\newline
+{\ttfamily \#include $<$cassert$>$}\newline
+{\ttfamily \#include $<$cstdint$>$}\newline
+{\ttfamily \#include $<$utility$>$}\newline
+{\ttfamily \#include $<$variant$>$}\newline
+{\ttfamily \#include $<$vector$>$}\newline
+Include dependency graph for parser.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sys-vm_2include_2sysio_2vm_2parser_8hpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1max__mutable__globals__checker}{sysio\+::vm\+::detail\+::max\+\_\+mutable\+\_\+globals\+\_\+checker$<$ Options, Enable $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1max__mutable__globals__checker_3_01_options_00_01std_1_1void__t_38b43c1edd3d9937f38ac80ad679c9653}{sysio\+::vm\+::detail\+::max\+\_\+mutable\+\_\+globals\+\_\+checker$<$ Options, std\+::void\+\_\+t$<$ max\+\_\+mutable\+\_\+globals\+\_\+t$<$ Options $>$ $>$ $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1max__func__local__bytes__checker}{sysio\+::vm\+::detail\+::max\+\_\+func\+\_\+local\+\_\+bytes\+\_\+checker$<$ Options, Enable $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1max__func__local__bytes__checker_3_01_options_00_01std_1_1void__t1a98a45684746495cfe9b3cb6e2bb462}{sysio\+::vm\+::detail\+::max\+\_\+func\+\_\+local\+\_\+bytes\+\_\+checker$<$ Options, std\+::void\+\_\+t$<$ decltype(std\+::declval$<$ Options $>$().\+max\+\_\+func\+\_\+local\+\_\+bytes)$>$ $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1max__func__local__bytes__stack__checker}{sysio\+::vm\+::detail\+::max\+\_\+func\+\_\+local\+\_\+bytes\+\_\+stack\+\_\+checker$<$ Options, Enable $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1max__func__local__bytes__stack__checker_3_01_options_00_01std_1_18ab8d4f24f2dfd731b6da0bf85cff054}{sysio\+::vm\+::detail\+::max\+\_\+func\+\_\+local\+\_\+bytes\+\_\+stack\+\_\+checker$<$ Options, std\+::enable\+\_\+if\+\_\+t$<$!max\+\_\+func\+\_\+local\+\_\+bytes\+\_\+checker$<$ Options $>$\+::is\+\_\+defined\texorpdfstring{$\vert$}{|}\texorpdfstring{$\vert$}{|}get\+\_\+max\+\_\+func\+\_\+local\+\_\+bytes\+\_\+no\+\_\+stack\+\_\+c$<$ Options $>$(0)$>$ $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1sysio__max__nested__structures__checker}{sysio\+::vm\+::detail\+::sysio\+\_\+max\+\_\+nested\+\_\+structures\+\_\+checker$<$ Options, Enable $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1sysio__max__nested__structures__checker_3_01_options_00_01std_1_1fbfb108ed160c57bb880bcf2e3ce31bc}{sysio\+::vm\+::detail\+::sysio\+\_\+max\+\_\+nested\+\_\+structures\+\_\+checker$<$ Options, std\+::void\+\_\+t$<$ decltype(std\+::declval$<$ Options $>$().\+sysio\+\_\+max\+\_\+nested\+\_\+structures)$>$ $>$}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1vm_1_1binary__parser}{sysio\+::vm\+::binary\+\_\+parser$<$ Writer, Options, Debug\+Info $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1pc__element__t}{sysio\+::vm\+::binary\+\_\+parser$<$ Writer, Options, Debug\+Info $>$\+::pc\+\_\+element\+\_\+t}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1operand__stack__type__tracker}{sysio\+::vm\+::binary\+\_\+parser$<$ Writer, Options, Debug\+Info $>$\+::operand\+\_\+stack\+\_\+type\+\_\+tracker}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1local__types__t}{sysio\+::vm\+::binary\+\_\+parser$<$ Writer, Options, Debug\+Info $>$\+::local\+\_\+types\+\_\+t}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1vm}{sysio\+::vm}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail}{sysio\+::vm\+::detail}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2parser_8hpp_aa8506a8b12f97e0e8f44f4a03462c903}{PARSER\+\_\+\+OPTION}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  default\+\_\+,  type)
+\item 
+\#define \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2parser_8hpp_aa6b716e9b0bc0bf8c9fc68cc026a38ae}{MAX\+\_\+\+ELEMENTS}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  default\+\_\+)
+\item 
+\#define \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2parser_8hpp_a73d414722845b106c885b6e1bbe3c399}{LOAD\+\_\+\+OP}}(op\+\_\+name,  max\+\_\+align,  type)
+\item 
+\#define \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2parser_8hpp_a5a8658e2f9acbfb17e41827ac55c16a5}{STORE\+\_\+\+OP}}(op\+\_\+name,  max\+\_\+align,  type)
+\item 
+\#define \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2parser_8hpp_a62c7ea0dd8316a3aefeb7980a94b9aad}{UNOP}}(opname)
+\item 
+\#define \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2parser_8hpp_a6b5d8de7ddab394b2f53f33d519dd230}{BINOP}}(opname)
+\item 
+\#define \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2parser_8hpp_a2094008d2e16309accddc8ba84ed62d9}{CASTOP}}(dst,  opname,  src)
+\item 
+\#define \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}~i32
+\item 
+\#define \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2parser_8hpp_a955f504eccf76b4eb2489c0adab03121}{A}}~i32
+\item 
+\#define \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2parser_8hpp_a955f504eccf76b4eb2489c0adab03121}{A}}~i64
+\item 
+\#define \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2parser_8hpp_a955f504eccf76b4eb2489c0adab03121}{A}}~f32
+\item 
+\#define \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2parser_8hpp_a955f504eccf76b4eb2489c0adab03121}{A}}~f64
+\item 
+\#define \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}~\mbox{\hyperlink{struct_a}{A}}
+\item 
+\#define \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2parser_8hpp_a955f504eccf76b4eb2489c0adab03121}{A}}~i32
+\item 
+\#define \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2parser_8hpp_a955f504eccf76b4eb2489c0adab03121}{A}}~i64
+\item 
+\#define \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2parser_8hpp_a955f504eccf76b4eb2489c0adab03121}{A}}~f32
+\item 
+\#define \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2parser_8hpp_a955f504eccf76b4eb2489c0adab03121}{A}}~f64
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a3973fe348e348191185825e34220d599}{sysio\+::vm\+::detail\+::\+PARSER\+\_\+\+OPTION}} (max\+\_\+func\+\_\+local\+\_\+bytes\+\_\+flags, \mbox{\hyperlink{namespacesysio_1_1vm_abc94c8e9af7289dc068a502c63ad98d4a65004f81079422462f2162dcf38954f3}{max\+\_\+func\+\_\+local\+\_\+bytes\+\_\+flags\+\_\+t\+::locals}}\texorpdfstring{$\vert$}{|}\mbox{\hyperlink{namespacesysio_1_1vm_abc94c8e9af7289dc068a502c63ad98d4afac2a47adace059aff113283a03f6760}{max\+\_\+func\+\_\+local\+\_\+bytes\+\_\+flags\+\_\+t\+::stack}}, \mbox{\hyperlink{namespacesysio_1_1vm_abc94c8e9af7289dc068a502c63ad98d4}{max\+\_\+func\+\_\+local\+\_\+bytes\+\_\+flags\+\_\+t}})
+\item 
+{\footnotesize template$<$typename Options $>$ }\\constexpr auto \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a90dfc2a370be1e4bf0b0d2419edd8207}{sysio\+::vm\+::detail\+::get\+\_\+max\+\_\+func\+\_\+local\+\_\+bytes\+\_\+no\+\_\+stack\+\_\+c}} (int) -\/$>$ std\+::enable\+\_\+if\+\_\+t$<$ std\+::is\+\_\+pointer\+\_\+v$<$ decltype(\&Options\+::max\+\_\+func\+\_\+local\+\_\+bytes\+\_\+flags)$>$, bool $>$
+\item 
+{\footnotesize template$<$typename Options $>$ }\\constexpr auto \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_adb455bae39572f44db19343fdc3c3860}{sysio\+::vm\+::detail\+::get\+\_\+max\+\_\+func\+\_\+local\+\_\+bytes\+\_\+no\+\_\+stack\+\_\+c}} (long) -\/$>$ bool
+\item 
+\mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_add5dbff1fa73277bfe6a15529f23a99f}{sysio\+::vm\+::detail\+::\+PARSER\+\_\+\+OPTION}} (forbid\+\_\+export\+\_\+mutable\+\_\+globals, false, bool)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a61a96b34981f2b6b65a2e8201e3d9611}{sysio\+::vm\+::detail\+::\+PARSER\+\_\+\+OPTION}} (allow\+\_\+code\+\_\+after\+\_\+function\+\_\+end, false, bool)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a603085d8cdd60ee48d6ed97a97164782}{sysio\+::vm\+::detail\+::\+PARSER\+\_\+\+OPTION}} (allow\+\_\+u32\+\_\+limits\+\_\+flags, false, bool)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_aae1f6ee4e83083947f5f4680038c0533}{sysio\+::vm\+::detail\+::\+PARSER\+\_\+\+OPTION}} (allow\+\_\+invalid\+\_\+empty\+\_\+local\+\_\+set, false, bool)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_ae9acecfbbc41203c407c76c37e385514}{sysio\+::vm\+::detail\+::\+PARSER\+\_\+\+OPTION}} (parse\+\_\+custom\+\_\+section\+\_\+name, false, bool)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{sys-vm_2include_2sysio_2vm_2parser_8hpp_a955f504eccf76b4eb2489c0adab03121}\index{parser.hpp@{parser.hpp}!A@{A}}
+\index{A@{A}!parser.hpp@{parser.hpp}}
+\doxysubsubsection{\texorpdfstring{A}{A}\hspace{0.1cm}{\footnotesize\ttfamily [1/8]}}
+{\footnotesize\ttfamily \label{sys-vm_2include_2sysio_2vm_2parser_8hpp_a955f504eccf76b4eb2489c0adab03121} 
+\#define A~i32}
+
+\Hypertarget{sys-vm_2include_2sysio_2vm_2parser_8hpp_a955f504eccf76b4eb2489c0adab03121}\index{parser.hpp@{parser.hpp}!A@{A}}
+\index{A@{A}!parser.hpp@{parser.hpp}}
+\doxysubsubsection{\texorpdfstring{A}{A}\hspace{0.1cm}{\footnotesize\ttfamily [2/8]}}
+{\footnotesize\ttfamily \label{sys-vm_2include_2sysio_2vm_2parser_8hpp_a955f504eccf76b4eb2489c0adab03121} 
+\#define A~i64}
+
+\Hypertarget{sys-vm_2include_2sysio_2vm_2parser_8hpp_a955f504eccf76b4eb2489c0adab03121}\index{parser.hpp@{parser.hpp}!A@{A}}
+\index{A@{A}!parser.hpp@{parser.hpp}}
+\doxysubsubsection{\texorpdfstring{A}{A}\hspace{0.1cm}{\footnotesize\ttfamily [3/8]}}
+{\footnotesize\ttfamily \label{sys-vm_2include_2sysio_2vm_2parser_8hpp_a955f504eccf76b4eb2489c0adab03121} 
+\#define A~f32}
+
+\Hypertarget{sys-vm_2include_2sysio_2vm_2parser_8hpp_a955f504eccf76b4eb2489c0adab03121}\index{parser.hpp@{parser.hpp}!A@{A}}
+\index{A@{A}!parser.hpp@{parser.hpp}}
+\doxysubsubsection{\texorpdfstring{A}{A}\hspace{0.1cm}{\footnotesize\ttfamily [4/8]}}
+{\footnotesize\ttfamily \label{sys-vm_2include_2sysio_2vm_2parser_8hpp_a955f504eccf76b4eb2489c0adab03121} 
+\#define A~f64}
+
+\Hypertarget{sys-vm_2include_2sysio_2vm_2parser_8hpp_a955f504eccf76b4eb2489c0adab03121}\index{parser.hpp@{parser.hpp}!A@{A}}
+\index{A@{A}!parser.hpp@{parser.hpp}}
+\doxysubsubsection{\texorpdfstring{A}{A}\hspace{0.1cm}{\footnotesize\ttfamily [5/8]}}
+{\footnotesize\ttfamily \label{sys-vm_2include_2sysio_2vm_2parser_8hpp_a955f504eccf76b4eb2489c0adab03121} 
+\#define A~i32}
+
+\Hypertarget{sys-vm_2include_2sysio_2vm_2parser_8hpp_a955f504eccf76b4eb2489c0adab03121}\index{parser.hpp@{parser.hpp}!A@{A}}
+\index{A@{A}!parser.hpp@{parser.hpp}}
+\doxysubsubsection{\texorpdfstring{A}{A}\hspace{0.1cm}{\footnotesize\ttfamily [6/8]}}
+{\footnotesize\ttfamily \label{sys-vm_2include_2sysio_2vm_2parser_8hpp_a955f504eccf76b4eb2489c0adab03121} 
+\#define A~i64}
+
+\Hypertarget{sys-vm_2include_2sysio_2vm_2parser_8hpp_a955f504eccf76b4eb2489c0adab03121}\index{parser.hpp@{parser.hpp}!A@{A}}
+\index{A@{A}!parser.hpp@{parser.hpp}}
+\doxysubsubsection{\texorpdfstring{A}{A}\hspace{0.1cm}{\footnotesize\ttfamily [7/8]}}
+{\footnotesize\ttfamily \label{sys-vm_2include_2sysio_2vm_2parser_8hpp_a955f504eccf76b4eb2489c0adab03121} 
+\#define A~f32}
+
+\Hypertarget{sys-vm_2include_2sysio_2vm_2parser_8hpp_a955f504eccf76b4eb2489c0adab03121}\index{parser.hpp@{parser.hpp}!A@{A}}
+\index{A@{A}!parser.hpp@{parser.hpp}}
+\doxysubsubsection{\texorpdfstring{A}{A}\hspace{0.1cm}{\footnotesize\ttfamily [8/8]}}
+{\footnotesize\ttfamily \label{sys-vm_2include_2sysio_2vm_2parser_8hpp_a955f504eccf76b4eb2489c0adab03121} 
+\#define A~f64}
+
+\Hypertarget{sys-vm_2include_2sysio_2vm_2parser_8hpp_a6b5d8de7ddab394b2f53f33d519dd230}\index{parser.hpp@{parser.hpp}!BINOP@{BINOP}}
+\index{BINOP@{BINOP}!parser.hpp@{parser.hpp}}
+\doxysubsubsection{\texorpdfstring{BINOP}{BINOP}}
+{\footnotesize\ttfamily \label{sys-vm_2include_2sysio_2vm_2parser_8hpp_a6b5d8de7ddab394b2f53f33d519dd230} 
+\#define BINOP(\begin{DoxyParamCaption}\item[{}]{opname}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ opcodes::opname:\ check\_in\_bounds();\ code\_writer.emit\_\ \#\#\ opname();\ op\_stack.pop(types::A);\ op\_stack.pop(types::A);\ op\_stack.push(types::R);\ \textcolor{keywordflow}{break};}
+
+\end{DoxyCode}
+\Hypertarget{sys-vm_2include_2sysio_2vm_2parser_8hpp_a2094008d2e16309accddc8ba84ed62d9}\index{parser.hpp@{parser.hpp}!CASTOP@{CASTOP}}
+\index{CASTOP@{CASTOP}!parser.hpp@{parser.hpp}}
+\doxysubsubsection{\texorpdfstring{CASTOP}{CASTOP}}
+{\footnotesize\ttfamily \label{sys-vm_2include_2sysio_2vm_2parser_8hpp_a2094008d2e16309accddc8ba84ed62d9} 
+\#define CASTOP(\begin{DoxyParamCaption}\item[{}]{dst}{, }\item[{}]{opname}{, }\item[{}]{src}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ opcodes::dst\ \#\#\ \_\ \#\#\ opname\ \#\#\ \_\ \#\#\ src:\ check\_in\_bounds();\ code\_writer.emit\_\ \#\#\ dst\ \#\#\ \_\ \#\#\ opname\ \#\#\ \_\ \#\#\ src();\ op\_stack.pop(types::src);\ op\_stack.push(types::dst);\ \textcolor{keywordflow}{break};}
+
+\end{DoxyCode}
+\Hypertarget{sys-vm_2include_2sysio_2vm_2parser_8hpp_a73d414722845b106c885b6e1bbe3c399}\index{parser.hpp@{parser.hpp}!LOAD\_OP@{LOAD\_OP}}
+\index{LOAD\_OP@{LOAD\_OP}!parser.hpp@{parser.hpp}}
+\doxysubsubsection{\texorpdfstring{LOAD\_OP}{LOAD\_OP}}
+{\footnotesize\ttfamily \label{sys-vm_2include_2sysio_2vm_2parser_8hpp_a73d414722845b106c885b6e1bbe3c399} 
+\#define LOAD\+\_\+\+OP(\begin{DoxyParamCaption}\item[{}]{op\+\_\+name}{, }\item[{}]{max\+\_\+align}{, }\item[{}]{type}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ opcodes::op\_name:\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ check\_in\_bounds();\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ SYS\_VM\_ASSERT(\_mod-\/>memories.size()\ >\ 0,\ wasm\_parse\_exception,\ \textcolor{stringliteral}{"{}load\ requires\ memory"{}});\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ alignment\ =\ parse\_varuint32(code);\ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ offset\ =\ parse\_varuint32(code);\ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ SYS\_VM\_ASSERT(alignment\ <=\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}(max\_align),\ wasm\_parse\_exception,\ \textcolor{stringliteral}{"{}alignment\ cannot\ be\ greater\ than\ size."{}});\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ SYS\_VM\_ASSERT(offset\ <=\ detail::get\_max\_memory\_offset(\_options),\ wasm\_parse\_exception,\ \textcolor{stringliteral}{"{}load\ offset\ too\ large."{}});\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ op\_stack.pop(types::i32);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ op\_stack.push(types::type);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ code\_writer.emit\_\ \#\#\ op\_name(\ alignment,\ offset\ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{break};}
+
+\end{DoxyCode}
+\Hypertarget{sys-vm_2include_2sysio_2vm_2parser_8hpp_aa6b716e9b0bc0bf8c9fc68cc026a38ae}\index{parser.hpp@{parser.hpp}!MAX\_ELEMENTS@{MAX\_ELEMENTS}}
+\index{MAX\_ELEMENTS@{MAX\_ELEMENTS}!parser.hpp@{parser.hpp}}
+\doxysubsubsection{\texorpdfstring{MAX\_ELEMENTS}{MAX\_ELEMENTS}}
+{\footnotesize\ttfamily \label{sys-vm_2include_2sysio_2vm_2parser_8hpp_aa6b716e9b0bc0bf8c9fc68cc026a38ae} 
+\#define MAX\+\_\+\+ELEMENTS(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{default\+\_\+}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_aa8506a8b12f97e0e8f44f4a03462c903}{PARSER\_OPTION}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ default\_,\ std::uint32\_t)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2parser_8hpp_source_l00066}{66}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00066\ \textcolor{preprocessor}{\#define\ MAX\_ELEMENTS(name,\ default\_)\(\backslash\)}}
+\DoxyCodeLine{00067\ \textcolor{preprocessor}{\ \ \ PARSER\_OPTION(name,\ default\_,\ std::uint32\_t)}}
+
+\end{DoxyCode}
+\Hypertarget{sys-vm_2include_2sysio_2vm_2parser_8hpp_aa8506a8b12f97e0e8f44f4a03462c903}\index{parser.hpp@{parser.hpp}!PARSER\_OPTION@{PARSER\_OPTION}}
+\index{PARSER\_OPTION@{PARSER\_OPTION}!parser.hpp@{parser.hpp}}
+\doxysubsubsection{\texorpdfstring{PARSER\_OPTION}{PARSER\_OPTION}}
+{\footnotesize\ttfamily \label{sys-vm_2include_2sysio_2vm_2parser_8hpp_aa8506a8b12f97e0e8f44f4a03462c903} 
+\#define PARSER\+\_\+\+OPTION(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{default\+\_\+}{, }\item[{}]{type}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ Options>\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ type\ get\_\ \#\#\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(\textcolor{keyword}{const}\ Options\&\ options,\ \textcolor{keywordtype}{long})\ \{\ (void)options;\ \textcolor{keywordflow}{return}\ default\_;\ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ Options>\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \textcolor{keyword}{auto}\ get\_\ \#\#\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(\textcolor{keyword}{const}\ Options\&\ options,\ \textcolor{keywordtype}{int})\ -\/>\ \textcolor{keyword}{decltype}(options.name)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \textcolor{keywordflow}{return}\ options.name;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ Options>\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ type\ get\_\ \#\#\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(\textcolor{keyword}{const}\ Options\&\ options)\ \{\ \textcolor{keywordflow}{return}\ detail::get\_\ \#\#\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(options,\ 0);\ \}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2parser_8hpp_source_l00056}{56}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00056\ \textcolor{preprocessor}{\#define\ PARSER\_OPTION(name,\ default\_,\ type)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00057\ \textcolor{preprocessor}{\ \ \ template<typename\ Options>\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00058\ \textcolor{preprocessor}{\ \ \ type\ get\_\ \#\#\ name(const\ Options\&\ options,\ long)\ \{\ (void)options;\ return\ default\_;\ \}\ \(\backslash\)}}
+\DoxyCodeLine{00059\ \textcolor{preprocessor}{\ \ \ template<typename\ Options>\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00060\ \textcolor{preprocessor}{\ \ \ auto\ get\_\ \#\#\ name(const\ Options\&\ options,\ int)\ -\/>\ decltype(options.name)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00061\ \textcolor{preprocessor}{\ \ \ \ \ return\ options.name;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00062\ \textcolor{preprocessor}{\ \ \ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00063\ \textcolor{preprocessor}{\ \ \ template<typename\ Options>\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00064\ \textcolor{preprocessor}{\ \ \ type\ get\_\ \#\#\ name(const\ Options\&\ options)\ \{\ return\ detail::get\_\ \#\#\ name(options,\ 0);\ \}}}
+
+\end{DoxyCode}
+\Hypertarget{sys-vm_2include_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}\index{parser.hpp@{parser.hpp}!R@{R}}
+\index{R@{R}!parser.hpp@{parser.hpp}}
+\doxysubsubsection{\texorpdfstring{R}{R}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{sys-vm_2include_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031} 
+\#define R~i32}
+
+\Hypertarget{sys-vm_2include_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}\index{parser.hpp@{parser.hpp}!R@{R}}
+\index{R@{R}!parser.hpp@{parser.hpp}}
+\doxysubsubsection{\texorpdfstring{R}{R}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{sys-vm_2include_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031} 
+\#define R~\mbox{\hyperlink{struct_a}{A}}}
+
+\Hypertarget{sys-vm_2include_2sysio_2vm_2parser_8hpp_a5a8658e2f9acbfb17e41827ac55c16a5}\index{parser.hpp@{parser.hpp}!STORE\_OP@{STORE\_OP}}
+\index{STORE\_OP@{STORE\_OP}!parser.hpp@{parser.hpp}}
+\doxysubsubsection{\texorpdfstring{STORE\_OP}{STORE\_OP}}
+{\footnotesize\ttfamily \label{sys-vm_2include_2sysio_2vm_2parser_8hpp_a5a8658e2f9acbfb17e41827ac55c16a5} 
+\#define STORE\+\_\+\+OP(\begin{DoxyParamCaption}\item[{}]{op\+\_\+name}{, }\item[{}]{max\+\_\+align}{, }\item[{}]{type}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ opcodes::op\_name:\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ check\_in\_bounds();\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ SYS\_VM\_ASSERT(\_mod-\/>memories.size()\ >\ 0,\ wasm\_parse\_exception,\ \textcolor{stringliteral}{"{}store\ requires\ memory"{}});\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ alignment\ =\ parse\_varuint32(code);\ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ offset\ =\ parse\_varuint32(code);\ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ SYS\_VM\_ASSERT(alignment\ <=\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}(max\_align),\ wasm\_parse\_exception,\ \textcolor{stringliteral}{"{}alignment\ cannot\ be\ greater\ than\ size."{}});\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ SYS\_VM\_ASSERT(offset\ <=\ detail::get\_max\_memory\_offset(\_options),\ wasm\_parse\_exception,\ \textcolor{stringliteral}{"{}store\ offset\ too\ large."{}});\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ op\_stack.pop(types::type);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ op\_stack.pop(types::i32);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ code\_writer.emit\_\ \#\#\ op\_name(\ alignment,\ offset\ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{break};}
+
+\end{DoxyCode}
+\Hypertarget{sys-vm_2include_2sysio_2vm_2parser_8hpp_a62c7ea0dd8316a3aefeb7980a94b9aad}\index{parser.hpp@{parser.hpp}!UNOP@{UNOP}}
+\index{UNOP@{UNOP}!parser.hpp@{parser.hpp}}
+\doxysubsubsection{\texorpdfstring{UNOP}{UNOP}}
+{\footnotesize\ttfamily \label{sys-vm_2include_2sysio_2vm_2parser_8hpp_a62c7ea0dd8316a3aefeb7980a94b9aad} 
+\#define UNOP(\begin{DoxyParamCaption}\item[{}]{opname}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ opcodes::opname:\ check\_in\_bounds();\ code\_writer.emit\_\ \#\#\ opname();\ op\_stack.pop(types::A);\ op\_stack.push(types::R);\ \textcolor{keywordflow}{break};}
+
+\end{DoxyCode}

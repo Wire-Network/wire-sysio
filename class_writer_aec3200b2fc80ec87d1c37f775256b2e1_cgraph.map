@@ -1,0 +1,9 @@
+<map id="Writer::StartObject" name="Writer::StartObject">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,135,56"/>
+<area shape="rect" id="Node000002" href="$class_writer.html#a1fc40f8b9f3abc2548c0c5782ce1755d" title=" " alt="" coords="214,5,311,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="135,32,198,24,199,29,135,38"/>
+<area shape="rect" id="Node000004" href="$class_writer.html#a81c72a2eecd47e042f56ca93a27a5cb1" title=" " alt="" coords="183,55,342,80"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="135,49,168,53,167,58,135,54"/>
+<area shape="rect" id="Node000003" href="$classinternal_1_1_stack.html#ac484468a2791bd3e9ba609bd1600ab48" title=" " alt="" coords="390,5,550,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="311,16,374,16,374,21,311,21"/>
+</map>

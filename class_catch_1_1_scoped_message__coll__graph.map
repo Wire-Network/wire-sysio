@@ -1,0 +1,13 @@
+<map id="Catch::ScopedMessage" name="Catch::ScopedMessage">
+<area shape="rect" id="Node000001" title=" " alt="" coords="95,271,256,297"/>
+<area shape="rect" id="Node000002" href="$struct_catch_1_1_message_info.html" title=" " alt="" coords="106,183,245,208"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="178,224,178,271,173,271,173,224"/>
+<area shape="rect" id="Node000003" href="$class_catch_1_1_string_ref.html" title=" " alt="" coords="5,94,125,120"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="78,132,97,157,116,170,137,180,135,184,113,174,93,161,74,135"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="149,94,202,120"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="178,135,178,182,173,182,173,135"/>
+<area shape="rect" id="Node000005" href="$struct_catch_1_1_source_line_info.html" title=" " alt="" coords="227,94,378,120"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="278,132,240,161,200,184,197,180,237,156,275,128"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="274,5,330,31"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="305,47,305,94,300,94,300,47"/>
+</map>

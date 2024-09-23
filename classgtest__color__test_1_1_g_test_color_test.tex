@@ -1,0 +1,216 @@
+\doxysection{gtest\+\_\+color\+\_\+test.\+GTest\+Color\+Test Class Reference}
+\hypertarget{classgtest__color__test_1_1_g_test_color_test}{}\label{classgtest__color__test_1_1_g_test_color_test}\index{gtest\_color\_test.GTestColorTest@{gtest\_color\_test.GTestColorTest}}
+
+
+Inheritance diagram for gtest\+\_\+color\+\_\+test.\+GTest\+Color\+Test\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=237pt]{classgtest__color__test_1_1_g_test_color_test__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for gtest\+\_\+color\+\_\+test.\+GTest\+Color\+Test\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=237pt]{classgtest__color__test_1_1_g_test_color_test__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classgtest__color__test_1_1_g_test_color_test_afb75a6f36c0f5b52b5bc11bb7cab63ec}{test\+No\+Env\+Var\+No\+Flag}} (self)
+\item 
+\mbox{\hyperlink{classgtest__color__test_1_1_g_test_color_test_acc086370de987fe140db87e2cb06d071}{test\+Flag\+Only}} (self)
+\item 
+\mbox{\hyperlink{classgtest__color__test_1_1_g_test_color_test_a9dfb7ba333aae9195dd79af6b87fa8d5}{test\+Env\+Var\+Only}} (self)
+\item 
+\mbox{\hyperlink{classgtest__color__test_1_1_g_test_color_test_ade18d5bc60f673849f48b26288e60f07}{test\+Env\+Var\+And\+Flag}} (self)
+\item 
+\mbox{\hyperlink{classgtest__color__test_1_1_g_test_color_test_a409e0d68b7287de4c825e8b1e18cd97c}{test\+Aliases\+Of\+Yes\+And\+No}} (self)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{gtest__color__test_8py_source_l00069}{69}} of file \mbox{\hyperlink{gtest__color__test_8py_source}{gtest\+\_\+color\+\_\+test.\+py}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classgtest__color__test_1_1_g_test_color_test_a409e0d68b7287de4c825e8b1e18cd97c}\index{gtest\_color\_test.GTestColorTest@{gtest\_color\_test.GTestColorTest}!testAliasesOfYesAndNo@{testAliasesOfYesAndNo}}
+\index{testAliasesOfYesAndNo@{testAliasesOfYesAndNo}!gtest\_color\_test.GTestColorTest@{gtest\_color\_test.GTestColorTest}}
+\doxysubsubsection{\texorpdfstring{testAliasesOfYesAndNo()}{testAliasesOfYesAndNo()}}
+{\footnotesize\ttfamily \label{classgtest__color__test_1_1_g_test_color_test_a409e0d68b7287de4c825e8b1e18cd97c} 
+gtest\+\_\+color\+\_\+test.\+GTest\+Color\+Test.\+test\+Aliases\+Of\+Yes\+And\+No (\begin{DoxyParamCaption}\item[{}]{self}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Tests using aliases in specifying --gtest_color.\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{gtest__color__test_8py_source_l00114}{114}} of file \mbox{\hyperlink{gtest__color__test_8py_source}{gtest\+\_\+color\+\_\+test.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00114\ \ \ \textcolor{keyword}{def\ }testAliasesOfYesAndNo(self):}
+\DoxyCodeLine{00115\ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Tests\ using\ aliases\ in\ specifying\ -\/-\/gtest\_color."{}"{}"{}}}
+\DoxyCodeLine{00116\ }
+\DoxyCodeLine{00117\ \ \ \ \ self.assert\_(UsesColor(\textcolor{stringliteral}{'dumb'},\ \textcolor{keywordtype}{None},\ \textcolor{stringliteral}{'true'}))}
+\DoxyCodeLine{00118\ \ \ \ \ self.assert\_(UsesColor(\textcolor{stringliteral}{'dumb'},\ \textcolor{keywordtype}{None},\ \textcolor{stringliteral}{'YES'}))}
+\DoxyCodeLine{00119\ \ \ \ \ self.assert\_(UsesColor(\textcolor{stringliteral}{'dumb'},\ \textcolor{keywordtype}{None},\ \textcolor{stringliteral}{'T'}))}
+\DoxyCodeLine{00120\ \ \ \ \ self.assert\_(UsesColor(\textcolor{stringliteral}{'dumb'},\ \textcolor{keywordtype}{None},\ \textcolor{stringliteral}{'1'}))}
+\DoxyCodeLine{00121\ }
+\DoxyCodeLine{00122\ \ \ \ \ self.assert\_(\textcolor{keywordflow}{not}\ UsesColor(\textcolor{stringliteral}{'xterm'},\ \textcolor{keywordtype}{None},\ \textcolor{stringliteral}{'f'}))}
+\DoxyCodeLine{00123\ \ \ \ \ self.assert\_(\textcolor{keywordflow}{not}\ UsesColor(\textcolor{stringliteral}{'xterm'},\ \textcolor{keywordtype}{None},\ \textcolor{stringliteral}{'false'}))}
+\DoxyCodeLine{00124\ \ \ \ \ self.assert\_(\textcolor{keywordflow}{not}\ UsesColor(\textcolor{stringliteral}{'xterm'},\ \textcolor{keywordtype}{None},\ \textcolor{stringliteral}{'0'}))}
+\DoxyCodeLine{00125\ \ \ \ \ self.assert\_(\textcolor{keywordflow}{not}\ UsesColor(\textcolor{stringliteral}{'xterm'},\ \textcolor{keywordtype}{None},\ \textcolor{stringliteral}{'unknown'}))}
+\DoxyCodeLine{00126\ }
+\DoxyCodeLine{00127\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classgtest__color__test_1_1_g_test_color_test_a409e0d68b7287de4c825e8b1e18cd97c_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classgtest__color__test_1_1_g_test_color_test_ade18d5bc60f673849f48b26288e60f07}\index{gtest\_color\_test.GTestColorTest@{gtest\_color\_test.GTestColorTest}!testEnvVarAndFlag@{testEnvVarAndFlag}}
+\index{testEnvVarAndFlag@{testEnvVarAndFlag}!gtest\_color\_test.GTestColorTest@{gtest\_color\_test.GTestColorTest}}
+\doxysubsubsection{\texorpdfstring{testEnvVarAndFlag()}{testEnvVarAndFlag()}}
+{\footnotesize\ttfamily \label{classgtest__color__test_1_1_g_test_color_test_ade18d5bc60f673849f48b26288e60f07} 
+gtest\+\_\+color\+\_\+test.\+GTest\+Color\+Test.\+test\+Env\+Var\+And\+Flag (\begin{DoxyParamCaption}\item[{}]{self}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Tests the case when there are both GTEST_COLOR and --gtest_color.\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{gtest__color__test_8py_source_l00107}{107}} of file \mbox{\hyperlink{gtest__color__test_8py_source}{gtest\+\_\+color\+\_\+test.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00107\ \ \ \textcolor{keyword}{def\ }testEnvVarAndFlag(self):}
+\DoxyCodeLine{00108\ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Tests\ the\ case\ when\ there\ are\ both\ GTEST\_COLOR\ and\ -\/-\/gtest\_color."{}"{}"{}}}
+\DoxyCodeLine{00109\ }
+\DoxyCodeLine{00110\ \ \ \ \ self.assert\_(\textcolor{keywordflow}{not}\ UsesColor(\textcolor{stringliteral}{'xterm-\/color'},\ \textcolor{stringliteral}{'no'},\ \textcolor{stringliteral}{'no'}))}
+\DoxyCodeLine{00111\ \ \ \ \ self.assert\_(UsesColor(\textcolor{stringliteral}{'dumb'},\ \textcolor{stringliteral}{'no'},\ \textcolor{stringliteral}{'yes'}))}
+\DoxyCodeLine{00112\ \ \ \ \ self.assert\_(UsesColor(\textcolor{stringliteral}{'xterm-\/color'},\ \textcolor{stringliteral}{'no'},\ \textcolor{stringliteral}{'auto'}))}
+\DoxyCodeLine{00113\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classgtest__color__test_1_1_g_test_color_test_ade18d5bc60f673849f48b26288e60f07_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classgtest__color__test_1_1_g_test_color_test_a9dfb7ba333aae9195dd79af6b87fa8d5}\index{gtest\_color\_test.GTestColorTest@{gtest\_color\_test.GTestColorTest}!testEnvVarOnly@{testEnvVarOnly}}
+\index{testEnvVarOnly@{testEnvVarOnly}!gtest\_color\_test.GTestColorTest@{gtest\_color\_test.GTestColorTest}}
+\doxysubsubsection{\texorpdfstring{testEnvVarOnly()}{testEnvVarOnly()}}
+{\footnotesize\ttfamily \label{classgtest__color__test_1_1_g_test_color_test_a9dfb7ba333aae9195dd79af6b87fa8d5} 
+gtest\+\_\+color\+\_\+test.\+GTest\+Color\+Test.\+test\+Env\+Var\+Only (\begin{DoxyParamCaption}\item[{}]{self}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Tests the case when there's GTEST_COLOR but not --gtest_color.\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{gtest__color__test_8py_source_l00096}{96}} of file \mbox{\hyperlink{gtest__color__test_8py_source}{gtest\+\_\+color\+\_\+test.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00096\ \ \ \textcolor{keyword}{def\ }testEnvVarOnly(self):}
+\DoxyCodeLine{00097\ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Tests\ the\ case\ when\ there's\ GTEST\_COLOR\ but\ not\ -\/-\/gtest\_color."{}"{}"{}}}
+\DoxyCodeLine{00098\ }
+\DoxyCodeLine{00099\ \ \ \ \ self.assert\_(\textcolor{keywordflow}{not}\ UsesColor(\textcolor{stringliteral}{'dumb'},\ \textcolor{stringliteral}{'no'},\ \textcolor{keywordtype}{None}))}
+\DoxyCodeLine{00100\ \ \ \ \ self.assert\_(\textcolor{keywordflow}{not}\ UsesColor(\textcolor{stringliteral}{'xterm-\/color'},\ \textcolor{stringliteral}{'no'},\ \textcolor{keywordtype}{None}))}
+\DoxyCodeLine{00101\ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keywordflow}{not}\ IS\_WINDOWS:}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ self.assert\_(\textcolor{keywordflow}{not}\ UsesColor(\textcolor{stringliteral}{'dumb'},\ \textcolor{stringliteral}{'auto'},\ \textcolor{keywordtype}{None}))}
+\DoxyCodeLine{00103\ \ \ \ \ self.assert\_(UsesColor(\textcolor{stringliteral}{'xterm-\/color'},\ \textcolor{stringliteral}{'auto'},\ \textcolor{keywordtype}{None}))}
+\DoxyCodeLine{00104\ \ \ \ \ self.assert\_(UsesColor(\textcolor{stringliteral}{'dumb'},\ \textcolor{stringliteral}{'yes'},\ \textcolor{keywordtype}{None}))}
+\DoxyCodeLine{00105\ \ \ \ \ self.assert\_(UsesColor(\textcolor{stringliteral}{'xterm-\/color'},\ \textcolor{stringliteral}{'yes'},\ \textcolor{keywordtype}{None}))}
+\DoxyCodeLine{00106\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classgtest__color__test_1_1_g_test_color_test_a9dfb7ba333aae9195dd79af6b87fa8d5_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classgtest__color__test_1_1_g_test_color_test_acc086370de987fe140db87e2cb06d071}\index{gtest\_color\_test.GTestColorTest@{gtest\_color\_test.GTestColorTest}!testFlagOnly@{testFlagOnly}}
+\index{testFlagOnly@{testFlagOnly}!gtest\_color\_test.GTestColorTest@{gtest\_color\_test.GTestColorTest}}
+\doxysubsubsection{\texorpdfstring{testFlagOnly()}{testFlagOnly()}}
+{\footnotesize\ttfamily \label{classgtest__color__test_1_1_g_test_color_test_acc086370de987fe140db87e2cb06d071} 
+gtest\+\_\+color\+\_\+test.\+GTest\+Color\+Test.\+test\+Flag\+Only (\begin{DoxyParamCaption}\item[{}]{self}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Tests the case when there's --gtest_color but not GTEST_COLOR.\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{gtest__color__test_8py_source_l00085}{85}} of file \mbox{\hyperlink{gtest__color__test_8py_source}{gtest\+\_\+color\+\_\+test.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00085\ \ \ \textcolor{keyword}{def\ }testFlagOnly(self):}
+\DoxyCodeLine{00086\ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Tests\ the\ case\ when\ there's\ -\/-\/gtest\_color\ but\ not\ GTEST\_COLOR."{}"{}"{}}}
+\DoxyCodeLine{00087\ }
+\DoxyCodeLine{00088\ \ \ \ \ self.assert\_(\textcolor{keywordflow}{not}\ UsesColor(\textcolor{stringliteral}{'dumb'},\ \textcolor{keywordtype}{None},\ \textcolor{stringliteral}{'no'}))}
+\DoxyCodeLine{00089\ \ \ \ \ self.assert\_(\textcolor{keywordflow}{not}\ UsesColor(\textcolor{stringliteral}{'xterm-\/color'},\ \textcolor{keywordtype}{None},\ \textcolor{stringliteral}{'no'}))}
+\DoxyCodeLine{00090\ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keywordflow}{not}\ IS\_WINDOWS:}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ self.assert\_(\textcolor{keywordflow}{not}\ UsesColor(\textcolor{stringliteral}{'emacs'},\ \textcolor{keywordtype}{None},\ \textcolor{stringliteral}{'auto'}))}
+\DoxyCodeLine{00092\ \ \ \ \ self.assert\_(UsesColor(\textcolor{stringliteral}{'xterm'},\ \textcolor{keywordtype}{None},\ \textcolor{stringliteral}{'auto'}))}
+\DoxyCodeLine{00093\ \ \ \ \ self.assert\_(UsesColor(\textcolor{stringliteral}{'dumb'},\ \textcolor{keywordtype}{None},\ \textcolor{stringliteral}{'yes'}))}
+\DoxyCodeLine{00094\ \ \ \ \ self.assert\_(UsesColor(\textcolor{stringliteral}{'xterm'},\ \textcolor{keywordtype}{None},\ \textcolor{stringliteral}{'yes'}))}
+\DoxyCodeLine{00095\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classgtest__color__test_1_1_g_test_color_test_acc086370de987fe140db87e2cb06d071_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classgtest__color__test_1_1_g_test_color_test_afb75a6f36c0f5b52b5bc11bb7cab63ec}\index{gtest\_color\_test.GTestColorTest@{gtest\_color\_test.GTestColorTest}!testNoEnvVarNoFlag@{testNoEnvVarNoFlag}}
+\index{testNoEnvVarNoFlag@{testNoEnvVarNoFlag}!gtest\_color\_test.GTestColorTest@{gtest\_color\_test.GTestColorTest}}
+\doxysubsubsection{\texorpdfstring{testNoEnvVarNoFlag()}{testNoEnvVarNoFlag()}}
+{\footnotesize\ttfamily \label{classgtest__color__test_1_1_g_test_color_test_afb75a6f36c0f5b52b5bc11bb7cab63ec} 
+gtest\+\_\+color\+\_\+test.\+GTest\+Color\+Test.\+test\+No\+Env\+Var\+No\+Flag (\begin{DoxyParamCaption}\item[{}]{self}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Tests the case when there's neither GTEST_COLOR nor --gtest_color.\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{gtest__color__test_8py_source_l00070}{70}} of file \mbox{\hyperlink{gtest__color__test_8py_source}{gtest\+\_\+color\+\_\+test.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00070\ \ \ \textcolor{keyword}{def\ }testNoEnvVarNoFlag(self):}
+\DoxyCodeLine{00071\ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Tests\ the\ case\ when\ there's\ neither\ GTEST\_COLOR\ nor\ -\/-\/gtest\_color."{}"{}"{}}}
+\DoxyCodeLine{00072\ }
+\DoxyCodeLine{00073\ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keywordflow}{not}\ IS\_WINDOWS:}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ self.assert\_(\textcolor{keywordflow}{not}\ UsesColor(\textcolor{stringliteral}{'dumb'},\ \textcolor{keywordtype}{None},\ \textcolor{keywordtype}{None}))}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ self.assert\_(\textcolor{keywordflow}{not}\ UsesColor(\textcolor{stringliteral}{'emacs'},\ \textcolor{keywordtype}{None},\ \textcolor{keywordtype}{None}))}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ self.assert\_(\textcolor{keywordflow}{not}\ UsesColor(\textcolor{stringliteral}{'xterm-\/mono'},\ \textcolor{keywordtype}{None},\ \textcolor{keywordtype}{None}))}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ self.assert\_(\textcolor{keywordflow}{not}\ UsesColor(\textcolor{stringliteral}{'unknown'},\ \textcolor{keywordtype}{None},\ \textcolor{keywordtype}{None}))}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ self.assert\_(\textcolor{keywordflow}{not}\ UsesColor(\textcolor{keywordtype}{None},\ \textcolor{keywordtype}{None},\ \textcolor{keywordtype}{None}))}
+\DoxyCodeLine{00079\ \ \ \ \ self.assert\_(UsesColor(\textcolor{stringliteral}{'linux'},\ \textcolor{keywordtype}{None},\ \textcolor{keywordtype}{None}))}
+\DoxyCodeLine{00080\ \ \ \ \ self.assert\_(UsesColor(\textcolor{stringliteral}{'cygwin'},\ \textcolor{keywordtype}{None},\ \textcolor{keywordtype}{None}))}
+\DoxyCodeLine{00081\ \ \ \ \ self.assert\_(UsesColor(\textcolor{stringliteral}{'xterm'},\ \textcolor{keywordtype}{None},\ \textcolor{keywordtype}{None}))}
+\DoxyCodeLine{00082\ \ \ \ \ self.assert\_(UsesColor(\textcolor{stringliteral}{'xterm-\/color'},\ \textcolor{keywordtype}{None},\ \textcolor{keywordtype}{None}))}
+\DoxyCodeLine{00083\ \ \ \ \ self.assert\_(UsesColor(\textcolor{stringliteral}{'xterm-\/256color'},\ \textcolor{keywordtype}{None},\ \textcolor{keywordtype}{None}))}
+\DoxyCodeLine{00084\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classgtest__color__test_1_1_g_test_color_test_afb75a6f36c0f5b52b5bc11bb7cab63ec_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/test/\mbox{\hyperlink{gtest__color__test_8py}{gtest\+\_\+color\+\_\+test.\+py}}\end{DoxyCompactItemize}

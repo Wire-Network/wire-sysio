@@ -1,0 +1,81 @@
+\doxysection{testing\+::internal\+::Elements\+Are\+Array\+Matcher\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classtesting_1_1internal_1_1_elements_are_array_matcher}{}\label{classtesting_1_1internal_1_1_elements_are_array_matcher}\index{testing::internal::ElementsAreArrayMatcher$<$ T $>$@{testing::internal::ElementsAreArrayMatcher$<$ T $>$}}
+
+
+{\ttfamily \#include $<$gmock-\/matchers.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename Iter $>$ }\\\mbox{\hyperlink{classtesting_1_1internal_1_1_elements_are_array_matcher_aa076a0583c29dc7da6107775bba73be8}{Elements\+Are\+Array\+Matcher}} (Iter first, Iter last)
+\item 
+{\footnotesize template$<$typename Container $>$ }\\\mbox{\hyperlink{classtesting_1_1internal_1_1_elements_are_array_matcher_ac776db6072208f39f3eced25fb353f75}{operator Matcher$<$ Container $>$}} () const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$\newline
+class testing\+::internal\+::\+Elements\+Are\+Array\+Matcher$<$ T $>$}
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l03894}{3894}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_elements_are_array_matcher_aa076a0583c29dc7da6107775bba73be8}\index{testing::internal::ElementsAreArrayMatcher$<$ T $>$@{testing::internal::ElementsAreArrayMatcher$<$ T $>$}!ElementsAreArrayMatcher@{ElementsAreArrayMatcher}}
+\index{ElementsAreArrayMatcher@{ElementsAreArrayMatcher}!testing::internal::ElementsAreArrayMatcher$<$ T $>$@{testing::internal::ElementsAreArrayMatcher$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{ElementsAreArrayMatcher()}{ElementsAreArrayMatcher()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_elements_are_array_matcher_aa076a0583c29dc7da6107775bba73be8} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+template$<$typename Iter $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_elements_are_array_matcher}{testing\+::internal\+::\+Elements\+Are\+Array\+Matcher}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::\+Elements\+Are\+Array\+Matcher (\begin{DoxyParamCaption}\item[{Iter}]{first}{, }\item[{Iter}]{last}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l03897}{3897}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03897\ :\ matchers\_(first,\ last)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_elements_are_array_matcher_ac776db6072208f39f3eced25fb353f75}\index{testing::internal::ElementsAreArrayMatcher$<$ T $>$@{testing::internal::ElementsAreArrayMatcher$<$ T $>$}!operator Matcher$<$ Container $>$@{operator Matcher$<$ Container $>$}}
+\index{operator Matcher$<$ Container $>$@{operator Matcher$<$ Container $>$}!testing::internal::ElementsAreArrayMatcher$<$ T $>$@{testing::internal::ElementsAreArrayMatcher$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{operator Matcher$<$ Container $>$()}{operator Matcher< Container >()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_elements_are_array_matcher_ac776db6072208f39f3eced25fb353f75} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+template$<$typename Container $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_elements_are_array_matcher}{testing\+::internal\+::\+Elements\+Are\+Array\+Matcher}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::operator \mbox{\hyperlink{classtesting_1_1_matcher}{Matcher}}$<$ Container $>$ (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l03900}{3900}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03900\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{03901\ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_ae1f37dc71d5daa6fb49ca1b6047d4a8c}{GTEST\_COMPILE\_ASSERT\_}}(}
+\DoxyCodeLine{03902\ \ \ \ \ \ \ \ \ !IsHashTable<\mbox{\hyperlink{gtest-internal_8h_a874567b176266188fabfffb8393267ce}{GTEST\_REMOVE\_REFERENCE\_AND\_CONST\_}}(Container)>\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{::value}},}
+\DoxyCodeLine{03903\ \ \ \ \ \ \ \ \ use\_UnorderedElementsAreArray\_with\_hash\_tables);}
+\DoxyCodeLine{03904\ }
+\DoxyCodeLine{03905\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetesting_aca6c4c4fdf7fb7257ea4fc76971cb82c}{MakeMatcher}}(\textcolor{keyword}{new}\ ElementsAreMatcherImpl<Container>(}
+\DoxyCodeLine{03906\ \ \ \ \ \ \ \ \ matchers\_.begin(),\ matchers\_.end()));}
+\DoxyCodeLine{03907\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_elements_are_array_matcher_ac776db6072208f39f3eced25fb353f75_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/include/gmock/\mbox{\hyperlink{gmock-matchers_8h}{gmock-\/matchers.\+h}}\end{DoxyCompactItemize}

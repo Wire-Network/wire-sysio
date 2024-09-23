@@ -1,0 +1,53 @@
+\doxysection{block\+\_\+info.\+cpp}
+\hypertarget{block__info_8cpp_source}{}\label{block__info_8cpp_source}\index{/Users/svetlasyrimis/Desktop/wire-\/network/WN-\/org/wire-\/system-\/contracts/contracts/sysio.system/src/block\_info.cpp@{/Users/svetlasyrimis/Desktop/wire-\/network/WN-\/org/wire-\/system-\/contracts/contracts/sysio.system/src/block\_info.cpp}}
+\mbox{\hyperlink{block__info_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{block__info_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{block__info_8hpp}{sysio.system/block\_info.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{block__info_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{sysio_8system_8hpp}{sysio.system/sysio.system.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{block__info_8cpp_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{block__info_8cpp_source_l00004}00004\ \textcolor{keyword}{namespace\ }\{}
+\DoxyCodeLine{\Hypertarget{block__info_8cpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{block__info_8cpp_source_l00006}00006\ \textcolor{keyword}{inline}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ block\_height\_from\_id(\textcolor{keyword}{const}\ sysio::checksum256\&\ block\_id)}
+\DoxyCodeLine{\Hypertarget{block__info_8cpp_source_l00007}00007\ \{}
+\DoxyCodeLine{\Hypertarget{block__info_8cpp_source_l00008}00008\ \ \ \ \textcolor{keyword}{auto}\ arr\ =\ block\_id.extract\_as\_byte\_array();}
+\DoxyCodeLine{\Hypertarget{block__info_8cpp_source_l00009}00009\ \ \ \ \textcolor{comment}{//\ 32-\/bit\ block\ height\ is\ encoded\ in\ big\ endian\ as\ the\ sequence\ of\ bytes:\ arr[0],\ arr[1],\ arr[2],\ arr[3]}}
+\DoxyCodeLine{\Hypertarget{block__info_8cpp_source_l00010}00010\ \ \ \ \textcolor{keywordflow}{return}\ ((arr[0]\ <<\ 0x18)\ |\ (arr[1]\ <<\ 0x10)\ |\ (arr[2]\ <<\ 0x08)\ |\ arr[3]);}
+\DoxyCodeLine{\Hypertarget{block__info_8cpp_source_l00011}00011\ \}}
+\DoxyCodeLine{\Hypertarget{block__info_8cpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{block__info_8cpp_source_l00013}00013\ \}\ \textcolor{comment}{//\ namespace}}
+\DoxyCodeLine{\Hypertarget{block__info_8cpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{block__info_8cpp_source_l00015}00015\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysiosystem}{sysiosystem}}\ \{}
+\DoxyCodeLine{\Hypertarget{block__info_8cpp_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{block__info_8cpp_source_l00017}00017\ \textcolor{keywordtype}{void}\ system\_contract::add\_to\_blockinfo\_table(\textcolor{keyword}{const}\ sysio::checksum256\&\ \ \ \ previous\_block\_id,}
+\DoxyCodeLine{\Hypertarget{block__info_8cpp_source_l00018}00018\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{sysio::block\_timestamp}}\ timestamp)\textcolor{keyword}{\ const}}
+\DoxyCodeLine{\Hypertarget{block__info_8cpp_source_l00019}00019\ \textcolor{keyword}{}\{}
+\DoxyCodeLine{\Hypertarget{block__info_8cpp_source_l00020}00020\ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ new\_block\_height\ \ \ \ =\ block\_height\_from\_id(previous\_block\_id)\ +\ 1;}
+\DoxyCodeLine{\Hypertarget{block__info_8cpp_source_l00021}00021\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ \ \ \ \ new\_block\_timestamp\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{classfc_1_1time__point}{sysio::time\_point}}\textcolor{keyword}{>}(timestamp);}
+\DoxyCodeLine{\Hypertarget{block__info_8cpp_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{block__info_8cpp_source_l00023}00023\ \ \ \ \mbox{\hyperlink{namespacesysiosystem_1_1block__info_ac0e11ae72cab33401d2389907474a957}{block\_info::block\_info\_table}}\ t(get\_self(),\ 0);}
+\DoxyCodeLine{\Hypertarget{block__info_8cpp_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{block__info_8cpp_source_l00025}00025\ \ \ \ \textcolor{keywordflow}{if}\ (block\_info::rolling\_window\_size\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{block__info_8cpp_source_l00026}00026\ \ \ \ \ \ \ \textcolor{comment}{//\ Add\ new\ entry\ to\ blockinfo\ table\ for\ the\ new\ block.}}
+\DoxyCodeLine{\Hypertarget{block__info_8cpp_source_l00027}00027\ \ \ \ \ \ \ t.emplace(get\_self(),\ [\&](\mbox{\hyperlink{structsysiosystem_1_1block__info_1_1block__info__record}{block\_info::block\_info\_record}}\&\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}})\ \{}
+\DoxyCodeLine{\Hypertarget{block__info_8cpp_source_l00028}00028\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.block\_height\ \ \ \ =\ new\_block\_height;}
+\DoxyCodeLine{\Hypertarget{block__info_8cpp_source_l00029}00029\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.block\_timestamp\ =\ new\_block\_timestamp;}
+\DoxyCodeLine{\Hypertarget{block__info_8cpp_source_l00030}00030\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{block__info_8cpp_source_l00031}00031\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{block__info_8cpp_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{block__info_8cpp_source_l00033}00033\ \ \ \ \textcolor{comment}{//\ Erase\ up\ to\ two\ entries\ that\ have\ fallen\ out\ of\ the\ rolling\ window.}}
+\DoxyCodeLine{\Hypertarget{block__info_8cpp_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{block__info_8cpp_source_l00035}00035\ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ last\_prunable\_block\_height\ =}
+\DoxyCodeLine{\Hypertarget{block__info_8cpp_source_l00036}00036\ \ \ \ \ \ \ std::max(new\_block\_height,\ block\_info::rolling\_window\_size)\ -\/\ block\_info::rolling\_window\_size;}
+\DoxyCodeLine{\Hypertarget{block__info_8cpp_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{block__info_8cpp_source_l00038}00038\ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ =\ 2;}
+\DoxyCodeLine{\Hypertarget{block__info_8cpp_source_l00039}00039\ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\ itr\ =\ t.begin(),\ end\ =\ t.end();\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{block__info_8cpp_source_l00040}00040\ \ \ \ \ \ \ \ \ itr\ !=\ end\ \&\&\ itr-\/>block\_height\ <=\ last\_prunable\_block\_height\ \&\&\ 0\ <\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}};\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{block__info_8cpp_source_l00041}00041\ \ \ \ \ \ \ \ \ -\/-\/\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}})\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{block__info_8cpp_source_l00042}00042\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{block__info_8cpp_source_l00043}00043\ \ \ \ \ \ \ itr\ =\ t.erase(itr);}
+\DoxyCodeLine{\Hypertarget{block__info_8cpp_source_l00044}00044\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{block__info_8cpp_source_l00045}00045\ \}}
+\DoxyCodeLine{\Hypertarget{block__info_8cpp_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{block__info_8cpp_source_l00047}00047\ \}\ \textcolor{comment}{//\ namespace\ sysiosystem}}
+
+\end{DoxyCode}

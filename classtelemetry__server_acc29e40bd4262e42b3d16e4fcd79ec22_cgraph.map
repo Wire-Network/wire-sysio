@@ -1,0 +1,10 @@
+<map id="telemetry_server::on_timer" name="telemetry_server::on_timer">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,104,146,145"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1endpoint.html#a1d9163813aa02ed32100f443b4ddbd8e" title="Get reference to access logger." alt="" coords="194,5,349,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="111,101,192,57,205,51,207,55,195,61,113,106"/>
+<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1endpoint.html#a5341f59de7ef1a565a2fd93daba212d5" title="Create a message and add it to the outgoing send queue (exception free)" alt="" coords="194,71,349,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="146,110,178,104,179,109,146,115"/>
+<area shape="rect" id="Node000004" href="$classtelemetry__server.html#a2a510e3a3c91c123f37d95d7b7d140ea" title=" " alt="" coords="199,136,344,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="146,142,184,148,183,154,146,147"/>
+<area shape="poly" id="edge4_Node000004_Node000001" title=" " alt="" coords="198,138,161,132,162,127,199,133"/>
+</map>

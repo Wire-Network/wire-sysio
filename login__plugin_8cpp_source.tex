@@ -1,0 +1,166 @@
+\doxysection{login\+\_\+plugin.\+cpp}
+\hypertarget{login__plugin_8cpp_source}{}\label{login__plugin_8cpp_source}\index{plugins/login\_plugin/login\_plugin.cpp@{plugins/login\_plugin/login\_plugin.cpp}}
+\mbox{\hyperlink{login__plugin_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{authorization__manager_8hpp}{sysio/chain/authorization\_manager.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp}{sysio/chain/exceptions.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{login__plugin_8hpp}{sysio/login\_plugin/login\_plugin.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{json_8hpp}{fc/io/json.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00007}00007\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00009}00009\ \textcolor{keyword}{static}\ \mbox{\hyperlink{classappbase_1_1abstract__plugin}{appbase::abstract\_plugin}}\&\ \_login\_plugin\ =\ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_a87e84549150056c56c0327cc4976cc2a}{register\_plugin}}<login\_plugin>();}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00011}00011\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}};}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00013}\mbox{\hyperlink{structsysio_1_1login__request}{00013}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structsysio_1_1login__request}{login\_request}}\ \{}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00014}\mbox{\hyperlink{structsysio_1_1login__request_a679a35d42393c7020c39fe4728162c87}{00014}}\ \ \ \ \mbox{\hyperlink{classfc_1_1crypto_1_1private__key}{chain::private\_key\_type}}\ \mbox{\hyperlink{structsysio_1_1login__request_a679a35d42393c7020c39fe4728162c87}{server\_ephemeral\_priv\_key}}\{\};}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00015}\mbox{\hyperlink{structsysio_1_1login__request_a8fcd4d13ad6449d013b9b2bcbb229c2c}{00015}}\ \ \ \ \mbox{\hyperlink{classfc_1_1crypto_1_1public__key}{chain::public\_key\_type}}\ \mbox{\hyperlink{structsysio_1_1login__request_a8fcd4d13ad6449d013b9b2bcbb229c2c}{server\_ephemeral\_pub\_key}}\{\};}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00016}\mbox{\hyperlink{structsysio_1_1login__request_a680b27d55d1111ceb53803c126ae6d67}{00016}}\ \ \ \ \mbox{\hyperlink{classfc_1_1time__point__sec}{chain::time\_point\_sec}}\ \mbox{\hyperlink{structsysio_1_1login__request_a680b27d55d1111ceb53803c126ae6d67}{expiration\_time}};}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00017}00017\ \};}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00019}\mbox{\hyperlink{structsysio_1_1login__request__pub__key__index}{00019}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structsysio_1_1login__request__pub__key__index}{login\_request\_pub\_key\_index}}\ \{\};}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00020}\mbox{\hyperlink{structsysio_1_1login__request__time__index}{00020}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structsysio_1_1login__request__time__index}{login\_request\_time\_index}}\ \{\};}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00022}\mbox{\hyperlink{namespacesysio_aca44e4e3828e19ae86b3c6eab210a94e}{00022}}\ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacesysio_aca44e4e3828e19ae86b3c6eab210a94e}{login\_request\_container}}\ =\ boost::multi\_index\_container<}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00023}00023\ \ \ \ \ \mbox{\hyperlink{structsysio_1_1login__request}{login\_request}},}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00024}00024\ \ \ \ \ indexed\_by<\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00025}00025\ \ \ \ \ \ \ \ \ ordered\_unique<tag<login\_request\_pub\_key\_index>,}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00026}00026\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ member<login\_request,\ chain::public\_key\_type,\ \&login\_request::server\_ephemeral\_pub\_key>>,}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00027}00027\ \ \ \ \ \ \ \ \ ordered\_non\_unique<tag<login\_request\_time\_index>,}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00028}00028\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ member<login\_request,\ chain::time\_point\_sec,\ \&login\_request::expiration\_time>>\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00029}00029\ \ \ \ \ \ \ \ \ >>;}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00031}\mbox{\hyperlink{classsysio_1_1login__plugin__impl}{00031}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1login__plugin__impl}{login\_plugin\_impl}}\ \{}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00032}00032\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00033}\mbox{\hyperlink{classsysio_1_1login__plugin__impl_a1e7b34fb3ee63cf4e33cec10e4b45455}{00033}}\ \ \ \ \mbox{\hyperlink{namespacesysio_aca44e4e3828e19ae86b3c6eab210a94e}{login\_request\_container}}\ \mbox{\hyperlink{classsysio_1_1login__plugin__impl_a1e7b34fb3ee63cf4e33cec10e4b45455}{requests}}\{\};}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00034}\mbox{\hyperlink{classsysio_1_1login__plugin__impl_ac323052bf6623c4cd151ca8855a077cc}{00034}}\ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{classsysio_1_1login__plugin__impl_ac323052bf6623c4cd151ca8855a077cc}{max\_login\_requests}}\ =\ 1000000;}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00035}\mbox{\hyperlink{classsysio_1_1login__plugin__impl_a69d6d93b57bb1735bad1d5a0b9d25a37}{00035}}\ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{classsysio_1_1login__plugin__impl_a69d6d93b57bb1735bad1d5a0b9d25a37}{max\_login\_timeout}}\ =\ 60;}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00037}\mbox{\hyperlink{classsysio_1_1login__plugin__impl_a95c0bed6fb919bea8160ce8cee35ef32}{00037}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1login__plugin__impl_a95c0bed6fb919bea8160ce8cee35ef32}{expire\_requests}}()\ \{}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00038}00038\ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ index\ =\ \mbox{\hyperlink{classsysio_1_1login__plugin__impl_a1e7b34fb3ee63cf4e33cec10e4b45455}{requests}}.get<\mbox{\hyperlink{structsysio_1_1login__request__time__index}{login\_request\_time\_index}}>();}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00039}00039\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ now\ =\ \mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{fc::time\_point::now}}();}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00040}00040\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\ it\ =\ index.begin();\ it\ !=\ index.end()\ \&\&\ it-\/>expiration\_time\ <\ now;\ it\ =\ index.erase(it))}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00041}00041\ \ \ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00042}00042\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00043}00043\ \};}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00045}00045\ login\_plugin::login\_plugin()\ :\ my\{\mbox{\hyperlink{namespacestd}{std}}::make\_unique<\mbox{\hyperlink{classsysio_1_1login__plugin__impl}{login\_plugin\_impl}}>()\}\ \{\}}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00046}\mbox{\hyperlink{classsysio_1_1login__plugin_a6ea616c983e6ea1ec142043ed9af40b7}{00046}}\ \mbox{\hyperlink{classsysio_1_1login__plugin_a6ea616c983e6ea1ec142043ed9af40b7}{login\_plugin::\string~login\_plugin}}()\ \{\}}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00048}\mbox{\hyperlink{classsysio_1_1login__plugin_a8375881090226b8c6574ff8a3af13d00}{00048}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1login__plugin_a8375881090226b8c6574ff8a3af13d00}{login\_plugin::set\_program\_options}}(options\_description\&,\ options\_description\&\ cfg)\ \{}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00049}00049\ \ \ \ cfg.add\_options()\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00050}00050\ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}max-\/login-\/requests"{}},\ bpo::value<uint32\_t>()-\/>default\_value(1000000),}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00051}00051\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}The\ maximum\ number\ of\ pending\ login\ requests"{}})\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00052}00052\ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}max-\/login-\/timeout"{}},\ bpo::value<uint32\_t>()-\/>default\_value(60),}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}The\ maximum\ timeout\ for\ pending\ login\ requests\ (in\ seconds)"{}});}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00054}00054\ \}}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00056}\mbox{\hyperlink{classsysio_1_1login__plugin_a05d443b12015468e46c302f5b9245899}{00056}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1login__plugin_a05d443b12015468e46c302f5b9245899}{login\_plugin::plugin\_initialize}}(\textcolor{keyword}{const}\ variables\_map\&\ options)\ \{}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00057}00057\ \ \ \ my-\/>max\_login\_requests\ =\ options.at(\textcolor{stringliteral}{"{}max-\/login-\/requests"{}}).as<\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}>();}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00058}00058\ \ \ \ my-\/>max\_login\_timeout\ =\ options.at(\textcolor{stringliteral}{"{}max-\/login-\/timeout"{}}).as<\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}>();}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00059}00059\ \}}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00061}\mbox{\hyperlink{login__plugin_8cpp_a6172887c892c48caf5f2a424ae44de37}{00061}}\ \textcolor{preprocessor}{\#define\ CALL(call\_name,\ http\_response\_code)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00062}00062\ \textcolor{preprocessor}{\ \ \ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00063}00063\ \textcolor{preprocessor}{\ \ \ \ \ \ std::string("{}/v1/login/"{}\ \#call\_name),\ [this](string,\ string\ body,\ url\_response\_callback\ cb)\ mutable\ \{\ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00064}00064\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ try\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00065}00065\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ if\ (body.empty())\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00066}00066\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ body\ =\ "{}\{\}"{};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00067}00067\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ fc::variant\ result(\ call\_name(fc::json::from\_string(body).as<login\_plugin::call\_name\#\#\_params>())\ );\ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00068}00068\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ cb(http\_response\_code,\ std::move(result));\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00069}00069\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \}\ catch\ (...)\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00070}00070\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ http\_plugin::handle\_exception("{}login"{},\ \#call\_name,\ body,\ cb);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00071}00071\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00072}00072\ \textcolor{preprocessor}{\ \ \ \ \ \ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00073}00073\ \textcolor{preprocessor}{\ \ \ \}}}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00074}00074\ }
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00075}\mbox{\hyperlink{classsysio_1_1login__plugin_a4b26614f4ddaf2c0333d07314422f955}{00075}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1login__plugin_a4b26614f4ddaf2c0333d07314422f955}{login\_plugin::plugin\_startup}}()\ \{}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00076}00076\ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\textcolor{stringliteral}{"{}starting\ login\_plugin"{}});}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00077}00077\ \ \ \ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_a3c4b68a0667942b58f1369f454ce0ce3}{get\_plugin}}<\mbox{\hyperlink{classsysio_1_1http__plugin}{http\_plugin}}>().add\_api(\{}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00078}00078\ \ \ \ \ \ \ \ \mbox{\hyperlink{login__plugin_8cpp_a6172887c892c48caf5f2a424ae44de37}{CALL}}(\mbox{\hyperlink{classsysio_1_1login__plugin_a48b449ac6a0aacba41cde01292a0f8df}{start\_login\_request}},\ 200),\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00079}00079\ \ \ \ \ \ \ \ \mbox{\hyperlink{login__plugin_8cpp_a6172887c892c48caf5f2a424ae44de37}{CALL}}(\mbox{\hyperlink{classsysio_1_1login__plugin_ad73eeba9f345e59ac8b3b88f6e996464}{finalize\_login\_request}},\ 200),}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00080}00080\ \ \ \ \ \ \ \ \textcolor{comment}{//\ CALL(do\_not\_use\_gen\_r1\_key,\ 200),\ \ //}}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00081}00081\ \ \ \ \ \ \ \ \textcolor{comment}{//\ CALL(do\_not\_use\_sign,\ 200),\ \ \ \ \ \ \ \ //}}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00082}00082\ \ \ \ \ \ \ \ \textcolor{comment}{//\ CALL(do\_not\_use\_get\_secret,\ 200),\ \ //}}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00083}00083\ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00084}00084\ \}}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00085}00085\ }
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00086}\mbox{\hyperlink{classsysio_1_1login__plugin_a431356fdad20fc6c4fe8031bf494efcc}{00086}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1login__plugin_a431356fdad20fc6c4fe8031bf494efcc}{login\_plugin::plugin\_shutdown}}()\ \{\}}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00087}00087\ }
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00088}00088\ \mbox{\hyperlink{structsysio_1_1login__plugin_1_1start__login__request__results}{login\_plugin::start\_login\_request\_results}}}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00089}\mbox{\hyperlink{classsysio_1_1login__plugin_a48b449ac6a0aacba41cde01292a0f8df}{00089}}\ \mbox{\hyperlink{classsysio_1_1login__plugin_a48b449ac6a0aacba41cde01292a0f8df}{login\_plugin::start\_login\_request}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1login__plugin_1_1start__login__request__params}{login\_plugin::start\_login\_request\_params}}\&\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params}{params}})\ \{}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00090}00090\ \ \ \ my-\/>expire\_requests();}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00091}00091\ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params}{params}}.expiration\_time\ >\ \mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{fc::time\_point::now}}(),\ fc::timeout\_exception,}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00092}00092\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Requested\ expiration\ time\ \$\{expiration\_time\}\ is\ in\ the\ past"{}},}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00093}00093\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}expiration\_time"{}},\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params}{params}}.expiration\_time));}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00094}00094\ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(my-\/>requests.size()\ <\ my-\/>max\_login\_requests,\ fc::timeout\_exception,\ \textcolor{stringliteral}{"{}Too\ many\ pending\ login\ requests"{}});}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00095}00095\ \ \ \ \mbox{\hyperlink{structsysio_1_1login__request}{login\_request}}\ request;}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00096}00096\ \ \ \ request.\mbox{\hyperlink{structsysio_1_1login__request_a679a35d42393c7020c39fe4728162c87}{server\_ephemeral\_priv\_key}}\ =\ \mbox{\hyperlink{classfc_1_1crypto_1_1private__key_ac5c6c2f7b6fb39c74ce662997f91b4f3}{chain::private\_key\_type::generate\_r1}}();}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00097}00097\ \ \ \ request.server\_ephemeral\_pub\_key\ =\ request.server\_ephemeral\_priv\_key.get\_public\_key();}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00098}00098\ \ \ \ request.expiration\_time\ =}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00099}00099\ \ \ \ \ \ \ \ std::min(\mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params}{params}}.expiration\_time,\ \mbox{\hyperlink{classfc_1_1time__point__sec}{fc::time\_point\_sec}}\{fc::time\_point::now()\}\ +\ my-\/>max\_login\_timeout);}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00100}00100\ \ \ \ my-\/>requests.insert(request);}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00101}00101\ \ \ \ \textcolor{keywordflow}{return}\ \{request.server\_ephemeral\_pub\_key\};}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00102}00102\ \}}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00103}00103\ }
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00104}00104\ \mbox{\hyperlink{structsysio_1_1login__plugin_1_1finalize__login__request__results}{login\_plugin::finalize\_login\_request\_results}}}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00105}\mbox{\hyperlink{classsysio_1_1login__plugin_ad73eeba9f345e59ac8b3b88f6e996464}{00105}}\ \mbox{\hyperlink{classsysio_1_1login__plugin_ad73eeba9f345e59ac8b3b88f6e996464}{login\_plugin::finalize\_login\_request}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1login__plugin_1_1finalize__login__request__params}{login\_plugin::finalize\_login\_request\_params}}\&\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params}{params}})\ \{}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00106}00106\ \ \ \ \mbox{\hyperlink{structsysio_1_1login__plugin_1_1finalize__login__request__results}{finalize\_login\_request\_results}}\ result;}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00107}00107\ \ \ \ my-\/>expire\_requests();}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00108}00108\ \ \ \ \textcolor{keyword}{auto}\&\ index\ =\ my-\/>requests.get<\mbox{\hyperlink{structsysio_1_1login__request__pub__key__index}{login\_request\_pub\_key\_index}}>();}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00109}00109\ \ \ \ \textcolor{keyword}{auto}\ it\ =\ index.find(\mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params}{params}}.server\_ephemeral\_pub\_key);}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00110}00110\ \ \ \ \textcolor{keywordflow}{if}\ (it\ ==\ index.end())\ \{}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00111}00111\ \ \ \ \ \ \ result.error\ =\ \textcolor{stringliteral}{"{}server\_ephemeral\_pub\_key\ expired\ or\ not\ found"{}};}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00112}00112\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00113}00113\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00114}00114\ \ \ \ \textcolor{keyword}{auto}\ request\ =\ *it;}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00115}00115\ \ \ \ index.erase(it);}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00116}00116\ }
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00117}00117\ \ \ \ \textcolor{keyword}{auto}\ shared\_secret\ =\ request.server\_ephemeral\_priv\_key.generate\_shared\_secret(\mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params}{params}}.client\_ephemeral\_pub\_key);}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00118}00118\ }
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00119}00119\ \ \ \ \mbox{\hyperlink{classfc_1_1vector}{chain::bytes}}\ combined\_data(1024\ *\ 1024);}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00120}00120\ \ \ \ \mbox{\hyperlink{classfc_1_1datastream}{chain::datastream<char*>}}\ sig\_data\_ds\{combined\_data.data(),\ combined\_data.size()\};}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00121}00121\ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(sig\_data\_ds,\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params}{params}}.permission);}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00122}00122\ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(sig\_data\_ds,\ shared\_secret);}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00123}00123\ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(sig\_data\_ds,\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params}{params}}.data);}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00124}00124\ \ \ \ combined\_data.resize(sig\_data\_ds.tellp());}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00125}00125\ }
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00126}00126\ \ \ \ result.digest\ =\ chain::sha256::hash(combined\_data);}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00127}00127\ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\&\ sig\ :\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params}{params}}.signatures)}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00128}00128\ \ \ \ \ \ \ result.recovered\_keys.insert(\mbox{\hyperlink{classfc_1_1crypto_1_1public__key}{chain::public\_key\_type}}\{sig,\ result.digest\});}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00129}00129\ }
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00130}00130\ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00131}00131\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacesysio_1_1chain_a057ec53a1f8d23b2fb89de6c19b41c32}{noop\_checktime}}\ =\ []\ \{\};}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00132}00132\ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ chain\ =\ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_a3c4b68a0667942b58f1369f454ce0ce3}{get\_plugin}}<\mbox{\hyperlink{classsysio_1_1chain__plugin}{chain\_plugin}}>().chain();}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00133}00133\ \ \ \ \ \ \ chain.get\_authorization\_manager().check\_authorization(\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00134}00134\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params}{params}}.permission.actor,\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params}{params}}.permission.permission,\ result.recovered\_keys,\ \{\},\ \mbox{\hyperlink{classfc_1_1microseconds}{fc::microseconds}}(0),}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00135}00135\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_a057ec53a1f8d23b2fb89de6c19b41c32}{noop\_checktime}},\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00136}00136\ \ \ \ \ \ \ result.permission\_satisfied\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00137}00137\ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00138}00138\ \ \ \ \ \ \ result.error\ =\ \textcolor{stringliteral}{"{}keys\ do\ not\ satisfy\ permission"{}};}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00139}00139\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00140}00140\ }
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00141}00141\ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00142}00142\ \}}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00143}00143\ }
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00144}00144\ \mbox{\hyperlink{structsysio_1_1login__plugin_1_1do__not__use__gen__r1__key__results}{login\_plugin::do\_not\_use\_gen\_r1\_key\_results}}}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00145}\mbox{\hyperlink{classsysio_1_1login__plugin_a27be8dcf11f5098a4fb3758b44c90bc0}{00145}}\ \mbox{\hyperlink{classsysio_1_1login__plugin_a27be8dcf11f5098a4fb3758b44c90bc0}{login\_plugin::do\_not\_use\_gen\_r1\_key}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1login__plugin_1_1do__not__use__gen__r1__key__params}{login\_plugin::do\_not\_use\_gen\_r1\_key\_params}}\&\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params}{params}})\ \{}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00146}00146\ \ \ \ \textcolor{keyword}{auto}\ priv\ =\ \mbox{\hyperlink{classfc_1_1crypto_1_1private__key_ac5c6c2f7b6fb39c74ce662997f91b4f3}{chain::private\_key\_type::generate\_r1}}();}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00147}00147\ \ \ \ \textcolor{keywordflow}{return}\ \{priv.get\_public\_key(),\ priv\};}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00148}00148\ \}}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00149}00149\ }
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00150}00150\ \mbox{\hyperlink{structsysio_1_1login__plugin_1_1do__not__use__sign__results}{login\_plugin::do\_not\_use\_sign\_results}}}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00151}\mbox{\hyperlink{classsysio_1_1login__plugin_a586b0bf9e77aacfb9c0eac7c2adee19f}{00151}}\ \mbox{\hyperlink{classsysio_1_1login__plugin_a586b0bf9e77aacfb9c0eac7c2adee19f}{login\_plugin::do\_not\_use\_sign}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1login__plugin_1_1do__not__use__sign__params}{login\_plugin::do\_not\_use\_sign\_params}}\&\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params}{params}})\ \{}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00152}00152\ \ \ \ \textcolor{keywordflow}{return}\ \{\mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params}{params}}.priv\_key.sign(chain::sha256::hash(\mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params}{params}}.data))\};}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00153}00153\ \}}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00154}00154\ }
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00155}00155\ \mbox{\hyperlink{structsysio_1_1login__plugin_1_1do__not__use__get__secret__results}{login\_plugin::do\_not\_use\_get\_secret\_results}}}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00156}\mbox{\hyperlink{classsysio_1_1login__plugin_a6309b00c1b232d162de788bf07169394}{00156}}\ \mbox{\hyperlink{classsysio_1_1login__plugin_a6309b00c1b232d162de788bf07169394}{login\_plugin::do\_not\_use\_get\_secret}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1login__plugin_1_1do__not__use__get__secret__params}{login\_plugin::do\_not\_use\_get\_secret\_params}}\&\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params}{params}})\ \{}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00157}00157\ \ \ \ \textcolor{keywordflow}{return}\ \{\mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params}{params}}.priv\_key.generate\_shared\_secret(\mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params}{params}}.pub\_key)\};}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00158}00158\ \}}
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00159}00159\ }
+\DoxyCodeLine{\Hypertarget{login__plugin_8cpp_source_l00160}00160\ \}\ \textcolor{comment}{//\ namespace\ sysio}}
+
+\end{DoxyCode}

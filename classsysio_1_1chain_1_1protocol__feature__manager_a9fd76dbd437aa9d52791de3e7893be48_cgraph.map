@@ -1,0 +1,11 @@
+<map id="sysio::chain::protocol_feature_manager::activate_feature" name="sysio::chain::protocol_feature_manager::activate_feature">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,63,185,119"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1chain_1_1protocol__feature__set.html#ae8a1236ae57e1bc45fbd29c4b9ae1643" title=" " alt="" coords="262,5,408,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="185,64,247,47,248,52,186,69"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1chain_1_1protocol__feature__set.html#aa3d76a6a13d7d417794cad6739b30683" title=" " alt="" coords="262,71,408,111"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="185,88,247,88,247,94,185,94"/>
+<area shape="rect" id="Node000005" href="$classsysio_1_1chain_1_1protocol__feature__manager.html#a5952c7d18c4d936c9416cf7cbce01d87" title=" " alt="" coords="233,136,437,177"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="186,113,244,129,243,134,185,118"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1chain_1_1protocol__feature__set.html#ade3656d3e5af67ec0cadfc8898e52a70" title=" " alt="" coords="485,5,630,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="408,23,469,23,469,28,408,28"/>
+</map>

@@ -1,0 +1,221 @@
+\doxysection{File\+Read\+Stream Class Reference}
+\hypertarget{class_file_read_stream}{}\label{class_file_read_stream}\index{FileReadStream@{FileReadStream}}
+
+
+File byte stream for input using fread().  
+
+
+
+
+{\ttfamily \#include $<$filereadstream.\+h$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef char \mbox{\hyperlink{class_file_read_stream_aa70b67aa47df53a8f01a675445f9e16a}{Ch}}
+\begin{DoxyCompactList}\small\item\em Character type (byte). \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_file_read_stream_adf91191843d50b900f43cb4f35f16f67}{File\+Read\+Stream}} (std\+::\+FILE \texorpdfstring{$\ast$}{*}fp, char \texorpdfstring{$\ast$}{*}buffer, size\+\_\+t buffer\+Size)
+\begin{DoxyCompactList}\small\item\em Constructor. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_file_read_stream_aa70b67aa47df53a8f01a675445f9e16a}{Ch}} \mbox{\hyperlink{class_file_read_stream_ab7d47da8952d3fe5856a261ec3c020c9}{Peek}} () const
+\item 
+\mbox{\hyperlink{class_file_read_stream_aa70b67aa47df53a8f01a675445f9e16a}{Ch}} \mbox{\hyperlink{class_file_read_stream_addcbccc9d86ccbbe6d8e876ba595dbcb}{Take}} ()
+\item 
+size\+\_\+t \mbox{\hyperlink{class_file_read_stream_ae82cfaafe347286b3af8976548bedf86}{Tell}} () const
+\item 
+void \mbox{\hyperlink{class_file_read_stream_a4f2eac5b08033b1527bff517be657a36}{Put}} (\mbox{\hyperlink{class_file_read_stream_aa70b67aa47df53a8f01a675445f9e16a}{Ch}})
+\item 
+void \mbox{\hyperlink{class_file_read_stream_acd031e3f578b23bc2a792ac41e1e95ae}{Flush}} ()
+\item 
+\mbox{\hyperlink{class_file_read_stream_aa70b67aa47df53a8f01a675445f9e16a}{Ch}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_file_read_stream_a21421afa5b1f41f7349f633f290aa223}{Put\+Begin}} ()
+\item 
+size\+\_\+t \mbox{\hyperlink{class_file_read_stream_a886660c89f698ff913d641d61466108f}{Put\+End}} (\mbox{\hyperlink{class_file_read_stream_aa70b67aa47df53a8f01a675445f9e16a}{Ch}} \texorpdfstring{$\ast$}{*})
+\item 
+const \mbox{\hyperlink{class_file_read_stream_aa70b67aa47df53a8f01a675445f9e16a}{Ch}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_file_read_stream_a1989429ffa42111e6f56ee14a3916cac}{Peek4}} () const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\begin{DoxyNote}{Note}
+implements Stream concept 
+\end{DoxyNote}
+
+
+Definition at line \mbox{\hyperlink{filereadstream_8h_source_l00034}{34}} of file \mbox{\hyperlink{filereadstream_8h_source}{filereadstream.\+h}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{class_file_read_stream_aa70b67aa47df53a8f01a675445f9e16a}\index{FileReadStream@{FileReadStream}!Ch@{Ch}}
+\index{Ch@{Ch}!FileReadStream@{FileReadStream}}
+\doxysubsubsection{\texorpdfstring{Ch}{Ch}}
+{\footnotesize\ttfamily \label{class_file_read_stream_aa70b67aa47df53a8f01a675445f9e16a} 
+char \mbox{\hyperlink{class_file_read_stream_aa70b67aa47df53a8f01a675445f9e16a}{File\+Read\+Stream\+::\+Ch}}}
+
+
+
+Definition at line \mbox{\hyperlink{filereadstream_8h_source_l00036}{36}} of file \mbox{\hyperlink{filereadstream_8h_source}{filereadstream.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_file_read_stream_adf91191843d50b900f43cb4f35f16f67}\index{FileReadStream@{FileReadStream}!FileReadStream@{FileReadStream}}
+\index{FileReadStream@{FileReadStream}!FileReadStream@{FileReadStream}}
+\doxysubsubsection{\texorpdfstring{FileReadStream()}{FileReadStream()}}
+{\footnotesize\ttfamily \label{class_file_read_stream_adf91191843d50b900f43cb4f35f16f67} 
+File\+Read\+Stream\+::\+File\+Read\+Stream (\begin{DoxyParamCaption}\item[{std\+::\+FILE \texorpdfstring{$\ast$}{*}}]{fp}{, }\item[{char \texorpdfstring{$\ast$}{*}}]{buffer}{, }\item[{size\+\_\+t}]{buffer\+Size}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+\begin{DoxyParams}{Parameters}
+{\em fp} & File pointer opened for read. \\
+\hline
+{\em buffer} & user-\/supplied buffer. \\
+\hline
+{\em buffer\+Size} & size of buffer in bytes. Must \texorpdfstring{$>$}{>}=4 bytes. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{filereadstream_8h_source_l00044}{44}} of file \mbox{\hyperlink{filereadstream_8h_source}{filereadstream.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ fp\_(fp),\ buffer\_(buffer),\ bufferSize\_(bufferSize),\ bufferLast\_(0),\ current\_(buffer\_),\ readCount\_(0),\ count\_(0),\ eof\_(\textcolor{keyword}{false})\ \{\ }
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(fp\_\ !=\ 0);}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(bufferSize\ >=\ 4);}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ Read();}
+\DoxyCodeLine{00048\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_file_read_stream_acd031e3f578b23bc2a792ac41e1e95ae}\index{FileReadStream@{FileReadStream}!Flush@{Flush}}
+\index{Flush@{Flush}!FileReadStream@{FileReadStream}}
+\doxysubsubsection{\texorpdfstring{Flush()}{Flush()}}
+{\footnotesize\ttfamily \label{class_file_read_stream_acd031e3f578b23bc2a792ac41e1e95ae} 
+void File\+Read\+Stream\+::\+Flush (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{filereadstream_8h_source_l00056}{56}} of file \mbox{\hyperlink{filereadstream_8h_source}{filereadstream.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00056\ \{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\textcolor{keyword}{false});\ \}\ }
+
+\end{DoxyCode}
+\Hypertarget{class_file_read_stream_ab7d47da8952d3fe5856a261ec3c020c9}\index{FileReadStream@{FileReadStream}!Peek@{Peek}}
+\index{Peek@{Peek}!FileReadStream@{FileReadStream}}
+\doxysubsubsection{\texorpdfstring{Peek()}{Peek()}}
+{\footnotesize\ttfamily \label{class_file_read_stream_ab7d47da8952d3fe5856a261ec3c020c9} 
+\mbox{\hyperlink{class_file_read_stream_aa70b67aa47df53a8f01a675445f9e16a}{Ch}} File\+Read\+Stream\+::\+Peek (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{filereadstream_8h_source_l00050}{50}} of file \mbox{\hyperlink{filereadstream_8h_source}{filereadstream.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00050\ \{\ \textcolor{keywordflow}{return}\ *current\_;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_file_read_stream_a1989429ffa42111e6f56ee14a3916cac}\index{FileReadStream@{FileReadStream}!Peek4@{Peek4}}
+\index{Peek4@{Peek4}!FileReadStream@{FileReadStream}}
+\doxysubsubsection{\texorpdfstring{Peek4()}{Peek4()}}
+{\footnotesize\ttfamily \label{class_file_read_stream_a1989429ffa42111e6f56ee14a3916cac} 
+const \mbox{\hyperlink{class_file_read_stream_aa70b67aa47df53a8f01a675445f9e16a}{Ch}} \texorpdfstring{$\ast$}{*} File\+Read\+Stream\+::\+Peek4 (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{filereadstream_8h_source_l00061}{61}} of file \mbox{\hyperlink{filereadstream_8h_source}{filereadstream.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (current\_\ +\ 4\ -\/\ !eof\_\ <=\ bufferLast\_)\ ?\ current\_\ :\ 0;}
+\DoxyCodeLine{00063\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_file_read_stream_a4f2eac5b08033b1527bff517be657a36}\index{FileReadStream@{FileReadStream}!Put@{Put}}
+\index{Put@{Put}!FileReadStream@{FileReadStream}}
+\doxysubsubsection{\texorpdfstring{Put()}{Put()}}
+{\footnotesize\ttfamily \label{class_file_read_stream_a4f2eac5b08033b1527bff517be657a36} 
+void File\+Read\+Stream\+::\+Put (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_file_read_stream_aa70b67aa47df53a8f01a675445f9e16a}{Ch}}}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{filereadstream_8h_source_l00055}{55}} of file \mbox{\hyperlink{filereadstream_8h_source}{filereadstream.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00055\ \{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\textcolor{keyword}{false});\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_file_read_stream_a21421afa5b1f41f7349f633f290aa223}\index{FileReadStream@{FileReadStream}!PutBegin@{PutBegin}}
+\index{PutBegin@{PutBegin}!FileReadStream@{FileReadStream}}
+\doxysubsubsection{\texorpdfstring{PutBegin()}{PutBegin()}}
+{\footnotesize\ttfamily \label{class_file_read_stream_a21421afa5b1f41f7349f633f290aa223} 
+\mbox{\hyperlink{class_file_read_stream_aa70b67aa47df53a8f01a675445f9e16a}{Ch}} \texorpdfstring{$\ast$}{*} File\+Read\+Stream\+::\+Put\+Begin (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{filereadstream_8h_source_l00057}{57}} of file \mbox{\hyperlink{filereadstream_8h_source}{filereadstream.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00057\ \{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\textcolor{keyword}{false});\ \textcolor{keywordflow}{return}\ 0;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_file_read_stream_a886660c89f698ff913d641d61466108f}\index{FileReadStream@{FileReadStream}!PutEnd@{PutEnd}}
+\index{PutEnd@{PutEnd}!FileReadStream@{FileReadStream}}
+\doxysubsubsection{\texorpdfstring{PutEnd()}{PutEnd()}}
+{\footnotesize\ttfamily \label{class_file_read_stream_a886660c89f698ff913d641d61466108f} 
+size\+\_\+t File\+Read\+Stream\+::\+Put\+End (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_file_read_stream_aa70b67aa47df53a8f01a675445f9e16a}{Ch}} \texorpdfstring{$\ast$}{*}}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{filereadstream_8h_source_l00058}{58}} of file \mbox{\hyperlink{filereadstream_8h_source}{filereadstream.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00058\ \{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\textcolor{keyword}{false});\ \textcolor{keywordflow}{return}\ 0;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_file_read_stream_addcbccc9d86ccbbe6d8e876ba595dbcb}\index{FileReadStream@{FileReadStream}!Take@{Take}}
+\index{Take@{Take}!FileReadStream@{FileReadStream}}
+\doxysubsubsection{\texorpdfstring{Take()}{Take()}}
+{\footnotesize\ttfamily \label{class_file_read_stream_addcbccc9d86ccbbe6d8e876ba595dbcb} 
+\mbox{\hyperlink{class_file_read_stream_aa70b67aa47df53a8f01a675445f9e16a}{Ch}} File\+Read\+Stream\+::\+Take (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{filereadstream_8h_source_l00051}{51}} of file \mbox{\hyperlink{filereadstream_8h_source}{filereadstream.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00051\ \{\ \mbox{\hyperlink{class_file_read_stream_aa70b67aa47df53a8f01a675445f9e16a}{Ch}}\ c\ =\ *current\_;\ Read();\ \textcolor{keywordflow}{return}\ c;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_file_read_stream_ae82cfaafe347286b3af8976548bedf86}\index{FileReadStream@{FileReadStream}!Tell@{Tell}}
+\index{Tell@{Tell}!FileReadStream@{FileReadStream}}
+\doxysubsubsection{\texorpdfstring{Tell()}{Tell()}}
+{\footnotesize\ttfamily \label{class_file_read_stream_ae82cfaafe347286b3af8976548bedf86} 
+size\+\_\+t File\+Read\+Stream\+::\+Tell (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{filereadstream_8h_source_l00052}{52}} of file \mbox{\hyperlink{filereadstream_8h_source}{filereadstream.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00052\ \{\ \textcolor{keywordflow}{return}\ count\_\ +\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(current\_\ -\/\ buffer\_);\ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/\mbox{\hyperlink{filereadstream_8h}{filereadstream.\+h}}\end{DoxyCompactItemize}

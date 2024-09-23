@@ -1,0 +1,428 @@
+\doxysection{libraries/yubihsm/examples/yubico\+\_\+otp.c File Reference}
+\hypertarget{yubico__otp_8c}{}\label{yubico__otp_8c}\index{libraries/yubihsm/examples/yubico\_otp.c@{libraries/yubihsm/examples/yubico\_otp.c}}
+{\ttfamily \#include $<$assert.\+h$>$}\newline
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include $<$openssl/aes.\+h$>$}\newline
+{\ttfamily \#include $<$openssl/evp.\+h$>$}\newline
+{\ttfamily \#include $<$yubihsm.\+h$>$}\newline
+Include dependency graph for yubico\+\_\+otp.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{yubico__otp_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{yubico__otp_8c_a377ec96b1eb26c7b26b84bb5b0c9a928}{DEFAULT\+\_\+\+CONNECTOR\+\_\+\+URL}}~"{}http\+://127.\+0.\+0.\+1\+:12345"{}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{yubico__otp_8c_a1d58c035ff1c657440eafb25f62b3726}{yubikey\+\_\+crc16}} (const \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}, size\+\_\+t buf\+\_\+size)
+\item 
+int \mbox{\hyperlink{yubico__otp_8c_a840291bc02cba5474a4cb46a9b9566fe}{main}} (void)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{yubico__otp_8c_a870e61ded67e4529500d708a5f1af286}{key\+\_\+label}} = "{}label"{}
+\item 
+const \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{yubico__otp_8c_abd7f8a696584d8ab4b9f4d1e1970be37}{password}} \mbox{[}$\,$\mbox{]} = "{}password"{}
+\item 
+const \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{yubico__otp_8c_a485b73836b7b661b3333a70b309ffba6}{otp\+\_\+key}} \mbox{[}$\,$\mbox{]}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{yubico__otp_8c_a377ec96b1eb26c7b26b84bb5b0c9a928}\index{yubico\_otp.c@{yubico\_otp.c}!DEFAULT\_CONNECTOR\_URL@{DEFAULT\_CONNECTOR\_URL}}
+\index{DEFAULT\_CONNECTOR\_URL@{DEFAULT\_CONNECTOR\_URL}!yubico\_otp.c@{yubico\_otp.c}}
+\doxysubsubsection{\texorpdfstring{DEFAULT\_CONNECTOR\_URL}{DEFAULT\_CONNECTOR\_URL}}
+{\footnotesize\ttfamily \label{yubico__otp_8c_a377ec96b1eb26c7b26b84bb5b0c9a928} 
+\#define DEFAULT\+\_\+\+CONNECTOR\+\_\+\+URL~"{}http\+://127.\+0.\+0.\+1\+:12345"{}}
+
+
+
+Definition at line \mbox{\hyperlink{yubico__otp_8c_source_l00032}{32}} of file \mbox{\hyperlink{yubico__otp_8c_source}{yubico\+\_\+otp.\+c}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{yubico__otp_8c_a840291bc02cba5474a4cb46a9b9566fe}\index{yubico\_otp.c@{yubico\_otp.c}!main@{main}}
+\index{main@{main}!yubico\_otp.c@{yubico\_otp.c}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{yubico__otp_8c_a840291bc02cba5474a4cb46a9b9566fe} 
+int main (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{yubico__otp_8c_source_l00088}{88}} of file \mbox{\hyperlink{yubico__otp_8c_source}{yubico\+\_\+otp.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00089\ \ \ \mbox{\hyperlink{structyh__connector}{yh\_connector}}\ *connector\ =\ NULL;}
+\DoxyCodeLine{00090\ \ \ \mbox{\hyperlink{structyh__session}{yh\_session}}\ *\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}}\ =\ NULL;}
+\DoxyCodeLine{00091\ \ \ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366}{yh\_rc}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a39fbc5bce29b178582419ae9d31ad252}{YHR\_GENERIC\_ERROR}};}
+\DoxyCodeLine{00092\ }
+\DoxyCodeLine{00093\ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ authkey\ =\ 1;}
+\DoxyCodeLine{00094\ }
+\DoxyCodeLine{00095\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *connector\_url;}
+\DoxyCodeLine{00096\ }
+\DoxyCodeLine{00097\ \ \ connector\_url\ =\ getenv(\textcolor{stringliteral}{"{}DEFAULT\_CONNECTOR\_URL"{}});}
+\DoxyCodeLine{00098\ \ \ \textcolor{keywordflow}{if}\ (connector\_url\ ==\ NULL)\ \{}
+\DoxyCodeLine{00099\ \ \ \ \ connector\_url\ =\ \mbox{\hyperlink{yubico__otp_8c_a377ec96b1eb26c7b26b84bb5b0c9a928}{DEFAULT\_CONNECTOR\_URL}};}
+\DoxyCodeLine{00100\ \ \ \}}
+\DoxyCodeLine{00101\ }
+\DoxyCodeLine{00102\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a5392844a98c6220c69fe08d3dcf8f1bc}{yh\_init}}();}
+\DoxyCodeLine{00103\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{00104\ }
+\DoxyCodeLine{00105\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a9c700747902a722d6c1d2073277de294}{yh\_init\_connector}}(connector\_url,\ \&connector);}
+\DoxyCodeLine{00106\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{00107\ }
+\DoxyCodeLine{00108\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_aa19be6ac70a2a5d1cef8d7e6902fe05f}{yh\_connect}}(connector,\ 0);}
+\DoxyCodeLine{00109\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{00110\ }
+\DoxyCodeLine{00111\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a3be331dcf8907ff3569e4dc230e1c615}{yh\_create\_session\_derived}}(connector,\ authkey,\ password,}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{sizeof}(password),\ \textcolor{keyword}{false},\ \&\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}});}
+\DoxyCodeLine{00113\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{00114\ }
+\DoxyCodeLine{00115\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a77870209747d5ccd90f9da3aae2bdfa8}{yh\_authenticate\_session}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}});}
+\DoxyCodeLine{00116\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{00117\ }
+\DoxyCodeLine{00118\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ session\_id;}
+\DoxyCodeLine{00119\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_aeabf472faf1ba8d963b39866e04df6b0}{yh\_get\_session\_id}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}},\ \&session\_id);}
+\DoxyCodeLine{00120\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{00121\ }
+\DoxyCodeLine{00122\ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Successfully\ established\ session\ \%02d\(\backslash\)n"{}},\ session\_id);}
+\DoxyCodeLine{00123\ }
+\DoxyCodeLine{00124\ \ \ \mbox{\hyperlink{structyh__capabilities}{yh\_capabilities}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a08393519edfd7c59fb01fb8db97514b5}{capabilities}}\ =\ \{\{0\}\};}
+\DoxyCodeLine{00125\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =}
+\DoxyCodeLine{00126\ \ \ \ \ \mbox{\hyperlink{yubihsm_8c_aab440e1cb671d9ba7a2e7d1243960e42}{yh\_string\_to\_capabilities}}(\textcolor{stringliteral}{"{}create-\/otp-\/aead:decrypt-\/otp:randomize-\/otp-\/aead"{}},}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a08393519edfd7c59fb01fb8db97514b5}{capabilities}});}
+\DoxyCodeLine{00128\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{00129\ }
+\DoxyCodeLine{00130\ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ domain\_five\ =\ 16;\ \textcolor{comment}{//\ Domain\ five\ is\ 0b0000000000010000}}
+\DoxyCodeLine{00131\ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_ada12860f8f9f5f3cac5b179ef352434c}{key\_id}}\ =\ 0;\ \ \ \ \ \ \ \textcolor{comment}{//\ ID\ 0\ lets\ the\ device\ generate\ an\ ID}}
+\DoxyCodeLine{00132\ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ nonce\_id\ =\ 0x12345678;}
+\DoxyCodeLine{00133\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a9e130d225a8dc003d7a7c0ce4b8ea5e4}{yh\_util\_generate\_otp\_aead\_key}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}},\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_ada12860f8f9f5f3cac5b179ef352434c}{key\_id}},\ \mbox{\hyperlink{yubico__otp_8c_a870e61ded67e4529500d708a5f1af286}{key\_label}},\ domain\_five,}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a08393519edfd7c59fb01fb8db97514b5}{capabilities}},\ \mbox{\hyperlink{yubihsm_8h_a498937b5a72accbb0ef21bb1dcdd55caa62e7ba4126ae16faeafb28972a4e0959}{YH\_ALGO\_AES128\_YUBICO\_OTP}},}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ nonce\_id);}
+\DoxyCodeLine{00136\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{00137\ }
+\DoxyCodeLine{00138\ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Generated\ OTP\ key\ with\ ID\ \%04x\(\backslash\)n"{}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_ada12860f8f9f5f3cac5b179ef352434c}{key\_id}});}
+\DoxyCodeLine{00139\ }
+\DoxyCodeLine{00140\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_ae736702f9463878db4adfd45b6a597f9}{yh\_util\_delete\_object}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_ada12860f8f9f5f3cac5b179ef352434c}{key\_id}},\ \mbox{\hyperlink{yubihsm_8h_a2fe39512cb4df34b270a67dbb8e13583a02c5f683fde147de6a9e1043f971f5f0}{YH\_OTP\_AEAD\_KEY}});}
+\DoxyCodeLine{00141\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{00142\ }
+\DoxyCodeLine{00143\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_addc22271306d847f53321984f41d818b}{yh\_util\_import\_otp\_aead\_key}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}},\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_ada12860f8f9f5f3cac5b179ef352434c}{key\_id}},\ \mbox{\hyperlink{yubico__otp_8c_a870e61ded67e4529500d708a5f1af286}{key\_label}},\ domain\_five,}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a08393519edfd7c59fb01fb8db97514b5}{capabilities}},\ nonce\_id,\ \mbox{\hyperlink{yubico__otp_8c_a485b73836b7b661b3333a70b309ffba6}{otp\_key}},}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{yubico__otp_8c_a485b73836b7b661b3333a70b309ffba6}{otp\_key}}));}
+\DoxyCodeLine{00146\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{00147\ }
+\DoxyCodeLine{00148\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ \textcolor{keyword}{sizeof}(test\_vectors)\ /\ \textcolor{keyword}{sizeof}(test\_vectors[0]);\ i++)\ \{}
+\DoxyCodeLine{00149\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ aead[512];}
+\DoxyCodeLine{00150\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ aead\_len\ =\ \textcolor{keyword}{sizeof}(aead);}
+\DoxyCodeLine{00151\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a82d295a02d9eb628f6dea4b4c01fdec4}{yh\_util\_create\_otp\_aead}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_ada12860f8f9f5f3cac5b179ef352434c}{key\_id}},\ test\_vectors[i].key,}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ test\_vectors[i].\textcolor{keywordtype}{id},\ aead,\ \&aead\_len);}
+\DoxyCodeLine{00153\ \ \ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{00154\ }
+\DoxyCodeLine{00155\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ \mbox{\hyperlink{yubico__otp_8c_ae83fbea40062666266a4d81b65e6aaa6}{use\_counter}};}
+\DoxyCodeLine{00156\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ \mbox{\hyperlink{yubico__otp_8c_a6f0f1d51fe1aa0b50b024dfd1376d270}{timestamp\_low}};}
+\DoxyCodeLine{00157\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \mbox{\hyperlink{yubico__otp_8c_a90dc44562265ed51bff2282df3fb5b4b}{timestamp\_high}};}
+\DoxyCodeLine{00158\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \mbox{\hyperlink{yubico__otp_8c_ae7c9eaabfd4bda45ca34abcfd5dfc17d}{session\_counter}};}
+\DoxyCodeLine{00159\ }
+\DoxyCodeLine{00160\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Checking\ test\ vector\ \%zu\ ...\ "{}},\ i);}
+\DoxyCodeLine{00161\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm_8c_a3677afe2209a1cae31f70a304e260e28}{yh\_util\_decrypt\_otp}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_ada12860f8f9f5f3cac5b179ef352434c}{key\_id}},\ aead,\ aead\_len,\ test\_vectors[i].\mbox{\hyperlink{yubico__otp_8c_ab1e1d61db8c48d537faca71988a7c123}{otp}},}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{yubico__otp_8c_ae83fbea40062666266a4d81b65e6aaa6}{use\_counter}},\ \&\mbox{\hyperlink{yubico__otp_8c_ae7c9eaabfd4bda45ca34abcfd5dfc17d}{session\_counter}},\ \&\mbox{\hyperlink{yubico__otp_8c_a90dc44562265ed51bff2282df3fb5b4b}{timestamp\_high}},}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{yubico__otp_8c_a6f0f1d51fe1aa0b50b024dfd1376d270}{timestamp\_low}});}
+\DoxyCodeLine{00165\ \ \ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{00166\ }
+\DoxyCodeLine{00167\ \ \ \ \ assert(test\_vectors[i].\mbox{\hyperlink{yubico__otp_8c_ae83fbea40062666266a4d81b65e6aaa6}{use\_counter}}\ ==\ \mbox{\hyperlink{yubico__otp_8c_ae83fbea40062666266a4d81b65e6aaa6}{use\_counter}});}
+\DoxyCodeLine{00168\ \ \ \ \ assert(test\_vectors[i].\mbox{\hyperlink{yubico__otp_8c_ae7c9eaabfd4bda45ca34abcfd5dfc17d}{session\_counter}}\ ==\ \mbox{\hyperlink{yubico__otp_8c_ae7c9eaabfd4bda45ca34abcfd5dfc17d}{session\_counter}});}
+\DoxyCodeLine{00169\ \ \ \ \ assert(test\_vectors[i].\mbox{\hyperlink{yubico__otp_8c_a90dc44562265ed51bff2282df3fb5b4b}{timestamp\_high}}\ ==\ \mbox{\hyperlink{yubico__otp_8c_a90dc44562265ed51bff2282df3fb5b4b}{timestamp\_high}});}
+\DoxyCodeLine{00170\ \ \ \ \ assert(test\_vectors[i].\mbox{\hyperlink{yubico__otp_8c_a6f0f1d51fe1aa0b50b024dfd1376d270}{timestamp\_low}}\ ==\ \mbox{\hyperlink{yubico__otp_8c_a6f0f1d51fe1aa0b50b024dfd1376d270}{timestamp\_low}});}
+\DoxyCodeLine{00171\ }
+\DoxyCodeLine{00172\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}OK\(\backslash\)n"{}});}
+\DoxyCodeLine{00173\ \ \ \}}
+\DoxyCodeLine{00174\ }
+\DoxyCodeLine{00175\ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Put\ OTP\ key\ with\ ID\ \%04x\(\backslash\)n"{}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_ada12860f8f9f5f3cac5b179ef352434c}{key\_id}});}
+\DoxyCodeLine{00176\ }
+\DoxyCodeLine{00177\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ otp\_data[64];}
+\DoxyCodeLine{00178\ \ \ \textcolor{keywordtype}{size\_t}\ otp\_data\_len\ =\ \textcolor{keyword}{sizeof}(otp\_data);}
+\DoxyCodeLine{00179\ \ \ \textcolor{keywordtype}{size\_t}\ tag\_len\ =\ 8;}
+\DoxyCodeLine{00180\ \ \ \textcolor{keywordtype}{size\_t}\ nonce\_len\ =\ 13;}
+\DoxyCodeLine{00181\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ nonce[13]\ =\ \{0\};}
+\DoxyCodeLine{00182\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ out\_buf[32];}
+\DoxyCodeLine{00183\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a565e4b6f63fecad4c290b50ee6684ee3}{out\_len}};}
+\DoxyCodeLine{00184\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a4bb1d420f681bc91bd36dc08695dbad6}{yh\_util\_randomize\_otp\_aead}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_ada12860f8f9f5f3cac5b179ef352434c}{key\_id}},\ otp\_data,\ \&otp\_data\_len);}
+\DoxyCodeLine{00185\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{00186\ }
+\DoxyCodeLine{00187\ \ \ EVP\_CIPHER\_CTX\ *ctx\ =\ EVP\_CIPHER\_CTX\_new();}
+\DoxyCodeLine{00188\ }
+\DoxyCodeLine{00189\ \ \ \textcolor{comment}{//\ Select\ cipher}}
+\DoxyCodeLine{00190\ \ \ assert(EVP\_DecryptInit\_ex(ctx,\ EVP\_aes\_128\_ccm(),\ NULL,\ NULL,\ NULL)\ ==\ 1);}
+\DoxyCodeLine{00191\ }
+\DoxyCodeLine{00192\ \ \ \textcolor{comment}{//\ Set\ nonce\ length}}
+\DoxyCodeLine{00193\ \ \ assert(EVP\_CIPHER\_CTX\_ctrl(ctx,\ EVP\_CTRL\_CCM\_SET\_IVLEN,\ nonce\_len,\ NULL)\ ==}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ \ 1);}
+\DoxyCodeLine{00195\ }
+\DoxyCodeLine{00196\ \ \ \textcolor{comment}{//\ Set\ expected\ tag\ value}}
+\DoxyCodeLine{00197\ \ \ assert(EVP\_CIPHER\_CTX\_ctrl(ctx,\ EVP\_CTRL\_CCM\_SET\_TAG,\ tag\_len,}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ otp\_data\ +\ otp\_data\_len\ -\/\ tag\_len)\ ==\ 1);}
+\DoxyCodeLine{00199\ }
+\DoxyCodeLine{00200\ \ \ \textcolor{comment}{//\ Specify\ key\ and\ IV}}
+\DoxyCodeLine{00201\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(nonce,\ \&nonce\_id,\ 4);}
+\DoxyCodeLine{00202\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(nonce\ +\ 4,\ otp\_data,\ 6);}
+\DoxyCodeLine{00203\ \ \ assert(EVP\_DecryptInit\_ex(ctx,\ NULL,\ NULL,\ \mbox{\hyperlink{yubico__otp_8c_a485b73836b7b661b3333a70b309ffba6}{otp\_key}},\ nonce)\ ==\ 1);}
+\DoxyCodeLine{00204\ }
+\DoxyCodeLine{00205\ \ \ \textcolor{comment}{//\ Decrypt\ plaintext,\ verify\ tag:\ can\ only\ be\ called\ once}}
+\DoxyCodeLine{00206\ \ \ assert(EVP\_DecryptUpdate(ctx,\ out\_buf,\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a565e4b6f63fecad4c290b50ee6684ee3}{out\_len}},\ otp\_data\ +\ 6,}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ otp\_data\_len\ -\/\ 6\ -\/\ tag\_len)\ ==\ 1);}
+\DoxyCodeLine{00208\ }
+\DoxyCodeLine{00209\ \ \ EVP\_CIPHER\_CTX\_free(ctx);}
+\DoxyCodeLine{00210\ }
+\DoxyCodeLine{00211\ \ \ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00212\ \ \ \ \ \textcolor{keyword}{union\ }\{}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \textcolor{keywordtype}{id}[6];}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ \mbox{\hyperlink{yubico__otp_8c_ae83fbea40062666266a4d81b65e6aaa6}{use\_counter}};}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ \mbox{\hyperlink{yubico__otp_8c_a6f0f1d51fe1aa0b50b024dfd1376d270}{timestamp\_low}};}
+\DoxyCodeLine{00217\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \mbox{\hyperlink{yubico__otp_8c_a90dc44562265ed51bff2282df3fb5b4b}{timestamp\_high}};}
+\DoxyCodeLine{00218\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \mbox{\hyperlink{yubico__otp_8c_ae7c9eaabfd4bda45ca34abcfd5dfc17d}{session\_counter}};}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ rnd;}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ \mbox{\hyperlink{yubico__otp_8c_aa60093a9a5d5d17864cfda66c47733e3}{crc}};}
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ raw[16];}
+\DoxyCodeLine{00223\ \ \ \ \ \};}
+\DoxyCodeLine{00224\ \ \ \}\ token\ =\ \{.raw\ =\ \{0\}\};}
+\DoxyCodeLine{00225\ }
+\DoxyCodeLine{00226\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \mbox{\hyperlink{yubico__otp_8c_ab1e1d61db8c48d537faca71988a7c123}{otp}}[16]\ =\ \{0\};}
+\DoxyCodeLine{00227\ }
+\DoxyCodeLine{00228\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(token.id,\ out\_buf\ +\ 16,\ 6);}
+\DoxyCodeLine{00229\ \ \ token.use\_counter\ =\ 0xabcd;}
+\DoxyCodeLine{00230\ \ \ token.timestamp\_low\ =\ 0xdcba;}
+\DoxyCodeLine{00231\ \ \ token.timestamp\_high\ =\ 0xff;}
+\DoxyCodeLine{00232\ \ \ token.session\_counter\ =\ 0x00;}
+\DoxyCodeLine{00233\ \ \ token.crc\ =\ \string~yubikey\_crc16(token.raw,\ 14);}
+\DoxyCodeLine{00234\ }
+\DoxyCodeLine{00235\ \ \ AES\_KEY\ k;}
+\DoxyCodeLine{00236\ \ \ AES\_set\_encrypt\_key(out\_buf,\ 128,\ \&k);}
+\DoxyCodeLine{00237\ \ \ AES\_ecb\_encrypt(token.raw,\ \mbox{\hyperlink{yubico__otp_8c_ab1e1d61db8c48d537faca71988a7c123}{otp}},\ \&k,\ AES\_ENCRYPT);}
+\DoxyCodeLine{00238\ }
+\DoxyCodeLine{00239\ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ \mbox{\hyperlink{yubico__otp_8c_ae83fbea40062666266a4d81b65e6aaa6}{use\_counter}};}
+\DoxyCodeLine{00240\ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ \mbox{\hyperlink{yubico__otp_8c_a6f0f1d51fe1aa0b50b024dfd1376d270}{timestamp\_low}};}
+\DoxyCodeLine{00241\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \mbox{\hyperlink{yubico__otp_8c_a90dc44562265ed51bff2282df3fb5b4b}{timestamp\_high}};}
+\DoxyCodeLine{00242\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \mbox{\hyperlink{yubico__otp_8c_ae7c9eaabfd4bda45ca34abcfd5dfc17d}{session\_counter}};}
+\DoxyCodeLine{00243\ }
+\DoxyCodeLine{00244\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a3677afe2209a1cae31f70a304e260e28}{yh\_util\_decrypt\_otp}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_ada12860f8f9f5f3cac5b179ef352434c}{key\_id}},\ otp\_data,\ otp\_data\_len,\ \mbox{\hyperlink{yubico__otp_8c_ab1e1d61db8c48d537faca71988a7c123}{otp}},}
+\DoxyCodeLine{00245\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{yubico__otp_8c_ae83fbea40062666266a4d81b65e6aaa6}{use\_counter}},\ \&\mbox{\hyperlink{yubico__otp_8c_ae7c9eaabfd4bda45ca34abcfd5dfc17d}{session\_counter}},\ \&\mbox{\hyperlink{yubico__otp_8c_a90dc44562265ed51bff2282df3fb5b4b}{timestamp\_high}},}
+\DoxyCodeLine{00246\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{yubico__otp_8c_a6f0f1d51fe1aa0b50b024dfd1376d270}{timestamp\_low}});}
+\DoxyCodeLine{00247\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{00248\ }
+\DoxyCodeLine{00249\ \ \ assert(\mbox{\hyperlink{yubico__otp_8c_ae83fbea40062666266a4d81b65e6aaa6}{use\_counter}}\ ==\ token.use\_counter);}
+\DoxyCodeLine{00250\ \ \ assert(\mbox{\hyperlink{yubico__otp_8c_a6f0f1d51fe1aa0b50b024dfd1376d270}{timestamp\_low}}\ ==\ token.timestamp\_low);}
+\DoxyCodeLine{00251\ \ \ assert(\mbox{\hyperlink{yubico__otp_8c_a90dc44562265ed51bff2282df3fb5b4b}{timestamp\_high}}\ ==\ token.timestamp\_high);}
+\DoxyCodeLine{00252\ \ \ assert(\mbox{\hyperlink{yubico__otp_8c_ae7c9eaabfd4bda45ca34abcfd5dfc17d}{session\_counter}}\ ==\ token.session\_counter);}
+\DoxyCodeLine{00253\ }
+\DoxyCodeLine{00254\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a61ab8dbab67b1cceb49cd306f8c3f4b1}{yh\_util\_close\_session}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}});}
+\DoxyCodeLine{00255\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{00256\ }
+\DoxyCodeLine{00257\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a1a35f8ae5a739848408633a514e41b2d}{yh\_destroy\_session}}(\&\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}});}
+\DoxyCodeLine{00258\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{00259\ }
+\DoxyCodeLine{00260\ \ \ \mbox{\hyperlink{yubihsm_8c_ab12d5a42d2219741bd3630b99ed1c7d2}{yh\_disconnect}}(connector);}
+\DoxyCodeLine{00261\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{00262\ }
+\DoxyCodeLine{00263\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a36e3d9a07c6689e14a9339ca1ebb7259}{yh\_exit}}();}
+\DoxyCodeLine{00264\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{00265\ }
+\DoxyCodeLine{00266\ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00267\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{yubico__otp_8c_a840291bc02cba5474a4cb46a9b9566fe_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{yubico__otp_8c_a1d58c035ff1c657440eafb25f62b3726}\index{yubico\_otp.c@{yubico\_otp.c}!yubikey\_crc16@{yubikey\_crc16}}
+\index{yubikey\_crc16@{yubikey\_crc16}!yubico\_otp.c@{yubico\_otp.c}}
+\doxysubsubsection{\texorpdfstring{yubikey\_crc16()}{yubikey\_crc16()}}
+{\footnotesize\ttfamily \label{yubico__otp_8c_a1d58c035ff1c657440eafb25f62b3726} 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} yubikey\+\_\+crc16 (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{buf}{, }\item[{size\+\_\+t}]{buf\+\_\+size}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{yubico__otp_8c_source_l00070}{70}} of file \mbox{\hyperlink{yubico__otp_8c_source}{yubico\+\_\+otp.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00071\ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ m\_crc\ =\ 0xffff;}
+\DoxyCodeLine{00072\ }
+\DoxyCodeLine{00073\ \ \ \textcolor{keywordflow}{while}\ (buf\_size-\/-\/)\ \{}
+\DoxyCodeLine{00074\ \ \ \ \ \textcolor{keywordtype}{int}\ i,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}};}
+\DoxyCodeLine{00075\ \ \ \ \ m\_crc\ \string^=\ (\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}})\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}++\ \&\ 0xFF;}
+\DoxyCodeLine{00076\ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ 8;\ i++)\ \{}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ =\ m\_crc\ \&\ 1;}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ m\_crc\ >>=\ 1;}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}})\ \{}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ m\_crc\ \string^=\ 0x8408;}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00082\ \ \ \ \ \}}
+\DoxyCodeLine{00083\ \ \ \}}
+\DoxyCodeLine{00084\ }
+\DoxyCodeLine{00085\ \ \ \textcolor{keywordflow}{return}\ m\_crc;}
+\DoxyCodeLine{00086\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{yubico__otp_8c_aa60093a9a5d5d17864cfda66c47733e3}\index{yubico\_otp.c@{yubico\_otp.c}!crc@{crc}}
+\index{crc@{crc}!yubico\_otp.c@{yubico\_otp.c}}
+\doxysubsubsection{\texorpdfstring{crc}{crc}}
+{\footnotesize\ttfamily \label{yubico__otp_8c_aa60093a9a5d5d17864cfda66c47733e3} 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} crc}
+
+
+
+Definition at line \mbox{\hyperlink{yubico__otp_8c_source_l00048}{48}} of file \mbox{\hyperlink{yubico__otp_8c_source}{yubico\+\_\+otp.\+c}}.
+
+\Hypertarget{yubico__otp_8c_a9fc31119e063002cf7bf5d9cfe33a373}\index{yubico\_otp.c@{yubico\_otp.c}!id@{id}}
+\index{id@{id}!yubico\_otp.c@{yubico\_otp.c}}
+\doxysubsubsection{\texorpdfstring{id}{id}}
+{\footnotesize\ttfamily \label{yubico__otp_8c_a9fc31119e063002cf7bf5d9cfe33a373} 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} id\mbox{[}6\mbox{]}}
+
+
+
+Definition at line \mbox{\hyperlink{yubico__otp_8c_source_l00042}{42}} of file \mbox{\hyperlink{yubico__otp_8c_source}{yubico\+\_\+otp.\+c}}.
+
+\Hypertarget{yubico__otp_8c_a9246c20bb98ad2b4c60313c053c70f08}\index{yubico\_otp.c@{yubico\_otp.c}!key@{key}}
+\index{key@{key}!yubico\_otp.c@{yubico\_otp.c}}
+\doxysubsubsection{\texorpdfstring{key}{key}}
+{\footnotesize\ttfamily \label{yubico__otp_8c_a9246c20bb98ad2b4c60313c053c70f08} 
+\mbox{\hyperlink{structyubihsm__pkcs11__object__desc}{yubihsm\+\_\+pkcs11\+\_\+object\+\_\+desc}} \texorpdfstring{$\ast$}{*} key}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{util__pkcs11_8c_a85589628d7732ef01a3f80a25d217c8c}{get\_object\_desc}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}}-\/>slot-\/>device\_session,\ \mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}}-\/>slot-\/>objects,}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_af9bd2054b5741fbfcc5a60dc8b7f9136}{hUnwrappingKey}})}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{yubico__otp_8c_source_l00041}{41}} of file \mbox{\hyperlink{yubico__otp_8c_source}{yubico\+\_\+otp.\+c}}.
+
+\Hypertarget{yubico__otp_8c_a870e61ded67e4529500d708a5f1af286}\index{yubico\_otp.c@{yubico\_otp.c}!key\_label@{key\_label}}
+\index{key\_label@{key\_label}!yubico\_otp.c@{yubico\_otp.c}}
+\doxysubsubsection{\texorpdfstring{key\_label}{key\_label}}
+{\footnotesize\ttfamily \label{yubico__otp_8c_a870e61ded67e4529500d708a5f1af286} 
+const char\texorpdfstring{$\ast$}{*} key\+\_\+label = "{}label"{}}
+
+
+
+Definition at line \mbox{\hyperlink{yubico__otp_8c_source_l00035}{35}} of file \mbox{\hyperlink{yubico__otp_8c_source}{yubico\+\_\+otp.\+c}}.
+
+\Hypertarget{yubico__otp_8c_ab1e1d61db8c48d537faca71988a7c123}\index{yubico\_otp.c@{yubico\_otp.c}!otp@{otp}}
+\index{otp@{otp}!yubico\_otp.c@{yubico\_otp.c}}
+\doxysubsubsection{\texorpdfstring{otp}{otp}}
+{\footnotesize\ttfamily \label{yubico__otp_8c_ab1e1d61db8c48d537faca71988a7c123} 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} otp\mbox{[}32\mbox{]}}
+
+
+
+Definition at line \mbox{\hyperlink{yubico__otp_8c_source_l00049}{49}} of file \mbox{\hyperlink{yubico__otp_8c_source}{yubico\+\_\+otp.\+c}}.
+
+\Hypertarget{yubico__otp_8c_a485b73836b7b661b3333a70b309ffba6}\index{yubico\_otp.c@{yubico\_otp.c}!otp\_key@{otp\_key}}
+\index{otp\_key@{otp\_key}!yubico\_otp.c@{yubico\_otp.c}}
+\doxysubsubsection{\texorpdfstring{otp\_key}{otp\_key}}
+{\footnotesize\ttfamily \label{yubico__otp_8c_a485b73836b7b661b3333a70b309ffba6} 
+const \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} otp\+\_\+key\mbox{[}$\,$\mbox{]}}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=\ \{0x80,\ 0x81,\ 0x82,\ 0x83,\ 0x84,\ 0x85,\ 0x86,\ 0x87,}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x88,\ 0x89,\ 0x8a,\ 0x8b,\ 0x8c,\ 0x8d,\ 0x8e,\ 0x8f\}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{yubico__otp_8c_source_l00037}{37}} of file \mbox{\hyperlink{yubico__otp_8c_source}{yubico\+\_\+otp.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{0x80,\ 0x81,\ 0x82,\ 0x83,\ 0x84,\ 0x85,\ 0x86,\ 0x87,}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x88,\ 0x89,\ 0x8a,\ 0x8b,\ 0x8c,\ 0x8d,\ 0x8e,\ 0x8f\};}
+
+\end{DoxyCode}
+\Hypertarget{yubico__otp_8c_abd7f8a696584d8ab4b9f4d1e1970be37}\index{yubico\_otp.c@{yubico\_otp.c}!password@{password}}
+\index{password@{password}!yubico\_otp.c@{yubico\_otp.c}}
+\doxysubsubsection{\texorpdfstring{password}{password}}
+{\footnotesize\ttfamily \label{yubico__otp_8c_abd7f8a696584d8ab4b9f4d1e1970be37} 
+const \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} password\mbox{[}$\,$\mbox{]} = "{}password"{}}
+
+
+
+Definition at line \mbox{\hyperlink{yubico__otp_8c_source_l00036}{36}} of file \mbox{\hyperlink{yubico__otp_8c_source}{yubico\+\_\+otp.\+c}}.
+
+\Hypertarget{yubico__otp_8c_a7ba1784f91d04c32f9b3139bc6fd8137}\index{yubico\_otp.c@{yubico\_otp.c}!random@{random}}
+\index{random@{random}!yubico\_otp.c@{yubico\_otp.c}}
+\doxysubsubsection{\texorpdfstring{random}{random}}
+{\footnotesize\ttfamily \label{yubico__otp_8c_a7ba1784f91d04c32f9b3139bc6fd8137} 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} random}
+
+
+
+Definition at line \mbox{\hyperlink{yubico__otp_8c_source_l00047}{47}} of file \mbox{\hyperlink{yubico__otp_8c_source}{yubico\+\_\+otp.\+c}}.
+
+\Hypertarget{yubico__otp_8c_ae7c9eaabfd4bda45ca34abcfd5dfc17d}\index{yubico\_otp.c@{yubico\_otp.c}!session\_counter@{session\_counter}}
+\index{session\_counter@{session\_counter}!yubico\_otp.c@{yubico\_otp.c}}
+\doxysubsubsection{\texorpdfstring{session\_counter}{session\_counter}}
+{\footnotesize\ttfamily \label{yubico__otp_8c_ae7c9eaabfd4bda45ca34abcfd5dfc17d} 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} session\+\_\+counter}
+
+
+
+Definition at line \mbox{\hyperlink{yubico__otp_8c_source_l00046}{46}} of file \mbox{\hyperlink{yubico__otp_8c_source}{yubico\+\_\+otp.\+c}}.
+
+\Hypertarget{yubico__otp_8c_a90dc44562265ed51bff2282df3fb5b4b}\index{yubico\_otp.c@{yubico\_otp.c}!timestamp\_high@{timestamp\_high}}
+\index{timestamp\_high@{timestamp\_high}!yubico\_otp.c@{yubico\_otp.c}}
+\doxysubsubsection{\texorpdfstring{timestamp\_high}{timestamp\_high}}
+{\footnotesize\ttfamily \label{yubico__otp_8c_a90dc44562265ed51bff2282df3fb5b4b} 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} timestamp\+\_\+high}
+
+
+
+Definition at line \mbox{\hyperlink{yubico__otp_8c_source_l00045}{45}} of file \mbox{\hyperlink{yubico__otp_8c_source}{yubico\+\_\+otp.\+c}}.
+
+\Hypertarget{yubico__otp_8c_a6f0f1d51fe1aa0b50b024dfd1376d270}\index{yubico\_otp.c@{yubico\_otp.c}!timestamp\_low@{timestamp\_low}}
+\index{timestamp\_low@{timestamp\_low}!yubico\_otp.c@{yubico\_otp.c}}
+\doxysubsubsection{\texorpdfstring{timestamp\_low}{timestamp\_low}}
+{\footnotesize\ttfamily \label{yubico__otp_8c_a6f0f1d51fe1aa0b50b024dfd1376d270} 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} timestamp\+\_\+low}
+
+
+
+Definition at line \mbox{\hyperlink{yubico__otp_8c_source_l00044}{44}} of file \mbox{\hyperlink{yubico__otp_8c_source}{yubico\+\_\+otp.\+c}}.
+
+\Hypertarget{yubico__otp_8c_ae83fbea40062666266a4d81b65e6aaa6}\index{yubico\_otp.c@{yubico\_otp.c}!use\_counter@{use\_counter}}
+\index{use\_counter@{use\_counter}!yubico\_otp.c@{yubico\_otp.c}}
+\doxysubsubsection{\texorpdfstring{use\_counter}{use\_counter}}
+{\footnotesize\ttfamily \label{yubico__otp_8c_ae83fbea40062666266a4d81b65e6aaa6} 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} use\+\_\+counter}
+
+
+
+Definition at line \mbox{\hyperlink{yubico__otp_8c_source_l00043}{43}} of file \mbox{\hyperlink{yubico__otp_8c_source}{yubico\+\_\+otp.\+c}}.
+

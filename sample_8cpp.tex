@@ -1,0 +1,424 @@
+\doxysection{libraries/fc/libraries/ff/depends/ate-\/pairing/test/sample.cpp File Reference}
+\hypertarget{sample_8cpp}{}\label{sample_8cpp}\index{libraries/fc/libraries/ff/depends/ate-\/pairing/test/sample.cpp@{libraries/fc/libraries/ff/depends/ate-\/pairing/test/sample.cpp}}
+{\ttfamily \#include "{}bn.\+h"{}}\newline
+{\ttfamily \#include "{}test\+\_\+point.\+hpp"{}}\newline
+Include dependency graph for sample.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sample_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{struct_s}{S}} $>$ }\\void \mbox{\hyperlink{sample_8cpp_a61de80d82d023076dac637b6a50f0a6e}{verify}} (const char \texorpdfstring{$\ast$}{*}msg, const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, const \mbox{\hyperlink{struct_s}{S}} \&b)
+\item 
+void \mbox{\hyperlink{sample_8cpp_aaff7c5460c8ae7217e8c34eb70920e2e}{sample1}} (const \mbox{\hyperlink{structbn_1_1_curve_param}{bn\+::\+Curve\+Param}} \&cp)
+\item 
+void \mbox{\hyperlink{sample_8cpp_ab3c0ff110d2d351b57056b5c79f8f4fa}{sample2}} (const \mbox{\hyperlink{structbn_1_1_curve_param}{bn\+::\+Curve\+Param}} \&cp)
+\item 
+void \mbox{\hyperlink{sample_8cpp_ae5436c312b3470f1d24c886d2036038d}{multi}} (const \mbox{\hyperlink{structbn_1_1_curve_param}{bn\+::\+Curve\+Param}} \&cp)
+\item 
+int \mbox{\hyperlink{sample_8cpp_a0ddf1224851353fc92bfbff6f499fa97}{main}} (int argc, char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}\mbox{[}$\,$\mbox{]})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{sample_8cpp_a0ddf1224851353fc92bfbff6f499fa97}\index{sample.cpp@{sample.cpp}!main@{main}}
+\index{main@{main}!sample.cpp@{sample.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{sample_8cpp_a0ddf1224851353fc92bfbff6f499fa97} 
+int main (\begin{DoxyParamCaption}\item[{int}]{argc}{, }\item[{char \texorpdfstring{$\ast$}{*}}]{argv}{\mbox{[}$\,$\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sample_8cpp_source_l00260}{260}} of file \mbox{\hyperlink{sample_8cpp_source}{sample.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00261\ \{}
+\DoxyCodeLine{00262\ \textcolor{preprocessor}{\#ifdef\ BN\_SUPPORT\_SNARK}}
+\DoxyCodeLine{00263\ \ \ \ \ \textcolor{keywordtype}{int}\ b\ =\ 3;}
+\DoxyCodeLine{00264\ \ \ \ \ \textcolor{keywordflow}{if}\ (argc\ >=\ 2)\ \{}
+\DoxyCodeLine{00265\ \ \ \ \ \ \ \ \ b\ =\ atoi(\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[1]);}
+\DoxyCodeLine{00266\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (b\ !=\ 3\ \&\&\ b\ !=\ 82)\ \{}
+\DoxyCodeLine{00267\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}not\ support\ b=\%d\(\backslash\)n"{}},\ b);}
+\DoxyCodeLine{00268\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{00269\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00270\ \ \ \ \ \}}
+\DoxyCodeLine{00271\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}SNARK\ b\ =\ \%d\(\backslash\)n"{}},\ b);}
+\DoxyCodeLine{00272\ \ \ \ \ \mbox{\hyperlink{structbn_1_1_curve_param}{bn::CurveParam}}\ cp\ =\ bn::CurveSNARK1;}
+\DoxyCodeLine{00273\ \ \ \ \ cp.\mbox{\hyperlink{structbn_1_1_curve_param_aac649328a96cc37f3c9fc66ade0b8831}{b}}\ =\ b;}
+\DoxyCodeLine{00274\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00275\ \ \ \ \ \textcolor{keywordflow}{if}\ (argc\ >\ 1\ \&\&\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[1])\ \{}
+\DoxyCodeLine{00276\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}not\ support\(\backslash\)n"{}});}
+\DoxyCodeLine{00277\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{00278\ \ \ \ \ \}}
+\DoxyCodeLine{00279\ \ \ \ \ \mbox{\hyperlink{structbn_1_1_curve_param}{bn::CurveParam}}\ cp\ =\ \mbox{\hyperlink{namespacebn_a79a7b30048022e75b4f8d886fe5224a0}{bn::CurveFp254BNb}};}
+\DoxyCodeLine{00280\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00281\ \ \ \ \ puts(\textcolor{stringliteral}{"{}sample1"{}});}
+\DoxyCodeLine{00282\ \ \ \ \ \mbox{\hyperlink{sample_8cpp_aaff7c5460c8ae7217e8c34eb70920e2e}{sample1}}(cp);}
+\DoxyCodeLine{00283\ \ \ \ \ puts(\textcolor{stringliteral}{"{}sample2"{}});}
+\DoxyCodeLine{00284\ \ \ \ \ \mbox{\hyperlink{sample_8cpp_ab3c0ff110d2d351b57056b5c79f8f4fa}{sample2}}(cp);}
+\DoxyCodeLine{00285\ \ \ \ \ puts(\textcolor{stringliteral}{"{}multi"{}});}
+\DoxyCodeLine{00286\ \ \ \ \ \mbox{\hyperlink{sample_8cpp_ae5436c312b3470f1d24c886d2036038d}{multi}}(cp);}
+\DoxyCodeLine{00287\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}errNum\ =\ \%d\(\backslash\)n"{}},\ errNum);}
+\DoxyCodeLine{00288\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sample_8cpp_a0ddf1224851353fc92bfbff6f499fa97_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{sample_8cpp_ae5436c312b3470f1d24c886d2036038d}\index{sample.cpp@{sample.cpp}!multi@{multi}}
+\index{multi@{multi}!sample.cpp@{sample.cpp}}
+\doxysubsubsection{\texorpdfstring{multi()}{multi()}}
+{\footnotesize\ttfamily \label{sample_8cpp_ae5436c312b3470f1d24c886d2036038d} 
+void multi (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structbn_1_1_curve_param}{bn\+::\+Curve\+Param}} \&}]{cp}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sample_8cpp_source_l00224}{224}} of file \mbox{\hyperlink{sample_8cpp_source}{sample.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00225\ \{}
+\DoxyCodeLine{00226\ \ \ \ \ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacebn}{bn}};}
+\DoxyCodeLine{00227\ \ \ \ \ \textcolor{comment}{//\ init\ my\ library}}
+\DoxyCodeLine{00228\ \ \ \ \ Param::init(cp);}
+\DoxyCodeLine{00229\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_point}{Point}}\&\ pt\ =\ \mbox{\hyperlink{test__point_8hpp_ae46abcc83c05232be0ecaf52ed4a3f76}{selectPoint}}(cp);}
+\DoxyCodeLine{00230\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_ec2}{Ec2}}\ g2(}
+\DoxyCodeLine{00231\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_fp2}{Fp2}}(\mbox{\hyperlink{class_fp}{Fp}}(pt.\mbox{\hyperlink{struct_point_a148039341e8417e5576a4a6b3e94ce11}{g2}}.aa),\ \mbox{\hyperlink{class_fp}{Fp}}(pt.\mbox{\hyperlink{struct_point_a148039341e8417e5576a4a6b3e94ce11}{g2}}.ab)),}
+\DoxyCodeLine{00232\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_fp2}{Fp2}}(\mbox{\hyperlink{class_fp}{Fp}}(pt.\mbox{\hyperlink{struct_point_a148039341e8417e5576a4a6b3e94ce11}{g2}}.ba),\ \mbox{\hyperlink{class_fp}{Fp}}(pt.\mbox{\hyperlink{struct_point_a148039341e8417e5576a4a6b3e94ce11}{g2}}.bb))}
+\DoxyCodeLine{00233\ \ \ \ \ );}
+\DoxyCodeLine{00234\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_ec1}{Ec1}}\ g1(pt.\mbox{\hyperlink{struct_point_a8dc92f57f9de0567be5f2eb7b90e78f3}{g1}}.a,\ pt.\mbox{\hyperlink{struct_point_a8dc92f57f9de0567be5f2eb7b90e78f3}{g1}}.b);}
+\DoxyCodeLine{00235\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\ =\ 10;}
+\DoxyCodeLine{00236\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ c\ =\ 234567;}
+\DoxyCodeLine{00237\ \ \ \ \ std::vector<Ec1>\ g1s;}
+\DoxyCodeLine{00238\ \ \ \ \ g1s.resize(\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}});}
+\DoxyCodeLine{00239\ }
+\DoxyCodeLine{00240\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}};\ i++)\ \{}
+\DoxyCodeLine{00241\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_ec1_ab3a0beb9412c7a3b2992c65ed90f2028}{Ec1::mul}}(g1s[i],\ g1,\ c\ +\ i);}
+\DoxyCodeLine{00242\ \ \ \ \ \ \ \ \ g1s[i]\ =\ g1\ *\ (c\ +\ i);}
+\DoxyCodeLine{00243\ \ \ \ \ \ \ \ \ g1s[i].normalize();}
+\DoxyCodeLine{00244\ \ \ \ \ \}}
+\DoxyCodeLine{00245\ \ \ \ \ std::vector<Fp6>\ Qcoeff;}
+\DoxyCodeLine{00246\ \ \ \ \ \mbox{\hyperlink{class_fp2}{Fp2}}\ precQ[3];}
+\DoxyCodeLine{00247\ \ \ \ \ \mbox{\hyperlink{namespacebn_1_1components_af7e078139e69b4cb42eb6a547dc748c6}{bn::components::precomputeG2}}(Qcoeff,\ precQ,\ g2.p);}
+\DoxyCodeLine{00248\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}};\ i++)\ \{}
+\DoxyCodeLine{00249\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_fp12}{Fp12}}\ e1;}
+\DoxyCodeLine{00250\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacebn_1_1components_a6ffa9f1e05f963b0af227759acee63b0}{bn::components::millerLoop}}(e1,\ Qcoeff,\ g1s[i].\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}});}
+\DoxyCodeLine{00251\ \ \ \ \ \ \ \ \ e1.final\_exp();}
+\DoxyCodeLine{00252\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_fp12}{Fp12}}\ e2;}
+\DoxyCodeLine{00253\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacebn_ad9358851168fca47e8912f07288e8f1a}{opt\_atePairing}}(e2,\ g2,\ g1s[i]);}
+\DoxyCodeLine{00254\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (e1\ !=\ e2)\ \{}
+\DoxyCodeLine{00255\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}err\ multi\ \%d\(\backslash\)n"{}},\ (\textcolor{keywordtype}{int})i);}
+\DoxyCodeLine{00256\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00257\ \ \ \ \ \}}
+\DoxyCodeLine{00258\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sample_8cpp_ae5436c312b3470f1d24c886d2036038d_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=190pt]{sample_8cpp_ae5436c312b3470f1d24c886d2036038d_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{sample_8cpp_aaff7c5460c8ae7217e8c34eb70920e2e}\index{sample.cpp@{sample.cpp}!sample1@{sample1}}
+\index{sample1@{sample1}!sample.cpp@{sample.cpp}}
+\doxysubsubsection{\texorpdfstring{sample1()}{sample1()}}
+{\footnotesize\ttfamily \label{sample_8cpp_aaff7c5460c8ae7217e8c34eb70920e2e} 
+void sample1 (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structbn_1_1_curve_param}{bn\+::\+Curve\+Param}} \&}]{cp}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sample_8cpp_source_l00022}{22}} of file \mbox{\hyperlink{sample_8cpp_source}{sample.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00023\ \{}
+\DoxyCodeLine{00024\ \ \ \ \ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacebn}{bn}};}
+\DoxyCodeLine{00025\ \ \ \ \ \textcolor{comment}{//\ init\ my\ library}}
+\DoxyCodeLine{00026\ \ \ \ \ Param::init(cp);}
+\DoxyCodeLine{00027\ \ \ \ \ \textcolor{comment}{//\ prepair\ a\ generator}}
+\DoxyCodeLine{00028\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_point}{Point}}\&\ pt\ =\ \mbox{\hyperlink{test__point_8hpp_ae46abcc83c05232be0ecaf52ed4a3f76}{selectPoint}}(cp);}
+\DoxyCodeLine{00029\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_fp2}{Fp2}}\ g2[3]\ =\ \{}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_fp2}{Fp2}}(\mbox{\hyperlink{class_fp}{Fp}}(pt.\mbox{\hyperlink{struct_point_a148039341e8417e5576a4a6b3e94ce11}{g2}}.aa),\ \mbox{\hyperlink{class_fp}{Fp}}(pt.\mbox{\hyperlink{struct_point_a148039341e8417e5576a4a6b3e94ce11}{g2}}.ab)),}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_fp2}{Fp2}}(\mbox{\hyperlink{class_fp}{Fp}}(pt.\mbox{\hyperlink{struct_point_a148039341e8417e5576a4a6b3e94ce11}{g2}}.ba),\ \mbox{\hyperlink{class_fp}{Fp}}(pt.\mbox{\hyperlink{struct_point_a148039341e8417e5576a4a6b3e94ce11}{g2}}.bb)),}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_fp2}{Fp2}}(1,\ 0),}
+\DoxyCodeLine{00033\ \ \ \ \ \};}
+\DoxyCodeLine{00034\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_fp}{Fp}}\ g1[3]\ =\ \{\ pt.\mbox{\hyperlink{struct_point_a8dc92f57f9de0567be5f2eb7b90e78f3}{g1}}.a,\ pt.\mbox{\hyperlink{struct_point_a8dc92f57f9de0567be5f2eb7b90e78f3}{g1}}.b,\ 1\ \};}
+\DoxyCodeLine{00035\ \ \ \ \ \textcolor{comment}{//\ verify\ g2\ and\ g1\ on\ curve}}
+\DoxyCodeLine{00036\ \ \ \ \ \mbox{\hyperlink{sample_8cpp_a61de80d82d023076dac637b6a50f0a6e}{verify}}(\textcolor{stringliteral}{"{}g1\ is\ on\ EC"{}},\ ecop::isOnECJac3(g1),\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00037\ \ \ \ \ \mbox{\hyperlink{sample_8cpp_a61de80d82d023076dac637b6a50f0a6e}{verify}}(\textcolor{stringliteral}{"{}g2\ is\ on\ twist\ EC"{}},\ ecop::isOnTwistECJac3(g2),\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00038\ \ \ \ \ puts(\textcolor{stringliteral}{"{}order\ of\ group"{}});}
+\DoxyCodeLine{00039\ \ \ \ \ \mbox{\hyperlink{java__api_8cpp_af1474931d5774e22c1c9894d7bb3f6b3}{PUT}}(Param::r);}
+\DoxyCodeLine{00040\ \ \ \ \ \mbox{\hyperlink{java__api_8cpp_af1474931d5774e22c1c9894d7bb3f6b3}{PUT}}(Param::p);}
+\DoxyCodeLine{00041\ \ \ \ \ \mbox{\hyperlink{java__api_8cpp_af1474931d5774e22c1c9894d7bb3f6b3}{PUT}}(Param::t);}
+\DoxyCodeLine{00042\ \ \ \ \ \{}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_fp}{Fp}}\ t[3];}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ ecop::ScalarMult(t,\ g1,\ Param::r);}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ (x,\ y,\ 0)\ means\ 0\ at\ Jacobi\ coordinate}}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sample_8cpp_a61de80d82d023076dac637b6a50f0a6e}{verify}}(\textcolor{stringliteral}{"{}orgder\ of\ g1\ ==\ r"{}},\ t[2],\ 0);}
+\DoxyCodeLine{00047\ \ \ \ \ \}}
+\DoxyCodeLine{00048\ \ \ \ \ \{}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_fp2}{Fp2}}\ t[3];}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ ecop::ScalarMult(t,\ g2,\ Param::r);}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sample_8cpp_a61de80d82d023076dac637b6a50f0a6e}{verify}}(\textcolor{stringliteral}{"{}order\ of\ g2\ ==\ r"{}},\ t[2],\ 0);}
+\DoxyCodeLine{00052\ \ \ \ \ \}}
+\DoxyCodeLine{00053\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *aStr\ =\ \textcolor{stringliteral}{"{}123456789012345"{}};}
+\DoxyCodeLine{00054\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *bStr\ =\ \textcolor{stringliteral}{"{}998752342342342342424242421"{}};}
+\DoxyCodeLine{00055\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structmie_1_1_vuint_t}{mie::Vuint}}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}(aStr);}
+\DoxyCodeLine{00056\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structmie_1_1_vuint_t}{mie::Vuint}}\ b(bStr);}
+\DoxyCodeLine{00057\ }
+\DoxyCodeLine{00058\ \ \ \ \ \textcolor{comment}{//\ scalar-\/multiplication\ sample}}
+\DoxyCodeLine{00059\ \ \ \ \ \{}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_fp}{Fp}}\ Pa[3];}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_fp}{Fp}}\ Pb[3];}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_fp}{Fp}}\ Pc[3];}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_fp}{Fp}}\ out[3];}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structmie_1_1_vuint_t}{mie::Vuint}}\ c\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ +\ b;}
+\DoxyCodeLine{00065\ }
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ ecop::ScalarMult(Pa,\ g1,\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});\ \textcolor{comment}{//\ Pa\ =\ g1\ *\ a}}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ ecop::ScalarMult(Pb,\ g1,\ b);\ \textcolor{comment}{//\ Pb\ =\ g1\ *\ b}}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ ecop::ScalarMult(Pc,\ g1,\ c);\ \textcolor{comment}{//\ Pc\ =\ g1\ *\ (a\ +\ b)}}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ ecop::ECAdd(out,\ Pa,\ Pb);\ \textcolor{comment}{//\ g1\ *\ a\ +\ g1\ *\ b}}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ ecop::NormalizeJac(Pc,\ Pc);}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ ecop::NormalizeJac(out,\ out);}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ std::cout\ <<\ std::hex;}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sample_8cpp_a61de80d82d023076dac637b6a50f0a6e}{verify}}(\textcolor{stringliteral}{"{}check\ g1\ *\ c\ =\ g1\ *\ a\ +\ g1\ *\ b"{}},\ Pc[0]\ ==\ out[0]\ \&\&\ Pc[1]\ ==\ out[1]\ \&\&\ Pc[2]\ ==\ out[2],\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00074\ }
+\DoxyCodeLine{00075\ \textcolor{preprocessor}{\#ifdef\ MIE\_ATE\_USE\_GMP}}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ \ \ \ mpz\_class\ aa(aStr);}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \ \ \ mpz\_class\ bb(bStr);}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ \ \ \ mpz\_class\ cc\ =\ aa\ +\ bb;}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_fp}{Fp}}\ Paa[3];}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_fp}{Fp}}\ Pbb[3];}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_fp}{Fp}}\ Pcc[3];}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \ \ \ ecop::ScalarMult(Paa,\ g1,\ aa);\ \textcolor{comment}{//\ Pa\ =\ g1\ *\ a}}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \ \ \ ecop::ScalarMult(Pbb,\ g1,\ bb);\ \textcolor{comment}{//\ Pb\ =\ g1\ *\ b}}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \ \ \ \ ecop::ScalarMult(Pcc,\ g1,\ cc);\ \textcolor{comment}{//\ Pc\ =\ g1\ *\ (a\ +\ b)}}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \ \ \ \ ecop::NormalizeJac(Pcc,\ Pcc);}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sample_8cpp_a61de80d82d023076dac637b6a50f0a6e}{verify}}(\textcolor{stringliteral}{"{}gmp\ Paa\ ==\ Pa"{}},\ Paa[0]\ ==\ Pa[0]\ \&\&\ Paa[1]\ ==\ Pa[1]\ \&\&\ Paa[2]\ ==\ Pa[2],\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sample_8cpp_a61de80d82d023076dac637b6a50f0a6e}{verify}}(\textcolor{stringliteral}{"{}gmp\ Pbb\ ==\ Pb"{}},\ Pbb[0]\ ==\ Pb[0]\ \&\&\ Pbb[1]\ ==\ Pb[1]\ \&\&\ Pbb[2]\ ==\ Pb[2],\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sample_8cpp_a61de80d82d023076dac637b6a50f0a6e}{verify}}(\textcolor{stringliteral}{"{}gmp\ Pcc\ ==\ Pc"{}},\ Pcc[0]\ ==\ Pc[0]\ \&\&\ Pcc[1]\ ==\ Pc[1]\ \&\&\ Pcc[2]\ ==\ Pc[2],\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00091\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00092\ \ \ \ \ \}}
+\DoxyCodeLine{00093\ }
+\DoxyCodeLine{00094\ \ \ \ \ \mbox{\hyperlink{class_fp12}{Fp12}}\ e;}
+\DoxyCodeLine{00095\ \ \ \ \ \textcolor{comment}{//\ calc\ e\ :\ G2\ x\ G1\ -\/>\ G3\ pairing}}
+\DoxyCodeLine{00096\ \ \ \ \ opt\_atePairingJac<Fp>(e,\ g2,\ g1);\ \textcolor{comment}{//\ e\ =\ e(g2,\ g1)}}
+\DoxyCodeLine{00097\ \ \ \ \ \mbox{\hyperlink{java__api_8cpp_af1474931d5774e22c1c9894d7bb3f6b3}{PUT}}(e);}
+\DoxyCodeLine{00098\ \ \ \ \ \{}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_fp12}{Fp12}}\ t\ =\ \mbox{\hyperlink{namespacemie_a595f193249b72c666b84e42439a60817}{power}}(e,\ Param::r);}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sample_8cpp_a61de80d82d023076dac637b6a50f0a6e}{verify}}(\textcolor{stringliteral}{"{}order\ of\ e\ ==\ r"{}},\ t,\ 1);}
+\DoxyCodeLine{00101\ \ \ \ \ \}}
+\DoxyCodeLine{00102\ \ \ \ \ \mbox{\hyperlink{class_fp2}{Fp2}}\ g2a[3];}
+\DoxyCodeLine{00103\ \ \ \ \ ecop::ScalarMult(g2a,\ g2,\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});\ \textcolor{comment}{//\ g2a\ =\ g2\ *\ a}}
+\DoxyCodeLine{00104\ \ \ \ \ \mbox{\hyperlink{class_fp12}{Fp12}}\ ea1;}
+\DoxyCodeLine{00105\ \ \ \ \ opt\_atePairingJac<Fp>(ea1,\ g2a,\ g1);\ \textcolor{comment}{//\ ea1\ =\ e(g2a,\ g1)}}
+\DoxyCodeLine{00106\ \ \ \ \ \mbox{\hyperlink{class_fp12}{Fp12}}\ ea2\ =\ \mbox{\hyperlink{namespacemie_a595f193249b72c666b84e42439a60817}{power}}(e,\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});\ \textcolor{comment}{//\ ea2\ =\ e\string^a}}
+\DoxyCodeLine{00107\ \ \ \ \ \mbox{\hyperlink{sample_8cpp_a61de80d82d023076dac637b6a50f0a6e}{verify}}(\textcolor{stringliteral}{"{}e(g2\ *\ a,\ g1)\ =\ e(g2,\ g1)\string^a"{}},\ ea1,\ ea2);}
+\DoxyCodeLine{00108\ }
+\DoxyCodeLine{00109\ \ \ \ \ \mbox{\hyperlink{class_fp}{Fp}}\ g1b[3];}
+\DoxyCodeLine{00110\ \ \ \ \ ecop::ScalarMult(g1b,\ g1,\ b);\ \textcolor{comment}{//\ g1b\ =\ g1\ *\ b}}
+\DoxyCodeLine{00111\ \ \ \ \ \mbox{\hyperlink{class_fp12}{Fp12}}\ eb1;}
+\DoxyCodeLine{00112\ \ \ \ \ opt\_atePairingJac<Fp>(eb1,\ g2,\ g1b);\ \textcolor{comment}{//\ eb1\ =\ e(g2,\ g1b)}}
+\DoxyCodeLine{00113\ \ \ \ \ \mbox{\hyperlink{class_fp12}{Fp12}}\ eb2\ =\ \mbox{\hyperlink{namespacemie_a595f193249b72c666b84e42439a60817}{power}}(e,\ b);\ \textcolor{comment}{//\ eb2\ =\ e\string^b}}
+\DoxyCodeLine{00114\ \ \ \ \ \mbox{\hyperlink{sample_8cpp_a61de80d82d023076dac637b6a50f0a6e}{verify}}(\textcolor{stringliteral}{"{}e(g2a,\ g1\ *\ b)\ =\ e(g2,\ g1)\string^b"{}},\ eb1,\ eb2);}
+\DoxyCodeLine{00115\ }
+\DoxyCodeLine{00116\ \ \ \ \ \mbox{\hyperlink{class_fp}{Fp}}\ q1[3];}
+\DoxyCodeLine{00117\ \ \ \ \ ecop::ScalarMult(q1,\ g1,\ 12345);}
+\DoxyCodeLine{00118\ }
+\DoxyCodeLine{00119\ \ \ \ \ \mbox{\hyperlink{sample_8cpp_a61de80d82d023076dac637b6a50f0a6e}{verify}}(\textcolor{stringliteral}{"{}q1\ is\ on\ EC"{}},\ ecop::isOnECJac3(q1),\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00120\ \ \ \ \ \mbox{\hyperlink{class_fp12}{Fp12}}\ e1,\ e2;}
+\DoxyCodeLine{00121\ \ \ \ \ opt\_atePairingJac<Fp>(e1,\ g2,\ g1);\ \textcolor{comment}{//\ e1\ =\ e(g2,\ g1)}}
+\DoxyCodeLine{00122\ \ \ \ \ opt\_atePairingJac<Fp>(e2,\ g2,\ q1);\ \textcolor{comment}{//\ e2\ =\ e(g2,\ q1)}}
+\DoxyCodeLine{00123\ \ \ \ \ \mbox{\hyperlink{class_fp}{Fp}}\ q2[3];}
+\DoxyCodeLine{00124\ \ \ \ \ ecop::ECAdd(q2,\ g1,\ q1);\ \textcolor{comment}{//\ q2\ =\ g1\ +\ q1}}
+\DoxyCodeLine{00125\ \ \ \ \ opt\_atePairingJac<Fp>(e,\ g2,\ q2);\ \textcolor{comment}{//\ e\ =\ e(g2,\ q2)}}
+\DoxyCodeLine{00126\ \ \ \ \ \mbox{\hyperlink{sample_8cpp_a61de80d82d023076dac637b6a50f0a6e}{verify}}(\textcolor{stringliteral}{"{}e\ =\ e1\ *\ e2"{}},\ e,\ e1\ *\ e2);}
+\DoxyCodeLine{00127\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=234pt]{sample_8cpp_aaff7c5460c8ae7217e8c34eb70920e2e_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=206pt]{sample_8cpp_aaff7c5460c8ae7217e8c34eb70920e2e_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{sample_8cpp_ab3c0ff110d2d351b57056b5c79f8f4fa}\index{sample.cpp@{sample.cpp}!sample2@{sample2}}
+\index{sample2@{sample2}!sample.cpp@{sample.cpp}}
+\doxysubsubsection{\texorpdfstring{sample2()}{sample2()}}
+{\footnotesize\ttfamily \label{sample_8cpp_ab3c0ff110d2d351b57056b5c79f8f4fa} 
+void sample2 (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structbn_1_1_curve_param}{bn\+::\+Curve\+Param}} \&}]{cp}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sample_8cpp_source_l00129}{129}} of file \mbox{\hyperlink{sample_8cpp_source}{sample.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00130\ \{}
+\DoxyCodeLine{00131\ \ \ \ \ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacebn}{bn}};}
+\DoxyCodeLine{00132\ \ \ \ \ \textcolor{comment}{//\ init\ my\ library}}
+\DoxyCodeLine{00133\ \ \ \ \ Param::init(cp);}
+\DoxyCodeLine{00134\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_point}{Point}}\&\ pt\ =\ \mbox{\hyperlink{test__point_8hpp_ae46abcc83c05232be0ecaf52ed4a3f76}{selectPoint}}(cp);}
+\DoxyCodeLine{00135\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_ec2}{Ec2}}\ g2(}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_fp2}{Fp2}}(\mbox{\hyperlink{class_fp}{Fp}}(pt.\mbox{\hyperlink{struct_point_a148039341e8417e5576a4a6b3e94ce11}{g2}}.aa),\ \mbox{\hyperlink{class_fp}{Fp}}(pt.\mbox{\hyperlink{struct_point_a148039341e8417e5576a4a6b3e94ce11}{g2}}.ab)),}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_fp2}{Fp2}}(\mbox{\hyperlink{class_fp}{Fp}}(pt.\mbox{\hyperlink{struct_point_a148039341e8417e5576a4a6b3e94ce11}{g2}}.ba),\ \mbox{\hyperlink{class_fp}{Fp}}(pt.\mbox{\hyperlink{struct_point_a148039341e8417e5576a4a6b3e94ce11}{g2}}.bb))}
+\DoxyCodeLine{00138\ \ \ \ \ );}
+\DoxyCodeLine{00139\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_ec1}{Ec1}}\ g1(pt.\mbox{\hyperlink{struct_point_a8dc92f57f9de0567be5f2eb7b90e78f3}{g1}}.a,\ pt.\mbox{\hyperlink{struct_point_a8dc92f57f9de0567be5f2eb7b90e78f3}{g1}}.b);}
+\DoxyCodeLine{00140\ \ \ \ \ \textcolor{comment}{//\ verify\ g2\ and\ g1\ on\ curve}}
+\DoxyCodeLine{00141\ \ \ \ \ \mbox{\hyperlink{sample_8cpp_a61de80d82d023076dac637b6a50f0a6e}{verify}}(\textcolor{stringliteral}{"{}g1\ is\ on\ EC"{}},\ g1.isValid(),\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00142\ \ \ \ \ \mbox{\hyperlink{sample_8cpp_a61de80d82d023076dac637b6a50f0a6e}{verify}}(\textcolor{stringliteral}{"{}g2\ is\ on\ twist\ EC"{}},\ g2.isValid(),\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00143\ \ \ \ \ puts(\textcolor{stringliteral}{"{}order\ of\ group"{}});}
+\DoxyCodeLine{00144\ \ \ \ \ \mbox{\hyperlink{java__api_8cpp_af1474931d5774e22c1c9894d7bb3f6b3}{PUT}}(Param::r);}
+\DoxyCodeLine{00145\ \ \ \ \ \{}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_ec1}{Ec1}}\ t\ =\ g1\ *\ Param::r;}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Ec1::mul(t,\ g1,\ Param::r);}}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sample_8cpp_a61de80d82d023076dac637b6a50f0a6e}{verify}}(\textcolor{stringliteral}{"{}orgder\ of\ g1\ ==\ r"{}},\ t.\mbox{\hyperlink{class_ec1_a6f3a72b17e4fef78ecce04900f348072}{isZero}}(),\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00149\ \ \ \ \ \}}
+\DoxyCodeLine{00150\ \ \ \ \ \{}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_ec2}{Ec2}}\ t\ =\ g2\ *\ Param::r;}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Ec2::mul(t,\ g2,\ Param::r);}}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sample_8cpp_a61de80d82d023076dac637b6a50f0a6e}{verify}}(\textcolor{stringliteral}{"{}order\ of\ g2\ ==\ r"{}},\ t.\mbox{\hyperlink{class_ec2_ad66a05f76a354ead24d6a15b326baf4f}{isZero}}(),\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00154\ \ \ \ \ \}}
+\DoxyCodeLine{00155\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *aStr\ =\ \textcolor{stringliteral}{"{}123456789012345"{}};}
+\DoxyCodeLine{00156\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *bStr\ =\ \textcolor{stringliteral}{"{}998752342342342342424242421"{}};}
+\DoxyCodeLine{00157\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structmie_1_1_vuint_t}{mie::Vuint}}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}(aStr);}
+\DoxyCodeLine{00158\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structmie_1_1_vuint_t}{mie::Vuint}}\ b(bStr);}
+\DoxyCodeLine{00159\ }
+\DoxyCodeLine{00160\ \ \ \ \ \textcolor{comment}{//\ scalar-\/multiplication\ sample}}
+\DoxyCodeLine{00161\ \ \ \ \ \{}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structmie_1_1_vuint_t}{mie::Vuint}}\ c\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ +\ b;}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_ec1}{Ec1}}\ Pa\ =\ g1\ *\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}};}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_ec1}{Ec1}}\ Pb\ =\ g1\ *\ b;}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_ec1}{Ec1}}\ Pc\ =\ g1\ *\ c;}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_ec1}{Ec1}}\ out\ =\ Pa\ +\ Pb;}
+\DoxyCodeLine{00167\ }
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sample_8cpp_a61de80d82d023076dac637b6a50f0a6e}{verify}}(\textcolor{stringliteral}{"{}check\ g1\ *\ c\ =\ g1\ *\ a\ +\ g1\ *\ b"{}},\ Pc,\ out);}
+\DoxyCodeLine{00169\ \textcolor{preprocessor}{\#ifdef\ MIE\_ATE\_USE\_GMP}}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \ \ \ \ mpz\_class\ aa(aStr);}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \ \ \ \ mpz\_class\ bb(bStr);}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ \ \ \ \ mpz\_class\ cc\ =\ aa\ +\ bb;}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_ec1}{Ec1}}\ Paa\ =\ g1\ *\ aa;}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_ec1}{Ec1}}\ Pbb\ =\ g1\ *\ bb;}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_ec1}{Ec1}}\ Pcc\ =\ g1\ *\ cc;}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sample_8cpp_a61de80d82d023076dac637b6a50f0a6e}{verify}}(\textcolor{stringliteral}{"{}gmp\ Paa\ ==\ Pa"{}},\ Paa,\ Pa);}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sample_8cpp_a61de80d82d023076dac637b6a50f0a6e}{verify}}(\textcolor{stringliteral}{"{}gmp\ Pbb\ ==\ Pb"{}},\ Pbb,\ Pb);}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sample_8cpp_a61de80d82d023076dac637b6a50f0a6e}{verify}}(\textcolor{stringliteral}{"{}gmp\ Pcc\ ==\ Pc"{}},\ Pcc,\ Pc);}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00181\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00182\ \ \ \ \ \}}
+\DoxyCodeLine{00183\ }
+\DoxyCodeLine{00184\ \ \ \ \ \mbox{\hyperlink{class_fp12}{Fp12}}\ e;}
+\DoxyCodeLine{00185\ \ \ \ \ \textcolor{comment}{//\ calc\ e\ :\ G2\ x\ G1\ -\/>\ G3\ pairing}}
+\DoxyCodeLine{00186\ \ \ \ \ \mbox{\hyperlink{namespacebn_ad9358851168fca47e8912f07288e8f1a}{opt\_atePairing}}(e,\ g2,\ g1);\ \textcolor{comment}{//\ e\ =\ e(g2,\ g1)}}
+\DoxyCodeLine{00187\ \ \ \ \ \mbox{\hyperlink{java__api_8cpp_af1474931d5774e22c1c9894d7bb3f6b3}{PUT}}(e);}
+\DoxyCodeLine{00188\ \ \ \ \ \{}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_fp12}{Fp12}}\ t\ =\ \mbox{\hyperlink{namespacemie_a595f193249b72c666b84e42439a60817}{power}}(e,\ Param::r);}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sample_8cpp_a61de80d82d023076dac637b6a50f0a6e}{verify}}(\textcolor{stringliteral}{"{}order\ of\ e\ ==\ r"{}},\ t,\ 1);}
+\DoxyCodeLine{00191\ \ \ \ \ \}}
+\DoxyCodeLine{00192\ \ \ \ \ \mbox{\hyperlink{class_ec2}{Ec2}}\ g2a\ =\ g2\ *\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}};}
+\DoxyCodeLine{00193\ \ \ \ \ \textcolor{comment}{//\ Ec2::mul(g2a,\ g2,\ a);}}
+\DoxyCodeLine{00194\ \ \ \ \ \mbox{\hyperlink{class_fp12}{Fp12}}\ ea1;}
+\DoxyCodeLine{00195\ \ \ \ \ \mbox{\hyperlink{namespacebn_ad9358851168fca47e8912f07288e8f1a}{opt\_atePairing}}(ea1,\ g2a,\ g1);\ \textcolor{comment}{//\ ea1\ =\ e(g2a,\ g1)}}
+\DoxyCodeLine{00196\ \ \ \ \ \mbox{\hyperlink{class_fp12}{Fp12}}\ ea2\ =\ \mbox{\hyperlink{namespacemie_a595f193249b72c666b84e42439a60817}{power}}(e,\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});\ \textcolor{comment}{//\ ea2\ =\ e\string^a}}
+\DoxyCodeLine{00197\ \ \ \ \ \mbox{\hyperlink{sample_8cpp_a61de80d82d023076dac637b6a50f0a6e}{verify}}(\textcolor{stringliteral}{"{}e(g2\ *\ a,\ g1)\ =\ e(g2,\ g1)\string^a"{}},\ ea1,\ ea2);}
+\DoxyCodeLine{00198\ }
+\DoxyCodeLine{00199\ \ \ \ \ \mbox{\hyperlink{class_ec1}{Ec1}}\ g1b\ =\ g1\ *\ b;}
+\DoxyCodeLine{00200\ \ \ \ \ \textcolor{comment}{//\ Ec1::mul(g1b,\ g1,\ b);}}
+\DoxyCodeLine{00201\ \ \ \ \ \mbox{\hyperlink{class_fp12}{Fp12}}\ eb1;}
+\DoxyCodeLine{00202\ \ \ \ \ \mbox{\hyperlink{namespacebn_ad9358851168fca47e8912f07288e8f1a}{opt\_atePairing}}(eb1,\ g2,\ g1b);\ \textcolor{comment}{//\ eb1\ =\ e(g2,\ g1b)}}
+\DoxyCodeLine{00203\ \ \ \ \ \mbox{\hyperlink{class_fp12}{Fp12}}\ eb2\ =\ \mbox{\hyperlink{namespacemie_a595f193249b72c666b84e42439a60817}{power}}(e,\ b);\ \textcolor{comment}{//\ eb2\ =\ e\string^b}}
+\DoxyCodeLine{00204\ \ \ \ \ \mbox{\hyperlink{sample_8cpp_a61de80d82d023076dac637b6a50f0a6e}{verify}}(\textcolor{stringliteral}{"{}e(g2a,\ g1\ *\ b)\ =\ e(g2,\ g1)\string^b"{}},\ eb1,\ eb2);}
+\DoxyCodeLine{00205\ }
+\DoxyCodeLine{00206\ \ \ \ \ \mbox{\hyperlink{class_ec1}{Ec1}}\ q1\ =\ g1\ *\ 12345;}
+\DoxyCodeLine{00207\ \ \ \ \ \mbox{\hyperlink{sample_8cpp_a61de80d82d023076dac637b6a50f0a6e}{verify}}(\textcolor{stringliteral}{"{}q1\ is\ on\ EC"{}},\ q1.\mbox{\hyperlink{class_ec1_a70985fcdb9380385de8809e5ed8e0310}{isValid}}(),\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00208\ \ \ \ \ \mbox{\hyperlink{class_fp12}{Fp12}}\ e1,\ e2;}
+\DoxyCodeLine{00209\ \ \ \ \ \mbox{\hyperlink{namespacebn_ad9358851168fca47e8912f07288e8f1a}{opt\_atePairing}}(e1,\ g2,\ g1);\ \textcolor{comment}{//\ e1\ =\ e(g2,\ g1)}}
+\DoxyCodeLine{00210\ \ \ \ \ \mbox{\hyperlink{namespacebn_ad9358851168fca47e8912f07288e8f1a}{opt\_atePairing}}(e2,\ g2,\ q1);\ \textcolor{comment}{//\ e2\ =\ e(g2,\ q1)}}
+\DoxyCodeLine{00211\ \ \ \ \ \mbox{\hyperlink{class_ec1}{Ec1}}\ q2\ =\ g1\ +\ q1;}
+\DoxyCodeLine{00212\ \ \ \ \ \mbox{\hyperlink{namespacebn_ad9358851168fca47e8912f07288e8f1a}{opt\_atePairing}}(e,\ g2,\ q2);\ \textcolor{comment}{//\ e\ =\ e(g2,\ q2)}}
+\DoxyCodeLine{00213\ \ \ \ \ \mbox{\hyperlink{sample_8cpp_a61de80d82d023076dac637b6a50f0a6e}{verify}}(\textcolor{stringliteral}{"{}e\ =\ e1\ *\ e2"{}},\ e,\ e1\ *\ e2);}
+\DoxyCodeLine{00214\ }
+\DoxyCodeLine{00215\ \ \ \ \ \textcolor{comment}{/*}}
+\DoxyCodeLine{00216\ \textcolor{comment}{\ \ \ \ \ \ \ \ reduce\ one\ copy\ as\ the\ following}}
+\DoxyCodeLine{00217\ \textcolor{comment}{\ \ \ \ */}}
+\DoxyCodeLine{00218\ \ \ \ \ \mbox{\hyperlink{class_ec2_ad05d82e70e2e9ae02d1964da54f2161a}{Ec2::mul}}(g2a,\ g2,\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});\ \textcolor{comment}{//\ g2a\ =\ g2\ *\ a}}
+\DoxyCodeLine{00219\ \ \ \ \ \mbox{\hyperlink{class_ec1_ab3a0beb9412c7a3b2992c65ed90f2028}{Ec1::mul}}(g1b,\ g1,\ b);}
+\DoxyCodeLine{00220\ \ \ \ \ \mbox{\hyperlink{sample_8cpp_a61de80d82d023076dac637b6a50f0a6e}{verify}}(\textcolor{stringliteral}{"{}g2a\ ==\ g2\ *\ a"{}},\ g2a,\ g2\ *\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{00221\ \ \ \ \ \mbox{\hyperlink{sample_8cpp_a61de80d82d023076dac637b6a50f0a6e}{verify}}(\textcolor{stringliteral}{"{}g1b\ ==\ g1\ *\ b"{}},\ g1b,\ g1\ *\ b);}
+\DoxyCodeLine{00222\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sample_8cpp_ab3c0ff110d2d351b57056b5c79f8f4fa_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=206pt]{sample_8cpp_ab3c0ff110d2d351b57056b5c79f8f4fa_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{sample_8cpp_a61de80d82d023076dac637b6a50f0a6e}\index{sample.cpp@{sample.cpp}!verify@{verify}}
+\index{verify@{verify}!sample.cpp@{sample.cpp}}
+\doxysubsubsection{\texorpdfstring{verify()}{verify()}}
+{\footnotesize\ttfamily \label{sample_8cpp_a61de80d82d023076dac637b6a50f0a6e} 
+template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{struct_s}{S}} $>$ \\
+void verify (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{msg}{, }\item[{const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{a}{, }\item[{const \mbox{\hyperlink{struct_s}{S}} \&}]{b}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sample_8cpp_source_l00010}{10}} of file \mbox{\hyperlink{sample_8cpp_source}{sample.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00011\ \{}
+\DoxyCodeLine{00012\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ ==\ b)\ \{}
+\DoxyCodeLine{00013\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\%s\ :\ ok\(\backslash\)n"{}},\ msg);}
+\DoxyCodeLine{00014\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\%s\ :\ ng\(\backslash\)n"{}},\ msg);}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{java__api_8cpp_af1474931d5774e22c1c9894d7bb3f6b3}{PUT}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{00017\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{java__api_8cpp_af1474931d5774e22c1c9894d7bb3f6b3}{PUT}}(b);}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ errNum++;}
+\DoxyCodeLine{00019\ \ \ \ \ \}}
+\DoxyCodeLine{00020\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=282pt]{sample_8cpp_a61de80d82d023076dac637b6a50f0a6e_icgraph}
+\end{center}
+\end{figure}

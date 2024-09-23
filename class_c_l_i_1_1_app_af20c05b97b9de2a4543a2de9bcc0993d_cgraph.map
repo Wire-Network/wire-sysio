@@ -1,0 +1,31 @@
+<map id="CLI::App::_parse_subcommand" name="CLI::App::_parse_subcommand">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,244,211,269"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_app.html#a6e3eedf148351dabd1868bd7e63d24bc" title="Count the required remaining positional arguments." alt="" coords="494,71,678,111"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="147,240,510,114,512,119,149,245"/>
+<area shape="rect" id="Node000007" href="$class_c_l_i_1_1_app.html#a70bf7b1ed5b4f823746dba84ec3d9927" title=" " alt="" coords="489,481,683,506"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="130,267,276,358,380,415,490,466,511,474,510,479,488,471,378,420,274,363,128,272"/>
+<area shape="rect" id="Node000008" href="$class_c_l_i_1_1_app.html#a3b564aa8c90f25152f5379c661ab82b1" title=" " alt="" coords="259,244,441,269"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="211,254,243,254,243,259,211,259"/>
+<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_option.html#a154543609c45d9c59c69991a08ca272b" title="Count the total number of times an option was passed." alt="" coords="755,136,884,161"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="672,109,750,129,749,134,671,114"/>
+<area shape="rect" id="Node000004" href="$class_c_l_i_1_1_option.html#af87dffed2cb245673312c993e563710e" title="The total min number of expected string values to be used." alt="" coords="743,5,896,46"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="660,68,729,48,730,53,662,73"/>
+<area shape="rect" id="Node000005" href="$class_c_l_i_1_1_option.html#acab7033604b49e314d290b01adea690d" title="True if the argument can be given directly." alt="" coords="731,185,908,210"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="620,109,671,141,732,171,748,177,746,182,730,176,669,146,617,114"/>
+<area shape="rect" id="Node000006" href="$class_c_l_i_1_1_option_base.html#aa902dee6da6d7f5b083b1c7d5f9c1308" title="True if this is a required option." alt="" coords="747,71,892,111"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="678,88,732,88,732,94,678,94"/>
+<area shape="poly" id="edge8_Node000008_Node000002" title=" " alt="" coords="361,241,412,188,448,156,488,127,508,116,511,121,490,132,452,160,416,192,364,245"/>
+<area shape="poly" id="edge14_Node000008_Node000003" title=" " alt="" coords="375,241,426,216,488,194,554,178,620,166,740,151,740,156,621,171,555,183,490,199,429,221,377,245"/>
+<area shape="poly" id="edge16_Node000008_Node000004" title=" " alt="" coords="353,242,369,204,397,153,436,100,461,76,488,57,546,31,609,17,671,12,728,13,727,18,671,17,609,23,548,36,490,61,464,80,440,103,402,155,374,206,358,244"/>
+<area shape="poly" id="edge17_Node000008_Node000005" title=" " alt="" coords="401,240,489,222,606,208,715,199,716,205,606,213,489,227,402,245"/>
+<area shape="poly" id="edge9_Node000008_Node000007" title=" " alt="" coords="364,268,400,317,443,380,456,406,463,428,472,447,491,466,498,471,495,476,487,470,468,450,458,430,451,408,439,383,395,320,359,271"/>
+<area shape="poly" id="edge12_Node000008_Node000008" title=" " alt="" coords="311,245,303,235,308,225,324,219,350,217,379,220,393,226,391,231,377,225,350,222,325,224,311,229,308,234,315,241"/>
+<area shape="rect" id="Node000009" href="$class_c_l_i_1_1_app.html#a0e00bdc00c5bca05d52d98833f77a3b5" title="Get the appropriate parent to fallthrough to which is the first one that has a name or the main app." alt="" coords="500,236,673,277"/>
+<area shape="poly" id="edge10_Node000008_Node000009" title=" " alt="" coords="442,254,484,254,484,259,442,259"/>
+<area shape="rect" id="Node000010" href="$class_c_l_i_1_1_app.html#afe454e935514c0acd6bd81e68d908206" title="Helper function to place extra values in the most appropriate position." alt="" coords="517,301,655,342"/>
+<area shape="poly" id="edge11_Node000008_Node000010" title=" " alt="" coords="400,267,503,296,501,301,398,272"/>
+<area shape="rect" id="Node000011" href="$class_c_l_i_1_1_option.html#a49ba3750688c16a2c001dd2c91ecba3e" title="Puts a result at the end." alt="" coords="508,366,664,392"/>
+<area shape="poly" id="edge13_Node000008_Node000011" title=" " alt="" coords="368,268,420,309,454,332,490,351,508,358,506,363,488,356,451,336,417,313,364,272"/>
+<area shape="rect" id="Node000012" href="$class_c_l_i_1_1_option.html#a784f66cb9371753ddeb8df59c85cb490" title="Get the current value of allow extra args." alt="" coords="510,416,662,457"/>
+<area shape="poly" id="edge15_Node000008_Node000012" title=" " alt="" coords="362,268,412,332,449,369,491,402,498,407,495,411,487,407,445,373,408,335,358,271"/>
+</map>

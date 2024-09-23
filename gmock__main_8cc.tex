@@ -1,0 +1,50 @@
+\doxysection{libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/src/gmock\+\_\+main.cc File Reference}
+\hypertarget{gmock__main_8cc}{}\label{gmock__main_8cc}\index{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googlemock/src/gmock\_main.cc@{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googlemock/src/gmock\_main.cc}}
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include "{}gmock/gmock.\+h"{}}\newline
+{\ttfamily \#include "{}gtest/gtest.\+h"{}}\newline
+Include dependency graph for gmock\+\_\+main.\+cc\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{gmock__main_8cc__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{gtest-port_8h_aa73be6f0ba4a7456180a94904ce17790}{GTEST\+\_\+\+API\+\_\+}} int \mbox{\hyperlink{gmock__main_8cc_a7f83bdc516d2cb86e20235d94ddf055a}{main}} (int argc, char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{gmock__main_8cc_a7f83bdc516d2cb86e20235d94ddf055a}\index{gmock\_main.cc@{gmock\_main.cc}!main@{main}}
+\index{main@{main}!gmock\_main.cc@{gmock\_main.cc}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{gmock__main_8cc_a7f83bdc516d2cb86e20235d94ddf055a} 
+\mbox{\hyperlink{gtest-port_8h_aa73be6f0ba4a7456180a94904ce17790}{GTEST\+\_\+\+API\+\_\+}} int main (\begin{DoxyParamCaption}\item[{int}]{argc}{, }\item[{char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{argv}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gmock__main_8cc_source_l00046}{46}} of file \mbox{\hyperlink{gmock__main_8cc_source}{gmock\+\_\+main.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00047\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_OS\_WINDOWS\_MOBILE}}
+\DoxyCodeLine{00048\ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}Running\ main()\ from\ gmock\_main.cc\(\backslash\)n"{}};}
+\DoxyCodeLine{00049\ \ \ \textcolor{comment}{//\ Since\ Google\ Mock\ depends\ on\ Google\ Test,\ InitGoogleMock()\ is}}
+\DoxyCodeLine{00050\ \ \ \textcolor{comment}{//\ also\ responsible\ for\ initializing\ Google\ Test.\ \ Therefore\ there's}}
+\DoxyCodeLine{00051\ \ \ \textcolor{comment}{//\ no\ need\ for\ calling\ testing::InitGoogleTest()\ separately.}}
+\DoxyCodeLine{00052\ \ \ \mbox{\hyperlink{namespacetesting_a32b1c6db9ba5133ccabfa67616b3c041}{testing::InitGoogleMock}}(\&argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}});}
+\DoxyCodeLine{00053\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{gtest_8h_a853a3792807489591d3d4a2f2ff9359f}{RUN\_ALL\_TESTS}}();}
+\DoxyCodeLine{00054\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{gmock__main_8cc_a7f83bdc516d2cb86e20235d94ddf055a_cgraph}
+\end{center}
+\end{figure}

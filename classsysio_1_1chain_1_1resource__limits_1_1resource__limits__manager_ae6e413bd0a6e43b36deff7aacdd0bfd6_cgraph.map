@@ -1,0 +1,20 @@
+<map id="sysio::chain::resource_limits::resource_limits_manager::add_transaction_usage" name="sysio::chain::resource_limits::resource_limits_manager::add_transaction_usage">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,71,226,126"/>
+<area shape="rect" id="Node000002" href="$classchainbase_1_1database.html#afcfe00f81a526c1376d4f51197dd3a9a" title=" " alt="" coords="706,79,874,105"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="226,95,691,90,691,95,226,100"/>
+<area shape="rect" id="Node000005" href="$classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager.html#a140981c195e4e0c5788f0aa6383c2697" title=" " alt="" coords="463,5,658,61"/>
+<area shape="poly" id="edge6_Node000001_Node000005" title=" " alt="" coords="226,80,447,47,448,52,227,85"/>
+<area shape="rect" id="Node000006" href="$classchainbase_1_1database.html#a9ebc006075e8fc2e84357a0e068b58d4" title=" " alt="" coords="274,136,415,176"/>
+<area shape="poly" id="edge9_Node000001_Node000006" title=" " alt="" coords="227,124,259,132,258,137,225,129"/>
+<area shape="rect" id="Node000003" href="$classchainbase_1_1database.html#aa5a2ca0da0092693ac49b36b7ec6817a" title=" " alt="" coords="922,45,1063,86"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="874,87,906,83,907,88,875,92"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="922,68,850,78,850,73,921,63"/>
+<area shape="rect" id="Node000004" href="$classchainbase_1_1database.html#a4d5297635dcf70be481d9b600da9bc13" title=" " alt="" coords="1111,74,1252,115"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="1064,73,1096,79,1096,84,1063,79"/>
+<area shape="poly" id="edge5_Node000004_Node000002" title=" " alt="" coords="1111,99,1063,100,922,100,889,99,889,94,922,95,1063,95,1111,94"/>
+<area shape="poly" id="edge8_Node000005_Node000002" title=" " alt="" coords="659,56,723,72,721,77,658,61"/>
+<area shape="poly" id="edge7_Node000005_Node000003" title=" " alt="" coords="659,38,906,56,906,61,659,43"/>
+<area shape="rect" id="Node000007" href="$classchainbase_1_1database.html#afaea057692a8bbbf3f506b64c60308b6" title=" " alt="" coords="490,136,631,176"/>
+<area shape="poly" id="edge10_Node000006_Node000007" title=" " alt="" coords="416,153,474,153,474,158,416,158"/>
+<area shape="poly" id="edge11_Node000007_Node000002" title=" " alt="" coords="631,134,725,107,727,112,633,139"/>
+</map>

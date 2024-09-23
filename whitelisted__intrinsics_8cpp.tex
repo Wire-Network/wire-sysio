@@ -1,0 +1,37 @@
+\doxysection{libraries/chain/whitelisted\+\_\+intrinsics.cpp File Reference}
+\hypertarget{whitelisted__intrinsics_8cpp}{}\label{whitelisted__intrinsics_8cpp}\index{libraries/chain/whitelisted\_intrinsics.cpp@{libraries/chain/whitelisted\_intrinsics.cpp}}
+{\ttfamily \#include $<$sysio/chain/whitelisted\+\_\+intrinsics.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/exceptions.\+hpp$>$}\newline
+Include dependency graph for whitelisted\+\_\+intrinsics.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{whitelisted__intrinsics_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain}{sysio\+::chain}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename Iterator $>$ }\\bool \mbox{\hyperlink{namespacesysio_1_1chain_a7713bf4dd36535082b854977afddf788}{sysio\+::chain\+::find\+\_\+intrinsic\+\_\+helper}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} h, std\+::string\+\_\+view \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}, Iterator \&itr, const Iterator \&end)
+\item 
+whitelisted\+\_\+intrinsics\+\_\+type\+::iterator \mbox{\hyperlink{namespacesysio_1_1chain_a6c9919896a775bf8129188b49018d0f5}{sysio\+::chain\+::find\+\_\+intrinsic}} (\mbox{\hyperlink{namespacesysio_1_1chain_ab67e634f02d35e09950917271779b2ff}{whitelisted\+\_\+intrinsics\+\_\+type}} \&whitelisted\+\_\+intrinsics, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} h, std\+::string\+\_\+view \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}})
+\item 
+whitelisted\+\_\+intrinsics\+\_\+type\+::const\+\_\+iterator \mbox{\hyperlink{namespacesysio_1_1chain_a00cb3a7e0a3c28dd4e7ec9684ebd3d5b}{sysio\+::chain\+::find\+\_\+intrinsic}} (const \mbox{\hyperlink{namespacesysio_1_1chain_ab67e634f02d35e09950917271779b2ff}{whitelisted\+\_\+intrinsics\+\_\+type}} \&whitelisted\+\_\+intrinsics, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} h, std\+::string\+\_\+view \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}})
+\item 
+bool \mbox{\hyperlink{namespacesysio_1_1chain_a87c46d5ffb5acbf3cf047af691093a12}{sysio\+::chain\+::is\+\_\+intrinsic\+\_\+whitelisted}} (const \mbox{\hyperlink{namespacesysio_1_1chain_ab67e634f02d35e09950917271779b2ff}{whitelisted\+\_\+intrinsics\+\_\+type}} \&whitelisted\+\_\+intrinsics, std\+::string\+\_\+view \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}})
+\item 
+void \mbox{\hyperlink{namespacesysio_1_1chain_a32f7ac67403d93f11d6098fb6abd1cc3}{sysio\+::chain\+::add\+\_\+intrinsic\+\_\+to\+\_\+whitelist}} (\mbox{\hyperlink{namespacesysio_1_1chain_ab67e634f02d35e09950917271779b2ff}{whitelisted\+\_\+intrinsics\+\_\+type}} \&whitelisted\+\_\+intrinsics, std\+::string\+\_\+view \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}})
+\item 
+void \mbox{\hyperlink{namespacesysio_1_1chain_a84ed15414a787e23c23383bd3362d0f7}{sysio\+::chain\+::remove\+\_\+intrinsic\+\_\+from\+\_\+whitelist}} (\mbox{\hyperlink{namespacesysio_1_1chain_ab67e634f02d35e09950917271779b2ff}{whitelisted\+\_\+intrinsics\+\_\+type}} \&whitelisted\+\_\+intrinsics, std\+::string\+\_\+view \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}})
+\item 
+void \mbox{\hyperlink{namespacesysio_1_1chain_a6f7ffc3d482aa46ff548e1968c66dd67}{sysio\+::chain\+::reset\+\_\+intrinsic\+\_\+whitelist}} (\mbox{\hyperlink{namespacesysio_1_1chain_ab67e634f02d35e09950917271779b2ff}{whitelisted\+\_\+intrinsics\+\_\+type}} \&whitelisted\+\_\+intrinsics, const std\+::set$<$ std\+::string $>$ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\item 
+std\+::set$<$ std\+::string $>$ \mbox{\hyperlink{namespacesysio_1_1chain_a9c55bd214b4e78fe1a28ef44ac2c3917}{sysio\+::chain\+::convert\+\_\+intrinsic\+\_\+whitelist\+\_\+to\+\_\+set}} (const \mbox{\hyperlink{namespacesysio_1_1chain_ab67e634f02d35e09950917271779b2ff}{whitelisted\+\_\+intrinsics\+\_\+type}} \&whitelisted\+\_\+intrinsics)
+\end{DoxyCompactItemize}

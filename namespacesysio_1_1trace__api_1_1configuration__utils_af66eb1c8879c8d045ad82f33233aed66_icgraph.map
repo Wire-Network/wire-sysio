@@ -1,0 +1,7 @@
+<map id="sysio::trace_api::configuration_utils::abi_def_from_file" name="sysio::trace_api::configuration_utils::abi_def_from_file">
+<area shape="rect" id="Node000001" title=" " alt="" coords="271,31,466,72"/>
+<area shape="rect" id="Node000002" href="$test__configuration__utils_8cpp.html#a595a81017330a8960029d489fd8595cc" title=" " alt="" coords="5,5,223,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="255,39,217,34,218,29,255,34"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1trace__api__rpc__plugin__impl.html#aefcd255adcccd0c9ddc5d2bb512eb3a8" title=" " alt="" coords="45,56,183,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="255,68,184,77,183,72,255,63"/>
+</map>

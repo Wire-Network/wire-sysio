@@ -1,0 +1,38 @@
+\doxysection{libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/src/gtest-\/death-\/test.cc File Reference}
+\hypertarget{gtest-death-test_8cc}{}\label{gtest-death-test_8cc}\index{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/src/gtest-\/death-\/test.cc@{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/src/gtest-\/death-\/test.cc}}
+{\ttfamily \#include "{}gtest/gtest-\/death-\/test.\+h"{}}\newline
+{\ttfamily \#include "{}gtest/internal/gtest-\/port.\+h"{}}\newline
+{\ttfamily \#include "{}gtest/internal/custom/gtest.\+h"{}}\newline
+{\ttfamily \#include "{}gtest/gtest-\/message.\+h"{}}\newline
+{\ttfamily \#include "{}gtest/internal/gtest-\/string.\+h"{}}\newline
+{\ttfamily \#include "{}src/gtest-\/internal-\/inl.\+h"{}}\newline
+Include dependency graph for gtest-\/death-\/test.cc\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{gtest-death-test_8cc__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=212pt]{gtest-death-test_8cc__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacetesting}{testing}}
+\item 
+namespace \mbox{\hyperlink{namespacetesting_1_1internal}{testing\+::internal}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacetesting_a62d8ec1eb3e20f20ed52604b0dfa3425}{testing\+::\+GTEST\+\_\+\+DEFINE\+\_\+string\+\_\+}} (death\+\_\+test\+\_\+style, \mbox{\hyperlink{namespacetesting_1_1internal_a7ed785df46a339403b0f749d3a879201}{internal\+::\+String\+From\+GTest\+Env}}("{}death\+\_\+test\+\_\+style"{}, k\+Default\+Death\+Test\+Style), "{}Indicates how to run \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}} death test in \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}} forked child process\+: "{} "{}\textbackslash{}"{}threadsafe\textbackslash{}"{} (child process re-\/executes the test binary "{} "{}from the beginning, running only the specific death test) or "{} "{}\textbackslash{}"{}fast\textbackslash{}"{} (child process runs the death test immediately "{} "{}after forking)."{})
+\item 
+\mbox{\hyperlink{namespacetesting_a428e5944490e497df683cb8324ce4489}{testing\+::\+GTEST\+\_\+\+DEFINE\+\_\+bool\+\_\+}} (death\+\_\+test\+\_\+use\+\_\+fork, \mbox{\hyperlink{namespacetesting_1_1internal_a67132cdce23fb71b6c38ee34ef81eb4c}{internal\+::\+Bool\+From\+GTest\+Env}}("{}death\+\_\+test\+\_\+use\+\_\+fork"{}, false), "{}Instructs to use fork()/\+\_\+exit() instead of clone() in death tests. "{} "{}Ignored and always uses fork() on POSIX systems where clone() is not "{} "{}implemented. Useful when running under valgrind or similar tools \mbox{\hyperlink{yubihsm__pkcs11_8c_a75d8898b07aafc20a48a415a1c6e7bf0}{if}} "{} "{}those do not support clone(). Valgrind 3.\+3.\+1 will just fail \mbox{\hyperlink{yubihsm__pkcs11_8c_a75d8898b07aafc20a48a415a1c6e7bf0}{if}} "{} "{}it sees an unsupported combination of clone() flags. "{} "{}It is not recommended to use this flag w/o valgrind though it will "{} "{}work in 99\% of the cases. Once valgrind is fixed, this flag will "{} "{}most likely be removed."{})
+\item 
+\mbox{\hyperlink{namespacetesting_1_1internal_a20bfd9d47d8dd167ffc1c37a4c9ff73e}{testing\+::internal\+::\+GTEST\+\_\+\+DEFINE\+\_\+string\+\_\+}} (internal\+\_\+run\+\_\+death\+\_\+test, "{}"{}, "{}Indicates the file, line number, temporal index of "{} "{}the single death test to run, and \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}} file descriptor to "{} "{}which \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}} success code may be sent, all separated by "{} "{}the \textquotesingle{}\texorpdfstring{$\vert$}{|}\textquotesingle{} characters.  This flag is specified \mbox{\hyperlink{yubihsm__pkcs11_8c_a75d8898b07aafc20a48a415a1c6e7bf0}{if}} and only \mbox{\hyperlink{yubihsm__pkcs11_8c_a75d8898b07aafc20a48a415a1c6e7bf0}{if}} the current "{} "{}process is \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}} \mbox{\hyperlink{xbyak__mnemonic_8h_ad8856ea517c970ed0584a251c3fdc94f}{sub}}-\/process launched for running \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}} thread-\/safe "{} "{}death test.  FOR INTERNAL USE ONLY."{})
+\end{DoxyCompactItemize}

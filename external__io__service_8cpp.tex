@@ -1,0 +1,127 @@
+\doxysection{libraries/fc/vendor/websocketpp/examples/external\+\_\+io\+\_\+service/external\+\_\+io\+\_\+service.cpp File Reference}
+\hypertarget{external__io__service_8cpp}{}\label{external__io__service_8cpp}\index{libraries/fc/vendor/websocketpp/examples/external\_io\_service/external\_io\_service.cpp@{libraries/fc/vendor/websocketpp/examples/external\_io\_service/external\_io\_service.cpp}}
+{\ttfamily \#include "{}tcp\+\_\+echo\+\_\+server.\+hpp"{}}\newline
+{\ttfamily \#include $<$websocketpp/config/asio\+\_\+no\+\_\+tls.\+hpp$>$}\newline
+{\ttfamily \#include $<$websocketpp/server.\+hpp$>$}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+Include dependency graph for external\+\_\+io\+\_\+service.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{external__io__service_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1server}{websocketpp\+::server}}$<$ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio}{websocketpp\+::config\+::asio}} $>$ \mbox{\hyperlink{external__io__service_8cpp_a64447228e52deac9360a1f0c21ecf3ab}{ws\+\_\+echo\+\_\+server}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{external__io__service_8cpp_a366cfe1a1010723a15a6001cd1a8bf60}{on\+\_\+message}} (\mbox{\hyperlink{external__io__service_8cpp_a64447228e52deac9360a1f0c21ecf3ab}{ws\+\_\+echo\+\_\+server}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, \mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{websocketpp\+::connection\+\_\+hdl}} hdl, \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a8097edab4feb0c36a69601c3786f0062}{ws\+\_\+echo\+\_\+server\+::message\+\_\+ptr}} msg)
+\item 
+int \mbox{\hyperlink{external__io__service_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{external__io__service_8cpp_a64447228e52deac9360a1f0c21ecf3ab}\index{external\_io\_service.cpp@{external\_io\_service.cpp}!ws\_echo\_server@{ws\_echo\_server}}
+\index{ws\_echo\_server@{ws\_echo\_server}!external\_io\_service.cpp@{external\_io\_service.cpp}}
+\doxysubsubsection{\texorpdfstring{ws\_echo\_server}{ws\_echo\_server}}
+{\footnotesize\ttfamily \label{external__io__service_8cpp_a64447228e52deac9360a1f0c21ecf3ab} 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1server}{websocketpp\+::server}}$<$\mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio}{websocketpp\+::config\+::asio}}$>$ \mbox{\hyperlink{external__io__service_8cpp_a64447228e52deac9360a1f0c21ecf3ab}{ws\+\_\+echo\+\_\+server}}}
+
+
+
+Definition at line \mbox{\hyperlink{external__io__service_8cpp_source_l00038}{38}} of file \mbox{\hyperlink{external__io__service_8cpp_source}{external\+\_\+io\+\_\+service.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{external__io__service_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}\index{external\_io\_service.cpp@{external\_io\_service.cpp}!main@{main}}
+\index{main@{main}!external\_io\_service.cpp@{external\_io\_service.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{external__io__service_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4} 
+int main (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{external__io__service_8cpp_source_l00061}{61}} of file \mbox{\hyperlink{external__io__service_8cpp_source}{external\+\_\+io\+\_\+service.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00062\ \ \ \ \ asio::io\_service\ service;}
+\DoxyCodeLine{00063\ }
+\DoxyCodeLine{00064\ \ \ \ \ \textcolor{comment}{//\ Add\ a\ TCP\ echo\ server\ on\ port\ 9003}}
+\DoxyCodeLine{00065\ \ \ \ \ \mbox{\hyperlink{structtcp__echo__server}{tcp\_echo\_server}}\ custom\_http\_server(service,\ 9003);}
+\DoxyCodeLine{00066\ }
+\DoxyCodeLine{00067\ \ \ \ \ \textcolor{comment}{//\ Add\ a\ WebSocket\ echo\ server\ on\ port\ 9002}}
+\DoxyCodeLine{00068\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1server}{ws\_echo\_server}}\ ws\_server;}
+\DoxyCodeLine{00069\ \ \ \ \ ws\_server.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a5d7da609ebd2f797e5e67b6d050ebc59}{set\_access\_channels}}(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a853aa0b8976e53f3181af3bc398d493e}{websocketpp::log::alevel::all}});}
+\DoxyCodeLine{00070\ \ \ \ \ ws\_server.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a3fe357b3c6434273a9965eb52902575d}{clear\_access\_channels}}(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_aa38cfdf7a82f33cac319438462707e90}{websocketpp::log::alevel::frame\_payload}});}
+\DoxyCodeLine{00071\ }
+\DoxyCodeLine{00072\ \ \ \ \ \textcolor{comment}{//\ The\ only\ difference\ in\ this\ code\ between\ an\ internal\ and\ external}}
+\DoxyCodeLine{00073\ \ \ \ \ \textcolor{comment}{//\ io\_service\ is\ the\ different\ constructor\ to\ init\_asio}}
+\DoxyCodeLine{00074\ \ \ \ \ ws\_server.init\_asio(\&service);}
+\DoxyCodeLine{00075\ }
+\DoxyCodeLine{00076\ \ \ \ \ \textcolor{comment}{//\ Register\ our\ message\ handler}}
+\DoxyCodeLine{00077\ \ \ \ \ ws\_server.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a34a3a8351bff65ba878975be471cab85}{set\_message\_handler}}(bind(\&\mbox{\hyperlink{external__io__service_8cpp_a366cfe1a1010723a15a6001cd1a8bf60}{on\_message}},\&ws\_server,::\_1,::\_2));}
+\DoxyCodeLine{00078\ \ \ \ \ ws\_server.listen(9002);}
+\DoxyCodeLine{00079\ \ \ \ \ ws\_server.\mbox{\hyperlink{classwebsocketpp_1_1server_a0204a7d444144f7ea5b8bbcf14689fc1}{start\_accept}}();}
+\DoxyCodeLine{00080\ }
+\DoxyCodeLine{00081\ \ \ \ \ \textcolor{comment}{//\ TODO:\ add\ a\ timer?}}
+\DoxyCodeLine{00082\ }
+\DoxyCodeLine{00083\ \ \ \ \ \textcolor{comment}{//\ Start\ the\ Asio\ io\_service\ run\ loop\ for\ all}}
+\DoxyCodeLine{00084\ \ \ \ \ service.run();}
+\DoxyCodeLine{00085\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{external__io__service_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{external__io__service_8cpp_a366cfe1a1010723a15a6001cd1a8bf60}\index{external\_io\_service.cpp@{external\_io\_service.cpp}!on\_message@{on\_message}}
+\index{on\_message@{on\_message}!external\_io\_service.cpp@{external\_io\_service.cpp}}
+\doxysubsubsection{\texorpdfstring{on\_message()}{on\_message()}}
+{\footnotesize\ttfamily \label{external__io__service_8cpp_a366cfe1a1010723a15a6001cd1a8bf60} 
+void on\+\_\+message (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{external__io__service_8cpp_a64447228e52deac9360a1f0c21ecf3ab}{ws\+\_\+echo\+\_\+server}} \texorpdfstring{$\ast$}{*}}]{s}{, }\item[{\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{websocketpp\+::connection\+\_\+hdl}}}]{hdl}{, }\item[{\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a8097edab4feb0c36a69601c3786f0062}{ws\+\_\+echo\+\_\+server\+::message\+\_\+ptr}}}]{msg}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{external__io__service_8cpp_source_l00041}{41}} of file \mbox{\hyperlink{external__io__service_8cpp_source}{external\+\_\+io\+\_\+service.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00042\ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}on\_message\ called\ with\ hdl:\ "{}}\ <<\ hdl.lock().get()}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\ and\ message:\ "{}}\ <<\ msg-\/>get\_payload()}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ std::endl;}
+\DoxyCodeLine{00045\ }
+\DoxyCodeLine{00046\ \ \ \ \ \textcolor{comment}{//\ check\ for\ a\ special\ command\ to\ instruct\ the\ server\ to\ stop\ listening\ so}}
+\DoxyCodeLine{00047\ \ \ \ \ \textcolor{comment}{//\ it\ can\ be\ cleanly\ exited.}}
+\DoxyCodeLine{00048\ \ \ \ \ \textcolor{keywordflow}{if}\ (msg-\/>get\_payload()\ ==\ \textcolor{stringliteral}{"{}stop-\/listening"{}})\ \{}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}-\/>stop\_listening();}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00051\ \ \ \ \ \}}
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}-\/>send(hdl,\ msg-\/>get\_payload(),\ msg-\/>get\_opcode());}
+\DoxyCodeLine{00055\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (websocketpp::lib::error\_code\ \textcolor{keyword}{const}\ \&\ e)\ \{}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}Echo\ failed\ because:\ "{}}\ <<\ e}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}("{}}\ <<\ e.message()\ <<\ \textcolor{stringliteral}{"{})"{}}\ <<\ std::endl;}
+\DoxyCodeLine{00058\ \ \ \ \ \}}
+\DoxyCodeLine{00059\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=225pt]{external__io__service_8cpp_a366cfe1a1010723a15a6001cd1a8bf60_icgraph}
+\end{center}
+\end{figure}

@@ -1,0 +1,35 @@
+<map id="sysio::chain_apis::trx_retry_db_impl::on_applied_transaction" name="sysio::chain_apis::trx_retry_db_impl::on_applied_transaction">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,142,149,198"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1abi__serializer.html#a2dc34bf706557f0c83d61b3791299c98" title=" " alt="" coords="197,55,372,96"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="129,139,196,106,211,100,213,105,198,111,131,144"/>
+<area shape="rect" id="Node000012" href="$classfc_1_1tracked__storage.html#ab578f3765c80c8cee1d758d440c99e90" title=" " alt="" coords="218,120,351,161"/>
+<area shape="poly" id="edge13_Node000001_Node000012" title=" " alt="" coords="148,157,202,150,203,155,149,163"/>
+<area shape="rect" id="Node000013" href="$namespacesysio_1_1chain.html#a9a9946a27c3832394b9b2b3911e0733c" title=" " alt="" coords="204,185,365,211"/>
+<area shape="poly" id="edge14_Node000001_Node000013" title=" " alt="" coords="149,177,189,183,188,188,148,182"/>
+<area shape="rect" id="Node000015" href="$classfc_1_1tracked__storage.html#a857cf0f6d4ca31111b633b9d4c923ffe" title=" " alt="" coords="218,235,351,276"/>
+<area shape="poly" id="edge16_Node000001_Node000015" title=" " alt="" coords="140,196,198,221,212,227,210,232,196,226,138,201"/>
+<area shape="rect" id="Node000003" href="$classfc_1_1microseconds.html#afc3eb0bfd792c7b1cda062e559e30c2e" title=" " alt="" coords="637,5,824,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="372,55,420,48,621,24,622,30,420,53,373,61"/>
+<area shape="rect" id="Node000005" href="$classfc_1_1time__point.html#aeccf1b70aa34b132c5269313b8a50573" title=" " alt="" coords="422,63,587,88"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="372,73,406,73,406,78,372,78"/>
+<area shape="rect" id="Node000007" href="$classfc_1_1time__point.html#aa164ff1268a16d4b32afcff181f6100e" title=" " alt="" coords="438,128,571,154"/>
+<area shape="poly" id="edge7_Node000002_Node000007" title=" " alt="" coords="356,94,445,120,443,126,354,99"/>
+<area shape="rect" id="Node000004" href="$classfc_1_1microseconds.html#a0c79856cd3ab96153901a64961bf216f" title=" " alt="" coords="872,5,1082,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="824,16,856,16,856,21,824,21"/>
+<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="558,59,661,33,663,38,559,65"/>
+<area shape="rect" id="Node000006" href="$classfc_1_1time__point.html#ab46781dcaab4880902bc136f36e39e5e" title=" " alt="" coords="664,55,797,96"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="588,73,649,73,649,78,588,78"/>
+<area shape="poly" id="edge11_Node000007_Node000006" title=" " alt="" coords="551,125,648,97,649,102,552,130"/>
+<area shape="rect" id="Node000008" href="$classfc_1_1mock__time__traits.html#a0bed781012a73b8c15882648397b56be" title=" " alt="" coords="660,120,801,161"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="571,138,645,138,645,144,571,144"/>
+<area shape="rect" id="Node000010" href="$classfc_1_1mock__time__traits.html#adddeebdf472c33f927827c111ddbf0b1" title=" " alt="" coords="660,186,801,226"/>
+<area shape="poly" id="edge10_Node000007_Node000010" title=" " alt="" coords="552,152,646,179,645,184,551,157"/>
+<area shape="rect" id="Node000011" href="$classfc_1_1time__point.html#abfea5efbe9ef58024cda814395ee9945" title=" " alt="" coords="664,251,797,292"/>
+<area shape="poly" id="edge12_Node000007_Node000011" title=" " alt="" coords="569,152,591,164,608,182,616,201,624,219,639,236,651,244,648,249,636,240,619,222,611,203,603,185,588,168,566,157"/>
+<area shape="rect" id="Node000009" href="$classfc_1_1mock__time__traits.html#a0d7245b32fd62b3bc712f658250cc4db" title=" " alt="" coords="891,128,1063,154"/>
+<area shape="poly" id="edge9_Node000008_Node000009" title=" " alt="" coords="801,138,875,138,875,144,801,144"/>
+<area shape="rect" id="Node000014" href="$structsysio_1_1chain_1_1name.html#a8847252c767dea5c3e8b60cc9d78505f" title=" " alt="" coords="439,178,570,218"/>
+<area shape="poly" id="edge15_Node000013_Node000014" title=" " alt="" coords="365,196,424,196,424,201,365,201"/>
+<area shape="rect" id="Node000016" href="$namespacefc_1_1tracked.html#a7a874ea77f5afa2de8f3d5fb6d19a241" title=" " alt="" coords="420,243,589,268"/>
+<area shape="poly" id="edge17_Node000015_Node000016" title=" " alt="" coords="352,253,405,253,405,258,352,258"/>
+</map>

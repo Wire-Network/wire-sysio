@@ -1,0 +1,59 @@
+\chapter{Xcode\+Guide}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2thirdparty_2gtest_2googletest_2docs_2_xcode_guide}{}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2thirdparty_2gtest_2googletest_2docs_2_xcode_guide}\index{XcodeGuide@{XcodeGuide}}
+This guide will explain how to use the Google Testing Framework in your Xcode projects on Mac OS X. This tutorial begins by quickly explaining what to do for experienced users. After the quick start, the guide goes provides additional explanation about each step.
+
+\doxysection*{Quick Start}
+
+Here is the quick guide for using Google \doxylink{class_test}{Test} in your Xcode project.
+
+
+\begin{DoxyEnumerate}
+\item Download the source from the \href{http://code.google.com/p/googletest}{\texttt{ website}} using this command\+: {\ttfamily svn checkout \href{http://googletest.googlecode.com/svn/trunk/}{\texttt{ http\+://googletest.\+googlecode.\+com/svn/trunk/}} googletest-\/read-\/only}.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Open up the {\ttfamily gtest.\+xcodeproj} in the {\ttfamily googletest-\/read-\/only/xcode/} directory and build the gtest.\+framework.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Create a new "{}\+Shell Tool"{} target in your Xcode project called something like "{}\+Unit\+Tests"{}.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Add the gtest.\+framework to your project and add it to the "{}\+Link Binary with Libraries"{} build phase of "{}\+Unit\+Tests"{}.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Add your unit test source code to the "{}\+Compile Sources"{} build phase of "{}\+Unit\+Tests"{}.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Edit the "{}\+Unit\+Tests"{} executable and add an environment variable named "{}\+DYLD\textbackslash{}\+\_\+\+FRAMEWORK\textbackslash{}\+\_\+\+PATH"{} with a value equal to the path to the framework containing the gtest.\+framework relative to the compiled executable.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Build and Go.
+\end{DoxyEnumerate}
+
+The following sections further explain each of the steps listed above in depth, describing in more detail how to complete it including some variations.
+
+\doxysection*{Get the Source}
+
+Currently, the gtest.\+framework discussed here isn\textquotesingle{}t available in a tagged release of Google \doxylink{class_test}{Test}, it is only available in the trunk. As explained at the Google \doxylink{class_test}{Test} \mbox{[}site\mbox{]}(\href{http://code.google.com/p/googletest/source/checkout}{\texttt{ http\+://code.\+google.\+com/p/googletest/source/checkout}}"{}$>$svn), you can get the code from anonymous SVN with this command\+:  @icode  svn checkout http\+://googletest.\+googlecode.\+com/svn/trunk/ googletest-\/read-\/only @endicode   \+Alternatively, if you are working with Subversion in your own code base, you can add Google Test as an external dependency to your own Subversion repository. By following this approach, everyone that checks out your svn repository will also receive a copy of Google Test (a specific version, if you wish) without having to check it out explicitly. This makes the set up of your project simpler and reduces the copied code in the repository.  \+To use $<$tt$>$svn\+:externals$<$/tt$>$, decide where you would like to have the external source reside. You might choose to put the external source inside the trunk, because you want it to be part of the branch when you make a release. However, keeping it outside the trunk in a version-\/tagged directory called something like $<$tt$>$third-\/party/googletest/1.\+0.\+1$<$/tt$>$, is another option. Once the location is established, use $<$tt$>$svn propedit svn\+:externals \+\_\+directory\+\_\+$<$/tt$>$ to set the svn\+:externals property on a directory in your repository. This directory won\textquotesingle{}t contain the code, but be its versioned parent directory.  \+The command $<$tt$>$svn propedit$<$/tt$>$ will bring up your Subversion editor, making editing the long, (potentially multi-\/line) property simpler. This same method can be used to check out a tagged branch, by using the appropriate URL (e.\+g. $<$tt$>$http\+://googletest.\+googlecode.\+com/svn/tags/release-\/1.\+0.\+1$<$/tt$>$). Additionally, the svn\+:externals property allows the specification of a particular revision of the trunk with the $<$tt$>$-\/r\+\_\+\textbackslash{}\#\textbackslash{}\#\+\_\+$<$/tt$>$ option (e.\+g. $<$tt$>$externals/src/googletest -\/r60 http\+://googletest.\+googlecode.\+com/svn/trunk$<$/tt$>$).  \+Here is an example of using the svn\+:externals properties on a trunk (read via $<$tt$>$svn propget$<$/tt$>$) of a project. This value checks out a copy of Google Test into the $<$tt$>$trunk/externals/src/googletest/$<$/tt$>$ directory.  @icode  \mbox{[}\+Computer\+:svn\mbox{]} user\$ svn propget svn\+:externals trunk externals/src/googletest http\+://googletest.\+googlecode.\+com/svn/trunk @endicode   $<$h1$>$\+Add the Framework to Your Project$<$/h1$>$  \+The next step is to build and add the gtest.\+framework to your own project. This guide describes two common ways below.    \texorpdfstring{$\ast$}{*} $<$strong$>$\+Option 1$<$/strong$>$ --- The simplest way to add Google Test to your own project, is to open gtest.\+xcodeproj (found in the xcode/ directory of the Google Test trunk) and build the framework manually. Then, add the built framework into your project using the "{}Add-\/\texorpdfstring{$>$}{>}Existing Framework..."{} from the context menu or "{}Project-\/\texorpdfstring{$>$}{>}Add..."{} from the main menu. The gtest.\+framework is relocatable and contains the headers and object code that you\textquotesingle{}ll need to make tests. This method requires rebuilding every time you upgrade Google Test in your project.   \texorpdfstring{$\ast$}{*} $<$strong$>$\+Option 2$<$/strong$>$ --- If you are going to be living off the trunk of Google Test, incorporating its latest features into your unit tests (or are a Google Test developer yourself). You\textquotesingle{}ll want to rebuild the framework every time the source updates. to do this, you\textquotesingle{}ll need to add the gtest.\+xcodeproj file, not the framework itself, to your own Xcode project. Then, from the build products that are revealed by the project\textquotesingle{}s disclosure triangle, you can find the gtest.\+framework, which can be added to your targets (discussed below).  $<$h1$>$\+Make a Test Target$<$/h1$>$  \+To start writing tests, make a new "{}Shell Tool"{} target. This target template is available under BSD, Cocoa, or Carbon. Add your unit test source code to the "{}Compile Sources"{} build phase of the target.  \+Next, you\textquotesingle{}ll want to add gtest.\+framework in two different ways, depending upon which option you chose above.    \texorpdfstring{$\ast$}{*} $<$strong$>$\+Option 1$<$/strong$>$ --- During compilation, Xcode will need to know that you are linking against the gtest.\+framework. Add the gtest.\+framework to the "{}Link \doxylink{struct_binary}{Binary} with Libraries"{} build phase of your test target. This will include the Google Test headers in your header search path, and will tell the linker where to find the library.   \texorpdfstring{$\ast$}{*} $<$strong$>$\+Option 2$<$/strong$>$ --- If your working out of the trunk, you\textquotesingle{}ll also want to add gtest.\+framework to your "{}Link \doxylink{struct_binary}{Binary} with Libraries"{} build phase of your test target. In addition, you\textquotesingle{}ll  want to add the gtest.\+framework as a dependency to your unit test target. This way, Xcode will make sure that gtest.\+framework is up to date, every time your build your target. Finally, if you don\textquotesingle{}t share build directories with Google Test, you\textquotesingle{}ll have to copy the gtest.\+framework into your own build products directory using a "{}Run Script"{} build phase.  $<$h1$>$\+Set Up the Executable Run Environment$<$/h1$>$  \+Since the unit test executable is a shell tool, it doesn\textquotesingle{}t have a bundle with a $<$tt$>$\+Contents/\+Frameworks$<$/tt$>$ directory, in which to place gtest.\+framework. Instead, the dynamic linker must be told at runtime to search for the framework in another location. This can be accomplished by setting the "{}DYLD\textbackslash{}\+\_\+\+FRAMEWORK\textbackslash{}\+\_\+\+PATH"{} environment variable in the "{}Edit Active Executable ..."{} Arguments tab, under "{}Variables to be set in the environment\+:"{}. The path for this value is the path (relative or absolute) of the directory containing the gtest.\+framework.  \+If you haven\textquotesingle{}t set up the DYLD\+\_\+\+FRAMEWORK\+\_\+\+PATH, correctly, you might get a message like this\+:  @icode  \mbox{[}\+Session started at 2008-\/08-\/15 06\+:23\+:57 -\/0600.\mbox{]}   dyld\+: Library not loaded\+: @loader\+\_\+path/../\+Frameworks/gtest.\+framework/\+Versions/\+A/gtest     Referenced from\+: /\+Users/username/\+Documents/\+Sandbox/gtest\+Sample/build/\+Debug/\+Widget\+Framework\+Test     Reason\+: image not found @endicode   \+To correct this problem, go to to the directory containing the executable named in "{}Referenced from\+:"{} value in the error message above. Then, with the terminal in this location, find the relative path to the directory containing the gtest.\+framework. That is the value you\textquotesingle{}ll need to set as the DYLD\+\_\+\+FRAMEWORK\+\_\+\+PATH.  $<$h1$>$\+Build and Go$<$/h1$>$  \+Now, when you click "{}Build and Go"{}, the test will be executed. Dumping out something like this\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{[Session\ started\ at\ 2008-\/08-\/06\ 06:36:13\ -\/0600.]}
+\DoxyCodeLine{[==========]\ Running\ 2\ tests\ from\ 1\ test\ case.}
+\DoxyCodeLine{[-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/]\ Global\ test\ environment\ set-\/up.}
+\DoxyCodeLine{[-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/]\ 2\ tests\ from\ WidgetInitializerTest}
+\DoxyCodeLine{[\ RUN\ \ \ \ \ \ ]\ WidgetInitializerTest.TestConstructor}
+\DoxyCodeLine{[\ \ \ \ \ \ \ OK\ ]\ WidgetInitializerTest.TestConstructor}
+\DoxyCodeLine{[\ RUN\ \ \ \ \ \ ]\ WidgetInitializerTest.TestConversion}
+\DoxyCodeLine{[\ \ \ \ \ \ \ OK\ ]\ WidgetInitializerTest.TestConversion}
+\DoxyCodeLine{[-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/]\ Global\ test\ environment\ tear-\/down}
+\DoxyCodeLine{[==========]\ 2\ tests\ from\ 1\ test\ case\ ran.}
+\DoxyCodeLine{[\ \ PASSED\ \ ]\ 2\ tests.}
+\DoxyCodeLine{}
+\DoxyCodeLine{The\ Debugger\ has\ exited\ with\ status\ 0.\ \ }
+
+\end{DoxyCode}
+
+
+\doxysection*{Summary}
+
+Unit testing is a valuable way to ensure your data model stays valid even during rapid development or refactoring. The Google Testing Framework is a great unit testing framework for C and C++ which integrates well with an Xcode development environment. 

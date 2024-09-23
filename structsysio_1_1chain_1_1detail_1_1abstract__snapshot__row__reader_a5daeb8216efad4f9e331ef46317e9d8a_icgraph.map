@@ -1,0 +1,7 @@
+<map id="sysio::chain::detail::abstract_snapshot_row_reader::provide" name="sysio::chain::detail::abstract_snapshot_row_reader::provide">
+<area shape="rect" id="Node000001" title=" " alt="" coords="239,31,403,87"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1chain_1_1istream__snapshot__reader.html#a8d66a77da41ec8840399e9123093f371" title=" " alt="" coords="5,5,191,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="223,47,191,42,192,37,224,42"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1chain_1_1variant__snapshot__reader.html#aeb25ba34a2c1671b67553a71a76b7149" title=" " alt="" coords="5,71,191,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="224,76,192,80,191,75,223,70"/>
+</map>

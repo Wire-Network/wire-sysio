@@ -1,0 +1,7 @@
+<map id="sysio::chain::block_log::contains_genesis_state" name="sysio::chain::block_log::contains_genesis_state">
+<area shape="rect" id="Node000001" title=" " alt="" coords="258,49,448,90"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1chain_1_1detail_1_1block__log__impl.html#a4bf087087dcea405e245031d4f9db5a4" title=" " alt="" coords="5,5,210,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="242,56,210,51,211,46,243,50"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1chain_1_1trim__data.html#ab5de810b1245a1ebff191bda8b98c9a1" title=" " alt="" coords="47,85,168,126"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="243,88,169,99,168,94,242,83"/>
+</map>

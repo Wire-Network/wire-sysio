@@ -1,0 +1,279 @@
+\doxysection{testing\+::Message Class Reference}
+\hypertarget{classtesting_1_1_message}{}\label{classtesting_1_1_message}\index{testing::Message@{testing::Message}}
+
+
+{\ttfamily \#include $<$gtest-\/message.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1_message_af5ba7216630df9845f18feb64b1a5383}{Message}} ()
+\item 
+\mbox{\hyperlink{classtesting_1_1_message_ac126e24804817a053bebba0920d94a11}{Message}} (const \mbox{\hyperlink{classtesting_1_1_message}{Message}} \&msg)
+\item 
+\mbox{\hyperlink{classtesting_1_1_message_a9de694ca239486809fc99fbbea8ac21d}{Message}} (const char \texorpdfstring{$\ast$}{*}str)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{classtesting_1_1_message}{Message}} \& \mbox{\hyperlink{classtesting_1_1_message_ac3bb8aed013ca36093eb36525a8ffc5d}{operator$<$$<$}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&val)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{classtesting_1_1_message}{Message}} \& \mbox{\hyperlink{classtesting_1_1_message_a11abae9dc33149b17ec3fd3899086568}{operator$<$$<$}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*}const \&\mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}})
+\item 
+\mbox{\hyperlink{classtesting_1_1_message}{Message}} \& \mbox{\hyperlink{classtesting_1_1_message_af674418e31abc5320bd16420ec02b81d}{operator$<$$<$}} (Basic\+Narrow\+Io\+Manip val)
+\item 
+\mbox{\hyperlink{classtesting_1_1_message}{Message}} \& \mbox{\hyperlink{classtesting_1_1_message_afd60257232a5ea7994e58cb96b05ced8}{operator$<$$<$}} (bool b)
+\item 
+\mbox{\hyperlink{classtesting_1_1_message}{Message}} \& \mbox{\hyperlink{classtesting_1_1_message_ac0db9c22535b28bc863bfd0a1fdf7e14}{operator$<$$<$}} (const wchar\+\_\+t \texorpdfstring{$\ast$}{*}wide\+\_\+c\+\_\+str)
+\item 
+\mbox{\hyperlink{classtesting_1_1_message}{Message}} \& \mbox{\hyperlink{classtesting_1_1_message_ac1d3a041ac4bb9c929ee746b31a13d6a}{operator$<$$<$}} (wchar\+\_\+t \texorpdfstring{$\ast$}{*}wide\+\_\+c\+\_\+str)
+\item 
+std\+::string \mbox{\hyperlink{classtesting_1_1_message_a2cdc4df62bdcc9df37651a1cf527704e}{Get\+String}} () const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{gtest-message_8h_source_l00085}{85}} of file \mbox{\hyperlink{gtest-message_8h_source}{gtest-\/message.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1_message_af5ba7216630df9845f18feb64b1a5383}\index{testing::Message@{testing::Message}!Message@{Message}}
+\index{Message@{Message}!testing::Message@{testing::Message}}
+\doxysubsubsection{\texorpdfstring{Message()}{Message()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{classtesting_1_1_message_af5ba7216630df9845f18feb64b1a5383} 
+testing\+::\+Message\+::\+Message (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8cc_source_l00960}{960}} of file \mbox{\hyperlink{gtest_8cc_source}{gtest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00960\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ ss\_(new\ ::std::stringstream)\ \{}
+\DoxyCodeLine{00961\ \ \ \textcolor{comment}{//\ By\ default,\ we\ want\ there\ to\ be\ enough\ precision\ when\ printing}}
+\DoxyCodeLine{00962\ \ \ \textcolor{comment}{//\ a\ double\ to\ a\ Message.}}
+\DoxyCodeLine{00963\ \ \ *ss\_\ <<\ std::setprecision(std::numeric\_limits<double>::digits10\ +\ 2);}
+\DoxyCodeLine{00964\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1_message_ac126e24804817a053bebba0920d94a11}\index{testing::Message@{testing::Message}!Message@{Message}}
+\index{Message@{Message}!testing::Message@{testing::Message}}
+\doxysubsubsection{\texorpdfstring{Message()}{Message()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{classtesting_1_1_message_ac126e24804817a053bebba0920d94a11} 
+testing\+::\+Message\+::\+Message (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classtesting_1_1_message}{Message}} \&}]{msg}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-message_8h_source_l00096}{96}} of file \mbox{\hyperlink{gtest-message_8h_source}{gtest-\/message.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ ss\_(new\ ::std::stringstream)\ \{\ \ \textcolor{comment}{//\ NOLINT}}
+\DoxyCodeLine{00097\ \ \ \ \ *ss\_\ <<\ msg.GetString();}
+\DoxyCodeLine{00098\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1_message_ac126e24804817a053bebba0920d94a11_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1_message_a9de694ca239486809fc99fbbea8ac21d}\index{testing::Message@{testing::Message}!Message@{Message}}
+\index{Message@{Message}!testing::Message@{testing::Message}}
+\doxysubsubsection{\texorpdfstring{Message()}{Message()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{classtesting_1_1_message_a9de694ca239486809fc99fbbea8ac21d} 
+testing\+::\+Message\+::\+Message (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{str}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-message_8h_source_l00101}{101}} of file \mbox{\hyperlink{gtest-message_8h_source}{gtest-\/message.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ ss\_(new\ ::std::stringstream)\ \{}
+\DoxyCodeLine{00102\ \ \ \ \ *ss\_\ <<\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}};}
+\DoxyCodeLine{00103\ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1_message_a2cdc4df62bdcc9df37651a1cf527704e}\index{testing::Message@{testing::Message}!GetString@{GetString}}
+\index{GetString@{GetString}!testing::Message@{testing::Message}}
+\doxysubsubsection{\texorpdfstring{GetString()}{GetString()}}
+{\footnotesize\ttfamily \label{classtesting_1_1_message_a2cdc4df62bdcc9df37651a1cf527704e} 
+std\+::string testing\+::\+Message\+::\+Get\+String (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8cc_source_l00995}{995}} of file \mbox{\hyperlink{gtest_8cc_source}{gtest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00995\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00996\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetesting_1_1internal_ac0a2b7f69fc829d80a39e925b6417e39}{internal::StringStreamToString}}(ss\_.\mbox{\hyperlink{classtesting_1_1internal_1_1scoped__ptr_a5a78280b6a59ff4b63aae444efc61e3f}{get}}());}
+\DoxyCodeLine{00997\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1_message_a2cdc4df62bdcc9df37651a1cf527704e_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1_message_a2cdc4df62bdcc9df37651a1cf527704e_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1_message_af674418e31abc5320bd16420ec02b81d}\index{testing::Message@{testing::Message}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!testing::Message@{testing::Message}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [1/6]}}
+{\footnotesize\ttfamily \label{classtesting_1_1_message_af674418e31abc5320bd16420ec02b81d} 
+\mbox{\hyperlink{classtesting_1_1_message}{Message}} \& testing\+::\+Message\+::operator$<$$<$ (\begin{DoxyParamCaption}\item[{Basic\+Narrow\+Io\+Manip}]{val}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-message_8h_source_l00165}{165}} of file \mbox{\hyperlink{gtest-message_8h_source}{gtest-\/message.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00166\ \ \ \ \ *ss\_\ <<\ val;}
+\DoxyCodeLine{00167\ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00168\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1_message_afd60257232a5ea7994e58cb96b05ced8}\index{testing::Message@{testing::Message}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!testing::Message@{testing::Message}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [2/6]}}
+{\footnotesize\ttfamily \label{classtesting_1_1_message_afd60257232a5ea7994e58cb96b05ced8} 
+\mbox{\hyperlink{classtesting_1_1_message}{Message}} \& testing\+::\+Message\+::operator$<$$<$ (\begin{DoxyParamCaption}\item[{bool}]{b}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-message_8h_source_l00171}{171}} of file \mbox{\hyperlink{gtest-message_8h_source}{gtest-\/message.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00172\ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this}\ <<\ (b\ ?\ \textcolor{stringliteral}{"{}true"{}}\ :\ \textcolor{stringliteral}{"{}false"{}});}
+\DoxyCodeLine{00173\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1_message_ac3bb8aed013ca36093eb36525a8ffc5d}\index{testing::Message@{testing::Message}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!testing::Message@{testing::Message}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [3/6]}}
+{\footnotesize\ttfamily \label{classtesting_1_1_message_ac3bb8aed013ca36093eb36525a8ffc5d} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{classtesting_1_1_message}{Message}} \& testing\+::\+Message\+::operator$<$$<$ (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{val}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-message_8h_source_l00115}{115}} of file \mbox{\hyperlink{gtest-message_8h_source}{gtest-\/message.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00116\ \ \ \ \ \textcolor{comment}{//\ Some\ libraries\ overload\ <<\ for\ STL\ containers.\ \ These}}
+\DoxyCodeLine{00117\ \ \ \ \ \textcolor{comment}{//\ overloads\ are\ defined\ in\ the\ global\ namespace\ instead\ of\ ::std.}}
+\DoxyCodeLine{00118\ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00119\ \ \ \ \ \textcolor{comment}{//\ C++'s\ symbol\ lookup\ rule\ (i.e.\ Koenig\ lookup)\ says\ that\ these}}
+\DoxyCodeLine{00120\ \ \ \ \ \textcolor{comment}{//\ overloads\ are\ visible\ in\ either\ the\ std\ namespace\ or\ the\ global}}
+\DoxyCodeLine{00121\ \ \ \ \ \textcolor{comment}{//\ namespace,\ but\ not\ other\ namespaces,\ including\ the\ testing}}
+\DoxyCodeLine{00122\ \ \ \ \ \textcolor{comment}{//\ namespace\ which\ Google\ Test's\ Message\ class\ is\ in.}}
+\DoxyCodeLine{00123\ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00124\ \ \ \ \ \textcolor{comment}{//\ To\ allow\ STL\ containers\ (and\ other\ types\ that\ has\ a\ <<\ operator}}
+\DoxyCodeLine{00125\ \ \ \ \ \textcolor{comment}{//\ defined\ in\ the\ global\ namespace)\ to\ be\ used\ in\ Google\ Test}}
+\DoxyCodeLine{00126\ \ \ \ \ \textcolor{comment}{//\ assertions,\ testing::Message\ must\ access\ the\ custom\ <<\ operator}}
+\DoxyCodeLine{00127\ \ \ \ \ \textcolor{comment}{//\ from\ the\ global\ namespace.\ \ With\ this\ using\ declaration,}}
+\DoxyCodeLine{00128\ \ \ \ \ \textcolor{comment}{//\ overloads\ of\ <<\ defined\ in\ the\ global\ namespace\ and\ those}}
+\DoxyCodeLine{00129\ \ \ \ \ \textcolor{comment}{//\ visible\ via\ Koenig\ lookup\ are\ both\ exposed\ in\ this\ function.}}
+\DoxyCodeLine{00130\ \ \ \ \ using\ ::operator\ <<;}
+\DoxyCodeLine{00131\ \ \ \ \ *ss\_\ <<\ val;}
+\DoxyCodeLine{00132\ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00133\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1_message_ac0db9c22535b28bc863bfd0a1fdf7e14}\index{testing::Message@{testing::Message}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!testing::Message@{testing::Message}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [4/6]}}
+{\footnotesize\ttfamily \label{classtesting_1_1_message_ac0db9c22535b28bc863bfd0a1fdf7e14} 
+\mbox{\hyperlink{classtesting_1_1_message}{Message}} \& testing\+::\+Message\+::operator$<$$<$ (\begin{DoxyParamCaption}\item[{const wchar\+\_\+t \texorpdfstring{$\ast$}{*}}]{wide\+\_\+c\+\_\+str}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8cc_source_l00968}{968}} of file \mbox{\hyperlink{gtest_8cc_source}{gtest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00968\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00969\ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this}\ <<\ \mbox{\hyperlink{classtesting_1_1internal_1_1_string_aaf7e376ff580677ea4954d5913d5b917}{internal::String::ShowWideCString}}(wide\_c\_str);}
+\DoxyCodeLine{00970\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1_message_ac0db9c22535b28bc863bfd0a1fdf7e14_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1_message_a11abae9dc33149b17ec3fd3899086568}\index{testing::Message@{testing::Message}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!testing::Message@{testing::Message}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [5/6]}}
+{\footnotesize\ttfamily \label{classtesting_1_1_message_a11abae9dc33149b17ec3fd3899086568} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{classtesting_1_1_message}{Message}} \& testing\+::\+Message\+::operator$<$$<$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*}const \&}]{pointer}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-message_8h_source_l00149}{149}} of file \mbox{\hyperlink{gtest-message_8h_source}{gtest-\/message.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ \ \textcolor{comment}{//\ NOLINT}}
+\DoxyCodeLine{00150\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}}\ ==\ NULL)\ \{}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ *ss\_\ <<\ \textcolor{stringliteral}{"{}(null)"{}};}
+\DoxyCodeLine{00152\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ *ss\_\ <<\ \mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}};}
+\DoxyCodeLine{00154\ \ \ \ \ \}}
+\DoxyCodeLine{00155\ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00156\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1_message_ac1d3a041ac4bb9c929ee746b31a13d6a}\index{testing::Message@{testing::Message}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!testing::Message@{testing::Message}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [6/6]}}
+{\footnotesize\ttfamily \label{classtesting_1_1_message_ac1d3a041ac4bb9c929ee746b31a13d6a} 
+\mbox{\hyperlink{classtesting_1_1_message}{Message}} \& testing\+::\+Message\+::operator$<$$<$ (\begin{DoxyParamCaption}\item[{wchar\+\_\+t \texorpdfstring{$\ast$}{*}}]{wide\+\_\+c\+\_\+str}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8cc_source_l00971}{971}} of file \mbox{\hyperlink{gtest_8cc_source}{gtest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00971\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00972\ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this}\ <<\ \mbox{\hyperlink{classtesting_1_1internal_1_1_string_aaf7e376ff580677ea4954d5913d5b917}{internal::String::ShowWideCString}}(wide\_c\_str);}
+\DoxyCodeLine{00973\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1_message_ac1d3a041ac4bb9c929ee746b31a13d6a_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/include/gtest/\mbox{\hyperlink{gtest-message_8h}{gtest-\/message.\+h}}\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/src/\mbox{\hyperlink{gtest_8cc}{gtest.\+cc}}\end{DoxyCompactItemize}

@@ -1,0 +1,230 @@
+\doxysection{libraries/fc/vendor/websocketpp/test/utility/close.cpp File Reference}
+\hypertarget{close_8cpp}{}\label{close_8cpp}\index{libraries/fc/vendor/websocketpp/test/utility/close.cpp@{libraries/fc/vendor/websocketpp/test/utility/close.cpp}}
+{\ttfamily \#include $<$boost/test/unit\+\_\+test.\+hpp$>$}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$string$>$}\newline
+{\ttfamily \#include $<$websocketpp/close.\+hpp$>$}\newline
+{\ttfamily \#include $<$websocketpp/utilities.\+hpp$>$}\newline
+Include dependency graph for close.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{close_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{close_8cpp_a6b2a3852db8bb19ab6909bac01859985}{BOOST\+\_\+\+TEST\+\_\+\+MODULE}}~\mbox{\hyperlink{integration_8cpp_af5b66d867a040d002fb57d645cae3fb4}{close}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{close_8cpp_ae8cff894f039d85d279322ee94d94c86}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (reserved\+\_\+values)
+\item 
+\mbox{\hyperlink{close_8cpp_a439ae40187810966d77671d8aee06927}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (invalid\+\_\+values)
+\item 
+\mbox{\hyperlink{close_8cpp_a3d0627426516914cda45d84cda251416}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (value\+\_\+extraction)
+\item 
+\mbox{\hyperlink{close_8cpp_a76e66f6d6d06a27643e6181f580cd557}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (extract\+\_\+empty)
+\item 
+\mbox{\hyperlink{close_8cpp_add426baada74c2f1cba874631f9a3934}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (extract\+\_\+short)
+\item 
+\mbox{\hyperlink{close_8cpp_a0f7a26e7edac8476cc6af2f79de6bef6}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (extract\+\_\+reason)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{close_8cpp_a6b2a3852db8bb19ab6909bac01859985}\index{close.cpp@{close.cpp}!BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}}
+\index{BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}!close.cpp@{close.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_TEST\_MODULE}{BOOST\_TEST\_MODULE}}
+{\footnotesize\ttfamily \label{close_8cpp_a6b2a3852db8bb19ab6909bac01859985} 
+\#define BOOST\+\_\+\+TEST\+\_\+\+MODULE~\mbox{\hyperlink{integration_8cpp_af5b66d867a040d002fb57d645cae3fb4}{close}}}
+
+
+
+Definition at line \mbox{\hyperlink{close_8cpp_source_l00028}{28}} of file \mbox{\hyperlink{close_8cpp_source}{close.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{close_8cpp_a76e66f6d6d06a27643e6181f580cd557}\index{close.cpp@{close.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!close.cpp@{close.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/6]}}
+{\footnotesize\ttfamily \label{close_8cpp_a76e66f6d6d06a27643e6181f580cd557} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{extract\+\_\+empty}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{close_8cpp_source_l00089}{89}} of file \mbox{\hyperlink{close_8cpp_source}{close.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00090\ \ \ \ \ lib::error\_code\ ec;}
+\DoxyCodeLine{00091\ \ \ \ \ std::string\ payload;}
+\DoxyCodeLine{00092\ }
+\DoxyCodeLine{00093\ \ \ \ \ BOOST\_CHECK(\ close::extract\_code(payload,ec)\ ==\ close::status::no\_status\ );}
+\DoxyCodeLine{00094\ \ \ \ \ BOOST\_CHECK(\ !ec\ );}
+\DoxyCodeLine{00095\ \}}
+
+\end{DoxyCode}
+\Hypertarget{close_8cpp_a0f7a26e7edac8476cc6af2f79de6bef6}\index{close.cpp@{close.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!close.cpp@{close.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/6]}}
+{\footnotesize\ttfamily \label{close_8cpp_a0f7a26e7edac8476cc6af2f79de6bef6} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{extract\+\_\+reason}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{close_8cpp_source_l00105}{105}} of file \mbox{\hyperlink{close_8cpp_source}{close.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00106\ \ \ \ \ lib::error\_code\ ec;}
+\DoxyCodeLine{00107\ \ \ \ \ std::string\ payload\ =\ \textcolor{stringliteral}{"{}00Foo"{}};}
+\DoxyCodeLine{00108\ }
+\DoxyCodeLine{00109\ \ \ \ \ BOOST\_CHECK(\ close::extract\_reason(payload,ec)\ ==\ \textcolor{stringliteral}{"{}Foo"{}}\ );}
+\DoxyCodeLine{00110\ \ \ \ \ BOOST\_CHECK(\ !ec\ );}
+\DoxyCodeLine{00111\ }
+\DoxyCodeLine{00112\ \ \ \ \ payload.clear();}
+\DoxyCodeLine{00113\ \ \ \ \ BOOST\_CHECK(\ close::extract\_reason(payload,ec).empty()\ );}
+\DoxyCodeLine{00114\ \ \ \ \ BOOST\_CHECK(\ !ec\ );}
+\DoxyCodeLine{00115\ }
+\DoxyCodeLine{00116\ \ \ \ \ payload\ =\ \textcolor{stringliteral}{"{}00"{}};}
+\DoxyCodeLine{00117\ \ \ \ \ BOOST\_CHECK(\ close::extract\_reason(payload,ec).empty()\ );}
+\DoxyCodeLine{00118\ \ \ \ \ BOOST\_CHECK(\ !ec\ );}
+\DoxyCodeLine{00119\ }
+\DoxyCodeLine{00120\ \ \ \ \ payload\ =\ \textcolor{stringliteral}{"{}000"{}};}
+\DoxyCodeLine{00121\ \ \ \ \ payload[2]\ =\ char(0xFF);}
+\DoxyCodeLine{00122\ }
+\DoxyCodeLine{00123\ \ \ \ \ close::extract\_reason(payload,ec);}
+\DoxyCodeLine{00124\ \ \ \ \ BOOST\_CHECK(\ ec\ ==\ error::invalid\_utf8\ );}
+\DoxyCodeLine{00125\ \}}
+
+\end{DoxyCode}
+\Hypertarget{close_8cpp_add426baada74c2f1cba874631f9a3934}\index{close.cpp@{close.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!close.cpp@{close.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [3/6]}}
+{\footnotesize\ttfamily \label{close_8cpp_add426baada74c2f1cba874631f9a3934} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{extract\+\_\+short}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{close_8cpp_source_l00097}{97}} of file \mbox{\hyperlink{close_8cpp_source}{close.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00098\ \ \ \ \ lib::error\_code\ ec;}
+\DoxyCodeLine{00099\ \ \ \ \ std::string\ payload\ =\ \textcolor{stringliteral}{"{}0"{}};}
+\DoxyCodeLine{00100\ }
+\DoxyCodeLine{00101\ \ \ \ \ BOOST\_CHECK(\ close::extract\_code(payload,ec)\ ==\ close::status::protocol\_error\ );}
+\DoxyCodeLine{00102\ \ \ \ \ BOOST\_CHECK(\ ec\ ==\ error::bad\_close\_code\ );}
+\DoxyCodeLine{00103\ \}}
+
+\end{DoxyCode}
+\Hypertarget{close_8cpp_a439ae40187810966d77671d8aee06927}\index{close.cpp@{close.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!close.cpp@{close.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [4/6]}}
+{\footnotesize\ttfamily \label{close_8cpp_a439ae40187810966d77671d8aee06927} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{invalid\+\_\+values}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{close_8cpp_source_l00048}{48}} of file \mbox{\hyperlink{close_8cpp_source}{close.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00049\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1close_1_1status_ad024f852889be28eadcec8209fdf9bc8}{close::status::invalid}}(0)\ );}
+\DoxyCodeLine{00050\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1close_1_1status_ad024f852889be28eadcec8209fdf9bc8}{close::status::invalid}}(999)\ );}
+\DoxyCodeLine{00051\ \ \ \ \ BOOST\_CHECK(\ !\mbox{\hyperlink{namespacewebsocketpp_1_1close_1_1status_ad024f852889be28eadcec8209fdf9bc8}{close::status::invalid}}(1000)\ );}
+\DoxyCodeLine{00052\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1close_1_1status_ad024f852889be28eadcec8209fdf9bc8}{close::status::invalid}}(1005)\ );}
+\DoxyCodeLine{00053\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1close_1_1status_ad024f852889be28eadcec8209fdf9bc8}{close::status::invalid}}(1006)\ );}
+\DoxyCodeLine{00054\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1close_1_1status_ad024f852889be28eadcec8209fdf9bc8}{close::status::invalid}}(1015)\ );}
+\DoxyCodeLine{00055\ \ \ \ \ BOOST\_CHECK(\ !\mbox{\hyperlink{namespacewebsocketpp_1_1close_1_1status_ad024f852889be28eadcec8209fdf9bc8}{close::status::invalid}}(2999)\ );}
+\DoxyCodeLine{00056\ \ \ \ \ BOOST\_CHECK(\ !\mbox{\hyperlink{namespacewebsocketpp_1_1close_1_1status_ad024f852889be28eadcec8209fdf9bc8}{close::status::invalid}}(3000)\ );}
+\DoxyCodeLine{00057\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1close_1_1status_ad024f852889be28eadcec8209fdf9bc8}{close::status::invalid}}(5000)\ );}
+\DoxyCodeLine{00058\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{close_8cpp_a439ae40187810966d77671d8aee06927_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{close_8cpp_ae8cff894f039d85d279322ee94d94c86}\index{close.cpp@{close.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!close.cpp@{close.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [5/6]}}
+{\footnotesize\ttfamily \label{close_8cpp_ae8cff894f039d85d279322ee94d94c86} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{reserved\+\_\+values}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{close_8cpp_source_l00039}{39}} of file \mbox{\hyperlink{close_8cpp_source}{close.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00040\ \ \ \ \ BOOST\_CHECK(\ !\mbox{\hyperlink{namespacewebsocketpp_1_1close_1_1status_af26a61f8a8c3247cf656349f96ea3008}{close::status::reserved}}(999)\ );}
+\DoxyCodeLine{00041\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1close_1_1status_af26a61f8a8c3247cf656349f96ea3008}{close::status::reserved}}(1004)\ );}
+\DoxyCodeLine{00042\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1close_1_1status_af26a61f8a8c3247cf656349f96ea3008}{close::status::reserved}}(1014)\ );}
+\DoxyCodeLine{00043\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1close_1_1status_af26a61f8a8c3247cf656349f96ea3008}{close::status::reserved}}(1016)\ );}
+\DoxyCodeLine{00044\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1close_1_1status_af26a61f8a8c3247cf656349f96ea3008}{close::status::reserved}}(2999)\ );}
+\DoxyCodeLine{00045\ \ \ \ \ BOOST\_CHECK(\ !\mbox{\hyperlink{namespacewebsocketpp_1_1close_1_1status_af26a61f8a8c3247cf656349f96ea3008}{close::status::reserved}}(1000)\ );}
+\DoxyCodeLine{00046\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{close_8cpp_ae8cff894f039d85d279322ee94d94c86_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{close_8cpp_a3d0627426516914cda45d84cda251416}\index{close.cpp@{close.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!close.cpp@{close.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [6/6]}}
+{\footnotesize\ttfamily \label{close_8cpp_a3d0627426516914cda45d84cda251416} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{value\+\_\+extraction}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{close_8cpp_source_l00060}{60}} of file \mbox{\hyperlink{close_8cpp_source}{close.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00061\ \ \ \ \ lib::error\_code\ ec;}
+\DoxyCodeLine{00062\ \ \ \ \ std::string\ payload\ =\ \textcolor{stringliteral}{"{}oo"{}};}
+\DoxyCodeLine{00063\ }
+\DoxyCodeLine{00064\ \ \ \ \ \textcolor{comment}{//\ Value\ =\ 1000}}
+\DoxyCodeLine{00065\ \ \ \ \ payload[0]\ =\ 0x03;}
+\DoxyCodeLine{00066\ \ \ \ \ payload[1]\ =\ char(0xe8);}
+\DoxyCodeLine{00067\ \ \ \ \ BOOST\_CHECK(\ close::extract\_code(payload,ec)\ ==\ close::status::normal\ );}
+\DoxyCodeLine{00068\ \ \ \ \ BOOST\_CHECK(\ !ec\ );}
+\DoxyCodeLine{00069\ }
+\DoxyCodeLine{00070\ \ \ \ \ \textcolor{comment}{//\ Value\ =\ 1004}}
+\DoxyCodeLine{00071\ \ \ \ \ payload[0]\ =\ 0x03;}
+\DoxyCodeLine{00072\ \ \ \ \ payload[1]\ =\ char(0xec);}
+\DoxyCodeLine{00073\ \ \ \ \ BOOST\_CHECK(\ close::extract\_code(payload,ec)\ ==\ 1004\ );}
+\DoxyCodeLine{00074\ \ \ \ \ BOOST\_CHECK(\ ec\ ==\ error::reserved\_close\_code\ );}
+\DoxyCodeLine{00075\ }
+\DoxyCodeLine{00076\ \ \ \ \ \textcolor{comment}{//\ Value\ =\ 1005}}
+\DoxyCodeLine{00077\ \ \ \ \ payload[0]\ =\ 0x03;}
+\DoxyCodeLine{00078\ \ \ \ \ payload[1]\ =\ char(0xed);}
+\DoxyCodeLine{00079\ \ \ \ \ BOOST\_CHECK(\ close::extract\_code(payload,ec)\ ==\ close::status::no\_status\ );}
+\DoxyCodeLine{00080\ \ \ \ \ BOOST\_CHECK(\ ec\ ==\ error::invalid\_close\_code\ );}
+\DoxyCodeLine{00081\ }
+\DoxyCodeLine{00082\ \ \ \ \ \textcolor{comment}{//\ Value\ =\ 3000}}
+\DoxyCodeLine{00083\ \ \ \ \ payload[0]\ =\ 0x0b;}
+\DoxyCodeLine{00084\ \ \ \ \ payload[1]\ =\ char(0xb8);}
+\DoxyCodeLine{00085\ \ \ \ \ BOOST\_CHECK(\ close::extract\_code(payload,ec)\ ==\ 3000\ );}
+\DoxyCodeLine{00086\ \ \ \ \ BOOST\_CHECK(\ !ec\ );}
+\DoxyCodeLine{00087\ \}}
+
+\end{DoxyCode}

@@ -1,0 +1,11 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,114,156,140"/>
+<area shape="rect" id="Node000001" href="$structdebug__custom_1_1transport__config.html" title=" " alt="" coords="204,5,369,46"/>
+<area shape="poly" id="edge49_Node000000_Node000001" title=" " alt="" coords="116,104,202,57,230,44,232,49,205,61,118,108"/>
+<area shape="rect" id="Node000002" href="$structdeflate__config_1_1transport__config.html" title=" " alt="" coords="206,71,367,111"/>
+<area shape="poly" id="edge50_Node000000_Node000002" title=" " alt="" coords="171,108,205,103,206,108,172,114"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1detail_1_1asio__local__with__stub__log_1_1transport__config.html" title=" " alt="" coords="215,135,358,191"/>
+<area shape="poly" id="edge51_Node000000_Node000003" title=" " alt="" coords="172,140,215,148,214,153,171,145"/>
+<area shape="rect" id="Node000004" href="$structsysio_1_1detail_1_1asio__with__stub__log_1_1transport__config.html" title=" " alt="" coords="216,215,356,271"/>
+<area shape="poly" id="edge52_Node000000_Node000004" title=" " alt="" coords="116,146,205,201,227,212,224,217,202,205,113,151"/>
+</map>

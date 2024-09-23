@@ -1,0 +1,11 @@
+<map id="CLI::App::_process_extras" name="CLI::App::_process_extras">
+<area shape="rect" id="Node000001" title="Throw an error if anything is left over and should not be." alt="" coords="5,48,140,89"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_app.html#ad90f9b3c1925879dfe39cb03c5247742" title="This returns the missing options from the current subcommand." alt="" coords="203,5,340,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="139,49,203,33,205,38,141,54"/>
+<area shape="rect" id="Node000003" href="$xbyak__mnemonic_8h.html#ad8856ea517c970ed0584a251c3fdc94f" title=" " alt="" coords="404,56,446,82"/>
+<area shape="poly" id="edge5_Node000001_Node000003" title=" " alt="" coords="140,66,388,66,388,72,140,72"/>
+<area shape="rect" id="Node000004" href="$class_c_l_i_1_1_app.html#a7a94b729128d22a6cc3e4998149d7101" title="This returns the number of remaining options, minus the – separator." alt="" coords="188,107,356,132"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="141,83,205,100,203,105,139,88"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="314,29,390,55,388,60,312,34"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="312,104,388,78,390,83,314,109"/>
+</map>

@@ -1,0 +1,339 @@
+\doxysection{libraries/fc/include/fc/crypto/webauthn\+\_\+json/test/unittest/cursorstreamwrappertest.cpp File Reference}
+\hypertarget{cursorstreamwrappertest_8cpp}{}\label{cursorstreamwrappertest_8cpp}\index{libraries/fc/include/fc/crypto/webauthn\_json/test/unittest/cursorstreamwrappertest.cpp@{libraries/fc/include/fc/crypto/webauthn\_json/test/unittest/cursorstreamwrappertest.cpp}}
+{\ttfamily \#include "{}unittest.\+h"{}}\newline
+{\ttfamily \#include "{}rapidjson/document.\+h"{}}\newline
+{\ttfamily \#include "{}rapidjson/cursorstreamwrapper.\+h"{}}\newline
+Include dependency graph for cursorstreamwrappertest.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{cursorstreamwrappertest_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{cursorstreamwrappertest_8cpp_a275da0d1f29dba3630a7ba31e01101e2}{test\+Json}} (const char \texorpdfstring{$\ast$}{*}json, size\+\_\+t \&line, size\+\_\+t \&col)
+\item 
+\mbox{\hyperlink{cursorstreamwrappertest_8cpp_ac4fb8d3acd98f897e36fa6bc9d54583d}{TEST}} (\mbox{\hyperlink{class_cursor_stream_wrapper}{Cursor\+Stream\+Wrapper}}, Missing\+First\+Bracket)
+\item 
+\mbox{\hyperlink{cursorstreamwrappertest_8cpp_ae8b36851bf3b3305e4292794cdd52ddc}{TEST}} (\mbox{\hyperlink{class_cursor_stream_wrapper}{Cursor\+Stream\+Wrapper}}, Missing\+Quotes)
+\item 
+\mbox{\hyperlink{cursorstreamwrappertest_8cpp_ad4f41f82ee5faf1e197735d085678b10}{TEST}} (\mbox{\hyperlink{class_cursor_stream_wrapper}{Cursor\+Stream\+Wrapper}}, Missing\+Colon)
+\item 
+\mbox{\hyperlink{cursorstreamwrappertest_8cpp_a128a1978f9d76e5b8f33a73fb193cd69}{TEST}} (\mbox{\hyperlink{class_cursor_stream_wrapper}{Cursor\+Stream\+Wrapper}}, Missing\+Second\+Quotes)
+\item 
+\mbox{\hyperlink{cursorstreamwrappertest_8cpp_a540fcbc4d8110c5cf1e394bef973864e}{TEST}} (\mbox{\hyperlink{class_cursor_stream_wrapper}{Cursor\+Stream\+Wrapper}}, Missing\+Comma)
+\item 
+\mbox{\hyperlink{cursorstreamwrappertest_8cpp_ad7be74dba4df64b632deef663f49ee1d}{TEST}} (\mbox{\hyperlink{class_cursor_stream_wrapper}{Cursor\+Stream\+Wrapper}}, Missing\+Array\+Bracket)
+\item 
+\mbox{\hyperlink{cursorstreamwrappertest_8cpp_aa928a9ee549a92b19b936232e5b80529}{TEST}} (\mbox{\hyperlink{class_cursor_stream_wrapper}{Cursor\+Stream\+Wrapper}}, Missing\+Array\+Comma)
+\item 
+\mbox{\hyperlink{cursorstreamwrappertest_8cpp_ac4cf5478a8fa67307f2b5d2213aca3a8}{TEST}} (\mbox{\hyperlink{class_cursor_stream_wrapper}{Cursor\+Stream\+Wrapper}}, Missing\+Last\+Array\+Bracket)
+\item 
+\mbox{\hyperlink{cursorstreamwrappertest_8cpp_a6bd684af3886ac0848edf1a8bdfc5c66}{TEST}} (\mbox{\hyperlink{class_cursor_stream_wrapper}{Cursor\+Stream\+Wrapper}}, Missing\+Last\+Bracket)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{cursorstreamwrappertest_8cpp_ad7be74dba4df64b632deef663f49ee1d}\index{cursorstreamwrappertest.cpp@{cursorstreamwrappertest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!cursorstreamwrappertest.cpp@{cursorstreamwrappertest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [1/9]}}
+{\footnotesize\ttfamily \label{cursorstreamwrappertest_8cpp_ad7be74dba4df64b632deef663f49ee1d} 
+TEST (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_cursor_stream_wrapper}{Cursor\+Stream\+Wrapper}}}]{}{, }\item[{Missing\+Array\+Bracket}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{cursorstreamwrappertest_8cpp_source_l00081}{81}} of file \mbox{\hyperlink{cursorstreamwrappertest_8cpp_source}{cursorstreamwrappertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00082\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ json[]\ =\ \textcolor{stringliteral}{"{}\{\(\backslash\)"{}string\(\backslash\)"{}\(\backslash\)n\(\backslash\)n:\(\backslash\)"{}my\ string\(\backslash\)"{},\(\backslash\)"{}array\(\backslash\)"{}\(\backslash\)n:\(\backslash\)"{}1\(\backslash\)"{},\ \(\backslash\)"{}2\(\backslash\)"{},\ \(\backslash\)"{}3\(\backslash\)"{}]\}"{}};}
+\DoxyCodeLine{00083\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ col,\ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}};}
+\DoxyCodeLine{00084\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{cursorstreamwrappertest_8cpp_a275da0d1f29dba3630a7ba31e01101e2}{testJson}}(json,\ line,\ col);}
+\DoxyCodeLine{00085\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}});}
+\DoxyCodeLine{00086\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(line,\ 4u);}
+\DoxyCodeLine{00087\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(col,\ 9u);}
+\DoxyCodeLine{00088\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{cursorstreamwrappertest_8cpp_ad7be74dba4df64b632deef663f49ee1d_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{cursorstreamwrappertest_8cpp_aa928a9ee549a92b19b936232e5b80529}\index{cursorstreamwrappertest.cpp@{cursorstreamwrappertest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!cursorstreamwrappertest.cpp@{cursorstreamwrappertest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [2/9]}}
+{\footnotesize\ttfamily \label{cursorstreamwrappertest_8cpp_aa928a9ee549a92b19b936232e5b80529} 
+TEST (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_cursor_stream_wrapper}{Cursor\+Stream\+Wrapper}}}]{}{, }\item[{Missing\+Array\+Comma}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{cursorstreamwrappertest_8cpp_source_l00090}{90}} of file \mbox{\hyperlink{cursorstreamwrappertest_8cpp_source}{cursorstreamwrappertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00091\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ json[]\ =\ \textcolor{stringliteral}{"{}\{\(\backslash\)"{}string\(\backslash\)"{}\(\backslash\)n\(\backslash\)n:\(\backslash\)"{}my\ string\(\backslash\)"{},\(\backslash\)"{}array\(\backslash\)"{}\(\backslash\)n:[\(\backslash\)"{}1\(\backslash\)"{}\ \(\backslash\)"{}2\(\backslash\)"{},\ \(\backslash\)"{}3\(\backslash\)"{}]\}"{}};}
+\DoxyCodeLine{00092\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ col,\ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}};}
+\DoxyCodeLine{00093\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{cursorstreamwrappertest_8cpp_a275da0d1f29dba3630a7ba31e01101e2}{testJson}}(json,\ line,\ col);}
+\DoxyCodeLine{00094\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}});}
+\DoxyCodeLine{00095\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(line,\ 4u);}
+\DoxyCodeLine{00096\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(col,\ 6u);}
+\DoxyCodeLine{00097\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{cursorstreamwrappertest_8cpp_aa928a9ee549a92b19b936232e5b80529_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{cursorstreamwrappertest_8cpp_ad4f41f82ee5faf1e197735d085678b10}\index{cursorstreamwrappertest.cpp@{cursorstreamwrappertest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!cursorstreamwrappertest.cpp@{cursorstreamwrappertest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [3/9]}}
+{\footnotesize\ttfamily \label{cursorstreamwrappertest_8cpp_ad4f41f82ee5faf1e197735d085678b10} 
+TEST (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_cursor_stream_wrapper}{Cursor\+Stream\+Wrapper}}}]{}{, }\item[{Missing\+Colon}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{cursorstreamwrappertest_8cpp_source_l00054}{54}} of file \mbox{\hyperlink{cursorstreamwrappertest_8cpp_source}{cursorstreamwrappertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00055\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ json[]\ =\ \textcolor{stringliteral}{"{}\{\(\backslash\)"{}string\(\backslash\)"{}\(\backslash\)n\(\backslash\)n\(\backslash\)"{}my\ string\(\backslash\)"{},\(\backslash\)"{}array\(\backslash\)"{}\(\backslash\)n:[\(\backslash\)"{}1\(\backslash\)"{},\ \(\backslash\)"{}2\(\backslash\)"{},\ \(\backslash\)"{}3\(\backslash\)"{}]\}"{}};}
+\DoxyCodeLine{00056\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ col,\ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}};}
+\DoxyCodeLine{00057\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{cursorstreamwrappertest_8cpp_a275da0d1f29dba3630a7ba31e01101e2}{testJson}}(json,\ line,\ col);}
+\DoxyCodeLine{00058\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}});}
+\DoxyCodeLine{00059\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(line,\ 3u);}
+\DoxyCodeLine{00060\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(col,\ 0u);}
+\DoxyCodeLine{00061\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{cursorstreamwrappertest_8cpp_ad4f41f82ee5faf1e197735d085678b10_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{cursorstreamwrappertest_8cpp_a540fcbc4d8110c5cf1e394bef973864e}\index{cursorstreamwrappertest.cpp@{cursorstreamwrappertest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!cursorstreamwrappertest.cpp@{cursorstreamwrappertest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [4/9]}}
+{\footnotesize\ttfamily \label{cursorstreamwrappertest_8cpp_a540fcbc4d8110c5cf1e394bef973864e} 
+TEST (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_cursor_stream_wrapper}{Cursor\+Stream\+Wrapper}}}]{}{, }\item[{Missing\+Comma}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{cursorstreamwrappertest_8cpp_source_l00072}{72}} of file \mbox{\hyperlink{cursorstreamwrappertest_8cpp_source}{cursorstreamwrappertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00073\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ json[]\ =\ \textcolor{stringliteral}{"{}\{\(\backslash\)"{}string\(\backslash\)"{}\(\backslash\)n\(\backslash\)n:\(\backslash\)"{}my\ string\(\backslash\)"{}\(\backslash\)"{}array\(\backslash\)"{}\(\backslash\)n:[\(\backslash\)"{}1\(\backslash\)"{},\ \(\backslash\)"{}2\(\backslash\)"{},\ \(\backslash\)"{}3\(\backslash\)"{}]\}"{}};}
+\DoxyCodeLine{00074\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ col,\ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}};}
+\DoxyCodeLine{00075\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{cursorstreamwrappertest_8cpp_a275da0d1f29dba3630a7ba31e01101e2}{testJson}}(json,\ line,\ col);}
+\DoxyCodeLine{00076\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}});}
+\DoxyCodeLine{00077\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(line,\ 3u);}
+\DoxyCodeLine{00078\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(col,\ 12u);}
+\DoxyCodeLine{00079\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{cursorstreamwrappertest_8cpp_a540fcbc4d8110c5cf1e394bef973864e_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{cursorstreamwrappertest_8cpp_ac4fb8d3acd98f897e36fa6bc9d54583d}\index{cursorstreamwrappertest.cpp@{cursorstreamwrappertest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!cursorstreamwrappertest.cpp@{cursorstreamwrappertest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [5/9]}}
+{\footnotesize\ttfamily \label{cursorstreamwrappertest_8cpp_ac4fb8d3acd98f897e36fa6bc9d54583d} 
+TEST (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_cursor_stream_wrapper}{Cursor\+Stream\+Wrapper}}}]{}{, }\item[{Missing\+First\+Bracket}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{cursorstreamwrappertest_8cpp_source_l00036}{36}} of file \mbox{\hyperlink{cursorstreamwrappertest_8cpp_source}{cursorstreamwrappertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00037\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ json[]\ =\ \textcolor{stringliteral}{"{}\(\backslash\)"{}string\(\backslash\)"{}\(\backslash\)n\(\backslash\)n:\(\backslash\)"{}my\ string\(\backslash\)"{},\(\backslash\)"{}array\(\backslash\)"{}\(\backslash\)n:[\(\backslash\)"{}1\(\backslash\)"{},\ \(\backslash\)"{}2\(\backslash\)"{},\ \(\backslash\)"{}3\(\backslash\)"{}]\}"{}};}
+\DoxyCodeLine{00038\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ col,\ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}};}
+\DoxyCodeLine{00039\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{cursorstreamwrappertest_8cpp_a275da0d1f29dba3630a7ba31e01101e2}{testJson}}(json,\ line,\ col);}
+\DoxyCodeLine{00040\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}});}
+\DoxyCodeLine{00041\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(line,\ 3u);}
+\DoxyCodeLine{00042\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(col,\ 0u);}
+\DoxyCodeLine{00043\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{cursorstreamwrappertest_8cpp_ac4fb8d3acd98f897e36fa6bc9d54583d_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{cursorstreamwrappertest_8cpp_ac4cf5478a8fa67307f2b5d2213aca3a8}\index{cursorstreamwrappertest.cpp@{cursorstreamwrappertest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!cursorstreamwrappertest.cpp@{cursorstreamwrappertest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [6/9]}}
+{\footnotesize\ttfamily \label{cursorstreamwrappertest_8cpp_ac4cf5478a8fa67307f2b5d2213aca3a8} 
+TEST (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_cursor_stream_wrapper}{Cursor\+Stream\+Wrapper}}}]{}{, }\item[{Missing\+Last\+Array\+Bracket}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{cursorstreamwrappertest_8cpp_source_l00099}{99}} of file \mbox{\hyperlink{cursorstreamwrappertest_8cpp_source}{cursorstreamwrappertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00100\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ json8[]\ =\ \textcolor{stringliteral}{"{}\{\(\backslash\)"{}string\(\backslash\)"{}\(\backslash\)n\(\backslash\)n:\(\backslash\)"{}my\ string\(\backslash\)"{},\(\backslash\)"{}array\(\backslash\)"{}\(\backslash\)n:[\(\backslash\)"{}1\(\backslash\)"{},\ \(\backslash\)"{}2\(\backslash\)"{},\ \(\backslash\)"{}3\(\backslash\)"{}\}"{}};}
+\DoxyCodeLine{00101\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ col,\ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}};}
+\DoxyCodeLine{00102\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{cursorstreamwrappertest_8cpp_a275da0d1f29dba3630a7ba31e01101e2}{testJson}}(json8,\ line,\ col);}
+\DoxyCodeLine{00103\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}});}
+\DoxyCodeLine{00104\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(line,\ 4u);}
+\DoxyCodeLine{00105\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(col,\ 15u);}
+\DoxyCodeLine{00106\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{cursorstreamwrappertest_8cpp_ac4cf5478a8fa67307f2b5d2213aca3a8_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{cursorstreamwrappertest_8cpp_a6bd684af3886ac0848edf1a8bdfc5c66}\index{cursorstreamwrappertest.cpp@{cursorstreamwrappertest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!cursorstreamwrappertest.cpp@{cursorstreamwrappertest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [7/9]}}
+{\footnotesize\ttfamily \label{cursorstreamwrappertest_8cpp_a6bd684af3886ac0848edf1a8bdfc5c66} 
+TEST (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_cursor_stream_wrapper}{Cursor\+Stream\+Wrapper}}}]{}{, }\item[{Missing\+Last\+Bracket}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{cursorstreamwrappertest_8cpp_source_l00108}{108}} of file \mbox{\hyperlink{cursorstreamwrappertest_8cpp_source}{cursorstreamwrappertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00109\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ json9[]\ =\ \textcolor{stringliteral}{"{}\{\(\backslash\)"{}string\(\backslash\)"{}\(\backslash\)n\(\backslash\)n:\(\backslash\)"{}my\ string\(\backslash\)"{},\(\backslash\)"{}array\(\backslash\)"{}\(\backslash\)n:[\(\backslash\)"{}1\(\backslash\)"{},\ \(\backslash\)"{}2\(\backslash\)"{},\ \(\backslash\)"{}3\(\backslash\)"{}]"{}};}
+\DoxyCodeLine{00110\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ col,\ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}};}
+\DoxyCodeLine{00111\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{cursorstreamwrappertest_8cpp_a275da0d1f29dba3630a7ba31e01101e2}{testJson}}(json9,\ line,\ col);}
+\DoxyCodeLine{00112\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}});}
+\DoxyCodeLine{00113\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(line,\ 4u);}
+\DoxyCodeLine{00114\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(col,\ 16u);}
+\DoxyCodeLine{00115\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{cursorstreamwrappertest_8cpp_a6bd684af3886ac0848edf1a8bdfc5c66_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{cursorstreamwrappertest_8cpp_ae8b36851bf3b3305e4292794cdd52ddc}\index{cursorstreamwrappertest.cpp@{cursorstreamwrappertest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!cursorstreamwrappertest.cpp@{cursorstreamwrappertest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [8/9]}}
+{\footnotesize\ttfamily \label{cursorstreamwrappertest_8cpp_ae8b36851bf3b3305e4292794cdd52ddc} 
+TEST (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_cursor_stream_wrapper}{Cursor\+Stream\+Wrapper}}}]{}{, }\item[{Missing\+Quotes}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{cursorstreamwrappertest_8cpp_source_l00045}{45}} of file \mbox{\hyperlink{cursorstreamwrappertest_8cpp_source}{cursorstreamwrappertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00046\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ json[]\ =\ \textcolor{stringliteral}{"{}\{\(\backslash\)"{}string\(\backslash\)n\(\backslash\)n:\(\backslash\)"{}my\ string\(\backslash\)"{},\(\backslash\)"{}array\(\backslash\)"{}\(\backslash\)n:[\(\backslash\)"{}1\(\backslash\)"{},\ \(\backslash\)"{}2\(\backslash\)"{},\ \(\backslash\)"{}3\(\backslash\)"{}]\}"{}};}
+\DoxyCodeLine{00047\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ col,\ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}};}
+\DoxyCodeLine{00048\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{cursorstreamwrappertest_8cpp_a275da0d1f29dba3630a7ba31e01101e2}{testJson}}(json,\ line,\ col);}
+\DoxyCodeLine{00049\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}});}
+\DoxyCodeLine{00050\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(line,\ 1u);}
+\DoxyCodeLine{00051\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(col,\ 8u);}
+\DoxyCodeLine{00052\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{cursorstreamwrappertest_8cpp_ae8b36851bf3b3305e4292794cdd52ddc_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{cursorstreamwrappertest_8cpp_a128a1978f9d76e5b8f33a73fb193cd69}\index{cursorstreamwrappertest.cpp@{cursorstreamwrappertest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!cursorstreamwrappertest.cpp@{cursorstreamwrappertest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [9/9]}}
+{\footnotesize\ttfamily \label{cursorstreamwrappertest_8cpp_a128a1978f9d76e5b8f33a73fb193cd69} 
+TEST (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_cursor_stream_wrapper}{Cursor\+Stream\+Wrapper}}}]{}{, }\item[{Missing\+Second\+Quotes}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{cursorstreamwrappertest_8cpp_source_l00063}{63}} of file \mbox{\hyperlink{cursorstreamwrappertest_8cpp_source}{cursorstreamwrappertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00064\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ json[]\ =\ \textcolor{stringliteral}{"{}\{\(\backslash\)"{}string\(\backslash\)"{}\(\backslash\)n\(\backslash\)n:my\ string\(\backslash\)"{},\(\backslash\)"{}array\(\backslash\)"{}\(\backslash\)n:[\(\backslash\)"{}1\(\backslash\)"{},\ \(\backslash\)"{}2\(\backslash\)"{},\ \(\backslash\)"{}3\(\backslash\)"{}]\}"{}};}
+\DoxyCodeLine{00065\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ col,\ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}};}
+\DoxyCodeLine{00066\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{cursorstreamwrappertest_8cpp_a275da0d1f29dba3630a7ba31e01101e2}{testJson}}(json,\ line,\ col);}
+\DoxyCodeLine{00067\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}});}
+\DoxyCodeLine{00068\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(line,\ 3u);}
+\DoxyCodeLine{00069\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(col,\ 1u);}
+\DoxyCodeLine{00070\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{cursorstreamwrappertest_8cpp_a128a1978f9d76e5b8f33a73fb193cd69_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{cursorstreamwrappertest_8cpp_a275da0d1f29dba3630a7ba31e01101e2}\index{cursorstreamwrappertest.cpp@{cursorstreamwrappertest.cpp}!testJson@{testJson}}
+\index{testJson@{testJson}!cursorstreamwrappertest.cpp@{cursorstreamwrappertest.cpp}}
+\doxysubsubsection{\texorpdfstring{testJson()}{testJson()}}
+{\footnotesize\ttfamily \label{cursorstreamwrappertest_8cpp_a275da0d1f29dba3630a7ba31e01101e2} 
+bool test\+Json (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{json}{, }\item[{size\+\_\+t \&}]{line}{, }\item[{size\+\_\+t \&}]{col}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{cursorstreamwrappertest_8cpp_source_l00023}{23}} of file \mbox{\hyperlink{cursorstreamwrappertest_8cpp_source}{cursorstreamwrappertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00024\ \ \ \ \ \mbox{\hyperlink{struct_generic_string_stream}{StringStream}}\ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}(json);}
+\DoxyCodeLine{00025\ \ \ \ \ \mbox{\hyperlink{class_cursor_stream_wrapper}{CursorStreamWrapper<StringStream>}}\ csw(ss);}
+\DoxyCodeLine{00026\ \ \ \ \ \mbox{\hyperlink{class_generic_document}{Document}}\ document;}
+\DoxyCodeLine{00027\ \ \ \ \ document.\mbox{\hyperlink{class_generic_document_a7bc1827a7ab04de4789fe46237f0e921}{ParseStream}}(csw);}
+\DoxyCodeLine{00028\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ document.\mbox{\hyperlink{class_generic_document_a510a0588db4eb372f5d81bc3646578fb}{HasParseError}}();}
+\DoxyCodeLine{00029\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}})\ \{}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ col\ =\ csw.GetColumn();}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}\ =\ csw.GetLine();}
+\DoxyCodeLine{00032\ \ \ \ \ \}}
+\DoxyCodeLine{00033\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00034\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{cursorstreamwrappertest_8cpp_a275da0d1f29dba3630a7ba31e01101e2_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=211pt]{cursorstreamwrappertest_8cpp_a275da0d1f29dba3630a7ba31e01101e2_icgraph}
+\end{center}
+\end{figure}

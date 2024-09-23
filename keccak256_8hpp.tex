@@ -1,0 +1,247 @@
+\doxysection{libraries/fc/include/fc/crypto/keccak256.hpp File Reference}
+\hypertarget{keccak256_8hpp}{}\label{keccak256_8hpp}\index{libraries/fc/include/fc/crypto/keccak256.hpp@{libraries/fc/include/fc/crypto/keccak256.hpp}}
+{\ttfamily \#include $<$cstdint$>$}\newline
+Include dependency graph for keccak256.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=206pt]{keccak256_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{keccak256_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_s_h_a3___c_t_x}{SHA3\+\_\+\+CTX}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{keccak256_8hpp_ae3783949296691c530f589cfbf5ee78e}{\+\_\+\+\_\+\+KECCAK256\+\_\+\+HPP\+\_\+}}
+\item 
+\#define \mbox{\hyperlink{keccak256_8hpp_adb7d0dfadf407bc9372b1636f4cd62e3}{sha3\+\_\+max\+\_\+permutation\+\_\+size}}~25
+\item 
+\#define \mbox{\hyperlink{keccak256_8hpp_a2a57db99c99b73eee9196f401c15b807}{sha3\+\_\+max\+\_\+rate\+\_\+in\+\_\+qwords}}~24
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef struct SHA3\+\_\+\+CTX \mbox{\hyperlink{keccak256_8hpp_ae5c989c3bd6a8f2d2abf7b33f430b996}{SHA3\+\_\+\+CTX}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{keccak256_8hpp_a11facd9a5ba2fa670b8adac99c9b885c}{keccak\+\_\+init}} (\mbox{\hyperlink{struct_s_h_a3___c_t_x}{SHA3\+\_\+\+CTX}} \texorpdfstring{$\ast$}{*}ctx)
+\item 
+void \mbox{\hyperlink{keccak256_8hpp_a3a3c3f80dd9847bffcaa8e638aefef12}{keccak\+\_\+update}} (\mbox{\hyperlink{struct_s_h_a3___c_t_x}{SHA3\+\_\+\+CTX}} \texorpdfstring{$\ast$}{*}ctx, const unsigned char \texorpdfstring{$\ast$}{*}msg, \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} size)
+\item 
+void \mbox{\hyperlink{keccak256_8hpp_ab3d065f3af63d47a27d94d60a38422b5}{keccak\+\_\+final}} (\mbox{\hyperlink{struct_s_h_a3___c_t_x}{SHA3\+\_\+\+CTX}} \texorpdfstring{$\ast$}{*}ctx, unsigned char \texorpdfstring{$\ast$}{*}result)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{keccak256_8hpp_ae3783949296691c530f589cfbf5ee78e}\index{keccak256.hpp@{keccak256.hpp}!\_\_KECCAK256\_HPP\_@{\_\_KECCAK256\_HPP\_}}
+\index{\_\_KECCAK256\_HPP\_@{\_\_KECCAK256\_HPP\_}!keccak256.hpp@{keccak256.hpp}}
+\doxysubsubsection{\texorpdfstring{\_\_KECCAK256\_HPP\_}{\_\_KECCAK256\_HPP\_}}
+{\footnotesize\ttfamily \label{keccak256_8hpp_ae3783949296691c530f589cfbf5ee78e} 
+\#define \+\_\+\+\_\+\+KECCAK256\+\_\+\+HPP\+\_\+}
+
+
+
+Definition at line \mbox{\hyperlink{keccak256_8hpp_source_l00025}{25}} of file \mbox{\hyperlink{keccak256_8hpp_source}{keccak256.\+hpp}}.
+
+\Hypertarget{keccak256_8hpp_adb7d0dfadf407bc9372b1636f4cd62e3}\index{keccak256.hpp@{keccak256.hpp}!sha3\_max\_permutation\_size@{sha3\_max\_permutation\_size}}
+\index{sha3\_max\_permutation\_size@{sha3\_max\_permutation\_size}!keccak256.hpp@{keccak256.hpp}}
+\doxysubsubsection{\texorpdfstring{sha3\_max\_permutation\_size}{sha3\_max\_permutation\_size}}
+{\footnotesize\ttfamily \label{keccak256_8hpp_adb7d0dfadf407bc9372b1636f4cd62e3} 
+\#define sha3\+\_\+max\+\_\+permutation\+\_\+size~25}
+
+
+
+Definition at line \mbox{\hyperlink{keccak256_8hpp_source_l00027}{27}} of file \mbox{\hyperlink{keccak256_8hpp_source}{keccak256.\+hpp}}.
+
+\Hypertarget{keccak256_8hpp_a2a57db99c99b73eee9196f401c15b807}\index{keccak256.hpp@{keccak256.hpp}!sha3\_max\_rate\_in\_qwords@{sha3\_max\_rate\_in\_qwords}}
+\index{sha3\_max\_rate\_in\_qwords@{sha3\_max\_rate\_in\_qwords}!keccak256.hpp@{keccak256.hpp}}
+\doxysubsubsection{\texorpdfstring{sha3\_max\_rate\_in\_qwords}{sha3\_max\_rate\_in\_qwords}}
+{\footnotesize\ttfamily \label{keccak256_8hpp_a2a57db99c99b73eee9196f401c15b807} 
+\#define sha3\+\_\+max\+\_\+rate\+\_\+in\+\_\+qwords~24}
+
+
+
+Definition at line \mbox{\hyperlink{keccak256_8hpp_source_l00028}{28}} of file \mbox{\hyperlink{keccak256_8hpp_source}{keccak256.\+hpp}}.
+
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{keccak256_8hpp_ae5c989c3bd6a8f2d2abf7b33f430b996}\index{keccak256.hpp@{keccak256.hpp}!SHA3\_CTX@{SHA3\_CTX}}
+\index{SHA3\_CTX@{SHA3\_CTX}!keccak256.hpp@{keccak256.hpp}}
+\doxysubsubsection{\texorpdfstring{SHA3\_CTX}{SHA3\_CTX}}
+{\footnotesize\ttfamily \label{keccak256_8hpp_ae5c989c3bd6a8f2d2abf7b33f430b996} 
+typedef struct SHA3\+\_\+\+CTX SHA3\+\_\+\+CTX}
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{keccak256_8hpp_ab3d065f3af63d47a27d94d60a38422b5}\index{keccak256.hpp@{keccak256.hpp}!keccak\_final@{keccak\_final}}
+\index{keccak\_final@{keccak\_final}!keccak256.hpp@{keccak256.hpp}}
+\doxysubsubsection{\texorpdfstring{keccak\_final()}{keccak\_final()}}
+{\footnotesize\ttfamily \label{keccak256_8hpp_ab3d065f3af63d47a27d94d60a38422b5} 
+void keccak\+\_\+final (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_s_h_a3___c_t_x}{SHA3\+\_\+\+CTX}} \texorpdfstring{$\ast$}{*}}]{ctx}{, }\item[{unsigned char \texorpdfstring{$\ast$}{*}}]{result}{}\end{DoxyParamCaption})}
+
+Store calculated hash into the given array.
+
+
+\begin{DoxyParams}{Parameters}
+{\em ctx} & the algorithm context containing current hashing state \\
+\hline
+{\em result} & calculated hash in binary form \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{keccak256_8cpp_source_l00220}{220}} of file \mbox{\hyperlink{keccak256_8cpp_source}{keccak256.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00221\ \{}
+\DoxyCodeLine{00222\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a66a5beeab221445b2b3142a490574638}{digest\_length}}\ =\ 100\ -\/\ \mbox{\hyperlink{keccak256_8cpp_ad51ded0bbd705f02f73fc60c0b721ced}{BLOCK\_SIZE}}\ /\ 2;}
+\DoxyCodeLine{00223\ }
+\DoxyCodeLine{00224\ \textcolor{comment}{//\ \ \ \ if\ (!(ctx-\/>rest\ \&\ SHA3\_FINALIZED))\ \{}}
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ clear\ the\ rest\ of\ the\ data\ queue\ */}}
+\DoxyCodeLine{00226\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}((\textcolor{keywordtype}{char}*)ctx-\/>\mbox{\hyperlink{struct_s_h_a3___c_t_x_a37957cb14d1f29d6e3c8b86c13baf86c}{message}}\ +\ ctx-\/>\mbox{\hyperlink{struct_s_h_a3___c_t_x_a206aeef34e8cabe7390884ef5c131999}{rest}},\ 0,\ \mbox{\hyperlink{keccak256_8cpp_ad51ded0bbd705f02f73fc60c0b721ced}{BLOCK\_SIZE}}\ -\/\ ctx-\/>\mbox{\hyperlink{struct_s_h_a3___c_t_x_a206aeef34e8cabe7390884ef5c131999}{rest}});}
+\DoxyCodeLine{00227\ \ \ \ \ \ \ \ \ ((\textcolor{keywordtype}{char}*)ctx-\/>\mbox{\hyperlink{struct_s_h_a3___c_t_x_a37957cb14d1f29d6e3c8b86c13baf86c}{message}})[ctx-\/>\mbox{\hyperlink{struct_s_h_a3___c_t_x_a206aeef34e8cabe7390884ef5c131999}{rest}}]\ |=\ 0x01;}
+\DoxyCodeLine{00228\ \ \ \ \ \ \ \ \ ((\textcolor{keywordtype}{char}*)ctx-\/>\mbox{\hyperlink{struct_s_h_a3___c_t_x_a37957cb14d1f29d6e3c8b86c13baf86c}{message}})[\mbox{\hyperlink{keccak256_8cpp_ad51ded0bbd705f02f73fc60c0b721ced}{BLOCK\_SIZE}}\ -\/\ 1]\ |=\ 0x80;}
+\DoxyCodeLine{00229\ }
+\DoxyCodeLine{00230\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ process\ final\ block\ */}}
+\DoxyCodeLine{00231\ \ \ \ \ \ \ \ \ sha3\_process\_block(ctx-\/>\mbox{\hyperlink{struct_s_h_a3___c_t_x_a7fcec2ce062e8a73ec6db44d20e86b1f}{hash}},\ ctx-\/>\mbox{\hyperlink{struct_s_h_a3___c_t_x_a37957cb14d1f29d6e3c8b86c13baf86c}{message}});}
+\DoxyCodeLine{00232\ \textcolor{comment}{//\ \ \ \ \ \ \ \ ctx-\/>rest\ =\ SHA3\_FINALIZED;\ /*\ mark\ context\ as\ finalized\ */}}
+\DoxyCodeLine{00233\ \textcolor{comment}{//\ \ \ \ \}}}
+\DoxyCodeLine{00234\ }
+\DoxyCodeLine{00235\ \ \ \ \ \textcolor{keywordflow}{if}\ (result)\ \{}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{keccak256_8cpp_a3890097089ffb7fd62e6b218500fb27d}{me64\_to\_le\_str}}(result,\ ctx-\/>\mbox{\hyperlink{struct_s_h_a3___c_t_x_a7fcec2ce062e8a73ec6db44d20e86b1f}{hash}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a66a5beeab221445b2b3142a490574638}{digest\_length}});}
+\DoxyCodeLine{00237\ \ \ \ \ \}}
+\DoxyCodeLine{00238\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=238pt]{keccak256_8hpp_ab3d065f3af63d47a27d94d60a38422b5_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=303pt]{keccak256_8hpp_ab3d065f3af63d47a27d94d60a38422b5_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{keccak256_8hpp_a11facd9a5ba2fa670b8adac99c9b885c}\index{keccak256.hpp@{keccak256.hpp}!keccak\_init@{keccak\_init}}
+\index{keccak\_init@{keccak\_init}!keccak256.hpp@{keccak256.hpp}}
+\doxysubsubsection{\texorpdfstring{keccak\_init()}{keccak\_init()}}
+{\footnotesize\ttfamily \label{keccak256_8hpp_a11facd9a5ba2fa670b8adac99c9b885c} 
+void keccak\+\_\+init (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_s_h_a3___c_t_x}{SHA3\+\_\+\+CTX}} \texorpdfstring{$\ast$}{*}}]{ctx}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{keccak256_8cpp_source_l00075}{75}} of file \mbox{\hyperlink{keccak256_8cpp_source}{keccak256.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00076\ \ \ \ \ \textcolor{comment}{/*\ NB:\ The\ Keccak\ capacity\ parameter\ =\ bits\ *\ 2\ */}}
+\DoxyCodeLine{00077\ }
+\DoxyCodeLine{00078\ \ \ \ \ std::memset(ctx,\ 0,\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{struct_s_h_a3___c_t_x}{SHA3\_CTX}}));}
+\DoxyCodeLine{00079\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=297pt]{keccak256_8hpp_a11facd9a5ba2fa670b8adac99c9b885c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{keccak256_8hpp_a3a3c3f80dd9847bffcaa8e638aefef12}\index{keccak256.hpp@{keccak256.hpp}!keccak\_update@{keccak\_update}}
+\index{keccak\_update@{keccak\_update}!keccak256.hpp@{keccak256.hpp}}
+\doxysubsubsection{\texorpdfstring{keccak\_update()}{keccak\_update()}}
+{\footnotesize\ttfamily \label{keccak256_8hpp_a3a3c3f80dd9847bffcaa8e638aefef12} 
+void keccak\+\_\+update (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_s_h_a3___c_t_x}{SHA3\+\_\+\+CTX}} \texorpdfstring{$\ast$}{*}}]{ctx}{, }\item[{const unsigned char \texorpdfstring{$\ast$}{*}}]{msg}{, }\item[{\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}}}]{size}{}\end{DoxyParamCaption})}
+
+Calculate message hash. Can be called repeatedly with chunks of the message to be hashed.
+
+
+\begin{DoxyParams}{Parameters}
+{\em ctx} & the algorithm context containing current hashing state \\
+\hline
+{\em msg} & message chunk \\
+\hline
+{\em size} & length of the message chunk \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{keccak256_8cpp_source_l00175}{175}} of file \mbox{\hyperlink{keccak256_8cpp_source}{keccak256.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00176\ \{}
+\DoxyCodeLine{00177\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ =\ (\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}})ctx-\/>\mbox{\hyperlink{struct_s_h_a3___c_t_x_a206aeef34e8cabe7390884ef5c131999}{rest}};}
+\DoxyCodeLine{00178\ }
+\DoxyCodeLine{00179\ \ \ \ \ \textcolor{comment}{//if\ (ctx-\/>rest\ \&\ SHA3\_FINALIZED)\ return;\ /*\ too\ late\ for\ additional\ input\ */}}
+\DoxyCodeLine{00180\ \ \ \ \ ctx-\/>\mbox{\hyperlink{struct_s_h_a3___c_t_x_a206aeef34e8cabe7390884ef5c131999}{rest}}\ =\ (unsigned)((ctx-\/>\mbox{\hyperlink{struct_s_h_a3___c_t_x_a206aeef34e8cabe7390884ef5c131999}{rest}}\ +\ size)\ \%\ \mbox{\hyperlink{keccak256_8cpp_ad51ded0bbd705f02f73fc60c0b721ced}{BLOCK\_SIZE}});}
+\DoxyCodeLine{00181\ }
+\DoxyCodeLine{00182\ \ \ \ \ \textcolor{comment}{/*\ fill\ partial\ block\ */}}
+\DoxyCodeLine{00183\ \ \ \ \ \textcolor{keywordflow}{if}\ (idx)\ \{}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ left\ =\ \mbox{\hyperlink{keccak256_8cpp_ad51ded0bbd705f02f73fc60c0b721ced}{BLOCK\_SIZE}}\ -\/\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}};}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}((\textcolor{keywordtype}{char}*)ctx-\/>\mbox{\hyperlink{struct_s_h_a3___c_t_x_a37957cb14d1f29d6e3c8b86c13baf86c}{message}}\ +\ idx,\ msg,\ (size\ <\ left\ ?\ size\ :\ left));}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (size\ <\ left)\ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00187\ }
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ process\ partial\ block\ */}}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ sha3\_process\_block(ctx-\/>\mbox{\hyperlink{struct_s_h_a3___c_t_x_a7fcec2ce062e8a73ec6db44d20e86b1f}{hash}},\ ctx-\/>\mbox{\hyperlink{struct_s_h_a3___c_t_x_a37957cb14d1f29d6e3c8b86c13baf86c}{message}});}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ msg\ \ +=\ left;}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ size\ -\/=\ left;}
+\DoxyCodeLine{00192\ \ \ \ \ \}}
+\DoxyCodeLine{00193\ }
+\DoxyCodeLine{00194\ \ \ \ \ \textcolor{keywordflow}{while}\ (size\ >=\ \mbox{\hyperlink{keccak256_8cpp_ad51ded0bbd705f02f73fc60c0b721ced}{BLOCK\_SIZE}})\ \{}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}*\ aligned\_message\_block;}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{keccak256_8cpp_a2f82bf392f983fcf9a7c3d8b86d52aeb}{IS\_ALIGNED\_64}}(msg))\ \{}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ the\ most\ common\ case\ is\ processing\ of\ an\ already\ aligned\ message\ without\ copying\ it}}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \ \ \ \ aligned\_message\_block\ =\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}*)(\textcolor{keywordtype}{void}*)msg;}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(ctx-\/>\mbox{\hyperlink{struct_s_h_a3___c_t_x_a37957cb14d1f29d6e3c8b86c13baf86c}{message}},\ msg,\ \mbox{\hyperlink{keccak256_8cpp_ad51ded0bbd705f02f73fc60c0b721ced}{BLOCK\_SIZE}});}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \ \ \ \ \ \ aligned\_message\_block\ =\ ctx-\/>\mbox{\hyperlink{struct_s_h_a3___c_t_x_a37957cb14d1f29d6e3c8b86c13baf86c}{message}};}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00203\ }
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ sha3\_process\_block(ctx-\/>\mbox{\hyperlink{struct_s_h_a3___c_t_x_a7fcec2ce062e8a73ec6db44d20e86b1f}{hash}},\ aligned\_message\_block);}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ msg\ \ +=\ \mbox{\hyperlink{keccak256_8cpp_ad51ded0bbd705f02f73fc60c0b721ced}{BLOCK\_SIZE}};}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ size\ -\/=\ \mbox{\hyperlink{keccak256_8cpp_ad51ded0bbd705f02f73fc60c0b721ced}{BLOCK\_SIZE}};}
+\DoxyCodeLine{00207\ \ \ \ \ \}}
+\DoxyCodeLine{00208\ }
+\DoxyCodeLine{00209\ \ \ \ \ \textcolor{keywordflow}{if}\ (size)\ \{}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(ctx-\/>\mbox{\hyperlink{struct_s_h_a3___c_t_x_a37957cb14d1f29d6e3c8b86c13baf86c}{message}},\ msg,\ size);\ \textcolor{comment}{/*\ save\ leftovers\ */}}
+\DoxyCodeLine{00211\ \ \ \ \ \}}
+\DoxyCodeLine{00212\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=252pt]{keccak256_8hpp_a3a3c3f80dd9847bffcaa8e638aefef12_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=314pt]{keccak256_8hpp_a3a3c3f80dd9847bffcaa8e638aefef12_icgraph}
+\end{center}
+\end{figure}

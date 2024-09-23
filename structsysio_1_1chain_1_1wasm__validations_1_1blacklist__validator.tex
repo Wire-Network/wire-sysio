@@ -1,0 +1,81 @@
+\doxysection{sysio\+::chain\+::wasm\+\_\+validations\+::blacklist\+\_\+validator Struct Reference}
+\hypertarget{structsysio_1_1chain_1_1wasm__validations_1_1blacklist__validator}{}\label{structsysio_1_1chain_1_1wasm__validations_1_1blacklist__validator}\index{sysio::chain::wasm\_validations::blacklist\_validator@{sysio::chain::wasm\_validations::blacklist\_validator}}
+
+
+{\ttfamily \#include $<$wasm\+\_\+sysio\+\_\+validation.\+hpp$>$}
+
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static void \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__validations_1_1blacklist__validator_a036ccdf655f3b60b907a786c4d737f42}{accept}} (\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1instr}{wasm\+\_\+ops\+::instr}} \texorpdfstring{$\ast$}{*}inst, \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1visitor__arg}{wasm\+\_\+ops\+::visitor\+\_\+arg}} \&arg)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static constexpr bool \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__validations_1_1blacklist__validator_a405505595f32c78350552f90529a087d}{kills}} = true
+\item 
+static constexpr bool \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__validations_1_1blacklist__validator_aa5a7b704f0715bc18d20380d2b05ad26}{post}} = false
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__validation_8hpp_source_l00094}{94}} of file \mbox{\hyperlink{wasm__sysio__validation_8hpp_source}{wasm\+\_\+sysio\+\_\+validation.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1chain_1_1wasm__validations_1_1blacklist__validator_a036ccdf655f3b60b907a786c4d737f42}\index{sysio::chain::wasm\_validations::blacklist\_validator@{sysio::chain::wasm\_validations::blacklist\_validator}!accept@{accept}}
+\index{accept@{accept}!sysio::chain::wasm\_validations::blacklist\_validator@{sysio::chain::wasm\_validations::blacklist\_validator}}
+\doxysubsubsection{\texorpdfstring{accept()}{accept()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__validations_1_1blacklist__validator_a036ccdf655f3b60b907a786c4d737f42} 
+static void sysio\+::chain\+::wasm\+\_\+validations\+::blacklist\+\_\+validator\+::accept (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1instr}{wasm\+\_\+ops\+::instr}} \texorpdfstring{$\ast$}{*}}]{inst}{, }\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1visitor__arg}{wasm\+\_\+ops\+::visitor\+\_\+arg}} \&}]{arg}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__validation_8hpp_source_l00097}{97}} of file \mbox{\hyperlink{wasm__sysio__validation_8hpp_source}{wasm\+\_\+sysio\+\_\+validation.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(wasm\_execution\_error,\ \textcolor{stringliteral}{"{}Error,\ blacklisted\ opcode\ \$\{op\}\ "{}},\ }
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}op"{}},\ inst-\/>to\_string()));}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=331pt]{structsysio_1_1chain_1_1wasm__validations_1_1blacklist__validator_a036ccdf655f3b60b907a786c4d737f42_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1chain_1_1wasm__validations_1_1blacklist__validator_a405505595f32c78350552f90529a087d}\index{sysio::chain::wasm\_validations::blacklist\_validator@{sysio::chain::wasm\_validations::blacklist\_validator}!kills@{kills}}
+\index{kills@{kills}!sysio::chain::wasm\_validations::blacklist\_validator@{sysio::chain::wasm\_validations::blacklist\_validator}}
+\doxysubsubsection{\texorpdfstring{kills}{kills}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__validations_1_1blacklist__validator_a405505595f32c78350552f90529a087d} 
+bool sysio\+::chain\+::wasm\+\_\+validations\+::blacklist\+\_\+validator\+::kills = true\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__validation_8hpp_source_l00095}{95}} of file \mbox{\hyperlink{wasm__sysio__validation_8hpp_source}{wasm\+\_\+sysio\+\_\+validation.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__validations_1_1blacklist__validator_aa5a7b704f0715bc18d20380d2b05ad26}\index{sysio::chain::wasm\_validations::blacklist\_validator@{sysio::chain::wasm\_validations::blacklist\_validator}!post@{post}}
+\index{post@{post}!sysio::chain::wasm\_validations::blacklist\_validator@{sysio::chain::wasm\_validations::blacklist\_validator}}
+\doxysubsubsection{\texorpdfstring{post}{post}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__validations_1_1blacklist__validator_aa5a7b704f0715bc18d20380d2b05ad26} 
+bool sysio\+::chain\+::wasm\+\_\+validations\+::blacklist\+\_\+validator\+::post = false\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__validation_8hpp_source_l00096}{96}} of file \mbox{\hyperlink{wasm__sysio__validation_8hpp_source}{wasm\+\_\+sysio\+\_\+validation.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{wasm__sysio__validation_8hpp}{wasm\+\_\+sysio\+\_\+validation.\+hpp}}\end{DoxyCompactItemize}

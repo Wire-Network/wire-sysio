@@ -1,0 +1,9 @@
+<map id="main" name="main">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,35,55,60"/>
+<area shape="rect" id="Node000002" href="$handler__switch_8cpp.html#a66234a1fbcdc53905337d6f7641a4bac" title=" " alt="" coords="124,5,238,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="55,40,109,29,110,35,56,45"/>
+<area shape="rect" id="Node000004" href="$classwebsocketpp_1_1endpoint.html#a34a3a8351bff65ba878975be471cab85" title=" " alt="" coords="103,55,259,96"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="56,49,88,56,87,61,55,55"/>
+<area shape="rect" id="Node000003" href="$handler__switch_8cpp.html#aa81df315f4822ef645ece28a64078243" title=" " alt="" coords="307,5,424,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="238,16,291,16,291,21,238,21"/>
+</map>

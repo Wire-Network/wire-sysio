@@ -1,0 +1,219 @@
+\doxysection{libraries/fc/test/test\+\_\+base64.cpp File Reference}
+\hypertarget{test__base64_8cpp}{}\label{test__base64_8cpp}\index{libraries/fc/test/test\_base64.cpp@{libraries/fc/test/test\_base64.cpp}}
+{\ttfamily \#include $<$boost/test/included/unit\+\_\+test.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/crypto/base64.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/exception/exception.\+hpp$>$}\newline
+Include dependency graph for test\+\_\+base64.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__base64_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{test__base64_8cpp_a6b2a3852db8bb19ab6909bac01859985}{BOOST\+\_\+\+TEST\+\_\+\+MODULE}}~base64
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{test__base64_8cpp_ad9d8221f773236656fca0b014edc22bb}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (base64enc)
+\item 
+\mbox{\hyperlink{test__base64_8cpp_ae70bfa24f5a3bc0917382b3c17fc033c}{FC\+\_\+\+LOG\+\_\+\+AND\+\_\+\+RETHROW}} ()
+\item 
+\mbox{\hyperlink{test__base64_8cpp_a70e608d742ab625fc39fda8773febc56}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (base64urlenc)
+\item 
+\mbox{\hyperlink{test__base64_8cpp_a3fc6e74e3484d4d83733556dfd262a26}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (base64dec)
+\item 
+\mbox{\hyperlink{test__base64_8cpp_a11a6641ff5fa56f8bde75180bd6972ff}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (base64urldec)
+\item 
+\mbox{\hyperlink{test__base64_8cpp_a6e265b7a5b149881ca4930b60f81a63d}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (base64dec\+\_\+extraequals)
+\item 
+\mbox{\hyperlink{test__base64_8cpp_a3a774316ed62f39d1f627d48b514a522}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (base64dec\+\_\+bad\+\_\+stuff)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{test__base64_8cpp_a6b2a3852db8bb19ab6909bac01859985}\index{test\_base64.cpp@{test\_base64.cpp}!BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}}
+\index{BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}!test\_base64.cpp@{test\_base64.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_TEST\_MODULE}{BOOST\_TEST\_MODULE}}
+{\footnotesize\ttfamily \label{test__base64_8cpp_a6b2a3852db8bb19ab6909bac01859985} 
+\#define BOOST\+\_\+\+TEST\+\_\+\+MODULE~base64}
+
+
+
+Definition at line \mbox{\hyperlink{test__base64_8cpp_source_l00001}{1}} of file \mbox{\hyperlink{test__base64_8cpp_source}{test\+\_\+base64.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{test__base64_8cpp_a3fc6e74e3484d4d83733556dfd262a26}\index{test\_base64.cpp@{test\_base64.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!test\_base64.cpp@{test\_base64.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/6]}}
+{\footnotesize\ttfamily \label{test__base64_8cpp_a3fc6e74e3484d4d83733556dfd262a26} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{base64dec}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__base64_8cpp_source_l00026}{26}} of file \mbox{\hyperlink{test__base64_8cpp_source}{test\+\_\+base64.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00027\ \ \ \ \textcolor{keyword}{auto}\ input\ =\ \textcolor{stringliteral}{"{}YWJjMTIzJCYoKSc/tPUB+n5h"{}}\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{00028\ \ \ \ \textcolor{keyword}{auto}\ expected\_output\ =\ \textcolor{stringliteral}{"{}abc123\$\&()'?\(\backslash\)xb4\(\backslash\)xf5\(\backslash\)x01\(\backslash\)xfa\string~a"{}}\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{00029\ }
+\DoxyCodeLine{00030\ \ \ \ BOOST\_CHECK\_EQUAL(expected\_output,\ \mbox{\hyperlink{namespacefc_ae8deb03ba4f32aa68c5dcc62578ea2de}{base64\_decode}}(input));}
+\DoxyCodeLine{00031\ \}\ \mbox{\hyperlink{test__base64_8cpp_ae70bfa24f5a3bc0917382b3c17fc033c}{FC\_LOG\_AND\_RETHROW}}();}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__base64_8cpp_a3fc6e74e3484d4d83733556dfd262a26_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__base64_8cpp_a3a774316ed62f39d1f627d48b514a522}\index{test\_base64.cpp@{test\_base64.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!test\_base64.cpp@{test\_base64.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/6]}}
+{\footnotesize\ttfamily \label{test__base64_8cpp_a3a774316ed62f39d1f627d48b514a522} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{base64dec\+\_\+bad\+\_\+stuff}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__base64_8cpp_source_l00047}{47}} of file \mbox{\hyperlink{test__base64_8cpp_source}{test\+\_\+base64.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00048\ \ \ \ \textcolor{keyword}{auto}\ input\ =\ \textcolor{stringliteral}{"{}YWJjMTIzJCYoKSc/tPU\$B+n5h="{}}\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{00049\ }
+\DoxyCodeLine{00050\ \ \ \ BOOST\_CHECK\_EXCEPTION(\mbox{\hyperlink{namespacefc_ae8deb03ba4f32aa68c5dcc62578ea2de}{base64\_decode}}(input),\ \mbox{\hyperlink{classfc_1_1exception}{fc::exception}},\ [](\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1exception}{fc::exception}}\&\ e)\ \{}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ e.\mbox{\hyperlink{classfc_1_1exception_a7611ea8fbe25dde56649b685c2298a37}{to\_detail\_string}}().find(\textcolor{stringliteral}{"{}encountered\ non-\/base64\ character"{}})\ !=\ std::string::npos;}
+\DoxyCodeLine{00052\ \ \ \ \});}
+\DoxyCodeLine{00053\ \}\ \mbox{\hyperlink{test__base64_8cpp_ae70bfa24f5a3bc0917382b3c17fc033c}{FC\_LOG\_AND\_RETHROW}}();}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__base64_8cpp_a3a774316ed62f39d1f627d48b514a522_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__base64_8cpp_a6e265b7a5b149881ca4930b60f81a63d}\index{test\_base64.cpp@{test\_base64.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!test\_base64.cpp@{test\_base64.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [3/6]}}
+{\footnotesize\ttfamily \label{test__base64_8cpp_a6e265b7a5b149881ca4930b60f81a63d} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{base64dec\+\_\+extraequals}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__base64_8cpp_source_l00040}{40}} of file \mbox{\hyperlink{test__base64_8cpp_source}{test\+\_\+base64.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00041\ \ \ \ \textcolor{keyword}{auto}\ input\ =\ \textcolor{stringliteral}{"{}YWJjMTIzJCYoKSc/tPUB+n5h========="{}}\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{00042\ \ \ \ \textcolor{keyword}{auto}\ expected\_output\ =\ \textcolor{stringliteral}{"{}abc123\$\&()'?\(\backslash\)xb4\(\backslash\)xf5\(\backslash\)x01\(\backslash\)xfa\string~a"{}}\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{00043\ }
+\DoxyCodeLine{00044\ \ \ \ BOOST\_CHECK\_EQUAL(expected\_output,\ \mbox{\hyperlink{namespacefc_ae8deb03ba4f32aa68c5dcc62578ea2de}{base64\_decode}}(input));}
+\DoxyCodeLine{00045\ \}\ \mbox{\hyperlink{test__base64_8cpp_ae70bfa24f5a3bc0917382b3c17fc033c}{FC\_LOG\_AND\_RETHROW}}();}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__base64_8cpp_a6e265b7a5b149881ca4930b60f81a63d_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__base64_8cpp_ad9d8221f773236656fca0b014edc22bb}\index{test\_base64.cpp@{test\_base64.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!test\_base64.cpp@{test\_base64.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [4/6]}}
+{\footnotesize\ttfamily \label{test__base64_8cpp_ad9d8221f773236656fca0b014edc22bb} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{base64enc}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__base64_8cpp_source_l00012}{12}} of file \mbox{\hyperlink{test__base64_8cpp_source}{test\+\_\+base64.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00012\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00013\ \ \ \ \textcolor{keyword}{auto}\ input\ =\ \textcolor{stringliteral}{"{}abc123\$\&()'?\(\backslash\)xb4\(\backslash\)xf5\(\backslash\)x01\(\backslash\)xfa\string~a"{}}\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{00014\ \ \ \ \textcolor{keyword}{auto}\ expected\_output\ =\ \textcolor{stringliteral}{"{}YWJjMTIzJCYoKSc/tPUB+n5h"{}}\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{00015\ }
+\DoxyCodeLine{00016\ \ \ \ BOOST\_CHECK\_EQUAL(expected\_output,\ \mbox{\hyperlink{namespacefc_a3668095306e6c6c4c53de5d7701e4dde}{base64\_encode}}(input));}
+\DoxyCodeLine{00017\ \}\ \mbox{\hyperlink{test__base64_8cpp_ae70bfa24f5a3bc0917382b3c17fc033c}{FC\_LOG\_AND\_RETHROW}}();}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__base64_8cpp_ad9d8221f773236656fca0b014edc22bb_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__base64_8cpp_a11a6641ff5fa56f8bde75180bd6972ff}\index{test\_base64.cpp@{test\_base64.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!test\_base64.cpp@{test\_base64.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [5/6]}}
+{\footnotesize\ttfamily \label{test__base64_8cpp_a11a6641ff5fa56f8bde75180bd6972ff} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{base64urldec}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__base64_8cpp_source_l00033}{33}} of file \mbox{\hyperlink{test__base64_8cpp_source}{test\+\_\+base64.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00034\ \ \ \ \textcolor{keyword}{auto}\ input\ =\ \textcolor{stringliteral}{"{}YWJjMTIzJCYoKSc\_tPUB-\/n5h"{}}\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{00035\ \ \ \ \textcolor{keyword}{auto}\ expected\_output\ =\ \textcolor{stringliteral}{"{}abc123\$\&()'?\(\backslash\)xb4\(\backslash\)xf5\(\backslash\)x01\(\backslash\)xfa\string~a"{}}\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{00036\ }
+\DoxyCodeLine{00037\ \ \ \ BOOST\_CHECK\_EQUAL(expected\_output,\ \mbox{\hyperlink{namespacefc_a68369d37f3fb275fd019ce5c1f2e92ed}{base64url\_decode}}(input));}
+\DoxyCodeLine{00038\ \}\ \mbox{\hyperlink{test__base64_8cpp_ae70bfa24f5a3bc0917382b3c17fc033c}{FC\_LOG\_AND\_RETHROW}}();}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__base64_8cpp_a11a6641ff5fa56f8bde75180bd6972ff_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__base64_8cpp_a70e608d742ab625fc39fda8773febc56}\index{test\_base64.cpp@{test\_base64.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!test\_base64.cpp@{test\_base64.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [6/6]}}
+{\footnotesize\ttfamily \label{test__base64_8cpp_a70e608d742ab625fc39fda8773febc56} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{base64urlenc}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__base64_8cpp_source_l00019}{19}} of file \mbox{\hyperlink{test__base64_8cpp_source}{test\+\_\+base64.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00020\ \ \ \ \textcolor{keyword}{auto}\ input\ =\ \textcolor{stringliteral}{"{}abc123\$\&()'?\(\backslash\)xb4\(\backslash\)xf5\(\backslash\)x01\(\backslash\)xfa\string~a"{}}\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{00021\ \ \ \ \textcolor{keyword}{auto}\ expected\_output\ =\ \textcolor{stringliteral}{"{}YWJjMTIzJCYoKSc\_tPUB-\/n5h"{}}\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{00022\ }
+\DoxyCodeLine{00023\ \ \ \ BOOST\_CHECK\_EQUAL(expected\_output,\ \mbox{\hyperlink{namespacefc_a4d30681e99b9cacc0c9b3b8985a5daa4}{base64url\_encode}}(input));}
+\DoxyCodeLine{00024\ \}\ \mbox{\hyperlink{test__base64_8cpp_ae70bfa24f5a3bc0917382b3c17fc033c}{FC\_LOG\_AND\_RETHROW}}();}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__base64_8cpp_a70e608d742ab625fc39fda8773febc56_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__base64_8cpp_ae70bfa24f5a3bc0917382b3c17fc033c}\index{test\_base64.cpp@{test\_base64.cpp}!FC\_LOG\_AND\_RETHROW@{FC\_LOG\_AND\_RETHROW}}
+\index{FC\_LOG\_AND\_RETHROW@{FC\_LOG\_AND\_RETHROW}!test\_base64.cpp@{test\_base64.cpp}}
+\doxysubsubsection{\texorpdfstring{FC\_LOG\_AND\_RETHROW()}{FC\_LOG\_AND\_RETHROW()}}
+{\footnotesize\ttfamily \label{test__base64_8cpp_ae70bfa24f5a3bc0917382b3c17fc033c} 
+FC\+\_\+\+LOG\+\_\+\+AND\+\_\+\+RETHROW (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+

@@ -1,0 +1,734 @@
+\doxysection{libraries/softfloat/source/\+ARM-\/\+VFPv2-\/default\+Na\+N/specialize.h File Reference}
+\hypertarget{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h}{}\label{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h}\index{libraries/softfloat/source/ARM-\/VFPv2-\/defaultNaN/specialize.h@{libraries/softfloat/source/ARM-\/VFPv2-\/defaultNaN/specialize.h}}
+{\ttfamily \#include $<$stdbool.\+h$>$}\newline
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include "{}primitive\+Types.\+h"{}}\newline
+{\ttfamily \#include "{}softfloat.\+h"{}}\newline
+Include dependency graph for specialize.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structcommon_na_n}{common\+NaN}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_ace136b6779a3c3a05887b19a8db6097e}{init\+\_\+detect\+Tininess}}~\mbox{\hyperlink{softfloat_2source_2include_2softfloat_8h_afa9be5679ab03d785820f2474c5ccc6ea45d0b9cb3582d5f04ce1460d0b9777b5}{softfloat\+\_\+tininess\+\_\+before\+Rounding}}
+\item 
+\#define \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_aa24a27313f9523bc60ea72bba7332118}{ui32\+\_\+from\+Pos\+Overflow}}~0x\+FFFFFFFF
+\item 
+\#define \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a9e0b2f62d75c84c1bce7d5b2c20ed053}{ui32\+\_\+from\+Neg\+Overflow}}~0
+\item 
+\#define \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_af7ce552f7d28687c9451a0efb9661c6c}{ui32\+\_\+from\+NaN}}~0
+\item 
+\#define \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_af89d1ac4448b17ad636e44bbd6bd349b}{i32\+\_\+from\+Pos\+Overflow}}~0x7\+FFFFFFF
+\item 
+\#define \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a85fee30f971a5082f769eb5dc8816d81}{i32\+\_\+from\+Neg\+Overflow}}~(-\/0x7\+FFFFFFF -\/ 1)
+\item 
+\#define \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_ae76a1f9a6a89f3407daa88aefdfa4d84}{i32\+\_\+from\+NaN}}~0
+\item 
+\#define \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a5e704ae714fd023365dceb7cfe14f2dc}{ui64\+\_\+from\+Pos\+Overflow}}~\mbox{\hyperlink{stdint_8h_a8da5373e041921aa34c2b6172ac3babc}{UINT64\+\_\+C}}( 0x\+FFFFFFFFFFFFFFFF )
+\item 
+\#define \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a6c157e1f00abf6a1b307a83dfcc107d7}{ui64\+\_\+from\+Neg\+Overflow}}~0
+\item 
+\#define \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a7a4ae6cfea07a2d6c7bf6c1849e44d87}{ui64\+\_\+from\+NaN}}~0
+\item 
+\#define \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_af38f53a03504c6cc4f84b0f3df1c5bf6}{i64\+\_\+from\+Pos\+Overflow}}~\mbox{\hyperlink{stdint_8h_a095799ae3fe39d90cfbbe21ad4713318}{INT64\+\_\+C}}( 0x7\+FFFFFFFFFFFFFFF )
+\item 
+\#define \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_acc823dc6690eaa4abfc7f49ef1fdc4fa}{i64\+\_\+from\+Neg\+Overflow}}~(-\/\mbox{\hyperlink{stdint_8h_a095799ae3fe39d90cfbbe21ad4713318}{INT64\+\_\+C}}( 0x7\+FFFFFFFFFFFFFFF ) -\/ 1)
+\item 
+\#define \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_aa7a325f8cc6020c3ca36643f3746c853}{i64\+\_\+from\+NaN}}~0
+\item 
+\#define \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_ae7d647328b842dbff1fb04b480db8dff}{default\+Na\+NF16\+UI}}~0x7\+E00
+\item 
+\#define \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_abc0281087bce323de3425406f4b56516}{softfloat\+\_\+is\+Sig\+Na\+NF16\+UI}}(uiA)
+\item 
+\#define \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a5f7fbeab5c67d1904b04973a1bb6de1a}{softfloat\+\_\+f16\+UITo\+Common\+NaN}}(uiA,  z\+Ptr)
+\item 
+\#define \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a3d18760b2ff5f8f8b325c31e601a56b0}{softfloat\+\_\+common\+Na\+NTo\+F16\+UI}}(a\+Ptr)
+\item 
+\#define \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a3d01d79473b170fa33aa2a1f63694855}{default\+Na\+NF32\+UI}}~0x7\+FC00000
+\item 
+\#define \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a8336c91cb3231dd160bbd31812dd63e9}{softfloat\+\_\+is\+Sig\+Na\+NF32\+UI}}(uiA)
+\item 
+\#define \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a4ff02fa4513423708e02c2d9021b1014}{softfloat\+\_\+f32\+UITo\+Common\+NaN}}(uiA,  z\+Ptr)
+\item 
+\#define \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_ae7e4a3b3ab5a01871575c54a829bc4ef}{softfloat\+\_\+common\+Na\+NTo\+F32\+UI}}(a\+Ptr)
+\item 
+\#define \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a527c11241bbb93ccd5f20d3ee3ce10e2}{default\+Na\+NF64\+UI}}~\mbox{\hyperlink{stdint_8h_a8da5373e041921aa34c2b6172ac3babc}{UINT64\+\_\+C}}( 0x7\+FF8000000000000 )
+\item 
+\#define \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a894f3f1fcd86adbdd3c27fa55d7f7ee1}{softfloat\+\_\+is\+Sig\+Na\+NF64\+UI}}(uiA)
+\item 
+\#define \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a8acd16868763544115edceb16ef3f3a3}{softfloat\+\_\+f64\+UITo\+Common\+NaN}}(uiA,  z\+Ptr)
+\item 
+\#define \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a85fab1d74bffdec9b5fb210a47515adc}{softfloat\+\_\+common\+Na\+NTo\+F64\+UI}}(a\+Ptr)
+\item 
+\#define \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_ab062611e0c729b33ee1a1517dcfa1ca0}{default\+Na\+NExt\+F80\+UI64}}~0x7\+FFF
+\item 
+\#define \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a5db77c799a311d39ea1f74d787fe88e5}{default\+Na\+NExt\+F80\+UI0}}~\mbox{\hyperlink{stdint_8h_a8da5373e041921aa34c2b6172ac3babc}{UINT64\+\_\+C}}( 0x\+C000000000000000 )
+\item 
+\#define \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a472371a22c79d4419e301c26ebd347e3}{softfloat\+\_\+is\+Sig\+Na\+NExt\+F80\+UI}}(ui\+A64,  ui\+A0)
+\item 
+\#define \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_ae3f051223b059c1bb9d2e78ac96bb8b3}{softfloat\+\_\+ext\+F80\+MTo\+Common\+NaN}}(a\+SPtr,  z\+Ptr)
+\item 
+\#define \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a90557145e757ecf7e7f05038a0e43f89}{default\+Na\+NF128\+UI96}}~0x7\+FFF8000
+\item 
+\#define \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a148679c6f04fba2d44bec8fbb6273417}{default\+Na\+NF128\+UI64}}~0
+\item 
+\#define \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_af037d3b7e3338528bc360e58c903e88c}{default\+Na\+NF128\+UI32}}~0
+\item 
+\#define \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_af0a06796d9f91e1ee4afbdac0bed3449}{default\+Na\+NF128\+UI0}}~0
+\item 
+\#define \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a74de69aaf73ece8f0204032a5e14fef7}{softfloat\+\_\+f128\+MTo\+Common\+NaN}}(a\+WPtr,  z\+Ptr)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_a6ed085329b153773ff76afa0702cf897}{uint\+\_\+fast16\+\_\+t}} \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a0a28af9eb929cdc41f022223db9cf25b}{softfloat\+\_\+propagate\+Na\+NF16\+UI}} (\mbox{\hyperlink{stdint_8h_a6ed085329b153773ff76afa0702cf897}{uint\+\_\+fast16\+\_\+t}} uiA, \mbox{\hyperlink{stdint_8h_a6ed085329b153773ff76afa0702cf897}{uint\+\_\+fast16\+\_\+t}} uiB)
+\item 
+\mbox{\hyperlink{stdint_8h_a8f075c759c74e109e8184306c663809d}{uint\+\_\+fast32\+\_\+t}} \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_ab7ccb9ad1e4fd7bb7f009c32a03248f3}{softfloat\+\_\+propagate\+Na\+NF32\+UI}} (\mbox{\hyperlink{stdint_8h_a8f075c759c74e109e8184306c663809d}{uint\+\_\+fast32\+\_\+t}} uiA, \mbox{\hyperlink{stdint_8h_a8f075c759c74e109e8184306c663809d}{uint\+\_\+fast32\+\_\+t}} uiB)
+\item 
+\mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\+\_\+fast64\+\_\+t}} \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a665c80620cd51560528db5435b02ef34}{softfloat\+\_\+propagate\+Na\+NF64\+UI}} (\mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\+\_\+fast64\+\_\+t}} uiA, \mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\+\_\+fast64\+\_\+t}} uiB)
+\item 
+void \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a9c0d6eed364b76c22461f99db8958007}{softfloat\+\_\+common\+Na\+NTo\+Ext\+F80M}} (const struct \mbox{\hyperlink{structcommon_na_n}{common\+NaN}} \texorpdfstring{$\ast$}{*}a\+Ptr, struct \mbox{\hyperlink{structext_float80_m}{ext\+Float80M}} \texorpdfstring{$\ast$}{*}z\+SPtr)
+\item 
+void \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a6d1fff7785c3407c872c7c2147223b5a}{softfloat\+\_\+propagate\+Na\+NExt\+F80M}} (const struct \mbox{\hyperlink{structext_float80_m}{ext\+Float80M}} \texorpdfstring{$\ast$}{*}a\+SPtr, const struct \mbox{\hyperlink{structext_float80_m}{ext\+Float80M}} \texorpdfstring{$\ast$}{*}b\+SPtr, struct \mbox{\hyperlink{structext_float80_m}{ext\+Float80M}} \texorpdfstring{$\ast$}{*}z\+SPtr)
+\item 
+void \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a5bc83e86f7e5c0d5085dc86ff423c8e4}{softfloat\+\_\+common\+Na\+NTo\+F128M}} (const struct \mbox{\hyperlink{structcommon_na_n}{common\+NaN}} \texorpdfstring{$\ast$}{*}a\+Ptr, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*}z\+WPtr)
+\item 
+void \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a04b5d25277cae924dd506c491f0af1ec}{softfloat\+\_\+propagate\+Na\+NF128M}} (const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*}a\+WPtr, const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*}b\+WPtr, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*}z\+WPtr)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a5db77c799a311d39ea1f74d787fe88e5}\index{specialize.h@{specialize.h}!defaultNaNExtF80UI0@{defaultNaNExtF80UI0}}
+\index{defaultNaNExtF80UI0@{defaultNaNExtF80UI0}!specialize.h@{specialize.h}}
+\doxysubsubsection{\texorpdfstring{defaultNaNExtF80UI0}{defaultNaNExtF80UI0}}
+{\footnotesize\ttfamily \label{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a5db77c799a311d39ea1f74d787fe88e5} 
+\#define default\+Na\+NExt\+F80\+UI0~\mbox{\hyperlink{stdint_8h_a8da5373e041921aa34c2b6172ac3babc}{UINT64\+\_\+C}}( 0x\+C000000000000000 )}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source_l00187}{187}} of file \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source}{specialize.\+h}}.
+
+\Hypertarget{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_ab062611e0c729b33ee1a1517dcfa1ca0}\index{specialize.h@{specialize.h}!defaultNaNExtF80UI64@{defaultNaNExtF80UI64}}
+\index{defaultNaNExtF80UI64@{defaultNaNExtF80UI64}!specialize.h@{specialize.h}}
+\doxysubsubsection{\texorpdfstring{defaultNaNExtF80UI64}{defaultNaNExtF80UI64}}
+{\footnotesize\ttfamily \label{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_ab062611e0c729b33ee1a1517dcfa1ca0} 
+\#define default\+Na\+NExt\+F80\+UI64~0x7\+FFF}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source_l00186}{186}} of file \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source}{specialize.\+h}}.
+
+\Hypertarget{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_af0a06796d9f91e1ee4afbdac0bed3449}\index{specialize.h@{specialize.h}!defaultNaNF128UI0@{defaultNaNF128UI0}}
+\index{defaultNaNF128UI0@{defaultNaNF128UI0}!specialize.h@{specialize.h}}
+\doxysubsubsection{\texorpdfstring{defaultNaNF128UI0}{defaultNaNF128UI0}}
+{\footnotesize\ttfamily \label{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_af0a06796d9f91e1ee4afbdac0bed3449} 
+\#define default\+Na\+NF128\+UI0~0}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source_l00359}{359}} of file \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source}{specialize.\+h}}.
+
+\Hypertarget{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_af037d3b7e3338528bc360e58c903e88c}\index{specialize.h@{specialize.h}!defaultNaNF128UI32@{defaultNaNF128UI32}}
+\index{defaultNaNF128UI32@{defaultNaNF128UI32}!specialize.h@{specialize.h}}
+\doxysubsubsection{\texorpdfstring{defaultNaNF128UI32}{defaultNaNF128UI32}}
+{\footnotesize\ttfamily \label{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_af037d3b7e3338528bc360e58c903e88c} 
+\#define default\+Na\+NF128\+UI32~0}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source_l00358}{358}} of file \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source}{specialize.\+h}}.
+
+\Hypertarget{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a148679c6f04fba2d44bec8fbb6273417}\index{specialize.h@{specialize.h}!defaultNaNF128UI64@{defaultNaNF128UI64}}
+\index{defaultNaNF128UI64@{defaultNaNF128UI64}!specialize.h@{specialize.h}}
+\doxysubsubsection{\texorpdfstring{defaultNaNF128UI64}{defaultNaNF128UI64}}
+{\footnotesize\ttfamily \label{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a148679c6f04fba2d44bec8fbb6273417} 
+\#define default\+Na\+NF128\+UI64~0}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source_l00357}{357}} of file \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source}{specialize.\+h}}.
+
+\Hypertarget{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a90557145e757ecf7e7f05038a0e43f89}\index{specialize.h@{specialize.h}!defaultNaNF128UI96@{defaultNaNF128UI96}}
+\index{defaultNaNF128UI96@{defaultNaNF128UI96}!specialize.h@{specialize.h}}
+\doxysubsubsection{\texorpdfstring{defaultNaNF128UI96}{defaultNaNF128UI96}}
+{\footnotesize\ttfamily \label{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a90557145e757ecf7e7f05038a0e43f89} 
+\#define default\+Na\+NF128\+UI96~0x7\+FFF8000}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source_l00356}{356}} of file \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source}{specialize.\+h}}.
+
+\Hypertarget{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_ae7d647328b842dbff1fb04b480db8dff}\index{specialize.h@{specialize.h}!defaultNaNF16UI@{defaultNaNF16UI}}
+\index{defaultNaNF16UI@{defaultNaNF16UI}!specialize.h@{specialize.h}}
+\doxysubsubsection{\texorpdfstring{defaultNaNF16UI}{defaultNaNF16UI}}
+{\footnotesize\ttfamily \label{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_ae7d647328b842dbff1fb04b480db8dff} 
+\#define default\+Na\+NF16\+UI~0x7\+E00}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source_l00081}{81}} of file \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source}{specialize.\+h}}.
+
+\Hypertarget{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a3d01d79473b170fa33aa2a1f63694855}\index{specialize.h@{specialize.h}!defaultNaNF32UI@{defaultNaNF32UI}}
+\index{defaultNaNF32UI@{defaultNaNF32UI}!specialize.h@{specialize.h}}
+\doxysubsubsection{\texorpdfstring{defaultNaNF32UI}{defaultNaNF32UI}}
+{\footnotesize\ttfamily \label{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a3d01d79473b170fa33aa2a1f63694855} 
+\#define default\+Na\+NF32\+UI~0x7\+FC00000}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source_l00116}{116}} of file \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source}{specialize.\+h}}.
+
+\Hypertarget{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a527c11241bbb93ccd5f20d3ee3ce10e2}\index{specialize.h@{specialize.h}!defaultNaNF64UI@{defaultNaNF64UI}}
+\index{defaultNaNF64UI@{defaultNaNF64UI}!specialize.h@{specialize.h}}
+\doxysubsubsection{\texorpdfstring{defaultNaNF64UI}{defaultNaNF64UI}}
+{\footnotesize\ttfamily \label{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a527c11241bbb93ccd5f20d3ee3ce10e2} 
+\#define default\+Na\+NF64\+UI~\mbox{\hyperlink{stdint_8h_a8da5373e041921aa34c2b6172ac3babc}{UINT64\+\_\+C}}( 0x7\+FF8000000000000 )}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source_l00151}{151}} of file \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source}{specialize.\+h}}.
+
+\Hypertarget{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_ae76a1f9a6a89f3407daa88aefdfa4d84}\index{specialize.h@{specialize.h}!i32\_fromNaN@{i32\_fromNaN}}
+\index{i32\_fromNaN@{i32\_fromNaN}!specialize.h@{specialize.h}}
+\doxysubsubsection{\texorpdfstring{i32\_fromNaN}{i32\_fromNaN}}
+{\footnotesize\ttfamily \label{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_ae76a1f9a6a89f3407daa88aefdfa4d84} 
+\#define i32\+\_\+from\+NaN~0}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source_l00059}{59}} of file \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source}{specialize.\+h}}.
+
+\Hypertarget{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a85fee30f971a5082f769eb5dc8816d81}\index{specialize.h@{specialize.h}!i32\_fromNegOverflow@{i32\_fromNegOverflow}}
+\index{i32\_fromNegOverflow@{i32\_fromNegOverflow}!specialize.h@{specialize.h}}
+\doxysubsubsection{\texorpdfstring{i32\_fromNegOverflow}{i32\_fromNegOverflow}}
+{\footnotesize\ttfamily \label{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a85fee30f971a5082f769eb5dc8816d81} 
+\#define i32\+\_\+from\+Neg\+Overflow~(-\/0x7\+FFFFFFF -\/ 1)}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source_l00058}{58}} of file \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source}{specialize.\+h}}.
+
+\Hypertarget{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_af89d1ac4448b17ad636e44bbd6bd349b}\index{specialize.h@{specialize.h}!i32\_fromPosOverflow@{i32\_fromPosOverflow}}
+\index{i32\_fromPosOverflow@{i32\_fromPosOverflow}!specialize.h@{specialize.h}}
+\doxysubsubsection{\texorpdfstring{i32\_fromPosOverflow}{i32\_fromPosOverflow}}
+{\footnotesize\ttfamily \label{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_af89d1ac4448b17ad636e44bbd6bd349b} 
+\#define i32\+\_\+from\+Pos\+Overflow~0x7\+FFFFFFF}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source_l00057}{57}} of file \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source}{specialize.\+h}}.
+
+\Hypertarget{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_aa7a325f8cc6020c3ca36643f3746c853}\index{specialize.h@{specialize.h}!i64\_fromNaN@{i64\_fromNaN}}
+\index{i64\_fromNaN@{i64\_fromNaN}!specialize.h@{specialize.h}}
+\doxysubsubsection{\texorpdfstring{i64\_fromNaN}{i64\_fromNaN}}
+{\footnotesize\ttfamily \label{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_aa7a325f8cc6020c3ca36643f3746c853} 
+\#define i64\+\_\+from\+NaN~0}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source_l00070}{70}} of file \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source}{specialize.\+h}}.
+
+\Hypertarget{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_acc823dc6690eaa4abfc7f49ef1fdc4fa}\index{specialize.h@{specialize.h}!i64\_fromNegOverflow@{i64\_fromNegOverflow}}
+\index{i64\_fromNegOverflow@{i64\_fromNegOverflow}!specialize.h@{specialize.h}}
+\doxysubsubsection{\texorpdfstring{i64\_fromNegOverflow}{i64\_fromNegOverflow}}
+{\footnotesize\ttfamily \label{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_acc823dc6690eaa4abfc7f49ef1fdc4fa} 
+\#define i64\+\_\+from\+Neg\+Overflow~(-\/\mbox{\hyperlink{stdint_8h_a095799ae3fe39d90cfbbe21ad4713318}{INT64\+\_\+C}}( 0x7\+FFFFFFFFFFFFFFF ) -\/ 1)}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source_l00069}{69}} of file \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source}{specialize.\+h}}.
+
+\Hypertarget{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_af38f53a03504c6cc4f84b0f3df1c5bf6}\index{specialize.h@{specialize.h}!i64\_fromPosOverflow@{i64\_fromPosOverflow}}
+\index{i64\_fromPosOverflow@{i64\_fromPosOverflow}!specialize.h@{specialize.h}}
+\doxysubsubsection{\texorpdfstring{i64\_fromPosOverflow}{i64\_fromPosOverflow}}
+{\footnotesize\ttfamily \label{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_af38f53a03504c6cc4f84b0f3df1c5bf6} 
+\#define i64\+\_\+from\+Pos\+Overflow~\mbox{\hyperlink{stdint_8h_a095799ae3fe39d90cfbbe21ad4713318}{INT64\+\_\+C}}( 0x7\+FFFFFFFFFFFFFFF )}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source_l00068}{68}} of file \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source}{specialize.\+h}}.
+
+\Hypertarget{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_ace136b6779a3c3a05887b19a8db6097e}\index{specialize.h@{specialize.h}!init\_detectTininess@{init\_detectTininess}}
+\index{init\_detectTininess@{init\_detectTininess}!specialize.h@{specialize.h}}
+\doxysubsubsection{\texorpdfstring{init\_detectTininess}{init\_detectTininess}}
+{\footnotesize\ttfamily \label{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_ace136b6779a3c3a05887b19a8db6097e} 
+\#define init\+\_\+detect\+Tininess~\mbox{\hyperlink{softfloat_2source_2include_2softfloat_8h_afa9be5679ab03d785820f2474c5ccc6ea45d0b9cb3582d5f04ce1460d0b9777b5}{softfloat\+\_\+tininess\+\_\+before\+Rounding}}}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source_l00048}{48}} of file \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source}{specialize.\+h}}.
+
+\Hypertarget{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a3d18760b2ff5f8f8b325c31e601a56b0}\index{specialize.h@{specialize.h}!softfloat\_commonNaNToF16UI@{softfloat\_commonNaNToF16UI}}
+\index{softfloat\_commonNaNToF16UI@{softfloat\_commonNaNToF16UI}!specialize.h@{specialize.h}}
+\doxysubsubsection{\texorpdfstring{softfloat\_commonNaNToF16UI}{softfloat\_commonNaNToF16UI}}
+{\footnotesize\ttfamily \label{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a3d18760b2ff5f8f8b325c31e601a56b0} 
+\#define softfloat\+\_\+common\+Na\+NTo\+F16\+UI(\begin{DoxyParamCaption}\item[{}]{a\+Ptr}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((\mbox{\hyperlink{stdint_8h_a6ed085329b153773ff76afa0702cf897}{uint\_fast16\_t}})\ \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_ae7d647328b842dbff1fb04b480db8dff}{defaultNaNF16UI}})}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source_l00102}{102}} of file \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source}{specialize.\+h}}.
+
+\Hypertarget{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_ae7e4a3b3ab5a01871575c54a829bc4ef}\index{specialize.h@{specialize.h}!softfloat\_commonNaNToF32UI@{softfloat\_commonNaNToF32UI}}
+\index{softfloat\_commonNaNToF32UI@{softfloat\_commonNaNToF32UI}!specialize.h@{specialize.h}}
+\doxysubsubsection{\texorpdfstring{softfloat\_commonNaNToF32UI}{softfloat\_commonNaNToF32UI}}
+{\footnotesize\ttfamily \label{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_ae7e4a3b3ab5a01871575c54a829bc4ef} 
+\#define softfloat\+\_\+common\+Na\+NTo\+F32\+UI(\begin{DoxyParamCaption}\item[{}]{a\+Ptr}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((\mbox{\hyperlink{stdint_8h_a8f075c759c74e109e8184306c663809d}{uint\_fast32\_t}})\ \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a3d01d79473b170fa33aa2a1f63694855}{defaultNaNF32UI}})}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source_l00137}{137}} of file \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source}{specialize.\+h}}.
+
+\Hypertarget{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a85fab1d74bffdec9b5fb210a47515adc}\index{specialize.h@{specialize.h}!softfloat\_commonNaNToF64UI@{softfloat\_commonNaNToF64UI}}
+\index{softfloat\_commonNaNToF64UI@{softfloat\_commonNaNToF64UI}!specialize.h@{specialize.h}}
+\doxysubsubsection{\texorpdfstring{softfloat\_commonNaNToF64UI}{softfloat\_commonNaNToF64UI}}
+{\footnotesize\ttfamily \label{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a85fab1d74bffdec9b5fb210a47515adc} 
+\#define softfloat\+\_\+common\+Na\+NTo\+F64\+UI(\begin{DoxyParamCaption}\item[{}]{a\+Ptr}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((\mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\_fast64\_t}})\ \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a527c11241bbb93ccd5f20d3ee3ce10e2}{defaultNaNF64UI}})}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source_l00172}{172}} of file \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source}{specialize.\+h}}.
+
+\Hypertarget{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_ae3f051223b059c1bb9d2e78ac96bb8b3}\index{specialize.h@{specialize.h}!softfloat\_extF80MToCommonNaN@{softfloat\_extF80MToCommonNaN}}
+\index{softfloat\_extF80MToCommonNaN@{softfloat\_extF80MToCommonNaN}!specialize.h@{specialize.h}}
+\doxysubsubsection{\texorpdfstring{softfloat\_extF80MToCommonNaN}{softfloat\_extF80MToCommonNaN}}
+{\footnotesize\ttfamily \label{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_ae3f051223b059c1bb9d2e78ac96bb8b3} 
+\#define softfloat\+\_\+ext\+F80\+MTo\+Common\+NaN(\begin{DoxyParamCaption}\item[{}]{a\+SPtr}{, }\item[{}]{z\+Ptr}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordflow}{if}\ (\ !\ ((aSPtr)-\/>signif\ \&\ \mbox{\hyperlink{stdint_8h_a8da5373e041921aa34c2b6172ac3babc}{UINT64\_C}}(\ 0x4000000000000000\ ))\ )\ \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2softfloat__raise_flags_8c_ac16bbf09eca0fe8ff91301d82c5a667f}{softfloat\_raiseFlags}}(\ \mbox{\hyperlink{softfloat_2source_2include_2softfloat_8h_a56a0f36da7f9eaaf54bd05cc2bf49173a191f069090c3d33752fb728272d9a4a9}{softfloat\_flag\_invalid}}\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source_l00318}{318}} of file \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source}{specialize.\+h}}.
+
+\Hypertarget{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a74de69aaf73ece8f0204032a5e14fef7}\index{specialize.h@{specialize.h}!softfloat\_f128MToCommonNaN@{softfloat\_f128MToCommonNaN}}
+\index{softfloat\_f128MToCommonNaN@{softfloat\_f128MToCommonNaN}!specialize.h@{specialize.h}}
+\doxysubsubsection{\texorpdfstring{softfloat\_f128MToCommonNaN}{softfloat\_f128MToCommonNaN}}
+{\footnotesize\ttfamily \label{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a74de69aaf73ece8f0204032a5e14fef7} 
+\#define softfloat\+\_\+f128\+MTo\+Common\+NaN(\begin{DoxyParamCaption}\item[{}]{a\+WPtr}{, }\item[{}]{z\+Ptr}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordflow}{if}\ (\ !\ ((aWPtr)[\mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_aa3af452dd34ad7a607f4ad31c234fda7}{indexWordHi}}(\ 4\ )]\ \&\ \mbox{\hyperlink{stdint_8h_a8da5373e041921aa34c2b6172ac3babc}{UINT64\_C}}(\ 0x0000800000000000\ ))\ )\ \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2softfloat__raise_flags_8c_ac16bbf09eca0fe8ff91301d82c5a667f}{softfloat\_raiseFlags}}(\ \mbox{\hyperlink{softfloat_2source_2include_2softfloat_8h_a56a0f36da7f9eaaf54bd05cc2bf49173a191f069090c3d33752fb728272d9a4a9}{softfloat\_flag\_invalid}}\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source_l00369}{369}} of file \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source}{specialize.\+h}}.
+
+\Hypertarget{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a5f7fbeab5c67d1904b04973a1bb6de1a}\index{specialize.h@{specialize.h}!softfloat\_f16UIToCommonNaN@{softfloat\_f16UIToCommonNaN}}
+\index{softfloat\_f16UIToCommonNaN@{softfloat\_f16UIToCommonNaN}!specialize.h@{specialize.h}}
+\doxysubsubsection{\texorpdfstring{softfloat\_f16UIToCommonNaN}{softfloat\_f16UIToCommonNaN}}
+{\footnotesize\ttfamily \label{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a5f7fbeab5c67d1904b04973a1bb6de1a} 
+\#define softfloat\+\_\+f16\+UITo\+Common\+NaN(\begin{DoxyParamCaption}\item[{}]{uiA}{, }\item[{}]{z\+Ptr}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordflow}{if}\ (\ !\ ((uiA)\ \&\ 0x0200)\ )\ \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2softfloat__raise_flags_8c_ac16bbf09eca0fe8ff91301d82c5a667f}{softfloat\_raiseFlags}}(\ \mbox{\hyperlink{softfloat_2source_2include_2softfloat_8h_a56a0f36da7f9eaaf54bd05cc2bf49173a191f069090c3d33752fb728272d9a4a9}{softfloat\_flag\_invalid}}\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source_l00096}{96}} of file \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source}{specialize.\+h}}.
+
+\Hypertarget{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a4ff02fa4513423708e02c2d9021b1014}\index{specialize.h@{specialize.h}!softfloat\_f32UIToCommonNaN@{softfloat\_f32UIToCommonNaN}}
+\index{softfloat\_f32UIToCommonNaN@{softfloat\_f32UIToCommonNaN}!specialize.h@{specialize.h}}
+\doxysubsubsection{\texorpdfstring{softfloat\_f32UIToCommonNaN}{softfloat\_f32UIToCommonNaN}}
+{\footnotesize\ttfamily \label{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a4ff02fa4513423708e02c2d9021b1014} 
+\#define softfloat\+\_\+f32\+UITo\+Common\+NaN(\begin{DoxyParamCaption}\item[{}]{uiA}{, }\item[{}]{z\+Ptr}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordflow}{if}\ (\ !\ ((uiA)\ \&\ 0x00400000)\ )\ \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2softfloat__raise_flags_8c_ac16bbf09eca0fe8ff91301d82c5a667f}{softfloat\_raiseFlags}}(\ \mbox{\hyperlink{softfloat_2source_2include_2softfloat_8h_a56a0f36da7f9eaaf54bd05cc2bf49173a191f069090c3d33752fb728272d9a4a9}{softfloat\_flag\_invalid}}\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source_l00131}{131}} of file \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source}{specialize.\+h}}.
+
+\Hypertarget{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a8acd16868763544115edceb16ef3f3a3}\index{specialize.h@{specialize.h}!softfloat\_f64UIToCommonNaN@{softfloat\_f64UIToCommonNaN}}
+\index{softfloat\_f64UIToCommonNaN@{softfloat\_f64UIToCommonNaN}!specialize.h@{specialize.h}}
+\doxysubsubsection{\texorpdfstring{softfloat\_f64UIToCommonNaN}{softfloat\_f64UIToCommonNaN}}
+{\footnotesize\ttfamily \label{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a8acd16868763544115edceb16ef3f3a3} 
+\#define softfloat\+\_\+f64\+UITo\+Common\+NaN(\begin{DoxyParamCaption}\item[{}]{uiA}{, }\item[{}]{z\+Ptr}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordflow}{if}\ (\ !\ ((uiA)\ \&\ \mbox{\hyperlink{stdint_8h_a8da5373e041921aa34c2b6172ac3babc}{UINT64\_C}}(\ 0x0008000000000000\ ))\ )\ \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2softfloat__raise_flags_8c_ac16bbf09eca0fe8ff91301d82c5a667f}{softfloat\_raiseFlags}}(\ \mbox{\hyperlink{softfloat_2source_2include_2softfloat_8h_a56a0f36da7f9eaaf54bd05cc2bf49173a191f069090c3d33752fb728272d9a4a9}{softfloat\_flag\_invalid}}\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source_l00166}{166}} of file \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source}{specialize.\+h}}.
+
+\Hypertarget{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a472371a22c79d4419e301c26ebd347e3}\index{specialize.h@{specialize.h}!softfloat\_isSigNaNExtF80UI@{softfloat\_isSigNaNExtF80UI}}
+\index{softfloat\_isSigNaNExtF80UI@{softfloat\_isSigNaNExtF80UI}!specialize.h@{specialize.h}}
+\doxysubsubsection{\texorpdfstring{softfloat\_isSigNaNExtF80UI}{softfloat\_isSigNaNExtF80UI}}
+{\footnotesize\ttfamily \label{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a472371a22c79d4419e301c26ebd347e3} 
+\#define softfloat\+\_\+is\+Sig\+Na\+NExt\+F80\+UI(\begin{DoxyParamCaption}\item[{}]{ui\+A64}{, }\item[{}]{ui\+A0}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((((uiA64)\ \&\ 0x7FFF)\ ==\ 0x7FFF)\ \&\&\ !\ ((uiA0)\ \&\ \mbox{\hyperlink{stdint_8h_a8da5373e041921aa34c2b6172ac3babc}{UINT64\_C}}(\ 0x4000000000000000\ ))\ \&\&\ ((uiA0)\ \&\ \mbox{\hyperlink{stdint_8h_a8da5373e041921aa34c2b6172ac3babc}{UINT64\_C}}(\ 0x3FFFFFFFFFFFFFFF\ )))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source_l00195}{195}} of file \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source}{specialize.\+h}}.
+
+\Hypertarget{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_abc0281087bce323de3425406f4b56516}\index{specialize.h@{specialize.h}!softfloat\_isSigNaNF16UI@{softfloat\_isSigNaNF16UI}}
+\index{softfloat\_isSigNaNF16UI@{softfloat\_isSigNaNF16UI}!specialize.h@{specialize.h}}
+\doxysubsubsection{\texorpdfstring{softfloat\_isSigNaNF16UI}{softfloat\_isSigNaNF16UI}}
+{\footnotesize\ttfamily \label{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_abc0281087bce323de3425406f4b56516} 
+\#define softfloat\+\_\+is\+Sig\+Na\+NF16\+UI(\begin{DoxyParamCaption}\item[{}]{uiA}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((((uiA)\ \&\ 0x7E00)\ ==\ 0x7C00)\ \&\&\ ((uiA)\ \&\ 0x01FF))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source_l00088}{88}} of file \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source}{specialize.\+h}}.
+
+\Hypertarget{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a8336c91cb3231dd160bbd31812dd63e9}\index{specialize.h@{specialize.h}!softfloat\_isSigNaNF32UI@{softfloat\_isSigNaNF32UI}}
+\index{softfloat\_isSigNaNF32UI@{softfloat\_isSigNaNF32UI}!specialize.h@{specialize.h}}
+\doxysubsubsection{\texorpdfstring{softfloat\_isSigNaNF32UI}{softfloat\_isSigNaNF32UI}}
+{\footnotesize\ttfamily \label{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a8336c91cb3231dd160bbd31812dd63e9} 
+\#define softfloat\+\_\+is\+Sig\+Na\+NF32\+UI(\begin{DoxyParamCaption}\item[{}]{uiA}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((((uiA)\ \&\ 0x7FC00000)\ ==\ 0x7F800000)\ \&\&\ ((uiA)\ \&\ 0x003FFFFF))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source_l00123}{123}} of file \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source}{specialize.\+h}}.
+
+\Hypertarget{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a894f3f1fcd86adbdd3c27fa55d7f7ee1}\index{specialize.h@{specialize.h}!softfloat\_isSigNaNF64UI@{softfloat\_isSigNaNF64UI}}
+\index{softfloat\_isSigNaNF64UI@{softfloat\_isSigNaNF64UI}!specialize.h@{specialize.h}}
+\doxysubsubsection{\texorpdfstring{softfloat\_isSigNaNF64UI}{softfloat\_isSigNaNF64UI}}
+{\footnotesize\ttfamily \label{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a894f3f1fcd86adbdd3c27fa55d7f7ee1} 
+\#define softfloat\+\_\+is\+Sig\+Na\+NF64\+UI(\begin{DoxyParamCaption}\item[{}]{uiA}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((((uiA)\ \&\ \mbox{\hyperlink{stdint_8h_a8da5373e041921aa34c2b6172ac3babc}{UINT64\_C}}(\ 0x7FF8000000000000\ ))\ ==\ \mbox{\hyperlink{stdint_8h_a8da5373e041921aa34c2b6172ac3babc}{UINT64\_C}}(\ 0x7FF0000000000000\ ))\ \&\&\ ((uiA)\ \&\ \mbox{\hyperlink{stdint_8h_a8da5373e041921aa34c2b6172ac3babc}{UINT64\_C}}(\ 0x0007FFFFFFFFFFFF\ )))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source_l00158}{158}} of file \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source}{specialize.\+h}}.
+
+\Hypertarget{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_af7ce552f7d28687c9451a0efb9661c6c}\index{specialize.h@{specialize.h}!ui32\_fromNaN@{ui32\_fromNaN}}
+\index{ui32\_fromNaN@{ui32\_fromNaN}!specialize.h@{specialize.h}}
+\doxysubsubsection{\texorpdfstring{ui32\_fromNaN}{ui32\_fromNaN}}
+{\footnotesize\ttfamily \label{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_af7ce552f7d28687c9451a0efb9661c6c} 
+\#define ui32\+\_\+from\+NaN~0}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source_l00056}{56}} of file \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source}{specialize.\+h}}.
+
+\Hypertarget{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a9e0b2f62d75c84c1bce7d5b2c20ed053}\index{specialize.h@{specialize.h}!ui32\_fromNegOverflow@{ui32\_fromNegOverflow}}
+\index{ui32\_fromNegOverflow@{ui32\_fromNegOverflow}!specialize.h@{specialize.h}}
+\doxysubsubsection{\texorpdfstring{ui32\_fromNegOverflow}{ui32\_fromNegOverflow}}
+{\footnotesize\ttfamily \label{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a9e0b2f62d75c84c1bce7d5b2c20ed053} 
+\#define ui32\+\_\+from\+Neg\+Overflow~0}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source_l00055}{55}} of file \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source}{specialize.\+h}}.
+
+\Hypertarget{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_aa24a27313f9523bc60ea72bba7332118}\index{specialize.h@{specialize.h}!ui32\_fromPosOverflow@{ui32\_fromPosOverflow}}
+\index{ui32\_fromPosOverflow@{ui32\_fromPosOverflow}!specialize.h@{specialize.h}}
+\doxysubsubsection{\texorpdfstring{ui32\_fromPosOverflow}{ui32\_fromPosOverflow}}
+{\footnotesize\ttfamily \label{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_aa24a27313f9523bc60ea72bba7332118} 
+\#define ui32\+\_\+from\+Pos\+Overflow~0x\+FFFFFFFF}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source_l00054}{54}} of file \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source}{specialize.\+h}}.
+
+\Hypertarget{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a7a4ae6cfea07a2d6c7bf6c1849e44d87}\index{specialize.h@{specialize.h}!ui64\_fromNaN@{ui64\_fromNaN}}
+\index{ui64\_fromNaN@{ui64\_fromNaN}!specialize.h@{specialize.h}}
+\doxysubsubsection{\texorpdfstring{ui64\_fromNaN}{ui64\_fromNaN}}
+{\footnotesize\ttfamily \label{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a7a4ae6cfea07a2d6c7bf6c1849e44d87} 
+\#define ui64\+\_\+from\+NaN~0}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source_l00067}{67}} of file \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source}{specialize.\+h}}.
+
+\Hypertarget{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a6c157e1f00abf6a1b307a83dfcc107d7}\index{specialize.h@{specialize.h}!ui64\_fromNegOverflow@{ui64\_fromNegOverflow}}
+\index{ui64\_fromNegOverflow@{ui64\_fromNegOverflow}!specialize.h@{specialize.h}}
+\doxysubsubsection{\texorpdfstring{ui64\_fromNegOverflow}{ui64\_fromNegOverflow}}
+{\footnotesize\ttfamily \label{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a6c157e1f00abf6a1b307a83dfcc107d7} 
+\#define ui64\+\_\+from\+Neg\+Overflow~0}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source_l00066}{66}} of file \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source}{specialize.\+h}}.
+
+\Hypertarget{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a5e704ae714fd023365dceb7cfe14f2dc}\index{specialize.h@{specialize.h}!ui64\_fromPosOverflow@{ui64\_fromPosOverflow}}
+\index{ui64\_fromPosOverflow@{ui64\_fromPosOverflow}!specialize.h@{specialize.h}}
+\doxysubsubsection{\texorpdfstring{ui64\_fromPosOverflow}{ui64\_fromPosOverflow}}
+{\footnotesize\ttfamily \label{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a5e704ae714fd023365dceb7cfe14f2dc} 
+\#define ui64\+\_\+from\+Pos\+Overflow~\mbox{\hyperlink{stdint_8h_a8da5373e041921aa34c2b6172ac3babc}{UINT64\+\_\+C}}( 0x\+FFFFFFFFFFFFFFFF )}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source_l00065}{65}} of file \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_source}{specialize.\+h}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a9c0d6eed364b76c22461f99db8958007}\index{specialize.h@{specialize.h}!softfloat\_commonNaNToExtF80M@{softfloat\_commonNaNToExtF80M}}
+\index{softfloat\_commonNaNToExtF80M@{softfloat\_commonNaNToExtF80M}!specialize.h@{specialize.h}}
+\doxysubsubsection{\texorpdfstring{softfloat\_commonNaNToExtF80M()}{softfloat\_commonNaNToExtF80M()}}
+{\footnotesize\ttfamily \label{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a9c0d6eed364b76c22461f99db8958007} 
+void softfloat\+\_\+common\+Na\+NTo\+Ext\+F80M (\begin{DoxyParamCaption}\item[{const struct \mbox{\hyperlink{structcommon_na_n}{common\+NaN}} \texorpdfstring{$\ast$}{*}}]{a\+Ptr}{, }\item[{struct \mbox{\hyperlink{structext_float80_m}{ext\+Float80M}} \texorpdfstring{$\ast$}{*}}]{z\+SPtr}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2s__common_na_n_to_ext_f80_m_8c_source_l00048}{48}} of file \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2s__common_na_n_to_ext_f80_m_8c_source}{s\+\_\+common\+Na\+NTo\+Ext\+F80\+M.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00050\ \{}
+\DoxyCodeLine{00051\ }
+\DoxyCodeLine{00052\ \ \ \ \ zSPtr-\/>\mbox{\hyperlink{structext_float80_m_afcc87c4645279344c5365a291766afe2}{signExp}}\ =\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a5e62ae06b6c2a91feb5b6e8175082250}{packToExtF80UI64}}(\ aPtr-\/>\mbox{\hyperlink{structcommon_na_n_a32e90937a4ec3878d2620fbafd31a16f}{sign}},\ 0x7FFF\ );}
+\DoxyCodeLine{00053\ \ \ \ \ zSPtr-\/>\mbox{\hyperlink{structext_float80_m_ac0c736880d01d0abd0a818e658755b3b}{signif}}\ =\ \mbox{\hyperlink{stdint_8h_a8da5373e041921aa34c2b6172ac3babc}{UINT64\_C}}(\ 0xC000000000000000\ )\ |\ aPtr-\/>\mbox{\hyperlink{structcommon_na_n_a05124b0293f6d395ce047744b12deff6}{v64}}>>1;}
+\DoxyCodeLine{00054\ }
+\DoxyCodeLine{00055\ \}}
+
+\end{DoxyCode}
+\Hypertarget{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a5bc83e86f7e5c0d5085dc86ff423c8e4}\index{specialize.h@{specialize.h}!softfloat\_commonNaNToF128M@{softfloat\_commonNaNToF128M}}
+\index{softfloat\_commonNaNToF128M@{softfloat\_commonNaNToF128M}!specialize.h@{specialize.h}}
+\doxysubsubsection{\texorpdfstring{softfloat\_commonNaNToF128M()}{softfloat\_commonNaNToF128M()}}
+{\footnotesize\ttfamily \label{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a5bc83e86f7e5c0d5085dc86ff423c8e4} 
+void softfloat\+\_\+common\+Na\+NTo\+F128M (\begin{DoxyParamCaption}\item[{const struct \mbox{\hyperlink{structcommon_na_n}{common\+NaN}} \texorpdfstring{$\ast$}{*}}]{a\+Ptr}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{z\+WPtr}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2s__common_na_n_to_f128_m_8c_source_l00049}{49}} of file \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2s__common_na_n_to_f128_m_8c_source}{s\+\_\+common\+Na\+NTo\+F128\+M.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00050\ \{}
+\DoxyCodeLine{00051\ }
+\DoxyCodeLine{00052\ \ \ \ \ \mbox{\hyperlink{softfloat_2source_2include_2primitives_8h_af7ca28fe38c3443fd29296502df4991e}{softfloat\_shortShiftRight128M}}(\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ *)\ \&aPtr-\/>\mbox{\hyperlink{structcommon_na_n_ad6c4c9c79bcfd2dc2656b599fa5f75a5}{v0}},\ 16,\ zWPtr\ );}
+\DoxyCodeLine{00053\ \ \ \ \ zWPtr[\mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_aa3af452dd34ad7a607f4ad31c234fda7}{indexWordHi}}(\ 4\ )]\ |=\ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})\ aPtr-\/>\mbox{\hyperlink{structcommon_na_n_a32e90937a4ec3878d2620fbafd31a16f}{sign}}<<31\ |\ 0x7FFF8000;}
+\DoxyCodeLine{00054\ }
+\DoxyCodeLine{00055\ \}}
+
+\end{DoxyCode}
+\Hypertarget{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a6d1fff7785c3407c872c7c2147223b5a}\index{specialize.h@{specialize.h}!softfloat\_propagateNaNExtF80M@{softfloat\_propagateNaNExtF80M}}
+\index{softfloat\_propagateNaNExtF80M@{softfloat\_propagateNaNExtF80M}!specialize.h@{specialize.h}}
+\doxysubsubsection{\texorpdfstring{softfloat\_propagateNaNExtF80M()}{softfloat\_propagateNaNExtF80M()}}
+{\footnotesize\ttfamily \label{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a6d1fff7785c3407c872c7c2147223b5a} 
+void softfloat\+\_\+propagate\+Na\+NExt\+F80M (\begin{DoxyParamCaption}\item[{const struct \mbox{\hyperlink{structext_float80_m}{ext\+Float80M}} \texorpdfstring{$\ast$}{*}}]{a\+SPtr}{, }\item[{const struct \mbox{\hyperlink{structext_float80_m}{ext\+Float80M}} \texorpdfstring{$\ast$}{*}}]{b\+SPtr}{, }\item[{struct \mbox{\hyperlink{structext_float80_m}{ext\+Float80M}} \texorpdfstring{$\ast$}{*}}]{z\+SPtr}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2s__propagate_na_n_ext_f80_m_8c_source_l00051}{51}} of file \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2s__propagate_na_n_ext_f80_m_8c_source}{s\+\_\+propagate\+Na\+NExt\+F80\+M.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00056\ \{}
+\DoxyCodeLine{00057\ \ \ \ \ \textcolor{keywordtype}{bool}\ isSigNaNA;}
+\DoxyCodeLine{00058\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structext_float80_m}{extFloat80M}}\ *sPtr;}
+\DoxyCodeLine{00059\ \ \ \ \ \textcolor{keywordtype}{bool}\ isSigNaNB;}
+\DoxyCodeLine{00060\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a6ed085329b153773ff76afa0702cf897}{uint\_fast16\_t}}\ uiB64;}
+\DoxyCodeLine{00061\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ uiB0;}
+\DoxyCodeLine{00062\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a6ed085329b153773ff76afa0702cf897}{uint\_fast16\_t}}\ uiA64;}
+\DoxyCodeLine{00063\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ uiA0;}
+\DoxyCodeLine{00064\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a6ed085329b153773ff76afa0702cf897}{uint\_fast16\_t}}\ uiMagA64,\ uiMagB64;}
+\DoxyCodeLine{00065\ }
+\DoxyCodeLine{00066\ \ \ \ \ isSigNaNA\ =\ \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2ext_f80_m__is_signaling_na_n_8c_ace8e5230b332cd22bdf612d80da1a3de}{extF80M\_isSignalingNaN}}(\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{structext_float80_m}{extFloat80\_t}}\ *)\ aSPtr\ );}
+\DoxyCodeLine{00067\ \ \ \ \ sPtr\ =\ aSPtr;}
+\DoxyCodeLine{00068\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ !\ bSPtr\ )\ \{}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ isSigNaNA\ )\ \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2softfloat__raise_flags_8c_ac16bbf09eca0fe8ff91301d82c5a667f}{softfloat\_raiseFlags}}(\ \mbox{\hyperlink{softfloat_2source_2include_2softfloat_8h_a56a0f36da7f9eaaf54bd05cc2bf49173a191f069090c3d33752fb728272d9a4a9}{softfloat\_flag\_invalid}}\ );}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ \mbox{\hyperlink{namespacefc_a79771837fffd80fcc4bc658ee2fc4b2b}{copy}};}
+\DoxyCodeLine{00071\ \ \ \ \ \}}
+\DoxyCodeLine{00072\ \ \ \ \ isSigNaNB\ =\ \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2ext_f80_m__is_signaling_na_n_8c_ace8e5230b332cd22bdf612d80da1a3de}{extF80M\_isSignalingNaN}}(\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{structext_float80_m}{extFloat80\_t}}\ *)\ bSPtr\ );}
+\DoxyCodeLine{00073\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ isSigNaNA\ |\ isSigNaNB\ )\ \{}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2softfloat__raise_flags_8c_ac16bbf09eca0fe8ff91301d82c5a667f}{softfloat\_raiseFlags}}(\ \mbox{\hyperlink{softfloat_2source_2include_2softfloat_8h_a56a0f36da7f9eaaf54bd05cc2bf49173a191f069090c3d33752fb728272d9a4a9}{softfloat\_flag\_invalid}}\ );}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ isSigNaNA\ )\ \{}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ uiB64\ =\ bSPtr-\/>\mbox{\hyperlink{structext_float80_m_afcc87c4645279344c5365a291766afe2}{signExp}};}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ isSigNaNB\ )\ \textcolor{keywordflow}{goto}\ returnLargerUIMag;}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \ \ \ uiB0\ =\ bSPtr-\/>\mbox{\hyperlink{structext_float80_m_ac0c736880d01d0abd0a818e658755b3b}{signif}};}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a252e90dd494604f3457bebaae12320b9}{isNaNExtF80UI}}(\ uiB64,\ uiB0\ )\ )\ \textcolor{keywordflow}{goto}\ copyB;}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ \mbox{\hyperlink{namespacefc_a79771837fffd80fcc4bc658ee2fc4b2b}{copy}};}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \ \ \ uiA64\ =\ aSPtr-\/>\mbox{\hyperlink{structext_float80_m_afcc87c4645279344c5365a291766afe2}{signExp}};}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \ \ \ uiA0\ =\ aSPtr-\/>\mbox{\hyperlink{structext_float80_m_ac0c736880d01d0abd0a818e658755b3b}{signif}};}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a252e90dd494604f3457bebaae12320b9}{isNaNExtF80UI}}(\ uiA64,\ uiA0\ )\ )\ \textcolor{keywordflow}{goto}\ \mbox{\hyperlink{namespacefc_a79771837fffd80fcc4bc658ee2fc4b2b}{copy}};}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ copyB;}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00087\ \ \ \ \ \}}
+\DoxyCodeLine{00088\ \ \ \ \ uiB64\ =\ bSPtr-\/>\mbox{\hyperlink{structext_float80_m_afcc87c4645279344c5365a291766afe2}{signExp}};}
+\DoxyCodeLine{00089\ \ returnLargerUIMag:}
+\DoxyCodeLine{00090\ \ \ \ \ uiA64\ =\ aSPtr-\/>\mbox{\hyperlink{structext_float80_m_afcc87c4645279344c5365a291766afe2}{signExp}};}
+\DoxyCodeLine{00091\ \ \ \ \ uiMagA64\ =\ uiA64\ \&\ 0x7FFF;}
+\DoxyCodeLine{00092\ \ \ \ \ uiMagB64\ =\ uiB64\ \&\ 0x7FFF;}
+\DoxyCodeLine{00093\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ uiMagA64\ <\ uiMagB64\ )\ \textcolor{keywordflow}{goto}\ copyB;}
+\DoxyCodeLine{00094\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ uiMagB64\ <\ uiMagA64\ )\ \textcolor{keywordflow}{goto}\ \mbox{\hyperlink{namespacefc_a79771837fffd80fcc4bc658ee2fc4b2b}{copy}};}
+\DoxyCodeLine{00095\ \ \ \ \ uiA0\ =\ aSPtr-\/>\mbox{\hyperlink{structext_float80_m_ac0c736880d01d0abd0a818e658755b3b}{signif}};}
+\DoxyCodeLine{00096\ \ \ \ \ uiB0\ =\ bSPtr-\/>\mbox{\hyperlink{structext_float80_m_ac0c736880d01d0abd0a818e658755b3b}{signif}};}
+\DoxyCodeLine{00097\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ uiA0\ <\ uiB0\ )\ \textcolor{keywordflow}{goto}\ copyB;}
+\DoxyCodeLine{00098\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ uiB0\ <\ uiA0\ )\ \textcolor{keywordflow}{goto}\ \mbox{\hyperlink{namespacefc_a79771837fffd80fcc4bc658ee2fc4b2b}{copy}};}
+\DoxyCodeLine{00099\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ uiA64\ <\ uiB64\ )\ \textcolor{keywordflow}{goto}\ \mbox{\hyperlink{namespacefc_a79771837fffd80fcc4bc658ee2fc4b2b}{copy}};}
+\DoxyCodeLine{00100\ \ copyB:}
+\DoxyCodeLine{00101\ \ \ \ \ sPtr\ =\ bSPtr;}
+\DoxyCodeLine{00102\ \ \mbox{\hyperlink{namespacefc_a79771837fffd80fcc4bc658ee2fc4b2b}{copy}}:}
+\DoxyCodeLine{00103\ \ \ \ \ zSPtr-\/>\mbox{\hyperlink{structext_float80_m_afcc87c4645279344c5365a291766afe2}{signExp}}\ =\ sPtr-\/>\mbox{\hyperlink{structext_float80_m_afcc87c4645279344c5365a291766afe2}{signExp}};}
+\DoxyCodeLine{00104\ \ \ \ \ zSPtr-\/>\mbox{\hyperlink{structext_float80_m_ac0c736880d01d0abd0a818e658755b3b}{signif}}\ =\ sPtr-\/>\mbox{\hyperlink{structext_float80_m_ac0c736880d01d0abd0a818e658755b3b}{signif}}\ |\ \mbox{\hyperlink{stdint_8h_a8da5373e041921aa34c2b6172ac3babc}{UINT64\_C}}(\ 0xC000000000000000\ );}
+\DoxyCodeLine{00105\ }
+\DoxyCodeLine{00106\ \}}
+
+\end{DoxyCode}
+\Hypertarget{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a04b5d25277cae924dd506c491f0af1ec}\index{specialize.h@{specialize.h}!softfloat\_propagateNaNF128M@{softfloat\_propagateNaNF128M}}
+\index{softfloat\_propagateNaNF128M@{softfloat\_propagateNaNF128M}!specialize.h@{specialize.h}}
+\doxysubsubsection{\texorpdfstring{softfloat\_propagateNaNF128M()}{softfloat\_propagateNaNF128M()}}
+{\footnotesize\ttfamily \label{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a04b5d25277cae924dd506c491f0af1ec} 
+void softfloat\+\_\+propagate\+Na\+NF128M (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{a\+WPtr}{, }\item[{const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{b\+WPtr}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{z\+WPtr}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2s__propagate_na_n_f128_m_8c_source_l00053}{53}} of file \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2s__propagate_na_n_f128_m_8c_source}{s\+\_\+propagate\+Na\+NF128\+M.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00055\ \{}
+\DoxyCodeLine{00056\ \ \ \ \ \textcolor{keywordtype}{bool}\ isSigNaNA;}
+\DoxyCodeLine{00057\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ *ptr;}
+\DoxyCodeLine{00058\ }
+\DoxyCodeLine{00059\ \ \ \ \ ptr\ =\ aWPtr;}
+\DoxyCodeLine{00060\ \ \ \ \ isSigNaNA\ =\ \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2f128_m__is_signaling_na_n_8c_a641033e2d5605286e9cdd3e0bf651cb9}{f128M\_isSignalingNaN}}(\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{structfloat128__t}{float128\_t}}\ *)\ aWPtr\ );}
+\DoxyCodeLine{00061\ \ \ \ \ \textcolor{keywordflow}{if}\ (}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ isSigNaNA}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ ||\ (bWPtr\ \&\&\ \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2f128_m__is_signaling_na_n_8c_a641033e2d5605286e9cdd3e0bf651cb9}{f128M\_isSignalingNaN}}(\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{structfloat128__t}{float128\_t}}\ *)\ bWPtr\ ))}
+\DoxyCodeLine{00064\ \ \ \ \ )\ \{}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2softfloat__raise_flags_8c_ac16bbf09eca0fe8ff91301d82c5a667f}{softfloat\_raiseFlags}}(\ \mbox{\hyperlink{softfloat_2source_2include_2softfloat_8h_a56a0f36da7f9eaaf54bd05cc2bf49173a191f069090c3d33752fb728272d9a4a9}{softfloat\_flag\_invalid}}\ );}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ isSigNaNA\ )\ \textcolor{keywordflow}{goto}\ \mbox{\hyperlink{namespacefc_a79771837fffd80fcc4bc658ee2fc4b2b}{copy}};}
+\DoxyCodeLine{00067\ \ \ \ \ \}}
+\DoxyCodeLine{00068\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ !\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a20b9dda0624f400a1cffd66ac207e165}{softfloat\_isNaNF128M}}(\ aWPtr\ )\ )\ ptr\ =\ bWPtr;}
+\DoxyCodeLine{00069\ \ \mbox{\hyperlink{namespacefc_a79771837fffd80fcc4bc658ee2fc4b2b}{copy}}:}
+\DoxyCodeLine{00070\ \ \ \ \ zWPtr[\mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_aa3af452dd34ad7a607f4ad31c234fda7}{indexWordHi}}(\ 4\ )]\ =\ ptr[\mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_aa3af452dd34ad7a607f4ad31c234fda7}{indexWordHi}}(\ 4\ )]\ |\ 0x00008000;}
+\DoxyCodeLine{00071\ \ \ \ \ zWPtr[\mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a49446dd1193996f92b1e5bb62eaa4689}{indexWord}}(\ 4,\ 2\ )]\ =\ ptr[\mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a49446dd1193996f92b1e5bb62eaa4689}{indexWord}}(\ 4,\ 2\ )];}
+\DoxyCodeLine{00072\ \ \ \ \ zWPtr[\mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a49446dd1193996f92b1e5bb62eaa4689}{indexWord}}(\ 4,\ 1\ )]\ =\ ptr[\mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a49446dd1193996f92b1e5bb62eaa4689}{indexWord}}(\ 4,\ 1\ )];}
+\DoxyCodeLine{00073\ \ \ \ \ zWPtr[\mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a49446dd1193996f92b1e5bb62eaa4689}{indexWord}}(\ 4,\ 0\ )]\ =\ ptr[\mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a49446dd1193996f92b1e5bb62eaa4689}{indexWord}}(\ 4,\ 0\ )];}
+\DoxyCodeLine{00074\ }
+\DoxyCodeLine{00075\ \}}
+
+\end{DoxyCode}
+\Hypertarget{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a0a28af9eb929cdc41f022223db9cf25b}\index{specialize.h@{specialize.h}!softfloat\_propagateNaNF16UI@{softfloat\_propagateNaNF16UI}}
+\index{softfloat\_propagateNaNF16UI@{softfloat\_propagateNaNF16UI}!specialize.h@{specialize.h}}
+\doxysubsubsection{\texorpdfstring{softfloat\_propagateNaNF16UI()}{softfloat\_propagateNaNF16UI()}}
+{\footnotesize\ttfamily \label{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a0a28af9eb929cdc41f022223db9cf25b} 
+\mbox{\hyperlink{stdint_8h_a6ed085329b153773ff76afa0702cf897}{uint\+\_\+fast16\+\_\+t}} softfloat\+\_\+propagate\+Na\+NF16\+UI (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a6ed085329b153773ff76afa0702cf897}{uint\+\_\+fast16\+\_\+t}}}]{uiA}{, }\item[{\mbox{\hyperlink{stdint_8h_a6ed085329b153773ff76afa0702cf897}{uint\+\_\+fast16\+\_\+t}}}]{uiB}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2s__propagate_na_n_f16_u_i_8c_source_l00051}{51}} of file \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2s__propagate_na_n_f16_u_i_8c_source}{s\+\_\+propagate\+Na\+NF16\+UI.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00052\ \{}
+\DoxyCodeLine{00053\ \ \ \ \ \textcolor{keywordtype}{bool}\ isSigNaNA;}
+\DoxyCodeLine{00054\ }
+\DoxyCodeLine{00055\ \ \ \ \ isSigNaNA\ =\ \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2specialize_8h_abc0281087bce323de3425406f4b56516}{softfloat\_isSigNaNF16UI}}(\ uiA\ );}
+\DoxyCodeLine{00056\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ isSigNaNA\ ||\ \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2specialize_8h_abc0281087bce323de3425406f4b56516}{softfloat\_isSigNaNF16UI}}(\ uiB\ )\ )\ \{}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2softfloat__raise_flags_8c_ac16bbf09eca0fe8ff91301d82c5a667f}{softfloat\_raiseFlags}}(\ \mbox{\hyperlink{softfloat_2source_2include_2softfloat_8h_a56a0f36da7f9eaaf54bd05cc2bf49173a191f069090c3d33752fb728272d9a4a9}{softfloat\_flag\_invalid}}\ );}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ isSigNaNA\ )\ \textcolor{keywordflow}{return}\ uiA\ |\ 0x0200;}
+\DoxyCodeLine{00059\ \ \ \ \ \}}
+\DoxyCodeLine{00060\ \ \ \ \ \textcolor{keywordflow}{return}\ (\mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a04fd9cc6c846c09355329b8f7a5af495}{isNaNF16UI}}(\ uiA\ )\ ?\ uiA\ :\ uiB)\ |\ 0x0200;}
+\DoxyCodeLine{00061\ }
+\DoxyCodeLine{00062\ \}}
+
+\end{DoxyCode}
+\Hypertarget{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_ab7ccb9ad1e4fd7bb7f009c32a03248f3}\index{specialize.h@{specialize.h}!softfloat\_propagateNaNF32UI@{softfloat\_propagateNaNF32UI}}
+\index{softfloat\_propagateNaNF32UI@{softfloat\_propagateNaNF32UI}!specialize.h@{specialize.h}}
+\doxysubsubsection{\texorpdfstring{softfloat\_propagateNaNF32UI()}{softfloat\_propagateNaNF32UI()}}
+{\footnotesize\ttfamily \label{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_ab7ccb9ad1e4fd7bb7f009c32a03248f3} 
+\mbox{\hyperlink{stdint_8h_a8f075c759c74e109e8184306c663809d}{uint\+\_\+fast32\+\_\+t}} softfloat\+\_\+propagate\+Na\+NF32\+UI (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a8f075c759c74e109e8184306c663809d}{uint\+\_\+fast32\+\_\+t}}}]{uiA}{, }\item[{\mbox{\hyperlink{stdint_8h_a8f075c759c74e109e8184306c663809d}{uint\+\_\+fast32\+\_\+t}}}]{uiB}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2s__propagate_na_n_f32_u_i_8c_source_l00051}{51}} of file \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2s__propagate_na_n_f32_u_i_8c_source}{s\+\_\+propagate\+Na\+NF32\+UI.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00052\ \{}
+\DoxyCodeLine{00053\ \ \ \ \ \textcolor{keywordtype}{bool}\ isSigNaNA;}
+\DoxyCodeLine{00054\ }
+\DoxyCodeLine{00055\ \ \ \ \ isSigNaNA\ =\ \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2specialize_8h_a8336c91cb3231dd160bbd31812dd63e9}{softfloat\_isSigNaNF32UI}}(\ uiA\ );}
+\DoxyCodeLine{00056\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ isSigNaNA\ ||\ \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2specialize_8h_a8336c91cb3231dd160bbd31812dd63e9}{softfloat\_isSigNaNF32UI}}(\ uiB\ )\ )\ \{}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2softfloat__raise_flags_8c_ac16bbf09eca0fe8ff91301d82c5a667f}{softfloat\_raiseFlags}}(\ \mbox{\hyperlink{softfloat_2source_2include_2softfloat_8h_a56a0f36da7f9eaaf54bd05cc2bf49173a191f069090c3d33752fb728272d9a4a9}{softfloat\_flag\_invalid}}\ );}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ isSigNaNA\ )\ \textcolor{keywordflow}{return}\ uiA\ |\ 0x00400000;}
+\DoxyCodeLine{00059\ \ \ \ \ \}}
+\DoxyCodeLine{00060\ \ \ \ \ \textcolor{keywordflow}{return}\ (\mbox{\hyperlink{softfloat_2source_2include_2internals_8h_ae950eca33420281d20e46d498b70fad1}{isNaNF32UI}}(\ uiA\ )\ ?\ uiA\ :\ uiB)\ |\ 0x00400000;}
+\DoxyCodeLine{00061\ }
+\DoxyCodeLine{00062\ \}}
+
+\end{DoxyCode}
+\Hypertarget{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a665c80620cd51560528db5435b02ef34}\index{specialize.h@{specialize.h}!softfloat\_propagateNaNF64UI@{softfloat\_propagateNaNF64UI}}
+\index{softfloat\_propagateNaNF64UI@{softfloat\_propagateNaNF64UI}!specialize.h@{specialize.h}}
+\doxysubsubsection{\texorpdfstring{softfloat\_propagateNaNF64UI()}{softfloat\_propagateNaNF64UI()}}
+{\footnotesize\ttfamily \label{softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2specialize_8h_a665c80620cd51560528db5435b02ef34} 
+\mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\+\_\+fast64\+\_\+t}} softfloat\+\_\+propagate\+Na\+NF64\+UI (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\+\_\+fast64\+\_\+t}}}]{uiA}{, }\item[{\mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\+\_\+fast64\+\_\+t}}}]{uiB}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2s__propagate_na_n_f64_u_i_8c_source_l00051}{51}} of file \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2s__propagate_na_n_f64_u_i_8c_source}{s\+\_\+propagate\+Na\+NF64\+UI.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00052\ \{}
+\DoxyCodeLine{00053\ \ \ \ \ \textcolor{keywordtype}{bool}\ isSigNaNA;}
+\DoxyCodeLine{00054\ }
+\DoxyCodeLine{00055\ \ \ \ \ isSigNaNA\ =\ \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2specialize_8h_a894f3f1fcd86adbdd3c27fa55d7f7ee1}{softfloat\_isSigNaNF64UI}}(\ uiA\ );}
+\DoxyCodeLine{00056\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ isSigNaNA\ ||\ \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2specialize_8h_a894f3f1fcd86adbdd3c27fa55d7f7ee1}{softfloat\_isSigNaNF64UI}}(\ uiB\ )\ )\ \{}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2softfloat__raise_flags_8c_ac16bbf09eca0fe8ff91301d82c5a667f}{softfloat\_raiseFlags}}(\ \mbox{\hyperlink{softfloat_2source_2include_2softfloat_8h_a56a0f36da7f9eaaf54bd05cc2bf49173a191f069090c3d33752fb728272d9a4a9}{softfloat\_flag\_invalid}}\ );}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ isSigNaNA\ )\ \textcolor{keywordflow}{return}\ uiA\ |\ \mbox{\hyperlink{stdint_8h_a8da5373e041921aa34c2b6172ac3babc}{UINT64\_C}}(\ 0x0008000000000000\ );}
+\DoxyCodeLine{00059\ \ \ \ \ \}}
+\DoxyCodeLine{00060\ \ \ \ \ \textcolor{keywordflow}{return}\ (\mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a54cf847b77be110d616ac7048c1cc0cf}{isNaNF64UI}}(\ uiA\ )\ ?\ uiA\ :\ uiB)\ |\ \mbox{\hyperlink{stdint_8h_a8da5373e041921aa34c2b6172ac3babc}{UINT64\_C}}(\ 0x0008000000000000\ );}
+\DoxyCodeLine{00061\ }
+\DoxyCodeLine{00062\ \}}
+
+\end{DoxyCode}

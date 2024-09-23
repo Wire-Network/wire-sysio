@@ -1,0 +1,8 @@
+<map id="mock_endpoint::mock_endpoint" name="mock_endpoint::mock_endpoint">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,65,155,106"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1transport_1_1asio_1_1endpoint.html#a22938eec899a9ab2b9ada2b76172f798" title="Initialize asio transport with internal io_service." alt="" coords="203,29,369,70"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="155,70,187,64,187,70,156,75"/>
+<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1transport_1_1asio_1_1endpoint.html#a26ad1ad26277ed99a691559e69d47932" title="Initialize logging." alt="" coords="207,94,364,150"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="156,96,192,103,191,108,155,101"/>
+<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="247,29,245,19,251,10,265,5,286,3,308,5,321,11,319,16,307,10,286,8,266,10,255,15,250,20,252,28"/>
+</map>

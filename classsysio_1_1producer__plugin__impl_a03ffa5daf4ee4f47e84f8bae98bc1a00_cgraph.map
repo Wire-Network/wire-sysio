@@ -1,0 +1,15 @@
+<map id="sysio::producer_plugin_impl::get_irreversible_block_age" name="sysio::producer_plugin_impl::get_irreversible_block_age">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,96,157,152"/>
+<area shape="rect" id="Node000002" href="$classfc_1_1time__point.html#aa164ff1268a16d4b32afcff181f6100e" title=" " alt="" coords="205,112,337,137"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="157,122,189,122,189,127,157,127"/>
+<area shape="rect" id="Node000003" href="$classfc_1_1mock__time__traits.html#a0bed781012a73b8c15882648397b56be" title=" " alt="" coords="385,5,525,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="293,109,384,57,395,51,397,56,386,61,295,113"/>
+<area shape="rect" id="Node000005" href="$classfc_1_1mock__time__traits.html#adddeebdf472c33f927827c111ddbf0b1" title=" " alt="" coords="385,71,525,111"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="337,110,370,104,371,109,338,115"/>
+<area shape="rect" id="Node000006" href="$classfc_1_1time__point.html#ab46781dcaab4880902bc136f36e39e5e" title=" " alt="" coords="388,136,522,177"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="338,133,373,139,373,145,337,138"/>
+<area shape="rect" id="Node000007" href="$classfc_1_1time__point.html#abfea5efbe9ef58024cda814395ee9945" title=" " alt="" coords="388,201,522,242"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="296,135,386,186,397,192,395,196,384,191,294,140"/>
+<area shape="rect" id="Node000004" href="$classfc_1_1mock__time__traits.html#a0d7245b32fd62b3bc712f658250cc4db" title=" " alt="" coords="573,13,746,38"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="526,23,558,23,558,28,526,28"/>
+</map>

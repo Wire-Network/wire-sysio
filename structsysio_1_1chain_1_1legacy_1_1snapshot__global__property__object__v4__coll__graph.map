@@ -1,0 +1,17 @@
+<map id="sysio::chain::legacy::snapshot_global_property_object_v4" name="sysio::chain::legacy::snapshot_global_property_object_v4">
+<area shape="rect" id="Node000001" title=" " alt="" coords="635,128,812,184"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1producer__authority__schedule.html" title=" " alt="" coords="306,5,455,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="471,43,541,64,612,90,680,126,677,130,610,95,539,69,469,49"/>
+<area shape="rect" id="Node000003" href="$classfc_1_1vector.html" title=" " alt="" coords="5,5,185,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="200,23,305,23,305,28,200,28"/>
+<area shape="rect" id="Node000004" href="$structsysio_1_1chain_1_1chain__config__v0.html" title="Producer&#45;voted blockchain configuration parameters." alt="" coords="315,71,446,111"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="462,104,635,137,634,142,461,109"/>
+<area shape="rect" id="Node000005" href="$structsysio_1_1chain_1_1chain__id__type.html" title=" " alt="" coords="315,136,446,177"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="461,154,635,154,635,159,461,159"/>
+<area shape="rect" id="Node000006" href="$classfc_1_1sha256.html" title=" " alt="" coords="54,144,136,169"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="152,154,315,154,315,159,152,159"/>
+<area shape="rect" id="Node000007" href="$structsysio_1_1chain_1_1kv__database__config.html" title="limits for a kv database." alt="" coords="294,201,467,242"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="482,200,634,171,635,176,483,205"/>
+<area shape="rect" id="Node000008" href="$structsysio_1_1chain_1_1wasm__config.html" title=" " alt="" coords="313,267,448,307"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="462,266,535,246,610,218,678,182,680,187,612,223,536,251,463,271"/>
+</map>

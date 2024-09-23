@@ -1,0 +1,524 @@
+\doxysection{internal\+::IValidation\+Error\+Handler\texorpdfstring{$<$}{<} Schema\+Type \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classinternal_1_1_i_validation_error_handler}{}\label{classinternal_1_1_i_validation_error_handler}\index{internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}}
+
+
+{\ttfamily \#include $<$schema.\+h$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef Schema\+Type\+::\+Ch \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_abba4e628023fc09afffd499b3675c5bf}{Ch}}
+\item 
+typedef Schema\+Type\+::\+SValue \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a3cb3350cdd81afff317ac3787b40f48e}{SValue}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a79e5eb5707b73497cff913093dfec060}{\texorpdfstring{$\sim$}{\string~}\+IValidation\+Error\+Handler}} ()
+\item 
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a195a561f0bbbfb66961c9331a6afab39}{Not\+Multiple\+Of}} (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} actual, const \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a3cb3350cdd81afff317ac3787b40f48e}{SValue}} \&expected)=0
+\item 
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_ad8bd123f154f4c39f48b366219878526}{Not\+Multiple\+Of}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} actual, const \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a3cb3350cdd81afff317ac3787b40f48e}{SValue}} \&expected)=0
+\item 
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_ada3d2275ccdeb4874f34942d257af9c5}{Not\+Multiple\+Of}} (double actual, const \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a3cb3350cdd81afff317ac3787b40f48e}{SValue}} \&expected)=0
+\item 
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a7dc32dfac536f8577cbcb702efde26d2}{Above\+Maximum}} (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} actual, const \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a3cb3350cdd81afff317ac3787b40f48e}{SValue}} \&expected, bool exclusive)=0
+\item 
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a78554707b14366d2ff7763290e1a6219}{Above\+Maximum}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} actual, const \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a3cb3350cdd81afff317ac3787b40f48e}{SValue}} \&expected, bool exclusive)=0
+\item 
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a5b9e4690c26adbf4128b0b16f9e0625f}{Above\+Maximum}} (double actual, const \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a3cb3350cdd81afff317ac3787b40f48e}{SValue}} \&expected, bool exclusive)=0
+\item 
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a5ad9849c01a0bfa923d37ef2f1b4c933}{Below\+Minimum}} (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} actual, const \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a3cb3350cdd81afff317ac3787b40f48e}{SValue}} \&expected, bool exclusive)=0
+\item 
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_aa7bbfd1a69ba08ae31f87cb96ab5ec04}{Below\+Minimum}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} actual, const \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a3cb3350cdd81afff317ac3787b40f48e}{SValue}} \&expected, bool exclusive)=0
+\item 
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a921da9a7fa127035a2a259b19813230e}{Below\+Minimum}} (double actual, const \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a3cb3350cdd81afff317ac3787b40f48e}{SValue}} \&expected, bool exclusive)=0
+\item 
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_ae000553bd9312a5090eed393541243af}{Too\+Long}} (const \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_abba4e628023fc09afffd499b3675c5bf}{Ch}} \texorpdfstring{$\ast$}{*}str, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} length, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} expected)=0
+\item 
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a57f0cd2c2c9781af0e4c447700537f23}{Too\+Short}} (const \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_abba4e628023fc09afffd499b3675c5bf}{Ch}} \texorpdfstring{$\ast$}{*}str, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} length, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} expected)=0
+\item 
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a9551391add918d6679f9a2a85dffc19c}{Does\+Not\+Match}} (const \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_abba4e628023fc09afffd499b3675c5bf}{Ch}} \texorpdfstring{$\ast$}{*}str, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} length)=0
+\item 
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a0ac36d4217d9a14205cbe392601f3ee7}{Disallowed\+Item}} (\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} index)=0
+\item 
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_afc144690ba0e24636a72f541efd32c3b}{Too\+Few\+Items}} (\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} actual\+Count, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} expected\+Count)=0
+\item 
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a9371ca15622897a429971f69c07c47ef}{Too\+Many\+Items}} (\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} actual\+Count, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} expected\+Count)=0
+\item 
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a3a0836796f39c946f31f87b80ddd6cf1}{Duplicate\+Items}} (\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} index1, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} index2)=0
+\item 
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a3494e9d2bff94979649e186aba71b32e}{Too\+Many\+Properties}} (\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} actual\+Count, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} expected\+Count)=0
+\item 
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_adf515d2fad2e55bc0735a6fb16eec9e6}{Too\+Few\+Properties}} (\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} actual\+Count, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} expected\+Count)=0
+\item 
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_ac0073bef86b572b4517876b304aada0f}{Start\+Missing\+Properties}} ()=0
+\item 
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a3a2165f53ab565e052bcd35b6d19e473}{Add\+Missing\+Property}} (const \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a3cb3350cdd81afff317ac3787b40f48e}{SValue}} \&\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})=0
+\item 
+virtual bool \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a3a01eec1a969cfb600340a2bad157c9c}{End\+Missing\+Properties}} ()=0
+\item 
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_abd92773fa046eeb6fd8416468e62e5b1}{Property\+Violations}} (\mbox{\hyperlink{classinternal_1_1_i_schema_validator}{ISchema\+Validator}} \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}subvalidators, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}})=0
+\item 
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a689b8acc4cbe3e8683c1a29950438ac8}{Disallowed\+Property}} (const \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_abba4e628023fc09afffd499b3675c5bf}{Ch}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} length)=0
+\item 
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_ab3cf4b9fe450ff76f52d70a2888f0342}{Start\+Dependency\+Errors}} ()=0
+\item 
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_ae312aea74718dda0411af023c0c78ef6}{Start\+Missing\+Dependent\+Properties}} ()=0
+\item 
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a2e9e0b2f67467a62642e37e839f689c5}{Add\+Missing\+Dependent\+Property}} (const \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a3cb3350cdd81afff317ac3787b40f48e}{SValue}} \&target\+Name)=0
+\item 
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a05af3199b8011a3476dfd238fa958213}{End\+Missing\+Dependent\+Properties}} (const \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a3cb3350cdd81afff317ac3787b40f48e}{SValue}} \&source\+Name)=0
+\item 
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a4b43ba6e6a9c544dfc631297104dc508}{Add\+Dependency\+Schema\+Error}} (const \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a3cb3350cdd81afff317ac3787b40f48e}{SValue}} \&souce\+Name, \mbox{\hyperlink{classinternal_1_1_i_schema_validator}{ISchema\+Validator}} \texorpdfstring{$\ast$}{*}subvalidator)=0
+\item 
+virtual bool \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a817c1e3e9cc62603997a2fcdc564820b}{End\+Dependency\+Errors}} ()=0
+\item 
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_acd352694d7b970b8695e9c0651eb5bab}{Disallowed\+Value}} ()=0
+\item 
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a994a8b1526a79737b9d7b7575def4f65}{Start\+Disallowed\+Type}} ()=0
+\item 
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a5e4d9e5d937bd54e481f90e23ec3aea4}{Add\+Expected\+Type}} (const typename Schema\+Type\+::\+Value\+Type \&expected\+Type)=0
+\item 
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_ad8133b3c055b3a91b5072af81304ab87}{End\+Disallowed\+Type}} (const typename Schema\+Type\+::\+Value\+Type \&actual\+Type)=0
+\item 
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a3ce77d66a09eb5d91833fc86f8fa5680}{Not\+All\+Of}} (\mbox{\hyperlink{classinternal_1_1_i_schema_validator}{ISchema\+Validator}} \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}subvalidators, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}})=0
+\item 
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a70105117617fc7edbe7f032975888e13}{None\+Of}} (\mbox{\hyperlink{classinternal_1_1_i_schema_validator}{ISchema\+Validator}} \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}subvalidators, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}})=0
+\item 
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a76cae77f1b841843473f7a61975aa8e6}{Not\+One\+Of}} (\mbox{\hyperlink{classinternal_1_1_i_schema_validator}{ISchema\+Validator}} \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}subvalidators, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}})=0
+\item 
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a570a6723282e6c0576a47c492ffe5602}{Disallowed}} ()=0
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Schema\+Type$>$\newline
+class internal\+::\+IValidation\+Error\+Handler$<$ Schema\+Type $>$}
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l00163}{163}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classinternal_1_1_i_validation_error_handler_abba4e628023fc09afffd499b3675c5bf}\index{internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}!Ch@{Ch}}
+\index{Ch@{Ch}!internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}}
+\doxysubsubsection{\texorpdfstring{Ch}{Ch}}
+{\footnotesize\ttfamily \label{classinternal_1_1_i_validation_error_handler_abba4e628023fc09afffd499b3675c5bf} 
+template$<$typename Schema\+Type $>$ \\
+Schema\+Type\+::\+Ch \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler}{internal\+::\+IValidation\+Error\+Handler}}$<$ Schema\+Type $>$\+::\+Ch}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l00165}{165}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+\Hypertarget{classinternal_1_1_i_validation_error_handler_a3cb3350cdd81afff317ac3787b40f48e}\index{internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}!SValue@{SValue}}
+\index{SValue@{SValue}!internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}}
+\doxysubsubsection{\texorpdfstring{SValue}{SValue}}
+{\footnotesize\ttfamily \label{classinternal_1_1_i_validation_error_handler_a3cb3350cdd81afff317ac3787b40f48e} 
+template$<$typename Schema\+Type $>$ \\
+Schema\+Type\+::\+SValue \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler}{internal\+::\+IValidation\+Error\+Handler}}$<$ Schema\+Type $>$\+::\+SValue}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l00166}{166}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classinternal_1_1_i_validation_error_handler_a79e5eb5707b73497cff913093dfec060}\index{internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}!````~IValidationErrorHandler@{\texorpdfstring{$\sim$}{\string~}IValidationErrorHandler}}
+\index{````~IValidationErrorHandler@{\texorpdfstring{$\sim$}{\string~}IValidationErrorHandler}!internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}IValidationErrorHandler()}{\string~IValidationErrorHandler()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_i_validation_error_handler_a79e5eb5707b73497cff913093dfec060} 
+template$<$typename Schema\+Type $>$ \\
+virtual \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler}{internal\+::\+IValidation\+Error\+Handler}}$<$ Schema\+Type $>$\+::\texorpdfstring{$\sim$}{\string~}\mbox{\hyperlink{classinternal_1_1_i_validation_error_handler}{IValidation\+Error\+Handler}} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l00168}{168}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00168\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classinternal_1_1_i_validation_error_handler_a5b9e4690c26adbf4128b0b16f9e0625f}\index{internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}!AboveMaximum@{AboveMaximum}}
+\index{AboveMaximum@{AboveMaximum}!internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}}
+\doxysubsubsection{\texorpdfstring{AboveMaximum()}{AboveMaximum()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{classinternal_1_1_i_validation_error_handler_a5b9e4690c26adbf4128b0b16f9e0625f} 
+template$<$typename Schema\+Type $>$ \\
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler}{internal\+::\+IValidation\+Error\+Handler}}$<$ Schema\+Type $>$\+::\+Above\+Maximum (\begin{DoxyParamCaption}\item[{double}]{actual}{, }\item[{const \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a3cb3350cdd81afff317ac3787b40f48e}{SValue}} \&}]{expected}{, }\item[{bool}]{exclusive}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{class_generic_schema_validator_abcf1f5b46bdae8ca20a80858d603483d}{Generic\+Schema\+Validator$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$}}.
+
+\Hypertarget{classinternal_1_1_i_validation_error_handler_a7dc32dfac536f8577cbcb702efde26d2}\index{internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}!AboveMaximum@{AboveMaximum}}
+\index{AboveMaximum@{AboveMaximum}!internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}}
+\doxysubsubsection{\texorpdfstring{AboveMaximum()}{AboveMaximum()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{classinternal_1_1_i_validation_error_handler_a7dc32dfac536f8577cbcb702efde26d2} 
+template$<$typename Schema\+Type $>$ \\
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler}{internal\+::\+IValidation\+Error\+Handler}}$<$ Schema\+Type $>$\+::\+Above\+Maximum (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}}]{actual}{, }\item[{const \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a3cb3350cdd81afff317ac3787b40f48e}{SValue}} \&}]{expected}{, }\item[{bool}]{exclusive}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{class_generic_schema_validator_a4c9c7db8a3488f84a5a86681ad1d8194}{Generic\+Schema\+Validator$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$}}.
+
+\Hypertarget{classinternal_1_1_i_validation_error_handler_a78554707b14366d2ff7763290e1a6219}\index{internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}!AboveMaximum@{AboveMaximum}}
+\index{AboveMaximum@{AboveMaximum}!internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}}
+\doxysubsubsection{\texorpdfstring{AboveMaximum()}{AboveMaximum()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{classinternal_1_1_i_validation_error_handler_a78554707b14366d2ff7763290e1a6219} 
+template$<$typename Schema\+Type $>$ \\
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler}{internal\+::\+IValidation\+Error\+Handler}}$<$ Schema\+Type $>$\+::\+Above\+Maximum (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{actual}{, }\item[{const \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a3cb3350cdd81afff317ac3787b40f48e}{SValue}} \&}]{expected}{, }\item[{bool}]{exclusive}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{class_generic_schema_validator_a9262c73768789eb7cf8dc271cfec7f96}{Generic\+Schema\+Validator$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$}}.
+
+\Hypertarget{classinternal_1_1_i_validation_error_handler_a4b43ba6e6a9c544dfc631297104dc508}\index{internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}!AddDependencySchemaError@{AddDependencySchemaError}}
+\index{AddDependencySchemaError@{AddDependencySchemaError}!internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}}
+\doxysubsubsection{\texorpdfstring{AddDependencySchemaError()}{AddDependencySchemaError()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_i_validation_error_handler_a4b43ba6e6a9c544dfc631297104dc508} 
+template$<$typename Schema\+Type $>$ \\
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler}{internal\+::\+IValidation\+Error\+Handler}}$<$ Schema\+Type $>$\+::\+Add\+Dependency\+Schema\+Error (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a3cb3350cdd81afff317ac3787b40f48e}{SValue}} \&}]{souce\+Name}{, }\item[{\mbox{\hyperlink{classinternal_1_1_i_schema_validator}{ISchema\+Validator}} \texorpdfstring{$\ast$}{*}}]{subvalidator}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+\Hypertarget{classinternal_1_1_i_validation_error_handler_a5e4d9e5d937bd54e481f90e23ec3aea4}\index{internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}!AddExpectedType@{AddExpectedType}}
+\index{AddExpectedType@{AddExpectedType}!internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}}
+\doxysubsubsection{\texorpdfstring{AddExpectedType()}{AddExpectedType()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_i_validation_error_handler_a5e4d9e5d937bd54e481f90e23ec3aea4} 
+template$<$typename Schema\+Type $>$ \\
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler}{internal\+::\+IValidation\+Error\+Handler}}$<$ Schema\+Type $>$\+::\+Add\+Expected\+Type (\begin{DoxyParamCaption}\item[{const typename Schema\+Type\+::\+Value\+Type \&}]{expected\+Type}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{class_generic_schema_validator_a68e5308e5ca9726ee66139a212b63bcc}{Generic\+Schema\+Validator$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$}}.
+
+\Hypertarget{classinternal_1_1_i_validation_error_handler_a2e9e0b2f67467a62642e37e839f689c5}\index{internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}!AddMissingDependentProperty@{AddMissingDependentProperty}}
+\index{AddMissingDependentProperty@{AddMissingDependentProperty}!internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}}
+\doxysubsubsection{\texorpdfstring{AddMissingDependentProperty()}{AddMissingDependentProperty()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_i_validation_error_handler_a2e9e0b2f67467a62642e37e839f689c5} 
+template$<$typename Schema\+Type $>$ \\
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler}{internal\+::\+IValidation\+Error\+Handler}}$<$ Schema\+Type $>$\+::\+Add\+Missing\+Dependent\+Property (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a3cb3350cdd81afff317ac3787b40f48e}{SValue}} \&}]{target\+Name}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{class_generic_schema_validator_a85f2be483f0ddfc402a97665aff6eca9}{Generic\+Schema\+Validator$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$}}.
+
+\Hypertarget{classinternal_1_1_i_validation_error_handler_a3a2165f53ab565e052bcd35b6d19e473}\index{internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}!AddMissingProperty@{AddMissingProperty}}
+\index{AddMissingProperty@{AddMissingProperty}!internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}}
+\doxysubsubsection{\texorpdfstring{AddMissingProperty()}{AddMissingProperty()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_i_validation_error_handler_a3a2165f53ab565e052bcd35b6d19e473} 
+template$<$typename Schema\+Type $>$ \\
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler}{internal\+::\+IValidation\+Error\+Handler}}$<$ Schema\+Type $>$\+::\+Add\+Missing\+Property (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a3cb3350cdd81afff317ac3787b40f48e}{SValue}} \&}]{name}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{class_generic_schema_validator_a8d355eeb25364e414d9a2f8121aa0eaa}{Generic\+Schema\+Validator$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$}}.
+
+\Hypertarget{classinternal_1_1_i_validation_error_handler_a921da9a7fa127035a2a259b19813230e}\index{internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}!BelowMinimum@{BelowMinimum}}
+\index{BelowMinimum@{BelowMinimum}!internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}}
+\doxysubsubsection{\texorpdfstring{BelowMinimum()}{BelowMinimum()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{classinternal_1_1_i_validation_error_handler_a921da9a7fa127035a2a259b19813230e} 
+template$<$typename Schema\+Type $>$ \\
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler}{internal\+::\+IValidation\+Error\+Handler}}$<$ Schema\+Type $>$\+::\+Below\+Minimum (\begin{DoxyParamCaption}\item[{double}]{actual}{, }\item[{const \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a3cb3350cdd81afff317ac3787b40f48e}{SValue}} \&}]{expected}{, }\item[{bool}]{exclusive}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{class_generic_schema_validator_afdd4a9787239a6fc3eeb56d34fd531f4}{Generic\+Schema\+Validator$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$}}.
+
+\Hypertarget{classinternal_1_1_i_validation_error_handler_a5ad9849c01a0bfa923d37ef2f1b4c933}\index{internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}!BelowMinimum@{BelowMinimum}}
+\index{BelowMinimum@{BelowMinimum}!internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}}
+\doxysubsubsection{\texorpdfstring{BelowMinimum()}{BelowMinimum()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{classinternal_1_1_i_validation_error_handler_a5ad9849c01a0bfa923d37ef2f1b4c933} 
+template$<$typename Schema\+Type $>$ \\
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler}{internal\+::\+IValidation\+Error\+Handler}}$<$ Schema\+Type $>$\+::\+Below\+Minimum (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}}]{actual}{, }\item[{const \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a3cb3350cdd81afff317ac3787b40f48e}{SValue}} \&}]{expected}{, }\item[{bool}]{exclusive}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{class_generic_schema_validator_a15a12306bc14f16357b4f2edea8396b7}{Generic\+Schema\+Validator$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$}}.
+
+\Hypertarget{classinternal_1_1_i_validation_error_handler_aa7bbfd1a69ba08ae31f87cb96ab5ec04}\index{internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}!BelowMinimum@{BelowMinimum}}
+\index{BelowMinimum@{BelowMinimum}!internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}}
+\doxysubsubsection{\texorpdfstring{BelowMinimum()}{BelowMinimum()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{classinternal_1_1_i_validation_error_handler_aa7bbfd1a69ba08ae31f87cb96ab5ec04} 
+template$<$typename Schema\+Type $>$ \\
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler}{internal\+::\+IValidation\+Error\+Handler}}$<$ Schema\+Type $>$\+::\+Below\+Minimum (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{actual}{, }\item[{const \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a3cb3350cdd81afff317ac3787b40f48e}{SValue}} \&}]{expected}{, }\item[{bool}]{exclusive}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{class_generic_schema_validator_ad3db1f3852a1b2e6fada43fbcad401ea}{Generic\+Schema\+Validator$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$}}.
+
+\Hypertarget{classinternal_1_1_i_validation_error_handler_a570a6723282e6c0576a47c492ffe5602}\index{internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}!Disallowed@{Disallowed}}
+\index{Disallowed@{Disallowed}!internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}}
+\doxysubsubsection{\texorpdfstring{Disallowed()}{Disallowed()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_i_validation_error_handler_a570a6723282e6c0576a47c492ffe5602} 
+template$<$typename Schema\+Type $>$ \\
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler}{internal\+::\+IValidation\+Error\+Handler}}$<$ Schema\+Type $>$\+::\+Disallowed (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{class_generic_schema_validator_acc65a322086c792d6534e306c7a091cf}{Generic\+Schema\+Validator$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$}}.
+
+\Hypertarget{classinternal_1_1_i_validation_error_handler_a0ac36d4217d9a14205cbe392601f3ee7}\index{internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}!DisallowedItem@{DisallowedItem}}
+\index{DisallowedItem@{DisallowedItem}!internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}}
+\doxysubsubsection{\texorpdfstring{DisallowedItem()}{DisallowedItem()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_i_validation_error_handler_a0ac36d4217d9a14205cbe392601f3ee7} 
+template$<$typename Schema\+Type $>$ \\
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler}{internal\+::\+IValidation\+Error\+Handler}}$<$ Schema\+Type $>$\+::\+Disallowed\+Item (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{index}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{class_generic_schema_validator_a2d47a88a3d9fb82466b5bda480b6e70f}{Generic\+Schema\+Validator$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$}}.
+
+\Hypertarget{classinternal_1_1_i_validation_error_handler_a689b8acc4cbe3e8683c1a29950438ac8}\index{internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}!DisallowedProperty@{DisallowedProperty}}
+\index{DisallowedProperty@{DisallowedProperty}!internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}}
+\doxysubsubsection{\texorpdfstring{DisallowedProperty()}{DisallowedProperty()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_i_validation_error_handler_a689b8acc4cbe3e8683c1a29950438ac8} 
+template$<$typename Schema\+Type $>$ \\
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler}{internal\+::\+IValidation\+Error\+Handler}}$<$ Schema\+Type $>$\+::\+Disallowed\+Property (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_abba4e628023fc09afffd499b3675c5bf}{Ch}} \texorpdfstring{$\ast$}{*}}]{name}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{length}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+\Hypertarget{classinternal_1_1_i_validation_error_handler_acd352694d7b970b8695e9c0651eb5bab}\index{internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}!DisallowedValue@{DisallowedValue}}
+\index{DisallowedValue@{DisallowedValue}!internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}}
+\doxysubsubsection{\texorpdfstring{DisallowedValue()}{DisallowedValue()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_i_validation_error_handler_acd352694d7b970b8695e9c0651eb5bab} 
+template$<$typename Schema\+Type $>$ \\
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler}{internal\+::\+IValidation\+Error\+Handler}}$<$ Schema\+Type $>$\+::\+Disallowed\+Value (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{class_generic_schema_validator_a2157f6c639b0464d9e34b00270472a19}{Generic\+Schema\+Validator$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$}}.
+
+\Hypertarget{classinternal_1_1_i_validation_error_handler_a9551391add918d6679f9a2a85dffc19c}\index{internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}!DoesNotMatch@{DoesNotMatch}}
+\index{DoesNotMatch@{DoesNotMatch}!internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}}
+\doxysubsubsection{\texorpdfstring{DoesNotMatch()}{DoesNotMatch()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_i_validation_error_handler_a9551391add918d6679f9a2a85dffc19c} 
+template$<$typename Schema\+Type $>$ \\
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler}{internal\+::\+IValidation\+Error\+Handler}}$<$ Schema\+Type $>$\+::\+Does\+Not\+Match (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_abba4e628023fc09afffd499b3675c5bf}{Ch}} \texorpdfstring{$\ast$}{*}}]{str}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{length}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+\Hypertarget{classinternal_1_1_i_validation_error_handler_a3a0836796f39c946f31f87b80ddd6cf1}\index{internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}!DuplicateItems@{DuplicateItems}}
+\index{DuplicateItems@{DuplicateItems}!internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}}
+\doxysubsubsection{\texorpdfstring{DuplicateItems()}{DuplicateItems()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_i_validation_error_handler_a3a0836796f39c946f31f87b80ddd6cf1} 
+template$<$typename Schema\+Type $>$ \\
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler}{internal\+::\+IValidation\+Error\+Handler}}$<$ Schema\+Type $>$\+::\+Duplicate\+Items (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{index1}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{index2}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{class_generic_schema_validator_a82aa865146069e3ba5010d25346a71f2}{Generic\+Schema\+Validator$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$}}.
+
+\Hypertarget{classinternal_1_1_i_validation_error_handler_a817c1e3e9cc62603997a2fcdc564820b}\index{internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}!EndDependencyErrors@{EndDependencyErrors}}
+\index{EndDependencyErrors@{EndDependencyErrors}!internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}}
+\doxysubsubsection{\texorpdfstring{EndDependencyErrors()}{EndDependencyErrors()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_i_validation_error_handler_a817c1e3e9cc62603997a2fcdc564820b} 
+template$<$typename Schema\+Type $>$ \\
+virtual bool \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler}{internal\+::\+IValidation\+Error\+Handler}}$<$ Schema\+Type $>$\+::\+End\+Dependency\+Errors (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{class_generic_schema_validator_ab6d1c964faaa0f86f9da51a0f66dc1e4}{Generic\+Schema\+Validator$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$}}.
+
+\Hypertarget{classinternal_1_1_i_validation_error_handler_ad8133b3c055b3a91b5072af81304ab87}\index{internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}!EndDisallowedType@{EndDisallowedType}}
+\index{EndDisallowedType@{EndDisallowedType}!internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}}
+\doxysubsubsection{\texorpdfstring{EndDisallowedType()}{EndDisallowedType()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_i_validation_error_handler_ad8133b3c055b3a91b5072af81304ab87} 
+template$<$typename Schema\+Type $>$ \\
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler}{internal\+::\+IValidation\+Error\+Handler}}$<$ Schema\+Type $>$\+::\+End\+Disallowed\+Type (\begin{DoxyParamCaption}\item[{const typename Schema\+Type\+::\+Value\+Type \&}]{actual\+Type}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{class_generic_schema_validator_ae0f99bfee3e2021c05322fd5d6de2f6e}{Generic\+Schema\+Validator$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$}}.
+
+\Hypertarget{classinternal_1_1_i_validation_error_handler_a05af3199b8011a3476dfd238fa958213}\index{internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}!EndMissingDependentProperties@{EndMissingDependentProperties}}
+\index{EndMissingDependentProperties@{EndMissingDependentProperties}!internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}}
+\doxysubsubsection{\texorpdfstring{EndMissingDependentProperties()}{EndMissingDependentProperties()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_i_validation_error_handler_a05af3199b8011a3476dfd238fa958213} 
+template$<$typename Schema\+Type $>$ \\
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler}{internal\+::\+IValidation\+Error\+Handler}}$<$ Schema\+Type $>$\+::\+End\+Missing\+Dependent\+Properties (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a3cb3350cdd81afff317ac3787b40f48e}{SValue}} \&}]{source\+Name}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{class_generic_schema_validator_afdcd2ff7b5f7e24f4f3d6976fa5b803e}{Generic\+Schema\+Validator$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$}}.
+
+\Hypertarget{classinternal_1_1_i_validation_error_handler_a3a01eec1a969cfb600340a2bad157c9c}\index{internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}!EndMissingProperties@{EndMissingProperties}}
+\index{EndMissingProperties@{EndMissingProperties}!internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}}
+\doxysubsubsection{\texorpdfstring{EndMissingProperties()}{EndMissingProperties()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_i_validation_error_handler_a3a01eec1a969cfb600340a2bad157c9c} 
+template$<$typename Schema\+Type $>$ \\
+virtual bool \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler}{internal\+::\+IValidation\+Error\+Handler}}$<$ Schema\+Type $>$\+::\+End\+Missing\+Properties (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{class_generic_schema_validator_a557b7aa531ff94a6355fed8f8575fed5}{Generic\+Schema\+Validator$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$}}.
+
+\Hypertarget{classinternal_1_1_i_validation_error_handler_a70105117617fc7edbe7f032975888e13}\index{internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}!NoneOf@{NoneOf}}
+\index{NoneOf@{NoneOf}!internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}}
+\doxysubsubsection{\texorpdfstring{NoneOf()}{NoneOf()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_i_validation_error_handler_a70105117617fc7edbe7f032975888e13} 
+template$<$typename Schema\+Type $>$ \\
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler}{internal\+::\+IValidation\+Error\+Handler}}$<$ Schema\+Type $>$\+::\+None\+Of (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classinternal_1_1_i_schema_validator}{ISchema\+Validator}} \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{subvalidators}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{count}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+\Hypertarget{classinternal_1_1_i_validation_error_handler_a3ce77d66a09eb5d91833fc86f8fa5680}\index{internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}!NotAllOf@{NotAllOf}}
+\index{NotAllOf@{NotAllOf}!internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}}
+\doxysubsubsection{\texorpdfstring{NotAllOf()}{NotAllOf()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_i_validation_error_handler_a3ce77d66a09eb5d91833fc86f8fa5680} 
+template$<$typename Schema\+Type $>$ \\
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler}{internal\+::\+IValidation\+Error\+Handler}}$<$ Schema\+Type $>$\+::\+Not\+All\+Of (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classinternal_1_1_i_schema_validator}{ISchema\+Validator}} \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{subvalidators}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{count}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+\Hypertarget{classinternal_1_1_i_validation_error_handler_ada3d2275ccdeb4874f34942d257af9c5}\index{internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}!NotMultipleOf@{NotMultipleOf}}
+\index{NotMultipleOf@{NotMultipleOf}!internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}}
+\doxysubsubsection{\texorpdfstring{NotMultipleOf()}{NotMultipleOf()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{classinternal_1_1_i_validation_error_handler_ada3d2275ccdeb4874f34942d257af9c5} 
+template$<$typename Schema\+Type $>$ \\
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler}{internal\+::\+IValidation\+Error\+Handler}}$<$ Schema\+Type $>$\+::\+Not\+Multiple\+Of (\begin{DoxyParamCaption}\item[{double}]{actual}{, }\item[{const \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a3cb3350cdd81afff317ac3787b40f48e}{SValue}} \&}]{expected}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{class_generic_schema_validator_ae5fc8a4545fed53955ec6c57b79ca949}{Generic\+Schema\+Validator$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$}}.
+
+\Hypertarget{classinternal_1_1_i_validation_error_handler_a195a561f0bbbfb66961c9331a6afab39}\index{internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}!NotMultipleOf@{NotMultipleOf}}
+\index{NotMultipleOf@{NotMultipleOf}!internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}}
+\doxysubsubsection{\texorpdfstring{NotMultipleOf()}{NotMultipleOf()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{classinternal_1_1_i_validation_error_handler_a195a561f0bbbfb66961c9331a6afab39} 
+template$<$typename Schema\+Type $>$ \\
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler}{internal\+::\+IValidation\+Error\+Handler}}$<$ Schema\+Type $>$\+::\+Not\+Multiple\+Of (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}}]{actual}{, }\item[{const \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a3cb3350cdd81afff317ac3787b40f48e}{SValue}} \&}]{expected}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{class_generic_schema_validator_ab2f08413a2b23d73d4bbd09c8ca1f547}{Generic\+Schema\+Validator$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$}}.
+
+\Hypertarget{classinternal_1_1_i_validation_error_handler_ad8bd123f154f4c39f48b366219878526}\index{internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}!NotMultipleOf@{NotMultipleOf}}
+\index{NotMultipleOf@{NotMultipleOf}!internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}}
+\doxysubsubsection{\texorpdfstring{NotMultipleOf()}{NotMultipleOf()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{classinternal_1_1_i_validation_error_handler_ad8bd123f154f4c39f48b366219878526} 
+template$<$typename Schema\+Type $>$ \\
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler}{internal\+::\+IValidation\+Error\+Handler}}$<$ Schema\+Type $>$\+::\+Not\+Multiple\+Of (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{actual}{, }\item[{const \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_a3cb3350cdd81afff317ac3787b40f48e}{SValue}} \&}]{expected}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{class_generic_schema_validator_a5c59d25dc44d85404cc587ebfa7455cd}{Generic\+Schema\+Validator$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$}}.
+
+\Hypertarget{classinternal_1_1_i_validation_error_handler_a76cae77f1b841843473f7a61975aa8e6}\index{internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}!NotOneOf@{NotOneOf}}
+\index{NotOneOf@{NotOneOf}!internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}}
+\doxysubsubsection{\texorpdfstring{NotOneOf()}{NotOneOf()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_i_validation_error_handler_a76cae77f1b841843473f7a61975aa8e6} 
+template$<$typename Schema\+Type $>$ \\
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler}{internal\+::\+IValidation\+Error\+Handler}}$<$ Schema\+Type $>$\+::\+Not\+One\+Of (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classinternal_1_1_i_schema_validator}{ISchema\+Validator}} \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{subvalidators}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{count}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+\Hypertarget{classinternal_1_1_i_validation_error_handler_abd92773fa046eeb6fd8416468e62e5b1}\index{internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}!PropertyViolations@{PropertyViolations}}
+\index{PropertyViolations@{PropertyViolations}!internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}}
+\doxysubsubsection{\texorpdfstring{PropertyViolations()}{PropertyViolations()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_i_validation_error_handler_abd92773fa046eeb6fd8416468e62e5b1} 
+template$<$typename Schema\+Type $>$ \\
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler}{internal\+::\+IValidation\+Error\+Handler}}$<$ Schema\+Type $>$\+::\+Property\+Violations (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classinternal_1_1_i_schema_validator}{ISchema\+Validator}} \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{subvalidators}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{count}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+\Hypertarget{classinternal_1_1_i_validation_error_handler_ab3cf4b9fe450ff76f52d70a2888f0342}\index{internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}!StartDependencyErrors@{StartDependencyErrors}}
+\index{StartDependencyErrors@{StartDependencyErrors}!internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}}
+\doxysubsubsection{\texorpdfstring{StartDependencyErrors()}{StartDependencyErrors()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_i_validation_error_handler_ab3cf4b9fe450ff76f52d70a2888f0342} 
+template$<$typename Schema\+Type $>$ \\
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler}{internal\+::\+IValidation\+Error\+Handler}}$<$ Schema\+Type $>$\+::\+Start\+Dependency\+Errors (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{class_generic_schema_validator_a767f115cc90e0f2f5bdd1c9fbdbf75df}{Generic\+Schema\+Validator$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$}}.
+
+\Hypertarget{classinternal_1_1_i_validation_error_handler_a994a8b1526a79737b9d7b7575def4f65}\index{internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}!StartDisallowedType@{StartDisallowedType}}
+\index{StartDisallowedType@{StartDisallowedType}!internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}}
+\doxysubsubsection{\texorpdfstring{StartDisallowedType()}{StartDisallowedType()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_i_validation_error_handler_a994a8b1526a79737b9d7b7575def4f65} 
+template$<$typename Schema\+Type $>$ \\
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler}{internal\+::\+IValidation\+Error\+Handler}}$<$ Schema\+Type $>$\+::\+Start\+Disallowed\+Type (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{class_generic_schema_validator_a9904719420fd91200f80772e92fe225f}{Generic\+Schema\+Validator$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$}}.
+
+\Hypertarget{classinternal_1_1_i_validation_error_handler_ae312aea74718dda0411af023c0c78ef6}\index{internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}!StartMissingDependentProperties@{StartMissingDependentProperties}}
+\index{StartMissingDependentProperties@{StartMissingDependentProperties}!internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}}
+\doxysubsubsection{\texorpdfstring{StartMissingDependentProperties()}{StartMissingDependentProperties()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_i_validation_error_handler_ae312aea74718dda0411af023c0c78ef6} 
+template$<$typename Schema\+Type $>$ \\
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler}{internal\+::\+IValidation\+Error\+Handler}}$<$ Schema\+Type $>$\+::\+Start\+Missing\+Dependent\+Properties (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{class_generic_schema_validator_ac4faa073bc4671f42e98a59a9e9cb01a}{Generic\+Schema\+Validator$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$}}.
+
+\Hypertarget{classinternal_1_1_i_validation_error_handler_ac0073bef86b572b4517876b304aada0f}\index{internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}!StartMissingProperties@{StartMissingProperties}}
+\index{StartMissingProperties@{StartMissingProperties}!internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}}
+\doxysubsubsection{\texorpdfstring{StartMissingProperties()}{StartMissingProperties()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_i_validation_error_handler_ac0073bef86b572b4517876b304aada0f} 
+template$<$typename Schema\+Type $>$ \\
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler}{internal\+::\+IValidation\+Error\+Handler}}$<$ Schema\+Type $>$\+::\+Start\+Missing\+Properties (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{class_generic_schema_validator_a41c4d67e349561f13948a5045bfc50c9}{Generic\+Schema\+Validator$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$}}.
+
+\Hypertarget{classinternal_1_1_i_validation_error_handler_afc144690ba0e24636a72f541efd32c3b}\index{internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}!TooFewItems@{TooFewItems}}
+\index{TooFewItems@{TooFewItems}!internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}}
+\doxysubsubsection{\texorpdfstring{TooFewItems()}{TooFewItems()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_i_validation_error_handler_afc144690ba0e24636a72f541efd32c3b} 
+template$<$typename Schema\+Type $>$ \\
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler}{internal\+::\+IValidation\+Error\+Handler}}$<$ Schema\+Type $>$\+::\+Too\+Few\+Items (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{actual\+Count}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{expected\+Count}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{class_generic_schema_validator_af39007d9bf43126dab231961a1c5064f}{Generic\+Schema\+Validator$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$}}.
+
+\Hypertarget{classinternal_1_1_i_validation_error_handler_adf515d2fad2e55bc0735a6fb16eec9e6}\index{internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}!TooFewProperties@{TooFewProperties}}
+\index{TooFewProperties@{TooFewProperties}!internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}}
+\doxysubsubsection{\texorpdfstring{TooFewProperties()}{TooFewProperties()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_i_validation_error_handler_adf515d2fad2e55bc0735a6fb16eec9e6} 
+template$<$typename Schema\+Type $>$ \\
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler}{internal\+::\+IValidation\+Error\+Handler}}$<$ Schema\+Type $>$\+::\+Too\+Few\+Properties (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{actual\+Count}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{expected\+Count}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{class_generic_schema_validator_aaebaf28aa289826a3c39dc953b0ca466}{Generic\+Schema\+Validator$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$}}.
+
+\Hypertarget{classinternal_1_1_i_validation_error_handler_ae000553bd9312a5090eed393541243af}\index{internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}!TooLong@{TooLong}}
+\index{TooLong@{TooLong}!internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}}
+\doxysubsubsection{\texorpdfstring{TooLong()}{TooLong()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_i_validation_error_handler_ae000553bd9312a5090eed393541243af} 
+template$<$typename Schema\+Type $>$ \\
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler}{internal\+::\+IValidation\+Error\+Handler}}$<$ Schema\+Type $>$\+::\+Too\+Long (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_abba4e628023fc09afffd499b3675c5bf}{Ch}} \texorpdfstring{$\ast$}{*}}]{str}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{length}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{expected}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+\Hypertarget{classinternal_1_1_i_validation_error_handler_a9371ca15622897a429971f69c07c47ef}\index{internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}!TooManyItems@{TooManyItems}}
+\index{TooManyItems@{TooManyItems}!internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}}
+\doxysubsubsection{\texorpdfstring{TooManyItems()}{TooManyItems()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_i_validation_error_handler_a9371ca15622897a429971f69c07c47ef} 
+template$<$typename Schema\+Type $>$ \\
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler}{internal\+::\+IValidation\+Error\+Handler}}$<$ Schema\+Type $>$\+::\+Too\+Many\+Items (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{actual\+Count}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{expected\+Count}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{class_generic_schema_validator_a78e85eeae0e2bdef827815672a7fbbc9}{Generic\+Schema\+Validator$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$}}.
+
+\Hypertarget{classinternal_1_1_i_validation_error_handler_a3494e9d2bff94979649e186aba71b32e}\index{internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}!TooManyProperties@{TooManyProperties}}
+\index{TooManyProperties@{TooManyProperties}!internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}}
+\doxysubsubsection{\texorpdfstring{TooManyProperties()}{TooManyProperties()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_i_validation_error_handler_a3494e9d2bff94979649e186aba71b32e} 
+template$<$typename Schema\+Type $>$ \\
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler}{internal\+::\+IValidation\+Error\+Handler}}$<$ Schema\+Type $>$\+::\+Too\+Many\+Properties (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{actual\+Count}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{expected\+Count}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{class_generic_schema_validator_ad7ca0a327420c110e9ee6e70b2cdbc87}{Generic\+Schema\+Validator$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$}}.
+
+\Hypertarget{classinternal_1_1_i_validation_error_handler_a57f0cd2c2c9781af0e4c447700537f23}\index{internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}!TooShort@{TooShort}}
+\index{TooShort@{TooShort}!internal::IValidationErrorHandler$<$ SchemaType $>$@{internal::IValidationErrorHandler$<$ SchemaType $>$}}
+\doxysubsubsection{\texorpdfstring{TooShort()}{TooShort()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_i_validation_error_handler_a57f0cd2c2c9781af0e4c447700537f23} 
+template$<$typename Schema\+Type $>$ \\
+virtual void \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler}{internal\+::\+IValidation\+Error\+Handler}}$<$ Schema\+Type $>$\+::\+Too\+Short (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler_abba4e628023fc09afffd499b3675c5bf}{Ch}} \texorpdfstring{$\ast$}{*}}]{str}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{length}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{expected}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/\mbox{\hyperlink{schema_8h}{schema.\+h}}\end{DoxyCompactItemize}

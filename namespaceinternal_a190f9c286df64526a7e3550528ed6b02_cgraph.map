@@ -1,0 +1,26 @@
+<map id="internal::CheckWithinHalfULP" name="internal::CheckWithinHalfULP">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,169,202,194"/>
+<area shape="rect" id="Node000002" href="$classinternal_1_1_big_integer.html#af8e90fff5382de6c1cda5f751017200c" title=" " alt="" coords="480,5,611,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="113,167,165,107,204,74,249,49,303,31,360,21,415,16,465,16,465,22,415,22,360,26,304,36,251,53,207,79,169,111,117,170"/>
+<area shape="rect" id="Node000003" href="$classinternal_1_1_big_integer.html#ad7ad62e6b62af38283ee940eb4015b26" title=" " alt="" coords="265,63,395,103"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="133,166,249,114,263,108,265,112,251,119,135,171"/>
+<area shape="rect" id="Node000005" href="$classinternal_1_1_double.html#a9721e0fdedef4d0fe6c7b411492a88fb" title=" " alt="" coords="250,128,410,169"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="195,166,234,160,235,165,196,171"/>
+<area shape="rect" id="Node000009" href="$classinternal_1_1_double.html#a1bf89d77be843f69facec9f2bc4dbc72" title=" " alt="" coords="250,193,410,234"/>
+<area shape="poly" id="edge9_Node000001_Node000009" title=" " alt="" coords="199,193,235,198,234,203,199,198"/>
+<area shape="rect" id="Node000010" href="$namespaceinternal.html#ace304441347098a4953ea99f50805da9" title=" " alt="" coords="280,258,380,284"/>
+<area shape="poly" id="edge12_Node000001_Node000010" title=" " alt="" coords="134,193,251,243,270,250,269,255,249,248,132,198"/>
+<area shape="rect" id="Node000011" href="$classinternal_1_1_big_integer.html#af491885747a0442492134c23a6ec4c65" title=" " alt="" coords="265,308,395,349"/>
+<area shape="poly" id="edge13_Node000001_Node000011" title=" " alt="" coords="120,193,175,241,251,294,259,299,257,303,248,299,172,245,117,197"/>
+<area shape="poly" id="edge4_Node000003_Node000002" title=" " alt="" coords="394,63,465,44,467,49,396,68"/>
+<area shape="rect" id="Node000004" href="$xbyak__mnemonic_8h.html#a1eab233e37cc0eb225b69b7840d34d96" title=" " alt="" coords="522,70,569,96"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="395,80,507,80,507,86,395,86"/>
+<area shape="rect" id="Node000006" href="$classinternal_1_1_double.html#ae091055d96d8730f654170613f2cf265" title=" " alt="" coords="458,128,633,153"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="410,143,442,141,442,147,411,148"/>
+<area shape="rect" id="Node000007" href="$classinternal_1_1_double.html#a8a39cd42010c69681da35d87f1331381" title=" " alt="" coords="459,177,632,202"/>
+<area shape="poly" id="edge7_Node000005_Node000007" title=" " alt="" coords="411,161,461,171,460,176,410,166"/>
+<area shape="rect" id="Node000008" href="$classinternal_1_1_double.html#ade5d3e893dd6884ccd37632109dae1a6" title=" " alt="" coords="681,202,866,228"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="633,197,666,200,666,206,632,202"/>
+<area shape="poly" id="edge10_Node000009_Node000007" title=" " alt="" coords="410,202,443,198,444,204,411,207"/>
+<area shape="poly" id="edge11_Node000009_Node000008" title=" " alt="" coords="411,212,458,212,666,213,666,218,458,218,411,217"/>
+</map>

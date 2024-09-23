@@ -1,0 +1,112 @@
+\doxysection{mvtosavings\+\_\+subcommand Struct Reference}
+\hypertarget{structmvtosavings__subcommand}{}\label{structmvtosavings__subcommand}\index{mvtosavings\_subcommand@{mvtosavings\_subcommand}}
+
+
+Collaboration diagram for mvtosavings\+\_\+subcommand\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=215pt]{structmvtosavings__subcommand__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structmvtosavings__subcommand_a69d6de6f274f14d1911cb12d82ecc149}{mvtosavings\+\_\+subcommand}} (\mbox{\hyperlink{class_c_l_i_1_1_app}{CLI\+::\+App}} \texorpdfstring{$\ast$}{*}action\+Root)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structmvtosavings__subcommand_a5beb56b95c8de8035d947032952646b3}{owner\+\_\+str}}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structmvtosavings__subcommand_a633834d7b8442fe9d660491a26185034}{rex\+\_\+str}}
+\item 
+const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \mbox{\hyperlink{structmvtosavings__subcommand_ad1a18506b32f0b59837dadf37bf12aab}{act\+\_\+name}} \{ "{}mvtosavings"{}\+\_\+n \}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l02103}{2103}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structmvtosavings__subcommand_a69d6de6f274f14d1911cb12d82ecc149}\index{mvtosavings\_subcommand@{mvtosavings\_subcommand}!mvtosavings\_subcommand@{mvtosavings\_subcommand}}
+\index{mvtosavings\_subcommand@{mvtosavings\_subcommand}!mvtosavings\_subcommand@{mvtosavings\_subcommand}}
+\doxysubsubsection{\texorpdfstring{mvtosavings\_subcommand()}{mvtosavings\_subcommand()}}
+{\footnotesize\ttfamily \label{structmvtosavings__subcommand_a69d6de6f274f14d1911cb12d82ecc149} 
+mvtosavings\+\_\+subcommand\+::mvtosavings\+\_\+subcommand (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_c_l_i_1_1_app}{CLI\+::\+App}} \texorpdfstring{$\ast$}{*}}]{action\+Root}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l02108}{2108}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02108\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02109\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ mvtosavings\ =\ actionRoot-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_a8b461d2233ec4121259011b5ed24b336}{add\_subcommand}}(\textcolor{stringliteral}{"{}mvtosavings"{}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}Move\ REX\ tokens\ to\ savings\ bucket"{}}));}
+\DoxyCodeLine{02110\ \ \ \ \ \ \ mvtosavings-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_a8c812d42c7720ecb5cd0aec41b5aa941}{add\_option}}(\textcolor{stringliteral}{"{}owner"{}},\ \mbox{\hyperlink{structmvtosavings__subcommand_a5beb56b95c8de8035d947032952646b3}{owner\_str}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}REX\ owner"{}}))-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a}{required}}();}
+\DoxyCodeLine{02111\ \ \ \ \ \ \ mvtosavings-\/>add\_option(\textcolor{stringliteral}{"{}rex"{}},\ \ \ \mbox{\hyperlink{structmvtosavings__subcommand_a633834d7b8442fe9d660491a26185034}{rex\_str}},\ \ \ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}Amount\ of\ REX\ to\ be\ moved\ to\ savings\ bucket"{}}))-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a}{required}}();}
+\DoxyCodeLine{02112\ \ \ \ \ \ \ \mbox{\hyperlink{programs_2clio_2main_8cpp_aa5d53f41b83b5323c73622fbbb15e9cd}{add\_standard\_transaction\_options}}(mvtosavings,\ \textcolor{stringliteral}{"{}owner@active"{}});}
+\DoxyCodeLine{02113\ \ \ \ \ \ \ mvtosavings-\/>callback([\textcolor{keyword}{this}]\ \{}
+\DoxyCodeLine{02114\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}\ act\_payload\ =\ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}()}
+\DoxyCodeLine{02115\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}owner"{}},\ \mbox{\hyperlink{structmvtosavings__subcommand_a5beb56b95c8de8035d947032952646b3}{owner\_str}})}
+\DoxyCodeLine{02116\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}rex"{}},\ \ \ \mbox{\hyperlink{structmvtosavings__subcommand_a633834d7b8442fe9d660491a26185034}{rex\_str}});}
+\DoxyCodeLine{02117\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ accountPermissions\ =\ \mbox{\hyperlink{programs_2clio_2main_8cpp_a2b91ca5dbe7cc4ab287d0e44c3037552}{get\_account\_permissions}}(\mbox{\hyperlink{programs_2clio_2main_8cpp_ad552924cb151dcd5b60c73856d1ff706}{tx\_permission}},\ \{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(\mbox{\hyperlink{structmvtosavings__subcommand_a5beb56b95c8de8035d947032952646b3}{owner\_str}}),\ config::active\_name\});}
+\DoxyCodeLine{02118\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{programs_2clio_2main_8cpp_aaf784434864a29e4835be7465173d1ab}{send\_actions}}(\{\mbox{\hyperlink{programs_2clio_2main_8cpp_a067e20df5f65333b0c3cf5840bc37dea}{create\_action}}(accountPermissions,\ config::system\_account\_name,\ \mbox{\hyperlink{structmvtosavings__subcommand_ad1a18506b32f0b59837dadf37bf12aab}{act\_name}},\ act\_payload)\});}
+\DoxyCodeLine{02119\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{02120\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structmvtosavings__subcommand_a69d6de6f274f14d1911cb12d82ecc149_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structmvtosavings__subcommand_ad1a18506b32f0b59837dadf37bf12aab}\index{mvtosavings\_subcommand@{mvtosavings\_subcommand}!act\_name@{act\_name}}
+\index{act\_name@{act\_name}!mvtosavings\_subcommand@{mvtosavings\_subcommand}}
+\doxysubsubsection{\texorpdfstring{act\_name}{act\_name}}
+{\footnotesize\ttfamily \label{structmvtosavings__subcommand_ad1a18506b32f0b59837dadf37bf12aab} 
+const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} mvtosavings\+\_\+subcommand\+::act\+\_\+name \{ "{}mvtosavings"{}\+\_\+n \}}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l02106}{2106}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02106\ \{\ \textcolor{stringliteral}{"{}mvtosavings"{}}\_n\ \};}
+
+\end{DoxyCode}
+\Hypertarget{structmvtosavings__subcommand_a5beb56b95c8de8035d947032952646b3}\index{mvtosavings\_subcommand@{mvtosavings\_subcommand}!owner\_str@{owner\_str}}
+\index{owner\_str@{owner\_str}!mvtosavings\_subcommand@{mvtosavings\_subcommand}}
+\doxysubsubsection{\texorpdfstring{owner\_str}{owner\_str}}
+{\footnotesize\ttfamily \label{structmvtosavings__subcommand_a5beb56b95c8de8035d947032952646b3} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} mvtosavings\+\_\+subcommand\+::owner\+\_\+str}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l02104}{2104}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{structmvtosavings__subcommand_a633834d7b8442fe9d660491a26185034}\index{mvtosavings\_subcommand@{mvtosavings\_subcommand}!rex\_str@{rex\_str}}
+\index{rex\_str@{rex\_str}!mvtosavings\_subcommand@{mvtosavings\_subcommand}}
+\doxysubsubsection{\texorpdfstring{rex\_str}{rex\_str}}
+{\footnotesize\ttfamily \label{structmvtosavings__subcommand_a633834d7b8442fe9d660491a26185034} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} mvtosavings\+\_\+subcommand\+::rex\+\_\+str}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l02105}{2105}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+programs/clio/\mbox{\hyperlink{programs_2clio_2main_8cpp}{main.\+cpp}}\end{DoxyCompactItemize}

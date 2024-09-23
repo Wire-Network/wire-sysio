@@ -1,0 +1,324 @@
+\doxysection{sysiosystem\+::exchange\+\_\+state Struct Reference}
+\hypertarget{structsysiosystem_1_1exchange__state}{}\label{structsysiosystem_1_1exchange__state}\index{sysiosystem::exchange\_state@{sysiosystem::exchange\_state}}
+
+
+{\ttfamily \#include $<$exchange\+\_\+state.\+hpp$>$}
+
+
+
+Collaboration diagram for sysiosystem\+::exchange\+\_\+state\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=276pt]{structsysiosystem_1_1exchange__state__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysiosystem_1_1exchange__state_1_1connector}{connector}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1exchange__state_aea576406feefe9951dc9b04af1db2be2}{primary\+\_\+key}} () const
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \mbox{\hyperlink{structsysiosystem_1_1exchange__state_a301de6e8ca49361110634fd27d98571f}{convert\+\_\+to\+\_\+exchange}} (\mbox{\hyperlink{structsysiosystem_1_1exchange__state_1_1connector}{connector}} \&reserve, const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&payment)
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \mbox{\hyperlink{structsysiosystem_1_1exchange__state_a4da57083b548454bde5d06d919af3cc4}{convert\+\_\+from\+\_\+exchange}} (\mbox{\hyperlink{structsysiosystem_1_1exchange__state_1_1connector}{connector}} \&reserve, const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&tokens)
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \mbox{\hyperlink{structsysiosystem_1_1exchange__state_a4910da202670276256e6594f0590d8fc}{convert}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&from, const \mbox{\hyperlink{classsysio_1_1chain_1_1symbol}{symbol}} \&to)
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \mbox{\hyperlink{structsysiosystem_1_1exchange__state_a8602fde72df2288c3458729e7a973f7a}{direct\+\_\+convert}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&from, const \mbox{\hyperlink{classsysio_1_1chain_1_1symbol}{symbol}} \&to)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1exchange__state_ab3d89e86a0d3c4ef488e5f351fbc77e2}{get\+\_\+bancor\+\_\+output}} (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} inp\+\_\+reserve, \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} out\+\_\+reserve, \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} inp)
+\item 
+static \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1exchange__state_a0883f2b115c93fa4f90dc34ebb99992c}{get\+\_\+bancor\+\_\+input}} (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} out\+\_\+reserve, \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} inp\+\_\+reserve, \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} out)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \mbox{\hyperlink{structsysiosystem_1_1exchange__state_a03e4901a1aaacc59b78d85d440972f51}{supply}}
+\item 
+\mbox{\hyperlink{structsysiosystem_1_1exchange__state_1_1connector}{connector}} \mbox{\hyperlink{structsysiosystem_1_1exchange__state_ae2c340ecb97fbfe30c640a522cc1894e}{base}}
+\item 
+\mbox{\hyperlink{structsysiosystem_1_1exchange__state_1_1connector}{connector}} \mbox{\hyperlink{structsysiosystem_1_1exchange__state_ad25c6801bcc1707b6dbd780b70b95bc2}{quote}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Uses Bancor math to create a 50/50 relay between two asset types.
+
+The state of the bancor exchange is entirely contained within this struct. There are no external side effects associated with using this API. 
+
+Definition at line \mbox{\hyperlink{exchange__state_8hpp_source_l00017}{17}} of file \mbox{\hyperlink{exchange__state_8hpp_source}{exchange\+\_\+state.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysiosystem_1_1exchange__state_a4910da202670276256e6594f0590d8fc}\index{sysiosystem::exchange\_state@{sysiosystem::exchange\_state}!convert@{convert}}
+\index{convert@{convert}!sysiosystem::exchange\_state@{sysiosystem::exchange\_state}}
+\doxysubsubsection{\texorpdfstring{convert()}{convert()}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1exchange__state_a4910da202670276256e6594f0590d8fc} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} sysiosystem\+::exchange\+\_\+state\+::convert (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&}]{from}{, }\item[{const \mbox{\hyperlink{classsysio_1_1chain_1_1symbol}{symbol}} \&}]{to}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{exchange__state_8cpp_source_l00039}{39}} of file \mbox{\hyperlink{exchange__state_8cpp_source}{exchange\+\_\+state.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00040\ \ \ \ \{}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ sell\_symbol\ \ =\ from.symbol;}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ base\_symbol\ \ =\ base.balance.symbol;}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ quote\_symbol\ =\ \mbox{\hyperlink{structsysiosystem_1_1exchange__state_ad25c6801bcc1707b6dbd780b70b95bc2}{quote}}.\mbox{\hyperlink{structsysiosystem_1_1exchange__state_1_1connector_a4222c96ec26bb4d033bef4220b28301b}{balance}}.symbol;}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ check(\ sell\_symbol\ !=\ to,\ \textcolor{stringliteral}{"{}cannot\ convert\ to\ the\ same\ symbol"{}}\ );}
+\DoxyCodeLine{00045\ }
+\DoxyCodeLine{00046\ \ \ \ \ \ \ asset\ out(\ 0,\ to\ );}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ sell\_symbol\ ==\ base\_symbol\ \&\&\ to\ ==\ quote\_symbol\ )\ \{}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ asset\ tmp\ =\ \mbox{\hyperlink{structsysiosystem_1_1exchange__state_a301de6e8ca49361110634fd27d98571f}{convert\_to\_exchange}}(\ base,\ from\ );}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \ out\ =\ \mbox{\hyperlink{structsysiosystem_1_1exchange__state_a4da57083b548454bde5d06d919af3cc4}{convert\_from\_exchange}}(\ \mbox{\hyperlink{structsysiosystem_1_1exchange__state_ad25c6801bcc1707b6dbd780b70b95bc2}{quote}},\ tmp\ );}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\ sell\_symbol\ ==\ quote\_symbol\ \&\&\ to\ ==\ base\_symbol\ )\ \{}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ asset\ tmp\ =\ \mbox{\hyperlink{structsysiosystem_1_1exchange__state_a301de6e8ca49361110634fd27d98571f}{convert\_to\_exchange}}(\ \mbox{\hyperlink{structsysiosystem_1_1exchange__state_ad25c6801bcc1707b6dbd780b70b95bc2}{quote}},\ from\ );}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ out\ =\ \mbox{\hyperlink{structsysiosystem_1_1exchange__state_a4da57083b548454bde5d06d919af3cc4}{convert\_from\_exchange}}(\ base,\ tmp\ );}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ check(\ \textcolor{keyword}{false},\ \textcolor{stringliteral}{"{}invalid\ conversion"{}}\ );}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ out;}
+\DoxyCodeLine{00057\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysiosystem_1_1exchange__state_a4910da202670276256e6594f0590d8fc_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysiosystem_1_1exchange__state_a4da57083b548454bde5d06d919af3cc4}\index{sysiosystem::exchange\_state@{sysiosystem::exchange\_state}!convert\_from\_exchange@{convert\_from\_exchange}}
+\index{convert\_from\_exchange@{convert\_from\_exchange}!sysiosystem::exchange\_state@{sysiosystem::exchange\_state}}
+\doxysubsubsection{\texorpdfstring{convert\_from\_exchange()}{convert\_from\_exchange()}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1exchange__state_a4da57083b548454bde5d06d919af3cc4} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} sysiosystem\+::exchange\+\_\+state\+::convert\+\_\+from\+\_\+exchange (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysiosystem_1_1exchange__state_1_1connector}{connector}} \&}]{reserve}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&}]{tokens}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{exchange__state_8cpp_source_l00025}{25}} of file \mbox{\hyperlink{exchange__state_8cpp_source}{exchange\+\_\+state.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00026\ \ \ \ \{}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{double}\ R0\ =\ reserve.balance.amount;}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{double}\ S0\ =\ \mbox{\hyperlink{structsysiosystem_1_1exchange__state_a03e4901a1aaacc59b78d85d440972f51}{supply}}.amount;}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{double}\ dS\ =\ -\/tokens.amount;\ \textcolor{comment}{//\ dS\ <\ 0,\ tokens\ are\ subtracted\ from\ supply}}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{double}\ Fi\ =\ double(1)\ /\ reserve.weight;}
+\DoxyCodeLine{00031\ }
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ dR\ =\ R0\ *\ (\ std::pow(1.\ +\ dS\ /\ S0,\ Fi)\ -\/\ 1.\ );\ \textcolor{comment}{//\ dR\ <\ 0\ since\ dS\ <\ 0}}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ dR\ >\ 0\ )\ dR\ =\ 0;\ \textcolor{comment}{//\ rounding\ errors}}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ reserve.balance.amount\ -\/=\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}(-\/dR);}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \mbox{\hyperlink{structsysiosystem_1_1exchange__state_a03e4901a1aaacc59b78d85d440972f51}{supply}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/=\ tokens;}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ asset(\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}(-\/dR),\ reserve.balance.symbol\ );}
+\DoxyCodeLine{00037\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysiosystem_1_1exchange__state_a4da57083b548454bde5d06d919af3cc4_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysiosystem_1_1exchange__state_a301de6e8ca49361110634fd27d98571f}\index{sysiosystem::exchange\_state@{sysiosystem::exchange\_state}!convert\_to\_exchange@{convert\_to\_exchange}}
+\index{convert\_to\_exchange@{convert\_to\_exchange}!sysiosystem::exchange\_state@{sysiosystem::exchange\_state}}
+\doxysubsubsection{\texorpdfstring{convert\_to\_exchange()}{convert\_to\_exchange()}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1exchange__state_a301de6e8ca49361110634fd27d98571f} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} sysiosystem\+::exchange\+\_\+state\+::convert\+\_\+to\+\_\+exchange (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysiosystem_1_1exchange__state_1_1connector}{connector}} \&}]{reserve}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&}]{payment}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{exchange__state_8cpp_source_l00011}{11}} of file \mbox{\hyperlink{exchange__state_8cpp_source}{exchange\+\_\+state.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00012\ \ \ \ \{}
+\DoxyCodeLine{00013\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{double}\ S0\ =\ \mbox{\hyperlink{structsysiosystem_1_1exchange__state_a03e4901a1aaacc59b78d85d440972f51}{supply}}.amount;}
+\DoxyCodeLine{00014\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{double}\ R0\ =\ reserve.balance.amount;}
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{double}\ dR\ =\ payment.amount;}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{double}\ F\ \ =\ reserve.weight;}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ dS\ =\ S0\ *\ (\ std::pow(1.\ +\ dR\ /\ R0,\ F)\ -\/\ 1.\ );}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ dS\ <\ 0\ )\ dS\ =\ 0;\ \textcolor{comment}{//\ rounding\ errors}}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ reserve.balance\ +=\ payment;}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \mbox{\hyperlink{structsysiosystem_1_1exchange__state_a03e4901a1aaacc59b78d85d440972f51}{supply}}.amount\ \ \ +=\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}(dS);}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ asset(\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}(dS),\ \mbox{\hyperlink{structsysiosystem_1_1exchange__state_a03e4901a1aaacc59b78d85d440972f51}{supply}}.symbol\ );}
+\DoxyCodeLine{00023\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysiosystem_1_1exchange__state_a301de6e8ca49361110634fd27d98571f_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysiosystem_1_1exchange__state_a8602fde72df2288c3458729e7a973f7a}\index{sysiosystem::exchange\_state@{sysiosystem::exchange\_state}!direct\_convert@{direct\_convert}}
+\index{direct\_convert@{direct\_convert}!sysiosystem::exchange\_state@{sysiosystem::exchange\_state}}
+\doxysubsubsection{\texorpdfstring{direct\_convert()}{direct\_convert()}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1exchange__state_a8602fde72df2288c3458729e7a973f7a} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} sysiosystem\+::exchange\+\_\+state\+::direct\+\_\+convert (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&}]{from}{, }\item[{const \mbox{\hyperlink{classsysio_1_1chain_1_1symbol}{symbol}} \&}]{to}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{exchange__state_8cpp_source_l00059}{59}} of file \mbox{\hyperlink{exchange__state_8cpp_source}{exchange\+\_\+state.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00060\ \ \ \ \{}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ sell\_symbol\ \ =\ from.symbol;}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ base\_symbol\ \ =\ base.balance.symbol;}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ quote\_symbol\ =\ \mbox{\hyperlink{structsysiosystem_1_1exchange__state_ad25c6801bcc1707b6dbd780b70b95bc2}{quote}}.\mbox{\hyperlink{structsysiosystem_1_1exchange__state_1_1connector_a4222c96ec26bb4d033bef4220b28301b}{balance}}.symbol;}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ check(\ sell\_symbol\ !=\ to,\ \textcolor{stringliteral}{"{}cannot\ convert\ to\ the\ same\ symbol"{}}\ );}
+\DoxyCodeLine{00065\ }
+\DoxyCodeLine{00066\ \ \ \ \ \ \ asset\ out(\ 0,\ to\ );}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ sell\_symbol\ ==\ base\_symbol\ \&\&\ to\ ==\ quote\_symbol\ )\ \{}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ out.amount\ =\ \mbox{\hyperlink{structsysiosystem_1_1exchange__state_ab3d89e86a0d3c4ef488e5f351fbc77e2}{get\_bancor\_output}}(\ base.balance.amount,\ \mbox{\hyperlink{structsysiosystem_1_1exchange__state_ad25c6801bcc1707b6dbd780b70b95bc2}{quote}}.\mbox{\hyperlink{structsysiosystem_1_1exchange__state_1_1connector_a4222c96ec26bb4d033bef4220b28301b}{balance}}.amount,\ from.amount\ );}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ base.balance\ \ +=\ from;}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysiosystem_1_1exchange__state_ad25c6801bcc1707b6dbd780b70b95bc2}{quote}}.\mbox{\hyperlink{structsysiosystem_1_1exchange__state_1_1connector_a4222c96ec26bb4d033bef4220b28301b}{balance}}\ -\/=\ out;}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\ sell\_symbol\ ==\ quote\_symbol\ \&\&\ to\ ==\ base\_symbol\ )\ \{}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ out.amount\ =\ \mbox{\hyperlink{structsysiosystem_1_1exchange__state_ab3d89e86a0d3c4ef488e5f351fbc77e2}{get\_bancor\_output}}(\ \mbox{\hyperlink{structsysiosystem_1_1exchange__state_ad25c6801bcc1707b6dbd780b70b95bc2}{quote}}.\mbox{\hyperlink{structsysiosystem_1_1exchange__state_1_1connector_a4222c96ec26bb4d033bef4220b28301b}{balance}}.amount,\ base.balance.amount,\ from.amount\ );}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysiosystem_1_1exchange__state_ad25c6801bcc1707b6dbd780b70b95bc2}{quote}}.\mbox{\hyperlink{structsysiosystem_1_1exchange__state_1_1connector_a4222c96ec26bb4d033bef4220b28301b}{balance}}\ +=\ from;}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ base.balance\ \ -\/=\ out;}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ check(\ \textcolor{keyword}{false},\ \textcolor{stringliteral}{"{}invalid\ conversion"{}}\ );}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ out;}
+\DoxyCodeLine{00079\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysiosystem_1_1exchange__state_a8602fde72df2288c3458729e7a973f7a_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysiosystem_1_1exchange__state_a0883f2b115c93fa4f90dc34ebb99992c}\index{sysiosystem::exchange\_state@{sysiosystem::exchange\_state}!get\_bancor\_input@{get\_bancor\_input}}
+\index{get\_bancor\_input@{get\_bancor\_input}!sysiosystem::exchange\_state@{sysiosystem::exchange\_state}}
+\doxysubsubsection{\texorpdfstring{get\_bancor\_input()}{get\_bancor\_input()}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1exchange__state_a0883f2b115c93fa4f90dc34ebb99992c} 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} sysiosystem\+::exchange\+\_\+state\+::get\+\_\+bancor\+\_\+input (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}}]{out\+\_\+reserve}{, }\item[{\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}}]{inp\+\_\+reserve}{, }\item[{\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}}]{out}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{exchange__state_8cpp_source_l00096}{96}} of file \mbox{\hyperlink{exchange__state_8cpp_source}{exchange\+\_\+state.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00099\ \ \ \ \{}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{double}\ ob\ =\ out\_reserve;}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{double}\ ib\ =\ inp\_reserve;}
+\DoxyCodeLine{00102\ }
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ inp\ =\ (ib\ *\ out)\ /\ (ob\ -\/\ out);}
+\DoxyCodeLine{00104\ }
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ inp\ <\ 0\ )\ inp\ =\ 0;}
+\DoxyCodeLine{00106\ }
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ inp;}
+\DoxyCodeLine{00108\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysiosystem_1_1exchange__state_a0883f2b115c93fa4f90dc34ebb99992c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysiosystem_1_1exchange__state_ab3d89e86a0d3c4ef488e5f351fbc77e2}\index{sysiosystem::exchange\_state@{sysiosystem::exchange\_state}!get\_bancor\_output@{get\_bancor\_output}}
+\index{get\_bancor\_output@{get\_bancor\_output}!sysiosystem::exchange\_state@{sysiosystem::exchange\_state}}
+\doxysubsubsection{\texorpdfstring{get\_bancor\_output()}{get\_bancor\_output()}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1exchange__state_ab3d89e86a0d3c4ef488e5f351fbc77e2} 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} sysiosystem\+::exchange\+\_\+state\+::get\+\_\+bancor\+\_\+output (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}}]{inp\+\_\+reserve}{, }\item[{\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}}]{out\+\_\+reserve}{, }\item[{\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}}]{inp}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{exchange__state_8cpp_source_l00081}{81}} of file \mbox{\hyperlink{exchange__state_8cpp_source}{exchange\+\_\+state.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00084\ \ \ \ \{}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{double}\ ib\ =\ inp\_reserve;}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{double}\ ob\ =\ out\_reserve;}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{double}\ in\ =\ inp;}
+\DoxyCodeLine{00088\ }
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ out\ =\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}(\ (in\ *\ ob)\ /\ (ib\ +\ in)\ );}
+\DoxyCodeLine{00090\ }
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ out\ <\ 0\ )\ out\ =\ 0;}
+\DoxyCodeLine{00092\ }
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ out;}
+\DoxyCodeLine{00094\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysiosystem_1_1exchange__state_ab3d89e86a0d3c4ef488e5f351fbc77e2_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysiosystem_1_1exchange__state_aea576406feefe9951dc9b04af1db2be2}\index{sysiosystem::exchange\_state@{sysiosystem::exchange\_state}!primary\_key@{primary\_key}}
+\index{primary\_key@{primary\_key}!sysiosystem::exchange\_state@{sysiosystem::exchange\_state}}
+\doxysubsubsection{\texorpdfstring{primary\_key()}{primary\_key()}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1exchange__state_aea576406feefe9951dc9b04af1db2be2} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} sysiosystem\+::exchange\+\_\+state\+::primary\+\_\+key (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{exchange__state_8hpp_source_l00030}{30}} of file \mbox{\hyperlink{exchange__state_8hpp_source}{exchange\+\_\+state.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00030\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysiosystem_1_1exchange__state_a03e4901a1aaacc59b78d85d440972f51}{supply}}.symbol.raw();\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysiosystem_1_1exchange__state_ae2c340ecb97fbfe30c640a522cc1894e}\index{sysiosystem::exchange\_state@{sysiosystem::exchange\_state}!base@{base}}
+\index{base@{base}!sysiosystem::exchange\_state@{sysiosystem::exchange\_state}}
+\doxysubsubsection{\texorpdfstring{base}{base}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1exchange__state_ae2c340ecb97fbfe30c640a522cc1894e} 
+\mbox{\hyperlink{structsysiosystem_1_1exchange__state_1_1connector}{connector}} sysiosystem\+::exchange\+\_\+state\+::base}
+
+
+
+Definition at line \mbox{\hyperlink{exchange__state_8hpp_source_l00027}{27}} of file \mbox{\hyperlink{exchange__state_8hpp_source}{exchange\+\_\+state.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1exchange__state_ad25c6801bcc1707b6dbd780b70b95bc2}\index{sysiosystem::exchange\_state@{sysiosystem::exchange\_state}!quote@{quote}}
+\index{quote@{quote}!sysiosystem::exchange\_state@{sysiosystem::exchange\_state}}
+\doxysubsubsection{\texorpdfstring{quote}{quote}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1exchange__state_ad25c6801bcc1707b6dbd780b70b95bc2} 
+\mbox{\hyperlink{structsysiosystem_1_1exchange__state_1_1connector}{connector}} sysiosystem\+::exchange\+\_\+state\+::quote}
+
+
+
+Definition at line \mbox{\hyperlink{exchange__state_8hpp_source_l00028}{28}} of file \mbox{\hyperlink{exchange__state_8hpp_source}{exchange\+\_\+state.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1exchange__state_a03e4901a1aaacc59b78d85d440972f51}\index{sysiosystem::exchange\_state@{sysiosystem::exchange\_state}!supply@{supply}}
+\index{supply@{supply}!sysiosystem::exchange\_state@{sysiosystem::exchange\_state}}
+\doxysubsubsection{\texorpdfstring{supply}{supply}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1exchange__state_a03e4901a1aaacc59b78d85d440972f51} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} sysiosystem\+::exchange\+\_\+state\+::supply}
+
+
+
+Definition at line \mbox{\hyperlink{exchange__state_8hpp_source_l00018}{18}} of file \mbox{\hyperlink{exchange__state_8hpp_source}{exchange\+\_\+state.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/svetlasyrimis/\+Desktop/wire-\/network/\+WN-\/org/wire-\/system-\/contracts/contracts/sysio.\+system/include/sysio.\+system/\mbox{\hyperlink{exchange__state_8hpp}{exchange\+\_\+state.\+hpp}}\item 
+/\+Users/svetlasyrimis/\+Desktop/wire-\/network/\+WN-\/org/wire-\/system-\/contracts/contracts/sysio.\+system/src/\mbox{\hyperlink{exchange__state_8cpp}{exchange\+\_\+state.\+cpp}}\end{DoxyCompactItemize}

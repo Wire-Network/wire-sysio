@@ -1,0 +1,156 @@
+\doxysection{testing\+::internal\+::Str\+Equality\+Matcher\texorpdfstring{$<$}{<} String\+Type \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classtesting_1_1internal_1_1_str_equality_matcher}{}\label{classtesting_1_1internal_1_1_str_equality_matcher}\index{testing::internal::StrEqualityMatcher$<$ StringType $>$@{testing::internal::StrEqualityMatcher$<$ StringType $>$}}
+
+
+{\ttfamily \#include $<$gmock-\/matchers.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_str_equality_matcher_a613006d82018b18ef8fded721f70f860}{Str\+Equality\+Matcher}} (const String\+Type \&str, bool expect\+\_\+eq, bool case\+\_\+sensitive)
+\item 
+{\footnotesize template$<$typename Char\+Type $>$ }\\bool \mbox{\hyperlink{classtesting_1_1internal_1_1_str_equality_matcher_a72b8373d619e29ce27ed3ecdc6089b0b}{Match\+And\+Explain}} (Char\+Type \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, \mbox{\hyperlink{classtesting_1_1_match_result_listener}{Match\+Result\+Listener}} \texorpdfstring{$\ast$}{*}listener) const
+\item 
+{\footnotesize template$<$typename Matchee\+String\+Type $>$ }\\bool \mbox{\hyperlink{classtesting_1_1internal_1_1_str_equality_matcher_aedb1ac6fc8c15b318dfd8e99927aa2e1}{Match\+And\+Explain}} (const Matchee\+String\+Type \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, \mbox{\hyperlink{classtesting_1_1_match_result_listener}{Match\+Result\+Listener}} \texorpdfstring{$\ast$}{*}) const
+\item 
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_str_equality_matcher_a18c05a02da6b1df1c3dbfe4870aaa3c2}{Describe\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}os) const
+\item 
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_str_equality_matcher_af595c0c79e9e550496fe62bc6bbdd4f3}{Describe\+Negation\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}os) const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename String\+Type$>$\newline
+class testing\+::internal\+::\+Str\+Equality\+Matcher$<$ String\+Type $>$}
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l01295}{1295}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_str_equality_matcher_a613006d82018b18ef8fded721f70f860}\index{testing::internal::StrEqualityMatcher$<$ StringType $>$@{testing::internal::StrEqualityMatcher$<$ StringType $>$}!StrEqualityMatcher@{StrEqualityMatcher}}
+\index{StrEqualityMatcher@{StrEqualityMatcher}!testing::internal::StrEqualityMatcher$<$ StringType $>$@{testing::internal::StrEqualityMatcher$<$ StringType $>$}}
+\doxysubsubsection{\texorpdfstring{StrEqualityMatcher()}{StrEqualityMatcher()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_str_equality_matcher_a613006d82018b18ef8fded721f70f860} 
+template$<$typename String\+Type $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_str_equality_matcher}{testing\+::internal\+::\+Str\+Equality\+Matcher}}$<$ String\+Type $>$\+::\+Str\+Equality\+Matcher (\begin{DoxyParamCaption}\item[{const String\+Type \&}]{str}{, }\item[{bool}]{expect\+\_\+eq}{, }\item[{bool}]{case\+\_\+sensitive}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l01297}{1297}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01299\ \ \ \ \ \ \ :\ string\_(str),\ expect\_eq\_(expect\_eq),\ case\_sensitive\_(case\_sensitive)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_str_equality_matcher_af595c0c79e9e550496fe62bc6bbdd4f3}\index{testing::internal::StrEqualityMatcher$<$ StringType $>$@{testing::internal::StrEqualityMatcher$<$ StringType $>$}!DescribeNegationTo@{DescribeNegationTo}}
+\index{DescribeNegationTo@{DescribeNegationTo}!testing::internal::StrEqualityMatcher$<$ StringType $>$@{testing::internal::StrEqualityMatcher$<$ StringType $>$}}
+\doxysubsubsection{\texorpdfstring{DescribeNegationTo()}{DescribeNegationTo()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_str_equality_matcher_af595c0c79e9e550496fe62bc6bbdd4f3} 
+template$<$typename String\+Type $>$ \\
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_str_equality_matcher}{testing\+::internal\+::\+Str\+Equality\+Matcher}}$<$ String\+Type $>$\+::\+Describe\+Negation\+To (\begin{DoxyParamCaption}\item[{\+::std\+::ostream \texorpdfstring{$\ast$}{*}}]{os}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l01344}{1344}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01344\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01345\ \ \ \ \ DescribeToHelper(!expect\_eq\_,\ os);}
+\DoxyCodeLine{01346\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1internal_1_1_str_equality_matcher_a18c05a02da6b1df1c3dbfe4870aaa3c2}\index{testing::internal::StrEqualityMatcher$<$ StringType $>$@{testing::internal::StrEqualityMatcher$<$ StringType $>$}!DescribeTo@{DescribeTo}}
+\index{DescribeTo@{DescribeTo}!testing::internal::StrEqualityMatcher$<$ StringType $>$@{testing::internal::StrEqualityMatcher$<$ StringType $>$}}
+\doxysubsubsection{\texorpdfstring{DescribeTo()}{DescribeTo()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_str_equality_matcher_a18c05a02da6b1df1c3dbfe4870aaa3c2} 
+template$<$typename String\+Type $>$ \\
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_str_equality_matcher}{testing\+::internal\+::\+Str\+Equality\+Matcher}}$<$ String\+Type $>$\+::\+Describe\+To (\begin{DoxyParamCaption}\item[{\+::std\+::ostream \texorpdfstring{$\ast$}{*}}]{os}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l01340}{1340}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01340\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01341\ \ \ \ \ DescribeToHelper(expect\_eq\_,\ os);}
+\DoxyCodeLine{01342\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1internal_1_1_str_equality_matcher_a72b8373d619e29ce27ed3ecdc6089b0b}\index{testing::internal::StrEqualityMatcher$<$ StringType $>$@{testing::internal::StrEqualityMatcher$<$ StringType $>$}!MatchAndExplain@{MatchAndExplain}}
+\index{MatchAndExplain@{MatchAndExplain}!testing::internal::StrEqualityMatcher$<$ StringType $>$@{testing::internal::StrEqualityMatcher$<$ StringType $>$}}
+\doxysubsubsection{\texorpdfstring{MatchAndExplain()}{MatchAndExplain()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_str_equality_matcher_a72b8373d619e29ce27ed3ecdc6089b0b} 
+template$<$typename String\+Type $>$ \\
+template$<$typename Char\+Type $>$ \\
+bool \mbox{\hyperlink{classtesting_1_1internal_1_1_str_equality_matcher}{testing\+::internal\+::\+Str\+Equality\+Matcher}}$<$ String\+Type $>$\+::\+Match\+And\+Explain (\begin{DoxyParamCaption}\item[{Char\+Type \texorpdfstring{$\ast$}{*}}]{s}{, }\item[{\mbox{\hyperlink{classtesting_1_1_match_result_listener}{Match\+Result\+Listener}} \texorpdfstring{$\ast$}{*}}]{listener}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l01320}{1320}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01320\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01321\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ ==\ NULL)\ \{}
+\DoxyCodeLine{01322\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !expect\_eq\_;}
+\DoxyCodeLine{01323\ \ \ \ \ \}}
+\DoxyCodeLine{01324\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_str_equality_matcher_a72b8373d619e29ce27ed3ecdc6089b0b}{MatchAndExplain}}(StringType(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}),\ listener);}
+\DoxyCodeLine{01325\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=185pt]{classtesting_1_1internal_1_1_str_equality_matcher_a72b8373d619e29ce27ed3ecdc6089b0b_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=185pt]{classtesting_1_1internal_1_1_str_equality_matcher_a72b8373d619e29ce27ed3ecdc6089b0b_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_str_equality_matcher_aedb1ac6fc8c15b318dfd8e99927aa2e1}\index{testing::internal::StrEqualityMatcher$<$ StringType $>$@{testing::internal::StrEqualityMatcher$<$ StringType $>$}!MatchAndExplain@{MatchAndExplain}}
+\index{MatchAndExplain@{MatchAndExplain}!testing::internal::StrEqualityMatcher$<$ StringType $>$@{testing::internal::StrEqualityMatcher$<$ StringType $>$}}
+\doxysubsubsection{\texorpdfstring{MatchAndExplain()}{MatchAndExplain()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_str_equality_matcher_aedb1ac6fc8c15b318dfd8e99927aa2e1} 
+template$<$typename String\+Type $>$ \\
+template$<$typename Matchee\+String\+Type $>$ \\
+bool \mbox{\hyperlink{classtesting_1_1internal_1_1_str_equality_matcher}{testing\+::internal\+::\+Str\+Equality\+Matcher}}$<$ String\+Type $>$\+::\+Match\+And\+Explain (\begin{DoxyParamCaption}\item[{const Matchee\+String\+Type \&}]{s}{, }\item[{\mbox{\hyperlink{classtesting_1_1_match_result_listener}{Match\+Result\+Listener}} \texorpdfstring{$\ast$}{*}}]{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l01332}{1332}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01333\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01334\ \ \ \ \ \textcolor{keyword}{const}\ StringType\&\ s2(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{01335\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ eq\ =\ case\_sensitive\_\ ?\ s2\ ==\ string\_\ :}
+\DoxyCodeLine{01336\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a383de24b1cca6648c14b03964c0ed843}{CaseInsensitiveStringEquals}}(s2,\ string\_);}
+\DoxyCodeLine{01337\ \ \ \ \ \textcolor{keywordflow}{return}\ expect\_eq\_\ ==\ eq;}
+\DoxyCodeLine{01338\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_str_equality_matcher_aedb1ac6fc8c15b318dfd8e99927aa2e1_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/include/gmock/\mbox{\hyperlink{gmock-matchers_8h}{gmock-\/matchers.\+h}}\end{DoxyCompactItemize}

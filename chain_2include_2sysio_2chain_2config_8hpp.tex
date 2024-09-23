@@ -1,0 +1,90 @@
+\doxysection{libraries/chain/include/sysio/chain/config.hpp File Reference}
+\hypertarget{chain_2include_2sysio_2chain_2config_8hpp}{}\label{chain_2include_2sysio_2chain_2config_8hpp}\index{libraries/chain/include/sysio/chain/config.hpp@{libraries/chain/include/sysio/chain/config.hpp}}
+{\ttfamily \#include $<$sysio/chain/wasm\+\_\+interface.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/time.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/utility.\+hpp$>$}\newline
+Include dependency graph for config.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{chain_2include_2sysio_2chain_2config_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{chain_2include_2sysio_2chain_2config_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain}{sysio\+::chain}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain_1_1config}{sysio\+::chain\+::config}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef \+\_\+\+\_\+uint128\+\_\+t \mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a376f631fcb770bd4b2e8349a33e52f8a}{sysio\+::chain\+::config\+::uint128\+\_\+t}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+constexpr \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{chain_2include_2sysio_2chain_2config_8hpp_a0b4bacb63f31764f50a185f320551fbc}{SYS\+\_\+\+PERCENT}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} percentage)
+\item 
+{\footnotesize template$<$typename Number $>$ }\\Number \mbox{\hyperlink{chain_2include_2sysio_2chain_2config_8hpp_a2a92d690e8a1055ceafb4bb0e513ccaa}{SYS\+\_\+\+PERCENT\+\_\+\+CEIL}} (Number \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} percentage)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\constexpr \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a2772c77657b1f6fda680bbe8f7282d13}{sysio\+::chain\+::config\+::billable\+\_\+size\+\_\+v}} = ((\mbox{\hyperlink{structsysio_1_1chain_1_1config_1_1billable__size}{billable\+\_\+size}}$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}} + billable\+\_\+alignment -\/ 1) / billable\+\_\+alignment) \texorpdfstring{$\ast$}{*} billable\+\_\+alignment
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{chain_2include_2sysio_2chain_2config_8hpp_a0b4bacb63f31764f50a185f320551fbc}\index{config.hpp@{config.hpp}!SYS\_PERCENT@{SYS\_PERCENT}}
+\index{SYS\_PERCENT@{SYS\_PERCENT}!config.hpp@{config.hpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_PERCENT()}{SYS\_PERCENT()}}
+{\footnotesize\ttfamily \label{chain_2include_2sysio_2chain_2config_8hpp_a0b4bacb63f31764f50a185f320551fbc} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} SYS\+\_\+\+PERCENT (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{value}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{percentage}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{chain_2include_2sysio_2chain_2config_8hpp_source_l00152}{152}} of file \mbox{\hyperlink{chain_2include_2sysio_2chain_2config_8hpp_source}{config.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00153\ \ \ \ \textcolor{keywordflow}{return}\ (\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ *\ percentage)\ /\ sysio::chain::config::percent\_100;}
+\DoxyCodeLine{00154\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{chain_2include_2sysio_2chain_2config_8hpp_a0b4bacb63f31764f50a185f320551fbc_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{chain_2include_2sysio_2chain_2config_8hpp_a2a92d690e8a1055ceafb4bb0e513ccaa}\index{config.hpp@{config.hpp}!SYS\_PERCENT\_CEIL@{SYS\_PERCENT\_CEIL}}
+\index{SYS\_PERCENT\_CEIL@{SYS\_PERCENT\_CEIL}!config.hpp@{config.hpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_PERCENT\_CEIL()}{SYS\_PERCENT\_CEIL()}}
+{\footnotesize\ttfamily \label{chain_2include_2sysio_2chain_2config_8hpp_a2a92d690e8a1055ceafb4bb0e513ccaa} 
+template$<$typename Number $>$ \\
+Number SYS\+\_\+\+PERCENT\+\_\+\+CEIL (\begin{DoxyParamCaption}\item[{Number}]{value}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{percentage}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{chain_2include_2sysio_2chain_2config_8hpp_source_l00157}{157}} of file \mbox{\hyperlink{chain_2include_2sysio_2chain_2config_8hpp_source}{config.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00158\ \ \ \ \textcolor{keywordflow}{return}\ ((\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ *\ percentage)\ +\ sysio::chain::config::percent\_100\ -\/\ sysio::chain::config::percent\_1)\ \ /\ sysio::chain::config::percent\_100;}
+\DoxyCodeLine{00159\ \}}
+
+\end{DoxyCode}

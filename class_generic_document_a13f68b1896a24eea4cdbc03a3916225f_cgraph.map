@@ -1,0 +1,26 @@
+<map id="GenericDocument::ParseInsitu" name="GenericDocument::ParseInsitu">
+<area shape="rect" id="Node000001" title="Parse JSON text from a mutable string." alt="" coords="5,129,206,155"/>
+<area shape="rect" id="Node000002" href="$class_generic_document.html#a7bc1827a7ab04de4789fe46237f0e921" title="Parse JSON text from an input stream (with Encoding conversion)" alt="" coords="254,129,464,155"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="206,140,238,140,238,145,206,145"/>
+<area shape="rect" id="Node000003" href="$classinternal_1_1_stack.html#aa6f933acc7ecd92a2b567db5fa8cd43a" title=" " alt="" coords="514,5,699,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="375,127,433,84,471,60,511,40,526,34,528,39,513,45,473,65,436,89,378,131"/>
+<area shape="rect" id="Node000004" href="$classinternal_1_1_stack.html#ac484468a2791bd3e9ba609bd1600ab48" title=" " alt="" coords="526,55,686,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="397,126,511,89,535,82,537,87,513,94,399,131"/>
+<area shape="rect" id="Node000005" href="$classinternal_1_1_stack.html#a657ae4d477b25d4e0045aee0efd809c3" title=" " alt="" coords="512,104,700,130"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="464,129,496,125,497,131,465,134"/>
+<area shape="rect" id="Node000006" href="$class_generic_value.html#ad7502bbfcd0c14f7ece07243d56e2b90" title="Assignment with move semantics." alt="" coords="526,153,687,179"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="465,150,510,154,510,160,464,155"/>
+<area shape="rect" id="Node000012" href="$class_generic_document.html#a901db1678f99a1b550003eed75bc380a" title="Parse JSON text from a read&#45;only string (with Encoding conversion)" alt="" coords="522,203,690,228"/>
+<area shape="poly" id="edge11_Node000002_Node000012" title=" " alt="" coords="378,153,433,175,508,199,506,205,431,180,376,158"/>
+<area shape="rect" id="Node000007" href="$class_generic_value.html#abb8ea2dfbe74ff4ee7dac6be31317f81" title="Assignment without calling destructor." alt="" coords="757,129,931,155"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="687,155,741,150,742,155,687,161"/>
+<area shape="rect" id="Node000008" href="$class_generic_value.html#a213ba89ef5ef961a5e655bd8c78ac9f4" title="Destructor." alt="" coords="748,179,940,204"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="687,172,733,177,732,182,687,177"/>
+<area shape="rect" id="Node000009" href="$class_generic_value.html#a40f567bae6fabbb07822ebac5fe00bfc" title=" " alt="" coords="998,106,1180,146"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="899,175,939,165,998,149,1000,154,940,170,900,181"/>
+<area shape="rect" id="Node000010" href="$class_generic_value.html#a8c39af1a639eae1b59db66e2cbb537c9" title=" " alt="" coords="998,171,1180,212"/>
+<area shape="poly" id="edge9_Node000008_Node000010" title=" " alt="" coords="940,189,982,189,982,194,940,194"/>
+<area shape="rect" id="Node000011" href="$class_generic_value.html#af182f2ccbcd962d2a28f92407622e9a9" title=" " alt="" coords="988,236,1190,262"/>
+<area shape="poly" id="edge10_Node000008_Node000011" title=" " alt="" coords="903,202,1017,229,1015,235,901,208"/>
+<area shape="poly" id="edge12_Node000012_Node000002" title=" " alt="" coords="586,205,511,182,447,162,448,157,513,177,587,200"/>
+</map>

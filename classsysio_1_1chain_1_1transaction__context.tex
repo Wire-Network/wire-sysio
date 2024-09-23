@@ -1,0 +1,1186 @@
+\doxysection{sysio\+::chain\+::transaction\+\_\+context Class Reference}
+\hypertarget{classsysio_1_1chain_1_1transaction__context}{}\label{classsysio_1_1chain_1_1transaction__context}\index{sysio::chain::transaction\_context@{sysio::chain::transaction\_context}}
+
+
+{\ttfamily \#include $<$transaction\+\_\+context.\+hpp$>$}
+
+
+
+Collaboration diagram for sysio\+::chain\+::transaction\+\_\+context\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1transaction__context__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a642c586e04091f30df003a71847f35f3}{transaction\+\_\+context}} (\mbox{\hyperlink{classsysio_1_1chain_1_1controller}{controller}} \&c, const \mbox{\hyperlink{structsysio_1_1chain_1_1packed__transaction}{packed\+\_\+transaction}} \&t, \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__checktime__timer}{transaction\+\_\+checktime\+\_\+timer}} \&\&timer, \mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}} \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a9c12181bd0bd8a5aea0200c80e7b00e7}{start}}=\mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{fc\+::time\+\_\+point\+::now}}(), bool \mbox{\hyperlink{namespacefc_a3d8a2be677709cc41f09aa7925f2d55fad6bcd1364809e1b881bb22334d14cd56}{read\+\_\+only}}=false)
+\item 
+\mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_ae449b02626b4cd23a0aeb8b091f582ab}{\texorpdfstring{$\sim$}{\string~}transaction\+\_\+context}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a5d3d1260b6f77fdc4b6a8cef3417e94c}{init\+\_\+for\+\_\+implicit\+\_\+trx}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} initial\+\_\+net\+\_\+usage=0)
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_adbf0d6f8a8a8d3b4544fafe24cd0a135}{init\+\_\+for\+\_\+input\+\_\+trx}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} packed\+\_\+trx\+\_\+unprunable\+\_\+size, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} packed\+\_\+trx\+\_\+prunable\+\_\+size)
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a03f76febe2160f0f23a5f60dae262184}{init\+\_\+for\+\_\+deferred\+\_\+trx}} (\mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}} \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_ab8e1aaec319ed2ae90b6a6f499919c89}{published}})
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a01f9fd71b2b5511311c8817a8b32c845}{exec}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a300b3d2c25e7de11562c579c41f43dda}{finalize}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a558e8aff8e48deb61fae7407e10e8788}{squash}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a5631f6c990c61c078e0de6f0e53171be}{undo}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a62b3defb107a356551a01d2c78e80b4b}{add\+\_\+net\+\_\+usage}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} u)
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_ac2563020d92f69f6fe9a0b878f5a86f3}{check\+\_\+net\+\_\+usage}} () const
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_ac47cac1e2ac5625a8589686503dd1261}{checktime}} () const
+\item 
+{\footnotesize template$<$typename Digest\+Type $>$ }\\Digest\+Type \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_ab851893d7707bae5ac294b19ecfd667b}{hash\+\_\+with\+\_\+checktime}} (const char \texorpdfstring{$\ast$}{*}data, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{yubihsm__pkcs11_8c_a133461752aa04472950ae3cccb8b86de}{datalen}}) const
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a26ad1d103e9f47c69dce0a8a85f76039}{pause\+\_\+billing\+\_\+timer}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a5ca7a519fb084bc4ad8c692a81f69277}{resume\+\_\+billing\+\_\+timer}} ()
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a2f8dc57cb2e3562de132326b0d06e15d}{update\+\_\+billed\+\_\+cpu\+\_\+time}} (\mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}} now)
+\item 
+std\+::tuple$<$ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}, \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}, bool, bool $>$ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_ad525fafe1ffad93dc767bf2b5b9ea0cc}{max\+\_\+bandwidth\+\_\+billed\+\_\+accounts\+\_\+can\+\_\+pay}} (bool force\+\_\+elastic\+\_\+limits=false) const
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a7ecbfbb3d05a6a0b128feeb0a469878c}{validate\+\_\+referenced\+\_\+accounts}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1transaction}{transaction}} \&trx, bool enforce\+\_\+actor\+\_\+whitelist\+\_\+blacklist) const
+\begin{DoxyCompactList}\small\item\em record\+\_\+transaction \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classsysio_1_1chain_1_1controller}{controller}} \& \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_af52efad2c5859002ad3bedad5834cb7f}{control}}
+\begin{DoxyCompactList}\small\item\em Fields\+: \end{DoxyCompactList}\item 
+const \mbox{\hyperlink{structsysio_1_1chain_1_1packed__transaction}{packed\+\_\+transaction}} \& \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a08e9cf6a4b8ce2f6211ce9d8de1b4da3}{packed\+\_\+trx}}
+\item 
+std\+::optional$<$ \mbox{\hyperlink{structchainbase_1_1database_1_1session}{chainbase\+::database\+::session}} $>$ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a90144b543cf9fd4e5ed08fc2a4cd75ff}{undo\+\_\+session}}
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_a4ee2867a6bec961c7a78b203cfd76be9}{transaction\+\_\+trace\+\_\+ptr}} \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a7211fab425e4375e247c2a3d1924e63f}{trace}}
+\item 
+\mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}} \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a9c12181bd0bd8a5aea0200c80e7b00e7}{start}}
+\item 
+\mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}} \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_ab8e1aaec319ed2ae90b6a6f499919c89}{published}}
+\item 
+\mbox{\hyperlink{classfc_1_1vector}{vector}}$<$ \mbox{\hyperlink{namespacesysio_1_1chain_a357fd9478475457e5bb386a3143079b6}{digest\+\_\+type}} $>$ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_aa16627a2b31f924e998137ba14f22123}{executed\+\_\+action\+\_\+receipt\+\_\+digests}}
+\item 
+flat\+\_\+set$<$ \mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} $>$ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_ac178b3a7e2ef905025ae4e2f262422ff}{bill\+\_\+to\+\_\+accounts}}
+\item 
+flat\+\_\+set$<$ \mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} $>$ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a5bcfb17b8688258f7287ad7c99567fad}{validate\+\_\+ram\+\_\+usage}}
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a0a6b517bf9697af0ff45842c12a72579}{initial\+\_\+max\+\_\+billable\+\_\+cpu}} = 0
+\begin{DoxyCompactList}\small\item\em the maximum number of virtual CPU instructions of the transaction that can be safely billed to the billable accounts \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}} \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a73f4035fab7271fec7fcac5aa01bd461}{delay}}
+\item 
+bool \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_ad22e57171587ed29b371184a7be4529a}{is\+\_\+input}} = false
+\item 
+bool \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a8cb5a958083512d7ff0bff751db87dd9}{apply\+\_\+context\+\_\+free}} = true
+\item 
+bool \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a799e9208ec6d2ea3d1dfccfd4eb97cec}{enforce\+\_\+whiteblacklist}} = true
+\item 
+\mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}} \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a708229aea669816e99b0039d716c3ed5}{block\+\_\+deadline}} = \mbox{\hyperlink{classfc_1_1time__point_aeccf1b70aa34b132c5269313b8a50573}{fc\+::time\+\_\+point\+::maximum}}()
+\item 
+\mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}} \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a1fafa59ca3817a6fc89466a7da19b72c}{leeway}} = \mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}}( config\+::default\+\_\+subjective\+\_\+cpu\+\_\+leeway\+\_\+us )
+\item 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a08b550fccea696363035c6736c146436}{billed\+\_\+cpu\+\_\+time\+\_\+us}} = 0
+\item 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_af80f48b601534a0adc286de6195e26a2}{subjective\+\_\+cpu\+\_\+bill\+\_\+us}} = 0
+\item 
+bool \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a05dbab6e9e0d4f3e30fa1392ac4430a1}{explicit\+\_\+billed\+\_\+cpu\+\_\+time}} = false
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1transaction__checktime__timer}{transaction\+\_\+checktime\+\_\+timer}} \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a346ee8df9ed43ccebf9ec1455facfc8d}{transaction\+\_\+timer}}
+\item 
+const bool \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_acd4137f1354209bb1237e5a1f26fdbcd}{is\+\_\+read\+\_\+only}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_afacea5f421e7b989103659e2e5fa3353}{controller\+\_\+impl}}
+\item 
+\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a7b669aea7e7e49e2cd5f5eff2e8ca927}{apply\+\_\+context}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{transaction__context_8hpp_source_l00032}{32}} of file \mbox{\hyperlink{transaction__context_8hpp_source}{transaction\+\_\+context.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classsysio_1_1chain_1_1transaction__context_a642c586e04091f30df003a71847f35f3}\index{sysio::chain::transaction\_context@{sysio::chain::transaction\_context}!transaction\_context@{transaction\_context}}
+\index{transaction\_context@{transaction\_context}!sysio::chain::transaction\_context@{sysio::chain::transaction\_context}}
+\doxysubsubsection{\texorpdfstring{transaction\_context()}{transaction\_context()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1transaction__context_a642c586e04091f30df003a71847f35f3} 
+sysio\+::chain\+::transaction\+\_\+context\+::transaction\+\_\+context (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classsysio_1_1chain_1_1controller}{controller}} \&}]{c}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1packed__transaction}{packed\+\_\+transaction}} \&}]{t}{, }\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1transaction__checktime__timer}{transaction\+\_\+checktime\+\_\+timer}} \&\&}]{timer}{, }\item[{\mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}}}]{start}{ = {\ttfamily \mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{fc\+::time\+\_\+point\+::now}}()}, }\item[{bool}]{read\+\_\+only}{ = {\ttfamily false}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{transaction__context_8cpp_source_l00047}{47}} of file \mbox{\hyperlink{transaction__context_8cpp_source}{transaction\+\_\+context.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00052\ \ \ \ :\mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_af52efad2c5859002ad3bedad5834cb7f}{control}}(c)}
+\DoxyCodeLine{00053\ \ \ \ ,\mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a08e9cf6a4b8ce2f6211ce9d8de1b4da3}{packed\_trx}}(t)}
+\DoxyCodeLine{00054\ \ \ \ ,\mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a90144b543cf9fd4e5ed08fc2a4cd75ff}{undo\_session}}()}
+\DoxyCodeLine{00055\ \ \ \ ,\mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a7211fab425e4375e247c2a3d1924e63f}{trace}}(std::make\_shared<transaction\_trace>())}
+\DoxyCodeLine{00056\ \ \ \ ,\mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a9c12181bd0bd8a5aea0200c80e7b00e7}{start}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})}
+\DoxyCodeLine{00057\ \ \ \ ,\mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a346ee8df9ed43ccebf9ec1455facfc8d}{transaction\_timer}}(std::move(tmr))}
+\DoxyCodeLine{00058\ \ \ \ ,\mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_acd4137f1354209bb1237e5a1f26fdbcd}{is\_read\_only}}(\mbox{\hyperlink{namespacefc_a3d8a2be677709cc41f09aa7925f2d55fad6bcd1364809e1b881bb22334d14cd56}{read\_only}})}
+\DoxyCodeLine{00059\ \ \ \ ,net\_usage(\mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a7211fab425e4375e247c2a3d1924e63f}{trace}}-\/>net\_usage)}
+\DoxyCodeLine{00060\ \ \ \ ,pseudo\_start(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})}
+\DoxyCodeLine{00061\ \ \ \ \{}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!c.skip\_db\_sessions())\ \{}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a90144b543cf9fd4e5ed08fc2a4cd75ff}{undo\_session}}.emplace(c.mutable\_db().start\_undo\_session(\textcolor{keyword}{true}));}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a7211fab425e4375e247c2a3d1924e63f}{trace}}-\/>id\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a08e9cf6a4b8ce2f6211ce9d8de1b4da3}{packed\_trx}}.\mbox{\hyperlink{structsysio_1_1chain_1_1packed__transaction_acc706e72aa422ee3e3c02f73871609cb}{id}}();}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a7211fab425e4375e247c2a3d1924e63f}{trace}}-\/>block\_num\ =\ c.head\_block\_num()\ +\ 1;}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a7211fab425e4375e247c2a3d1924e63f}{trace}}-\/>block\_time\ =\ c.pending\_block\_time();}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a7211fab425e4375e247c2a3d1924e63f}{trace}}-\/>producer\_block\_id\ =\ c.pending\_producer\_block\_id();}
+\DoxyCodeLine{00069\ }
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\textcolor{keyword}{auto}\ dm\_logger\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_af52efad2c5859002ad3bedad5834cb7f}{control}}.\mbox{\hyperlink{classsysio_1_1chain_1_1controller_a4f6404b355a3a4bf7fb60c92e85443d1}{get\_deep\_mind\_logger}}())}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ dm\_logger-\/>on\_start\_transaction();}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00074\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1transaction__context_a642c586e04091f30df003a71847f35f3_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1transaction__context_ae449b02626b4cd23a0aeb8b091f582ab}\index{sysio::chain::transaction\_context@{sysio::chain::transaction\_context}!````~transaction\_context@{\texorpdfstring{$\sim$}{\string~}transaction\_context}}
+\index{````~transaction\_context@{\texorpdfstring{$\sim$}{\string~}transaction\_context}!sysio::chain::transaction\_context@{sysio::chain::transaction\_context}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}transaction\_context()}{\string~transaction\_context()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1transaction__context_ae449b02626b4cd23a0aeb8b091f582ab} 
+sysio\+::chain\+::transaction\+\_\+context\+::\texorpdfstring{$\sim$}{\string~}transaction\+\_\+context (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{transaction__context_8cpp_source_l00076}{76}} of file \mbox{\hyperlink{transaction__context_8cpp_source}{transaction\+\_\+context.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00077\ \ \ \ \{}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\textcolor{keyword}{auto}\ dm\_logger\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_af52efad2c5859002ad3bedad5834cb7f}{control}}.\mbox{\hyperlink{classsysio_1_1chain_1_1controller_a4f6404b355a3a4bf7fb60c92e85443d1}{get\_deep\_mind\_logger}}())}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \ dm\_logger-\/>on\_end\_transaction();}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00082\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1transaction__context_ae449b02626b4cd23a0aeb8b091f582ab_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1chain_1_1transaction__context_a62b3defb107a356551a01d2c78e80b4b}\index{sysio::chain::transaction\_context@{sysio::chain::transaction\_context}!add\_net\_usage@{add\_net\_usage}}
+\index{add\_net\_usage@{add\_net\_usage}!sysio::chain::transaction\_context@{sysio::chain::transaction\_context}}
+\doxysubsubsection{\texorpdfstring{add\_net\_usage()}{add\_net\_usage()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1transaction__context_a62b3defb107a356551a01d2c78e80b4b} 
+void sysio\+::chain\+::transaction\+\_\+context\+::add\+\_\+net\+\_\+usage (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{u}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{transaction__context_8hpp_source_l00057}{57}} of file \mbox{\hyperlink{transaction__context_8hpp_source}{transaction\+\_\+context.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00057\ \{\ net\_usage\ +=\ u;\ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_ac2563020d92f69f6fe9a0b878f5a86f3}{check\_net\_usage}}();\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1transaction__context_a62b3defb107a356551a01d2c78e80b4b_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1transaction__context_a62b3defb107a356551a01d2c78e80b4b_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1transaction__context_ac2563020d92f69f6fe9a0b878f5a86f3}\index{sysio::chain::transaction\_context@{sysio::chain::transaction\_context}!check\_net\_usage@{check\_net\_usage}}
+\index{check\_net\_usage@{check\_net\_usage}!sysio::chain::transaction\_context@{sysio::chain::transaction\_context}}
+\doxysubsubsection{\texorpdfstring{check\_net\_usage()}{check\_net\_usage()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1transaction__context_ac2563020d92f69f6fe9a0b878f5a86f3} 
+void sysio\+::chain\+::transaction\+\_\+context\+::check\+\_\+net\+\_\+usage (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{transaction__context_8cpp_source_l00404}{404}} of file \mbox{\hyperlink{transaction__context_8cpp_source}{transaction\+\_\+context.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00404\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00405\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_af52efad2c5859002ad3bedad5834cb7f}{control}}.\mbox{\hyperlink{classsysio_1_1chain_1_1controller_afc8b0aff5d6f215c336a682c83badf6e}{skip\_trx\_checks}}())\ \{}
+\DoxyCodeLine{00406\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ BOOST\_UNLIKELY(net\_usage\ >\ eager\_net\_limit)\ )\ \{}
+\DoxyCodeLine{00407\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ net\_limit\_due\_to\_block\ )\ \{}
+\DoxyCodeLine{00408\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a1bfa656552ea0534b2c91ee0fe33f850}{SYS\_THROW}}(\ block\_net\_usage\_exceeded,}
+\DoxyCodeLine{00409\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}not\ enough\ space\ left\ in\ block:\ \$\{net\_usage\}\ >\ \$\{net\_limit\}"{}},}
+\DoxyCodeLine{00410\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}net\_usage"{}},\ net\_usage)(\textcolor{stringliteral}{"{}net\_limit"{}},\ eager\_net\_limit)\ );}
+\DoxyCodeLine{00411\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (net\_limit\_due\_to\_greylist)\ \{}
+\DoxyCodeLine{00412\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a1bfa656552ea0534b2c91ee0fe33f850}{SYS\_THROW}}(\ greylist\_net\_usage\_exceeded,}
+\DoxyCodeLine{00413\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}greylisted\ transaction\ net\ usage\ is\ too\ high:\ \$\{net\_usage\}\ >\ \$\{net\_limit\}"{}},}
+\DoxyCodeLine{00414\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}net\_usage"{}},\ net\_usage)(\textcolor{stringliteral}{"{}net\_limit"{}},\ eager\_net\_limit)\ );}
+\DoxyCodeLine{00415\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00416\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a1bfa656552ea0534b2c91ee0fe33f850}{SYS\_THROW}}(\ tx\_net\_usage\_exceeded,}
+\DoxyCodeLine{00417\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}transaction\ net\ usage\ is\ too\ high:\ \$\{net\_usage\}\ >\ \$\{net\_limit\}"{}},}
+\DoxyCodeLine{00418\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}net\_usage"{}},\ net\_usage)(\textcolor{stringliteral}{"{}net\_limit"{}},\ eager\_net\_limit)\ );}
+\DoxyCodeLine{00419\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00420\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00421\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00422\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1transaction__context_ac2563020d92f69f6fe9a0b878f5a86f3_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1transaction__context_ac2563020d92f69f6fe9a0b878f5a86f3_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1transaction__context_ac47cac1e2ac5625a8589686503dd1261}\index{sysio::chain::transaction\_context@{sysio::chain::transaction\_context}!checktime@{checktime}}
+\index{checktime@{checktime}!sysio::chain::transaction\_context@{sysio::chain::transaction\_context}}
+\doxysubsubsection{\texorpdfstring{checktime()}{checktime()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1transaction__context_ac47cac1e2ac5625a8589686503dd1261} 
+void sysio\+::chain\+::transaction\+\_\+context\+::checktime (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{transaction__context_8cpp_source_l00424}{424}} of file \mbox{\hyperlink{transaction__context_8cpp_source}{transaction\+\_\+context.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00424\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00425\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(BOOST\_LIKELY(\mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a346ee8df9ed43ccebf9ec1455facfc8d}{transaction\_timer}}.\mbox{\hyperlink{structsysio_1_1chain_1_1transaction__checktime__timer_a957951b0f382670abeac7531d35924c1}{expired}}\ ==\ \textcolor{keyword}{false}))}
+\DoxyCodeLine{00426\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00427\ }
+\DoxyCodeLine{00428\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ now\ =\ \mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{fc::time\_point::now}}();}
+\DoxyCodeLine{00429\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a05dbab6e9e0d4f3e30fa1392ac4430a1}{explicit\_billed\_cpu\_time}}\ ||\ deadline\_exception\_code\ ==\ deadline\_exception::code\_value\ )\ \{}
+\DoxyCodeLine{00430\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a1bfa656552ea0534b2c91ee0fe33f850}{SYS\_THROW}}(\ deadline\_exception,\ \textcolor{stringliteral}{"{}deadline\ exceeded\ \$\{billing\_timer\}us"{}},}
+\DoxyCodeLine{00431\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}billing\_timer"{}},\ now\ -\/\ pseudo\_start)(\textcolor{stringliteral}{"{}now"{}},\ now)(\textcolor{stringliteral}{"{}deadline"{}},\ \_deadline)(\textcolor{stringliteral}{"{}start"{}},\ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a9c12181bd0bd8a5aea0200c80e7b00e7}{start}})\ );}
+\DoxyCodeLine{00432\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(\ deadline\_exception\_code\ ==\ block\_cpu\_usage\_exceeded::code\_value\ )\ \{}
+\DoxyCodeLine{00433\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a1bfa656552ea0534b2c91ee0fe33f850}{SYS\_THROW}}(\ block\_cpu\_usage\_exceeded,}
+\DoxyCodeLine{00434\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}not\ enough\ time\ left\ in\ block\ to\ complete\ executing\ transaction\ \$\{billing\_timer\}us"{}},}
+\DoxyCodeLine{00435\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}now"{}},\ now)(\textcolor{stringliteral}{"{}deadline"{}},\ \_deadline)(\textcolor{stringliteral}{"{}start"{}},\ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a9c12181bd0bd8a5aea0200c80e7b00e7}{start}})(\textcolor{stringliteral}{"{}billing\_timer"{}},\ now\ -\/\ pseudo\_start)\ );}
+\DoxyCodeLine{00436\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(\ deadline\_exception\_code\ ==\ tx\_cpu\_usage\_exceeded::code\_value\ )\ \{}
+\DoxyCodeLine{00437\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (cpu\_limit\_due\_to\_greylist)\ \{}
+\DoxyCodeLine{00438\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a1bfa656552ea0534b2c91ee0fe33f850}{SYS\_THROW}}(\ greylist\_cpu\_usage\_exceeded,}
+\DoxyCodeLine{00439\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}greylisted\ transaction\ was\ executing\ for\ too\ long\ \$\{billing\_timer\}us"{}},}
+\DoxyCodeLine{00440\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}now"{}},\ now)(\textcolor{stringliteral}{"{}deadline"{}},\ \_deadline)(\textcolor{stringliteral}{"{}start"{}},\ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a9c12181bd0bd8a5aea0200c80e7b00e7}{start}})(\textcolor{stringliteral}{"{}billing\_timer"{}},\ now\ -\/\ pseudo\_start)\ );}
+\DoxyCodeLine{00441\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00442\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a1bfa656552ea0534b2c91ee0fe33f850}{SYS\_THROW}}(\ tx\_cpu\_usage\_exceeded,}
+\DoxyCodeLine{00443\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}transaction\ was\ executing\ for\ too\ long\ \$\{billing\_timer\}us"{}},}
+\DoxyCodeLine{00444\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}now"{}},\ now)(\textcolor{stringliteral}{"{}deadline"{}},\ \_deadline)(\textcolor{stringliteral}{"{}start"{}},\ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a9c12181bd0bd8a5aea0200c80e7b00e7}{start}})(\textcolor{stringliteral}{"{}billing\_timer"{}},\ now\ -\/\ pseudo\_start)\ );}
+\DoxyCodeLine{00445\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00446\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(\ deadline\_exception\_code\ ==\ leeway\_deadline\_exception::code\_value\ )\ \{}
+\DoxyCodeLine{00447\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a1bfa656552ea0534b2c91ee0fe33f850}{SYS\_THROW}}(\ leeway\_deadline\_exception,}
+\DoxyCodeLine{00448\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}the\ transaction\ was\ unable\ to\ complete\ by\ deadline,\ "{}}}
+\DoxyCodeLine{00449\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}but\ it\ is\ possible\ it\ could\ have\ succeeded\ if\ it\ were\ allowed\ to\ run\ to\ completion\ \$\{billing\_timer\}"{}},}
+\DoxyCodeLine{00450\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}now"{}},\ now)(\textcolor{stringliteral}{"{}deadline"{}},\ \_deadline)(\textcolor{stringliteral}{"{}start"{}},\ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a9c12181bd0bd8a5aea0200c80e7b00e7}{start}})(\textcolor{stringliteral}{"{}billing\_timer"{}},\ now\ -\/\ pseudo\_start)\ );}
+\DoxyCodeLine{00451\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00452\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ \textcolor{keyword}{false},\ \ \mbox{\hyperlink{namespacesysio_1_1chain_a5dfe17906469eaf079c180c1afb4ad94}{transaction\_exception}},\ \textcolor{stringliteral}{"{}unexpected\ deadline\ exception\ code\ \$\{code\}"{}},\ (\textcolor{stringliteral}{"{}code"{}},\ deadline\_exception\_code)\ );}
+\DoxyCodeLine{00453\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1transaction__context_ac47cac1e2ac5625a8589686503dd1261_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1transaction__context_ac47cac1e2ac5625a8589686503dd1261_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1transaction__context_a01f9fd71b2b5511311c8817a8b32c845}\index{sysio::chain::transaction\_context@{sysio::chain::transaction\_context}!exec@{exec}}
+\index{exec@{exec}!sysio::chain::transaction\_context@{sysio::chain::transaction\_context}}
+\doxysubsubsection{\texorpdfstring{exec()}{exec()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1transaction__context_a01f9fd71b2b5511311c8817a8b32c845} 
+void sysio\+::chain\+::transaction\+\_\+context\+::exec (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{transaction__context_8cpp_source_l00313}{313}} of file \mbox{\hyperlink{transaction__context_8cpp_source}{transaction\+\_\+context.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00313\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00314\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ is\_initialized,\ \mbox{\hyperlink{namespacesysio_1_1chain_a5dfe17906469eaf079c180c1afb4ad94}{transaction\_exception}},\ \textcolor{stringliteral}{"{}must\ first\ initialize"{}}\ );}
+\DoxyCodeLine{00315\ }
+\DoxyCodeLine{00316\ \ \ \ \ \ \ \textcolor{keyword}{const}\ transaction\&\ trx\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a08e9cf6a4b8ce2f6211ce9d8de1b4da3}{packed\_trx}}.\mbox{\hyperlink{structsysio_1_1chain_1_1packed__transaction_ad193d26eb97cfd5b3f7d8b957eaa35a2}{get\_transaction}}();}
+\DoxyCodeLine{00317\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a8cb5a958083512d7ff0bff751db87dd9}{apply\_context\_free}}\ )\ \{}
+\DoxyCodeLine{00318\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ act\ :\ trx.context\_free\_actions\ )\ \{}
+\DoxyCodeLine{00319\ \ \ \ \ \ \ \ \ \ \ \ \ schedule\_action(\ act,\ act.account,\ \textcolor{keyword}{true},\ 0,\ 0\ );}
+\DoxyCodeLine{00320\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00321\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00322\ }
+\DoxyCodeLine{00323\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ delay\ ==\ \mbox{\hyperlink{classfc_1_1microseconds}{fc::microseconds}}()\ )\ \{}
+\DoxyCodeLine{00324\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ act\ :\ trx.actions\ )\ \{}
+\DoxyCodeLine{00325\ \ \ \ \ \ \ \ \ \ \ \ \ schedule\_action(\ act,\ act.account,\ \textcolor{keyword}{false},\ 0,\ 0\ );}
+\DoxyCodeLine{00326\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00327\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00328\ }
+\DoxyCodeLine{00329\ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ action\_traces\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a7211fab425e4375e247c2a3d1924e63f}{trace}}-\/>action\_traces;}
+\DoxyCodeLine{00330\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ num\_original\_actions\_to\_execute\ =\ action\_traces.size();}
+\DoxyCodeLine{00331\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ i\ =\ 1;\ i\ <=\ num\_original\_actions\_to\_execute;\ ++i\ )\ \{}
+\DoxyCodeLine{00332\ \ \ \ \ \ \ \ \ \ execute\_action(\ i,\ 0\ );}
+\DoxyCodeLine{00333\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00334\ }
+\DoxyCodeLine{00335\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ delay\ !=\ \mbox{\hyperlink{classfc_1_1microseconds}{fc::microseconds}}()\ )\ \{}
+\DoxyCodeLine{00336\ \ \ \ \ \ \ \ \ \ schedule\_transaction();}
+\DoxyCodeLine{00337\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00338\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1transaction__context_a01f9fd71b2b5511311c8817a8b32c845_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1transaction__context_a01f9fd71b2b5511311c8817a8b32c845_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1transaction__context_a300b3d2c25e7de11562c579c41f43dda}\index{sysio::chain::transaction\_context@{sysio::chain::transaction\_context}!finalize@{finalize}}
+\index{finalize@{finalize}!sysio::chain::transaction\_context@{sysio::chain::transaction\_context}}
+\doxysubsubsection{\texorpdfstring{finalize()}{finalize()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1transaction__context_a300b3d2c25e7de11562c579c41f43dda} 
+void sysio\+::chain\+::transaction\+\_\+context\+::finalize (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{transaction__context_8cpp_source_l00340}{340}} of file \mbox{\hyperlink{transaction__context_8cpp_source}{transaction\+\_\+context.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00340\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00341\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ is\_initialized,\ \mbox{\hyperlink{namespacesysio_1_1chain_a5dfe17906469eaf079c180c1afb4ad94}{transaction\_exception}},\ \textcolor{stringliteral}{"{}must\ first\ initialize"{}}\ );}
+\DoxyCodeLine{00342\ }
+\DoxyCodeLine{00343\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_ad22e57171587ed29b371184a7be4529a}{is\_input}}\ )\ \{}
+\DoxyCodeLine{00344\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ transaction\&\ trx\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a08e9cf6a4b8ce2f6211ce9d8de1b4da3}{packed\_trx}}.\mbox{\hyperlink{structsysio_1_1chain_1_1packed__transaction_ad193d26eb97cfd5b3f7d8b957eaa35a2}{get\_transaction}}();}
+\DoxyCodeLine{00345\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ am\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_af52efad2c5859002ad3bedad5834cb7f}{control}}.\mbox{\hyperlink{classsysio_1_1chain_1_1controller_a4c7e83b4e4c21205b0fb9b2e4b7fb227}{get\_mutable\_authorization\_manager}}();}
+\DoxyCodeLine{00346\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ act\ :\ trx.actions\ )\ \{}
+\DoxyCodeLine{00347\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ auth\ :\ act.authorization\ )\ \{}
+\DoxyCodeLine{00348\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ am.update\_permission\_usage(\ am.get\_permission(auth)\ );}
+\DoxyCodeLine{00349\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00350\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00351\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00352\ }
+\DoxyCodeLine{00353\ \ \ \ \ \ \ \textcolor{comment}{//\ auto\&\ rl\ =\ control.get\_mutable\_resource\_limits\_manager();}}
+\DoxyCodeLine{00354\ \ \ \ \ \ \ \textcolor{comment}{//\ for(\ auto\ a\ :\ validate\_ram\_usage\ )\ \{}}
+\DoxyCodeLine{00355\ \ \ \ \ \ \ \textcolor{comment}{//\ \ \ \ rl.verify\_account\_ram\_usage(\ a\ );}}
+\DoxyCodeLine{00356\ \ \ \ \ \ \ \textcolor{comment}{//\ \}}}
+\DoxyCodeLine{00357\ }
+\DoxyCodeLine{00358\ \ \ \ \ \ \ \textcolor{comment}{//\ //\ Calculate\ the\ new\ highest\ network\ usage\ and\ CPU\ time\ that\ all\ of\ the\ billed\ accounts\ can\ afford\ to\ be\ billed}}
+\DoxyCodeLine{00359\ \ \ \ \ \ \ \textcolor{comment}{//\ int64\_t\ account\_net\_limit\ =\ 0;}}
+\DoxyCodeLine{00360\ \ \ \ \ \ \ \textcolor{comment}{//\ int64\_t\ account\_cpu\_limit\ =\ 0;}}
+\DoxyCodeLine{00361\ \ \ \ \ \ \ \textcolor{comment}{//\ bool\ greylisted\_net\ =\ false,\ greylisted\_cpu\ =\ false;}}
+\DoxyCodeLine{00362\ \ \ \ \ \ \ \textcolor{comment}{//\ std::tie(\ account\_net\_limit,\ account\_cpu\_limit,\ greylisted\_net,\ greylisted\_cpu)\ =\ max\_bandwidth\_billed\_accounts\_can\_pay();}}
+\DoxyCodeLine{00363\ \ \ \ \ \ \ \textcolor{comment}{//\ net\_limit\_due\_to\_greylist\ |=\ greylisted\_net;}}
+\DoxyCodeLine{00364\ \ \ \ \ \ \ \textcolor{comment}{//\ cpu\_limit\_due\_to\_greylist\ |=\ greylisted\_cpu;}}
+\DoxyCodeLine{00365\ }
+\DoxyCodeLine{00366\ \ \ \ \ \ \ \textcolor{comment}{//\ //\ Possibly\ lower\ net\_limit\ to\ what\ the\ billed\ accounts\ can\ pay}}
+\DoxyCodeLine{00367\ \ \ \ \ \ \ \textcolor{comment}{//\ if(\ static\_cast<uint64\_t>(account\_net\_limit)\ <=\ net\_limit\ )\ \{}}
+\DoxyCodeLine{00368\ \ \ \ \ \ \ \textcolor{comment}{//\ \ \ \ //\ NOTE:\ net\_limit\ may\ possibly\ not\ be\ objective\ anymore\ due\ to\ net\ greylisting,\ but\ it\ should\ still\ be\ no\ greater\ than\ the\ truly\ objective\ net\_limit}}
+\DoxyCodeLine{00369\ \ \ \ \ \ \ \textcolor{comment}{//\ \ \ \ net\_limit\ =\ static\_cast<uint64\_t>(account\_net\_limit);}}
+\DoxyCodeLine{00370\ \ \ \ \ \ \ \textcolor{comment}{//\ \ \ \ net\_limit\_due\_to\_block\ =\ false;}}
+\DoxyCodeLine{00371\ \ \ \ \ \ \ \textcolor{comment}{//\ \}}}
+\DoxyCodeLine{00372\ }
+\DoxyCodeLine{00373\ \ \ \ \ \ \ \textcolor{comment}{//\ //\ Possibly\ lower\ objective\_duration\_limit\ to\ what\ the\ billed\ accounts\ can\ pay}}
+\DoxyCodeLine{00374\ \ \ \ \ \ \ \textcolor{comment}{//\ if(\ account\_cpu\_limit\ <=\ objective\_duration\_limit.count()\ )\ \{}}
+\DoxyCodeLine{00375\ \ \ \ \ \ \ \textcolor{comment}{//\ \ \ \ //\ NOTE:\ objective\_duration\_limit\ may\ possibly\ not\ be\ objective\ anymore\ due\ to\ cpu\ greylisting,\ but\ it\ should\ still\ be\ no\ greater\ than\ the\ truly\ objective\ objective\_duration\_limit}}
+\DoxyCodeLine{00376\ \ \ \ \ \ \ \textcolor{comment}{//\ \ \ \ objective\_duration\_limit\ =\ fc::microseconds(account\_cpu\_limit);}}
+\DoxyCodeLine{00377\ \ \ \ \ \ \ \textcolor{comment}{//\ \ \ \ billing\_timer\_exception\_code\ =\ tx\_cpu\_usage\_exceeded::code\_value;}}
+\DoxyCodeLine{00378\ \ \ \ \ \ \ \textcolor{comment}{//\ \}}}
+\DoxyCodeLine{00379\ }
+\DoxyCodeLine{00380\ \ \ \ \ \ \ net\_usage\ =\ ((net\_usage\ +\ 7)/8)*8;\ \textcolor{comment}{//\ Round\ up\ to\ nearest\ multiple\ of\ word\ size\ (8\ bytes)}}
+\DoxyCodeLine{00381\ }
+\DoxyCodeLine{00382\ \ \ \ \ \ \ eager\_net\_limit\ =\ net\_limit;}
+\DoxyCodeLine{00383\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_ac2563020d92f69f6fe9a0b878f5a86f3}{check\_net\_usage}}();}
+\DoxyCodeLine{00384\ }
+\DoxyCodeLine{00385\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ now\ =\ \mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{fc::time\_point::now}}();}
+\DoxyCodeLine{00386\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a7211fab425e4375e247c2a3d1924e63f}{trace}}-\/>elapsed\ =\ now\ -\/\ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a9c12181bd0bd8a5aea0200c80e7b00e7}{start}};}
+\DoxyCodeLine{00387\ }
+\DoxyCodeLine{00388\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a2f8dc57cb2e3562de132326b0d06e15d}{update\_billed\_cpu\_time}}(\ now\ );}
+\DoxyCodeLine{00389\ }
+\DoxyCodeLine{00390\ \ \ \ \ \ \ \textcolor{comment}{//\ validate\_cpu\_usage\_to\_bill(\ billed\_cpu\_time\_us,\ account\_cpu\_limit,\ true\ );}}
+\DoxyCodeLine{00391\ \ \ \ \ \ \ \textcolor{comment}{//\ auto\&\ rl\ =\ control.get\_mutable\_resource\_limits\_manager();}}
+\DoxyCodeLine{00392\ \ \ \ \ \ \ \textcolor{comment}{//\ rl.add\_transaction\_usage(\ bill\_to\_accounts,\ static\_cast<uint64\_t>(billed\_cpu\_time\_us),\ net\_usage,}}
+\DoxyCodeLine{00393\ \ \ \ \ \ \ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ block\_timestamp\_type(control.pending\_block\_time()).slot\ );\ //\ Should\ never\ fail}}
+\DoxyCodeLine{00394\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1transaction__context_a300b3d2c25e7de11562c579c41f43dda_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1transaction__context_a300b3d2c25e7de11562c579c41f43dda_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1transaction__context_ab851893d7707bae5ac294b19ecfd667b}\index{sysio::chain::transaction\_context@{sysio::chain::transaction\_context}!hash\_with\_checktime@{hash\_with\_checktime}}
+\index{hash\_with\_checktime@{hash\_with\_checktime}!sysio::chain::transaction\_context@{sysio::chain::transaction\_context}}
+\doxysubsubsection{\texorpdfstring{hash\_with\_checktime()}{hash\_with\_checktime()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1transaction__context_ab851893d7707bae5ac294b19ecfd667b} 
+template$<$typename Digest\+Type $>$ \\
+Digest\+Type sysio\+::chain\+::transaction\+\_\+context\+::hash\+\_\+with\+\_\+checktime (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{data}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{datalen}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{transaction__context_8hpp_source_l00064}{64}} of file \mbox{\hyperlink{transaction__context_8hpp_source}{transaction\+\_\+context.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ bs\ =\ sysio::chain::config::hashing\_checktime\_block\_size;}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typename}\ DigestType::encoder\ enc;}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a133461752aa04472950ae3cccb8b86de}{datalen}}\ >\ bs\ )\ \{}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ enc.write(\ data,\ bs\ );}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ data\ \ \ \ +=\ bs;}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a133461752aa04472950ae3cccb8b86de}{datalen}}\ -\/=\ bs;}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_ac47cac1e2ac5625a8589686503dd1261}{checktime}}();}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \ \ \ enc.write(\ data,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a133461752aa04472950ae3cccb8b86de}{datalen}}\ );}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ enc.result();}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1transaction__context_ab851893d7707bae5ac294b19ecfd667b_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1transaction__context_ab851893d7707bae5ac294b19ecfd667b_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1transaction__context_a03f76febe2160f0f23a5f60dae262184}\index{sysio::chain::transaction\_context@{sysio::chain::transaction\_context}!init\_for\_deferred\_trx@{init\_for\_deferred\_trx}}
+\index{init\_for\_deferred\_trx@{init\_for\_deferred\_trx}!sysio::chain::transaction\_context@{sysio::chain::transaction\_context}}
+\doxysubsubsection{\texorpdfstring{init\_for\_deferred\_trx()}{init\_for\_deferred\_trx()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1transaction__context_a03f76febe2160f0f23a5f60dae262184} 
+void sysio\+::chain\+::transaction\+\_\+context\+::init\+\_\+for\+\_\+deferred\+\_\+trx (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}}}]{published}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{transaction__context_8cpp_source_l00296}{296}} of file \mbox{\hyperlink{transaction__context_8cpp_source}{transaction\+\_\+context.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00297\ \ \ \ \{}
+\DoxyCodeLine{00298\ \ \ \ \ \ \ \textcolor{keyword}{const}\ transaction\&\ trx\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a08e9cf6a4b8ce2f6211ce9d8de1b4da3}{packed\_trx}}.\mbox{\hyperlink{structsysio_1_1chain_1_1packed__transaction_ad193d26eb97cfd5b3f7d8b957eaa35a2}{get\_transaction}}();}
+\DoxyCodeLine{00299\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ (trx.expiration.sec\_since\_epoch()\ !=\ 0)\ \&\&\ (trx.transaction\_extensions.size()\ >\ 0)\ )\ \{}
+\DoxyCodeLine{00300\ \ \ \ \ \ \ \ \ \ disallow\_transaction\_extensions(\ \textcolor{stringliteral}{"{}no\ transaction\ extensions\ supported\ yet\ for\ deferred\ transactions"{}}\ );}
+\DoxyCodeLine{00301\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00302\ \ \ \ \ \ \ \textcolor{comment}{//\ If\ (trx.expiration.sec\_since\_epoch()\ ==\ 0)\ then\ it\ was\ created\ after\ NO\_DUPLICATE\_DEFERRED\_ID\ activation,}}
+\DoxyCodeLine{00303\ \ \ \ \ \ \ \textcolor{comment}{//\ and\ so\ validation\ of\ its\ extensions\ was\ done\ either\ in:}}
+\DoxyCodeLine{00304\ \ \ \ \ \ \ \textcolor{comment}{//\ \ \ *\ apply\_context::schedule\_deferred\_transaction\ for\ contract-\/generated\ transactions;}}
+\DoxyCodeLine{00305\ \ \ \ \ \ \ \textcolor{comment}{//\ \ \ *\ or\ transaction\_context::init\_for\_input\_trx\ for\ delayed\ input\ transactions.}}
+\DoxyCodeLine{00306\ }
+\DoxyCodeLine{00307\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_ab8e1aaec319ed2ae90b6a6f499919c89}{published}}\ =\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}};}
+\DoxyCodeLine{00308\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a7211fab425e4375e247c2a3d1924e63f}{trace}}-\/>scheduled\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00309\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a8cb5a958083512d7ff0bff751db87dd9}{apply\_context\_free}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00310\ \ \ \ \ \ \ \mbox{\hyperlink{lib_8h_a02fd73d861ef2e4aabb38c0c9ff82947}{init}}(\ 0\ );}
+\DoxyCodeLine{00311\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1transaction__context_a03f76febe2160f0f23a5f60dae262184_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1transaction__context_a03f76febe2160f0f23a5f60dae262184_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1transaction__context_a5d3d1260b6f77fdc4b6a8cef3417e94c}\index{sysio::chain::transaction\_context@{sysio::chain::transaction\_context}!init\_for\_implicit\_trx@{init\_for\_implicit\_trx}}
+\index{init\_for\_implicit\_trx@{init\_for\_implicit\_trx}!sysio::chain::transaction\_context@{sysio::chain::transaction\_context}}
+\doxysubsubsection{\texorpdfstring{init\_for\_implicit\_trx()}{init\_for\_implicit\_trx()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1transaction__context_a5d3d1260b6f77fdc4b6a8cef3417e94c} 
+void sysio\+::chain\+::transaction\+\_\+context\+::init\+\_\+for\+\_\+implicit\+\_\+trx (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{initial\+\_\+net\+\_\+usage}{ = {\ttfamily 0}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{transaction__context_8cpp_source_l00244}{244}} of file \mbox{\hyperlink{transaction__context_8cpp_source}{transaction\+\_\+context.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00245\ \ \ \ \{}
+\DoxyCodeLine{00246\ \ \ \ \ \ \ \textcolor{keyword}{const}\ transaction\&\ trx\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a08e9cf6a4b8ce2f6211ce9d8de1b4da3}{packed\_trx}}.\mbox{\hyperlink{structsysio_1_1chain_1_1packed__transaction_ad193d26eb97cfd5b3f7d8b957eaa35a2}{get\_transaction}}();}
+\DoxyCodeLine{00247\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ trx.transaction\_extensions.size()\ >\ 0\ )\ \{}
+\DoxyCodeLine{00248\ \ \ \ \ \ \ \ \ \ disallow\_transaction\_extensions(\ \textcolor{stringliteral}{"{}no\ transaction\ extensions\ supported\ yet\ for\ implicit\ transactions"{}}\ );}
+\DoxyCodeLine{00249\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00250\ }
+\DoxyCodeLine{00251\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_ab8e1aaec319ed2ae90b6a6f499919c89}{published}}\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_af52efad2c5859002ad3bedad5834cb7f}{control}}.\mbox{\hyperlink{classsysio_1_1chain_1_1controller_abb1d81f96986df3bce46bd37caaf6a69}{pending\_block\_time}}();}
+\DoxyCodeLine{00252\ \ \ \ \ \ \ \mbox{\hyperlink{lib_8h_a02fd73d861ef2e4aabb38c0c9ff82947}{init}}(\ initial\_net\_usage);}
+\DoxyCodeLine{00253\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1transaction__context_a5d3d1260b6f77fdc4b6a8cef3417e94c_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1transaction__context_a5d3d1260b6f77fdc4b6a8cef3417e94c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1transaction__context_adbf0d6f8a8a8d3b4544fafe24cd0a135}\index{sysio::chain::transaction\_context@{sysio::chain::transaction\_context}!init\_for\_input\_trx@{init\_for\_input\_trx}}
+\index{init\_for\_input\_trx@{init\_for\_input\_trx}!sysio::chain::transaction\_context@{sysio::chain::transaction\_context}}
+\doxysubsubsection{\texorpdfstring{init\_for\_input\_trx()}{init\_for\_input\_trx()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1transaction__context_adbf0d6f8a8a8d3b4544fafe24cd0a135} 
+void sysio\+::chain\+::transaction\+\_\+context\+::init\+\_\+for\+\_\+input\+\_\+trx (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{packed\+\_\+trx\+\_\+unprunable\+\_\+size}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{packed\+\_\+trx\+\_\+prunable\+\_\+size}{}\end{DoxyParamCaption})}
+
+checks for dupes
+
+Definition at line \mbox{\hyperlink{transaction__context_8cpp_source_l00255}{255}} of file \mbox{\hyperlink{transaction__context_8cpp_source}{transaction\+\_\+context.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00257\ \ \ \ \{}
+\DoxyCodeLine{00258\ \ \ \ \ \ \ \textcolor{keyword}{const}\ transaction\&\ trx\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a08e9cf6a4b8ce2f6211ce9d8de1b4da3}{packed\_trx}}.\mbox{\hyperlink{structsysio_1_1chain_1_1packed__transaction_ad193d26eb97cfd5b3f7d8b957eaa35a2}{get\_transaction}}();}
+\DoxyCodeLine{00259\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ trx.transaction\_extensions.size()\ >\ 0\ )\ \{}
+\DoxyCodeLine{00260\ \ \ \ \ \ \ \ \ \ disallow\_transaction\_extensions(\ \textcolor{stringliteral}{"{}no\ transaction\ extensions\ supported\ yet\ for\ input\ transactions"{}}\ );}
+\DoxyCodeLine{00261\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00262\ }
+\DoxyCodeLine{00263\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ cfg\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_af52efad2c5859002ad3bedad5834cb7f}{control}}.\mbox{\hyperlink{classsysio_1_1chain_1_1controller_a0bb11e832a05b6437c79bf81758b1b7d}{get\_global\_properties}}().\mbox{\hyperlink{classsysio_1_1chain_1_1global__property__object_a7f149fcf87034217c899838eb4430496}{configuration}};}
+\DoxyCodeLine{00264\ }
+\DoxyCodeLine{00265\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ discounted\_size\_for\_pruned\_data\ =\ packed\_trx\_prunable\_size;}
+\DoxyCodeLine{00266\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ cfg.context\_free\_discount\_net\_usage\_den\ >\ 0}
+\DoxyCodeLine{00267\ \ \ \ \ \ \ \ \ \ \ \&\&\ cfg.context\_free\_discount\_net\_usage\_num\ <\ cfg.context\_free\_discount\_net\_usage\_den\ )}
+\DoxyCodeLine{00268\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00269\ \ \ \ \ \ \ \ \ \ discounted\_size\_for\_pruned\_data\ *=\ cfg.context\_free\_discount\_net\_usage\_num;}
+\DoxyCodeLine{00270\ \ \ \ \ \ \ \ \ \ discounted\_size\_for\_pruned\_data\ =\ \ (\ discounted\_size\_for\_pruned\_data\ +\ cfg.context\_free\_discount\_net\_usage\_den\ -\/\ 1)}
+\DoxyCodeLine{00271\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ /\ cfg.context\_free\_discount\_net\_usage\_den;\ \textcolor{comment}{//\ rounds\ up}}
+\DoxyCodeLine{00272\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00273\ }
+\DoxyCodeLine{00274\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ initial\_net\_usage\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\textcolor{keyword}{>}(cfg.base\_per\_transaction\_net\_usage)}
+\DoxyCodeLine{00275\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ +\ packed\_trx\_unprunable\_size\ +\ discounted\_size\_for\_pruned\_data;}
+\DoxyCodeLine{00276\ }
+\DoxyCodeLine{00277\ }
+\DoxyCodeLine{00278\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ trx.delay\_sec.value\ >\ 0\ )\ \{}
+\DoxyCodeLine{00279\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ delayed,\ also\ charge\ ahead\ of\ time\ for\ the\ additional\ net\ usage\ needed\ to\ retire\ the\ delayed\ transaction}}
+\DoxyCodeLine{00280\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ whether\ that\ be\ by\ successfully\ executing,\ soft\ failure,\ hard\ failure,\ or\ expiration.}}
+\DoxyCodeLine{00281\ \ \ \ \ \ \ \ \ \ initial\_net\_usage\ +=\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\textcolor{keyword}{>}(cfg.base\_per\_transaction\_net\_usage)}
+\DoxyCodeLine{00282\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ +\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\textcolor{keyword}{>}(config::transaction\_id\_net\_usage);}
+\DoxyCodeLine{00283\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00284\ }
+\DoxyCodeLine{00285\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_ab8e1aaec319ed2ae90b6a6f499919c89}{published}}\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_af52efad2c5859002ad3bedad5834cb7f}{control}}.\mbox{\hyperlink{classsysio_1_1chain_1_1controller_abb1d81f96986df3bce46bd37caaf6a69}{pending\_block\_time}}();}
+\DoxyCodeLine{00286\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_ad22e57171587ed29b371184a7be4529a}{is\_input}}\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00287\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_af52efad2c5859002ad3bedad5834cb7f}{control}}.\mbox{\hyperlink{classsysio_1_1chain_1_1controller_afc8b0aff5d6f215c336a682c83badf6e}{skip\_trx\_checks}}())\ \{}
+\DoxyCodeLine{00288\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_af52efad2c5859002ad3bedad5834cb7f}{control}}.\mbox{\hyperlink{classsysio_1_1chain_1_1controller_a3c9f983e8d4aba41afbb0a473feca18f}{validate\_expiration}}(trx);}
+\DoxyCodeLine{00289\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_af52efad2c5859002ad3bedad5834cb7f}{control}}.\mbox{\hyperlink{classsysio_1_1chain_1_1controller_a92e84ef71388fa365bcf17a4fbcce047}{validate\_tapos}}(trx);}
+\DoxyCodeLine{00290\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a7ecbfbb3d05a6a0b128feeb0a469878c}{validate\_referenced\_accounts}}(\ trx,\ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a799e9208ec6d2ea3d1dfccfd4eb97cec}{enforce\_whiteblacklist}}\ \&\&\ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_af52efad2c5859002ad3bedad5834cb7f}{control}}.\mbox{\hyperlink{classsysio_1_1chain_1_1controller_a0fcc85a590581560765686050fe105a8}{is\_producing\_block}}()\ );}
+\DoxyCodeLine{00291\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00292\ \ \ \ \ \ \ \mbox{\hyperlink{lib_8h_a02fd73d861ef2e4aabb38c0c9ff82947}{init}}(\ initial\_net\_usage);}
+\DoxyCodeLine{00293\ \ \ \ \ \ \ record\_transaction(\ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a08e9cf6a4b8ce2f6211ce9d8de1b4da3}{packed\_trx}}.\mbox{\hyperlink{structsysio_1_1chain_1_1packed__transaction_acc706e72aa422ee3e3c02f73871609cb}{id}}(),\ trx.expiration\ );\ }
+\DoxyCodeLine{00294\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1transaction__context_adbf0d6f8a8a8d3b4544fafe24cd0a135_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1transaction__context_adbf0d6f8a8a8d3b4544fafe24cd0a135_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1transaction__context_ad525fafe1ffad93dc767bf2b5b9ea0cc}\index{sysio::chain::transaction\_context@{sysio::chain::transaction\_context}!max\_bandwidth\_billed\_accounts\_can\_pay@{max\_bandwidth\_billed\_accounts\_can\_pay}}
+\index{max\_bandwidth\_billed\_accounts\_can\_pay@{max\_bandwidth\_billed\_accounts\_can\_pay}!sysio::chain::transaction\_context@{sysio::chain::transaction\_context}}
+\doxysubsubsection{\texorpdfstring{max\_bandwidth\_billed\_accounts\_can\_pay()}{max\_bandwidth\_billed\_accounts\_can\_pay()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1transaction__context_ad525fafe1ffad93dc767bf2b5b9ea0cc} 
+std\+::tuple$<$ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}, \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}, bool, bool $>$ sysio\+::chain\+::transaction\+\_\+context\+::max\+\_\+bandwidth\+\_\+billed\+\_\+accounts\+\_\+can\+\_\+pay (\begin{DoxyParamCaption}\item[{bool}]{force\+\_\+elastic\+\_\+limits}{ = {\ttfamily false}}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{transaction__context_8cpp_source_l00574}{574}} of file \mbox{\hyperlink{transaction__context_8cpp_source}{transaction\+\_\+context.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00574\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00575\ \ \ \ \ \ \ \textcolor{comment}{//\ Assumes\ rl.update\_account\_usage(\ bill\_to\_accounts,\ block\_timestamp\_type(control.pending\_block\_time()).slot\ )\ was\ already\ called\ prior}}
+\DoxyCodeLine{00576\ }
+\DoxyCodeLine{00577\ \ \ \ \ \ \ \textcolor{comment}{//\ Calculate\ the\ new\ highest\ network\ usage\ and\ CPU\ time\ that\ all\ of\ the\ billed\ accounts\ can\ afford\ to\ be\ billed}}
+\DoxyCodeLine{00578\ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ rl\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_af52efad2c5859002ad3bedad5834cb7f}{control}}.\mbox{\hyperlink{classsysio_1_1chain_1_1controller_add2453cf4d0208ca9f277337c9a5ed7a}{get\_mutable\_resource\_limits\_manager}}();}
+\DoxyCodeLine{00579\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{static}\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ large\_number\_no\_overflow\ =\ std::numeric\_limits<int64\_t>::max()/2;}
+\DoxyCodeLine{00580\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ account\_net\_limit\ =\ large\_number\_no\_overflow;}
+\DoxyCodeLine{00581\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ account\_cpu\_limit\ =\ large\_number\_no\_overflow;}
+\DoxyCodeLine{00582\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ greylisted\_net\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00583\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ greylisted\_cpu\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00584\ }
+\DoxyCodeLine{00585\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ specified\_greylist\_limit\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_af52efad2c5859002ad3bedad5834cb7f}{control}}.\mbox{\hyperlink{classsysio_1_1chain_1_1controller_a9d7c53697f9d587b6f2e583af9f7e712}{get\_greylist\_limit}}();}
+\DoxyCodeLine{00586\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ :\ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_ac178b3a7e2ef905025ae4e2f262422ff}{bill\_to\_accounts}}\ )\ \{}
+\DoxyCodeLine{00587\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ greylist\_limit\ =\ config::maximum\_elastic\_resource\_multiplier;}
+\DoxyCodeLine{00588\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !force\_elastic\_limits\ \&\&\ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_af52efad2c5859002ad3bedad5834cb7f}{control}}.\mbox{\hyperlink{classsysio_1_1chain_1_1controller_a0fcc85a590581560765686050fe105a8}{is\_producing\_block}}()\ )\ \{}
+\DoxyCodeLine{00589\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_af52efad2c5859002ad3bedad5834cb7f}{control}}.\mbox{\hyperlink{classsysio_1_1chain_1_1controller_aa1c6dcfae09e0e0ea50ba3fda8915114}{is\_resource\_greylisted}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})\ )\ \{}
+\DoxyCodeLine{00590\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ greylist\_limit\ =\ 1;}
+\DoxyCodeLine{00591\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00592\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ greylist\_limit\ =\ specified\_greylist\_limit;}
+\DoxyCodeLine{00593\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00594\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00595\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ [net\_limit,\ net\_was\_greylisted]\ =\ rl.get\_account\_net\_limit(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ greylist\_limit);}
+\DoxyCodeLine{00596\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ net\_limit\ >=\ 0\ )\ \{}
+\DoxyCodeLine{00597\ \ \ \ \ \ \ \ \ \ \ \ \ account\_net\_limit\ =\ std::min(\ account\_net\_limit,\ net\_limit\ );}
+\DoxyCodeLine{00598\ \ \ \ \ \ \ \ \ \ \ \ \ greylisted\_net\ |=\ net\_was\_greylisted;}
+\DoxyCodeLine{00599\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00600\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ [cpu\_limit,\ cpu\_was\_greylisted]\ =\ rl.get\_account\_cpu\_limit(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ greylist\_limit);}
+\DoxyCodeLine{00601\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ cpu\_limit\ >=\ 0\ )\ \{}
+\DoxyCodeLine{00602\ \ \ \ \ \ \ \ \ \ \ \ \ account\_cpu\_limit\ =\ std::min(\ account\_cpu\_limit,\ cpu\_limit\ );}
+\DoxyCodeLine{00603\ \ \ \ \ \ \ \ \ \ \ \ \ greylisted\_cpu\ |=\ cpu\_was\_greylisted;}
+\DoxyCodeLine{00604\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00605\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00606\ }
+\DoxyCodeLine{00607\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ (!force\_elastic\_limits\ \&\&\ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_af52efad2c5859002ad3bedad5834cb7f}{control}}.\mbox{\hyperlink{classsysio_1_1chain_1_1controller_a0fcc85a590581560765686050fe105a8}{is\_producing\_block}}())\ ||\ (!greylisted\_cpu\ \&\&\ !greylisted\_net),}
+\DoxyCodeLine{00608\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_a5dfe17906469eaf079c180c1afb4ad94}{transaction\_exception}},\ \textcolor{stringliteral}{"{}greylisted\ when\ not\ producing\ block"{}}\ );}
+\DoxyCodeLine{00609\ }
+\DoxyCodeLine{00610\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::make\_tuple(account\_net\_limit,\ account\_cpu\_limit,\ greylisted\_net,\ greylisted\_cpu);}
+\DoxyCodeLine{00611\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1transaction__context_ad525fafe1ffad93dc767bf2b5b9ea0cc_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1transaction__context_ad525fafe1ffad93dc767bf2b5b9ea0cc_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1transaction__context_a26ad1d103e9f47c69dce0a8a85f76039}\index{sysio::chain::transaction\_context@{sysio::chain::transaction\_context}!pause\_billing\_timer@{pause\_billing\_timer}}
+\index{pause\_billing\_timer@{pause\_billing\_timer}!sysio::chain::transaction\_context@{sysio::chain::transaction\_context}}
+\doxysubsubsection{\texorpdfstring{pause\_billing\_timer()}{pause\_billing\_timer()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1transaction__context_a26ad1d103e9f47c69dce0a8a85f76039} 
+void sysio\+::chain\+::transaction\+\_\+context\+::pause\+\_\+billing\+\_\+timer (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{transaction__context_8cpp_source_l00455}{455}} of file \mbox{\hyperlink{transaction__context_8cpp_source}{transaction\+\_\+context.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00455\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00456\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a05dbab6e9e0d4f3e30fa1392ac4430a1}{explicit\_billed\_cpu\_time}}\ ||\ pseudo\_start\ ==\ \mbox{\hyperlink{classfc_1_1time__point}{fc::time\_point}}()\ )\ \textcolor{keywordflow}{return};\ \textcolor{comment}{//\ either\ irrelevant\ or\ already\ paused}}
+\DoxyCodeLine{00457\ }
+\DoxyCodeLine{00458\ \ \ \ \ \ \ paused\_time\ =\ \mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{fc::time\_point::now}}();}
+\DoxyCodeLine{00459\ \ \ \ \ \ \ billed\_time\ =\ paused\_time\ -\/\ pseudo\_start;}
+\DoxyCodeLine{00460\ \ \ \ \ \ \ pseudo\_start\ =\ \mbox{\hyperlink{classfc_1_1time__point}{fc::time\_point}}();}
+\DoxyCodeLine{00461\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a346ee8df9ed43ccebf9ec1455facfc8d}{transaction\_timer}}.\mbox{\hyperlink{structsysio_1_1chain_1_1transaction__checktime__timer_ad84002d0816f8b4b6aa3c2dd3772d1fe}{stop}}();}
+\DoxyCodeLine{00462\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1transaction__context_a26ad1d103e9f47c69dce0a8a85f76039_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1transaction__context_a26ad1d103e9f47c69dce0a8a85f76039_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1transaction__context_a5ca7a519fb084bc4ad8c692a81f69277}\index{sysio::chain::transaction\_context@{sysio::chain::transaction\_context}!resume\_billing\_timer@{resume\_billing\_timer}}
+\index{resume\_billing\_timer@{resume\_billing\_timer}!sysio::chain::transaction\_context@{sysio::chain::transaction\_context}}
+\doxysubsubsection{\texorpdfstring{resume\_billing\_timer()}{resume\_billing\_timer()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1transaction__context_a5ca7a519fb084bc4ad8c692a81f69277} 
+void sysio\+::chain\+::transaction\+\_\+context\+::resume\+\_\+billing\+\_\+timer (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{transaction__context_8cpp_source_l00464}{464}} of file \mbox{\hyperlink{transaction__context_8cpp_source}{transaction\+\_\+context.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00464\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00465\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a05dbab6e9e0d4f3e30fa1392ac4430a1}{explicit\_billed\_cpu\_time}}\ ||\ pseudo\_start\ !=\ \mbox{\hyperlink{classfc_1_1time__point}{fc::time\_point}}()\ )\ \textcolor{keywordflow}{return};\ \textcolor{comment}{//\ either\ irrelevant\ or\ already\ running}}
+\DoxyCodeLine{00466\ }
+\DoxyCodeLine{00467\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ now\ =\ \mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{fc::time\_point::now}}();}
+\DoxyCodeLine{00468\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ paused\ =\ now\ -\/\ paused\_time;}
+\DoxyCodeLine{00469\ }
+\DoxyCodeLine{00470\ \ \ \ \ \ \ pseudo\_start\ =\ now\ -\/\ billed\_time;}
+\DoxyCodeLine{00471\ \ \ \ \ \ \ \_deadline\ +=\ paused;}
+\DoxyCodeLine{00472\ }
+\DoxyCodeLine{00473\ \ \ \ \ \ \ \textcolor{comment}{//\ do\ not\ allow\ to\ go\ past\ block\ wall\ clock\ deadline}}
+\DoxyCodeLine{00474\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a708229aea669816e99b0039d716c3ed5}{block\_deadline}}\ <\ \_deadline\ )\ \{}
+\DoxyCodeLine{00475\ \ \ \ \ \ \ \ \ \ deadline\_exception\_code\ =\ deadline\_exception::code\_value;}
+\DoxyCodeLine{00476\ \ \ \ \ \ \ \ \ \ \_deadline\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a708229aea669816e99b0039d716c3ed5}{block\_deadline}};}
+\DoxyCodeLine{00477\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00478\ }
+\DoxyCodeLine{00479\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a346ee8df9ed43ccebf9ec1455facfc8d}{transaction\_timer}}.\mbox{\hyperlink{structsysio_1_1chain_1_1transaction__checktime__timer_aef90525b3674b77efd2bb44da3405fc6}{start}}(\_deadline);}
+\DoxyCodeLine{00480\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1transaction__context_a5ca7a519fb084bc4ad8c692a81f69277_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1transaction__context_a5ca7a519fb084bc4ad8c692a81f69277_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1transaction__context_a558e8aff8e48deb61fae7407e10e8788}\index{sysio::chain::transaction\_context@{sysio::chain::transaction\_context}!squash@{squash}}
+\index{squash@{squash}!sysio::chain::transaction\_context@{sysio::chain::transaction\_context}}
+\doxysubsubsection{\texorpdfstring{squash()}{squash()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1transaction__context_a558e8aff8e48deb61fae7407e10e8788} 
+void sysio\+::chain\+::transaction\+\_\+context\+::squash (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{transaction__context_8cpp_source_l00396}{396}} of file \mbox{\hyperlink{transaction__context_8cpp_source}{transaction\+\_\+context.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00396\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00397\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a90144b543cf9fd4e5ed08fc2a4cd75ff}{undo\_session}})\ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a90144b543cf9fd4e5ed08fc2a4cd75ff}{undo\_session}}-\/>squash();}
+\DoxyCodeLine{00398\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1transaction__context_a558e8aff8e48deb61fae7407e10e8788_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1transaction__context_a5631f6c990c61c078e0de6f0e53171be}\index{sysio::chain::transaction\_context@{sysio::chain::transaction\_context}!undo@{undo}}
+\index{undo@{undo}!sysio::chain::transaction\_context@{sysio::chain::transaction\_context}}
+\doxysubsubsection{\texorpdfstring{undo()}{undo()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1transaction__context_a5631f6c990c61c078e0de6f0e53171be} 
+void sysio\+::chain\+::transaction\+\_\+context\+::undo (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{transaction__context_8cpp_source_l00400}{400}} of file \mbox{\hyperlink{transaction__context_8cpp_source}{transaction\+\_\+context.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00400\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00401\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a90144b543cf9fd4e5ed08fc2a4cd75ff}{undo\_session}})\ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a90144b543cf9fd4e5ed08fc2a4cd75ff}{undo\_session}}-\/>undo();}
+\DoxyCodeLine{00402\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1transaction__context_a5631f6c990c61c078e0de6f0e53171be_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1transaction__context_a2f8dc57cb2e3562de132326b0d06e15d}\index{sysio::chain::transaction\_context@{sysio::chain::transaction\_context}!update\_billed\_cpu\_time@{update\_billed\_cpu\_time}}
+\index{update\_billed\_cpu\_time@{update\_billed\_cpu\_time}!sysio::chain::transaction\_context@{sysio::chain::transaction\_context}}
+\doxysubsubsection{\texorpdfstring{update\_billed\_cpu\_time()}{update\_billed\_cpu\_time()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1transaction__context_a2f8dc57cb2e3562de132326b0d06e15d} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::chain\+::transaction\+\_\+context\+::update\+\_\+billed\+\_\+cpu\+\_\+time (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}}}]{now}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{transaction__context_8cpp_source_l00565}{565}} of file \mbox{\hyperlink{transaction__context_8cpp_source}{transaction\+\_\+context.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00565\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00566\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a05dbab6e9e0d4f3e30fa1392ac4430a1}{explicit\_billed\_cpu\_time}}\ )\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\textcolor{keyword}{>}(\mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a08b550fccea696363035c6736c146436}{billed\_cpu\_time\_us}});}
+\DoxyCodeLine{00567\ }
+\DoxyCodeLine{00568\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ cfg\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_af52efad2c5859002ad3bedad5834cb7f}{control}}.\mbox{\hyperlink{classsysio_1_1chain_1_1controller_a0bb11e832a05b6437c79bf81758b1b7d}{get\_global\_properties}}().\mbox{\hyperlink{classsysio_1_1chain_1_1global__property__object_a7f149fcf87034217c899838eb4430496}{configuration}};}
+\DoxyCodeLine{00569\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a08b550fccea696363035c6736c146436}{billed\_cpu\_time\_us}}\ =\ std::max(\ (now\ -\/\ pseudo\_start).\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}(),\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\textcolor{keyword}{>}(cfg.min\_transaction\_cpu\_usage)\ );}
+\DoxyCodeLine{00570\ }
+\DoxyCodeLine{00571\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\textcolor{keyword}{>}(\mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_a08b550fccea696363035c6736c146436}{billed\_cpu\_time\_us}});}
+\DoxyCodeLine{00572\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1transaction__context_a2f8dc57cb2e3562de132326b0d06e15d_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1transaction__context_a2f8dc57cb2e3562de132326b0d06e15d_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1transaction__context_a7ecbfbb3d05a6a0b128feeb0a469878c}\index{sysio::chain::transaction\_context@{sysio::chain::transaction\_context}!validate\_referenced\_accounts@{validate\_referenced\_accounts}}
+\index{validate\_referenced\_accounts@{validate\_referenced\_accounts}!sysio::chain::transaction\_context@{sysio::chain::transaction\_context}}
+\doxysubsubsection{\texorpdfstring{validate\_referenced\_accounts()}{validate\_referenced\_accounts()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1transaction__context_a7ecbfbb3d05a6a0b128feeb0a469878c} 
+void sysio\+::chain\+::transaction\+\_\+context\+::validate\+\_\+referenced\+\_\+accounts (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1transaction}{transaction}} \&}]{trx}{, }\item[{bool}]{enforce\+\_\+actor\+\_\+whitelist\+\_\+blacklist}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{transaction__context_8cpp_source_l00739}{739}} of file \mbox{\hyperlink{transaction__context_8cpp_source}{transaction\+\_\+context.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00739\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00740\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ db\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_af52efad2c5859002ad3bedad5834cb7f}{control}}.\mbox{\hyperlink{classsysio_1_1chain_1_1controller_a0c79d00dae8c0d90efc18f4d091b2391}{db}}();}
+\DoxyCodeLine{00741\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ auth\_manager\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_af52efad2c5859002ad3bedad5834cb7f}{control}}.\mbox{\hyperlink{classsysio_1_1chain_1_1controller_a8f7456b81f2657ccf6c39b35afb16af4}{get\_authorization\_manager}}();}
+\DoxyCodeLine{00742\ }
+\DoxyCodeLine{00743\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ :\ trx.context\_free\_actions\ )\ \{}
+\DoxyCodeLine{00744\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}*\ code\ =\ db.find<account\_object,\ by\_name>(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.account);}
+\DoxyCodeLine{00745\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ code\ !=\ \textcolor{keyword}{nullptr},\ \mbox{\hyperlink{namespacesysio_1_1chain_a5dfe17906469eaf079c180c1afb4ad94}{transaction\_exception}},}
+\DoxyCodeLine{00746\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}action's\ code\ account\ '\$\{account\}'\ does\ not\ exist"{}},\ (\textcolor{stringliteral}{"{}account"{}},\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.account)\ );}
+\DoxyCodeLine{00747\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.authorization.size()\ ==\ 0,\ \mbox{\hyperlink{namespacesysio_1_1chain_a5dfe17906469eaf079c180c1afb4ad94}{transaction\_exception}},}
+\DoxyCodeLine{00748\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}context-\/free\ actions\ cannot\ have\ authorizations"{}}\ );}
+\DoxyCodeLine{00749\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00750\ }
+\DoxyCodeLine{00751\ \ \ \ \ \ \ flat\_set<account\_name>\ actors;}
+\DoxyCodeLine{00752\ }
+\DoxyCodeLine{00753\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ one\_auth\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00754\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ :\ trx.actions\ )\ \{}
+\DoxyCodeLine{00755\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}*\ code\ =\ db.find<account\_object,\ by\_name>(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.account);}
+\DoxyCodeLine{00756\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ code\ !=\ \textcolor{keyword}{nullptr},\ \mbox{\hyperlink{namespacesysio_1_1chain_a5dfe17906469eaf079c180c1afb4ad94}{transaction\_exception}},}
+\DoxyCodeLine{00757\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}action's\ code\ account\ '\$\{account\}'\ does\ not\ exist"{}},\ (\textcolor{stringliteral}{"{}account"{}},\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.account)\ );}
+\DoxyCodeLine{00758\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ auth\ :\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.authorization\ )\ \{}
+\DoxyCodeLine{00759\ \ \ \ \ \ \ \ \ \ \ \ \ one\_auth\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00760\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}*\ actor\ =\ db.find<account\_object,\ by\_name>(auth.actor);}
+\DoxyCodeLine{00761\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ actor\ \ !=\ \textcolor{keyword}{nullptr},\ \mbox{\hyperlink{namespacesysio_1_1chain_a5dfe17906469eaf079c180c1afb4ad94}{transaction\_exception}},}
+\DoxyCodeLine{00762\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}action's\ authorizing\ actor\ '\$\{account\}'\ does\ not\ exist"{}},\ (\textcolor{stringliteral}{"{}account"{}},\ auth.actor)\ );}
+\DoxyCodeLine{00763\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ auth\_manager.find\_permission(auth)\ !=\ \textcolor{keyword}{nullptr},\ \mbox{\hyperlink{namespacesysio_1_1chain_a5dfe17906469eaf079c180c1afb4ad94}{transaction\_exception}},}
+\DoxyCodeLine{00764\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}action's\ authorizations\ include\ a\ non-\/existent\ permission:\ \$\{permission\}"{}},}
+\DoxyCodeLine{00765\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}permission"{}},\ auth)\ );}
+\DoxyCodeLine{00766\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ enforce\_actor\_whitelist\_blacklist\ )}
+\DoxyCodeLine{00767\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ actors.insert(\ auth.actor\ );}
+\DoxyCodeLine{00768\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00769\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00770\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ one\_auth\ ||\ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_acd4137f1354209bb1237e5a1f26fdbcd}{is\_read\_only}},\ tx\_no\_auths,\ \textcolor{stringliteral}{"{}transaction\ must\ have\ at\ least\ one\ authorization"{}}\ );}
+\DoxyCodeLine{00771\ }
+\DoxyCodeLine{00772\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ enforce\_actor\_whitelist\_blacklist\ )\ \{}
+\DoxyCodeLine{00773\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_af52efad2c5859002ad3bedad5834cb7f}{control}}.\mbox{\hyperlink{classsysio_1_1chain_1_1controller_aa378f4265708c1bc41e4ee058ed71e6a}{check\_actor\_list}}(\ actors\ );}
+\DoxyCodeLine{00774\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00775\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1transaction__context_a7ecbfbb3d05a6a0b128feeb0a469878c_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1transaction__context_a7ecbfbb3d05a6a0b128feeb0a469878c_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{classsysio_1_1chain_1_1transaction__context_a7b669aea7e7e49e2cd5f5eff2e8ca927}\index{sysio::chain::transaction\_context@{sysio::chain::transaction\_context}!apply\_context@{apply\_context}}
+\index{apply\_context@{apply\_context}!sysio::chain::transaction\_context@{sysio::chain::transaction\_context}}
+\doxysubsubsection{\texorpdfstring{apply\_context}{apply\_context}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1transaction__context_a7b669aea7e7e49e2cd5f5eff2e8ca927} 
+friend \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context}{apply\+\_\+context}}\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{transaction__context_8hpp_source_l00089}{89}} of file \mbox{\hyperlink{transaction__context_8hpp_source}{transaction\+\_\+context.\+hpp}}.
+
+\Hypertarget{classsysio_1_1chain_1_1transaction__context_afacea5f421e7b989103659e2e5fa3353}\index{sysio::chain::transaction\_context@{sysio::chain::transaction\_context}!controller\_impl@{controller\_impl}}
+\index{controller\_impl@{controller\_impl}!sysio::chain::transaction\_context@{sysio::chain::transaction\_context}}
+\doxysubsubsection{\texorpdfstring{controller\_impl}{controller\_impl}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1transaction__context_afacea5f421e7b989103659e2e5fa3353} 
+friend struct \mbox{\hyperlink{structsysio_1_1chain_1_1controller__impl}{controller\+\_\+impl}}\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{transaction__context_8hpp_source_l00088}{88}} of file \mbox{\hyperlink{transaction__context_8hpp_source}{transaction\+\_\+context.\+hpp}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classsysio_1_1chain_1_1transaction__context_a8cb5a958083512d7ff0bff751db87dd9}\index{sysio::chain::transaction\_context@{sysio::chain::transaction\_context}!apply\_context\_free@{apply\_context\_free}}
+\index{apply\_context\_free@{apply\_context\_free}!sysio::chain::transaction\_context@{sysio::chain::transaction\_context}}
+\doxysubsubsection{\texorpdfstring{apply\_context\_free}{apply\_context\_free}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1transaction__context_a8cb5a958083512d7ff0bff751db87dd9} 
+bool sysio\+::chain\+::transaction\+\_\+context\+::apply\+\_\+context\+\_\+free = true}
+
+
+
+Definition at line \mbox{\hyperlink{transaction__context_8hpp_source_l00140}{140}} of file \mbox{\hyperlink{transaction__context_8hpp_source}{transaction\+\_\+context.\+hpp}}.
+
+\Hypertarget{classsysio_1_1chain_1_1transaction__context_ac178b3a7e2ef905025ae4e2f262422ff}\index{sysio::chain::transaction\_context@{sysio::chain::transaction\_context}!bill\_to\_accounts@{bill\_to\_accounts}}
+\index{bill\_to\_accounts@{bill\_to\_accounts}!sysio::chain::transaction\_context@{sysio::chain::transaction\_context}}
+\doxysubsubsection{\texorpdfstring{bill\_to\_accounts}{bill\_to\_accounts}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1transaction__context_ac178b3a7e2ef905025ae4e2f262422ff} 
+flat\+\_\+set$<$\mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}}$>$ sysio\+::chain\+::transaction\+\_\+context\+::bill\+\_\+to\+\_\+accounts}
+
+
+
+Definition at line \mbox{\hyperlink{transaction__context_8hpp_source_l00132}{132}} of file \mbox{\hyperlink{transaction__context_8hpp_source}{transaction\+\_\+context.\+hpp}}.
+
+\Hypertarget{classsysio_1_1chain_1_1transaction__context_a08b550fccea696363035c6736c146436}\index{sysio::chain::transaction\_context@{sysio::chain::transaction\_context}!billed\_cpu\_time\_us@{billed\_cpu\_time\_us}}
+\index{billed\_cpu\_time\_us@{billed\_cpu\_time\_us}!sysio::chain::transaction\_context@{sysio::chain::transaction\_context}}
+\doxysubsubsection{\texorpdfstring{billed\_cpu\_time\_us}{billed\_cpu\_time\_us}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1transaction__context_a08b550fccea696363035c6736c146436} 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} sysio\+::chain\+::transaction\+\_\+context\+::billed\+\_\+cpu\+\_\+time\+\_\+us = 0}
+
+
+
+Definition at line \mbox{\hyperlink{transaction__context_8hpp_source_l00145}{145}} of file \mbox{\hyperlink{transaction__context_8hpp_source}{transaction\+\_\+context.\+hpp}}.
+
+\Hypertarget{classsysio_1_1chain_1_1transaction__context_a708229aea669816e99b0039d716c3ed5}\index{sysio::chain::transaction\_context@{sysio::chain::transaction\_context}!block\_deadline@{block\_deadline}}
+\index{block\_deadline@{block\_deadline}!sysio::chain::transaction\_context@{sysio::chain::transaction\_context}}
+\doxysubsubsection{\texorpdfstring{block\_deadline}{block\_deadline}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1transaction__context_a708229aea669816e99b0039d716c3ed5} 
+\mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}} sysio\+::chain\+::transaction\+\_\+context\+::block\+\_\+deadline = \mbox{\hyperlink{classfc_1_1time__point_aeccf1b70aa34b132c5269313b8a50573}{fc\+::time\+\_\+point\+::maximum}}()}
+
+
+
+Definition at line \mbox{\hyperlink{transaction__context_8hpp_source_l00143}{143}} of file \mbox{\hyperlink{transaction__context_8hpp_source}{transaction\+\_\+context.\+hpp}}.
+
+\Hypertarget{classsysio_1_1chain_1_1transaction__context_af52efad2c5859002ad3bedad5834cb7f}\index{sysio::chain::transaction\_context@{sysio::chain::transaction\_context}!control@{control}}
+\index{control@{control}!sysio::chain::transaction\_context@{sysio::chain::transaction\_context}}
+\doxysubsubsection{\texorpdfstring{control}{control}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1transaction__context_af52efad2c5859002ad3bedad5834cb7f} 
+\mbox{\hyperlink{classsysio_1_1chain_1_1controller}{controller}}\& sysio\+::chain\+::transaction\+\_\+context\+::control}
+
+
+
+Definition at line \mbox{\hyperlink{transaction__context_8hpp_source_l00122}{122}} of file \mbox{\hyperlink{transaction__context_8hpp_source}{transaction\+\_\+context.\+hpp}}.
+
+\Hypertarget{classsysio_1_1chain_1_1transaction__context_a73f4035fab7271fec7fcac5aa01bd461}\index{sysio::chain::transaction\_context@{sysio::chain::transaction\_context}!delay@{delay}}
+\index{delay@{delay}!sysio::chain::transaction\_context@{sysio::chain::transaction\_context}}
+\doxysubsubsection{\texorpdfstring{delay}{delay}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1transaction__context_a73f4035fab7271fec7fcac5aa01bd461} 
+\mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}} sysio\+::chain\+::transaction\+\_\+context\+::delay}
+
+
+
+Definition at line \mbox{\hyperlink{transaction__context_8hpp_source_l00138}{138}} of file \mbox{\hyperlink{transaction__context_8hpp_source}{transaction\+\_\+context.\+hpp}}.
+
+\Hypertarget{classsysio_1_1chain_1_1transaction__context_a799e9208ec6d2ea3d1dfccfd4eb97cec}\index{sysio::chain::transaction\_context@{sysio::chain::transaction\_context}!enforce\_whiteblacklist@{enforce\_whiteblacklist}}
+\index{enforce\_whiteblacklist@{enforce\_whiteblacklist}!sysio::chain::transaction\_context@{sysio::chain::transaction\_context}}
+\doxysubsubsection{\texorpdfstring{enforce\_whiteblacklist}{enforce\_whiteblacklist}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1transaction__context_a799e9208ec6d2ea3d1dfccfd4eb97cec} 
+bool sysio\+::chain\+::transaction\+\_\+context\+::enforce\+\_\+whiteblacklist = true}
+
+
+
+Definition at line \mbox{\hyperlink{transaction__context_8hpp_source_l00141}{141}} of file \mbox{\hyperlink{transaction__context_8hpp_source}{transaction\+\_\+context.\+hpp}}.
+
+\Hypertarget{classsysio_1_1chain_1_1transaction__context_aa16627a2b31f924e998137ba14f22123}\index{sysio::chain::transaction\_context@{sysio::chain::transaction\_context}!executed\_action\_receipt\_digests@{executed\_action\_receipt\_digests}}
+\index{executed\_action\_receipt\_digests@{executed\_action\_receipt\_digests}!sysio::chain::transaction\_context@{sysio::chain::transaction\_context}}
+\doxysubsubsection{\texorpdfstring{executed\_action\_receipt\_digests}{executed\_action\_receipt\_digests}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1transaction__context_aa16627a2b31f924e998137ba14f22123} 
+\mbox{\hyperlink{classfc_1_1vector}{vector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_a357fd9478475457e5bb386a3143079b6}{digest\+\_\+type}}$>$ sysio\+::chain\+::transaction\+\_\+context\+::executed\+\_\+action\+\_\+receipt\+\_\+digests}
+
+
+
+Definition at line \mbox{\hyperlink{transaction__context_8hpp_source_l00131}{131}} of file \mbox{\hyperlink{transaction__context_8hpp_source}{transaction\+\_\+context.\+hpp}}.
+
+\Hypertarget{classsysio_1_1chain_1_1transaction__context_a05dbab6e9e0d4f3e30fa1392ac4430a1}\index{sysio::chain::transaction\_context@{sysio::chain::transaction\_context}!explicit\_billed\_cpu\_time@{explicit\_billed\_cpu\_time}}
+\index{explicit\_billed\_cpu\_time@{explicit\_billed\_cpu\_time}!sysio::chain::transaction\_context@{sysio::chain::transaction\_context}}
+\doxysubsubsection{\texorpdfstring{explicit\_billed\_cpu\_time}{explicit\_billed\_cpu\_time}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1transaction__context_a05dbab6e9e0d4f3e30fa1392ac4430a1} 
+bool sysio\+::chain\+::transaction\+\_\+context\+::explicit\+\_\+billed\+\_\+cpu\+\_\+time = false}
+
+
+
+Definition at line \mbox{\hyperlink{transaction__context_8hpp_source_l00147}{147}} of file \mbox{\hyperlink{transaction__context_8hpp_source}{transaction\+\_\+context.\+hpp}}.
+
+\Hypertarget{classsysio_1_1chain_1_1transaction__context_a0a6b517bf9697af0ff45842c12a72579}\index{sysio::chain::transaction\_context@{sysio::chain::transaction\_context}!initial\_max\_billable\_cpu@{initial\_max\_billable\_cpu}}
+\index{initial\_max\_billable\_cpu@{initial\_max\_billable\_cpu}!sysio::chain::transaction\_context@{sysio::chain::transaction\_context}}
+\doxysubsubsection{\texorpdfstring{initial\_max\_billable\_cpu}{initial\_max\_billable\_cpu}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1transaction__context_a0a6b517bf9697af0ff45842c12a72579} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} sysio\+::chain\+::transaction\+\_\+context\+::initial\+\_\+max\+\_\+billable\+\_\+cpu = 0}
+
+
+
+Definition at line \mbox{\hyperlink{transaction__context_8hpp_source_l00136}{136}} of file \mbox{\hyperlink{transaction__context_8hpp_source}{transaction\+\_\+context.\+hpp}}.
+
+\Hypertarget{classsysio_1_1chain_1_1transaction__context_ad22e57171587ed29b371184a7be4529a}\index{sysio::chain::transaction\_context@{sysio::chain::transaction\_context}!is\_input@{is\_input}}
+\index{is\_input@{is\_input}!sysio::chain::transaction\_context@{sysio::chain::transaction\_context}}
+\doxysubsubsection{\texorpdfstring{is\_input}{is\_input}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1transaction__context_ad22e57171587ed29b371184a7be4529a} 
+bool sysio\+::chain\+::transaction\+\_\+context\+::is\+\_\+input = false}
+
+
+
+Definition at line \mbox{\hyperlink{transaction__context_8hpp_source_l00139}{139}} of file \mbox{\hyperlink{transaction__context_8hpp_source}{transaction\+\_\+context.\+hpp}}.
+
+\Hypertarget{classsysio_1_1chain_1_1transaction__context_acd4137f1354209bb1237e5a1f26fdbcd}\index{sysio::chain::transaction\_context@{sysio::chain::transaction\_context}!is\_read\_only@{is\_read\_only}}
+\index{is\_read\_only@{is\_read\_only}!sysio::chain::transaction\_context@{sysio::chain::transaction\_context}}
+\doxysubsubsection{\texorpdfstring{is\_read\_only}{is\_read\_only}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1transaction__context_acd4137f1354209bb1237e5a1f26fdbcd} 
+const bool sysio\+::chain\+::transaction\+\_\+context\+::is\+\_\+read\+\_\+only}
+
+
+
+Definition at line \mbox{\hyperlink{transaction__context_8hpp_source_l00151}{151}} of file \mbox{\hyperlink{transaction__context_8hpp_source}{transaction\+\_\+context.\+hpp}}.
+
+\Hypertarget{classsysio_1_1chain_1_1transaction__context_a1fafa59ca3817a6fc89466a7da19b72c}\index{sysio::chain::transaction\_context@{sysio::chain::transaction\_context}!leeway@{leeway}}
+\index{leeway@{leeway}!sysio::chain::transaction\_context@{sysio::chain::transaction\_context}}
+\doxysubsubsection{\texorpdfstring{leeway}{leeway}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1transaction__context_a1fafa59ca3817a6fc89466a7da19b72c} 
+\mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}} sysio\+::chain\+::transaction\+\_\+context\+::leeway = \mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}}( config\+::default\+\_\+subjective\+\_\+cpu\+\_\+leeway\+\_\+us )}
+
+
+
+Definition at line \mbox{\hyperlink{transaction__context_8hpp_source_l00144}{144}} of file \mbox{\hyperlink{transaction__context_8hpp_source}{transaction\+\_\+context.\+hpp}}.
+
+\Hypertarget{classsysio_1_1chain_1_1transaction__context_a08e9cf6a4b8ce2f6211ce9d8de1b4da3}\index{sysio::chain::transaction\_context@{sysio::chain::transaction\_context}!packed\_trx@{packed\_trx}}
+\index{packed\_trx@{packed\_trx}!sysio::chain::transaction\_context@{sysio::chain::transaction\_context}}
+\doxysubsubsection{\texorpdfstring{packed\_trx}{packed\_trx}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1transaction__context_a08e9cf6a4b8ce2f6211ce9d8de1b4da3} 
+const \mbox{\hyperlink{structsysio_1_1chain_1_1packed__transaction}{packed\+\_\+transaction}}\& sysio\+::chain\+::transaction\+\_\+context\+::packed\+\_\+trx}
+
+
+
+Definition at line \mbox{\hyperlink{transaction__context_8hpp_source_l00123}{123}} of file \mbox{\hyperlink{transaction__context_8hpp_source}{transaction\+\_\+context.\+hpp}}.
+
+\Hypertarget{classsysio_1_1chain_1_1transaction__context_ab8e1aaec319ed2ae90b6a6f499919c89}\index{sysio::chain::transaction\_context@{sysio::chain::transaction\_context}!published@{published}}
+\index{published@{published}!sysio::chain::transaction\_context@{sysio::chain::transaction\_context}}
+\doxysubsubsection{\texorpdfstring{published}{published}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1transaction__context_ab8e1aaec319ed2ae90b6a6f499919c89} 
+\mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}} sysio\+::chain\+::transaction\+\_\+context\+::published}
+
+
+
+Definition at line \mbox{\hyperlink{transaction__context_8hpp_source_l00128}{128}} of file \mbox{\hyperlink{transaction__context_8hpp_source}{transaction\+\_\+context.\+hpp}}.
+
+\Hypertarget{classsysio_1_1chain_1_1transaction__context_a9c12181bd0bd8a5aea0200c80e7b00e7}\index{sysio::chain::transaction\_context@{sysio::chain::transaction\_context}!start@{start}}
+\index{start@{start}!sysio::chain::transaction\_context@{sysio::chain::transaction\_context}}
+\doxysubsubsection{\texorpdfstring{start}{start}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1transaction__context_a9c12181bd0bd8a5aea0200c80e7b00e7} 
+\mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}} sysio\+::chain\+::transaction\+\_\+context\+::start}
+
+
+
+Definition at line \mbox{\hyperlink{transaction__context_8hpp_source_l00126}{126}} of file \mbox{\hyperlink{transaction__context_8hpp_source}{transaction\+\_\+context.\+hpp}}.
+
+\Hypertarget{classsysio_1_1chain_1_1transaction__context_af80f48b601534a0adc286de6195e26a2}\index{sysio::chain::transaction\_context@{sysio::chain::transaction\_context}!subjective\_cpu\_bill\_us@{subjective\_cpu\_bill\_us}}
+\index{subjective\_cpu\_bill\_us@{subjective\_cpu\_bill\_us}!sysio::chain::transaction\_context@{sysio::chain::transaction\_context}}
+\doxysubsubsection{\texorpdfstring{subjective\_cpu\_bill\_us}{subjective\_cpu\_bill\_us}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1transaction__context_af80f48b601534a0adc286de6195e26a2} 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} sysio\+::chain\+::transaction\+\_\+context\+::subjective\+\_\+cpu\+\_\+bill\+\_\+us = 0}
+
+
+
+Definition at line \mbox{\hyperlink{transaction__context_8hpp_source_l00146}{146}} of file \mbox{\hyperlink{transaction__context_8hpp_source}{transaction\+\_\+context.\+hpp}}.
+
+\Hypertarget{classsysio_1_1chain_1_1transaction__context_a7211fab425e4375e247c2a3d1924e63f}\index{sysio::chain::transaction\_context@{sysio::chain::transaction\_context}!trace@{trace}}
+\index{trace@{trace}!sysio::chain::transaction\_context@{sysio::chain::transaction\_context}}
+\doxysubsubsection{\texorpdfstring{trace}{trace}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1transaction__context_a7211fab425e4375e247c2a3d1924e63f} 
+\mbox{\hyperlink{namespacesysio_1_1chain_a4ee2867a6bec961c7a78b203cfd76be9}{transaction\+\_\+trace\+\_\+ptr}} sysio\+::chain\+::transaction\+\_\+context\+::trace}
+
+
+
+Definition at line \mbox{\hyperlink{transaction__context_8hpp_source_l00125}{125}} of file \mbox{\hyperlink{transaction__context_8hpp_source}{transaction\+\_\+context.\+hpp}}.
+
+\Hypertarget{classsysio_1_1chain_1_1transaction__context_a346ee8df9ed43ccebf9ec1455facfc8d}\index{sysio::chain::transaction\_context@{sysio::chain::transaction\_context}!transaction\_timer@{transaction\_timer}}
+\index{transaction\_timer@{transaction\_timer}!sysio::chain::transaction\_context@{sysio::chain::transaction\_context}}
+\doxysubsubsection{\texorpdfstring{transaction\_timer}{transaction\_timer}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1transaction__context_a346ee8df9ed43ccebf9ec1455facfc8d} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1transaction__checktime__timer}{transaction\+\_\+checktime\+\_\+timer}} sysio\+::chain\+::transaction\+\_\+context\+::transaction\+\_\+timer}
+
+
+
+Definition at line \mbox{\hyperlink{transaction__context_8hpp_source_l00149}{149}} of file \mbox{\hyperlink{transaction__context_8hpp_source}{transaction\+\_\+context.\+hpp}}.
+
+\Hypertarget{classsysio_1_1chain_1_1transaction__context_a90144b543cf9fd4e5ed08fc2a4cd75ff}\index{sysio::chain::transaction\_context@{sysio::chain::transaction\_context}!undo\_session@{undo\_session}}
+\index{undo\_session@{undo\_session}!sysio::chain::transaction\_context@{sysio::chain::transaction\_context}}
+\doxysubsubsection{\texorpdfstring{undo\_session}{undo\_session}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1transaction__context_a90144b543cf9fd4e5ed08fc2a4cd75ff} 
+std\+::optional$<$\mbox{\hyperlink{structchainbase_1_1database_1_1session}{chainbase\+::database\+::session}}$>$ sysio\+::chain\+::transaction\+\_\+context\+::undo\+\_\+session}
+
+
+
+Definition at line \mbox{\hyperlink{transaction__context_8hpp_source_l00124}{124}} of file \mbox{\hyperlink{transaction__context_8hpp_source}{transaction\+\_\+context.\+hpp}}.
+
+\Hypertarget{classsysio_1_1chain_1_1transaction__context_a5bcfb17b8688258f7287ad7c99567fad}\index{sysio::chain::transaction\_context@{sysio::chain::transaction\_context}!validate\_ram\_usage@{validate\_ram\_usage}}
+\index{validate\_ram\_usage@{validate\_ram\_usage}!sysio::chain::transaction\_context@{sysio::chain::transaction\_context}}
+\doxysubsubsection{\texorpdfstring{validate\_ram\_usage}{validate\_ram\_usage}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1transaction__context_a5bcfb17b8688258f7287ad7c99567fad} 
+flat\+\_\+set$<$\mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}}$>$ sysio\+::chain\+::transaction\+\_\+context\+::validate\+\_\+ram\+\_\+usage}
+
+
+
+Definition at line \mbox{\hyperlink{transaction__context_8hpp_source_l00133}{133}} of file \mbox{\hyperlink{transaction__context_8hpp_source}{transaction\+\_\+context.\+hpp}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{transaction__context_8hpp}{transaction\+\_\+context.\+hpp}}\item 
+libraries/chain/\mbox{\hyperlink{transaction__context_8cpp}{transaction\+\_\+context.\+cpp}}\end{DoxyCompactItemize}

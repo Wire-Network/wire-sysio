@@ -1,0 +1,151 @@
+\doxysection{sysiosystem\+::block\+\_\+info Namespace Reference}
+\hypertarget{namespacesysiosystem_1_1block__info}{}\label{namespacesysiosystem_1_1block__info}\index{sysiosystem::block\_info@{sysiosystem::block\_info}}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysiosystem_1_1block__info_1_1block__batch__info}{block\+\_\+batch\+\_\+info}}
+\item 
+struct \mbox{\hyperlink{structsysiosystem_1_1block__info_1_1block__info__record}{block\+\_\+info\+\_\+record}}
+\item 
+struct \mbox{\hyperlink{structsysiosystem_1_1block__info_1_1latest__block__batch__info__result}{latest\+\_\+block\+\_\+batch\+\_\+info\+\_\+result}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{namespacesysiosystem_1_1block__info_ac0e11ae72cab33401d2389907474a957}{block\+\_\+info\+\_\+table}} = sysio\+::multi\+\_\+index$<$"{}blockinfo"{}\+\_\+n, \mbox{\hyperlink{structsysiosystem_1_1block__info_1_1block__info__record}{block\+\_\+info\+\_\+record}}$>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysiosystem_1_1block__info_1_1latest__block__batch__info__result}{latest\+\_\+block\+\_\+batch\+\_\+info\+\_\+result}} \mbox{\hyperlink{namespacesysiosystem_1_1block__info_aaac02db22145c90ec190da119ea3bd33}{get\+\_\+latest\+\_\+block\+\_\+batch\+\_\+info}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} batch\+\_\+start\+\_\+height\+\_\+offset, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} batch\+\_\+size, \mbox{\hyperlink{structsysio_1_1chain_1_1name}{sysio\+::name}} system\+\_\+account\+\_\+name="{}sysio"{}\+\_\+n)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{namespacesysiosystem_1_1block__info_ac0e11ae72cab33401d2389907474a957}\index{sysiosystem::block\_info@{sysiosystem::block\_info}!block\_info\_table@{block\_info\_table}}
+\index{block\_info\_table@{block\_info\_table}!sysiosystem::block\_info@{sysiosystem::block\_info}}
+\doxysubsubsection{\texorpdfstring{block\_info\_table}{block\_info\_table}}
+{\footnotesize\ttfamily \label{namespacesysiosystem_1_1block__info_ac0e11ae72cab33401d2389907474a957} 
+using \mbox{\hyperlink{namespacesysiosystem_1_1block__info_ac0e11ae72cab33401d2389907474a957}{sysiosystem\+::block\+\_\+info\+::block\+\_\+info\+\_\+table}} = sysio\+::multi\+\_\+index$<$"{}blockinfo"{}\+\_\+n, \mbox{\hyperlink{structsysiosystem_1_1block__info_1_1block__info__record}{block\+\_\+info\+\_\+record}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{block__info_8hpp_source_l00034}{34}} of file \mbox{\hyperlink{block__info_8hpp_source}{block\+\_\+info.\+hpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacesysiosystem_1_1block__info_aaac02db22145c90ec190da119ea3bd33}\index{sysiosystem::block\_info@{sysiosystem::block\_info}!get\_latest\_block\_batch\_info@{get\_latest\_block\_batch\_info}}
+\index{get\_latest\_block\_batch\_info@{get\_latest\_block\_batch\_info}!sysiosystem::block\_info@{sysiosystem::block\_info}}
+\doxysubsubsection{\texorpdfstring{get\_latest\_block\_batch\_info()}{get\_latest\_block\_batch\_info()}}
+{\footnotesize\ttfamily \label{namespacesysiosystem_1_1block__info_aaac02db22145c90ec190da119ea3bd33} 
+\mbox{\hyperlink{structsysiosystem_1_1block__info_1_1latest__block__batch__info__result}{latest\+\_\+block\+\_\+batch\+\_\+info\+\_\+result}} sysiosystem\+::block\+\_\+info\+::get\+\_\+latest\+\_\+block\+\_\+batch\+\_\+info (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{batch\+\_\+start\+\_\+height\+\_\+offset}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{batch\+\_\+size}{, }\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1name}{sysio\+::name}}}]{system\+\_\+account\+\_\+name}{ = {\ttfamily "{}sysio"{}\+\_\+n}}\end{DoxyParamCaption})}
+
+Get information on the latest block batch.
+
+\doxylink{struct_a}{A} block batch is a contiguous range of blocks of a particular size. \doxylink{struct_a}{A} sequence of blocks can be partitioned into a sequence of block batches, where all except for perhaps the last batch in the sequence have the same size. The last batch in the sequence can have a smaller size if the blocks of the blockchain that would complete that batch have not yet been generated or recorded.
+
+This function enables the caller to specify a particular partitioning of the sequence of blocks into a sequence of block batches of a particular non-\/zero size ({\ttfamily batch\+\_\+size}) and then isolates the last block batch in that sequence and returns the information about that latest block batch if possible. The partitioning will ensure that {\ttfamily batch\+\_\+start\+\_\+height\+\_\+offset} will be equal to the starting block height of exactly one of block batches in the sequence.
+
+The information about the latest block batch is the same data captured in {\ttfamily \doxylink{structsysiosystem_1_1block__info_1_1block__batch__info}{block\+\_\+batch\+\_\+info}}. Particularly, it returns the height and timestamp of starting and ending blocks within that latest block batch. Note that the range spanning from the start to end block of the latest block batch may be less than batch\+\_\+size because latest block batch may be incomplete. Also, it is possible for the record capturing info for the starting block to not exist in the blockinfo table. This can either be due to the records being erased as they fall out of the rolling window or, in rare cases, due to gaps in block info records due to failures of the onblock action. In such a case, this function will be unable to return a {\ttfamily \doxylink{structsysiosystem_1_1block__info_1_1block__batch__info}{block\+\_\+batch\+\_\+info}} and will instead be forced to return the {\ttfamily insufficient\+\_\+data} error code. Furthermore, if {\ttfamily batch\+\_\+start\+\_\+height\+\_\+offset} is greater than the height of the latest block for which information is recorded in the blockinfo table, there will be no latest block batch identified for the function to return information about and so it will again be forced to return the {\ttfamily insufficient\+\_\+data} error code instead. 
+
+Definition at line \mbox{\hyperlink{block__info_8hpp_source_l00084}{84}} of file \mbox{\hyperlink{block__info_8hpp_source}{block\+\_\+info.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00087\ \{}
+\DoxyCodeLine{00088\ \ \ \ \mbox{\hyperlink{structsysiosystem_1_1block__info_1_1latest__block__batch__info__result}{latest\_block\_batch\_info\_result}}\ result;}
+\DoxyCodeLine{00089\ }
+\DoxyCodeLine{00090\ \ \ \ \textcolor{keywordflow}{if}\ (batch\_size\ ==\ 0)\ \{}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ result.error\_code\ =\ latest\_block\_batch\_info\_result::invalid\_input;}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00093\ \ \ \ \}}
+\DoxyCodeLine{00094\ }
+\DoxyCodeLine{00095\ \ \ \ block\_info\_table\ t(system\_account\_name,\ 0);}
+\DoxyCodeLine{00096\ }
+\DoxyCodeLine{00097\ \ \ \ \textcolor{comment}{//\ Find\ information\ on\ latest\ block\ recorded\ in\ the\ blockinfo\ table.}}
+\DoxyCodeLine{00098\ }
+\DoxyCodeLine{00099\ \ \ \ \textcolor{keywordflow}{if}\ (t.cbegin()\ ==\ t.cend())\ \{}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \textcolor{comment}{//\ The\ blockinfo\ table\ is\ empty.}}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ result.error\_code\ =\ latest\_block\_batch\_info\_result::insufficient\_data;}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00103\ \ \ \ \}}
+\DoxyCodeLine{00104\ }
+\DoxyCodeLine{00105\ \ \ \ \textcolor{keyword}{auto}\ latest\_block\_info\_itr\ =\ -\/-\/t.cend();}
+\DoxyCodeLine{00106\ }
+\DoxyCodeLine{00107\ \ \ \ \textcolor{keywordflow}{if}\ (latest\_block\_info\_itr-\/>version\ !=\ 0)\ \{}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \textcolor{comment}{//\ Compiled\ code\ for\ this\ function\ within\ the\ calling\ contract\ has\ not\ been\ updated\ to\ support\ new\ version\ of}}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \textcolor{comment}{//\ the\ blockinfo\ table.}}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ result.error\_code\ =\ latest\_block\_batch\_info\_result::unsupported\_version;}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00112\ \ \ \ \}}
+\DoxyCodeLine{00113\ }
+\DoxyCodeLine{00114\ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ latest\_block\_batch\_end\_height\ =\ latest\_block\_info\_itr-\/>block\_height;}
+\DoxyCodeLine{00115\ }
+\DoxyCodeLine{00116\ \ \ \ \textcolor{keywordflow}{if}\ (latest\_block\_batch\_end\_height\ <\ batch\_start\_height\_offset)\ \{}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \textcolor{comment}{//\ Caller\ asking\ for\ a\ block\ batch\ that\ has\ not\ even\ begun\ to\ be\ recorded\ yet.}}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ result.error\_code\ =\ latest\_block\_batch\_info\_result::insufficient\_data;}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00120\ \ \ \ \}}
+\DoxyCodeLine{00121\ }
+\DoxyCodeLine{00122\ \ \ \ \textcolor{comment}{//\ Calculate\ height\ for\ the\ starting\ block\ of\ the\ latest\ block\ batch.}}
+\DoxyCodeLine{00123\ }
+\DoxyCodeLine{00124\ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ latest\_block\_batch\_start\_height\ =}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ latest\_block\_batch\_end\_height\ -\/\ ((latest\_block\_batch\_end\_height\ -\/\ batch\_start\_height\_offset)\ \%\ batch\_size);}
+\DoxyCodeLine{00126\ }
+\DoxyCodeLine{00127\ \ \ \ \textcolor{comment}{//\ Note:\ 1\ <=\ (latest\_block\_batch\_end\_height\ -\/\ latest\_block\_batch\_start\_height\ +\ 1)\ <=\ batch\_size}}
+\DoxyCodeLine{00128\ }
+\DoxyCodeLine{00129\ \ \ \ \textcolor{keywordflow}{if}\ (latest\_block\_batch\_start\_height\ ==\ latest\_block\_batch\_end\_height)\ \{}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \textcolor{comment}{//\ When\ batch\_size\ ==\ 1,\ this\ function\ effectively\ simplifies\ to\ just\ returning\ the\ info\ of\ the\ latest\ recorded}}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \textcolor{comment}{//\ block.\ In\ that\ case,\ the\ start\ block\ and\ the\ end\ block\ of\ the\ batch\ are\ the\ same\ and\ there\ is\ no\ need\ for}}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \textcolor{comment}{//\ another\ lookup.\ So\ shortcut\ the\ rest\ of\ the\ process\ and\ return\ a\ successful\ result\ immediately.}}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ result.result.emplace(block\_batch\_info\{}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \ .batch\_start\_height\ \ \ \ \ \ \ \ \ \ =\ latest\_block\_batch\_start\_height,}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \ .batch\_start\_timestamp\ \ \ \ \ \ \ =\ latest\_block\_info\_itr-\/>block\_timestamp,}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \ .batch\_current\_end\_height\ \ \ \ =\ latest\_block\_batch\_end\_height,}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ .batch\_current\_end\_timestamp\ =\ latest\_block\_info\_itr-\/>block\_timestamp,}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00140\ \ \ \ \}}
+\DoxyCodeLine{00141\ }
+\DoxyCodeLine{00142\ \ \ \ \textcolor{comment}{//\ Find\ information\ on\ start\ block\ of\ the\ latest\ block\ batch\ recorded\ in\ the\ blockinfo\ table.}}
+\DoxyCodeLine{00143\ }
+\DoxyCodeLine{00144\ \ \ \ \textcolor{keyword}{auto}\ start\_block\_info\_itr\ =\ t.find(latest\_block\_batch\_start\_height);}
+\DoxyCodeLine{00145\ \ \ \ \textcolor{keywordflow}{if}\ (start\_block\_info\_itr\ ==\ t.cend()\ ||\ start\_block\_info\_itr-\/>block\_height\ !=\ latest\_block\_batch\_start\_height)\ \{}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \textcolor{comment}{//\ Record\ for\ information\ on\ start\ block\ of\ the\ latest\ block\ batch\ could\ not\ be\ found\ in\ blockinfo\ table.}}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \textcolor{comment}{//\ This\ is\ either\ because\ of:}}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \textcolor{comment}{//\ \ \ \ *\ a\ gap\ in\ recording\ info\ due\ to\ a\ failed\ onblock\ action;}}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \textcolor{comment}{//\ \ \ \ *\ a\ requested\ start\ block\ that\ was\ processed\ by\ onblock\ prior\ to\ deployment\ of\ the\ system\ contract\ code}}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \textcolor{comment}{//\ \ \ \ introducing\ the\ blockinfo\ table;}}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \textcolor{comment}{//\ \ \ \ *\ or,\ most\ likely,\ because\ the\ record\ for\ the\ requested\ start\ block\ was\ pruned\ from\ the\ blockinfo\ table\ as}}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \textcolor{comment}{//\ \ \ \ it\ fell\ out\ of\ the\ rolling\ window.}}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ result.error\_code\ =\ latest\_block\_batch\_info\_result::insufficient\_data;}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00155\ \ \ \ \}}
+\DoxyCodeLine{00156\ }
+\DoxyCodeLine{00157\ \ \ \ \textcolor{keywordflow}{if}\ (start\_block\_info\_itr-\/>version\ !=\ 0)\ \{}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \textcolor{comment}{//\ Compiled\ code\ for\ this\ function\ within\ the\ calling\ contract\ has\ not\ been\ updated\ to\ support\ new\ version\ of}}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \textcolor{comment}{//\ the\ blockinfo\ table.}}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ result.error\_code\ =\ latest\_block\_batch\_info\_result::unsupported\_version;}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00162\ \ \ \ \}}
+\DoxyCodeLine{00163\ }
+\DoxyCodeLine{00164\ \ \ \ \textcolor{comment}{//\ Successfully\ return\ block\_batch\_info\ for\ the\ found\ latest\ block\ batch\ in\ its\ current\ state.}}
+\DoxyCodeLine{00165\ }
+\DoxyCodeLine{00166\ \ \ \ result.result.emplace(block\_batch\_info\{}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ .batch\_start\_height\ \ \ \ \ \ \ \ \ \ =\ latest\_block\_batch\_start\_height,}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ .batch\_start\_timestamp\ \ \ \ \ \ \ =\ start\_block\_info\_itr-\/>block\_timestamp,}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ .batch\_current\_end\_height\ \ \ \ =\ latest\_block\_batch\_end\_height,}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ .batch\_current\_end\_timestamp\ =\ latest\_block\_info\_itr-\/>block\_timestamp,}
+\DoxyCodeLine{00171\ \ \ \ \});}
+\DoxyCodeLine{00172\ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00173\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysiosystem_1_1block__info_aaac02db22145c90ec190da119ea3bd33_icgraph}
+\end{center}
+\end{figure}

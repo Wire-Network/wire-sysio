@@ -1,0 +1,52 @@
+<map id="websocketpp::endpoint::send" name="websocketpp::endpoint::send">
+<area shape="rect" id="Node000001" title="Create a message and add it to the outgoing send queue (exception free)" alt="" coords="784,276,939,317"/>
+<area shape="rect" id="Node000002" href="$classcount__server.html#a06a8dba8a9a887972faefab77a95ca0c" title=" " alt="" coords="564,5,701,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="850,262,836,213,813,154,779,95,758,69,734,46,718,36,700,29,702,24,721,31,737,41,762,65,784,92,818,152,841,211,855,261"/>
+<area shape="rect" id="Node000004" href="$classutility__server.html#a34dbd3789ee5ef7c1918e4ff9d154a15" title=" " alt="" coords="567,55,698,96"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="843,264,826,228,801,187,771,146,734,111,697,92,700,87,737,107,775,142,806,184,830,225,848,261"/>
+<area shape="rect" id="Node000006" href="$classbroadcast__server.html#aa56cb8528f19afc3b1a2712d07d0b499" title=" " alt="" coords="561,120,704,161"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="833,266,790,219,763,195,734,175,704,161,706,156,737,171,766,191,794,215,837,262"/>
+<area shape="rect" id="Node000008" href="$echo__client_8cpp.html#a8c13595a4801a15825ae3f8c8bb37ed4" title=" " alt="" coords="585,185,680,211"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="818,270,778,246,735,225,680,209,681,203,737,220,781,241,820,265"/>
+<area shape="rect" id="Node000010" href="$sip__client_8cpp.html#a9602fc6fab09cf0b8aa1fbe3973de3ad" title=" " alt="" coords="597,235,668,260"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="768,279,667,258,669,252,769,274"/>
+<area shape="rect" id="Node000012" href="$classperftest.html#a55d1e404c7a1e57b27dbb9b16cd72fbc" title=" " alt="" coords="571,284,694,310"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="768,300,694,300,694,294,768,294"/>
+<area shape="rect" id="Node000014" href="$classtelemetry__server.html#acc29e40bd4262e42b3d16e4fcd79ec22" title=" " alt="" coords="562,334,703,374"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="770,322,704,339,702,334,769,317"/>
+<area shape="rect" id="Node000018" href="$classbroadcast__server.html#aab1bd3f376f3d5242660b686c6b45b40" title=" " alt="" coords="545,399,720,440"/>
+<area shape="poly" id="edge18_Node000001_Node000018" title=" " alt="" coords="826,329,784,360,737,389,708,401,706,396,734,384,781,355,823,325"/>
+<area shape="rect" id="Node000020" href="$classwebsocket__endpoint.html#aaae3d15cae0c3d7fd134ca28676e53cc" title=" " alt="" coords="562,464,703,505"/>
+<area shape="poly" id="edge20_Node000001_Node000020" title=" " alt="" coords="843,332,800,394,771,426,737,454,704,471,702,466,734,449,767,422,796,390,839,329"/>
+<area shape="rect" id="Node000022" href="$classtelemetry__client.html#acc925f9ef40b46fdfb040b9325c67ae2" title=" " alt="" coords="529,529,736,555"/>
+<area shape="poly" id="edge22_Node000001_Node000022" title=" " alt="" coords="852,333,836,376,812,427,780,477,737,519,716,531,713,526,734,515,775,473,808,424,831,374,847,331"/>
+<area shape="rect" id="Node000025" href="$connection_2connection_8cpp.html#aa55319b56d099c1d6bbc9d022f7fe982" title=" " alt="" coords="583,579,682,604"/>
+<area shape="poly" id="edge25_Node000001_Node000025" title=" " alt="" coords="857,333,844,386,821,450,786,515,764,544,737,570,711,584,683,592,681,587,709,579,734,565,760,540,782,512,816,448,838,384,851,332"/>
+<area shape="rect" id="Node000003" href="$simple__count__server__thread_8cpp.html#ae66f6b31b5ad750f1fe042a706a4e3d4" title=" " alt="" coords="364,5,413,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="549,21,413,21,413,16,549,16"/>
+<area shape="rect" id="Node000005" href="$classutility__server.html#a4644a7feb970cc203374dd68eb8dec9c" title=" " alt="" coords="321,55,455,96"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="551,78,456,78,456,73,551,73"/>
+<area shape="rect" id="Node000007" href="$classbroadcast__server.html#af82bddbdb53e36a5aa8448bedd4a84d5" title=" " alt="" coords="295,120,481,161"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="546,144,482,144,482,138,546,138"/>
+<area shape="rect" id="Node000009" href="$echo__client_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97" title=" " alt="" coords="364,185,413,211"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="569,201,413,201,413,196,569,196"/>
+<area shape="rect" id="Node000011" href="$sip__client_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97" title=" " alt="" coords="364,235,413,260"/>
+<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="582,250,413,250,413,245,582,245"/>
+<area shape="rect" id="Node000013" href="$classperftest.html#a4e118ad1d9d81fddf82b5db930b26924" title=" " alt="" coords="330,284,447,310"/>
+<area shape="poly" id="edge12_Node000012_Node000013" title=" " alt="" coords="556,300,447,300,447,294,556,294"/>
+<area shape="rect" id="Node000015" href="$classtelemetry__server.html#a2a510e3a3c91c123f37d95d7b7d140ea" title=" " alt="" coords="316,334,460,374"/>
+<area shape="poly" id="edge14_Node000014_Node000015" title=" " alt="" coords="547,365,461,365,461,360,547,360"/>
+<area shape="poly" id="edge15_Node000015_Node000014" title=" " alt="" coords="476,343,562,343,562,349,476,348"/>
+<area shape="rect" id="Node000016" href="$classtelemetry__server.html#a8c09eba40e8993079859e9f1974254ab" title=" " alt="" coords="103,341,247,367"/>
+<area shape="poly" id="edge16_Node000015_Node000016" title=" " alt="" coords="300,357,247,357,247,352,300,352"/>
+<area shape="rect" id="Node000017" href="$telemetry__server_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97" title=" " alt="" coords="5,341,55,367"/>
+<area shape="poly" id="edge17_Node000016_Node000017" title=" " alt="" coords="87,357,55,357,55,352,87,352"/>
+<area shape="rect" id="Node000019" href="$broadcast__server_8cpp.html#ae66f6b31b5ad750f1fe042a706a4e3d4" title=" " alt="" coords="364,407,413,432"/>
+<area shape="poly" id="edge19_Node000018_Node000019" title=" " alt="" coords="529,422,413,422,413,417,529,417"/>
+<area shape="rect" id="Node000021" href="$utility__client_8cpp.html#ae66f6b31b5ad750f1fe042a706a4e3d4" title=" " alt="" coords="364,472,413,498"/>
+<area shape="poly" id="edge21_Node000020_Node000021" title=" " alt="" coords="547,488,413,488,413,482,547,482"/>
+<area shape="rect" id="Node000023" href="$classtelemetry__client.html#aa5765b95b628b04bbe403cf022d0f014" title=" " alt="" coords="318,529,458,555"/>
+<area shape="poly" id="edge23_Node000022_Node000023" title=" " alt="" coords="514,545,458,545,458,540,514,540"/>
+<area shape="rect" id="Node000024" href="$telemetry__client_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97" title=" " alt="" coords="150,529,200,555"/>
+<area shape="poly" id="edge24_Node000023_Node000024" title=" " alt="" coords="303,545,200,545,200,540,303,540"/>
+</map>

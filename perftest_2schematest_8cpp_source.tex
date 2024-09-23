@@ -1,0 +1,229 @@
+\doxysection{schematest.\+cpp}
+\hypertarget{perftest_2schematest_8cpp_source}{}\label{perftest_2schematest_8cpp_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/test/perftest/schematest.cpp@{libraries/fc/include/fc/crypto/webauthn\_json/test/perftest/schematest.cpp}}
+\mbox{\hyperlink{perftest_2schematest_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{perftest_8h}{perftest.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#if\ TEST\_RAPIDJSON}}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{schema_8h}{rapidjson/schema.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <ctime>}}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00010}\mbox{\hyperlink{perftest_2schematest_8cpp_a25f003de16c08a4888b69f619d70f427}{00010}}\ \textcolor{preprocessor}{\#define\ ARRAY\_SIZE(a)\ sizeof(a)\ /\ sizeof(a[0])}}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00012}00012\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacerapidjson}{rapidjson}};}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00014}00014\ RAPIDJSON\_DIAG\_PUSH}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00015}00015\ \textcolor{preprocessor}{\#if\ defined(\_\_GNUC\_\_)\ \&\&\ \_\_GNUC\_\_\ >=\ 7}}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00016}00016\ RAPIDJSON\_DIAG\_OFF(\mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}-\/\mbox{\hyperlink{yubihsm__pkcs11_8c_a49aa97067a36875627e1380c3fb3833d}{overflow}})}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00017}00017\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00019}00019\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ Allocator>}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00020}00020\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{char}*\ ReadFile(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ filename,\ \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}\&\ allocator)\ \{}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00021}00021\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *paths[]\ =\ \{}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00022}00022\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}"{}},}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00023}00023\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}bin/"{}},}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00024}00024\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}../bin/"{}},}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00025}00025\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}../../bin/"{}},}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00026}00026\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}../../../bin/"{}}}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00027}00027\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00028}00028\ \ \ \ \ \textcolor{keywordtype}{char}\ buffer[1024];}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00029}00029\ \ \ \ \ FILE\ *fp\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00030}00030\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ \textcolor{keyword}{sizeof}(paths)\ /\ \textcolor{keyword}{sizeof}(paths[0]);\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00031}00031\ \ \ \ \ \ \ \ \ sprintf(buffer,\ \textcolor{stringliteral}{"{}\%s\%s"{}},\ paths[i],\ filename);}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00032}00032\ \ \ \ \ \ \ \ \ fp\ =\ fopen(buffer,\ \textcolor{stringliteral}{"{}rb"{}});}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00033}00033\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (fp)}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00034}00034\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00035}00035\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00037}00037\ \ \ \ \ \textcolor{keywordflow}{if}\ (!fp)}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00038}00038\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00040}00040\ \ \ \ \ fseek(fp,\ 0,\ SEEK\_END);}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00041}00041\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ length\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(ftell(fp));}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00042}00042\ \ \ \ \ fseek(fp,\ 0,\ SEEK\_SET);}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00043}00043\ \ \ \ \ \textcolor{keywordtype}{char}*\ json\ =\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(allocator.Malloc(length\ +\ 1));}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00044}00044\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ readLength\ =\ fread(json,\ 1,\ length,\ fp);}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00045}00045\ \ \ \ \ json[readLength]\ =\ \textcolor{charliteral}{'\(\backslash\)0'};}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00046}00046\ \ \ \ \ fclose(fp);}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00047}00047\ \ \ \ \ \textcolor{keywordflow}{return}\ json;}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00048}00048\ \}}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00050}00050\ RAPIDJSON\_DIAG\_POP}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00052}\mbox{\hyperlink{class_schema}{00052}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_schema}{Schema}}\ :\ \textcolor{keyword}{public}\ PerfTest\ \{}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00053}00053\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00054}\mbox{\hyperlink{class_schema_a2e4edc9da4da173a47617320abba7f0f}{00054}}\ \ \ \ \ \mbox{\hyperlink{class_schema_a2e4edc9da4da173a47617320abba7f0f}{Schema}}()\ \{\}}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00056}\mbox{\hyperlink{class_schema_a30f124d0ae285a4769582acc298ea65b}{00056}}\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_schema_a30f124d0ae285a4769582acc298ea65b}{SetUp}}()\ \{}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00057}00057\ \ \ \ \ \ \ \ \ PerfTest::SetUp();}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00059}00059\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ filenames[]\ =\ \{}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}additionalItems.json"{}},}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00061}00061\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}additionalProperties.json"{}},}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00062}00062\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}allOf.json"{}},}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}anyOf.json"{}},}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00064}00064\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}default.json"{}},}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00065}00065\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}definitions.json"{}},}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00066}00066\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}dependencies.json"{}},}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00067}00067\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}enum.json"{}},}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}items.json"{}},}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}maximum.json"{}},}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}maxItems.json"{}},}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00071}00071\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}maxLength.json"{}},}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}maxProperties.json"{}},}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00073}00073\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}minimum.json"{}},}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00074}00074\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}minItems.json"{}},}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00075}00075\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}minLength.json"{}},}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}minProperties.json"{}},}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}multipleOf.json"{}},}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00078}00078\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}not.json"{}},}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}oneOf.json"{}},}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00080}00080\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}pattern.json"{}},}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00081}00081\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}patternProperties.json"{}},}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00082}00082\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}properties.json"{}},}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00083}00083\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}ref.json"{}},}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00084}00084\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}refRemote.json"{}},}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00085}00085\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}required.json"{}},}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00086}00086\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}type.json"{}},}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00087}00087\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}uniqueItems.json"{}}}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00088}00088\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00089}00089\ }
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00090}00090\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ jsonBuffer[65536];}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00091}00091\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_memory_pool_allocator}{MemoryPoolAllocator<>}}\ jsonAllocator(jsonBuffer,\ \textcolor{keyword}{sizeof}(jsonBuffer));}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00092}00092\ }
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00093}00093\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{perftest_2schematest_8cpp_a25f003de16c08a4888b69f619d70f427}{ARRAY\_SIZE}}(filenames);\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00094}00094\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ filename[FILENAME\_MAX];}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00095}00095\ \ \ \ \ \ \ \ \ \ \ \ \ sprintf(filename,\ \textcolor{stringliteral}{"{}jsonschema/tests/draft4/\%s"{}},\ filenames[i]);}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00096}00096\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}*\ json\ =\ ReadFile(filename,\ jsonAllocator);}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00097}00097\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!json)\ \{}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00098}00098\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ printf(\textcolor{stringliteral}{"{}json\ test\ suite\ file\ \%s\ not\ found"{}},\ filename);}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00099}00099\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00100}00100\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00101}00101\ }
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00102}00102\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_document}{Document}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}};}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00103}00103\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.Parse(json);}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00104}00104\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.HasParseError())\ \{}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00105}00105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ printf(\textcolor{stringliteral}{"{}json\ test\ suite\ file\ \%s\ has\ parse\ error"{}},\ filename);}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00106}00106\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00107}00107\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00108}00108\ }
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00109}00109\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{class_generic_value}{Value::ConstValueIterator}}\ schemaItr\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.Begin();\ schemaItr\ !=\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.End();\ ++schemaItr)\ \{}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00110}00110\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ schemaDescription\ =\ (*schemaItr)[\textcolor{stringliteral}{"{}description"{}}].GetString();}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00111}00111\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (IsExcludeTestSuite(schemaDescription))}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00112}00112\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00113}00113\ }
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00114}00114\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_schema_1_1_test_suite}{TestSuite}}*\ ts\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{struct_schema_1_1_test_suite}{TestSuite}};}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00115}00115\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ts-\/>\mbox{\hyperlink{struct_schema_1_1_test_suite_abb0c1696936822f13151e8c13f84f8b9}{schema}}\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{fwd_8h_a05c97278ec100471e77a4d678957701b}{SchemaDocument}}((*schemaItr)[\textcolor{stringliteral}{"{}schema"{}}]);}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00116}00116\ }
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00117}00117\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ Value\&\ tests\ =\ (*schemaItr)[\textcolor{stringliteral}{"{}tests"{}}];}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00118}00118\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{class_generic_value}{Value::ConstValueIterator}}\ testItr\ =\ tests.Begin();\ testItr\ !=\ tests.End();\ ++testItr)\ \{}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00119}00119\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (IsExcludeTest(schemaDescription\ +\ \textcolor{stringliteral}{"{},\ "{}}\ +\ (*testItr)[\textcolor{stringliteral}{"{}description"{}}].GetString()))}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00120}00120\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00121}00121\ }
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00122}00122\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_document}{Document}}*\ d2\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{document_8h_ac6ea5b168e3fe8c7fa532450fc9391f7}{Document}};}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00123}00123\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ d2-\/>CopyFrom((*testItr)[\textcolor{stringliteral}{"{}data"{}}],\ d2-\/>\mbox{\hyperlink{class_generic_document_a1362cbdcce6ca37356744a3a0dbb11d6}{GetAllocator}}());}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00124}00124\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ts-\/>\mbox{\hyperlink{struct_schema_1_1_test_suite_a2ce085b9aad0441ce9c68794d27e4fde}{tests}}.push\_back(d2);}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00125}00125\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00126}00126\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_schema_a9ba0b56a14f8f5f072fdf65ede13594f}{testSuites}}.push\_back(ts);}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00127}00127\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00128}00128\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00129}00129\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00130}00130\ }
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00131}\mbox{\hyperlink{class_schema_acfd8fa13b78876ca7f4c256dfc4d00f7}{00131}}\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_schema_acfd8fa13b78876ca7f4c256dfc4d00f7}{TearDown}}()\ \{}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00132}00132\ \ \ \ \ \ \ \ \ PerfTest::TearDown();}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00133}00133\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (TestSuiteList::const\_iterator\ itr\ =\ \mbox{\hyperlink{class_schema_a9ba0b56a14f8f5f072fdf65ede13594f}{testSuites}}.begin();\ itr\ !=\ \mbox{\hyperlink{class_schema_a9ba0b56a14f8f5f072fdf65ede13594f}{testSuites}}.end();\ ++itr)}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00134}00134\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{delete}\ *itr;}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00135}00135\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_schema_a9ba0b56a14f8f5f072fdf65ede13594f}{testSuites}}.clear();}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00136}00136\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00137}00137\ }
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00138}00138\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00139}00139\ \ \ \ \ \textcolor{comment}{//\ Using\ the\ same\ exclusion\ in\ https://github.com/json-\/schema/JSON-\/Schema-\/Test-\/Suite}}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00140}00140\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{bool}\ IsExcludeTestSuite(\textcolor{keyword}{const}\ std::string\&\ description)\ \{}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00141}00141\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ excludeTestSuites[]\ =\ \{}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00142}00142\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//lost\ failing\ these\ tests}}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00143}00143\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}remote\ ref"{}},}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00144}00144\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}remote\ ref,\ containing\ refs\ itself"{}},}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00145}00145\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}fragment\ within\ remote\ ref"{}},}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00146}00146\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}ref\ within\ remote\ ref"{}},}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00147}00147\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}change\ resolution\ scope"{}},}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00148}00148\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ these\ below\ were\ added\ to\ get\ jsck\ in\ the\ benchmarks)}}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00149}00149\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}uniqueItems\ validation"{}},}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00150}00150\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}valid\ definition"{}},}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00151}00151\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}invalid\ definition"{}}}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00152}00152\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00153}00153\ }
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00154}00154\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{perftest_2schematest_8cpp_a25f003de16c08a4888b69f619d70f427}{ARRAY\_SIZE}}(excludeTestSuites);\ i++)}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00155}00155\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (excludeTestSuites[i]\ ==\ description)}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00156}00156\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00157}00157\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00158}00158\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00159}00159\ }
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00160}00160\ \ \ \ \ \textcolor{comment}{//\ Using\ the\ same\ exclusion\ in\ https://github.com/json-\/schema/JSON-\/Schema-\/Test-\/Suite}}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00161}00161\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{bool}\ IsExcludeTest(\textcolor{keyword}{const}\ std::string\&\ description)\ \{}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00162}00162\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ excludeTests[]\ =\ \{}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00163}00163\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//lots\ of\ validators\ fail\ these}}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00164}00164\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}invalid\ definition,\ invalid\ definition\ schema"{}},}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00165}00165\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}maxLength\ validation,\ two\ supplementary\ Unicode\ code\ points\ is\ long\ enough"{}},}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00166}00166\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}minLength\ validation,\ one\ supplementary\ Unicode\ code\ point\ is\ not\ long\ enough"{}},}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00167}00167\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//this\ is\ to\ get\ tv4\ in\ the\ benchmarks}}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00168}00168\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}heterogeneous\ enum\ validation,\ something\ else\ is\ invalid"{}}}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00169}00169\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00170}00170\ }
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00171}00171\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{perftest_2schematest_8cpp_a25f003de16c08a4888b69f619d70f427}{ARRAY\_SIZE}}(excludeTests);\ i++)}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00172}00172\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (excludeTests[i]\ ==\ description)}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00173}00173\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00174}00174\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00175}00175\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00176}00176\ }
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00177}00177\ \ \ \ \ \mbox{\hyperlink{class_schema_a2e4edc9da4da173a47617320abba7f0f}{Schema}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{class_schema}{Schema}}\&);}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00178}00178\ \ \ \ \ \mbox{\hyperlink{class_schema}{Schema}}\&\ operator=(\textcolor{keyword}{const}\ \mbox{\hyperlink{class_schema}{Schema}}\&);}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00179}00179\ }
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00180}00180\ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00181}\mbox{\hyperlink{class_schema_a6350ff51a7a6cbbf78712f864d0e45a5}{00181}}\ \ \ \ \ \textcolor{keyword}{typedef}\ std::vector<Document*>\ \mbox{\hyperlink{class_schema_a6350ff51a7a6cbbf78712f864d0e45a5}{DocumentList}};}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00182}00182\ }
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00183}\mbox{\hyperlink{struct_schema_1_1_test_suite}{00183}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_schema_1_1_test_suite}{TestSuite}}\ \{}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00184}\mbox{\hyperlink{struct_schema_1_1_test_suite_a4d5b9c83d63b62dd1848520314a60ef2}{00184}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_schema_1_1_test_suite_a4d5b9c83d63b62dd1848520314a60ef2}{TestSuite}}()\ :\ \mbox{\hyperlink{struct_schema_1_1_test_suite_abb0c1696936822f13151e8c13f84f8b9}{schema}}()\ \{\}}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00185}\mbox{\hyperlink{struct_schema_1_1_test_suite_a5003dce5e6b033cb86ae60f813d7c40f}{00185}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_schema_1_1_test_suite_a5003dce5e6b033cb86ae60f813d7c40f}{\string~TestSuite}}()\ \{}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00186}00186\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{delete}\ \mbox{\hyperlink{struct_schema_1_1_test_suite_abb0c1696936822f13151e8c13f84f8b9}{schema}};}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00187}00187\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (DocumentList::iterator\ itr\ =\ \mbox{\hyperlink{struct_schema_1_1_test_suite_a2ce085b9aad0441ce9c68794d27e4fde}{tests}}.begin();\ itr\ !=\ \mbox{\hyperlink{struct_schema_1_1_test_suite_a2ce085b9aad0441ce9c68794d27e4fde}{tests}}.end();\ ++itr)}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00188}00188\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{delete}\ *itr;}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00189}00189\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00190}\mbox{\hyperlink{struct_schema_1_1_test_suite_abb0c1696936822f13151e8c13f84f8b9}{00190}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_schema_document}{SchemaDocument}}*\ \mbox{\hyperlink{struct_schema_1_1_test_suite_abb0c1696936822f13151e8c13f84f8b9}{schema}};}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00191}\mbox{\hyperlink{struct_schema_1_1_test_suite_a2ce085b9aad0441ce9c68794d27e4fde}{00191}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_schema_a6350ff51a7a6cbbf78712f864d0e45a5}{DocumentList}}\ \mbox{\hyperlink{struct_schema_1_1_test_suite_a2ce085b9aad0441ce9c68794d27e4fde}{tests}};}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00192}00192\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00193}00193\ }
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00194}\mbox{\hyperlink{class_schema_a429914b2b761b69fc1a398550ad70ff1}{00194}}\ \ \ \ \ \textcolor{keyword}{typedef}\ std::vector<TestSuite*\ >\ \mbox{\hyperlink{class_schema_a429914b2b761b69fc1a398550ad70ff1}{TestSuiteList}};}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00195}\mbox{\hyperlink{class_schema_a9ba0b56a14f8f5f072fdf65ede13594f}{00195}}\ \ \ \ \ \mbox{\hyperlink{class_schema_a429914b2b761b69fc1a398550ad70ff1}{TestSuiteList}}\ \mbox{\hyperlink{class_schema_a9ba0b56a14f8f5f072fdf65ede13594f}{testSuites}};}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00196}00196\ \};}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00197}00197\ }
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00198}\mbox{\hyperlink{perftest_2schematest_8cpp_a2c5e22c20fbad50bc8a47803b79d552e}{00198}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{class_schema}{Schema}},\ TestSuite)\ \{}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00199}00199\ \ \ \ \ \textcolor{keywordtype}{char}\ validatorBuffer[65536];}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00200}00200\ \ \ \ \ \mbox{\hyperlink{class_memory_pool_allocator}{MemoryPoolAllocator<>}}\ validatorAllocator(validatorBuffer,\ \textcolor{keyword}{sizeof}(validatorBuffer));}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00201}00201\ }
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00202}00202\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ trialCount\ =\ 100000;}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00203}00203\ \ \ \ \ \textcolor{keywordtype}{int}\ testCount\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00204}00204\ \ \ \ \ clock\_t\ start\ =\ clock();}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00205}00205\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ trialCount;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00206}00206\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (TestSuiteList::const\_iterator\ itr\ =\ testSuites.begin();\ itr\ !=\ testSuites.end();\ ++itr)\ \{}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00207}00207\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ TestSuite\&\ ts\ =\ **itr;}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00208}00208\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_schema_validator}{GenericSchemaValidator<SchemaDocument,\ BaseReaderHandler<UTF8<>}}\ >,\ \mbox{\hyperlink{class_memory_pool_allocator}{MemoryPoolAllocator<>}}\ >\ \ validator(*ts.schema,\ \&validatorAllocator);}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00209}00209\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (DocumentList::const\_iterator\ testItr\ =\ ts.tests.begin();\ testItr\ !=\ ts.tests.end();\ ++testItr)\ \{}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00210}00210\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ validator.\mbox{\hyperlink{class_generic_schema_validator_a49efbbe098cb77728be3d48cafed17e4}{Reset}}();}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00211}00211\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (*testItr)-\/>Accept(validator);}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00212}00212\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ testCount++;}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00213}00213\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00214}00214\ \ \ \ \ \ \ \ \ \ \ \ \ validatorAllocator.\mbox{\hyperlink{class_memory_pool_allocator_a57bbc80e570db6110901b9a7e36dbda0}{Clear}}();}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00215}00215\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00216}00216\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00217}00217\ \ \ \ \ clock\_t\ end\ =\ clock();}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00218}00218\ \ \ \ \ \textcolor{keywordtype}{double}\ duration\ =\ double(end\ -\/\ start)\ /\ CLOCKS\_PER\_SEC;}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00219}00219\ \ \ \ \ printf(\textcolor{stringliteral}{"{}\%d\ trials\ in\ \%f\ s\ -\/>\ \%f\ trials\ per\ sec\(\backslash\)n"{}},\ trialCount,\ duration,\ trialCount\ /\ duration);}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00220}00220\ \ \ \ \ printf(\textcolor{stringliteral}{"{}\%d\ tests\ per\ trial\(\backslash\)n"{}},\ testCount\ /\ trialCount);}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00221}00221\ \}}
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00222}00222\ }
+\DoxyCodeLine{\Hypertarget{perftest_2schematest_8cpp_source_l00223}00223\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

@@ -1,0 +1,262 @@
+\doxysection{sysio\+::resource\+\_\+monitor\+\_\+plugin Class Reference}
+\hypertarget{classsysio_1_1resource__monitor__plugin}{}\label{classsysio_1_1resource__monitor__plugin}\index{sysio::resource\_monitor\_plugin@{sysio::resource\_monitor\_plugin}}
+
+
+{\ttfamily \#include $<$resource\+\_\+monitor\+\_\+plugin.\+hpp$>$}
+
+
+
+Inheritance diagram for sysio\+::resource\+\_\+monitor\+\_\+plugin\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=211pt]{classsysio_1_1resource__monitor__plugin__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for sysio\+::resource\+\_\+monitor\+\_\+plugin\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=211pt]{classsysio_1_1resource__monitor__plugin__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classsysio_1_1resource__monitor__plugin_a90e0286a4d611b80f01ef62efa3a9a0c}{resource\+\_\+monitor\+\_\+plugin}} ()
+\item 
+virtual \mbox{\hyperlink{classsysio_1_1resource__monitor__plugin_a8b93e10a48ce2ead30ffb21c06db7713}{\texorpdfstring{$\sim$}{\string~}resource\+\_\+monitor\+\_\+plugin}} ()
+\item 
+virtual void \mbox{\hyperlink{classsysio_1_1resource__monitor__plugin_a6d82af2b00041a1f160d7268c1b454b7}{set\+\_\+program\+\_\+options}} (options\+\_\+description \&, options\+\_\+description \&cfg) override
+\item 
+void \mbox{\hyperlink{classsysio_1_1resource__monitor__plugin_a8aa338848d9b4ea7f0af24674fb9afe3}{plugin\+\_\+initialize}} (const variables\+\_\+map \&options)
+\item 
+void \mbox{\hyperlink{classsysio_1_1resource__monitor__plugin_a9450b8a934658e7baa38d0b581c98812}{plugin\+\_\+startup}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1resource__monitor__plugin_aec66e2d4bf2493717a81701b2504e138}{plugin\+\_\+shutdown}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1resource__monitor__plugin_a756d8d52fe7acf391a9e11e27a1a482b}{monitor\+\_\+directory}} (const bfs\+::path \&\mbox{\hyperlink{classfc_1_1path}{path}})
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classappbase_1_1plugin}{appbase\+::plugin$<$ resource\+\_\+monitor\+\_\+plugin $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classappbase_1_1plugin_a3cf5509f2854ffb274018dca8606c50a}{plugin}} ()
+\item 
+virtual \mbox{\hyperlink{classappbase_1_1plugin_a6c83bcf2c8ee3de87593824da807e4ba}{\texorpdfstring{$\sim$}{\string~}plugin}} ()
+\item 
+virtual \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408}{state}} \mbox{\hyperlink{classappbase_1_1plugin_a857288c2424b57a898c0579d25dacbb0}{get\+\_\+state}} () const override
+\item 
+virtual const std\+::string \& \mbox{\hyperlink{classappbase_1_1plugin_a274f072d2f7f37d43ae74e01edd0ba62}{name}} () const override
+\item 
+virtual void \mbox{\hyperlink{classappbase_1_1plugin_a6a0cd7ccc873527ebb5e6716b249ea17}{register\+\_\+dependencies}} ()
+\item 
+virtual void \mbox{\hyperlink{classappbase_1_1plugin_ac28755a82831d41e5d0ef0ce56b10fa9}{initialize}} (const variables\+\_\+map \&options) override
+\item 
+virtual void \mbox{\hyperlink{classappbase_1_1plugin_ab314bd778e71a91de584cd9b8a999867}{handle\+\_\+sighup}} () override
+\item 
+virtual void \mbox{\hyperlink{classappbase_1_1plugin_a10e4e1c582bfadf67f510df76d87abfd}{startup}} () override
+\item 
+virtual void \mbox{\hyperlink{classappbase_1_1plugin_a21e5be5587fca41fbc91367d449b8f27}{shutdown}} () override
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classappbase_1_1abstract__plugin}{appbase\+::abstract\+\_\+plugin}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4643a2618ac94aa2ef56e59fe363f828}{\texorpdfstring{$\sim$}{\string~}abstract\+\_\+plugin}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Public Types inherited from \mbox{\hyperlink{classappbase_1_1abstract__plugin}{appbase\+::abstract\+\_\+plugin}}}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408}{state}} \{ \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408ac712ce3482a78b8bf87080aefd77cf7d}{registered}}
+, \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408a9ae208bba76e9c0eab1cac52953f947b}{initialized}}
+, \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408a808ebbf475942017567644697eca3224}{started}}
+, \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408a320c2eebb5306f385aebfca07336d29e}{stopped}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Member Functions inherited from \mbox{\hyperlink{classappbase_1_1plugin}{appbase\+::plugin$<$ resource\+\_\+monitor\+\_\+plugin $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classappbase_1_1plugin_a51f43c3c64ab8524928698a72a186822}{plugin}} (const string \&\mbox{\hyperlink{classappbase_1_1plugin_a274f072d2f7f37d43ae74e01edd0ba62}{name}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{resource__monitor__plugin_8hpp_source_l00009}{9}} of file \mbox{\hyperlink{resource__monitor__plugin_8hpp_source}{resource\+\_\+monitor\+\_\+plugin.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classsysio_1_1resource__monitor__plugin_a90e0286a4d611b80f01ef62efa3a9a0c}\index{sysio::resource\_monitor\_plugin@{sysio::resource\_monitor\_plugin}!resource\_monitor\_plugin@{resource\_monitor\_plugin}}
+\index{resource\_monitor\_plugin@{resource\_monitor\_plugin}!sysio::resource\_monitor\_plugin@{sysio::resource\_monitor\_plugin}}
+\doxysubsubsection{\texorpdfstring{resource\_monitor\_plugin()}{resource\_monitor\_plugin()}}
+{\footnotesize\ttfamily \label{classsysio_1_1resource__monitor__plugin_a90e0286a4d611b80f01ef62efa3a9a0c} 
+sysio\+::resource\+\_\+monitor\+\_\+plugin\+::resource\+\_\+monitor\+\_\+plugin (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{resource__monitor__plugin_8cpp_source_l00160}{160}} of file \mbox{\hyperlink{resource__monitor__plugin_8cpp_source}{resource\+\_\+monitor\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00160\ :my(std::make\_unique<resource\_monitor\_plugin\_impl>())\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1resource__monitor__plugin_a8b93e10a48ce2ead30ffb21c06db7713}\index{sysio::resource\_monitor\_plugin@{sysio::resource\_monitor\_plugin}!````~resource\_monitor\_plugin@{\texorpdfstring{$\sim$}{\string~}resource\_monitor\_plugin}}
+\index{````~resource\_monitor\_plugin@{\texorpdfstring{$\sim$}{\string~}resource\_monitor\_plugin}!sysio::resource\_monitor\_plugin@{sysio::resource\_monitor\_plugin}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}resource\_monitor\_plugin()}{\string~resource\_monitor\_plugin()}}
+{\footnotesize\ttfamily \label{classsysio_1_1resource__monitor__plugin_a8b93e10a48ce2ead30ffb21c06db7713} 
+sysio\+::resource\+\_\+monitor\+\_\+plugin\+::\texorpdfstring{$\sim$}{\string~}resource\+\_\+monitor\+\_\+plugin (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{resource__monitor__plugin_8cpp_source_l00162}{162}} of file \mbox{\hyperlink{resource__monitor__plugin_8cpp_source}{resource\+\_\+monitor\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00162\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1resource__monitor__plugin_a756d8d52fe7acf391a9e11e27a1a482b}\index{sysio::resource\_monitor\_plugin@{sysio::resource\_monitor\_plugin}!monitor\_directory@{monitor\_directory}}
+\index{monitor\_directory@{monitor\_directory}!sysio::resource\_monitor\_plugin@{sysio::resource\_monitor\_plugin}}
+\doxysubsubsection{\texorpdfstring{monitor\_directory()}{monitor\_directory()}}
+{\footnotesize\ttfamily \label{classsysio_1_1resource__monitor__plugin_a756d8d52fe7acf391a9e11e27a1a482b} 
+void sysio\+::resource\+\_\+monitor\+\_\+plugin\+::monitor\+\_\+directory (\begin{DoxyParamCaption}\item[{const bfs\+::path \&}]{path}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{resource__monitor__plugin_8cpp_source_l00180}{180}} of file \mbox{\hyperlink{resource__monitor__plugin_8cpp_source}{resource\+\_\+monitor\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00181\ \ \ \ my-\/>monitor\_directory(\ path\ );}
+\DoxyCodeLine{00182\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1resource__monitor__plugin_a756d8d52fe7acf391a9e11e27a1a482b_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1resource__monitor__plugin_a8aa338848d9b4ea7f0af24674fb9afe3}\index{sysio::resource\_monitor\_plugin@{sysio::resource\_monitor\_plugin}!plugin\_initialize@{plugin\_initialize}}
+\index{plugin\_initialize@{plugin\_initialize}!sysio::resource\_monitor\_plugin@{sysio::resource\_monitor\_plugin}}
+\doxysubsubsection{\texorpdfstring{plugin\_initialize()}{plugin\_initialize()}}
+{\footnotesize\ttfamily \label{classsysio_1_1resource__monitor__plugin_a8aa338848d9b4ea7f0af24674fb9afe3} 
+void sysio\+::resource\+\_\+monitor\+\_\+plugin\+::plugin\+\_\+initialize (\begin{DoxyParamCaption}\item[{const variables\+\_\+map \&}]{options}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{resource__monitor__plugin_8cpp_source_l00168}{168}} of file \mbox{\hyperlink{resource__monitor__plugin_8cpp_source}{resource\+\_\+monitor\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00169\ \ \ \ my-\/>plugin\_initialize(options);}
+\DoxyCodeLine{00170\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1resource__monitor__plugin_a8aa338848d9b4ea7f0af24674fb9afe3_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1resource__monitor__plugin_aec66e2d4bf2493717a81701b2504e138}\index{sysio::resource\_monitor\_plugin@{sysio::resource\_monitor\_plugin}!plugin\_shutdown@{plugin\_shutdown}}
+\index{plugin\_shutdown@{plugin\_shutdown}!sysio::resource\_monitor\_plugin@{sysio::resource\_monitor\_plugin}}
+\doxysubsubsection{\texorpdfstring{plugin\_shutdown()}{plugin\_shutdown()}}
+{\footnotesize\ttfamily \label{classsysio_1_1resource__monitor__plugin_aec66e2d4bf2493717a81701b2504e138} 
+void sysio\+::resource\+\_\+monitor\+\_\+plugin\+::plugin\+\_\+shutdown (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{resource__monitor__plugin_8cpp_source_l00176}{176}} of file \mbox{\hyperlink{resource__monitor__plugin_8cpp_source}{resource\+\_\+monitor\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00177\ \ \ \ my-\/>plugin\_shutdown();}
+\DoxyCodeLine{00178\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1resource__monitor__plugin_aec66e2d4bf2493717a81701b2504e138_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1resource__monitor__plugin_a9450b8a934658e7baa38d0b581c98812}\index{sysio::resource\_monitor\_plugin@{sysio::resource\_monitor\_plugin}!plugin\_startup@{plugin\_startup}}
+\index{plugin\_startup@{plugin\_startup}!sysio::resource\_monitor\_plugin@{sysio::resource\_monitor\_plugin}}
+\doxysubsubsection{\texorpdfstring{plugin\_startup()}{plugin\_startup()}}
+{\footnotesize\ttfamily \label{classsysio_1_1resource__monitor__plugin_a9450b8a934658e7baa38d0b581c98812} 
+void sysio\+::resource\+\_\+monitor\+\_\+plugin\+::plugin\+\_\+startup (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{resource__monitor__plugin_8cpp_source_l00172}{172}} of file \mbox{\hyperlink{resource__monitor__plugin_8cpp_source}{resource\+\_\+monitor\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00173\ \ \ \ my-\/>plugin\_startup();}
+\DoxyCodeLine{00174\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=348pt]{classsysio_1_1resource__monitor__plugin_a9450b8a934658e7baa38d0b581c98812_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1resource__monitor__plugin_a6d82af2b00041a1f160d7268c1b454b7}\index{sysio::resource\_monitor\_plugin@{sysio::resource\_monitor\_plugin}!set\_program\_options@{set\_program\_options}}
+\index{set\_program\_options@{set\_program\_options}!sysio::resource\_monitor\_plugin@{sysio::resource\_monitor\_plugin}}
+\doxysubsubsection{\texorpdfstring{set\_program\_options()}{set\_program\_options()}}
+{\footnotesize\ttfamily \label{classsysio_1_1resource__monitor__plugin_a6d82af2b00041a1f160d7268c1b454b7} 
+void sysio\+::resource\+\_\+monitor\+\_\+plugin\+::set\+\_\+program\+\_\+options (\begin{DoxyParamCaption}\item[{options\+\_\+description \&}]{cli}{, }\item[{options\+\_\+description \&}]{cfg}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classappbase_1_1abstract__plugin_a274a3c7462de3c699a8eb23741ed7655}{appbase\+::abstract\+\_\+plugin}}.
+
+
+
+Definition at line \mbox{\hyperlink{resource__monitor__plugin_8cpp_source_l00164}{164}} of file \mbox{\hyperlink{resource__monitor__plugin_8cpp_source}{resource\+\_\+monitor\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00165\ \ \ \ my-\/>set\_program\_options(\mbox{\hyperlink{xbyak__mnemonic_8h_a4229a9b84f8b8673326f12bd41acd27c}{cli}},\ cfg);}
+\DoxyCodeLine{00166\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=288pt]{classsysio_1_1resource__monitor__plugin_a6d82af2b00041a1f160d7268c1b454b7_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1resource__monitor__plugin_a6d82af2b00041a1f160d7268c1b454b7_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+plugins/resource\+\_\+monitor\+\_\+plugin/include/sysio/resource\+\_\+monitor\+\_\+plugin/\mbox{\hyperlink{resource__monitor__plugin_8hpp}{resource\+\_\+monitor\+\_\+plugin.\+hpp}}\item 
+plugins/resource\+\_\+monitor\+\_\+plugin/\mbox{\hyperlink{resource__monitor__plugin_8cpp}{resource\+\_\+monitor\+\_\+plugin.\+cpp}}\end{DoxyCompactItemize}

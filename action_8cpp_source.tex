@@ -1,0 +1,38 @@
+\doxysection{action.\+cpp}
+\hypertarget{action_8cpp_source}{}\label{action_8cpp_source}\index{libraries/chain/webassembly/action.cpp@{libraries/chain/webassembly/action.cpp}}
+\mbox{\hyperlink{action_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{action_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{interface_8hpp}{sysio/chain/webassembly/interface.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{action_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{apply__context_8hpp}{sysio/chain/apply\_context.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{action_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{global__property__object_8hpp}{sysio/chain/global\_property\_object.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{action_8cpp_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{action_8cpp_source_l00005}00005\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{\ \textcolor{keyword}{namespace\ }chain\ \{\ \textcolor{keyword}{namespace\ }webassembly\ \{}
+\DoxyCodeLine{\Hypertarget{action_8cpp_source_l00006}\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_a09aec5f6c946043b43150a69641df425}{00006}}\ \ \ \ \mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}}\ \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_a09aec5f6c946043b43150a69641df425}{interface::read\_action\_data}}(\mbox{\hyperlink{structsysio_1_1vm_1_1argument__proxy}{legacy\_span<char>}}\ memory)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{action_8cpp_source_l00007}00007\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ =\ \mbox{\hyperlink{structcontext}{context}}.get\_action().data.size();}
+\DoxyCodeLine{\Hypertarget{action_8cpp_source_l00008}00008\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ memory.size()\ ==\ 0\ )\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{\Hypertarget{action_8cpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{action_8cpp_source_l00010}00010\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ copy\_size\ =\ std::min(\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(memory.size()),\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ );}
+\DoxyCodeLine{\Hypertarget{action_8cpp_source_l00011}00011\ \ \ \ \ \ \ std::memcpy(\ memory.data(),\ \mbox{\hyperlink{structcontext}{context}}.get\_action().data.data(),\ copy\_size\ );}
+\DoxyCodeLine{\Hypertarget{action_8cpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{action_8cpp_source_l00013}00013\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ copy\_size;}
+\DoxyCodeLine{\Hypertarget{action_8cpp_source_l00014}00014\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{action_8cpp_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{action_8cpp_source_l00016}\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_a214c6b50aee6897f6f64b309f9a45fe6}{00016}}\ \ \ \ \mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}}\ \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_a214c6b50aee6897f6f64b309f9a45fe6}{interface::action\_data\_size}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{action_8cpp_source_l00017}00017\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structcontext}{context}}.get\_action().data.size();}
+\DoxyCodeLine{\Hypertarget{action_8cpp_source_l00018}00018\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{action_8cpp_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{action_8cpp_source_l00020}\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_a26eedbffa8f7c5833d150d080412336a}{00020}}\ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\ \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_a26eedbffa8f7c5833d150d080412336a}{interface::current\_receiver}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{action_8cpp_source_l00021}00021\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structcontext}{context}}.get\_receiver();}
+\DoxyCodeLine{\Hypertarget{action_8cpp_source_l00022}00022\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{action_8cpp_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{action_8cpp_source_l00024}\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_a50ce60d969d1bb508d659a657c915dfe}{00024}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_a50ce60d969d1bb508d659a657c915dfe}{interface::set\_action\_return\_value}}(\ \mbox{\hyperlink{classsysio_1_1vm_1_1span}{span<const\ char>}}\ packed\_blob\ )\ \{}
+\DoxyCodeLine{\Hypertarget{action_8cpp_source_l00025}00025\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ max\_action\_return\_value\_size\ =\ }
+\DoxyCodeLine{\Hypertarget{action_8cpp_source_l00026}00026\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structcontext}{context}}.control.get\_global\_properties().configuration.max\_action\_return\_value\_size;}
+\DoxyCodeLine{\Hypertarget{action_8cpp_source_l00027}00027\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(packed\_blob.\mbox{\hyperlink{classsysio_1_1vm_1_1span_a584ee0404e01edf225142e86d23d6d7d}{size}}()\ <=\ max\_action\_return\_value\_size,}
+\DoxyCodeLine{\Hypertarget{action_8cpp_source_l00028}00028\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ action\_return\_value\_exception,\ }
+\DoxyCodeLine{\Hypertarget{action_8cpp_source_l00029}00029\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}action\ return\ value\ size\ must\ be\ less\ or\ equal\ to\ \$\{s\}\ bytes"{}},\ (\textcolor{stringliteral}{"{}s"{}},\ max\_action\_return\_value\_size));}
+\DoxyCodeLine{\Hypertarget{action_8cpp_source_l00030}00030\ \ \ \ \ \ \ \mbox{\hyperlink{structcontext}{context}}.action\_return\_value.assign(\ packed\_blob.\mbox{\hyperlink{classsysio_1_1vm_1_1span_a65d9e2641d763c860ae175a9a936a309}{data}}(),\ packed\_blob.\mbox{\hyperlink{classsysio_1_1vm_1_1span_a65d9e2641d763c860ae175a9a936a309}{data}}()\ +\ packed\_blob.\mbox{\hyperlink{classsysio_1_1vm_1_1span_a584ee0404e01edf225142e86d23d6d7d}{size}}()\ );}
+\DoxyCodeLine{\Hypertarget{action_8cpp_source_l00031}00031\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{action_8cpp_source_l00032}00032\ \}\}\}\ \textcolor{comment}{//\ ns\ sysio::chain::webassembly}}
+
+\end{DoxyCode}

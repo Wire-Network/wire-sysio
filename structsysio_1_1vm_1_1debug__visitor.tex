@@ -1,0 +1,1561 @@
+\doxysection{sysio\+::vm\+::debug\+\_\+visitor\texorpdfstring{$<$}{<} Execution\+CTX \texorpdfstring{$>$}{>} Struct Template Reference}
+\hypertarget{structsysio_1_1vm_1_1debug__visitor}{}\label{structsysio_1_1vm_1_1debug__visitor}\index{sysio::vm::debug\_visitor$<$ ExecutionCTX $>$@{sysio::vm::debug\_visitor$<$ ExecutionCTX $>$}}
+
+
+{\ttfamily \#include $<$debug\+\_\+visitor.\+hpp$>$}
+
+
+
+Inheritance diagram for sysio\+::vm\+::debug\+\_\+visitor\texorpdfstring{$<$}{<} Execution\+CTX \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=209pt]{structsysio_1_1vm_1_1debug__visitor__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for sysio\+::vm\+::debug\+\_\+visitor\texorpdfstring{$<$}{<} Execution\+CTX \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=209pt]{structsysio_1_1vm_1_1debug__visitor__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1vm_1_1debug__visitor_af5b33b607498780a3759c828b969fd3d}{debug\+\_\+visitor}} (Execution\+CTX \&ctx)
+\item 
+Execution\+CTX \& \mbox{\hyperlink{structsysio_1_1vm_1_1debug__visitor_a6c5abcb09938ed107074b09ae0b4ef60}{get\+\_\+context}} ()
+\item 
+\mbox{\hyperlink{structsysio_1_1vm_1_1debug__visitor_af5b33b607498780a3759c828b969fd3d}{debug\+\_\+visitor}} (Execution\+CTX \&ctx)
+\item 
+Execution\+CTX \& \mbox{\hyperlink{structsysio_1_1vm_1_1debug__visitor_a6c5abcb09938ed107074b09ae0b4ef60}{get\+\_\+context}} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor}{sysio\+::vm\+::interpret\+\_\+visitor$<$ Execution\+CTX $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a2f0bc3fc055f8891ba7ef7cecb0b2906}{interpret\+\_\+visitor}} (Execution\+CTX \&ec)
+\item 
+\mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a2f0bc3fc055f8891ba7ef7cecb0b2906}{interpret\+\_\+visitor}} (Execution\+CTX \&ec)
+\item 
+Execution\+CTX \& \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a46be325f6d007d98192a194a431e6d45}{get\+\_\+context}} ()
+\item 
+Execution\+CTX \& \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a46be325f6d007d98192a194a431e6d45}{get\+\_\+context}} ()
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_ab7e741e18cf9b1cd8f03bdd6892e6f60}{operator()}} (const unreachable\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a1386f700060b7884ead187fab618f551}{operator()}} (const nop\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a1c1596169f727250ee6450ef66f3b74e}{operator()}} (const end\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a72b6e560ae5e597cfbd25cb6dda2ba91}{operator()}} (const return\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_ad57d4dbdd4a337025fb06b4a34334dd7}{operator()}} (const block\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a1b2d21806dd19a9dcb0e7c579e671957}{operator()}} (const loop\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_af4464a4f7aa71288580bf56650476c66}{operator()}} (const if\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a3ce97d9a0039391ac5a000d786ea8075}{operator()}} (const else\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a76e09965ce9dff38f623f15ebd9d1ef4}{operator()}} (const br\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_acaf730e089041ef501ae3b55c7cb4fbf}{operator()}} (const br\+\_\+if\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_af075c734e40f03dd2ee3ff55ead90f45}{operator()}} (const br\+\_\+table\+\_\+data\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a3c4abbdb19320f6b94d77c4f6c6051e1}{operator()}} (const br\+\_\+table\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a0a672cce7261bfb6693364449e519e08}{operator()}} (const call\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a9060d97ecc496b48e513718c6667256d}{operator()}} (const call\+\_\+indirect\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_ace5b32dadc44689f802ca0207f15c9f2}{operator()}} (const drop\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a8f66ca060f953ebd1545640aac7c06d4}{operator()}} (const select\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_aba446804084182942a1cc8919dbcfbbd}{operator()}} (const get\+\_\+local\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a99743f348e369fe03d10f3f1b9f58902}{operator()}} (const set\+\_\+local\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a4e7c6557df1bf6a990656f9a02a4d85f}{operator()}} (const tee\+\_\+local\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a9b33c504d48e808fbd2880581f3041d3}{operator()}} (const get\+\_\+global\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_accdc217c961adf1310a9f33d23e914d1}{operator()}} (const set\+\_\+global\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a8fc5a6ea1fcbbfa6a9bcb4aa4d49999d}{operator()}} (const i32\+\_\+load\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a16f4d38c51436a0224c412d57ad71708}{operator()}} (const i32\+\_\+load8\+\_\+s\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a7edcb1faaa1f414ca060a31e654795f5}{operator()}} (const i32\+\_\+load16\+\_\+s\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a4f00dc1e434d1dcfa57c8aa239db01a5}{operator()}} (const i32\+\_\+load8\+\_\+u\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a181ea0722168c3613f3b4b8bd09d5aef}{operator()}} (const i32\+\_\+load16\+\_\+u\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a7ee18fc49ca822f555270afccf9bc76d}{operator()}} (const i64\+\_\+load\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_afad4ee516c331a47e9833b2f3f2c7546}{operator()}} (const i64\+\_\+load8\+\_\+s\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a1c414d225a6dd01d51eb2b119b3544db}{operator()}} (const i64\+\_\+load16\+\_\+s\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a211315c3a883b96993a7f75ba870e067}{operator()}} (const i64\+\_\+load32\+\_\+s\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a90128c136504158d5181ef9437c4e9b9}{operator()}} (const i64\+\_\+load8\+\_\+u\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a2ae27cdb8ab3c2833582169ce99dff94}{operator()}} (const i64\+\_\+load16\+\_\+u\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a21b11daaf20252c17eb015b67626b7b6}{operator()}} (const i64\+\_\+load32\+\_\+u\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_ad86661b556e03ba71cbd7dff6bd3f9f7}{operator()}} (const f32\+\_\+load\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a0ad40039ff5e78b96b63867aafc81408}{operator()}} (const f64\+\_\+load\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a3234e3c07e132a261b2497851e355ee0}{operator()}} (const i32\+\_\+store\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_aa3ce1b298ef0cd9d071ede4035e0f1ca}{operator()}} (const i32\+\_\+store8\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_aa693d79b2d6ac0aa1d9a8d82c161094f}{operator()}} (const i32\+\_\+store16\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a3333c5c24f97718b5c04b22b5f7f66fb}{operator()}} (const i64\+\_\+store\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a86711c96d27bc0961b2aa6eea8628161}{operator()}} (const i64\+\_\+store8\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a9901106c3c51009f4574a9797cb0d69f}{operator()}} (const i64\+\_\+store16\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_ade05c2cb8e054aaca6ef6ad9dfe8f9cc}{operator()}} (const i64\+\_\+store32\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a14d793b1e12985e756fc8ebf571f2926}{operator()}} (const f32\+\_\+store\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a6152c768dfacb4652fbc930d443d9da2}{operator()}} (const f64\+\_\+store\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a380c19448d3b24a3cf78ac424df02609}{operator()}} (const current\+\_\+memory\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a4f22c4c3cf1fbc42d12859921dd8ae4c}{operator()}} (const grow\+\_\+memory\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a17a2c80d6b123605e4f9a24fbe4822d2}{operator()}} (const i32\+\_\+const\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a3324dcfa1c08377555a6cab3be8cf31c}{operator()}} (const i64\+\_\+const\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_aa72fd16af863a488ca6d3cffaed56c76}{operator()}} (const f32\+\_\+const\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a625048d39f9dfd84bc22a3e0f6d0fe75}{operator()}} (const f64\+\_\+const\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a1444bd0653118f626aa2ac582aa4e950}{operator()}} (const i32\+\_\+eqz\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_afad209560d0494ade0fd914524ceb210}{operator()}} (const i32\+\_\+eq\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a69b454212bb76ad29a3b64dc448c25f1}{operator()}} (const i32\+\_\+ne\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_aea1186521570bd5e5d450a9ebb4ff114}{operator()}} (const i32\+\_\+lt\+\_\+s\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_af0cd152931c02c8e4a496b41185208ab}{operator()}} (const i32\+\_\+lt\+\_\+u\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_ac422b5142aaca4e1e1097973829badf1}{operator()}} (const i32\+\_\+le\+\_\+s\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a7357c12cc0f7f05ebc79323a6dadcf51}{operator()}} (const i32\+\_\+le\+\_\+u\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a6ed79004b6fed66a6e482efd1afd8036}{operator()}} (const i32\+\_\+gt\+\_\+s\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a01d08baf0c5ade319711e47e6a689968}{operator()}} (const i32\+\_\+gt\+\_\+u\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a3c46b1da16deb75ccb391993d5b533d9}{operator()}} (const i32\+\_\+ge\+\_\+s\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_ad8df52e8bf0f1dec4ba5d0efca0e53bf}{operator()}} (const i32\+\_\+ge\+\_\+u\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a1a42c94415960fb7105802e271df0f8d}{operator()}} (const i64\+\_\+eqz\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a50f80e5227223751d8ad4111432889d8}{operator()}} (const i64\+\_\+eq\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_af56cbbd03e761c35348accf0eee905aa}{operator()}} (const i64\+\_\+ne\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a809865dff90fff63d58171b17757ddbb}{operator()}} (const i64\+\_\+lt\+\_\+s\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a728fc119f4f0a0d2c34f18d60b01fee0}{operator()}} (const i64\+\_\+lt\+\_\+u\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a4cf52e5552335c52acd025235e8849bf}{operator()}} (const i64\+\_\+le\+\_\+s\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_ad2596f7c278be7ffbd8f12adfd846057}{operator()}} (const i64\+\_\+le\+\_\+u\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_ad31939defbf5011307675c70cda08bb0}{operator()}} (const i64\+\_\+gt\+\_\+s\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a43a2d5d0ea77082be8b85fb757cc0fc5}{operator()}} (const i64\+\_\+gt\+\_\+u\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_ae09756462f3867cb8b59e740d3c3c5c0}{operator()}} (const i64\+\_\+ge\+\_\+s\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a07f4507e5a0bb8881a9cd65851e2dd5f}{operator()}} (const i64\+\_\+ge\+\_\+u\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a0d90be47db3562293b9594b2a8682408}{operator()}} (const f32\+\_\+eq\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a292ecf07b306ccee6129da6092bd358b}{operator()}} (const f32\+\_\+ne\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_af4dc386ae9e0ace3c202cebd55646ed4}{operator()}} (const f32\+\_\+lt\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_ac0d61b1a44478feda93fd6de5ab5e77f}{operator()}} (const f32\+\_\+gt\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a71b7406d028eec58f8d43920c845882a}{operator()}} (const f32\+\_\+le\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a90a2db1b8b6a827fb4b89de5d14d5462}{operator()}} (const f32\+\_\+ge\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a4eaf7d7052eb8887cf665ce3dd0e9ec3}{operator()}} (const f64\+\_\+eq\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a00d6769d637ea554e271157717351d5b}{operator()}} (const f64\+\_\+ne\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a47ae295b7fbea4da06bc07b136d8eeb4}{operator()}} (const f64\+\_\+lt\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_ab3a7da4450e35f550dc17e7eacc7bee3}{operator()}} (const f64\+\_\+gt\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_ac443f2633e28004ed536883d2d4c7499}{operator()}} (const f64\+\_\+le\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_aeb61204a8073018b8f5c82b7ea7a8613}{operator()}} (const f64\+\_\+ge\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_abb4d638623cec3d1de6609763c881bc1}{operator()}} (const i32\+\_\+clz\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_ad660ca0221ce21a2c7bb6e4412e7a32e}{operator()}} (const i32\+\_\+ctz\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_aa1fc6a3c4972d32cdb94f5d00ffc37ae}{operator()}} (const i32\+\_\+popcnt\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a79cbe9b904ad4a7f910b748b33d5ffe1}{operator()}} (const i32\+\_\+add\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a66c4b99f1b1244e6d24fa6c35f63a50e}{operator()}} (const i32\+\_\+sub\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_aa043d724a9f4a7c819d72e987b6c2dc8}{operator()}} (const i32\+\_\+mul\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_ab8488a039eb92fd42c4d69b646b741a6}{operator()}} (const i32\+\_\+div\+\_\+s\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a59b485878ff0bef8e5aa9678a3348df9}{operator()}} (const i32\+\_\+div\+\_\+u\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a757dfaeaa8212b2fd6e3b537533bb0f9}{operator()}} (const i32\+\_\+rem\+\_\+s\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_aa4fdb78bde76b92cbbe179d68b65e536}{operator()}} (const i32\+\_\+rem\+\_\+u\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a8fb6f0903f5f1c86f199347fd0657254}{operator()}} (const i32\+\_\+and\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a5667a90e2b180063defc6a574e189e5c}{operator()}} (const i32\+\_\+or\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_af3fcf5b57658293ef888076d7741320b}{operator()}} (const i32\+\_\+xor\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_abb137eff94806ff99d47300b476669b3}{operator()}} (const i32\+\_\+shl\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_acfb2ef8ad77b896725a31c2a22a55967}{operator()}} (const i32\+\_\+shr\+\_\+s\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a5f5f99c98536d4c1256bee3e37cb131a}{operator()}} (const i32\+\_\+shr\+\_\+u\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a91260ebfe0d8beee6c63be597bd2742e}{operator()}} (const i32\+\_\+rotl\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a8178c894918295e85679f6d42052c0f3}{operator()}} (const i32\+\_\+rotr\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_ae90542915062faa9f2643f1503ca91b6}{operator()}} (const i64\+\_\+clz\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_abaff9721282865bbd0a57f22ec285cf7}{operator()}} (const i64\+\_\+ctz\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a2c23c57ece1ccae17dccbc25da635504}{operator()}} (const i64\+\_\+popcnt\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a84c9d7408aaafb2460068205425b20c9}{operator()}} (const i64\+\_\+add\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_ab529c67fa4bd89491402e4dc7d1a18b8}{operator()}} (const i64\+\_\+sub\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_aecc450549d669e6e31b143c167d105cf}{operator()}} (const i64\+\_\+mul\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_ab53057c0e26674a65b0418c66a0dd27e}{operator()}} (const i64\+\_\+div\+\_\+s\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a3465d4009a40e9ae16e7f295ceead633}{operator()}} (const i64\+\_\+div\+\_\+u\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a0d0535f5eb43234bd7b43320e73deeca}{operator()}} (const i64\+\_\+rem\+\_\+s\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a7fc8de63f1c1846bf50254f64ea8f314}{operator()}} (const i64\+\_\+rem\+\_\+u\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a75615a63f866f12fb2b7a455c944d353}{operator()}} (const i64\+\_\+and\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a963049c01d928c3d9903622487ab45bb}{operator()}} (const i64\+\_\+or\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a294a8e8f730231cbc23ddc4b3bd47809}{operator()}} (const i64\+\_\+xor\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a3e737227433a298b787f362a6c185ba8}{operator()}} (const i64\+\_\+shl\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a9cac3f250b775dbb89a8a1c89dc5f6b3}{operator()}} (const i64\+\_\+shr\+\_\+s\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a983b733dc86a124c908f2c379905667e}{operator()}} (const i64\+\_\+shr\+\_\+u\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_acfbffe5e272ae8661eab2580984e1a79}{operator()}} (const i64\+\_\+rotl\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a41dba8a31f51d1ea59d5880644eb0b86}{operator()}} (const i64\+\_\+rotr\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a9d833b3adacd997257e59555ecc1b994}{operator()}} (const f32\+\_\+abs\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_afc4e3afe4dc6ae353559126b59b9e539}{operator()}} (const f32\+\_\+neg\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a5f0a7a62ecfe2d627bafcfdb802baa02}{operator()}} (const f32\+\_\+ceil\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_ac07999fe6ed78b0414a726ff8dd6c3e0}{operator()}} (const f32\+\_\+floor\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a047a78ae774056e262b52aa8e6204195}{operator()}} (const f32\+\_\+trunc\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_ab6ab8f314ead65779fecdf91a80b6281}{operator()}} (const f32\+\_\+nearest\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_aef54e172e710797dc5e2c3f89cf41684}{operator()}} (const f32\+\_\+sqrt\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_aff3373418421a06dfe811cb23cb2220d}{operator()}} (const f32\+\_\+add\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a76b75d83eb2c4e136a56a09eb08737ce}{operator()}} (const f32\+\_\+sub\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_ae93e6aacc2f02ad6a3aa308743aab2b4}{operator()}} (const f32\+\_\+mul\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a425f1618d39908ca89a6d3344ce28c3d}{operator()}} (const f32\+\_\+div\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a6c53b6ee266f14f21894d7c42dbe4db5}{operator()}} (const f32\+\_\+min\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a4f51126b36ab9fdc6add44cdbb85b16e}{operator()}} (const f32\+\_\+max\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a06b31daea3d8aaf2c5277a73d0fa2cb5}{operator()}} (const f32\+\_\+copysign\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a287bf43e00b8b405b8da83bef76d8cee}{operator()}} (const f64\+\_\+abs\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a7ae1e459438644410ae964c8f7eb41a0}{operator()}} (const f64\+\_\+neg\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_ae7953a95c12a3484b873460325d19f09}{operator()}} (const f64\+\_\+ceil\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a7b02761c3d50b176e7886c44a9f7d979}{operator()}} (const f64\+\_\+floor\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a2167a73494ffc93b90f2716b4c9c9896}{operator()}} (const f64\+\_\+trunc\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a374cdce6748299f8f94d279c37a32b43}{operator()}} (const f64\+\_\+nearest\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a9c50c1bc64bae67d53286421e6879a1f}{operator()}} (const f64\+\_\+sqrt\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a31df796f0bcdbbb1b92c18673e3c7171}{operator()}} (const f64\+\_\+add\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a5dafe55837575384845391cdb3a89688}{operator()}} (const f64\+\_\+sub\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a93adc5f0bb8bed902e2d00678144fe44}{operator()}} (const f64\+\_\+mul\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a1fa50ad599744c66ef609432d2f096e9}{operator()}} (const f64\+\_\+div\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_af0c546a2dac153ee499d11dd52e9fc71}{operator()}} (const f64\+\_\+min\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a312950efd39cf54fe5589f49aa65fd80}{operator()}} (const f64\+\_\+max\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a6a0d22ed013db57fb6be095d5bfddd14}{operator()}} (const f64\+\_\+copysign\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a428eb875af26caa50337a008be4e4cbb}{operator()}} (const i32\+\_\+wrap\+\_\+i64\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a72d84074e66ebdd918a29e30111b3b75}{operator()}} (const i32\+\_\+trunc\+\_\+s\+\_\+f32\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_adca3fff8f4ed5cfe57d31cdfed16f385}{operator()}} (const i32\+\_\+trunc\+\_\+u\+\_\+f32\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a389625a88eb264e53d8add790e93c248}{operator()}} (const i32\+\_\+trunc\+\_\+s\+\_\+f64\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_ad5d3509c7d397e560b72354fa30c7afb}{operator()}} (const i32\+\_\+trunc\+\_\+u\+\_\+f64\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_ae90ffb5e4833d37a526dde2dc383d91f}{operator()}} (const i64\+\_\+extend\+\_\+s\+\_\+i32\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a11900f697d09cf6ab018beb39867b289}{operator()}} (const i64\+\_\+extend\+\_\+u\+\_\+i32\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a9e808e431d8d1953e99973a36d04db0b}{operator()}} (const i64\+\_\+trunc\+\_\+s\+\_\+f32\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a14be319e8d2589057103a7ec991cef94}{operator()}} (const i64\+\_\+trunc\+\_\+u\+\_\+f32\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a61f0eb070f0355ebfd279b2d99b46bdf}{operator()}} (const i64\+\_\+trunc\+\_\+s\+\_\+f64\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_ad4e461cbbb56143103867e22bd30d904}{operator()}} (const i64\+\_\+trunc\+\_\+u\+\_\+f64\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a851d572b983eea73fd82453bf8e651a1}{operator()}} (const f32\+\_\+convert\+\_\+s\+\_\+i32\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_ae854e82a4aa8b7fec162dd1fbed7af05}{operator()}} (const f32\+\_\+convert\+\_\+u\+\_\+i32\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_afe5bf208e60c6a430f6094c7b87e7f58}{operator()}} (const f32\+\_\+convert\+\_\+s\+\_\+i64\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a8de10b4a10308d2a6d98c15569312179}{operator()}} (const f32\+\_\+convert\+\_\+u\+\_\+i64\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a55bb1426eb8195537ff018941ede17ed}{operator()}} (const f32\+\_\+demote\+\_\+f64\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_ac0c055beb8d95cbbbe83a2335501c80a}{operator()}} (const f64\+\_\+convert\+\_\+s\+\_\+i32\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_aaf7e57d3ab0e7d7942592f8af2abfbfb}{operator()}} (const f64\+\_\+convert\+\_\+u\+\_\+i32\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_abcdb59d62729bed1360484c612358ece}{operator()}} (const f64\+\_\+convert\+\_\+s\+\_\+i64\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a6e1a69bb7a4507c256bc9fb6abf24e69}{operator()}} (const f64\+\_\+convert\+\_\+u\+\_\+i64\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a5398458a46384c9cc4d95644a8943584}{operator()}} (const f64\+\_\+promote\+\_\+f32\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a634053d88ddcd7de44d62290493f4f74}{operator()}} (const i32\+\_\+reinterpret\+\_\+f32\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a06a27773e2a6bb9e57405c632e31f8f3}{operator()}} (const i64\+\_\+reinterpret\+\_\+f64\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_ae712783550b0963d6fe080286f92e8d2}{operator()}} (const f32\+\_\+reinterpret\+\_\+i32\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a5e74a012b55691eb7f734efa92a24b94}{operator()}} (const f64\+\_\+reinterpret\+\_\+i64\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_ab7e741e18cf9b1cd8f03bdd6892e6f60}{operator()}} (const unreachable\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a1386f700060b7884ead187fab618f551}{operator()}} (const nop\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a1c1596169f727250ee6450ef66f3b74e}{operator()}} (const end\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a72b6e560ae5e597cfbd25cb6dda2ba91}{operator()}} (const return\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_ad57d4dbdd4a337025fb06b4a34334dd7}{operator()}} (const block\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a1b2d21806dd19a9dcb0e7c579e671957}{operator()}} (const loop\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_af4464a4f7aa71288580bf56650476c66}{operator()}} (const if\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a3ce97d9a0039391ac5a000d786ea8075}{operator()}} (const else\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a76e09965ce9dff38f623f15ebd9d1ef4}{operator()}} (const br\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_acaf730e089041ef501ae3b55c7cb4fbf}{operator()}} (const br\+\_\+if\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_af075c734e40f03dd2ee3ff55ead90f45}{operator()}} (const br\+\_\+table\+\_\+data\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a3c4abbdb19320f6b94d77c4f6c6051e1}{operator()}} (const br\+\_\+table\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a0a672cce7261bfb6693364449e519e08}{operator()}} (const call\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a9060d97ecc496b48e513718c6667256d}{operator()}} (const call\+\_\+indirect\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_ace5b32dadc44689f802ca0207f15c9f2}{operator()}} (const drop\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a8f66ca060f953ebd1545640aac7c06d4}{operator()}} (const select\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_aba446804084182942a1cc8919dbcfbbd}{operator()}} (const get\+\_\+local\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a99743f348e369fe03d10f3f1b9f58902}{operator()}} (const set\+\_\+local\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a4e7c6557df1bf6a990656f9a02a4d85f}{operator()}} (const tee\+\_\+local\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a9b33c504d48e808fbd2880581f3041d3}{operator()}} (const get\+\_\+global\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_accdc217c961adf1310a9f33d23e914d1}{operator()}} (const set\+\_\+global\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a8fc5a6ea1fcbbfa6a9bcb4aa4d49999d}{operator()}} (const i32\+\_\+load\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a16f4d38c51436a0224c412d57ad71708}{operator()}} (const i32\+\_\+load8\+\_\+s\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a7edcb1faaa1f414ca060a31e654795f5}{operator()}} (const i32\+\_\+load16\+\_\+s\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a4f00dc1e434d1dcfa57c8aa239db01a5}{operator()}} (const i32\+\_\+load8\+\_\+u\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a181ea0722168c3613f3b4b8bd09d5aef}{operator()}} (const i32\+\_\+load16\+\_\+u\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a7ee18fc49ca822f555270afccf9bc76d}{operator()}} (const i64\+\_\+load\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_afad4ee516c331a47e9833b2f3f2c7546}{operator()}} (const i64\+\_\+load8\+\_\+s\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a1c414d225a6dd01d51eb2b119b3544db}{operator()}} (const i64\+\_\+load16\+\_\+s\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a211315c3a883b96993a7f75ba870e067}{operator()}} (const i64\+\_\+load32\+\_\+s\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a90128c136504158d5181ef9437c4e9b9}{operator()}} (const i64\+\_\+load8\+\_\+u\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a2ae27cdb8ab3c2833582169ce99dff94}{operator()}} (const i64\+\_\+load16\+\_\+u\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a21b11daaf20252c17eb015b67626b7b6}{operator()}} (const i64\+\_\+load32\+\_\+u\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_ad86661b556e03ba71cbd7dff6bd3f9f7}{operator()}} (const f32\+\_\+load\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a0ad40039ff5e78b96b63867aafc81408}{operator()}} (const f64\+\_\+load\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a3234e3c07e132a261b2497851e355ee0}{operator()}} (const i32\+\_\+store\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_aa3ce1b298ef0cd9d071ede4035e0f1ca}{operator()}} (const i32\+\_\+store8\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_aa693d79b2d6ac0aa1d9a8d82c161094f}{operator()}} (const i32\+\_\+store16\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a3333c5c24f97718b5c04b22b5f7f66fb}{operator()}} (const i64\+\_\+store\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a86711c96d27bc0961b2aa6eea8628161}{operator()}} (const i64\+\_\+store8\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a9901106c3c51009f4574a9797cb0d69f}{operator()}} (const i64\+\_\+store16\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_ade05c2cb8e054aaca6ef6ad9dfe8f9cc}{operator()}} (const i64\+\_\+store32\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a14d793b1e12985e756fc8ebf571f2926}{operator()}} (const f32\+\_\+store\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a6152c768dfacb4652fbc930d443d9da2}{operator()}} (const f64\+\_\+store\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a380c19448d3b24a3cf78ac424df02609}{operator()}} (const current\+\_\+memory\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a4f22c4c3cf1fbc42d12859921dd8ae4c}{operator()}} (const grow\+\_\+memory\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a17a2c80d6b123605e4f9a24fbe4822d2}{operator()}} (const i32\+\_\+const\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a3324dcfa1c08377555a6cab3be8cf31c}{operator()}} (const i64\+\_\+const\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_aa72fd16af863a488ca6d3cffaed56c76}{operator()}} (const f32\+\_\+const\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a625048d39f9dfd84bc22a3e0f6d0fe75}{operator()}} (const f64\+\_\+const\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a1444bd0653118f626aa2ac582aa4e950}{operator()}} (const i32\+\_\+eqz\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_afad209560d0494ade0fd914524ceb210}{operator()}} (const i32\+\_\+eq\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a69b454212bb76ad29a3b64dc448c25f1}{operator()}} (const i32\+\_\+ne\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_aea1186521570bd5e5d450a9ebb4ff114}{operator()}} (const i32\+\_\+lt\+\_\+s\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_af0cd152931c02c8e4a496b41185208ab}{operator()}} (const i32\+\_\+lt\+\_\+u\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_ac422b5142aaca4e1e1097973829badf1}{operator()}} (const i32\+\_\+le\+\_\+s\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a7357c12cc0f7f05ebc79323a6dadcf51}{operator()}} (const i32\+\_\+le\+\_\+u\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a6ed79004b6fed66a6e482efd1afd8036}{operator()}} (const i32\+\_\+gt\+\_\+s\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a01d08baf0c5ade319711e47e6a689968}{operator()}} (const i32\+\_\+gt\+\_\+u\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a3c46b1da16deb75ccb391993d5b533d9}{operator()}} (const i32\+\_\+ge\+\_\+s\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_ad8df52e8bf0f1dec4ba5d0efca0e53bf}{operator()}} (const i32\+\_\+ge\+\_\+u\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a1a42c94415960fb7105802e271df0f8d}{operator()}} (const i64\+\_\+eqz\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a50f80e5227223751d8ad4111432889d8}{operator()}} (const i64\+\_\+eq\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_af56cbbd03e761c35348accf0eee905aa}{operator()}} (const i64\+\_\+ne\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a809865dff90fff63d58171b17757ddbb}{operator()}} (const i64\+\_\+lt\+\_\+s\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a728fc119f4f0a0d2c34f18d60b01fee0}{operator()}} (const i64\+\_\+lt\+\_\+u\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a4cf52e5552335c52acd025235e8849bf}{operator()}} (const i64\+\_\+le\+\_\+s\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_ad2596f7c278be7ffbd8f12adfd846057}{operator()}} (const i64\+\_\+le\+\_\+u\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_ad31939defbf5011307675c70cda08bb0}{operator()}} (const i64\+\_\+gt\+\_\+s\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a43a2d5d0ea77082be8b85fb757cc0fc5}{operator()}} (const i64\+\_\+gt\+\_\+u\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_ae09756462f3867cb8b59e740d3c3c5c0}{operator()}} (const i64\+\_\+ge\+\_\+s\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a07f4507e5a0bb8881a9cd65851e2dd5f}{operator()}} (const i64\+\_\+ge\+\_\+u\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a0d90be47db3562293b9594b2a8682408}{operator()}} (const f32\+\_\+eq\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a292ecf07b306ccee6129da6092bd358b}{operator()}} (const f32\+\_\+ne\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_af4dc386ae9e0ace3c202cebd55646ed4}{operator()}} (const f32\+\_\+lt\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_ac0d61b1a44478feda93fd6de5ab5e77f}{operator()}} (const f32\+\_\+gt\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a71b7406d028eec58f8d43920c845882a}{operator()}} (const f32\+\_\+le\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a90a2db1b8b6a827fb4b89de5d14d5462}{operator()}} (const f32\+\_\+ge\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a4eaf7d7052eb8887cf665ce3dd0e9ec3}{operator()}} (const f64\+\_\+eq\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a00d6769d637ea554e271157717351d5b}{operator()}} (const f64\+\_\+ne\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a47ae295b7fbea4da06bc07b136d8eeb4}{operator()}} (const f64\+\_\+lt\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_ab3a7da4450e35f550dc17e7eacc7bee3}{operator()}} (const f64\+\_\+gt\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_ac443f2633e28004ed536883d2d4c7499}{operator()}} (const f64\+\_\+le\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_aeb61204a8073018b8f5c82b7ea7a8613}{operator()}} (const f64\+\_\+ge\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_abb4d638623cec3d1de6609763c881bc1}{operator()}} (const i32\+\_\+clz\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_ad660ca0221ce21a2c7bb6e4412e7a32e}{operator()}} (const i32\+\_\+ctz\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_aa1fc6a3c4972d32cdb94f5d00ffc37ae}{operator()}} (const i32\+\_\+popcnt\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a79cbe9b904ad4a7f910b748b33d5ffe1}{operator()}} (const i32\+\_\+add\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a66c4b99f1b1244e6d24fa6c35f63a50e}{operator()}} (const i32\+\_\+sub\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_aa043d724a9f4a7c819d72e987b6c2dc8}{operator()}} (const i32\+\_\+mul\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_ab8488a039eb92fd42c4d69b646b741a6}{operator()}} (const i32\+\_\+div\+\_\+s\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a59b485878ff0bef8e5aa9678a3348df9}{operator()}} (const i32\+\_\+div\+\_\+u\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a757dfaeaa8212b2fd6e3b537533bb0f9}{operator()}} (const i32\+\_\+rem\+\_\+s\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_aa4fdb78bde76b92cbbe179d68b65e536}{operator()}} (const i32\+\_\+rem\+\_\+u\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a8fb6f0903f5f1c86f199347fd0657254}{operator()}} (const i32\+\_\+and\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a5667a90e2b180063defc6a574e189e5c}{operator()}} (const i32\+\_\+or\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_af3fcf5b57658293ef888076d7741320b}{operator()}} (const i32\+\_\+xor\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_abb137eff94806ff99d47300b476669b3}{operator()}} (const i32\+\_\+shl\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_acfb2ef8ad77b896725a31c2a22a55967}{operator()}} (const i32\+\_\+shr\+\_\+s\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a5f5f99c98536d4c1256bee3e37cb131a}{operator()}} (const i32\+\_\+shr\+\_\+u\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a91260ebfe0d8beee6c63be597bd2742e}{operator()}} (const i32\+\_\+rotl\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a8178c894918295e85679f6d42052c0f3}{operator()}} (const i32\+\_\+rotr\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_ae90542915062faa9f2643f1503ca91b6}{operator()}} (const i64\+\_\+clz\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_abaff9721282865bbd0a57f22ec285cf7}{operator()}} (const i64\+\_\+ctz\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a2c23c57ece1ccae17dccbc25da635504}{operator()}} (const i64\+\_\+popcnt\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a84c9d7408aaafb2460068205425b20c9}{operator()}} (const i64\+\_\+add\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_ab529c67fa4bd89491402e4dc7d1a18b8}{operator()}} (const i64\+\_\+sub\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_aecc450549d669e6e31b143c167d105cf}{operator()}} (const i64\+\_\+mul\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_ab53057c0e26674a65b0418c66a0dd27e}{operator()}} (const i64\+\_\+div\+\_\+s\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a3465d4009a40e9ae16e7f295ceead633}{operator()}} (const i64\+\_\+div\+\_\+u\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a0d0535f5eb43234bd7b43320e73deeca}{operator()}} (const i64\+\_\+rem\+\_\+s\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a7fc8de63f1c1846bf50254f64ea8f314}{operator()}} (const i64\+\_\+rem\+\_\+u\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a75615a63f866f12fb2b7a455c944d353}{operator()}} (const i64\+\_\+and\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a963049c01d928c3d9903622487ab45bb}{operator()}} (const i64\+\_\+or\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a294a8e8f730231cbc23ddc4b3bd47809}{operator()}} (const i64\+\_\+xor\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a3e737227433a298b787f362a6c185ba8}{operator()}} (const i64\+\_\+shl\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a9cac3f250b775dbb89a8a1c89dc5f6b3}{operator()}} (const i64\+\_\+shr\+\_\+s\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a983b733dc86a124c908f2c379905667e}{operator()}} (const i64\+\_\+shr\+\_\+u\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_acfbffe5e272ae8661eab2580984e1a79}{operator()}} (const i64\+\_\+rotl\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a41dba8a31f51d1ea59d5880644eb0b86}{operator()}} (const i64\+\_\+rotr\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a9d833b3adacd997257e59555ecc1b994}{operator()}} (const f32\+\_\+abs\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_afc4e3afe4dc6ae353559126b59b9e539}{operator()}} (const f32\+\_\+neg\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a5f0a7a62ecfe2d627bafcfdb802baa02}{operator()}} (const f32\+\_\+ceil\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_ac07999fe6ed78b0414a726ff8dd6c3e0}{operator()}} (const f32\+\_\+floor\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a047a78ae774056e262b52aa8e6204195}{operator()}} (const f32\+\_\+trunc\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_ab6ab8f314ead65779fecdf91a80b6281}{operator()}} (const f32\+\_\+nearest\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_aef54e172e710797dc5e2c3f89cf41684}{operator()}} (const f32\+\_\+sqrt\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_aff3373418421a06dfe811cb23cb2220d}{operator()}} (const f32\+\_\+add\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a76b75d83eb2c4e136a56a09eb08737ce}{operator()}} (const f32\+\_\+sub\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_ae93e6aacc2f02ad6a3aa308743aab2b4}{operator()}} (const f32\+\_\+mul\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a425f1618d39908ca89a6d3344ce28c3d}{operator()}} (const f32\+\_\+div\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a6c53b6ee266f14f21894d7c42dbe4db5}{operator()}} (const f32\+\_\+min\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a4f51126b36ab9fdc6add44cdbb85b16e}{operator()}} (const f32\+\_\+max\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a06b31daea3d8aaf2c5277a73d0fa2cb5}{operator()}} (const f32\+\_\+copysign\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a287bf43e00b8b405b8da83bef76d8cee}{operator()}} (const f64\+\_\+abs\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a7ae1e459438644410ae964c8f7eb41a0}{operator()}} (const f64\+\_\+neg\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_ae7953a95c12a3484b873460325d19f09}{operator()}} (const f64\+\_\+ceil\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a7b02761c3d50b176e7886c44a9f7d979}{operator()}} (const f64\+\_\+floor\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a2167a73494ffc93b90f2716b4c9c9896}{operator()}} (const f64\+\_\+trunc\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a374cdce6748299f8f94d279c37a32b43}{operator()}} (const f64\+\_\+nearest\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a9c50c1bc64bae67d53286421e6879a1f}{operator()}} (const f64\+\_\+sqrt\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a31df796f0bcdbbb1b92c18673e3c7171}{operator()}} (const f64\+\_\+add\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a5dafe55837575384845391cdb3a89688}{operator()}} (const f64\+\_\+sub\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a93adc5f0bb8bed902e2d00678144fe44}{operator()}} (const f64\+\_\+mul\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a1fa50ad599744c66ef609432d2f096e9}{operator()}} (const f64\+\_\+div\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_af0c546a2dac153ee499d11dd52e9fc71}{operator()}} (const f64\+\_\+min\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a312950efd39cf54fe5589f49aa65fd80}{operator()}} (const f64\+\_\+max\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a6a0d22ed013db57fb6be095d5bfddd14}{operator()}} (const f64\+\_\+copysign\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a428eb875af26caa50337a008be4e4cbb}{operator()}} (const i32\+\_\+wrap\+\_\+i64\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a72d84074e66ebdd918a29e30111b3b75}{operator()}} (const i32\+\_\+trunc\+\_\+s\+\_\+f32\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_adca3fff8f4ed5cfe57d31cdfed16f385}{operator()}} (const i32\+\_\+trunc\+\_\+u\+\_\+f32\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a389625a88eb264e53d8add790e93c248}{operator()}} (const i32\+\_\+trunc\+\_\+s\+\_\+f64\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_ad5d3509c7d397e560b72354fa30c7afb}{operator()}} (const i32\+\_\+trunc\+\_\+u\+\_\+f64\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_ae90ffb5e4833d37a526dde2dc383d91f}{operator()}} (const i64\+\_\+extend\+\_\+s\+\_\+i32\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a11900f697d09cf6ab018beb39867b289}{operator()}} (const i64\+\_\+extend\+\_\+u\+\_\+i32\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a9e808e431d8d1953e99973a36d04db0b}{operator()}} (const i64\+\_\+trunc\+\_\+s\+\_\+f32\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a14be319e8d2589057103a7ec991cef94}{operator()}} (const i64\+\_\+trunc\+\_\+u\+\_\+f32\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a61f0eb070f0355ebfd279b2d99b46bdf}{operator()}} (const i64\+\_\+trunc\+\_\+s\+\_\+f64\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_ad4e461cbbb56143103867e22bd30d904}{operator()}} (const i64\+\_\+trunc\+\_\+u\+\_\+f64\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a851d572b983eea73fd82453bf8e651a1}{operator()}} (const f32\+\_\+convert\+\_\+s\+\_\+i32\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_ae854e82a4aa8b7fec162dd1fbed7af05}{operator()}} (const f32\+\_\+convert\+\_\+u\+\_\+i32\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_afe5bf208e60c6a430f6094c7b87e7f58}{operator()}} (const f32\+\_\+convert\+\_\+s\+\_\+i64\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a8de10b4a10308d2a6d98c15569312179}{operator()}} (const f32\+\_\+convert\+\_\+u\+\_\+i64\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a55bb1426eb8195537ff018941ede17ed}{operator()}} (const f32\+\_\+demote\+\_\+f64\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_ac0c055beb8d95cbbbe83a2335501c80a}{operator()}} (const f64\+\_\+convert\+\_\+s\+\_\+i32\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_aaf7e57d3ab0e7d7942592f8af2abfbfb}{operator()}} (const f64\+\_\+convert\+\_\+u\+\_\+i32\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_abcdb59d62729bed1360484c612358ece}{operator()}} (const f64\+\_\+convert\+\_\+s\+\_\+i64\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a6e1a69bb7a4507c256bc9fb6abf24e69}{operator()}} (const f64\+\_\+convert\+\_\+u\+\_\+i64\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a5398458a46384c9cc4d95644a8943584}{operator()}} (const f64\+\_\+promote\+\_\+f32\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a634053d88ddcd7de44d62290493f4f74}{operator()}} (const i32\+\_\+reinterpret\+\_\+f32\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a06a27773e2a6bb9e57405c632e31f8f3}{operator()}} (const i64\+\_\+reinterpret\+\_\+f64\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_ae712783550b0963d6fe080286f92e8d2}{operator()}} (const f32\+\_\+reinterpret\+\_\+i32\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a5e74a012b55691eb7f734efa92a24b94}{operator()}} (const f64\+\_\+reinterpret\+\_\+i64\+\_\+t \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a94dc30be7d503bd5c0cdddf6584bd7f4}{pop\+\_\+memop\+\_\+addr}} (const Op \&\mbox{\hyperlink{unionop}{op}})
+\item 
+void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a94dc30be7d503bd5c0cdddf6584bd7f4}{pop\+\_\+memop\+\_\+addr}} (const Op \&\mbox{\hyperlink{unionop}{op}})
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor}{sysio\+::vm\+::base\+\_\+visitor}}}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_ae8fc55853c1e4a08119b970ac260ecd4}{operator()}} (const unreachable\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a2360ed9e8beb2d5b02bb6b98acbb4f30}{operator()}} (const nop\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_ad6d3a481e5c28a4c8db4b180ee0bc055}{operator()}} (const exit\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a81db0f821cd5f03cf239ec9fe4b75544}{operator()}} (const end\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_af44ff006a353475953eef2e301b0c5c8}{operator()}} (const return\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a9bab8a8175f1889afc2ae369322207aa}{operator()}} (const block\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a305006af19fbead270086ad902af715a}{operator()}} (const loop\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a481ee13ad3d661669e7334f52aff669a}{operator()}} (const if\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a3808517d6844fbad8b3884823490cd04}{operator()}} (const else\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a8820c849f21e7f09b8140dee9d312ad5}{operator()}} (const br\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a299936d8f20d7d311fd0557d4b0ff0ce}{operator()}} (const br\+\_\+if\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a285e750c4f71b956708ddfd7358f9314}{operator()}} (const br\+\_\+table\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a16ac653ad16217c65c4145d04af7cd05}{operator()}} (const call\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a93ea17e9217faea3e9cc43af711e2df3}{operator()}} (const call\+\_\+indirect\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a2adb52099ea7af257075e19fa360da06}{operator()}} (const drop\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a69034c4cbc045af7a24e4f5e89d8e2b8}{operator()}} (const select\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_acc7f7900e0b824947836c5e604ed909f}{operator()}} (const get\+\_\+local\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a19948f6225f5906bcf2c55e563a3ce28}{operator()}} (const set\+\_\+local\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a96ab8ee975c0c14f6c584b21dd0dbc1a}{operator()}} (const tee\+\_\+local\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a6964e5fcef25b3a3f788f725647d2910}{operator()}} (const get\+\_\+global\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a0a367b7b8529fc0dce4400cd6e88ffcb}{operator()}} (const set\+\_\+global\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a1206e24219e68cdcc05ee63228e7ee34}{operator()}} (const i32\+\_\+load\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a31042c4ba9d769c6a646df8c7d5190a2}{operator()}} (const i32\+\_\+load8\+\_\+s\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a11aacc821690f3b5741bcae05f004258}{operator()}} (const i32\+\_\+load16\+\_\+s\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_af1fa89ce1d6c0af4ef85a59bb3dd101b}{operator()}} (const i32\+\_\+load8\+\_\+u\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_aabc2fa8b3be8a2301f524ed407197ee5}{operator()}} (const i32\+\_\+load16\+\_\+u\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_aa0aedec104b0af8f30bfb657b258ed0a}{operator()}} (const i64\+\_\+load\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_accf42056a774b84af07d8eb0376ecd12}{operator()}} (const i64\+\_\+load8\+\_\+s\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a3005dfa8b303968a456e4b0ea41f148b}{operator()}} (const i64\+\_\+load16\+\_\+s\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a68122f7da20d1dedeb41b9ebfce7a235}{operator()}} (const i64\+\_\+load32\+\_\+s\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_af0885fe40fd3e286efadd35095cba37a}{operator()}} (const i64\+\_\+load8\+\_\+u\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a45c854ca7683b229ec3d46efc9c435c9}{operator()}} (const i64\+\_\+load16\+\_\+u\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a900bca2f10a509e1190d330568ef6a1a}{operator()}} (const i64\+\_\+load32\+\_\+u\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_af2c6c937461be3f8b13f67835a4c360c}{operator()}} (const f32\+\_\+load\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_ae91241764819a4d7a1ae63e9e0cf10f9}{operator()}} (const f64\+\_\+load\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_ab91068f4d733218411a35f1d5150649d}{operator()}} (const i32\+\_\+store\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_afd5bd96b2b9b6c888d08a0ca560f043a}{operator()}} (const i32\+\_\+store8\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a813dc5f67cc0f44cb83c4dbea0f67c33}{operator()}} (const i32\+\_\+store16\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a8d1fe2ee5a95754581d079a6182ddd03}{operator()}} (const i64\+\_\+store\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a2756eb31d4d0a910c4846a0c8d05cf4d}{operator()}} (const i64\+\_\+store8\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_aa9ddd81c39a360a8de295601490aaada}{operator()}} (const i64\+\_\+store16\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a2c5c52213a493e28522c8ec8a92448f5}{operator()}} (const i64\+\_\+store32\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_adc4b8d88f35ed93e95a4ea86e9bf0494}{operator()}} (const f32\+\_\+store\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a334ea1570eb57c67e1afee2fb88d122c}{operator()}} (const f64\+\_\+store\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_ace7a0451736e82f44ab4f0319f4f03a8}{operator()}} (const current\+\_\+memory\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a9ac7b91bcee7646a21202fbca68c4f4c}{operator()}} (const grow\+\_\+memory\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_aca323281f6175c475c82aa0f7e20fcc0}{operator()}} (const i32\+\_\+const\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_affe70bb3f90e19c7fcb1ae48701f3167}{operator()}} (const i64\+\_\+const\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_aefbb0fb4cca945a427cd1b3b6b1220ab}{operator()}} (const f32\+\_\+const\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_ac08e89ee32d17ecb2a8bc3db0d946fc9}{operator()}} (const f64\+\_\+const\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a33180de8cf5a888f744c8f566a6e5409}{operator()}} (const i32\+\_\+eqz\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a67492b2dbf9731e859da64e1d30d9157}{operator()}} (const i32\+\_\+eq\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_adf494e8875ce9243ff26cf5c55ba96c5}{operator()}} (const i32\+\_\+ne\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_ac18be5991101e2440b58b3696fda71eb}{operator()}} (const i32\+\_\+lt\+\_\+s\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a23b6605b3b09273d10974977c4a7e4df}{operator()}} (const i32\+\_\+lt\+\_\+u\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a25dcd1bd6848bd67aa3f5d1cd1d0ecb1}{operator()}} (const i32\+\_\+le\+\_\+s\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_aa0f11df35fae77ca71279a15ee5d7d9b}{operator()}} (const i32\+\_\+le\+\_\+u\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a1d8ffd9b1a7b7fb51f180eceb1cf9692}{operator()}} (const i32\+\_\+gt\+\_\+s\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a0a6c1d3febd29d3c31cc98d6c96d216e}{operator()}} (const i32\+\_\+gt\+\_\+u\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_af0fa5d31a1acb5efa062ae830487114c}{operator()}} (const i32\+\_\+ge\+\_\+s\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a9b0869379006a30ce30575c80e542695}{operator()}} (const i32\+\_\+ge\+\_\+u\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_af56a897a54d443247b1e67e853d7d8ff}{operator()}} (const i64\+\_\+eqz\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a69f91d2fb8ad261d3c0368c90d4b6cc0}{operator()}} (const i64\+\_\+eq\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a6e5851ec2ce027d6254b0f85153708e2}{operator()}} (const i64\+\_\+ne\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a8a80eb10f02e0a5ddc773cf2b9773b5a}{operator()}} (const i64\+\_\+lt\+\_\+s\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_aac61b44b2b66d800ed9f0303600b1fc7}{operator()}} (const i64\+\_\+lt\+\_\+u\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_aa91d452ff2089c1bb3bbc11fe61a137c}{operator()}} (const i64\+\_\+le\+\_\+s\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a819bb61840f2dd1fb798711f1d4883fb}{operator()}} (const i64\+\_\+le\+\_\+u\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a7bf8dd72f665ba48bc36ac3f2832a375}{operator()}} (const i64\+\_\+gt\+\_\+s\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_aa3adae24b3122ea3721743197484fbff}{operator()}} (const i64\+\_\+gt\+\_\+u\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a4a4280cfa52851218f6a5eb27cbbc0d4}{operator()}} (const i64\+\_\+ge\+\_\+s\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_ac10679e66c6ae8980a9b4c8fc8c8adee}{operator()}} (const i64\+\_\+ge\+\_\+u\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a891f5ee582f946210b6d6688b0b6fd36}{operator()}} (const f32\+\_\+eq\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a21df00ba444f7baa59e544f1001132b2}{operator()}} (const f32\+\_\+ne\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_ab79c0462ad3c96be518b09e41c746eed}{operator()}} (const f32\+\_\+lt\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a6f96e49a0b0bbd3e9de849c9ce2d82a3}{operator()}} (const f32\+\_\+gt\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a79d85c1341fae0982c33f00d2a32cb92}{operator()}} (const f32\+\_\+le\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_aba528b4ce467e4061bec9e491b775447}{operator()}} (const f32\+\_\+ge\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a7f55bf01195addab0dd086cb0674a9ba}{operator()}} (const f64\+\_\+eq\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_ad64460e2c4951b14e34438a7c78f5a95}{operator()}} (const f64\+\_\+ne\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a343a744cb029ef84524fe81d7aeedbb1}{operator()}} (const f64\+\_\+lt\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a64f08a6a982df5c4c8f04bd8450ed598}{operator()}} (const f64\+\_\+gt\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a3b8a76641846aead076e24c242bc99ef}{operator()}} (const f64\+\_\+le\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a55f897d354d7eebba69494f62a6a0c3f}{operator()}} (const f64\+\_\+ge\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a784277c212b2edb984bb2f88466179be}{operator()}} (const i32\+\_\+clz\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a37d6edecd7c1653783149ef8f7f19dbd}{operator()}} (const i32\+\_\+ctz\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a9cbc6df78454d864ff543748d22ae57a}{operator()}} (const i32\+\_\+popcnt\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a8fb8ee576d52a85bab620b10a04024a3}{operator()}} (const i32\+\_\+add\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_aeb515a84b4cd20fc7a6214e9beb652b7}{operator()}} (const i32\+\_\+sub\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a61b20cc43b4d2b04f256121e8e9b18b0}{operator()}} (const i32\+\_\+mul\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_aaf3f55115f35750efe59614657da9292}{operator()}} (const i32\+\_\+div\+\_\+s\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a32bde97566a4c7aebb14111e6e4d5e98}{operator()}} (const i32\+\_\+div\+\_\+u\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a151488a81b683f4d64da8d6cb44e7771}{operator()}} (const i32\+\_\+rem\+\_\+s\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a3f276bcd0ae991774e306a63d5e4e595}{operator()}} (const i32\+\_\+rem\+\_\+u\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a860845ee38f2939e48f2ae68469fbf01}{operator()}} (const i32\+\_\+and\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a6c6dd28bf0e37d6cc695e90d16272659}{operator()}} (const i32\+\_\+or\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_ae20797b1bc03a977683203aa1079c6dc}{operator()}} (const i32\+\_\+xor\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a4908637d21f5ac71be26269a29a20283}{operator()}} (const i32\+\_\+shl\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a24e0706bd7f4ad0b6eaccfd658c041be}{operator()}} (const i32\+\_\+shr\+\_\+s\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_af575ab86c432258d06f24f99fbc8a3f5}{operator()}} (const i32\+\_\+shr\+\_\+u\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a82c873cb96ffc2f47f66a85b2ac17898}{operator()}} (const i32\+\_\+rotl\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a70f5206d1851c869e8b9ab924b61f02b}{operator()}} (const i32\+\_\+rotr\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a43700e6c78cad7865d23b71861f4ecce}{operator()}} (const i64\+\_\+clz\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a5768bee9dc6ba7820aa7a15ad8208057}{operator()}} (const i64\+\_\+ctz\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a7f637a72a0986c4f828d3771b00a72ce}{operator()}} (const i64\+\_\+popcnt\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_aa1d959f0dc4b974136c91f2c4ec4a003}{operator()}} (const i64\+\_\+add\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a015e072e217522b12137809a0bd6b2e6}{operator()}} (const i64\+\_\+sub\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_aeb25b09811432712e3f3b46899cd82d8}{operator()}} (const i64\+\_\+mul\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_acbe800bd9483bab0a098a9b0d331fb8c}{operator()}} (const i64\+\_\+div\+\_\+s\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_aa47e4b9d94de395e955766992c0f23e5}{operator()}} (const i64\+\_\+div\+\_\+u\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a8db71139961dac039b8ea4509228f161}{operator()}} (const i64\+\_\+rem\+\_\+s\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a3fa647ac8d68c5ff0c920d7a6dd29002}{operator()}} (const i64\+\_\+rem\+\_\+u\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_ac432f618c4aee9a1f61e657404b9e34f}{operator()}} (const i64\+\_\+and\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a28387d7da2dc8b7d0e818683fad84134}{operator()}} (const i64\+\_\+or\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_aea03b117d12ea804ef75cfd314ecea25}{operator()}} (const i64\+\_\+xor\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a309ad90205a7f9fa6c4b81a34fd8bfd8}{operator()}} (const i64\+\_\+shl\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_ab027d4167ac92bdb6b5f31e9f4eacb58}{operator()}} (const i64\+\_\+shr\+\_\+s\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a32a7bc06b4b0148d69fee8b4b1cfd7c7}{operator()}} (const i64\+\_\+shr\+\_\+u\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a08a740f846ce3afc04a1d7a1805d305e}{operator()}} (const i64\+\_\+rotl\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a6b379f455bc469fcf345d5a9c67b7fe1}{operator()}} (const i64\+\_\+rotr\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_abc8d06443e723edc7d97441f757ff636}{operator()}} (const f32\+\_\+abs\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a7891f55735acb96d5a4799c9c12d6147}{operator()}} (const f32\+\_\+neg\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a62d7a2f68efaee2c7368ef2c8ed0d2ec}{operator()}} (const f32\+\_\+ceil\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a6e5d21f30ed2339a82284ad42e7bdff4}{operator()}} (const f32\+\_\+floor\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_ab75ee6389277fa4775d5c00e35c57eb0}{operator()}} (const f32\+\_\+trunc\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a3c7406492b4ef0e6da3e6cd4991d3e49}{operator()}} (const f32\+\_\+nearest\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_ab2b4889ee44081e700669394c4fa5676}{operator()}} (const f32\+\_\+sqrt\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a1482b6d807e0462916bd875c27ccc2f1}{operator()}} (const f32\+\_\+add\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_aac6ed796491c949ae894908d9d147e1c}{operator()}} (const f32\+\_\+sub\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a1b121e9a2d60e027ef6aab1ca59ff6a2}{operator()}} (const f32\+\_\+mul\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_afb14fbcc249e25a17a9ae0f87ca3eb45}{operator()}} (const f32\+\_\+div\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a71fccdd28848474409326df3cb332565}{operator()}} (const f32\+\_\+min\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a1b560c0ac2ee507e86fb370e5a4aca53}{operator()}} (const f32\+\_\+max\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a21d2e899d167264697a4bfd6f7501330}{operator()}} (const f32\+\_\+copysign\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_ae4c0293f8be1f44a4b14d2e314a555c4}{operator()}} (const f64\+\_\+abs\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_aaf385eecb9cb02dd795d812f74743b74}{operator()}} (const f64\+\_\+neg\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a1fc22b15d1ffd839db08f6836d23890c}{operator()}} (const f64\+\_\+ceil\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a775167f25ac7e69c99fa1eeddc583666}{operator()}} (const f64\+\_\+floor\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a20ffbb58a019646e57837d0cc58a83c8}{operator()}} (const f64\+\_\+trunc\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a7badb621422814ee0ae7592fef8dd52d}{operator()}} (const f64\+\_\+nearest\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_ab8ed7ccce1aa52af83bad44755c85533}{operator()}} (const f64\+\_\+sqrt\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_ac0046731a957bf2168cdc74c733767e4}{operator()}} (const f64\+\_\+add\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_af146ff3a1df4b8abf2a04987f53a2354}{operator()}} (const f64\+\_\+sub\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_ae55f9852184a932bdae1034af5426c73}{operator()}} (const f64\+\_\+mul\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_ad714b4c055d4a5d72318fedfba7fc5b2}{operator()}} (const f64\+\_\+div\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a493e71ee081ac7a7e40b0c82658c29c4}{operator()}} (const f64\+\_\+min\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_af6f350735833b7b73b0625debce3ae11}{operator()}} (const f64\+\_\+max\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a46ab19b4a20093f7540b83df6902f430}{operator()}} (const f64\+\_\+copysign\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a08e91d663d80b85781e9eab82427465c}{operator()}} (const i32\+\_\+wrap\+\_\+i64\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_ad2f86d3b303e0cb17a25ecd73c305cbe}{operator()}} (const i32\+\_\+trunc\+\_\+s\+\_\+f32\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_ae8047a3813dd889fda80f6b964fef845}{operator()}} (const i32\+\_\+trunc\+\_\+u\+\_\+f32\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_ad8f12143de995ef3a9d847894498d5e3}{operator()}} (const i32\+\_\+trunc\+\_\+s\+\_\+f64\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a26302e054032bdf15e7323d688943075}{operator()}} (const i32\+\_\+trunc\+\_\+u\+\_\+f64\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a3e9c55443d884c92bf259bdfa2c052c4}{operator()}} (const i64\+\_\+extend\+\_\+s\+\_\+i32\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_acd32623b466cc4dc44500a7ba027b360}{operator()}} (const i64\+\_\+extend\+\_\+u\+\_\+i32\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a26d19eb508d58896430058e60d3eb312}{operator()}} (const i64\+\_\+trunc\+\_\+s\+\_\+f32\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a153698d4a58665e621a4a7be1220ff7f}{operator()}} (const i64\+\_\+trunc\+\_\+u\+\_\+f32\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_ad4af88973c49cccf845956c5d1a7d8f2}{operator()}} (const i64\+\_\+trunc\+\_\+s\+\_\+f64\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a38d0fd234fb2b452c6ac2c4ecc46e833}{operator()}} (const i64\+\_\+trunc\+\_\+u\+\_\+f64\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a2d5b64ffaa76037193d9c9495dfd2070}{operator()}} (const f32\+\_\+convert\+\_\+s\+\_\+i32\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a48b81c3027390d737dff157ea9ad733d}{operator()}} (const f32\+\_\+convert\+\_\+u\+\_\+i32\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a1ccadb6dc0662e9b8f2d7dd4059fcd35}{operator()}} (const f32\+\_\+convert\+\_\+s\+\_\+i64\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a7b9e3690f397addfdeb893154b0f5bcf}{operator()}} (const f32\+\_\+convert\+\_\+u\+\_\+i64\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a1d6e91eda570679e3f1e9df679c74fb0}{operator()}} (const f32\+\_\+demote\+\_\+f64\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a828e06ee0423821a2f149e4709eac84e}{operator()}} (const f64\+\_\+convert\+\_\+s\+\_\+i32\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a6b58107750fe9b07d6cde7898d5b59cc}{operator()}} (const f64\+\_\+convert\+\_\+u\+\_\+i32\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_ad91ae58d59a32b9c80d4112559adafd8}{operator()}} (const f64\+\_\+convert\+\_\+s\+\_\+i64\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a3f2e21a467e57d485ecac91efbc704ff}{operator()}} (const f64\+\_\+convert\+\_\+u\+\_\+i64\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a55e3c465d580f98cd0638da632271536}{operator()}} (const f64\+\_\+promote\+\_\+f32\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a8f5143c3b9b80aa0e74fd77301ec49ab}{operator()}} (const i32\+\_\+reinterpret\+\_\+f32\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_ab7d424010001fdb52253d8cc5594c8d0}{operator()}} (const i64\+\_\+reinterpret\+\_\+f64\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_ae0710bf0ca5c09e7765201d45144dc6f}{operator()}} (const f32\+\_\+reinterpret\+\_\+i32\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a68b647b5bbf0edd2ad50fcf1c8ce3ef6}{operator()}} (const f64\+\_\+reinterpret\+\_\+i64\+\_\+t \&)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a4297225845a579680c6dfa58e3352a7b}{operator()}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} val)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_ae8fc55853c1e4a08119b970ac260ecd4}{operator()}} (const unreachable\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a2360ed9e8beb2d5b02bb6b98acbb4f30}{operator()}} (const nop\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_ad6d3a481e5c28a4c8db4b180ee0bc055}{operator()}} (const exit\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a81db0f821cd5f03cf239ec9fe4b75544}{operator()}} (const end\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_af44ff006a353475953eef2e301b0c5c8}{operator()}} (const return\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a9bab8a8175f1889afc2ae369322207aa}{operator()}} (const block\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a305006af19fbead270086ad902af715a}{operator()}} (const loop\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a481ee13ad3d661669e7334f52aff669a}{operator()}} (const if\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a3808517d6844fbad8b3884823490cd04}{operator()}} (const else\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a8820c849f21e7f09b8140dee9d312ad5}{operator()}} (const br\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a299936d8f20d7d311fd0557d4b0ff0ce}{operator()}} (const br\+\_\+if\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a285e750c4f71b956708ddfd7358f9314}{operator()}} (const br\+\_\+table\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a16ac653ad16217c65c4145d04af7cd05}{operator()}} (const call\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a93ea17e9217faea3e9cc43af711e2df3}{operator()}} (const call\+\_\+indirect\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a2adb52099ea7af257075e19fa360da06}{operator()}} (const drop\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a69034c4cbc045af7a24e4f5e89d8e2b8}{operator()}} (const select\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_acc7f7900e0b824947836c5e604ed909f}{operator()}} (const get\+\_\+local\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a19948f6225f5906bcf2c55e563a3ce28}{operator()}} (const set\+\_\+local\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a96ab8ee975c0c14f6c584b21dd0dbc1a}{operator()}} (const tee\+\_\+local\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a6964e5fcef25b3a3f788f725647d2910}{operator()}} (const get\+\_\+global\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a0a367b7b8529fc0dce4400cd6e88ffcb}{operator()}} (const set\+\_\+global\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a1206e24219e68cdcc05ee63228e7ee34}{operator()}} (const i32\+\_\+load\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a31042c4ba9d769c6a646df8c7d5190a2}{operator()}} (const i32\+\_\+load8\+\_\+s\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a11aacc821690f3b5741bcae05f004258}{operator()}} (const i32\+\_\+load16\+\_\+s\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_af1fa89ce1d6c0af4ef85a59bb3dd101b}{operator()}} (const i32\+\_\+load8\+\_\+u\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_aabc2fa8b3be8a2301f524ed407197ee5}{operator()}} (const i32\+\_\+load16\+\_\+u\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_aa0aedec104b0af8f30bfb657b258ed0a}{operator()}} (const i64\+\_\+load\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_accf42056a774b84af07d8eb0376ecd12}{operator()}} (const i64\+\_\+load8\+\_\+s\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a3005dfa8b303968a456e4b0ea41f148b}{operator()}} (const i64\+\_\+load16\+\_\+s\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a68122f7da20d1dedeb41b9ebfce7a235}{operator()}} (const i64\+\_\+load32\+\_\+s\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_af0885fe40fd3e286efadd35095cba37a}{operator()}} (const i64\+\_\+load8\+\_\+u\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a45c854ca7683b229ec3d46efc9c435c9}{operator()}} (const i64\+\_\+load16\+\_\+u\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a900bca2f10a509e1190d330568ef6a1a}{operator()}} (const i64\+\_\+load32\+\_\+u\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_af2c6c937461be3f8b13f67835a4c360c}{operator()}} (const f32\+\_\+load\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_ae91241764819a4d7a1ae63e9e0cf10f9}{operator()}} (const f64\+\_\+load\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_ab91068f4d733218411a35f1d5150649d}{operator()}} (const i32\+\_\+store\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_afd5bd96b2b9b6c888d08a0ca560f043a}{operator()}} (const i32\+\_\+store8\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a813dc5f67cc0f44cb83c4dbea0f67c33}{operator()}} (const i32\+\_\+store16\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a8d1fe2ee5a95754581d079a6182ddd03}{operator()}} (const i64\+\_\+store\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a2756eb31d4d0a910c4846a0c8d05cf4d}{operator()}} (const i64\+\_\+store8\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_aa9ddd81c39a360a8de295601490aaada}{operator()}} (const i64\+\_\+store16\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a2c5c52213a493e28522c8ec8a92448f5}{operator()}} (const i64\+\_\+store32\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_adc4b8d88f35ed93e95a4ea86e9bf0494}{operator()}} (const f32\+\_\+store\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a334ea1570eb57c67e1afee2fb88d122c}{operator()}} (const f64\+\_\+store\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_ace7a0451736e82f44ab4f0319f4f03a8}{operator()}} (const current\+\_\+memory\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a9ac7b91bcee7646a21202fbca68c4f4c}{operator()}} (const grow\+\_\+memory\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_aca323281f6175c475c82aa0f7e20fcc0}{operator()}} (const i32\+\_\+const\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_affe70bb3f90e19c7fcb1ae48701f3167}{operator()}} (const i64\+\_\+const\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_aefbb0fb4cca945a427cd1b3b6b1220ab}{operator()}} (const f32\+\_\+const\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_ac08e89ee32d17ecb2a8bc3db0d946fc9}{operator()}} (const f64\+\_\+const\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a33180de8cf5a888f744c8f566a6e5409}{operator()}} (const i32\+\_\+eqz\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a67492b2dbf9731e859da64e1d30d9157}{operator()}} (const i32\+\_\+eq\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_adf494e8875ce9243ff26cf5c55ba96c5}{operator()}} (const i32\+\_\+ne\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_ac18be5991101e2440b58b3696fda71eb}{operator()}} (const i32\+\_\+lt\+\_\+s\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a23b6605b3b09273d10974977c4a7e4df}{operator()}} (const i32\+\_\+lt\+\_\+u\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a25dcd1bd6848bd67aa3f5d1cd1d0ecb1}{operator()}} (const i32\+\_\+le\+\_\+s\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_aa0f11df35fae77ca71279a15ee5d7d9b}{operator()}} (const i32\+\_\+le\+\_\+u\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a1d8ffd9b1a7b7fb51f180eceb1cf9692}{operator()}} (const i32\+\_\+gt\+\_\+s\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a0a6c1d3febd29d3c31cc98d6c96d216e}{operator()}} (const i32\+\_\+gt\+\_\+u\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_af0fa5d31a1acb5efa062ae830487114c}{operator()}} (const i32\+\_\+ge\+\_\+s\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a9b0869379006a30ce30575c80e542695}{operator()}} (const i32\+\_\+ge\+\_\+u\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_af56a897a54d443247b1e67e853d7d8ff}{operator()}} (const i64\+\_\+eqz\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a69f91d2fb8ad261d3c0368c90d4b6cc0}{operator()}} (const i64\+\_\+eq\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a6e5851ec2ce027d6254b0f85153708e2}{operator()}} (const i64\+\_\+ne\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a8a80eb10f02e0a5ddc773cf2b9773b5a}{operator()}} (const i64\+\_\+lt\+\_\+s\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_aac61b44b2b66d800ed9f0303600b1fc7}{operator()}} (const i64\+\_\+lt\+\_\+u\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_aa91d452ff2089c1bb3bbc11fe61a137c}{operator()}} (const i64\+\_\+le\+\_\+s\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a819bb61840f2dd1fb798711f1d4883fb}{operator()}} (const i64\+\_\+le\+\_\+u\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a7bf8dd72f665ba48bc36ac3f2832a375}{operator()}} (const i64\+\_\+gt\+\_\+s\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_aa3adae24b3122ea3721743197484fbff}{operator()}} (const i64\+\_\+gt\+\_\+u\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a4a4280cfa52851218f6a5eb27cbbc0d4}{operator()}} (const i64\+\_\+ge\+\_\+s\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_ac10679e66c6ae8980a9b4c8fc8c8adee}{operator()}} (const i64\+\_\+ge\+\_\+u\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a891f5ee582f946210b6d6688b0b6fd36}{operator()}} (const f32\+\_\+eq\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a21df00ba444f7baa59e544f1001132b2}{operator()}} (const f32\+\_\+ne\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_ab79c0462ad3c96be518b09e41c746eed}{operator()}} (const f32\+\_\+lt\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a6f96e49a0b0bbd3e9de849c9ce2d82a3}{operator()}} (const f32\+\_\+gt\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a79d85c1341fae0982c33f00d2a32cb92}{operator()}} (const f32\+\_\+le\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_aba528b4ce467e4061bec9e491b775447}{operator()}} (const f32\+\_\+ge\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a7f55bf01195addab0dd086cb0674a9ba}{operator()}} (const f64\+\_\+eq\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_ad64460e2c4951b14e34438a7c78f5a95}{operator()}} (const f64\+\_\+ne\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a343a744cb029ef84524fe81d7aeedbb1}{operator()}} (const f64\+\_\+lt\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a64f08a6a982df5c4c8f04bd8450ed598}{operator()}} (const f64\+\_\+gt\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a3b8a76641846aead076e24c242bc99ef}{operator()}} (const f64\+\_\+le\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a55f897d354d7eebba69494f62a6a0c3f}{operator()}} (const f64\+\_\+ge\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a784277c212b2edb984bb2f88466179be}{operator()}} (const i32\+\_\+clz\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a37d6edecd7c1653783149ef8f7f19dbd}{operator()}} (const i32\+\_\+ctz\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a9cbc6df78454d864ff543748d22ae57a}{operator()}} (const i32\+\_\+popcnt\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a8fb8ee576d52a85bab620b10a04024a3}{operator()}} (const i32\+\_\+add\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_aeb515a84b4cd20fc7a6214e9beb652b7}{operator()}} (const i32\+\_\+sub\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a61b20cc43b4d2b04f256121e8e9b18b0}{operator()}} (const i32\+\_\+mul\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_aaf3f55115f35750efe59614657da9292}{operator()}} (const i32\+\_\+div\+\_\+s\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a32bde97566a4c7aebb14111e6e4d5e98}{operator()}} (const i32\+\_\+div\+\_\+u\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a151488a81b683f4d64da8d6cb44e7771}{operator()}} (const i32\+\_\+rem\+\_\+s\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a3f276bcd0ae991774e306a63d5e4e595}{operator()}} (const i32\+\_\+rem\+\_\+u\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a860845ee38f2939e48f2ae68469fbf01}{operator()}} (const i32\+\_\+and\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a6c6dd28bf0e37d6cc695e90d16272659}{operator()}} (const i32\+\_\+or\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_ae20797b1bc03a977683203aa1079c6dc}{operator()}} (const i32\+\_\+xor\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a4908637d21f5ac71be26269a29a20283}{operator()}} (const i32\+\_\+shl\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a24e0706bd7f4ad0b6eaccfd658c041be}{operator()}} (const i32\+\_\+shr\+\_\+s\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_af575ab86c432258d06f24f99fbc8a3f5}{operator()}} (const i32\+\_\+shr\+\_\+u\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a82c873cb96ffc2f47f66a85b2ac17898}{operator()}} (const i32\+\_\+rotl\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a70f5206d1851c869e8b9ab924b61f02b}{operator()}} (const i32\+\_\+rotr\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a43700e6c78cad7865d23b71861f4ecce}{operator()}} (const i64\+\_\+clz\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a5768bee9dc6ba7820aa7a15ad8208057}{operator()}} (const i64\+\_\+ctz\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a7f637a72a0986c4f828d3771b00a72ce}{operator()}} (const i64\+\_\+popcnt\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_aa1d959f0dc4b974136c91f2c4ec4a003}{operator()}} (const i64\+\_\+add\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a015e072e217522b12137809a0bd6b2e6}{operator()}} (const i64\+\_\+sub\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_aeb25b09811432712e3f3b46899cd82d8}{operator()}} (const i64\+\_\+mul\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_acbe800bd9483bab0a098a9b0d331fb8c}{operator()}} (const i64\+\_\+div\+\_\+s\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_aa47e4b9d94de395e955766992c0f23e5}{operator()}} (const i64\+\_\+div\+\_\+u\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a8db71139961dac039b8ea4509228f161}{operator()}} (const i64\+\_\+rem\+\_\+s\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a3fa647ac8d68c5ff0c920d7a6dd29002}{operator()}} (const i64\+\_\+rem\+\_\+u\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_ac432f618c4aee9a1f61e657404b9e34f}{operator()}} (const i64\+\_\+and\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a28387d7da2dc8b7d0e818683fad84134}{operator()}} (const i64\+\_\+or\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_aea03b117d12ea804ef75cfd314ecea25}{operator()}} (const i64\+\_\+xor\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a309ad90205a7f9fa6c4b81a34fd8bfd8}{operator()}} (const i64\+\_\+shl\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_ab027d4167ac92bdb6b5f31e9f4eacb58}{operator()}} (const i64\+\_\+shr\+\_\+s\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a32a7bc06b4b0148d69fee8b4b1cfd7c7}{operator()}} (const i64\+\_\+shr\+\_\+u\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a08a740f846ce3afc04a1d7a1805d305e}{operator()}} (const i64\+\_\+rotl\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a6b379f455bc469fcf345d5a9c67b7fe1}{operator()}} (const i64\+\_\+rotr\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_abc8d06443e723edc7d97441f757ff636}{operator()}} (const f32\+\_\+abs\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a7891f55735acb96d5a4799c9c12d6147}{operator()}} (const f32\+\_\+neg\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a62d7a2f68efaee2c7368ef2c8ed0d2ec}{operator()}} (const f32\+\_\+ceil\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a6e5d21f30ed2339a82284ad42e7bdff4}{operator()}} (const f32\+\_\+floor\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_ab75ee6389277fa4775d5c00e35c57eb0}{operator()}} (const f32\+\_\+trunc\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a3c7406492b4ef0e6da3e6cd4991d3e49}{operator()}} (const f32\+\_\+nearest\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_ab2b4889ee44081e700669394c4fa5676}{operator()}} (const f32\+\_\+sqrt\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a1482b6d807e0462916bd875c27ccc2f1}{operator()}} (const f32\+\_\+add\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_aac6ed796491c949ae894908d9d147e1c}{operator()}} (const f32\+\_\+sub\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a1b121e9a2d60e027ef6aab1ca59ff6a2}{operator()}} (const f32\+\_\+mul\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_afb14fbcc249e25a17a9ae0f87ca3eb45}{operator()}} (const f32\+\_\+div\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a71fccdd28848474409326df3cb332565}{operator()}} (const f32\+\_\+min\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a1b560c0ac2ee507e86fb370e5a4aca53}{operator()}} (const f32\+\_\+max\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a21d2e899d167264697a4bfd6f7501330}{operator()}} (const f32\+\_\+copysign\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_ae4c0293f8be1f44a4b14d2e314a555c4}{operator()}} (const f64\+\_\+abs\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_aaf385eecb9cb02dd795d812f74743b74}{operator()}} (const f64\+\_\+neg\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a1fc22b15d1ffd839db08f6836d23890c}{operator()}} (const f64\+\_\+ceil\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a775167f25ac7e69c99fa1eeddc583666}{operator()}} (const f64\+\_\+floor\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a20ffbb58a019646e57837d0cc58a83c8}{operator()}} (const f64\+\_\+trunc\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a7badb621422814ee0ae7592fef8dd52d}{operator()}} (const f64\+\_\+nearest\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_ab8ed7ccce1aa52af83bad44755c85533}{operator()}} (const f64\+\_\+sqrt\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_ac0046731a957bf2168cdc74c733767e4}{operator()}} (const f64\+\_\+add\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_af146ff3a1df4b8abf2a04987f53a2354}{operator()}} (const f64\+\_\+sub\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_ae55f9852184a932bdae1034af5426c73}{operator()}} (const f64\+\_\+mul\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_ad714b4c055d4a5d72318fedfba7fc5b2}{operator()}} (const f64\+\_\+div\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a493e71ee081ac7a7e40b0c82658c29c4}{operator()}} (const f64\+\_\+min\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_af6f350735833b7b73b0625debce3ae11}{operator()}} (const f64\+\_\+max\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a46ab19b4a20093f7540b83df6902f430}{operator()}} (const f64\+\_\+copysign\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a08e91d663d80b85781e9eab82427465c}{operator()}} (const i32\+\_\+wrap\+\_\+i64\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_ad2f86d3b303e0cb17a25ecd73c305cbe}{operator()}} (const i32\+\_\+trunc\+\_\+s\+\_\+f32\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_ae8047a3813dd889fda80f6b964fef845}{operator()}} (const i32\+\_\+trunc\+\_\+u\+\_\+f32\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_ad8f12143de995ef3a9d847894498d5e3}{operator()}} (const i32\+\_\+trunc\+\_\+s\+\_\+f64\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a26302e054032bdf15e7323d688943075}{operator()}} (const i32\+\_\+trunc\+\_\+u\+\_\+f64\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a3e9c55443d884c92bf259bdfa2c052c4}{operator()}} (const i64\+\_\+extend\+\_\+s\+\_\+i32\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_acd32623b466cc4dc44500a7ba027b360}{operator()}} (const i64\+\_\+extend\+\_\+u\+\_\+i32\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a26d19eb508d58896430058e60d3eb312}{operator()}} (const i64\+\_\+trunc\+\_\+s\+\_\+f32\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a153698d4a58665e621a4a7be1220ff7f}{operator()}} (const i64\+\_\+trunc\+\_\+u\+\_\+f32\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_ad4af88973c49cccf845956c5d1a7d8f2}{operator()}} (const i64\+\_\+trunc\+\_\+s\+\_\+f64\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a38d0fd234fb2b452c6ac2c4ecc46e833}{operator()}} (const i64\+\_\+trunc\+\_\+u\+\_\+f64\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a2d5b64ffaa76037193d9c9495dfd2070}{operator()}} (const f32\+\_\+convert\+\_\+s\+\_\+i32\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a48b81c3027390d737dff157ea9ad733d}{operator()}} (const f32\+\_\+convert\+\_\+u\+\_\+i32\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a1ccadb6dc0662e9b8f2d7dd4059fcd35}{operator()}} (const f32\+\_\+convert\+\_\+s\+\_\+i64\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a7b9e3690f397addfdeb893154b0f5bcf}{operator()}} (const f32\+\_\+convert\+\_\+u\+\_\+i64\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a1d6e91eda570679e3f1e9df679c74fb0}{operator()}} (const f32\+\_\+demote\+\_\+f64\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a828e06ee0423821a2f149e4709eac84e}{operator()}} (const f64\+\_\+convert\+\_\+s\+\_\+i32\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a6b58107750fe9b07d6cde7898d5b59cc}{operator()}} (const f64\+\_\+convert\+\_\+u\+\_\+i32\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_ad91ae58d59a32b9c80d4112559adafd8}{operator()}} (const f64\+\_\+convert\+\_\+s\+\_\+i64\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a3f2e21a467e57d485ecac91efbc704ff}{operator()}} (const f64\+\_\+convert\+\_\+u\+\_\+i64\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a55e3c465d580f98cd0638da632271536}{operator()}} (const f64\+\_\+promote\+\_\+f32\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a8f5143c3b9b80aa0e74fd77301ec49ab}{operator()}} (const i32\+\_\+reinterpret\+\_\+f32\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_ab7d424010001fdb52253d8cc5594c8d0}{operator()}} (const i64\+\_\+reinterpret\+\_\+f64\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_ae0710bf0ca5c09e7765201d45144dc6f}{operator()}} (const f32\+\_\+reinterpret\+\_\+i32\+\_\+t \&)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a68b647b5bbf0edd2ad50fcf1c8ce3ef6}{operator()}} (const f64\+\_\+reinterpret\+\_\+i64\+\_\+t \&)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{structsysio_1_1vm_1_1base__visitor_a4297225845a579680c6dfa58e3352a7b}{operator()}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} val)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Static Public Member Functions inherited from \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor}{sysio\+::vm\+::interpret\+\_\+visitor$<$ Execution\+CTX $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+static constexpr void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a35b5df3cab67bb7060b0207259376b45}{align\+\_\+address}} (void \texorpdfstring{$\ast$}{*}addr, size\+\_\+t align\+\_\+amt)
+\item 
+static constexpr void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a35b5df3cab67bb7060b0207259376b45}{align\+\_\+address}} (void \texorpdfstring{$\ast$}{*}addr, size\+\_\+t align\+\_\+amt)
+\item 
+static \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a58582e52dcf6f80b76fd508e7c273f61}{read\+\_\+unaligned}} (const void \texorpdfstring{$\ast$}{*}addr)
+\item 
+static \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a58582e52dcf6f80b76fd508e7c273f61}{read\+\_\+unaligned}} (const void \texorpdfstring{$\ast$}{*}addr)
+\item 
+static void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a5d4d291f0c2986c0b8e3bba1d77e85cd}{write\+\_\+unaligned}} (void \texorpdfstring{$\ast$}{*}addr, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+static void \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a5d4d291f0c2986c0b8e3bba1d77e85cd}{write\+\_\+unaligned}} (void \texorpdfstring{$\ast$}{*}addr, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes inherited from \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor}{sysio\+::vm\+::interpret\+\_\+visitor$<$ Execution\+CTX $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+Execution\+CTX \& \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a820d685c526a649f5a50dd3576857cce}{context}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Execution\+CTX$>$\newline
+struct sysio\+::vm\+::debug\+\_\+visitor$<$ Execution\+CTX $>$}
+
+
+Definition at line \mbox{\hyperlink{vm_2debug__visitor_8hpp_source_l00021}{21}} of file \mbox{\hyperlink{vm_2debug__visitor_8hpp_source}{debug\+\_\+visitor.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structsysio_1_1vm_1_1debug__visitor_af5b33b607498780a3759c828b969fd3d}\index{sysio::vm::debug\_visitor$<$ ExecutionCTX $>$@{sysio::vm::debug\_visitor$<$ ExecutionCTX $>$}!debug\_visitor@{debug\_visitor}}
+\index{debug\_visitor@{debug\_visitor}!sysio::vm::debug\_visitor$<$ ExecutionCTX $>$@{sysio::vm::debug\_visitor$<$ ExecutionCTX $>$}}
+\doxysubsubsection{\texorpdfstring{debug\_visitor()}{debug\_visitor()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1debug__visitor_af5b33b607498780a3759c828b969fd3d} 
+template$<$typename Execution\+CTX $>$ \\
+\mbox{\hyperlink{structsysio_1_1vm_1_1debug__visitor}{sysio\+::vm\+::debug\+\_\+visitor}}$<$ Execution\+CTX $>$\+::debug\+\_\+visitor (\begin{DoxyParamCaption}\item[{Execution\+CTX \&}]{ctx}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2debug__visitor_8hpp_source_l00023}{23}} of file \mbox{\hyperlink{sysio_2vm_2debug__visitor_8hpp_source}{debug\+\_\+visitor.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00023\ :\ interpret\_visitor<ExecutionCTX>(ctx)\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1vm_1_1debug__visitor_af5b33b607498780a3759c828b969fd3d}\index{sysio::vm::debug\_visitor$<$ ExecutionCTX $>$@{sysio::vm::debug\_visitor$<$ ExecutionCTX $>$}!debug\_visitor@{debug\_visitor}}
+\index{debug\_visitor@{debug\_visitor}!sysio::vm::debug\_visitor$<$ ExecutionCTX $>$@{sysio::vm::debug\_visitor$<$ ExecutionCTX $>$}}
+\doxysubsubsection{\texorpdfstring{debug\_visitor()}{debug\_visitor()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1debug__visitor_af5b33b607498780a3759c828b969fd3d} 
+template$<$typename Execution\+CTX $>$ \\
+\mbox{\hyperlink{structsysio_1_1vm_1_1debug__visitor}{sysio\+::vm\+::debug\+\_\+visitor}}$<$ Execution\+CTX $>$\+::debug\+\_\+visitor (\begin{DoxyParamCaption}\item[{Execution\+CTX \&}]{ctx}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2debug__visitor_8hpp_source_l00023}{23}} of file \mbox{\hyperlink{vm_2debug__visitor_8hpp_source}{debug\+\_\+visitor.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00023\ :\ interpret\_visitor<ExecutionCTX>(ctx)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1vm_1_1debug__visitor_a6c5abcb09938ed107074b09ae0b4ef60}\index{sysio::vm::debug\_visitor$<$ ExecutionCTX $>$@{sysio::vm::debug\_visitor$<$ ExecutionCTX $>$}!get\_context@{get\_context}}
+\index{get\_context@{get\_context}!sysio::vm::debug\_visitor$<$ ExecutionCTX $>$@{sysio::vm::debug\_visitor$<$ ExecutionCTX $>$}}
+\doxysubsubsection{\texorpdfstring{get\_context()}{get\_context()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1debug__visitor_a6c5abcb09938ed107074b09ae0b4ef60} 
+template$<$typename Execution\+CTX $>$ \\
+Execution\+CTX \& \mbox{\hyperlink{structsysio_1_1vm_1_1debug__visitor}{sysio\+::vm\+::debug\+\_\+visitor}}$<$ Execution\+CTX $>$\+::get\+\_\+context (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2debug__visitor_8hpp_source_l00024}{24}} of file \mbox{\hyperlink{sysio_2vm_2debug__visitor_8hpp_source}{debug\+\_\+visitor.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00024\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a46be325f6d007d98192a194a431e6d45}{interpret\_visitor<ExecutionCTX>::get\_context}}();\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=343pt]{structsysio_1_1vm_1_1debug__visitor_a6c5abcb09938ed107074b09ae0b4ef60_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1vm_1_1debug__visitor_a6c5abcb09938ed107074b09ae0b4ef60}\index{sysio::vm::debug\_visitor$<$ ExecutionCTX $>$@{sysio::vm::debug\_visitor$<$ ExecutionCTX $>$}!get\_context@{get\_context}}
+\index{get\_context@{get\_context}!sysio::vm::debug\_visitor$<$ ExecutionCTX $>$@{sysio::vm::debug\_visitor$<$ ExecutionCTX $>$}}
+\doxysubsubsection{\texorpdfstring{get\_context()}{get\_context()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1debug__visitor_a6c5abcb09938ed107074b09ae0b4ef60} 
+template$<$typename Execution\+CTX $>$ \\
+Execution\+CTX \& \mbox{\hyperlink{structsysio_1_1vm_1_1debug__visitor}{sysio\+::vm\+::debug\+\_\+visitor}}$<$ Execution\+CTX $>$\+::get\+\_\+context (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2debug__visitor_8hpp_source_l00024}{24}} of file \mbox{\hyperlink{vm_2debug__visitor_8hpp_source}{debug\+\_\+visitor.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00024\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1vm_1_1interpret__visitor_a46be325f6d007d98192a194a431e6d45}{interpret\_visitor<ExecutionCTX>::get\_context}}();\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=343pt]{structsysio_1_1vm_1_1debug__visitor_a6c5abcb09938ed107074b09ae0b4ef60_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/include/sysio/sysio/vm/\mbox{\hyperlink{sysio_2vm_2debug__visitor_8hpp}{debug\+\_\+visitor.\+hpp}}\item 
+libraries/sys-\/vm/include/sysio/vm/\mbox{\hyperlink{vm_2debug__visitor_8hpp}{debug\+\_\+visitor.\+hpp}}\end{DoxyCompactItemize}

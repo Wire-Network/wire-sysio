@@ -1,0 +1,5 @@
+<map id="websocketpp::config::asio_tls" name="websocketpp::config::asio_tls">
+<area shape="rect" id="Node000001" title="Server config with asio transport and TLS enabled." alt="" coords="5,94,147,135"/>
+<area shape="rect" id="Node000002" href="$structwebsocketpp_1_1config_1_1core.html" title="Server config with iostream transport." alt="" coords="5,5,147,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="79,62,79,94,73,94,73,62"/>
+</map>

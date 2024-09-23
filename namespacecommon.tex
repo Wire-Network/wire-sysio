@@ -1,0 +1,193 @@
+\doxysection{common Namespace Reference}
+\hypertarget{namespacecommon}{}\label{namespacecommon}\index{common@{common}}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacecommon_a64548838415038ccfa1c37e7bb37c298}{Get\+Command\+Output}} (command)
+\item 
+\mbox{\hyperlink{namespacecommon_a916f1d8769cc92716b8c740b4023d5b7}{Get\+Svn\+Info}} ()
+\item 
+\mbox{\hyperlink{namespacecommon_a50b57180a1264350b1511dcfff01cab8}{Get\+Svn\+Trunk}} ()
+\item 
+\mbox{\hyperlink{namespacecommon_ae3f470573605f598fdd1fe6f91fa465d}{Is\+In\+GTest\+Svn}} ()
+\item 
+\mbox{\hyperlink{namespacecommon_a989984e3a650548f95dacf30fc16ede9}{Is\+In\+GMock\+Svn}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacecommon_a8441f667816bce34e6100f88a9ea7dfa}{\+\_\+\+SVN\+\_\+\+INFO\+\_\+\+URL\+\_\+\+RE}} = re.\+compile(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\textquotesingle{}\texorpdfstring{$^\wedge$}{\string^}URL\+: https\+://(\textbackslash{}w+)\textbackslash{}.googlecode\textbackslash{}.\+com/svn(.\texorpdfstring{$\ast$}{*})\textquotesingle{})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\begin{DoxyVerb}Shared utilities for writing scripts for Google Test/Mock.\end{DoxyVerb}
+ 
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacecommon_a64548838415038ccfa1c37e7bb37c298}\index{common@{common}!GetCommandOutput@{GetCommandOutput}}
+\index{GetCommandOutput@{GetCommandOutput}!common@{common}}
+\doxysubsubsection{\texorpdfstring{GetCommandOutput()}{GetCommandOutput()}}
+{\footnotesize\ttfamily \label{namespacecommon_a64548838415038ccfa1c37e7bb37c298} 
+common.\+Get\+Command\+Output (\begin{DoxyParamCaption}\item[{}]{command}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Runs the shell command and returns its stdout as a list of lines.\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{common_8py_source_l00046}{46}} of file \mbox{\hyperlink{common_8py_source}{common.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00046\ \textcolor{keyword}{def\ }GetCommandOutput(command):}
+\DoxyCodeLine{00047\ \ \ \textcolor{stringliteral}{"{}"{}"{}Runs\ the\ shell\ command\ and\ returns\ its\ stdout\ as\ a\ list\ of\ lines."{}"{}"{}}}
+\DoxyCodeLine{00048\ }
+\DoxyCodeLine{00049\ \ \ f\ =\ os.popen(command,\ \textcolor{stringliteral}{'r'})}
+\DoxyCodeLine{00050\ \ \ lines\ =\ [line.strip()\ \textcolor{keywordflow}{for}\ line\ \textcolor{keywordflow}{in}\ f.readlines()]}
+\DoxyCodeLine{00051\ \ \ f.close()}
+\DoxyCodeLine{00052\ \ \ \textcolor{keywordflow}{return}\ lines}
+\DoxyCodeLine{00053\ }
+\DoxyCodeLine{00054\ }
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacecommon_a64548838415038ccfa1c37e7bb37c298_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacecommon_a916f1d8769cc92716b8c740b4023d5b7}\index{common@{common}!GetSvnInfo@{GetSvnInfo}}
+\index{GetSvnInfo@{GetSvnInfo}!common@{common}}
+\doxysubsubsection{\texorpdfstring{GetSvnInfo()}{GetSvnInfo()}}
+{\footnotesize\ttfamily \label{namespacecommon_a916f1d8769cc92716b8c740b4023d5b7} 
+common.\+Get\+Svn\+Info (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Returns the project name and the current SVN workspace's root path.\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{common_8py_source_l00055}{55}} of file \mbox{\hyperlink{common_8py_source}{common.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00055\ \textcolor{keyword}{def\ }GetSvnInfo():}
+\DoxyCodeLine{00056\ \ \ \textcolor{stringliteral}{"{}"{}"{}Returns\ the\ project\ name\ and\ the\ current\ SVN\ workspace's\ root\ path."{}"{}"{}}}
+\DoxyCodeLine{00057\ }
+\DoxyCodeLine{00058\ \ \ \textcolor{keywordflow}{for}\ line\ \textcolor{keywordflow}{in}\ GetCommandOutput(\textcolor{stringliteral}{'svn\ info\ .'}):}
+\DoxyCodeLine{00059\ \ \ \ \ m\ =\ \_SVN\_INFO\_URL\_RE.match(line)}
+\DoxyCodeLine{00060\ \ \ \ \ \textcolor{keywordflow}{if}\ m:}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ project\ =\ m.group(1)\ \ \textcolor{comment}{\#\ googletest\ or\ googlemock}}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ rel\_path\ =\ m.group(2)}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ root\ =\ os.path.realpath(rel\_path.count(\textcolor{stringliteral}{'/'})\ *\ \textcolor{stringliteral}{'../'})}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ project,\ root}
+\DoxyCodeLine{00065\ }
+\DoxyCodeLine{00066\ \ \ \textcolor{keywordflow}{return}\ \textcolor{keywordtype}{None},\ \textcolor{keywordtype}{None}}
+\DoxyCodeLine{00067\ }
+\DoxyCodeLine{00068\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacecommon_a916f1d8769cc92716b8c740b4023d5b7_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=344pt]{namespacecommon_a916f1d8769cc92716b8c740b4023d5b7_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacecommon_a50b57180a1264350b1511dcfff01cab8}\index{common@{common}!GetSvnTrunk@{GetSvnTrunk}}
+\index{GetSvnTrunk@{GetSvnTrunk}!common@{common}}
+\doxysubsubsection{\texorpdfstring{GetSvnTrunk()}{GetSvnTrunk()}}
+{\footnotesize\ttfamily \label{namespacecommon_a50b57180a1264350b1511dcfff01cab8} 
+common.\+Get\+Svn\+Trunk (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Returns the current SVN workspace's trunk root path.\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{common_8py_source_l00069}{69}} of file \mbox{\hyperlink{common_8py_source}{common.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00069\ \textcolor{keyword}{def\ }GetSvnTrunk():}
+\DoxyCodeLine{00070\ \ \ \textcolor{stringliteral}{"{}"{}"{}Returns\ the\ current\ SVN\ workspace's\ trunk\ root\ path."{}"{}"{}}}
+\DoxyCodeLine{00071\ }
+\DoxyCodeLine{00072\ \ \ \_,\ root\ =\ GetSvnInfo()}
+\DoxyCodeLine{00073\ \ \ \textcolor{keywordflow}{return}\ root\ +\ \textcolor{stringliteral}{'/trunk'}\ \textcolor{keywordflow}{if}\ root\ \textcolor{keywordflow}{else}\ \textcolor{keywordtype}{None}}
+\DoxyCodeLine{00074\ }
+\DoxyCodeLine{00075\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacecommon_a50b57180a1264350b1511dcfff01cab8_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacecommon_a989984e3a650548f95dacf30fc16ede9}\index{common@{common}!IsInGMockSvn@{IsInGMockSvn}}
+\index{IsInGMockSvn@{IsInGMockSvn}!common@{common}}
+\doxysubsubsection{\texorpdfstring{IsInGMockSvn()}{IsInGMockSvn()}}
+{\footnotesize\ttfamily \label{namespacecommon_a989984e3a650548f95dacf30fc16ede9} 
+common.\+Is\+In\+GMock\+Svn (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{common_8py_source_l00081}{81}} of file \mbox{\hyperlink{common_8py_source}{common.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00081\ \textcolor{keyword}{def\ }IsInGMockSvn():}
+\DoxyCodeLine{00082\ \ \ project,\ \_\ =\ GetSvnInfo()}
+\DoxyCodeLine{00083\ \ \ \textcolor{keywordflow}{return}\ project\ ==\ \textcolor{stringliteral}{'googlemock'}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacecommon_a989984e3a650548f95dacf30fc16ede9_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacecommon_ae3f470573605f598fdd1fe6f91fa465d}\index{common@{common}!IsInGTestSvn@{IsInGTestSvn}}
+\index{IsInGTestSvn@{IsInGTestSvn}!common@{common}}
+\doxysubsubsection{\texorpdfstring{IsInGTestSvn()}{IsInGTestSvn()}}
+{\footnotesize\ttfamily \label{namespacecommon_ae3f470573605f598fdd1fe6f91fa465d} 
+common.\+Is\+In\+GTest\+Svn (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{common_8py_source_l00076}{76}} of file \mbox{\hyperlink{common_8py_source}{common.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00076\ \textcolor{keyword}{def\ }IsInGTestSvn():}
+\DoxyCodeLine{00077\ \ \ project,\ \_\ =\ GetSvnInfo()}
+\DoxyCodeLine{00078\ \ \ \textcolor{keywordflow}{return}\ project\ ==\ \textcolor{stringliteral}{'googletest'}}
+\DoxyCodeLine{00079\ }
+\DoxyCodeLine{00080\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacecommon_ae3f470573605f598fdd1fe6f91fa465d_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{namespacecommon_a8441f667816bce34e6100f88a9ea7dfa}\index{common@{common}!\_SVN\_INFO\_URL\_RE@{\_SVN\_INFO\_URL\_RE}}
+\index{\_SVN\_INFO\_URL\_RE@{\_SVN\_INFO\_URL\_RE}!common@{common}}
+\doxysubsubsection{\texorpdfstring{\_SVN\_INFO\_URL\_RE}{\_SVN\_INFO\_URL\_RE}}
+{\footnotesize\ttfamily \label{namespacecommon_a8441f667816bce34e6100f88a9ea7dfa} 
+common.\+\_\+\+SVN\+\_\+\+INFO\+\_\+\+URL\+\_\+\+RE = re.\+compile(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\textquotesingle{}\texorpdfstring{$^\wedge$}{\string^}URL\+: https\+://(\textbackslash{}w+)\textbackslash{}.googlecode\textbackslash{}.\+com/svn(.\texorpdfstring{$\ast$}{*})\textquotesingle{})\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{common_8py_source_l00043}{43}} of file \mbox{\hyperlink{common_8py_source}{common.\+py}}.
+

@@ -1,0 +1,95 @@
+\doxysection{fc\+::http\+\_\+client\+\_\+impl\+::check\+\_\+closed\+\_\+visitor Struct Reference}
+\hypertarget{structfc_1_1http__client__impl_1_1check__closed__visitor}{}\label{structfc_1_1http__client__impl_1_1check__closed__visitor}\index{fc::http\_client\_impl::check\_closed\_visitor@{fc::http\_client\_impl::check\_closed\_visitor}}
+
+
+Inheritance diagram for fc\+::http\+\_\+client\+\_\+impl\+::check\+\_\+closed\+\_\+visitor\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=194pt]{structfc_1_1http__client__impl_1_1check__closed__visitor__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for fc\+::http\+\_\+client\+\_\+impl\+::check\+\_\+closed\+\_\+visitor\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=194pt]{structfc_1_1http__client__impl_1_1check__closed__visitor__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{structfc_1_1http__client__impl_1_1check__closed__visitor_ae24da416afbd24afc0e92f2a2339cc4d}{operator()}} (const \mbox{\hyperlink{classfc_1_1http__client__impl_adc95a13334ceb3ff477fc1ddcb561996}{raw\+\_\+socket\+\_\+ptr}} \&ptr) const
+\item 
+bool \mbox{\hyperlink{structfc_1_1http__client__impl_1_1check__closed__visitor_a72c99c7b3c926f345fca8c721979a21b}{operator()}} (const \mbox{\hyperlink{classfc_1_1http__client__impl_aa89e365027f58b6fa923d70c8d773006}{ssl\+\_\+socket\+\_\+ptr}} \&ptr) const
+\item 
+bool \mbox{\hyperlink{structfc_1_1http__client__impl_1_1check__closed__visitor_aabaaecd5a909ca08f63cb3be7327007f}{operator()}} (const \mbox{\hyperlink{classfc_1_1http__client__impl_a26f75c9818c40ea19196406944151e3f}{unix\+\_\+socket\+\_\+ptr}} \&ptr) const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{http__client_8cpp_source_l00234}{234}} of file \mbox{\hyperlink{http__client_8cpp_source}{http\+\_\+client.\+cpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structfc_1_1http__client__impl_1_1check__closed__visitor_ae24da416afbd24afc0e92f2a2339cc4d}\index{fc::http\_client\_impl::check\_closed\_visitor@{fc::http\_client\_impl::check\_closed\_visitor}!operator()@{operator()}}
+\index{operator()@{operator()}!fc::http\_client\_impl::check\_closed\_visitor@{fc::http\_client\_impl::check\_closed\_visitor}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{structfc_1_1http__client__impl_1_1check__closed__visitor_ae24da416afbd24afc0e92f2a2339cc4d} 
+bool fc\+::http\+\_\+client\+\_\+impl\+::check\+\_\+closed\+\_\+visitor\+::operator() (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1http__client__impl_adc95a13334ceb3ff477fc1ddcb561996}{raw\+\_\+socket\+\_\+ptr}} \&}]{ptr}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{http__client_8cpp_source_l00235}{235}} of file \mbox{\hyperlink{http__client_8cpp_source}{http\+\_\+client.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !ptr-\/>is\_open();}
+\DoxyCodeLine{00237\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structfc_1_1http__client__impl_1_1check__closed__visitor_a72c99c7b3c926f345fca8c721979a21b}\index{fc::http\_client\_impl::check\_closed\_visitor@{fc::http\_client\_impl::check\_closed\_visitor}!operator()@{operator()}}
+\index{operator()@{operator()}!fc::http\_client\_impl::check\_closed\_visitor@{fc::http\_client\_impl::check\_closed\_visitor}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{structfc_1_1http__client__impl_1_1check__closed__visitor_a72c99c7b3c926f345fca8c721979a21b} 
+bool fc\+::http\+\_\+client\+\_\+impl\+::check\+\_\+closed\+\_\+visitor\+::operator() (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1http__client__impl_aa89e365027f58b6fa923d70c8d773006}{ssl\+\_\+socket\+\_\+ptr}} \&}]{ptr}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{http__client_8cpp_source_l00239}{239}} of file \mbox{\hyperlink{http__client_8cpp_source}{http\+\_\+client.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !ptr-\/>lowest\_layer().is\_open();}
+\DoxyCodeLine{00241\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structfc_1_1http__client__impl_1_1check__closed__visitor_aabaaecd5a909ca08f63cb3be7327007f}\index{fc::http\_client\_impl::check\_closed\_visitor@{fc::http\_client\_impl::check\_closed\_visitor}!operator()@{operator()}}
+\index{operator()@{operator()}!fc::http\_client\_impl::check\_closed\_visitor@{fc::http\_client\_impl::check\_closed\_visitor}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{structfc_1_1http__client__impl_1_1check__closed__visitor_aabaaecd5a909ca08f63cb3be7327007f} 
+bool fc\+::http\+\_\+client\+\_\+impl\+::check\+\_\+closed\+\_\+visitor\+::operator() (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1http__client__impl_a26f75c9818c40ea19196406944151e3f}{unix\+\_\+socket\+\_\+ptr}} \&}]{ptr}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{http__client_8cpp_source_l00243}{243}} of file \mbox{\hyperlink{http__client_8cpp_source}{http\+\_\+client.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00243\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00244\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !ptr-\/>is\_open();}
+\DoxyCodeLine{00245\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/src/network/http/\mbox{\hyperlink{http__client_8cpp}{http\+\_\+client.\+cpp}}\end{DoxyCompactItemize}

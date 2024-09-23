@@ -1,0 +1,1326 @@
+\doxysection{Xbyak\+::Operand Class Reference}
+\hypertarget{class_xbyak_1_1_operand}{}\label{class_xbyak_1_1_operand}\index{Xbyak::Operand@{Xbyak::Operand}}
+
+
+{\ttfamily \#include $<$xbyak.\+h$>$}
+
+
+
+Inheritance diagram for Xbyak\+::Operand\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_xbyak_1_1_operand__inherit__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933b}{Kind}} \{ \newline
+\mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933ba6bbbc7e33ffa1256e35eaa63205c6daa}{NONE}} = 0
+, \mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933ba986b99f1b072c0821e0077bd9a469ad0}{MEM}} = 1 \texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<} 0
+, \mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933ba5cee5588c3a23aee8620236a677ff3f5}{REG}} = 1 \texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<} 1
+, \mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933ba0bdf21ff8b7e1d36c6fa48fd394c0a54}{MMX}} = 1 \texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<} 2
+, \newline
+\mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933ba1769e4d0acbf4fe129429537a960f9bc}{FPU}} = 1 \texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<} 3
+, \mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933ba974504afdac8c2f752da0fc0df5f9ae2}{XMM}} = 1 \texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<} 4
+, \mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933baa1754a37db134c90663f28c713a5ad04}{YMM}} = 1 \texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<} 5
+, \mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933ba779c9b07696cb348f7b5768894569d4e}{ZMM}} = 1 \texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<} 6
+, \newline
+\mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933ba3957facc59122051f2df89f7d934ad86}{OPMASK}} = 1 \texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<} 7
+, \mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933bae150704056abed48b380559e57b1ecdd}{BNDREG}} = 1 \texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<} 8
+ \}
+\item 
+enum \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846}{Code}} \{ \newline
+\mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a4cd6657e958297a35479ad6583520a67}{EAX}} = 0
+, \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a0633f76397deb9e17330a08c7b410a8c}{ECX}}
+, \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a8726c2f76163e0f35d2601750be37f12}{EDX}}
+, \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846ae4800c083bb2d2a087da1ff14990079a}{EBX}}
+, \newline
+\mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a1027bc617f8f52395078e43b96d0bb5a}{ESP}}
+, \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a47841e8c6ddcbad4f6ae4f437857e31d}{EBP}}
+, \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846aae18a2d599bea597e539fd7e1fb415cb}{ESI}}
+, \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846ae11bd14e6dd6ca1cb53693b4c2cd361e}{EDI}}
+, \newline
+\mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a6f5695b5f7c18a0e7579938d91de33bb}{AX}} = 0
+, \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846af7097c7ec6f30389c72b0c6ac4f0a3d5}{CX}}
+, \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846aa156e6e53bc2fd23aa8861a62e82f6b9}{DX}}
+, \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a6d365ab314220693f54e50c007cfd754}{BX}}
+, \newline
+\mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846ad64ca664228a615bd9ac634ec75c8298}{SP}}
+, \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a4b2755d2928db8d373758329652cc304}{BP}}
+, \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846af7751921bd4a1b1a8e71d324cf259465}{SI}}
+, \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846ad258a74b07663cf87b60db9f8d1c434b}{DI}}
+, \newline
+\mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a2dd47887596c69d9f015a43fa9f31e5c}{AL}} = 0
+, \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a5fbb58c96231af5a3c9f1020f3e1373f}{CL}}
+, \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a2df878df007d2207b8ea47f51ae867cb}{DL}}
+, \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a3fd98f8da96f6918a6b872184444434a}{BL}}
+, \newline
+\mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a7ed297782033727d617c17eacbd7f286}{AH}}
+, \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a1d9d0e733e8f9f0096bda6b23dd4145c}{CH}}
+, \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846ade9d568528a9b679fc4885ebf0ecaa88}{DH}}
+, \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846aebbcac94094b13a323ac2e1f327ba12e}{BH}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_xbyak_1_1_operand_acf1e02ccf35af769d8d4f3cfa4c00a31}{Operand}} ()
+\item 
+\mbox{\hyperlink{class_xbyak_1_1_operand_a78c8c4d23855cdab33d769e950c7d242}{Operand}} (int idx, \mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933b}{Kind}} kind, int \mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}}, bool ext8bit=0)
+\item 
+\mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933b}{Kind}} \mbox{\hyperlink{class_xbyak_1_1_operand_a209c322fcecff9f02e62462ec754fa6f}{get\+Kind}} () const
+\item 
+int \mbox{\hyperlink{class_xbyak_1_1_operand_a9722a98c75928e06e3be3198b7aaa426}{get\+Idx}} () const
+\item 
+bool \mbox{\hyperlink{class_xbyak_1_1_operand_af83a6a5fbcad1f4ac74ee3fde5070b0c}{is\+None}} () const
+\item 
+bool \mbox{\hyperlink{class_xbyak_1_1_operand_a5306a21d9e3c6305703faf108dd6357e}{is\+MMX}} () const
+\item 
+bool \mbox{\hyperlink{class_xbyak_1_1_operand_a8483cb23fc2fcba13e05f0fcd279d7b0}{is\+XMM}} () const
+\item 
+bool \mbox{\hyperlink{class_xbyak_1_1_operand_a7eecec4168018f49a4de1fca690daf82}{is\+YMM}} () const
+\item 
+bool \mbox{\hyperlink{class_xbyak_1_1_operand_a84f556436fcca82114f31a11fa1c8d6d}{is\+ZMM}} () const
+\item 
+bool \mbox{\hyperlink{class_xbyak_1_1_operand_ab4812fc1303247fa863643ca1c971b48}{is\+XMEM}} () const
+\item 
+bool \mbox{\hyperlink{class_xbyak_1_1_operand_a0b9b5d66efcd55697ad382d449b9f015}{is\+YMEM}} () const
+\item 
+bool \mbox{\hyperlink{class_xbyak_1_1_operand_ae1166f22d239ee0164830e3c418ba9da}{is\+ZMEM}} () const
+\item 
+bool \mbox{\hyperlink{class_xbyak_1_1_operand_a2cb3c6e9e8025e1dd8348cbf4f4c0dfc}{is\+OPMASK}} () const
+\item 
+bool \mbox{\hyperlink{class_xbyak_1_1_operand_ad58425431c023d3dfdd8efcbd68ce463}{is\+BNDREG}} () const
+\item 
+bool \mbox{\hyperlink{class_xbyak_1_1_operand_a4029ea538d06b3cea1afd3a0ebb99435}{is\+REG}} (int \mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}}=0) const
+\item 
+bool \mbox{\hyperlink{class_xbyak_1_1_operand_ac19f160ee96afdf829f4154ffd9fe1fc}{is\+MEM}} (int \mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}}=0) const
+\item 
+bool \mbox{\hyperlink{class_xbyak_1_1_operand_a4376cef05826332bd486095a4e5eac6f}{is\+FPU}} () const
+\item 
+bool \mbox{\hyperlink{class_xbyak_1_1_operand_a0fd53f9394841224652bf009be2173b3}{is\+Ext8bit}} () const
+\item 
+bool \mbox{\hyperlink{class_xbyak_1_1_operand_ae0e37428afb23c2827d368e23a250ef9}{is\+Ext\+Idx}} () const
+\item 
+bool \mbox{\hyperlink{class_xbyak_1_1_operand_a08c30697005cb69a10e16251e2f04280}{is\+Ext\+Idx2}} () const
+\item 
+bool \mbox{\hyperlink{class_xbyak_1_1_operand_ab1d912dc190e8fb6845400c2c3fe984b}{has\+Evex}} () const
+\item 
+bool \mbox{\hyperlink{class_xbyak_1_1_operand_af45f32fe9206c761ea3c230b5e049548}{has\+Rex}} () const
+\item 
+bool \mbox{\hyperlink{class_xbyak_1_1_operand_adf4bc2c35ff0f6af393a4686bccc3c3e}{has\+Zero}} () const
+\item 
+int \mbox{\hyperlink{class_xbyak_1_1_operand_aa948d58929e477691fa5e3a855134dfd}{get\+Opmask\+Idx}} () const
+\item 
+int \mbox{\hyperlink{class_xbyak_1_1_operand_a1c2de351f77e1f2ebb070c99aedc752c}{get\+Rounding}} () const
+\item 
+void \mbox{\hyperlink{class_xbyak_1_1_operand_ae4566ecb8f753309634f398e38815f3a}{set\+Kind}} (\mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933b}{Kind}} kind)
+\item 
+void \mbox{\hyperlink{class_xbyak_1_1_operand_abf0d6e2e262fe0cf98a90aaf69ed0f6c}{set\+Bit}} (int \mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}})
+\item 
+void \mbox{\hyperlink{class_xbyak_1_1_operand_aa2f69fb69466ecd3f61ff6c14bfe03e7}{set\+Opmask\+Idx}} (int idx, bool ignore\+\_\+idx0=false)
+\item 
+void \mbox{\hyperlink{class_xbyak_1_1_operand_a7c798c092b9be49260b0c84415b14070}{set\+Rounding}} (int idx)
+\item 
+void \mbox{\hyperlink{class_xbyak_1_1_operand_ada51176315e62e6497bd2fdefc5b749a}{set\+Zero}} ()
+\item 
+bool \mbox{\hyperlink{class_xbyak_1_1_operand_aa0ff6015e7d58df1fbef621b31eb28d0}{is\+High8bit}} () const
+\item 
+bool \mbox{\hyperlink{class_xbyak_1_1_operand_a771d8a1ae5c59167f53598d96a8e2de4}{is}} (int kind, \mbox{\hyperlink{namespace_xbyak_a880d0e902046fa68ba57ae3fbc4acdf3}{uint32}} \mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}}=0) const
+\item 
+bool \mbox{\hyperlink{class_xbyak_1_1_operand_ab7597e16695f902c54b47f3e57d938b5}{is\+Bit}} (\mbox{\hyperlink{namespace_xbyak_a880d0e902046fa68ba57ae3fbc4acdf3}{uint32}} \mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}}) const
+\item 
+\mbox{\hyperlink{namespace_xbyak_a880d0e902046fa68ba57ae3fbc4acdf3}{uint32}} \mbox{\hyperlink{class_xbyak_1_1_operand_ab855bd6658a3e238422d2bcf81f96873}{get\+Bit}} () const
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_xbyak_1_1_operand_a91b31d592d0a980789f0627f4e06654c}{to\+String}} () const
+\item 
+bool \mbox{\hyperlink{class_xbyak_1_1_operand_aaa7b0308352959ba27ec00fad2e83838}{is\+Equal\+If\+Not\+Inherited}} (const \mbox{\hyperlink{class_xbyak_1_1_operand}{Operand}} \&rhs) const
+\item 
+bool \mbox{\hyperlink{class_xbyak_1_1_operand_a8230601a350974bfc06f29aa44743aa4}{operator==}} (const \mbox{\hyperlink{class_xbyak_1_1_operand}{Operand}} \&rhs) const
+\item 
+bool \mbox{\hyperlink{class_xbyak_1_1_operand_ac4a7ca3effed46ac88686ca9568364a3}{operator!=}} (const \mbox{\hyperlink{class_xbyak_1_1_operand}{Operand}} \&rhs) const
+\item 
+const \mbox{\hyperlink{class_xbyak_1_1_address}{Address}} \& \mbox{\hyperlink{class_xbyak_1_1_operand_a553e665bd1e551fa299a78c7c48e3d39}{get\+Address}} () const
+\item 
+const \mbox{\hyperlink{class_xbyak_1_1_reg}{Reg}} \& \mbox{\hyperlink{class_xbyak_1_1_operand_aeb5b6b64bea046f5966c947425a6703b}{get\+Reg}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{class_xbyak_1_1_operand_a84e995df5368e19ee64caa02f3a66926}{set\+Idx}} (int idx)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+unsigned int \mbox{\hyperlink{class_xbyak_1_1_operand_af80f4a4e3502e05cfbf4ba54329946f2}{zero\+\_\+}}\+:1
+\item 
+unsigned int \mbox{\hyperlink{class_xbyak_1_1_operand_aca73d80838ec810e51d7fec7f8a28abe}{mask\+\_\+}}\+:3
+\item 
+unsigned int \mbox{\hyperlink{class_xbyak_1_1_operand_ae1caaf8be40d1a0ea84e8da7849b37cc}{rounding\+\_\+}}\+:3
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00353}{353}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+
+\doxysubsection{Member Enumeration Documentation}
+\Hypertarget{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846}\index{Xbyak::Operand@{Xbyak::Operand}!Code@{Code}}
+\index{Code@{Code}!Xbyak::Operand@{Xbyak::Operand}}
+\doxysubsubsection{\texorpdfstring{Code}{Code}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846} 
+enum \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846}{Xbyak\+::\+Operand\+::\+Code}}}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{EAX@{EAX}!Xbyak::Operand@{Xbyak::Operand}}\index{Xbyak::Operand@{Xbyak::Operand}!EAX@{EAX}}}\Hypertarget{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a4cd6657e958297a35479ad6583520a67}\label{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846} 
+EAX&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ECX@{ECX}!Xbyak::Operand@{Xbyak::Operand}}\index{Xbyak::Operand@{Xbyak::Operand}!ECX@{ECX}}}\Hypertarget{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a0633f76397deb9e17330a08c7b410a8c}\label{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846} 
+ECX&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{EDX@{EDX}!Xbyak::Operand@{Xbyak::Operand}}\index{Xbyak::Operand@{Xbyak::Operand}!EDX@{EDX}}}\Hypertarget{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a8726c2f76163e0f35d2601750be37f12}\label{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846} 
+EDX&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{EBX@{EBX}!Xbyak::Operand@{Xbyak::Operand}}\index{Xbyak::Operand@{Xbyak::Operand}!EBX@{EBX}}}\Hypertarget{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846ae4800c083bb2d2a087da1ff14990079a}\label{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846} 
+EBX&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ESP@{ESP}!Xbyak::Operand@{Xbyak::Operand}}\index{Xbyak::Operand@{Xbyak::Operand}!ESP@{ESP}}}\Hypertarget{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a1027bc617f8f52395078e43b96d0bb5a}\label{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846} 
+ESP&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{EBP@{EBP}!Xbyak::Operand@{Xbyak::Operand}}\index{Xbyak::Operand@{Xbyak::Operand}!EBP@{EBP}}}\Hypertarget{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a47841e8c6ddcbad4f6ae4f437857e31d}\label{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846} 
+EBP&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ESI@{ESI}!Xbyak::Operand@{Xbyak::Operand}}\index{Xbyak::Operand@{Xbyak::Operand}!ESI@{ESI}}}\Hypertarget{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846aae18a2d599bea597e539fd7e1fb415cb}\label{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846} 
+ESI&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{EDI@{EDI}!Xbyak::Operand@{Xbyak::Operand}}\index{Xbyak::Operand@{Xbyak::Operand}!EDI@{EDI}}}\Hypertarget{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846ae11bd14e6dd6ca1cb53693b4c2cd361e}\label{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846} 
+EDI&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{AX@{AX}!Xbyak::Operand@{Xbyak::Operand}}\index{Xbyak::Operand@{Xbyak::Operand}!AX@{AX}}}\Hypertarget{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a6f5695b5f7c18a0e7579938d91de33bb}\label{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846} 
+AX&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{CX@{CX}!Xbyak::Operand@{Xbyak::Operand}}\index{Xbyak::Operand@{Xbyak::Operand}!CX@{CX}}}\Hypertarget{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846af7097c7ec6f30389c72b0c6ac4f0a3d5}\label{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846} 
+CX&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{DX@{DX}!Xbyak::Operand@{Xbyak::Operand}}\index{Xbyak::Operand@{Xbyak::Operand}!DX@{DX}}}\Hypertarget{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846aa156e6e53bc2fd23aa8861a62e82f6b9}\label{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846} 
+DX&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{BX@{BX}!Xbyak::Operand@{Xbyak::Operand}}\index{Xbyak::Operand@{Xbyak::Operand}!BX@{BX}}}\Hypertarget{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a6d365ab314220693f54e50c007cfd754}\label{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846} 
+BX&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{SP@{SP}!Xbyak::Operand@{Xbyak::Operand}}\index{Xbyak::Operand@{Xbyak::Operand}!SP@{SP}}}\Hypertarget{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846ad64ca664228a615bd9ac634ec75c8298}\label{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846} 
+SP&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{BP@{BP}!Xbyak::Operand@{Xbyak::Operand}}\index{Xbyak::Operand@{Xbyak::Operand}!BP@{BP}}}\Hypertarget{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a4b2755d2928db8d373758329652cc304}\label{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846} 
+BP&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{SI@{SI}!Xbyak::Operand@{Xbyak::Operand}}\index{Xbyak::Operand@{Xbyak::Operand}!SI@{SI}}}\Hypertarget{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846af7751921bd4a1b1a8e71d324cf259465}\label{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846} 
+SI&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{DI@{DI}!Xbyak::Operand@{Xbyak::Operand}}\index{Xbyak::Operand@{Xbyak::Operand}!DI@{DI}}}\Hypertarget{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846ad258a74b07663cf87b60db9f8d1c434b}\label{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846} 
+DI&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{AL@{AL}!Xbyak::Operand@{Xbyak::Operand}}\index{Xbyak::Operand@{Xbyak::Operand}!AL@{AL}}}\Hypertarget{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a2dd47887596c69d9f015a43fa9f31e5c}\label{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846} 
+AL&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{CL@{CL}!Xbyak::Operand@{Xbyak::Operand}}\index{Xbyak::Operand@{Xbyak::Operand}!CL@{CL}}}\Hypertarget{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a5fbb58c96231af5a3c9f1020f3e1373f}\label{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846} 
+CL&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{DL@{DL}!Xbyak::Operand@{Xbyak::Operand}}\index{Xbyak::Operand@{Xbyak::Operand}!DL@{DL}}}\Hypertarget{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a2df878df007d2207b8ea47f51ae867cb}\label{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846} 
+DL&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{BL@{BL}!Xbyak::Operand@{Xbyak::Operand}}\index{Xbyak::Operand@{Xbyak::Operand}!BL@{BL}}}\Hypertarget{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a3fd98f8da96f6918a6b872184444434a}\label{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846} 
+BL&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{AH@{AH}!Xbyak::Operand@{Xbyak::Operand}}\index{Xbyak::Operand@{Xbyak::Operand}!AH@{AH}}}\Hypertarget{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a7ed297782033727d617c17eacbd7f286}\label{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846} 
+AH&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{CH@{CH}!Xbyak::Operand@{Xbyak::Operand}}\index{Xbyak::Operand@{Xbyak::Operand}!CH@{CH}}}\Hypertarget{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a1d9d0e733e8f9f0096bda6b23dd4145c}\label{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846} 
+CH&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{DH@{DH}!Xbyak::Operand@{Xbyak::Operand}}\index{Xbyak::Operand@{Xbyak::Operand}!DH@{DH}}}\Hypertarget{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846ade9d568528a9b679fc4885ebf0ecaa88}\label{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846} 
+DH&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{BH@{BH}!Xbyak::Operand@{Xbyak::Operand}}\index{Xbyak::Operand@{Xbyak::Operand}!BH@{BH}}}\Hypertarget{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846aebbcac94094b13a323ac2e1f327ba12e}\label{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846} 
+BH&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00376}{376}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00376\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00377\ \textcolor{preprocessor}{\#ifdef\ XBYAK64}}
+\DoxyCodeLine{00378\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{make__nm_8cpp_add5c4fd7473c570379f79d8b75709e8c}{RAX}}\ =\ 0,\ RCX,\ RDX,\ RBX,\ RSP,\ RBP,\ RSI,\ RDI,\ R8,\ R9,\ R10,\ R11,\ R12,\ R13,\ R14,\ R15,}
+\DoxyCodeLine{00379\ \ \ \ \ \ \ \ \ R8D\ =\ 8,\ R9D,\ R10D,\ R11D,\ R12D,\ R13D,\ R14D,\ R15D,}
+\DoxyCodeLine{00380\ \ \ \ \ \ \ \ \ R8W\ =\ 8,\ R9W,\ R10W,\ R11W,\ R12W,\ R13W,\ R14W,\ R15W,}
+\DoxyCodeLine{00381\ \ \ \ \ \ \ \ \ R8B\ =\ 8,\ R9B,\ R10B,\ R11B,\ R12B,\ R13B,\ R14B,\ R15B,}
+\DoxyCodeLine{00382\ \ \ \ \ \ \ \ \ SPL\ =\ 4,\ BPL,\ SIL,\ DIL,}
+\DoxyCodeLine{00383\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00384\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a4cd6657e958297a35479ad6583520a67}{EAX}}\ =\ 0,\ \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a0633f76397deb9e17330a08c7b410a8c}{ECX}},\ \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a8726c2f76163e0f35d2601750be37f12}{EDX}},\ \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846ae4800c083bb2d2a087da1ff14990079a}{EBX}},\ \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a1027bc617f8f52395078e43b96d0bb5a}{ESP}},\ \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a47841e8c6ddcbad4f6ae4f437857e31d}{EBP}},\ \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846aae18a2d599bea597e539fd7e1fb415cb}{ESI}},\ \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846ae11bd14e6dd6ca1cb53693b4c2cd361e}{EDI}},}
+\DoxyCodeLine{00385\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a6f5695b5f7c18a0e7579938d91de33bb}{AX}}\ =\ 0,\ \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846af7097c7ec6f30389c72b0c6ac4f0a3d5}{CX}},\ \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846aa156e6e53bc2fd23aa8861a62e82f6b9}{DX}},\ \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a6d365ab314220693f54e50c007cfd754}{BX}},\ \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846ad64ca664228a615bd9ac634ec75c8298}{SP}},\ \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a4b2755d2928db8d373758329652cc304}{BP}},\ \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846af7751921bd4a1b1a8e71d324cf259465}{SI}},\ \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846ad258a74b07663cf87b60db9f8d1c434b}{DI}},}
+\DoxyCodeLine{00386\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a2dd47887596c69d9f015a43fa9f31e5c}{AL}}\ =\ 0,\ \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a5fbb58c96231af5a3c9f1020f3e1373f}{CL}},\ \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a2df878df007d2207b8ea47f51ae867cb}{DL}},\ \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a3fd98f8da96f6918a6b872184444434a}{BL}},\ \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a7ed297782033727d617c17eacbd7f286}{AH}},\ \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a1d9d0e733e8f9f0096bda6b23dd4145c}{CH}},\ \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846ade9d568528a9b679fc4885ebf0ecaa88}{DH}},\ \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846aebbcac94094b13a323ac2e1f327ba12e}{BH}}}
+\DoxyCodeLine{00387\ \ \ \ \ \};}
+
+\end{DoxyCode}
+\Hypertarget{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933b}\index{Xbyak::Operand@{Xbyak::Operand}!Kind@{Kind}}
+\index{Kind@{Kind}!Xbyak::Operand@{Xbyak::Operand}}
+\doxysubsubsection{\texorpdfstring{Kind}{Kind}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933b} 
+enum \mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933b}{Xbyak\+::\+Operand\+::\+Kind}}}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{NONE@{NONE}!Xbyak::Operand@{Xbyak::Operand}}\index{Xbyak::Operand@{Xbyak::Operand}!NONE@{NONE}}}\Hypertarget{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933ba6bbbc7e33ffa1256e35eaa63205c6daa}\label{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933b} 
+NONE&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{MEM@{MEM}!Xbyak::Operand@{Xbyak::Operand}}\index{Xbyak::Operand@{Xbyak::Operand}!MEM@{MEM}}}\Hypertarget{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933ba986b99f1b072c0821e0077bd9a469ad0}\label{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933b} 
+MEM&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{REG@{REG}!Xbyak::Operand@{Xbyak::Operand}}\index{Xbyak::Operand@{Xbyak::Operand}!REG@{REG}}}\Hypertarget{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933ba5cee5588c3a23aee8620236a677ff3f5}\label{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933b} 
+REG&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{MMX@{MMX}!Xbyak::Operand@{Xbyak::Operand}}\index{Xbyak::Operand@{Xbyak::Operand}!MMX@{MMX}}}\Hypertarget{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933ba0bdf21ff8b7e1d36c6fa48fd394c0a54}\label{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933b} 
+MMX&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{FPU@{FPU}!Xbyak::Operand@{Xbyak::Operand}}\index{Xbyak::Operand@{Xbyak::Operand}!FPU@{FPU}}}\Hypertarget{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933ba1769e4d0acbf4fe129429537a960f9bc}\label{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933b} 
+FPU&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{XMM@{XMM}!Xbyak::Operand@{Xbyak::Operand}}\index{Xbyak::Operand@{Xbyak::Operand}!XMM@{XMM}}}\Hypertarget{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933ba974504afdac8c2f752da0fc0df5f9ae2}\label{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933b} 
+XMM&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{YMM@{YMM}!Xbyak::Operand@{Xbyak::Operand}}\index{Xbyak::Operand@{Xbyak::Operand}!YMM@{YMM}}}\Hypertarget{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933baa1754a37db134c90663f28c713a5ad04}\label{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933b} 
+YMM&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZMM@{ZMM}!Xbyak::Operand@{Xbyak::Operand}}\index{Xbyak::Operand@{Xbyak::Operand}!ZMM@{ZMM}}}\Hypertarget{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933ba779c9b07696cb348f7b5768894569d4e}\label{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933b} 
+ZMM&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{OPMASK@{OPMASK}!Xbyak::Operand@{Xbyak::Operand}}\index{Xbyak::Operand@{Xbyak::Operand}!OPMASK@{OPMASK}}}\Hypertarget{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933ba3957facc59122051f2df89f7d934ad86}\label{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933b} 
+OPMASK&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{BNDREG@{BNDREG}!Xbyak::Operand@{Xbyak::Operand}}\index{Xbyak::Operand@{Xbyak::Operand}!BNDREG@{BNDREG}}}\Hypertarget{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933bae150704056abed48b380559e57b1ecdd}\label{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933b} 
+BNDREG&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00364}{364}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00364\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00365\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933ba6bbbc7e33ffa1256e35eaa63205c6daa}{NONE}}\ =\ 0,}
+\DoxyCodeLine{00366\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933ba986b99f1b072c0821e0077bd9a469ad0}{MEM}}\ =\ 1\ <<\ 0,}
+\DoxyCodeLine{00367\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933ba5cee5588c3a23aee8620236a677ff3f5}{REG}}\ =\ 1\ <<\ 1,}
+\DoxyCodeLine{00368\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933ba0bdf21ff8b7e1d36c6fa48fd394c0a54}{MMX}}\ =\ 1\ <<\ 2,}
+\DoxyCodeLine{00369\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933ba1769e4d0acbf4fe129429537a960f9bc}{FPU}}\ =\ 1\ <<\ 3,}
+\DoxyCodeLine{00370\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933ba974504afdac8c2f752da0fc0df5f9ae2}{XMM}}\ =\ 1\ <<\ 4,}
+\DoxyCodeLine{00371\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933baa1754a37db134c90663f28c713a5ad04}{YMM}}\ =\ 1\ <<\ 5,}
+\DoxyCodeLine{00372\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933ba779c9b07696cb348f7b5768894569d4e}{ZMM}}\ =\ 1\ <<\ 6,}
+\DoxyCodeLine{00373\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933ba3957facc59122051f2df89f7d934ad86}{OPMASK}}\ =\ 1\ <<\ 7,}
+\DoxyCodeLine{00374\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933bae150704056abed48b380559e57b1ecdd}{BNDREG}}\ =\ 1\ <<\ 8}
+\DoxyCodeLine{00375\ \ \ \ \ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_xbyak_1_1_operand_acf1e02ccf35af769d8d4f3cfa4c00a31}\index{Xbyak::Operand@{Xbyak::Operand}!Operand@{Operand}}
+\index{Operand@{Operand}!Xbyak::Operand@{Xbyak::Operand}}
+\doxysubsubsection{\texorpdfstring{Operand()}{Operand()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_operand_acf1e02ccf35af769d8d4f3cfa4c00a31} 
+Xbyak\+::\+Operand\+::\+Operand (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00388}{388}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00388\ :\ idx\_(0),\ kind\_(0),\ bit\_(0),\ \mbox{\hyperlink{class_xbyak_1_1_operand_af80f4a4e3502e05cfbf4ba54329946f2}{zero\_}}(0),\ \mbox{\hyperlink{class_xbyak_1_1_operand_aca73d80838ec810e51d7fec7f8a28abe}{mask\_}}(0),\ \mbox{\hyperlink{class_xbyak_1_1_operand_ae1caaf8be40d1a0ea84e8da7849b37cc}{rounding\_}}(0)\ \{\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_xbyak_1_1_operand_a78c8c4d23855cdab33d769e950c7d242}\index{Xbyak::Operand@{Xbyak::Operand}!Operand@{Operand}}
+\index{Operand@{Operand}!Xbyak::Operand@{Xbyak::Operand}}
+\doxysubsubsection{\texorpdfstring{Operand()}{Operand()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_operand_a78c8c4d23855cdab33d769e950c7d242} 
+Xbyak\+::\+Operand\+::\+Operand (\begin{DoxyParamCaption}\item[{int}]{idx}{, }\item[{\mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933b}{Kind}}}]{kind}{, }\item[{int}]{bit}{, }\item[{bool}]{ext8bit}{ = {\ttfamily 0}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00389}{389}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00390\ \ \ \ \ \ \ \ \ :\ idx\_(\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{normalize__prefix_8cpp_adde6aaee8457bee49c2a92621fe22b79}{uint8}}\textcolor{keyword}{>}(idx\ |\ (ext8bit\ ?\ EXT8BIT\ :\ 0)))}
+\DoxyCodeLine{00391\ \ \ \ \ \ \ \ \ ,\ kind\_(kind)}
+\DoxyCodeLine{00392\ \ \ \ \ \ \ \ \ ,\ bit\_(\mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}})}
+\DoxyCodeLine{00393\ \ \ \ \ \ \ \ \ ,\ \mbox{\hyperlink{class_xbyak_1_1_operand_af80f4a4e3502e05cfbf4ba54329946f2}{zero\_}}(0),\ \mbox{\hyperlink{class_xbyak_1_1_operand_aca73d80838ec810e51d7fec7f8a28abe}{mask\_}}(0),\ \mbox{\hyperlink{class_xbyak_1_1_operand_ae1caaf8be40d1a0ea84e8da7849b37cc}{rounding\_}}(0)}
+\DoxyCodeLine{00394\ \ \ \ \ \{}
+\DoxyCodeLine{00395\ \ \ \ \ \ \ \ \ assert((bit\_\ \&\ (bit\_\ -\/\ 1))\ ==\ 0);\ \textcolor{comment}{//\ bit\ must\ be\ power\ of\ two}}
+\DoxyCodeLine{00396\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_xbyak_1_1_operand_a553e665bd1e551fa299a78c7c48e3d39}\index{Xbyak::Operand@{Xbyak::Operand}!getAddress@{getAddress}}
+\index{getAddress@{getAddress}!Xbyak::Operand@{Xbyak::Operand}}
+\doxysubsubsection{\texorpdfstring{getAddress()}{getAddress()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_operand_a553e665bd1e551fa299a78c7c48e3d39} 
+const \mbox{\hyperlink{class_xbyak_1_1_address}{Address}} \& Xbyak\+::\+Operand\+::get\+Address (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l01044}{1044}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01045\ \{}
+\DoxyCodeLine{01046\ \ \ \ \ assert(\mbox{\hyperlink{class_xbyak_1_1_operand_ac19f160ee96afdf829f4154ffd9fe1fc}{isMEM}}());}
+\DoxyCodeLine{01047\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\textcolor{keyword}{const\ }Address\&\textcolor{keyword}{>}(*this);}
+\DoxyCodeLine{01048\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{class_xbyak_1_1_operand_a553e665bd1e551fa299a78c7c48e3d39_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_xbyak_1_1_operand_ab855bd6658a3e238422d2bcf81f96873}\index{Xbyak::Operand@{Xbyak::Operand}!getBit@{getBit}}
+\index{getBit@{getBit}!Xbyak::Operand@{Xbyak::Operand}}
+\doxysubsubsection{\texorpdfstring{getBit()}{getBit()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_operand_ab855bd6658a3e238422d2bcf81f96873} 
+\mbox{\hyperlink{namespace_xbyak_a880d0e902046fa68ba57ae3fbc4acdf3}{uint32}} Xbyak\+::\+Operand\+::get\+Bit (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00453}{453}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00453\ \{\ \textcolor{keywordflow}{return}\ bit\_;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{class_xbyak_1_1_operand_ab855bd6658a3e238422d2bcf81f96873_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_xbyak_1_1_operand_a9722a98c75928e06e3be3198b7aaa426}\index{Xbyak::Operand@{Xbyak::Operand}!getIdx@{getIdx}}
+\index{getIdx@{getIdx}!Xbyak::Operand@{Xbyak::Operand}}
+\doxysubsubsection{\texorpdfstring{getIdx()}{getIdx()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_operand_a9722a98c75928e06e3be3198b7aaa426} 
+int Xbyak\+::\+Operand\+::get\+Idx (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00398}{398}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00398\ \{\ \textcolor{keywordflow}{return}\ idx\_\ \&\ (EXT8BIT\ -\/\ 1);\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{class_xbyak_1_1_operand_a9722a98c75928e06e3be3198b7aaa426_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_xbyak_1_1_operand_a209c322fcecff9f02e62462ec754fa6f}\index{Xbyak::Operand@{Xbyak::Operand}!getKind@{getKind}}
+\index{getKind@{getKind}!Xbyak::Operand@{Xbyak::Operand}}
+\doxysubsubsection{\texorpdfstring{getKind()}{getKind()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_operand_a209c322fcecff9f02e62462ec754fa6f} 
+\mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933b}{Kind}} Xbyak\+::\+Operand\+::get\+Kind (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00397}{397}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00397\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933b}{Kind}}\textcolor{keyword}{>}(kind\_);\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_xbyak_1_1_operand_a209c322fcecff9f02e62462ec754fa6f_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_xbyak_1_1_operand_aa948d58929e477691fa5e3a855134dfd}\index{Xbyak::Operand@{Xbyak::Operand}!getOpmaskIdx@{getOpmaskIdx}}
+\index{getOpmaskIdx@{getOpmaskIdx}!Xbyak::Operand@{Xbyak::Operand}}
+\doxysubsubsection{\texorpdfstring{getOpmaskIdx()}{getOpmaskIdx()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_operand_aa948d58929e477691fa5e3a855134dfd} 
+int Xbyak\+::\+Operand\+::get\+Opmask\+Idx (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00418}{418}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00418\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_xbyak_1_1_operand_aca73d80838ec810e51d7fec7f8a28abe}{mask\_}};\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_xbyak_1_1_operand_aa948d58929e477691fa5e3a855134dfd_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_xbyak_1_1_operand_aeb5b6b64bea046f5966c947425a6703b}\index{Xbyak::Operand@{Xbyak::Operand}!getReg@{getReg}}
+\index{getReg@{getReg}!Xbyak::Operand@{Xbyak::Operand}}
+\doxysubsubsection{\texorpdfstring{getReg()}{getReg()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_operand_aeb5b6b64bea046f5966c947425a6703b} 
+const \mbox{\hyperlink{class_xbyak_1_1_reg}{Reg}} \& Xbyak\+::\+Operand\+::get\+Reg (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00540}{540}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00541\ \{}
+\DoxyCodeLine{00542\ \ \ \ \ assert(!\mbox{\hyperlink{class_xbyak_1_1_operand_ac19f160ee96afdf829f4154ffd9fe1fc}{isMEM}}());}
+\DoxyCodeLine{00543\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\textcolor{keyword}{const\ }\mbox{\hyperlink{struct_reg}{Reg}}\&\textcolor{keyword}{>}(*this);}
+\DoxyCodeLine{00544\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{class_xbyak_1_1_operand_aeb5b6b64bea046f5966c947425a6703b_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_xbyak_1_1_operand_a1c2de351f77e1f2ebb070c99aedc752c}\index{Xbyak::Operand@{Xbyak::Operand}!getRounding@{getRounding}}
+\index{getRounding@{getRounding}!Xbyak::Operand@{Xbyak::Operand}}
+\doxysubsubsection{\texorpdfstring{getRounding()}{getRounding()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_operand_a1c2de351f77e1f2ebb070c99aedc752c} 
+int Xbyak\+::\+Operand\+::get\+Rounding (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00419}{419}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00419\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_xbyak_1_1_operand_ae1caaf8be40d1a0ea84e8da7849b37cc}{rounding\_}};\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_xbyak_1_1_operand_a1c2de351f77e1f2ebb070c99aedc752c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_xbyak_1_1_operand_ab1d912dc190e8fb6845400c2c3fe984b}\index{Xbyak::Operand@{Xbyak::Operand}!hasEvex@{hasEvex}}
+\index{hasEvex@{hasEvex}!Xbyak::Operand@{Xbyak::Operand}}
+\doxysubsubsection{\texorpdfstring{hasEvex()}{hasEvex()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_operand_ab1d912dc190e8fb6845400c2c3fe984b} 
+bool Xbyak\+::\+Operand\+::has\+Evex (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00415}{415}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00415\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_xbyak_1_1_operand_a84f556436fcca82114f31a11fa1c8d6d}{isZMM}}()\ ||\ \mbox{\hyperlink{class_xbyak_1_1_operand_a08c30697005cb69a10e16251e2f04280}{isExtIdx2}}()\ ||\ \mbox{\hyperlink{class_xbyak_1_1_operand_aa948d58929e477691fa5e3a855134dfd}{getOpmaskIdx}}()\ ||\ \mbox{\hyperlink{class_xbyak_1_1_operand_a1c2de351f77e1f2ebb070c99aedc752c}{getRounding}}();\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_xbyak_1_1_operand_ab1d912dc190e8fb6845400c2c3fe984b_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_xbyak_1_1_operand_af45f32fe9206c761ea3c230b5e049548}\index{Xbyak::Operand@{Xbyak::Operand}!hasRex@{hasRex}}
+\index{hasRex@{hasRex}!Xbyak::Operand@{Xbyak::Operand}}
+\doxysubsubsection{\texorpdfstring{hasRex()}{hasRex()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_operand_af45f32fe9206c761ea3c230b5e049548} 
+bool Xbyak\+::\+Operand\+::has\+Rex (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00416}{416}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00416\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_xbyak_1_1_operand_a0fd53f9394841224652bf009be2173b3}{isExt8bit}}()\ ||\ \mbox{\hyperlink{class_xbyak_1_1_operand_a4029ea538d06b3cea1afd3a0ebb99435}{isREG}}(64)\ ||\ \mbox{\hyperlink{class_xbyak_1_1_operand_ae0e37428afb23c2827d368e23a250ef9}{isExtIdx}}();\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_xbyak_1_1_operand_af45f32fe9206c761ea3c230b5e049548_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_xbyak_1_1_operand_adf4bc2c35ff0f6af393a4686bccc3c3e}\index{Xbyak::Operand@{Xbyak::Operand}!hasZero@{hasZero}}
+\index{hasZero@{hasZero}!Xbyak::Operand@{Xbyak::Operand}}
+\doxysubsubsection{\texorpdfstring{hasZero()}{hasZero()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_operand_adf4bc2c35ff0f6af393a4686bccc3c3e} 
+bool Xbyak\+::\+Operand\+::has\+Zero (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00417}{417}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00417\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_xbyak_1_1_operand_af80f4a4e3502e05cfbf4ba54329946f2}{zero\_}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_xbyak_1_1_operand_a771d8a1ae5c59167f53598d96a8e2de4}\index{Xbyak::Operand@{Xbyak::Operand}!is@{is}}
+\index{is@{is}!Xbyak::Operand@{Xbyak::Operand}}
+\doxysubsubsection{\texorpdfstring{is()}{is()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_operand_a771d8a1ae5c59167f53598d96a8e2de4} 
+bool Xbyak\+::\+Operand\+::is (\begin{DoxyParamCaption}\item[{int}]{kind}{, }\item[{\mbox{\hyperlink{namespace_xbyak_a880d0e902046fa68ba57ae3fbc4acdf3}{uint32}}}]{bit}{ = {\ttfamily 0}}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00448}{448}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00449\ \ \ \ \ \{}
+\DoxyCodeLine{00450\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (kind\ ==\ 0\ ||\ (kind\_\ \&\ kind))\ \&\&\ (\mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}}\ ==\ 0\ ||\ (bit\_\ \&\ \mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}}));\ \textcolor{comment}{//\ cf.\ you\ can\ set\ (8|16)}}
+\DoxyCodeLine{00451\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_xbyak_1_1_operand_a771d8a1ae5c59167f53598d96a8e2de4_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_xbyak_1_1_operand_ab7597e16695f902c54b47f3e57d938b5}\index{Xbyak::Operand@{Xbyak::Operand}!isBit@{isBit}}
+\index{isBit@{isBit}!Xbyak::Operand@{Xbyak::Operand}}
+\doxysubsubsection{\texorpdfstring{isBit()}{isBit()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_operand_ab7597e16695f902c54b47f3e57d938b5} 
+bool Xbyak\+::\+Operand\+::is\+Bit (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespace_xbyak_a880d0e902046fa68ba57ae3fbc4acdf3}{uint32}}}]{bit}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00452}{452}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00452\ \{\ \textcolor{keywordflow}{return}\ (bit\_\ \&\ \mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}})\ !=\ 0;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{class_xbyak_1_1_operand_ab7597e16695f902c54b47f3e57d938b5_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_xbyak_1_1_operand_ad58425431c023d3dfdd8efcbd68ce463}\index{Xbyak::Operand@{Xbyak::Operand}!isBNDREG@{isBNDREG}}
+\index{isBNDREG@{isBNDREG}!Xbyak::Operand@{Xbyak::Operand}}
+\doxysubsubsection{\texorpdfstring{isBNDREG()}{isBNDREG()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_operand_ad58425431c023d3dfdd8efcbd68ce463} 
+bool Xbyak\+::\+Operand\+::is\+BNDREG (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00408}{408}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00408\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_xbyak_1_1_operand_a771d8a1ae5c59167f53598d96a8e2de4}{is}}(\mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933bae150704056abed48b380559e57b1ecdd}{BNDREG}});\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_xbyak_1_1_operand_ad58425431c023d3dfdd8efcbd68ce463_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_xbyak_1_1_operand_aaa7b0308352959ba27ec00fad2e83838}\index{Xbyak::Operand@{Xbyak::Operand}!isEqualIfNotInherited@{isEqualIfNotInherited}}
+\index{isEqualIfNotInherited@{isEqualIfNotInherited}!Xbyak::Operand@{Xbyak::Operand}}
+\doxysubsubsection{\texorpdfstring{isEqualIfNotInherited()}{isEqualIfNotInherited()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_operand_aaa7b0308352959ba27ec00fad2e83838} 
+bool Xbyak\+::\+Operand\+::is\+Equal\+If\+Not\+Inherited (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_xbyak_1_1_operand}{Operand}} \&}]{rhs}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00502}{502}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00502\ \{\ \textcolor{keywordflow}{return}\ idx\_\ ==\ rhs.idx\_\ \&\&\ kind\_\ ==\ rhs.kind\_\ \&\&\ bit\_\ ==\ rhs.bit\_\ \&\&\ \mbox{\hyperlink{class_xbyak_1_1_operand_af80f4a4e3502e05cfbf4ba54329946f2}{zero\_}}\ ==\ rhs.zero\_\ \&\&\ \mbox{\hyperlink{class_xbyak_1_1_operand_aca73d80838ec810e51d7fec7f8a28abe}{mask\_}}\ ==\ rhs.mask\_\ \&\&\ \mbox{\hyperlink{class_xbyak_1_1_operand_ae1caaf8be40d1a0ea84e8da7849b37cc}{rounding\_}}\ ==\ rhs.rounding\_;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_xbyak_1_1_operand_a0fd53f9394841224652bf009be2173b3}\index{Xbyak::Operand@{Xbyak::Operand}!isExt8bit@{isExt8bit}}
+\index{isExt8bit@{isExt8bit}!Xbyak::Operand@{Xbyak::Operand}}
+\doxysubsubsection{\texorpdfstring{isExt8bit()}{isExt8bit()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_operand_a0fd53f9394841224652bf009be2173b3} 
+bool Xbyak\+::\+Operand\+::is\+Ext8bit (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00412}{412}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00412\ \{\ \textcolor{keywordflow}{return}\ (idx\_\ \&\ EXT8BIT)\ !=\ 0;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_xbyak_1_1_operand_a0fd53f9394841224652bf009be2173b3_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_xbyak_1_1_operand_ae0e37428afb23c2827d368e23a250ef9}\index{Xbyak::Operand@{Xbyak::Operand}!isExtIdx@{isExtIdx}}
+\index{isExtIdx@{isExtIdx}!Xbyak::Operand@{Xbyak::Operand}}
+\doxysubsubsection{\texorpdfstring{isExtIdx()}{isExtIdx()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_operand_ae0e37428afb23c2827d368e23a250ef9} 
+bool Xbyak\+::\+Operand\+::is\+Ext\+Idx (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00413}{413}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00413\ \{\ \textcolor{keywordflow}{return}\ (\mbox{\hyperlink{class_xbyak_1_1_operand_a9722a98c75928e06e3be3198b7aaa426}{getIdx}}()\ \&\ 8)\ !=\ 0;\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_xbyak_1_1_operand_ae0e37428afb23c2827d368e23a250ef9_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_xbyak_1_1_operand_ae0e37428afb23c2827d368e23a250ef9_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_xbyak_1_1_operand_a08c30697005cb69a10e16251e2f04280}\index{Xbyak::Operand@{Xbyak::Operand}!isExtIdx2@{isExtIdx2}}
+\index{isExtIdx2@{isExtIdx2}!Xbyak::Operand@{Xbyak::Operand}}
+\doxysubsubsection{\texorpdfstring{isExtIdx2()}{isExtIdx2()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_operand_a08c30697005cb69a10e16251e2f04280} 
+bool Xbyak\+::\+Operand\+::is\+Ext\+Idx2 (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00414}{414}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00414\ \{\ \textcolor{keywordflow}{return}\ (\mbox{\hyperlink{class_xbyak_1_1_operand_a9722a98c75928e06e3be3198b7aaa426}{getIdx}}()\ \&\ 16)\ !=\ 0;\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_xbyak_1_1_operand_a08c30697005cb69a10e16251e2f04280_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_xbyak_1_1_operand_a08c30697005cb69a10e16251e2f04280_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_xbyak_1_1_operand_a4376cef05826332bd486095a4e5eac6f}\index{Xbyak::Operand@{Xbyak::Operand}!isFPU@{isFPU}}
+\index{isFPU@{isFPU}!Xbyak::Operand@{Xbyak::Operand}}
+\doxysubsubsection{\texorpdfstring{isFPU()}{isFPU()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_operand_a4376cef05826332bd486095a4e5eac6f} 
+bool Xbyak\+::\+Operand\+::is\+FPU (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00411}{411}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00411\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_xbyak_1_1_operand_a771d8a1ae5c59167f53598d96a8e2de4}{is}}(\mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933ba1769e4d0acbf4fe129429537a960f9bc}{FPU}});\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=336pt]{class_xbyak_1_1_operand_a4376cef05826332bd486095a4e5eac6f_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_xbyak_1_1_operand_aa0ff6015e7d58df1fbef621b31eb28d0}\index{Xbyak::Operand@{Xbyak::Operand}!isHigh8bit@{isHigh8bit}}
+\index{isHigh8bit@{isHigh8bit}!Xbyak::Operand@{Xbyak::Operand}}
+\doxysubsubsection{\texorpdfstring{isHigh8bit()}{isHigh8bit()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_operand_aa0ff6015e7d58df1fbef621b31eb28d0} 
+bool Xbyak\+::\+Operand\+::is\+High8bit (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00440}{440}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00441\ \ \ \ \ \{}
+\DoxyCodeLine{00442\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{class_xbyak_1_1_operand_ab7597e16695f902c54b47f3e57d938b5}{isBit}}(8))\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00443\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_xbyak_1_1_operand_a0fd53f9394841224652bf009be2173b3}{isExt8bit}}())\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00444\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ =\ \mbox{\hyperlink{class_xbyak_1_1_operand_a9722a98c75928e06e3be3198b7aaa426}{getIdx}}();}
+\DoxyCodeLine{00445\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a7ed297782033727d617c17eacbd7f286}{AH}}\ <=\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ \&\&\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ <=\ \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846aebbcac94094b13a323ac2e1f327ba12e}{BH}};}
+\DoxyCodeLine{00446\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_xbyak_1_1_operand_ac19f160ee96afdf829f4154ffd9fe1fc}\index{Xbyak::Operand@{Xbyak::Operand}!isMEM@{isMEM}}
+\index{isMEM@{isMEM}!Xbyak::Operand@{Xbyak::Operand}}
+\doxysubsubsection{\texorpdfstring{isMEM()}{isMEM()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_operand_ac19f160ee96afdf829f4154ffd9fe1fc} 
+bool Xbyak\+::\+Operand\+::is\+MEM (\begin{DoxyParamCaption}\item[{int}]{bit}{ = {\ttfamily 0}}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00410}{410}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00410\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_xbyak_1_1_operand_a771d8a1ae5c59167f53598d96a8e2de4}{is}}(\mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933ba986b99f1b072c0821e0077bd9a469ad0}{MEM}},\ \mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}});\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=339pt]{class_xbyak_1_1_operand_ac19f160ee96afdf829f4154ffd9fe1fc_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{class_xbyak_1_1_operand_ac19f160ee96afdf829f4154ffd9fe1fc_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_xbyak_1_1_operand_a5306a21d9e3c6305703faf108dd6357e}\index{Xbyak::Operand@{Xbyak::Operand}!isMMX@{isMMX}}
+\index{isMMX@{isMMX}!Xbyak::Operand@{Xbyak::Operand}}
+\doxysubsubsection{\texorpdfstring{isMMX()}{isMMX()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_operand_a5306a21d9e3c6305703faf108dd6357e} 
+bool Xbyak\+::\+Operand\+::is\+MMX (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00400}{400}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00400\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_xbyak_1_1_operand_a771d8a1ae5c59167f53598d96a8e2de4}{is}}(\mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933ba0bdf21ff8b7e1d36c6fa48fd394c0a54}{MMX}});\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=339pt]{class_xbyak_1_1_operand_a5306a21d9e3c6305703faf108dd6357e_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_xbyak_1_1_operand_af83a6a5fbcad1f4ac74ee3fde5070b0c}\index{Xbyak::Operand@{Xbyak::Operand}!isNone@{isNone}}
+\index{isNone@{isNone}!Xbyak::Operand@{Xbyak::Operand}}
+\doxysubsubsection{\texorpdfstring{isNone()}{isNone()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_operand_af83a6a5fbcad1f4ac74ee3fde5070b0c} 
+bool Xbyak\+::\+Operand\+::is\+None (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00399}{399}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00399\ \{\ \textcolor{keywordflow}{return}\ kind\_\ ==\ 0;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_xbyak_1_1_operand_a2cb3c6e9e8025e1dd8348cbf4f4c0dfc}\index{Xbyak::Operand@{Xbyak::Operand}!isOPMASK@{isOPMASK}}
+\index{isOPMASK@{isOPMASK}!Xbyak::Operand@{Xbyak::Operand}}
+\doxysubsubsection{\texorpdfstring{isOPMASK()}{isOPMASK()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_operand_a2cb3c6e9e8025e1dd8348cbf4f4c0dfc} 
+bool Xbyak\+::\+Operand\+::is\+OPMASK (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00407}{407}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00407\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_xbyak_1_1_operand_a771d8a1ae5c59167f53598d96a8e2de4}{is}}(\mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933ba3957facc59122051f2df89f7d934ad86}{OPMASK}});\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_xbyak_1_1_operand_a2cb3c6e9e8025e1dd8348cbf4f4c0dfc_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_xbyak_1_1_operand_a4029ea538d06b3cea1afd3a0ebb99435}\index{Xbyak::Operand@{Xbyak::Operand}!isREG@{isREG}}
+\index{isREG@{isREG}!Xbyak::Operand@{Xbyak::Operand}}
+\doxysubsubsection{\texorpdfstring{isREG()}{isREG()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_operand_a4029ea538d06b3cea1afd3a0ebb99435} 
+bool Xbyak\+::\+Operand\+::is\+REG (\begin{DoxyParamCaption}\item[{int}]{bit}{ = {\ttfamily 0}}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00409}{409}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00409\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_xbyak_1_1_operand_a771d8a1ae5c59167f53598d96a8e2de4}{is}}(\mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933ba5cee5588c3a23aee8620236a677ff3f5}{REG}},\ \mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}});\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=338pt]{class_xbyak_1_1_operand_a4029ea538d06b3cea1afd3a0ebb99435_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{class_xbyak_1_1_operand_a4029ea538d06b3cea1afd3a0ebb99435_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_xbyak_1_1_operand_ab4812fc1303247fa863643ca1c971b48}\index{Xbyak::Operand@{Xbyak::Operand}!isXMEM@{isXMEM}}
+\index{isXMEM@{isXMEM}!Xbyak::Operand@{Xbyak::Operand}}
+\doxysubsubsection{\texorpdfstring{isXMEM()}{isXMEM()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_operand_ab4812fc1303247fa863643ca1c971b48} 
+bool Xbyak\+::\+Operand\+::is\+XMEM (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00404}{404}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00404\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_xbyak_1_1_operand_a771d8a1ae5c59167f53598d96a8e2de4}{is}}(\mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933ba974504afdac8c2f752da0fc0df5f9ae2}{XMM}}\ |\ \mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933ba986b99f1b072c0821e0077bd9a469ad0}{MEM}});\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=346pt]{class_xbyak_1_1_operand_ab4812fc1303247fa863643ca1c971b48_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_xbyak_1_1_operand_a8483cb23fc2fcba13e05f0fcd279d7b0}\index{Xbyak::Operand@{Xbyak::Operand}!isXMM@{isXMM}}
+\index{isXMM@{isXMM}!Xbyak::Operand@{Xbyak::Operand}}
+\doxysubsubsection{\texorpdfstring{isXMM()}{isXMM()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_operand_a8483cb23fc2fcba13e05f0fcd279d7b0} 
+bool Xbyak\+::\+Operand\+::is\+XMM (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00401}{401}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00401\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_xbyak_1_1_operand_a771d8a1ae5c59167f53598d96a8e2de4}{is}}(\mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933ba974504afdac8c2f752da0fc0df5f9ae2}{XMM}});\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=339pt]{class_xbyak_1_1_operand_a8483cb23fc2fcba13e05f0fcd279d7b0_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_xbyak_1_1_operand_a0b9b5d66efcd55697ad382d449b9f015}\index{Xbyak::Operand@{Xbyak::Operand}!isYMEM@{isYMEM}}
+\index{isYMEM@{isYMEM}!Xbyak::Operand@{Xbyak::Operand}}
+\doxysubsubsection{\texorpdfstring{isYMEM()}{isYMEM()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_operand_a0b9b5d66efcd55697ad382d449b9f015} 
+bool Xbyak\+::\+Operand\+::is\+YMEM (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00405}{405}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00405\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_xbyak_1_1_operand_a771d8a1ae5c59167f53598d96a8e2de4}{is}}(\mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933baa1754a37db134c90663f28c713a5ad04}{YMM}}\ |\ \mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933ba986b99f1b072c0821e0077bd9a469ad0}{MEM}});\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=346pt]{class_xbyak_1_1_operand_a0b9b5d66efcd55697ad382d449b9f015_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_xbyak_1_1_operand_a7eecec4168018f49a4de1fca690daf82}\index{Xbyak::Operand@{Xbyak::Operand}!isYMM@{isYMM}}
+\index{isYMM@{isYMM}!Xbyak::Operand@{Xbyak::Operand}}
+\doxysubsubsection{\texorpdfstring{isYMM()}{isYMM()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_operand_a7eecec4168018f49a4de1fca690daf82} 
+bool Xbyak\+::\+Operand\+::is\+YMM (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00402}{402}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00402\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_xbyak_1_1_operand_a771d8a1ae5c59167f53598d96a8e2de4}{is}}(\mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933baa1754a37db134c90663f28c713a5ad04}{YMM}});\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=339pt]{class_xbyak_1_1_operand_a7eecec4168018f49a4de1fca690daf82_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_xbyak_1_1_operand_ae1166f22d239ee0164830e3c418ba9da}\index{Xbyak::Operand@{Xbyak::Operand}!isZMEM@{isZMEM}}
+\index{isZMEM@{isZMEM}!Xbyak::Operand@{Xbyak::Operand}}
+\doxysubsubsection{\texorpdfstring{isZMEM()}{isZMEM()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_operand_ae1166f22d239ee0164830e3c418ba9da} 
+bool Xbyak\+::\+Operand\+::is\+ZMEM (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00406}{406}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00406\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_xbyak_1_1_operand_a771d8a1ae5c59167f53598d96a8e2de4}{is}}(\mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933ba779c9b07696cb348f7b5768894569d4e}{ZMM}}\ |\ \mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933ba986b99f1b072c0821e0077bd9a469ad0}{MEM}});\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=345pt]{class_xbyak_1_1_operand_ae1166f22d239ee0164830e3c418ba9da_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_xbyak_1_1_operand_a84f556436fcca82114f31a11fa1c8d6d}\index{Xbyak::Operand@{Xbyak::Operand}!isZMM@{isZMM}}
+\index{isZMM@{isZMM}!Xbyak::Operand@{Xbyak::Operand}}
+\doxysubsubsection{\texorpdfstring{isZMM()}{isZMM()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_operand_a84f556436fcca82114f31a11fa1c8d6d} 
+bool Xbyak\+::\+Operand\+::is\+ZMM (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00403}{403}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00403\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_xbyak_1_1_operand_a771d8a1ae5c59167f53598d96a8e2de4}{is}}(\mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933ba779c9b07696cb348f7b5768894569d4e}{ZMM}});\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=339pt]{class_xbyak_1_1_operand_a84f556436fcca82114f31a11fa1c8d6d_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_xbyak_1_1_operand_a84f556436fcca82114f31a11fa1c8d6d_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_xbyak_1_1_operand_ac4a7ca3effed46ac88686ca9568364a3}\index{Xbyak::Operand@{Xbyak::Operand}!operator"!=@{operator"!=}}
+\index{operator"!=@{operator"!=}!Xbyak::Operand@{Xbyak::Operand}}
+\doxysubsubsection{\texorpdfstring{operator"!=()}{operator!=()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_operand_ac4a7ca3effed46ac88686ca9568364a3} 
+bool Xbyak\+::\+Operand\+::operator!= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_xbyak_1_1_operand}{Operand}} \&}]{rhs}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00504}{504}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00504\ \{\ \textcolor{keywordflow}{return}\ !\mbox{\hyperlink{class_xbyak_1_1_operand_a8230601a350974bfc06f29aa44743aa4}{operator==}}(rhs);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_xbyak_1_1_operand_a8230601a350974bfc06f29aa44743aa4}\index{Xbyak::Operand@{Xbyak::Operand}!operator==@{operator==}}
+\index{operator==@{operator==}!Xbyak::Operand@{Xbyak::Operand}}
+\doxysubsubsection{\texorpdfstring{operator==()}{operator==()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_operand_a8230601a350974bfc06f29aa44743aa4} 
+bool Xbyak\+::\+Operand\+::operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_xbyak_1_1_operand}{Operand}} \&}]{rhs}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l01050}{1050}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01051\ \{}
+\DoxyCodeLine{01052\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_xbyak_1_1_operand_ac19f160ee96afdf829f4154ffd9fe1fc}{isMEM}}()\ \&\&\ rhs.isMEM())\ \textcolor{keywordflow}{return}\ this-\/>\mbox{\hyperlink{class_xbyak_1_1_operand_a553e665bd1e551fa299a78c7c48e3d39}{getAddress}}()\ ==\ rhs.\mbox{\hyperlink{class_xbyak_1_1_operand_a553e665bd1e551fa299a78c7c48e3d39}{getAddress}}();}
+\DoxyCodeLine{01053\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_xbyak_1_1_operand_aaa7b0308352959ba27ec00fad2e83838}{isEqualIfNotInherited}}(rhs);}
+\DoxyCodeLine{01054\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_xbyak_1_1_operand_a8230601a350974bfc06f29aa44743aa4_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_xbyak_1_1_operand_abf0d6e2e262fe0cf98a90aaf69ed0f6c}\index{Xbyak::Operand@{Xbyak::Operand}!setBit@{setBit}}
+\index{setBit@{setBit}!Xbyak::Operand@{Xbyak::Operand}}
+\doxysubsubsection{\texorpdfstring{setBit()}{setBit()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_operand_abf0d6e2e262fe0cf98a90aaf69ed0f6c} 
+void Xbyak\+::\+Operand\+::set\+Bit (\begin{DoxyParamCaption}\item[{int}]{bit}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00426}{426}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00426\ \{\ bit\_\ =\ \mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_xbyak_1_1_operand_a84e995df5368e19ee64caa02f3a66926}\index{Xbyak::Operand@{Xbyak::Operand}!setIdx@{setIdx}}
+\index{setIdx@{setIdx}!Xbyak::Operand@{Xbyak::Operand}}
+\doxysubsubsection{\texorpdfstring{setIdx()}{setIdx()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_operand_a84e995df5368e19ee64caa02f3a66926} 
+void Xbyak\+::\+Operand\+::set\+Idx (\begin{DoxyParamCaption}\item[{int}]{idx}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00362}{362}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00362\ \{\ idx\_\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_xbyak_1_1_operand_ae4566ecb8f753309634f398e38815f3a}\index{Xbyak::Operand@{Xbyak::Operand}!setKind@{setKind}}
+\index{setKind@{setKind}!Xbyak::Operand@{Xbyak::Operand}}
+\doxysubsubsection{\texorpdfstring{setKind()}{setKind()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_operand_ae4566ecb8f753309634f398e38815f3a} 
+void Xbyak\+::\+Operand\+::set\+Kind (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933b}{Kind}}}]{kind}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00420}{420}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00421\ \ \ \ \ \{}
+\DoxyCodeLine{00422\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((kind\ \&\ (\mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933ba974504afdac8c2f752da0fc0df5f9ae2}{XMM}}|\mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933baa1754a37db134c90663f28c713a5ad04}{YMM}}|\mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933ba779c9b07696cb348f7b5768894569d4e}{ZMM}}))\ ==\ 0)\ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00423\ \ \ \ \ \ \ \ \ kind\_\ =\ kind;}
+\DoxyCodeLine{00424\ \ \ \ \ \ \ \ \ bit\_\ =\ kind\ ==\ \mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933ba974504afdac8c2f752da0fc0df5f9ae2}{XMM}}\ ?\ 128\ :\ kind\ ==\ \mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933baa1754a37db134c90663f28c713a5ad04}{YMM}}\ ?\ 256\ :\ 512;}
+\DoxyCodeLine{00425\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_xbyak_1_1_operand_aa2f69fb69466ecd3f61ff6c14bfe03e7}\index{Xbyak::Operand@{Xbyak::Operand}!setOpmaskIdx@{setOpmaskIdx}}
+\index{setOpmaskIdx@{setOpmaskIdx}!Xbyak::Operand@{Xbyak::Operand}}
+\doxysubsubsection{\texorpdfstring{setOpmaskIdx()}{setOpmaskIdx()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_operand_aa2f69fb69466ecd3f61ff6c14bfe03e7} 
+void Xbyak\+::\+Operand\+::set\+Opmask\+Idx (\begin{DoxyParamCaption}\item[{int}]{idx}{, }\item[{bool}]{ignore\+\_\+idx0}{ = {\ttfamily false}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00427}{427}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00428\ \ \ \ \ \{}
+\DoxyCodeLine{00429\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!ignore\_idx0\ \&\&\ idx\ ==\ 0)\ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{calc_8cpp_a2c3e4bb40f36b262a5214e2da2bca9c5}{Error}}(\mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06ad0dd5d1dafb007ac290a3bba4c61c94e}{ERR\_K0\_IS\_INVALID}});}
+\DoxyCodeLine{00430\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_xbyak_1_1_operand_aca73d80838ec810e51d7fec7f8a28abe}{mask\_}})\ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{calc_8cpp_a2c3e4bb40f36b262a5214e2da2bca9c5}{Error}}(\mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a30e9e47e0cd3323bd4cb4fad462b8dd1}{ERR\_OPMASK\_IS\_ALREADY\_SET}});}
+\DoxyCodeLine{00431\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_operand_aca73d80838ec810e51d7fec7f8a28abe}{mask\_}}\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}};}
+\DoxyCodeLine{00432\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_xbyak_1_1_operand_a7c798c092b9be49260b0c84415b14070}\index{Xbyak::Operand@{Xbyak::Operand}!setRounding@{setRounding}}
+\index{setRounding@{setRounding}!Xbyak::Operand@{Xbyak::Operand}}
+\doxysubsubsection{\texorpdfstring{setRounding()}{setRounding()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_operand_a7c798c092b9be49260b0c84415b14070} 
+void Xbyak\+::\+Operand\+::set\+Rounding (\begin{DoxyParamCaption}\item[{int}]{idx}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00433}{433}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00434\ \ \ \ \ \{}
+\DoxyCodeLine{00435\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_xbyak_1_1_operand_ae1caaf8be40d1a0ea84e8da7849b37cc}{rounding\_}})\ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{calc_8cpp_a2c3e4bb40f36b262a5214e2da2bca9c5}{Error}}(\mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a3e9e698e685de7ab55bce7c6d4596b36}{ERR\_ROUNDING\_IS\_ALREADY\_SET}});}
+\DoxyCodeLine{00436\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_operand_ae1caaf8be40d1a0ea84e8da7849b37cc}{rounding\_}}\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}};}
+\DoxyCodeLine{00437\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_xbyak_1_1_operand_ada51176315e62e6497bd2fdefc5b749a}\index{Xbyak::Operand@{Xbyak::Operand}!setZero@{setZero}}
+\index{setZero@{setZero}!Xbyak::Operand@{Xbyak::Operand}}
+\doxysubsubsection{\texorpdfstring{setZero()}{setZero()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_operand_ada51176315e62e6497bd2fdefc5b749a} 
+void Xbyak\+::\+Operand\+::set\+Zero (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00438}{438}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00438\ \{\ \mbox{\hyperlink{class_xbyak_1_1_operand_af80f4a4e3502e05cfbf4ba54329946f2}{zero\_}}\ =\ \textcolor{keyword}{true};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_xbyak_1_1_operand_a91b31d592d0a980789f0627f4e06654c}\index{Xbyak::Operand@{Xbyak::Operand}!toString@{toString}}
+\index{toString@{toString}!Xbyak::Operand@{Xbyak::Operand}}
+\doxysubsubsection{\texorpdfstring{toString()}{toString()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_operand_a91b31d592d0a980789f0627f4e06654c} 
+const char \texorpdfstring{$\ast$}{*} Xbyak\+::\+Operand\+::to\+String (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00454}{454}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00455\ \ \ \ \ \{}
+\DoxyCodeLine{00456\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ =\ \mbox{\hyperlink{class_xbyak_1_1_operand_a9722a98c75928e06e3be3198b7aaa426}{getIdx}}();}
+\DoxyCodeLine{00457\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (kind\_\ ==\ \mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933ba5cee5588c3a23aee8620236a677ff3f5}{REG}})\ \{}
+\DoxyCodeLine{00458\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_xbyak_1_1_operand_a0fd53f9394841224652bf009be2173b3}{isExt8bit}}())\ \{}
+\DoxyCodeLine{00459\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{cvt__test_8cpp_af73a49a9258b274934a51f5b17b0d1be}{tbl}}[4]\ =\ \{\ \textcolor{stringliteral}{"{}spl"{}},\ \textcolor{stringliteral}{"{}bpl"{}},\ \textcolor{stringliteral}{"{}sil"{}},\ \textcolor{stringliteral}{"{}dil"{}}\ \};}
+\DoxyCodeLine{00460\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{cvt__test_8cpp_af73a49a9258b274934a51f5b17b0d1be}{tbl}}[\mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ -\/\ 4];}
+\DoxyCodeLine{00461\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00462\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{cvt__test_8cpp_af73a49a9258b274934a51f5b17b0d1be}{tbl}}[4][16]\ =\ \{}
+\DoxyCodeLine{00463\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ \textcolor{stringliteral}{"{}al"{}},\ \textcolor{stringliteral}{"{}cl"{}},\ \textcolor{stringliteral}{"{}dl"{}},\ \textcolor{stringliteral}{"{}bl"{}},\ \textcolor{stringliteral}{"{}ah"{}},\ \textcolor{stringliteral}{"{}ch"{}},\ \textcolor{stringliteral}{"{}dh"{}},\ \textcolor{stringliteral}{"{}bh"{}},\ \textcolor{stringliteral}{"{}r8b"{}},\ \textcolor{stringliteral}{"{}r9b"{}},\ \textcolor{stringliteral}{"{}r10b"{}},\ \ \textcolor{stringliteral}{"{}r11b"{}},\ \textcolor{stringliteral}{"{}r12b"{}},\ \textcolor{stringliteral}{"{}r13b"{}},\ \textcolor{stringliteral}{"{}r14b"{}},\ \textcolor{stringliteral}{"{}r15b"{}}\ \},}
+\DoxyCodeLine{00464\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ \textcolor{stringliteral}{"{}ax"{}},\ \textcolor{stringliteral}{"{}cx"{}},\ \textcolor{stringliteral}{"{}dx"{}},\ \textcolor{stringliteral}{"{}bx"{}},\ \textcolor{stringliteral}{"{}sp"{}},\ \textcolor{stringliteral}{"{}bp"{}},\ \textcolor{stringliteral}{"{}si"{}},\ \textcolor{stringliteral}{"{}di"{}},\ \textcolor{stringliteral}{"{}r8w"{}},\ \textcolor{stringliteral}{"{}r9w"{}},\ \textcolor{stringliteral}{"{}r10w"{}},\ \ \textcolor{stringliteral}{"{}r11w"{}},\ \textcolor{stringliteral}{"{}r12w"{}},\ \textcolor{stringliteral}{"{}r13w"{}},\ \textcolor{stringliteral}{"{}r14w"{}},\ \textcolor{stringliteral}{"{}r15w"{}}\ \},}
+\DoxyCodeLine{00465\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ \textcolor{stringliteral}{"{}eax"{}},\ \textcolor{stringliteral}{"{}ecx"{}},\ \textcolor{stringliteral}{"{}edx"{}},\ \textcolor{stringliteral}{"{}ebx"{}},\ \textcolor{stringliteral}{"{}esp"{}},\ \textcolor{stringliteral}{"{}ebp"{}},\ \textcolor{stringliteral}{"{}esi"{}},\ \textcolor{stringliteral}{"{}edi"{}},\ \textcolor{stringliteral}{"{}r8d"{}},\ \textcolor{stringliteral}{"{}r9d"{}},\ \textcolor{stringliteral}{"{}r10d"{}},\ \ \textcolor{stringliteral}{"{}r11d"{}},\ \textcolor{stringliteral}{"{}r12d"{}},\ \textcolor{stringliteral}{"{}r13d"{}},\ \textcolor{stringliteral}{"{}r14d"{}},\ \textcolor{stringliteral}{"{}r15d"{}}\ \},}
+\DoxyCodeLine{00466\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ \textcolor{stringliteral}{"{}rax"{}},\ \textcolor{stringliteral}{"{}rcx"{}},\ \textcolor{stringliteral}{"{}rdx"{}},\ \textcolor{stringliteral}{"{}rbx"{}},\ \textcolor{stringliteral}{"{}rsp"{}},\ \textcolor{stringliteral}{"{}rbp"{}},\ \textcolor{stringliteral}{"{}rsi"{}},\ \textcolor{stringliteral}{"{}rdi"{}},\ \textcolor{stringliteral}{"{}r8"{}},\ \textcolor{stringliteral}{"{}r9"{}},\ \textcolor{stringliteral}{"{}r10"{}},\ \ \textcolor{stringliteral}{"{}r11"{}},\ \textcolor{stringliteral}{"{}r12"{}},\ \textcolor{stringliteral}{"{}r13"{}},\ \textcolor{stringliteral}{"{}r14"{}},\ \textcolor{stringliteral}{"{}r15"{}}\ \},}
+\DoxyCodeLine{00467\ \ \ \ \ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00468\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{cvt__test_8cpp_af73a49a9258b274934a51f5b17b0d1be}{tbl}}[bit\_\ ==\ 8\ ?\ 0\ :\ bit\_\ ==\ 16\ ?\ 1\ :\ bit\_\ ==\ 32\ ?\ 2\ :\ 3][\mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}];}
+\DoxyCodeLine{00469\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_xbyak_1_1_operand_a2cb3c6e9e8025e1dd8348cbf4f4c0dfc}{isOPMASK}}())\ \{}
+\DoxyCodeLine{00470\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{cvt__test_8cpp_af73a49a9258b274934a51f5b17b0d1be}{tbl}}[8]\ =\ \{\ \textcolor{stringliteral}{"{}k0"{}},\ \textcolor{stringliteral}{"{}k1"{}},\ \textcolor{stringliteral}{"{}k2"{}},\ \textcolor{stringliteral}{"{}k3"{}},\ \textcolor{stringliteral}{"{}k4"{}},\ \textcolor{stringliteral}{"{}k5"{}},\ \textcolor{stringliteral}{"{}k6"{}},\ \textcolor{stringliteral}{"{}k7"{}}\ \};}
+\DoxyCodeLine{00471\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{cvt__test_8cpp_af73a49a9258b274934a51f5b17b0d1be}{tbl}}[\mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}];}
+\DoxyCodeLine{00472\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_xbyak_1_1_operand_a84f556436fcca82114f31a11fa1c8d6d}{isZMM}}())\ \{}
+\DoxyCodeLine{00473\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{cvt__test_8cpp_af73a49a9258b274934a51f5b17b0d1be}{tbl}}[32]\ =\ \{}
+\DoxyCodeLine{00474\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}zmm0"{}},\ \textcolor{stringliteral}{"{}zmm1"{}},\ \textcolor{stringliteral}{"{}zmm2"{}},\ \textcolor{stringliteral}{"{}zmm3"{}},\ \textcolor{stringliteral}{"{}zmm4"{}},\ \textcolor{stringliteral}{"{}zmm5"{}},\ \textcolor{stringliteral}{"{}zmm6"{}},\ \textcolor{stringliteral}{"{}zmm7"{}},\ \textcolor{stringliteral}{"{}zmm8"{}},\ \textcolor{stringliteral}{"{}zmm9"{}},\ \textcolor{stringliteral}{"{}zmm10"{}},\ \textcolor{stringliteral}{"{}zmm11"{}},\ \textcolor{stringliteral}{"{}zmm12"{}},\ \textcolor{stringliteral}{"{}zmm13"{}},\ \textcolor{stringliteral}{"{}zmm14"{}},\ \textcolor{stringliteral}{"{}zmm15"{}},}
+\DoxyCodeLine{00475\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}zmm16"{}},\ \textcolor{stringliteral}{"{}zmm17"{}},\ \textcolor{stringliteral}{"{}zmm18"{}},\ \textcolor{stringliteral}{"{}zmm19"{}},\ \textcolor{stringliteral}{"{}zmm20"{}},\ \textcolor{stringliteral}{"{}zmm21"{}},\ \textcolor{stringliteral}{"{}zmm22"{}},\ \textcolor{stringliteral}{"{}zmm23"{}},\ \textcolor{stringliteral}{"{}zmm24"{}},\ \textcolor{stringliteral}{"{}zmm25"{}},\ \textcolor{stringliteral}{"{}zmm26"{}},\ \textcolor{stringliteral}{"{}zmm27"{}},\ \textcolor{stringliteral}{"{}zmm28"{}},\ \textcolor{stringliteral}{"{}zmm29"{}},\ \textcolor{stringliteral}{"{}zmm30"{}},\ \textcolor{stringliteral}{"{}zmm31"{}}}
+\DoxyCodeLine{00476\ \ \ \ \ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00477\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{cvt__test_8cpp_af73a49a9258b274934a51f5b17b0d1be}{tbl}}[\mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}];}
+\DoxyCodeLine{00478\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_xbyak_1_1_operand_a7eecec4168018f49a4de1fca690daf82}{isYMM}}())\ \{}
+\DoxyCodeLine{00479\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{cvt__test_8cpp_af73a49a9258b274934a51f5b17b0d1be}{tbl}}[32]\ =\ \{}
+\DoxyCodeLine{00480\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}ymm0"{}},\ \textcolor{stringliteral}{"{}ymm1"{}},\ \textcolor{stringliteral}{"{}ymm2"{}},\ \textcolor{stringliteral}{"{}ymm3"{}},\ \textcolor{stringliteral}{"{}ymm4"{}},\ \textcolor{stringliteral}{"{}ymm5"{}},\ \textcolor{stringliteral}{"{}ymm6"{}},\ \textcolor{stringliteral}{"{}ymm7"{}},\ \textcolor{stringliteral}{"{}ymm8"{}},\ \textcolor{stringliteral}{"{}ymm9"{}},\ \textcolor{stringliteral}{"{}ymm10"{}},\ \textcolor{stringliteral}{"{}ymm11"{}},\ \textcolor{stringliteral}{"{}ymm12"{}},\ \textcolor{stringliteral}{"{}ymm13"{}},\ \textcolor{stringliteral}{"{}ymm14"{}},\ \textcolor{stringliteral}{"{}ymm15"{}},}
+\DoxyCodeLine{00481\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}ymm16"{}},\ \textcolor{stringliteral}{"{}ymm17"{}},\ \textcolor{stringliteral}{"{}ymm18"{}},\ \textcolor{stringliteral}{"{}ymm19"{}},\ \textcolor{stringliteral}{"{}ymm20"{}},\ \textcolor{stringliteral}{"{}ymm21"{}},\ \textcolor{stringliteral}{"{}ymm22"{}},\ \textcolor{stringliteral}{"{}ymm23"{}},\ \textcolor{stringliteral}{"{}ymm24"{}},\ \textcolor{stringliteral}{"{}ymm25"{}},\ \textcolor{stringliteral}{"{}ymm26"{}},\ \textcolor{stringliteral}{"{}ymm27"{}},\ \textcolor{stringliteral}{"{}ymm28"{}},\ \textcolor{stringliteral}{"{}ymm29"{}},\ \textcolor{stringliteral}{"{}ymm30"{}},\ \textcolor{stringliteral}{"{}ymm31"{}}}
+\DoxyCodeLine{00482\ \ \ \ \ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00483\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{cvt__test_8cpp_af73a49a9258b274934a51f5b17b0d1be}{tbl}}[\mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}];}
+\DoxyCodeLine{00484\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_xbyak_1_1_operand_a8483cb23fc2fcba13e05f0fcd279d7b0}{isXMM}}())\ \{}
+\DoxyCodeLine{00485\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{cvt__test_8cpp_af73a49a9258b274934a51f5b17b0d1be}{tbl}}[32]\ =\ \{}
+\DoxyCodeLine{00486\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}xmm0"{}},\ \textcolor{stringliteral}{"{}xmm1"{}},\ \textcolor{stringliteral}{"{}xmm2"{}},\ \textcolor{stringliteral}{"{}xmm3"{}},\ \textcolor{stringliteral}{"{}xmm4"{}},\ \textcolor{stringliteral}{"{}xmm5"{}},\ \textcolor{stringliteral}{"{}xmm6"{}},\ \textcolor{stringliteral}{"{}xmm7"{}},\ \textcolor{stringliteral}{"{}xmm8"{}},\ \textcolor{stringliteral}{"{}xmm9"{}},\ \textcolor{stringliteral}{"{}xmm10"{}},\ \textcolor{stringliteral}{"{}xmm11"{}},\ \textcolor{stringliteral}{"{}xmm12"{}},\ \textcolor{stringliteral}{"{}xmm13"{}},\ \textcolor{stringliteral}{"{}xmm14"{}},\ \textcolor{stringliteral}{"{}xmm15"{}},}
+\DoxyCodeLine{00487\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}xmm16"{}},\ \textcolor{stringliteral}{"{}xmm17"{}},\ \textcolor{stringliteral}{"{}xmm18"{}},\ \textcolor{stringliteral}{"{}xmm19"{}},\ \textcolor{stringliteral}{"{}xmm20"{}},\ \textcolor{stringliteral}{"{}xmm21"{}},\ \textcolor{stringliteral}{"{}xmm22"{}},\ \textcolor{stringliteral}{"{}xmm23"{}},\ \textcolor{stringliteral}{"{}xmm24"{}},\ \textcolor{stringliteral}{"{}xmm25"{}},\ \textcolor{stringliteral}{"{}xmm26"{}},\ \textcolor{stringliteral}{"{}xmm27"{}},\ \textcolor{stringliteral}{"{}xmm28"{}},\ \textcolor{stringliteral}{"{}xmm29"{}},\ \textcolor{stringliteral}{"{}xmm30"{}},\ \textcolor{stringliteral}{"{}xmm31"{}}}
+\DoxyCodeLine{00488\ \ \ \ \ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00489\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{cvt__test_8cpp_af73a49a9258b274934a51f5b17b0d1be}{tbl}}[\mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}];}
+\DoxyCodeLine{00490\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_xbyak_1_1_operand_a5306a21d9e3c6305703faf108dd6357e}{isMMX}}())\ \{}
+\DoxyCodeLine{00491\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{cvt__test_8cpp_af73a49a9258b274934a51f5b17b0d1be}{tbl}}[8]\ =\ \{\ \textcolor{stringliteral}{"{}mm0"{}},\ \textcolor{stringliteral}{"{}mm1"{}},\ \textcolor{stringliteral}{"{}mm2"{}},\ \textcolor{stringliteral}{"{}mm3"{}},\ \textcolor{stringliteral}{"{}mm4"{}},\ \textcolor{stringliteral}{"{}mm5"{}},\ \textcolor{stringliteral}{"{}mm6"{}},\ \textcolor{stringliteral}{"{}mm7"{}}\ \};}
+\DoxyCodeLine{00492\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{cvt__test_8cpp_af73a49a9258b274934a51f5b17b0d1be}{tbl}}[\mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}];}
+\DoxyCodeLine{00493\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_xbyak_1_1_operand_a4376cef05826332bd486095a4e5eac6f}{isFPU}}())\ \{}
+\DoxyCodeLine{00494\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{cvt__test_8cpp_af73a49a9258b274934a51f5b17b0d1be}{tbl}}[8]\ =\ \{\ \textcolor{stringliteral}{"{}st0"{}},\ \textcolor{stringliteral}{"{}st1"{}},\ \textcolor{stringliteral}{"{}st2"{}},\ \textcolor{stringliteral}{"{}st3"{}},\ \textcolor{stringliteral}{"{}st4"{}},\ \textcolor{stringliteral}{"{}st5"{}},\ \textcolor{stringliteral}{"{}st6"{}},\ \textcolor{stringliteral}{"{}st7"{}}\ \};}
+\DoxyCodeLine{00495\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{cvt__test_8cpp_af73a49a9258b274934a51f5b17b0d1be}{tbl}}[\mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}];}
+\DoxyCodeLine{00496\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_xbyak_1_1_operand_ad58425431c023d3dfdd8efcbd68ce463}{isBNDREG}}())\ \{}
+\DoxyCodeLine{00497\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{cvt__test_8cpp_af73a49a9258b274934a51f5b17b0d1be}{tbl}}[4]\ =\ \{\ \textcolor{stringliteral}{"{}bnd0"{}},\ \textcolor{stringliteral}{"{}bnd1"{}},\ \textcolor{stringliteral}{"{}bnd2"{}},\ \textcolor{stringliteral}{"{}bnd3"{}}\ \};}
+\DoxyCodeLine{00498\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{cvt__test_8cpp_af73a49a9258b274934a51f5b17b0d1be}{tbl}}[\mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}];}
+\DoxyCodeLine{00499\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00500\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{calc_8cpp_a2c3e4bb40f36b262a5214e2da2bca9c5}{Error}}(\mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a50843e628314f8ee441d800a933b23e3}{ERR\_INTERNAL}});}
+\DoxyCodeLine{00501\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{class_xbyak_1_1_operand_aca73d80838ec810e51d7fec7f8a28abe}\index{Xbyak::Operand@{Xbyak::Operand}!mask\_@{mask\_}}
+\index{mask\_@{mask\_}!Xbyak::Operand@{Xbyak::Operand}}
+\doxysubsubsection{\texorpdfstring{mask\_}{mask\_}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_operand_aca73d80838ec810e51d7fec7f8a28abe} 
+unsigned int Xbyak\+::\+Operand\+::mask\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00360}{360}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+\Hypertarget{class_xbyak_1_1_operand_ae1caaf8be40d1a0ea84e8da7849b37cc}\index{Xbyak::Operand@{Xbyak::Operand}!rounding\_@{rounding\_}}
+\index{rounding\_@{rounding\_}!Xbyak::Operand@{Xbyak::Operand}}
+\doxysubsubsection{\texorpdfstring{rounding\_}{rounding\_}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_operand_ae1caaf8be40d1a0ea84e8da7849b37cc} 
+unsigned int Xbyak\+::\+Operand\+::rounding\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00361}{361}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+\Hypertarget{class_xbyak_1_1_operand_af80f4a4e3502e05cfbf4ba54329946f2}\index{Xbyak::Operand@{Xbyak::Operand}!zero\_@{zero\_}}
+\index{zero\_@{zero\_}!Xbyak::Operand@{Xbyak::Operand}}
+\doxysubsubsection{\texorpdfstring{zero\_}{zero\_}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_operand_af80f4a4e3502e05cfbf4ba54329946f2} 
+unsigned int Xbyak\+::\+Operand\+::zero\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00359}{359}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/libraries/ff/depends/xbyak/xbyak/\mbox{\hyperlink{xbyak_8h}{xbyak.\+h}}\end{DoxyCompactItemize}

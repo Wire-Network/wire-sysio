@@ -1,0 +1,7 @@
+<map id="launcher_def::do_command" name="launcher_def::do_command">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,187,31"/>
+<area shape="rect" id="Node000002" href="$structlauncher__def.html#a016f09fbb85268c29c46e28c1ae06660" title=" " alt="" coords="235,5,380,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="187,16,220,16,220,21,187,21"/>
+<area shape="rect" id="Node000003" href="$structlauncher__def.html#af1b7d62253cacd97d1b757a5ff912bcf" title=" " alt="" coords="428,5,596,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="381,16,412,16,412,21,381,21"/>
+</map>

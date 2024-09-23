@@ -1,0 +1,149 @@
+\doxysection{testing\+::internal\+::Action\+Result\+Holder\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classtesting_1_1internal_1_1_action_result_holder}{}\label{classtesting_1_1internal_1_1_action_result_holder}\index{testing::internal::ActionResultHolder$<$ T $>$@{testing::internal::ActionResultHolder$<$ T $>$}}
+
+
+{\ttfamily \#include $<$gmock-\/spec-\/builders.\+h$>$}
+
+
+
+Inheritance diagram for testing\+::internal\+::Action\+Result\+Holder\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=240pt]{classtesting_1_1internal_1_1_action_result_holder__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for testing\+::internal\+::Action\+Result\+Holder\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=240pt]{classtesting_1_1internal_1_1_action_result_holder__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{classtesting_1_1internal_1_1_action_result_holder_a057df6cceeeab9ea06e679bcf6b78960}{Unwrap}} ()
+\item 
+virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_action_result_holder_a06d1fb40fc863328dbcc102bc46dece4}{Print\+As\+Action\+Result}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}os) const
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_action_result_holder_base}{testing\+::internal\+::\+Untyped\+Action\+Result\+Holder\+Base}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_action_result_holder_base_a2e6c331d249aea75ccc1e4fba3897a29}{\texorpdfstring{$\sim$}{\string~}\+Untyped\+Action\+Result\+Holder\+Base}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename F $>$ }\\static \mbox{\hyperlink{classtesting_1_1internal_1_1_action_result_holder}{Action\+Result\+Holder}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classtesting_1_1internal_1_1_action_result_holder_a47175ba122311867db65f060e2629fb1}{Perform\+Default\+Action}} (const \mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base}{Function\+Mocker\+Base}}$<$ F $>$ \texorpdfstring{$\ast$}{*}func\+\_\+mocker, typename \mbox{\hyperlink{structtesting_1_1internal_1_1_rvalue_ref}{Rvalue\+Ref}}$<$ typename \mbox{\hyperlink{structtesting_1_1internal_1_1_function}{Function}}$<$ F $>$\+::\+Argument\+Tuple $>$\+::type args, const std\+::string \&call\+\_\+description)
+\item 
+{\footnotesize template$<$typename F $>$ }\\static \mbox{\hyperlink{classtesting_1_1internal_1_1_action_result_holder}{Action\+Result\+Holder}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classtesting_1_1internal_1_1_action_result_holder_a3735744e64fcefc41712beae09519b13}{Perform\+Action}} (const \mbox{\hyperlink{classtesting_1_1_action}{Action}}$<$ F $>$ \&\mbox{\hyperlink{structaction}{action}}, typename \mbox{\hyperlink{structtesting_1_1internal_1_1_rvalue_ref}{Rvalue\+Ref}}$<$ typename \mbox{\hyperlink{structtesting_1_1internal_1_1_function}{Function}}$<$ F $>$\+::\+Argument\+Tuple $>$\+::type args)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$\newline
+class testing\+::internal\+::\+Action\+Result\+Holder$<$ T $>$}
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l01384}{1384}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_action_result_holder_a3735744e64fcefc41712beae09519b13}\index{testing::internal::ActionResultHolder$<$ T $>$@{testing::internal::ActionResultHolder$<$ T $>$}!PerformAction@{PerformAction}}
+\index{PerformAction@{PerformAction}!testing::internal::ActionResultHolder$<$ T $>$@{testing::internal::ActionResultHolder$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{PerformAction()}{PerformAction()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_action_result_holder_a3735744e64fcefc41712beae09519b13} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+template$<$typename F $>$ \\
+static \mbox{\hyperlink{classtesting_1_1internal_1_1_action_result_holder}{Action\+Result\+Holder}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classtesting_1_1internal_1_1_action_result_holder}{testing\+::internal\+::\+Action\+Result\+Holder}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::\+Perform\+Action (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classtesting_1_1_action}{Action}}$<$ F $>$ \&}]{action}{, }\item[{typename \mbox{\hyperlink{structtesting_1_1internal_1_1_rvalue_ref}{Rvalue\+Ref}}$<$ typename \mbox{\hyperlink{structtesting_1_1internal_1_1_function}{Function}}$<$ F $>$\+::\+Argument\+Tuple $>$\+::type}]{args}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l01412}{1412}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01414\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01415\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ ActionResultHolder(}
+\DoxyCodeLine{01416\ \ \ \ \ \ \ \ \ Wrapper(\mbox{\hyperlink{structaction}{action}}.Perform(\mbox{\hyperlink{namespacetesting_1_1internal_aa1114d84589bd22f45d443527528cb35}{internal::move}}(args))));}
+\DoxyCodeLine{01417\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1internal_1_1_action_result_holder_a47175ba122311867db65f060e2629fb1}\index{testing::internal::ActionResultHolder$<$ T $>$@{testing::internal::ActionResultHolder$<$ T $>$}!PerformDefaultAction@{PerformDefaultAction}}
+\index{PerformDefaultAction@{PerformDefaultAction}!testing::internal::ActionResultHolder$<$ T $>$@{testing::internal::ActionResultHolder$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{PerformDefaultAction()}{PerformDefaultAction()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_action_result_holder_a47175ba122311867db65f060e2629fb1} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+template$<$typename F $>$ \\
+static \mbox{\hyperlink{classtesting_1_1internal_1_1_action_result_holder}{Action\+Result\+Holder}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classtesting_1_1internal_1_1_action_result_holder}{testing\+::internal\+::\+Action\+Result\+Holder}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::\+Perform\+Default\+Action (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base}{Function\+Mocker\+Base}}$<$ F $>$ \texorpdfstring{$\ast$}{*}}]{func\+\_\+mocker}{, }\item[{typename \mbox{\hyperlink{structtesting_1_1internal_1_1_rvalue_ref}{Rvalue\+Ref}}$<$ typename \mbox{\hyperlink{structtesting_1_1internal_1_1_function}{Function}}$<$ F $>$\+::\+Argument\+Tuple $>$\+::type}]{args}{, }\item[{const std\+::string \&}]{call\+\_\+description}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l01401}{1401}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01404\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01405\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ ActionResultHolder(Wrapper(func\_mocker-\/>PerformDefaultAction(}
+\DoxyCodeLine{01406\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_aa1114d84589bd22f45d443527528cb35}{internal::move}}(args),\ call\_description)));}
+\DoxyCodeLine{01407\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_action_result_holder_a47175ba122311867db65f060e2629fb1_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_action_result_holder_a06d1fb40fc863328dbcc102bc46dece4}\index{testing::internal::ActionResultHolder$<$ T $>$@{testing::internal::ActionResultHolder$<$ T $>$}!PrintAsActionResult@{PrintAsActionResult}}
+\index{PrintAsActionResult@{PrintAsActionResult}!testing::internal::ActionResultHolder$<$ T $>$@{testing::internal::ActionResultHolder$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{PrintAsActionResult()}{PrintAsActionResult()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_action_result_holder_a06d1fb40fc863328dbcc102bc46dece4} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_action_result_holder}{testing\+::internal\+::\+Action\+Result\+Holder}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::\+Print\+As\+Action\+Result (\begin{DoxyParamCaption}\item[{\+::std\+::ostream \texorpdfstring{$\ast$}{*}}]{os}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_action_result_holder_base_a4b4a558fcb1d3b02c0fec34f186d3b90}{testing\+::internal\+::\+Untyped\+Action\+Result\+Holder\+Base}}.
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l01392}{1392}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01392\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01393\ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n\ \ \ \ \ \ \ \ \ \ Returns:\ "{}};}
+\DoxyCodeLine{01394\ \ \ \ \ \textcolor{comment}{//\ T\ may\ be\ a\ reference\ type,\ so\ we\ don't\ use\ UniversalPrint().}}
+\DoxyCodeLine{01395\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_universal_printer_aecec021e1abbaa260b701e24e3fe33eb}{UniversalPrinter<T>::Print}}(result\_.\mbox{\hyperlink{classtesting_1_1internal_1_1_reference_or_value_wrapper_a272aa31ad952f3ff0c3049eb97448de9}{Peek}}(),\ os);}
+\DoxyCodeLine{01396\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1internal_1_1_action_result_holder_a057df6cceeeab9ea06e679bcf6b78960}\index{testing::internal::ActionResultHolder$<$ T $>$@{testing::internal::ActionResultHolder$<$ T $>$}!Unwrap@{Unwrap}}
+\index{Unwrap@{Unwrap}!testing::internal::ActionResultHolder$<$ T $>$@{testing::internal::ActionResultHolder$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{Unwrap()}{Unwrap()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_action_result_holder_a057df6cceeeab9ea06e679bcf6b78960} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{classtesting_1_1internal_1_1_action_result_holder}{testing\+::internal\+::\+Action\+Result\+Holder}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::\+Unwrap (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l01387}{1387}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01387\ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01388\ \ \ \ \ \textcolor{keywordflow}{return}\ result\_.\mbox{\hyperlink{classtesting_1_1internal_1_1_reference_or_value_wrapper_a5a6505b809ba770725e7b8091927a5ba}{Unwrap}}();}
+\DoxyCodeLine{01389\ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/include/gmock/\mbox{\hyperlink{gmock-spec-builders_8h}{gmock-\/spec-\/builders.\+h}}\end{DoxyCompactItemize}

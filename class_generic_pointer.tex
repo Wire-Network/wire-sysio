@@ -1,0 +1,1254 @@
+\doxysection{Generic\+Pointer\texorpdfstring{$<$}{<} Value\+Type, Allocator \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{class_generic_pointer}{}\label{class_generic_pointer}\index{GenericPointer$<$ ValueType, Allocator $>$@{GenericPointer$<$ ValueType, Allocator $>$}}
+
+
+Represents a JSON Pointer. Use Pointer for \doxylink{struct_u_t_f8}{UTF8} encoding and default allocator.  
+
+
+
+
+{\ttfamily \#include $<$pointer.\+h$>$}
+
+
+
+Collaboration diagram for Generic\+Pointer\texorpdfstring{$<$}{<} Value\+Type, Allocator \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_generic_pointer__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{class_generic_pointer_1_1_percent_encode_stream}{Percent\+Encode\+Stream}}
+\begin{DoxyCompactList}\small\item\em \doxylink{struct_a}{A} helper stream to encode character (UTF-\/8 code unit) into percent-\/encoded sequence. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_generic_pointer_1_1_token}{Token}}
+\begin{DoxyCompactList}\small\item\em \doxylink{struct_a}{A} token is the basic units of internal representation. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef Value\+Type\+::\+Encoding\+Type \mbox{\hyperlink{class_generic_pointer_a06534f32c7e26ae8d2e1b199634ceb19}{Encoding\+Type}}
+\begin{DoxyCompactList}\small\item\em Encoding type from Value. \end{DoxyCompactList}\item 
+typedef Value\+Type\+::\+Ch \mbox{\hyperlink{class_generic_pointer_a77f7746a798967ee3f9aa608164eafef}{Ch}}
+\begin{DoxyCompactList}\small\item\em Character type from Value. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Append token}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_generic_pointer_aeb61ba8e67260b43090791eeca8b90e0}{allocator}}
+\item 
+\mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_generic_pointer_a331cffeec161b80ea18ac3f1562851bf}{allocator\+\_\+}}
+\begin{DoxyCompactList}\small\item\em The current allocator. It is either user-\/supplied or equal to own\+Allocator\+\_\+. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_generic_pointer_a99b51c07419ee17d57e97774d8ee63ab}{own\+Allocator\+\_\+}}
+\begin{DoxyCompactList}\small\item\em Allocator owned by this Pointer. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_generic_pointer_a77f7746a798967ee3f9aa608164eafef}{Ch}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_generic_pointer_a2fd627c663483ad08e4f26707ea5ad86}{name\+Buffer\+\_\+}}
+\begin{DoxyCompactList}\small\item\em \doxylink{struct_a}{A} buffer containing all names in tokens. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{struct_generic_pointer_1_1_token}{Token}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_generic_pointer_a997793c66ea1a264089c37c8731eb138}{tokens\+\_\+}}
+\begin{DoxyCompactList}\small\item\em \doxylink{struct_a}{A} list of tokens. \end{DoxyCompactList}\item 
+size\+\_\+t \mbox{\hyperlink{class_generic_pointer_a7051cf59af6622542a050bd0ff0340f8}{token\+Count\+\_\+}}
+\begin{DoxyCompactList}\small\item\em Number of tokens in tokens\+\_\+. \end{DoxyCompactList}\item 
+size\+\_\+t \mbox{\hyperlink{class_generic_pointer_ad103ed62e206319f1f0f4aa271866e37}{parse\+Error\+Offset\+\_\+}}
+\begin{DoxyCompactList}\small\item\em Offset in code unit when parsing fail. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_gacb2e274f33e54d91b96e9883a99a98be}{Pointer\+Parse\+Error\+Code}} \mbox{\hyperlink{class_generic_pointer_a8898ec432dc40b28f79db78dc4ca83e0}{parse\+Error\+Code\+\_\+}}
+\begin{DoxyCompactList}\small\item\em Parsing error code. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}} \mbox{\hyperlink{class_generic_pointer_aa8f86c0f330807f337351a95ae254b78}{Append}} (const \mbox{\hyperlink{struct_generic_pointer_1_1_token}{Token}} \&token, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{class_generic_pointer_aeb61ba8e67260b43090791eeca8b90e0}{allocator}}=0) const
+\begin{DoxyCompactList}\small\item\em Append a token and return a new Pointer. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}} \mbox{\hyperlink{class_generic_pointer_a9f8a1711f5b8e0d951c25c6c65326f77}{Append}} (const \mbox{\hyperlink{class_generic_pointer_a77f7746a798967ee3f9aa608164eafef}{Ch}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} length, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{class_generic_pointer_aeb61ba8e67260b43090791eeca8b90e0}{allocator}}=0) const
+\begin{DoxyCompactList}\small\item\em Append a name token with length, and return a new Pointer. \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{class_generic_pointer_aaf4d7d852098878d24188d134182d42f}{RAPIDJSON\+\_\+\+DISABLEIF\+\_\+\+RETURN}} ((internal\+::\+Not\+Expr$<$ internal\+::\+Is\+Same$<$ typename internal\+::\+Remove\+Const$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{\+::\+Type}}, \mbox{\hyperlink{class_generic_pointer_a77f7746a798967ee3f9aa608164eafef}{Ch}} $>$ $>$),(\mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}})) \mbox{\hyperlink{class_generic_pointer_aa8f86c0f330807f337351a95ae254b78}{Append}}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}
+\begin{DoxyCompactList}\small\item\em Append a name token without length, and return a new Pointer. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Constructors and destructor.}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_generic_pointer_a5d85b7dc82719643e8f7adccd5a74fbe}{Generic\+Pointer}} (\mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{class_generic_pointer_aeb61ba8e67260b43090791eeca8b90e0}{allocator}}=0)
+\begin{DoxyCompactList}\small\item\em Default constructor. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_generic_pointer_a4ad549b8a826c3c2dedf03fcc07be9b0}{Generic\+Pointer}} (const \mbox{\hyperlink{class_generic_pointer_a77f7746a798967ee3f9aa608164eafef}{Ch}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{class_generic_pointer_aeb61ba8e67260b43090791eeca8b90e0}{allocator}}=0)
+\begin{DoxyCompactList}\small\item\em Constructor that parses a string or URI fragment representation. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_generic_pointer_a9c05684ea95306aac7626e70cb3946cc}{Generic\+Pointer}} (const \mbox{\hyperlink{class_generic_pointer_a77f7746a798967ee3f9aa608164eafef}{Ch}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}}, size\+\_\+t length, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{class_generic_pointer_aeb61ba8e67260b43090791eeca8b90e0}{allocator}}=0)
+\begin{DoxyCompactList}\small\item\em Constructor that parses a string or URI fragment representation, with length of the source string. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_generic_pointer_a524a9921eff68f389a817a20ca7f1d84}{Generic\+Pointer}} (const \mbox{\hyperlink{struct_generic_pointer_1_1_token}{Token}} \texorpdfstring{$\ast$}{*}tokens, size\+\_\+t token\+Count)
+\begin{DoxyCompactList}\small\item\em Constructor with user-\/supplied tokens. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_generic_pointer_a7803645e8f7f349ee09c7d50351e9432}{Generic\+Pointer}} (const \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}} \&rhs)
+\begin{DoxyCompactList}\small\item\em Copy constructor. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_generic_pointer_a4395ca3f5c646e47cc9b93d21d1660ae}{Generic\+Pointer}} (const \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}} \&rhs, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{class_generic_pointer_aeb61ba8e67260b43090791eeca8b90e0}{allocator}})
+\begin{DoxyCompactList}\small\item\em Copy constructor. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_generic_pointer_acf3eb2f7c4ebf9256f638aafa17534cb}{\texorpdfstring{$\sim$}{\string~}\+Generic\+Pointer}} ()
+\begin{DoxyCompactList}\small\item\em Destructor. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}} \& \mbox{\hyperlink{class_generic_pointer_ae1b46fbcab2c8557825f7be842acbfe7}{operator=}} (const \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}} \&rhs)
+\begin{DoxyCompactList}\small\item\em Assignment operator. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}} \& \mbox{\hyperlink{class_generic_pointer_af148818f7c2b10243221953d887044c6}{Swap}} (\mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}} \&other) RAPIDJSON\+\_\+\+NOEXCEPT
+\begin{DoxyCompactList}\small\item\em Swap the content of this pointer with an other. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_generic_pointer_a249c61b5d4bed20c3f8972c57f46a937}{swap}} (\mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}} \&b) RAPIDJSON\+\_\+\+NOEXCEPT
+\begin{DoxyCompactList}\small\item\em free-\/standing swap function helper \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Value\+Type, typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} = Crt\+Allocator$>$\newline
+class Generic\+Pointer$<$ Value\+Type, Allocator $>$}
+This class implements RFC 6901 "{}\+Java\+Script Object Notation (\+JSON) Pointer"{} (\href{https://tools.ietf.org/html/rfc6901}{\texttt{ https\+://tools.\+ietf.\+org/html/rfc6901}}).
+
+\doxylink{struct_a}{A} JSON pointer is for identifying a specific value in a JSON document (\doxylink{class_generic_document}{Generic\+Document}). It can simplify coding of DOM tree manipulation, because it can access multiple-\/level depth of DOM tree with single API call.
+
+After it parses a string representation (e.\+g. "{}/foo/0"{} or URI fragment representation (e.\+g. "{}\#/foo/0"{}) into its internal representation (tokens), it can be used to resolve a specific value in multiple documents, or sub-\/tree of documents.
+
+Contrary to \doxylink{class_generic_value}{Generic\+Value}, Pointer can be copy constructed and copy assigned. Apart from assignment, a Pointer cannot be modified after construction.
+
+Although Pointer is very convenient, please aware that constructing Pointer involves parsing and dynamic memory allocation. \doxylink{struct_a}{A} special constructor with user-\/ supplied tokens eliminates these.
+
+\doxylink{class_generic_pointer}{Generic\+Pointer} depends on \doxylink{class_generic_document}{Generic\+Document} and \doxylink{class_generic_value}{Generic\+Value}.
+
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em Value\+Type} & The value type of the DOM tree. E.\+g. \doxylink{class_generic_value}{Generic\+Value}\texorpdfstring{$<$}{<}UTF8$<$$>$ \texorpdfstring{$>$}{>} \\
+\hline
+{\em Allocator} & The allocator type for allocating memory for internal representation.\\
+\hline
+\end{DoxyTemplParams}
+\begin{DoxyNote}{Note}
+\doxylink{class_generic_pointer}{Generic\+Pointer} uses same encoding of Value\+Type. However, Allocator of \doxylink{class_generic_pointer}{Generic\+Pointer} is independent of Allocator of Value. 
+\end{DoxyNote}
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l00079}{79}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{class_generic_pointer_a77f7746a798967ee3f9aa608164eafef}\index{GenericPointer$<$ ValueType, Allocator $>$@{GenericPointer$<$ ValueType, Allocator $>$}!Ch@{Ch}}
+\index{Ch@{Ch}!GenericPointer$<$ ValueType, Allocator $>$@{GenericPointer$<$ ValueType, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{Ch}{Ch}}
+{\footnotesize\ttfamily \label{class_generic_pointer_a77f7746a798967ee3f9aa608164eafef} 
+template$<$typename Value\+Type , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Crt\+Allocator$>$ \\
+Value\+Type\+::\+Ch \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ Value\+Type, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Ch}
+
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l00082}{82}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+\Hypertarget{class_generic_pointer_a06534f32c7e26ae8d2e1b199634ceb19}\index{GenericPointer$<$ ValueType, Allocator $>$@{GenericPointer$<$ ValueType, Allocator $>$}!EncodingType@{EncodingType}}
+\index{EncodingType@{EncodingType}!GenericPointer$<$ ValueType, Allocator $>$@{GenericPointer$<$ ValueType, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{EncodingType}{EncodingType}}
+{\footnotesize\ttfamily \label{class_generic_pointer_a06534f32c7e26ae8d2e1b199634ceb19} 
+template$<$typename Value\+Type , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Crt\+Allocator$>$ \\
+Value\+Type\+::\+Encoding\+Type \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ Value\+Type, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Encoding\+Type}
+
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l00081}{81}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_generic_pointer_a5d85b7dc82719643e8f7adccd5a74fbe}\index{GenericPointer$<$ ValueType, Allocator $>$@{GenericPointer$<$ ValueType, Allocator $>$}!GenericPointer@{GenericPointer}}
+\index{GenericPointer@{GenericPointer}!GenericPointer$<$ ValueType, Allocator $>$@{GenericPointer$<$ ValueType, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{GenericPointer()}{GenericPointer()}\hspace{0.1cm}{\footnotesize\ttfamily [1/6]}}
+{\footnotesize\ttfamily \label{class_generic_pointer_a5d85b7dc82719643e8f7adccd5a74fbe} 
+template$<$typename Value\+Type , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Crt\+Allocator$>$ \\
+\mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ Value\+Type, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\mbox{\hyperlink{class_generic_pointer}{\+::\+Generic\+Pointer}} (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} \texorpdfstring{$\ast$}{*}}]{allocator}{ = {\ttfamily 0}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l00107}{107}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00107\ :\ \mbox{\hyperlink{class_generic_pointer_a331cffeec161b80ea18ac3f1562851bf}{allocator\_}}(\mbox{\hyperlink{class_generic_pointer_aeb61ba8e67260b43090791eeca8b90e0}{allocator}}),\ \mbox{\hyperlink{class_generic_pointer_a99b51c07419ee17d57e97774d8ee63ab}{ownAllocator\_}}(),\ \mbox{\hyperlink{class_generic_pointer_a2fd627c663483ad08e4f26707ea5ad86}{nameBuffer\_}}(),\ \mbox{\hyperlink{class_generic_pointer_a997793c66ea1a264089c37c8731eb138}{tokens\_}}(),\ \mbox{\hyperlink{class_generic_pointer_a7051cf59af6622542a050bd0ff0340f8}{tokenCount\_}}(),\ \mbox{\hyperlink{class_generic_pointer_ad103ed62e206319f1f0f4aa271866e37}{parseErrorOffset\_}}(),\ \mbox{\hyperlink{class_generic_pointer_a8898ec432dc40b28f79db78dc4ca83e0}{parseErrorCode\_}}(\mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_ggacb2e274f33e54d91b96e9883a99a98bea81e2b6fbd1bf4ac890ddb7779265e3a0}{kPointerParseErrorNone}})\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_pointer_a4ad549b8a826c3c2dedf03fcc07be9b0}\index{GenericPointer$<$ ValueType, Allocator $>$@{GenericPointer$<$ ValueType, Allocator $>$}!GenericPointer@{GenericPointer}}
+\index{GenericPointer@{GenericPointer}!GenericPointer$<$ ValueType, Allocator $>$@{GenericPointer$<$ ValueType, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{GenericPointer()}{GenericPointer()}\hspace{0.1cm}{\footnotesize\ttfamily [2/6]}}
+{\footnotesize\ttfamily \label{class_generic_pointer_a4ad549b8a826c3c2dedf03fcc07be9b0} 
+template$<$typename Value\+Type , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Crt\+Allocator$>$ \\
+\mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ Value\+Type, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\mbox{\hyperlink{class_generic_pointer}{\+::\+Generic\+Pointer}} (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_generic_pointer_a77f7746a798967ee3f9aa608164eafef}{Ch}} \texorpdfstring{$\ast$}{*}}]{source}{, }\item[{\mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} \texorpdfstring{$\ast$}{*}}]{allocator}{ = {\ttfamily 0}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+\begin{DoxyParams}{Parameters}
+{\em source} & \doxylink{struct_a}{A} null-\/terminated, string or URI fragment representation of JSON pointer. \\
+\hline
+{\em allocator} & User supplied allocator for this pointer. If no allocator is provided, it creates a self-\/owned one. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l00114}{114}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{class_generic_pointer_a331cffeec161b80ea18ac3f1562851bf}{allocator\_}}(\mbox{\hyperlink{class_generic_pointer_aeb61ba8e67260b43090791eeca8b90e0}{allocator}}),\ \mbox{\hyperlink{class_generic_pointer_a99b51c07419ee17d57e97774d8ee63ab}{ownAllocator\_}}(),\ \mbox{\hyperlink{class_generic_pointer_a2fd627c663483ad08e4f26707ea5ad86}{nameBuffer\_}}(),\ \mbox{\hyperlink{class_generic_pointer_a997793c66ea1a264089c37c8731eb138}{tokens\_}}(),\ \mbox{\hyperlink{class_generic_pointer_a7051cf59af6622542a050bd0ff0340f8}{tokenCount\_}}(),\ \mbox{\hyperlink{class_generic_pointer_ad103ed62e206319f1f0f4aa271866e37}{parseErrorOffset\_}}(),\ \mbox{\hyperlink{class_generic_pointer_a8898ec432dc40b28f79db78dc4ca83e0}{parseErrorCode\_}}(\mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_ggacb2e274f33e54d91b96e9883a99a98bea81e2b6fbd1bf4ac890ddb7779265e3a0}{kPointerParseErrorNone}})\ \{}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ Parse(\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}},\ \mbox{\hyperlink{namespaceinternal_a86326fb0c9d7c7ea8edd7deedbb2b26e}{internal::StrLen}}(\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}}));}
+\DoxyCodeLine{00116\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=349pt]{class_generic_pointer_a4ad549b8a826c3c2dedf03fcc07be9b0_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_pointer_a9c05684ea95306aac7626e70cb3946cc}\index{GenericPointer$<$ ValueType, Allocator $>$@{GenericPointer$<$ ValueType, Allocator $>$}!GenericPointer@{GenericPointer}}
+\index{GenericPointer@{GenericPointer}!GenericPointer$<$ ValueType, Allocator $>$@{GenericPointer$<$ ValueType, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{GenericPointer()}{GenericPointer()}\hspace{0.1cm}{\footnotesize\ttfamily [3/6]}}
+{\footnotesize\ttfamily \label{class_generic_pointer_a9c05684ea95306aac7626e70cb3946cc} 
+template$<$typename Value\+Type , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Crt\+Allocator$>$ \\
+\mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ Value\+Type, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\mbox{\hyperlink{class_generic_pointer}{\+::\+Generic\+Pointer}} (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_generic_pointer_a77f7746a798967ee3f9aa608164eafef}{Ch}} \texorpdfstring{$\ast$}{*}}]{source}{, }\item[{size\+\_\+t}]{length}{, }\item[{\mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} \texorpdfstring{$\ast$}{*}}]{allocator}{ = {\ttfamily 0}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+\begin{DoxyParams}{Parameters}
+{\em source} & \doxylink{struct_a}{A} string or URI fragment representation of JSON pointer. \\
+\hline
+{\em length} & Length of source. \\
+\hline
+{\em allocator} & User supplied allocator for this pointer. If no allocator is provided, it creates a self-\/owned one. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyNote}{Note}
+Slightly faster than the overload without length. 
+\end{DoxyNote}
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l00137}{137}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{class_generic_pointer_a331cffeec161b80ea18ac3f1562851bf}{allocator\_}}(\mbox{\hyperlink{class_generic_pointer_aeb61ba8e67260b43090791eeca8b90e0}{allocator}}),\ \mbox{\hyperlink{class_generic_pointer_a99b51c07419ee17d57e97774d8ee63ab}{ownAllocator\_}}(),\ \mbox{\hyperlink{class_generic_pointer_a2fd627c663483ad08e4f26707ea5ad86}{nameBuffer\_}}(),\ \mbox{\hyperlink{class_generic_pointer_a997793c66ea1a264089c37c8731eb138}{tokens\_}}(),\ \mbox{\hyperlink{class_generic_pointer_a7051cf59af6622542a050bd0ff0340f8}{tokenCount\_}}(),\ \mbox{\hyperlink{class_generic_pointer_ad103ed62e206319f1f0f4aa271866e37}{parseErrorOffset\_}}(),\ \mbox{\hyperlink{class_generic_pointer_a8898ec432dc40b28f79db78dc4ca83e0}{parseErrorCode\_}}(\mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_ggacb2e274f33e54d91b96e9883a99a98bea81e2b6fbd1bf4ac890ddb7779265e3a0}{kPointerParseErrorNone}})\ \{}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ Parse(\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}},\ length);}
+\DoxyCodeLine{00139\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_pointer_a524a9921eff68f389a817a20ca7f1d84}\index{GenericPointer$<$ ValueType, Allocator $>$@{GenericPointer$<$ ValueType, Allocator $>$}!GenericPointer@{GenericPointer}}
+\index{GenericPointer@{GenericPointer}!GenericPointer$<$ ValueType, Allocator $>$@{GenericPointer$<$ ValueType, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{GenericPointer()}{GenericPointer()}\hspace{0.1cm}{\footnotesize\ttfamily [4/6]}}
+{\footnotesize\ttfamily \label{class_generic_pointer_a524a9921eff68f389a817a20ca7f1d84} 
+template$<$typename Value\+Type , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Crt\+Allocator$>$ \\
+\mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ Value\+Type, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\mbox{\hyperlink{class_generic_pointer}{\+::\+Generic\+Pointer}} (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct_generic_pointer_1_1_token}{Token}} \texorpdfstring{$\ast$}{*}}]{tokens}{, }\item[{size\+\_\+t}]{token\+Count}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+This constructor let user supplies const array of tokens. This prevents the parsing process and eliminates allocation. This is preferred for memory constrained environments.
+
+
+\begin{DoxyParams}{Parameters}
+{\em tokens} & An constant array of tokens representing the JSON pointer. \\
+\hline
+{\em token\+Count} & Number of tokens.\\
+\hline
+\end{DoxyParams}
+{\bfseries{Example}} 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{preprocessor}{\#define\ NAME(s)\ \{\ s,\ sizeof(s)\ /\ sizeof(s[0])\ -\/\ 1,\ kPointerInvalidIndex\ \}}}
+\DoxyCodeLine{\textcolor{preprocessor}{\#define\ INDEX(i)\ \{\ \#i,\ sizeof(\#i)\ -\/\ 1,\ i\ \}}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_generic_pointer_1_1_token}{Pointer::Token}}\ kTokens[]\ =\ \{\ \mbox{\hyperlink{pointertest_8cpp_a59c7737920212dcb3bb9df58d7062de4}{NAME}}(\textcolor{stringliteral}{"{}foo"{}}),\ \mbox{\hyperlink{pointertest_8cpp_aa5fad23b2a5eed790e6661e896a506b7}{INDEX}}(123)\ \};}
+\DoxyCodeLine{\textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_generic_pointer}{Pointer}}\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}(kTokens,\ \textcolor{keyword}{sizeof}(kTokens)\ /\ \textcolor{keyword}{sizeof}(kTokens[0]));}
+\DoxyCodeLine{\textcolor{comment}{//\ Equivalent\ to\ static\ const\ Pointer\ p("{}/foo/123"{});}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{preprocessor}{\#undef\ NAME}}
+\DoxyCodeLine{\textcolor{preprocessor}{\#undef\ INDEX}}
+
+\end{DoxyCode}
+ 
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l00163}{163}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00163\ :\ \mbox{\hyperlink{class_generic_pointer_a331cffeec161b80ea18ac3f1562851bf}{allocator\_}}(),\ \mbox{\hyperlink{class_generic_pointer_a99b51c07419ee17d57e97774d8ee63ab}{ownAllocator\_}}(),\ \mbox{\hyperlink{class_generic_pointer_a2fd627c663483ad08e4f26707ea5ad86}{nameBuffer\_}}(),\ \mbox{\hyperlink{class_generic_pointer_a997793c66ea1a264089c37c8731eb138}{tokens\_}}(\textcolor{keyword}{const\_cast<}Token*\textcolor{keyword}{>}(tokens)),\ \mbox{\hyperlink{class_generic_pointer_a7051cf59af6622542a050bd0ff0340f8}{tokenCount\_}}(tokenCount),\ \mbox{\hyperlink{class_generic_pointer_ad103ed62e206319f1f0f4aa271866e37}{parseErrorOffset\_}}(),\ \mbox{\hyperlink{class_generic_pointer_a8898ec432dc40b28f79db78dc4ca83e0}{parseErrorCode\_}}(\mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_ggacb2e274f33e54d91b96e9883a99a98bea81e2b6fbd1bf4ac890ddb7779265e3a0}{kPointerParseErrorNone}})\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_pointer_a7803645e8f7f349ee09c7d50351e9432}\index{GenericPointer$<$ ValueType, Allocator $>$@{GenericPointer$<$ ValueType, Allocator $>$}!GenericPointer@{GenericPointer}}
+\index{GenericPointer@{GenericPointer}!GenericPointer$<$ ValueType, Allocator $>$@{GenericPointer$<$ ValueType, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{GenericPointer()}{GenericPointer()}\hspace{0.1cm}{\footnotesize\ttfamily [5/6]}}
+{\footnotesize\ttfamily \label{class_generic_pointer_a7803645e8f7f349ee09c7d50351e9432} 
+template$<$typename Value\+Type , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Crt\+Allocator$>$ \\
+\mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ Value\+Type, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\mbox{\hyperlink{class_generic_pointer}{\+::\+Generic\+Pointer}} (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ Value\+Type, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \&}]{rhs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l00166}{166}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{class_generic_pointer_a331cffeec161b80ea18ac3f1562851bf}{allocator\_}}(rhs.\mbox{\hyperlink{class_generic_pointer_a331cffeec161b80ea18ac3f1562851bf}{allocator\_}}),\ \mbox{\hyperlink{class_generic_pointer_a99b51c07419ee17d57e97774d8ee63ab}{ownAllocator\_}}(),\ \mbox{\hyperlink{class_generic_pointer_a2fd627c663483ad08e4f26707ea5ad86}{nameBuffer\_}}(),\ \mbox{\hyperlink{class_generic_pointer_a997793c66ea1a264089c37c8731eb138}{tokens\_}}(),\ \mbox{\hyperlink{class_generic_pointer_a7051cf59af6622542a050bd0ff0340f8}{tokenCount\_}}(),\ \mbox{\hyperlink{class_generic_pointer_ad103ed62e206319f1f0f4aa271866e37}{parseErrorOffset\_}}(),\ \mbox{\hyperlink{class_generic_pointer_a8898ec432dc40b28f79db78dc4ca83e0}{parseErrorCode\_}}(\mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_ggacb2e274f33e54d91b96e9883a99a98bea81e2b6fbd1bf4ac890ddb7779265e3a0}{kPointerParseErrorNone}})\ \{}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \ \ *\textcolor{keyword}{this}\ =\ rhs;}
+\DoxyCodeLine{00168\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_pointer_a4395ca3f5c646e47cc9b93d21d1660ae}\index{GenericPointer$<$ ValueType, Allocator $>$@{GenericPointer$<$ ValueType, Allocator $>$}!GenericPointer@{GenericPointer}}
+\index{GenericPointer@{GenericPointer}!GenericPointer$<$ ValueType, Allocator $>$@{GenericPointer$<$ ValueType, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{GenericPointer()}{GenericPointer()}\hspace{0.1cm}{\footnotesize\ttfamily [6/6]}}
+{\footnotesize\ttfamily \label{class_generic_pointer_a4395ca3f5c646e47cc9b93d21d1660ae} 
+template$<$typename Value\+Type , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Crt\+Allocator$>$ \\
+\mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ Value\+Type, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\mbox{\hyperlink{class_generic_pointer}{\+::\+Generic\+Pointer}} (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ Value\+Type, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \&}]{rhs}{, }\item[{\mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} \texorpdfstring{$\ast$}{*}}]{allocator}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l00171}{171}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{class_generic_pointer_a331cffeec161b80ea18ac3f1562851bf}{allocator\_}}(\mbox{\hyperlink{class_generic_pointer_aeb61ba8e67260b43090791eeca8b90e0}{allocator}}),\ \mbox{\hyperlink{class_generic_pointer_a99b51c07419ee17d57e97774d8ee63ab}{ownAllocator\_}}(),\ \mbox{\hyperlink{class_generic_pointer_a2fd627c663483ad08e4f26707ea5ad86}{nameBuffer\_}}(),\ \mbox{\hyperlink{class_generic_pointer_a997793c66ea1a264089c37c8731eb138}{tokens\_}}(),\ \mbox{\hyperlink{class_generic_pointer_a7051cf59af6622542a050bd0ff0340f8}{tokenCount\_}}(),\ \mbox{\hyperlink{class_generic_pointer_ad103ed62e206319f1f0f4aa271866e37}{parseErrorOffset\_}}(),\ \mbox{\hyperlink{class_generic_pointer_a8898ec432dc40b28f79db78dc4ca83e0}{parseErrorCode\_}}(\mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_ggacb2e274f33e54d91b96e9883a99a98bea81e2b6fbd1bf4ac890ddb7779265e3a0}{kPointerParseErrorNone}})\ \{}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ *\textcolor{keyword}{this}\ =\ rhs;}
+\DoxyCodeLine{00173\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_pointer_acf3eb2f7c4ebf9256f638aafa17534cb}\index{GenericPointer$<$ ValueType, Allocator $>$@{GenericPointer$<$ ValueType, Allocator $>$}!````~GenericPointer@{\texorpdfstring{$\sim$}{\string~}GenericPointer}}
+\index{````~GenericPointer@{\texorpdfstring{$\sim$}{\string~}GenericPointer}!GenericPointer$<$ ValueType, Allocator $>$@{GenericPointer$<$ ValueType, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}GenericPointer()}{\string~GenericPointer()}}
+{\footnotesize\ttfamily \label{class_generic_pointer_acf3eb2f7c4ebf9256f638aafa17534cb} 
+template$<$typename Value\+Type , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Crt\+Allocator$>$ \\
+\mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ Value\+Type, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\texorpdfstring{$\sim$}{\string~}\mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l00176}{176}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_generic_pointer_a2fd627c663483ad08e4f26707ea5ad86}{nameBuffer\_}})\ \ \ \ \textcolor{comment}{//\ If\ user-\/supplied\ tokens\ constructor\ is\ used,\ nameBuffer\_\ is\ nullptr\ and\ tokens\_\ are\ not\ deallocated.}}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \ \ \ \ Allocator::Free(\mbox{\hyperlink{class_generic_pointer_a997793c66ea1a264089c37c8731eb138}{tokens\_}});}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_a52c941c3fdd646527cdcd42aa846a28a}{RAPIDJSON\_DELETE}}(\mbox{\hyperlink{class_generic_pointer_a99b51c07419ee17d57e97774d8ee63ab}{ownAllocator\_}});}
+\DoxyCodeLine{00180\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_generic_pointer_a9f8a1711f5b8e0d951c25c6c65326f77}\index{GenericPointer$<$ ValueType, Allocator $>$@{GenericPointer$<$ ValueType, Allocator $>$}!Append@{Append}}
+\index{Append@{Append}!GenericPointer$<$ ValueType, Allocator $>$@{GenericPointer$<$ ValueType, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{Append()}{Append()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_generic_pointer_a9f8a1711f5b8e0d951c25c6c65326f77} 
+template$<$typename Value\+Type , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Crt\+Allocator$>$ \\
+\mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}} \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ Value\+Type, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Append (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_generic_pointer_a77f7746a798967ee3f9aa608164eafef}{Ch}} \texorpdfstring{$\ast$}{*}}]{name}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{length}{, }\item[{\mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} \texorpdfstring{$\ast$}{*}}]{allocator}{ = {\ttfamily 0}}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+\begin{DoxyParams}{Parameters}
+{\em name} & Name to be appended. \\
+\hline
+{\em length} & Length of name. \\
+\hline
+{\em allocator} & Allocator for the newly return Pointer. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\doxylink{struct_a}{A} new Pointer with appended token. 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l00262}{262}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00262\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00263\ \ \ \ \ \ \ \ \ Token\ token\ =\ \{\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ length,\ kPointerInvalidIndex\ \};}
+\DoxyCodeLine{00264\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_generic_pointer_aa8f86c0f330807f337351a95ae254b78}{Append}}(token,\ \mbox{\hyperlink{class_generic_pointer_aeb61ba8e67260b43090791eeca8b90e0}{allocator}});}
+\DoxyCodeLine{00265\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_generic_pointer_a9f8a1711f5b8e0d951c25c6c65326f77_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_pointer_aa8f86c0f330807f337351a95ae254b78}\index{GenericPointer$<$ ValueType, Allocator $>$@{GenericPointer$<$ ValueType, Allocator $>$}!Append@{Append}}
+\index{Append@{Append}!GenericPointer$<$ ValueType, Allocator $>$@{GenericPointer$<$ ValueType, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{Append()}{Append()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_generic_pointer_aa8f86c0f330807f337351a95ae254b78} 
+template$<$typename Value\+Type , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Crt\+Allocator$>$ \\
+\mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}} \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ Value\+Type, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Append (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct_generic_pointer_1_1_token}{Token}} \&}]{token}{, }\item[{\mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} \texorpdfstring{$\ast$}{*}}]{allocator}{ = {\ttfamily 0}}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+\begin{DoxyParams}{Parameters}
+{\em token} & \doxylink{struct_generic_pointer_1_1_token}{Token} to be appended. \\
+\hline
+{\em allocator} & Allocator for the newly return Pointer. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\doxylink{struct_a}{A} new Pointer with appended token. 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l00244}{244}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00244\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00245\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_pointer}{GenericPointer}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};}
+\DoxyCodeLine{00246\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.allocator\_\ =\ \mbox{\hyperlink{class_generic_pointer_aeb61ba8e67260b43090791eeca8b90e0}{allocator}};}
+\DoxyCodeLine{00247\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_pointer_a77f7746a798967ee3f9aa608164eafef}{Ch}}\ *\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.CopyFromRaw(*\textcolor{keyword}{this},\ 1,\ token.length\ +\ 1);}
+\DoxyCodeLine{00248\ \ \ \ \ \ \ \ \ std::memcpy(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\ token.name,\ (token.length\ +\ 1)\ *\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{class_generic_pointer_a77f7746a798967ee3f9aa608164eafef}{Ch}}));}
+\DoxyCodeLine{00249\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.tokens\_[\mbox{\hyperlink{class_generic_pointer_a7051cf59af6622542a050bd0ff0340f8}{tokenCount\_}}].name\ =\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}};}
+\DoxyCodeLine{00250\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.tokens\_[\mbox{\hyperlink{class_generic_pointer_a7051cf59af6622542a050bd0ff0340f8}{tokenCount\_}}].length\ =\ token.length;}
+\DoxyCodeLine{00251\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.tokens\_[\mbox{\hyperlink{class_generic_pointer_a7051cf59af6622542a050bd0ff0340f8}{tokenCount\_}}].index\ =\ token.index;}
+\DoxyCodeLine{00252\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};}
+\DoxyCodeLine{00253\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_generic_pointer_aa8f86c0f330807f337351a95ae254b78_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_pointer_ae1b46fbcab2c8557825f7be842acbfe7}\index{GenericPointer$<$ ValueType, Allocator $>$@{GenericPointer$<$ ValueType, Allocator $>$}!operator=@{operator=}}
+\index{operator=@{operator=}!GenericPointer$<$ ValueType, Allocator $>$@{GenericPointer$<$ ValueType, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}}
+{\footnotesize\ttfamily \label{class_generic_pointer_ae1b46fbcab2c8557825f7be842acbfe7} 
+template$<$typename Value\+Type , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Crt\+Allocator$>$ \\
+\mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}} \& \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ Value\+Type, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::operator= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ Value\+Type, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \&}]{rhs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l00183}{183}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{this}\ !=\ \&rhs)\ \{}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Do\ not\ delete\ ownAllcator}}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_generic_pointer_a2fd627c663483ad08e4f26707ea5ad86}{nameBuffer\_}})}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Allocator::Free(\mbox{\hyperlink{class_generic_pointer_a997793c66ea1a264089c37c8731eb138}{tokens\_}});}
+\DoxyCodeLine{00188\ }
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_pointer_a7051cf59af6622542a050bd0ff0340f8}{tokenCount\_}}\ =\ rhs.\mbox{\hyperlink{class_generic_pointer_a7051cf59af6622542a050bd0ff0340f8}{tokenCount\_}};}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_pointer_ad103ed62e206319f1f0f4aa271866e37}{parseErrorOffset\_}}\ =\ rhs.\mbox{\hyperlink{class_generic_pointer_ad103ed62e206319f1f0f4aa271866e37}{parseErrorOffset\_}};}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_pointer_a8898ec432dc40b28f79db78dc4ca83e0}{parseErrorCode\_}}\ =\ rhs.\mbox{\hyperlink{class_generic_pointer_a8898ec432dc40b28f79db78dc4ca83e0}{parseErrorCode\_}};}
+\DoxyCodeLine{00192\ }
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (rhs.\mbox{\hyperlink{class_generic_pointer_a2fd627c663483ad08e4f26707ea5ad86}{nameBuffer\_}})}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ CopyFromRaw(rhs);\ \textcolor{comment}{//\ Normally\ parsed\ tokens.}}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_pointer_a997793c66ea1a264089c37c8731eb138}{tokens\_}}\ =\ rhs.\mbox{\hyperlink{class_generic_pointer_a997793c66ea1a264089c37c8731eb138}{tokens\_}};\ \textcolor{comment}{//\ User\ supplied\ const\ tokens.}}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_pointer_a2fd627c663483ad08e4f26707ea5ad86}{nameBuffer\_}}\ =\ 0;}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00201\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_pointer_aaf4d7d852098878d24188d134182d42f}\index{GenericPointer$<$ ValueType, Allocator $>$@{GenericPointer$<$ ValueType, Allocator $>$}!RAPIDJSON\_DISABLEIF\_RETURN@{RAPIDJSON\_DISABLEIF\_RETURN}}
+\index{RAPIDJSON\_DISABLEIF\_RETURN@{RAPIDJSON\_DISABLEIF\_RETURN}!GenericPointer$<$ ValueType, Allocator $>$@{GenericPointer$<$ ValueType, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{RAPIDJSON\_DISABLEIF\_RETURN()}{RAPIDJSON\_DISABLEIF\_RETURN()}}
+{\footnotesize\ttfamily \label{class_generic_pointer_aaf4d7d852098878d24188d134182d42f} 
+template$<$typename Value\+Type , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Crt\+Allocator$>$ \\
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ Value\+Type, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+RAPIDJSON\+\_\+\+DISABLEIF\+\_\+\+RETURN (\begin{DoxyParamCaption}\item[{(internal\+::\+Not\+Expr$<$ internal\+::\+Is\+Same$<$ typename internal\+::\+Remove\+Const$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{\+::\+Type}}, \mbox{\hyperlink{class_generic_pointer_a77f7746a798967ee3f9aa608164eafef}{Ch}} $>$ $>$)}]{}{, }\item[{(\mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ Value\+Type, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$)}]{}{}\end{DoxyParamCaption})}
+
+
+\begin{DoxyParams}{Parameters}
+{\em name} & Name (const Ch\texorpdfstring{$\ast$}{*}) to be appended. \\
+\hline
+{\em allocator} & Allocator for the newly return Pointer. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\doxylink{struct_a}{A} new Pointer with appended token. 
+\end{DoxyReturn}
+\Hypertarget{class_generic_pointer_af148818f7c2b10243221953d887044c6}\index{GenericPointer$<$ ValueType, Allocator $>$@{GenericPointer$<$ ValueType, Allocator $>$}!Swap@{Swap}}
+\index{Swap@{Swap}!GenericPointer$<$ ValueType, Allocator $>$@{GenericPointer$<$ ValueType, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{Swap()}{Swap()}}
+{\footnotesize\ttfamily \label{class_generic_pointer_af148818f7c2b10243221953d887044c6} 
+template$<$typename Value\+Type , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Crt\+Allocator$>$ \\
+\mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}} \& \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ Value\+Type, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Swap (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ Value\+Type, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \&}]{other}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+\begin{DoxyParams}{Parameters}
+{\em other} & The pointer to swap with. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyNote}{Note}
+Constant complexity. 
+\end{DoxyNote}
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l00208}{208}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a72b2c71d36273b9691487f58c671ce04}{internal::Swap}}(\mbox{\hyperlink{class_generic_pointer_a331cffeec161b80ea18ac3f1562851bf}{allocator\_}},\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.allocator\_);}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a72b2c71d36273b9691487f58c671ce04}{internal::Swap}}(\mbox{\hyperlink{class_generic_pointer_a99b51c07419ee17d57e97774d8ee63ab}{ownAllocator\_}},\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.ownAllocator\_);}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a72b2c71d36273b9691487f58c671ce04}{internal::Swap}}(\mbox{\hyperlink{class_generic_pointer_a2fd627c663483ad08e4f26707ea5ad86}{nameBuffer\_}},\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.nameBuffer\_);}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a72b2c71d36273b9691487f58c671ce04}{internal::Swap}}(\mbox{\hyperlink{class_generic_pointer_a997793c66ea1a264089c37c8731eb138}{tokens\_}},\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.tokens\_);}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a72b2c71d36273b9691487f58c671ce04}{internal::Swap}}(\mbox{\hyperlink{class_generic_pointer_a7051cf59af6622542a050bd0ff0340f8}{tokenCount\_}},\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.tokenCount\_);}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a72b2c71d36273b9691487f58c671ce04}{internal::Swap}}(\mbox{\hyperlink{class_generic_pointer_ad103ed62e206319f1f0f4aa271866e37}{parseErrorOffset\_}},\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.parseErrorOffset\_);}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a72b2c71d36273b9691487f58c671ce04}{internal::Swap}}(\mbox{\hyperlink{class_generic_pointer_a8898ec432dc40b28f79db78dc4ca83e0}{parseErrorCode\_}},\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.parseErrorCode\_);}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00217\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=306pt]{class_generic_pointer_af148818f7c2b10243221953d887044c6_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_generic_pointer_af148818f7c2b10243221953d887044c6_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{class_generic_pointer_a249c61b5d4bed20c3f8972c57f46a937}\index{GenericPointer$<$ ValueType, Allocator $>$@{GenericPointer$<$ ValueType, Allocator $>$}!swap@{swap}}
+\index{swap@{swap}!GenericPointer$<$ ValueType, Allocator $>$@{GenericPointer$<$ ValueType, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{swap}{swap}}
+{\footnotesize\ttfamily \label{class_generic_pointer_a249c61b5d4bed20c3f8972c57f46a937} 
+template$<$typename Value\+Type , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Crt\+Allocator$>$ \\
+void swap (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ Value\+Type, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \&}]{a}{, }\item[{\mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ Value\+Type, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \&}]{b}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+Helper function to enable support for common swap implementation pattern based on {\ttfamily \doxylink{namespacestd_abb7e41c7063536ff6eeee4bb5f66de6c}{std\+::swap}\+:} 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_generic_pointer_a249c61b5d4bed20c3f8972c57f46a937}{swap}}(MyClass\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ MyClass\&\ b)\ \{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacestd_abb7e41c7063536ff6eeee4bb5f66de6c}{std::swap}};}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{class_generic_pointer_a249c61b5d4bed20c3f8972c57f46a937}{swap}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.pointer,\ b.pointer);}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ ...}}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+ \begin{DoxySeeAlso}{See also}
+\doxylink{class_generic_pointer_af148818f7c2b10243221953d887044c6}{Swap()} 
+\end{DoxySeeAlso}
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l00231}{231}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00231\ \{\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.Swap(b);\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{class_generic_pointer_aeb61ba8e67260b43090791eeca8b90e0}\index{GenericPointer$<$ ValueType, Allocator $>$@{GenericPointer$<$ ValueType, Allocator $>$}!allocator@{allocator}}
+\index{allocator@{allocator}!GenericPointer$<$ ValueType, Allocator $>$@{GenericPointer$<$ ValueType, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{allocator}{allocator}}
+{\footnotesize\ttfamily \label{class_generic_pointer_aeb61ba8e67260b43090791eeca8b90e0} 
+template$<$typename Value\+Type , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Crt\+Allocator$>$ \\
+\mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ Value\+Type, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::allocator}
+
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l00275}{275}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00275\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00276\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_generic_pointer_aa8f86c0f330807f337351a95ae254b78}{Append}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ \mbox{\hyperlink{namespaceinternal_a86326fb0c9d7c7ea8edd7deedbb2b26e}{internal::StrLen}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}),\ \mbox{\hyperlink{class_generic_pointer_aeb61ba8e67260b43090791eeca8b90e0}{allocator}});}
+\DoxyCodeLine{00277\ \ \ \ \ \}}
+\DoxyCodeLine{00278\ }
+\DoxyCodeLine{00279\ \textcolor{preprocessor}{\#if\ RAPIDJSON\_HAS\_STDSTRING}}
+\DoxyCodeLine{00281\ }
+\DoxyCodeLine{00286\ \ \ \ \ \mbox{\hyperlink{class_generic_pointer}{GenericPointer}}\ \mbox{\hyperlink{class_generic_pointer_aa8f86c0f330807f337351a95ae254b78}{Append}}(\textcolor{keyword}{const}\ std::basic\_string<Ch>\&\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}*\ \mbox{\hyperlink{class_generic_pointer_aeb61ba8e67260b43090791eeca8b90e0}{allocator}}\ =\ 0)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00287\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_generic_pointer_aa8f86c0f330807f337351a95ae254b78}{Append}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}.c\_str(),\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\textcolor{keyword}{>}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}.size()),\ \mbox{\hyperlink{class_generic_pointer_aeb61ba8e67260b43090791eeca8b90e0}{allocator}});}
+\DoxyCodeLine{00288\ \ \ \ \ \}}
+\DoxyCodeLine{00289\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00290\ }
+\DoxyCodeLine{00292\ }
+\DoxyCodeLine{00297\ \ \ \ \ \mbox{\hyperlink{class_generic_pointer}{GenericPointer}}\ \mbox{\hyperlink{class_generic_pointer_aa8f86c0f330807f337351a95ae254b78}{Append}}(\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\ index,\ \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}*\ \mbox{\hyperlink{class_generic_pointer_aeb61ba8e67260b43090791eeca8b90e0}{allocator}}\ =\ 0)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00298\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ buffer[21];}
+\DoxyCodeLine{00299\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}*\ end\ =\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}})\ ==\ 4\ ?\ \mbox{\hyperlink{namespaceinternal_a90e3cb218b557548f361e99dc718b4b1}{internal::u32toa}}(index,\ buffer)\ :\ \mbox{\hyperlink{namespaceinternal_a489150922c0320e4290b455bf3c6e36c}{internal::u64toa}}(index,\ buffer);}
+\DoxyCodeLine{00300\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\ length\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\textcolor{keyword}{>}(end\ -\/\ buffer);}
+\DoxyCodeLine{00301\ \ \ \ \ \ \ \ \ buffer[length]\ =\ \textcolor{charliteral}{'\(\backslash\)0'};}
+\DoxyCodeLine{00302\ }
+\DoxyCodeLine{00303\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{sizeof}(\mbox{\hyperlink{class_generic_pointer_a77f7746a798967ee3f9aa608164eafef}{Ch}})\ ==\ 1)\ \{}
+\DoxyCodeLine{00304\ \ \ \ \ \ \ \ \ \ \ \ \ Token\ token\ =\ \{\ \textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{class_generic_pointer_a77f7746a798967ee3f9aa608164eafef}{Ch}}*\textcolor{keyword}{>}(buffer),\ length,\ index\ \};}
+\DoxyCodeLine{00305\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_generic_pointer_aa8f86c0f330807f337351a95ae254b78}{Append}}(token,\ \mbox{\hyperlink{class_generic_pointer_aeb61ba8e67260b43090791eeca8b90e0}{allocator}});}
+\DoxyCodeLine{00306\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00307\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00308\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_pointer_a77f7746a798967ee3f9aa608164eafef}{Ch}}\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}[21];}
+\DoxyCodeLine{00309\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <=\ length;\ i++)}
+\DoxyCodeLine{00310\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}[i]\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{class_generic_pointer_a77f7746a798967ee3f9aa608164eafef}{Ch}}\textcolor{keyword}{>}(buffer[i]);}
+\DoxyCodeLine{00311\ \ \ \ \ \ \ \ \ \ \ \ \ Token\ token\ =\ \{\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ length,\ index\ \};}
+\DoxyCodeLine{00312\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_generic_pointer_aa8f86c0f330807f337351a95ae254b78}{Append}}(token,\ \mbox{\hyperlink{class_generic_pointer_aeb61ba8e67260b43090791eeca8b90e0}{allocator}});}
+\DoxyCodeLine{00313\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00314\ \ \ \ \ \}}
+\DoxyCodeLine{00315\ }
+\DoxyCodeLine{00317\ }
+\DoxyCodeLine{00322\ \ \ \ \ \mbox{\hyperlink{class_generic_pointer}{GenericPointer}}\ \mbox{\hyperlink{class_generic_pointer_aa8f86c0f330807f337351a95ae254b78}{Append}}(\textcolor{keyword}{const}\ ValueType\&\ token,\ \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}*\ \mbox{\hyperlink{class_generic_pointer_aeb61ba8e67260b43090791eeca8b90e0}{allocator}}\ =\ 0)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00323\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (token.IsString())}
+\DoxyCodeLine{00324\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_generic_pointer_aa8f86c0f330807f337351a95ae254b78}{Append}}(token.GetString(),\ token.GetStringLength(),\ \mbox{\hyperlink{class_generic_pointer_aeb61ba8e67260b43090791eeca8b90e0}{allocator}});}
+\DoxyCodeLine{00325\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00326\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(token.IsUint64());}
+\DoxyCodeLine{00327\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(token.GetUint64()\ <=\ \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}(\string~0));}
+\DoxyCodeLine{00328\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_generic_pointer_aa8f86c0f330807f337351a95ae254b78}{Append}}(\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\textcolor{keyword}{>}(token.GetUint64()),\ \mbox{\hyperlink{class_generic_pointer_aeb61ba8e67260b43090791eeca8b90e0}{allocator}});}
+\DoxyCodeLine{00329\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00330\ \ \ \ \ \}}
+\DoxyCodeLine{00331\ }
+\DoxyCodeLine{00333\ }
+\DoxyCodeLine{00334\ }
+\DoxyCodeLine{00336\ \ \ \ \ \textcolor{keywordtype}{bool}\ IsValid()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_generic_pointer_a8898ec432dc40b28f79db78dc4ca83e0}{parseErrorCode\_}}\ ==\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_ggacb2e274f33e54d91b96e9883a99a98bea81e2b6fbd1bf4ac890ddb7779265e3a0}{kPointerParseErrorNone}};\ \}}
+\DoxyCodeLine{00337\ }
+\DoxyCodeLine{00339\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ GetParseErrorOffset()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_generic_pointer_ad103ed62e206319f1f0f4aa271866e37}{parseErrorOffset\_}};\ \}}
+\DoxyCodeLine{00340\ }
+\DoxyCodeLine{00342\ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_gacb2e274f33e54d91b96e9883a99a98be}{PointerParseErrorCode}}\ GetParseErrorCode()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_generic_pointer_a8898ec432dc40b28f79db78dc4ca83e0}{parseErrorCode\_}};\ \}}
+\DoxyCodeLine{00343\ }
+\DoxyCodeLine{00345\ }
+\DoxyCodeLine{00347\ \ \ \ \ \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}\&\ GetAllocator()\ \{\ \textcolor{keywordflow}{return}\ *\mbox{\hyperlink{class_generic_pointer_a331cffeec161b80ea18ac3f1562851bf}{allocator\_}};\ \}}
+\DoxyCodeLine{00348\ }
+\DoxyCodeLine{00350\ }
+\DoxyCodeLine{00351\ }
+\DoxyCodeLine{00353\ \ \ \ \ \textcolor{keyword}{const}\ Token*\ \mbox{\hyperlink{namespacecpp_1_1tokenize_abdc89f5b08e972e7404e9b9ac1dd17ff}{GetTokens}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_generic_pointer_a997793c66ea1a264089c37c8731eb138}{tokens\_}};\ \}}
+\DoxyCodeLine{00354\ }
+\DoxyCodeLine{00356\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ GetTokenCount()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_generic_pointer_a7051cf59af6622542a050bd0ff0340f8}{tokenCount\_}};\ \}}
+\DoxyCodeLine{00357\ }
+\DoxyCodeLine{00359\ }
+\DoxyCodeLine{00361\ }
+\DoxyCodeLine{00362\ }
+\DoxyCodeLine{00364\ }
+\DoxyCodeLine{00367\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{environment_8hpp_ac70f6c217754a8581540f9d3f5b1c1ed}{operator==}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{class_generic_pointer}{GenericPointer}}\&\ rhs)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00368\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!IsValid()\ ||\ !rhs.IsValid()\ ||\ \mbox{\hyperlink{class_generic_pointer_a7051cf59af6622542a050bd0ff0340f8}{tokenCount\_}}\ !=\ rhs.\mbox{\hyperlink{class_generic_pointer_a7051cf59af6622542a050bd0ff0340f8}{tokenCount\_}})}
+\DoxyCodeLine{00369\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00370\ }
+\DoxyCodeLine{00371\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{class_generic_pointer_a7051cf59af6622542a050bd0ff0340f8}{tokenCount\_}};\ i++)\ \{}
+\DoxyCodeLine{00372\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_generic_pointer_a997793c66ea1a264089c37c8731eb138}{tokens\_}}[i].index\ !=\ rhs.\mbox{\hyperlink{class_generic_pointer_a997793c66ea1a264089c37c8731eb138}{tokens\_}}[i].\mbox{\hyperlink{struct_generic_pointer_1_1_token_a0ce571cfe3f3da942a5912bb2cd24dcf}{index}}\ ||}
+\DoxyCodeLine{00373\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_pointer_a997793c66ea1a264089c37c8731eb138}{tokens\_}}[i].\mbox{\hyperlink{struct_generic_pointer_1_1_token_a67383574032a3289d34002bb2d95df6d}{length}}\ !=\ rhs.\mbox{\hyperlink{class_generic_pointer_a997793c66ea1a264089c37c8731eb138}{tokens\_}}[i].\mbox{\hyperlink{struct_generic_pointer_1_1_token_a67383574032a3289d34002bb2d95df6d}{length}}\ ||\ }
+\DoxyCodeLine{00374\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{class_generic_pointer_a997793c66ea1a264089c37c8731eb138}{tokens\_}}[i].\mbox{\hyperlink{struct_generic_pointer_1_1_token_a67383574032a3289d34002bb2d95df6d}{length}}\ !=\ 0\ \&\&\ std::memcmp(\mbox{\hyperlink{class_generic_pointer_a997793c66ea1a264089c37c8731eb138}{tokens\_}}[i].\mbox{\hyperlink{struct_generic_pointer_1_1_token_a8aa9b13bd66addb0c0512cfcae72174c}{name}},\ rhs.\mbox{\hyperlink{class_generic_pointer_a997793c66ea1a264089c37c8731eb138}{tokens\_}}[i].\mbox{\hyperlink{struct_generic_pointer_1_1_token_a8aa9b13bd66addb0c0512cfcae72174c}{name}},\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{class_generic_pointer_a77f7746a798967ee3f9aa608164eafef}{Ch}})*\ \mbox{\hyperlink{class_generic_pointer_a997793c66ea1a264089c37c8731eb138}{tokens\_}}[i].\mbox{\hyperlink{struct_generic_pointer_1_1_token_a67383574032a3289d34002bb2d95df6d}{length}})\ !=\ 0))}
+\DoxyCodeLine{00375\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00376\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00377\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00378\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00379\ }
+\DoxyCodeLine{00380\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00381\ \ \ \ \ \}}
+\DoxyCodeLine{00382\ }
+\DoxyCodeLine{00384\ }
+\DoxyCodeLine{00387\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{environment_8hpp_a1f4c4c464184ccd8c78b240bcb2017c8}{operator!=}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{class_generic_pointer}{GenericPointer}}\&\ rhs)\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ !(*\textcolor{keyword}{this}\ ==\ rhs);\ \}}
+\DoxyCodeLine{00388\ }
+\DoxyCodeLine{00390\ }
+\DoxyCodeLine{00393\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{base58_8cpp_a6db3085f36d565f1dd8589c8386d3a2f}{operator<}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{class_generic_pointer}{GenericPointer}}\&\ rhs)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00394\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!IsValid())}
+\DoxyCodeLine{00395\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00396\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!rhs.IsValid())}
+\DoxyCodeLine{00397\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00398\ }
+\DoxyCodeLine{00399\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_generic_pointer_a7051cf59af6622542a050bd0ff0340f8}{tokenCount\_}}\ !=\ rhs.\mbox{\hyperlink{class_generic_pointer_a7051cf59af6622542a050bd0ff0340f8}{tokenCount\_}})}
+\DoxyCodeLine{00400\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_generic_pointer_a7051cf59af6622542a050bd0ff0340f8}{tokenCount\_}}\ <\ rhs.\mbox{\hyperlink{class_generic_pointer_a7051cf59af6622542a050bd0ff0340f8}{tokenCount\_}};}
+\DoxyCodeLine{00401\ }
+\DoxyCodeLine{00402\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{class_generic_pointer_a7051cf59af6622542a050bd0ff0340f8}{tokenCount\_}};\ i++)\ \{}
+\DoxyCodeLine{00403\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_generic_pointer_a997793c66ea1a264089c37c8731eb138}{tokens\_}}[i].index\ !=\ rhs.\mbox{\hyperlink{class_generic_pointer_a997793c66ea1a264089c37c8731eb138}{tokens\_}}[i].\mbox{\hyperlink{struct_generic_pointer_1_1_token_a0ce571cfe3f3da942a5912bb2cd24dcf}{index}})}
+\DoxyCodeLine{00404\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_generic_pointer_a997793c66ea1a264089c37c8731eb138}{tokens\_}}[i].\mbox{\hyperlink{struct_generic_pointer_1_1_token_a0ce571cfe3f3da942a5912bb2cd24dcf}{index}}\ <\ rhs.\mbox{\hyperlink{class_generic_pointer_a997793c66ea1a264089c37c8731eb138}{tokens\_}}[i].\mbox{\hyperlink{struct_generic_pointer_1_1_token_a0ce571cfe3f3da942a5912bb2cd24dcf}{index}};}
+\DoxyCodeLine{00405\ }
+\DoxyCodeLine{00406\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_generic_pointer_a997793c66ea1a264089c37c8731eb138}{tokens\_}}[i].length\ !=\ rhs.\mbox{\hyperlink{class_generic_pointer_a997793c66ea1a264089c37c8731eb138}{tokens\_}}[i].\mbox{\hyperlink{struct_generic_pointer_1_1_token_a67383574032a3289d34002bb2d95df6d}{length}})}
+\DoxyCodeLine{00407\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_generic_pointer_a997793c66ea1a264089c37c8731eb138}{tokens\_}}[i].\mbox{\hyperlink{struct_generic_pointer_1_1_token_a67383574032a3289d34002bb2d95df6d}{length}}\ <\ rhs.\mbox{\hyperlink{class_generic_pointer_a997793c66ea1a264089c37c8731eb138}{tokens\_}}[i].\mbox{\hyperlink{struct_generic_pointer_1_1_token_a67383574032a3289d34002bb2d95df6d}{length}};}
+\DoxyCodeLine{00408\ }
+\DoxyCodeLine{00409\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keywordtype}{int}\ \mbox{\hyperlink{xbyak__mnemonic_8h_a1eab233e37cc0eb225b69b7840d34d96}{cmp}}\ =\ std::memcmp(\mbox{\hyperlink{class_generic_pointer_a997793c66ea1a264089c37c8731eb138}{tokens\_}}[i].\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ rhs.\mbox{\hyperlink{class_generic_pointer_a997793c66ea1a264089c37c8731eb138}{tokens\_}}[i].\mbox{\hyperlink{struct_generic_pointer_1_1_token_a8aa9b13bd66addb0c0512cfcae72174c}{name}},\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{class_generic_pointer_a77f7746a798967ee3f9aa608164eafef}{Ch}})\ *\ \mbox{\hyperlink{class_generic_pointer_a997793c66ea1a264089c37c8731eb138}{tokens\_}}[i].\mbox{\hyperlink{struct_generic_pointer_1_1_token_a67383574032a3289d34002bb2d95df6d}{length}}))}
+\DoxyCodeLine{00410\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{xbyak__mnemonic_8h_a1eab233e37cc0eb225b69b7840d34d96}{cmp}}\ <\ 0;}
+\DoxyCodeLine{00411\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00412\ }
+\DoxyCodeLine{00413\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00414\ \ \ \ \ \}}
+\DoxyCodeLine{00415\ }
+\DoxyCodeLine{00417\ }
+\DoxyCodeLine{00419\ }
+\DoxyCodeLine{00420\ }
+\DoxyCodeLine{00422\ }
+\DoxyCodeLine{00426\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ OutputStream>}
+\DoxyCodeLine{00427\ \ \ \ \ \textcolor{keywordtype}{bool}\ Stringify(OutputStream\&\ os)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00428\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Stringify<false,\ OutputStream>(os);}
+\DoxyCodeLine{00429\ \ \ \ \ \}}
+\DoxyCodeLine{00430\ }
+\DoxyCodeLine{00432\ }
+\DoxyCodeLine{00436\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ OutputStream>}
+\DoxyCodeLine{00437\ \ \ \ \ \textcolor{keywordtype}{bool}\ StringifyUriFragment(OutputStream\&\ os)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00438\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Stringify<true,\ OutputStream>(os);}
+\DoxyCodeLine{00439\ \ \ \ \ \}}
+\DoxyCodeLine{00440\ }
+\DoxyCodeLine{00442\ }
+\DoxyCodeLine{00444\ }
+\DoxyCodeLine{00445\ }
+\DoxyCodeLine{00447\ }
+\DoxyCodeLine{00461\ \ \ \ \ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}\&\ Create(ValueType\&\ root,\ \textcolor{keyword}{typename}\ ValueType::AllocatorType\&\ \mbox{\hyperlink{class_generic_pointer_aeb61ba8e67260b43090791eeca8b90e0}{allocator}},\ \textcolor{keywordtype}{bool}*\ alreadyExist\ =\ 0)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00462\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(IsValid());}
+\DoxyCodeLine{00463\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}*\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ =\ \&root;}
+\DoxyCodeLine{00464\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ exist\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00465\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ Token\ *t\ =\ \mbox{\hyperlink{class_generic_pointer_a997793c66ea1a264089c37c8731eb138}{tokens\_}};\ t\ !=\ \mbox{\hyperlink{class_generic_pointer_a997793c66ea1a264089c37c8731eb138}{tokens\_}}\ +\ \mbox{\hyperlink{class_generic_pointer_a7051cf59af6622542a050bd0ff0340f8}{tokenCount\_}};\ ++t)\ \{}
+\DoxyCodeLine{00466\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>IsArray()\ \&\&\ t-\/>name[0]\ ==\ \textcolor{charliteral}{'-\/'}\ \&\&\ t-\/>length\ ==\ 1)\ \{}
+\DoxyCodeLine{00467\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>PushBack(\mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}().Move(),\ \mbox{\hyperlink{class_generic_pointer_aeb61ba8e67260b43090791eeca8b90e0}{allocator}});}
+\DoxyCodeLine{00468\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ =\ \&((*v)[\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>Size()\ -\/\ 1]);}
+\DoxyCodeLine{00469\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ exist\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00470\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00471\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00472\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (t-\/>index\ ==\ kPointerInvalidIndex)\ \{\ \textcolor{comment}{//\ must\ be\ object\ name}}
+\DoxyCodeLine{00473\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>IsObject())}
+\DoxyCodeLine{00474\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>SetObject();\ \textcolor{comment}{//\ Change\ to\ Object}}
+\DoxyCodeLine{00475\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00476\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{\ \textcolor{comment}{//\ object\ name\ or\ array\ index}}
+\DoxyCodeLine{00477\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>IsArray()\ \&\&\ !\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>IsObject())}
+\DoxyCodeLine{00478\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>SetArray();\ \textcolor{comment}{//\ Change\ to\ Array}}
+\DoxyCodeLine{00479\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00480\ }
+\DoxyCodeLine{00481\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>IsArray())\ \{}
+\DoxyCodeLine{00482\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (t-\/>index\ >=\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>Size())\ \{}
+\DoxyCodeLine{00483\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>Reserve(t-\/>index\ +\ 1,\ \mbox{\hyperlink{class_generic_pointer_aeb61ba8e67260b43090791eeca8b90e0}{allocator}});}
+\DoxyCodeLine{00484\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (t-\/>index\ >=\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>Size())}
+\DoxyCodeLine{00485\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>PushBack(\mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}().Move(),\ \mbox{\hyperlink{class_generic_pointer_aeb61ba8e67260b43090791eeca8b90e0}{allocator}});}
+\DoxyCodeLine{00486\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ exist\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00487\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00488\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ =\ \&((*v)[t-\/>index]);}
+\DoxyCodeLine{00489\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00490\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00491\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typename}\ ValueType::MemberIterator\ m\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>FindMember(\mbox{\hyperlink{struct_generic_string_ref}{GenericStringRef<Ch>}}(t-\/>name,\ t-\/>length));}
+\DoxyCodeLine{00492\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (m\ ==\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>MemberEnd())\ \{}
+\DoxyCodeLine{00493\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>AddMember(\mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}(t-\/>name,\ t-\/>length,\ \mbox{\hyperlink{class_generic_pointer_aeb61ba8e67260b43090791eeca8b90e0}{allocator}}).Move(),\ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}().Move(),\ \mbox{\hyperlink{class_generic_pointer_aeb61ba8e67260b43090791eeca8b90e0}{allocator}});}
+\DoxyCodeLine{00494\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ =\ \&(-\/-\/\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>MemberEnd())-\/>value;\ \textcolor{comment}{//\ Assumes\ AddMember()\ appends\ at\ the\ end}}
+\DoxyCodeLine{00495\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ exist\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00496\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00497\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00498\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ =\ \&m-\/>value;}
+\DoxyCodeLine{00499\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00500\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00501\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00502\ }
+\DoxyCodeLine{00503\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (alreadyExist)}
+\DoxyCodeLine{00504\ \ \ \ \ \ \ \ \ \ \ \ \ *alreadyExist\ =\ exist;}
+\DoxyCodeLine{00505\ }
+\DoxyCodeLine{00506\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{00507\ \ \ \ \ \}}
+\DoxyCodeLine{00508\ }
+\DoxyCodeLine{00510\ }
+\DoxyCodeLine{00515\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ stackAllocator>}
+\DoxyCodeLine{00516\ \ \ \ \ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}\&\ Create(\mbox{\hyperlink{class_generic_document}{GenericDocument<EncodingType,\ typename\ ValueType::AllocatorType,\ stackAllocator>}}\&\ document,\ \textcolor{keywordtype}{bool}*\ alreadyExist\ =\ 0)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00517\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Create(document,\ document.\mbox{\hyperlink{class_generic_document_a1362cbdcce6ca37356744a3a0dbb11d6}{GetAllocator}}(),\ alreadyExist);}
+\DoxyCodeLine{00518\ \ \ \ \ \}}
+\DoxyCodeLine{00519\ }
+\DoxyCodeLine{00521\ }
+\DoxyCodeLine{00523\ }
+\DoxyCodeLine{00524\ }
+\DoxyCodeLine{00526\ }
+\DoxyCodeLine{00539\ \ \ \ \ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}*\ Get(ValueType\&\ root,\ \textcolor{keywordtype}{size\_t}*\ unresolvedTokenIndex\ =\ 0)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00540\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(IsValid());}
+\DoxyCodeLine{00541\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}*\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ =\ \&root;}
+\DoxyCodeLine{00542\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ Token\ *t\ =\ \mbox{\hyperlink{class_generic_pointer_a997793c66ea1a264089c37c8731eb138}{tokens\_}};\ t\ !=\ \mbox{\hyperlink{class_generic_pointer_a997793c66ea1a264089c37c8731eb138}{tokens\_}}\ +\ \mbox{\hyperlink{class_generic_pointer_a7051cf59af6622542a050bd0ff0340f8}{tokenCount\_}};\ ++t)\ \{}
+\DoxyCodeLine{00543\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>GetType())\ \{}
+\DoxyCodeLine{00544\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7a146f46700e905e8df96a6a90b5c7640f}{kObjectType}}:}
+\DoxyCodeLine{00545\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00546\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typename}\ ValueType::MemberIterator\ m\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>FindMember(\mbox{\hyperlink{struct_generic_string_ref}{GenericStringRef<Ch>}}(t-\/>name,\ t-\/>length));}
+\DoxyCodeLine{00547\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (m\ ==\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>MemberEnd())}
+\DoxyCodeLine{00548\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00549\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ =\ \&m-\/>value;}
+\DoxyCodeLine{00550\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00551\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{00552\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7af41527d6925efa3c5c3dadb23dfef7c8}{kArrayType}}:}
+\DoxyCodeLine{00553\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (t-\/>index\ ==\ kPointerInvalidIndex\ ||\ t-\/>index\ >=\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>Size())}
+\DoxyCodeLine{00554\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00555\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ =\ \&((*v)[t-\/>index]);}
+\DoxyCodeLine{00556\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{00557\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00558\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00559\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00560\ }
+\DoxyCodeLine{00561\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Error:\ unresolved\ token}}
+\DoxyCodeLine{00562\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (unresolvedTokenIndex)}
+\DoxyCodeLine{00563\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *unresolvedTokenIndex\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(t\ -\/\ \mbox{\hyperlink{class_generic_pointer_a997793c66ea1a264089c37c8731eb138}{tokens\_}});}
+\DoxyCodeLine{00564\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00565\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00566\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{00567\ \ \ \ \ \}}
+\DoxyCodeLine{00568\ }
+\DoxyCodeLine{00570\ }
+\DoxyCodeLine{00574\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}*\ Get(\textcolor{keyword}{const}\ ValueType\&\ root,\ \textcolor{keywordtype}{size\_t}*\ unresolvedTokenIndex\ =\ 0)\textcolor{keyword}{\ const\ }\{\ }
+\DoxyCodeLine{00575\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Get(\textcolor{keyword}{const\_cast<}\mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}\&\textcolor{keyword}{>}(root),\ unresolvedTokenIndex);}
+\DoxyCodeLine{00576\ \ \ \ \ \}}
+\DoxyCodeLine{00577\ }
+\DoxyCodeLine{00579\ }
+\DoxyCodeLine{00581\ }
+\DoxyCodeLine{00582\ }
+\DoxyCodeLine{00584\ }
+\DoxyCodeLine{00593\ \ \ \ \ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}\&\ GetWithDefault(ValueType\&\ root,\ \textcolor{keyword}{const}\ ValueType\&\ \mbox{\hyperlink{pointer_8h_a3db30c1795eb39d4452f8698f4a67f05}{defaultValue}},\ \textcolor{keyword}{typename}\ ValueType::AllocatorType\&\ \mbox{\hyperlink{class_generic_pointer_aeb61ba8e67260b43090791eeca8b90e0}{allocator}})\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00594\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ alreadyExist;}
+\DoxyCodeLine{00595\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}\&\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ =\ Create(root,\ \mbox{\hyperlink{class_generic_pointer_aeb61ba8e67260b43090791eeca8b90e0}{allocator}},\ \&alreadyExist);}
+\DoxyCodeLine{00596\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ alreadyExist\ ?\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ :\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.CopyFrom(\mbox{\hyperlink{pointer_8h_a3db30c1795eb39d4452f8698f4a67f05}{defaultValue}},\ \mbox{\hyperlink{class_generic_pointer_aeb61ba8e67260b43090791eeca8b90e0}{allocator}});}
+\DoxyCodeLine{00597\ \ \ \ \ \}}
+\DoxyCodeLine{00598\ }
+\DoxyCodeLine{00600\ \ \ \ \ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}\&\ GetWithDefault(ValueType\&\ root,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_generic_pointer_a77f7746a798967ee3f9aa608164eafef}{Ch}}*\ \mbox{\hyperlink{pointer_8h_a3db30c1795eb39d4452f8698f4a67f05}{defaultValue}},\ \textcolor{keyword}{typename}\ ValueType::AllocatorType\&\ \mbox{\hyperlink{class_generic_pointer_aeb61ba8e67260b43090791eeca8b90e0}{allocator}})\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00601\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ alreadyExist;}
+\DoxyCodeLine{00602\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}\&\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ =\ Create(root,\ \mbox{\hyperlink{class_generic_pointer_aeb61ba8e67260b43090791eeca8b90e0}{allocator}},\ \&alreadyExist);}
+\DoxyCodeLine{00603\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ alreadyExist\ ?\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ :\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.SetString(\mbox{\hyperlink{pointer_8h_a3db30c1795eb39d4452f8698f4a67f05}{defaultValue}},\ \mbox{\hyperlink{class_generic_pointer_aeb61ba8e67260b43090791eeca8b90e0}{allocator}});}
+\DoxyCodeLine{00604\ \ \ \ \ \}}
+\DoxyCodeLine{00605\ }
+\DoxyCodeLine{00606\ \textcolor{preprocessor}{\#if\ RAPIDJSON\_HAS\_STDSTRING}}
+\DoxyCodeLine{00608\ \ \ \ \ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}\&\ GetWithDefault(ValueType\&\ root,\ \textcolor{keyword}{const}\ std::basic\_string<Ch>\&\ \mbox{\hyperlink{pointer_8h_a3db30c1795eb39d4452f8698f4a67f05}{defaultValue}},\ \textcolor{keyword}{typename}\ ValueType::AllocatorType\&\ \mbox{\hyperlink{class_generic_pointer_aeb61ba8e67260b43090791eeca8b90e0}{allocator}})\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00609\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ alreadyExist;}
+\DoxyCodeLine{00610\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}\&\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ =\ Create(root,\ \mbox{\hyperlink{class_generic_pointer_aeb61ba8e67260b43090791eeca8b90e0}{allocator}},\ \&alreadyExist);}
+\DoxyCodeLine{00611\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ alreadyExist\ ?\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ :\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.SetString(\mbox{\hyperlink{pointer_8h_a3db30c1795eb39d4452f8698f4a67f05}{defaultValue}},\ \mbox{\hyperlink{class_generic_pointer_aeb61ba8e67260b43090791eeca8b90e0}{allocator}});}
+\DoxyCodeLine{00612\ \ \ \ \ \}}
+\DoxyCodeLine{00613\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00614\ }
+\DoxyCodeLine{00616\ }
+\DoxyCodeLine{00619\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{00620\ \ \ \ \ \mbox{\hyperlink{class_generic_pointer_aaf4d7d852098878d24188d134182d42f}{RAPIDJSON\_DISABLEIF\_RETURN}}((internal::OrExpr<internal::IsPointer<T>,\ \mbox{\hyperlink{structinternal_1_1_is_generic_value}{internal::IsGenericValue<T>}}\ >),\ (ValueType\&))}
+\DoxyCodeLine{00621\ \ \ \ \ GetWithDefault(ValueType\&\ root,\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \mbox{\hyperlink{pointer_8h_a3db30c1795eb39d4452f8698f4a67f05}{defaultValue}},\ \textcolor{keyword}{typename}\ ValueType::AllocatorType\&\ \mbox{\hyperlink{class_generic_pointer_aeb61ba8e67260b43090791eeca8b90e0}{allocator}})\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00622\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ GetWithDefault(root,\ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}(\mbox{\hyperlink{pointer_8h_a3db30c1795eb39d4452f8698f4a67f05}{defaultValue}}).Move(),\ \mbox{\hyperlink{class_generic_pointer_aeb61ba8e67260b43090791eeca8b90e0}{allocator}});}
+\DoxyCodeLine{00623\ \ \ \ \ \}}
+\DoxyCodeLine{00624\ }
+\DoxyCodeLine{00626\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ stackAllocator>}
+\DoxyCodeLine{00627\ \ \ \ \ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}\&\ GetWithDefault(\mbox{\hyperlink{class_generic_document}{GenericDocument<EncodingType,\ typename\ ValueType::AllocatorType,\ stackAllocator>}}\&\ document,\ \textcolor{keyword}{const}\ ValueType\&\ \mbox{\hyperlink{pointer_8h_a3db30c1795eb39d4452f8698f4a67f05}{defaultValue}})\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00628\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ GetWithDefault(document,\ \mbox{\hyperlink{pointer_8h_a3db30c1795eb39d4452f8698f4a67f05}{defaultValue}},\ document.\mbox{\hyperlink{class_generic_document_a1362cbdcce6ca37356744a3a0dbb11d6}{GetAllocator}}());}
+\DoxyCodeLine{00629\ \ \ \ \ \}}
+\DoxyCodeLine{00630\ }
+\DoxyCodeLine{00632\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ stackAllocator>}
+\DoxyCodeLine{00633\ \ \ \ \ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}\&\ GetWithDefault(\mbox{\hyperlink{class_generic_document}{GenericDocument<EncodingType,\ typename\ ValueType::AllocatorType,\ stackAllocator>}}\&\ document,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_generic_pointer_a77f7746a798967ee3f9aa608164eafef}{Ch}}*\ \mbox{\hyperlink{pointer_8h_a3db30c1795eb39d4452f8698f4a67f05}{defaultValue}})\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00634\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ GetWithDefault(document,\ \mbox{\hyperlink{pointer_8h_a3db30c1795eb39d4452f8698f4a67f05}{defaultValue}},\ document.\mbox{\hyperlink{class_generic_document_a1362cbdcce6ca37356744a3a0dbb11d6}{GetAllocator}}());}
+\DoxyCodeLine{00635\ \ \ \ \ \}}
+\DoxyCodeLine{00636\ \ \ \ \ }
+\DoxyCodeLine{00637\ \textcolor{preprocessor}{\#if\ RAPIDJSON\_HAS\_STDSTRING}}
+\DoxyCodeLine{00639\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ stackAllocator>}
+\DoxyCodeLine{00640\ \ \ \ \ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}\&\ GetWithDefault(\mbox{\hyperlink{class_generic_document}{GenericDocument<EncodingType,\ typename\ ValueType::AllocatorType,\ stackAllocator>}}\&\ document,\ \textcolor{keyword}{const}\ std::basic\_string<Ch>\&\ \mbox{\hyperlink{pointer_8h_a3db30c1795eb39d4452f8698f4a67f05}{defaultValue}})\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00641\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ GetWithDefault(document,\ \mbox{\hyperlink{pointer_8h_a3db30c1795eb39d4452f8698f4a67f05}{defaultValue}},\ document.\mbox{\hyperlink{class_generic_document_a1362cbdcce6ca37356744a3a0dbb11d6}{GetAllocator}}());}
+\DoxyCodeLine{00642\ \ \ \ \ \}}
+\DoxyCodeLine{00643\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00644\ }
+\DoxyCodeLine{00646\ }
+\DoxyCodeLine{00649\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T,\ \textcolor{keyword}{typename}\ stackAllocator>}
+\DoxyCodeLine{00650\ \ \ \ \ \mbox{\hyperlink{class_generic_pointer_aaf4d7d852098878d24188d134182d42f}{RAPIDJSON\_DISABLEIF\_RETURN}}((internal::OrExpr<internal::IsPointer<T>,\ \mbox{\hyperlink{structinternal_1_1_is_generic_value}{internal::IsGenericValue<T>}}\ >),\ (ValueType\&))}
+\DoxyCodeLine{00651\ \ \ \ \ GetWithDefault(\mbox{\hyperlink{class_generic_document}{GenericDocument<EncodingType,\ typename\ ValueType::AllocatorType,\ stackAllocator>}}\&\ document,\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \mbox{\hyperlink{pointer_8h_a3db30c1795eb39d4452f8698f4a67f05}{defaultValue}})\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00652\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ GetWithDefault(document,\ \mbox{\hyperlink{pointer_8h_a3db30c1795eb39d4452f8698f4a67f05}{defaultValue}},\ document.\mbox{\hyperlink{class_generic_document_a1362cbdcce6ca37356744a3a0dbb11d6}{GetAllocator}}());}
+\DoxyCodeLine{00653\ \ \ \ \ \}}
+\DoxyCodeLine{00654\ }
+\DoxyCodeLine{00656\ }
+\DoxyCodeLine{00658\ }
+\DoxyCodeLine{00659\ }
+\DoxyCodeLine{00661\ }
+\DoxyCodeLine{00670\ \ \ \ \ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}\&\ Set(ValueType\&\ root,\ ValueType\&\ \mbox{\hyperlink{pointer_8h_a1a309f137cf282fe5bdc882038e728d9}{value}},\ \textcolor{keyword}{typename}\ ValueType::AllocatorType\&\ \mbox{\hyperlink{class_generic_pointer_aeb61ba8e67260b43090791eeca8b90e0}{allocator}})\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00671\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Create(root,\ \mbox{\hyperlink{class_generic_pointer_aeb61ba8e67260b43090791eeca8b90e0}{allocator}})\ =\ \mbox{\hyperlink{pointer_8h_a1a309f137cf282fe5bdc882038e728d9}{value}};}
+\DoxyCodeLine{00672\ \ \ \ \ \}}
+\DoxyCodeLine{00673\ }
+\DoxyCodeLine{00675\ \ \ \ \ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}\&\ Set(ValueType\&\ root,\ \textcolor{keyword}{const}\ ValueType\&\ \mbox{\hyperlink{pointer_8h_a1a309f137cf282fe5bdc882038e728d9}{value}},\ \textcolor{keyword}{typename}\ ValueType::AllocatorType\&\ \mbox{\hyperlink{class_generic_pointer_aeb61ba8e67260b43090791eeca8b90e0}{allocator}})\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00676\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Create(root,\ \mbox{\hyperlink{class_generic_pointer_aeb61ba8e67260b43090791eeca8b90e0}{allocator}}).CopyFrom(\mbox{\hyperlink{pointer_8h_a1a309f137cf282fe5bdc882038e728d9}{value}},\ \mbox{\hyperlink{class_generic_pointer_aeb61ba8e67260b43090791eeca8b90e0}{allocator}});}
+\DoxyCodeLine{00677\ \ \ \ \ \}}
+\DoxyCodeLine{00678\ }
+\DoxyCodeLine{00680\ \ \ \ \ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}\&\ Set(ValueType\&\ root,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_generic_pointer_a77f7746a798967ee3f9aa608164eafef}{Ch}}*\ \mbox{\hyperlink{pointer_8h_a1a309f137cf282fe5bdc882038e728d9}{value}},\ \textcolor{keyword}{typename}\ ValueType::AllocatorType\&\ \mbox{\hyperlink{class_generic_pointer_aeb61ba8e67260b43090791eeca8b90e0}{allocator}})\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00681\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Create(root,\ \mbox{\hyperlink{class_generic_pointer_aeb61ba8e67260b43090791eeca8b90e0}{allocator}})\ =\ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}(\mbox{\hyperlink{pointer_8h_a1a309f137cf282fe5bdc882038e728d9}{value}},\ \mbox{\hyperlink{class_generic_pointer_aeb61ba8e67260b43090791eeca8b90e0}{allocator}}).Move();}
+\DoxyCodeLine{00682\ \ \ \ \ \}}
+\DoxyCodeLine{00683\ }
+\DoxyCodeLine{00684\ \textcolor{preprocessor}{\#if\ RAPIDJSON\_HAS\_STDSTRING}}
+\DoxyCodeLine{00686\ \ \ \ \ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}\&\ Set(ValueType\&\ root,\ \textcolor{keyword}{const}\ std::basic\_string<Ch>\&\ \mbox{\hyperlink{pointer_8h_a1a309f137cf282fe5bdc882038e728d9}{value}},\ \textcolor{keyword}{typename}\ ValueType::AllocatorType\&\ \mbox{\hyperlink{class_generic_pointer_aeb61ba8e67260b43090791eeca8b90e0}{allocator}})\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00687\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Create(root,\ \mbox{\hyperlink{class_generic_pointer_aeb61ba8e67260b43090791eeca8b90e0}{allocator}})\ =\ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}(\mbox{\hyperlink{pointer_8h_a1a309f137cf282fe5bdc882038e728d9}{value}},\ \mbox{\hyperlink{class_generic_pointer_aeb61ba8e67260b43090791eeca8b90e0}{allocator}}).Move();}
+\DoxyCodeLine{00688\ \ \ \ \ \}}
+\DoxyCodeLine{00689\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00690\ }
+\DoxyCodeLine{00692\ }
+\DoxyCodeLine{00695\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{00696\ \ \ \ \ \mbox{\hyperlink{class_generic_pointer_aaf4d7d852098878d24188d134182d42f}{RAPIDJSON\_DISABLEIF\_RETURN}}((internal::OrExpr<internal::IsPointer<T>,\ \mbox{\hyperlink{structinternal_1_1_is_generic_value}{internal::IsGenericValue<T>}}\ >),\ (ValueType\&))}
+\DoxyCodeLine{00697\ \ \ \ \ Set(ValueType\&\ root,\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \mbox{\hyperlink{pointer_8h_a1a309f137cf282fe5bdc882038e728d9}{value}},\ \textcolor{keyword}{typename}\ ValueType::AllocatorType\&\ \mbox{\hyperlink{class_generic_pointer_aeb61ba8e67260b43090791eeca8b90e0}{allocator}})\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00698\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Create(root,\ \mbox{\hyperlink{class_generic_pointer_aeb61ba8e67260b43090791eeca8b90e0}{allocator}})\ =\ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}(\mbox{\hyperlink{pointer_8h_a1a309f137cf282fe5bdc882038e728d9}{value}}).Move();}
+\DoxyCodeLine{00699\ \ \ \ \ \}}
+\DoxyCodeLine{00700\ }
+\DoxyCodeLine{00702\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ stackAllocator>}
+\DoxyCodeLine{00703\ \ \ \ \ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}\&\ Set(\mbox{\hyperlink{class_generic_document}{GenericDocument<EncodingType,\ typename\ ValueType::AllocatorType,\ stackAllocator>}}\&\ document,\ ValueType\&\ \mbox{\hyperlink{pointer_8h_a1a309f137cf282fe5bdc882038e728d9}{value}})\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00704\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Create(document)\ =\ \mbox{\hyperlink{pointer_8h_a1a309f137cf282fe5bdc882038e728d9}{value}};}
+\DoxyCodeLine{00705\ \ \ \ \ \}}
+\DoxyCodeLine{00706\ }
+\DoxyCodeLine{00708\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ stackAllocator>}
+\DoxyCodeLine{00709\ \ \ \ \ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}\&\ Set(\mbox{\hyperlink{class_generic_document}{GenericDocument<EncodingType,\ typename\ ValueType::AllocatorType,\ stackAllocator>}}\&\ document,\ \textcolor{keyword}{const}\ ValueType\&\ \mbox{\hyperlink{pointer_8h_a1a309f137cf282fe5bdc882038e728d9}{value}})\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00710\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Create(document).CopyFrom(\mbox{\hyperlink{pointer_8h_a1a309f137cf282fe5bdc882038e728d9}{value}},\ document.\mbox{\hyperlink{class_generic_document_a1362cbdcce6ca37356744a3a0dbb11d6}{GetAllocator}}());}
+\DoxyCodeLine{00711\ \ \ \ \ \}}
+\DoxyCodeLine{00712\ }
+\DoxyCodeLine{00714\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ stackAllocator>}
+\DoxyCodeLine{00715\ \ \ \ \ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}\&\ Set(\mbox{\hyperlink{class_generic_document}{GenericDocument<EncodingType,\ typename\ ValueType::AllocatorType,\ stackAllocator>}}\&\ document,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_generic_pointer_a77f7746a798967ee3f9aa608164eafef}{Ch}}*\ \mbox{\hyperlink{pointer_8h_a1a309f137cf282fe5bdc882038e728d9}{value}})\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00716\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Create(document)\ =\ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}(\mbox{\hyperlink{pointer_8h_a1a309f137cf282fe5bdc882038e728d9}{value}},\ document.\mbox{\hyperlink{class_generic_document_a1362cbdcce6ca37356744a3a0dbb11d6}{GetAllocator}}()).Move();}
+\DoxyCodeLine{00717\ \ \ \ \ \}}
+\DoxyCodeLine{00718\ }
+\DoxyCodeLine{00719\ \textcolor{preprocessor}{\#if\ RAPIDJSON\_HAS\_STDSTRING}}
+\DoxyCodeLine{00721\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ stackAllocator>}
+\DoxyCodeLine{00722\ \ \ \ \ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}\&\ Set(\mbox{\hyperlink{class_generic_document}{GenericDocument<EncodingType,\ typename\ ValueType::AllocatorType,\ stackAllocator>}}\&\ document,\ \textcolor{keyword}{const}\ std::basic\_string<Ch>\&\ \mbox{\hyperlink{pointer_8h_a1a309f137cf282fe5bdc882038e728d9}{value}})\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00723\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Create(document)\ =\ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}(\mbox{\hyperlink{pointer_8h_a1a309f137cf282fe5bdc882038e728d9}{value}},\ document.\mbox{\hyperlink{class_generic_document_a1362cbdcce6ca37356744a3a0dbb11d6}{GetAllocator}}()).Move();}
+\DoxyCodeLine{00724\ \ \ \ \ \}}
+\DoxyCodeLine{00725\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00726\ }
+\DoxyCodeLine{00728\ }
+\DoxyCodeLine{00731\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T,\ \textcolor{keyword}{typename}\ stackAllocator>}
+\DoxyCodeLine{00732\ \ \ \ \ \mbox{\hyperlink{class_generic_pointer_aaf4d7d852098878d24188d134182d42f}{RAPIDJSON\_DISABLEIF\_RETURN}}((internal::OrExpr<internal::IsPointer<T>,\ \mbox{\hyperlink{structinternal_1_1_is_generic_value}{internal::IsGenericValue<T>}}\ >),\ (ValueType\&))}
+\DoxyCodeLine{00733\ \ \ \ \ \ \ \ \ Set(\mbox{\hyperlink{class_generic_document}{GenericDocument<EncodingType,\ typename\ ValueType::AllocatorType,\ stackAllocator>}}\&\ document,\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \mbox{\hyperlink{pointer_8h_a1a309f137cf282fe5bdc882038e728d9}{value}})\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00734\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Create(document)\ =\ \mbox{\hyperlink{pointer_8h_a1a309f137cf282fe5bdc882038e728d9}{value}};}
+\DoxyCodeLine{00735\ \ \ \ \ \}}
+\DoxyCodeLine{00736\ }
+\DoxyCodeLine{00738\ }
+\DoxyCodeLine{00740\ }
+\DoxyCodeLine{00741\ }
+\DoxyCodeLine{00743\ }
+\DoxyCodeLine{00752\ \ \ \ \ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}\&\ \mbox{\hyperlink{class_generic_pointer_af148818f7c2b10243221953d887044c6}{Swap}}(ValueType\&\ root,\ ValueType\&\ \mbox{\hyperlink{pointer_8h_a1a309f137cf282fe5bdc882038e728d9}{value}},\ \textcolor{keyword}{typename}\ ValueType::AllocatorType\&\ \mbox{\hyperlink{class_generic_pointer_aeb61ba8e67260b43090791eeca8b90e0}{allocator}})\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00753\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Create(root,\ \mbox{\hyperlink{class_generic_pointer_aeb61ba8e67260b43090791eeca8b90e0}{allocator}}).\mbox{\hyperlink{class_generic_pointer_af148818f7c2b10243221953d887044c6}{Swap}}(\mbox{\hyperlink{pointer_8h_a1a309f137cf282fe5bdc882038e728d9}{value}});}
+\DoxyCodeLine{00754\ \ \ \ \ \}}
+\DoxyCodeLine{00755\ }
+\DoxyCodeLine{00757\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ stackAllocator>}
+\DoxyCodeLine{00758\ \ \ \ \ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}\&\ \mbox{\hyperlink{class_generic_pointer_af148818f7c2b10243221953d887044c6}{Swap}}(\mbox{\hyperlink{class_generic_document}{GenericDocument<EncodingType,\ typename\ ValueType::AllocatorType,\ stackAllocator>}}\&\ document,\ ValueType\&\ \mbox{\hyperlink{pointer_8h_a1a309f137cf282fe5bdc882038e728d9}{value}})\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00759\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Create(document).\mbox{\hyperlink{class_generic_pointer_af148818f7c2b10243221953d887044c6}{Swap}}(\mbox{\hyperlink{pointer_8h_a1a309f137cf282fe5bdc882038e728d9}{value}});}
+\DoxyCodeLine{00760\ \ \ \ \ \}}
+\DoxyCodeLine{00761\ }
+\DoxyCodeLine{00763\ }
+\DoxyCodeLine{00765\ }
+\DoxyCodeLine{00771\ \ \ \ \ \textcolor{keywordtype}{bool}\ Erase(ValueType\&\ root)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00772\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(IsValid());}
+\DoxyCodeLine{00773\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_generic_pointer_a7051cf59af6622542a050bd0ff0340f8}{tokenCount\_}}\ ==\ 0)\ \textcolor{comment}{//\ Cannot\ erase\ the\ root}}
+\DoxyCodeLine{00774\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00775\ }
+\DoxyCodeLine{00776\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}*\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ =\ \&root;}
+\DoxyCodeLine{00777\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ Token*\ last\ =\ \mbox{\hyperlink{class_generic_pointer_a997793c66ea1a264089c37c8731eb138}{tokens\_}}\ +\ (\mbox{\hyperlink{class_generic_pointer_a7051cf59af6622542a050bd0ff0340f8}{tokenCount\_}}\ -\/\ 1);}
+\DoxyCodeLine{00778\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ Token\ *t\ =\ \mbox{\hyperlink{class_generic_pointer_a997793c66ea1a264089c37c8731eb138}{tokens\_}};\ t\ !=\ last;\ ++t)\ \{}
+\DoxyCodeLine{00779\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>GetType())\ \{}
+\DoxyCodeLine{00780\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7a146f46700e905e8df96a6a90b5c7640f}{kObjectType}}:}
+\DoxyCodeLine{00781\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00782\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typename}\ ValueType::MemberIterator\ m\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>FindMember(\mbox{\hyperlink{struct_generic_string_ref}{GenericStringRef<Ch>}}(t-\/>name,\ t-\/>length));}
+\DoxyCodeLine{00783\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (m\ ==\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>MemberEnd())}
+\DoxyCodeLine{00784\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00785\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ =\ \&m-\/>value;}
+\DoxyCodeLine{00786\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00787\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00788\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7af41527d6925efa3c5c3dadb23dfef7c8}{kArrayType}}:}
+\DoxyCodeLine{00789\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (t-\/>index\ ==\ kPointerInvalidIndex\ ||\ t-\/>index\ >=\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>Size())}
+\DoxyCodeLine{00790\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00791\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ =\ \&((*v)[t-\/>index]);}
+\DoxyCodeLine{00792\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00793\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00794\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00795\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00796\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00797\ }
+\DoxyCodeLine{00798\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>GetType())\ \{}
+\DoxyCodeLine{00799\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7a146f46700e905e8df96a6a90b5c7640f}{kObjectType}}:}
+\DoxyCodeLine{00800\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>EraseMember(\mbox{\hyperlink{struct_generic_string_ref}{GenericStringRef<Ch>}}(last-\/>name,\ last-\/>length));}
+\DoxyCodeLine{00801\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7af41527d6925efa3c5c3dadb23dfef7c8}{kArrayType}}:}
+\DoxyCodeLine{00802\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (last-\/>index\ ==\ kPointerInvalidIndex\ ||\ last-\/>index\ >=\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>Size())}
+\DoxyCodeLine{00803\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00804\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>Erase(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>Begin()\ +\ last-\/>index);}
+\DoxyCodeLine{00805\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00806\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00807\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00808\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00809\ \ \ \ \ \}}
+\DoxyCodeLine{00810\ }
+\DoxyCodeLine{00811\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00813\ }
+\DoxyCodeLine{00819\ \ \ \ \ \mbox{\hyperlink{class_generic_pointer_a77f7746a798967ee3f9aa608164eafef}{Ch}}*\ CopyFromRaw(\textcolor{keyword}{const}\ \mbox{\hyperlink{class_generic_pointer}{GenericPointer}}\&\ rhs,\ \textcolor{keywordtype}{size\_t}\ extraToken\ =\ 0,\ \textcolor{keywordtype}{size\_t}\ extraNameBufferSize\ =\ 0)\ \{}
+\DoxyCodeLine{00820\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{class_generic_pointer_a331cffeec161b80ea18ac3f1562851bf}{allocator\_}})\ \textcolor{comment}{//\ allocator\ is\ independently\ owned.}}
+\DoxyCodeLine{00821\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_pointer_a99b51c07419ee17d57e97774d8ee63ab}{ownAllocator\_}}\ =\ \mbox{\hyperlink{class_generic_pointer_a331cffeec161b80ea18ac3f1562851bf}{allocator\_}}\ =\ \mbox{\hyperlink{rapidjson_8h_abdc7cd7902748ffe6626d71c59a73c3b}{RAPIDJSON\_NEW}}(\mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}})();}
+\DoxyCodeLine{00822\ }
+\DoxyCodeLine{00823\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ nameBufferSize\ =\ rhs.\mbox{\hyperlink{class_generic_pointer_a7051cf59af6622542a050bd0ff0340f8}{tokenCount\_}};\ \textcolor{comment}{//\ null\ terminators\ for\ tokens}}
+\DoxyCodeLine{00824\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (Token\ *t\ =\ rhs.\mbox{\hyperlink{class_generic_pointer_a997793c66ea1a264089c37c8731eb138}{tokens\_}};\ t\ !=\ rhs.\mbox{\hyperlink{class_generic_pointer_a997793c66ea1a264089c37c8731eb138}{tokens\_}}\ +\ rhs.\mbox{\hyperlink{class_generic_pointer_a7051cf59af6622542a050bd0ff0340f8}{tokenCount\_}};\ ++t)}
+\DoxyCodeLine{00825\ \ \ \ \ \ \ \ \ \ \ \ \ nameBufferSize\ +=\ t-\/>length;}
+\DoxyCodeLine{00826\ }
+\DoxyCodeLine{00827\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_pointer_a7051cf59af6622542a050bd0ff0340f8}{tokenCount\_}}\ =\ rhs.\mbox{\hyperlink{class_generic_pointer_a7051cf59af6622542a050bd0ff0340f8}{tokenCount\_}}\ +\ extraToken;}
+\DoxyCodeLine{00828\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_pointer_a997793c66ea1a264089c37c8731eb138}{tokens\_}}\ =\ \textcolor{keyword}{static\_cast<}Token\ *\textcolor{keyword}{>}(\mbox{\hyperlink{class_generic_pointer_a331cffeec161b80ea18ac3f1562851bf}{allocator\_}}-\/>Malloc(\mbox{\hyperlink{class_generic_pointer_a7051cf59af6622542a050bd0ff0340f8}{tokenCount\_}}\ *\ \textcolor{keyword}{sizeof}(Token)\ +\ (nameBufferSize\ +\ extraNameBufferSize)\ *\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{class_generic_pointer_a77f7746a798967ee3f9aa608164eafef}{Ch}})));}
+\DoxyCodeLine{00829\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_pointer_a2fd627c663483ad08e4f26707ea5ad86}{nameBuffer\_}}\ =\ \textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{class_generic_pointer_a77f7746a798967ee3f9aa608164eafef}{Ch}}\ *\textcolor{keyword}{>}(\mbox{\hyperlink{class_generic_pointer_a997793c66ea1a264089c37c8731eb138}{tokens\_}}\ +\ \mbox{\hyperlink{class_generic_pointer_a7051cf59af6622542a050bd0ff0340f8}{tokenCount\_}});}
+\DoxyCodeLine{00830\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (rhs.\mbox{\hyperlink{class_generic_pointer_a7051cf59af6622542a050bd0ff0340f8}{tokenCount\_}}\ >\ 0)\ \{}
+\DoxyCodeLine{00831\ \ \ \ \ \ \ \ \ \ \ \ \ std::memcpy(\mbox{\hyperlink{class_generic_pointer_a997793c66ea1a264089c37c8731eb138}{tokens\_}},\ rhs.\mbox{\hyperlink{class_generic_pointer_a997793c66ea1a264089c37c8731eb138}{tokens\_}},\ rhs.\mbox{\hyperlink{class_generic_pointer_a7051cf59af6622542a050bd0ff0340f8}{tokenCount\_}}\ *\ \textcolor{keyword}{sizeof}(Token));}
+\DoxyCodeLine{00832\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00833\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (nameBufferSize\ >\ 0)\ \{}
+\DoxyCodeLine{00834\ \ \ \ \ \ \ \ \ \ \ \ \ std::memcpy(\mbox{\hyperlink{class_generic_pointer_a2fd627c663483ad08e4f26707ea5ad86}{nameBuffer\_}},\ rhs.\mbox{\hyperlink{class_generic_pointer_a2fd627c663483ad08e4f26707ea5ad86}{nameBuffer\_}},\ nameBufferSize\ *\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{class_generic_pointer_a77f7746a798967ee3f9aa608164eafef}{Ch}}));}
+\DoxyCodeLine{00835\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00836\ }
+\DoxyCodeLine{00837\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Adjust\ pointers\ to\ name\ buffer}}
+\DoxyCodeLine{00838\ \ \ \ \ \ \ \ \ std::ptrdiff\_t\ \mbox{\hyperlink{jmp_8cpp_aca9876635a5afd01576dae38f10dc723}{diff}}\ =\ \mbox{\hyperlink{class_generic_pointer_a2fd627c663483ad08e4f26707ea5ad86}{nameBuffer\_}}\ -\/\ rhs.\mbox{\hyperlink{class_generic_pointer_a2fd627c663483ad08e4f26707ea5ad86}{nameBuffer\_}};}
+\DoxyCodeLine{00839\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (Token\ *t\ =\ \mbox{\hyperlink{class_generic_pointer_a997793c66ea1a264089c37c8731eb138}{tokens\_}};\ t\ !=\ \mbox{\hyperlink{class_generic_pointer_a997793c66ea1a264089c37c8731eb138}{tokens\_}}\ +\ rhs.\mbox{\hyperlink{class_generic_pointer_a7051cf59af6622542a050bd0ff0340f8}{tokenCount\_}};\ ++t)}
+\DoxyCodeLine{00840\ \ \ \ \ \ \ \ \ \ \ \ \ t-\/>name\ +=\ \mbox{\hyperlink{jmp_8cpp_aca9876635a5afd01576dae38f10dc723}{diff}};}
+\DoxyCodeLine{00841\ }
+\DoxyCodeLine{00842\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_generic_pointer_a2fd627c663483ad08e4f26707ea5ad86}{nameBuffer\_}}\ +\ nameBufferSize;}
+\DoxyCodeLine{00843\ \ \ \ \ \}}
+\DoxyCodeLine{00844\ }
+\DoxyCodeLine{00846\ }
+\DoxyCodeLine{00850\ \ \ \ \ \textcolor{keywordtype}{bool}\ NeedPercentEncode(\mbox{\hyperlink{class_generic_pointer_a77f7746a798967ee3f9aa608164eafef}{Ch}}\ c)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00851\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !((c\ >=\ \textcolor{charliteral}{'0'}\ \&\&\ c\ <=\ \textcolor{charliteral}{'9'})\ ||\ (c\ >=\ \textcolor{charliteral}{'A'}\ \&\&\ c\ <=\textcolor{charliteral}{'Z'})\ ||\ (c\ >=\ \textcolor{charliteral}{'a'}\ \&\&\ c\ <=\ \textcolor{charliteral}{'z'})\ ||\ c\ ==\ \textcolor{charliteral}{'-\/'}\ ||\ c\ ==\ \textcolor{charliteral}{'.'}\ ||\ c\ ==\ \textcolor{charliteral}{'\_'}\ ||\ c\ ==\textcolor{charliteral}{'\string~'});}
+\DoxyCodeLine{00852\ \ \ \ \ \}}
+\DoxyCodeLine{00853\ }
+\DoxyCodeLine{00855\ \textcolor{preprocessor}{\#ifndef\ \_\_clang\_\_\ }\textcolor{comment}{//\ -\/Wdocumentation}}
+\DoxyCodeLine{00861\ \#endif}
+\DoxyCodeLine{00862\ \ \ \ \ \textcolor{keywordtype}{void}\ Parse(\textcolor{keyword}{const}\ \mbox{\hyperlink{class_generic_pointer_a77f7746a798967ee3f9aa608164eafef}{Ch}}*\ \mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}},\ \textcolor{keywordtype}{size\_t}\ length)\ \{}
+\DoxyCodeLine{00863\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}}\ !=\ NULL);}
+\DoxyCodeLine{00864\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\mbox{\hyperlink{class_generic_pointer_a2fd627c663483ad08e4f26707ea5ad86}{nameBuffer\_}}\ ==\ 0);}
+\DoxyCodeLine{00865\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\mbox{\hyperlink{class_generic_pointer_a997793c66ea1a264089c37c8731eb138}{tokens\_}}\ ==\ 0);}
+\DoxyCodeLine{00866\ }
+\DoxyCodeLine{00867\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Create\ own\ allocator\ if\ user\ did\ not\ supply.}}
+\DoxyCodeLine{00868\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{class_generic_pointer_a331cffeec161b80ea18ac3f1562851bf}{allocator\_}})}
+\DoxyCodeLine{00869\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_pointer_a99b51c07419ee17d57e97774d8ee63ab}{ownAllocator\_}}\ =\ \mbox{\hyperlink{class_generic_pointer_a331cffeec161b80ea18ac3f1562851bf}{allocator\_}}\ =\ \mbox{\hyperlink{rapidjson_8h_abdc7cd7902748ffe6626d71c59a73c3b}{RAPIDJSON\_NEW}}(\mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}})();}
+\DoxyCodeLine{00870\ }
+\DoxyCodeLine{00871\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Count\ number\ of\ '/'\ as\ tokenCount}}
+\DoxyCodeLine{00872\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_pointer_a7051cf59af6622542a050bd0ff0340f8}{tokenCount\_}}\ =\ 0;}
+\DoxyCodeLine{00873\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{class_generic_pointer_a77f7746a798967ee3f9aa608164eafef}{Ch}}*\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ =\ \mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}};\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ !=\ \mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}}\ +\ length;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}++)\ }
+\DoxyCodeLine{00874\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (*\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ ==\ \textcolor{charliteral}{'/'})}
+\DoxyCodeLine{00875\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_pointer_a7051cf59af6622542a050bd0ff0340f8}{tokenCount\_}}++;}
+\DoxyCodeLine{00876\ }
+\DoxyCodeLine{00877\ \ \ \ \ \ \ \ \ Token*\ token\ =\ \mbox{\hyperlink{class_generic_pointer_a997793c66ea1a264089c37c8731eb138}{tokens\_}}\ =\ \textcolor{keyword}{static\_cast<}Token\ *\textcolor{keyword}{>}(\mbox{\hyperlink{class_generic_pointer_a331cffeec161b80ea18ac3f1562851bf}{allocator\_}}-\/>Malloc(\mbox{\hyperlink{class_generic_pointer_a7051cf59af6622542a050bd0ff0340f8}{tokenCount\_}}\ *\ \textcolor{keyword}{sizeof}(Token)\ +\ length\ *\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{class_generic_pointer_a77f7746a798967ee3f9aa608164eafef}{Ch}})));}
+\DoxyCodeLine{00878\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_pointer_a77f7746a798967ee3f9aa608164eafef}{Ch}}*\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ =\ \mbox{\hyperlink{class_generic_pointer_a2fd627c663483ad08e4f26707ea5ad86}{nameBuffer\_}}\ =\ \textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{class_generic_pointer_a77f7746a798967ee3f9aa608164eafef}{Ch}}\ *\textcolor{keyword}{>}(\mbox{\hyperlink{class_generic_pointer_a997793c66ea1a264089c37c8731eb138}{tokens\_}}\ +\ \mbox{\hyperlink{class_generic_pointer_a7051cf59af6622542a050bd0ff0340f8}{tokenCount\_}});}
+\DoxyCodeLine{00879\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ i\ =\ 0;}
+\DoxyCodeLine{00880\ }
+\DoxyCodeLine{00881\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Detect\ if\ it\ is\ a\ URI\ fragment}}
+\DoxyCodeLine{00882\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ uriFragment\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00883\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}}[i]\ ==\ \textcolor{charliteral}{'\#'})\ \{}
+\DoxyCodeLine{00884\ \ \ \ \ \ \ \ \ \ \ \ \ uriFragment\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00885\ \ \ \ \ \ \ \ \ \ \ \ \ i++;}
+\DoxyCodeLine{00886\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00887\ }
+\DoxyCodeLine{00888\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (i\ !=\ length\ \&\&\ \mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}}[i]\ !=\ \textcolor{charliteral}{'/'})\ \{}
+\DoxyCodeLine{00889\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_pointer_a8898ec432dc40b28f79db78dc4ca83e0}{parseErrorCode\_}}\ =\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_ggacb2e274f33e54d91b96e9883a99a98bea5821696a2ab6cbccdc8288cbe6e81c77}{kPointerParseErrorTokenMustBeginWithSolidus}};}
+\DoxyCodeLine{00890\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ error;}
+\DoxyCodeLine{00891\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00892\ }
+\DoxyCodeLine{00893\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (i\ <\ length)\ \{}
+\DoxyCodeLine{00894\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}}[i]\ ==\ \textcolor{charliteral}{'/'});}
+\DoxyCodeLine{00895\ \ \ \ \ \ \ \ \ \ \ \ \ i++;\ \textcolor{comment}{//\ consumes\ '/'}}
+\DoxyCodeLine{00896\ }
+\DoxyCodeLine{00897\ \ \ \ \ \ \ \ \ \ \ \ \ token-\/>name\ =\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}};}
+\DoxyCodeLine{00898\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ isNumber\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00899\ }
+\DoxyCodeLine{00900\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (i\ <\ length\ \&\&\ \mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}}[i]\ !=\ \textcolor{charliteral}{'/'})\ \{}
+\DoxyCodeLine{00901\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_pointer_a77f7746a798967ee3f9aa608164eafef}{Ch}}\ c\ =\ \mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}}[i];}
+\DoxyCodeLine{00902\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (uriFragment)\ \{}
+\DoxyCodeLine{00903\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Decoding\ percent-\/encoding\ for\ URI\ fragment}}
+\DoxyCodeLine{00904\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (c\ ==\ \textcolor{charliteral}{'\%'})\ \{}
+\DoxyCodeLine{00905\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ PercentDecodeStream\ is(\&\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}}[i],\ \mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}}\ +\ length);}
+\DoxyCodeLine{00906\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_generic_insitu_string_stream}{GenericInsituStringStream<EncodingType>}}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}});}
+\DoxyCodeLine{00907\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_pointer_a77f7746a798967ee3f9aa608164eafef}{Ch}}*\ begin\ =\ os.PutBegin();}
+\DoxyCodeLine{00908\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{struct_transcoder}{Transcoder}}<\mbox{\hyperlink{struct_u_t_f8}{UTF8<>}},\ \mbox{\hyperlink{class_generic_pointer_a06534f32c7e26ae8d2e1b199634ceb19}{EncodingType}}>().Validate(is,\ os)\ ||\ !is.IsValid())\ \{}
+\DoxyCodeLine{00909\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_pointer_a8898ec432dc40b28f79db78dc4ca83e0}{parseErrorCode\_}}\ =\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_ggacb2e274f33e54d91b96e9883a99a98beac0c1b013c0db34dcc5a47fc1ee7a8c35}{kPointerParseErrorInvalidPercentEncoding}};}
+\DoxyCodeLine{00910\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ error;}
+\DoxyCodeLine{00911\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00912\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ =\ os.PutEnd(begin);}
+\DoxyCodeLine{00913\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i\ +=\ is.Tell()\ -\/\ 1;}
+\DoxyCodeLine{00914\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ ==\ 1)}
+\DoxyCodeLine{00915\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ c\ =\ *\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}};}
+\DoxyCodeLine{00916\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00917\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ +=\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}};}
+\DoxyCodeLine{00918\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ isNumber\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00919\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i++;}
+\DoxyCodeLine{00920\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{00921\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00922\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00923\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (NeedPercentEncode(c))\ \{}
+\DoxyCodeLine{00924\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_pointer_a8898ec432dc40b28f79db78dc4ca83e0}{parseErrorCode\_}}\ =\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_ggacb2e274f33e54d91b96e9883a99a98beabd7eae93627f74267009a03679b6dc38}{kPointerParseErrorCharacterMustPercentEncode}};}
+\DoxyCodeLine{00925\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ error;}
+\DoxyCodeLine{00926\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00927\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00928\ }
+\DoxyCodeLine{00929\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i++;}
+\DoxyCodeLine{00930\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00931\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Escaping\ "{}\string~0"{}\ -\/>\ '\string~',\ "{}\string~1"{}\ -\/>\ '/'}}
+\DoxyCodeLine{00932\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (c\ ==\ \textcolor{charliteral}{'\string~'})\ \{}
+\DoxyCodeLine{00933\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (i\ <\ length)\ \{}
+\DoxyCodeLine{00934\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ c\ =\ \mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}}[i];}
+\DoxyCodeLine{00935\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (c\ ==\ \textcolor{charliteral}{'0'})\ \ \ \ \ \ \ c\ =\ \textcolor{charliteral}{'\string~'};}
+\DoxyCodeLine{00936\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (c\ ==\ \textcolor{charliteral}{'1'})\ \ c\ =\ \textcolor{charliteral}{'/'};}
+\DoxyCodeLine{00937\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00938\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_pointer_a8898ec432dc40b28f79db78dc4ca83e0}{parseErrorCode\_}}\ =\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_ggacb2e274f33e54d91b96e9883a99a98bea4d2a7e511d717fd1d2f532ef5fcf821b}{kPointerParseErrorInvalidEscape}};}
+\DoxyCodeLine{00939\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ error;}
+\DoxyCodeLine{00940\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00941\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i++;}
+\DoxyCodeLine{00942\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00943\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00944\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_pointer_a8898ec432dc40b28f79db78dc4ca83e0}{parseErrorCode\_}}\ =\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_ggacb2e274f33e54d91b96e9883a99a98bea4d2a7e511d717fd1d2f532ef5fcf821b}{kPointerParseErrorInvalidEscape}};}
+\DoxyCodeLine{00945\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ error;}
+\DoxyCodeLine{00946\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00947\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00948\ }
+\DoxyCodeLine{00949\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ First\ check\ for\ index:\ all\ of\ characters\ are\ digit}}
+\DoxyCodeLine{00950\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (c\ <\ \textcolor{charliteral}{'0'}\ ||\ c\ >\ \textcolor{charliteral}{'9'})}
+\DoxyCodeLine{00951\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ isNumber\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00952\ }
+\DoxyCodeLine{00953\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}++\ =\ c;}
+\DoxyCodeLine{00954\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00955\ \ \ \ \ \ \ \ \ \ \ \ \ token-\/>length\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\textcolor{keyword}{>}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ -\/\ token-\/>name);}
+\DoxyCodeLine{00956\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (token-\/>length\ ==\ 0)}
+\DoxyCodeLine{00957\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ isNumber\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00958\ \ \ \ \ \ \ \ \ \ \ \ \ *\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}++\ =\ \textcolor{charliteral}{'\(\backslash\)0'};\ \textcolor{comment}{//\ Null\ terminator}}
+\DoxyCodeLine{00959\ }
+\DoxyCodeLine{00960\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Second\ check\ for\ index:\ more\ than\ one\ digit\ cannot\ have\ leading\ zero}}
+\DoxyCodeLine{00961\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isNumber\ \&\&\ token-\/>length\ >\ 1\ \&\&\ token-\/>name[0]\ ==\ \textcolor{charliteral}{'0'})}
+\DoxyCodeLine{00962\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ isNumber\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00963\ }
+\DoxyCodeLine{00964\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ String\ to\ SizeType\ conversion}}
+\DoxyCodeLine{00965\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\ n\ =\ 0;}
+\DoxyCodeLine{00966\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isNumber)\ \{}
+\DoxyCodeLine{00967\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ =\ 0;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ <\ token-\/>length;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}++)\ \{}
+\DoxyCodeLine{00968\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\ m\ =\ n\ *\ 10\ +\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\textcolor{keyword}{>}(token-\/>name[\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}]\ -\/\ \textcolor{charliteral}{'0'});}
+\DoxyCodeLine{00969\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (m\ <\ n)\ \{\ \ \ \textcolor{comment}{//\ overflow\ detection}}
+\DoxyCodeLine{00970\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ isNumber\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00971\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00972\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00973\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ n\ =\ m;}
+\DoxyCodeLine{00974\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00975\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00976\ }
+\DoxyCodeLine{00977\ \ \ \ \ \ \ \ \ \ \ \ \ token-\/>index\ =\ isNumber\ ?\ n\ :\ kPointerInvalidIndex;}
+\DoxyCodeLine{00978\ \ \ \ \ \ \ \ \ \ \ \ \ token++;}
+\DoxyCodeLine{00979\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00980\ }
+\DoxyCodeLine{00981\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ <=\ \mbox{\hyperlink{class_generic_pointer_a2fd627c663483ad08e4f26707ea5ad86}{nameBuffer\_}}\ +\ length);\ \textcolor{comment}{//\ Should\ not\ overflow\ buffer}}
+\DoxyCodeLine{00982\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_pointer_a8898ec432dc40b28f79db78dc4ca83e0}{parseErrorCode\_}}\ =\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_ggacb2e274f33e54d91b96e9883a99a98bea81e2b6fbd1bf4ac890ddb7779265e3a0}{kPointerParseErrorNone}};}
+\DoxyCodeLine{00983\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00984\ }
+\DoxyCodeLine{00985\ \ \ \ \ error:}
+\DoxyCodeLine{00986\ \ \ \ \ \ \ \ \ Allocator::Free(\mbox{\hyperlink{class_generic_pointer_a997793c66ea1a264089c37c8731eb138}{tokens\_}});}
+\DoxyCodeLine{00987\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_pointer_a2fd627c663483ad08e4f26707ea5ad86}{nameBuffer\_}}\ =\ 0;}
+\DoxyCodeLine{00988\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_pointer_a997793c66ea1a264089c37c8731eb138}{tokens\_}}\ =\ 0;}
+\DoxyCodeLine{00989\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_pointer_a7051cf59af6622542a050bd0ff0340f8}{tokenCount\_}}\ =\ 0;}
+\DoxyCodeLine{00990\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_pointer_ad103ed62e206319f1f0f4aa271866e37}{parseErrorOffset\_}}\ =\ i;}
+\DoxyCodeLine{00991\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00992\ \ \ \ \ \}}
+\DoxyCodeLine{00993\ }
+\DoxyCodeLine{00995\ }
+\DoxyCodeLine{01000\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keywordtype}{bool}\ uriFragment,\ \textcolor{keyword}{typename}\ OutputStream>}
+\DoxyCodeLine{01001\ \ \ \ \ \textcolor{keywordtype}{bool}\ Stringify(OutputStream\&\ os)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{01002\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(IsValid());}
+\DoxyCodeLine{01003\ }
+\DoxyCodeLine{01004\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (uriFragment)}
+\DoxyCodeLine{01005\ \ \ \ \ \ \ \ \ \ \ \ \ os.Put(\textcolor{charliteral}{'\#'});}
+\DoxyCodeLine{01006\ }
+\DoxyCodeLine{01007\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (Token\ *t\ =\ \mbox{\hyperlink{class_generic_pointer_a997793c66ea1a264089c37c8731eb138}{tokens\_}};\ t\ !=\ \mbox{\hyperlink{class_generic_pointer_a997793c66ea1a264089c37c8731eb138}{tokens\_}}\ +\ \mbox{\hyperlink{class_generic_pointer_a7051cf59af6622542a050bd0ff0340f8}{tokenCount\_}};\ ++t)\ \{}
+\DoxyCodeLine{01008\ \ \ \ \ \ \ \ \ \ \ \ \ os.Put(\textcolor{charliteral}{'/'});}
+\DoxyCodeLine{01009\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ =\ 0;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ <\ t-\/>length;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}++)\ \{}
+\DoxyCodeLine{01010\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_pointer_a77f7746a798967ee3f9aa608164eafef}{Ch}}\ c\ =\ t-\/>name[\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}];}
+\DoxyCodeLine{01011\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (c\ ==\ \textcolor{charliteral}{'\string~'})\ \{}
+\DoxyCodeLine{01012\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os.Put(\textcolor{charliteral}{'\string~'});}
+\DoxyCodeLine{01013\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os.Put(\textcolor{charliteral}{'0'});}
+\DoxyCodeLine{01014\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01015\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (c\ ==\ \textcolor{charliteral}{'/'})\ \{}
+\DoxyCodeLine{01016\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os.Put(\textcolor{charliteral}{'\string~'});}
+\DoxyCodeLine{01017\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os.Put(\textcolor{charliteral}{'1'});}
+\DoxyCodeLine{01018\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01019\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (uriFragment\ \&\&\ NeedPercentEncode(c))\ \{\ }
+\DoxyCodeLine{01020\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Transcode\ to\ UTF8\ sequence}}
+\DoxyCodeLine{01021\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_generic_string_stream}{GenericStringStream<typename\ ValueType::EncodingType>}}\ \mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}}(\&t-\/>name[\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}]);}
+\DoxyCodeLine{01022\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ PercentEncodeStream<OutputStream>\ target(os);}
+\DoxyCodeLine{01023\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{struct_transcoder}{Transcoder}}<\mbox{\hyperlink{class_generic_pointer_a06534f32c7e26ae8d2e1b199634ceb19}{EncodingType}},\ \mbox{\hyperlink{struct_u_t_f8}{UTF8<>}}\ >().Validate(\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}},\ target))}
+\DoxyCodeLine{01024\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{01025\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ +=\ \mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}}.Tell()\ -\/\ 1;}
+\DoxyCodeLine{01026\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01027\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{01028\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os.Put(c);}
+\DoxyCodeLine{01029\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01030\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01031\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{01032\ \ \ \ \ \}}
+\DoxyCodeLine{01033\ }
+\DoxyCodeLine{01035\ }
+\DoxyCodeLine{01040\ \ \ \ \ \textcolor{keyword}{class\ }PercentDecodeStream\ \{}
+\DoxyCodeLine{01041\ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{01042\ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{typename}\ ValueType::Ch\ \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}};}
+\DoxyCodeLine{01043\ }
+\DoxyCodeLine{01045\ }
+\DoxyCodeLine{01049\ \ \ \ \ \ \ \ \ PercentDecodeStream(\textcolor{keyword}{const}\ \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}*\ \mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}*\ end)\ :\ src\_(\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}}),\ head\_(\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}}),\ end\_(end),\ valid\_(true)\ \{\}}
+\DoxyCodeLine{01050\ }
+\DoxyCodeLine{01051\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}\ Take()\ \{}
+\DoxyCodeLine{01052\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (*src\_\ !=\ \textcolor{charliteral}{'\%'}\ ||\ src\_\ +\ 3\ >\ end\_)\ \{\ \textcolor{comment}{//\ \%XY\ triplet}}
+\DoxyCodeLine{01053\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ valid\_\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{01054\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{01055\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01056\ \ \ \ \ \ \ \ \ \ \ \ \ src\_++;}
+\DoxyCodeLine{01057\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}\ c\ =\ 0;}
+\DoxyCodeLine{01058\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ =\ 0;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ <\ 2;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}++)\ \{}
+\DoxyCodeLine{01059\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ c\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}\textcolor{keyword}{>}(c\ <<\ 4);}
+\DoxyCodeLine{01060\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}\ h\ =\ *src\_;}
+\DoxyCodeLine{01061\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \ \ \ \ \ (h\ >=\ \textcolor{charliteral}{'0'}\ \&\&\ h\ <=\ \textcolor{charliteral}{'9'})\ c\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}\textcolor{keyword}{>}(c\ +\ h\ -\/\ \textcolor{charliteral}{'0'});}
+\DoxyCodeLine{01062\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (h\ >=\ \textcolor{charliteral}{'A'}\ \&\&\ h\ <=\ \textcolor{charliteral}{'F'})\ c\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}\textcolor{keyword}{>}(c\ +\ h\ -\/\ \textcolor{charliteral}{'A'}\ +\ 10);}
+\DoxyCodeLine{01063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (h\ >=\ \textcolor{charliteral}{'a'}\ \&\&\ h\ <=\ \textcolor{charliteral}{'f'})\ c\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}\textcolor{keyword}{>}(c\ +\ h\ -\/\ \textcolor{charliteral}{'a'}\ +\ 10);}
+\DoxyCodeLine{01064\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{01065\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ valid\_\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{01066\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{01067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01068\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ src\_++;}
+\DoxyCodeLine{01069\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01070\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ c;}
+\DoxyCodeLine{01071\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01072\ }
+\DoxyCodeLine{01073\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ Tell()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(src\_\ -\/\ head\_);\ \}}
+\DoxyCodeLine{01074\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ IsValid()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ valid\_;\ \}}
+\DoxyCodeLine{01075\ }
+\DoxyCodeLine{01076\ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{01077\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}*\ src\_;\ \ \ \ \ }
+\DoxyCodeLine{01078\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}*\ head\_;\ \ \ \ }
+\DoxyCodeLine{01079\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}*\ end\_;\ \ \ \ \ }
+\DoxyCodeLine{01080\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ valid\_;\ \ \ \ \ \ \ \ }
+\DoxyCodeLine{01081\ \ \ \ \ \};}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_pointer_a331cffeec161b80ea18ac3f1562851bf}\index{GenericPointer$<$ ValueType, Allocator $>$@{GenericPointer$<$ ValueType, Allocator $>$}!allocator\_@{allocator\_}}
+\index{allocator\_@{allocator\_}!GenericPointer$<$ ValueType, Allocator $>$@{GenericPointer$<$ ValueType, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{allocator\_}{allocator\_}}
+{\footnotesize\ttfamily \label{class_generic_pointer_a331cffeec161b80ea18ac3f1562851bf} 
+template$<$typename Value\+Type , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Crt\+Allocator$>$ \\
+\mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ Value\+Type, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::allocator\+\_\+}
+
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l01099}{1099}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+\Hypertarget{class_generic_pointer_a2fd627c663483ad08e4f26707ea5ad86}\index{GenericPointer$<$ ValueType, Allocator $>$@{GenericPointer$<$ ValueType, Allocator $>$}!nameBuffer\_@{nameBuffer\_}}
+\index{nameBuffer\_@{nameBuffer\_}!GenericPointer$<$ ValueType, Allocator $>$@{GenericPointer$<$ ValueType, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{nameBuffer\_}{nameBuffer\_}}
+{\footnotesize\ttfamily \label{class_generic_pointer_a2fd627c663483ad08e4f26707ea5ad86} 
+template$<$typename Value\+Type , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Crt\+Allocator$>$ \\
+\mbox{\hyperlink{class_generic_pointer_a77f7746a798967ee3f9aa608164eafef}{Ch}}\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ Value\+Type, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::name\+Buffer\+\_\+}
+
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l01101}{1101}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+\Hypertarget{class_generic_pointer_a99b51c07419ee17d57e97774d8ee63ab}\index{GenericPointer$<$ ValueType, Allocator $>$@{GenericPointer$<$ ValueType, Allocator $>$}!ownAllocator\_@{ownAllocator\_}}
+\index{ownAllocator\_@{ownAllocator\_}!GenericPointer$<$ ValueType, Allocator $>$@{GenericPointer$<$ ValueType, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{ownAllocator\_}{ownAllocator\_}}
+{\footnotesize\ttfamily \label{class_generic_pointer_a99b51c07419ee17d57e97774d8ee63ab} 
+template$<$typename Value\+Type , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Crt\+Allocator$>$ \\
+\mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ Value\+Type, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::own\+Allocator\+\_\+}
+
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l01100}{1100}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+\Hypertarget{class_generic_pointer_a8898ec432dc40b28f79db78dc4ca83e0}\index{GenericPointer$<$ ValueType, Allocator $>$@{GenericPointer$<$ ValueType, Allocator $>$}!parseErrorCode\_@{parseErrorCode\_}}
+\index{parseErrorCode\_@{parseErrorCode\_}!GenericPointer$<$ ValueType, Allocator $>$@{GenericPointer$<$ ValueType, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{parseErrorCode\_}{parseErrorCode\_}}
+{\footnotesize\ttfamily \label{class_generic_pointer_a8898ec432dc40b28f79db78dc4ca83e0} 
+template$<$typename Value\+Type , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Crt\+Allocator$>$ \\
+\mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_gacb2e274f33e54d91b96e9883a99a98be}{Pointer\+Parse\+Error\+Code}} \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ Value\+Type, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::parse\+Error\+Code\+\_\+}
+
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l01105}{1105}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+\Hypertarget{class_generic_pointer_ad103ed62e206319f1f0f4aa271866e37}\index{GenericPointer$<$ ValueType, Allocator $>$@{GenericPointer$<$ ValueType, Allocator $>$}!parseErrorOffset\_@{parseErrorOffset\_}}
+\index{parseErrorOffset\_@{parseErrorOffset\_}!GenericPointer$<$ ValueType, Allocator $>$@{GenericPointer$<$ ValueType, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{parseErrorOffset\_}{parseErrorOffset\_}}
+{\footnotesize\ttfamily \label{class_generic_pointer_ad103ed62e206319f1f0f4aa271866e37} 
+template$<$typename Value\+Type , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Crt\+Allocator$>$ \\
+size\+\_\+t \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ Value\+Type, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::parse\+Error\+Offset\+\_\+}
+
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l01104}{1104}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+\Hypertarget{class_generic_pointer_a7051cf59af6622542a050bd0ff0340f8}\index{GenericPointer$<$ ValueType, Allocator $>$@{GenericPointer$<$ ValueType, Allocator $>$}!tokenCount\_@{tokenCount\_}}
+\index{tokenCount\_@{tokenCount\_}!GenericPointer$<$ ValueType, Allocator $>$@{GenericPointer$<$ ValueType, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{tokenCount\_}{tokenCount\_}}
+{\footnotesize\ttfamily \label{class_generic_pointer_a7051cf59af6622542a050bd0ff0340f8} 
+template$<$typename Value\+Type , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Crt\+Allocator$>$ \\
+size\+\_\+t \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ Value\+Type, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::token\+Count\+\_\+}
+
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l01103}{1103}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+\Hypertarget{class_generic_pointer_a997793c66ea1a264089c37c8731eb138}\index{GenericPointer$<$ ValueType, Allocator $>$@{GenericPointer$<$ ValueType, Allocator $>$}!tokens\_@{tokens\_}}
+\index{tokens\_@{tokens\_}!GenericPointer$<$ ValueType, Allocator $>$@{GenericPointer$<$ ValueType, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{tokens\_}{tokens\_}}
+{\footnotesize\ttfamily \label{class_generic_pointer_a997793c66ea1a264089c37c8731eb138} 
+template$<$typename Value\+Type , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Crt\+Allocator$>$ \\
+\mbox{\hyperlink{struct_generic_pointer_1_1_token}{Token}}\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ Value\+Type, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::tokens\+\_\+}
+
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l01102}{1102}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/\mbox{\hyperlink{fwd_8h}{fwd.\+h}}\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/\mbox{\hyperlink{pointer_8h}{pointer.\+h}}\end{DoxyCompactItemize}

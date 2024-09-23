@@ -1,0 +1,9 @@
+<map id="fc::variant::variant" name="fc::variant::variant">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,132,56"/>
+<area shape="rect" id="Node000002" href="$yubihsm__pkcs11_8c.html#adc4bd59a60361844aa0e852efa210105" title=" " alt="" coords="209,5,277,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="132,32,193,23,194,28,133,37"/>
+<area shape="rect" id="Node000003" href="$classfc_1_1variant.html#ab18b9c0de85df3571204f86805bf6c5e" title="Constructs a null_type variant." alt="" coords="180,55,306,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="133,50,165,54,164,59,132,55"/>
+<area shape="rect" id="Node000004" href="$namespacefc.html#a101ffbbefd2ddbb23eea290bbe9f87a1" title=" " alt="" coords="354,55,490,80"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="306,65,339,65,339,70,306,70"/>
+</map>

@@ -1,0 +1,18 @@
+<map id="sysio::trace_api::transaction_trace_v3" name="sysio::trace_api::transaction_trace_v3">
+<area shape="rect" id="Node000001" title=" " alt="" coords="892,147,1078,188"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1trace__api_1_1transaction__trace__v2.html" title=" " alt="" coords="592,84,777,125"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="793,125,892,146,891,151,792,130"/>
+<area shape="rect" id="Node000003" href="$classfc_1_1sha256.html" title=" " alt="" coords="356,5,438,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="454,30,569,64,624,81,622,87,567,69,453,36"/>
+<area shape="rect" id="Node000004" href="$classfc_1_1enum__type.html" title=" " alt="" coords="325,55,470,96"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="485,82,592,93,591,98,485,87"/>
+<area shape="rect" id="Node000005" href="$structfc_1_1unsigned__int.html" title=" " alt="" coords="13,147,126,172"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="142,151,592,110,592,116,142,156"/>
+<area shape="rect" id="Node000006" href="$structsysio_1_1chain_1_1transaction__header.html" title=" " alt="" coords="316,183,479,224"/>
+<area shape="poly" id="edge7_Node000006_Node000005" title=" " alt="" coords="127,174,158,182,239,192,316,198,315,204,238,198,157,187,126,180"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="494,194,532,184,566,167,574,160,578,152,582,144,590,135,609,123,612,128,594,139,586,147,583,155,578,163,570,171,533,189,495,199"/>
+<area shape="rect" id="Node000007" href="$classfc_1_1time__point__sec.html" title=" " alt="" coords="5,219,134,244"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="149,233,218,233,291,228,324,222,325,227,292,233,219,239,149,239"/>
+<area shape="rect" id="Node000008" href="$classsysio_1_1chain_1_1block__timestamp.html" title=" " alt="" coords="594,150,776,220"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="791,176,892,170,892,176,792,181"/>
+</map>

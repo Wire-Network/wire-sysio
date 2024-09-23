@@ -1,0 +1,327 @@
+\doxysection{Queue\texorpdfstring{$<$}{<} E \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{class_queue}{}\label{class_queue}\index{Queue$<$ E $>$@{Queue$<$ E $>$}}
+
+
+{\ttfamily \#include $<$sample3-\/inl.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_queue_ab09891e54b51dc677ee6efb350687ae4}{Queue}} ()
+\item 
+\mbox{\hyperlink{class_queue_a49fe82adb8dc2fb62ab53876a6933d0f}{\texorpdfstring{$\sim$}{\string~}\+Queue}} ()
+\item 
+void \mbox{\hyperlink{class_queue_acfdd5f9f7e936ca30dcf877370ef9510}{Clear}} ()
+\item 
+size\+\_\+t \mbox{\hyperlink{class_queue_abc4d78b5f66041011c5590bf703847b0}{Size}} () const
+\item 
+\mbox{\hyperlink{class_queue_node}{Queue\+Node}}$<$ E $>$ \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_queue_ae6bfe598d2ac848acf99055bbcfeb6df}{Head}} ()
+\item 
+const \mbox{\hyperlink{class_queue_node}{Queue\+Node}}$<$ E $>$ \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_queue_a24e0568348020ee356981156e71007d0}{Head}} () const
+\item 
+\mbox{\hyperlink{class_queue_node}{Queue\+Node}}$<$ E $>$ \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_queue_a9ea23f0b64d8005eb032b17861b169dd}{Last}} ()
+\item 
+const \mbox{\hyperlink{class_queue_node}{Queue\+Node}}$<$ E $>$ \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_queue_a8d1db3ed5d3d43dc76861ecc64b3e1df}{Last}} () const
+\item 
+void \mbox{\hyperlink{class_queue_abaa2e7175457307bca74f5562cbdaaa9}{Enqueue}} (const E \&element)
+\item 
+E \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_queue_a42bb3a81cb3f6cd084da16a39d38eb03}{Dequeue}} ()
+\item 
+{\footnotesize template$<$typename F $>$ }\\\mbox{\hyperlink{class_queue}{Queue}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_queue_a61c2800fd12a0ba74523c8763a86423b}{Map}} (F function) const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename E$>$\newline
+class Queue$<$ E $>$}
+
+
+Definition at line \mbox{\hyperlink{sample3-inl_8h_source_l00074}{74}} of file \mbox{\hyperlink{sample3-inl_8h_source}{sample3-\/inl.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_queue_ab09891e54b51dc677ee6efb350687ae4}\index{Queue$<$ E $>$@{Queue$<$ E $>$}!Queue@{Queue}}
+\index{Queue@{Queue}!Queue$<$ E $>$@{Queue$<$ E $>$}}
+\doxysubsubsection{\texorpdfstring{Queue()}{Queue()}}
+{\footnotesize\ttfamily \label{class_queue_ab09891e54b51dc677ee6efb350687ae4} 
+template$<$typename E $>$ \\
+\mbox{\hyperlink{class_queue}{Queue}}$<$ E $>$\mbox{\hyperlink{class_queue}{\+::\+Queue}} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sample3-inl_8h_source_l00077}{77}} of file \mbox{\hyperlink{sample3-inl_8h_source}{sample3-\/inl.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00077\ :\ head\_(NULL),\ last\_(NULL),\ size\_(0)\ \{\}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=264pt]{class_queue_ab09891e54b51dc677ee6efb350687ae4_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_queue_a49fe82adb8dc2fb62ab53876a6933d0f}\index{Queue$<$ E $>$@{Queue$<$ E $>$}!````~Queue@{\texorpdfstring{$\sim$}{\string~}Queue}}
+\index{````~Queue@{\texorpdfstring{$\sim$}{\string~}Queue}!Queue$<$ E $>$@{Queue$<$ E $>$}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}Queue()}{\string~Queue()}}
+{\footnotesize\ttfamily \label{class_queue_a49fe82adb8dc2fb62ab53876a6933d0f} 
+template$<$typename E $>$ \\
+\mbox{\hyperlink{class_queue}{Queue}}$<$ E $>$\+::\texorpdfstring{$\sim$}{\string~}\mbox{\hyperlink{class_queue}{Queue}} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sample3-inl_8h_source_l00080}{80}} of file \mbox{\hyperlink{sample3-inl_8h_source}{sample3-\/inl.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00080\ \{\ \mbox{\hyperlink{class_queue_acfdd5f9f7e936ca30dcf877370ef9510}{Clear}}();\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_queue_a49fe82adb8dc2fb62ab53876a6933d0f_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_queue_acfdd5f9f7e936ca30dcf877370ef9510}\index{Queue$<$ E $>$@{Queue$<$ E $>$}!Clear@{Clear}}
+\index{Clear@{Clear}!Queue$<$ E $>$@{Queue$<$ E $>$}}
+\doxysubsubsection{\texorpdfstring{Clear()}{Clear()}}
+{\footnotesize\ttfamily \label{class_queue_acfdd5f9f7e936ca30dcf877370ef9510} 
+template$<$typename E $>$ \\
+void \mbox{\hyperlink{class_queue}{Queue}}$<$ E $>$\+::\+Clear (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sample3-inl_8h_source_l00083}{83}} of file \mbox{\hyperlink{sample3-inl_8h_source}{sample3-\/inl.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00084\ \ \ \ \ \textcolor{keywordflow}{if}\ (size\_\ >\ 0)\ \{}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \textcolor{comment}{//\ 1.\ Deletes\ every\ node.}}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \mbox{\hyperlink{class_queue_node}{QueueNode<E>}}*\ node\ =\ head\_;}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \mbox{\hyperlink{class_queue_node}{QueueNode<E>}}*\ \mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}}\ =\ node-\/>\mbox{\hyperlink{class_queue_node_a55ab43663e363a44c7d8ccb511aa87e2}{next}}();}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (;\ ;)\ \{}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \textcolor{keyword}{delete}\ node;}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ node\ =\ \mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}};}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (node\ ==\ NULL)\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}}\ =\ node-\/>\mbox{\hyperlink{class_queue_node_a55ab43663e363a44c7d8ccb511aa87e2}{next}}();}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00094\ }
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \textcolor{comment}{//\ 2.\ Resets\ the\ member\ variables.}}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ head\_\ =\ last\_\ =\ NULL;}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ size\_\ =\ 0;}
+\DoxyCodeLine{00098\ \ \ \ \ \}}
+\DoxyCodeLine{00099\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=282pt]{class_queue_acfdd5f9f7e936ca30dcf877370ef9510_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=275pt]{class_queue_acfdd5f9f7e936ca30dcf877370ef9510_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_queue_a42bb3a81cb3f6cd084da16a39d38eb03}\index{Queue$<$ E $>$@{Queue$<$ E $>$}!Dequeue@{Dequeue}}
+\index{Dequeue@{Dequeue}!Queue$<$ E $>$@{Queue$<$ E $>$}}
+\doxysubsubsection{\texorpdfstring{Dequeue()}{Dequeue()}}
+{\footnotesize\ttfamily \label{class_queue_a42bb3a81cb3f6cd084da16a39d38eb03} 
+template$<$typename E $>$ \\
+E \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_queue}{Queue}}$<$ E $>$\+::\+Dequeue (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sample3-inl_8h_source_l00131}{131}} of file \mbox{\hyperlink{sample3-inl_8h_source}{sample3-\/inl.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00132\ \ \ \ \ \textcolor{keywordflow}{if}\ (size\_\ ==\ 0)\ \{}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ NULL;}
+\DoxyCodeLine{00134\ \ \ \ \ \}}
+\DoxyCodeLine{00135\ }
+\DoxyCodeLine{00136\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_queue_node}{QueueNode<E>}}*\ \textcolor{keyword}{const}\ old\_head\ =\ head\_;}
+\DoxyCodeLine{00137\ \ \ \ \ head\_\ =\ head\_-\/>next\_;}
+\DoxyCodeLine{00138\ \ \ \ \ size\_-\/-\/;}
+\DoxyCodeLine{00139\ \ \ \ \ \textcolor{keywordflow}{if}\ (size\_\ ==\ 0)\ \{}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ last\_\ =\ NULL;}
+\DoxyCodeLine{00141\ \ \ \ \ \}}
+\DoxyCodeLine{00142\ }
+\DoxyCodeLine{00143\ \ \ \ \ E*\ element\ =\ \textcolor{keyword}{new}\ E(old\_head-\/>\mbox{\hyperlink{class_queue_node_ae1cc72046c97b37def7d434c5b3483d8}{element}}());}
+\DoxyCodeLine{00144\ \ \ \ \ \textcolor{keyword}{delete}\ old\_head;}
+\DoxyCodeLine{00145\ }
+\DoxyCodeLine{00146\ \ \ \ \ \textcolor{keywordflow}{return}\ element;}
+\DoxyCodeLine{00147\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=314pt]{class_queue_a42bb3a81cb3f6cd084da16a39d38eb03_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_queue_abaa2e7175457307bca74f5562cbdaaa9}\index{Queue$<$ E $>$@{Queue$<$ E $>$}!Enqueue@{Enqueue}}
+\index{Enqueue@{Enqueue}!Queue$<$ E $>$@{Queue$<$ E $>$}}
+\doxysubsubsection{\texorpdfstring{Enqueue()}{Enqueue()}}
+{\footnotesize\ttfamily \label{class_queue_abaa2e7175457307bca74f5562cbdaaa9} 
+template$<$typename E $>$ \\
+void \mbox{\hyperlink{class_queue}{Queue}}$<$ E $>$\+::\+Enqueue (\begin{DoxyParamCaption}\item[{const E \&}]{element}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sample3-inl_8h_source_l00116}{116}} of file \mbox{\hyperlink{sample3-inl_8h_source}{sample3-\/inl.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00117\ \ \ \ \ \mbox{\hyperlink{class_queue_node}{QueueNode<E>}}*\ new\_node\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_queue_node}{QueueNode<E>}}(element);}
+\DoxyCodeLine{00118\ }
+\DoxyCodeLine{00119\ \ \ \ \ \textcolor{keywordflow}{if}\ (size\_\ ==\ 0)\ \{}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ head\_\ =\ last\_\ =\ new\_node;}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ size\_\ =\ 1;}
+\DoxyCodeLine{00122\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ last\_-\/>next\_\ =\ new\_node;}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ last\_\ =\ new\_node;}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ size\_++;}
+\DoxyCodeLine{00126\ \ \ \ \ \}}
+\DoxyCodeLine{00127\ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=274pt]{class_queue_abaa2e7175457307bca74f5562cbdaaa9_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_queue_ae6bfe598d2ac848acf99055bbcfeb6df}\index{Queue$<$ E $>$@{Queue$<$ E $>$}!Head@{Head}}
+\index{Head@{Head}!Queue$<$ E $>$@{Queue$<$ E $>$}}
+\doxysubsubsection{\texorpdfstring{Head()}{Head()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_queue_ae6bfe598d2ac848acf99055bbcfeb6df} 
+template$<$typename E $>$ \\
+\mbox{\hyperlink{class_queue_node}{Queue\+Node}}$<$ E $>$ \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_queue}{Queue}}$<$ E $>$\+::\+Head (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sample3-inl_8h_source_l00105}{105}} of file \mbox{\hyperlink{sample3-inl_8h_source}{sample3-\/inl.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00105\ \{\ \textcolor{keywordflow}{return}\ head\_;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_queue_a24e0568348020ee356981156e71007d0}\index{Queue$<$ E $>$@{Queue$<$ E $>$}!Head@{Head}}
+\index{Head@{Head}!Queue$<$ E $>$@{Queue$<$ E $>$}}
+\doxysubsubsection{\texorpdfstring{Head()}{Head()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_queue_a24e0568348020ee356981156e71007d0} 
+template$<$typename E $>$ \\
+const \mbox{\hyperlink{class_queue_node}{Queue\+Node}}$<$ E $>$ \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_queue}{Queue}}$<$ E $>$\+::\+Head (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sample3-inl_8h_source_l00106}{106}} of file \mbox{\hyperlink{sample3-inl_8h_source}{sample3-\/inl.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00106\ \{\ \textcolor{keywordflow}{return}\ head\_;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_queue_a9ea23f0b64d8005eb032b17861b169dd}\index{Queue$<$ E $>$@{Queue$<$ E $>$}!Last@{Last}}
+\index{Last@{Last}!Queue$<$ E $>$@{Queue$<$ E $>$}}
+\doxysubsubsection{\texorpdfstring{Last()}{Last()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_queue_a9ea23f0b64d8005eb032b17861b169dd} 
+template$<$typename E $>$ \\
+\mbox{\hyperlink{class_queue_node}{Queue\+Node}}$<$ E $>$ \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_queue}{Queue}}$<$ E $>$\+::\+Last (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sample3-inl_8h_source_l00109}{109}} of file \mbox{\hyperlink{sample3-inl_8h_source}{sample3-\/inl.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00109\ \{\ \textcolor{keywordflow}{return}\ last\_;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_queue_a8d1db3ed5d3d43dc76861ecc64b3e1df}\index{Queue$<$ E $>$@{Queue$<$ E $>$}!Last@{Last}}
+\index{Last@{Last}!Queue$<$ E $>$@{Queue$<$ E $>$}}
+\doxysubsubsection{\texorpdfstring{Last()}{Last()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_queue_a8d1db3ed5d3d43dc76861ecc64b3e1df} 
+template$<$typename E $>$ \\
+const \mbox{\hyperlink{class_queue_node}{Queue\+Node}}$<$ E $>$ \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_queue}{Queue}}$<$ E $>$\+::\+Last (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sample3-inl_8h_source_l00110}{110}} of file \mbox{\hyperlink{sample3-inl_8h_source}{sample3-\/inl.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00110\ \{\ \textcolor{keywordflow}{return}\ last\_;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_queue_a61c2800fd12a0ba74523c8763a86423b}\index{Queue$<$ E $>$@{Queue$<$ E $>$}!Map@{Map}}
+\index{Map@{Map}!Queue$<$ E $>$@{Queue$<$ E $>$}}
+\doxysubsubsection{\texorpdfstring{Map()}{Map()}}
+{\footnotesize\ttfamily \label{class_queue_a61c2800fd12a0ba74523c8763a86423b} 
+template$<$typename E $>$ \\
+template$<$typename F $>$ \\
+\mbox{\hyperlink{class_queue}{Queue}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_queue}{Queue}}$<$ E $>$\+::\+Map (\begin{DoxyParamCaption}\item[{F}]{function}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sample3-inl_8h_source_l00153}{153}} of file \mbox{\hyperlink{sample3-inl_8h_source}{sample3-\/inl.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00154\ \ \ \ \ \mbox{\hyperlink{class_queue}{Queue}}*\ new\_queue\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_queue_ab09891e54b51dc677ee6efb350687ae4}{Queue}}();}
+\DoxyCodeLine{00155\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{class_queue_node}{QueueNode<E>}}*\ node\ =\ head\_;\ node\ !=\ NULL;\ node\ =\ node-\/>next\_)\ \{}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ new\_queue-\/>\mbox{\hyperlink{class_queue_abaa2e7175457307bca74f5562cbdaaa9}{Enqueue}}(function(node-\/>element()));}
+\DoxyCodeLine{00157\ \ \ \ \ \}}
+\DoxyCodeLine{00158\ }
+\DoxyCodeLine{00159\ \ \ \ \ \textcolor{keywordflow}{return}\ new\_queue;}
+\DoxyCodeLine{00160\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=274pt]{class_queue_a61c2800fd12a0ba74523c8763a86423b_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_queue_abc4d78b5f66041011c5590bf703847b0}\index{Queue$<$ E $>$@{Queue$<$ E $>$}!Size@{Size}}
+\index{Size@{Size}!Queue$<$ E $>$@{Queue$<$ E $>$}}
+\doxysubsubsection{\texorpdfstring{Size()}{Size()}}
+{\footnotesize\ttfamily \label{class_queue_abc4d78b5f66041011c5590bf703847b0} 
+template$<$typename E $>$ \\
+size\+\_\+t \mbox{\hyperlink{class_queue}{Queue}}$<$ E $>$\+::\+Size (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sample3-inl_8h_source_l00102}{102}} of file \mbox{\hyperlink{sample3-inl_8h_source}{sample3-\/inl.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00102\ \{\ \textcolor{keywordflow}{return}\ size\_;\ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/samples/\mbox{\hyperlink{sample3-inl_8h}{sample3-\/inl.\+h}}\end{DoxyCompactItemize}

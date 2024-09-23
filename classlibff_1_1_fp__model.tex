@@ -1,0 +1,714 @@
+\doxysection{libff\+::Fp\+\_\+model\texorpdfstring{$<$}{<} n, modulus \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classlibff_1_1_fp__model}{}\label{classlibff_1_1_fp__model}\index{libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}}
+
+
+{\ttfamily \#include $<$fp.\+hpp$>$}
+
+
+
+Collaboration diagram for libff\+::Fp\+\_\+model\texorpdfstring{$<$}{<} n, modulus \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=178pt]{classlibff_1_1_fp__model__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classlibff_1_1_fp__model_acb234cdc48b7fcd37e14f45d13eaa629}{Fp\+\_\+model}} ()
+\item 
+\mbox{\hyperlink{classlibff_1_1_fp__model_a2175fc36f686cb5010b96c463056bae4}{Fp\+\_\+model}} (const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \&b)
+\item 
+\mbox{\hyperlink{classlibff_1_1_fp__model_a5e1ece4b4256f35ea18ac391b995ca56}{Fp\+\_\+model}} (const long x, const bool is\+\_\+unsigned=false)
+\item 
+void \mbox{\hyperlink{classlibff_1_1_fp__model_ab6cdf64f9e9e6d83623456fcf5d8215d}{set\+\_\+ulong}} (const unsigned long x)
+\item 
+void \mbox{\hyperlink{classlibff_1_1_fp__model_a6a3b968d196b205c1d20d9eaeab03133}{mul\+\_\+reduce}} (const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \&other)
+\item 
+void \mbox{\hyperlink{classlibff_1_1_fp__model_abc5964d55be3242f3f24e7e241103d6c}{clear}} ()
+\item 
+\mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \mbox{\hyperlink{classlibff_1_1_fp__model_ad57a9219a90f4e0a29cb771e46a02e26}{as\+\_\+bigint}} () const
+\item 
+unsigned long \mbox{\hyperlink{classlibff_1_1_fp__model_a51d0f3ba3dd34f8e7544056dbfc46243}{as\+\_\+ulong}} () const
+\item 
+bool \mbox{\hyperlink{classlibff_1_1_fp__model_a5ed84aa2307aa75b1a28f84ea6764512}{operator==}} (const \mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}} \&other) const
+\item 
+bool \mbox{\hyperlink{classlibff_1_1_fp__model_a02e4dac825394a7e9e1226e410fa86d0}{operator!=}} (const \mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}} \&other) const
+\item 
+bool \mbox{\hyperlink{classlibff_1_1_fp__model_a121b2621e9557b86faa6806774f42837}{is\+\_\+zero}} () const
+\item 
+void \mbox{\hyperlink{classlibff_1_1_fp__model_a2390cfd38458e3f18a640c75ee5cf77c}{print}} () const
+\item 
+\mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}} \& \mbox{\hyperlink{classlibff_1_1_fp__model_ad483789590ca7b067001da5f14003df8}{operator+=}} (const \mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}} \&other)
+\item 
+\mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}} \& \mbox{\hyperlink{classlibff_1_1_fp__model_a67c91c0981f2903e85278691df3c85fc}{operator-\/=}} (const \mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}} \&other)
+\item 
+\mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}} \& \mbox{\hyperlink{classlibff_1_1_fp__model_a3ea5535bc79501c3d3b2b1fee12ad416}{operator\texorpdfstring{$\ast$}{*}=}} (const \mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}} \&other)
+\item 
+\mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}} \& \mbox{\hyperlink{classlibff_1_1_fp__model_afc98ea28e887caa3be1977695b9d5e9e}{operator\texorpdfstring{$^\wedge$}{\string^}=}} (const unsigned long pow)
+\item 
+{\footnotesize template$<$mp\+\_\+size\+\_\+t m$>$ }\\\mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}} \& \mbox{\hyperlink{classlibff_1_1_fp__model_ab7094fa07079e4af5e86d57dad682fdd}{operator\texorpdfstring{$^\wedge$}{\string^}=}} (const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ m $>$ \&pow)
+\item 
+\mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}} \mbox{\hyperlink{classlibff_1_1_fp__model_a993f5ec1873b0586649b92d319fc0f92}{operator+}} (const \mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}} \&other) const
+\item 
+\mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}} \mbox{\hyperlink{classlibff_1_1_fp__model_ae6966f75ebe45c9348b167f1d86aab29}{operator-\/}} (const \mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}} \&other) const
+\item 
+\mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}} \mbox{\hyperlink{classlibff_1_1_fp__model_a16613069b06a92260dbb664226b81eca}{operator\texorpdfstring{$\ast$}{*}}} (const \mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}} \&other) const
+\item 
+\mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}} \mbox{\hyperlink{classlibff_1_1_fp__model_a04053a089a221b0d06c6775913a43ce2}{operator-\/}} () const
+\item 
+\mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}} \mbox{\hyperlink{classlibff_1_1_fp__model_a878d4d0568cc224a45ed70376601e4dc}{squared}} () const
+\item 
+\mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}} \& \mbox{\hyperlink{classlibff_1_1_fp__model_a329302b492bc144152a9beb6d264750e}{invert}} ()
+\item 
+\mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}} \mbox{\hyperlink{classlibff_1_1_fp__model_ad409a6550d657e24f4e7b659210422ee}{inverse}} () const
+\item 
+\mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}} \mbox{\hyperlink{classlibff_1_1_fp__model_a4b1cb360b5ac04525c9376444d8d90e0}{sqrt}} () const
+\item 
+\mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}} \mbox{\hyperlink{classlibff_1_1_fp__model_afc48b3e08b4dbe5b50c99b344ba04293}{operator\texorpdfstring{$^\wedge$}{\string^}}} (const unsigned long pow) const
+\item 
+{\footnotesize template$<$mp\+\_\+size\+\_\+t m$>$ }\\\mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}} \mbox{\hyperlink{classlibff_1_1_fp__model_ac069ffcfbb38da0159b8c29f3dcae772}{operator\texorpdfstring{$^\wedge$}{\string^}}} (const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ m $>$ \&pow) const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static bool \mbox{\hyperlink{classlibff_1_1_fp__model_aad8fde5dcb0d06dc2c047ac703782e14}{modulus\+\_\+is\+\_\+valid}} ()
+\item 
+static size\+\_\+t \mbox{\hyperlink{classlibff_1_1_fp__model_a8e1692adc99262cae6371824b9e8a835}{size\+\_\+in\+\_\+bits}} ()
+\item 
+static size\+\_\+t \mbox{\hyperlink{classlibff_1_1_fp__model_a0609f8a4336ca590e7c96321003e2a81}{capacity}} ()
+\item 
+static \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \mbox{\hyperlink{classlibff_1_1_fp__model_a17007913e835c044394a3bd0208d09d6}{field\+\_\+char}} ()
+\item 
+static \mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}}$<$ n, modulus $>$ \mbox{\hyperlink{classlibff_1_1_fp__model_a1cceda9ecc480759163142b6bf4a34d9}{zero}} ()
+\item 
+static \mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}}$<$ n, modulus $>$ \mbox{\hyperlink{classlibff_1_1_fp__model_a408a92e1b8192eaac73e5eab3a092070}{one}} ()
+\item 
+static \mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}}$<$ n, modulus $>$ \mbox{\hyperlink{classlibff_1_1_fp__model_afc32db599e3a27d9ed19016d14d465a3}{random\+\_\+element}} ()
+\item 
+static \mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}}$<$ n, modulus $>$ \mbox{\hyperlink{classlibff_1_1_fp__model_a8663f3fa984e363f04329eaafb9eafba}{geometric\+\_\+generator}} ()
+\item 
+static \mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}}$<$ n, modulus $>$ \mbox{\hyperlink{classlibff_1_1_fp__model_ad3b68c3d0165c127663a7129307bb440}{arithmetic\+\_\+generator}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \mbox{\hyperlink{classlibff_1_1_fp__model_a977a0d961267c687e9f02683a8da793d}{mont\+\_\+repr}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static const mp\+\_\+size\+\_\+t \mbox{\hyperlink{classlibff_1_1_fp__model_a537cb6d7a4bdf842cf9dd9194c67fb93}{num\+\_\+limbs}} = n
+\item 
+static const constexpr \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& \mbox{\hyperlink{classlibff_1_1_fp__model_afebd82e1e7f5a3ced7deef0a380106db}{mod}} = modulus
+\item 
+static size\+\_\+t \mbox{\hyperlink{classlibff_1_1_fp__model_aecfd64a342178c36e698e0dc396ba6b7}{num\+\_\+bits}}
+\item 
+static \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \mbox{\hyperlink{classlibff_1_1_fp__model_a04984b5f5bdb7e8c069a178135a77539}{euler}}
+\item 
+static size\+\_\+t \mbox{\hyperlink{classlibff_1_1_fp__model_a49e83d2e676b7fea1be6c15f38b5b092}{s}}
+\item 
+static \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \mbox{\hyperlink{classlibff_1_1_fp__model_a4d30d3d757da6bd54e8f48ecaf3700f8}{t}}
+\item 
+static \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \mbox{\hyperlink{classlibff_1_1_fp__model_a6edca2710d9a73411833a6caed2c85c2}{t\+\_\+minus\+\_\+1\+\_\+over\+\_\+2}}
+\item 
+static \mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}}$<$ n, modulus $>$ \mbox{\hyperlink{classlibff_1_1_fp__model_abf09833d5282be98e80e3f18e73cc703}{nqr}}
+\item 
+static \mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}}$<$ n, modulus $>$ \mbox{\hyperlink{classlibff_1_1_fp__model_ab2723a0ad82d74eb6a31dc9388a97e0c}{nqr\+\_\+to\+\_\+t}}
+\item 
+static \mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}}$<$ n, modulus $>$ \mbox{\hyperlink{classlibff_1_1_fp__model_a1459a44f2311d64ac99eb0a0d13ad4e3}{multiplicative\+\_\+generator}}
+\item 
+static \mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}}$<$ n, modulus $>$ \mbox{\hyperlink{classlibff_1_1_fp__model_a82935d78fe563dc841b11bcb758df556}{root\+\_\+of\+\_\+unity}}
+\item 
+static mp\+\_\+limb\+\_\+t \mbox{\hyperlink{classlibff_1_1_fp__model_ab1936627f881fd43fdadd4b729e18a78}{inv}}
+\item 
+static \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \mbox{\hyperlink{classlibff_1_1_fp__model_ac2e728d7c90def07823f11545370df7f}{Rsquared}}
+\item 
+static \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \mbox{\hyperlink{classlibff_1_1_fp__model_aac2244a6009de65787e6f3f6c8ee0c15}{Rcubed}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+std\+::ostream \& \mbox{\hyperlink{classlibff_1_1_fp__model_aaebd2c3235cfcb63a30d691ec60d9608}{operator}} (std\+::ostream \&out, const \mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}}$<$ n, modulus $>$ \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})
+\item 
+std\+::istream \& \mbox{\hyperlink{classlibff_1_1_fp__model_ab63c5aa142f3de8d7ec2f58de4b91198}{operator$>$$>$}} (std\+::istream \&in, \mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}}$<$ n, modulus $>$ \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$\newline
+class libff\+::\+Fp\+\_\+model$<$ n, modulus $>$}
+Arithmetic in the finite field F\mbox{[}p\mbox{]}, for prime p of fixed length.
+
+This class implements Fp-\/arithmetic, for a large prime p, using a fixed number of words. It is optimized for tight memory consumption, so the modulus p is passed as a template parameter, to avoid per-\/element overheads.
+
+The implementation is mostly a wrapper around GMP\textquotesingle{}s MPN (constant-\/size integers). But for the integer sizes of interest for libff (3 to 5 limbs of 64 bits each), we implement performance-\/critical routines, like addition and multiplication, using hand-\/optimzied assembly code. 
+
+Definition at line \mbox{\hyperlink{fp_8hpp_source_l00040}{40}} of file \mbox{\hyperlink{fp_8hpp_source}{fp.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classlibff_1_1_fp__model_acb234cdc48b7fcd37e14f45d13eaa629}\index{libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}!Fp\_model@{Fp\_model}}
+\index{Fp\_model@{Fp\_model}!libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}}
+\doxysubsubsection{\texorpdfstring{Fp\_model()}{Fp\_model()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{classlibff_1_1_fp__model_acb234cdc48b7fcd37e14f45d13eaa629} 
+template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ \\
+\mbox{\hyperlink{classlibff_1_1_fp__model}{libff\+::\+Fp\+\_\+model}}$<$ n, modulus $>$\+::\+Fp\+\_\+model (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{fp_8hpp_source_l00068}{68}} of file \mbox{\hyperlink{fp_8hpp_source}{fp.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00068\ \{\};}
+
+\end{DoxyCode}
+\Hypertarget{classlibff_1_1_fp__model_a2175fc36f686cb5010b96c463056bae4}\index{libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}!Fp\_model@{Fp\_model}}
+\index{Fp\_model@{Fp\_model}!libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}}
+\doxysubsubsection{\texorpdfstring{Fp\_model()}{Fp\_model()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{classlibff_1_1_fp__model_a2175fc36f686cb5010b96c463056bae4} 
+template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ \\
+\mbox{\hyperlink{classlibff_1_1_fp__model}{libff\+::\+Fp\+\_\+model}}$<$ n, modulus $>$\+::\+Fp\+\_\+model (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \&}]{b}{}\end{DoxyParamCaption})}
+
+\Hypertarget{classlibff_1_1_fp__model_a5e1ece4b4256f35ea18ac391b995ca56}\index{libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}!Fp\_model@{Fp\_model}}
+\index{Fp\_model@{Fp\_model}!libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}}
+\doxysubsubsection{\texorpdfstring{Fp\_model()}{Fp\_model()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{classlibff_1_1_fp__model_a5e1ece4b4256f35ea18ac391b995ca56} 
+template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ \\
+\mbox{\hyperlink{classlibff_1_1_fp__model}{libff\+::\+Fp\+\_\+model}}$<$ n, modulus $>$\+::\+Fp\+\_\+model (\begin{DoxyParamCaption}\item[{const long}]{x}{, }\item[{const bool}]{is\+\_\+unsigned}{ = {\ttfamily false}}\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classlibff_1_1_fp__model_ad3b68c3d0165c127663a7129307bb440}\index{libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}!arithmetic\_generator@{arithmetic\_generator}}
+\index{arithmetic\_generator@{arithmetic\_generator}!libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}}
+\doxysubsubsection{\texorpdfstring{arithmetic\_generator()}{arithmetic\_generator()}}
+{\footnotesize\ttfamily \label{classlibff_1_1_fp__model_ad3b68c3d0165c127663a7129307bb440} 
+template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ \\
+static \mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}}$<$ n, modulus $>$ \mbox{\hyperlink{classlibff_1_1_fp__model}{libff\+::\+Fp\+\_\+model}}$<$ n, modulus $>$\+::arithmetic\+\_\+generator (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+\Hypertarget{classlibff_1_1_fp__model_ad57a9219a90f4e0a29cb771e46a02e26}\index{libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}!as\_bigint@{as\_bigint}}
+\index{as\_bigint@{as\_bigint}!libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}}
+\doxysubsubsection{\texorpdfstring{as\_bigint()}{as\_bigint()}}
+{\footnotesize\ttfamily \label{classlibff_1_1_fp__model_ad57a9219a90f4e0a29cb771e46a02e26} 
+template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ \\
+\mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \mbox{\hyperlink{classlibff_1_1_fp__model}{libff\+::\+Fp\+\_\+model}}$<$ n, modulus $>$\+::as\+\_\+bigint (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=291pt]{classlibff_1_1_fp__model_ad57a9219a90f4e0a29cb771e46a02e26_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classlibff_1_1_fp__model_a51d0f3ba3dd34f8e7544056dbfc46243}\index{libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}!as\_ulong@{as\_ulong}}
+\index{as\_ulong@{as\_ulong}!libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}}
+\doxysubsubsection{\texorpdfstring{as\_ulong()}{as\_ulong()}}
+{\footnotesize\ttfamily \label{classlibff_1_1_fp__model_a51d0f3ba3dd34f8e7544056dbfc46243} 
+template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ \\
+unsigned long \mbox{\hyperlink{classlibff_1_1_fp__model}{libff\+::\+Fp\+\_\+model}}$<$ n, modulus $>$\+::as\+\_\+ulong (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+\Hypertarget{classlibff_1_1_fp__model_a0609f8a4336ca590e7c96321003e2a81}\index{libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}!capacity@{capacity}}
+\index{capacity@{capacity}!libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}}
+\doxysubsubsection{\texorpdfstring{capacity()}{capacity()}}
+{\footnotesize\ttfamily \label{classlibff_1_1_fp__model_a0609f8a4336ca590e7c96321003e2a81} 
+template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ \\
+static size\+\_\+t \mbox{\hyperlink{classlibff_1_1_fp__model}{libff\+::\+Fp\+\_\+model}}$<$ n, modulus $>$\+::capacity (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{fp_8hpp_source_l00115}{115}} of file \mbox{\hyperlink{fp_8hpp_source}{fp.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00115\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classlibff_1_1_fp__model_aecfd64a342178c36e698e0dc396ba6b7}{num\_bits}}\ -\/\ 1;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classlibff_1_1_fp__model_abc5964d55be3242f3f24e7e241103d6c}\index{libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}!clear@{clear}}
+\index{clear@{clear}!libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}}
+\doxysubsubsection{\texorpdfstring{clear()}{clear()}}
+{\footnotesize\ttfamily \label{classlibff_1_1_fp__model_abc5964d55be3242f3f24e7e241103d6c} 
+template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ \\
+void \mbox{\hyperlink{classlibff_1_1_fp__model}{libff\+::\+Fp\+\_\+model}}$<$ n, modulus $>$\+::clear (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classlibff_1_1_fp__model_abc5964d55be3242f3f24e7e241103d6c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classlibff_1_1_fp__model_a17007913e835c044394a3bd0208d09d6}\index{libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}!field\_char@{field\_char}}
+\index{field\_char@{field\_char}!libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}}
+\doxysubsubsection{\texorpdfstring{field\_char()}{field\_char()}}
+{\footnotesize\ttfamily \label{classlibff_1_1_fp__model_a17007913e835c044394a3bd0208d09d6} 
+template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ \\
+static \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \mbox{\hyperlink{classlibff_1_1_fp__model}{libff\+::\+Fp\+\_\+model}}$<$ n, modulus $>$\+::field\+\_\+char (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{fp_8hpp_source_l00116}{116}} of file \mbox{\hyperlink{fp_8hpp_source}{fp.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00116\ \{\ \textcolor{keywordflow}{return}\ modulus;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classlibff_1_1_fp__model_a17007913e835c044394a3bd0208d09d6_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classlibff_1_1_fp__model_a8663f3fa984e363f04329eaafb9eafba}\index{libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}!geometric\_generator@{geometric\_generator}}
+\index{geometric\_generator@{geometric\_generator}!libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}}
+\doxysubsubsection{\texorpdfstring{geometric\_generator()}{geometric\_generator()}}
+{\footnotesize\ttfamily \label{classlibff_1_1_fp__model_a8663f3fa984e363f04329eaafb9eafba} 
+template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ \\
+static \mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}}$<$ n, modulus $>$ \mbox{\hyperlink{classlibff_1_1_fp__model}{libff\+::\+Fp\+\_\+model}}$<$ n, modulus $>$\+::geometric\+\_\+generator (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+\Hypertarget{classlibff_1_1_fp__model_ad409a6550d657e24f4e7b659210422ee}\index{libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}!inverse@{inverse}}
+\index{inverse@{inverse}!libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}}
+\doxysubsubsection{\texorpdfstring{inverse()}{inverse()}}
+{\footnotesize\ttfamily \label{classlibff_1_1_fp__model_ad409a6550d657e24f4e7b659210422ee} 
+template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ \\
+\mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}} \mbox{\hyperlink{classlibff_1_1_fp__model}{libff\+::\+Fp\+\_\+model}}$<$ n, modulus $>$\+::inverse (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classlibff_1_1_fp__model_ad409a6550d657e24f4e7b659210422ee_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classlibff_1_1_fp__model_a329302b492bc144152a9beb6d264750e}\index{libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}!invert@{invert}}
+\index{invert@{invert}!libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}}
+\doxysubsubsection{\texorpdfstring{invert()}{invert()}}
+{\footnotesize\ttfamily \label{classlibff_1_1_fp__model_a329302b492bc144152a9beb6d264750e} 
+template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ \\
+\mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}} \& \mbox{\hyperlink{classlibff_1_1_fp__model}{libff\+::\+Fp\+\_\+model}}$<$ n, modulus $>$\+::invert (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{classlibff_1_1_fp__model_a121b2621e9557b86faa6806774f42837}\index{libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}!is\_zero@{is\_zero}}
+\index{is\_zero@{is\_zero}!libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}}
+\doxysubsubsection{\texorpdfstring{is\_zero()}{is\_zero()}}
+{\footnotesize\ttfamily \label{classlibff_1_1_fp__model_a121b2621e9557b86faa6806774f42837} 
+template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ \\
+bool \mbox{\hyperlink{classlibff_1_1_fp__model}{libff\+::\+Fp\+\_\+model}}$<$ n, modulus $>$\+::is\+\_\+zero (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classlibff_1_1_fp__model_a121b2621e9557b86faa6806774f42837_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classlibff_1_1_fp__model_aad8fde5dcb0d06dc2c047ac703782e14}\index{libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}!modulus\_is\_valid@{modulus\_is\_valid}}
+\index{modulus\_is\_valid@{modulus\_is\_valid}!libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}}
+\doxysubsubsection{\texorpdfstring{modulus\_is\_valid()}{modulus\_is\_valid()}}
+{\footnotesize\ttfamily \label{classlibff_1_1_fp__model_aad8fde5dcb0d06dc2c047ac703782e14} 
+template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ \\
+static bool \mbox{\hyperlink{classlibff_1_1_fp__model}{libff\+::\+Fp\+\_\+model}}$<$ n, modulus $>$\+::modulus\+\_\+is\+\_\+valid (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{fp_8hpp_source_l00066}{66}} of file \mbox{\hyperlink{fp_8hpp_source}{fp.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00066\ \{\ \textcolor{keywordflow}{return}\ modulus.data[n-\/1]\ !=\ 0;\ \}\ \textcolor{comment}{//\ mpn\ inverse\ assumes\ that\ highest\ limb\ is\ non-\/zero}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classlibff_1_1_fp__model_aad8fde5dcb0d06dc2c047ac703782e14_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classlibff_1_1_fp__model_a6a3b968d196b205c1d20d9eaeab03133}\index{libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}!mul\_reduce@{mul\_reduce}}
+\index{mul\_reduce@{mul\_reduce}!libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}}
+\doxysubsubsection{\texorpdfstring{mul\_reduce()}{mul\_reduce()}}
+{\footnotesize\ttfamily \label{classlibff_1_1_fp__model_a6a3b968d196b205c1d20d9eaeab03133} 
+template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ \\
+void \mbox{\hyperlink{classlibff_1_1_fp__model}{libff\+::\+Fp\+\_\+model}}$<$ n, modulus $>$\+::mul\+\_\+reduce (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \&}]{other}{}\end{DoxyParamCaption})}
+
+\Hypertarget{classlibff_1_1_fp__model_a408a92e1b8192eaac73e5eab3a092070}\index{libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}!one@{one}}
+\index{one@{one}!libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}}
+\doxysubsubsection{\texorpdfstring{one()}{one()}}
+{\footnotesize\ttfamily \label{classlibff_1_1_fp__model_a408a92e1b8192eaac73e5eab3a092070} 
+template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ \\
+static \mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}}$<$ n, modulus $>$ \mbox{\hyperlink{classlibff_1_1_fp__model}{libff\+::\+Fp\+\_\+model}}$<$ n, modulus $>$\+::one (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+\Hypertarget{classlibff_1_1_fp__model_a02e4dac825394a7e9e1226e410fa86d0}\index{libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}!operator"!=@{operator"!=}}
+\index{operator"!=@{operator"!=}!libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}}
+\doxysubsubsection{\texorpdfstring{operator"!=()}{operator!=()}}
+{\footnotesize\ttfamily \label{classlibff_1_1_fp__model_a02e4dac825394a7e9e1226e410fa86d0} 
+template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ \\
+bool \mbox{\hyperlink{classlibff_1_1_fp__model}{libff\+::\+Fp\+\_\+model}}$<$ n, modulus $>$\+::operator!= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}}$<$ n, modulus $>$ \&}]{other}{}\end{DoxyParamCaption}) const}
+
+\Hypertarget{classlibff_1_1_fp__model_a16613069b06a92260dbb664226b81eca}\index{libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}!operator\texorpdfstring{$\ast$}{*}@{operator\texorpdfstring{$\ast$}{*}}}
+\index{operator\texorpdfstring{$\ast$}{*}@{operator\texorpdfstring{$\ast$}{*}}!libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}}
+\doxysubsubsection{\texorpdfstring{operator\texorpdfstring{$\ast$}{*}()}{operator*()}}
+{\footnotesize\ttfamily \label{classlibff_1_1_fp__model_a16613069b06a92260dbb664226b81eca} 
+template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ \\
+\mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}} \mbox{\hyperlink{classlibff_1_1_fp__model}{libff\+::\+Fp\+\_\+model}}$<$ n, modulus $>$\mbox{\hyperlink{classlibff_1_1_fp__model_aaebd2c3235cfcb63a30d691ec60d9608}{\+::operator}}\texorpdfstring{$\ast$}{*} (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}}$<$ n, modulus $>$ \&}]{other}{}\end{DoxyParamCaption}) const}
+
+\Hypertarget{classlibff_1_1_fp__model_a3ea5535bc79501c3d3b2b1fee12ad416}\index{libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}!operator\texorpdfstring{$\ast$}{*}=@{operator\texorpdfstring{$\ast$}{*}=}}
+\index{operator\texorpdfstring{$\ast$}{*}=@{operator\texorpdfstring{$\ast$}{*}=}!libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}}
+\doxysubsubsection{\texorpdfstring{operator\texorpdfstring{$\ast$}{*}=()}{operator*=()}}
+{\footnotesize\ttfamily \label{classlibff_1_1_fp__model_a3ea5535bc79501c3d3b2b1fee12ad416} 
+template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ \\
+\mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}} \& \mbox{\hyperlink{classlibff_1_1_fp__model}{libff\+::\+Fp\+\_\+model}}$<$ n, modulus $>$\mbox{\hyperlink{classlibff_1_1_fp__model_aaebd2c3235cfcb63a30d691ec60d9608}{\+::operator}}\texorpdfstring{$\ast$}{*}= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}}$<$ n, modulus $>$ \&}]{other}{}\end{DoxyParamCaption})}
+
+\Hypertarget{classlibff_1_1_fp__model_a993f5ec1873b0586649b92d319fc0f92}\index{libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}!operator+@{operator+}}
+\index{operator+@{operator+}!libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}}
+\doxysubsubsection{\texorpdfstring{operator+()}{operator+()}}
+{\footnotesize\ttfamily \label{classlibff_1_1_fp__model_a993f5ec1873b0586649b92d319fc0f92} 
+template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ \\
+\mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}} \mbox{\hyperlink{classlibff_1_1_fp__model}{libff\+::\+Fp\+\_\+model}}$<$ n, modulus $>$\mbox{\hyperlink{classlibff_1_1_fp__model_aaebd2c3235cfcb63a30d691ec60d9608}{\+::operator}}+ (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}}$<$ n, modulus $>$ \&}]{other}{}\end{DoxyParamCaption}) const}
+
+\Hypertarget{classlibff_1_1_fp__model_ad483789590ca7b067001da5f14003df8}\index{libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}!operator+=@{operator+=}}
+\index{operator+=@{operator+=}!libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}}
+\doxysubsubsection{\texorpdfstring{operator+=()}{operator+=()}}
+{\footnotesize\ttfamily \label{classlibff_1_1_fp__model_ad483789590ca7b067001da5f14003df8} 
+template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ \\
+\mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}} \& \mbox{\hyperlink{classlibff_1_1_fp__model}{libff\+::\+Fp\+\_\+model}}$<$ n, modulus $>$\mbox{\hyperlink{classlibff_1_1_fp__model_aaebd2c3235cfcb63a30d691ec60d9608}{\+::operator}}+= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}}$<$ n, modulus $>$ \&}]{other}{}\end{DoxyParamCaption})}
+
+\Hypertarget{classlibff_1_1_fp__model_a04053a089a221b0d06c6775913a43ce2}\index{libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}!operator-\/@{operator-\/}}
+\index{operator-\/@{operator-\/}!libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}}
+\doxysubsubsection{\texorpdfstring{operator-\/()}{operator-()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classlibff_1_1_fp__model_a04053a089a221b0d06c6775913a43ce2} 
+template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ \\
+\mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}} \mbox{\hyperlink{classlibff_1_1_fp__model}{libff\+::\+Fp\+\_\+model}}$<$ n, modulus $>$\mbox{\hyperlink{classlibff_1_1_fp__model_aaebd2c3235cfcb63a30d691ec60d9608}{\+::operator}}-\/ (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+\Hypertarget{classlibff_1_1_fp__model_ae6966f75ebe45c9348b167f1d86aab29}\index{libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}!operator-\/@{operator-\/}}
+\index{operator-\/@{operator-\/}!libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}}
+\doxysubsubsection{\texorpdfstring{operator-\/()}{operator-()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classlibff_1_1_fp__model_ae6966f75ebe45c9348b167f1d86aab29} 
+template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ \\
+\mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}} \mbox{\hyperlink{classlibff_1_1_fp__model}{libff\+::\+Fp\+\_\+model}}$<$ n, modulus $>$\mbox{\hyperlink{classlibff_1_1_fp__model_aaebd2c3235cfcb63a30d691ec60d9608}{\+::operator}}-\/ (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}}$<$ n, modulus $>$ \&}]{other}{}\end{DoxyParamCaption}) const}
+
+\Hypertarget{classlibff_1_1_fp__model_a67c91c0981f2903e85278691df3c85fc}\index{libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}!operator-\/=@{operator-\/=}}
+\index{operator-\/=@{operator-\/=}!libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}}
+\doxysubsubsection{\texorpdfstring{operator-\/=()}{operator-=()}}
+{\footnotesize\ttfamily \label{classlibff_1_1_fp__model_a67c91c0981f2903e85278691df3c85fc} 
+template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ \\
+\mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}} \& \mbox{\hyperlink{classlibff_1_1_fp__model}{libff\+::\+Fp\+\_\+model}}$<$ n, modulus $>$\mbox{\hyperlink{classlibff_1_1_fp__model_aaebd2c3235cfcb63a30d691ec60d9608}{\+::operator}}-\/= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}}$<$ n, modulus $>$ \&}]{other}{}\end{DoxyParamCaption})}
+
+\Hypertarget{classlibff_1_1_fp__model_a5ed84aa2307aa75b1a28f84ea6764512}\index{libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}!operator==@{operator==}}
+\index{operator==@{operator==}!libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}}
+\doxysubsubsection{\texorpdfstring{operator==()}{operator==()}}
+{\footnotesize\ttfamily \label{classlibff_1_1_fp__model_a5ed84aa2307aa75b1a28f84ea6764512} 
+template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ \\
+bool \mbox{\hyperlink{classlibff_1_1_fp__model}{libff\+::\+Fp\+\_\+model}}$<$ n, modulus $>$\mbox{\hyperlink{classlibff_1_1_fp__model_aaebd2c3235cfcb63a30d691ec60d9608}{\+::operator}}== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}}$<$ n, modulus $>$ \&}]{other}{}\end{DoxyParamCaption}) const}
+
+\Hypertarget{classlibff_1_1_fp__model_ac069ffcfbb38da0159b8c29f3dcae772}\index{libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}!operator\texorpdfstring{$^\wedge$}{\string^}@{operator\texorpdfstring{$^\wedge$}{\string^}}}
+\index{operator\texorpdfstring{$^\wedge$}{\string^}@{operator\texorpdfstring{$^\wedge$}{\string^}}!libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}}
+\doxysubsubsection{\texorpdfstring{operator\texorpdfstring{$^\wedge$}{\string^}()}{operator\string^()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classlibff_1_1_fp__model_ac069ffcfbb38da0159b8c29f3dcae772} 
+template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ \\
+template$<$mp\+\_\+size\+\_\+t m$>$ \\
+\mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}} \mbox{\hyperlink{classlibff_1_1_fp__model}{libff\+::\+Fp\+\_\+model}}$<$ n, modulus $>$\mbox{\hyperlink{classlibff_1_1_fp__model_aaebd2c3235cfcb63a30d691ec60d9608}{\+::operator}}\texorpdfstring{$^\wedge$}{\string^} (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ m $>$ \&}]{pow}{}\end{DoxyParamCaption}) const}
+
+\Hypertarget{classlibff_1_1_fp__model_afc48b3e08b4dbe5b50c99b344ba04293}\index{libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}!operator\texorpdfstring{$^\wedge$}{\string^}@{operator\texorpdfstring{$^\wedge$}{\string^}}}
+\index{operator\texorpdfstring{$^\wedge$}{\string^}@{operator\texorpdfstring{$^\wedge$}{\string^}}!libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}}
+\doxysubsubsection{\texorpdfstring{operator\texorpdfstring{$^\wedge$}{\string^}()}{operator\string^()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classlibff_1_1_fp__model_afc48b3e08b4dbe5b50c99b344ba04293} 
+template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ \\
+\mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}} \mbox{\hyperlink{classlibff_1_1_fp__model}{libff\+::\+Fp\+\_\+model}}$<$ n, modulus $>$\mbox{\hyperlink{classlibff_1_1_fp__model_aaebd2c3235cfcb63a30d691ec60d9608}{\+::operator}}\texorpdfstring{$^\wedge$}{\string^} (\begin{DoxyParamCaption}\item[{const unsigned long}]{pow}{}\end{DoxyParamCaption}) const}
+
+\Hypertarget{classlibff_1_1_fp__model_ab7094fa07079e4af5e86d57dad682fdd}\index{libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}!operator\texorpdfstring{$^\wedge$}{\string^}=@{operator\texorpdfstring{$^\wedge$}{\string^}=}}
+\index{operator\texorpdfstring{$^\wedge$}{\string^}=@{operator\texorpdfstring{$^\wedge$}{\string^}=}!libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}}
+\doxysubsubsection{\texorpdfstring{operator\texorpdfstring{$^\wedge$}{\string^}=()}{operator\string^=()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classlibff_1_1_fp__model_ab7094fa07079e4af5e86d57dad682fdd} 
+template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ \\
+template$<$mp\+\_\+size\+\_\+t m$>$ \\
+\mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}} \& \mbox{\hyperlink{classlibff_1_1_fp__model}{libff\+::\+Fp\+\_\+model}}$<$ n, modulus $>$\mbox{\hyperlink{classlibff_1_1_fp__model_aaebd2c3235cfcb63a30d691ec60d9608}{\+::operator}}\texorpdfstring{$^\wedge$}{\string^}= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ m $>$ \&}]{pow}{}\end{DoxyParamCaption})}
+
+\Hypertarget{classlibff_1_1_fp__model_afc98ea28e887caa3be1977695b9d5e9e}\index{libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}!operator\texorpdfstring{$^\wedge$}{\string^}=@{operator\texorpdfstring{$^\wedge$}{\string^}=}}
+\index{operator\texorpdfstring{$^\wedge$}{\string^}=@{operator\texorpdfstring{$^\wedge$}{\string^}=}!libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}}
+\doxysubsubsection{\texorpdfstring{operator\texorpdfstring{$^\wedge$}{\string^}=()}{operator\string^=()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classlibff_1_1_fp__model_afc98ea28e887caa3be1977695b9d5e9e} 
+template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ \\
+\mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}} \& \mbox{\hyperlink{classlibff_1_1_fp__model}{libff\+::\+Fp\+\_\+model}}$<$ n, modulus $>$\mbox{\hyperlink{classlibff_1_1_fp__model_aaebd2c3235cfcb63a30d691ec60d9608}{\+::operator}}\texorpdfstring{$^\wedge$}{\string^}= (\begin{DoxyParamCaption}\item[{const unsigned long}]{pow}{}\end{DoxyParamCaption})}
+
+\Hypertarget{classlibff_1_1_fp__model_a2390cfd38458e3f18a640c75ee5cf77c}\index{libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}!print@{print}}
+\index{print@{print}!libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}}
+\doxysubsubsection{\texorpdfstring{print()}{print()}}
+{\footnotesize\ttfamily \label{classlibff_1_1_fp__model_a2390cfd38458e3f18a640c75ee5cf77c} 
+template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ \\
+void \mbox{\hyperlink{classlibff_1_1_fp__model}{libff\+::\+Fp\+\_\+model}}$<$ n, modulus $>$\+::print (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classlibff_1_1_fp__model_a2390cfd38458e3f18a640c75ee5cf77c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classlibff_1_1_fp__model_afc32db599e3a27d9ed19016d14d465a3}\index{libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}!random\_element@{random\_element}}
+\index{random\_element@{random\_element}!libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}}
+\doxysubsubsection{\texorpdfstring{random\_element()}{random\_element()}}
+{\footnotesize\ttfamily \label{classlibff_1_1_fp__model_afc32db599e3a27d9ed19016d14d465a3} 
+template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ \\
+static \mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}}$<$ n, modulus $>$ \mbox{\hyperlink{classlibff_1_1_fp__model}{libff\+::\+Fp\+\_\+model}}$<$ n, modulus $>$\+::random\+\_\+element (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classlibff_1_1_fp__model_afc32db599e3a27d9ed19016d14d465a3_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classlibff_1_1_fp__model_ab6cdf64f9e9e6d83623456fcf5d8215d}\index{libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}!set\_ulong@{set\_ulong}}
+\index{set\_ulong@{set\_ulong}!libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}}
+\doxysubsubsection{\texorpdfstring{set\_ulong()}{set\_ulong()}}
+{\footnotesize\ttfamily \label{classlibff_1_1_fp__model_ab6cdf64f9e9e6d83623456fcf5d8215d} 
+template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ \\
+void \mbox{\hyperlink{classlibff_1_1_fp__model}{libff\+::\+Fp\+\_\+model}}$<$ n, modulus $>$\+::set\+\_\+ulong (\begin{DoxyParamCaption}\item[{const unsigned long}]{x}{}\end{DoxyParamCaption})}
+
+\Hypertarget{classlibff_1_1_fp__model_a8e1692adc99262cae6371824b9e8a835}\index{libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}!size\_in\_bits@{size\_in\_bits}}
+\index{size\_in\_bits@{size\_in\_bits}!libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}}
+\doxysubsubsection{\texorpdfstring{size\_in\_bits()}{size\_in\_bits()}}
+{\footnotesize\ttfamily \label{classlibff_1_1_fp__model_a8e1692adc99262cae6371824b9e8a835} 
+template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ \\
+static size\+\_\+t \mbox{\hyperlink{classlibff_1_1_fp__model}{libff\+::\+Fp\+\_\+model}}$<$ n, modulus $>$\+::size\+\_\+in\+\_\+bits (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{fp_8hpp_source_l00114}{114}} of file \mbox{\hyperlink{fp_8hpp_source}{fp.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00114\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classlibff_1_1_fp__model_aecfd64a342178c36e698e0dc396ba6b7}{num\_bits}};\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=330pt]{classlibff_1_1_fp__model_a8e1692adc99262cae6371824b9e8a835_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classlibff_1_1_fp__model_a4b1cb360b5ac04525c9376444d8d90e0}\index{libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}!sqrt@{sqrt}}
+\index{sqrt@{sqrt}!libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}}
+\doxysubsubsection{\texorpdfstring{sqrt()}{sqrt()}}
+{\footnotesize\ttfamily \label{classlibff_1_1_fp__model_a4b1cb360b5ac04525c9376444d8d90e0} 
+template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ \\
+\mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}} \mbox{\hyperlink{classlibff_1_1_fp__model}{libff\+::\+Fp\+\_\+model}}$<$ n, modulus $>$\+::sqrt (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+\Hypertarget{classlibff_1_1_fp__model_a878d4d0568cc224a45ed70376601e4dc}\index{libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}!squared@{squared}}
+\index{squared@{squared}!libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}}
+\doxysubsubsection{\texorpdfstring{squared()}{squared()}}
+{\footnotesize\ttfamily \label{classlibff_1_1_fp__model_a878d4d0568cc224a45ed70376601e4dc} 
+template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ \\
+\mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}} \mbox{\hyperlink{classlibff_1_1_fp__model}{libff\+::\+Fp\+\_\+model}}$<$ n, modulus $>$\+::squared (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classlibff_1_1_fp__model_a878d4d0568cc224a45ed70376601e4dc_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classlibff_1_1_fp__model_a1cceda9ecc480759163142b6bf4a34d9}\index{libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}!zero@{zero}}
+\index{zero@{zero}!libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}}
+\doxysubsubsection{\texorpdfstring{zero()}{zero()}}
+{\footnotesize\ttfamily \label{classlibff_1_1_fp__model_a1cceda9ecc480759163142b6bf4a34d9} 
+template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ \\
+static \mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}}$<$ n, modulus $>$ \mbox{\hyperlink{classlibff_1_1_fp__model}{libff\+::\+Fp\+\_\+model}}$<$ n, modulus $>$\+::zero (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{classlibff_1_1_fp__model_aaebd2c3235cfcb63a30d691ec60d9608}\index{libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}!operator@{operator}}
+\index{operator@{operator}!libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}}
+\doxysubsubsection{\texorpdfstring{operator}{operator}}
+{\footnotesize\ttfamily \label{classlibff_1_1_fp__model_aaebd2c3235cfcb63a30d691ec60d9608} 
+template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ \\
+std\+::ostream \& operator (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{out}{, }\item[{const \mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}}$<$ n, modulus $>$ \&}]{p}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+\Hypertarget{classlibff_1_1_fp__model_ab63c5aa142f3de8d7ec2f58de4b91198}\index{libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}!operator$>$$>$@{operator$>$$>$}}
+\index{operator$>$$>$@{operator$>$$>$}!libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}}
+\doxysubsubsection{\texorpdfstring{operator$>$$>$}{operator>>}}
+{\footnotesize\ttfamily \label{classlibff_1_1_fp__model_ab63c5aa142f3de8d7ec2f58de4b91198} 
+template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ \\
+std\+::istream \& \mbox{\hyperlink{classlibff_1_1_fp__model_aaebd2c3235cfcb63a30d691ec60d9608}{operator}}$>$$>$ (\begin{DoxyParamCaption}\item[{std\+::istream \&}]{in}{, }\item[{\mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}}$<$ n, modulus $>$ \&}]{p}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classlibff_1_1_fp__model_a04984b5f5bdb7e8c069a178135a77539}\index{libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}!euler@{euler}}
+\index{euler@{euler}!libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}}
+\doxysubsubsection{\texorpdfstring{euler}{euler}}
+{\footnotesize\ttfamily \label{classlibff_1_1_fp__model_a04984b5f5bdb7e8c069a178135a77539} 
+template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ \\
+\mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \mbox{\hyperlink{classlibff_1_1_fp__model}{libff\+::\+Fp\+\_\+model}}$<$ n, modulus $>$\+::euler\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{fp_8hpp_source_l00054}{54}} of file \mbox{\hyperlink{fp_8hpp_source}{fp.\+hpp}}.
+
+\Hypertarget{classlibff_1_1_fp__model_ab1936627f881fd43fdadd4b729e18a78}\index{libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}!inv@{inv}}
+\index{inv@{inv}!libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}}
+\doxysubsubsection{\texorpdfstring{inv}{inv}}
+{\footnotesize\ttfamily \label{classlibff_1_1_fp__model_ab1936627f881fd43fdadd4b729e18a78} 
+template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ \\
+mp\+\_\+limb\+\_\+t \mbox{\hyperlink{classlibff_1_1_fp__model}{libff\+::\+Fp\+\_\+model}}$<$ n, modulus $>$\+::inv\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{fp_8hpp_source_l00062}{62}} of file \mbox{\hyperlink{fp_8hpp_source}{fp.\+hpp}}.
+
+\Hypertarget{classlibff_1_1_fp__model_afebd82e1e7f5a3ced7deef0a380106db}\index{libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}!mod@{mod}}
+\index{mod@{mod}!libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}}
+\doxysubsubsection{\texorpdfstring{mod}{mod}}
+{\footnotesize\ttfamily \label{classlibff_1_1_fp__model_afebd82e1e7f5a3ced7deef0a380106db} 
+template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ \\
+const constexpr \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$n$>$\& \mbox{\hyperlink{classlibff_1_1_fp__model}{libff\+::\+Fp\+\_\+model}}$<$ n, modulus $>$\+::mod = modulus\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{fp_8hpp_source_l00045}{45}} of file \mbox{\hyperlink{fp_8hpp_source}{fp.\+hpp}}.
+
+\Hypertarget{classlibff_1_1_fp__model_a977a0d961267c687e9f02683a8da793d}\index{libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}!mont\_repr@{mont\_repr}}
+\index{mont\_repr@{mont\_repr}!libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}}
+\doxysubsubsection{\texorpdfstring{mont\_repr}{mont\_repr}}
+{\footnotesize\ttfamily \label{classlibff_1_1_fp__model_a977a0d961267c687e9f02683a8da793d} 
+template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ \\
+\mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$n$>$ \mbox{\hyperlink{classlibff_1_1_fp__model}{libff\+::\+Fp\+\_\+model}}$<$ n, modulus $>$\+::mont\+\_\+repr}
+
+
+
+Definition at line \mbox{\hyperlink{fp_8hpp_source_l00042}{42}} of file \mbox{\hyperlink{fp_8hpp_source}{fp.\+hpp}}.
+
+\Hypertarget{classlibff_1_1_fp__model_a1459a44f2311d64ac99eb0a0d13ad4e3}\index{libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}!multiplicative\_generator@{multiplicative\_generator}}
+\index{multiplicative\_generator@{multiplicative\_generator}!libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}}
+\doxysubsubsection{\texorpdfstring{multiplicative\_generator}{multiplicative\_generator}}
+{\footnotesize\ttfamily \label{classlibff_1_1_fp__model_a1459a44f2311d64ac99eb0a0d13ad4e3} 
+template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ \\
+\mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}}$<$ n, modulus $>$ \mbox{\hyperlink{classlibff_1_1_fp__model}{libff\+::\+Fp\+\_\+model}}$<$ n, modulus $>$\+::multiplicative\+\_\+generator\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{fp_8hpp_source_l00060}{60}} of file \mbox{\hyperlink{fp_8hpp_source}{fp.\+hpp}}.
+
+\Hypertarget{classlibff_1_1_fp__model_abf09833d5282be98e80e3f18e73cc703}\index{libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}!nqr@{nqr}}
+\index{nqr@{nqr}!libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}}
+\doxysubsubsection{\texorpdfstring{nqr}{nqr}}
+{\footnotesize\ttfamily \label{classlibff_1_1_fp__model_abf09833d5282be98e80e3f18e73cc703} 
+template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ \\
+\mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}}$<$ n, modulus $>$ \mbox{\hyperlink{classlibff_1_1_fp__model}{libff\+::\+Fp\+\_\+model}}$<$ n, modulus $>$\+::nqr\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{fp_8hpp_source_l00058}{58}} of file \mbox{\hyperlink{fp_8hpp_source}{fp.\+hpp}}.
+
+\Hypertarget{classlibff_1_1_fp__model_ab2723a0ad82d74eb6a31dc9388a97e0c}\index{libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}!nqr\_to\_t@{nqr\_to\_t}}
+\index{nqr\_to\_t@{nqr\_to\_t}!libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}}
+\doxysubsubsection{\texorpdfstring{nqr\_to\_t}{nqr\_to\_t}}
+{\footnotesize\ttfamily \label{classlibff_1_1_fp__model_ab2723a0ad82d74eb6a31dc9388a97e0c} 
+template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ \\
+\mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}}$<$ n, modulus $>$ \mbox{\hyperlink{classlibff_1_1_fp__model}{libff\+::\+Fp\+\_\+model}}$<$ n, modulus $>$\+::nqr\+\_\+to\+\_\+t\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{fp_8hpp_source_l00059}{59}} of file \mbox{\hyperlink{fp_8hpp_source}{fp.\+hpp}}.
+
+\Hypertarget{classlibff_1_1_fp__model_aecfd64a342178c36e698e0dc396ba6b7}\index{libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}!num\_bits@{num\_bits}}
+\index{num\_bits@{num\_bits}!libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}}
+\doxysubsubsection{\texorpdfstring{num\_bits}{num\_bits}}
+{\footnotesize\ttfamily \label{classlibff_1_1_fp__model_aecfd64a342178c36e698e0dc396ba6b7} 
+template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ \\
+size\+\_\+t \mbox{\hyperlink{classlibff_1_1_fp__model}{libff\+::\+Fp\+\_\+model}}$<$ n, modulus $>$\+::num\+\_\+bits\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{fp_8hpp_source_l00053}{53}} of file \mbox{\hyperlink{fp_8hpp_source}{fp.\+hpp}}.
+
+\Hypertarget{classlibff_1_1_fp__model_a537cb6d7a4bdf842cf9dd9194c67fb93}\index{libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}!num\_limbs@{num\_limbs}}
+\index{num\_limbs@{num\_limbs}!libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}}
+\doxysubsubsection{\texorpdfstring{num\_limbs}{num\_limbs}}
+{\footnotesize\ttfamily \label{classlibff_1_1_fp__model_a537cb6d7a4bdf842cf9dd9194c67fb93} 
+template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ \\
+const mp\+\_\+size\+\_\+t \mbox{\hyperlink{classlibff_1_1_fp__model}{libff\+::\+Fp\+\_\+model}}$<$ n, modulus $>$\+::num\+\_\+limbs = n\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{fp_8hpp_source_l00044}{44}} of file \mbox{\hyperlink{fp_8hpp_source}{fp.\+hpp}}.
+
+\Hypertarget{classlibff_1_1_fp__model_aac2244a6009de65787e6f3f6c8ee0c15}\index{libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}!Rcubed@{Rcubed}}
+\index{Rcubed@{Rcubed}!libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}}
+\doxysubsubsection{\texorpdfstring{Rcubed}{Rcubed}}
+{\footnotesize\ttfamily \label{classlibff_1_1_fp__model_aac2244a6009de65787e6f3f6c8ee0c15} 
+template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ \\
+\mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \mbox{\hyperlink{classlibff_1_1_fp__model}{libff\+::\+Fp\+\_\+model}}$<$ n, modulus $>$\+::\+Rcubed\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{fp_8hpp_source_l00064}{64}} of file \mbox{\hyperlink{fp_8hpp_source}{fp.\+hpp}}.
+
+\Hypertarget{classlibff_1_1_fp__model_a82935d78fe563dc841b11bcb758df556}\index{libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}!root\_of\_unity@{root\_of\_unity}}
+\index{root\_of\_unity@{root\_of\_unity}!libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}}
+\doxysubsubsection{\texorpdfstring{root\_of\_unity}{root\_of\_unity}}
+{\footnotesize\ttfamily \label{classlibff_1_1_fp__model_a82935d78fe563dc841b11bcb758df556} 
+template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ \\
+\mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}}$<$ n, modulus $>$ \mbox{\hyperlink{classlibff_1_1_fp__model}{libff\+::\+Fp\+\_\+model}}$<$ n, modulus $>$\+::root\+\_\+of\+\_\+unity\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{fp_8hpp_source_l00061}{61}} of file \mbox{\hyperlink{fp_8hpp_source}{fp.\+hpp}}.
+
+\Hypertarget{classlibff_1_1_fp__model_ac2e728d7c90def07823f11545370df7f}\index{libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}!Rsquared@{Rsquared}}
+\index{Rsquared@{Rsquared}!libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}}
+\doxysubsubsection{\texorpdfstring{Rsquared}{Rsquared}}
+{\footnotesize\ttfamily \label{classlibff_1_1_fp__model_ac2e728d7c90def07823f11545370df7f} 
+template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ \\
+\mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \mbox{\hyperlink{classlibff_1_1_fp__model}{libff\+::\+Fp\+\_\+model}}$<$ n, modulus $>$\+::\+Rsquared\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{fp_8hpp_source_l00063}{63}} of file \mbox{\hyperlink{fp_8hpp_source}{fp.\+hpp}}.
+
+\Hypertarget{classlibff_1_1_fp__model_a49e83d2e676b7fea1be6c15f38b5b092}\index{libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}!s@{s}}
+\index{s@{s}!libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}}
+\doxysubsubsection{\texorpdfstring{s}{s}}
+{\footnotesize\ttfamily \label{classlibff_1_1_fp__model_a49e83d2e676b7fea1be6c15f38b5b092} 
+template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ \\
+size\+\_\+t \mbox{\hyperlink{classlibff_1_1_fp__model}{libff\+::\+Fp\+\_\+model}}$<$ n, modulus $>$\+::s\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{fp_8hpp_source_l00055}{55}} of file \mbox{\hyperlink{fp_8hpp_source}{fp.\+hpp}}.
+
+\Hypertarget{classlibff_1_1_fp__model_a4d30d3d757da6bd54e8f48ecaf3700f8}\index{libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}!t@{t}}
+\index{t@{t}!libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}}
+\doxysubsubsection{\texorpdfstring{t}{t}}
+{\footnotesize\ttfamily \label{classlibff_1_1_fp__model_a4d30d3d757da6bd54e8f48ecaf3700f8} 
+template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ \\
+\mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \mbox{\hyperlink{classlibff_1_1_fp__model}{libff\+::\+Fp\+\_\+model}}$<$ n, modulus $>$\+::t\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{fp_8hpp_source_l00056}{56}} of file \mbox{\hyperlink{fp_8hpp_source}{fp.\+hpp}}.
+
+\Hypertarget{classlibff_1_1_fp__model_a6edca2710d9a73411833a6caed2c85c2}\index{libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}!t\_minus\_1\_over\_2@{t\_minus\_1\_over\_2}}
+\index{t\_minus\_1\_over\_2@{t\_minus\_1\_over\_2}!libff::Fp\_model$<$ n, modulus $>$@{libff::Fp\_model$<$ n, modulus $>$}}
+\doxysubsubsection{\texorpdfstring{t\_minus\_1\_over\_2}{t\_minus\_1\_over\_2}}
+{\footnotesize\ttfamily \label{classlibff_1_1_fp__model_a6edca2710d9a73411833a6caed2c85c2} 
+template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ \\
+\mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \mbox{\hyperlink{classlibff_1_1_fp__model}{libff\+::\+Fp\+\_\+model}}$<$ n, modulus $>$\+::t\+\_\+minus\+\_\+1\+\_\+over\+\_\+2\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{fp_8hpp_source_l00057}{57}} of file \mbox{\hyperlink{fp_8hpp_source}{fp.\+hpp}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/libraries/ff/libff/algebra/fields/\mbox{\hyperlink{fp_8hpp}{fp.\+hpp}}\end{DoxyCompactItemize}

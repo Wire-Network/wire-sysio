@@ -1,0 +1,172 @@
+\doxysection{platformtest.\+cpp}
+\hypertarget{platformtest_8cpp_source}{}\label{platformtest_8cpp_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/test/perftest/platformtest.cpp@{libraries/fc/include/fc/crypto/webauthn\_json/test/perftest/platformtest.cpp}}
+\mbox{\hyperlink{platformtest_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00001}00001\ \textcolor{comment}{//\ Tencent\ is\ pleased\ to\ support\ the\ open\ source\ community\ by\ making\ RapidJSON\ available.}}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00002}00002\ \textcolor{comment}{//\ }}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00003}00003\ \textcolor{comment}{//\ Copyright\ (C)\ 2015\ THL\ A29\ Limited,\ a\ Tencent\ company,\ and\ Milo\ Yip.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00004}00004\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00005}00005\ \textcolor{comment}{//\ Licensed\ under\ the\ MIT\ License\ (the\ "{}License"{});\ you\ may\ not\ use\ this\ file\ except}}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00006}00006\ \textcolor{comment}{//\ in\ compliance\ with\ the\ License.\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00007}00007\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00008}00008\ \textcolor{comment}{//\ http://opensource.org/licenses/MIT}}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00009}00009\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00010}00010\ \textcolor{comment}{//\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software\ distributed\ }}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00011}00011\ \textcolor{comment}{//\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,\ WITHOUT\ WARRANTIES\ OR\ }}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00012}00012\ \textcolor{comment}{//\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.\ See\ the\ License\ for\ the\ }}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00013}00013\ \textcolor{comment}{//\ specific\ language\ governing\ permissions\ and\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00015}00015\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{perftest_8h}{perftest.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00017}00017\ \textcolor{comment}{//\ This\ file\ is\ for\ giving\ the\ performance\ characteristics\ of\ the\ platform\ (compiler/OS/CPU).}}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00019}00019\ \textcolor{preprocessor}{\#if\ TEST\_PLATFORM}}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00021}00021\ \textcolor{preprocessor}{\#include\ <cmath>}}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00022}00022\ \textcolor{preprocessor}{\#include\ <fcntl.h>}}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00024}00024\ \textcolor{comment}{//\ Windows}}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00025}00025\ \textcolor{preprocessor}{\#ifdef\ \_WIN32}}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00026}00026\ \textcolor{preprocessor}{\#include\ <windows.h>}}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00027}00027\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00029}00029\ \textcolor{comment}{//\ UNIX}}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00030}00030\ \textcolor{preprocessor}{\#if\ defined(unix)\ ||\ defined(\_\_unix\_\_)\ ||\ defined(\_\_unix)}}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00031}00031\ \textcolor{preprocessor}{\#include\ <unistd.h>}}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00032}00032\ \textcolor{preprocessor}{\#ifdef\ \_POSIX\_MAPPED\_FILES}}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00033}00033\ \textcolor{preprocessor}{\#include\ <sys/mman.h>}}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00034}00034\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00035}00035\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00037}00037\ \textcolor{keyword}{class\ }\mbox{\hyperlink{namespace_platform}{Platform}}\ :\ \textcolor{keyword}{public}\ PerfTest\ \{}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00038}00038\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00039}00039\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ SetUp()\ \{}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00040}00040\ \ \ \ \ \ \ \ \ PerfTest::SetUp();}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00042}00042\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ temp\ buffer\ for\ testing}}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00043}00043\ \ \ \ \ \ \ \ \ temp\_\ =\ (\textcolor{keywordtype}{char}\ *)malloc(length\_\ +\ 1);}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00044}00044\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(temp\_,\ json\_,\ length\_);}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00045}00045\ \ \ \ \ \ \ \ \ checkSum\_\ =\ CheckSum();}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00046}00046\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00048}00048\ \ \ \ \ \textcolor{keywordtype}{char}\ CheckSum()\ \{}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ c\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00050}00050\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ length\_;\ ++i)}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00051}00051\ \ \ \ \ \ \ \ \ \ \ \ \ c\ +=\ temp\_[i];}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00052}00052\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ c;}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00053}00053\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00054}00054\ }
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00055}00055\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ TearDown()\ \{}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00056}00056\ \ \ \ \ \ \ \ \ PerfTest::TearDown();}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00057}00057\ \ \ \ \ \ \ \ \ free(temp\_);}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00058}00058\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00060}00060\ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00061}00061\ \ \ \ \ \textcolor{keywordtype}{char}\ *temp\_;}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00062}00062\ \ \ \ \ \textcolor{keywordtype}{char}\ checkSum\_;}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00063}00063\ \};}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00065}00065\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{namespace_platform}{Platform}},\ CheckSum)\ \{}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00066}00066\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ kTrialCount;\ i++)}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00067}00067\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(checkSum\_,\ CheckSum());}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00068}00068\ \}}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00069}00069\ }
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00070}00070\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{namespace_platform}{Platform}},\ strlen)\ \{}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00071}00071\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ kTrialCount;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00072}00072\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}\ =\ strlen(json\_);}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00073}00073\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(length\_,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}});}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00074}00074\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00075}00075\ \}}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00076}00076\ }
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00077}00077\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{namespace_platform}{Platform}},\ memcmp)\ \{}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00078}00078\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ kTrialCount;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00079}00079\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0u,\ memcmp(temp\_,\ json\_,\ length\_));}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00080}00080\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00081}00081\ \}}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00083}00083\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{namespace_platform}{Platform}},\ pow)\ \{}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00084}00084\ \ \ \ \ \textcolor{keywordtype}{double}\ sum\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00085}00085\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ kTrialCount\ *\ kTrialCount;\ i++)}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00086}00086\ \ \ \ \ \ \ \ \ sum\ +=\ pow(10.0,\ i\ \&\ 255);}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00087}00087\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aa8bc8320813e1abb0016129b636e3b27}{EXPECT\_GT}}(sum,\ 0.0);}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00088}00088\ \}}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00089}00089\ }
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00090}00090\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{namespace_platform}{Platform}},\ Whitespace\_strlen)\ \{}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00091}00091\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ kTrialCount;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00092}00092\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}\ =\ strlen(whitespace\_);}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00093}00093\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_aa8bc8320813e1abb0016129b636e3b27}{EXPECT\_GT}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}},\ whitespace\_length\_);}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00094}00094\ \ \ \ \ \}\ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00095}00095\ \}}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00096}00096\ }
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00097}00097\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{namespace_platform}{Platform}},\ Whitespace\_strspn)\ \{}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00098}00098\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ kTrialCount;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00099}00099\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}\ =\ strspn(whitespace\_,\ \textcolor{stringliteral}{"{}\ \(\backslash\)n\(\backslash\)r\(\backslash\)t"{}});}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00100}00100\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(whitespace\_length\_,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}});}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00101}00101\ \ \ \ \ \}\ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00102}00102\ \}}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00103}00103\ }
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00104}00104\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{namespace_platform}{Platform}},\ fread)\ \{}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00105}00105\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ kTrialCount;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00106}00106\ \ \ \ \ \ \ \ \ FILE\ *fp\ =\ fopen(filename\_,\ \textcolor{stringliteral}{"{}rb"{}});}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00107}00107\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a1a6db8b1338ee7040329322b77779086}{ASSERT\_EQ}}(length\_,\ fread(temp\_,\ 1,\ length\_,\ fp));}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00108}00108\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(checkSum\_,\ CheckSum());}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00109}00109\ \ \ \ \ \ \ \ \ fclose(fp);}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00110}00110\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00111}00111\ \}}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00112}00112\ }
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00113}00113\ \textcolor{preprocessor}{\#ifdef\ \_MSC\_VER}}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00114}00114\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{namespace_platform}{Platform}},\ read)\ \{}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00115}00115\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ kTrialCount;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00116}00116\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ fd\ =\ \_open(filename\_,\ \_O\_BINARY\ |\ \_O\_RDONLY);}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00117}00117\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_aa866c8dece57912e6f51495ed3e8d8d5}{ASSERT\_NE}}(-\/1,\ fd);}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00118}00118\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a1a6db8b1338ee7040329322b77779086}{ASSERT\_EQ}}(length\_,\ \_read(fd,\ temp\_,\ length\_));}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00119}00119\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(checkSum\_,\ CheckSum());}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00120}00120\ \ \ \ \ \ \ \ \ \_close(fd);}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00121}00121\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00122}00122\ \}}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00123}00123\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00124}00124\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{namespace_platform}{Platform}},\ read)\ \{}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00125}00125\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ kTrialCount;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00126}00126\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ fd\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1session_1_1state_a12acca56cdb6c10f467dfb10fc763ca5a90d929cb6e119645ec2800451bfdc0a0}{open}}(filename\_,\ O\_RDONLY);}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00127}00127\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_aa866c8dece57912e6f51495ed3e8d8d5}{ASSERT\_NE}}(-\/1,\ fd);}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00128}00128\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a1a6db8b1338ee7040329322b77779086}{ASSERT\_EQ}}(length\_,\ read(fd,\ temp\_,\ length\_));}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00129}00129\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(checkSum\_,\ CheckSum());}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00130}00130\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{integration_8cpp_af5b66d867a040d002fb57d645cae3fb4}{close}}(fd);}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00131}00131\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00132}00132\ \}}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00133}00133\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00134}00134\ }
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00135}00135\ \textcolor{preprocessor}{\#ifdef\ \_WIN32}}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00136}00136\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{namespace_platform}{Platform}},\ MapViewOfFile)\ \{}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00137}00137\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ kTrialCount;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00138}00138\ \ \ \ \ \ \ \ \ HANDLE\ file\ =\ CreateFile(filename\_,\ GENERIC\_READ,\ 0,\ NULL,\ OPEN\_EXISTING,\ FILE\_ATTRIBUTE\_NORMAL,\ NULL);}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00139}00139\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_aa866c8dece57912e6f51495ed3e8d8d5}{ASSERT\_NE}}(INVALID\_HANDLE\_VALUE,\ file);}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00140}00140\ \ \ \ \ \ \ \ \ HANDLE\ mapObject\ =\ CreateFileMapping(file,\ NULL,\ PAGE\_READONLY,\ 0,\ length\_,\ NULL);}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00141}00141\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_aa866c8dece57912e6f51495ed3e8d8d5}{ASSERT\_NE}}(INVALID\_HANDLE\_VALUE,\ mapObject);}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00142}00142\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ *\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ MapViewOfFile(mapObject,\ FILE\_MAP\_READ,\ 0,\ 0,\ length\_);}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00143}00143\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ !=\ NULL);}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00144}00144\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(checkSum\_,\ CheckSum());}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00145}00145\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(UnmapViewOfFile(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})\ ==\ \mbox{\hyperlink{pkcs11_8h_aa8cecfc5c5c054d2875c03e77b7be15d}{TRUE}});}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00146}00146\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(CloseHandle(mapObject)\ ==\ \mbox{\hyperlink{pkcs11_8h_aa8cecfc5c5c054d2875c03e77b7be15d}{TRUE}});}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00147}00147\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(CloseHandle(file)\ ==\ \mbox{\hyperlink{pkcs11_8h_aa8cecfc5c5c054d2875c03e77b7be15d}{TRUE}});}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00148}00148\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00149}00149\ \}}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00150}00150\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00151}00151\ }
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00152}00152\ \textcolor{preprocessor}{\#ifdef\ \_POSIX\_MAPPED\_FILES}}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00153}00153\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{namespace_platform}{Platform}},\ mmap)\ \{}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00154}00154\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ kTrialCount;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00155}00155\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ fd\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1session_1_1state_a12acca56cdb6c10f467dfb10fc763ca5a90d929cb6e119645ec2800451bfdc0a0}{open}}(filename\_,\ O\_RDONLY);}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00156}00156\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_aa866c8dece57912e6f51495ed3e8d8d5}{ASSERT\_NE}}(-\/1,\ fd);}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00157}00157\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ *\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ mmap(NULL,\ length\_,\ PROT\_READ,\ MAP\_PRIVATE,\ fd,\ 0);}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00158}00158\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ !=\ NULL);}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00159}00159\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(checkSum\_,\ CheckSum());}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00160}00160\ \ \ \ \ \ \ \ \ munmap(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\ length\_);}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00161}00161\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{integration_8cpp_af5b66d867a040d002fb57d645cae3fb4}{close}}(fd);}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00162}00162\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00163}00163\ \}}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00164}00164\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00165}00165\ }
+\DoxyCodeLine{\Hypertarget{platformtest_8cpp_source_l00166}00166\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ TEST\_PLATFORM}}
+
+\end{DoxyCode}

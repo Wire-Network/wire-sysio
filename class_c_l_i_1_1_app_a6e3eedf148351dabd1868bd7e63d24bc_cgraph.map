@@ -1,0 +1,11 @@
+<map id="CLI::App::_count_remaining_positionals" name="CLI::App::_count_remaining_positionals">
+<area shape="rect" id="Node000001" title="Count the required remaining positional arguments." alt="" coords="5,84,189,125"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_option.html#a154543609c45d9c59c69991a08ca272b" title="Count the total number of times an option was passed." alt="" coords="261,5,389,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="140,82,236,41,258,33,260,39,238,46,142,86"/>
+<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_option.html#af87dffed2cb245673312c993e563710e" title="The total min number of expected string values to be used." alt="" coords="248,55,402,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="189,90,233,85,233,90,190,96"/>
+<area shape="rect" id="Node000004" href="$class_c_l_i_1_1_option.html#acab7033604b49e314d290b01adea690d" title="True if the argument can be given directly." alt="" coords="237,120,413,146"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="190,113,222,117,221,123,189,119"/>
+<area shape="rect" id="Node000005" href="$class_c_l_i_1_1_option_base.html#aa902dee6da6d7f5b083b1c7d5f9c1308" title="True if this is a required option." alt="" coords="253,170,397,210"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="153,123,238,156,253,162,251,167,236,161,151,128"/>
+</map>

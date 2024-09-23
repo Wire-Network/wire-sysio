@@ -1,0 +1,66 @@
+\doxysection{libraries/wasm-\/jit/\+Include/\+IR/\+Operator\+Printer.h File Reference}
+\hypertarget{_operator_printer_8h}{}\label{_operator_printer_8h}\index{libraries/wasm-\/jit/Include/IR/OperatorPrinter.h@{libraries/wasm-\/jit/Include/IR/OperatorPrinter.h}}
+{\ttfamily \#include "{}Inline/\+Basic\+Types.\+h"{}}\newline
+{\ttfamily \#include "{}Inline/\+Serialization.\+h"{}}\newline
+{\ttfamily \#include "{}IR.\+h"{}}\newline
+{\ttfamily \#include "{}Module.\+h"{}}\newline
+{\ttfamily \#include "{}Operators.\+h"{}}\newline
+Include dependency graph for Operator\+Printer.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{_operator_printer_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{_operator_printer_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_i_r_1_1_operator_printer}{IR\+::\+Operator\+Printer}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespace_i_r}{IR}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{_operator_printer_8h_a0c71ee5bcdb73fd61e4b983a6120c861}{VISIT\+\_\+\+OPCODE}}(encoding,  \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  name\+String,  Imm, ...)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{_operator_printer_8h_a0c71ee5bcdb73fd61e4b983a6120c861}\index{OperatorPrinter.h@{OperatorPrinter.h}!VISIT\_OPCODE@{VISIT\_OPCODE}}
+\index{VISIT\_OPCODE@{VISIT\_OPCODE}!OperatorPrinter.h@{OperatorPrinter.h}}
+\doxysubsubsection{\texorpdfstring{VISIT\_OPCODE}{VISIT\_OPCODE}}
+{\footnotesize\ttfamily \label{_operator_printer_8h_a0c71ee5bcdb73fd61e4b983a6120c861} 
+\#define VISIT\+\_\+\+OPCODE(\begin{DoxyParamCaption}\item[{}]{encoding}{, }\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{name\+String}{, }\item[{}]{Imm}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ std::string\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(Imm\ imm\ =\ \{\})\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::string(nameString)\ +\ describeImm(imm);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{_operator_printer_8h_source_l00018}{18}} of file \mbox{\hyperlink{_operator_printer_8h_source}{Operator\+Printer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#define\ VISIT\_OPCODE(encoding,name,nameString,Imm,...)\ \(\backslash\)}}
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ std::string\ name(Imm\ imm\ =\ \{\})\ \(\backslash\)}}
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \{\ \(\backslash\)}}
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ return\ std::string(nameString)\ +\ describeImm(imm);\ \(\backslash\)}}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \}}}
+
+\end{DoxyCode}

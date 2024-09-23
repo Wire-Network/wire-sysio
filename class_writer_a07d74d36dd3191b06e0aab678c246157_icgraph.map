@@ -1,0 +1,25 @@
+<map id="Writer::IsComplete" name="Writer::IsComplete">
+<area shape="rect" id="Node000001" title="Checks whether the output is a complete JSON." alt="" coords="109,252,239,278"/>
+<area shape="rect" id="Node000002" href="$prettywritertest_8cpp.html#a09fd3ae0b4f8e7dccb5421dff71b9245" title=" " alt="" coords="5,5,61,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="160,239,121,149,92,95,59,44,49,33,53,30,63,41,97,92,126,146,165,237"/>
+<area shape="rect" id="Node000003" href="$prettywritertest_8cpp.html#abe0376325cacaa63085d1252790e25d7" title=" " alt="" coords="5,55,61,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="156,239,115,171,59,93,48,82,52,79,63,90,119,168,160,237"/>
+<area shape="rect" id="Node000004" href="$prettywritertest_8cpp.html#aa9f976ea86c5d8d3393d4e1fc733ae5e" title=" " alt="" coords="5,104,61,130"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="149,242,59,143,48,132,51,128,63,139,153,238"/>
+<area shape="rect" id="Node000005" href="$prettywritertest_8cpp.html#a2f008ec971ec60b45f575b040bccb845" title=" " alt="" coords="5,153,61,179"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="140,245,52,182,55,177,143,241"/>
+<area shape="rect" id="Node000006" href="$writertest_8cpp.html#aa59b06d241d019412b7e60e31223442d" title=" " alt="" coords="5,203,61,228"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="120,249,60,228,62,223,121,244"/>
+<area shape="rect" id="Node000007" href="$writertest_8cpp.html#aa264cd0f1fed39bec0fc98c9a9c45229" title=" " alt="" coords="5,252,61,278"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="93,268,61,268,61,262,93,262"/>
+<area shape="rect" id="Node000008" href="$writertest_8cpp.html#a80be7fa365cb784245eed8653bd20717" title=" " alt="" coords="5,301,61,327"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="121,286,62,307,60,302,120,281"/>
+<area shape="rect" id="Node000009" href="$writertest_8cpp.html#ad66cd6e2bd1c874767f0282454792faf" title=" " alt="" coords="5,351,61,376"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="143,289,55,352,52,348,140,285"/>
+<area shape="rect" id="Node000010" href="$writertest_8cpp.html#a83e9c781f01842bc1ce45cfb02c6724f" title=" " alt="" coords="5,400,61,426"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="153,292,63,391,51,401,48,397,59,387,149,288"/>
+<area shape="rect" id="Node000011" href="$writertest_8cpp.html#a34dc08ca330946819e373c771932ec54" title=" " alt="" coords="5,449,61,475"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="160,293,119,362,63,440,52,451,48,447,59,436,115,359,156,290"/>
+<area shape="rect" id="Node000012" href="$writertest_8cpp.html#a52dab6dd5f297c20ea7403610b56db4a" title=" " alt="" coords="5,499,61,524"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="165,293,126,383,97,438,63,489,53,500,49,496,59,486,92,435,121,381,160,291"/>
+</map>

@@ -1,0 +1,10 @@
+<map id="IR::DataSegment" name="IR::DataSegment">
+<area shape="rect" id="Node000001" title=" " alt="" coords="20,198,143,223"/>
+<area shape="rect" id="Node000002" href="$struct_pointer_int_helper.html" title=" " alt="" coords="5,5,168,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="81,61,74,109,74,135,82,197,76,197,69,135,69,109,76,61"/>
+<area shape="rect" id="Node000003" href="$struct_i_r_1_1_initializer_expression.html" title=" " alt="" coords="166,109,327,135"/>
+<area shape="poly" id="edge4_Node000003_Node000002" title=" " alt="" coords="126,53,172,83,219,106,217,111,170,87,123,57"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="211,145,106,199,103,195,209,140"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="217,13,276,38"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="249,54,249,108,244,108,244,54"/>
+</map>

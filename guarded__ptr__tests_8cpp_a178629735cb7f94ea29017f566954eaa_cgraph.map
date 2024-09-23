@@ -1,0 +1,7 @@
+<map id="TEST_CASE" name="TEST_CASE">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,46,105,72"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1vm_1_1guarded__ptr.html#a7527dc2e613459062329750f75d0715e" title=" " alt="" coords="153,5,285,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="105,46,137,40,138,45,106,52"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1vm_1_1guarded__ptr.html#acdc7726e140ff456958f488336c19f98" title=" " alt="" coords="153,71,285,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="106,66,138,72,137,78,105,71"/>
+</map>

@@ -1,0 +1,11 @@
+<map id="sysio::chain::authorization_manager::get_permission_last_used" name="sysio::chain::authorization_manager::get_permission_last_used">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,180,61"/>
+<area shape="rect" id="Node000002" href="$classchainbase_1_1database.html#afcfe00f81a526c1376d4f51197dd3a9a" title=" " alt="" coords="228,20,395,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="180,30,212,30,212,36,180,36"/>
+<area shape="rect" id="Node000003" href="$classchainbase_1_1database.html#aa5a2ca0da0092693ac49b36b7ec6817a" title=" " alt="" coords="443,13,584,54"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="396,39,427,39,427,45,396,45"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="443,27,411,27,411,22,443,22"/>
+<area shape="rect" id="Node000004" href="$classchainbase_1_1database.html#a4d5297635dcf70be481d9b600da9bc13" title=" " alt="" coords="632,42,774,83"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="585,41,618,47,617,52,584,47"/>
+<area shape="poly" id="edge5_Node000004_Node000002" title=" " alt="" coords="632,67,584,68,513,71,443,68,371,53,372,48,443,63,513,66,584,63,632,62"/>
+</map>

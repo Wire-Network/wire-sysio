@@ -1,0 +1,17 @@
+<map id="CLI::Option::nonpositional" name="CLI::Option::nonpositional">
+<area shape="rect" id="Node000001" title="True if option has at least one non&#45;positional name." alt="" coords="814,120,986,145"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_formatter.html#ad48dd6b9432babc0037d6726230221f0" title="This prints out all the groups of options." alt="" coords="619,83,766,124"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="798,121,766,116,766,111,799,116"/>
+<area shape="rect" id="Node000006" href="$class_c_l_i_1_1_formatter.html#a3aac4a7ce4ca139704e632915892024c" title="This displays the usage line." alt="" coords="425,140,571,181"/>
+<area shape="poly" id="edge8_Node000001_Node000006" title=" " alt="" coords="798,142,572,158,572,153,798,137"/>
+<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_formatter.html#ade54fd392e2c9f5364744dca82408e60" title="This prints out a subcommand in help&#45;all." alt="" coords="425,26,571,66"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="606,81,569,69,570,64,608,76"/>
+<area shape="rect" id="Node000004" href="$class_c_l_i_1_1_formatter.html#a838e0f47efa4fbd1b738eedb156887b9" title="This puts everything together." alt="" coords="5,62,183,88"/>
+<area shape="poly" id="edge7_Node000002_Node000004" title=" " alt="" coords="604,102,183,82,183,77,604,97"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="416,24,377,17,303,8,272,10,231,17,169,38,118,64,116,60,166,33,230,11,271,4,304,3,377,11,417,19"/>
+<area shape="rect" id="Node000005" href="$class_c_l_i_1_1_formatter.html#a9e6b7c4c6eee50b11fe1ca785002db04" title="This prints out all the subcommands." alt="" coords="231,26,377,66"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="409,58,377,57,377,52,409,52"/>
+<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="392,34,424,35,424,40,392,40"/>
+<area shape="poly" id="edge6_Node000005_Node000004" title=" " alt="" coords="215,61,183,66,183,60,214,56"/>
+<area shape="poly" id="edge9_Node000006_Node000004" title=" " alt="" coords="409,155,322,143,230,125,176,109,128,91,130,86,177,104,231,119,323,137,410,149"/>
+</map>

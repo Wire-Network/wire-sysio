@@ -1,0 +1,58 @@
+\doxysection{secp256k1\+\_\+preallocated.\+h}
+\hypertarget{secp256k1__preallocated_8h_source}{}\label{secp256k1__preallocated_8h_source}\index{libraries/fc/secp256k1/secp256k1/include/secp256k1\_preallocated.h@{libraries/fc/secp256k1/secp256k1/include/secp256k1\_preallocated.h}}
+\mbox{\hyperlink{secp256k1__preallocated_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{secp256k1__preallocated_8h_source_l00001}00001\ \textcolor{preprocessor}{\#ifndef\ SECP256K1\_PREALLOCATED\_H}}
+\DoxyCodeLine{\Hypertarget{secp256k1__preallocated_8h_source_l00002}00002\ \textcolor{preprocessor}{\#define\ SECP256K1\_PREALLOCATED\_H}}
+\DoxyCodeLine{\Hypertarget{secp256k1__preallocated_8h_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{secp256k1__preallocated_8h_source_l00004}00004\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{secp256k1_8h}{secp256k1.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{secp256k1__preallocated_8h_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{secp256k1__preallocated_8h_source_l00006}00006\ \textcolor{preprocessor}{\#ifdef\ \_\_cplusplus}}
+\DoxyCodeLine{\Hypertarget{secp256k1__preallocated_8h_source_l00007}00007\ \textcolor{keyword}{extern}\ \textcolor{stringliteral}{"{}C"{}}\ \{}
+\DoxyCodeLine{\Hypertarget{secp256k1__preallocated_8h_source_l00008}00008\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{secp256k1__preallocated_8h_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{secp256k1__preallocated_8h_source_l00010}00010\ \textcolor{comment}{/*\ The\ module\ provided\ by\ this\ header\ file\ is\ intended\ for\ settings\ in\ which\ it}}
+\DoxyCodeLine{\Hypertarget{secp256k1__preallocated_8h_source_l00011}00011\ \textcolor{comment}{\ *\ is\ not\ possible\ or\ desirable\ to\ rely\ on\ dynamic\ memory\ allocation.\ It\ provides}}
+\DoxyCodeLine{\Hypertarget{secp256k1__preallocated_8h_source_l00012}00012\ \textcolor{comment}{\ *\ functions\ for\ creating,\ cloning,\ and\ destroying\ secp256k1\ context\ objects\ in\ a}}
+\DoxyCodeLine{\Hypertarget{secp256k1__preallocated_8h_source_l00013}00013\ \textcolor{comment}{\ *\ contiguous\ fixed-\/size\ block\ of\ memory\ provided\ by\ the\ caller.}}
+\DoxyCodeLine{\Hypertarget{secp256k1__preallocated_8h_source_l00014}00014\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{secp256k1__preallocated_8h_source_l00015}00015\ \textcolor{comment}{\ *\ Context\ objects\ created\ by\ functions\ in\ this\ module\ can\ be\ used\ like\ contexts}}
+\DoxyCodeLine{\Hypertarget{secp256k1__preallocated_8h_source_l00016}00016\ \textcolor{comment}{\ *\ objects\ created\ by\ functions\ in\ secp256k1.h,\ i.e.,\ they\ can\ be\ passed\ to\ any}}
+\DoxyCodeLine{\Hypertarget{secp256k1__preallocated_8h_source_l00017}00017\ \textcolor{comment}{\ *\ API\ function\ that\ expects\ a\ context\ object\ (see\ secp256k1.h\ for\ details).\ The}}
+\DoxyCodeLine{\Hypertarget{secp256k1__preallocated_8h_source_l00018}00018\ \textcolor{comment}{\ *\ only\ exception\ is\ that\ context\ objects\ created\ by\ functions\ in\ this\ module}}
+\DoxyCodeLine{\Hypertarget{secp256k1__preallocated_8h_source_l00019}00019\ \textcolor{comment}{\ *\ must\ be\ destroyed\ using\ secp256k1\_context\_preallocated\_destroy\ (in\ this}}
+\DoxyCodeLine{\Hypertarget{secp256k1__preallocated_8h_source_l00020}00020\ \textcolor{comment}{\ *\ module)\ instead\ of\ secp256k1\_context\_destroy\ (in\ secp256k1.h).}}
+\DoxyCodeLine{\Hypertarget{secp256k1__preallocated_8h_source_l00021}00021\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{secp256k1__preallocated_8h_source_l00022}00022\ \textcolor{comment}{\ *\ It\ is\ guaranteed\ that\ functions\ in\ this\ module\ will\ not\ call\ malloc\ or\ its}}
+\DoxyCodeLine{\Hypertarget{secp256k1__preallocated_8h_source_l00023}00023\ \textcolor{comment}{\ *\ friends\ realloc,\ calloc,\ and\ free.}}
+\DoxyCodeLine{\Hypertarget{secp256k1__preallocated_8h_source_l00024}00024\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{secp256k1__preallocated_8h_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{secp256k1__preallocated_8h_source_l00035}00035\ \mbox{\hyperlink{secp256k1_8h_a3f1967acd0fe26283877c61b3f2694a5}{SECP256K1\_API}}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{secp256k1__preallocated_8h_af6942b255e9715e64af285bcf0bafe4b}{secp256k1\_context\_preallocated\_size}}(}
+\DoxyCodeLine{\Hypertarget{secp256k1__preallocated_8h_source_l00036}00036\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae0ed371842ace71a7886a6134ecbcb62}{flags}}}
+\DoxyCodeLine{\Hypertarget{secp256k1__preallocated_8h_source_l00037}00037\ )\ \mbox{\hyperlink{secp256k1_8h_aebd5ca8fbfcbb0ba0754a46115143c2c}{SECP256K1\_WARN\_UNUSED\_RESULT}};}
+\DoxyCodeLine{\Hypertarget{secp256k1__preallocated_8h_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{secp256k1__preallocated_8h_source_l00064}00064\ \mbox{\hyperlink{secp256k1_8h_a3f1967acd0fe26283877c61b3f2694a5}{SECP256K1\_API}}\ \mbox{\hyperlink{structsecp256k1__context__struct}{secp256k1\_context}}*\ \mbox{\hyperlink{secp256k1__preallocated_8h_ae5490f09b147364c44bf1129b624405f}{secp256k1\_context\_preallocated\_create}}(}
+\DoxyCodeLine{\Hypertarget{secp256k1__preallocated_8h_source_l00065}00065\ \ \ \ \ \textcolor{keywordtype}{void}*\ prealloc,}
+\DoxyCodeLine{\Hypertarget{secp256k1__preallocated_8h_source_l00066}00066\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae0ed371842ace71a7886a6134ecbcb62}{flags}}}
+\DoxyCodeLine{\Hypertarget{secp256k1__preallocated_8h_source_l00067}00067\ )\ \mbox{\hyperlink{secp256k1_8h_a03c194d8fa91b9b66758b36c91e0b5cb}{SECP256K1\_ARG\_NONNULL}}(1)\ \mbox{\hyperlink{secp256k1_8h_aebd5ca8fbfcbb0ba0754a46115143c2c}{SECP256K1\_WARN\_UNUSED\_RESULT}};}
+\DoxyCodeLine{\Hypertarget{secp256k1__preallocated_8h_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{secp256k1__preallocated_8h_source_l00075}00075\ \mbox{\hyperlink{secp256k1_8h_a3f1967acd0fe26283877c61b3f2694a5}{SECP256K1\_API}}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{secp256k1__preallocated_8h_a7bb1e7240fc9ffabe07e565603a4dfee}{secp256k1\_context\_preallocated\_clone\_size}}(}
+\DoxyCodeLine{\Hypertarget{secp256k1__preallocated_8h_source_l00076}00076\ \ \ \ \ const\ \mbox{\hyperlink{structsecp256k1__context__struct}{secp256k1\_context}}*\ ctx}
+\DoxyCodeLine{\Hypertarget{secp256k1__preallocated_8h_source_l00077}00077\ )\ \mbox{\hyperlink{secp256k1_8h_a03c194d8fa91b9b66758b36c91e0b5cb}{SECP256K1\_ARG\_NONNULL}}(1)\ \mbox{\hyperlink{secp256k1_8h_aebd5ca8fbfcbb0ba0754a46115143c2c}{SECP256K1\_WARN\_UNUSED\_RESULT}};}
+\DoxyCodeLine{\Hypertarget{secp256k1__preallocated_8h_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{secp256k1__preallocated_8h_source_l00095}00095\ \mbox{\hyperlink{secp256k1_8h_a3f1967acd0fe26283877c61b3f2694a5}{SECP256K1\_API}}\ \mbox{\hyperlink{structsecp256k1__context__struct}{secp256k1\_context}}*\ \mbox{\hyperlink{secp256k1__preallocated_8h_afbe046709184f275b585435091ddb5c3}{secp256k1\_context\_preallocated\_clone}}(}
+\DoxyCodeLine{\Hypertarget{secp256k1__preallocated_8h_source_l00096}00096\ \ \ \ \ const\ \mbox{\hyperlink{structsecp256k1__context__struct}{secp256k1\_context}}*\ ctx,}
+\DoxyCodeLine{\Hypertarget{secp256k1__preallocated_8h_source_l00097}00097\ \ \ \ \ \textcolor{keywordtype}{void}*\ prealloc}
+\DoxyCodeLine{\Hypertarget{secp256k1__preallocated_8h_source_l00098}00098\ )\ \mbox{\hyperlink{secp256k1_8h_a03c194d8fa91b9b66758b36c91e0b5cb}{SECP256K1\_ARG\_NONNULL}}(1)\ \mbox{\hyperlink{secp256k1_8h_a03c194d8fa91b9b66758b36c91e0b5cb}{SECP256K1\_ARG\_NONNULL}}(2)\ \mbox{\hyperlink{secp256k1_8h_aebd5ca8fbfcbb0ba0754a46115143c2c}{SECP256K1\_WARN\_UNUSED\_RESULT}};}
+\DoxyCodeLine{\Hypertarget{secp256k1__preallocated_8h_source_l00099}00099\ }
+\DoxyCodeLine{\Hypertarget{secp256k1__preallocated_8h_source_l00120}00120\ \mbox{\hyperlink{secp256k1_8h_a3f1967acd0fe26283877c61b3f2694a5}{SECP256K1\_API}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{secp256k1__preallocated_8h_ae51bf3c2ed533998dab9c7b2ce180664}{secp256k1\_context\_preallocated\_destroy}}(}
+\DoxyCodeLine{\Hypertarget{secp256k1__preallocated_8h_source_l00121}00121\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__context__struct}{secp256k1\_context}}*\ ctx}
+\DoxyCodeLine{\Hypertarget{secp256k1__preallocated_8h_source_l00122}00122\ )\ \mbox{\hyperlink{secp256k1_8h_a03c194d8fa91b9b66758b36c91e0b5cb}{SECP256K1\_ARG\_NONNULL}}(1);}
+\DoxyCodeLine{\Hypertarget{secp256k1__preallocated_8h_source_l00123}00123\ }
+\DoxyCodeLine{\Hypertarget{secp256k1__preallocated_8h_source_l00124}00124\ \textcolor{preprocessor}{\#ifdef\ \_\_cplusplus}}
+\DoxyCodeLine{\Hypertarget{secp256k1__preallocated_8h_source_l00125}00125\ \}}
+\DoxyCodeLine{\Hypertarget{secp256k1__preallocated_8h_source_l00126}00126\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{secp256k1__preallocated_8h_source_l00127}00127\ }
+\DoxyCodeLine{\Hypertarget{secp256k1__preallocated_8h_source_l00128}00128\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{/*\ SECP256K1\_PREALLOCATED\_H\ */}\textcolor{preprocessor}{}}
+
+\end{DoxyCode}

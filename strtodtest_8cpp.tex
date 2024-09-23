@@ -1,0 +1,157 @@
+\doxysection{libraries/fc/include/fc/crypto/webauthn\+\_\+json/test/unittest/strtodtest.cpp File Reference}
+\hypertarget{strtodtest_8cpp}{}\label{strtodtest_8cpp}\index{libraries/fc/include/fc/crypto/webauthn\_json/test/unittest/strtodtest.cpp@{libraries/fc/include/fc/crypto/webauthn\_json/test/unittest/strtodtest.cpp}}
+{\ttfamily \#include "{}unittest.\+h"{}}\newline
+{\ttfamily \#include "{}rapidjson/internal/strtod.\+h"{}}\newline
+Include dependency graph for strtodtest.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{strtodtest_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{strtodtest_8cpp_a92485163f9780d3f913ba6241bb668a1}{BIGINTEGER\+\_\+\+LITERAL}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{strtodtest_8cpp_af9b928c452759c06619b92264055bf48}{TEST}} (Strtod, Check\+Approximation\+Case)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{strtodtest_8cpp_a92485163f9780d3f913ba6241bb668a1}\index{strtodtest.cpp@{strtodtest.cpp}!BIGINTEGER\_LITERAL@{BIGINTEGER\_LITERAL}}
+\index{BIGINTEGER\_LITERAL@{BIGINTEGER\_LITERAL}!strtodtest.cpp@{strtodtest.cpp}}
+\doxysubsubsection{\texorpdfstring{BIGINTEGER\_LITERAL}{BIGINTEGER\_LITERAL}}
+{\footnotesize\ttfamily \label{strtodtest_8cpp_a92485163f9780d3f913ba6241bb668a1} 
+\#define BIGINTEGER\+\_\+\+LITERAL(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{BigInteger(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})\ -\/\ 1)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{strtodtest_8cpp_source_l00024}{24}} of file \mbox{\hyperlink{strtodtest_8cpp_source}{strtodtest.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{strtodtest_8cpp_af9b928c452759c06619b92264055bf48}\index{strtodtest.cpp@{strtodtest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!strtodtest.cpp@{strtodtest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}}
+{\footnotesize\ttfamily \label{strtodtest_8cpp_af9b928c452759c06619b92264055bf48} 
+TEST (\begin{DoxyParamCaption}\item[{Strtod}]{}{, }\item[{Check\+Approximation\+Case}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{strtodtest_8cpp_source_l00028}{28}} of file \mbox{\hyperlink{strtodtest_8cpp_source}{strtodtest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00029\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ kSignificandSize\ =\ 52;}
+\DoxyCodeLine{00030\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ kExponentBias\ =\ 0x3FF;}
+\DoxyCodeLine{00031\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ kExponentMask\ =\ \mbox{\hyperlink{rapidjson_8h_aaee1245f375a71be1ac9b8a07ba5fb8f}{RAPIDJSON\_UINT64\_C2}}(0x7FF00000,\ 0x00000000);}
+\DoxyCodeLine{00032\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ kSignificandMask\ =\ \mbox{\hyperlink{rapidjson_8h_aaee1245f375a71be1ac9b8a07ba5fb8f}{RAPIDJSON\_UINT64\_C2}}(0x000FFFFF,\ 0xFFFFFFFF);}
+\DoxyCodeLine{00033\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ kHiddenBit\ =\ \mbox{\hyperlink{rapidjson_8h_aaee1245f375a71be1ac9b8a07ba5fb8f}{RAPIDJSON\_UINT64\_C2}}(0x00100000,\ 0x00000000);}
+\DoxyCodeLine{00034\ }
+\DoxyCodeLine{00035\ \ \ \ \ \textcolor{comment}{//\ http://www.exploringbinary.com/using-\/integers-\/to-\/check-\/a-\/floating-\/point-\/approximation/}}
+\DoxyCodeLine{00036\ \ \ \ \ \textcolor{comment}{//\ Let\ b\ =\ 0x1.465a72e467d88p-\/149}}
+\DoxyCodeLine{00037\ \ \ \ \ \textcolor{comment}{//\ \ \ \ \ \ \ =\ 5741268244528520\ x\ 2\string^-\/201}}
+\DoxyCodeLine{00038\ \ \ \ \ \textcolor{keyword}{union\ }\{}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}};}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ u;}
+\DoxyCodeLine{00041\ \ \ \ \ \}u;}
+\DoxyCodeLine{00042\ \ \ \ \ u.u\ =\ 0x465a72e467d88\ |\ ((\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\textcolor{keyword}{>}(-\/149\ +\ kExponentBias))\ <<\ kSignificandSize);}
+\DoxyCodeLine{00043\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{double}\ b\ =\ u.d;}
+\DoxyCodeLine{00044\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ bInt\ =\ (u.u\ \&\ kSignificandMask)\ |\ kHiddenBit;}
+\DoxyCodeLine{00045\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ bExp\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(((u.u\ \&\ kExponentMask)\ >>\ kSignificandSize)\ -\/\ kExponentBias\ -\/\ kSignificandSize);}
+\DoxyCodeLine{00046\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ab4852f9430cf656690256ea7fe6323b8}{EXPECT\_DOUBLE\_EQ}}(1.7864e-\/45,\ b);}
+\DoxyCodeLine{00047\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\mbox{\hyperlink{rapidjson_8h_aaee1245f375a71be1ac9b8a07ba5fb8f}{RAPIDJSON\_UINT64\_C2}}(0x001465a7,\ 0x2e467d88),\ bInt);}
+\DoxyCodeLine{00048\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(-\/201,\ bExp);}
+\DoxyCodeLine{00049\ }
+\DoxyCodeLine{00050\ \ \ \ \ \textcolor{comment}{//\ Let\ d\ =\ 17864\ x\ 10-\/49}}
+\DoxyCodeLine{00051\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ dInt[]\ =\ \textcolor{stringliteral}{"{}17864"{}};}
+\DoxyCodeLine{00052\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ dExp\ =\ -\/49;}
+\DoxyCodeLine{00053\ }
+\DoxyCodeLine{00054\ \ \ \ \ \textcolor{comment}{//\ Let\ h\ =\ 2\string^(bExp-\/1)}}
+\DoxyCodeLine{00055\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ hExp\ =\ bExp\ -\/\ 1;}
+\DoxyCodeLine{00056\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(-\/202,\ hExp);}
+\DoxyCodeLine{00057\ }
+\DoxyCodeLine{00058\ \ \ \ \ \textcolor{keywordtype}{int}\ dS\_Exp2\ =\ 0;}
+\DoxyCodeLine{00059\ \ \ \ \ \textcolor{keywordtype}{int}\ dS\_Exp5\ =\ 0;}
+\DoxyCodeLine{00060\ \ \ \ \ \textcolor{keywordtype}{int}\ bS\_Exp2\ =\ 0;}
+\DoxyCodeLine{00061\ \ \ \ \ \textcolor{keywordtype}{int}\ bS\_Exp5\ =\ 0;}
+\DoxyCodeLine{00062\ \ \ \ \ \textcolor{keywordtype}{int}\ hS\_Exp2\ =\ 0;}
+\DoxyCodeLine{00063\ \ \ \ \ \textcolor{keywordtype}{int}\ hS\_Exp5\ =\ 0;}
+\DoxyCodeLine{00064\ }
+\DoxyCodeLine{00065\ \ \ \ \ \textcolor{comment}{//\ Adjust\ for\ decimal\ exponent}}
+\DoxyCodeLine{00066\ \ \ \ \ \textcolor{keywordflow}{if}\ (dExp\ >=\ 0)\ \{}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ dS\_Exp2\ +=\ dExp;}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ dS\_Exp5\ +=\ dExp;}
+\DoxyCodeLine{00069\ \ \ \ \ \}}
+\DoxyCodeLine{00070\ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ bS\_Exp2\ -\/=\ dExp;}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ bS\_Exp5\ -\/=\ dExp;}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ hS\_Exp2\ -\/=\ dExp;}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ hS\_Exp5\ -\/=\ dExp;}
+\DoxyCodeLine{00075\ \ \ \ \ \}}
+\DoxyCodeLine{00076\ }
+\DoxyCodeLine{00077\ \ \ \ \ \textcolor{comment}{//\ Adjust\ for\ binary\ exponent}}
+\DoxyCodeLine{00078\ \ \ \ \ \textcolor{keywordflow}{if}\ (bExp\ >=\ 0)}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ bS\_Exp2\ +=\ bExp;}
+\DoxyCodeLine{00080\ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ dS\_Exp2\ -\/=\ bExp;}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ hS\_Exp2\ -\/=\ bExp;}
+\DoxyCodeLine{00083\ \ \ \ \ \}}
+\DoxyCodeLine{00084\ }
+\DoxyCodeLine{00085\ \ \ \ \ \textcolor{comment}{//\ Adjust\ for\ half\ ulp\ exponent}}
+\DoxyCodeLine{00086\ \ \ \ \ \textcolor{keywordflow}{if}\ (hExp\ >=\ 0)}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ hS\_Exp2\ +=\ hExp;}
+\DoxyCodeLine{00088\ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ dS\_Exp2\ -\/=\ hExp;}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ bS\_Exp2\ -\/=\ hExp;}
+\DoxyCodeLine{00091\ \ \ \ \ \}}
+\DoxyCodeLine{00092\ }
+\DoxyCodeLine{00093\ \ \ \ \ \textcolor{comment}{//\ Remove\ common\ power\ of\ two\ factor\ from\ all\ three\ scaled\ values}}
+\DoxyCodeLine{00094\ \ \ \ \ \textcolor{keywordtype}{int}\ common\_Exp2\ =\ (std::min)(dS\_Exp2,\ (std::min)(bS\_Exp2,\ hS\_Exp2));}
+\DoxyCodeLine{00095\ \ \ \ \ dS\_Exp2\ -\/=\ common\_Exp2;}
+\DoxyCodeLine{00096\ \ \ \ \ bS\_Exp2\ -\/=\ common\_Exp2;}
+\DoxyCodeLine{00097\ \ \ \ \ hS\_Exp2\ -\/=\ common\_Exp2;}
+\DoxyCodeLine{00098\ }
+\DoxyCodeLine{00099\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(153,\ dS\_Exp2);}
+\DoxyCodeLine{00100\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0,\ dS\_Exp5);}
+\DoxyCodeLine{00101\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(1,\ bS\_Exp2);}
+\DoxyCodeLine{00102\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(49,\ bS\_Exp5);}
+\DoxyCodeLine{00103\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0,\ hS\_Exp2);}
+\DoxyCodeLine{00104\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(49,\ hS\_Exp5);}
+\DoxyCodeLine{00105\ }
+\DoxyCodeLine{00106\ \ \ \ \ BigInteger\ dS\ =\ \mbox{\hyperlink{strtodtest_8cpp_a92485163f9780d3f913ba6241bb668a1}{BIGINTEGER\_LITERAL}}(dInt);}
+\DoxyCodeLine{00107\ \ \ \ \ dS.MultiplyPow5(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\textcolor{keyword}{>}(dS\_Exp5))\ <<=\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(dS\_Exp2);}
+\DoxyCodeLine{00108\ }
+\DoxyCodeLine{00109\ \ \ \ \ BigInteger\ bS(bInt);}
+\DoxyCodeLine{00110\ \ \ \ \ bS.MultiplyPow5(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\textcolor{keyword}{>}(bS\_Exp5))\ <<=\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(bS\_Exp2);}
+\DoxyCodeLine{00111\ }
+\DoxyCodeLine{00112\ \ \ \ \ BigInteger\ hS(1);}
+\DoxyCodeLine{00113\ \ \ \ \ hS.MultiplyPow5(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\textcolor{keyword}{>}(hS\_Exp5))\ <<=\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(hS\_Exp2);}
+\DoxyCodeLine{00114\ }
+\DoxyCodeLine{00115\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{strtodtest_8cpp_a92485163f9780d3f913ba6241bb668a1}{BIGINTEGER\_LITERAL}}(\textcolor{stringliteral}{"{}203970822259994138521801764465966248930731085529088"{}})\ ==\ dS);}
+\DoxyCodeLine{00116\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{strtodtest_8cpp_a92485163f9780d3f913ba6241bb668a1}{BIGINTEGER\_LITERAL}}(\textcolor{stringliteral}{"{}203970822259994122305215569213032722473144531250000"{}})\ ==\ bS);}
+\DoxyCodeLine{00117\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{strtodtest_8cpp_a92485163f9780d3f913ba6241bb668a1}{BIGINTEGER\_LITERAL}}(\textcolor{stringliteral}{"{}17763568394002504646778106689453125"{}})\ ==\ hS);}
+\DoxyCodeLine{00118\ }
+\DoxyCodeLine{00119\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(1,\ dS.Compare(bS));}
+\DoxyCodeLine{00120\ \ \ \ \ }
+\DoxyCodeLine{00121\ \ \ \ \ BigInteger\ delta(0);}
+\DoxyCodeLine{00122\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(dS.Difference(bS,\ \&delta));}
+\DoxyCodeLine{00123\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{strtodtest_8cpp_a92485163f9780d3f913ba6241bb668a1}{BIGINTEGER\_LITERAL}}(\textcolor{stringliteral}{"{}16216586195252933526457586554279088"{}})\ ==\ delta);}
+\DoxyCodeLine{00124\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(bS.Difference(dS,\ \&delta));}
+\DoxyCodeLine{00125\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{strtodtest_8cpp_a92485163f9780d3f913ba6241bb668a1}{BIGINTEGER\_LITERAL}}(\textcolor{stringliteral}{"{}16216586195252933526457586554279088"{}})\ ==\ delta);}
+\DoxyCodeLine{00126\ }
+\DoxyCodeLine{00127\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(-\/1,\ delta.Compare(hS));}
+\DoxyCodeLine{00128\ \}}
+
+\end{DoxyCode}

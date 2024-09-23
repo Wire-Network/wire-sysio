@@ -1,0 +1,220 @@
+\doxysection{Basic\+OStream\+Wrapper\texorpdfstring{$<$}{<} Stream\+Type \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{class_basic_o_stream_wrapper}{}\label{class_basic_o_stream_wrapper}\index{BasicOStreamWrapper$<$ StreamType $>$@{BasicOStreamWrapper$<$ StreamType $>$}}
+
+
+Wrapper of {\ttfamily std\+::basic\+\_\+ostream} into Rapid\+JSON\textquotesingle{}s Stream concept.  
+
+
+
+
+{\ttfamily \#include $<$ostreamwrapper.\+h$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef Stream\+Type\+::char\+\_\+type \mbox{\hyperlink{class_basic_o_stream_wrapper_a63041dfdca56dceff6f00d0ceea33afd}{Ch}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_basic_o_stream_wrapper_a067a516c13b7c9d4dacef598d32779ef}{Basic\+OStream\+Wrapper}} (Stream\+Type \&stream)
+\item 
+void \mbox{\hyperlink{class_basic_o_stream_wrapper_a7d3ba9d651fbe27fe05387f512154ea8}{Put}} (\mbox{\hyperlink{class_basic_o_stream_wrapper_a63041dfdca56dceff6f00d0ceea33afd}{Ch}} c)
+\item 
+void \mbox{\hyperlink{class_basic_o_stream_wrapper_a1c48a8b7520b0ab6ca34e665b928b56d}{Flush}} ()
+\item 
+char \mbox{\hyperlink{class_basic_o_stream_wrapper_a6dc18ded82487d41a2d123e21a9e050b}{Peek}} () const
+\item 
+char \mbox{\hyperlink{class_basic_o_stream_wrapper_a54be63e8d24f4d82329b860a907f65fe}{Take}} ()
+\item 
+size\+\_\+t \mbox{\hyperlink{class_basic_o_stream_wrapper_a62f214649fbfb8380a69fe92b864a61b}{Tell}} () const
+\item 
+char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_basic_o_stream_wrapper_a730569bd680f2f08ee71b891ebea101a}{Put\+Begin}} ()
+\item 
+size\+\_\+t \mbox{\hyperlink{class_basic_o_stream_wrapper_a1da108e43a5a517c4484821fced1fca0}{Put\+End}} (char \texorpdfstring{$\ast$}{*})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Stream\+Type$>$\newline
+class Basic\+OStream\+Wrapper$<$ Stream\+Type $>$}
+The classes can be wrapped including but not limited to\+:
+
+
+\begin{DoxyItemize}
+\item {\ttfamily std\+::ostringstream} 
+\item {\ttfamily std\+::stringstream} 
+\item {\ttfamily std\+::wpstringstream} 
+\item {\ttfamily std\+::wstringstream} 
+\item {\ttfamily std\+::ifstream} 
+\item {\ttfamily std\+::fstream} 
+\item {\ttfamily std\+::wofstream} 
+\item {\ttfamily std\+::wfstream} 
+\end{DoxyItemize}
+
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em Stream\+Type} & Class derived from {\ttfamily std\+::basic\+\_\+ostream}. \\
+\hline
+\end{DoxyTemplParams}
+
+
+Definition at line \mbox{\hyperlink{ostreamwrapper_8h_source_l00045}{45}} of file \mbox{\hyperlink{ostreamwrapper_8h_source}{ostreamwrapper.\+h}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{class_basic_o_stream_wrapper_a63041dfdca56dceff6f00d0ceea33afd}\index{BasicOStreamWrapper$<$ StreamType $>$@{BasicOStreamWrapper$<$ StreamType $>$}!Ch@{Ch}}
+\index{Ch@{Ch}!BasicOStreamWrapper$<$ StreamType $>$@{BasicOStreamWrapper$<$ StreamType $>$}}
+\doxysubsubsection{\texorpdfstring{Ch}{Ch}}
+{\footnotesize\ttfamily \label{class_basic_o_stream_wrapper_a63041dfdca56dceff6f00d0ceea33afd} 
+template$<$typename Stream\+Type $>$ \\
+Stream\+Type\+::char\+\_\+type \mbox{\hyperlink{class_basic_o_stream_wrapper}{Basic\+OStream\+Wrapper}}$<$ Stream\+Type $>$\+::\+Ch}
+
+
+
+Definition at line \mbox{\hyperlink{ostreamwrapper_8h_source_l00047}{47}} of file \mbox{\hyperlink{ostreamwrapper_8h_source}{ostreamwrapper.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_basic_o_stream_wrapper_a067a516c13b7c9d4dacef598d32779ef}\index{BasicOStreamWrapper$<$ StreamType $>$@{BasicOStreamWrapper$<$ StreamType $>$}!BasicOStreamWrapper@{BasicOStreamWrapper}}
+\index{BasicOStreamWrapper@{BasicOStreamWrapper}!BasicOStreamWrapper$<$ StreamType $>$@{BasicOStreamWrapper$<$ StreamType $>$}}
+\doxysubsubsection{\texorpdfstring{BasicOStreamWrapper()}{BasicOStreamWrapper()}}
+{\footnotesize\ttfamily \label{class_basic_o_stream_wrapper_a067a516c13b7c9d4dacef598d32779ef} 
+template$<$typename Stream\+Type $>$ \\
+\mbox{\hyperlink{class_basic_o_stream_wrapper}{Basic\+OStream\+Wrapper}}$<$ Stream\+Type $>$\mbox{\hyperlink{class_basic_o_stream_wrapper}{\+::\+Basic\+OStream\+Wrapper}} (\begin{DoxyParamCaption}\item[{Stream\+Type \&}]{stream}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{ostreamwrapper_8h_source_l00048}{48}} of file \mbox{\hyperlink{ostreamwrapper_8h_source}{ostreamwrapper.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00048\ :\ stream\_(stream)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_basic_o_stream_wrapper_a1c48a8b7520b0ab6ca34e665b928b56d}\index{BasicOStreamWrapper$<$ StreamType $>$@{BasicOStreamWrapper$<$ StreamType $>$}!Flush@{Flush}}
+\index{Flush@{Flush}!BasicOStreamWrapper$<$ StreamType $>$@{BasicOStreamWrapper$<$ StreamType $>$}}
+\doxysubsubsection{\texorpdfstring{Flush()}{Flush()}}
+{\footnotesize\ttfamily \label{class_basic_o_stream_wrapper_a1c48a8b7520b0ab6ca34e665b928b56d} 
+template$<$typename Stream\+Type $>$ \\
+void \mbox{\hyperlink{class_basic_o_stream_wrapper}{Basic\+OStream\+Wrapper}}$<$ Stream\+Type $>$\+::\+Flush (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{ostreamwrapper_8h_source_l00054}{54}} of file \mbox{\hyperlink{ostreamwrapper_8h_source}{ostreamwrapper.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ stream\_.flush();}
+\DoxyCodeLine{00056\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_basic_o_stream_wrapper_a6dc18ded82487d41a2d123e21a9e050b}\index{BasicOStreamWrapper$<$ StreamType $>$@{BasicOStreamWrapper$<$ StreamType $>$}!Peek@{Peek}}
+\index{Peek@{Peek}!BasicOStreamWrapper$<$ StreamType $>$@{BasicOStreamWrapper$<$ StreamType $>$}}
+\doxysubsubsection{\texorpdfstring{Peek()}{Peek()}}
+{\footnotesize\ttfamily \label{class_basic_o_stream_wrapper_a6dc18ded82487d41a2d123e21a9e050b} 
+template$<$typename Stream\+Type $>$ \\
+char \mbox{\hyperlink{class_basic_o_stream_wrapper}{Basic\+OStream\+Wrapper}}$<$ Stream\+Type $>$\+::\+Peek (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{ostreamwrapper_8h_source_l00059}{59}} of file \mbox{\hyperlink{ostreamwrapper_8h_source}{ostreamwrapper.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00059\ \{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\textcolor{keyword}{false});\ \textcolor{keywordflow}{return}\ 0;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_basic_o_stream_wrapper_a7d3ba9d651fbe27fe05387f512154ea8}\index{BasicOStreamWrapper$<$ StreamType $>$@{BasicOStreamWrapper$<$ StreamType $>$}!Put@{Put}}
+\index{Put@{Put}!BasicOStreamWrapper$<$ StreamType $>$@{BasicOStreamWrapper$<$ StreamType $>$}}
+\doxysubsubsection{\texorpdfstring{Put()}{Put()}}
+{\footnotesize\ttfamily \label{class_basic_o_stream_wrapper_a7d3ba9d651fbe27fe05387f512154ea8} 
+template$<$typename Stream\+Type $>$ \\
+void \mbox{\hyperlink{class_basic_o_stream_wrapper}{Basic\+OStream\+Wrapper}}$<$ Stream\+Type $>$\+::\+Put (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_basic_o_stream_wrapper_a63041dfdca56dceff6f00d0ceea33afd}{Ch}}}]{c}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{ostreamwrapper_8h_source_l00050}{50}} of file \mbox{\hyperlink{ostreamwrapper_8h_source}{ostreamwrapper.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ stream\_.put(c);}
+\DoxyCodeLine{00052\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_basic_o_stream_wrapper_a730569bd680f2f08ee71b891ebea101a}\index{BasicOStreamWrapper$<$ StreamType $>$@{BasicOStreamWrapper$<$ StreamType $>$}!PutBegin@{PutBegin}}
+\index{PutBegin@{PutBegin}!BasicOStreamWrapper$<$ StreamType $>$@{BasicOStreamWrapper$<$ StreamType $>$}}
+\doxysubsubsection{\texorpdfstring{PutBegin()}{PutBegin()}}
+{\footnotesize\ttfamily \label{class_basic_o_stream_wrapper_a730569bd680f2f08ee71b891ebea101a} 
+template$<$typename Stream\+Type $>$ \\
+char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_basic_o_stream_wrapper}{Basic\+OStream\+Wrapper}}$<$ Stream\+Type $>$\+::\+Put\+Begin (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{ostreamwrapper_8h_source_l00062}{62}} of file \mbox{\hyperlink{ostreamwrapper_8h_source}{ostreamwrapper.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00062\ \{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\textcolor{keyword}{false});\ \textcolor{keywordflow}{return}\ 0;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_basic_o_stream_wrapper_a1da108e43a5a517c4484821fced1fca0}\index{BasicOStreamWrapper$<$ StreamType $>$@{BasicOStreamWrapper$<$ StreamType $>$}!PutEnd@{PutEnd}}
+\index{PutEnd@{PutEnd}!BasicOStreamWrapper$<$ StreamType $>$@{BasicOStreamWrapper$<$ StreamType $>$}}
+\doxysubsubsection{\texorpdfstring{PutEnd()}{PutEnd()}}
+{\footnotesize\ttfamily \label{class_basic_o_stream_wrapper_a1da108e43a5a517c4484821fced1fca0} 
+template$<$typename Stream\+Type $>$ \\
+size\+\_\+t \mbox{\hyperlink{class_basic_o_stream_wrapper}{Basic\+OStream\+Wrapper}}$<$ Stream\+Type $>$\+::\+Put\+End (\begin{DoxyParamCaption}\item[{char \texorpdfstring{$\ast$}{*}}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{ostreamwrapper_8h_source_l00063}{63}} of file \mbox{\hyperlink{ostreamwrapper_8h_source}{ostreamwrapper.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00063\ \{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\textcolor{keyword}{false});\ \textcolor{keywordflow}{return}\ 0;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_basic_o_stream_wrapper_a54be63e8d24f4d82329b860a907f65fe}\index{BasicOStreamWrapper$<$ StreamType $>$@{BasicOStreamWrapper$<$ StreamType $>$}!Take@{Take}}
+\index{Take@{Take}!BasicOStreamWrapper$<$ StreamType $>$@{BasicOStreamWrapper$<$ StreamType $>$}}
+\doxysubsubsection{\texorpdfstring{Take()}{Take()}}
+{\footnotesize\ttfamily \label{class_basic_o_stream_wrapper_a54be63e8d24f4d82329b860a907f65fe} 
+template$<$typename Stream\+Type $>$ \\
+char \mbox{\hyperlink{class_basic_o_stream_wrapper}{Basic\+OStream\+Wrapper}}$<$ Stream\+Type $>$\+::\+Take (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{ostreamwrapper_8h_source_l00060}{60}} of file \mbox{\hyperlink{ostreamwrapper_8h_source}{ostreamwrapper.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00060\ \{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\textcolor{keyword}{false});\ \textcolor{keywordflow}{return}\ 0;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_basic_o_stream_wrapper_a62f214649fbfb8380a69fe92b864a61b}\index{BasicOStreamWrapper$<$ StreamType $>$@{BasicOStreamWrapper$<$ StreamType $>$}!Tell@{Tell}}
+\index{Tell@{Tell}!BasicOStreamWrapper$<$ StreamType $>$@{BasicOStreamWrapper$<$ StreamType $>$}}
+\doxysubsubsection{\texorpdfstring{Tell()}{Tell()}}
+{\footnotesize\ttfamily \label{class_basic_o_stream_wrapper_a62f214649fbfb8380a69fe92b864a61b} 
+template$<$typename Stream\+Type $>$ \\
+size\+\_\+t \mbox{\hyperlink{class_basic_o_stream_wrapper}{Basic\+OStream\+Wrapper}}$<$ Stream\+Type $>$\+::\+Tell (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{ostreamwrapper_8h_source_l00061}{61}} of file \mbox{\hyperlink{ostreamwrapper_8h_source}{ostreamwrapper.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00061\ \{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\textcolor{keyword}{false});\ \textcolor{keywordflow}{return}\ 0;\ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/\mbox{\hyperlink{ostreamwrapper_8h}{ostreamwrapper.\+h}}\end{DoxyCompactItemize}

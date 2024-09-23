@@ -1,0 +1,59 @@
+\doxysection{permission\+\_\+link\+\_\+object.\+hpp}
+\hypertarget{permission__link__object_8hpp_source}{}\label{permission__link__object_8hpp_source}\index{libraries/chain/include/sysio/chain/permission\_link\_object.hpp@{libraries/chain/include/sysio/chain/permission\_link\_object.hpp}}
+\mbox{\hyperlink{permission__link__object_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{permission__link__object_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{permission__link__object_8hpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{authority_8hpp}{sysio/chain/authority.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{permission__link__object_8hpp_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{permission__link__object_8hpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{multi__index__includes_8hpp}{multi\_index\_includes.hpp}}"{}}}
+\DoxyCodeLine{\Hypertarget{permission__link__object_8hpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{permission__link__object_8hpp_source_l00006}00006\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{\ \textcolor{keyword}{namespace\ }chain\ \{}
+\DoxyCodeLine{\Hypertarget{permission__link__object_8hpp_source_l00026}\mbox{\hyperlink{classsysio_1_1chain_1_1permission__link__object}{00026}}\ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1chain_1_1permission__link__object}{permission\_link\_object}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{structchainbase_1_1object}{chainbase::object}}<permission\_link\_object\_type,\ permission\_link\_object>\ \{}
+\DoxyCodeLine{\Hypertarget{permission__link__object_8hpp_source_l00027}00027\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2types_8hpp_a4f726ee00eb9bbf2574c06492926cf73}{OBJECT\_CTOR}}(\mbox{\hyperlink{classsysio_1_1chain_1_1permission__link__object}{permission\_link\_object}})}
+\DoxyCodeLine{\Hypertarget{permission__link__object_8hpp_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{permission__link__object_8hpp_source_l00029}00029\ \ \ \ \ \ \ \mbox{\hyperlink{classchainbase_1_1oid}{id\_type}}\ \ \ \ \ \ \ \ id;}
+\DoxyCodeLine{\Hypertarget{permission__link__object_8hpp_source_l00031}00031\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{account\_name}}\ \ \ \ account;}
+\DoxyCodeLine{\Hypertarget{permission__link__object_8hpp_source_l00033}00033\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{account\_name}}\ \ \ \ code;\ }
+\DoxyCodeLine{\Hypertarget{permission__link__object_8hpp_source_l00036}00036\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_a7a1685bcc352cda9e45f055932069428}{action\_name}}\ \ \ \ \ \ \ message\_type;}
+\DoxyCodeLine{\Hypertarget{permission__link__object_8hpp_source_l00039}00039\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{permission\_name}}\ required\_permission;}
+\DoxyCodeLine{\Hypertarget{permission__link__object_8hpp_source_l00040}00040\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{permission__link__object_8hpp_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{permission__link__object_8hpp_source_l00042}00042\ \ \ \ \textcolor{keyword}{struct\ }by\_action\_name;}
+\DoxyCodeLine{\Hypertarget{permission__link__object_8hpp_source_l00043}00043\ \ \ \ \textcolor{keyword}{struct\ }by\_permission\_name;}
+\DoxyCodeLine{\Hypertarget{permission__link__object_8hpp_source_l00044}\mbox{\hyperlink{namespacesysio_1_1chain_a255011fa21760c6c73a1187a23d0afd1}{00044}}\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacesysio_1_1chain_a255011fa21760c6c73a1187a23d0afd1}{permission\_link\_index}}\ =\ \mbox{\hyperlink{namespacechainbase_aba1e047495dcaa4e0d32ff25b8705f1f}{chainbase::shared\_multi\_index\_container}}<}
+\DoxyCodeLine{\Hypertarget{permission__link__object_8hpp_source_l00045}00045\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1permission__link__object}{permission\_link\_object}},}
+\DoxyCodeLine{\Hypertarget{permission__link__object_8hpp_source_l00046}00046\ \ \ \ \ \ \ indexed\_by<}
+\DoxyCodeLine{\Hypertarget{permission__link__object_8hpp_source_l00047}00047\ \ \ \ \ \ \ \ \ \ ordered\_unique<tag<by\_id>,}
+\DoxyCodeLine{\Hypertarget{permission__link__object_8hpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_MULTI\_INDEX\_MEMBER(\mbox{\hyperlink{classsysio_1_1chain_1_1permission__link__object}{permission\_link\_object}},\ \mbox{\hyperlink{classchainbase_1_1oid}{permission\_link\_object::id\_type}},\ \textcolor{keywordtype}{id})}
+\DoxyCodeLine{\Hypertarget{permission__link__object_8hpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \ >,}
+\DoxyCodeLine{\Hypertarget{permission__link__object_8hpp_source_l00050}00050\ \ \ \ \ \ \ \ \ \ ordered\_unique<tag<by\_action\_name>,}
+\DoxyCodeLine{\Hypertarget{permission__link__object_8hpp_source_l00051}00051\ \ \ \ \ \ \ \ \ \ \ \ \ composite\_key<\mbox{\hyperlink{classsysio_1_1chain_1_1permission__link__object}{permission\_link\_object}},}
+\DoxyCodeLine{\Hypertarget{permission__link__object_8hpp_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_MULTI\_INDEX\_MEMBER(\mbox{\hyperlink{classsysio_1_1chain_1_1permission__link__object}{permission\_link\_object}},\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{account\_name}},\ account),}
+\DoxyCodeLine{\Hypertarget{permission__link__object_8hpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_MULTI\_INDEX\_MEMBER(\mbox{\hyperlink{classsysio_1_1chain_1_1permission__link__object}{permission\_link\_object}},\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{account\_name}},\ code),}
+\DoxyCodeLine{\Hypertarget{permission__link__object_8hpp_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_MULTI\_INDEX\_MEMBER(\mbox{\hyperlink{classsysio_1_1chain_1_1permission__link__object}{permission\_link\_object}},\ \mbox{\hyperlink{namespacesysio_1_1chain_a7a1685bcc352cda9e45f055932069428}{action\_name}},\ message\_type)}
+\DoxyCodeLine{\Hypertarget{permission__link__object_8hpp_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \ \ \ >}
+\DoxyCodeLine{\Hypertarget{permission__link__object_8hpp_source_l00056}00056\ \ \ \ \ \ \ \ \ \ >,}
+\DoxyCodeLine{\Hypertarget{permission__link__object_8hpp_source_l00057}00057\ \ \ \ \ \ \ \ \ \ ordered\_unique<tag<by\_permission\_name>,}
+\DoxyCodeLine{\Hypertarget{permission__link__object_8hpp_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \ \ \ composite\_key<\mbox{\hyperlink{classsysio_1_1chain_1_1permission__link__object}{permission\_link\_object}},}
+\DoxyCodeLine{\Hypertarget{permission__link__object_8hpp_source_l00059}00059\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_MULTI\_INDEX\_MEMBER(\mbox{\hyperlink{classsysio_1_1chain_1_1permission__link__object}{permission\_link\_object}},\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{account\_name}},\ account),}
+\DoxyCodeLine{\Hypertarget{permission__link__object_8hpp_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_MULTI\_INDEX\_MEMBER(\mbox{\hyperlink{classsysio_1_1chain_1_1permission__link__object}{permission\_link\_object}},\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{permission\_name}},\ required\_permission),}
+\DoxyCodeLine{\Hypertarget{permission__link__object_8hpp_source_l00061}00061\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_MULTI\_INDEX\_MEMBER(\mbox{\hyperlink{classsysio_1_1chain_1_1permission__link__object}{permission\_link\_object}},\ \mbox{\hyperlink{classchainbase_1_1oid}{permission\_link\_object::id\_type}},\ \textcolor{keywordtype}{id})}
+\DoxyCodeLine{\Hypertarget{permission__link__object_8hpp_source_l00062}00062\ \ \ \ \ \ \ \ \ \ \ \ \ >}
+\DoxyCodeLine{\Hypertarget{permission__link__object_8hpp_source_l00063}00063\ \ \ \ \ \ \ \ \ \ >}
+\DoxyCodeLine{\Hypertarget{permission__link__object_8hpp_source_l00064}00064\ \ \ \ \ \ \ >}
+\DoxyCodeLine{\Hypertarget{permission__link__object_8hpp_source_l00065}00065\ \ \ \ >;}
+\DoxyCodeLine{\Hypertarget{permission__link__object_8hpp_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{permission__link__object_8hpp_source_l00067}00067\ \ \ \ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{classconfig}{config}}\ \{}
+\DoxyCodeLine{\Hypertarget{permission__link__object_8hpp_source_l00068}00068\ \ \ \ \ \ \ \textcolor{keyword}{template}<>}
+\DoxyCodeLine{\Hypertarget{permission__link__object_8hpp_source_l00069}\mbox{\hyperlink{structsysio_1_1chain_1_1config_1_1billable__size_3_01permission__link__object_01_4}{00069}}\ \ \ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structsysio_1_1chain_1_1config_1_1billable__size}{billable\_size}}<\mbox{\hyperlink{classsysio_1_1chain_1_1permission__link__object}{permission\_link\_object}}>\ \{}
+\DoxyCodeLine{\Hypertarget{permission__link__object_8hpp_source_l00070}\mbox{\hyperlink{structsysio_1_1chain_1_1config_1_1billable__size_3_01permission__link__object_01_4_adb06a774eaa608e0a8848388450a44a5}{00070}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ overhead\ =\ overhead\_per\_row\_per\_index\_ram\_bytes\ *\ 3;\ }
+\DoxyCodeLine{\Hypertarget{permission__link__object_8hpp_source_l00071}\mbox{\hyperlink{structsysio_1_1chain_1_1config_1_1billable__size_3_01permission__link__object_01_4_aaef4cf3204d784d4faa524c65075b0da}{00071}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ =\ 40\ +\ overhead;\ }
+\DoxyCodeLine{\Hypertarget{permission__link__object_8hpp_source_l00072}00072\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{permission__link__object_8hpp_source_l00073}00073\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{permission__link__object_8hpp_source_l00074}00074\ \}\ \}\ \textcolor{comment}{//\ sysio::chain}}
+\DoxyCodeLine{\Hypertarget{permission__link__object_8hpp_source_l00075}00075\ }
+\DoxyCodeLine{\Hypertarget{permission__link__object_8hpp_source_l00076}00076\ \mbox{\hyperlink{chainbase_8hpp_a789572f90cbf8d6a0c1909c170298a1a}{CHAINBASE\_SET\_INDEX\_TYPE}}(\mbox{\hyperlink{classsysio_1_1chain_1_1permission__link__object}{sysio::chain::permission\_link\_object}},\ \mbox{\hyperlink{namespacesysio_1_1chain_a255011fa21760c6c73a1187a23d0afd1}{sysio::chain::permission\_link\_index}})}
+\DoxyCodeLine{\Hypertarget{permission__link__object_8hpp_source_l00077}00077\ }
+\DoxyCodeLine{\Hypertarget{permission__link__object_8hpp_source_l00078}00078\ \mbox{\hyperlink{reflect_8hpp_a2ace850e636b1ca0b18fe3177e413d99}{FC\_REFLECT}}(\mbox{\hyperlink{classsysio_1_1chain_1_1permission__link__object}{sysio::chain::permission\_link\_object}},\ (account)(code)(message\_type)(required\_permission))}
+
+\end{DoxyCode}

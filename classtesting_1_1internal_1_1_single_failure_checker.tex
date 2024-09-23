@@ -1,0 +1,61 @@
+\doxysection{testing\+::internal\+::Single\+Failure\+Checker Class Reference}
+\hypertarget{classtesting_1_1internal_1_1_single_failure_checker}{}\label{classtesting_1_1internal_1_1_single_failure_checker}\index{testing::internal::SingleFailureChecker@{testing::internal::SingleFailureChecker}}
+
+
+{\ttfamily \#include $<$gtest-\/spi.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_single_failure_checker_aa9327ba046aec95a5027d1a92a076e75}{Single\+Failure\+Checker}} (const \mbox{\hyperlink{classtesting_1_1_test_part_result_array}{Test\+Part\+Result\+Array}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{test__account__query__db_8cpp_a33f2983ff61d9343e424c440190d8610}{results}}, \mbox{\hyperlink{classtesting_1_1_test_part_result_a65ae656b33fdfdfffaf34858778a52d5}{Test\+Part\+Result\+::\+Type}} type, const std\+::string \&substr)
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_single_failure_checker_a4b0a907c9c1b350c79d70af138e9f0bf}{\texorpdfstring{$\sim$}{\string~}\+Single\+Failure\+Checker}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{gtest-spi_8h_source_l00096}{96}} of file \mbox{\hyperlink{gtest-spi_8h_source}{gtest-\/spi.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_single_failure_checker_aa9327ba046aec95a5027d1a92a076e75}\index{testing::internal::SingleFailureChecker@{testing::internal::SingleFailureChecker}!SingleFailureChecker@{SingleFailureChecker}}
+\index{SingleFailureChecker@{SingleFailureChecker}!testing::internal::SingleFailureChecker@{testing::internal::SingleFailureChecker}}
+\doxysubsubsection{\texorpdfstring{SingleFailureChecker()}{SingleFailureChecker()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_single_failure_checker_aa9327ba046aec95a5027d1a92a076e75} 
+testing\+::internal\+::\+Single\+Failure\+Checker\+::\+Single\+Failure\+Checker (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classtesting_1_1_test_part_result_array}{Test\+Part\+Result\+Array}} \texorpdfstring{$\ast$}{*}}]{results}{, }\item[{\mbox{\hyperlink{classtesting_1_1_test_part_result_a65ae656b33fdfdfffaf34858778a52d5}{Test\+Part\+Result\+::\+Type}}}]{type}{, }\item[{const std\+::string \&}]{substr}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8cc_source_l00687}{687}} of file \mbox{\hyperlink{gtest_8cc_source}{gtest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00690\ \ \ \ \ :\ results\_(\mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__result}{results}}),\ type\_(type),\ substr\_(substr)\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1internal_1_1_single_failure_checker_a4b0a907c9c1b350c79d70af138e9f0bf}\index{testing::internal::SingleFailureChecker@{testing::internal::SingleFailureChecker}!````~SingleFailureChecker@{\texorpdfstring{$\sim$}{\string~}SingleFailureChecker}}
+\index{````~SingleFailureChecker@{\texorpdfstring{$\sim$}{\string~}SingleFailureChecker}!testing::internal::SingleFailureChecker@{testing::internal::SingleFailureChecker}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}SingleFailureChecker()}{\string~SingleFailureChecker()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_single_failure_checker_a4b0a907c9c1b350c79d70af138e9f0bf} 
+testing\+::internal\+::\+Single\+Failure\+Checker\+::\texorpdfstring{$\sim$}{\string~}\+Single\+Failure\+Checker (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8cc_source_l00696}{696}} of file \mbox{\hyperlink{gtest_8cc_source}{gtest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00696\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00697\ \ \ \mbox{\hyperlink{gtest__pred__impl_8h_a7285708fa5d37d6d8ed5b5e59da08bae}{EXPECT\_PRED\_FORMAT3}}(HasOneFailure,\ *results\_,\ type\_,\ substr\_);}
+\DoxyCodeLine{00698\ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/include/gtest/\mbox{\hyperlink{gtest-spi_8h}{gtest-\/spi.\+h}}\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/src/\mbox{\hyperlink{gtest_8cc}{gtest.\+cc}}\end{DoxyCompactItemize}

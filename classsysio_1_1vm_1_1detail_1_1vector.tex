@@ -1,0 +1,898 @@
+\doxysection{sysio\+::vm\+::detail\+::vector\texorpdfstring{$<$}{<} T, Allocator \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classsysio_1_1vm_1_1detail_1_1vector}{}\label{classsysio_1_1vm_1_1detail_1_1vector}\index{sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}}
+
+
+{\ttfamily \#include $<$vector.\+hpp$>$}
+
+
+
+Inheritance diagram for sysio\+::vm\+::detail\+::vector\texorpdfstring{$<$}{<} T, Allocator \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=194pt]{classsysio_1_1vm_1_1detail_1_1vector__inherit__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+constexpr \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_a166d4c1e0d0e7060df5665098ea1ce3c}{vector}} (\mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} \&\mbox{\hyperlink{namespacechainbase_add7d4cf66ab3f2808fe613e6b0343b89}{allocator}}, size\+\_\+t \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_aff0b6c2a0666cc8d6ec1f1e64cdd9036}{size}}=0)
+\item 
+constexpr \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_a3d118accc27c58028e60de13e9d4c923}{vector}} (const \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{vector}} \&mv)=delete
+\item 
+constexpr \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_a84df95733e22b103c19cef74d25ef8d4}{vector}} (\mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{vector}} \&\&mv)=default
+\item 
+constexpr \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{vector}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_a1187ddc4e26a89beeeeea922ecb201d4}{operator=}} (\mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{vector}} \&\&mv)=default
+\item 
+constexpr void \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_afc1d102d8b0144266a1adbc474bbdb40}{resize}} (size\+\_\+t \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_aff0b6c2a0666cc8d6ec1f1e64cdd9036}{size}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{union_u}{U}} , typename  = std\+::enable\+\_\+if\+\_\+t$<$std\+::is\+\_\+same\+\_\+v$<$\+T, std\+::decay\+\_\+t$<$\+U$>$$>$, int$>$$>$ }\\constexpr void \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_a9f4d37cc24f1b29d403366a9e5074659}{push\+\_\+back}} (\mbox{\hyperlink{union_u}{U}} \&\&val)
+\item 
+constexpr void \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_a9b8945d9c76c3ae28e78101d91b5ea9f}{emplace\+\_\+back}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\&val)
+\item 
+constexpr void \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_a1d1a1b718817bc05c2f63d939e9f4874}{back}} ()
+\item 
+constexpr void \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_a3b37bffe783905515944e7dde1838909}{pop\+\_\+back}} ()
+\item 
+constexpr \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_aa56c22e9b50f5cec1a3a48dfd2a867ba}{at}} (size\+\_\+t i)
+\item 
+constexpr \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_a581ddd7297e96d46b6b775409ac691f3}{at}} (size\+\_\+t i) const
+\item 
+constexpr \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_a19b5ac3b97a8d9e4d1abcb91d2adc28c}{at\+\_\+no\+\_\+check}} (size\+\_\+t i)
+\item 
+constexpr \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_ab0329eca0a8eed915a01e1f0f7967725}{at\+\_\+no\+\_\+check}} (size\+\_\+t i) const
+\item 
+constexpr \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_a4852b1b2ddcbb5c40c3f1763ec9865a9}{operator\mbox{[}$\,$\mbox{]}}} (size\+\_\+t i) const
+\item 
+constexpr \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_aa19a5683a80d614fda1f7cf02043f089}{operator\mbox{[}$\,$\mbox{]}}} (size\+\_\+t i)
+\item 
+constexpr \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_aac5b08caaaf15b5cef7539b0423ecc4c}{raw}} () const
+\item 
+constexpr size\+\_\+t \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_aff0b6c2a0666cc8d6ec1f1e64cdd9036}{size}} () const
+\item 
+constexpr void \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_a1f3f2b0014a7487b6d7f8e044ae13556}{set}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*}data, size\+\_\+t \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_aff0b6c2a0666cc8d6ec1f1e64cdd9036}{size}}, size\+\_\+t index=-\/1)
+\item 
+constexpr void \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_ac277a0c3dcf579d18e84c349357dce61}{copy}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*}data, size\+\_\+t \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_aff0b6c2a0666cc8d6ec1f1e64cdd9036}{size}})
+\item 
+constexpr \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_a166d4c1e0d0e7060df5665098ea1ce3c}{vector}} (\mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} \&\mbox{\hyperlink{namespacechainbase_add7d4cf66ab3f2808fe613e6b0343b89}{allocator}}, size\+\_\+t \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_aff0b6c2a0666cc8d6ec1f1e64cdd9036}{size}}=0)
+\item 
+constexpr \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_a3d118accc27c58028e60de13e9d4c923}{vector}} (const \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{vector}} \&mv)=delete
+\item 
+constexpr \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_a84df95733e22b103c19cef74d25ef8d4}{vector}} (\mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{vector}} \&\&mv)=default
+\item 
+constexpr \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{vector}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_a1187ddc4e26a89beeeeea922ecb201d4}{operator=}} (\mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{vector}} \&\&mv)=default
+\item 
+constexpr void \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_afc1d102d8b0144266a1adbc474bbdb40}{resize}} (size\+\_\+t \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_aff0b6c2a0666cc8d6ec1f1e64cdd9036}{size}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{union_u}{U}} , typename  = std\+::enable\+\_\+if\+\_\+t$<$std\+::is\+\_\+same\+\_\+v$<$\+T, std\+::decay\+\_\+t$<$\+U$>$$>$, int$>$$>$ }\\constexpr void \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_a9f4d37cc24f1b29d403366a9e5074659}{push\+\_\+back}} (\mbox{\hyperlink{union_u}{U}} \&\&val)
+\item 
+constexpr void \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_a9b8945d9c76c3ae28e78101d91b5ea9f}{emplace\+\_\+back}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\&val)
+\item 
+constexpr void \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_a1d1a1b718817bc05c2f63d939e9f4874}{back}} ()
+\item 
+constexpr void \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_a3b37bffe783905515944e7dde1838909}{pop\+\_\+back}} ()
+\item 
+constexpr \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_aa56c22e9b50f5cec1a3a48dfd2a867ba}{at}} (size\+\_\+t i)
+\item 
+constexpr \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_a581ddd7297e96d46b6b775409ac691f3}{at}} (size\+\_\+t i) const
+\item 
+constexpr \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_a19b5ac3b97a8d9e4d1abcb91d2adc28c}{at\+\_\+no\+\_\+check}} (size\+\_\+t i)
+\item 
+constexpr \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_ab0329eca0a8eed915a01e1f0f7967725}{at\+\_\+no\+\_\+check}} (size\+\_\+t i) const
+\item 
+constexpr \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_a4852b1b2ddcbb5c40c3f1763ec9865a9}{operator\mbox{[}$\,$\mbox{]}}} (size\+\_\+t i) const
+\item 
+constexpr \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_aa19a5683a80d614fda1f7cf02043f089}{operator\mbox{[}$\,$\mbox{]}}} (size\+\_\+t i)
+\item 
+constexpr \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_aac5b08caaaf15b5cef7539b0423ecc4c}{raw}} () const
+\item 
+constexpr size\+\_\+t \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_aff0b6c2a0666cc8d6ec1f1e64cdd9036}{size}} () const
+\item 
+constexpr void \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_a1f3f2b0014a7487b6d7f8e044ae13556}{set}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*}data, size\+\_\+t \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_aff0b6c2a0666cc8d6ec1f1e64cdd9036}{size}}, size\+\_\+t index=-\/1)
+\item 
+constexpr void \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_ac277a0c3dcf579d18e84c349357dce61}{copy}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*}data, size\+\_\+t \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_aff0b6c2a0666cc8d6ec1f1e64cdd9036}{size}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}$>$\newline
+class sysio\+::vm\+::detail\+::vector$<$ T, Allocator $>$}
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2vector_8hpp_source_l00014}{14}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2vector_8hpp_source}{vector.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classsysio_1_1vm_1_1detail_1_1vector_a166d4c1e0d0e7060df5665098ea1ce3c}\index{sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}!vector@{vector}}
+\index{vector@{vector}!sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{vector()}{vector()}\hspace{0.1cm}{\footnotesize\ttfamily [1/6]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1detail_1_1vector_a166d4c1e0d0e7060df5665098ea1ce3c} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{sysio\+::vm\+::detail\+::vector}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::vector (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} \&}]{allocator}{, }\item[{size\+\_\+t}]{size}{ = {\ttfamily 0}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2vector_8hpp_source_l00016}{16}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2vector_8hpp_source}{vector.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :}
+\DoxyCodeLine{00017\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_size(\mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_aff0b6c2a0666cc8d6ec1f1e64cdd9036}{size}}),}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_allocator(\&\mbox{\hyperlink{namespacechainbase_add7d4cf66ab3f2808fe613e6b0343b89}{allocator}}),}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_data(\mbox{\hyperlink{namespacechainbase_add7d4cf66ab3f2808fe613e6b0343b89}{allocator}}.template\ alloc<T>(\ \_size\ ))\ \{}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1detail_1_1vector_a3d118accc27c58028e60de13e9d4c923}\index{sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}!vector@{vector}}
+\index{vector@{vector}!sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{vector()}{vector()}\hspace{0.1cm}{\footnotesize\ttfamily [2/6]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1detail_1_1vector_a3d118accc27c58028e60de13e9d4c923} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{sysio\+::vm\+::detail\+::vector}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::vector (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{vector}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \&}]{mv}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [constexpr]}, {\ttfamily [delete]}}
+
+\Hypertarget{classsysio_1_1vm_1_1detail_1_1vector_a84df95733e22b103c19cef74d25ef8d4}\index{sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}!vector@{vector}}
+\index{vector@{vector}!sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{vector()}{vector()}\hspace{0.1cm}{\footnotesize\ttfamily [3/6]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1detail_1_1vector_a84df95733e22b103c19cef74d25ef8d4} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{sysio\+::vm\+::detail\+::vector}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::vector (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{vector}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \&\&}]{mv}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [constexpr]}, {\ttfamily [default]}}
+
+\Hypertarget{classsysio_1_1vm_1_1detail_1_1vector_a166d4c1e0d0e7060df5665098ea1ce3c}\index{sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}!vector@{vector}}
+\index{vector@{vector}!sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{vector()}{vector()}\hspace{0.1cm}{\footnotesize\ttfamily [4/6]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1detail_1_1vector_a166d4c1e0d0e7060df5665098ea1ce3c} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{sysio\+::vm\+::detail\+::vector}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::vector (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} \&}]{allocator}{, }\item[{size\+\_\+t}]{size}{ = {\ttfamily 0}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2vector_8hpp_source_l00016}{16}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2vector_8hpp_source}{vector.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :}
+\DoxyCodeLine{00017\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_size(\mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_aff0b6c2a0666cc8d6ec1f1e64cdd9036}{size}}),}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_allocator(\&\mbox{\hyperlink{namespacechainbase_add7d4cf66ab3f2808fe613e6b0343b89}{allocator}}),}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_data(\mbox{\hyperlink{namespacechainbase_add7d4cf66ab3f2808fe613e6b0343b89}{allocator}}.template\ alloc<T>(\ \_size\ ))\ \{}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1detail_1_1vector_a3d118accc27c58028e60de13e9d4c923}\index{sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}!vector@{vector}}
+\index{vector@{vector}!sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{vector()}{vector()}\hspace{0.1cm}{\footnotesize\ttfamily [5/6]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1detail_1_1vector_a3d118accc27c58028e60de13e9d4c923} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{sysio\+::vm\+::detail\+::vector}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::vector (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{vector}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \&}]{mv}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [constexpr]}, {\ttfamily [delete]}}
+
+\Hypertarget{classsysio_1_1vm_1_1detail_1_1vector_a84df95733e22b103c19cef74d25ef8d4}\index{sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}!vector@{vector}}
+\index{vector@{vector}!sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{vector()}{vector()}\hspace{0.1cm}{\footnotesize\ttfamily [6/6]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1detail_1_1vector_a84df95733e22b103c19cef74d25ef8d4} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{sysio\+::vm\+::detail\+::vector}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::vector (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{vector}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \&\&}]{mv}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [constexpr]}, {\ttfamily [default]}}
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1vm_1_1detail_1_1vector_aa56c22e9b50f5cec1a3a48dfd2a867ba}\index{sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}!at@{at}}
+\index{at@{at}!sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{at()}{at()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1detail_1_1vector_aa56c22e9b50f5cec1a3a48dfd2a867ba} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{sysio\+::vm\+::detail\+::vector}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::at (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{i}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2vector_8hpp_source_l00057}{57}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2vector_8hpp_source}{vector.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(\ i\ <\ \_size,\ wasm\_vector\_oob\_exception,\ \textcolor{stringliteral}{"{}vector\ read\ out\ of\ bounds"{}}\ );}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \_data[i];}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=333pt]{classsysio_1_1vm_1_1detail_1_1vector_aa56c22e9b50f5cec1a3a48dfd2a867ba_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1detail_1_1vector_aa56c22e9b50f5cec1a3a48dfd2a867ba}\index{sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}!at@{at}}
+\index{at@{at}!sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{at()}{at()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1detail_1_1vector_aa56c22e9b50f5cec1a3a48dfd2a867ba} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{sysio\+::vm\+::detail\+::vector}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::at (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{i}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2vector_8hpp_source_l00057}{57}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2vector_8hpp_source}{vector.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(\ i\ <\ \_size,\ wasm\_vector\_oob\_exception,\ \textcolor{stringliteral}{"{}vector\ read\ out\ of\ bounds"{}}\ );}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \_data[i];}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1detail_1_1vector_a581ddd7297e96d46b6b775409ac691f3}\index{sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}!at@{at}}
+\index{at@{at}!sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{at()}{at()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1detail_1_1vector_a581ddd7297e96d46b6b775409ac691f3} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{sysio\+::vm\+::detail\+::vector}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::at (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{i}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2vector_8hpp_source_l00062}{62}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2vector_8hpp_source}{vector.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(\ i\ <\ \_size,\ wasm\_vector\_oob\_exception,\ \textcolor{stringliteral}{"{}vector\ read\ out\ of\ bounds"{}}\ );}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \_data[i];}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1detail_1_1vector_a581ddd7297e96d46b6b775409ac691f3}\index{sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}!at@{at}}
+\index{at@{at}!sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{at()}{at()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1detail_1_1vector_a581ddd7297e96d46b6b775409ac691f3} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{sysio\+::vm\+::detail\+::vector}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::at (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{i}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2vector_8hpp_source_l00062}{62}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2vector_8hpp_source}{vector.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(\ i\ <\ \_size,\ wasm\_vector\_oob\_exception,\ \textcolor{stringliteral}{"{}vector\ read\ out\ of\ bounds"{}}\ );}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \_data[i];}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1detail_1_1vector_a19b5ac3b97a8d9e4d1abcb91d2adc28c}\index{sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}!at\_no\_check@{at\_no\_check}}
+\index{at\_no\_check@{at\_no\_check}!sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{at\_no\_check()}{at\_no\_check()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1detail_1_1vector_a19b5ac3b97a8d9e4d1abcb91d2adc28c} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{sysio\+::vm\+::detail\+::vector}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::at\+\_\+no\+\_\+check (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{i}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2vector_8hpp_source_l00067}{67}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2vector_8hpp_source}{vector.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \_data[i];}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1detail_1_1vector_a19b5ac3b97a8d9e4d1abcb91d2adc28c}\index{sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}!at\_no\_check@{at\_no\_check}}
+\index{at\_no\_check@{at\_no\_check}!sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{at\_no\_check()}{at\_no\_check()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1detail_1_1vector_a19b5ac3b97a8d9e4d1abcb91d2adc28c} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{sysio\+::vm\+::detail\+::vector}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::at\+\_\+no\+\_\+check (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{i}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2vector_8hpp_source_l00067}{67}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2vector_8hpp_source}{vector.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \_data[i];}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1detail_1_1vector_ab0329eca0a8eed915a01e1f0f7967725}\index{sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}!at\_no\_check@{at\_no\_check}}
+\index{at\_no\_check@{at\_no\_check}!sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{at\_no\_check()}{at\_no\_check()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1detail_1_1vector_ab0329eca0a8eed915a01e1f0f7967725} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{sysio\+::vm\+::detail\+::vector}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::at\+\_\+no\+\_\+check (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{i}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2vector_8hpp_source_l00071}{71}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2vector_8hpp_source}{vector.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \_data[i];}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1detail_1_1vector_ab0329eca0a8eed915a01e1f0f7967725}\index{sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}!at\_no\_check@{at\_no\_check}}
+\index{at\_no\_check@{at\_no\_check}!sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{at\_no\_check()}{at\_no\_check()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1detail_1_1vector_ab0329eca0a8eed915a01e1f0f7967725} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{sysio\+::vm\+::detail\+::vector}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::at\+\_\+no\+\_\+check (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{i}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2vector_8hpp_source_l00071}{71}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2vector_8hpp_source}{vector.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \_data[i];}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1detail_1_1vector_a1d1a1b718817bc05c2f63d939e9f4874}\index{sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}!back@{back}}
+\index{back@{back}!sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{back()}{back()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1detail_1_1vector_a1d1a1b718817bc05c2f63d939e9f4874} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+void \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{sysio\+::vm\+::detail\+::vector}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::back (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2vector_8hpp_source_l00048}{48}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2vector_8hpp_source}{vector.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \_data[\_index];}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1detail_1_1vector_a1d1a1b718817bc05c2f63d939e9f4874}\index{sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}!back@{back}}
+\index{back@{back}!sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{back()}{back()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1detail_1_1vector_a1d1a1b718817bc05c2f63d939e9f4874} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+void \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{sysio\+::vm\+::detail\+::vector}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::back (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2vector_8hpp_source_l00048}{48}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2vector_8hpp_source}{vector.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \_data[\_index];}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1detail_1_1vector_ac277a0c3dcf579d18e84c349357dce61}\index{sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}!copy@{copy}}
+\index{copy@{copy}!sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{copy()}{copy()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1detail_1_1vector_ac277a0c3dcf579d18e84c349357dce61} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+void \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{sysio\+::vm\+::detail\+::vector}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::copy (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*}}]{data}{, }\item[{size\+\_\+t}]{size}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2vector_8hpp_source_l00080}{80}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2vector_8hpp_source}{vector.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_afc1d102d8b0144266a1adbc474bbdb40}{resize}}(\mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_aff0b6c2a0666cc8d6ec1f1e64cdd9036}{size}});}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::copy\_n(data,\ \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_aff0b6c2a0666cc8d6ec1f1e64cdd9036}{size}},\ \_data);}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_index\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_aff0b6c2a0666cc8d6ec1f1e64cdd9036}{size}}-\/1;}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1vm_1_1detail_1_1vector_ac277a0c3dcf579d18e84c349357dce61_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1vm_1_1detail_1_1vector_ac277a0c3dcf579d18e84c349357dce61_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1detail_1_1vector_ac277a0c3dcf579d18e84c349357dce61}\index{sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}!copy@{copy}}
+\index{copy@{copy}!sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{copy()}{copy()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1detail_1_1vector_ac277a0c3dcf579d18e84c349357dce61} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+void \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{sysio\+::vm\+::detail\+::vector}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::copy (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*}}]{data}{, }\item[{size\+\_\+t}]{size}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2vector_8hpp_source_l00080}{80}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2vector_8hpp_source}{vector.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_afc1d102d8b0144266a1adbc474bbdb40}{resize}}(\mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_aff0b6c2a0666cc8d6ec1f1e64cdd9036}{size}});}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::copy\_n(data,\ \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_aff0b6c2a0666cc8d6ec1f1e64cdd9036}{size}},\ \_data);}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_index\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_aff0b6c2a0666cc8d6ec1f1e64cdd9036}{size}}-\/1;}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1vm_1_1detail_1_1vector_ac277a0c3dcf579d18e84c349357dce61_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1vm_1_1detail_1_1vector_ac277a0c3dcf579d18e84c349357dce61_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1detail_1_1vector_a9b8945d9c76c3ae28e78101d91b5ea9f}\index{sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}!emplace\_back@{emplace\_back}}
+\index{emplace\_back@{emplace\_back}!sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{emplace\_back()}{emplace\_back()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1detail_1_1vector_a9b8945d9c76c3ae28e78101d91b5ea9f} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+void \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{sysio\+::vm\+::detail\+::vector}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::emplace\+\_\+back (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\&}]{val}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2vector_8hpp_source_l00041}{41}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2vector_8hpp_source}{vector.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ if\ the\ vector\ is\ unbounded\ don't\ assert}}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ \_index\ >=\ \_size\ )}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_afc1d102d8b0144266a1adbc474bbdb40}{resize}}(\ \_size\ *\ 2\ );}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_data[\_index++]\ =\ std::move(val);}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1vm_1_1detail_1_1vector_a9b8945d9c76c3ae28e78101d91b5ea9f_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=303pt]{classsysio_1_1vm_1_1detail_1_1vector_a9b8945d9c76c3ae28e78101d91b5ea9f_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1detail_1_1vector_a9b8945d9c76c3ae28e78101d91b5ea9f}\index{sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}!emplace\_back@{emplace\_back}}
+\index{emplace\_back@{emplace\_back}!sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{emplace\_back()}{emplace\_back()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1detail_1_1vector_a9b8945d9c76c3ae28e78101d91b5ea9f} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+void \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{sysio\+::vm\+::detail\+::vector}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::emplace\+\_\+back (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\&}]{val}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2vector_8hpp_source_l00041}{41}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2vector_8hpp_source}{vector.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ if\ the\ vector\ is\ unbounded\ don't\ assert}}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ \_index\ >=\ \_size\ )}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_afc1d102d8b0144266a1adbc474bbdb40}{resize}}(\ \_size\ *\ 2\ );}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_data[\_index++]\ =\ std::move(val);}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1vm_1_1detail_1_1vector_a9b8945d9c76c3ae28e78101d91b5ea9f_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1detail_1_1vector_a1187ddc4e26a89beeeeea922ecb201d4}\index{sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}!operator=@{operator=}}
+\index{operator=@{operator=}!sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1detail_1_1vector_a1187ddc4e26a89beeeeea922ecb201d4} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{vector}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{sysio\+::vm\+::detail\+::vector}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::operator= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{vector}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \&\&}]{mv}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [constexpr]}, {\ttfamily [default]}}
+
+\Hypertarget{classsysio_1_1vm_1_1detail_1_1vector_a1187ddc4e26a89beeeeea922ecb201d4}\index{sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}!operator=@{operator=}}
+\index{operator=@{operator=}!sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1detail_1_1vector_a1187ddc4e26a89beeeeea922ecb201d4} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{vector}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{sysio\+::vm\+::detail\+::vector}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::operator= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{vector}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \&\&}]{mv}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [constexpr]}, {\ttfamily [default]}}
+
+\Hypertarget{classsysio_1_1vm_1_1detail_1_1vector_aa19a5683a80d614fda1f7cf02043f089}\index{sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}!operator\mbox{[}\mbox{]}@{operator[]}}
+\index{operator\mbox{[}\mbox{]}@{operator[]}!sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{operator[]()}{operator[]()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1detail_1_1vector_aa19a5683a80d614fda1f7cf02043f089} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{sysio\+::vm\+::detail\+::vector}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::operator\mbox{[}$\,$\mbox{]} (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{i}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2vector_8hpp_source_l00076}{76}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2vector_8hpp_source}{vector.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00076\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_aa56c22e9b50f5cec1a3a48dfd2a867ba}{at}}(i);\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=304pt]{classsysio_1_1vm_1_1detail_1_1vector_aa19a5683a80d614fda1f7cf02043f089_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1detail_1_1vector_aa19a5683a80d614fda1f7cf02043f089}\index{sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}!operator\mbox{[}\mbox{]}@{operator[]}}
+\index{operator\mbox{[}\mbox{]}@{operator[]}!sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{operator[]()}{operator[]()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1detail_1_1vector_aa19a5683a80d614fda1f7cf02043f089} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{sysio\+::vm\+::detail\+::vector}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::operator\mbox{[}$\,$\mbox{]} (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{i}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2vector_8hpp_source_l00076}{76}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2vector_8hpp_source}{vector.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00076\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_aa56c22e9b50f5cec1a3a48dfd2a867ba}{at}}(i);\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=304pt]{classsysio_1_1vm_1_1detail_1_1vector_aa19a5683a80d614fda1f7cf02043f089_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1detail_1_1vector_a4852b1b2ddcbb5c40c3f1763ec9865a9}\index{sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}!operator\mbox{[}\mbox{]}@{operator[]}}
+\index{operator\mbox{[}\mbox{]}@{operator[]}!sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{operator[]()}{operator[]()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1detail_1_1vector_a4852b1b2ddcbb5c40c3f1763ec9865a9} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{sysio\+::vm\+::detail\+::vector}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::operator\mbox{[}$\,$\mbox{]} (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{i}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2vector_8hpp_source_l00075}{75}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2vector_8hpp_source}{vector.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00075\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_aa56c22e9b50f5cec1a3a48dfd2a867ba}{at}}(i);\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=304pt]{classsysio_1_1vm_1_1detail_1_1vector_a4852b1b2ddcbb5c40c3f1763ec9865a9_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1detail_1_1vector_a4852b1b2ddcbb5c40c3f1763ec9865a9}\index{sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}!operator\mbox{[}\mbox{]}@{operator[]}}
+\index{operator\mbox{[}\mbox{]}@{operator[]}!sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{operator[]()}{operator[]()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1detail_1_1vector_a4852b1b2ddcbb5c40c3f1763ec9865a9} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{sysio\+::vm\+::detail\+::vector}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::operator\mbox{[}$\,$\mbox{]} (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{i}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2vector_8hpp_source_l00075}{75}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2vector_8hpp_source}{vector.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00075\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_aa56c22e9b50f5cec1a3a48dfd2a867ba}{at}}(i);\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=304pt]{classsysio_1_1vm_1_1detail_1_1vector_a4852b1b2ddcbb5c40c3f1763ec9865a9_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1detail_1_1vector_a3b37bffe783905515944e7dde1838909}\index{sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}!pop\_back@{pop\_back}}
+\index{pop\_back@{pop\_back}!sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{pop\_back()}{pop\_back()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1detail_1_1vector_a3b37bffe783905515944e7dde1838909} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+void \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{sysio\+::vm\+::detail\+::vector}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::pop\+\_\+back (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2vector_8hpp_source_l00052}{52}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2vector_8hpp_source}{vector.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(\ \_index\ >=\ 0,\ wasm\_vector\_oob\_exception,\ \textcolor{stringliteral}{"{}vector\ pop\ out\ of\ bounds"{}}\ );}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_index-\/-\/;}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1detail_1_1vector_a3b37bffe783905515944e7dde1838909}\index{sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}!pop\_back@{pop\_back}}
+\index{pop\_back@{pop\_back}!sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{pop\_back()}{pop\_back()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1detail_1_1vector_a3b37bffe783905515944e7dde1838909} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+void \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{sysio\+::vm\+::detail\+::vector}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::pop\+\_\+back (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2vector_8hpp_source_l00052}{52}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2vector_8hpp_source}{vector.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(\ \_index\ >=\ 0,\ wasm\_vector\_oob\_exception,\ \textcolor{stringliteral}{"{}vector\ pop\ out\ of\ bounds"{}}\ );}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_index-\/-\/;}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1detail_1_1vector_a9f4d37cc24f1b29d403366a9e5074659}\index{sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}!push\_back@{push\_back}}
+\index{push\_back@{push\_back}!sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{push\_back()}{push\_back()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1detail_1_1vector_a9f4d37cc24f1b29d403366a9e5074659} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+template$<$typename \mbox{\hyperlink{union_u}{U}} , typename  = std\+::enable\+\_\+if\+\_\+t$<$std\+::is\+\_\+same\+\_\+v$<$\+T, std\+::decay\+\_\+t$<$\+U$>$$>$, int$>$$>$ \\
+void \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{sysio\+::vm\+::detail\+::vector}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::push\+\_\+back (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{union_u}{U}} \&\&}]{val}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2vector_8hpp_source_l00035}{35}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2vector_8hpp_source}{vector.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ if\ the\ vector\ is\ unbounded\ don't\ assert}}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ \_index\ >=\ \_size\ )}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_afc1d102d8b0144266a1adbc474bbdb40}{resize}}(\ \_size\ *\ 2\ );}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_data[\_index++]\ =\ std::forward<U>(val);}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1vm_1_1detail_1_1vector_a9f4d37cc24f1b29d403366a9e5074659_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=336pt]{classsysio_1_1vm_1_1detail_1_1vector_a9f4d37cc24f1b29d403366a9e5074659_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1detail_1_1vector_a9f4d37cc24f1b29d403366a9e5074659}\index{sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}!push\_back@{push\_back}}
+\index{push\_back@{push\_back}!sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{push\_back()}{push\_back()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1detail_1_1vector_a9f4d37cc24f1b29d403366a9e5074659} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+template$<$typename \mbox{\hyperlink{union_u}{U}} , typename  = std\+::enable\+\_\+if\+\_\+t$<$std\+::is\+\_\+same\+\_\+v$<$\+T, std\+::decay\+\_\+t$<$\+U$>$$>$, int$>$$>$ \\
+void \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{sysio\+::vm\+::detail\+::vector}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::push\+\_\+back (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{union_u}{U}} \&\&}]{val}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2vector_8hpp_source_l00035}{35}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2vector_8hpp_source}{vector.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ if\ the\ vector\ is\ unbounded\ don't\ assert}}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ \_index\ >=\ \_size\ )}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_afc1d102d8b0144266a1adbc474bbdb40}{resize}}(\ \_size\ *\ 2\ );}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_data[\_index++]\ =\ std::forward<U>(val);}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1vm_1_1detail_1_1vector_a9f4d37cc24f1b29d403366a9e5074659_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1detail_1_1vector_aac5b08caaaf15b5cef7539b0423ecc4c}\index{sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}!raw@{raw}}
+\index{raw@{raw}!sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{raw()}{raw()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1detail_1_1vector_aac5b08caaaf15b5cef7539b0423ecc4c} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{sysio\+::vm\+::detail\+::vector}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::raw (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2vector_8hpp_source_l00077}{77}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2vector_8hpp_source}{vector.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00077\ \{\ \textcolor{keywordflow}{return}\ \_data;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1detail_1_1vector_aac5b08caaaf15b5cef7539b0423ecc4c}\index{sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}!raw@{raw}}
+\index{raw@{raw}!sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{raw()}{raw()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1detail_1_1vector_aac5b08caaaf15b5cef7539b0423ecc4c} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{sysio\+::vm\+::detail\+::vector}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::raw (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2vector_8hpp_source_l00077}{77}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2vector_8hpp_source}{vector.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00077\ \{\ \textcolor{keywordflow}{return}\ \_data;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1detail_1_1vector_afc1d102d8b0144266a1adbc474bbdb40}\index{sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}!resize@{resize}}
+\index{resize@{resize}!sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{resize()}{resize()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1detail_1_1vector_afc1d102d8b0144266a1adbc474bbdb40} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+void \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{sysio\+::vm\+::detail\+::vector}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::resize (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{size}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2vector_8hpp_source_l00026}{26}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2vector_8hpp_source}{vector.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_aff0b6c2a0666cc8d6ec1f1e64cdd9036}{size}}\ >\ \_size)\ \{}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_data\ =\ \_allocator-\/>template\ alloc<T>(\ \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_aff0b6c2a0666cc8d6ec1f1e64cdd9036}{size}}\ );}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_allocator-\/>template\ reclaim<T>(\ \_data\ +\ \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_aff0b6c2a0666cc8d6ec1f1e64cdd9036}{size}},\ \_size\ -\/\ \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_aff0b6c2a0666cc8d6ec1f1e64cdd9036}{size}}\ );}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_size\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_aff0b6c2a0666cc8d6ec1f1e64cdd9036}{size}};}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=304pt]{classsysio_1_1vm_1_1detail_1_1vector_afc1d102d8b0144266a1adbc474bbdb40_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1vm_1_1detail_1_1vector_afc1d102d8b0144266a1adbc474bbdb40_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1detail_1_1vector_afc1d102d8b0144266a1adbc474bbdb40}\index{sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}!resize@{resize}}
+\index{resize@{resize}!sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{resize()}{resize()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1detail_1_1vector_afc1d102d8b0144266a1adbc474bbdb40} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+void \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{sysio\+::vm\+::detail\+::vector}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::resize (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{size}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2vector_8hpp_source_l00026}{26}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2vector_8hpp_source}{vector.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_aff0b6c2a0666cc8d6ec1f1e64cdd9036}{size}}\ >\ \_size)\ \{}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_data\ =\ \_allocator-\/>template\ alloc<T>(\ \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_aff0b6c2a0666cc8d6ec1f1e64cdd9036}{size}}\ );}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_allocator-\/>template\ reclaim<T>(\ \_data\ +\ \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_aff0b6c2a0666cc8d6ec1f1e64cdd9036}{size}},\ \_size\ -\/\ \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_aff0b6c2a0666cc8d6ec1f1e64cdd9036}{size}}\ );}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_size\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_aff0b6c2a0666cc8d6ec1f1e64cdd9036}{size}};}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=304pt]{classsysio_1_1vm_1_1detail_1_1vector_afc1d102d8b0144266a1adbc474bbdb40_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1detail_1_1vector_a1f3f2b0014a7487b6d7f8e044ae13556}\index{sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}!set@{set}}
+\index{set@{set}!sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{set()}{set()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1detail_1_1vector_a1f3f2b0014a7487b6d7f8e044ae13556} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+void \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{sysio\+::vm\+::detail\+::vector}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::set (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*}}]{data}{, }\item[{size\+\_\+t}]{size}{, }\item[{size\+\_\+t}]{index}{ = {\ttfamily -\/1}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2vector_8hpp_source_l00079}{79}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2vector_8hpp_source}{vector.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00079\ \{\ \_size\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_aff0b6c2a0666cc8d6ec1f1e64cdd9036}{size}};\ \_data\ =\ data;\ \_index\ =\ index\ ==\ -\/1\ ?\ \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_aff0b6c2a0666cc8d6ec1f1e64cdd9036}{size}}\ -\/\ 1\ :\ index;\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=304pt]{classsysio_1_1vm_1_1detail_1_1vector_a1f3f2b0014a7487b6d7f8e044ae13556_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1detail_1_1vector_a1f3f2b0014a7487b6d7f8e044ae13556}\index{sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}!set@{set}}
+\index{set@{set}!sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{set()}{set()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1detail_1_1vector_a1f3f2b0014a7487b6d7f8e044ae13556} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+void \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{sysio\+::vm\+::detail\+::vector}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::set (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*}}]{data}{, }\item[{size\+\_\+t}]{size}{, }\item[{size\+\_\+t}]{index}{ = {\ttfamily -\/1}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2vector_8hpp_source_l00079}{79}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2vector_8hpp_source}{vector.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00079\ \{\ \_size\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_aff0b6c2a0666cc8d6ec1f1e64cdd9036}{size}};\ \_data\ =\ data;\ \_index\ =\ index\ ==\ -\/1\ ?\ \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector_aff0b6c2a0666cc8d6ec1f1e64cdd9036}{size}}\ -\/\ 1\ :\ index;\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=304pt]{classsysio_1_1vm_1_1detail_1_1vector_a1f3f2b0014a7487b6d7f8e044ae13556_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1detail_1_1vector_aff0b6c2a0666cc8d6ec1f1e64cdd9036}\index{sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}!size@{size}}
+\index{size@{size}!sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{size()}{size()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1detail_1_1vector_aff0b6c2a0666cc8d6ec1f1e64cdd9036} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+size\+\_\+t \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{sysio\+::vm\+::detail\+::vector}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::size (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2vector_8hpp_source_l00078}{78}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2vector_8hpp_source}{vector.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00078\ \{\ \textcolor{keywordflow}{return}\ \_size;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1vm_1_1detail_1_1vector_aff0b6c2a0666cc8d6ec1f1e64cdd9036_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1detail_1_1vector_aff0b6c2a0666cc8d6ec1f1e64cdd9036}\index{sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}!size@{size}}
+\index{size@{size}!sysio::vm::detail::vector$<$ T, Allocator $>$@{sysio::vm::detail::vector$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{size()}{size()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1detail_1_1vector_aff0b6c2a0666cc8d6ec1f1e64cdd9036} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+size\+\_\+t \mbox{\hyperlink{classsysio_1_1vm_1_1detail_1_1vector}{sysio\+::vm\+::detail\+::vector}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::size (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2vector_8hpp_source_l00078}{78}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2vector_8hpp_source}{vector.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00078\ \{\ \textcolor{keywordflow}{return}\ \_size;\ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/include/sysio/sysio/vm/\mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2vector_8hpp}{vector.\+hpp}}\item 
+libraries/sys-\/vm/include/sysio/vm/\mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2vector_8hpp}{vector.\+hpp}}\end{DoxyCompactItemize}

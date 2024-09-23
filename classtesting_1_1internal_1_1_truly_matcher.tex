@@ -1,0 +1,116 @@
+\doxysection{testing\+::internal\+::Truly\+Matcher\texorpdfstring{$<$}{<} Predicate \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classtesting_1_1internal_1_1_truly_matcher}{}\label{classtesting_1_1internal_1_1_truly_matcher}\index{testing::internal::TrulyMatcher$<$ Predicate $>$@{testing::internal::TrulyMatcher$<$ Predicate $>$}}
+
+
+{\ttfamily \#include $<$gmock-\/matchers.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_truly_matcher_a9fdc4ddba121e0dad4773b5685e0f28d}{Truly\+Matcher}} (Predicate pred)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\bool \mbox{\hyperlink{classtesting_1_1internal_1_1_truly_matcher_ad3781c661936a845ec165c1aad239634}{Match\+And\+Explain}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&x, \mbox{\hyperlink{classtesting_1_1_match_result_listener}{Match\+Result\+Listener}} \texorpdfstring{$\ast$}{*}) const
+\item 
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_truly_matcher_ac327b4bd408386f489c4279e7e3f9530}{Describe\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}os) const
+\item 
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_truly_matcher_a2e753f5d571b6a51b8ef620dcbb3a591}{Describe\+Negation\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}os) const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Predicate$>$\newline
+class testing\+::internal\+::\+Truly\+Matcher$<$ Predicate $>$}
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l01953}{1953}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_truly_matcher_a9fdc4ddba121e0dad4773b5685e0f28d}\index{testing::internal::TrulyMatcher$<$ Predicate $>$@{testing::internal::TrulyMatcher$<$ Predicate $>$}!TrulyMatcher@{TrulyMatcher}}
+\index{TrulyMatcher@{TrulyMatcher}!testing::internal::TrulyMatcher$<$ Predicate $>$@{testing::internal::TrulyMatcher$<$ Predicate $>$}}
+\doxysubsubsection{\texorpdfstring{TrulyMatcher()}{TrulyMatcher()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_truly_matcher_a9fdc4ddba121e0dad4773b5685e0f28d} 
+template$<$typename Predicate $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_truly_matcher}{testing\+::internal\+::\+Truly\+Matcher}}$<$ Predicate $>$\+::\+Truly\+Matcher (\begin{DoxyParamCaption}\item[{Predicate}]{pred}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l01955}{1955}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01955\ :\ predicate\_(pred)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_truly_matcher_a2e753f5d571b6a51b8ef620dcbb3a591}\index{testing::internal::TrulyMatcher$<$ Predicate $>$@{testing::internal::TrulyMatcher$<$ Predicate $>$}!DescribeNegationTo@{DescribeNegationTo}}
+\index{DescribeNegationTo@{DescribeNegationTo}!testing::internal::TrulyMatcher$<$ Predicate $>$@{testing::internal::TrulyMatcher$<$ Predicate $>$}}
+\doxysubsubsection{\texorpdfstring{DescribeNegationTo()}{DescribeNegationTo()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_truly_matcher_a2e753f5d571b6a51b8ef620dcbb3a591} 
+template$<$typename Predicate $>$ \\
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_truly_matcher}{testing\+::internal\+::\+Truly\+Matcher}}$<$ Predicate $>$\+::\+Describe\+Negation\+To (\begin{DoxyParamCaption}\item[{\+::std\+::ostream \texorpdfstring{$\ast$}{*}}]{os}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l01979}{1979}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01979\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01980\ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}doesn't\ satisfy\ the\ given\ predicate"{}};}
+\DoxyCodeLine{01981\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1internal_1_1_truly_matcher_ac327b4bd408386f489c4279e7e3f9530}\index{testing::internal::TrulyMatcher$<$ Predicate $>$@{testing::internal::TrulyMatcher$<$ Predicate $>$}!DescribeTo@{DescribeTo}}
+\index{DescribeTo@{DescribeTo}!testing::internal::TrulyMatcher$<$ Predicate $>$@{testing::internal::TrulyMatcher$<$ Predicate $>$}}
+\doxysubsubsection{\texorpdfstring{DescribeTo()}{DescribeTo()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_truly_matcher_ac327b4bd408386f489c4279e7e3f9530} 
+template$<$typename Predicate $>$ \\
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_truly_matcher}{testing\+::internal\+::\+Truly\+Matcher}}$<$ Predicate $>$\+::\+Describe\+To (\begin{DoxyParamCaption}\item[{\+::std\+::ostream \texorpdfstring{$\ast$}{*}}]{os}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l01975}{1975}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01975\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01976\ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}satisfies\ the\ given\ predicate"{}};}
+\DoxyCodeLine{01977\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1internal_1_1_truly_matcher_ad3781c661936a845ec165c1aad239634}\index{testing::internal::TrulyMatcher$<$ Predicate $>$@{testing::internal::TrulyMatcher$<$ Predicate $>$}!MatchAndExplain@{MatchAndExplain}}
+\index{MatchAndExplain@{MatchAndExplain}!testing::internal::TrulyMatcher$<$ Predicate $>$@{testing::internal::TrulyMatcher$<$ Predicate $>$}}
+\doxysubsubsection{\texorpdfstring{MatchAndExplain()}{MatchAndExplain()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_truly_matcher_ad3781c661936a845ec165c1aad239634} 
+template$<$typename Predicate $>$ \\
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+bool \mbox{\hyperlink{classtesting_1_1internal_1_1_truly_matcher}{testing\+::internal\+::\+Truly\+Matcher}}$<$ Predicate $>$\+::\+Match\+And\+Explain (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{x}{, }\item[{\mbox{\hyperlink{classtesting_1_1_match_result_listener}{Match\+Result\+Listener}} \texorpdfstring{$\ast$}{*}}]{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l01962}{1962}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01963\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01964\ \ \ \ \ \textcolor{comment}{//\ Without\ the\ if-\/statement,\ MSVC\ sometimes\ warns\ about\ converting}}
+\DoxyCodeLine{01965\ \ \ \ \ \textcolor{comment}{//\ a\ value\ to\ bool\ (warning\ 4800).}}
+\DoxyCodeLine{01966\ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{01967\ \ \ \ \ \textcolor{comment}{//\ We\ cannot\ write\ 'return\ !!predicate\_(x);'\ as\ that\ doesn't\ work}}
+\DoxyCodeLine{01968\ \ \ \ \ \textcolor{comment}{//\ when\ predicate\_(x)\ returns\ a\ class\ convertible\ to\ bool\ but}}
+\DoxyCodeLine{01969\ \ \ \ \ \textcolor{comment}{//\ having\ no\ operator!().}}
+\DoxyCodeLine{01970\ \ \ \ \ \textcolor{keywordflow}{if}\ (predicate\_(x))}
+\DoxyCodeLine{01971\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{01972\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{01973\ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/include/gmock/\mbox{\hyperlink{gmock-matchers_8h}{gmock-\/matchers.\+h}}\end{DoxyCompactItemize}

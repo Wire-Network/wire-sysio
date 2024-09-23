@@ -1,0 +1,457 @@
+\doxysection{encodingstest.\+cpp}
+\hypertarget{encodingstest_8cpp_source}{}\label{encodingstest_8cpp_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/test/unittest/encodingstest.cpp@{libraries/fc/include/fc/crypto/webauthn\_json/test/unittest/encodingstest.cpp}}
+\mbox{\hyperlink{encodingstest_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00001}00001\ \textcolor{comment}{//\ Tencent\ is\ pleased\ to\ support\ the\ open\ source\ community\ by\ making\ RapidJSON\ available.}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00002}00002\ \textcolor{comment}{//\ }}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00003}00003\ \textcolor{comment}{//\ Copyright\ (C)\ 2015\ THL\ A29\ Limited,\ a\ Tencent\ company,\ and\ Milo\ Yip.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00004}00004\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00005}00005\ \textcolor{comment}{//\ Licensed\ under\ the\ MIT\ License\ (the\ "{}License"{});\ you\ may\ not\ use\ this\ file\ except}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00006}00006\ \textcolor{comment}{//\ in\ compliance\ with\ the\ License.\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00007}00007\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00008}00008\ \textcolor{comment}{//\ http://opensource.org/licenses/MIT}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00009}00009\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00010}00010\ \textcolor{comment}{//\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software\ distributed\ }}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00011}00011\ \textcolor{comment}{//\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,\ WITHOUT\ WARRANTIES\ OR\ }}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00012}00012\ \textcolor{comment}{//\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.\ See\ the\ License\ for\ the\ }}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00013}00013\ \textcolor{comment}{//\ specific\ language\ governing\ permissions\ and\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00015}00015\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{unittest_8h}{unittest.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00016}00016\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{filereadstream_8h}{rapidjson/filereadstream.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00017}00017\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{filewritestream_8h}{rapidjson/filewritestream.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00018}00018\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{encodedstream_8h}{rapidjson/encodedstream.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00019}00019\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{stringbuffer_8h}{rapidjson/stringbuffer.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00021}00021\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacerapidjson}{rapidjson}};}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00023}00023\ \textcolor{comment}{//\ Verification\ of\ encoders/decoders\ with\ Hoehrmann's\ UTF8\ decoder}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00025}00025\ \textcolor{comment}{//\ http://www.unicode.org/Public/UNIDATA/Blocks.txt}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00026}00026\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ kCodepointRanges[]\ =\ \{}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00027}00027\ \ \ \ \ 0x0000,\ \ \ \ \ 0x007F,\ \ \ \ \ \textcolor{comment}{//\ Basic\ Latin}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00028}00028\ \ \ \ \ 0x0080,\ \ \ \ \ 0x00FF,\ \ \ \ \ \textcolor{comment}{//\ Latin-\/1\ Supplement}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00029}00029\ \ \ \ \ 0x0100,\ \ \ \ \ 0x017F,\ \ \ \ \ \textcolor{comment}{//\ Latin\ Extended-\/A}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00030}00030\ \ \ \ \ 0x0180,\ \ \ \ \ 0x024F,\ \ \ \ \ \textcolor{comment}{//\ Latin\ Extended-\/B}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00031}00031\ \ \ \ \ 0x0250,\ \ \ \ \ 0x02AF,\ \ \ \ \ \textcolor{comment}{//\ IPA\ Extensions}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00032}00032\ \ \ \ \ 0x02B0,\ \ \ \ \ 0x02FF,\ \ \ \ \ \textcolor{comment}{//\ Spacing\ Modifier\ Letters}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00033}00033\ \ \ \ \ 0x0300,\ \ \ \ \ 0x036F,\ \ \ \ \ \textcolor{comment}{//\ Combining\ Diacritical\ Marks}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00034}00034\ \ \ \ \ 0x0370,\ \ \ \ \ 0x03FF,\ \ \ \ \ \textcolor{comment}{//\ Greek\ and\ Coptic}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00035}00035\ \ \ \ \ 0x0400,\ \ \ \ \ 0x04FF,\ \ \ \ \ \textcolor{comment}{//\ Cyrillic}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00036}00036\ \ \ \ \ 0x0500,\ \ \ \ \ 0x052F,\ \ \ \ \ \textcolor{comment}{//\ Cyrillic\ Supplement}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00037}00037\ \ \ \ \ 0x0530,\ \ \ \ \ 0x058F,\ \ \ \ \ \textcolor{comment}{//\ Armenian}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00038}00038\ \ \ \ \ 0x0590,\ \ \ \ \ 0x05FF,\ \ \ \ \ \textcolor{comment}{//\ Hebrew}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00039}00039\ \ \ \ \ 0x0600,\ \ \ \ \ 0x06FF,\ \ \ \ \ \textcolor{comment}{//\ Arabic}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00040}00040\ \ \ \ \ 0x0700,\ \ \ \ \ 0x074F,\ \ \ \ \ \textcolor{comment}{//\ Syriac}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00041}00041\ \ \ \ \ 0x0750,\ \ \ \ \ 0x077F,\ \ \ \ \ \textcolor{comment}{//\ Arabic\ Supplement}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00042}00042\ \ \ \ \ 0x0780,\ \ \ \ \ 0x07BF,\ \ \ \ \ \textcolor{comment}{//\ Thaana}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00043}00043\ \ \ \ \ 0x07C0,\ \ \ \ \ 0x07FF,\ \ \ \ \ \textcolor{comment}{//\ NKo}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00044}00044\ \ \ \ \ 0x0800,\ \ \ \ \ 0x083F,\ \ \ \ \ \textcolor{comment}{//\ Samaritan}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00045}00045\ \ \ \ \ 0x0840,\ \ \ \ \ 0x085F,\ \ \ \ \ \textcolor{comment}{//\ Mandaic}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00046}00046\ \ \ \ \ 0x0900,\ \ \ \ \ 0x097F,\ \ \ \ \ \textcolor{comment}{//\ Devanagari}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00047}00047\ \ \ \ \ 0x0980,\ \ \ \ \ 0x09FF,\ \ \ \ \ \textcolor{comment}{//\ Bengali}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00048}00048\ \ \ \ \ 0x0A00,\ \ \ \ \ 0x0A7F,\ \ \ \ \ \textcolor{comment}{//\ Gurmukhi}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00049}00049\ \ \ \ \ 0x0A80,\ \ \ \ \ 0x0AFF,\ \ \ \ \ \textcolor{comment}{//\ Gujarati}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00050}00050\ \ \ \ \ 0x0B00,\ \ \ \ \ 0x0B7F,\ \ \ \ \ \textcolor{comment}{//\ Oriya}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00051}00051\ \ \ \ \ 0x0B80,\ \ \ \ \ 0x0BFF,\ \ \ \ \ \textcolor{comment}{//\ Tamil}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00052}00052\ \ \ \ \ 0x0C00,\ \ \ \ \ 0x0C7F,\ \ \ \ \ \textcolor{comment}{//\ Telugu}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00053}00053\ \ \ \ \ 0x0C80,\ \ \ \ \ 0x0CFF,\ \ \ \ \ \textcolor{comment}{//\ Kannada}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00054}00054\ \ \ \ \ 0x0D00,\ \ \ \ \ 0x0D7F,\ \ \ \ \ \textcolor{comment}{//\ Malayalam}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00055}00055\ \ \ \ \ 0x0D80,\ \ \ \ \ 0x0DFF,\ \ \ \ \ \textcolor{comment}{//\ Sinhala}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00056}00056\ \ \ \ \ 0x0E00,\ \ \ \ \ 0x0E7F,\ \ \ \ \ \textcolor{comment}{//\ Thai}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00057}00057\ \ \ \ \ 0x0E80,\ \ \ \ \ 0x0EFF,\ \ \ \ \ \textcolor{comment}{//\ Lao}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00058}00058\ \ \ \ \ 0x0F00,\ \ \ \ \ 0x0FFF,\ \ \ \ \ \textcolor{comment}{//\ Tibetan}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00059}00059\ \ \ \ \ 0x1000,\ \ \ \ \ 0x109F,\ \ \ \ \ \textcolor{comment}{//\ Myanmar}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00060}00060\ \ \ \ \ 0x10A0,\ \ \ \ \ 0x10FF,\ \ \ \ \ \textcolor{comment}{//\ Georgian}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00061}00061\ \ \ \ \ 0x1100,\ \ \ \ \ 0x11FF,\ \ \ \ \ \textcolor{comment}{//\ Hangul\ Jamo}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00062}00062\ \ \ \ \ 0x1200,\ \ \ \ \ 0x137F,\ \ \ \ \ \textcolor{comment}{//\ Ethiopic}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00063}00063\ \ \ \ \ 0x1380,\ \ \ \ \ 0x139F,\ \ \ \ \ \textcolor{comment}{//\ Ethiopic\ Supplement}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00064}00064\ \ \ \ \ 0x13A0,\ \ \ \ \ 0x13FF,\ \ \ \ \ \textcolor{comment}{//\ Cherokee}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00065}00065\ \ \ \ \ 0x1400,\ \ \ \ \ 0x167F,\ \ \ \ \ \textcolor{comment}{//\ Unified\ Canadian\ Aboriginal\ Syllabics}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00066}00066\ \ \ \ \ 0x1680,\ \ \ \ \ 0x169F,\ \ \ \ \ \textcolor{comment}{//\ Ogham}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00067}00067\ \ \ \ \ 0x16A0,\ \ \ \ \ 0x16FF,\ \ \ \ \ \textcolor{comment}{//\ Runic}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00068}00068\ \ \ \ \ 0x1700,\ \ \ \ \ 0x171F,\ \ \ \ \ \textcolor{comment}{//\ Tagalog}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00069}00069\ \ \ \ \ 0x1720,\ \ \ \ \ 0x173F,\ \ \ \ \ \textcolor{comment}{//\ Hanunoo}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00070}00070\ \ \ \ \ 0x1740,\ \ \ \ \ 0x175F,\ \ \ \ \ \textcolor{comment}{//\ Buhid}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00071}00071\ \ \ \ \ 0x1760,\ \ \ \ \ 0x177F,\ \ \ \ \ \textcolor{comment}{//\ Tagbanwa}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00072}00072\ \ \ \ \ 0x1780,\ \ \ \ \ 0x17FF,\ \ \ \ \ \textcolor{comment}{//\ Khmer}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00073}00073\ \ \ \ \ 0x1800,\ \ \ \ \ 0x18AF,\ \ \ \ \ \textcolor{comment}{//\ Mongolian}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00074}00074\ \ \ \ \ 0x18B0,\ \ \ \ \ 0x18FF,\ \ \ \ \ \textcolor{comment}{//\ Unified\ Canadian\ Aboriginal\ Syllabics\ Extended}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00075}00075\ \ \ \ \ 0x1900,\ \ \ \ \ 0x194F,\ \ \ \ \ \textcolor{comment}{//\ Limbu}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00076}00076\ \ \ \ \ 0x1950,\ \ \ \ \ 0x197F,\ \ \ \ \ \textcolor{comment}{//\ Tai\ Le}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00077}00077\ \ \ \ \ 0x1980,\ \ \ \ \ 0x19DF,\ \ \ \ \ \textcolor{comment}{//\ New\ Tai\ Lue}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00078}00078\ \ \ \ \ 0x19E0,\ \ \ \ \ 0x19FF,\ \ \ \ \ \textcolor{comment}{//\ Khmer\ Symbols}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00079}00079\ \ \ \ \ 0x1A00,\ \ \ \ \ 0x1A1F,\ \ \ \ \ \textcolor{comment}{//\ Buginese}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00080}00080\ \ \ \ \ 0x1A20,\ \ \ \ \ 0x1AAF,\ \ \ \ \ \textcolor{comment}{//\ Tai\ Tham}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00081}00081\ \ \ \ \ 0x1B00,\ \ \ \ \ 0x1B7F,\ \ \ \ \ \textcolor{comment}{//\ Balinese}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00082}00082\ \ \ \ \ 0x1B80,\ \ \ \ \ 0x1BBF,\ \ \ \ \ \textcolor{comment}{//\ Sundanese}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00083}00083\ \ \ \ \ 0x1BC0,\ \ \ \ \ 0x1BFF,\ \ \ \ \ \textcolor{comment}{//\ Batak}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00084}00084\ \ \ \ \ 0x1C00,\ \ \ \ \ 0x1C4F,\ \ \ \ \ \textcolor{comment}{//\ Lepcha}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00085}00085\ \ \ \ \ 0x1C50,\ \ \ \ \ 0x1C7F,\ \ \ \ \ \textcolor{comment}{//\ Ol\ Chiki}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00086}00086\ \ \ \ \ 0x1CD0,\ \ \ \ \ 0x1CFF,\ \ \ \ \ \textcolor{comment}{//\ Vedic\ Extensions}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00087}00087\ \ \ \ \ 0x1D00,\ \ \ \ \ 0x1D7F,\ \ \ \ \ \textcolor{comment}{//\ Phonetic\ Extensions}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00088}00088\ \ \ \ \ 0x1D80,\ \ \ \ \ 0x1DBF,\ \ \ \ \ \textcolor{comment}{//\ Phonetic\ Extensions\ Supplement}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00089}00089\ \ \ \ \ 0x1DC0,\ \ \ \ \ 0x1DFF,\ \ \ \ \ \textcolor{comment}{//\ Combining\ Diacritical\ Marks\ Supplement}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00090}00090\ \ \ \ \ 0x1E00,\ \ \ \ \ 0x1EFF,\ \ \ \ \ \textcolor{comment}{//\ Latin\ Extended\ Additional}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00091}00091\ \ \ \ \ 0x1F00,\ \ \ \ \ 0x1FFF,\ \ \ \ \ \textcolor{comment}{//\ Greek\ Extended}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00092}00092\ \ \ \ \ 0x2000,\ \ \ \ \ 0x206F,\ \ \ \ \ \textcolor{comment}{//\ General\ Punctuation}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00093}00093\ \ \ \ \ 0x2070,\ \ \ \ \ 0x209F,\ \ \ \ \ \textcolor{comment}{//\ Superscripts\ and\ Subscripts}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00094}00094\ \ \ \ \ 0x20A0,\ \ \ \ \ 0x20CF,\ \ \ \ \ \textcolor{comment}{//\ Currency\ Symbols}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00095}00095\ \ \ \ \ 0x20D0,\ \ \ \ \ 0x20FF,\ \ \ \ \ \textcolor{comment}{//\ Combining\ Diacritical\ Marks\ for\ Symbols}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00096}00096\ \ \ \ \ 0x2100,\ \ \ \ \ 0x214F,\ \ \ \ \ \textcolor{comment}{//\ Letterlike\ Symbols}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00097}00097\ \ \ \ \ 0x2150,\ \ \ \ \ 0x218F,\ \ \ \ \ \textcolor{comment}{//\ Number\ Forms}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00098}00098\ \ \ \ \ 0x2190,\ \ \ \ \ 0x21FF,\ \ \ \ \ \textcolor{comment}{//\ Arrows}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00099}00099\ \ \ \ \ 0x2200,\ \ \ \ \ 0x22FF,\ \ \ \ \ \textcolor{comment}{//\ Mathematical\ Operators}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00100}00100\ \ \ \ \ 0x2300,\ \ \ \ \ 0x23FF,\ \ \ \ \ \textcolor{comment}{//\ Miscellaneous\ Technical}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00101}00101\ \ \ \ \ 0x2400,\ \ \ \ \ 0x243F,\ \ \ \ \ \textcolor{comment}{//\ Control\ Pictures}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00102}00102\ \ \ \ \ 0x2440,\ \ \ \ \ 0x245F,\ \ \ \ \ \textcolor{comment}{//\ Optical\ Character\ Recognition}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00103}00103\ \ \ \ \ 0x2460,\ \ \ \ \ 0x24FF,\ \ \ \ \ \textcolor{comment}{//\ Enclosed\ Alphanumerics}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00104}00104\ \ \ \ \ 0x2500,\ \ \ \ \ 0x257F,\ \ \ \ \ \textcolor{comment}{//\ Box\ Drawing}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00105}00105\ \ \ \ \ 0x2580,\ \ \ \ \ 0x259F,\ \ \ \ \ \textcolor{comment}{//\ Block\ Elements}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00106}00106\ \ \ \ \ 0x25A0,\ \ \ \ \ 0x25FF,\ \ \ \ \ \textcolor{comment}{//\ Geometric\ Shapes}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00107}00107\ \ \ \ \ 0x2600,\ \ \ \ \ 0x26FF,\ \ \ \ \ \textcolor{comment}{//\ Miscellaneous\ Symbols}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00108}00108\ \ \ \ \ 0x2700,\ \ \ \ \ 0x27BF,\ \ \ \ \ \textcolor{comment}{//\ Dingbats}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00109}00109\ \ \ \ \ 0x27C0,\ \ \ \ \ 0x27EF,\ \ \ \ \ \textcolor{comment}{//\ Miscellaneous\ Mathematical\ Symbols-\/A}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00110}00110\ \ \ \ \ 0x27F0,\ \ \ \ \ 0x27FF,\ \ \ \ \ \textcolor{comment}{//\ Supplemental\ Arrows-\/A}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00111}00111\ \ \ \ \ 0x2800,\ \ \ \ \ 0x28FF,\ \ \ \ \ \textcolor{comment}{//\ Braille\ Patterns}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00112}00112\ \ \ \ \ 0x2900,\ \ \ \ \ 0x297F,\ \ \ \ \ \textcolor{comment}{//\ Supplemental\ Arrows-\/B}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00113}00113\ \ \ \ \ 0x2980,\ \ \ \ \ 0x29FF,\ \ \ \ \ \textcolor{comment}{//\ Miscellaneous\ Mathematical\ Symbols-\/B}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00114}00114\ \ \ \ \ 0x2A00,\ \ \ \ \ 0x2AFF,\ \ \ \ \ \textcolor{comment}{//\ Supplemental\ Mathematical\ Operators}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00115}00115\ \ \ \ \ 0x2B00,\ \ \ \ \ 0x2BFF,\ \ \ \ \ \textcolor{comment}{//\ Miscellaneous\ Symbols\ and\ Arrows}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00116}00116\ \ \ \ \ 0x2C00,\ \ \ \ \ 0x2C5F,\ \ \ \ \ \textcolor{comment}{//\ Glagolitic}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00117}00117\ \ \ \ \ 0x2C60,\ \ \ \ \ 0x2C7F,\ \ \ \ \ \textcolor{comment}{//\ Latin\ Extended-\/C}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00118}00118\ \ \ \ \ 0x2C80,\ \ \ \ \ 0x2CFF,\ \ \ \ \ \textcolor{comment}{//\ Coptic}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00119}00119\ \ \ \ \ 0x2D00,\ \ \ \ \ 0x2D2F,\ \ \ \ \ \textcolor{comment}{//\ Georgian\ Supplement}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00120}00120\ \ \ \ \ 0x2D30,\ \ \ \ \ 0x2D7F,\ \ \ \ \ \textcolor{comment}{//\ Tifinagh}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00121}00121\ \ \ \ \ 0x2D80,\ \ \ \ \ 0x2DDF,\ \ \ \ \ \textcolor{comment}{//\ Ethiopic\ Extended}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00122}00122\ \ \ \ \ 0x2DE0,\ \ \ \ \ 0x2DFF,\ \ \ \ \ \textcolor{comment}{//\ Cyrillic\ Extended-\/A}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00123}00123\ \ \ \ \ 0x2E00,\ \ \ \ \ 0x2E7F,\ \ \ \ \ \textcolor{comment}{//\ Supplemental\ Punctuation}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00124}00124\ \ \ \ \ 0x2E80,\ \ \ \ \ 0x2EFF,\ \ \ \ \ \textcolor{comment}{//\ CJK\ Radicals\ Supplement}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00125}00125\ \ \ \ \ 0x2F00,\ \ \ \ \ 0x2FDF,\ \ \ \ \ \textcolor{comment}{//\ Kangxi\ Radicals}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00126}00126\ \ \ \ \ 0x2FF0,\ \ \ \ \ 0x2FFF,\ \ \ \ \ \textcolor{comment}{//\ Ideographic\ Description\ Characters}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00127}00127\ \ \ \ \ 0x3000,\ \ \ \ \ 0x303F,\ \ \ \ \ \textcolor{comment}{//\ CJK\ Symbols\ and\ Punctuation}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00128}00128\ \ \ \ \ 0x3040,\ \ \ \ \ 0x309F,\ \ \ \ \ \textcolor{comment}{//\ Hiragana}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00129}00129\ \ \ \ \ 0x30A0,\ \ \ \ \ 0x30FF,\ \ \ \ \ \textcolor{comment}{//\ Katakana}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00130}00130\ \ \ \ \ 0x3100,\ \ \ \ \ 0x312F,\ \ \ \ \ \textcolor{comment}{//\ Bopomofo}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00131}00131\ \ \ \ \ 0x3130,\ \ \ \ \ 0x318F,\ \ \ \ \ \textcolor{comment}{//\ Hangul\ Compatibility\ Jamo}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00132}00132\ \ \ \ \ 0x3190,\ \ \ \ \ 0x319F,\ \ \ \ \ \textcolor{comment}{//\ Kanbun}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00133}00133\ \ \ \ \ 0x31A0,\ \ \ \ \ 0x31BF,\ \ \ \ \ \textcolor{comment}{//\ Bopomofo\ Extended}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00134}00134\ \ \ \ \ 0x31C0,\ \ \ \ \ 0x31EF,\ \ \ \ \ \textcolor{comment}{//\ CJK\ Strokes}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00135}00135\ \ \ \ \ 0x31F0,\ \ \ \ \ 0x31FF,\ \ \ \ \ \textcolor{comment}{//\ Katakana\ Phonetic\ Extensions}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00136}00136\ \ \ \ \ 0x3200,\ \ \ \ \ 0x32FF,\ \ \ \ \ \textcolor{comment}{//\ Enclosed\ CJK\ Letters\ and\ Months}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00137}00137\ \ \ \ \ 0x3300,\ \ \ \ \ 0x33FF,\ \ \ \ \ \textcolor{comment}{//\ CJK\ Compatibility}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00138}00138\ \ \ \ \ 0x3400,\ \ \ \ \ 0x4DBF,\ \ \ \ \ \textcolor{comment}{//\ CJK\ Unified\ Ideographs\ Extension\ A}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00139}00139\ \ \ \ \ 0x4DC0,\ \ \ \ \ 0x4DFF,\ \ \ \ \ \textcolor{comment}{//\ Yijing\ Hexagram\ Symbols}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00140}00140\ \ \ \ \ 0x4E00,\ \ \ \ \ 0x9FFF,\ \ \ \ \ \textcolor{comment}{//\ CJK\ Unified\ Ideographs}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00141}00141\ \ \ \ \ 0xA000,\ \ \ \ \ 0xA48F,\ \ \ \ \ \textcolor{comment}{//\ Yi\ Syllables}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00142}00142\ \ \ \ \ 0xA490,\ \ \ \ \ 0xA4CF,\ \ \ \ \ \textcolor{comment}{//\ Yi\ Radicals}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00143}00143\ \ \ \ \ 0xA4D0,\ \ \ \ \ 0xA4FF,\ \ \ \ \ \textcolor{comment}{//\ Lisu}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00144}00144\ \ \ \ \ 0xA500,\ \ \ \ \ 0xA63F,\ \ \ \ \ \textcolor{comment}{//\ Vai}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00145}00145\ \ \ \ \ 0xA640,\ \ \ \ \ 0xA69F,\ \ \ \ \ \textcolor{comment}{//\ Cyrillic\ Extended-\/B}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00146}00146\ \ \ \ \ 0xA6A0,\ \ \ \ \ 0xA6FF,\ \ \ \ \ \textcolor{comment}{//\ Bamum}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00147}00147\ \ \ \ \ 0xA700,\ \ \ \ \ 0xA71F,\ \ \ \ \ \textcolor{comment}{//\ Modifier\ Tone\ Letters}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00148}00148\ \ \ \ \ 0xA720,\ \ \ \ \ 0xA7FF,\ \ \ \ \ \textcolor{comment}{//\ Latin\ Extended-\/D}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00149}00149\ \ \ \ \ 0xA800,\ \ \ \ \ 0xA82F,\ \ \ \ \ \textcolor{comment}{//\ Syloti\ Nagri}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00150}00150\ \ \ \ \ 0xA830,\ \ \ \ \ 0xA83F,\ \ \ \ \ \textcolor{comment}{//\ Common\ Indic\ Number\ Forms}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00151}00151\ \ \ \ \ 0xA840,\ \ \ \ \ 0xA87F,\ \ \ \ \ \textcolor{comment}{//\ Phags-\/pa}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00152}00152\ \ \ \ \ 0xA880,\ \ \ \ \ 0xA8DF,\ \ \ \ \ \textcolor{comment}{//\ Saurashtra}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00153}00153\ \ \ \ \ 0xA8E0,\ \ \ \ \ 0xA8FF,\ \ \ \ \ \textcolor{comment}{//\ Devanagari\ Extended}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00154}00154\ \ \ \ \ 0xA900,\ \ \ \ \ 0xA92F,\ \ \ \ \ \textcolor{comment}{//\ Kayah\ Li}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00155}00155\ \ \ \ \ 0xA930,\ \ \ \ \ 0xA95F,\ \ \ \ \ \textcolor{comment}{//\ Rejang}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00156}00156\ \ \ \ \ 0xA960,\ \ \ \ \ 0xA97F,\ \ \ \ \ \textcolor{comment}{//\ Hangul\ Jamo\ Extended-\/A}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00157}00157\ \ \ \ \ 0xA980,\ \ \ \ \ 0xA9DF,\ \ \ \ \ \textcolor{comment}{//\ Javanese}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00158}00158\ \ \ \ \ 0xAA00,\ \ \ \ \ 0xAA5F,\ \ \ \ \ \textcolor{comment}{//\ Cham}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00159}00159\ \ \ \ \ 0xAA60,\ \ \ \ \ 0xAA7F,\ \ \ \ \ \textcolor{comment}{//\ Myanmar\ Extended-\/A}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00160}00160\ \ \ \ \ 0xAA80,\ \ \ \ \ 0xAADF,\ \ \ \ \ \textcolor{comment}{//\ Tai\ Viet}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00161}00161\ \ \ \ \ 0xAB00,\ \ \ \ \ 0xAB2F,\ \ \ \ \ \textcolor{comment}{//\ Ethiopic\ Extended-\/A}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00162}00162\ \ \ \ \ 0xABC0,\ \ \ \ \ 0xABFF,\ \ \ \ \ \textcolor{comment}{//\ Meetei\ Mayek}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00163}00163\ \ \ \ \ 0xAC00,\ \ \ \ \ 0xD7AF,\ \ \ \ \ \textcolor{comment}{//\ Hangul\ Syllables}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00164}00164\ \ \ \ \ 0xD7B0,\ \ \ \ \ 0xD7FF,\ \ \ \ \ \textcolor{comment}{//\ Hangul\ Jamo\ Extended-\/B}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00165}00165\ \ \ \ \ \textcolor{comment}{//0xD800,\ \ \ \ \ \ \ 0xDB7F,\ \ \ \ \ //\ High\ Surrogates}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00166}00166\ \ \ \ \ \textcolor{comment}{//0xDB80,\ \ \ \ \ \ \ 0xDBFF,\ \ \ \ \ //\ High\ Private\ Use\ Surrogates}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00167}00167\ \ \ \ \ \textcolor{comment}{//0xDC00,\ \ \ \ \ \ \ 0xDFFF,\ \ \ \ \ //\ Low\ Surrogates}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00168}00168\ \ \ \ \ 0xE000,\ \ \ \ \ 0xF8FF,\ \ \ \ \ \textcolor{comment}{//\ Private\ Use\ Area}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00169}00169\ \ \ \ \ 0xF900,\ \ \ \ \ 0xFAFF,\ \ \ \ \ \textcolor{comment}{//\ CJK\ Compatibility\ Ideographs}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00170}00170\ \ \ \ \ 0xFB00,\ \ \ \ \ 0xFB4F,\ \ \ \ \ \textcolor{comment}{//\ Alphabetic\ Presentation\ Forms}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00171}00171\ \ \ \ \ 0xFB50,\ \ \ \ \ 0xFDFF,\ \ \ \ \ \textcolor{comment}{//\ Arabic\ Presentation\ Forms-\/A}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00172}00172\ \ \ \ \ 0xFE00,\ \ \ \ \ 0xFE0F,\ \ \ \ \ \textcolor{comment}{//\ Variation\ Selectors}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00173}00173\ \ \ \ \ 0xFE10,\ \ \ \ \ 0xFE1F,\ \ \ \ \ \textcolor{comment}{//\ Vertical\ Forms}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00174}00174\ \ \ \ \ 0xFE20,\ \ \ \ \ 0xFE2F,\ \ \ \ \ \textcolor{comment}{//\ Combining\ Half\ Marks}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00175}00175\ \ \ \ \ 0xFE30,\ \ \ \ \ 0xFE4F,\ \ \ \ \ \textcolor{comment}{//\ CJK\ Compatibility\ Forms}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00176}00176\ \ \ \ \ 0xFE50,\ \ \ \ \ 0xFE6F,\ \ \ \ \ \textcolor{comment}{//\ Small\ Form\ Variants}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00177}00177\ \ \ \ \ 0xFE70,\ \ \ \ \ 0xFEFF,\ \ \ \ \ \textcolor{comment}{//\ Arabic\ Presentation\ Forms-\/B}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00178}00178\ \ \ \ \ 0xFF00,\ \ \ \ \ 0xFFEF,\ \ \ \ \ \textcolor{comment}{//\ Halfwidth\ and\ Fullwidth\ Forms}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00179}00179\ \ \ \ \ 0xFFF0,\ \ \ \ \ 0xFFFF,\ \ \ \ \ \textcolor{comment}{//\ Specials}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00180}00180\ \ \ \ \ 0x10000,\ \ \ \ 0x1007F,\ \ \ \ \textcolor{comment}{//\ Linear\ B\ Syllabary}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00181}00181\ \ \ \ \ 0x10080,\ \ \ \ 0x100FF,\ \ \ \ \textcolor{comment}{//\ Linear\ B\ Ideograms}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00182}00182\ \ \ \ \ 0x10100,\ \ \ \ 0x1013F,\ \ \ \ \textcolor{comment}{//\ Aegean\ Numbers}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00183}00183\ \ \ \ \ 0x10140,\ \ \ \ 0x1018F,\ \ \ \ \textcolor{comment}{//\ Ancient\ Greek\ Numbers}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00184}00184\ \ \ \ \ 0x10190,\ \ \ \ 0x101CF,\ \ \ \ \textcolor{comment}{//\ Ancient\ Symbols}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00185}00185\ \ \ \ \ 0x101D0,\ \ \ \ 0x101FF,\ \ \ \ \textcolor{comment}{//\ Phaistos\ Disc}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00186}00186\ \ \ \ \ 0x10280,\ \ \ \ 0x1029F,\ \ \ \ \textcolor{comment}{//\ Lycian}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00187}00187\ \ \ \ \ 0x102A0,\ \ \ \ 0x102DF,\ \ \ \ \textcolor{comment}{//\ Carian}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00188}00188\ \ \ \ \ 0x10300,\ \ \ \ 0x1032F,\ \ \ \ \textcolor{comment}{//\ Old\ Italic}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00189}00189\ \ \ \ \ 0x10330,\ \ \ \ 0x1034F,\ \ \ \ \textcolor{comment}{//\ Gothic}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00190}00190\ \ \ \ \ 0x10380,\ \ \ \ 0x1039F,\ \ \ \ \textcolor{comment}{//\ Ugaritic}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00191}00191\ \ \ \ \ 0x103A0,\ \ \ \ 0x103DF,\ \ \ \ \textcolor{comment}{//\ Old\ Persian}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00192}00192\ \ \ \ \ 0x10400,\ \ \ \ 0x1044F,\ \ \ \ \textcolor{comment}{//\ Deseret}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00193}00193\ \ \ \ \ 0x10450,\ \ \ \ 0x1047F,\ \ \ \ \textcolor{comment}{//\ Shavian}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00194}00194\ \ \ \ \ 0x10480,\ \ \ \ 0x104AF,\ \ \ \ \textcolor{comment}{//\ Osmanya}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00195}00195\ \ \ \ \ 0x10800,\ \ \ \ 0x1083F,\ \ \ \ \textcolor{comment}{//\ Cypriot\ Syllabary}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00196}00196\ \ \ \ \ 0x10840,\ \ \ \ 0x1085F,\ \ \ \ \textcolor{comment}{//\ Imperial\ Aramaic}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00197}00197\ \ \ \ \ 0x10900,\ \ \ \ 0x1091F,\ \ \ \ \textcolor{comment}{//\ Phoenician}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00198}00198\ \ \ \ \ 0x10920,\ \ \ \ 0x1093F,\ \ \ \ \textcolor{comment}{//\ Lydian}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00199}00199\ \ \ \ \ 0x10A00,\ \ \ \ 0x10A5F,\ \ \ \ \textcolor{comment}{//\ Kharoshthi}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00200}00200\ \ \ \ \ 0x10A60,\ \ \ \ 0x10A7F,\ \ \ \ \textcolor{comment}{//\ Old\ South\ Arabian}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00201}00201\ \ \ \ \ 0x10B00,\ \ \ \ 0x10B3F,\ \ \ \ \textcolor{comment}{//\ Avestan}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00202}00202\ \ \ \ \ 0x10B40,\ \ \ \ 0x10B5F,\ \ \ \ \textcolor{comment}{//\ Inscriptional\ Parthian}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00203}00203\ \ \ \ \ 0x10B60,\ \ \ \ 0x10B7F,\ \ \ \ \textcolor{comment}{//\ Inscriptional\ Pahlavi}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00204}00204\ \ \ \ \ 0x10C00,\ \ \ \ 0x10C4F,\ \ \ \ \textcolor{comment}{//\ Old\ Turkic}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00205}00205\ \ \ \ \ 0x10E60,\ \ \ \ 0x10E7F,\ \ \ \ \textcolor{comment}{//\ Rumi\ Numeral\ Symbols}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00206}00206\ \ \ \ \ 0x11000,\ \ \ \ 0x1107F,\ \ \ \ \textcolor{comment}{//\ Brahmi}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00207}00207\ \ \ \ \ 0x11080,\ \ \ \ 0x110CF,\ \ \ \ \textcolor{comment}{//\ Kaithi}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00208}00208\ \ \ \ \ 0x12000,\ \ \ \ 0x123FF,\ \ \ \ \textcolor{comment}{//\ Cuneiform}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00209}00209\ \ \ \ \ 0x12400,\ \ \ \ 0x1247F,\ \ \ \ \textcolor{comment}{//\ Cuneiform\ Numbers\ and\ Punctuation}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00210}00210\ \ \ \ \ 0x13000,\ \ \ \ 0x1342F,\ \ \ \ \textcolor{comment}{//\ Egyptian\ Hieroglyphs}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00211}00211\ \ \ \ \ 0x16800,\ \ \ \ 0x16A3F,\ \ \ \ \textcolor{comment}{//\ Bamum\ Supplement}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00212}00212\ \ \ \ \ 0x1B000,\ \ \ \ 0x1B0FF,\ \ \ \ \textcolor{comment}{//\ Kana\ Supplement}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00213}00213\ \ \ \ \ 0x1D000,\ \ \ \ 0x1D0FF,\ \ \ \ \textcolor{comment}{//\ Byzantine\ Musical\ Symbols}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00214}00214\ \ \ \ \ 0x1D100,\ \ \ \ 0x1D1FF,\ \ \ \ \textcolor{comment}{//\ Musical\ Symbols}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00215}00215\ \ \ \ \ 0x1D200,\ \ \ \ 0x1D24F,\ \ \ \ \textcolor{comment}{//\ Ancient\ Greek\ Musical\ Notation}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00216}00216\ \ \ \ \ 0x1D300,\ \ \ \ 0x1D35F,\ \ \ \ \textcolor{comment}{//\ Tai\ Xuan\ Jing\ Symbols}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00217}00217\ \ \ \ \ 0x1D360,\ \ \ \ 0x1D37F,\ \ \ \ \textcolor{comment}{//\ Counting\ Rod\ Numerals}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00218}00218\ \ \ \ \ 0x1D400,\ \ \ \ 0x1D7FF,\ \ \ \ \textcolor{comment}{//\ Mathematical\ Alphanumeric\ Symbols}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00219}00219\ \ \ \ \ 0x1F000,\ \ \ \ 0x1F02F,\ \ \ \ \textcolor{comment}{//\ Mahjong\ Tiles}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00220}00220\ \ \ \ \ 0x1F030,\ \ \ \ 0x1F09F,\ \ \ \ \textcolor{comment}{//\ Domino\ Tiles}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00221}00221\ \ \ \ \ 0x1F0A0,\ \ \ \ 0x1F0FF,\ \ \ \ \textcolor{comment}{//\ Playing\ Cards}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00222}00222\ \ \ \ \ 0x1F100,\ \ \ \ 0x1F1FF,\ \ \ \ \textcolor{comment}{//\ Enclosed\ Alphanumeric\ Supplement}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00223}00223\ \ \ \ \ 0x1F200,\ \ \ \ 0x1F2FF,\ \ \ \ \textcolor{comment}{//\ Enclosed\ Ideographic\ Supplement}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00224}00224\ \ \ \ \ 0x1F300,\ \ \ \ 0x1F5FF,\ \ \ \ \textcolor{comment}{//\ Miscellaneous\ Symbols\ And\ Pictographs}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00225}00225\ \ \ \ \ 0x1F600,\ \ \ \ 0x1F64F,\ \ \ \ \textcolor{comment}{//\ Emoticons}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00226}00226\ \ \ \ \ 0x1F680,\ \ \ \ 0x1F6FF,\ \ \ \ \textcolor{comment}{//\ Transport\ And\ Map\ Symbols}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00227}00227\ \ \ \ \ 0x1F700,\ \ \ \ 0x1F77F,\ \ \ \ \textcolor{comment}{//\ Alchemical\ Symbols}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00228}00228\ \ \ \ \ 0x20000,\ \ \ \ 0x2A6DF,\ \ \ \ \textcolor{comment}{//\ CJK\ Unified\ Ideographs\ Extension\ B}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00229}00229\ \ \ \ \ 0x2A700,\ \ \ \ 0x2B73F,\ \ \ \ \textcolor{comment}{//\ CJK\ Unified\ Ideographs\ Extension\ C}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00230}00230\ \ \ \ \ 0x2B740,\ \ \ \ 0x2B81F,\ \ \ \ \textcolor{comment}{//\ CJK\ Unified\ Ideographs\ Extension\ D}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00231}00231\ \ \ \ \ 0x2F800,\ \ \ \ 0x2FA1F,\ \ \ \ \textcolor{comment}{//\ CJK\ Compatibility\ Ideographs\ Supplement}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00232}00232\ \ \ \ \ 0xE0000,\ \ \ \ 0xE007F,\ \ \ \ \textcolor{comment}{//\ Tags}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00233}00233\ \ \ \ \ 0xE0100,\ \ \ \ 0xE01EF,\ \ \ \ \textcolor{comment}{//\ Variation\ Selectors\ Supplement}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00234}00234\ \ \ \ \ 0xF0000,\ \ \ \ 0xFFFFF,\ \ \ \ \textcolor{comment}{//\ Supplementary\ Private\ Use\ Area-\/A}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00235}00235\ \ \ \ \ 0x100000,\ \ \ 0x10FFFF,\ \ \ \textcolor{comment}{//\ Supplementary\ Private\ Use\ Area-\/B}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00236}00236\ \ \ \ \ 0xFFFFFFFF}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00237}00237\ \};}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00238}00238\ }
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00239}00239\ \textcolor{comment}{//\ Copyright\ (c)\ 2008-\/2010\ Bjoern\ Hoehrmann\ <bjoern@hoehrmann.de>}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00240}00240\ \textcolor{comment}{//\ See\ http://bjoern.hoehrmann.de/utf-\/8/decoder/dfa/\ for\ details.}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00241}00241\ }
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00242}\mbox{\hyperlink{encodingstest_8cpp_a82b09bd7c24e408c73e16db56b8db6cf}{00242}}\ \textcolor{preprocessor}{\#define\ UTF8\_ACCEPT\ 0u}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00243}00243\ }
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00244}00244\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ utf8d[]\ =\ \{}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00245}00245\ \ \ \ \ \textcolor{comment}{//\ The\ first\ part\ of\ the\ table\ maps\ bytes\ to\ character\ classes\ that}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00246}00246\ \ \ \ \ \textcolor{comment}{//\ to\ reduce\ the\ size\ of\ the\ transition\ table\ and\ create\ bitmasks.}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00247}00247\ \ \ \ \ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,\ \ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00248}00248\ \ \ \ \ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,\ \ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00249}00249\ \ \ \ \ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,\ \ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00250}00250\ \ \ \ \ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,\ \ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00251}00251\ \ \ \ \ 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,\ \ 9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00252}00252\ \ \ \ \ 7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,\ \ 7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00253}00253\ \ \ \ \ 8,8,2,2,2,2,2,2,2,2,2,2,2,2,2,2,\ \ 2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00254}00254\ \ \ \ \ 10,3,3,3,3,3,3,3,3,3,3,3,3,4,3,3,\ 11,6,6,6,5,8,8,8,8,8,8,8,8,8,8,8,}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00255}00255\ }
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00256}00256\ \ \ \ \ \textcolor{comment}{//\ The\ second\ part\ is\ a\ transition\ table\ that\ maps\ a\ combination}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00257}00257\ \ \ \ \ \textcolor{comment}{//\ of\ a\ state\ of\ the\ automaton\ and\ a\ character\ class\ to\ a\ state.}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00258}00258\ \ \ \ \ 0,12,24,36,60,96,84,12,12,12,48,72,\ 12,12,12,12,12,12,12,12,12,12,12,12,}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00259}00259\ \ \ \ \ 12,\ 0,12,12,12,12,12,\ 0,12,\ 0,12,12,\ 12,24,12,12,12,12,12,24,12,24,12,12,}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00260}00260\ \ \ \ \ 12,12,12,12,12,12,12,24,12,12,12,12,\ 12,24,12,12,12,12,12,12,12,24,12,12,}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00261}00261\ \ \ \ \ 12,12,12,12,12,12,12,36,12,36,12,12,\ 12,36,12,12,12,12,12,36,12,36,12,12,}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00262}00262\ \ \ \ \ 12,36,12,12,12,12,12,12,12,12,12,12,\ }
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00263}00263\ \};}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00264}00264\ }
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00265}00265\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keyword}{inline}\ decode(\textcolor{keywordtype}{unsigned}*\ \mbox{\hyperlink{structstate}{state}},\ \textcolor{keywordtype}{unsigned}*\ codep,\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{byte})\ \{}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00266}00266\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ type\ =\ utf8d[\mbox{\hyperlink{namespace_xbyak_1_1util_aa32c2b65ee9fdc28f9ef245092e96352}{byte}}];}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00267}00267\ }
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00268}00268\ \ \ \ \ *codep\ =\ (*\mbox{\hyperlink{structstate}{state}}\ !=\ \mbox{\hyperlink{encodingstest_8cpp_a82b09bd7c24e408c73e16db56b8db6cf}{UTF8\_ACCEPT}})\ ?}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00269}00269\ \ \ \ \ \ \ \ \ (\textcolor{keywordtype}{byte}\ \&\ 0x3fu)\ |\ (*codep\ <<\ 6)\ :}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00270}00270\ \ \ \ \ (0xffu\ >>\ type)\ \&\ (\mbox{\hyperlink{namespace_xbyak_1_1util_aa32c2b65ee9fdc28f9ef245092e96352}{byte}});}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00271}00271\ }
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00272}00272\ \ \ \ \ *\mbox{\hyperlink{structstate}{state}}\ =\ utf8d[256\ +\ *\mbox{\hyperlink{structstate}{state}}\ +\ \mbox{\hyperlink{yubihsm_8h_a1d127017fb298b889f4ba24752d08b8e}{type}}];}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00273}00273\ \ \ \ \ \textcolor{keywordflow}{return}\ *\mbox{\hyperlink{structstate}{state}};}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00274}00274\ \}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00275}00275\ }
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00276}00276\ \textcolor{comment}{//static\ bool\ IsUTF8(unsigned\ char*\ s)\ \{}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00277}00277\ \textcolor{comment}{//\ \ unsigned\ codepoint,\ state\ =\ 0;}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00278}00278\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00279}00279\ \textcolor{comment}{//\ \ while\ (*s)}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00280}00280\ \textcolor{comment}{//\ \ \ \ \ \ decode(\&state,\ \&codepoint,\ *s++);}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00281}00281\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00282}00282\ \textcolor{comment}{//\ \ return\ state\ ==\ UTF8\_ACCEPT;}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00283}00283\ \textcolor{comment}{//\}}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00284}00284\ }
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00285}\mbox{\hyperlink{encodingstest_8cpp_ab05cd9f7f0d56ae67de5120e244e3db1}{00285}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(EncodingsTest,\ \mbox{\hyperlink{namespace_u_t_f8}{UTF8}})\ \{}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00286}00286\ \ \ \ \ \mbox{\hyperlink{class_generic_string_buffer}{StringBuffer}}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ os2;}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00287}00287\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}*\ range\ =\ kCodepointRanges;\ *range\ !=\ 0xFFFFFFFF;\ range\ +=\ 2)\ \{}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00288}00288\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{unsigned}\ codepoint\ =\ range[0];\ codepoint\ <=\ range[1];\ ++codepoint)\ \{}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00289}00289\ \ \ \ \ \ \ \ \ \ \ \ \ os.Clear();}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00290}00290\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_u_t_f8}{UTF8<>::Encode}}(os,\ codepoint);}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00291}00291\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ encodedStr\ =\ os.GetString();}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00292}00292\ }
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00293}00293\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Decode\ with\ Hoehrmann}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00294}00294\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00295}00295\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ decodedCodepoint\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00296}00296\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \mbox{\hyperlink{structstate}{state}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00297}00297\ }
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00298}00298\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ decodedCount\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00299}00299\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ =\ encodedStr;\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};\ ++\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00300}00300\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!decode(\&\mbox{\hyperlink{structstate}{state}},\ \&decodedCodepoint,\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\textcolor{keyword}{>}(*\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})))\ \{}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00301}00301\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(codepoint,\ decodedCodepoint);}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00302}00302\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ decodedCount++;}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00303}00303\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00304}00304\ }
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00305}00305\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (*encodedStr)\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ This\ decoder\ cannot\ handle\ U+0000}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00306}00306\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(1u,\ decodedCount);\ \ \ \ \textcolor{comment}{//\ Should\ only\ contain\ one\ code\ point}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00307}00307\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00308}00308\ }
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00309}00309\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\mbox{\hyperlink{encodingstest_8cpp_a82b09bd7c24e408c73e16db56b8db6cf}{UTF8\_ACCEPT}},\ \mbox{\hyperlink{structstate}{state}});}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00310}00310\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{encodingstest_8cpp_a82b09bd7c24e408c73e16db56b8db6cf}{UTF8\_ACCEPT}}\ !=\ \mbox{\hyperlink{structstate}{state}})}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00311}00311\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ std::hex\ <<\ codepoint\ <<\ \textcolor{stringliteral}{"{}\ "{}}\ <<\ decodedCodepoint\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00312}00312\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00313}00313\ }
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00314}00314\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Decode}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00315}00315\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00316}00316\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_generic_string_stream}{StringStream}}\ is(encodedStr);}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00317}00317\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ decodedCodepoint;}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00318}00318\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ result\ =\ \mbox{\hyperlink{struct_u_t_f8}{UTF8<>::Decode}}(is,\ \&decodedCodepoint);}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00319}00319\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(result);}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00320}00320\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(codepoint,\ decodedCodepoint);}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00321}00321\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!result\ ||\ codepoint\ !=\ decodedCodepoint)}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00322}00322\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ std::hex\ <<\ codepoint\ <<\ \textcolor{stringliteral}{"{}\ "{}}\ <<\ decodedCodepoint\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00323}00323\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00324}00324\ }
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00325}00325\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Validate}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00326}00326\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00327}00327\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_generic_string_stream}{StringStream}}\ is(encodedStr);}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00328}00328\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os2.\mbox{\hyperlink{class_generic_string_buffer_a42f15c959046d899cb74c3120a6995f9}{Clear}}();}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00329}00329\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ result\ =\ \mbox{\hyperlink{struct_u_t_f8}{UTF8<>::Validate}}(is,\ os2);}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00330}00330\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(result);}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00331}00331\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0,\ \mbox{\hyperlink{unittest_8h_a8d8e3cf93e9b811c207711d0b353de02}{StrCmp}}(encodedStr,\ os2.\mbox{\hyperlink{class_generic_string_buffer_a42079865bab1deb930c6cff7d491c719}{GetString}}()));}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00332}00332\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00333}00333\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00334}00334\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00335}00335\ \}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00336}00336\ }
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00337}\mbox{\hyperlink{encodingstest_8cpp_ab7f3d19596b09778a08a46c852a99463}{00337}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(EncodingsTest,\ \mbox{\hyperlink{struct_u_t_f16}{UTF16}})\ \{}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00338}00338\ \ \ \ \ \mbox{\hyperlink{class_generic_string_buffer}{GenericStringBuffer<UTF16<>}}\ >\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ os2;}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00339}00339\ \ \ \ \ \mbox{\hyperlink{class_generic_string_buffer}{GenericStringBuffer<UTF8<>}}\ >\ utf8os;}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00340}00340\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}*\ range\ =\ kCodepointRanges;\ *range\ !=\ 0xFFFFFFFF;\ range\ +=\ 2)\ \{}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00341}00341\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{unsigned}\ codepoint\ =\ range[0];\ codepoint\ <=\ range[1];\ ++codepoint)\ \{}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00342}00342\ \ \ \ \ \ \ \ \ \ \ \ \ os.Clear();}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00343}00343\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_u_t_f16_a9d8ded01244e30d037c4afa10ee2b30e}{UTF16<>::Encode}}(os,\ codepoint);}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00344}00344\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_u_t_f16_a2bb000b19017f8c6d607f3db33fa138d}{UTF16<>::Ch}}*\ encodedStr\ =\ os.GetString();}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00345}00345\ }
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00346}00346\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Encode\ with\ Hoehrmann's\ code}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00347}00347\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (codepoint\ !=\ 0)\ \textcolor{comment}{//\ cannot\ handle\ U+0000}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00348}00348\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00349}00349\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ encode\ with\ UTF8<>\ first}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00350}00350\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ utf8os.\mbox{\hyperlink{class_generic_string_buffer_a42f15c959046d899cb74c3120a6995f9}{Clear}}();}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00351}00351\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_u_t_f8}{UTF8<>::Encode}}(utf8os,\ codepoint);}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00352}00352\ }
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00353}00353\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ transcode\ from\ UTF8\ to\ UTF16\ with\ Hoehrmann's\ code}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00354}00354\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ decodedCodepoint\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00355}00355\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \mbox{\hyperlink{structstate}{state}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00356}00356\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_u_t_f16_a2bb000b19017f8c6d607f3db33fa138d}{UTF16<>::Ch}}\ buffer[3],\ *\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ \&buffer[0];}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00357}00357\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ =\ utf8os.\mbox{\hyperlink{class_generic_string_buffer_a42079865bab1deb930c6cff7d491c719}{GetString}}();\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};\ ++\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})\ \{}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00358}00358\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!decode(\&\mbox{\hyperlink{structstate}{state}},\ \&decodedCodepoint,\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\textcolor{keyword}{>}(*\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})))}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00359}00359\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00360}00360\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00361}00361\ }
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00362}00362\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (codepoint\ <=\ 0xFFFF)}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00363}00363\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}++\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{struct_u_t_f16_a2bb000b19017f8c6d607f3db33fa138d}{UTF16<>::Ch}}\textcolor{keyword}{>}(decodedCodepoint);}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00364}00364\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00365}00365\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Encode\ code\ points\ above\ U+FFFF\ as\ surrogate\ pair.}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00366}00366\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}++\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{struct_u_t_f16_a2bb000b19017f8c6d607f3db33fa138d}{UTF16<>::Ch}}\textcolor{keyword}{>}(0xD7C0\ +\ (decodedCodepoint\ >>\ 10));}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00367}00367\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}++\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{struct_u_t_f16_a2bb000b19017f8c6d607f3db33fa138d}{UTF16<>::Ch}}\textcolor{keyword}{>}(0xDC00\ +\ (decodedCodepoint\ \&\ 0x3FF));}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00368}00368\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00369}00369\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}++\ =\ \textcolor{charliteral}{'\(\backslash\)0'};}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00370}00370\ }
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00371}00371\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0,\ \mbox{\hyperlink{unittest_8h_a8d8e3cf93e9b811c207711d0b353de02}{StrCmp}}(buffer,\ encodedStr));}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00372}00372\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00373}00373\ }
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00374}00374\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Decode}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00375}00375\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00376}00376\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_generic_string_stream}{GenericStringStream<UTF16<>}}\ >\ is(encodedStr);}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00377}00377\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ decodedCodepoint;}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00378}00378\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ result\ =\ \mbox{\hyperlink{struct_u_t_f16_a124c79dfd9f9b4c3fb65bd55ba17b4be}{UTF16<>::Decode}}(is,\ \&decodedCodepoint);}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00379}00379\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(result);}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00380}00380\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(codepoint,\ decodedCodepoint);\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00381}00381\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!result\ ||\ codepoint\ !=\ decodedCodepoint)}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00382}00382\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ std::hex\ <<\ codepoint\ <<\ \textcolor{stringliteral}{"{}\ "{}}\ <<\ decodedCodepoint\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00383}00383\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00384}00384\ }
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00385}00385\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Validate}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00386}00386\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00387}00387\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_generic_string_stream}{GenericStringStream<UTF16<>}}\ >\ is(encodedStr);}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00388}00388\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os2.\mbox{\hyperlink{class_generic_string_buffer_a42f15c959046d899cb74c3120a6995f9}{Clear}}();}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00389}00389\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ result\ =\ \mbox{\hyperlink{struct_u_t_f16_a7516184ed5dce10c0e7895bec124d97d}{UTF16<>::Validate}}(is,\ os2);}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00390}00390\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(result);}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00391}00391\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0,\ \mbox{\hyperlink{unittest_8h_a8d8e3cf93e9b811c207711d0b353de02}{StrCmp}}(encodedStr,\ os2.\mbox{\hyperlink{class_generic_string_buffer_a42079865bab1deb930c6cff7d491c719}{GetString}}()));}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00392}00392\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00393}00393\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00394}00394\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00395}00395\ \}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00396}00396\ }
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00397}\mbox{\hyperlink{encodingstest_8cpp_a2aaab2285fe0a34a726ff5ca9aa42600}{00397}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(EncodingsTest,\ \mbox{\hyperlink{struct_u_t_f32}{UTF32}})\ \{}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00398}00398\ \ \ \ \ \mbox{\hyperlink{class_generic_string_buffer}{GenericStringBuffer<UTF32<>}}\ >\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ os2;}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00399}00399\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}*\ range\ =\ kCodepointRanges;\ *range\ !=\ 0xFFFFFFFF;\ range\ +=\ 2)\ \{}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00400}00400\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{unsigned}\ codepoint\ =\ range[0];\ codepoint\ <=\ range[1];\ ++codepoint)\ \{}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00401}00401\ \ \ \ \ \ \ \ \ \ \ \ \ os.Clear();}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00402}00402\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_u_t_f32_a511d1b09672ce535085895a28d8c2f13}{UTF32<>::Encode}}(os,\ codepoint);}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00403}00403\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_u_t_f32_aa215989d027f01f256174c5f91332997}{UTF32<>::Ch}}*\ encodedStr\ =\ os.GetString();}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00404}00404\ }
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00405}00405\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Decode}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00406}00406\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00407}00407\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_generic_string_stream}{GenericStringStream<UTF32<>}}\ >\ is(encodedStr);}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00408}00408\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ decodedCodepoint;}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00409}00409\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ result\ =\ \mbox{\hyperlink{struct_u_t_f32_a6e7258a5e982e101345dffdc355e9b53}{UTF32<>::Decode}}(is,\ \&decodedCodepoint);}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00410}00410\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(result);}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00411}00411\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(codepoint,\ decodedCodepoint);\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00412}00412\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!result\ ||\ codepoint\ !=\ decodedCodepoint)}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00413}00413\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ std::hex\ <<\ codepoint\ <<\ \textcolor{stringliteral}{"{}\ "{}}\ <<\ decodedCodepoint\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00414}00414\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00415}00415\ }
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00416}00416\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Validate}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00417}00417\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00418}00418\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_generic_string_stream}{GenericStringStream<UTF32<>}}\ >\ is(encodedStr);}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00419}00419\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os2.\mbox{\hyperlink{class_generic_string_buffer_a42f15c959046d899cb74c3120a6995f9}{Clear}}();}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00420}00420\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ result\ =\ \mbox{\hyperlink{struct_u_t_f32_a71336fb0546b3079e01bbd51d2fa2e45}{UTF32<>::Validate}}(is,\ os2);}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00421}00421\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(result);}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00422}00422\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0,\ \mbox{\hyperlink{unittest_8h_a8d8e3cf93e9b811c207711d0b353de02}{StrCmp}}(encodedStr,\ os2.\mbox{\hyperlink{class_generic_string_buffer_a42079865bab1deb930c6cff7d491c719}{GetString}}()));}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00423}00423\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00424}00424\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00425}00425\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00426}00426\ \}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00427}00427\ }
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00428}\mbox{\hyperlink{encodingstest_8cpp_aba4e61249b906ecfde5b0fa10ca475d1}{00428}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(EncodingsTest,\ \mbox{\hyperlink{struct_a_s_c_i_i}{ASCII}})\ \{}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00429}00429\ \ \ \ \ \mbox{\hyperlink{class_generic_string_buffer}{StringBuffer}}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ os2;}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00430}00430\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{unsigned}\ codepoint\ =\ 0;\ codepoint\ <\ 128;\ codepoint++)\ \{}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00431}00431\ \ \ \ \ \ \ \ \ os.Clear();}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00432}00432\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_a_s_c_i_i_af56b1605fe233c54693facc7de457f72}{ASCII<>::Encode}}(os,\ codepoint);}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00433}00433\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_a_s_c_i_i_a55aad132d2a556a25f6c02e4f9b372de}{ASCII<>::Ch}}*\ encodedStr\ =\ os.GetString();}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00434}00434\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00435}00435\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_generic_string_stream}{StringStream}}\ is(encodedStr);}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00436}00436\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ decodedCodepoint;}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00437}00437\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ result\ =\ \mbox{\hyperlink{struct_a_s_c_i_i_a44844bbfd0a4fc282993fd72f3f58eee}{ASCII<>::Decode}}(is,\ \&decodedCodepoint);}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00438}00438\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!result\ ||\ codepoint\ !=\ decodedCodepoint)}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00439}00439\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ std::hex\ <<\ codepoint\ <<\ \textcolor{stringliteral}{"{}\ "{}}\ <<\ decodedCodepoint\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00440}00440\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00441}00441\ }
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00442}00442\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Validate}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00443}00443\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00444}00444\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_generic_string_stream}{StringStream}}\ is(encodedStr);}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00445}00445\ \ \ \ \ \ \ \ \ \ \ \ \ os2.\mbox{\hyperlink{class_generic_string_buffer_a42f15c959046d899cb74c3120a6995f9}{Clear}}();}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00446}00446\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ result\ =\ \mbox{\hyperlink{struct_a_s_c_i_i_a398680588a09e6ce9b56e32195047c78}{ASCII<>::Validate}}(is,\ os2);}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00447}00447\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(result);}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00448}00448\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0,\ \mbox{\hyperlink{unittest_8h_a8d8e3cf93e9b811c207711d0b353de02}{StrCmp}}(encodedStr,\ os2.\mbox{\hyperlink{class_generic_string_buffer_a42079865bab1deb930c6cff7d491c719}{GetString}}()));}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00449}00449\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00450}00450\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodingstest_8cpp_source_l00451}00451\ \}}
+
+\end{DoxyCode}

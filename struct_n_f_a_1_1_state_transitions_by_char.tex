@@ -1,0 +1,190 @@
+\doxysection{NFA\+::State\+Transitions\+By\+Char Struct Reference}
+\hypertarget{struct_n_f_a_1_1_state_transitions_by_char}{}\label{struct_n_f_a_1_1_state_transitions_by_char}\index{NFA::StateTransitionsByChar@{NFA::StateTransitionsByChar}}
+
+
+Collaboration diagram for NFA\+::State\+Transitions\+By\+Char\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=227pt]{struct_n_f_a_1_1_state_transitions_by_char__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_n_f_a_1_1_state_transitions_by_char_a5e2471b28cb7fa808d855624843d07ad}{State\+Transitions\+By\+Char}} (\mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} inC, \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} in\+Num\+States)
+\item 
+\mbox{\hyperlink{struct_n_f_a_1_1_state_transitions_by_char_aac2fd10f175c019a59a0743a0d4aae93}{State\+Transitions\+By\+Char}} (\mbox{\hyperlink{struct_n_f_a_1_1_state_transitions_by_char}{State\+Transitions\+By\+Char}} \&\&in\+Move)
+\item 
+\mbox{\hyperlink{struct_n_f_a_1_1_state_transitions_by_char_a8cd2cf0b7f84ce154c2a08a7fa7cbe0c}{\texorpdfstring{$\sim$}{\string~}\+State\+Transitions\+By\+Char}} ()
+\item 
+void \mbox{\hyperlink{struct_n_f_a_1_1_state_transitions_by_char_a776d72f9dcdac041454bf41ef82f7ff5}{operator=}} (\mbox{\hyperlink{struct_n_f_a_1_1_state_transitions_by_char}{State\+Transitions\+By\+Char}} \&\&in\+Move)
+\item 
+bool \mbox{\hyperlink{struct_n_f_a_1_1_state_transitions_by_char_ab59ef8fe522fc9e59396c77cfec5e49d}{operator$<$}} (const \mbox{\hyperlink{struct_n_f_a_1_1_state_transitions_by_char}{State\+Transitions\+By\+Char}} \&right) const
+\item 
+bool \mbox{\hyperlink{struct_n_f_a_1_1_state_transitions_by_char_afeec485243cd457792e33e2259d7178a}{operator!=}} (const \mbox{\hyperlink{struct_n_f_a_1_1_state_transitions_by_char}{State\+Transitions\+By\+Char}} \&right) const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} \mbox{\hyperlink{struct_n_f_a_1_1_state_transitions_by_char_a6d6a713162e6bf59ac1b0cb22acb481a}{c}}
+\item 
+\mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{State\+Index}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{struct_n_f_a_1_1_state_transitions_by_char_a2ddc6fa25470d3c4f0c8d39a626cddec}{next\+State\+By\+Initial\+State}}
+\item 
+\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} \mbox{\hyperlink{struct_n_f_a_1_1_state_transitions_by_char_ab5fce543678c9aa3396afcd56a5df096}{num\+States}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{_n_f_a_8cpp_source_l00286}{286}} of file \mbox{\hyperlink{_n_f_a_8cpp_source}{NFA.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{struct_n_f_a_1_1_state_transitions_by_char_a5e2471b28cb7fa808d855624843d07ad}\index{NFA::StateTransitionsByChar@{NFA::StateTransitionsByChar}!StateTransitionsByChar@{StateTransitionsByChar}}
+\index{StateTransitionsByChar@{StateTransitionsByChar}!NFA::StateTransitionsByChar@{NFA::StateTransitionsByChar}}
+\doxysubsubsection{\texorpdfstring{StateTransitionsByChar()}{StateTransitionsByChar()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{struct_n_f_a_1_1_state_transitions_by_char_a5e2471b28cb7fa808d855624843d07ad} 
+NFA\+::\+State\+Transitions\+By\+Char\+::\+State\+Transitions\+By\+Char (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}}]{inC}{, }\item[{\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}}]{in\+Num\+States}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_n_f_a_8cpp_source_l00291}{291}} of file \mbox{\hyperlink{_n_f_a_8cpp_source}{NFA.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00291\ :\ \mbox{\hyperlink{struct_n_f_a_1_1_state_transitions_by_char_a6d6a713162e6bf59ac1b0cb22acb481a}{c}}(inC),\ \mbox{\hyperlink{struct_n_f_a_1_1_state_transitions_by_char_a2ddc6fa25470d3c4f0c8d39a626cddec}{nextStateByInitialState}}(\textcolor{keyword}{nullptr}),\ \mbox{\hyperlink{struct_n_f_a_1_1_state_transitions_by_char_ab5fce543678c9aa3396afcd56a5df096}{numStates}}(inNumStates)\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{struct_n_f_a_1_1_state_transitions_by_char_aac2fd10f175c019a59a0743a0d4aae93}\index{NFA::StateTransitionsByChar@{NFA::StateTransitionsByChar}!StateTransitionsByChar@{StateTransitionsByChar}}
+\index{StateTransitionsByChar@{StateTransitionsByChar}!NFA::StateTransitionsByChar@{NFA::StateTransitionsByChar}}
+\doxysubsubsection{\texorpdfstring{StateTransitionsByChar()}{StateTransitionsByChar()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{struct_n_f_a_1_1_state_transitions_by_char_aac2fd10f175c019a59a0743a0d4aae93} 
+NFA\+::\+State\+Transitions\+By\+Char\+::\+State\+Transitions\+By\+Char (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_n_f_a_1_1_state_transitions_by_char}{State\+Transitions\+By\+Char}} \&\&}]{in\+Move}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_n_f_a_8cpp_source_l00292}{292}} of file \mbox{\hyperlink{_n_f_a_8cpp_source}{NFA.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00293\ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{struct_n_f_a_1_1_state_transitions_by_char_a6d6a713162e6bf59ac1b0cb22acb481a}{c}}(inMove.c),\ \mbox{\hyperlink{struct_n_f_a_1_1_state_transitions_by_char_a2ddc6fa25470d3c4f0c8d39a626cddec}{nextStateByInitialState}}(inMove.nextStateByInitialState),\ \mbox{\hyperlink{struct_n_f_a_1_1_state_transitions_by_char_ab5fce543678c9aa3396afcd56a5df096}{numStates}}(inMove.numStates)}
+\DoxyCodeLine{00294\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00295\ \ \ \ \ \ \ \ \ \ \ \ \ inMove.nextStateByInitialState\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00296\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_n_f_a_1_1_state_transitions_by_char_a8cd2cf0b7f84ce154c2a08a7fa7cbe0c}\index{NFA::StateTransitionsByChar@{NFA::StateTransitionsByChar}!````~StateTransitionsByChar@{\texorpdfstring{$\sim$}{\string~}StateTransitionsByChar}}
+\index{````~StateTransitionsByChar@{\texorpdfstring{$\sim$}{\string~}StateTransitionsByChar}!NFA::StateTransitionsByChar@{NFA::StateTransitionsByChar}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}StateTransitionsByChar()}{\string~StateTransitionsByChar()}}
+{\footnotesize\ttfamily \label{struct_n_f_a_1_1_state_transitions_by_char_a8cd2cf0b7f84ce154c2a08a7fa7cbe0c} 
+NFA\+::\+State\+Transitions\+By\+Char\+::\texorpdfstring{$\sim$}{\string~}\+State\+Transitions\+By\+Char (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_n_f_a_8cpp_source_l00297}{297}} of file \mbox{\hyperlink{_n_f_a_8cpp_source}{NFA.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00297\ \{\ \textcolor{keywordflow}{if}(\mbox{\hyperlink{struct_n_f_a_1_1_state_transitions_by_char_a2ddc6fa25470d3c4f0c8d39a626cddec}{nextStateByInitialState}})\ \{\ \textcolor{keyword}{delete}\ []\ \mbox{\hyperlink{struct_n_f_a_1_1_state_transitions_by_char_a2ddc6fa25470d3c4f0c8d39a626cddec}{nextStateByInitialState}};\ \}\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_n_f_a_1_1_state_transitions_by_char_afeec485243cd457792e33e2259d7178a}\index{NFA::StateTransitionsByChar@{NFA::StateTransitionsByChar}!operator"!=@{operator"!=}}
+\index{operator"!=@{operator"!=}!NFA::StateTransitionsByChar@{NFA::StateTransitionsByChar}}
+\doxysubsubsection{\texorpdfstring{operator"!=()}{operator!=()}}
+{\footnotesize\ttfamily \label{struct_n_f_a_1_1_state_transitions_by_char_afeec485243cd457792e33e2259d7178a} 
+bool NFA\+::\+State\+Transitions\+By\+Char\+::operator!= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct_n_f_a_1_1_state_transitions_by_char}{State\+Transitions\+By\+Char}} \&}]{right}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_n_f_a_8cpp_source_l00312}{312}} of file \mbox{\hyperlink{_n_f_a_8cpp_source}{NFA.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00313\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00314\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_errors_8h_a03bec6af3af0dd492e348b40cbe40a46}{WAVM\_ASSERT\_THROW}}(\mbox{\hyperlink{struct_n_f_a_1_1_state_transitions_by_char_ab5fce543678c9aa3396afcd56a5df096}{numStates}}\ ==\ right.numStates);}
+\DoxyCodeLine{00315\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ memcmp(\mbox{\hyperlink{struct_n_f_a_1_1_state_transitions_by_char_a2ddc6fa25470d3c4f0c8d39a626cddec}{nextStateByInitialState}},right.nextStateByInitialState,\textcolor{keyword}{sizeof}(\mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{StateIndex}})*\mbox{\hyperlink{struct_n_f_a_1_1_state_transitions_by_char_ab5fce543678c9aa3396afcd56a5df096}{numStates}})\ !=\ 0;}
+\DoxyCodeLine{00316\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_n_f_a_1_1_state_transitions_by_char_ab59ef8fe522fc9e59396c77cfec5e49d}\index{NFA::StateTransitionsByChar@{NFA::StateTransitionsByChar}!operator$<$@{operator$<$}}
+\index{operator$<$@{operator$<$}!NFA::StateTransitionsByChar@{NFA::StateTransitionsByChar}}
+\doxysubsubsection{\texorpdfstring{operator$<$()}{operator<()}}
+{\footnotesize\ttfamily \label{struct_n_f_a_1_1_state_transitions_by_char_ab59ef8fe522fc9e59396c77cfec5e49d} 
+bool NFA\+::\+State\+Transitions\+By\+Char\+::operator$<$ (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct_n_f_a_1_1_state_transitions_by_char}{State\+Transitions\+By\+Char}} \&}]{right}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_n_f_a_8cpp_source_l00307}{307}} of file \mbox{\hyperlink{_n_f_a_8cpp_source}{NFA.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00308\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00309\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_errors_8h_a03bec6af3af0dd492e348b40cbe40a46}{WAVM\_ASSERT\_THROW}}(\mbox{\hyperlink{struct_n_f_a_1_1_state_transitions_by_char_ab5fce543678c9aa3396afcd56a5df096}{numStates}}\ ==\ right.numStates);}
+\DoxyCodeLine{00310\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ memcmp(\mbox{\hyperlink{struct_n_f_a_1_1_state_transitions_by_char_a2ddc6fa25470d3c4f0c8d39a626cddec}{nextStateByInitialState}},right.nextStateByInitialState,\textcolor{keyword}{sizeof}(\mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{StateIndex}})*\mbox{\hyperlink{struct_n_f_a_1_1_state_transitions_by_char_ab5fce543678c9aa3396afcd56a5df096}{numStates}})\ <\ 0;}
+\DoxyCodeLine{00311\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_n_f_a_1_1_state_transitions_by_char_a776d72f9dcdac041454bf41ef82f7ff5}\index{NFA::StateTransitionsByChar@{NFA::StateTransitionsByChar}!operator=@{operator=}}
+\index{operator=@{operator=}!NFA::StateTransitionsByChar@{NFA::StateTransitionsByChar}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}}
+{\footnotesize\ttfamily \label{struct_n_f_a_1_1_state_transitions_by_char_a776d72f9dcdac041454bf41ef82f7ff5} 
+void NFA\+::\+State\+Transitions\+By\+Char\+::operator= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_n_f_a_1_1_state_transitions_by_char}{State\+Transitions\+By\+Char}} \&\&}]{in\+Move}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_n_f_a_8cpp_source_l00299}{299}} of file \mbox{\hyperlink{_n_f_a_8cpp_source}{NFA.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00300\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00301\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_n_f_a_1_1_state_transitions_by_char_a6d6a713162e6bf59ac1b0cb22acb481a}{c}}\ =\ inMove.c;}
+\DoxyCodeLine{00302\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_n_f_a_1_1_state_transitions_by_char_a2ddc6fa25470d3c4f0c8d39a626cddec}{nextStateByInitialState}}\ =\ inMove.nextStateByInitialState;}
+\DoxyCodeLine{00303\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_n_f_a_1_1_state_transitions_by_char_ab5fce543678c9aa3396afcd56a5df096}{numStates}}\ =\ inMove.numStates;}
+\DoxyCodeLine{00304\ \ \ \ \ \ \ \ \ \ \ \ \ inMove.nextStateByInitialState\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00305\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_n_f_a_1_1_state_transitions_by_char_a6d6a713162e6bf59ac1b0cb22acb481a}\index{NFA::StateTransitionsByChar@{NFA::StateTransitionsByChar}!c@{c}}
+\index{c@{c}!NFA::StateTransitionsByChar@{NFA::StateTransitionsByChar}}
+\doxysubsubsection{\texorpdfstring{c}{c}}
+{\footnotesize\ttfamily \label{struct_n_f_a_1_1_state_transitions_by_char_a6d6a713162e6bf59ac1b0cb22acb481a} 
+\mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} NFA\+::\+State\+Transitions\+By\+Char\+::c}
+
+
+
+Definition at line \mbox{\hyperlink{_n_f_a_8cpp_source_l00288}{288}} of file \mbox{\hyperlink{_n_f_a_8cpp_source}{NFA.\+cpp}}.
+
+\Hypertarget{struct_n_f_a_1_1_state_transitions_by_char_a2ddc6fa25470d3c4f0c8d39a626cddec}\index{NFA::StateTransitionsByChar@{NFA::StateTransitionsByChar}!nextStateByInitialState@{nextStateByInitialState}}
+\index{nextStateByInitialState@{nextStateByInitialState}!NFA::StateTransitionsByChar@{NFA::StateTransitionsByChar}}
+\doxysubsubsection{\texorpdfstring{nextStateByInitialState}{nextStateByInitialState}}
+{\footnotesize\ttfamily \label{struct_n_f_a_1_1_state_transitions_by_char_a2ddc6fa25470d3c4f0c8d39a626cddec} 
+\mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{State\+Index}}\texorpdfstring{$\ast$}{*} NFA\+::\+State\+Transitions\+By\+Char\+::next\+State\+By\+Initial\+State}
+
+
+
+Definition at line \mbox{\hyperlink{_n_f_a_8cpp_source_l00289}{289}} of file \mbox{\hyperlink{_n_f_a_8cpp_source}{NFA.\+cpp}}.
+
+\Hypertarget{struct_n_f_a_1_1_state_transitions_by_char_ab5fce543678c9aa3396afcd56a5df096}\index{NFA::StateTransitionsByChar@{NFA::StateTransitionsByChar}!numStates@{numStates}}
+\index{numStates@{numStates}!NFA::StateTransitionsByChar@{NFA::StateTransitionsByChar}}
+\doxysubsubsection{\texorpdfstring{numStates}{numStates}}
+{\footnotesize\ttfamily \label{struct_n_f_a_1_1_state_transitions_by_char_ab5fce543678c9aa3396afcd56a5df096} 
+\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} NFA\+::\+State\+Transitions\+By\+Char\+::num\+States}
+
+
+
+Definition at line \mbox{\hyperlink{_n_f_a_8cpp_source_l00290}{290}} of file \mbox{\hyperlink{_n_f_a_8cpp_source}{NFA.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/wasm-\/jit/\+Source/\+WAST/\mbox{\hyperlink{_n_f_a_8cpp}{NFA.\+cpp}}\end{DoxyCompactItemize}

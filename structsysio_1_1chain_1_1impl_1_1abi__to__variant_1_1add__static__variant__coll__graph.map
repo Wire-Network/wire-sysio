@@ -1,0 +1,11 @@
+<map id="sysio::chain::impl::abi_to_variant::add_static_variant&lt; Resolver &gt;" name="sysio::chain::impl::abi_to_variant::add_static_variant&lt; Resolver &gt;">
+<area shape="rect" id="Node000001" title=" " alt="" coords="22,213,204,268"/>
+<area shape="rect" id="Node000002" href="$classfc_1_1mutable__variant__object.html" title="An order&#45;preserving dictionary of variants." alt="" coords="5,109,138,150"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="87,163,105,211,100,213,82,165"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1chain_1_1impl_1_1abi__traverse__context.html" title=" " alt="" coords="162,109,312,150"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="205,162,145,214,142,210,201,158"/>
+<area shape="rect" id="Node000004" href="$classfc_1_1optional__delegate.html" title=" " alt="" coords="105,5,246,46"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="197,58,227,107,223,110,193,61"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="270,13,326,38"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="285,53,251,110,246,107,281,51"/>
+</map>

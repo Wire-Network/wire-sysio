@@ -1,0 +1,44 @@
+<map id="launcher_def" name="launcher_def">
+<area shape="rect" id="Node000001" title=" " alt="" coords="797,395,893,421"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="543,88,599,114"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="615,93,652,92,695,96,738,108,775,131,790,152,803,182,823,258,837,338,845,394,840,395,832,338,818,260,798,183,785,154,772,135,736,113,694,101,652,97,615,98"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,231,59,257"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="54,218,82,200,148,183,234,171,333,165,437,166,540,173,635,188,716,211,748,225,775,242,792,258,807,278,827,321,839,363,845,394,840,395,834,364,822,323,802,281,788,262,772,246,746,230,714,216,634,193,539,178,437,171,333,170,235,176,149,188,84,205,57,222"/>
+<area shape="rect" id="Node000004" href="$structtestnet__def.html" title=" " alt="" coords="528,236,614,262"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="72,223,82,220,117,217,153,220,314,223,475,233,528,240,527,245,475,239,314,228,153,225,117,223,83,225,73,228"/>
+<area shape="rect" id="Node000005" href="$structremote__deploy.html" title=" " alt="" coords="200,316,306,342"/>
+<area shape="poly" id="edge6_Node000005_Node000003" title=" " alt="" coords="60,264,84,280,143,303,200,318,199,323,141,308,81,285,57,269"/>
+<area shape="rect" id="Node000011" href="$structserver__identities.html" title=" " alt="" coords="513,395,629,421"/>
+<area shape="poly" id="edge15_Node000011_Node000003" title=" " alt="" coords="48,269,67,306,96,348,133,388,154,405,178,418,223,434,270,443,319,447,367,446,456,435,526,419,527,424,457,440,367,451,319,452,270,448,221,439,176,423,151,409,129,392,92,351,63,309,43,272"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="631,254,702,272,740,287,775,307,797,327,816,351,840,393,835,396,811,354,793,331,772,311,738,292,701,277,629,259"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="321,315,474,283,538,260,540,265,476,288,322,320"/>
+<area shape="poly" id="edge16_Node000011_Node000005" title=" " alt="" coords="322,343,517,392,516,397,321,349"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="181,252,325,292"/>
+<area shape="poly" id="edge7_Node000004_Node000006" title=" " alt="" coords="340,263,527,250,528,255,341,268"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="196,367,310,393"/>
+<area shape="poly" id="edge8_Node000001_Node000007" title=" " alt="" coords="307,359,352,344,416,337,481,337,545,341,608,348,719,370,802,392,801,397,718,375,607,354,545,346,481,342,416,343,354,349,309,364"/>
+<area shape="poly" id="edge14_Node000011_Node000007" title=" " alt="" coords="309,395,353,404,437,410,512,409,513,414,436,416,353,410,308,400"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="506,444,637,470"/>
+<area shape="poly" id="edge9_Node000001_Node000008" title=" " alt="" coords="652,446,773,426,800,419,801,424,774,431,652,451"/>
+<area shape="rect" id="Node000009" href="$structlast__run__def.html" title=" " alt="" coords="525,507,617,533"/>
+<area shape="poly" id="edge10_Node000001_Node000009" title=" " alt="" coords="632,509,701,492,772,465,804,443,830,419,833,423,808,447,775,469,703,497,633,514"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="177,547,329,573"/>
+<area shape="poly" id="edge11_Node000009_Node000010" title=" " alt="" coords="344,556,408,553,475,544,529,531,531,536,475,550,409,558,344,562"/>
+<area shape="poly" id="edge12_Node000001_Node000011" title=" " alt="" coords="644,405,797,405,797,411,644,411"/>
+<area shape="rect" id="Node000012" title=" " alt="" coords="181,482,325,523"/>
+<area shape="poly" id="edge13_Node000011_Node000012" title=" " alt="" coords="340,521,374,524,409,522,443,514,473,499,484,484,486,468,487,449,497,430,512,419,515,424,501,434,492,450,491,468,489,486,477,503,445,519,410,527,374,529,340,526"/>
+<area shape="rect" id="Node000013" href="$structproducer__set__def.html" title=" " alt="" coords="510,583,632,609"/>
+<area shape="poly" id="edge17_Node000001_Node000013" title=" " alt="" coords="646,579,711,557,743,541,772,521,795,497,813,469,837,420,841,423,818,472,799,500,775,525,745,545,713,562,648,584"/>
+<area shape="rect" id="Node000014" title=" " alt="" coords="177,596,329,622"/>
+<area shape="poly" id="edge18_Node000013_Node000014" title=" " alt="" coords="344,606,475,602,510,599,510,604,475,607,344,611"/>
+<area shape="rect" id="Node000015" href="$structsysio_1_1chain_1_1genesis__state.html" title=" " alt="" coords="499,696,643,736"/>
+<area shape="poly" id="edge19_Node000001_Node000015" title=" " alt="" coords="639,687,709,648,742,623,771,593,800,548,820,499,833,454,839,421,844,422,838,455,825,501,805,551,775,597,746,627,711,653,642,691"/>
+<area shape="rect" id="Node000016" href="$structsysio_1_1chain_1_1chain__config__v0.html" title="Producer&#45;voted blockchain configuration parameters." alt="" coords="188,696,318,736"/>
+<area shape="poly" id="edge20_Node000015_Node000016" title=" " alt="" coords="334,713,499,713,499,719,334,719"/>
+<area shape="rect" id="Node000017" href="$structsysio_1_1chain_1_1wasm__config.html" title=" " alt="" coords="186,761,320,802"/>
+<area shape="poly" id="edge21_Node000015_Node000017" title=" " alt="" coords="335,772,404,763,474,749,519,734,521,739,476,754,404,768,336,777"/>
+<area shape="rect" id="Node000018" href="$classfc_1_1time__point.html" title=" " alt="" coords="203,826,303,851"/>
+<area shape="poly" id="edge22_Node000015_Node000018" title=" " alt="" coords="318,831,395,817,435,805,474,790,515,764,548,735,552,739,518,768,476,795,437,810,396,822,319,836"/>
+<area shape="rect" id="Node000019" href="$classfc_1_1crypto_1_1public__key.html" title=" " alt="" coords="180,646,326,671"/>
+<area shape="poly" id="edge23_Node000015_Node000019" title=" " alt="" coords="342,670,475,693,499,698,498,703,475,699,341,675"/>
+</map>

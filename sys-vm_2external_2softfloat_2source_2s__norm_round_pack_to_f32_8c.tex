@@ -1,0 +1,63 @@
+\doxysection{libraries/sys-\/vm/external/softfloat/source/s\+\_\+norm\+Round\+Pack\+To\+F32.c File Reference}
+\hypertarget{sys-vm_2external_2softfloat_2source_2s__norm_round_pack_to_f32_8c}{}\label{sys-vm_2external_2softfloat_2source_2s__norm_round_pack_to_f32_8c}\index{libraries/sys-\/vm/external/softfloat/source/s\_normRoundPackToF32.c@{libraries/sys-\/vm/external/softfloat/source/s\_normRoundPackToF32.c}}
+{\ttfamily \#include $<$stdbool.\+h$>$}\newline
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include "{}platform.\+h"{}}\newline
+{\ttfamily \#include "{}internals.\+h"{}}\newline
+Include dependency graph for s\+\_\+norm\+Round\+Pack\+To\+F32.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sys-vm_2external_2softfloat_2source_2s__norm_round_pack_to_f32_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structfloat32__t}{float32\+\_\+t}} \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2s__norm_round_pack_to_f32_8c_a92a6551d621717aeaed84fcf032b121d}{softfloat\+\_\+norm\+Round\+Pack\+To\+F32}} (bool sign, \mbox{\hyperlink{stdint_8h_a9b7386d4af0e20ee32296d9a158c9f3a}{int\+\_\+fast16\+\_\+t}} exp, \mbox{\hyperlink{stdint_8h_a8f075c759c74e109e8184306c663809d}{uint\+\_\+fast32\+\_\+t}} sig)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{sys-vm_2external_2softfloat_2source_2s__norm_round_pack_to_f32_8c_a92a6551d621717aeaed84fcf032b121d}\index{s\_normRoundPackToF32.c@{s\_normRoundPackToF32.c}!softfloat\_normRoundPackToF32@{softfloat\_normRoundPackToF32}}
+\index{softfloat\_normRoundPackToF32@{softfloat\_normRoundPackToF32}!s\_normRoundPackToF32.c@{s\_normRoundPackToF32.c}}
+\doxysubsubsection{\texorpdfstring{softfloat\_normRoundPackToF32()}{softfloat\_normRoundPackToF32()}}
+{\footnotesize\ttfamily \label{sys-vm_2external_2softfloat_2source_2s__norm_round_pack_to_f32_8c_a92a6551d621717aeaed84fcf032b121d} 
+\mbox{\hyperlink{structfloat32__t}{float32\+\_\+t}} softfloat\+\_\+norm\+Round\+Pack\+To\+F32 (\begin{DoxyParamCaption}\item[{bool}]{sign}{, }\item[{\mbox{\hyperlink{stdint_8h_a9b7386d4af0e20ee32296d9a158c9f3a}{int\+\_\+fast16\+\_\+t}}}]{exp}{, }\item[{\mbox{\hyperlink{stdint_8h_a8f075c759c74e109e8184306c663809d}{uint\+\_\+fast32\+\_\+t}}}]{sig}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2s__norm_round_pack_to_f32_8c_source_l00043}{43}} of file \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2s__norm_round_pack_to_f32_8c_source}{s\+\_\+norm\+Round\+Pack\+To\+F32.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00044\ \{}
+\DoxyCodeLine{00045\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a880ed9ceb8621521452c81d03bd08cfb}{int\_fast8\_t}}\ shiftDist;}
+\DoxyCodeLine{00046\ \ \ \ \ \textcolor{keyword}{union\ }\mbox{\hyperlink{unionui32__f32}{ui32\_f32}}\ uZ;}
+\DoxyCodeLine{00047\ }
+\DoxyCodeLine{00048\ \ \ \ \ shiftDist\ =\ \mbox{\hyperlink{softfloat_2source_2s__count_leading_zeros32_8c_a20e06c2785548bfc8a5351e7e241e351}{softfloat\_countLeadingZeros32}}(\ sig\ )\ -\/\ 1;}
+\DoxyCodeLine{00049\ \ \ \ \ exp\ -\/=\ shiftDist;}
+\DoxyCodeLine{00050\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ (7\ <=\ shiftDist)\ \&\&\ ((\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int})\ exp\ <\ 0xFD)\ )\ \{}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ uZ.ui\ =\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_ae970520bfd736ba8bfe602326cffc6e1}{packToF32UI}}(\ sign,\ sig\ ?\ exp\ :\ 0,\ sig<<(shiftDist\ -\/\ 7)\ );}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ uZ.f;}
+\DoxyCodeLine{00053\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a61e681b8b00e2254aabeda081824b4b1}{softfloat\_roundPackToF32}}(\ sign,\ exp,\ sig<<shiftDist\ );}
+\DoxyCodeLine{00055\ \ \ \ \ \}}
+\DoxyCodeLine{00056\ }
+\DoxyCodeLine{00057\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sys-vm_2external_2softfloat_2source_2s__norm_round_pack_to_f32_8c_a92a6551d621717aeaed84fcf032b121d_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sys-vm_2external_2softfloat_2source_2s__norm_round_pack_to_f32_8c_a92a6551d621717aeaed84fcf032b121d_icgraph}
+\end{center}
+\end{figure}

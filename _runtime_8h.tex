@@ -1,0 +1,166 @@
+\doxysection{libraries/wasm-\/jit/\+Include/\+Runtime/\+Runtime.h File Reference}
+\hypertarget{_runtime_8h}{}\label{_runtime_8h}\index{libraries/wasm-\/jit/Include/Runtime/Runtime.h@{libraries/wasm-\/jit/Include/Runtime/Runtime.h}}
+{\ttfamily \#include "{}Inline/\+Basic\+Types.\+h"{}}\newline
+{\ttfamily \#include "{}Tagged\+Value.\+h"{}}\newline
+{\ttfamily \#include "{}IR/\+Types.\+h"{}}\newline
+Include dependency graph for Runtime.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{_runtime_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{_runtime_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_runtime_1_1_exception}{Runtime\+::\+Exception}}
+\item 
+struct \mbox{\hyperlink{struct_runtime_1_1_object_instance}{Runtime\+::\+Object\+Instance}}
+\item 
+struct \mbox{\hyperlink{struct_runtime_1_1_import_bindings}{Runtime\+::\+Import\+Bindings}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespace_i_r}{IR}}
+\item 
+namespace \mbox{\hyperlink{namespace_runtime}{Runtime}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{_runtime_8h_aae02bf1df7927dd0f69c6412fce40fc4}{RUNTIME\+\_\+\+API}}~\mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_a14d005bd653c82f4e705b4ded2a4fc07}{DLL\+\_\+\+IMPORT}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{_runtime_8h_aae02bf1df7927dd0f69c6412fce40fc4}{RUNTIME\+\_\+\+API}} void \mbox{\hyperlink{namespace_runtime_a0ebfdf511ffd17d799367faca1af3258}{Runtime\+::init}} ()
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_runtime_ae08ed9a8645988069f7c449048472b0d}{Runtime\+::describe\+Exception\+Cause}} (\mbox{\hyperlink{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59c}{Exception\+::\+Cause}} cause)
+\item 
+\mbox{\hyperlink{_runtime_8h_aae02bf1df7927dd0f69c6412fce40fc4}{RUNTIME\+\_\+\+API}} void \mbox{\hyperlink{namespace_runtime_accacf151834031172f1659b46317cd86}{Runtime\+::cause\+Exception}} (\mbox{\hyperlink{struct_runtime_1_1_exception_afc8ac3bfe94580f2f2e8a8c0945de59c}{Exception\+::\+Cause}} cause)
+\item 
+\mbox{\hyperlink{_runtime_8h_aae02bf1df7927dd0f69c6412fce40fc4}{RUNTIME\+\_\+\+API}} bool \mbox{\hyperlink{namespace_runtime_a6235ca7597f3333aa3932daeca2e4746}{Runtime\+::isA}} (\mbox{\hyperlink{struct_runtime_1_1_object_instance}{Object\+Instance}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}, const \mbox{\hyperlink{struct_i_r_1_1_object_type}{IR\+::\+Object\+Type}} \&type)
+\item 
+\mbox{\hyperlink{struct_runtime_1_1_function_instance}{Function\+Instance}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_runtime_a11201ffdc21c10931405eccf4318cd08}{Runtime\+::as\+Function}} (\mbox{\hyperlink{struct_runtime_1_1_object_instance}{Object\+Instance}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}})
+\item 
+\mbox{\hyperlink{struct_runtime_1_1_table_instance}{Table\+Instance}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_runtime_aa13468c3f88bf92243a8c6666df4b83f}{Runtime\+::as\+Table}} (\mbox{\hyperlink{struct_runtime_1_1_object_instance}{Object\+Instance}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}})
+\item 
+\mbox{\hyperlink{struct_runtime_1_1_memory_instance}{Memory\+Instance}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_runtime_a244568c4f3db3c64f6be8b4704fb3ae5}{Runtime\+::as\+Memory}} (\mbox{\hyperlink{struct_runtime_1_1_object_instance}{Object\+Instance}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}})
+\item 
+\mbox{\hyperlink{struct_runtime_1_1_global_instance}{Global\+Instance}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_runtime_a140aaa1b152c62be80b1695ee926db78}{Runtime\+::as\+Global}} (\mbox{\hyperlink{struct_runtime_1_1_object_instance}{Object\+Instance}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}})
+\item 
+\mbox{\hyperlink{struct_runtime_1_1_module_instance}{Module\+Instance}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_runtime_a8ea2f0a1be4f5cd3ecf15be8beac2d88}{Runtime\+::as\+Module}} (\mbox{\hyperlink{struct_runtime_1_1_object_instance}{Object\+Instance}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}})
+\item 
+{\footnotesize template$<$typename Instance $>$ }\\Instance \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_runtime_a02749f1ef9c9428a82e5edc11817fcb8}{Runtime\+::as}} (\mbox{\hyperlink{struct_runtime_1_1_object_instance}{Object\+Instance}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}})
+\item 
+template$<$$>$ \mbox{\hyperlink{struct_runtime_1_1_function_instance}{Function\+Instance}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_runtime_a9268b30636f211eb8449abb6527c267e}{Runtime\+::as$<$ Function\+Instance $>$}} (\mbox{\hyperlink{struct_runtime_1_1_object_instance}{Object\+Instance}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}})
+\item 
+template$<$$>$ \mbox{\hyperlink{struct_runtime_1_1_table_instance}{Table\+Instance}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_runtime_aa14099c4477d006f3f556d4c4720331c}{Runtime\+::as$<$ Table\+Instance $>$}} (\mbox{\hyperlink{struct_runtime_1_1_object_instance}{Object\+Instance}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}})
+\item 
+template$<$$>$ \mbox{\hyperlink{struct_runtime_1_1_memory_instance}{Memory\+Instance}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_runtime_aa72957b433602d277008951cb8faaa7b}{Runtime\+::as$<$ Memory\+Instance $>$}} (\mbox{\hyperlink{struct_runtime_1_1_object_instance}{Object\+Instance}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}})
+\item 
+template$<$$>$ \mbox{\hyperlink{struct_runtime_1_1_global_instance}{Global\+Instance}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_runtime_a984dbd99279264243deb56dfd73e0b38}{Runtime\+::as$<$ Global\+Instance $>$}} (\mbox{\hyperlink{struct_runtime_1_1_object_instance}{Object\+Instance}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}})
+\item 
+template$<$$>$ \mbox{\hyperlink{struct_runtime_1_1_module_instance}{Module\+Instance}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_runtime_a3119cf9cd0c75fb7f5e43f4fb57afcf3}{Runtime\+::as$<$ Module\+Instance $>$}} (\mbox{\hyperlink{struct_runtime_1_1_object_instance}{Object\+Instance}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}})
+\item 
+\mbox{\hyperlink{struct_runtime_1_1_object_instance}{Object\+Instance}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_runtime_aa22344f824983bc34dfd267a98fca84b}{Runtime\+::as\+Object}} (\mbox{\hyperlink{struct_runtime_1_1_function_instance}{Function\+Instance}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908ac1c425268e68385d1ab5074c17a94f14}{function}})
+\item 
+\mbox{\hyperlink{struct_runtime_1_1_object_instance}{Object\+Instance}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_runtime_a848604fb3c3aa8c3fb193185314d9da2}{Runtime\+::as\+Object}} (\mbox{\hyperlink{struct_runtime_1_1_table_instance}{Table\+Instance}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908aaab9e1de16f38176f86d7a92ba337a8d}{table}})
+\item 
+\mbox{\hyperlink{struct_runtime_1_1_object_instance}{Object\+Instance}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_runtime_a8caa3f600412b2c9d269fb555f8e774a}{Runtime\+::as\+Object}} (\mbox{\hyperlink{struct_runtime_1_1_memory_instance}{Memory\+Instance}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908acd69b4957f06cd818d7bf3d61980e291}{memory}})
+\item 
+\mbox{\hyperlink{struct_runtime_1_1_object_instance}{Object\+Instance}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_runtime_aa7ffa38f0709f6ae3f4db149c303b70b}{Runtime\+::as\+Object}} (\mbox{\hyperlink{struct_runtime_1_1_global_instance}{Global\+Instance}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a9c70933aff6b2a6d08c687a6cbb6b765}{global}})
+\item 
+\mbox{\hyperlink{struct_runtime_1_1_object_instance}{Object\+Instance}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_runtime_ada78d14e3b2d63baf2c664d0b6ba6ab5}{Runtime\+::as\+Object}} (\mbox{\hyperlink{struct_runtime_1_1_module_instance}{Module\+Instance}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}})
+\item 
+\mbox{\hyperlink{struct_runtime_1_1_function_instance}{Function\+Instance}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_runtime_a80e13af5176b0870076233d9d7314691}{Runtime\+::as\+Function\+Nullable}} (\mbox{\hyperlink{struct_runtime_1_1_object_instance}{Object\+Instance}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}})
+\item 
+\mbox{\hyperlink{struct_runtime_1_1_table_instance}{Table\+Instance}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_runtime_a340be809fddab4a0b78a968e1ef25522}{Runtime\+::as\+Table\+Nullable}} (\mbox{\hyperlink{struct_runtime_1_1_object_instance}{Object\+Instance}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}})
+\item 
+\mbox{\hyperlink{struct_runtime_1_1_memory_instance}{Memory\+Instance}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_runtime_acd081f0a0cb1c6fe5b369605b177517c}{Runtime\+::as\+Memory\+Nullable}} (\mbox{\hyperlink{struct_runtime_1_1_object_instance}{Object\+Instance}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}})
+\item 
+\mbox{\hyperlink{struct_runtime_1_1_global_instance}{Global\+Instance}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_runtime_a1c0d45744b6faa5f9d25d369d98d5dbc}{Runtime\+::as\+Global\+Nullable}} (\mbox{\hyperlink{struct_runtime_1_1_object_instance}{Object\+Instance}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}})
+\item 
+\mbox{\hyperlink{struct_runtime_1_1_module_instance}{Module\+Instance}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_runtime_a7902dcc7bedbe98a3a87cd12ef3f20fd}{Runtime\+::as\+Module\+Nullable}} (\mbox{\hyperlink{struct_runtime_1_1_object_instance}{Object\+Instance}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}})
+\item 
+\mbox{\hyperlink{_runtime_8h_aae02bf1df7927dd0f69c6412fce40fc4}{RUNTIME\+\_\+\+API}} void \mbox{\hyperlink{namespace_runtime_a99e85ba1e74372d2f08a062072d4db26}{Runtime\+::free\+Unreferenced\+Objects}} (std\+::vector$<$ \mbox{\hyperlink{struct_runtime_1_1_object_instance}{Object\+Instance}} \texorpdfstring{$\ast$}{*} $>$ \&\&root\+Object\+References)
+\item 
+\mbox{\hyperlink{_runtime_8h_aae02bf1df7927dd0f69c6412fce40fc4}{RUNTIME\+\_\+\+API}} \mbox{\hyperlink{struct_runtime_1_1_result}{Result}} \mbox{\hyperlink{namespace_runtime_a4c0fd89cd874083ebb4abce86826f870}{Runtime\+::invoke\+Function}} (\mbox{\hyperlink{struct_runtime_1_1_function_instance}{Function\+Instance}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908ac1c425268e68385d1ab5074c17a94f14}{function}}, const std\+::vector$<$ \mbox{\hyperlink{struct_runtime_1_1_value}{Value}} $>$ \&parameters)
+\item 
+\mbox{\hyperlink{_runtime_8h_aae02bf1df7927dd0f69c6412fce40fc4}{RUNTIME\+\_\+\+API}} const \mbox{\hyperlink{struct_i_r_1_1_function_type}{IR\+::\+Function\+Type}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_runtime_a197d000f4edc547fd059d713016c35c1}{Runtime\+::get\+Function\+Type}} (\mbox{\hyperlink{struct_runtime_1_1_function_instance}{Function\+Instance}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908ac1c425268e68385d1ab5074c17a94f14}{function}})
+\item 
+\mbox{\hyperlink{_runtime_8h_aae02bf1df7927dd0f69c6412fce40fc4}{RUNTIME\+\_\+\+API}} \mbox{\hyperlink{struct_runtime_1_1_table_instance}{Table\+Instance}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_runtime_a168b93bcccb362814980e69def2d4e79}{Runtime\+::create\+Table}} (\mbox{\hyperlink{struct_i_r_1_1_table_type}{IR\+::\+Table\+Type}} type)
+\item 
+\mbox{\hyperlink{_runtime_8h_aae02bf1df7927dd0f69c6412fce40fc4}{RUNTIME\+\_\+\+API}} \mbox{\hyperlink{struct_runtime_1_1_object_instance}{Object\+Instance}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_runtime_a765a60566376ae10006ad322073d5211}{Runtime\+::get\+Table\+Element}} (\mbox{\hyperlink{struct_runtime_1_1_table_instance}{Table\+Instance}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908aaab9e1de16f38176f86d7a92ba337a8d}{table}}, \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} index)
+\item 
+\mbox{\hyperlink{_runtime_8h_aae02bf1df7927dd0f69c6412fce40fc4}{RUNTIME\+\_\+\+API}} \mbox{\hyperlink{struct_runtime_1_1_object_instance}{Object\+Instance}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_runtime_a8c0c757d6d51a907319cc2e8601b2a4f}{Runtime\+::set\+Table\+Element}} (\mbox{\hyperlink{struct_runtime_1_1_table_instance}{Table\+Instance}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908aaab9e1de16f38176f86d7a92ba337a8d}{table}}, \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} index, \mbox{\hyperlink{struct_runtime_1_1_object_instance}{Object\+Instance}} \texorpdfstring{$\ast$}{*}new\+Value)
+\item 
+\mbox{\hyperlink{_runtime_8h_aae02bf1df7927dd0f69c6412fce40fc4}{RUNTIME\+\_\+\+API}} \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} \mbox{\hyperlink{namespace_runtime_a53d68458bd2268c1c28d8a854035a475}{Runtime\+::get\+Table\+Num\+Elements}} (\mbox{\hyperlink{struct_runtime_1_1_table_instance}{Table\+Instance}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908aaab9e1de16f38176f86d7a92ba337a8d}{table}})
+\item 
+\mbox{\hyperlink{_runtime_8h_aae02bf1df7927dd0f69c6412fce40fc4}{RUNTIME\+\_\+\+API}} \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} \mbox{\hyperlink{namespace_runtime_a66bc995248a968bfd86c8fe4644e0e73}{Runtime\+::get\+Table\+Max\+Elements}} (\mbox{\hyperlink{struct_runtime_1_1_table_instance}{Table\+Instance}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908aaab9e1de16f38176f86d7a92ba337a8d}{table}})
+\item 
+\mbox{\hyperlink{_runtime_8h_aae02bf1df7927dd0f69c6412fce40fc4}{RUNTIME\+\_\+\+API}} \mbox{\hyperlink{_basic_types_8h_aadfe637f5e04b575f76f744f6fdd7e27}{Iptr}} \mbox{\hyperlink{namespace_runtime_a1a7f6656bef610d73dd65917d5d9267f}{Runtime\+::grow\+Table}} (\mbox{\hyperlink{struct_runtime_1_1_table_instance}{Table\+Instance}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908aaab9e1de16f38176f86d7a92ba337a8d}{table}}, \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} num\+Elements)
+\item 
+\mbox{\hyperlink{_runtime_8h_aae02bf1df7927dd0f69c6412fce40fc4}{RUNTIME\+\_\+\+API}} \mbox{\hyperlink{_basic_types_8h_aadfe637f5e04b575f76f744f6fdd7e27}{Iptr}} \mbox{\hyperlink{namespace_runtime_a847afa400040248d5bc010c5a1de7a66}{Runtime\+::shrink\+Table}} (\mbox{\hyperlink{struct_runtime_1_1_table_instance}{Table\+Instance}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908aaab9e1de16f38176f86d7a92ba337a8d}{table}}, \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} num\+Elements)
+\item 
+\mbox{\hyperlink{_runtime_8h_aae02bf1df7927dd0f69c6412fce40fc4}{RUNTIME\+\_\+\+API}} \mbox{\hyperlink{struct_runtime_1_1_memory_instance}{Memory\+Instance}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_runtime_a68d144ed82e1b19bf300a0df84de9fa5}{Runtime\+::create\+Memory}} (\mbox{\hyperlink{struct_i_r_1_1_memory_type}{IR\+::\+Memory\+Type}} type)
+\item 
+\mbox{\hyperlink{_runtime_8h_aae02bf1df7927dd0f69c6412fce40fc4}{RUNTIME\+\_\+\+API}} \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_runtime_ac4dfcf8e1c7c694aa65c9a785eaeb2d7}{Runtime\+::get\+Memory\+Base\+Address}} (\mbox{\hyperlink{struct_runtime_1_1_memory_instance}{Memory\+Instance}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908acd69b4957f06cd818d7bf3d61980e291}{memory}})
+\item 
+\mbox{\hyperlink{_runtime_8h_aae02bf1df7927dd0f69c6412fce40fc4}{RUNTIME\+\_\+\+API}} \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} \mbox{\hyperlink{namespace_runtime_ae046915dd65eaedf9651ba7d9bf5b98d}{Runtime\+::get\+Memory\+Num\+Pages}} (\mbox{\hyperlink{struct_runtime_1_1_memory_instance}{Memory\+Instance}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908acd69b4957f06cd818d7bf3d61980e291}{memory}})
+\item 
+\mbox{\hyperlink{_runtime_8h_aae02bf1df7927dd0f69c6412fce40fc4}{RUNTIME\+\_\+\+API}} \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} \mbox{\hyperlink{namespace_runtime_a222bb9e2ae85edf33314d29123e6743a}{Runtime\+::get\+Memory\+Max\+Pages}} (\mbox{\hyperlink{struct_runtime_1_1_memory_instance}{Memory\+Instance}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908acd69b4957f06cd818d7bf3d61980e291}{memory}})
+\item 
+\mbox{\hyperlink{_runtime_8h_aae02bf1df7927dd0f69c6412fce40fc4}{RUNTIME\+\_\+\+API}} \mbox{\hyperlink{_basic_types_8h_aadfe637f5e04b575f76f744f6fdd7e27}{Iptr}} \mbox{\hyperlink{namespace_runtime_ad4981543d341a681300c79dd3fb2ee38}{Runtime\+::grow\+Memory}} (\mbox{\hyperlink{struct_runtime_1_1_memory_instance}{Memory\+Instance}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908acd69b4957f06cd818d7bf3d61980e291}{memory}}, \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} num\+Pages)
+\item 
+\mbox{\hyperlink{_runtime_8h_aae02bf1df7927dd0f69c6412fce40fc4}{RUNTIME\+\_\+\+API}} \mbox{\hyperlink{_basic_types_8h_aadfe637f5e04b575f76f744f6fdd7e27}{Iptr}} \mbox{\hyperlink{namespace_runtime_a80425164df20a6fd82bdf8317ab9ac49}{Runtime\+::shrink\+Memory}} (\mbox{\hyperlink{struct_runtime_1_1_memory_instance}{Memory\+Instance}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908acd69b4957f06cd818d7bf3d61980e291}{memory}}, \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} num\+Pages)
+\item 
+\mbox{\hyperlink{_runtime_8h_aae02bf1df7927dd0f69c6412fce40fc4}{RUNTIME\+\_\+\+API}} \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_runtime_a910c59ea4886adbd07c5dc76efc33d22}{Runtime\+::get\+Validated\+Memory\+Offset\+Range}} (\mbox{\hyperlink{struct_runtime_1_1_memory_instance}{Memory\+Instance}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908acd69b4957f06cd818d7bf3d61980e291}{memory}}, \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} offset, \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} num\+Bytes)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{struct_runtime_1_1_value}{Value}} $>$ }\\\mbox{\hyperlink{struct_runtime_1_1_value}{Value}} \& \mbox{\hyperlink{namespace_runtime_abdea14af17bce8aed044b0163fb810ac}{Runtime\+::memory\+Ref}} (\mbox{\hyperlink{struct_runtime_1_1_memory_instance}{Memory\+Instance}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908acd69b4957f06cd818d7bf3d61980e291}{memory}}, \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}} offset)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{struct_runtime_1_1_value}{Value}} $>$ }\\\mbox{\hyperlink{struct_runtime_1_1_value}{Value}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_runtime_ad7a0afa9dcd43c8a7b460835097adcf2}{Runtime\+::memory\+Array\+Ptr}} (\mbox{\hyperlink{struct_runtime_1_1_memory_instance}{Memory\+Instance}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908acd69b4957f06cd818d7bf3d61980e291}{memory}}, \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}} offset, \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}} num\+Elements)
+\item 
+\mbox{\hyperlink{_runtime_8h_aae02bf1df7927dd0f69c6412fce40fc4}{RUNTIME\+\_\+\+API}} \mbox{\hyperlink{struct_runtime_1_1_global_instance}{Global\+Instance}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_runtime_a51a8de076fdfee96fb162d16f580eb5e}{Runtime\+::create\+Global}} (\mbox{\hyperlink{struct_i_r_1_1_global_type}{IR\+::\+Global\+Type}} type, \mbox{\hyperlink{struct_runtime_1_1_value}{Value}} initial\+Value)
+\item 
+\mbox{\hyperlink{_runtime_8h_aae02bf1df7927dd0f69c6412fce40fc4}{RUNTIME\+\_\+\+API}} \mbox{\hyperlink{struct_runtime_1_1_value}{Value}} \mbox{\hyperlink{namespace_runtime_aedd1986232d31f811914ee655f846f8e}{Runtime\+::get\+Global\+Value}} (\mbox{\hyperlink{struct_runtime_1_1_global_instance}{Global\+Instance}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a9c70933aff6b2a6d08c687a6cbb6b765}{global}})
+\item 
+\mbox{\hyperlink{_runtime_8h_aae02bf1df7927dd0f69c6412fce40fc4}{RUNTIME\+\_\+\+API}} \mbox{\hyperlink{struct_runtime_1_1_value}{Value}} \mbox{\hyperlink{namespace_runtime_a73b63ff33deb3e8395da3cc402120aa4}{Runtime\+::set\+Global\+Value}} (\mbox{\hyperlink{struct_runtime_1_1_global_instance}{Global\+Instance}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a9c70933aff6b2a6d08c687a6cbb6b765}{global}}, \mbox{\hyperlink{struct_runtime_1_1_value}{Value}} new\+Value)
+\item 
+\mbox{\hyperlink{_runtime_8h_aae02bf1df7927dd0f69c6412fce40fc4}{RUNTIME\+\_\+\+API}} \mbox{\hyperlink{struct_runtime_1_1_module_instance}{Module\+Instance}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_runtime_ab69935c3ec51168c91c2d864c7aa1334}{Runtime\+::instantiate\+Module}} (const \mbox{\hyperlink{struct_i_r_1_1_module}{IR\+::\+Module}} \&\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}, \mbox{\hyperlink{struct_runtime_1_1_import_bindings}{Import\+Bindings}} \&\&imports)
+\item 
+\mbox{\hyperlink{_runtime_8h_aae02bf1df7927dd0f69c6412fce40fc4}{RUNTIME\+\_\+\+API}} \mbox{\hyperlink{struct_runtime_1_1_memory_instance}{Memory\+Instance}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_runtime_a3bc85f3836483d11af7f492468f42a96}{Runtime\+::get\+Default\+Memory}} (\mbox{\hyperlink{struct_runtime_1_1_module_instance}{Module\+Instance}} \texorpdfstring{$\ast$}{*}module\+Instance)
+\item 
+\mbox{\hyperlink{_runtime_8h_aae02bf1df7927dd0f69c6412fce40fc4}{RUNTIME\+\_\+\+API}} \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{namespace_runtime_ac6e865dcdc9c0b0188240582af778c11}{Runtime\+::get\+Default\+Memory\+Size}} (\mbox{\hyperlink{struct_runtime_1_1_module_instance}{Module\+Instance}} \texorpdfstring{$\ast$}{*}module\+Instance)
+\item 
+\mbox{\hyperlink{_runtime_8h_aae02bf1df7927dd0f69c6412fce40fc4}{RUNTIME\+\_\+\+API}} \mbox{\hyperlink{struct_runtime_1_1_table_instance}{Table\+Instance}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_runtime_ab715c1f20348d378fc586ac09a8d4f7a}{Runtime\+::get\+Default\+Table}} (\mbox{\hyperlink{struct_runtime_1_1_module_instance}{Module\+Instance}} \texorpdfstring{$\ast$}{*}module\+Instance)
+\item 
+\mbox{\hyperlink{_runtime_8h_aae02bf1df7927dd0f69c6412fce40fc4}{RUNTIME\+\_\+\+API}} void \mbox{\hyperlink{namespace_runtime_acce00902365a16ddc81a4058918b9b22}{Runtime\+::run\+Instance\+Start\+Func}} (\mbox{\hyperlink{struct_runtime_1_1_module_instance}{Module\+Instance}} \texorpdfstring{$\ast$}{*}module\+Instance)
+\item 
+\mbox{\hyperlink{_runtime_8h_aae02bf1df7927dd0f69c6412fce40fc4}{RUNTIME\+\_\+\+API}} void \mbox{\hyperlink{namespace_runtime_a57f366991784b7f4ca9755fa339945ee}{Runtime\+::reset\+Global\+Instances}} (\mbox{\hyperlink{struct_runtime_1_1_module_instance}{Module\+Instance}} \texorpdfstring{$\ast$}{*}module\+Instance)
+\item 
+\mbox{\hyperlink{_runtime_8h_aae02bf1df7927dd0f69c6412fce40fc4}{RUNTIME\+\_\+\+API}} void \mbox{\hyperlink{namespace_runtime_aafc3dee0829286f2e029fe6f95af3dfc}{Runtime\+::reset\+Memory}} (\mbox{\hyperlink{struct_runtime_1_1_memory_instance}{Memory\+Instance}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908acd69b4957f06cd818d7bf3d61980e291}{memory}}, \mbox{\hyperlink{struct_i_r_1_1_memory_type}{IR\+::\+Memory\+Type}} \&new\+Memory\+Type)
+\item 
+\mbox{\hyperlink{_runtime_8h_aae02bf1df7927dd0f69c6412fce40fc4}{RUNTIME\+\_\+\+API}} \mbox{\hyperlink{struct_runtime_1_1_object_instance}{Object\+Instance}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_runtime_a1cf2c6ca5564ae56d4cf17c9e63fe256}{Runtime\+::get\+Instance\+Export}} (\mbox{\hyperlink{struct_runtime_1_1_module_instance}{Module\+Instance}} \texorpdfstring{$\ast$}{*}module\+Instance, const std\+::string \&\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{_runtime_8h_aae02bf1df7927dd0f69c6412fce40fc4}\index{Runtime.h@{Runtime.h}!RUNTIME\_API@{RUNTIME\_API}}
+\index{RUNTIME\_API@{RUNTIME\_API}!Runtime.h@{Runtime.h}}
+\doxysubsubsection{\texorpdfstring{RUNTIME\_API}{RUNTIME\_API}}
+{\footnotesize\ttfamily \label{_runtime_8h_aae02bf1df7927dd0f69c6412fce40fc4} 
+\#define RUNTIME\+\_\+\+API~\mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_a14d005bd653c82f4e705b4ded2a4fc07}{DLL\+\_\+\+IMPORT}}}
+
+
+
+Definition at line \mbox{\hyperlink{_runtime_8h_source_l00008}{8}} of file \mbox{\hyperlink{_runtime_8h_source}{Runtime.\+h}}.
+

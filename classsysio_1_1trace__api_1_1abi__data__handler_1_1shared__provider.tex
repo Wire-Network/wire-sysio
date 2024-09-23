@@ -1,0 +1,82 @@
+\doxysection{sysio\+::trace\+\_\+api\+::abi\+\_\+data\+\_\+handler\+::shared\+\_\+provider Class Reference}
+\hypertarget{classsysio_1_1trace__api_1_1abi__data__handler_1_1shared__provider}{}\label{classsysio_1_1trace__api_1_1abi__data__handler_1_1shared__provider}\index{sysio::trace\_api::abi\_data\_handler::shared\_provider@{sysio::trace\_api::abi\_data\_handler::shared\_provider}}
+
+
+{\ttfamily \#include $<$abi\+\_\+data\+\_\+handler.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classsysio_1_1trace__api_1_1abi__data__handler_1_1shared__provider_a426acc75cda2ffda884a1713ccb70c5d}{shared\+\_\+provider}} (const std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classsysio_1_1trace__api_1_1abi__data__handler}{abi\+\_\+data\+\_\+handler}} $>$ \&\mbox{\hyperlink{classsysio_1_1trace__api_1_1abi__data__handler_1_1shared__provider_a077357e4dbd918fd98024e765f06f631}{handler}})
+\item 
+std\+::tuple$<$ \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}}, std\+::optional$<$ \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} $>$ $>$ \mbox{\hyperlink{classsysio_1_1trace__api_1_1abi__data__handler_1_1shared__provider_a8800a9e549b58d73a981e200110afef4}{serialize\+\_\+to\+\_\+variant}} (const std\+::variant$<$ \mbox{\hyperlink{structsysio_1_1trace__api_1_1action__trace__v0}{action\+\_\+trace\+\_\+v0}}, \mbox{\hyperlink{structsysio_1_1trace__api_1_1action__trace__v1}{action\+\_\+trace\+\_\+v1}} $>$ \&\mbox{\hyperlink{structsysio_1_1chain_1_1action}{action}}, const \mbox{\hyperlink{namespacesysio_1_1trace__api_a24d1d2b642518b3d627011e7ef39ae9a}{yield\+\_\+function}} \&yield)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classsysio_1_1trace__api_1_1abi__data__handler}{abi\+\_\+data\+\_\+handler}} $>$ \mbox{\hyperlink{classsysio_1_1trace__api_1_1abi__data__handler_1_1shared__provider_a077357e4dbd918fd98024e765f06f631}{handler}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Utility class that allows mulitple request\+\_\+handlers to share the same \doxylink{classsysio_1_1trace__api_1_1abi__data__handler}{abi\+\_\+data\+\_\+handler} 
+
+Definition at line \mbox{\hyperlink{abi__data__handler_8hpp_source_l00045}{45}} of file \mbox{\hyperlink{abi__data__handler_8hpp_source}{abi\+\_\+data\+\_\+handler.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classsysio_1_1trace__api_1_1abi__data__handler_1_1shared__provider_a426acc75cda2ffda884a1713ccb70c5d}\index{sysio::trace\_api::abi\_data\_handler::shared\_provider@{sysio::trace\_api::abi\_data\_handler::shared\_provider}!shared\_provider@{shared\_provider}}
+\index{shared\_provider@{shared\_provider}!sysio::trace\_api::abi\_data\_handler::shared\_provider@{sysio::trace\_api::abi\_data\_handler::shared\_provider}}
+\doxysubsubsection{\texorpdfstring{shared\_provider()}{shared\_provider()}}
+{\footnotesize\ttfamily \label{classsysio_1_1trace__api_1_1abi__data__handler_1_1shared__provider_a426acc75cda2ffda884a1713ccb70c5d} 
+sysio\+::trace\+\_\+api\+::abi\+\_\+data\+\_\+handler\+::shared\+\_\+provider\+::shared\+\_\+provider (\begin{DoxyParamCaption}\item[{const std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classsysio_1_1trace__api_1_1abi__data__handler}{abi\+\_\+data\+\_\+handler}} $>$ \&}]{handler}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{abi__data__handler_8hpp_source_l00047}{47}} of file \mbox{\hyperlink{abi__data__handler_8hpp_source}{abi\+\_\+data\+\_\+handler.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ :\mbox{\hyperlink{classsysio_1_1trace__api_1_1abi__data__handler_1_1shared__provider_a077357e4dbd918fd98024e765f06f631}{handler}}(\mbox{\hyperlink{classsysio_1_1trace__api_1_1abi__data__handler_1_1shared__provider_a077357e4dbd918fd98024e765f06f631}{handler}})}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1trace__api_1_1abi__data__handler_1_1shared__provider_a8800a9e549b58d73a981e200110afef4}\index{sysio::trace\_api::abi\_data\_handler::shared\_provider@{sysio::trace\_api::abi\_data\_handler::shared\_provider}!serialize\_to\_variant@{serialize\_to\_variant}}
+\index{serialize\_to\_variant@{serialize\_to\_variant}!sysio::trace\_api::abi\_data\_handler::shared\_provider@{sysio::trace\_api::abi\_data\_handler::shared\_provider}}
+\doxysubsubsection{\texorpdfstring{serialize\_to\_variant()}{serialize\_to\_variant()}}
+{\footnotesize\ttfamily \label{classsysio_1_1trace__api_1_1abi__data__handler_1_1shared__provider_a8800a9e549b58d73a981e200110afef4} 
+std\+::tuple$<$ \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}}, std\+::optional$<$ \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} $>$ $>$ sysio\+::trace\+\_\+api\+::abi\+\_\+data\+\_\+handler\+::shared\+\_\+provider\+::serialize\+\_\+to\+\_\+variant (\begin{DoxyParamCaption}\item[{const std\+::variant$<$ \mbox{\hyperlink{structsysio_1_1trace__api_1_1action__trace__v0}{action\+\_\+trace\+\_\+v0}}, \mbox{\hyperlink{structsysio_1_1trace__api_1_1action__trace__v1}{action\+\_\+trace\+\_\+v1}} $>$ \&}]{action}{, }\item[{const \mbox{\hyperlink{namespacesysio_1_1trace__api_a24d1d2b642518b3d627011e7ef39ae9a}{yield\+\_\+function}} \&}]{yield}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{abi__data__handler_8hpp_source_l00051}{51}} of file \mbox{\hyperlink{abi__data__handler_8hpp_source}{abi\+\_\+data\+\_\+handler.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1abi__data__handler_1_1shared__provider_a077357e4dbd918fd98024e765f06f631}{handler}}-\/>serialize\_to\_variant(\mbox{\hyperlink{structaction}{action}},\ yield);}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classsysio_1_1trace__api_1_1abi__data__handler_1_1shared__provider_a077357e4dbd918fd98024e765f06f631}\index{sysio::trace\_api::abi\_data\_handler::shared\_provider@{sysio::trace\_api::abi\_data\_handler::shared\_provider}!handler@{handler}}
+\index{handler@{handler}!sysio::trace\_api::abi\_data\_handler::shared\_provider@{sysio::trace\_api::abi\_data\_handler::shared\_provider}}
+\doxysubsubsection{\texorpdfstring{handler}{handler}}
+{\footnotesize\ttfamily \label{classsysio_1_1trace__api_1_1abi__data__handler_1_1shared__provider_a077357e4dbd918fd98024e765f06f631} 
+std\+::shared\+\_\+ptr$<$\mbox{\hyperlink{classsysio_1_1trace__api_1_1abi__data__handler}{abi\+\_\+data\+\_\+handler}}$>$ sysio\+::trace\+\_\+api\+::abi\+\_\+data\+\_\+handler\+::shared\+\_\+provider\+::handler}
+
+
+
+Definition at line \mbox{\hyperlink{abi__data__handler_8hpp_source_l00055}{55}} of file \mbox{\hyperlink{abi__data__handler_8hpp_source}{abi\+\_\+data\+\_\+handler.\+hpp}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+plugins/trace\+\_\+api\+\_\+plugin/include/sysio/trace\+\_\+api/\mbox{\hyperlink{abi__data__handler_8hpp}{abi\+\_\+data\+\_\+handler.\+hpp}}\end{DoxyCompactItemize}

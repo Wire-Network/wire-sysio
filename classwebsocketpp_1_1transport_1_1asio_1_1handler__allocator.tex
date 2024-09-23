@@ -1,0 +1,118 @@
+\doxysection{websocketpp\+::transport\+::asio\+::handler\+\_\+allocator Class Reference}
+\hypertarget{classwebsocketpp_1_1transport_1_1asio_1_1handler__allocator}{}\label{classwebsocketpp_1_1transport_1_1asio_1_1handler__allocator}\index{websocketpp::transport::asio::handler\_allocator@{websocketpp::transport::asio::handler\_allocator}}
+
+
+{\ttfamily \#include $<$base.\+hpp$>$}
+
+
+
+Collaboration diagram for websocketpp\+::transport\+::asio\+::handler\+\_\+allocator\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=200pt]{classwebsocketpp_1_1transport_1_1asio_1_1handler__allocator__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1handler__allocator_a3639b1584c3410758649846529b4c755}{handler\+\_\+allocator}} ()
+\item 
+void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1handler__allocator_ac9e06098f9fd2966d2881513994e0bd3}{allocate}} (std\+::size\+\_\+t memsize)
+\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1handler__allocator_a8ba1b99267d13036f866f1e10d925efc}{deallocate}} (void \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static const size\+\_\+t \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1handler__allocator_aea8d0b7af2997fc2e84e95e459c16ccb}{size}} = 1024
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{transport_2asio_2base_8hpp_source_l00052}{52}} of file \mbox{\hyperlink{transport_2asio_2base_8hpp_source}{base.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classwebsocketpp_1_1transport_1_1asio_1_1handler__allocator_a3639b1584c3410758649846529b4c755}\index{websocketpp::transport::asio::handler\_allocator@{websocketpp::transport::asio::handler\_allocator}!handler\_allocator@{handler\_allocator}}
+\index{handler\_allocator@{handler\_allocator}!websocketpp::transport::asio::handler\_allocator@{websocketpp::transport::asio::handler\_allocator}}
+\doxysubsubsection{\texorpdfstring{handler\_allocator()}{handler\_allocator()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1transport_1_1asio_1_1handler__allocator_a3639b1584c3410758649846529b4c755} 
+websocketpp\+::transport\+::asio\+::handler\+\_\+allocator\+::handler\+\_\+allocator (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{transport_2asio_2base_8hpp_source_l00056}{56}} of file \mbox{\hyperlink{transport_2asio_2base_8hpp_source}{base.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00056\ :\ m\_in\_use(\textcolor{keyword}{false})\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classwebsocketpp_1_1transport_1_1asio_1_1handler__allocator_ac9e06098f9fd2966d2881513994e0bd3}\index{websocketpp::transport::asio::handler\_allocator@{websocketpp::transport::asio::handler\_allocator}!allocate@{allocate}}
+\index{allocate@{allocate}!websocketpp::transport::asio::handler\_allocator@{websocketpp::transport::asio::handler\_allocator}}
+\doxysubsubsection{\texorpdfstring{allocate()}{allocate()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1transport_1_1asio_1_1handler__allocator_ac9e06098f9fd2966d2881513994e0bd3} 
+void \texorpdfstring{$\ast$}{*} websocketpp\+::transport\+::asio\+::handler\+\_\+allocator\+::allocate (\begin{DoxyParamCaption}\item[{std\+::size\+\_\+t}]{memsize}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{transport_2asio_2base_8hpp_source_l00063}{63}} of file \mbox{\hyperlink{transport_2asio_2base_8hpp_source}{base.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!m\_in\_use\ \&\&\ memsize\ <\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1handler__allocator_aea8d0b7af2997fc2e84e95e459c16ccb}{size}})\ \{}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ m\_in\_use\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{void}*\textcolor{keyword}{>}(\&m\_storage);}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \ \ \ return\ ::operator\ \textcolor{keyword}{new}(memsize);}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00070\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1transport_1_1asio_1_1handler__allocator_a8ba1b99267d13036f866f1e10d925efc}\index{websocketpp::transport::asio::handler\_allocator@{websocketpp::transport::asio::handler\_allocator}!deallocate@{deallocate}}
+\index{deallocate@{deallocate}!websocketpp::transport::asio::handler\_allocator@{websocketpp::transport::asio::handler\_allocator}}
+\doxysubsubsection{\texorpdfstring{deallocate()}{deallocate()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1transport_1_1asio_1_1handler__allocator_a8ba1b99267d13036f866f1e10d925efc} 
+void websocketpp\+::transport\+::asio\+::handler\+\_\+allocator\+::deallocate (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{pointer}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{transport_2asio_2base_8hpp_source_l00072}{72}} of file \mbox{\hyperlink{transport_2asio_2base_8hpp_source}{base.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}}\ ==\ \&m\_storage)\ \{}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \ \ \ m\_in\_use\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ ::operator\ \textcolor{keyword}{delete}(\mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}});}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00078\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classwebsocketpp_1_1transport_1_1asio_1_1handler__allocator_aea8d0b7af2997fc2e84e95e459c16ccb}\index{websocketpp::transport::asio::handler\_allocator@{websocketpp::transport::asio::handler\_allocator}!size@{size}}
+\index{size@{size}!websocketpp::transport::asio::handler\_allocator@{websocketpp::transport::asio::handler\_allocator}}
+\doxysubsubsection{\texorpdfstring{size}{size}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1transport_1_1asio_1_1handler__allocator_aea8d0b7af2997fc2e84e95e459c16ccb} 
+const size\+\_\+t websocketpp\+::transport\+::asio\+::handler\+\_\+allocator\+::size = 1024\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{transport_2asio_2base_8hpp_source_l00054}{54}} of file \mbox{\hyperlink{transport_2asio_2base_8hpp_source}{base.\+hpp}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/vendor/websocketpp/websocketpp/transport/asio/\mbox{\hyperlink{transport_2asio_2base_8hpp}{base.\+hpp}}\end{DoxyCompactItemize}

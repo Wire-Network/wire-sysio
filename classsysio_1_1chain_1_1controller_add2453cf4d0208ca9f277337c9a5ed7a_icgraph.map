@@ -1,0 +1,10 @@
+<map id="sysio::chain::controller::get_mutable_resource_limits_manager" name="sysio::chain::controller::get_mutable_resource_limits_manager">
+<area shape="rect" id="Node000001" title=" " alt="" coords="501,71,658,126"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1chain_1_1transaction__context.html#ad525fafe1ffad93dc767bf2b5b9ea0cc" title=" " alt="" coords="279,5,453,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="485,73,453,62,454,57,487,67"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1chain_1_1controller__impl.html#a43b89d301b09c599969412d7db819bd3" title=" " alt="" coords="5,46,231,87"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="485,95,231,77,231,72,485,89"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1chain_1_1controller.html#a72b5d03a47c8644a68d625fc4dca44bf" title=" " alt="" coords="286,136,446,176"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="487,126,445,137,444,132,486,121"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="263,50,232,54,231,49,263,44"/>
+</map>

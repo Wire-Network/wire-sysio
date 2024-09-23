@@ -1,0 +1,113 @@
+\doxysection{libraries/chain/include/sysio/chain/wasm\+\_\+sysio\+\_\+injection.hpp File Reference}
+\hypertarget{wasm__sysio__injection_8hpp}{}\label{wasm__sysio__injection_8hpp}\index{libraries/chain/include/sysio/chain/wasm\_sysio\_injection.hpp@{libraries/chain/include/sysio/chain/wasm\_sysio\_injection.hpp}}
+{\ttfamily \#include $<$sysio/chain/wasm\+\_\+sysio\+\_\+binary\+\_\+ops.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/wasm\+\_\+sysio\+\_\+constraints.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/webassembly/common.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/exception/exception.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/exceptions.\+hpp$>$}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$functional$>$}\newline
+{\ttfamily \#include $<$vector$>$}\newline
+{\ttfamily \#include $<$map$>$}\newline
+{\ttfamily \#include $<$stack$>$}\newline
+{\ttfamily \#include $<$queue$>$}\newline
+{\ttfamily \#include $<$unordered\+\_\+set$>$}\newline
+{\ttfamily \#include "{}IR/\+Module.\+h"{}}\newline
+{\ttfamily \#include "{}IR/\+Operators.\+h"{}}\newline
+{\ttfamily \#include "{}WASM/\+WASM.\+h"{}}\newline
+Include dependency graph for wasm\+\_\+sysio\+\_\+injection.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{wasm__sysio__injection_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{wasm__sysio__injection_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils}{sysio\+::chain\+::wasm\+\_\+injections\+::injector\+\_\+utils}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1noop__injection__visitor}{sysio\+::chain\+::wasm\+\_\+injections\+::noop\+\_\+injection\+\_\+visitor}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1memories__injection__visitor}{sysio\+::chain\+::wasm\+\_\+injections\+::memories\+\_\+injection\+\_\+visitor}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1data__segments__injection__visitor}{sysio\+::chain\+::wasm\+\_\+injections\+::data\+\_\+segments\+\_\+injection\+\_\+visitor}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1tables__injection__visitor}{sysio\+::chain\+::wasm\+\_\+injections\+::tables\+\_\+injection\+\_\+visitor}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1globals__injection__visitor}{sysio\+::chain\+::wasm\+\_\+injections\+::globals\+\_\+injection\+\_\+visitor}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1blacklist__injection__visitor}{sysio\+::chain\+::wasm\+\_\+injections\+::blacklist\+\_\+injection\+\_\+visitor}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1no__injections__injectors}{sysio\+::chain\+::wasm\+\_\+injections\+::no\+\_\+injections\+\_\+injectors}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pass__injector}{sysio\+::chain\+::wasm\+\_\+injections\+::pass\+\_\+injector}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1fix__call__index}{sysio\+::chain\+::wasm\+\_\+injections\+::fix\+\_\+call\+\_\+index}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f32__binop__injector}{sysio\+::chain\+::wasm\+\_\+injections\+::f32\+\_\+binop\+\_\+injector$<$ Opcode $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f32__unop__injector}{sysio\+::chain\+::wasm\+\_\+injections\+::f32\+\_\+unop\+\_\+injector$<$ Opcode $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f32__relop__injector}{sysio\+::chain\+::wasm\+\_\+injections\+::f32\+\_\+relop\+\_\+injector$<$ Opcode $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f64__binop__injector}{sysio\+::chain\+::wasm\+\_\+injections\+::f64\+\_\+binop\+\_\+injector$<$ Opcode $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f64__unop__injector}{sysio\+::chain\+::wasm\+\_\+injections\+::f64\+\_\+unop\+\_\+injector$<$ Opcode $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f64__relop__injector}{sysio\+::chain\+::wasm\+\_\+injections\+::f64\+\_\+relop\+\_\+injector$<$ Opcode $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f32__trunc__i32__injector}{sysio\+::chain\+::wasm\+\_\+injections\+::f32\+\_\+trunc\+\_\+i32\+\_\+injector$<$ Opcode $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f32__trunc__i64__injector}{sysio\+::chain\+::wasm\+\_\+injections\+::f32\+\_\+trunc\+\_\+i64\+\_\+injector$<$ Opcode $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f64__trunc__i32__injector}{sysio\+::chain\+::wasm\+\_\+injections\+::f64\+\_\+trunc\+\_\+i32\+\_\+injector$<$ Opcode $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f64__trunc__i64__injector}{sysio\+::chain\+::wasm\+\_\+injections\+::f64\+\_\+trunc\+\_\+i64\+\_\+injector$<$ Opcode $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1i32__convert__f32__injector}{sysio\+::chain\+::wasm\+\_\+injections\+::i32\+\_\+convert\+\_\+f32\+\_\+injector$<$ Opcode $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1i64__convert__f32__injector}{sysio\+::chain\+::wasm\+\_\+injections\+::i64\+\_\+convert\+\_\+f32\+\_\+injector$<$ Opcode $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1i32__convert__f64__injector}{sysio\+::chain\+::wasm\+\_\+injections\+::i32\+\_\+convert\+\_\+f64\+\_\+injector$<$ Opcode $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1i64__convert__f64__injector}{sysio\+::chain\+::wasm\+\_\+injections\+::i64\+\_\+convert\+\_\+f64\+\_\+injector$<$ Opcode $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f32__promote__injector}{sysio\+::chain\+::wasm\+\_\+injections\+::f32\+\_\+promote\+\_\+injector}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f64__demote__injector}{sysio\+::chain\+::wasm\+\_\+injections\+::f64\+\_\+demote\+\_\+injector}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors}{sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1post__op__injectors}{sysio\+::chain\+::wasm\+\_\+injections\+::post\+\_\+op\+\_\+injectors}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1module__injectors}{sysio\+::chain\+::wasm\+\_\+injections\+::module\+\_\+injectors$<$ Visitors $>$}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1chain_1_1wasm__injections_1_1wasm__binary__injection}{sysio\+::chain\+::wasm\+\_\+injections\+::wasm\+\_\+binary\+\_\+injection}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain}{sysio\+::chain}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__injections}{sysio\+::chain\+::wasm\+\_\+injections}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__injections_ae6c2c7dd4fcb0b0322d8e0ee4841d3ae}{sysio\+::chain\+::wasm\+\_\+injections\+::wasm\+\_\+validate\+\_\+func}} = std\+::function$<$void(\mbox{\hyperlink{struct_i_r_1_1_module}{IR\+::\+Module}}\&)$>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+constexpr const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__injections_ac77e8c15fd91a11ed9b09160043fa17f}{sysio\+::chain\+::wasm\+\_\+injections\+::inject\+\_\+which\+\_\+op}} (\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} opcode)
+\end{DoxyCompactItemize}

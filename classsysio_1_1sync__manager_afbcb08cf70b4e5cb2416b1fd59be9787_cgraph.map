@@ -1,0 +1,15 @@
+<map id="sysio::sync_manager::sync_recv_block" name="sysio::sync_manager::sync_recv_block">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,96,151,137"/>
+<area shape="rect" id="Node000002" href="$namespaceappbase.html#a99374dc23934f008a09f2f79be9eae40" title=" " alt="" coords="231,13,330,38"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="112,93,198,49,216,42,218,46,200,53,115,98"/>
+<area shape="rect" id="Node000004" href="$namespacesysio.html#a0369be74f29dbab1c8afd88c3f6d2858" title=" " alt="" coords="206,63,354,103"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="150,102,190,95,191,100,151,107"/>
+<area shape="rect" id="Node000005" href="$classsysio_1_1sync__manager.html#afe3debb36f6f73dbbf6a3bbb8c4ef734" title=" " alt="" coords="208,128,353,169"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="151,125,193,132,192,137,150,130"/>
+<area shape="rect" id="Node000007" href="$classsysio_1_1sync__manager.html#af128876bbe4648c785d7a0905110186e" title=" " alt="" coords="199,193,362,234"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="117,135,200,178,213,184,211,189,197,183,115,140"/>
+<area shape="rect" id="Node000003" href="$classappbase_1_1application.html#ac874b2659b400fe254f1ae4260d06ecf" title=" " alt="" coords="430,5,570,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="330,23,415,23,415,28,330,28"/>
+<area shape="rect" id="Node000006" href="$namespacesysio.html#af36f44203d6675615cf012396bcef424" title=" " alt="" coords="410,136,590,161"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="353,146,394,146,394,151,353,151"/>
+</map>

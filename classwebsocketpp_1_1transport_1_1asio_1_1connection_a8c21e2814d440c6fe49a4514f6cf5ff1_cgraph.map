@@ -1,0 +1,5 @@
+<map id="websocketpp::transport::asio::connection::handle_post_init_timeout" name="websocketpp::transport::asio::connection::handle_post_init_timeout">
+<area shape="rect" id="Node000001" title="Post init timeout callback." alt="" coords="5,5,176,61"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1transport_1_1asio_1_1connection.html#ac4b63fadf2083ab4656ab7f1a47d3b5d" title="Cancel the underlying socket and log any errors." alt="" coords="224,5,394,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="176,30,208,30,208,36,176,36"/>
+</map>

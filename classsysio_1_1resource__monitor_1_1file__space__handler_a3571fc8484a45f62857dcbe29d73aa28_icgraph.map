@@ -1,0 +1,20 @@
+<map id="sysio::resource_monitor::file_space_handler::is_threshold_exceeded" name="sysio::resource_monitor::file_space_handler::is_threshold_exceeded">
+<area shape="rect" id="Node000001" title=" " alt="" coords="642,96,803,152"/>
+<area shape="rect" id="Node000002" href="$structadd__file__system__fixture.html#a4ed12f206a71e60bf983a91ebe159496" title=" " alt="" coords="432,5,594,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="654,92,593,61,565,49,567,44,595,57,657,87"/>
+<area shape="rect" id="Node000003" href="$structspace__handler__fixture.html#ae8dd009166a506ec3386360a5c8e2897" title=" " alt="" coords="432,71,594,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="626,112,595,107,595,101,627,106"/>
+<area shape="rect" id="Node000004" href="$structthreshold__fixture.html#ad36b722388f251e4b012964b2d8eb071" title=" " alt="" coords="436,136,590,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="627,142,591,147,590,142,626,136"/>
+<area shape="rect" id="Node000006" href="$classsysio_1_1resource__monitor_1_1file__space__handler.html#a6faa30d2db31020b3db4886a554e147a" title=" " alt="" coords="433,224,593,280"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="664,163,562,226,559,222,661,158"/>
+<area shape="rect" id="Node000005" href="$structthreshold__fixture.html#a12384110a96ecb01358f005d70b3d108" title=" " alt="" coords="213,136,373,177"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="420,159,374,159,374,154,420,154"/>
+<area shape="poly" id="edge9_Node000006_Node000006" title=" " alt="" coords="546,212,534,206,513,203,495,205,483,210,477,216,477,224,472,224,472,214,480,205,494,200,513,198,535,200,549,207"/>
+<area shape="rect" id="Node000007" href="$classsysio_1_1resource__monitor__plugin__impl.html#ae06c885da6f082b29ca5b5ff8c5724e4" title=" " alt="" coords="202,216,384,257"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="417,248,384,246,385,240,418,243"/>
+<area shape="rect" id="Node000008" href="$structspace__handler__fixture.html#acdb08c8ee2a829f47b5b992ab73f5364" title=" " alt="" coords="219,281,367,322"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="419,276,368,288,367,282,417,271"/>
+<area shape="rect" id="Node000009" href="$structspace__handler__fixture.html#a2f88ee3184e87f67f178e4c4074be6f3" title=" " alt="" coords="5,281,154,322"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="204,304,154,304,154,299,204,299"/>
+</map>

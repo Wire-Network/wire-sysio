@@ -1,0 +1,131 @@
+\doxysection{get\+\_\+schedule\+\_\+subcommand Struct Reference}
+\hypertarget{structget__schedule__subcommand}{}\label{structget__schedule__subcommand}\index{get\_schedule\_subcommand@{get\_schedule\_subcommand}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{structget__schedule__subcommand_ae24edcd54a05536b0574b263a65fb062}{print}} (const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}, const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&schedule)
+\item 
+\mbox{\hyperlink{structget__schedule__subcommand_add73f1d1dcb885a95244088f9955c17e}{get\+\_\+schedule\+\_\+subcommand}} (\mbox{\hyperlink{class_c_l_i_1_1_app}{CLI\+::\+App}} \texorpdfstring{$\ast$}{*}action\+Root)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{structget__schedule__subcommand_a3d2f18927e525680fbd47d89bdaa0fb2}{print\+\_\+json}} = false
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01421}{1421}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structget__schedule__subcommand_add73f1d1dcb885a95244088f9955c17e}\index{get\_schedule\_subcommand@{get\_schedule\_subcommand}!get\_schedule\_subcommand@{get\_schedule\_subcommand}}
+\index{get\_schedule\_subcommand@{get\_schedule\_subcommand}!get\_schedule\_subcommand@{get\_schedule\_subcommand}}
+\doxysubsubsection{\texorpdfstring{get\_schedule\_subcommand()}{get\_schedule\_subcommand()}}
+{\footnotesize\ttfamily \label{structget__schedule__subcommand_add73f1d1dcb885a95244088f9955c17e} 
+get\+\_\+schedule\+\_\+subcommand\+::get\+\_\+schedule\+\_\+subcommand (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_c_l_i_1_1_app}{CLI\+::\+App}} \texorpdfstring{$\ast$}{*}}]{action\+Root}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01448}{1448}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01448\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01449\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ get\_schedule\ =\ actionRoot-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_a8b461d2233ec4121259011b5ed24b336}{add\_subcommand}}(\textcolor{stringliteral}{"{}schedule"{}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}Retrieve\ the\ producer\ schedule"{}}));}
+\DoxyCodeLine{01450\ \ \ \ \ \ \ get\_schedule-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_a5fef22317a182fa5db1d7b1af4c89c68}{add\_flag}}(\textcolor{stringliteral}{"{}-\/-\/json,-\/j"{}},\ \mbox{\hyperlink{structget__schedule__subcommand_a3d2f18927e525680fbd47d89bdaa0fb2}{print\_json}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}Output\ in\ JSON\ format"{}}));}
+\DoxyCodeLine{01451\ \ \ \ \ \ \ get\_schedule-\/>callback([\textcolor{keyword}{this}]\ \{}
+\DoxyCodeLine{01452\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ result\ =\ \mbox{\hyperlink{programs_2clio_2main_8cpp_af931af8e9f099860a2670931f8d3ad2c}{call}}(\mbox{\hyperlink{namespacesysio_1_1client_1_1http_a0846b8cd52178faf5ffc1656b79528ff}{get\_schedule\_func}},\ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}());}
+\DoxyCodeLine{01453\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ \mbox{\hyperlink{structget__schedule__subcommand_a3d2f18927e525680fbd47d89bdaa0fb2}{print\_json}}\ )\ \{}
+\DoxyCodeLine{01454\ \ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ \mbox{\hyperlink{classfc_1_1json_ae6c022ab581a9552ae2c97ff5d73aaf8}{fc::json::to\_pretty\_string}}(result)\ <<\ std::endl;}
+\DoxyCodeLine{01455\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{01456\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01457\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structget__schedule__subcommand_ae24edcd54a05536b0574b263a65fb062}{print}}(\textcolor{stringliteral}{"{}active"{}},\ result[\textcolor{stringliteral}{"{}active"{}}]);}
+\DoxyCodeLine{01458\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structget__schedule__subcommand_ae24edcd54a05536b0574b263a65fb062}{print}}(\textcolor{stringliteral}{"{}pending"{}},\ result[\textcolor{stringliteral}{"{}pending"{}}]);}
+\DoxyCodeLine{01459\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structget__schedule__subcommand_ae24edcd54a05536b0574b263a65fb062}{print}}(\textcolor{stringliteral}{"{}proposed"{}},\ result[\textcolor{stringliteral}{"{}proposed"{}}]);}
+\DoxyCodeLine{01460\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{01461\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structget__schedule__subcommand_add73f1d1dcb885a95244088f9955c17e_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structget__schedule__subcommand_ae24edcd54a05536b0574b263a65fb062}\index{get\_schedule\_subcommand@{get\_schedule\_subcommand}!print@{print}}
+\index{print@{print}!get\_schedule\_subcommand@{get\_schedule\_subcommand}}
+\doxysubsubsection{\texorpdfstring{print()}{print()}}
+{\footnotesize\ttfamily \label{structget__schedule__subcommand_ae24edcd54a05536b0574b263a65fb062} 
+void get\+\_\+schedule\+\_\+subcommand\+::print (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{name}{, }\item[{const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&}]{schedule}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01424}{1424}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01424\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01425\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (schedule.is\_null())\ \{}
+\DoxyCodeLine{01426\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\%s\ schedule\ empty\(\backslash\)n\(\backslash\)n"{}},\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}});}
+\DoxyCodeLine{01427\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{01428\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01429\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\%s\ schedule\ version\ \%s\(\backslash\)n"{}},\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}},\ schedule[\textcolor{stringliteral}{"{}version"{}}].as\_string().c\_str());}
+\DoxyCodeLine{01430\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\ \ \ \ \%-\/13s\ \%s\(\backslash\)n"{}},\ \textcolor{stringliteral}{"{}Producer"{}},\ \textcolor{stringliteral}{"{}Producer\ Authority"{}});}
+\DoxyCodeLine{01431\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\ \ \ \ \%-\/13s\ \%s\(\backslash\)n"{}},\ \textcolor{stringliteral}{"{}============="{}},\ \textcolor{stringliteral}{"{}=================="{}});}
+\DoxyCodeLine{01432\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\&\ row:\ schedule[\textcolor{stringliteral}{"{}producers"{}}].get\_array()\ )\ \{}
+\DoxyCodeLine{01433\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ row.get\_object().contains(\textcolor{stringliteral}{"{}block\_signing\_key"{}})\ )\ \{}
+\DoxyCodeLine{01434\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ pre\ 2.0}}
+\DoxyCodeLine{01435\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\ \textcolor{stringliteral}{"{}\ \ \ \ \%-\/13s\ \%s\(\backslash\)n"{}},\ row[\textcolor{stringliteral}{"{}producer\_name"{}}].as\_string().c\_str(),\ row[\textcolor{stringliteral}{"{}block\_signing\_key"{}}].as\_string().c\_str()\ );}
+\DoxyCodeLine{01436\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{01437\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\ \textcolor{stringliteral}{"{}\ \ \ \ \%-\/13s\ "{}},\ row[\textcolor{stringliteral}{"{}producer\_name"{}}].as\_string().c\_str()\ );}
+\DoxyCodeLine{01438\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ =\ row[\textcolor{stringliteral}{"{}authority"{}}].as<\mbox{\hyperlink{namespacesysio_1_1chain_a5d68aec4c925d17b62f0a9b543fabfc5}{block\_signing\_authority}}>();}
+\DoxyCodeLine{01439\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_assert}(\ std::is\_same<\textcolor{keyword}{decltype}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}),\ std::variant<block\_signing\_authority\_v0>>\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{::value}},}
+\DoxyCodeLine{01440\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Updates\ maybe\ needed\ if\ block\_signing\_authority\ changes"{}}\ );}
+\DoxyCodeLine{01441\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1block__signing__authority__v0}{block\_signing\_authority\_v0}}\ auth\ =\ std::get<block\_signing\_authority\_v0>(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{01442\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\ \textcolor{stringliteral}{"{}\%s\(\backslash\)n"{}},\ \mbox{\hyperlink{classfc_1_1json_aa6541960d7f05567559b866cfaf88dfa}{fc::json::to\_string}}(\ auth,\ \mbox{\hyperlink{classfc_1_1time__point_aeccf1b70aa34b132c5269313b8a50573}{fc::time\_point::maximum}}()\ ).c\_str()\ );}
+\DoxyCodeLine{01443\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01444\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01445\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{01446\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structget__schedule__subcommand_ae24edcd54a05536b0574b263a65fb062_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structget__schedule__subcommand_ae24edcd54a05536b0574b263a65fb062_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structget__schedule__subcommand_a3d2f18927e525680fbd47d89bdaa0fb2}\index{get\_schedule\_subcommand@{get\_schedule\_subcommand}!print\_json@{print\_json}}
+\index{print\_json@{print\_json}!get\_schedule\_subcommand@{get\_schedule\_subcommand}}
+\doxysubsubsection{\texorpdfstring{print\_json}{print\_json}}
+{\footnotesize\ttfamily \label{structget__schedule__subcommand_a3d2f18927e525680fbd47d89bdaa0fb2} 
+bool get\+\_\+schedule\+\_\+subcommand\+::print\+\_\+json = false}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01422}{1422}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+programs/clio/\mbox{\hyperlink{programs_2clio_2main_8cpp}{main.\+cpp}}\end{DoxyCompactItemize}

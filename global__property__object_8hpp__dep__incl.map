@@ -1,0 +1,42 @@
+<map id="libraries/chain/include/sysio/chain/global_property_object.hpp" name="libraries/chain/include/sysio/chain/global_property_object.hpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="1247,5,1430,61"/>
+<area shape="rect" id="Node000002" href="$apply__context_8cpp.html" title=" " alt="" coords="5,116,142,157"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1232,40,986,49,675,64,373,85,249,98,154,112,127,118,126,113,153,106,248,92,373,80,675,59,986,44,1232,35"/>
+<area shape="rect" id="Node000003" href="$authorization__manager_8cpp.html" title=" " alt="" coords="165,116,344,157"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="1232,39,1063,45,845,58,602,79,358,112,325,118,324,113,357,106,601,74,845,52,1063,40,1232,34"/>
+<area shape="rect" id="Node000004" href="$controller_8cpp.html" title=" " alt="" coords="369,124,551,150"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="1232,42,930,64,746,84,563,112,501,126,500,121,562,106,746,79,929,59,1232,37"/>
+<area shape="rect" id="Node000005" href="$deep__mind_8cpp.html" title=" " alt="" coords="575,116,708,157"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="1232,43,996,66,858,85,721,112,696,118,694,113,720,106,857,80,995,61,1231,38"/>
+<area shape="rect" id="Node000006" href="$wasm__interface__private_8hpp.html" title=" " alt="" coords="732,109,919,165"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="1232,56,938,112,920,116,919,110,937,106,1231,50"/>
+<area shape="rect" id="Node000007" href="$wasm__interface_8cpp.html" title=" " alt="" coords="821,220,961,261"/>
+<area shape="poly" id="edge9_Node000001_Node000007" title=" " alt="" coords="1232,39,1171,46,1107,59,1042,80,983,111,965,129,943,159,904,221,900,218,939,156,961,126,980,107,1040,75,1105,54,1171,41,1231,34"/>
+<area shape="rect" id="Node000008" href="$sysio__contract_8cpp.html" title=" " alt="" coords="993,116,1130,157"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="1251,69,1116,118,1114,113,1249,64"/>
+<area shape="rect" id="Node000009" href="$transaction__context_8cpp.html" title=" " alt="" coords="1154,116,1324,157"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="1303,74,1260,118,1256,114,1300,70"/>
+<area shape="rect" id="Node000010" href="$action_8cpp.html" title=" " alt="" coords="1348,116,1533,157"/>
+<area shape="poly" id="edge10_Node000001_Node000010" title=" " alt="" coords="1378,70,1423,114,1419,118,1375,74"/>
+<area shape="rect" id="Node000011" href="$privileged_8cpp.html" title=" " alt="" coords="1557,116,1742,157"/>
+<area shape="poly" id="edge11_Node000001_Node000011" title=" " alt="" coords="1437,64,1590,113,1588,118,1436,69"/>
+<area shape="rect" id="Node000012" href="$sys-vm-oc_8cpp.html" title=" " alt="" coords="1766,116,1952,157"/>
+<area shape="poly" id="edge12_Node000001_Node000012" title=" " alt="" coords="1446,49,1593,74,1755,106,1785,113,1784,118,1754,112,1592,80,1445,54"/>
+<area shape="rect" id="Node000013" href="$executor_8cpp.html" title=" " alt="" coords="1975,116,2193,157"/>
+<area shape="poly" id="edge13_Node000001_Node000013" title=" " alt="" coords="1446,41,1684,67,1965,106,2001,113,2000,119,1964,112,1684,72,1446,47"/>
+<area shape="rect" id="Node000014" href="$sys-vm_8cpp.html" title=" " alt="" coords="2217,116,2402,157"/>
+<area shape="poly" id="edge14_Node000001_Node000014" title=" " alt="" coords="1446,35,1595,43,1785,56,1996,77,2206,106,2240,113,2239,119,2205,112,1995,82,1785,61,1595,48,1445,41"/>
+<area shape="rect" id="Node000015" href="$webassembly_2transaction_8cpp.html" title=" " alt="" coords="2426,116,2612,157"/>
+<area shape="poly" id="edge15_Node000001_Node000015" title=" " alt="" coords="1446,33,1630,38,1872,50,2143,72,2281,87,2415,106,2450,113,2449,119,2414,112,2280,92,2142,77,1871,55,1630,43,1446,38"/>
+<area shape="rect" id="Node000016" href="$state__history_2include_2sysio_2state__history_2serialization_8hpp.html" title=" " alt="" coords="2635,109,2816,165"/>
+<area shape="poly" id="edge16_Node000001_Node000016" title=" " alt="" coords="1446,31,1663,33,1956,43,2289,66,2459,83,2625,106,2636,108,2635,114,2624,112,2458,89,2288,71,1956,48,1662,38,1446,36"/>
+<area shape="rect" id="Node000020" href="$producer__plugin_8cpp.html" title=" " alt="" coords="2840,116,2998,157"/>
+<area shape="poly" id="edge20_Node000001_Node000020" title=" " alt="" coords="1446,34,1749,42,2148,56,2542,77,2705,91,2829,106,2860,113,2859,119,2828,112,2704,96,2541,82,2148,61,1749,47,1446,39"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="854,177,881,219,876,221,849,179"/>
+<area shape="rect" id="Node000017" href="$create__deltas_8cpp.html" title=" " alt="" coords="2484,220,2629,261"/>
+<area shape="poly" id="edge17_Node000016_Node000017" title=" " alt="" coords="2669,175,2590,222,2587,217,2666,171"/>
+<area shape="rect" id="Node000018" href="$trace__converter_8cpp.html" title=" " alt="" coords="2653,220,2798,261"/>
+<area shape="poly" id="edge18_Node000016_Node000018" title=" " alt="" coords="2728,180,2728,220,2723,220,2723,180"/>
+<area shape="rect" id="Node000019" href="$state__history__plugin_8cpp.html" title=" " alt="" coords="2823,213,2964,268"/>
+<area shape="poly" id="edge19_Node000016_Node000019" title=" " alt="" coords="2785,171,2850,210,2847,214,2782,175"/>
+</map>

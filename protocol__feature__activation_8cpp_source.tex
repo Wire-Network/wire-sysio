@@ -1,0 +1,56 @@
+\doxysection{protocol\+\_\+feature\+\_\+activation.\+cpp}
+\hypertarget{protocol__feature__activation_8cpp_source}{}\label{protocol__feature__activation_8cpp_source}\index{libraries/chain/protocol\_feature\_activation.cpp@{libraries/chain/protocol\_feature\_activation.cpp}}
+\mbox{\hyperlink{protocol__feature__activation_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{protocol__feature__activation_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{protocol__feature__activation_8hpp}{sysio/chain/protocol\_feature\_activation.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{protocol__feature__activation_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp}{sysio/chain/exceptions.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{protocol__feature__activation_8cpp_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{protocol__feature__activation_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <algorithm>}}
+\DoxyCodeLine{\Hypertarget{protocol__feature__activation_8cpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{protocol__feature__activation_8cpp_source_l00006}00006\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{\ \textcolor{keyword}{namespace\ }chain\ \{}
+\DoxyCodeLine{\Hypertarget{protocol__feature__activation_8cpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{protocol__feature__activation_8cpp_source_l00008}\mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature__activation_a4590a4712e754cb8a9488a768305b559}{00008}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature__activation_a4590a4712e754cb8a9488a768305b559}{protocol\_feature\_activation::reflector\_init}}()\ \{}
+\DoxyCodeLine{\Hypertarget{protocol__feature__activation_8cpp_source_l00009}00009\ \ \ \ \ \ \ \textcolor{keyword}{static\_assert}(\ \mbox{\hyperlink{namespacefc_1_1raw_a2faa56ac1b3732aa5606b053b3f92d78}{fc::raw::has\_feature\_reflector\_init\_on\_unpacked\_reflected\_types}},}
+\DoxyCodeLine{\Hypertarget{protocol__feature__activation_8cpp_source_l00010}00010\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}protocol\_feature\_activation\ expects\ FC\ to\ support\ reflector\_init"{}}\ );}
+\DoxyCodeLine{\Hypertarget{protocol__feature__activation_8cpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{protocol__feature__activation_8cpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{protocol__feature__activation_8cpp_source_l00013}00013\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature__activation_a659c70c2f93eb19013970b0331fff00e}{protocol\_features}}.size()\ >\ 0,\ ill\_formed\_protocol\_feature\_activation,}
+\DoxyCodeLine{\Hypertarget{protocol__feature__activation_8cpp_source_l00014}00014\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Protocol\ feature\ activation\ extension\ must\ have\ at\ least\ one\ protocol\ feature\ digest"{}},}
+\DoxyCodeLine{\Hypertarget{protocol__feature__activation_8cpp_source_l00015}00015\ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{protocol__feature__activation_8cpp_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{protocol__feature__activation_8cpp_source_l00017}00017\ \ \ \ \ \ \ set<digest\_type>\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{\Hypertarget{protocol__feature__activation_8cpp_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{protocol__feature__activation_8cpp_source_l00019}00019\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ :\ \mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature__activation_a659c70c2f93eb19013970b0331fff00e}{protocol\_features}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{protocol__feature__activation_8cpp_source_l00020}00020\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ res\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.insert(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ );}
+\DoxyCodeLine{\Hypertarget{protocol__feature__activation_8cpp_source_l00021}00021\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ res.second,\ ill\_formed\_protocol\_feature\_activation,}
+\DoxyCodeLine{\Hypertarget{protocol__feature__activation_8cpp_source_l00022}00022\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Protocol\ feature\ digest\ \$\{d\}\ was\ repeated\ in\ the\ protocol\ feature\ activation\ extension"{}},}
+\DoxyCodeLine{\Hypertarget{protocol__feature__activation_8cpp_source_l00023}00023\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}d"{}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}})}
+\DoxyCodeLine{\Hypertarget{protocol__feature__activation_8cpp_source_l00024}00024\ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{protocol__feature__activation_8cpp_source_l00025}00025\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{protocol__feature__activation_8cpp_source_l00026}00026\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{protocol__feature__activation_8cpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{protocol__feature__activation_8cpp_source_l00028}\mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature__activation__set_ab01dbdab9b0adcec82ad87b33a12f3a6}{00028}}\ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature__activation__set_a76272ea0cd2c056a5ac64833d235df9b}{protocol\_feature\_activation\_set::protocol\_feature\_activation\_set}}(}
+\DoxyCodeLine{\Hypertarget{protocol__feature__activation_8cpp_source_l00029}00029\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature__activation__set}{protocol\_feature\_activation\_set}}\&\ orig\_pfa\_set,}
+\DoxyCodeLine{\Hypertarget{protocol__feature__activation_8cpp_source_l00030}00030\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1vector}{vector<digest\_type>}}\ additional\_features,}
+\DoxyCodeLine{\Hypertarget{protocol__feature__activation_8cpp_source_l00031}00031\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ enforce\_disjoint}
+\DoxyCodeLine{\Hypertarget{protocol__feature__activation_8cpp_source_l00032}00032\ \ \ \ )}
+\DoxyCodeLine{\Hypertarget{protocol__feature__activation_8cpp_source_l00033}00033\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{protocol__feature__activation_8cpp_source_l00034}00034\ \ \ \ \ \ \ std::sort(\ additional\_features.begin(),\ additional\_features.end()\ );}
+\DoxyCodeLine{\Hypertarget{protocol__feature__activation_8cpp_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{protocol__feature__activation_8cpp_source_l00036}00036\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ s1\ =\ orig\_pfa\_set.\mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature__activation__set_a15562ea9156da8caf0dcdf91b4cc2129}{protocol\_features}};}
+\DoxyCodeLine{\Hypertarget{protocol__feature__activation_8cpp_source_l00037}00037\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ s2\ =\ additional\_features;}
+\DoxyCodeLine{\Hypertarget{protocol__feature__activation_8cpp_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{protocol__feature__activation_8cpp_source_l00039}00039\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ expected\_size\ =\ s1.size()\ +\ s2.size();}
+\DoxyCodeLine{\Hypertarget{protocol__feature__activation_8cpp_source_l00040}00040\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature__activation__set_a15562ea9156da8caf0dcdf91b4cc2129}{protocol\_features}}.reserve(\ expected\_size\ );}
+\DoxyCodeLine{\Hypertarget{protocol__feature__activation_8cpp_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{protocol__feature__activation_8cpp_source_l00042}00042\ \ \ \ \ \ \ std::set\_union(\ s1.cbegin(),\ s1.cend(),\ s2.cbegin(),\ s2.cend(),\ \mbox{\hyperlink{namespacesysio_1_1chain_a1491348a4182743cfdf2d0d41f5c6796}{end\_inserter}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature__activation__set_a15562ea9156da8caf0dcdf91b4cc2129}{protocol\_features}}\ )\ );}
+\DoxyCodeLine{\Hypertarget{protocol__feature__activation_8cpp_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{protocol__feature__activation_8cpp_source_l00044}00044\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ !enforce\_disjoint\ ||\ \mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature__activation__set_a15562ea9156da8caf0dcdf91b4cc2129}{protocol\_features}}.size()\ ==\ expected\_size,}
+\DoxyCodeLine{\Hypertarget{protocol__feature__activation_8cpp_source_l00045}00045\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ invalid\_block\_header\_extension,}
+\DoxyCodeLine{\Hypertarget{protocol__feature__activation_8cpp_source_l00046}00046\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}duplication\ of\ protocol\ feature\ digests"{}}}
+\DoxyCodeLine{\Hypertarget{protocol__feature__activation_8cpp_source_l00047}00047\ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{protocol__feature__activation_8cpp_source_l00048}00048\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{protocol__feature__activation_8cpp_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{protocol__feature__activation_8cpp_source_l00050}00050\ \}\ \}\ \ \textcolor{comment}{//\ sysio::chain}}
+
+\end{DoxyCode}

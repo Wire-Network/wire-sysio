@@ -1,0 +1,183 @@
+\doxysection{libraries/sys-\/vm/external/\+Catch2/include/internal/catch\+\_\+tostring.h File Reference}
+\hypertarget{catch__tostring_8h}{}\label{catch__tostring_8h}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_tostring.h@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_tostring.h}}
+{\ttfamily \#include $<$vector$>$}\newline
+{\ttfamily \#include $<$cstddef$>$}\newline
+{\ttfamily \#include $<$type\+\_\+traits$>$}\newline
+{\ttfamily \#include $<$string$>$}\newline
+{\ttfamily \#include "{}catch\+\_\+compiler\+\_\+capabilities.\+h"{}}\newline
+{\ttfamily \#include "{}catch\+\_\+stream.\+h"{}}\newline
+{\ttfamily \#include "{}catch\+\_\+interfaces\+\_\+enum\+\_\+values\+\_\+registry.\+h"{}}\newline
+Include dependency graph for catch\+\_\+tostring.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{catch__tostring_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{catch__tostring_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{class_catch_1_1_detail_1_1_is_stream_insertable}{Catch\+::\+Detail\+::\+Is\+Stream\+Insertable$<$ T $>$}}
+\item 
+struct \mbox{\hyperlink{struct_catch_1_1_string_maker}{Catch\+::\+String\+Maker$<$ T, typename $>$}}
+\item 
+struct \mbox{\hyperlink{struct_catch_1_1_string_maker_3_01std_1_1string_01_4}{Catch\+::\+String\+Maker$<$ std\+::string $>$}}
+\item 
+struct \mbox{\hyperlink{struct_catch_1_1_string_maker_3_01char_01const_01_5_01_4}{Catch\+::\+String\+Maker$<$ char const \texorpdfstring{$\ast$}{*} $>$}}
+\item 
+struct \mbox{\hyperlink{struct_catch_1_1_string_maker_3_01char_01_5_01_4}{Catch\+::\+String\+Maker$<$ char \texorpdfstring{$\ast$}{*} $>$}}
+\item 
+struct \mbox{\hyperlink{struct_catch_1_1_string_maker_3_01std_1_1wstring_01_4}{Catch\+::\+String\+Maker$<$ std\+::wstring $>$}}
+\item 
+struct \mbox{\hyperlink{struct_catch_1_1_string_maker_3_01wchar__t_01const_01_5_01_4}{Catch\+::\+String\+Maker$<$ wchar\+\_\+t const \texorpdfstring{$\ast$}{*} $>$}}
+\item 
+struct \mbox{\hyperlink{struct_catch_1_1_string_maker_3_01wchar__t_01_5_01_4}{Catch\+::\+String\+Maker$<$ wchar\+\_\+t \texorpdfstring{$\ast$}{*} $>$}}
+\item 
+struct \mbox{\hyperlink{struct_catch_1_1_string_maker_3_01char_0f_s_z_0e_4}{Catch\+::\+String\+Maker$<$ char\mbox{[}\+SZ\mbox{]}$>$}}
+\item 
+struct \mbox{\hyperlink{struct_catch_1_1_string_maker_3_01signed_01char_0f_s_z_0e_4}{Catch\+::\+String\+Maker$<$ signed char\mbox{[}\+SZ\mbox{]}$>$}}
+\item 
+struct \mbox{\hyperlink{struct_catch_1_1_string_maker_3_01unsigned_01char_0f_s_z_0e_4}{Catch\+::\+String\+Maker$<$ unsigned char\mbox{[}\+SZ\mbox{]}$>$}}
+\item 
+struct \mbox{\hyperlink{struct_catch_1_1_string_maker_3_01int_01_4}{Catch\+::\+String\+Maker$<$ int $>$}}
+\item 
+struct \mbox{\hyperlink{struct_catch_1_1_string_maker_3_01long_01_4}{Catch\+::\+String\+Maker$<$ long $>$}}
+\item 
+struct \mbox{\hyperlink{struct_catch_1_1_string_maker_3_01long_01long_01_4}{Catch\+::\+String\+Maker$<$ long long $>$}}
+\item 
+struct \mbox{\hyperlink{struct_catch_1_1_string_maker_3_01unsigned_01int_01_4}{Catch\+::\+String\+Maker$<$ unsigned int $>$}}
+\item 
+struct \mbox{\hyperlink{struct_catch_1_1_string_maker_3_01unsigned_01long_01_4}{Catch\+::\+String\+Maker$<$ unsigned long $>$}}
+\item 
+struct \mbox{\hyperlink{struct_catch_1_1_string_maker_3_01unsigned_01long_01long_01_4}{Catch\+::\+String\+Maker$<$ unsigned long long $>$}}
+\item 
+struct \mbox{\hyperlink{struct_catch_1_1_string_maker_3_01bool_01_4}{Catch\+::\+String\+Maker$<$ bool $>$}}
+\item 
+struct \mbox{\hyperlink{struct_catch_1_1_string_maker_3_01char_01_4}{Catch\+::\+String\+Maker$<$ char $>$}}
+\item 
+struct \mbox{\hyperlink{struct_catch_1_1_string_maker_3_01signed_01char_01_4}{Catch\+::\+String\+Maker$<$ signed char $>$}}
+\item 
+struct \mbox{\hyperlink{struct_catch_1_1_string_maker_3_01unsigned_01char_01_4}{Catch\+::\+String\+Maker$<$ unsigned char $>$}}
+\item 
+struct \mbox{\hyperlink{struct_catch_1_1_string_maker_3_01std_1_1nullptr__t_01_4}{Catch\+::\+String\+Maker$<$ std\+::nullptr\+\_\+t $>$}}
+\item 
+struct \mbox{\hyperlink{struct_catch_1_1_string_maker_3_01float_01_4}{Catch\+::\+String\+Maker$<$ float $>$}}
+\item 
+struct \mbox{\hyperlink{struct_catch_1_1_string_maker_3_01double_01_4}{Catch\+::\+String\+Maker$<$ double $>$}}
+\item 
+struct \mbox{\hyperlink{struct_catch_1_1_string_maker_3_01_t_01_5_01_4}{Catch\+::\+String\+Maker$<$ T \texorpdfstring{$\ast$}{*} $>$}}
+\item 
+struct \mbox{\hyperlink{struct_catch_1_1_string_maker_3_01_r_01_c_1_1_5_01_4}{Catch\+::\+String\+Maker$<$ R C\+::\texorpdfstring{$\ast$}{*} $>$}}
+\item 
+struct \mbox{\hyperlink{struct_catch_1_1not__this__one}{Catch\+::not\+\_\+this\+\_\+one}}
+\item 
+struct \mbox{\hyperlink{struct_catch_1_1is__range}{Catch\+::is\+\_\+range$<$ T $>$}}
+\item 
+struct \mbox{\hyperlink{struct_catch_1_1_string_maker_3_01_r_00_01typename_01std_1_1enable__if_3_01is__range_3_01_r_01_4536d8fedfff6d62432b3dc59b56e1380}{Catch\+::\+String\+Maker$<$ R, typename std\+::enable\+\_\+if$<$ is\+\_\+range$<$ R $>$\+::value \&\&!\+::\+Catch\+::\+Detail\+::\+Is\+Stream\+Insertable$<$ R $>$\+::value $>$\+::type $>$}}
+\item 
+struct \mbox{\hyperlink{struct_catch_1_1_string_maker_3_01_t_0f_s_z_0e_4}{Catch\+::\+String\+Maker$<$ T\mbox{[}\+SZ\mbox{]}$>$}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespace_catch}{Catch}}
+\item 
+namespace \mbox{\hyperlink{namespace_catch_1_1_detail}{Catch\+::\+Detail}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{catch__tostring_8h_a1c3c601bf24488800bdf3f634a2a6b11}{INTERNAL\+\_\+\+CATCH\+\_\+\+REGISTER\+\_\+\+ENUM}}(enum\+Name, ...)
+\item 
+\#define \mbox{\hyperlink{catch__tostring_8h_a3063d7b316c984044916079ab8b7dad6}{CATCH\+\_\+\+REGISTER\+\_\+\+ENUM}}(enum\+Name, ...)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+std\+::string \mbox{\hyperlink{namespace_catch_1_1_detail_ac5d6c510e565ee5bddcc2236194ce29e}{Catch\+::\+Detail\+::raw\+Memory\+To\+String}} (const void \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}, std\+::size\+\_\+t size)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\std\+::string \mbox{\hyperlink{namespace_catch_1_1_detail_a371620ed524abfcae5c3772bf49b563a}{Catch\+::\+Detail\+::raw\+Memory\+To\+String}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}})
+\item 
+{\footnotesize template$<$typename E $>$ }\\std\+::string \mbox{\hyperlink{namespace_catch_1_1_detail_a242396de537c5176710d680cc9ca6b93}{Catch\+::\+Detail\+::convert\+Unknown\+Enum\+To\+String}} (E e)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\std\+::enable\+\_\+if$<$!std\+::is\+\_\+enum$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}} \&\&!std\+::is\+\_\+base\+\_\+of$<$ std\+::exception, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}}, std\+::string $>$\+::type \mbox{\hyperlink{namespace_catch_1_1_detail_aa4fbd846029625d08378606ffe9ebc3b}{Catch\+::\+Detail\+::convert\+Unstreamable}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const \&)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\std\+::enable\+\_\+if$<$!std\+::is\+\_\+enum$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}} \&\&std\+::is\+\_\+base\+\_\+of$<$ std\+::exception, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}}, std\+::string $>$\+::type \mbox{\hyperlink{namespace_catch_1_1_detail_a669969ab020f5a314d6fa97749a99f56}{Catch\+::\+Detail\+::convert\+Unstreamable}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const \&ex)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\std\+::enable\+\_\+if$<$ std\+::is\+\_\+enum$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}}, std\+::string $>$\+::type \mbox{\hyperlink{namespace_catch_1_1_detail_af5310e4687d8c000e7911b91164756e6}{Catch\+::\+Detail\+::convert\+Unstreamable}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\std\+::string \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{Catch\+::\+Detail\+::stringify}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&e)
+\item 
+{\footnotesize template$<$typename Input\+Iterator $>$ }\\std\+::string \mbox{\hyperlink{namespace_catch_1_1_detail_a6650a1dff325bf29962ff15ae73fd972}{Catch\+::\+Detail\+::range\+To\+String}} (Input\+Iterator first, Input\+Iterator last)
+\item 
+{\footnotesize template$<$typename Range $>$ }\\std\+::string \mbox{\hyperlink{namespace_catch_af13494e925a793e3e7143c6ce6f442c2}{Catch\+::range\+To\+String}} (Range const \&range)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ }\\std\+::string \mbox{\hyperlink{namespace_catch_ae162dc66b7767a52e7e4283915fd3d9f}{Catch\+::range\+To\+String}} (std\+::vector$<$ bool, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ const \&v)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_catch_1_1not__this__one}{not\+\_\+this\+\_\+one}} \mbox{\hyperlink{namespace_catch_ad631ea7966978087a74b24be7a3adaf8}{Catch\+::begin}} (...)
+\item 
+\mbox{\hyperlink{struct_catch_1_1not__this__one}{not\+\_\+this\+\_\+one}} \mbox{\hyperlink{namespace_catch_ac19253ceb17eee4cf6a10dd39e4a98c6}{Catch\+::end}} (...)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{catch__tostring_8h_a3063d7b316c984044916079ab8b7dad6}\index{catch\_tostring.h@{catch\_tostring.h}!CATCH\_REGISTER\_ENUM@{CATCH\_REGISTER\_ENUM}}
+\index{CATCH\_REGISTER\_ENUM@{CATCH\_REGISTER\_ENUM}!catch\_tostring.h@{catch\_tostring.h}}
+\doxysubsubsection{\texorpdfstring{CATCH\_REGISTER\_ENUM}{CATCH\_REGISTER\_ENUM}}
+{\footnotesize\ttfamily \label{catch__tostring_8h_a3063d7b316c984044916079ab8b7dad6} 
+\#define CATCH\+\_\+\+REGISTER\+\_\+\+ENUM(\begin{DoxyParamCaption}\item[{}]{enum\+Name}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__tostring_8h_a1c3c601bf24488800bdf3f634a2a6b11}{INTERNAL\_CATCH\_REGISTER\_ENUM}}(\ enumName,\ \_\_VA\_ARGS\_\_\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__tostring_8h_source_l00653}{653}} of file \mbox{\hyperlink{catch__tostring_8h_source}{catch\+\_\+tostring.\+h}}.
+
+\Hypertarget{catch__tostring_8h_a1c3c601bf24488800bdf3f634a2a6b11}\index{catch\_tostring.h@{catch\_tostring.h}!INTERNAL\_CATCH\_REGISTER\_ENUM@{INTERNAL\_CATCH\_REGISTER\_ENUM}}
+\index{INTERNAL\_CATCH\_REGISTER\_ENUM@{INTERNAL\_CATCH\_REGISTER\_ENUM}!catch\_tostring.h@{catch\_tostring.h}}
+\doxysubsubsection{\texorpdfstring{INTERNAL\_CATCH\_REGISTER\_ENUM}{INTERNAL\_CATCH\_REGISTER\_ENUM}}
+{\footnotesize\ttfamily \label{catch__tostring_8h_a1c3c601bf24488800bdf3f634a2a6b11} 
+\#define INTERNAL\+\_\+\+CATCH\+\_\+\+REGISTER\+\_\+\+ENUM(\begin{DoxyParamCaption}\item[{}]{enum\+Name}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{template}<>\ \textcolor{keyword}{struct\ }StringMaker<enumName>\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ std::string\ \mbox{\hyperlink{struct_catch_1_1_string_maker_a98ebf81ba6ef3cfd72b23316e291d3d0}{convert}}(\ enumName\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ )\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ enumInfo\ =\ \mbox{\hyperlink{namespace_catch_a585459763f2c7610e57de2dd22dd1ad8}{::Catch::getMutableRegistryHub}}().\mbox{\hyperlink{struct_catch_1_1_i_mutable_registry_hub_ab1f0013630047f8295e5969b624ad632}{getMutableEnumValuesRegistry}}().\mbox{\hyperlink{struct_catch_1_1_i_mutable_enum_values_registry_a56e9726c383ed48731621c7183730310}{registerEnum}}(\ \#enumName,\ \#\_\_VA\_ARGS\_\_,\ \{\ \_\_VA\_ARGS\_\_\ \}\ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ enumInfo.\mbox{\hyperlink{struct_catch_1_1_detail_1_1_enum_info_a2fdfacc411d7afb1cb690366e5e49cb3}{lookup}}(\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ )\ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \};\ \(\backslash\)}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__tostring_8h_source_l00643}{643}} of file \mbox{\hyperlink{catch__tostring_8h_source}{catch\+\_\+tostring.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00643\ \textcolor{preprocessor}{\#define\ INTERNAL\_CATCH\_REGISTER\_ENUM(\ enumName,\ ...\ )\ \(\backslash\)}}
+\DoxyCodeLine{00644\ \textcolor{preprocessor}{namespace\ Catch\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00645\ \textcolor{preprocessor}{\ \ \ \ template<>\ struct\ StringMaker<enumName>\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00646\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ static\ std::string\ convert(\ enumName\ value\ )\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00647\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ static\ const\ auto\&\ enumInfo\ =\ ::Catch::getMutableRegistryHub().getMutableEnumValuesRegistry().registerEnum(\ \#enumName,\ \#\_\_VA\_ARGS\_\_,\ \{\ \_\_VA\_ARGS\_\_\ \}\ );\ \(\backslash\)}}
+\DoxyCodeLine{00648\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ return\ enumInfo.lookup(\ static\_cast<int>(\ value\ )\ );\ \(\backslash\)}}
+\DoxyCodeLine{00649\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00650\ \textcolor{preprocessor}{\ \ \ \ \};\ \(\backslash\)}}
+\DoxyCodeLine{00651\ \textcolor{preprocessor}{\}}}
+
+\end{DoxyCode}

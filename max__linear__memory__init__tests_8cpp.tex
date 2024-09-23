@@ -1,0 +1,137 @@
+\doxysection{libraries/sys-\/vm/tests/max\+\_\+linear\+\_\+memory\+\_\+init\+\_\+tests.cpp File Reference}
+\hypertarget{max__linear__memory__init__tests_8cpp}{}\label{max__linear__memory__init__tests_8cpp}\index{libraries/sys-\/vm/tests/max\_linear\_memory\_init\_tests.cpp@{libraries/sys-\/vm/tests/max\_linear\_memory\_init\_tests.cpp}}
+{\ttfamily \#include $<$sysio/vm/backend.\+hpp$>$}\newline
+{\ttfamily \#include "{}utils.\+hpp"{}}\newline
+{\ttfamily \#include $<$catch2/catch.\+hpp$>$}\newline
+Include dependency graph for max\+\_\+linear\+\_\+memory\+\_\+init\+\_\+tests.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{max__linear__memory__init__tests_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{max__linear__memory__init__tests_8cpp_a072df4a0e2daf6b15f5506ac678e44c8}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Test max\+\_\+linear\+\_\+memory\+\_\+init default"{}, "{}\mbox{[}max\+\_\+linear\+\_\+memory\+\_\+init\+\_\+test\mbox{]}"{})
+\item 
+\mbox{\hyperlink{max__linear__memory__init__tests_8cpp_a62631d0e7de52b2db06a8702e6e1889e}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Test max\+\_\+linear\+\_\+memory\+\_\+init static"{}, "{}\mbox{[}max\+\_\+linear\+\_\+memory\+\_\+init\+\_\+test\mbox{]}"{})
+\item 
+\mbox{\hyperlink{max__linear__memory__init__tests_8cpp_a5e53eca741edce674b2a8b71e227a6c4}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Test max\+\_\+linear\+\_\+memory\+\_\+init unlimited"{}, "{}\mbox{[}max\+\_\+linear\+\_\+memory\+\_\+init\+\_\+test\mbox{]}"{})
+\item 
+\mbox{\hyperlink{max__linear__memory__init__tests_8cpp_aa31b922c8c5d39d6f55373b9fe192988}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Test max\+\_\+linear\+\_\+memory\+\_\+init dynamic"{}, "{}\mbox{[}max\+\_\+linear\+\_\+memory\+\_\+init\+\_\+test\mbox{]}"{})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+wasm\+\_\+allocator \mbox{\hyperlink{max__linear__memory__init__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{max__linear__memory__init__tests_8cpp_a072df4a0e2daf6b15f5506ac678e44c8}\index{max\_linear\_memory\_init\_tests.cpp@{max\_linear\_memory\_init\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!max\_linear\_memory\_init\_tests.cpp@{max\_linear\_memory\_init\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{max__linear__memory__init__tests_8cpp_a072df4a0e2daf6b15f5506ac678e44c8} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Test max\+\_\+linear\+\_\+memory\+\_\+init default"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}max\+\_\+linear\+\_\+memory\+\_\+init\+\_\+test\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{max__linear__memory__init__tests_8cpp_source_l00095}{95}} of file \mbox{\hyperlink{max__linear__memory__init__tests_8cpp_source}{max\+\_\+linear\+\_\+memory\+\_\+init\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00096\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType>}};}
+\DoxyCodeLine{00097\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backendfull12(full\_12\_data\_wasm,\ \&\mbox{\hyperlink{max__linear__memory__init__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00098\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backendempty12(empty\_12\_data\_wasm,\ \&\mbox{\hyperlink{max__linear__memory__init__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00099\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backendempty13(empty\_13\_data\_wasm,\ \&\mbox{\hyperlink{max__linear__memory__init__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00100\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backendone11(one\_11\_data\_wasm,\ \&\mbox{\hyperlink{max__linear__memory__init__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00101\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backendone12(one\_12\_data\_wasm,\ \&\mbox{\hyperlink{max__linear__memory__init__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00102\ \ \ \ \textcolor{comment}{//\ This\ is\ well\ formed\ but\ should\ fail\ linking}}
+\DoxyCodeLine{00103\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(wrap\_data\_wasm,\ \&\mbox{\hyperlink{max__linear__memory__init__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}),\ wasm\_memory\_exception);}
+\DoxyCodeLine{00104\ \}}
+
+\end{DoxyCode}
+\Hypertarget{max__linear__memory__init__tests_8cpp_aa31b922c8c5d39d6f55373b9fe192988}\index{max\_linear\_memory\_init\_tests.cpp@{max\_linear\_memory\_init\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!max\_linear\_memory\_init\_tests.cpp@{max\_linear\_memory\_init\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{max__linear__memory__init__tests_8cpp_aa31b922c8c5d39d6f55373b9fe192988} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Test max\+\_\+linear\+\_\+memory\+\_\+init dynamic"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}max\+\_\+linear\+\_\+memory\+\_\+init\+\_\+test\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{max__linear__memory__init__tests_8cpp_source_l00126}{126}} of file \mbox{\hyperlink{max__linear__memory__init__tests_8cpp_source}{max\+\_\+linear\+\_\+memory\+\_\+init\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00127\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ dynamic\_options>}};}
+\DoxyCodeLine{00128\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backendfull12(full\_12\_data\_wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\{12\});}
+\DoxyCodeLine{00129\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backendempty12(empty\_12\_data\_wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\{12\});}
+\DoxyCodeLine{00130\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(empty\_13\_data\_wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\{12\}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{00131\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backendone11(one\_11\_data\_wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\{12\});}
+\DoxyCodeLine{00132\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(one\_12\_data\_wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\{12\}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{00133\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(wrap\_data\_wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\{12\}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{00134\ \}}
+
+\end{DoxyCode}
+\Hypertarget{max__linear__memory__init__tests_8cpp_a62631d0e7de52b2db06a8702e6e1889e}\index{max\_linear\_memory\_init\_tests.cpp@{max\_linear\_memory\_init\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!max\_linear\_memory\_init\_tests.cpp@{max\_linear\_memory\_init\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{max__linear__memory__init__tests_8cpp_a62631d0e7de52b2db06a8702e6e1889e} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Test max\+\_\+linear\+\_\+memory\+\_\+init static"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}max\+\_\+linear\+\_\+memory\+\_\+init\+\_\+test\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{max__linear__memory__init__tests_8cpp_source_l00106}{106}} of file \mbox{\hyperlink{max__linear__memory__init__tests_8cpp_source}{max\+\_\+linear\+\_\+memory\+\_\+init\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00107\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ static\_options>}};}
+\DoxyCodeLine{00108\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backendfull12(full\_12\_data\_wasm,\ \&\mbox{\hyperlink{max__linear__memory__init__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00109\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backendempty12(empty\_12\_data\_wasm,\ \&\mbox{\hyperlink{max__linear__memory__init__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00110\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(empty\_13\_data\_wasm,\ \&\mbox{\hyperlink{max__linear__memory__init__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{00111\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backendone11(one\_11\_data\_wasm,\ \&\mbox{\hyperlink{max__linear__memory__init__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00112\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(one\_12\_data\_wasm,\ \&\mbox{\hyperlink{max__linear__memory__init__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{00113\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(wrap\_data\_wasm,\ \&\mbox{\hyperlink{max__linear__memory__init__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{00114\ \}}
+
+\end{DoxyCode}
+\Hypertarget{max__linear__memory__init__tests_8cpp_a5e53eca741edce674b2a8b71e227a6c4}\index{max\_linear\_memory\_init\_tests.cpp@{max\_linear\_memory\_init\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!max\_linear\_memory\_init\_tests.cpp@{max\_linear\_memory\_init\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{max__linear__memory__init__tests_8cpp_a5e53eca741edce674b2a8b71e227a6c4} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Test max\+\_\+linear\+\_\+memory\+\_\+init unlimited"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}max\+\_\+linear\+\_\+memory\+\_\+init\+\_\+test\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{max__linear__memory__init__tests_8cpp_source_l00116}{116}} of file \mbox{\hyperlink{max__linear__memory__init__tests_8cpp_source}{max\+\_\+linear\+\_\+memory\+\_\+init\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00117\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ empty\_options>}};}
+\DoxyCodeLine{00118\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backendfull12(full\_12\_data\_wasm,\ \&\mbox{\hyperlink{max__linear__memory__init__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00119\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backendempty12(empty\_12\_data\_wasm,\ \&\mbox{\hyperlink{max__linear__memory__init__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00120\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backendempty13(empty\_13\_data\_wasm,\ \&\mbox{\hyperlink{max__linear__memory__init__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00121\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backendone11(one\_11\_data\_wasm,\ \&\mbox{\hyperlink{max__linear__memory__init__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00122\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backendone12(one\_12\_data\_wasm,\ \&\mbox{\hyperlink{max__linear__memory__init__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00123\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(wrap\_data\_wasm,\ \&\mbox{\hyperlink{max__linear__memory__init__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}),\ wasm\_memory\_exception);}
+\DoxyCodeLine{00124\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{max__linear__memory__init__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}\index{max\_linear\_memory\_init\_tests.cpp@{max\_linear\_memory\_init\_tests.cpp}!wa@{wa}}
+\index{wa@{wa}!max\_linear\_memory\_init\_tests.cpp@{max\_linear\_memory\_init\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{wa}{wa}}
+{\footnotesize\ttfamily \label{max__linear__memory__init__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89} 
+wasm\+\_\+allocator wa\hspace{0.3cm}{\ttfamily [extern]}}
+
+
+
+Definition at line \mbox{\hyperlink{libraries_2sys-vm_2tests_2main_8cpp_source_l00010}{10}} of file \mbox{\hyperlink{libraries_2sys-vm_2tests_2main_8cpp_source}{main.\+cpp}}.
+

@@ -1,0 +1,43 @@
+\doxysection{boost\+::hash\texorpdfstring{$<$}{<} fc\+::sha256 \texorpdfstring{$>$}{>} Struct Reference}
+\hypertarget{structboost_1_1hash_3_01fc_1_1sha256_01_4}{}\label{structboost_1_1hash_3_01fc_1_1sha256_01_4}\index{boost::hash$<$ fc::sha256 $>$@{boost::hash$<$ fc::sha256 $>$}}
+
+
+{\ttfamily \#include $<$sha256.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+size\+\_\+t \mbox{\hyperlink{structboost_1_1hash_3_01fc_1_1sha256_01_4_ad9998dab7ec57359493783a742685bc8}{operator()}} (const \mbox{\hyperlink{classfc_1_1sha256}{fc\+::sha256}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}) const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{sha256_8hpp_source_l00129}{129}} of file \mbox{\hyperlink{sha256_8hpp_source}{sha256.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structboost_1_1hash_3_01fc_1_1sha256_01_4_ad9998dab7ec57359493783a742685bc8}\index{boost::hash$<$ fc::sha256 $>$@{boost::hash$<$ fc::sha256 $>$}!operator()@{operator()}}
+\index{operator()@{operator()}!boost::hash$<$ fc::sha256 $>$@{boost::hash$<$ fc::sha256 $>$}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}}
+{\footnotesize\ttfamily \label{structboost_1_1hash_3_01fc_1_1sha256_01_4_ad9998dab7ec57359493783a742685bc8} 
+size\+\_\+t boost\+::hash$<$ \mbox{\hyperlink{classfc_1_1sha256}{fc\+::sha256}} $>$\+::operator() (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1sha256}{fc\+::sha256}} \&}]{s}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sha256_8hpp_source_l00131}{131}} of file \mbox{\hyperlink{sha256_8hpp_source}{sha256.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.\_hash[3];\textcolor{comment}{//*((size\_t*)\&s);}}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/\mbox{\hyperlink{sha256_8hpp}{sha256.\+hpp}}\end{DoxyCompactItemize}

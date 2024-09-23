@@ -1,0 +1,930 @@
+\doxysection{libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/pointer.h File Reference}
+\hypertarget{pointer_8h}{}\label{pointer_8h}\index{libraries/fc/include/fc/crypto/webauthn\_json/include/rapidjson/pointer.h@{libraries/fc/include/fc/crypto/webauthn\_json/include/rapidjson/pointer.h}}
+{\ttfamily \#include "{}document.\+h"{}}\newline
+{\ttfamily \#include "{}internal/itoa.\+h"{}}\newline
+Include dependency graph for pointer.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{pointer_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{pointer_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer$<$ Value\+Type, Allocator $>$}}
+\begin{DoxyCompactList}\small\item\em Represents a JSON Pointer. Use Pointer for \doxylink{struct_u_t_f8}{UTF8} encoding and default allocator. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_generic_pointer_1_1_token}{Generic\+Pointer$<$ Value\+Type, Allocator $>$\+::\+Token}}
+\begin{DoxyCompactList}\small\item\em \doxylink{struct_a}{A} token is the basic units of internal representation. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_generic_pointer_1_1_percent_encode_stream}{Generic\+Pointer$<$ Value\+Type, Allocator $>$\+::\+Percent\+Encode\+Stream$<$ Output\+Stream $>$}}
+\begin{DoxyCompactList}\small\item\em \doxylink{struct_a}{A} helper stream to encode character (UTF-\/8 code unit) into percent-\/encoded sequence. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} $>$ \mbox{\hyperlink{pointer_8h_a8db3e2eda83fba7d12ee284fff895262}{Pointer}}
+\begin{DoxyCompactList}\small\item\em \doxylink{class_generic_pointer}{Generic\+Pointer} for Value (UTF-\/8, default allocator). \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_gacb2e274f33e54d91b96e9883a99a98be}{Pointer\+Parse\+Error\+Code}} \{ \newline
+\mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_ggacb2e274f33e54d91b96e9883a99a98bea81e2b6fbd1bf4ac890ddb7779265e3a0}{k\+Pointer\+Parse\+Error\+None}} = 0
+, \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_ggacb2e274f33e54d91b96e9883a99a98bea5821696a2ab6cbccdc8288cbe6e81c77}{k\+Pointer\+Parse\+Error\+Token\+Must\+Begin\+With\+Solidus}}
+, \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_ggacb2e274f33e54d91b96e9883a99a98bea4d2a7e511d717fd1d2f532ef5fcf821b}{k\+Pointer\+Parse\+Error\+Invalid\+Escape}}
+, \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_ggacb2e274f33e54d91b96e9883a99a98beac0c1b013c0db34dcc5a47fc1ee7a8c35}{k\+Pointer\+Parse\+Error\+Invalid\+Percent\+Encoding}}
+, \newline
+\mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_ggacb2e274f33e54d91b96e9883a99a98beabd7eae93627f74267009a03679b6dc38}{k\+Pointer\+Parse\+Error\+Character\+Must\+Percent\+Encode}}
+ \}
+\begin{DoxyCompactList}\small\item\em Error code of parsing. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Helper functions for Generic\+Pointer}
+\begin{DoxyCompactItemize}
+\item 
+const \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ typename T\+::\+Value\+Type $>$ \& \mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}}
+\item 
+const \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ typename T\+::\+Value\+Type $>$ T2 \mbox{\hyperlink{pointer_8h_a3db30c1795eb39d4452f8698f4a67f05}{default\+Value}}
+\item 
+const \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ typename T\+::\+Value\+Type $>$ T2 T\+::\+Allocator\+Type \& \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}
+\item 
+const Char\+Type(\& \mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}} )\mbox{[}\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\mbox{]}
+\item 
+const \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ typename T\+::\+Value\+Type $>$ T2 \mbox{\hyperlink{pointer_8h_a1a309f137cf282fe5bdc882038e728d9}{value}}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\T\+::\+Value\+Type \& \mbox{\hyperlink{pointer_8h_a7ce0d37e372f630e46e221e45714e84b}{Create\+Value\+By\+Pointer}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&root, const \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ typename T\+::\+Value\+Type $>$ \&\mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}}, typename T\+::\+Allocator\+Type \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename Char\+Type , size\+\_\+t N$>$ }\\T\+::\+Value\+Type \& \mbox{\hyperlink{pointer_8h_a916460d6eccdc49ecf85e2e6ab9767a4}{Create\+Value\+By\+Pointer}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&root, const Char\+Type(\&\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}})\mbox{[}\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\mbox{]}, typename T\+::\+Allocator\+Type \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})
+\item 
+{\footnotesize template$<$typename Document\+Type $>$ }\\Document\+Type\+::\+Value\+Type \& \mbox{\hyperlink{pointer_8h_a6dc4215e763f8544057e36582381f66c}{Create\+Value\+By\+Pointer}} (Document\+Type \&document, const \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ typename Document\+Type\+::\+Value\+Type $>$ \&\mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}})
+\item 
+{\footnotesize template$<$typename Document\+Type , typename Char\+Type , size\+\_\+t N$>$ }\\Document\+Type\+::\+Value\+Type \& \mbox{\hyperlink{pointer_8h_ae5f22e098e170e51d47beb75812b9a5b}{Create\+Value\+By\+Pointer}} (Document\+Type \&document, const Char\+Type(\&\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}})\mbox{[}\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\mbox{]})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\T\+::\+Value\+Type \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{pointer_8h_a581633984b11d0587c2ad06649efefc4}{Get\+Value\+By\+Pointer}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&root, const \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ typename T\+::\+Value\+Type $>$ \&\mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}}, size\+\_\+t \texorpdfstring{$\ast$}{*}unresolved\+Token\+Index=0)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\const T\+::\+Value\+Type \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{pointer_8h_ae0edeb21a41191c864727b3b2ce95131}{Get\+Value\+By\+Pointer}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&root, const \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ typename T\+::\+Value\+Type $>$ \&\mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}}, size\+\_\+t \texorpdfstring{$\ast$}{*}unresolved\+Token\+Index=0)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename Char\+Type , size\+\_\+t N$>$ }\\T\+::\+Value\+Type \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{pointer_8h_a3f324884650614ca6b0ef4765566bc9d}{Get\+Value\+By\+Pointer}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&root, const Char\+Type(\&\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}})\mbox{[}\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\mbox{]}, size\+\_\+t \texorpdfstring{$\ast$}{*}unresolved\+Token\+Index=0)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename Char\+Type , size\+\_\+t N$>$ }\\const T\+::\+Value\+Type \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{pointer_8h_a2683bf19840749f07ceaf659b4cee6d9}{Get\+Value\+By\+Pointer}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&root, const Char\+Type(\&\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}})\mbox{[}\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\mbox{]}, size\+\_\+t \texorpdfstring{$\ast$}{*}unresolved\+Token\+Index=0)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\T\+::\+Value\+Type \& \mbox{\hyperlink{pointer_8h_accdac20f6fea3ab631da1a0df5208a61}{Get\+Value\+By\+Pointer\+With\+Default}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&root, const \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ typename T\+::\+Value\+Type $>$ \&\mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}}, const typename T\+::\+Value\+Type \&\mbox{\hyperlink{pointer_8h_a3db30c1795eb39d4452f8698f4a67f05}{default\+Value}}, typename T\+::\+Allocator\+Type \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\T\+::\+Value\+Type \& \mbox{\hyperlink{pointer_8h_a38d0f082d4e54b591cba9ae9c70cf828}{Get\+Value\+By\+Pointer\+With\+Default}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&root, const \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ typename T\+::\+Value\+Type $>$ \&\mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}}, const typename \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{T\+::\+Ch}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{pointer_8h_a3db30c1795eb39d4452f8698f4a67f05}{default\+Value}}, typename T\+::\+Allocator\+Type \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename T2 $>$ }\\\mbox{\hyperlink{pointer_8h_a7eb8633670d0e7df80a9fa3a508dd1d2}{RAPIDJSON\+\_\+\+DISABLEIF\+\_\+\+RETURN}} ((internal\+::\+Or\+Expr$<$ internal\+::\+Is\+Pointer$<$ T2 $>$, \mbox{\hyperlink{structinternal_1_1_is_generic_value}{internal\+::\+Is\+Generic\+Value}}$<$ T2 $>$ $>$),(typename T\+::\+Value\+Type \&)) \mbox{\hyperlink{pointer_8h_accdac20f6fea3ab631da1a0df5208a61}{Get\+Value\+By\+Pointer\+With\+Default}}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&root
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename Char\+Type , size\+\_\+t N$>$ }\\T\+::\+Value\+Type \& \mbox{\hyperlink{pointer_8h_a04e7d4fa9f18bae987e39e6c1045ae70}{Get\+Value\+By\+Pointer\+With\+Default}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&root, const Char\+Type(\&\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}})\mbox{[}\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\mbox{]}, const typename T\+::\+Value\+Type \&\mbox{\hyperlink{pointer_8h_a3db30c1795eb39d4452f8698f4a67f05}{default\+Value}}, typename T\+::\+Allocator\+Type \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename Char\+Type , size\+\_\+t N$>$ }\\T\+::\+Value\+Type \& \mbox{\hyperlink{pointer_8h_a25951a749a68964998983a6b4fbebf07}{Get\+Value\+By\+Pointer\+With\+Default}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&root, const Char\+Type(\&\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}})\mbox{[}\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\mbox{]}, const typename \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{T\+::\+Ch}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{pointer_8h_a3db30c1795eb39d4452f8698f4a67f05}{default\+Value}}, typename T\+::\+Allocator\+Type \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename Char\+Type , size\+\_\+t N, typename T2 $>$ }\\\mbox{\hyperlink{pointer_8h_ae26d117fc2f0ef0275825d2a510e8a8d}{RAPIDJSON\+\_\+\+DISABLEIF\+\_\+\+RETURN}} ((internal\+::\+Or\+Expr$<$ internal\+::\+Is\+Pointer$<$ T2 $>$, \mbox{\hyperlink{structinternal_1_1_is_generic_value}{internal\+::\+Is\+Generic\+Value}}$<$ T2 $>$ $>$),(typename T\+::\+Value\+Type \&)) \mbox{\hyperlink{pointer_8h_accdac20f6fea3ab631da1a0df5208a61}{Get\+Value\+By\+Pointer\+With\+Default}}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&root
+\item 
+{\footnotesize template$<$typename Document\+Type $>$ }\\Document\+Type\+::\+Value\+Type \& \mbox{\hyperlink{pointer_8h_a6fde94e8be246ff3f73ee62335a0e09c}{Get\+Value\+By\+Pointer\+With\+Default}} (Document\+Type \&document, const \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ typename Document\+Type\+::\+Value\+Type $>$ \&\mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}}, const typename Document\+Type\+::\+Value\+Type \&\mbox{\hyperlink{pointer_8h_a3db30c1795eb39d4452f8698f4a67f05}{default\+Value}})
+\item 
+{\footnotesize template$<$typename Document\+Type $>$ }\\Document\+Type\+::\+Value\+Type \& \mbox{\hyperlink{pointer_8h_a9c1c1317bc0a138099995ef011f0db3f}{Get\+Value\+By\+Pointer\+With\+Default}} (Document\+Type \&document, const \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ typename Document\+Type\+::\+Value\+Type $>$ \&\mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}}, const typename \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Document\+Type\+::\+Ch}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{pointer_8h_a3db30c1795eb39d4452f8698f4a67f05}{default\+Value}})
+\item 
+{\footnotesize template$<$typename Document\+Type , typename T2 $>$ }\\\mbox{\hyperlink{pointer_8h_a409f561a9f9a793f7032b50536f8c526}{RAPIDJSON\+\_\+\+DISABLEIF\+\_\+\+RETURN}} ((internal\+::\+Or\+Expr$<$ internal\+::\+Is\+Pointer$<$ T2 $>$, \mbox{\hyperlink{structinternal_1_1_is_generic_value}{internal\+::\+Is\+Generic\+Value}}$<$ T2 $>$ $>$),(typename Document\+Type\+::\+Value\+Type \&)) \mbox{\hyperlink{pointer_8h_accdac20f6fea3ab631da1a0df5208a61}{Get\+Value\+By\+Pointer\+With\+Default}}(Document\+Type \&document
+\item 
+{\footnotesize template$<$typename Document\+Type , typename Char\+Type , size\+\_\+t N$>$ }\\Document\+Type\+::\+Value\+Type \& \mbox{\hyperlink{pointer_8h_a41a691f733d842ff55465842e33c9bd3}{Get\+Value\+By\+Pointer\+With\+Default}} (Document\+Type \&document, const Char\+Type(\&\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}})\mbox{[}\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\mbox{]}, const typename Document\+Type\+::\+Value\+Type \&\mbox{\hyperlink{pointer_8h_a3db30c1795eb39d4452f8698f4a67f05}{default\+Value}})
+\item 
+{\footnotesize template$<$typename Document\+Type , typename Char\+Type , size\+\_\+t N$>$ }\\Document\+Type\+::\+Value\+Type \& \mbox{\hyperlink{pointer_8h_aa818d57b32e8d879ba37871b01a2b9e3}{Get\+Value\+By\+Pointer\+With\+Default}} (Document\+Type \&document, const Char\+Type(\&\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}})\mbox{[}\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\mbox{]}, const typename \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Document\+Type\+::\+Ch}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{pointer_8h_a3db30c1795eb39d4452f8698f4a67f05}{default\+Value}})
+\item 
+{\footnotesize template$<$typename Document\+Type , typename Char\+Type , size\+\_\+t N, typename T2 $>$ }\\\mbox{\hyperlink{pointer_8h_aaaf14202ae851a7d3c3db56789b9eab4}{RAPIDJSON\+\_\+\+DISABLEIF\+\_\+\+RETURN}} ((internal\+::\+Or\+Expr$<$ internal\+::\+Is\+Pointer$<$ T2 $>$, \mbox{\hyperlink{structinternal_1_1_is_generic_value}{internal\+::\+Is\+Generic\+Value}}$<$ T2 $>$ $>$),(typename Document\+Type\+::\+Value\+Type \&)) \mbox{\hyperlink{pointer_8h_accdac20f6fea3ab631da1a0df5208a61}{Get\+Value\+By\+Pointer\+With\+Default}}(Document\+Type \&document
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\T\+::\+Value\+Type \& \mbox{\hyperlink{pointer_8h_a58128fa07ac8e9159440c83d0a78f2be}{Set\+Value\+By\+Pointer}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&root, const \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ typename T\+::\+Value\+Type $>$ \&\mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}}, typename T\+::\+Value\+Type \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}, typename T\+::\+Allocator\+Type \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\T\+::\+Value\+Type \& \mbox{\hyperlink{pointer_8h_ac28f67a837bdead4e9a0b8bd02dbd4d8}{Set\+Value\+By\+Pointer}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&root, const \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ typename T\+::\+Value\+Type $>$ \&\mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}}, const typename T\+::\+Value\+Type \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}, typename T\+::\+Allocator\+Type \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\T\+::\+Value\+Type \& \mbox{\hyperlink{pointer_8h_a3187558966f689fdd72120793b39b91a}{Set\+Value\+By\+Pointer}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&root, const \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ typename T\+::\+Value\+Type $>$ \&\mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}}, const typename \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{T\+::\+Ch}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}, typename T\+::\+Allocator\+Type \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename Char\+Type , size\+\_\+t N$>$ }\\T\+::\+Value\+Type \& \mbox{\hyperlink{pointer_8h_a562b6d41c46d173c9406c8a9918c68a3}{Set\+Value\+By\+Pointer}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&root, const Char\+Type(\&\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}})\mbox{[}\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\mbox{]}, typename T\+::\+Value\+Type \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}, typename T\+::\+Allocator\+Type \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename Char\+Type , size\+\_\+t N$>$ }\\T\+::\+Value\+Type \& \mbox{\hyperlink{pointer_8h_a057fa4cef0e9df7176cfdc87ed895f34}{Set\+Value\+By\+Pointer}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&root, const Char\+Type(\&\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}})\mbox{[}\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\mbox{]}, const typename T\+::\+Value\+Type \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}, typename T\+::\+Allocator\+Type \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename Char\+Type , size\+\_\+t N$>$ }\\T\+::\+Value\+Type \& \mbox{\hyperlink{pointer_8h_a2e3bd9cdb4a8dc98aaf0580dee70f264}{Set\+Value\+By\+Pointer}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&root, const Char\+Type(\&\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}})\mbox{[}\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\mbox{]}, const typename \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{T\+::\+Ch}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}, typename T\+::\+Allocator\+Type \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})
+\item 
+{\footnotesize template$<$typename Document\+Type $>$ }\\Document\+Type\+::\+Value\+Type \& \mbox{\hyperlink{pointer_8h_a4623bdd62153e95fdfac34c3af92a654}{Set\+Value\+By\+Pointer}} (Document\+Type \&document, const \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ typename Document\+Type\+::\+Value\+Type $>$ \&\mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}}, typename Document\+Type\+::\+Value\+Type \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+{\footnotesize template$<$typename Document\+Type $>$ }\\Document\+Type\+::\+Value\+Type \& \mbox{\hyperlink{pointer_8h_a2fc4c2e668dd4e16063d596b2b9b61a3}{Set\+Value\+By\+Pointer}} (Document\+Type \&document, const \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ typename Document\+Type\+::\+Value\+Type $>$ \&\mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}}, const typename Document\+Type\+::\+Value\+Type \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+{\footnotesize template$<$typename Document\+Type $>$ }\\Document\+Type\+::\+Value\+Type \& \mbox{\hyperlink{pointer_8h_af988b5e086851ff3645fe2345019ab44}{Set\+Value\+By\+Pointer}} (Document\+Type \&document, const \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ typename Document\+Type\+::\+Value\+Type $>$ \&\mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}}, const typename \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Document\+Type\+::\+Ch}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+{\footnotesize template$<$typename Document\+Type , typename Char\+Type , size\+\_\+t N$>$ }\\Document\+Type\+::\+Value\+Type \& \mbox{\hyperlink{pointer_8h_a82e5b3f00a10ab6aaac37af78de4d19d}{Set\+Value\+By\+Pointer}} (Document\+Type \&document, const Char\+Type(\&\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}})\mbox{[}\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\mbox{]}, typename Document\+Type\+::\+Value\+Type \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+{\footnotesize template$<$typename Document\+Type , typename Char\+Type , size\+\_\+t N$>$ }\\Document\+Type\+::\+Value\+Type \& \mbox{\hyperlink{pointer_8h_a51a45d6a8d97468b650fc275255b7504}{Set\+Value\+By\+Pointer}} (Document\+Type \&document, const Char\+Type(\&\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}})\mbox{[}\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\mbox{]}, const typename Document\+Type\+::\+Value\+Type \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+{\footnotesize template$<$typename Document\+Type , typename Char\+Type , size\+\_\+t N$>$ }\\Document\+Type\+::\+Value\+Type \& \mbox{\hyperlink{pointer_8h_a46da885c093bb294a323e4c144449d2e}{Set\+Value\+By\+Pointer}} (Document\+Type \&document, const Char\+Type(\&\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}})\mbox{[}\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\mbox{]}, const typename \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Document\+Type\+::\+Ch}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\T\+::\+Value\+Type \& \mbox{\hyperlink{pointer_8h_a542981a8bdcf3bc3c701c7eff39648ac}{Swap\+Value\+By\+Pointer}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&root, const \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ typename T\+::\+Value\+Type $>$ \&\mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}}, typename T\+::\+Value\+Type \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}, typename T\+::\+Allocator\+Type \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename Char\+Type , size\+\_\+t N$>$ }\\T\+::\+Value\+Type \& \mbox{\hyperlink{pointer_8h_a8f368fc6d5e55f6f0a5ea5e2af7ea23f}{Swap\+Value\+By\+Pointer}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&root, const Char\+Type(\&\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}})\mbox{[}\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\mbox{]}, typename T\+::\+Value\+Type \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}, typename T\+::\+Allocator\+Type \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})
+\item 
+{\footnotesize template$<$typename Document\+Type $>$ }\\Document\+Type\+::\+Value\+Type \& \mbox{\hyperlink{pointer_8h_abd25c9d96f8e5002f93f998cf11905a3}{Swap\+Value\+By\+Pointer}} (Document\+Type \&document, const \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ typename Document\+Type\+::\+Value\+Type $>$ \&\mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}}, typename Document\+Type\+::\+Value\+Type \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+{\footnotesize template$<$typename Document\+Type , typename Char\+Type , size\+\_\+t N$>$ }\\Document\+Type\+::\+Value\+Type \& \mbox{\hyperlink{pointer_8h_a33c56cdd1034a750112e81df6c4e653a}{Swap\+Value\+By\+Pointer}} (Document\+Type \&document, const Char\+Type(\&\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}})\mbox{[}\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\mbox{]}, typename Document\+Type\+::\+Value\+Type \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\bool \mbox{\hyperlink{pointer_8h_a7342710933f35ad7267c871f4a8cc55f}{Erase\+Value\+By\+Pointer}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&root, const \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ typename T\+::\+Value\+Type $>$ \&\mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename Char\+Type , size\+\_\+t N$>$ }\\bool \mbox{\hyperlink{pointer_8h_a392608401615d4655338ebb295116666}{Erase\+Value\+By\+Pointer}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&root, const Char\+Type(\&\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}})\mbox{[}\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\mbox{]})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{pointer_8h_a8db3e2eda83fba7d12ee284fff895262}\index{pointer.h@{pointer.h}!Pointer@{Pointer}}
+\index{Pointer@{Pointer}!pointer.h@{pointer.h}}
+\doxysubsubsection{\texorpdfstring{Pointer}{Pointer}}
+{\footnotesize\ttfamily \label{pointer_8h_a8db3e2eda83fba7d12ee284fff895262} 
+typedef \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$\mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}}$>$ \mbox{\hyperlink{fwd_8h_a0e5c49dba7ec654cdda5735347c00397}{Pointer}}}
+
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l01109}{1109}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{pointer_8h_ae5f22e098e170e51d47beb75812b9a5b}\index{pointer.h@{pointer.h}!CreateValueByPointer@{CreateValueByPointer}}
+\index{CreateValueByPointer@{CreateValueByPointer}!pointer.h@{pointer.h}}
+\doxysubsubsection{\texorpdfstring{CreateValueByPointer()}{CreateValueByPointer()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{pointer_8h_ae5f22e098e170e51d47beb75812b9a5b} 
+template$<$typename Document\+Type , typename Char\+Type , size\+\_\+t N$>$ \\
+Document\+Type\+::\+Value\+Type \& Create\+Value\+By\+Pointer (\begin{DoxyParamCaption}\item[{Document\+Type \&}]{document}{, }\item[{const Char\+Type(\&)}]{source}{\mbox{[}\+N\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l01134}{1134}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01134\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01135\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_generic_pointer}{GenericPointer<typename\ DocumentType::ValueType>}}(\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}},\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\ -\/\ 1).Create(document);}
+\DoxyCodeLine{01136\ \}}
+
+\end{DoxyCode}
+\Hypertarget{pointer_8h_a6dc4215e763f8544057e36582381f66c}\index{pointer.h@{pointer.h}!CreateValueByPointer@{CreateValueByPointer}}
+\index{CreateValueByPointer@{CreateValueByPointer}!pointer.h@{pointer.h}}
+\doxysubsubsection{\texorpdfstring{CreateValueByPointer()}{CreateValueByPointer()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{pointer_8h_a6dc4215e763f8544057e36582381f66c} 
+template$<$typename Document\+Type $>$ \\
+Document\+Type\+::\+Value\+Type \& Create\+Value\+By\+Pointer (\begin{DoxyParamCaption}\item[{Document\+Type \&}]{document}{, }\item[{const \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ typename Document\+Type\+::\+Value\+Type $>$ \&}]{pointer}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l01129}{1129}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01129\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01130\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}}.Create(document);}
+\DoxyCodeLine{01131\ \}}
+
+\end{DoxyCode}
+\Hypertarget{pointer_8h_a916460d6eccdc49ecf85e2e6ab9767a4}\index{pointer.h@{pointer.h}!CreateValueByPointer@{CreateValueByPointer}}
+\index{CreateValueByPointer@{CreateValueByPointer}!pointer.h@{pointer.h}}
+\doxysubsubsection{\texorpdfstring{CreateValueByPointer()}{CreateValueByPointer()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{pointer_8h_a916460d6eccdc49ecf85e2e6ab9767a4} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename Char\+Type , size\+\_\+t N$>$ \\
+T\+::\+Value\+Type \& Create\+Value\+By\+Pointer (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{root}{, }\item[{const Char\+Type(\&)}]{source}{\mbox{[}\+N\mbox{]}, }\item[{typename T\+::\+Allocator\+Type \&}]{a}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l01122}{1122}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01122\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01123\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_generic_pointer}{GenericPointer<typename\ T::ValueType>}}(\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}},\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\ -\/\ 1).Create(root,\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{01124\ \}}
+
+\end{DoxyCode}
+\Hypertarget{pointer_8h_a7ce0d37e372f630e46e221e45714e84b}\index{pointer.h@{pointer.h}!CreateValueByPointer@{CreateValueByPointer}}
+\index{CreateValueByPointer@{CreateValueByPointer}!pointer.h@{pointer.h}}
+\doxysubsubsection{\texorpdfstring{CreateValueByPointer()}{CreateValueByPointer()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{pointer_8h_a7ce0d37e372f630e46e221e45714e84b} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+T\+::\+Value\+Type \& Create\+Value\+By\+Pointer (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{root}{, }\item[{const \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ typename T\+::\+Value\+Type $>$ \&}]{pointer}{, }\item[{typename T\+::\+Allocator\+Type \&}]{a}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l01117}{1117}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01117\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01118\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}}.Create(root,\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{01119\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=270pt]{pointer_8h_a7ce0d37e372f630e46e221e45714e84b_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{pointer_8h_a392608401615d4655338ebb295116666}\index{pointer.h@{pointer.h}!EraseValueByPointer@{EraseValueByPointer}}
+\index{EraseValueByPointer@{EraseValueByPointer}!pointer.h@{pointer.h}}
+\doxysubsubsection{\texorpdfstring{EraseValueByPointer()}{EraseValueByPointer()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{pointer_8h_a392608401615d4655338ebb295116666} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename Char\+Type , size\+\_\+t N$>$ \\
+bool Erase\+Value\+By\+Pointer (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{root}{, }\item[{const Char\+Type(\&)}]{source}{\mbox{[}\+N\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l01402}{1402}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01402\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01403\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_generic_pointer}{GenericPointer<typename\ T::ValueType>}}(\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}},\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\ -\/\ 1).Erase(root);}
+\DoxyCodeLine{01404\ \}}
+
+\end{DoxyCode}
+\Hypertarget{pointer_8h_a7342710933f35ad7267c871f4a8cc55f}\index{pointer.h@{pointer.h}!EraseValueByPointer@{EraseValueByPointer}}
+\index{EraseValueByPointer@{EraseValueByPointer}!pointer.h@{pointer.h}}
+\doxysubsubsection{\texorpdfstring{EraseValueByPointer()}{EraseValueByPointer()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{pointer_8h_a7342710933f35ad7267c871f4a8cc55f} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+bool Erase\+Value\+By\+Pointer (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{root}{, }\item[{const \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ typename T\+::\+Value\+Type $>$ \&}]{pointer}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l01397}{1397}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01397\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01398\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}}.Erase(root);}
+\DoxyCodeLine{01399\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=266pt]{pointer_8h_a7342710933f35ad7267c871f4a8cc55f_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{pointer_8h_a2683bf19840749f07ceaf659b4cee6d9}\index{pointer.h@{pointer.h}!GetValueByPointer@{GetValueByPointer}}
+\index{GetValueByPointer@{GetValueByPointer}!pointer.h@{pointer.h}}
+\doxysubsubsection{\texorpdfstring{GetValueByPointer()}{GetValueByPointer()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{pointer_8h_a2683bf19840749f07ceaf659b4cee6d9} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename Char\+Type , size\+\_\+t N$>$ \\
+const T\+::\+Value\+Type \texorpdfstring{$\ast$}{*} Get\+Value\+By\+Pointer (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{root}{, }\item[{const Char\+Type(\&)}]{source}{\mbox{[}\+N\mbox{]}, }\item[{size\+\_\+t \texorpdfstring{$\ast$}{*}}]{unresolved\+Token\+Index}{ = {\ttfamily 0}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l01156}{1156}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01156\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01157\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_generic_pointer}{GenericPointer<typename\ T::ValueType>}}(\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}},\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\ -\/\ 1).Get(root,\ unresolvedTokenIndex);}
+\DoxyCodeLine{01158\ \}}
+
+\end{DoxyCode}
+\Hypertarget{pointer_8h_ae0edeb21a41191c864727b3b2ce95131}\index{pointer.h@{pointer.h}!GetValueByPointer@{GetValueByPointer}}
+\index{GetValueByPointer@{GetValueByPointer}!pointer.h@{pointer.h}}
+\doxysubsubsection{\texorpdfstring{GetValueByPointer()}{GetValueByPointer()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{pointer_8h_ae0edeb21a41191c864727b3b2ce95131} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+const T\+::\+Value\+Type \texorpdfstring{$\ast$}{*} Get\+Value\+By\+Pointer (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{root}{, }\item[{const \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ typename T\+::\+Value\+Type $>$ \&}]{pointer}{, }\item[{size\+\_\+t \texorpdfstring{$\ast$}{*}}]{unresolved\+Token\+Index}{ = {\ttfamily 0}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l01146}{1146}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01146\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01147\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}}.Get(root,\ unresolvedTokenIndex);}
+\DoxyCodeLine{01148\ \}}
+
+\end{DoxyCode}
+\Hypertarget{pointer_8h_a3f324884650614ca6b0ef4765566bc9d}\index{pointer.h@{pointer.h}!GetValueByPointer@{GetValueByPointer}}
+\index{GetValueByPointer@{GetValueByPointer}!pointer.h@{pointer.h}}
+\doxysubsubsection{\texorpdfstring{GetValueByPointer()}{GetValueByPointer()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{pointer_8h_a3f324884650614ca6b0ef4765566bc9d} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename Char\+Type , size\+\_\+t N$>$ \\
+T\+::\+Value\+Type \texorpdfstring{$\ast$}{*} Get\+Value\+By\+Pointer (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{root}{, }\item[{const Char\+Type(\&)}]{source}{\mbox{[}\+N\mbox{]}, }\item[{size\+\_\+t \texorpdfstring{$\ast$}{*}}]{unresolved\+Token\+Index}{ = {\ttfamily 0}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l01151}{1151}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01151\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01152\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_generic_pointer}{GenericPointer<typename\ T::ValueType>}}(\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}},\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\ -\/\ 1).Get(root,\ unresolvedTokenIndex);}
+\DoxyCodeLine{01153\ \}}
+
+\end{DoxyCode}
+\Hypertarget{pointer_8h_a581633984b11d0587c2ad06649efefc4}\index{pointer.h@{pointer.h}!GetValueByPointer@{GetValueByPointer}}
+\index{GetValueByPointer@{GetValueByPointer}!pointer.h@{pointer.h}}
+\doxysubsubsection{\texorpdfstring{GetValueByPointer()}{GetValueByPointer()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{pointer_8h_a581633984b11d0587c2ad06649efefc4} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+T\+::\+Value\+Type \texorpdfstring{$\ast$}{*} Get\+Value\+By\+Pointer (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{root}{, }\item[{const \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ typename T\+::\+Value\+Type $>$ \&}]{pointer}{, }\item[{size\+\_\+t \texorpdfstring{$\ast$}{*}}]{unresolved\+Token\+Index}{ = {\ttfamily 0}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l01141}{1141}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01141\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01142\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}}.Get(root,\ unresolvedTokenIndex);}
+\DoxyCodeLine{01143\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{pointer_8h_a581633984b11d0587c2ad06649efefc4_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{pointer_8h_aa818d57b32e8d879ba37871b01a2b9e3}\index{pointer.h@{pointer.h}!GetValueByPointerWithDefault@{GetValueByPointerWithDefault}}
+\index{GetValueByPointerWithDefault@{GetValueByPointerWithDefault}!pointer.h@{pointer.h}}
+\doxysubsubsection{\texorpdfstring{GetValueByPointerWithDefault()}{GetValueByPointerWithDefault()}\hspace{0.1cm}{\footnotesize\ttfamily [1/8]}}
+{\footnotesize\ttfamily \label{pointer_8h_aa818d57b32e8d879ba37871b01a2b9e3} 
+template$<$typename Document\+Type , typename Char\+Type , size\+\_\+t N$>$ \\
+Document\+Type\+::\+Value\+Type \& Get\+Value\+By\+Pointer\+With\+Default (\begin{DoxyParamCaption}\item[{Document\+Type \&}]{document}{, }\item[{const Char\+Type(\&)}]{source}{\mbox{[}\+N\mbox{]}, }\item[{const typename \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Document\+Type\+::\+Ch}} \texorpdfstring{$\ast$}{*}}]{default\+Value}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l01239}{1239}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01239\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01240\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_generic_pointer}{GenericPointer<typename\ DocumentType::ValueType>}}(\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}},\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\ -\/\ 1).GetWithDefault(document,\ \mbox{\hyperlink{pointer_8h_a3db30c1795eb39d4452f8698f4a67f05}{defaultValue}});}
+\DoxyCodeLine{01241\ \}}
+
+\end{DoxyCode}
+\Hypertarget{pointer_8h_a41a691f733d842ff55465842e33c9bd3}\index{pointer.h@{pointer.h}!GetValueByPointerWithDefault@{GetValueByPointerWithDefault}}
+\index{GetValueByPointerWithDefault@{GetValueByPointerWithDefault}!pointer.h@{pointer.h}}
+\doxysubsubsection{\texorpdfstring{GetValueByPointerWithDefault()}{GetValueByPointerWithDefault()}\hspace{0.1cm}{\footnotesize\ttfamily [2/8]}}
+{\footnotesize\ttfamily \label{pointer_8h_a41a691f733d842ff55465842e33c9bd3} 
+template$<$typename Document\+Type , typename Char\+Type , size\+\_\+t N$>$ \\
+Document\+Type\+::\+Value\+Type \& Get\+Value\+By\+Pointer\+With\+Default (\begin{DoxyParamCaption}\item[{Document\+Type \&}]{document}{, }\item[{const Char\+Type(\&)}]{source}{\mbox{[}\+N\mbox{]}, }\item[{const typename Document\+Type\+::\+Value\+Type \&}]{default\+Value}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l01234}{1234}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01234\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01235\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_generic_pointer}{GenericPointer<typename\ DocumentType::ValueType>}}(\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}},\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\ -\/\ 1).GetWithDefault(document,\ \mbox{\hyperlink{pointer_8h_a3db30c1795eb39d4452f8698f4a67f05}{defaultValue}});}
+\DoxyCodeLine{01236\ \}}
+
+\end{DoxyCode}
+\Hypertarget{pointer_8h_a9c1c1317bc0a138099995ef011f0db3f}\index{pointer.h@{pointer.h}!GetValueByPointerWithDefault@{GetValueByPointerWithDefault}}
+\index{GetValueByPointerWithDefault@{GetValueByPointerWithDefault}!pointer.h@{pointer.h}}
+\doxysubsubsection{\texorpdfstring{GetValueByPointerWithDefault()}{GetValueByPointerWithDefault()}\hspace{0.1cm}{\footnotesize\ttfamily [3/8]}}
+{\footnotesize\ttfamily \label{pointer_8h_a9c1c1317bc0a138099995ef011f0db3f} 
+template$<$typename Document\+Type $>$ \\
+Document\+Type\+::\+Value\+Type \& Get\+Value\+By\+Pointer\+With\+Default (\begin{DoxyParamCaption}\item[{Document\+Type \&}]{document}{, }\item[{const \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ typename Document\+Type\+::\+Value\+Type $>$ \&}]{pointer}{, }\item[{const typename \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Document\+Type\+::\+Ch}} \texorpdfstring{$\ast$}{*}}]{default\+Value}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l01216}{1216}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01216\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01217\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}}.GetWithDefault(document,\ \mbox{\hyperlink{pointer_8h_a3db30c1795eb39d4452f8698f4a67f05}{defaultValue}});}
+\DoxyCodeLine{01218\ \}}
+
+\end{DoxyCode}
+\Hypertarget{pointer_8h_a6fde94e8be246ff3f73ee62335a0e09c}\index{pointer.h@{pointer.h}!GetValueByPointerWithDefault@{GetValueByPointerWithDefault}}
+\index{GetValueByPointerWithDefault@{GetValueByPointerWithDefault}!pointer.h@{pointer.h}}
+\doxysubsubsection{\texorpdfstring{GetValueByPointerWithDefault()}{GetValueByPointerWithDefault()}\hspace{0.1cm}{\footnotesize\ttfamily [4/8]}}
+{\footnotesize\ttfamily \label{pointer_8h_a6fde94e8be246ff3f73ee62335a0e09c} 
+template$<$typename Document\+Type $>$ \\
+Document\+Type\+::\+Value\+Type \& Get\+Value\+By\+Pointer\+With\+Default (\begin{DoxyParamCaption}\item[{Document\+Type \&}]{document}{, }\item[{const \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ typename Document\+Type\+::\+Value\+Type $>$ \&}]{pointer}{, }\item[{const typename Document\+Type\+::\+Value\+Type \&}]{default\+Value}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l01211}{1211}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01211\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01212\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}}.GetWithDefault(document,\ \mbox{\hyperlink{pointer_8h_a3db30c1795eb39d4452f8698f4a67f05}{defaultValue}});}
+\DoxyCodeLine{01213\ \}}
+
+\end{DoxyCode}
+\Hypertarget{pointer_8h_a25951a749a68964998983a6b4fbebf07}\index{pointer.h@{pointer.h}!GetValueByPointerWithDefault@{GetValueByPointerWithDefault}}
+\index{GetValueByPointerWithDefault@{GetValueByPointerWithDefault}!pointer.h@{pointer.h}}
+\doxysubsubsection{\texorpdfstring{GetValueByPointerWithDefault()}{GetValueByPointerWithDefault()}\hspace{0.1cm}{\footnotesize\ttfamily [5/8]}}
+{\footnotesize\ttfamily \label{pointer_8h_a25951a749a68964998983a6b4fbebf07} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename Char\+Type , size\+\_\+t N$>$ \\
+T\+::\+Value\+Type \& Get\+Value\+By\+Pointer\+With\+Default (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{root}{, }\item[{const Char\+Type(\&)}]{source}{\mbox{[}\+N\mbox{]}, }\item[{const typename \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{T\+::\+Ch}} \texorpdfstring{$\ast$}{*}}]{default\+Value}{, }\item[{typename T\+::\+Allocator\+Type \&}]{a}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l01191}{1191}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01191\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01192\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_generic_pointer}{GenericPointer<typename\ T::ValueType>}}(\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}},\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\ -\/\ 1).GetWithDefault(root,\ \mbox{\hyperlink{pointer_8h_a3db30c1795eb39d4452f8698f4a67f05}{defaultValue}},\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{01193\ \}}
+
+\end{DoxyCode}
+\Hypertarget{pointer_8h_a04e7d4fa9f18bae987e39e6c1045ae70}\index{pointer.h@{pointer.h}!GetValueByPointerWithDefault@{GetValueByPointerWithDefault}}
+\index{GetValueByPointerWithDefault@{GetValueByPointerWithDefault}!pointer.h@{pointer.h}}
+\doxysubsubsection{\texorpdfstring{GetValueByPointerWithDefault()}{GetValueByPointerWithDefault()}\hspace{0.1cm}{\footnotesize\ttfamily [6/8]}}
+{\footnotesize\ttfamily \label{pointer_8h_a04e7d4fa9f18bae987e39e6c1045ae70} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename Char\+Type , size\+\_\+t N$>$ \\
+T\+::\+Value\+Type \& Get\+Value\+By\+Pointer\+With\+Default (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{root}{, }\item[{const Char\+Type(\&)}]{source}{\mbox{[}\+N\mbox{]}, }\item[{const typename T\+::\+Value\+Type \&}]{default\+Value}{, }\item[{typename T\+::\+Allocator\+Type \&}]{a}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l01186}{1186}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01186\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01187\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_generic_pointer}{GenericPointer<typename\ T::ValueType>}}(\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}},\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\ -\/\ 1).GetWithDefault(root,\ \mbox{\hyperlink{pointer_8h_a3db30c1795eb39d4452f8698f4a67f05}{defaultValue}},\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{01188\ \}}
+
+\end{DoxyCode}
+\Hypertarget{pointer_8h_a38d0f082d4e54b591cba9ae9c70cf828}\index{pointer.h@{pointer.h}!GetValueByPointerWithDefault@{GetValueByPointerWithDefault}}
+\index{GetValueByPointerWithDefault@{GetValueByPointerWithDefault}!pointer.h@{pointer.h}}
+\doxysubsubsection{\texorpdfstring{GetValueByPointerWithDefault()}{GetValueByPointerWithDefault()}\hspace{0.1cm}{\footnotesize\ttfamily [7/8]}}
+{\footnotesize\ttfamily \label{pointer_8h_a38d0f082d4e54b591cba9ae9c70cf828} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+T\+::\+Value\+Type \& Get\+Value\+By\+Pointer\+With\+Default (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{root}{, }\item[{const \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ typename T\+::\+Value\+Type $>$ \&}]{pointer}{, }\item[{const typename \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{T\+::\+Ch}} \texorpdfstring{$\ast$}{*}}]{default\+Value}{, }\item[{typename T\+::\+Allocator\+Type \&}]{a}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l01168}{1168}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01168\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01169\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}}.GetWithDefault(root,\ \mbox{\hyperlink{pointer_8h_a3db30c1795eb39d4452f8698f4a67f05}{defaultValue}},\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{01170\ \}}
+
+\end{DoxyCode}
+\Hypertarget{pointer_8h_accdac20f6fea3ab631da1a0df5208a61}\index{pointer.h@{pointer.h}!GetValueByPointerWithDefault@{GetValueByPointerWithDefault}}
+\index{GetValueByPointerWithDefault@{GetValueByPointerWithDefault}!pointer.h@{pointer.h}}
+\doxysubsubsection{\texorpdfstring{GetValueByPointerWithDefault()}{GetValueByPointerWithDefault()}\hspace{0.1cm}{\footnotesize\ttfamily [8/8]}}
+{\footnotesize\ttfamily \label{pointer_8h_accdac20f6fea3ab631da1a0df5208a61} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+T\+::\+Value\+Type \& Get\+Value\+By\+Pointer\+With\+Default (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{root}{, }\item[{const \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ typename T\+::\+Value\+Type $>$ \&}]{pointer}{, }\item[{const typename T\+::\+Value\+Type \&}]{default\+Value}{, }\item[{typename T\+::\+Allocator\+Type \&}]{a}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l01163}{1163}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01163\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01164\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}}.GetWithDefault(root,\ \mbox{\hyperlink{pointer_8h_a3db30c1795eb39d4452f8698f4a67f05}{defaultValue}},\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{01165\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=308pt]{pointer_8h_accdac20f6fea3ab631da1a0df5208a61_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{pointer_8h_a409f561a9f9a793f7032b50536f8c526}\index{pointer.h@{pointer.h}!RAPIDJSON\_DISABLEIF\_RETURN@{RAPIDJSON\_DISABLEIF\_RETURN}}
+\index{RAPIDJSON\_DISABLEIF\_RETURN@{RAPIDJSON\_DISABLEIF\_RETURN}!pointer.h@{pointer.h}}
+\doxysubsubsection{\texorpdfstring{RAPIDJSON\_DISABLEIF\_RETURN()}{RAPIDJSON\_DISABLEIF\_RETURN()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{pointer_8h_a409f561a9f9a793f7032b50536f8c526} 
+template$<$typename Document\+Type , typename T2 $>$ \\
+RAPIDJSON\+\_\+\+DISABLEIF\+\_\+\+RETURN (\begin{DoxyParamCaption}\item[{(internal\+::\+Or\+Expr$<$ internal\+::\+Is\+Pointer$<$ T2 $>$, \mbox{\hyperlink{structinternal_1_1_is_generic_value}{internal\+::\+Is\+Generic\+Value}}$<$ T2 $>$ $>$)}]{}{, }\item[{(typename Document\+Type\+::\+Value\+Type \&)}]{}{}\end{DoxyParamCaption}) \&}
+
+\Hypertarget{pointer_8h_aaaf14202ae851a7d3c3db56789b9eab4}\index{pointer.h@{pointer.h}!RAPIDJSON\_DISABLEIF\_RETURN@{RAPIDJSON\_DISABLEIF\_RETURN}}
+\index{RAPIDJSON\_DISABLEIF\_RETURN@{RAPIDJSON\_DISABLEIF\_RETURN}!pointer.h@{pointer.h}}
+\doxysubsubsection{\texorpdfstring{RAPIDJSON\_DISABLEIF\_RETURN()}{RAPIDJSON\_DISABLEIF\_RETURN()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{pointer_8h_aaaf14202ae851a7d3c3db56789b9eab4} 
+template$<$typename Document\+Type , typename Char\+Type , size\+\_\+t N, typename T2 $>$ \\
+RAPIDJSON\+\_\+\+DISABLEIF\+\_\+\+RETURN (\begin{DoxyParamCaption}\item[{(internal\+::\+Or\+Expr$<$ internal\+::\+Is\+Pointer$<$ T2 $>$, \mbox{\hyperlink{structinternal_1_1_is_generic_value}{internal\+::\+Is\+Generic\+Value}}$<$ T2 $>$ $>$)}]{}{, }\item[{(typename Document\+Type\+::\+Value\+Type \&)}]{}{}\end{DoxyParamCaption}) \&}
+
+\Hypertarget{pointer_8h_a7eb8633670d0e7df80a9fa3a508dd1d2}\index{pointer.h@{pointer.h}!RAPIDJSON\_DISABLEIF\_RETURN@{RAPIDJSON\_DISABLEIF\_RETURN}}
+\index{RAPIDJSON\_DISABLEIF\_RETURN@{RAPIDJSON\_DISABLEIF\_RETURN}!pointer.h@{pointer.h}}
+\doxysubsubsection{\texorpdfstring{RAPIDJSON\_DISABLEIF\_RETURN()}{RAPIDJSON\_DISABLEIF\_RETURN()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{pointer_8h_a7eb8633670d0e7df80a9fa3a508dd1d2} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename T2 $>$ \\
+RAPIDJSON\+\_\+\+DISABLEIF\+\_\+\+RETURN (\begin{DoxyParamCaption}\item[{(internal\+::\+Or\+Expr$<$ internal\+::\+Is\+Pointer$<$ T2 $>$, \mbox{\hyperlink{structinternal_1_1_is_generic_value}{internal\+::\+Is\+Generic\+Value}}$<$ T2 $>$ $>$)}]{}{, }\item[{(typename T\+::\+Value\+Type \&)}]{}{}\end{DoxyParamCaption}) \&}
+
+\Hypertarget{pointer_8h_ae26d117fc2f0ef0275825d2a510e8a8d}\index{pointer.h@{pointer.h}!RAPIDJSON\_DISABLEIF\_RETURN@{RAPIDJSON\_DISABLEIF\_RETURN}}
+\index{RAPIDJSON\_DISABLEIF\_RETURN@{RAPIDJSON\_DISABLEIF\_RETURN}!pointer.h@{pointer.h}}
+\doxysubsubsection{\texorpdfstring{RAPIDJSON\_DISABLEIF\_RETURN()}{RAPIDJSON\_DISABLEIF\_RETURN()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{pointer_8h_ae26d117fc2f0ef0275825d2a510e8a8d} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename Char\+Type , size\+\_\+t N, typename T2 $>$ \\
+RAPIDJSON\+\_\+\+DISABLEIF\+\_\+\+RETURN (\begin{DoxyParamCaption}\item[{(internal\+::\+Or\+Expr$<$ internal\+::\+Is\+Pointer$<$ T2 $>$, \mbox{\hyperlink{structinternal_1_1_is_generic_value}{internal\+::\+Is\+Generic\+Value}}$<$ T2 $>$ $>$)}]{}{, }\item[{(typename T\+::\+Value\+Type \&)}]{}{}\end{DoxyParamCaption}) \&}
+
+\Hypertarget{pointer_8h_a46da885c093bb294a323e4c144449d2e}\index{pointer.h@{pointer.h}!SetValueByPointer@{SetValueByPointer}}
+\index{SetValueByPointer@{SetValueByPointer}!pointer.h@{pointer.h}}
+\doxysubsubsection{\texorpdfstring{SetValueByPointer()}{SetValueByPointer()}\hspace{0.1cm}{\footnotesize\ttfamily [1/12]}}
+{\footnotesize\ttfamily \label{pointer_8h_a46da885c093bb294a323e4c144449d2e} 
+template$<$typename Document\+Type , typename Char\+Type , size\+\_\+t N$>$ \\
+Document\+Type\+::\+Value\+Type \& Set\+Value\+By\+Pointer (\begin{DoxyParamCaption}\item[{Document\+Type \&}]{document}{, }\item[{const Char\+Type(\&)}]{source}{\mbox{[}\+N\mbox{]}, }\item[{const typename \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Document\+Type\+::\+Ch}} \texorpdfstring{$\ast$}{*}}]{value}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l01355}{1355}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01355\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01356\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_generic_pointer}{GenericPointer<typename\ DocumentType::ValueType>}}(\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}},\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\ -\/\ 1).Set(document,\ \mbox{\hyperlink{pointer_8h_a1a309f137cf282fe5bdc882038e728d9}{value}});}
+\DoxyCodeLine{01357\ \}}
+
+\end{DoxyCode}
+\Hypertarget{pointer_8h_a51a45d6a8d97468b650fc275255b7504}\index{pointer.h@{pointer.h}!SetValueByPointer@{SetValueByPointer}}
+\index{SetValueByPointer@{SetValueByPointer}!pointer.h@{pointer.h}}
+\doxysubsubsection{\texorpdfstring{SetValueByPointer()}{SetValueByPointer()}\hspace{0.1cm}{\footnotesize\ttfamily [2/12]}}
+{\footnotesize\ttfamily \label{pointer_8h_a51a45d6a8d97468b650fc275255b7504} 
+template$<$typename Document\+Type , typename Char\+Type , size\+\_\+t N$>$ \\
+Document\+Type\+::\+Value\+Type \& Set\+Value\+By\+Pointer (\begin{DoxyParamCaption}\item[{Document\+Type \&}]{document}{, }\item[{const Char\+Type(\&)}]{source}{\mbox{[}\+N\mbox{]}, }\item[{const typename Document\+Type\+::\+Value\+Type \&}]{value}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l01350}{1350}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01350\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01351\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_generic_pointer}{GenericPointer<typename\ DocumentType::ValueType>}}(\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}},\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\ -\/\ 1).Set(document,\ \mbox{\hyperlink{pointer_8h_a1a309f137cf282fe5bdc882038e728d9}{value}});}
+\DoxyCodeLine{01352\ \}}
+
+\end{DoxyCode}
+\Hypertarget{pointer_8h_a82e5b3f00a10ab6aaac37af78de4d19d}\index{pointer.h@{pointer.h}!SetValueByPointer@{SetValueByPointer}}
+\index{SetValueByPointer@{SetValueByPointer}!pointer.h@{pointer.h}}
+\doxysubsubsection{\texorpdfstring{SetValueByPointer()}{SetValueByPointer()}\hspace{0.1cm}{\footnotesize\ttfamily [3/12]}}
+{\footnotesize\ttfamily \label{pointer_8h_a82e5b3f00a10ab6aaac37af78de4d19d} 
+template$<$typename Document\+Type , typename Char\+Type , size\+\_\+t N$>$ \\
+Document\+Type\+::\+Value\+Type \& Set\+Value\+By\+Pointer (\begin{DoxyParamCaption}\item[{Document\+Type \&}]{document}{, }\item[{const Char\+Type(\&)}]{source}{\mbox{[}\+N\mbox{]}, }\item[{typename Document\+Type\+::\+Value\+Type \&}]{value}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l01345}{1345}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01345\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01346\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_generic_pointer}{GenericPointer<typename\ DocumentType::ValueType>}}(\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}},\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\ -\/\ 1).Set(document,\ \mbox{\hyperlink{pointer_8h_a1a309f137cf282fe5bdc882038e728d9}{value}});}
+\DoxyCodeLine{01347\ \}}
+
+\end{DoxyCode}
+\Hypertarget{pointer_8h_af988b5e086851ff3645fe2345019ab44}\index{pointer.h@{pointer.h}!SetValueByPointer@{SetValueByPointer}}
+\index{SetValueByPointer@{SetValueByPointer}!pointer.h@{pointer.h}}
+\doxysubsubsection{\texorpdfstring{SetValueByPointer()}{SetValueByPointer()}\hspace{0.1cm}{\footnotesize\ttfamily [4/12]}}
+{\footnotesize\ttfamily \label{pointer_8h_af988b5e086851ff3645fe2345019ab44} 
+template$<$typename Document\+Type $>$ \\
+Document\+Type\+::\+Value\+Type \& Set\+Value\+By\+Pointer (\begin{DoxyParamCaption}\item[{Document\+Type \&}]{document}{, }\item[{const \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ typename Document\+Type\+::\+Value\+Type $>$ \&}]{pointer}{, }\item[{const typename \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Document\+Type\+::\+Ch}} \texorpdfstring{$\ast$}{*}}]{value}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l01327}{1327}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01327\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01328\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}}.Set(document,\ \mbox{\hyperlink{pointer_8h_a1a309f137cf282fe5bdc882038e728d9}{value}});}
+\DoxyCodeLine{01329\ \}}
+
+\end{DoxyCode}
+\Hypertarget{pointer_8h_a2fc4c2e668dd4e16063d596b2b9b61a3}\index{pointer.h@{pointer.h}!SetValueByPointer@{SetValueByPointer}}
+\index{SetValueByPointer@{SetValueByPointer}!pointer.h@{pointer.h}}
+\doxysubsubsection{\texorpdfstring{SetValueByPointer()}{SetValueByPointer()}\hspace{0.1cm}{\footnotesize\ttfamily [5/12]}}
+{\footnotesize\ttfamily \label{pointer_8h_a2fc4c2e668dd4e16063d596b2b9b61a3} 
+template$<$typename Document\+Type $>$ \\
+Document\+Type\+::\+Value\+Type \& Set\+Value\+By\+Pointer (\begin{DoxyParamCaption}\item[{Document\+Type \&}]{document}{, }\item[{const \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ typename Document\+Type\+::\+Value\+Type $>$ \&}]{pointer}{, }\item[{const typename Document\+Type\+::\+Value\+Type \&}]{value}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l01322}{1322}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01322\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01323\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}}.Set(document,\ \mbox{\hyperlink{pointer_8h_a1a309f137cf282fe5bdc882038e728d9}{value}});}
+\DoxyCodeLine{01324\ \}}
+
+\end{DoxyCode}
+\Hypertarget{pointer_8h_a4623bdd62153e95fdfac34c3af92a654}\index{pointer.h@{pointer.h}!SetValueByPointer@{SetValueByPointer}}
+\index{SetValueByPointer@{SetValueByPointer}!pointer.h@{pointer.h}}
+\doxysubsubsection{\texorpdfstring{SetValueByPointer()}{SetValueByPointer()}\hspace{0.1cm}{\footnotesize\ttfamily [6/12]}}
+{\footnotesize\ttfamily \label{pointer_8h_a4623bdd62153e95fdfac34c3af92a654} 
+template$<$typename Document\+Type $>$ \\
+Document\+Type\+::\+Value\+Type \& Set\+Value\+By\+Pointer (\begin{DoxyParamCaption}\item[{Document\+Type \&}]{document}{, }\item[{const \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ typename Document\+Type\+::\+Value\+Type $>$ \&}]{pointer}{, }\item[{typename Document\+Type\+::\+Value\+Type \&}]{value}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l01317}{1317}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01317\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01318\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}}.Set(document,\ \mbox{\hyperlink{pointer_8h_a1a309f137cf282fe5bdc882038e728d9}{value}});}
+\DoxyCodeLine{01319\ \}}
+
+\end{DoxyCode}
+\Hypertarget{pointer_8h_a2e3bd9cdb4a8dc98aaf0580dee70f264}\index{pointer.h@{pointer.h}!SetValueByPointer@{SetValueByPointer}}
+\index{SetValueByPointer@{SetValueByPointer}!pointer.h@{pointer.h}}
+\doxysubsubsection{\texorpdfstring{SetValueByPointer()}{SetValueByPointer()}\hspace{0.1cm}{\footnotesize\ttfamily [7/12]}}
+{\footnotesize\ttfamily \label{pointer_8h_a2e3bd9cdb4a8dc98aaf0580dee70f264} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename Char\+Type , size\+\_\+t N$>$ \\
+T\+::\+Value\+Type \& Set\+Value\+By\+Pointer (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{root}{, }\item[{const Char\+Type(\&)}]{source}{\mbox{[}\+N\mbox{]}, }\item[{const typename \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{T\+::\+Ch}} \texorpdfstring{$\ast$}{*}}]{value}{, }\item[{typename T\+::\+Allocator\+Type \&}]{a}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l01297}{1297}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01297\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01298\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_generic_pointer}{GenericPointer<typename\ T::ValueType>}}(\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}},\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\ -\/\ 1).Set(root,\ \mbox{\hyperlink{pointer_8h_a1a309f137cf282fe5bdc882038e728d9}{value}},\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{01299\ \}}
+
+\end{DoxyCode}
+\Hypertarget{pointer_8h_a057fa4cef0e9df7176cfdc87ed895f34}\index{pointer.h@{pointer.h}!SetValueByPointer@{SetValueByPointer}}
+\index{SetValueByPointer@{SetValueByPointer}!pointer.h@{pointer.h}}
+\doxysubsubsection{\texorpdfstring{SetValueByPointer()}{SetValueByPointer()}\hspace{0.1cm}{\footnotesize\ttfamily [8/12]}}
+{\footnotesize\ttfamily \label{pointer_8h_a057fa4cef0e9df7176cfdc87ed895f34} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename Char\+Type , size\+\_\+t N$>$ \\
+T\+::\+Value\+Type \& Set\+Value\+By\+Pointer (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{root}{, }\item[{const Char\+Type(\&)}]{source}{\mbox{[}\+N\mbox{]}, }\item[{const typename T\+::\+Value\+Type \&}]{value}{, }\item[{typename T\+::\+Allocator\+Type \&}]{a}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l01292}{1292}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01292\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01293\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_generic_pointer}{GenericPointer<typename\ T::ValueType>}}(\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}},\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\ -\/\ 1).Set(root,\ \mbox{\hyperlink{pointer_8h_a1a309f137cf282fe5bdc882038e728d9}{value}},\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{01294\ \}}
+
+\end{DoxyCode}
+\Hypertarget{pointer_8h_a562b6d41c46d173c9406c8a9918c68a3}\index{pointer.h@{pointer.h}!SetValueByPointer@{SetValueByPointer}}
+\index{SetValueByPointer@{SetValueByPointer}!pointer.h@{pointer.h}}
+\doxysubsubsection{\texorpdfstring{SetValueByPointer()}{SetValueByPointer()}\hspace{0.1cm}{\footnotesize\ttfamily [9/12]}}
+{\footnotesize\ttfamily \label{pointer_8h_a562b6d41c46d173c9406c8a9918c68a3} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename Char\+Type , size\+\_\+t N$>$ \\
+T\+::\+Value\+Type \& Set\+Value\+By\+Pointer (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{root}{, }\item[{const Char\+Type(\&)}]{source}{\mbox{[}\+N\mbox{]}, }\item[{typename T\+::\+Value\+Type \&}]{value}{, }\item[{typename T\+::\+Allocator\+Type \&}]{a}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l01287}{1287}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01287\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01288\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_generic_pointer}{GenericPointer<typename\ T::ValueType>}}(\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}},\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\ -\/\ 1).Set(root,\ \mbox{\hyperlink{pointer_8h_a1a309f137cf282fe5bdc882038e728d9}{value}},\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{01289\ \}}
+
+\end{DoxyCode}
+\Hypertarget{pointer_8h_a3187558966f689fdd72120793b39b91a}\index{pointer.h@{pointer.h}!SetValueByPointer@{SetValueByPointer}}
+\index{SetValueByPointer@{SetValueByPointer}!pointer.h@{pointer.h}}
+\doxysubsubsection{\texorpdfstring{SetValueByPointer()}{SetValueByPointer()}\hspace{0.1cm}{\footnotesize\ttfamily [10/12]}}
+{\footnotesize\ttfamily \label{pointer_8h_a3187558966f689fdd72120793b39b91a} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+T\+::\+Value\+Type \& Set\+Value\+By\+Pointer (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{root}{, }\item[{const \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ typename T\+::\+Value\+Type $>$ \&}]{pointer}{, }\item[{const typename \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{T\+::\+Ch}} \texorpdfstring{$\ast$}{*}}]{value}{, }\item[{typename T\+::\+Allocator\+Type \&}]{a}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l01269}{1269}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01269\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01270\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}}.Set(root,\ \mbox{\hyperlink{pointer_8h_a1a309f137cf282fe5bdc882038e728d9}{value}},\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{01271\ \}}
+
+\end{DoxyCode}
+\Hypertarget{pointer_8h_ac28f67a837bdead4e9a0b8bd02dbd4d8}\index{pointer.h@{pointer.h}!SetValueByPointer@{SetValueByPointer}}
+\index{SetValueByPointer@{SetValueByPointer}!pointer.h@{pointer.h}}
+\doxysubsubsection{\texorpdfstring{SetValueByPointer()}{SetValueByPointer()}\hspace{0.1cm}{\footnotesize\ttfamily [11/12]}}
+{\footnotesize\ttfamily \label{pointer_8h_ac28f67a837bdead4e9a0b8bd02dbd4d8} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+T\+::\+Value\+Type \& Set\+Value\+By\+Pointer (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{root}{, }\item[{const \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ typename T\+::\+Value\+Type $>$ \&}]{pointer}{, }\item[{const typename T\+::\+Value\+Type \&}]{value}{, }\item[{typename T\+::\+Allocator\+Type \&}]{a}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l01264}{1264}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01264\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01265\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}}.Set(root,\ \mbox{\hyperlink{pointer_8h_a1a309f137cf282fe5bdc882038e728d9}{value}},\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{01266\ \}}
+
+\end{DoxyCode}
+\Hypertarget{pointer_8h_a58128fa07ac8e9159440c83d0a78f2be}\index{pointer.h@{pointer.h}!SetValueByPointer@{SetValueByPointer}}
+\index{SetValueByPointer@{SetValueByPointer}!pointer.h@{pointer.h}}
+\doxysubsubsection{\texorpdfstring{SetValueByPointer()}{SetValueByPointer()}\hspace{0.1cm}{\footnotesize\ttfamily [12/12]}}
+{\footnotesize\ttfamily \label{pointer_8h_a58128fa07ac8e9159440c83d0a78f2be} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+T\+::\+Value\+Type \& Set\+Value\+By\+Pointer (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{root}{, }\item[{const \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ typename T\+::\+Value\+Type $>$ \&}]{pointer}{, }\item[{typename T\+::\+Value\+Type \&}]{value}{, }\item[{typename T\+::\+Allocator\+Type \&}]{a}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l01259}{1259}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01259\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01260\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}}.Set(root,\ \mbox{\hyperlink{pointer_8h_a1a309f137cf282fe5bdc882038e728d9}{value}},\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{01261\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=255pt]{pointer_8h_a58128fa07ac8e9159440c83d0a78f2be_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{pointer_8h_a33c56cdd1034a750112e81df6c4e653a}\index{pointer.h@{pointer.h}!SwapValueByPointer@{SwapValueByPointer}}
+\index{SwapValueByPointer@{SwapValueByPointer}!pointer.h@{pointer.h}}
+\doxysubsubsection{\texorpdfstring{SwapValueByPointer()}{SwapValueByPointer()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{pointer_8h_a33c56cdd1034a750112e81df6c4e653a} 
+template$<$typename Document\+Type , typename Char\+Type , size\+\_\+t N$>$ \\
+Document\+Type\+::\+Value\+Type \& Swap\+Value\+By\+Pointer (\begin{DoxyParamCaption}\item[{Document\+Type \&}]{document}{, }\item[{const Char\+Type(\&)}]{source}{\mbox{[}\+N\mbox{]}, }\item[{typename Document\+Type\+::\+Value\+Type \&}]{value}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l01390}{1390}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01390\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01391\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_generic_pointer}{GenericPointer<typename\ DocumentType::ValueType>}}(\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}},\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\ -\/\ 1).\mbox{\hyperlink{class_generic_pointer_af148818f7c2b10243221953d887044c6}{Swap}}(document,\ \mbox{\hyperlink{pointer_8h_a1a309f137cf282fe5bdc882038e728d9}{value}});}
+\DoxyCodeLine{01392\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{pointer_8h_a33c56cdd1034a750112e81df6c4e653a_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{pointer_8h_abd25c9d96f8e5002f93f998cf11905a3}\index{pointer.h@{pointer.h}!SwapValueByPointer@{SwapValueByPointer}}
+\index{SwapValueByPointer@{SwapValueByPointer}!pointer.h@{pointer.h}}
+\doxysubsubsection{\texorpdfstring{SwapValueByPointer()}{SwapValueByPointer()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{pointer_8h_abd25c9d96f8e5002f93f998cf11905a3} 
+template$<$typename Document\+Type $>$ \\
+Document\+Type\+::\+Value\+Type \& Swap\+Value\+By\+Pointer (\begin{DoxyParamCaption}\item[{Document\+Type \&}]{document}{, }\item[{const \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ typename Document\+Type\+::\+Value\+Type $>$ \&}]{pointer}{, }\item[{typename Document\+Type\+::\+Value\+Type \&}]{value}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l01385}{1385}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01385\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01386\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}}.Swap(document,\ \mbox{\hyperlink{pointer_8h_a1a309f137cf282fe5bdc882038e728d9}{value}});}
+\DoxyCodeLine{01387\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{pointer_8h_abd25c9d96f8e5002f93f998cf11905a3_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{pointer_8h_a8f368fc6d5e55f6f0a5ea5e2af7ea23f}\index{pointer.h@{pointer.h}!SwapValueByPointer@{SwapValueByPointer}}
+\index{SwapValueByPointer@{SwapValueByPointer}!pointer.h@{pointer.h}}
+\doxysubsubsection{\texorpdfstring{SwapValueByPointer()}{SwapValueByPointer()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{pointer_8h_a8f368fc6d5e55f6f0a5ea5e2af7ea23f} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename Char\+Type , size\+\_\+t N$>$ \\
+T\+::\+Value\+Type \& Swap\+Value\+By\+Pointer (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{root}{, }\item[{const Char\+Type(\&)}]{source}{\mbox{[}\+N\mbox{]}, }\item[{typename T\+::\+Value\+Type \&}]{value}{, }\item[{typename T\+::\+Allocator\+Type \&}]{a}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l01380}{1380}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01380\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01381\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_generic_pointer}{GenericPointer<typename\ T::ValueType>}}(\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}},\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\ -\/\ 1).\mbox{\hyperlink{class_generic_pointer_af148818f7c2b10243221953d887044c6}{Swap}}(root,\ \mbox{\hyperlink{pointer_8h_a1a309f137cf282fe5bdc882038e728d9}{value}},\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{01382\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{pointer_8h_a8f368fc6d5e55f6f0a5ea5e2af7ea23f_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{pointer_8h_a542981a8bdcf3bc3c701c7eff39648ac}\index{pointer.h@{pointer.h}!SwapValueByPointer@{SwapValueByPointer}}
+\index{SwapValueByPointer@{SwapValueByPointer}!pointer.h@{pointer.h}}
+\doxysubsubsection{\texorpdfstring{SwapValueByPointer()}{SwapValueByPointer()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{pointer_8h_a542981a8bdcf3bc3c701c7eff39648ac} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+T\+::\+Value\+Type \& Swap\+Value\+By\+Pointer (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{root}{, }\item[{const \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ typename T\+::\+Value\+Type $>$ \&}]{pointer}{, }\item[{typename T\+::\+Value\+Type \&}]{value}{, }\item[{typename T\+::\+Allocator\+Type \&}]{a}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l01375}{1375}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01375\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01376\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}}.Swap(root,\ \mbox{\hyperlink{pointer_8h_a1a309f137cf282fe5bdc882038e728d9}{value}},\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{01377\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{pointer_8h_a542981a8bdcf3bc3c701c7eff39648ac_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=265pt]{pointer_8h_a542981a8bdcf3bc3c701c7eff39648ac_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{pointer_8h_aeeddce917cf130d62c370b8f216026dd}\index{pointer.h@{pointer.h}!a@{a}}
+\index{a@{a}!pointer.h@{pointer.h}}
+\doxysubsubsection{\texorpdfstring{a}{a}}
+{\footnotesize\ttfamily \label{pointer_8h_aeeddce917cf130d62c370b8f216026dd} 
+const \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ typename T\+::\+Value\+Type $>$ T2 T\+::\+Allocator\+Type \& a}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}}.GetWithDefault(root,\ \mbox{\hyperlink{pointer_8h_a3db30c1795eb39d4452f8698f4a67f05}{defaultValue}},\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l01181}{1181}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+\Hypertarget{pointer_8h_a3db30c1795eb39d4452f8698f4a67f05}\index{pointer.h@{pointer.h}!defaultValue@{defaultValue}}
+\index{defaultValue@{defaultValue}!pointer.h@{pointer.h}}
+\doxysubsubsection{\texorpdfstring{defaultValue}{defaultValue}}
+{\footnotesize\ttfamily \label{pointer_8h_a3db30c1795eb39d4452f8698f4a67f05} 
+const \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ typename Document\+Type\+::\+Value\+Type $>$ T2 default\+Value}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}}.GetWithDefault(document,\ \mbox{\hyperlink{pointer_8h_a3db30c1795eb39d4452f8698f4a67f05}{defaultValue}})}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l01181}{1181}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+\Hypertarget{pointer_8h_aae1f8d263916ad71bd415381591549c0}\index{pointer.h@{pointer.h}!pointer@{pointer}}
+\index{pointer@{pointer}!pointer.h@{pointer.h}}
+\doxysubsubsection{\texorpdfstring{pointer}{pointer}}
+{\footnotesize\ttfamily \label{pointer_8h_aae1f8d263916ad71bd415381591549c0} 
+const \mbox{\hyperlink{class_generic_pointer}{Generic\+Pointer}}$<$ typename Document\+Type\+::\+Value\+Type $>$ \& pointer}
+
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l01181}{1181}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+\Hypertarget{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}\index{pointer.h@{pointer.h}!source@{source}}
+\index{source@{source}!pointer.h@{pointer.h}}
+\doxysubsubsection{\texorpdfstring{source}{source}}
+{\footnotesize\ttfamily \label{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55} 
+const Char\+Type(\& source}
+
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l01204}{1204}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+
+\Hypertarget{pointer_8h_a1a309f137cf282fe5bdc882038e728d9}\index{pointer.h@{pointer.h}!value@{value}}
+\index{value@{value}!pointer.h@{pointer.h}}
+\doxysubsubsection{\texorpdfstring{value}{value}}
+{\footnotesize\ttfamily \label{pointer_8h_a1a309f137cf282fe5bdc882038e728d9} 
+const Char\+Type( T2 value}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}}.Set(document,\ \mbox{\hyperlink{pointer_8h_a1a309f137cf282fe5bdc882038e728d9}{value}})}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{pointer_8h_source_l01282}{1282}} of file \mbox{\hyperlink{pointer_8h_source}{pointer.\+h}}.
+

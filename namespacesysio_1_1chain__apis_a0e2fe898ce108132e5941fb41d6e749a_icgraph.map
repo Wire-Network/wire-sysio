@@ -1,0 +1,15 @@
+<map id="sysio::chain_apis::get_table_type" name="sysio::chain_apis::get_table_type">
+<area shape="rect" id="Node000001" title=" " alt="" coords="465,150,595,191"/>
+<area shape="poly" id="edge7_Node000001_Node000001" title=" " alt="" coords="564,137,552,131,530,129,510,131,498,135,493,141,495,149,490,150,488,140,495,131,509,126,530,124,553,126,567,132"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1chain__apis_1_1read__only.html#a6c99772e65be27388ca7b781fab63d62" title=" " alt="" coords="239,5,399,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="497,141,459,108,416,75,395,64,397,59,418,71,463,103,500,137"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1chain__apis_1_1read__only.html#a7af49932b12b98727f7f2872a40b047e" title=" " alt="" coords="221,85,417,126"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="450,148,386,129,388,124,451,143"/>
+<area shape="rect" id="Node000004" href="$namespacesysio_1_1chain__apis.html#a8566344f638304618d3768b20885e2b5" title=" " alt="" coords="254,150,384,191"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="449,173,385,173,385,168,449,168"/>
+<area shape="rect" id="Node000005" href="$classsysio_1_1chain__apis_1_1read__only.html#aa4cd64db980084853c87f8886c5f74e8" title=" " alt="" coords="5,180,173,220"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="453,198,417,205,354,211,289,213,173,210,173,205,289,208,353,206,417,200,452,193"/>
+<area shape="rect" id="Node000006" href="$classsysio_1_1chain__apis_1_1read__only.html#aa9f992c389558773fe358c7a03e3c91b" title=" " alt="" coords="232,265,406,306"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="491,202,418,249,380,267,377,262,416,244,488,198"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="238,183,174,192,173,186,238,178"/>
+</map>

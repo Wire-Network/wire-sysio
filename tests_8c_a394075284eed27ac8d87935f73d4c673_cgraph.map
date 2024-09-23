@@ -1,0 +1,11 @@
+<map id="run_ec_combine" name="run_ec_combine">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,35,122,60"/>
+<area shape="rect" id="Node000002" href="$tests_8c.html#af668387a475fa94107e316b2ddc003cf" title=" " alt="" coords="170,35,290,60"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="122,45,154,45,154,50,122,50"/>
+<area shape="rect" id="Node000003" href="$tests_8c.html#a51e09e6745e0afdb0d596ee0f4b3c3f7" title=" " alt="" coords="338,5,509,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="290,36,322,31,323,36,291,41"/>
+<area shape="rect" id="Node000004" href="$secp256k1_8c.html#a92498665c38198fc1943e463c017c140" title=" " alt="" coords="346,55,501,96"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="291,54,332,60,331,65,290,59"/>
+<area shape="rect" id="Node000005" href="$yubihsm__pkcs11_8c.html#adc4bd59a60361844aa0e852efa210105" title=" " alt="" coords="557,63,626,88"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="501,73,541,73,541,78,501,78"/>
+</map>

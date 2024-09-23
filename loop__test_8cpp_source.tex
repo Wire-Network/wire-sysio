@@ -1,0 +1,57 @@
+\doxysection{loop\+\_\+test.\+cpp}
+\hypertarget{loop__test_8cpp_source}{}\label{loop__test_8cpp_source}\index{libraries/fc/libraries/ff/depends/ate-\/pairing/test/loop\_test.cpp@{libraries/fc/libraries/ff/depends/ate-\/pairing/test/loop\_test.cpp}}
+\mbox{\hyperlink{loop__test_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{loop__test_8cpp_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{loop__test_8cpp_source_l00002}00002\ \textcolor{comment}{\ \ \ \ loop\ test}}
+\DoxyCodeLine{\Hypertarget{loop__test_8cpp_source_l00003}00003\ \textcolor{comment}{*/}}
+\DoxyCodeLine{\Hypertarget{loop__test_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{bn_8h}{bn.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{loop__test_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{test__point_8hpp}{test\_point.hpp}}"{}}}
+\DoxyCodeLine{\Hypertarget{loop__test_8cpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{loop__test_8cpp_source_l00007}00007\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacebn}{bn}};}
+\DoxyCodeLine{\Hypertarget{loop__test_8cpp_source_l00008}00008\ \textcolor{keyword}{using\ namespace\ }ecop;}
+\DoxyCodeLine{\Hypertarget{loop__test_8cpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{loop__test_8cpp_source_l00010}\mbox{\hyperlink{loop__test_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{00010}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{loop__test_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}()}
+\DoxyCodeLine{\Hypertarget{loop__test_8cpp_source_l00011}00011\ \{}
+\DoxyCodeLine{\Hypertarget{loop__test_8cpp_source_l00012}00012\ \textcolor{preprocessor}{\#ifdef\ BN\_SUPPORT\_SNARK}}
+\DoxyCodeLine{\Hypertarget{loop__test_8cpp_source_l00013}00013\ \ \ \ \ puts(\textcolor{stringliteral}{"{}snark"{}});}
+\DoxyCodeLine{\Hypertarget{loop__test_8cpp_source_l00014}00014\ \ \ \ \ \mbox{\hyperlink{structbn_1_1_curve_param}{bn::CurveParam}}\ cp\ =\ bn::CurveSNARK1;}
+\DoxyCodeLine{\Hypertarget{loop__test_8cpp_source_l00015}00015\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{loop__test_8cpp_source_l00016}00016\ \ \ \ \ puts(\textcolor{stringliteral}{"{}fp254BNb"{}});}
+\DoxyCodeLine{\Hypertarget{loop__test_8cpp_source_l00017}00017\ \ \ \ \ \mbox{\hyperlink{structbn_1_1_curve_param}{bn::CurveParam}}\ cp\ =\ \mbox{\hyperlink{namespacebn_a79a7b30048022e75b4f8d886fe5224a0}{bn::CurveFp254BNb}};}
+\DoxyCodeLine{\Hypertarget{loop__test_8cpp_source_l00018}00018\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{loop__test_8cpp_source_l00019}00019\ \ \ \ \ \textcolor{comment}{//\ init\ my\ library}}
+\DoxyCodeLine{\Hypertarget{loop__test_8cpp_source_l00020}00020\ \ \ \ \ \mbox{\hyperlink{structbn_1_1_param_t_aae3c7ee13b7b29d24da8638bc854dffb}{Param::init}}();}
+\DoxyCodeLine{\Hypertarget{loop__test_8cpp_source_l00021}00021\ \ \ \ \ \textcolor{comment}{//\ prepair\ a\ generator}}
+\DoxyCodeLine{\Hypertarget{loop__test_8cpp_source_l00022}00022\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_point}{Point}}\&\ pt\ =\ \mbox{\hyperlink{test__point_8hpp_ae46abcc83c05232be0ecaf52ed4a3f76}{selectPoint}}(cp);}
+\DoxyCodeLine{\Hypertarget{loop__test_8cpp_source_l00023}00023\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_ec2}{Ec2}}\ g2(}
+\DoxyCodeLine{\Hypertarget{loop__test_8cpp_source_l00024}00024\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacebn_afe11bd65aac84b50b31d9984d059be92}{Fp2}}(\mbox{\hyperlink{namespacebn_a790c0215583382a829e202ecb0c844b9}{Fp}}(pt.\mbox{\hyperlink{struct_point_a148039341e8417e5576a4a6b3e94ce11}{g2}}.aa),\ \mbox{\hyperlink{class_fp}{Fp}}(pt.\mbox{\hyperlink{struct_point_a148039341e8417e5576a4a6b3e94ce11}{g2}}.ab)),}
+\DoxyCodeLine{\Hypertarget{loop__test_8cpp_source_l00025}00025\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_fp2}{Fp2}}(\mbox{\hyperlink{namespacebn_a790c0215583382a829e202ecb0c844b9}{Fp}}(pt.\mbox{\hyperlink{struct_point_a148039341e8417e5576a4a6b3e94ce11}{g2}}.ba),\ \mbox{\hyperlink{class_fp}{Fp}}(pt.\mbox{\hyperlink{struct_point_a148039341e8417e5576a4a6b3e94ce11}{g2}}.bb))}
+\DoxyCodeLine{\Hypertarget{loop__test_8cpp_source_l00026}00026\ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{loop__test_8cpp_source_l00027}00027\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_ec1}{Ec1}}\ g1(pt.\mbox{\hyperlink{struct_point_a8dc92f57f9de0567be5f2eb7b90e78f3}{g1}}.a,\ pt.\mbox{\hyperlink{struct_point_a8dc92f57f9de0567be5f2eb7b90e78f3}{g1}}.b);}
+\DoxyCodeLine{\Hypertarget{loop__test_8cpp_source_l00028}00028\ \ \ \ \ \mbox{\hyperlink{class_fp12}{Fp12}}\ e,\ ea,\ ea1,\ ea2;}
+\DoxyCodeLine{\Hypertarget{loop__test_8cpp_source_l00029}00029\ \ \ \ \ \mbox{\hyperlink{class_ec2}{Ec2}}\ g2a;}
+\DoxyCodeLine{\Hypertarget{loop__test_8cpp_source_l00030}00030\ \ \ \ \ \mbox{\hyperlink{class_ec1}{Ec1}}\ g1a;}
+\DoxyCodeLine{\Hypertarget{loop__test_8cpp_source_l00031}00031\ \ \ \ \ \textcolor{comment}{//\ calc\ e\ :\ G2\ x\ G1\ -\/>\ G3\ pairing}}
+\DoxyCodeLine{\Hypertarget{loop__test_8cpp_source_l00032}00032\ \ \ \ \ \mbox{\hyperlink{namespacebn_ad9358851168fca47e8912f07288e8f1a}{opt\_atePairing}}(e,\ g2,\ g1);\ \textcolor{comment}{//\ e\ =\ e(g2,\ g1)}}
+\DoxyCodeLine{\Hypertarget{loop__test_8cpp_source_l00033}00033\ \ \ \ \ \mbox{\hyperlink{structmie_1_1_vuint_t}{mie::Vuint}}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}(\textcolor{stringliteral}{"{}0x18b48dddfb2f81cc829b4b9acd393ccb1e90909aabe126bcdbe6a96438eaf313"{}});}
+\DoxyCodeLine{\Hypertarget{loop__test_8cpp_source_l00034}00034\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ 3000;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{loop__test_8cpp_source_l00035}00035\ \ \ \ \ \ \ \ \ ea\ =\ power(e,\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{\Hypertarget{loop__test_8cpp_source_l00036}00036\ \ \ \ \ \ \ \ \ g1a\ =\ g1\ *\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}};}
+\DoxyCodeLine{\Hypertarget{loop__test_8cpp_source_l00037}00037\ \ \ \ \ \ \ \ \ g2a\ =\ g2\ *\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}};}
+\DoxyCodeLine{\Hypertarget{loop__test_8cpp_source_l00038}00038\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacebn_ad9358851168fca47e8912f07288e8f1a}{opt\_atePairing}}(ea1,\ g2,\ g1a);\ \textcolor{comment}{//\ ea1\ =\ e(g2,\ g1a)}}
+\DoxyCodeLine{\Hypertarget{loop__test_8cpp_source_l00039}00039\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacebn_ad9358851168fca47e8912f07288e8f1a}{opt\_atePairing}}(ea2,\ g2a,\ g1);\ \textcolor{comment}{//\ ea2\ =\ e(g2a,\ g1)}}
+\DoxyCodeLine{\Hypertarget{loop__test_8cpp_source_l00040}00040\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ea\ !=\ ea1\ ||\ ea\ !=\ ea2)\ \{}
+\DoxyCodeLine{\Hypertarget{loop__test_8cpp_source_l00041}00041\ \ \ \ \ \ \ \ \ \ \ \ \ printf(\textcolor{stringliteral}{"{}ERR\ i=\%d\(\backslash\)n"{}},\ i);}
+\DoxyCodeLine{\Hypertarget{loop__test_8cpp_source_l00042}00042\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{java__api_8cpp_af1474931d5774e22c1c9894d7bb3f6b3}{PUT}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{\Hypertarget{loop__test_8cpp_source_l00043}00043\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{java__api_8cpp_af1474931d5774e22c1c9894d7bb3f6b3}{PUT}}(ea);}
+\DoxyCodeLine{\Hypertarget{loop__test_8cpp_source_l00044}00044\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{java__api_8cpp_af1474931d5774e22c1c9894d7bb3f6b3}{PUT}}(ea1);}
+\DoxyCodeLine{\Hypertarget{loop__test_8cpp_source_l00045}00045\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{java__api_8cpp_af1474931d5774e22c1c9894d7bb3f6b3}{PUT}}(ea2);}
+\DoxyCodeLine{\Hypertarget{loop__test_8cpp_source_l00046}00046\ \ \ \ \ \ \ \ \ \ \ \ \ exit(1);}
+\DoxyCodeLine{\Hypertarget{loop__test_8cpp_source_l00047}00047\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{loop__test_8cpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ -\/=\ 1;}
+\DoxyCodeLine{\Hypertarget{loop__test_8cpp_source_l00049}00049\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{loop__test_8cpp_source_l00050}00050\ \ \ \ \ puts(\textcolor{stringliteral}{"{}ok"{}});}
+\DoxyCodeLine{\Hypertarget{loop__test_8cpp_source_l00051}00051\ \}}
+
+\end{DoxyCode}

@@ -1,0 +1,5 @@
+<map id="websocketpp::processor::hybi13::ready" name="websocketpp::processor::hybi13::ready">
+<area shape="rect" id="Node000001" title="Test whether or not the processor has a message ready." alt="" coords="217,5,380,46"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1processor_1_1hybi13.html#a8fe09bba8cbe2821ef5c7cf3fd9573cd" title="Retrieves the most recently processed message." alt="" coords="5,5,169,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="201,28,169,28,169,23,201,23"/>
+</map>

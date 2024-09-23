@@ -1,0 +1,150 @@
+\doxysection{fix\+Whitespace Namespace Reference}
+\hypertarget{namespacefix_whitespace}{}\label{namespacefix_whitespace}\index{fixWhitespace@{fixWhitespace}}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacefix_whitespace_aa1e090d2992ca0dd841b958b8595aee5}{is\+Source\+File}} (path)
+\item 
+\mbox{\hyperlink{namespacefix_whitespace_a559e1cc7e1c2c02ed80f407ede94992b}{fix\+All\+Files\+In\+Dir}} (dir)
+\item 
+\mbox{\hyperlink{namespacefix_whitespace_a2234d3c4e46c3ee50c4835d7c34439a6}{fix\+File}} (path)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacefix_whitespace_a42a9f54567e94560998d0229bc8d10fe}{changed\+Files}} = \mbox{\hyperlink{namespacefix_whitespace_a559e1cc7e1c2c02ed80f407ede94992b}{fix\+All\+Files\+In\+Dir}}(catch\+Path)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacefix_whitespace_a559e1cc7e1c2c02ed80f407ede94992b}\index{fixWhitespace@{fixWhitespace}!fixAllFilesInDir@{fixAllFilesInDir}}
+\index{fixAllFilesInDir@{fixAllFilesInDir}!fixWhitespace@{fixWhitespace}}
+\doxysubsubsection{\texorpdfstring{fixAllFilesInDir()}{fixAllFilesInDir()}}
+{\footnotesize\ttfamily \label{namespacefix_whitespace_a559e1cc7e1c2c02ed80f407ede94992b} 
+fix\+Whitespace.\+fix\+All\+Files\+In\+Dir (\begin{DoxyParamCaption}\item[{}]{dir}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{fix_whitespace_8py_source_l00010}{10}} of file \mbox{\hyperlink{fix_whitespace_8py_source}{fix\+Whitespace.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00010\ \textcolor{keyword}{def\ }fixAllFilesInDir(\ dir\ ):}
+\DoxyCodeLine{00011\ \ \ \ \ changedFiles\ =\ 0}
+\DoxyCodeLine{00012\ \ \ \ \ \textcolor{keywordflow}{for}\ f\ \textcolor{keywordflow}{in}\ os.listdir(\ dir\ ):}
+\DoxyCodeLine{00013\ \ \ \ \ \ \ \ \ path\ =\ os.path.join(\ dir,f\ )}
+\DoxyCodeLine{00014\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ os.path.isfile(\ path\ ):}
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ isSourceFile(\ path\ ):}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ fixFile(\ path\ ):}
+\DoxyCodeLine{00017\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ changedFiles\ +=\ 1}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ \ \ \ \ fixAllFilesInDir(\ path\ )}
+\DoxyCodeLine{00020\ \ \ \ \ \textcolor{keywordflow}{return}\ changedFiles}
+\DoxyCodeLine{00021\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacefix_whitespace_a559e1cc7e1c2c02ed80f407ede94992b_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=204pt]{namespacefix_whitespace_a559e1cc7e1c2c02ed80f407ede94992b_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacefix_whitespace_a2234d3c4e46c3ee50c4835d7c34439a6}\index{fixWhitespace@{fixWhitespace}!fixFile@{fixFile}}
+\index{fixFile@{fixFile}!fixWhitespace@{fixWhitespace}}
+\doxysubsubsection{\texorpdfstring{fixFile()}{fixFile()}}
+{\footnotesize\ttfamily \label{namespacefix_whitespace_a2234d3c4e46c3ee50c4835d7c34439a6} 
+fix\+Whitespace.\+fix\+File (\begin{DoxyParamCaption}\item[{}]{path}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{fix_whitespace_8py_source_l00022}{22}} of file \mbox{\hyperlink{fix_whitespace_8py_source}{fix\+Whitespace.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00022\ \textcolor{keyword}{def\ }fixFile(\ path\ ):}
+\DoxyCodeLine{00023\ \ \ \ \ f\ =\ open(\ path,\ \textcolor{stringliteral}{'r'}\ )}
+\DoxyCodeLine{00024\ \ \ \ \ lines\ =\ []}
+\DoxyCodeLine{00025\ \ \ \ \ changed\ =\ 0}
+\DoxyCodeLine{00026\ \ \ \ \ \textcolor{keywordflow}{for}\ line\ \textcolor{keywordflow}{in}\ f:}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ trimmed\ =\ line.rstrip()\ +\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ trimmed\ =\ trimmed.replace(\textcolor{stringliteral}{'\(\backslash\)t'},\ \textcolor{stringliteral}{'\ \ \ \ '})}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ trimmed\ !=\ line:}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ \ \ \ changed\ =\ changed\ +1}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ lines.append(\ trimmed\ )}
+\DoxyCodeLine{00032\ \ \ \ \ f.close()}
+\DoxyCodeLine{00033\ \ \ \ \ \textcolor{keywordflow}{if}\ changed\ >\ 0:}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \textcolor{keyword}{global}\ changedFiles}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ changedFiles\ =\ changedFiles\ +\ 1}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\ path\ +\ \textcolor{stringliteral}{"{}:"{}}\ )}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\ \textcolor{stringliteral}{"{}\ -\/\ fixed\ "{}}\ +\ str(changed)\ +\ \textcolor{stringliteral}{"{}\ line(s)"{}}\ )}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ altPath\ =\ path\ +\ \textcolor{stringliteral}{"{}.backup"{}}}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ os.rename(\ path,\ altPath\ )}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ f2\ =\ open(\ path,\ \textcolor{stringliteral}{'w'}\ )}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ line\ \textcolor{keywordflow}{in}\ lines:}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \ \ \ f2.write(\ line\ )}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ f2.close()}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ os.remove(\ altPath\ )}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{True}}
+\DoxyCodeLine{00046\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{False}}
+\DoxyCodeLine{00047\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=323pt]{namespacefix_whitespace_a2234d3c4e46c3ee50c4835d7c34439a6_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=348pt]{namespacefix_whitespace_a2234d3c4e46c3ee50c4835d7c34439a6_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacefix_whitespace_aa1e090d2992ca0dd841b958b8595aee5}\index{fixWhitespace@{fixWhitespace}!isSourceFile@{isSourceFile}}
+\index{isSourceFile@{isSourceFile}!fixWhitespace@{fixWhitespace}}
+\doxysubsubsection{\texorpdfstring{isSourceFile()}{isSourceFile()}}
+{\footnotesize\ttfamily \label{namespacefix_whitespace_aa1e090d2992ca0dd841b958b8595aee5} 
+fix\+Whitespace.\+is\+Source\+File (\begin{DoxyParamCaption}\item[{}]{path}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{fix_whitespace_8py_source_l00007}{7}} of file \mbox{\hyperlink{fix_whitespace_8py_source}{fix\+Whitespace.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00007\ \textcolor{keyword}{def\ }isSourceFile(\ path\ ):}
+\DoxyCodeLine{00008\ \ \ \ \ \textcolor{keywordflow}{return}\ path.endswith(\ \textcolor{stringliteral}{"{}.cpp"{}}\ )\ \textcolor{keywordflow}{or}\ path.endswith(\ \textcolor{stringliteral}{"{}.h"{}}\ )\ \textcolor{keywordflow}{or}\ path.endswith(\ \textcolor{stringliteral}{"{}.hpp"{}}\ )}
+\DoxyCodeLine{00009\ }
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacefix_whitespace_aa1e090d2992ca0dd841b958b8595aee5_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{namespacefix_whitespace_a42a9f54567e94560998d0229bc8d10fe}\index{fixWhitespace@{fixWhitespace}!changedFiles@{changedFiles}}
+\index{changedFiles@{changedFiles}!fixWhitespace@{fixWhitespace}}
+\doxysubsubsection{\texorpdfstring{changedFiles}{changedFiles}}
+{\footnotesize\ttfamily \label{namespacefix_whitespace_a42a9f54567e94560998d0229bc8d10fe} 
+fix\+Whitespace.\+changed\+Files = \mbox{\hyperlink{namespacefix_whitespace_a559e1cc7e1c2c02ed80f407ede94992b}{fix\+All\+Files\+In\+Dir}}(catch\+Path)}
+
+
+
+Definition at line \mbox{\hyperlink{fix_whitespace_8py_source_l00048}{48}} of file \mbox{\hyperlink{fix_whitespace_8py_source}{fix\+Whitespace.\+py}}.
+

@@ -1,0 +1,156 @@
+\doxysection{sysio\+::chain\+::detail\+::ostream\+\_\+wrapper Struct Reference}
+\hypertarget{structsysio_1_1chain_1_1detail_1_1ostream__wrapper}{}\label{structsysio_1_1chain_1_1detail_1_1ostream__wrapper}\index{sysio::chain::detail::ostream\_wrapper@{sysio::chain::detail::ostream\_wrapper}}
+
+
+{\ttfamily \#include $<$snapshot.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1detail_1_1ostream__wrapper_accead635da8da49349da6de6c18b6f82}{ostream\+\_\+wrapper}} (std\+::ostream \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1detail_1_1ostream__wrapper_aadd6636635262c6e427aaf5b88130954}{ostream\+\_\+wrapper}} (\mbox{\hyperlink{structsysio_1_1chain_1_1detail_1_1ostream__wrapper}{ostream\+\_\+wrapper}} \&\&)=default
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1detail_1_1ostream__wrapper_ae372f32a18e800390230ec7c2f29b2d2}{ostream\+\_\+wrapper}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1detail_1_1ostream__wrapper}{ostream\+\_\+wrapper}} \&)=default
+\item 
+auto \& \mbox{\hyperlink{structsysio_1_1chain_1_1detail_1_1ostream__wrapper_a8cabca6c6795cf2c411b302b36c1726b}{write}} (const char \texorpdfstring{$\ast$}{*}d, size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\item 
+auto \& \mbox{\hyperlink{structsysio_1_1chain_1_1detail_1_1ostream__wrapper_a27a8973e8b2e03fc1f90840394cb76d3}{put}} (char c)
+\item 
+auto \mbox{\hyperlink{structsysio_1_1chain_1_1detail_1_1ostream__wrapper_a001f76b87db55d9e852d3efe1537f48c}{tellp}} () const
+\item 
+auto \& \mbox{\hyperlink{structsysio_1_1chain_1_1detail_1_1ostream__wrapper_aebf74c1dcf0ff319ff86b4b5dae4bc32}{seekp}} (std\+::ostream\+::pos\+\_\+type \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::ostream \& \mbox{\hyperlink{structsysio_1_1chain_1_1detail_1_1ostream__wrapper_a5152765235653e50e9a8b984f19b2922}{inner}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Due to a pattern in our code of overloading {\ttfamily operator \texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<} ( std\+::ostream\&, ... )} to provide human-\/readable string forms of data, we cannot directly use ostream as those operators will be used instead of the expected operators. In otherwords\+: fc\+::raw\+::pack(fc\+::datastream...) will end up calling {\itshape very} different operators than fc\+::raw\+::pack(std\+::ostream...) 
+
+Definition at line \mbox{\hyperlink{snapshot_8hpp_source_l00042}{42}} of file \mbox{\hyperlink{snapshot_8hpp_source}{snapshot.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structsysio_1_1chain_1_1detail_1_1ostream__wrapper_accead635da8da49349da6de6c18b6f82}\index{sysio::chain::detail::ostream\_wrapper@{sysio::chain::detail::ostream\_wrapper}!ostream\_wrapper@{ostream\_wrapper}}
+\index{ostream\_wrapper@{ostream\_wrapper}!sysio::chain::detail::ostream\_wrapper@{sysio::chain::detail::ostream\_wrapper}}
+\doxysubsubsection{\texorpdfstring{ostream\_wrapper()}{ostream\_wrapper()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1detail_1_1ostream__wrapper_accead635da8da49349da6de6c18b6f82} 
+sysio\+::chain\+::detail\+::ostream\+\_\+wrapper\+::ostream\+\_\+wrapper (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{s}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{snapshot_8hpp_source_l00043}{43}} of file \mbox{\hyperlink{snapshot_8hpp_source}{snapshot.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ :\mbox{\hyperlink{structsysio_1_1chain_1_1detail_1_1ostream__wrapper_a5152765235653e50e9a8b984f19b2922}{inner}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})\ \{}
+\DoxyCodeLine{00045\ }
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1detail_1_1ostream__wrapper_aadd6636635262c6e427aaf5b88130954}\index{sysio::chain::detail::ostream\_wrapper@{sysio::chain::detail::ostream\_wrapper}!ostream\_wrapper@{ostream\_wrapper}}
+\index{ostream\_wrapper@{ostream\_wrapper}!sysio::chain::detail::ostream\_wrapper@{sysio::chain::detail::ostream\_wrapper}}
+\doxysubsubsection{\texorpdfstring{ostream\_wrapper()}{ostream\_wrapper()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1detail_1_1ostream__wrapper_aadd6636635262c6e427aaf5b88130954} 
+sysio\+::chain\+::detail\+::ostream\+\_\+wrapper\+::ostream\+\_\+wrapper (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1detail_1_1ostream__wrapper}{ostream\+\_\+wrapper}} \&\&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [default]}}
+
+\Hypertarget{structsysio_1_1chain_1_1detail_1_1ostream__wrapper_ae372f32a18e800390230ec7c2f29b2d2}\index{sysio::chain::detail::ostream\_wrapper@{sysio::chain::detail::ostream\_wrapper}!ostream\_wrapper@{ostream\_wrapper}}
+\index{ostream\_wrapper@{ostream\_wrapper}!sysio::chain::detail::ostream\_wrapper@{sysio::chain::detail::ostream\_wrapper}}
+\doxysubsubsection{\texorpdfstring{ostream\_wrapper()}{ostream\_wrapper()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1detail_1_1ostream__wrapper_ae372f32a18e800390230ec7c2f29b2d2} 
+sysio\+::chain\+::detail\+::ostream\+\_\+wrapper\+::ostream\+\_\+wrapper (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1detail_1_1ostream__wrapper}{ostream\+\_\+wrapper}} \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [default]}}
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1chain_1_1detail_1_1ostream__wrapper_a27a8973e8b2e03fc1f90840394cb76d3}\index{sysio::chain::detail::ostream\_wrapper@{sysio::chain::detail::ostream\_wrapper}!put@{put}}
+\index{put@{put}!sysio::chain::detail::ostream\_wrapper@{sysio::chain::detail::ostream\_wrapper}}
+\doxysubsubsection{\texorpdfstring{put()}{put()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1detail_1_1ostream__wrapper_a27a8973e8b2e03fc1f90840394cb76d3} 
+auto \& sysio\+::chain\+::detail\+::ostream\+\_\+wrapper\+::put (\begin{DoxyParamCaption}\item[{char}]{c}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{snapshot_8hpp_source_l00055}{55}} of file \mbox{\hyperlink{snapshot_8hpp_source}{snapshot.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1chain_1_1detail_1_1ostream__wrapper_a5152765235653e50e9a8b984f19b2922}{inner}}.put(c);}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1detail_1_1ostream__wrapper_aebf74c1dcf0ff319ff86b4b5dae4bc32}\index{sysio::chain::detail::ostream\_wrapper@{sysio::chain::detail::ostream\_wrapper}!seekp@{seekp}}
+\index{seekp@{seekp}!sysio::chain::detail::ostream\_wrapper@{sysio::chain::detail::ostream\_wrapper}}
+\doxysubsubsection{\texorpdfstring{seekp()}{seekp()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1detail_1_1ostream__wrapper_aebf74c1dcf0ff319ff86b4b5dae4bc32} 
+auto \& sysio\+::chain\+::detail\+::ostream\+\_\+wrapper\+::seekp (\begin{DoxyParamCaption}\item[{std\+::ostream\+::pos\+\_\+type}]{p}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{snapshot_8hpp_source_l00063}{63}} of file \mbox{\hyperlink{snapshot_8hpp_source}{snapshot.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1chain_1_1detail_1_1ostream__wrapper_a5152765235653e50e9a8b984f19b2922}{inner}}.seekp(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}});}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1detail_1_1ostream__wrapper_a001f76b87db55d9e852d3efe1537f48c}\index{sysio::chain::detail::ostream\_wrapper@{sysio::chain::detail::ostream\_wrapper}!tellp@{tellp}}
+\index{tellp@{tellp}!sysio::chain::detail::ostream\_wrapper@{sysio::chain::detail::ostream\_wrapper}}
+\doxysubsubsection{\texorpdfstring{tellp()}{tellp()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1detail_1_1ostream__wrapper_a001f76b87db55d9e852d3efe1537f48c} 
+auto sysio\+::chain\+::detail\+::ostream\+\_\+wrapper\+::tellp (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{snapshot_8hpp_source_l00059}{59}} of file \mbox{\hyperlink{snapshot_8hpp_source}{snapshot.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1chain_1_1detail_1_1ostream__wrapper_a5152765235653e50e9a8b984f19b2922}{inner}}.tellp();}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1detail_1_1ostream__wrapper_a8cabca6c6795cf2c411b302b36c1726b}\index{sysio::chain::detail::ostream\_wrapper@{sysio::chain::detail::ostream\_wrapper}!write@{write}}
+\index{write@{write}!sysio::chain::detail::ostream\_wrapper@{sysio::chain::detail::ostream\_wrapper}}
+\doxysubsubsection{\texorpdfstring{write()}{write()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1detail_1_1ostream__wrapper_a8cabca6c6795cf2c411b302b36c1726b} 
+auto \& sysio\+::chain\+::detail\+::ostream\+\_\+wrapper\+::write (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{d}{, }\item[{size\+\_\+t}]{s}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{snapshot_8hpp_source_l00051}{51}} of file \mbox{\hyperlink{snapshot_8hpp_source}{snapshot.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1chain_1_1detail_1_1ostream__wrapper_a5152765235653e50e9a8b984f19b2922}{inner}}.write(d,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1chain_1_1detail_1_1ostream__wrapper_a5152765235653e50e9a8b984f19b2922}\index{sysio::chain::detail::ostream\_wrapper@{sysio::chain::detail::ostream\_wrapper}!inner@{inner}}
+\index{inner@{inner}!sysio::chain::detail::ostream\_wrapper@{sysio::chain::detail::ostream\_wrapper}}
+\doxysubsubsection{\texorpdfstring{inner}{inner}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1detail_1_1ostream__wrapper_a5152765235653e50e9a8b984f19b2922} 
+std\+::ostream\& sysio\+::chain\+::detail\+::ostream\+\_\+wrapper\+::inner}
+
+
+
+Definition at line \mbox{\hyperlink{snapshot_8hpp_source_l00067}{67}} of file \mbox{\hyperlink{snapshot_8hpp_source}{snapshot.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{snapshot_8hpp}{snapshot.\+hpp}}\end{DoxyCompactItemize}

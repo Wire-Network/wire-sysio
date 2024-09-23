@@ -1,0 +1,61 @@
+\doxysection{libraries/sys-\/vm/external/\+Catch2/examples/110-\/\+Fix-\/\+Class\+Fixture.cpp File Reference}
+\hypertarget{110-_fix-_class_fixture_8cpp}{}\label{110-_fix-_class_fixture_8cpp}\index{libraries/sys-\/vm/external/Catch2/examples/110-\/Fix-\/ClassFixture.cpp@{libraries/sys-\/vm/external/Catch2/examples/110-\/Fix-\/ClassFixture.cpp}}
+{\ttfamily \#include $<$catch2/catch.\+hpp$>$}\newline
+Include dependency graph for 110-\/Fix-\/\+Class\+Fixture.cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{110-_fix-_class_fixture_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{class_d_b_connection}{DBConnection}}
+\item 
+class \mbox{\hyperlink{class_unique_tests_fixture}{Unique\+Tests\+Fixture}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{110-_fix-_class_fixture_8cpp_ac298230ebdc08f7e595c8fdb674dceb2}{TEST\+\_\+\+CASE\+\_\+\+METHOD}} (\mbox{\hyperlink{class_unique_tests_fixture}{Unique\+Tests\+Fixture}}, "{}Create \mbox{\hyperlink{class_employee}{Employee}}/No Name"{}, "{}\mbox{[}create\mbox{]}"{})
+\item 
+\mbox{\hyperlink{110-_fix-_class_fixture_8cpp_a183479b94806e65e39a9c0c3f57776ab}{TEST\+\_\+\+CASE\+\_\+\+METHOD}} (\mbox{\hyperlink{class_unique_tests_fixture}{Unique\+Tests\+Fixture}}, "{}Create \mbox{\hyperlink{class_employee}{Employee}}/Normal"{}, "{}\mbox{[}create\mbox{]}"{})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{110-_fix-_class_fixture_8cpp_ac298230ebdc08f7e595c8fdb674dceb2}\index{110-\/Fix-\/ClassFixture.cpp@{110-\/Fix-\/ClassFixture.cpp}!TEST\_CASE\_METHOD@{TEST\_CASE\_METHOD}}
+\index{TEST\_CASE\_METHOD@{TEST\_CASE\_METHOD}!110-\/Fix-\/ClassFixture.cpp@{110-\/Fix-\/ClassFixture.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE\_METHOD()}{TEST\_CASE\_METHOD()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{110-_fix-_class_fixture_8cpp_ac298230ebdc08f7e595c8fdb674dceb2} 
+TEST\+\_\+\+CASE\+\_\+\+METHOD (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_unique_tests_fixture}{Unique\+Tests\+Fixture}}}]{}{, }\item[{"{}Create \mbox{\hyperlink{class_employee}{Employee}}/No Name"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}create\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{110-_fix-_class_fixture_8cpp_source_l00046}{46}} of file \mbox{\hyperlink{110-_fix-_class_fixture_8cpp_source}{110-\/\+Fix-\/\+Class\+Fixture.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00047\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ae3c33faa1d31a2bb0811dac74b994e3e}{REQUIRE\_THROWS}}(\ conn.executeSQL(\ \textcolor{stringliteral}{"{}INSERT\ INTO\ employee\ (id,\ name)\ VALUES\ (?,\ ?)"{}},\ getID(),\ \textcolor{stringliteral}{"{}"{}})\ );}
+\DoxyCodeLine{00048\ \}}
+
+\end{DoxyCode}
+\Hypertarget{110-_fix-_class_fixture_8cpp_a183479b94806e65e39a9c0c3f57776ab}\index{110-\/Fix-\/ClassFixture.cpp@{110-\/Fix-\/ClassFixture.cpp}!TEST\_CASE\_METHOD@{TEST\_CASE\_METHOD}}
+\index{TEST\_CASE\_METHOD@{TEST\_CASE\_METHOD}!110-\/Fix-\/ClassFixture.cpp@{110-\/Fix-\/ClassFixture.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE\_METHOD()}{TEST\_CASE\_METHOD()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{110-_fix-_class_fixture_8cpp_a183479b94806e65e39a9c0c3f57776ab} 
+TEST\+\_\+\+CASE\+\_\+\+METHOD (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_unique_tests_fixture}{Unique\+Tests\+Fixture}}}]{}{, }\item[{"{}Create \mbox{\hyperlink{class_employee}{Employee}}/Normal"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}create\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{110-_fix-_class_fixture_8cpp_source_l00050}{50}} of file \mbox{\hyperlink{110-_fix-_class_fixture_8cpp_source}{110-\/\+Fix-\/\+Class\+Fixture.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00051\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ conn.executeSQL(\ \textcolor{stringliteral}{"{}INSERT\ INTO\ employee\ (id,\ name)\ VALUES\ (?,\ ?)"{}},\ getID(),\ \textcolor{stringliteral}{"{}Joe\ Bloggs"{}}\ )\ );}
+\DoxyCodeLine{00052\ \}}
+
+\end{DoxyCode}

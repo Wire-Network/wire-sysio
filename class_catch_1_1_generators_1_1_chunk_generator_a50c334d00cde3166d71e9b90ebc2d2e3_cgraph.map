@@ -1,0 +1,13 @@
+<map id="Catch::Generators::ChunkGenerator::ChunkGenerator" name="Catch::Generators::ChunkGenerator::ChunkGenerator">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,71,225,111"/>
+<area shape="rect" id="Node000002" href="$class_catch_1_1_generators_1_1_generator_wrapper.html#a4a461a591d0bd5360a2745cb2b5011cc" title=" " alt="" coords="276,5,428,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="191,68,261,48,262,53,192,73"/>
+<area shape="rect" id="Node000003" href="$class_catch_1_1_generators_1_1_generator_wrapper.html#acbfdca94811ae02461bd2cf5f60b666e" title=" " alt="" coords="273,71,432,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="225,88,257,88,257,94,225,94"/>
+<area shape="rect" id="Node000004" href="$namespace_catch.html#a3cbceeab9252d1b752f66a2826e92548" title=" " alt="" coords="273,136,432,161"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="202,109,282,129,281,134,201,114"/>
+<area shape="rect" id="Node000005" href="$namespace_catch.html#a54c1ce08041448d684ae8edc14162cd2" title=" " alt="" coords="480,136,566,161"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="432,146,464,146,464,151,432,151"/>
+<area shape="rect" id="Node000006" href="$namespace_catch.html#a1b2213f54e4d31a659db49827e81856b" title=" " alt="" coords="614,136,703,161"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="567,146,599,146,599,151,567,151"/>
+</map>

@@ -1,0 +1,17 @@
+<map id="libraries/sys&#45;vm/external/Catch2/include/internal/catch_benchmark.h" name="libraries/sys&#45;vm/external/Catch2/include/internal/catch_benchmark.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="176,5,339,61"/>
+<area shape="rect" id="Node000002" href="$catch__stringref_8h.html" title=" " alt="" coords="60,109,178,135"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="215,64,152,103,149,98,213,59"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="184,183,238,208"/>
+<area shape="poly" id="edge8_Node000001_Node000004" title=" " alt="" coords="252,62,221,168,216,167,247,61"/>
+<area shape="rect" id="Node000006" href="$catch__timer_8h.html" title=" " alt="" coords="252,109,351,135"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="274,60,291,94,286,96,269,62"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="314,183,374,208"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="317,60,344,80,365,108,370,123,370,140,361,170,356,168,365,139,365,124,360,110,340,84,314,64"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,183,70,208"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="107,137,64,174,61,170,103,133"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="136,133,185,171,182,175,133,137"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="93,183,152,208"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="122,135,124,167,119,167,117,135"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="311,134,331,168,327,171,306,136"/>
+</map>

@@ -1,0 +1,116 @@
+\doxysection{exchange\+\_\+state.\+cpp}
+\hypertarget{exchange__state_8cpp_source}{}\label{exchange__state_8cpp_source}\index{/Users/svetlasyrimis/Desktop/wire-\/network/WN-\/org/wire-\/system-\/contracts/contracts/sysio.system/src/exchange\_state.cpp@{/Users/svetlasyrimis/Desktop/wire-\/network/WN-\/org/wire-\/system-\/contracts/contracts/sysio.system/src/exchange\_state.cpp}}
+\mbox{\hyperlink{exchange__state_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{exchange__state_8hpp}{sysio.system/exchange\_state.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <sysio/check.hpp>}}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <cmath>}}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00007}00007\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysiosystem}{sysiosystem}}\ \{}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00009}00009\ \ \ \ \textcolor{keyword}{using\ }sysio::check;}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00011}\mbox{\hyperlink{structsysiosystem_1_1exchange__state_a301de6e8ca49361110634fd27d98571f}{00011}}\ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\ \mbox{\hyperlink{structsysiosystem_1_1exchange__state_a301de6e8ca49361110634fd27d98571f}{exchange\_state::convert\_to\_exchange}}(\ \mbox{\hyperlink{structsysiosystem_1_1exchange__state_1_1connector}{connector}}\&\ reserve,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\&\ payment\ )}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00012}00012\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00013}00013\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{double}\ S0\ =\ \mbox{\hyperlink{structsysiosystem_1_1exchange__state_a03e4901a1aaacc59b78d85d440972f51}{supply}}.amount;}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00014}00014\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{double}\ R0\ =\ reserve.\mbox{\hyperlink{structsysiosystem_1_1exchange__state_1_1connector_a4222c96ec26bb4d033bef4220b28301b}{balance}}.amount;}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00015}00015\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{double}\ dR\ =\ payment.amount;}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00016}00016\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{double}\ F\ \ =\ reserve.\mbox{\hyperlink{structsysiosystem_1_1exchange__state_1_1connector_ad9847c21610017106b022faafcd1f9a0}{weight}};}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00018}00018\ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ dS\ =\ S0\ *\ (\ std::pow(1.\ +\ dR\ /\ R0,\ F)\ -\/\ 1.\ );}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00019}00019\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ dS\ <\ 0\ )\ dS\ =\ 0;\ \textcolor{comment}{//\ rounding\ errors}}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00020}00020\ \ \ \ \ \ \ reserve.\mbox{\hyperlink{structsysiosystem_1_1exchange__state_1_1connector_a4222c96ec26bb4d033bef4220b28301b}{balance}}\ +=\ payment;}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00021}00021\ \ \ \ \ \ \ \mbox{\hyperlink{structsysiosystem_1_1exchange__state_a03e4901a1aaacc59b78d85d440972f51}{supply}}.amount\ \ \ +=\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}(dS);}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00022}00022\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}(\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}(dS),\ \mbox{\hyperlink{structsysiosystem_1_1exchange__state_a03e4901a1aaacc59b78d85d440972f51}{supply}}.symbol\ );}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00023}00023\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00025}\mbox{\hyperlink{structsysiosystem_1_1exchange__state_a4da57083b548454bde5d06d919af3cc4}{00025}}\ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\ \mbox{\hyperlink{structsysiosystem_1_1exchange__state_a4da57083b548454bde5d06d919af3cc4}{exchange\_state::convert\_from\_exchange}}(\ \mbox{\hyperlink{structsysiosystem_1_1exchange__state_1_1connector}{connector}}\&\ reserve,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\&\ tokens\ )}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00026}00026\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00027}00027\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{double}\ R0\ =\ reserve.\mbox{\hyperlink{structsysiosystem_1_1exchange__state_1_1connector_a4222c96ec26bb4d033bef4220b28301b}{balance}}.amount;}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00028}00028\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{double}\ S0\ =\ \mbox{\hyperlink{structsysiosystem_1_1exchange__state_a03e4901a1aaacc59b78d85d440972f51}{supply}}.amount;}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00029}00029\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{double}\ dS\ =\ -\/tokens.amount;\ \textcolor{comment}{//\ dS\ <\ 0,\ tokens\ are\ subtracted\ from\ supply}}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00030}00030\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{double}\ Fi\ =\ double(1)\ /\ reserve.\mbox{\hyperlink{structsysiosystem_1_1exchange__state_1_1connector_ad9847c21610017106b022faafcd1f9a0}{weight}};}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00032}00032\ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ dR\ =\ R0\ *\ (\ std::pow(1.\ +\ dS\ /\ S0,\ Fi)\ -\/\ 1.\ );\ \textcolor{comment}{//\ dR\ <\ 0\ since\ dS\ <\ 0}}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00033}00033\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ dR\ >\ 0\ )\ dR\ =\ 0;\ \textcolor{comment}{//\ rounding\ errors}}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00034}00034\ \ \ \ \ \ \ reserve.\mbox{\hyperlink{structsysiosystem_1_1exchange__state_1_1connector_a4222c96ec26bb4d033bef4220b28301b}{balance}}.amount\ -\/=\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}(-\/dR);}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00035}00035\ \ \ \ \ \ \ \mbox{\hyperlink{structsysiosystem_1_1exchange__state_a03e4901a1aaacc59b78d85d440972f51}{supply}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/=\ tokens;}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00036}00036\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}(\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}(-\/dR),\ reserve.\mbox{\hyperlink{structsysiosystem_1_1exchange__state_1_1connector_a4222c96ec26bb4d033bef4220b28301b}{balance}}.symbol\ );}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00037}00037\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00039}\mbox{\hyperlink{structsysiosystem_1_1exchange__state_a4910da202670276256e6594f0590d8fc}{00039}}\ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\ \mbox{\hyperlink{structsysiosystem_1_1exchange__state_a4910da202670276256e6594f0590d8fc}{exchange\_state::convert}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\&\ from,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1chain_1_1symbol}{symbol}}\&\ to\ )}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00040}00040\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00041}00041\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ sell\_symbol\ \ =\ from.symbol;}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00042}00042\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ base\_symbol\ \ =\ base.balance.symbol;}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00043}00043\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ quote\_symbol\ =\ \mbox{\hyperlink{structsysiosystem_1_1exchange__state_ad25c6801bcc1707b6dbd780b70b95bc2}{quote}}.\mbox{\hyperlink{structsysiosystem_1_1exchange__state_1_1connector_a4222c96ec26bb4d033bef4220b28301b}{balance}}.symbol;}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00044}00044\ \ \ \ \ \ \ check(\ sell\_symbol\ !=\ to,\ \textcolor{stringliteral}{"{}cannot\ convert\ to\ the\ same\ symbol"{}}\ );}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00046}00046\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\ out(\ 0,\ to\ );}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00047}00047\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ sell\_symbol\ ==\ base\_symbol\ \&\&\ to\ ==\ quote\_symbol\ )\ \{}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\ tmp\ =\ \mbox{\hyperlink{structsysiosystem_1_1exchange__state_a301de6e8ca49361110634fd27d98571f}{convert\_to\_exchange}}(\ base,\ from\ );}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \ out\ =\ \mbox{\hyperlink{structsysiosystem_1_1exchange__state_a4da57083b548454bde5d06d919af3cc4}{convert\_from\_exchange}}(\ \mbox{\hyperlink{structsysiosystem_1_1exchange__state_ad25c6801bcc1707b6dbd780b70b95bc2}{quote}},\ tmp\ );}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00050}00050\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\ sell\_symbol\ ==\ quote\_symbol\ \&\&\ to\ ==\ base\_symbol\ )\ \{}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00051}00051\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\ tmp\ =\ \mbox{\hyperlink{structsysiosystem_1_1exchange__state_a301de6e8ca49361110634fd27d98571f}{convert\_to\_exchange}}(\ \mbox{\hyperlink{structsysiosystem_1_1exchange__state_ad25c6801bcc1707b6dbd780b70b95bc2}{quote}},\ from\ );}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00052}00052\ \ \ \ \ \ \ \ \ \ out\ =\ \mbox{\hyperlink{structsysiosystem_1_1exchange__state_a4da57083b548454bde5d06d919af3cc4}{convert\_from\_exchange}}(\ base,\ tmp\ );}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00053}00053\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00054}00054\ \ \ \ \ \ \ \ \ \ check(\ \textcolor{keyword}{false},\ \textcolor{stringliteral}{"{}invalid\ conversion"{}}\ );}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00055}00055\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00056}00056\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ out;}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00057}00057\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00059}\mbox{\hyperlink{structsysiosystem_1_1exchange__state_a8602fde72df2288c3458729e7a973f7a}{00059}}\ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\ \mbox{\hyperlink{structsysiosystem_1_1exchange__state_a8602fde72df2288c3458729e7a973f7a}{exchange\_state::direct\_convert}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\&\ from,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1chain_1_1symbol}{symbol}}\&\ to\ )}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00060}00060\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00061}00061\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ sell\_symbol\ \ =\ from.symbol;}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00062}00062\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ base\_symbol\ \ =\ base.balance.symbol;}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00063}00063\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ quote\_symbol\ =\ \mbox{\hyperlink{structsysiosystem_1_1exchange__state_ad25c6801bcc1707b6dbd780b70b95bc2}{quote}}.\mbox{\hyperlink{structsysiosystem_1_1exchange__state_1_1connector_a4222c96ec26bb4d033bef4220b28301b}{balance}}.symbol;}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00064}00064\ \ \ \ \ \ \ check(\ sell\_symbol\ !=\ to,\ \textcolor{stringliteral}{"{}cannot\ convert\ to\ the\ same\ symbol"{}}\ );}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00066}00066\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\ out(\ 0,\ to\ );}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00067}00067\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ sell\_symbol\ ==\ base\_symbol\ \&\&\ to\ ==\ quote\_symbol\ )\ \{}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00068}00068\ \ \ \ \ \ \ \ \ \ out.amount\ =\ \mbox{\hyperlink{structsysiosystem_1_1exchange__state_ab3d89e86a0d3c4ef488e5f351fbc77e2}{get\_bancor\_output}}(\ base.balance.amount,\ \mbox{\hyperlink{structsysiosystem_1_1exchange__state_ad25c6801bcc1707b6dbd780b70b95bc2}{quote}}.\mbox{\hyperlink{structsysiosystem_1_1exchange__state_1_1connector_a4222c96ec26bb4d033bef4220b28301b}{balance}}.amount,\ from.amount\ );}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00069}00069\ \ \ \ \ \ \ \ \ \ base.balance\ \ +=\ from;}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysiosystem_1_1exchange__state_ad25c6801bcc1707b6dbd780b70b95bc2}{quote}}.\mbox{\hyperlink{structsysiosystem_1_1exchange__state_1_1connector_a4222c96ec26bb4d033bef4220b28301b}{balance}}\ -\/=\ out;}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00071}00071\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\ sell\_symbol\ ==\ quote\_symbol\ \&\&\ to\ ==\ base\_symbol\ )\ \{}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00072}00072\ \ \ \ \ \ \ \ \ \ out.amount\ =\ \mbox{\hyperlink{structsysiosystem_1_1exchange__state_ab3d89e86a0d3c4ef488e5f351fbc77e2}{get\_bancor\_output}}(\ \mbox{\hyperlink{structsysiosystem_1_1exchange__state_ad25c6801bcc1707b6dbd780b70b95bc2}{quote}}.\mbox{\hyperlink{structsysiosystem_1_1exchange__state_1_1connector_a4222c96ec26bb4d033bef4220b28301b}{balance}}.amount,\ base.balance.amount,\ from.amount\ );}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00073}00073\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysiosystem_1_1exchange__state_ad25c6801bcc1707b6dbd780b70b95bc2}{quote}}.\mbox{\hyperlink{structsysiosystem_1_1exchange__state_1_1connector_a4222c96ec26bb4d033bef4220b28301b}{balance}}\ +=\ from;}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00074}00074\ \ \ \ \ \ \ \ \ \ base.balance\ \ -\/=\ out;}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00075}00075\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00076}00076\ \ \ \ \ \ \ \ \ \ check(\ \textcolor{keyword}{false},\ \textcolor{stringliteral}{"{}invalid\ conversion"{}}\ );}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00077}00077\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00078}00078\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ out;}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00079}00079\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00080}00080\ }
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00081}\mbox{\hyperlink{structsysiosystem_1_1exchange__state_ab3d89e86a0d3c4ef488e5f351fbc77e2}{00081}}\ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ \mbox{\hyperlink{structsysiosystem_1_1exchange__state_ab3d89e86a0d3c4ef488e5f351fbc77e2}{exchange\_state::get\_bancor\_output}}(\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ inp\_reserve,}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00082}00082\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ out\_reserve,}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00083}00083\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ inp\ )}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00084}00084\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00085}00085\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{double}\ ib\ =\ inp\_reserve;}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00086}00086\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{double}\ ob\ =\ out\_reserve;}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00087}00087\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{double}\ in\ =\ inp;}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00088}00088\ }
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00089}00089\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ out\ =\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}(\ (in\ *\ ob)\ /\ (ib\ +\ in)\ );}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00090}00090\ }
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00091}00091\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ out\ <\ 0\ )\ out\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00092}00092\ }
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00093}00093\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ out;}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00094}00094\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00095}00095\ }
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00096}\mbox{\hyperlink{structsysiosystem_1_1exchange__state_a0883f2b115c93fa4f90dc34ebb99992c}{00096}}\ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ \mbox{\hyperlink{structsysiosystem_1_1exchange__state_a0883f2b115c93fa4f90dc34ebb99992c}{exchange\_state::get\_bancor\_input}}(\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ out\_reserve,}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00097}00097\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ inp\_reserve,}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00098}00098\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ out\ )}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00099}00099\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00100}00100\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{double}\ ob\ =\ out\_reserve;}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00101}00101\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{double}\ ib\ =\ inp\_reserve;}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00102}00102\ }
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00103}00103\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ inp\ =\ (ib\ *\ out)\ /\ (ob\ -\/\ out);}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00104}00104\ }
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00105}00105\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ inp\ <\ 0\ )\ inp\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00106}00106\ }
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00107}00107\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ inp;}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00108}00108\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00109}00109\ }
+\DoxyCodeLine{\Hypertarget{exchange__state_8cpp_source_l00110}00110\ \}\ }
+
+\end{DoxyCode}

@@ -1,0 +1,20 @@
+<map id="sysio::chain::webassembly::interface::_sysio_f64_demote" name="sysio::chain::webassembly::interface::_sysio_f64_demote">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,118,206,158"/>
+<area shape="rect" id="Node000002" href="$softfloat_2source_2f64__to__f32_8c.html#a55310848a4499b36b4e16451a24185e0" title=" " alt="" coords="270,76,352,102"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="192,115,254,100,256,105,194,120"/>
+<area shape="rect" id="Node000007" href="$softfloat_2source_2include_2softfloat_8hpp.html#aa9844e6aebaaa652c490e1731c80ba86" title=" " alt="" coords="254,125,369,151"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="206,136,238,136,238,141,206,141"/>
+<area shape="rect" id="Node000009" href="$softfloat_2source_2include_2softfloat_8hpp.html#a94d6a7de67c4c0295bb025e9bc549544" title=" " alt="" coords="261,175,362,200"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="194,156,246,169,245,175,192,162"/>
+<area shape="rect" id="Node000003" href="$sys-vm_2external_2softfloat_2source_2s__round_pack_to_f32_8c.html#a95adfbcd39520724557eced9b215c399" title=" " alt="" coords="417,29,590,55"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="352,76,433,57,434,62,354,82"/>
+<area shape="rect" id="Node000006" href="$sys-vm_2external_2softfloat_2source_2s__short_shift_right_jam64_8c.html#a2ea3f16ccc33498d3efe192489acc380" title=" " alt="" coords="422,79,585,120"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="353,88,407,91,407,97,353,94"/>
+<area shape="rect" id="Node000004" href="$softfloat_2source_28086-_s_s_e_2softfloat__raise_flags_8c.html#ac16bbf09eca0fe8ff91301d82c5a667f" title=" " alt="" coords="656,5,791,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="591,30,640,25,640,30,591,35"/>
+<area shape="rect" id="Node000005" href="$sys-vm_2external_2softfloat_2source_2s__shift_right_jam32_8c.html#a6b119a74cc6fd0a60fd3d85448b24bc6" title=" " alt="" coords="638,55,809,80"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="591,50,623,53,622,59,591,55"/>
+<area shape="rect" id="Node000008" href="$yubihsm__pkcs11_8c.html#ae785d5badbf1f08b491af31f32a135a1" title=" " alt="" coords="468,155,539,180"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="370,144,453,157,452,162,369,150"/>
+<area shape="poly" id="edge9_Node000009_Node000008" title=" " alt="" coords="362,180,452,170,453,175,362,185"/>
+</map>

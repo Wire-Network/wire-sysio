@@ -1,0 +1,17 @@
+<map id="bn::Fp12T::Frobenius2" name="bn::Fp12T::Frobenius2">
+<area shape="rect" id="Node000001" title=" " alt="" coords="958,23,1108,49"/>
+<area shape="rect" id="Node000002" href="$structbn_1_1_fp12_t.html#a958c542c68e408220bd3dd163c353c59" title=" " alt="" coords="564,23,703,49"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="963,22,910,14,830,8,751,14,686,25,685,20,750,8,830,3,910,8,964,17"/>
+<area shape="rect" id="Node000006" href="$structbn_1_1_fp12_t.html#a81023ad2430a0a2de0fb98296d715e2c" title=" " alt="" coords="755,23,906,49"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="943,39,906,39,906,34,943,34"/>
+<area shape="rect" id="Node000007" href="$structbn_1_1_fp12_t.html#a7468e60aea79bcbe8794c791b76f330d" title=" " alt="" coords="751,73,910,98"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="963,56,887,75,886,70,962,51"/>
+<area shape="rect" id="Node000003" href="$namespacelibff.html#a94cda500a6c4fadd7c821134984f01ee" title=" " alt="" coords="400,16,516,57"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="549,39,517,39,517,34,549,34"/>
+<area shape="rect" id="Node000004" href="$classlibff_1_1bn128__pp.html#a38502799f0a10d16529921201aa46c6f" title=" " alt="" coords="214,16,352,57"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="384,39,352,39,352,34,384,34"/>
+<area shape="rect" id="Node000005" href="$classlibff_1_1bn128__pp.html#a24b289664090517dc81265440564c24d" title=" " alt="" coords="5,16,166,57"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="198,39,166,39,166,34,198,34"/>
+<area shape="poly" id="edge6_Node000006_Node000002" title=" " alt="" coords="740,39,703,39,703,34,740,34"/>
+<area shape="poly" id="edge8_Node000007_Node000002" title=" " alt="" coords="761,71,687,52,688,47,762,66"/>
+</map>

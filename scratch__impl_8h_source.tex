@@ -1,0 +1,105 @@
+\doxysection{scratch\+\_\+impl.\+h}
+\hypertarget{scratch__impl_8h_source}{}\label{scratch__impl_8h_source}\index{libraries/fc/secp256k1/secp256k1/src/scratch\_impl.h@{libraries/fc/secp256k1/secp256k1/src/scratch\_impl.h}}
+\mbox{\hyperlink{scratch__impl_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00001}00001\ \textcolor{comment}{/***********************************************************************}}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2017\ Andrew\ Poelstra\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00003}00003\ \textcolor{comment}{\ *\ Distributed\ under\ the\ MIT\ software\ license,\ see\ the\ accompanying\ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00004}00004\ \textcolor{comment}{\ *\ file\ COPYING\ or\ https://www.opensource.org/licenses/mit-\/license.php.*}}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00005}00005\ \textcolor{comment}{\ ***********************************************************************/}}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00007}00007\ \textcolor{preprocessor}{\#ifndef\ SECP256K1\_SCRATCH\_IMPL\_H}}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00008}00008\ \textcolor{preprocessor}{\#define\ SECP256K1\_SCRATCH\_IMPL\_H}}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00010}00010\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h}{util.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00011}00011\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{scratch_8h}{scratch.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00013}00013\ \textcolor{keyword}{static}\ \mbox{\hyperlink{structsecp256k1__scratch__space__struct}{secp256k1\_scratch}}*\ secp256k1\_scratch\_create(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__callback}{secp256k1\_callback}}*\ error\_callback,\ \textcolor{keywordtype}{size\_t}\ size)\ \{}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00014}00014\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ base\_alloc\ =\ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_a7a45c2decf18b109c399282bb64708da}{ROUND\_TO\_ALIGN}}(\textcolor{keyword}{sizeof}(\mbox{\hyperlink{structsecp256k1__scratch__space__struct}{secp256k1\_scratch}}));}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00015}00015\ \ \ \ \ \textcolor{keywordtype}{void}\ *alloc\ =\ checked\_malloc(error\_callback,\ base\_alloc\ +\ size);}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00016}00016\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__scratch__space__struct}{secp256k1\_scratch}}*\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ (\mbox{\hyperlink{structsecp256k1__scratch__space__struct}{secp256k1\_scratch}}\ *)alloc;}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00017}00017\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ !=\ NULL)\ \{}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00018}00018\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}},\ 0,\ \textcolor{keyword}{sizeof}(*\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}));}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00019}00019\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}-\/>magic,\ \textcolor{stringliteral}{"{}scratch"{}},\ 8);}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00020}00020\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}-\/>data\ =\ (\textcolor{keywordtype}{void}\ *)\ ((\textcolor{keywordtype}{char}\ *)\ alloc\ +\ base\_alloc);}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00021}00021\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}-\/>max\_size\ =\ size;}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00022}00022\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00023}00023\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00024}00024\ \}}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00026}00026\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_scratch\_destroy(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__callback}{secp256k1\_callback}}*\ error\_callback,\ \mbox{\hyperlink{structsecp256k1__scratch__space__struct}{secp256k1\_scratch}}*\ scratch)\ \{}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00027}00027\ \ \ \ \ \textcolor{keywordflow}{if}\ (scratch\ !=\ NULL)\ \{}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00028}00028\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(scratch-\/>\mbox{\hyperlink{structsecp256k1__scratch__space__struct_a1a7fd762172b1d5455223d4c33a596f9}{alloc\_size}}\ ==\ 0);\ \textcolor{comment}{/*\ all\ checkpoints\ should\ be\ applied\ */}}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00029}00029\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (secp256k1\_memcmp\_var(scratch-\/>\mbox{\hyperlink{structsecp256k1__scratch__space__struct_a794b94d27e06cc8ece235e3baaa68240}{magic}},\ \textcolor{stringliteral}{"{}scratch"{}},\ 8)\ !=\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00030}00030\ \ \ \ \ \ \ \ \ \ \ \ \ secp256k1\_callback\_call(error\_callback,\ \textcolor{stringliteral}{"{}invalid\ scratch\ space"{}});}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00031}00031\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00032}00032\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00033}00033\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(scratch-\/>\mbox{\hyperlink{structsecp256k1__scratch__space__struct_a794b94d27e06cc8ece235e3baaa68240}{magic}},\ 0,\ \textcolor{keyword}{sizeof}(scratch-\/>\mbox{\hyperlink{structsecp256k1__scratch__space__struct_a794b94d27e06cc8ece235e3baaa68240}{magic}}));}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00034}00034\ \ \ \ \ \ \ \ \ free(scratch);}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00035}00035\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00036}00036\ \}}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00038}00038\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{size\_t}\ secp256k1\_scratch\_checkpoint(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__callback}{secp256k1\_callback}}*\ error\_callback,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scratch__space__struct}{secp256k1\_scratch}}*\ scratch)\ \{}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00039}00039\ \ \ \ \ \textcolor{keywordflow}{if}\ (secp256k1\_memcmp\_var(scratch-\/>\mbox{\hyperlink{structsecp256k1__scratch__space__struct_a794b94d27e06cc8ece235e3baaa68240}{magic}},\ \textcolor{stringliteral}{"{}scratch"{}},\ 8)\ !=\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00040}00040\ \ \ \ \ \ \ \ \ secp256k1\_callback\_call(error\_callback,\ \textcolor{stringliteral}{"{}invalid\ scratch\ space"{}});}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00041}00041\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00042}00042\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00043}00043\ \ \ \ \ \textcolor{keywordflow}{return}\ scratch-\/>\mbox{\hyperlink{structsecp256k1__scratch__space__struct_a1a7fd762172b1d5455223d4c33a596f9}{alloc\_size}};}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00044}00044\ \}}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00046}00046\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_scratch\_apply\_checkpoint(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__callback}{secp256k1\_callback}}*\ error\_callback,\ \mbox{\hyperlink{structsecp256k1__scratch__space__struct}{secp256k1\_scratch}}*\ scratch,\ \textcolor{keywordtype}{size\_t}\ checkpoint)\ \{}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00047}00047\ \ \ \ \ \textcolor{keywordflow}{if}\ (secp256k1\_memcmp\_var(scratch-\/>\mbox{\hyperlink{structsecp256k1__scratch__space__struct_a794b94d27e06cc8ece235e3baaa68240}{magic}},\ \textcolor{stringliteral}{"{}scratch"{}},\ 8)\ !=\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00048}00048\ \ \ \ \ \ \ \ \ secp256k1\_callback\_call(error\_callback,\ \textcolor{stringliteral}{"{}invalid\ scratch\ space"{}});}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00049}00049\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00050}00050\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00051}00051\ \ \ \ \ \textcolor{keywordflow}{if}\ (checkpoint\ >\ scratch-\/>\mbox{\hyperlink{structsecp256k1__scratch__space__struct_a1a7fd762172b1d5455223d4c33a596f9}{alloc\_size}})\ \{}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00052}00052\ \ \ \ \ \ \ \ \ secp256k1\_callback\_call(error\_callback,\ \textcolor{stringliteral}{"{}invalid\ checkpoint"{}});}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00053}00053\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00054}00054\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00055}00055\ \ \ \ \ scratch-\/>\mbox{\hyperlink{structsecp256k1__scratch__space__struct_a1a7fd762172b1d5455223d4c33a596f9}{alloc\_size}}\ =\ checkpoint;}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00056}00056\ \}}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00058}00058\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{size\_t}\ secp256k1\_scratch\_max\_allocation(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__callback}{secp256k1\_callback}}*\ error\_callback,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scratch__space__struct}{secp256k1\_scratch}}*\ scratch,\ \textcolor{keywordtype}{size\_t}\ objects)\ \{}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00059}00059\ \ \ \ \ \textcolor{keywordflow}{if}\ (secp256k1\_memcmp\_var(scratch-\/>\mbox{\hyperlink{structsecp256k1__scratch__space__struct_a794b94d27e06cc8ece235e3baaa68240}{magic}},\ \textcolor{stringliteral}{"{}scratch"{}},\ 8)\ !=\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00060}00060\ \ \ \ \ \ \ \ \ secp256k1\_callback\_call(error\_callback,\ \textcolor{stringliteral}{"{}invalid\ scratch\ space"{}});}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00061}00061\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00062}00062\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00063}00063\ \ \ \ \ \textcolor{comment}{/*\ Ensure\ that\ multiplication\ will\ not\ wrap\ around\ */}}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00064}00064\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_a450f9d8af07bfe2f313dbe3a78738a5e}{ALIGNMENT}}\ >\ 1\ \&\&\ objects\ >\ \mbox{\hyperlink{stdint_8h_a3c75bb398badb69c7577b21486f9963f}{SIZE\_MAX}}/(\mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_a450f9d8af07bfe2f313dbe3a78738a5e}{ALIGNMENT}}\ -\/\ 1))\ \{}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00065}00065\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00066}00066\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00067}00067\ \ \ \ \ \textcolor{keywordflow}{if}\ (scratch-\/>\mbox{\hyperlink{structsecp256k1__scratch__space__struct_a1f2a8df08845fcbfea507f9b65142401}{max\_size}}\ -\/\ scratch-\/>\mbox{\hyperlink{structsecp256k1__scratch__space__struct_a1a7fd762172b1d5455223d4c33a596f9}{alloc\_size}}\ <=\ objects\ *\ (\mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_a450f9d8af07bfe2f313dbe3a78738a5e}{ALIGNMENT}}\ -\/\ 1))\ \{}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00068}00068\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00069}00069\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00070}00070\ \ \ \ \ \textcolor{keywordflow}{return}\ scratch-\/>\mbox{\hyperlink{structsecp256k1__scratch__space__struct_a1f2a8df08845fcbfea507f9b65142401}{max\_size}}\ -\/\ scratch-\/>\mbox{\hyperlink{structsecp256k1__scratch__space__struct_a1a7fd762172b1d5455223d4c33a596f9}{alloc\_size}}\ -\/\ objects\ *\ (\mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_a450f9d8af07bfe2f313dbe3a78738a5e}{ALIGNMENT}}\ -\/\ 1);}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00071}00071\ \}}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00073}00073\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ *secp256k1\_scratch\_alloc(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__callback}{secp256k1\_callback}}*\ error\_callback,\ \mbox{\hyperlink{structsecp256k1__scratch__space__struct}{secp256k1\_scratch}}*\ scratch,\ \textcolor{keywordtype}{size\_t}\ size)\ \{}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00074}00074\ \ \ \ \ \textcolor{keywordtype}{void}\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00075}00075\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ rounded\_size;}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00076}00076\ }
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00077}00077\ \ \ \ \ rounded\_size\ =\ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_a7a45c2decf18b109c399282bb64708da}{ROUND\_TO\_ALIGN}}(size);}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00078}00078\ \ \ \ \ \textcolor{comment}{/*\ Check\ that\ rounding\ did\ not\ wrap\ around\ */}}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00079}00079\ \ \ \ \ \textcolor{keywordflow}{if}\ (rounded\_size\ <\ size)\ \{}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00080}00080\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ NULL;}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00081}00081\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00082}00082\ \ \ \ \ size\ =\ rounded\_size;}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00083}00083\ }
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00084}00084\ \ \ \ \ \textcolor{keywordflow}{if}\ (secp256k1\_memcmp\_var(scratch-\/>\mbox{\hyperlink{structsecp256k1__scratch__space__struct_a794b94d27e06cc8ece235e3baaa68240}{magic}},\ \textcolor{stringliteral}{"{}scratch"{}},\ 8)\ !=\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00085}00085\ \ \ \ \ \ \ \ \ secp256k1\_callback\_call(error\_callback,\ \textcolor{stringliteral}{"{}invalid\ scratch\ space"{}});}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00086}00086\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ NULL;}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00087}00087\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00088}00088\ }
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00089}00089\ \ \ \ \ \textcolor{keywordflow}{if}\ (size\ >\ scratch-\/>\mbox{\hyperlink{structsecp256k1__scratch__space__struct_a1f2a8df08845fcbfea507f9b65142401}{max\_size}}\ -\/\ scratch-\/>\mbox{\hyperlink{structsecp256k1__scratch__space__struct_a1a7fd762172b1d5455223d4c33a596f9}{alloc\_size}})\ \{}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00090}00090\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ NULL;}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00091}00091\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00092}00092\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ (\textcolor{keywordtype}{void}\ *)\ ((\textcolor{keywordtype}{char}\ *)\ scratch-\/>\mbox{\hyperlink{structsecp256k1__scratch__space__struct_a411d4fd1980301bb2e3a7d0f83eeba47}{data}}\ +\ scratch-\/>\mbox{\hyperlink{structsecp256k1__scratch__space__struct_a1a7fd762172b1d5455223d4c33a596f9}{alloc\_size}});}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00093}00093\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}},\ 0,\ size);}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00094}00094\ \ \ \ \ scratch-\/>\mbox{\hyperlink{structsecp256k1__scratch__space__struct_a1a7fd762172b1d5455223d4c33a596f9}{alloc\_size}}\ +=\ size;}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00095}00095\ }
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00096}00096\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00097}00097\ \}}
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00098}00098\ }
+\DoxyCodeLine{\Hypertarget{scratch__impl_8h_source_l00099}00099\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

@@ -1,0 +1,145 @@
+\doxysection{sysio\+::state\+\_\+history\+::trace\+\_\+converter Struct Reference}
+\hypertarget{structsysio_1_1state__history_1_1trace__converter}{}\label{structsysio_1_1state__history_1_1trace__converter}\index{sysio::state\_history::trace\_converter@{sysio::state\_history::trace\_converter}}
+
+
+{\ttfamily \#include $<$trace\+\_\+converter.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{structsysio_1_1state__history_1_1trace__converter_ab4ca84fdc2d30675408e6e9f4d4c18c8}{add\+\_\+transaction}} (const \mbox{\hyperlink{namespacesysio_1_1chain_a4ee2867a6bec961c7a78b203cfd76be9}{transaction\+\_\+trace\+\_\+ptr}} \&trace, const \mbox{\hyperlink{namespacesysio_1_1chain_a7041c0316bd294d0866609ab3e0cc7a7}{chain\+::packed\+\_\+transaction\+\_\+ptr}} \&\mbox{\hyperlink{structsysio_1_1chain_1_1transaction}{transaction}})
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_ac6f5a1f1e061f000983f5d5f3ac25dfa}{bytes}} \mbox{\hyperlink{structsysio_1_1state__history_1_1trace__converter_a62e0192e6d6919f2171f46b7335eafa5}{pack}} (const \mbox{\hyperlink{classchainbase_1_1database}{chainbase\+::database}} \&db, bool trace\+\_\+debug\+\_\+mode, const \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\+\_\+state\+\_\+ptr}} \&\mbox{\hyperlink{structsysio_1_1chain_1_1block__state}{block\+\_\+state}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::map$<$ \mbox{\hyperlink{namespacesysio_1_1chain_aa85a3b49b3b219d1e3840567579e7e63}{transaction\+\_\+id\+\_\+type}}, \mbox{\hyperlink{structsysio_1_1state__history_1_1augmented__transaction__trace}{augmented\+\_\+transaction\+\_\+trace}} $>$ \mbox{\hyperlink{structsysio_1_1state__history_1_1trace__converter_ad0809adfb2d44c4587a46763d02efdaf}{cached\+\_\+traces}}
+\item 
+std\+::optional$<$ \mbox{\hyperlink{structsysio_1_1state__history_1_1augmented__transaction__trace}{augmented\+\_\+transaction\+\_\+trace}} $>$ \mbox{\hyperlink{structsysio_1_1state__history_1_1trace__converter_a86c4c2c779102104f43943f1278f58dc}{onblock\+\_\+trace}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{trace__converter_8hpp_source_l00012}{12}} of file \mbox{\hyperlink{trace__converter_8hpp_source}{trace\+\_\+converter.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1state__history_1_1trace__converter_ab4ca84fdc2d30675408e6e9f4d4c18c8}\index{sysio::state\_history::trace\_converter@{sysio::state\_history::trace\_converter}!add\_transaction@{add\_transaction}}
+\index{add\_transaction@{add\_transaction}!sysio::state\_history::trace\_converter@{sysio::state\_history::trace\_converter}}
+\doxysubsubsection{\texorpdfstring{add\_transaction()}{add\_transaction()}}
+{\footnotesize\ttfamily \label{structsysio_1_1state__history_1_1trace__converter_ab4ca84fdc2d30675408e6e9f4d4c18c8} 
+void sysio\+::state\+\_\+history\+::trace\+\_\+converter\+::add\+\_\+transaction (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_a4ee2867a6bec961c7a78b203cfd76be9}{transaction\+\_\+trace\+\_\+ptr}} \&}]{trace}{, }\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_a7041c0316bd294d0866609ab3e0cc7a7}{chain\+::packed\+\_\+transaction\+\_\+ptr}} \&}]{transaction}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{trace__converter_8cpp_source_l00007}{7}} of file \mbox{\hyperlink{trace__converter_8cpp_source}{trace\+\_\+converter.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00007\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00008\ \ \ \ \textcolor{keywordflow}{if}\ (trace-\/>receipt)\ \{}
+\DoxyCodeLine{00009\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacesysio_1_1chain_a9a9946a27c3832394b9b2b3911e0733c}{chain::is\_onblock}}(*trace))}
+\DoxyCodeLine{00010\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1state__history_1_1trace__converter_a86c4c2c779102104f43943f1278f58dc}{onblock\_trace}}.emplace(trace,\ transaction);}
+\DoxyCodeLine{00011\ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (trace-\/>failed\_dtrx\_trace)}
+\DoxyCodeLine{00012\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1state__history_1_1trace__converter_ad0809adfb2d44c4587a46763d02efdaf}{cached\_traces}}[trace-\/>failed\_dtrx\_trace-\/>id]\ =\ augmented\_transaction\_trace\{trace,\ transaction\};}
+\DoxyCodeLine{00013\ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00014\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1state__history_1_1trace__converter_ad0809adfb2d44c4587a46763d02efdaf}{cached\_traces}}[trace-\/>id]\ =\ augmented\_transaction\_trace\{trace,\ transaction\};}
+\DoxyCodeLine{00015\ \ \ \ \}}
+\DoxyCodeLine{00016\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1state__history_1_1trace__converter_ab4ca84fdc2d30675408e6e9f4d4c18c8_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1state__history_1_1trace__converter_ab4ca84fdc2d30675408e6e9f4d4c18c8_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1state__history_1_1trace__converter_a62e0192e6d6919f2171f46b7335eafa5}\index{sysio::state\_history::trace\_converter@{sysio::state\_history::trace\_converter}!pack@{pack}}
+\index{pack@{pack}!sysio::state\_history::trace\_converter@{sysio::state\_history::trace\_converter}}
+\doxysubsubsection{\texorpdfstring{pack()}{pack()}}
+{\footnotesize\ttfamily \label{structsysio_1_1state__history_1_1trace__converter_a62e0192e6d6919f2171f46b7335eafa5} 
+\mbox{\hyperlink{namespacesysio_1_1chain_ac6f5a1f1e061f000983f5d5f3ac25dfa}{bytes}} sysio\+::state\+\_\+history\+::trace\+\_\+converter\+::pack (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classchainbase_1_1database}{chainbase\+::database}} \&}]{db}{, }\item[{bool}]{trace\+\_\+debug\+\_\+mode}{, }\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\+\_\+state\+\_\+ptr}} \&}]{block\+\_\+state}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{trace__converter_8cpp_source_l00018}{18}} of file \mbox{\hyperlink{trace__converter_8cpp_source}{trace\+\_\+converter.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00019\ \ \ \ std::vector<augmented\_transaction\_trace>\ traces;}
+\DoxyCodeLine{00020\ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structsysio_1_1state__history_1_1trace__converter_a86c4c2c779102104f43943f1278f58dc}{onblock\_trace}})}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ traces.push\_back(*\mbox{\hyperlink{structsysio_1_1state__history_1_1trace__converter_a86c4c2c779102104f43943f1278f58dc}{onblock\_trace}});}
+\DoxyCodeLine{00022\ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\&\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ :\ block\_state-\/>block-\/>transactions)\ \{}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_aa85a3b49b3b219d1e3840567579e7e63}{transaction\_id\_type}}\ \mbox{\hyperlink{code__cache_8cpp_aa0efefe21f4700d78692edc823e763be}{id}};}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (std::holds\_alternative<transaction\_id\_type>(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.trx))}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{id}\ =\ std::get<transaction\_id\_type>(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.trx);}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{id}\ =\ std::get<chain::packed\_transaction>(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.trx).id();}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ it\ =\ \mbox{\hyperlink{structsysio_1_1state__history_1_1trace__converter_ad0809adfb2d44c4587a46763d02efdaf}{cached\_traces}}.find(\textcolor{keywordtype}{id});}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(it\ !=\ \mbox{\hyperlink{structsysio_1_1state__history_1_1trace__converter_ad0809adfb2d44c4587a46763d02efdaf}{cached\_traces}}.end()\ \&\&\ it-\/>second.trace-\/>receipt,\ chain::plugin\_exception,}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}missing\ trace\ for\ transaction\ \$\{id\}"{}},\ (\textcolor{stringliteral}{"{}id"{}},\ \textcolor{keywordtype}{id}));}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ traces.push\_back(it-\/>second);}
+\DoxyCodeLine{00032\ \ \ \ \}}
+\DoxyCodeLine{00033\ \ \ \ \mbox{\hyperlink{structsysio_1_1state__history_1_1trace__converter_ad0809adfb2d44c4587a46763d02efdaf}{cached\_traces}}.clear();}
+\DoxyCodeLine{00034\ \ \ \ \mbox{\hyperlink{structsysio_1_1state__history_1_1trace__converter_a86c4c2c779102104f43943f1278f58dc}{onblock\_trace}}.reset();}
+\DoxyCodeLine{00035\ }
+\DoxyCodeLine{00036\ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(\mbox{\hyperlink{state__history_2include_2sysio_2state__history_2serialization_8hpp_a8919e19ccc221814a4ea1632ee94d0fc}{make\_history\_context\_wrapper}}(db,\ trace\_debug\_mode,\ traces));}
+\DoxyCodeLine{00037\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=345pt]{structsysio_1_1state__history_1_1trace__converter_a62e0192e6d6919f2171f46b7335eafa5_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1state__history_1_1trace__converter_a62e0192e6d6919f2171f46b7335eafa5_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1state__history_1_1trace__converter_ad0809adfb2d44c4587a46763d02efdaf}\index{sysio::state\_history::trace\_converter@{sysio::state\_history::trace\_converter}!cached\_traces@{cached\_traces}}
+\index{cached\_traces@{cached\_traces}!sysio::state\_history::trace\_converter@{sysio::state\_history::trace\_converter}}
+\doxysubsubsection{\texorpdfstring{cached\_traces}{cached\_traces}}
+{\footnotesize\ttfamily \label{structsysio_1_1state__history_1_1trace__converter_ad0809adfb2d44c4587a46763d02efdaf} 
+std\+::map$<$\mbox{\hyperlink{namespacesysio_1_1chain_aa85a3b49b3b219d1e3840567579e7e63}{transaction\+\_\+id\+\_\+type}}, \mbox{\hyperlink{structsysio_1_1state__history_1_1augmented__transaction__trace}{augmented\+\_\+transaction\+\_\+trace}}$>$ sysio\+::state\+\_\+history\+::trace\+\_\+converter\+::cached\+\_\+traces}
+
+
+
+Definition at line \mbox{\hyperlink{trace__converter_8hpp_source_l00013}{13}} of file \mbox{\hyperlink{trace__converter_8hpp_source}{trace\+\_\+converter.\+hpp}}.
+
+\Hypertarget{structsysio_1_1state__history_1_1trace__converter_a86c4c2c779102104f43943f1278f58dc}\index{sysio::state\_history::trace\_converter@{sysio::state\_history::trace\_converter}!onblock\_trace@{onblock\_trace}}
+\index{onblock\_trace@{onblock\_trace}!sysio::state\_history::trace\_converter@{sysio::state\_history::trace\_converter}}
+\doxysubsubsection{\texorpdfstring{onblock\_trace}{onblock\_trace}}
+{\footnotesize\ttfamily \label{structsysio_1_1state__history_1_1trace__converter_a86c4c2c779102104f43943f1278f58dc} 
+std\+::optional$<$\mbox{\hyperlink{structsysio_1_1state__history_1_1augmented__transaction__trace}{augmented\+\_\+transaction\+\_\+trace}}$>$ sysio\+::state\+\_\+history\+::trace\+\_\+converter\+::onblock\+\_\+trace}
+
+
+
+Definition at line \mbox{\hyperlink{trace__converter_8hpp_source_l00014}{14}} of file \mbox{\hyperlink{trace__converter_8hpp_source}{trace\+\_\+converter.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/state\+\_\+history/include/sysio/state\+\_\+history/\mbox{\hyperlink{trace__converter_8hpp}{trace\+\_\+converter.\+hpp}}\item 
+libraries/state\+\_\+history/\mbox{\hyperlink{trace__converter_8cpp}{trace\+\_\+converter.\+cpp}}\end{DoxyCompactItemize}

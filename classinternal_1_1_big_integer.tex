@@ -1,0 +1,532 @@
+\doxysection{internal\+::Big\+Integer Class Reference}
+\hypertarget{classinternal_1_1_big_integer}{}\label{classinternal_1_1_big_integer}\index{internal::BigInteger@{internal::BigInteger}}
+
+
+{\ttfamily \#include $<$biginteger.\+h$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{classinternal_1_1_big_integer_a60accaa6586b7f4b89e3ded6f2f55b37}{Type}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classinternal_1_1_big_integer_abec623168bc9494dec2f50643b897f72}{Big\+Integer}} (const \mbox{\hyperlink{classinternal_1_1_big_integer}{Big\+Integer}} \&rhs)
+\item 
+\mbox{\hyperlink{classinternal_1_1_big_integer_ad02b0ef9da203efddd4af07e923732c0}{Big\+Integer}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} u)
+\item 
+\mbox{\hyperlink{classinternal_1_1_big_integer_a656bd1bd4af3920beb90ba4af87b6181}{Big\+Integer}} (const char \texorpdfstring{$\ast$}{*}decimals, size\+\_\+t length)
+\item 
+\mbox{\hyperlink{classinternal_1_1_big_integer}{Big\+Integer}} \& \mbox{\hyperlink{classinternal_1_1_big_integer_ac783203409480350dbbcd9e0c95001be}{operator=}} (const \mbox{\hyperlink{classinternal_1_1_big_integer}{Big\+Integer}} \&rhs)
+\item 
+\mbox{\hyperlink{classinternal_1_1_big_integer}{Big\+Integer}} \& \mbox{\hyperlink{classinternal_1_1_big_integer_a0ffe0c4c762312682d60e82c38b38c45}{operator=}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} u)
+\item 
+\mbox{\hyperlink{classinternal_1_1_big_integer}{Big\+Integer}} \& \mbox{\hyperlink{classinternal_1_1_big_integer_ad77a8a66494070c1518d8ca4948cbfae}{operator+=}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} u)
+\item 
+\mbox{\hyperlink{classinternal_1_1_big_integer}{Big\+Integer}} \& \mbox{\hyperlink{classinternal_1_1_big_integer_a212b816f6d07b5b50347bde5a96a0160}{operator\texorpdfstring{$\ast$}{*}=}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} u)
+\item 
+\mbox{\hyperlink{classinternal_1_1_big_integer}{Big\+Integer}} \& \mbox{\hyperlink{classinternal_1_1_big_integer_ad6b2e9b15ae1e1c9c2f8e68112b3f265}{operator\texorpdfstring{$\ast$}{*}=}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} u)
+\item 
+\mbox{\hyperlink{classinternal_1_1_big_integer}{Big\+Integer}} \& \mbox{\hyperlink{classinternal_1_1_big_integer_a06a6f5d1d81b91248b0ab3c2d65a500a}{operator$<$$<$=}} (size\+\_\+t shift)
+\item 
+bool \mbox{\hyperlink{classinternal_1_1_big_integer_a52b424669238bdebc134e793d3b470ae}{operator==}} (const \mbox{\hyperlink{classinternal_1_1_big_integer}{Big\+Integer}} \&rhs) const
+\item 
+bool \mbox{\hyperlink{classinternal_1_1_big_integer_a8b6ab0d652d461c1136e0388d352628b}{operator==}} (const \mbox{\hyperlink{classinternal_1_1_big_integer_a60accaa6586b7f4b89e3ded6f2f55b37}{Type}} rhs) const
+\item 
+\mbox{\hyperlink{classinternal_1_1_big_integer}{Big\+Integer}} \& \mbox{\hyperlink{classinternal_1_1_big_integer_af491885747a0442492134c23a6ec4c65}{Multiply\+Pow5}} (unsigned exp)
+\item 
+bool \mbox{\hyperlink{classinternal_1_1_big_integer_ad7ad62e6b62af38283ee940eb4015b26}{Difference}} (const \mbox{\hyperlink{classinternal_1_1_big_integer}{Big\+Integer}} \&rhs, \mbox{\hyperlink{classinternal_1_1_big_integer}{Big\+Integer}} \texorpdfstring{$\ast$}{*}out) const
+\item 
+int \mbox{\hyperlink{classinternal_1_1_big_integer_af8e90fff5382de6c1cda5f751017200c}{Compare}} (const \mbox{\hyperlink{classinternal_1_1_big_integer}{Big\+Integer}} \&rhs) const
+\item 
+size\+\_\+t \mbox{\hyperlink{classinternal_1_1_big_integer_aa0ad6e74839b7c7fe77c9742ec079525}{Get\+Count}} () const
+\item 
+\mbox{\hyperlink{classinternal_1_1_big_integer_a60accaa6586b7f4b89e3ded6f2f55b37}{Type}} \mbox{\hyperlink{classinternal_1_1_big_integer_a7288eefd49735c3c3edec698f56738bd}{Get\+Digit}} (size\+\_\+t index) const
+\item 
+bool \mbox{\hyperlink{classinternal_1_1_big_integer_ae12dd6759f1f76501db3d1bcafce39cd}{Is\+Zero}} () const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{biginteger_8h_source_l00028}{28}} of file \mbox{\hyperlink{biginteger_8h_source}{biginteger.\+h}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classinternal_1_1_big_integer_a60accaa6586b7f4b89e3ded6f2f55b37}\index{internal::BigInteger@{internal::BigInteger}!Type@{Type}}
+\index{Type@{Type}!internal::BigInteger@{internal::BigInteger}}
+\doxysubsubsection{\texorpdfstring{Type}{Type}}
+{\footnotesize\ttfamily \label{classinternal_1_1_big_integer_a60accaa6586b7f4b89e3ded6f2f55b37} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{classinternal_1_1_big_integer_a60accaa6586b7f4b89e3ded6f2f55b37}{internal\+::\+Big\+Integer\+::\+Type}}}
+
+
+
+Definition at line \mbox{\hyperlink{biginteger_8h_source_l00030}{30}} of file \mbox{\hyperlink{biginteger_8h_source}{biginteger.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classinternal_1_1_big_integer_abec623168bc9494dec2f50643b897f72}\index{internal::BigInteger@{internal::BigInteger}!BigInteger@{BigInteger}}
+\index{BigInteger@{BigInteger}!internal::BigInteger@{internal::BigInteger}}
+\doxysubsubsection{\texorpdfstring{BigInteger()}{BigInteger()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{classinternal_1_1_big_integer_abec623168bc9494dec2f50643b897f72} 
+internal\+::\+Big\+Integer\+::\+Big\+Integer (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classinternal_1_1_big_integer}{Big\+Integer}} \&}]{rhs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{biginteger_8h_source_l00032}{32}} of file \mbox{\hyperlink{biginteger_8h_source}{biginteger.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ count\_(rhs.count\_)\ \{}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ std::memcpy(digits\_,\ rhs.digits\_,\ count\_\ *\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}}));}
+\DoxyCodeLine{00034\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classinternal_1_1_big_integer_ad02b0ef9da203efddd4af07e923732c0}\index{internal::BigInteger@{internal::BigInteger}!BigInteger@{BigInteger}}
+\index{BigInteger@{BigInteger}!internal::BigInteger@{internal::BigInteger}}
+\doxysubsubsection{\texorpdfstring{BigInteger()}{BigInteger()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{classinternal_1_1_big_integer_ad02b0ef9da203efddd4af07e923732c0} 
+internal\+::\+Big\+Integer\+::\+Big\+Integer (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{u}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{biginteger_8h_source_l00036}{36}} of file \mbox{\hyperlink{biginteger_8h_source}{biginteger.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ count\_(1)\ \{}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ digits\_[0]\ =\ u;}
+\DoxyCodeLine{00038\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classinternal_1_1_big_integer_a656bd1bd4af3920beb90ba4af87b6181}\index{internal::BigInteger@{internal::BigInteger}!BigInteger@{BigInteger}}
+\index{BigInteger@{BigInteger}!internal::BigInteger@{internal::BigInteger}}
+\doxysubsubsection{\texorpdfstring{BigInteger()}{BigInteger()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{classinternal_1_1_big_integer_a656bd1bd4af3920beb90ba4af87b6181} 
+internal\+::\+Big\+Integer\+::\+Big\+Integer (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{decimals}{, }\item[{size\+\_\+t}]{length}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{biginteger_8h_source_l00040}{40}} of file \mbox{\hyperlink{biginteger_8h_source}{biginteger.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ count\_(1)\ \{}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(length\ >\ 0);}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ digits\_[0]\ =\ 0;}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ i\ =\ 0;}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ kMaxDigitPerIteration\ =\ 19;\ \ \textcolor{comment}{//\ 2\string^64\ =\ 18446744073709551616\ >\ 10\string^19}}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (length\ >=\ kMaxDigitPerIteration)\ \{}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \ \ \ AppendDecimal64(decimals\ +\ i,\ decimals\ +\ i\ +\ kMaxDigitPerIteration);}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \ \ \ length\ -\/=\ kMaxDigitPerIteration;}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \ \ \ i\ +=\ kMaxDigitPerIteration;}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00050\ }
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (length\ >\ 0)}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \ \ AppendDecimal64(decimals\ +\ i,\ decimals\ +\ i\ +\ length);}
+\DoxyCodeLine{00053\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classinternal_1_1_big_integer_af8e90fff5382de6c1cda5f751017200c}\index{internal::BigInteger@{internal::BigInteger}!Compare@{Compare}}
+\index{Compare@{Compare}!internal::BigInteger@{internal::BigInteger}}
+\doxysubsubsection{\texorpdfstring{Compare()}{Compare()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_big_integer_af8e90fff5382de6c1cda5f751017200c} 
+int internal\+::\+Big\+Integer\+::\+Compare (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classinternal_1_1_big_integer}{Big\+Integer}} \&}]{rhs}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{biginteger_8h_source_l00208}{208}} of file \mbox{\hyperlink{biginteger_8h_source}{biginteger.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (count\_\ !=\ rhs.count\_)}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ count\_\ <\ rhs.count\_\ ?\ -\/1\ :\ 1;}
+\DoxyCodeLine{00211\ }
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ count\_;\ i-\/-\/\ >\ 0;)}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (digits\_[i]\ !=\ rhs.digits\_[i])}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ digits\_[i]\ <\ rhs.digits\_[i]\ ?\ -\/1\ :\ 1;}
+\DoxyCodeLine{00215\ }
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00217\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classinternal_1_1_big_integer_af8e90fff5382de6c1cda5f751017200c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classinternal_1_1_big_integer_ad7ad62e6b62af38283ee940eb4015b26}\index{internal::BigInteger@{internal::BigInteger}!Difference@{Difference}}
+\index{Difference@{Difference}!internal::BigInteger@{internal::BigInteger}}
+\doxysubsubsection{\texorpdfstring{Difference()}{Difference()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_big_integer_ad7ad62e6b62af38283ee940eb4015b26} 
+bool internal\+::\+Big\+Integer\+::\+Difference (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classinternal_1_1_big_integer}{Big\+Integer}} \&}]{rhs}{, }\item[{\mbox{\hyperlink{classinternal_1_1_big_integer}{Big\+Integer}} \texorpdfstring{$\ast$}{*}}]{out}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{biginteger_8h_source_l00186}{186}} of file \mbox{\hyperlink{biginteger_8h_source}{biginteger.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{xbyak__mnemonic_8h_a1eab233e37cc0eb225b69b7840d34d96}{cmp}}\ =\ \mbox{\hyperlink{classinternal_1_1_big_integer_af8e90fff5382de6c1cda5f751017200c}{Compare}}(rhs);}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\mbox{\hyperlink{xbyak__mnemonic_8h_a1eab233e37cc0eb225b69b7840d34d96}{cmp}}\ !=\ 0);}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classinternal_1_1_big_integer_abec623168bc9494dec2f50643b897f72}{BigInteger}}\ *\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ *b;\ \ \textcolor{comment}{//\ Makes\ a\ >\ b}}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{xbyak__mnemonic_8h_a1eab233e37cc0eb225b69b7840d34d96}{cmp}}\ <\ 0)\ \{\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ =\ \&rhs;\ b\ =\ \textcolor{keyword}{this};\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \textcolor{keyword}{true};\ \}}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \ \ \ \ \ \ \ \ \{\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ =\ \textcolor{keyword}{this};\ b\ =\ \&rhs;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \textcolor{keyword}{false};\ \}}
+\DoxyCodeLine{00193\ }
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}}\ borrow\ =\ 0;}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>count\_;\ i++)\ \{}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>digits\_[i]\ -\/\ borrow;}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (i\ <\ b-\/>count\_)}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ -\/=\ b-\/>digits\_[i];}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ \ \ \ \ borrow\ =\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ >\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}-\/>digits\_[i])\ ?\ 1\ :\ 0;}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \ \ \ \ out-\/>digits\_[i]\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}};}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (d\ !=\ 0)}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ out-\/>count\_\ =\ i\ +\ 1;}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00204\ }
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00206\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=312pt]{classinternal_1_1_big_integer_ad7ad62e6b62af38283ee940eb4015b26_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classinternal_1_1_big_integer_ad7ad62e6b62af38283ee940eb4015b26_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classinternal_1_1_big_integer_aa0ad6e74839b7c7fe77c9742ec079525}\index{internal::BigInteger@{internal::BigInteger}!GetCount@{GetCount}}
+\index{GetCount@{GetCount}!internal::BigInteger@{internal::BigInteger}}
+\doxysubsubsection{\texorpdfstring{GetCount()}{GetCount()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_big_integer_aa0ad6e74839b7c7fe77c9742ec079525} 
+size\+\_\+t internal\+::\+Big\+Integer\+::\+Get\+Count (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{biginteger_8h_source_l00219}{219}} of file \mbox{\hyperlink{biginteger_8h_source}{biginteger.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00219\ \{\ \textcolor{keywordflow}{return}\ count\_;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classinternal_1_1_big_integer_a7288eefd49735c3c3edec698f56738bd}\index{internal::BigInteger@{internal::BigInteger}!GetDigit@{GetDigit}}
+\index{GetDigit@{GetDigit}!internal::BigInteger@{internal::BigInteger}}
+\doxysubsubsection{\texorpdfstring{GetDigit()}{GetDigit()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_big_integer_a7288eefd49735c3c3edec698f56738bd} 
+\mbox{\hyperlink{classinternal_1_1_big_integer_a60accaa6586b7f4b89e3ded6f2f55b37}{Type}} internal\+::\+Big\+Integer\+::\+Get\+Digit (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{index}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{biginteger_8h_source_l00220}{220}} of file \mbox{\hyperlink{biginteger_8h_source}{biginteger.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00220\ \{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(index\ <\ count\_);\ \textcolor{keywordflow}{return}\ digits\_[index];\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classinternal_1_1_big_integer_ae12dd6759f1f76501db3d1bcafce39cd}\index{internal::BigInteger@{internal::BigInteger}!IsZero@{IsZero}}
+\index{IsZero@{IsZero}!internal::BigInteger@{internal::BigInteger}}
+\doxysubsubsection{\texorpdfstring{IsZero()}{IsZero()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_big_integer_ae12dd6759f1f76501db3d1bcafce39cd} 
+bool internal\+::\+Big\+Integer\+::\+Is\+Zero (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{biginteger_8h_source_l00221}{221}} of file \mbox{\hyperlink{biginteger_8h_source}{biginteger.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00221\ \{\ \textcolor{keywordflow}{return}\ count\_\ ==\ 1\ \&\&\ digits\_[0]\ ==\ 0;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=312pt]{classinternal_1_1_big_integer_ae12dd6759f1f76501db3d1bcafce39cd_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classinternal_1_1_big_integer_af491885747a0442492134c23a6ec4c65}\index{internal::BigInteger@{internal::BigInteger}!MultiplyPow5@{MultiplyPow5}}
+\index{MultiplyPow5@{MultiplyPow5}!internal::BigInteger@{internal::BigInteger}}
+\doxysubsubsection{\texorpdfstring{MultiplyPow5()}{MultiplyPow5()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_big_integer_af491885747a0442492134c23a6ec4c65} 
+\mbox{\hyperlink{classinternal_1_1_big_integer}{Big\+Integer}} \& internal\+::\+Big\+Integer\+::\+Multiply\+Pow5 (\begin{DoxyParamCaption}\item[{unsigned}]{exp}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{biginteger_8h_source_l00162}{162}} of file \mbox{\hyperlink{biginteger_8h_source}{biginteger.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ kPow5[12]\ =\ \{}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ \ \ \ \ 5,}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \ \ \ \ 5\ *\ 5,}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \ \ \ \ 5\ *\ 5\ *\ 5,}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \ \ \ \ \ \ 5\ *\ 5\ *\ 5\ *\ 5,}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \ \ \ \ 5\ *\ 5\ *\ 5\ *\ 5\ *\ 5,}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \ \ \ \ 5\ *\ 5\ *\ 5\ *\ 5\ *\ 5\ *\ 5,}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \ \ \ \ 5\ *\ 5\ *\ 5\ *\ 5\ *\ 5\ *\ 5\ *\ 5,}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \ \ \ \ 5\ *\ 5\ *\ 5\ *\ 5\ *\ 5\ *\ 5\ *\ 5\ *\ 5,}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \ \ \ \ 5\ *\ 5\ *\ 5\ *\ 5\ *\ 5\ *\ 5\ *\ 5\ *\ 5\ *\ 5,}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ \ \ \ \ 5\ *\ 5\ *\ 5\ *\ 5\ *\ 5\ *\ 5\ *\ 5\ *\ 5\ *\ 5\ *\ 5,}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ \ \ \ \ 5\ *\ 5\ *\ 5\ *\ 5\ *\ 5\ *\ 5\ *\ 5\ *\ 5\ *\ 5\ *\ 5\ *\ 5,}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \ \ \ \ 5\ *\ 5\ *\ 5\ *\ 5\ *\ 5\ *\ 5\ *\ 5\ *\ 5\ *\ 5\ *\ 5\ *\ 5\ *\ 5}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (exp\ ==\ 0)\ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (;\ exp\ >=\ 27;\ exp\ -\/=\ 27)\ *\textcolor{keyword}{this}\ *=\ \mbox{\hyperlink{rapidjson_8h_aaee1245f375a71be1ac9b8a07ba5fb8f}{RAPIDJSON\_UINT64\_C2}}(0X6765C793,\ 0XFA10079D);\ \textcolor{comment}{//\ 5\string^27}}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (;\ exp\ >=\ 13;\ exp\ -\/=\ 13)\ *\textcolor{keyword}{this}\ *=\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\textcolor{keyword}{>}(1220703125u);\ \textcolor{comment}{//\ 5\string^13}}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (exp\ >\ 0)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *\textcolor{keyword}{this}\ *=\ kPow5[exp\ -\/\ 1];}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00182\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classinternal_1_1_big_integer_af491885747a0442492134c23a6ec4c65_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classinternal_1_1_big_integer_ad6b2e9b15ae1e1c9c2f8e68112b3f265}\index{internal::BigInteger@{internal::BigInteger}!operator\texorpdfstring{$\ast$}{*}=@{operator\texorpdfstring{$\ast$}{*}=}}
+\index{operator\texorpdfstring{$\ast$}{*}=@{operator\texorpdfstring{$\ast$}{*}=}!internal::BigInteger@{internal::BigInteger}}
+\doxysubsubsection{\texorpdfstring{operator\texorpdfstring{$\ast$}{*}=()}{operator*=()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classinternal_1_1_big_integer_ad6b2e9b15ae1e1c9c2f8e68112b3f265} 
+\mbox{\hyperlink{classinternal_1_1_big_integer}{Big\+Integer}} \& internal\+::\+Big\+Integer\+::operator\texorpdfstring{$\ast$}{*}= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{u}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{biginteger_8h_source_l00105}{105}} of file \mbox{\hyperlink{biginteger_8h_source}{biginteger.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (u\ ==\ 0)\ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this}\ =\ 0;}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (u\ ==\ 1)\ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (*\textcolor{keyword}{this}\ ==\ 1)\ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this}\ =\ u;}
+\DoxyCodeLine{00109\ }
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ k\ =\ 0;}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ count\_;\ i++)\ \{}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ c\ =\ digits\_[i]\ >>\ 32;}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ =\ digits\_[i]\ \&\ 0xFFFFFFFF;}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ uc\ =\ u\ *\ c;}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ ud\ =\ u\ *\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}};}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ p0\ =\ ud\ +\ k;}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ p1\ =\ uc\ +\ (p0\ >>\ 32);}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ digits\_[i]\ =\ (p0\ \&\ 0xFFFFFFFF)\ |\ (p1\ <<\ 32);}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ \ \ \ k\ =\ p1\ >>\ 32;}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (k\ >\ 0)}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \ \ \ \ PushBack(k);}
+\DoxyCodeLine{00124\ }
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00126\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classinternal_1_1_big_integer_a212b816f6d07b5b50347bde5a96a0160}\index{internal::BigInteger@{internal::BigInteger}!operator\texorpdfstring{$\ast$}{*}=@{operator\texorpdfstring{$\ast$}{*}=}}
+\index{operator\texorpdfstring{$\ast$}{*}=@{operator\texorpdfstring{$\ast$}{*}=}!internal::BigInteger@{internal::BigInteger}}
+\doxysubsubsection{\texorpdfstring{operator\texorpdfstring{$\ast$}{*}=()}{operator*=()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classinternal_1_1_big_integer_a212b816f6d07b5b50347bde5a96a0160} 
+\mbox{\hyperlink{classinternal_1_1_big_integer}{Big\+Integer}} \& internal\+::\+Big\+Integer\+::operator\texorpdfstring{$\ast$}{*}= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{u}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{biginteger_8h_source_l00087}{87}} of file \mbox{\hyperlink{biginteger_8h_source}{biginteger.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (u\ ==\ 0)\ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this}\ =\ 0;}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (u\ ==\ 1)\ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (*\textcolor{keyword}{this}\ ==\ 1)\ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this}\ =\ u;}
+\DoxyCodeLine{00091\ }
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ k\ =\ 0;}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ count\_;\ i++)\ \{}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ hi;}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \ \ \ digits\_[i]\ =\ MulAdd64(digits\_[i],\ u,\ k,\ \&hi);}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \ \ \ k\ =\ hi;}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (k\ >\ 0)}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ \ \ \ PushBack(k);}
+\DoxyCodeLine{00101\ }
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00103\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classinternal_1_1_big_integer_ad77a8a66494070c1518d8ca4948cbfae}\index{internal::BigInteger@{internal::BigInteger}!operator+=@{operator+=}}
+\index{operator+=@{operator+=}!internal::BigInteger@{internal::BigInteger}}
+\doxysubsubsection{\texorpdfstring{operator+=()}{operator+=()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_big_integer_ad77a8a66494070c1518d8ca4948cbfae} 
+\mbox{\hyperlink{classinternal_1_1_big_integer}{Big\+Integer}} \& internal\+::\+Big\+Integer\+::operator+= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{u}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{biginteger_8h_source_l00070}{70}} of file \mbox{\hyperlink{biginteger_8h_source}{biginteger.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}}\ backup\ =\ digits\_[0];}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ digits\_[0]\ +=\ u;}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ count\_\ -\/\ 1;\ i++)\ \{}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (digits\_[i]\ >=\ backup)}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};\ \textcolor{comment}{//\ no\ carry}}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ backup\ =\ digits\_[i\ +\ 1];}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ \ \ \ digits\_[i\ +\ 1]\ +=\ 1;}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00079\ }
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Last\ carry}}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (digits\_[count\_\ -\/\ 1]\ <\ backup)}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \ \ \ PushBack(1);}
+\DoxyCodeLine{00083\ }
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00085\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classinternal_1_1_big_integer_a06a6f5d1d81b91248b0ab3c2d65a500a}\index{internal::BigInteger@{internal::BigInteger}!operator$<$$<$=@{operator$<$$<$=}}
+\index{operator$<$$<$=@{operator$<$$<$=}!internal::BigInteger@{internal::BigInteger}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$=()}{operator<<=()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_big_integer_a06a6f5d1d81b91248b0ab3c2d65a500a} 
+\mbox{\hyperlink{classinternal_1_1_big_integer}{Big\+Integer}} \& internal\+::\+Big\+Integer\+::operator$<$$<$= (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{shift}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{biginteger_8h_source_l00128}{128}} of file \mbox{\hyperlink{biginteger_8h_source}{biginteger.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classinternal_1_1_big_integer_ae12dd6759f1f76501db3d1bcafce39cd}{IsZero}}()\ ||\ shift\ ==\ 0)\ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00130\ }
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ offset\ =\ shift\ /\ kTypeBit;}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ interShift\ =\ shift\ \%\ kTypeBit;}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(count\_\ +\ offset\ <=\ kCapacity);}
+\DoxyCodeLine{00134\ }
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (interShift\ ==\ 0)\ \{}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \ \ \ \ std::memmove(digits\_\ +\ offset,\ digits\_,\ count\_\ *\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}}));}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ \ \ \ count\_\ +=\ offset;}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \ \ \ \ digits\_[count\_]\ =\ 0;}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ count\_;\ i\ >\ 0;\ i-\/-\/)}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ digits\_[i\ +\ offset]\ =\ (digits\_[i]\ <<\ interShift)\ |\ (digits\_[i\ -\/\ 1]\ >>\ (kTypeBit\ -\/\ interShift));}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \ \ \ \ digits\_[offset]\ =\ digits\_[0]\ <<\ interShift;}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ \ \ \ \ count\_\ +=\ offset;}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (digits\_[count\_])}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ count\_++;}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00148\ }
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ std::memset(digits\_,\ 0,\ offset\ *\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}}));}
+\DoxyCodeLine{00150\ }
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00152\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=312pt]{classinternal_1_1_big_integer_a06a6f5d1d81b91248b0ab3c2d65a500a_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classinternal_1_1_big_integer_ac783203409480350dbbcd9e0c95001be}\index{internal::BigInteger@{internal::BigInteger}!operator=@{operator=}}
+\index{operator=@{operator=}!internal::BigInteger@{internal::BigInteger}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classinternal_1_1_big_integer_ac783203409480350dbbcd9e0c95001be} 
+\mbox{\hyperlink{classinternal_1_1_big_integer}{Big\+Integer}} \& internal\+::\+Big\+Integer\+::operator= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classinternal_1_1_big_integer}{Big\+Integer}} \&}]{rhs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{biginteger_8h_source_l00055}{55}} of file \mbox{\hyperlink{biginteger_8h_source}{biginteger.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00056\ \ \ \ \ \{}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{this}\ !=\ \&rhs)\ \{}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \ \ \ count\_\ =\ rhs.count\_;}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ \ \ \ std::memcpy(digits\_,\ rhs.digits\_,\ count\_\ *\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}}));}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00062\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classinternal_1_1_big_integer_a0ffe0c4c762312682d60e82c38b38c45}\index{internal::BigInteger@{internal::BigInteger}!operator=@{operator=}}
+\index{operator=@{operator=}!internal::BigInteger@{internal::BigInteger}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classinternal_1_1_big_integer_a0ffe0c4c762312682d60e82c38b38c45} 
+\mbox{\hyperlink{classinternal_1_1_big_integer}{Big\+Integer}} \& internal\+::\+Big\+Integer\+::operator= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{u}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{biginteger_8h_source_l00064}{64}} of file \mbox{\hyperlink{biginteger_8h_source}{biginteger.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ digits\_[0]\ =\ u;\ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ count\_\ =\ 1;}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00068\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classinternal_1_1_big_integer_a52b424669238bdebc134e793d3b470ae}\index{internal::BigInteger@{internal::BigInteger}!operator==@{operator==}}
+\index{operator==@{operator==}!internal::BigInteger@{internal::BigInteger}}
+\doxysubsubsection{\texorpdfstring{operator==()}{operator==()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classinternal_1_1_big_integer_a52b424669238bdebc134e793d3b470ae} 
+bool internal\+::\+Big\+Integer\+::operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classinternal_1_1_big_integer}{Big\+Integer}} \&}]{rhs}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{biginteger_8h_source_l00154}{154}} of file \mbox{\hyperlink{biginteger_8h_source}{biginteger.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ count\_\ ==\ rhs.count\_\ \&\&\ std::memcmp(digits\_,\ rhs.digits\_,\ count\_\ *\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}}))\ ==\ 0;}
+\DoxyCodeLine{00156\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classinternal_1_1_big_integer_a8b6ab0d652d461c1136e0388d352628b}\index{internal::BigInteger@{internal::BigInteger}!operator==@{operator==}}
+\index{operator==@{operator==}!internal::BigInteger@{internal::BigInteger}}
+\doxysubsubsection{\texorpdfstring{operator==()}{operator==()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classinternal_1_1_big_integer_a8b6ab0d652d461c1136e0388d352628b} 
+bool internal\+::\+Big\+Integer\+::operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classinternal_1_1_big_integer_a60accaa6586b7f4b89e3ded6f2f55b37}{Type}}}]{rhs}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{biginteger_8h_source_l00158}{158}} of file \mbox{\hyperlink{biginteger_8h_source}{biginteger.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ count\_\ ==\ 1\ \&\&\ digits\_[0]\ ==\ rhs;}
+\DoxyCodeLine{00160\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/internal/\mbox{\hyperlink{biginteger_8h}{biginteger.\+h}}\end{DoxyCompactItemize}

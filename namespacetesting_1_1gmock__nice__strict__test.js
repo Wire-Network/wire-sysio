@@ -1,0 +1,28 @@
+var namespacetesting_1_1gmock__nice__strict__test =
+[
+    [ "Foo", "classtesting_1_1gmock__nice__strict__test_1_1_foo.html", "classtesting_1_1gmock__nice__strict__test_1_1_foo" ],
+    [ "MockBar", "classtesting_1_1gmock__nice__strict__test_1_1_mock_bar.html", "classtesting_1_1gmock__nice__strict__test_1_1_mock_bar" ],
+    [ "MockFoo", "classtesting_1_1gmock__nice__strict__test_1_1_mock_foo.html", "classtesting_1_1gmock__nice__strict__test_1_1_mock_foo" ],
+    [ "NotDefaultConstructible", "classtesting_1_1gmock__nice__strict__test_1_1_not_default_constructible.html", "classtesting_1_1gmock__nice__strict__test_1_1_not_default_constructible" ],
+    [ "TEST", "namespacetesting_1_1gmock__nice__strict__test.html#af147980581baec3cf492457c2d1e0276", null ],
+    [ "TEST", "namespacetesting_1_1gmock__nice__strict__test.html#abafc38649114354a5dc342524ca2102e", null ],
+    [ "TEST", "namespacetesting_1_1gmock__nice__strict__test.html#a8ae416186af77fc0d066467be92c6c86", null ],
+    [ "TEST", "namespacetesting_1_1gmock__nice__strict__test.html#a9618de98b38e8e4270873d9b2616e3e1", null ],
+    [ "TEST", "namespacetesting_1_1gmock__nice__strict__test.html#a982de09f3040cc5b9f457a7aa4e00652", null ],
+    [ "TEST", "namespacetesting_1_1gmock__nice__strict__test.html#a475ee57b7b86f3f81d50819db3dd78b4", null ],
+    [ "TEST", "namespacetesting_1_1gmock__nice__strict__test.html#a0a43059a52437e547c8fb836008b8e60", null ],
+    [ "TEST", "namespacetesting_1_1gmock__nice__strict__test.html#a49fd5610815a7ced633a1c8ac3f62709", null ],
+    [ "TEST", "namespacetesting_1_1gmock__nice__strict__test.html#a12b9f686345faa5a646da65a67c38a44", null ],
+    [ "TEST", "namespacetesting_1_1gmock__nice__strict__test.html#a4172e1193c21d61e34d9b2c379d2f6be", null ],
+    [ "TEST", "namespacetesting_1_1gmock__nice__strict__test.html#a81bfeea94824935648545225f5dd3c00", null ],
+    [ "TEST", "namespacetesting_1_1gmock__nice__strict__test.html#af6a34a561886bec5e278239ef65d6011", null ],
+    [ "TEST", "namespacetesting_1_1gmock__nice__strict__test.html#a2bad58b3a12ea95eb4a731026c576b40", null ],
+    [ "TEST", "namespacetesting_1_1gmock__nice__strict__test.html#a4534bdd7c8ca19aad56933d34e0ea4db", null ],
+    [ "TEST", "namespacetesting_1_1gmock__nice__strict__test.html#a5f8498b9a90a81c4709b8d3ae968500e", null ],
+    [ "TEST", "namespacetesting_1_1gmock__nice__strict__test.html#a269b7756fb785a84a609543700f77256", null ],
+    [ "TEST", "namespacetesting_1_1gmock__nice__strict__test.html#a21456158013d707a1238d0ade00ea3f6", null ],
+    [ "TEST", "namespacetesting_1_1gmock__nice__strict__test.html#ae52f11a6045e9c307237cf02b85e6b79", null ],
+    [ "TEST", "namespacetesting_1_1gmock__nice__strict__test.html#ae58ab074e0f9218a727d1fec0793667e", null ],
+    [ "TEST", "namespacetesting_1_1gmock__nice__strict__test.html#afea105507ce78fc0e2c20d9f4cca16d7", null ],
+    [ "TEST", "namespacetesting_1_1gmock__nice__strict__test.html#a04e9402fd03549e1eda88659b6eac174", null ]
+];

@@ -1,0 +1,9 @@
+<map id="bn::ecop::isOnTwistECJac3" name="bn::ecop::isOnTwistECJac3">
+<area shape="rect" id="Node000001" title=" " alt="" coords="293,31,477,56"/>
+<area shape="rect" id="Node000002" href="$classbn_1_1_ec_t.html#aa36ed5d9e7e0834ea185ff7ff1173bfd" title=" " alt="" coords="118,5,230,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="277,33,229,27,230,22,278,28"/>
+<area shape="rect" id="Node000003" href="$bn_8cpp.html#a1bc46ba441ef3a314ca746486968bce9" title=" " alt="" coords="103,55,245,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="278,58,245,62,245,57,278,53"/>
+<area shape="rect" id="Node000004" href="$bn_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97" title=" " alt="" coords="5,55,55,80"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="87,70,55,70,55,65,87,65"/>
+</map>

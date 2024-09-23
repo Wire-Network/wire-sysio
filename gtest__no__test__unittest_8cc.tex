@@ -1,0 +1,59 @@
+\doxysection{libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/test/gtest\+\_\+no\+\_\+test\+\_\+unittest.cc File Reference}
+\hypertarget{gtest__no__test__unittest_8cc}{}\label{gtest__no__test__unittest_8cc}\index{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/test/gtest\_no\_test\_unittest.cc@{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/test/gtest\_no\_test\_unittest.cc}}
+{\ttfamily \#include "{}gtest/gtest.\+h"{}}\newline
+Include dependency graph for gtest\+\_\+no\+\_\+test\+\_\+unittest.\+cc\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{gtest__no__test__unittest_8cc__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{gtest__no__test__unittest_8cc_a3c04138a5bfe5d72780bb7e82a18e627}{main}} (int argc, char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{gtest__no__test__unittest_8cc_a3c04138a5bfe5d72780bb7e82a18e627}\index{gtest\_no\_test\_unittest.cc@{gtest\_no\_test\_unittest.cc}!main@{main}}
+\index{main@{main}!gtest\_no\_test\_unittest.cc@{gtest\_no\_test\_unittest.cc}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{gtest__no__test__unittest_8cc_a3c04138a5bfe5d72780bb7e82a18e627} 
+int main (\begin{DoxyParamCaption}\item[{int}]{argc}{, }\item[{char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{argv}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest__no__test__unittest_8cc_source_l00037}{37}} of file \mbox{\hyperlink{gtest__no__test__unittest_8cc_source}{gtest\+\_\+no\+\_\+test\+\_\+unittest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00038\ \ \ \mbox{\hyperlink{namespacetesting_afd726ae08c9bd16dc52f78c822d9946b}{testing::InitGoogleTest}}(\&argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}});}
+\DoxyCodeLine{00039\ }
+\DoxyCodeLine{00040\ \ \ \textcolor{comment}{//\ An\ ad-\/hoc\ assertion\ outside\ of\ all\ tests.}}
+\DoxyCodeLine{00041\ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00042\ \ \ \textcolor{comment}{//\ This\ serves\ three\ purposes:}}
+\DoxyCodeLine{00043\ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00044\ \ \ \textcolor{comment}{//\ 1.\ It\ verifies\ that\ an\ ad-\/hoc\ assertion\ can\ be\ executed\ even\ if}}
+\DoxyCodeLine{00045\ \ \ \textcolor{comment}{//\ \ \ \ no\ test\ is\ defined.}}
+\DoxyCodeLine{00046\ \ \ \textcolor{comment}{//\ 2.\ It\ verifies\ that\ a\ failed\ ad-\/hoc\ assertion\ causes\ the\ test}}
+\DoxyCodeLine{00047\ \ \ \textcolor{comment}{//\ \ \ \ program\ to\ fail.}}
+\DoxyCodeLine{00048\ \ \ \textcolor{comment}{//\ 3.\ We\ had\ a\ bug\ where\ the\ XML\ output\ won't\ be\ generated\ if\ an}}
+\DoxyCodeLine{00049\ \ \ \textcolor{comment}{//\ \ \ \ assertion\ is\ executed\ before\ RUN\_ALL\_TESTS()\ is\ called,\ even}}
+\DoxyCodeLine{00050\ \ \ \textcolor{comment}{//\ \ \ \ though\ -\/-\/gtest\_output=xml\ is\ specified.\ \ This\ makes\ sure\ the}}
+\DoxyCodeLine{00051\ \ \ \textcolor{comment}{//\ \ \ \ bug\ is\ fixed\ and\ doesn't\ regress.}}
+\DoxyCodeLine{00052\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(1,\ 2);}
+\DoxyCodeLine{00053\ }
+\DoxyCodeLine{00054\ \ \ \textcolor{comment}{//\ The\ above\ EXPECT\_EQ()\ should\ cause\ RUN\_ALL\_TESTS()\ to\ return\ non-\/zero.}}
+\DoxyCodeLine{00055\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{gtest_8h_a853a3792807489591d3d4a2f2ff9359f}{RUN\_ALL\_TESTS}}()\ ?\ 0\ :\ 1;}
+\DoxyCodeLine{00056\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{gtest__no__test__unittest_8cc_a3c04138a5bfe5d72780bb7e82a18e627_cgraph}
+\end{center}
+\end{figure}

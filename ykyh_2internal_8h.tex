@@ -1,0 +1,97 @@
+\doxysection{libraries/yubihsm/ykyh/internal.h File Reference}
+\hypertarget{ykyh_2internal_8h}{}\label{ykyh_2internal_8h}\index{libraries/yubihsm/ykyh/internal.h@{libraries/yubihsm/ykyh/internal.h}}
+{\ttfamily \#include $<$stdbool.\+h$>$}\newline
+{\ttfamily \#include $<$PCSC/wintypes.\+h$>$}\newline
+{\ttfamily \#include $<$PCSC/winscard.\+h$>$}\newline
+Include dependency graph for internal.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{ykyh_2internal_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=194pt]{ykyh_2internal_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structykyh__state}{ykyh\+\_\+state}}
+\item 
+union \mbox{\hyperlink{unionu___a_p_d_u}{u\+\_\+\+APDU}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{ykyh_2internal_8h_ac0796a41f81aa8dabfd63e8229c13cf9}{READER\+\_\+\+LEN}}~32
+\item 
+\#define \mbox{\hyperlink{ykyh_2internal_8h_a2330f00f64a38d907439722a54243757}{MAX\+\_\+\+READERS}}~16
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef union \mbox{\hyperlink{unionu___a_p_d_u}{u\+\_\+\+APDU}} \mbox{\hyperlink{ykyh_2internal_8h_a042a024c7e24e51ae9810c561fbdc91b}{APDU}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+unsigned const char \mbox{\hyperlink{ykyh_2internal_8h_ae9c5490e642a06846009f761174e7ca1}{aid}} \mbox{[}$\,$\mbox{]} = \{0xa0, 0x00, 0x00, 0x05, 0x27, 0x21, 0x07\}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{ykyh_2internal_8h_a2330f00f64a38d907439722a54243757}\index{internal.h@{internal.h}!MAX\_READERS@{MAX\_READERS}}
+\index{MAX\_READERS@{MAX\_READERS}!internal.h@{internal.h}}
+\doxysubsubsection{\texorpdfstring{MAX\_READERS}{MAX\_READERS}}
+{\footnotesize\ttfamily \label{ykyh_2internal_8h_a2330f00f64a38d907439722a54243757} 
+\#define MAX\+\_\+\+READERS~16}
+
+
+
+Definition at line \mbox{\hyperlink{ykyh_2internal_8h_source_l00032}{32}} of file \mbox{\hyperlink{ykyh_2internal_8h_source}{internal.\+h}}.
+
+\Hypertarget{ykyh_2internal_8h_ac0796a41f81aa8dabfd63e8229c13cf9}\index{internal.h@{internal.h}!READER\_LEN@{READER\_LEN}}
+\index{READER\_LEN@{READER\_LEN}!internal.h@{internal.h}}
+\doxysubsubsection{\texorpdfstring{READER\_LEN}{READER\_LEN}}
+{\footnotesize\ttfamily \label{ykyh_2internal_8h_ac0796a41f81aa8dabfd63e8229c13cf9} 
+\#define READER\+\_\+\+LEN~32}
+
+
+
+Definition at line \mbox{\hyperlink{ykyh_2internal_8h_source_l00031}{31}} of file \mbox{\hyperlink{ykyh_2internal_8h_source}{internal.\+h}}.
+
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{ykyh_2internal_8h_a042a024c7e24e51ae9810c561fbdc91b}\index{internal.h@{internal.h}!APDU@{APDU}}
+\index{APDU@{APDU}!internal.h@{internal.h}}
+\doxysubsubsection{\texorpdfstring{APDU}{APDU}}
+{\footnotesize\ttfamily \label{ykyh_2internal_8h_a042a024c7e24e51ae9810c561fbdc91b} 
+typedef union \mbox{\hyperlink{unionu___a_p_d_u}{u\+\_\+\+APDU}} \mbox{\hyperlink{ykyh_2internal_8h_a042a024c7e24e51ae9810c561fbdc91b}{APDU}}}
+
+
+
+Definition at line \mbox{\hyperlink{ykyh_2internal_8h_source_l00052}{52}} of file \mbox{\hyperlink{ykyh_2internal_8h_source}{internal.\+h}}.
+
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{ykyh_2internal_8h_ae9c5490e642a06846009f761174e7ca1}\index{internal.h@{internal.h}!aid@{aid}}
+\index{aid@{aid}!internal.h@{internal.h}}
+\doxysubsubsection{\texorpdfstring{aid}{aid}}
+{\footnotesize\ttfamily \label{ykyh_2internal_8h_ae9c5490e642a06846009f761174e7ca1} 
+unsigned const char aid\mbox{[}$\,$\mbox{]} = \{0xa0, 0x00, 0x00, 0x05, 0x27, 0x21, 0x07\}}
+
+
+
+Definition at line \mbox{\hyperlink{ykyh_2internal_8h_source_l00054}{54}} of file \mbox{\hyperlink{ykyh_2internal_8h_source}{internal.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00054\ \{0xa0,\ 0x00,\ 0x00,\ 0x05,\ 0x27,\ 0x21,\ 0x07\};}
+
+\end{DoxyCode}

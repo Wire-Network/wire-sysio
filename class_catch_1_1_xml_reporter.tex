@@ -1,0 +1,661 @@
+\doxysection{Catch\+::Xml\+Reporter Class Reference}
+\hypertarget{class_catch_1_1_xml_reporter}{}\label{class_catch_1_1_xml_reporter}\index{Catch::XmlReporter@{Catch::XmlReporter}}
+
+
+{\ttfamily \#include $<$catch\+\_\+reporter\+\_\+xml.\+h$>$}
+
+
+
+Inheritance diagram for Catch\+::Xml\+Reporter\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=213pt]{class_catch_1_1_xml_reporter__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Catch\+::Xml\+Reporter\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_xml_reporter__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_catch_1_1_xml_reporter_aa34d7e971361f72ce7622602011d6441}{Xml\+Reporter}} (\mbox{\hyperlink{struct_catch_1_1_reporter_config}{Reporter\+Config}} const \&\+\_\+config)
+\item 
+\mbox{\hyperlink{class_catch_1_1_xml_reporter_a00aa87ce78b6f4ac8ed612446a5eeff3}{\texorpdfstring{$\sim$}{\string~}\+Xml\+Reporter}} () override
+\item 
+virtual std\+::string \mbox{\hyperlink{class_catch_1_1_xml_reporter_ad94c592b511097332f6e5ecf29ccb2ee}{get\+Stylesheet\+Ref}} () const
+\item 
+void \mbox{\hyperlink{class_catch_1_1_xml_reporter_a190d2ae83de78e06273fa476d3729771}{write\+Source\+Info}} (\mbox{\hyperlink{struct_catch_1_1_source_line_info}{Source\+Line\+Info}} const \&source\+Info)
+\item 
+void \mbox{\hyperlink{class_catch_1_1_xml_reporter_a5e80921e60f776401d6e2e111e48398f}{no\+Matching\+Test\+Cases}} (std\+::string const \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}) override
+\item 
+void \mbox{\hyperlink{class_catch_1_1_xml_reporter_ab5de0b02d5a30612ae5449360d867672}{test\+Run\+Starting}} (\mbox{\hyperlink{struct_catch_1_1_test_run_info}{Test\+Run\+Info}} const \&test\+Info) override
+\item 
+void \mbox{\hyperlink{class_catch_1_1_xml_reporter_a873beb2333056238c4fd476ef90412fb}{test\+Group\+Starting}} (\mbox{\hyperlink{struct_catch_1_1_group_info}{Group\+Info}} const \&group\+Info) override
+\item 
+void \mbox{\hyperlink{class_catch_1_1_xml_reporter_a1395b2efb62faaa947a42638a03be32c}{test\+Case\+Starting}} (\mbox{\hyperlink{struct_catch_1_1_test_case_info}{Test\+Case\+Info}} const \&test\+Info) override
+\item 
+void \mbox{\hyperlink{class_catch_1_1_xml_reporter_a06befa9cf2b661c5226317bff0f05c64}{section\+Starting}} (\mbox{\hyperlink{struct_catch_1_1_section_info}{Section\+Info}} const \&section\+Info) override
+\item 
+void \mbox{\hyperlink{class_catch_1_1_xml_reporter_a4f2661042672c0930086700fcd348f04}{assertion\+Starting}} (\mbox{\hyperlink{struct_catch_1_1_assertion_info}{Assertion\+Info}} const \&) override
+\item 
+bool \mbox{\hyperlink{class_catch_1_1_xml_reporter_a133d3b5deb923998634d96ff8f234cde}{assertion\+Ended}} (\mbox{\hyperlink{struct_catch_1_1_assertion_stats}{Assertion\+Stats}} const \&assertion\+Stats) override
+\item 
+void \mbox{\hyperlink{class_catch_1_1_xml_reporter_a73c809f067d58a7a6748cb13643448e5}{section\+Ended}} (\mbox{\hyperlink{struct_catch_1_1_section_stats}{Section\+Stats}} const \&section\+Stats) override
+\item 
+void \mbox{\hyperlink{class_catch_1_1_xml_reporter_ab641ec7e115cb94efa02f85e9d91de0f}{test\+Case\+Ended}} (\mbox{\hyperlink{struct_catch_1_1_test_case_stats}{Test\+Case\+Stats}} const \&test\+Case\+Stats) override
+\item 
+void \mbox{\hyperlink{class_catch_1_1_xml_reporter_ab9ba05f0311cb976fb6f7e5bd2df477c}{test\+Group\+Ended}} (\mbox{\hyperlink{struct_catch_1_1_test_group_stats}{Test\+Group\+Stats}} const \&test\+Group\+Stats) override
+\item 
+void \mbox{\hyperlink{class_catch_1_1_xml_reporter_a2458c9f342a446f0b3a7480b53c93705}{test\+Run\+Ended}} (\mbox{\hyperlink{struct_catch_1_1_test_run_stats}{Test\+Run\+Stats}} const \&test\+Run\+Stats) override
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base}{Catch\+::\+Streaming\+Reporter\+Base$<$ Xml\+Reporter $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_aa92dc1c46e7ec51639bedac214dba74a}{Streaming\+Reporter\+Base}} (\mbox{\hyperlink{struct_catch_1_1_reporter_config}{Reporter\+Config}} const \&\+\_\+config)
+\item 
+\mbox{\hyperlink{struct_catch_1_1_reporter_preferences}{Reporter\+Preferences}} \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a83390b98f9a6ac5dab1165d6eb1a7f62}{get\+Preferences}} () const override
+\item 
+\mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ae70b64581a4fcaf024073b9619737826}{\texorpdfstring{$\sim$}{\string~}\+Streaming\+Reporter\+Base}} () override=default
+\item 
+void \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ae9debeac49a31342ffa6844de5346cbf}{skip\+Test}} (\mbox{\hyperlink{struct_catch_1_1_test_case_info}{Test\+Case\+Info}} const \&) override
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter}{Catch\+::\+IStreaming\+Reporter}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_a7edcaeb7bb35258b4faa4b79a20320e1}{\texorpdfstring{$\sim$}{\string~}\+IStreaming\+Reporter}} ()=default
+\item 
+virtual void \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_ac0b61a3ef04ee287937751c043a7013a}{benchmark\+Starting}} (\mbox{\hyperlink{struct_catch_1_1_benchmark_info}{Benchmark\+Info}} const \&)
+\item 
+virtual void \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_aed607b9cde8193cc470c2749f106b4fa}{benchmark\+Ended}} (\mbox{\hyperlink{struct_catch_1_1_benchmark_stats}{Benchmark\+Stats}} const \&)
+\item 
+virtual void \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_ad5001d7247cc94e5fec26b0e702f134f}{fatal\+Error\+Encountered}} (\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})
+\item 
+virtual bool \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_a6ca0329f20ad8b8ec7b3d1958f1fa73f}{is\+Multi}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static std\+::string \mbox{\hyperlink{class_catch_1_1_xml_reporter_ab998bc455a7b20f6a8b78ce291601807}{get\+Description}} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Static Public Member Functions inherited from \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base}{Catch\+::\+Streaming\+Reporter\+Base$<$ Xml\+Reporter $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+static std\+::set$<$ \mbox{\hyperlink{namespace_catch_af85c0d46dfe687d923a157362fd07737}{Verbosity}} $>$ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ac6bcd1df9a5cd22abc781c919bed010e}{get\+Supported\+Verbosities}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Public Attributes inherited from \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base}{Catch\+::\+Streaming\+Reporter\+Base$<$ Xml\+Reporter $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespace_catch_a961f6f5f07e265684c220a8ae014d7d6}{IConfig\+Ptr}} \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_aea2fd5c5f7cbfa78d96e15485a1b8ff7}{m\+\_\+config}}
+\item 
+std\+::ostream \& \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a8ad7526bce08333b7d9414cc157e1f6d}{stream}}
+\item 
+\mbox{\hyperlink{struct_catch_1_1_lazy_stat}{Lazy\+Stat}}$<$ \mbox{\hyperlink{struct_catch_1_1_test_run_info}{Test\+Run\+Info}} $>$ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ad6fcc15e73e91f3cd19a0c8324783bd7}{current\+Test\+Run\+Info}}
+\item 
+\mbox{\hyperlink{struct_catch_1_1_lazy_stat}{Lazy\+Stat}}$<$ \mbox{\hyperlink{struct_catch_1_1_group_info}{Group\+Info}} $>$ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a1b3f99eb83f649f90be2e3a2a296f76f}{current\+Group\+Info}}
+\item 
+\mbox{\hyperlink{struct_catch_1_1_lazy_stat}{Lazy\+Stat}}$<$ \mbox{\hyperlink{struct_catch_1_1_test_case_info}{Test\+Case\+Info}} $>$ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a974c80ec3ab579eeafe899d9f0a97405}{current\+Test\+Case\+Info}}
+\item 
+std\+::vector$<$ \mbox{\hyperlink{struct_catch_1_1_section_info}{Section\+Info}} $>$ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a5358f16b9cc5afa0633519bf2c3a642b}{m\+\_\+section\+Stack}}
+\item 
+\mbox{\hyperlink{struct_catch_1_1_reporter_preferences}{Reporter\+Preferences}} \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ab3c0202658a530cb0a384fef4fbd0baf}{m\+\_\+reporter\+Prefs}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__xml_8h_source_l00017}{17}} of file \mbox{\hyperlink{catch__reporter__xml_8h_source}{catch\+\_\+reporter\+\_\+xml.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_catch_1_1_xml_reporter_aa34d7e971361f72ce7622602011d6441}\index{Catch::XmlReporter@{Catch::XmlReporter}!XmlReporter@{XmlReporter}}
+\index{XmlReporter@{XmlReporter}!Catch::XmlReporter@{Catch::XmlReporter}}
+\doxysubsubsection{\texorpdfstring{XmlReporter()}{XmlReporter()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_xml_reporter_aa34d7e971361f72ce7622602011d6441} 
+Catch\+::\+Xml\+Reporter\+::\+Xml\+Reporter (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_reporter_config}{Reporter\+Config}} const \&}]{\+\_\+config}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__xml_8cpp_source_l00022}{22}} of file \mbox{\hyperlink{catch__reporter__xml_8cpp_source}{catch\+\_\+reporter\+\_\+xml.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00023\ \ \ \ \ :\ \ \ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_aa92dc1c46e7ec51639bedac214dba74a}{StreamingReporterBase}}(\ \_config\ ),}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ m\_xml(\_config.stream())}
+\DoxyCodeLine{00025\ \ \ \ \ \{}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ab3c0202658a530cb0a384fef4fbd0baf}{m\_reporterPrefs}}.\mbox{\hyperlink{struct_catch_1_1_reporter_preferences_a434511c4080edbbc12e0d1c31ea14769}{shouldRedirectStdOut}}\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ab3c0202658a530cb0a384fef4fbd0baf}{m\_reporterPrefs}}.\mbox{\hyperlink{struct_catch_1_1_reporter_preferences_a10e13e10dfdc9a97dde0a72c573d7419}{shouldReportAllAssertions}}\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00028\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_xml_reporter_a00aa87ce78b6f4ac8ed612446a5eeff3}\index{Catch::XmlReporter@{Catch::XmlReporter}!````~XmlReporter@{\texorpdfstring{$\sim$}{\string~}XmlReporter}}
+\index{````~XmlReporter@{\texorpdfstring{$\sim$}{\string~}XmlReporter}!Catch::XmlReporter@{Catch::XmlReporter}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}XmlReporter()}{\string~XmlReporter()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_xml_reporter_a00aa87ce78b6f4ac8ed612446a5eeff3} 
+Catch\+::\+Xml\+Reporter\+::\texorpdfstring{$\sim$}{\string~}\+Xml\+Reporter (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [default]}}
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_catch_1_1_xml_reporter_a133d3b5deb923998634d96ff8f234cde}\index{Catch::XmlReporter@{Catch::XmlReporter}!assertionEnded@{assertionEnded}}
+\index{assertionEnded@{assertionEnded}!Catch::XmlReporter@{Catch::XmlReporter}}
+\doxysubsubsection{\texorpdfstring{assertionEnded()}{assertionEnded()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_xml_reporter_a133d3b5deb923998634d96ff8f234cde} 
+bool Catch\+::\+Xml\+Reporter\+::assertion\+Ended (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_assertion_stats}{Assertion\+Stats}} const \&}]{assertion\+Stats}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_a5248ab87149e0f1abe2de96c387ff5e3}{Catch\+::\+IStreaming\+Reporter}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__xml_8cpp_source_l00097}{97}} of file \mbox{\hyperlink{catch__reporter__xml_8cpp_source}{catch\+\_\+reporter\+\_\+xml.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00098\ }
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ AssertionResult\ \textcolor{keyword}{const}\&\ result\ =\ assertionStats.assertionResult;}
+\DoxyCodeLine{00100\ }
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ includeResults\ =\ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_aea2fd5c5f7cbfa78d96e15485a1b8ff7}{m\_config}}-\/>includeSuccessfulResults()\ ||\ !result.isOk();}
+\DoxyCodeLine{00102\ }
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ includeResults\ ||\ result.getResultType()\ ==\ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa22806493991ee90456cfbd973ae8d1ab}{ResultWas::Warning}}\ )\ \{}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Print\ any\ info\ messages\ in\ <Info>\ tags.}}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\ \textcolor{keyword}{const}\&\ msg\ :\ assertionStats.infoMessages\ )\ \{}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ msg.type\ ==\ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efae8d83c08b4e070286dd95134ad2152bb}{ResultWas::Info}}\ \&\&\ includeResults\ )\ \{}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_xml.\mbox{\hyperlink{class_catch_1_1_xml_writer_a48f1a53e3255938813ff91f9fec9b690}{scopedElement}}(\ \textcolor{stringliteral}{"{}Info"{}}\ )}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .\mbox{\hyperlink{class_catch_1_1_xml_writer_1_1_scoped_element_a189c87f530ce85304ce4e1075609d2f5}{writeText}}(\ msg.message\ );}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\ msg.type\ ==\ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa22806493991ee90456cfbd973ae8d1ab}{ResultWas::Warning}}\ )\ \{}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_xml.\mbox{\hyperlink{class_catch_1_1_xml_writer_a48f1a53e3255938813ff91f9fec9b690}{scopedElement}}(\ \textcolor{stringliteral}{"{}Warning"{}}\ )}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .\mbox{\hyperlink{class_catch_1_1_xml_writer_1_1_scoped_element_a189c87f530ce85304ce4e1075609d2f5}{writeText}}(\ msg.message\ );}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00115\ }
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Drop\ out\ if\ result\ was\ successful\ but\ we're\ not\ printing\ them.}}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !includeResults\ \&\&\ result.getResultType()\ !=\ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa22806493991ee90456cfbd973ae8d1ab}{ResultWas::Warning}}\ )}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00119\ }
+\DoxyCodeLine{00120\ }
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Print\ the\ expression\ if\ there\ is\ one.}}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ result.hasExpression()\ )\ \{}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \ \ \ \ m\_xml.\mbox{\hyperlink{class_catch_1_1_xml_writer_a6114b9d8038cd4f159ccd016f12d4992}{startElement}}(\ \textcolor{stringliteral}{"{}Expression"{}}\ )}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .\mbox{\hyperlink{class_catch_1_1_xml_writer_ad433310b59d30e0fedc7130dc11c563b}{writeAttribute}}(\ \textcolor{stringliteral}{"{}success"{}},\ result.succeeded()\ )}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .\mbox{\hyperlink{class_catch_1_1_xml_writer_ad433310b59d30e0fedc7130dc11c563b}{writeAttribute}}(\ \textcolor{stringliteral}{"{}type"{}},\ result.getTestMacroName()\ );}
+\DoxyCodeLine{00126\ }
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_xml_reporter_a190d2ae83de78e06273fa476d3729771}{writeSourceInfo}}(\ result.getSourceInfo()\ );}
+\DoxyCodeLine{00128\ }
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \ \ \ m\_xml.\mbox{\hyperlink{class_catch_1_1_xml_writer_a48f1a53e3255938813ff91f9fec9b690}{scopedElement}}(\ \textcolor{stringliteral}{"{}Original"{}}\ )}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .\mbox{\hyperlink{class_catch_1_1_xml_writer_1_1_scoped_element_a189c87f530ce85304ce4e1075609d2f5}{writeText}}(\ result.getExpression()\ );}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \ \ \ m\_xml.\mbox{\hyperlink{class_catch_1_1_xml_writer_a48f1a53e3255938813ff91f9fec9b690}{scopedElement}}(\ \textcolor{stringliteral}{"{}Expanded"{}}\ )}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .\mbox{\hyperlink{class_catch_1_1_xml_writer_1_1_scoped_element_a189c87f530ce85304ce4e1075609d2f5}{writeText}}(\ result.getExpandedExpression()\ );}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00134\ }
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ And...\ Print\ a\ result\ applicable\ to\ each\ result\ type.}}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(\ result.getResultType()\ )\ \{}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa765782e127faff9d9796388edb4d7fcd}{ResultWas::ThrewException}}:}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_xml.\mbox{\hyperlink{class_catch_1_1_xml_writer_a6114b9d8038cd4f159ccd016f12d4992}{startElement}}(\ \textcolor{stringliteral}{"{}Exception"{}}\ );}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_xml_reporter_a190d2ae83de78e06273fa476d3729771}{writeSourceInfo}}(\ result.getSourceInfo()\ );}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_xml.\mbox{\hyperlink{class_catch_1_1_xml_writer_a4c49775bdf7b5bd870b34ab22af62a9c}{writeText}}(\ result.getMessage()\ );}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_xml.\mbox{\hyperlink{class_catch_1_1_xml_writer_a8fcaa0821b6c2c1750c654af0b33c823}{endElement}}();}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efac7f0c2afadf75d1d24bf8729ebd32cee}{ResultWas::FatalErrorCondition}}:}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_xml.\mbox{\hyperlink{class_catch_1_1_xml_writer_a6114b9d8038cd4f159ccd016f12d4992}{startElement}}(\ \textcolor{stringliteral}{"{}FatalErrorCondition"{}}\ );}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_xml_reporter_a190d2ae83de78e06273fa476d3729771}{writeSourceInfo}}(\ result.getSourceInfo()\ );}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_xml.\mbox{\hyperlink{class_catch_1_1_xml_writer_a4c49775bdf7b5bd870b34ab22af62a9c}{writeText}}(\ result.getMessage()\ );}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_xml.\mbox{\hyperlink{class_catch_1_1_xml_writer_a8fcaa0821b6c2c1750c654af0b33c823}{endElement}}();}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efae8d83c08b4e070286dd95134ad2152bb}{ResultWas::Info}}:}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_xml.\mbox{\hyperlink{class_catch_1_1_xml_writer_a48f1a53e3255938813ff91f9fec9b690}{scopedElement}}(\ \textcolor{stringliteral}{"{}Info"{}}\ )}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .\mbox{\hyperlink{class_catch_1_1_xml_writer_1_1_scoped_element_a189c87f530ce85304ce4e1075609d2f5}{writeText}}(\ result.getMessage()\ );}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa22806493991ee90456cfbd973ae8d1ab}{ResultWas::Warning}}:}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Warning\ will\ already\ have\ been\ written}}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa0c08e9a7cc2a689bfb86ca3a6cfc6444}{ResultWas::ExplicitFailure}}:}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_xml.\mbox{\hyperlink{class_catch_1_1_xml_writer_a6114b9d8038cd4f159ccd016f12d4992}{startElement}}(\ \textcolor{stringliteral}{"{}Failure"{}}\ );}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_xml_reporter_a190d2ae83de78e06273fa476d3729771}{writeSourceInfo}}(\ result.getSourceInfo()\ );}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_xml.\mbox{\hyperlink{class_catch_1_1_xml_writer_a4c49775bdf7b5bd870b34ab22af62a9c}{writeText}}(\ result.getMessage()\ );}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_xml.\mbox{\hyperlink{class_catch_1_1_xml_writer_a8fcaa0821b6c2c1750c654af0b33c823}{endElement}}();}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00165\ }
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ result.hasExpression()\ )}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \ \ \ \ \ \ m\_xml.\mbox{\hyperlink{class_catch_1_1_xml_writer_a8fcaa0821b6c2c1750c654af0b33c823}{endElement}}();}
+\DoxyCodeLine{00168\ }
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00170\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_xml_reporter_a133d3b5deb923998634d96ff8f234cde_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_xml_reporter_a4f2661042672c0930086700fcd348f04}\index{Catch::XmlReporter@{Catch::XmlReporter}!assertionStarting@{assertionStarting}}
+\index{assertionStarting@{assertionStarting}!Catch::XmlReporter@{Catch::XmlReporter}}
+\doxysubsubsection{\texorpdfstring{assertionStarting()}{assertionStarting()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_xml_reporter_a4f2661042672c0930086700fcd348f04} 
+void Catch\+::\+Xml\+Reporter\+::assertion\+Starting (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_assertion_info}{Assertion\+Info}} const \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_ae1c3becff20f4a940c9f01d2c4114a17}{Catch\+::\+IStreaming\+Reporter}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__xml_8cpp_source_l00095}{95}} of file \mbox{\hyperlink{catch__reporter__xml_8cpp_source}{catch\+\_\+reporter\+\_\+xml.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00095\ \{\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_xml_reporter_ab998bc455a7b20f6a8b78ce291601807}\index{Catch::XmlReporter@{Catch::XmlReporter}!getDescription@{getDescription}}
+\index{getDescription@{getDescription}!Catch::XmlReporter@{Catch::XmlReporter}}
+\doxysubsubsection{\texorpdfstring{getDescription()}{getDescription()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_xml_reporter_ab998bc455a7b20f6a8b78ce291601807} 
+std\+::string Catch\+::\+Xml\+Reporter\+::get\+Description (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__xml_8cpp_source_l00032}{32}} of file \mbox{\hyperlink{catch__reporter__xml_8cpp_source}{catch\+\_\+reporter\+\_\+xml.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Reports\ test\ results\ as\ an\ XML\ document"{}};}
+\DoxyCodeLine{00034\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_xml_reporter_ad94c592b511097332f6e5ecf29ccb2ee}\index{Catch::XmlReporter@{Catch::XmlReporter}!getStylesheetRef@{getStylesheetRef}}
+\index{getStylesheetRef@{getStylesheetRef}!Catch::XmlReporter@{Catch::XmlReporter}}
+\doxysubsubsection{\texorpdfstring{getStylesheetRef()}{getStylesheetRef()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_xml_reporter_ad94c592b511097332f6e5ecf29ccb2ee} 
+std\+::string Catch\+::\+Xml\+Reporter\+::get\+Stylesheet\+Ref (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__xml_8cpp_source_l00036}{36}} of file \mbox{\hyperlink{catch__reporter__xml_8cpp_source}{catch\+\_\+reporter\+\_\+xml.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::string();}
+\DoxyCodeLine{00038\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=322pt]{class_catch_1_1_xml_reporter_ad94c592b511097332f6e5ecf29ccb2ee_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_xml_reporter_a5e80921e60f776401d6e2e111e48398f}\index{Catch::XmlReporter@{Catch::XmlReporter}!noMatchingTestCases@{noMatchingTestCases}}
+\index{noMatchingTestCases@{noMatchingTestCases}!Catch::XmlReporter@{Catch::XmlReporter}}
+\doxysubsubsection{\texorpdfstring{noMatchingTestCases()}{noMatchingTestCases()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_xml_reporter_a5e80921e60f776401d6e2e111e48398f} 
+void Catch\+::\+Xml\+Reporter\+::no\+Matching\+Test\+Cases (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{s}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a3576d7fca326a345fd3aff03efa4fbc8}{Catch\+::\+Streaming\+Reporter\+Base$<$ Xml\+Reporter $>$}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__xml_8cpp_source_l00046}{46}} of file \mbox{\hyperlink{catch__reporter__xml_8cpp_source}{catch\+\_\+reporter\+\_\+xml.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a3576d7fca326a345fd3aff03efa4fbc8}{StreamingReporterBase::noMatchingTestCases}}(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ );}
+\DoxyCodeLine{00048\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_xml_reporter_a5e80921e60f776401d6e2e111e48398f_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_xml_reporter_a73c809f067d58a7a6748cb13643448e5}\index{Catch::XmlReporter@{Catch::XmlReporter}!sectionEnded@{sectionEnded}}
+\index{sectionEnded@{sectionEnded}!Catch::XmlReporter@{Catch::XmlReporter}}
+\doxysubsubsection{\texorpdfstring{sectionEnded()}{sectionEnded()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_xml_reporter_a73c809f067d58a7a6748cb13643448e5} 
+void Catch\+::\+Xml\+Reporter\+::section\+Ended (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_section_stats}{Section\+Stats}} const \&}]{section\+Stats}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ab889c47d829ddb5a2b96b46e1e09d207}{Catch\+::\+Streaming\+Reporter\+Base$<$ Xml\+Reporter $>$}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__xml_8cpp_source_l00172}{172}} of file \mbox{\hyperlink{catch__reporter__xml_8cpp_source}{catch\+\_\+reporter\+\_\+xml.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ab889c47d829ddb5a2b96b46e1e09d207}{StreamingReporterBase::sectionEnded}}(\ sectionStats\ );}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ -\/-\/m\_sectionDepth\ >\ 0\ )\ \{}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \ \ \ \ XmlWriter::ScopedElement\ e\ =\ m\_xml.\mbox{\hyperlink{class_catch_1_1_xml_writer_a48f1a53e3255938813ff91f9fec9b690}{scopedElement}}(\ \textcolor{stringliteral}{"{}OverallResults"{}}\ );}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \ \ \ \ e.\mbox{\hyperlink{class_catch_1_1_xml_writer_1_1_scoped_element_a33b1fe4123c56d644abe8f4cab3edb45}{writeAttribute}}(\ \textcolor{stringliteral}{"{}successes"{}},\ sectionStats.assertions.passed\ );}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \ \ \ \ e.\mbox{\hyperlink{class_catch_1_1_xml_writer_1_1_scoped_element_a33b1fe4123c56d644abe8f4cab3edb45}{writeAttribute}}(\ \textcolor{stringliteral}{"{}failures"{}},\ sectionStats.assertions.failed\ );}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \ \ \ \ e.\mbox{\hyperlink{class_catch_1_1_xml_writer_1_1_scoped_element_a33b1fe4123c56d644abe8f4cab3edb45}{writeAttribute}}(\ \textcolor{stringliteral}{"{}expectedFailures"{}},\ sectionStats.assertions.failedButOk\ );}
+\DoxyCodeLine{00179\ }
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_aea2fd5c5f7cbfa78d96e15485a1b8ff7}{m\_config}}-\/>showDurations()\ ==\ \mbox{\hyperlink{struct_catch_1_1_show_durations_a82fa0174554187220c1eda175f122ee1ac9dcaeb20b4d9ca94227ab3f6878ae0a}{ShowDurations::Always}}\ )}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ e.\mbox{\hyperlink{class_catch_1_1_xml_writer_1_1_scoped_element_a33b1fe4123c56d644abe8f4cab3edb45}{writeAttribute}}(\ \textcolor{stringliteral}{"{}durationInSeconds"{}},\ sectionStats.durationInSeconds\ );}
+\DoxyCodeLine{00182\ }
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \ \ \ \ \ \ m\_xml.\mbox{\hyperlink{class_catch_1_1_xml_writer_a8fcaa0821b6c2c1750c654af0b33c823}{endElement}}();}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00185\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_xml_reporter_a73c809f067d58a7a6748cb13643448e5_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_xml_reporter_a06befa9cf2b661c5226317bff0f05c64}\index{Catch::XmlReporter@{Catch::XmlReporter}!sectionStarting@{sectionStarting}}
+\index{sectionStarting@{sectionStarting}!Catch::XmlReporter@{Catch::XmlReporter}}
+\doxysubsubsection{\texorpdfstring{sectionStarting()}{sectionStarting()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_xml_reporter_a06befa9cf2b661c5226317bff0f05c64} 
+void Catch\+::\+Xml\+Reporter\+::section\+Starting (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_section_info}{Section\+Info}} const \&}]{section\+Info}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a249cfe647a373a77d118e4c564422e49}{Catch\+::\+Streaming\+Reporter\+Base$<$ Xml\+Reporter $>$}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__xml_8cpp_source_l00085}{85}} of file \mbox{\hyperlink{catch__reporter__xml_8cpp_source}{catch\+\_\+reporter\+\_\+xml.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a249cfe647a373a77d118e4c564422e49}{StreamingReporterBase::sectionStarting}}(\ sectionInfo\ );}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ m\_sectionDepth++\ >\ 0\ )\ \{}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \ \ \ m\_xml.\mbox{\hyperlink{class_catch_1_1_xml_writer_a6114b9d8038cd4f159ccd016f12d4992}{startElement}}(\ \textcolor{stringliteral}{"{}Section"{}}\ )}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .\mbox{\hyperlink{class_catch_1_1_xml_writer_ad433310b59d30e0fedc7130dc11c563b}{writeAttribute}}(\ \textcolor{stringliteral}{"{}name"{}},\ \mbox{\hyperlink{namespace_catch_a084108b47f37d8bfd5db51c50c7451b3}{trim}}(\ sectionInfo.name\ )\ );}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_xml_reporter_a190d2ae83de78e06273fa476d3729771}{writeSourceInfo}}(\ sectionInfo.lineInfo\ );}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ \ \ m\_xml.\mbox{\hyperlink{class_catch_1_1_xml_writer_aba98703d9852416e237de82aed4a9c4f}{ensureTagClosed}}();}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00093\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_xml_reporter_a06befa9cf2b661c5226317bff0f05c64_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_xml_reporter_ab641ec7e115cb94efa02f85e9d91de0f}\index{Catch::XmlReporter@{Catch::XmlReporter}!testCaseEnded@{testCaseEnded}}
+\index{testCaseEnded@{testCaseEnded}!Catch::XmlReporter@{Catch::XmlReporter}}
+\doxysubsubsection{\texorpdfstring{testCaseEnded()}{testCaseEnded()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_xml_reporter_ab641ec7e115cb94efa02f85e9d91de0f} 
+void Catch\+::\+Xml\+Reporter\+::test\+Case\+Ended (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_test_case_stats}{Test\+Case\+Stats}} const \&}]{test\+Case\+Stats}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ae9e916b4aeb5e9080f3b77a10d69c5f6}{Catch\+::\+Streaming\+Reporter\+Base$<$ Xml\+Reporter $>$}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__xml_8cpp_source_l00187}{187}} of file \mbox{\hyperlink{catch__reporter__xml_8cpp_source}{catch\+\_\+reporter\+\_\+xml.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ae9e916b4aeb5e9080f3b77a10d69c5f6}{StreamingReporterBase::testCaseEnded}}(\ testCaseStats\ );}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ XmlWriter::ScopedElement\ e\ =\ m\_xml.\mbox{\hyperlink{class_catch_1_1_xml_writer_a48f1a53e3255938813ff91f9fec9b690}{scopedElement}}(\ \textcolor{stringliteral}{"{}OverallResult"{}}\ );}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ e.\mbox{\hyperlink{class_catch_1_1_xml_writer_1_1_scoped_element_a33b1fe4123c56d644abe8f4cab3edb45}{writeAttribute}}(\ \textcolor{stringliteral}{"{}success"{}},\ testCaseStats.totals.assertions.allOk()\ );}
+\DoxyCodeLine{00191\ }
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_aea2fd5c5f7cbfa78d96e15485a1b8ff7}{m\_config}}-\/>showDurations()\ ==\ \mbox{\hyperlink{struct_catch_1_1_show_durations_a82fa0174554187220c1eda175f122ee1ac9dcaeb20b4d9ca94227ab3f6878ae0a}{ShowDurations::Always}}\ )}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \ \ \ \ \ \ e.\mbox{\hyperlink{class_catch_1_1_xml_writer_1_1_scoped_element_a33b1fe4123c56d644abe8f4cab3edb45}{writeAttribute}}(\ \textcolor{stringliteral}{"{}durationInSeconds"{}},\ m\_testCaseTimer.\mbox{\hyperlink{class_catch_1_1_timer_a065e37e3c9eb16bd4dcf41971d8deedc}{getElapsedSeconds}}()\ );}
+\DoxyCodeLine{00194\ }
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !testCaseStats.stdOut.empty()\ )}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \ \ \ \ m\_xml.\mbox{\hyperlink{class_catch_1_1_xml_writer_a48f1a53e3255938813ff91f9fec9b690}{scopedElement}}(\ \textcolor{stringliteral}{"{}StdOut"{}}\ ).\mbox{\hyperlink{class_catch_1_1_xml_writer_1_1_scoped_element_a189c87f530ce85304ce4e1075609d2f5}{writeText}}(\ \mbox{\hyperlink{namespace_catch_a084108b47f37d8bfd5db51c50c7451b3}{trim}}(\ testCaseStats.stdOut\ ),\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !testCaseStats.stdErr.empty()\ )}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \ \ \ \ m\_xml.\mbox{\hyperlink{class_catch_1_1_xml_writer_a48f1a53e3255938813ff91f9fec9b690}{scopedElement}}(\ \textcolor{stringliteral}{"{}StdErr"{}}\ ).\mbox{\hyperlink{class_catch_1_1_xml_writer_1_1_scoped_element_a189c87f530ce85304ce4e1075609d2f5}{writeText}}(\ \mbox{\hyperlink{namespace_catch_a084108b47f37d8bfd5db51c50c7451b3}{trim}}(\ testCaseStats.stdErr\ ),\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{00199\ }
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ m\_xml.\mbox{\hyperlink{class_catch_1_1_xml_writer_a8fcaa0821b6c2c1750c654af0b33c823}{endElement}}();}
+\DoxyCodeLine{00201\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_xml_reporter_ab641ec7e115cb94efa02f85e9d91de0f_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_xml_reporter_a1395b2efb62faaa947a42638a03be32c}\index{Catch::XmlReporter@{Catch::XmlReporter}!testCaseStarting@{testCaseStarting}}
+\index{testCaseStarting@{testCaseStarting}!Catch::XmlReporter@{Catch::XmlReporter}}
+\doxysubsubsection{\texorpdfstring{testCaseStarting()}{testCaseStarting()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_xml_reporter_a1395b2efb62faaa947a42638a03be32c} 
+void Catch\+::\+Xml\+Reporter\+::test\+Case\+Starting (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_test_case_info}{Test\+Case\+Info}} const \&}]{test\+Info}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ad8a773ceb481c17f3cedee3bf65b9820}{Catch\+::\+Streaming\+Reporter\+Base$<$ Xml\+Reporter $>$}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__xml_8cpp_source_l00071}{71}} of file \mbox{\hyperlink{catch__reporter__xml_8cpp_source}{catch\+\_\+reporter\+\_\+xml.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ad8a773ceb481c17f3cedee3bf65b9820}{StreamingReporterBase::testCaseStarting}}(testInfo);}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ m\_xml.\mbox{\hyperlink{class_catch_1_1_xml_writer_a6114b9d8038cd4f159ccd016f12d4992}{startElement}}(\ \textcolor{stringliteral}{"{}TestCase"{}}\ )}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \ \ \ .\mbox{\hyperlink{class_catch_1_1_xml_writer_ad433310b59d30e0fedc7130dc11c563b}{writeAttribute}}(\ \textcolor{stringliteral}{"{}name"{}},\ \mbox{\hyperlink{namespace_catch_a084108b47f37d8bfd5db51c50c7451b3}{trim}}(\ testInfo.name\ )\ )}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \ \ \ .\mbox{\hyperlink{class_catch_1_1_xml_writer_ad433310b59d30e0fedc7130dc11c563b}{writeAttribute}}(\ \textcolor{stringliteral}{"{}description"{}},\ testInfo.description\ )}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ .\mbox{\hyperlink{class_catch_1_1_xml_writer_ad433310b59d30e0fedc7130dc11c563b}{writeAttribute}}(\ \textcolor{stringliteral}{"{}tags"{}},\ testInfo.tagsAsString()\ );}
+\DoxyCodeLine{00077\ }
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_xml_reporter_a190d2ae83de78e06273fa476d3729771}{writeSourceInfo}}(\ testInfo.lineInfo\ );}
+\DoxyCodeLine{00079\ }
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_aea2fd5c5f7cbfa78d96e15485a1b8ff7}{m\_config}}-\/>showDurations()\ ==\ \mbox{\hyperlink{struct_catch_1_1_show_durations_a82fa0174554187220c1eda175f122ee1ac9dcaeb20b4d9ca94227ab3f6878ae0a}{ShowDurations::Always}}\ )}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \ \ \ m\_testCaseTimer.\mbox{\hyperlink{class_catch_1_1_timer_a0a56e879e43f36c102bf9ea8b5fc8b72}{start}}();}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ m\_xml.\mbox{\hyperlink{class_catch_1_1_xml_writer_aba98703d9852416e237de82aed4a9c4f}{ensureTagClosed}}();}
+\DoxyCodeLine{00083\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_xml_reporter_a1395b2efb62faaa947a42638a03be32c_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_xml_reporter_ab9ba05f0311cb976fb6f7e5bd2df477c}\index{Catch::XmlReporter@{Catch::XmlReporter}!testGroupEnded@{testGroupEnded}}
+\index{testGroupEnded@{testGroupEnded}!Catch::XmlReporter@{Catch::XmlReporter}}
+\doxysubsubsection{\texorpdfstring{testGroupEnded()}{testGroupEnded()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_xml_reporter_ab9ba05f0311cb976fb6f7e5bd2df477c} 
+void Catch\+::\+Xml\+Reporter\+::test\+Group\+Ended (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_test_group_stats}{Test\+Group\+Stats}} const \&}]{test\+Group\+Stats}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_aebb3f5242058ff945527079b85964bbe}{Catch\+::\+Streaming\+Reporter\+Base$<$ Xml\+Reporter $>$}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__xml_8cpp_source_l00203}{203}} of file \mbox{\hyperlink{catch__reporter__xml_8cpp_source}{catch\+\_\+reporter\+\_\+xml.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_aebb3f5242058ff945527079b85964bbe}{StreamingReporterBase::testGroupEnded}}(\ testGroupStats\ );}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ TODO:\ Check\ testGroupStats.aborting\ and\ act\ accordingly.}}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ m\_xml.\mbox{\hyperlink{class_catch_1_1_xml_writer_a48f1a53e3255938813ff91f9fec9b690}{scopedElement}}(\ \textcolor{stringliteral}{"{}OverallResults"{}}\ )}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ \ \ \ \ \ \ .\mbox{\hyperlink{class_catch_1_1_xml_writer_1_1_scoped_element_a33b1fe4123c56d644abe8f4cab3edb45}{writeAttribute}}(\ \textcolor{stringliteral}{"{}successes"{}},\ testGroupStats.totals.assertions.passed\ )}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \ \ \ \ \ \ .\mbox{\hyperlink{class_catch_1_1_xml_writer_1_1_scoped_element_a33b1fe4123c56d644abe8f4cab3edb45}{writeAttribute}}(\ \textcolor{stringliteral}{"{}failures"{}},\ testGroupStats.totals.assertions.failed\ )}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \ \ \ \ \ \ .\mbox{\hyperlink{class_catch_1_1_xml_writer_1_1_scoped_element_a33b1fe4123c56d644abe8f4cab3edb45}{writeAttribute}}(\ \textcolor{stringliteral}{"{}expectedFailures"{}},\ testGroupStats.totals.assertions.failedButOk\ );}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \ \ m\_xml.\mbox{\hyperlink{class_catch_1_1_xml_writer_a8fcaa0821b6c2c1750c654af0b33c823}{endElement}}();}
+\DoxyCodeLine{00211\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_xml_reporter_ab9ba05f0311cb976fb6f7e5bd2df477c_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_xml_reporter_a873beb2333056238c4fd476ef90412fb}\index{Catch::XmlReporter@{Catch::XmlReporter}!testGroupStarting@{testGroupStarting}}
+\index{testGroupStarting@{testGroupStarting}!Catch::XmlReporter@{Catch::XmlReporter}}
+\doxysubsubsection{\texorpdfstring{testGroupStarting()}{testGroupStarting()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_xml_reporter_a873beb2333056238c4fd476ef90412fb} 
+void Catch\+::\+Xml\+Reporter\+::test\+Group\+Starting (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_group_info}{Group\+Info}} const \&}]{group\+Info}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a6961a1cbf0d4bffed14cb04f80aaf318}{Catch\+::\+Streaming\+Reporter\+Base$<$ Xml\+Reporter $>$}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__xml_8cpp_source_l00065}{65}} of file \mbox{\hyperlink{catch__reporter__xml_8cpp_source}{catch\+\_\+reporter\+\_\+xml.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a6961a1cbf0d4bffed14cb04f80aaf318}{StreamingReporterBase::testGroupStarting}}(\ groupInfo\ );}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ m\_xml.\mbox{\hyperlink{class_catch_1_1_xml_writer_a6114b9d8038cd4f159ccd016f12d4992}{startElement}}(\ \textcolor{stringliteral}{"{}Group"{}}\ )}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \ \ \ .\mbox{\hyperlink{class_catch_1_1_xml_writer_ad433310b59d30e0fedc7130dc11c563b}{writeAttribute}}(\ \textcolor{stringliteral}{"{}name"{}},\ groupInfo.name\ );}
+\DoxyCodeLine{00069\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_xml_reporter_a873beb2333056238c4fd476ef90412fb_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_xml_reporter_a2458c9f342a446f0b3a7480b53c93705}\index{Catch::XmlReporter@{Catch::XmlReporter}!testRunEnded@{testRunEnded}}
+\index{testRunEnded@{testRunEnded}!Catch::XmlReporter@{Catch::XmlReporter}}
+\doxysubsubsection{\texorpdfstring{testRunEnded()}{testRunEnded()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_xml_reporter_a2458c9f342a446f0b3a7480b53c93705} 
+void Catch\+::\+Xml\+Reporter\+::test\+Run\+Ended (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_test_run_stats}{Test\+Run\+Stats}} const \&}]{test\+Run\+Stats}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a8cfd2e27ce7746966cf145b818254fd1}{Catch\+::\+Streaming\+Reporter\+Base$<$ Xml\+Reporter $>$}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__xml_8cpp_source_l00213}{213}} of file \mbox{\hyperlink{catch__reporter__xml_8cpp_source}{catch\+\_\+reporter\+\_\+xml.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a8cfd2e27ce7746966cf145b818254fd1}{StreamingReporterBase::testRunEnded}}(\ testRunStats\ );}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \ \ m\_xml.\mbox{\hyperlink{class_catch_1_1_xml_writer_a48f1a53e3255938813ff91f9fec9b690}{scopedElement}}(\ \textcolor{stringliteral}{"{}OverallResults"{}}\ )}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ \ \ \ \ .\mbox{\hyperlink{class_catch_1_1_xml_writer_1_1_scoped_element_a33b1fe4123c56d644abe8f4cab3edb45}{writeAttribute}}(\ \textcolor{stringliteral}{"{}successes"{}},\ testRunStats.totals.assertions.passed\ )}
+\DoxyCodeLine{00217\ \ \ \ \ \ \ \ \ \ \ \ \ .\mbox{\hyperlink{class_catch_1_1_xml_writer_1_1_scoped_element_a33b1fe4123c56d644abe8f4cab3edb45}{writeAttribute}}(\ \textcolor{stringliteral}{"{}failures"{}},\ testRunStats.totals.assertions.failed\ )}
+\DoxyCodeLine{00218\ \ \ \ \ \ \ \ \ \ \ \ \ .\mbox{\hyperlink{class_catch_1_1_xml_writer_1_1_scoped_element_a33b1fe4123c56d644abe8f4cab3edb45}{writeAttribute}}(\ \textcolor{stringliteral}{"{}expectedFailures"{}},\ testRunStats.totals.assertions.failedButOk\ );}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \ \ m\_xml.\mbox{\hyperlink{class_catch_1_1_xml_writer_a8fcaa0821b6c2c1750c654af0b33c823}{endElement}}();}
+\DoxyCodeLine{00220\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_xml_reporter_a2458c9f342a446f0b3a7480b53c93705_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_xml_reporter_ab5de0b02d5a30612ae5449360d867672}\index{Catch::XmlReporter@{Catch::XmlReporter}!testRunStarting@{testRunStarting}}
+\index{testRunStarting@{testRunStarting}!Catch::XmlReporter@{Catch::XmlReporter}}
+\doxysubsubsection{\texorpdfstring{testRunStarting()}{testRunStarting()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_xml_reporter_ab5de0b02d5a30612ae5449360d867672} 
+void Catch\+::\+Xml\+Reporter\+::test\+Run\+Starting (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_test_run_info}{Test\+Run\+Info}} const \&}]{test\+Info}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a510b201b48fb7d0ebd11d0c8c65a43ba}{Catch\+::\+Streaming\+Reporter\+Base$<$ Xml\+Reporter $>$}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__xml_8cpp_source_l00050}{50}} of file \mbox{\hyperlink{catch__reporter__xml_8cpp_source}{catch\+\_\+reporter\+\_\+xml.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a510b201b48fb7d0ebd11d0c8c65a43ba}{StreamingReporterBase::testRunStarting}}(\ testInfo\ );}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ std::string\ stylesheetRef\ =\ \mbox{\hyperlink{class_catch_1_1_xml_reporter_ad94c592b511097332f6e5ecf29ccb2ee}{getStylesheetRef}}();}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !stylesheetRef.empty()\ )}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \ \ \ m\_xml.\mbox{\hyperlink{class_catch_1_1_xml_writer_a82beef2dcf4342d5b132236c96b4705e}{writeStylesheetRef}}(\ stylesheetRef\ );}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ m\_xml.\mbox{\hyperlink{class_catch_1_1_xml_writer_a6114b9d8038cd4f159ccd016f12d4992}{startElement}}(\ \textcolor{stringliteral}{"{}Catch"{}}\ );}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !\mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_aea2fd5c5f7cbfa78d96e15485a1b8ff7}{m\_config}}-\/>name().empty()\ )}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ \ \ \ m\_xml.\mbox{\hyperlink{class_catch_1_1_xml_writer_ad433310b59d30e0fedc7130dc11c563b}{writeAttribute}}(\ \textcolor{stringliteral}{"{}name"{}},\ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_aea2fd5c5f7cbfa78d96e15485a1b8ff7}{m\_config}}-\/>name()\ );}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_aea2fd5c5f7cbfa78d96e15485a1b8ff7}{m\_config}}-\/>testSpec().hasFilters())}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ \ \ \ m\_xml.\mbox{\hyperlink{class_catch_1_1_xml_writer_ad433310b59d30e0fedc7130dc11c563b}{writeAttribute}}(\ \textcolor{stringliteral}{"{}filters"{}},\ \mbox{\hyperlink{namespace_catch_a517007deae24c241b3402b4433160a9b}{serializeFilters}}(\ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_aea2fd5c5f7cbfa78d96e15485a1b8ff7}{m\_config}}-\/>getTestsOrTags()\ )\ );}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_aea2fd5c5f7cbfa78d96e15485a1b8ff7}{m\_config}}-\/>rngSeed()\ !=\ 0\ )}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \ \ \ \ m\_xml.\mbox{\hyperlink{class_catch_1_1_xml_writer_a48f1a53e3255938813ff91f9fec9b690}{scopedElement}}(\ \textcolor{stringliteral}{"{}Randomness"{}}\ )}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .\mbox{\hyperlink{class_catch_1_1_xml_writer_1_1_scoped_element_a33b1fe4123c56d644abe8f4cab3edb45}{writeAttribute}}(\ \textcolor{stringliteral}{"{}seed"{}},\ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_aea2fd5c5f7cbfa78d96e15485a1b8ff7}{m\_config}}-\/>rngSeed()\ );}
+\DoxyCodeLine{00063\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_xml_reporter_ab5de0b02d5a30612ae5449360d867672_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_xml_reporter_a190d2ae83de78e06273fa476d3729771}\index{Catch::XmlReporter@{Catch::XmlReporter}!writeSourceInfo@{writeSourceInfo}}
+\index{writeSourceInfo@{writeSourceInfo}!Catch::XmlReporter@{Catch::XmlReporter}}
+\doxysubsubsection{\texorpdfstring{writeSourceInfo()}{writeSourceInfo()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_xml_reporter_a190d2ae83de78e06273fa476d3729771} 
+void Catch\+::\+Xml\+Reporter\+::write\+Source\+Info (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_source_line_info}{Source\+Line\+Info}} const \&}]{source\+Info}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__xml_8cpp_source_l00040}{40}} of file \mbox{\hyperlink{catch__reporter__xml_8cpp_source}{catch\+\_\+reporter\+\_\+xml.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ m\_xml}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \ \ \ .\mbox{\hyperlink{class_catch_1_1_xml_writer_ad433310b59d30e0fedc7130dc11c563b}{writeAttribute}}(\ \textcolor{stringliteral}{"{}filename"{}},\ sourceInfo.file\ )}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \ \ \ .\mbox{\hyperlink{class_catch_1_1_xml_writer_ad433310b59d30e0fedc7130dc11c563b}{writeAttribute}}(\ \textcolor{stringliteral}{"{}line"{}},\ sourceInfo.line\ );}
+\DoxyCodeLine{00044\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_xml_reporter_a190d2ae83de78e06273fa476d3729771_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=322pt]{class_catch_1_1_xml_reporter_a190d2ae83de78e06273fa476d3729771_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/include/reporters/\mbox{\hyperlink{catch__reporter__xml_8h}{catch\+\_\+reporter\+\_\+xml.\+h}}\item 
+libraries/sys-\/vm/external/\+Catch2/include/reporters/\mbox{\hyperlink{catch__reporter__xml_8cpp}{catch\+\_\+reporter\+\_\+xml.\+cpp}}\end{DoxyCompactItemize}

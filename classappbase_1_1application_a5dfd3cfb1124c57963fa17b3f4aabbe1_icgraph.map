@@ -1,0 +1,25 @@
+<map id="appbase::application::data_dir" name="appbase::application::data_dir">
+<area shape="rect" id="Node000001" title="Get data directory." alt="" coords="656,235,797,275"/>
+<area shape="rect" id="Node000002" href="$classappbase_1_1application.html#adebe1a60f6663b205a196385d4bc6231" title=" " alt="" coords="453,5,593,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="710,221,694,184,671,141,642,99,607,61,588,49,591,44,610,57,646,95,676,139,699,182,715,219"/>
+<area shape="rect" id="Node000005" href="$classsysio_1_1chain__plugin.html#a0192ac61f3f59d4fdf2dcbbd2c7104ca" title=" " alt="" coords="457,71,589,111"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="700,223,660,174,634,149,607,127,585,114,588,110,610,122,638,145,664,170,704,220"/>
+<area shape="rect" id="Node000006" href="$classsysio_1_1http__plugin.html#abafb2339628893273c194f690f790ed1" title=" " alt="" coords="462,136,585,177"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="676,229,607,192,579,180,581,175,609,187,679,224"/>
+<area shape="rect" id="Node000007" href="$classsysio_1_1producer__plugin.html#a091e6c32d2a7834be0d0a9b9b7fa061d" title=" " alt="" coords="448,201,599,242"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="641,244,599,237,600,231,642,238"/>
+<area shape="rect" id="Node000008" href="$classsysio_1_1state__history__plugin.html#a77b01db68c4deb416c61cebfce6c987a" title=" " alt="" coords="444,267,602,307"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="641,271,603,277,603,272,641,266"/>
+<area shape="rect" id="Node000009" href="$structsysio_1_1trace__api__common__impl.html#abc7218c366ab884e62b93813f353393c" title=" " alt="" coords="438,332,608,373"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="678,286,609,321,581,334,579,329,607,317,676,281"/>
+<area shape="rect" id="Node000010" href="$classsysio_1_1wallet__plugin.html#a2d6f483f94038fbd6dccf5089b553b5d" title=" " alt="" coords="456,397,591,438"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="704,290,664,339,638,364,610,387,588,399,585,394,607,382,634,360,660,335,700,286"/>
+<area shape="rect" id="Node000011" href="$classappbase_1_1application.html#af81fa07af200b5b24049ed5d197a864f" title="Set default data directory." alt="" coords="450,463,596,503"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="715,291,699,328,676,371,646,414,610,452,591,464,588,460,607,448,642,410,671,368,694,325,710,288"/>
+<area shape="rect" id="Node000003" href="$classappbase_1_1application.html#a29ed51314f78ebe6795930a4ca910fd6" title="Looks for the –plugin commandline / config option and calls initialize on those plugins." alt="" coords="250,5,390,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="438,28,390,28,390,23,438,23"/>
+<area shape="rect" id="Node000004" href="$test__trx__full_8cpp.html#afdace07785a80c02d7fbb1d13154c2c4" title=" " alt="" coords="5,13,202,38"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="234,28,202,28,202,23,234,23"/>
+<area shape="rect" id="Node000012" href="$programs_2kiod_2main_8cpp.html#a3c04138a5bfe5d72780bb7e82a18e627" title=" " alt="" coords="295,470,344,496"/>
+<area shape="poly" id="edge11_Node000011_Node000012" title=" " alt="" coords="434,486,345,486,345,480,434,480"/>
+</map>

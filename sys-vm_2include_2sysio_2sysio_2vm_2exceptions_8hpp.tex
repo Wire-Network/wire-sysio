@@ -1,0 +1,92 @@
+\doxysection{libraries/sys-\/vm/include/sysio/sysio/vm/exceptions.hpp File Reference}
+\hypertarget{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp}{}\label{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp}\index{libraries/sys-\/vm/include/sysio/sysio/vm/exceptions.hpp@{libraries/sys-\/vm/include/sysio/sysio/vm/exceptions.hpp}}
+{\ttfamily \#include $<$sysio/vm/utils.\+hpp$>$}\newline
+{\ttfamily \#include $<$cstdint$>$}\newline
+{\ttfamily \#include $<$exception$>$}\newline
+Include dependency graph for exceptions.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=315pt]{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1exception}{sysio\+::vm\+::exception}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1vm}{sysio\+::vm}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\+\_\+\+VM\+\_\+\+ASSERT}}(expr,  exc\+\_\+type,  msg)
+\item 
+\#define \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a4fbc8fbf0f92d582ab1d278b60bcd603}{DECLARE\+\_\+\+EXCEPTION}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  \+\_\+code,  \+\_\+what)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a4fbc8fbf0f92d582ab1d278b60bcd603}\index{exceptions.hpp@{exceptions.hpp}!DECLARE\_EXCEPTION@{DECLARE\_EXCEPTION}}
+\index{DECLARE\_EXCEPTION@{DECLARE\_EXCEPTION}!exceptions.hpp@{exceptions.hpp}}
+\doxysubsubsection{\texorpdfstring{DECLARE\_EXCEPTION}{DECLARE\_EXCEPTION}}
+{\footnotesize\ttfamily \label{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a4fbc8fbf0f92d582ab1d278b60bcd603} 
+\#define DECLARE\+\_\+\+EXCEPTION(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{\+\_\+code}{, }\item[{}]{\+\_\+what}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{structsysio_1_1vm_1_1exception}{sysio::vm::exception}}\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ name(std::string\ msg)\ :\ msg(msg)\ \{\}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{structsysio_1_1vm_1_1exception_ae888671119bac3f7c635b6bc8244dc33}{what}}()\textcolor{keyword}{const}\ throw()\ \{\ \textcolor{keywordflow}{return}\ \_what;\ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{structsysio_1_1vm_1_1exception_af86f633419d7c667dc588b16f13f1972}{detail}}()\textcolor{keyword}{const}\ throw()\ \{\ \textcolor{keywordflow}{return}\ msg.c\_str();\ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ code()\textcolor{keyword}{const\ }\{\ \textcolor{keywordflow}{return}\ \_code;\ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ std::string\ msg;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \};}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_source_l00020}{20}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_source}{exceptions.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#define\ DECLARE\_EXCEPTION(name,\ \_code,\ \_what)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\ \ \ struct\ name\ :\ public\ sysio::vm::exception\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\ \ \ \ \ \ name(std::string\ msg)\ :\ msg(msg)\ \{\}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\ \ \ \ \ \ virtual\ const\ char*\ what()const\ throw()\ \{\ return\ \_what;\ \}\ \(\backslash\)}}
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\ \ \ \ \ \ virtual\ const\ char*\ detail()const\ throw()\ \{\ return\ msg.c\_str();\ \}\ \(\backslash\)}}
+\DoxyCodeLine{00025\ \textcolor{preprocessor}{\ \ \ \ \ \ uint32\_t\ code()const\ \{\ return\ \_code;\ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00026\ \textcolor{preprocessor}{\ \ \ \ \ \ std::string\ msg;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00027\ \textcolor{preprocessor}{\ \ \ \};}}
+
+\end{DoxyCode}
+\Hypertarget{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}\index{exceptions.hpp@{exceptions.hpp}!SYS\_VM\_ASSERT@{SYS\_VM\_ASSERT}}
+\index{SYS\_VM\_ASSERT@{SYS\_VM\_ASSERT}!exceptions.hpp@{exceptions.hpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_ASSERT}{SYS\_VM\_ASSERT}}
+{\footnotesize\ttfamily \label{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a} 
+\#define SYS\+\_\+\+VM\+\_\+\+ASSERT(\begin{DoxyParamCaption}\item[{}]{expr}{, }\item[{}]{exc\+\_\+type}{, }\item[{}]{msg}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{exception_8hpp_ab10d0a221f4d7a706701b806c8135fd7}{UNLIKELY}}(expr))\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keywordflow}{throw}\ exc\_type\{msg\};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_source_l00008}{8}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_source}{exceptions.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00008\ \textcolor{preprocessor}{\#define\ SYS\_VM\_ASSERT(\ expr,\ exc\_type,\ msg\ )\ \(\backslash\)}}
+\DoxyCodeLine{00009\ \textcolor{preprocessor}{\ \ \ if\ (!UNLIKELY(expr))\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00010\ \textcolor{preprocessor}{\ \ \ \ \ \ throw\ exc\_type\{msg\};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00011\ \textcolor{preprocessor}{\ \ \ \}}}
+
+\end{DoxyCode}

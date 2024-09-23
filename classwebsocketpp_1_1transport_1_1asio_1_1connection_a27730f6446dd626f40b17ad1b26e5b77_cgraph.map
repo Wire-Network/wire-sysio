@@ -1,0 +1,39 @@
+<map id="websocketpp::transport::asio::connection::handle_pre_init" name="websocketpp::transport::asio::connection::handle_pre_init">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,147,176,202"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1transport_1_1asio_1_1connection.html#ad640e3f3123494ba1e58ad9842c46169" title=" " alt="" coords="1152,180,1333,220"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="155,144,234,113,332,82,442,58,499,50,555,48,789,48,847,51,906,61,963,75,1018,93,1117,132,1193,170,1191,174,1115,137,1016,98,962,80,905,66,847,57,789,53,555,53,499,56,443,63,334,87,235,118,157,149"/>
+<area shape="rect" id="Node000011" href="$classwebsocketpp_1_1transport_1_1asio_1_1connection.html#a55e3fac0ec05389d6765a6496922f099" title=" " alt="" coords="224,220,423,260"/>
+<area shape="poly" id="edge11_Node000001_Node000011" title=" " alt="" coords="177,196,235,212,233,217,176,201"/>
+<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1transport_1_1asio_1_1connection.html#ac190efbc8cfd2654bc07b5b9382c36cc" title="Get a shared pointer to this component." alt="" coords="1640,391,1798,446"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="1259,219,1308,284,1343,319,1383,348,1425,365,1487,380,1625,404,1624,409,1486,385,1424,370,1380,353,1339,323,1304,288,1255,222"/>
+<area shape="rect" id="Node000004" href="$classwebsocketpp_1_1transport_1_1asio_1_1connection.html#a6782049b9d8b324d85da34dd9e426950" title="Post init timeout callback." alt="" coords="1389,168,1560,224"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="1334,196,1373,195,1374,200,1334,201"/>
+<area shape="rect" id="Node000006" href="$classwebsocketpp_1_1transport_1_1asio_1_1connection.html#a8c21e2814d440c6fe49a4514f6cf5ff1" title="Post init timeout callback." alt="" coords="1389,37,1560,93"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="1278,177,1411,99,1414,103,1281,181"/>
+<area shape="rect" id="Node000008" href="$classwebsocketpp_1_1transport_1_1asio_1_1connection.html#ab9db04550ee6b3dd2643cd7d23cda3f1" title="Call back a function after a period of time." alt="" coords="1381,298,1568,339"/>
+<area shape="poly" id="edge7_Node000002_Node000008" title=" " alt="" coords="1286,218,1421,288,1418,293,1283,223"/>
+<area shape="rect" id="Node000005" href="$namespacewebsocketpp_1_1lib_1_1asio.html#a1096d9d4bcff306bf568ba95842142b5" title=" " alt="" coords="1643,176,1794,216"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="1560,193,1628,193,1628,198,1560,198"/>
+<area shape="rect" id="Node000007" href="$classwebsocketpp_1_1transport_1_1asio_1_1connection.html#ac4b63fadf2083ab4656ab7f1a47d3b5d" title="Cancel the underlying socket and log any errors." alt="" coords="1634,5,1804,61"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="1560,51,1618,44,1619,49,1560,57"/>
+<area shape="poly" id="edge8_Node000008_Node000003" title=" " alt="" coords="1528,337,1636,382,1634,387,1525,342"/>
+<area shape="rect" id="Node000009" href="$classwebsocketpp_1_1transport_1_1asio_1_1connection.html#a61ec4db64a17fcd38d2ca1c819dd2d9b" title="Timer callback." alt="" coords="1616,248,1822,288"/>
+<area shape="poly" id="edge9_Node000008_Node000009" title=" " alt="" coords="1568,297,1602,289,1603,294,1569,302"/>
+<area shape="rect" id="Node000010" href="$namespacewebsocketpp_1_1lib_1_1asio.html#a38ce6cba13c37a134a65f3623d00090e" title=" " alt="" coords="1643,313,1794,354"/>
+<area shape="poly" id="edge10_Node000008_Node000010" title=" " alt="" coords="1568,321,1628,325,1627,330,1568,327"/>
+<area shape="poly" id="edge12_Node000011_Node000003" title=" " alt="" coords="347,258,401,308,436,335,472,359,555,408,622,445,656,458,693,467,735,473,786,475,1244,475,1346,471,1448,461,1624,434,1625,439,1449,466,1346,476,1244,480,786,480,735,478,692,472,654,463,620,450,553,413,470,363,432,339,398,312,343,262"/>
+<area shape="poly" id="edge22_Node000011_Node000008" title=" " alt="" coords="367,258,444,292,546,330,664,361,725,370,786,373,1020,373,1111,370,1203,361,1366,337,1366,342,1204,367,1112,375,1020,378,786,378,725,375,663,366,545,335,442,297,365,263"/>
+<area shape="rect" id="Node000012" href="$classwebsocketpp_1_1transport_1_1asio_1_1connection.html#a5bf6d19bdada66f4880182f632fe88e0" title=" " alt="" coords="702,88,873,144"/>
+<area shape="poly" id="edge13_Node000011_Node000012" title=" " alt="" coords="400,216,470,197,687,139,688,145,472,202,402,221"/>
+<area shape="rect" id="Node000013" href="$classwebsocketpp_1_1transport_1_1asio_1_1connection.html#a5684daf9e8ee3e0447694d4376832917" title=" " alt="" coords="471,212,641,268"/>
+<area shape="poly" id="edge15_Node000011_Node000013" title=" " alt="" coords="424,237,455,237,455,242,424,242"/>
+<area shape="poly" id="edge14_Node000012_Node000007" title=" " alt="" coords="873,96,1101,56,1241,37,1381,23,1474,19,1568,23,1618,24,1618,30,1568,28,1474,25,1382,28,1241,42,1102,61,874,101"/>
+<area shape="poly" id="edge16_Node000013_Node000005" title=" " alt="" coords="641,223,689,216,883,190,1034,172,1186,161,1381,153,1475,148,1516,148,1568,153,1640,168,1639,173,1567,158,1515,154,1475,154,1381,158,1186,166,1035,177,883,195,690,221,642,228"/>
+<area shape="rect" id="Node000014" href="$classwebsocketpp_1_1transport_1_1asio_1_1connection.html#a37efcf4f20e4291bb62174cdd4093730" title=" " alt="" coords="689,230,886,271"/>
+<area shape="poly" id="edge17_Node000013_Node000014" title=" " alt="" coords="642,241,674,243,674,248,642,246"/>
+<area shape="poly" id="edge18_Node000014_Node000003" title=" " alt="" coords="864,269,934,288,1156,352,1254,377,1382,400,1508,412,1624,416,1624,422,1508,418,1381,405,1253,382,1155,357,933,293,862,274"/>
+<area shape="rect" id="Node000015" href="$classwebsocketpp_1_1transport_1_1asio_1_1connection.html#abb5b33cf14e1f84aa5997e1fe8bffa0e" title="Proxy read callback." alt="" coords="934,223,1104,278"/>
+<area shape="poly" id="edge19_Node000014_Node000015" title=" " alt="" coords="886,248,918,248,918,253,886,253"/>
+<area shape="poly" id="edge21_Node000015_Node000002" title=" " alt="" coords="1104,229,1136,221,1137,226,1105,234"/>
+<area shape="poly" id="edge20_Node000015_Node000005" title=" " alt="" coords="1105,252,1316,253,1442,246,1567,233,1637,218,1638,223,1568,238,1442,252,1316,258,1105,257"/>
+</map>

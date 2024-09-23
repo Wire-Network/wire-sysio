@@ -1,0 +1,9 @@
+<map id="websocketpp::transport::asio::connection::async_write" name="websocketpp::transport::asio::connection::async_write">
+<area shape="rect" id="Node000001" title="Initiate a potentially asyncronous write of the given buffers." alt="" coords="5,93,208,134"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1transport_1_1asio_1_1connection.html#ac190efbc8cfd2654bc07b5b9382c36cc" title="Get a shared pointer to this component." alt="" coords="266,5,423,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="168,90,250,62,252,67,170,95"/>
+<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1transport_1_1asio_1_1connection.html#a5f0bb67448323c4653f564397dcb0fe8" title="Async write callback." alt="" coords="259,85,430,141"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="208,110,244,110,244,116,208,116"/>
+<area shape="rect" id="Node000004" href="$namespacewebsocketpp_1_1transport_1_1asio.html#ae1d60a52c0f07b90a75d36a3dcaac589" title=" " alt="" coords="256,165,433,221"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="170,131,246,157,245,162,168,137"/>
+</map>

@@ -1,0 +1,19 @@
+<map id="appbase::application::startup" name="appbase::application::startup">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,104,146,145"/>
+<area shape="rect" id="Node000002" href="$classappbase_1_1application.html#a916a3366706654967671be9b82ab0e35" title=" " alt="" coords="204,5,344,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="110,101,192,57,206,50,208,55,195,61,113,106"/>
+<area shape="rect" id="Node000003" href="$classappbase_1_1application.html#aa47481ba83e2811dff7f84eff8662a56" title=" " alt="" coords="204,71,344,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="145,110,188,103,189,108,146,115"/>
+<area shape="rect" id="Node000004" href="$classappbase_1_1application.html#a116e20109f980460cf8c38e349766bcc" title=" " alt="" coords="204,136,344,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="146,133,189,140,188,145,145,138"/>
+<area shape="rect" id="Node000006" href="$classappbase_1_1plugin.html#a10e4e1c582bfadf67f510df76d87abfd" title=" " alt="" coords="194,201,354,226"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="112,143,195,186,212,193,211,198,193,191,110,148"/>
+<area shape="rect" id="Node000005" href="$classappbase_1_1application.html#a81aa58d3f94570b7976145039155fc46" title=" " alt="" coords="402,136,542,177"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="344,154,387,154,387,159,344,159"/>
+<area shape="rect" id="Node000007" href="$namespaceappbase.html#a99374dc23934f008a09f2f79be9eae40" title=" " alt="" coords="422,201,522,226"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="354,211,407,211,407,216,354,216"/>
+<area shape="rect" id="Node000009" href="$classappbase_1_1application.html#ad5635d30c2f520340d58665ed99f8a4d" title=" " alt="" coords="402,251,542,291"/>
+<area shape="poly" id="edge8_Node000006_Node000009" title=" " alt="" coords="322,225,388,244,386,249,320,230"/>
+<area shape="rect" id="Node000008" href="$classappbase_1_1application.html#ac874b2659b400fe254f1ae4260d06ecf" title=" " alt="" coords="590,193,731,234"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="522,211,575,211,575,216,522,216"/>
+</map>

@@ -1,0 +1,17 @@
+<map id="Catch::JunitReporter::writeAssertion" name="Catch::JunitReporter::writeAssertion">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,112,148,153"/>
+<area shape="rect" id="Node000002" href="$class_catch_1_1_xml_writer.html#a48f1a53e3255938813ff91f9fec9b690" title=" " alt="" coords="219,5,390,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="104,109,146,82,195,55,208,49,210,54,197,60,148,86,107,114"/>
+<area shape="rect" id="Node000005" href="$class_catch_1_1_reusable_string_stream.html#a0e9ecf260b2a5d35f4886ef0d51f6270" title=" " alt="" coords="196,94,414,120"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="148,122,180,118,181,123,148,127"/>
+<area shape="rect" id="Node000006" href="$class_catch_1_1_xml_writer.html#ad433310b59d30e0fedc7130dc11c563b" title=" " alt="" coords="202,144,408,169"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="148,137,186,141,186,146,148,142"/>
+<area shape="rect" id="Node000007" href="$class_catch_1_1_xml_writer.html#a4c49775bdf7b5bd870b34ab22af62a9c" title=" " alt="" coords="472,129,655,154"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="118,151,155,167,196,179,257,189,304,191,414,179,463,170,509,157,510,162,464,175,414,184,305,196,256,194,195,184,154,172,116,156"/>
+<area shape="rect" id="Node000003" href="$class_catch_1_1_xml_writer.html#a6114b9d8038cd4f159ccd016f12d4992" title=" " alt="" coords="462,46,665,72"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="391,34,447,41,446,47,391,39"/>
+<area shape="rect" id="Node000004" href="$class_catch_1_1_xml_writer.html#aba98703d9852416e237de82aed4a9c4f" title=" " alt="" coords="713,97,882,138"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="619,70,699,90,698,96,617,75"/>
+<area shape="poly" id="edge5_Node000005_Node000005" title=" " alt="" coords="267,95,260,86,264,76,279,70,305,68,333,70,347,77,345,82,331,75,305,73,281,75,268,80,265,85,271,92"/>
+<area shape="poly" id="edge8_Node000007_Node000004" title=" " alt="" coords="655,130,697,125,698,131,655,135"/>
+</map>

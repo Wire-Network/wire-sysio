@@ -1,0 +1,719 @@
+\doxysection{Xbyak Namespace Reference}
+\hypertarget{namespace_xbyak}{}\label{namespace_xbyak}\index{Xbyak@{Xbyak}}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespace_xbyak_1_1inner}{inner}}
+\item 
+namespace \mbox{\hyperlink{namespace_xbyak_1_1util}{util}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{class_xbyak_1_1_address}{Address}}
+\item 
+class \mbox{\hyperlink{class_xbyak_1_1_address_frame}{Address\+Frame}}
+\item 
+struct \mbox{\hyperlink{struct_xbyak_1_1_allocator}{Allocator}}
+\item 
+struct \mbox{\hyperlink{struct_xbyak_1_1_bounds_reg}{Bounds\+Reg}}
+\item 
+class \mbox{\hyperlink{class_xbyak_1_1_code_array}{Code\+Array}}
+\item 
+class \mbox{\hyperlink{class_xbyak_1_1_code_generator}{Code\+Generator}}
+\item 
+class \mbox{\hyperlink{class_xbyak_1_1_error}{Error}}
+\item 
+struct \mbox{\hyperlink{struct_xbyak_1_1_evex_modifier_rounding}{Evex\+Modifier\+Rounding}}
+\item 
+struct \mbox{\hyperlink{struct_xbyak_1_1_evex_modifier_zero}{Evex\+Modifier\+Zero}}
+\item 
+struct \mbox{\hyperlink{struct_xbyak_1_1_fpu}{Fpu}}
+\item 
+struct \mbox{\hyperlink{struct_xbyak_1_1_jmp_label}{Jmp\+Label}}
+\item 
+class \mbox{\hyperlink{class_xbyak_1_1_label}{Label}}
+\item 
+class \mbox{\hyperlink{class_xbyak_1_1_label_manager}{Label\+Manager}}
+\item 
+struct \mbox{\hyperlink{struct_xbyak_1_1_mmx}{Mmx}}
+\item 
+class \mbox{\hyperlink{class_xbyak_1_1_operand}{Operand}}
+\item 
+struct \mbox{\hyperlink{struct_xbyak_1_1_opmask}{Opmask}}
+\item 
+class \mbox{\hyperlink{class_xbyak_1_1_reg}{Reg}}
+\item 
+struct \mbox{\hyperlink{struct_xbyak_1_1_reg16}{Reg16}}
+\item 
+struct \mbox{\hyperlink{struct_xbyak_1_1_reg32}{Reg32}}
+\item 
+struct \mbox{\hyperlink{struct_xbyak_1_1_reg32e}{Reg32e}}
+\item 
+struct \mbox{\hyperlink{struct_xbyak_1_1_reg8}{Reg8}}
+\item 
+class \mbox{\hyperlink{class_xbyak_1_1_reg_exp}{Reg\+Exp}}
+\item 
+class \mbox{\hyperlink{class_xbyak_1_1_segment}{Segment}}
+\item 
+struct \mbox{\hyperlink{struct_xbyak_1_1_xmm}{Xmm}}
+\item 
+struct \mbox{\hyperlink{struct_xbyak_1_1_ymm}{Ymm}}
+\item 
+struct \mbox{\hyperlink{struct_xbyak_1_1_zmm}{Zmm}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}}
+\item 
+typedef \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{namespace_xbyak_aa801f2c4184cd7654e2033d8977e2260}{sint64}}
+\item 
+typedef unsigned int \mbox{\hyperlink{namespace_xbyak_a880d0e902046fa68ba57ae3fbc4acdf3}{uint32}}
+\item 
+typedef unsigned short \mbox{\hyperlink{namespace_xbyak_a64c25188b50730813410b77ea2c17b83}{uint16}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \{ \mbox{\hyperlink{namespace_xbyak_a280f1cb4eeabb3077bb5a8d9e6523f53af9b54a9b5d61f3ff04f90e58798b3168}{DEFAULT\+\_\+\+MAX\+\_\+\+CODE\+\_\+\+SIZE}} = 4096
+, \mbox{\hyperlink{namespace_xbyak_a280f1cb4eeabb3077bb5a8d9e6523f53a208fbc4575805069e050f092ec735530}{VERSION}} = 0x5630
+ \}
+\item 
+enum \{ \newline
+\mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a0691a78e4bdd252daa8518c00af5b308}{ERR\+\_\+\+NONE}} = 0
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a73b230b497459e850d1dfc4ad0019135}{ERR\+\_\+\+BAD\+\_\+\+ADDRESSING}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06af61b35be85f1cbb5c73e05dad24e268d}{ERR\+\_\+\+CODE\+\_\+\+IS\+\_\+\+TOO\+\_\+\+BIG}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a246caaa68df0ce2348c190bcd4051016}{ERR\+\_\+\+BAD\+\_\+\+SCALE}}
+, \newline
+\mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06ade9914e9d4ec6a6a91c632bb6a883485}{ERR\+\_\+\+ESP\+\_\+\+CANT\+\_\+\+BE\+\_\+\+INDEX}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06aec974bb4fc18789afc47a32374b95c03}{ERR\+\_\+\+BAD\+\_\+\+COMBINATION}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a22bbe3522f8ea9a5c9fbd8a8ccd2e56a}{ERR\+\_\+\+BAD\+\_\+\+SIZE\+\_\+\+OF\+\_\+\+REGISTER}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06abb82cfe381ef1db43e601baecf5940ce}{ERR\+\_\+\+IMM\+\_\+\+IS\+\_\+\+TOO\+\_\+\+BIG}}
+, \newline
+\mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06ab3fa729fb0e76c07aa55417071cbef99}{ERR\+\_\+\+BAD\+\_\+\+ALIGN}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a807c8aaba38133effaf36b2572c7a855}{ERR\+\_\+\+LABEL\+\_\+\+IS\+\_\+\+REDEFINED}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a841cce0dc70a502cc8e23604b3afb1cf}{ERR\+\_\+\+LABEL\+\_\+\+IS\+\_\+\+TOO\+\_\+\+FAR}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06af75e8a7dafc9d2d75a4430d22338f5ac}{ERR\+\_\+\+LABEL\+\_\+\+IS\+\_\+\+NOT\+\_\+\+FOUND}}
+, \newline
+\mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a7a2042cbcaa57af973493cc80904ba6c}{ERR\+\_\+\+CODE\+\_\+\+ISNOT\+\_\+\+COPYABLE}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06ad95586d156d26087eb10d8c0d864beab}{ERR\+\_\+\+BAD\+\_\+\+PARAMETER}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a96d712d0e43db4fc53fcf8823812c26b}{ERR\+\_\+\+CANT\+\_\+\+PROTECT}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a9b68abb796f356f5d84f14cb37774495}{ERR\+\_\+\+CANT\+\_\+\+USE\+\_\+64\+BIT\+\_\+\+DISP}}
+, \newline
+\mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a72d4859ae850c52756e13d0c43cca4cf}{ERR\+\_\+\+OFFSET\+\_\+\+IS\+\_\+\+TOO\+\_\+\+BIG}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a064d616f77f3a2226524b33c436f4bb2}{ERR\+\_\+\+MEM\+\_\+\+SIZE\+\_\+\+IS\+\_\+\+NOT\+\_\+\+SPECIFIED}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a76ce3adbbb43865867090a6e5762ede6}{ERR\+\_\+\+BAD\+\_\+\+MEM\+\_\+\+SIZE}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06aa6c5fc0cf3e60088eb2000203ae8ebd1}{ERR\+\_\+\+BAD\+\_\+\+ST\+\_\+\+COMBINATION}}
+, \newline
+\mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06ad8b7909a2781d00f56ac0b28cee10b3f}{ERR\+\_\+\+OVER\+\_\+\+LOCAL\+\_\+\+LABEL}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06afd80235203c330292c8b6a13e3528db9}{ERR\+\_\+\+UNDER\+\_\+\+LOCAL\+\_\+\+LABEL}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a1afca0ea4f4af630386c184bcb1a528b}{ERR\+\_\+\+CANT\+\_\+\+ALLOC}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a0828f53595ac517c91bda86659fda8cf}{ERR\+\_\+\+ONLY\+\_\+\+T\+\_\+\+NEAR\+\_\+\+IS\+\_\+\+SUPPORTED\+\_\+\+IN\+\_\+\+AUTO\+\_\+\+GROW}}
+, \newline
+\mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a0ac8c0e0b16261976cd32b6400fc177d}{ERR\+\_\+\+BAD\+\_\+\+PROTECT\+\_\+\+MODE}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a6c4e5038c3ea250a9bd3ce2f52db03c6}{ERR\+\_\+\+BAD\+\_\+\+PNUM}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06acc9627281fa3e87754e20898cc691b50}{ERR\+\_\+\+BAD\+\_\+\+TNUM}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a24e875a48f33f3c5596b43105423d5d7}{ERR\+\_\+\+BAD\+\_\+\+VSIB\+\_\+\+ADDRESSING}}
+, \newline
+\mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a2b4641b294f3f1e2bc518fbbe640313a}{ERR\+\_\+\+CANT\+\_\+\+CONVERT}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a7670b0b6242a1acd2176dfb48b4e3eec}{ERR\+\_\+\+LABEL\+\_\+\+ISNOT\+\_\+\+SET\+\_\+\+BY\+\_\+L}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06ab5cabef7104ab6d8bd964e469cc647a8}{ERR\+\_\+\+LABEL\+\_\+\+IS\+\_\+\+ALREADY\+\_\+\+SET\+\_\+\+BY\+\_\+L}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a1bcd0cf493398ea6d89ee4aaf7e65632}{ERR\+\_\+\+BAD\+\_\+\+LABEL\+\_\+\+STR}}
+, \newline
+\mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06adf0441b7061eb6668a8720e58c92726b}{ERR\+\_\+\+MUNMAP}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a30e9e47e0cd3323bd4cb4fad462b8dd1}{ERR\+\_\+\+OPMASK\+\_\+\+IS\+\_\+\+ALREADY\+\_\+\+SET}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a3e9e698e685de7ab55bce7c6d4596b36}{ERR\+\_\+\+ROUNDING\+\_\+\+IS\+\_\+\+ALREADY\+\_\+\+SET}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06ad0dd5d1dafb007ac290a3bba4c61c94e}{ERR\+\_\+\+K0\+\_\+\+IS\+\_\+\+INVALID}}
+, \newline
+\mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06aae0a0a338652bc379f4e16d0dd72336f}{ERR\+\_\+\+EVEX\+\_\+\+IS\+\_\+\+INVALID}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a5284baa3dd2915263452a2e63f6f3e6d}{ERR\+\_\+\+SAE\+\_\+\+IS\+\_\+\+INVALID}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a841852a8eda37c1cb73ab10dd5fea2a3}{ERR\+\_\+\+ER\+\_\+\+IS\+\_\+\+INVALID}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a0b8f8d3791d848000830f4ca37ea124f}{ERR\+\_\+\+INVALID\+\_\+\+BROADCAST}}
+, \newline
+\mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06adbd2b83e7cd3f27d260605d2a1be3f7a}{ERR\+\_\+\+INVALID\+\_\+\+OPMASK\+\_\+\+WITH\+\_\+\+MEMORY}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a96d8537d1140d96d6a1d754ecb80b27c}{ERR\+\_\+\+INVALID\+\_\+\+ZERO}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06afb971fce27301c591063bdb1dba9f171}{ERR\+\_\+\+INVALID\+\_\+\+RIP\+\_\+\+IN\+\_\+\+AUTO\+\_\+\+GROW}}
+, \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a9b82c2e8f7faac37dbdc80041f8e4a88}{ERR\+\_\+\+INVALID\+\_\+\+MIB\+\_\+\+ADDRESS}}
+, \newline
+\mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a50843e628314f8ee441d800a933b23e3}{ERR\+\_\+\+INTERNAL}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_xbyak_a0a84bc0dd9c07a922876a48add1b6b0a}{Convert\+Error\+To\+String}} (const \mbox{\hyperlink{class_xbyak_1_1_error}{Error}} \&err)
+\item 
+void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_xbyak_acd5e5fdfad3f9247fe1fafc147c13f02}{Aligned\+Malloc}} (size\+\_\+t size, size\+\_\+t alignment)
+\item 
+void \mbox{\hyperlink{namespace_xbyak_a669e145d957208c83bfa93945998a2e8}{Aligned\+Free}} (void \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} To , \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} From $>$ }\\const To \mbox{\hyperlink{namespace_xbyak_ad60ea5f6215534109ed45a19f413a6f0}{Cast\+To}} (From \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})  throw ()
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{namespace_xbyak_ac2775aa479d15e5706271fe108ea5b1e}{operator\texorpdfstring{$\vert$}{|}}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&x, const \mbox{\hyperlink{struct_xbyak_1_1_opmask}{Opmask}} \&k)
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{namespace_xbyak_adedf5a47759006b2a8b58dc3566bcfe8}{operator\texorpdfstring{$\vert$}{|}}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&x, const \mbox{\hyperlink{struct_xbyak_1_1_evex_modifier_zero}{Evex\+Modifier\+Zero}} \&)
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{namespace_xbyak_adc8f16489a1ae9cbb86c3c95bcd170e2}{operator\texorpdfstring{$\vert$}{|}}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&x, const \mbox{\hyperlink{struct_xbyak_1_1_evex_modifier_rounding}{Evex\+Modifier\+Rounding}} \&emr)
+\item 
+\mbox{\hyperlink{class_xbyak_1_1_reg_exp}{Reg\+Exp}} \mbox{\hyperlink{namespace_xbyak_ad3279dbafd16eb38b9d9663820f08967}{operator+}} (const \mbox{\hyperlink{class_xbyak_1_1_reg_exp}{Reg\+Exp}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, const \mbox{\hyperlink{class_xbyak_1_1_reg_exp}{Reg\+Exp}} \&b)
+\item 
+\mbox{\hyperlink{class_xbyak_1_1_reg_exp}{Reg\+Exp}} \mbox{\hyperlink{namespace_xbyak_a53137b1404584ccb48ab44b7b30e5862}{operator\texorpdfstring{$\ast$}{*}}} (const \mbox{\hyperlink{class_xbyak_1_1_reg}{Reg}} \&\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}, int scale)
+\item 
+\mbox{\hyperlink{class_xbyak_1_1_reg_exp}{Reg\+Exp}} \mbox{\hyperlink{namespace_xbyak_a12d73a75b2efac72e5f7fc5c7fc889c6}{operator-\/}} (const \mbox{\hyperlink{class_xbyak_1_1_reg_exp}{Reg\+Exp}} \&e, size\+\_\+t disp)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+void \texorpdfstring{$\ast$}{*}const \mbox{\hyperlink{namespace_xbyak_ad5e0c45dcb6452fbb134519d796b0991}{Auto\+Grow}} = (void\texorpdfstring{$\ast$}{*})1
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{namespace_xbyak_aa801f2c4184cd7654e2033d8977e2260}\index{Xbyak@{Xbyak}!sint64@{sint64}}
+\index{sint64@{sint64}!Xbyak@{Xbyak}}
+\doxysubsubsection{\texorpdfstring{sint64}{sint64}}
+{\footnotesize\ttfamily \label{namespace_xbyak_aa801f2c4184cd7654e2033d8977e2260} 
+typedef \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{namespace_xbyak_aa801f2c4184cd7654e2033d8977e2260}{Xbyak\+::sint64}}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00118}{118}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+\Hypertarget{namespace_xbyak_a64c25188b50730813410b77ea2c17b83}\index{Xbyak@{Xbyak}!uint16@{uint16}}
+\index{uint16@{uint16}!Xbyak@{Xbyak}}
+\doxysubsubsection{\texorpdfstring{uint16}{uint16}}
+{\footnotesize\ttfamily \label{namespace_xbyak_a64c25188b50730813410b77ea2c17b83} 
+typedef unsigned short \mbox{\hyperlink{namespace_xbyak_a64c25188b50730813410b77ea2c17b83}{Xbyak\+::uint16}}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00121}{121}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+\Hypertarget{namespace_xbyak_a880d0e902046fa68ba57ae3fbc4acdf3}\index{Xbyak@{Xbyak}!uint32@{uint32}}
+\index{uint32@{uint32}!Xbyak@{Xbyak}}
+\doxysubsubsection{\texorpdfstring{uint32}{uint32}}
+{\footnotesize\ttfamily \label{namespace_xbyak_a880d0e902046fa68ba57ae3fbc4acdf3} 
+typedef unsigned int \mbox{\hyperlink{namespace_xbyak_a880d0e902046fa68ba57ae3fbc4acdf3}{Xbyak\+::uint32}}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00120}{120}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+\Hypertarget{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}\index{Xbyak@{Xbyak}!uint64@{uint64}}
+\index{uint64@{uint64}!Xbyak@{Xbyak}}
+\doxysubsubsection{\texorpdfstring{uint64}{uint64}}
+{\footnotesize\ttfamily \label{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad} 
+typedef \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{Xbyak\+::uint64}}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00117}{117}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{namespace_xbyak_a280f1cb4eeabb3077bb5a8d9e6523f53}\doxysubsubsection{\texorpdfstring{anonymous enum}{anonymous enum}}
+{\footnotesize\ttfamily \label{namespace_xbyak_a280f1cb4eeabb3077bb5a8d9e6523f53} 
+anonymous enum}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{DEFAULT\_MAX\_CODE\_SIZE@{DEFAULT\_MAX\_CODE\_SIZE}!Xbyak@{Xbyak}}\index{Xbyak@{Xbyak}!DEFAULT\_MAX\_CODE\_SIZE@{DEFAULT\_MAX\_CODE\_SIZE}}}\Hypertarget{namespace_xbyak_a280f1cb4eeabb3077bb5a8d9e6523f53af9b54a9b5d61f3ff04f90e58798b3168}\label{namespace_xbyak_a280f1cb4eeabb3077bb5a8d9e6523f53} 
+DEFAULT\+\_\+\+MAX\+\_\+\+CODE\+\_\+\+SIZE&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{VERSION@{VERSION}!Xbyak@{Xbyak}}\index{Xbyak@{Xbyak}!VERSION@{VERSION}}}\Hypertarget{namespace_xbyak_a280f1cb4eeabb3077bb5a8d9e6523f53a208fbc4575805069e050f092ec735530}\label{namespace_xbyak_a280f1cb4eeabb3077bb5a8d9e6523f53} 
+VERSION&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00106}{106}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00106\ \ \ \ \ \ \{}
+\DoxyCodeLine{00107\ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_a280f1cb4eeabb3077bb5a8d9e6523f53af9b54a9b5d61f3ff04f90e58798b3168}{DEFAULT\_MAX\_CODE\_SIZE}}\ =\ 4096,}
+\DoxyCodeLine{00108\ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_a280f1cb4eeabb3077bb5a8d9e6523f53a208fbc4575805069e050f092ec735530}{VERSION}}\ =\ 0x5630\ \textcolor{comment}{/*\ 0xABCD\ =\ A.BC(D)\ */}}
+\DoxyCodeLine{00109\ \};}
+
+\end{DoxyCode}
+\Hypertarget{namespace_xbyak_a032df0d38632bd776af6589f25127c06}\doxysubsubsection{\texorpdfstring{anonymous enum}{anonymous enum}}
+{\footnotesize\ttfamily \label{namespace_xbyak_a032df0d38632bd776af6589f25127c06} 
+anonymous enum}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ERR\_NONE@{ERR\_NONE}!Xbyak@{Xbyak}}\index{Xbyak@{Xbyak}!ERR\_NONE@{ERR\_NONE}}}\Hypertarget{namespace_xbyak_a032df0d38632bd776af6589f25127c06a0691a78e4bdd252daa8518c00af5b308}\label{namespace_xbyak_a032df0d38632bd776af6589f25127c06} 
+ERR\+\_\+\+NONE&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ERR\_BAD\_ADDRESSING@{ERR\_BAD\_ADDRESSING}!Xbyak@{Xbyak}}\index{Xbyak@{Xbyak}!ERR\_BAD\_ADDRESSING@{ERR\_BAD\_ADDRESSING}}}\Hypertarget{namespace_xbyak_a032df0d38632bd776af6589f25127c06a73b230b497459e850d1dfc4ad0019135}\label{namespace_xbyak_a032df0d38632bd776af6589f25127c06} 
+ERR\+\_\+\+BAD\+\_\+\+ADDRESSING&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ERR\_CODE\_IS\_TOO\_BIG@{ERR\_CODE\_IS\_TOO\_BIG}!Xbyak@{Xbyak}}\index{Xbyak@{Xbyak}!ERR\_CODE\_IS\_TOO\_BIG@{ERR\_CODE\_IS\_TOO\_BIG}}}\Hypertarget{namespace_xbyak_a032df0d38632bd776af6589f25127c06af61b35be85f1cbb5c73e05dad24e268d}\label{namespace_xbyak_a032df0d38632bd776af6589f25127c06} 
+ERR\+\_\+\+CODE\+\_\+\+IS\+\_\+\+TOO\+\_\+\+BIG&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ERR\_BAD\_SCALE@{ERR\_BAD\_SCALE}!Xbyak@{Xbyak}}\index{Xbyak@{Xbyak}!ERR\_BAD\_SCALE@{ERR\_BAD\_SCALE}}}\Hypertarget{namespace_xbyak_a032df0d38632bd776af6589f25127c06a246caaa68df0ce2348c190bcd4051016}\label{namespace_xbyak_a032df0d38632bd776af6589f25127c06} 
+ERR\+\_\+\+BAD\+\_\+\+SCALE&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ERR\_ESP\_CANT\_BE\_INDEX@{ERR\_ESP\_CANT\_BE\_INDEX}!Xbyak@{Xbyak}}\index{Xbyak@{Xbyak}!ERR\_ESP\_CANT\_BE\_INDEX@{ERR\_ESP\_CANT\_BE\_INDEX}}}\Hypertarget{namespace_xbyak_a032df0d38632bd776af6589f25127c06ade9914e9d4ec6a6a91c632bb6a883485}\label{namespace_xbyak_a032df0d38632bd776af6589f25127c06} 
+ERR\+\_\+\+ESP\+\_\+\+CANT\+\_\+\+BE\+\_\+\+INDEX&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ERR\_BAD\_COMBINATION@{ERR\_BAD\_COMBINATION}!Xbyak@{Xbyak}}\index{Xbyak@{Xbyak}!ERR\_BAD\_COMBINATION@{ERR\_BAD\_COMBINATION}}}\Hypertarget{namespace_xbyak_a032df0d38632bd776af6589f25127c06aec974bb4fc18789afc47a32374b95c03}\label{namespace_xbyak_a032df0d38632bd776af6589f25127c06} 
+ERR\+\_\+\+BAD\+\_\+\+COMBINATION&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ERR\_BAD\_SIZE\_OF\_REGISTER@{ERR\_BAD\_SIZE\_OF\_REGISTER}!Xbyak@{Xbyak}}\index{Xbyak@{Xbyak}!ERR\_BAD\_SIZE\_OF\_REGISTER@{ERR\_BAD\_SIZE\_OF\_REGISTER}}}\Hypertarget{namespace_xbyak_a032df0d38632bd776af6589f25127c06a22bbe3522f8ea9a5c9fbd8a8ccd2e56a}\label{namespace_xbyak_a032df0d38632bd776af6589f25127c06} 
+ERR\+\_\+\+BAD\+\_\+\+SIZE\+\_\+\+OF\+\_\+\+REGISTER&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ERR\_IMM\_IS\_TOO\_BIG@{ERR\_IMM\_IS\_TOO\_BIG}!Xbyak@{Xbyak}}\index{Xbyak@{Xbyak}!ERR\_IMM\_IS\_TOO\_BIG@{ERR\_IMM\_IS\_TOO\_BIG}}}\Hypertarget{namespace_xbyak_a032df0d38632bd776af6589f25127c06abb82cfe381ef1db43e601baecf5940ce}\label{namespace_xbyak_a032df0d38632bd776af6589f25127c06} 
+ERR\+\_\+\+IMM\+\_\+\+IS\+\_\+\+TOO\+\_\+\+BIG&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ERR\_BAD\_ALIGN@{ERR\_BAD\_ALIGN}!Xbyak@{Xbyak}}\index{Xbyak@{Xbyak}!ERR\_BAD\_ALIGN@{ERR\_BAD\_ALIGN}}}\Hypertarget{namespace_xbyak_a032df0d38632bd776af6589f25127c06ab3fa729fb0e76c07aa55417071cbef99}\label{namespace_xbyak_a032df0d38632bd776af6589f25127c06} 
+ERR\+\_\+\+BAD\+\_\+\+ALIGN&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ERR\_LABEL\_IS\_REDEFINED@{ERR\_LABEL\_IS\_REDEFINED}!Xbyak@{Xbyak}}\index{Xbyak@{Xbyak}!ERR\_LABEL\_IS\_REDEFINED@{ERR\_LABEL\_IS\_REDEFINED}}}\Hypertarget{namespace_xbyak_a032df0d38632bd776af6589f25127c06a807c8aaba38133effaf36b2572c7a855}\label{namespace_xbyak_a032df0d38632bd776af6589f25127c06} 
+ERR\+\_\+\+LABEL\+\_\+\+IS\+\_\+\+REDEFINED&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ERR\_LABEL\_IS\_TOO\_FAR@{ERR\_LABEL\_IS\_TOO\_FAR}!Xbyak@{Xbyak}}\index{Xbyak@{Xbyak}!ERR\_LABEL\_IS\_TOO\_FAR@{ERR\_LABEL\_IS\_TOO\_FAR}}}\Hypertarget{namespace_xbyak_a032df0d38632bd776af6589f25127c06a841cce0dc70a502cc8e23604b3afb1cf}\label{namespace_xbyak_a032df0d38632bd776af6589f25127c06} 
+ERR\+\_\+\+LABEL\+\_\+\+IS\+\_\+\+TOO\+\_\+\+FAR&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ERR\_LABEL\_IS\_NOT\_FOUND@{ERR\_LABEL\_IS\_NOT\_FOUND}!Xbyak@{Xbyak}}\index{Xbyak@{Xbyak}!ERR\_LABEL\_IS\_NOT\_FOUND@{ERR\_LABEL\_IS\_NOT\_FOUND}}}\Hypertarget{namespace_xbyak_a032df0d38632bd776af6589f25127c06af75e8a7dafc9d2d75a4430d22338f5ac}\label{namespace_xbyak_a032df0d38632bd776af6589f25127c06} 
+ERR\+\_\+\+LABEL\+\_\+\+IS\+\_\+\+NOT\+\_\+\+FOUND&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ERR\_CODE\_ISNOT\_COPYABLE@{ERR\_CODE\_ISNOT\_COPYABLE}!Xbyak@{Xbyak}}\index{Xbyak@{Xbyak}!ERR\_CODE\_ISNOT\_COPYABLE@{ERR\_CODE\_ISNOT\_COPYABLE}}}\Hypertarget{namespace_xbyak_a032df0d38632bd776af6589f25127c06a7a2042cbcaa57af973493cc80904ba6c}\label{namespace_xbyak_a032df0d38632bd776af6589f25127c06} 
+ERR\+\_\+\+CODE\+\_\+\+ISNOT\+\_\+\+COPYABLE&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ERR\_BAD\_PARAMETER@{ERR\_BAD\_PARAMETER}!Xbyak@{Xbyak}}\index{Xbyak@{Xbyak}!ERR\_BAD\_PARAMETER@{ERR\_BAD\_PARAMETER}}}\Hypertarget{namespace_xbyak_a032df0d38632bd776af6589f25127c06ad95586d156d26087eb10d8c0d864beab}\label{namespace_xbyak_a032df0d38632bd776af6589f25127c06} 
+ERR\+\_\+\+BAD\+\_\+\+PARAMETER&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ERR\_CANT\_PROTECT@{ERR\_CANT\_PROTECT}!Xbyak@{Xbyak}}\index{Xbyak@{Xbyak}!ERR\_CANT\_PROTECT@{ERR\_CANT\_PROTECT}}}\Hypertarget{namespace_xbyak_a032df0d38632bd776af6589f25127c06a96d712d0e43db4fc53fcf8823812c26b}\label{namespace_xbyak_a032df0d38632bd776af6589f25127c06} 
+ERR\+\_\+\+CANT\+\_\+\+PROTECT&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ERR\_CANT\_USE\_64BIT\_DISP@{ERR\_CANT\_USE\_64BIT\_DISP}!Xbyak@{Xbyak}}\index{Xbyak@{Xbyak}!ERR\_CANT\_USE\_64BIT\_DISP@{ERR\_CANT\_USE\_64BIT\_DISP}}}\Hypertarget{namespace_xbyak_a032df0d38632bd776af6589f25127c06a9b68abb796f356f5d84f14cb37774495}\label{namespace_xbyak_a032df0d38632bd776af6589f25127c06} 
+ERR\+\_\+\+CANT\+\_\+\+USE\+\_\+64\+BIT\+\_\+\+DISP&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ERR\_OFFSET\_IS\_TOO\_BIG@{ERR\_OFFSET\_IS\_TOO\_BIG}!Xbyak@{Xbyak}}\index{Xbyak@{Xbyak}!ERR\_OFFSET\_IS\_TOO\_BIG@{ERR\_OFFSET\_IS\_TOO\_BIG}}}\Hypertarget{namespace_xbyak_a032df0d38632bd776af6589f25127c06a72d4859ae850c52756e13d0c43cca4cf}\label{namespace_xbyak_a032df0d38632bd776af6589f25127c06} 
+ERR\+\_\+\+OFFSET\+\_\+\+IS\+\_\+\+TOO\+\_\+\+BIG&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ERR\_MEM\_SIZE\_IS\_NOT\_SPECIFIED@{ERR\_MEM\_SIZE\_IS\_NOT\_SPECIFIED}!Xbyak@{Xbyak}}\index{Xbyak@{Xbyak}!ERR\_MEM\_SIZE\_IS\_NOT\_SPECIFIED@{ERR\_MEM\_SIZE\_IS\_NOT\_SPECIFIED}}}\Hypertarget{namespace_xbyak_a032df0d38632bd776af6589f25127c06a064d616f77f3a2226524b33c436f4bb2}\label{namespace_xbyak_a032df0d38632bd776af6589f25127c06} 
+ERR\+\_\+\+MEM\+\_\+\+SIZE\+\_\+\+IS\+\_\+\+NOT\+\_\+\+SPECIFIED&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ERR\_BAD\_MEM\_SIZE@{ERR\_BAD\_MEM\_SIZE}!Xbyak@{Xbyak}}\index{Xbyak@{Xbyak}!ERR\_BAD\_MEM\_SIZE@{ERR\_BAD\_MEM\_SIZE}}}\Hypertarget{namespace_xbyak_a032df0d38632bd776af6589f25127c06a76ce3adbbb43865867090a6e5762ede6}\label{namespace_xbyak_a032df0d38632bd776af6589f25127c06} 
+ERR\+\_\+\+BAD\+\_\+\+MEM\+\_\+\+SIZE&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ERR\_BAD\_ST\_COMBINATION@{ERR\_BAD\_ST\_COMBINATION}!Xbyak@{Xbyak}}\index{Xbyak@{Xbyak}!ERR\_BAD\_ST\_COMBINATION@{ERR\_BAD\_ST\_COMBINATION}}}\Hypertarget{namespace_xbyak_a032df0d38632bd776af6589f25127c06aa6c5fc0cf3e60088eb2000203ae8ebd1}\label{namespace_xbyak_a032df0d38632bd776af6589f25127c06} 
+ERR\+\_\+\+BAD\+\_\+\+ST\+\_\+\+COMBINATION&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ERR\_OVER\_LOCAL\_LABEL@{ERR\_OVER\_LOCAL\_LABEL}!Xbyak@{Xbyak}}\index{Xbyak@{Xbyak}!ERR\_OVER\_LOCAL\_LABEL@{ERR\_OVER\_LOCAL\_LABEL}}}\Hypertarget{namespace_xbyak_a032df0d38632bd776af6589f25127c06ad8b7909a2781d00f56ac0b28cee10b3f}\label{namespace_xbyak_a032df0d38632bd776af6589f25127c06} 
+ERR\+\_\+\+OVER\+\_\+\+LOCAL\+\_\+\+LABEL&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ERR\_UNDER\_LOCAL\_LABEL@{ERR\_UNDER\_LOCAL\_LABEL}!Xbyak@{Xbyak}}\index{Xbyak@{Xbyak}!ERR\_UNDER\_LOCAL\_LABEL@{ERR\_UNDER\_LOCAL\_LABEL}}}\Hypertarget{namespace_xbyak_a032df0d38632bd776af6589f25127c06afd80235203c330292c8b6a13e3528db9}\label{namespace_xbyak_a032df0d38632bd776af6589f25127c06} 
+ERR\+\_\+\+UNDER\+\_\+\+LOCAL\+\_\+\+LABEL&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ERR\_CANT\_ALLOC@{ERR\_CANT\_ALLOC}!Xbyak@{Xbyak}}\index{Xbyak@{Xbyak}!ERR\_CANT\_ALLOC@{ERR\_CANT\_ALLOC}}}\Hypertarget{namespace_xbyak_a032df0d38632bd776af6589f25127c06a1afca0ea4f4af630386c184bcb1a528b}\label{namespace_xbyak_a032df0d38632bd776af6589f25127c06} 
+ERR\+\_\+\+CANT\+\_\+\+ALLOC&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ERR\_ONLY\_T\_NEAR\_IS\_SUPPORTED\_IN\_AUTO\_GROW@{ERR\_ONLY\_T\_NEAR\_IS\_SUPPORTED\_IN\_AUTO\_GROW}!Xbyak@{Xbyak}}\index{Xbyak@{Xbyak}!ERR\_ONLY\_T\_NEAR\_IS\_SUPPORTED\_IN\_AUTO\_GROW@{ERR\_ONLY\_T\_NEAR\_IS\_SUPPORTED\_IN\_AUTO\_GROW}}}\Hypertarget{namespace_xbyak_a032df0d38632bd776af6589f25127c06a0828f53595ac517c91bda86659fda8cf}\label{namespace_xbyak_a032df0d38632bd776af6589f25127c06} 
+ERR\+\_\+\+ONLY\+\_\+\+T\+\_\+\+NEAR\+\_\+\+IS\+\_\+\+SUPPORTED\+\_\+\+IN\+\_\+\+AUTO\+\_\+\+GROW&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ERR\_BAD\_PROTECT\_MODE@{ERR\_BAD\_PROTECT\_MODE}!Xbyak@{Xbyak}}\index{Xbyak@{Xbyak}!ERR\_BAD\_PROTECT\_MODE@{ERR\_BAD\_PROTECT\_MODE}}}\Hypertarget{namespace_xbyak_a032df0d38632bd776af6589f25127c06a0ac8c0e0b16261976cd32b6400fc177d}\label{namespace_xbyak_a032df0d38632bd776af6589f25127c06} 
+ERR\+\_\+\+BAD\+\_\+\+PROTECT\+\_\+\+MODE&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ERR\_BAD\_PNUM@{ERR\_BAD\_PNUM}!Xbyak@{Xbyak}}\index{Xbyak@{Xbyak}!ERR\_BAD\_PNUM@{ERR\_BAD\_PNUM}}}\Hypertarget{namespace_xbyak_a032df0d38632bd776af6589f25127c06a6c4e5038c3ea250a9bd3ce2f52db03c6}\label{namespace_xbyak_a032df0d38632bd776af6589f25127c06} 
+ERR\+\_\+\+BAD\+\_\+\+PNUM&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ERR\_BAD\_TNUM@{ERR\_BAD\_TNUM}!Xbyak@{Xbyak}}\index{Xbyak@{Xbyak}!ERR\_BAD\_TNUM@{ERR\_BAD\_TNUM}}}\Hypertarget{namespace_xbyak_a032df0d38632bd776af6589f25127c06acc9627281fa3e87754e20898cc691b50}\label{namespace_xbyak_a032df0d38632bd776af6589f25127c06} 
+ERR\+\_\+\+BAD\+\_\+\+TNUM&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ERR\_BAD\_VSIB\_ADDRESSING@{ERR\_BAD\_VSIB\_ADDRESSING}!Xbyak@{Xbyak}}\index{Xbyak@{Xbyak}!ERR\_BAD\_VSIB\_ADDRESSING@{ERR\_BAD\_VSIB\_ADDRESSING}}}\Hypertarget{namespace_xbyak_a032df0d38632bd776af6589f25127c06a24e875a48f33f3c5596b43105423d5d7}\label{namespace_xbyak_a032df0d38632bd776af6589f25127c06} 
+ERR\+\_\+\+BAD\+\_\+\+VSIB\+\_\+\+ADDRESSING&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ERR\_CANT\_CONVERT@{ERR\_CANT\_CONVERT}!Xbyak@{Xbyak}}\index{Xbyak@{Xbyak}!ERR\_CANT\_CONVERT@{ERR\_CANT\_CONVERT}}}\Hypertarget{namespace_xbyak_a032df0d38632bd776af6589f25127c06a2b4641b294f3f1e2bc518fbbe640313a}\label{namespace_xbyak_a032df0d38632bd776af6589f25127c06} 
+ERR\+\_\+\+CANT\+\_\+\+CONVERT&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ERR\_LABEL\_ISNOT\_SET\_BY\_L@{ERR\_LABEL\_ISNOT\_SET\_BY\_L}!Xbyak@{Xbyak}}\index{Xbyak@{Xbyak}!ERR\_LABEL\_ISNOT\_SET\_BY\_L@{ERR\_LABEL\_ISNOT\_SET\_BY\_L}}}\Hypertarget{namespace_xbyak_a032df0d38632bd776af6589f25127c06a7670b0b6242a1acd2176dfb48b4e3eec}\label{namespace_xbyak_a032df0d38632bd776af6589f25127c06} 
+ERR\+\_\+\+LABEL\+\_\+\+ISNOT\+\_\+\+SET\+\_\+\+BY\+\_\+L&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ERR\_LABEL\_IS\_ALREADY\_SET\_BY\_L@{ERR\_LABEL\_IS\_ALREADY\_SET\_BY\_L}!Xbyak@{Xbyak}}\index{Xbyak@{Xbyak}!ERR\_LABEL\_IS\_ALREADY\_SET\_BY\_L@{ERR\_LABEL\_IS\_ALREADY\_SET\_BY\_L}}}\Hypertarget{namespace_xbyak_a032df0d38632bd776af6589f25127c06ab5cabef7104ab6d8bd964e469cc647a8}\label{namespace_xbyak_a032df0d38632bd776af6589f25127c06} 
+ERR\+\_\+\+LABEL\+\_\+\+IS\+\_\+\+ALREADY\+\_\+\+SET\+\_\+\+BY\+\_\+L&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ERR\_BAD\_LABEL\_STR@{ERR\_BAD\_LABEL\_STR}!Xbyak@{Xbyak}}\index{Xbyak@{Xbyak}!ERR\_BAD\_LABEL\_STR@{ERR\_BAD\_LABEL\_STR}}}\Hypertarget{namespace_xbyak_a032df0d38632bd776af6589f25127c06a1bcd0cf493398ea6d89ee4aaf7e65632}\label{namespace_xbyak_a032df0d38632bd776af6589f25127c06} 
+ERR\+\_\+\+BAD\+\_\+\+LABEL\+\_\+\+STR&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ERR\_MUNMAP@{ERR\_MUNMAP}!Xbyak@{Xbyak}}\index{Xbyak@{Xbyak}!ERR\_MUNMAP@{ERR\_MUNMAP}}}\Hypertarget{namespace_xbyak_a032df0d38632bd776af6589f25127c06adf0441b7061eb6668a8720e58c92726b}\label{namespace_xbyak_a032df0d38632bd776af6589f25127c06} 
+ERR\+\_\+\+MUNMAP&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ERR\_OPMASK\_IS\_ALREADY\_SET@{ERR\_OPMASK\_IS\_ALREADY\_SET}!Xbyak@{Xbyak}}\index{Xbyak@{Xbyak}!ERR\_OPMASK\_IS\_ALREADY\_SET@{ERR\_OPMASK\_IS\_ALREADY\_SET}}}\Hypertarget{namespace_xbyak_a032df0d38632bd776af6589f25127c06a30e9e47e0cd3323bd4cb4fad462b8dd1}\label{namespace_xbyak_a032df0d38632bd776af6589f25127c06} 
+ERR\+\_\+\+OPMASK\+\_\+\+IS\+\_\+\+ALREADY\+\_\+\+SET&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ERR\_ROUNDING\_IS\_ALREADY\_SET@{ERR\_ROUNDING\_IS\_ALREADY\_SET}!Xbyak@{Xbyak}}\index{Xbyak@{Xbyak}!ERR\_ROUNDING\_IS\_ALREADY\_SET@{ERR\_ROUNDING\_IS\_ALREADY\_SET}}}\Hypertarget{namespace_xbyak_a032df0d38632bd776af6589f25127c06a3e9e698e685de7ab55bce7c6d4596b36}\label{namespace_xbyak_a032df0d38632bd776af6589f25127c06} 
+ERR\+\_\+\+ROUNDING\+\_\+\+IS\+\_\+\+ALREADY\+\_\+\+SET&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ERR\_K0\_IS\_INVALID@{ERR\_K0\_IS\_INVALID}!Xbyak@{Xbyak}}\index{Xbyak@{Xbyak}!ERR\_K0\_IS\_INVALID@{ERR\_K0\_IS\_INVALID}}}\Hypertarget{namespace_xbyak_a032df0d38632bd776af6589f25127c06ad0dd5d1dafb007ac290a3bba4c61c94e}\label{namespace_xbyak_a032df0d38632bd776af6589f25127c06} 
+ERR\+\_\+\+K0\+\_\+\+IS\+\_\+\+INVALID&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ERR\_EVEX\_IS\_INVALID@{ERR\_EVEX\_IS\_INVALID}!Xbyak@{Xbyak}}\index{Xbyak@{Xbyak}!ERR\_EVEX\_IS\_INVALID@{ERR\_EVEX\_IS\_INVALID}}}\Hypertarget{namespace_xbyak_a032df0d38632bd776af6589f25127c06aae0a0a338652bc379f4e16d0dd72336f}\label{namespace_xbyak_a032df0d38632bd776af6589f25127c06} 
+ERR\+\_\+\+EVEX\+\_\+\+IS\+\_\+\+INVALID&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ERR\_SAE\_IS\_INVALID@{ERR\_SAE\_IS\_INVALID}!Xbyak@{Xbyak}}\index{Xbyak@{Xbyak}!ERR\_SAE\_IS\_INVALID@{ERR\_SAE\_IS\_INVALID}}}\Hypertarget{namespace_xbyak_a032df0d38632bd776af6589f25127c06a5284baa3dd2915263452a2e63f6f3e6d}\label{namespace_xbyak_a032df0d38632bd776af6589f25127c06} 
+ERR\+\_\+\+SAE\+\_\+\+IS\+\_\+\+INVALID&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ERR\_ER\_IS\_INVALID@{ERR\_ER\_IS\_INVALID}!Xbyak@{Xbyak}}\index{Xbyak@{Xbyak}!ERR\_ER\_IS\_INVALID@{ERR\_ER\_IS\_INVALID}}}\Hypertarget{namespace_xbyak_a032df0d38632bd776af6589f25127c06a841852a8eda37c1cb73ab10dd5fea2a3}\label{namespace_xbyak_a032df0d38632bd776af6589f25127c06} 
+ERR\+\_\+\+ER\+\_\+\+IS\+\_\+\+INVALID&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ERR\_INVALID\_BROADCAST@{ERR\_INVALID\_BROADCAST}!Xbyak@{Xbyak}}\index{Xbyak@{Xbyak}!ERR\_INVALID\_BROADCAST@{ERR\_INVALID\_BROADCAST}}}\Hypertarget{namespace_xbyak_a032df0d38632bd776af6589f25127c06a0b8f8d3791d848000830f4ca37ea124f}\label{namespace_xbyak_a032df0d38632bd776af6589f25127c06} 
+ERR\+\_\+\+INVALID\+\_\+\+BROADCAST&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ERR\_INVALID\_OPMASK\_WITH\_MEMORY@{ERR\_INVALID\_OPMASK\_WITH\_MEMORY}!Xbyak@{Xbyak}}\index{Xbyak@{Xbyak}!ERR\_INVALID\_OPMASK\_WITH\_MEMORY@{ERR\_INVALID\_OPMASK\_WITH\_MEMORY}}}\Hypertarget{namespace_xbyak_a032df0d38632bd776af6589f25127c06adbd2b83e7cd3f27d260605d2a1be3f7a}\label{namespace_xbyak_a032df0d38632bd776af6589f25127c06} 
+ERR\+\_\+\+INVALID\+\_\+\+OPMASK\+\_\+\+WITH\+\_\+\+MEMORY&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ERR\_INVALID\_ZERO@{ERR\_INVALID\_ZERO}!Xbyak@{Xbyak}}\index{Xbyak@{Xbyak}!ERR\_INVALID\_ZERO@{ERR\_INVALID\_ZERO}}}\Hypertarget{namespace_xbyak_a032df0d38632bd776af6589f25127c06a96d8537d1140d96d6a1d754ecb80b27c}\label{namespace_xbyak_a032df0d38632bd776af6589f25127c06} 
+ERR\+\_\+\+INVALID\+\_\+\+ZERO&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ERR\_INVALID\_RIP\_IN\_AUTO\_GROW@{ERR\_INVALID\_RIP\_IN\_AUTO\_GROW}!Xbyak@{Xbyak}}\index{Xbyak@{Xbyak}!ERR\_INVALID\_RIP\_IN\_AUTO\_GROW@{ERR\_INVALID\_RIP\_IN\_AUTO\_GROW}}}\Hypertarget{namespace_xbyak_a032df0d38632bd776af6589f25127c06afb971fce27301c591063bdb1dba9f171}\label{namespace_xbyak_a032df0d38632bd776af6589f25127c06} 
+ERR\+\_\+\+INVALID\+\_\+\+RIP\+\_\+\+IN\+\_\+\+AUTO\+\_\+\+GROW&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ERR\_INVALID\_MIB\_ADDRESS@{ERR\_INVALID\_MIB\_ADDRESS}!Xbyak@{Xbyak}}\index{Xbyak@{Xbyak}!ERR\_INVALID\_MIB\_ADDRESS@{ERR\_INVALID\_MIB\_ADDRESS}}}\Hypertarget{namespace_xbyak_a032df0d38632bd776af6589f25127c06a9b82c2e8f7faac37dbdc80041f8e4a88}\label{namespace_xbyak_a032df0d38632bd776af6589f25127c06} 
+ERR\+\_\+\+INVALID\+\_\+\+MIB\+\_\+\+ADDRESS&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ERR\_INTERNAL@{ERR\_INTERNAL}!Xbyak@{Xbyak}}\index{Xbyak@{Xbyak}!ERR\_INTERNAL@{ERR\_INTERNAL}}}\Hypertarget{namespace_xbyak_a032df0d38632bd776af6589f25127c06a50843e628314f8ee441d800a933b23e3}\label{namespace_xbyak_a032df0d38632bd776af6589f25127c06} 
+ERR\+\_\+\+INTERNAL&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00136}{136}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00136\ \ \ \ \ \ \{}
+\DoxyCodeLine{00137\ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a0691a78e4bdd252daa8518c00af5b308}{ERR\_NONE}}\ =\ 0,}
+\DoxyCodeLine{00138\ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a73b230b497459e850d1dfc4ad0019135}{ERR\_BAD\_ADDRESSING}},}
+\DoxyCodeLine{00139\ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06af61b35be85f1cbb5c73e05dad24e268d}{ERR\_CODE\_IS\_TOO\_BIG}},}
+\DoxyCodeLine{00140\ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a246caaa68df0ce2348c190bcd4051016}{ERR\_BAD\_SCALE}},}
+\DoxyCodeLine{00141\ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06ade9914e9d4ec6a6a91c632bb6a883485}{ERR\_ESP\_CANT\_BE\_INDEX}},}
+\DoxyCodeLine{00142\ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06aec974bb4fc18789afc47a32374b95c03}{ERR\_BAD\_COMBINATION}},}
+\DoxyCodeLine{00143\ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a22bbe3522f8ea9a5c9fbd8a8ccd2e56a}{ERR\_BAD\_SIZE\_OF\_REGISTER}},}
+\DoxyCodeLine{00144\ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06abb82cfe381ef1db43e601baecf5940ce}{ERR\_IMM\_IS\_TOO\_BIG}},}
+\DoxyCodeLine{00145\ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06ab3fa729fb0e76c07aa55417071cbef99}{ERR\_BAD\_ALIGN}},}
+\DoxyCodeLine{00146\ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a807c8aaba38133effaf36b2572c7a855}{ERR\_LABEL\_IS\_REDEFINED}},}
+\DoxyCodeLine{00147\ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a841cce0dc70a502cc8e23604b3afb1cf}{ERR\_LABEL\_IS\_TOO\_FAR}},}
+\DoxyCodeLine{00148\ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06af75e8a7dafc9d2d75a4430d22338f5ac}{ERR\_LABEL\_IS\_NOT\_FOUND}},}
+\DoxyCodeLine{00149\ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a7a2042cbcaa57af973493cc80904ba6c}{ERR\_CODE\_ISNOT\_COPYABLE}},}
+\DoxyCodeLine{00150\ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06ad95586d156d26087eb10d8c0d864beab}{ERR\_BAD\_PARAMETER}},}
+\DoxyCodeLine{00151\ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a96d712d0e43db4fc53fcf8823812c26b}{ERR\_CANT\_PROTECT}},}
+\DoxyCodeLine{00152\ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a9b68abb796f356f5d84f14cb37774495}{ERR\_CANT\_USE\_64BIT\_DISP}},}
+\DoxyCodeLine{00153\ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a72d4859ae850c52756e13d0c43cca4cf}{ERR\_OFFSET\_IS\_TOO\_BIG}},}
+\DoxyCodeLine{00154\ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a064d616f77f3a2226524b33c436f4bb2}{ERR\_MEM\_SIZE\_IS\_NOT\_SPECIFIED}},}
+\DoxyCodeLine{00155\ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a76ce3adbbb43865867090a6e5762ede6}{ERR\_BAD\_MEM\_SIZE}},}
+\DoxyCodeLine{00156\ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06aa6c5fc0cf3e60088eb2000203ae8ebd1}{ERR\_BAD\_ST\_COMBINATION}},}
+\DoxyCodeLine{00157\ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06ad8b7909a2781d00f56ac0b28cee10b3f}{ERR\_OVER\_LOCAL\_LABEL}},\ \textcolor{comment}{//\ not\ used}}
+\DoxyCodeLine{00158\ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06afd80235203c330292c8b6a13e3528db9}{ERR\_UNDER\_LOCAL\_LABEL}},}
+\DoxyCodeLine{00159\ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a1afca0ea4f4af630386c184bcb1a528b}{ERR\_CANT\_ALLOC}},}
+\DoxyCodeLine{00160\ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a0828f53595ac517c91bda86659fda8cf}{ERR\_ONLY\_T\_NEAR\_IS\_SUPPORTED\_IN\_AUTO\_GROW}},}
+\DoxyCodeLine{00161\ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a0ac8c0e0b16261976cd32b6400fc177d}{ERR\_BAD\_PROTECT\_MODE}},}
+\DoxyCodeLine{00162\ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a6c4e5038c3ea250a9bd3ce2f52db03c6}{ERR\_BAD\_PNUM}},}
+\DoxyCodeLine{00163\ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06acc9627281fa3e87754e20898cc691b50}{ERR\_BAD\_TNUM}},}
+\DoxyCodeLine{00164\ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a24e875a48f33f3c5596b43105423d5d7}{ERR\_BAD\_VSIB\_ADDRESSING}},}
+\DoxyCodeLine{00165\ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a2b4641b294f3f1e2bc518fbbe640313a}{ERR\_CANT\_CONVERT}},}
+\DoxyCodeLine{00166\ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a7670b0b6242a1acd2176dfb48b4e3eec}{ERR\_LABEL\_ISNOT\_SET\_BY\_L}},}
+\DoxyCodeLine{00167\ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06ab5cabef7104ab6d8bd964e469cc647a8}{ERR\_LABEL\_IS\_ALREADY\_SET\_BY\_L}},}
+\DoxyCodeLine{00168\ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a1bcd0cf493398ea6d89ee4aaf7e65632}{ERR\_BAD\_LABEL\_STR}},}
+\DoxyCodeLine{00169\ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06adf0441b7061eb6668a8720e58c92726b}{ERR\_MUNMAP}},}
+\DoxyCodeLine{00170\ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a30e9e47e0cd3323bd4cb4fad462b8dd1}{ERR\_OPMASK\_IS\_ALREADY\_SET}},}
+\DoxyCodeLine{00171\ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a3e9e698e685de7ab55bce7c6d4596b36}{ERR\_ROUNDING\_IS\_ALREADY\_SET}},}
+\DoxyCodeLine{00172\ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06ad0dd5d1dafb007ac290a3bba4c61c94e}{ERR\_K0\_IS\_INVALID}},}
+\DoxyCodeLine{00173\ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06aae0a0a338652bc379f4e16d0dd72336f}{ERR\_EVEX\_IS\_INVALID}},}
+\DoxyCodeLine{00174\ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a5284baa3dd2915263452a2e63f6f3e6d}{ERR\_SAE\_IS\_INVALID}},}
+\DoxyCodeLine{00175\ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a841852a8eda37c1cb73ab10dd5fea2a3}{ERR\_ER\_IS\_INVALID}},}
+\DoxyCodeLine{00176\ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a0b8f8d3791d848000830f4ca37ea124f}{ERR\_INVALID\_BROADCAST}},}
+\DoxyCodeLine{00177\ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06adbd2b83e7cd3f27d260605d2a1be3f7a}{ERR\_INVALID\_OPMASK\_WITH\_MEMORY}},}
+\DoxyCodeLine{00178\ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a96d8537d1140d96d6a1d754ecb80b27c}{ERR\_INVALID\_ZERO}},}
+\DoxyCodeLine{00179\ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06afb971fce27301c591063bdb1dba9f171}{ERR\_INVALID\_RIP\_IN\_AUTO\_GROW}},}
+\DoxyCodeLine{00180\ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a9b82c2e8f7faac37dbdc80041f8e4a88}{ERR\_INVALID\_MIB\_ADDRESS}},}
+\DoxyCodeLine{00181\ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06a50843e628314f8ee441d800a933b23e3}{ERR\_INTERNAL}}}
+\DoxyCodeLine{00182\ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespace_xbyak_a669e145d957208c83bfa93945998a2e8}\index{Xbyak@{Xbyak}!AlignedFree@{AlignedFree}}
+\index{AlignedFree@{AlignedFree}!Xbyak@{Xbyak}}
+\doxysubsubsection{\texorpdfstring{AlignedFree()}{AlignedFree()}}
+{\footnotesize\ttfamily \label{namespace_xbyak_a669e145d957208c83bfa93945998a2e8} 
+void Xbyak\+::\+Aligned\+Free (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{p}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00267}{267}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00268\ \{}
+\DoxyCodeLine{00269\ \textcolor{preprocessor}{\#ifdef\ \_\_MINGW32\_\_}}
+\DoxyCodeLine{00270\ \ \ \ \ \_\_mingw\_aligned\_free(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}});}
+\DoxyCodeLine{00271\ \textcolor{preprocessor}{\#elif\ defined(\_MSC\_VER)}}
+\DoxyCodeLine{00272\ \ \ \ \ \_aligned\_free(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}});}
+\DoxyCodeLine{00273\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00274\ \ \ \ \ free(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}});}
+\DoxyCodeLine{00275\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00276\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=328pt]{namespace_xbyak_a669e145d957208c83bfa93945998a2e8_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_xbyak_acd5e5fdfad3f9247fe1fafc147c13f02}\index{Xbyak@{Xbyak}!AlignedMalloc@{AlignedMalloc}}
+\index{AlignedMalloc@{AlignedMalloc}!Xbyak@{Xbyak}}
+\doxysubsubsection{\texorpdfstring{AlignedMalloc()}{AlignedMalloc()}}
+{\footnotesize\ttfamily \label{namespace_xbyak_acd5e5fdfad3f9247fe1fafc147c13f02} 
+void \texorpdfstring{$\ast$}{*} Xbyak\+::\+Aligned\+Malloc (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{size}{, }\item[{size\+\_\+t}]{alignment}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00254}{254}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00255\ \{}
+\DoxyCodeLine{00256\ \textcolor{preprocessor}{\#ifdef\ \_\_MINGW32\_\_}}
+\DoxyCodeLine{00257\ \ \ \ \ \textcolor{keywordflow}{return}\ \_\_mingw\_aligned\_malloc(size,\ alignment);}
+\DoxyCodeLine{00258\ \textcolor{preprocessor}{\#elif\ defined(\_WIN32)}}
+\DoxyCodeLine{00259\ \ \ \ \ \textcolor{keywordflow}{return}\ \_aligned\_malloc(size,\ alignment);}
+\DoxyCodeLine{00260\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00261\ \ \ \ \ \textcolor{keywordtype}{void}\ *\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}};}
+\DoxyCodeLine{00262\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ posix\_memalign(\&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\ alignment,\ size);}
+\DoxyCodeLine{00263\ \ \ \ \ \textcolor{keywordflow}{return}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ ==\ 0)\ ?\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ :\ 0;}
+\DoxyCodeLine{00264\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00265\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=341pt]{namespace_xbyak_acd5e5fdfad3f9247fe1fafc147c13f02_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_xbyak_ad60ea5f6215534109ed45a19f413a6f0}\index{Xbyak@{Xbyak}!CastTo@{CastTo}}
+\index{CastTo@{CastTo}!Xbyak@{Xbyak}}
+\doxysubsubsection{\texorpdfstring{CastTo()}{CastTo()}}
+{\footnotesize\ttfamily \label{namespace_xbyak_ad60ea5f6215534109ed45a19f413a6f0} 
+template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} To , \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} From $>$ \\
+const To Xbyak\+::\+Cast\+To (\begin{DoxyParamCaption}\item[{From}]{p}{}\end{DoxyParamCaption}) throw ( ) \hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00279}{279}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00280\ \{}
+\DoxyCodeLine{00281\ \ \ \ \ \textcolor{keywordflow}{return}\ (\textcolor{keyword}{const}\ To)(size\_t)(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}});}
+\DoxyCodeLine{00282\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_xbyak_ad60ea5f6215534109ed45a19f413a6f0_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_xbyak_a0a84bc0dd9c07a922876a48add1b6b0a}\index{Xbyak@{Xbyak}!ConvertErrorToString@{ConvertErrorToString}}
+\index{ConvertErrorToString@{ConvertErrorToString}!Xbyak@{Xbyak}}
+\doxysubsubsection{\texorpdfstring{ConvertErrorToString()}{ConvertErrorToString()}}
+{\footnotesize\ttfamily \label{namespace_xbyak_a0a84bc0dd9c07a922876a48add1b6b0a} 
+const char \texorpdfstring{$\ast$}{*} Xbyak\+::\+Convert\+Error\+To\+String (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_xbyak_1_1_error}{Error}} \&}]{err}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00249}{249}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00250\ \{}
+\DoxyCodeLine{00251\ \ \ \ \ \textcolor{keywordflow}{return}\ err.\mbox{\hyperlink{class_xbyak_1_1_error_a9c9d5a611b9bff74aea56de5b7ea87d4}{what}}();}
+\DoxyCodeLine{00252\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespace_xbyak_a53137b1404584ccb48ab44b7b30e5862}\index{Xbyak@{Xbyak}!operator\texorpdfstring{$\ast$}{*}@{operator\texorpdfstring{$\ast$}{*}}}
+\index{operator\texorpdfstring{$\ast$}{*}@{operator\texorpdfstring{$\ast$}{*}}!Xbyak@{Xbyak}}
+\doxysubsubsection{\texorpdfstring{operator\texorpdfstring{$\ast$}{*}()}{operator*()}}
+{\footnotesize\ttfamily \label{namespace_xbyak_a53137b1404584ccb48ab44b7b30e5862} 
+\mbox{\hyperlink{class_xbyak_1_1_reg_exp}{Reg\+Exp}} Xbyak\+::operator\texorpdfstring{$\ast$}{*} (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_xbyak_1_1_reg}{Reg}} \&}]{r}{, }\item[{int}]{scale}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00776}{776}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00777\ \{}
+\DoxyCodeLine{00778\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_xbyak_1_1_reg_exp}{RegExp}}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ scale);}
+\DoxyCodeLine{00779\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespace_xbyak_ad3279dbafd16eb38b9d9663820f08967}\index{Xbyak@{Xbyak}!operator+@{operator+}}
+\index{operator+@{operator+}!Xbyak@{Xbyak}}
+\doxysubsubsection{\texorpdfstring{operator+()}{operator+()}}
+{\footnotesize\ttfamily \label{namespace_xbyak_ad3279dbafd16eb38b9d9663820f08967} 
+\mbox{\hyperlink{class_xbyak_1_1_reg_exp}{Reg\+Exp}} Xbyak\+::operator+ (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_xbyak_1_1_reg_exp}{Reg\+Exp}} \&}]{a}{, }\item[{const \mbox{\hyperlink{class_xbyak_1_1_reg_exp}{Reg\+Exp}} \&}]{b}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00756}{756}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00757\ \{}
+\DoxyCodeLine{00758\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.index\_.getBit()\ \&\&\ b.index\_.\mbox{\hyperlink{class_xbyak_1_1_operand_ab855bd6658a3e238422d2bcf81f96873}{getBit}}())\ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{calc_8cpp_a2c3e4bb40f36b262a5214e2da2bca9c5}{Error}}(ERR\_BAD\_ADDRESSING);}
+\DoxyCodeLine{00759\ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_reg_exp}{RegExp}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}};}
+\DoxyCodeLine{00760\ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.index\_.getBit())\ \{\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.index\_\ =\ b.index\_;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.scale\_\ =\ b.scale\_;\ \}}
+\DoxyCodeLine{00761\ \ \ \ \ \textcolor{keywordflow}{if}\ (b.base\_.\mbox{\hyperlink{class_xbyak_1_1_operand_ab855bd6658a3e238422d2bcf81f96873}{getBit}}())\ \{}
+\DoxyCodeLine{00762\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.base\_.getBit())\ \{}
+\DoxyCodeLine{00763\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.index\_.getBit())\ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{calc_8cpp_a2c3e4bb40f36b262a5214e2da2bca9c5}{Error}}(ERR\_BAD\_ADDRESSING);}
+\DoxyCodeLine{00764\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ base\ +\ base\ =>\ base\ +\ index\ *\ 1}}
+\DoxyCodeLine{00765\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.index\_\ =\ b.base\_;}
+\DoxyCodeLine{00766\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ [reg\ +\ esp]\ =>\ [esp\ +\ reg]}}
+\DoxyCodeLine{00767\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.index\_.getIdx()\ ==\ Operand::ESP)\ \mbox{\hyperlink{namespacestd_abb7e41c7063536ff6eeee4bb5f66de6c}{std::swap}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.base\_,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.index\_);}
+\DoxyCodeLine{00768\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.scale\_\ =\ 1;}
+\DoxyCodeLine{00769\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00770\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.base\_\ =\ b.base\_;}
+\DoxyCodeLine{00771\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00772\ \ \ \ \ \}}
+\DoxyCodeLine{00773\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.disp\_\ +=\ b.disp\_;}
+\DoxyCodeLine{00774\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00775\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespace_xbyak_a12d73a75b2efac72e5f7fc5c7fc889c6}\index{Xbyak@{Xbyak}!operator-\/@{operator-\/}}
+\index{operator-\/@{operator-\/}!Xbyak@{Xbyak}}
+\doxysubsubsection{\texorpdfstring{operator-\/()}{operator-()}}
+{\footnotesize\ttfamily \label{namespace_xbyak_a12d73a75b2efac72e5f7fc5c7fc889c6} 
+\mbox{\hyperlink{class_xbyak_1_1_reg_exp}{Reg\+Exp}} Xbyak\+::operator-\/ (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_xbyak_1_1_reg_exp}{Reg\+Exp}} \&}]{e}{, }\item[{size\+\_\+t}]{disp}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00780}{780}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00781\ \{}
+\DoxyCodeLine{00782\ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_reg_exp}{RegExp}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ e;}
+\DoxyCodeLine{00783\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.disp\_\ -\/=\ disp;}
+\DoxyCodeLine{00784\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00785\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespace_xbyak_adc8f16489a1ae9cbb86c3c95bcd170e2}\index{Xbyak@{Xbyak}!operator\texttt{"|}@{operator\texttt{"|}}}
+\index{operator\texttt{"|}@{operator\texttt{"|}}!Xbyak@{Xbyak}}
+\doxysubsubsection{\texorpdfstring{operator\texttt{"|}()}{operator|()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{namespace_xbyak_adc8f16489a1ae9cbb86c3c95bcd170e2} 
+template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} Xbyak\+::operator\texorpdfstring{$\vert$}{|} (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{x}{, }\item[{const \mbox{\hyperlink{struct_xbyak_1_1_evex_modifier_rounding}{Evex\+Modifier\+Rounding}} \&}]{emr}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00599}{599}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00599\ \{\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}(x);\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.setRounding(emr.\mbox{\hyperlink{struct_xbyak_1_1_evex_modifier_rounding_a72f26335c7d0e1503c20fd620f2e3717}{rounding}});\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespace_xbyak_adedf5a47759006b2a8b58dc3566bcfe8}\index{Xbyak@{Xbyak}!operator\texttt{"|}@{operator\texttt{"|}}}
+\index{operator\texttt{"|}@{operator\texttt{"|}}!Xbyak@{Xbyak}}
+\doxysubsubsection{\texorpdfstring{operator\texttt{"|}()}{operator|()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{namespace_xbyak_adedf5a47759006b2a8b58dc3566bcfe8} 
+template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} Xbyak\+::operator\texorpdfstring{$\vert$}{|} (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{x}{, }\item[{const \mbox{\hyperlink{struct_xbyak_1_1_evex_modifier_zero}{Evex\+Modifier\+Zero}} \&}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00598}{598}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00598\ \{\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}(x);\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.setZero();\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespace_xbyak_ac2775aa479d15e5706271fe108ea5b1e}\index{Xbyak@{Xbyak}!operator\texttt{"|}@{operator\texttt{"|}}}
+\index{operator\texttt{"|}@{operator\texttt{"|}}!Xbyak@{Xbyak}}
+\doxysubsubsection{\texorpdfstring{operator\texttt{"|}()}{operator|()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{namespace_xbyak_ac2775aa479d15e5706271fe108ea5b1e} 
+template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} Xbyak\+::operator\texorpdfstring{$\vert$}{|} (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{x}{, }\item[{const \mbox{\hyperlink{struct_xbyak_1_1_opmask}{Opmask}} \&}]{k}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00597}{597}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00597\ \{\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}(x);\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.setOpmaskIdx(k.\mbox{\hyperlink{class_xbyak_1_1_operand_a9722a98c75928e06e3be3198b7aaa426}{getIdx}}());\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{namespace_xbyak_ad5e0c45dcb6452fbb134519d796b0991}\index{Xbyak@{Xbyak}!AutoGrow@{AutoGrow}}
+\index{AutoGrow@{AutoGrow}!Xbyak@{Xbyak}}
+\doxysubsubsection{\texorpdfstring{AutoGrow}{AutoGrow}}
+{\footnotesize\ttfamily \label{namespace_xbyak_ad5e0c45dcb6452fbb134519d796b0991} 
+void\texorpdfstring{$\ast$}{*} const Xbyak\+::\+Auto\+Grow = (void\texorpdfstring{$\ast$}{*})1}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00788}{788}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+

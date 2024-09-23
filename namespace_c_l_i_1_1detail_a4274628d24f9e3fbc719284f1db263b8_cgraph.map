@@ -1,0 +1,8 @@
+<map id="CLI::detail::valid_name_string" name="CLI::detail::valid_name_string">
+<area shape="rect" id="Node000001" title="Verify an option name." alt="" coords="5,5,122,46"/>
+<area shape="rect" id="Node000002" href="$namespace_c_l_i_1_1detail.html#a3a05d1129df69e88135e178137b1fd89" title="Verify the first character of an option." alt="" coords="334,5,450,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="122,20,170,19,286,19,319,20,318,25,286,24,170,24,122,26"/>
+<area shape="rect" id="Node000003" href="$namespace_c_l_i_1_1detail.html#a841371d5dbb0a52f453de4cc1d00cc51" title="Verify following characters of an option." alt="" coords="170,33,286,74"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="123,33,155,39,154,44,122,38"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="286,41,318,36,319,41,287,46"/>
+</map>

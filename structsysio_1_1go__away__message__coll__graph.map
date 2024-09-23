@@ -1,0 +1,5 @@
+<map id="sysio::go_away_message" name="sysio::go_away_message">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,94,178,120"/>
+<area shape="rect" id="Node000002" href="$classfc_1_1sha256.html" title=" " alt="" coords="50,5,133,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="94,47,94,94,89,94,89,47"/>
+</map>

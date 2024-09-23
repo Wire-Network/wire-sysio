@@ -1,0 +1,211 @@
+\doxysection{testing\+::internal\+::Size\+Is\+Matcher\texorpdfstring{$<$}{<} Size\+Matcher \texorpdfstring{$>$}{>}\+::Impl\texorpdfstring{$<$}{<} Container \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classtesting_1_1internal_1_1_size_is_matcher_1_1_impl}{}\label{classtesting_1_1internal_1_1_size_is_matcher_1_1_impl}\index{testing::internal::SizeIsMatcher$<$ SizeMatcher $>$::Impl$<$ Container $>$@{testing::internal::SizeIsMatcher$<$ SizeMatcher $>$::Impl$<$ Container $>$}}
+
+
+{\ttfamily \#include $<$gmock-\/matchers.\+h$>$}
+
+
+
+Inheritance diagram for testing\+::internal\+::Size\+Is\+Matcher\texorpdfstring{$<$}{<} Size\+Matcher \texorpdfstring{$>$}{>}\+::Impl\texorpdfstring{$<$}{<} Container \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=223pt]{classtesting_1_1internal_1_1_size_is_matcher_1_1_impl__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for testing\+::internal\+::Size\+Is\+Matcher\texorpdfstring{$<$}{<} Size\+Matcher \texorpdfstring{$>$}{>}\+::Impl\texorpdfstring{$<$}{<} Container \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=223pt]{classtesting_1_1internal_1_1_size_is_matcher_1_1_impl__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{classtesting_1_1internal_1_1_stl_container_view}{internal\+::\+Stl\+Container\+View}}$<$ \mbox{\hyperlink{gtest-internal_8h_a874567b176266188fabfffb8393267ce}{GTEST\+\_\+\+REMOVE\+\_\+\+REFERENCE\+\_\+\+AND\+\_\+\+CONST\+\_\+}}(Container)$>$ \mbox{\hyperlink{classtesting_1_1internal_1_1_size_is_matcher_1_1_impl_ad87cca05ed55d7f388021adbfd5d7ec2}{Container\+View}}
+\item 
+typedef Container\+View\+::type\+::size\+\_\+type \mbox{\hyperlink{classtesting_1_1internal_1_1_size_is_matcher_1_1_impl_a94d938fbc79eabf9e89c066cdf03428d}{Size\+Type}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_size_is_matcher_1_1_impl_aa5279c8598ec8982546350fb442223f3}{Impl}} (const Size\+Matcher \&size\+\_\+matcher)
+\item 
+virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_size_is_matcher_1_1_impl_a6b2524886e5fa751e96495a74d75b7cd}{Describe\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}os) const
+\item 
+virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_size_is_matcher_1_1_impl_a24b76fc2ac7b8d58cb5c7a3c5d5d35ab}{Describe\+Negation\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}os) const
+\item 
+virtual bool \mbox{\hyperlink{classtesting_1_1internal_1_1_size_is_matcher_1_1_impl_a5180472f5a18b8c0314ed835c52e09d4}{Match\+And\+Explain}} (Container container, \mbox{\hyperlink{classtesting_1_1_match_result_listener}{Match\+Result\+Listener}} \texorpdfstring{$\ast$}{*}listener) const
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classtesting_1_1_matcher_interface}{testing\+::\+Matcher\+Interface$<$ Container $>$}}}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classtesting_1_1_matcher_describer_interface}{testing\+::\+Matcher\+Describer\+Interface}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{classtesting_1_1_matcher_describer_interface_ae2236a56ad2cc35cad10efc1208854f4}{\texorpdfstring{$\sim$}{\string~}\+Matcher\+Describer\+Interface}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Size\+Matcher$>$\newline
+template$<$typename Container$>$\newline
+class testing\+::internal\+::\+Size\+Is\+Matcher$<$ Size\+Matcher $>$\+::\+Impl$<$ Container $>$}
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l02706}{2706}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_size_is_matcher_1_1_impl_ad87cca05ed55d7f388021adbfd5d7ec2}\index{testing::internal::SizeIsMatcher$<$ SizeMatcher $>$::Impl$<$ Container $>$@{testing::internal::SizeIsMatcher$<$ SizeMatcher $>$::Impl$<$ Container $>$}!ContainerView@{ContainerView}}
+\index{ContainerView@{ContainerView}!testing::internal::SizeIsMatcher$<$ SizeMatcher $>$::Impl$<$ Container $>$@{testing::internal::SizeIsMatcher$<$ SizeMatcher $>$::Impl$<$ Container $>$}}
+\doxysubsubsection{\texorpdfstring{ContainerView}{ContainerView}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_size_is_matcher_1_1_impl_ad87cca05ed55d7f388021adbfd5d7ec2} 
+template$<$typename Size\+Matcher $>$ \\
+template$<$typename Container $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_stl_container_view}{internal\+::\+Stl\+Container\+View}}$<$ \mbox{\hyperlink{gtest-internal_8h_a874567b176266188fabfffb8393267ce}{GTEST\+\_\+\+REMOVE\+\_\+\+REFERENCE\+\_\+\+AND\+\_\+\+CONST\+\_\+}}(Container)$>$ \mbox{\hyperlink{classtesting_1_1internal_1_1_size_is_matcher}{testing\+::internal\+::\+Size\+Is\+Matcher}}$<$ Size\+Matcher $>$\mbox{\hyperlink{classtesting_1_1internal_1_1_size_is_matcher_1_1_impl_aa5279c8598ec8982546350fb442223f3}{\+::\+Impl}}$<$ Container $>$\+::\+Container\+View}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l02709}{2709}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+\Hypertarget{classtesting_1_1internal_1_1_size_is_matcher_1_1_impl_a94d938fbc79eabf9e89c066cdf03428d}\index{testing::internal::SizeIsMatcher$<$ SizeMatcher $>$::Impl$<$ Container $>$@{testing::internal::SizeIsMatcher$<$ SizeMatcher $>$::Impl$<$ Container $>$}!SizeType@{SizeType}}
+\index{SizeType@{SizeType}!testing::internal::SizeIsMatcher$<$ SizeMatcher $>$::Impl$<$ Container $>$@{testing::internal::SizeIsMatcher$<$ SizeMatcher $>$::Impl$<$ Container $>$}}
+\doxysubsubsection{\texorpdfstring{SizeType}{SizeType}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_size_is_matcher_1_1_impl_a94d938fbc79eabf9e89c066cdf03428d} 
+template$<$typename Size\+Matcher $>$ \\
+template$<$typename Container $>$ \\
+Container\+View\+::type\+::size\+\_\+type \mbox{\hyperlink{classtesting_1_1internal_1_1_size_is_matcher}{testing\+::internal\+::\+Size\+Is\+Matcher}}$<$ Size\+Matcher $>$\mbox{\hyperlink{classtesting_1_1internal_1_1_size_is_matcher_1_1_impl_aa5279c8598ec8982546350fb442223f3}{\+::\+Impl}}$<$ Container $>$\+::\+Size\+Type}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l02710}{2710}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_size_is_matcher_1_1_impl_aa5279c8598ec8982546350fb442223f3}\index{testing::internal::SizeIsMatcher$<$ SizeMatcher $>$::Impl$<$ Container $>$@{testing::internal::SizeIsMatcher$<$ SizeMatcher $>$::Impl$<$ Container $>$}!Impl@{Impl}}
+\index{Impl@{Impl}!testing::internal::SizeIsMatcher$<$ SizeMatcher $>$::Impl$<$ Container $>$@{testing::internal::SizeIsMatcher$<$ SizeMatcher $>$::Impl$<$ Container $>$}}
+\doxysubsubsection{\texorpdfstring{Impl()}{Impl()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_size_is_matcher_1_1_impl_aa5279c8598ec8982546350fb442223f3} 
+template$<$typename Size\+Matcher $>$ \\
+template$<$typename Container $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_size_is_matcher}{testing\+::internal\+::\+Size\+Is\+Matcher}}$<$ Size\+Matcher $>$\+::\+Impl$<$ Container $>$\+::\+Impl (\begin{DoxyParamCaption}\item[{const Size\+Matcher \&}]{size\+\_\+matcher}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l02711}{2711}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02712\ \ \ \ \ \ \ \ \ :\ size\_matcher\_(MatcherCast<SizeType>(size\_matcher))\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_size_is_matcher_1_1_impl_a24b76fc2ac7b8d58cb5c7a3c5d5d35ab}\index{testing::internal::SizeIsMatcher$<$ SizeMatcher $>$::Impl$<$ Container $>$@{testing::internal::SizeIsMatcher$<$ SizeMatcher $>$::Impl$<$ Container $>$}!DescribeNegationTo@{DescribeNegationTo}}
+\index{DescribeNegationTo@{DescribeNegationTo}!testing::internal::SizeIsMatcher$<$ SizeMatcher $>$::Impl$<$ Container $>$@{testing::internal::SizeIsMatcher$<$ SizeMatcher $>$::Impl$<$ Container $>$}}
+\doxysubsubsection{\texorpdfstring{DescribeNegationTo()}{DescribeNegationTo()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_size_is_matcher_1_1_impl_a24b76fc2ac7b8d58cb5c7a3c5d5d35ab} 
+template$<$typename Size\+Matcher $>$ \\
+template$<$typename Container $>$ \\
+virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_size_is_matcher}{testing\+::internal\+::\+Size\+Is\+Matcher}}$<$ Size\+Matcher $>$\mbox{\hyperlink{classtesting_1_1internal_1_1_size_is_matcher_1_1_impl_aa5279c8598ec8982546350fb442223f3}{\+::\+Impl}}$<$ Container $>$\+::\+Describe\+Negation\+To (\begin{DoxyParamCaption}\item[{\+::std\+::ostream \texorpdfstring{$\ast$}{*}}]{os}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classtesting_1_1_matcher_describer_interface_a2071afbc47097c4d1c0064275af34db0}{testing\+::\+Matcher\+Describer\+Interface}}.
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l02718}{2718}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02718\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02719\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}size\ "{}};}
+\DoxyCodeLine{02720\ \ \ \ \ \ \ size\_matcher\_.\mbox{\hyperlink{classtesting_1_1internal_1_1_matcher_base_ac1089d49b6b8a381900618985cd69b7f}{DescribeNegationTo}}(os);}
+\DoxyCodeLine{02721\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_size_is_matcher_1_1_impl_a24b76fc2ac7b8d58cb5c7a3c5d5d35ab_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_size_is_matcher_1_1_impl_a6b2524886e5fa751e96495a74d75b7cd}\index{testing::internal::SizeIsMatcher$<$ SizeMatcher $>$::Impl$<$ Container $>$@{testing::internal::SizeIsMatcher$<$ SizeMatcher $>$::Impl$<$ Container $>$}!DescribeTo@{DescribeTo}}
+\index{DescribeTo@{DescribeTo}!testing::internal::SizeIsMatcher$<$ SizeMatcher $>$::Impl$<$ Container $>$@{testing::internal::SizeIsMatcher$<$ SizeMatcher $>$::Impl$<$ Container $>$}}
+\doxysubsubsection{\texorpdfstring{DescribeTo()}{DescribeTo()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_size_is_matcher_1_1_impl_a6b2524886e5fa751e96495a74d75b7cd} 
+template$<$typename Size\+Matcher $>$ \\
+template$<$typename Container $>$ \\
+virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_size_is_matcher}{testing\+::internal\+::\+Size\+Is\+Matcher}}$<$ Size\+Matcher $>$\mbox{\hyperlink{classtesting_1_1internal_1_1_size_is_matcher_1_1_impl_aa5279c8598ec8982546350fb442223f3}{\+::\+Impl}}$<$ Container $>$\+::\+Describe\+To (\begin{DoxyParamCaption}\item[{\+::std\+::ostream \texorpdfstring{$\ast$}{*}}]{os}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classtesting_1_1_matcher_describer_interface_ad9f861588bd969b6e3e717f13bb94e7b}{testing\+::\+Matcher\+Describer\+Interface}}.
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l02714}{2714}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02714\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02715\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}size\ "{}};}
+\DoxyCodeLine{02716\ \ \ \ \ \ \ size\_matcher\_.\mbox{\hyperlink{classtesting_1_1internal_1_1_matcher_base_a7e0c883c7745e0d646463077ef1c1267}{DescribeTo}}(os);}
+\DoxyCodeLine{02717\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=349pt]{classtesting_1_1internal_1_1_size_is_matcher_1_1_impl_a6b2524886e5fa751e96495a74d75b7cd_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_size_is_matcher_1_1_impl_a5180472f5a18b8c0314ed835c52e09d4}\index{testing::internal::SizeIsMatcher$<$ SizeMatcher $>$::Impl$<$ Container $>$@{testing::internal::SizeIsMatcher$<$ SizeMatcher $>$::Impl$<$ Container $>$}!MatchAndExplain@{MatchAndExplain}}
+\index{MatchAndExplain@{MatchAndExplain}!testing::internal::SizeIsMatcher$<$ SizeMatcher $>$::Impl$<$ Container $>$@{testing::internal::SizeIsMatcher$<$ SizeMatcher $>$::Impl$<$ Container $>$}}
+\doxysubsubsection{\texorpdfstring{MatchAndExplain()}{MatchAndExplain()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_size_is_matcher_1_1_impl_a5180472f5a18b8c0314ed835c52e09d4} 
+template$<$typename Size\+Matcher $>$ \\
+template$<$typename Container $>$ \\
+virtual bool \mbox{\hyperlink{classtesting_1_1internal_1_1_size_is_matcher}{testing\+::internal\+::\+Size\+Is\+Matcher}}$<$ Size\+Matcher $>$\mbox{\hyperlink{classtesting_1_1internal_1_1_size_is_matcher_1_1_impl_aa5279c8598ec8982546350fb442223f3}{\+::\+Impl}}$<$ Container $>$\+::\+Match\+And\+Explain (\begin{DoxyParamCaption}\item[{Container}]{container}{, }\item[{\mbox{\hyperlink{classtesting_1_1_match_result_listener}{Match\+Result\+Listener}} \texorpdfstring{$\ast$}{*}}]{listener}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classtesting_1_1_matcher_interface_a296b43607cd99d60365f0e6a762777cf}{testing\+::\+Matcher\+Interface$<$ Container $>$}}.
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l02723}{2723}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02724\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02725\ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_size_is_matcher_1_1_impl_a94d938fbc79eabf9e89c066cdf03428d}{SizeType}}\ size\ =\ container.size();}
+\DoxyCodeLine{02726\ \ \ \ \ \ \ StringMatchResultListener\ size\_listener;}
+\DoxyCodeLine{02727\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ result\ =\ size\_matcher\_.\mbox{\hyperlink{classtesting_1_1internal_1_1_matcher_base_aab88b1d23b6b94a8495ce6a0e0c576ce}{MatchAndExplain}}(size,\ \&size\_listener);}
+\DoxyCodeLine{02728\ \ \ \ \ \ \ *listener}
+\DoxyCodeLine{02729\ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}whose\ size\ "{}}\ <<\ size\ <<\ (result\ ?\ \textcolor{stringliteral}{"{}\ matches"{}}\ :\ \textcolor{stringliteral}{"{}\ doesn't\ match"{}});}
+\DoxyCodeLine{02730\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_ad609eb8bac84ab487464a3449c57640a}{PrintIfNotEmpty}}(size\_listener.str(),\ listener-\/>stream());}
+\DoxyCodeLine{02731\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{02732\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_size_is_matcher_1_1_impl_a5180472f5a18b8c0314ed835c52e09d4_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/include/gmock/\mbox{\hyperlink{gmock-matchers_8h}{gmock-\/matchers.\+h}}\end{DoxyCompactItemize}

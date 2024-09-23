@@ -1,0 +1,9 @@
+<map id="sysio::chain::trim_data" name="sysio::chain::trim_data">
+<area shape="rect" id="Node000001" title=" " alt="" coords="25,199,179,225"/>
+<area shape="rect" id="Node000002" href="$classfc_1_1path.html" title="wraps boost::filesystem::path to provide platform independent path manipulation." alt="" coords="5,88,71,114"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="35,129,35,152,42,174,54,187,69,196,66,201,50,191,38,176,30,153,30,129"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1chain_1_1chain__id__type.html" title=" " alt="" coords="102,80,232,121"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="159,137,140,176,119,200,115,197,136,174,155,135"/>
+<area shape="rect" id="Node000004" href="$classfc_1_1sha256.html" title=" " alt="" coords="126,5,208,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="170,47,170,80,165,80,165,47"/>
+</map>

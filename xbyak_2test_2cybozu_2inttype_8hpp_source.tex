@@ -1,0 +1,121 @@
+\doxysection{inttype.\+hpp}
+\hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source}{}\label{xbyak_2test_2cybozu_2inttype_8hpp_source}\index{libraries/fc/libraries/ff/depends/xbyak/test/cybozu/inttype.hpp@{libraries/fc/libraries/ff/depends/xbyak/test/cybozu/inttype.hpp}}
+\mbox{\hyperlink{xbyak_2test_2cybozu_2inttype_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00008}00008\ \textcolor{preprocessor}{\#if\ defined(\_MSC\_VER)\ \&\&\ (MSC\_VER\ <=\ 1500)}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00009}00009\ \ \ \ \ \textcolor{keyword}{typedef}\ \_\_int64\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}};}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00010}00010\ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{unsigned}\ \_\_int64\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}};}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00011}00011\ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}};}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00012}00012\ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}};}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00013}00013\ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{short}\ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}};}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00014}00014\ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{short}\ \mbox{\hyperlink{stdint_8h_a269259c924dce846340ddbb810db2e3c}{int16\_t}};}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00015}00015\ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}};}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00016}00016\ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{signed}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{stdint_8h_aef44329758059c91c76d334e8fc09700}{int8\_t}};}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00017}00017\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00018}00018\ \textcolor{preprocessor}{\ \ \ \ \#include\ <\mbox{\hyperlink{stdint_8h}{stdint.h}}>}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00019}00019\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00021}00021\ \textcolor{preprocessor}{\#ifdef\ \_MSC\_VER}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00022}00022\ \textcolor{preprocessor}{\ \ \ \ \#ifndef\ CYBOZU\_DEFINED\_SSIZE\_T}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00023}00023\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#define\ CYBOZU\_DEFINED\_SSIZE\_T}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00024}00024\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#ifdef\ \_WIN64}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00025}00025\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ ssize\_t;}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00026}00026\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#else}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00027}00027\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}}\ ssize\_t;}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00028}00028\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#endif}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00029}00029\ \textcolor{preprocessor}{\ \ \ \ \#endif}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00030}00030\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00031}00031\ \textcolor{preprocessor}{\ \ \ \ \#include\ <unistd.h>}\ \textcolor{comment}{//\ for\ ssize\_t}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00032}00032\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00034}00034\ \textcolor{preprocessor}{\#ifndef\ CYBOZU\_ALIGN}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00035}00035\ \textcolor{preprocessor}{\ \ \ \ \#ifdef\ \_MSC\_VER}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00036}00036\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#define\ CYBOZU\_ALIGN(x)\ \_\_declspec(align(x))}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00037}00037\ \textcolor{preprocessor}{\ \ \ \ \#else}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00038}\mbox{\hyperlink{xbyak_2test_2cybozu_2inttype_8hpp_a7a8b009e99b75a1b25f4c38503b7ee62}{00038}}\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#define\ CYBOZU\_ALIGN(x)\ \_\_attribute\_\_((aligned(x)))}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00039}00039\ \textcolor{preprocessor}{\ \ \ \ \#endif}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00040}00040\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00041}00041\ \textcolor{preprocessor}{\#ifndef\ CYBOZU\_ALLOCA}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00042}00042\ \textcolor{preprocessor}{\ \ \ \ \#ifdef\ \_MSC\_VER}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00043}00043\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#include\ <malloc.h>}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00044}00044\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#define\ CYBOZU\_ALLOCA(x)\ \_malloca(x)}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00045}00045\ \textcolor{preprocessor}{\ \ \ \ \#else}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00046}\mbox{\hyperlink{xbyak_2test_2cybozu_2inttype_8hpp_ada57abbe34b2b6df7713c87602d58ac1}{00046}}\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#define\ CYBOZU\_ALLOCA\_(x)\ \_\_builtin\_alloca(x)}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00047}00047\ \textcolor{preprocessor}{\ \ \ \ \#endif}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00048}00048\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00049}00049\ \textcolor{preprocessor}{\#ifndef\ CYBOZU\_FOREACH}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00050}00050\ \ \ \ \ \textcolor{comment}{//\ std::vector<int>\ v;\ CYBOZU\_FOREACH(auto\ x,\ v)\ \{...\}}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00051}00051\ \textcolor{preprocessor}{\ \ \ \ \#if\ defined(\_MSC\_VER)\ \&\&\ (\_MSC\_VER\ >=\ 1400)}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00052}00052\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#define\ CYBOZU\_FOREACH(type\_x,\ xs)\ for\ each\ (type\_x\ in\ xs)}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00053}00053\ \textcolor{preprocessor}{\ \ \ \ \#elif\ defined(\_\_GNUC\_\_)}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00054}00054\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#define\ CYBOZU\_FOREACH(type\_x,\ xs)\ for\ (type\_x\ :\ xs)}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00055}00055\ \textcolor{preprocessor}{\ \ \ \ \#endif}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00056}00056\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00057}00057\ \textcolor{preprocessor}{\#ifndef\ CYBOZU\_NUM\_OF\_ARRAY}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00058}\mbox{\hyperlink{xbyak_2test_2cybozu_2inttype_8hpp_a9590a04f10a3cc6e777de8bef7ae030c}{00058}}\ \textcolor{preprocessor}{\ \ \ \ \#define\ CYBOZU\_NUM\_OF\_ARRAY(x)\ (sizeof(x)\ /\ sizeof(*x))}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00059}00059\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00060}00060\ \textcolor{preprocessor}{\#ifndef\ CYBOZU\_SNPRINTF}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00061}00061\ \textcolor{preprocessor}{\ \ \ \ \#ifdef\ \_MSC\_VER}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00062}00062\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#define\ CYBOZU\_SNPRINTF(x,\ len,\ ...)\ (void)\_snprintf\_s(x,\ len,\ len\ -\/\ 1,\ \_\_VA\_ARGS\_\_)}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00063}00063\ \textcolor{preprocessor}{\ \ \ \ \#else}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00064}\mbox{\hyperlink{xbyak_2test_2cybozu_2inttype_8hpp_a6ff8eedb77b726a888b05c967e5d270e}{00064}}\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#define\ CYBOZU\_SNPRINTF(x,\ len,\ ...)\ (void)snprintf(x,\ len,\ \_\_VA\_ARGS\_\_)}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00065}00065\ \textcolor{preprocessor}{\ \ \ \ \#endif}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00066}00066\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00067}00067\ }
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00068}\mbox{\hyperlink{xbyak_2test_2cybozu_2inttype_8hpp_a6e8c965fda263156ba402d9551b0485b}{00068}}\ \textcolor{preprocessor}{\#define\ CYBOZU\_CPP\_VERSION\_CPP03\ 0}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00069}\mbox{\hyperlink{xbyak_2test_2cybozu_2inttype_8hpp_aa807dce4c171a94a787374dc859197dd}{00069}}\ \textcolor{preprocessor}{\#define\ CYBOZU\_CPP\_VERSION\_TR1\ 1}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00070}\mbox{\hyperlink{xbyak_2test_2cybozu_2inttype_8hpp_a7e393045f353f1af7d1c875a391de81d}{00070}}\ \textcolor{preprocessor}{\#define\ CYBOZU\_CPP\_VERSION\_CPP11\ 2}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00072}00072\ \textcolor{preprocessor}{\#if\ (\_\_cplusplus\ >=\ 201103)\ ||\ (\_MSC\_VER\ >=\ 1500)\ ||\ defined(\_\_GXX\_EXPERIMENTAL\_CXX0X\_\_)}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00073}00073\ \textcolor{preprocessor}{\ \ \ \ \#if\ defined(\_MSC\_VER)\ \&\&\ (\_MSC\_VER\ <=\ 1600)}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00074}00074\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#define\ CYBOZU\_CPP\_VERSION\ CYBOZU\_CPP\_VERSION\_TR1}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00075}00075\ \textcolor{preprocessor}{\ \ \ \ \#else}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00076}00076\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#define\ CYBOZU\_CPP\_VERSION\ CYBOZU\_CPP\_VERSION\_CPP11}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00077}00077\ \textcolor{preprocessor}{\ \ \ \ \#endif}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00078}00078\ \textcolor{preprocessor}{\#elif\ (\_\_GNUC\_\_\ >=\ 4\ \&\&\ \_\_GNUC\_MINOR\_\_\ >=\ 5)\ ||\ (\_\_clang\_major\_\_\ >=\ 3)}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00079}00079\ \textcolor{preprocessor}{\ \ \ \ \#define\ CYBOZU\_CPP\_VERSION\ CYBOZU\_CPP\_VERSION\_TR1}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00080}00080\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00081}\mbox{\hyperlink{xbyak_2test_2cybozu_2inttype_8hpp_ab28a8f9b585142cd1b3dbb873793340c}{00081}}\ \textcolor{preprocessor}{\ \ \ \ \#define\ CYBOZU\_CPP\_VERSION\ CYBOZU\_CPP\_VERSION\_CPP03}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00082}00082\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00083}00083\ }
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00084}00084\ \textcolor{preprocessor}{\#if\ (CYBOZU\_CPP\_VERSION\ ==\ CYBOZU\_CPP\_VERSION\_TR1)}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00085}00085\ \textcolor{preprocessor}{\ \ \ \ \#define\ CYBOZU\_NAMESPACE\_STD\ std::tr1}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00086}00086\ \textcolor{preprocessor}{\ \ \ \ \#define\ CYBOZU\_NAMESPACE\_TR1\_BEGIN\ namespace\ tr1\ \{}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00087}00087\ \textcolor{preprocessor}{\ \ \ \ \#define\ CYBOZU\_NAMESPACE\_TR1\_END\ \}}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00088}00088\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00089}\mbox{\hyperlink{xbyak_2test_2cybozu_2inttype_8hpp_a7410ce0bb8601765676018efe712360a}{00089}}\ \textcolor{preprocessor}{\ \ \ \ \#define\ CYBOZU\_NAMESPACE\_STD\ std}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00090}\mbox{\hyperlink{xbyak_2test_2cybozu_2inttype_8hpp_a4b137e9bb3490b8f0157281f9b8647b0}{00090}}\ \textcolor{preprocessor}{\ \ \ \ \#define\ CYBOZU\_NAMESPACE\_TR1\_BEGIN}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00091}\mbox{\hyperlink{xbyak_2test_2cybozu_2inttype_8hpp_a11a2045c1dc1b5ae30b76ee24bf7ff76}{00091}}\ \textcolor{preprocessor}{\ \ \ \ \#define\ CYBOZU\_NAMESPACE\_TR1\_END}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00092}00092\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00093}00093\ }
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00094}00094\ \textcolor{preprocessor}{\#ifndef\ CYBOZU\_OS\_BIT}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00095}00095\ \textcolor{preprocessor}{\ \ \ \ \#if\ defined(\_WIN64)\ ||\ defined(\_\_x86\_64\_\_)}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00096}00096\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#define\ CYBOZU\_OS\_BIT\ 64}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00097}00097\ \textcolor{preprocessor}{\ \ \ \ \#else}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00098}\mbox{\hyperlink{xbyak_2test_2cybozu_2inttype_8hpp_a66ce9a5702fda83c4e384f6706c9778d}{00098}}\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#define\ CYBOZU\_OS\_BIT\ 32}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00099}00099\ \textcolor{preprocessor}{\ \ \ \ \#endif}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00100}00100\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00101}00101\ }
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00102}00102\ }
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00103}00103\ \textcolor{preprocessor}{\#ifndef\ CYBOZU\_ENDIAN}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00104}\mbox{\hyperlink{xbyak_2test_2cybozu_2inttype_8hpp_af25a3440c644e1e4b8a856824c9472dd}{00104}}\ \textcolor{preprocessor}{\ \ \ \ \#define\ CYBOZU\_ENDIAN\_UNKNOWN\ 0}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00105}\mbox{\hyperlink{xbyak_2test_2cybozu_2inttype_8hpp_a43fa25921317799841ec0f1b3e9ac425}{00105}}\ \textcolor{preprocessor}{\ \ \ \ \#define\ CYBOZU\_ENDIAN\_LITTLE\ 1}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00106}\mbox{\hyperlink{xbyak_2test_2cybozu_2inttype_8hpp_a33b49301a837bcfdce1f629f0e067c6c}{00106}}\ \textcolor{preprocessor}{\ \ \ \ \#define\ CYBOZU\_ENDIAN\_BIG\ 2}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00107}00107\ \textcolor{preprocessor}{\ \ \ \ \#if\ defined(\_M\_IX86)\ ||\ defined(\_M\_AMD64)\ ||\ defined(\_\_x86\_64\_\_)\ ||\ defined(\_\_i386\_\_)}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00108}00108\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#define\ CYBOZU\_ENDIAN\ CYBOZU\_ENDIAN\_LITTLE}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00109}00109\ \textcolor{preprocessor}{\ \ \ \ \#else}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00110}\mbox{\hyperlink{xbyak_2test_2cybozu_2inttype_8hpp_ad070c94713f729d5fa45d2e1db1673cf}{00110}}\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#define\ CYBOZU\_ENDIAN\ CYBOZU\_ENDIAN\_UNKNOWN}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00111}00111\ \textcolor{preprocessor}{\ \ \ \ \#endif}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00112}00112\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00113}00113\ }
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00114}00114\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacecybozu}{cybozu}}\ \{}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00115}00115\ \textcolor{keyword}{template}<\textcolor{keyword}{class}\ T>}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00116}00116\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacecybozu_abde6423ec5ae02c2dde02c810458fbdf}{disable\_warning\_unused\_variable}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&)\ \{\ \}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00117}00117\ \textcolor{keyword}{template}<\textcolor{keyword}{class}\ T,\ \textcolor{keyword}{class}\ S>}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00118}00118\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \mbox{\hyperlink{namespacecybozu_ac5c1b9f2563e9274b9de051be14ddd40}{cast}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_s}{S}}*\ ptr)\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\textcolor{keyword}{>}(\textcolor{keyword}{static\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{void}*\textcolor{keyword}{>}(ptr));\ \}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00119}00119\ \textcolor{keyword}{template}<\textcolor{keyword}{class}\ T,\ \textcolor{keyword}{class}\ S>}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00120}00120\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \mbox{\hyperlink{namespacecybozu_ac5c1b9f2563e9274b9de051be14ddd40}{cast}}(\mbox{\hyperlink{struct_s}{S}}*\ ptr)\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\textcolor{keyword}{>}(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{void}*\textcolor{keyword}{>}(ptr));\ \}}
+\DoxyCodeLine{\Hypertarget{xbyak_2test_2cybozu_2inttype_8hpp_source_l00121}00121\ \}\ \textcolor{comment}{//\ cybozu}}
+
+\end{DoxyCode}

@@ -1,0 +1,7 @@
+<map id="mock_endpoint::handle_connect" name="mock_endpoint::handle_connect">
+<area shape="rect" id="Node000001" title=" " alt="" coords="461,5,616,46"/>
+<area shape="rect" id="Node000002" href="$structmock__endpoint.html#acf190f7ee5faaae2599125bf9d8513af" title=" " alt="" coords="250,13,413,38"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="445,28,414,28,414,23,445,23"/>
+<area shape="rect" id="Node000003" href="$timers_8cpp.html#a54b22724b0bf3188576fd1db09594a16" title=" " alt="" coords="5,13,202,38"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="234,28,202,28,202,23,234,23"/>
+</map>

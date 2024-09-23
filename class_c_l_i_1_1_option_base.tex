@@ -1,0 +1,675 @@
+\doxysection{CLI\+::Option\+Base\texorpdfstring{$<$}{<} CRTP \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{class_c_l_i_1_1_option_base}{}\label{class_c_l_i_1_1_option_base}\index{CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}}
+
+
+{\ttfamily \#include $<$CLI11.\+hpp$>$}
+
+
+
+Collaboration diagram for CLI\+::Option\+Base\texorpdfstring{$<$}{<} CRTP \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=215pt]{class_c_l_i_1_1_option_base__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+CRTP \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_c_l_i_1_1_option_base_a17077e6cf3e228a4978fb4be525bc80d}{group}} (const std\+::string \&\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})
+\begin{DoxyCompactList}\small\item\em Changes the group membership. \end{DoxyCompactList}\item 
+CRTP \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a}{required}} (bool \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}=true)
+\begin{DoxyCompactList}\small\item\em Set the option as required. \end{DoxyCompactList}\item 
+CRTP \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_c_l_i_1_1_option_base_a083eb9ce01d6f8a59f6cfea0cece2e05}{mandatory}} (bool \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}=true)
+\begin{DoxyCompactList}\small\item\em Support Plumbum term. \end{DoxyCompactList}\item 
+CRTP \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_c_l_i_1_1_option_base_ac5ee05409ef6e5369e78ecf127bb0e7f}{always\+\_\+capture\+\_\+default}} (bool \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}=true)
+\item 
+const std\+::string \& \mbox{\hyperlink{class_c_l_i_1_1_option_base_ad824d0f4f973675beece17d6b5ad9d00}{get\+\_\+group}} () const
+\begin{DoxyCompactList}\small\item\em Get the group of this option. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_c_l_i_1_1_option_base_aa902dee6da6d7f5b083b1c7d5f9c1308}{get\+\_\+required}} () const
+\begin{DoxyCompactList}\small\item\em True if this is a required option. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_c_l_i_1_1_option_base_a12d180bda82c466cfbcd5fbeac27e956}{get\+\_\+ignore\+\_\+case}} () const
+\begin{DoxyCompactList}\small\item\em The status of ignore case. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_c_l_i_1_1_option_base_a321ce55e69252d0b01426480a8c6c894}{get\+\_\+ignore\+\_\+underscore}} () const
+\begin{DoxyCompactList}\small\item\em The status of ignore\+\_\+underscore. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_c_l_i_1_1_option_base_a148499af929ff2498d1ef3567fc18dfc}{get\+\_\+configurable}} () const
+\begin{DoxyCompactList}\small\item\em The status of configurable. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_c_l_i_1_1_option_base_a07c4e6b7c4a7c3af4e147613d5e39aa0}{get\+\_\+disable\+\_\+flag\+\_\+override}} () const
+\begin{DoxyCompactList}\small\item\em The status of configurable. \end{DoxyCompactList}\item 
+char \mbox{\hyperlink{class_c_l_i_1_1_option_base_ad3057f1f7bdd0473d86aad54a0e36064}{get\+\_\+delimiter}} () const
+\begin{DoxyCompactList}\small\item\em Get the current delimiter char. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_c_l_i_1_1_option_base_acf913635549804e222cd309294cdba7a}{get\+\_\+always\+\_\+capture\+\_\+default}} () const
+\begin{DoxyCompactList}\small\item\em Return true if this will automatically capture the default value for help printing. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{namespace_c_l_i_a991a3264d3459575fc7e83eb54d73d2b}{Multi\+Option\+Policy}} \mbox{\hyperlink{class_c_l_i_1_1_option_base_a67ade2fd6f98b5a77c45b18c3d8ae639}{get\+\_\+multi\+\_\+option\+\_\+policy}} () const
+\begin{DoxyCompactList}\small\item\em The status of the multi option policy. \end{DoxyCompactList}\item 
+CRTP \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_c_l_i_1_1_option_base_abf721b86beb0f957a4d85ad4f6e72c20}{take\+\_\+last}} ()
+\begin{DoxyCompactList}\small\item\em Set the multi option policy to take last. \end{DoxyCompactList}\item 
+CRTP \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_c_l_i_1_1_option_base_a5727e47f4541f99986503b086f1da735}{take\+\_\+first}} ()
+\begin{DoxyCompactList}\small\item\em Set the multi option policy to take last. \end{DoxyCompactList}\item 
+CRTP \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_c_l_i_1_1_option_base_a0edb237c89d77253e079e4d6c7f86e8c}{take\+\_\+all}} ()
+\begin{DoxyCompactList}\small\item\em Set the multi option policy to take all arguments. \end{DoxyCompactList}\item 
+CRTP \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_c_l_i_1_1_option_base_a1c353d2455f0fc251fa8d0e98b66ea93}{join}} ()
+\begin{DoxyCompactList}\small\item\em Set the multi option policy to join. \end{DoxyCompactList}\item 
+CRTP \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_c_l_i_1_1_option_base_a2f9160afa4b72e8425bffd043be92ea6}{join}} (char delim)
+\begin{DoxyCompactList}\small\item\em Set the multi option policy to join with a specific delimiter. \end{DoxyCompactList}\item 
+CRTP \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_c_l_i_1_1_option_base_a618d6a4f8137bec3272a04d848106046}{configurable}} (bool \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}=true)
+\begin{DoxyCompactList}\small\item\em Allow in a configuration file. \end{DoxyCompactList}\item 
+CRTP \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_c_l_i_1_1_option_base_a620c2f57aca00ad2ad1fe8870143fcc1}{delimiter}} (char \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}=\textquotesingle{}\textbackslash{}0\textquotesingle{})
+\begin{DoxyCompactList}\small\item\em Allow in a configuration file. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{class_c_l_i_1_1_option_base_aeccfd835475420d963f2fff446c32003}{copy\+\_\+to}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*}other) const
+\begin{DoxyCompactList}\small\item\em Copy the contents to another similar class (one based on \doxylink{class_c_l_i_1_1_option_base}{Option\+Base}) \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::string \mbox{\hyperlink{class_c_l_i_1_1_option_base_ad0d8bd0637023f7d87a8e95315e8fb21}{group\+\_\+}} = std\+::string("{}Options"{})
+\begin{DoxyCompactList}\small\item\em The group membership. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_c_l_i_1_1_option_base_abad838fd3da11f840a40536a279912ac}{required\+\_\+}} \{false\}
+\begin{DoxyCompactList}\small\item\em True if this is a required option. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_c_l_i_1_1_option_base_a616d0aa1bd4e540733e24f88bc17cd3a}{ignore\+\_\+case\+\_\+}} \{false\}
+\begin{DoxyCompactList}\small\item\em Ignore the case when matching (option, not value) \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_c_l_i_1_1_option_base_adafc24528125977c500b9b0c7b5068bf}{ignore\+\_\+underscore\+\_\+}} \{false\}
+\begin{DoxyCompactList}\small\item\em Ignore underscores when matching (option, not value) \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_c_l_i_1_1_option_base_a86801bb8560b37e40ea60815871a22ee}{configurable\+\_\+}} \{true\}
+\begin{DoxyCompactList}\small\item\em Allow this option to be given in a configuration file. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_c_l_i_1_1_option_base_ab62f608c0957e32ccf56f2834aa574c1}{disable\+\_\+flag\+\_\+override\+\_\+}} \{false\}
+\begin{DoxyCompactList}\small\item\em Disable overriding flag values with \textquotesingle{}=value\textquotesingle{}. \end{DoxyCompactList}\item 
+char \mbox{\hyperlink{class_c_l_i_1_1_option_base_ac4164d93e2b8e59b2de24dad04a9f34b}{delimiter\+\_\+}} \{\textquotesingle{}\textbackslash{}0\textquotesingle{}\}
+\begin{DoxyCompactList}\small\item\em Specify a delimiter character for vector arguments. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_c_l_i_1_1_option_base_a23aca05ffa9c2d3fbba10b5434cdba64}{always\+\_\+capture\+\_\+default\+\_\+}} \{false\}
+\begin{DoxyCompactList}\small\item\em Automatically capture default value. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{namespace_c_l_i_a991a3264d3459575fc7e83eb54d73d2b}{Multi\+Option\+Policy}} \mbox{\hyperlink{class_c_l_i_1_1_option_base_a2c5483d3c992baad97beed3de2b82b05}{multi\+\_\+option\+\_\+policy\+\_\+}} \{\mbox{\hyperlink{namespace_c_l_i_a991a3264d3459575fc7e83eb54d73d2ba8ce61dd2505effd96f937fa743b6491f}{Multi\+Option\+Policy\+::\+Throw}}\}
+\begin{DoxyCompactList}\small\item\em Policy for handling multiple arguments beyond the expected Max. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename CRTP$>$\newline
+class CLI\+::\+Option\+Base$<$ CRTP $>$}
+This is the CRTP base class for \doxylink{class_c_l_i_1_1_option}{Option} and \doxylink{class_c_l_i_1_1_option_defaults}{Option\+Defaults}. It was designed this way to share parts of the class; an \doxylink{class_c_l_i_1_1_option_defaults}{Option\+Defaults} can copy to an \doxylink{class_c_l_i_1_1_option}{Option}. 
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l03346}{3346}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_c_l_i_1_1_option_base_ac5ee05409ef6e5369e78ecf127bb0e7f}\index{CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}!always\_capture\_default@{always\_capture\_default}}
+\index{always\_capture\_default@{always\_capture\_default}!CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}}
+\doxysubsubsection{\texorpdfstring{always\_capture\_default()}{always\_capture\_default()}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_option_base_ac5ee05409ef6e5369e78ecf127bb0e7f} 
+template$<$typename CRTP $>$ \\
+CRTP \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_c_l_i_1_1_option_base}{CLI\+::\+Option\+Base}}$<$ CRTP $>$\+::always\+\_\+capture\+\_\+default (\begin{DoxyParamCaption}\item[{bool}]{value}{ = {\ttfamily true}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l03408}{3408}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03408\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{03409\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_c_l_i_1_1_option_base_a23aca05ffa9c2d3fbba10b5434cdba64}{always\_capture\_default\_}}\ =\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}};}
+\DoxyCodeLine{03410\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}CRTP\ *\textcolor{keyword}{>}(\textcolor{keyword}{this});}
+\DoxyCodeLine{03411\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_c_l_i_1_1_option_base_a618d6a4f8137bec3272a04d848106046}\index{CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}!configurable@{configurable}}
+\index{configurable@{configurable}!CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}}
+\doxysubsubsection{\texorpdfstring{configurable()}{configurable()}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_option_base_a618d6a4f8137bec3272a04d848106046} 
+template$<$typename CRTP $>$ \\
+CRTP \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_c_l_i_1_1_option_base}{CLI\+::\+Option\+Base}}$<$ CRTP $>$\+::configurable (\begin{DoxyParamCaption}\item[{bool}]{value}{ = {\ttfamily true}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l03481}{3481}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03481\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{03482\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_c_l_i_1_1_option_base_a86801bb8560b37e40ea60815871a22ee}{configurable\_}}\ =\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}};}
+\DoxyCodeLine{03483\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}CRTP\ *\textcolor{keyword}{>}(\textcolor{keyword}{this});}
+\DoxyCodeLine{03484\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{class_c_l_i_1_1_option_base_a618d6a4f8137bec3272a04d848106046_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_c_l_i_1_1_option_base_aeccfd835475420d963f2fff446c32003}\index{CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}!copy\_to@{copy\_to}}
+\index{copy\_to@{copy\_to}!CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}}
+\doxysubsubsection{\texorpdfstring{copy\_to()}{copy\_to()}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_option_base_aeccfd835475420d963f2fff446c32003} 
+template$<$typename CRTP $>$ \\
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+void \mbox{\hyperlink{class_c_l_i_1_1_option_base}{CLI\+::\+Option\+Base}}$<$ CRTP $>$\+::copy\+\_\+to (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*}}]{other}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l03378}{3378}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03378\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{03379\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}-\/>group(\mbox{\hyperlink{class_c_l_i_1_1_option_base_ad0d8bd0637023f7d87a8e95315e8fb21}{group\_}});}
+\DoxyCodeLine{03380\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}-\/>required(\mbox{\hyperlink{class_c_l_i_1_1_option_base_abad838fd3da11f840a40536a279912ac}{required\_}});}
+\DoxyCodeLine{03381\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}-\/>ignore\_case(\mbox{\hyperlink{class_c_l_i_1_1_option_base_a616d0aa1bd4e540733e24f88bc17cd3a}{ignore\_case\_}});}
+\DoxyCodeLine{03382\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}-\/>ignore\_underscore(\mbox{\hyperlink{class_c_l_i_1_1_option_base_adafc24528125977c500b9b0c7b5068bf}{ignore\_underscore\_}});}
+\DoxyCodeLine{03383\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}-\/>configurable(\mbox{\hyperlink{class_c_l_i_1_1_option_base_a86801bb8560b37e40ea60815871a22ee}{configurable\_}});}
+\DoxyCodeLine{03384\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}-\/>disable\_flag\_override(\mbox{\hyperlink{class_c_l_i_1_1_option_base_ab62f608c0957e32ccf56f2834aa574c1}{disable\_flag\_override\_}});}
+\DoxyCodeLine{03385\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}-\/>delimiter(\mbox{\hyperlink{class_c_l_i_1_1_option_base_ac4164d93e2b8e59b2de24dad04a9f34b}{delimiter\_}});}
+\DoxyCodeLine{03386\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}-\/>always\_capture\_default(\mbox{\hyperlink{class_c_l_i_1_1_option_base_a23aca05ffa9c2d3fbba10b5434cdba64}{always\_capture\_default\_}});}
+\DoxyCodeLine{03387\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}-\/>multi\_option\_policy(\mbox{\hyperlink{class_c_l_i_1_1_option_base_a2c5483d3c992baad97beed3de2b82b05}{multi\_option\_policy\_}});}
+\DoxyCodeLine{03388\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_c_l_i_1_1_option_base_a620c2f57aca00ad2ad1fe8870143fcc1}\index{CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}!delimiter@{delimiter}}
+\index{delimiter@{delimiter}!CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}}
+\doxysubsubsection{\texorpdfstring{delimiter()}{delimiter()}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_option_base_a620c2f57aca00ad2ad1fe8870143fcc1} 
+template$<$typename CRTP $>$ \\
+CRTP \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_c_l_i_1_1_option_base}{CLI\+::\+Option\+Base}}$<$ CRTP $>$\+::delimiter (\begin{DoxyParamCaption}\item[{char}]{value}{ = {\ttfamily \textquotesingle{}\textbackslash{}0\textquotesingle{}}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l03487}{3487}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03487\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{03488\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_c_l_i_1_1_option_base_ac4164d93e2b8e59b2de24dad04a9f34b}{delimiter\_}}\ =\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}};}
+\DoxyCodeLine{03489\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}CRTP\ *\textcolor{keyword}{>}(\textcolor{keyword}{this});}
+\DoxyCodeLine{03490\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_c_l_i_1_1_option_base_a620c2f57aca00ad2ad1fe8870143fcc1_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_c_l_i_1_1_option_base_acf913635549804e222cd309294cdba7a}\index{CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}!get\_always\_capture\_default@{get\_always\_capture\_default}}
+\index{get\_always\_capture\_default@{get\_always\_capture\_default}!CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}}
+\doxysubsubsection{\texorpdfstring{get\_always\_capture\_default()}{get\_always\_capture\_default()}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_option_base_acf913635549804e222cd309294cdba7a} 
+template$<$typename CRTP $>$ \\
+bool \mbox{\hyperlink{class_c_l_i_1_1_option_base}{CLI\+::\+Option\+Base}}$<$ CRTP $>$\+::get\+\_\+always\+\_\+capture\+\_\+default (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l03437}{3437}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03437\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_c_l_i_1_1_option_base_a23aca05ffa9c2d3fbba10b5434cdba64}{always\_capture\_default\_}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_c_l_i_1_1_option_base_a148499af929ff2498d1ef3567fc18dfc}\index{CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}!get\_configurable@{get\_configurable}}
+\index{get\_configurable@{get\_configurable}!CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}}
+\doxysubsubsection{\texorpdfstring{get\_configurable()}{get\_configurable()}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_option_base_a148499af929ff2498d1ef3567fc18dfc} 
+template$<$typename CRTP $>$ \\
+bool \mbox{\hyperlink{class_c_l_i_1_1_option_base}{CLI\+::\+Option\+Base}}$<$ CRTP $>$\+::get\+\_\+configurable (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l03428}{3428}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03428\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_c_l_i_1_1_option_base_a86801bb8560b37e40ea60815871a22ee}{configurable\_}};\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=327pt]{class_c_l_i_1_1_option_base_a148499af929ff2498d1ef3567fc18dfc_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_c_l_i_1_1_option_base_ad3057f1f7bdd0473d86aad54a0e36064}\index{CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}!get\_delimiter@{get\_delimiter}}
+\index{get\_delimiter@{get\_delimiter}!CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}}
+\doxysubsubsection{\texorpdfstring{get\_delimiter()}{get\_delimiter()}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_option_base_ad3057f1f7bdd0473d86aad54a0e36064} 
+template$<$typename CRTP $>$ \\
+char \mbox{\hyperlink{class_c_l_i_1_1_option_base}{CLI\+::\+Option\+Base}}$<$ CRTP $>$\+::get\+\_\+delimiter (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l03434}{3434}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03434\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_c_l_i_1_1_option_base_ac4164d93e2b8e59b2de24dad04a9f34b}{delimiter\_}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_c_l_i_1_1_option_base_a07c4e6b7c4a7c3af4e147613d5e39aa0}\index{CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}!get\_disable\_flag\_override@{get\_disable\_flag\_override}}
+\index{get\_disable\_flag\_override@{get\_disable\_flag\_override}!CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}}
+\doxysubsubsection{\texorpdfstring{get\_disable\_flag\_override()}{get\_disable\_flag\_override()}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_option_base_a07c4e6b7c4a7c3af4e147613d5e39aa0} 
+template$<$typename CRTP $>$ \\
+bool \mbox{\hyperlink{class_c_l_i_1_1_option_base}{CLI\+::\+Option\+Base}}$<$ CRTP $>$\+::get\+\_\+disable\+\_\+flag\+\_\+override (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l03431}{3431}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03431\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_c_l_i_1_1_option_base_ab62f608c0957e32ccf56f2834aa574c1}{disable\_flag\_override\_}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_c_l_i_1_1_option_base_ad824d0f4f973675beece17d6b5ad9d00}\index{CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}!get\_group@{get\_group}}
+\index{get\_group@{get\_group}!CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}}
+\doxysubsubsection{\texorpdfstring{get\_group()}{get\_group()}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_option_base_ad824d0f4f973675beece17d6b5ad9d00} 
+template$<$typename CRTP $>$ \\
+const std\+::string \& \mbox{\hyperlink{class_c_l_i_1_1_option_base}{CLI\+::\+Option\+Base}}$<$ CRTP $>$\+::get\+\_\+group (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l03416}{3416}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03416\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_c_l_i_1_1_option_base_ad0d8bd0637023f7d87a8e95315e8fb21}{group\_}};\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_c_l_i_1_1_option_base_ad824d0f4f973675beece17d6b5ad9d00_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_c_l_i_1_1_option_base_a12d180bda82c466cfbcd5fbeac27e956}\index{CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}!get\_ignore\_case@{get\_ignore\_case}}
+\index{get\_ignore\_case@{get\_ignore\_case}!CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}}
+\doxysubsubsection{\texorpdfstring{get\_ignore\_case()}{get\_ignore\_case()}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_option_base_a12d180bda82c466cfbcd5fbeac27e956} 
+template$<$typename CRTP $>$ \\
+bool \mbox{\hyperlink{class_c_l_i_1_1_option_base}{CLI\+::\+Option\+Base}}$<$ CRTP $>$\+::get\+\_\+ignore\+\_\+case (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l03422}{3422}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03422\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_c_l_i_1_1_option_base_a616d0aa1bd4e540733e24f88bc17cd3a}{ignore\_case\_}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_c_l_i_1_1_option_base_a321ce55e69252d0b01426480a8c6c894}\index{CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}!get\_ignore\_underscore@{get\_ignore\_underscore}}
+\index{get\_ignore\_underscore@{get\_ignore\_underscore}!CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}}
+\doxysubsubsection{\texorpdfstring{get\_ignore\_underscore()}{get\_ignore\_underscore()}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_option_base_a321ce55e69252d0b01426480a8c6c894} 
+template$<$typename CRTP $>$ \\
+bool \mbox{\hyperlink{class_c_l_i_1_1_option_base}{CLI\+::\+Option\+Base}}$<$ CRTP $>$\+::get\+\_\+ignore\+\_\+underscore (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l03425}{3425}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03425\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_c_l_i_1_1_option_base_adafc24528125977c500b9b0c7b5068bf}{ignore\_underscore\_}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_c_l_i_1_1_option_base_a67ade2fd6f98b5a77c45b18c3d8ae639}\index{CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}!get\_multi\_option\_policy@{get\_multi\_option\_policy}}
+\index{get\_multi\_option\_policy@{get\_multi\_option\_policy}!CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}}
+\doxysubsubsection{\texorpdfstring{get\_multi\_option\_policy()}{get\_multi\_option\_policy()}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_option_base_a67ade2fd6f98b5a77c45b18c3d8ae639} 
+template$<$typename CRTP $>$ \\
+\mbox{\hyperlink{namespace_c_l_i_a991a3264d3459575fc7e83eb54d73d2b}{Multi\+Option\+Policy}} \mbox{\hyperlink{class_c_l_i_1_1_option_base}{CLI\+::\+Option\+Base}}$<$ CRTP $>$\+::get\+\_\+multi\+\_\+option\+\_\+policy (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l03440}{3440}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03440\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_c_l_i_1_1_option_base_a2c5483d3c992baad97beed3de2b82b05}{multi\_option\_policy\_}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_c_l_i_1_1_option_base_aa902dee6da6d7f5b083b1c7d5f9c1308}\index{CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}!get\_required@{get\_required}}
+\index{get\_required@{get\_required}!CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}}
+\doxysubsubsection{\texorpdfstring{get\_required()}{get\_required()}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_option_base_aa902dee6da6d7f5b083b1c7d5f9c1308} 
+template$<$typename CRTP $>$ \\
+bool \mbox{\hyperlink{class_c_l_i_1_1_option_base}{CLI\+::\+Option\+Base}}$<$ CRTP $>$\+::get\+\_\+required (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l03419}{3419}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03419\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_c_l_i_1_1_option_base_abad838fd3da11f840a40536a279912ac}{required\_}};\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_c_l_i_1_1_option_base_aa902dee6da6d7f5b083b1c7d5f9c1308_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_c_l_i_1_1_option_base_a17077e6cf3e228a4978fb4be525bc80d}\index{CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}!group@{group}}
+\index{group@{group}!CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}}
+\doxysubsubsection{\texorpdfstring{group()}{group()}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_option_base_a17077e6cf3e228a4978fb4be525bc80d} 
+template$<$typename CRTP $>$ \\
+CRTP \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_c_l_i_1_1_option_base}{CLI\+::\+Option\+Base}}$<$ CRTP $>$\+::group (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{name}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l03394}{3394}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03394\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{03395\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_c_l_i_1_1_option_base_ad0d8bd0637023f7d87a8e95315e8fb21}{group\_}}\ =\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}};}
+\DoxyCodeLine{03396\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}CRTP\ *\textcolor{keyword}{>}(\textcolor{keyword}{this});}
+\DoxyCodeLine{03397\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_c_l_i_1_1_option_base_a1c353d2455f0fc251fa8d0e98b66ea93}\index{CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}!join@{join}}
+\index{join@{join}!CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}}
+\doxysubsubsection{\texorpdfstring{join()}{join()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_option_base_a1c353d2455f0fc251fa8d0e98b66ea93} 
+template$<$typename CRTP $>$ \\
+CRTP \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_c_l_i_1_1_option_base}{CLI\+::\+Option\+Base}}$<$ CRTP $>$\+::join (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l03466}{3466}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03466\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{03467\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacesysio_a5c18cd9d34b8c5d3af8e2de75577673fa1f42b089b0bc1105b38f19140a65cc2a}{self}}\ =\ \textcolor{keyword}{static\_cast<}CRTP\ *\textcolor{keyword}{>}(\textcolor{keyword}{this});}
+\DoxyCodeLine{03468\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_a5c18cd9d34b8c5d3af8e2de75577673fa1f42b089b0bc1105b38f19140a65cc2a}{self}}-\/>multi\_option\_policy(\mbox{\hyperlink{namespace_c_l_i_a991a3264d3459575fc7e83eb54d73d2baa286d9991c6a547ae25a5f5216164b8f}{MultiOptionPolicy::Join}});}
+\DoxyCodeLine{03469\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacesysio_a5c18cd9d34b8c5d3af8e2de75577673fa1f42b089b0bc1105b38f19140a65cc2a}{self}};}
+\DoxyCodeLine{03470\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_c_l_i_1_1_option_base_a2f9160afa4b72e8425bffd043be92ea6}\index{CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}!join@{join}}
+\index{join@{join}!CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}}
+\doxysubsubsection{\texorpdfstring{join()}{join()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_option_base_a2f9160afa4b72e8425bffd043be92ea6} 
+template$<$typename CRTP $>$ \\
+CRTP \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_c_l_i_1_1_option_base}{CLI\+::\+Option\+Base}}$<$ CRTP $>$\+::join (\begin{DoxyParamCaption}\item[{char}]{delim}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l03473}{3473}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03473\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{03474\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacesysio_a5c18cd9d34b8c5d3af8e2de75577673fa1f42b089b0bc1105b38f19140a65cc2a}{self}}\ =\ \textcolor{keyword}{static\_cast<}CRTP\ *\textcolor{keyword}{>}(\textcolor{keyword}{this});}
+\DoxyCodeLine{03475\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_a5c18cd9d34b8c5d3af8e2de75577673fa1f42b089b0bc1105b38f19140a65cc2a}{self}}-\/>delimiter\_\ =\ delim;}
+\DoxyCodeLine{03476\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_a5c18cd9d34b8c5d3af8e2de75577673fa1f42b089b0bc1105b38f19140a65cc2a}{self}}-\/>multi\_option\_policy(\mbox{\hyperlink{namespace_c_l_i_a991a3264d3459575fc7e83eb54d73d2baa286d9991c6a547ae25a5f5216164b8f}{MultiOptionPolicy::Join}});}
+\DoxyCodeLine{03477\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacesysio_a5c18cd9d34b8c5d3af8e2de75577673fa1f42b089b0bc1105b38f19140a65cc2a}{self}};}
+\DoxyCodeLine{03478\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_c_l_i_1_1_option_base_a083eb9ce01d6f8a59f6cfea0cece2e05}\index{CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}!mandatory@{mandatory}}
+\index{mandatory@{mandatory}!CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}}
+\doxysubsubsection{\texorpdfstring{mandatory()}{mandatory()}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_option_base_a083eb9ce01d6f8a59f6cfea0cece2e05} 
+template$<$typename CRTP $>$ \\
+CRTP \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_c_l_i_1_1_option_base}{CLI\+::\+Option\+Base}}$<$ CRTP $>$\+::mandatory (\begin{DoxyParamCaption}\item[{bool}]{value}{ = {\ttfamily true}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l03406}{3406}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03406\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a}{required}}(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}});\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_c_l_i_1_1_option_base_a083eb9ce01d6f8a59f6cfea0cece2e05_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a}\index{CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}!required@{required}}
+\index{required@{required}!CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}}
+\doxysubsubsection{\texorpdfstring{required()}{required()}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a} 
+template$<$typename CRTP $>$ \\
+CRTP \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_c_l_i_1_1_option_base}{CLI\+::\+Option\+Base}}$<$ CRTP $>$\+::required (\begin{DoxyParamCaption}\item[{bool}]{value}{ = {\ttfamily true}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l03400}{3400}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03400\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{03401\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_c_l_i_1_1_option_base_abad838fd3da11f840a40536a279912ac}{required\_}}\ =\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}};}
+\DoxyCodeLine{03402\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}CRTP\ *\textcolor{keyword}{>}(\textcolor{keyword}{this});}
+\DoxyCodeLine{03403\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_c_l_i_1_1_option_base_a0edb237c89d77253e079e4d6c7f86e8c}\index{CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}!take\_all@{take\_all}}
+\index{take\_all@{take\_all}!CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}}
+\doxysubsubsection{\texorpdfstring{take\_all()}{take\_all()}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_option_base_a0edb237c89d77253e079e4d6c7f86e8c} 
+template$<$typename CRTP $>$ \\
+CRTP \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_c_l_i_1_1_option_base}{CLI\+::\+Option\+Base}}$<$ CRTP $>$\+::take\+\_\+all (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l03459}{3459}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03459\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{03460\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacesysio_a5c18cd9d34b8c5d3af8e2de75577673fa1f42b089b0bc1105b38f19140a65cc2a}{self}}\ =\ \textcolor{keyword}{static\_cast<}CRTP\ *\textcolor{keyword}{>}(\textcolor{keyword}{this});}
+\DoxyCodeLine{03461\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_a5c18cd9d34b8c5d3af8e2de75577673fa1f42b089b0bc1105b38f19140a65cc2a}{self}}-\/>multi\_option\_policy(\mbox{\hyperlink{namespace_c_l_i_a991a3264d3459575fc7e83eb54d73d2ba571fa4972dd227b4097ab6a774ca1263}{MultiOptionPolicy::TakeAll}});}
+\DoxyCodeLine{03462\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacesysio_a5c18cd9d34b8c5d3af8e2de75577673fa1f42b089b0bc1105b38f19140a65cc2a}{self}};}
+\DoxyCodeLine{03463\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_c_l_i_1_1_option_base_a5727e47f4541f99986503b086f1da735}\index{CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}!take\_first@{take\_first}}
+\index{take\_first@{take\_first}!CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}}
+\doxysubsubsection{\texorpdfstring{take\_first()}{take\_first()}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_option_base_a5727e47f4541f99986503b086f1da735} 
+template$<$typename CRTP $>$ \\
+CRTP \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_c_l_i_1_1_option_base}{CLI\+::\+Option\+Base}}$<$ CRTP $>$\+::take\+\_\+first (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l03452}{3452}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03452\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{03453\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacesysio_a5c18cd9d34b8c5d3af8e2de75577673fa1f42b089b0bc1105b38f19140a65cc2a}{self}}\ =\ \textcolor{keyword}{static\_cast<}CRTP\ *\textcolor{keyword}{>}(\textcolor{keyword}{this});}
+\DoxyCodeLine{03454\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_a5c18cd9d34b8c5d3af8e2de75577673fa1f42b089b0bc1105b38f19140a65cc2a}{self}}-\/>multi\_option\_policy(\mbox{\hyperlink{namespace_c_l_i_a991a3264d3459575fc7e83eb54d73d2ba59a97fc8d11b2b3f89acfe1c3ac891df}{MultiOptionPolicy::TakeFirst}});}
+\DoxyCodeLine{03455\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacesysio_a5c18cd9d34b8c5d3af8e2de75577673fa1f42b089b0bc1105b38f19140a65cc2a}{self}};}
+\DoxyCodeLine{03456\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_c_l_i_1_1_option_base_abf721b86beb0f957a4d85ad4f6e72c20}\index{CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}!take\_last@{take\_last}}
+\index{take\_last@{take\_last}!CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}}
+\doxysubsubsection{\texorpdfstring{take\_last()}{take\_last()}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_option_base_abf721b86beb0f957a4d85ad4f6e72c20} 
+template$<$typename CRTP $>$ \\
+CRTP \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_c_l_i_1_1_option_base}{CLI\+::\+Option\+Base}}$<$ CRTP $>$\+::take\+\_\+last (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l03445}{3445}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03445\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{03446\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacesysio_a5c18cd9d34b8c5d3af8e2de75577673fa1f42b089b0bc1105b38f19140a65cc2a}{self}}\ =\ \textcolor{keyword}{static\_cast<}CRTP\ *\textcolor{keyword}{>}(\textcolor{keyword}{this});}
+\DoxyCodeLine{03447\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_a5c18cd9d34b8c5d3af8e2de75577673fa1f42b089b0bc1105b38f19140a65cc2a}{self}}-\/>multi\_option\_policy(\mbox{\hyperlink{namespace_c_l_i_a991a3264d3459575fc7e83eb54d73d2ba91a7975e6be6ac082721192c7eb98891}{MultiOptionPolicy::TakeLast}});}
+\DoxyCodeLine{03448\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacesysio_a5c18cd9d34b8c5d3af8e2de75577673fa1f42b089b0bc1105b38f19140a65cc2a}{self}};}
+\DoxyCodeLine{03449\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{class_c_l_i_1_1_option_base_a23aca05ffa9c2d3fbba10b5434cdba64}\index{CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}!always\_capture\_default\_@{always\_capture\_default\_}}
+\index{always\_capture\_default\_@{always\_capture\_default\_}!CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}}
+\doxysubsubsection{\texorpdfstring{always\_capture\_default\_}{always\_capture\_default\_}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_option_base_a23aca05ffa9c2d3fbba10b5434cdba64} 
+template$<$typename CRTP $>$ \\
+bool \mbox{\hyperlink{class_c_l_i_1_1_option_base}{CLI\+::\+Option\+Base}}$<$ CRTP $>$\+::always\+\_\+capture\+\_\+default\+\_\+ \{false\}\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l03372}{3372}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03372\ \{\textcolor{keyword}{false}\};}
+
+\end{DoxyCode}
+\Hypertarget{class_c_l_i_1_1_option_base_a86801bb8560b37e40ea60815871a22ee}\index{CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}!configurable\_@{configurable\_}}
+\index{configurable\_@{configurable\_}!CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}}
+\doxysubsubsection{\texorpdfstring{configurable\_}{configurable\_}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_option_base_a86801bb8560b37e40ea60815871a22ee} 
+template$<$typename CRTP $>$ \\
+bool \mbox{\hyperlink{class_c_l_i_1_1_option_base}{CLI\+::\+Option\+Base}}$<$ CRTP $>$\+::configurable\+\_\+ \{true\}\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l03363}{3363}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03363\ \{\textcolor{keyword}{true}\};}
+
+\end{DoxyCode}
+\Hypertarget{class_c_l_i_1_1_option_base_ac4164d93e2b8e59b2de24dad04a9f34b}\index{CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}!delimiter\_@{delimiter\_}}
+\index{delimiter\_@{delimiter\_}!CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}}
+\doxysubsubsection{\texorpdfstring{delimiter\_}{delimiter\_}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_option_base_ac4164d93e2b8e59b2de24dad04a9f34b} 
+template$<$typename CRTP $>$ \\
+char \mbox{\hyperlink{class_c_l_i_1_1_option_base}{CLI\+::\+Option\+Base}}$<$ CRTP $>$\+::delimiter\+\_\+ \{\textquotesingle{}\textbackslash{}0\textquotesingle{}\}\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l03369}{3369}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03369\ \{\textcolor{charliteral}{'\(\backslash\)0'}\};}
+
+\end{DoxyCode}
+\Hypertarget{class_c_l_i_1_1_option_base_ab62f608c0957e32ccf56f2834aa574c1}\index{CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}!disable\_flag\_override\_@{disable\_flag\_override\_}}
+\index{disable\_flag\_override\_@{disable\_flag\_override\_}!CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}}
+\doxysubsubsection{\texorpdfstring{disable\_flag\_override\_}{disable\_flag\_override\_}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_option_base_ab62f608c0957e32ccf56f2834aa574c1} 
+template$<$typename CRTP $>$ \\
+bool \mbox{\hyperlink{class_c_l_i_1_1_option_base}{CLI\+::\+Option\+Base}}$<$ CRTP $>$\+::disable\+\_\+flag\+\_\+override\+\_\+ \{false\}\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l03366}{3366}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03366\ \{\textcolor{keyword}{false}\};}
+
+\end{DoxyCode}
+\Hypertarget{class_c_l_i_1_1_option_base_ad0d8bd0637023f7d87a8e95315e8fb21}\index{CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}!group\_@{group\_}}
+\index{group\_@{group\_}!CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}}
+\doxysubsubsection{\texorpdfstring{group\_}{group\_}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_option_base_ad0d8bd0637023f7d87a8e95315e8fb21} 
+template$<$typename CRTP $>$ \\
+std\+::string \mbox{\hyperlink{class_c_l_i_1_1_option_base}{CLI\+::\+Option\+Base}}$<$ CRTP $>$\+::group\+\_\+ = std\+::string("{}Options"{})\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l03351}{3351}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+\Hypertarget{class_c_l_i_1_1_option_base_a616d0aa1bd4e540733e24f88bc17cd3a}\index{CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}!ignore\_case\_@{ignore\_case\_}}
+\index{ignore\_case\_@{ignore\_case\_}!CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}}
+\doxysubsubsection{\texorpdfstring{ignore\_case\_}{ignore\_case\_}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_option_base_a616d0aa1bd4e540733e24f88bc17cd3a} 
+template$<$typename CRTP $>$ \\
+bool \mbox{\hyperlink{class_c_l_i_1_1_option_base}{CLI\+::\+Option\+Base}}$<$ CRTP $>$\+::ignore\+\_\+case\+\_\+ \{false\}\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l03357}{3357}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03357\ \{\textcolor{keyword}{false}\};}
+
+\end{DoxyCode}
+\Hypertarget{class_c_l_i_1_1_option_base_adafc24528125977c500b9b0c7b5068bf}\index{CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}!ignore\_underscore\_@{ignore\_underscore\_}}
+\index{ignore\_underscore\_@{ignore\_underscore\_}!CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}}
+\doxysubsubsection{\texorpdfstring{ignore\_underscore\_}{ignore\_underscore\_}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_option_base_adafc24528125977c500b9b0c7b5068bf} 
+template$<$typename CRTP $>$ \\
+bool \mbox{\hyperlink{class_c_l_i_1_1_option_base}{CLI\+::\+Option\+Base}}$<$ CRTP $>$\+::ignore\+\_\+underscore\+\_\+ \{false\}\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l03360}{3360}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03360\ \{\textcolor{keyword}{false}\};}
+
+\end{DoxyCode}
+\Hypertarget{class_c_l_i_1_1_option_base_a2c5483d3c992baad97beed3de2b82b05}\index{CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}!multi\_option\_policy\_@{multi\_option\_policy\_}}
+\index{multi\_option\_policy\_@{multi\_option\_policy\_}!CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}}
+\doxysubsubsection{\texorpdfstring{multi\_option\_policy\_}{multi\_option\_policy\_}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_option_base_a2c5483d3c992baad97beed3de2b82b05} 
+template$<$typename CRTP $>$ \\
+\mbox{\hyperlink{namespace_c_l_i_a991a3264d3459575fc7e83eb54d73d2b}{Multi\+Option\+Policy}} \mbox{\hyperlink{class_c_l_i_1_1_option_base}{CLI\+::\+Option\+Base}}$<$ CRTP $>$\+::multi\+\_\+option\+\_\+policy\+\_\+ \{\mbox{\hyperlink{namespace_c_l_i_a991a3264d3459575fc7e83eb54d73d2ba8ce61dd2505effd96f937fa743b6491f}{Multi\+Option\+Policy\+::\+Throw}}\}\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l03375}{3375}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03375\ \{\mbox{\hyperlink{namespace_c_l_i_a991a3264d3459575fc7e83eb54d73d2ba8ce61dd2505effd96f937fa743b6491f}{MultiOptionPolicy::Throw}}\};}
+
+\end{DoxyCode}
+\Hypertarget{class_c_l_i_1_1_option_base_abad838fd3da11f840a40536a279912ac}\index{CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}!required\_@{required\_}}
+\index{required\_@{required\_}!CLI::OptionBase$<$ CRTP $>$@{CLI::OptionBase$<$ CRTP $>$}}
+\doxysubsubsection{\texorpdfstring{required\_}{required\_}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_option_base_abad838fd3da11f840a40536a279912ac} 
+template$<$typename CRTP $>$ \\
+bool \mbox{\hyperlink{class_c_l_i_1_1_option_base}{CLI\+::\+Option\+Base}}$<$ CRTP $>$\+::required\+\_\+ \{false\}\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l03354}{3354}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03354\ \{\textcolor{keyword}{false}\};}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+programs/clio/\mbox{\hyperlink{_c_l_i11_8hpp}{CLI11.\+hpp}}\end{DoxyCompactItemize}

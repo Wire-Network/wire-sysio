@@ -1,0 +1,257 @@
+\doxysection{File\+Write\+Stream Class Reference}
+\hypertarget{class_file_write_stream}{}\label{class_file_write_stream}\index{FileWriteStream@{FileWriteStream}}
+
+
+Wrapper of C file stream for output using fwrite().  
+
+
+
+
+{\ttfamily \#include $<$filewritestream.\+h$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef char \mbox{\hyperlink{class_file_write_stream_a42a626fb22f69c5634e8ed62a92cd167}{Ch}}
+\begin{DoxyCompactList}\small\item\em Character type. Only support char. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_file_write_stream_a553ea3e7377a7f7cace2daa3cc90e1a1}{File\+Write\+Stream}} (std\+::\+FILE \texorpdfstring{$\ast$}{*}fp, char \texorpdfstring{$\ast$}{*}buffer, size\+\_\+t buffer\+Size)
+\item 
+void \mbox{\hyperlink{class_file_write_stream_af6a6061d0accd939fa475b9b34427d85}{Put}} (char c)
+\item 
+void \mbox{\hyperlink{class_file_write_stream_ad9ec108b24316a2c1c83c6ddc75d308a}{PutN}} (char c, size\+\_\+t n)
+\item 
+void \mbox{\hyperlink{class_file_write_stream_a939fbf183ba36464c5e0837df4329d37}{Flush}} ()
+\item 
+char \mbox{\hyperlink{class_file_write_stream_ab556c7e26346ddff0e579a53c09c3a13}{Peek}} () const
+\item 
+char \mbox{\hyperlink{class_file_write_stream_ac927a0ae09a85eaba58a74ceb04b40ed}{Take}} ()
+\item 
+size\+\_\+t \mbox{\hyperlink{class_file_write_stream_a06272de32d6ac4d10c9bd5deb79a0234}{Tell}} () const
+\item 
+char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_file_write_stream_a3805559e228703c94d1165f0653e1f64}{Put\+Begin}} ()
+\item 
+size\+\_\+t \mbox{\hyperlink{class_file_write_stream_a54b14047e4c998db0594290605f8f0dc}{Put\+End}} (char \texorpdfstring{$\ast$}{*})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\begin{DoxyNote}{Note}
+implements Stream concept 
+\end{DoxyNote}
+
+
+Definition at line \mbox{\hyperlink{filewritestream_8h_source_l00032}{32}} of file \mbox{\hyperlink{filewritestream_8h_source}{filewritestream.\+h}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{class_file_write_stream_a42a626fb22f69c5634e8ed62a92cd167}\index{FileWriteStream@{FileWriteStream}!Ch@{Ch}}
+\index{Ch@{Ch}!FileWriteStream@{FileWriteStream}}
+\doxysubsubsection{\texorpdfstring{Ch}{Ch}}
+{\footnotesize\ttfamily \label{class_file_write_stream_a42a626fb22f69c5634e8ed62a92cd167} 
+char \mbox{\hyperlink{class_file_write_stream_a42a626fb22f69c5634e8ed62a92cd167}{File\+Write\+Stream\+::\+Ch}}}
+
+
+
+Definition at line \mbox{\hyperlink{filewritestream_8h_source_l00034}{34}} of file \mbox{\hyperlink{filewritestream_8h_source}{filewritestream.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_file_write_stream_a553ea3e7377a7f7cace2daa3cc90e1a1}\index{FileWriteStream@{FileWriteStream}!FileWriteStream@{FileWriteStream}}
+\index{FileWriteStream@{FileWriteStream}!FileWriteStream@{FileWriteStream}}
+\doxysubsubsection{\texorpdfstring{FileWriteStream()}{FileWriteStream()}}
+{\footnotesize\ttfamily \label{class_file_write_stream_a553ea3e7377a7f7cace2daa3cc90e1a1} 
+File\+Write\+Stream\+::\+File\+Write\+Stream (\begin{DoxyParamCaption}\item[{std\+::\+FILE \texorpdfstring{$\ast$}{*}}]{fp}{, }\item[{char \texorpdfstring{$\ast$}{*}}]{buffer}{, }\item[{size\+\_\+t}]{buffer\+Size}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{filewritestream_8h_source_l00036}{36}} of file \mbox{\hyperlink{filewritestream_8h_source}{filewritestream.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ fp\_(fp),\ buffer\_(buffer),\ bufferEnd\_(buffer\ +\ bufferSize),\ current\_(buffer\_)\ \{\ }
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(fp\_\ !=\ 0);}
+\DoxyCodeLine{00038\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_file_write_stream_a939fbf183ba36464c5e0837df4329d37}\index{FileWriteStream@{FileWriteStream}!Flush@{Flush}}
+\index{Flush@{Flush}!FileWriteStream@{FileWriteStream}}
+\doxysubsubsection{\texorpdfstring{Flush()}{Flush()}}
+{\footnotesize\ttfamily \label{class_file_write_stream_a939fbf183ba36464c5e0837df4329d37} 
+void File\+Write\+Stream\+::\+Flush (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{filewritestream_8h_source_l00063}{63}} of file \mbox{\hyperlink{filewritestream_8h_source}{filewritestream.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (current\_\ !=\ buffer\_)\ \{}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ result\ =\ std::fwrite(buffer\_,\ 1,\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(current\_\ -\/\ buffer\_),\ fp\_);}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (result\ <\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(current\_\ -\/\ buffer\_))\ \{}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ failure\ deliberately\ ignored\ at\ this\ time}}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ added\ to\ avoid\ warn\_unused\_result\ build\ errors}}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \ \ \ current\_\ =\ buffer\_;}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00072\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=346pt]{class_file_write_stream_a939fbf183ba36464c5e0837df4329d37_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_file_write_stream_ab556c7e26346ddff0e579a53c09c3a13}\index{FileWriteStream@{FileWriteStream}!Peek@{Peek}}
+\index{Peek@{Peek}!FileWriteStream@{FileWriteStream}}
+\doxysubsubsection{\texorpdfstring{Peek()}{Peek()}}
+{\footnotesize\ttfamily \label{class_file_write_stream_ab556c7e26346ddff0e579a53c09c3a13} 
+char File\+Write\+Stream\+::\+Peek (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{filewritestream_8h_source_l00075}{75}} of file \mbox{\hyperlink{filewritestream_8h_source}{filewritestream.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00075\ \{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\textcolor{keyword}{false});\ \textcolor{keywordflow}{return}\ 0;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_file_write_stream_af6a6061d0accd939fa475b9b34427d85}\index{FileWriteStream@{FileWriteStream}!Put@{Put}}
+\index{Put@{Put}!FileWriteStream@{FileWriteStream}}
+\doxysubsubsection{\texorpdfstring{Put()}{Put()}}
+{\footnotesize\ttfamily \label{class_file_write_stream_af6a6061d0accd939fa475b9b34427d85} 
+void File\+Write\+Stream\+::\+Put (\begin{DoxyParamCaption}\item[{char}]{c}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{filewritestream_8h_source_l00040}{40}} of file \mbox{\hyperlink{filewritestream_8h_source}{filewritestream.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ }
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (current\_\ >=\ bufferEnd\_)}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_file_write_stream_a939fbf183ba36464c5e0837df4329d37}{Flush}}();}
+\DoxyCodeLine{00043\ }
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ *current\_++\ =\ c;}
+\DoxyCodeLine{00045\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=339pt]{class_file_write_stream_af6a6061d0accd939fa475b9b34427d85_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_file_write_stream_a3805559e228703c94d1165f0653e1f64}\index{FileWriteStream@{FileWriteStream}!PutBegin@{PutBegin}}
+\index{PutBegin@{PutBegin}!FileWriteStream@{FileWriteStream}}
+\doxysubsubsection{\texorpdfstring{PutBegin()}{PutBegin()}}
+{\footnotesize\ttfamily \label{class_file_write_stream_a3805559e228703c94d1165f0653e1f64} 
+char \texorpdfstring{$\ast$}{*} File\+Write\+Stream\+::\+Put\+Begin (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{filewritestream_8h_source_l00078}{78}} of file \mbox{\hyperlink{filewritestream_8h_source}{filewritestream.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00078\ \{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\textcolor{keyword}{false});\ \textcolor{keywordflow}{return}\ 0;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_file_write_stream_a54b14047e4c998db0594290605f8f0dc}\index{FileWriteStream@{FileWriteStream}!PutEnd@{PutEnd}}
+\index{PutEnd@{PutEnd}!FileWriteStream@{FileWriteStream}}
+\doxysubsubsection{\texorpdfstring{PutEnd()}{PutEnd()}}
+{\footnotesize\ttfamily \label{class_file_write_stream_a54b14047e4c998db0594290605f8f0dc} 
+size\+\_\+t File\+Write\+Stream\+::\+Put\+End (\begin{DoxyParamCaption}\item[{char \texorpdfstring{$\ast$}{*}}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{filewritestream_8h_source_l00079}{79}} of file \mbox{\hyperlink{filewritestream_8h_source}{filewritestream.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00079\ \{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\textcolor{keyword}{false});\ \textcolor{keywordflow}{return}\ 0;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_file_write_stream_ad9ec108b24316a2c1c83c6ddc75d308a}\index{FileWriteStream@{FileWriteStream}!PutN@{PutN}}
+\index{PutN@{PutN}!FileWriteStream@{FileWriteStream}}
+\doxysubsubsection{\texorpdfstring{PutN()}{PutN()}}
+{\footnotesize\ttfamily \label{class_file_write_stream_ad9ec108b24316a2c1c83c6ddc75d308a} 
+void File\+Write\+Stream\+::\+PutN (\begin{DoxyParamCaption}\item[{char}]{c}{, }\item[{size\+\_\+t}]{n}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{filewritestream_8h_source_l00047}{47}} of file \mbox{\hyperlink{filewritestream_8h_source}{filewritestream.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ avail\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(bufferEnd\_\ -\/\ current\_);}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (n\ >\ avail)\ \{}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \ \ \ std::memset(current\_,\ c,\ avail);}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ current\_\ +=\ avail;}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_file_write_stream_a939fbf183ba36464c5e0837df4329d37}{Flush}}();}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \ n\ -\/=\ avail;}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \ \ \ avail\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(bufferEnd\_\ -\/\ current\_);}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00056\ }
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (n\ >\ 0)\ \{}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \ \ \ std::memset(current\_,\ c,\ n);}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ \ \ \ current\_\ +=\ n;}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00061\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=346pt]{class_file_write_stream_ad9ec108b24316a2c1c83c6ddc75d308a_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_file_write_stream_ac927a0ae09a85eaba58a74ceb04b40ed}\index{FileWriteStream@{FileWriteStream}!Take@{Take}}
+\index{Take@{Take}!FileWriteStream@{FileWriteStream}}
+\doxysubsubsection{\texorpdfstring{Take()}{Take()}}
+{\footnotesize\ttfamily \label{class_file_write_stream_ac927a0ae09a85eaba58a74ceb04b40ed} 
+char File\+Write\+Stream\+::\+Take (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{filewritestream_8h_source_l00076}{76}} of file \mbox{\hyperlink{filewritestream_8h_source}{filewritestream.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00076\ \{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\textcolor{keyword}{false});\ \textcolor{keywordflow}{return}\ 0;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_file_write_stream_a06272de32d6ac4d10c9bd5deb79a0234}\index{FileWriteStream@{FileWriteStream}!Tell@{Tell}}
+\index{Tell@{Tell}!FileWriteStream@{FileWriteStream}}
+\doxysubsubsection{\texorpdfstring{Tell()}{Tell()}}
+{\footnotesize\ttfamily \label{class_file_write_stream_a06272de32d6ac4d10c9bd5deb79a0234} 
+size\+\_\+t File\+Write\+Stream\+::\+Tell (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{filewritestream_8h_source_l00077}{77}} of file \mbox{\hyperlink{filewritestream_8h_source}{filewritestream.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00077\ \{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\textcolor{keyword}{false});\ \textcolor{keywordflow}{return}\ 0;\ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/\mbox{\hyperlink{filewritestream_8h}{filewritestream.\+h}}\end{DoxyCompactItemize}

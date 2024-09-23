@@ -1,0 +1,15 @@
+<map id="fc::message_buffer::read_ptr" name="fc::message_buffer::read_ptr">
+<area shape="rect" id="Node000001" title=" " alt="" coords="494,98,627,138"/>
+<area shape="rect" id="Node000002" href="$test__message__buffer_8cpp.html#a726ea74fa85bcd71c27873a80f644ecb" title="Test default construction and buffer sequence generation." alt="" coords="250,5,446,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="521,91,485,66,445,45,415,34,417,29,447,40,488,62,524,86"/>
+<area shape="rect" id="Node000003" href="$test__message__buffer_8cpp.html#ac64fd5998672b472a05dead509a6e008" title="Test buffer growth and shrinking." alt="" coords="250,55,446,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="478,101,404,84,406,78,479,96"/>
+<area shape="rect" id="Node000004" href="$test__message__buffer_8cpp.html#ae9f66dfac041e0941e63b810d0cb5315" title="Test peek and read across multiple buffers." alt="" coords="5,172,202,198"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="479,123,370,130,250,146,194,159,144,174,143,169,193,154,249,141,369,125,478,118"/>
+<area shape="rect" id="Node000005" href="$test__message__buffer_8cpp.html#a51213da5fa9bc94beae58bc546fe060c" title="Test automatic allocation when advancing the read_ptr to the end." alt="" coords="250,156,446,182"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="479,140,406,158,404,153,478,135"/>
+<area shape="rect" id="Node000006" href="$classfc_1_1message__buffer.html#a535ef4f901ac8e5f9008524eafad9447" title=" " alt="" coords="281,230,414,270"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="518,150,447,196,388,231,385,227,445,192,515,145"/>
+<area shape="poly" id="edge6_Node000006_Node000004" title=" " alt="" coords="266,231,154,201,155,196,267,226"/>
+<area shape="poly" id="edge7_Node000006_Node000006" title=" " alt="" coords="382,217,370,211,348,208,328,210,315,215,311,221,313,229,308,230,306,220,312,211,326,205,348,203,371,206,385,212"/>
+</map>

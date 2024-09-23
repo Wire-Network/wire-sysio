@@ -1,0 +1,233 @@
+\chapter{High-\/\+Speed Software Implementation of the Optimal Ate Pairing over Barreto-\/\+Naehrig Curves}
+\hypertarget{md_libraries_2fc_2libraries_2ff_2depends_2ate-pairing_2readme}{}\label{md_libraries_2fc_2libraries_2ff_2depends_2ate-pairing_2readme}\index{High-\/Speed Software Implementation of the Optimal Ate Pairing over Barreto-\/Naehrig Curves@{High-\/Speed Software Implementation of the Optimal Ate Pairing over Barreto-\/Naehrig Curves}}
+This library provides functionality to compute the optimal ate pairing over Barreto-\/\+Naehrig (BN) curves. It is released under the \href{http://opensource.org/licenses/BSD-3-Clause}{\texttt{ BSD 3-\/Clause License}}.
+
+Now I\textquotesingle{}m developing a new pairing library \href{https://github.com/herumi/mcl/}{\texttt{ mcl}}, which is more portable and supports larger primes than this library though it is a little slower.
+
+\doxysection*{History }
+
+
+\begin{DoxyItemize}
+\item 2015/\+May/15\+: add \doxysectlink{md_libraries_2fc_2libraries_2ff_2depends_2ate-pairing_2java_2java}{java api}{0}
+\item 2014/\+Jun/15\+: support a BN curve for SNARKs, incorporating code from \href{https://github.com/scipr-lab/libsnark}{\texttt{ libsnark}}
+\item 2013/\+Jun/02\+: support {\ttfamily mulx} on \href{http://en.wikipedia.org/wiki/Haswell_\%28microarchitecture\%29}{\texttt{ Haswell}}
+\item 2013/\+Mar/08\+: add elliptic curve class
+\item 2012/\+Jan/30\+: rewrite ate pairing according to \href{http://www.patricklonga.bravehost.com/speed_pairing.html}{\texttt{ Faster explicit formulas for computing pairings over ordinary curves}}
+\item 2010/\+Sep/8\+: change twist xi from u + 12 to u
+\item 2010/\+Jul/15\+: use cyclotomic squaring for final exponentiation
+\item 2010/\+Jun/18\+: first release
+\end{DoxyItemize}
+
+\doxysection*{Overview }
+
+The following two BN curves are supported\+:
+
+
+\begin{DoxyEnumerate}
+\item a BN curve over the 254-\/bit prime p = 36z\texorpdfstring{$^\wedge$}{\string^}4 + 36z\texorpdfstring{$^\wedge$}{\string^}3 + 24z\texorpdfstring{$^\wedge$}{\string^}2 + 6z + 1 where z = -\/(2\texorpdfstring{$^\wedge$}{\string^}62 + 2\texorpdfstring{$^\wedge$}{\string^}55 + 1); and
+\item a BN curve over a 254-\/bit prime p such that n \+:= p + 1 -\/ t has high 2-\/adicity.
+\end{DoxyEnumerate}
+
+By default, the first curve (we call it as Curve\+Fp254\+BNb) is used; when setting the flag {\ttfamily SUPPORT\+\_\+\+SNARK}, the second curve (we call it as Curve\+SNARK) is used instead.
+
+
+\begin{DoxyItemize}
+\item {\bfseries{Curve\+Fp254\+BNb}} The value of z is found by \href{http://dx.doi.org/10.1007/978-3-540-85538-5_13}{\texttt{ \mbox{[}NASKM\mbox{]}}} first. The curve instantiated by z is investigated by \href{http://eprint.iacr.org/2010/429}{\texttt{ \mbox{[}PSNB\mbox{]}}} for an efficient implementation. Our library implements a fast algorithm, which is proposed by \href{http://eprint.iacr.org/2010/526}{\texttt{ \mbox{[}AKLGL\mbox{]}}} for this curve. The performance of this library is competitive to the state-\/of-\/the-\/art implementation report in \href{http://sac2013.irmacs.sfu.ca/slides/s1.pdf}{\texttt{ \mbox{[}ABLR\mbox{]}}}.
+\item {\bfseries{Curve\+SNARK}} Support for the second curve builds on code provided by \href{http://www.scipr-lab.org/}{\texttt{ SCIPR Lab}} in \href{https://github.com/scipr-lab/libsnark}{\texttt{ libsnark}}. The curve was specifically selected for speeding up {\bfseries{Succinct Non-\/interactive ARguments of Knowledge}} (SNARKs), which benefit from its high 2-\/adicity (see \href{http://eprint.iacr.org/2013/507}{\texttt{ \mbox{[}BCGTV13\mbox{]}}} and \href{http://eprint.iacr.org/2013/879}{\texttt{ \mbox{[}BCTV14\mbox{]}}}).
+\end{DoxyItemize}
+
+Pairing computations on the first curve are more efficient, and the performance numbers reported below (and in our papers) are achieved using this curve (which is prefered for applications that do not benefit from high 2-\/adicity). Note that the old parameters in \mbox{[}BDMOHT\mbox{]} are not used now.
+
+\doxysection*{Parameters }
+
+The curve equation for a BN curve is\+: \begin{DoxyVerb}E/Fp: y^2 = x^3 + b .
+\end{DoxyVerb}
+
+
+The two supported BN curves have the following parameters\+:
+
+
+\begin{DoxyEnumerate}
+\item b = 2 and p = 16798108731015832284940804142231733909889187121439069848933715426072753864723; and
+\item b = 3 and p = 21888242871839275222246405745257275088696311157297823662689037894645226208583.
+\end{DoxyEnumerate}
+
+As usual,
+
+
+\begin{DoxyItemize}
+\item the cyclic group G1 (aka \doxylink{class_ec1}{Ec1}) is instantiated as E(\+Fp)\mbox{[}n\mbox{]} where n \+:= p + 1 -\/ t;
+\item the cyclic group \doxylink{struct_g2}{G2} (aka \doxylink{class_ec2}{Ec2}) is instantiated as the inverse image of E\textquotesingle{}(Fp\texorpdfstring{$^\wedge$}{\string^}2)\mbox{[}n\mbox{]} under a twisting isomorphism from E\textquotesingle{} to E; and
+\item the pairing e\+: G1 x \doxylink{struct_g2}{G2} -\/\texorpdfstring{$>$}{>} \doxylink{class_fp12}{Fp12} is the optimal ate pairing.
+\end{DoxyItemize}
+
+The field \doxylink{class_fp12}{Fp12} is constructed via the following tower\+:
+
+
+\begin{DoxyItemize}
+\item \doxylink{class_fp2}{Fp2} = \doxylink{class_fp}{Fp}\mbox{[}u\mbox{]} / (u\texorpdfstring{$^\wedge$}{\string^}2 + 1)
+\item Fp6 = \doxylink{class_fp2}{Fp2}\mbox{[}v\mbox{]} / (v\texorpdfstring{$^\wedge$}{\string^}3 -\/ Xi) where Xi = u + 1
+\item \doxylink{class_fp12}{Fp12} = Fp6\mbox{[}w\mbox{]} / (w\texorpdfstring{$^\wedge$}{\string^}2 -\/ v)
+\end{DoxyItemize}
+
+\doxysection*{Requirements }
+
+
+\begin{DoxyItemize}
+\item OS\+: 64-\/bit Windows; 64-\/bit Linux; Mac OS X
+\item CPU\+: x64 Intel; AMD processor
+\item C++ compiler\+: Visual Studio 2012; gcc 4.\+4.\+1 or later
+\end{DoxyItemize}
+
+\doxysection*{Build instructions }
+
+\doxysubsection*{Windows}
+
+\begin{DoxyVerb}> git clone git://github.com/herumi/xbyak.git
+> git clone git://github.com/herumi/ate-pairing.git
+> git clone git://github.com/herumi/cybozulib-ext.git ; compiled binary of mpir
+\end{DoxyVerb}
+
+
+Open {\ttfamily ate/ate.\+sln} and compile {\ttfamily test\+\_\+bn} with Release mode. The produced binary is {\ttfamily ate/x64/\+Release/test\+\_\+bn.\+exe}.
+
+\doxysubsection*{Cygwin}
+
+Install {\ttfamily mingw64-\/x86\+\_\+64-\/gcc-\/g++} (run Cygwin setup and search {\ttfamily mingw64}). Then use the following commands\+: \begin{DoxyVerb}PATH=/usr/x86_64-w64-mingw32/sys-root/mingw/bin/:$PATH
+make -j
+test/bn.exe
+\end{DoxyVerb}
+
+
+Note that {\ttfamily test/bn.\+exe} uses {\ttfamily mulx} if possible; if you do not want to use it, run the executable as {\ttfamily test/bn.\+exe -\/mulx 0}. (This allows you to verify the difference with/without mulx on Haswell.)
+
+\doxysubsection*{Linux}
+
+Use the following commands\+: \begin{DoxyVerb}$ git clone git://github.com/herumi/xbyak.git
+$ git clone git://github.com/herumi/ate-pairing.git
+$ cd ate-pairing
+$ make -j
+$ test/bn
+\end{DoxyVerb}
+
+
+The library \href{https://github.com/herumi/xbyak}{\texttt{ xbyak}} is a x86/x86-\/64 JIT assembler for C++, developed for efficient pairing implementations. (See also \href{http://homepage1.nifty.com/herumi/soft/xbyak_e.html}{\texttt{ this webpage}}.) Note that binaries other than {\ttfamily test/bn} are used for testing purposes only.
+
+
+\begin{DoxyItemize}
+\item This implementation uses dynamically-\/generated code, so you will get the error {\ttfamily zm\+Init ERR\+:can\textquotesingle{}t protect} if execution of code on the heap is disallowed by some modern systems. For example, on Fedora 20, run {\ttfamily sudo setsebool -\/P allow\+\_\+execheap 1} to allow execution to solve this.
+\end{DoxyItemize}
+
+By the default, the first BN curve is used. If instead you want to use the second BN curve (specialized to SNARKs), modify the fourth line above to\+: \begin{DoxyVerb}$ make -j SUPPORT_SNARK=1
+\end{DoxyVerb}
+
+
+
+\begin{DoxyItemize}
+\item REMARK. You {\itshape defined} {\ttfamily BN\+\_\+\+SUPPORT\+\_\+\+SNARK} macro for a compile when if you use a library(libzm.\+a) made by {\ttfamily SUPPORT\+\_\+\+SNARK=1}.
+\end{DoxyItemize}
+
+\doxysection*{Usage }
+
+See the function {\ttfamily \doxylink{sample_8cpp_ab3c0ff110d2d351b57056b5c79f8f4fa}{sample2()}} in \href{https://github.com/herumi/ate-pairing/blob/master/test/sample.cpp}{\texttt{ sample.\+cpp}}. Also, use can use {\ttfamily mpz\+\_\+class} for scalar multiplication of points on the elliptic curves, if {\ttfamily MIE\+\_\+\+ATE\+\_\+\+USE\+\_\+\+GMP} is defined. For instance\+: \begin{DoxyVerb}using namespace bn;
+Param::init();
+const Ec2 g2(...);
+const Ec1 g1(...);
+mpz_class a("123456789");
+mpz_class b("98765432");
+Ec1 g1a = g1 * a;
+Ec2 g2b = g2 * b;
+Fp12 e;
+opt_atePairing(e, g2b, g1a);
+\end{DoxyVerb}
+
+
+\doxysection*{Usage for Java }
+
+See \doxysectlink{md_libraries_2fc_2libraries_2ff_2depends_2ate-pairing_2java_2java}{java.md}{0}. \doxylink{struct_a}{A} sample code is \href{java/BN254Test.java}{\texttt{ BN254\+Test.\+java}}.
+
+\doxysection*{Operation costs }
+
+Let mu be the cost of {\itshape unreduced multiplication} producing double-\/precision result (i.\+e., 256-\/bit int x 256-\/bit int to 512-\/bit int); and let r be the cost of {\itshape modular reduction} of double-\/precision integers (i.\+e., 512-\/bit int to 256-\/bit int in \doxylink{class_fp}{Fp}). Then, for us,
+
+
+\begin{DoxyItemize}
+\item \doxylink{class_fp_aadceb26f8ffc93073e770c183c3f9b68}{Fp\+::mul} = mu + r
+\item \doxylink{class_fp2_a2c1c38beb6f006778112096fc2aac7f2}{Fp2\+::mul} = 3mu + 2r
+\item Fp2\+::square = 2mu + 2r
+\end{DoxyItemize}
+
+Next, we compare the costs of our library with the one of \href{http://eprint.iacr.org/2010/526}{\texttt{ \mbox{[}AKLGL10\mbox{]}}}\+:
+
+\tabulinesep=1mm
+\begin{longtabu}spread 0pt [c]{*{3}{|X[-1]}|}
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Phase   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ \mbox{[}AKLGL10\mbox{]}   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ This work    }\\\cline{1-3}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Phase   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ \mbox{[}AKLGL10\mbox{]}   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ This work    }\\\cline{1-3}
+\endhead
+Miller loop   &6792mu + 3022r   &6785mu + 3022r    \\\cline{1-3}
+Final exponentiation   &3753mu + 2006r   &3526mu + 1932r    \\\cline{1-3}
+Optimal ate pairing   &10545mu + 5028r   &10311mu + 4954r   \\\cline{1-3}
+\end{longtabu}
+
+
+Note\+: \href{http://eprint.iacr.org/2010/526}{\texttt{ \mbox{[}Table 2 in p. 17, AKLGL10\mbox{]}}} does not contain the cost of (m, r) so we have added the costs of (282m + 6mu + 4r) and (30m + 75mu + 50r) to ML and FE respectively.
+
+Finally, at the moment, our implementation does not support the algorithm in \href{https://eprint.iacr.org/2010/429}{\texttt{ PSNB10}}.
+
+\doxysection*{Benchmark }
+
+The cost of a pairing is {\bfseries{1.\+17M}} clock cycles on Core i7 4700MQ (Haswell) 2.\+4\+GHz processor with Turbo\+Boost disabled. Below, we also include clock cycle counts on Core i7 2600 3.\+4\+GHz, Xeon X5650 2.\+6\+GHz, and Core i7 4700MQ 2.\+4\+GHz. The formal benchmark is written in \mbox{[}ZPMRTH\mbox{]}. \begin{DoxyVerb}% sudo sh -c "echo 0 > /sys/devices/system/cpu/cpufreq/boost"
+% cat /sys/devices/system/cpu/cpufreq/boost
+0
+\end{DoxyVerb}
+
+
+\tabulinesep=1mm
+\begin{longtabu}spread 0pt [c]{*{5}{|X[-1]}|}
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ operation   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ i7 2600   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Xeon X5650   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Haswell   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Haswell with mulx    }\\\cline{1-5}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ operation   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ i7 2600   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Xeon X5650   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Haswell   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Haswell with mulx    }\\\cline{1-5}
+\endhead
+Turbo\+Boost   &on   &on   &off   &off   \\\cline{1-5}
+\end{longtabu}
+\texorpdfstring{$\vert$}{|} \texorpdfstring{$\vert$}{|} \texorpdfstring{$\vert$}{|} \texorpdfstring{$\vert$}{|} mu \texorpdfstring{$\vert$}{|} 50 \texorpdfstring{$\vert$}{|}60 \texorpdfstring{$\vert$}{|}42 \texorpdfstring{$\vert$}{|}38 r \texorpdfstring{$\vert$}{|} 80 \texorpdfstring{$\vert$}{|}98 \texorpdfstring{$\vert$}{|}69 \texorpdfstring{$\vert$}{|}65 \doxylink{class_fp}{Fp}\+:mul \texorpdfstring{$\vert$}{|}124 \texorpdfstring{$\vert$}{|}146 \texorpdfstring{$\vert$}{|}98 \texorpdfstring{$\vert$}{|}90 \doxylink{class_fp2}{Fp2}\+:mul \texorpdfstring{$\vert$}{|}360 \texorpdfstring{$\vert$}{|}412 \texorpdfstring{$\vert$}{|} \texorpdfstring{$\vert$}{|} \doxylink{class_fp2}{Fp2}\+:square \texorpdfstring{$\vert$}{|}288 \texorpdfstring{$\vert$}{|}335 \texorpdfstring{$\vert$}{|} \texorpdfstring{$\vert$}{|} \texorpdfstring{$\vert$}{|} \texorpdfstring{$\vert$}{|} \texorpdfstring{$\vert$}{|} \texorpdfstring{$\vert$}{|} G1\+::double \texorpdfstring{$\vert$}{|}1150 \texorpdfstring{$\vert$}{|}1300 \texorpdfstring{$\vert$}{|} \texorpdfstring{$\vert$}{|} G1\+::add \texorpdfstring{$\vert$}{|}2200 \texorpdfstring{$\vert$}{|}2600 \texorpdfstring{$\vert$}{|} \texorpdfstring{$\vert$}{|} G2\+::double \texorpdfstring{$\vert$}{|}2500 \texorpdfstring{$\vert$}{|}2900 \texorpdfstring{$\vert$}{|} \texorpdfstring{$\vert$}{|} G2\+::add \texorpdfstring{$\vert$}{|}5650 \texorpdfstring{$\vert$}{|}6500 \texorpdfstring{$\vert$}{|} \texorpdfstring{$\vert$}{|} Fp12\+::square\texorpdfstring{$\vert$}{|}4500 \texorpdfstring{$\vert$}{|}5150 \texorpdfstring{$\vert$}{|} \texorpdfstring{$\vert$}{|} \doxylink{class_fp12_a120decc9bc6a64401de37f6cf2b3337e}{Fp12\+::mul} \texorpdfstring{$\vert$}{|}6150 \texorpdfstring{$\vert$}{|}7000 \texorpdfstring{$\vert$}{|} \texorpdfstring{$\vert$}{|} \texorpdfstring{$\vert$}{|} \texorpdfstring{$\vert$}{|} \texorpdfstring{$\vert$}{|} \texorpdfstring{$\vert$}{|} Miller loop \texorpdfstring{$\vert$}{|}0.83M \texorpdfstring{$\vert$}{|}0.97M \texorpdfstring{$\vert$}{|}0.82M \texorpdfstring{$\vert$}{|}0.71M final\+\_\+exp \texorpdfstring{$\vert$}{|}0.53M \texorpdfstring{$\vert$}{|}0.63M \texorpdfstring{$\vert$}{|}0.51M \texorpdfstring{$\vert$}{|}0.46M \texorpdfstring{$\vert$}{|} \texorpdfstring{$\vert$}{|} \texorpdfstring{$\vert$}{|} \texorpdfstring{$\vert$}{|} pairing \texorpdfstring{$\vert$}{|}1.36M \texorpdfstring{$\vert$}{|}1.60M \texorpdfstring{$\vert$}{|}1.33M \texorpdfstring{$\vert$}{|}1.17M
+
+\doxysection*{References }
+
+
+\begin{DoxyItemize}
+\item \mbox{[}ABLR\mbox{]} \href{http://dx.doi.org/10.1007/978-3-662-43414-7_1}{\texttt{ {\itshape The Realm of the Pairings}}} (Invited Talk), Diego F. Aranha, Paulo \doxylink{struct_s}{S}. L. M. Barreto, Patrick Longa, and Jefferson E. Ricardini, SAC 2013, (\href{http://eprint.iacr.org/2013/722}{\texttt{ preprint}}, \href{http://sac2013.irmacs.sfu.ca/slides/s1.pdf}{\texttt{ slide}})
+\item \mbox{[}NASKM\mbox{]} \href{http://dx.doi.org/10.1007/978-3-540-85538-5_13}{\texttt{ {\itshape Integer Variable chi-\/\+Based Ate Pairing}}}, Y. Nogami, M. Akane, Y. Sakemi, H. Kato, and Y. Morikawa, Pairing 2008
+\item \mbox{[}PSNB\mbox{]} \href{http://dx.doi.org/10.1016/j.jss.2011.03.083}{\texttt{ {\itshape A Family of Implementation-\/\+Friendly BN Elliptic Curves}}}, G.\+C.\+C.\+F. Pereira, M.\+A. Simplicio Jr, M. Naehrig, P.\+S.\+L.\+M. Barreto, J. Systems and Software 2011, (\href{http://eprint.iacr.org/2010/429}{\texttt{ preprint}})
+\item \mbox{[}AKLGL\mbox{]} \href{http://dx.doi.org/10.1007/978-3-642-20465-4_5}{\texttt{ {\itshape Faster Explicit Formulas for Computing Pairings over Ordinary Curves}}}, D.\+F. Aranha, K. Karabina, P. Longa, C.\+H. Gebotys, J. Lopez, EUROCRYPTO 2011, (\href{http://eprint.iacr.org/2010/526}{\texttt{ preprint}})
+\item \mbox{[}BDMOHT\mbox{]} \href{http://dx.doi.org/10.1007/978-3-642-17455-1_2}{\texttt{ {\itshape High-\/\+Speed Software Implementation of the Optimal Ate Pairing over Barreto-\/\+Naehrig Curves}}}, Jean-\/\+Luc Beuchat, Jorge Enrique González Díaz, Shigeo Mitsunari, Eiji Okamoto, Francisco Rodríguez-\/\+Henríquez, Tadanori Teruya, Pairing 2010, (\href{http://eprint.iacr.org/2010/354}{\texttt{ preprint}})
+\item \href{http://eprint.iacr.org/2013/362}{\texttt{ {\itshape A Fast Implementation of the Optimal Ate Pairing over BN curve on Intel Haswell Processor}}}, Shigeo Mitsunari, IACR e\+Print 2013/362
+\item \href{http://eprint.iacr.org/2013/879}{\texttt{ {\itshape Succinct Non-\/\+Interactive Zero Knowledge for a von Neumann Architecture}}}, Eli Ben-\/\+Sasson, Alessandro Chiesa, Eran Tromer, Madars Virza, USENIX Security 2014
+\item \mbox{[}ZPMRTH\mbox{]} \href{http://dx.doi.org/10.1109/TC.2014.2329681}{\texttt{ {\itshape Software implementation of an Attribute-\/\+Based Encryption scheme}}}, Eric Zavattoni and Luis J. Dominguez Perez and Shigeo Mitsunari and Ana H. Sanchez-\/\+Ramirez and Tadanori Teruya and Francisco Rodriguez-\/\+Henriquez, IEEE Transactions on Computers, To appear, (\href{https://eprint.iacr.org/2014/401}{\texttt{ preprint}}, \href{http://sandia.cs.cinvestav.mx/index.php?n=Site.CPABE}{\texttt{ project Web page and source code}})
+\item \href{http://homepage1.nifty.com/herumi/crypt/ate-pairing.html}{\texttt{ This library\textquotesingle{}s old webpage}}
+\end{DoxyItemize}
+
+\doxysection*{Authors }
+
+
+\begin{DoxyItemize}
+\item MITSUNARI Shigeo ({\ttfamily herumi@nifty.\+com})
+\item TERUYA Tadanori ({\ttfamily tadanori.\+teruya@gmail.\+com})
+\end{DoxyItemize}
+
+\doxysection*{Contributors }
+
+
+\begin{DoxyItemize}
+\item Alessandro Chiesa ({\ttfamily alexch@mit.\+edu})
+\item Madars Virza ({\ttfamily madars@mit.\+edu}) 
+\end{DoxyItemize}

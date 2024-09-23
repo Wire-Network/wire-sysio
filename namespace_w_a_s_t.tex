@@ -1,0 +1,2421 @@
+\doxysection{WAST Namespace Reference}
+\hypertarget{namespace_w_a_s_t}{}\label{namespace_w_a_s_t}\index{WAST@{WAST}}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_w_a_s_t_1_1_action}{Action}}
+\item 
+struct \mbox{\hyperlink{struct_w_a_s_t_1_1_action_command}{Action\+Command}}
+\item 
+struct \mbox{\hyperlink{struct_w_a_s_t_1_1_assert_invalid_or_malformed_command}{Assert\+Invalid\+Or\+Malformed\+Command}}
+\item 
+struct \mbox{\hyperlink{struct_w_a_s_t_1_1_assert_return_command}{Assert\+Return\+Command}}
+\item 
+struct \mbox{\hyperlink{struct_w_a_s_t_1_1_assert_return_na_n_command}{Assert\+Return\+Na\+NCommand}}
+\item 
+struct \mbox{\hyperlink{struct_w_a_s_t_1_1_assert_trap_command}{Assert\+Trap\+Command}}
+\item 
+struct \mbox{\hyperlink{struct_w_a_s_t_1_1_assert_unlinkable_command}{Assert\+Unlinkable\+Command}}
+\item 
+struct \mbox{\hyperlink{struct_w_a_s_t_1_1_command}{Command}}
+\item 
+struct \mbox{\hyperlink{struct_w_a_s_t_1_1_error}{Error}}
+\item 
+struct \mbox{\hyperlink{struct_w_a_s_t_1_1_fatal_parse_exception}{Fatal\+Parse\+Exception}}
+\item 
+struct \mbox{\hyperlink{struct_w_a_s_t_1_1_function_print_context}{Function\+Print\+Context}}
+\item 
+struct \mbox{\hyperlink{struct_w_a_s_t_1_1_get_action}{Get\+Action}}
+\item 
+struct \mbox{\hyperlink{struct_w_a_s_t_1_1_invoke_action}{Invoke\+Action}}
+\item 
+struct \mbox{\hyperlink{struct_w_a_s_t_1_1_line_info}{Line\+Info}}
+\item 
+struct \mbox{\hyperlink{struct_w_a_s_t_1_1_module_action}{Module\+Action}}
+\item 
+struct \mbox{\hyperlink{struct_w_a_s_t_1_1_module_parse_state}{Module\+Parse\+State}}
+\item 
+struct \mbox{\hyperlink{struct_w_a_s_t_1_1_module_print_context}{Module\+Print\+Context}}
+\item 
+struct \mbox{\hyperlink{struct_w_a_s_t_1_1_name}{Name}}
+\item 
+struct \mbox{\hyperlink{struct_w_a_s_t_1_1_name_scope}{Name\+Scope}}
+\item 
+struct \mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}}
+\item 
+struct \mbox{\hyperlink{struct_w_a_s_t_1_1_recover_parse_exception}{Recover\+Parse\+Exception}}
+\item 
+struct \mbox{\hyperlink{struct_w_a_s_t_1_1_reference}{Reference}}
+\item 
+struct \mbox{\hyperlink{struct_w_a_s_t_1_1_register_command}{Register\+Command}}
+\item 
+struct \mbox{\hyperlink{struct_w_a_s_t_1_1_scoped_tag_printer}{Scoped\+Tag\+Printer}}
+\item 
+struct \mbox{\hyperlink{struct_w_a_s_t_1_1_static_data}{Static\+Data}}
+\item 
+struct \mbox{\hyperlink{struct_w_a_s_t_1_1_text_file_locus}{Text\+File\+Locus}}
+\item 
+struct \mbox{\hyperlink{struct_w_a_s_t_1_1_unresolved_error}{Unresolved\+Error}}
+\item 
+struct \mbox{\hyperlink{struct_w_a_s_t_1_1_unresolved_function_type}{Unresolved\+Function\+Type}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef std\+::unordered\+\_\+map$<$ \mbox{\hyperlink{struct_w_a_s_t_1_1_name}{Name}}, \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}, \mbox{\hyperlink{struct_w_a_s_t_1_1_name_1_1_hasher}{Name\+::\+Hasher}} $>$ \mbox{\hyperlink{namespace_w_a_s_t_a2d9d3ba4e83db4fbb314c3068261afa5}{Name\+To\+Index\+Map}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum class \mbox{\hyperlink{namespace_w_a_s_t_a054762705d8542a796362ce7f711b628}{Action\+Type}} \{ \mbox{\hyperlink{namespace_w_a_s_t_a054762705d8542a796362ce7f711b628a0aca8c24dbd30a4ddf273908d06d135d}{\+\_\+module}}
+, \mbox{\hyperlink{namespace_w_a_s_t_a054762705d8542a796362ce7f711b628a5fb833d20ef9f93596f4117a81523536}{invoke}}
+, \mbox{\hyperlink{namespace_w_a_s_t_a054762705d8542a796362ce7f711b628ab5eda0a74558a342cf659187f06f746f}{get}}
+ \}
+\item 
+enum \mbox{\hyperlink{namespace_w_a_s_t_a57c99a932a2a7d69084cbeca01031f32}{Token\+Type}} \+: U16 \{ \mbox{\hyperlink{namespace_w_a_s_t_a57c99a932a2a7d69084cbeca01031f32a39fb9d16c0964296c4a8b6b567b1c17d}{num\+Token\+Types}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{_w_a_s_t_8h_a4d4cd62fee2b2e181ef87d58fe61064c}{WAST\+\_\+\+API}} void \mbox{\hyperlink{namespace_w_a_s_t_a3d4677a7354c0caa2a1825c290f7a81d}{parse\+Test\+Commands}} (const char \texorpdfstring{$\ast$}{*}string, \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} string\+Length, std\+::vector$<$ std\+::unique\+\_\+ptr$<$ \mbox{\hyperlink{struct_w_a_s_t_1_1_command}{Command}} $>$ $>$ \&out\+Test\+Commands, std\+::vector$<$ \mbox{\hyperlink{struct_w_a_s_t_1_1_error}{Error}} $>$ \&out\+Errors)
+\item 
+\mbox{\hyperlink{_w_a_s_t_8h_a4d4cd62fee2b2e181ef87d58fe61064c}{WAST\+\_\+\+API}} bool \mbox{\hyperlink{namespace_w_a_s_t_a6d93426db9bd262249b9ce93ddba7c87}{parse\+Module}} (const char \texorpdfstring{$\ast$}{*}string, \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} string\+Length, \mbox{\hyperlink{struct_i_r_1_1_module}{IR\+::\+Module}} \&out\+Module, std\+::vector$<$ \mbox{\hyperlink{struct_w_a_s_t_1_1_error}{Error}} $>$ \&out\+Errors)
+\item 
+\mbox{\hyperlink{_w_a_s_t_8h_a4d4cd62fee2b2e181ef87d58fe61064c}{WAST\+\_\+\+API}} std\+::string \mbox{\hyperlink{namespace_w_a_s_t_aa6c1fd4b6c7ec43ba7e25dc6138d4899}{print}} (const \mbox{\hyperlink{struct_i_r_1_1_module}{IR\+::\+Module}} \&module)
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_w_a_s_t_a23505430f91325d50b390d1318fd20b5}{describe\+Token}} (\mbox{\hyperlink{namespace_w_a_s_t_a57c99a932a2a7d69084cbeca01031f32}{Token\+Type}} token\+Type)
+\item 
+bool \mbox{\hyperlink{namespace_w_a_s_t_ae250d021fe4842a3a03f4ded3a982c20}{is\+Recovery\+Point\+Char}} (char c)
+\item 
+Token \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_w_a_s_t_a9ffdd3dd8d6db105464488183a5f13da}{lex}} (const char \texorpdfstring{$\ast$}{*}string, \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} string\+Length, \mbox{\hyperlink{struct_w_a_s_t_1_1_line_info}{Line\+Info}} \texorpdfstring{$\ast$}{*}\&out\+Line\+Info)
+\item 
+void \mbox{\hyperlink{namespace_w_a_s_t_ac4e53dc178c5ceaf93b846c81f9adfc2}{free\+Tokens}} (Token \texorpdfstring{$\ast$}{*}tokens)
+\item 
+void \mbox{\hyperlink{namespace_w_a_s_t_ae0e7852160946f05f04d4cab549275d9}{free\+Line\+Info}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_line_info}{Line\+Info}} \texorpdfstring{$\ast$}{*}line\+Info)
+\item 
+\mbox{\hyperlink{struct_w_a_s_t_1_1_text_file_locus}{Text\+File\+Locus}} \mbox{\hyperlink{namespace_w_a_s_t_a29cdb29885fdca5fa42fd1e7bf3c62b1}{calc\+Locus\+From\+Offset}} (const char \texorpdfstring{$\ast$}{*}string, const \mbox{\hyperlink{struct_w_a_s_t_1_1_line_info}{Line\+Info}} \texorpdfstring{$\ast$}{*}line\+Info, \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} char\+Offset)
+\item 
+\mbox{\hyperlink{namespace_w_a_s_t_aa7cfc1625466b4ac24691f75df863cc7}{PACKED\+\_\+\+STRUCT}} (struct Token \{ \mbox{\hyperlink{namespace_w_a_s_t_a57c99a932a2a7d69084cbeca01031f32}{Token\+Type}} type;\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}} begin;\})
+\item 
+void \mbox{\hyperlink{namespace_w_a_s_t_a726a4231e5222857c2151800be474de7}{find\+Closing\+Parenthesis}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&\mbox{\hyperlink{structstate}{state}}, const Token \texorpdfstring{$\ast$}{*}opening\+Parenthesis\+Token)
+\item 
+void \mbox{\hyperlink{namespace_w_a_s_t_af36d14f42c697d5272a592bf7349d06d}{parse\+Errorf}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&\mbox{\hyperlink{structstate}{state}}, \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} char\+Offset, const char \texorpdfstring{$\ast$}{*}message\+Format, va\+\_\+list message\+Arguments)
+\item 
+void \mbox{\hyperlink{namespace_w_a_s_t_a2a4f0a07b303edd2429f3db01b0b6deb}{parse\+Errorf}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&\mbox{\hyperlink{structstate}{state}}, \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} char\+Offset, const char \texorpdfstring{$\ast$}{*}message\+Format,...)
+\item 
+void \mbox{\hyperlink{namespace_w_a_s_t_acef8b86d580be4e8ababec916f5f4bd9}{parse\+Errorf}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&\mbox{\hyperlink{structstate}{state}}, const char \texorpdfstring{$\ast$}{*}next\+Char, const char \texorpdfstring{$\ast$}{*}message\+Format,...)
+\item 
+void \mbox{\hyperlink{namespace_w_a_s_t_ae1d0d61716282a37bd7990c2ec54ae4b}{parse\+Errorf}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&\mbox{\hyperlink{structstate}{state}}, const Token \texorpdfstring{$\ast$}{*}next\+Token, const char \texorpdfstring{$\ast$}{*}message\+Format,...)
+\item 
+void \mbox{\hyperlink{namespace_w_a_s_t_a8001b89de5d29cdf830471e70b13798a}{require}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&\mbox{\hyperlink{structstate}{state}}, \mbox{\hyperlink{namespace_w_a_s_t_a57c99a932a2a7d69084cbeca01031f32}{Token\+Type}} type)
+\item 
+bool \mbox{\hyperlink{namespace_w_a_s_t_a9f94aa21c00c56bd18ed6b48ee8145c8}{try\+Parse\+Value\+Type}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&\mbox{\hyperlink{structstate}{state}}, \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{Value\+Type}} \&out\+Value\+Type)
+\item 
+bool \mbox{\hyperlink{namespace_w_a_s_t_a9e4c5dc0f2d2044bb55b0702d2f6dc51}{try\+Parse\+Result\+Type}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&\mbox{\hyperlink{structstate}{state}}, \mbox{\hyperlink{namespace_i_r_ac56fb5355b338ad4a167c48ec539b90b}{Result\+Type}} \&out\+Result\+Type)
+\item 
+\mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{Value\+Type}} \mbox{\hyperlink{namespace_w_a_s_t_afb469d566925151c57afa1dd31721c9c}{parse\+Value\+Type}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&\mbox{\hyperlink{structstate}{state}})
+\item 
+const \mbox{\hyperlink{struct_i_r_1_1_function_type}{Function\+Type}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_w_a_s_t_afdc0ca4bc5028ce0d0d1f0b50eadf451}{parse\+Function\+Type}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_module_parse_state}{Module\+Parse\+State}} \&\mbox{\hyperlink{structstate}{state}}, \mbox{\hyperlink{namespace_w_a_s_t_a2d9d3ba4e83db4fbb314c3068261afa5}{Name\+To\+Index\+Map}} \&out\+Local\+Name\+To\+Index\+Map, std\+::vector$<$ std\+::string $>$ \&out\+Local\+Disassembly\+Names)
+\item 
+\mbox{\hyperlink{struct_w_a_s_t_1_1_unresolved_function_type}{Unresolved\+Function\+Type}} \mbox{\hyperlink{namespace_w_a_s_t_ab72b47fe2520b8a7840ff4ce5d07684d}{parse\+Function\+Type\+Ref\+And\+Or\+Decl}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_module_parse_state}{Module\+Parse\+State}} \&\mbox{\hyperlink{structstate}{state}}, \mbox{\hyperlink{namespace_w_a_s_t_a2d9d3ba4e83db4fbb314c3068261afa5}{Name\+To\+Index\+Map}} \&out\+Local\+Name\+To\+Index\+Map, std\+::vector$<$ std\+::string $>$ \&out\+Local\+Disassembly\+Names)
+\item 
+\mbox{\hyperlink{struct_i_r_1_1_indexed_function_type}{Indexed\+Function\+Type}} \mbox{\hyperlink{namespace_w_a_s_t_ae274bd19819be1d3ef32161e6d8a2f7f}{resolve\+Function\+Type}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_module_parse_state}{Module\+Parse\+State}} \&\mbox{\hyperlink{structstate}{state}}, const \mbox{\hyperlink{struct_w_a_s_t_1_1_unresolved_function_type}{Unresolved\+Function\+Type}} \&unresolved\+Type)
+\item 
+\mbox{\hyperlink{struct_i_r_1_1_indexed_function_type}{Indexed\+Function\+Type}} \mbox{\hyperlink{namespace_w_a_s_t_a0fe85cc07ee6a0695ebb31644fc0ce7b}{get\+Unique\+Function\+Type\+Index}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_module_parse_state}{Module\+Parse\+State}} \&\mbox{\hyperlink{structstate}{state}}, const \mbox{\hyperlink{struct_i_r_1_1_function_type}{Function\+Type}} \texorpdfstring{$\ast$}{*}function\+Type)
+\item 
+bool \mbox{\hyperlink{namespace_w_a_s_t_a5a1887aa3f790b93a65b578a3b4628e3}{try\+Parse\+Name}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&\mbox{\hyperlink{structstate}{state}}, \mbox{\hyperlink{struct_w_a_s_t_1_1_name}{Name}} \&out\+Name)
+\item 
+bool \mbox{\hyperlink{namespace_w_a_s_t_a965b97566a3d051c08b06c7488c14ad8}{try\+Parse\+Name\+Or\+Index\+Ref}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&\mbox{\hyperlink{structstate}{state}}, \mbox{\hyperlink{struct_w_a_s_t_1_1_reference}{Reference}} \&out\+Ref)
+\item 
+\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}} \mbox{\hyperlink{namespace_w_a_s_t_a90c0a142bd4b2b03f4d957bca6a88365}{parse\+And\+Resolve\+Name\+Or\+Index\+Ref}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&\mbox{\hyperlink{structstate}{state}}, const \mbox{\hyperlink{namespace_w_a_s_t_a2d9d3ba4e83db4fbb314c3068261afa5}{Name\+To\+Index\+Map}} \&name\+To\+Index\+Map, \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} max\+Index, const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{structcontext}{context}})
+\item 
+void \mbox{\hyperlink{namespace_w_a_s_t_a9b736e747098508f90bd9495fa4a9a11}{bind\+Name}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&\mbox{\hyperlink{structstate}{state}}, \mbox{\hyperlink{namespace_w_a_s_t_a2d9d3ba4e83db4fbb314c3068261afa5}{Name\+To\+Index\+Map}} \&name\+To\+Index\+Map, const \mbox{\hyperlink{struct_w_a_s_t_1_1_name}{Name}} \&\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}, \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} index)
+\item 
+\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}} \mbox{\hyperlink{namespace_w_a_s_t_ad98b487d5f8d6b2397db35e9d6c79ae8}{resolve\+Ref}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&\mbox{\hyperlink{structstate}{state}}, const \mbox{\hyperlink{namespace_w_a_s_t_a2d9d3ba4e83db4fbb314c3068261afa5}{Name\+To\+Index\+Map}} \&name\+To\+Index\+Map, \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} max\+Index, const \mbox{\hyperlink{struct_w_a_s_t_1_1_reference}{Reference}} \&ref)
+\item 
+bool \mbox{\hyperlink{namespace_w_a_s_t_abdd0bdb7d4c0fb7a7b98ef2624edb7b3}{try\+Parse\+Hexit}} (const char \texorpdfstring{$\ast$}{*}\&next\+Char, \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} \&out\+Value)
+\item 
+bool \mbox{\hyperlink{namespace_w_a_s_t_a445014b335af98dc3ab063c91108f1b4}{try\+Parse\+String}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&\mbox{\hyperlink{structstate}{state}}, std\+::string \&out\+String)
+\item 
+std\+::string \mbox{\hyperlink{namespace_w_a_s_t_a135c7788f903660b33ab7c72e6662882}{parse\+UTF8\+String}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&\mbox{\hyperlink{structstate}{state}})
+\item 
+bool \mbox{\hyperlink{namespace_w_a_s_t_a0fb1b690639911ade0de451575d32309}{try\+Parse\+I32}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&\mbox{\hyperlink{structstate}{state}}, \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}} \&out\+I32)
+\item 
+bool \mbox{\hyperlink{namespace_w_a_s_t_a8f980380d965a6fceff6ff5c61dc6974}{try\+Parse\+I64}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&\mbox{\hyperlink{structstate}{state}}, \mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}} \&out\+I64)
+\item 
+\mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} \mbox{\hyperlink{namespace_w_a_s_t_ad29b64fadb8a9ec5fe54a9a147fcf618}{parse\+I8}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&\mbox{\hyperlink{structstate}{state}})
+\item 
+\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}} \mbox{\hyperlink{namespace_w_a_s_t_aa08a40e9ae2c8cb30939574c65bb9eb7}{parse\+I32}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&\mbox{\hyperlink{structstate}{state}})
+\item 
+\mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}} \mbox{\hyperlink{namespace_w_a_s_t_acc415079db29202983e4d49cabc59ab3}{parse\+I64}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&\mbox{\hyperlink{structstate}{state}})
+\item 
+\mbox{\hyperlink{_basic_types_8h_a841d3674577a1e86afdc2f4845f46c4b}{F32}} \mbox{\hyperlink{namespace_w_a_s_t_a2951f7730d860b16cf24168f13ec7d01}{parse\+F32}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&\mbox{\hyperlink{structstate}{state}})
+\item 
+\mbox{\hyperlink{_basic_types_8h_adc9896ee12db3bb116fc63b3464c72c7}{F64}} \mbox{\hyperlink{namespace_w_a_s_t_a40af95ba4f3fbebd5324a913f89d1aff}{parse\+F64}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&\mbox{\hyperlink{structstate}{state}})
+\item 
+\mbox{\hyperlink{struct_i_r_1_1_function_def}{IR\+::\+Function\+Def}} \mbox{\hyperlink{namespace_w_a_s_t_ad67ed47b4a120f234a3a4a2da076418f}{parse\+Function\+Def}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_module_parse_state}{Module\+Parse\+State}} \&\mbox{\hyperlink{structstate}{state}}, const Token \texorpdfstring{$\ast$}{*}func\+Token)
+\item 
+void \mbox{\hyperlink{namespace_w_a_s_t_ad410cd830815633b2f57fdce5c6919fd}{parse\+Module\+Body}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_module_parse_state}{Module\+Parse\+State}} \&\mbox{\hyperlink{structstate}{state}})
+\item 
+char \mbox{\hyperlink{namespace_w_a_s_t_ad103a4b3d99fda4a614de3bd2e6a50b0}{nibble\+To\+Hex\+Char}} (\mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+std\+::string \mbox{\hyperlink{namespace_w_a_s_t_a5289ca10863a134a961943f0e2089979}{escape\+String}} (const char \texorpdfstring{$\ast$}{*}string, \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} num\+Chars)
+\item 
+std\+::string \mbox{\hyperlink{namespace_w_a_s_t_aa50878b22fc84d3c627432d2c62f0595}{expand\+Indentation}} (std\+::string \&\&in\+String, \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} spaces\+Per\+Indent\+Level=2)
+\item 
+void \mbox{\hyperlink{namespace_w_a_s_t_a8590c2ba00bd5c84e51a477829c3451a}{print}} (std\+::string \&string, \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{Value\+Type}} type)
+\item 
+void \mbox{\hyperlink{namespace_w_a_s_t_ae825d82b1d6a7665e875a45a0e5e0408}{print}} (std\+::string \&string, \mbox{\hyperlink{namespace_i_r_ac56fb5355b338ad4a167c48ec539b90b}{Result\+Type}} type)
+\item 
+void \mbox{\hyperlink{namespace_w_a_s_t_a0e2234267f0a78cce9b56a4eb2289f7e}{print}} (std\+::string \&string, const \mbox{\hyperlink{struct_i_r_1_1_size_constraints}{Size\+Constraints}} \&size)
+\item 
+void \mbox{\hyperlink{namespace_w_a_s_t_aa9ee110560c7eeebefbe62815fc76fbe}{print}} (std\+::string \&string, const \mbox{\hyperlink{struct_i_r_1_1_function_type}{Function\+Type}} \texorpdfstring{$\ast$}{*}function\+Type)
+\item 
+void \mbox{\hyperlink{namespace_w_a_s_t_a14bfd2a89f2b7739a7318f88cf4ee01d}{print}} (std\+::string \&string, const \mbox{\hyperlink{struct_i_r_1_1_table_type}{Table\+Type}} \&type)
+\item 
+void \mbox{\hyperlink{namespace_w_a_s_t_a635c072dabbaf8b427133493d23089f8}{print}} (std\+::string \&string, const \mbox{\hyperlink{struct_i_r_1_1_memory_type}{Memory\+Type}} \&type)
+\item 
+void \mbox{\hyperlink{namespace_w_a_s_t_ab418aba8b6293832449742eb57dbb1a5}{print}} (std\+::string \&string, \mbox{\hyperlink{struct_i_r_1_1_global_type}{Global\+Type}} type)
+\item 
+void \mbox{\hyperlink{namespace_w_a_s_t_a193408df7bc6cc6719ab4f5099e21d3b}{print\+Control\+Signature}} (std\+::string \&string, \mbox{\hyperlink{namespace_i_r_ac56fb5355b338ad4a167c48ec539b90b}{Result\+Type}} result\+Type)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}} $>$ }\\void \mbox{\hyperlink{namespace_w_a_s_t_a8550106ad7b7088eaa4e1bc5eda655d3}{print\+Import\+Type}} (std\+::string \&string, const \mbox{\hyperlink{struct_i_r_1_1_module}{Module}} \&module, \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}} type)
+\item 
+template$<$$>$ void \mbox{\hyperlink{namespace_w_a_s_t_a218d2e26da6cfe8ee104b31071543e67}{print\+Import\+Type$<$ Indexed\+Function\+Type $>$}} (std\+::string \&string, const \mbox{\hyperlink{struct_i_r_1_1_module}{Module}} \&module, \mbox{\hyperlink{struct_i_r_1_1_indexed_function_type}{Indexed\+Function\+Type}} type)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}} $>$ }\\void \mbox{\hyperlink{namespace_w_a_s_t_acfea461e9d1989e37b963a730a903140}{print\+Import}} (std\+::string \&string, const \mbox{\hyperlink{struct_i_r_1_1_module}{Module}} \&module, const \mbox{\hyperlink{struct_i_r_1_1_import}{Import}}$<$ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}} $>$ \&import, \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} import\+Index, const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}, const char \texorpdfstring{$\ast$}{*}type\+Tag)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{namespace_w_a_s_t_a2d9d3ba4e83db4fbb314c3068261afa5}\index{WAST@{WAST}!NameToIndexMap@{NameToIndexMap}}
+\index{NameToIndexMap@{NameToIndexMap}!WAST@{WAST}}
+\doxysubsubsection{\texorpdfstring{NameToIndexMap}{NameToIndexMap}}
+{\footnotesize\ttfamily \label{namespace_w_a_s_t_a2d9d3ba4e83db4fbb314c3068261afa5} 
+typedef std\+::unordered\+\_\+map$<$\mbox{\hyperlink{struct_w_a_s_t_1_1_name}{Name}},\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}},\mbox{\hyperlink{struct_w_a_s_t_1_1_name_1_1_hasher}{Name\+::\+Hasher}}$>$ \mbox{\hyperlink{namespace_w_a_s_t_a2d9d3ba4e83db4fbb314c3068261afa5}{WAST\+::\+Name\+To\+Index\+Map}}}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_8h_source_l00088}{88}} of file \mbox{\hyperlink{_parse_8h_source}{Parse.\+h}}.
+
+
+
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{namespace_w_a_s_t_a054762705d8542a796362ce7f711b628}\index{WAST@{WAST}!ActionType@{ActionType}}
+\index{ActionType@{ActionType}!WAST@{WAST}}
+\doxysubsubsection{\texorpdfstring{ActionType}{ActionType}}
+{\footnotesize\ttfamily \label{namespace_w_a_s_t_a054762705d8542a796362ce7f711b628} 
+enum \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{namespace_w_a_s_t_a054762705d8542a796362ce7f711b628}{WAST\+::\+Action\+Type}}\hspace{0.3cm}{\ttfamily [strong]}}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{\_module@{\_module}!WAST@{WAST}}\index{WAST@{WAST}!\_module@{\_module}}}\Hypertarget{namespace_w_a_s_t_a054762705d8542a796362ce7f711b628a0aca8c24dbd30a4ddf273908d06d135d}\label{namespace_w_a_s_t_a054762705d8542a796362ce7f711b628} 
+\+\_\+module&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{invoke@{invoke}!WAST@{WAST}}\index{WAST@{WAST}!invoke@{invoke}}}\Hypertarget{namespace_w_a_s_t_a054762705d8542a796362ce7f711b628a5fb833d20ef9f93596f4117a81523536}\label{namespace_w_a_s_t_a054762705d8542a796362ce7f711b628} 
+invoke&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{get@{get}!WAST@{WAST}}\index{WAST@{WAST}!get@{get}}}\Hypertarget{namespace_w_a_s_t_a054762705d8542a796362ce7f711b628ab5eda0a74558a342cf659187f06f746f}\label{namespace_w_a_s_t_a054762705d8542a796362ce7f711b628} 
+get&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{_test_script_8h_source_l00041}{41}} of file \mbox{\hyperlink{_test_script_8h_source}{Test\+Script.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00042\ \ \ \ \ \{}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_a054762705d8542a796362ce7f711b628a0aca8c24dbd30a4ddf273908d06d135d}{\_module}},}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_a054762705d8542a796362ce7f711b628a5fb833d20ef9f93596f4117a81523536}{invoke}},}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ get,}
+\DoxyCodeLine{00046\ \ \ \ \ \};}
+
+\end{DoxyCode}
+\Hypertarget{namespace_w_a_s_t_a57c99a932a2a7d69084cbeca01031f32}\index{WAST@{WAST}!TokenType@{TokenType}}
+\index{TokenType@{TokenType}!WAST@{WAST}}
+\doxysubsubsection{\texorpdfstring{TokenType}{TokenType}}
+{\footnotesize\ttfamily \label{namespace_w_a_s_t_a57c99a932a2a7d69084cbeca01031f32} 
+enum \mbox{\hyperlink{namespace_w_a_s_t_a57c99a932a2a7d69084cbeca01031f32}{WAST\+::\+Token\+Type}} \+: \mbox{\hyperlink{_basic_types_8h_a0a0a322d5fa4a546d293a77ba8b4a71f}{U16}}}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{numTokenTypes@{numTokenTypes}!WAST@{WAST}}\index{WAST@{WAST}!numTokenTypes@{numTokenTypes}}}\Hypertarget{namespace_w_a_s_t_a57c99a932a2a7d69084cbeca01031f32a39fb9d16c0964296c4a8b6b567b1c17d}\label{namespace_w_a_s_t_a57c99a932a2a7d69084cbeca01031f32} 
+num\+Token\+Types&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{_lexer_8h_source_l00087}{87}} of file \mbox{\hyperlink{_lexer_8h_source}{Lexer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00088\ \ \ \ \ \{}
+\DoxyCodeLine{00089\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#define\ VISIT\_TOKEN(name,description)\ t\_\#\#name,}}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_lexer_8h_a44201a8ebbcc0d7ade75480d088f57b2}{ENUM\_TOKENS}}()}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \textcolor{preprocessor}{\#undef\ VISIT\_TOKEN}}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_a57c99a932a2a7d69084cbeca01031f32a39fb9d16c0964296c4a8b6b567b1c17d}{numTokenTypes}}}
+\DoxyCodeLine{00093\ \ \ \ \ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespace_w_a_s_t_a9b736e747098508f90bd9495fa4a9a11}\index{WAST@{WAST}!bindName@{bindName}}
+\index{bindName@{bindName}!WAST@{WAST}}
+\doxysubsubsection{\texorpdfstring{bindName()}{bindName()}}
+{\footnotesize\ttfamily \label{namespace_w_a_s_t_a9b736e747098508f90bd9495fa4a9a11} 
+void WAST\+::bind\+Name (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&}]{state}{, }\item[{\mbox{\hyperlink{namespace_w_a_s_t_a2d9d3ba4e83db4fbb314c3068261afa5}{Name\+To\+Index\+Map}} \&}]{name\+To\+Index\+Map}{, }\item[{const \mbox{\hyperlink{struct_w_a_s_t_1_1_name}{Name}} \&}]{name}{, }\item[{\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}}]{index}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_8cpp_source_l00322}{322}} of file \mbox{\hyperlink{_parse_8cpp_source}{Parse.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00323\ \ \ \ \ \{}
+\DoxyCodeLine{00324\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_errors_8h_a36d7655d01d72167969992b17b772507}{errorUnless}}(index\ <=\ \mbox{\hyperlink{stdint_8h_ab5eb23180f7cc12b7d6c04a8ec067fdd}{UINT32\_MAX}});}
+\DoxyCodeLine{00325\ }
+\DoxyCodeLine{00326\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})}
+\DoxyCodeLine{00327\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00328\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ mapIt\ =\ nameToIndexMap.find(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}});}
+\DoxyCodeLine{00329\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(mapIt\ !=\ nameToIndexMap.end())}
+\DoxyCodeLine{00330\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00331\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_w_a_s_t_1_1_text_file_locus}{TextFileLocus}}\ previousDefinitionLocus\ =\ \mbox{\hyperlink{namespace_w_a_s_t_a29cdb29885fdca5fa42fd1e7bf3c62b1}{calcLocusFromOffset}}(\mbox{\hyperlink{structstate}{state}}.string,\ \ \ \ \mbox{\hyperlink{structstate}{state}}.lineInfo,mapIt-\/>first.getCharOffset(\mbox{\hyperlink{structstate}{state}}.string));}
+\DoxyCodeLine{00332\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_af36d14f42c697d5272a592bf7349d06d}{parseErrorf}}(\mbox{\hyperlink{structstate}{state}},\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}.getCharOffset(\mbox{\hyperlink{structstate}{state}}.string),\textcolor{stringliteral}{"{}redefinition\ of\ name\ defined\ at\ \%s"{}},previousDefinitionLocus.\mbox{\hyperlink{struct_w_a_s_t_1_1_text_file_locus_a6a1645bd22ae8a3b5f318b0975b5abd8}{describe}}().c\_str());}
+\DoxyCodeLine{00333\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00334\ \ \ \ \ \ \ \ \ \ \ \ \ nameToIndexMap.emplace(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}(index));}
+\DoxyCodeLine{00335\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00336\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_a9b736e747098508f90bd9495fa4a9a11_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_a9b736e747098508f90bd9495fa4a9a11_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_w_a_s_t_a29cdb29885fdca5fa42fd1e7bf3c62b1}\index{WAST@{WAST}!calcLocusFromOffset@{calcLocusFromOffset}}
+\index{calcLocusFromOffset@{calcLocusFromOffset}!WAST@{WAST}}
+\doxysubsubsection{\texorpdfstring{calcLocusFromOffset()}{calcLocusFromOffset()}}
+{\footnotesize\ttfamily \label{namespace_w_a_s_t_a29cdb29885fdca5fa42fd1e7bf3c62b1} 
+\mbox{\hyperlink{struct_w_a_s_t_1_1_text_file_locus}{Text\+File\+Locus}} WAST\+::calc\+Locus\+From\+Offset (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{string}{, }\item[{const \mbox{\hyperlink{struct_w_a_s_t_1_1_line_info}{Line\+Info}} \texorpdfstring{$\ast$}{*}}]{line\+Info}{, }\item[{\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}}]{char\+Offset}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_lexer_8cpp_source_l00331}{331}} of file \mbox{\hyperlink{_lexer_8cpp_source}{Lexer.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00332\ \ \ \ \ \{}
+\DoxyCodeLine{00333\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Binary\ search\ the\ line\ starts\ for\ the\ last\ one\ before\ charIndex.}}
+\DoxyCodeLine{00334\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ minLineIndex\ =\ 0;}
+\DoxyCodeLine{00335\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ maxLineIndex\ =\ lineInfo-\/>\mbox{\hyperlink{struct_w_a_s_t_1_1_line_info_a414b827a7ed94595b5e77b85f0df31a0}{numLineStarts}}\ -\/\ 1;}
+\DoxyCodeLine{00336\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(maxLineIndex\ >\ minLineIndex)}
+\DoxyCodeLine{00337\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00338\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ medianLineIndex\ =\ (minLineIndex\ +\ maxLineIndex\ +\ 1)\ /\ 2;}
+\DoxyCodeLine{00339\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(charOffset\ <\ lineInfo-\/>lineStarts[medianLineIndex])}
+\DoxyCodeLine{00340\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00341\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ maxLineIndex\ =\ medianLineIndex\ -\/\ 1;}
+\DoxyCodeLine{00342\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00343\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(charOffset\ >\ lineInfo-\/>\mbox{\hyperlink{struct_w_a_s_t_1_1_line_info_a9126d0f1e7b90b40a84a99c713b6debd}{lineStarts}}[medianLineIndex])}
+\DoxyCodeLine{00344\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00345\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ minLineIndex\ =\ medianLineIndex;}
+\DoxyCodeLine{00346\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00347\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00348\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00349\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ minLineIndex\ =\ maxLineIndex\ =\ medianLineIndex;}
+\DoxyCodeLine{00350\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00351\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00352\ \ \ \ \ \ \ \ \ TextFileLocus\ result;}
+\DoxyCodeLine{00353\ \ \ \ \ \ \ \ \ result.newlines\ =\ (\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}})minLineIndex;}
+\DoxyCodeLine{00354\ }
+\DoxyCodeLine{00355\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Count\ tabs\ and\ and\ spaces\ from\ the\ beginning\ of\ the\ line\ to\ charIndex.}}
+\DoxyCodeLine{00356\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}\ index\ =\ lineInfo-\/>\mbox{\hyperlink{struct_w_a_s_t_1_1_line_info_a9126d0f1e7b90b40a84a99c713b6debd}{lineStarts}}[result.newlines];index\ <\ charOffset;++index)}
+\DoxyCodeLine{00357\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00358\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\textcolor{keywordtype}{string}[index]\ ==\ \textcolor{charliteral}{'\(\backslash\)t'})\ \{\ ++result.tabs;\ \}}
+\DoxyCodeLine{00359\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{\ ++result.characters;\ \}}
+\DoxyCodeLine{00360\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00361\ }
+\DoxyCodeLine{00362\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Copy\ the\ full\ source\ line\ into\ the\ TextFileLocus\ for\ context.}}
+\DoxyCodeLine{00363\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ lineStartOffset\ =\ getLineOffset(lineInfo,result.newlines);}
+\DoxyCodeLine{00364\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ lineEndOffset\ =\ getLineOffset(lineInfo,result.newlines+1)\ -\/\ 1;}
+\DoxyCodeLine{00365\ \ \ \ \ \ \ \ \ result.sourceLine\ =\ std::string(\textcolor{keywordtype}{string}\ +\ lineStartOffset,lineEndOffset\ -\/\ lineStartOffset);}
+\DoxyCodeLine{00366\ }
+\DoxyCodeLine{00367\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00368\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_a29cdb29885fdca5fa42fd1e7bf3c62b1_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_w_a_s_t_a23505430f91325d50b390d1318fd20b5}\index{WAST@{WAST}!describeToken@{describeToken}}
+\index{describeToken@{describeToken}!WAST@{WAST}}
+\doxysubsubsection{\texorpdfstring{describeToken()}{describeToken()}}
+{\footnotesize\ttfamily \label{namespace_w_a_s_t_a23505430f91325d50b390d1318fd20b5} 
+const char \texorpdfstring{$\ast$}{*} WAST\+::describe\+Token (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespace_w_a_s_t_a57c99a932a2a7d69084cbeca01031f32}{Token\+Type}}}]{token\+Type}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_lexer_8cpp_source_l00014}{14}} of file \mbox{\hyperlink{_lexer_8cpp_source}{Lexer.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00015\ \ \ \ \ \{}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_errors_8h_a03bec6af3af0dd492e348b40cbe40a46}{WAVM\_ASSERT\_THROW}}(tokenType\ <\ numTokenTypes);}
+\DoxyCodeLine{00017\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ tokenDescriptions[]\ =}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ This\ ENUM\_TOKENS\ must\ come\ before\ the\ literalTokenPairs\ definition\ that\ redefines\ VISIT\_OPERATOR\_TOKEN.}}
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \#define\ VISIT\_TOKEN(name,description)\ description,}}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_lexer_8h_a44201a8ebbcc0d7ade75480d088f57b2}{ENUM\_TOKENS}}()}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{preprocessor}{\#undef\ VISIT\_TOKEN}}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ tokenDescriptions[tokenType];}
+\DoxyCodeLine{00025\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_a23505430f91325d50b390d1318fd20b5_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_w_a_s_t_a5289ca10863a134a961943f0e2089979}\index{WAST@{WAST}!escapeString@{escapeString}}
+\index{escapeString@{escapeString}!WAST@{WAST}}
+\doxysubsubsection{\texorpdfstring{escapeString()}{escapeString()}}
+{\footnotesize\ttfamily \label{namespace_w_a_s_t_a5289ca10863a134a961943f0e2089979} 
+std\+::string WAST\+::escape\+String (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{string}{, }\item[{\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}}]{num\+Chars}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_print_8cpp_source_l00018}{18}} of file \mbox{\hyperlink{_print_8cpp_source}{Print.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00019\ \ \ \ \ \{}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ std::string\ result;}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ charIndex\ =\ 0;charIndex\ <\ numChars;++charIndex)}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ c\ =\ \textcolor{keywordtype}{string}[charIndex];}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(c\ ==\ \textcolor{charliteral}{'\(\backslash\)\(\backslash\)'})\ \{\ result\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)\(\backslash\)\(\backslash\)"{}};\ \}}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(c\ ==\ \textcolor{charliteral}{'\(\backslash\)"{}'})\ \{\ result\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)\(\backslash\)"{}"{}};\ \}}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(c\ ==\ \textcolor{charliteral}{'\(\backslash\)n'})\ \{\ result\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)n"{}};\ \}}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(c\ <\ 0x20\ ||\ c\ >\ 0x7e)}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ result\ +=\ \textcolor{charliteral}{'\(\backslash\)\(\backslash\)'};}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ result\ +=\ \mbox{\hyperlink{namespace_n_f_a_a3ef97d19fa0e3344352c4d88f439b92d}{nibbleToHexChar}}((c\ \&\ 0xf0)\ >>\ 4);}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ result\ +=\ \mbox{\hyperlink{namespace_n_f_a_a3ef97d19fa0e3344352c4d88f439b92d}{nibbleToHexChar}}((c\ \&\ 0x0f)\ >>\ 0);}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{\ result\ +=\ c;\ \}}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00036\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=346pt]{namespace_w_a_s_t_a5289ca10863a134a961943f0e2089979_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_a5289ca10863a134a961943f0e2089979_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_w_a_s_t_aa50878b22fc84d3c627432d2c62f0595}\index{WAST@{WAST}!expandIndentation@{expandIndentation}}
+\index{expandIndentation@{expandIndentation}!WAST@{WAST}}
+\doxysubsubsection{\texorpdfstring{expandIndentation()}{expandIndentation()}}
+{\footnotesize\ttfamily \label{namespace_w_a_s_t_aa50878b22fc84d3c627432d2c62f0595} 
+std\+::string WAST\+::expand\+Indentation (\begin{DoxyParamCaption}\item[{std\+::string \&\&}]{in\+String}{, }\item[{\mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}}]{spaces\+Per\+Indent\+Level}{ = {\ttfamily 2}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_print_8cpp_source_l00038}{38}} of file \mbox{\hyperlink{_print_8cpp_source}{Print.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00039\ \ \ \ \ \{}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ std::string\ paddedInput\ =\ std::move(inString);}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ paddedInput\ +=\ \textcolor{charliteral}{'\(\backslash\)0'};}
+\DoxyCodeLine{00042\ }
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ std::string\ result;}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ next\ =\ paddedInput.data();}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ end\ =\ paddedInput.data()\ +\ paddedInput.size()\ -\/\ 1;}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ indentDepth\ =\ 0;}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(next\ <\ end)}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Absorb\ INDENT\_STRING\ and\ DEDENT\_STRING,\ but\ keep\ track\ of\ the\ indentation\ depth,}}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ and\ insert\ a\ proportional\ number\ of\ spaces\ following\ newlines.\ }}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(*(\mbox{\hyperlink{_basic_types_8h_a0a0a322d5fa4a546d293a77ba8b4a71f}{U16}}*)next\ ==\ *(\mbox{\hyperlink{_basic_types_8h_a0a0a322d5fa4a546d293a77ba8b4a71f}{U16}}*)\mbox{\hyperlink{_print_8cpp_a4d927e2dff3425fa9fc8f7b9982fb251}{INDENT\_STRING}})\ \{\ ++indentDepth;\ next\ +=\ 2;\ \}}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(*(\mbox{\hyperlink{_basic_types_8h_a0a0a322d5fa4a546d293a77ba8b4a71f}{U16}}*)next\ ==\ *(\mbox{\hyperlink{_basic_types_8h_a0a0a322d5fa4a546d293a77ba8b4a71f}{U16}}*)\mbox{\hyperlink{_print_8cpp_a95de3890728266fd2c1a416d55c1cafb}{DEDENT\_STRING}})\ \{\ \mbox{\hyperlink{_errors_8h_a36d7655d01d72167969992b17b772507}{errorUnless}}(indentDepth\ >\ 0);\ -\/-\/indentDepth;\ next\ +=\ 2;\ \}}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(*next\ ==\ \textcolor{charliteral}{'\(\backslash\)n'})}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ result\ +=\ \textcolor{charliteral}{'\(\backslash\)n'};}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ result.insert(result.end(),indentDepth*2,\textcolor{charliteral}{'\ '});}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++\mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}};}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{\ result\ +=\ *\mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}}++;\ \}}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00062\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_aa50878b22fc84d3c627432d2c62f0595_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_w_a_s_t_a726a4231e5222857c2151800be474de7}\index{WAST@{WAST}!findClosingParenthesis@{findClosingParenthesis}}
+\index{findClosingParenthesis@{findClosingParenthesis}!WAST@{WAST}}
+\doxysubsubsection{\texorpdfstring{findClosingParenthesis()}{findClosingParenthesis()}}
+{\footnotesize\ttfamily \label{namespace_w_a_s_t_a726a4231e5222857c2151800be474de7} 
+void WAST\+::find\+Closing\+Parenthesis (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&}]{state}{, }\item[{const Token \texorpdfstring{$\ast$}{*}}]{opening\+Parenthesis\+Token}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_8cpp_source_l00019}{19}} of file \mbox{\hyperlink{_parse_8cpp_source}{Parse.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00020\ \ \ \ \ \{}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Skip\ over\ tokens\ until\ the\ ')'\ closing\ the\ current\ parentheses\ nesting\ depth\ is\ found.}}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ depth\ =\ 1;}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(depth\ >\ 0)}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(\mbox{\hyperlink{structstate}{state}}.nextToken-\/>type)}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++\mbox{\hyperlink{structstate}{state}}.nextToken;}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ t\_leftParenthesis:}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++\mbox{\hyperlink{structstate}{state}}.nextToken;}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++depth;}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ t\_rightParenthesis:}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++\mbox{\hyperlink{structstate}{state}}.nextToken;}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/-\/depth;}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ t\_eof:}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_af36d14f42c697d5272a592bf7349d06d}{parseErrorf}}(\mbox{\hyperlink{structstate}{state}},openingParenthesisToken,\textcolor{stringliteral}{"{}reached\ end\ of\ input\ while\ trying\ to\ find\ closing\ parenthesis"{}});}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{struct_w_a_s_t_1_1_fatal_parse_exception}{FatalParseException}}();}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00043\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_a726a4231e5222857c2151800be474de7_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_a726a4231e5222857c2151800be474de7_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_w_a_s_t_ae0e7852160946f05f04d4cab549275d9}\index{WAST@{WAST}!freeLineInfo@{freeLineInfo}}
+\index{freeLineInfo@{freeLineInfo}!WAST@{WAST}}
+\doxysubsubsection{\texorpdfstring{freeLineInfo()}{freeLineInfo()}}
+{\footnotesize\ttfamily \label{namespace_w_a_s_t_ae0e7852160946f05f04d4cab549275d9} 
+void WAST\+::free\+Line\+Info (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_w_a_s_t_1_1_line_info}{Line\+Info}} \texorpdfstring{$\ast$}{*}}]{line\+Info}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_lexer_8cpp_source_l00319}{319}} of file \mbox{\hyperlink{_lexer_8cpp_source}{Lexer.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00320\ \ \ \ \ \{}
+\DoxyCodeLine{00321\ \ \ \ \ \ \ \ \ free(lineInfo-\/>\mbox{\hyperlink{struct_w_a_s_t_1_1_line_info_a9126d0f1e7b90b40a84a99c713b6debd}{lineStarts}});}
+\DoxyCodeLine{00322\ \ \ \ \ \ \ \ \ \textcolor{keyword}{delete}\ lineInfo;}
+\DoxyCodeLine{00323\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_ae0e7852160946f05f04d4cab549275d9_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_w_a_s_t_ac4e53dc178c5ceaf93b846c81f9adfc2}\index{WAST@{WAST}!freeTokens@{freeTokens}}
+\index{freeTokens@{freeTokens}!WAST@{WAST}}
+\doxysubsubsection{\texorpdfstring{freeTokens()}{freeTokens()}}
+{\footnotesize\ttfamily \label{namespace_w_a_s_t_ac4e53dc178c5ceaf93b846c81f9adfc2} 
+void WAST\+::free\+Tokens (\begin{DoxyParamCaption}\item[{Token \texorpdfstring{$\ast$}{*}}]{tokens}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_lexer_8cpp_source_l00314}{314}} of file \mbox{\hyperlink{_lexer_8cpp_source}{Lexer.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00315\ \ \ \ \ \{}
+\DoxyCodeLine{00316\ \ \ \ \ \ \ \ \ free(tokens);}
+\DoxyCodeLine{00317\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_ac4e53dc178c5ceaf93b846c81f9adfc2_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_w_a_s_t_a0fe85cc07ee6a0695ebb31644fc0ce7b}\index{WAST@{WAST}!getUniqueFunctionTypeIndex@{getUniqueFunctionTypeIndex}}
+\index{getUniqueFunctionTypeIndex@{getUniqueFunctionTypeIndex}!WAST@{WAST}}
+\doxysubsubsection{\texorpdfstring{getUniqueFunctionTypeIndex()}{getUniqueFunctionTypeIndex()}}
+{\footnotesize\ttfamily \label{namespace_w_a_s_t_a0fe85cc07ee6a0695ebb31644fc0ce7b} 
+\mbox{\hyperlink{struct_i_r_1_1_indexed_function_type}{IR\+::\+Indexed\+Function\+Type}} WAST\+::get\+Unique\+Function\+Type\+Index (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_w_a_s_t_1_1_module_parse_state}{Module\+Parse\+State}} \&}]{state}{, }\item[{const \mbox{\hyperlink{struct_i_r_1_1_function_type}{Function\+Type}} \texorpdfstring{$\ast$}{*}}]{function\+Type}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_8cpp_source_l00226}{226}} of file \mbox{\hyperlink{_parse_8cpp_source}{Parse.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00227\ \ \ \ \ \{}
+\DoxyCodeLine{00228\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ this\ type\ is\ not\ in\ the\ module's\ type\ table\ yet,\ add\ it.}}
+\DoxyCodeLine{00229\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ functionTypeToIndexMapIt\ =\ \mbox{\hyperlink{structstate}{state}}.functionTypeToIndexMap.find(functionType);}
+\DoxyCodeLine{00230\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(functionTypeToIndexMapIt\ !=\ \mbox{\hyperlink{structstate}{state}}.functionTypeToIndexMap.end())}
+\DoxyCodeLine{00231\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00232\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_i_r_1_1_indexed_function_type}{IndexedFunctionType}}\ \{functionTypeToIndexMapIt-\/>second\};}
+\DoxyCodeLine{00233\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00234\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ functionTypeIndex\ =\ \mbox{\hyperlink{structstate}{state}}.module.types.size();}
+\DoxyCodeLine{00237\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.module.types.push\_back(functionType);}
+\DoxyCodeLine{00238\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.disassemblyNames.types.push\_back(std::string());}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_errors_8h_a36d7655d01d72167969992b17b772507}{errorUnless}}(functionTypeIndex\ <\ \mbox{\hyperlink{stdint_8h_ab5eb23180f7cc12b7d6c04a8ec067fdd}{UINT32\_MAX}});}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.functionTypeToIndexMap.emplace(functionType,(\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}})functionTypeIndex);}
+\DoxyCodeLine{00241\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_i_r_1_1_indexed_function_type}{IndexedFunctionType}}\ \{(\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}})functionTypeIndex\};}
+\DoxyCodeLine{00242\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00243\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_a0fe85cc07ee6a0695ebb31644fc0ce7b_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_w_a_s_t_ae250d021fe4842a3a03f4ded3a982c20}\index{WAST@{WAST}!isRecoveryPointChar@{isRecoveryPointChar}}
+\index{isRecoveryPointChar@{isRecoveryPointChar}!WAST@{WAST}}
+\doxysubsubsection{\texorpdfstring{isRecoveryPointChar()}{isRecoveryPointChar()}}
+{\footnotesize\ttfamily \label{namespace_w_a_s_t_ae250d021fe4842a3a03f4ded3a982c20} 
+bool WAST\+::is\+Recovery\+Point\+Char (\begin{DoxyParamCaption}\item[{char}]{c}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_lexer_8cpp_source_l00153}{153}} of file \mbox{\hyperlink{_lexer_8cpp_source}{Lexer.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00154\ \ \ \ \ \{}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(c)}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Recover\ lexing\ at\ the\ next\ whitespace\ or\ parenthesis.}}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\ '}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)t'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)r'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)n'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)f'}:}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'('}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{')'}:}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00164\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_ae250d021fe4842a3a03f4ded3a982c20_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_w_a_s_t_a9ffdd3dd8d6db105464488183a5f13da}\index{WAST@{WAST}!lex@{lex}}
+\index{lex@{lex}!WAST@{WAST}}
+\doxysubsubsection{\texorpdfstring{lex()}{lex()}}
+{\footnotesize\ttfamily \label{namespace_w_a_s_t_a9ffdd3dd8d6db105464488183a5f13da} 
+Token \texorpdfstring{$\ast$}{*} WAST\+::lex (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{string}{, }\item[{\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}}]{string\+Length}{, }\item[{\mbox{\hyperlink{struct_w_a_s_t_1_1_line_info}{Line\+Info}} \texorpdfstring{$\ast$}{*}\&}]{out\+Line\+Info}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_lexer_8cpp_source_l00166}{166}} of file \mbox{\hyperlink{_lexer_8cpp_source}{Lexer.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00167\ \ \ \ \ \{}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{struct_w_a_s_t_1_1_static_data}{StaticData}}\ staticData;}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_timing_1_1_timer}{Timing::Timer}}\ timer;}
+\DoxyCodeLine{00171\ }
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(stringLength\ >\ \mbox{\hyperlink{stdint_8h_ab5eb23180f7cc12b7d6c04a8ec067fdd}{UINT32\_MAX}})}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_errors_a719a329951edb01e45afe1443dfa2a92}{Errors::fatalf}}(\textcolor{stringliteral}{"{}cannot\ lex\ strings\ with\ more\ than\ \%u\ characters"{}},\mbox{\hyperlink{stdint_8h_ab5eb23180f7cc12b7d6c04a8ec067fdd}{UINT32\_MAX}});}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Allocate\ enough\ memory\ up\ front\ for\ a\ token\ and\ newline\ for\ each\ character\ in\ the\ input\ string.}}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ Token*\ tokens\ =\ (Token*)malloc(\textcolor{keyword}{sizeof}(Token)\ *\ (stringLength\ +\ 1));}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}*\ lineStarts\ =\ (\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}*)malloc(\textcolor{keyword}{sizeof}(\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}})\ *\ (stringLength\ +\ 2));}
+\DoxyCodeLine{00180\ }
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ Token*\ nextToken\ =\ tokens;}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}*\ nextLineStart\ =\ lineStarts;}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \ \ *nextLineStart++\ =\ 0;}
+\DoxyCodeLine{00184\ }
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ nextChar\ =\ string;}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\textcolor{keyword}{true})}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Skip\ whitespace\ and\ comments\ (keeping\ track\ of\ newlines).}}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\textcolor{keyword}{true})}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(*nextChar)}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Single\ line\ comments.}}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{';'}:}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(nextChar[1]\ !=\ \textcolor{charliteral}{';'})\ \{\ \textcolor{keywordflow}{goto}\ doneSkippingWhitespace;\ \}}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ nextChar\ +=\ 2;}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(*nextChar)}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(*nextChar\ ==\ \textcolor{charliteral}{'\(\backslash\)n'})}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Emit\ a\ line\ start\ for\ the\ newline.}}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *nextLineStart++\ =\ \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}(nextChar\ -\/\ \textcolor{keywordtype}{string}\ +\ 1);}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++nextChar;}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++nextChar;}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Delimited\ (possibly\ multi-\/line)\ comments.}}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'('}:}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(nextChar[1]\ !=\ \textcolor{charliteral}{';'})\ \{\ \textcolor{keywordflow}{goto}\ doneSkippingWhitespace;\ \}}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00217\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ firstCommentChar\ =\ nextChar;}
+\DoxyCodeLine{00218\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ nextChar\ +=\ 2;}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}\ commentDepth\ =\ 1;}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(commentDepth)}
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(nextChar[0]\ ==\ \textcolor{charliteral}{';'}\ \&\&\ nextChar[1]\ ==\ \textcolor{charliteral}{')'})}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/-\/commentDepth;}
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ nextChar\ +=\ 2;}
+\DoxyCodeLine{00226\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00227\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(nextChar[0]\ ==\ \textcolor{charliteral}{'('}\ \&\&\ nextChar[1]\ ==\ \textcolor{charliteral}{';'})}
+\DoxyCodeLine{00228\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00229\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++commentDepth;}
+\DoxyCodeLine{00230\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ nextChar\ +=\ 2;}
+\DoxyCodeLine{00231\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00232\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(nextChar\ ==\ \textcolor{keywordtype}{string}\ +\ stringLength)}
+\DoxyCodeLine{00233\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00234\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Emit\ an\ unterminated\ comment\ token.}}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ nextToken-\/>type\ =\ t\_unterminatedComment;}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ nextToken-\/>begin\ =\ \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}(firstCommentChar\ -\/\ \textcolor{keywordtype}{string});}
+\DoxyCodeLine{00237\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++nextToken;}
+\DoxyCodeLine{00238\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ doneSkippingWhitespace;}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00241\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00242\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(*nextChar\ ==\ \textcolor{charliteral}{'\(\backslash\)n'})}
+\DoxyCodeLine{00243\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00244\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Emit\ a\ line\ start\ for\ the\ newline.}}
+\DoxyCodeLine{00245\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *nextLineStart++\ =\ \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}(nextChar\ -\/\ \textcolor{keywordtype}{string});}
+\DoxyCodeLine{00246\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00247\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++nextChar;}
+\DoxyCodeLine{00248\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00249\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00250\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00251\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00252\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Whitespace.}}
+\DoxyCodeLine{00253\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)n'}:}
+\DoxyCodeLine{00254\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *nextLineStart++\ =\ \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}(nextChar\ -\/\ \textcolor{keywordtype}{string}\ +\ 1);}
+\DoxyCodeLine{00255\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++nextChar;}
+\DoxyCodeLine{00256\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00257\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\ '}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)t'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)r'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)f'}:}
+\DoxyCodeLine{00258\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++nextChar;}
+\DoxyCodeLine{00259\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00260\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00261\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ doneSkippingWhitespace;}
+\DoxyCodeLine{00262\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00263\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00264\ \ \ \ \ \ \ \ \ \ \ \ \ doneSkippingWhitespace:}
+\DoxyCodeLine{00265\ }
+\DoxyCodeLine{00266\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Once\ we\ reach\ a\ non-\/whitespace,\ non-\/comment\ character,\ feed\ characters\ into\ the\ NFA\ until\ it\ reaches\ a\ terminal\ state.}}
+\DoxyCodeLine{00267\ \ \ \ \ \ \ \ \ \ \ \ \ nextToken-\/>begin\ =\ \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}(nextChar\ -\/\ \textcolor{keywordtype}{string});}
+\DoxyCodeLine{00268\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{NFA::StateIndex}}\ terminalState\ =\ staticData.\mbox{\hyperlink{struct_w_a_s_t_1_1_static_data_a37c4d27bb956914c06b3198191995f35}{nfaMachine}}.\mbox{\hyperlink{struct_n_f_a_1_1_machine_ac25347ea5e9d318f6ac499af40e7b77b}{feed}}(nextChar);}
+\DoxyCodeLine{00269\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(terminalState\ !=\ \mbox{\hyperlink{namespace_n_f_a_ad9fb95d6afb96fea8750c3543ee293a1ac83c0f7e053c5efc232f432bba1ab6c6}{NFA::unmatchedCharacterTerminal}})}
+\DoxyCodeLine{00270\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00271\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ nextToken-\/>type\ =\ \mbox{\hyperlink{namespace_catch_1_1clara_1_1detail_a437f089d309df2e967ebed3b873f0bf9}{TokenType}}(\mbox{\hyperlink{namespace_n_f_a_ad9fb95d6afb96fea8750c3543ee293a1a6df9f5bfcb1889079b46027cf7bdac15}{NFA::maximumTerminalStateIndex}}\ -\/\ (\mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{NFA::StateIndex}})terminalState);}
+\DoxyCodeLine{00272\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++nextToken;}
+\DoxyCodeLine{00273\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00274\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00275\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00276\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(nextToken-\/>begin\ <\ stringLength)}
+\DoxyCodeLine{00277\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00278\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Emit\ an\ unrecognized\ token.}}
+\DoxyCodeLine{00279\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ nextToken-\/>type\ =\ t\_unrecognized;}
+\DoxyCodeLine{00280\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++nextToken;}
+\DoxyCodeLine{00281\ }
+\DoxyCodeLine{00282\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Advance\ until\ a\ recovery\ point.}}
+\DoxyCodeLine{00283\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(!\mbox{\hyperlink{namespace_w_a_s_t_ae250d021fe4842a3a03f4ded3a982c20}{isRecoveryPointChar}}(*nextChar))\ \{\ ++nextChar;\ \}}
+\DoxyCodeLine{00284\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00285\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00286\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00287\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00288\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00289\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00290\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00291\ }
+\DoxyCodeLine{00292\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Emit\ an\ end\ token\ to\ mark\ the\ end\ of\ the\ token\ stream.}}
+\DoxyCodeLine{00293\ \ \ \ \ \ \ \ \ nextToken-\/>type\ =\ t\_eof;}
+\DoxyCodeLine{00294\ \ \ \ \ \ \ \ \ ++nextToken;}
+\DoxyCodeLine{00295\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00296\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Emit\ an\ extra\ line\ start\ for\ the\ end\ of\ the\ file,\ so\ you\ can\ find\ the\ end\ of\ a\ line\ with\ lineStarts[line\ +\ 1].}}
+\DoxyCodeLine{00297\ \ \ \ \ \ \ \ \ *nextLineStart++\ =\ \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}(nextChar\ -\/\ \textcolor{keywordtype}{string})\ +\ 1;}
+\DoxyCodeLine{00298\ }
+\DoxyCodeLine{00299\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Shrink\ the\ line\ start\ and\ token\ arrays\ to\ the\ final\ number\ of\ tokens/lines.}}
+\DoxyCodeLine{00300\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ numLineStarts\ =\ nextLineStart\ -\/\ lineStarts;}
+\DoxyCodeLine{00301\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ numTokens\ =\ nextToken\ -\/\ tokens;}
+\DoxyCodeLine{00302\ \ \ \ \ \ \ \ \ lineStarts\ =\ (\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}*)realloc(lineStarts,\textcolor{keyword}{sizeof}(\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}})\ *\ numLineStarts);}
+\DoxyCodeLine{00303\ \ \ \ \ \ \ \ \ tokens\ =\ (Token*)realloc(tokens,\textcolor{keyword}{sizeof}(Token)\ *\ numTokens);}
+\DoxyCodeLine{00304\ }
+\DoxyCodeLine{00305\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Create\ the\ LineInfo\ object\ that\ encapsulates\ the\ line\ start\ information.}}
+\DoxyCodeLine{00306\ \ \ \ \ \ \ \ \ outLineInfo\ =\ \textcolor{keyword}{new}\ LineInfo\ \{lineStarts,\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}(numLineStarts)\};}
+\DoxyCodeLine{00307\ }
+\DoxyCodeLine{00308\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_timing_a4f7cf4a3faa27612ba0ad6e4653651f8}{Timing::logRatePerSecond}}(\textcolor{stringliteral}{"{}lexed\ WAST\ file"{}},timer,stringLength/1024.0/1024.0,\textcolor{stringliteral}{"{}MB"{}});}
+\DoxyCodeLine{00309\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{Log::printf}}(\mbox{\hyperlink{namespace_log_a1f055cc08a2ed074aa74f9d99c8a0901aaa59d67c2123f094d0d6798ffe651c4d}{Log::Category::metrics}},\textcolor{stringliteral}{"{}lexer\ produced\ \%u\ tokens\ (\%.1fMB)\(\backslash\)n"{}},numTokens,numTokens*\textcolor{keyword}{sizeof}(Token)/1024.0/1024.0);}
+\DoxyCodeLine{00310\ }
+\DoxyCodeLine{00311\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ tokens;}
+\DoxyCodeLine{00312\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_a9ffdd3dd8d6db105464488183a5f13da_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_a9ffdd3dd8d6db105464488183a5f13da_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_w_a_s_t_ad103a4b3d99fda4a614de3bd2e6a50b0}\index{WAST@{WAST}!nibbleToHexChar@{nibbleToHexChar}}
+\index{nibbleToHexChar@{nibbleToHexChar}!WAST@{WAST}}
+\doxysubsubsection{\texorpdfstring{nibbleToHexChar()}{nibbleToHexChar()}}
+{\footnotesize\ttfamily \label{namespace_w_a_s_t_ad103a4b3d99fda4a614de3bd2e6a50b0} 
+char WAST\+::nibble\+To\+Hex\+Char (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}}]{value}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_print_8cpp_source_l00016}{16}} of file \mbox{\hyperlink{_print_8cpp_source}{Print.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00016\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ <\ 10\ ?\ (\textcolor{charliteral}{'0'}\ +\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})\ :\ \textcolor{stringliteral}{'a'}\ +\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ -\/\ 10;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_ad103a4b3d99fda4a614de3bd2e6a50b0_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_w_a_s_t_aa7cfc1625466b4ac24691f75df863cc7}\index{WAST@{WAST}!PACKED\_STRUCT@{PACKED\_STRUCT}}
+\index{PACKED\_STRUCT@{PACKED\_STRUCT}!WAST@{WAST}}
+\doxysubsubsection{\texorpdfstring{PACKED\_STRUCT()}{PACKED\_STRUCT()}}
+{\footnotesize\ttfamily \label{namespace_w_a_s_t_aa7cfc1625466b4ac24691f75df863cc7} 
+WAST\+::\+PACKED\+\_\+\+STRUCT (\begin{DoxyParamCaption}\item[{struct Token \{ \mbox{\hyperlink{namespace_w_a_s_t_a57c99a932a2a7d69084cbeca01031f32}{Token\+Type}} type;\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}} begin;\}}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{namespace_w_a_s_t_a90c0a142bd4b2b03f4d957bca6a88365}\index{WAST@{WAST}!parseAndResolveNameOrIndexRef@{parseAndResolveNameOrIndexRef}}
+\index{parseAndResolveNameOrIndexRef@{parseAndResolveNameOrIndexRef}!WAST@{WAST}}
+\doxysubsubsection{\texorpdfstring{parseAndResolveNameOrIndexRef()}{parseAndResolveNameOrIndexRef()}}
+{\footnotesize\ttfamily \label{namespace_w_a_s_t_a90c0a142bd4b2b03f4d957bca6a88365} 
+\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}} WAST\+::parse\+And\+Resolve\+Name\+Or\+Index\+Ref (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&}]{state}{, }\item[{const \mbox{\hyperlink{namespace_w_a_s_t_a2d9d3ba4e83db4fbb314c3068261afa5}{Name\+To\+Index\+Map}} \&}]{name\+To\+Index\+Map}{, }\item[{\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}}]{max\+Index}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{context}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_8cpp_source_l00295}{295}} of file \mbox{\hyperlink{_parse_8cpp_source}{Parse.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00296\ \ \ \ \ \{}
+\DoxyCodeLine{00297\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_w_a_s_t_1_1_reference}{Reference}}\ ref;}
+\DoxyCodeLine{00298\ }
+\DoxyCodeLine{00299\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(strcmp(\mbox{\hyperlink{structcontext}{context}},\ \textcolor{stringliteral}{"{}type"{}})\ ==\ 0\ \ \ \ \ \textcolor{comment}{//limits\ this\ block\ strictly\ to\ call\_indirect}}
+\DoxyCodeLine{00300\ \ \ \ \ \ \ \ \ \&\&\ \mbox{\hyperlink{structstate}{state}}.nextToken[0].type\ ==\ t\_leftParenthesis}
+\DoxyCodeLine{00301\ \ \ \ \ \ \ \ \ \&\&\ \mbox{\hyperlink{structstate}{state}}.nextToken[1].type\ ==\ t\_type)}
+\DoxyCodeLine{00302\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00303\ \ \ \ \ \ \ \ \ \ \ \ \ parseParenthesized(\mbox{\hyperlink{structstate}{state}},[\&]}
+\DoxyCodeLine{00304\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00305\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_a8001b89de5d29cdf830471e70b13798a}{require}}(\mbox{\hyperlink{structstate}{state}},t\_type);}
+\DoxyCodeLine{00306\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!\mbox{\hyperlink{namespace_w_a_s_t_a965b97566a3d051c08b06c7488c14ad8}{tryParseNameOrIndexRef}}(\mbox{\hyperlink{structstate}{state}},ref))}
+\DoxyCodeLine{00307\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00308\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_af36d14f42c697d5272a592bf7349d06d}{parseErrorf}}(\mbox{\hyperlink{structstate}{state}},\mbox{\hyperlink{structstate}{state}}.nextToken,\textcolor{stringliteral}{"{}expected\ type\ name\ or\ index"{}});}
+\DoxyCodeLine{00309\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{struct_w_a_s_t_1_1_recover_parse_exception}{RecoverParseException}}();}
+\DoxyCodeLine{00310\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00311\ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00312\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00313\ }
+\DoxyCodeLine{00314\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(ref.type\ ==\ Reference::Type::invalid\ \&\&\ !\mbox{\hyperlink{namespace_w_a_s_t_a965b97566a3d051c08b06c7488c14ad8}{tryParseNameOrIndexRef}}(\mbox{\hyperlink{structstate}{state}},ref))}
+\DoxyCodeLine{00315\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00316\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_af36d14f42c697d5272a592bf7349d06d}{parseErrorf}}(\mbox{\hyperlink{structstate}{state}},\mbox{\hyperlink{structstate}{state}}.nextToken,\textcolor{stringliteral}{"{}expected\ \%s\ name\ or\ index"{}},\mbox{\hyperlink{structcontext}{context}});}
+\DoxyCodeLine{00317\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ RecoverParseException();}
+\DoxyCodeLine{00318\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00319\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_w_a_s_t_ad98b487d5f8d6b2397db35e9d6c79ae8}{resolveRef}}(\mbox{\hyperlink{structstate}{state}},nameToIndexMap,maxIndex,ref);}
+\DoxyCodeLine{00320\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_a90c0a142bd4b2b03f4d957bca6a88365_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_w_a_s_t_acef8b86d580be4e8ababec916f5f4bd9}\index{WAST@{WAST}!parseErrorf@{parseErrorf}}
+\index{parseErrorf@{parseErrorf}!WAST@{WAST}}
+\doxysubsubsection{\texorpdfstring{parseErrorf()}{parseErrorf()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{namespace_w_a_s_t_acef8b86d580be4e8ababec916f5f4bd9} 
+void WAST\+::parse\+Errorf (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&}]{state}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{next\+Char}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{message\+Format}{, }\item[{}]{...}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_8cpp_source_l00063}{63}} of file \mbox{\hyperlink{_parse_8cpp_source}{Parse.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00064\ \ \ \ \ \{}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ va\_list\ messageArguments;}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ va\_start(messageArguments,messageFormat);}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_af36d14f42c697d5272a592bf7349d06d}{parseErrorf}}(\mbox{\hyperlink{structstate}{state}},nextChar\ -\/\ \mbox{\hyperlink{structstate}{state}}.string,messageFormat,messageArguments);}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ va\_end(messageArguments);}
+\DoxyCodeLine{00069\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_acef8b86d580be4e8ababec916f5f4bd9_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_w_a_s_t_ae1d0d61716282a37bd7990c2ec54ae4b}\index{WAST@{WAST}!parseErrorf@{parseErrorf}}
+\index{parseErrorf@{parseErrorf}!WAST@{WAST}}
+\doxysubsubsection{\texorpdfstring{parseErrorf()}{parseErrorf()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{namespace_w_a_s_t_ae1d0d61716282a37bd7990c2ec54ae4b} 
+void WAST\+::parse\+Errorf (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&}]{state}{, }\item[{const Token \texorpdfstring{$\ast$}{*}}]{next\+Token}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{message\+Format}{, }\item[{}]{...}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_8cpp_source_l00070}{70}} of file \mbox{\hyperlink{_parse_8cpp_source}{Parse.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00071\ \ \ \ \ \{}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ va\_list\ messageArguments;}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ va\_start(messageArguments,messageFormat);}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_af36d14f42c697d5272a592bf7349d06d}{parseErrorf}}(\mbox{\hyperlink{structstate}{state}},nextToken-\/>begin,messageFormat,messageArguments);}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ va\_end(messageArguments);}
+\DoxyCodeLine{00076\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_ae1d0d61716282a37bd7990c2ec54ae4b_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_w_a_s_t_af36d14f42c697d5272a592bf7349d06d}\index{WAST@{WAST}!parseErrorf@{parseErrorf}}
+\index{parseErrorf@{parseErrorf}!WAST@{WAST}}
+\doxysubsubsection{\texorpdfstring{parseErrorf()}{parseErrorf()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{namespace_w_a_s_t_af36d14f42c697d5272a592bf7349d06d} 
+void WAST\+::parse\+Errorf (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&}]{state}{, }\item[{\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}}]{char\+Offset}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{message\+Format}{, }\item[{va\+\_\+list}]{message\+Arguments}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_8cpp_source_l00045}{45}} of file \mbox{\hyperlink{_parse_8cpp_source}{Parse.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00046\ \ \ \ \ \{}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Format\ the\ message.}}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ messageBuffer[1024];}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ numPrintedChars\ =\ std::vsnprintf(messageBuffer,\textcolor{keyword}{sizeof}(messageBuffer),messageFormat,messageArguments);}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(numPrintedChars\ >=\ 1023\ ||\ numPrintedChars\ <\ 0)\ \{\ \mbox{\hyperlink{namespace_errors_a6959930ad6159fe3eb2e04ebf87c1b84}{Errors::unreachable}}();\ \}}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ messageBuffer[numPrintedChars]\ =\ 0;}
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Add\ the\ error\ to\ the\ state's\ error\ list.}}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.errors.emplace\_back(charOffset,messageBuffer);}
+\DoxyCodeLine{00055\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_af36d14f42c697d5272a592bf7349d06d_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_af36d14f42c697d5272a592bf7349d06d_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_w_a_s_t_a2a4f0a07b303edd2429f3db01b0b6deb}\index{WAST@{WAST}!parseErrorf@{parseErrorf}}
+\index{parseErrorf@{parseErrorf}!WAST@{WAST}}
+\doxysubsubsection{\texorpdfstring{parseErrorf()}{parseErrorf()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{namespace_w_a_s_t_a2a4f0a07b303edd2429f3db01b0b6deb} 
+void WAST\+::parse\+Errorf (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&}]{state}{, }\item[{\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}}]{char\+Offset}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{message\+Format}{, }\item[{}]{...}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_8cpp_source_l00056}{56}} of file \mbox{\hyperlink{_parse_8cpp_source}{Parse.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00057\ \ \ \ \ \{}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ va\_list\ messageArguments;}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ va\_start(messageArguments,messageFormat);}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_af36d14f42c697d5272a592bf7349d06d}{parseErrorf}}(\mbox{\hyperlink{structstate}{state}},charOffset,messageFormat,messageArguments);}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ va\_end(messageArguments);}
+\DoxyCodeLine{00062\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_a2a4f0a07b303edd2429f3db01b0b6deb_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_w_a_s_t_a2951f7730d860b16cf24168f13ec7d01}\index{WAST@{WAST}!parseF32@{parseF32}}
+\index{parseF32@{parseF32}!WAST@{WAST}}
+\doxysubsubsection{\texorpdfstring{parseF32()}{parseF32()}}
+{\footnotesize\ttfamily \label{namespace_w_a_s_t_a2951f7730d860b16cf24168f13ec7d01} 
+\mbox{\hyperlink{_basic_types_8h_a841d3674577a1e86afdc2f4845f46c4b}{F32}} WAST\+::parse\+F32 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&}]{state}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_numbers_8cpp_source_l00320}{320}} of file \mbox{\hyperlink{_parse_numbers_8cpp_source}{Parse\+Numbers.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00321\ \ \ \ \ \{}
+\DoxyCodeLine{00322\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_a841d3674577a1e86afdc2f4845f46c4b}{F32}}\ result;}
+\DoxyCodeLine{00323\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!\mbox{\hyperlink{_parse_numbers_8cpp_abd5f32c35fd7b1107c20345aa1f6b2bd}{tryParseFloat}}(\mbox{\hyperlink{structstate}{state}},result))}
+\DoxyCodeLine{00324\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00325\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_af36d14f42c697d5272a592bf7349d06d}{parseErrorf}}(\mbox{\hyperlink{structstate}{state}},\mbox{\hyperlink{structstate}{state}}.nextToken,\textcolor{stringliteral}{"{}expected\ f32\ literal"{}});}
+\DoxyCodeLine{00326\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{struct_w_a_s_t_1_1_recover_parse_exception}{RecoverParseException}}();}
+\DoxyCodeLine{00327\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00328\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00329\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_a2951f7730d860b16cf24168f13ec7d01_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_w_a_s_t_a40af95ba4f3fbebd5324a913f89d1aff}\index{WAST@{WAST}!parseF64@{parseF64}}
+\index{parseF64@{parseF64}!WAST@{WAST}}
+\doxysubsubsection{\texorpdfstring{parseF64()}{parseF64()}}
+{\footnotesize\ttfamily \label{namespace_w_a_s_t_a40af95ba4f3fbebd5324a913f89d1aff} 
+\mbox{\hyperlink{_basic_types_8h_adc9896ee12db3bb116fc63b3464c72c7}{F64}} WAST\+::parse\+F64 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&}]{state}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_numbers_8cpp_source_l00331}{331}} of file \mbox{\hyperlink{_parse_numbers_8cpp_source}{Parse\+Numbers.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00332\ \ \ \ \ \{}
+\DoxyCodeLine{00333\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_adc9896ee12db3bb116fc63b3464c72c7}{F64}}\ result;}
+\DoxyCodeLine{00334\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!\mbox{\hyperlink{_parse_numbers_8cpp_abd5f32c35fd7b1107c20345aa1f6b2bd}{tryParseFloat}}(\mbox{\hyperlink{structstate}{state}},result))}
+\DoxyCodeLine{00335\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00336\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_af36d14f42c697d5272a592bf7349d06d}{parseErrorf}}(\mbox{\hyperlink{structstate}{state}},\mbox{\hyperlink{structstate}{state}}.nextToken,\textcolor{stringliteral}{"{}expected\ f64\ literal"{}});}
+\DoxyCodeLine{00337\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{struct_w_a_s_t_1_1_recover_parse_exception}{RecoverParseException}}();}
+\DoxyCodeLine{00338\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00339\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00340\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_a40af95ba4f3fbebd5324a913f89d1aff_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_w_a_s_t_ad67ed47b4a120f234a3a4a2da076418f}\index{WAST@{WAST}!parseFunctionDef@{parseFunctionDef}}
+\index{parseFunctionDef@{parseFunctionDef}!WAST@{WAST}}
+\doxysubsubsection{\texorpdfstring{parseFunctionDef()}{parseFunctionDef()}}
+{\footnotesize\ttfamily \label{namespace_w_a_s_t_ad67ed47b4a120f234a3a4a2da076418f} 
+\mbox{\hyperlink{struct_i_r_1_1_function_def}{Function\+Def}} WAST\+::parse\+Function\+Def (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_w_a_s_t_1_1_module_parse_state}{Module\+Parse\+State}} \&}]{state}{, }\item[{const Token \texorpdfstring{$\ast$}{*}}]{func\+Token}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_function_8cpp_source_l00542}{542}} of file \mbox{\hyperlink{_parse_function_8cpp_source}{Parse\+Function.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00543\ \ \ \ \ \{}
+\DoxyCodeLine{00544\ \ \ \ \ \ \ \ \ std::vector<std::string>*\ localDisassemblyNames\ =\ \textcolor{keyword}{new}\ std::vector<std::string>;}
+\DoxyCodeLine{00545\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_a2d9d3ba4e83db4fbb314c3068261afa5}{NameToIndexMap}}*\ localNameToIndexMap\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{namespace_w_a_s_t_a2d9d3ba4e83db4fbb314c3068261afa5}{NameToIndexMap}}();}
+\DoxyCodeLine{00546\ }
+\DoxyCodeLine{00547\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Parse\ the\ function\ type,\ as\ a\ reference\ or\ explicit\ declaration.}}
+\DoxyCodeLine{00548\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_w_a_s_t_1_1_unresolved_function_type}{UnresolvedFunctionType}}\ unresolvedFunctionType\ =\ \mbox{\hyperlink{namespace_w_a_s_t_ab72b47fe2520b8a7840ff4ce5d07684d}{parseFunctionTypeRefAndOrDecl}}(\mbox{\hyperlink{structstate}{state}},*localNameToIndexMap,*localDisassemblyNames);}
+\DoxyCodeLine{00549\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00550\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Defer\ resolving\ the\ function\ type\ until\ all\ type\ declarations\ have\ been\ parsed.}}
+\DoxyCodeLine{00551\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ functionIndex\ =\ \mbox{\hyperlink{structstate}{state}}.module.functions.size();}
+\DoxyCodeLine{00552\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ functionDefIndex\ =\ \mbox{\hyperlink{structstate}{state}}.module.functions.defs.size();}
+\DoxyCodeLine{00553\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ Token*\ firstBodyToken\ =\ \mbox{\hyperlink{structstate}{state}}.nextToken;}
+\DoxyCodeLine{00554\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.postTypeCallbacks.push\_back(}
+\DoxyCodeLine{00555\ \ \ \ \ \ \ \ \ [functionIndex,functionDefIndex,firstBodyToken,localNameToIndexMap,localDisassemblyNames,unresolvedFunctionType]}
+\DoxyCodeLine{00556\ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{struct_w_a_s_t_1_1_module_parse_state}{ModuleParseState}}\&\ \mbox{\hyperlink{structstate}{state}})}
+\DoxyCodeLine{00557\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00558\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Resolve\ the\ function\ type\ and\ set\ it\ on\ the\ FunctionDef.}}
+\DoxyCodeLine{00559\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_i_r_1_1_indexed_function_type}{IndexedFunctionType}}\ functionTypeIndex\ =\ \mbox{\hyperlink{namespace_w_a_s_t_ae274bd19819be1d3ef32161e6d8a2f7f}{resolveFunctionType}}(\mbox{\hyperlink{structstate}{state}},unresolvedFunctionType);}
+\DoxyCodeLine{00560\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.module.functions.defs[functionDefIndex].type\ =\ functionTypeIndex;}
+\DoxyCodeLine{00561\ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00562\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Defer\ parsing\ the\ body\ of\ the\ function\ until\ all\ function\ types\ have\ been\ resolved.}}
+\DoxyCodeLine{00563\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.postDeclarationCallbacks.push\_back(}
+\DoxyCodeLine{00564\ \ \ \ \ \ \ \ \ \ \ \ \ [functionIndex,functionDefIndex,firstBodyToken,localNameToIndexMap,localDisassemblyNames,functionTypeIndex]}
+\DoxyCodeLine{00565\ \ \ \ \ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{struct_w_a_s_t_1_1_module_parse_state}{ModuleParseState}}\&\ \mbox{\hyperlink{structstate}{state}})}
+\DoxyCodeLine{00566\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00567\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_i_r_1_1_function_def}{FunctionDef}}\&\ functionDef\ =\ \mbox{\hyperlink{structstate}{state}}.module.functions.defs[functionDefIndex];}
+\DoxyCodeLine{00568\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_i_r_1_1_function_type}{FunctionType}}*\ functionType\ =\ functionTypeIndex.\mbox{\hyperlink{struct_i_r_1_1_indexed_function_type_ad76a69c366f186a0e17305099ea15aba}{index}}\ ==\ \mbox{\hyperlink{stdint_8h_ab5eb23180f7cc12b7d6c04a8ec067fdd}{UINT32\_MAX}}}
+\DoxyCodeLine{00569\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ?\ \mbox{\hyperlink{struct_i_r_1_1_function_type_a97cbdf384d97c3a5203a1310c9af0822}{FunctionType::get}}()}
+\DoxyCodeLine{00570\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{structstate}{state}}.\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.types[functionTypeIndex.index];}
+\DoxyCodeLine{00571\ }
+\DoxyCodeLine{00572\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Parse\ the\ function's\ local\ variables.}}
+\DoxyCodeLine{00573\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{ParseState}}\ localParseState(\mbox{\hyperlink{structstate}{state}}.string,\mbox{\hyperlink{structstate}{state}}.lineInfo,\mbox{\hyperlink{structstate}{state}}.errors,firstBodyToken);}
+\DoxyCodeLine{00574\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(tryParseParenthesizedTagged(localParseState,t\_local,[\&]}
+\DoxyCodeLine{00575\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00576\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_w_a_s_t_1_1_name}{Name}}\ localName;}
+\DoxyCodeLine{00577\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{namespace_w_a_s_t_a5a1887aa3f790b93a65b578a3b4628e3}{tryParseName}}(localParseState,localName))}
+\DoxyCodeLine{00578\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00579\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_a9b736e747098508f90bd9495fa4a9a11}{bindName}}(localParseState,*localNameToIndexMap,localName,functionType-\/>\mbox{\hyperlink{struct_i_r_1_1_function_type_a92e17c58f6cd40ee5392dba1bdc2e822}{parameters}}.size()\ +\ functionDef.\mbox{\hyperlink{struct_i_r_1_1_function_def_a34738d2b2fa494ebf86433b872fee943}{nonParameterLocalTypes}}.size());}
+\DoxyCodeLine{00580\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ localDisassemblyNames-\/>push\_back(localName.\mbox{\hyperlink{struct_w_a_s_t_1_1_name_acaddef876eb6fe1caf5c67998c3cc9b1}{getString}}());}
+\DoxyCodeLine{00581\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ functionDef.\mbox{\hyperlink{struct_i_r_1_1_function_def_a34738d2b2fa494ebf86433b872fee943}{nonParameterLocalTypes}}.push\_back(\mbox{\hyperlink{namespace_w_a_s_t_afb469d566925151c57afa1dd31721c9c}{parseValueType}}(localParseState));}
+\DoxyCodeLine{00582\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00583\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00584\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00585\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(localParseState.nextToken-\/>type\ !=\ t\_rightParenthesis)}
+\DoxyCodeLine{00586\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00587\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ localDisassemblyNames-\/>push\_back(std::string());}
+\DoxyCodeLine{00588\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ functionDef.\mbox{\hyperlink{struct_i_r_1_1_function_def_a34738d2b2fa494ebf86433b872fee943}{nonParameterLocalTypes}}.push\_back(\mbox{\hyperlink{namespace_w_a_s_t_afb469d566925151c57afa1dd31721c9c}{parseValueType}}(localParseState));}
+\DoxyCodeLine{00589\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00590\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00591\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}));}
+\DoxyCodeLine{00592\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.disassemblyNames.functions[functionIndex].locals\ =\ std::move(*localDisassemblyNames);}
+\DoxyCodeLine{00593\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{delete}\ localDisassemblyNames;}
+\DoxyCodeLine{00594\ }
+\DoxyCodeLine{00595\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Parse\ the\ function's\ code.}}
+\DoxyCodeLine{00596\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ FunctionParseState\ functionState(\mbox{\hyperlink{structstate}{state}},localNameToIndexMap,localParseState.nextToken,functionDef);}
+\DoxyCodeLine{00597\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}}
+\DoxyCodeLine{00598\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00599\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ parseInstrSequence(functionState);}
+\DoxyCodeLine{00600\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!functionState.errors.size())}
+\DoxyCodeLine{00601\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00602\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ functionState.validatingCodeStream.end();}
+\DoxyCodeLine{00603\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ functionState.validatingCodeStream.finishValidation();}
+\DoxyCodeLine{00604\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00605\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00606\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{catch}(\mbox{\hyperlink{struct_i_r_1_1_validation_exception}{ValidationException}}\ exception)}
+\DoxyCodeLine{00607\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00608\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_af36d14f42c697d5272a592bf7349d06d}{parseErrorf}}(\mbox{\hyperlink{structstate}{state}},firstBodyToken,\textcolor{stringliteral}{"{}\%s"{}},exception.\mbox{\hyperlink{struct_i_r_1_1_validation_exception_a9308689c3efeb272361bf9a07bf8f8ae}{message}}.c\_str());}
+\DoxyCodeLine{00609\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00610\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{catch}(\mbox{\hyperlink{struct_w_a_s_t_1_1_recover_parse_exception}{RecoverParseException}})\ \{\}}
+\DoxyCodeLine{00611\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{catch}(\mbox{\hyperlink{struct_w_a_s_t_1_1_fatal_parse_exception}{FatalParseException}})\ \{\}}
+\DoxyCodeLine{00612\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ functionDef.\mbox{\hyperlink{struct_i_r_1_1_function_def_a30854c34daa4c0da86950f8a63e59da5}{code}}\ =\ std::move(functionState.codeByteStream.getBytes());}
+\DoxyCodeLine{00613\ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00614\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00615\ }
+\DoxyCodeLine{00616\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Continue\ parsing\ after\ the\ closing\ parenthesis.}}
+\DoxyCodeLine{00617\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_a726a4231e5222857c2151800be474de7}{findClosingParenthesis}}(\mbox{\hyperlink{structstate}{state}},funcToken-\/1);}
+\DoxyCodeLine{00618\ \ \ \ \ \ \ \ \ -\/-\/\mbox{\hyperlink{structstate}{state}}.nextToken;}
+\DoxyCodeLine{00619\ \ \ \ \ }
+\DoxyCodeLine{00620\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{\{\mbox{\hyperlink{stdint_8h_ab5eb23180f7cc12b7d6c04a8ec067fdd}{UINT32\_MAX}}\},\{\},\{\}\};}
+\DoxyCodeLine{00621\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_ad67ed47b4a120f234a3a4a2da076418f_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_w_a_s_t_afdc0ca4bc5028ce0d0d1f0b50eadf451}\index{WAST@{WAST}!parseFunctionType@{parseFunctionType}}
+\index{parseFunctionType@{parseFunctionType}!WAST@{WAST}}
+\doxysubsubsection{\texorpdfstring{parseFunctionType()}{parseFunctionType()}}
+{\footnotesize\ttfamily \label{namespace_w_a_s_t_afdc0ca4bc5028ce0d0d1f0b50eadf451} 
+const \mbox{\hyperlink{struct_i_r_1_1_function_type}{IR\+::\+Function\+Type}} \texorpdfstring{$\ast$}{*} WAST\+::parse\+Function\+Type (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_w_a_s_t_1_1_module_parse_state}{Module\+Parse\+State}} \&}]{state}{, }\item[{\mbox{\hyperlink{namespace_w_a_s_t_a2d9d3ba4e83db4fbb314c3068261afa5}{Name\+To\+Index\+Map}} \&}]{out\+Local\+Name\+To\+Index\+Map}{, }\item[{std\+::vector$<$ std\+::string $>$ \&}]{out\+Local\+Disassembly\+Names}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_8cpp_source_l00121}{121}} of file \mbox{\hyperlink{_parse_8cpp_source}{Parse.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00122\ \ \ \ \ \{}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ std::vector<ValueType>\ parameters;}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_i_r_ac56fb5355b338ad4a167c48ec539b90b}{ResultType}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ ResultType::none;}
+\DoxyCodeLine{00125\ }
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Parse\ the\ function\ parameters.}}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(tryParseParenthesizedTagged(\mbox{\hyperlink{structstate}{state}},t\_param,[\&]}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_w_a_s_t_1_1_name}{Name}}\ parameterName;}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{namespace_w_a_s_t_a5a1887aa3f790b93a65b578a3b4628e3}{tryParseName}}(\mbox{\hyperlink{structstate}{state}},parameterName))}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ (param\ <name>\ <type>)}}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_a9b736e747098508f90bd9495fa4a9a11}{bindName}}(\mbox{\hyperlink{structstate}{state}},outLocalNameToIndexMap,parameterName,parameters.size());}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ parameters.push\_back(\mbox{\hyperlink{namespace_w_a_s_t_afb469d566925151c57afa1dd31721c9c}{parseValueType}}(\mbox{\hyperlink{structstate}{state}}));}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ outLocalDisassemblyNames.push\_back(parameterName.\mbox{\hyperlink{struct_w_a_s_t_1_1_name_acaddef876eb6fe1caf5c67998c3cc9b1}{getString}}());}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ (param\ <type>*)}}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}\ parameterType;}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(tryParseValueType(\mbox{\hyperlink{structstate}{state}},parameterType))}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ parameters.push\_back(parameterType);}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ outLocalDisassemblyNames.push\_back(std::string());}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \}));}
+\DoxyCodeLine{00148\ }
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Parse\ <=\ 1\ result\ type:\ (result\ <value\ type>*)*}}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\mbox{\hyperlink{structstate}{state}}.nextToken[0].type\ ==\ t\_leftParenthesis}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ \&\&\ \mbox{\hyperlink{structstate}{state}}.nextToken[1].type\ ==\ t\_result)}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \ \ \ \ parseParenthesized(\mbox{\hyperlink{structstate}{state}},[\&]}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_a8001b89de5d29cdf830471e70b13798a}{require}}(\mbox{\hyperlink{structstate}{state}},t\_result);}
+\DoxyCodeLine{00156\ }
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_i_r_ac56fb5355b338ad4a167c48ec539b90b}{ResultType}}\ resultElementType;}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ Token*\ elementToken\ =\ \mbox{\hyperlink{structstate}{state}}.nextToken;}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\mbox{\hyperlink{namespace_w_a_s_t_a9e4c5dc0f2d2044bb55b0702d2f6dc51}{tryParseResultType}}(\mbox{\hyperlink{structstate}{state}},resultElementType))}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ !=\ ResultType::none)\ \{\ \mbox{\hyperlink{namespace_w_a_s_t_af36d14f42c697d5272a592bf7349d06d}{parseErrorf}}(\mbox{\hyperlink{structstate}{state}},elementToken,\textcolor{stringliteral}{"{}function\ type\ cannot\ have\ more\ than\ 1\ result\ element"{}});\ \}}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ resultElementType;}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00166\ }
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_i_r_1_1_function_type_a97cbdf384d97c3a5203a1310c9af0822}{FunctionType::get}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}},parameters);}
+\DoxyCodeLine{00168\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_afdc0ca4bc5028ce0d0d1f0b50eadf451_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_afdc0ca4bc5028ce0d0d1f0b50eadf451_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_w_a_s_t_ab72b47fe2520b8a7840ff4ce5d07684d}\index{WAST@{WAST}!parseFunctionTypeRefAndOrDecl@{parseFunctionTypeRefAndOrDecl}}
+\index{parseFunctionTypeRefAndOrDecl@{parseFunctionTypeRefAndOrDecl}!WAST@{WAST}}
+\doxysubsubsection{\texorpdfstring{parseFunctionTypeRefAndOrDecl()}{parseFunctionTypeRefAndOrDecl()}}
+{\footnotesize\ttfamily \label{namespace_w_a_s_t_ab72b47fe2520b8a7840ff4ce5d07684d} 
+\mbox{\hyperlink{struct_w_a_s_t_1_1_unresolved_function_type}{Unresolved\+Function\+Type}} WAST\+::parse\+Function\+Type\+Ref\+And\+Or\+Decl (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_w_a_s_t_1_1_module_parse_state}{Module\+Parse\+State}} \&}]{state}{, }\item[{\mbox{\hyperlink{namespace_w_a_s_t_a2d9d3ba4e83db4fbb314c3068261afa5}{Name\+To\+Index\+Map}} \&}]{out\+Local\+Name\+To\+Index\+Map}{, }\item[{std\+::vector$<$ std\+::string $>$ \&}]{out\+Local\+Disassembly\+Names}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_8cpp_source_l00170}{170}} of file \mbox{\hyperlink{_parse_8cpp_source}{Parse.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00171\ \ \ \ \ \{}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Parse\ an\ optional\ function\ type\ reference.}}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_w_a_s_t_1_1_reference}{Reference}}\ functionTypeRef;}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{structstate}{state}}.nextToken[0].type\ ==\ t\_leftParenthesis}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \&\&\ \mbox{\hyperlink{structstate}{state}}.nextToken[1].type\ ==\ t\_type)}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \ \ \ \ parseParenthesized(\mbox{\hyperlink{structstate}{state}},[\&]}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_a8001b89de5d29cdf830471e70b13798a}{require}}(\mbox{\hyperlink{structstate}{state}},t\_type);}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!\mbox{\hyperlink{namespace_w_a_s_t_a965b97566a3d051c08b06c7488c14ad8}{tryParseNameOrIndexRef}}(\mbox{\hyperlink{structstate}{state}},functionTypeRef))}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_af36d14f42c697d5272a592bf7349d06d}{parseErrorf}}(\mbox{\hyperlink{structstate}{state}},\mbox{\hyperlink{structstate}{state}}.nextToken,\textcolor{stringliteral}{"{}expected\ type\ name\ or\ index"{}});}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{struct_w_a_s_t_1_1_recover_parse_exception}{RecoverParseException}}();}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00187\ }
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Parse\ the\ explicit\ function\ parameters\ and\ result\ type.}}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_i_r_1_1_function_type}{FunctionType}}*\ explicitFunctionType\ =\ \mbox{\hyperlink{namespace_w_a_s_t_afdc0ca4bc5028ce0d0d1f0b50eadf451}{parseFunctionType}}(\mbox{\hyperlink{structstate}{state}},outLocalNameToIndexMap,outLocalDisassemblyNames);}
+\DoxyCodeLine{00190\ }
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ UnresolvedFunctionType\ result;}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ result.reference\ =\ functionTypeRef;}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \ \ result.explicitType\ =\ explicitFunctionType;}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00195\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_ab72b47fe2520b8a7840ff4ce5d07684d_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_ab72b47fe2520b8a7840ff4ce5d07684d_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_w_a_s_t_aa08a40e9ae2c8cb30939574c65bb9eb7}\index{WAST@{WAST}!parseI32@{parseI32}}
+\index{parseI32@{parseI32}!WAST@{WAST}}
+\doxysubsubsection{\texorpdfstring{parseI32()}{parseI32()}}
+{\footnotesize\ttfamily \label{namespace_w_a_s_t_aa08a40e9ae2c8cb30939574c65bb9eb7} 
+\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}} WAST\+::parse\+I32 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&}]{state}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_numbers_8cpp_source_l00298}{298}} of file \mbox{\hyperlink{_parse_numbers_8cpp_source}{Parse\+Numbers.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00299\ \ \ \ \ \{}
+\DoxyCodeLine{00300\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}\ result;}
+\DoxyCodeLine{00301\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!\mbox{\hyperlink{namespace_w_a_s_t_a0fb1b690639911ade0de451575d32309}{tryParseI32}}(\mbox{\hyperlink{structstate}{state}},result))}
+\DoxyCodeLine{00302\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00303\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_af36d14f42c697d5272a592bf7349d06d}{parseErrorf}}(\mbox{\hyperlink{structstate}{state}},\mbox{\hyperlink{structstate}{state}}.nextToken,\textcolor{stringliteral}{"{}expected\ i32\ literal"{}});}
+\DoxyCodeLine{00304\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{struct_w_a_s_t_1_1_recover_parse_exception}{RecoverParseException}}();}
+\DoxyCodeLine{00305\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00306\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00307\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_aa08a40e9ae2c8cb30939574c65bb9eb7_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_w_a_s_t_acc415079db29202983e4d49cabc59ab3}\index{WAST@{WAST}!parseI64@{parseI64}}
+\index{parseI64@{parseI64}!WAST@{WAST}}
+\doxysubsubsection{\texorpdfstring{parseI64()}{parseI64()}}
+{\footnotesize\ttfamily \label{namespace_w_a_s_t_acc415079db29202983e4d49cabc59ab3} 
+\mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}} WAST\+::parse\+I64 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&}]{state}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_numbers_8cpp_source_l00309}{309}} of file \mbox{\hyperlink{_parse_numbers_8cpp_source}{Parse\+Numbers.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00310\ \ \ \ \ \{}
+\DoxyCodeLine{00311\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}}\ result;}
+\DoxyCodeLine{00312\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!\mbox{\hyperlink{namespace_w_a_s_t_a8f980380d965a6fceff6ff5c61dc6974}{tryParseI64}}(\mbox{\hyperlink{structstate}{state}},result))}
+\DoxyCodeLine{00313\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00314\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_af36d14f42c697d5272a592bf7349d06d}{parseErrorf}}(\mbox{\hyperlink{structstate}{state}},\mbox{\hyperlink{structstate}{state}}.nextToken,\textcolor{stringliteral}{"{}expected\ i64\ literal"{}});}
+\DoxyCodeLine{00315\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{struct_w_a_s_t_1_1_recover_parse_exception}{RecoverParseException}}();}
+\DoxyCodeLine{00316\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00317\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00318\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_acc415079db29202983e4d49cabc59ab3_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_w_a_s_t_ad29b64fadb8a9ec5fe54a9a147fcf618}\index{WAST@{WAST}!parseI8@{parseI8}}
+\index{parseI8@{parseI8}!WAST@{WAST}}
+\doxysubsubsection{\texorpdfstring{parseI8()}{parseI8()}}
+{\footnotesize\ttfamily \label{namespace_w_a_s_t_ad29b64fadb8a9ec5fe54a9a147fcf618} 
+\mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} WAST\+::parse\+I8 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&}]{state}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_numbers_8cpp_source_l00287}{287}} of file \mbox{\hyperlink{_parse_numbers_8cpp_source}{Parse\+Numbers.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00288\ \ \ \ \ \{}
+\DoxyCodeLine{00289\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}\ result;}
+\DoxyCodeLine{00290\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!\mbox{\hyperlink{_parse_numbers_8cpp_af87f5b92805387a61b56acbb2b7d46b7}{tryParseInt<U32>}}(\mbox{\hyperlink{structstate}{state}},result,\mbox{\hyperlink{stdint_8h_aadcf2a81af243df333b31efa6461ab8e}{INT8\_MIN}},\mbox{\hyperlink{stdint_8h_aeb4e270a084ee26fe73e799861bd0252}{UINT8\_MAX}}))}
+\DoxyCodeLine{00291\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00292\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_af36d14f42c697d5272a592bf7349d06d}{parseErrorf}}(\mbox{\hyperlink{structstate}{state}},\mbox{\hyperlink{structstate}{state}}.nextToken,\textcolor{stringliteral}{"{}expected\ i8\ literal"{}});}
+\DoxyCodeLine{00293\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{struct_w_a_s_t_1_1_recover_parse_exception}{RecoverParseException}}();}
+\DoxyCodeLine{00294\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00295\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}(result);}
+\DoxyCodeLine{00296\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_ad29b64fadb8a9ec5fe54a9a147fcf618_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_w_a_s_t_a6d93426db9bd262249b9ce93ddba7c87}\index{WAST@{WAST}!parseModule@{parseModule}}
+\index{parseModule@{parseModule}!WAST@{WAST}}
+\doxysubsubsection{\texorpdfstring{parseModule()}{parseModule()}}
+{\footnotesize\ttfamily \label{namespace_w_a_s_t_a6d93426db9bd262249b9ce93ddba7c87} 
+bool WAST\+::parse\+Module (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{string}{, }\item[{\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}}]{string\+Length}{, }\item[{\mbox{\hyperlink{struct_i_r_1_1_module}{IR\+::\+Module}} \&}]{out\+Module}{, }\item[{std\+::vector$<$ \mbox{\hyperlink{struct_w_a_s_t_1_1_error}{Error}} $>$ \&}]{out\+Errors}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_module_8cpp_source_l00638}{638}} of file \mbox{\hyperlink{_parse_module_8cpp_source}{Parse\+Module.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00639\ \ \ \ \ \{}
+\DoxyCodeLine{00640\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_timing_1_1_timer}{Timing::Timer}}\ timer;}
+\DoxyCodeLine{00641\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00642\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Lex\ the\ string.}}
+\DoxyCodeLine{00643\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_w_a_s_t_1_1_line_info}{LineInfo}}*\ lineInfo\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00644\ \ \ \ \ \ \ \ \ std::vector<UnresolvedError>\ unresolvedErrors;}
+\DoxyCodeLine{00645\ \ \ \ \ \ \ \ \ Token*\ tokens\ =\ \mbox{\hyperlink{namespace_w_a_s_t_a9ffdd3dd8d6db105464488183a5f13da}{lex}}(\textcolor{keywordtype}{string},stringLength,lineInfo);}
+\DoxyCodeLine{00646\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_w_a_s_t_1_1_module_parse_state}{ModuleParseState}}\ \mbox{\hyperlink{structstate}{state}}(\textcolor{keywordtype}{string},lineInfo,unresolvedErrors,tokens,outModule);}
+\DoxyCodeLine{00647\ }
+\DoxyCodeLine{00648\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}}
+\DoxyCodeLine{00649\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00650\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Parse\ (module\ ...)<eof>}}
+\DoxyCodeLine{00651\ \ \ \ \ \ \ \ \ \ \ \ \ parseParenthesized(\mbox{\hyperlink{structstate}{state}},[\&]}
+\DoxyCodeLine{00652\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00653\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_a8001b89de5d29cdf830471e70b13798a}{require}}(\mbox{\hyperlink{structstate}{state}},t\_module);}
+\DoxyCodeLine{00654\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_ad410cd830815633b2f57fdce5c6919fd}{parseModuleBody}}(\mbox{\hyperlink{structstate}{state}});}
+\DoxyCodeLine{00655\ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00656\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_a8001b89de5d29cdf830471e70b13798a}{require}}(\mbox{\hyperlink{structstate}{state}},t\_eof);}
+\DoxyCodeLine{00657\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00658\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{catch}(\mbox{\hyperlink{struct_w_a_s_t_1_1_recover_parse_exception}{RecoverParseException}})\ \{\}}
+\DoxyCodeLine{00659\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{catch}(\mbox{\hyperlink{struct_w_a_s_t_1_1_fatal_parse_exception}{FatalParseException}})\ \{\}}
+\DoxyCodeLine{00660\ }
+\DoxyCodeLine{00661\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Resolve\ line\ information\ for\ any\ errors,\ and\ write\ them\ to\ outErrors.}}
+\DoxyCodeLine{00662\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\&\ unresolvedError\ :\ unresolvedErrors)}
+\DoxyCodeLine{00663\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00664\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_w_a_s_t_1_1_text_file_locus}{TextFileLocus}}\ locus\ =\ \mbox{\hyperlink{namespace_w_a_s_t_a29cdb29885fdca5fa42fd1e7bf3c62b1}{calcLocusFromOffset}}(\mbox{\hyperlink{structstate}{state}}.string,lineInfo,unresolvedError.charOffset);}
+\DoxyCodeLine{00665\ \ \ \ \ \ \ \ \ \ \ \ \ outErrors.push\_back(\{std::move(locus),std::move(unresolvedError.message)\});}
+\DoxyCodeLine{00666\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00667\ }
+\DoxyCodeLine{00668\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Free\ the\ tokens\ and\ line\ info.}}
+\DoxyCodeLine{00669\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_ac4e53dc178c5ceaf93b846c81f9adfc2}{freeTokens}}(tokens);}
+\DoxyCodeLine{00670\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_ae0e7852160946f05f04d4cab549275d9}{freeLineInfo}}(lineInfo);}
+\DoxyCodeLine{00671\ }
+\DoxyCodeLine{00672\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_timing_a4f7cf4a3faa27612ba0ad6e4653651f8}{Timing::logRatePerSecond}}(\textcolor{stringliteral}{"{}lexed\ and\ parsed\ WAST"{}},timer,stringLength\ /\ 1024.0\ /\ 1024.0,\textcolor{stringliteral}{"{}MB"{}});}
+\DoxyCodeLine{00673\ }
+\DoxyCodeLine{00674\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ outErrors.size()\ ==\ 0;}
+\DoxyCodeLine{00675\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_a6d93426db9bd262249b9ce93ddba7c87_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_a6d93426db9bd262249b9ce93ddba7c87_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_w_a_s_t_ad410cd830815633b2f57fdce5c6919fd}\index{WAST@{WAST}!parseModuleBody@{parseModuleBody}}
+\index{parseModuleBody@{parseModuleBody}!WAST@{WAST}}
+\doxysubsubsection{\texorpdfstring{parseModuleBody()}{parseModuleBody()}}
+{\footnotesize\ttfamily \label{namespace_w_a_s_t_ad410cd830815633b2f57fdce5c6919fd} 
+void WAST\+::parse\+Module\+Body (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_w_a_s_t_1_1_module_parse_state}{Module\+Parse\+State}} \&}]{state}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_module_8cpp_source_l00589}{589}} of file \mbox{\hyperlink{_parse_module_8cpp_source}{Parse\+Module.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00590\ \ \ \ \ \{}
+\DoxyCodeLine{00591\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ Token*\ firstToken\ =\ \mbox{\hyperlink{structstate}{state}}.nextToken;}
+\DoxyCodeLine{00592\ }
+\DoxyCodeLine{00593\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Parse\ the\ module's\ declarations.}}
+\DoxyCodeLine{00594\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\mbox{\hyperlink{structstate}{state}}.nextToken-\/>type\ !=\ t\_rightParenthesis)}
+\DoxyCodeLine{00595\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00596\ \ \ \ \ \ \ \ \ \ \ \ \ parseDeclaration(\mbox{\hyperlink{structstate}{state}});}
+\DoxyCodeLine{00597\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00598\ }
+\DoxyCodeLine{00599\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Process\ the\ callbacks\ requested\ after\ all\ type\ declarations\ have\ been\ parsed.}}
+\DoxyCodeLine{00600\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!\mbox{\hyperlink{structstate}{state}}.errors.size())}
+\DoxyCodeLine{00601\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00602\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ callback\ :\ \mbox{\hyperlink{structstate}{state}}.postTypeCallbacks)}
+\DoxyCodeLine{00603\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00604\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ callback(\mbox{\hyperlink{structstate}{state}});}
+\DoxyCodeLine{00605\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00606\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00607\ }
+\DoxyCodeLine{00608\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Process\ the\ callbacks\ requested\ after\ all\ declarations\ have\ been\ parsed.}}
+\DoxyCodeLine{00609\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!\mbox{\hyperlink{structstate}{state}}.errors.size())}
+\DoxyCodeLine{00610\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00611\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ callback\ :\ \mbox{\hyperlink{structstate}{state}}.postDeclarationCallbacks)}
+\DoxyCodeLine{00612\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00613\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ callback(\mbox{\hyperlink{structstate}{state}});}
+\DoxyCodeLine{00614\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00615\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00616\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00617\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Validate\ the\ module's\ definitions\ (excluding\ function\ code,\ which\ is\ validated\ as\ it\ is\ parsed).}}
+\DoxyCodeLine{00618\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!\mbox{\hyperlink{structstate}{state}}.errors.size())}
+\DoxyCodeLine{00619\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00620\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}}
+\DoxyCodeLine{00621\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00622\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_i_r_a623d4533e80c60c6d4a5217635b7602f}{IR::validateDefinitions}}(\mbox{\hyperlink{structstate}{state}}.module);}
+\DoxyCodeLine{00623\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00624\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{catch}(\mbox{\hyperlink{struct_i_r_1_1_validation_exception}{ValidationException}}\ validationException)}
+\DoxyCodeLine{00625\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00626\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_af36d14f42c697d5272a592bf7349d06d}{parseErrorf}}(\mbox{\hyperlink{structstate}{state}},firstToken,\textcolor{stringliteral}{"{}validation\ exception:\ \%s"{}},validationException.\mbox{\hyperlink{struct_i_r_1_1_validation_exception_a9308689c3efeb272361bf9a07bf8f8ae}{message}}.c\_str());}
+\DoxyCodeLine{00627\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00628\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00629\ }
+\DoxyCodeLine{00630\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Set\ the\ module's\ disassembly\ names.}}
+\DoxyCodeLine{00631\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_errors_8h_a03bec6af3af0dd492e348b40cbe40a46}{WAVM\_ASSERT\_THROW}}(\mbox{\hyperlink{structstate}{state}}.module.functions.size()\ ==\ \mbox{\hyperlink{structstate}{state}}.disassemblyNames.functions.size());}
+\DoxyCodeLine{00632\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_errors_8h_a03bec6af3af0dd492e348b40cbe40a46}{WAVM\_ASSERT\_THROW}}(\mbox{\hyperlink{structstate}{state}}.module.tables.size()\ ==\ \mbox{\hyperlink{structstate}{state}}.disassemblyNames.tables.size());}
+\DoxyCodeLine{00633\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_errors_8h_a03bec6af3af0dd492e348b40cbe40a46}{WAVM\_ASSERT\_THROW}}(\mbox{\hyperlink{structstate}{state}}.module.memories.size()\ ==\ \mbox{\hyperlink{structstate}{state}}.disassemblyNames.memories.size());}
+\DoxyCodeLine{00634\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_errors_8h_a03bec6af3af0dd492e348b40cbe40a46}{WAVM\_ASSERT\_THROW}}(\mbox{\hyperlink{structstate}{state}}.module.globals.size()\ ==\ \mbox{\hyperlink{structstate}{state}}.disassemblyNames.globals.size());}
+\DoxyCodeLine{00635\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_i_r_ac643afa4254e978e5e09895166b8bdb8}{IR::setDisassemblyNames}}(\mbox{\hyperlink{structstate}{state}}.module,\mbox{\hyperlink{structstate}{state}}.disassemblyNames);}
+\DoxyCodeLine{00636\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_ad410cd830815633b2f57fdce5c6919fd_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_ad410cd830815633b2f57fdce5c6919fd_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_w_a_s_t_a3d4677a7354c0caa2a1825c290f7a81d}\index{WAST@{WAST}!parseTestCommands@{parseTestCommands}}
+\index{parseTestCommands@{parseTestCommands}!WAST@{WAST}}
+\doxysubsubsection{\texorpdfstring{parseTestCommands()}{parseTestCommands()}}
+{\footnotesize\ttfamily \label{namespace_w_a_s_t_a3d4677a7354c0caa2a1825c290f7a81d} 
+\mbox{\hyperlink{_w_a_s_t_8h_a4d4cd62fee2b2e181ef87d58fe61064c}{WAST\+\_\+\+API}} void WAST\+::parse\+Test\+Commands (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{string}{, }\item[{\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}}]{string\+Length}{, }\item[{std\+::vector$<$ std\+::unique\+\_\+ptr$<$ \mbox{\hyperlink{struct_w_a_s_t_1_1_command}{Command}} $>$ $>$ \&}]{out\+Test\+Commands}{, }\item[{std\+::vector$<$ \mbox{\hyperlink{struct_w_a_s_t_1_1_error}{Error}} $>$ \&}]{out\+Errors}{}\end{DoxyParamCaption})}
+
+\Hypertarget{namespace_w_a_s_t_a135c7788f903660b33ab7c72e6662882}\index{WAST@{WAST}!parseUTF8String@{parseUTF8String}}
+\index{parseUTF8String@{parseUTF8String}!WAST@{WAST}}
+\doxysubsubsection{\texorpdfstring{parseUTF8String()}{parseUTF8String()}}
+{\footnotesize\ttfamily \label{namespace_w_a_s_t_a135c7788f903660b33ab7c72e6662882} 
+std\+::string WAST\+::parse\+UTF8\+String (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&}]{state}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_8cpp_source_l00481}{481}} of file \mbox{\hyperlink{_parse_8cpp_source}{Parse.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00482\ \ \ \ \ \{}
+\DoxyCodeLine{00483\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ Token*\ stringToken\ =\ \mbox{\hyperlink{structstate}{state}}.nextToken;}
+\DoxyCodeLine{00484\ \ \ \ \ \ \ \ \ std::string\ result;}
+\DoxyCodeLine{00485\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!\mbox{\hyperlink{namespace_w_a_s_t_a445014b335af98dc3ab063c91108f1b4}{tryParseString}}(\mbox{\hyperlink{structstate}{state}},result))}
+\DoxyCodeLine{00486\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00487\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_af36d14f42c697d5272a592bf7349d06d}{parseErrorf}}(\mbox{\hyperlink{structstate}{state}},stringToken,\textcolor{stringliteral}{"{}expected\ string\ literal"{}});}
+\DoxyCodeLine{00488\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{struct_w_a_s_t_1_1_recover_parse_exception}{RecoverParseException}}();}
+\DoxyCodeLine{00489\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00490\ }
+\DoxyCodeLine{00491\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Check\ that\ the\ string\ is\ a\ valid\ UTF-\/8\ encoding.}}
+\DoxyCodeLine{00492\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}*\ endChar\ =\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}*)result.data()\ +\ result.size();}
+\DoxyCodeLine{00493\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}*\ nextChar\ =\ \mbox{\hyperlink{namespace_u_t_f8_a837f952e9b17947ad305fe3641fec87e}{UTF8::validateString}}((\textcolor{keyword}{const}\ \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}*)result.data(),endChar);}
+\DoxyCodeLine{00494\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(nextChar\ !=\ endChar)}
+\DoxyCodeLine{00495\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00496\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ charOffset\ =\ stringToken-\/>begin\ +\ (nextChar\ -\/\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}*)result.data())\ +\ 1;}
+\DoxyCodeLine{00497\ \ \ \ \ \ \ \ \ \ \ \ \ parseErrorf(\mbox{\hyperlink{structstate}{state}},charOffset,\textcolor{stringliteral}{"{}invalid\ UTF-\/8\ encoding"{}});}
+\DoxyCodeLine{00498\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00499\ }
+\DoxyCodeLine{00500\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00501\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_a135c7788f903660b33ab7c72e6662882_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_w_a_s_t_afb469d566925151c57afa1dd31721c9c}\index{WAST@{WAST}!parseValueType@{parseValueType}}
+\index{parseValueType@{parseValueType}!WAST@{WAST}}
+\doxysubsubsection{\texorpdfstring{parseValueType()}{parseValueType()}}
+{\footnotesize\ttfamily \label{namespace_w_a_s_t_afb469d566925151c57afa1dd31721c9c} 
+\mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{IR\+::\+Value\+Type}} WAST\+::parse\+Value\+Type (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&}]{state}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_8cpp_source_l00110}{110}} of file \mbox{\hyperlink{_parse_8cpp_source}{Parse.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00111\ \ \ \ \ \{}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}\ result;}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!\mbox{\hyperlink{namespace_w_a_s_t_a9f94aa21c00c56bd18ed6b48ee8145c8}{tryParseValueType}}(\mbox{\hyperlink{structstate}{state}},result))}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_af36d14f42c697d5272a592bf7349d06d}{parseErrorf}}(\mbox{\hyperlink{structstate}{state}},\mbox{\hyperlink{structstate}{state}}.nextToken,\textcolor{stringliteral}{"{}expected\ value\ type"{}});}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{struct_w_a_s_t_1_1_recover_parse_exception}{RecoverParseException}}();}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00119\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_afb469d566925151c57afa1dd31721c9c_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_afb469d566925151c57afa1dd31721c9c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_w_a_s_t_aa6c1fd4b6c7ec43ba7e25dc6138d4899}\index{WAST@{WAST}!print@{print}}
+\index{print@{print}!WAST@{WAST}}
+\doxysubsubsection{\texorpdfstring{print()}{print()}\hspace{0.1cm}{\footnotesize\ttfamily [1/8]}}
+{\footnotesize\ttfamily \label{namespace_w_a_s_t_aa6c1fd4b6c7ec43ba7e25dc6138d4899} 
+std\+::string WAST\+::print (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct_i_r_1_1_module}{IR\+::\+Module}} \&}]{module}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_print_8cpp_source_l00687}{687}} of file \mbox{\hyperlink{_print_8cpp_source}{Print.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00688\ \ \ \ \ \{}
+\DoxyCodeLine{00689\ \ \ \ \ \ \ \ \ std::string\ string;}
+\DoxyCodeLine{00690\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_w_a_s_t_1_1_module_print_context}{ModulePrintContext}}\ \mbox{\hyperlink{programs_2clio_2main_8cpp_a7e8fab42307e75bda555628c7381f239}{context}}(\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}},\textcolor{keywordtype}{string});}
+\DoxyCodeLine{00691\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structcontext}{context}}.printModule();}
+\DoxyCodeLine{00692\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_w_a_s_t_aa50878b22fc84d3c627432d2c62f0595}{expandIndentation}}(std::move(\textcolor{keywordtype}{string}));}
+\DoxyCodeLine{00693\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=312pt]{namespace_w_a_s_t_aa6c1fd4b6c7ec43ba7e25dc6138d4899_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_aa6c1fd4b6c7ec43ba7e25dc6138d4899_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_w_a_s_t_aa9ee110560c7eeebefbe62815fc76fbe}\index{WAST@{WAST}!print@{print}}
+\index{print@{print}!WAST@{WAST}}
+\doxysubsubsection{\texorpdfstring{print()}{print()}\hspace{0.1cm}{\footnotesize\ttfamily [2/8]}}
+{\footnotesize\ttfamily \label{namespace_w_a_s_t_aa9ee110560c7eeebefbe62815fc76fbe} 
+void WAST\+::print (\begin{DoxyParamCaption}\item[{std\+::string \&}]{string}{, }\item[{const \mbox{\hyperlink{struct_i_r_1_1_function_type}{Function\+Type}} \texorpdfstring{$\ast$}{*}}]{function\+Type}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_print_8cpp_source_l00091}{91}} of file \mbox{\hyperlink{_print_8cpp_source}{Print.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00092\ \ \ \ \ \{}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Print\ the\ function\ parameters.}}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(functionType-\/>\mbox{\hyperlink{struct_i_r_1_1_function_type_a92e17c58f6cd40ee5392dba1bdc2e822}{parameters}}.size())}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_w_a_s_t_1_1_scoped_tag_printer}{ScopedTagPrinter}}\ paramTag(\textcolor{keywordtype}{string},\textcolor{stringliteral}{"{}param"{}});}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ parameterIndex\ =\ 0;parameterIndex\ <\ functionType-\/>\mbox{\hyperlink{struct_i_r_1_1_function_type_a92e17c58f6cd40ee5392dba1bdc2e822}{parameters}}.size();++parameterIndex)}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \textcolor{charliteral}{'\ '};}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\textcolor{keywordtype}{string},functionType-\/>\mbox{\hyperlink{struct_i_r_1_1_function_type_a92e17c58f6cd40ee5392dba1bdc2e822}{parameters}}[parameterIndex]);}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00103\ }
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Print\ the\ function\ return\ type.}}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(functionType-\/>\mbox{\hyperlink{struct_i_r_1_1_function_type_a6f6a20ea31fb2218bcdba1bc4d6a1103}{ret}}\ !=\ ResultType::none)}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \textcolor{charliteral}{'\ '};}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \ \ \ \ ScopedTagPrinter\ resultTag(\textcolor{keywordtype}{string},\textcolor{stringliteral}{"{}result"{}});}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \textcolor{charliteral}{'\ '};}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\textcolor{keywordtype}{string},functionType-\/>\mbox{\hyperlink{struct_i_r_1_1_function_type_a6f6a20ea31fb2218bcdba1bc4d6a1103}{ret}});}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00112\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_aa9ee110560c7eeebefbe62815fc76fbe_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_w_a_s_t_a635c072dabbaf8b427133493d23089f8}\index{WAST@{WAST}!print@{print}}
+\index{print@{print}!WAST@{WAST}}
+\doxysubsubsection{\texorpdfstring{print()}{print()}\hspace{0.1cm}{\footnotesize\ttfamily [3/8]}}
+{\footnotesize\ttfamily \label{namespace_w_a_s_t_a635c072dabbaf8b427133493d23089f8} 
+void WAST\+::print (\begin{DoxyParamCaption}\item[{std\+::string \&}]{string}{, }\item[{const \mbox{\hyperlink{struct_i_r_1_1_memory_type}{Memory\+Type}} \&}]{type}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_print_8cpp_source_l00120}{120}} of file \mbox{\hyperlink{_print_8cpp_source}{Print.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00121\ \ \ \ \ \{}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\textcolor{keywordtype}{string},type.size);}
+\DoxyCodeLine{00123\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_a635c072dabbaf8b427133493d23089f8_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_w_a_s_t_a0e2234267f0a78cce9b56a4eb2289f7e}\index{WAST@{WAST}!print@{print}}
+\index{print@{print}!WAST@{WAST}}
+\doxysubsubsection{\texorpdfstring{print()}{print()}\hspace{0.1cm}{\footnotesize\ttfamily [4/8]}}
+{\footnotesize\ttfamily \label{namespace_w_a_s_t_a0e2234267f0a78cce9b56a4eb2289f7e} 
+void WAST\+::print (\begin{DoxyParamCaption}\item[{std\+::string \&}]{string}{, }\item[{const \mbox{\hyperlink{struct_i_r_1_1_size_constraints}{Size\+Constraints}} \&}]{size}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_print_8cpp_source_l00085}{85}} of file \mbox{\hyperlink{_print_8cpp_source}{Print.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00086\ \ \ \ \ \{}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ std::to\_string(size.\mbox{\hyperlink{struct_i_r_1_1_size_constraints_a1c14a08815ebd644f74f1cb4ba311616}{min}});}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(size.\mbox{\hyperlink{struct_i_r_1_1_size_constraints_adc8bdcc2a510a4ae1f54ba3c0938e8a4}{max}}\ !=\ \mbox{\hyperlink{stdint_8h_a30654b4b67d97c42ca3f9b6052dda916}{UINT64\_MAX}})\ \{\ \textcolor{keywordtype}{string}\ +=\ \textcolor{charliteral}{'\ '};\ \textcolor{keywordtype}{string}\ +=\ std::to\_string(size.\mbox{\hyperlink{struct_i_r_1_1_size_constraints_adc8bdcc2a510a4ae1f54ba3c0938e8a4}{max}});\ \}}
+\DoxyCodeLine{00089\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespace_w_a_s_t_a14bfd2a89f2b7739a7318f88cf4ee01d}\index{WAST@{WAST}!print@{print}}
+\index{print@{print}!WAST@{WAST}}
+\doxysubsubsection{\texorpdfstring{print()}{print()}\hspace{0.1cm}{\footnotesize\ttfamily [5/8]}}
+{\footnotesize\ttfamily \label{namespace_w_a_s_t_a14bfd2a89f2b7739a7318f88cf4ee01d} 
+void WAST\+::print (\begin{DoxyParamCaption}\item[{std\+::string \&}]{string}{, }\item[{const \mbox{\hyperlink{struct_i_r_1_1_table_type}{Table\+Type}} \&}]{type}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_print_8cpp_source_l00114}{114}} of file \mbox{\hyperlink{_print_8cpp_source}{Print.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00115\ \ \ \ \ \{}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\textcolor{keywordtype}{string},type.size);}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \textcolor{stringliteral}{"{}\ anyfunc"{}};}
+\DoxyCodeLine{00118\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_a14bfd2a89f2b7739a7318f88cf4ee01d_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_w_a_s_t_ab418aba8b6293832449742eb57dbb1a5}\index{WAST@{WAST}!print@{print}}
+\index{print@{print}!WAST@{WAST}}
+\doxysubsubsection{\texorpdfstring{print()}{print()}\hspace{0.1cm}{\footnotesize\ttfamily [6/8]}}
+{\footnotesize\ttfamily \label{namespace_w_a_s_t_ab418aba8b6293832449742eb57dbb1a5} 
+void WAST\+::print (\begin{DoxyParamCaption}\item[{std\+::string \&}]{string}{, }\item[{\mbox{\hyperlink{struct_i_r_1_1_global_type}{Global\+Type}}}]{type}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_print_8cpp_source_l00125}{125}} of file \mbox{\hyperlink{_print_8cpp_source}{Print.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00126\ \ \ \ \ \{}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(type.isMutable)\ \{\ \textcolor{keywordtype}{string}\ +=\ \textcolor{stringliteral}{"{}(mut\ "{}};\ \}}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\textcolor{keywordtype}{string},type.valueType);}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(type.isMutable)\ \{\ \textcolor{keywordtype}{string}\ +=\ \textcolor{stringliteral}{"{})"{}};\ \}}
+\DoxyCodeLine{00130\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_ab418aba8b6293832449742eb57dbb1a5_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_w_a_s_t_ae825d82b1d6a7665e875a45a0e5e0408}\index{WAST@{WAST}!print@{print}}
+\index{print@{print}!WAST@{WAST}}
+\doxysubsubsection{\texorpdfstring{print()}{print()}\hspace{0.1cm}{\footnotesize\ttfamily [7/8]}}
+{\footnotesize\ttfamily \label{namespace_w_a_s_t_ae825d82b1d6a7665e875a45a0e5e0408} 
+void WAST\+::print (\begin{DoxyParamCaption}\item[{std\+::string \&}]{string}{, }\item[{\mbox{\hyperlink{namespace_i_r_ac56fb5355b338ad4a167c48ec539b90b}{Result\+Type}}}]{type}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_print_8cpp_source_l00083}{83}} of file \mbox{\hyperlink{_print_8cpp_source}{Print.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00083\ \{\ \textcolor{keywordtype}{string}\ +=\ \mbox{\hyperlink{namespace_i_r_a85d4203bbc1c989c8351490c711537f5}{asString}}(type);\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=252pt]{namespace_w_a_s_t_ae825d82b1d6a7665e875a45a0e5e0408_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_w_a_s_t_a8590c2ba00bd5c84e51a477829c3451a}\index{WAST@{WAST}!print@{print}}
+\index{print@{print}!WAST@{WAST}}
+\doxysubsubsection{\texorpdfstring{print()}{print()}\hspace{0.1cm}{\footnotesize\ttfamily [8/8]}}
+{\footnotesize\ttfamily \label{namespace_w_a_s_t_a8590c2ba00bd5c84e51a477829c3451a} 
+void WAST\+::print (\begin{DoxyParamCaption}\item[{std\+::string \&}]{string}{, }\item[{\mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{Value\+Type}}}]{type}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_print_8cpp_source_l00082}{82}} of file \mbox{\hyperlink{_print_8cpp_source}{Print.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00082\ \{\ \textcolor{keywordtype}{string}\ +=\ \mbox{\hyperlink{namespace_i_r_a85d4203bbc1c989c8351490c711537f5}{asString}}(type);\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=252pt]{namespace_w_a_s_t_a8590c2ba00bd5c84e51a477829c3451a_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_w_a_s_t_a193408df7bc6cc6719ab4f5099e21d3b}\index{WAST@{WAST}!printControlSignature@{printControlSignature}}
+\index{printControlSignature@{printControlSignature}!WAST@{WAST}}
+\doxysubsubsection{\texorpdfstring{printControlSignature()}{printControlSignature()}}
+{\footnotesize\ttfamily \label{namespace_w_a_s_t_a193408df7bc6cc6719ab4f5099e21d3b} 
+void WAST\+::print\+Control\+Signature (\begin{DoxyParamCaption}\item[{std\+::string \&}]{string}{, }\item[{\mbox{\hyperlink{namespace_i_r_ac56fb5355b338ad4a167c48ec539b90b}{Result\+Type}}}]{result\+Type}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_print_8cpp_source_l00132}{132}} of file \mbox{\hyperlink{_print_8cpp_source}{Print.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00133\ \ \ \ \ \{}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(resultType\ !=\ ResultType::none)}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \textcolor{stringliteral}{"{}\ (result\ "{}};}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\textcolor{keywordtype}{string},resultType);}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \textcolor{charliteral}{')'};}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00140\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_a193408df7bc6cc6719ab4f5099e21d3b_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_a193408df7bc6cc6719ab4f5099e21d3b_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_w_a_s_t_acfea461e9d1989e37b963a730a903140}\index{WAST@{WAST}!printImport@{printImport}}
+\index{printImport@{printImport}!WAST@{WAST}}
+\doxysubsubsection{\texorpdfstring{printImport()}{printImport()}}
+{\footnotesize\ttfamily \label{namespace_w_a_s_t_acfea461e9d1989e37b963a730a903140} 
+template$<$typename \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}} $>$ \\
+void WAST\+::print\+Import (\begin{DoxyParamCaption}\item[{std\+::string \&}]{string}{, }\item[{const \mbox{\hyperlink{struct_i_r_1_1_module}{Module}} \&}]{module}{, }\item[{const \mbox{\hyperlink{struct_i_r_1_1_import}{Import}}$<$ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}} $>$ \&}]{import}{, }\item[{\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}}]{import\+Index}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{name}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{type\+Tag}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_print_8cpp_source_l00460}{460}} of file \mbox{\hyperlink{_print_8cpp_source}{Print.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00461\ \ \ \ \ \{}
+\DoxyCodeLine{00462\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \textcolor{charliteral}{'\(\backslash\)n'};}
+\DoxyCodeLine{00463\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_w_a_s_t_1_1_scoped_tag_printer}{ScopedTagPrinter}}\ importTag(\textcolor{keywordtype}{string},\textcolor{stringliteral}{"{}import"{}});}
+\DoxyCodeLine{00464\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \textcolor{stringliteral}{"{}\ \(\backslash\)"{}"{}};}
+\DoxyCodeLine{00465\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ escapeString(\textcolor{keyword}{import}.moduleName.c\_str(),\textcolor{keyword}{import}.moduleName.length());}
+\DoxyCodeLine{00466\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)"{}\ \(\backslash\)"{}"{}};}
+\DoxyCodeLine{00467\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ escapeString(\textcolor{keyword}{import}.exportName.c\_str(),\textcolor{keyword}{import}.exportName.length());}
+\DoxyCodeLine{00468\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)"{}\ ("{}};}
+\DoxyCodeLine{00469\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ typeTag;}
+\DoxyCodeLine{00470\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \textcolor{charliteral}{'\ '};}
+\DoxyCodeLine{00471\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}};}
+\DoxyCodeLine{00472\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \textcolor{charliteral}{'\ '};}
+\DoxyCodeLine{00473\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_a8550106ad7b7088eaa4e1bc5eda655d3}{printImportType}}(\textcolor{keywordtype}{string},\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}},\textcolor{keyword}{import}.type);}
+\DoxyCodeLine{00474\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \textcolor{charliteral}{')'};}
+\DoxyCodeLine{00475\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_acfea461e9d1989e37b963a730a903140_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=347pt]{namespace_w_a_s_t_acfea461e9d1989e37b963a730a903140_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_w_a_s_t_a8550106ad7b7088eaa4e1bc5eda655d3}\index{WAST@{WAST}!printImportType@{printImportType}}
+\index{printImportType@{printImportType}!WAST@{WAST}}
+\doxysubsubsection{\texorpdfstring{printImportType()}{printImportType()}}
+{\footnotesize\ttfamily \label{namespace_w_a_s_t_a8550106ad7b7088eaa4e1bc5eda655d3} 
+template$<$typename \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}} $>$ \\
+void WAST\+::print\+Import\+Type (\begin{DoxyParamCaption}\item[{std\+::string \&}]{string}{, }\item[{const \mbox{\hyperlink{struct_i_r_1_1_module}{Module}} \&}]{module}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}}}]{type}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_print_8cpp_source_l00449}{449}} of file \mbox{\hyperlink{_print_8cpp_source}{Print.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00450\ \ \ \ \ \{}
+\DoxyCodeLine{00451\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\textcolor{keywordtype}{string},type);}
+\DoxyCodeLine{00452\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_a8550106ad7b7088eaa4e1bc5eda655d3_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_a8550106ad7b7088eaa4e1bc5eda655d3_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_w_a_s_t_a218d2e26da6cfe8ee104b31071543e67}\index{WAST@{WAST}!printImportType$<$ IndexedFunctionType $>$@{printImportType$<$ IndexedFunctionType $>$}}
+\index{printImportType$<$ IndexedFunctionType $>$@{printImportType$<$ IndexedFunctionType $>$}!WAST@{WAST}}
+\doxysubsubsection{\texorpdfstring{printImportType$<$ IndexedFunctionType $>$()}{printImportType< IndexedFunctionType >()}}
+{\footnotesize\ttfamily \label{namespace_w_a_s_t_a218d2e26da6cfe8ee104b31071543e67} 
+template$<$$>$ \\
+void \mbox{\hyperlink{namespace_w_a_s_t_a8550106ad7b7088eaa4e1bc5eda655d3}{WAST\+::print\+Import\+Type}}$<$ \mbox{\hyperlink{struct_i_r_1_1_indexed_function_type}{Indexed\+Function\+Type}} $>$ (\begin{DoxyParamCaption}\item[{std\+::string \&}]{string}{, }\item[{const \mbox{\hyperlink{struct_i_r_1_1_module}{Module}} \&}]{module}{, }\item[{\mbox{\hyperlink{struct_i_r_1_1_indexed_function_type}{Indexed\+Function\+Type}}}]{type}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_print_8cpp_source_l00454}{454}} of file \mbox{\hyperlink{_print_8cpp_source}{Print.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00455\ \ \ \ \ \{}
+\DoxyCodeLine{00456\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\textcolor{keywordtype}{string},\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.types[type.index]);}
+\DoxyCodeLine{00457\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_a218d2e26da6cfe8ee104b31071543e67_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_w_a_s_t_a8001b89de5d29cdf830471e70b13798a}\index{WAST@{WAST}!require@{require}}
+\index{require@{require}!WAST@{WAST}}
+\doxysubsubsection{\texorpdfstring{require()}{require()}}
+{\footnotesize\ttfamily \label{namespace_w_a_s_t_a8001b89de5d29cdf830471e70b13798a} 
+void WAST\+::require (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&}]{state}{, }\item[{\mbox{\hyperlink{namespace_w_a_s_t_a57c99a932a2a7d69084cbeca01031f32}{Token\+Type}}}]{type}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_8cpp_source_l00078}{78}} of file \mbox{\hyperlink{_parse_8cpp_source}{Parse.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00079\ \ \ \ \ \{}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{structstate}{state}}.nextToken-\/>type\ !=\ type)}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_af36d14f42c697d5272a592bf7349d06d}{parseErrorf}}(\mbox{\hyperlink{structstate}{state}},\mbox{\hyperlink{structstate}{state}}.nextToken,\textcolor{stringliteral}{"{}expected\ \%s"{}},\mbox{\hyperlink{namespace_w_a_s_t_a23505430f91325d50b390d1318fd20b5}{describeToken}}(type));}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{struct_w_a_s_t_1_1_recover_parse_exception}{RecoverParseException}}();}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ ++\mbox{\hyperlink{structstate}{state}}.nextToken;}
+\DoxyCodeLine{00086\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_a8001b89de5d29cdf830471e70b13798a_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_a8001b89de5d29cdf830471e70b13798a_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_w_a_s_t_ae274bd19819be1d3ef32161e6d8a2f7f}\index{WAST@{WAST}!resolveFunctionType@{resolveFunctionType}}
+\index{resolveFunctionType@{resolveFunctionType}!WAST@{WAST}}
+\doxysubsubsection{\texorpdfstring{resolveFunctionType()}{resolveFunctionType()}}
+{\footnotesize\ttfamily \label{namespace_w_a_s_t_ae274bd19819be1d3ef32161e6d8a2f7f} 
+\mbox{\hyperlink{struct_i_r_1_1_indexed_function_type}{IR\+::\+Indexed\+Function\+Type}} WAST\+::resolve\+Function\+Type (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_w_a_s_t_1_1_module_parse_state}{Module\+Parse\+State}} \&}]{state}{, }\item[{const \mbox{\hyperlink{struct_w_a_s_t_1_1_unresolved_function_type}{Unresolved\+Function\+Type}} \&}]{unresolved\+Type}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_8cpp_source_l00197}{197}} of file \mbox{\hyperlink{_parse_8cpp_source}{Parse.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00198\ \ \ \ \ \{}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!unresolvedType.\mbox{\hyperlink{struct_w_a_s_t_1_1_unresolved_function_type_aa023cab7ce5852adb103b666f8e5a988}{reference}})}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_w_a_s_t_a0fe85cc07ee6a0695ebb31644fc0ce7b}{getUniqueFunctionTypeIndex}}(\mbox{\hyperlink{structstate}{state}},unresolvedType.\mbox{\hyperlink{struct_w_a_s_t_1_1_unresolved_function_type_ac15afbf3107440e51e7018d37f7fadff}{explicitType}});}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Resolve\ the\ referenced\ type.}}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}\ referencedFunctionTypeIndex\ =\ resolveRef(\mbox{\hyperlink{structstate}{state}},\mbox{\hyperlink{structstate}{state}}.typeNameToIndexMap,\mbox{\hyperlink{structstate}{state}}.module.types.size(),unresolvedType.\mbox{\hyperlink{struct_w_a_s_t_1_1_unresolved_function_type_aa023cab7ce5852adb103b666f8e5a988}{reference}});}
+\DoxyCodeLine{00207\ }
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Validate\ that\ if\ the\ function\ definition\ has\ both\ a\ type\ reference\ and\ explicit\ parameter/result\ type\ declarations,\ they\ match.}}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ hasExplicitParametersOrResultType\ =\ unresolvedType.\mbox{\hyperlink{struct_w_a_s_t_1_1_unresolved_function_type_ac15afbf3107440e51e7018d37f7fadff}{explicitType}}\ !=\ \mbox{\hyperlink{struct_i_r_1_1_function_type_a97cbdf384d97c3a5203a1310c9af0822}{FunctionType::get}}();}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(hasExplicitParametersOrResultType)}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(referencedFunctionTypeIndex\ !=\ \mbox{\hyperlink{stdint_8h_ab5eb23180f7cc12b7d6c04a8ec067fdd}{UINT32\_MAX}}}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\&\ \mbox{\hyperlink{structstate}{state}}.module.types[referencedFunctionTypeIndex]\ !=\ unresolvedType.\mbox{\hyperlink{struct_w_a_s_t_1_1_unresolved_function_type_ac15afbf3107440e51e7018d37f7fadff}{explicitType}})}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ parseErrorf(\mbox{\hyperlink{structstate}{state}},unresolvedType.\mbox{\hyperlink{struct_w_a_s_t_1_1_unresolved_function_type_aa023cab7ce5852adb103b666f8e5a988}{reference}}.\mbox{\hyperlink{struct_w_a_s_t_1_1_reference_a98e8e176b1812f626d9e8e1d83a63486}{token}},\textcolor{stringliteral}{"{}referenced\ function\ type\ (\%s)\ does\ not\ match\ declared\ parameters\ and\ results\ (\%s)"{}},}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_i_r_a85d4203bbc1c989c8351490c711537f5}{asString}}(\mbox{\hyperlink{structstate}{state}}.module.types[referencedFunctionTypeIndex]).c\_str(),}
+\DoxyCodeLine{00217\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_i_r_a85d4203bbc1c989c8351490c711537f5}{asString}}(unresolvedType.\mbox{\hyperlink{struct_w_a_s_t_1_1_unresolved_function_type_ac15afbf3107440e51e7018d37f7fadff}{explicitType}}).c\_str()}
+\DoxyCodeLine{00218\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00221\ }
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{referencedFunctionTypeIndex\};}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00224\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_ae274bd19819be1d3ef32161e6d8a2f7f_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_ae274bd19819be1d3ef32161e6d8a2f7f_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_w_a_s_t_ad98b487d5f8d6b2397db35e9d6c79ae8}\index{WAST@{WAST}!resolveRef@{resolveRef}}
+\index{resolveRef@{resolveRef}!WAST@{WAST}}
+\doxysubsubsection{\texorpdfstring{resolveRef()}{resolveRef()}}
+{\footnotesize\ttfamily \label{namespace_w_a_s_t_ad98b487d5f8d6b2397db35e9d6c79ae8} 
+\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}} WAST\+::resolve\+Ref (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&}]{state}{, }\item[{const \mbox{\hyperlink{namespace_w_a_s_t_a2d9d3ba4e83db4fbb314c3068261afa5}{Name\+To\+Index\+Map}} \&}]{name\+To\+Index\+Map}{, }\item[{\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}}]{max\+Index}{, }\item[{const \mbox{\hyperlink{struct_w_a_s_t_1_1_reference}{Reference}} \&}]{ref}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_8cpp_source_l00338}{338}} of file \mbox{\hyperlink{_parse_8cpp_source}{Parse.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00339\ \ \ \ \ \{}
+\DoxyCodeLine{00340\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(ref.type)}
+\DoxyCodeLine{00341\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00342\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ Reference::Type::index:}
+\DoxyCodeLine{00343\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00344\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(ref.index\ >=\ maxIndex)}
+\DoxyCodeLine{00345\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00346\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_af36d14f42c697d5272a592bf7349d06d}{parseErrorf}}(\mbox{\hyperlink{structstate}{state}},ref.token,\textcolor{stringliteral}{"{}invalid\ index"{}});}
+\DoxyCodeLine{00347\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{stdint_8h_ab5eb23180f7cc12b7d6c04a8ec067fdd}{UINT32\_MAX}};}
+\DoxyCodeLine{00348\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00349\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ref.index;}
+\DoxyCodeLine{00350\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00351\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ Reference::Type::name:}
+\DoxyCodeLine{00352\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00353\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ nameToIndexMapIt\ =\ nameToIndexMap.find(ref.name);}
+\DoxyCodeLine{00354\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(nameToIndexMapIt\ ==\ nameToIndexMap.end())}
+\DoxyCodeLine{00355\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00356\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_af36d14f42c697d5272a592bf7349d06d}{parseErrorf}}(\mbox{\hyperlink{structstate}{state}},ref.token,\textcolor{stringliteral}{"{}unknown\ name"{}});}
+\DoxyCodeLine{00357\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{stdint_8h_ab5eb23180f7cc12b7d6c04a8ec067fdd}{UINT32\_MAX}};}
+\DoxyCodeLine{00358\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00359\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00360\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00361\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ nameToIndexMapIt-\/>second;}
+\DoxyCodeLine{00362\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00363\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00364\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:\ \mbox{\hyperlink{namespace_errors_a6959930ad6159fe3eb2e04ebf87c1b84}{Errors::unreachable}}();}
+\DoxyCodeLine{00365\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00366\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_ad98b487d5f8d6b2397db35e9d6c79ae8_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_ad98b487d5f8d6b2397db35e9d6c79ae8_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_w_a_s_t_abdd0bdb7d4c0fb7a7b98ef2624edb7b3}\index{WAST@{WAST}!tryParseHexit@{tryParseHexit}}
+\index{tryParseHexit@{tryParseHexit}!WAST@{WAST}}
+\doxysubsubsection{\texorpdfstring{tryParseHexit()}{tryParseHexit()}}
+{\footnotesize\ttfamily \label{namespace_w_a_s_t_abdd0bdb7d4c0fb7a7b98ef2624edb7b3} 
+bool WAST\+::try\+Parse\+Hexit (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}\&}]{next\+Char}{, }\item[{\mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} \&}]{out\+Value}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_8cpp_source_l00368}{368}} of file \mbox{\hyperlink{_parse_8cpp_source}{Parse.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00369\ \ \ \ \ \{}
+\DoxyCodeLine{00370\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(*nextChar\ >=\ \textcolor{charliteral}{'0'}\ \&\&\ *nextChar\ <=\ \textcolor{charliteral}{'9'})\ \{\ outValue\ =\ *nextChar\ -\/\ \textcolor{charliteral}{'0'};\ \}}
+\DoxyCodeLine{00371\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(*nextChar\ >=\ \textcolor{charliteral}{'a'}\ \&\&\ *nextChar\ <=\ \textcolor{charliteral}{'f'})\ \{\ outValue\ =\ *nextChar\ -\/\ \textcolor{charliteral}{'a'}\ +\ 10;\ \}}
+\DoxyCodeLine{00372\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(*nextChar\ >=\ \textcolor{charliteral}{'A'}\ \&\&\ *nextChar\ <=\ \textcolor{charliteral}{'F'})\ \{\ outValue\ =\ *nextChar\ -\/\ \textcolor{charliteral}{'A'}\ +\ 10;\ \}}
+\DoxyCodeLine{00373\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00374\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00375\ \ \ \ \ \ \ \ \ \ \ \ \ outValue\ =\ 0;}
+\DoxyCodeLine{00376\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00377\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00378\ \ \ \ \ \ \ \ \ ++nextChar;}
+\DoxyCodeLine{00379\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00380\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespace_w_a_s_t_a0fb1b690639911ade0de451575d32309}\index{WAST@{WAST}!tryParseI32@{tryParseI32}}
+\index{tryParseI32@{tryParseI32}!WAST@{WAST}}
+\doxysubsubsection{\texorpdfstring{tryParseI32()}{tryParseI32()}}
+{\footnotesize\ttfamily \label{namespace_w_a_s_t_a0fb1b690639911ade0de451575d32309} 
+bool WAST\+::try\+Parse\+I32 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&}]{state}{, }\item[{\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}} \&}]{out\+I32}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_numbers_8cpp_source_l00277}{277}} of file \mbox{\hyperlink{_parse_numbers_8cpp_source}{Parse\+Numbers.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00278\ \ \ \ \ \{}
+\DoxyCodeLine{00279\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{_parse_numbers_8cpp_af87f5b92805387a61b56acbb2b7d46b7}{tryParseInt<U32>}}(\mbox{\hyperlink{structstate}{state}},outI32,\mbox{\hyperlink{stdint_8h_a688eb21a22db27c2b2bd5836943cdcbe}{INT32\_MIN}},\mbox{\hyperlink{stdint_8h_ab5eb23180f7cc12b7d6c04a8ec067fdd}{UINT32\_MAX}});}
+\DoxyCodeLine{00280\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=279pt]{namespace_w_a_s_t_a0fb1b690639911ade0de451575d32309_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_a0fb1b690639911ade0de451575d32309_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_w_a_s_t_a8f980380d965a6fceff6ff5c61dc6974}\index{WAST@{WAST}!tryParseI64@{tryParseI64}}
+\index{tryParseI64@{tryParseI64}!WAST@{WAST}}
+\doxysubsubsection{\texorpdfstring{tryParseI64()}{tryParseI64()}}
+{\footnotesize\ttfamily \label{namespace_w_a_s_t_a8f980380d965a6fceff6ff5c61dc6974} 
+bool WAST\+::try\+Parse\+I64 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&}]{state}{, }\item[{\mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}} \&}]{out\+I64}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_numbers_8cpp_source_l00282}{282}} of file \mbox{\hyperlink{_parse_numbers_8cpp_source}{Parse\+Numbers.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00283\ \ \ \ \ \{}
+\DoxyCodeLine{00284\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{_parse_numbers_8cpp_af87f5b92805387a61b56acbb2b7d46b7}{tryParseInt<U64>}}(\mbox{\hyperlink{structstate}{state}},outI64,\mbox{\hyperlink{stdint_8h_ab21f12f372f67b8ff0aa3432336ede67}{INT64\_MIN}},\mbox{\hyperlink{stdint_8h_a30654b4b67d97c42ca3f9b6052dda916}{UINT64\_MAX}});}
+\DoxyCodeLine{00285\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=279pt]{namespace_w_a_s_t_a8f980380d965a6fceff6ff5c61dc6974_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=302pt]{namespace_w_a_s_t_a8f980380d965a6fceff6ff5c61dc6974_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_w_a_s_t_a5a1887aa3f790b93a65b578a3b4628e3}\index{WAST@{WAST}!tryParseName@{tryParseName}}
+\index{tryParseName@{tryParseName}!WAST@{WAST}}
+\doxysubsubsection{\texorpdfstring{tryParseName()}{tryParseName()}}
+{\footnotesize\ttfamily \label{namespace_w_a_s_t_a5a1887aa3f790b93a65b578a3b4628e3} 
+bool WAST\+::try\+Parse\+Name (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&}]{state}{, }\item[{\mbox{\hyperlink{struct_w_a_s_t_1_1_name}{Name}} \&}]{out\+Name}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_8cpp_source_l00252}{252}} of file \mbox{\hyperlink{_parse_8cpp_source}{Parse.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00253\ \ \ \ \ \{}
+\DoxyCodeLine{00254\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{structstate}{state}}.nextToken-\/>type\ !=\ t\_name)\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};\ \}}
+\DoxyCodeLine{00255\ }
+\DoxyCodeLine{00256\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Find\ the\ first\ non-\/name\ character.}}
+\DoxyCodeLine{00257\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ firstChar\ =\ \mbox{\hyperlink{structstate}{state}}.string\ +\ \mbox{\hyperlink{structstate}{state}}.nextToken-\/>begin;;}
+\DoxyCodeLine{00258\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ nextChar\ =\ firstChar;}
+\DoxyCodeLine{00259\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_errors_8h_a03bec6af3af0dd492e348b40cbe40a46}{WAVM\_ASSERT\_THROW}}(*nextChar\ ==\ \textcolor{charliteral}{'\$'});}
+\DoxyCodeLine{00260\ \ \ \ \ \ \ \ \ ++nextChar;}
+\DoxyCodeLine{00261\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\textcolor{keyword}{true})}
+\DoxyCodeLine{00262\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00263\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ c\ =\ *nextChar;}
+\DoxyCodeLine{00264\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}((c\ >=\ \textcolor{charliteral}{'a'}\ \&\&\ c\ <=\ \textcolor{charliteral}{'z'})}
+\DoxyCodeLine{00265\ \ \ \ \ \ \ \ \ \ \ \ \ ||\ (c\ >=\ \textcolor{charliteral}{'A'}\ \&\&\ c\ <=\ \textcolor{charliteral}{'Z'})}
+\DoxyCodeLine{00266\ \ \ \ \ \ \ \ \ \ \ \ \ ||\ (c\ >=\ \textcolor{charliteral}{'0'}\ \&\&\ c\ <=\ \textcolor{charliteral}{'9'})}
+\DoxyCodeLine{00267\ \ \ \ \ \ \ \ \ \ \ \ \ ||\ c==\textcolor{charliteral}{'\_'}\ ||\ c==\textcolor{charliteral}{'\(\backslash\)''}\ ||\ c==\textcolor{charliteral}{'+'}\ ||\ c==\textcolor{charliteral}{'-\/'}\ ||\ c==\textcolor{charliteral}{'*'}\ ||\ c==\textcolor{charliteral}{'/'}\ ||\ c==\textcolor{charliteral}{'\(\backslash\)\(\backslash\)'}\ ||\ c==\textcolor{charliteral}{'\string^'}\ ||\ c==\textcolor{charliteral}{'\string~'}\ ||\ c==\textcolor{charliteral}{'='}}
+\DoxyCodeLine{00268\ \ \ \ \ \ \ \ \ \ \ \ \ ||\ c==\textcolor{charliteral}{'<'}\ ||\ c==\textcolor{charliteral}{'>'}\ ||\ c==\textcolor{charliteral}{'!'}\ ||\ c==\textcolor{charliteral}{'?'}\ ||\ c==\textcolor{charliteral}{'@'}\ ||\ c==\textcolor{charliteral}{'\#'}\ ||\ c==\textcolor{charliteral}{'\$'}\ ||\ c==\textcolor{charliteral}{'\%'}\ ||\ c==\textcolor{charliteral}{'\&'}\ ||\ c==\textcolor{charliteral}{'|'}}
+\DoxyCodeLine{00269\ \ \ \ \ \ \ \ \ \ \ \ \ ||\ c==\textcolor{charliteral}{':'}\ ||\ c==\textcolor{charliteral}{'`'}\ ||\ c==\textcolor{charliteral}{'.'})}
+\DoxyCodeLine{00270\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00271\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++nextChar;}
+\DoxyCodeLine{00272\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00273\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00274\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00275\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00276\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00277\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00278\ }
+\DoxyCodeLine{00279\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_errors_8h_a03bec6af3af0dd492e348b40cbe40a46}{WAVM\_ASSERT\_THROW}}(\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}(nextChar\ -\/\ \mbox{\hyperlink{structstate}{state}}.string)\ >\ \mbox{\hyperlink{structstate}{state}}.nextToken-\/>begin\ +\ 1);}
+\DoxyCodeLine{00280\ \ \ \ \ \ \ \ \ ++\mbox{\hyperlink{structstate}{state}}.nextToken;}
+\DoxyCodeLine{00281\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_errors_8h_a03bec6af3af0dd492e348b40cbe40a46}{WAVM\_ASSERT\_THROW}}(\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}(nextChar\ -\/\ \mbox{\hyperlink{structstate}{state}}.string)\ <=\ \mbox{\hyperlink{structstate}{state}}.nextToken-\/>begin);}
+\DoxyCodeLine{00282\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_errors_8h_a03bec6af3af0dd492e348b40cbe40a46}{WAVM\_ASSERT\_THROW}}(\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}(nextChar\ -\/\ firstChar)\ <=\ \mbox{\hyperlink{stdint_8h_ab5eb23180f7cc12b7d6c04a8ec067fdd}{UINT32\_MAX}});}
+\DoxyCodeLine{00283\ \ \ \ \ \ \ \ \ outName\ =\ Name(firstChar,\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}(nextChar\ -\/\ firstChar));}
+\DoxyCodeLine{00284\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00285\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_a5a1887aa3f790b93a65b578a3b4628e3_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_w_a_s_t_a965b97566a3d051c08b06c7488c14ad8}\index{WAST@{WAST}!tryParseNameOrIndexRef@{tryParseNameOrIndexRef}}
+\index{tryParseNameOrIndexRef@{tryParseNameOrIndexRef}!WAST@{WAST}}
+\doxysubsubsection{\texorpdfstring{tryParseNameOrIndexRef()}{tryParseNameOrIndexRef()}}
+{\footnotesize\ttfamily \label{namespace_w_a_s_t_a965b97566a3d051c08b06c7488c14ad8} 
+bool WAST\+::try\+Parse\+Name\+Or\+Index\+Ref (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&}]{state}{, }\item[{\mbox{\hyperlink{struct_w_a_s_t_1_1_reference}{Reference}} \&}]{out\+Ref}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_8cpp_source_l00287}{287}} of file \mbox{\hyperlink{_parse_8cpp_source}{Parse.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00288\ \ \ \ \ \{}
+\DoxyCodeLine{00289\ \ \ \ \ \ \ \ \ outRef.\mbox{\hyperlink{struct_w_a_s_t_1_1_reference_a98e8e176b1812f626d9e8e1d83a63486}{token}}\ =\ \mbox{\hyperlink{structstate}{state}}.nextToken;}
+\DoxyCodeLine{00290\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{namespace_w_a_s_t_a5a1887aa3f790b93a65b578a3b4628e3}{tryParseName}}(\mbox{\hyperlink{structstate}{state}},outRef.\mbox{\hyperlink{struct_w_a_s_t_1_1_reference_a5cf0db51e258f551a0d12892056522a0}{name}}))\ \{\ outRef.\mbox{\hyperlink{struct_w_a_s_t_1_1_reference_acfd4670d22a4c21f5aa8918a0d14f599}{type}}\ =\ Reference::Type::name;\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \}}
+\DoxyCodeLine{00291\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(tryParseI32(\mbox{\hyperlink{structstate}{state}},outRef.\mbox{\hyperlink{struct_w_a_s_t_1_1_reference_a636568c708a85b40e965083a2eb0e371}{index}}))\ \{\ outRef.\mbox{\hyperlink{struct_w_a_s_t_1_1_reference_acfd4670d22a4c21f5aa8918a0d14f599}{type}}\ =\ Reference::Type::index;\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \}}
+\DoxyCodeLine{00292\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00293\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_a965b97566a3d051c08b06c7488c14ad8_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_a965b97566a3d051c08b06c7488c14ad8_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_w_a_s_t_a9e4c5dc0f2d2044bb55b0702d2f6dc51}\index{WAST@{WAST}!tryParseResultType@{tryParseResultType}}
+\index{tryParseResultType@{tryParseResultType}!WAST@{WAST}}
+\doxysubsubsection{\texorpdfstring{tryParseResultType()}{tryParseResultType()}}
+{\footnotesize\ttfamily \label{namespace_w_a_s_t_a9e4c5dc0f2d2044bb55b0702d2f6dc51} 
+bool WAST\+::try\+Parse\+Result\+Type (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&}]{state}{, }\item[{\mbox{\hyperlink{namespace_i_r_ac56fb5355b338ad4a167c48ec539b90b}{Result\+Type}} \&}]{out\+Result\+Type}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_8cpp_source_l00105}{105}} of file \mbox{\hyperlink{_parse_8cpp_source}{Parse.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00106\ \ \ \ \ \{}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_w_a_s_t_a9f94aa21c00c56bd18ed6b48ee8145c8}{tryParseValueType}}(\mbox{\hyperlink{structstate}{state}},*(\mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}*)\&outResultType);}
+\DoxyCodeLine{00108\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_a9e4c5dc0f2d2044bb55b0702d2f6dc51_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_a9e4c5dc0f2d2044bb55b0702d2f6dc51_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_w_a_s_t_a445014b335af98dc3ab063c91108f1b4}\index{WAST@{WAST}!tryParseString@{tryParseString}}
+\index{tryParseString@{tryParseString}!WAST@{WAST}}
+\doxysubsubsection{\texorpdfstring{tryParseString()}{tryParseString()}}
+{\footnotesize\ttfamily \label{namespace_w_a_s_t_a445014b335af98dc3ab063c91108f1b4} 
+bool WAST\+::try\+Parse\+String (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&}]{state}{, }\item[{std\+::string \&}]{out\+String}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_8cpp_source_l00448}{448}} of file \mbox{\hyperlink{_parse_8cpp_source}{Parse.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00449\ \ \ \ \ \{}
+\DoxyCodeLine{00450\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{structstate}{state}}.nextToken-\/>type\ !=\ t\_string)}
+\DoxyCodeLine{00451\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00452\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00453\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00454\ }
+\DoxyCodeLine{00455\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Parse\ a\ string\ literal;\ the\ lexer\ has\ already\ rejected\ unterminated\ strings,}}
+\DoxyCodeLine{00456\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ so\ this\ just\ needs\ to\ copy\ the\ characters\ and\ evaluate\ escape\ codes.}}
+\DoxyCodeLine{00457\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ nextChar\ =\ \mbox{\hyperlink{structstate}{state}}.string\ +\ \mbox{\hyperlink{structstate}{state}}.nextToken-\/>begin;}
+\DoxyCodeLine{00458\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_errors_8h_a03bec6af3af0dd492e348b40cbe40a46}{WAVM\_ASSERT\_THROW}}(*nextChar\ ==\ \textcolor{charliteral}{'\(\backslash\)"{}'});}
+\DoxyCodeLine{00459\ \ \ \ \ \ \ \ \ ++nextChar;}
+\DoxyCodeLine{00460\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\textcolor{keyword}{true})}
+\DoxyCodeLine{00461\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00462\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(*nextChar)}
+\DoxyCodeLine{00463\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00464\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)\(\backslash\)'}:}
+\DoxyCodeLine{00465\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00466\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++nextChar;}
+\DoxyCodeLine{00467\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ parseCharEscapeCode(nextChar,\mbox{\hyperlink{structstate}{state}},outString);}
+\DoxyCodeLine{00468\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00469\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00470\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)"{}'}:}
+\DoxyCodeLine{00471\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++\mbox{\hyperlink{structstate}{state}}.nextToken;}
+\DoxyCodeLine{00472\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_errors_8h_a03bec6af3af0dd492e348b40cbe40a46}{WAVM\_ASSERT\_THROW}}(\mbox{\hyperlink{structstate}{state}}.string\ +\ \mbox{\hyperlink{structstate}{state}}.nextToken-\/>begin\ >\ nextChar);}
+\DoxyCodeLine{00473\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00474\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00475\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ outString\ +=\ *nextChar++;}
+\DoxyCodeLine{00476\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00477\ \ \ \ \ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00478\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00479\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_a445014b335af98dc3ab063c91108f1b4_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_w_a_s_t_a9f94aa21c00c56bd18ed6b48ee8145c8}\index{WAST@{WAST}!tryParseValueType@{tryParseValueType}}
+\index{tryParseValueType@{tryParseValueType}!WAST@{WAST}}
+\doxysubsubsection{\texorpdfstring{tryParseValueType()}{tryParseValueType()}}
+{\footnotesize\ttfamily \label{namespace_w_a_s_t_a9f94aa21c00c56bd18ed6b48ee8145c8} 
+bool WAST\+::try\+Parse\+Value\+Type (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&}]{state}{, }\item[{\mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{Value\+Type}} \&}]{out\+Value\+Type}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_8cpp_source_l00088}{88}} of file \mbox{\hyperlink{_parse_8cpp_source}{Parse.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00089\ \ \ \ \ \{}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(\mbox{\hyperlink{structstate}{state}}.nextToken-\/>type)}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ t\_i32:\ ++\mbox{\hyperlink{structstate}{state}}.nextToken;\ outValueType\ =\ ValueType::i32;\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ t\_i64:\ ++\mbox{\hyperlink{structstate}{state}}.nextToken;\ outValueType\ =\ ValueType::i64;\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ t\_f32:\ ++\mbox{\hyperlink{structstate}{state}}.nextToken;\ outValueType\ =\ ValueType::f32;\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ t\_f64:\ ++\mbox{\hyperlink{structstate}{state}}.nextToken;\ outValueType\ =\ ValueType::f64;\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00096\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#if\ ENABLE\_SIMD\_PROTOTYPE}}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ t\_v128:\ ++\mbox{\hyperlink{structstate}{state}}.nextToken;\ outValueType\ =\ ValueType::v128;\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00098\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#endif}}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ \ \ \ outValueType\ =\ ValueType::any;}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00103\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_w_a_s_t_a9f94aa21c00c56bd18ed6b48ee8145c8_icgraph}
+\end{center}
+\end{figure}

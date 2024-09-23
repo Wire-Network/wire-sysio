@@ -1,0 +1,248 @@
+\doxysection{Catch\+::clara\+::detail\+::Result\+Value\+Base\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{class_catch_1_1clara_1_1detail_1_1_result_value_base}{}\label{class_catch_1_1clara_1_1detail_1_1_result_value_base}\index{Catch::clara::detail::ResultValueBase$<$ T $>$@{Catch::clara::detail::ResultValueBase$<$ T $>$}}
+
+
+{\ttfamily \#include $<$clara.\+hpp$>$}
+
+
+
+Inheritance diagram for Catch\+::clara\+::detail\+::Result\+Value\+Base\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=201pt]{class_catch_1_1clara_1_1detail_1_1_result_value_base__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Catch\+::clara\+::detail\+::Result\+Value\+Base\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=201pt]{class_catch_1_1clara_1_1detail_1_1_result_value_base__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+auto \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_result_value_base_ad5746e02555ea74def8b1bae0dea8412}{value}} () const -\/$>$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const \&
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_result_value_base_a5a131be9b6ff64588705b4dacffb26ef}{Result\+Value\+Base}} (\mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_result_base_af11d9f101bf1970fcfac44020fc70f29}{Type}} type)
+\item 
+\mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_result_value_base_aaf92e8f12e3580b399662f354d8852a6}{Result\+Value\+Base}} (\mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_result_value_base}{Result\+Value\+Base}} const \&other)
+\item 
+\mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_result_value_base_a704e80d0f0013df8aec7f74c9eb9e2bd}{Result\+Value\+Base}} (\mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_result_base_af11d9f101bf1970fcfac44020fc70f29}{Type}}, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const \&\mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_result_value_base_ad5746e02555ea74def8b1bae0dea8412}{value}})
+\item 
+auto \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_result_value_base_a6b29ddc10f291c5acf5da0b19d9da088}{operator=}} (\mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_result_value_base}{Result\+Value\+Base}} const \&other) -\/$>$ \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_result_value_base}{Result\+Value\+Base}} \&
+\item 
+\mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_result_value_base_a0036829c80501fa0e2205662613127bf}{\texorpdfstring{$\sim$}{\string~}\+Result\+Value\+Base}} () override
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Member Functions inherited from \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_result_base}{Catch\+::clara\+::detail\+::\+Result\+Base}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_result_base_a5ef660b022dd555f3c888a59672989f0}{Result\+Base}} (\mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_result_base_af11d9f101bf1970fcfac44020fc70f29}{Type}} type)
+\item 
+virtual \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_result_base_ad56bddcf780604b32a72c532a27a7678}{\texorpdfstring{$\sim$}{\string~}\+Result\+Base}} ()=default
+\item 
+virtual void \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_result_base_aa91bd693bc2172f8bcfd82d23b6c6db4}{enforce\+Ok}} () const =0
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\begin{tabbing}
+xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=\kill
+union \{\\
+\>\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_result_value_base_a33326e573f7975f993b86dec9e26e7ab}{m\_value}}\\
+\}; \\
+
+\end{tabbing}\end{DoxyCompactItemize}
+\doxysubsection*{Protected Attributes inherited from \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_result_base}{Catch\+::clara\+::detail\+::\+Result\+Base}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_result_base_af11d9f101bf1970fcfac44020fc70f29}{Type}} \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_result_base_a5ae9b615359f0868248905bc1a6952d8}{m\+\_\+type}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Public Types inherited from \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_result_base}{Catch\+::clara\+::detail\+::\+Result\+Base}}}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_result_base_af11d9f101bf1970fcfac44020fc70f29}{Type}} \{ \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_result_base_af11d9f101bf1970fcfac44020fc70f29abf55ab60d7d8d5702362b0d2e1187c3d}{Ok}}
+, \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_result_base_af11d9f101bf1970fcfac44020fc70f29a1c3262fdb2fdb200a6eea601af93207e}{Logic\+Error}}
+, \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_result_base_af11d9f101bf1970fcfac44020fc70f29ad657be0d15add037a57322ae463050ee}{Runtime\+Error}}
+ \}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$\newline
+class Catch\+::clara\+::detail\+::\+Result\+Value\+Base$<$ T $>$}
+
+
+Definition at line \mbox{\hyperlink{include_2external_2clara_8hpp_source_l00536}{536}} of file \mbox{\hyperlink{include_2external_2clara_8hpp_source}{clara.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_catch_1_1clara_1_1detail_1_1_result_value_base_a5a131be9b6ff64588705b4dacffb26ef}\index{Catch::clara::detail::ResultValueBase$<$ T $>$@{Catch::clara::detail::ResultValueBase$<$ T $>$}!ResultValueBase@{ResultValueBase}}
+\index{ResultValueBase@{ResultValueBase}!Catch::clara::detail::ResultValueBase$<$ T $>$@{Catch::clara::detail::ResultValueBase$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{ResultValueBase()}{ResultValueBase()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{class_catch_1_1clara_1_1detail_1_1_result_value_base_a5a131be9b6ff64588705b4dacffb26ef} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_result_value_base}{Catch\+::clara\+::detail\+::\+Result\+Value\+Base}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::\+Result\+Value\+Base (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_result_base_af11d9f101bf1970fcfac44020fc70f29}{Type}}}]{type}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{include_2external_2clara_8hpp_source_l00544}{544}} of file \mbox{\hyperlink{include_2external_2clara_8hpp_source}{clara.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00544\ :\ \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_result_base_a5ef660b022dd555f3c888a59672989f0}{ResultBase}}(\ type\ )\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1clara_1_1detail_1_1_result_value_base_aaf92e8f12e3580b399662f354d8852a6}\index{Catch::clara::detail::ResultValueBase$<$ T $>$@{Catch::clara::detail::ResultValueBase$<$ T $>$}!ResultValueBase@{ResultValueBase}}
+\index{ResultValueBase@{ResultValueBase}!Catch::clara::detail::ResultValueBase$<$ T $>$@{Catch::clara::detail::ResultValueBase$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{ResultValueBase()}{ResultValueBase()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{class_catch_1_1clara_1_1detail_1_1_result_value_base_aaf92e8f12e3580b399662f354d8852a6} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_result_value_base}{Catch\+::clara\+::detail\+::\+Result\+Value\+Base}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::\+Result\+Value\+Base (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_result_value_base}{Result\+Value\+Base}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ const \&}]{other}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{include_2external_2clara_8hpp_source_l00546}{546}} of file \mbox{\hyperlink{include_2external_2clara_8hpp_source}{clara.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00546\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_result_base_a5ef660b022dd555f3c888a59672989f0}{ResultBase}}(\ other\ )\ \{}
+\DoxyCodeLine{00547\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_result_base_a5ae9b615359f0868248905bc1a6952d8}{m\_type}}\ ==\ \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_result_base_af11d9f101bf1970fcfac44020fc70f29abf55ab60d7d8d5702362b0d2e1187c3d}{ResultBase::Ok}}\ )}
+\DoxyCodeLine{00548\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}(\ \&\mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_result_value_base_a33326e573f7975f993b86dec9e26e7ab}{m\_value}}\ )\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}(\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.m\_value\ );}
+\DoxyCodeLine{00549\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1clara_1_1detail_1_1_result_value_base_a704e80d0f0013df8aec7f74c9eb9e2bd}\index{Catch::clara::detail::ResultValueBase$<$ T $>$@{Catch::clara::detail::ResultValueBase$<$ T $>$}!ResultValueBase@{ResultValueBase}}
+\index{ResultValueBase@{ResultValueBase}!Catch::clara::detail::ResultValueBase$<$ T $>$@{Catch::clara::detail::ResultValueBase$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{ResultValueBase()}{ResultValueBase()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{class_catch_1_1clara_1_1detail_1_1_result_value_base_a704e80d0f0013df8aec7f74c9eb9e2bd} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_result_value_base}{Catch\+::clara\+::detail\+::\+Result\+Value\+Base}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::\+Result\+Value\+Base (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_result_base_af11d9f101bf1970fcfac44020fc70f29}{Type}}}]{}{, }\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const \&}]{value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{include_2external_2clara_8hpp_source_l00551}{551}} of file \mbox{\hyperlink{include_2external_2clara_8hpp_source}{clara.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00551\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_result_base_a5ef660b022dd555f3c888a59672989f0}{ResultBase}}(\ \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_result_base_af11d9f101bf1970fcfac44020fc70f29abf55ab60d7d8d5702362b0d2e1187c3d}{Ok}}\ )\ \{}
+\DoxyCodeLine{00552\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}(\ \&\mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_result_value_base_a33326e573f7975f993b86dec9e26e7ab}{m\_value}}\ )\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}(\ \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_result_value_base_ad5746e02555ea74def8b1bae0dea8412}{value}}\ );}
+\DoxyCodeLine{00553\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1clara_1_1detail_1_1_result_value_base_a704e80d0f0013df8aec7f74c9eb9e2bd_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1clara_1_1detail_1_1_result_value_base_a0036829c80501fa0e2205662613127bf}\index{Catch::clara::detail::ResultValueBase$<$ T $>$@{Catch::clara::detail::ResultValueBase$<$ T $>$}!````~ResultValueBase@{\texorpdfstring{$\sim$}{\string~}ResultValueBase}}
+\index{````~ResultValueBase@{\texorpdfstring{$\sim$}{\string~}ResultValueBase}!Catch::clara::detail::ResultValueBase$<$ T $>$@{Catch::clara::detail::ResultValueBase$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}ResultValueBase()}{\string~ResultValueBase()}}
+{\footnotesize\ttfamily \label{class_catch_1_1clara_1_1detail_1_1_result_value_base_a0036829c80501fa0e2205662613127bf} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_result_value_base}{Catch\+::clara\+::detail\+::\+Result\+Value\+Base}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::\texorpdfstring{$\sim$}{\string~}\mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_result_value_base}{Result\+Value\+Base}} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{include_2external_2clara_8hpp_source_l00564}{564}} of file \mbox{\hyperlink{include_2external_2clara_8hpp_source}{clara.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00564\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00565\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_result_base_a5ae9b615359f0868248905bc1a6952d8}{m\_type}}\ ==\ \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_result_base_af11d9f101bf1970fcfac44020fc70f29abf55ab60d7d8d5702362b0d2e1187c3d}{Ok}}\ )}
+\DoxyCodeLine{00566\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_result_value_base_a33326e573f7975f993b86dec9e26e7ab}{m\_value}}.\string~T();}
+\DoxyCodeLine{00567\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_catch_1_1clara_1_1detail_1_1_result_value_base_a6b29ddc10f291c5acf5da0b19d9da088}\index{Catch::clara::detail::ResultValueBase$<$ T $>$@{Catch::clara::detail::ResultValueBase$<$ T $>$}!operator=@{operator=}}
+\index{operator=@{operator=}!Catch::clara::detail::ResultValueBase$<$ T $>$@{Catch::clara::detail::ResultValueBase$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}}
+{\footnotesize\ttfamily \label{class_catch_1_1clara_1_1detail_1_1_result_value_base_a6b29ddc10f291c5acf5da0b19d9da088} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+auto \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_result_value_base}{Catch\+::clara\+::detail\+::\+Result\+Value\+Base}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::operator= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_result_value_base}{Result\+Value\+Base}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ const \&}]{other}{}\end{DoxyParamCaption}) -\/$>$ \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_result_value_base}{Result\+Value\+Base}} \& \hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{include_2external_2clara_8hpp_source_l00555}{555}} of file \mbox{\hyperlink{include_2external_2clara_8hpp_source}{clara.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00555\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00556\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_result_base_a5ae9b615359f0868248905bc1a6952d8}{m\_type}}\ ==\ \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_result_base_af11d9f101bf1970fcfac44020fc70f29abf55ab60d7d8d5702362b0d2e1187c3d}{ResultBase::Ok}}\ )}
+\DoxyCodeLine{00557\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_result_value_base_a33326e573f7975f993b86dec9e26e7ab}{m\_value}}.\string~T();}
+\DoxyCodeLine{00558\ \ \ \ \ \ \ \ \ \ \ \ \ ResultBase::operator=(other);}
+\DoxyCodeLine{00559\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_result_base_a5ae9b615359f0868248905bc1a6952d8}{m\_type}}\ ==\ \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_result_base_af11d9f101bf1970fcfac44020fc70f29abf55ab60d7d8d5702362b0d2e1187c3d}{ResultBase::Ok}}\ )}
+\DoxyCodeLine{00560\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}(\ \&\mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_result_value_base_a33326e573f7975f993b86dec9e26e7ab}{m\_value}}\ )\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}(\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.m\_value\ );}
+\DoxyCodeLine{00561\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00562\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1clara_1_1detail_1_1_result_value_base_ad5746e02555ea74def8b1bae0dea8412}\index{Catch::clara::detail::ResultValueBase$<$ T $>$@{Catch::clara::detail::ResultValueBase$<$ T $>$}!value@{value}}
+\index{value@{value}!Catch::clara::detail::ResultValueBase$<$ T $>$@{Catch::clara::detail::ResultValueBase$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{value()}{value()}}
+{\footnotesize\ttfamily \label{class_catch_1_1clara_1_1detail_1_1_result_value_base_ad5746e02555ea74def8b1bae0dea8412} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+auto \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_result_value_base}{Catch\+::clara\+::detail\+::\+Result\+Value\+Base}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::value (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const -\/$>$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const \& \hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{include_2external_2clara_8hpp_source_l00538}{538}} of file \mbox{\hyperlink{include_2external_2clara_8hpp_source}{clara.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00538\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00539\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_result_base_aa91bd693bc2172f8bcfd82d23b6c6db4}{enforceOk}}();}
+\DoxyCodeLine{00540\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_result_value_base_a33326e573f7975f993b86dec9e26e7ab}{m\_value}};}
+\DoxyCodeLine{00541\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1clara_1_1detail_1_1_result_value_base_ad5746e02555ea74def8b1bae0dea8412_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1clara_1_1detail_1_1_result_value_base_ad5746e02555ea74def8b1bae0dea8412_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{class_catch_1_1clara_1_1detail_1_1_result_value_base_a4aab0774ee7fb40564a10e232ed9b947}\doxysubsubsection{\texorpdfstring{[union]}{[union]}}
+{\footnotesize\ttfamily \label{class_catch_1_1clara_1_1detail_1_1_result_value_base_a4aab0774ee7fb40564a10e232ed9b947} 
+union  \{ ... \}  \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_result_value_base}{Catch\+::clara\+::detail\+::\+Result\+Value\+Base}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\hspace{0.3cm}{\ttfamily [protected]}}
+
+\Hypertarget{class_catch_1_1clara_1_1detail_1_1_result_value_base_a33326e573f7975f993b86dec9e26e7ab}\index{Catch::clara::detail::ResultValueBase$<$ T $>$@{Catch::clara::detail::ResultValueBase$<$ T $>$}!m\_value@{m\_value}}
+\index{m\_value@{m\_value}!Catch::clara::detail::ResultValueBase$<$ T $>$@{Catch::clara::detail::ResultValueBase$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{m\_value}{m\_value}}
+{\footnotesize\ttfamily \label{class_catch_1_1clara_1_1detail_1_1_result_value_base_a33326e573f7975f993b86dec9e26e7ab} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_result_value_base}{Catch\+::clara\+::detail\+::\+Result\+Value\+Base}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::m\+\_\+value}
+
+
+
+Definition at line \mbox{\hyperlink{include_2external_2clara_8hpp_source_l00570}{570}} of file \mbox{\hyperlink{include_2external_2clara_8hpp_source}{clara.\+hpp}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/include/external/\mbox{\hyperlink{include_2external_2clara_8hpp}{clara.\+hpp}}\end{DoxyCompactItemize}

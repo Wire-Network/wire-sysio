@@ -1,0 +1,36 @@
+\doxysection{To\+String\+Pair.\+tests.\+cpp}
+\hypertarget{_to_string_pair_8tests_8cpp_source}{}\label{_to_string_pair_8tests_8cpp_source}\index{libraries/sys-\/vm/external/Catch2/projects/SelfTest/UsageTests/ToStringPair.tests.cpp@{libraries/sys-\/vm/external/Catch2/projects/SelfTest/UsageTests/ToStringPair.tests.cpp}}
+\mbox{\hyperlink{_to_string_pair_8tests_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_to_string_pair_8tests_8cpp_source_l00001}\mbox{\hyperlink{_to_string_pair_8tests_8cpp_abcb2983dc4daef90b1d3f703d21071ac}{00001}}\ \textcolor{preprocessor}{\#define\ CATCH\_CONFIG\_ENABLE\_PAIR\_STRINGMAKER}}
+\DoxyCodeLine{\Hypertarget{_to_string_pair_8tests_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ "{}catch.hpp"{}}}
+\DoxyCodeLine{\Hypertarget{_to_string_pair_8tests_8cpp_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{_to_string_pair_8tests_8cpp_source_l00004}\mbox{\hyperlink{_to_string_pair_8tests_8cpp_a651c2782d8fa6f84abfd437a7347404c}{00004}}\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\ \textcolor{stringliteral}{"{}std::pair<int,std::string>\ -\/>\ toString"{}},\ \textcolor{stringliteral}{"{}[toString][pair]"{}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{_to_string_pair_8tests_8cpp_source_l00005}00005\ \ \ \ \ std::pair<int,std::string>\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}(\ 34,\ \textcolor{stringliteral}{"{}xyzzy"{}}\ );}
+\DoxyCodeLine{\Hypertarget{_to_string_pair_8tests_8cpp_source_l00006}00006\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ )\ ==\ \textcolor{stringliteral}{"{}\{\ 34,\ \(\backslash\)"{}xyzzy\(\backslash\)"{}\ \}"{}}\ );}
+\DoxyCodeLine{\Hypertarget{_to_string_pair_8tests_8cpp_source_l00007}00007\ \}}
+\DoxyCodeLine{\Hypertarget{_to_string_pair_8tests_8cpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{_to_string_pair_8tests_8cpp_source_l00009}\mbox{\hyperlink{_to_string_pair_8tests_8cpp_a936f6f8d8353881b5aa6739de5eecdd9}{00009}}\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\ \textcolor{stringliteral}{"{}std::pair<int,const\ std::string>\ -\/>\ toString"{}},\ \textcolor{stringliteral}{"{}[toString][pair]"{}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{_to_string_pair_8tests_8cpp_source_l00010}00010\ \ \ \ \ std::pair<int,const\ std::string>\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}(\ 34,\ \textcolor{stringliteral}{"{}xyzzy"{}}\ );}
+\DoxyCodeLine{\Hypertarget{_to_string_pair_8tests_8cpp_source_l00011}00011\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})\ ==\ \textcolor{stringliteral}{"{}\{\ 34,\ \(\backslash\)"{}xyzzy\(\backslash\)"{}\ \}"{}}\ );}
+\DoxyCodeLine{\Hypertarget{_to_string_pair_8tests_8cpp_source_l00012}00012\ \}}
+\DoxyCodeLine{\Hypertarget{_to_string_pair_8tests_8cpp_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{_to_string_pair_8tests_8cpp_source_l00014}\mbox{\hyperlink{_to_string_pair_8tests_8cpp_a2db0fdf16ddfe50b954321978c980aad}{00014}}\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\ \textcolor{stringliteral}{"{}std::vector<std::pair<std::string,int>\ >\ -\/>\ toString"{}},\ \textcolor{stringliteral}{"{}[toString][pair]"{}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{_to_string_pair_8tests_8cpp_source_l00015}00015\ \ \ \ \ std::vector<std::pair<std::string,int>\ >\ pr;}
+\DoxyCodeLine{\Hypertarget{_to_string_pair_8tests_8cpp_source_l00016}00016\ \ \ \ \ pr.push\_back(\ std::make\_pair(\textcolor{stringliteral}{"{}green"{}},\ 55\ )\ );}
+\DoxyCodeLine{\Hypertarget{_to_string_pair_8tests_8cpp_source_l00017}00017\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(\ pr\ )\ ==\ \textcolor{stringliteral}{"{}\{\ \{\ \(\backslash\)"{}green\(\backslash\)"{},\ 55\ \}\ \}"{}}\ );}
+\DoxyCodeLine{\Hypertarget{_to_string_pair_8tests_8cpp_source_l00018}00018\ \}}
+\DoxyCodeLine{\Hypertarget{_to_string_pair_8tests_8cpp_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{_to_string_pair_8tests_8cpp_source_l00020}00020\ \textcolor{comment}{//\ This\ is\ pretty\ contrived\ -\/\ I\ figure\ if\ this\ works,\ anything\ will...}}
+\DoxyCodeLine{\Hypertarget{_to_string_pair_8tests_8cpp_source_l00021}\mbox{\hyperlink{_to_string_pair_8tests_8cpp_a24b1015bfb68b89cd0bff03fd27b6b63}{00021}}\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\ \textcolor{stringliteral}{"{}pair<pair<int,const\ char\ *,pair<std::string,int>\ >\ -\/>\ toString"{}},\ \textcolor{stringliteral}{"{}[toString][pair]"{}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{_to_string_pair_8tests_8cpp_source_l00022}00022\ \ \ \ \ \textcolor{keyword}{typedef}\ std::pair<int,const\ char\ *>\ left\_t;}
+\DoxyCodeLine{\Hypertarget{_to_string_pair_8tests_8cpp_source_l00023}00023\ \ \ \ \ \textcolor{keyword}{typedef}\ std::pair<std::string,int>\ right\_t;}
+\DoxyCodeLine{\Hypertarget{_to_string_pair_8tests_8cpp_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{_to_string_pair_8tests_8cpp_source_l00025}00025\ \ \ \ \ left\_t\ \ left(\ 42,\ \textcolor{stringliteral}{"{}Arthur"{}}\ );}
+\DoxyCodeLine{\Hypertarget{_to_string_pair_8tests_8cpp_source_l00026}00026\ \ \ \ \ right\_t\ right(\ \textcolor{stringliteral}{"{}Ford"{}},\ 24\ );}
+\DoxyCodeLine{\Hypertarget{_to_string_pair_8tests_8cpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{_to_string_pair_8tests_8cpp_source_l00028}00028\ \ \ \ \ std::pair<left\_t,right\_t>\ pair(\ left,\ right\ );}
+\DoxyCodeLine{\Hypertarget{_to_string_pair_8tests_8cpp_source_l00029}00029\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(\ pair\ )\ ==\ \textcolor{stringliteral}{"{}\{\ \{\ 42,\ \(\backslash\)"{}Arthur\(\backslash\)"{}\ \},\ \{\ \(\backslash\)"{}Ford\(\backslash\)"{},\ 24\ \}\ \}"{}}\ );}
+\DoxyCodeLine{\Hypertarget{_to_string_pair_8tests_8cpp_source_l00030}00030\ \}}
+
+\end{DoxyCode}

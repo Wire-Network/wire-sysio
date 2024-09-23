@@ -1,0 +1,9 @@
+<map id="libraries/softfloat/source/include/softfloat_types.h" name="libraries/softfloat/source/include/softfloat_types.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,166,61"/>
+<area shape="rect" id="Node000002" href="$stdint_8h.html" title=" " alt="" coords="53,109,118,135"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="88,61,88,93,83,93,83,61"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="10,183,73,208"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="81,136,59,171,55,168,76,133"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="98,183,164,208"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="95,133,117,168,113,171,91,136"/>
+</map>

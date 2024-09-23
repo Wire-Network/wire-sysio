@@ -1,0 +1,11 @@
+<map id="chainbase::undo_index::undo" name="chainbase::undo_index::undo">
+<area shape="rect" id="Node000001" title=" " alt="" coords="410,71,564,111"/>
+<area shape="rect" id="Node000002" href="$classchainbase_1_1undo__index_1_1session.html#a934cd54876931dbd9478b94ef3beeaee" title=" " alt="" coords="208,5,362,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="407,68,349,49,351,44,409,63"/>
+<area shape="rect" id="Node000004" href="$classchainbase_1_1undo__index.html#afc0dc54196701b45b4907173719965fc" title=" " alt="" coords="208,71,362,111"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="395,94,362,94,362,88,395,88"/>
+<area shape="rect" id="Node000005" href="$classchainbase_1_1undo__index_1_1session.html#a29e9c3d5212eb778bcc046bf9d97ed33" title=" " alt="" coords="208,136,362,177"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="409,119,351,138,349,133,407,114"/>
+<area shape="rect" id="Node000003" href="$classchainbase_1_1undo__index_1_1session.html#ac72f2eac3f2fd9e5dabe3e1b8e5ea0d6" title=" " alt="" coords="5,5,160,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="192,28,160,28,160,23,192,23"/>
+</map>

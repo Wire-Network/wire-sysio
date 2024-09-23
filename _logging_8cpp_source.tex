@@ -1,0 +1,47 @@
+\doxysection{Logging.\+cpp}
+\hypertarget{_logging_8cpp_source}{}\label{_logging_8cpp_source}\index{libraries/wasm-\/jit/Source/Logging/Logging.cpp@{libraries/wasm-\/jit/Source/Logging/Logging.cpp}}
+\mbox{\hyperlink{_logging_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_logging_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_logging_8h}{Logging.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_logging_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h}{Platform/Platform.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_logging_8cpp_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{_logging_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <cstdio>}}
+\DoxyCodeLine{\Hypertarget{_logging_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <cstdarg>}}
+\DoxyCodeLine{\Hypertarget{_logging_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <cstdlib>}}
+\DoxyCodeLine{\Hypertarget{_logging_8cpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{_logging_8cpp_source_l00008}00008\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_log}{Log}}}
+\DoxyCodeLine{\Hypertarget{_logging_8cpp_source_l00009}00009\ \{}
+\DoxyCodeLine{\Hypertarget{_logging_8cpp_source_l00010}00010\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{bool}\ categoryEnabled[(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}})\mbox{\hyperlink{namespace_log_a1f055cc08a2ed074aa74f9d99c8a0901a0fc3cfbc27e91ea60a787de13dae3e3c}{Category::num}}]\ =}
+\DoxyCodeLine{\Hypertarget{_logging_8cpp_source_l00011}00011\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_logging_8cpp_source_l00012}00012\ \ \ \ \ \ \ \ \ \textcolor{keyword}{true},\ \textcolor{comment}{//\ error}}
+\DoxyCodeLine{\Hypertarget{_logging_8cpp_source_l00013}00013\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#ifdef\ \_DEBUG\ }\textcolor{comment}{//\ debug}}
+\DoxyCodeLine{\Hypertarget{_logging_8cpp_source_l00014}00014\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{true},}
+\DoxyCodeLine{\Hypertarget{_logging_8cpp_source_l00015}00015\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#else}}
+\DoxyCodeLine{\Hypertarget{_logging_8cpp_source_l00016}00016\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{false},}
+\DoxyCodeLine{\Hypertarget{_logging_8cpp_source_l00017}00017\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#endif}}
+\DoxyCodeLine{\Hypertarget{_logging_8cpp_source_l00018}00018\ \ \ \ \ \ \ \ \ WAVM\_METRICS\_OUTPUT\ !=\ 0\ \textcolor{comment}{//\ metrics}}
+\DoxyCodeLine{\Hypertarget{_logging_8cpp_source_l00019}00019\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_logging_8cpp_source_l00020}\mbox{\hyperlink{namespace_log_a606363a3c198ebb5e5843cde96282a47}{00020}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespace_log_a606363a3c198ebb5e5843cde96282a47}{setCategoryEnabled}}(\mbox{\hyperlink{namespace_log_a1f055cc08a2ed074aa74f9d99c8a0901}{Category}}\ category,\textcolor{keywordtype}{bool}\ enable)}
+\DoxyCodeLine{\Hypertarget{_logging_8cpp_source_l00021}00021\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_logging_8cpp_source_l00022}00022\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_errors_8h_a03bec6af3af0dd492e348b40cbe40a46}{WAVM\_ASSERT\_THROW}}(category\ <\ \mbox{\hyperlink{namespace_log_a1f055cc08a2ed074aa74f9d99c8a0901a0fc3cfbc27e91ea60a787de13dae3e3c}{Category::num}});}
+\DoxyCodeLine{\Hypertarget{_logging_8cpp_source_l00023}00023\ \ \ \ \ \ \ \ \ categoryEnabled[(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}})category]\ =\ enable;}
+\DoxyCodeLine{\Hypertarget{_logging_8cpp_source_l00024}00024\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_logging_8cpp_source_l00025}\mbox{\hyperlink{namespace_log_a2f2e440d94d04f480e2258096241f07f}{00025}}\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespace_log_a2f2e440d94d04f480e2258096241f07f}{isCategoryEnabled}}(\mbox{\hyperlink{namespace_log_a1f055cc08a2ed074aa74f9d99c8a0901}{Category}}\ category)}
+\DoxyCodeLine{\Hypertarget{_logging_8cpp_source_l00026}00026\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_logging_8cpp_source_l00027}00027\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_errors_8h_a03bec6af3af0dd492e348b40cbe40a46}{WAVM\_ASSERT\_THROW}}(category\ <\ \mbox{\hyperlink{namespace_log_a1f055cc08a2ed074aa74f9d99c8a0901a0fc3cfbc27e91ea60a787de13dae3e3c}{Category::num}});}
+\DoxyCodeLine{\Hypertarget{_logging_8cpp_source_l00028}00028\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ categoryEnabled[(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}})category];}
+\DoxyCodeLine{\Hypertarget{_logging_8cpp_source_l00029}00029\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_logging_8cpp_source_l00030}\mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{00030}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\mbox{\hyperlink{namespace_log_a1f055cc08a2ed074aa74f9d99c8a0901}{Category}}\ category,\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}},...)}
+\DoxyCodeLine{\Hypertarget{_logging_8cpp_source_l00031}00031\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_logging_8cpp_source_l00032}00032\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(categoryEnabled[(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}})category])}
+\DoxyCodeLine{\Hypertarget{_logging_8cpp_source_l00033}00033\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_logging_8cpp_source_l00034}00034\ \ \ \ \ \ \ \ \ \ \ \ \ va\_list\ varArgs;}
+\DoxyCodeLine{\Hypertarget{_logging_8cpp_source_l00035}00035\ \ \ \ \ \ \ \ \ \ \ \ \ va\_start(varArgs,\mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}});}
+\DoxyCodeLine{\Hypertarget{_logging_8cpp_source_l00036}00036\ \ \ \ \ \ \ \ \ \ \ \ \ vfprintf(stdout,\mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}},varArgs);}
+\DoxyCodeLine{\Hypertarget{_logging_8cpp_source_l00037}00037\ \ \ \ \ \ \ \ \ \ \ \ \ fflush(stdout);}
+\DoxyCodeLine{\Hypertarget{_logging_8cpp_source_l00038}00038\ \ \ \ \ \ \ \ \ \ \ \ \ va\_end(varArgs);}
+\DoxyCodeLine{\Hypertarget{_logging_8cpp_source_l00039}00039\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_logging_8cpp_source_l00040}00040\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_logging_8cpp_source_l00041}00041\ \}}
+
+\end{DoxyCode}

@@ -1,0 +1,495 @@
+\doxysection{sysio\+::multisig Class Reference}
+\hypertarget{classsysio_1_1multisig}{}\label{classsysio_1_1multisig}\index{sysio::multisig@{sysio::multisig}}
+
+
+{\ttfamily \#include $<$sysio.\+msig.\+hpp$>$}
+
+
+
+Inheritance diagram for sysio\+::multisig\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=159pt]{classsysio_1_1multisig__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for sysio\+::multisig\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=159pt]{classsysio_1_1multisig__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{classsysio_1_1multisig_a8552f3baf650e0beef358f0fa557334b}{propose\+\_\+action}} = sysio\+::action\+\_\+wrapper$<$"{}propose"{}\+\_\+n, \&\mbox{\hyperlink{classsysio_1_1multisig_ad6138d276fcc71f34449be4ab723711a}{multisig\+::propose}}$>$
+\item 
+using \mbox{\hyperlink{classsysio_1_1multisig_a8c1a7e188fea191c50c4e2a49c703fe5}{approve\+\_\+action}} = sysio\+::action\+\_\+wrapper$<$"{}approve"{}\+\_\+n, \&\mbox{\hyperlink{classsysio_1_1multisig_aa8c9dc60263edc40d44ad70d4f494eab}{multisig\+::approve}}$>$
+\item 
+using \mbox{\hyperlink{classsysio_1_1multisig_a42c4aba7cf4c97bc775e05535da2f32b}{unapprove\+\_\+action}} = sysio\+::action\+\_\+wrapper$<$"{}unapprove"{}\+\_\+n, \&\mbox{\hyperlink{classsysio_1_1multisig_a3eb227d61f157715952d5edd8473a2ee}{multisig\+::unapprove}}$>$
+\item 
+using \mbox{\hyperlink{classsysio_1_1multisig_a768611e4e0c4323dcb3b193b602fc02f}{cancel\+\_\+action}} = sysio\+::action\+\_\+wrapper$<$"{}cancel"{}\+\_\+n, \&\mbox{\hyperlink{classsysio_1_1multisig_a559913d8d1defde0a28de43889988f54}{multisig\+::cancel}}$>$
+\item 
+using \mbox{\hyperlink{classsysio_1_1multisig_a196afa4760b1252a45c1f73eb576af68}{exec\+\_\+action}} = sysio\+::action\+\_\+wrapper$<$"{}exec"{}\+\_\+n, \&\mbox{\hyperlink{classsysio_1_1multisig_a90749d39af4ad1b1bf6385317731d96c}{multisig\+::exec}}$>$
+\item 
+using \mbox{\hyperlink{classsysio_1_1multisig_a451e7bd791a7d2ed2f4b87f50203ef31}{invalidate\+\_\+action}} = sysio\+::action\+\_\+wrapper$<$"{}invalidate"{}\+\_\+n, \&\mbox{\hyperlink{classsysio_1_1multisig_a385e7e7f0fe5559e9d88ac6b70a5ffe8}{multisig\+::invalidate}}$>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{classsysio_1_1multisig_ad6138d276fcc71f34449be4ab723711a}{propose}} (ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$ proposer, ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$ proposal\+\_\+name, ignore$<$ std\+::vector$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1permission__level}{permission\+\_\+level}} $>$ $>$ requested, ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1transaction}{transaction}} $>$ trx)
+\item 
+void \mbox{\hyperlink{classsysio_1_1multisig_aa8c9dc60263edc40d44ad70d4f494eab}{approve}} (\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} proposer, \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} proposal\+\_\+name, \mbox{\hyperlink{structsysio_1_1chain_1_1permission__level}{permission\+\_\+level}} level, const sysio\+::binary\+\_\+extension$<$ sysio\+::checksum256 $>$ \&proposal\+\_\+hash)
+\item 
+void \mbox{\hyperlink{classsysio_1_1multisig_a3eb227d61f157715952d5edd8473a2ee}{unapprove}} (\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} proposer, \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} proposal\+\_\+name, \mbox{\hyperlink{structsysio_1_1chain_1_1permission__level}{permission\+\_\+level}} level)
+\item 
+void \mbox{\hyperlink{classsysio_1_1multisig_a559913d8d1defde0a28de43889988f54}{cancel}} (\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} proposer, \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} proposal\+\_\+name, \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} canceler)
+\item 
+void \mbox{\hyperlink{classsysio_1_1multisig_a90749d39af4ad1b1bf6385317731d96c}{exec}} (\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} proposer, \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} proposal\+\_\+name, \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} executer)
+\item 
+void \mbox{\hyperlink{classsysio_1_1multisig_a385e7e7f0fe5559e9d88ac6b70a5ffe8}{invalidate}} (\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} account)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+The {\ttfamily sysio.\+msig} system contract allows for creation of proposed transactions which require authorization from a list of accounts, approval of the proposed transactions by those accounts required to approve it, and finally, it also allows the execution of the approved transactions on the blockchain.
+
+In short, the workflow to propose, review, approve and then executed a transaction it can be described by the following\+:
+\begin{DoxyItemize}
+\item first you create a transaction json file,
+\item then you submit this proposal to the {\ttfamily sysio.\+msig} contract, and you also insert the account permissions required to approve this proposal into the command that submits the proposal to the blockchain,
+\item the proposal then gets stored on the blockchain by the {\ttfamily sysio.\+msig} contract, and is accessible for review and approval to those accounts required to approve it,
+\item after each of the appointed accounts required to approve the proposed transactions reviews and approves it, you can execute the proposed transaction. The {\ttfamily sysio.\+msig} contract will execute it automatically, but not before validating that the transaction has not expired, it is not cancelled, and it has been signed by all the permissions in the initial proposal\textquotesingle{}s required permission list. 
+\end{DoxyItemize}
+
+Definition at line \mbox{\hyperlink{sysio_8msig_8hpp_source_l00019}{19}} of file \mbox{\hyperlink{sysio_8msig_8hpp_source}{sysio.\+msig.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classsysio_1_1multisig_a8c1a7e188fea191c50c4e2a49c703fe5}\index{sysio::multisig@{sysio::multisig}!approve\_action@{approve\_action}}
+\index{approve\_action@{approve\_action}!sysio::multisig@{sysio::multisig}}
+\doxysubsubsection{\texorpdfstring{approve\_action}{approve\_action}}
+{\footnotesize\ttfamily \label{classsysio_1_1multisig_a8c1a7e188fea191c50c4e2a49c703fe5} 
+using \mbox{\hyperlink{classsysio_1_1multisig_a8c1a7e188fea191c50c4e2a49c703fe5}{sysio\+::multisig\+::approve\+\_\+action}} = sysio\+::action\+\_\+wrapper$<$"{}approve"{}\+\_\+n, \&\mbox{\hyperlink{classsysio_1_1multisig_aa8c9dc60263edc40d44ad70d4f494eab}{multisig\+::approve}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8msig_8hpp_source_l00110}{110}} of file \mbox{\hyperlink{sysio_8msig_8hpp_source}{sysio.\+msig.\+hpp}}.
+
+\Hypertarget{classsysio_1_1multisig_a768611e4e0c4323dcb3b193b602fc02f}\index{sysio::multisig@{sysio::multisig}!cancel\_action@{cancel\_action}}
+\index{cancel\_action@{cancel\_action}!sysio::multisig@{sysio::multisig}}
+\doxysubsubsection{\texorpdfstring{cancel\_action}{cancel\_action}}
+{\footnotesize\ttfamily \label{classsysio_1_1multisig_a768611e4e0c4323dcb3b193b602fc02f} 
+using \mbox{\hyperlink{classsysio_1_1multisig_a768611e4e0c4323dcb3b193b602fc02f}{sysio\+::multisig\+::cancel\+\_\+action}} = sysio\+::action\+\_\+wrapper$<$"{}cancel"{}\+\_\+n, \&\mbox{\hyperlink{classsysio_1_1multisig_a559913d8d1defde0a28de43889988f54}{multisig\+::cancel}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8msig_8hpp_source_l00112}{112}} of file \mbox{\hyperlink{sysio_8msig_8hpp_source}{sysio.\+msig.\+hpp}}.
+
+\Hypertarget{classsysio_1_1multisig_a196afa4760b1252a45c1f73eb576af68}\index{sysio::multisig@{sysio::multisig}!exec\_action@{exec\_action}}
+\index{exec\_action@{exec\_action}!sysio::multisig@{sysio::multisig}}
+\doxysubsubsection{\texorpdfstring{exec\_action}{exec\_action}}
+{\footnotesize\ttfamily \label{classsysio_1_1multisig_a196afa4760b1252a45c1f73eb576af68} 
+using \mbox{\hyperlink{classsysio_1_1multisig_a196afa4760b1252a45c1f73eb576af68}{sysio\+::multisig\+::exec\+\_\+action}} = sysio\+::action\+\_\+wrapper$<$"{}exec"{}\+\_\+n, \&\mbox{\hyperlink{classsysio_1_1multisig_a90749d39af4ad1b1bf6385317731d96c}{multisig\+::exec}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8msig_8hpp_source_l00113}{113}} of file \mbox{\hyperlink{sysio_8msig_8hpp_source}{sysio.\+msig.\+hpp}}.
+
+\Hypertarget{classsysio_1_1multisig_a451e7bd791a7d2ed2f4b87f50203ef31}\index{sysio::multisig@{sysio::multisig}!invalidate\_action@{invalidate\_action}}
+\index{invalidate\_action@{invalidate\_action}!sysio::multisig@{sysio::multisig}}
+\doxysubsubsection{\texorpdfstring{invalidate\_action}{invalidate\_action}}
+{\footnotesize\ttfamily \label{classsysio_1_1multisig_a451e7bd791a7d2ed2f4b87f50203ef31} 
+using \mbox{\hyperlink{classsysio_1_1multisig_a451e7bd791a7d2ed2f4b87f50203ef31}{sysio\+::multisig\+::invalidate\+\_\+action}} = sysio\+::action\+\_\+wrapper$<$"{}invalidate"{}\+\_\+n, \&\mbox{\hyperlink{classsysio_1_1multisig_a385e7e7f0fe5559e9d88ac6b70a5ffe8}{multisig\+::invalidate}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8msig_8hpp_source_l00114}{114}} of file \mbox{\hyperlink{sysio_8msig_8hpp_source}{sysio.\+msig.\+hpp}}.
+
+\Hypertarget{classsysio_1_1multisig_a8552f3baf650e0beef358f0fa557334b}\index{sysio::multisig@{sysio::multisig}!propose\_action@{propose\_action}}
+\index{propose\_action@{propose\_action}!sysio::multisig@{sysio::multisig}}
+\doxysubsubsection{\texorpdfstring{propose\_action}{propose\_action}}
+{\footnotesize\ttfamily \label{classsysio_1_1multisig_a8552f3baf650e0beef358f0fa557334b} 
+using \mbox{\hyperlink{classsysio_1_1multisig_a8552f3baf650e0beef358f0fa557334b}{sysio\+::multisig\+::propose\+\_\+action}} = sysio\+::action\+\_\+wrapper$<$"{}propose"{}\+\_\+n, \&\mbox{\hyperlink{classsysio_1_1multisig_ad6138d276fcc71f34449be4ab723711a}{multisig\+::propose}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8msig_8hpp_source_l00109}{109}} of file \mbox{\hyperlink{sysio_8msig_8hpp_source}{sysio.\+msig.\+hpp}}.
+
+\Hypertarget{classsysio_1_1multisig_a42c4aba7cf4c97bc775e05535da2f32b}\index{sysio::multisig@{sysio::multisig}!unapprove\_action@{unapprove\_action}}
+\index{unapprove\_action@{unapprove\_action}!sysio::multisig@{sysio::multisig}}
+\doxysubsubsection{\texorpdfstring{unapprove\_action}{unapprove\_action}}
+{\footnotesize\ttfamily \label{classsysio_1_1multisig_a42c4aba7cf4c97bc775e05535da2f32b} 
+using \mbox{\hyperlink{classsysio_1_1multisig_a42c4aba7cf4c97bc775e05535da2f32b}{sysio\+::multisig\+::unapprove\+\_\+action}} = sysio\+::action\+\_\+wrapper$<$"{}unapprove"{}\+\_\+n, \&\mbox{\hyperlink{classsysio_1_1multisig_a3eb227d61f157715952d5edd8473a2ee}{multisig\+::unapprove}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8msig_8hpp_source_l00111}{111}} of file \mbox{\hyperlink{sysio_8msig_8hpp_source}{sysio.\+msig.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1multisig_aa8c9dc60263edc40d44ad70d4f494eab}\index{sysio::multisig@{sysio::multisig}!approve@{approve}}
+\index{approve@{approve}!sysio::multisig@{sysio::multisig}}
+\doxysubsubsection{\texorpdfstring{approve()}{approve()}}
+{\footnotesize\ttfamily \label{classsysio_1_1multisig_aa8c9dc60263edc40d44ad70d4f494eab} 
+void sysio\+::multisig\+::approve (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}}]{proposer}{, }\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}}]{proposal\+\_\+name}{, }\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1permission__level}{permission\+\_\+level}}}]{level}{, }\item[{const sysio\+::binary\+\_\+extension$<$ sysio\+::checksum256 $>$ \&}]{proposal\+\_\+hash}{}\end{DoxyParamCaption})}
+
+Approve action approves an existing proposal. Allows an account, the owner of {\ttfamily level} permission, to approve a proposal {\ttfamily proposal\+\_\+name} proposed by {\ttfamily proposer}. If the proposal\textquotesingle{}s requested approval list contains the {\ttfamily level} permission then the {\ttfamily level} permission is moved from internal {\ttfamily requested\+\_\+approvals} list to internal {\ttfamily provided\+\_\+approvals} list of the proposal, thus persisting the approval for the {\ttfamily proposal\+\_\+name} proposal. Storage changes are billed to {\ttfamily proposer}.
+
+
+\begin{DoxyParams}{Parameters}
+{\em proposer} & -\/ The account proposing a transaction \\
+\hline
+{\em proposal\+\_\+name} & -\/ The name of the proposal (should be unique for proposer) \\
+\hline
+{\em level} & -\/ Permission level approving the transaction \\
+\hline
+{\em proposal\+\_\+hash} & -\/ Transaction\textquotesingle{}s checksum \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{sysio_8msig_8cpp_source_l00059}{59}} of file \mbox{\hyperlink{sysio_8msig_8cpp_source}{sysio.\+msig.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00061\ \{}
+\DoxyCodeLine{00062\ \ \ \ require\_auth(\ level\ );}
+\DoxyCodeLine{00063\ }
+\DoxyCodeLine{00064\ \ \ \ \textcolor{keywordflow}{if}(\ proposal\_hash\ )\ \{}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ proposals\ proptable(\ get\_self(),\ proposer.value\ );}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ prop\ =\ proptable.get(\ proposal\_name.value,\ \textcolor{stringliteral}{"{}proposal\ not\ found"{}}\ );}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ assert\_sha256(\ prop.packed\_transaction.data(),\ prop.packed\_transaction.size(),\ *proposal\_hash\ );}
+\DoxyCodeLine{00068\ \ \ \ \}}
+\DoxyCodeLine{00069\ }
+\DoxyCodeLine{00070\ \ \ \ approvals\ apptable(\ get\_self(),\ proposer.value\ );}
+\DoxyCodeLine{00071\ \ \ \ \textcolor{keyword}{auto}\ apps\_it\ =\ apptable.find(\ proposal\_name.value\ );}
+\DoxyCodeLine{00072\ \ \ \ \textcolor{keywordflow}{if}\ (\ apps\_it\ !=\ apptable.end()\ )\ \{}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ std::find\_if(\ apps\_it-\/>requested\_approvals.begin(),\ apps\_it-\/>requested\_approvals.end(),\ [\&](\textcolor{keyword}{const}\ approval\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})\ \{\ return\ a.level\ ==\ level;\ \}\ );}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ check(\ itr\ !=\ apps\_it-\/>requested\_approvals.end(),\ \textcolor{stringliteral}{"{}approval\ is\ not\ on\ the\ list\ of\ requested\ approvals"{}}\ );}
+\DoxyCodeLine{00075\ }
+\DoxyCodeLine{00076\ \ \ \ \ \ \ apptable.modify(\ apps\_it,\ proposer,\ [\&](\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ )\ \{}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.provided\_approvals.push\_back(\ approval\{\ \mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}},\ current\_time\_point()\ \}\ );}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.requested\_approvals.erase(\ itr\ );}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00080\ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ old\_approvals\ old\_apptable(\ get\_self(),\ proposer.value\ );}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ apps\ =\ old\_apptable.get(\ proposal\_name.value,\ \textcolor{stringliteral}{"{}proposal\ not\ found"{}}\ );}
+\DoxyCodeLine{00083\ }
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ std::find(\ apps.requested\_approvals.begin(),\ apps.requested\_approvals.end(),\ level\ );}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ check(\ itr\ !=\ apps.requested\_approvals.end(),\ \textcolor{stringliteral}{"{}approval\ is\ not\ on\ the\ list\ of\ requested\ approvals"{}}\ );}
+\DoxyCodeLine{00086\ }
+\DoxyCodeLine{00087\ \ \ \ \ \ \ old\_apptable.modify(\ apps,\ proposer,\ [\&](\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ )\ \{}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.provided\_approvals.push\_back(\ level\ );}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.requested\_approvals.erase(\ itr\ );}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00091\ \ \ \ \}}
+\DoxyCodeLine{00092\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1multisig_a559913d8d1defde0a28de43889988f54}\index{sysio::multisig@{sysio::multisig}!cancel@{cancel}}
+\index{cancel@{cancel}!sysio::multisig@{sysio::multisig}}
+\doxysubsubsection{\texorpdfstring{cancel()}{cancel()}}
+{\footnotesize\ttfamily \label{classsysio_1_1multisig_a559913d8d1defde0a28de43889988f54} 
+void sysio\+::multisig\+::cancel (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}}]{proposer}{, }\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}}]{proposal\+\_\+name}{, }\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}}]{canceler}{}\end{DoxyParamCaption})}
+
+Cancel action cancels an existing proposal.
+
+
+\begin{DoxyParams}{Parameters}
+{\em proposer} & -\/ The account proposing a transaction \\
+\hline
+{\em proposal\+\_\+name} & -\/ The name of the proposal (should be an existing proposal) \\
+\hline
+{\em canceler} & -\/ The account cancelling the proposal (only the proposer can cancel an unexpired transaction, and the canceler has to be different than the proposer)\\
+\hline
+\end{DoxyParams}
+Allows the {\ttfamily canceler} account to cancel the {\ttfamily proposal\+\_\+name} proposal, created by a {\ttfamily proposer}, only after time has expired on the proposed transaction. It removes corresponding entries from internal proptable and from approval (or old approvals) tables as well. 
+
+Definition at line \mbox{\hyperlink{sysio_8msig_8cpp_source_l00118}{118}} of file \mbox{\hyperlink{sysio_8msig_8cpp_source}{sysio.\+msig.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00119\ \ \ \ require\_auth(\ canceler\ );}
+\DoxyCodeLine{00120\ }
+\DoxyCodeLine{00121\ \ \ \ proposals\ proptable(\ get\_self(),\ proposer.value\ );}
+\DoxyCodeLine{00122\ \ \ \ \textcolor{keyword}{auto}\&\ prop\ =\ proptable.get(\ proposal\_name.value,\ \textcolor{stringliteral}{"{}proposal\ not\ found"{}}\ );}
+\DoxyCodeLine{00123\ }
+\DoxyCodeLine{00124\ \ \ \ \textcolor{keywordflow}{if}(\ canceler\ !=\ proposer\ )\ \{}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ check(\ unpack<transaction\_header>(\ prop.packed\_transaction\ ).expiration\ <\ \mbox{\hyperlink{classfc_1_1time__point__sec}{sysio::time\_point\_sec}}(current\_time\_point()),\ \textcolor{stringliteral}{"{}cannot\ cancel\ until\ expiration"{}}\ );}
+\DoxyCodeLine{00126\ \ \ \ \}}
+\DoxyCodeLine{00127\ \ \ \ proptable.erase(prop);}
+\DoxyCodeLine{00128\ }
+\DoxyCodeLine{00129\ \ \ \ \textcolor{comment}{//remove\ from\ new\ table}}
+\DoxyCodeLine{00130\ \ \ \ approvals\ apptable(\ get\_self(),\ proposer.value\ );}
+\DoxyCodeLine{00131\ \ \ \ \textcolor{keyword}{auto}\ apps\_it\ =\ apptable.find(\ proposal\_name.value\ );}
+\DoxyCodeLine{00132\ \ \ \ \textcolor{keywordflow}{if}\ (\ apps\_it\ !=\ apptable.end()\ )\ \{}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ apptable.erase(apps\_it);}
+\DoxyCodeLine{00134\ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ old\_approvals\ old\_apptable(\ get\_self(),\ proposer.value\ );}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ apps\_it\ =\ old\_apptable.find(\ proposal\_name.value\ );}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ check(\ apps\_it\ !=\ old\_apptable.end(),\ \textcolor{stringliteral}{"{}proposal\ not\ found"{}}\ );}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ old\_apptable.erase(apps\_it);}
+\DoxyCodeLine{00139\ \ \ \ \}}
+\DoxyCodeLine{00140\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1multisig_a90749d39af4ad1b1bf6385317731d96c}\index{sysio::multisig@{sysio::multisig}!exec@{exec}}
+\index{exec@{exec}!sysio::multisig@{sysio::multisig}}
+\doxysubsubsection{\texorpdfstring{exec()}{exec()}}
+{\footnotesize\ttfamily \label{classsysio_1_1multisig_a90749d39af4ad1b1bf6385317731d96c} 
+void sysio\+::multisig\+::exec (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}}]{proposer}{, }\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}}]{proposal\+\_\+name}{, }\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}}]{executer}{}\end{DoxyParamCaption})}
+
+Exec action allows an {\ttfamily executer} account to execute a proposal.
+
+Preconditions\+:
+\begin{DoxyItemize}
+\item {\ttfamily executer} has authorization,
+\item {\ttfamily proposal\+\_\+name} is found in the proposals table,
+\item all requested approvals are received,
+\item proposed transaction is not expired,
+\item and approval accounts are not found in invalidations table.
+\end{DoxyItemize}
+
+If all preconditions are met the transaction is executed as a deferred transaction, and the proposal is erased from the proposals table.
+
+
+\begin{DoxyParams}{Parameters}
+{\em proposer} & -\/ The account proposing a transaction \\
+\hline
+{\em proposal\+\_\+name} & -\/ The name of the proposal (should be an existing proposal) \\
+\hline
+{\em executer} & -\/ The account executing the transaction \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{sysio_8msig_8cpp_source_l00142}{142}} of file \mbox{\hyperlink{sysio_8msig_8cpp_source}{sysio.\+msig.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00143\ \ \ \ require\_auth(\ executer\ );}
+\DoxyCodeLine{00144\ }
+\DoxyCodeLine{00145\ \ \ \ proposals\ proptable(\ get\_self(),\ proposer.value\ );}
+\DoxyCodeLine{00146\ \ \ \ \textcolor{keyword}{auto}\&\ prop\ =\ proptable.get(\ proposal\_name.value,\ \textcolor{stringliteral}{"{}proposal\ not\ found"{}}\ );}
+\DoxyCodeLine{00147\ \ \ \ transaction\_header\ trx\_header;}
+\DoxyCodeLine{00148\ \ \ \ datastream<const\ char*>\ \mbox{\hyperlink{namespace_xbyak_1_1util_a4b2aef26182d21706896022467868f7c}{ds}}(\ prop.packed\_transaction.data(),\ prop.packed\_transaction.size()\ );}
+\DoxyCodeLine{00149\ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_a4b2aef26182d21706896022467868f7c}{ds}}\ >>\ trx\_header;}
+\DoxyCodeLine{00150\ \ \ \ check(\ trx\_header.expiration\ >=\ \mbox{\hyperlink{classfc_1_1time__point__sec}{sysio::time\_point\_sec}}(current\_time\_point()),\ \textcolor{stringliteral}{"{}transaction\ expired"{}}\ );}
+\DoxyCodeLine{00151\ }
+\DoxyCodeLine{00152\ \ \ \ approvals\ apptable(\ get\_self(),\ proposer.value\ );}
+\DoxyCodeLine{00153\ \ \ \ \textcolor{keyword}{auto}\ apps\_it\ =\ apptable.find(\ proposal\_name.value\ );}
+\DoxyCodeLine{00154\ \ \ \ std::vector<permission\_level>\ approvals;}
+\DoxyCodeLine{00155\ \ \ \ invalidations\ inv\_table(\ get\_self(),\ get\_self().\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ );}
+\DoxyCodeLine{00156\ \ \ \ \textcolor{keywordflow}{if}\ (\ apps\_it\ !=\ apptable.end()\ )\ \{}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ approvals.reserve(\ apps\_it-\/>provided\_approvals.size()\ );}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ :\ apps\_it-\/>provided\_approvals\ )\ \{}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ it\ =\ inv\_table.find(\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.level.actor.value\ );}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ it\ ==\ inv\_table.end()\ ||\ it-\/>last\_invalidation\_time\ <\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.time\ )\ \{}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \ \ \ \ approvals.push\_back(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.level);}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ apptable.erase(apps\_it);}
+\DoxyCodeLine{00165\ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ old\_approvals\ old\_apptable(\ get\_self(),\ proposer.value\ );}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ apps\ =\ old\_apptable.get(\ proposal\_name.value,\ \textcolor{stringliteral}{"{}proposal\ not\ found"{}}\ );}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\ \textcolor{keyword}{auto}\&\ level\ :\ apps.provided\_approvals\ )\ \{}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ it\ =\ inv\_table.find(\ \mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}}.actor.value\ );}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ it\ ==\ inv\_table.end()\ )\ \{}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \ \ \ \ approvals.push\_back(\ level\ );}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ old\_apptable.erase(apps);}
+\DoxyCodeLine{00175\ \ \ \ \}}
+\DoxyCodeLine{00176\ \ \ \ \textcolor{keyword}{auto}\ packed\_provided\_approvals\ =\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_a2037777efc75e528d703850afeff8cd4}{pack}}(approvals);}
+\DoxyCodeLine{00177\ \ \ \ \textcolor{keyword}{auto}\ res\ =\ \ check\_transaction\_authorization(}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ prop.packed\_transaction.data(),\ prop.packed\_transaction.size(),}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*)0,\ 0,}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ packed\_provided\_approvals.data(),\ packed\_provided\_approvals.size()}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00182\ }
+\DoxyCodeLine{00183\ \ \ \ check(\ res\ >\ 0,\ \textcolor{stringliteral}{"{}transaction\ authorization\ failed"{}}\ );}
+\DoxyCodeLine{00184\ }
+\DoxyCodeLine{00185\ \ \ \ send\_deferred(\ (\mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a376f631fcb770bd4b2e8349a33e52f8a}{uint128\_t}}(proposer.value)\ <<\ 64)\ |\ proposal\_name.value,\ executer,}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ prop.packed\_transaction.data(),\ prop.packed\_transaction.size()\ );}
+\DoxyCodeLine{00187\ }
+\DoxyCodeLine{00188\ \ \ \ proptable.erase(prop);}
+\DoxyCodeLine{00189\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1multisig_a385e7e7f0fe5559e9d88ac6b70a5ffe8}\index{sysio::multisig@{sysio::multisig}!invalidate@{invalidate}}
+\index{invalidate@{invalidate}!sysio::multisig@{sysio::multisig}}
+\doxysubsubsection{\texorpdfstring{invalidate()}{invalidate()}}
+{\footnotesize\ttfamily \label{classsysio_1_1multisig_a385e7e7f0fe5559e9d88ac6b70a5ffe8} 
+void sysio\+::multisig\+::invalidate (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}}]{account}{}\end{DoxyParamCaption})}
+
+Invalidate action allows an {\ttfamily account} to invalidate itself, that is, its name is added to the invalidations table and this table will be cross referenced when exec is performed.
+
+
+\begin{DoxyParams}{Parameters}
+{\em account} & -\/ The account invalidating the transaction \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{sysio_8msig_8cpp_source_l00191}{191}} of file \mbox{\hyperlink{sysio_8msig_8cpp_source}{sysio.\+msig.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00192\ \ \ \ require\_auth(\ account\ );}
+\DoxyCodeLine{00193\ \ \ \ invalidations\ inv\_table(\ get\_self(),\ get\_self().\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ );}
+\DoxyCodeLine{00194\ \ \ \ \textcolor{keyword}{auto}\ it\ =\ inv\_table.find(\ account.value\ );}
+\DoxyCodeLine{00195\ \ \ \ \textcolor{keywordflow}{if}\ (\ it\ ==\ inv\_table.end()\ )\ \{}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ inv\_table.emplace(\ account,\ [\&](\textcolor{keyword}{auto}\&\ i)\ \{}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \ \ \ \ i.account\ =\ account;}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \ \ \ \ i.last\_invalidation\_time\ =\ current\_time\_point();}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00200\ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ inv\_table.modify(\ it,\ account,\ [\&](\textcolor{keyword}{auto}\&\ i)\ \{}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \ \ \ \ \ \ i.last\_invalidation\_time\ =\ current\_time\_point();}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00204\ \ \ \ \}}
+\DoxyCodeLine{00205\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1multisig_ad6138d276fcc71f34449be4ab723711a}\index{sysio::multisig@{sysio::multisig}!propose@{propose}}
+\index{propose@{propose}!sysio::multisig@{sysio::multisig}}
+\doxysubsubsection{\texorpdfstring{propose()}{propose()}}
+{\footnotesize\ttfamily \label{classsysio_1_1multisig_ad6138d276fcc71f34449be4ab723711a} 
+void sysio\+::multisig\+::propose (\begin{DoxyParamCaption}\item[{ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$}]{proposer}{, }\item[{ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$}]{proposal\+\_\+name}{, }\item[{ignore$<$ std\+::vector$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1permission__level}{permission\+\_\+level}} $>$ $>$}]{requested}{, }\item[{ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1transaction}{transaction}} $>$}]{trx}{}\end{DoxyParamCaption})}
+
+Propose action, creates a proposal containing one transaction. Allows an account {\ttfamily proposer} to make a proposal {\ttfamily proposal\+\_\+name} which has {\ttfamily requested} permission levels expected to approve the proposal, and if approved by all expected permission levels then {\ttfamily trx} transaction can we executed by this proposal. The {\ttfamily proposer} account is authorized and the {\ttfamily trx} transaction is verified if it was authorized by the provided keys and permissions, and if the proposal name doesn’t already exist; if all validations pass the {\ttfamily proposal\+\_\+name} and {\ttfamily trx} trasanction are saved in the proposals table and the {\ttfamily requested} permission levels to the approvals table (for the {\ttfamily proposer} context). Storage changes are billed to {\ttfamily proposer}.
+
+
+\begin{DoxyParams}{Parameters}
+{\em proposer} & -\/ The account proposing a transaction \\
+\hline
+{\em proposal\+\_\+name} & -\/ The name of the proposal (should be unique for proposer) \\
+\hline
+{\em requested} & -\/ Permission levels expected to approve the proposal \\
+\hline
+{\em trx} & -\/ Proposed transaction \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{sysio_8msig_8cpp_source_l00009}{9}} of file \mbox{\hyperlink{sysio_8msig_8cpp_source}{sysio.\+msig.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00013\ \{}
+\DoxyCodeLine{00014\ \ \ \ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ \_proposer;}
+\DoxyCodeLine{00015\ \ \ \ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ \_proposal\_name;}
+\DoxyCodeLine{00016\ \ \ \ std::vector<permission\_level>\ \_requested;}
+\DoxyCodeLine{00017\ \ \ \ transaction\_header\ \_trx\_header;}
+\DoxyCodeLine{00018\ }
+\DoxyCodeLine{00019\ \ \ \ \_ds\ >>\ \_proposer\ >>\ \_proposal\_name\ >>\ \_requested;}
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00021\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ trx\_pos\ =\ \_ds.pos();}
+\DoxyCodeLine{00022\ \ \ \ \textcolor{keywordtype}{size\_t}\ size\ \ \ \ =\ \_ds.remaining();}
+\DoxyCodeLine{00023\ \ \ \ \_ds\ >>\ \_trx\_header;}
+\DoxyCodeLine{00024\ }
+\DoxyCodeLine{00025\ \ \ \ require\_auth(\ \_proposer\ );}
+\DoxyCodeLine{00026\ \ \ \ check(\ \_trx\_header.expiration\ >=\ \mbox{\hyperlink{classfc_1_1time__point__sec}{sysio::time\_point\_sec}}(current\_time\_point()),\ \textcolor{stringliteral}{"{}transaction\ expired"{}}\ );}
+\DoxyCodeLine{00027\ \ \ \ \textcolor{comment}{//check(\ trx\_header.actions.size()\ >\ 0,\ "{}transaction\ must\ have\ at\ least\ one\ action"{}\ );}}
+\DoxyCodeLine{00028\ }
+\DoxyCodeLine{00029\ \ \ \ proposals\ proptable(\ get\_self(),\ \_proposer.value\ );}
+\DoxyCodeLine{00030\ \ \ \ check(\ proptable.find(\ \_proposal\_name.value\ )\ ==\ proptable.end(),\ \textcolor{stringliteral}{"{}proposal\ with\ the\ same\ name\ exists"{}}\ );}
+\DoxyCodeLine{00031\ }
+\DoxyCodeLine{00032\ \ \ \ \textcolor{keyword}{auto}\ packed\_requested\ =\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_a2037777efc75e528d703850afeff8cd4}{pack}}(\_requested);}
+\DoxyCodeLine{00033\ \ \ \ \textcolor{keyword}{auto}\ res\ =\ \ check\_transaction\_authorization(}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ trx\_pos,\ size,}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*)0,\ 0,}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ packed\_requested.data(),\ packed\_requested.size()}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00038\ }
+\DoxyCodeLine{00039\ \ \ \ check(\ res\ >\ 0,\ \textcolor{stringliteral}{"{}transaction\ authorization\ failed"{}}\ );}
+\DoxyCodeLine{00040\ }
+\DoxyCodeLine{00041\ \ \ \ std::vector<char>\ pkd\_trans;}
+\DoxyCodeLine{00042\ \ \ \ pkd\_trans.resize(size);}
+\DoxyCodeLine{00043\ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}((\textcolor{keywordtype}{char}*)pkd\_trans.data(),\ trx\_pos,\ size);}
+\DoxyCodeLine{00044\ \ \ \ proptable.emplace(\ \_proposer,\ [\&](\ \textcolor{keyword}{auto}\&\ prop\ )\ \{}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ prop.proposal\_name\ \ \ \ \ \ \ =\ \_proposal\_name;}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ prop.packed\_transaction\ \ =\ pkd\_trans;}
+\DoxyCodeLine{00047\ \ \ \ \});}
+\DoxyCodeLine{00048\ }
+\DoxyCodeLine{00049\ \ \ \ approvals\ apptable(\ get\_self(),\ \_proposer.value\ );}
+\DoxyCodeLine{00050\ \ \ \ apptable.emplace(\ \_proposer,\ [\&](\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ )\ \{}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.proposal\_name\ \ \ \ \ \ \ =\ \_proposal\_name;}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.requested\_approvals.reserve(\ \_requested.size()\ );}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\ \textcolor{keyword}{auto}\&\ level\ :\ \_requested\ )\ \{}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.requested\_approvals.push\_back(\ approval\{\ \mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}},\ \mbox{\hyperlink{namespacesystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_a28ca3704afa6ea443dd4a095daaedb3a}{time\_point}}\{\ microseconds\{0\}\ \}\ \}\ );}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00056\ \ \ \ \});}
+\DoxyCodeLine{00057\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=289pt]{classsysio_1_1multisig_ad6138d276fcc71f34449be4ab723711a_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1multisig_a3eb227d61f157715952d5edd8473a2ee}\index{sysio::multisig@{sysio::multisig}!unapprove@{unapprove}}
+\index{unapprove@{unapprove}!sysio::multisig@{sysio::multisig}}
+\doxysubsubsection{\texorpdfstring{unapprove()}{unapprove()}}
+{\footnotesize\ttfamily \label{classsysio_1_1multisig_a3eb227d61f157715952d5edd8473a2ee} 
+void sysio\+::multisig\+::unapprove (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}}]{proposer}{, }\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}}]{proposal\+\_\+name}{, }\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1permission__level}{permission\+\_\+level}}}]{level}{}\end{DoxyParamCaption})}
+
+Unapprove action revokes an existing proposal. This action is the reverse of the {\ttfamily approve} action\+: if all validations pass the {\ttfamily level} permission is erased from internal {\ttfamily provided\+\_\+approvals} and added to the internal {\ttfamily requested\+\_\+approvals} list, and thus un-\/approve or revoke the proposal.
+
+
+\begin{DoxyParams}{Parameters}
+{\em proposer} & -\/ The account proposing a transaction \\
+\hline
+{\em proposal\+\_\+name} & -\/ The name of the proposal (should be an existing proposal) \\
+\hline
+{\em level} & -\/ Permission level revoking approval for proposal \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{sysio_8msig_8cpp_source_l00094}{94}} of file \mbox{\hyperlink{sysio_8msig_8cpp_source}{sysio.\+msig.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00095\ \ \ \ require\_auth(\ level\ );}
+\DoxyCodeLine{00096\ }
+\DoxyCodeLine{00097\ \ \ \ approvals\ apptable(\ get\_self(),\ proposer.value\ );}
+\DoxyCodeLine{00098\ \ \ \ \textcolor{keyword}{auto}\ apps\_it\ =\ apptable.find(\ proposal\_name.value\ );}
+\DoxyCodeLine{00099\ \ \ \ \textcolor{keywordflow}{if}\ (\ apps\_it\ !=\ apptable.end()\ )\ \{}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ std::find\_if(\ apps\_it-\/>provided\_approvals.begin(),\ apps\_it-\/>provided\_approvals.end(),\ [\&](\textcolor{keyword}{const}\ approval\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})\ \{\ return\ a.level\ ==\ level;\ \}\ );}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ check(\ itr\ !=\ apps\_it-\/>provided\_approvals.end(),\ \textcolor{stringliteral}{"{}no\ approval\ previously\ granted"{}}\ );}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ apptable.modify(\ apps\_it,\ proposer,\ [\&](\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ )\ \{}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.requested\_approvals.push\_back(\ approval\{\ \mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}},\ current\_time\_point()\ \}\ );}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.provided\_approvals.erase(\ itr\ );}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00106\ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ old\_approvals\ old\_apptable(\ get\_self(),\ proposer.value\ );}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ apps\ =\ old\_apptable.get(\ proposal\_name.value,\ \textcolor{stringliteral}{"{}proposal\ not\ found"{}}\ );}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ std::find(\ apps.provided\_approvals.begin(),\ apps.provided\_approvals.end(),\ level\ );}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ check(\ itr\ !=\ apps.provided\_approvals.end(),\ \textcolor{stringliteral}{"{}no\ approval\ previously\ granted"{}}\ );}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ old\_apptable.modify(\ apps,\ proposer,\ [\&](\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ )\ \{}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.requested\_approvals.push\_back(\ level\ );}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.provided\_approvals.erase(\ itr\ );}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00115\ \ \ \ \}}
+\DoxyCodeLine{00116\ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/svetlasyrimis/\+Desktop/wire-\/network/\+WN-\/org/wire-\/system-\/contracts/contracts/sysio.\+msig/include/sysio.\+msig/\mbox{\hyperlink{sysio_8msig_8hpp}{sysio.\+msig.\+hpp}}\item 
+/\+Users/svetlasyrimis/\+Desktop/wire-\/network/\+WN-\/org/wire-\/system-\/contracts/contracts/sysio.\+msig/src/\mbox{\hyperlink{sysio_8msig_8cpp}{sysio.\+msig.\+cpp}}\end{DoxyCompactItemize}

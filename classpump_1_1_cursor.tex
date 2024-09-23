@@ -1,0 +1,315 @@
+\doxysection{pump.\+Cursor Class Reference}
+\hypertarget{classpump_1_1_cursor}{}\label{classpump_1_1_cursor}\index{pump.Cursor@{pump.Cursor}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classpump_1_1_cursor_a733bac44d6c6a8c0e6932c72e2a2c55c}{\+\_\+\+\_\+init\+\_\+\+\_\+}} (self, \mbox{\hyperlink{classpump_1_1_cursor_aee8d8b67360da7fc4e635540cb41d48c}{line}}=-\/1, \mbox{\hyperlink{classpump_1_1_cursor_ae73db76c3a845a82afb334633864254e}{column}}=-\/1)
+\item 
+\mbox{\hyperlink{classpump_1_1_cursor_a012a67506d0a3e81daec0394d18359b8}{\+\_\+\+\_\+eq\+\_\+\+\_\+}} (self, rhs)
+\item 
+\mbox{\hyperlink{classpump_1_1_cursor_a6480281fc3721fcd6430ed7294d978fb}{\+\_\+\+\_\+ne\+\_\+\+\_\+}} (self, rhs)
+\item 
+\mbox{\hyperlink{classpump_1_1_cursor_a7ec8a30a836133d7654fcaf81250fc77}{\+\_\+\+\_\+lt\+\_\+\+\_\+}} (self, rhs)
+\item 
+\mbox{\hyperlink{classpump_1_1_cursor_a18831ec16c4757038316afa6a644e895}{\+\_\+\+\_\+le\+\_\+\+\_\+}} (self, rhs)
+\item 
+\mbox{\hyperlink{classpump_1_1_cursor_abd63ecd2e2f3c4c166d1cdbb32271e65}{\+\_\+\+\_\+gt\+\_\+\+\_\+}} (self, rhs)
+\item 
+\mbox{\hyperlink{classpump_1_1_cursor_a905243f68d8d43c46febf0a534d6e818}{\+\_\+\+\_\+ge\+\_\+\+\_\+}} (self, rhs)
+\item 
+\mbox{\hyperlink{classpump_1_1_cursor_afca901b5f22d9b2bfe207beccdec7dfa}{\+\_\+\+\_\+str\+\_\+\+\_\+}} (self)
+\item 
+\mbox{\hyperlink{classpump_1_1_cursor_a7a565e3c30559d7b02ece7817ab1cf72}{\+\_\+\+\_\+add\+\_\+\+\_\+}} (self, offset)
+\item 
+\mbox{\hyperlink{classpump_1_1_cursor_a8a9a818d6c242243bc08641deb3b007d}{\+\_\+\+\_\+sub\+\_\+\+\_\+}} (self, offset)
+\item 
+\mbox{\hyperlink{classpump_1_1_cursor_ae5be3cd7be0409815feaa37cca01f0bf}{Clone}} (self)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classpump_1_1_cursor_aee8d8b67360da7fc4e635540cb41d48c}{line}} = line
+\item 
+\mbox{\hyperlink{classpump_1_1_cursor_ae73db76c3a845a82afb334633864254e}{column}} = column
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\begin{DoxyVerb}Represents a position (line and column) in a text file.\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{pump_8py_source_l00087}{87}} of file \mbox{\hyperlink{pump_8py_source}{pump.\+py}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classpump_1_1_cursor_a733bac44d6c6a8c0e6932c72e2a2c55c}\index{pump.Cursor@{pump.Cursor}!\_\_init\_\_@{\_\_init\_\_}}
+\index{\_\_init\_\_@{\_\_init\_\_}!pump.Cursor@{pump.Cursor}}
+\doxysubsubsection{\texorpdfstring{\_\_init\_\_()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily \label{classpump_1_1_cursor_a733bac44d6c6a8c0e6932c72e2a2c55c} 
+pump.\+Cursor.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self}{, }\item[{}]{line}{ = {\ttfamily -\/1}, }\item[{}]{column}{ = {\ttfamily -\/1}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pump_8py_source_l00090}{90}} of file \mbox{\hyperlink{pump_8py_source}{pump.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00090\ \ \ \textcolor{keyword}{def\ }\_\_init\_\_(self,\ line=-\/1,\ column=-\/1):}
+\DoxyCodeLine{00091\ \ \ \ \ self.line\ =\ line}
+\DoxyCodeLine{00092\ \ \ \ \ self.column\ =\ column}
+\DoxyCodeLine{00093\ }
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classpump_1_1_cursor_a7a565e3c30559d7b02ece7817ab1cf72}\index{pump.Cursor@{pump.Cursor}!\_\_add\_\_@{\_\_add\_\_}}
+\index{\_\_add\_\_@{\_\_add\_\_}!pump.Cursor@{pump.Cursor}}
+\doxysubsubsection{\texorpdfstring{\_\_add\_\_()}{\_\_add\_\_()}}
+{\footnotesize\ttfamily \label{classpump_1_1_cursor_a7a565e3c30559d7b02ece7817ab1cf72} 
+pump.\+Cursor.\+\_\+\+\_\+add\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self}{, }\item[{}]{offset}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pump_8py_source_l00119}{119}} of file \mbox{\hyperlink{pump_8py_source}{pump.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00119\ \ \ \textcolor{keyword}{def\ }\_\_add\_\_(self,\ offset):}
+\DoxyCodeLine{00120\ \ \ \ \ \textcolor{keywordflow}{return}\ Cursor(self.line,\ self.column\ +\ offset)}
+\DoxyCodeLine{00121\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classpump_1_1_cursor_a7a565e3c30559d7b02ece7817ab1cf72_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classpump_1_1_cursor_a012a67506d0a3e81daec0394d18359b8}\index{pump.Cursor@{pump.Cursor}!\_\_eq\_\_@{\_\_eq\_\_}}
+\index{\_\_eq\_\_@{\_\_eq\_\_}!pump.Cursor@{pump.Cursor}}
+\doxysubsubsection{\texorpdfstring{\_\_eq\_\_()}{\_\_eq\_\_()}}
+{\footnotesize\ttfamily \label{classpump_1_1_cursor_a012a67506d0a3e81daec0394d18359b8} 
+pump.\+Cursor.\+\_\+\+\_\+eq\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self}{, }\item[{}]{rhs}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pump_8py_source_l00094}{94}} of file \mbox{\hyperlink{pump_8py_source}{pump.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00094\ \ \ \textcolor{keyword}{def\ }\_\_eq\_\_(self,\ rhs):}
+\DoxyCodeLine{00095\ \ \ \ \ \textcolor{keywordflow}{return}\ self.line\ ==\ rhs.line\ \textcolor{keywordflow}{and}\ self.column\ ==\ rhs.column}
+\DoxyCodeLine{00096\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classpump_1_1_cursor_a012a67506d0a3e81daec0394d18359b8_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classpump_1_1_cursor_a905243f68d8d43c46febf0a534d6e818}\index{pump.Cursor@{pump.Cursor}!\_\_ge\_\_@{\_\_ge\_\_}}
+\index{\_\_ge\_\_@{\_\_ge\_\_}!pump.Cursor@{pump.Cursor}}
+\doxysubsubsection{\texorpdfstring{\_\_ge\_\_()}{\_\_ge\_\_()}}
+{\footnotesize\ttfamily \label{classpump_1_1_cursor_a905243f68d8d43c46febf0a534d6e818} 
+pump.\+Cursor.\+\_\+\+\_\+ge\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self}{, }\item[{}]{rhs}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pump_8py_source_l00110}{110}} of file \mbox{\hyperlink{pump_8py_source}{pump.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00110\ \ \ \textcolor{keyword}{def\ }\_\_ge\_\_(self,\ rhs):}
+\DoxyCodeLine{00111\ \ \ \ \ \textcolor{keywordflow}{return}\ rhs\ <=\ self}
+\DoxyCodeLine{00112\ }
+
+\end{DoxyCode}
+\Hypertarget{classpump_1_1_cursor_abd63ecd2e2f3c4c166d1cdbb32271e65}\index{pump.Cursor@{pump.Cursor}!\_\_gt\_\_@{\_\_gt\_\_}}
+\index{\_\_gt\_\_@{\_\_gt\_\_}!pump.Cursor@{pump.Cursor}}
+\doxysubsubsection{\texorpdfstring{\_\_gt\_\_()}{\_\_gt\_\_()}}
+{\footnotesize\ttfamily \label{classpump_1_1_cursor_abd63ecd2e2f3c4c166d1cdbb32271e65} 
+pump.\+Cursor.\+\_\+\+\_\+gt\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self}{, }\item[{}]{rhs}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pump_8py_source_l00107}{107}} of file \mbox{\hyperlink{pump_8py_source}{pump.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00107\ \ \ \textcolor{keyword}{def\ }\_\_gt\_\_(self,\ rhs):}
+\DoxyCodeLine{00108\ \ \ \ \ \textcolor{keywordflow}{return}\ rhs\ <\ self}
+\DoxyCodeLine{00109\ }
+
+\end{DoxyCode}
+\Hypertarget{classpump_1_1_cursor_a18831ec16c4757038316afa6a644e895}\index{pump.Cursor@{pump.Cursor}!\_\_le\_\_@{\_\_le\_\_}}
+\index{\_\_le\_\_@{\_\_le\_\_}!pump.Cursor@{pump.Cursor}}
+\doxysubsubsection{\texorpdfstring{\_\_le\_\_()}{\_\_le\_\_()}}
+{\footnotesize\ttfamily \label{classpump_1_1_cursor_a18831ec16c4757038316afa6a644e895} 
+pump.\+Cursor.\+\_\+\+\_\+le\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self}{, }\item[{}]{rhs}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pump_8py_source_l00104}{104}} of file \mbox{\hyperlink{pump_8py_source}{pump.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00104\ \ \ \textcolor{keyword}{def\ }\_\_le\_\_(self,\ rhs):}
+\DoxyCodeLine{00105\ \ \ \ \ \textcolor{keywordflow}{return}\ self\ <\ rhs\ \textcolor{keywordflow}{or}\ self\ ==\ rhs}
+\DoxyCodeLine{00106\ }
+
+\end{DoxyCode}
+\Hypertarget{classpump_1_1_cursor_a7ec8a30a836133d7654fcaf81250fc77}\index{pump.Cursor@{pump.Cursor}!\_\_lt\_\_@{\_\_lt\_\_}}
+\index{\_\_lt\_\_@{\_\_lt\_\_}!pump.Cursor@{pump.Cursor}}
+\doxysubsubsection{\texorpdfstring{\_\_lt\_\_()}{\_\_lt\_\_()}}
+{\footnotesize\ttfamily \label{classpump_1_1_cursor_a7ec8a30a836133d7654fcaf81250fc77} 
+pump.\+Cursor.\+\_\+\+\_\+lt\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self}{, }\item[{}]{rhs}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pump_8py_source_l00100}{100}} of file \mbox{\hyperlink{pump_8py_source}{pump.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00100\ \ \ \textcolor{keyword}{def\ }\_\_lt\_\_(self,\ rhs):}
+\DoxyCodeLine{00101\ \ \ \ \ \textcolor{keywordflow}{return}\ self.line\ <\ rhs.line\ \textcolor{keywordflow}{or}\ (}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ self.line\ ==\ rhs.line\ \textcolor{keywordflow}{and}\ self.column\ <\ rhs.column)}
+\DoxyCodeLine{00103\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classpump_1_1_cursor_a7ec8a30a836133d7654fcaf81250fc77_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classpump_1_1_cursor_a6480281fc3721fcd6430ed7294d978fb}\index{pump.Cursor@{pump.Cursor}!\_\_ne\_\_@{\_\_ne\_\_}}
+\index{\_\_ne\_\_@{\_\_ne\_\_}!pump.Cursor@{pump.Cursor}}
+\doxysubsubsection{\texorpdfstring{\_\_ne\_\_()}{\_\_ne\_\_()}}
+{\footnotesize\ttfamily \label{classpump_1_1_cursor_a6480281fc3721fcd6430ed7294d978fb} 
+pump.\+Cursor.\+\_\+\+\_\+ne\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self}{, }\item[{}]{rhs}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pump_8py_source_l00097}{97}} of file \mbox{\hyperlink{pump_8py_source}{pump.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00097\ \ \ \textcolor{keyword}{def\ }\_\_ne\_\_(self,\ rhs):}
+\DoxyCodeLine{00098\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keywordflow}{not}\ self\ ==\ rhs}
+\DoxyCodeLine{00099\ }
+
+\end{DoxyCode}
+\Hypertarget{classpump_1_1_cursor_afca901b5f22d9b2bfe207beccdec7dfa}\index{pump.Cursor@{pump.Cursor}!\_\_str\_\_@{\_\_str\_\_}}
+\index{\_\_str\_\_@{\_\_str\_\_}!pump.Cursor@{pump.Cursor}}
+\doxysubsubsection{\texorpdfstring{\_\_str\_\_()}{\_\_str\_\_()}}
+{\footnotesize\ttfamily \label{classpump_1_1_cursor_afca901b5f22d9b2bfe207beccdec7dfa} 
+pump.\+Cursor.\+\_\+\+\_\+str\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pump_8py_source_l00113}{113}} of file \mbox{\hyperlink{pump_8py_source}{pump.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00113\ \ \ \textcolor{keyword}{def\ }\_\_str\_\_(self):}
+\DoxyCodeLine{00114\ \ \ \ \ \textcolor{keywordflow}{if}\ self\ ==\ Eof():}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{'EOF'}}
+\DoxyCodeLine{00116\ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{'\%s(\%s)'}\ \%\ (self.line\ +\ 1,\ self.column)}
+\DoxyCodeLine{00118\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classpump_1_1_cursor_afca901b5f22d9b2bfe207beccdec7dfa_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classpump_1_1_cursor_a8a9a818d6c242243bc08641deb3b007d}\index{pump.Cursor@{pump.Cursor}!\_\_sub\_\_@{\_\_sub\_\_}}
+\index{\_\_sub\_\_@{\_\_sub\_\_}!pump.Cursor@{pump.Cursor}}
+\doxysubsubsection{\texorpdfstring{\_\_sub\_\_()}{\_\_sub\_\_()}}
+{\footnotesize\ttfamily \label{classpump_1_1_cursor_a8a9a818d6c242243bc08641deb3b007d} 
+pump.\+Cursor.\+\_\+\+\_\+sub\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self}{, }\item[{}]{offset}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pump_8py_source_l00122}{122}} of file \mbox{\hyperlink{pump_8py_source}{pump.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00122\ \ \ \textcolor{keyword}{def\ }\_\_sub\_\_(self,\ offset):}
+\DoxyCodeLine{00123\ \ \ \ \ \textcolor{keywordflow}{return}\ Cursor(self.line,\ self.column\ -\/\ offset)}
+\DoxyCodeLine{00124\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classpump_1_1_cursor_a8a9a818d6c242243bc08641deb3b007d_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classpump_1_1_cursor_ae5be3cd7be0409815feaa37cca01f0bf}\index{pump.Cursor@{pump.Cursor}!Clone@{Clone}}
+\index{Clone@{Clone}!pump.Cursor@{pump.Cursor}}
+\doxysubsubsection{\texorpdfstring{Clone()}{Clone()}}
+{\footnotesize\ttfamily \label{classpump_1_1_cursor_ae5be3cd7be0409815feaa37cca01f0bf} 
+pump.\+Cursor.\+Clone (\begin{DoxyParamCaption}\item[{}]{self}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Returns a copy of self.\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{pump_8py_source_l00125}{125}} of file \mbox{\hyperlink{pump_8py_source}{pump.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00125\ \ \ \textcolor{keyword}{def\ }Clone(self):}
+\DoxyCodeLine{00126\ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Returns\ a\ copy\ of\ self."{}"{}"{}}}
+\DoxyCodeLine{00127\ }
+\DoxyCodeLine{00128\ \ \ \ \ \textcolor{keywordflow}{return}\ Cursor(self.line,\ self.column)}
+\DoxyCodeLine{00129\ }
+\DoxyCodeLine{00130\ }
+\DoxyCodeLine{00131\ \textcolor{comment}{\#\ Special\ cursor\ to\ indicate\ the\ end-\/of-\/file.}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classpump_1_1_cursor_ae5be3cd7be0409815feaa37cca01f0bf_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classpump_1_1_cursor_ae73db76c3a845a82afb334633864254e}\index{pump.Cursor@{pump.Cursor}!column@{column}}
+\index{column@{column}!pump.Cursor@{pump.Cursor}}
+\doxysubsubsection{\texorpdfstring{column}{column}}
+{\footnotesize\ttfamily \label{classpump_1_1_cursor_ae73db76c3a845a82afb334633864254e} 
+pump.\+Cursor.\+column = column}
+
+
+
+Definition at line \mbox{\hyperlink{pump_8py_source_l00092}{92}} of file \mbox{\hyperlink{pump_8py_source}{pump.\+py}}.
+
+\Hypertarget{classpump_1_1_cursor_aee8d8b67360da7fc4e635540cb41d48c}\index{pump.Cursor@{pump.Cursor}!line@{line}}
+\index{line@{line}!pump.Cursor@{pump.Cursor}}
+\doxysubsubsection{\texorpdfstring{line}{line}}
+{\footnotesize\ttfamily \label{classpump_1_1_cursor_aee8d8b67360da7fc4e635540cb41d48c} 
+pump.\+Cursor.\+line = line}
+
+
+
+Definition at line \mbox{\hyperlink{pump_8py_source_l00091}{91}} of file \mbox{\hyperlink{pump_8py_source}{pump.\+py}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/scripts/\mbox{\hyperlink{pump_8py}{pump.\+py}}\end{DoxyCompactItemize}

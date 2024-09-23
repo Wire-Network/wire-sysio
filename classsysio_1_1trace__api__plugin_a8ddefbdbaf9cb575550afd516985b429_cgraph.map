@@ -1,0 +1,13 @@
+<map id="sysio::trace_api_plugin::plugin_startup" name="sysio::trace_api_plugin::plugin_startup">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,23,160,64"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1trace__api__plugin.html#aca24a14fa319b5bed80374e065c4302f" title=" " alt="" coords="208,23,362,64"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="160,41,192,41,192,46,160,46"/>
+<area shape="rect" id="Node000003" href="$namespacesysio.html#ad66b67a8dd0a897a0a5b89f954fd3ade" title=" " alt="" coords="410,5,544,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="362,31,394,26,395,32,363,36"/>
+<area shape="rect" id="Node000004" href="$classfc_1_1logger.html#a2214632598874a4e52a5500a6346515e" title=" " alt="" coords="416,55,538,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="363,50,401,55,400,61,362,56"/>
+<area shape="rect" id="Node000005" href="$classfc_1_1logger.html#ad8267d78496b4a3241148afd11fa2e03" title=" " alt="" coords="608,25,723,51"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="538,55,592,47,593,52,539,61"/>
+<area shape="rect" id="Node000006" href="$structfc_1_1log__config.html#ad7c05723f767652011149945ae0308e1" title=" " alt="" coords="592,75,739,116"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="539,74,577,80,576,85,538,79"/>
+</map>

@@ -1,0 +1,72 @@
+\doxysection{gtest-\/typed-\/test\+\_\+test.h}
+\hypertarget{gtest-typed-test__test_8h_source}{}\label{gtest-typed-test__test_8h_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/test/gtest-\/typed-\/test\_test.h@{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/test/gtest-\/typed-\/test\_test.h}}
+\mbox{\hyperlink{gtest-typed-test__test_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00001}00001\ \textcolor{comment}{//\ Copyright\ 2008\ Google\ Inc.}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00002}00002\ \textcolor{comment}{//\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00003}00003\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00004}00004\ \textcolor{comment}{//\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00005}00005\ \textcolor{comment}{//\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00006}00006\ \textcolor{comment}{//\ met:}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00007}00007\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00008}00008\ \textcolor{comment}{//\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00009}00009\ \textcolor{comment}{//\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00010}00010\ \textcolor{comment}{//\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00011}00011\ \textcolor{comment}{//\ copyright\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00012}00012\ \textcolor{comment}{//\ in\ the\ documentation\ and/or\ other\ materials\ provided\ with\ the}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00013}00013\ \textcolor{comment}{//\ distribution.}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00014}00014\ \textcolor{comment}{//\ \ \ \ \ *\ Neither\ the\ name\ of\ Google\ Inc.\ nor\ the\ names\ of\ its}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00015}00015\ \textcolor{comment}{//\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products\ derived\ from}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00016}00016\ \textcolor{comment}{//\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00017}00017\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00018}00018\ \textcolor{comment}{//\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00019}00019\ \textcolor{comment}{//\ "{}AS\ IS"{}\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00020}00020\ \textcolor{comment}{//\ LIMITED\ TO,\ THE\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00021}00021\ \textcolor{comment}{//\ A\ PARTICULAR\ PURPOSE\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ THE\ COPYRIGHT}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00022}00022\ \textcolor{comment}{//\ OWNER\ OR\ CONTRIBUTORS\ BE\ LIABLE\ FOR\ ANY\ DIRECT,\ INDIRECT,\ INCIDENTAL,}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00023}00023\ \textcolor{comment}{//\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES\ (INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00024}00024\ \textcolor{comment}{//\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;\ LOSS\ OF\ USE,}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00025}00025\ \textcolor{comment}{//\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND\ ON\ ANY}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00026}00026\ \textcolor{comment}{//\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00027}00027\ \textcolor{comment}{//\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00028}00028\ \textcolor{comment}{//\ OF\ THIS\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00029}00029\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00030}00030\ \textcolor{comment}{//\ Author:\ wan@google.com\ (Zhanyong\ Wan)}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00032}00032\ \textcolor{preprocessor}{\#ifndef\ GTEST\_TEST\_GTEST\_TYPED\_TEST\_TEST\_H\_}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00033}00033\ \textcolor{preprocessor}{\#define\ GTEST\_TEST\_GTEST\_TYPED\_TEST\_TEST\_H\_}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00035}00035\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{gtest_8h}{gtest/gtest.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00037}00037\ \textcolor{preprocessor}{\#if\ GTEST\_HAS\_TYPED\_TEST\_P}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00039}00039\ \textcolor{keyword}{using\ }\mbox{\hyperlink{classtesting_1_1_test}{testing::Test}};}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00041}00041\ \textcolor{comment}{//\ For\ testing\ that\ the\ same\ type-\/parameterized\ test\ case\ can\ be}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00042}00042\ \textcolor{comment}{//\ instantiated\ in\ different\ translation\ units\ linked\ together.}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00043}00043\ \textcolor{comment}{//\ ContainerTest\ will\ be\ instantiated\ in\ both\ gtest-\/typed-\/test\_test.cc}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00044}00044\ \textcolor{comment}{//\ and\ gtest-\/typed-\/test2\_test.cc.}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00046}00046\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00047}00047\ \textcolor{keyword}{class\ }ContainerTest\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{class_test}{Test}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00048}00048\ \};}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00050}00050\ \mbox{\hyperlink{gtest__list__tests__unittest___8cc_a8f36af28829ba875ca3675b4054f48b6}{TYPED\_TEST\_CASE\_P}}(ContainerTest);}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00052}00052\ \mbox{\hyperlink{gtest__list__tests__unittest___8cc_aadd51dfff9d63b5e0faa0130697684c1}{TYPED\_TEST\_P}}(ContainerTest,\ CanBeDefaultConstructed)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00053}00053\ \ \ TypeParam\ container;}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00054}00054\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00056}00056\ \mbox{\hyperlink{gtest__list__tests__unittest___8cc_aadd51dfff9d63b5e0faa0130697684c1}{TYPED\_TEST\_P}}(ContainerTest,\ InitialSizeIsZero)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00057}00057\ \ \ TypeParam\ container;}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00058}00058\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0\mbox{\hyperlink{union_u}{U}},\ container.size());}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00059}00059\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00061}00061\ \mbox{\hyperlink{gtest__list__tests__unittest___8cc_a3316a9dc1c581f96a50ec10e0c116e5c}{REGISTER\_TYPED\_TEST\_CASE\_P}}(ContainerTest,}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00062}00062\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ CanBeDefaultConstructed,\ InitialSizeIsZero);}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00064}00064\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_HAS\_TYPED\_TEST\_P}}
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{gtest-typed-test__test_8h_source_l00066}00066\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_TEST\_GTEST\_TYPED\_TEST\_TEST\_H\_}}
+
+\end{DoxyCode}

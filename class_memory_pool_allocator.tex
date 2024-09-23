@@ -1,0 +1,391 @@
+\doxysection{Memory\+Pool\+Allocator\texorpdfstring{$<$}{<} Base\+Allocator \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{class_memory_pool_allocator}{}\label{class_memory_pool_allocator}\index{MemoryPoolAllocator$<$ BaseAllocator $>$@{MemoryPoolAllocator$<$ BaseAllocator $>$}}
+
+
+Default memory allocator used by the parser and DOM.  
+
+
+
+
+{\ttfamily \#include $<$allocators.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_memory_pool_allocator_aeec85ac657f242ac5620115141be5209}{Memory\+Pool\+Allocator}} (size\+\_\+t chunk\+Size=k\+Default\+Chunk\+Capacity, Base\+Allocator \texorpdfstring{$\ast$}{*}base\+Allocator=0)
+\begin{DoxyCompactList}\small\item\em Constructor with chunk\+Size. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_memory_pool_allocator_a1f0d865093fdb955d956b7a445a8ddbf}{Memory\+Pool\+Allocator}} (void \texorpdfstring{$\ast$}{*}buffer, size\+\_\+t size, size\+\_\+t chunk\+Size=k\+Default\+Chunk\+Capacity, Base\+Allocator \texorpdfstring{$\ast$}{*}base\+Allocator=0)
+\begin{DoxyCompactList}\small\item\em Constructor with user-\/supplied buffer. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_memory_pool_allocator_ad4eee0ef3cfe8cda31034fbce98b7a9b}{\texorpdfstring{$\sim$}{\string~}\+Memory\+Pool\+Allocator}} ()
+\begin{DoxyCompactList}\small\item\em Destructor. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_memory_pool_allocator_a57bbc80e570db6110901b9a7e36dbda0}{Clear}} ()
+\begin{DoxyCompactList}\small\item\em Deallocates all memory chunks, excluding the user-\/supplied buffer. \end{DoxyCompactList}\item 
+size\+\_\+t \mbox{\hyperlink{class_memory_pool_allocator_a5672e0833fda2e71ce987911397489ed}{Capacity}} () const
+\begin{DoxyCompactList}\small\item\em Computes the total capacity of allocated memory chunks. \end{DoxyCompactList}\item 
+size\+\_\+t \mbox{\hyperlink{class_memory_pool_allocator_ae7fcf0341c13e899cf488bc7c8949956}{Size}} () const
+\begin{DoxyCompactList}\small\item\em Computes the memory blocks allocated. \end{DoxyCompactList}\item 
+void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_memory_pool_allocator_a8d300531c1f556172aef1259ff55cb48}{Malloc}} (size\+\_\+t size)
+\begin{DoxyCompactList}\small\item\em Allocates a memory block. (concept Allocator) \end{DoxyCompactList}\item 
+void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_memory_pool_allocator_a7c273279d361b207ff622d4bdfc63074}{Realloc}} (void \texorpdfstring{$\ast$}{*}original\+Ptr, size\+\_\+t original\+Size, size\+\_\+t new\+Size)
+\begin{DoxyCompactList}\small\item\em Resizes a memory block (concept Allocator) \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static void \mbox{\hyperlink{class_memory_pool_allocator_a6b180eb150451b4df8b70d827cd1191c}{Free}} (void \texorpdfstring{$\ast$}{*}ptr)
+\begin{DoxyCompactList}\small\item\em Frees a memory block (concept Allocator) \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static const bool \mbox{\hyperlink{class_memory_pool_allocator_ab4c7c5c631e451689bc9da392a65194f}{k\+Need\+Free}} = false
+\begin{DoxyCompactList}\small\item\em Tell users that no need to call \doxylink{class_memory_pool_allocator_a6b180eb150451b4df8b70d827cd1191c}{Free()} with this allocator. (concept Allocator) \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Base\+Allocator = Crt\+Allocator$>$\newline
+class Memory\+Pool\+Allocator$<$ Base\+Allocator $>$}
+This allocator allocate memory blocks from pre-\/allocated memory chunks.
+
+It does not free memory blocks. And \doxylink{class_memory_pool_allocator_a7c273279d361b207ff622d4bdfc63074}{Realloc()} only allocate new memory.
+
+The memory chunks are allocated by Base\+Allocator, which is \doxylink{class_crt_allocator}{Crt\+Allocator} by default.
+
+User may also supply a buffer as the first chunk.
+
+If the user-\/buffer is full then additional chunks are allocated by Base\+Allocator.
+
+The user-\/buffer is not deallocated by this allocator.
+
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em Base\+Allocator} & the allocator type for allocating memory chunks. Default is \doxylink{class_crt_allocator}{Crt\+Allocator}. \\
+\hline
+\end{DoxyTemplParams}
+\begin{DoxyNote}{Note}
+implements Allocator concept 
+\end{DoxyNote}
+
+
+Definition at line \mbox{\hyperlink{allocators_8h_source_l00115}{115}} of file \mbox{\hyperlink{allocators_8h_source}{allocators.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_memory_pool_allocator_aeec85ac657f242ac5620115141be5209}\index{MemoryPoolAllocator$<$ BaseAllocator $>$@{MemoryPoolAllocator$<$ BaseAllocator $>$}!MemoryPoolAllocator@{MemoryPoolAllocator}}
+\index{MemoryPoolAllocator@{MemoryPoolAllocator}!MemoryPoolAllocator$<$ BaseAllocator $>$@{MemoryPoolAllocator$<$ BaseAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{MemoryPoolAllocator()}{MemoryPoolAllocator()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_memory_pool_allocator_aeec85ac657f242ac5620115141be5209} 
+template$<$typename Base\+Allocator  = Crt\+Allocator$>$ \\
+\mbox{\hyperlink{class_memory_pool_allocator}{Memory\+Pool\+Allocator}}$<$ Base\+Allocator $>$\mbox{\hyperlink{class_memory_pool_allocator}{\+::\+Memory\+Pool\+Allocator}} (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{chunk\+Size}{ = {\ttfamily kDefaultChunkCapacity}, }\item[{Base\+Allocator \texorpdfstring{$\ast$}{*}}]{base\+Allocator}{ = {\ttfamily 0}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+\begin{DoxyParams}{Parameters}
+{\em chunk\+Size} & The size of memory chunk. The default is k\+Default\+Chunk\+Size. \\
+\hline
+{\em base\+Allocator} & The allocator for allocating memory chunks. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{allocators_8h_source_l00123}{123}} of file \mbox{\hyperlink{allocators_8h_source}{allocators.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ }
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ chunkHead\_(0),\ chunk\_capacity\_(chunkSize),\ userBuffer\_(0),\ baseAllocator\_(baseAllocator),\ ownBaseAllocator\_(0)}
+\DoxyCodeLine{00125\ \ \ \ \ \{}
+\DoxyCodeLine{00126\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_memory_pool_allocator_a1f0d865093fdb955d956b7a445a8ddbf}\index{MemoryPoolAllocator$<$ BaseAllocator $>$@{MemoryPoolAllocator$<$ BaseAllocator $>$}!MemoryPoolAllocator@{MemoryPoolAllocator}}
+\index{MemoryPoolAllocator@{MemoryPoolAllocator}!MemoryPoolAllocator$<$ BaseAllocator $>$@{MemoryPoolAllocator$<$ BaseAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{MemoryPoolAllocator()}{MemoryPoolAllocator()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_memory_pool_allocator_a1f0d865093fdb955d956b7a445a8ddbf} 
+template$<$typename Base\+Allocator  = Crt\+Allocator$>$ \\
+\mbox{\hyperlink{class_memory_pool_allocator}{Memory\+Pool\+Allocator}}$<$ Base\+Allocator $>$\mbox{\hyperlink{class_memory_pool_allocator}{\+::\+Memory\+Pool\+Allocator}} (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{buffer}{, }\item[{size\+\_\+t}]{size}{, }\item[{size\+\_\+t}]{chunk\+Size}{ = {\ttfamily kDefaultChunkCapacity}, }\item[{Base\+Allocator \texorpdfstring{$\ast$}{*}}]{base\+Allocator}{ = {\ttfamily 0}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+The user buffer will be used firstly. When it is full, memory pool allocates new chunk with chunk size.
+
+The user buffer will not be deallocated when this allocator is destructed.
+
+
+\begin{DoxyParams}{Parameters}
+{\em buffer} & User supplied buffer. \\
+\hline
+{\em size} & Size of the buffer in bytes. It must at least larger than sizeof(\+Chunk\+Header). \\
+\hline
+{\em chunk\+Size} & The size of memory chunk. The default is k\+Default\+Chunk\+Size. \\
+\hline
+{\em base\+Allocator} & The allocator for allocating memory chunks. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{allocators_8h_source_l00138}{138}} of file \mbox{\hyperlink{allocators_8h_source}{allocators.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ chunkHead\_(0),\ chunk\_capacity\_(chunkSize),\ userBuffer\_(buffer),\ baseAllocator\_(baseAllocator),\ ownBaseAllocator\_(0)}
+\DoxyCodeLine{00140\ \ \ \ \ \{}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(buffer\ !=\ 0);}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(size\ >\ \textcolor{keyword}{sizeof}(ChunkHeader));}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ chunkHead\_\ =\ \textcolor{keyword}{reinterpret\_cast<}ChunkHeader*\textcolor{keyword}{>}(buffer);}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ chunkHead\_-\/>capacity\ =\ size\ -\/\ \textcolor{keyword}{sizeof}(ChunkHeader);}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ chunkHead\_-\/>size\ =\ 0;}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ chunkHead\_-\/>next\ =\ 0;}
+\DoxyCodeLine{00147\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_memory_pool_allocator_ad4eee0ef3cfe8cda31034fbce98b7a9b}\index{MemoryPoolAllocator$<$ BaseAllocator $>$@{MemoryPoolAllocator$<$ BaseAllocator $>$}!````~MemoryPoolAllocator@{\texorpdfstring{$\sim$}{\string~}MemoryPoolAllocator}}
+\index{````~MemoryPoolAllocator@{\texorpdfstring{$\sim$}{\string~}MemoryPoolAllocator}!MemoryPoolAllocator$<$ BaseAllocator $>$@{MemoryPoolAllocator$<$ BaseAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}MemoryPoolAllocator()}{\string~MemoryPoolAllocator()}}
+{\footnotesize\ttfamily \label{class_memory_pool_allocator_ad4eee0ef3cfe8cda31034fbce98b7a9b} 
+template$<$typename Base\+Allocator  = Crt\+Allocator$>$ \\
+\mbox{\hyperlink{class_memory_pool_allocator}{Memory\+Pool\+Allocator}}$<$ Base\+Allocator $>$\+::\texorpdfstring{$\sim$}{\string~}\mbox{\hyperlink{class_memory_pool_allocator}{Memory\+Pool\+Allocator}} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+This deallocates all memory chunks, excluding the user-\/supplied buffer. 
+
+Definition at line \mbox{\hyperlink{allocators_8h_source_l00152}{152}} of file \mbox{\hyperlink{allocators_8h_source}{allocators.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_memory_pool_allocator_a57bbc80e570db6110901b9a7e36dbda0}{Clear}}();}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_a52c941c3fdd646527cdcd42aa846a28a}{RAPIDJSON\_DELETE}}(ownBaseAllocator\_);}
+\DoxyCodeLine{00155\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=346pt]{class_memory_pool_allocator_ad4eee0ef3cfe8cda31034fbce98b7a9b_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_memory_pool_allocator_a5672e0833fda2e71ce987911397489ed}\index{MemoryPoolAllocator$<$ BaseAllocator $>$@{MemoryPoolAllocator$<$ BaseAllocator $>$}!Capacity@{Capacity}}
+\index{Capacity@{Capacity}!MemoryPoolAllocator$<$ BaseAllocator $>$@{MemoryPoolAllocator$<$ BaseAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{Capacity()}{Capacity()}}
+{\footnotesize\ttfamily \label{class_memory_pool_allocator_a5672e0833fda2e71ce987911397489ed} 
+template$<$typename Base\+Allocator  = Crt\+Allocator$>$ \\
+size\+\_\+t \mbox{\hyperlink{class_memory_pool_allocator}{Memory\+Pool\+Allocator}}$<$ Base\+Allocator $>$\+::\+Capacity (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+\begin{DoxyReturn}{Returns}
+total capacity in bytes. 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{allocators_8h_source_l00171}{171}} of file \mbox{\hyperlink{allocators_8h_source}{allocators.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ capacity\ =\ 0;}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (ChunkHeader*\ c\ =\ chunkHead\_;\ c\ !=\ 0;\ c\ =\ c-\/>next)}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ \ \ \ \ capacity\ +=\ c-\/>capacity;}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ capacity;}
+\DoxyCodeLine{00176\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=267pt]{class_memory_pool_allocator_a5672e0833fda2e71ce987911397489ed_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_memory_pool_allocator_a57bbc80e570db6110901b9a7e36dbda0}\index{MemoryPoolAllocator$<$ BaseAllocator $>$@{MemoryPoolAllocator$<$ BaseAllocator $>$}!Clear@{Clear}}
+\index{Clear@{Clear}!MemoryPoolAllocator$<$ BaseAllocator $>$@{MemoryPoolAllocator$<$ BaseAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{Clear()}{Clear()}}
+{\footnotesize\ttfamily \label{class_memory_pool_allocator_a57bbc80e570db6110901b9a7e36dbda0} 
+template$<$typename Base\+Allocator  = Crt\+Allocator$>$ \\
+void \mbox{\hyperlink{class_memory_pool_allocator}{Memory\+Pool\+Allocator}}$<$ Base\+Allocator $>$\+::\+Clear (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{allocators_8h_source_l00158}{158}} of file \mbox{\hyperlink{allocators_8h_source}{allocators.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (chunkHead\_\ \&\&\ chunkHead\_\ !=\ userBuffer\_)\ \{}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \ \ \ \ ChunkHeader*\ \mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}}\ =\ chunkHead\_-\/>next;}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \ \ \ \ baseAllocator\_-\/>Free(chunkHead\_);}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \ \ \ \ \ \ chunkHead\_\ =\ \mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}};}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (chunkHead\_\ \&\&\ chunkHead\_\ ==\ userBuffer\_)}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \ \ \ \ chunkHead\_-\/>size\ =\ 0;\ \textcolor{comment}{//\ Clear\ user\ buffer}}
+\DoxyCodeLine{00166\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=346pt]{class_memory_pool_allocator_a57bbc80e570db6110901b9a7e36dbda0_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_memory_pool_allocator_a6b180eb150451b4df8b70d827cd1191c}\index{MemoryPoolAllocator$<$ BaseAllocator $>$@{MemoryPoolAllocator$<$ BaseAllocator $>$}!Free@{Free}}
+\index{Free@{Free}!MemoryPoolAllocator$<$ BaseAllocator $>$@{MemoryPoolAllocator$<$ BaseAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{Free()}{Free()}}
+{\footnotesize\ttfamily \label{class_memory_pool_allocator_a6b180eb150451b4df8b70d827cd1191c} 
+template$<$typename Base\+Allocator  = Crt\+Allocator$>$ \\
+static void \mbox{\hyperlink{class_memory_pool_allocator}{Memory\+Pool\+Allocator}}$<$ Base\+Allocator $>$\+::\+Free (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{ptr}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{allocators_8h_source_l00238}{238}} of file \mbox{\hyperlink{allocators_8h_source}{allocators.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00238\ \{\ (void)ptr;\ \}\ \textcolor{comment}{//\ Do\ nothing}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_memory_pool_allocator_a6b180eb150451b4df8b70d827cd1191c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_memory_pool_allocator_a8d300531c1f556172aef1259ff55cb48}\index{MemoryPoolAllocator$<$ BaseAllocator $>$@{MemoryPoolAllocator$<$ BaseAllocator $>$}!Malloc@{Malloc}}
+\index{Malloc@{Malloc}!MemoryPoolAllocator$<$ BaseAllocator $>$@{MemoryPoolAllocator$<$ BaseAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{Malloc()}{Malloc()}}
+{\footnotesize\ttfamily \label{class_memory_pool_allocator_a8d300531c1f556172aef1259ff55cb48} 
+template$<$typename Base\+Allocator  = Crt\+Allocator$>$ \\
+void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_memory_pool_allocator}{Memory\+Pool\+Allocator}}$<$ Base\+Allocator $>$\+::\+Malloc (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{size}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{allocators_8h_source_l00189}{189}} of file \mbox{\hyperlink{allocators_8h_source}{allocators.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!size)}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ NULL;}
+\DoxyCodeLine{00192\ }
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \ \ size\ =\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_ga583915242504c7fdb36e826f02f76242}{RAPIDJSON\_ALIGN}}(size);}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (chunkHead\_\ ==\ 0\ ||\ chunkHead\_-\/>size\ +\ size\ >\ chunkHead\_-\/>capacity)}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!AddChunk(chunk\_capacity\_\ >\ size\ ?\ chunk\_capacity\_\ :\ size))}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ NULL;}
+\DoxyCodeLine{00197\ }
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ *buffer\ =\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{char}\ *\textcolor{keyword}{>}(chunkHead\_)\ +\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_ga583915242504c7fdb36e826f02f76242}{RAPIDJSON\_ALIGN}}(\textcolor{keyword}{sizeof}(ChunkHeader))\ +\ chunkHead\_-\/>size;}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ chunkHead\_-\/>size\ +=\ size;}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ buffer;}
+\DoxyCodeLine{00201\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=334pt]{class_memory_pool_allocator_a8d300531c1f556172aef1259ff55cb48_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_memory_pool_allocator_a7c273279d361b207ff622d4bdfc63074}\index{MemoryPoolAllocator$<$ BaseAllocator $>$@{MemoryPoolAllocator$<$ BaseAllocator $>$}!Realloc@{Realloc}}
+\index{Realloc@{Realloc}!MemoryPoolAllocator$<$ BaseAllocator $>$@{MemoryPoolAllocator$<$ BaseAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{Realloc()}{Realloc()}}
+{\footnotesize\ttfamily \label{class_memory_pool_allocator_a7c273279d361b207ff622d4bdfc63074} 
+template$<$typename Base\+Allocator  = Crt\+Allocator$>$ \\
+void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_memory_pool_allocator}{Memory\+Pool\+Allocator}}$<$ Base\+Allocator $>$\+::\+Realloc (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{original\+Ptr}{, }\item[{size\+\_\+t}]{original\+Size}{, }\item[{size\+\_\+t}]{new\+Size}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{allocators_8h_source_l00204}{204}} of file \mbox{\hyperlink{allocators_8h_source}{allocators.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (originalPtr\ ==\ 0)}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_memory_pool_allocator_a8d300531c1f556172aef1259ff55cb48}{Malloc}}(newSize);}
+\DoxyCodeLine{00207\ }
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (newSize\ ==\ 0)}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ NULL;}
+\DoxyCodeLine{00210\ }
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \ \ originalSize\ =\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_ga583915242504c7fdb36e826f02f76242}{RAPIDJSON\_ALIGN}}(originalSize);}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \ \ newSize\ =\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_ga583915242504c7fdb36e826f02f76242}{RAPIDJSON\_ALIGN}}(newSize);}
+\DoxyCodeLine{00213\ }
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Do\ not\ shrink\ if\ new\ size\ is\ smaller\ than\ original}}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (originalSize\ >=\ newSize)}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ originalPtr;}
+\DoxyCodeLine{00217\ }
+\DoxyCodeLine{00218\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Simply\ expand\ it\ if\ it\ is\ the\ last\ allocation\ and\ there\ is\ sufficient\ space}}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (originalPtr\ ==\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{char}\ *\textcolor{keyword}{>}(chunkHead\_)\ +\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_ga583915242504c7fdb36e826f02f76242}{RAPIDJSON\_ALIGN}}(\textcolor{keyword}{sizeof}(ChunkHeader))\ +\ chunkHead\_-\/>size\ -\/\ originalSize)\ \{}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ increment\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(newSize\ -\/\ originalSize);}
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (chunkHead\_-\/>size\ +\ increment\ <=\ chunkHead\_-\/>capacity)\ \{}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ chunkHead\_-\/>size\ +=\ increment;}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ originalPtr;}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00226\ }
+\DoxyCodeLine{00227\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Realloc\ process:\ allocate\ and\ copy\ memory,\ do\ not\ free\ original\ buffer.}}
+\DoxyCodeLine{00228\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keywordtype}{void}*\ newBuffer\ =\ \mbox{\hyperlink{class_memory_pool_allocator_a8d300531c1f556172aef1259ff55cb48}{Malloc}}(newSize))\ \{}
+\DoxyCodeLine{00229\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (originalSize)}
+\DoxyCodeLine{00230\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::memcpy(newBuffer,\ originalPtr,\ originalSize);}
+\DoxyCodeLine{00231\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ newBuffer;}
+\DoxyCodeLine{00232\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00233\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00234\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ NULL;}
+\DoxyCodeLine{00235\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=334pt]{class_memory_pool_allocator_a7c273279d361b207ff622d4bdfc63074_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_memory_pool_allocator_ae7fcf0341c13e899cf488bc7c8949956}\index{MemoryPoolAllocator$<$ BaseAllocator $>$@{MemoryPoolAllocator$<$ BaseAllocator $>$}!Size@{Size}}
+\index{Size@{Size}!MemoryPoolAllocator$<$ BaseAllocator $>$@{MemoryPoolAllocator$<$ BaseAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{Size()}{Size()}}
+{\footnotesize\ttfamily \label{class_memory_pool_allocator_ae7fcf0341c13e899cf488bc7c8949956} 
+template$<$typename Base\+Allocator  = Crt\+Allocator$>$ \\
+size\+\_\+t \mbox{\hyperlink{class_memory_pool_allocator}{Memory\+Pool\+Allocator}}$<$ Base\+Allocator $>$\+::\+Size (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+\begin{DoxyReturn}{Returns}
+total used bytes. 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{allocators_8h_source_l00181}{181}} of file \mbox{\hyperlink{allocators_8h_source}{allocators.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ size\ =\ 0;}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (ChunkHeader*\ c\ =\ chunkHead\_;\ c\ !=\ 0;\ c\ =\ c-\/>next)}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ \ \ \ \ size\ +=\ c-\/>size;}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ size;}
+\DoxyCodeLine{00186\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=267pt]{class_memory_pool_allocator_ae7fcf0341c13e899cf488bc7c8949956_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{class_memory_pool_allocator_ab4c7c5c631e451689bc9da392a65194f}\index{MemoryPoolAllocator$<$ BaseAllocator $>$@{MemoryPoolAllocator$<$ BaseAllocator $>$}!kNeedFree@{kNeedFree}}
+\index{kNeedFree@{kNeedFree}!MemoryPoolAllocator$<$ BaseAllocator $>$@{MemoryPoolAllocator$<$ BaseAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{kNeedFree}{kNeedFree}}
+{\footnotesize\ttfamily \label{class_memory_pool_allocator_ab4c7c5c631e451689bc9da392a65194f} 
+template$<$typename Base\+Allocator  = Crt\+Allocator$>$ \\
+const bool \mbox{\hyperlink{class_memory_pool_allocator}{Memory\+Pool\+Allocator}}$<$ Base\+Allocator $>$\+::k\+Need\+Free = false\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{allocators_8h_source_l00117}{117}} of file \mbox{\hyperlink{allocators_8h_source}{allocators.\+h}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/\mbox{\hyperlink{allocators_8h}{allocators.\+h}}\end{DoxyCompactItemize}

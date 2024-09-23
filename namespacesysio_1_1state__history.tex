@@ -1,0 +1,396 @@
+\doxysection{sysio\+::state\+\_\+history Namespace Reference}
+\hypertarget{namespacesysio_1_1state__history}{}\label{namespacesysio_1_1state__history}\index{sysio::state\_history@{sysio::state\_history}}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1state__history_1_1augmented__transaction__trace}{augmented\+\_\+transaction\+\_\+trace}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1state__history_1_1big__vector__wrapper}{big\+\_\+vector\+\_\+wrapper}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1state__history_1_1block__position}{block\+\_\+position}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1state__history_1_1get__blocks__ack__request__v0}{get\+\_\+blocks\+\_\+ack\+\_\+request\+\_\+v0}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1state__history_1_1get__blocks__request__v0}{get\+\_\+blocks\+\_\+request\+\_\+v0}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1state__history_1_1get__blocks__result__v0}{get\+\_\+blocks\+\_\+result\+\_\+v0}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1state__history_1_1get__status__request__v0}{get\+\_\+status\+\_\+request\+\_\+v0}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1state__history_1_1get__status__result__v0}{get\+\_\+status\+\_\+result\+\_\+v0}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1state__history_1_1partial__transaction}{partial\+\_\+transaction}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1state__history_1_1table__delta}{table\+\_\+delta}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1state__history_1_1trace__converter}{trace\+\_\+converter}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1state__history_a0e788deef6248a86a8620bdbf4dea020}{state\+\_\+request}} = std\+::variant$<$\mbox{\hyperlink{structsysio_1_1state__history_1_1get__status__request__v0}{get\+\_\+status\+\_\+request\+\_\+v0}}, \mbox{\hyperlink{structsysio_1_1state__history_1_1get__blocks__request__v0}{get\+\_\+blocks\+\_\+request\+\_\+v0}}, \mbox{\hyperlink{structsysio_1_1state__history_1_1get__blocks__ack__request__v0}{get\+\_\+blocks\+\_\+ack\+\_\+request\+\_\+v0}}$>$
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1state__history_a7c0ebdf566e085620947b3981fb324ec}{state\+\_\+result}} = std\+::variant$<$\mbox{\hyperlink{structsysio_1_1state__history_1_1get__status__result__v0}{get\+\_\+status\+\_\+result\+\_\+v0}}, \mbox{\hyperlink{structsysio_1_1state__history_1_1get__blocks__result__v0}{get\+\_\+blocks\+\_\+result\+\_\+v0}}$>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_ac6f5a1f1e061f000983f5d5f3ac25dfa}{bytes}} \mbox{\hyperlink{namespacesysio_1_1state__history_a56d6b703f34519b5d085529ebd120d29}{zlib\+\_\+compress\+\_\+bytes}} (const \mbox{\hyperlink{namespacesysio_1_1chain_ac6f5a1f1e061f000983f5d5f3ac25dfa}{bytes}} \&in)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_ac6f5a1f1e061f000983f5d5f3ac25dfa}{bytes}} \mbox{\hyperlink{namespacesysio_1_1state__history_a81fbdf52169b3b2295f3911729f09142}{zlib\+\_\+decompress}} (const \mbox{\hyperlink{namespacesysio_1_1chain_ac6f5a1f1e061f000983f5d5f3ac25dfa}{bytes}} \&in)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\bool \mbox{\hyperlink{namespacesysio_1_1state__history_a7297e6b09d82cabc24f7231b09fdf14a}{include\+\_\+delta}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&old, const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&curr)
+\item 
+bool \mbox{\hyperlink{namespacesysio_1_1state__history_a9aa62de9d68ebae6a40816a55b928e07}{include\+\_\+delta}} (const \mbox{\hyperlink{classsysio_1_1chain_1_1table__id__object}{chain\+::table\+\_\+id\+\_\+object}} \&old, const \mbox{\hyperlink{classsysio_1_1chain_1_1table__id__object}{chain\+::table\+\_\+id\+\_\+object}} \&curr)
+\item 
+bool \mbox{\hyperlink{namespacesysio_1_1state__history_ab398df574c5103e7fd21debde64ec0ee}{include\+\_\+delta}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1resource__limits__object}{chain\+::resource\+\_\+limits\+::resource\+\_\+limits\+\_\+object}} \&old, const \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1resource__limits__object}{chain\+::resource\+\_\+limits\+::resource\+\_\+limits\+\_\+object}} \&curr)
+\item 
+bool \mbox{\hyperlink{namespacesysio_1_1state__history_ab354d08ce3577c51e35780853ec6b25f}{include\+\_\+delta}} (const \mbox{\hyperlink{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__state__object}{chain\+::resource\+\_\+limits\+::resource\+\_\+limits\+\_\+state\+\_\+object}} \&old, const \mbox{\hyperlink{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__state__object}{chain\+::resource\+\_\+limits\+::resource\+\_\+limits\+\_\+state\+\_\+object}} \&curr)
+\item 
+bool \mbox{\hyperlink{namespacesysio_1_1state__history_a58921fbf0e9665770c7b3a695d2df8cd}{include\+\_\+delta}} (const \mbox{\hyperlink{classsysio_1_1chain_1_1account__metadata__object}{chain\+::account\+\_\+metadata\+\_\+object}} \&old, const \mbox{\hyperlink{classsysio_1_1chain_1_1account__metadata__object}{chain\+::account\+\_\+metadata\+\_\+object}} \&curr)
+\item 
+bool \mbox{\hyperlink{namespacesysio_1_1state__history_a0a3e79f324afc8a501a9778d80cec968}{include\+\_\+delta}} (const \mbox{\hyperlink{classsysio_1_1chain_1_1code__object}{chain\+::code\+\_\+object}} \&old, const \mbox{\hyperlink{classsysio_1_1chain_1_1code__object}{chain\+::code\+\_\+object}} \&curr)
+\item 
+bool \mbox{\hyperlink{namespacesysio_1_1state__history_ad7e684e78494225a5ea390d4a2cb88db}{include\+\_\+delta}} (const \mbox{\hyperlink{classsysio_1_1chain_1_1protocol__state__object}{chain\+::protocol\+\_\+state\+\_\+object}} \&old, const \mbox{\hyperlink{classsysio_1_1chain_1_1protocol__state__object}{chain\+::protocol\+\_\+state\+\_\+object}} \&curr)
+\item 
+std\+::vector$<$ \mbox{\hyperlink{structsysio_1_1state__history_1_1table__delta}{table\+\_\+delta}} $>$ \mbox{\hyperlink{namespacesysio_1_1state__history_a4672b7cf25419ada24cf1366ef85687d}{create\+\_\+deltas}} (const \mbox{\hyperlink{classchainbase_1_1database}{chainbase\+::database}} \&db, bool full\+\_\+snapshot)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{namespacesysio_1_1state__history_a0e788deef6248a86a8620bdbf4dea020}\index{sysio::state\_history@{sysio::state\_history}!state\_request@{state\_request}}
+\index{state\_request@{state\_request}!sysio::state\_history@{sysio::state\_history}}
+\doxysubsubsection{\texorpdfstring{state\_request}{state\_request}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1state__history_a0e788deef6248a86a8620bdbf4dea020} 
+using \mbox{\hyperlink{namespacesysio_1_1state__history_a0e788deef6248a86a8620bdbf4dea020}{sysio\+::state\+\_\+history\+::state\+\_\+request}} = std\+::variant$<$\mbox{\hyperlink{structsysio_1_1state__history_1_1get__status__request__v0}{get\+\_\+status\+\_\+request\+\_\+v0}}, \mbox{\hyperlink{structsysio_1_1state__history_1_1get__blocks__request__v0}{get\+\_\+blocks\+\_\+request\+\_\+v0}}, \mbox{\hyperlink{structsysio_1_1state__history_1_1get__blocks__ack__request__v0}{get\+\_\+blocks\+\_\+ack\+\_\+request\+\_\+v0}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{state__history_2include_2sysio_2state__history_2types_8hpp_source_l00114}{114}} of file \mbox{\hyperlink{state__history_2include_2sysio_2state__history_2types_8hpp_source}{types.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1state__history_a7c0ebdf566e085620947b3981fb324ec}\index{sysio::state\_history@{sysio::state\_history}!state\_result@{state\_result}}
+\index{state\_result@{state\_result}!sysio::state\_history@{sysio::state\_history}}
+\doxysubsubsection{\texorpdfstring{state\_result}{state\_result}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1state__history_a7c0ebdf566e085620947b3981fb324ec} 
+using \mbox{\hyperlink{namespacesysio_1_1state__history_a7c0ebdf566e085620947b3981fb324ec}{sysio\+::state\+\_\+history\+::state\+\_\+result}} = std\+::variant$<$\mbox{\hyperlink{structsysio_1_1state__history_1_1get__status__result__v0}{get\+\_\+status\+\_\+result\+\_\+v0}}, \mbox{\hyperlink{structsysio_1_1state__history_1_1get__blocks__result__v0}{get\+\_\+blocks\+\_\+result\+\_\+v0}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{state__history_2include_2sysio_2state__history_2types_8hpp_source_l00115}{115}} of file \mbox{\hyperlink{state__history_2include_2sysio_2state__history_2types_8hpp_source}{types.\+hpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacesysio_1_1state__history_a4672b7cf25419ada24cf1366ef85687d}\index{sysio::state\_history@{sysio::state\_history}!create\_deltas@{create\_deltas}}
+\index{create\_deltas@{create\_deltas}!sysio::state\_history@{sysio::state\_history}}
+\doxysubsubsection{\texorpdfstring{create\_deltas()}{create\_deltas()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1state__history_a4672b7cf25419ada24cf1366ef85687d} 
+std\+::vector$<$ \mbox{\hyperlink{structsysio_1_1state__history_1_1table__delta}{table\+\_\+delta}} $>$ sysio\+::state\+\_\+history\+::create\+\_\+deltas (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classchainbase_1_1database}{chainbase\+::database}} \&}]{db}{, }\item[{bool}]{full\+\_\+snapshot}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{create__deltas_8cpp_source_l00058}{58}} of file \mbox{\hyperlink{create__deltas_8cpp_source}{create\+\_\+deltas.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00059\ \ \ \ std::vector<table\_delta>\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ deltas;}
+\DoxyCodeLine{00060\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ table\_id\_index\ =\ db.\mbox{\hyperlink{classchainbase_1_1database_a4d5297635dcf70be481d9b600da9bc13}{get\_index}}<\mbox{\hyperlink{namespacesysio_1_1chain_aacd8d660fd83146e0a5d6a9cb7b19a29}{chain::table\_id\_multi\_index}}>();}
+\DoxyCodeLine{00061\ \ \ \ std::map<uint64\_t,\ const\ chain::table\_id\_object*>\ removed\_table\_id;}
+\DoxyCodeLine{00062\ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\&\ rem\ :\ table\_id\_index.last\_undo\_session().removed\_values)}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ removed\_table\_id[rem.id.\_id]\ =\ \&rem;}
+\DoxyCodeLine{00064\ }
+\DoxyCodeLine{00065\ \ \ \ \textcolor{keyword}{auto}\ get\_table\_id\ =\ [\&](\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ tid)\ -\/>\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1chain_1_1table__id__object}{chain::table\_id\_object}}\&\ \{}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ obj\ =\ table\_id\_index.find(tid);}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (obj)}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *obj;}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ it\ =\ removed\_table\_id.find(tid);}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(it\ !=\ removed\_table\_id.end(),\ chain::plugin\_exception,\ \textcolor{stringliteral}{"{}can\ not\ found\ table\ id\ \$\{tid\}"{}},\ (\textcolor{stringliteral}{"{}tid"{}},\ tid));}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *it-\/>second;}
+\DoxyCodeLine{00072\ \ \ \ \};}
+\DoxyCodeLine{00073\ }
+\DoxyCodeLine{00074\ \ \ \ \textcolor{keyword}{auto}\ pack\_row\ \ \ \ \ \ \ \ \ \ =\ [\&](\textcolor{keyword}{auto}\&\ row)\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(\mbox{\hyperlink{state__history_2include_2sysio_2state__history_2serialization_8hpp_aeef58505371e2c7f9376d471c9719fa1}{make\_history\_serial\_wrapper}}(db,\ row));\ \};}
+\DoxyCodeLine{00075\ \ \ \ \textcolor{keyword}{auto}\ pack\_contract\_row\ =\ [\&](\textcolor{keyword}{auto}\&\ row)\ \{}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(\mbox{\hyperlink{state__history_2include_2sysio_2state__history_2serialization_8hpp_a8919e19ccc221814a4ea1632ee94d0fc}{make\_history\_context\_wrapper}}(db,\ get\_table\_id(row.t\_id.\_id),\ row));}
+\DoxyCodeLine{00077\ \ \ \ \};}
+\DoxyCodeLine{00078\ }
+\DoxyCodeLine{00079\ \ \ \ \textcolor{keyword}{auto}\ process\_table\ =\ [\&](\textcolor{keyword}{auto}*\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ \textcolor{keyword}{auto}\&\ index,\ \textcolor{keyword}{auto}\&\ pack\_row)\ \{}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (full\_snapshot)\ \{}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (index.indices().empty())}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ deltas.push\_back(\{\});}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ delta\ =\ deltas.back();}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \ delta.name\ \ =\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}};}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\&\ row\ :\ index.indices())}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \ \ \ \ delta.rows.obj.emplace\_back(\textcolor{keyword}{true},\ pack\_row(row));}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ undo\ =\ index.last\_undo\_session();}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (undo.old\_values.empty()\ \&\&\ undo.new\_values.empty()\ \&\&\ undo.removed\_values.empty())}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ deltas.push\_back(\{\});}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ delta\ =\ deltas.back();}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ delta.name\ \ =\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}};}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\&\ old\ :\ undo.old\_values)\ \{}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ row\ =\ index.get(old.id);}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacesysio_1_1state__history_a7297e6b09d82cabc24f7231b09fdf14a}{include\_delta}}(old,\ row))}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ delta.rows.obj.emplace\_back(\textcolor{keyword}{true},\ pack\_row(row));}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\&\ old\ :\ undo.removed\_values)}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \ \ \ delta.rows.obj.emplace\_back(\textcolor{keyword}{false},\ pack\_row(old));}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\&\ row\ :\ undo.new\_values)\ \{}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \ \ \ delta.rows.obj.emplace\_back(\textcolor{keyword}{true},\ pack\_row(row));}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00106\ \ \ \ \};}
+\DoxyCodeLine{00107\ }
+\DoxyCodeLine{00108\ \ \ \ process\_table(\textcolor{stringliteral}{"{}account"{}},\ db.\mbox{\hyperlink{classchainbase_1_1database_a4d5297635dcf70be481d9b600da9bc13}{get\_index}}<chain::account\_index>(),\ pack\_row);}
+\DoxyCodeLine{00109\ \ \ \ process\_table(\textcolor{stringliteral}{"{}account\_metadata"{}},\ db.\mbox{\hyperlink{classchainbase_1_1database_a4d5297635dcf70be481d9b600da9bc13}{get\_index}}<chain::account\_metadata\_index>(),\ pack\_row);}
+\DoxyCodeLine{00110\ \ \ \ process\_table(\textcolor{stringliteral}{"{}code"{}},\ db.\mbox{\hyperlink{classchainbase_1_1database_a4d5297635dcf70be481d9b600da9bc13}{get\_index}}<chain::code\_index>(),\ pack\_row);}
+\DoxyCodeLine{00111\ }
+\DoxyCodeLine{00112\ \ \ \ process\_table(\textcolor{stringliteral}{"{}contract\_table"{}},\ db.\mbox{\hyperlink{classchainbase_1_1database_a4d5297635dcf70be481d9b600da9bc13}{get\_index}}<chain::table\_id\_multi\_index>(),\ pack\_row);}
+\DoxyCodeLine{00113\ \ \ \ process\_table(\textcolor{stringliteral}{"{}contract\_row"{}},\ db.\mbox{\hyperlink{classchainbase_1_1database_a4d5297635dcf70be481d9b600da9bc13}{get\_index}}<chain::key\_value\_index>(),\ pack\_contract\_row);}
+\DoxyCodeLine{00114\ \ \ \ process\_table(\textcolor{stringliteral}{"{}contract\_index64"{}},\ db.\mbox{\hyperlink{classchainbase_1_1database_a4d5297635dcf70be481d9b600da9bc13}{get\_index}}<chain::index64\_index>(),\ pack\_contract\_row);}
+\DoxyCodeLine{00115\ \ \ \ process\_table(\textcolor{stringliteral}{"{}contract\_index128"{}},\ db.\mbox{\hyperlink{classchainbase_1_1database_a4d5297635dcf70be481d9b600da9bc13}{get\_index}}<chain::index128\_index>(),\ pack\_contract\_row);}
+\DoxyCodeLine{00116\ \ \ \ process\_table(\textcolor{stringliteral}{"{}contract\_index256"{}},\ db.\mbox{\hyperlink{classchainbase_1_1database_a4d5297635dcf70be481d9b600da9bc13}{get\_index}}<chain::index256\_index>(),\ pack\_contract\_row);}
+\DoxyCodeLine{00117\ \ \ \ process\_table(\textcolor{stringliteral}{"{}contract\_index\_double"{}},\ db.\mbox{\hyperlink{classchainbase_1_1database_a4d5297635dcf70be481d9b600da9bc13}{get\_index}}<chain::index\_double\_index>(),\ pack\_contract\_row);}
+\DoxyCodeLine{00118\ \ \ \ process\_table(\textcolor{stringliteral}{"{}contract\_index\_long\_double"{}},\ db.\mbox{\hyperlink{classchainbase_1_1database_a4d5297635dcf70be481d9b600da9bc13}{get\_index}}<chain::index\_long\_double\_index>(),\ pack\_contract\_row);}
+\DoxyCodeLine{00119\ }
+\DoxyCodeLine{00120\ \ \ \ process\_table(\textcolor{stringliteral}{"{}global\_property"{}},\ db.\mbox{\hyperlink{classchainbase_1_1database_a4d5297635dcf70be481d9b600da9bc13}{get\_index}}<chain::global\_property\_multi\_index>(),\ pack\_row);}
+\DoxyCodeLine{00121\ \ \ \ process\_table(\textcolor{stringliteral}{"{}generated\_transaction"{}},\ db.\mbox{\hyperlink{classchainbase_1_1database_a4d5297635dcf70be481d9b600da9bc13}{get\_index}}<chain::generated\_transaction\_multi\_index>(),\ pack\_row);}
+\DoxyCodeLine{00122\ \ \ \ process\_table(\textcolor{stringliteral}{"{}protocol\_state"{}},\ db.\mbox{\hyperlink{classchainbase_1_1database_a4d5297635dcf70be481d9b600da9bc13}{get\_index}}<chain::protocol\_state\_multi\_index>(),\ pack\_row);}
+\DoxyCodeLine{00123\ }
+\DoxyCodeLine{00124\ \ \ \ process\_table(\textcolor{stringliteral}{"{}permission"{}},\ db.\mbox{\hyperlink{classchainbase_1_1database_a4d5297635dcf70be481d9b600da9bc13}{get\_index}}<chain::permission\_index>(),\ pack\_row);}
+\DoxyCodeLine{00125\ \ \ \ process\_table(\textcolor{stringliteral}{"{}permission\_link"{}},\ db.\mbox{\hyperlink{classchainbase_1_1database_a4d5297635dcf70be481d9b600da9bc13}{get\_index}}<chain::permission\_link\_index>(),\ pack\_row);}
+\DoxyCodeLine{00126\ }
+\DoxyCodeLine{00127\ \ \ \ process\_table(\textcolor{stringliteral}{"{}resource\_limits"{}},\ db.\mbox{\hyperlink{classchainbase_1_1database_a4d5297635dcf70be481d9b600da9bc13}{get\_index}}<chain::resource\_limits::resource\_limits\_index>(),\ pack\_row);}
+\DoxyCodeLine{00128\ \ \ \ process\_table(\textcolor{stringliteral}{"{}resource\_usage"{}},\ db.\mbox{\hyperlink{classchainbase_1_1database_a4d5297635dcf70be481d9b600da9bc13}{get\_index}}<chain::resource\_limits::resource\_usage\_index>(),\ pack\_row);}
+\DoxyCodeLine{00129\ \ \ \ process\_table(\textcolor{stringliteral}{"{}resource\_limits\_state"{}},\ db.\mbox{\hyperlink{classchainbase_1_1database_a4d5297635dcf70be481d9b600da9bc13}{get\_index}}<chain::resource\_limits::resource\_limits\_state\_index>(),}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ pack\_row);}
+\DoxyCodeLine{00131\ \ \ \ process\_table(\textcolor{stringliteral}{"{}resource\_limits\_config"{}},\ db.\mbox{\hyperlink{classchainbase_1_1database_a4d5297635dcf70be481d9b600da9bc13}{get\_index}}<chain::resource\_limits::resource\_limits\_config\_index>(),}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ pack\_row);}
+\DoxyCodeLine{00133\ }
+\DoxyCodeLine{00134\ \ \ \ \textcolor{keywordflow}{return}\ deltas;}
+\DoxyCodeLine{00135\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1state__history_a4672b7cf25419ada24cf1366ef85687d_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1state__history_a4672b7cf25419ada24cf1366ef85687d_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacesysio_1_1state__history_a58921fbf0e9665770c7b3a695d2df8cd}\index{sysio::state\_history@{sysio::state\_history}!include\_delta@{include\_delta}}
+\index{include\_delta@{include\_delta}!sysio::state\_history@{sysio::state\_history}}
+\doxysubsubsection{\texorpdfstring{include\_delta()}{include\_delta()}\hspace{0.1cm}{\footnotesize\ttfamily [1/7]}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1state__history_a58921fbf0e9665770c7b3a695d2df8cd} 
+bool sysio\+::state\+\_\+history\+::include\+\_\+delta (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classsysio_1_1chain_1_1account__metadata__object}{chain\+::account\+\_\+metadata\+\_\+object}} \&}]{old}{, }\item[{const \mbox{\hyperlink{classsysio_1_1chain_1_1account__metadata__object}{chain\+::account\+\_\+metadata\+\_\+object}} \&}]{curr}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{create__deltas_8cpp_source_l00040}{40}} of file \mbox{\hyperlink{create__deltas_8cpp_source}{create\+\_\+deltas.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00041\ \ \ \ \textcolor{keywordflow}{return}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ old.name\ !=\ curr.name\ ||\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ old.is\_privileged()\ !=\ curr.is\_privileged()\ ||\ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ old.last\_code\_update\ !=\ curr.last\_code\_update\ ||\ \textcolor{comment}{//}}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ old.vm\_type\ !=\ curr.vm\_type\ ||\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ old.vm\_version\ !=\ curr.vm\_version\ ||\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ old.code\_hash\ !=\ curr.code\_hash;}
+\DoxyCodeLine{00048\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacesysio_1_1state__history_a0a3e79f324afc8a501a9778d80cec968}\index{sysio::state\_history@{sysio::state\_history}!include\_delta@{include\_delta}}
+\index{include\_delta@{include\_delta}!sysio::state\_history@{sysio::state\_history}}
+\doxysubsubsection{\texorpdfstring{include\_delta()}{include\_delta()}\hspace{0.1cm}{\footnotesize\ttfamily [2/7]}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1state__history_a0a3e79f324afc8a501a9778d80cec968} 
+bool sysio\+::state\+\_\+history\+::include\+\_\+delta (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classsysio_1_1chain_1_1code__object}{chain\+::code\+\_\+object}} \&}]{old}{, }\item[{const \mbox{\hyperlink{classsysio_1_1chain_1_1code__object}{chain\+::code\+\_\+object}} \&}]{curr}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{create__deltas_8cpp_source_l00050}{50}} of file \mbox{\hyperlink{create__deltas_8cpp_source}{create\+\_\+deltas.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ \textcolor{comment}{//}}
+\DoxyCodeLine{00051\ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00052\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacesysio_1_1state__history_ad7e684e78494225a5ea390d4a2cb88db}\index{sysio::state\_history@{sysio::state\_history}!include\_delta@{include\_delta}}
+\index{include\_delta@{include\_delta}!sysio::state\_history@{sysio::state\_history}}
+\doxysubsubsection{\texorpdfstring{include\_delta()}{include\_delta()}\hspace{0.1cm}{\footnotesize\ttfamily [3/7]}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1state__history_ad7e684e78494225a5ea390d4a2cb88db} 
+bool sysio\+::state\+\_\+history\+::include\+\_\+delta (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classsysio_1_1chain_1_1protocol__state__object}{chain\+::protocol\+\_\+state\+\_\+object}} \&}]{old}{, }\item[{const \mbox{\hyperlink{classsysio_1_1chain_1_1protocol__state__object}{chain\+::protocol\+\_\+state\+\_\+object}} \&}]{curr}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{create__deltas_8cpp_source_l00054}{54}} of file \mbox{\hyperlink{create__deltas_8cpp_source}{create\+\_\+deltas.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00055\ \ \ \ \textcolor{keywordflow}{return}\ old.\mbox{\hyperlink{classsysio_1_1chain_1_1protocol__state__object_ae9694b005b07756cdb14eadf6f09a0af}{activated\_protocol\_features}}\ !=\ curr.\mbox{\hyperlink{classsysio_1_1chain_1_1protocol__state__object_ae9694b005b07756cdb14eadf6f09a0af}{activated\_protocol\_features}};}
+\DoxyCodeLine{00056\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacesysio_1_1state__history_ab398df574c5103e7fd21debde64ec0ee}\index{sysio::state\_history@{sysio::state\_history}!include\_delta@{include\_delta}}
+\index{include\_delta@{include\_delta}!sysio::state\_history@{sysio::state\_history}}
+\doxysubsubsection{\texorpdfstring{include\_delta()}{include\_delta()}\hspace{0.1cm}{\footnotesize\ttfamily [4/7]}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1state__history_ab398df574c5103e7fd21debde64ec0ee} 
+bool sysio\+::state\+\_\+history\+::include\+\_\+delta (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1resource__limits__object}{chain\+::resource\+\_\+limits\+::resource\+\_\+limits\+\_\+object}} \&}]{old}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1resource__limits__object}{chain\+::resource\+\_\+limits\+::resource\+\_\+limits\+\_\+object}} \&}]{curr}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{create__deltas_8cpp_source_l00016}{16}} of file \mbox{\hyperlink{create__deltas_8cpp_source}{create\+\_\+deltas.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00017\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00018\ \ \ \ \textcolor{keywordflow}{return}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ old.\mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1resource__limits__object_a9eaec91376588de2dd82766e23750f87}{net\_weight}}\ !=\ curr.\mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1resource__limits__object_a9eaec91376588de2dd82766e23750f87}{net\_weight}}\ ||\ \textcolor{comment}{//}}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ old.\mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1resource__limits__object_aaeaa8f4c3c9e4cd8c823ecb22cc3f982}{cpu\_weight}}\ !=\ curr.\mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1resource__limits__object_aaeaa8f4c3c9e4cd8c823ecb22cc3f982}{cpu\_weight}}\ ||\ \textcolor{comment}{//}}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ old.\mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1resource__limits__object_a7e7945f847d9e441e69f938921270836}{ram\_bytes}}\ !=\ curr.\mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1resource__limits__object_a7e7945f847d9e441e69f938921270836}{ram\_bytes}};}
+\DoxyCodeLine{00022\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacesysio_1_1state__history_ab354d08ce3577c51e35780853ec6b25f}\index{sysio::state\_history@{sysio::state\_history}!include\_delta@{include\_delta}}
+\index{include\_delta@{include\_delta}!sysio::state\_history@{sysio::state\_history}}
+\doxysubsubsection{\texorpdfstring{include\_delta()}{include\_delta()}\hspace{0.1cm}{\footnotesize\ttfamily [5/7]}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1state__history_ab354d08ce3577c51e35780853ec6b25f} 
+bool sysio\+::state\+\_\+history\+::include\+\_\+delta (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__state__object}{chain\+::resource\+\_\+limits\+::resource\+\_\+limits\+\_\+state\+\_\+object}} \&}]{old}{, }\item[{const \mbox{\hyperlink{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__state__object}{chain\+::resource\+\_\+limits\+::resource\+\_\+limits\+\_\+state\+\_\+object}} \&}]{curr}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{create__deltas_8cpp_source_l00024}{24}} of file \mbox{\hyperlink{create__deltas_8cpp_source}{create\+\_\+deltas.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00026\ \ \ \ \textcolor{keywordflow}{return}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ old.average\_block\_net\_usage.\mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator_a71318b93d001293944aa2edb7413e30f}{last\_ordinal}}\ !=\ curr.average\_block\_net\_usage.\mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator_a71318b93d001293944aa2edb7413e30f}{last\_ordinal}}\ ||\ \textcolor{comment}{//}}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ old.average\_block\_net\_usage.\mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator_a287aeeff9e2c62aae2ea1f2860e50a32}{value\_ex}}\ !=\ curr.average\_block\_net\_usage.\mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator_a287aeeff9e2c62aae2ea1f2860e50a32}{value\_ex}}\ ||\ \ \ \ \ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ old.average\_block\_net\_usage.\mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator_a10942e33869aa60d5b644aa3da2e366b}{consumed}}\ !=\ curr.average\_block\_net\_usage.\mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator_a10942e33869aa60d5b644aa3da2e366b}{consumed}}\ ||\ \ \ \ \ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ old.average\_block\_cpu\_usage.\mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator_a71318b93d001293944aa2edb7413e30f}{last\_ordinal}}\ !=\ curr.average\_block\_cpu\_usage.\mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator_a71318b93d001293944aa2edb7413e30f}{last\_ordinal}}\ ||\ \textcolor{comment}{//}}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ old.average\_block\_cpu\_usage.\mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator_a287aeeff9e2c62aae2ea1f2860e50a32}{value\_ex}}\ !=\ curr.average\_block\_cpu\_usage.\mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator_a287aeeff9e2c62aae2ea1f2860e50a32}{value\_ex}}\ ||\ \ \ \ \ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ old.average\_block\_cpu\_usage.\mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator_a10942e33869aa60d5b644aa3da2e366b}{consumed}}\ !=\ curr.average\_block\_cpu\_usage.\mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator_a10942e33869aa60d5b644aa3da2e366b}{consumed}}\ ||\ \ \ \ \ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ old.total\_net\_weight\ !=\ curr.total\_net\_weight\ ||\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ old.total\_cpu\_weight\ !=\ curr.total\_cpu\_weight\ ||\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ old.total\_ram\_bytes\ !=\ curr.total\_ram\_bytes\ ||\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ old.virtual\_net\_limit\ !=\ curr.virtual\_net\_limit\ ||\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ old.virtual\_cpu\_limit\ !=\ curr.virtual\_cpu\_limit;}
+\DoxyCodeLine{00038\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacesysio_1_1state__history_a9aa62de9d68ebae6a40816a55b928e07}\index{sysio::state\_history@{sysio::state\_history}!include\_delta@{include\_delta}}
+\index{include\_delta@{include\_delta}!sysio::state\_history@{sysio::state\_history}}
+\doxysubsubsection{\texorpdfstring{include\_delta()}{include\_delta()}\hspace{0.1cm}{\footnotesize\ttfamily [6/7]}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1state__history_a9aa62de9d68ebae6a40816a55b928e07} 
+bool sysio\+::state\+\_\+history\+::include\+\_\+delta (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classsysio_1_1chain_1_1table__id__object}{chain\+::table\+\_\+id\+\_\+object}} \&}]{old}{, }\item[{const \mbox{\hyperlink{classsysio_1_1chain_1_1table__id__object}{chain\+::table\+\_\+id\+\_\+object}} \&}]{curr}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{create__deltas_8cpp_source_l00012}{12}} of file \mbox{\hyperlink{create__deltas_8cpp_source}{create\+\_\+deltas.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00012\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00013\ \ \ \ \textcolor{keywordflow}{return}\ old.payer\ !=\ curr.payer;}
+\DoxyCodeLine{00014\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacesysio_1_1state__history_a7297e6b09d82cabc24f7231b09fdf14a}\index{sysio::state\_history@{sysio::state\_history}!include\_delta@{include\_delta}}
+\index{include\_delta@{include\_delta}!sysio::state\_history@{sysio::state\_history}}
+\doxysubsubsection{\texorpdfstring{include\_delta()}{include\_delta()}\hspace{0.1cm}{\footnotesize\ttfamily [7/7]}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1state__history_a7297e6b09d82cabc24f7231b09fdf14a} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+bool sysio\+::state\+\_\+history\+::include\+\_\+delta (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{old}{, }\item[{const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{curr}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{create__deltas_8cpp_source_l00008}{8}} of file \mbox{\hyperlink{create__deltas_8cpp_source}{create\+\_\+deltas.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00008\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00009\ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00010\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1state__history_a7297e6b09d82cabc24f7231b09fdf14a_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacesysio_1_1state__history_a56d6b703f34519b5d085529ebd120d29}\index{sysio::state\_history@{sysio::state\_history}!zlib\_compress\_bytes@{zlib\_compress\_bytes}}
+\index{zlib\_compress\_bytes@{zlib\_compress\_bytes}!sysio::state\_history@{sysio::state\_history}}
+\doxysubsubsection{\texorpdfstring{zlib\_compress\_bytes()}{zlib\_compress\_bytes()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1state__history_a56d6b703f34519b5d085529ebd120d29} 
+\mbox{\hyperlink{namespacesysio_1_1chain_ac6f5a1f1e061f000983f5d5f3ac25dfa}{bytes}} sysio\+::state\+\_\+history\+::zlib\+\_\+compress\+\_\+bytes (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_ac6f5a1f1e061f000983f5d5f3ac25dfa}{bytes}} \&}]{in}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{compression_8cpp_source_l00011}{11}} of file \mbox{\hyperlink{compression_8cpp_source}{compression.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00011\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00012\ \ \ \ \mbox{\hyperlink{classfc_1_1vector}{bytes}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ out;}
+\DoxyCodeLine{00013\ \ \ \ bio::filtering\_ostream\ comp;}
+\DoxyCodeLine{00014\ \ \ \ comp.push(bio::zlib\_compressor(bio::zlib::default\_compression));}
+\DoxyCodeLine{00015\ \ \ \ comp.push(bio::back\_inserter(out));}
+\DoxyCodeLine{00016\ \ \ \ bio::write(comp,\ in.data(),\ in.size());}
+\DoxyCodeLine{00017\ \ \ \ bio::close(comp);}
+\DoxyCodeLine{00018\ \ \ \ \textcolor{keywordflow}{return}\ out;}
+\DoxyCodeLine{00019\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1state__history_a56d6b703f34519b5d085529ebd120d29_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacesysio_1_1state__history_a81fbdf52169b3b2295f3911729f09142}\index{sysio::state\_history@{sysio::state\_history}!zlib\_decompress@{zlib\_decompress}}
+\index{zlib\_decompress@{zlib\_decompress}!sysio::state\_history@{sysio::state\_history}}
+\doxysubsubsection{\texorpdfstring{zlib\_decompress()}{zlib\_decompress()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1state__history_a81fbdf52169b3b2295f3911729f09142} 
+\mbox{\hyperlink{namespacesysio_1_1chain_ac6f5a1f1e061f000983f5d5f3ac25dfa}{bytes}} sysio\+::state\+\_\+history\+::zlib\+\_\+decompress (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_ac6f5a1f1e061f000983f5d5f3ac25dfa}{bytes}} \&}]{in}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{compression_8cpp_source_l00021}{21}} of file \mbox{\hyperlink{compression_8cpp_source}{compression.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00022\ \ \ \ \mbox{\hyperlink{classfc_1_1vector}{bytes}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ out;}
+\DoxyCodeLine{00023\ \ \ \ bio::filtering\_ostream\ decomp;}
+\DoxyCodeLine{00024\ \ \ \ decomp.push(bio::zlib\_decompressor());}
+\DoxyCodeLine{00025\ \ \ \ decomp.push(bio::back\_inserter(out));}
+\DoxyCodeLine{00026\ \ \ \ bio::write(decomp,\ in.data(),\ in.size());}
+\DoxyCodeLine{00027\ \ \ \ bio::close(decomp);}
+\DoxyCodeLine{00028\ \ \ \ \textcolor{keywordflow}{return}\ out;}
+\DoxyCodeLine{00029\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1state__history_a81fbdf52169b3b2295f3911729f09142_icgraph}
+\end{center}
+\end{figure}

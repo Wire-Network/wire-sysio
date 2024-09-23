@@ -1,0 +1,36 @@
+var structsysio_1_1chain_1_1packed__transaction =
+[
+    [ "compression_type", "structsysio_1_1chain_1_1packed__transaction.html#aec47710805eaf76d06f50bed3c9a0383", [
+      [ "none", "structsysio_1_1chain_1_1packed__transaction.html#aec47710805eaf76d06f50bed3c9a0383a334c4a4c42fdb79d7ebc3e73b517e6f8", null ],
+      [ "zlib", "structsysio_1_1chain_1_1packed__transaction.html#aec47710805eaf76d06f50bed3c9a0383a7a990d405d2c6fb93aa8fbb0ec1a3b23", null ]
+    ] ],
+    [ "packed_transaction", "structsysio_1_1chain_1_1packed__transaction.html#a1b33734ff429c2bf0a087aaa6537d3aa", null ],
+    [ "packed_transaction", "structsysio_1_1chain_1_1packed__transaction.html#ab4ba158e73c46bb6e06e7c694e5d3968", null ],
+    [ "packed_transaction", "structsysio_1_1chain_1_1packed__transaction.html#aed35f19ec05ac0e6d2982d7abb4b4dc7", null ],
+    [ "packed_transaction", "structsysio_1_1chain_1_1packed__transaction.html#a4078fc64926a68256298861d55913b8d", null ],
+    [ "packed_transaction", "structsysio_1_1chain_1_1packed__transaction.html#a2ea0032dee7203554617c5e4907cbea5", null ],
+    [ "packed_transaction", "structsysio_1_1chain_1_1packed__transaction.html#aba460eec010387fe03f45394a88cc957", null ],
+    [ "packed_transaction", "structsysio_1_1chain_1_1packed__transaction.html#a3a234033e9ddcba244b580ea0e636d0a", null ],
+    [ "packed_transaction", "structsysio_1_1chain_1_1packed__transaction.html#a9b108c6163feaa79035520cb5a8e4f65", null ],
+    [ "expiration", "structsysio_1_1chain_1_1packed__transaction.html#a64f473c15c6c0fa2a095a66fddbd9c47", null ],
+    [ "get_compression", "structsysio_1_1chain_1_1packed__transaction.html#a71c5a6ca50eea35d6d9062eab7fc1caa", null ],
+    [ "get_context_free_data", "structsysio_1_1chain_1_1packed__transaction.html#aacc985f8bfb21148f8421b6389bced07", null ],
+    [ "get_estimated_size", "structsysio_1_1chain_1_1packed__transaction.html#ad91bbc830ebbffaa8b4581d9e5945c82", null ],
+    [ "get_packed_context_free_data", "structsysio_1_1chain_1_1packed__transaction.html#a302ea97d6a0774a0e33f8306de98f9e2", null ],
+    [ "get_packed_transaction", "structsysio_1_1chain_1_1packed__transaction.html#add9b1d40201f723322a8452f692b380c", null ],
+    [ "get_prunable_size", "structsysio_1_1chain_1_1packed__transaction.html#a6cb9d045ad550faaf9692712f0005ed0", null ],
+    [ "get_raw_transaction", "structsysio_1_1chain_1_1packed__transaction.html#a13440ded71a188caa682ef014342e566", null ],
+    [ "get_signatures", "structsysio_1_1chain_1_1packed__transaction.html#a5cb2f9913fe72904801c2647f02995de", null ],
+    [ "get_signed_transaction", "structsysio_1_1chain_1_1packed__transaction.html#ac07b8dd1294ac4848244cb154256512b", null ],
+    [ "get_transaction", "structsysio_1_1chain_1_1packed__transaction.html#ad193d26eb97cfd5b3f7d8b957eaa35a2", null ],
+    [ "get_unprunable_size", "structsysio_1_1chain_1_1packed__transaction.html#a6432984f68c8f570eb9ef7da18e55b3f", null ],
+    [ "id", "structsysio_1_1chain_1_1packed__transaction.html#acc706e72aa422ee3e3c02f73871609cb", null ],
+    [ "operator=", "structsysio_1_1chain_1_1packed__transaction.html#a146a108bbaaeef290d39e96bee60bbae", null ],
+    [ "operator=", "structsysio_1_1chain_1_1packed__transaction.html#ad9d1712c40a171e2105287b74ff52eb0", null ],
+    [ "packed_digest", "structsysio_1_1chain_1_1packed__transaction.html#a3141db1ad51de278edf8dbe87f27697d", null ],
+    [ "fc::has_reflector_init< packed_transaction >", "structsysio_1_1chain_1_1packed__transaction.html#a028ef2331379842a35167dbbcf2ed92f", null ],
+    [ "fc::reflector< packed_transaction >", "structsysio_1_1chain_1_1packed__transaction.html#a52de92c4540ea88bb43b1604628eebd0", null ],
+    [ "fc::reflector_init_visitor< packed_transaction >", "structsysio_1_1chain_1_1packed__transaction.html#a699feb81b2f2ca846a6900bbfe62442b", null ],
+    [ "operator!=", "structsysio_1_1chain_1_1packed__transaction.html#ae54b5a4710d8769f38d5cefde9492040", null ],
+    [ "operator==", "structsysio_1_1chain_1_1packed__transaction.html#a8a0b2fbdf0597a1da73977b904b14d54", null ]
+];

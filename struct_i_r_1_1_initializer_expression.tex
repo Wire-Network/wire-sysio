@@ -1,0 +1,282 @@
+\doxysection{IR\+::Initializer\+Expression Struct Reference}
+\hypertarget{struct_i_r_1_1_initializer_expression}{}\label{struct_i_r_1_1_initializer_expression}\index{IR::InitializerExpression@{IR::InitializerExpression}}
+
+
+{\ttfamily \#include $<$Module.\+h$>$}
+
+
+
+Collaboration diagram for IR\+::Initializer\+Expression\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=264pt]{struct_i_r_1_1_initializer_expression__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum class \mbox{\hyperlink{struct_i_r_1_1_initializer_expression_a9a750d98a419b79ee4826a047051033a}{Type}} \+: U8 \{ \newline
+\mbox{\hyperlink{struct_i_r_1_1_initializer_expression_a9a750d98a419b79ee4826a047051033aaaf09b572a2dfa9d0e811d458b51a5395}{i32\+\_\+const}} = 0x41
+, \mbox{\hyperlink{struct_i_r_1_1_initializer_expression_a9a750d98a419b79ee4826a047051033aa6559ffc871a107da7b00628ab165dd52}{i64\+\_\+const}} = 0x42
+, \mbox{\hyperlink{struct_i_r_1_1_initializer_expression_a9a750d98a419b79ee4826a047051033aad45bbc753854d55d3709abae9ff70544}{f32\+\_\+const}} = 0x43
+, \mbox{\hyperlink{struct_i_r_1_1_initializer_expression_a9a750d98a419b79ee4826a047051033aa59fba2191173c583fef18016d997b43d}{f64\+\_\+const}} = 0x44
+, \newline
+\mbox{\hyperlink{struct_i_r_1_1_initializer_expression_a9a750d98a419b79ee4826a047051033aaa3cb4bb86d6df102d0a7e937d7d5f43f}{get\+\_\+global}} = 0x23
+, \mbox{\hyperlink{struct_i_r_1_1_initializer_expression_a9a750d98a419b79ee4826a047051033aacb5e100e5a9a3e7f6d1fd97512215282}{error}} = 0xff
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_i_r_1_1_initializer_expression_a2f82bc4fe071d9597b22343c820781c8}{Initializer\+Expression}} ()
+\item 
+\mbox{\hyperlink{struct_i_r_1_1_initializer_expression_a23310dcada1c9a304c4e3846411fd8d4}{Initializer\+Expression}} (\mbox{\hyperlink{_basic_types_8h_a2f1a62071dd7dc3f6ef85c1b7612dc35}{I32}} in\+I32)
+\item 
+\mbox{\hyperlink{struct_i_r_1_1_initializer_expression_ac50f313a18cd60715adebc1bfcd1ca06}{Initializer\+Expression}} (\mbox{\hyperlink{_basic_types_8h_a416b74ff5b1dc365af5713a3f48fb8b9}{I64}} in\+I64)
+\item 
+\mbox{\hyperlink{struct_i_r_1_1_initializer_expression_a4e9d584aed8a13275553878c7bd86f22}{Initializer\+Expression}} (\mbox{\hyperlink{_basic_types_8h_a841d3674577a1e86afdc2f4845f46c4b}{F32}} in\+F32)
+\item 
+\mbox{\hyperlink{struct_i_r_1_1_initializer_expression_ad794bbcaee5eebb9816bea075d2c2c06}{Initializer\+Expression}} (\mbox{\hyperlink{_basic_types_8h_adc9896ee12db3bb116fc63b3464c72c7}{F64}} in\+F64)
+\item 
+\mbox{\hyperlink{struct_i_r_1_1_initializer_expression_a6295b58ea6c3c681192cd12de2088758}{Initializer\+Expression}} (\mbox{\hyperlink{struct_i_r_1_1_initializer_expression_a9a750d98a419b79ee4826a047051033a}{Type}} in\+Type, \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} in\+Global\+Index)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_i_r_1_1_initializer_expression_a9a750d98a419b79ee4826a047051033a}{Type}} \mbox{\hyperlink{struct_i_r_1_1_initializer_expression_a66f8d262d27a9bd6536f0268974c7dd5}{type}}
+\item 
+\begin{tabbing}
+xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=\kill
+union \{\\
+\>\mbox{\hyperlink{_basic_types_8h_a2f1a62071dd7dc3f6ef85c1b7612dc35}{I32}} \mbox{\hyperlink{struct_i_r_1_1_initializer_expression_ae39054471f85529a9a641962618bab7e}{i32}}\\
+\>\mbox{\hyperlink{_basic_types_8h_a416b74ff5b1dc365af5713a3f48fb8b9}{I64}} \mbox{\hyperlink{struct_i_r_1_1_initializer_expression_ab777bb0a665bfc21bde59f2bc3ae4c77}{i64}}\\
+\>\mbox{\hyperlink{_basic_types_8h_a841d3674577a1e86afdc2f4845f46c4b}{F32}} \mbox{\hyperlink{struct_i_r_1_1_initializer_expression_a5411cbab9a351c570a65440b14175765}{f32}}\\
+\>\mbox{\hyperlink{_basic_types_8h_adc9896ee12db3bb116fc63b3464c72c7}{F64}} \mbox{\hyperlink{struct_i_r_1_1_initializer_expression_ab35ab53209a2a771973719a934f1fd23}{f64}}\\
+\>\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} \mbox{\hyperlink{struct_i_r_1_1_initializer_expression_a00cd4a62f249390a3e6b504161d6cb16}{globalIndex}}\\
+\}; \\
+
+\end{tabbing}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{_module_8h_source_l00012}{12}} of file \mbox{\hyperlink{_module_8h_source}{Module.\+h}}.
+
+
+
+\doxysubsection{Member Enumeration Documentation}
+\Hypertarget{struct_i_r_1_1_initializer_expression_a9a750d98a419b79ee4826a047051033a}\index{IR::InitializerExpression@{IR::InitializerExpression}!Type@{Type}}
+\index{Type@{Type}!IR::InitializerExpression@{IR::InitializerExpression}}
+\doxysubsubsection{\texorpdfstring{Type}{Type}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_initializer_expression_a9a750d98a419b79ee4826a047051033a} 
+enum \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{struct_i_r_1_1_initializer_expression_a9a750d98a419b79ee4826a047051033a}{IR\+::\+Initializer\+Expression\+::\+Type}} \+: \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}\hspace{0.3cm}{\ttfamily [strong]}}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{i32\_const@{i32\_const}!IR::InitializerExpression@{IR::InitializerExpression}}\index{IR::InitializerExpression@{IR::InitializerExpression}!i32\_const@{i32\_const}}}\Hypertarget{struct_i_r_1_1_initializer_expression_a9a750d98a419b79ee4826a047051033aaaf09b572a2dfa9d0e811d458b51a5395}\label{struct_i_r_1_1_initializer_expression_a9a750d98a419b79ee4826a047051033a} 
+i32\+\_\+const&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{i64\_const@{i64\_const}!IR::InitializerExpression@{IR::InitializerExpression}}\index{IR::InitializerExpression@{IR::InitializerExpression}!i64\_const@{i64\_const}}}\Hypertarget{struct_i_r_1_1_initializer_expression_a9a750d98a419b79ee4826a047051033aa6559ffc871a107da7b00628ab165dd52}\label{struct_i_r_1_1_initializer_expression_a9a750d98a419b79ee4826a047051033a} 
+i64\+\_\+const&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{f32\_const@{f32\_const}!IR::InitializerExpression@{IR::InitializerExpression}}\index{IR::InitializerExpression@{IR::InitializerExpression}!f32\_const@{f32\_const}}}\Hypertarget{struct_i_r_1_1_initializer_expression_a9a750d98a419b79ee4826a047051033aad45bbc753854d55d3709abae9ff70544}\label{struct_i_r_1_1_initializer_expression_a9a750d98a419b79ee4826a047051033a} 
+f32\+\_\+const&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{f64\_const@{f64\_const}!IR::InitializerExpression@{IR::InitializerExpression}}\index{IR::InitializerExpression@{IR::InitializerExpression}!f64\_const@{f64\_const}}}\Hypertarget{struct_i_r_1_1_initializer_expression_a9a750d98a419b79ee4826a047051033aa59fba2191173c583fef18016d997b43d}\label{struct_i_r_1_1_initializer_expression_a9a750d98a419b79ee4826a047051033a} 
+f64\+\_\+const&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{get\_global@{get\_global}!IR::InitializerExpression@{IR::InitializerExpression}}\index{IR::InitializerExpression@{IR::InitializerExpression}!get\_global@{get\_global}}}\Hypertarget{struct_i_r_1_1_initializer_expression_a9a750d98a419b79ee4826a047051033aaa3cb4bb86d6df102d0a7e937d7d5f43f}\label{struct_i_r_1_1_initializer_expression_a9a750d98a419b79ee4826a047051033a} 
+get\+\_\+global&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{error@{error}!IR::InitializerExpression@{IR::InitializerExpression}}\index{IR::InitializerExpression@{IR::InitializerExpression}!error@{error}}}\Hypertarget{struct_i_r_1_1_initializer_expression_a9a750d98a419b79ee4826a047051033aacb5e100e5a9a3e7f6d1fd97512215282}\label{struct_i_r_1_1_initializer_expression_a9a750d98a419b79ee4826a047051033a} 
+error&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{_module_8h_source_l00014}{14}} of file \mbox{\hyperlink{_module_8h_source}{Module.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_i_r_1_1_initializer_expression_a9a750d98a419b79ee4826a047051033aaaf09b572a2dfa9d0e811d458b51a5395}{i32\_const}}\ =\ 0x41,}
+\DoxyCodeLine{00017\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_i_r_1_1_initializer_expression_a9a750d98a419b79ee4826a047051033aa6559ffc871a107da7b00628ab165dd52}{i64\_const}}\ =\ 0x42,}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_i_r_1_1_initializer_expression_a9a750d98a419b79ee4826a047051033aad45bbc753854d55d3709abae9ff70544}{f32\_const}}\ =\ 0x43,}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_i_r_1_1_initializer_expression_a9a750d98a419b79ee4826a047051033aa59fba2191173c583fef18016d997b43d}{f64\_const}}\ =\ 0x44,}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_i_r_1_1_initializer_expression_a9a750d98a419b79ee4826a047051033aaa3cb4bb86d6df102d0a7e937d7d5f43f}{get\_global}}\ =\ 0x23,}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \ \ \ \ error\ =\ 0xff}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{struct_i_r_1_1_initializer_expression_a2f82bc4fe071d9597b22343c820781c8}\index{IR::InitializerExpression@{IR::InitializerExpression}!InitializerExpression@{InitializerExpression}}
+\index{InitializerExpression@{InitializerExpression}!IR::InitializerExpression@{IR::InitializerExpression}}
+\doxysubsubsection{\texorpdfstring{InitializerExpression()}{InitializerExpression()}\hspace{0.1cm}{\footnotesize\ttfamily [1/6]}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_initializer_expression_a2f82bc4fe071d9597b22343c820781c8} 
+IR\+::\+Initializer\+Expression\+::\+Initializer\+Expression (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_module_8h_source_l00032}{32}} of file \mbox{\hyperlink{_module_8h_source}{Module.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00032\ :\ \mbox{\hyperlink{struct_i_r_1_1_initializer_expression_a66f8d262d27a9bd6536f0268974c7dd5}{type}}(\mbox{\hyperlink{struct_i_r_1_1_initializer_expression_a9a750d98a419b79ee4826a047051033aacb5e100e5a9a3e7f6d1fd97512215282}{Type::error}})\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{struct_i_r_1_1_initializer_expression_a23310dcada1c9a304c4e3846411fd8d4}\index{IR::InitializerExpression@{IR::InitializerExpression}!InitializerExpression@{InitializerExpression}}
+\index{InitializerExpression@{InitializerExpression}!IR::InitializerExpression@{IR::InitializerExpression}}
+\doxysubsubsection{\texorpdfstring{InitializerExpression()}{InitializerExpression()}\hspace{0.1cm}{\footnotesize\ttfamily [2/6]}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_initializer_expression_a23310dcada1c9a304c4e3846411fd8d4} 
+IR\+::\+Initializer\+Expression\+::\+Initializer\+Expression (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{_basic_types_8h_a2f1a62071dd7dc3f6ef85c1b7612dc35}{I32}}}]{in\+I32}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_module_8h_source_l00033}{33}} of file \mbox{\hyperlink{_module_8h_source}{Module.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00033\ :\ \mbox{\hyperlink{struct_i_r_1_1_initializer_expression_a66f8d262d27a9bd6536f0268974c7dd5}{type}}(\mbox{\hyperlink{struct_i_r_1_1_initializer_expression_a9a750d98a419b79ee4826a047051033aaaf09b572a2dfa9d0e811d458b51a5395}{Type::i32\_const}}),\ \mbox{\hyperlink{struct_i_r_1_1_initializer_expression_ae39054471f85529a9a641962618bab7e}{i32}}(inI32)\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{struct_i_r_1_1_initializer_expression_ac50f313a18cd60715adebc1bfcd1ca06}\index{IR::InitializerExpression@{IR::InitializerExpression}!InitializerExpression@{InitializerExpression}}
+\index{InitializerExpression@{InitializerExpression}!IR::InitializerExpression@{IR::InitializerExpression}}
+\doxysubsubsection{\texorpdfstring{InitializerExpression()}{InitializerExpression()}\hspace{0.1cm}{\footnotesize\ttfamily [3/6]}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_initializer_expression_ac50f313a18cd60715adebc1bfcd1ca06} 
+IR\+::\+Initializer\+Expression\+::\+Initializer\+Expression (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{_basic_types_8h_a416b74ff5b1dc365af5713a3f48fb8b9}{I64}}}]{in\+I64}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_module_8h_source_l00034}{34}} of file \mbox{\hyperlink{_module_8h_source}{Module.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00034\ :\ \mbox{\hyperlink{struct_i_r_1_1_initializer_expression_a66f8d262d27a9bd6536f0268974c7dd5}{type}}(\mbox{\hyperlink{struct_i_r_1_1_initializer_expression_a9a750d98a419b79ee4826a047051033aa6559ffc871a107da7b00628ab165dd52}{Type::i64\_const}}),\ \mbox{\hyperlink{struct_i_r_1_1_initializer_expression_ab777bb0a665bfc21bde59f2bc3ae4c77}{i64}}(inI64)\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{struct_i_r_1_1_initializer_expression_a4e9d584aed8a13275553878c7bd86f22}\index{IR::InitializerExpression@{IR::InitializerExpression}!InitializerExpression@{InitializerExpression}}
+\index{InitializerExpression@{InitializerExpression}!IR::InitializerExpression@{IR::InitializerExpression}}
+\doxysubsubsection{\texorpdfstring{InitializerExpression()}{InitializerExpression()}\hspace{0.1cm}{\footnotesize\ttfamily [4/6]}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_initializer_expression_a4e9d584aed8a13275553878c7bd86f22} 
+IR\+::\+Initializer\+Expression\+::\+Initializer\+Expression (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{_basic_types_8h_a841d3674577a1e86afdc2f4845f46c4b}{F32}}}]{in\+F32}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_module_8h_source_l00035}{35}} of file \mbox{\hyperlink{_module_8h_source}{Module.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00035\ :\ \mbox{\hyperlink{struct_i_r_1_1_initializer_expression_a66f8d262d27a9bd6536f0268974c7dd5}{type}}(\mbox{\hyperlink{struct_i_r_1_1_initializer_expression_a9a750d98a419b79ee4826a047051033aad45bbc753854d55d3709abae9ff70544}{Type::f32\_const}}),\ \mbox{\hyperlink{struct_i_r_1_1_initializer_expression_a5411cbab9a351c570a65440b14175765}{f32}}(inF32)\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{struct_i_r_1_1_initializer_expression_ad794bbcaee5eebb9816bea075d2c2c06}\index{IR::InitializerExpression@{IR::InitializerExpression}!InitializerExpression@{InitializerExpression}}
+\index{InitializerExpression@{InitializerExpression}!IR::InitializerExpression@{IR::InitializerExpression}}
+\doxysubsubsection{\texorpdfstring{InitializerExpression()}{InitializerExpression()}\hspace{0.1cm}{\footnotesize\ttfamily [5/6]}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_initializer_expression_ad794bbcaee5eebb9816bea075d2c2c06} 
+IR\+::\+Initializer\+Expression\+::\+Initializer\+Expression (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{_basic_types_8h_adc9896ee12db3bb116fc63b3464c72c7}{F64}}}]{in\+F64}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_module_8h_source_l00036}{36}} of file \mbox{\hyperlink{_module_8h_source}{Module.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00036\ :\ \mbox{\hyperlink{struct_i_r_1_1_initializer_expression_a66f8d262d27a9bd6536f0268974c7dd5}{type}}(\mbox{\hyperlink{struct_i_r_1_1_initializer_expression_a9a750d98a419b79ee4826a047051033aa59fba2191173c583fef18016d997b43d}{Type::f64\_const}}),\ \mbox{\hyperlink{struct_i_r_1_1_initializer_expression_ab35ab53209a2a771973719a934f1fd23}{f64}}(inF64)\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{struct_i_r_1_1_initializer_expression_a6295b58ea6c3c681192cd12de2088758}\index{IR::InitializerExpression@{IR::InitializerExpression}!InitializerExpression@{InitializerExpression}}
+\index{InitializerExpression@{InitializerExpression}!IR::InitializerExpression@{IR::InitializerExpression}}
+\doxysubsubsection{\texorpdfstring{InitializerExpression()}{InitializerExpression()}\hspace{0.1cm}{\footnotesize\ttfamily [6/6]}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_initializer_expression_a6295b58ea6c3c681192cd12de2088758} 
+IR\+::\+Initializer\+Expression\+::\+Initializer\+Expression (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_i_r_1_1_initializer_expression_a9a750d98a419b79ee4826a047051033a}{Type}}}]{in\+Type}{, }\item[{\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}}]{in\+Global\+Index}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_module_8h_source_l00037}{37}} of file \mbox{\hyperlink{_module_8h_source}{Module.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00037\ :\ \mbox{\hyperlink{struct_i_r_1_1_initializer_expression_a66f8d262d27a9bd6536f0268974c7dd5}{type}}(inType),\ \mbox{\hyperlink{struct_i_r_1_1_initializer_expression_a00cd4a62f249390a3e6b504161d6cb16}{globalIndex}}(inGlobalIndex)\ \{\ \mbox{\hyperlink{_errors_8h_a03bec6af3af0dd492e348b40cbe40a46}{WAVM\_ASSERT\_THROW}}(inType\ ==\ \mbox{\hyperlink{struct_i_r_1_1_initializer_expression_a9a750d98a419b79ee4826a047051033aaa3cb4bb86d6df102d0a7e937d7d5f43f}{Type::get\_global}});\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_i_r_1_1_initializer_expression_a31cde2d2e429eb35eff0e510c3e3eed5}\doxysubsubsection{\texorpdfstring{[union]}{[union]}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_initializer_expression_a31cde2d2e429eb35eff0e510c3e3eed5} 
+union  \{ ... \}  \mbox{\hyperlink{struct_i_r_1_1_initializer_expression}{IR\+::\+Initializer\+Expression}}}
+
+\Hypertarget{struct_i_r_1_1_initializer_expression_a5411cbab9a351c570a65440b14175765}\index{IR::InitializerExpression@{IR::InitializerExpression}!f32@{f32}}
+\index{f32@{f32}!IR::InitializerExpression@{IR::InitializerExpression}}
+\doxysubsubsection{\texorpdfstring{f32}{f32}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_initializer_expression_a5411cbab9a351c570a65440b14175765} 
+\mbox{\hyperlink{_basic_types_8h_a841d3674577a1e86afdc2f4845f46c4b}{F32}} IR\+::\+Initializer\+Expression\+::f32}
+
+
+
+Definition at line \mbox{\hyperlink{_module_8h_source_l00028}{28}} of file \mbox{\hyperlink{_module_8h_source}{Module.\+h}}.
+
+\Hypertarget{struct_i_r_1_1_initializer_expression_ab35ab53209a2a771973719a934f1fd23}\index{IR::InitializerExpression@{IR::InitializerExpression}!f64@{f64}}
+\index{f64@{f64}!IR::InitializerExpression@{IR::InitializerExpression}}
+\doxysubsubsection{\texorpdfstring{f64}{f64}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_initializer_expression_ab35ab53209a2a771973719a934f1fd23} 
+\mbox{\hyperlink{_basic_types_8h_adc9896ee12db3bb116fc63b3464c72c7}{F64}} IR\+::\+Initializer\+Expression\+::f64}
+
+
+
+Definition at line \mbox{\hyperlink{_module_8h_source_l00029}{29}} of file \mbox{\hyperlink{_module_8h_source}{Module.\+h}}.
+
+\Hypertarget{struct_i_r_1_1_initializer_expression_a00cd4a62f249390a3e6b504161d6cb16}\index{IR::InitializerExpression@{IR::InitializerExpression}!globalIndex@{globalIndex}}
+\index{globalIndex@{globalIndex}!IR::InitializerExpression@{IR::InitializerExpression}}
+\doxysubsubsection{\texorpdfstring{globalIndex}{globalIndex}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_initializer_expression_a00cd4a62f249390a3e6b504161d6cb16} 
+\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} IR\+::\+Initializer\+Expression\+::global\+Index}
+
+
+
+Definition at line \mbox{\hyperlink{_module_8h_source_l00030}{30}} of file \mbox{\hyperlink{_module_8h_source}{Module.\+h}}.
+
+\Hypertarget{struct_i_r_1_1_initializer_expression_ae39054471f85529a9a641962618bab7e}\index{IR::InitializerExpression@{IR::InitializerExpression}!i32@{i32}}
+\index{i32@{i32}!IR::InitializerExpression@{IR::InitializerExpression}}
+\doxysubsubsection{\texorpdfstring{i32}{i32}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_initializer_expression_ae39054471f85529a9a641962618bab7e} 
+\mbox{\hyperlink{_basic_types_8h_a2f1a62071dd7dc3f6ef85c1b7612dc35}{I32}} IR\+::\+Initializer\+Expression\+::i32}
+
+
+
+Definition at line \mbox{\hyperlink{_module_8h_source_l00026}{26}} of file \mbox{\hyperlink{_module_8h_source}{Module.\+h}}.
+
+\Hypertarget{struct_i_r_1_1_initializer_expression_ab777bb0a665bfc21bde59f2bc3ae4c77}\index{IR::InitializerExpression@{IR::InitializerExpression}!i64@{i64}}
+\index{i64@{i64}!IR::InitializerExpression@{IR::InitializerExpression}}
+\doxysubsubsection{\texorpdfstring{i64}{i64}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_initializer_expression_ab777bb0a665bfc21bde59f2bc3ae4c77} 
+\mbox{\hyperlink{_basic_types_8h_a416b74ff5b1dc365af5713a3f48fb8b9}{I64}} IR\+::\+Initializer\+Expression\+::i64}
+
+
+
+Definition at line \mbox{\hyperlink{_module_8h_source_l00027}{27}} of file \mbox{\hyperlink{_module_8h_source}{Module.\+h}}.
+
+\Hypertarget{struct_i_r_1_1_initializer_expression_a66f8d262d27a9bd6536f0268974c7dd5}\index{IR::InitializerExpression@{IR::InitializerExpression}!type@{type}}
+\index{type@{type}!IR::InitializerExpression@{IR::InitializerExpression}}
+\doxysubsubsection{\texorpdfstring{type}{type}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_initializer_expression_a66f8d262d27a9bd6536f0268974c7dd5} 
+\mbox{\hyperlink{struct_i_r_1_1_initializer_expression_a9a750d98a419b79ee4826a047051033a}{Type}} IR\+::\+Initializer\+Expression\+::type}
+
+
+
+Definition at line \mbox{\hyperlink{_module_8h_source_l00023}{23}} of file \mbox{\hyperlink{_module_8h_source}{Module.\+h}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/wasm-\/jit/\+Include/\+IR/\mbox{\hyperlink{_module_8h}{Module.\+h}}\end{DoxyCompactItemize}

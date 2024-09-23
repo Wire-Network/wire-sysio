@@ -1,0 +1,148 @@
+\doxysection{Random\+Int\+Generator Class Reference}
+\hypertarget{class_random_int_generator}{}\label{class_random_int_generator}\index{RandomIntGenerator@{RandomIntGenerator}}
+
+
+Inheritance diagram for Random\+Int\+Generator\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=198pt]{class_random_int_generator__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Random\+Int\+Generator\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=198pt]{class_random_int_generator__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_random_int_generator_a176a0e629577687ab7fa77a2b656ef8a}{Random\+Int\+Generator}} (int low, int high)
+\item 
+int const \& \mbox{\hyperlink{class_random_int_generator_ac6fffa166da96d59763b69573c67d918}{get}} () const override
+\item 
+bool \mbox{\hyperlink{class_random_int_generator_a665ebd2a72423f7c953278e591cd0dd3}{next}} () override
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{struct_catch_1_1_generators_1_1_i_generator}{Catch\+::\+Generators\+::\+IGenerator$<$ int $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{struct_catch_1_1_generators_1_1_i_generator_afe5b6eecbbd735e69748d68574611747}{\texorpdfstring{$\sim$}{\string~}\+IGenerator}} ()=default
+\item 
+virtual \mbox{\hyperlink{struct_catch_1_1_generators_1_1_i_generator_afe5b6eecbbd735e69748d68574611747}{\texorpdfstring{$\sim$}{\string~}\+IGenerator}} ()=default
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{class_catch_1_1_generators_1_1_generator_untyped_base}{Catch\+::\+Generators\+::\+Generator\+Untyped\+Base}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_catch_1_1_generators_1_1_generator_untyped_base_a00ff0179d739c3016756b6cf56fabbad}{Generator\+Untyped\+Base}} ()=default
+\item 
+virtual \mbox{\hyperlink{class_catch_1_1_generators_1_1_generator_untyped_base_a3e9065352141a8706eafeb3ffb3b662e}{\texorpdfstring{$\sim$}{\string~}\+Generator\+Untyped\+Base}} ()
+\item 
+\mbox{\hyperlink{class_catch_1_1_generators_1_1_generator_untyped_base_a00ff0179d739c3016756b6cf56fabbad}{Generator\+Untyped\+Base}} ()=default
+\item 
+virtual \mbox{\hyperlink{class_catch_1_1_generators_1_1_generator_untyped_base_a6f05f8099fdc5744a7aff68aa8c09c7f}{\texorpdfstring{$\sim$}{\string~}\+Generator\+Untyped\+Base}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Public Types inherited from \mbox{\hyperlink{struct_catch_1_1_generators_1_1_i_generator}{Catch\+::\+Generators\+::\+IGenerator$<$ int $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{struct_catch_1_1_generators_1_1_i_generator_acbb6642f67ee8d8aeae1f79ae5e16504}{type}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{300-_gen-_own_generator_8cpp_source_l00012}{12}} of file \mbox{\hyperlink{300-_gen-_own_generator_8cpp_source}{300-\/\+Gen-\/\+Own\+Generator.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_random_int_generator_a176a0e629577687ab7fa77a2b656ef8a}\index{RandomIntGenerator@{RandomIntGenerator}!RandomIntGenerator@{RandomIntGenerator}}
+\index{RandomIntGenerator@{RandomIntGenerator}!RandomIntGenerator@{RandomIntGenerator}}
+\doxysubsubsection{\texorpdfstring{RandomIntGenerator()}{RandomIntGenerator()}}
+{\footnotesize\ttfamily \label{class_random_int_generator_a176a0e629577687ab7fa77a2b656ef8a} 
+Random\+Int\+Generator\+::\+Random\+Int\+Generator (\begin{DoxyParamCaption}\item[{int}]{low}{, }\item[{int}]{high}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{300-_gen-_own_generator_8cpp_source_l00018}{18}} of file \mbox{\hyperlink{300-_gen-_own_generator_8cpp_source}{300-\/\+Gen-\/\+Own\+Generator.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ m\_rand(std::random\_device\{\}()),}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ m\_dist(low,\ high)}
+\DoxyCodeLine{00021\ \ \ \ \ \{}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{void}\textcolor{keyword}{>}(\mbox{\hyperlink{class_random_int_generator_a665ebd2a72423f7c953278e591cd0dd3}{next}}());}
+\DoxyCodeLine{00023\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=336pt]{class_random_int_generator_a176a0e629577687ab7fa77a2b656ef8a_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_random_int_generator_ac6fffa166da96d59763b69573c67d918}\index{RandomIntGenerator@{RandomIntGenerator}!get@{get}}
+\index{get@{get}!RandomIntGenerator@{RandomIntGenerator}}
+\doxysubsubsection{\texorpdfstring{get()}{get()}}
+{\footnotesize\ttfamily \label{class_random_int_generator_ac6fffa166da96d59763b69573c67d918} 
+int const  \& Random\+Int\+Generator\+::get (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_generators_1_1_i_generator_a0fb6da789cda5b4e90f036737db82485}{Catch\+::\+Generators\+::\+IGenerator$<$ int $>$}}.
+
+
+
+Definition at line \mbox{\hyperlink{300-_gen-_own_generator_8cpp_source_l00033}{33}} of file \mbox{\hyperlink{300-_gen-_own_generator_8cpp_source}{300-\/\+Gen-\/\+Own\+Generator.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00034\ \ \ \ \ \textcolor{keywordflow}{return}\ current\_number;}
+\DoxyCodeLine{00035\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_random_int_generator_a665ebd2a72423f7c953278e591cd0dd3}\index{RandomIntGenerator@{RandomIntGenerator}!next@{next}}
+\index{next@{next}!RandomIntGenerator@{RandomIntGenerator}}
+\doxysubsubsection{\texorpdfstring{next()}{next()}}
+{\footnotesize\ttfamily \label{class_random_int_generator_a665ebd2a72423f7c953278e591cd0dd3} 
+bool Random\+Int\+Generator\+::next (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{class_catch_1_1_generators_1_1_generator_untyped_base_aeed3c0cd6233c5f553549e453b8d6638}{Catch\+::\+Generators\+::\+Generator\+Untyped\+Base}}.
+
+
+
+Definition at line \mbox{\hyperlink{300-_gen-_own_generator_8cpp_source_l00026}{26}} of file \mbox{\hyperlink{300-_gen-_own_generator_8cpp_source}{300-\/\+Gen-\/\+Own\+Generator.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ current\_number\ =\ m\_dist(m\_rand);}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00029\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=336pt]{class_random_int_generator_a665ebd2a72423f7c953278e591cd0dd3_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/examples/\mbox{\hyperlink{300-_gen-_own_generator_8cpp}{300-\/\+Gen-\/\+Own\+Generator.\+cpp}}\end{DoxyCompactItemize}

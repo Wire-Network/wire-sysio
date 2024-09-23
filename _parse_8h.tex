@@ -1,0 +1,116 @@
+\doxysection{libraries/wasm-\/jit/\+Source/\+WAST/\+Parse.h File Reference}
+\hypertarget{_parse_8h}{}\label{_parse_8h}\index{libraries/wasm-\/jit/Source/WAST/Parse.h@{libraries/wasm-\/jit/Source/WAST/Parse.h}}
+{\ttfamily \#include "{}Inline/\+Basic\+Types.\+h"{}}\newline
+{\ttfamily \#include "{}WAST.\+h"{}}\newline
+{\ttfamily \#include "{}Lexer.\+h"{}}\newline
+{\ttfamily \#include "{}IR/\+Types.\+h"{}}\newline
+{\ttfamily \#include "{}IR/\+Module.\+h"{}}\newline
+{\ttfamily \#include $<$functional$>$}\newline
+{\ttfamily \#include $<$map$>$}\newline
+{\ttfamily \#include $<$unordered\+\_\+map$>$}\newline
+Include dependency graph for Parse.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{_parse_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{_parse_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_w_a_s_t_1_1_fatal_parse_exception}{WAST\+::\+Fatal\+Parse\+Exception}}
+\item 
+struct \mbox{\hyperlink{struct_w_a_s_t_1_1_recover_parse_exception}{WAST\+::\+Recover\+Parse\+Exception}}
+\item 
+struct \mbox{\hyperlink{struct_w_a_s_t_1_1_unresolved_error}{WAST\+::\+Unresolved\+Error}}
+\item 
+struct \mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{WAST\+::\+Parse\+State}}
+\item 
+struct \mbox{\hyperlink{struct_w_a_s_t_1_1_name}{WAST\+::\+Name}}
+\item 
+struct \mbox{\hyperlink{struct_w_a_s_t_1_1_name_1_1_hasher}{WAST\+::\+Name\+::\+Hasher}}
+\item 
+struct \mbox{\hyperlink{struct_w_a_s_t_1_1_reference}{WAST\+::\+Reference}}
+\item 
+struct \mbox{\hyperlink{struct_w_a_s_t_1_1_unresolved_function_type}{WAST\+::\+Unresolved\+Function\+Type}}
+\item 
+struct \mbox{\hyperlink{struct_w_a_s_t_1_1_module_parse_state}{WAST\+::\+Module\+Parse\+State}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespace_w_a_s_t}{WAST}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef std\+::unordered\+\_\+map$<$ \mbox{\hyperlink{struct_w_a_s_t_1_1_name}{Name}}, \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}, \mbox{\hyperlink{struct_w_a_s_t_1_1_name_1_1_hasher}{Name\+::\+Hasher}} $>$ \mbox{\hyperlink{namespace_w_a_s_t_a2d9d3ba4e83db4fbb314c3068261afa5}{WAST\+::\+Name\+To\+Index\+Map}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{namespace_w_a_s_t_a2a4f0a07b303edd2429f3db01b0b6deb}{WAST\+::parse\+Errorf}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&\mbox{\hyperlink{structstate}{state}}, \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} char\+Offset, const char \texorpdfstring{$\ast$}{*}message\+Format,...)
+\item 
+void \mbox{\hyperlink{namespace_w_a_s_t_acef8b86d580be4e8ababec916f5f4bd9}{WAST\+::parse\+Errorf}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&\mbox{\hyperlink{structstate}{state}}, const char \texorpdfstring{$\ast$}{*}next\+Char, const char \texorpdfstring{$\ast$}{*}message\+Format,...)
+\item 
+void \mbox{\hyperlink{namespace_w_a_s_t_ae1d0d61716282a37bd7990c2ec54ae4b}{WAST\+::parse\+Errorf}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&\mbox{\hyperlink{structstate}{state}}, const Token \texorpdfstring{$\ast$}{*}next\+Token, const char \texorpdfstring{$\ast$}{*}message\+Format,...)
+\item 
+void \mbox{\hyperlink{namespace_w_a_s_t_a8001b89de5d29cdf830471e70b13798a}{WAST\+::require}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&\mbox{\hyperlink{structstate}{state}}, \mbox{\hyperlink{namespace_w_a_s_t_a57c99a932a2a7d69084cbeca01031f32}{Token\+Type}} type)
+\item 
+bool \mbox{\hyperlink{namespace_w_a_s_t_a9f94aa21c00c56bd18ed6b48ee8145c8}{WAST\+::try\+Parse\+Value\+Type}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&\mbox{\hyperlink{structstate}{state}}, \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{Value\+Type}} \&out\+Value\+Type)
+\item 
+bool \mbox{\hyperlink{namespace_w_a_s_t_a9e4c5dc0f2d2044bb55b0702d2f6dc51}{WAST\+::try\+Parse\+Result\+Type}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&\mbox{\hyperlink{structstate}{state}}, \mbox{\hyperlink{namespace_i_r_ac56fb5355b338ad4a167c48ec539b90b}{Result\+Type}} \&out\+Result\+Type)
+\item 
+\mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{Value\+Type}} \mbox{\hyperlink{namespace_w_a_s_t_afb469d566925151c57afa1dd31721c9c}{WAST\+::parse\+Value\+Type}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&\mbox{\hyperlink{structstate}{state}})
+\item 
+const \mbox{\hyperlink{struct_i_r_1_1_function_type}{Function\+Type}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_w_a_s_t_afdc0ca4bc5028ce0d0d1f0b50eadf451}{WAST\+::parse\+Function\+Type}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_module_parse_state}{Module\+Parse\+State}} \&\mbox{\hyperlink{structstate}{state}}, \mbox{\hyperlink{namespace_w_a_s_t_a2d9d3ba4e83db4fbb314c3068261afa5}{Name\+To\+Index\+Map}} \&out\+Local\+Name\+To\+Index\+Map, std\+::vector$<$ std\+::string $>$ \&out\+Local\+Disassembly\+Names)
+\item 
+\mbox{\hyperlink{struct_w_a_s_t_1_1_unresolved_function_type}{Unresolved\+Function\+Type}} \mbox{\hyperlink{namespace_w_a_s_t_ab72b47fe2520b8a7840ff4ce5d07684d}{WAST\+::parse\+Function\+Type\+Ref\+And\+Or\+Decl}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_module_parse_state}{Module\+Parse\+State}} \&\mbox{\hyperlink{structstate}{state}}, \mbox{\hyperlink{namespace_w_a_s_t_a2d9d3ba4e83db4fbb314c3068261afa5}{Name\+To\+Index\+Map}} \&out\+Local\+Name\+To\+Index\+Map, std\+::vector$<$ std\+::string $>$ \&out\+Local\+Disassembly\+Names)
+\item 
+\mbox{\hyperlink{struct_i_r_1_1_indexed_function_type}{Indexed\+Function\+Type}} \mbox{\hyperlink{namespace_w_a_s_t_ae274bd19819be1d3ef32161e6d8a2f7f}{WAST\+::resolve\+Function\+Type}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_module_parse_state}{Module\+Parse\+State}} \&\mbox{\hyperlink{structstate}{state}}, const \mbox{\hyperlink{struct_w_a_s_t_1_1_unresolved_function_type}{Unresolved\+Function\+Type}} \&unresolved\+Type)
+\item 
+\mbox{\hyperlink{struct_i_r_1_1_indexed_function_type}{Indexed\+Function\+Type}} \mbox{\hyperlink{namespace_w_a_s_t_a0fe85cc07ee6a0695ebb31644fc0ce7b}{WAST\+::get\+Unique\+Function\+Type\+Index}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_module_parse_state}{Module\+Parse\+State}} \&\mbox{\hyperlink{structstate}{state}}, const \mbox{\hyperlink{struct_i_r_1_1_function_type}{Function\+Type}} \texorpdfstring{$\ast$}{*}function\+Type)
+\item 
+bool \mbox{\hyperlink{namespace_w_a_s_t_abdd0bdb7d4c0fb7a7b98ef2624edb7b3}{WAST\+::try\+Parse\+Hexit}} (const char \texorpdfstring{$\ast$}{*}\&next\+Char, \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} \&out\+Value)
+\item 
+bool \mbox{\hyperlink{namespace_w_a_s_t_a0fb1b690639911ade0de451575d32309}{WAST\+::try\+Parse\+I32}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&\mbox{\hyperlink{structstate}{state}}, \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}} \&out\+I32)
+\item 
+bool \mbox{\hyperlink{namespace_w_a_s_t_a8f980380d965a6fceff6ff5c61dc6974}{WAST\+::try\+Parse\+I64}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&\mbox{\hyperlink{structstate}{state}}, \mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}} \&out\+I64)
+\item 
+\mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} \mbox{\hyperlink{namespace_w_a_s_t_ad29b64fadb8a9ec5fe54a9a147fcf618}{WAST\+::parse\+I8}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&\mbox{\hyperlink{structstate}{state}})
+\item 
+\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}} \mbox{\hyperlink{namespace_w_a_s_t_aa08a40e9ae2c8cb30939574c65bb9eb7}{WAST\+::parse\+I32}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&\mbox{\hyperlink{structstate}{state}})
+\item 
+\mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}} \mbox{\hyperlink{namespace_w_a_s_t_acc415079db29202983e4d49cabc59ab3}{WAST\+::parse\+I64}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&\mbox{\hyperlink{structstate}{state}})
+\item 
+\mbox{\hyperlink{_basic_types_8h_a841d3674577a1e86afdc2f4845f46c4b}{F32}} \mbox{\hyperlink{namespace_w_a_s_t_a2951f7730d860b16cf24168f13ec7d01}{WAST\+::parse\+F32}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&\mbox{\hyperlink{structstate}{state}})
+\item 
+\mbox{\hyperlink{_basic_types_8h_adc9896ee12db3bb116fc63b3464c72c7}{F64}} \mbox{\hyperlink{namespace_w_a_s_t_a40af95ba4f3fbebd5324a913f89d1aff}{WAST\+::parse\+F64}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&\mbox{\hyperlink{structstate}{state}})
+\item 
+bool \mbox{\hyperlink{namespace_w_a_s_t_a445014b335af98dc3ab063c91108f1b4}{WAST\+::try\+Parse\+String}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&\mbox{\hyperlink{structstate}{state}}, std\+::string \&out\+String)
+\item 
+std\+::string \mbox{\hyperlink{namespace_w_a_s_t_a135c7788f903660b33ab7c72e6662882}{WAST\+::parse\+UTF8\+String}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&\mbox{\hyperlink{structstate}{state}})
+\item 
+bool \mbox{\hyperlink{namespace_w_a_s_t_a5a1887aa3f790b93a65b578a3b4628e3}{WAST\+::try\+Parse\+Name}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&\mbox{\hyperlink{structstate}{state}}, \mbox{\hyperlink{struct_w_a_s_t_1_1_name}{Name}} \&out\+Name)
+\item 
+bool \mbox{\hyperlink{namespace_w_a_s_t_a965b97566a3d051c08b06c7488c14ad8}{WAST\+::try\+Parse\+Name\+Or\+Index\+Ref}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&\mbox{\hyperlink{structstate}{state}}, \mbox{\hyperlink{struct_w_a_s_t_1_1_reference}{Reference}} \&out\+Ref)
+\item 
+\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}} \mbox{\hyperlink{namespace_w_a_s_t_a90c0a142bd4b2b03f4d957bca6a88365}{WAST\+::parse\+And\+Resolve\+Name\+Or\+Index\+Ref}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&\mbox{\hyperlink{structstate}{state}}, const \mbox{\hyperlink{namespace_w_a_s_t_a2d9d3ba4e83db4fbb314c3068261afa5}{Name\+To\+Index\+Map}} \&name\+To\+Index\+Map, \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} max\+Index, const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{structcontext}{context}})
+\item 
+void \mbox{\hyperlink{namespace_w_a_s_t_a9b736e747098508f90bd9495fa4a9a11}{WAST\+::bind\+Name}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&\mbox{\hyperlink{structstate}{state}}, \mbox{\hyperlink{namespace_w_a_s_t_a2d9d3ba4e83db4fbb314c3068261afa5}{Name\+To\+Index\+Map}} \&name\+To\+Index\+Map, const \mbox{\hyperlink{struct_w_a_s_t_1_1_name}{Name}} \&\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}, \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} index)
+\item 
+\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}} \mbox{\hyperlink{namespace_w_a_s_t_ad98b487d5f8d6b2397db35e9d6c79ae8}{WAST\+::resolve\+Ref}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&\mbox{\hyperlink{structstate}{state}}, const \mbox{\hyperlink{namespace_w_a_s_t_a2d9d3ba4e83db4fbb314c3068261afa5}{Name\+To\+Index\+Map}} \&name\+To\+Index\+Map, \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} max\+Index, const \mbox{\hyperlink{struct_w_a_s_t_1_1_reference}{Reference}} \&ref)
+\item 
+void \mbox{\hyperlink{namespace_w_a_s_t_a726a4231e5222857c2151800be474de7}{WAST\+::find\+Closing\+Parenthesis}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&\mbox{\hyperlink{structstate}{state}}, const Token \texorpdfstring{$\ast$}{*}opening\+Parenthesis\+Token)
+\item 
+\mbox{\hyperlink{struct_i_r_1_1_function_def}{IR\+::\+Function\+Def}} \mbox{\hyperlink{namespace_w_a_s_t_ad67ed47b4a120f234a3a4a2da076418f}{WAST\+::parse\+Function\+Def}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_module_parse_state}{Module\+Parse\+State}} \&\mbox{\hyperlink{structstate}{state}}, const Token \texorpdfstring{$\ast$}{*}func\+Token)
+\item 
+void \mbox{\hyperlink{namespace_w_a_s_t_ad410cd830815633b2f57fdce5c6919fd}{WAST\+::parse\+Module\+Body}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_module_parse_state}{Module\+Parse\+State}} \&\mbox{\hyperlink{structstate}{state}})
+\end{DoxyCompactItemize}

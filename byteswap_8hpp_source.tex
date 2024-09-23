@@ -1,0 +1,20 @@
+\doxysection{byteswap.\+hpp}
+\hypertarget{byteswap_8hpp_source}{}\label{byteswap_8hpp_source}\index{libraries/fc/src/byteswap.hpp@{libraries/fc/src/byteswap.hpp}}
+\mbox{\hyperlink{byteswap_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{byteswap_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{byteswap_8hpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{byteswap_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#ifdef\ \_WIN32}}
+\DoxyCodeLine{\Hypertarget{byteswap_8hpp_source_l00004}00004\ \textcolor{preprocessor}{\#\ include\ <stdlib.h>}}
+\DoxyCodeLine{\Hypertarget{byteswap_8hpp_source_l00005}00005\ \textcolor{preprocessor}{\#\ define\ bswap\_64(x)\ \_byteswap\_uint64(x)}}
+\DoxyCodeLine{\Hypertarget{byteswap_8hpp_source_l00006}00006\ \textcolor{preprocessor}{\#elif\ defined(\_\_APPLE\_\_)}}
+\DoxyCodeLine{\Hypertarget{byteswap_8hpp_source_l00007}00007\ \textcolor{preprocessor}{\#\ include\ <libkern/OSByteOrder.h>}}
+\DoxyCodeLine{\Hypertarget{byteswap_8hpp_source_l00008}00008\ \textcolor{preprocessor}{\#\ define\ bswap\_64(x)\ OSSwapInt64(x)}}
+\DoxyCodeLine{\Hypertarget{byteswap_8hpp_source_l00009}00009\ \textcolor{preprocessor}{\#elif\ defined(\_\_FreeBSD\_\_)}}
+\DoxyCodeLine{\Hypertarget{byteswap_8hpp_source_l00010}00010\ \textcolor{preprocessor}{\#\ include\ <sys/endian.h>}}
+\DoxyCodeLine{\Hypertarget{byteswap_8hpp_source_l00011}00011\ \textcolor{preprocessor}{\#\ define\ bswap\_64(x)\ bswap64(x)}}
+\DoxyCodeLine{\Hypertarget{byteswap_8hpp_source_l00012}00012\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{byteswap_8hpp_source_l00013}00013\ \textcolor{preprocessor}{\#\ include\ <byteswap.h>}}
+\DoxyCodeLine{\Hypertarget{byteswap_8hpp_source_l00014}00014\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

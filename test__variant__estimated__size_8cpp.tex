@@ -1,0 +1,351 @@
+\doxysection{libraries/fc/test/variant\+\_\+estimated\+\_\+size/test\+\_\+variant\+\_\+estimated\+\_\+size.cpp File Reference}
+\hypertarget{test__variant__estimated__size_8cpp}{}\label{test__variant__estimated__size_8cpp}\index{libraries/fc/test/variant\_estimated\_size/test\_variant\_estimated\_size.cpp@{libraries/fc/test/variant\_estimated\_size/test\_variant\_estimated\_size.cpp}}
+{\ttfamily \#include $<$boost/test/included/unit\+\_\+test.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/variant\+\_\+object.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/exception/exception.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/crypto/base64.\+hpp$>$}\newline
+{\ttfamily \#include $<$string$>$}\newline
+Include dependency graph for test\+\_\+variant\+\_\+estimated\+\_\+size.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__variant__estimated__size_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{test__variant__estimated__size_8cpp_a6b2a3852db8bb19ab6909bac01859985}{BOOST\+\_\+\+TEST\+\_\+\+MODULE}}~\mbox{\hyperlink{classfc_1_1variant}{variant}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{test__variant__estimated__size_8cpp_a02f824db2b71f82cad8182f20d14407f}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (null\+\_\+variant\+\_\+estimated\+\_\+size\+\_\+test)
+\item 
+\mbox{\hyperlink{test__variant__estimated__size_8cpp_a2e8018ae35a3eeacbed27ac870a984af}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (int64\+\_\+variant\+\_\+estimated\+\_\+size\+\_\+test)
+\item 
+\mbox{\hyperlink{test__variant__estimated__size_8cpp_add3840ded8e43dfffbf212d4fed6ad90}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (uint64\+\_\+variant\+\_\+estimated\+\_\+size\+\_\+test)
+\item 
+\mbox{\hyperlink{test__variant__estimated__size_8cpp_ae3a7c65126a8fffb35320010ee8bda9a}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (double\+\_\+variant\+\_\+estimated\+\_\+size\+\_\+test)
+\item 
+\mbox{\hyperlink{test__variant__estimated__size_8cpp_a71d17654b36ff5adfcfc22671bac0d5b}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (string\+\_\+variant\+\_\+estimated\+\_\+size\+\_\+test)
+\item 
+\mbox{\hyperlink{test__variant__estimated__size_8cpp_a1deb1fcda09a128713b02171e65d1f03}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (blob\+\_\+variant\+\_\+estimated\+\_\+size\+\_\+test)
+\item 
+\mbox{\hyperlink{test__variant__estimated__size_8cpp_ae872afa2822a76406276f81711ef0374}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (variant\+\_\+object\+\_\+variant\+\_\+estimated\+\_\+size\+\_\+test)
+\item 
+\mbox{\hyperlink{test__variant__estimated__size_8cpp_a4afaafd8b85b1eaef682b8efdf748634}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (array\+\_\+variant\+\_\+estimated\+\_\+size\+\_\+test)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{test__variant__estimated__size_8cpp_a6b2a3852db8bb19ab6909bac01859985}\index{test\_variant\_estimated\_size.cpp@{test\_variant\_estimated\_size.cpp}!BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}}
+\index{BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}!test\_variant\_estimated\_size.cpp@{test\_variant\_estimated\_size.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_TEST\_MODULE}{BOOST\_TEST\_MODULE}}
+{\footnotesize\ttfamily \label{test__variant__estimated__size_8cpp_a6b2a3852db8bb19ab6909bac01859985} 
+\#define BOOST\+\_\+\+TEST\+\_\+\+MODULE~\mbox{\hyperlink{classfc_1_1variant}{variant}}}
+
+
+
+Definition at line \mbox{\hyperlink{test__variant__estimated__size_8cpp_source_l00001}{1}} of file \mbox{\hyperlink{test__variant__estimated__size_8cpp_source}{test\+\_\+variant\+\_\+estimated\+\_\+size.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{test__variant__estimated__size_8cpp_a4afaafd8b85b1eaef682b8efdf748634}\index{test\_variant\_estimated\_size.cpp@{test\_variant\_estimated\_size.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!test\_variant\_estimated\_size.cpp@{test\_variant\_estimated\_size.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/8]}}
+{\footnotesize\ttfamily \label{test__variant__estimated__size_8cpp_a4afaafd8b85b1eaef682b8efdf748634} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{array\+\_\+variant\+\_\+estimated\+\_\+size\+\_\+test}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__variant__estimated__size_8cpp_source_l00138}{138}} of file \mbox{\hyperlink{test__variant__estimated__size_8cpp_source}{test\+\_\+variant\+\_\+estimated\+\_\+size.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00139\ \{}
+\DoxyCodeLine{00140\ \ \ \ \textcolor{keywordtype}{bool}\ b\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00141\ \ \ \ \textcolor{keywordtype}{wchar\_t}\ wc[]\ =\ L\textcolor{stringliteral}{"{}Goodbye"{}};\ \textcolor{comment}{//\ 7\ +\ sizeof(string)}}
+\DoxyCodeLine{00142\ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ i\ =\ 54321;}
+\DoxyCodeLine{00143\ }
+\DoxyCodeLine{00144\ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{variant}}\ v\_bool(b);}
+\DoxyCodeLine{00145\ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{variant}}\ v\_wchar(wc);}
+\DoxyCodeLine{00146\ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{variant}}\ v\_uint32(i);\ \textcolor{comment}{//\ +\ 3\ *\ sizeof(variant)}}
+\DoxyCodeLine{00147\ }
+\DoxyCodeLine{00148\ \ \ \ \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}\ vs;\ \textcolor{comment}{//\ +\ sizeof(variants)}}
+\DoxyCodeLine{00149\ \ \ \ vs.push\_back(v\_bool);}
+\DoxyCodeLine{00150\ \ \ \ vs.push\_back(v\_wchar);}
+\DoxyCodeLine{00151\ \ \ \ vs.push\_back(v\_uint32);}
+\DoxyCodeLine{00152\ }
+\DoxyCodeLine{00153\ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{variant}}\ v\_variants(vs);\ \textcolor{comment}{//\ +\ sizeof(variant)}}
+\DoxyCodeLine{00154\ \ \ \ BOOST\_CHECK\_EQUAL(v\_variants.estimated\_size(),\ 7\ +\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{string})\ +\ 4\ *\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{classfc_1_1variant}{variant}})\ +\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}));}
+\DoxyCodeLine{00155\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__variant__estimated__size_8cpp_a4afaafd8b85b1eaef682b8efdf748634_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__variant__estimated__size_8cpp_a1deb1fcda09a128713b02171e65d1f03}\index{test\_variant\_estimated\_size.cpp@{test\_variant\_estimated\_size.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!test\_variant\_estimated\_size.cpp@{test\_variant\_estimated\_size.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/8]}}
+{\footnotesize\ttfamily \label{test__variant__estimated__size_8cpp_a1deb1fcda09a128713b02171e65d1f03} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{blob\+\_\+variant\+\_\+estimated\+\_\+size\+\_\+test}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__variant__estimated__size_8cpp_source_l00092}{92}} of file \mbox{\hyperlink{test__variant__estimated__size_8cpp_source}{test\+\_\+variant\+\_\+estimated\+\_\+size.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00093\ \{}
+\DoxyCodeLine{00094\ \ \ \ \mbox{\hyperlink{structfc_1_1blob}{blob}}\ \mbox{\hyperlink{namespace_xbyak_1_1util_ab5af29f4e1d45ee51da87d37853590ef}{bl}};}
+\DoxyCodeLine{00095\ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_ab5af29f4e1d45ee51da87d37853590ef}{bl}}.data.push\_back(\textcolor{charliteral}{'f'});}
+\DoxyCodeLine{00096\ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_ab5af29f4e1d45ee51da87d37853590ef}{bl}}.data.push\_back(\textcolor{charliteral}{'o'});}
+\DoxyCodeLine{00097\ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_ab5af29f4e1d45ee51da87d37853590ef}{bl}}.data.push\_back(\textcolor{charliteral}{'o'});}
+\DoxyCodeLine{00098\ }
+\DoxyCodeLine{00099\ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{variant}}\ v\_blob(bl);}
+\DoxyCodeLine{00100\ }
+\DoxyCodeLine{00101\ \ \ \ BOOST\_CHECK\_EQUAL(v\_blob.estimated\_size(),\ 3\ +\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{classfc_1_1variant}{variant}})\ +\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{structfc_1_1blob}{blob}}));}
+\DoxyCodeLine{00102\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__variant__estimated__size_8cpp_a1deb1fcda09a128713b02171e65d1f03_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__variant__estimated__size_8cpp_ae3a7c65126a8fffb35320010ee8bda9a}\index{test\_variant\_estimated\_size.cpp@{test\_variant\_estimated\_size.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!test\_variant\_estimated\_size.cpp@{test\_variant\_estimated\_size.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [3/8]}}
+{\footnotesize\ttfamily \label{test__variant__estimated__size_8cpp_ae3a7c65126a8fffb35320010ee8bda9a} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{double\+\_\+variant\+\_\+estimated\+\_\+size\+\_\+test}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__variant__estimated__size_8cpp_source_l00059}{59}} of file \mbox{\hyperlink{test__variant__estimated__size_8cpp_source}{test\+\_\+variant\+\_\+estimated\+\_\+size.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00060\ \{}
+\DoxyCodeLine{00061\ \ \ \ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}\ =\ 3.14;}
+\DoxyCodeLine{00062\ \ \ \ \textcolor{keywordtype}{double}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ =\ 12.345;}
+\DoxyCodeLine{00063\ }
+\DoxyCodeLine{00064\ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{variant}}\ v\_float(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}});}
+\DoxyCodeLine{00065\ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{variant}}\ v\_double(d);}
+\DoxyCodeLine{00066\ }
+\DoxyCodeLine{00067\ \ \ \ BOOST\_CHECK\_EQUAL(v\_float.estimated\_size(),\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{classfc_1_1variant}{variant}}));}
+\DoxyCodeLine{00068\ \ \ \ BOOST\_CHECK\_EQUAL(v\_double.estimated\_size(),\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{classfc_1_1variant}{variant}}));}
+\DoxyCodeLine{00069\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__variant__estimated__size_8cpp_ae3a7c65126a8fffb35320010ee8bda9a_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__variant__estimated__size_8cpp_a2e8018ae35a3eeacbed27ac870a984af}\index{test\_variant\_estimated\_size.cpp@{test\_variant\_estimated\_size.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!test\_variant\_estimated\_size.cpp@{test\_variant\_estimated\_size.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [4/8]}}
+{\footnotesize\ttfamily \label{test__variant__estimated__size_8cpp_a2e8018ae35a3eeacbed27ac870a984af} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{int64\+\_\+variant\+\_\+estimated\+\_\+size\+\_\+test}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__variant__estimated__size_8cpp_source_l00023}{23}} of file \mbox{\hyperlink{test__variant__estimated__size_8cpp_source}{test\+\_\+variant\+\_\+estimated\+\_\+size.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00024\ \{}
+\DoxyCodeLine{00025\ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ i\ =\ 1;}
+\DoxyCodeLine{00026\ \ \ \ \mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ =\ 2;}
+\DoxyCodeLine{00027\ \ \ \ \mbox{\hyperlink{stdint_8h_a269259c924dce846340ddbb810db2e3c}{int16\_t}}\ k\ =\ 3;}
+\DoxyCodeLine{00028\ \ \ \ \mbox{\hyperlink{stdint_8h_aef44329758059c91c76d334e8fc09700}{int8\_t}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}\ =\ 4;}
+\DoxyCodeLine{00029\ }
+\DoxyCodeLine{00030\ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{variant}}\ v\_int\_64(i);}
+\DoxyCodeLine{00031\ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{variant}}\ v\_int\_32(\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}});}
+\DoxyCodeLine{00032\ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{variant}}\ v\_int\_16(k);}
+\DoxyCodeLine{00033\ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{variant}}\ v\_int\_8(\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}});}
+\DoxyCodeLine{00034\ }
+\DoxyCodeLine{00035\ \ \ \ BOOST\_CHECK\_EQUAL(v\_int\_64.estimated\_size(),\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{classfc_1_1variant}{variant}}));}
+\DoxyCodeLine{00036\ \ \ \ BOOST\_CHECK\_EQUAL(v\_int\_32.estimated\_size(),\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{classfc_1_1variant}{variant}}));}
+\DoxyCodeLine{00037\ \ \ \ BOOST\_CHECK\_EQUAL(v\_int\_16.estimated\_size(),\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{classfc_1_1variant}{variant}}));}
+\DoxyCodeLine{00038\ \ \ \ BOOST\_CHECK\_EQUAL(v\_int\_8.estimated\_size(),\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{classfc_1_1variant}{variant}}));}
+\DoxyCodeLine{00039\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__variant__estimated__size_8cpp_a2e8018ae35a3eeacbed27ac870a984af_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__variant__estimated__size_8cpp_a02f824db2b71f82cad8182f20d14407f}\index{test\_variant\_estimated\_size.cpp@{test\_variant\_estimated\_size.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!test\_variant\_estimated\_size.cpp@{test\_variant\_estimated\_size.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [5/8]}}
+{\footnotesize\ttfamily \label{test__variant__estimated__size_8cpp_a02f824db2b71f82cad8182f20d14407f} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{null\+\_\+variant\+\_\+estimated\+\_\+size\+\_\+test}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__variant__estimated__size_8cpp_source_l00012}{12}} of file \mbox{\hyperlink{test__variant__estimated__size_8cpp_source}{test\+\_\+variant\+\_\+estimated\+\_\+size.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00013\ \{}
+\DoxyCodeLine{00014\ \ \ \ \mbox{\hyperlink{namespacefc_aeffaff8d6d824699c60630a03055fd2f}{nullptr\_t}}\ np;}
+\DoxyCodeLine{00015\ }
+\DoxyCodeLine{00016\ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{variant}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{00017\ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{variant}}\ v\_nullptr(np);}
+\DoxyCodeLine{00018\ }
+\DoxyCodeLine{00019\ \ \ \ BOOST\_CHECK\_EQUAL(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.estimated\_size(),\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{classfc_1_1variant}{variant}}));}
+\DoxyCodeLine{00020\ \ \ \ BOOST\_CHECK\_EQUAL(v\_nullptr.estimated\_size(),\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{classfc_1_1variant}{variant}}));}
+\DoxyCodeLine{00021\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__variant__estimated__size_8cpp_a02f824db2b71f82cad8182f20d14407f_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__variant__estimated__size_8cpp_a71d17654b36ff5adfcfc22671bac0d5b}\index{test\_variant\_estimated\_size.cpp@{test\_variant\_estimated\_size.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!test\_variant\_estimated\_size.cpp@{test\_variant\_estimated\_size.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [6/8]}}
+{\footnotesize\ttfamily \label{test__variant__estimated__size_8cpp_a71d17654b36ff5adfcfc22671bac0d5b} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{string\+\_\+variant\+\_\+estimated\+\_\+size\+\_\+test}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__variant__estimated__size_8cpp_source_l00071}{71}} of file \mbox{\hyperlink{test__variant__estimated__size_8cpp_source}{test\+\_\+variant\+\_\+estimated\+\_\+size.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00072\ \{}
+\DoxyCodeLine{00073\ \ \ \ \textcolor{keywordtype}{char}\ c[]\ =\ \textcolor{stringliteral}{"{}Hello\ World"{}};}
+\DoxyCodeLine{00074\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ cc\ =\ \textcolor{stringliteral}{"{}Goodbye"{}};}
+\DoxyCodeLine{00075\ \ \ \ \textcolor{keywordtype}{wchar\_t}\ wc[]\ =\ L\textcolor{stringliteral}{"{}0123456789"{}};}
+\DoxyCodeLine{00076\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{wchar\_t}*\ cwc\ =\ L\textcolor{stringliteral}{"{}foo"{}};}
+\DoxyCodeLine{00077\ \ \ \ \textcolor{keywordtype}{string}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ =\ \textcolor{stringliteral}{"{}abcdefghijklmnopqrstuvwxyz"{}};}
+\DoxyCodeLine{00078\ }
+\DoxyCodeLine{00079\ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{variant}}\ v\_char(c);}
+\DoxyCodeLine{00080\ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{variant}}\ v\_const\_char(cc);}
+\DoxyCodeLine{00081\ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{variant}}\ v\_wchar(wc);}
+\DoxyCodeLine{00082\ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{variant}}\ v\_const\_wchar(cwc);}
+\DoxyCodeLine{00083\ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{variant}}\ v\_string(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{00084\ }
+\DoxyCodeLine{00085\ \ \ \ BOOST\_CHECK\_EQUAL(v\_char.estimated\_size(),\ 11\ +\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{classfc_1_1variant}{variant}})\ +\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{string}));}
+\DoxyCodeLine{00086\ \ \ \ BOOST\_CHECK\_EQUAL(v\_const\_char.estimated\_size(),\ 7\ +\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{classfc_1_1variant}{variant}})\ +\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{string}));}
+\DoxyCodeLine{00087\ \ \ \ BOOST\_CHECK\_EQUAL(v\_wchar.estimated\_size(),\ 10\ +\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{classfc_1_1variant}{variant}})\ +\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{string}));}
+\DoxyCodeLine{00088\ \ \ \ BOOST\_CHECK\_EQUAL(v\_const\_wchar.estimated\_size(),\ 3\ +\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{classfc_1_1variant}{variant}})\ +\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{string}));}
+\DoxyCodeLine{00089\ \ \ \ BOOST\_CHECK\_EQUAL(v\_string.estimated\_size(),\ 26\ +\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{classfc_1_1variant}{variant}})\ +\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{string}));}
+\DoxyCodeLine{00090\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__variant__estimated__size_8cpp_a71d17654b36ff5adfcfc22671bac0d5b_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__variant__estimated__size_8cpp_add3840ded8e43dfffbf212d4fed6ad90}\index{test\_variant\_estimated\_size.cpp@{test\_variant\_estimated\_size.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!test\_variant\_estimated\_size.cpp@{test\_variant\_estimated\_size.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [7/8]}}
+{\footnotesize\ttfamily \label{test__variant__estimated__size_8cpp_add3840ded8e43dfffbf212d4fed6ad90} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{uint64\+\_\+variant\+\_\+estimated\+\_\+size\+\_\+test}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__variant__estimated__size_8cpp_source_l00041}{41}} of file \mbox{\hyperlink{test__variant__estimated__size_8cpp_source}{test\+\_\+variant\+\_\+estimated\+\_\+size.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00042\ \{}
+\DoxyCodeLine{00043\ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ i\ =\ 1;}
+\DoxyCodeLine{00044\ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ =\ 2;}
+\DoxyCodeLine{00045\ \ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ k\ =\ 3;}
+\DoxyCodeLine{00046\ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}\ =\ 4;}
+\DoxyCodeLine{00047\ }
+\DoxyCodeLine{00048\ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{variant}}\ v\_uint\_64(i);}
+\DoxyCodeLine{00049\ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{variant}}\ v\_uint\_32(\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}});}
+\DoxyCodeLine{00050\ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{variant}}\ v\_uint\_16(k);}
+\DoxyCodeLine{00051\ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{variant}}\ v\_uint\_8(\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}});}
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ \ \ \ BOOST\_CHECK\_EQUAL(v\_uint\_64.estimated\_size(),\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{classfc_1_1variant}{variant}}));}
+\DoxyCodeLine{00054\ \ \ \ BOOST\_CHECK\_EQUAL(v\_uint\_32.estimated\_size(),\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{classfc_1_1variant}{variant}}));}
+\DoxyCodeLine{00055\ \ \ \ BOOST\_CHECK\_EQUAL(v\_uint\_16.estimated\_size(),\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{classfc_1_1variant}{variant}}));}
+\DoxyCodeLine{00056\ \ \ \ BOOST\_CHECK\_EQUAL(v\_uint\_8.estimated\_size(),\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{classfc_1_1variant}{variant}}));}
+\DoxyCodeLine{00057\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__variant__estimated__size_8cpp_add3840ded8e43dfffbf212d4fed6ad90_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__variant__estimated__size_8cpp_ae872afa2822a76406276f81711ef0374}\index{test\_variant\_estimated\_size.cpp@{test\_variant\_estimated\_size.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!test\_variant\_estimated\_size.cpp@{test\_variant\_estimated\_size.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [8/8]}}
+{\footnotesize\ttfamily \label{test__variant__estimated__size_8cpp_ae872afa2822a76406276f81711ef0374} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{variant\+\_\+object\+\_\+variant\+\_\+estimated\+\_\+size\+\_\+test}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__variant__estimated__size_8cpp_source_l00104}{104}} of file \mbox{\hyperlink{test__variant__estimated__size_8cpp_source}{test\+\_\+variant\+\_\+estimated\+\_\+size.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00105\ \{}
+\DoxyCodeLine{00106\ \ \ \ \textcolor{keywordtype}{string}\ \mbox{\hyperlink{namespace_xbyak_1_1util_af8470854aa90939d4da91289ed794592}{k1}}\ =\ \textcolor{stringliteral}{"{}key\_bool"{}};}
+\DoxyCodeLine{00107\ \ \ \ \textcolor{keywordtype}{string}\ \mbox{\hyperlink{namespace_xbyak_1_1util_ac0dde280b7bdf628e0817e4e7cf0a11f}{k2}}\ =\ \textcolor{stringliteral}{"{}key\_string"{}};}
+\DoxyCodeLine{00108\ \ \ \ \textcolor{keywordtype}{string}\ \mbox{\hyperlink{namespace_xbyak_1_1util_a5c5fe0d5d511a86937012247ec0141dc}{k3}}\ =\ \textcolor{stringliteral}{"{}key\_int16"{}};}
+\DoxyCodeLine{00109\ \ \ \ \textcolor{keywordtype}{string}\ \mbox{\hyperlink{namespace_xbyak_1_1util_aa1885fef6531ac0218c592d1fa30ee51}{k4}}\ =\ \textcolor{stringliteral}{"{}key\_blob"{}};\ \textcolor{comment}{//\ 35\ +\ 4\ *\ sizeof(string)}}
+\DoxyCodeLine{00110\ }
+\DoxyCodeLine{00111\ \ \ \ \textcolor{keywordtype}{bool}\ b\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00112\ \ \ \ \textcolor{keywordtype}{string}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ =\ \textcolor{stringliteral}{"{}HelloWorld"{}};\ \textcolor{comment}{//\ 10\ +\ sizeof(string)}}
+\DoxyCodeLine{00113\ \ \ \ \mbox{\hyperlink{stdint_8h_a269259c924dce846340ddbb810db2e3c}{int16\_t}}\ i\ =\ 123;}
+\DoxyCodeLine{00114\ \ \ \ \mbox{\hyperlink{structfc_1_1blob}{blob}}\ \mbox{\hyperlink{namespace_xbyak_1_1util_ab5af29f4e1d45ee51da87d37853590ef}{bl}};}
+\DoxyCodeLine{00115\ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_ab5af29f4e1d45ee51da87d37853590ef}{bl}}.data.push\_back(\textcolor{charliteral}{'b'});}
+\DoxyCodeLine{00116\ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_ab5af29f4e1d45ee51da87d37853590ef}{bl}}.data.push\_back(\textcolor{charliteral}{'a'});}
+\DoxyCodeLine{00117\ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_ab5af29f4e1d45ee51da87d37853590ef}{bl}}.data.push\_back(\textcolor{charliteral}{'r'});\ \textcolor{comment}{//\ 3\ +\ sizeof(blob)}}
+\DoxyCodeLine{00118\ }
+\DoxyCodeLine{00119\ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{variant}}\ v\_bool(b);}
+\DoxyCodeLine{00120\ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{variant}}\ v\_string(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{00121\ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{variant}}\ v\_int16(i);}
+\DoxyCodeLine{00122\ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{variant}}\ v\_blob(bl);\ \textcolor{comment}{//\ +\ 4\ *\ sizeof(variant)}}
+\DoxyCodeLine{00123\ }
+\DoxyCodeLine{00124\ \ \ \ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\_variant\_object}}\ mu;}
+\DoxyCodeLine{00125\ \ \ \ mu(k1,\ b);}
+\DoxyCodeLine{00126\ \ \ \ mu(k2,\ v\_string);}
+\DoxyCodeLine{00127\ \ \ \ mu(k3,\ v\_int16);}
+\DoxyCodeLine{00128\ \ \ \ mu(k4,\ bl);}
+\DoxyCodeLine{00129\ \ \ \ \mbox{\hyperlink{classfc_1_1variant__object}{variant\_object}}\ vo(mu);\ \textcolor{comment}{//\ +\ sizeof(variant\_object)\ +\ sizeof(std::vector<variant\_object::entry>)}}
+\DoxyCodeLine{00130\ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{variant}}\ v\_vo(vo);\ \textcolor{comment}{//\ +\ sizeof(variant)}}
+\DoxyCodeLine{00131\ }
+\DoxyCodeLine{00132\ \ \ \ BOOST\_CHECK\_EQUAL(vo.estimated\_size(),\ 48\ +\ 5\ *\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{string})\ +\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{structfc_1_1blob}{blob}})\ +\ 4\ *\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{classfc_1_1variant}{variant}})\ +}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{classfc_1_1variant__object}{variant\_object}})\ +\ \textcolor{keyword}{sizeof}(std::vector<variant\_object::entry>));}
+\DoxyCodeLine{00134\ \ \ \ BOOST\_CHECK\_EQUAL(v\_vo.estimated\_size(),\ 48\ +\ 5\ *\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{string})\ +\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{structfc_1_1blob}{blob}})\ +\ 5\ *\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{classfc_1_1variant}{variant}})\ +}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{classfc_1_1variant__object}{variant\_object}})\ +\ \textcolor{keyword}{sizeof}(std::vector<variant\_object::entry>));}
+\DoxyCodeLine{00136\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__variant__estimated__size_8cpp_ae872afa2822a76406276f81711ef0374_cgraph}
+\end{center}
+\end{figure}

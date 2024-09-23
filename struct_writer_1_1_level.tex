@@ -1,0 +1,90 @@
+\doxysection{Writer\texorpdfstring{$<$}{<} Output\+Stream, Source\+Encoding, Target\+Encoding, Stack\+Allocator, write\+Flags \texorpdfstring{$>$}{>}\+::Level Struct Reference}
+\hypertarget{struct_writer_1_1_level}{}\label{struct_writer_1_1_level}\index{Writer$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$::Level@{Writer$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$::Level}}
+
+
+Information for each nested level.  
+
+
+
+
+{\ttfamily \#include $<$writer.\+h$>$}
+
+
+
+Collaboration diagram for Writer\texorpdfstring{$<$}{<} Output\+Stream, Source\+Encoding, Target\+Encoding, Stack\+Allocator, write\+Flags \texorpdfstring{$>$}{>}\+::Level\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=247pt]{struct_writer_1_1_level__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_writer_1_1_level_a0b1844a7a1b7c6c20e1964dbb67da484}{Level}} (bool in\+Array\+\_\+)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+size\+\_\+t \mbox{\hyperlink{struct_writer_1_1_level_a4a09e5fda49d0d57b2adc041203f244f}{value\+Count}}
+\begin{DoxyCompactList}\small\item\em number of values in this level \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{struct_writer_1_1_level_aa009a2d675e98757c2997072aad78789}{in\+Array}}
+\begin{DoxyCompactList}\small\item\em true if in array, otherwise in object \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Output\+Stream, typename Source\+Encoding = UTF8$<$$>$, typename Target\+Encoding = UTF8$<$$>$, typename Stack\+Allocator = Crt\+Allocator, unsigned write\+Flags = k\+Write\+Default\+Flags$>$\newline
+struct Writer$<$ Output\+Stream, Source\+Encoding, Target\+Encoding, Stack\+Allocator, write\+Flags $>$\+::\+Level}
+
+
+Definition at line \mbox{\hyperlink{writer_8h_source_l00287}{287}} of file \mbox{\hyperlink{writer_8h_source}{writer.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{struct_writer_1_1_level_a0b1844a7a1b7c6c20e1964dbb67da484}\index{Writer$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$::Level@{Writer$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$::Level}!Level@{Level}}
+\index{Level@{Level}!Writer$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$::Level@{Writer$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$::Level}}
+\doxysubsubsection{\texorpdfstring{Level()}{Level()}}
+{\footnotesize\ttfamily \label{struct_writer_1_1_level_a0b1844a7a1b7c6c20e1964dbb67da484} 
+template$<$typename Output\+Stream , typename Source\+Encoding  = UTF8$<$$>$, typename Target\+Encoding  = UTF8$<$$>$, typename Stack\+Allocator  = Crt\+Allocator, unsigned write\+Flags = k\+Write\+Default\+Flags$>$ \\
+\mbox{\hyperlink{class_writer}{Writer}}$<$ Output\+Stream, Source\+Encoding, Target\+Encoding, Stack\+Allocator, write\+Flags $>$\+::\+Level\+::\+Level (\begin{DoxyParamCaption}\item[{bool}]{in\+Array\+\_\+}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{writer_8h_source_l00288}{288}} of file \mbox{\hyperlink{writer_8h_source}{writer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00288\ :\ \mbox{\hyperlink{struct_writer_1_1_level_a4a09e5fda49d0d57b2adc041203f244f}{valueCount}}(0),\ \mbox{\hyperlink{struct_writer_1_1_level_aa009a2d675e98757c2997072aad78789}{inArray}}(inArray\_)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_writer_1_1_level_aa009a2d675e98757c2997072aad78789}\index{Writer$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$::Level@{Writer$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$::Level}!inArray@{inArray}}
+\index{inArray@{inArray}!Writer$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$::Level@{Writer$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$::Level}}
+\doxysubsubsection{\texorpdfstring{inArray}{inArray}}
+{\footnotesize\ttfamily \label{struct_writer_1_1_level_aa009a2d675e98757c2997072aad78789} 
+template$<$typename Output\+Stream , typename Source\+Encoding  = UTF8$<$$>$, typename Target\+Encoding  = UTF8$<$$>$, typename Stack\+Allocator  = Crt\+Allocator, unsigned write\+Flags = k\+Write\+Default\+Flags$>$ \\
+bool \mbox{\hyperlink{class_writer}{Writer}}$<$ Output\+Stream, Source\+Encoding, Target\+Encoding, Stack\+Allocator, write\+Flags $>$\+::\+Level\+::in\+Array}
+
+
+
+Definition at line \mbox{\hyperlink{writer_8h_source_l00290}{290}} of file \mbox{\hyperlink{writer_8h_source}{writer.\+h}}.
+
+\Hypertarget{struct_writer_1_1_level_a4a09e5fda49d0d57b2adc041203f244f}\index{Writer$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$::Level@{Writer$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$::Level}!valueCount@{valueCount}}
+\index{valueCount@{valueCount}!Writer$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$::Level@{Writer$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$::Level}}
+\doxysubsubsection{\texorpdfstring{valueCount}{valueCount}}
+{\footnotesize\ttfamily \label{struct_writer_1_1_level_a4a09e5fda49d0d57b2adc041203f244f} 
+template$<$typename Output\+Stream , typename Source\+Encoding  = UTF8$<$$>$, typename Target\+Encoding  = UTF8$<$$>$, typename Stack\+Allocator  = Crt\+Allocator, unsigned write\+Flags = k\+Write\+Default\+Flags$>$ \\
+size\+\_\+t \mbox{\hyperlink{class_writer}{Writer}}$<$ Output\+Stream, Source\+Encoding, Target\+Encoding, Stack\+Allocator, write\+Flags $>$\+::\+Level\+::value\+Count}
+
+
+
+Definition at line \mbox{\hyperlink{writer_8h_source_l00289}{289}} of file \mbox{\hyperlink{writer_8h_source}{writer.\+h}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/\mbox{\hyperlink{writer_8h}{writer.\+h}}\end{DoxyCompactItemize}

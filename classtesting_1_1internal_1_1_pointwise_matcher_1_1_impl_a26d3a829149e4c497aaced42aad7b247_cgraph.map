@@ -1,0 +1,12 @@
+<map id="testing::internal::PointwiseMatcher::Impl::DescribeNegationTo" name="testing::internal::PointwiseMatcher::Impl::DescribeNegationTo">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,164,87"/>
+<area shape="rect" id="Node000002" href="$classtesting_1_1internal_1_1_matcher_base.html#ac1089d49b6b8a381900618985cd69b7f" title=" " alt="" coords="212,5,436,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="164,45,196,41,196,46,164,51"/>
+<area shape="rect" id="Node000003" href="$namespacetesting_1_1internal.html#a30708fa2bacf11895b03bdb21eb72309" title=" " alt="" coords="265,71,383,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="164,67,250,78,249,84,164,72"/>
+<area shape="rect" id="Node000004" href="$classtesting_1_1internal_1_1_universal_printer.html#aecec021e1abbaa260b701e24e3fe33eb" title=" " alt="" coords="484,71,633,111"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="383,88,468,88,468,94,383,94"/>
+<area shape="rect" id="Node000005" href="$namespacetesting_1_1internal.html#a8fd10cc30084c36a89c74868c8bd53f8" title=" " alt="" coords="681,71,800,111"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="634,97,666,97,666,103,634,103"/>
+<area shape="poly" id="edge5_Node000005_Node000004" title=" " alt="" coords="681,85,649,85,649,79,681,80"/>
+</map>

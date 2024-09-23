@@ -1,0 +1,195 @@
+\doxysection{nm\+\_\+debug\+\_\+info Struct Reference}
+\hypertarget{structnm__debug__info}{}\label{structnm__debug__info}\index{nm\_debug\_info@{nm\_debug\_info}}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{structnm__debug__info_a7434679cfddcefb686649ea4856b9206}{builder}} = \mbox{\hyperlink{structnm__debug__info}{nm\+\_\+debug\+\_\+info}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{structnm__debug__info_aa4a6ef815e4fa6415e24639e0d54fddb}{on\+\_\+code\+\_\+start}} (const void \texorpdfstring{$\ast$}{*}compiled\+\_\+base, const void \texorpdfstring{$\ast$}{*}wasm\+\_\+code\+\_\+start)
+\item 
+void \mbox{\hyperlink{structnm__debug__info_a8fabad2e8fe4ae9a5f345839de5d09c6}{on\+\_\+function\+\_\+start}} (const void \texorpdfstring{$\ast$}{*}code\+\_\+addr, const void \texorpdfstring{$\ast$}{*}wasm\+\_\+addr)
+\item 
+void \mbox{\hyperlink{structnm__debug__info_a634b7d7c37e69480d46be7d3d030da92}{on\+\_\+instr\+\_\+start}} (const void \texorpdfstring{$\ast$}{*}code\+\_\+addr, const void \texorpdfstring{$\ast$}{*}wasm\+\_\+addr)
+\item 
+void \mbox{\hyperlink{structnm__debug__info_a48e6583ddd55266e2d260f16d6f6d54f}{on\+\_\+code\+\_\+end}} (const void \texorpdfstring{$\ast$}{*}code\+\_\+addr, const void \texorpdfstring{$\ast$}{*}wasm\+\_\+addr)
+\item 
+void \mbox{\hyperlink{structnm__debug__info_a8afdbb26cc40f0ff966677711e89a875}{set}} (\mbox{\hyperlink{structnm__debug__info}{nm\+\_\+debug\+\_\+info}} \&\&other)
+\item 
+void \mbox{\hyperlink{structnm__debug__info_a0cfef058ebfcb9b055bced877002c25a}{relocate}} (const void \texorpdfstring{$\ast$}{*})
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structnm__debug__info_a1ecad6e2a5bcfd62cdc09ea145d52bb0}{get\+\_\+function}} (std\+::uint32\+\_\+t addr)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+const void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structnm__debug__info_a0009f23b1ce9aada07d6e06f9322a6b4}{wasm\+\_\+base}}
+\item 
+std\+::vector$<$ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} $>$ \mbox{\hyperlink{structnm__debug__info_a5e39ea3cd1d9c4ab3284f9726755b865}{function\+\_\+offsets}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{addr2line_8cpp_source_l00006}{6}} of file \mbox{\hyperlink{addr2line_8cpp_source}{addr2line.\+cpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{structnm__debug__info_a7434679cfddcefb686649ea4856b9206}\index{nm\_debug\_info@{nm\_debug\_info}!builder@{builder}}
+\index{builder@{builder}!nm\_debug\_info@{nm\_debug\_info}}
+\doxysubsubsection{\texorpdfstring{builder}{builder}}
+{\footnotesize\ttfamily \label{structnm__debug__info_a7434679cfddcefb686649ea4856b9206} 
+using \mbox{\hyperlink{structnm__debug__info_a7434679cfddcefb686649ea4856b9206}{nm\+\_\+debug\+\_\+info\+::builder}} = \mbox{\hyperlink{structnm__debug__info}{nm\+\_\+debug\+\_\+info}}}
+
+
+
+Definition at line \mbox{\hyperlink{addr2line_8cpp_source_l00007}{7}} of file \mbox{\hyperlink{addr2line_8cpp_source}{addr2line.\+cpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structnm__debug__info_a1ecad6e2a5bcfd62cdc09ea145d52bb0}\index{nm\_debug\_info@{nm\_debug\_info}!get\_function@{get\_function}}
+\index{get\_function@{get\_function}!nm\_debug\_info@{nm\_debug\_info}}
+\doxysubsubsection{\texorpdfstring{get\_function()}{get\_function()}}
+{\footnotesize\ttfamily \label{structnm__debug__info_a1ecad6e2a5bcfd62cdc09ea145d52bb0} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} nm\+\_\+debug\+\_\+info\+::get\+\_\+function (\begin{DoxyParamCaption}\item[{std\+::uint32\+\_\+t}]{addr}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{addr2line_8cpp_source_l00019}{19}} of file \mbox{\hyperlink{addr2line_8cpp_source}{addr2line.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ pos\ =\ std::lower\_bound(\mbox{\hyperlink{structnm__debug__info_a5e39ea3cd1d9c4ab3284f9726755b865}{function\_offsets}}.begin(),\ \mbox{\hyperlink{structnm__debug__info_a5e39ea3cd1d9c4ab3284f9726755b865}{function\_offsets}}.end(),\ addr\ +\ 1);}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(pos\ ==\ \mbox{\hyperlink{structnm__debug__info_a5e39ea3cd1d9c4ab3284f9726755b865}{function\_offsets}}.begin())\ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (pos\ -\/\ \mbox{\hyperlink{structnm__debug__info_a5e39ea3cd1d9c4ab3284f9726755b865}{function\_offsets}}.begin())\ -\/\ 1;}
+\DoxyCodeLine{00023\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structnm__debug__info_a48e6583ddd55266e2d260f16d6f6d54f}\index{nm\_debug\_info@{nm\_debug\_info}!on\_code\_end@{on\_code\_end}}
+\index{on\_code\_end@{on\_code\_end}!nm\_debug\_info@{nm\_debug\_info}}
+\doxysubsubsection{\texorpdfstring{on\_code\_end()}{on\_code\_end()}}
+{\footnotesize\ttfamily \label{structnm__debug__info_a48e6583ddd55266e2d260f16d6f6d54f} 
+void nm\+\_\+debug\+\_\+info\+::on\+\_\+code\+\_\+end (\begin{DoxyParamCaption}\item[{const void \texorpdfstring{$\ast$}{*}}]{code\+\_\+addr}{, }\item[{const void \texorpdfstring{$\ast$}{*}}]{wasm\+\_\+addr}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{addr2line_8cpp_source_l00015}{15}} of file \mbox{\hyperlink{addr2line_8cpp_source}{addr2line.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00015\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{structnm__debug__info_aa4a6ef815e4fa6415e24639e0d54fddb}\index{nm\_debug\_info@{nm\_debug\_info}!on\_code\_start@{on\_code\_start}}
+\index{on\_code\_start@{on\_code\_start}!nm\_debug\_info@{nm\_debug\_info}}
+\doxysubsubsection{\texorpdfstring{on\_code\_start()}{on\_code\_start()}}
+{\footnotesize\ttfamily \label{structnm__debug__info_aa4a6ef815e4fa6415e24639e0d54fddb} 
+void nm\+\_\+debug\+\_\+info\+::on\+\_\+code\+\_\+start (\begin{DoxyParamCaption}\item[{const void \texorpdfstring{$\ast$}{*}}]{compiled\+\_\+base}{, }\item[{const void \texorpdfstring{$\ast$}{*}}]{wasm\+\_\+code\+\_\+start}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{addr2line_8cpp_source_l00008}{8}} of file \mbox{\hyperlink{addr2line_8cpp_source}{addr2line.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00008\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00009\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structnm__debug__info_a0009f23b1ce9aada07d6e06f9322a6b4}{wasm\_base}}\ =\ wasm\_code\_start;}
+\DoxyCodeLine{00010\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structnm__debug__info_a8fabad2e8fe4ae9a5f345839de5d09c6}\index{nm\_debug\_info@{nm\_debug\_info}!on\_function\_start@{on\_function\_start}}
+\index{on\_function\_start@{on\_function\_start}!nm\_debug\_info@{nm\_debug\_info}}
+\doxysubsubsection{\texorpdfstring{on\_function\_start()}{on\_function\_start()}}
+{\footnotesize\ttfamily \label{structnm__debug__info_a8fabad2e8fe4ae9a5f345839de5d09c6} 
+void nm\+\_\+debug\+\_\+info\+::on\+\_\+function\+\_\+start (\begin{DoxyParamCaption}\item[{const void \texorpdfstring{$\ast$}{*}}]{code\+\_\+addr}{, }\item[{const void \texorpdfstring{$\ast$}{*}}]{wasm\+\_\+addr}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{addr2line_8cpp_source_l00011}{11}} of file \mbox{\hyperlink{addr2line_8cpp_source}{addr2line.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00011\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00012\ \ \ \ \ \ \ \mbox{\hyperlink{structnm__debug__info_a5e39ea3cd1d9c4ab3284f9726755b865}{function\_offsets}}.push\_back(\textcolor{keyword}{static\_cast<}std::uint32\_t\textcolor{keyword}{>}(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(wasm\_addr)\ -\/\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(\mbox{\hyperlink{structnm__debug__info_a0009f23b1ce9aada07d6e06f9322a6b4}{wasm\_base}})));}
+\DoxyCodeLine{00013\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structnm__debug__info_a634b7d7c37e69480d46be7d3d030da92}\index{nm\_debug\_info@{nm\_debug\_info}!on\_instr\_start@{on\_instr\_start}}
+\index{on\_instr\_start@{on\_instr\_start}!nm\_debug\_info@{nm\_debug\_info}}
+\doxysubsubsection{\texorpdfstring{on\_instr\_start()}{on\_instr\_start()}}
+{\footnotesize\ttfamily \label{structnm__debug__info_a634b7d7c37e69480d46be7d3d030da92} 
+void nm\+\_\+debug\+\_\+info\+::on\+\_\+instr\+\_\+start (\begin{DoxyParamCaption}\item[{const void \texorpdfstring{$\ast$}{*}}]{code\+\_\+addr}{, }\item[{const void \texorpdfstring{$\ast$}{*}}]{wasm\+\_\+addr}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{addr2line_8cpp_source_l00014}{14}} of file \mbox{\hyperlink{addr2line_8cpp_source}{addr2line.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00014\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{structnm__debug__info_a0cfef058ebfcb9b055bced877002c25a}\index{nm\_debug\_info@{nm\_debug\_info}!relocate@{relocate}}
+\index{relocate@{relocate}!nm\_debug\_info@{nm\_debug\_info}}
+\doxysubsubsection{\texorpdfstring{relocate()}{relocate()}}
+{\footnotesize\ttfamily \label{structnm__debug__info_a0cfef058ebfcb9b055bced877002c25a} 
+void nm\+\_\+debug\+\_\+info\+::relocate (\begin{DoxyParamCaption}\item[{const void \texorpdfstring{$\ast$}{*}}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{addr2line_8cpp_source_l00017}{17}} of file \mbox{\hyperlink{addr2line_8cpp_source}{addr2line.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00017\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{structnm__debug__info_a8afdbb26cc40f0ff966677711e89a875}\index{nm\_debug\_info@{nm\_debug\_info}!set@{set}}
+\index{set@{set}!nm\_debug\_info@{nm\_debug\_info}}
+\doxysubsubsection{\texorpdfstring{set()}{set()}}
+{\footnotesize\ttfamily \label{structnm__debug__info_a8afdbb26cc40f0ff966677711e89a875} 
+void nm\+\_\+debug\+\_\+info\+::set (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structnm__debug__info}{nm\+\_\+debug\+\_\+info}} \&\&}]{other}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{addr2line_8cpp_source_l00016}{16}} of file \mbox{\hyperlink{addr2line_8cpp_source}{addr2line.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00016\ \{\ *\textcolor{keyword}{this}\ =\ std::move(other);\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structnm__debug__info_a5e39ea3cd1d9c4ab3284f9726755b865}\index{nm\_debug\_info@{nm\_debug\_info}!function\_offsets@{function\_offsets}}
+\index{function\_offsets@{function\_offsets}!nm\_debug\_info@{nm\_debug\_info}}
+\doxysubsubsection{\texorpdfstring{function\_offsets}{function\_offsets}}
+{\footnotesize\ttfamily \label{structnm__debug__info_a5e39ea3cd1d9c4ab3284f9726755b865} 
+std\+::vector$<$\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}$>$ nm\+\_\+debug\+\_\+info\+::function\+\_\+offsets}
+
+
+
+Definition at line \mbox{\hyperlink{addr2line_8cpp_source_l00026}{26}} of file \mbox{\hyperlink{addr2line_8cpp_source}{addr2line.\+cpp}}.
+
+\Hypertarget{structnm__debug__info_a0009f23b1ce9aada07d6e06f9322a6b4}\index{nm\_debug\_info@{nm\_debug\_info}!wasm\_base@{wasm\_base}}
+\index{wasm\_base@{wasm\_base}!nm\_debug\_info@{nm\_debug\_info}}
+\doxysubsubsection{\texorpdfstring{wasm\_base}{wasm\_base}}
+{\footnotesize\ttfamily \label{structnm__debug__info_a0009f23b1ce9aada07d6e06f9322a6b4} 
+const void\texorpdfstring{$\ast$}{*} nm\+\_\+debug\+\_\+info\+::wasm\+\_\+base}
+
+
+
+Definition at line \mbox{\hyperlink{addr2line_8cpp_source_l00025}{25}} of file \mbox{\hyperlink{addr2line_8cpp_source}{addr2line.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/tools/\mbox{\hyperlink{addr2line_8cpp}{addr2line.\+cpp}}\end{DoxyCompactItemize}

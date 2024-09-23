@@ -1,0 +1,120 @@
+\doxysection{sysio\+::chain\+::webassembly\+::eos\+\_\+vm\+\_\+runtime Namespace Reference}
+\hypertarget{namespacesysio_1_1chain_1_1webassembly_1_1eos__vm__runtime}{}\label{namespacesysio_1_1chain_1_1webassembly_1_1eos__vm__runtime}\index{sysio::chain::webassembly::eos\_vm\_runtime@{sysio::chain::webassembly::eos\_vm\_runtime}}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1apply__options}{apply\+\_\+options}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1eos__vm__instantiated__module}{eos\+\_\+vm\+\_\+instantiated\+\_\+module}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1eos__vm__profile__runtime}{eos\+\_\+vm\+\_\+profile\+\_\+runtime}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1eos__vm__runtime}{eos\+\_\+vm\+\_\+runtime}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1profile__config}{profile\+\_\+config}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1setcode__options}{setcode\+\_\+options}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_a78d9d364a9ab60de8d18b4660f592d5f}{validate}} (const \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}} \&code, const \mbox{\hyperlink{namespacesysio_1_1chain_ab67e634f02d35e09950917271779b2ff}{whitelisted\+\_\+intrinsics\+\_\+type}} \&intrinsics)
+\item 
+void \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_a9cd22b0e9d05f910358f809fcd29ffec}{validate}} (const \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}} \&code, const \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config}{wasm\+\_\+config}} \&cfg, const \mbox{\hyperlink{namespacesysio_1_1chain_ab67e634f02d35e09950917271779b2ff}{whitelisted\+\_\+intrinsics\+\_\+type}} \&intrinsics)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacesysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_a9cd22b0e9d05f910358f809fcd29ffec}\index{sysio::chain::webassembly::eos\_vm\_runtime@{sysio::chain::webassembly::eos\_vm\_runtime}!validate@{validate}}
+\index{validate@{validate}!sysio::chain::webassembly::eos\_vm\_runtime@{sysio::chain::webassembly::eos\_vm\_runtime}}
+\doxysubsubsection{\texorpdfstring{validate()}{validate()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_a9cd22b0e9d05f910358f809fcd29ffec} 
+void sysio\+::chain\+::webassembly\+::eos\+\_\+vm\+\_\+runtime\+::validate (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}} \&}]{code}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config}{wasm\+\_\+config}} \&}]{cfg}{, }\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_ab67e634f02d35e09950917271779b2ff}{whitelisted\+\_\+intrinsics\+\_\+type}} \&}]{intrinsics}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_8cpp_source_l00084}{84}} of file \mbox{\hyperlink{sys-vm_8cpp_source}{sys-\/vm.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00085\ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(code.size()\ <=\ cfg.\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config_a9babd37977ef9c65c151773743dda59a}{max\_module\_bytes}},\ wasm\_serialization\_error,\ \textcolor{stringliteral}{"{}Code\ too\ large"{}});}
+\DoxyCodeLine{00086\ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1guarded__ptr}{wasm\_code\_ptr}}\ code\_ptr((\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}*)code.data(),\ code.size());}
+\DoxyCodeLine{00087\ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{eos\_vm\_null\_backend\_t<wasm\_config>}}\ \mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}(code\_ptr,\ code.size(),\ \textcolor{keyword}{nullptr},\ cfg);}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \textcolor{comment}{//\ check\ import\ signatures}}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ eos\_vm\_host\_functions\_t::resolve(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af2bdf6918391f431538eb92100389eab}{get\_module}}());}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \textcolor{comment}{//\ check\ that\ the\ imports\ are\ all\ currently\ enabled}}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ imports\ =\ \mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af2bdf6918391f431538eb92100389eab}{get\_module}}().\mbox{\hyperlink{structsysio_1_1vm_1_1module_a2a37d2018ca228dfc0b4f26af1242262}{imports}};}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(std::uint32\_t\ i\ =\ 0;\ i\ <\ imports.size();\ ++i)\ \{}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(std::string\_view((\textcolor{keywordtype}{char}*)imports[i].module\_str.raw(),\ imports[i].module\_str.size())\ ==\ \textcolor{stringliteral}{"{}env"{}}\ \&\&}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_a87c46d5ffb5acbf3cf047af691093a12}{is\_intrinsic\_whitelisted}}(intrinsics,\ std::string\_view((\textcolor{keywordtype}{char}*)imports[i].field\_str.raw(),\ imports[i].field\_str.size())),}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ wasm\_serialization\_error,\ \textcolor{stringliteral}{"{}\$\{module\}.\$\{fn\}\ unresolveable"{}},}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}module"{}},\ std::string((\textcolor{keywordtype}{char}*)imports[i].module\_str.raw(),\ imports[i].module\_str.size()))}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}fn"{}},\ std::string((\textcolor{keywordtype}{char}*)imports[i].field\_str.raw(),\ imports[i].field\_str.size())));}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \textcolor{comment}{//\ check\ apply}}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ apply\_idx\ =\ \mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af2bdf6918391f431538eb92100389eab}{get\_module}}().\mbox{\hyperlink{structsysio_1_1vm_1_1module_a0c79890e0b0f354fafeab5b1a45cbc39}{get\_exported\_function}}(\textcolor{stringliteral}{"{}apply"{}});}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(apply\_idx\ <\ std::numeric\_limits<uint32\_t>::max(),\ wasm\_serialization\_error,\ \textcolor{stringliteral}{"{}apply\ not\ exported"{}});}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1vm_1_1func__type}{vm::func\_type}}\&\ apply\_type\ =\ \mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af2bdf6918391f431538eb92100389eab}{get\_module}}().\mbox{\hyperlink{structsysio_1_1vm_1_1module_ab377c16704ff6297e91ded7803aec9ab}{get\_function\_type}}(apply\_idx);}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}((apply\_type\ ==\ \mbox{\hyperlink{structsysio_1_1vm_1_1host__function}{vm::host\_function}}\{\{vm::i64,\ vm::i64,\ vm::i64\},\ \{\}\}),\ wasm\_serialization\_error,\ \textcolor{stringliteral}{"{}apply\ has\ wrong\ type"{}});}
+\DoxyCodeLine{00105\ \ \ \ \}\ \textcolor{keywordflow}{catch}(vm::exception\&\ e)\ \{}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a1bfa656552ea0534b2c91ee0fe33f850}{SYS\_THROW}}(wasm\_serialization\_error,\ e.detail());}
+\DoxyCodeLine{00107\ \ \ \ \}}
+\DoxyCodeLine{00108\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_a9cd22b0e9d05f910358f809fcd29ffec_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacesysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_a78d9d364a9ab60de8d18b4660f592d5f}\index{sysio::chain::webassembly::eos\_vm\_runtime@{sysio::chain::webassembly::eos\_vm\_runtime}!validate@{validate}}
+\index{validate@{validate}!sysio::chain::webassembly::eos\_vm\_runtime@{sysio::chain::webassembly::eos\_vm\_runtime}}
+\doxysubsubsection{\texorpdfstring{validate()}{validate()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_a78d9d364a9ab60de8d18b4660f592d5f} 
+void sysio\+::chain\+::webassembly\+::eos\+\_\+vm\+\_\+runtime\+::validate (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}} \&}]{code}{, }\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_ab67e634f02d35e09950917271779b2ff}{whitelisted\+\_\+intrinsics\+\_\+type}} \&}]{intrinsics}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_8cpp_source_l00064}{64}} of file \mbox{\hyperlink{sys-vm_8cpp_source}{sys-\/vm.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00065\ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1guarded__ptr}{wasm\_code\_ptr}}\ code\_ptr((\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}*)code.data(),\ code.size());}
+\DoxyCodeLine{00066\ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{eos\_vm\_null\_backend\_t<setcode\_options>}}\ \mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}(code\_ptr,\ code.size(),\ \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \textcolor{comment}{//\ check\ import\ signatures}}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ eos\_vm\_host\_functions\_t::resolve(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af2bdf6918391f431538eb92100389eab}{get\_module}}());}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \textcolor{comment}{//\ check\ that\ the\ imports\ are\ all\ currently\ enabled}}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ imports\ =\ \mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af2bdf6918391f431538eb92100389eab}{get\_module}}().\mbox{\hyperlink{structsysio_1_1vm_1_1module_a2a37d2018ca228dfc0b4f26af1242262}{imports}};}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(std::uint32\_t\ i\ =\ 0;\ i\ <\ imports.size();\ ++i)\ \{}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(std::string\_view((\textcolor{keywordtype}{char}*)imports[i].module\_str.raw(),\ imports[i].module\_str.size())\ ==\ \textcolor{stringliteral}{"{}env"{}}\ \&\&}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_a87c46d5ffb5acbf3cf047af691093a12}{is\_intrinsic\_whitelisted}}(intrinsics,\ std::string\_view((\textcolor{keywordtype}{char}*)imports[i].field\_str.raw(),\ imports[i].field\_str.size())),}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ wasm\_serialization\_error,\ \textcolor{stringliteral}{"{}\$\{module\}.\$\{fn\}\ unresolveable"{}},}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}module"{}},\ std::string((\textcolor{keywordtype}{char}*)imports[i].module\_str.raw(),\ imports[i].module\_str.size()))}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}fn"{}},\ std::string((\textcolor{keywordtype}{char}*)imports[i].field\_str.raw(),\ imports[i].field\_str.size())));}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00079\ \ \ \ \}\ \textcolor{keywordflow}{catch}(\mbox{\hyperlink{structsysio_1_1vm_1_1exception}{vm::exception}}\&\ e)\ \{}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a1bfa656552ea0534b2c91ee0fe33f850}{SYS\_THROW}}(wasm\_serialization\_error,\ e.\mbox{\hyperlink{structsysio_1_1vm_1_1exception_af86f633419d7c667dc588b16f13f1972}{detail}}());}
+\DoxyCodeLine{00081\ \ \ \ \}}
+\DoxyCodeLine{00082\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_a78d9d364a9ab60de8d18b4660f592d5f_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_a78d9d364a9ab60de8d18b4660f592d5f_icgraph}
+\end{center}
+\end{figure}

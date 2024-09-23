@@ -1,0 +1,55 @@
+\doxysection{libraries/softfloat/source/\+ARM-\/\+VFPv2/s\+\_\+f128\+UITo\+Common\+NaN.c File Reference}
+\hypertarget{softfloat_2source_2_a_r_m-_v_f_pv2_2s__f128_u_i_to_common_na_n_8c}{}\label{softfloat_2source_2_a_r_m-_v_f_pv2_2s__f128_u_i_to_common_na_n_8c}\index{libraries/softfloat/source/ARM-\/VFPv2/s\_f128UIToCommonNaN.c@{libraries/softfloat/source/ARM-\/VFPv2/s\_f128UIToCommonNaN.c}}
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include "{}platform.\+h"{}}\newline
+{\ttfamily \#include "{}primitives.\+h"{}}\newline
+{\ttfamily \#include "{}specialize.\+h"{}}\newline
+{\ttfamily \#include "{}softfloat.\+h"{}}\newline
+Include dependency graph for s\+\_\+f128\+UITo\+Common\+Na\+N.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{softfloat_2source_2_a_r_m-_v_f_pv2_2s__f128_u_i_to_common_na_n_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2_2s__f128_u_i_to_common_na_n_8c_a3a7621aec65d591b5ee9a1ad6a082439}{softfloat\+\_\+f128\+UITo\+Common\+NaN}} (\mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\+\_\+fast64\+\_\+t}} ui\+A64, \mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\+\_\+fast64\+\_\+t}} ui\+A0, struct \mbox{\hyperlink{structcommon_na_n}{common\+NaN}} \texorpdfstring{$\ast$}{*}z\+Ptr)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{softfloat_2source_2_a_r_m-_v_f_pv2_2s__f128_u_i_to_common_na_n_8c_a3a7621aec65d591b5ee9a1ad6a082439}\index{s\_f128UIToCommonNaN.c@{s\_f128UIToCommonNaN.c}!softfloat\_f128UIToCommonNaN@{softfloat\_f128UIToCommonNaN}}
+\index{softfloat\_f128UIToCommonNaN@{softfloat\_f128UIToCommonNaN}!s\_f128UIToCommonNaN.c@{s\_f128UIToCommonNaN.c}}
+\doxysubsubsection{\texorpdfstring{softfloat\_f128UIToCommonNaN()}{softfloat\_f128UIToCommonNaN()}}
+{\footnotesize\ttfamily \label{softfloat_2source_2_a_r_m-_v_f_pv2_2s__f128_u_i_to_common_na_n_8c_a3a7621aec65d591b5ee9a1ad6a082439} 
+void softfloat\+\_\+f128\+UITo\+Common\+NaN (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\+\_\+fast64\+\_\+t}}}]{ui\+A64}{, }\item[{\mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\+\_\+fast64\+\_\+t}}}]{ui\+A0}{, }\item[{struct \mbox{\hyperlink{structcommon_na_n}{common\+NaN}} \texorpdfstring{$\ast$}{*}}]{z\+Ptr}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2_2s__f128_u_i_to_common_na_n_8c_source_l00051}{51}} of file \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2_2s__f128_u_i_to_common_na_n_8c_source}{s\+\_\+f128\+UITo\+Common\+Na\+N.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00053\ \{}
+\DoxyCodeLine{00054\ \ \ \ \ \textcolor{keyword}{struct\ }uint128\ NaNSig;}
+\DoxyCodeLine{00055\ }
+\DoxyCodeLine{00056\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ softfloat\_isSigNaNF128UI(\ uiA64,\ uiA0\ )\ )\ \{}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2softfloat__raise_flags_8c_ac16bbf09eca0fe8ff91301d82c5a667f}{softfloat\_raiseFlags}}(\ \mbox{\hyperlink{softfloat_2source_2include_2softfloat_8h_a56a0f36da7f9eaaf54bd05cc2bf49173a191f069090c3d33752fb728272d9a4a9}{softfloat\_flag\_invalid}}\ );}
+\DoxyCodeLine{00058\ \ \ \ \ \}}
+\DoxyCodeLine{00059\ \ \ \ \ NaNSig\ =\ \mbox{\hyperlink{softfloat_2source_2s__short_shift_left128_8c_a5813c1cdc091451e4bcbf3227ebc0632}{softfloat\_shortShiftLeft128}}(\ uiA64,\ uiA0,\ 16\ );}
+\DoxyCodeLine{00060\ \ \ \ \ zPtr-\/>\mbox{\hyperlink{structcommon_na_n_a32e90937a4ec3878d2620fbafd31a16f}{sign}}\ =\ uiA64>>63;}
+\DoxyCodeLine{00061\ \ \ \ \ zPtr-\/>\mbox{\hyperlink{structcommon_na_n_a05124b0293f6d395ce047744b12deff6}{v64}}\ \ =\ NaNSig.v64;}
+\DoxyCodeLine{00062\ \ \ \ \ zPtr-\/>\mbox{\hyperlink{structcommon_na_n_ad6c4c9c79bcfd2dc2656b599fa5f75a5}{v0}}\ \ \ =\ NaNSig.v0;}
+\DoxyCodeLine{00063\ }
+\DoxyCodeLine{00064\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{softfloat_2source_2_a_r_m-_v_f_pv2_2s__f128_u_i_to_common_na_n_8c_a3a7621aec65d591b5ee9a1ad6a082439_cgraph}
+\end{center}
+\end{figure}

@@ -1,0 +1,7 @@
+<map id="BOOST_AUTO_TEST_CASE" name="BOOST_AUTO_TEST_CASE">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,46,202,72"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1processor_1_1hybi00.html#a8065338a7a9c760a92ce24d736a3dff2" title="Process new websocket connection bytes." alt="" coords="250,5,413,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="195,43,234,37,235,42,196,48"/>
+<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1processor_1_1hybi00.html#a8a0ebdb322dad95ea3c7aee8e5c56b9a" title="Checks if there is a message ready." alt="" coords="250,71,413,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="200,70,235,75,234,80,199,75"/>
+</map>

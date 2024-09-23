@@ -1,0 +1,18 @@
+<map id="sysio::chain::webassembly::eosvmoc::eosvmoc_runtime" name="sysio::chain::webassembly::eosvmoc::eosvmoc_runtime">
+<area shape="rect" id="Node000001" title=" " alt="" coords="904,101,1097,142"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1chain_1_1wasm__runtime__interface.html" title=" " alt="" coords="680,5,815,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="818,49,945,98,943,103,816,54"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1chain_1_1eosvmoc_1_1code__cache__sync.html" title=" " alt="" coords="671,71,824,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="839,99,904,107,903,113,839,105"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base.html" title=" " alt="" coords="319,71,471,111"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="487,88,671,88,671,94,487,94"/>
+<area shape="rect" id="Node000005" href="$classchainbase_1_1database.html" title=" " alt="" coords="5,32,147,57"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="162,52,295,71,318,75,318,80,294,76,162,58"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="48,116,104,141"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="119,121,294,101,318,98,319,103,295,106,120,126"/>
+<area shape="rect" id="Node000008" href="$classsysio_1_1chain_1_1eosvmoc_1_1memory.html" title=" " alt="" coords="495,131,647,171"/>
+<area shape="poly" id="edge8_Node000008_Node000006" title=" " alt="" coords="120,131,171,135,345,144,494,147,494,153,345,149,170,141,119,136"/>
+<area shape="rect" id="Node000007" href="$classsysio_1_1chain_1_1eosvmoc_1_1executor.html" title=" " alt="" coords="671,199,824,239"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="838,196,879,182,923,162,963,140,966,145,926,167,881,187,839,201"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="663,145,823,135,903,129,903,134,824,141,663,150"/>
+</map>

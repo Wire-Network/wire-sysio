@@ -1,0 +1,739 @@
+\doxysection{NFA Namespace Reference}
+\hypertarget{namespace_n_f_a}{}\label{namespace_n_f_a}\index{NFA@{NFA}}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_n_f_a_1_1_builder}{Builder}}
+\item 
+struct \mbox{\hyperlink{struct_n_f_a_1_1_d_f_a_state}{DFAState}}
+\item 
+struct \mbox{\hyperlink{struct_n_f_a_1_1_machine}{Machine}}
+\item 
+struct \mbox{\hyperlink{struct_n_f_a_1_1_n_f_a_state}{NFAState}}
+\item 
+struct \mbox{\hyperlink{struct_n_f_a_1_1_state_transitions_by_char}{State\+Transitions\+By\+Char}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef std\+::vector$<$ \mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{State\+Index}} $>$ \mbox{\hyperlink{namespace_n_f_a_a570d84ef0d5ae4e6a39b5c9477f5550a}{State\+Set}}
+\item 
+typedef \mbox{\hyperlink{struct_dense_static_int_set}{Dense\+Static\+Int\+Set}}$<$ \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}, 256 $>$ \mbox{\hyperlink{namespace_n_f_a_aab46c702df98598c70d9290d164ffa99}{Char\+Set}}
+\item 
+typedef \mbox{\hyperlink{_basic_types_8h_a393f3d55b6dd420b4ec0482d11fb0d9b}{I16}} \mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{State\+Index}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \{ \mbox{\hyperlink{namespace_n_f_a_ad9fb95d6afb96fea8750c3543ee293a1ab7afa25e880146b8ce78efc4cb221274}{edge\+Doesnt\+Consume\+Input\+Flag}} = (State\+Index)0x4000
+, \mbox{\hyperlink{namespace_n_f_a_ad9fb95d6afb96fea8750c3543ee293a1ac83c0f7e053c5efc232f432bba1ab6c6}{unmatched\+Character\+Terminal}} = (State\+Index)0x8000
+, \mbox{\hyperlink{namespace_n_f_a_ad9fb95d6afb96fea8750c3543ee293a1a6df9f5bfcb1889079b46027cf7bdac15}{maximum\+Terminal\+State\+Index}} = (State\+Index)0xbfff
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename Element $>$ }\\void \mbox{\hyperlink{namespace_n_f_a_aee88df88a0f7b7a71e4f1f40ed4f2549}{add\+Unique}} (std\+::vector$<$ Element $>$ \&vector, const Element \&element)
+\item 
+\mbox{\hyperlink{struct_n_f_a_1_1_builder}{Builder}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_n_f_a_adf36678137843faef3c32d8f0a9dcb25}{create\+Builder}} ()
+\item 
+\mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{State\+Index}} \mbox{\hyperlink{namespace_n_f_a_aa1fa2de1cb3ea820ec7ae1994d624803}{add\+State}} (\mbox{\hyperlink{struct_n_f_a_1_1_builder}{Builder}} \texorpdfstring{$\ast$}{*}builder)
+\item 
+void \mbox{\hyperlink{namespace_n_f_a_a7fcfabbb0aaf904f594a4c6d72e9e54c}{add\+Edge}} (\mbox{\hyperlink{struct_n_f_a_1_1_builder}{Builder}} \texorpdfstring{$\ast$}{*}builder, \mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{State\+Index}} initial\+State, const \mbox{\hyperlink{namespace_n_f_a_aab46c702df98598c70d9290d164ffa99}{Char\+Set}} \&predicate, \mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{State\+Index}} next\+State)
+\item 
+void \mbox{\hyperlink{namespace_n_f_a_acfdce2879b3ebd805fc8512239d7dd44}{add\+Epsilon\+Edge}} (\mbox{\hyperlink{struct_n_f_a_1_1_builder}{Builder}} \texorpdfstring{$\ast$}{*}builder, \mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{State\+Index}} initial\+State, \mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{State\+Index}} next\+State)
+\item 
+\mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{State\+Index}} \mbox{\hyperlink{namespace_n_f_a_ad1e9e5dd3c2cdbefdf6ba97f12d26eae}{get\+Non\+Terminal\+Edge}} (\mbox{\hyperlink{struct_n_f_a_1_1_builder}{Builder}} \texorpdfstring{$\ast$}{*}builder, \mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{State\+Index}} initial\+State, char c)
+\item 
+std\+::vector$<$ \mbox{\hyperlink{struct_n_f_a_1_1_d_f_a_state}{DFAState}} $>$ \mbox{\hyperlink{namespace_n_f_a_a85f8760e97560d17b54b9d9404a28e8e}{convert\+To\+DFA}} (\mbox{\hyperlink{struct_n_f_a_1_1_builder}{Builder}} \texorpdfstring{$\ast$}{*}builder)
+\item 
+char \mbox{\hyperlink{namespace_n_f_a_a3ef97d19fa0e3344352c4d88f439b92d}{nibble\+To\+Hex\+Char}} (\mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+std\+::string \mbox{\hyperlink{namespace_n_f_a_abebdef6f328f9c9b95753bc0c3f24af7}{escape\+String}} (const std\+::string \&string)
+\item 
+std\+::string \mbox{\hyperlink{namespace_n_f_a_adc756f037e3d4d7c0de30430245cf6d2}{get\+Graph\+Edge\+Char\+Label}} (\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} char\+Index)
+\item 
+std\+::string \mbox{\hyperlink{namespace_n_f_a_a7386c58e4560679b7381ec2aa47f7933}{get\+Graph\+Edge\+Label}} (const \mbox{\hyperlink{namespace_n_f_a_aab46c702df98598c70d9290d164ffa99}{Char\+Set}} \&char\+Set)
+\item 
+std\+::string \mbox{\hyperlink{namespace_n_f_a_ad2bae1dc95f748e75ed2ef3d06b38868}{dump\+NFAGraph\+Viz}} (const \mbox{\hyperlink{struct_n_f_a_1_1_builder}{Builder}} \texorpdfstring{$\ast$}{*}builder)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{namespace_n_f_a_aab46c702df98598c70d9290d164ffa99}\index{NFA@{NFA}!CharSet@{CharSet}}
+\index{CharSet@{CharSet}!NFA@{NFA}}
+\doxysubsubsection{\texorpdfstring{CharSet}{CharSet}}
+{\footnotesize\ttfamily \label{namespace_n_f_a_aab46c702df98598c70d9290d164ffa99} 
+typedef \mbox{\hyperlink{struct_dense_static_int_set}{Dense\+Static\+Int\+Set}}$<$\mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}},256$>$ \mbox{\hyperlink{namespace_n_f_a_aab46c702df98598c70d9290d164ffa99}{NFA\+::\+Char\+Set}}}
+
+
+
+Definition at line \mbox{\hyperlink{_n_f_a_8h_source_l00011}{11}} of file \mbox{\hyperlink{_n_f_a_8h_source}{NFA.\+h}}.
+
+\Hypertarget{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}\index{NFA@{NFA}!StateIndex@{StateIndex}}
+\index{StateIndex@{StateIndex}!NFA@{NFA}}
+\doxysubsubsection{\texorpdfstring{StateIndex}{StateIndex}}
+{\footnotesize\ttfamily \label{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c} 
+typedef \mbox{\hyperlink{_basic_types_8h_a393f3d55b6dd420b4ec0482d11fb0d9b}{I16}} \mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{NFA\+::\+State\+Index}}}
+
+
+
+Definition at line \mbox{\hyperlink{_n_f_a_8h_source_l00014}{14}} of file \mbox{\hyperlink{_n_f_a_8h_source}{NFA.\+h}}.
+
+\Hypertarget{namespace_n_f_a_a570d84ef0d5ae4e6a39b5c9477f5550a}\index{NFA@{NFA}!StateSet@{StateSet}}
+\index{StateSet@{StateSet}!NFA@{NFA}}
+\doxysubsubsection{\texorpdfstring{StateSet}{StateSet}}
+{\footnotesize\ttfamily \label{namespace_n_f_a_a570d84ef0d5ae4e6a39b5c9477f5550a} 
+typedef std\+::vector$<$\mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{State\+Index}}$>$ \mbox{\hyperlink{namespace_n_f_a_a570d84ef0d5ae4e6a39b5c9477f5550a}{NFA\+::\+State\+Set}}}
+
+
+
+Definition at line \mbox{\hyperlink{_n_f_a_8cpp_source_l00014}{14}} of file \mbox{\hyperlink{_n_f_a_8cpp_source}{NFA.\+cpp}}.
+
+
+
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{namespace_n_f_a_ad9fb95d6afb96fea8750c3543ee293a1}\doxysubsubsection{\texorpdfstring{anonymous enum}{anonymous enum}}
+{\footnotesize\ttfamily \label{namespace_n_f_a_ad9fb95d6afb96fea8750c3543ee293a1} 
+anonymous enum}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{edgeDoesntConsumeInputFlag@{edgeDoesntConsumeInputFlag}!NFA@{NFA}}\index{NFA@{NFA}!edgeDoesntConsumeInputFlag@{edgeDoesntConsumeInputFlag}}}\Hypertarget{namespace_n_f_a_ad9fb95d6afb96fea8750c3543ee293a1ab7afa25e880146b8ce78efc4cb221274}\label{namespace_n_f_a_ad9fb95d6afb96fea8750c3543ee293a1} 
+edge\+Doesnt\+Consume\+Input\+Flag&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{unmatchedCharacterTerminal@{unmatchedCharacterTerminal}!NFA@{NFA}}\index{NFA@{NFA}!unmatchedCharacterTerminal@{unmatchedCharacterTerminal}}}\Hypertarget{namespace_n_f_a_ad9fb95d6afb96fea8750c3543ee293a1ac83c0f7e053c5efc232f432bba1ab6c6}\label{namespace_n_f_a_ad9fb95d6afb96fea8750c3543ee293a1} 
+unmatched\+Character\+Terminal&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{maximumTerminalStateIndex@{maximumTerminalStateIndex}!NFA@{NFA}}\index{NFA@{NFA}!maximumTerminalStateIndex@{maximumTerminalStateIndex}}}\Hypertarget{namespace_n_f_a_ad9fb95d6afb96fea8750c3543ee293a1a6df9f5bfcb1889079b46027cf7bdac15}\label{namespace_n_f_a_ad9fb95d6afb96fea8750c3543ee293a1} 
+maximum\+Terminal\+State\+Index&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{_n_f_a_8h_source_l00016}{16}} of file \mbox{\hyperlink{_n_f_a_8h_source}{NFA.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00017\ \ \ \ \ \{}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_n_f_a_ad9fb95d6afb96fea8750c3543ee293a1ab7afa25e880146b8ce78efc4cb221274}{edgeDoesntConsumeInputFlag}}\ =\ (\mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{StateIndex}})0x4000,\ \textcolor{comment}{//\ A\ flag\ that's\ set\ on\ terminal\ DFA\ state\ transitions\ that\ don't\ consume\ any\ input}}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ unmatchedCharacterTerminal\ =\ (\mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{StateIndex}})0x8000,\ \textcolor{comment}{//\ An\ implicit\ terminal\ state\ that\ indicates\ the\ DFA\ didn't\ recognize\ the\ input}}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_n_f_a_ad9fb95d6afb96fea8750c3543ee293a1a6df9f5bfcb1889079b46027cf7bdac15}{maximumTerminalStateIndex}}\ =\ (\mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{StateIndex}})0xbfff,\ \textcolor{comment}{//\ Should\ be\ the\ largest\ negative\ number\ that\ doesn't\ have\ edgeDoesntConsumeInputFlag\ set.}}
+\DoxyCodeLine{00021\ \ \ \ \ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespace_n_f_a_a7fcfabbb0aaf904f594a4c6d72e9e54c}\index{NFA@{NFA}!addEdge@{addEdge}}
+\index{addEdge@{addEdge}!NFA@{NFA}}
+\doxysubsubsection{\texorpdfstring{addEdge()}{addEdge()}}
+{\footnotesize\ttfamily \label{namespace_n_f_a_a7fcfabbb0aaf904f594a4c6d72e9e54c} 
+void NFA\+::add\+Edge (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_n_f_a_1_1_builder}{Builder}} \texorpdfstring{$\ast$}{*}}]{builder}{, }\item[{\mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{State\+Index}}}]{initial\+State}{, }\item[{const \mbox{\hyperlink{namespace_n_f_a_aab46c702df98598c70d9290d164ffa99}{Char\+Set}} \&}]{predicate}{, }\item[{\mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{State\+Index}}}]{next\+State}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_n_f_a_8cpp_source_l00054}{54}} of file \mbox{\hyperlink{_n_f_a_8cpp_source}{NFA.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00055\ \ \ \ \ \{}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_dense_static_int_set}{CharSet}}\&\ transitionPredicate\ =\ builder-\/>\mbox{\hyperlink{struct_n_f_a_1_1_builder_ae099c05cc1744278569e43d01bc0c839}{nfaStates}}[initialState].nextStateToPredicateMap[nextState];}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ transitionPredicate\ =\ transitionPredicate\ |\ predicate;}
+\DoxyCodeLine{00058\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespace_n_f_a_acfdce2879b3ebd805fc8512239d7dd44}\index{NFA@{NFA}!addEpsilonEdge@{addEpsilonEdge}}
+\index{addEpsilonEdge@{addEpsilonEdge}!NFA@{NFA}}
+\doxysubsubsection{\texorpdfstring{addEpsilonEdge()}{addEpsilonEdge()}}
+{\footnotesize\ttfamily \label{namespace_n_f_a_acfdce2879b3ebd805fc8512239d7dd44} 
+void NFA\+::add\+Epsilon\+Edge (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_n_f_a_1_1_builder}{Builder}} \texorpdfstring{$\ast$}{*}}]{builder}{, }\item[{\mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{State\+Index}}}]{initial\+State}{, }\item[{\mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{State\+Index}}}]{next\+State}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_n_f_a_8cpp_source_l00060}{60}} of file \mbox{\hyperlink{_n_f_a_8cpp_source}{NFA.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00061\ \ \ \ \ \{}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_n_f_a_aee88df88a0f7b7a71e4f1f40ed4f2549}{addUnique}}(builder-\/>\mbox{\hyperlink{struct_n_f_a_1_1_builder_ae099c05cc1744278569e43d01bc0c839}{nfaStates}}[initialState].epsilonNextStates,nextState);}
+\DoxyCodeLine{00063\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=318pt]{namespace_n_f_a_acfdce2879b3ebd805fc8512239d7dd44_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_n_f_a_aa1fa2de1cb3ea820ec7ae1994d624803}\index{NFA@{NFA}!addState@{addState}}
+\index{addState@{addState}!NFA@{NFA}}
+\doxysubsubsection{\texorpdfstring{addState()}{addState()}}
+{\footnotesize\ttfamily \label{namespace_n_f_a_aa1fa2de1cb3ea820ec7ae1994d624803} 
+\mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{State\+Index}} NFA\+::add\+State (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_n_f_a_1_1_builder}{Builder}} \texorpdfstring{$\ast$}{*}}]{builder}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_n_f_a_8cpp_source_l00047}{47}} of file \mbox{\hyperlink{_n_f_a_8cpp_source}{NFA.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00048\ \ \ \ \ \{}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_errors_8h_a03bec6af3af0dd492e348b40cbe40a46}{WAVM\_ASSERT\_THROW}}(builder-\/>\mbox{\hyperlink{struct_n_f_a_1_1_builder_ae099c05cc1744278569e43d01bc0c839}{nfaStates}}.size()\ <\ \mbox{\hyperlink{stdint_8h_ac58f2c111cc9989c86db2a7dc4fd84ca}{INT16\_MAX}});}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ builder-\/>\mbox{\hyperlink{struct_n_f_a_1_1_builder_ae099c05cc1744278569e43d01bc0c839}{nfaStates}}.emplace\_back();}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{StateIndex}}(builder-\/>\mbox{\hyperlink{struct_n_f_a_1_1_builder_ae099c05cc1744278569e43d01bc0c839}{nfaStates}}.size()\ -\/\ 1);}
+\DoxyCodeLine{00052\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_n_f_a_aa1fa2de1cb3ea820ec7ae1994d624803_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_n_f_a_aee88df88a0f7b7a71e4f1f40ed4f2549}\index{NFA@{NFA}!addUnique@{addUnique}}
+\index{addUnique@{addUnique}!NFA@{NFA}}
+\doxysubsubsection{\texorpdfstring{addUnique()}{addUnique()}}
+{\footnotesize\ttfamily \label{namespace_n_f_a_aee88df88a0f7b7a71e4f1f40ed4f2549} 
+template$<$typename Element $>$ \\
+void NFA\+::add\+Unique (\begin{DoxyParamCaption}\item[{std\+::vector$<$ Element $>$ \&}]{vector}{, }\item[{const Element \&}]{element}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_n_f_a_8cpp_source_l00017}{17}} of file \mbox{\hyperlink{_n_f_a_8cpp_source}{NFA.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00018\ \ \ \ \ \{}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ existingElement\ :\ vector)}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(existingElement\ ==\ element)}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ vector.push\_back(element);}
+\DoxyCodeLine{00027\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_n_f_a_aee88df88a0f7b7a71e4f1f40ed4f2549_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_n_f_a_a85f8760e97560d17b54b9d9404a28e8e}\index{NFA@{NFA}!convertToDFA@{convertToDFA}}
+\index{convertToDFA@{convertToDFA}!NFA@{NFA}}
+\doxysubsubsection{\texorpdfstring{convertToDFA()}{convertToDFA()}}
+{\footnotesize\ttfamily \label{namespace_n_f_a_a85f8760e97560d17b54b9d9404a28e8e} 
+std\+::vector$<$ \mbox{\hyperlink{struct_n_f_a_1_1_d_f_a_state}{DFAState}} $>$ NFA\+::convert\+To\+DFA (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_n_f_a_1_1_builder}{Builder}} \texorpdfstring{$\ast$}{*}}]{builder}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_n_f_a_8cpp_source_l00090}{90}} of file \mbox{\hyperlink{_n_f_a_8cpp_source}{NFA.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00091\ \ \ \ \ \{}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_timing_1_1_timer}{Timing::Timer}}\ timer;}
+\DoxyCodeLine{00093\ }
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ std::vector<DFAState>\ dfaStates;}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ std::map<StateSet,StateIndex>\ nfaStateSetToDFAStateMap;}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ std::vector<StateSet>\ dfaStateToNFAStateSetMap;}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ std::vector<StateIndex>\ pendingDFAStates;}
+\DoxyCodeLine{00098\ }
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ nfaStateSetToDFAStateMap.emplace(\mbox{\hyperlink{namespace_n_f_a_a570d84ef0d5ae4e6a39b5c9477f5550a}{StateSet}}\ \{0\},(StateIndex)0);}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ dfaStateToNFAStateSetMap.emplace\_back(StateSet\ \{0\});}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ dfaStates.emplace\_back();}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ pendingDFAStates.push\_back((StateIndex)0);}
+\DoxyCodeLine{00103\ }
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ maxLocalStates\ =\ 0;}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ maxDFANextStates\ =\ 0;}
+\DoxyCodeLine{00106\ }
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(pendingDFAStates.size())}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{StateIndex}}\ currentDFAStateIndex\ =\ pendingDFAStates.back();}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \ \ \ \ pendingDFAStates.pop\_back();}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespace_n_f_a_a570d84ef0d5ae4e6a39b5c9477f5550a}{StateSet}}\ currentStateSet\ =\ dfaStateToNFAStateSetMap[currentDFAStateIndex];}
+\DoxyCodeLine{00113\ }
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Expand\ the\ set\ of\ current\ states\ to\ include\ all\ states\ reachable\ by\ epsilon\ transitions\ from\ the\ current\ states.}}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_n_f_a_a570d84ef0d5ae4e6a39b5c9477f5550a}{StateSet}}\ epsilonClosureCurrentStateSet\ =\ currentStateSet;}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ scanIndex\ =\ 0;scanIndex\ <\ epsilonClosureCurrentStateSet.size();++scanIndex)}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{StateIndex}}\ scanState\ =\ epsilonClosureCurrentStateSet[scanIndex];}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(scanState\ >=\ 0)}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\ epsilonNextState\ :\ builder-\/>\mbox{\hyperlink{struct_n_f_a_1_1_builder_ae099c05cc1744278569e43d01bc0c839}{nfaStates}}[scanState].epsilonNextStates)}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_n_f_a_aee88df88a0f7b7a71e4f1f40ed4f2549}{addUnique}}(epsilonClosureCurrentStateSet,epsilonNextState);}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00127\ }
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Find\ the\ subset\ of\ the\ non-\/terminal\ states\ in\ the\ current\ set.}}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_n_f_a_a570d84ef0d5ae4e6a39b5c9477f5550a}{StateSet}}\ nonTerminalCurrentStateSet;}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{StateIndex}}\ currentTerminalState\ =\ \mbox{\hyperlink{namespace_n_f_a_ad9fb95d6afb96fea8750c3543ee293a1ac83c0f7e053c5efc232f432bba1ab6c6}{unmatchedCharacterTerminal}}\ |\ \mbox{\hyperlink{namespace_n_f_a_ad9fb95d6afb96fea8750c3543ee293a1ab7afa25e880146b8ce78efc4cb221274}{edgeDoesntConsumeInputFlag}};}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ hasCurrentTerminalState\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\ stateIndex\ :\ epsilonClosureCurrentStateSet)}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(stateIndex\ >=\ 0)}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_n_f_a_aee88df88a0f7b7a71e4f1f40ed4f2549}{addUnique}}(nonTerminalCurrentStateSet,stateIndex);}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(hasCurrentTerminalState)}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_errors_a719a329951edb01e45afe1443dfa2a92}{Errors::fatalf}}(\textcolor{stringliteral}{"{}NFA\ has\ multiple\ possible\ terminal\ states\ for\ the\ same\ input"{}});}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ hasCurrentTerminalState\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ currentTerminalState\ =\ stateIndex\ |\ \mbox{\hyperlink{namespace_n_f_a_ad9fb95d6afb96fea8750c3543ee293a1ab7afa25e880146b8ce78efc4cb221274}{edgeDoesntConsumeInputFlag}};}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00148\ }
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Build\ a\ compact\ index\ of\ the\ states\ following\ all\ states\ in\ the\ current\ set.}}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \ \ \ \ std::map<StateIndex,StateIndex>\ stateIndexToLocalStateIndexMap;}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ \ \ \ \ std::vector<StateIndex>\ localStateIndexToStateIndexMap;}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\ stateIndex\ :\ nonTerminalCurrentStateSet)}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ NFAState\&\ nfaState\ =\ builder-\/>\mbox{\hyperlink{struct_n_f_a_1_1_builder_ae099c05cc1744278569e43d01bc0c839}{nfaStates}}[stateIndex];}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\ transition\ :\ nfaState.nextStateToPredicateMap)}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!stateIndexToLocalStateIndexMap.count(transition.first))}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ stateIndexToLocalStateIndexMap.emplace(transition.first,(StateIndex)localStateIndexToStateIndexMap.size());}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ localStateIndexToStateIndexMap.emplace\_back(transition.first);}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00164\ }
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!stateIndexToLocalStateIndexMap.count(currentTerminalState))}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ stateIndexToLocalStateIndexMap.emplace(currentTerminalState,(StateIndex)localStateIndexToStateIndexMap.size());}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ localStateIndexToStateIndexMap.emplace\_back(currentTerminalState);}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{enum}\ \{\ numSupportedLocalStates\ =\ 64\ \};}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{struct_dense_static_int_set}{DenseStaticIntSet<StateIndex,numSupportedLocalStates>}}\ LocalStateSet;}
+\DoxyCodeLine{00173\ }
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ numLocalStates\ =\ stateIndexToLocalStateIndexMap.size();}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_errors_8h_a03bec6af3af0dd492e348b40cbe40a46}{WAVM\_ASSERT\_THROW}}(numLocalStates\ <=\ numSupportedLocalStates);}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \ \ \ \ maxLocalStates\ =\ std::max<Uptr>(maxLocalStates,numLocalStates);}
+\DoxyCodeLine{00177\ }
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Combine\ the\ [nextState][char]\ transition\ maps\ for\ current\ states\ and\ transpose\ to\ [char][nextState]}}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ After\ building\ the\ compact\ index\ of\ referenced\ states,\ the\ nextState\ set\ can\ be\ represented\ as\ a\ 64-\/bit\ mask.}}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \ \ \ \ LocalStateSet\ charToLocalStateSet[256];}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\ stateIndex\ :\ nonTerminalCurrentStateSet)}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ NFAState\&\ nfaState\ =\ builder-\/>\mbox{\hyperlink{struct_n_f_a_1_1_builder_ae099c05cc1744278569e43d01bc0c839}{nfaStates}}[stateIndex];}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\ transition\ :\ nfaState.nextStateToPredicateMap)}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ charIndex\ =\ 0;charIndex\ <\ 256;++charIndex)}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(transition.second.contains((\textcolor{keywordtype}{char})charIndex))}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ charToLocalStateSet[charIndex].add(stateIndexToLocalStateIndexMap.at(transition.first));}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ LocalStateSet\ currentTerminalStateLocalSet(stateIndexToLocalStateIndexMap.at(currentTerminalState));}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ charIndex\ =\ 0;charIndex\ <\ 256;++charIndex)}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(charToLocalStateSet[charIndex].isEmpty())}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ charToLocalStateSet[charIndex]\ =\ currentTerminalStateLocalSet;}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00204\ }
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Find\ the\ set\ of\ unique\ local\ state\ sets\ that\ follow\ this\ state\ set.}}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ \ \ \ \ std::vector<LocalStateSet>\ uniqueLocalNextStateSets;}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ charIndex\ =\ 0;charIndex\ <\ 256;++charIndex)}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ LocalStateSet\ localStateSet\ =\ charToLocalStateSet[charIndex];}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!localStateSet.isEmpty())}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_n_f_a_aee88df88a0f7b7a71e4f1f40ed4f2549}{addUnique}}(uniqueLocalNextStateSets,localStateSet);}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00215\ }
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ For\ each\ unique\ local\ state\ set\ that\ follows\ this\ state\ set,\ find\ or\ create\ a\ corresponding\ DFA\ state.}}
+\DoxyCodeLine{00217\ \ \ \ \ \ \ \ \ \ \ \ \ std::map<LocalStateSet,StateIndex>\ localStateSetToDFAStateIndexMap;}
+\DoxyCodeLine{00218\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\ localNextStateSet\ :\ uniqueLocalNextStateSets)}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Convert\ the\ local\ state\ set\ bit\ mask\ to\ a\ global\ NFA\ state\ set.}}
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_n_f_a_a570d84ef0d5ae4e6a39b5c9477f5550a}{StateSet}}\ nextStateSet;}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ LocalStateSet\ residualLocalStateSet\ =\ localNextStateSet;}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\textcolor{keyword}{true})}
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00226\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{StateIndex}}\ localStateIndex\ =\ residualLocalStateSet.getSmallestMember();}
+\DoxyCodeLine{00227\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(localStateIndex\ ==\ numSupportedLocalStates)\ \{\ \textcolor{keywordflow}{break};\ \}}
+\DoxyCodeLine{00228\ }
+\DoxyCodeLine{00229\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ nextStateSet.push\_back(localStateIndexToStateIndexMap.at(localStateIndex));}
+\DoxyCodeLine{00230\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ residualLocalStateSet.remove(localStateIndex);}
+\DoxyCodeLine{00231\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00232\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00233\ }
+\DoxyCodeLine{00234\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(nextStateSet.size()\ ==\ 1\ \&\&\ *nextStateSet.begin()\ <\ 0)}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ localStateSetToDFAStateIndexMap.insert(std::make\_pair(localNextStateSet,*nextStateSet.begin()));}
+\DoxyCodeLine{00237\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00238\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Find\ an\ existing\ DFA\ state\ corresponding\ to\ this\ NFA\ state\ set.}}
+\DoxyCodeLine{00241\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ nextDFAStateIt\ =\ nfaStateSetToDFAStateMap.find(nextStateSet);}
+\DoxyCodeLine{00242\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{StateIndex}}\ nextDFAStateIndex;}
+\DoxyCodeLine{00243\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(nextDFAStateIt\ !=\ nfaStateSetToDFAStateMap.end())}
+\DoxyCodeLine{00244\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00245\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ localStateSetToDFAStateIndexMap.emplace(localNextStateSet,nextDFAStateIt-\/>second);}
+\DoxyCodeLine{00246\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00247\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00248\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00249\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ no\ corresponding\ DFA\ state\ existing\ yet,\ create\ a\ new\ one\ and\ add\ it\ to\ the\ queue}}
+\DoxyCodeLine{00250\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ of\ pending\ states\ to\ process.}}
+\DoxyCodeLine{00251\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ nextDFAStateIndex\ =\ (\mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{StateIndex}})dfaStates.size();}
+\DoxyCodeLine{00252\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ localStateSetToDFAStateIndexMap.emplace(localNextStateSet,nextDFAStateIndex);}
+\DoxyCodeLine{00253\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ nfaStateSetToDFAStateMap.insert(std::make\_pair(nextStateSet,nextDFAStateIndex));}
+\DoxyCodeLine{00254\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ dfaStateToNFAStateSetMap.emplace\_back(nextStateSet);}
+\DoxyCodeLine{00255\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ dfaStates.emplace\_back();}
+\DoxyCodeLine{00256\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ pendingDFAStates.push\_back(nextDFAStateIndex);}
+\DoxyCodeLine{00257\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00258\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00259\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00260\ }
+\DoxyCodeLine{00261\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Set\ up\ the\ DFA\ transition\ map.}}
+\DoxyCodeLine{00262\ \ \ \ \ \ \ \ \ \ \ \ \ DFAState\&\ dfaState\ =\ dfaStates[nfaStateSetToDFAStateMap[currentStateSet]];}
+\DoxyCodeLine{00263\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\ localStateSetToDFAStateIndex\ :\ localStateSetToDFAStateIndexMap)}
+\DoxyCodeLine{00264\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00265\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ LocalStateSet\ localStateSet\ =\ localStateSetToDFAStateIndex.first;}
+\DoxyCodeLine{00266\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{StateIndex}}\ nextDFAStateIndex\ =\ localStateSetToDFAStateIndex.second;}
+\DoxyCodeLine{00267\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ charIndex\ =\ 0;charIndex\ <\ 256;++charIndex)}
+\DoxyCodeLine{00268\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00269\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(charToLocalStateSet[charIndex]\ ==\ localStateSet)}
+\DoxyCodeLine{00270\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00271\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ dfaState.nextStateByChar[charIndex]\ =\ nextDFAStateIndex;}
+\DoxyCodeLine{00272\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00273\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00274\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00275\ \ \ \ \ \ \ \ \ \ \ \ \ maxDFANextStates\ =\ std::max(maxDFANextStates,(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}})uniqueLocalNextStateSets.size());}
+\DoxyCodeLine{00276\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00277\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00278\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_timing_a13894b5d7cecb827bcef919187a66d94}{Timing::logTimer}}(\textcolor{stringliteral}{"{}translated\ NFA-\/>DFA"{}},timer);}
+\DoxyCodeLine{00279\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{Log::printf}}(\mbox{\hyperlink{namespace_log_a1f055cc08a2ed074aa74f9d99c8a0901aaa59d67c2123f094d0d6798ffe651c4d}{Log::Category::metrics}},\textcolor{stringliteral}{"{}\ \ translated\ NFA\ with\ \%u\ states\ to\ DFA\ with\ \%u\ states\(\backslash\)n"{}},builder-\/>\mbox{\hyperlink{struct_n_f_a_1_1_builder_ae099c05cc1744278569e43d01bc0c839}{nfaStates}}.size(),dfaStates.size());}
+\DoxyCodeLine{00280\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{Log::printf}}(\mbox{\hyperlink{namespace_log_a1f055cc08a2ed074aa74f9d99c8a0901aaa59d67c2123f094d0d6798ffe651c4d}{Log::Category::metrics}},\textcolor{stringliteral}{"{}\ \ maximum\ number\ of\ states\ following\ a\ NFA\ state\ set:\ \%u\(\backslash\)n"{}},maxLocalStates);}
+\DoxyCodeLine{00281\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{Log::printf}}(\mbox{\hyperlink{namespace_log_a1f055cc08a2ed074aa74f9d99c8a0901aaa59d67c2123f094d0d6798ffe651c4d}{Log::Category::metrics}},\textcolor{stringliteral}{"{}\ \ maximum\ number\ of\ states\ following\ a\ DFA\ state:\ \%u\(\backslash\)n"{}},maxDFANextStates);}
+\DoxyCodeLine{00282\ }
+\DoxyCodeLine{00283\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ dfaStates;}
+\DoxyCodeLine{00284\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_n_f_a_a85f8760e97560d17b54b9d9404a28e8e_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=343pt]{namespace_n_f_a_a85f8760e97560d17b54b9d9404a28e8e_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_n_f_a_adf36678137843faef3c32d8f0a9dcb25}\index{NFA@{NFA}!createBuilder@{createBuilder}}
+\index{createBuilder@{createBuilder}!NFA@{NFA}}
+\doxysubsubsection{\texorpdfstring{createBuilder()}{createBuilder()}}
+{\footnotesize\ttfamily \label{namespace_n_f_a_adf36678137843faef3c32d8f0a9dcb25} 
+\mbox{\hyperlink{struct_n_f_a_1_1_builder}{Builder}} \texorpdfstring{$\ast$}{*} NFA\+::create\+Builder (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_n_f_a_8cpp_source_l00040}{40}} of file \mbox{\hyperlink{_n_f_a_8cpp_source}{NFA.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00041\ \ \ \ \ \{}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ builder\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{struct_n_f_a_1_1_builder}{Builder}}();}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_n_f_a_aa1fa2de1cb3ea820ec7ae1994d624803}{addState}}(builder);}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ builder;}
+\DoxyCodeLine{00045\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=297pt]{namespace_n_f_a_adf36678137843faef3c32d8f0a9dcb25_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_n_f_a_adf36678137843faef3c32d8f0a9dcb25_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_n_f_a_ad2bae1dc95f748e75ed2ef3d06b38868}\index{NFA@{NFA}!dumpNFAGraphViz@{dumpNFAGraphViz}}
+\index{dumpNFAGraphViz@{dumpNFAGraphViz}!NFA@{NFA}}
+\doxysubsubsection{\texorpdfstring{dumpNFAGraphViz()}{dumpNFAGraphViz()}}
+{\footnotesize\ttfamily \label{namespace_n_f_a_ad2bae1dc95f748e75ed2ef3d06b38868} 
+std\+::string NFA\+::dump\+NFAGraph\+Viz (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct_n_f_a_1_1_builder}{Builder}} \texorpdfstring{$\ast$}{*}}]{builder}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_n_f_a_8cpp_source_l00467}{467}} of file \mbox{\hyperlink{_n_f_a_8cpp_source}{NFA.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00468\ \ \ \ \ \{}
+\DoxyCodeLine{00469\ \ \ \ \ \ \ \ \ std::string\ result;}
+\DoxyCodeLine{00470\ \ \ \ \ \ \ \ \ result\ +=\ \textcolor{stringliteral}{"{}digraph\ \{\(\backslash\)n"{}};}
+\DoxyCodeLine{00471\ \ \ \ \ \ \ \ \ std::set<StateIndex>\ terminalStates;}
+\DoxyCodeLine{00472\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ stateIndex\ =\ 0;stateIndex\ <\ builder-\/>\mbox{\hyperlink{struct_n_f_a_1_1_builder_ae099c05cc1744278569e43d01bc0c839}{nfaStates}}.size();++stateIndex)}
+\DoxyCodeLine{00473\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00474\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_n_f_a_1_1_n_f_a_state}{NFAState}}\&\ nfaState\ =\ builder-\/>\mbox{\hyperlink{struct_n_f_a_1_1_builder_ae099c05cc1744278569e43d01bc0c839}{nfaStates}}[stateIndex];}
+\DoxyCodeLine{00475\ }
+\DoxyCodeLine{00476\ \ \ \ \ \ \ \ \ \ \ \ \ result\ +=\ \textcolor{stringliteral}{"{}state"{}}\ +\ std::to\_string(stateIndex)\ +\ \textcolor{stringliteral}{"{}[shape=square\ label=\(\backslash\)"{}"{}}\ +\ std::to\_string(stateIndex)\ +\ \textcolor{stringliteral}{"{}\(\backslash\)"{}];\(\backslash\)n"{}};}
+\DoxyCodeLine{00477\ }
+\DoxyCodeLine{00478\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ statePredicatePair\ :\ nfaState.\mbox{\hyperlink{struct_n_f_a_1_1_n_f_a_state_ae13788d4108acbb13ff1ad901ef80dd8}{nextStateToPredicateMap}})}
+\DoxyCodeLine{00479\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00480\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ edgeLabel\ =\ \mbox{\hyperlink{namespace_n_f_a_a7386c58e4560679b7381ec2aa47f7933}{getGraphEdgeLabel}}(statePredicatePair.second);}
+\DoxyCodeLine{00481\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ nextStateName\ =\ statePredicatePair.first\ <\ 0}
+\DoxyCodeLine{00482\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ?\ \textcolor{stringliteral}{"{}terminal"{}}\ +\ std::to\_string(-\/statePredicatePair.first)}
+\DoxyCodeLine{00483\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \textcolor{stringliteral}{"{}state"{}}\ +\ \mbox{\hyperlink{namespacestd}{std}}::to\_string(statePredicatePair.first);}
+\DoxyCodeLine{00484\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ result\ +=\ \textcolor{stringliteral}{"{}state"{}}\ +\ std::to\_string(stateIndex)}
+\DoxyCodeLine{00485\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ +\ \textcolor{stringliteral}{"{}\ -\/>\ "{}}}
+\DoxyCodeLine{00486\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ +\ nextStateName\ +\ \textcolor{stringliteral}{"{}[label=\(\backslash\)"{}"{}}\ +\ \mbox{\hyperlink{namespace_n_f_a_abebdef6f328f9c9b95753bc0c3f24af7}{escapeString}}(edgeLabel)\ +\ \textcolor{stringliteral}{"{}\(\backslash\)"{}];\(\backslash\)n"{}};}
+\DoxyCodeLine{00487\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(statePredicatePair.first\ <\ 0)}
+\DoxyCodeLine{00488\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00489\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ terminalStates.emplace(statePredicatePair.first);}
+\DoxyCodeLine{00490\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00491\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00492\ }
+\DoxyCodeLine{00493\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\ epsilonNextState\ :\ nfaState.\mbox{\hyperlink{struct_n_f_a_1_1_n_f_a_state_ae0ec1d173727cd5b3885fa948c8e2d22}{epsilonNextStates}})}
+\DoxyCodeLine{00494\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00495\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ nextStateName\ =\ epsilonNextState\ <\ 0}
+\DoxyCodeLine{00496\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ?\ \textcolor{stringliteral}{"{}terminal"{}}\ +\ std::to\_string(-\/epsilonNextState)}
+\DoxyCodeLine{00497\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \textcolor{stringliteral}{"{}state"{}}\ +\ \mbox{\hyperlink{namespacestd}{std}}::to\_string(epsilonNextState);}
+\DoxyCodeLine{00498\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ result\ +=\ \textcolor{stringliteral}{"{}state"{}}\ +\ std::to\_string(stateIndex)\ +\ \textcolor{stringliteral}{"{}\ -\/>\ "{}}\ +\ nextStateName\ +\ \textcolor{stringliteral}{"{}[label=\(\backslash\)"{}\&epsilon;\(\backslash\)"{}];\(\backslash\)n"{}};}
+\DoxyCodeLine{00499\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00500\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00501\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\ terminalState\ :\ terminalStates)}
+\DoxyCodeLine{00502\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00503\ \ \ \ \ \ \ \ \ \ \ \ \ result\ +=\ \textcolor{stringliteral}{"{}terminal"{}}\ +\ std::to\_string(-\/terminalState)}
+\DoxyCodeLine{00504\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ +\ \textcolor{stringliteral}{"{}[shape=octagon\ label=\(\backslash\)"{}"{}}\ +\ std::to\_string(maximumTerminalStateIndex\ -\/\ terminalState)\ +\ \textcolor{stringliteral}{"{}\(\backslash\)"{}];\(\backslash\)n"{}};}
+\DoxyCodeLine{00505\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00506\ \ \ \ \ \ \ \ \ result\ +=\ \textcolor{stringliteral}{"{}\}\(\backslash\)n"{}};}
+\DoxyCodeLine{00507\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00508\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_n_f_a_ad2bae1dc95f748e75ed2ef3d06b38868_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_n_f_a_ad2bae1dc95f748e75ed2ef3d06b38868_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_n_f_a_abebdef6f328f9c9b95753bc0c3f24af7}\index{NFA@{NFA}!escapeString@{escapeString}}
+\index{escapeString@{escapeString}!NFA@{NFA}}
+\doxysubsubsection{\texorpdfstring{escapeString()}{escapeString()}}
+{\footnotesize\ttfamily \label{namespace_n_f_a_abebdef6f328f9c9b95753bc0c3f24af7} 
+std\+::string NFA\+::escape\+String (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{string}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_n_f_a_8cpp_source_l00399}{399}} of file \mbox{\hyperlink{_n_f_a_8cpp_source}{NFA.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00400\ \ \ \ \ \{}
+\DoxyCodeLine{00401\ \ \ \ \ \ \ \ \ std::string\ result;}
+\DoxyCodeLine{00402\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ charIndex\ =\ 0;charIndex\ <\ \textcolor{keywordtype}{string}.size();++charIndex)}
+\DoxyCodeLine{00403\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00404\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ c\ =\ \textcolor{keywordtype}{string}[charIndex];}
+\DoxyCodeLine{00405\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(c\ ==\ \textcolor{charliteral}{'\(\backslash\)\(\backslash\)'})\ \{\ result\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)\(\backslash\)\(\backslash\)"{}};\ \}}
+\DoxyCodeLine{00406\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(c\ ==\ \textcolor{charliteral}{'\(\backslash\)"{}'})\ \{\ result\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)\(\backslash\)"{}"{}};\ \}}
+\DoxyCodeLine{00407\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(c\ ==\ \textcolor{charliteral}{'\(\backslash\)n'})\ \{\ result\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)n"{}};\ \}}
+\DoxyCodeLine{00408\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(c\ <\ 0x20\ ||\ c\ >\ 0x7e)}
+\DoxyCodeLine{00409\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00410\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ result\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)\(\backslash\)\(\backslash\)"{}};}
+\DoxyCodeLine{00411\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ result\ +=\ \mbox{\hyperlink{namespace_n_f_a_a3ef97d19fa0e3344352c4d88f439b92d}{nibbleToHexChar}}((c\ \&\ 0xf0)\ >>\ 4);}
+\DoxyCodeLine{00412\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ result\ +=\ \mbox{\hyperlink{namespace_n_f_a_a3ef97d19fa0e3344352c4d88f439b92d}{nibbleToHexChar}}((c\ \&\ 0x0f)\ >>\ 0);}
+\DoxyCodeLine{00413\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00414\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{\ result\ +=\ c;\ \}}
+\DoxyCodeLine{00415\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00416\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00417\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=333pt]{namespace_n_f_a_abebdef6f328f9c9b95753bc0c3f24af7_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_n_f_a_abebdef6f328f9c9b95753bc0c3f24af7_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_n_f_a_adc756f037e3d4d7c0de30430245cf6d2}\index{NFA@{NFA}!getGraphEdgeCharLabel@{getGraphEdgeCharLabel}}
+\index{getGraphEdgeCharLabel@{getGraphEdgeCharLabel}!NFA@{NFA}}
+\doxysubsubsection{\texorpdfstring{getGraphEdgeCharLabel()}{getGraphEdgeCharLabel()}}
+{\footnotesize\ttfamily \label{namespace_n_f_a_adc756f037e3d4d7c0de30430245cf6d2} 
+std\+::string NFA\+::get\+Graph\+Edge\+Char\+Label (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}}]{char\+Index}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_n_f_a_8cpp_source_l00419}{419}} of file \mbox{\hyperlink{_n_f_a_8cpp_source}{NFA.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00420\ \ \ \ \ \{}
+\DoxyCodeLine{00421\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(charIndex)}
+\DoxyCodeLine{00422\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00423\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\string^'}:\ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)\string^"{}};}
+\DoxyCodeLine{00424\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)f'}:\ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)f"{}};}
+\DoxyCodeLine{00425\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)r'}:\ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)r"{}};}
+\DoxyCodeLine{00426\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)n'}:\ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)n"{}};}
+\DoxyCodeLine{00427\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)t'}:\ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)t"{}};}
+\DoxyCodeLine{00428\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)''}:\ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)\(\backslash\)'"{}};}
+\DoxyCodeLine{00429\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)"{}'}:\ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)\(\backslash\)"{}"{}};}
+\DoxyCodeLine{00430\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)\(\backslash\)'}:\ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)\(\backslash\)\(\backslash\)"{}};}
+\DoxyCodeLine{00431\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'-\/'}:\ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)-\/"{}};}
+\DoxyCodeLine{00432\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:\ \textcolor{keywordflow}{return}\ std::string(1,(\textcolor{keywordtype}{char})charIndex);}
+\DoxyCodeLine{00433\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00434\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_n_f_a_adc756f037e3d4d7c0de30430245cf6d2_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_n_f_a_a7386c58e4560679b7381ec2aa47f7933}\index{NFA@{NFA}!getGraphEdgeLabel@{getGraphEdgeLabel}}
+\index{getGraphEdgeLabel@{getGraphEdgeLabel}!NFA@{NFA}}
+\doxysubsubsection{\texorpdfstring{getGraphEdgeLabel()}{getGraphEdgeLabel()}}
+{\footnotesize\ttfamily \label{namespace_n_f_a_a7386c58e4560679b7381ec2aa47f7933} 
+std\+::string NFA\+::get\+Graph\+Edge\+Label (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespace_n_f_a_aab46c702df98598c70d9290d164ffa99}{Char\+Set}} \&}]{char\+Set}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_n_f_a_8cpp_source_l00436}{436}} of file \mbox{\hyperlink{_n_f_a_8cpp_source}{NFA.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00437\ \ \ \ \ \{}
+\DoxyCodeLine{00438\ \ \ \ \ \ \ \ \ std::string\ edgeLabel;}
+\DoxyCodeLine{00439\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}\ numSetChars\ =\ 0;}
+\DoxyCodeLine{00440\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ charIndex\ =\ 0;charIndex\ <\ 256;++charIndex)}
+\DoxyCodeLine{00441\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00442\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(charSet.\mbox{\hyperlink{struct_dense_static_int_set_a20fadddd5d316b82a7c04a50fb3619fc}{contains}}((\textcolor{keywordtype}{char})charIndex))\ \{\ ++numSetChars;\ \}}
+\DoxyCodeLine{00443\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00444\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(numSetChars\ >\ 1)\ \{\ edgeLabel\ +=\ \textcolor{stringliteral}{"{}["{}};\ \}}
+\DoxyCodeLine{00445\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ isNegative\ =\ numSetChars\ >=\ 100;}
+\DoxyCodeLine{00446\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(isNegative)\ \{\ edgeLabel\ +=\ \textcolor{stringliteral}{"{}\string^"{}};\ \}}
+\DoxyCodeLine{00447\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ charIndex\ =\ 0;charIndex\ <\ 256;++charIndex)}
+\DoxyCodeLine{00448\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00449\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(charSet.\mbox{\hyperlink{struct_dense_static_int_set_a20fadddd5d316b82a7c04a50fb3619fc}{contains}}((\textcolor{keywordtype}{char})charIndex)\ !=\ isNegative)}
+\DoxyCodeLine{00450\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00451\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ edgeLabel\ +=\ \mbox{\hyperlink{namespace_n_f_a_adc756f037e3d4d7c0de30430245cf6d2}{getGraphEdgeCharLabel}}(charIndex);}
+\DoxyCodeLine{00452\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(charIndex\ +\ 2\ <\ 256}
+\DoxyCodeLine{00453\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\&\ charSet.\mbox{\hyperlink{struct_dense_static_int_set_a20fadddd5d316b82a7c04a50fb3619fc}{contains}}((\textcolor{keywordtype}{char})charIndex+1)\ !=\ isNegative}
+\DoxyCodeLine{00454\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\&\ charSet.\mbox{\hyperlink{struct_dense_static_int_set_a20fadddd5d316b82a7c04a50fb3619fc}{contains}}((\textcolor{keywordtype}{char})charIndex+2)\ !=\ isNegative)}
+\DoxyCodeLine{00455\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00456\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ edgeLabel\ +=\ \textcolor{stringliteral}{"{}-\/"{}};}
+\DoxyCodeLine{00457\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ charIndex\ +=\ 2;}
+\DoxyCodeLine{00458\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(charIndex\ +\ 1\ <\ 256\ \&\&\ charSet.\mbox{\hyperlink{struct_dense_static_int_set_a20fadddd5d316b82a7c04a50fb3619fc}{contains}}((\textcolor{keywordtype}{char})charIndex+1)\ !=\ isNegative)\ \{\ ++charIndex;\ \}}
+\DoxyCodeLine{00459\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ edgeLabel\ +=\ \mbox{\hyperlink{namespace_n_f_a_adc756f037e3d4d7c0de30430245cf6d2}{getGraphEdgeCharLabel}}(charIndex);}
+\DoxyCodeLine{00460\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00461\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00462\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00463\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(numSetChars\ >\ 1)\ \{\ edgeLabel\ +=\ \textcolor{stringliteral}{"{}]"{}};\ \}}
+\DoxyCodeLine{00464\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ edgeLabel;}
+\DoxyCodeLine{00465\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_n_f_a_a7386c58e4560679b7381ec2aa47f7933_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_n_f_a_a7386c58e4560679b7381ec2aa47f7933_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_n_f_a_ad1e9e5dd3c2cdbefdf6ba97f12d26eae}\index{NFA@{NFA}!getNonTerminalEdge@{getNonTerminalEdge}}
+\index{getNonTerminalEdge@{getNonTerminalEdge}!NFA@{NFA}}
+\doxysubsubsection{\texorpdfstring{getNonTerminalEdge()}{getNonTerminalEdge()}}
+{\footnotesize\ttfamily \label{namespace_n_f_a_ad1e9e5dd3c2cdbefdf6ba97f12d26eae} 
+\mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{State\+Index}} NFA\+::get\+Non\+Terminal\+Edge (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_n_f_a_1_1_builder}{Builder}} \texorpdfstring{$\ast$}{*}}]{builder}{, }\item[{\mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{State\+Index}}}]{initial\+State}{, }\item[{char}]{c}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_n_f_a_8cpp_source_l00065}{65}} of file \mbox{\hyperlink{_n_f_a_8cpp_source}{NFA.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00066\ \ \ \ \ \{}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ nextStateToPredicatePair\ :\ builder-\/>\mbox{\hyperlink{struct_n_f_a_1_1_builder_ae099c05cc1744278569e43d01bc0c839}{nfaStates}}[initialState].nextStateToPredicateMap)}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(nextStateToPredicatePair.first\ >=\ 0\ \&\&\ nextStateToPredicatePair.second.contains((\mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}})c))}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ nextStateToPredicatePair.first;}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00074\ }
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_n_f_a_ad9fb95d6afb96fea8750c3543ee293a1ac83c0f7e053c5efc232f432bba1ab6c6}{unmatchedCharacterTerminal}};}
+\DoxyCodeLine{00076\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespace_n_f_a_a3ef97d19fa0e3344352c4d88f439b92d}\index{NFA@{NFA}!nibbleToHexChar@{nibbleToHexChar}}
+\index{nibbleToHexChar@{nibbleToHexChar}!NFA@{NFA}}
+\doxysubsubsection{\texorpdfstring{nibbleToHexChar()}{nibbleToHexChar()}}
+{\footnotesize\ttfamily \label{namespace_n_f_a_a3ef97d19fa0e3344352c4d88f439b92d} 
+char NFA\+::nibble\+To\+Hex\+Char (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}}]{value}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_n_f_a_8cpp_source_l00397}{397}} of file \mbox{\hyperlink{_n_f_a_8cpp_source}{NFA.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00397\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ <\ 10\ ?\ (\textcolor{charliteral}{'0'}\ +\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})\ :\ \textcolor{stringliteral}{'a'}\ +\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ -\/\ 10;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_n_f_a_a3ef97d19fa0e3344352c4d88f439b92d_icgraph}
+\end{center}
+\end{figure}

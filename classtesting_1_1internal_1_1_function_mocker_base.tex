@@ -1,0 +1,503 @@
+\doxysection{testing\+::internal\+::Function\+Mocker\+Base\texorpdfstring{$<$}{<} F \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classtesting_1_1internal_1_1_function_mocker_base}{}\label{classtesting_1_1internal_1_1_function_mocker_base}\index{testing::internal::FunctionMockerBase$<$ F $>$@{testing::internal::FunctionMockerBase$<$ F $>$}}
+
+
+{\ttfamily \#include $<$gmock-\/spec-\/builders.\+h$>$}
+
+
+
+Inheritance diagram for testing\+::internal\+::Function\+Mocker\+Base\texorpdfstring{$<$}{<} F \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=225pt]{classtesting_1_1internal_1_1_function_mocker_base__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for testing\+::internal\+::Function\+Mocker\+Base\texorpdfstring{$<$}{<} F \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=225pt]{classtesting_1_1internal_1_1_function_mocker_base__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{structtesting_1_1internal_1_1_function}{Function}}$<$ F $>$\+::\+Result \mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base_a9ba8e306ef2395b45496550035ab4be0}{Result}}
+\item 
+typedef \mbox{\hyperlink{structtesting_1_1internal_1_1_function}{Function}}$<$ F $>$\+::\+Argument\+Tuple \mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base_a2bce16e3cb543ae3ca7554e163fb29a8}{Argument\+Tuple}}
+\item 
+typedef \mbox{\hyperlink{structtesting_1_1internal_1_1_function}{Function}}$<$ F $>$\+::\+Argument\+Matcher\+Tuple \mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base_aa5252ae41d9387401390822de12fda3b}{Argument\+Matcher\+Tuple}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base_a2206d80aad533ba6bf1f5e09c909aee0}{Function\+Mocker\+Base}} ()
+\item 
+virtual \mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base_a3c33e7b4aa0e28e5bd46eb072f511068}{\texorpdfstring{$\sim$}{\string~}\+Function\+Mocker\+Base}} () \mbox{\hyperlink{gtest-port_8h_a69abff5a4efdd07bd5faebe3dd318d06}{GTEST\+\_\+\+LOCK\+\_\+\+EXCLUDED\+\_\+}}(g\+\_\+gmock\+\_\+mutex)
+\item 
+const \mbox{\hyperlink{classtesting_1_1internal_1_1_on_call_spec}{On\+Call\+Spec}}$<$ F $>$ \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base_ae938313e7b8bb17e8945f91c8aa70411}{Find\+On\+Call\+Spec}} (const \mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base_a2bce16e3cb543ae3ca7554e163fb29a8}{Argument\+Tuple}} \&args) const
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base_a9ba8e306ef2395b45496550035ab4be0}{Result}} \mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base_a31904a256840331e75d9cc3cfa15897e}{Perform\+Default\+Action}} (typename \mbox{\hyperlink{structtesting_1_1internal_1_1_rvalue_ref}{Rvalue\+Ref}}$<$ typename \mbox{\hyperlink{structtesting_1_1internal_1_1_function}{Function}}$<$ F $>$\mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base_a2bce16e3cb543ae3ca7554e163fb29a8}{\+::\+Argument\+Tuple}} $>$\+::type args, const std\+::string \&call\+\_\+description) const
+\item 
+virtual \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_action_result_holder_base}{Untyped\+Action\+Result\+Holder\+Base}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base_a7552cb8f11ee7dc325a0713bf9943a5d}{Untyped\+Perform\+Default\+Action}} (void \texorpdfstring{$\ast$}{*}untyped\+\_\+args, const std\+::string \&call\+\_\+description) const
+\item 
+virtual \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_action_result_holder_base}{Untyped\+Action\+Result\+Holder\+Base}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base_a17a3b6e6e7ace5af6f08cc3bcf041e74}{Untyped\+Perform\+Action}} (const void \texorpdfstring{$\ast$}{*}untyped\+\_\+action, void \texorpdfstring{$\ast$}{*}untyped\+\_\+args) const
+\item 
+virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base_ada818fcb2b892f21bb939def386599e7}{Clear\+Default\+Actions\+Locked}} () \mbox{\hyperlink{gtest-port_8h_a149f693bd59fa1bc937af54c0cdcb32f}{GTEST\+\_\+\+EXCLUSIVE\+\_\+\+LOCK\+\_\+\+REQUIRED\+\_\+}}(g\+\_\+gmock\+\_\+mutex)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_function_mocker_base}{testing\+::internal\+::\+Untyped\+Function\+Mocker\+Base}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_function_mocker_base_aedfa95e65d80936e4dff040140513b36}{Untyped\+Function\+Mocker\+Base}} ()
+\item 
+virtual \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_function_mocker_base_a6badd47a3fe2a439ef98aa91bf73d721}{\texorpdfstring{$\sim$}{\string~}\+Untyped\+Function\+Mocker\+Base}} ()
+\item 
+bool \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_function_mocker_base_a3f1d62a1662a3daa2895b3af963be269}{Verify\+And\+Clear\+Expectations\+Locked}} () \mbox{\hyperlink{gtest-port_8h_a149f693bd59fa1bc937af54c0cdcb32f}{GTEST\+\_\+\+EXCLUSIVE\+\_\+\+LOCK\+\_\+\+REQUIRED\+\_\+}}(g\+\_\+gmock\+\_\+mutex)
+\item 
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_function_mocker_base_a0cd3dd14b92c714eab690c9597f32ffd}{Register\+Owner}} (const void \texorpdfstring{$\ast$}{*}mock\+\_\+obj) \mbox{\hyperlink{gtest-port_8h_a69abff5a4efdd07bd5faebe3dd318d06}{GTEST\+\_\+\+LOCK\+\_\+\+EXCLUDED\+\_\+}}(g\+\_\+gmock\+\_\+mutex)
+\item 
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_function_mocker_base_a287bcacee639b7d123cec29e0614fe96}{Set\+Owner\+And\+Name}} (const void \texorpdfstring{$\ast$}{*}mock\+\_\+obj, const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}) \mbox{\hyperlink{gtest-port_8h_a69abff5a4efdd07bd5faebe3dd318d06}{GTEST\+\_\+\+LOCK\+\_\+\+EXCLUDED\+\_\+}}(g\+\_\+gmock\+\_\+mutex)
+\item 
+const void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_function_mocker_base_a71863dd67193a7082078d5b366d5ce51}{Mock\+Object}} () const \mbox{\hyperlink{gtest-port_8h_a69abff5a4efdd07bd5faebe3dd318d06}{GTEST\+\_\+\+LOCK\+\_\+\+EXCLUDED\+\_\+}}(g\+\_\+gmock\+\_\+mutex)
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_function_mocker_base_ae90a5b5d48db1e99634bc6ff39ded335}{Name}} () const \mbox{\hyperlink{gtest-port_8h_a69abff5a4efdd07bd5faebe3dd318d06}{GTEST\+\_\+\+LOCK\+\_\+\+EXCLUDED\+\_\+}}(g\+\_\+gmock\+\_\+mutex)
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_action_result_holder_base}{Untyped\+Action\+Result\+Holder\+Base}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_function_mocker_base_a819f2e6575f1245e65fc2040150b5bac}{Untyped\+Invoke\+With}} (void \texorpdfstring{$\ast$}{*}untyped\+\_\+args) \mbox{\hyperlink{gtest-port_8h_a69abff5a4efdd07bd5faebe3dd318d06}{GTEST\+\_\+\+LOCK\+\_\+\+EXCLUDED\+\_\+}}(g\+\_\+gmock\+\_\+mutex)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{classtesting_1_1internal_1_1_action_result_holder}{Action\+Result\+Holder}}$<$ \mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base_a9ba8e306ef2395b45496550035ab4be0}{Result}} $>$ \mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base_a8442c990725541a8c6b8a06cbb8d8bbd}{Result\+Holder}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Types inherited from \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_function_mocker_base}{testing\+::internal\+::\+Untyped\+Function\+Mocker\+Base}}}
+\begin{DoxyCompactItemize}
+\item 
+typedef std\+::vector$<$ const void \texorpdfstring{$\ast$}{*} $>$ \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_function_mocker_base_a1a423cc3a18cb9039f45aa1aca8f3db7}{Untyped\+On\+Call\+Specs}}
+\item 
+typedef std\+::vector$<$ \mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr}{internal\+::linked\+\_\+ptr}}$<$ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base}{Expectation\+Base}} $>$ $>$ \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_function_mocker_base_ad8fd7ca342d6b07a3188c0401397f5fd}{Untyped\+Expectations}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base_a9ba8e306ef2395b45496550035ab4be0}{Result}} \mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base_ac29acd6b53f4edd608921ad9190d9202}{Invoke\+With}} (typename \mbox{\hyperlink{structtesting_1_1internal_1_1_rvalue_ref}{Rvalue\+Ref}}$<$ typename \mbox{\hyperlink{structtesting_1_1internal_1_1_function}{Function}}$<$ F $>$\mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base_a2bce16e3cb543ae3ca7554e163fb29a8}{\+::\+Argument\+Tuple}} $>$\+::type args) \mbox{\hyperlink{gtest-port_8h_a69abff5a4efdd07bd5faebe3dd318d06}{GTEST\+\_\+\+LOCK\+\_\+\+EXCLUDED\+\_\+}}(g\+\_\+gmock\+\_\+mutex)
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_on_call_spec}{On\+Call\+Spec}}$<$ F $>$ \& \mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base_a21cd1573358dfebe35436eb6b92c2bf5}{Add\+New\+On\+Call\+Spec}} (const char \texorpdfstring{$\ast$}{*}file, int line, const \mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base_aa5252ae41d9387401390822de12fda3b}{Argument\+Matcher\+Tuple}} \&m) \mbox{\hyperlink{gtest-port_8h_a69abff5a4efdd07bd5faebe3dd318d06}{GTEST\+\_\+\+LOCK\+\_\+\+EXCLUDED\+\_\+}}(g\+\_\+gmock\+\_\+mutex)
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_typed_expectation}{Typed\+Expectation}}$<$ F $>$ \& \mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base_ab6e19e23946142052257bbf32a981949}{Add\+New\+Expectation}} (const char \texorpdfstring{$\ast$}{*}file, int line, const std\+::string \&source\+\_\+text, const \mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base_aa5252ae41d9387401390822de12fda3b}{Argument\+Matcher\+Tuple}} \&m) \mbox{\hyperlink{gtest-port_8h_a69abff5a4efdd07bd5faebe3dd318d06}{GTEST\+\_\+\+LOCK\+\_\+\+EXCLUDED\+\_\+}}(g\+\_\+gmock\+\_\+mutex)
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Member Functions inherited from \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_function_mocker_base}{testing\+::internal\+::\+Untyped\+Function\+Mocker\+Base}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1_expectation}{Expectation}} \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_function_mocker_base_a7705611c4a63df16cddb0674878c403a}{Get\+Handle\+Of}} (\mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base}{Expectation\+Base}} \texorpdfstring{$\ast$}{*}exp)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{structtesting_1_1internal_1_1_function}{Function}} $>$ }\\\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base_ae72aeee91c93e8ae5e1ed7f726a766b2}{Mock\+Spec}}
+\item 
+{\footnotesize template$<$typename Func $>$ }\\\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base_a4f17de55396a8ef740d5ad2b1380a851}{Typed\+Expectation}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Protected Attributes inherited from \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_function_mocker_base}{testing\+::internal\+::\+Untyped\+Function\+Mocker\+Base}}}
+\begin{DoxyCompactItemize}
+\item 
+const void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_function_mocker_base_adf35c589969bb985668616031cb9ed56}{mock\+\_\+obj\+\_\+}}
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_function_mocker_base_a2d472077b9a8d3758caaec5770259f70}{name\+\_\+}}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_function_mocker_base_a1a423cc3a18cb9039f45aa1aca8f3db7}{Untyped\+On\+Call\+Specs}} \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_function_mocker_base_aed2a1913f6c03fd47c8900039556be34}{untyped\+\_\+on\+\_\+call\+\_\+specs\+\_\+}}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_function_mocker_base_ad8fd7ca342d6b07a3188c0401397f5fd}{Untyped\+Expectations}} \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_function_mocker_base_aae4a42a4bace1fcb0cd4bdf1ddd40277}{untyped\+\_\+expectations\+\_\+}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename F$>$\newline
+class testing\+::internal\+::\+Function\+Mocker\+Base$<$ F $>$}
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l01469}{1469}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_function_mocker_base_aa5252ae41d9387401390822de12fda3b}\index{testing::internal::FunctionMockerBase$<$ F $>$@{testing::internal::FunctionMockerBase$<$ F $>$}!ArgumentMatcherTuple@{ArgumentMatcherTuple}}
+\index{ArgumentMatcherTuple@{ArgumentMatcherTuple}!testing::internal::FunctionMockerBase$<$ F $>$@{testing::internal::FunctionMockerBase$<$ F $>$}}
+\doxysubsubsection{\texorpdfstring{ArgumentMatcherTuple}{ArgumentMatcherTuple}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_function_mocker_base_aa5252ae41d9387401390822de12fda3b} 
+template$<$typename F $>$ \\
+\mbox{\hyperlink{structtesting_1_1internal_1_1_function}{Function}}$<$F$>$\+::\+Argument\+Matcher\+Tuple \mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base}{testing\+::internal\+::\+Function\+Mocker\+Base}}$<$ F $>$\+::\+Argument\+Matcher\+Tuple}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l01473}{1473}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+\Hypertarget{classtesting_1_1internal_1_1_function_mocker_base_a2bce16e3cb543ae3ca7554e163fb29a8}\index{testing::internal::FunctionMockerBase$<$ F $>$@{testing::internal::FunctionMockerBase$<$ F $>$}!ArgumentTuple@{ArgumentTuple}}
+\index{ArgumentTuple@{ArgumentTuple}!testing::internal::FunctionMockerBase$<$ F $>$@{testing::internal::FunctionMockerBase$<$ F $>$}}
+\doxysubsubsection{\texorpdfstring{ArgumentTuple}{ArgumentTuple}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_function_mocker_base_a2bce16e3cb543ae3ca7554e163fb29a8} 
+template$<$typename F $>$ \\
+\mbox{\hyperlink{structtesting_1_1internal_1_1_function}{Function}}$<$F$>$\+::\+Argument\+Tuple \mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base}{testing\+::internal\+::\+Function\+Mocker\+Base}}$<$ F $>$\+::\+Argument\+Tuple}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l01472}{1472}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+\Hypertarget{classtesting_1_1internal_1_1_function_mocker_base_a9ba8e306ef2395b45496550035ab4be0}\index{testing::internal::FunctionMockerBase$<$ F $>$@{testing::internal::FunctionMockerBase$<$ F $>$}!Result@{Result}}
+\index{Result@{Result}!testing::internal::FunctionMockerBase$<$ F $>$@{testing::internal::FunctionMockerBase$<$ F $>$}}
+\doxysubsubsection{\texorpdfstring{Result}{Result}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_function_mocker_base_a9ba8e306ef2395b45496550035ab4be0} 
+template$<$typename F $>$ \\
+\mbox{\hyperlink{structtesting_1_1internal_1_1_function}{Function}}$<$F$>$\+::\+Result \mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base}{testing\+::internal\+::\+Function\+Mocker\+Base}}$<$ F $>$\+::\+Result}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l01471}{1471}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+\Hypertarget{classtesting_1_1internal_1_1_function_mocker_base_a8442c990725541a8c6b8a06cbb8d8bbd}\index{testing::internal::FunctionMockerBase$<$ F $>$@{testing::internal::FunctionMockerBase$<$ F $>$}!ResultHolder@{ResultHolder}}
+\index{ResultHolder@{ResultHolder}!testing::internal::FunctionMockerBase$<$ F $>$@{testing::internal::FunctionMockerBase$<$ F $>$}}
+\doxysubsubsection{\texorpdfstring{ResultHolder}{ResultHolder}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_function_mocker_base_a8442c990725541a8c6b8a06cbb8d8bbd} 
+template$<$typename F $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_action_result_holder}{Action\+Result\+Holder}}$<$\mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base_a9ba8e306ef2395b45496550035ab4be0}{Result}}$>$ \mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base}{testing\+::internal\+::\+Function\+Mocker\+Base}}$<$ F $>$\+::\+Result\+Holder\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l01591}{1591}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_function_mocker_base_a2206d80aad533ba6bf1f5e09c909aee0}\index{testing::internal::FunctionMockerBase$<$ F $>$@{testing::internal::FunctionMockerBase$<$ F $>$}!FunctionMockerBase@{FunctionMockerBase}}
+\index{FunctionMockerBase@{FunctionMockerBase}!testing::internal::FunctionMockerBase$<$ F $>$@{testing::internal::FunctionMockerBase$<$ F $>$}}
+\doxysubsubsection{\texorpdfstring{FunctionMockerBase()}{FunctionMockerBase()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_function_mocker_base_a2206d80aad533ba6bf1f5e09c909aee0} 
+template$<$typename F $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base}{testing\+::internal\+::\+Function\+Mocker\+Base}}$<$ F $>$\+::\+Function\+Mocker\+Base (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l01475}{1475}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01475\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1internal_1_1_function_mocker_base_a3c33e7b4aa0e28e5bd46eb072f511068}\index{testing::internal::FunctionMockerBase$<$ F $>$@{testing::internal::FunctionMockerBase$<$ F $>$}!````~FunctionMockerBase@{\texorpdfstring{$\sim$}{\string~}FunctionMockerBase}}
+\index{````~FunctionMockerBase@{\texorpdfstring{$\sim$}{\string~}FunctionMockerBase}!testing::internal::FunctionMockerBase$<$ F $>$@{testing::internal::FunctionMockerBase$<$ F $>$}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}FunctionMockerBase()}{\string~FunctionMockerBase()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_function_mocker_base_a3c33e7b4aa0e28e5bd46eb072f511068} 
+template$<$typename F $>$ \\
+virtual \mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base}{testing\+::internal\+::\+Function\+Mocker\+Base}}$<$ F $>$\+::\texorpdfstring{$\sim$}{\string~}\mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base}{Function\+Mocker\+Base}} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l01480}{1480}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01481\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01482\ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a08b187c6cc4e28400aadf9a32fccc8de}{MutexLock}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}(\&g\_gmock\_mutex);}
+\DoxyCodeLine{01483\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_function_mocker_base_a3f1d62a1662a3daa2895b3af963be269}{VerifyAndClearExpectationsLocked}}();}
+\DoxyCodeLine{01484\ \ \ \ \ Mock::UnregisterLocked(\textcolor{keyword}{this});}
+\DoxyCodeLine{01485\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base_ada818fcb2b892f21bb939def386599e7}{ClearDefaultActionsLocked}}();}
+\DoxyCodeLine{01486\ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_function_mocker_base_ab6e19e23946142052257bbf32a981949}\index{testing::internal::FunctionMockerBase$<$ F $>$@{testing::internal::FunctionMockerBase$<$ F $>$}!AddNewExpectation@{AddNewExpectation}}
+\index{AddNewExpectation@{AddNewExpectation}!testing::internal::FunctionMockerBase$<$ F $>$@{testing::internal::FunctionMockerBase$<$ F $>$}}
+\doxysubsubsection{\texorpdfstring{AddNewExpectation()}{AddNewExpectation()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_function_mocker_base_ab6e19e23946142052257bbf32a981949} 
+template$<$typename F $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_typed_expectation}{Typed\+Expectation}}$<$ F $>$ \& \mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base}{testing\+::internal\+::\+Function\+Mocker\+Base}}$<$ F $>$\+::\+Add\+New\+Expectation (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{file}{, }\item[{int}]{line}{, }\item[{const std\+::string \&}]{source\+\_\+text}{, }\item[{const \mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base_aa5252ae41d9387401390822de12fda3b}{Argument\+Matcher\+Tuple}} \&}]{m}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l01619}{1619}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01622\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01623\ \ \ \ \ Mock::RegisterUseByOnCallOrExpectCall(\mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_function_mocker_base_a71863dd67193a7082078d5b366d5ce51}{MockObject}}(),\ file,\ line);}
+\DoxyCodeLine{01624\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base_a4f17de55396a8ef740d5ad2b1380a851}{TypedExpectation<F>}}*\ \textcolor{keyword}{const}\ expectation\ =}
+\DoxyCodeLine{01625\ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base_a4f17de55396a8ef740d5ad2b1380a851}{TypedExpectation<F>}}(\textcolor{keyword}{this},\ file,\ line,\ source\_text,\ m);}
+\DoxyCodeLine{01626\ \ \ \ \ \textcolor{keyword}{const}\ linked\_ptr<ExpectationBase>\ untyped\_expectation(expectation);}
+\DoxyCodeLine{01627\ \ \ \ \ \textcolor{comment}{//\ See\ the\ definition\ of\ untyped\_expectations\_\ for\ why\ access\ to}}
+\DoxyCodeLine{01628\ \ \ \ \ \textcolor{comment}{//\ it\ is\ unprotected\ here.}}
+\DoxyCodeLine{01629\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_function_mocker_base_aae4a42a4bace1fcb0cd4bdf1ddd40277}{untyped\_expectations\_}}.push\_back(untyped\_expectation);}
+\DoxyCodeLine{01630\ }
+\DoxyCodeLine{01631\ \ \ \ \ \textcolor{comment}{//\ Adds\ this\ expectation\ into\ the\ implicit\ sequence\ if\ there\ is\ one.}}
+\DoxyCodeLine{01632\ \ \ \ \ Sequence*\ \textcolor{keyword}{const}\ implicit\_sequence\ =\ \mbox{\hyperlink{namespacetesting_1_1internal_af4407fe8aeb1e43b2f58940736a20590}{g\_gmock\_implicit\_sequence}}.get();}
+\DoxyCodeLine{01633\ \ \ \ \ \textcolor{keywordflow}{if}\ (implicit\_sequence\ !=\ NULL)\ \{}
+\DoxyCodeLine{01634\ \ \ \ \ \ \ implicit\_sequence-\/>AddExpectation(Expectation(untyped\_expectation));}
+\DoxyCodeLine{01635\ \ \ \ \ \}}
+\DoxyCodeLine{01636\ }
+\DoxyCodeLine{01637\ \ \ \ \ \textcolor{keywordflow}{return}\ *expectation;}
+\DoxyCodeLine{01638\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=331pt]{classtesting_1_1internal_1_1_function_mocker_base_ab6e19e23946142052257bbf32a981949_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_function_mocker_base_a21cd1573358dfebe35436eb6b92c2bf5}\index{testing::internal::FunctionMockerBase$<$ F $>$@{testing::internal::FunctionMockerBase$<$ F $>$}!AddNewOnCallSpec@{AddNewOnCallSpec}}
+\index{AddNewOnCallSpec@{AddNewOnCallSpec}!testing::internal::FunctionMockerBase$<$ F $>$@{testing::internal::FunctionMockerBase$<$ F $>$}}
+\doxysubsubsection{\texorpdfstring{AddNewOnCallSpec()}{AddNewOnCallSpec()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_function_mocker_base_a21cd1573358dfebe35436eb6b92c2bf5} 
+template$<$typename F $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_on_call_spec}{On\+Call\+Spec}}$<$ F $>$ \& \mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base}{testing\+::internal\+::\+Function\+Mocker\+Base}}$<$ F $>$\+::\+Add\+New\+On\+Call\+Spec (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{file}{, }\item[{int}]{line}{, }\item[{const \mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base_aa5252ae41d9387401390822de12fda3b}{Argument\+Matcher\+Tuple}} \&}]{m}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l01608}{1608}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01611\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01612\ \ \ \ \ Mock::RegisterUseByOnCallOrExpectCall(\mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_function_mocker_base_a71863dd67193a7082078d5b366d5ce51}{MockObject}}(),\ file,\ line);}
+\DoxyCodeLine{01613\ \ \ \ \ OnCallSpec<F>*\ \textcolor{keyword}{const}\ on\_call\_spec\ =\ \textcolor{keyword}{new}\ OnCallSpec<F>(file,\ line,\ m);}
+\DoxyCodeLine{01614\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_function_mocker_base_aed2a1913f6c03fd47c8900039556be34}{untyped\_on\_call\_specs\_}}.push\_back(on\_call\_spec);}
+\DoxyCodeLine{01615\ \ \ \ \ \textcolor{keywordflow}{return}\ *on\_call\_spec;}
+\DoxyCodeLine{01616\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1internal_1_1_function_mocker_base_ada818fcb2b892f21bb939def386599e7}\index{testing::internal::FunctionMockerBase$<$ F $>$@{testing::internal::FunctionMockerBase$<$ F $>$}!ClearDefaultActionsLocked@{ClearDefaultActionsLocked}}
+\index{ClearDefaultActionsLocked@{ClearDefaultActionsLocked}!testing::internal::FunctionMockerBase$<$ F $>$@{testing::internal::FunctionMockerBase$<$ F $>$}}
+\doxysubsubsection{\texorpdfstring{ClearDefaultActionsLocked()}{ClearDefaultActionsLocked()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_function_mocker_base_ada818fcb2b892f21bb939def386599e7} 
+template$<$typename F $>$ \\
+virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base}{testing\+::internal\+::\+Function\+Mocker\+Base}}$<$ F $>$\+::\+Clear\+Default\+Actions\+Locked (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_function_mocker_base_a40ddd95736946a7951033aa89a7b617f}{testing\+::internal\+::\+Untyped\+Function\+Mocker\+Base}}.
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l01561}{1561}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01562\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01563\ \ \ \ \ g\_gmock\_mutex.AssertHeld();}
+\DoxyCodeLine{01564\ }
+\DoxyCodeLine{01565\ \ \ \ \ \textcolor{comment}{//\ Deleting\ our\ default\ actions\ may\ trigger\ other\ mock\ objects\ to\ be}}
+\DoxyCodeLine{01566\ \ \ \ \ \textcolor{comment}{//\ deleted,\ for\ example\ if\ an\ action\ contains\ a\ reference\ counted\ smart}}
+\DoxyCodeLine{01567\ \ \ \ \ \textcolor{comment}{//\ pointer\ to\ that\ mock\ object,\ and\ that\ is\ the\ last\ reference.\ So\ if\ we}}
+\DoxyCodeLine{01568\ \ \ \ \ \textcolor{comment}{//\ delete\ our\ actions\ within\ the\ context\ of\ the\ global\ mutex\ we\ may\ deadlock}}
+\DoxyCodeLine{01569\ \ \ \ \ \textcolor{comment}{//\ when\ this\ method\ is\ called\ again.\ Instead,\ make\ a\ copy\ of\ the\ set\ of}}
+\DoxyCodeLine{01570\ \ \ \ \ \textcolor{comment}{//\ actions\ to\ delete,\ clear\ our\ set\ within\ the\ mutex,\ and\ then\ delete\ the}}
+\DoxyCodeLine{01571\ \ \ \ \ \textcolor{comment}{//\ actions\ outside\ of\ the\ mutex.}}
+\DoxyCodeLine{01572\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_function_mocker_base_a1a423cc3a18cb9039f45aa1aca8f3db7}{UntypedOnCallSpecs}}\ specs\_to\_delete;}
+\DoxyCodeLine{01573\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_function_mocker_base_aed2a1913f6c03fd47c8900039556be34}{untyped\_on\_call\_specs\_}}.swap(specs\_to\_delete);}
+\DoxyCodeLine{01574\ }
+\DoxyCodeLine{01575\ \ \ \ \ g\_gmock\_mutex.Unlock();}
+\DoxyCodeLine{01576\ \ \ \ \ \textcolor{keywordflow}{for}\ (UntypedOnCallSpecs::const\_iterator\ it\ =}
+\DoxyCodeLine{01577\ \ \ \ \ \ \ \ \ \ \ \ \ \ specs\_to\_delete.begin();}
+\DoxyCodeLine{01578\ \ \ \ \ \ \ \ \ \ it\ !=\ specs\_to\_delete.end();\ ++it)\ \{}
+\DoxyCodeLine{01579\ \ \ \ \ \ \ \textcolor{keyword}{delete}\ \textcolor{keyword}{static\_cast<}\textcolor{keyword}{const\ }OnCallSpec<F>*\textcolor{keyword}{>}(*it);}
+\DoxyCodeLine{01580\ \ \ \ \ \}}
+\DoxyCodeLine{01581\ }
+\DoxyCodeLine{01582\ \ \ \ \ \textcolor{comment}{//\ Lock\ the\ mutex\ again,\ since\ the\ caller\ expects\ it\ to\ be\ locked\ when\ we}}
+\DoxyCodeLine{01583\ \ \ \ \ \textcolor{comment}{//\ return.}}
+\DoxyCodeLine{01584\ \ \ \ \ g\_gmock\_mutex.Lock();}
+\DoxyCodeLine{01585\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1internal_1_1_function_mocker_base_ae938313e7b8bb17e8945f91c8aa70411}\index{testing::internal::FunctionMockerBase$<$ F $>$@{testing::internal::FunctionMockerBase$<$ F $>$}!FindOnCallSpec@{FindOnCallSpec}}
+\index{FindOnCallSpec@{FindOnCallSpec}!testing::internal::FunctionMockerBase$<$ F $>$@{testing::internal::FunctionMockerBase$<$ F $>$}}
+\doxysubsubsection{\texorpdfstring{FindOnCallSpec()}{FindOnCallSpec()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_function_mocker_base_ae938313e7b8bb17e8945f91c8aa70411} 
+template$<$typename F $>$ \\
+const \mbox{\hyperlink{classtesting_1_1internal_1_1_on_call_spec}{On\+Call\+Spec}}$<$ F $>$ \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base}{testing\+::internal\+::\+Function\+Mocker\+Base}}$<$ F $>$\+::\+Find\+On\+Call\+Spec (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base_a2bce16e3cb543ae3ca7554e163fb29a8}{Argument\+Tuple}} \&}]{args}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l01491}{1491}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01492\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01493\ \ \ \ \ \textcolor{keywordflow}{for}\ (UntypedOnCallSpecs::const\_reverse\_iterator\ it}
+\DoxyCodeLine{01494\ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_function_mocker_base_aed2a1913f6c03fd47c8900039556be34}{untyped\_on\_call\_specs\_}}.rbegin();}
+\DoxyCodeLine{01495\ \ \ \ \ \ \ \ \ \ it\ !=\ \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_function_mocker_base_aed2a1913f6c03fd47c8900039556be34}{untyped\_on\_call\_specs\_}}.rend();\ ++it)\ \{}
+\DoxyCodeLine{01496\ \ \ \ \ \ \ \textcolor{keyword}{const}\ OnCallSpec<F>*\ spec\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keyword}{const\ }OnCallSpec<F>*\textcolor{keyword}{>}(*it);}
+\DoxyCodeLine{01497\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (spec-\/>Matches(args))}
+\DoxyCodeLine{01498\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ spec;}
+\DoxyCodeLine{01499\ \ \ \ \ \}}
+\DoxyCodeLine{01500\ }
+\DoxyCodeLine{01501\ \ \ \ \ \textcolor{keywordflow}{return}\ NULL;}
+\DoxyCodeLine{01502\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_function_mocker_base_ae938313e7b8bb17e8945f91c8aa70411_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_function_mocker_base_ac29acd6b53f4edd608921ad9190d9202}\index{testing::internal::FunctionMockerBase$<$ F $>$@{testing::internal::FunctionMockerBase$<$ F $>$}!InvokeWith@{InvokeWith}}
+\index{InvokeWith@{InvokeWith}!testing::internal::FunctionMockerBase$<$ F $>$@{testing::internal::FunctionMockerBase$<$ F $>$}}
+\doxysubsubsection{\texorpdfstring{InvokeWith()}{InvokeWith()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_function_mocker_base_ac29acd6b53f4edd608921ad9190d9202} 
+template$<$typename F $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base_a9ba8e306ef2395b45496550035ab4be0}{Result}} \mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base}{testing\+::internal\+::\+Function\+Mocker\+Base}}$<$ F $>$\+::\+Invoke\+With (\begin{DoxyParamCaption}\item[{typename \mbox{\hyperlink{structtesting_1_1internal_1_1_rvalue_ref}{Rvalue\+Ref}}$<$ typename \mbox{\hyperlink{structtesting_1_1internal_1_1_function}{Function}}$<$ F $>$\mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base_a2bce16e3cb543ae3ca7554e163fb29a8}{\+::\+Argument\+Tuple}} $>$\+::type}]{args}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l01596}{1596}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01598\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01599\ \ \ \ \ \textcolor{comment}{//\ const\_cast\ is\ required\ since\ in\ C++98\ we\ still\ pass\ ArgumentTuple\ around}}
+\DoxyCodeLine{01600\ \ \ \ \ \textcolor{comment}{//\ by\ const\&\ instead\ of\ rvalue\ reference.}}
+\DoxyCodeLine{01601\ \ \ \ \ \textcolor{keywordtype}{void}*\ untyped\_args\ =\ \textcolor{keyword}{const\_cast<}\textcolor{keywordtype}{void}*\textcolor{keyword}{>}(\textcolor{keyword}{static\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{void}*\textcolor{keyword}{>}(\&\mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}));}
+\DoxyCodeLine{01602\ \ \ \ \ scoped\_ptr<ResultHolder>\ holder(}
+\DoxyCodeLine{01603\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a1a1a1aed3fe00908b8a45d5ab4a33665}{DownCast\_<ResultHolder*>}}(this-\/>\mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_function_mocker_base_a819f2e6575f1245e65fc2040150b5bac}{UntypedInvokeWith}}(untyped\_args)));}
+\DoxyCodeLine{01604\ \ \ \ \ \textcolor{keywordflow}{return}\ holder-\/>Unwrap();}
+\DoxyCodeLine{01605\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1internal_1_1_function_mocker_base_a31904a256840331e75d9cc3cfa15897e}\index{testing::internal::FunctionMockerBase$<$ F $>$@{testing::internal::FunctionMockerBase$<$ F $>$}!PerformDefaultAction@{PerformDefaultAction}}
+\index{PerformDefaultAction@{PerformDefaultAction}!testing::internal::FunctionMockerBase$<$ F $>$@{testing::internal::FunctionMockerBase$<$ F $>$}}
+\doxysubsubsection{\texorpdfstring{PerformDefaultAction()}{PerformDefaultAction()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_function_mocker_base_a31904a256840331e75d9cc3cfa15897e} 
+template$<$typename F $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base_a9ba8e306ef2395b45496550035ab4be0}{Result}} \mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base}{testing\+::internal\+::\+Function\+Mocker\+Base}}$<$ F $>$\+::\+Perform\+Default\+Action (\begin{DoxyParamCaption}\item[{typename \mbox{\hyperlink{structtesting_1_1internal_1_1_rvalue_ref}{Rvalue\+Ref}}$<$ typename \mbox{\hyperlink{structtesting_1_1internal_1_1_function}{Function}}$<$ F $>$\mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base_a2bce16e3cb543ae3ca7554e163fb29a8}{\+::\+Argument\+Tuple}} $>$\+::type}]{args}{, }\item[{const std\+::string \&}]{call\+\_\+description}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l01511}{1511}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01513\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01514\ \ \ \ \ \textcolor{keyword}{const}\ OnCallSpec<F>*\ \textcolor{keyword}{const}\ spec\ =}
+\DoxyCodeLine{01515\ \ \ \ \ \ \ \ \ this-\/>\mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base_ae938313e7b8bb17e8945f91c8aa70411}{FindOnCallSpec}}(args);}
+\DoxyCodeLine{01516\ \ \ \ \ \textcolor{keywordflow}{if}\ (spec\ !=\ NULL)\ \{}
+\DoxyCodeLine{01517\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ spec-\/>GetAction().Perform(\mbox{\hyperlink{namespacetesting_1_1internal_aa1114d84589bd22f45d443527528cb35}{internal::move}}(args));}
+\DoxyCodeLine{01518\ \ \ \ \ \}}
+\DoxyCodeLine{01519\ \ \ \ \ \textcolor{keyword}{const}\ std::string\ message\ =}
+\DoxyCodeLine{01520\ \ \ \ \ \ \ \ \ call\_description\ +}
+\DoxyCodeLine{01521\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)n\ \ \ \ The\ mock\ function\ has\ no\ default\ action\ "{}}}
+\DoxyCodeLine{01522\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}set,\ and\ its\ return\ type\ has\ no\ default\ value\ set."{}};}
+\DoxyCodeLine{01523\ \textcolor{preprocessor}{\#if\ GTEST\_HAS\_EXCEPTIONS}}
+\DoxyCodeLine{01524\ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{classtesting_1_1_default_value_aec1ff9b510af7dbb86c837fd2409fd70}{DefaultValue<Result>::Exists}}())\ \{}
+\DoxyCodeLine{01525\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(message);}
+\DoxyCodeLine{01526\ \ \ \ \ \}}
+\DoxyCodeLine{01527\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{01528\ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a7a259643b7f2d23ce2b757728df42c99}{Assert}}(\mbox{\hyperlink{classtesting_1_1_default_value_aec1ff9b510af7dbb86c837fd2409fd70}{DefaultValue<Result>::Exists}}(),\ \textcolor{stringliteral}{"{}"{}},\ -\/1,\ message);}
+\DoxyCodeLine{01529\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{01530\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtesting_1_1_default_value_a4dc6dfee4cbc9cdb36f5c9cde5cf2b83}{DefaultValue<Result>::Get}}();}
+\DoxyCodeLine{01531\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=348pt]{classtesting_1_1internal_1_1_function_mocker_base_a31904a256840331e75d9cc3cfa15897e_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_function_mocker_base_a31904a256840331e75d9cc3cfa15897e_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_function_mocker_base_a17a3b6e6e7ace5af6f08cc3bcf041e74}\index{testing::internal::FunctionMockerBase$<$ F $>$@{testing::internal::FunctionMockerBase$<$ F $>$}!UntypedPerformAction@{UntypedPerformAction}}
+\index{UntypedPerformAction@{UntypedPerformAction}!testing::internal::FunctionMockerBase$<$ F $>$@{testing::internal::FunctionMockerBase$<$ F $>$}}
+\doxysubsubsection{\texorpdfstring{UntypedPerformAction()}{UntypedPerformAction()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_function_mocker_base_a17a3b6e6e7ace5af6f08cc3bcf041e74} 
+template$<$typename F $>$ \\
+virtual \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_action_result_holder_base}{Untyped\+Action\+Result\+Holder\+Base}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base}{testing\+::internal\+::\+Function\+Mocker\+Base}}$<$ F $>$\+::\+Untyped\+Perform\+Action (\begin{DoxyParamCaption}\item[{const void \texorpdfstring{$\ast$}{*}}]{untyped\+\_\+action}{, }\item[{void \texorpdfstring{$\ast$}{*}}]{untyped\+\_\+args}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_function_mocker_base_a72444ef0803ee880597d281ca4de9417}{testing\+::internal\+::\+Untyped\+Function\+Mocker\+Base}}.
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l01550}{1550}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01551\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01552\ \ \ \ \ \textcolor{comment}{//\ Make\ a\ copy\ of\ the\ action\ before\ performing\ it,\ in\ case\ the}}
+\DoxyCodeLine{01553\ \ \ \ \ \textcolor{comment}{//\ action\ deletes\ the\ mock\ object\ (and\ thus\ deletes\ itself).}}
+\DoxyCodeLine{01554\ \ \ \ \ \textcolor{keyword}{const}\ Action<F>\ \mbox{\hyperlink{structaction}{action}}\ =\ *\textcolor{keyword}{static\_cast<}\textcolor{keyword}{const\ }Action<F>*\textcolor{keyword}{>}(untyped\_action);}
+\DoxyCodeLine{01555\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base_a2bce16e3cb543ae3ca7554e163fb29a8}{ArgumentTuple}}*\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base_a2bce16e3cb543ae3ca7554e163fb29a8}{ArgumentTuple}}*\textcolor{keyword}{>}(untyped\_args);}
+\DoxyCodeLine{01556\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_action_result_holder_a3735744e64fcefc41712beae09519b13}{ResultHolder::PerformAction}}(\mbox{\hyperlink{structaction}{action}},\ \mbox{\hyperlink{namespacetesting_1_1internal_aa1114d84589bd22f45d443527528cb35}{internal::move}}(*args));}
+\DoxyCodeLine{01557\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1internal_1_1_function_mocker_base_a7552cb8f11ee7dc325a0713bf9943a5d}\index{testing::internal::FunctionMockerBase$<$ F $>$@{testing::internal::FunctionMockerBase$<$ F $>$}!UntypedPerformDefaultAction@{UntypedPerformDefaultAction}}
+\index{UntypedPerformDefaultAction@{UntypedPerformDefaultAction}!testing::internal::FunctionMockerBase$<$ F $>$@{testing::internal::FunctionMockerBase$<$ F $>$}}
+\doxysubsubsection{\texorpdfstring{UntypedPerformDefaultAction()}{UntypedPerformDefaultAction()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_function_mocker_base_a7552cb8f11ee7dc325a0713bf9943a5d} 
+template$<$typename F $>$ \\
+virtual \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_action_result_holder_base}{Untyped\+Action\+Result\+Holder\+Base}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base}{testing\+::internal\+::\+Function\+Mocker\+Base}}$<$ F $>$\+::\+Untyped\+Perform\+Default\+Action (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{untyped\+\_\+args}{, }\item[{const std\+::string \&}]{call\+\_\+description}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_function_mocker_base_a60c710afc6162ee64d75d6b0e59b3429}{testing\+::internal\+::\+Untyped\+Function\+Mocker\+Base}}.
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l01538}{1538}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01540\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01541\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base_a2bce16e3cb543ae3ca7554e163fb29a8}{ArgumentTuple}}*\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base_a2bce16e3cb543ae3ca7554e163fb29a8}{ArgumentTuple}}*\textcolor{keyword}{>}(untyped\_args);}
+\DoxyCodeLine{01542\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_action_result_holder_a47175ba122311867db65f060e2629fb1}{ResultHolder::PerformDefaultAction}}(\textcolor{keyword}{this},\ \mbox{\hyperlink{namespacetesting_1_1internal_aa1114d84589bd22f45d443527528cb35}{internal::move}}(*args),}
+\DoxyCodeLine{01543\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ call\_description);}
+\DoxyCodeLine{01544\ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_function_mocker_base_ae72aeee91c93e8ae5e1ed7f726a766b2}\index{testing::internal::FunctionMockerBase$<$ F $>$@{testing::internal::FunctionMockerBase$<$ F $>$}!MockSpec@{MockSpec}}
+\index{MockSpec@{MockSpec}!testing::internal::FunctionMockerBase$<$ F $>$@{testing::internal::FunctionMockerBase$<$ F $>$}}
+\doxysubsubsection{\texorpdfstring{MockSpec}{MockSpec}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_function_mocker_base_ae72aeee91c93e8ae5e1ed7f726a766b2} 
+template$<$typename F $>$ \\
+template$<$typename \mbox{\hyperlink{structtesting_1_1internal_1_1_function}{Function}} $>$ \\
+friend \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classtesting_1_1internal_1_1_mock_spec}{Mock\+Spec}}\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l01589}{1589}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+\Hypertarget{classtesting_1_1internal_1_1_function_mocker_base_a4f17de55396a8ef740d5ad2b1380a851}\index{testing::internal::FunctionMockerBase$<$ F $>$@{testing::internal::FunctionMockerBase$<$ F $>$}!TypedExpectation@{TypedExpectation}}
+\index{TypedExpectation@{TypedExpectation}!testing::internal::FunctionMockerBase$<$ F $>$@{testing::internal::FunctionMockerBase$<$ F $>$}}
+\doxysubsubsection{\texorpdfstring{TypedExpectation}{TypedExpectation}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_function_mocker_base_a4f17de55396a8ef740d5ad2b1380a851} 
+template$<$typename F $>$ \\
+template$<$typename Func $>$ \\
+friend \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classtesting_1_1internal_1_1_typed_expectation}{Typed\+Expectation}}\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l01641}{1641}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/include/gmock/\mbox{\hyperlink{gmock-generated-function-mockers_8h}{gmock-\/generated-\/function-\/mockers.\+h}}\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/include/gmock/\mbox{\hyperlink{gmock-spec-builders_8h}{gmock-\/spec-\/builders.\+h}}\end{DoxyCompactItemize}

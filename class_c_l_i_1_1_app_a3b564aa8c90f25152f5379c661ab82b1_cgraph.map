@@ -1,0 +1,27 @@
+<map id="CLI::App::_parse_positional" name="CLI::App::_parse_positional">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,228,188,254"/>
+<area shape="poly" id="edge9_Node000001_Node000001" title=" " alt="" coords="57,229,50,219,54,210,70,203,97,201,125,204,140,211,138,216,124,209,96,207,71,209,58,213,55,219,62,226"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_app.html#a6e3eedf148351dabd1868bd7e63d24bc" title="Count the required remaining positional arguments." alt="" coords="241,112,424,153"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="122,225,235,169,263,157,265,162,237,174,124,230"/>
+<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_option.html#a154543609c45d9c59c69991a08ca272b" title="Count the total number of times an option was passed." alt="" coords="502,5,630,31"/>
+<area shape="poly" id="edge11_Node000001_Node000003" title=" " alt="" coords="101,226,119,192,148,147,186,100,209,80,234,63,297,35,363,20,428,12,486,11,486,16,428,17,364,25,298,40,237,67,213,84,190,104,152,150,124,195,106,229"/>
+<area shape="rect" id="Node000004" href="$class_c_l_i_1_1_option.html#af87dffed2cb245673312c993e563710e" title="The total min number of expected string values to be used." alt="" coords="490,55,643,96"/>
+<area shape="poly" id="edge13_Node000001_Node000004" title=" " alt="" coords="104,226,124,198,153,162,190,126,235,98,294,78,357,66,418,62,474,63,474,68,418,68,357,72,295,83,237,103,194,131,157,166,128,201,108,229"/>
+<area shape="rect" id="Node000005" href="$class_c_l_i_1_1_option.html#acab7033604b49e314d290b01adea690d" title="True if the argument can be given directly." alt="" coords="478,185,654,211"/>
+<area shape="poly" id="edge14_Node000001_Node000005" title=" " alt="" coords="161,225,235,213,353,203,462,197,462,203,353,208,236,218,162,230"/>
+<area shape="rect" id="Node000007" href="$class_c_l_i_1_1_app.html#a70bf7b1ed5b4f823746dba84ec3d9927" title=" " alt="" coords="236,228,430,254"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="188,238,220,238,220,244,188,244"/>
+<area shape="rect" id="Node000008" href="$class_c_l_i_1_1_app.html#a0e00bdc00c5bca05d52d98833f77a3b5" title="Get the appropriate parent to fallthrough to which is the first one that has a name or the main app." alt="" coords="246,278,420,318"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="153,252,232,271,231,276,152,257"/>
+<area shape="rect" id="Node000009" href="$class_c_l_i_1_1_app.html#afe454e935514c0acd6bd81e68d908206" title="Helper function to place extra values in the most appropriate position." alt="" coords="264,343,402,384"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="117,252,169,289,237,328,252,335,250,339,234,333,166,293,114,256"/>
+<area shape="rect" id="Node000010" href="$class_c_l_i_1_1_option.html#a49ba3750688c16a2c001dd2c91ecba3e" title="Puts a result at the end." alt="" coords="255,408,411,434"/>
+<area shape="poly" id="edge10_Node000001_Node000010" title=" " alt="" coords="108,252,157,320,194,360,237,393,249,399,246,404,234,398,190,364,152,323,103,256"/>
+<area shape="rect" id="Node000011" href="$class_c_l_i_1_1_option.html#a784f66cb9371753ddeb8df59c85cb490" title="Get the current value of allow extra args." alt="" coords="257,458,408,498"/>
+<area shape="poly" id="edge12_Node000001_Node000011" title=" " alt="" coords="105,253,122,291,151,342,189,397,212,422,237,444,245,450,242,454,234,448,208,426,185,400,146,345,118,293,101,255"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="361,110,414,75,477,41,495,34,497,39,479,46,416,80,364,114"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="417,109,474,95,475,101,419,115"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="409,151,503,178,502,183,407,156"/>
+<area shape="rect" id="Node000006" href="$class_c_l_i_1_1_option_base.html#aa902dee6da6d7f5b083b1c7d5f9c1308" title="True if this is a required option." alt="" coords="494,120,638,161"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="425,133,478,135,478,140,425,139"/>
+</map>

@@ -1,0 +1,27 @@
+\doxysection{WASM.\+h}
+\hypertarget{_w_a_s_m_8h_source}{}\label{_w_a_s_m_8h_source}\index{libraries/wasm-\/jit/Include/WASM/WASM.h@{libraries/wasm-\/jit/Include/WASM/WASM.h}}
+\mbox{\hyperlink{_w_a_s_m_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_w_a_s_m_8h_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{_w_a_s_m_8h_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_w_a_s_m_8h_source_l00003}00003\ \textcolor{preprocessor}{\#ifndef\ WEBASSEMBLY\_API}}
+\DoxyCodeLine{\Hypertarget{_w_a_s_m_8h_source_l00004}\mbox{\hyperlink{_w_a_s_m_8h_afc9ce6deeb157b0638e2e03495aa1831}{00004}}\ \textcolor{preprocessor}{\ \ \ \ \#define\ WEBASSEMBLY\_API\ DLL\_IMPORT}}
+\DoxyCodeLine{\Hypertarget{_w_a_s_m_8h_source_l00005}00005\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{_w_a_s_m_8h_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{_w_a_s_m_8h_source_l00007}00007\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_basic_types_8h}{Inline/BasicTypes.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_w_a_s_m_8h_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{_w_a_s_m_8h_source_l00009}00009\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_i_r}{IR}}\ \{\ \textcolor{keyword}{struct\ }Module;\ \textcolor{keyword}{struct\ }DisassemblyNames;\ \}}
+\DoxyCodeLine{\Hypertarget{_w_a_s_m_8h_source_l00010}00010\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_serialization}{Serialization}}\ \{\ \textcolor{keyword}{struct\ }InputStream;\ \textcolor{keyword}{struct\ }OutputStream;\ \}}
+\DoxyCodeLine{\Hypertarget{_w_a_s_m_8h_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{_w_a_s_m_8h_source_l00012}00012\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_w_a_s_m}{WASM}}}
+\DoxyCodeLine{\Hypertarget{_w_a_s_m_8h_source_l00013}00013\ \{}
+\DoxyCodeLine{\Hypertarget{_w_a_s_m_8h_source_l00014}\mbox{\hyperlink{namespace_w_a_s_m_a5c8e6887571b126ae374d7cb5c38eac4}{00014}}\ \ \ \ \ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespace_w_a_s_m_a5c8e6887571b126ae374d7cb5c38eac4}{check\_limits}};}
+\DoxyCodeLine{\Hypertarget{_w_a_s_m_8h_source_l00015}\mbox{\hyperlink{struct_w_a_s_m_1_1scoped__skip__checks}{00015}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_w_a_s_m_1_1scoped__skip__checks}{scoped\_skip\_checks}}\ \{}
+\DoxyCodeLine{\Hypertarget{_w_a_s_m_8h_source_l00016}\mbox{\hyperlink{struct_w_a_s_m_1_1scoped__skip__checks_a94f9b5c3f1d36fa7259e4f3b22c490c0}{00016}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_w_a_s_m_1_1scoped__skip__checks_a94f9b5c3f1d36fa7259e4f3b22c490c0}{scoped\_skip\_checks}}()\ \{\ \mbox{\hyperlink{namespace_w_a_s_m_a5c8e6887571b126ae374d7cb5c38eac4}{check\_limits}}\ =\ \textcolor{keyword}{false};\ \}}
+\DoxyCodeLine{\Hypertarget{_w_a_s_m_8h_source_l00017}\mbox{\hyperlink{struct_w_a_s_m_1_1scoped__skip__checks_ad8cd8f149ac4725dc42730d1b7036385}{00017}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_w_a_s_m_1_1scoped__skip__checks_ad8cd8f149ac4725dc42730d1b7036385}{\string~scoped\_skip\_checks}}()\ \{\ \mbox{\hyperlink{namespace_w_a_s_m_a5c8e6887571b126ae374d7cb5c38eac4}{check\_limits}}\ =\ \textcolor{keyword}{true};\ \}}
+\DoxyCodeLine{\Hypertarget{_w_a_s_m_8h_source_l00018}00018\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_w_a_s_m_8h_source_l00019}00019\ \ \ \ \ \mbox{\hyperlink{_w_a_s_m_8h_afc9ce6deeb157b0638e2e03495aa1831}{WEBASSEMBLY\_API}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespace_serialization_a2a05c5aff4847073ca0fb887d20ac485}{serialize}}(\mbox{\hyperlink{struct_serialization_1_1_input_stream}{Serialization::InputStream}}\&\ stream,\mbox{\hyperlink{struct_i_r_1_1_module}{IR::Module}}\&\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}});}
+\DoxyCodeLine{\Hypertarget{_w_a_s_m_8h_source_l00020}00020\ \ \ \ \ \mbox{\hyperlink{_w_a_s_m_8h_afc9ce6deeb157b0638e2e03495aa1831}{WEBASSEMBLY\_API}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespace_serialization_a2a05c5aff4847073ca0fb887d20ac485}{serialize}}(\mbox{\hyperlink{struct_serialization_1_1_output_stream}{Serialization::OutputStream}}\&\ stream,\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_i_r_1_1_module}{IR::Module}}\&\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}});}
+\DoxyCodeLine{\Hypertarget{_w_a_s_m_8h_source_l00021}00021\ \}}
+
+\end{DoxyCode}

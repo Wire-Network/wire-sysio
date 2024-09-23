@@ -1,0 +1,67 @@
+\doxysection{libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/memorybuffer.h File Reference}
+\hypertarget{memorybuffer_8h}{}\label{memorybuffer_8h}\index{libraries/fc/include/fc/crypto/webauthn\_json/include/rapidjson/memorybuffer.h@{libraries/fc/include/fc/crypto/webauthn\_json/include/rapidjson/memorybuffer.h}}
+{\ttfamily \#include "{}stream.\+h"{}}\newline
+{\ttfamily \#include "{}internal/stack.\+h"{}}\newline
+Include dependency graph for memorybuffer.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{memorybuffer_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{memorybuffer_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_generic_memory_buffer}{Generic\+Memory\+Buffer$<$ Allocator $>$}}
+\begin{DoxyCompactList}\small\item\em Represents an in-\/memory output byte stream. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{struct_generic_memory_buffer}{Generic\+Memory\+Buffer}} \mbox{\hyperlink{memorybuffer_8h_aad74f4c6994a951097a63ee117039085}{Memory\+Buffer}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+template$<$$>$ void \mbox{\hyperlink{memorybuffer_8h_a635d8eaaf48777150dc08f7d5a8be054}{PutN}} (\mbox{\hyperlink{fwd_8h_a611aeb4e5d606f0b099c6408fd8e8e4d}{Memory\+Buffer}} \&memory\+Buffer, char c, size\+\_\+t n)
+\begin{DoxyCompactList}\small\item\em Implement specialized version of \doxylink{memorybuffer_8h_a635d8eaaf48777150dc08f7d5a8be054}{Put\+N()} with \doxylink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset()} for better performance. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{memorybuffer_8h_aad74f4c6994a951097a63ee117039085}\index{memorybuffer.h@{memorybuffer.h}!MemoryBuffer@{MemoryBuffer}}
+\index{MemoryBuffer@{MemoryBuffer}!memorybuffer.h@{memorybuffer.h}}
+\doxysubsubsection{\texorpdfstring{MemoryBuffer}{MemoryBuffer}}
+{\footnotesize\ttfamily \label{memorybuffer_8h_aad74f4c6994a951097a63ee117039085} 
+typedef \mbox{\hyperlink{struct_generic_memory_buffer}{Generic\+Memory\+Buffer}} \mbox{\hyperlink{fwd_8h_a611aeb4e5d606f0b099c6408fd8e8e4d}{Memory\+Buffer}}}
+
+
+
+Definition at line \mbox{\hyperlink{memorybuffer_8h_source_l00060}{60}} of file \mbox{\hyperlink{memorybuffer_8h_source}{memorybuffer.\+h}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{memorybuffer_8h_a635d8eaaf48777150dc08f7d5a8be054}\index{memorybuffer.h@{memorybuffer.h}!PutN@{PutN}}
+\index{PutN@{PutN}!memorybuffer.h@{memorybuffer.h}}
+\doxysubsubsection{\texorpdfstring{PutN()}{PutN()}}
+{\footnotesize\ttfamily \label{memorybuffer_8h_a635d8eaaf48777150dc08f7d5a8be054} 
+template$<$$>$ \\
+void PutN (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{fwd_8h_a611aeb4e5d606f0b099c6408fd8e8e4d}{Memory\+Buffer}} \&}]{memory\+Buffer}{, }\item[{char}]{c}{, }\item[{size\+\_\+t}]{n}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{memorybuffer_8h_source_l00064}{64}} of file \mbox{\hyperlink{memorybuffer_8h_source}{memorybuffer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00065\ \ \ \ \ std::memset(memoryBuffer.\mbox{\hyperlink{struct_generic_memory_buffer_a977b479180bebe8ae14ca1c11d52a486}{stack\_}}.Push<\textcolor{keywordtype}{char}>(n),\ c,\ n\ *\ \textcolor{keyword}{sizeof}(c));}
+\DoxyCodeLine{00066\ \}}
+
+\end{DoxyCode}

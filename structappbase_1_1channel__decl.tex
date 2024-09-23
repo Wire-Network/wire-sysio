@@ -1,0 +1,61 @@
+\doxysection{appbase\+::channel\+\_\+decl\texorpdfstring{$<$}{<} Tag, Data, Dispatch\+Policy \texorpdfstring{$>$}{>} Struct Template Reference}
+\hypertarget{structappbase_1_1channel__decl}{}\label{structappbase_1_1channel__decl}\index{appbase::channel\_decl$<$ Tag, Data, DispatchPolicy $>$@{appbase::channel\_decl$<$ Tag, Data, DispatchPolicy $>$}}
+
+
+{\ttfamily \#include $<$channel.\+hpp$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{structappbase_1_1channel__decl_aa309e47583ff1b9d37d1d1eef8d00c33}{channel\+\_\+type}} = \mbox{\hyperlink{classappbase_1_1channel}{channel}}$<$\mbox{\hyperlink{struct_data}{Data}}, Dispatch\+Policy$>$
+\item 
+using \mbox{\hyperlink{structappbase_1_1channel__decl_a43b9f11da52bba91c78f48f6265b47d5}{tag\+\_\+type}} = Tag
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Tag, typename \mbox{\hyperlink{struct_data}{Data}}, typename Dispatch\+Policy = drop\+\_\+exceptions$>$\newline
+struct appbase\+::channel\+\_\+decl$<$ Tag, Data, Dispatch\+Policy $>$}
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em Tag} & -\/ API specific discriminator used to distinguish between otherwise identical data types \\
+\hline
+{\em \doxylink{struct_data}{Data}} & -\/ the typ of the \doxylink{struct_data}{Data} the channel carries \\
+\hline
+{\em Dispatch\+Policy} & -\/ The dispatch policy to use for this channel (defaults to \doxylink{structappbase_1_1drop__exceptions}{drop\+\_\+exceptions}) \\
+\hline
+\end{DoxyTemplParams}
+
+
+Definition at line \mbox{\hyperlink{channel_8hpp_source_l00183}{183}} of file \mbox{\hyperlink{channel_8hpp_source}{channel.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{structappbase_1_1channel__decl_aa309e47583ff1b9d37d1d1eef8d00c33}\index{appbase::channel\_decl$<$ Tag, Data, DispatchPolicy $>$@{appbase::channel\_decl$<$ Tag, Data, DispatchPolicy $>$}!channel\_type@{channel\_type}}
+\index{channel\_type@{channel\_type}!appbase::channel\_decl$<$ Tag, Data, DispatchPolicy $>$@{appbase::channel\_decl$<$ Tag, Data, DispatchPolicy $>$}}
+\doxysubsubsection{\texorpdfstring{channel\_type}{channel\_type}}
+{\footnotesize\ttfamily \label{structappbase_1_1channel__decl_aa309e47583ff1b9d37d1d1eef8d00c33} 
+template$<$typename Tag , typename \mbox{\hyperlink{struct_data}{Data}} , typename Dispatch\+Policy  = drop\+\_\+exceptions$>$ \\
+using \mbox{\hyperlink{structappbase_1_1channel__decl}{appbase\+::channel\+\_\+decl}}$<$ Tag, \mbox{\hyperlink{struct_data}{Data}}, Dispatch\+Policy $>$\+::channel\+\_\+type = \mbox{\hyperlink{classappbase_1_1channel}{channel}}$<$\mbox{\hyperlink{struct_data}{Data}}, Dispatch\+Policy$>$}
+
+
+
+Definition at line \mbox{\hyperlink{channel_8hpp_source_l00184}{184}} of file \mbox{\hyperlink{channel_8hpp_source}{channel.\+hpp}}.
+
+\Hypertarget{structappbase_1_1channel__decl_a43b9f11da52bba91c78f48f6265b47d5}\index{appbase::channel\_decl$<$ Tag, Data, DispatchPolicy $>$@{appbase::channel\_decl$<$ Tag, Data, DispatchPolicy $>$}!tag\_type@{tag\_type}}
+\index{tag\_type@{tag\_type}!appbase::channel\_decl$<$ Tag, Data, DispatchPolicy $>$@{appbase::channel\_decl$<$ Tag, Data, DispatchPolicy $>$}}
+\doxysubsubsection{\texorpdfstring{tag\_type}{tag\_type}}
+{\footnotesize\ttfamily \label{structappbase_1_1channel__decl_a43b9f11da52bba91c78f48f6265b47d5} 
+template$<$typename Tag , typename \mbox{\hyperlink{struct_data}{Data}} , typename Dispatch\+Policy  = drop\+\_\+exceptions$>$ \\
+using \mbox{\hyperlink{structappbase_1_1channel__decl}{appbase\+::channel\+\_\+decl}}$<$ Tag, \mbox{\hyperlink{struct_data}{Data}}, Dispatch\+Policy $>$\+::tag\+\_\+type = Tag}
+
+
+
+Definition at line \mbox{\hyperlink{channel_8hpp_source_l00185}{185}} of file \mbox{\hyperlink{channel_8hpp_source}{channel.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/appbase/include/appbase/\mbox{\hyperlink{channel_8hpp}{channel.\+hpp}}\end{DoxyCompactItemize}

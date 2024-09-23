@@ -1,0 +1,28 @@
+var classlibff_1_1bn128___g1 =
+[
+    [ "base_field", "classlibff_1_1bn128___g1.html#a7b8bc8ca63d77da2ee95784482bb199f", null ],
+    [ "scalar_field", "classlibff_1_1bn128___g1.html#a03c304a40d21bee0ad48cb18ada682e5", null ],
+    [ "bn128_G1", "classlibff_1_1bn128___g1.html#a4ce3fcefa7d49fe8d2c96d8a7e0fa151", null ],
+    [ "bn128_G1", "classlibff_1_1bn128___g1.html#aa42719ee28b7e319cb8782bfd656ecca", null ],
+    [ "add", "classlibff_1_1bn128___g1.html#a6301382ce0f7f3f2777dc57ab5103f80", null ],
+    [ "dbl", "classlibff_1_1bn128___g1.html#a58e7a7d8ef2839d795ee248d9daae72e", null ],
+    [ "fill_coord", "classlibff_1_1bn128___g1.html#afd6326f1cc1ff6a17081f74ca9216b2d", null ],
+    [ "is_special", "classlibff_1_1bn128___g1.html#a5f28c4c967c995559251d91228bf0af4", null ],
+    [ "is_well_formed", "classlibff_1_1bn128___g1.html#a030efeb524acaca972a566fa3723f08c", null ],
+    [ "is_zero", "classlibff_1_1bn128___g1.html#a1134ff417c9818b8820feb8d4cd02f16", null ],
+    [ "mixed_add", "classlibff_1_1bn128___g1.html#a7b54631aa80a0729a1e48ef4a873f503", null ],
+    [ "operator!=", "classlibff_1_1bn128___g1.html#aebbaf25d587de9beb6c189e4d589481a", null ],
+    [ "operator+", "classlibff_1_1bn128___g1.html#a6a0a3a932247ce88a942feaaa128eacf", null ],
+    [ "operator-", "classlibff_1_1bn128___g1.html#a677313d8c59aea74e6ace4eda96647ca", null ],
+    [ "operator-", "classlibff_1_1bn128___g1.html#aef05548375a30e4acc2d1849f568be05", null ],
+    [ "operator==", "classlibff_1_1bn128___g1.html#a5fd53c6a2166f3077d7cbc447a47e5da", null ],
+    [ "print", "classlibff_1_1bn128___g1.html#a0c6d8eb2c99bc860e3cf7217b74eec00", null ],
+    [ "print_coordinates", "classlibff_1_1bn128___g1.html#a251b11c4dc3493d836f0b616e342ad93", null ],
+    [ "to_affine_coordinates", "classlibff_1_1bn128___g1.html#a84a04d9b8081d52ed31dfea639b22b05", null ],
+    [ "to_special", "classlibff_1_1bn128___g1.html#a0172b7317b39021abe2854147acec0c2", null ],
+    [ "operator<<", "classlibff_1_1bn128___g1.html#a0393d3e557bdc564cbca0645a0733588", null ],
+    [ "operator>>", "classlibff_1_1bn128___g1.html#afb3bf4e500ca1f1b6b4f82598bf3fb72", null ],
+    [ "X", "classlibff_1_1bn128___g1.html#ae42bf5d5de10e12b133bfbbdb13e3528", null ],
+    [ "Y", "classlibff_1_1bn128___g1.html#ab2bac599b15c8fec13f8bedfd69f654b", null ],
+    [ "Z", "classlibff_1_1bn128___g1.html#a7df38b6418d64534fdea9de3bbd4a9f2", null ]
+];

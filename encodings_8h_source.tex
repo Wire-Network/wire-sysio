@@ -1,0 +1,636 @@
+\doxysection{encodings.\+h}
+\hypertarget{encodings_8h_source}{}\label{encodings_8h_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/include/rapidjson/encodings.h@{libraries/fc/include/fc/crypto/webauthn\_json/include/rapidjson/encodings.h}}
+\mbox{\hyperlink{encodings_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00001}00001\ \textcolor{comment}{//\ Tencent\ is\ pleased\ to\ support\ the\ open\ source\ community\ by\ making\ RapidJSON\ available.}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00002}00002\ \textcolor{comment}{//\ }}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00003}00003\ \textcolor{comment}{//\ Copyright\ (C)\ 2015\ THL\ A29\ Limited,\ a\ Tencent\ company,\ and\ Milo\ Yip.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00004}00004\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00005}00005\ \textcolor{comment}{//\ Licensed\ under\ the\ MIT\ License\ (the\ "{}License"{});\ you\ may\ not\ use\ this\ file\ except}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00006}00006\ \textcolor{comment}{//\ in\ compliance\ with\ the\ License.\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00007}00007\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00008}00008\ \textcolor{comment}{//\ http://opensource.org/licenses/MIT}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00009}00009\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00010}00010\ \textcolor{comment}{//\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software\ distributed\ }}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00011}00011\ \textcolor{comment}{//\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,\ WITHOUT\ WARRANTIES\ OR\ }}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00012}00012\ \textcolor{comment}{//\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.\ See\ the\ License\ for\ the\ }}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00013}00013\ \textcolor{comment}{//\ specific\ language\ governing\ permissions\ and\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00015}00015\ \textcolor{preprocessor}{\#ifndef\ RAPIDJSON\_ENCODINGS\_H\_}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00016}00016\ \textcolor{preprocessor}{\#define\ RAPIDJSON\_ENCODINGS\_H\_}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00018}00018\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{rapidjson_8h}{rapidjson.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00020}00020\ \textcolor{preprocessor}{\#if\ defined(\_MSC\_VER)\ \&\&\ !defined(\_\_clang\_\_)}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00021}00021\ RAPIDJSON\_DIAG\_PUSH}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00022}00022\ RAPIDJSON\_DIAG\_OFF(4244)\ \textcolor{comment}{//\ conversion\ from\ 'type1'\ to\ 'type2',\ possible\ loss\ of\ data}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00023}00023\ RAPIDJSON\_DIAG\_OFF(4702)\ \ \textcolor{comment}{//\ unreachable\ code}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00024}00024\ \textcolor{preprocessor}{\#elif\ defined(\_\_GNUC\_\_)}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00025}00025\ RAPIDJSON\_DIAG\_PUSH}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00026}00026\ RAPIDJSON\_DIAG\_OFF(effc++)}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00027}00027\ RAPIDJSON\_DIAG\_OFF(\mbox{\hyperlink{yubihsm__pkcs11_8c_a49aa97067a36875627e1380c3fb3833d}{overflow}})}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00028}00028\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00030}00030\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gad3806c8251fdc7da9618b7e922674ffc}{RAPIDJSON\_NAMESPACE\_BEGIN}}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00033}00033\ \textcolor{comment}{//\ Encoding}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00054}00054\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00062}00062\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00076}00076\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00080}00080\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00087}00087\ \textcolor{comment}{//\ UTF8}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00088}00088\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00090}00090\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00095}00095\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ CharType\ =\ \textcolor{keywordtype}{char}>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00096}\mbox{\hyperlink{struct_u_t_f8}{00096}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{namespace_u_t_f8}{UTF8}}\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00097}\mbox{\hyperlink{struct_u_t_f8_a8351676b3eda285d7fe902fc472e066e}{00097}}\ \ \ \ \ \textcolor{keyword}{typedef}\ CharType\ \mbox{\hyperlink{struct_u_t_f8_a8351676b3eda285d7fe902fc472e066e}{Ch}};}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00098}00098\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00099}\mbox{\hyperlink{struct_u_t_f8_a136b31c25877ae298cd1af5dedc37930a1a78b02dbcc9ddfd12f86a51cddf8fad}{00099}}\ \ \ \ \ \textcolor{keyword}{enum}\ \{\ \mbox{\hyperlink{struct_u_t_f8_a136b31c25877ae298cd1af5dedc37930a1a78b02dbcc9ddfd12f86a51cddf8fad}{supportUnicode}}\ =\ 1\ \};}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00100}00100\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00101}00101\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ OutputStream>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00102}\mbox{\hyperlink{struct_u_t_f8_af286ed19ca60d261a9b11b65bee1298b}{00102}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_u_t_f8_af286ed19ca60d261a9b11b65bee1298b}{Encode}}(OutputStream\&\ os,\ \textcolor{keywordtype}{unsigned}\ codepoint)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00103}00103\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (codepoint\ <=\ 0x7F)\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00104}00104\ \ \ \ \ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{struct_u_t_f8_a8351676b3eda285d7fe902fc472e066e}{Ch}}\textcolor{keyword}{>}(codepoint\ \&\ 0xFF));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00105}00105\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (codepoint\ <=\ 0x7FF)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00106}00106\ \ \ \ \ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{struct_u_t_f8_a8351676b3eda285d7fe902fc472e066e}{Ch}}\textcolor{keyword}{>}(0xC0\ |\ ((codepoint\ >>\ 6)\ \&\ 0xFF)));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00107}00107\ \ \ \ \ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{struct_u_t_f8_a8351676b3eda285d7fe902fc472e066e}{Ch}}\textcolor{keyword}{>}(0x80\ |\ ((codepoint\ \&\ 0x3F))));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00108}00108\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00109}00109\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (codepoint\ <=\ 0xFFFF)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00110}00110\ \ \ \ \ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{struct_u_t_f8_a8351676b3eda285d7fe902fc472e066e}{Ch}}\textcolor{keyword}{>}(0xE0\ |\ ((codepoint\ >>\ 12)\ \&\ 0xFF)));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00111}00111\ \ \ \ \ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{struct_u_t_f8_a8351676b3eda285d7fe902fc472e066e}{Ch}}\textcolor{keyword}{>}(0x80\ |\ ((codepoint\ >>\ 6)\ \&\ 0x3F)));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00112}00112\ \ \ \ \ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{struct_u_t_f8_a8351676b3eda285d7fe902fc472e066e}{Ch}}\textcolor{keyword}{>}(0x80\ |\ (codepoint\ \&\ 0x3F)));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00113}00113\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00114}00114\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00115}00115\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(codepoint\ <=\ 0x10FFFF);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00116}00116\ \ \ \ \ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{struct_u_t_f8_a8351676b3eda285d7fe902fc472e066e}{Ch}}\textcolor{keyword}{>}(0xF0\ |\ ((codepoint\ >>\ 18)\ \&\ 0xFF)));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00117}00117\ \ \ \ \ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{struct_u_t_f8_a8351676b3eda285d7fe902fc472e066e}{Ch}}\textcolor{keyword}{>}(0x80\ |\ ((codepoint\ >>\ 12)\ \&\ 0x3F)));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00118}00118\ \ \ \ \ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{struct_u_t_f8_a8351676b3eda285d7fe902fc472e066e}{Ch}}\textcolor{keyword}{>}(0x80\ |\ ((codepoint\ >>\ 6)\ \&\ 0x3F)));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00119}00119\ \ \ \ \ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{struct_u_t_f8_a8351676b3eda285d7fe902fc472e066e}{Ch}}\textcolor{keyword}{>}(0x80\ |\ (codepoint\ \&\ 0x3F)));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00120}00120\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00121}00121\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00122}00122\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00123}00123\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ OutputStream>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00124}\mbox{\hyperlink{struct_u_t_f8_aac6bdaf03c114265384b2ae3e425e7a8}{00124}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_u_t_f8_aac6bdaf03c114265384b2ae3e425e7a8}{EncodeUnsafe}}(OutputStream\&\ os,\ \textcolor{keywordtype}{unsigned}\ codepoint)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00125}00125\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (codepoint\ <=\ 0x7F)\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00126}00126\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{encodings_8h_ad57ba7f2912c5509924b69dec7db4396}{PutUnsafe}}(os,\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{struct_u_t_f8_a8351676b3eda285d7fe902fc472e066e}{Ch}}\textcolor{keyword}{>}(codepoint\ \&\ 0xFF));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00127}00127\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (codepoint\ <=\ 0x7FF)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00128}00128\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{encodings_8h_ad57ba7f2912c5509924b69dec7db4396}{PutUnsafe}}(os,\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{struct_u_t_f8_a8351676b3eda285d7fe902fc472e066e}{Ch}}\textcolor{keyword}{>}(0xC0\ |\ ((codepoint\ >>\ 6)\ \&\ 0xFF)));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00129}00129\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{encodings_8h_ad57ba7f2912c5509924b69dec7db4396}{PutUnsafe}}(os,\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{struct_u_t_f8_a8351676b3eda285d7fe902fc472e066e}{Ch}}\textcolor{keyword}{>}(0x80\ |\ ((codepoint\ \&\ 0x3F))));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00130}00130\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00131}00131\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (codepoint\ <=\ 0xFFFF)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00132}00132\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{encodings_8h_ad57ba7f2912c5509924b69dec7db4396}{PutUnsafe}}(os,\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{struct_u_t_f8_a8351676b3eda285d7fe902fc472e066e}{Ch}}\textcolor{keyword}{>}(0xE0\ |\ ((codepoint\ >>\ 12)\ \&\ 0xFF)));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00133}00133\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{encodings_8h_ad57ba7f2912c5509924b69dec7db4396}{PutUnsafe}}(os,\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{struct_u_t_f8_a8351676b3eda285d7fe902fc472e066e}{Ch}}\textcolor{keyword}{>}(0x80\ |\ ((codepoint\ >>\ 6)\ \&\ 0x3F)));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00134}00134\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{encodings_8h_ad57ba7f2912c5509924b69dec7db4396}{PutUnsafe}}(os,\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{struct_u_t_f8_a8351676b3eda285d7fe902fc472e066e}{Ch}}\textcolor{keyword}{>}(0x80\ |\ (codepoint\ \&\ 0x3F)));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00135}00135\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00136}00136\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00137}00137\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(codepoint\ <=\ 0x10FFFF);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00138}00138\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{encodings_8h_ad57ba7f2912c5509924b69dec7db4396}{PutUnsafe}}(os,\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{struct_u_t_f8_a8351676b3eda285d7fe902fc472e066e}{Ch}}\textcolor{keyword}{>}(0xF0\ |\ ((codepoint\ >>\ 18)\ \&\ 0xFF)));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00139}00139\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{encodings_8h_ad57ba7f2912c5509924b69dec7db4396}{PutUnsafe}}(os,\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{struct_u_t_f8_a8351676b3eda285d7fe902fc472e066e}{Ch}}\textcolor{keyword}{>}(0x80\ |\ ((codepoint\ >>\ 12)\ \&\ 0x3F)));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00140}00140\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{encodings_8h_ad57ba7f2912c5509924b69dec7db4396}{PutUnsafe}}(os,\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{struct_u_t_f8_a8351676b3eda285d7fe902fc472e066e}{Ch}}\textcolor{keyword}{>}(0x80\ |\ ((codepoint\ >>\ 6)\ \&\ 0x3F)));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00141}00141\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{encodings_8h_ad57ba7f2912c5509924b69dec7db4396}{PutUnsafe}}(os,\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{struct_u_t_f8_a8351676b3eda285d7fe902fc472e066e}{Ch}}\textcolor{keyword}{>}(0x80\ |\ (codepoint\ \&\ 0x3F)));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00142}00142\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00143}00143\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00144}00144\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00145}00145\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ InputStream>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00146}\mbox{\hyperlink{struct_u_t_f8_a17c6badb31acf4f784111c886737fb17}{00146}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_u_t_f8_a17c6badb31acf4f784111c886737fb17}{Decode}}(InputStream\&\ is,\ \textcolor{keywordtype}{unsigned}*\ codepoint)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00147}00147\ \textcolor{preprocessor}{\#define\ RAPIDJSON\_COPY()\ c\ =\ is.Take();\ *codepoint\ =\ (*codepoint\ <<\ 6)\ |\ (static\_cast<unsigned\ char>(c)\ \&\ 0x3Fu)}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00148}00148\ \textcolor{preprocessor}{\#define\ RAPIDJSON\_TRANS(mask)\ result\ \&=\ ((GetRange(static\_cast<unsigned\ char>(c))\ \&\ mask)\ !=\ 0)}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00149}00149\ \textcolor{preprocessor}{\#define\ RAPIDJSON\_TAIL()\ RAPIDJSON\_COPY();\ RAPIDJSON\_TRANS(0x70)}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00150}00150\ \ \ \ \ \ \ \ \ \textcolor{keyword}{typename}\ InputStream::Ch\ c\ =\ is.Take();}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00151}00151\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!(c\ \&\ 0x80))\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00152}00152\ \ \ \ \ \ \ \ \ \ \ \ \ *codepoint\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\textcolor{keyword}{>}(c);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00153}00153\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00154}00154\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00155}00155\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00156}00156\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ type\ =\ \mbox{\hyperlink{struct_u_t_f8_ac06bbf38df41adb0c7b9eaa93f85cc38}{GetRange}}(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\textcolor{keyword}{>}(c));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00157}00157\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (type\ >=\ 32)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00158}00158\ \ \ \ \ \ \ \ \ \ \ \ \ *codepoint\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00159}00159\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00160}00160\ \ \ \ \ \ \ \ \ \ \ \ \ *codepoint\ =\ (0xFFu\ >>\ \mbox{\hyperlink{yubihsm_8h_a1d127017fb298b889f4ba24752d08b8e}{type}})\ \&\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\textcolor{keyword}{>}(c);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00161}00161\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00162}00162\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ result\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00163}00163\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (type)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00164}00164\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ 2:\ \mbox{\hyperlink{encodings_8h_aaa13dc9e0effa5edff532c344b5b35f7}{RAPIDJSON\_TAIL}}();\ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00165}00165\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ 3:\ \mbox{\hyperlink{encodings_8h_aaa13dc9e0effa5edff532c344b5b35f7}{RAPIDJSON\_TAIL}}();\ \mbox{\hyperlink{encodings_8h_aaa13dc9e0effa5edff532c344b5b35f7}{RAPIDJSON\_TAIL}}();\ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00166}00166\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ 4:\ \mbox{\hyperlink{encodings_8h_a3c5bc66bef12c668f05bbd4df5690171}{RAPIDJSON\_COPY}}();\ \mbox{\hyperlink{encodings_8h_ad84116656b63c4b8d43a2264db620a4b}{RAPIDJSON\_TRANS}}(0x50);\ \mbox{\hyperlink{encodings_8h_aaa13dc9e0effa5edff532c344b5b35f7}{RAPIDJSON\_TAIL}}();\ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00167}00167\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ 5:\ \mbox{\hyperlink{encodings_8h_a3c5bc66bef12c668f05bbd4df5690171}{RAPIDJSON\_COPY}}();\ \mbox{\hyperlink{encodings_8h_ad84116656b63c4b8d43a2264db620a4b}{RAPIDJSON\_TRANS}}(0x10);\ \mbox{\hyperlink{encodings_8h_aaa13dc9e0effa5edff532c344b5b35f7}{RAPIDJSON\_TAIL}}();\ \mbox{\hyperlink{encodings_8h_aaa13dc9e0effa5edff532c344b5b35f7}{RAPIDJSON\_TAIL}}();\ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00168}00168\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ 6:\ \mbox{\hyperlink{encodings_8h_aaa13dc9e0effa5edff532c344b5b35f7}{RAPIDJSON\_TAIL}}();\ \mbox{\hyperlink{encodings_8h_aaa13dc9e0effa5edff532c344b5b35f7}{RAPIDJSON\_TAIL}}();\ \mbox{\hyperlink{encodings_8h_aaa13dc9e0effa5edff532c344b5b35f7}{RAPIDJSON\_TAIL}}();\ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00169}00169\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ 10:\ \mbox{\hyperlink{encodings_8h_a3c5bc66bef12c668f05bbd4df5690171}{RAPIDJSON\_COPY}}();\ \mbox{\hyperlink{encodings_8h_ad84116656b63c4b8d43a2264db620a4b}{RAPIDJSON\_TRANS}}(0x20);\ \mbox{\hyperlink{encodings_8h_aaa13dc9e0effa5edff532c344b5b35f7}{RAPIDJSON\_TAIL}}();\ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00170}00170\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ 11:\ \mbox{\hyperlink{encodings_8h_a3c5bc66bef12c668f05bbd4df5690171}{RAPIDJSON\_COPY}}();\ \mbox{\hyperlink{encodings_8h_ad84116656b63c4b8d43a2264db620a4b}{RAPIDJSON\_TRANS}}(0x60);\ \mbox{\hyperlink{encodings_8h_aaa13dc9e0effa5edff532c344b5b35f7}{RAPIDJSON\_TAIL}}();\ \mbox{\hyperlink{encodings_8h_aaa13dc9e0effa5edff532c344b5b35f7}{RAPIDJSON\_TAIL}}();\ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00171}00171\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00172}00172\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00173}00173\ \textcolor{preprocessor}{\#undef\ RAPIDJSON\_COPY}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00174}00174\ \textcolor{preprocessor}{\#undef\ RAPIDJSON\_TRANS}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00175}00175\ \textcolor{preprocessor}{\#undef\ RAPIDJSON\_TAIL}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00176}00176\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00177}00177\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00178}00178\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ InputStream,\ \textcolor{keyword}{typename}\ OutputStream>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00179}\mbox{\hyperlink{struct_u_t_f8_a9e2e7e37d819baeb5e643654c6e61e33}{00179}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_u_t_f8_a9e2e7e37d819baeb5e643654c6e61e33}{Validate}}(InputStream\&\ is,\ OutputStream\&\ os)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00180}00180\ \textcolor{preprocessor}{\#define\ RAPIDJSON\_COPY()\ os.Put(c\ =\ is.Take())}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00181}00181\ \textcolor{preprocessor}{\#define\ RAPIDJSON\_TRANS(mask)\ result\ \&=\ ((GetRange(static\_cast<unsigned\ char>(c))\ \&\ mask)\ !=\ 0)}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00182}00182\ \textcolor{preprocessor}{\#define\ RAPIDJSON\_TAIL()\ RAPIDJSON\_COPY();\ RAPIDJSON\_TRANS(0x70)}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00183}00183\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_u_t_f8_a8351676b3eda285d7fe902fc472e066e}{Ch}}\ c;}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00184}00184\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{encodings_8h_a3c5bc66bef12c668f05bbd4df5690171}{RAPIDJSON\_COPY}}();}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00185}00185\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!(c\ \&\ 0x80))}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00186}00186\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00187}00187\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00188}00188\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ result\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00189}00189\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (\mbox{\hyperlink{struct_u_t_f8_ac06bbf38df41adb0c7b9eaa93f85cc38}{GetRange}}(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\textcolor{keyword}{>}(c)))\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00190}00190\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ 2:\ \mbox{\hyperlink{encodings_8h_aaa13dc9e0effa5edff532c344b5b35f7}{RAPIDJSON\_TAIL}}();\ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00191}00191\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ 3:\ \mbox{\hyperlink{encodings_8h_aaa13dc9e0effa5edff532c344b5b35f7}{RAPIDJSON\_TAIL}}();\ \mbox{\hyperlink{encodings_8h_aaa13dc9e0effa5edff532c344b5b35f7}{RAPIDJSON\_TAIL}}();\ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00192}00192\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ 4:\ \mbox{\hyperlink{encodings_8h_a3c5bc66bef12c668f05bbd4df5690171}{RAPIDJSON\_COPY}}();\ \mbox{\hyperlink{encodings_8h_ad84116656b63c4b8d43a2264db620a4b}{RAPIDJSON\_TRANS}}(0x50);\ \mbox{\hyperlink{encodings_8h_aaa13dc9e0effa5edff532c344b5b35f7}{RAPIDJSON\_TAIL}}();\ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00193}00193\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ 5:\ \mbox{\hyperlink{encodings_8h_a3c5bc66bef12c668f05bbd4df5690171}{RAPIDJSON\_COPY}}();\ \mbox{\hyperlink{encodings_8h_ad84116656b63c4b8d43a2264db620a4b}{RAPIDJSON\_TRANS}}(0x10);\ \mbox{\hyperlink{encodings_8h_aaa13dc9e0effa5edff532c344b5b35f7}{RAPIDJSON\_TAIL}}();\ \mbox{\hyperlink{encodings_8h_aaa13dc9e0effa5edff532c344b5b35f7}{RAPIDJSON\_TAIL}}();\ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00194}00194\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ 6:\ \mbox{\hyperlink{encodings_8h_aaa13dc9e0effa5edff532c344b5b35f7}{RAPIDJSON\_TAIL}}();\ \mbox{\hyperlink{encodings_8h_aaa13dc9e0effa5edff532c344b5b35f7}{RAPIDJSON\_TAIL}}();\ \mbox{\hyperlink{encodings_8h_aaa13dc9e0effa5edff532c344b5b35f7}{RAPIDJSON\_TAIL}}();\ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00195}00195\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ 10:\ \mbox{\hyperlink{encodings_8h_a3c5bc66bef12c668f05bbd4df5690171}{RAPIDJSON\_COPY}}();\ \mbox{\hyperlink{encodings_8h_ad84116656b63c4b8d43a2264db620a4b}{RAPIDJSON\_TRANS}}(0x20);\ \mbox{\hyperlink{encodings_8h_aaa13dc9e0effa5edff532c344b5b35f7}{RAPIDJSON\_TAIL}}();\ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00196}00196\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ 11:\ \mbox{\hyperlink{encodings_8h_a3c5bc66bef12c668f05bbd4df5690171}{RAPIDJSON\_COPY}}();\ \mbox{\hyperlink{encodings_8h_ad84116656b63c4b8d43a2264db620a4b}{RAPIDJSON\_TRANS}}(0x60);\ \mbox{\hyperlink{encodings_8h_aaa13dc9e0effa5edff532c344b5b35f7}{RAPIDJSON\_TAIL}}();\ \mbox{\hyperlink{encodings_8h_aaa13dc9e0effa5edff532c344b5b35f7}{RAPIDJSON\_TAIL}}();\ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00197}00197\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00198}00198\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00199}00199\ \textcolor{preprocessor}{\#undef\ RAPIDJSON\_COPY}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00200}00200\ \textcolor{preprocessor}{\#undef\ RAPIDJSON\_TRANS}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00201}00201\ \textcolor{preprocessor}{\#undef\ RAPIDJSON\_TAIL}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00202}00202\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00203}00203\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00204}\mbox{\hyperlink{struct_u_t_f8_ac06bbf38df41adb0c7b9eaa93f85cc38}{00204}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{struct_u_t_f8_ac06bbf38df41adb0c7b9eaa93f85cc38}{GetRange}}(\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ c)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00205}00205\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Referring\ to\ DFA\ of\ http://bjoern.hoehrmann.de/utf-\/8/decoder/dfa/}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00206}00206\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ With\ new\ mapping\ 1\ -\/>\ 0x10,\ 7\ -\/>\ 0x20,\ 9\ -\/>\ 0x40,\ such\ that\ AND\ operation\ can\ test\ multiple\ types.}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00207}00207\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ type[]\ =\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00208}00208\ \ \ \ \ \ \ \ \ \ \ \ \ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,\ \ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00209}00209\ \ \ \ \ \ \ \ \ \ \ \ \ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,\ \ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00210}00210\ \ \ \ \ \ \ \ \ \ \ \ \ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,\ \ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00211}00211\ \ \ \ \ \ \ \ \ \ \ \ \ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,\ \ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00212}00212\ \ \ \ \ \ \ \ \ \ \ \ \ 0x10,0x10,0x10,0x10,0x10,0x10,0x10,0x10,0x10,0x10,0x10,0x10,0x10,0x10,0x10,0x10,}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00213}00213\ \ \ \ \ \ \ \ \ \ \ \ \ 0x40,0x40,0x40,0x40,0x40,0x40,0x40,0x40,0x40,0x40,0x40,0x40,0x40,0x40,0x40,0x40,}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00214}00214\ \ \ \ \ \ \ \ \ \ \ \ \ 0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00215}00215\ \ \ \ \ \ \ \ \ \ \ \ \ 0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00216}00216\ \ \ \ \ \ \ \ \ \ \ \ \ 8,8,2,2,2,2,2,2,2,2,2,2,2,2,2,2,\ \ 2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00217}00217\ \ \ \ \ \ \ \ \ \ \ \ \ 10,3,3,3,3,3,3,3,3,3,3,3,3,4,3,3,\ 11,6,6,6,5,8,8,8,8,8,8,8,8,8,8,8,}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00218}00218\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00219}00219\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ type[c];}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00220}00220\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00221}00221\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00222}00222\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ InputByteStream>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00223}\mbox{\hyperlink{struct_u_t_f8_a1b2359d6ea50ae32fefc9b28e9878a31}{00223}}\ \ \ \ \ \textcolor{keyword}{static}\ CharType\ \mbox{\hyperlink{struct_u_t_f8_a1b2359d6ea50ae32fefc9b28e9878a31}{TakeBOM}}(InputByteStream\&\ is)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00224}00224\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_af95188da1d8eb6d4b148fe9ce71cd7c4}{RAPIDJSON\_STATIC\_ASSERT}}(\textcolor{keyword}{sizeof}(\textcolor{keyword}{typename}\ InputByteStream::Ch)\ ==\ 1);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00225}00225\ \ \ \ \ \ \ \ \ \textcolor{keyword}{typename}\ InputByteStream::Ch\ c\ =\ \mbox{\hyperlink{struct_u_t_f8_a5b2561a5031c8a699e593cd51b2c6864}{Take}}(is);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00226}00226\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\textcolor{keyword}{>}(c)\ !=\ 0xEFu)\ \textcolor{keywordflow}{return}\ c;}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00227}00227\ \ \ \ \ \ \ \ \ c\ =\ is.Take();}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00228}00228\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\textcolor{keyword}{>}(c)\ !=\ 0xBBu)\ \textcolor{keywordflow}{return}\ c;}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00229}00229\ \ \ \ \ \ \ \ \ c\ =\ is.Take();}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00230}00230\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\textcolor{keyword}{>}(c)\ !=\ 0xBFu)\ \textcolor{keywordflow}{return}\ c;}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00231}00231\ \ \ \ \ \ \ \ \ c\ =\ is.Take();}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00232}00232\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ c;}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00233}00233\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00234}00234\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00235}00235\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ InputByteStream>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00236}\mbox{\hyperlink{struct_u_t_f8_a5b2561a5031c8a699e593cd51b2c6864}{00236}}\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{struct_u_t_f8_a8351676b3eda285d7fe902fc472e066e}{Ch}}\ \mbox{\hyperlink{struct_u_t_f8_a5b2561a5031c8a699e593cd51b2c6864}{Take}}(InputByteStream\&\ is)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00237}00237\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_af95188da1d8eb6d4b148fe9ce71cd7c4}{RAPIDJSON\_STATIC\_ASSERT}}(\textcolor{keyword}{sizeof}(\textcolor{keyword}{typename}\ InputByteStream::Ch)\ ==\ 1);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00238}00238\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{struct_u_t_f8_a8351676b3eda285d7fe902fc472e066e}{Ch}}\textcolor{keyword}{>}(is.Take());}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00239}00239\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00240}00240\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00241}00241\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ OutputByteStream>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00242}\mbox{\hyperlink{struct_u_t_f8_a6b171e5f0662ad81d498875bbdbc536a}{00242}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_u_t_f8_a6b171e5f0662ad81d498875bbdbc536a}{PutBOM}}(OutputByteStream\&\ os)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00243}00243\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_af95188da1d8eb6d4b148fe9ce71cd7c4}{RAPIDJSON\_STATIC\_ASSERT}}(\textcolor{keyword}{sizeof}(\textcolor{keyword}{typename}\ OutputByteStream::Ch)\ ==\ 1);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00244}00244\ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}typename\ OutputByteStream::Ch\textcolor{keyword}{>}(0xEFu));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00245}00245\ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}typename\ OutputByteStream::Ch\textcolor{keyword}{>}(0xBBu));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00246}00246\ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}typename\ OutputByteStream::Ch\textcolor{keyword}{>}(0xBFu));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00247}00247\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00248}00248\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00249}00249\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ OutputByteStream>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00250}\mbox{\hyperlink{struct_u_t_f8_ab24c23227413798e9be28a21eb26fe51}{00250}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_u_t_f8_ab24c23227413798e9be28a21eb26fe51}{Put}}(OutputByteStream\&\ os,\ \mbox{\hyperlink{struct_u_t_f8_a8351676b3eda285d7fe902fc472e066e}{Ch}}\ c)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00251}00251\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_af95188da1d8eb6d4b148fe9ce71cd7c4}{RAPIDJSON\_STATIC\_ASSERT}}(\textcolor{keyword}{sizeof}(\textcolor{keyword}{typename}\ OutputByteStream::Ch)\ ==\ 1);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00252}00252\ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}typename\ OutputByteStream::Ch\textcolor{keyword}{>}(c));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00253}00253\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00254}00254\ \};}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00255}00255\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00257}00257\ \textcolor{comment}{//\ UTF16}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00258}00258\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00260}00260\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00268}00268\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ CharType\ =\ \textcolor{keywordtype}{wchar\_t}>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00269}\mbox{\hyperlink{struct_u_t_f16}{00269}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_u_t_f16}{UTF16}}\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00270}\mbox{\hyperlink{struct_u_t_f16_a2bb000b19017f8c6d607f3db33fa138d}{00270}}\ \ \ \ \ \textcolor{keyword}{typedef}\ CharType\ \mbox{\hyperlink{struct_u_t_f16_a2bb000b19017f8c6d607f3db33fa138d}{Ch}};}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00271}\mbox{\hyperlink{struct_u_t_f16_a04aeeefa5dcba7c5156bc78a5c1f1557}{00271}}\ \ \ \ \ \mbox{\hyperlink{struct_u_t_f16_a04aeeefa5dcba7c5156bc78a5c1f1557}{RAPIDJSON\_STATIC\_ASSERT}}(\textcolor{keyword}{sizeof}(\mbox{\hyperlink{struct_u_t_f16_a2bb000b19017f8c6d607f3db33fa138d}{Ch}})\ >=\ 2);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00272}00272\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00273}\mbox{\hyperlink{struct_u_t_f16_a4ea47765fecb1fee0492c72ee4af2c09a98b69a56ef3548af9741fff3fcb7b28c}{00273}}\ \ \ \ \ \textcolor{keyword}{enum}\ \{\ \mbox{\hyperlink{struct_u_t_f16_a4ea47765fecb1fee0492c72ee4af2c09a98b69a56ef3548af9741fff3fcb7b28c}{supportUnicode}}\ =\ 1\ \};}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00274}00274\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00275}00275\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ OutputStream>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00276}\mbox{\hyperlink{struct_u_t_f16_a9d8ded01244e30d037c4afa10ee2b30e}{00276}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_u_t_f16_a9d8ded01244e30d037c4afa10ee2b30e}{Encode}}(OutputStream\&\ os,\ \textcolor{keywordtype}{unsigned}\ codepoint)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00277}00277\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_af95188da1d8eb6d4b148fe9ce71cd7c4}{RAPIDJSON\_STATIC\_ASSERT}}(\textcolor{keyword}{sizeof}(\textcolor{keyword}{typename}\ OutputStream::Ch)\ >=\ 2);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00278}00278\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (codepoint\ <=\ 0xFFFF)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00279}00279\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(codepoint\ <\ 0xD800\ ||\ codepoint\ >\ 0xDFFF);\ \textcolor{comment}{//\ Code\ point\ itself\ cannot\ be\ surrogate\ pair\ }}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00280}00280\ \ \ \ \ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}typename\ OutputStream::Ch\textcolor{keyword}{>}(codepoint));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00281}00281\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00282}00282\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00283}00283\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(codepoint\ <=\ 0x10FFFF);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00284}00284\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ v\ =\ codepoint\ -\/\ 0x10000;}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00285}00285\ \ \ \ \ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}typename\ OutputStream::Ch\textcolor{keyword}{>}((v\ >>\ 10)\ |\ 0xD800));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00286}00286\ \ \ \ \ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}typename\ OutputStream::Ch\textcolor{keyword}{>}((v\ \&\ 0x3FF)\ |\ 0xDC00));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00287}00287\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00288}00288\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00289}00289\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00290}00290\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00291}00291\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ OutputStream>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00292}\mbox{\hyperlink{struct_u_t_f16_aa67661e756c273871b574e7133b7fc63}{00292}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_u_t_f16_aa67661e756c273871b574e7133b7fc63}{EncodeUnsafe}}(OutputStream\&\ os,\ \textcolor{keywordtype}{unsigned}\ codepoint)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00293}00293\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_af95188da1d8eb6d4b148fe9ce71cd7c4}{RAPIDJSON\_STATIC\_ASSERT}}(\textcolor{keyword}{sizeof}(\textcolor{keyword}{typename}\ OutputStream::Ch)\ >=\ 2);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00294}00294\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (codepoint\ <=\ 0xFFFF)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00295}00295\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(codepoint\ <\ 0xD800\ ||\ codepoint\ >\ 0xDFFF);\ \textcolor{comment}{//\ Code\ point\ itself\ cannot\ be\ surrogate\ pair\ }}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00296}00296\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{encodings_8h_ad57ba7f2912c5509924b69dec7db4396}{PutUnsafe}}(os,\ \textcolor{keyword}{static\_cast<}typename\ OutputStream::Ch\textcolor{keyword}{>}(codepoint));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00297}00297\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00298}00298\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00299}00299\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(codepoint\ <=\ 0x10FFFF);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00300}00300\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ v\ =\ codepoint\ -\/\ 0x10000;}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00301}00301\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{encodings_8h_ad57ba7f2912c5509924b69dec7db4396}{PutUnsafe}}(os,\ \textcolor{keyword}{static\_cast<}typename\ OutputStream::Ch\textcolor{keyword}{>}((v\ >>\ 10)\ |\ 0xD800));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00302}00302\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{encodings_8h_ad57ba7f2912c5509924b69dec7db4396}{PutUnsafe}}(os,\ \textcolor{keyword}{static\_cast<}typename\ OutputStream::Ch\textcolor{keyword}{>}((v\ \&\ 0x3FF)\ |\ 0xDC00));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00303}00303\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00304}00304\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00305}00305\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00306}00306\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ InputStream>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00307}\mbox{\hyperlink{struct_u_t_f16_a124c79dfd9f9b4c3fb65bd55ba17b4be}{00307}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_u_t_f16_a124c79dfd9f9b4c3fb65bd55ba17b4be}{Decode}}(InputStream\&\ is,\ \textcolor{keywordtype}{unsigned}*\ codepoint)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00308}00308\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_af95188da1d8eb6d4b148fe9ce71cd7c4}{RAPIDJSON\_STATIC\_ASSERT}}(\textcolor{keyword}{sizeof}(\textcolor{keyword}{typename}\ InputStream::Ch)\ >=\ 2);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00309}00309\ \ \ \ \ \ \ \ \ \textcolor{keyword}{typename}\ InputStream::Ch\ c\ =\ is.Take();}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00310}00310\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (c\ <\ 0xD800\ ||\ c\ >\ 0xDFFF)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00311}00311\ \ \ \ \ \ \ \ \ \ \ \ \ *codepoint\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\textcolor{keyword}{>}(c);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00312}00312\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00313}00313\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00314}00314\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (c\ <=\ 0xDBFF)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00315}00315\ \ \ \ \ \ \ \ \ \ \ \ \ *codepoint\ =\ (\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\textcolor{keyword}{>}(c)\ \&\ 0x3FF)\ <<\ 10;}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00316}00316\ \ \ \ \ \ \ \ \ \ \ \ \ c\ =\ is.Take();}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00317}00317\ \ \ \ \ \ \ \ \ \ \ \ \ *codepoint\ |=\ (\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\textcolor{keyword}{>}(c)\ \&\ 0x3FF);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00318}00318\ \ \ \ \ \ \ \ \ \ \ \ \ *codepoint\ +=\ 0x10000;}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00319}00319\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ c\ >=\ 0xDC00\ \&\&\ c\ <=\ 0xDFFF;}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00320}00320\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00321}00321\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00322}00322\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00323}00323\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00324}00324\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ InputStream,\ \textcolor{keyword}{typename}\ OutputStream>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00325}\mbox{\hyperlink{struct_u_t_f16_a7516184ed5dce10c0e7895bec124d97d}{00325}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_u_t_f16_a7516184ed5dce10c0e7895bec124d97d}{Validate}}(InputStream\&\ is,\ OutputStream\&\ os)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00326}00326\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_af95188da1d8eb6d4b148fe9ce71cd7c4}{RAPIDJSON\_STATIC\_ASSERT}}(\textcolor{keyword}{sizeof}(\textcolor{keyword}{typename}\ InputStream::Ch)\ >=\ 2);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00327}00327\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_af95188da1d8eb6d4b148fe9ce71cd7c4}{RAPIDJSON\_STATIC\_ASSERT}}(\textcolor{keyword}{sizeof}(\textcolor{keyword}{typename}\ OutputStream::Ch)\ >=\ 2);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00328}00328\ \ \ \ \ \ \ \ \ \textcolor{keyword}{typename}\ InputStream::Ch\ c;}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00329}00329\ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}typename\ OutputStream::Ch\textcolor{keyword}{>}(c\ =\ is.Take()));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00330}00330\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (c\ <\ 0xD800\ ||\ c\ >\ 0xDFFF)}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00331}00331\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00332}00332\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (c\ <=\ 0xDBFF)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00333}00333\ \ \ \ \ \ \ \ \ \ \ \ \ os.Put(c\ =\ is.Take());}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00334}00334\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ c\ >=\ 0xDC00\ \&\&\ c\ <=\ 0xDFFF;}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00335}00335\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00336}00336\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00337}00337\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00338}00338\ \};}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00339}00339\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00341}00341\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ CharType\ =\ \textcolor{keywordtype}{wchar\_t}>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00342}\mbox{\hyperlink{struct_u_t_f16_l_e}{00342}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_u_t_f16_l_e}{UTF16LE}}\ :\ \mbox{\hyperlink{struct_u_t_f16}{UTF16}}<CharType>\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00343}00343\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ InputByteStream>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00344}\mbox{\hyperlink{struct_u_t_f16_l_e_ab1d5f43903815155796733f76b21deea}{00344}}\ \ \ \ \ \textcolor{keyword}{static}\ CharType\ \mbox{\hyperlink{struct_u_t_f16_l_e_ab1d5f43903815155796733f76b21deea}{TakeBOM}}(InputByteStream\&\ is)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00345}00345\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_af95188da1d8eb6d4b148fe9ce71cd7c4}{RAPIDJSON\_STATIC\_ASSERT}}(\textcolor{keyword}{sizeof}(\textcolor{keyword}{typename}\ InputByteStream::Ch)\ ==\ 1);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00346}00346\ \ \ \ \ \ \ \ \ CharType\ c\ =\ \mbox{\hyperlink{struct_u_t_f16_l_e_a5927b3d75ff9ce02056d827c14bd0160}{Take}}(is);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00347}00347\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\textcolor{keyword}{>}(c)\ ==\ 0xFEFFu\ ?\ \mbox{\hyperlink{struct_u_t_f16_l_e_a5927b3d75ff9ce02056d827c14bd0160}{Take}}(is)\ :\ c;}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00348}00348\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00349}00349\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00350}00350\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ InputByteStream>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00351}\mbox{\hyperlink{struct_u_t_f16_l_e_a5927b3d75ff9ce02056d827c14bd0160}{00351}}\ \ \ \ \ \textcolor{keyword}{static}\ CharType\ \mbox{\hyperlink{struct_u_t_f16_l_e_a5927b3d75ff9ce02056d827c14bd0160}{Take}}(InputByteStream\&\ is)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00352}00352\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_af95188da1d8eb6d4b148fe9ce71cd7c4}{RAPIDJSON\_STATIC\_ASSERT}}(\textcolor{keyword}{sizeof}(\textcolor{keyword}{typename}\ InputByteStream::Ch)\ ==\ 1);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00353}00353\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ c\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\textcolor{keyword}{>}(is.Take());}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00354}00354\ \ \ \ \ \ \ \ \ c\ |=\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\textcolor{keyword}{>}(\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\textcolor{keyword}{>}(is.Take()))\ <<\ 8;}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00355}00355\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}CharType\textcolor{keyword}{>}(c);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00356}00356\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00357}00357\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00358}00358\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ OutputByteStream>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00359}\mbox{\hyperlink{struct_u_t_f16_l_e_a6bfd05f8cac35c1594c7fce47009f198}{00359}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_u_t_f16_l_e_a6bfd05f8cac35c1594c7fce47009f198}{PutBOM}}(OutputByteStream\&\ os)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00360}00360\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_af95188da1d8eb6d4b148fe9ce71cd7c4}{RAPIDJSON\_STATIC\_ASSERT}}(\textcolor{keyword}{sizeof}(\textcolor{keyword}{typename}\ OutputByteStream::Ch)\ ==\ 1);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00361}00361\ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}typename\ OutputByteStream::Ch\textcolor{keyword}{>}(0xFFu));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00362}00362\ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}typename\ OutputByteStream::Ch\textcolor{keyword}{>}(0xFEu));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00363}00363\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00364}00364\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00365}00365\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ OutputByteStream>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00366}\mbox{\hyperlink{struct_u_t_f16_l_e_ac018cc43a1dba5a6ca232bd9a257072c}{00366}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_u_t_f16_l_e_ac018cc43a1dba5a6ca232bd9a257072c}{Put}}(OutputByteStream\&\ os,\ CharType\ c)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00367}00367\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_af95188da1d8eb6d4b148fe9ce71cd7c4}{RAPIDJSON\_STATIC\_ASSERT}}(\textcolor{keyword}{sizeof}(\textcolor{keyword}{typename}\ OutputByteStream::Ch)\ ==\ 1);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00368}00368\ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}typename\ OutputByteStream::Ch\textcolor{keyword}{>}(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\textcolor{keyword}{>}(c)\ \&\ 0xFFu));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00369}00369\ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}typename\ OutputByteStream::Ch\textcolor{keyword}{>}((\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\textcolor{keyword}{>}(c)\ >>\ 8)\ \&\ 0xFFu));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00370}00370\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00371}00371\ \};}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00372}00372\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00374}00374\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ CharType\ =\ \textcolor{keywordtype}{wchar\_t}>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00375}\mbox{\hyperlink{struct_u_t_f16_b_e}{00375}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_u_t_f16_b_e}{UTF16BE}}\ :\ \mbox{\hyperlink{struct_u_t_f16}{UTF16}}<CharType>\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00376}00376\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ InputByteStream>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00377}\mbox{\hyperlink{struct_u_t_f16_b_e_a5d5184a373149c69b4b8baf8507f9591}{00377}}\ \ \ \ \ \textcolor{keyword}{static}\ CharType\ \mbox{\hyperlink{struct_u_t_f16_b_e_a5d5184a373149c69b4b8baf8507f9591}{TakeBOM}}(InputByteStream\&\ is)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00378}00378\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_af95188da1d8eb6d4b148fe9ce71cd7c4}{RAPIDJSON\_STATIC\_ASSERT}}(\textcolor{keyword}{sizeof}(\textcolor{keyword}{typename}\ InputByteStream::Ch)\ ==\ 1);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00379}00379\ \ \ \ \ \ \ \ \ CharType\ c\ =\ \mbox{\hyperlink{struct_u_t_f16_b_e_a671ca76d54f45aa5f62eb86c4e69738a}{Take}}(is);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00380}00380\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\textcolor{keyword}{>}(c)\ ==\ 0xFEFFu\ ?\ \mbox{\hyperlink{struct_u_t_f16_b_e_a671ca76d54f45aa5f62eb86c4e69738a}{Take}}(is)\ :\ c;}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00381}00381\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00382}00382\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00383}00383\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ InputByteStream>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00384}\mbox{\hyperlink{struct_u_t_f16_b_e_a671ca76d54f45aa5f62eb86c4e69738a}{00384}}\ \ \ \ \ \textcolor{keyword}{static}\ CharType\ \mbox{\hyperlink{struct_u_t_f16_b_e_a671ca76d54f45aa5f62eb86c4e69738a}{Take}}(InputByteStream\&\ is)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00385}00385\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_af95188da1d8eb6d4b148fe9ce71cd7c4}{RAPIDJSON\_STATIC\_ASSERT}}(\textcolor{keyword}{sizeof}(\textcolor{keyword}{typename}\ InputByteStream::Ch)\ ==\ 1);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00386}00386\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ c\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\textcolor{keyword}{>}(\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\textcolor{keyword}{>}(is.Take()))\ <<\ 8;}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00387}00387\ \ \ \ \ \ \ \ \ c\ |=\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\textcolor{keyword}{>}(\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\textcolor{keyword}{>}(is.Take()));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00388}00388\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}CharType\textcolor{keyword}{>}(c);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00389}00389\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00390}00390\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00391}00391\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ OutputByteStream>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00392}\mbox{\hyperlink{struct_u_t_f16_b_e_ae109dda1ad7955049589885ea5a13652}{00392}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_u_t_f16_b_e_ae109dda1ad7955049589885ea5a13652}{PutBOM}}(OutputByteStream\&\ os)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00393}00393\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_af95188da1d8eb6d4b148fe9ce71cd7c4}{RAPIDJSON\_STATIC\_ASSERT}}(\textcolor{keyword}{sizeof}(\textcolor{keyword}{typename}\ OutputByteStream::Ch)\ ==\ 1);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00394}00394\ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}typename\ OutputByteStream::Ch\textcolor{keyword}{>}(0xFEu));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00395}00395\ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}typename\ OutputByteStream::Ch\textcolor{keyword}{>}(0xFFu));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00396}00396\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00397}00397\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00398}00398\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ OutputByteStream>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00399}\mbox{\hyperlink{struct_u_t_f16_b_e_ab0f964c3ec9ac6cc47f2875ae112dbfe}{00399}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_u_t_f16_b_e_ab0f964c3ec9ac6cc47f2875ae112dbfe}{Put}}(OutputByteStream\&\ os,\ CharType\ c)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00400}00400\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_af95188da1d8eb6d4b148fe9ce71cd7c4}{RAPIDJSON\_STATIC\_ASSERT}}(\textcolor{keyword}{sizeof}(\textcolor{keyword}{typename}\ OutputByteStream::Ch)\ ==\ 1);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00401}00401\ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}typename\ OutputByteStream::Ch\textcolor{keyword}{>}((\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\textcolor{keyword}{>}(c)\ >>\ 8)\ \&\ 0xFFu));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00402}00402\ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}typename\ OutputByteStream::Ch\textcolor{keyword}{>}(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\textcolor{keyword}{>}(c)\ \&\ 0xFFu));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00403}00403\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00404}00404\ \};}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00405}00405\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00407}00407\ \textcolor{comment}{//\ UTF32}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00408}00408\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00410}00410\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00417}00417\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ CharType\ =\ \textcolor{keywordtype}{unsigned}>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00418}\mbox{\hyperlink{struct_u_t_f32}{00418}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_u_t_f32}{UTF32}}\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00419}\mbox{\hyperlink{struct_u_t_f32_aa215989d027f01f256174c5f91332997}{00419}}\ \ \ \ \ \textcolor{keyword}{typedef}\ CharType\ \mbox{\hyperlink{struct_u_t_f32_aa215989d027f01f256174c5f91332997}{Ch}};}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00420}\mbox{\hyperlink{struct_u_t_f32_aae11b766f799d311679d59e9f7077f83}{00420}}\ \ \ \ \ \mbox{\hyperlink{struct_u_t_f32_aae11b766f799d311679d59e9f7077f83}{RAPIDJSON\_STATIC\_ASSERT}}(\textcolor{keyword}{sizeof}(\mbox{\hyperlink{struct_u_t_f32_aa215989d027f01f256174c5f91332997}{Ch}})\ >=\ 4);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00421}00421\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00422}\mbox{\hyperlink{struct_u_t_f32_a4baddc2142816c358b41f5b08ce29778ae44852fd9d88deed3a956b89108412a5}{00422}}\ \ \ \ \ \textcolor{keyword}{enum}\ \{\ \mbox{\hyperlink{struct_u_t_f32_a4baddc2142816c358b41f5b08ce29778ae44852fd9d88deed3a956b89108412a5}{supportUnicode}}\ =\ 1\ \};}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00423}00423\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00424}00424\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ OutputStream>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00425}\mbox{\hyperlink{struct_u_t_f32_a511d1b09672ce535085895a28d8c2f13}{00425}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_u_t_f32_a511d1b09672ce535085895a28d8c2f13}{Encode}}(OutputStream\&\ os,\ \textcolor{keywordtype}{unsigned}\ codepoint)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00426}00426\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_af95188da1d8eb6d4b148fe9ce71cd7c4}{RAPIDJSON\_STATIC\_ASSERT}}(\textcolor{keyword}{sizeof}(\textcolor{keyword}{typename}\ OutputStream::Ch)\ >=\ 4);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00427}00427\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(codepoint\ <=\ 0x10FFFF);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00428}00428\ \ \ \ \ \ \ \ \ os.Put(codepoint);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00429}00429\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00430}00430\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00431}00431\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ OutputStream>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00432}\mbox{\hyperlink{struct_u_t_f32_ae50dd8dff92c36ee184c6d4eccb1961e}{00432}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_u_t_f32_ae50dd8dff92c36ee184c6d4eccb1961e}{EncodeUnsafe}}(OutputStream\&\ os,\ \textcolor{keywordtype}{unsigned}\ codepoint)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00433}00433\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_af95188da1d8eb6d4b148fe9ce71cd7c4}{RAPIDJSON\_STATIC\_ASSERT}}(\textcolor{keyword}{sizeof}(\textcolor{keyword}{typename}\ OutputStream::Ch)\ >=\ 4);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00434}00434\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(codepoint\ <=\ 0x10FFFF);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00435}00435\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{encodings_8h_ad57ba7f2912c5509924b69dec7db4396}{PutUnsafe}}(os,\ codepoint);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00436}00436\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00437}00437\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00438}00438\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ InputStream>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00439}\mbox{\hyperlink{struct_u_t_f32_a6e7258a5e982e101345dffdc355e9b53}{00439}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_u_t_f32_a6e7258a5e982e101345dffdc355e9b53}{Decode}}(InputStream\&\ is,\ \textcolor{keywordtype}{unsigned}*\ codepoint)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00440}00440\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_af95188da1d8eb6d4b148fe9ce71cd7c4}{RAPIDJSON\_STATIC\_ASSERT}}(\textcolor{keyword}{sizeof}(\textcolor{keyword}{typename}\ InputStream::Ch)\ >=\ 4);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00441}00441\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_u_t_f32_aa215989d027f01f256174c5f91332997}{Ch}}\ c\ =\ is.Take();}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00442}00442\ \ \ \ \ \ \ \ \ *codepoint\ =\ c;}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00443}00443\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ c\ <=\ 0x10FFFF;}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00444}00444\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00445}00445\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00446}00446\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ InputStream,\ \textcolor{keyword}{typename}\ OutputStream>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00447}\mbox{\hyperlink{struct_u_t_f32_a71336fb0546b3079e01bbd51d2fa2e45}{00447}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_u_t_f32_a71336fb0546b3079e01bbd51d2fa2e45}{Validate}}(InputStream\&\ is,\ OutputStream\&\ os)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00448}00448\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_af95188da1d8eb6d4b148fe9ce71cd7c4}{RAPIDJSON\_STATIC\_ASSERT}}(\textcolor{keyword}{sizeof}(\textcolor{keyword}{typename}\ InputStream::Ch)\ >=\ 4);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00449}00449\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_u_t_f32_aa215989d027f01f256174c5f91332997}{Ch}}\ c;}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00450}00450\ \ \ \ \ \ \ \ \ os.Put(c\ =\ is.Take());}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00451}00451\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ c\ <=\ 0x10FFFF;}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00452}00452\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00453}00453\ \};}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00454}00454\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00456}00456\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ CharType\ =\ \textcolor{keywordtype}{unsigned}>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00457}\mbox{\hyperlink{struct_u_t_f32_l_e}{00457}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_u_t_f32_l_e}{UTF32LE}}\ :\ \mbox{\hyperlink{struct_u_t_f32}{UTF32}}<CharType>\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00458}00458\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ InputByteStream>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00459}\mbox{\hyperlink{struct_u_t_f32_l_e_a8729612b0a8b1126c61c4f8f8c34410e}{00459}}\ \ \ \ \ \textcolor{keyword}{static}\ CharType\ \mbox{\hyperlink{struct_u_t_f32_l_e_a8729612b0a8b1126c61c4f8f8c34410e}{TakeBOM}}(InputByteStream\&\ is)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00460}00460\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_af95188da1d8eb6d4b148fe9ce71cd7c4}{RAPIDJSON\_STATIC\_ASSERT}}(\textcolor{keyword}{sizeof}(\textcolor{keyword}{typename}\ InputByteStream::Ch)\ ==\ 1);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00461}00461\ \ \ \ \ \ \ \ \ CharType\ c\ =\ \mbox{\hyperlink{struct_u_t_f32_l_e_ad13967549811be12897362bb37b2c819}{Take}}(is);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00462}00462\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\textcolor{keyword}{>}(c)\ ==\ 0x0000FEFFu\ ?\ \mbox{\hyperlink{struct_u_t_f32_l_e_ad13967549811be12897362bb37b2c819}{Take}}(is)\ :\ c;}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00463}00463\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00464}00464\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00465}00465\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ InputByteStream>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00466}\mbox{\hyperlink{struct_u_t_f32_l_e_ad13967549811be12897362bb37b2c819}{00466}}\ \ \ \ \ \textcolor{keyword}{static}\ CharType\ \mbox{\hyperlink{struct_u_t_f32_l_e_ad13967549811be12897362bb37b2c819}{Take}}(InputByteStream\&\ is)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00467}00467\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_af95188da1d8eb6d4b148fe9ce71cd7c4}{RAPIDJSON\_STATIC\_ASSERT}}(\textcolor{keyword}{sizeof}(\textcolor{keyword}{typename}\ InputByteStream::Ch)\ ==\ 1);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00468}00468\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ c\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\textcolor{keyword}{>}(is.Take());}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00469}00469\ \ \ \ \ \ \ \ \ c\ |=\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\textcolor{keyword}{>}(\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\textcolor{keyword}{>}(is.Take()))\ <<\ 8;}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00470}00470\ \ \ \ \ \ \ \ \ c\ |=\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\textcolor{keyword}{>}(\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\textcolor{keyword}{>}(is.Take()))\ <<\ 16;}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00471}00471\ \ \ \ \ \ \ \ \ c\ |=\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\textcolor{keyword}{>}(\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\textcolor{keyword}{>}(is.Take()))\ <<\ 24;}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00472}00472\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}CharType\textcolor{keyword}{>}(c);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00473}00473\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00474}00474\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00475}00475\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ OutputByteStream>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00476}\mbox{\hyperlink{struct_u_t_f32_l_e_accd97d45e55746c900dab356605825be}{00476}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_u_t_f32_l_e_accd97d45e55746c900dab356605825be}{PutBOM}}(OutputByteStream\&\ os)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00477}00477\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_af95188da1d8eb6d4b148fe9ce71cd7c4}{RAPIDJSON\_STATIC\_ASSERT}}(\textcolor{keyword}{sizeof}(\textcolor{keyword}{typename}\ OutputByteStream::Ch)\ ==\ 1);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00478}00478\ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}typename\ OutputByteStream::Ch\textcolor{keyword}{>}(0xFFu));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00479}00479\ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}typename\ OutputByteStream::Ch\textcolor{keyword}{>}(0xFEu));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00480}00480\ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}typename\ OutputByteStream::Ch\textcolor{keyword}{>}(0x00u));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00481}00481\ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}typename\ OutputByteStream::Ch\textcolor{keyword}{>}(0x00u));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00482}00482\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00483}00483\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00484}00484\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ OutputByteStream>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00485}\mbox{\hyperlink{struct_u_t_f32_l_e_a61bb50e7fba27e3fe28a9f30eb366193}{00485}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_u_t_f32_l_e_a61bb50e7fba27e3fe28a9f30eb366193}{Put}}(OutputByteStream\&\ os,\ CharType\ c)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00486}00486\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_af95188da1d8eb6d4b148fe9ce71cd7c4}{RAPIDJSON\_STATIC\_ASSERT}}(\textcolor{keyword}{sizeof}(\textcolor{keyword}{typename}\ OutputByteStream::Ch)\ ==\ 1);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00487}00487\ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}typename\ OutputByteStream::Ch\textcolor{keyword}{>}(c\ \&\ 0xFFu));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00488}00488\ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}typename\ OutputByteStream::Ch\textcolor{keyword}{>}((c\ >>\ 8)\ \&\ 0xFFu));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00489}00489\ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}typename\ OutputByteStream::Ch\textcolor{keyword}{>}((c\ >>\ 16)\ \&\ 0xFFu));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00490}00490\ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}typename\ OutputByteStream::Ch\textcolor{keyword}{>}((c\ >>\ 24)\ \&\ 0xFFu));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00491}00491\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00492}00492\ \};}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00493}00493\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00495}00495\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ CharType\ =\ \textcolor{keywordtype}{unsigned}>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00496}\mbox{\hyperlink{struct_u_t_f32_b_e}{00496}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_u_t_f32_b_e}{UTF32BE}}\ :\ \mbox{\hyperlink{struct_u_t_f32}{UTF32}}<CharType>\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00497}00497\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ InputByteStream>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00498}\mbox{\hyperlink{struct_u_t_f32_b_e_a07d228f51ad43ef83af2529ca4bd1181}{00498}}\ \ \ \ \ \textcolor{keyword}{static}\ CharType\ \mbox{\hyperlink{struct_u_t_f32_b_e_a07d228f51ad43ef83af2529ca4bd1181}{TakeBOM}}(InputByteStream\&\ is)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00499}00499\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_af95188da1d8eb6d4b148fe9ce71cd7c4}{RAPIDJSON\_STATIC\_ASSERT}}(\textcolor{keyword}{sizeof}(\textcolor{keyword}{typename}\ InputByteStream::Ch)\ ==\ 1);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00500}00500\ \ \ \ \ \ \ \ \ CharType\ c\ =\ \mbox{\hyperlink{struct_u_t_f32_b_e_ace3086ece3b13417c758b5abcf3016c8}{Take}}(is);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00501}00501\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\textcolor{keyword}{>}(c)\ ==\ 0x0000FEFFu\ ?\ \mbox{\hyperlink{struct_u_t_f32_b_e_ace3086ece3b13417c758b5abcf3016c8}{Take}}(is)\ :\ c;\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00502}00502\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00503}00503\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00504}00504\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ InputByteStream>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00505}\mbox{\hyperlink{struct_u_t_f32_b_e_ace3086ece3b13417c758b5abcf3016c8}{00505}}\ \ \ \ \ \textcolor{keyword}{static}\ CharType\ \mbox{\hyperlink{struct_u_t_f32_b_e_ace3086ece3b13417c758b5abcf3016c8}{Take}}(InputByteStream\&\ is)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00506}00506\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_af95188da1d8eb6d4b148fe9ce71cd7c4}{RAPIDJSON\_STATIC\_ASSERT}}(\textcolor{keyword}{sizeof}(\textcolor{keyword}{typename}\ InputByteStream::Ch)\ ==\ 1);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00507}00507\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ c\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\textcolor{keyword}{>}(\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\textcolor{keyword}{>}(is.Take()))\ <<\ 24;}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00508}00508\ \ \ \ \ \ \ \ \ c\ |=\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\textcolor{keyword}{>}(\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\textcolor{keyword}{>}(is.Take()))\ <<\ 16;}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00509}00509\ \ \ \ \ \ \ \ \ c\ |=\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\textcolor{keyword}{>}(\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\textcolor{keyword}{>}(is.Take()))\ <<\ 8;}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00510}00510\ \ \ \ \ \ \ \ \ c\ |=\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\textcolor{keyword}{>}(\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\textcolor{keyword}{>}(is.Take()));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00511}00511\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}CharType\textcolor{keyword}{>}(c);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00512}00512\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00513}00513\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00514}00514\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ OutputByteStream>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00515}\mbox{\hyperlink{struct_u_t_f32_b_e_a8b1a216dd267ff06a9000cbe593ebd24}{00515}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_u_t_f32_b_e_a8b1a216dd267ff06a9000cbe593ebd24}{PutBOM}}(OutputByteStream\&\ os)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00516}00516\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_af95188da1d8eb6d4b148fe9ce71cd7c4}{RAPIDJSON\_STATIC\_ASSERT}}(\textcolor{keyword}{sizeof}(\textcolor{keyword}{typename}\ OutputByteStream::Ch)\ ==\ 1);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00517}00517\ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}typename\ OutputByteStream::Ch\textcolor{keyword}{>}(0x00u));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00518}00518\ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}typename\ OutputByteStream::Ch\textcolor{keyword}{>}(0x00u));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00519}00519\ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}typename\ OutputByteStream::Ch\textcolor{keyword}{>}(0xFEu));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00520}00520\ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}typename\ OutputByteStream::Ch\textcolor{keyword}{>}(0xFFu));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00521}00521\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00522}00522\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00523}00523\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ OutputByteStream>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00524}\mbox{\hyperlink{struct_u_t_f32_b_e_ad270b8b016d477f7f7354df535fa28c5}{00524}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_u_t_f32_b_e_ad270b8b016d477f7f7354df535fa28c5}{Put}}(OutputByteStream\&\ os,\ CharType\ c)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00525}00525\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_af95188da1d8eb6d4b148fe9ce71cd7c4}{RAPIDJSON\_STATIC\_ASSERT}}(\textcolor{keyword}{sizeof}(\textcolor{keyword}{typename}\ OutputByteStream::Ch)\ ==\ 1);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00526}00526\ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}typename\ OutputByteStream::Ch\textcolor{keyword}{>}((c\ >>\ 24)\ \&\ 0xFFu));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00527}00527\ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}typename\ OutputByteStream::Ch\textcolor{keyword}{>}((c\ >>\ 16)\ \&\ 0xFFu));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00528}00528\ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}typename\ OutputByteStream::Ch\textcolor{keyword}{>}((c\ >>\ 8)\ \&\ 0xFFu));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00529}00529\ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}typename\ OutputByteStream::Ch\textcolor{keyword}{>}(c\ \&\ 0xFFu));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00530}00530\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00531}00531\ \};}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00532}00532\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00534}00534\ \textcolor{comment}{//\ ASCII}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00535}00535\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00537}00537\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00541}00541\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ CharType\ =\ \textcolor{keywordtype}{char}>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00542}\mbox{\hyperlink{struct_a_s_c_i_i}{00542}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_a_s_c_i_i}{ASCII}}\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00543}\mbox{\hyperlink{struct_a_s_c_i_i_a55aad132d2a556a25f6c02e4f9b372de}{00543}}\ \ \ \ \ \textcolor{keyword}{typedef}\ CharType\ \mbox{\hyperlink{struct_a_s_c_i_i_a55aad132d2a556a25f6c02e4f9b372de}{Ch}};}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00544}00544\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00545}\mbox{\hyperlink{struct_a_s_c_i_i_a94f5d05889901570dd0a2f61f60d7b14a672ec36bd3404c3050a9111a934cbe00}{00545}}\ \ \ \ \ \textcolor{keyword}{enum}\ \{\ \mbox{\hyperlink{struct_a_s_c_i_i_a94f5d05889901570dd0a2f61f60d7b14a672ec36bd3404c3050a9111a934cbe00}{supportUnicode}}\ =\ 0\ \};}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00546}00546\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00547}00547\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ OutputStream>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00548}\mbox{\hyperlink{struct_a_s_c_i_i_af56b1605fe233c54693facc7de457f72}{00548}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_a_s_c_i_i_af56b1605fe233c54693facc7de457f72}{Encode}}(OutputStream\&\ os,\ \textcolor{keywordtype}{unsigned}\ codepoint)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00549}00549\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(codepoint\ <=\ 0x7F);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00550}00550\ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{struct_a_s_c_i_i_a55aad132d2a556a25f6c02e4f9b372de}{Ch}}\textcolor{keyword}{>}(codepoint\ \&\ 0xFF));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00551}00551\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00552}00552\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00553}00553\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ OutputStream>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00554}\mbox{\hyperlink{struct_a_s_c_i_i_afeb90d6f04771067b83b35a0f366af46}{00554}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_a_s_c_i_i_afeb90d6f04771067b83b35a0f366af46}{EncodeUnsafe}}(OutputStream\&\ os,\ \textcolor{keywordtype}{unsigned}\ codepoint)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00555}00555\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(codepoint\ <=\ 0x7F);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00556}00556\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{encodings_8h_ad57ba7f2912c5509924b69dec7db4396}{PutUnsafe}}(os,\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{struct_a_s_c_i_i_a55aad132d2a556a25f6c02e4f9b372de}{Ch}}\textcolor{keyword}{>}(codepoint\ \&\ 0xFF));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00557}00557\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00558}00558\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00559}00559\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ InputStream>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00560}\mbox{\hyperlink{struct_a_s_c_i_i_a44844bbfd0a4fc282993fd72f3f58eee}{00560}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_a_s_c_i_i_a44844bbfd0a4fc282993fd72f3f58eee}{Decode}}(InputStream\&\ is,\ \textcolor{keywordtype}{unsigned}*\ codepoint)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00561}00561\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ c\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\textcolor{keyword}{>}(is.Take());}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00562}00562\ \ \ \ \ \ \ \ \ *codepoint\ =\ c;}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00563}00563\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ c\ <=\ 0X7F;}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00564}00564\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00565}00565\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00566}00566\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ InputStream,\ \textcolor{keyword}{typename}\ OutputStream>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00567}\mbox{\hyperlink{struct_a_s_c_i_i_a398680588a09e6ce9b56e32195047c78}{00567}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_a_s_c_i_i_a398680588a09e6ce9b56e32195047c78}{Validate}}(InputStream\&\ is,\ OutputStream\&\ os)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00568}00568\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ c\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\textcolor{keyword}{>}(is.Take());}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00569}00569\ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}typename\ OutputStream::Ch\textcolor{keyword}{>}(c));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00570}00570\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ c\ <=\ 0x7F;}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00571}00571\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00572}00572\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00573}00573\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ InputByteStream>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00574}\mbox{\hyperlink{struct_a_s_c_i_i_aad78500eb98f45582a4df020e3fb2278}{00574}}\ \ \ \ \ \textcolor{keyword}{static}\ CharType\ \mbox{\hyperlink{struct_a_s_c_i_i_aad78500eb98f45582a4df020e3fb2278}{TakeBOM}}(InputByteStream\&\ is)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00575}00575\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_af95188da1d8eb6d4b148fe9ce71cd7c4}{RAPIDJSON\_STATIC\_ASSERT}}(\textcolor{keyword}{sizeof}(\textcolor{keyword}{typename}\ InputByteStream::Ch)\ ==\ 1);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00576}00576\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ c\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\textcolor{keyword}{>}(\mbox{\hyperlink{struct_a_s_c_i_i_ab1b9fdf0a5c05658d62fded913d923a3}{Take}}(is));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00577}00577\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{struct_a_s_c_i_i_a55aad132d2a556a25f6c02e4f9b372de}{Ch}}\textcolor{keyword}{>}(c);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00578}00578\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00579}00579\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00580}00580\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ InputByteStream>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00581}\mbox{\hyperlink{struct_a_s_c_i_i_ab1b9fdf0a5c05658d62fded913d923a3}{00581}}\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{struct_a_s_c_i_i_a55aad132d2a556a25f6c02e4f9b372de}{Ch}}\ \mbox{\hyperlink{struct_a_s_c_i_i_ab1b9fdf0a5c05658d62fded913d923a3}{Take}}(InputByteStream\&\ is)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00582}00582\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_af95188da1d8eb6d4b148fe9ce71cd7c4}{RAPIDJSON\_STATIC\_ASSERT}}(\textcolor{keyword}{sizeof}(\textcolor{keyword}{typename}\ InputByteStream::Ch)\ ==\ 1);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00583}00583\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{struct_a_s_c_i_i_a55aad132d2a556a25f6c02e4f9b372de}{Ch}}\textcolor{keyword}{>}(is.Take());}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00584}00584\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00585}00585\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00586}00586\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ OutputByteStream>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00587}\mbox{\hyperlink{struct_a_s_c_i_i_a3036dc1d604039c3224ca0a890ee0134}{00587}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_a_s_c_i_i_a3036dc1d604039c3224ca0a890ee0134}{PutBOM}}(OutputByteStream\&\ os)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00588}00588\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_af95188da1d8eb6d4b148fe9ce71cd7c4}{RAPIDJSON\_STATIC\_ASSERT}}(\textcolor{keyword}{sizeof}(\textcolor{keyword}{typename}\ OutputByteStream::Ch)\ ==\ 1);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00589}00589\ \ \ \ \ \ \ \ \ (void)os;}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00590}00590\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00591}00591\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00592}00592\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ OutputByteStream>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00593}\mbox{\hyperlink{struct_a_s_c_i_i_a218b244b9cd961ea6c5775a734cec20e}{00593}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_a_s_c_i_i_a218b244b9cd961ea6c5775a734cec20e}{Put}}(OutputByteStream\&\ os,\ \mbox{\hyperlink{struct_a_s_c_i_i_a55aad132d2a556a25f6c02e4f9b372de}{Ch}}\ c)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00594}00594\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_af95188da1d8eb6d4b148fe9ce71cd7c4}{RAPIDJSON\_STATIC\_ASSERT}}(\textcolor{keyword}{sizeof}(\textcolor{keyword}{typename}\ OutputByteStream::Ch)\ ==\ 1);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00595}00595\ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}typename\ OutputByteStream::Ch\textcolor{keyword}{>}(c));}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00596}00596\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00597}00597\ \};}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00598}00598\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00600}00600\ \textcolor{comment}{//\ AutoUTF}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00601}00601\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00603}\mbox{\hyperlink{encodings_8h_ac9448aedf514a5bb509bae73a9ce4e58}{00603}}\ \textcolor{keyword}{enum}\ \mbox{\hyperlink{encodings_8h_ac9448aedf514a5bb509bae73a9ce4e58}{UTFType}}\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00604}\mbox{\hyperlink{encodings_8h_ac9448aedf514a5bb509bae73a9ce4e58a7fd9945f1c494a4a4ee9446017e790f1}{00604}}\ \ \ \ \ \mbox{\hyperlink{encodings_8h_ac9448aedf514a5bb509bae73a9ce4e58a7fd9945f1c494a4a4ee9446017e790f1}{kUTF8}}\ =\ 0,\ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00605}\mbox{\hyperlink{encodings_8h_ac9448aedf514a5bb509bae73a9ce4e58ab72f5865db6af4e33757ee52ddad9fda}{00605}}\ \ \ \ \ \mbox{\hyperlink{encodings_8h_ac9448aedf514a5bb509bae73a9ce4e58ab72f5865db6af4e33757ee52ddad9fda}{kUTF16LE}}\ =\ 1,\ \ \ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00606}\mbox{\hyperlink{encodings_8h_ac9448aedf514a5bb509bae73a9ce4e58a1a455c6e8be641e715de9aa8ffa6cea0}{00606}}\ \ \ \ \ \mbox{\hyperlink{encodings_8h_ac9448aedf514a5bb509bae73a9ce4e58a1a455c6e8be641e715de9aa8ffa6cea0}{kUTF16BE}}\ =\ 2,\ \ \ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00607}\mbox{\hyperlink{encodings_8h_ac9448aedf514a5bb509bae73a9ce4e58a885dec757d256c427be6759296d482e0}{00607}}\ \ \ \ \ \mbox{\hyperlink{encodings_8h_ac9448aedf514a5bb509bae73a9ce4e58a885dec757d256c427be6759296d482e0}{kUTF32LE}}\ =\ 3,\ \ \ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00608}00608\ \ \ \ \ \mbox{\hyperlink{encodings_8h_ac9448aedf514a5bb509bae73a9ce4e58a14da8da33c9f9aa904bf0d1aac3fa76e}{kUTF32BE}}\ =\ 4\ \ \ \ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00609}\mbox{\hyperlink{encodings_8h_ac9448aedf514a5bb509bae73a9ce4e58a14da8da33c9f9aa904bf0d1aac3fa76e}{00609}}\ \};}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00610}00610\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00612}00612\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00614}00614\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ CharType>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00615}\mbox{\hyperlink{struct_auto_u_t_f}{00615}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_auto_u_t_f}{AutoUTF}}\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00616}\mbox{\hyperlink{struct_auto_u_t_f_a1dcd687806dff36d9e831023809da97e}{00616}}\ \ \ \ \ \textcolor{keyword}{typedef}\ CharType\ \mbox{\hyperlink{struct_auto_u_t_f_a1dcd687806dff36d9e831023809da97e}{Ch}};}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00617}00617\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00618}\mbox{\hyperlink{struct_auto_u_t_f_ab0630ebb4330775acf381c27eb2ba00cadc86ae046cd64f591495ac635a5c04c2}{00618}}\ \ \ \ \ \textcolor{keyword}{enum}\ \{\ \mbox{\hyperlink{struct_auto_u_t_f_ab0630ebb4330775acf381c27eb2ba00cadc86ae046cd64f591495ac635a5c04c2}{supportUnicode}}\ =\ 1\ \};}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00619}00619\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00620}\mbox{\hyperlink{encodings_8h_a6530c8834a049a0ff230b56072df6c24}{00620}}\ \textcolor{preprocessor}{\#define\ RAPIDJSON\_ENCODINGS\_FUNC(x)\ UTF8<Ch>::x,\ UTF16LE<Ch>::x,\ UTF16BE<Ch>::x,\ UTF32LE<Ch>::x,\ UTF32BE<Ch>::x}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00621}00621\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00622}00622\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ OutputStream>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00623}\mbox{\hyperlink{struct_auto_u_t_f_a414946115261f886e74dd42cb4b98781}{00623}}\ \ \ \ \ \textcolor{keyword}{static}\ RAPIDJSON\_FORCEINLINE\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_auto_u_t_f_a414946115261f886e74dd42cb4b98781}{Encode}}(OutputStream\&\ os,\ \textcolor{keywordtype}{unsigned}\ codepoint)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00624}00624\ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ void\ (*EncodeFunc)(OutputStream\&,\ unsigned);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00625}00625\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ EncodeFunc\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}[]\ =\ \{\ \mbox{\hyperlink{encodings_8h_a6530c8834a049a0ff230b56072df6c24}{RAPIDJSON\_ENCODINGS\_FUNC}}(\mbox{\hyperlink{struct_auto_u_t_f_a414946115261f886e74dd42cb4b98781}{Encode}})\ \};}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00626}00626\ \ \ \ \ \ \ \ \ (*\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}[os.GetType()])(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ codepoint);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00627}00627\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00628}00628\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00629}00629\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ OutputStream>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00630}\mbox{\hyperlink{struct_auto_u_t_f_a05f5dcd1f153b61b763e44ed452de251}{00630}}\ \ \ \ \ \textcolor{keyword}{static}\ RAPIDJSON\_FORCEINLINE\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_auto_u_t_f_a05f5dcd1f153b61b763e44ed452de251}{EncodeUnsafe}}(OutputStream\&\ os,\ \textcolor{keywordtype}{unsigned}\ codepoint)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00631}00631\ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ void\ (*EncodeFunc)(OutputStream\&,\ unsigned);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00632}00632\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ EncodeFunc\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}[]\ =\ \{\ \mbox{\hyperlink{encodings_8h_a6530c8834a049a0ff230b56072df6c24}{RAPIDJSON\_ENCODINGS\_FUNC}}(\mbox{\hyperlink{struct_auto_u_t_f_a05f5dcd1f153b61b763e44ed452de251}{EncodeUnsafe}})\ \};}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00633}00633\ \ \ \ \ \ \ \ \ (*\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}[os.GetType()])(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ codepoint);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00634}00634\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00635}00635\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00636}00636\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ InputStream>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00637}\mbox{\hyperlink{struct_auto_u_t_f_aa5e3c1dc23dbb75f6442ff69500a35b0}{00637}}\ \ \ \ \ \textcolor{keyword}{static}\ RAPIDJSON\_FORCEINLINE\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_auto_u_t_f_aa5e3c1dc23dbb75f6442ff69500a35b0}{Decode}}(InputStream\&\ is,\ \textcolor{keywordtype}{unsigned}*\ codepoint)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00638}00638\ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ bool\ (*DecodeFunc)(InputStream\&,\ \textcolor{keywordtype}{unsigned}*);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00639}00639\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ DecodeFunc\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}[]\ =\ \{\ \mbox{\hyperlink{encodings_8h_a6530c8834a049a0ff230b56072df6c24}{RAPIDJSON\_ENCODINGS\_FUNC}}(\mbox{\hyperlink{struct_auto_u_t_f_aa5e3c1dc23dbb75f6442ff69500a35b0}{Decode}})\ \};}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00640}00640\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (*\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}[is.GetType()])(is,\ codepoint);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00641}00641\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00642}00642\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00643}00643\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ InputStream,\ \textcolor{keyword}{typename}\ OutputStream>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00644}\mbox{\hyperlink{struct_auto_u_t_f_a36dd6f226d6a07c12161e21c0aff20b1}{00644}}\ \ \ \ \ \textcolor{keyword}{static}\ RAPIDJSON\_FORCEINLINE\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_auto_u_t_f_a36dd6f226d6a07c12161e21c0aff20b1}{Validate}}(InputStream\&\ is,\ OutputStream\&\ os)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00645}00645\ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ bool\ (*ValidateFunc)(InputStream\&,\ OutputStream\&);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00646}00646\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ ValidateFunc\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}[]\ =\ \{\ \mbox{\hyperlink{encodings_8h_a6530c8834a049a0ff230b56072df6c24}{RAPIDJSON\_ENCODINGS\_FUNC}}(\mbox{\hyperlink{struct_auto_u_t_f_a36dd6f226d6a07c12161e21c0aff20b1}{Validate}})\ \};}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00647}00647\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (*\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}[is.GetType()])(is,\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00648}00648\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00649}00649\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00650}00650\ \textcolor{preprocessor}{\#undef\ RAPIDJSON\_ENCODINGS\_FUNC}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00651}00651\ \};}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00652}00652\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00654}00654\ \textcolor{comment}{//\ Transcoder}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00655}00655\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00657}00657\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ SourceEncoding,\ \textcolor{keyword}{typename}\ TargetEncoding>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00658}\mbox{\hyperlink{struct_transcoder}{00658}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_transcoder}{Transcoder}}\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00660}00660\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ InputStream,\ \textcolor{keyword}{typename}\ OutputStream>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00661}\mbox{\hyperlink{struct_transcoder_a0ea2edfe35784ebf1063921d2bd5fb66}{00661}}\ \ \ \ \ \textcolor{keyword}{static}\ RAPIDJSON\_FORCEINLINE\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_transcoder_a0ea2edfe35784ebf1063921d2bd5fb66}{Transcode}}(InputStream\&\ is,\ OutputStream\&\ os)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00662}00662\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ codepoint;}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00663}00663\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!SourceEncoding::Decode(is,\ \&codepoint))}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00664}00664\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00665}00665\ \ \ \ \ \ \ \ \ TargetEncoding::Encode(os,\ codepoint);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00666}00666\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00667}00667\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00668}00668\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00669}00669\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ InputStream,\ \textcolor{keyword}{typename}\ OutputStream>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00670}\mbox{\hyperlink{struct_transcoder_a16345a912c679b2ea197328eb1444f82}{00670}}\ \ \ \ \ \textcolor{keyword}{static}\ RAPIDJSON\_FORCEINLINE\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_transcoder_a16345a912c679b2ea197328eb1444f82}{TranscodeUnsafe}}(InputStream\&\ is,\ OutputStream\&\ os)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00671}00671\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ codepoint;}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00672}00672\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!SourceEncoding::Decode(is,\ \&codepoint))}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00673}00673\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00674}00674\ \ \ \ \ \ \ \ \ TargetEncoding::EncodeUnsafe(os,\ codepoint);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00675}00675\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00676}00676\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00677}00677\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00679}00679\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ InputStream,\ \textcolor{keyword}{typename}\ OutputStream>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00680}\mbox{\hyperlink{struct_transcoder_a8a64aa837f7962894a99f63232472543}{00680}}\ \ \ \ \ \textcolor{keyword}{static}\ RAPIDJSON\_FORCEINLINE\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_transcoder_a8a64aa837f7962894a99f63232472543}{Validate}}(InputStream\&\ is,\ OutputStream\&\ os)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00681}00681\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_transcoder_a0ea2edfe35784ebf1063921d2bd5fb66}{Transcode}}(is,\ os);\ \ \ \textcolor{comment}{//\ Since\ source/target\ encoding\ is\ different,\ must\ transcode.}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00682}00682\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00683}00683\ \};}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00684}00684\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00685}00685\ \textcolor{comment}{//\ Forward\ declaration.}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00686}00686\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ Stream>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00687}00687\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{encodings_8h_ad57ba7f2912c5509924b69dec7db4396}{PutUnsafe}}(\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}}\&\ stream,\ \textcolor{keyword}{typename}\ Stream::Ch\ c);}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00688}00688\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00690}00690\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ Encoding>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00691}\mbox{\hyperlink{struct_transcoder_3_01_encoding_00_01_encoding_01_4}{00691}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_transcoder}{Transcoder}}<\mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}},\ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}>\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00692}00692\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ InputStream,\ \textcolor{keyword}{typename}\ OutputStream>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00693}\mbox{\hyperlink{struct_transcoder_3_01_encoding_00_01_encoding_01_4_aad11cdc2b829123a7b9969e34d456813}{00693}}\ \ \ \ \ \textcolor{keyword}{static}\ RAPIDJSON\_FORCEINLINE\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_transcoder_3_01_encoding_00_01_encoding_01_4_aad11cdc2b829123a7b9969e34d456813}{Transcode}}(InputStream\&\ is,\ OutputStream\&\ os)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00694}00694\ \ \ \ \ \ \ \ \ os.Put(is.Take());\ \ \textcolor{comment}{//\ Just\ copy\ one\ code\ unit.\ This\ semantic\ is\ different\ from\ primary\ template\ class.}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00695}00695\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00696}00696\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00697}00697\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00698}00698\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ InputStream,\ \textcolor{keyword}{typename}\ OutputStream>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00699}\mbox{\hyperlink{struct_transcoder_3_01_encoding_00_01_encoding_01_4_addf67decfff7d0de510c47842eb53cef}{00699}}\ \ \ \ \ \textcolor{keyword}{static}\ RAPIDJSON\_FORCEINLINE\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_transcoder_3_01_encoding_00_01_encoding_01_4_addf67decfff7d0de510c47842eb53cef}{TranscodeUnsafe}}(InputStream\&\ is,\ OutputStream\&\ os)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00700}00700\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{encodings_8h_ad57ba7f2912c5509924b69dec7db4396}{PutUnsafe}}(os,\ is.Take());\ \ \textcolor{comment}{//\ Just\ copy\ one\ code\ unit.\ This\ semantic\ is\ different\ from\ primary\ template\ class.}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00701}00701\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00702}00702\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00703}00703\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00704}00704\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ InputStream,\ \textcolor{keyword}{typename}\ OutputStream>}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00705}\mbox{\hyperlink{struct_transcoder_3_01_encoding_00_01_encoding_01_4_a536aa3930251161d05e112947ec2f9c8}{00705}}\ \ \ \ \ \textcolor{keyword}{static}\ RAPIDJSON\_FORCEINLINE\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_transcoder_3_01_encoding_00_01_encoding_01_4_a536aa3930251161d05e112947ec2f9c8}{Validate}}(InputStream\&\ is,\ OutputStream\&\ os)\ \{}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00706}00706\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Encoding::Validate(is,\ os);\ \ \textcolor{comment}{//\ source/target\ encoding\ are\ the\ same}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00707}00707\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00708}00708\ \};}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00709}00709\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00710}00710\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gaf18f052a98b9f5df5448d39484b743c1}{RAPIDJSON\_NAMESPACE\_END}}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00711}00711\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00712}00712\ \textcolor{preprocessor}{\#if\ defined(\_\_GNUC\_\_)\ ||\ (defined(\_MSC\_VER)\ \&\&\ !defined(\_\_clang\_\_))}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00713}00713\ RAPIDJSON\_DIAG\_POP}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00714}00714\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00715}00715\ }
+\DoxyCodeLine{\Hypertarget{encodings_8h_source_l00716}00716\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ RAPIDJSON\_ENCODINGS\_H\_}}
+
+\end{DoxyCode}

@@ -1,0 +1,45 @@
+\doxysection{libraries/chain/fork\+\_\+database.cpp File Reference}
+\hypertarget{fork__database_8cpp}{}\label{fork__database_8cpp}\index{libraries/chain/fork\_database.cpp@{libraries/chain/fork\_database.cpp}}
+{\ttfamily \#include $<$sysio/chain/fork\+\_\+database.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/exceptions.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/multi\+\_\+index\+\_\+container.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/multi\+\_\+index/member.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/multi\+\_\+index/ordered\+\_\+index.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/multi\+\_\+index/hashed\+\_\+index.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/multi\+\_\+index/mem\+\_\+fun.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/multi\+\_\+index/global\+\_\+fun.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/multi\+\_\+index/composite\+\_\+key.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/io/fstream.\+hpp$>$}\newline
+{\ttfamily \#include $<$fstream$>$}\newline
+{\ttfamily \#include $<$shared\+\_\+mutex$>$}\newline
+Include dependency graph for fork\+\_\+database.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{fork__database_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl}{sysio\+::chain\+::fork\+\_\+database\+\_\+impl}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain}{sysio\+::chain}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef multi\+\_\+index\+\_\+container$<$ \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\+\_\+state\+\_\+ptr}}, indexed\+\_\+by$<$ hashed\+\_\+unique$<$ tag$<$ by\+\_\+block\+\_\+id $>$, member$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1block__header__state}{block\+\_\+header\+\_\+state}}, \mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{block\+\_\+id\+\_\+type}}, \&\mbox{\hyperlink{structsysio_1_1chain_1_1block__header__state_a19f6899e80705092e990411eaed6e7a8}{block\+\_\+header\+\_\+state\+::id}} $>$, std\+::hash$<$ \mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{block\+\_\+id\+\_\+type}} $>$ $>$, ordered\+\_\+non\+\_\+unique$<$ tag$<$ by\+\_\+prev $>$, const\+\_\+mem\+\_\+fun$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1block__header__state}{block\+\_\+header\+\_\+state}}, const \mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{block\+\_\+id\+\_\+type}} \&, \&\mbox{\hyperlink{structsysio_1_1chain_1_1block__header__state_aa04eb1de498c4f32522020819d039eee}{block\+\_\+header\+\_\+state\+::prev}} $>$ $>$, ordered\+\_\+unique$<$ tag$<$ by\+\_\+lib\+\_\+block\+\_\+num $>$, composite\+\_\+key$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1block__state}{block\+\_\+state}}, global\+\_\+fun$<$ const \mbox{\hyperlink{structsysio_1_1chain_1_1block__state}{block\+\_\+state}} \&, bool, \&\mbox{\hyperlink{namespacesysio_1_1chain_a2879f555341b6f05da08bb064081e44d}{block\+\_\+state\+\_\+is\+\_\+valid}} $>$, member$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1detail_1_1block__header__state__common}{detail\+::block\+\_\+header\+\_\+state\+\_\+common}}, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}, \&\mbox{\hyperlink{structsysio_1_1chain_1_1detail_1_1block__header__state__common_a3bdf45e437e6440790ee3ccedb1dda05}{detail\+::block\+\_\+header\+\_\+state\+\_\+common\+::dpos\+\_\+irreversible\+\_\+blocknum}} $>$, member$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1detail_1_1block__header__state__common}{detail\+::block\+\_\+header\+\_\+state\+\_\+common}}, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}, \&\mbox{\hyperlink{structsysio_1_1chain_1_1detail_1_1block__header__state__common_ae85e3375836639cb1e7543aea7cf0552}{detail\+::block\+\_\+header\+\_\+state\+\_\+common\+::block\+\_\+num}} $>$, member$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1block__header__state}{block\+\_\+header\+\_\+state}}, \mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{block\+\_\+id\+\_\+type}}, \&\mbox{\hyperlink{structsysio_1_1chain_1_1block__header__state_a19f6899e80705092e990411eaed6e7a8}{block\+\_\+header\+\_\+state\+::id}} $>$ $>$, composite\+\_\+key\+\_\+compare$<$ std\+::greater$<$ bool $>$, std\+::greater$<$ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} $>$, std\+::greater$<$ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} $>$, \mbox{\hyperlink{structsysio_1_1chain_1_1sha256__less}{sha256\+\_\+less}} $>$ $>$ $>$ $>$ \mbox{\hyperlink{namespacesysio_1_1chain_a41ae8badf840b6de83fb1a7697c0b583}{sysio\+::chain\+::fork\+\_\+multi\+\_\+index\+\_\+type}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{namespacesysio_1_1chain_a2879f555341b6f05da08bb064081e44d}{sysio\+::chain\+::block\+\_\+state\+\_\+is\+\_\+valid}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1block__state}{block\+\_\+state}} \&bs)
+\item 
+bool \mbox{\hyperlink{namespacesysio_1_1chain_a4d023005b3b47d76c62beeaebc291fa3}{sysio\+::chain\+::first\+\_\+preferred}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1block__header__state}{block\+\_\+header\+\_\+state}} \&lhs, const \mbox{\hyperlink{structsysio_1_1chain_1_1block__header__state}{block\+\_\+header\+\_\+state}} \&rhs)
+\end{DoxyCompactItemize}

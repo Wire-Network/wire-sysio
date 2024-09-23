@@ -1,0 +1,81 @@
+\doxysection{max\+\_\+pages\+\_\+tests.\+cpp}
+\hypertarget{max__pages__tests_8cpp_source}{}\label{max__pages__tests_8cpp_source}\index{libraries/sys-\/vm/tests/max\_pages\_tests.cpp@{libraries/sys-\/vm/tests/max\_pages\_tests.cpp}}
+\mbox{\hyperlink{max__pages__tests_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <sysio/vm/backend.hpp>}}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{sys-vm_2tests_2utils_8hpp}{utils.hpp}}"{}}}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{single__include_2catch2_2catch_8hpp}{catch2/catch.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00006}00006\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacesysio_1_1vm}{sysio::vm}};}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00008}00008\ \textcolor{keyword}{extern}\ \mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator}{wasm\_allocator}}\ \mbox{\hyperlink{max__pages__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}};}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00010}00010\ \textcolor{keyword}{namespace\ }\{}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00012}00012\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00013}00013\ \textcolor{comment}{\ *\ (module}}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00014}00014\ \textcolor{comment}{\ *\ \ \ (memory\ 3\ 6)}}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00015}00015\ \textcolor{comment}{\ *\ \ \ (func\ (export\ "{}f"{})\ (result\ i32)}}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00016}00016\ \textcolor{comment}{\ *\ \ \ \ \ (i32.const\ 1)}}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00017}00017\ \textcolor{comment}{\ *\ \ \ \ \ (memory.grow)}}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00018}00018\ \textcolor{comment}{\ *\ \ \ )}}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00019}00019\ \textcolor{comment}{\ *\ )}}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00020}00020\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00021}00021\ std::vector<uint8\_t>\ mem\_wasm\ =\ \{}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00022}00022\ \ \ \ 0x00,\ 0x61,\ 0x73,\ 0x6d,\ 0x01,\ 0x00,\ 0x00,\ 0x00,\ 0x01,\ 0x05,\ 0x01,\ 0x60,}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00023}00023\ \ \ \ 0x00,\ 0x01,\ 0x7f,\ 0x03,\ 0x02,\ 0x01,\ 0x00,\ 0x05,\ 0x04,\ 0x01,\ 0x01,\ 0x03,}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00024}00024\ \ \ \ 0x06,\ 0x07,\ 0x05,\ 0x01,\ 0x01,\ 0x66,\ 0x00,\ 0x00,\ 0x0a,\ 0x08,\ 0x01,\ 0x06,}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00025}00025\ \ \ \ 0x00,\ 0x41,\ 0x01,\ 0x40,\ 0x00,\ 0x0b}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00026}00026\ \};}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00028}00028\ \textcolor{keyword}{struct\ }empty\_options\ \{\};}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00029}00029\ \textcolor{keyword}{struct\ }static\_options\_2\ \{}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00030}00030\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ std::uint32\_t\ \mbox{\hyperlink{namespacesysio_1_1vm_a0ae6751a77293216df4656dee5081eb2a95b0fd1e8f1e450ae134af180be894f3}{max\_pages}}\ =\ 2;}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00031}00031\ \};}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00032}00032\ \textcolor{keyword}{struct\ }static\_options\_3\ \{}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00033}00033\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ std::uint32\_t\ \mbox{\hyperlink{namespacesysio_1_1vm_a0ae6751a77293216df4656dee5081eb2a95b0fd1e8f1e450ae134af180be894f3}{max\_pages}}\ =\ 3;}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00034}00034\ \};}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00035}00035\ \textcolor{keyword}{struct\ }dynamic\_options\ \{}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00036}00036\ \ \ \ std::uint32\_t\ \mbox{\hyperlink{namespacesysio_1_1vm_a0ae6751a77293216df4656dee5081eb2a95b0fd1e8f1e450ae134af180be894f3}{max\_pages}};}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00037}00037\ \};}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00039}00039\ \}}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00041}\mbox{\hyperlink{max__pages__tests_8cpp_a4518c616205d0cdbc45d6eb9f6ccfc97}{00041}}\ \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_a3e5f265967cb6d730cad8ca15e807ac2}{BACKEND\_TEST\_CASE}}(\textcolor{stringliteral}{"{}Test\ max\_pages\ default"{}},\ \textcolor{stringliteral}{"{}[max\_pages\_test]"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00042}00042\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType>}};}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00043}00043\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend}}(mem\_wasm,\ \&\mbox{\hyperlink{max__pages__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00044}00044\ \}}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00046}\mbox{\hyperlink{max__pages__tests_8cpp_a25b52c8fc7678a56b25e46d821e70ebc}{00046}}\ \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_a3e5f265967cb6d730cad8ca15e807ac2}{BACKEND\_TEST\_CASE}}(\textcolor{stringliteral}{"{}Test\ max\_pages\ unlimited"{}},\ \textcolor{stringliteral}{"{}[max\_pages\_test]"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00047}00047\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ empty\_options>}};}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00048}00048\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend}}(mem\_wasm,\ \&\mbox{\hyperlink{max__pages__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00049}00049\ \}}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00051}\mbox{\hyperlink{max__pages__tests_8cpp_a448625321b285046e86f230407c5086f}{00051}}\ \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_a3e5f265967cb6d730cad8ca15e807ac2}{BACKEND\_TEST\_CASE}}(\textcolor{stringliteral}{"{}Test\ max\_pages\ static\ fail"{}},\ \textcolor{stringliteral}{"{}[max\_pages\_test]"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00052}00052\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ static\_options\_2>}};}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00053}00053\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(mem\_wasm,\ \&\mbox{\hyperlink{max__pages__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00054}00054\ \}}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00056}\mbox{\hyperlink{max__pages__tests_8cpp_ac75985fdea7355c9d5d0d39ff2b4d5a6}{00056}}\ \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_a3e5f265967cb6d730cad8ca15e807ac2}{BACKEND\_TEST\_CASE}}(\textcolor{stringliteral}{"{}Test\ max\_pages\ static\ pass"{}},\ \textcolor{stringliteral}{"{}[max\_pages\_test]"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00057}00057\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ static\_options\_3>}};}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00058}00058\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend}}(mem\_wasm,\ \&\mbox{\hyperlink{max__pages__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00059}00059\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}f"{}})-\/>to\_i32()\ ==\ -\/1);}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00060}00060\ \}}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00062}\mbox{\hyperlink{max__pages__tests_8cpp_a564a8a3d1e65ec7861c6b1c03bb1a66b}{00062}}\ \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_a3e5f265967cb6d730cad8ca15e807ac2}{BACKEND\_TEST\_CASE}}(\textcolor{stringliteral}{"{}Test\ max\_pages\ dynamic\ fail"{}},\ \textcolor{stringliteral}{"{}[max\_pages\_test]"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00063}00063\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ dynamic\_options>}};}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00064}00064\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(mem\_wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\{2\}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00065}00065\ \}}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00067}\mbox{\hyperlink{max__pages__tests_8cpp_a59ae3f6c16b1afed250789dc8fe8a329}{00067}}\ \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_a3e5f265967cb6d730cad8ca15e807ac2}{BACKEND\_TEST\_CASE}}(\textcolor{stringliteral}{"{}Test\ max\_pages\ dynamic\ pass"{}},\ \textcolor{stringliteral}{"{}[max\_pages\_test]"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00068}00068\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ dynamic\_options>}};}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00069}00069\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend}}(mem\_wasm,\ \&\mbox{\hyperlink{max__pages__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}},\ dynamic\_options\{3\});}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00070}00070\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}f"{}})-\/>to\_i32()\ ==\ -\/1);}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00071}00071\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_ad9fabfa0081daaedb3fbe3a62b42bd01}{initialize}}(\textcolor{keyword}{nullptr},\ dynamic\_options\{4\});}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00072}00072\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\_with\_return}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}f"{}})-\/>to\_i32()\ ==\ 3);}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00073}00073\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_ad9fabfa0081daaedb3fbe3a62b42bd01}{initialize}}(\textcolor{keyword}{nullptr},\ dynamic\_options\{3\});}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00074}00074\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_ad9fabfa0081daaedb3fbe3a62b42bd01}{initialize}}(\textcolor{keyword}{nullptr},\ dynamic\_options\{2\}),\ std::exception);}
+\DoxyCodeLine{\Hypertarget{max__pages__tests_8cpp_source_l00075}00075\ \}}
+
+\end{DoxyCode}

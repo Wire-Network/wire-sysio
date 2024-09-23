@@ -1,0 +1,65 @@
+\doxysection{libraries/sys-\/vm/external/softfloat/source/s\+\_\+try\+Propagate\+Na\+NExt\+F80M.c File Reference}
+\hypertarget{sys-vm_2external_2softfloat_2source_2s__try_propagate_na_n_ext_f80_m_8c}{}\label{sys-vm_2external_2softfloat_2source_2s__try_propagate_na_n_ext_f80_m_8c}\index{libraries/sys-\/vm/external/softfloat/source/s\_tryPropagateNaNExtF80M.c@{libraries/sys-\/vm/external/softfloat/source/s\_tryPropagateNaNExtF80M.c}}
+{\ttfamily \#include $<$stdbool.\+h$>$}\newline
+{\ttfamily \#include "{}platform.\+h"{}}\newline
+{\ttfamily \#include "{}internals.\+h"{}}\newline
+{\ttfamily \#include "{}specialize.\+h"{}}\newline
+Include dependency graph for s\+\_\+try\+Propagate\+Na\+NExt\+F80\+M.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sys-vm_2external_2softfloat_2source_2s__try_propagate_na_n_ext_f80_m_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2s__try_propagate_na_n_ext_f80_m_8c_a5da15212eaf2079cda13b971a0e5af37}{softfloat\+\_\+try\+Propagate\+Na\+NExt\+F80M}} (const struct \mbox{\hyperlink{structext_float80_m}{ext\+Float80M}} \texorpdfstring{$\ast$}{*}a\+SPtr, const struct \mbox{\hyperlink{structext_float80_m}{ext\+Float80M}} \texorpdfstring{$\ast$}{*}b\+SPtr, struct \mbox{\hyperlink{structext_float80_m}{ext\+Float80M}} \texorpdfstring{$\ast$}{*}z\+SPtr)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{sys-vm_2external_2softfloat_2source_2s__try_propagate_na_n_ext_f80_m_8c_a5da15212eaf2079cda13b971a0e5af37}\index{s\_tryPropagateNaNExtF80M.c@{s\_tryPropagateNaNExtF80M.c}!softfloat\_tryPropagateNaNExtF80M@{softfloat\_tryPropagateNaNExtF80M}}
+\index{softfloat\_tryPropagateNaNExtF80M@{softfloat\_tryPropagateNaNExtF80M}!s\_tryPropagateNaNExtF80M.c@{s\_tryPropagateNaNExtF80M.c}}
+\doxysubsubsection{\texorpdfstring{softfloat\_tryPropagateNaNExtF80M()}{softfloat\_tryPropagateNaNExtF80M()}}
+{\footnotesize\ttfamily \label{sys-vm_2external_2softfloat_2source_2s__try_propagate_na_n_ext_f80_m_8c_a5da15212eaf2079cda13b971a0e5af37} 
+bool softfloat\+\_\+try\+Propagate\+Na\+NExt\+F80M (\begin{DoxyParamCaption}\item[{const struct \mbox{\hyperlink{structext_float80_m}{ext\+Float80M}} \texorpdfstring{$\ast$}{*}}]{a\+SPtr}{, }\item[{const struct \mbox{\hyperlink{structext_float80_m}{ext\+Float80M}} \texorpdfstring{$\ast$}{*}}]{b\+SPtr}{, }\item[{struct \mbox{\hyperlink{structext_float80_m}{ext\+Float80M}} \texorpdfstring{$\ast$}{*}}]{z\+SPtr}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2s__try_propagate_na_n_ext_f80_m_8c_source_l00043}{43}} of file \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2s__try_propagate_na_n_ext_f80_m_8c_source}{s\+\_\+try\+Propagate\+Na\+NExt\+F80\+M.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00048\ \{}
+\DoxyCodeLine{00049\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a6ed085329b153773ff76afa0702cf897}{uint\_fast16\_t}}\ ui64;}
+\DoxyCodeLine{00050\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ ui0;}
+\DoxyCodeLine{00051\ }
+\DoxyCodeLine{00052\ \ \ \ \ ui64\ =\ aSPtr-\/>\mbox{\hyperlink{structext_float80_m_afcc87c4645279344c5365a291766afe2}{signExp}};}
+\DoxyCodeLine{00053\ \ \ \ \ ui0\ \ =\ aSPtr-\/>\mbox{\hyperlink{structext_float80_m_ac0c736880d01d0abd0a818e658755b3b}{signif}};}
+\DoxyCodeLine{00054\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a252e90dd494604f3457bebaae12320b9}{isNaNExtF80UI}}(\ ui64,\ ui0\ )\ )\ \textcolor{keywordflow}{goto}\ propagateNaN;}
+\DoxyCodeLine{00055\ \ \ \ \ ui64\ =\ bSPtr-\/>\mbox{\hyperlink{structext_float80_m_afcc87c4645279344c5365a291766afe2}{signExp}};}
+\DoxyCodeLine{00056\ \ \ \ \ ui0\ \ =\ bSPtr-\/>\mbox{\hyperlink{structext_float80_m_ac0c736880d01d0abd0a818e658755b3b}{signif}};}
+\DoxyCodeLine{00057\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a252e90dd494604f3457bebaae12320b9}{isNaNExtF80UI}}(\ ui64,\ ui0\ )\ )\ \textcolor{keywordflow}{goto}\ propagateNaN;}
+\DoxyCodeLine{00058\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00059\ \ propagateNaN:}
+\DoxyCodeLine{00060\ \ \ \ \ \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2s__propagate_na_n_ext_f80_m_8c_a6d1fff7785c3407c872c7c2147223b5a}{softfloat\_propagateNaNExtF80M}}(\ aSPtr,\ bSPtr,\ zSPtr\ );}
+\DoxyCodeLine{00061\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00062\ }
+\DoxyCodeLine{00063\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sys-vm_2external_2softfloat_2source_2s__try_propagate_na_n_ext_f80_m_8c_a5da15212eaf2079cda13b971a0e5af37_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sys-vm_2external_2softfloat_2source_2s__try_propagate_na_n_ext_f80_m_8c_a5da15212eaf2079cda13b971a0e5af37_icgraph}
+\end{center}
+\end{figure}

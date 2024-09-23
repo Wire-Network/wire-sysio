@@ -1,0 +1,10 @@
+<map id="websocketpp::transport::asio::endpoint::init_asio" name="websocketpp::transport::asio::endpoint::init_asio">
+<area shape="rect" id="Node000001" title="Initialize asio transport with internal io_service." alt="" coords="220,71,386,111"/>
+<area shape="poly" id="edge1_Node000001_Node000001" title=" " alt="" coords="338,57,325,52,303,49,282,51,270,56,265,62,267,69,262,71,260,61,267,52,281,46,303,44,326,46,340,53"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1transport_1_1asio_1_1endpoint.html#a320fc4ea3a151afaf8b973ce32effd25" title="initialize asio transport with external io_service" alt="" coords="5,5,172,46"/>
+<area shape="poly" id="edge2_Node000001_Node000002" title=" " alt="" coords="219,68,157,49,159,44,220,63"/>
+<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1transport_1_1asio_1_1endpoint.html#a7b4249fd3e2663323ac29ef7935278de" title="Initialize asio transport with internal io_service (exception free)" alt="" coords="5,71,172,111"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="204,94,172,94,172,88,204,88"/>
+<area shape="rect" id="Node000004" href="$structmock__endpoint.html#ac8289dd49b44a75ea155985a8ddbab50" title=" " alt="" coords="14,136,163,177"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="220,119,159,138,157,133,219,114"/>
+</map>

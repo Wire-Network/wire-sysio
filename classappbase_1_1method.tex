@@ -1,0 +1,243 @@
+\doxysection{appbase\+::method\texorpdfstring{$<$}{<} Function\+Sig, Dispatch\+Policy \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classappbase_1_1method}{}\label{classappbase_1_1method}\index{appbase::method$<$ FunctionSig, DispatchPolicy $>$@{appbase::method$<$ FunctionSig, DispatchPolicy $>$}}
+
+
+{\ttfamily \#include $<$method.\+hpp$>$}
+
+
+
+Inheritance diagram for appbase\+::method\texorpdfstring{$<$}{<} Function\+Sig, Dispatch\+Policy \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=218pt]{classappbase_1_1method__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for appbase\+::method\texorpdfstring{$<$}{<} Function\+Sig, Dispatch\+Policy \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=218pt]{classappbase_1_1method__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classappbase_1_1method_1_1handle}{handle}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{classappbase_1_1method_1_1handle}{handle}} \mbox{\hyperlink{classappbase_1_1method_a72e40fc195aa3d02dbc5e80c33950495}{register\+\_\+provider}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} provider, int \mbox{\hyperlink{structappbase_1_1priority}{priority}}=0)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classappbase_1_1method_a167f4d022de1046cbf8b4eeb69b7bc44}{method}} ()=default
+\item 
+virtual \mbox{\hyperlink{classappbase_1_1method_ad6bd3f7ba672fd501c2500f2266ff92b}{\texorpdfstring{$\sim$}{\string~}method}} ()=default
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static void \mbox{\hyperlink{classappbase_1_1method_a7d085ad3c8a482b32db5e2ccb04bd12a}{deleter}} (void \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{namespaceappbase_af7b12aeed8c3ae8f23a8bf8d553f5a04}{erased\+\_\+method\+\_\+ptr}})
+\item 
+static \mbox{\hyperlink{classappbase_1_1method}{method}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classappbase_1_1method_a27909571888c9a1e2125c57914dc0c11}{get\+\_\+method}} (\mbox{\hyperlink{namespaceappbase_af7b12aeed8c3ae8f23a8bf8d553f5a04}{erased\+\_\+method\+\_\+ptr}} \&ptr)
+\item 
+static \mbox{\hyperlink{namespaceappbase_af7b12aeed8c3ae8f23a8bf8d553f5a04}{erased\+\_\+method\+\_\+ptr}} \mbox{\hyperlink{classappbase_1_1method_a187def2e2170a897a116def11785b1d6}{make\+\_\+unique}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classappbase_1_1method_a9e2f411dc2cf5784cc01a89c488b4056}{appbase\+::application}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Function\+Sig, typename Dispatch\+Policy$>$\newline
+class appbase\+::method$<$ Function\+Sig, Dispatch\+Policy $>$}
+\doxylink{struct_a}{A} method is a loosely linked application level function. Callers can grab a method and call it Providers can grab a method and register themselves
+
+This removes the need to tightly couple different plugins in the application.
+
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em Function\+Sig} & -\/ the signature of the method (eg void(int, int)) \\
+\hline
+{\em Dispatch\+Policy} & -\/ the policy for dispatching this method \\
+\hline
+\end{DoxyTemplParams}
+
+
+Definition at line \mbox{\hyperlink{method_8hpp_source_l00197}{197}} of file \mbox{\hyperlink{method_8hpp_source}{method.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classappbase_1_1method_a167f4d022de1046cbf8b4eeb69b7bc44}\index{appbase::method$<$ FunctionSig, DispatchPolicy $>$@{appbase::method$<$ FunctionSig, DispatchPolicy $>$}!method@{method}}
+\index{method@{method}!appbase::method$<$ FunctionSig, DispatchPolicy $>$@{appbase::method$<$ FunctionSig, DispatchPolicy $>$}}
+\doxysubsubsection{\texorpdfstring{method()}{method()}}
+{\footnotesize\ttfamily \label{classappbase_1_1method_a167f4d022de1046cbf8b4eeb69b7bc44} 
+template$<$typename Function\+Sig , typename Dispatch\+Policy $>$ \\
+\mbox{\hyperlink{classappbase_1_1method}{appbase\+::method}}$<$ Function\+Sig, Dispatch\+Policy $>$\+::method (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [default]}}
+
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classappbase_1_1method_a167f4d022de1046cbf8b4eeb69b7bc44_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classappbase_1_1method_ad6bd3f7ba672fd501c2500f2266ff92b}\index{appbase::method$<$ FunctionSig, DispatchPolicy $>$@{appbase::method$<$ FunctionSig, DispatchPolicy $>$}!````~method@{\texorpdfstring{$\sim$}{\string~}method}}
+\index{````~method@{\texorpdfstring{$\sim$}{\string~}method}!appbase::method$<$ FunctionSig, DispatchPolicy $>$@{appbase::method$<$ FunctionSig, DispatchPolicy $>$}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}method()}{\string~method()}}
+{\footnotesize\ttfamily \label{classappbase_1_1method_ad6bd3f7ba672fd501c2500f2266ff92b} 
+template$<$typename Function\+Sig , typename Dispatch\+Policy $>$ \\
+virtual \mbox{\hyperlink{classappbase_1_1method}{appbase\+::method}}$<$ Function\+Sig, Dispatch\+Policy $>$\+::\texorpdfstring{$\sim$}{\string~}\mbox{\hyperlink{classappbase_1_1method}{method}} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [virtual]}, {\ttfamily [default]}}
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classappbase_1_1method_a7d085ad3c8a482b32db5e2ccb04bd12a}\index{appbase::method$<$ FunctionSig, DispatchPolicy $>$@{appbase::method$<$ FunctionSig, DispatchPolicy $>$}!deleter@{deleter}}
+\index{deleter@{deleter}!appbase::method$<$ FunctionSig, DispatchPolicy $>$@{appbase::method$<$ FunctionSig, DispatchPolicy $>$}}
+\doxysubsubsection{\texorpdfstring{deleter()}{deleter()}}
+{\footnotesize\ttfamily \label{classappbase_1_1method_a7d085ad3c8a482b32db5e2ccb04bd12a} 
+template$<$typename Function\+Sig , typename Dispatch\+Policy $>$ \\
+static void \mbox{\hyperlink{classappbase_1_1method}{appbase\+::method}}$<$ Function\+Sig, Dispatch\+Policy $>$\+::deleter (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{erased\+\_\+method\+\_\+ptr}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}, {\ttfamily [protected]}}
+
+Proper deleter for type-\/erased method note\+: no type checking is performed at this level
+
+
+\begin{DoxyParams}{Parameters}
+{\em erased\+\_\+method\+\_\+ptr} & \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{method_8hpp_source_l00267}{267}} of file \mbox{\hyperlink{method_8hpp_source}{method.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00267\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00268\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ ptr\ =\ \textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{classappbase_1_1method_a167f4d022de1046cbf8b4eeb69b7bc44}{method}}*\textcolor{keyword}{>}(\mbox{\hyperlink{namespaceappbase_af7b12aeed8c3ae8f23a8bf8d553f5a04}{erased\_method\_ptr}});}
+\DoxyCodeLine{00269\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{delete}\ ptr;}
+\DoxyCodeLine{00270\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classappbase_1_1method_a7d085ad3c8a482b32db5e2ccb04bd12a_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classappbase_1_1method_a27909571888c9a1e2125c57914dc0c11}\index{appbase::method$<$ FunctionSig, DispatchPolicy $>$@{appbase::method$<$ FunctionSig, DispatchPolicy $>$}!get\_method@{get\_method}}
+\index{get\_method@{get\_method}!appbase::method$<$ FunctionSig, DispatchPolicy $>$@{appbase::method$<$ FunctionSig, DispatchPolicy $>$}}
+\doxysubsubsection{\texorpdfstring{get\_method()}{get\_method()}}
+{\footnotesize\ttfamily \label{classappbase_1_1method_a27909571888c9a1e2125c57914dc0c11} 
+template$<$typename Function\+Sig , typename Dispatch\+Policy $>$ \\
+static \mbox{\hyperlink{classappbase_1_1method}{method}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classappbase_1_1method}{appbase\+::method}}$<$ Function\+Sig, Dispatch\+Policy $>$\+::get\+\_\+method (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespaceappbase_af7b12aeed8c3ae8f23a8bf8d553f5a04}{erased\+\_\+method\+\_\+ptr}} \&}]{ptr}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}, {\ttfamily [protected]}}
+
+get the method\texorpdfstring{$\ast$}{*} back from an erased pointer
+
+
+\begin{DoxyParams}{Parameters}
+{\em ptr} & -\/ the type-\/erased method pointer \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+-\/ the type safe method pointer 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{method_8hpp_source_l00278}{278}} of file \mbox{\hyperlink{method_8hpp_source}{method.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00278\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00279\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{classappbase_1_1method_a167f4d022de1046cbf8b4eeb69b7bc44}{method}}*\textcolor{keyword}{>}(ptr.get());}
+\DoxyCodeLine{00280\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classappbase_1_1method_a187def2e2170a897a116def11785b1d6}\index{appbase::method$<$ FunctionSig, DispatchPolicy $>$@{appbase::method$<$ FunctionSig, DispatchPolicy $>$}!make\_unique@{make\_unique}}
+\index{make\_unique@{make\_unique}!appbase::method$<$ FunctionSig, DispatchPolicy $>$@{appbase::method$<$ FunctionSig, DispatchPolicy $>$}}
+\doxysubsubsection{\texorpdfstring{make\_unique()}{make\_unique()}}
+{\footnotesize\ttfamily \label{classappbase_1_1method_a187def2e2170a897a116def11785b1d6} 
+template$<$typename Function\+Sig , typename Dispatch\+Policy $>$ \\
+static \mbox{\hyperlink{namespaceappbase_af7b12aeed8c3ae8f23a8bf8d553f5a04}{erased\+\_\+method\+\_\+ptr}} \mbox{\hyperlink{classappbase_1_1method}{appbase\+::method}}$<$ Function\+Sig, Dispatch\+Policy $>$\+::make\+\_\+unique (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}, {\ttfamily [protected]}}
+
+Construct a unique\+\_\+ptr for the type erased method poiner \begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{method_8hpp_source_l00286}{286}} of file \mbox{\hyperlink{method_8hpp_source}{method.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00286\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00287\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespaceappbase_af7b12aeed8c3ae8f23a8bf8d553f5a04}{erased\_method\_ptr}}(\textcolor{keyword}{new}\ \mbox{\hyperlink{classappbase_1_1method_a167f4d022de1046cbf8b4eeb69b7bc44}{method}}(),\ \&\mbox{\hyperlink{classappbase_1_1method_a7d085ad3c8a482b32db5e2ccb04bd12a}{deleter}});}
+\DoxyCodeLine{00288\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classappbase_1_1method_a187def2e2170a897a116def11785b1d6_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classappbase_1_1method_a72e40fc195aa3d02dbc5e80c33950495}\index{appbase::method$<$ FunctionSig, DispatchPolicy $>$@{appbase::method$<$ FunctionSig, DispatchPolicy $>$}!register\_provider@{register\_provider}}
+\index{register\_provider@{register\_provider}!appbase::method$<$ FunctionSig, DispatchPolicy $>$@{appbase::method$<$ FunctionSig, DispatchPolicy $>$}}
+\doxysubsubsection{\texorpdfstring{register\_provider()}{register\_provider()}}
+{\footnotesize\ttfamily \label{classappbase_1_1method_a72e40fc195aa3d02dbc5e80c33950495} 
+template$<$typename Function\+Sig , typename Dispatch\+Policy $>$ \\
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{classappbase_1_1method_1_1handle}{handle}} \mbox{\hyperlink{classappbase_1_1method}{appbase\+::method}}$<$ Function\+Sig, Dispatch\+Policy $>$\+::register\+\_\+provider (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}}]{provider}{, }\item[{int}]{priority}{ = {\ttfamily 0}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Register a provider of this method
+
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em T} & -\/ the type of the provider (functor, lambda) \\
+\hline
+\end{DoxyTemplParams}
+
+\begin{DoxyParams}{Parameters}
+{\em provider} & -\/ the provider \\
+\hline
+{\em priority} & -\/ the priority of this provider, lower is called before higher \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{method_8hpp_source_l00253}{253}} of file \mbox{\hyperlink{method_8hpp_source}{method.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00253\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00254\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ handle(this-\/>\_signal.connect(priority,\ provider));}
+\DoxyCodeLine{00255\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{classappbase_1_1method_a9e2f411dc2cf5784cc01a89c488b4056}\index{appbase::method$<$ FunctionSig, DispatchPolicy $>$@{appbase::method$<$ FunctionSig, DispatchPolicy $>$}!appbase::application@{appbase::application}}
+\index{appbase::application@{appbase::application}!appbase::method$<$ FunctionSig, DispatchPolicy $>$@{appbase::method$<$ FunctionSig, DispatchPolicy $>$}}
+\doxysubsubsection{\texorpdfstring{appbase::application}{appbase::application}}
+{\footnotesize\ttfamily \label{classappbase_1_1method_a9e2f411dc2cf5784cc01a89c488b4056} 
+template$<$typename Function\+Sig , typename Dispatch\+Policy $>$ \\
+friend \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classappbase_1_1application}{appbase\+::application}}\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{method_8hpp_source_l00290}{290}} of file \mbox{\hyperlink{method_8hpp_source}{method.\+hpp}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/appbase/include/appbase/\mbox{\hyperlink{method_8hpp}{method.\+hpp}}\end{DoxyCompactItemize}

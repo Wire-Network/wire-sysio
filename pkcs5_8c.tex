@@ -1,0 +1,120 @@
+\doxysection{libraries/yubihsm/common/pkcs5.c File Reference}
+\hypertarget{pkcs5_8c}{}\label{pkcs5_8c}\index{libraries/yubihsm/common/pkcs5.c@{libraries/yubihsm/common/pkcs5.c}}
+{\ttfamily \#include $<$openssl/evp.\+h$>$}\newline
+{\ttfamily \#include "{}pkcs5.\+h"{}}\newline
+{\ttfamily \#include "{}hash.\+h"{}}\newline
+Include dependency graph for pkcs5.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{pkcs5_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{pkcs5_8c_ada697ff717a4c947866f025d6d2bfc3a}{pkcs5\+\_\+pbkdf2\+\_\+hmac}} (const \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}password, size\+\_\+t cb\+\_\+password, const \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}salt, size\+\_\+t cb\+\_\+salt, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} iterations, \mbox{\hyperlink{yubihsm_2common_2hash_8h_a488906826f8aaf7e850c35889d560089}{hash\+\_\+t}} hash, \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}key, size\+\_\+t cb\+\_\+key)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{pkcs5_8c_ada697ff717a4c947866f025d6d2bfc3a}\index{pkcs5.c@{pkcs5.c}!pkcs5\_pbkdf2\_hmac@{pkcs5\_pbkdf2\_hmac}}
+\index{pkcs5\_pbkdf2\_hmac@{pkcs5\_pbkdf2\_hmac}!pkcs5.c@{pkcs5.c}}
+\doxysubsubsection{\texorpdfstring{pkcs5\_pbkdf2\_hmac()}{pkcs5\_pbkdf2\_hmac()}}
+{\footnotesize\ttfamily \label{pkcs5_8c_ada697ff717a4c947866f025d6d2bfc3a} 
+bool pkcs5\+\_\+pbkdf2\+\_\+hmac (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{password}{, }\item[{size\+\_\+t}]{cb\+\_\+password}{, }\item[{const \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{salt}{, }\item[{size\+\_\+t}]{cb\+\_\+salt}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{iterations}{, }\item[{\mbox{\hyperlink{yubihsm_2common_2hash_8h_a488906826f8aaf7e850c35889d560089}{hash\+\_\+t}}}]{hash}{, }\item[{\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{key}{, }\item[{size\+\_\+t}]{cb\+\_\+key}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pkcs5_8c_source_l00027}{27}} of file \mbox{\hyperlink{pkcs5_8c_source}{pkcs5.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00030\ \ \ \textcolor{keywordtype}{bool}\ res\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00031\ }
+\DoxyCodeLine{00032\ \textcolor{preprocessor}{\#ifdef\ \_WIN32\_BCRYPT}}
+\DoxyCodeLine{00033\ \ \ NTSTATUS\ status\ =\ 0;}
+\DoxyCodeLine{00034\ \ \ LPCWSTR\ alg\ =\ NULL;}
+\DoxyCodeLine{00035\ \ \ BCRYPT\_ALG\_HANDLE\ hAlg\ =\ 0;}
+\DoxyCodeLine{00036\ }
+\DoxyCodeLine{00037\ \ \ \textcolor{comment}{/*\ mingw64\ defines\ the\ BCryptDeriveKeyPBKDF2\ function,\ but\ its\ import\ library}}
+\DoxyCodeLine{00038\ \textcolor{comment}{\ \ \ *doesn't\ include\ the\ export.}}
+\DoxyCodeLine{00039\ \textcolor{comment}{\ \ \ **}}
+\DoxyCodeLine{00040\ \textcolor{comment}{\ \ \ **\ Once\ this\ is\ fixed,\ we\ can\ just\ call\ the\ function\ directly.\ \ Until\ then,}}
+\DoxyCodeLine{00041\ \textcolor{comment}{\ \ \ *we\ need\ to\ dynamically\ load\ the\ function.}}
+\DoxyCodeLine{00042\ \textcolor{comment}{\ \ \ */}}
+\DoxyCodeLine{00043\ }
+\DoxyCodeLine{00044\ \ \ \textcolor{keyword}{typedef}\ NTSTATUS\ WINAPI\ (}
+\DoxyCodeLine{00045\ \ \ \ \ *PFN\_BCryptDeriveKeyPBKDF2)(BCRYPT\_ALG\_HANDLE\ hPrf,\ PUCHAR\ pbPassword,}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ULONG\ cbPassword,\ PUCHAR\ pbSalt,\ ULONG\ cbSalt,}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ULONGLONG\ cIterations,\ PUCHAR\ pbDerivedKey,}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ULONG\ cbDerivedKey,\ ULONG\ dwFlags);}
+\DoxyCodeLine{00049\ \ \ HMODULE\ hBCrypt\ =\ NULL;}
+\DoxyCodeLine{00050\ \ \ PFN\_BCryptDeriveKeyPBKDF2\ fnBCryptDeriveKeyPBKDF2\ =\ NULL;}
+\DoxyCodeLine{00051\ }
+\DoxyCodeLine{00052\ \ \ \textcolor{keywordflow}{if}\ (!(hBCrypt\ =\ LoadLibrary(\textcolor{stringliteral}{"{}bcrypt.dll"{}})))\ \{}
+\DoxyCodeLine{00053\ \ \ \ \ \textcolor{keywordflow}{goto}\ cleanup;}
+\DoxyCodeLine{00054\ \ \ \}}
+\DoxyCodeLine{00055\ }
+\DoxyCodeLine{00056\ \ \ \textcolor{keywordflow}{if}\ (!(fnBCryptDeriveKeyPBKDF2\ =\ (PFN\_BCryptDeriveKeyPBKDF2)(}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ \ (\textcolor{keywordtype}{void}\ (*)(\textcolor{keywordtype}{void}))\ GetProcAddress(hBCrypt,\ \textcolor{stringliteral}{"{}BCryptDeriveKeyPBKDF2"{}}))))\ \{}
+\DoxyCodeLine{00058\ \ \ \ \ \textcolor{keywordflow}{goto}\ cleanup;}
+\DoxyCodeLine{00059\ \ \ \}}
+\DoxyCodeLine{00060\ }
+\DoxyCodeLine{00061\ \ \ \textcolor{keywordflow}{if}\ (!(alg\ =\ \mbox{\hyperlink{hash_8c_a2de35447908a9afccca42825a87854fb}{get\_hash}}(hash)))\ \{}
+\DoxyCodeLine{00062\ \ \ \ \ \textcolor{keywordflow}{goto}\ cleanup;}
+\DoxyCodeLine{00063\ \ \ \}}
+\DoxyCodeLine{00064\ }
+\DoxyCodeLine{00065\ \ \ \textcolor{keywordflow}{if}\ (!BCRYPT\_SUCCESS(}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ status\ =\ BCryptOpenAlgorithmProvider(\&hAlg,\ alg,\ NULL,}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BCRYPT\_ALG\_HANDLE\_HMAC\_FLAG)))\ \{}
+\DoxyCodeLine{00068\ \ \ \ \ \textcolor{keywordflow}{goto}\ cleanup;}
+\DoxyCodeLine{00069\ \ \ \}}
+\DoxyCodeLine{00070\ }
+\DoxyCodeLine{00071\ \ \ \textcolor{keywordflow}{if}\ (!BCRYPT\_SUCCESS(}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ status\ =}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \ fnBCryptDeriveKeyPBKDF2(hAlg,\ (PUCHAR)\ password,\ (ULONG)\ cb\_password,}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (PUCHAR)\ salt,\ (ULONG)\ cb\_salt,\ iterations,}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ key,\ (ULONG)\ cb\_key,\ 0)))\ \{}
+\DoxyCodeLine{00076\ \ \ \ \ \textcolor{keywordflow}{goto}\ cleanup;}
+\DoxyCodeLine{00077\ \ \ \}}
+\DoxyCodeLine{00078\ }
+\DoxyCodeLine{00079\ \ \ res\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00080\ }
+\DoxyCodeLine{00081\ cleanup:}
+\DoxyCodeLine{00082\ }
+\DoxyCodeLine{00083\ \ \ \textcolor{keywordflow}{if}\ (hAlg)\ \{}
+\DoxyCodeLine{00084\ \ \ \ \ BCryptCloseAlgorithmProvider(hAlg,\ 0);}
+\DoxyCodeLine{00085\ \ \ \}}
+\DoxyCodeLine{00086\ \ \ \textcolor{keywordflow}{if}\ (hBCrypt)\ \{}
+\DoxyCodeLine{00087\ \ \ \ \ FreeLibrary(hBCrypt);}
+\DoxyCodeLine{00088\ \ \ \}}
+\DoxyCodeLine{00089\ }
+\DoxyCodeLine{00090\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00091\ \ \ \textcolor{keyword}{const}\ EVP\_MD\ *md\ =\ NULL;}
+\DoxyCodeLine{00092\ }
+\DoxyCodeLine{00093\ \ \ \textcolor{keywordflow}{if}\ (!(md\ =\ \mbox{\hyperlink{hash_8c_a2de35447908a9afccca42825a87854fb}{get\_hash}}(hash)))\ \{}
+\DoxyCodeLine{00094\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00095\ \ \ \}}
+\DoxyCodeLine{00096\ }
+\DoxyCodeLine{00097\ \ \ \textcolor{comment}{/*\ for\ some\ reason\ openssl\ always\ returns\ 1\ for\ PBKDF2\ */}}
+\DoxyCodeLine{00098\ \ \ \textcolor{keywordflow}{if}\ (1\ !=\ PKCS5\_PBKDF2\_HMAC((\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *)\ password,\ cb\_password,\ salt,}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ cb\_salt,\ iterations,\ md,\ cb\_key,\ key))\ \{}
+\DoxyCodeLine{00100\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00101\ \ \ \}}
+\DoxyCodeLine{00102\ }
+\DoxyCodeLine{00103\ \ \ res\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00104\ }
+\DoxyCodeLine{00105\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00106\ \ \ \textcolor{keywordflow}{return}\ res;}
+\DoxyCodeLine{00107\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=278pt]{pkcs5_8c_ada697ff717a4c947866f025d6d2bfc3a_cgraph}
+\end{center}
+\end{figure}

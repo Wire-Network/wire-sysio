@@ -1,0 +1,9 @@
+<map id="chainbase::undo_index::session::squash" name="chainbase::undo_index::session::squash">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,160,46"/>
+<area shape="rect" id="Node000002" href="$classchainbase_1_1undo__index.html#a4122a979134c51f89494b1b1dcde85ae" title=" " alt="" coords="208,5,362,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="160,23,192,23,192,28,160,28"/>
+<area shape="rect" id="Node000003" href="$classchainbase_1_1undo__index.html#a8b2730418e8491d1668d074e110bcbe4" title=" " alt="" coords="410,5,573,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="362,23,394,23,394,28,362,28"/>
+<area shape="rect" id="Node000004" href="$classchainbase_1_1undo__index.html#a4db9852ac98f4f1081c9148c304286a7" title=" " alt="" coords="621,5,776,46"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="574,23,606,23,606,28,574,28"/>
+</map>

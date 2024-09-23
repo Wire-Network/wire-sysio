@@ -1,0 +1,10 @@
+<map id="Catch::Matchers::Floating::WithinUlpsMatcher::describe" name="Catch::Matchers::Floating::WithinUlpsMatcher::describe">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,23,203,64"/>
+<area shape="rect" id="Node000002" href="$namespace_catch_1_1_detail.html#af0ad48344ffd3f92f3568465248a9880" title=" " alt="" coords="251,5,403,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="203,30,235,26,235,31,203,35"/>
+<area shape="rect" id="Node000003" href="$namespace_catch.html#a800dd11d86d4ee3e86f9b83336b94b08" title=" " alt="" coords="270,55,384,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="203,52,255,57,254,62,203,57"/>
+<area shape="rect" id="Node000004" href="$class_catch_1_1_reusable_string_stream.html#a0e9ecf260b2a5d35f4886ef0d51f6270" title=" " alt="" coords="451,55,669,80"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="385,65,436,65,436,70,385,70"/>
+<area shape="poly" id="edge4_Node000004_Node000004" title=" " alt="" coords="522,56,514,46,518,36,534,30,560,28,589,31,603,38,601,42,587,36,560,33,535,35,522,40,519,45,526,53"/>
+</map>

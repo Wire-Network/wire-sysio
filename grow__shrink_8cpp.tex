@@ -1,0 +1,90 @@
+\doxysection{libraries/chainbase/test/grow\+\_\+shrink.cpp File Reference}
+\hypertarget{grow__shrink_8cpp}{}\label{grow__shrink_8cpp}\index{libraries/chainbase/test/grow\_shrink.cpp@{libraries/chainbase/test/grow\_shrink.cpp}}
+{\ttfamily \#include $<$boost/test/unit\+\_\+test.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/test/data/test\+\_\+case.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/test/data/monomorphic.\+hpp$>$}\newline
+{\ttfamily \#include $<$chainbase/chainbase.\+hpp$>$}\newline
+Include dependency graph for grow\+\_\+shrink.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{grow__shrink_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{grow__shrink_8cpp_a035ef6e4811c03e6a0770283b0d3ef7a}{BOOST\+\_\+\+DATA\+\_\+\+TEST\+\_\+\+CASE}} (grow\+\_\+shrink, boost\+::unit\+\_\+test\+::data\+::make(\mbox{\hyperlink{grow__shrink_8cpp_aa47370771328d3eddb92b8b2dee0ebc2}{test\+\_\+modes}}), map\+\_\+mode)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+const \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a7fe6684b11f441d2e971fe65166d7d5f}{pinnable\+\_\+mapped\+\_\+file\+::map\+\_\+mode}} \mbox{\hyperlink{grow__shrink_8cpp_aa47370771328d3eddb92b8b2dee0ebc2}{test\+\_\+modes}} \mbox{[}$\,$\mbox{]} = \{pinnable\+\_\+mapped\+\_\+file\+::map\+\_\+mode\+::mapped, pinnable\+\_\+mapped\+\_\+file\+::map\+\_\+mode\+::heap\}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{grow__shrink_8cpp_a035ef6e4811c03e6a0770283b0d3ef7a}\index{grow\_shrink.cpp@{grow\_shrink.cpp}!BOOST\_DATA\_TEST\_CASE@{BOOST\_DATA\_TEST\_CASE}}
+\index{BOOST\_DATA\_TEST\_CASE@{BOOST\_DATA\_TEST\_CASE}!grow\_shrink.cpp@{grow\_shrink.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_DATA\_TEST\_CASE()}{BOOST\_DATA\_TEST\_CASE()}}
+{\footnotesize\ttfamily \label{grow__shrink_8cpp_a035ef6e4811c03e6a0770283b0d3ef7a} 
+BOOST\+\_\+\+DATA\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{grow\+\_\+shrink}]{}{, }\item[{boost\+::unit\+\_\+test\+::data\+::make(\mbox{\hyperlink{grow__shrink_8cpp_aa47370771328d3eddb92b8b2dee0ebc2}{test\+\_\+modes}})}]{}{, }\item[{map\+\_\+mode}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{grow__shrink_8cpp_source_l00010}{10}} of file \mbox{\hyperlink{grow__shrink_8cpp_source}{grow\+\_\+shrink.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00010\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00011\ \ \ \ boost::filesystem::path\ temp\ =\ boost::filesystem::temp\_directory\_path()\ /\ boost::filesystem::unique\_path();}
+\DoxyCodeLine{00012\ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00013\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ db\_start\_size\ \ =\ 8u*1024u*1024u;}
+\DoxyCodeLine{00014\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ db\_grow\_size\ \ \ =\ 16u*1024u*1024u;}
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ db\_shrunk\_size\ =\ 2u*1024u*1024u;}
+\DoxyCodeLine{00016\ }
+\DoxyCodeLine{00017\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classchainbase_1_1database}{chainbase::database}}\ db(temp,\ database::read\_write,\ db\_start\_size,\ \textcolor{keyword}{false},\ map\_mode);}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classchainbase_1_1database}{chainbase::database}}\ db(temp,\ database::read\_write,\ db\_grow\_size,\ \textcolor{keyword}{false},\ map\_mode);}
+\DoxyCodeLine{00022\ \ \ \ \ \ BOOST\_CHECK(db.get\_free\_memory()\ >\ db\_start\_size);}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classchainbase_1_1database}{chainbase::database}}\ db(temp,\ database::read\_write,\ db\_shrunk\_size,\ \textcolor{keyword}{false},\ map\_mode);}
+\DoxyCodeLine{00026\ \ \ \ \ \ BOOST\_CHECK(db.get\_free\_memory()\ >\ db\_start\_size);}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00028\ }
+\DoxyCodeLine{00029\ \ \ \ \}\ \textcolor{keywordflow}{catch}(...)\ \{}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ bfs::remove\_all(temp);}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \textcolor{keywordflow}{throw};}
+\DoxyCodeLine{00032\ \ \ \ \}}
+\DoxyCodeLine{00033\ \ \ \ bfs::remove\_all(temp);}
+\DoxyCodeLine{00034\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{grow__shrink_8cpp_a035ef6e4811c03e6a0770283b0d3ef7a_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{grow__shrink_8cpp_aa47370771328d3eddb92b8b2dee0ebc2}\index{grow\_shrink.cpp@{grow\_shrink.cpp}!test\_modes@{test\_modes}}
+\index{test\_modes@{test\_modes}!grow\_shrink.cpp@{grow\_shrink.cpp}}
+\doxysubsubsection{\texorpdfstring{test\_modes}{test\_modes}}
+{\footnotesize\ttfamily \label{grow__shrink_8cpp_aa47370771328d3eddb92b8b2dee0ebc2} 
+const \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a7fe6684b11f441d2e971fe65166d7d5f}{pinnable\+\_\+mapped\+\_\+file\+::map\+\_\+mode}} test\+\_\+modes\mbox{[}$\,$\mbox{]} = \{pinnable\+\_\+mapped\+\_\+file\+::map\+\_\+mode\+::mapped, pinnable\+\_\+mapped\+\_\+file\+::map\+\_\+mode\+::heap\}}
+
+
+
+Definition at line \mbox{\hyperlink{grow__shrink_8cpp_source_l00008}{8}} of file \mbox{\hyperlink{grow__shrink_8cpp_source}{grow\+\_\+shrink.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00008\ \{pinnable\_mapped\_file::map\_mode::mapped,\ pinnable\_mapped\_file::map\_mode::heap\};}
+
+\end{DoxyCode}

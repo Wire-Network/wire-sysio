@@ -1,0 +1,266 @@
+\doxysection{Catch\+::Benchmark\+Looper Class Reference}
+\hypertarget{class_catch_1_1_benchmark_looper}{}\label{class_catch_1_1_benchmark_looper}\index{Catch::BenchmarkLooper@{Catch::BenchmarkLooper}}
+
+
+{\ttfamily \#include $<$catch\+\_\+benchmark.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_catch_1_1_benchmark_looper_ab9ba6397306a70082f39e63a8a71bde6}{Benchmark\+Looper}} (\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})
+\item 
+\mbox{\hyperlink{class_catch_1_1_benchmark_looper_a54da41bada9da038dc05faf41d746765}{operator bool}} ()
+\item 
+void \mbox{\hyperlink{class_catch_1_1_benchmark_looper_a210552aff5b19408637444d4bb35d59c}{increment}} ()
+\item 
+void \mbox{\hyperlink{class_catch_1_1_benchmark_looper_a0697d1b266112b110edf2025b82c4e77}{report\+Start}} ()
+\item 
+auto \mbox{\hyperlink{class_catch_1_1_benchmark_looper_a97bd944521f519b1593a5d1d2f9998fa}{needs\+More\+Iterations}} () -\/$>$ bool
+\item 
+\mbox{\hyperlink{class_catch_1_1_benchmark_looper_ab9ba6397306a70082f39e63a8a71bde6}{Benchmark\+Looper}} (\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})
+\item 
+\mbox{\hyperlink{class_catch_1_1_benchmark_looper_a54da41bada9da038dc05faf41d746765}{operator bool}} ()
+\item 
+void \mbox{\hyperlink{class_catch_1_1_benchmark_looper_a210552aff5b19408637444d4bb35d59c}{increment}} ()
+\item 
+void \mbox{\hyperlink{class_catch_1_1_benchmark_looper_a0697d1b266112b110edf2025b82c4e77}{report\+Start}} ()
+\item 
+auto \mbox{\hyperlink{class_catch_1_1_benchmark_looper_a97bd944521f519b1593a5d1d2f9998fa}{needs\+More\+Iterations}} () -\/$>$ bool
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source_l02572}{2572}} of file \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source}{catch.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_catch_1_1_benchmark_looper_ab9ba6397306a70082f39e63a8a71bde6}\index{Catch::BenchmarkLooper@{Catch::BenchmarkLooper}!BenchmarkLooper@{BenchmarkLooper}}
+\index{BenchmarkLooper@{BenchmarkLooper}!Catch::BenchmarkLooper@{Catch::BenchmarkLooper}}
+\doxysubsubsection{\texorpdfstring{BenchmarkLooper()}{BenchmarkLooper()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_benchmark_looper_ab9ba6397306a70082f39e63a8a71bde6} 
+Catch\+::\+Benchmark\+Looper\+::\+Benchmark\+Looper (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}}}]{name}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__benchmark_8h_source_l00030}{30}} of file \mbox{\hyperlink{catch__benchmark_8h_source}{catch\+\_\+benchmark.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ :\ \ \ m\_name(\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ ),}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \ \ \ m\_resolution(\ getResolution()\ )}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_benchmark_looper_a0697d1b266112b110edf2025b82c4e77}{reportStart}}();}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \ \ \ m\_timer.\mbox{\hyperlink{class_catch_1_1_timer_a0a56e879e43f36c102bf9ea8b5fc8b72}{start}}();}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_benchmark_looper_ab9ba6397306a70082f39e63a8a71bde6_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_benchmark_looper_ab9ba6397306a70082f39e63a8a71bde6}\index{Catch::BenchmarkLooper@{Catch::BenchmarkLooper}!BenchmarkLooper@{BenchmarkLooper}}
+\index{BenchmarkLooper@{BenchmarkLooper}!Catch::BenchmarkLooper@{Catch::BenchmarkLooper}}
+\doxysubsubsection{\texorpdfstring{BenchmarkLooper()}{BenchmarkLooper()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_benchmark_looper_ab9ba6397306a70082f39e63a8a71bde6} 
+Catch\+::\+Benchmark\+Looper\+::\+Benchmark\+Looper (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}}}]{name}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source_l02583}{2583}} of file \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source}{catch.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02584\ \ \ \ \ \ \ \ \ :\ \ \ m\_name(\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ ),}
+\DoxyCodeLine{02585\ \ \ \ \ \ \ \ \ \ \ \ \ m\_resolution(\ getResolution()\ )}
+\DoxyCodeLine{02586\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02587\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_benchmark_looper_a0697d1b266112b110edf2025b82c4e77}{reportStart}}();}
+\DoxyCodeLine{02588\ \ \ \ \ \ \ \ \ \ \ \ \ m\_timer.\mbox{\hyperlink{class_catch_1_1_timer_a0a56e879e43f36c102bf9ea8b5fc8b72}{start}}();}
+\DoxyCodeLine{02589\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_benchmark_looper_ab9ba6397306a70082f39e63a8a71bde6_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_catch_1_1_benchmark_looper_a210552aff5b19408637444d4bb35d59c}\index{Catch::BenchmarkLooper@{Catch::BenchmarkLooper}!increment@{increment}}
+\index{increment@{increment}!Catch::BenchmarkLooper@{Catch::BenchmarkLooper}}
+\doxysubsubsection{\texorpdfstring{increment()}{increment()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_benchmark_looper_a210552aff5b19408637444d4bb35d59c} 
+void Catch\+::\+Benchmark\+Looper\+::increment (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__benchmark_8h_source_l00044}{44}} of file \mbox{\hyperlink{catch__benchmark_8h_source}{catch\+\_\+benchmark.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \ \ \ ++m\_count;}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_benchmark_looper_a210552aff5b19408637444d4bb35d59c}\index{Catch::BenchmarkLooper@{Catch::BenchmarkLooper}!increment@{increment}}
+\index{increment@{increment}!Catch::BenchmarkLooper@{Catch::BenchmarkLooper}}
+\doxysubsubsection{\texorpdfstring{increment()}{increment()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_benchmark_looper_a210552aff5b19408637444d4bb35d59c} 
+void Catch\+::\+Benchmark\+Looper\+::increment (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source_l02597}{2597}} of file \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source}{catch.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02597\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02598\ \ \ \ \ \ \ \ \ \ \ \ \ ++m\_count;}
+\DoxyCodeLine{02599\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_benchmark_looper_a97bd944521f519b1593a5d1d2f9998fa}\index{Catch::BenchmarkLooper@{Catch::BenchmarkLooper}!needsMoreIterations@{needsMoreIterations}}
+\index{needsMoreIterations@{needsMoreIterations}!Catch::BenchmarkLooper@{Catch::BenchmarkLooper}}
+\doxysubsubsection{\texorpdfstring{needsMoreIterations()}{needsMoreIterations()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_benchmark_looper_a97bd944521f519b1593a5d1d2f9998fa} 
+auto Catch\+::\+Benchmark\+Looper\+::needs\+More\+Iterations (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) -\/$>$ bool}
+
+
+
+Definition at line \mbox{\hyperlink{catch__benchmark_8cpp_source_l00023}{23}} of file \mbox{\hyperlink{catch__benchmark_8cpp_source}{catch\+\_\+benchmark.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ elapsed\ =\ m\_timer.\mbox{\hyperlink{class_catch_1_1_timer_a57be5d17ca868a2d6fb1eea84de665cf}{getElapsedNanoseconds}}();}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Exponentially\ increasing\ iterations\ until\ we're\ confident\ in\ our\ timer\ resolution}}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ elapsed\ <\ m\_resolution\ )\ \{}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \ \ \ \ m\_iterationsToRun\ *=\ 10;}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00031\ }
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_catch_af718eeab870712f292ed8dc6ee3f6488}{getResultCapture}}().\mbox{\hyperlink{struct_catch_1_1_i_result_capture_a6e5e64f9d94211a888249012ab6cc7fb}{benchmarkEnded}}(\ \{\ \{\ m\_name\ \},\ m\_count,\ elapsed\ \}\ );}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00034\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_benchmark_looper_a97bd944521f519b1593a5d1d2f9998fa_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_benchmark_looper_a97bd944521f519b1593a5d1d2f9998fa_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_benchmark_looper_a97bd944521f519b1593a5d1d2f9998fa}\index{Catch::BenchmarkLooper@{Catch::BenchmarkLooper}!needsMoreIterations@{needsMoreIterations}}
+\index{needsMoreIterations@{needsMoreIterations}!Catch::BenchmarkLooper@{Catch::BenchmarkLooper}}
+\doxysubsubsection{\texorpdfstring{needsMoreIterations()}{needsMoreIterations()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_benchmark_looper_a97bd944521f519b1593a5d1d2f9998fa} 
+auto Catch\+::\+Benchmark\+Looper\+::needs\+More\+Iterations (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) -\/$>$  bool}
+
+\Hypertarget{class_catch_1_1_benchmark_looper_a54da41bada9da038dc05faf41d746765}\index{Catch::BenchmarkLooper@{Catch::BenchmarkLooper}!operator bool@{operator bool}}
+\index{operator bool@{operator bool}!Catch::BenchmarkLooper@{Catch::BenchmarkLooper}}
+\doxysubsubsection{\texorpdfstring{operator bool()}{operator bool()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_benchmark_looper_a54da41bada9da038dc05faf41d746765} 
+Catch\+::\+Benchmark\+Looper\+::operator bool (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__benchmark_8h_source_l00038}{38}} of file \mbox{\hyperlink{catch__benchmark_8h_source}{catch\+\_\+benchmark.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ m\_count\ <\ m\_iterationsToRun\ )}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_catch_1_1_benchmark_looper_a97bd944521f519b1593a5d1d2f9998fa}{needsMoreIterations}}();}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_benchmark_looper_a54da41bada9da038dc05faf41d746765_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_benchmark_looper_a54da41bada9da038dc05faf41d746765}\index{Catch::BenchmarkLooper@{Catch::BenchmarkLooper}!operator bool@{operator bool}}
+\index{operator bool@{operator bool}!Catch::BenchmarkLooper@{Catch::BenchmarkLooper}}
+\doxysubsubsection{\texorpdfstring{operator bool()}{operator bool()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_benchmark_looper_a54da41bada9da038dc05faf41d746765} 
+Catch\+::\+Benchmark\+Looper\+::operator bool (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source_l02591}{2591}} of file \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source}{catch.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02591\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02592\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ m\_count\ <\ m\_iterationsToRun\ )}
+\DoxyCodeLine{02593\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{02594\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_catch_1_1_benchmark_looper_a97bd944521f519b1593a5d1d2f9998fa}{needsMoreIterations}}();}
+\DoxyCodeLine{02595\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_benchmark_looper_a0697d1b266112b110edf2025b82c4e77}\index{Catch::BenchmarkLooper@{Catch::BenchmarkLooper}!reportStart@{reportStart}}
+\index{reportStart@{reportStart}!Catch::BenchmarkLooper@{Catch::BenchmarkLooper}}
+\doxysubsubsection{\texorpdfstring{reportStart()}{reportStart()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_benchmark_looper_a0697d1b266112b110edf2025b82c4e77} 
+void Catch\+::\+Benchmark\+Looper\+::report\+Start (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__benchmark_8cpp_source_l00020}{20}} of file \mbox{\hyperlink{catch__benchmark_8cpp_source}{catch\+\_\+benchmark.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_catch_af718eeab870712f292ed8dc6ee3f6488}{getResultCapture}}().\mbox{\hyperlink{struct_catch_1_1_i_result_capture_a264ae12330c74b2daae41715a30d51bf}{benchmarkStarting}}(\ \{\ m\_name\ \}\ );}
+\DoxyCodeLine{00022\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_benchmark_looper_a0697d1b266112b110edf2025b82c4e77_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_benchmark_looper_a0697d1b266112b110edf2025b82c4e77_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_benchmark_looper_a0697d1b266112b110edf2025b82c4e77}\index{Catch::BenchmarkLooper@{Catch::BenchmarkLooper}!reportStart@{reportStart}}
+\index{reportStart@{reportStart}!Catch::BenchmarkLooper@{Catch::BenchmarkLooper}}
+\doxysubsubsection{\texorpdfstring{reportStart()}{reportStart()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_benchmark_looper_a0697d1b266112b110edf2025b82c4e77} 
+void Catch\+::\+Benchmark\+Looper\+::report\+Start (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__benchmark_8h}{catch\+\_\+benchmark.\+h}}\item 
+libraries/sys-\/vm/external/\+Catch2/single\+\_\+include/catch2/\mbox{\hyperlink{single__include_2catch2_2catch_8hpp}{catch.\+hpp}}\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__benchmark_8cpp}{catch\+\_\+benchmark.\+cpp}}\end{DoxyCompactItemize}

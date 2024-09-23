@@ -1,0 +1,7 @@
+<map id="CLI::detail::split_names" name="CLI::detail::split_names">
+<area shape="rect" id="Node000001" title=" " alt="" coords="207,35,320,75"/>
+<area shape="rect" id="Node000002" href="$namespace_c_l_i_1_1detail.html#aef5e2e24cdf5eb20ac37c5fdabec8f62" title="extract default flag values either {def} or starting with a !" alt="" coords="5,5,159,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="191,46,159,41,160,35,192,41"/>
+<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_option.html#a35e90f0fc810ccca676f7fa39bf4cc27" title="Making an option by hand is not defined, it must be made by the App class." alt="" coords="15,70,149,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="192,69,150,75,149,70,191,63"/>
+</map>

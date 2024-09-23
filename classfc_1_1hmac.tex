@@ -1,0 +1,75 @@
+\doxysection{fc\+::hmac\texorpdfstring{$<$}{<} H \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classfc_1_1hmac}{}\label{classfc_1_1hmac}\index{fc::hmac$<$ H $>$@{fc::hmac$<$ H $>$}}
+
+
+{\ttfamily \#include $<$hmac.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1hmac_ad05dc89e24eabf7bbf8f8d076c95c744}{hmac}} ()
+\item 
+H \mbox{\hyperlink{classfc_1_1hmac_ae7f854720f2cbd191888ab47b0fe9983}{digest}} (const char \texorpdfstring{$\ast$}{*}c, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} c\+\_\+len, const char \texorpdfstring{$\ast$}{*}d, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} d\+\_\+len)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename H$>$\newline
+class fc\+::hmac$<$ H $>$}
+
+
+Definition at line \mbox{\hyperlink{hmac_8hpp_source_l00018}{18}} of file \mbox{\hyperlink{hmac_8hpp_source}{hmac.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1hmac_ad05dc89e24eabf7bbf8f8d076c95c744}\index{fc::hmac$<$ H $>$@{fc::hmac$<$ H $>$}!hmac@{hmac}}
+\index{hmac@{hmac}!fc::hmac$<$ H $>$@{fc::hmac$<$ H $>$}}
+\doxysubsubsection{\texorpdfstring{hmac()}{hmac()}}
+{\footnotesize\ttfamily \label{classfc_1_1hmac_ad05dc89e24eabf7bbf8f8d076c95c744} 
+template$<$typename H $>$ \\
+\mbox{\hyperlink{classfc_1_1hmac}{fc\+::hmac}}$<$ H $>$\+::hmac (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{hmac_8hpp_source_l00021}{21}} of file \mbox{\hyperlink{hmac_8hpp_source}{hmac.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00021\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1hmac_ae7f854720f2cbd191888ab47b0fe9983}\index{fc::hmac$<$ H $>$@{fc::hmac$<$ H $>$}!digest@{digest}}
+\index{digest@{digest}!fc::hmac$<$ H $>$@{fc::hmac$<$ H $>$}}
+\doxysubsubsection{\texorpdfstring{digest()}{digest()}}
+{\footnotesize\ttfamily \label{classfc_1_1hmac_ae7f854720f2cbd191888ab47b0fe9983} 
+template$<$typename H $>$ \\
+H \mbox{\hyperlink{classfc_1_1hmac}{fc\+::hmac}}$<$ H $>$\+::digest (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{c}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{c\+\_\+len}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{d}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{d\+\_\+len}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{hmac_8hpp_source_l00023}{23}} of file \mbox{\hyperlink{hmac_8hpp_source}{hmac.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ encoder.reset();}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ add\_key(c,\ c\_len,\ 0x36);}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ encoder.write(\ d,\ d\_len\ );}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ H\ intermediate\ =\ encoder.result();}
+\DoxyCodeLine{00029\ }
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ encoder.reset();}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ add\_key(c,\ c\_len,\ 0x5c);}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ encoder.write(\ intermediate.data(),\ intermediate.data\_size()\ );}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ encoder.result();}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/\mbox{\hyperlink{hmac_8hpp}{hmac.\+hpp}}\end{DoxyCompactItemize}

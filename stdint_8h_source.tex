@@ -1,0 +1,305 @@
+\doxysection{stdint.\+h}
+\hypertarget{stdint_8h_source}{}\label{stdint_8h_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/include/rapidjson/msinttypes/stdint.h@{libraries/fc/include/fc/crypto/webauthn\_json/include/rapidjson/msinttypes/stdint.h}}
+\mbox{\hyperlink{stdint_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00001}00001\ \textcolor{comment}{//\ ISO\ C9x\ \ compliant\ stdint.h\ for\ Microsoft\ Visual\ Studio}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00002}00002\ \textcolor{comment}{//\ Based\ on\ ISO/IEC\ 9899:TC2\ Committee\ draft\ (May\ 6,\ 2005)\ WG14/N1124\ }}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00003}00003\ \textcolor{comment}{//\ }}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00004}00004\ \textcolor{comment}{//\ \ Copyright\ (c)\ 2006-\/2013\ Alexander\ Chemeris}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00005}00005\ \textcolor{comment}{//\ }}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00006}00006\ \textcolor{comment}{//\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00007}00007\ \textcolor{comment}{//\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are\ met:}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00008}00008\ \textcolor{comment}{//\ }}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00009}00009\ \textcolor{comment}{//\ \ \ 1.\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright\ notice,}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00010}00010\ \textcolor{comment}{//\ \ \ \ \ \ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00011}00011\ \textcolor{comment}{//\ }}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00012}00012\ \textcolor{comment}{//\ \ \ 2.\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00013}00013\ \textcolor{comment}{//\ \ \ \ \ \ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer\ in\ the}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00014}00014\ \textcolor{comment}{//\ \ \ \ \ \ documentation\ and/or\ other\ materials\ provided\ with\ the\ distribution.}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00015}00015\ \textcolor{comment}{//\ }}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00016}00016\ \textcolor{comment}{//\ \ \ 3.\ Neither\ the\ name\ of\ the\ product\ nor\ the\ names\ of\ its\ contributors\ may}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00017}00017\ \textcolor{comment}{//\ \ \ \ \ \ be\ used\ to\ endorse\ or\ promote\ products\ derived\ from\ this\ software}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00018}00018\ \textcolor{comment}{//\ \ \ \ \ \ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00019}00019\ \textcolor{comment}{//\ }}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00020}00020\ \textcolor{comment}{//\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ AUTHOR\ \`{}\`{}AS\ IS''\ AND\ ANY\ EXPRESS\ OR\ IMPLIED}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00021}00021\ \textcolor{comment}{//\ WARRANTIES,\ INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ THE\ IMPLIED\ WARRANTIES\ OF}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00022}00022\ \textcolor{comment}{//\ MERCHANTABILITY\ AND\ FITNESS\ FOR\ A\ PARTICULAR\ PURPOSE\ ARE\ DISCLAIMED.\ IN\ NO}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00023}00023\ \textcolor{comment}{//\ EVENT\ SHALL\ THE\ AUTHOR\ BE\ LIABLE\ FOR\ ANY\ DIRECT,\ INDIRECT,\ INCIDENTAL,}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00024}00024\ \textcolor{comment}{//\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES\ (INCLUDING,\ BUT\ NOT\ LIMITED\ TO,}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00025}00025\ \textcolor{comment}{//\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;\ LOSS\ OF\ USE,\ DATA,\ OR\ PROFITS;}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00026}00026\ \textcolor{comment}{//\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND\ ON\ ANY\ THEORY\ OF\ LIABILITY,\ }}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00027}00027\ \textcolor{comment}{//\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT\ (INCLUDING\ NEGLIGENCE\ OR}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00028}00028\ \textcolor{comment}{//\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE\ OF\ THIS\ SOFTWARE,\ EVEN\ IF}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00029}00029\ \textcolor{comment}{//\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00030}00030\ \textcolor{comment}{//\ }}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00033}00033\ \textcolor{comment}{//\ The\ above\ software\ in\ this\ distribution\ may\ have\ been\ modified\ by\ }}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00034}00034\ \textcolor{comment}{//\ THL\ A29\ Limited\ ("{}Tencent\ Modifications"{}).\ }}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00035}00035\ \textcolor{comment}{//\ All\ Tencent\ Modifications\ are\ Copyright\ (C)\ 2015\ THL\ A29\ Limited.}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00037}00037\ \textcolor{preprocessor}{\#ifndef\ \_MSC\_VER\ }\textcolor{comment}{//\ [}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00038}00038\ \textcolor{preprocessor}{\#error\ "{}Use\ this\ header\ only\ with\ Microsoft\ Visual\ C++\ compilers!"{}}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00039}00039\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ \_MSC\_VER\ ]}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00041}00041\ \textcolor{preprocessor}{\#ifndef\ \_MSC\_STDINT\_H\_\ }\textcolor{comment}{//\ [}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00042}00042\ \textcolor{preprocessor}{\#define\ \_MSC\_STDINT\_H\_}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00044}00044\ \textcolor{preprocessor}{\#if\ \_MSC\_VER\ >\ 1000}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00045}00045\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00046}00046\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00048}00048\ \textcolor{comment}{//\ miloyip:\ Originally\ Visual\ Studio\ 2010\ uses\ its\ own\ stdint.h.\ However\ it\ generates\ warning\ with\ INT64\_C(),\ so\ change\ to\ use\ this\ file\ for\ vs2010.}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00049}00049\ \textcolor{preprocessor}{\#if\ \_MSC\_VER\ >=\ 1600\ }\textcolor{comment}{//\ [}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00050}00050\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{stdint_8h}{stdint.h}}>}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00052}00052\ \textcolor{preprocessor}{\#if\ !defined(\_\_cplusplus)\ ||\ defined(\_\_STDC\_CONSTANT\_MACROS)\ }\textcolor{comment}{//\ [\ \ \ See\ footnote\ 224\ at\ page\ 260}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00054}00054\ \textcolor{preprocessor}{\#undef\ INT8\_C}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00055}00055\ \textcolor{preprocessor}{\#undef\ INT16\_C}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00056}00056\ \textcolor{preprocessor}{\#undef\ INT32\_C}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00057}00057\ \textcolor{preprocessor}{\#undef\ INT64\_C}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00058}00058\ \textcolor{preprocessor}{\#undef\ UINT8\_C}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00059}00059\ \textcolor{preprocessor}{\#undef\ UINT16\_C}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00060}00060\ \textcolor{preprocessor}{\#undef\ UINT32\_C}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00061}00061\ \textcolor{preprocessor}{\#undef\ UINT64\_C}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00062}00062\ }
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00063}00063\ \textcolor{comment}{//\ 7.18.4.1\ Macros\ for\ minimum-\/width\ integer\ constants}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00065}00065\ \textcolor{preprocessor}{\#define\ INT8\_C(val)\ \ val\#\#i8}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00066}00066\ \textcolor{preprocessor}{\#define\ INT16\_C(val)\ val\#\#i16}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00067}00067\ \textcolor{preprocessor}{\#define\ INT32\_C(val)\ val\#\#i32}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00068}00068\ \textcolor{preprocessor}{\#define\ INT64\_C(val)\ val\#\#i64}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00069}00069\ }
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00070}00070\ \textcolor{preprocessor}{\#define\ UINT8\_C(val)\ \ val\#\#ui8}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00071}00071\ \textcolor{preprocessor}{\#define\ UINT16\_C(val)\ val\#\#ui16}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00072}00072\ \textcolor{preprocessor}{\#define\ UINT32\_C(val)\ val\#\#ui32}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00073}00073\ \textcolor{preprocessor}{\#define\ UINT64\_C(val)\ val\#\#ui64}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00074}00074\ }
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00075}00075\ \textcolor{comment}{//\ 7.18.4.2\ Macros\ for\ greatest-\/width\ integer\ constants}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00076}00076\ \textcolor{comment}{//\ These\ \#ifndef's\ are\ needed\ to\ prevent\ collisions\ with\ <boost/cstdint.hpp>.}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00077}00077\ \textcolor{comment}{//\ Check\ out\ Issue\ 9\ for\ the\ details.}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00078}00078\ \textcolor{preprocessor}{\#ifndef\ INTMAX\_C\ }\textcolor{comment}{//\ \ \ [}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00079}00079\ \textcolor{preprocessor}{\#\ \ define\ INTMAX\_C\ \ \ INT64\_C}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00080}00080\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ INTMAX\_C\ \ \ \ ]}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00081}00081\ \textcolor{preprocessor}{\#ifndef\ UINTMAX\_C\ }\textcolor{comment}{//\ \ [}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00082}00082\ \textcolor{preprocessor}{\#\ \ define\ UINTMAX\_C\ \ UINT64\_C}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00083}00083\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ UINTMAX\_C\ \ \ ]}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00084}00084\ }
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00085}00085\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ \_\_STDC\_CONSTANT\_MACROS\ ]}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00086}00086\ }
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00087}00087\ \textcolor{preprocessor}{\#else\ }\textcolor{comment}{//\ ]\ \_MSC\_VER\ >=\ 1700\ [}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00088}00088\ }
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00089}00089\ \textcolor{preprocessor}{\#include\ <limits.h>}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00090}00090\ }
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00091}00091\ \textcolor{comment}{//\ For\ Visual\ Studio\ 6\ in\ C++\ mode\ and\ for\ many\ Visual\ Studio\ versions\ when}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00092}00092\ \textcolor{comment}{//\ compiling\ for\ ARM\ we\ have\ to\ wrap\ <wchar.h>\ include\ with\ 'extern\ "{}C++"{}\ \{\}'}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00093}00093\ \textcolor{comment}{//\ or\ compiler\ would\ give\ many\ errors\ like\ this:}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00094}00094\ \textcolor{comment}{//\ \ \ error\ C2733:\ second\ C\ linkage\ of\ overloaded\ function\ 'wmemchr'\ not\ allowed}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00095}00095\ \textcolor{preprocessor}{\#if\ defined(\_\_cplusplus)\ \&\&\ !defined(\_M\_ARM)}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00096}00096\ \textcolor{keyword}{extern}\ \textcolor{stringliteral}{"{}C"{}}\ \{}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00097}00097\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00098}00098\ \textcolor{preprocessor}{\#\ \ include\ <wchar.h>}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00099}00099\ \textcolor{preprocessor}{\#if\ defined(\_\_cplusplus)\ \&\&\ !defined(\_M\_ARM)}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00100}00100\ \}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00101}00101\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00102}00102\ }
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00103}00103\ \textcolor{comment}{//\ Define\ \_W64\ macros\ to\ mark\ types\ changing\ their\ size,\ like\ intptr\_t.}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00104}00104\ \textcolor{preprocessor}{\#ifndef\ \_W64}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00105}00105\ \textcolor{preprocessor}{\#\ \ if\ !defined(\_\_midl)\ \&\&\ (defined(\_X86\_)\ ||\ defined(\_M\_IX86))\ \&\&\ \_MSC\_VER\ >=\ 1300}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00106}00106\ \textcolor{preprocessor}{\#\ \ \ \ \ define\ \_W64\ \_\_w64}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00107}00107\ \textcolor{preprocessor}{\#\ \ else}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00108}\mbox{\hyperlink{stdint_8h_a3730e9bd68460c3bea497352ee69b9ae}{00108}}\ \textcolor{preprocessor}{\#\ \ \ \ \ define\ \_W64}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00109}00109\ \textcolor{preprocessor}{\#\ \ endif}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00110}00110\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00111}00111\ }
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00112}00112\ }
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00113}00113\ \textcolor{comment}{//\ 7.18.1\ Integer\ types}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00114}00114\ }
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00115}00115\ \textcolor{comment}{//\ 7.18.1.1\ Exact-\/width\ integer\ types}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00116}00116\ }
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00117}00117\ \textcolor{comment}{//\ Visual\ Studio\ 6\ and\ Embedded\ Visual\ C++\ 4\ doesn't}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00118}00118\ \textcolor{comment}{//\ realize\ that,\ e.g.\ char\ has\ the\ same\ size\ as\ \_\_int8}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00119}00119\ \textcolor{comment}{//\ so\ we\ give\ up\ on\ \_\_intX\ for\ them.}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00120}00120\ \textcolor{preprocessor}{\#if\ (\_MSC\_VER\ <\ 1300)}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00121}\mbox{\hyperlink{stdint_8h_aef44329758059c91c76d334e8fc09700}{00121}}\ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{signed}\ \textcolor{keywordtype}{char}\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aef44329758059c91c76d334e8fc09700}{int8\_t}};}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00122}\mbox{\hyperlink{stdint_8h_a269259c924dce846340ddbb810db2e3c}{00122}}\ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{signed}\ \textcolor{keywordtype}{short}\ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a269259c924dce846340ddbb810db2e3c}{int16\_t}};}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00123}\mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{00123}}\ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{signed}\ \textcolor{keywordtype}{int}\ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}};}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00124}\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{00124}}\ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}};}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00125}\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{00125}}\ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{short}\ \ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}};}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00126}\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{00126}}\ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}};}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00127}00127\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00128}00128\ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{signed}\ \_\_int8\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aef44329758059c91c76d334e8fc09700}{int8\_t}};}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00129}00129\ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{signed}\ \_\_int16\ \ \ \ \mbox{\hyperlink{stdint_8h_a269259c924dce846340ddbb810db2e3c}{int16\_t}};}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00130}00130\ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{signed}\ \_\_int32\ \ \ \ \mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}};}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00131}00131\ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{unsigned}\ \_\_int8\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}};}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00132}00132\ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{unsigned}\ \_\_int16\ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}};}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00133}00133\ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{unsigned}\ \_\_int32\ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}};}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00134}00134\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00135}\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{00135}}\ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{signed}\ \_\_int64\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}};}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00136}\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{00136}}\ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{unsigned}\ \_\_int64\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}};}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00137}00137\ }
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00138}00138\ }
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00139}00139\ \textcolor{comment}{//\ 7.18.1.2\ Minimum-\/width\ integer\ types}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00140}\mbox{\hyperlink{stdint_8h_aadfd725efbf565422ab13db91ccca53c}{00140}}\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{stdint_8h_aef44329758059c91c76d334e8fc09700}{int8\_t}}\ \ \ \ \mbox{\hyperlink{stdint_8h_aadfd725efbf565422ab13db91ccca53c}{int\_least8\_t}};}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00141}\mbox{\hyperlink{stdint_8h_a17f379713bed2a28ac431760401253cd}{00141}}\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{stdint_8h_a269259c924dce846340ddbb810db2e3c}{int16\_t}}\ \ \ \mbox{\hyperlink{stdint_8h_a17f379713bed2a28ac431760401253cd}{int\_least16\_t}};}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00142}\mbox{\hyperlink{stdint_8h_a2676b57a778795e5d0598970f1407f38}{00142}}\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}}\ \ \ \mbox{\hyperlink{stdint_8h_a2676b57a778795e5d0598970f1407f38}{int\_least32\_t}};}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00143}\mbox{\hyperlink{stdint_8h_a2073b30b3170d509bc756bf5c7862caf}{00143}}\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ \ \ \mbox{\hyperlink{stdint_8h_a2073b30b3170d509bc756bf5c7862caf}{int\_least64\_t}};}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00144}\mbox{\hyperlink{stdint_8h_ac76e2383debd5a3b100514044828961a}{00144}}\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \ \ \mbox{\hyperlink{stdint_8h_ac76e2383debd5a3b100514044828961a}{uint\_least8\_t}};}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00145}\mbox{\hyperlink{stdint_8h_a4f3f6e6631cb4aaeadf1c59ff597b2fb}{00145}}\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ \ \mbox{\hyperlink{stdint_8h_a4f3f6e6631cb4aaeadf1c59ff597b2fb}{uint\_least16\_t}};}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00146}\mbox{\hyperlink{stdint_8h_ac0af81082969e5e3f4d939b1de7002ac}{00146}}\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \ \mbox{\hyperlink{stdint_8h_ac0af81082969e5e3f4d939b1de7002ac}{uint\_least32\_t}};}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00147}\mbox{\hyperlink{stdint_8h_ab604f73dd823867b43702ae88b4f4445}{00147}}\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \ \mbox{\hyperlink{stdint_8h_ab604f73dd823867b43702ae88b4f4445}{uint\_least64\_t}};}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00148}00148\ }
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00149}00149\ \textcolor{comment}{//\ 7.18.1.3\ Fastest\ minimum-\/width\ integer\ types}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00150}\mbox{\hyperlink{stdint_8h_a880ed9ceb8621521452c81d03bd08cfb}{00150}}\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{stdint_8h_aef44329758059c91c76d334e8fc09700}{int8\_t}}\ \ \ \ \mbox{\hyperlink{stdint_8h_a880ed9ceb8621521452c81d03bd08cfb}{int\_fast8\_t}};}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00151}\mbox{\hyperlink{stdint_8h_a9b7386d4af0e20ee32296d9a158c9f3a}{00151}}\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{stdint_8h_a269259c924dce846340ddbb810db2e3c}{int16\_t}}\ \ \ \mbox{\hyperlink{stdint_8h_a9b7386d4af0e20ee32296d9a158c9f3a}{int\_fast16\_t}};}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00152}\mbox{\hyperlink{stdint_8h_a920d4b149da0252281b6762375fb644a}{00152}}\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}}\ \ \ \mbox{\hyperlink{stdint_8h_a920d4b149da0252281b6762375fb644a}{int\_fast32\_t}};}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00153}\mbox{\hyperlink{stdint_8h_afd072b9a94c14417246175f6442422ae}{00153}}\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ \ \ \mbox{\hyperlink{stdint_8h_afd072b9a94c14417246175f6442422ae}{int\_fast64\_t}};}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00154}\mbox{\hyperlink{stdint_8h_ad0fca8b15c218d2c687f8c373a71d228}{00154}}\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \ \ \mbox{\hyperlink{stdint_8h_ad0fca8b15c218d2c687f8c373a71d228}{uint\_fast8\_t}};}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00155}\mbox{\hyperlink{stdint_8h_a6ed085329b153773ff76afa0702cf897}{00155}}\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ \ \mbox{\hyperlink{stdint_8h_a6ed085329b153773ff76afa0702cf897}{uint\_fast16\_t}};}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00156}\mbox{\hyperlink{stdint_8h_a8f075c759c74e109e8184306c663809d}{00156}}\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \ \mbox{\hyperlink{stdint_8h_a8f075c759c74e109e8184306c663809d}{uint\_fast32\_t}};}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00157}\mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{00157}}\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \ \mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\_fast64\_t}};}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00158}00158\ }
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00159}00159\ \textcolor{comment}{//\ 7.18.1.4\ Integer\ types\ capable\ of\ holding\ object\ pointers}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00160}00160\ \textcolor{preprocessor}{\#ifdef\ \_WIN64\ }\textcolor{comment}{//\ [}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00161}00161\ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{signed}\ \_\_int64\ \ \ \ \mbox{\hyperlink{stdint_8h_abd3131a20f4053d808d4277db3e39a23}{intptr\_t}};}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00162}00162\ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{unsigned}\ \_\_int64\ \ \mbox{\hyperlink{stdint_8h_a31b85deecb45924320becd11d3ee16ce}{uintptr\_t}};}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00163}00163\ \textcolor{preprocessor}{\#else\ }\textcolor{comment}{//\ \_WIN64\ ][}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00164}\mbox{\hyperlink{stdint_8h_abd3131a20f4053d808d4277db3e39a23}{00164}}\ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{stdint_8h_a3730e9bd68460c3bea497352ee69b9ae}{\_W64}}\ \textcolor{keywordtype}{signed}\ \textcolor{keywordtype}{int}\ \ \ \mbox{\hyperlink{stdint_8h_abd3131a20f4053d808d4277db3e39a23}{intptr\_t}};}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00165}\mbox{\hyperlink{stdint_8h_a31b85deecb45924320becd11d3ee16ce}{00165}}\ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{stdint_8h_a3730e9bd68460c3bea497352ee69b9ae}{\_W64}}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{stdint_8h_a31b85deecb45924320becd11d3ee16ce}{uintptr\_t}};}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00166}00166\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ \_WIN64\ ]}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00167}00167\ }
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00168}00168\ \textcolor{comment}{//\ 7.18.1.5\ Greatest-\/width\ integer\ types}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00169}\mbox{\hyperlink{stdint_8h_a036cd61bb4b30bb510b9538af4cebd1d}{00169}}\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ \ \ \mbox{\hyperlink{stdint_8h_a036cd61bb4b30bb510b9538af4cebd1d}{intmax\_t}};}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00170}\mbox{\hyperlink{stdint_8h_a2ba5f6c0633401558d277b2c0e4f758d}{00170}}\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \ \mbox{\hyperlink{stdint_8h_a2ba5f6c0633401558d277b2c0e4f758d}{uintmax\_t}};}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00171}00171\ }
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00172}00172\ }
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00173}00173\ \textcolor{comment}{//\ 7.18.2\ Limits\ of\ specified-\/width\ integer\ types}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00174}00174\ }
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00175}00175\ \textcolor{preprocessor}{\#if\ !defined(\_\_cplusplus)\ ||\ defined(\_\_STDC\_LIMIT\_MACROS)\ }\textcolor{comment}{//\ [\ \ \ See\ footnote\ 220\ at\ page\ 257\ and\ footnote\ 221\ at\ page\ 259}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00176}00176\ }
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00177}00177\ \textcolor{comment}{//\ 7.18.2.1\ Limits\ of\ exact-\/width\ integer\ types}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00178}\mbox{\hyperlink{stdint_8h_aadcf2a81af243df333b31efa6461ab8e}{00178}}\ \textcolor{preprocessor}{\#define\ INT8\_MIN\ \ \ \ \ ((int8\_t)\_I8\_MIN)}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00179}\mbox{\hyperlink{stdint_8h_aaf7f29f45f1a513b4748a4e5014ddf6a}{00179}}\ \textcolor{preprocessor}{\#define\ INT8\_MAX\ \ \ \ \ \_I8\_MAX}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00180}\mbox{\hyperlink{stdint_8h_ad4e9955955b27624963643eac448118a}{00180}}\ \textcolor{preprocessor}{\#define\ INT16\_MIN\ \ \ \ ((int16\_t)\_I16\_MIN)}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00181}\mbox{\hyperlink{stdint_8h_ac58f2c111cc9989c86db2a7dc4fd84ca}{00181}}\ \textcolor{preprocessor}{\#define\ INT16\_MAX\ \ \ \ \_I16\_MAX}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00182}\mbox{\hyperlink{stdint_8h_a688eb21a22db27c2b2bd5836943cdcbe}{00182}}\ \textcolor{preprocessor}{\#define\ INT32\_MIN\ \ \ \ ((int32\_t)\_I32\_MIN)}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00183}\mbox{\hyperlink{stdint_8h_a181807730d4a375f848ba139813ce04f}{00183}}\ \textcolor{preprocessor}{\#define\ INT32\_MAX\ \ \ \ \_I32\_MAX}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00184}\mbox{\hyperlink{stdint_8h_ab21f12f372f67b8ff0aa3432336ede67}{00184}}\ \textcolor{preprocessor}{\#define\ INT64\_MIN\ \ \ \ ((int64\_t)\_I64\_MIN)}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00185}\mbox{\hyperlink{stdint_8h_ad0d744f05898e32d01f73f8af3cd2071}{00185}}\ \textcolor{preprocessor}{\#define\ INT64\_MAX\ \ \ \ \_I64\_MAX}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00186}\mbox{\hyperlink{stdint_8h_aeb4e270a084ee26fe73e799861bd0252}{00186}}\ \textcolor{preprocessor}{\#define\ UINT8\_MAX\ \ \ \ \_UI8\_MAX}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00187}\mbox{\hyperlink{stdint_8h_a3ea490c9b3617d4479bd80ef93cd5602}{00187}}\ \textcolor{preprocessor}{\#define\ UINT16\_MAX\ \ \ \_UI16\_MAX}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00188}\mbox{\hyperlink{stdint_8h_ab5eb23180f7cc12b7d6c04a8ec067fdd}{00188}}\ \textcolor{preprocessor}{\#define\ UINT32\_MAX\ \ \ \_UI32\_MAX}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00189}\mbox{\hyperlink{stdint_8h_a30654b4b67d97c42ca3f9b6052dda916}{00189}}\ \textcolor{preprocessor}{\#define\ UINT64\_MAX\ \ \ \_UI64\_MAX}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00190}00190\ }
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00191}00191\ \textcolor{comment}{//\ 7.18.2.2\ Limits\ of\ minimum-\/width\ integer\ types}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00192}\mbox{\hyperlink{stdint_8h_a3e986cad833f63f420962ff60eda87e5}{00192}}\ \textcolor{preprocessor}{\#define\ INT\_LEAST8\_MIN\ \ \ \ INT8\_MIN}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00193}\mbox{\hyperlink{stdint_8h_aa05109908fb2770f632d2b646b9f85bf}{00193}}\ \textcolor{preprocessor}{\#define\ INT\_LEAST8\_MAX\ \ \ \ INT8\_MAX}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00194}\mbox{\hyperlink{stdint_8h_a1f91bfd5820c2f27af3d260fc75813e1}{00194}}\ \textcolor{preprocessor}{\#define\ INT\_LEAST16\_MIN\ \ \ INT16\_MIN}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00195}\mbox{\hyperlink{stdint_8h_a7eb2a8e2a1c65d6c9ad0f86154890baa}{00195}}\ \textcolor{preprocessor}{\#define\ INT\_LEAST16\_MAX\ \ \ INT16\_MAX}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00196}\mbox{\hyperlink{stdint_8h_a2360a536116dd734820a6b5b3d560ce7}{00196}}\ \textcolor{preprocessor}{\#define\ INT\_LEAST32\_MIN\ \ \ INT32\_MIN}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00197}\mbox{\hyperlink{stdint_8h_a5618711a0a54f722190a3a1219e278c2}{00197}}\ \textcolor{preprocessor}{\#define\ INT\_LEAST32\_MAX\ \ \ INT32\_MAX}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00198}\mbox{\hyperlink{stdint_8h_ac12b4f6966b57ad82feb683b284b4060}{00198}}\ \textcolor{preprocessor}{\#define\ INT\_LEAST64\_MIN\ \ \ INT64\_MIN}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00199}\mbox{\hyperlink{stdint_8h_a35d0f98a2e507fd1be779d49da92724e}{00199}}\ \textcolor{preprocessor}{\#define\ INT\_LEAST64\_MAX\ \ \ INT64\_MAX}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00200}\mbox{\hyperlink{stdint_8h_a2a80bde77ee1698d0f42f334adad4f2b}{00200}}\ \textcolor{preprocessor}{\#define\ UINT\_LEAST8\_MAX\ \ \ UINT8\_MAX}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00201}\mbox{\hyperlink{stdint_8h_a6ef6a1a518bbf516ca8b0180b11c358f}{00201}}\ \textcolor{preprocessor}{\#define\ UINT\_LEAST16\_MAX\ \ UINT16\_MAX}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00202}\mbox{\hyperlink{stdint_8h_a70cad8bacc9a6db301e1cdc86cc8d571}{00202}}\ \textcolor{preprocessor}{\#define\ UINT\_LEAST32\_MAX\ \ UINT32\_MAX}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00203}\mbox{\hyperlink{stdint_8h_aab530113fa96e280e49c3c138b0f917d}{00203}}\ \textcolor{preprocessor}{\#define\ UINT\_LEAST64\_MAX\ \ UINT64\_MAX}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00204}00204\ }
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00205}00205\ \textcolor{comment}{//\ 7.18.2.3\ Limits\ of\ fastest\ minimum-\/width\ integer\ types}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00206}\mbox{\hyperlink{stdint_8h_aad8fb982cb19143efd5ee9a1a7a89390}{00206}}\ \textcolor{preprocessor}{\#define\ INT\_FAST8\_MIN\ \ \ \ INT8\_MIN}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00207}\mbox{\hyperlink{stdint_8h_acbcdb3bee0f5f904da5df8de69a80ca3}{00207}}\ \textcolor{preprocessor}{\#define\ INT\_FAST8\_MAX\ \ \ \ INT8\_MAX}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00208}\mbox{\hyperlink{stdint_8h_a169460a4e2a79138723d68d99372d958}{00208}}\ \textcolor{preprocessor}{\#define\ INT\_FAST16\_MIN\ \ \ INT16\_MIN}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00209}\mbox{\hyperlink{stdint_8h_a2fd35d0ea091e04caec504ff0042cf00}{00209}}\ \textcolor{preprocessor}{\#define\ INT\_FAST16\_MAX\ \ \ INT16\_MAX}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00210}\mbox{\hyperlink{stdint_8h_ad93df1652ed0635513d5efe4f1219926}{00210}}\ \textcolor{preprocessor}{\#define\ INT\_FAST32\_MIN\ \ \ INT32\_MIN}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00211}\mbox{\hyperlink{stdint_8h_ac96fa0f41b19e89f109e4f9913ca6635}{00211}}\ \textcolor{preprocessor}{\#define\ INT\_FAST32\_MAX\ \ \ INT32\_MAX}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00212}\mbox{\hyperlink{stdint_8h_a50f0fdcb00ea2500cec0f3d6d45c36f3}{00212}}\ \textcolor{preprocessor}{\#define\ INT\_FAST64\_MIN\ \ \ INT64\_MIN}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00213}\mbox{\hyperlink{stdint_8h_a13c95cf9c209d8daacb36cbf0d5ba275}{00213}}\ \textcolor{preprocessor}{\#define\ INT\_FAST64\_MAX\ \ \ INT64\_MAX}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00214}\mbox{\hyperlink{stdint_8h_a2c6f97ea2d76d0cf6260c84046cdb44e}{00214}}\ \textcolor{preprocessor}{\#define\ UINT\_FAST8\_MAX\ \ \ UINT8\_MAX}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00215}\mbox{\hyperlink{stdint_8h_aed28ca63d9b222f6f1377358fe73a183}{00215}}\ \textcolor{preprocessor}{\#define\ UINT\_FAST16\_MAX\ \ UINT16\_MAX}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00216}\mbox{\hyperlink{stdint_8h_ad51246a178143208b2db3315efd21c45}{00216}}\ \textcolor{preprocessor}{\#define\ UINT\_FAST32\_MAX\ \ UINT32\_MAX}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00217}\mbox{\hyperlink{stdint_8h_aeb74410af7781bc84b5f64ae7a8f4a17}{00217}}\ \textcolor{preprocessor}{\#define\ UINT\_FAST64\_MAX\ \ UINT64\_MAX}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00218}00218\ }
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00219}00219\ \textcolor{comment}{//\ 7.18.2.4\ Limits\ of\ integer\ types\ capable\ of\ holding\ object\ pointers}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00220}00220\ \textcolor{preprocessor}{\#ifdef\ \_WIN64\ }\textcolor{comment}{//\ [}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00221}00221\ \textcolor{preprocessor}{\#\ \ define\ INTPTR\_MIN\ \ \ INT64\_MIN}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00222}00222\ \textcolor{preprocessor}{\#\ \ define\ INTPTR\_MAX\ \ \ INT64\_MAX}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00223}00223\ \textcolor{preprocessor}{\#\ \ define\ UINTPTR\_MAX\ \ UINT64\_MAX}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00224}00224\ \textcolor{preprocessor}{\#else\ }\textcolor{comment}{//\ \_WIN64\ ][}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00225}\mbox{\hyperlink{stdint_8h_a2aaa6d3aa1d7d1e0e326955aa24db752}{00225}}\ \textcolor{preprocessor}{\#\ \ define\ INTPTR\_MIN\ \ \ INT32\_MIN}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00226}\mbox{\hyperlink{stdint_8h_a9e5742f2bae4a5283431a3c03499e3a9}{00226}}\ \textcolor{preprocessor}{\#\ \ define\ INTPTR\_MAX\ \ \ INT32\_MAX}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00227}\mbox{\hyperlink{stdint_8h_ab2355300ea19395357e62d780f4dd073}{00227}}\ \textcolor{preprocessor}{\#\ \ define\ UINTPTR\_MAX\ \ UINT32\_MAX}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00228}00228\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ \_WIN64\ ]}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00229}00229\ }
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00230}00230\ \textcolor{comment}{//\ 7.18.2.5\ Limits\ of\ greatest-\/width\ integer\ types}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00231}\mbox{\hyperlink{stdint_8h_a2b0a3edfc672154f606dc3ad26277b61}{00231}}\ \textcolor{preprocessor}{\#define\ INTMAX\_MIN\ \ \ INT64\_MIN}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00232}\mbox{\hyperlink{stdint_8h_a022b9b0a3564d786244a4631847c37a3}{00232}}\ \textcolor{preprocessor}{\#define\ INTMAX\_MAX\ \ \ INT64\_MAX}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00233}\mbox{\hyperlink{stdint_8h_aa54fd5210434219e9027bfa0f0e325c8}{00233}}\ \textcolor{preprocessor}{\#define\ UINTMAX\_MAX\ \ UINT64\_MAX}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00234}00234\ }
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00235}00235\ \textcolor{comment}{//\ 7.18.3\ Limits\ of\ other\ integer\ types}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00236}00236\ }
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00237}00237\ \textcolor{preprocessor}{\#ifdef\ \_WIN64\ }\textcolor{comment}{//\ [}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00238}00238\ \textcolor{preprocessor}{\#\ \ define\ PTRDIFF\_MIN\ \ \_I64\_MIN}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00239}00239\ \textcolor{preprocessor}{\#\ \ define\ PTRDIFF\_MAX\ \ \_I64\_MAX}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00240}00240\ \textcolor{preprocessor}{\#else\ \ }\textcolor{comment}{//\ \_WIN64\ ][}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00241}\mbox{\hyperlink{stdint_8h_ad9b88ba2fb858f98b50b38e49875d90e}{00241}}\ \textcolor{preprocessor}{\#\ \ define\ PTRDIFF\_MIN\ \ \_I32\_MIN}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00242}\mbox{\hyperlink{stdint_8h_add2ef7bffac19cfdd1f4b5495409672f}{00242}}\ \textcolor{preprocessor}{\#\ \ define\ PTRDIFF\_MAX\ \ \_I32\_MAX}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00243}00243\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ \_WIN64\ ]}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00244}00244\ }
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00245}\mbox{\hyperlink{stdint_8h_a21e605b9ac3a03b6de93cdf5a69e129f}{00245}}\ \textcolor{preprocessor}{\#define\ SIG\_ATOMIC\_MIN\ \ INT\_MIN}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00246}\mbox{\hyperlink{stdint_8h_a1f5fe9445d0ad0bee21bab1de4cc3e58}{00246}}\ \textcolor{preprocessor}{\#define\ SIG\_ATOMIC\_MAX\ \ INT\_MAX}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00247}00247\ }
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00248}00248\ \textcolor{preprocessor}{\#ifndef\ SIZE\_MAX\ }\textcolor{comment}{//\ [}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00249}00249\ \textcolor{preprocessor}{\#\ \ ifdef\ \_WIN64\ }\textcolor{comment}{//\ [}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00250}00250\ \textcolor{preprocessor}{\#\ \ \ \ \ define\ SIZE\_MAX\ \ \_UI64\_MAX}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00251}00251\ \textcolor{preprocessor}{\#\ \ else\ }\textcolor{comment}{//\ \_WIN64\ ][}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00252}\mbox{\hyperlink{stdint_8h_a3c75bb398badb69c7577b21486f9963f}{00252}}\ \textcolor{preprocessor}{\#\ \ \ \ \ define\ SIZE\_MAX\ \ \_UI32\_MAX}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00253}00253\ \textcolor{preprocessor}{\#\ \ endif\ }\textcolor{comment}{//\ \_WIN64\ ]}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00254}00254\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ SIZE\_MAX\ ]}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00255}00255\ }
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00256}00256\ \textcolor{comment}{//\ WCHAR\_MIN\ and\ WCHAR\_MAX\ are\ also\ defined\ in\ <wchar.h>}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00257}00257\ \textcolor{preprocessor}{\#ifndef\ WCHAR\_MIN\ }\textcolor{comment}{//\ [}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00258}\mbox{\hyperlink{stdint_8h_a051084d5ebcabf282d9ca9bb2b891a78}{00258}}\ \textcolor{preprocessor}{\#\ \ define\ WCHAR\_MIN\ \ 0}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00259}00259\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ WCHAR\_MIN\ ]}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00260}00260\ \textcolor{preprocessor}{\#ifndef\ WCHAR\_MAX\ }\textcolor{comment}{//\ [}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00261}\mbox{\hyperlink{stdint_8h_a2a823f3ccf2306cfbaa34d8addf66010}{00261}}\ \textcolor{preprocessor}{\#\ \ define\ WCHAR\_MAX\ \ \_UI16\_MAX}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00262}00262\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ WCHAR\_MAX\ ]}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00263}00263\ }
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00264}\mbox{\hyperlink{stdint_8h_a5285bc55170ae1701e599decacc7f001}{00264}}\ \textcolor{preprocessor}{\#define\ WINT\_MIN\ \ 0}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00265}\mbox{\hyperlink{stdint_8h_ad3f7b6bb8aa7d619017a91d3b2edc1ee}{00265}}\ \textcolor{preprocessor}{\#define\ WINT\_MAX\ \ \_UI16\_MAX}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00266}00266\ }
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00267}00267\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ \_\_STDC\_LIMIT\_MACROS\ ]}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00268}00268\ }
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00269}00269\ }
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00270}00270\ \textcolor{comment}{//\ 7.18.4\ Limits\ of\ other\ integer\ types}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00271}00271\ }
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00272}00272\ \textcolor{preprocessor}{\#if\ !defined(\_\_cplusplus)\ ||\ defined(\_\_STDC\_CONSTANT\_MACROS)\ }\textcolor{comment}{//\ [\ \ \ See\ footnote\ 224\ at\ page\ 260}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00273}00273\ }
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00274}00274\ \textcolor{comment}{//\ 7.18.4.1\ Macros\ for\ minimum-\/width\ integer\ constants}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00275}00275\ }
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00276}\mbox{\hyperlink{stdint_8h_acf31df4f42272d793d752c4628c0f195}{00276}}\ \textcolor{preprocessor}{\#define\ INT8\_C(val)\ \ val\#\#i8}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00277}\mbox{\hyperlink{stdint_8h_ab8c7ef9b034497b6cbd51a82eb22943b}{00277}}\ \textcolor{preprocessor}{\#define\ INT16\_C(val)\ val\#\#i16}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00278}\mbox{\hyperlink{stdint_8h_a7df71d27f096826a76677178823f39bb}{00278}}\ \textcolor{preprocessor}{\#define\ INT32\_C(val)\ val\#\#i32}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00279}\mbox{\hyperlink{stdint_8h_a095799ae3fe39d90cfbbe21ad4713318}{00279}}\ \textcolor{preprocessor}{\#define\ INT64\_C(val)\ val\#\#i64}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00280}00280\ }
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00281}\mbox{\hyperlink{stdint_8h_a8caaafb4382e3c415f261b6580f0929d}{00281}}\ \textcolor{preprocessor}{\#define\ UINT8\_C(val)\ \ val\#\#ui8}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00282}\mbox{\hyperlink{stdint_8h_ac8ab4bd1a0343acea9b7ed3e05c5ad13}{00282}}\ \textcolor{preprocessor}{\#define\ UINT16\_C(val)\ val\#\#ui16}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00283}\mbox{\hyperlink{stdint_8h_a189f825ef34a1be844d384db2618ce12}{00283}}\ \textcolor{preprocessor}{\#define\ UINT32\_C(val)\ val\#\#ui32}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00284}\mbox{\hyperlink{stdint_8h_a8da5373e041921aa34c2b6172ac3babc}{00284}}\ \textcolor{preprocessor}{\#define\ UINT64\_C(val)\ val\#\#ui64}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00285}00285\ }
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00286}00286\ \textcolor{comment}{//\ 7.18.4.2\ Macros\ for\ greatest-\/width\ integer\ constants}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00287}00287\ \textcolor{comment}{//\ These\ \#ifndef's\ are\ needed\ to\ prevent\ collisions\ with\ <boost/cstdint.hpp>.}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00288}00288\ \textcolor{comment}{//\ Check\ out\ Issue\ 9\ for\ the\ details.}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00289}00289\ \textcolor{preprocessor}{\#ifndef\ INTMAX\_C\ }\textcolor{comment}{//\ \ \ [}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00290}\mbox{\hyperlink{stdint_8h_ad558c804c227da1f8e1844e5314e80c5}{00290}}\ \textcolor{preprocessor}{\#\ \ define\ INTMAX\_C\ \ \ INT64\_C}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00291}00291\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ INTMAX\_C\ \ \ \ ]}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00292}00292\ \textcolor{preprocessor}{\#ifndef\ UINTMAX\_C\ }\textcolor{comment}{//\ \ [}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00293}\mbox{\hyperlink{stdint_8h_ad7d1c8e3d3b8ba6eed942f6f7a0910db}{00293}}\ \textcolor{preprocessor}{\#\ \ define\ UINTMAX\_C\ \ UINT64\_C}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00294}00294\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ UINTMAX\_C\ \ \ ]}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00295}00295\ }
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00296}00296\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ \_\_STDC\_CONSTANT\_MACROS\ ]}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00297}00297\ }
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00298}00298\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ \_MSC\_VER\ >=\ 1600\ ]}}
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00299}00299\ }
+\DoxyCodeLine{\Hypertarget{stdint_8h_source_l00300}00300\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ \_MSC\_STDINT\_H\_\ ]}}
+
+\end{DoxyCode}

@@ -1,0 +1,439 @@
+\doxysection{sysio\+::vm\+::running\+\_\+context\texorpdfstring{$<$}{<} Host\+\_\+\+Type, Execution\+\_\+\+Interface \texorpdfstring{$>$}{>} Struct Template Reference}
+\hypertarget{structsysio_1_1vm_1_1running__context}{}\label{structsysio_1_1vm_1_1running__context}\index{sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$@{sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$}}
+
+
+{\ttfamily \#include $<$host\+\_\+function.\+hpp$>$}
+
+
+
+Collaboration diagram for sysio\+::vm\+::running\+\_\+context\texorpdfstring{$<$}{<} Host\+\_\+\+Type, Execution\+\_\+\+Interface \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=212pt]{structsysio_1_1vm_1_1running__context__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a69040f9a8b13c6a7de2df8a9b07fce71}{running\+\_\+context\+\_\+t}} = \mbox{\hyperlink{structsysio_1_1vm_1_1running__context}{running\+\_\+context}}$<$Execution\+\_\+\+Interface$>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a7afa36ffbfccf6704e19ad6f374e6821}{running\+\_\+context}} (Host\+\_\+\+Type \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a5a5638571b2406db1f899a039f3eff9d}{host}}, const Execution\+\_\+\+Interface \&ei)
+\item 
+\mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a4313b6793cb38b4564eb60b1937f4486}{running\+\_\+context}} (Host\+\_\+\+Type \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a5a5638571b2406db1f899a039f3eff9d}{host}}, Execution\+\_\+\+Interface \&\&ei)
+\item 
+void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_adcf11dcf0561f87d00d970dedd3cc7f1}{access}} (\mbox{\hyperlink{namespacesysio_1_1vm_a82e706727e849ccc38e1c8e7888c1609}{wasm\+\_\+ptr\+\_\+t}} addr=0) const
+\item 
+Execution\+\_\+\+Interface \& \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a102b607430e70aab298a77980fe775b1}{get\+\_\+interface}} ()
+\item 
+const Execution\+\_\+\+Interface \& \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a499abb110132b4d1d866394eb22f89fb}{get\+\_\+interface}} () const
+\item 
+decltype(auto) \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a4e977f78d30ba3952099aae66b486541}{get\+\_\+host}} ()
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{union_u}{U}} $>$ }\\auto \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a478b0dc62286dd10788d1a035656b0ed}{validate\+\_\+pointer}} (\mbox{\hyperlink{union_u}{U}} ptr, \mbox{\hyperlink{namespacesysio_1_1vm_ab7d81f47e123ef4970d3e643196660ea}{wasm\+\_\+size\+\_\+t}} \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}) const
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\auto \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a17c78537d5c2f671c0fec3513e0e4eb3}{validate\+\_\+null\+\_\+terminated\+\_\+pointer}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} ptr) const
+\item 
+\mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a7afa36ffbfccf6704e19ad6f374e6821}{running\+\_\+context}} (Host\+\_\+\+Type \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a5a5638571b2406db1f899a039f3eff9d}{host}}, const Execution\+\_\+\+Interface \&ei)
+\item 
+\mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a4313b6793cb38b4564eb60b1937f4486}{running\+\_\+context}} (Host\+\_\+\+Type \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a5a5638571b2406db1f899a039f3eff9d}{host}}, Execution\+\_\+\+Interface \&\&ei)
+\item 
+void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_adcf11dcf0561f87d00d970dedd3cc7f1}{access}} (\mbox{\hyperlink{namespacesysio_1_1vm_a82e706727e849ccc38e1c8e7888c1609}{wasm\+\_\+ptr\+\_\+t}} addr=0) const
+\item 
+Execution\+\_\+\+Interface \& \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a102b607430e70aab298a77980fe775b1}{get\+\_\+interface}} ()
+\item 
+const Execution\+\_\+\+Interface \& \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a499abb110132b4d1d866394eb22f89fb}{get\+\_\+interface}} () const
+\item 
+decltype(auto) \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a4e977f78d30ba3952099aae66b486541}{get\+\_\+host}} ()
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{union_u}{U}} $>$ }\\auto \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a478b0dc62286dd10788d1a035656b0ed}{validate\+\_\+pointer}} (\mbox{\hyperlink{union_u}{U}} ptr, \mbox{\hyperlink{namespacesysio_1_1vm_ab7d81f47e123ef4970d3e643196660ea}{wasm\+\_\+size\+\_\+t}} \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}) const
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\auto \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a17c78537d5c2f671c0fec3513e0e4eb3}{validate\+\_\+null\+\_\+terminated\+\_\+pointer}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} ptr) const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+Host\+\_\+\+Type \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a5a5638571b2406db1f899a039f3eff9d}{host}}
+\item 
+Execution\+\_\+\+Interface \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_acb4ee00df8e5719608f1fba32d6d0bed}{interface}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Host\+\_\+\+Type = standalone\+\_\+function\+\_\+t, typename Execution\+\_\+\+Interface = execution\+\_\+interface$>$\newline
+struct sysio\+::vm\+::running\+\_\+context$<$ Host\+\_\+\+Type, Execution\+\_\+\+Interface $>$}
+
+
+Definition at line \mbox{\hyperlink{vm_2host__function_8hpp_source_l00031}{31}} of file \mbox{\hyperlink{vm_2host__function_8hpp_source}{host\+\_\+function.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{structsysio_1_1vm_1_1running__context_a69040f9a8b13c6a7de2df8a9b07fce71}\index{sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$@{sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$}!running\_context\_t@{running\_context\_t}}
+\index{running\_context\_t@{running\_context\_t}!sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$@{sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$}}
+\doxysubsubsection{\texorpdfstring{running\_context\_t}{running\_context\_t}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1running__context_a69040f9a8b13c6a7de2df8a9b07fce71} 
+template$<$typename Host\+\_\+\+Type  = standalone\+\_\+function\+\_\+t, typename Execution\+\_\+\+Interface  = execution\+\_\+interface$>$ \\
+typedef \mbox{\hyperlink{structsysio_1_1vm_1_1running__context}{running\+\_\+context}}$<$ Execution\+\_\+\+Interface $>$ \mbox{\hyperlink{structsysio_1_1vm_1_1running__context}{sysio\+::vm\+::running\+\_\+context}}$<$ Host\+\_\+\+Type, Execution\+\_\+\+Interface $>$\+::running\+\_\+context\+\_\+t = \mbox{\hyperlink{structsysio_1_1vm_1_1running__context}{running\+\_\+context}}$<$Execution\+\_\+\+Interface$>$}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_source_l00032}{32}} of file \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_source}{host\+\_\+function.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structsysio_1_1vm_1_1running__context_a7afa36ffbfccf6704e19ad6f374e6821}\index{sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$@{sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$}!running\_context@{running\_context}}
+\index{running\_context@{running\_context}!sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$@{sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$}}
+\doxysubsubsection{\texorpdfstring{running\_context()}{running\_context()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1running__context_a7afa36ffbfccf6704e19ad6f374e6821} 
+template$<$typename Host\+\_\+\+Type  = standalone\+\_\+function\+\_\+t, typename Execution\+\_\+\+Interface  = execution\+\_\+interface$>$ \\
+\mbox{\hyperlink{structsysio_1_1vm_1_1running__context}{sysio\+::vm\+::running\+\_\+context}}$<$ Host\+\_\+\+Type, Execution\+\_\+\+Interface $>$\+::running\+\_\+context (\begin{DoxyParamCaption}\item[{Host\+\_\+\+Type \texorpdfstring{$\ast$}{*}}]{host}{, }\item[{const Execution\+\_\+\+Interface \&}]{ei}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_source_l00033}{33}} of file \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_source}{host\+\_\+function.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00033\ :\ \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a5a5638571b2406db1f899a039f3eff9d}{host}}(host),\ \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_acb4ee00df8e5719608f1fba32d6d0bed}{interface}}(ei)\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1vm_1_1running__context_a4313b6793cb38b4564eb60b1937f4486}\index{sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$@{sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$}!running\_context@{running\_context}}
+\index{running\_context@{running\_context}!sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$@{sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$}}
+\doxysubsubsection{\texorpdfstring{running\_context()}{running\_context()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1running__context_a4313b6793cb38b4564eb60b1937f4486} 
+template$<$typename Host\+\_\+\+Type  = standalone\+\_\+function\+\_\+t, typename Execution\+\_\+\+Interface  = execution\+\_\+interface$>$ \\
+\mbox{\hyperlink{structsysio_1_1vm_1_1running__context}{sysio\+::vm\+::running\+\_\+context}}$<$ Host\+\_\+\+Type, Execution\+\_\+\+Interface $>$\+::running\+\_\+context (\begin{DoxyParamCaption}\item[{Host\+\_\+\+Type \texorpdfstring{$\ast$}{*}}]{host}{, }\item[{Execution\+\_\+\+Interface \&\&}]{ei}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_source_l00034}{34}} of file \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_source}{host\+\_\+function.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00034\ :\ \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a5a5638571b2406db1f899a039f3eff9d}{host}}(host),\ \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_acb4ee00df8e5719608f1fba32d6d0bed}{interface}}(ei)\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1vm_1_1running__context_a7afa36ffbfccf6704e19ad6f374e6821}\index{sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$@{sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$}!running\_context@{running\_context}}
+\index{running\_context@{running\_context}!sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$@{sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$}}
+\doxysubsubsection{\texorpdfstring{running\_context()}{running\_context()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1running__context_a7afa36ffbfccf6704e19ad6f374e6821} 
+template$<$typename Host\+\_\+\+Type  = standalone\+\_\+function\+\_\+t, typename Execution\+\_\+\+Interface  = execution\+\_\+interface$>$ \\
+\mbox{\hyperlink{structsysio_1_1vm_1_1running__context}{sysio\+::vm\+::running\+\_\+context}}$<$ Host\+\_\+\+Type, Execution\+\_\+\+Interface $>$\+::running\+\_\+context (\begin{DoxyParamCaption}\item[{Host\+\_\+\+Type \texorpdfstring{$\ast$}{*}}]{host}{, }\item[{const Execution\+\_\+\+Interface \&}]{ei}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2host__function_8hpp_source_l00033}{33}} of file \mbox{\hyperlink{vm_2host__function_8hpp_source}{host\+\_\+function.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00033\ :\ \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a5a5638571b2406db1f899a039f3eff9d}{host}}(host),\ \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_acb4ee00df8e5719608f1fba32d6d0bed}{interface}}(ei)\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1vm_1_1running__context_a4313b6793cb38b4564eb60b1937f4486}\index{sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$@{sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$}!running\_context@{running\_context}}
+\index{running\_context@{running\_context}!sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$@{sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$}}
+\doxysubsubsection{\texorpdfstring{running\_context()}{running\_context()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1running__context_a4313b6793cb38b4564eb60b1937f4486} 
+template$<$typename Host\+\_\+\+Type  = standalone\+\_\+function\+\_\+t, typename Execution\+\_\+\+Interface  = execution\+\_\+interface$>$ \\
+\mbox{\hyperlink{structsysio_1_1vm_1_1running__context}{sysio\+::vm\+::running\+\_\+context}}$<$ Host\+\_\+\+Type, Execution\+\_\+\+Interface $>$\+::running\+\_\+context (\begin{DoxyParamCaption}\item[{Host\+\_\+\+Type \texorpdfstring{$\ast$}{*}}]{host}{, }\item[{Execution\+\_\+\+Interface \&\&}]{ei}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2host__function_8hpp_source_l00034}{34}} of file \mbox{\hyperlink{vm_2host__function_8hpp_source}{host\+\_\+function.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00034\ :\ \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a5a5638571b2406db1f899a039f3eff9d}{host}}(host),\ \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_acb4ee00df8e5719608f1fba32d6d0bed}{interface}}(ei)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1vm_1_1running__context_adcf11dcf0561f87d00d970dedd3cc7f1}\index{sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$@{sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$}!access@{access}}
+\index{access@{access}!sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$@{sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$}}
+\doxysubsubsection{\texorpdfstring{access()}{access()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1running__context_adcf11dcf0561f87d00d970dedd3cc7f1} 
+template$<$typename Host\+\_\+\+Type  = standalone\+\_\+function\+\_\+t, typename Execution\+\_\+\+Interface  = execution\+\_\+interface$>$ \\
+void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structsysio_1_1vm_1_1running__context}{sysio\+::vm\+::running\+\_\+context}}$<$ Host\+\_\+\+Type, Execution\+\_\+\+Interface $>$\+::access (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacesysio_1_1vm_a82e706727e849ccc38e1c8e7888c1609}{wasm\+\_\+ptr\+\_\+t}}}]{addr}{ = {\ttfamily 0}}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_source_l00036}{36}} of file \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_source}{host\+\_\+function.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00036\ \{\ \textcolor{keywordflow}{return}\ (\textcolor{keywordtype}{char}*)\mbox{\hyperlink{structsysio_1_1vm_1_1running__context_acb4ee00df8e5719608f1fba32d6d0bed}{interface}}.get\_memory()\ +\ addr;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=342pt]{structsysio_1_1vm_1_1running__context_adcf11dcf0561f87d00d970dedd3cc7f1_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1vm_1_1running__context_adcf11dcf0561f87d00d970dedd3cc7f1}\index{sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$@{sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$}!access@{access}}
+\index{access@{access}!sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$@{sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$}}
+\doxysubsubsection{\texorpdfstring{access()}{access()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1running__context_adcf11dcf0561f87d00d970dedd3cc7f1} 
+template$<$typename Host\+\_\+\+Type  = standalone\+\_\+function\+\_\+t, typename Execution\+\_\+\+Interface  = execution\+\_\+interface$>$ \\
+void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structsysio_1_1vm_1_1running__context}{sysio\+::vm\+::running\+\_\+context}}$<$ Host\+\_\+\+Type, Execution\+\_\+\+Interface $>$\+::access (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacesysio_1_1vm_a82e706727e849ccc38e1c8e7888c1609}{wasm\+\_\+ptr\+\_\+t}}}]{addr}{ = {\ttfamily 0}}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2host__function_8hpp_source_l00036}{36}} of file \mbox{\hyperlink{vm_2host__function_8hpp_source}{host\+\_\+function.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00036\ \{\ \textcolor{keywordflow}{return}\ (\textcolor{keywordtype}{char}*)\mbox{\hyperlink{structsysio_1_1vm_1_1running__context_acb4ee00df8e5719608f1fba32d6d0bed}{interface}}.get\_memory()\ +\ addr;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1vm_1_1running__context_a4e977f78d30ba3952099aae66b486541}\index{sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$@{sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$}!get\_host@{get\_host}}
+\index{get\_host@{get\_host}!sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$@{sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$}}
+\doxysubsubsection{\texorpdfstring{get\_host()}{get\_host()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1running__context_a4e977f78d30ba3952099aae66b486541} 
+template$<$typename Host\+\_\+\+Type  = standalone\+\_\+function\+\_\+t, typename Execution\+\_\+\+Interface  = execution\+\_\+interface$>$ \\
+decltype(auto) \mbox{\hyperlink{structsysio_1_1vm_1_1running__context}{sysio\+::vm\+::running\+\_\+context}}$<$ Host\+\_\+\+Type, Execution\+\_\+\+Interface $>$\+::get\+\_\+host (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_source_l00041}{41}} of file \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_source}{host\+\_\+function.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00041\ \{\ \textcolor{keywordflow}{return}\ *\mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a5a5638571b2406db1f899a039f3eff9d}{host}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1vm_1_1running__context_a4e977f78d30ba3952099aae66b486541}\index{sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$@{sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$}!get\_host@{get\_host}}
+\index{get\_host@{get\_host}!sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$@{sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$}}
+\doxysubsubsection{\texorpdfstring{get\_host()}{get\_host()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1running__context_a4e977f78d30ba3952099aae66b486541} 
+template$<$typename Host\+\_\+\+Type  = standalone\+\_\+function\+\_\+t, typename Execution\+\_\+\+Interface  = execution\+\_\+interface$>$ \\
+decltype(auto) \mbox{\hyperlink{structsysio_1_1vm_1_1running__context}{sysio\+::vm\+::running\+\_\+context}}$<$ Host\+\_\+\+Type, Execution\+\_\+\+Interface $>$\+::get\+\_\+host (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2host__function_8hpp_source_l00041}{41}} of file \mbox{\hyperlink{vm_2host__function_8hpp_source}{host\+\_\+function.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00041\ \{\ \textcolor{keywordflow}{return}\ *\mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a5a5638571b2406db1f899a039f3eff9d}{host}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1vm_1_1running__context_a102b607430e70aab298a77980fe775b1}\index{sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$@{sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$}!get\_interface@{get\_interface}}
+\index{get\_interface@{get\_interface}!sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$@{sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$}}
+\doxysubsubsection{\texorpdfstring{get\_interface()}{get\_interface()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1running__context_a102b607430e70aab298a77980fe775b1} 
+template$<$typename Host\+\_\+\+Type  = standalone\+\_\+function\+\_\+t, typename Execution\+\_\+\+Interface  = execution\+\_\+interface$>$ \\
+Execution\+\_\+\+Interface \& \mbox{\hyperlink{structsysio_1_1vm_1_1running__context}{sysio\+::vm\+::running\+\_\+context}}$<$ Host\+\_\+\+Type, Execution\+\_\+\+Interface $>$\+::get\+\_\+interface (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_source_l00038}{38}} of file \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_source}{host\+\_\+function.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00038\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_acb4ee00df8e5719608f1fba32d6d0bed}{interface}};\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1vm_1_1running__context_a102b607430e70aab298a77980fe775b1_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1vm_1_1running__context_a102b607430e70aab298a77980fe775b1}\index{sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$@{sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$}!get\_interface@{get\_interface}}
+\index{get\_interface@{get\_interface}!sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$@{sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$}}
+\doxysubsubsection{\texorpdfstring{get\_interface()}{get\_interface()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1running__context_a102b607430e70aab298a77980fe775b1} 
+template$<$typename Host\+\_\+\+Type  = standalone\+\_\+function\+\_\+t, typename Execution\+\_\+\+Interface  = execution\+\_\+interface$>$ \\
+Execution\+\_\+\+Interface \& \mbox{\hyperlink{structsysio_1_1vm_1_1running__context}{sysio\+::vm\+::running\+\_\+context}}$<$ Host\+\_\+\+Type, Execution\+\_\+\+Interface $>$\+::get\+\_\+interface (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2host__function_8hpp_source_l00038}{38}} of file \mbox{\hyperlink{vm_2host__function_8hpp_source}{host\+\_\+function.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00038\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_acb4ee00df8e5719608f1fba32d6d0bed}{interface}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1vm_1_1running__context_a499abb110132b4d1d866394eb22f89fb}\index{sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$@{sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$}!get\_interface@{get\_interface}}
+\index{get\_interface@{get\_interface}!sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$@{sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$}}
+\doxysubsubsection{\texorpdfstring{get\_interface()}{get\_interface()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1running__context_a499abb110132b4d1d866394eb22f89fb} 
+template$<$typename Host\+\_\+\+Type  = standalone\+\_\+function\+\_\+t, typename Execution\+\_\+\+Interface  = execution\+\_\+interface$>$ \\
+const Execution\+\_\+\+Interface \& \mbox{\hyperlink{structsysio_1_1vm_1_1running__context}{sysio\+::vm\+::running\+\_\+context}}$<$ Host\+\_\+\+Type, Execution\+\_\+\+Interface $>$\+::get\+\_\+interface (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_source_l00039}{39}} of file \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_source}{host\+\_\+function.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00039\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_acb4ee00df8e5719608f1fba32d6d0bed}{interface}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1vm_1_1running__context_a499abb110132b4d1d866394eb22f89fb}\index{sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$@{sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$}!get\_interface@{get\_interface}}
+\index{get\_interface@{get\_interface}!sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$@{sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$}}
+\doxysubsubsection{\texorpdfstring{get\_interface()}{get\_interface()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1running__context_a499abb110132b4d1d866394eb22f89fb} 
+template$<$typename Host\+\_\+\+Type  = standalone\+\_\+function\+\_\+t, typename Execution\+\_\+\+Interface  = execution\+\_\+interface$>$ \\
+const Execution\+\_\+\+Interface \& \mbox{\hyperlink{structsysio_1_1vm_1_1running__context}{sysio\+::vm\+::running\+\_\+context}}$<$ Host\+\_\+\+Type, Execution\+\_\+\+Interface $>$\+::get\+\_\+interface (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2host__function_8hpp_source_l00039}{39}} of file \mbox{\hyperlink{vm_2host__function_8hpp_source}{host\+\_\+function.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00039\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_acb4ee00df8e5719608f1fba32d6d0bed}{interface}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1vm_1_1running__context_a17c78537d5c2f671c0fec3513e0e4eb3}\index{sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$@{sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$}!validate\_null\_terminated\_pointer@{validate\_null\_terminated\_pointer}}
+\index{validate\_null\_terminated\_pointer@{validate\_null\_terminated\_pointer}!sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$@{sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$}}
+\doxysubsubsection{\texorpdfstring{validate\_null\_terminated\_pointer()}{validate\_null\_terminated\_pointer()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1running__context_a17c78537d5c2f671c0fec3513e0e4eb3} 
+template$<$typename Host\+\_\+\+Type  = standalone\+\_\+function\+\_\+t, typename Execution\+\_\+\+Interface  = execution\+\_\+interface$>$ \\
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+auto \mbox{\hyperlink{structsysio_1_1vm_1_1running__context}{sysio\+::vm\+::running\+\_\+context}}$<$ Host\+\_\+\+Type, Execution\+\_\+\+Interface $>$\+::validate\+\_\+null\+\_\+terminated\+\_\+pointer (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}}]{ptr}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_source_l00049}{49}} of file \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_source}{host\+\_\+function.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a102b607430e70aab298a77980fe775b1}{get\_interface}}().validate\_null\_terminated\_pointer(ptr);}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=345pt]{structsysio_1_1vm_1_1running__context_a17c78537d5c2f671c0fec3513e0e4eb3_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1vm_1_1running__context_a17c78537d5c2f671c0fec3513e0e4eb3}\index{sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$@{sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$}!validate\_null\_terminated\_pointer@{validate\_null\_terminated\_pointer}}
+\index{validate\_null\_terminated\_pointer@{validate\_null\_terminated\_pointer}!sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$@{sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$}}
+\doxysubsubsection{\texorpdfstring{validate\_null\_terminated\_pointer()}{validate\_null\_terminated\_pointer()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1running__context_a17c78537d5c2f671c0fec3513e0e4eb3} 
+template$<$typename Host\+\_\+\+Type  = standalone\+\_\+function\+\_\+t, typename Execution\+\_\+\+Interface  = execution\+\_\+interface$>$ \\
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+auto \mbox{\hyperlink{structsysio_1_1vm_1_1running__context}{sysio\+::vm\+::running\+\_\+context}}$<$ Host\+\_\+\+Type, Execution\+\_\+\+Interface $>$\+::validate\+\_\+null\+\_\+terminated\+\_\+pointer (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}}]{ptr}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2host__function_8hpp_source_l00049}{49}} of file \mbox{\hyperlink{vm_2host__function_8hpp_source}{host\+\_\+function.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a102b607430e70aab298a77980fe775b1}{get\_interface}}().validate\_null\_terminated\_pointer(ptr);}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=345pt]{structsysio_1_1vm_1_1running__context_a17c78537d5c2f671c0fec3513e0e4eb3_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1vm_1_1running__context_a478b0dc62286dd10788d1a035656b0ed}\index{sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$@{sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$}!validate\_pointer@{validate\_pointer}}
+\index{validate\_pointer@{validate\_pointer}!sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$@{sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$}}
+\doxysubsubsection{\texorpdfstring{validate\_pointer()}{validate\_pointer()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1running__context_a478b0dc62286dd10788d1a035656b0ed} 
+template$<$typename Host\+\_\+\+Type  = standalone\+\_\+function\+\_\+t, typename Execution\+\_\+\+Interface  = execution\+\_\+interface$>$ \\
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{union_u}{U}} $>$ \\
+auto \mbox{\hyperlink{structsysio_1_1vm_1_1running__context}{sysio\+::vm\+::running\+\_\+context}}$<$ Host\+\_\+\+Type, Execution\+\_\+\+Interface $>$\+::validate\+\_\+pointer (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{union_u}{U}}}]{ptr}{, }\item[{\mbox{\hyperlink{namespacesysio_1_1vm_ab7d81f47e123ef4970d3e643196660ea}{wasm\+\_\+size\+\_\+t}}}]{len}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_source_l00044}{44}} of file \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_source}{host\+\_\+function.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a102b607430e70aab298a77980fe775b1}{get\_interface}}().template\ \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a478b0dc62286dd10788d1a035656b0ed}{validate\_pointer<T>}}(ptr,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}});}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1vm_1_1running__context_a478b0dc62286dd10788d1a035656b0ed_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=208pt]{structsysio_1_1vm_1_1running__context_a478b0dc62286dd10788d1a035656b0ed_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1vm_1_1running__context_a478b0dc62286dd10788d1a035656b0ed}\index{sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$@{sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$}!validate\_pointer@{validate\_pointer}}
+\index{validate\_pointer@{validate\_pointer}!sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$@{sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$}}
+\doxysubsubsection{\texorpdfstring{validate\_pointer()}{validate\_pointer()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1running__context_a478b0dc62286dd10788d1a035656b0ed} 
+template$<$typename Host\+\_\+\+Type  = standalone\+\_\+function\+\_\+t, typename Execution\+\_\+\+Interface  = execution\+\_\+interface$>$ \\
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{union_u}{U}} $>$ \\
+auto \mbox{\hyperlink{structsysio_1_1vm_1_1running__context}{sysio\+::vm\+::running\+\_\+context}}$<$ Host\+\_\+\+Type, Execution\+\_\+\+Interface $>$\+::validate\+\_\+pointer (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{union_u}{U}}}]{ptr}{, }\item[{\mbox{\hyperlink{namespacesysio_1_1vm_ab7d81f47e123ef4970d3e643196660ea}{wasm\+\_\+size\+\_\+t}}}]{len}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2host__function_8hpp_source_l00044}{44}} of file \mbox{\hyperlink{vm_2host__function_8hpp_source}{host\+\_\+function.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a102b607430e70aab298a77980fe775b1}{get\_interface}}().template\ \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a478b0dc62286dd10788d1a035656b0ed}{validate\_pointer<T>}}(ptr,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}});}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1vm_1_1running__context_a478b0dc62286dd10788d1a035656b0ed_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1vm_1_1running__context_a5a5638571b2406db1f899a039f3eff9d}\index{sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$@{sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$}!host@{host}}
+\index{host@{host}!sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$@{sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$}}
+\doxysubsubsection{\texorpdfstring{host}{host}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1running__context_a5a5638571b2406db1f899a039f3eff9d} 
+template$<$typename Host\+\_\+\+Type  = standalone\+\_\+function\+\_\+t, typename Execution\+\_\+\+Interface  = execution\+\_\+interface$>$ \\
+Host\+\_\+\+Type \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structsysio_1_1vm_1_1running__context}{sysio\+::vm\+::running\+\_\+context}}$<$ Host\+\_\+\+Type, Execution\+\_\+\+Interface $>$\+::host}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_source_l00053}{53}} of file \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_source}{host\+\_\+function.\+hpp}}.
+
+\Hypertarget{structsysio_1_1vm_1_1running__context_acb4ee00df8e5719608f1fba32d6d0bed}\index{sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$@{sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$}!interface@{interface}}
+\index{interface@{interface}!sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$@{sysio::vm::running\_context$<$ Host\_Type, Execution\_Interface $>$}}
+\doxysubsubsection{\texorpdfstring{interface}{interface}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1running__context_acb4ee00df8e5719608f1fba32d6d0bed} 
+template$<$typename Host\+\_\+\+Type  = standalone\+\_\+function\+\_\+t, typename Execution\+\_\+\+Interface  = execution\+\_\+interface$>$ \\
+Execution\+\_\+\+Interface \mbox{\hyperlink{structsysio_1_1vm_1_1running__context}{sysio\+::vm\+::running\+\_\+context}}$<$ Host\+\_\+\+Type, Execution\+\_\+\+Interface $>$\+::interface}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_source_l00054}{54}} of file \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_source}{host\+\_\+function.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/include/sysio/sysio/vm/\mbox{\hyperlink{sysio_2vm_2host__function_8hpp}{host\+\_\+function.\+hpp}}\item 
+libraries/sys-\/vm/include/sysio/vm/\mbox{\hyperlink{vm_2host__function_8hpp}{host\+\_\+function.\+hpp}}\end{DoxyCompactItemize}

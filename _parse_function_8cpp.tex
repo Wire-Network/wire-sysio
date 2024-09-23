@@ -1,0 +1,143 @@
+\doxysection{libraries/wasm-\/jit/\+Source/\+WAST/\+Parse\+Function.cpp File Reference}
+\hypertarget{_parse_function_8cpp}{}\label{_parse_function_8cpp}\index{libraries/wasm-\/jit/Source/WAST/ParseFunction.cpp@{libraries/wasm-\/jit/Source/WAST/ParseFunction.cpp}}
+{\ttfamily \#include "{}Inline/\+Basic\+Types.\+h"{}}\newline
+{\ttfamily \#include "{}WAST.\+h"{}}\newline
+{\ttfamily \#include "{}Lexer.\+h"{}}\newline
+{\ttfamily \#include "{}Parse.\+h"{}}\newline
+{\ttfamily \#include "{}IR/\+Module.\+h"{}}\newline
+{\ttfamily \#include "{}IR/\+Operators.\+h"{}}\newline
+{\ttfamily \#include "{}IR/\+Validate.\+h"{}}\newline
+{\ttfamily \#include "{}Inline/\+Serialization.\+h"{}}\newline
+{\ttfamily \#include $<$memory$>$}\newline
+Include dependency graph for Parse\+Function.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{_parse_function_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespace_w_a_s_t}{WAST}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{_parse_function_8cpp_a5c975c850de8a1221bcc1a77cc2f7013}{VISIT\+\_\+\+OP}}(opcode,  \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  name\+String,  Imm, ...)
+\item 
+\#define \mbox{\hyperlink{_parse_function_8cpp_a5c975c850de8a1221bcc1a77cc2f7013}{VISIT\+\_\+\+OP}}(opcode,  \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  name\+String,  Imm, ...)
+\item 
+\#define \mbox{\hyperlink{_parse_function_8cpp_a5c975c850de8a1221bcc1a77cc2f7013}{VISIT\+\_\+\+OP}}(opcode,  \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  name\+String,  Imm, ...)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_i_r_1_1_function_def}{IR\+::\+Function\+Def}} \mbox{\hyperlink{namespace_w_a_s_t_ad67ed47b4a120f234a3a4a2da076418f}{WAST\+::parse\+Function\+Def}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_module_parse_state}{Module\+Parse\+State}} \&\mbox{\hyperlink{structstate}{state}}, const Token \texorpdfstring{$\ast$}{*}func\+Token)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{_parse_function_8cpp_a5c975c850de8a1221bcc1a77cc2f7013}\index{ParseFunction.cpp@{ParseFunction.cpp}!VISIT\_OP@{VISIT\_OP}}
+\index{VISIT\_OP@{VISIT\_OP}!ParseFunction.cpp@{ParseFunction.cpp}}
+\doxysubsubsection{\texorpdfstring{VISIT\_OP}{VISIT\_OP}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{_parse_function_8cpp_a5c975c850de8a1221bcc1a77cc2f7013} 
+\#define VISIT\+\_\+\+OP(\begin{DoxyParamCaption}\item[{}]{opcode}{, }\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{name\+String}{, }\item[{}]{Imm}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ parseOp\_\#\#\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(FunctionParseState\&\ \mbox{\hyperlink{structstate}{state}},\textcolor{keywordtype}{bool}\ isExpression)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ ++\mbox{\hyperlink{structstate}{state}}.nextToken;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ Imm\ imm;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ parseImm(\mbox{\hyperlink{structstate}{state}},imm);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ if(isExpression)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ parseExprSequence(\mbox{\hyperlink{structstate}{state}});\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.validatingCodeStream.name(imm);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{_parse_function_8cpp_source_l00356}{356}} of file \mbox{\hyperlink{_parse_function_8cpp_source}{Parse\+Function.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00356\ \textcolor{preprocessor}{\#define\ VISIT\_OP(opcode,name,nameString,Imm,...)\ \(\backslash\)}}
+\DoxyCodeLine{00357\ \textcolor{preprocessor}{\ \ \ \ static\ void\ parseOp\_\#\#name(FunctionParseState\&\ state,bool\ isExpression)\ \(\backslash\)}}
+\DoxyCodeLine{00358\ \textcolor{preprocessor}{\ \ \ \ \{\ \(\backslash\)}}
+\DoxyCodeLine{00359\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ ++state.nextToken;\ \(\backslash\)}}
+\DoxyCodeLine{00360\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ Imm\ imm;\ \(\backslash\)}}
+\DoxyCodeLine{00361\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ parseImm(state,imm);\ \(\backslash\)}}
+\DoxyCodeLine{00362\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ if(isExpression)\ \(\backslash\)}}
+\DoxyCodeLine{00363\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \{\ \(\backslash\)}}
+\DoxyCodeLine{00364\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ parseExprSequence(state);\ \(\backslash\)}}
+\DoxyCodeLine{00365\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00366\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ state.validatingCodeStream.name(imm);\ \(\backslash\)}}
+\DoxyCodeLine{00367\ \textcolor{preprocessor}{\ \ \ \ \}}}
+
+\end{DoxyCode}
+\Hypertarget{_parse_function_8cpp_a5c975c850de8a1221bcc1a77cc2f7013}\index{ParseFunction.cpp@{ParseFunction.cpp}!VISIT\_OP@{VISIT\_OP}}
+\index{VISIT\_OP@{VISIT\_OP}!ParseFunction.cpp@{ParseFunction.cpp}}
+\doxysubsubsection{\texorpdfstring{VISIT\_OP}{VISIT\_OP}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{_parse_function_8cpp_a5c975c850de8a1221bcc1a77cc2f7013} 
+\#define VISIT\+\_\+\+OP(\begin{DoxyParamCaption}\item[{}]{opcode}{, }\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{name\+String}{, }\item[{}]{Imm}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordflow}{case}\ t\_\#\#\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}:\ parseOp\_\#\#\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(\mbox{\hyperlink{structstate}{state}},\textcolor{keyword}{true});\ \textcolor{keywordflow}{break};}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{_parse_function_8cpp_source_l00356}{356}} of file \mbox{\hyperlink{_parse_function_8cpp_source}{Parse\+Function.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00356\ \textcolor{preprocessor}{\#define\ VISIT\_OP(opcode,name,nameString,Imm,...)\ \(\backslash\)}}
+\DoxyCodeLine{00357\ \textcolor{preprocessor}{\ \ \ \ static\ void\ parseOp\_\#\#name(FunctionParseState\&\ state,bool\ isExpression)\ \(\backslash\)}}
+\DoxyCodeLine{00358\ \textcolor{preprocessor}{\ \ \ \ \{\ \(\backslash\)}}
+\DoxyCodeLine{00359\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ ++state.nextToken;\ \(\backslash\)}}
+\DoxyCodeLine{00360\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ Imm\ imm;\ \(\backslash\)}}
+\DoxyCodeLine{00361\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ parseImm(state,imm);\ \(\backslash\)}}
+\DoxyCodeLine{00362\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ if(isExpression)\ \(\backslash\)}}
+\DoxyCodeLine{00363\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \{\ \(\backslash\)}}
+\DoxyCodeLine{00364\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ parseExprSequence(state);\ \(\backslash\)}}
+\DoxyCodeLine{00365\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00366\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ state.validatingCodeStream.name(imm);\ \(\backslash\)}}
+\DoxyCodeLine{00367\ \textcolor{preprocessor}{\ \ \ \ \}}}
+
+\end{DoxyCode}
+\Hypertarget{_parse_function_8cpp_a5c975c850de8a1221bcc1a77cc2f7013}\index{ParseFunction.cpp@{ParseFunction.cpp}!VISIT\_OP@{VISIT\_OP}}
+\index{VISIT\_OP@{VISIT\_OP}!ParseFunction.cpp@{ParseFunction.cpp}}
+\doxysubsubsection{\texorpdfstring{VISIT\_OP}{VISIT\_OP}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{_parse_function_8cpp_a5c975c850de8a1221bcc1a77cc2f7013} 
+\#define VISIT\+\_\+\+OP(\begin{DoxyParamCaption}\item[{}]{opcode}{, }\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{name\+String}{, }\item[{}]{Imm}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordflow}{case}\ t\_\#\#\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}:\ parseOp\_\#\#\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(\mbox{\hyperlink{structstate}{state}},\textcolor{keyword}{false});\ \textcolor{keywordflow}{break};}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{_parse_function_8cpp_source_l00356}{356}} of file \mbox{\hyperlink{_parse_function_8cpp_source}{Parse\+Function.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00356\ \textcolor{preprocessor}{\#define\ VISIT\_OP(opcode,name,nameString,Imm,...)\ \(\backslash\)}}
+\DoxyCodeLine{00357\ \textcolor{preprocessor}{\ \ \ \ static\ void\ parseOp\_\#\#name(FunctionParseState\&\ state,bool\ isExpression)\ \(\backslash\)}}
+\DoxyCodeLine{00358\ \textcolor{preprocessor}{\ \ \ \ \{\ \(\backslash\)}}
+\DoxyCodeLine{00359\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ ++state.nextToken;\ \(\backslash\)}}
+\DoxyCodeLine{00360\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ Imm\ imm;\ \(\backslash\)}}
+\DoxyCodeLine{00361\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ parseImm(state,imm);\ \(\backslash\)}}
+\DoxyCodeLine{00362\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ if(isExpression)\ \(\backslash\)}}
+\DoxyCodeLine{00363\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \{\ \(\backslash\)}}
+\DoxyCodeLine{00364\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ parseExprSequence(state);\ \(\backslash\)}}
+\DoxyCodeLine{00365\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00366\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ state.validatingCodeStream.name(imm);\ \(\backslash\)}}
+\DoxyCodeLine{00367\ \textcolor{preprocessor}{\ \ \ \ \}}}
+
+\end{DoxyCode}

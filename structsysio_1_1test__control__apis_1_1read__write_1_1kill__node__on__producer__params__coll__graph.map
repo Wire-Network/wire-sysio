@@ -1,0 +1,5 @@
+<map id="sysio::test_control_apis::read_write::kill_node_on_producer_params" name="sysio::test_control_apis::read_write::kill_node_on_producer_params">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,94,190,150"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1name.html" title="Immutable except for fc::from_variant." alt="" coords="32,5,163,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="100,47,100,93,95,93,95,47"/>
+</map>

@@ -1,0 +1,701 @@
+\doxysection{sysiobios\+::bios Class Reference}
+\hypertarget{classsysiobios_1_1bios}{}\label{classsysiobios_1_1bios}\index{sysiobios::bios@{sysiobios::bios}}
+
+
+{\ttfamily \#include $<$sysio.\+bios.\+hpp$>$}
+
+
+
+Inheritance diagram for sysiobios\+::bios\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=161pt]{classsysiobios_1_1bios__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for sysiobios\+::bios\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=161pt]{classsysiobios_1_1bios__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysiobios_1_1bios_1_1abi__hash}{abi\+\_\+hash}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef sysio\+::multi\+\_\+index$<$ "{}abihash"{}\+\_\+n, \mbox{\hyperlink{structsysiobios_1_1bios_1_1abi__hash}{abi\+\_\+hash}} $>$ \mbox{\hyperlink{classsysiobios_1_1bios_afa8e3a9dda880dc77c4b2a098e3d06ab}{abi\+\_\+hash\+\_\+table}}
+\item 
+using \mbox{\hyperlink{classsysiobios_1_1bios_a7dc1d944502cfbfa100ac59a5b210e96}{newaccount\+\_\+action}} = action\+\_\+wrapper$<$"{}newaccount"{}\+\_\+n, \&\mbox{\hyperlink{classsysiobios_1_1bios_a401c65d011b7a9634d43482504d10a03}{bios\+::newaccount}}$>$
+\item 
+using \mbox{\hyperlink{classsysiobios_1_1bios_a13f9806edf1cf05d789a05e12bcc56d3}{updateauth\+\_\+action}} = action\+\_\+wrapper$<$"{}updateauth"{}\+\_\+n, \&\mbox{\hyperlink{classsysiobios_1_1bios_a22768debac784dc24991477f709a3bd6}{bios\+::updateauth}}$>$
+\item 
+using \mbox{\hyperlink{classsysiobios_1_1bios_afc2cf01e1f43c401f99b2da7157965ba}{deleteauth\+\_\+action}} = action\+\_\+wrapper$<$"{}deleteauth"{}\+\_\+n, \&\mbox{\hyperlink{classsysiobios_1_1bios_adb1b06b3facaf17125c9b11826f62d55}{bios\+::deleteauth}}$>$
+\item 
+using \mbox{\hyperlink{classsysiobios_1_1bios_a6b7194879ed7c3c30eff19295c439f47}{linkauth\+\_\+action}} = action\+\_\+wrapper$<$"{}linkauth"{}\+\_\+n, \&\mbox{\hyperlink{classsysiobios_1_1bios_a677e3a82aea6777db78669d67cb0222c}{bios\+::linkauth}}$>$
+\item 
+using \mbox{\hyperlink{classsysiobios_1_1bios_aeb3a97c9080da5919fb7c2d8b289fba3}{unlinkauth\+\_\+action}} = action\+\_\+wrapper$<$"{}unlinkauth"{}\+\_\+n, \&\mbox{\hyperlink{classsysiobios_1_1bios_a19557effdbe3108db7eb472035561fd5}{bios\+::unlinkauth}}$>$
+\item 
+using \mbox{\hyperlink{classsysiobios_1_1bios_a68dfb895cbb88829a97aa9e7651635b3}{canceldelay\+\_\+action}} = action\+\_\+wrapper$<$"{}canceldelay"{}\+\_\+n, \&\mbox{\hyperlink{classsysiobios_1_1bios_a65f4904f98b87bb9d41fc70add2ccd45}{bios\+::canceldelay}}$>$
+\item 
+using \mbox{\hyperlink{classsysiobios_1_1bios_af3ff3207039fba5155b27abba6f668db}{setcode\+\_\+action}} = action\+\_\+wrapper$<$"{}setcode"{}\+\_\+n, \&\mbox{\hyperlink{classsysiobios_1_1bios_ad3ccd98da04d26f84a791df28ddf0163}{bios\+::setcode}}$>$
+\item 
+using \mbox{\hyperlink{classsysiobios_1_1bios_a92d466fa3727d244d9b27c5dcf582831}{setabi\+\_\+action}} = action\+\_\+wrapper$<$"{}setabi"{}\+\_\+n, \&\mbox{\hyperlink{classsysiobios_1_1bios_ae6a371995275689627137540163400f3}{bios\+::setabi}}$>$
+\item 
+using \mbox{\hyperlink{classsysiobios_1_1bios_a24baccb5399e5d33b2773e274aa3d69d}{setpriv\+\_\+action}} = action\+\_\+wrapper$<$"{}setpriv"{}\+\_\+n, \&\mbox{\hyperlink{classsysiobios_1_1bios_a354cd416a947ceb4570f79945201dc26}{bios\+::setpriv}}$>$
+\item 
+using \mbox{\hyperlink{classsysiobios_1_1bios_a6ab9e6dc84cc852371ad7f6078474db1}{setalimits\+\_\+action}} = action\+\_\+wrapper$<$"{}setalimits"{}\+\_\+n, \&\mbox{\hyperlink{classsysiobios_1_1bios_a1c0a48375d49f6e40ac68cea3f607023}{bios\+::setalimits}}$>$
+\item 
+using \mbox{\hyperlink{classsysiobios_1_1bios_ad8a23ffb486e482bcd706afa2359586f}{setprods\+\_\+action}} = action\+\_\+wrapper$<$"{}setprods"{}\+\_\+n, \&\mbox{\hyperlink{classsysiobios_1_1bios_aa3c044b6e735772bb74b701b9644adff}{bios\+::setprods}}$>$
+\item 
+using \mbox{\hyperlink{classsysiobios_1_1bios_a935e9748aed1f483921d829ae8086152}{setparams\+\_\+action}} = action\+\_\+wrapper$<$"{}setparams"{}\+\_\+n, \&\mbox{\hyperlink{classsysiobios_1_1bios_a12292a38385cd27b44230142b16055fe}{bios\+::setparams}}$>$
+\item 
+using \mbox{\hyperlink{classsysiobios_1_1bios_ae2018827503b18e3c9abe53f3587c421}{reqauth\+\_\+action}} = action\+\_\+wrapper$<$"{}reqauth"{}\+\_\+n, \&\mbox{\hyperlink{classsysiobios_1_1bios_a166b4faf7c18e7d56cea30dffb16898a}{bios\+::reqauth}}$>$
+\item 
+using \mbox{\hyperlink{classsysiobios_1_1bios_a854293ec38b2e7ebc09542f8552138f4}{activate\+\_\+action}} = action\+\_\+wrapper$<$"{}activate"{}\+\_\+n, \&\mbox{\hyperlink{classsysiobios_1_1bios_ac875a9162aa0c383f2f09cb73218e707}{bios\+::activate}}$>$
+\item 
+using \mbox{\hyperlink{classsysiobios_1_1bios_a28f69fccf62981fef5703c55f6ec29df}{reqactivated\+\_\+action}} = action\+\_\+wrapper$<$"{}reqactivated"{}\+\_\+n, \&\mbox{\hyperlink{classsysiobios_1_1bios_a24871c773956cc1b268e98f422c115c7}{bios\+::reqactivated}}$>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{classsysiobios_1_1bios_a401c65d011b7a9634d43482504d10a03}{newaccount}} (\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} creator, \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}, ignore$<$ \mbox{\hyperlink{structsysiobios_1_1authority}{authority}} $>$ owner, ignore$<$ \mbox{\hyperlink{structsysiobios_1_1authority}{authority}} $>$ active)
+\item 
+void \mbox{\hyperlink{classsysiobios_1_1bios_a22768debac784dc24991477f709a3bd6}{updateauth}} (ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$ account, ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$ permission, ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$ parent, ignore$<$ \mbox{\hyperlink{structsysiobios_1_1authority}{authority}} $>$ auth)
+\item 
+void \mbox{\hyperlink{classsysiobios_1_1bios_adb1b06b3facaf17125c9b11826f62d55}{deleteauth}} (ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$ account, ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$ permission)
+\item 
+void \mbox{\hyperlink{classsysiobios_1_1bios_a677e3a82aea6777db78669d67cb0222c}{linkauth}} (ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$ account, ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$ code, ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$ type, ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$ requirement)
+\item 
+void \mbox{\hyperlink{classsysiobios_1_1bios_a19557effdbe3108db7eb472035561fd5}{unlinkauth}} (ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$ account, ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$ code, ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$ type)
+\item 
+void \mbox{\hyperlink{classsysiobios_1_1bios_a65f4904f98b87bb9d41fc70add2ccd45}{canceldelay}} (ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1permission__level}{permission\+\_\+level}} $>$ canceling\+\_\+auth, ignore$<$ checksum256 $>$ trx\+\_\+id)
+\item 
+void \mbox{\hyperlink{classsysiobios_1_1bios_ad3ccd98da04d26f84a791df28ddf0163}{setcode}} (\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} account, \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} vmtype, \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} vmversion, const std\+::vector$<$ char $>$ \&code)
+\item 
+void \mbox{\hyperlink{classsysiobios_1_1bios_ae6a371995275689627137540163400f3}{setabi}} (\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} account, const std\+::vector$<$ char $>$ \&abi)
+\item 
+void \mbox{\hyperlink{classsysiobios_1_1bios_ab97794753eb584019f3a85167d69d2e7}{onerror}} (ignore$<$ uint128\+\_\+t $>$ sender\+\_\+id, ignore$<$ std\+::vector$<$ char $>$ $>$ sent\+\_\+trx)
+\item 
+void \mbox{\hyperlink{classsysiobios_1_1bios_a354cd416a947ceb4570f79945201dc26}{setpriv}} (\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} account, \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} is\+\_\+priv)
+\item 
+void \mbox{\hyperlink{classsysiobios_1_1bios_a1c0a48375d49f6e40ac68cea3f607023}{setalimits}} (\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} account, \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} ram\+\_\+bytes, \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} net\+\_\+weight, \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} cpu\+\_\+weight)
+\item 
+void \mbox{\hyperlink{classsysiobios_1_1bios_aa3c044b6e735772bb74b701b9644adff}{setprods}} (const std\+::vector$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority}{sysio\+::producer\+\_\+authority}} $>$ \&schedule)
+\item 
+void \mbox{\hyperlink{classsysiobios_1_1bios_a12292a38385cd27b44230142b16055fe}{setparams}} (const sysio\+::blockchain\+\_\+parameters \&\mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}})
+\item 
+void \mbox{\hyperlink{classsysiobios_1_1bios_a166b4faf7c18e7d56cea30dffb16898a}{reqauth}} (\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} from)
+\item 
+void \mbox{\hyperlink{classsysiobios_1_1bios_ac875a9162aa0c383f2f09cb73218e707}{activate}} (const sysio\+::checksum256 \&feature\+\_\+digest)
+\item 
+void \mbox{\hyperlink{classsysiobios_1_1bios_a24871c773956cc1b268e98f422c115c7}{reqactivated}} (const sysio\+::checksum256 \&feature\+\_\+digest)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+The {\ttfamily sysio.\+bios} is the first sample of system contract provided by {\ttfamily block.\+one} through the EOSIO platform. It is a minimalist system contract because it only supplies the actions that are absolutely critical to bootstrap a chain and nothing more. This allows for a chain agnostic approach to bootstrapping a chain.
+
+Just like in the {\ttfamily sysio.\+system} sample contract implementation, there are a few actions which are not implemented at the contract level ({\ttfamily newaccount}, {\ttfamily updateauth}, {\ttfamily deleteauth}, {\ttfamily linkauth}, {\ttfamily unlinkauth}, {\ttfamily canceldelay}, {\ttfamily onerror}, {\ttfamily setabi}, {\ttfamily setcode}), they are just declared in the contract so they will show in the contract\textquotesingle{}s ABI and users will be able to push those actions to the chain via the account holding the {\ttfamily sysio.\+system} contract, but the implementation is at the EOSIO core level. They are referred to as EOSIO native actions. 
+
+Definition at line \mbox{\hyperlink{sysio_8bios_8hpp_source_l00074}{74}} of file \mbox{\hyperlink{sysio_8bios_8hpp_source}{sysio.\+bios.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classsysiobios_1_1bios_afa8e3a9dda880dc77c4b2a098e3d06ab}\index{sysiobios::bios@{sysiobios::bios}!abi\_hash\_table@{abi\_hash\_table}}
+\index{abi\_hash\_table@{abi\_hash\_table}!sysiobios::bios@{sysiobios::bios}}
+\doxysubsubsection{\texorpdfstring{abi\_hash\_table}{abi\_hash\_table}}
+{\footnotesize\ttfamily \label{classsysiobios_1_1bios_afa8e3a9dda880dc77c4b2a098e3d06ab} 
+sysio\+::multi\+\_\+index$<$ "{}abihash"{}\+\_\+n, \mbox{\hyperlink{structsysiobios_1_1bios_1_1abi__hash}{abi\+\_\+hash}} $>$ \mbox{\hyperlink{classsysiobios_1_1bios_afa8e3a9dda880dc77c4b2a098e3d06ab}{sysiobios\+::bios\+::abi\+\_\+hash\+\_\+table}}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8bios_8hpp_source_l00264}{264}} of file \mbox{\hyperlink{sysio_8bios_8hpp_source}{sysio.\+bios.\+hpp}}.
+
+\Hypertarget{classsysiobios_1_1bios_a854293ec38b2e7ebc09542f8552138f4}\index{sysiobios::bios@{sysiobios::bios}!activate\_action@{activate\_action}}
+\index{activate\_action@{activate\_action}!sysiobios::bios@{sysiobios::bios}}
+\doxysubsubsection{\texorpdfstring{activate\_action}{activate\_action}}
+{\footnotesize\ttfamily \label{classsysiobios_1_1bios_a854293ec38b2e7ebc09542f8552138f4} 
+using \mbox{\hyperlink{classsysiobios_1_1bios_a854293ec38b2e7ebc09542f8552138f4}{sysiobios\+::bios\+::activate\+\_\+action}} = action\+\_\+wrapper$<$"{}activate"{}\+\_\+n, \&\mbox{\hyperlink{classsysiobios_1_1bios_ac875a9162aa0c383f2f09cb73218e707}{bios\+::activate}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8bios_8hpp_source_l00279}{279}} of file \mbox{\hyperlink{sysio_8bios_8hpp_source}{sysio.\+bios.\+hpp}}.
+
+\Hypertarget{classsysiobios_1_1bios_a68dfb895cbb88829a97aa9e7651635b3}\index{sysiobios::bios@{sysiobios::bios}!canceldelay\_action@{canceldelay\_action}}
+\index{canceldelay\_action@{canceldelay\_action}!sysiobios::bios@{sysiobios::bios}}
+\doxysubsubsection{\texorpdfstring{canceldelay\_action}{canceldelay\_action}}
+{\footnotesize\ttfamily \label{classsysiobios_1_1bios_a68dfb895cbb88829a97aa9e7651635b3} 
+using \mbox{\hyperlink{classsysiobios_1_1bios_a68dfb895cbb88829a97aa9e7651635b3}{sysiobios\+::bios\+::canceldelay\+\_\+action}} = action\+\_\+wrapper$<$"{}canceldelay"{}\+\_\+n, \&\mbox{\hyperlink{classsysiobios_1_1bios_a65f4904f98b87bb9d41fc70add2ccd45}{bios\+::canceldelay}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8bios_8hpp_source_l00271}{271}} of file \mbox{\hyperlink{sysio_8bios_8hpp_source}{sysio.\+bios.\+hpp}}.
+
+\Hypertarget{classsysiobios_1_1bios_afc2cf01e1f43c401f99b2da7157965ba}\index{sysiobios::bios@{sysiobios::bios}!deleteauth\_action@{deleteauth\_action}}
+\index{deleteauth\_action@{deleteauth\_action}!sysiobios::bios@{sysiobios::bios}}
+\doxysubsubsection{\texorpdfstring{deleteauth\_action}{deleteauth\_action}}
+{\footnotesize\ttfamily \label{classsysiobios_1_1bios_afc2cf01e1f43c401f99b2da7157965ba} 
+using \mbox{\hyperlink{classsysiobios_1_1bios_afc2cf01e1f43c401f99b2da7157965ba}{sysiobios\+::bios\+::deleteauth\+\_\+action}} = action\+\_\+wrapper$<$"{}deleteauth"{}\+\_\+n, \&\mbox{\hyperlink{classsysiobios_1_1bios_adb1b06b3facaf17125c9b11826f62d55}{bios\+::deleteauth}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8bios_8hpp_source_l00268}{268}} of file \mbox{\hyperlink{sysio_8bios_8hpp_source}{sysio.\+bios.\+hpp}}.
+
+\Hypertarget{classsysiobios_1_1bios_a6b7194879ed7c3c30eff19295c439f47}\index{sysiobios::bios@{sysiobios::bios}!linkauth\_action@{linkauth\_action}}
+\index{linkauth\_action@{linkauth\_action}!sysiobios::bios@{sysiobios::bios}}
+\doxysubsubsection{\texorpdfstring{linkauth\_action}{linkauth\_action}}
+{\footnotesize\ttfamily \label{classsysiobios_1_1bios_a6b7194879ed7c3c30eff19295c439f47} 
+using \mbox{\hyperlink{classsysiobios_1_1bios_a6b7194879ed7c3c30eff19295c439f47}{sysiobios\+::bios\+::linkauth\+\_\+action}} = action\+\_\+wrapper$<$"{}linkauth"{}\+\_\+n, \&\mbox{\hyperlink{classsysiobios_1_1bios_a677e3a82aea6777db78669d67cb0222c}{bios\+::linkauth}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8bios_8hpp_source_l00269}{269}} of file \mbox{\hyperlink{sysio_8bios_8hpp_source}{sysio.\+bios.\+hpp}}.
+
+\Hypertarget{classsysiobios_1_1bios_a7dc1d944502cfbfa100ac59a5b210e96}\index{sysiobios::bios@{sysiobios::bios}!newaccount\_action@{newaccount\_action}}
+\index{newaccount\_action@{newaccount\_action}!sysiobios::bios@{sysiobios::bios}}
+\doxysubsubsection{\texorpdfstring{newaccount\_action}{newaccount\_action}}
+{\footnotesize\ttfamily \label{classsysiobios_1_1bios_a7dc1d944502cfbfa100ac59a5b210e96} 
+using \mbox{\hyperlink{classsysiobios_1_1bios_a7dc1d944502cfbfa100ac59a5b210e96}{sysiobios\+::bios\+::newaccount\+\_\+action}} = action\+\_\+wrapper$<$"{}newaccount"{}\+\_\+n, \&\mbox{\hyperlink{classsysiobios_1_1bios_a401c65d011b7a9634d43482504d10a03}{bios\+::newaccount}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8bios_8hpp_source_l00266}{266}} of file \mbox{\hyperlink{sysio_8bios_8hpp_source}{sysio.\+bios.\+hpp}}.
+
+\Hypertarget{classsysiobios_1_1bios_a28f69fccf62981fef5703c55f6ec29df}\index{sysiobios::bios@{sysiobios::bios}!reqactivated\_action@{reqactivated\_action}}
+\index{reqactivated\_action@{reqactivated\_action}!sysiobios::bios@{sysiobios::bios}}
+\doxysubsubsection{\texorpdfstring{reqactivated\_action}{reqactivated\_action}}
+{\footnotesize\ttfamily \label{classsysiobios_1_1bios_a28f69fccf62981fef5703c55f6ec29df} 
+using \mbox{\hyperlink{classsysiobios_1_1bios_a28f69fccf62981fef5703c55f6ec29df}{sysiobios\+::bios\+::reqactivated\+\_\+action}} = action\+\_\+wrapper$<$"{}reqactivated"{}\+\_\+n, \&\mbox{\hyperlink{classsysiobios_1_1bios_a24871c773956cc1b268e98f422c115c7}{bios\+::reqactivated}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8bios_8hpp_source_l00280}{280}} of file \mbox{\hyperlink{sysio_8bios_8hpp_source}{sysio.\+bios.\+hpp}}.
+
+\Hypertarget{classsysiobios_1_1bios_ae2018827503b18e3c9abe53f3587c421}\index{sysiobios::bios@{sysiobios::bios}!reqauth\_action@{reqauth\_action}}
+\index{reqauth\_action@{reqauth\_action}!sysiobios::bios@{sysiobios::bios}}
+\doxysubsubsection{\texorpdfstring{reqauth\_action}{reqauth\_action}}
+{\footnotesize\ttfamily \label{classsysiobios_1_1bios_ae2018827503b18e3c9abe53f3587c421} 
+using \mbox{\hyperlink{classsysiobios_1_1bios_ae2018827503b18e3c9abe53f3587c421}{sysiobios\+::bios\+::reqauth\+\_\+action}} = action\+\_\+wrapper$<$"{}reqauth"{}\+\_\+n, \&\mbox{\hyperlink{classsysiobios_1_1bios_a166b4faf7c18e7d56cea30dffb16898a}{bios\+::reqauth}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8bios_8hpp_source_l00278}{278}} of file \mbox{\hyperlink{sysio_8bios_8hpp_source}{sysio.\+bios.\+hpp}}.
+
+\Hypertarget{classsysiobios_1_1bios_a92d466fa3727d244d9b27c5dcf582831}\index{sysiobios::bios@{sysiobios::bios}!setabi\_action@{setabi\_action}}
+\index{setabi\_action@{setabi\_action}!sysiobios::bios@{sysiobios::bios}}
+\doxysubsubsection{\texorpdfstring{setabi\_action}{setabi\_action}}
+{\footnotesize\ttfamily \label{classsysiobios_1_1bios_a92d466fa3727d244d9b27c5dcf582831} 
+using \mbox{\hyperlink{classsysiobios_1_1bios_a92d466fa3727d244d9b27c5dcf582831}{sysiobios\+::bios\+::setabi\+\_\+action}} = action\+\_\+wrapper$<$"{}setabi"{}\+\_\+n, \&\mbox{\hyperlink{classsysiobios_1_1bios_ae6a371995275689627137540163400f3}{bios\+::setabi}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8bios_8hpp_source_l00273}{273}} of file \mbox{\hyperlink{sysio_8bios_8hpp_source}{sysio.\+bios.\+hpp}}.
+
+\Hypertarget{classsysiobios_1_1bios_a6ab9e6dc84cc852371ad7f6078474db1}\index{sysiobios::bios@{sysiobios::bios}!setalimits\_action@{setalimits\_action}}
+\index{setalimits\_action@{setalimits\_action}!sysiobios::bios@{sysiobios::bios}}
+\doxysubsubsection{\texorpdfstring{setalimits\_action}{setalimits\_action}}
+{\footnotesize\ttfamily \label{classsysiobios_1_1bios_a6ab9e6dc84cc852371ad7f6078474db1} 
+using \mbox{\hyperlink{classsysiobios_1_1bios_a6ab9e6dc84cc852371ad7f6078474db1}{sysiobios\+::bios\+::setalimits\+\_\+action}} = action\+\_\+wrapper$<$"{}setalimits"{}\+\_\+n, \&\mbox{\hyperlink{classsysiobios_1_1bios_a1c0a48375d49f6e40ac68cea3f607023}{bios\+::setalimits}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8bios_8hpp_source_l00275}{275}} of file \mbox{\hyperlink{sysio_8bios_8hpp_source}{sysio.\+bios.\+hpp}}.
+
+\Hypertarget{classsysiobios_1_1bios_af3ff3207039fba5155b27abba6f668db}\index{sysiobios::bios@{sysiobios::bios}!setcode\_action@{setcode\_action}}
+\index{setcode\_action@{setcode\_action}!sysiobios::bios@{sysiobios::bios}}
+\doxysubsubsection{\texorpdfstring{setcode\_action}{setcode\_action}}
+{\footnotesize\ttfamily \label{classsysiobios_1_1bios_af3ff3207039fba5155b27abba6f668db} 
+using \mbox{\hyperlink{classsysiobios_1_1bios_af3ff3207039fba5155b27abba6f668db}{sysiobios\+::bios\+::setcode\+\_\+action}} = action\+\_\+wrapper$<$"{}setcode"{}\+\_\+n, \&\mbox{\hyperlink{classsysiobios_1_1bios_ad3ccd98da04d26f84a791df28ddf0163}{bios\+::setcode}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8bios_8hpp_source_l00272}{272}} of file \mbox{\hyperlink{sysio_8bios_8hpp_source}{sysio.\+bios.\+hpp}}.
+
+\Hypertarget{classsysiobios_1_1bios_a935e9748aed1f483921d829ae8086152}\index{sysiobios::bios@{sysiobios::bios}!setparams\_action@{setparams\_action}}
+\index{setparams\_action@{setparams\_action}!sysiobios::bios@{sysiobios::bios}}
+\doxysubsubsection{\texorpdfstring{setparams\_action}{setparams\_action}}
+{\footnotesize\ttfamily \label{classsysiobios_1_1bios_a935e9748aed1f483921d829ae8086152} 
+using \mbox{\hyperlink{classsysiobios_1_1bios_a935e9748aed1f483921d829ae8086152}{sysiobios\+::bios\+::setparams\+\_\+action}} = action\+\_\+wrapper$<$"{}setparams"{}\+\_\+n, \&\mbox{\hyperlink{classsysiobios_1_1bios_a12292a38385cd27b44230142b16055fe}{bios\+::setparams}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8bios_8hpp_source_l00277}{277}} of file \mbox{\hyperlink{sysio_8bios_8hpp_source}{sysio.\+bios.\+hpp}}.
+
+\Hypertarget{classsysiobios_1_1bios_a24baccb5399e5d33b2773e274aa3d69d}\index{sysiobios::bios@{sysiobios::bios}!setpriv\_action@{setpriv\_action}}
+\index{setpriv\_action@{setpriv\_action}!sysiobios::bios@{sysiobios::bios}}
+\doxysubsubsection{\texorpdfstring{setpriv\_action}{setpriv\_action}}
+{\footnotesize\ttfamily \label{classsysiobios_1_1bios_a24baccb5399e5d33b2773e274aa3d69d} 
+using \mbox{\hyperlink{classsysiobios_1_1bios_a24baccb5399e5d33b2773e274aa3d69d}{sysiobios\+::bios\+::setpriv\+\_\+action}} = action\+\_\+wrapper$<$"{}setpriv"{}\+\_\+n, \&\mbox{\hyperlink{classsysiobios_1_1bios_a354cd416a947ceb4570f79945201dc26}{bios\+::setpriv}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8bios_8hpp_source_l00274}{274}} of file \mbox{\hyperlink{sysio_8bios_8hpp_source}{sysio.\+bios.\+hpp}}.
+
+\Hypertarget{classsysiobios_1_1bios_ad8a23ffb486e482bcd706afa2359586f}\index{sysiobios::bios@{sysiobios::bios}!setprods\_action@{setprods\_action}}
+\index{setprods\_action@{setprods\_action}!sysiobios::bios@{sysiobios::bios}}
+\doxysubsubsection{\texorpdfstring{setprods\_action}{setprods\_action}}
+{\footnotesize\ttfamily \label{classsysiobios_1_1bios_ad8a23ffb486e482bcd706afa2359586f} 
+using \mbox{\hyperlink{classsysiobios_1_1bios_ad8a23ffb486e482bcd706afa2359586f}{sysiobios\+::bios\+::setprods\+\_\+action}} = action\+\_\+wrapper$<$"{}setprods"{}\+\_\+n, \&\mbox{\hyperlink{classsysiobios_1_1bios_aa3c044b6e735772bb74b701b9644adff}{bios\+::setprods}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8bios_8hpp_source_l00276}{276}} of file \mbox{\hyperlink{sysio_8bios_8hpp_source}{sysio.\+bios.\+hpp}}.
+
+\Hypertarget{classsysiobios_1_1bios_aeb3a97c9080da5919fb7c2d8b289fba3}\index{sysiobios::bios@{sysiobios::bios}!unlinkauth\_action@{unlinkauth\_action}}
+\index{unlinkauth\_action@{unlinkauth\_action}!sysiobios::bios@{sysiobios::bios}}
+\doxysubsubsection{\texorpdfstring{unlinkauth\_action}{unlinkauth\_action}}
+{\footnotesize\ttfamily \label{classsysiobios_1_1bios_aeb3a97c9080da5919fb7c2d8b289fba3} 
+using \mbox{\hyperlink{classsysiobios_1_1bios_aeb3a97c9080da5919fb7c2d8b289fba3}{sysiobios\+::bios\+::unlinkauth\+\_\+action}} = action\+\_\+wrapper$<$"{}unlinkauth"{}\+\_\+n, \&\mbox{\hyperlink{classsysiobios_1_1bios_a19557effdbe3108db7eb472035561fd5}{bios\+::unlinkauth}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8bios_8hpp_source_l00270}{270}} of file \mbox{\hyperlink{sysio_8bios_8hpp_source}{sysio.\+bios.\+hpp}}.
+
+\Hypertarget{classsysiobios_1_1bios_a13f9806edf1cf05d789a05e12bcc56d3}\index{sysiobios::bios@{sysiobios::bios}!updateauth\_action@{updateauth\_action}}
+\index{updateauth\_action@{updateauth\_action}!sysiobios::bios@{sysiobios::bios}}
+\doxysubsubsection{\texorpdfstring{updateauth\_action}{updateauth\_action}}
+{\footnotesize\ttfamily \label{classsysiobios_1_1bios_a13f9806edf1cf05d789a05e12bcc56d3} 
+using \mbox{\hyperlink{classsysiobios_1_1bios_a13f9806edf1cf05d789a05e12bcc56d3}{sysiobios\+::bios\+::updateauth\+\_\+action}} = action\+\_\+wrapper$<$"{}updateauth"{}\+\_\+n, \&\mbox{\hyperlink{classsysiobios_1_1bios_a22768debac784dc24991477f709a3bd6}{bios\+::updateauth}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8bios_8hpp_source_l00267}{267}} of file \mbox{\hyperlink{sysio_8bios_8hpp_source}{sysio.\+bios.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysiobios_1_1bios_ac875a9162aa0c383f2f09cb73218e707}\index{sysiobios::bios@{sysiobios::bios}!activate@{activate}}
+\index{activate@{activate}!sysiobios::bios@{sysiobios::bios}}
+\doxysubsubsection{\texorpdfstring{activate()}{activate()}}
+{\footnotesize\ttfamily \label{classsysiobios_1_1bios_ac875a9162aa0c383f2f09cb73218e707} 
+void sysiobios\+::bios\+::activate (\begin{DoxyParamCaption}\item[{const sysio\+::checksum256 \&}]{feature\+\_\+digest}{}\end{DoxyParamCaption})}
+
+Activate action, activates a protocol feature
+
+
+\begin{DoxyParams}{Parameters}
+{\em feature\+\_\+digest} & -\/ hash of the protocol feature to activate. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{sysio_8bios_8cpp_source_l00048}{48}} of file \mbox{\hyperlink{sysio_8bios_8cpp_source}{sysio.\+bios.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00049\ \ \ \ require\_auth(\ get\_self()\ );}
+\DoxyCodeLine{00050\ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_a406d45a184cdba0af316b5bf34bf56cfa26c81486f55acca0e2de7ec342d97105}{preactivate\_feature}}(\ feature\_digest\ );}
+\DoxyCodeLine{00051\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysiobios_1_1bios_a65f4904f98b87bb9d41fc70add2ccd45}\index{sysiobios::bios@{sysiobios::bios}!canceldelay@{canceldelay}}
+\index{canceldelay@{canceldelay}!sysiobios::bios@{sysiobios::bios}}
+\doxysubsubsection{\texorpdfstring{canceldelay()}{canceldelay()}}
+{\footnotesize\ttfamily \label{classsysiobios_1_1bios_a65f4904f98b87bb9d41fc70add2ccd45} 
+void sysiobios\+::bios\+::canceldelay (\begin{DoxyParamCaption}\item[{ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1permission__level}{permission\+\_\+level}} $>$}]{canceling\+\_\+auth}{, }\item[{ignore$<$ checksum256 $>$}]{trx\+\_\+id}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Cancel delay action cancels a deferred transaction.
+
+
+\begin{DoxyParams}{Parameters}
+{\em canceling\+\_\+auth} & -\/ the permission that authorizes this action, \\
+\hline
+{\em trx\+\_\+id} & -\/ the deferred transaction id to be cancelled. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{sysio_8bios_8hpp_source_l00158}{158}} of file \mbox{\hyperlink{sysio_8bios_8hpp_source}{sysio.\+bios.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00158\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classsysiobios_1_1bios_adb1b06b3facaf17125c9b11826f62d55}\index{sysiobios::bios@{sysiobios::bios}!deleteauth@{deleteauth}}
+\index{deleteauth@{deleteauth}!sysiobios::bios@{sysiobios::bios}}
+\doxysubsubsection{\texorpdfstring{deleteauth()}{deleteauth()}}
+{\footnotesize\ttfamily \label{classsysiobios_1_1bios_adb1b06b3facaf17125c9b11826f62d55} 
+void sysiobios\+::bios\+::deleteauth (\begin{DoxyParamCaption}\item[{ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$}]{account}{, }\item[{ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$}]{permission}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Delete authorization action deletes the authorization for an account\textquotesingle{}s permission.
+
+
+\begin{DoxyParams}{Parameters}
+{\em account} & -\/ the account for which the permission authorization is deleted, \\
+\hline
+{\em permission} & -\/ the permission name been deleted. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{sysio_8bios_8hpp_source_l00115}{115}} of file \mbox{\hyperlink{sysio_8bios_8hpp_source}{sysio.\+bios.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classsysiobios_1_1bios_a677e3a82aea6777db78669d67cb0222c}\index{sysiobios::bios@{sysiobios::bios}!linkauth@{linkauth}}
+\index{linkauth@{linkauth}!sysiobios::bios@{sysiobios::bios}}
+\doxysubsubsection{\texorpdfstring{linkauth()}{linkauth()}}
+{\footnotesize\ttfamily \label{classsysiobios_1_1bios_a677e3a82aea6777db78669d67cb0222c} 
+void sysiobios\+::bios\+::linkauth (\begin{DoxyParamCaption}\item[{ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$}]{account}{, }\item[{ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$}]{code}{, }\item[{ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$}]{type}{, }\item[{ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$}]{requirement}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Link authorization action assigns a specific action from a contract to a permission you have created. Five system actions can not be linked {\ttfamily updateauth}, {\ttfamily deleteauth}, {\ttfamily linkauth}, {\ttfamily unlinkauth}, and {\ttfamily canceldelay}. This is useful because when doing authorization checks, the EOSIO based blockchain starts with the action needed to be authorized (and the contract belonging to), and looks up which permission is needed to pass authorization validation. If a link is set, that permission is used for authoraization validation otherwise then active is the default, with the exception of {\ttfamily \doxylink{namespacefc_a8b03fb95276f683bde05b7715d9f0014}{sysio.\+any}}. {\ttfamily \doxylink{namespacefc_a8b03fb95276f683bde05b7715d9f0014}{sysio.\+any}} is an implicit permission which exists on every account; you can link actions to {\ttfamily \doxylink{namespacefc_a8b03fb95276f683bde05b7715d9f0014}{sysio.\+any}} and that will make it so linked actions are accessible to any permissions defined for the account.
+
+
+\begin{DoxyParams}{Parameters}
+{\em account} & -\/ the permission\textquotesingle{}s owner to be linked and the payer of the RAM needed to store this link, \\
+\hline
+{\em code} & -\/ the owner of the action to be linked, \\
+\hline
+{\em type} & -\/ the action to be linked, \\
+\hline
+{\em requirement} & -\/ the permission to be linked. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{sysio_8bios_8hpp_source_l00134}{134}} of file \mbox{\hyperlink{sysio_8bios_8hpp_source}{sysio.\+bios.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classsysiobios_1_1bios_a401c65d011b7a9634d43482504d10a03}\index{sysiobios::bios@{sysiobios::bios}!newaccount@{newaccount}}
+\index{newaccount@{newaccount}!sysiobios::bios@{sysiobios::bios}}
+\doxysubsubsection{\texorpdfstring{newaccount()}{newaccount()}}
+{\footnotesize\ttfamily \label{classsysiobios_1_1bios_a401c65d011b7a9634d43482504d10a03} 
+void sysiobios\+::bios\+::newaccount (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}}]{creator}{, }\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}}]{name}{, }\item[{ignore$<$ \mbox{\hyperlink{structsysiobios_1_1authority}{authority}} $>$}]{owner}{, }\item[{ignore$<$ \mbox{\hyperlink{structsysiobios_1_1authority}{authority}} $>$}]{active}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+New account action, called after a new account is created. This code enforces resource-\/limits rules for new accounts as well as new account naming conventions.
+
+
+\begin{DoxyEnumerate}
+\item accounts cannot contain \textquotesingle{}.\textquotesingle{} symbols which forces all acccounts to be 12 characters long without \textquotesingle{}.\textquotesingle{} until a future account auction process is implemented which prevents name squatting.
+\item new accounts must stake a minimal number of tokens (as set in system parameters) therefore, this method will execute an inline buyram from receiver for newacnt in an amount equal to the current new account creation fee. 
+\end{DoxyEnumerate}
+
+Definition at line \mbox{\hyperlink{sysio_8bios_8hpp_source_l00090}{90}} of file \mbox{\hyperlink{sysio_8bios_8hpp_source}{sysio.\+bios.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classsysiobios_1_1bios_ab97794753eb584019f3a85167d69d2e7}\index{sysiobios::bios@{sysiobios::bios}!onerror@{onerror}}
+\index{onerror@{onerror}!sysiobios::bios@{sysiobios::bios}}
+\doxysubsubsection{\texorpdfstring{onerror()}{onerror()}}
+{\footnotesize\ttfamily \label{classsysiobios_1_1bios_ab97794753eb584019f3a85167d69d2e7} 
+void sysiobios\+::bios\+::onerror (\begin{DoxyParamCaption}\item[{ignore$<$ uint128\+\_\+t $>$}]{sender\+\_\+id}{, }\item[{ignore$<$ std\+::vector$<$ char $>$ $>$}]{sent\+\_\+trx}{}\end{DoxyParamCaption})}
+
+On error action, notification of this action is delivered to the sender of a deferred transaction when an objective error occurs while executing the deferred transaction. This action is not meant to be called directly.
+
+
+\begin{DoxyParams}{Parameters}
+{\em sender\+\_\+id} & -\/ the id for the deferred transaction chosen by the sender, \\
+\hline
+{\em sent\+\_\+trx} & -\/ the deferred transaction that failed. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{sysio_8bios_8cpp_source_l00020}{20}} of file \mbox{\hyperlink{sysio_8bios_8cpp_source}{sysio.\+bios.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00021\ \ \ \ check(\ \textcolor{keyword}{false},\ \textcolor{stringliteral}{"{}the\ onerror\ action\ cannot\ be\ called\ directly"{}}\ );}
+\DoxyCodeLine{00022\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysiobios_1_1bios_a24871c773956cc1b268e98f422c115c7}\index{sysiobios::bios@{sysiobios::bios}!reqactivated@{reqactivated}}
+\index{reqactivated@{reqactivated}!sysiobios::bios@{sysiobios::bios}}
+\doxysubsubsection{\texorpdfstring{reqactivated()}{reqactivated()}}
+{\footnotesize\ttfamily \label{classsysiobios_1_1bios_a24871c773956cc1b268e98f422c115c7} 
+void sysiobios\+::bios\+::reqactivated (\begin{DoxyParamCaption}\item[{const sysio\+::checksum256 \&}]{feature\+\_\+digest}{}\end{DoxyParamCaption})}
+
+Require activated action, asserts that a protocol feature has been activated
+
+
+\begin{DoxyParams}{Parameters}
+{\em feature\+\_\+digest} & -\/ hash of the protocol feature to check for activation. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{sysio_8bios_8cpp_source_l00053}{53}} of file \mbox{\hyperlink{sysio_8bios_8cpp_source}{sysio.\+bios.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00054\ \ \ \ check(\ is\_feature\_activated(\ feature\_digest\ ),\ \textcolor{stringliteral}{"{}protocol\ feature\ is\ not\ activated"{}}\ );}
+\DoxyCodeLine{00055\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysiobios_1_1bios_a166b4faf7c18e7d56cea30dffb16898a}\index{sysiobios::bios@{sysiobios::bios}!reqauth@{reqauth}}
+\index{reqauth@{reqauth}!sysiobios::bios@{sysiobios::bios}}
+\doxysubsubsection{\texorpdfstring{reqauth()}{reqauth()}}
+{\footnotesize\ttfamily \label{classsysiobios_1_1bios_a166b4faf7c18e7d56cea30dffb16898a} 
+void sysiobios\+::bios\+::reqauth (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}}]{from}{}\end{DoxyParamCaption})}
+
+Require authorization action, checks if the account name {\ttfamily from} passed in as param has authorization to access current action, that is, if it is listed in the action’s allowed permissions vector.
+
+
+\begin{DoxyParams}{Parameters}
+{\em from} & -\/ the account name to authorize \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{sysio_8bios_8cpp_source_l00044}{44}} of file \mbox{\hyperlink{sysio_8bios_8cpp_source}{sysio.\+bios.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00045\ \ \ \ require\_auth(\ from\ );}
+\DoxyCodeLine{00046\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysiobios_1_1bios_ae6a371995275689627137540163400f3}\index{sysiobios::bios@{sysiobios::bios}!setabi@{setabi}}
+\index{setabi@{setabi}!sysiobios::bios@{sysiobios::bios}}
+\doxysubsubsection{\texorpdfstring{setabi()}{setabi()}}
+{\footnotesize\ttfamily \label{classsysiobios_1_1bios_ae6a371995275689627137540163400f3} 
+void sysiobios\+::bios\+::setabi (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}}]{account}{, }\item[{const std\+::vector$<$ char $>$ \&}]{abi}{}\end{DoxyParamCaption})}
+
+Set abi action sets the abi for contract identified by {\ttfamily account} name. Creates an entry in the abi\+\_\+hash\+\_\+table index, with {\ttfamily account} name as key, if it is not already present and sets its value with the abi hash. Otherwise it is updating the current abi hash value for the existing {\ttfamily account} key.
+
+
+\begin{DoxyParams}{Parameters}
+{\em account} & -\/ the name of the account to set the abi for \\
+\hline
+{\em abi} & -\/ the abi hash represented as a vector of characters \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{sysio_8bios_8cpp_source_l00005}{5}} of file \mbox{\hyperlink{sysio_8bios_8cpp_source}{sysio.\+bios.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00005\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00006\ \ \ \ \mbox{\hyperlink{classsysiobios_1_1bios_afa8e3a9dda880dc77c4b2a098e3d06ab}{abi\_hash\_table}}\ table(get\_self(),\ get\_self().\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}});}
+\DoxyCodeLine{00007\ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ table.find(\ account.value\ );}
+\DoxyCodeLine{00008\ \ \ \ \textcolor{keywordflow}{if}(\ itr\ ==\ table.end()\ )\ \{}
+\DoxyCodeLine{00009\ \ \ \ \ \ \ table.emplace(\ account,\ [\&](\ \textcolor{keyword}{auto}\&\ row\ )\ \{}
+\DoxyCodeLine{00010\ \ \ \ \ \ \ \ \ \ row.owner\ =\ account;}
+\DoxyCodeLine{00011\ \ \ \ \ \ \ \ \ \ row.hash\ \ =\ \mbox{\hyperlink{classfc_1_1sha256}{sysio::sha256}}(\textcolor{keyword}{const\_cast<}\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(abi.data()),\ abi.size());}
+\DoxyCodeLine{00012\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00013\ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00014\ \ \ \ \ \ \ table.modify(\ itr,\ sysio::same\_payer,\ [\&](\ \textcolor{keyword}{auto}\&\ row\ )\ \{}
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \ \ \ row.hash\ =\ \mbox{\hyperlink{classfc_1_1sha256}{sysio::sha256}}(\textcolor{keyword}{const\_cast<}\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(abi.data()),\ abi.size());}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00017\ \ \ \ \}}
+\DoxyCodeLine{00018\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysiobios_1_1bios_a1c0a48375d49f6e40ac68cea3f607023}\index{sysiobios::bios@{sysiobios::bios}!setalimits@{setalimits}}
+\index{setalimits@{setalimits}!sysiobios::bios@{sysiobios::bios}}
+\doxysubsubsection{\texorpdfstring{setalimits()}{setalimits()}}
+{\footnotesize\ttfamily \label{classsysiobios_1_1bios_a1c0a48375d49f6e40ac68cea3f607023} 
+void sysiobios\+::bios\+::setalimits (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}}]{account}{, }\item[{\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}}]{ram\+\_\+bytes}{, }\item[{\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}}]{net\+\_\+weight}{, }\item[{\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}}]{cpu\+\_\+weight}{}\end{DoxyParamCaption})}
+
+Sets the resource limits of an account
+
+
+\begin{DoxyParams}{Parameters}
+{\em account} & -\/ name of the account whose resource limit to be set \\
+\hline
+{\em ram\+\_\+bytes} & -\/ ram limit in absolute bytes \\
+\hline
+{\em net\+\_\+weight} & -\/ fractionally proportionate net limit of available resources based on (weight / total\+\_\+weight\+\_\+of\+\_\+all\+\_\+accounts) \\
+\hline
+{\em cpu\+\_\+weight} & -\/ fractionally proportionate cpu limit of available resources based on (weight / total\+\_\+weight\+\_\+of\+\_\+all\+\_\+accounts) \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{sysio_8bios_8cpp_source_l00029}{29}} of file \mbox{\hyperlink{sysio_8bios_8cpp_source}{sysio.\+bios.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00030\ \ \ \ require\_auth(\ get\_self()\ );}
+\DoxyCodeLine{00031\ \ \ \ set\_resource\_limits(\ account,\ ram\_bytes,\ net\_weight,\ cpu\_weight\ );}
+\DoxyCodeLine{00032\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysiobios_1_1bios_ad3ccd98da04d26f84a791df28ddf0163}\index{sysiobios::bios@{sysiobios::bios}!setcode@{setcode}}
+\index{setcode@{setcode}!sysiobios::bios@{sysiobios::bios}}
+\doxysubsubsection{\texorpdfstring{setcode()}{setcode()}}
+{\footnotesize\ttfamily \label{classsysiobios_1_1bios_ad3ccd98da04d26f84a791df28ddf0163} 
+void sysiobios\+::bios\+::setcode (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}}]{account}{, }\item[{\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}}}]{vmtype}{, }\item[{\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}}}]{vmversion}{, }\item[{const std\+::vector$<$ char $>$ \&}]{code}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Set code action sets the contract code for an account.
+
+
+\begin{DoxyParams}{Parameters}
+{\em account} & -\/ the account for which to set the contract code. \\
+\hline
+{\em vmtype} & -\/ reserved, set it to zero. \\
+\hline
+{\em vmversion} & -\/ reserved, set it to zero. \\
+\hline
+{\em code} & -\/ the code content to be set, in the form of a blob binary.. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{sysio_8bios_8hpp_source_l00169}{169}} of file \mbox{\hyperlink{sysio_8bios_8hpp_source}{sysio.\+bios.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00169\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classsysiobios_1_1bios_a12292a38385cd27b44230142b16055fe}\index{sysiobios::bios@{sysiobios::bios}!setparams@{setparams}}
+\index{setparams@{setparams}!sysiobios::bios@{sysiobios::bios}}
+\doxysubsubsection{\texorpdfstring{setparams()}{setparams()}}
+{\footnotesize\ttfamily \label{classsysiobios_1_1bios_a12292a38385cd27b44230142b16055fe} 
+void sysiobios\+::bios\+::setparams (\begin{DoxyParamCaption}\item[{const sysio\+::blockchain\+\_\+parameters \&}]{params}{}\end{DoxyParamCaption})}
+
+Set params action, sets the blockchain parameters. By tuning these parameters, various degrees of customization can be achieved.
+
+
+\begin{DoxyParams}{Parameters}
+{\em params} & -\/ New blockchain parameters to set \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{sysio_8bios_8cpp_source_l00039}{39}} of file \mbox{\hyperlink{sysio_8bios_8cpp_source}{sysio.\+bios.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00040\ \ \ \ require\_auth(\ get\_self()\ );}
+\DoxyCodeLine{00041\ \ \ \ set\_blockchain\_parameters(\ \mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}}\ );}
+\DoxyCodeLine{00042\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysiobios_1_1bios_a354cd416a947ceb4570f79945201dc26}\index{sysiobios::bios@{sysiobios::bios}!setpriv@{setpriv}}
+\index{setpriv@{setpriv}!sysiobios::bios@{sysiobios::bios}}
+\doxysubsubsection{\texorpdfstring{setpriv()}{setpriv()}}
+{\footnotesize\ttfamily \label{classsysiobios_1_1bios_a354cd416a947ceb4570f79945201dc26} 
+void sysiobios\+::bios\+::setpriv (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}}]{account}{, }\item[{\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}}}]{is\+\_\+priv}{}\end{DoxyParamCaption})}
+
+Set privilege action allows to set privilege status for an account (turn it on/off). 
+\begin{DoxyParams}{Parameters}
+{\em account} & -\/ the account to set the privileged status for. \\
+\hline
+{\em is\+\_\+priv} & -\/ 0 for false, \texorpdfstring{$>$}{>} 0 for true. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{sysio_8bios_8cpp_source_l00024}{24}} of file \mbox{\hyperlink{sysio_8bios_8cpp_source}{sysio.\+bios.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00025\ \ \ \ require\_auth(\ get\_self()\ );}
+\DoxyCodeLine{00026\ \ \ \ set\_privileged(\ account,\ is\_priv\ );}
+\DoxyCodeLine{00027\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysiobios_1_1bios_aa3c044b6e735772bb74b701b9644adff}\index{sysiobios::bios@{sysiobios::bios}!setprods@{setprods}}
+\index{setprods@{setprods}!sysiobios::bios@{sysiobios::bios}}
+\doxysubsubsection{\texorpdfstring{setprods()}{setprods()}}
+{\footnotesize\ttfamily \label{classsysiobios_1_1bios_aa3c044b6e735772bb74b701b9644adff} 
+void sysiobios\+::bios\+::setprods (\begin{DoxyParamCaption}\item[{const std\+::vector$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority}{sysio\+::producer\+\_\+authority}} $>$ \&}]{schedule}{}\end{DoxyParamCaption})}
+
+Set producers action, sets a new list of active producers, by proposing a schedule change, once the block that contains the proposal becomes irreversible, the schedule is promoted to "{}pending"{} automatically. Once the block that promotes the schedule is irreversible, the schedule will become "{}active"{}.
+
+
+\begin{DoxyParams}{Parameters}
+{\em schedule} & -\/ New list of active producers to set \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{sysio_8bios_8cpp_source_l00034}{34}} of file \mbox{\hyperlink{sysio_8bios_8cpp_source}{sysio.\+bios.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00035\ \ \ \ require\_auth(\ get\_self()\ );}
+\DoxyCodeLine{00036\ \ \ \ set\_proposed\_producers(\ schedule\ );}
+\DoxyCodeLine{00037\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysiobios_1_1bios_a19557effdbe3108db7eb472035561fd5}\index{sysiobios::bios@{sysiobios::bios}!unlinkauth@{unlinkauth}}
+\index{unlinkauth@{unlinkauth}!sysiobios::bios@{sysiobios::bios}}
+\doxysubsubsection{\texorpdfstring{unlinkauth()}{unlinkauth()}}
+{\footnotesize\ttfamily \label{classsysiobios_1_1bios_a19557effdbe3108db7eb472035561fd5} 
+void sysiobios\+::bios\+::unlinkauth (\begin{DoxyParamCaption}\item[{ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$}]{account}{, }\item[{ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$}]{code}{, }\item[{ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$}]{type}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Unlink authorization action it\textquotesingle{}s doing the reverse of linkauth action, by unlinking the given action.
+
+
+\begin{DoxyParams}{Parameters}
+{\em account} & -\/ the owner of the permission to be unlinked and the receiver of the freed RAM, \\
+\hline
+{\em code} & -\/ the owner of the action to be unlinked, \\
+\hline
+{\em type} & -\/ the action to be unlinked. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{sysio_8bios_8hpp_source_l00147}{147}} of file \mbox{\hyperlink{sysio_8bios_8hpp_source}{sysio.\+bios.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classsysiobios_1_1bios_a22768debac784dc24991477f709a3bd6}\index{sysiobios::bios@{sysiobios::bios}!updateauth@{updateauth}}
+\index{updateauth@{updateauth}!sysiobios::bios@{sysiobios::bios}}
+\doxysubsubsection{\texorpdfstring{updateauth()}{updateauth()}}
+{\footnotesize\ttfamily \label{classsysiobios_1_1bios_a22768debac784dc24991477f709a3bd6} 
+void sysiobios\+::bios\+::updateauth (\begin{DoxyParamCaption}\item[{ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$}]{account}{, }\item[{ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$}]{permission}{, }\item[{ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$}]{parent}{, }\item[{ignore$<$ \mbox{\hyperlink{structsysiobios_1_1authority}{authority}} $>$}]{auth}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Update authorization action updates pemission for an account.
+
+
+\begin{DoxyParams}{Parameters}
+{\em account} & -\/ the account for which the permission is updated, \\
+\hline
+{\em pemission} & -\/ the permission name which is updated, \\
+\hline
+{\em parem} & -\/ the parent of the permission which is updated, \\
+\hline
+{\em aut} & -\/ the json describing the permission authorization. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{sysio_8bios_8hpp_source_l00103}{103}} of file \mbox{\hyperlink{sysio_8bios_8hpp_source}{sysio.\+bios.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/svetlasyrimis/\+Desktop/wire-\/network/\+WN-\/org/wire-\/system-\/contracts/contracts/sysio.\+bios/include/sysio.\+bios/\mbox{\hyperlink{sysio_8bios_8hpp}{sysio.\+bios.\+hpp}}\item 
+/\+Users/svetlasyrimis/\+Desktop/wire-\/network/\+WN-\/org/wire-\/system-\/contracts/contracts/sysio.\+bios/src/\mbox{\hyperlink{sysio_8bios_8cpp}{sysio.\+bios.\+cpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,7 @@
+<map id="TestInsituMultipleRoot" name="TestInsituMultipleRoot">
+<area shape="rect" id="Node000001" title=" " alt="" coords="109,31,260,56"/>
+<area shape="rect" id="Node000002" href="$readertest_8cpp.html#aa237ee4974ab4463734b51bc308d53bb" title=" " alt="" coords="5,5,61,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="93,31,61,25,62,20,94,26"/>
+<area shape="rect" id="Node000003" href="$readertest_8cpp.html#a341f256b64084922f5f08d42b610a183" title=" " alt="" coords="5,55,61,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="94,61,61,66,61,61,93,55"/>
+</map>

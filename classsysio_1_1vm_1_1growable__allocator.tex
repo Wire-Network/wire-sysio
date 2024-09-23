@@ -1,0 +1,907 @@
+\doxysection{sysio\+::vm\+::growable\+\_\+allocator Class Reference}
+\hypertarget{classsysio_1_1vm_1_1growable__allocator}{}\label{classsysio_1_1vm_1_1growable__allocator}\index{sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}}
+
+
+{\ttfamily \#include $<$allocator.\+hpp$>$}
+
+
+
+Collaboration diagram for sysio\+::vm\+::growable\+\_\+allocator\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=214pt]{classsysio_1_1vm_1_1growable__allocator__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a0349e53d197ca12de2924486329ce64c}{growable\+\_\+allocator}} (size\+\_\+t size)
+\item 
+\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a4ede1512163b47c6a7d6e87620984549}{\texorpdfstring{$\sim$}{\string~}growable\+\_\+allocator}} ()
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a5fc8b2ef9ef1ef157d18ec40cf9310ee}{alloc}} (size\+\_\+t size=0)
+\item 
+void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_afee3bafc0705850fe8b2d4bdc4601521}{start\+\_\+code}} ()
+\item 
+{\footnotesize template$<$bool Is\+Jit$>$ }\\void \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_af145745e6a5b2238fa56d6a2f422be51}{end\+\_\+code}} (void \texorpdfstring{$\ast$}{*}code\+\_\+base)
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_aad6e55de7db90487d6575343114a755d}{enable\+\_\+code}} (bool \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1155e0065cf9a3cdb380751b67ea5b24}{is\+\_\+jit}})
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a62721749cc0a0e1af38c3c82e2a31dcf}{disable\+\_\+code}} ()
+\item 
+const void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a5d23df5b7092184fdf575b6fea6fe496}{get\+\_\+code\+\_\+start}} () const
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_ad9ed557611289b11da2b169bb45484cd}{reclaim}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*}ptr, size\+\_\+t size=0)
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a37801d94046523d46c5a77b857359986}{finalize}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a7a09ef6a8d73e1458ee9f9edce986bd8}{free}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_ab46b67aaafe30db996930c6dec473ce8}{reset}} ()
+\item 
+\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a0349e53d197ca12de2924486329ce64c}{growable\+\_\+allocator}} (size\+\_\+t size)
+\item 
+\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a4ede1512163b47c6a7d6e87620984549}{\texorpdfstring{$\sim$}{\string~}growable\+\_\+allocator}} ()
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a5fc8b2ef9ef1ef157d18ec40cf9310ee}{alloc}} (size\+\_\+t size=0)
+\item 
+void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_afee3bafc0705850fe8b2d4bdc4601521}{start\+\_\+code}} ()
+\item 
+{\footnotesize template$<$bool Is\+Jit$>$ }\\void \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_af145745e6a5b2238fa56d6a2f422be51}{end\+\_\+code}} (void \texorpdfstring{$\ast$}{*}code\+\_\+base)
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_aad6e55de7db90487d6575343114a755d}{enable\+\_\+code}} (bool \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1155e0065cf9a3cdb380751b67ea5b24}{is\+\_\+jit}})
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a62721749cc0a0e1af38c3c82e2a31dcf}{disable\+\_\+code}} ()
+\item 
+const void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a5d23df5b7092184fdf575b6fea6fe496}{get\+\_\+code\+\_\+start}} () const
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_ad9ed557611289b11da2b169bb45484cd}{reclaim}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*}ptr, size\+\_\+t size=0)
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a37801d94046523d46c5a77b857359986}{finalize}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a7a09ef6a8d73e1458ee9f9edce986bd8}{free}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_ab46b67aaafe30db996930c6dec473ce8}{reset}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$std\+::size\+\_\+t align\+\_\+amt$>$ }\\static constexpr size\+\_\+t \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a864b318420afb03072753423044548b8}{align\+\_\+offset}} (size\+\_\+t offset)
+\item 
+static std\+::size\+\_\+t \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_acb056eb364fabf0e6a2641fbde6503e5}{align\+\_\+to\+\_\+page}} (std\+::size\+\_\+t offset)
+\item 
+{\footnotesize template$<$std\+::size\+\_\+t align\+\_\+amt$>$ }\\static constexpr size\+\_\+t \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a864b318420afb03072753423044548b8}{align\+\_\+offset}} (size\+\_\+t offset)
+\item 
+static std\+::size\+\_\+t \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_acb056eb364fabf0e6a2641fbde6503e5}{align\+\_\+to\+\_\+page}} (std\+::size\+\_\+t offset)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+size\+\_\+t \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\+\_\+offset}} = 0
+\item 
+size\+\_\+t \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1beb84251b8c27b8efe2f847b7ce55a1}{\+\_\+size}} = 0
+\item 
+std\+::size\+\_\+t \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9ead3933f35d984d9dba8bf14a29965f}{\+\_\+capacity}} = 0
+\item 
+char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9848885bcca3edad4c739a9472b54194}{\+\_\+base}}
+\item 
+char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1d8add8bc04002ce9dd681dab5550d0d}{\+\_\+code\+\_\+base}} = nullptr
+\item 
+size\+\_\+t \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_adb2de0ed256807f52a2b09d1f45764a9}{\+\_\+code\+\_\+size}} = 0
+\item 
+bool \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1155e0065cf9a3cdb380751b67ea5b24}{is\+\_\+jit}} = false
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static constexpr size\+\_\+t \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1a3da972f341769c0334debea85c02fb}{max\+\_\+memory\+\_\+size}} = 1024 \texorpdfstring{$\ast$}{*} 1024 \texorpdfstring{$\ast$}{*} 1024
+\item 
+static constexpr size\+\_\+t \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_aa9b20a281dcefb59b7aedcb489036355}{chunk\+\_\+size}} = 128 \texorpdfstring{$\ast$}{*} 1024
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{vm_2allocator_8hpp_source_l00267}{267}} of file \mbox{\hyperlink{vm_2allocator_8hpp_source}{allocator.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classsysio_1_1vm_1_1growable__allocator_a0349e53d197ca12de2924486329ce64c}\index{sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}!growable\_allocator@{growable\_allocator}}
+\index{growable\_allocator@{growable\_allocator}!sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}}
+\doxysubsubsection{\texorpdfstring{growable\_allocator()}{growable\_allocator()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1growable__allocator_a0349e53d197ca12de2924486329ce64c} 
+sysio\+::vm\+::growable\+\_\+allocator\+::growable\+\_\+allocator (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{size}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2allocator_8hpp_source_l00281}{281}} of file \mbox{\hyperlink{sysio_2vm_2allocator_8hpp_source}{allocator.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00281\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00282\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(size\ <=\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1a3da972f341769c0334debea85c02fb}{max\_memory\_size}},\ wasm\_bad\_alloc,\ \textcolor{stringliteral}{"{}Too\ large\ initial\ memory\ size"{}});}
+\DoxyCodeLine{00283\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9848885bcca3edad4c739a9472b54194}{\_base}}\ =\ (\textcolor{keywordtype}{char}*)mmap(NULL,\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1a3da972f341769c0334debea85c02fb}{max\_memory\_size}},\ PROT\_NONE,\ MAP\_PRIVATE\ |\ MAP\_ANONYMOUS,\ -\/1,\ 0);}
+\DoxyCodeLine{00284\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9848885bcca3edad4c739a9472b54194}{\_base}}\ !=\ MAP\_FAILED,\ wasm\_bad\_alloc,\ \textcolor{stringliteral}{"{}mmap\ failed."{}});}
+\DoxyCodeLine{00285\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (size\ !=\ 0)\ \{}
+\DoxyCodeLine{00286\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ chunks\_to\_alloc\ =\ (\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a864b318420afb03072753423044548b8}{align\_offset<chunk\_size>}}(size)\ /\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_aa9b20a281dcefb59b7aedcb489036355}{chunk\_size}});}
+\DoxyCodeLine{00287\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1beb84251b8c27b8efe2f847b7ce55a1}{\_size}}\ +=\ (\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_aa9b20a281dcefb59b7aedcb489036355}{chunk\_size}}\ *\ chunks\_to\_alloc);}
+\DoxyCodeLine{00288\ \ \ \ \ \ \ \ \ \ \ \ \ mprotect((\textcolor{keywordtype}{char}*)\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9848885bcca3edad4c739a9472b54194}{\_base}},\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1beb84251b8c27b8efe2f847b7ce55a1}{\_size}},\ PROT\_READ\ |\ PROT\_WRITE);}
+\DoxyCodeLine{00289\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00290\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9ead3933f35d984d9dba8bf14a29965f}{\_capacity}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1a3da972f341769c0334debea85c02fb}{max\_memory\_size}};}
+\DoxyCodeLine{00291\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=334pt]{classsysio_1_1vm_1_1growable__allocator_a0349e53d197ca12de2924486329ce64c_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1growable__allocator_a4ede1512163b47c6a7d6e87620984549}\index{sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}!````~growable\_allocator@{\texorpdfstring{$\sim$}{\string~}growable\_allocator}}
+\index{````~growable\_allocator@{\texorpdfstring{$\sim$}{\string~}growable\_allocator}!sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}growable\_allocator()}{\string~growable\_allocator()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1growable__allocator_a4ede1512163b47c6a7d6e87620984549} 
+sysio\+::vm\+::growable\+\_\+allocator\+::\texorpdfstring{$\sim$}{\string~}growable\+\_\+allocator (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2allocator_8hpp_source_l00293}{293}} of file \mbox{\hyperlink{sysio_2vm_2allocator_8hpp_source}{allocator.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00293\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00294\ \ \ \ \ \ \ \ \ \ munmap(\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9848885bcca3edad4c739a9472b54194}{\_base}},\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9ead3933f35d984d9dba8bf14a29965f}{\_capacity}});}
+\DoxyCodeLine{00295\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1155e0065cf9a3cdb380751b67ea5b24}{is\_jit}})\ \{}
+\DoxyCodeLine{00296\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__allocator_a3f0facc0b61e7eac38b41c15db4c4f00}{jit\_allocator::instance}}().\mbox{\hyperlink{classsysio_1_1vm_1_1jit__allocator_a602363acba307fbc4e06fb7bab007f82}{free}}(\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1d8add8bc04002ce9dd681dab5550d0d}{\_code\_base}});}
+\DoxyCodeLine{00297\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00298\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=339pt]{classsysio_1_1vm_1_1growable__allocator_a4ede1512163b47c6a7d6e87620984549_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1growable__allocator_a0349e53d197ca12de2924486329ce64c}\index{sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}!growable\_allocator@{growable\_allocator}}
+\index{growable\_allocator@{growable\_allocator}!sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}}
+\doxysubsubsection{\texorpdfstring{growable\_allocator()}{growable\_allocator()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1growable__allocator_a0349e53d197ca12de2924486329ce64c} 
+sysio\+::vm\+::growable\+\_\+allocator\+::growable\+\_\+allocator (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{size}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2allocator_8hpp_source_l00281}{281}} of file \mbox{\hyperlink{vm_2allocator_8hpp_source}{allocator.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00281\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00282\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(size\ <=\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1a3da972f341769c0334debea85c02fb}{max\_memory\_size}},\ wasm\_bad\_alloc,\ \textcolor{stringliteral}{"{}Too\ large\ initial\ memory\ size"{}});}
+\DoxyCodeLine{00283\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9848885bcca3edad4c739a9472b54194}{\_base}}\ =\ (\textcolor{keywordtype}{char}*)mmap(NULL,\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1a3da972f341769c0334debea85c02fb}{max\_memory\_size}},\ PROT\_NONE,\ MAP\_PRIVATE\ |\ MAP\_ANONYMOUS,\ -\/1,\ 0);}
+\DoxyCodeLine{00284\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9848885bcca3edad4c739a9472b54194}{\_base}}\ !=\ MAP\_FAILED,\ wasm\_bad\_alloc,\ \textcolor{stringliteral}{"{}mmap\ failed."{}});}
+\DoxyCodeLine{00285\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (size\ !=\ 0)\ \{}
+\DoxyCodeLine{00286\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ chunks\_to\_alloc\ =\ (\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a864b318420afb03072753423044548b8}{align\_offset<chunk\_size>}}(size)\ /\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_aa9b20a281dcefb59b7aedcb489036355}{chunk\_size}});}
+\DoxyCodeLine{00287\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1beb84251b8c27b8efe2f847b7ce55a1}{\_size}}\ +=\ (\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_aa9b20a281dcefb59b7aedcb489036355}{chunk\_size}}\ *\ chunks\_to\_alloc);}
+\DoxyCodeLine{00288\ \ \ \ \ \ \ \ \ \ \ \ \ mprotect((\textcolor{keywordtype}{char}*)\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9848885bcca3edad4c739a9472b54194}{\_base}},\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1beb84251b8c27b8efe2f847b7ce55a1}{\_size}},\ PROT\_READ\ |\ PROT\_WRITE);}
+\DoxyCodeLine{00289\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00290\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9ead3933f35d984d9dba8bf14a29965f}{\_capacity}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1a3da972f341769c0334debea85c02fb}{max\_memory\_size}};}
+\DoxyCodeLine{00291\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=334pt]{classsysio_1_1vm_1_1growable__allocator_a0349e53d197ca12de2924486329ce64c_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1growable__allocator_a4ede1512163b47c6a7d6e87620984549}\index{sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}!````~growable\_allocator@{\texorpdfstring{$\sim$}{\string~}growable\_allocator}}
+\index{````~growable\_allocator@{\texorpdfstring{$\sim$}{\string~}growable\_allocator}!sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}growable\_allocator()}{\string~growable\_allocator()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1growable__allocator_a4ede1512163b47c6a7d6e87620984549} 
+sysio\+::vm\+::growable\+\_\+allocator\+::\texorpdfstring{$\sim$}{\string~}growable\+\_\+allocator (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2allocator_8hpp_source_l00293}{293}} of file \mbox{\hyperlink{vm_2allocator_8hpp_source}{allocator.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00293\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00294\ \ \ \ \ \ \ \ \ \ munmap(\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9848885bcca3edad4c739a9472b54194}{\_base}},\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9ead3933f35d984d9dba8bf14a29965f}{\_capacity}});}
+\DoxyCodeLine{00295\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1155e0065cf9a3cdb380751b67ea5b24}{is\_jit}})\ \{}
+\DoxyCodeLine{00296\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__allocator_a3f0facc0b61e7eac38b41c15db4c4f00}{jit\_allocator::instance}}().\mbox{\hyperlink{classsysio_1_1vm_1_1jit__allocator_a602363acba307fbc4e06fb7bab007f82}{free}}(\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1d8add8bc04002ce9dd681dab5550d0d}{\_code\_base}});}
+\DoxyCodeLine{00297\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00298\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=339pt]{classsysio_1_1vm_1_1growable__allocator_a4ede1512163b47c6a7d6e87620984549_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1vm_1_1growable__allocator_a864b318420afb03072753423044548b8}\index{sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}!align\_offset@{align\_offset}}
+\index{align\_offset@{align\_offset}!sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}}
+\doxysubsubsection{\texorpdfstring{align\_offset()}{align\_offset()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1growable__allocator_a864b318420afb03072753423044548b8} 
+template$<$std\+::size\+\_\+t align\+\_\+amt$>$ \\
+static constexpr size\+\_\+t sysio\+::vm\+::growable\+\_\+allocator\+::align\+\_\+offset (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{offset}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2allocator_8hpp_source_l00272}{272}} of file \mbox{\hyperlink{sysio_2vm_2allocator_8hpp_source}{allocator.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00272\ \{\ \textcolor{keywordflow}{return}\ (offset\ +\ align\_amt\ -\/\ 1)\ \&\ \string~(align\_amt\ -\/\ 1);\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1vm_1_1growable__allocator_a864b318420afb03072753423044548b8_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1growable__allocator_a864b318420afb03072753423044548b8}\index{sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}!align\_offset@{align\_offset}}
+\index{align\_offset@{align\_offset}!sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}}
+\doxysubsubsection{\texorpdfstring{align\_offset()}{align\_offset()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1growable__allocator_a864b318420afb03072753423044548b8} 
+template$<$std\+::size\+\_\+t align\+\_\+amt$>$ \\
+static constexpr size\+\_\+t sysio\+::vm\+::growable\+\_\+allocator\+::align\+\_\+offset (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{offset}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2allocator_8hpp_source_l00272}{272}} of file \mbox{\hyperlink{vm_2allocator_8hpp_source}{allocator.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00272\ \{\ \textcolor{keywordflow}{return}\ (offset\ +\ align\_amt\ -\/\ 1)\ \&\ \string~(align\_amt\ -\/\ 1);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1growable__allocator_acb056eb364fabf0e6a2641fbde6503e5}\index{sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}!align\_to\_page@{align\_to\_page}}
+\index{align\_to\_page@{align\_to\_page}!sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}}
+\doxysubsubsection{\texorpdfstring{align\_to\_page()}{align\_to\_page()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1growable__allocator_acb056eb364fabf0e6a2641fbde6503e5} 
+static std\+::size\+\_\+t sysio\+::vm\+::growable\+\_\+allocator\+::align\+\_\+to\+\_\+page (\begin{DoxyParamCaption}\item[{std\+::size\+\_\+t}]{offset}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2allocator_8hpp_source_l00274}{274}} of file \mbox{\hyperlink{sysio_2vm_2allocator_8hpp_source}{allocator.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00274\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00275\ \ \ \ \ \ \ \ \ \ std::size\_t\ pagesize\ =\ \textcolor{keyword}{static\_cast<}std::size\_t\textcolor{keyword}{>}(::sysconf(\_SC\_PAGESIZE));}
+\DoxyCodeLine{00276\ \ \ \ \ \ \ \ \ \ assert(\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1a3da972f341769c0334debea85c02fb}{max\_memory\_size}}\ \%\ \mbox{\hyperlink{namespacesysio_1_1vm_a0ae6751a77293216df4656dee5081eb2a10108b6260714ad13914454c1dd1ec8f}{page\_size}}\ ==\ 0);}
+\DoxyCodeLine{00277\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (offset\ +\ pagesize\ -\/\ 1)\ \&\ \string~(pagesize\ -\/\ 1);}
+\DoxyCodeLine{00278\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1vm_1_1growable__allocator_acb056eb364fabf0e6a2641fbde6503e5_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1growable__allocator_acb056eb364fabf0e6a2641fbde6503e5}\index{sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}!align\_to\_page@{align\_to\_page}}
+\index{align\_to\_page@{align\_to\_page}!sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}}
+\doxysubsubsection{\texorpdfstring{align\_to\_page()}{align\_to\_page()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1growable__allocator_acb056eb364fabf0e6a2641fbde6503e5} 
+static std\+::size\+\_\+t sysio\+::vm\+::growable\+\_\+allocator\+::align\+\_\+to\+\_\+page (\begin{DoxyParamCaption}\item[{std\+::size\+\_\+t}]{offset}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2allocator_8hpp_source_l00274}{274}} of file \mbox{\hyperlink{vm_2allocator_8hpp_source}{allocator.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00274\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00275\ \ \ \ \ \ \ \ \ \ std::size\_t\ pagesize\ =\ \textcolor{keyword}{static\_cast<}std::size\_t\textcolor{keyword}{>}(::sysconf(\_SC\_PAGESIZE));}
+\DoxyCodeLine{00276\ \ \ \ \ \ \ \ \ \ assert(\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1a3da972f341769c0334debea85c02fb}{max\_memory\_size}}\ \%\ \mbox{\hyperlink{namespacesysio_1_1vm_a0ae6751a77293216df4656dee5081eb2a10108b6260714ad13914454c1dd1ec8f}{page\_size}}\ ==\ 0);}
+\DoxyCodeLine{00277\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (offset\ +\ pagesize\ -\/\ 1)\ \&\ \string~(pagesize\ -\/\ 1);}
+\DoxyCodeLine{00278\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1growable__allocator_a5fc8b2ef9ef1ef157d18ec40cf9310ee}\index{sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}!alloc@{alloc}}
+\index{alloc@{alloc}!sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}}
+\doxysubsubsection{\texorpdfstring{alloc()}{alloc()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1growable__allocator_a5fc8b2ef9ef1ef157d18ec40cf9310ee} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} sysio\+::vm\+::growable\+\_\+allocator\+::alloc (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{size}{ = {\ttfamily 0}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2allocator_8hpp_source_l00302}{302}} of file \mbox{\hyperlink{sysio_2vm_2allocator_8hpp_source}{allocator.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00302\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00303\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_assert}(\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1a3da972f341769c0334debea85c02fb}{max\_memory\_size}}\ \%\ \textcolor{keyword}{alignof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}})\ ==\ 0,\ \textcolor{stringliteral}{"{}alignment\ must\ divide\ max\_memory\_size."{}});}
+\DoxyCodeLine{00304\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a864b318420afb03072753423044548b8}{align\_offset<alignof(T)>}}(\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}});}
+\DoxyCodeLine{00305\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Evaluating\ the\ inequality\ in\ this\ form\ cannot\ cause\ integer\ overflow.}}
+\DoxyCodeLine{00306\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Once\ this\ assertion\ passes,\ the\ rest\ of\ the\ function\ is\ safe.}}
+\DoxyCodeLine{00307\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}\ ((\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1a3da972f341769c0334debea85c02fb}{max\_memory\_size}}\ -\/\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}})\ /\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}})\ >=\ size,\ wasm\_bad\_alloc,\ \textcolor{stringliteral}{"{}Allocated\ too\ much\ memory"{}});}
+\DoxyCodeLine{00308\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ aligned\ =\ (\textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}})\ *\ size)\ +\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}};}
+\DoxyCodeLine{00309\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (aligned\ >\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1beb84251b8c27b8efe2f847b7ce55a1}{\_size}})\ \{}
+\DoxyCodeLine{00310\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ chunks\_to\_alloc\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a864b318420afb03072753423044548b8}{align\_offset<chunk\_size>}}(aligned\ -\/\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1beb84251b8c27b8efe2f847b7ce55a1}{\_size}})\ /\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_aa9b20a281dcefb59b7aedcb489036355}{chunk\_size}};}
+\DoxyCodeLine{00311\ \ \ \ \ \ \ \ \ \ \ \ \ mprotect((\textcolor{keywordtype}{char}*)\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9848885bcca3edad4c739a9472b54194}{\_base}}\ +\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1beb84251b8c27b8efe2f847b7ce55a1}{\_size}},\ (\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_aa9b20a281dcefb59b7aedcb489036355}{chunk\_size}}\ *\ chunks\_to\_alloc),\ PROT\_READ\ |\ PROT\_WRITE);}
+\DoxyCodeLine{00312\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1beb84251b8c27b8efe2f847b7ce55a1}{\_size}}\ +=\ (\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_aa9b20a281dcefb59b7aedcb489036355}{chunk\_size}}\ *\ chunks\_to\_alloc);}
+\DoxyCodeLine{00313\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00314\ }
+\DoxyCodeLine{00315\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ ptr\ \ =\ (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*)(\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9848885bcca3edad4c739a9472b54194}{\_base}}\ +\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}});}
+\DoxyCodeLine{00316\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}}\ =\ aligned;}
+\DoxyCodeLine{00317\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ptr;}
+\DoxyCodeLine{00318\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=334pt]{classsysio_1_1vm_1_1growable__allocator_a5fc8b2ef9ef1ef157d18ec40cf9310ee_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1vm_1_1growable__allocator_a5fc8b2ef9ef1ef157d18ec40cf9310ee_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1growable__allocator_a5fc8b2ef9ef1ef157d18ec40cf9310ee}\index{sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}!alloc@{alloc}}
+\index{alloc@{alloc}!sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}}
+\doxysubsubsection{\texorpdfstring{alloc()}{alloc()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1growable__allocator_a5fc8b2ef9ef1ef157d18ec40cf9310ee} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} sysio\+::vm\+::growable\+\_\+allocator\+::alloc (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{size}{ = {\ttfamily 0}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2allocator_8hpp_source_l00302}{302}} of file \mbox{\hyperlink{vm_2allocator_8hpp_source}{allocator.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00302\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00303\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_assert}(\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1a3da972f341769c0334debea85c02fb}{max\_memory\_size}}\ \%\ \textcolor{keyword}{alignof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}})\ ==\ 0,\ \textcolor{stringliteral}{"{}alignment\ must\ divide\ max\_memory\_size."{}});}
+\DoxyCodeLine{00304\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a864b318420afb03072753423044548b8}{align\_offset<alignof(T)>}}(\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}});}
+\DoxyCodeLine{00305\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Evaluating\ the\ inequality\ in\ this\ form\ cannot\ cause\ integer\ overflow.}}
+\DoxyCodeLine{00306\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Once\ this\ assertion\ passes,\ the\ rest\ of\ the\ function\ is\ safe.}}
+\DoxyCodeLine{00307\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}\ ((\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1a3da972f341769c0334debea85c02fb}{max\_memory\_size}}\ -\/\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}})\ /\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}})\ >=\ size,\ wasm\_bad\_alloc,\ \textcolor{stringliteral}{"{}Allocated\ too\ much\ memory"{}});}
+\DoxyCodeLine{00308\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ aligned\ =\ (\textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}})\ *\ size)\ +\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}};}
+\DoxyCodeLine{00309\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (aligned\ >\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1beb84251b8c27b8efe2f847b7ce55a1}{\_size}})\ \{}
+\DoxyCodeLine{00310\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ chunks\_to\_alloc\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a864b318420afb03072753423044548b8}{align\_offset<chunk\_size>}}(aligned\ -\/\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1beb84251b8c27b8efe2f847b7ce55a1}{\_size}})\ /\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_aa9b20a281dcefb59b7aedcb489036355}{chunk\_size}};}
+\DoxyCodeLine{00311\ \ \ \ \ \ \ \ \ \ \ \ \ mprotect((\textcolor{keywordtype}{char}*)\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9848885bcca3edad4c739a9472b54194}{\_base}}\ +\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1beb84251b8c27b8efe2f847b7ce55a1}{\_size}},\ (\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_aa9b20a281dcefb59b7aedcb489036355}{chunk\_size}}\ *\ chunks\_to\_alloc),\ PROT\_READ\ |\ PROT\_WRITE);}
+\DoxyCodeLine{00312\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1beb84251b8c27b8efe2f847b7ce55a1}{\_size}}\ +=\ (\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_aa9b20a281dcefb59b7aedcb489036355}{chunk\_size}}\ *\ chunks\_to\_alloc);}
+\DoxyCodeLine{00313\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00314\ }
+\DoxyCodeLine{00315\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ ptr\ \ =\ (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*)(\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9848885bcca3edad4c739a9472b54194}{\_base}}\ +\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}});}
+\DoxyCodeLine{00316\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}}\ =\ aligned;}
+\DoxyCodeLine{00317\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ptr;}
+\DoxyCodeLine{00318\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=334pt]{classsysio_1_1vm_1_1growable__allocator_a5fc8b2ef9ef1ef157d18ec40cf9310ee_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1growable__allocator_a62721749cc0a0e1af38c3c82e2a31dcf}\index{sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}!disable\_code@{disable\_code}}
+\index{disable\_code@{disable\_code}!sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}}
+\doxysubsubsection{\texorpdfstring{disable\_code()}{disable\_code()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1growable__allocator_a62721749cc0a0e1af38c3c82e2a31dcf} 
+void sysio\+::vm\+::growable\+\_\+allocator\+::disable\+\_\+code (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2allocator_8hpp_source_l00349}{349}} of file \mbox{\hyperlink{sysio_2vm_2allocator_8hpp_source}{allocator.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00349\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00350\ \ \ \ \ \ \ \ \ \ mprotect(\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1d8add8bc04002ce9dd681dab5550d0d}{\_code\_base}},\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_adb2de0ed256807f52a2b09d1f45764a9}{\_code\_size}},\ PROT\_NONE);}
+\DoxyCodeLine{00351\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1growable__allocator_a62721749cc0a0e1af38c3c82e2a31dcf}\index{sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}!disable\_code@{disable\_code}}
+\index{disable\_code@{disable\_code}!sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}}
+\doxysubsubsection{\texorpdfstring{disable\_code()}{disable\_code()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1growable__allocator_a62721749cc0a0e1af38c3c82e2a31dcf} 
+void sysio\+::vm\+::growable\+\_\+allocator\+::disable\+\_\+code (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2allocator_8hpp_source_l00349}{349}} of file \mbox{\hyperlink{vm_2allocator_8hpp_source}{allocator.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00349\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00350\ \ \ \ \ \ \ \ \ \ mprotect(\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1d8add8bc04002ce9dd681dab5550d0d}{\_code\_base}},\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_adb2de0ed256807f52a2b09d1f45764a9}{\_code\_size}},\ PROT\_NONE);}
+\DoxyCodeLine{00351\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1growable__allocator_aad6e55de7db90487d6575343114a755d}\index{sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}!enable\_code@{enable\_code}}
+\index{enable\_code@{enable\_code}!sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}}
+\doxysubsubsection{\texorpdfstring{enable\_code()}{enable\_code()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1growable__allocator_aad6e55de7db90487d6575343114a755d} 
+void sysio\+::vm\+::growable\+\_\+allocator\+::enable\+\_\+code (\begin{DoxyParamCaption}\item[{bool}]{is\+\_\+jit}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2allocator_8hpp_source_l00345}{345}} of file \mbox{\hyperlink{sysio_2vm_2allocator_8hpp_source}{allocator.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00345\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00346\ \ \ \ \ \ \ \ \ \ mprotect(\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1d8add8bc04002ce9dd681dab5550d0d}{\_code\_base}},\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_adb2de0ed256807f52a2b09d1f45764a9}{\_code\_size}},\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1155e0065cf9a3cdb380751b67ea5b24}{is\_jit}}?PROT\_EXEC:(PROT\_READ|PROT\_WRITE));}
+\DoxyCodeLine{00347\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1vm_1_1growable__allocator_aad6e55de7db90487d6575343114a755d_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1growable__allocator_aad6e55de7db90487d6575343114a755d}\index{sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}!enable\_code@{enable\_code}}
+\index{enable\_code@{enable\_code}!sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}}
+\doxysubsubsection{\texorpdfstring{enable\_code()}{enable\_code()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1growable__allocator_aad6e55de7db90487d6575343114a755d} 
+void sysio\+::vm\+::growable\+\_\+allocator\+::enable\+\_\+code (\begin{DoxyParamCaption}\item[{bool}]{is\+\_\+jit}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2allocator_8hpp_source_l00345}{345}} of file \mbox{\hyperlink{vm_2allocator_8hpp_source}{allocator.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00345\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00346\ \ \ \ \ \ \ \ \ \ mprotect(\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1d8add8bc04002ce9dd681dab5550d0d}{\_code\_base}},\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_adb2de0ed256807f52a2b09d1f45764a9}{\_code\_size}},\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1155e0065cf9a3cdb380751b67ea5b24}{is\_jit}}?PROT\_EXEC:(PROT\_READ|PROT\_WRITE));}
+\DoxyCodeLine{00347\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1growable__allocator_af145745e6a5b2238fa56d6a2f422be51}\index{sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}!end\_code@{end\_code}}
+\index{end\_code@{end\_code}!sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}}
+\doxysubsubsection{\texorpdfstring{end\_code()}{end\_code()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1growable__allocator_af145745e6a5b2238fa56d6a2f422be51} 
+template$<$bool Is\+Jit$>$ \\
+void sysio\+::vm\+::growable\+\_\+allocator\+::end\+\_\+code (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{code\+\_\+base}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2allocator_8hpp_source_l00325}{325}} of file \mbox{\hyperlink{sysio_2vm_2allocator_8hpp_source}{allocator.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00325\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00326\ \ \ \ \ \ \ \ \ \ assert((\textcolor{keywordtype}{char}*)code\_base\ >=\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9848885bcca3edad4c739a9472b54194}{\_base}});}
+\DoxyCodeLine{00327\ \ \ \ \ \ \ \ \ \ assert((\textcolor{keywordtype}{char}*)code\_base\ <=\ (\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9848885bcca3edad4c739a9472b54194}{\_base}}+\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}}));}
+\DoxyCodeLine{00328\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_acb056eb364fabf0e6a2641fbde6503e5}{align\_to\_page}}(\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}});}
+\DoxyCodeLine{00329\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1d8add8bc04002ce9dd681dab5550d0d}{\_code\_base}}\ =\ (\textcolor{keywordtype}{char}*)code\_base;}
+\DoxyCodeLine{00330\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_adb2de0ed256807f52a2b09d1f45764a9}{\_code\_size}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}}\ -\/\ ((\textcolor{keywordtype}{char}*)code\_base\ -\/\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9848885bcca3edad4c739a9472b54194}{\_base}});}
+\DoxyCodeLine{00331\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keyword}{constexpr}\ (IsJit)\ \{}
+\DoxyCodeLine{00332\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \&\ jit\_alloc\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__allocator_a3f0facc0b61e7eac38b41c15db4c4f00}{jit\_allocator::instance}}();}
+\DoxyCodeLine{00333\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ *\ executable\_code\ =\ jit\_alloc.alloc(\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_adb2de0ed256807f52a2b09d1f45764a9}{\_code\_size}});}
+\DoxyCodeLine{00334\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ err\ =\ mprotect(executable\_code,\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_adb2de0ed256807f52a2b09d1f45764a9}{\_code\_size}},\ PROT\_READ\ |\ PROT\_WRITE);}
+\DoxyCodeLine{00335\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(err\ ==\ 0,\ wasm\_bad\_alloc,\ \textcolor{stringliteral}{"{}mprotect\ failed"{}});}
+\DoxyCodeLine{00336\ \ \ \ \ \ \ \ \ \ \ \ \ std::memcpy(executable\_code,\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1d8add8bc04002ce9dd681dab5550d0d}{\_code\_base}},\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_adb2de0ed256807f52a2b09d1f45764a9}{\_code\_size}});}
+\DoxyCodeLine{00337\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1155e0065cf9a3cdb380751b67ea5b24}{is\_jit}}\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00338\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1d8add8bc04002ce9dd681dab5550d0d}{\_code\_base}}\ =\ (\textcolor{keywordtype}{char}*)executable\_code;}
+\DoxyCodeLine{00339\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}}\ =\ (\textcolor{keywordtype}{char}*)code\_base\ -\/\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9848885bcca3edad4c739a9472b54194}{\_base}};}
+\DoxyCodeLine{00340\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00341\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_aad6e55de7db90487d6575343114a755d}{enable\_code}}(IsJit);}
+\DoxyCodeLine{00342\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=346pt]{classsysio_1_1vm_1_1growable__allocator_af145745e6a5b2238fa56d6a2f422be51_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=342pt]{classsysio_1_1vm_1_1growable__allocator_af145745e6a5b2238fa56d6a2f422be51_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1growable__allocator_af145745e6a5b2238fa56d6a2f422be51}\index{sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}!end\_code@{end\_code}}
+\index{end\_code@{end\_code}!sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}}
+\doxysubsubsection{\texorpdfstring{end\_code()}{end\_code()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1growable__allocator_af145745e6a5b2238fa56d6a2f422be51} 
+template$<$bool Is\+Jit$>$ \\
+void sysio\+::vm\+::growable\+\_\+allocator\+::end\+\_\+code (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{code\+\_\+base}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2allocator_8hpp_source_l00325}{325}} of file \mbox{\hyperlink{vm_2allocator_8hpp_source}{allocator.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00325\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00326\ \ \ \ \ \ \ \ \ \ assert((\textcolor{keywordtype}{char}*)code\_base\ >=\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9848885bcca3edad4c739a9472b54194}{\_base}});}
+\DoxyCodeLine{00327\ \ \ \ \ \ \ \ \ \ assert((\textcolor{keywordtype}{char}*)code\_base\ <=\ (\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9848885bcca3edad4c739a9472b54194}{\_base}}+\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}}));}
+\DoxyCodeLine{00328\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_acb056eb364fabf0e6a2641fbde6503e5}{align\_to\_page}}(\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}});}
+\DoxyCodeLine{00329\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1d8add8bc04002ce9dd681dab5550d0d}{\_code\_base}}\ =\ (\textcolor{keywordtype}{char}*)code\_base;}
+\DoxyCodeLine{00330\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_adb2de0ed256807f52a2b09d1f45764a9}{\_code\_size}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}}\ -\/\ ((\textcolor{keywordtype}{char}*)code\_base\ -\/\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9848885bcca3edad4c739a9472b54194}{\_base}});}
+\DoxyCodeLine{00331\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keyword}{constexpr}\ (IsJit)\ \{}
+\DoxyCodeLine{00332\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \&\ jit\_alloc\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__allocator_a3f0facc0b61e7eac38b41c15db4c4f00}{jit\_allocator::instance}}();}
+\DoxyCodeLine{00333\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ *\ executable\_code\ =\ jit\_alloc.alloc(\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_adb2de0ed256807f52a2b09d1f45764a9}{\_code\_size}});}
+\DoxyCodeLine{00334\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ err\ =\ mprotect(executable\_code,\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_adb2de0ed256807f52a2b09d1f45764a9}{\_code\_size}},\ PROT\_READ\ |\ PROT\_WRITE);}
+\DoxyCodeLine{00335\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(err\ ==\ 0,\ wasm\_bad\_alloc,\ \textcolor{stringliteral}{"{}mprotect\ failed"{}});}
+\DoxyCodeLine{00336\ \ \ \ \ \ \ \ \ \ \ \ \ std::memcpy(executable\_code,\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1d8add8bc04002ce9dd681dab5550d0d}{\_code\_base}},\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_adb2de0ed256807f52a2b09d1f45764a9}{\_code\_size}});}
+\DoxyCodeLine{00337\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1155e0065cf9a3cdb380751b67ea5b24}{is\_jit}}\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00338\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1d8add8bc04002ce9dd681dab5550d0d}{\_code\_base}}\ =\ (\textcolor{keywordtype}{char}*)executable\_code;}
+\DoxyCodeLine{00339\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}}\ =\ (\textcolor{keywordtype}{char}*)code\_base\ -\/\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9848885bcca3edad4c739a9472b54194}{\_base}};}
+\DoxyCodeLine{00340\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00341\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_aad6e55de7db90487d6575343114a755d}{enable\_code}}(IsJit);}
+\DoxyCodeLine{00342\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=346pt]{classsysio_1_1vm_1_1growable__allocator_af145745e6a5b2238fa56d6a2f422be51_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1growable__allocator_a37801d94046523d46c5a77b857359986}\index{sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}!finalize@{finalize}}
+\index{finalize@{finalize}!sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}}
+\doxysubsubsection{\texorpdfstring{finalize()}{finalize()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1growable__allocator_a37801d94046523d46c5a77b857359986} 
+void sysio\+::vm\+::growable\+\_\+allocator\+::finalize (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2allocator_8hpp_source_l00369}{369}} of file \mbox{\hyperlink{sysio_2vm_2allocator_8hpp_source}{allocator.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00369\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00370\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9ead3933f35d984d9dba8bf14a29965f}{\_capacity}}\ !=\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}})\ \{}
+\DoxyCodeLine{00371\ \ \ \ \ \ \ \ \ \ \ \ \ std::size\_t\ final\_size\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_acb056eb364fabf0e6a2641fbde6503e5}{align\_to\_page}}(\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}});}
+\DoxyCodeLine{00372\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(munmap(\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9848885bcca3edad4c739a9472b54194}{\_base}}\ +\ final\_size,\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9ead3933f35d984d9dba8bf14a29965f}{\_capacity}}\ -\/\ final\_size)\ ==\ 0,\ wasm\_bad\_alloc,\ \textcolor{stringliteral}{"{}failed\ to\ finalize\ growable\_allocator"{}});}
+\DoxyCodeLine{00373\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9ead3933f35d984d9dba8bf14a29965f}{\_capacity}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1beb84251b8c27b8efe2f847b7ce55a1}{\_size}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}}\ =\ final\_size;}
+\DoxyCodeLine{00374\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00375\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=344pt]{classsysio_1_1vm_1_1growable__allocator_a37801d94046523d46c5a77b857359986_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1growable__allocator_a37801d94046523d46c5a77b857359986}\index{sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}!finalize@{finalize}}
+\index{finalize@{finalize}!sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}}
+\doxysubsubsection{\texorpdfstring{finalize()}{finalize()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1growable__allocator_a37801d94046523d46c5a77b857359986} 
+void sysio\+::vm\+::growable\+\_\+allocator\+::finalize (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2allocator_8hpp_source_l00369}{369}} of file \mbox{\hyperlink{vm_2allocator_8hpp_source}{allocator.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00369\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00370\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9ead3933f35d984d9dba8bf14a29965f}{\_capacity}}\ !=\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}})\ \{}
+\DoxyCodeLine{00371\ \ \ \ \ \ \ \ \ \ \ \ \ std::size\_t\ final\_size\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_acb056eb364fabf0e6a2641fbde6503e5}{align\_to\_page}}(\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}});}
+\DoxyCodeLine{00372\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(munmap(\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9848885bcca3edad4c739a9472b54194}{\_base}}\ +\ final\_size,\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9ead3933f35d984d9dba8bf14a29965f}{\_capacity}}\ -\/\ final\_size)\ ==\ 0,\ wasm\_bad\_alloc,\ \textcolor{stringliteral}{"{}failed\ to\ finalize\ growable\_allocator"{}});}
+\DoxyCodeLine{00373\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9ead3933f35d984d9dba8bf14a29965f}{\_capacity}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1beb84251b8c27b8efe2f847b7ce55a1}{\_size}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}}\ =\ final\_size;}
+\DoxyCodeLine{00374\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00375\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=344pt]{classsysio_1_1vm_1_1growable__allocator_a37801d94046523d46c5a77b857359986_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1growable__allocator_a7a09ef6a8d73e1458ee9f9edce986bd8}\index{sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}!free@{free}}
+\index{free@{free}!sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}}
+\doxysubsubsection{\texorpdfstring{free()}{free()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1growable__allocator_a7a09ef6a8d73e1458ee9f9edce986bd8} 
+void sysio\+::vm\+::growable\+\_\+allocator\+::free (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2allocator_8hpp_source_l00377}{377}} of file \mbox{\hyperlink{sysio_2vm_2allocator_8hpp_source}{allocator.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00377\ \{\ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(\textcolor{keyword}{false},\ wasm\_bad\_alloc,\ \textcolor{stringliteral}{"{}unimplemented"{}});\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1growable__allocator_a7a09ef6a8d73e1458ee9f9edce986bd8}\index{sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}!free@{free}}
+\index{free@{free}!sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}}
+\doxysubsubsection{\texorpdfstring{free()}{free()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1growable__allocator_a7a09ef6a8d73e1458ee9f9edce986bd8} 
+void sysio\+::vm\+::growable\+\_\+allocator\+::free (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2allocator_8hpp_source_l00377}{377}} of file \mbox{\hyperlink{vm_2allocator_8hpp_source}{allocator.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00377\ \{\ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(\textcolor{keyword}{false},\ wasm\_bad\_alloc,\ \textcolor{stringliteral}{"{}unimplemented"{}});\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1growable__allocator_a5d23df5b7092184fdf575b6fea6fe496}\index{sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}!get\_code\_start@{get\_code\_start}}
+\index{get\_code\_start@{get\_code\_start}!sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}}
+\doxysubsubsection{\texorpdfstring{get\_code\_start()}{get\_code\_start()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1growable__allocator_a5d23df5b7092184fdf575b6fea6fe496} 
+const void \texorpdfstring{$\ast$}{*} sysio\+::vm\+::growable\+\_\+allocator\+::get\+\_\+code\+\_\+start (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2allocator_8hpp_source_l00353}{353}} of file \mbox{\hyperlink{sysio_2vm_2allocator_8hpp_source}{allocator.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00353\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1d8add8bc04002ce9dd681dab5550d0d}{\_code\_base}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1growable__allocator_a5d23df5b7092184fdf575b6fea6fe496}\index{sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}!get\_code\_start@{get\_code\_start}}
+\index{get\_code\_start@{get\_code\_start}!sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}}
+\doxysubsubsection{\texorpdfstring{get\_code\_start()}{get\_code\_start()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1growable__allocator_a5d23df5b7092184fdf575b6fea6fe496} 
+const void \texorpdfstring{$\ast$}{*} sysio\+::vm\+::growable\+\_\+allocator\+::get\+\_\+code\+\_\+start (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2allocator_8hpp_source_l00353}{353}} of file \mbox{\hyperlink{vm_2allocator_8hpp_source}{allocator.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00353\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1d8add8bc04002ce9dd681dab5550d0d}{\_code\_base}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1growable__allocator_ad9ed557611289b11da2b169bb45484cd}\index{sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}!reclaim@{reclaim}}
+\index{reclaim@{reclaim}!sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}}
+\doxysubsubsection{\texorpdfstring{reclaim()}{reclaim()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1growable__allocator_ad9ed557611289b11da2b169bb45484cd} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+void sysio\+::vm\+::growable\+\_\+allocator\+::reclaim (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*}}]{ptr}{, }\item[{size\+\_\+t}]{size}{ = {\ttfamily 0}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2allocator_8hpp_source_l00359}{359}} of file \mbox{\hyperlink{sysio_2vm_2allocator_8hpp_source}{allocator.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00359\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00360\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}}\ /\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}})\ >=\ size,\ wasm\_bad\_alloc,\ \textcolor{stringliteral}{"{}reclaimed\ too\ much\ memory"{}}\ );}
+\DoxyCodeLine{00361\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(\ size\ ==\ 0\ ||\ (\textcolor{keywordtype}{char}*)(ptr\ +\ size)\ ==\ (\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9848885bcca3edad4c739a9472b54194}{\_base}}\ +\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}}),\ wasm\_bad\_alloc,\ \textcolor{stringliteral}{"{}reclaiming\ memory\ must\ be\ strictly\ LIFO"{}});}
+\DoxyCodeLine{00362\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ size\ !=\ 0\ )}
+\DoxyCodeLine{00363\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}}\ =\ ((\textcolor{keywordtype}{char}*)ptr\ -\/\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9848885bcca3edad4c739a9472b54194}{\_base}});}
+\DoxyCodeLine{00364\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=328pt]{classsysio_1_1vm_1_1growable__allocator_ad9ed557611289b11da2b169bb45484cd_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1growable__allocator_ad9ed557611289b11da2b169bb45484cd}\index{sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}!reclaim@{reclaim}}
+\index{reclaim@{reclaim}!sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}}
+\doxysubsubsection{\texorpdfstring{reclaim()}{reclaim()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1growable__allocator_ad9ed557611289b11da2b169bb45484cd} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+void sysio\+::vm\+::growable\+\_\+allocator\+::reclaim (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*}}]{ptr}{, }\item[{size\+\_\+t}]{size}{ = {\ttfamily 0}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2allocator_8hpp_source_l00359}{359}} of file \mbox{\hyperlink{vm_2allocator_8hpp_source}{allocator.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00359\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00360\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}}\ /\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}})\ >=\ size,\ wasm\_bad\_alloc,\ \textcolor{stringliteral}{"{}reclaimed\ too\ much\ memory"{}}\ );}
+\DoxyCodeLine{00361\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(\ size\ ==\ 0\ ||\ (\textcolor{keywordtype}{char}*)(ptr\ +\ size)\ ==\ (\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9848885bcca3edad4c739a9472b54194}{\_base}}\ +\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}}),\ wasm\_bad\_alloc,\ \textcolor{stringliteral}{"{}reclaiming\ memory\ must\ be\ strictly\ LIFO"{}});}
+\DoxyCodeLine{00362\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ size\ !=\ 0\ )}
+\DoxyCodeLine{00363\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}}\ =\ ((\textcolor{keywordtype}{char}*)ptr\ -\/\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9848885bcca3edad4c739a9472b54194}{\_base}});}
+\DoxyCodeLine{00364\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1growable__allocator_ab46b67aaafe30db996930c6dec473ce8}\index{sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}!reset@{reset}}
+\index{reset@{reset}!sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}}
+\doxysubsubsection{\texorpdfstring{reset()}{reset()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1growable__allocator_ab46b67aaafe30db996930c6dec473ce8} 
+void sysio\+::vm\+::growable\+\_\+allocator\+::reset (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2allocator_8hpp_source_l00379}{379}} of file \mbox{\hyperlink{sysio_2vm_2allocator_8hpp_source}{allocator.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00379\ \{\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}}\ =\ 0;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1growable__allocator_ab46b67aaafe30db996930c6dec473ce8}\index{sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}!reset@{reset}}
+\index{reset@{reset}!sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}}
+\doxysubsubsection{\texorpdfstring{reset()}{reset()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1growable__allocator_ab46b67aaafe30db996930c6dec473ce8} 
+void sysio\+::vm\+::growable\+\_\+allocator\+::reset (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2allocator_8hpp_source_l00379}{379}} of file \mbox{\hyperlink{vm_2allocator_8hpp_source}{allocator.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00379\ \{\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}}\ =\ 0;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1growable__allocator_afee3bafc0705850fe8b2d4bdc4601521}\index{sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}!start\_code@{start\_code}}
+\index{start\_code@{start\_code}!sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}}
+\doxysubsubsection{\texorpdfstring{start\_code()}{start\_code()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1growable__allocator_afee3bafc0705850fe8b2d4bdc4601521} 
+void \texorpdfstring{$\ast$}{*} sysio\+::vm\+::growable\+\_\+allocator\+::start\+\_\+code (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2allocator_8hpp_source_l00320}{320}} of file \mbox{\hyperlink{sysio_2vm_2allocator_8hpp_source}{allocator.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00320\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00321\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_acb056eb364fabf0e6a2641fbde6503e5}{align\_to\_page}}(\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}});}
+\DoxyCodeLine{00322\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9848885bcca3edad4c739a9472b54194}{\_base}}\ +\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}};}
+\DoxyCodeLine{00323\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1vm_1_1growable__allocator_afee3bafc0705850fe8b2d4bdc4601521_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1growable__allocator_afee3bafc0705850fe8b2d4bdc4601521}\index{sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}!start\_code@{start\_code}}
+\index{start\_code@{start\_code}!sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}}
+\doxysubsubsection{\texorpdfstring{start\_code()}{start\_code()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1growable__allocator_afee3bafc0705850fe8b2d4bdc4601521} 
+void \texorpdfstring{$\ast$}{*} sysio\+::vm\+::growable\+\_\+allocator\+::start\+\_\+code (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2allocator_8hpp_source_l00320}{320}} of file \mbox{\hyperlink{vm_2allocator_8hpp_source}{allocator.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00320\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00321\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_acb056eb364fabf0e6a2641fbde6503e5}{align\_to\_page}}(\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}});}
+\DoxyCodeLine{00322\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9848885bcca3edad4c739a9472b54194}{\_base}}\ +\ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}{\_offset}};}
+\DoxyCodeLine{00323\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1vm_1_1growable__allocator_afee3bafc0705850fe8b2d4bdc4601521_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classsysio_1_1vm_1_1growable__allocator_a9848885bcca3edad4c739a9472b54194}\index{sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}!\_base@{\_base}}
+\index{\_base@{\_base}!sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}}
+\doxysubsubsection{\texorpdfstring{\_base}{\_base}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1growable__allocator_a9848885bcca3edad4c739a9472b54194} 
+char \texorpdfstring{$\ast$}{*} sysio\+::vm\+::growable\+\_\+allocator\+::\+\_\+base}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2allocator_8hpp_source_l00384}{384}} of file \mbox{\hyperlink{sysio_2vm_2allocator_8hpp_source}{allocator.\+hpp}}.
+
+\Hypertarget{classsysio_1_1vm_1_1growable__allocator_a9ead3933f35d984d9dba8bf14a29965f}\index{sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}!\_capacity@{\_capacity}}
+\index{\_capacity@{\_capacity}!sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}}
+\doxysubsubsection{\texorpdfstring{\_capacity}{\_capacity}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1growable__allocator_a9ead3933f35d984d9dba8bf14a29965f} 
+std\+::size\+\_\+t sysio\+::vm\+::growable\+\_\+allocator\+::\+\_\+capacity = 0}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2allocator_8hpp_source_l00383}{383}} of file \mbox{\hyperlink{sysio_2vm_2allocator_8hpp_source}{allocator.\+hpp}}.
+
+\Hypertarget{classsysio_1_1vm_1_1growable__allocator_a1d8add8bc04002ce9dd681dab5550d0d}\index{sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}!\_code\_base@{\_code\_base}}
+\index{\_code\_base@{\_code\_base}!sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}}
+\doxysubsubsection{\texorpdfstring{\_code\_base}{\_code\_base}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1growable__allocator_a1d8add8bc04002ce9dd681dab5550d0d} 
+char \texorpdfstring{$\ast$}{*} sysio\+::vm\+::growable\+\_\+allocator\+::\+\_\+code\+\_\+base = nullptr}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2allocator_8hpp_source_l00385}{385}} of file \mbox{\hyperlink{sysio_2vm_2allocator_8hpp_source}{allocator.\+hpp}}.
+
+\Hypertarget{classsysio_1_1vm_1_1growable__allocator_adb2de0ed256807f52a2b09d1f45764a9}\index{sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}!\_code\_size@{\_code\_size}}
+\index{\_code\_size@{\_code\_size}!sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}}
+\doxysubsubsection{\texorpdfstring{\_code\_size}{\_code\_size}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1growable__allocator_adb2de0ed256807f52a2b09d1f45764a9} 
+size\+\_\+t sysio\+::vm\+::growable\+\_\+allocator\+::\+\_\+code\+\_\+size = 0}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2allocator_8hpp_source_l00386}{386}} of file \mbox{\hyperlink{sysio_2vm_2allocator_8hpp_source}{allocator.\+hpp}}.
+
+\Hypertarget{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e}\index{sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}!\_offset@{\_offset}}
+\index{\_offset@{\_offset}!sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}}
+\doxysubsubsection{\texorpdfstring{\_offset}{\_offset}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1growable__allocator_a9fafc7b54d31d45342a017fdc82e292e} 
+size\+\_\+t sysio\+::vm\+::growable\+\_\+allocator\+::\+\_\+offset = 0}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2allocator_8hpp_source_l00381}{381}} of file \mbox{\hyperlink{sysio_2vm_2allocator_8hpp_source}{allocator.\+hpp}}.
+
+\Hypertarget{classsysio_1_1vm_1_1growable__allocator_a1beb84251b8c27b8efe2f847b7ce55a1}\index{sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}!\_size@{\_size}}
+\index{\_size@{\_size}!sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}}
+\doxysubsubsection{\texorpdfstring{\_size}{\_size}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1growable__allocator_a1beb84251b8c27b8efe2f847b7ce55a1} 
+size\+\_\+t sysio\+::vm\+::growable\+\_\+allocator\+::\+\_\+size = 0}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2allocator_8hpp_source_l00382}{382}} of file \mbox{\hyperlink{sysio_2vm_2allocator_8hpp_source}{allocator.\+hpp}}.
+
+\Hypertarget{classsysio_1_1vm_1_1growable__allocator_aa9b20a281dcefb59b7aedcb489036355}\index{sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}!chunk\_size@{chunk\_size}}
+\index{chunk\_size@{chunk\_size}!sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}}
+\doxysubsubsection{\texorpdfstring{chunk\_size}{chunk\_size}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1growable__allocator_aa9b20a281dcefb59b7aedcb489036355} 
+static constexpr size\+\_\+t sysio\+::vm\+::growable\+\_\+allocator\+::chunk\+\_\+size = 128 \texorpdfstring{$\ast$}{*} 1024\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2allocator_8hpp_source_l00270}{270}} of file \mbox{\hyperlink{sysio_2vm_2allocator_8hpp_source}{allocator.\+hpp}}.
+
+\Hypertarget{classsysio_1_1vm_1_1growable__allocator_a1155e0065cf9a3cdb380751b67ea5b24}\index{sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}!is\_jit@{is\_jit}}
+\index{is\_jit@{is\_jit}!sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}}
+\doxysubsubsection{\texorpdfstring{is\_jit}{is\_jit}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1growable__allocator_a1155e0065cf9a3cdb380751b67ea5b24} 
+bool sysio\+::vm\+::growable\+\_\+allocator\+::is\+\_\+jit = false}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2allocator_8hpp_source_l00387}{387}} of file \mbox{\hyperlink{sysio_2vm_2allocator_8hpp_source}{allocator.\+hpp}}.
+
+\Hypertarget{classsysio_1_1vm_1_1growable__allocator_a1a3da972f341769c0334debea85c02fb}\index{sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}!max\_memory\_size@{max\_memory\_size}}
+\index{max\_memory\_size@{max\_memory\_size}!sysio::vm::growable\_allocator@{sysio::vm::growable\_allocator}}
+\doxysubsubsection{\texorpdfstring{max\_memory\_size}{max\_memory\_size}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1growable__allocator_a1a3da972f341769c0334debea85c02fb} 
+static constexpr size\+\_\+t sysio\+::vm\+::growable\+\_\+allocator\+::max\+\_\+memory\+\_\+size = 1024 \texorpdfstring{$\ast$}{*} 1024 \texorpdfstring{$\ast$}{*} 1024\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2allocator_8hpp_source_l00269}{269}} of file \mbox{\hyperlink{sysio_2vm_2allocator_8hpp_source}{allocator.\+hpp}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/include/sysio/sysio/vm/\mbox{\hyperlink{sysio_2vm_2allocator_8hpp}{allocator.\+hpp}}\item 
+libraries/sys-\/vm/include/sysio/vm/\mbox{\hyperlink{vm_2allocator_8hpp}{allocator.\+hpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,126 @@
+\doxysection{testing\+::internal\+::Os\+Stack\+Trace\+Getter\+Interface Class Reference}
+\hypertarget{classtesting_1_1internal_1_1_os_stack_trace_getter_interface}{}\label{classtesting_1_1internal_1_1_os_stack_trace_getter_interface}\index{testing::internal::OsStackTraceGetterInterface@{testing::internal::OsStackTraceGetterInterface}}
+
+
+{\ttfamily \#include $<$gtest-\/internal-\/inl.\+h$>$}
+
+
+
+Inheritance diagram for testing\+::internal\+::Os\+Stack\+Trace\+Getter\+Interface\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=224pt]{classtesting_1_1internal_1_1_os_stack_trace_getter_interface__inherit__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_os_stack_trace_getter_interface_afbe9eb0ca8775fbb98ff0720011b6708}{Os\+Stack\+Trace\+Getter\+Interface}} ()
+\item 
+virtual \mbox{\hyperlink{classtesting_1_1internal_1_1_os_stack_trace_getter_interface_a193f4a1de4af9b78010c659912df5a15}{\texorpdfstring{$\sim$}{\string~}\+Os\+Stack\+Trace\+Getter\+Interface}} ()
+\item 
+virtual std\+::string \mbox{\hyperlink{classtesting_1_1internal_1_1_os_stack_trace_getter_interface_a0c41724e4e47647a7fe2ace8e70c0ec7}{Current\+Stack\+Trace}} (int max\+\_\+depth, int skip\+\_\+count)=0
+\item 
+virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_os_stack_trace_getter_interface_a791bd120428b5a53d5eeba1b27296a39}{Upon\+Leaving\+GTest}} ()=0
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static const char \texorpdfstring{$\ast$}{*}const \mbox{\hyperlink{classtesting_1_1internal_1_1_os_stack_trace_getter_interface_a669c49ce9ae05935e70bddb35a81ceb8}{k\+Elided\+Frames\+Marker}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{gtest-internal-inl_8h_source_l00414}{414}} of file \mbox{\hyperlink{gtest-internal-inl_8h_source}{gtest-\/internal-\/inl.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_os_stack_trace_getter_interface_afbe9eb0ca8775fbb98ff0720011b6708}\index{testing::internal::OsStackTraceGetterInterface@{testing::internal::OsStackTraceGetterInterface}!OsStackTraceGetterInterface@{OsStackTraceGetterInterface}}
+\index{OsStackTraceGetterInterface@{OsStackTraceGetterInterface}!testing::internal::OsStackTraceGetterInterface@{testing::internal::OsStackTraceGetterInterface}}
+\doxysubsubsection{\texorpdfstring{OsStackTraceGetterInterface()}{OsStackTraceGetterInterface()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_os_stack_trace_getter_interface_afbe9eb0ca8775fbb98ff0720011b6708} 
+testing\+::internal\+::\+Os\+Stack\+Trace\+Getter\+Interface\+::\+Os\+Stack\+Trace\+Getter\+Interface (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-internal-inl_8h_source_l00416}{416}} of file \mbox{\hyperlink{gtest-internal-inl_8h_source}{gtest-\/internal-\/inl.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00416\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1internal_1_1_os_stack_trace_getter_interface_a193f4a1de4af9b78010c659912df5a15}\index{testing::internal::OsStackTraceGetterInterface@{testing::internal::OsStackTraceGetterInterface}!````~OsStackTraceGetterInterface@{\texorpdfstring{$\sim$}{\string~}OsStackTraceGetterInterface}}
+\index{````~OsStackTraceGetterInterface@{\texorpdfstring{$\sim$}{\string~}OsStackTraceGetterInterface}!testing::internal::OsStackTraceGetterInterface@{testing::internal::OsStackTraceGetterInterface}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}OsStackTraceGetterInterface()}{\string~OsStackTraceGetterInterface()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_os_stack_trace_getter_interface_a193f4a1de4af9b78010c659912df5a15} 
+virtual testing\+::internal\+::\+Os\+Stack\+Trace\+Getter\+Interface\+::\texorpdfstring{$\sim$}{\string~}\+Os\+Stack\+Trace\+Getter\+Interface (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-internal-inl_8h_source_l00417}{417}} of file \mbox{\hyperlink{gtest-internal-inl_8h_source}{gtest-\/internal-\/inl.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00417\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_os_stack_trace_getter_interface_a0c41724e4e47647a7fe2ace8e70c0ec7}\index{testing::internal::OsStackTraceGetterInterface@{testing::internal::OsStackTraceGetterInterface}!CurrentStackTrace@{CurrentStackTrace}}
+\index{CurrentStackTrace@{CurrentStackTrace}!testing::internal::OsStackTraceGetterInterface@{testing::internal::OsStackTraceGetterInterface}}
+\doxysubsubsection{\texorpdfstring{CurrentStackTrace()}{CurrentStackTrace()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_os_stack_trace_getter_interface_a0c41724e4e47647a7fe2ace8e70c0ec7} 
+virtual std\+::string testing\+::internal\+::\+Os\+Stack\+Trace\+Getter\+Interface\+::\+Current\+Stack\+Trace (\begin{DoxyParamCaption}\item[{int}]{max\+\_\+depth}{, }\item[{int}]{skip\+\_\+count}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{classtesting_1_1internal_1_1_os_stack_trace_getter_a48bb58971e05251159a590398132a0f8}{testing\+::internal\+::\+Os\+Stack\+Trace\+Getter}}.
+
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_os_stack_trace_getter_interface_a0c41724e4e47647a7fe2ace8e70c0ec7_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_os_stack_trace_getter_interface_a791bd120428b5a53d5eeba1b27296a39}\index{testing::internal::OsStackTraceGetterInterface@{testing::internal::OsStackTraceGetterInterface}!UponLeavingGTest@{UponLeavingGTest}}
+\index{UponLeavingGTest@{UponLeavingGTest}!testing::internal::OsStackTraceGetterInterface@{testing::internal::OsStackTraceGetterInterface}}
+\doxysubsubsection{\texorpdfstring{UponLeavingGTest()}{UponLeavingGTest()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_os_stack_trace_getter_interface_a791bd120428b5a53d5eeba1b27296a39} 
+virtual void testing\+::internal\+::\+Os\+Stack\+Trace\+Getter\+Interface\+::\+Upon\+Leaving\+GTest (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{classtesting_1_1internal_1_1_os_stack_trace_getter_a8ae0237629b6b5672b4b5ef8e292205c}{testing\+::internal\+::\+Os\+Stack\+Trace\+Getter}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_os_stack_trace_getter_interface_a669c49ce9ae05935e70bddb35a81ceb8}\index{testing::internal::OsStackTraceGetterInterface@{testing::internal::OsStackTraceGetterInterface}!kElidedFramesMarker@{kElidedFramesMarker}}
+\index{kElidedFramesMarker@{kElidedFramesMarker}!testing::internal::OsStackTraceGetterInterface@{testing::internal::OsStackTraceGetterInterface}}
+\doxysubsubsection{\texorpdfstring{kElidedFramesMarker}{kElidedFramesMarker}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_os_stack_trace_getter_interface_a669c49ce9ae05935e70bddb35a81ceb8} 
+const char \texorpdfstring{$\ast$}{*}const testing\+::internal\+::\+Os\+Stack\+Trace\+Getter\+Interface\+::k\+Elided\+Frames\+Marker\hspace{0.3cm}{\ttfamily [static]}}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}...\ "{}}\ \mbox{\hyperlink{gtest-port_8h_a13d98c217176bd8722c395b9225fc19d}{GTEST\_NAME\_}}\ \textcolor{stringliteral}{"{}\ internal\ frames\ ..."{}}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{gtest-internal-inl_8h_source_l00434}{434}} of file \mbox{\hyperlink{gtest-internal-inl_8h_source}{gtest-\/internal-\/inl.\+h}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/src/\mbox{\hyperlink{gtest-internal-inl_8h}{gtest-\/internal-\/inl.\+h}}\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/src/\mbox{\hyperlink{gtest_8cc}{gtest.\+cc}}\end{DoxyCompactItemize}

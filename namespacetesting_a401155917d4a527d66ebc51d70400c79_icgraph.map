@@ -1,0 +1,13 @@
+<map id="testing::DoubleNear" name="testing::DoubleNear">
+<area shape="rect" id="Node000001" title=" " alt="" coords="222,144,359,169"/>
+<area shape="rect" id="Node000002" href="$namespacetesting_1_1gmock__matchers__test.html#a6f3834a4f5028027db270e7f3e0052f6" title=" " alt="" coords="5,5,174,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="264,134,222,98,172,61,148,49,151,44,175,57,226,93,267,130"/>
+<area shape="rect" id="Node000003" href="$namespacetesting_1_1gmock__matchers__test.html#aa7589c5d34e5aae4031e5e0fac29c9f5" title=" " alt="" coords="5,71,174,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="233,141,154,114,155,109,235,136"/>
+<area shape="rect" id="Node000004" href="$namespacetesting_1_1gmock__matchers__test.html#a31d14a68cacbaab3fafd26247cc11f9c" title=" " alt="" coords="5,136,174,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="206,159,174,159,174,154,206,154"/>
+<area shape="rect" id="Node000005" href="$namespacetesting_1_1gmock__matchers__test.html#a9542b930e1de4d087a8655855edcc13c" title=" " alt="" coords="5,201,174,242"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="235,177,155,203,154,198,233,172"/>
+<area shape="rect" id="Node000006" href="$namespacetesting_1_1gmock__matchers__test.html#a4250d3de38128f3452a0a9e93173bdb4" title=" " alt="" coords="5,267,174,307"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="267,182,226,219,175,256,151,269,148,264,172,251,222,215,264,178"/>
+</map>

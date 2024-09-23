@@ -1,0 +1,60 @@
+\doxysection{libraries/appbase/include/appbase/method.hpp File Reference}
+\hypertarget{method_8hpp}{}\label{method_8hpp}\index{libraries/appbase/include/appbase/method.hpp@{libraries/appbase/include/appbase/method.hpp}}
+{\ttfamily \#include $<$boost/signals2.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/exception/diagnostic\+\_\+information.\+hpp$>$}\newline
+Include dependency graph for method.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=328pt]{method_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{method_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structappbase_1_1first__success__policy_3_01_ret_07_args_8_8_8_08_4}{appbase\+::first\+\_\+success\+\_\+policy$<$ Ret(\+Args...)$>$}}
+\item 
+struct \mbox{\hyperlink{structappbase_1_1first__success__policy_3_01void_07_args_8_8_8_08_4}{appbase\+::first\+\_\+success\+\_\+policy$<$ void(\+Args...)$>$}}
+\item 
+struct \mbox{\hyperlink{structappbase_1_1first__provider__policy_3_01_ret_07_args_8_8_8_08_4}{appbase\+::first\+\_\+provider\+\_\+policy$<$ Ret(\+Args...)$>$}}
+\item 
+struct \mbox{\hyperlink{structappbase_1_1first__provider__policy_3_01void_07_args_8_8_8_08_4}{appbase\+::first\+\_\+provider\+\_\+policy$<$ void(\+Args...)$>$}}
+\item 
+class \mbox{\hyperlink{classappbase_1_1impl_1_1method__caller_3_01_ret_07_args_8_8_8_08_00_01_dispatch_policy_01_4}{appbase\+::impl\+::method\+\_\+caller$<$ Ret(\+Args...), Dispatch\+Policy $>$}}
+\item 
+class \mbox{\hyperlink{classappbase_1_1impl_1_1method__caller_3_01void_07_args_8_8_8_08_00_01_dispatch_policy_01_4}{appbase\+::impl\+::method\+\_\+caller$<$ void(\+Args...), Dispatch\+Policy $>$}}
+\item 
+class \mbox{\hyperlink{classappbase_1_1method}{appbase\+::method$<$ Function\+Sig, Dispatch\+Policy $>$}}
+\item 
+class \mbox{\hyperlink{classappbase_1_1method_1_1handle}{appbase\+::method$<$ Function\+Sig, Dispatch\+Policy $>$\+::handle}}
+\item 
+struct \mbox{\hyperlink{structappbase_1_1method__decl}{appbase\+::method\+\_\+decl$<$ Tag, Function\+Sig, Dispatch\+Policy $>$}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespaceappbase}{appbase}}
+\item 
+namespace \mbox{\hyperlink{namespaceappbase_1_1impl}{appbase\+::impl}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{namespaceappbase_af7b12aeed8c3ae8f23a8bf8d553f5a04}{appbase\+::erased\+\_\+method\+\_\+ptr}} = std\+::unique\+\_\+ptr$<$void, void(\texorpdfstring{$\ast$}{*})(void\texorpdfstring{$\ast$}{*})$>$
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\using \mbox{\hyperlink{namespaceappbase_af6d8cf2c6f2a52a0016b86ce095f7ede}{appbase\+::is\+\_\+method\+\_\+decl}} = decltype(\mbox{\hyperlink{namespaceappbase_ad5483ef56194bb7ef7943247d3e28326}{is\+\_\+method\+\_\+decl\+\_\+impl}}(std\+::declval$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\texorpdfstring{$\ast$}{*}$>$()))
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename Tag , typename Function\+Sig , \mbox{\hyperlink{yubihsm__pkcs11_8c_a53ef06e29c840024a683512c1acd791a}{template}}$<$ typename $>$ \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} Dispatch\+Policy$>$ }\\std\+::true\+\_\+type \mbox{\hyperlink{namespaceappbase_ad5483ef56194bb7ef7943247d3e28326}{appbase\+::is\+\_\+method\+\_\+decl\+\_\+impl}} (const \mbox{\hyperlink{structappbase_1_1method__decl}{method\+\_\+decl}}$<$ Tag, Function\+Sig, Dispatch\+Policy $>$ \texorpdfstring{$\ast$}{*})
+\item 
+std\+::false\+\_\+type \mbox{\hyperlink{namespaceappbase_a796451095dca0b122177cfd7756b5c90}{appbase\+::is\+\_\+method\+\_\+decl\+\_\+impl}} (...)
+\end{DoxyCompactItemize}

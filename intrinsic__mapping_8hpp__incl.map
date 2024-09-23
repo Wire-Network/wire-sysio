@@ -1,0 +1,9 @@
+<map id="libraries/chain/include/sysio/chain/webassembly/sys&#45;vm&#45;oc/intrinsic_mapping.hpp" name="libraries/chain/include/sysio/chain/webassembly/sys&#45;vm&#45;oc/intrinsic_mapping.hpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,222,61"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="12,109,63,135"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="92,63,60,99,56,95,88,59"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="87,109,140,135"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="116,61,116,93,111,93,111,61"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="163,109,250,135"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="144,59,184,96,181,100,141,63"/>
+</map>

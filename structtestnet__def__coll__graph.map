@@ -1,0 +1,10 @@
+<map id="testnet_def" name="testnet_def">
+<area shape="rect" id="Node000001" title=" " alt="" coords="81,243,167,268"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,59,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="25,47,18,76,13,109,15,145,25,179,39,199,57,216,97,240,94,244,54,220,35,202,20,181,10,146,8,109,13,74,20,45"/>
+<area shape="rect" id="Node000003" href="$structremote__deploy.html" title=" " alt="" coords="71,146,177,172"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="50,42,118,145,114,148,46,45"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="127,188,127,242,121,242,121,188"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="201,139,346,180"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="239,192,197,221,153,244,150,240,195,216,236,187"/>
+</map>

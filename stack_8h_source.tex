@@ -1,0 +1,235 @@
+\doxysection{stack.\+h}
+\hypertarget{stack_8h_source}{}\label{stack_8h_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/include/rapidjson/internal/stack.h@{libraries/fc/include/fc/crypto/webauthn\_json/include/rapidjson/internal/stack.h}}
+\mbox{\hyperlink{stack_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00001}00001\ \textcolor{comment}{//\ Tencent\ is\ pleased\ to\ support\ the\ open\ source\ community\ by\ making\ RapidJSON\ available.}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00002}00002\ \textcolor{comment}{//\ }}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00003}00003\ \textcolor{comment}{//\ Copyright\ (C)\ 2015\ THL\ A29\ Limited,\ a\ Tencent\ company,\ and\ Milo\ Yip.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00004}00004\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00005}00005\ \textcolor{comment}{//\ Licensed\ under\ the\ MIT\ License\ (the\ "{}License"{});\ you\ may\ not\ use\ this\ file\ except}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00006}00006\ \textcolor{comment}{//\ in\ compliance\ with\ the\ License.\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00007}00007\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00008}00008\ \textcolor{comment}{//\ http://opensource.org/licenses/MIT}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00009}00009\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00010}00010\ \textcolor{comment}{//\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software\ distributed\ }}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00011}00011\ \textcolor{comment}{//\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,\ WITHOUT\ WARRANTIES\ OR\ }}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00012}00012\ \textcolor{comment}{//\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.\ See\ the\ License\ for\ the\ }}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00013}00013\ \textcolor{comment}{//\ specific\ language\ governing\ permissions\ and\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00015}00015\ \textcolor{preprocessor}{\#ifndef\ RAPIDJSON\_INTERNAL\_STACK\_H\_}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00016}00016\ \textcolor{preprocessor}{\#define\ RAPIDJSON\_INTERNAL\_STACK\_H\_}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00018}00018\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{allocators_8h}{../allocators.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00019}00019\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{swap_8h}{swap.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00020}00020\ \textcolor{preprocessor}{\#include\ <cstddef>}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00022}00022\ \textcolor{preprocessor}{\#if\ defined(\_\_clang\_\_)}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00023}00023\ RAPIDJSON\_DIAG\_PUSH}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00024}00024\ RAPIDJSON\_DIAG\_OFF(c++98-\/compat)}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00025}00025\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00027}00027\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gad3806c8251fdc7da9618b7e922674ffc}{RAPIDJSON\_NAMESPACE\_BEGIN}}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00028}00028\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceinternal}{internal}}\ \{}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00031}00031\ \textcolor{comment}{//\ Stack}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00036}00036\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ Allocator>}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00037}\mbox{\hyperlink{classinternal_1_1_stack}{00037}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classinternal_1_1_stack}{Stack}}\ \{}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00038}00038\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00039}00039\ \ \ \ \ \textcolor{comment}{//\ Optimization\ note:\ Do\ not\ allocate\ memory\ for\ stack\_\ in\ constructor.}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00040}00040\ \ \ \ \ \textcolor{comment}{//\ Do\ it\ lazily\ when\ first\ Push()\ -\/>\ Expand()\ -\/>\ Resize().}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00041}\mbox{\hyperlink{classinternal_1_1_stack_af09ab91f9e5143deccf7c9af837f451e}{00041}}\ \ \ \ \ \mbox{\hyperlink{classinternal_1_1_stack_af09ab91f9e5143deccf7c9af837f451e}{Stack}}(\mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}*\ allocator,\ \textcolor{keywordtype}{size\_t}\ stackCapacity)\ :\ allocator\_(allocator),\ ownAllocator\_(0),\ stack\_(0),\ stackTop\_(0),\ stackEnd\_(0),\ initialCapacity\_(stackCapacity)\ \{}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00042}00042\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00044}00044\ \textcolor{preprocessor}{\#if\ RAPIDJSON\_HAS\_CXX11\_RVALUE\_REFS}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00045}00045\ \ \ \ \ \mbox{\hyperlink{classinternal_1_1_stack_af09ab91f9e5143deccf7c9af837f451e}{Stack}}(\mbox{\hyperlink{classinternal_1_1_stack}{Stack}}\&\&\ rhs)}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00046}00046\ \ \ \ \ \ \ \ \ :\ allocator\_(rhs.allocator\_),}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00047}00047\ \ \ \ \ \ \ \ \ \ \ ownAllocator\_(rhs.ownAllocator\_),}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \ stack\_(rhs.stack\_),}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00049}00049\ \ \ \ \ \ \ \ \ \ \ stackTop\_(rhs.stackTop\_),}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00050}00050\ \ \ \ \ \ \ \ \ \ \ stackEnd\_(rhs.stackEnd\_),}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00051}00051\ \ \ \ \ \ \ \ \ \ \ initialCapacity\_(rhs.initialCapacity\_)}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00052}00052\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00053}00053\ \ \ \ \ \ \ \ \ rhs.allocator\_\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00054}00054\ \ \ \ \ \ \ \ \ rhs.ownAllocator\_\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00055}00055\ \ \ \ \ \ \ \ \ rhs.stack\_\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00056}00056\ \ \ \ \ \ \ \ \ rhs.stackTop\_\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00057}00057\ \ \ \ \ \ \ \ \ rhs.stackEnd\_\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00058}00058\ \ \ \ \ \ \ \ \ rhs.initialCapacity\_\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00059}00059\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00060}00060\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00062}\mbox{\hyperlink{classinternal_1_1_stack_afedce84c8816abe9277a71ebd5e1808a}{00062}}\ \ \ \ \ \mbox{\hyperlink{classinternal_1_1_stack_afedce84c8816abe9277a71ebd5e1808a}{\string~Stack}}()\ \{}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00063}00063\ \ \ \ \ \ \ \ \ Destroy();}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00064}00064\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00066}00066\ \textcolor{preprocessor}{\#if\ RAPIDJSON\_HAS\_CXX11\_RVALUE\_REFS}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00067}00067\ \ \ \ \ \mbox{\hyperlink{classinternal_1_1_stack}{Stack}}\&\ operator=(\mbox{\hyperlink{classinternal_1_1_stack}{Stack}}\&\&\ rhs)\ \{}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00068}00068\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\&rhs\ !=\ \textcolor{keyword}{this})}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00069}00069\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \ \ \ Destroy();}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \ \ \ allocator\_\ =\ rhs.allocator\_;}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00073}00073\ \ \ \ \ \ \ \ \ \ \ \ \ ownAllocator\_\ =\ rhs.ownAllocator\_;}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00074}00074\ \ \ \ \ \ \ \ \ \ \ \ \ stack\_\ =\ rhs.stack\_;}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00075}00075\ \ \ \ \ \ \ \ \ \ \ \ \ stackTop\_\ =\ rhs.stackTop\_;}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \ \ \ stackEnd\_\ =\ rhs.stackEnd\_;}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ initialCapacity\_\ =\ rhs.initialCapacity\_;}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \ \ \ rhs.allocator\_\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00080}00080\ \ \ \ \ \ \ \ \ \ \ \ \ rhs.ownAllocator\_\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00081}00081\ \ \ \ \ \ \ \ \ \ \ \ \ rhs.stack\_\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00082}00082\ \ \ \ \ \ \ \ \ \ \ \ \ rhs.stackTop\_\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00083}00083\ \ \ \ \ \ \ \ \ \ \ \ \ rhs.stackEnd\_\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00084}00084\ \ \ \ \ \ \ \ \ \ \ \ \ rhs.initialCapacity\_\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00085}00085\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00086}00086\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00087}00087\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00088}00088\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00089}00089\ }
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00090}\mbox{\hyperlink{classinternal_1_1_stack_a5e601199a21d84b1ac612f558be0f2c3}{00090}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classinternal_1_1_stack_a5e601199a21d84b1ac612f558be0f2c3}{Swap}}(\mbox{\hyperlink{classinternal_1_1_stack}{Stack}}\&\ rhs)\ RAPIDJSON\_NOEXCEPT\ \{}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00091}00091\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a72b2c71d36273b9691487f58c671ce04}{internal::Swap}}(allocator\_,\ rhs.allocator\_);}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00092}00092\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a72b2c71d36273b9691487f58c671ce04}{internal::Swap}}(ownAllocator\_,\ rhs.ownAllocator\_);}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00093}00093\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a72b2c71d36273b9691487f58c671ce04}{internal::Swap}}(stack\_,\ rhs.stack\_);}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00094}00094\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a72b2c71d36273b9691487f58c671ce04}{internal::Swap}}(stackTop\_,\ rhs.stackTop\_);}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00095}00095\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a72b2c71d36273b9691487f58c671ce04}{internal::Swap}}(stackEnd\_,\ rhs.stackEnd\_);}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00096}00096\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a72b2c71d36273b9691487f58c671ce04}{internal::Swap}}(initialCapacity\_,\ rhs.initialCapacity\_);}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00097}00097\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00098}00098\ }
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00099}\mbox{\hyperlink{classinternal_1_1_stack_a02da31665a372738e81ded2f7b7d598e}{00099}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classinternal_1_1_stack_a02da31665a372738e81ded2f7b7d598e}{Clear}}()\ \{\ stackTop\_\ =\ stack\_;\ \}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00100}00100\ }
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00101}\mbox{\hyperlink{classinternal_1_1_stack_a3852b8494d69c91f6a238a51572e591e}{00101}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classinternal_1_1_stack_a3852b8494d69c91f6a238a51572e591e}{ShrinkToFit}}()\ \{\ }
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00102}00102\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classinternal_1_1_stack_a2b8bda380e33838a99e3c73ff9785f03}{Empty}}())\ \{}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00103}00103\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ the\ stack\ is\ empty,\ completely\ deallocate\ the\ memory.}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00104}00104\ \ \ \ \ \ \ \ \ \ \ \ \ Allocator::Free(stack\_);\ \textcolor{comment}{//\ NOLINT\ (+clang-\/analyzer-\/unix.Malloc)}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00105}00105\ \ \ \ \ \ \ \ \ \ \ \ \ stack\_\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00106}00106\ \ \ \ \ \ \ \ \ \ \ \ \ stackTop\_\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00107}00107\ \ \ \ \ \ \ \ \ \ \ \ \ stackEnd\_\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00108}00108\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00109}00109\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00110}00110\ \ \ \ \ \ \ \ \ \ \ \ \ Resize(\mbox{\hyperlink{classinternal_1_1_stack_ac484468a2791bd3e9ba609bd1600ab48}{GetSize}}());}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00111}00111\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00112}00112\ }
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00113}00113\ \ \ \ \ \textcolor{comment}{//\ Optimization\ note:\ try\ to\ minimize\ the\ size\ of\ this\ function\ for\ force\ inline.}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00114}00114\ \ \ \ \ \textcolor{comment}{//\ Expansion\ is\ run\ very\ infrequently,\ so\ it\ is\ moved\ to\ another\ (probably\ non-\/inline)\ function.}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00115}00115\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00116}\mbox{\hyperlink{classinternal_1_1_stack_a7ae5de892834b7fc16099eb5e23dd97c}{00116}}\ \ \ \ \ RAPIDJSON\_FORCEINLINE\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classinternal_1_1_stack_a7ae5de892834b7fc16099eb5e23dd97c}{Reserve}}(\textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ =\ 1)\ \{}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00117}00117\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Expand\ the\ stack\ if\ needed}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00118}00118\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_ga6a2b1695c13e77ae425e3cbac980ccb5}{RAPIDJSON\_UNLIKELY}}(\textcolor{keyword}{static\_cast<}std::ptrdiff\_t\textcolor{keyword}{>}(\textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}})\ *\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}})\ >\ (stackEnd\_\ -\/\ stackTop\_)))}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00119}00119\ \ \ \ \ \ \ \ \ \ \ \ \ Expand<T>(\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}});}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00120}00120\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00121}00121\ }
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00122}00122\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00123}\mbox{\hyperlink{classinternal_1_1_stack_a2d3b995140893ce92e9b94ada11ee3f3}{00123}}\ \ \ \ \ RAPIDJSON\_FORCEINLINE\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ \mbox{\hyperlink{classinternal_1_1_stack_a2d3b995140893ce92e9b94ada11ee3f3}{Push}}(\textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ =\ 1)\ \{}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00124}00124\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classinternal_1_1_stack_a7ae5de892834b7fc16099eb5e23dd97c}{Reserve<T>}}(\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}});}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00125}00125\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classinternal_1_1_stack_a8b82b6705a41aa259936a81b927bcac0}{PushUnsafe<T>}}(\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}});}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00126}00126\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00127}00127\ }
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00128}00128\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00129}\mbox{\hyperlink{classinternal_1_1_stack_a8b82b6705a41aa259936a81b927bcac0}{00129}}\ \ \ \ \ RAPIDJSON\_FORCEINLINE\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ \mbox{\hyperlink{classinternal_1_1_stack_a8b82b6705a41aa259936a81b927bcac0}{PushUnsafe}}(\textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ =\ 1)\ \{}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00130}00130\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(stackTop\_);}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00131}00131\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\textcolor{keyword}{static\_cast<}std::ptrdiff\_t\textcolor{keyword}{>}(\textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}})\ *\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}})\ <=\ (stackEnd\_\ -\/\ stackTop\_));}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00132}00132\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\textcolor{keyword}{>}(stackTop\_);}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00133}00133\ \ \ \ \ \ \ \ \ stackTop\_\ +=\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}})\ *\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}};}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00134}00134\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00135}00135\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00136}00136\ }
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00137}00137\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00138}\mbox{\hyperlink{classinternal_1_1_stack_a1cb63cab765815c0624c6676b3712b03}{00138}}\ \ \ \ \ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ \mbox{\hyperlink{classinternal_1_1_stack_a1cb63cab765815c0624c6676b3712b03}{Pop}}(\textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}})\ \{}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00139}00139\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\mbox{\hyperlink{classinternal_1_1_stack_ac484468a2791bd3e9ba609bd1600ab48}{GetSize}}()\ >=\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ *\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}));}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00140}00140\ \ \ \ \ \ \ \ \ stackTop\_\ -\/=\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ *\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}});}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00141}00141\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\textcolor{keyword}{>}(stackTop\_);}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00142}00142\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00143}00143\ }
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00144}00144\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00145}\mbox{\hyperlink{classinternal_1_1_stack_a9c2611699081d74be865ebe67315dc6d}{00145}}\ \ \ \ \ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ \mbox{\hyperlink{classinternal_1_1_stack_a9c2611699081d74be865ebe67315dc6d}{Top}}()\ \{\ }
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00146}00146\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\mbox{\hyperlink{classinternal_1_1_stack_ac484468a2791bd3e9ba609bd1600ab48}{GetSize}}()\ >=\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}));}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00147}00147\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\textcolor{keyword}{>}(stackTop\_\ -\/\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}));}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00148}00148\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00149}00149\ }
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00150}00150\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00151}\mbox{\hyperlink{classinternal_1_1_stack_a18e79cab61089f955d42b6c45bb51c23}{00151}}\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ \mbox{\hyperlink{classinternal_1_1_stack_a18e79cab61089f955d42b6c45bb51c23}{Top}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00152}00152\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\mbox{\hyperlink{classinternal_1_1_stack_ac484468a2791bd3e9ba609bd1600ab48}{GetSize}}()\ >=\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}));}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00153}00153\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\textcolor{keyword}{>}(stackTop\_\ -\/\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}));}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00154}00154\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00155}00155\ }
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00156}00156\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00157}\mbox{\hyperlink{classinternal_1_1_stack_acb8a65d110faf22be514db83524409c5}{00157}}\ \ \ \ \ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ \mbox{\hyperlink{classinternal_1_1_stack_acb8a65d110faf22be514db83524409c5}{End}}()\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\textcolor{keyword}{>}(stackTop\_);\ \}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00158}00158\ }
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00159}00159\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00160}\mbox{\hyperlink{classinternal_1_1_stack_a242967361d9e254d13b85cfc2161861e}{00160}}\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ \mbox{\hyperlink{classinternal_1_1_stack_a242967361d9e254d13b85cfc2161861e}{End}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\textcolor{keyword}{>}(stackTop\_);\ \}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00161}00161\ }
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00162}00162\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00163}\mbox{\hyperlink{classinternal_1_1_stack_a6acd2f7a16458184084c40d9f06f4a55}{00163}}\ \ \ \ \ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ \mbox{\hyperlink{classinternal_1_1_stack_a6acd2f7a16458184084c40d9f06f4a55}{Bottom}}()\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\textcolor{keyword}{>}(stack\_);\ \}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00164}00164\ }
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00165}00165\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00166}\mbox{\hyperlink{classinternal_1_1_stack_aeb6c4af6d6de57865232e1926dc0834e}{00166}}\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ \mbox{\hyperlink{classinternal_1_1_stack_aeb6c4af6d6de57865232e1926dc0834e}{Bottom}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\textcolor{keyword}{>}(stack\_);\ \}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00167}00167\ }
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00168}\mbox{\hyperlink{classinternal_1_1_stack_a657ae4d477b25d4e0045aee0efd809c3}{00168}}\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classinternal_1_1_stack_a657ae4d477b25d4e0045aee0efd809c3}{HasAllocator}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00169}00169\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ allocator\_\ !=\ 0;}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00170}00170\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00171}00171\ }
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00172}\mbox{\hyperlink{classinternal_1_1_stack_aa6f933acc7ecd92a2b567db5fa8cd43a}{00172}}\ \ \ \ \ \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}\&\ \mbox{\hyperlink{classinternal_1_1_stack_aa6f933acc7ecd92a2b567db5fa8cd43a}{GetAllocator}}()\ \{}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00173}00173\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(allocator\_);}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00174}00174\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *allocator\_;}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00175}00175\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00176}00176\ }
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00177}\mbox{\hyperlink{classinternal_1_1_stack_a2b8bda380e33838a99e3c73ff9785f03}{00177}}\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classinternal_1_1_stack_a2b8bda380e33838a99e3c73ff9785f03}{Empty}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ stackTop\_\ ==\ stack\_;\ \}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00178}\mbox{\hyperlink{classinternal_1_1_stack_ac484468a2791bd3e9ba609bd1600ab48}{00178}}\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classinternal_1_1_stack_ac484468a2791bd3e9ba609bd1600ab48}{GetSize}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(stackTop\_\ -\/\ stack\_);\ \}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00179}\mbox{\hyperlink{classinternal_1_1_stack_a67d5d7ee9424d3dd46cf9d001b6cdc6b}{00179}}\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classinternal_1_1_stack_a67d5d7ee9424d3dd46cf9d001b6cdc6b}{GetCapacity}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(stackEnd\_\ -\/\ stack\_);\ \}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00180}00180\ }
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00181}00181\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00182}00182\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00183}00183\ \ \ \ \ \textcolor{keywordtype}{void}\ Expand(\textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}})\ \{}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00184}00184\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Only\ expand\ the\ capacity\ if\ the\ current\ stack\ exists.\ Otherwise\ just\ create\ a\ stack\ with\ initial\ capacity.}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00185}00185\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ newCapacity;}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00186}00186\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (stack\_\ ==\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00187}00187\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!allocator\_)}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00188}00188\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ownAllocator\_\ =\ allocator\_\ =\ \mbox{\hyperlink{rapidjson_8h_abdc7cd7902748ffe6626d71c59a73c3b}{RAPIDJSON\_NEW}}(\mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}})();}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00189}00189\ \ \ \ \ \ \ \ \ \ \ \ \ newCapacity\ =\ initialCapacity\_;}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00190}00190\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00191}00191\ \ \ \ \ \ \ \ \ \ \ \ \ newCapacity\ =\ \mbox{\hyperlink{classinternal_1_1_stack_a67d5d7ee9424d3dd46cf9d001b6cdc6b}{GetCapacity}}();}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00192}00192\ \ \ \ \ \ \ \ \ \ \ \ \ newCapacity\ +=\ (newCapacity\ +\ 1)\ /\ 2;}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00193}00193\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00194}00194\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ newSize\ =\ \mbox{\hyperlink{classinternal_1_1_stack_ac484468a2791bd3e9ba609bd1600ab48}{GetSize}}()\ +\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}})\ *\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}};}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00195}00195\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (newCapacity\ <\ newSize)}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00196}00196\ \ \ \ \ \ \ \ \ \ \ \ \ newCapacity\ =\ newSize;}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00197}00197\ }
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00198}00198\ \ \ \ \ \ \ \ \ Resize(newCapacity);}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00199}00199\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00200}00200\ }
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00201}00201\ \ \ \ \ \textcolor{keywordtype}{void}\ Resize(\textcolor{keywordtype}{size\_t}\ newCapacity)\ \{}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00202}00202\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ size\ =\ \mbox{\hyperlink{classinternal_1_1_stack_ac484468a2791bd3e9ba609bd1600ab48}{GetSize}}();\ \ \textcolor{comment}{//\ Backup\ the\ current\ size}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00203}00203\ \ \ \ \ \ \ \ \ stack\_\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(allocator\_-\/>Realloc(stack\_,\ \mbox{\hyperlink{classinternal_1_1_stack_a67d5d7ee9424d3dd46cf9d001b6cdc6b}{GetCapacity}}(),\ newCapacity));}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00204}00204\ \ \ \ \ \ \ \ \ stackTop\_\ =\ stack\_\ +\ size;}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00205}00205\ \ \ \ \ \ \ \ \ stackEnd\_\ =\ stack\_\ +\ newCapacity;}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00206}00206\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00207}00207\ }
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00208}00208\ \ \ \ \ \textcolor{keywordtype}{void}\ Destroy()\ \{}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00209}00209\ \ \ \ \ \ \ \ \ Allocator::Free(stack\_);}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00210}00210\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_a52c941c3fdd646527cdcd42aa846a28a}{RAPIDJSON\_DELETE}}(ownAllocator\_);\ \textcolor{comment}{//\ Only\ delete\ if\ it\ is\ owned\ by\ the\ stack}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00211}00211\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00212}00212\ }
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00213}00213\ \ \ \ \ \textcolor{comment}{//\ Prohibit\ copy\ constructor\ \&\ assignment\ operator.}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00214}00214\ \ \ \ \ \mbox{\hyperlink{classinternal_1_1_stack_af09ab91f9e5143deccf7c9af837f451e}{Stack}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classinternal_1_1_stack_af09ab91f9e5143deccf7c9af837f451e}{Stack}}\&);}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00215}00215\ \ \ \ \ \mbox{\hyperlink{classinternal_1_1_stack_af09ab91f9e5143deccf7c9af837f451e}{Stack}}\&\ operator=(\textcolor{keyword}{const}\ \mbox{\hyperlink{classinternal_1_1_stack_af09ab91f9e5143deccf7c9af837f451e}{Stack}}\&);}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00216}00216\ }
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00217}00217\ \ \ \ \ \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}*\ allocator\_;}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00218}00218\ \ \ \ \ \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}*\ ownAllocator\_;}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00219}00219\ \ \ \ \ \textcolor{keywordtype}{char}\ *stack\_;}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00220}00220\ \ \ \ \ \textcolor{keywordtype}{char}\ *stackTop\_;}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00221}00221\ \ \ \ \ \textcolor{keywordtype}{char}\ *stackEnd\_;}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00222}00222\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ initialCapacity\_;}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00223}00223\ \};}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00224}00224\ }
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00225}00225\ \}\ \textcolor{comment}{//\ namespace\ internal}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00226}00226\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gaf18f052a98b9f5df5448d39484b743c1}{RAPIDJSON\_NAMESPACE\_END}}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00227}00227\ }
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00228}00228\ \textcolor{preprocessor}{\#if\ defined(\_\_clang\_\_)}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00229}00229\ RAPIDJSON\_DIAG\_POP}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00230}00230\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00231}00231\ }
+\DoxyCodeLine{\Hypertarget{stack_8h_source_l00232}00232\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ RAPIDJSON\_STACK\_H\_}}
+
+\end{DoxyCode}

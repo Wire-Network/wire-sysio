@@ -1,0 +1,96 @@
+\doxysection{websocketpp\+::lib Namespace Reference}
+\hypertarget{namespacewebsocketpp_1_1lib}{}\label{namespacewebsocketpp_1_1lib}\index{websocketpp::lib@{websocketpp::lib}}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacewebsocketpp_1_1lib_1_1asio}{asio}}
+\item 
+namespace \mbox{\hyperlink{namespacewebsocketpp_1_1lib_1_1net}{net}}
+\item 
+namespace \mbox{\hyperlink{namespacewebsocketpp_1_1lib_1_1placeholders}{placeholders}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef boost\+::scoped\+\_\+array$<$ unsigned char $>$ \mbox{\hyperlink{namespacewebsocketpp_1_1lib_a0021504e0fcd9438c7531506ccd95d94}{unique\+\_\+ptr\+\_\+uchar\+\_\+array}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{namespacewebsocketpp_1_1lib_ae781ac2d4191bb30a65742279cfdeca4}{clear\+\_\+function}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&x)
+\item 
+std\+::tm \mbox{\hyperlink{namespacewebsocketpp_1_1lib_a1b873cb6baa3d85b57573bee059b29f4}{localtime}} (std\+::time\+\_\+t const \&time)
+\begin{DoxyCompactList}\small\item\em Thread safe cross platform localtime. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{namespacewebsocketpp_1_1lib_a0021504e0fcd9438c7531506ccd95d94}\index{websocketpp::lib@{websocketpp::lib}!unique\_ptr\_uchar\_array@{unique\_ptr\_uchar\_array}}
+\index{unique\_ptr\_uchar\_array@{unique\_ptr\_uchar\_array}!websocketpp::lib@{websocketpp::lib}}
+\doxysubsubsection{\texorpdfstring{unique\_ptr\_uchar\_array}{unique\_ptr\_uchar\_array}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1lib_a0021504e0fcd9438c7531506ccd95d94} 
+typedef boost\+::scoped\+\_\+array$<$unsigned char$>$ \mbox{\hyperlink{namespacewebsocketpp_1_1lib_a0021504e0fcd9438c7531506ccd95d94}{websocketpp\+::lib\+::unique\+\_\+ptr\+\_\+uchar\+\_\+array}}}
+
+
+
+Definition at line \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source_l00083}{83}} of file \mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp_source}{memory.\+hpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacewebsocketpp_1_1lib_ae781ac2d4191bb30a65742279cfdeca4}\index{websocketpp::lib@{websocketpp::lib}!clear\_function@{clear\_function}}
+\index{clear\_function@{clear\_function}!websocketpp::lib@{websocketpp::lib}}
+\doxysubsubsection{\texorpdfstring{clear\_function()}{clear\_function()}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1lib_ae781ac2d4191bb30a65742279cfdeca4} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+void websocketpp\+::lib\+::clear\+\_\+function (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{x}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{functional_8hpp_source_l00097}{97}} of file \mbox{\hyperlink{functional_8hpp_source}{functional.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ x.clear();}
+\DoxyCodeLine{00099\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacewebsocketpp_1_1lib_a1b873cb6baa3d85b57573bee059b29f4}\index{websocketpp::lib@{websocketpp::lib}!localtime@{localtime}}
+\index{localtime@{localtime}!websocketpp::lib@{websocketpp::lib}}
+\doxysubsubsection{\texorpdfstring{localtime()}{localtime()}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1lib_a1b873cb6baa3d85b57573bee059b29f4} 
+std\+::tm websocketpp\+::lib\+::localtime (\begin{DoxyParamCaption}\item[{std\+::time\+\_\+t const \&}]{time}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vendor_2websocketpp_2websocketpp_2common_2time_8hpp_source_l00041}{41}} of file \mbox{\hyperlink{vendor_2websocketpp_2websocketpp_2common_2time_8hpp_source}{time.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00042\ \ \ \ \ std::tm\ tm\_snapshot;}
+\DoxyCodeLine{00043\ \textcolor{preprocessor}{\#if\ (defined(\_\_MINGW32\_\_)\ ||\ defined(\_\_MINGW64\_\_))}}
+\DoxyCodeLine{00044\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(\&tm\_snapshot,\ ::localtime(\&time),\ \textcolor{keyword}{sizeof}(std::tm));}
+\DoxyCodeLine{00045\ \textcolor{preprocessor}{\#elif\ (defined(WIN32)\ ||\ defined(\_WIN32)\ ||\ defined(\_\_WIN32\_\_))}}
+\DoxyCodeLine{00046\ \ \ \ \ localtime\_s(\&tm\_snapshot,\ \&time);\ }
+\DoxyCodeLine{00047\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00048\ \ \ \ \ localtime\_r(\&time,\ \&tm\_snapshot);\ \textcolor{comment}{//\ POSIX\ \ }}
+\DoxyCodeLine{00049\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00050\ \ \ \ \ \textcolor{keywordflow}{return}\ tm\_snapshot;}
+\DoxyCodeLine{00051\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=304pt]{namespacewebsocketpp_1_1lib_a1b873cb6baa3d85b57573bee059b29f4_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=215pt]{namespacewebsocketpp_1_1lib_a1b873cb6baa3d85b57573bee059b29f4_icgraph}
+\end{center}
+\end{figure}

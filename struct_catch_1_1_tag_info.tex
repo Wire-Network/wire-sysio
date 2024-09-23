@@ -1,0 +1,113 @@
+\doxysection{Catch\+::Tag\+Info Struct Reference}
+\hypertarget{struct_catch_1_1_tag_info}{}\label{struct_catch_1_1_tag_info}\index{Catch::TagInfo@{Catch::TagInfo}}
+
+
+{\ttfamily \#include $<$catch\+\_\+list.\+h$>$}
+
+
+
+Collaboration diagram for Catch\+::Tag\+Info\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=161pt]{struct_catch_1_1_tag_info__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{struct_catch_1_1_tag_info_a5ee84ccb68379088fdccbc7867b20754}{add}} (std\+::string const \&spelling)
+\item 
+std\+::string \mbox{\hyperlink{struct_catch_1_1_tag_info_a383b0c3531d4822ef13991bc15a58974}{all}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::set$<$ std\+::string $>$ \mbox{\hyperlink{struct_catch_1_1_tag_info_af666de1ea615c77682fdea632d288ff6}{spellings}}
+\item 
+std\+::size\+\_\+t \mbox{\hyperlink{struct_catch_1_1_tag_info_ae056c754ab1e2f1a8f175096ae5835c2}{count}} = 0
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{catch__list_8h_source_l00022}{22}} of file \mbox{\hyperlink{catch__list_8h_source}{catch\+\_\+list.\+h}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_catch_1_1_tag_info_a5ee84ccb68379088fdccbc7867b20754}\index{Catch::TagInfo@{Catch::TagInfo}!add@{add}}
+\index{add@{add}!Catch::TagInfo@{Catch::TagInfo}}
+\doxysubsubsection{\texorpdfstring{add()}{add()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_tag_info_a5ee84ccb68379088fdccbc7867b20754} 
+void Catch\+::\+Tag\+Info\+::add (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{spelling}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__list_8cpp_source_l00081}{81}} of file \mbox{\hyperlink{catch__list_8cpp_source}{catch\+\_\+list.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ ++\mbox{\hyperlink{struct_catch_1_1_tag_info_ae056c754ab1e2f1a8f175096ae5835c2}{count}};}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_tag_info_af666de1ea615c77682fdea632d288ff6}{spellings}}.insert(\ spelling\ );}
+\DoxyCodeLine{00084\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=345pt]{struct_catch_1_1_tag_info_a5ee84ccb68379088fdccbc7867b20754_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_catch_1_1_tag_info_a383b0c3531d4822ef13991bc15a58974}\index{Catch::TagInfo@{Catch::TagInfo}!all@{all}}
+\index{all@{all}!Catch::TagInfo@{Catch::TagInfo}}
+\doxysubsubsection{\texorpdfstring{all()}{all()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_tag_info_a383b0c3531d4822ef13991bc15a58974} 
+std\+::string Catch\+::\+Tag\+Info\+::all (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{catch__list_8cpp_source_l00086}{86}} of file \mbox{\hyperlink{catch__list_8cpp_source}{catch\+\_\+list.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ std::string\ out;}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\ \textcolor{keyword}{const}\&\ spelling\ :\ \mbox{\hyperlink{struct_catch_1_1_tag_info_af666de1ea615c77682fdea632d288ff6}{spellings}}\ )}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \ out\ +=\ \textcolor{stringliteral}{"{}["{}}\ +\ spelling\ +\ \textcolor{stringliteral}{"{}]"{}};}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ out;}
+\DoxyCodeLine{00091\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_catch_1_1_tag_info_ae056c754ab1e2f1a8f175096ae5835c2}\index{Catch::TagInfo@{Catch::TagInfo}!count@{count}}
+\index{count@{count}!Catch::TagInfo@{Catch::TagInfo}}
+\doxysubsubsection{\texorpdfstring{count}{count}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_tag_info_ae056c754ab1e2f1a8f175096ae5835c2} 
+std\+::size\+\_\+t Catch\+::\+Tag\+Info\+::count = 0}
+
+
+
+Definition at line \mbox{\hyperlink{catch__list_8h_source_l00027}{27}} of file \mbox{\hyperlink{catch__list_8h_source}{catch\+\_\+list.\+h}}.
+
+\Hypertarget{struct_catch_1_1_tag_info_af666de1ea615c77682fdea632d288ff6}\index{Catch::TagInfo@{Catch::TagInfo}!spellings@{spellings}}
+\index{spellings@{spellings}!Catch::TagInfo@{Catch::TagInfo}}
+\doxysubsubsection{\texorpdfstring{spellings}{spellings}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_tag_info_af666de1ea615c77682fdea632d288ff6} 
+std\+::set$<$std\+::string$>$ Catch\+::\+Tag\+Info\+::spellings}
+
+
+
+Definition at line \mbox{\hyperlink{catch__list_8h_source_l00026}{26}} of file \mbox{\hyperlink{catch__list_8h_source}{catch\+\_\+list.\+h}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__list_8h}{catch\+\_\+list.\+h}}\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__list_8cpp}{catch\+\_\+list.\+cpp}}\end{DoxyCompactItemize}

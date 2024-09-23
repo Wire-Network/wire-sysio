@@ -1,0 +1,24 @@
+<map id="websocketpp::frame::get_masking_key_offset" name="websocketpp::frame::get_masking_key_offset">
+<area shape="rect" id="Node000001" title="Calculate the offset location of the masking key within the extended header." alt="" coords="887,136,1058,177"/>
+<area shape="rect" id="Node000002" href="$namespacewebsocketpp_1_1frame.html#abd4f23c906cc48fb3b34603fd4284b01" title="Calculates the full length of the header based on the first bytes." alt="" coords="699,103,839,143"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="871,142,839,137,839,132,872,137"/>
+<area shape="rect" id="Node000011" href="$namespacewebsocketpp_1_1frame.html#aed7edd146ce3aa5b87adc9fcc5fcb10f" title="Extract the masking key from a frame header." alt="" coords="699,168,839,209"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="872,175,839,180,839,175,871,170"/>
+<area shape="rect" id="Node000003" href="$frame_8cpp.html#a2eb593e91f71f541200821fa274712bb" title=" " alt="" coords="455,53,651,78"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="684,103,651,94,606,82,607,77,652,88,685,97"/>
+<area shape="rect" id="Node000004" href="$classwebsocketpp_1_1processor_1_1hybi13.html#a5c5e3234a0067c7f14fe0ceb4e647659" title="Process new websocket connection bytes." alt="" coords="472,168,635,209"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="686,151,624,170,622,165,684,146"/>
+<area shape="rect" id="Node000005" href="$namespacewebsocketpp_1_1frame.html#ae63c3e01399a6787ed09b710853344a4" title="Generate a properly sized contiguous string that encodes a full frame header." alt="" coords="484,103,623,143"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="684,126,623,126,623,120,684,120"/>
+<area shape="rect" id="Node000006" href="$classwebsocketpp_1_1processor_1_1hybi13.html#a5aa8f27959beeeef73997a80c2560663" title="Generic prepare control frame with opcode and payload." alt="" coords="230,71,394,111"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="468,114,394,105,395,99,469,109"/>
+<area shape="rect" id="Node000010" href="$classwebsocketpp_1_1processor_1_1hybi13.html#a72f4833d66eb51e37a956f434895b3ab" title="Prepare a user data message for writing." alt="" coords="217,136,407,177"/>
+<area shape="poly" id="edge9_Node000005_Node000010" title=" " alt="" coords="469,137,408,146,407,141,468,132"/>
+<area shape="rect" id="Node000007" href="$classwebsocketpp_1_1processor_1_1hybi13.html#a8cbb98af828463c5ef80429a7ade715d" title=" " alt="" coords="5,5,169,46"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="224,68,159,49,160,44,226,63"/>
+<area shape="rect" id="Node000008" href="$classwebsocketpp_1_1processor_1_1hybi13.html#a38d06bc30c10cd1947c9a7b3051f8961" title="Get URI." alt="" coords="5,71,169,111"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="214,94,169,94,169,88,214,88"/>
+<area shape="rect" id="Node000009" href="$classwebsocketpp_1_1processor_1_1hybi13.html#ab5ca972653c126e7c6a05c529b394321" title=" " alt="" coords="5,136,169,177"/>
+<area shape="poly" id="edge8_Node000006_Node000009" title=" " alt="" coords="226,119,160,138,159,133,224,114"/>
+<area shape="poly" id="edge11_Node000011_Node000004" title=" " alt="" coords="684,191,635,191,635,186,684,186"/>
+</map>

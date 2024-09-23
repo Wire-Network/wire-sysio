@@ -1,0 +1,137 @@
+\chapter{App\+Base}
+\hypertarget{index}{}\label{index}\index{AppBase@{AppBase}}
+\label{index_md_libraries_2appbase_2_r_e_a_d_m_e}%
+\Hypertarget{index_md_libraries_2appbase_2_r_e_a_d_m_e}%
+
+
+The App\+Base library provides a basic framework for building applications from a set of plugins. App\+Base manages the plugin life-\/cycle and ensures that all plugins are configured, initialized, started, and shutdown in the proper order.
+
+\doxysection*{Key Features}
+
+
+\begin{DoxyItemize}
+\item Dynamically Specify Plugins to Load
+\item Automatically Load \doxylink{class_dependent}{Dependent} Plugins in Order
+\item Plugins can specify commandline arguments and configuration file options
+\item Program gracefully exits from SIGINT, SIGTERM, and SIGPIPE
+\item Minimal Dependencies (Boost 1.\+60, c++14)
+\end{DoxyItemize}
+
+\doxysection*{Defining a Plugin}
+
+\doxylink{struct_a}{A} simple example of a 2-\/plugin application can be found in the /examples directory. Each plugin has a simple life cycle\+:
+
+
+\begin{DoxyEnumerate}
+\item Initialize -\/ parse configuration file options
+\item Startup -\/ start executing, using configuration file options
+\item Shutdown -\/ stop everything and free all resources
+\end{DoxyEnumerate}
+
+All plugins complete the Initialize step before any plugin enters the Startup step. Any dependent plugin specified by {\ttfamily APPBASE\+\_\+\+PLUGIN\+\_\+\+REQUIRES} will be Initialized or Started prior to the plugin being Initialized or Started.
+
+Shutdown is called in the reverse order of Startup.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{class\ net\_plugin\ :\ public\ appbase::plugin<net\_plugin>}
+\DoxyCodeLine{\{}
+\DoxyCodeLine{\ \ \ public:}
+\DoxyCodeLine{\ \ \ \ \ net\_plugin()\{\};}
+\DoxyCodeLine{\ \ \ \ \ \string~net\_plugin()\{\};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \ APPBASE\_PLUGIN\_REQUIRES(\ (chain\_plugin)\ );}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \ virtual\ void\ set\_program\_options(\ options\_description\&\ cli,\ options\_description\&\ cfg\ )\ override}
+\DoxyCodeLine{\ \ \ \ \ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ cfg.add\_options()}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ ("{}listen-\/endpoint"{},\ bpo::value<string>()-\/>default\_value(\ "{}127.0.0.1:9876"{}\ ),\ "{}The\ local\ IP\ address\ and\ port\ to\ listen\ for\ incoming\ connections."{})}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ ("{}remote-\/endpoint"{},\ bpo::value<\ vector<string>\ >()-\/>composing(),\ "{}The\ IP\ address\ and\ port\ of\ a\ remote\ peer\ to\ sync\ with."{})}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ ("{}public-\/endpoint"{},\ bpo::value<string>()-\/>default\_value(\ "{}0.0.0.0:9876"{}\ ),\ "{}The\ public\ IP\ address\ and\ port\ that\ should\ be\ advertized\ to\ peers."{})}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{\ \ \ \ \ \}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \ void\ plugin\_initialize(\ const\ variables\_map\&\ options\ )\ \{\ std::cout\ <<\ "{}initialize\ net\ plugin\(\backslash\)n"{};\ \}}
+\DoxyCodeLine{\ \ \ \ \ void\ plugin\_startup()\ \ \{\ std::cout\ <<\ "{}starting\ net\ plugin\ \(\backslash\)n"{};\ \}}
+\DoxyCodeLine{\ \ \ \ \ void\ plugin\_shutdown()\ \{\ std::cout\ <<\ "{}shutdown\ net\ plugin\ \(\backslash\)n"{};\ \}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\};}
+\DoxyCodeLine{}
+\DoxyCodeLine{int\ main(\ int\ argc,\ char**\ argv\ )\ \{}
+\DoxyCodeLine{\ \ \ try\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ appbase::app().register\_plugin<net\_plugin>();\ //\ implict\ registration\ of\ chain\_plugin\ dependency}
+\DoxyCodeLine{\ \ \ \ \ \ if(\ !appbase::app().initialize(\ argc,\ argv\ )\ )}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ return\ -\/1;}
+\DoxyCodeLine{\ \ \ \ \ \ appbase::app().startup();}
+\DoxyCodeLine{\ \ \ \ \ \ appbase::app().exec();}
+\DoxyCodeLine{\ \ \ \}\ catch\ (\ const\ boost::exception\&\ e\ )\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ std::cerr\ <<\ boost::diagnostic\_information(e)\ <<\ "{}\(\backslash\)n"{};}
+\DoxyCodeLine{\ \ \ \}\ catch\ (\ const\ std::exception\&\ e\ )\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ std::cerr\ <<\ e.what()\ <<\ "{}\(\backslash\)n"{};}
+\DoxyCodeLine{\ \ \ \}\ catch\ (\ ...\ )\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ std::cerr\ <<\ "{}unknown\ exception\(\backslash\)n"{};}
+\DoxyCodeLine{\ \ \ \}}
+\DoxyCodeLine{\ \ \ std::cout\ <<\ "{}exited\ cleanly\(\backslash\)n"{};}
+\DoxyCodeLine{\ \ \ return\ 0;}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+This example can be used like follows\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{./examples/appbase\_example\ -\/-\/plugin\ net\_plugin}
+\DoxyCodeLine{initialize\ chain\ plugin}
+\DoxyCodeLine{initialize\ net\ plugin}
+\DoxyCodeLine{starting\ chain\ plugin}
+\DoxyCodeLine{starting\ net\ plugin}
+\DoxyCodeLine{\string^C}
+\DoxyCodeLine{shutdown\ net\ plugin}
+\DoxyCodeLine{shutdown\ chain\ plugin}
+\DoxyCodeLine{exited\ cleanly}
+
+\end{DoxyCode}
+
+
+\doxysubsection*{Boost ASIO}
+
+App\+Base maintains a singleton {\ttfamily application} instance which can be accessed via {\ttfamily \doxylink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{appbase\+::app()}}. This application owns a {\ttfamily boost\+::asio\+::io\+\_\+service} which starts running when {\ttfamily appbase\+::exec()} is called. If a plugin needs to perform IO or other asynchronous operations then it should dispatch it via {\ttfamily application} {\ttfamily io\+\_\+service} which is setup to use an execution priority queue. 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{app().post(\ appbase::priority::low,\ lambda\ )}
+
+\end{DoxyCode}
+ OR 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{delay\_timer-\/>async\_wait(\ app().get\_priority\_queue().wrap(\ priority::low,\ lambda\ )\ );}
+
+\end{DoxyCode}
+ Use of {\ttfamily get\+\_\+io\+\_\+service()} directly is not recommended as the priority queue will not be respected.
+
+Because the app calls {\ttfamily io\+\_\+service\+::run()} from within {\ttfamily application\+::exec()} and does not spawn any threads all asynchronous operations posted to the io\+\_\+service should be run in the same thread. ~\newline
+
+
+\doxysection*{Graceful Exit}
+
+To trigger a graceful exit call {\ttfamily \doxylink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{appbase\+::app()}.quit()} or send SIGTERM, SIGINT, or SIGPIPE to the process.
+
+\doxysection*{Dependencies}
+
+
+\begin{DoxyEnumerate}
+\item c++14 or newer (clang or g++)
+\item Boost 1.\+60 or newer compiled with C++14 support
+\end{DoxyEnumerate}
+
+To compile boost with c++14 use\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{./b2\ ...\ \ cxxflags="{}-\/std=c++0x\ -\/stdlib=libc++"{}\ linkflags="{}-\/stdlib=libc++"{}\ ...}
+
+\end{DoxyCode}
+ \input{getting_started}
+\input{faq}
+\input{tutorials}
+\input{reference_8handlers}

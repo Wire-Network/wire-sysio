@@ -1,0 +1,119 @@
+\doxysection{allow\+\_\+u32\+\_\+limits\+\_\+flags\+\_\+tests.\+cpp}
+\hypertarget{allow__u32__limits__flags__tests_8cpp_source}{}\label{allow__u32__limits__flags__tests_8cpp_source}\index{libraries/sys-\/vm/tests/allow\_u32\_limits\_flags\_tests.cpp@{libraries/sys-\/vm/tests/allow\_u32\_limits\_flags\_tests.cpp}}
+\mbox{\hyperlink{allow__u32__limits__flags__tests_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <sysio/vm/backend.hpp>}}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{sys-vm_2tests_2utils_8hpp}{utils.hpp}}"{}}}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{single__include_2catch2_2catch_8hpp}{catch2/catch.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00006}00006\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacesysio_1_1vm}{sysio::vm}};}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00008}00008\ \textcolor{keyword}{extern}\ \mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator}{wasm\_allocator}}\ \mbox{\hyperlink{allow__u32__limits__flags__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}};}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00010}00010\ \textcolor{keyword}{namespace\ }\{}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00012}00012\ \textcolor{comment}{//\ All\ of\ these\ wasms\ use\ 0x3FFE/0x3FFF\ instead\ of\ 0x00/0x01\ for\ the\ flags}}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00014}00014\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00015}00015\ \textcolor{comment}{\ *\ (module}}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00016}00016\ \textcolor{comment}{\ *\ \ (memory\ 1)}}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00017}00017\ \textcolor{comment}{\ *\ )}}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00018}00018\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00019}00019\ std::vector<uint8\_t>\ mem\_no\_max\_wasm\ =\ \{}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00020}00020\ \ \ \ 0x00,\ 0x61,\ 0x73,\ 0x6d,\ 0x01,\ 0x00,\ 0x00,\ 0x00,\ 0x05,\ 0x04,\ 0x01,\ 0xFE,}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00021}00021\ \ \ \ 0x7F,\ 0x01}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00022}00022\ \};}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00024}00024\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00025}00025\ \textcolor{comment}{\ *\ (module}}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00026}00026\ \textcolor{comment}{\ *\ \ (memory\ 1\ 2)}}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00027}00027\ \textcolor{comment}{\ *\ )}}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00028}00028\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00029}00029\ std::vector<uint8\_t>\ mem\_max\_wasm\ =\ \{}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00030}00030\ \ \ \ 0x00,\ 0x61,\ 0x73,\ 0x6d,\ 0x01,\ 0x00,\ 0x00,\ 0x00,\ 0x05,\ 0x05,\ 0x01,\ 0xFF,}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00031}00031\ \ \ \ 0x7F,\ 0x01,\ 0x02}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00032}00032\ \};}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00034}00034\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00035}00035\ \textcolor{comment}{\ *\ (module}}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00036}00036\ \textcolor{comment}{\ *\ \ (table\ 1)}}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00037}00037\ \textcolor{comment}{\ *\ )}}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00038}00038\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00039}00039\ std::vector<uint8\_t>\ table\_no\_max\_wasm\ =\ \{}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00040}00040\ \ \ \ 0x00,\ 0x61,\ 0x73,\ 0x6d,\ 0x01,\ 0x00,\ 0x00,\ 0x00,\ 0x04,\ 0x05,\ 0x01,\ 0x70,}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00041}00041\ \ \ \ 0xFE,\ 0x7F,\ 0x01}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00042}00042\ \};}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00044}00044\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00045}00045\ \textcolor{comment}{\ *\ (module}}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00046}00046\ \textcolor{comment}{\ *\ \ (table\ 1\ 2)}}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00047}00047\ \textcolor{comment}{\ *\ )}}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00048}00048\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00049}00049\ std::vector<uint8\_t>\ table\_max\_wasm\ =\ \{}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00050}00050\ \ \ \ 0x00,\ 0x61,\ 0x73,\ 0x6d,\ 0x01,\ 0x00,\ 0x00,\ 0x00,\ 0x04,\ 0x06,\ 0x01,\ 0x70,}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00051}00051\ \ \ \ 0xFF,\ 0x7F,\ 0x01,\ 0x02}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00052}00052\ \};}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00054}00054\ \textcolor{keyword}{struct\ }empty\_options\ \{\};}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00055}00055\ \textcolor{keyword}{struct\ }static\_options\_false\ \{}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00056}00056\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{bool}\ allow\_u32\_limits\_flags\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00057}00057\ \};}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00058}00058\ \textcolor{keyword}{struct\ }static\_options\_true\ \{}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00059}00059\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{bool}\ allow\_u32\_limits\_flags\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00060}00060\ \};}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00061}00061\ \textcolor{keyword}{struct\ }dynamic\_options\ \{}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00062}00062\ \ \ \ \textcolor{keywordtype}{bool}\ allow\_u32\_limits\_flags;}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00063}00063\ \};}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00065}00065\ \}}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00067}\mbox{\hyperlink{allow__u32__limits__flags__tests_8cpp_a93b63e4457c2f4ac9a3f6a8f73cb1b58}{00067}}\ \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_a3e5f265967cb6d730cad8ca15e807ac2}{BACKEND\_TEST\_CASE}}(\textcolor{stringliteral}{"{}Test\ allow\_u32\_limits\_flags\ default"{}},\ \textcolor{stringliteral}{"{}[allow\_u32\_limits\_flags\_test]"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00068}00068\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType>}};}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00069}00069\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(mem\_no\_max\_wasm,\ \&\mbox{\hyperlink{allow__u32__limits__flags__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00070}00070\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(mem\_max\_wasm,\ \&\mbox{\hyperlink{allow__u32__limits__flags__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00071}00071\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(table\_no\_max\_wasm,\ \&\mbox{\hyperlink{allow__u32__limits__flags__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00072}00072\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(table\_max\_wasm,\ \&\mbox{\hyperlink{allow__u32__limits__flags__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00073}00073\ \}}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00074}00074\ }
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00075}\mbox{\hyperlink{allow__u32__limits__flags__tests_8cpp_a87f383c256efce8ff019a258ae761721}{00075}}\ \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_a3e5f265967cb6d730cad8ca15e807ac2}{BACKEND\_TEST\_CASE}}(\textcolor{stringliteral}{"{}Test\ allow\_u32\_limits\_flags\ empty"{}},\ \textcolor{stringliteral}{"{}[allow\_u32\_limits\_flags\_test]"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00076}00076\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ empty\_options>}};}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00077}00077\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(mem\_no\_max\_wasm,\ \&\mbox{\hyperlink{allow__u32__limits__flags__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00078}00078\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(mem\_max\_wasm,\ \&\mbox{\hyperlink{allow__u32__limits__flags__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00079}00079\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(table\_no\_max\_wasm,\ \&\mbox{\hyperlink{allow__u32__limits__flags__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00080}00080\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(table\_max\_wasm,\ \&\mbox{\hyperlink{allow__u32__limits__flags__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00081}00081\ \}}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00083}\mbox{\hyperlink{allow__u32__limits__flags__tests_8cpp_a8caa1c3b8dcfaf5312111ba02b8aa3b5}{00083}}\ \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_a3e5f265967cb6d730cad8ca15e807ac2}{BACKEND\_TEST\_CASE}}(\textcolor{stringliteral}{"{}Test\ allow\_u32\_limits\_flags\ static\ fail"{}},\ \textcolor{stringliteral}{"{}[allow\_u32\_limits\_flags\_test]"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00084}00084\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ static\_options\_false>}};}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00085}00085\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(mem\_no\_max\_wasm,\ \&\mbox{\hyperlink{allow__u32__limits__flags__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00086}00086\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(mem\_max\_wasm,\ \&\mbox{\hyperlink{allow__u32__limits__flags__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00087}00087\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(table\_no\_max\_wasm,\ \&\mbox{\hyperlink{allow__u32__limits__flags__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00088}00088\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(table\_max\_wasm,\ \&\mbox{\hyperlink{allow__u32__limits__flags__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00089}00089\ \}}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00090}00090\ }
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00091}\mbox{\hyperlink{allow__u32__limits__flags__tests_8cpp_a1c8dc92afdf482ecb7c50b4534d7ffcf}{00091}}\ \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_a3e5f265967cb6d730cad8ca15e807ac2}{BACKEND\_TEST\_CASE}}(\textcolor{stringliteral}{"{}Test\ allow\_u32\_limits\_flags\ static\ pass"{}},\ \textcolor{stringliteral}{"{}[allow\_u32\_limits\_flags\_test]"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00092}00092\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ static\_options\_true>}};}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00093}00093\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_mem\_no\_max(mem\_no\_max\_wasm,\ \&\mbox{\hyperlink{allow__u32__limits__flags__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00094}00094\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_mem\_max(mem\_max\_wasm,\ \&\mbox{\hyperlink{allow__u32__limits__flags__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00095}00095\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_table\_no\_max(table\_no\_max\_wasm,\ \&\mbox{\hyperlink{allow__u32__limits__flags__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00096}00096\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_table\_max(table\_max\_wasm,\ \&\mbox{\hyperlink{allow__u32__limits__flags__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00097}00097\ \}}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00098}00098\ }
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00099}\mbox{\hyperlink{allow__u32__limits__flags__tests_8cpp_ae3dbf43b86bbc3b910968950e8240177}{00099}}\ \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_a3e5f265967cb6d730cad8ca15e807ac2}{BACKEND\_TEST\_CASE}}(\textcolor{stringliteral}{"{}Test\ allow\_u32\_limits\_flags\ dynamic\ fail"{}},\ \textcolor{stringliteral}{"{}[allow\_u32\_limits\_flags\_test]"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00100}00100\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ dynamic\_options>}};}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00101}00101\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(mem\_max\_wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\{\textcolor{keyword}{false}\}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00102}00102\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(mem\_no\_max\_wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\{\textcolor{keyword}{false}\}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00103}00103\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(table\_max\_wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\{\textcolor{keyword}{false}\}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00104}00104\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(table\_no\_max\_wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\{\textcolor{keyword}{false}\}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00105}00105\ \}}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00106}00106\ }
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00107}\mbox{\hyperlink{allow__u32__limits__flags__tests_8cpp_a8ea2a8d35300a394cd8de9509dcaf447}{00107}}\ \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_a3e5f265967cb6d730cad8ca15e807ac2}{BACKEND\_TEST\_CASE}}(\textcolor{stringliteral}{"{}Test\ allow\_u32\_limits\_flags\ dynamic\ pass"{}},\ \textcolor{stringliteral}{"{}[allow\_u32\_limits\_flags\_test]"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00108}00108\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ dynamic\_options>}};}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00109}00109\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_mem\_max(mem\_max\_wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\{\textcolor{keyword}{true}\});}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00110}00110\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_mem\_no\_max(mem\_no\_max\_wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\{\textcolor{keyword}{true}\});}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00111}00111\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_table\_max(table\_max\_wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\{\textcolor{keyword}{true}\});}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00112}00112\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_table\_no\_max(table\_no\_max\_wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\{\textcolor{keyword}{true}\});}
+\DoxyCodeLine{\Hypertarget{allow__u32__limits__flags__tests_8cpp_source_l00113}00113\ \}}
+
+\end{DoxyCode}

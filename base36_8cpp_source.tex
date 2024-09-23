@@ -1,0 +1,88 @@
+\doxysection{base36.\+cpp}
+\hypertarget{base36_8cpp_source}{}\label{base36_8cpp_source}\index{libraries/fc/src/crypto/base36.cpp@{libraries/fc/src/crypto/base36.cpp}}
+\mbox{\hyperlink{base36_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <memory>}}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp}{fc/crypto/bigint.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{sstream_8hpp}{fc/io/sstream.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{logger_8hpp}{fc/log/logger.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00006}00006\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00007}00007\ \{}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00008}\mbox{\hyperlink{namespacefc_ae5802edd2c08cd4ab7649485d04f5455}{00008}}\ \ \ \ \ \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc::string}}\ \mbox{\hyperlink{namespacefc_a6f2f19aa8654427b9c9fd4a2ddf1c2de}{to\_base36}}(\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ data,\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ )}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00009}00009\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00010}00010\ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ ==\ 0\ )\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc::string}}();}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00012}00012\ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ src\ =\ data;}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00013}00013\ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ src\_len\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}};}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00014}00014\ \ \ \ \ \ \ \ std::unique\_ptr<char[]>\ buffer(\textcolor{keyword}{new}\ \textcolor{keywordtype}{char}[\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}+1]);}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00015}00015\ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (*data\ \&\ 0x80)\ \{}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00016}00016\ \ \ \ \ \ \ \ \ \ \ \ buffer[0]\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00017}00017\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(\ buffer.get()\ +\ 1,\ data,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ );}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00018}00018\ \ \ \ \ \ \ \ \ \ \ \ src\ =\ buffer.get();}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00019}00019\ \ \ \ \ \ \ \ \ \ \ \ src\_len++;}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00020}00020\ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00021}00021\ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bigint}{fc::bigint}}\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}(\ src,\ src\_len\ );}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00023}00023\ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ base36\ =\ \textcolor{stringliteral}{"{}0123456789abcdefghijklmnopqrstuvwxyz"{}};}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00024}00024\ \ \ \ \ \ \ \ std::vector<char>\ out(\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ *\ 1.6)\ +\ 2\ );}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00025}00025\ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ pos\ =\ out.size()\ -\/\ 1;}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00026}00026\ \ \ \ \ \ \ \ out[pos]\ =\ \textcolor{charliteral}{'\(\backslash\)0'};}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00027}00027\ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bigint}{fc::bigint}}\ \_36(36);}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00028}00028\ \ \ \ \ \ \ \ \textcolor{keywordflow}{do}\ \{}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00029}00029\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00030}00030\ \ \ \ \ \ \ \ \ \ \ \ -\/-\/pos;}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00031}00031\ \ \ \ \ \ \ \ \ \ \ \ out[pos]\ =\ base36[(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ \%\ \_36).\mbox{\hyperlink{namespacefc_afe327b84123fcbda675ea00418471c9a}{to\_int64}}()];}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00032}00032\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00033}00033\ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{while}\ (\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ /=\ \_36);}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00034}00034\ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}-\/-\/\ >\ 0\ \&\&\ *data++\ ==\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00035}00035\ \ \ \ \ \ \ \ \ \ \ \ out[-\/-\/pos]\ =\ \textcolor{charliteral}{'0'};}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00036}00036\ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00037}00037\ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \&out[pos];\ \textcolor{comment}{//fc::string(\ \&out[pos],\ out.size()\ -\/\ pos);}}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00038}00038\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00040}\mbox{\hyperlink{namespacefc_a6f2f19aa8654427b9c9fd4a2ddf1c2de}{00040}}\ \ \ \ \ \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc::string}}\ \mbox{\hyperlink{namespacefc_a6f2f19aa8654427b9c9fd4a2ddf1c2de}{to\_base36}}(\ \textcolor{keyword}{const}\ std::vector<char>\&\ vec\ )}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00041}00041\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00042}00042\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_a6f2f19aa8654427b9c9fd4a2ddf1c2de}{to\_base36}}(\ (\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*)vec.data(),\ vec.size()\ );}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00043}00043\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00045}\mbox{\hyperlink{namespacefc_a15e97c2580fda902a3ae94beb5288b7f}{00045}}\ \ \ \ \ std::vector<char>\ \mbox{\hyperlink{namespacefc_a15e97c2580fda902a3ae94beb5288b7f}{from\_base36}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc::string}}\&\ b36\ )}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00046}00046\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00047}00047\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ b36.empty()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \ \ std::vector<char>\ empty;}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ empty;}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00050}00050\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00052}00052\ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bigint}{fc::bigint}}\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}};}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00054}00054\ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bigint}{fc::bigint}}\ pos\ =\ 0;\ }
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00055}00055\ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bigint}{fc::bigint}}\ \_36(36);}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00056}00056\ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\ itr\ =\ b36.rbegin();\ itr\ !=\ b36.rend();\ ++itr\ )}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00057}00057\ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ *itr\ >=\ \textcolor{charliteral}{'0'}\ \&\&\ *itr\ <=\ \textcolor{charliteral}{'9'}\ )}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00059}00059\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ =\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ +\ \ \_36.\mbox{\hyperlink{classfc_1_1bigint_a8bb114eb168697d5d697f0b3452bd0aa}{exp}}(pos)\ *\ \mbox{\hyperlink{classfc_1_1bigint}{fc::bigint}}(*itr\ -\/\ \textcolor{charliteral}{'0'});}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(\ *itr\ >=\ \textcolor{charliteral}{'a'}\ \&\&\ *itr\ <=\ \textcolor{charliteral}{'z'}\ )}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00061}00061\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ =\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ +\ (\_36.\mbox{\hyperlink{classfc_1_1bigint_a8bb114eb168697d5d697f0b3452bd0aa}{exp}}(pos)\ *\ \ \mbox{\hyperlink{classfc_1_1bigint}{fc::bigint}}(10+*itr\ -\/\ \textcolor{charliteral}{'a'}));}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00062}00062\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(\ *itr\ >=\ \textcolor{charliteral}{'A'}\ \&\&\ *itr\ <=\ \textcolor{charliteral}{'Z'}\ )}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ =\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ +\ (\_36.\mbox{\hyperlink{classfc_1_1bigint_a8bb114eb168697d5d697f0b3452bd0aa}{exp}}(pos)\ *\ \ \mbox{\hyperlink{classfc_1_1bigint}{fc::bigint}}(10+*itr\ -\/\ \textcolor{charliteral}{'A'}));}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00064}00064\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00065}00065\ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00066}00066\ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a1759e5c9691d8ad754bdf5eff8bb23ac}{wlog}}(\textcolor{stringliteral}{"{}unknown\ '\$\{char\}'"{}},\ (\textcolor{stringliteral}{"{}char"{}},\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc::string}}(\&*itr,1))\ );}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00067}00067\ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \ ++pos;}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00069}00069\ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00071}00071\ \ \ \ \ \ \ \ std::vector<char>\ \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}}\ =\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}};}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00072}00072\ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ leading\_zeros\ =\ 0,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ =\ \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}}.size();}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00073}00073\ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *in\ =\ b36.c\_str();}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00074}00074\ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (*in++\ ==\ \textcolor{charliteral}{'0'})\ \{\ leading\_zeros++;\ \}}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00075}00075\ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}*\ first\ =\ \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}}.data();}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00076}00076\ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ >\ 0\ \&\&\ *first\ ==\ 0)\ \{\ first++;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}-\/-\/;\ \}}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00077}00077\ \ \ \ \ \ \ \ std::vector<char>\ result;}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00078}00078\ \ \ \ \ \ \ \ result.resize(leading\_zeros\ +\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ 0);}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00079}00079\ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(\ result.data()\ +\ leading\_zeros,\ first,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ );}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00080}00080\ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00081}00081\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{base36_8cpp_source_l00082}00082\ \}}
+
+\end{DoxyCode}

@@ -1,0 +1,54 @@
+\doxysection{libraries/fc/include/fc/fwd\+\_\+impl.hpp File Reference}
+\hypertarget{fwd__impl_8hpp}{}\label{fwd__impl_8hpp}\index{libraries/fc/include/fc/fwd\_impl.hpp@{libraries/fc/include/fc/fwd\_impl.hpp}}
+{\ttfamily \#include $<$fc/utility.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/fwd.\+hpp$>$}\newline
+{\ttfamily \#include $<$new$>$}\newline
+Include dependency graph for fwd\+\_\+impl.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{fwd__impl_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{fwd__impl_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structfc_1_1detail_1_1add}{fc\+::detail\+::add$<$ A, U $>$}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1detail_1_1add__eq}{fc\+::detail\+::add\+\_\+eq$<$ A, U $>$}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1detail_1_1sub}{fc\+::detail\+::sub$<$ A, U $>$}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1detail_1_1sub__eq}{fc\+::detail\+::sub\+\_\+eq$<$ A, U $>$}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1detail_1_1insert__op}{fc\+::detail\+::insert\+\_\+op$<$ A, U $>$}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1detail_1_1extract__op}{fc\+::detail\+::extract\+\_\+op$<$ A, U $>$}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacefc}{fc}}
+\begin{DoxyCompactList}\small\item\em namespace \doxylink{namespacesysio_1_1chain}{sysio\+::chain} \end{DoxyCompactList}\item 
+namespace \mbox{\hyperlink{namespacefc_1_1detail}{fc\+::detail}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , unsigned int S, typename \mbox{\hyperlink{union_u}{U}} , typename \mbox{\hyperlink{struct_a}{A}} $>$ }\\auto \mbox{\hyperlink{namespacefc_a2b8e30247189705c9bd2a495eec53229}{fc\+::operator+}} (const \mbox{\hyperlink{classfc_1_1fwd}{fwd}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{struct_s}{S}}, \mbox{\hyperlink{struct_a}{A}} $>$ \&x, \mbox{\hyperlink{union_u}{U}} \&\&u) -\/$>$ typename \mbox{\hyperlink{structfc_1_1detail_1_1add}{detail\+::add}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{union_u}{U}} $>$\+::type
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , unsigned int S, typename \mbox{\hyperlink{union_u}{U}} , typename \mbox{\hyperlink{struct_a}{A}} $>$ }\\auto \mbox{\hyperlink{namespacefc_a2db96673fde8ae64be589f48e8bf158e}{fc\+::operator-\/}} (const \mbox{\hyperlink{classfc_1_1fwd}{fwd}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{struct_s}{S}}, \mbox{\hyperlink{struct_a}{A}} $>$ \&x, \mbox{\hyperlink{union_u}{U}} \&\&u) -\/$>$ typename \mbox{\hyperlink{structfc_1_1detail_1_1sub}{detail\+::sub}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{union_u}{U}} $>$\+::type
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , unsigned int S, typename \mbox{\hyperlink{union_u}{U}} , typename \mbox{\hyperlink{struct_a}{A}} $>$ }\\auto \mbox{\hyperlink{namespacefc_a77d311915918f07a27b2f90fc95fc61a}{fc\+::operator$<$$<$}} (\mbox{\hyperlink{union_u}{U}} \&u, const \mbox{\hyperlink{classfc_1_1fwd}{fwd}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{struct_s}{S}}, \mbox{\hyperlink{struct_a}{A}} $>$ \&\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}) -\/$>$ typename \mbox{\hyperlink{structfc_1_1detail_1_1insert__op}{detail\+::insert\+\_\+op}}$<$ \mbox{\hyperlink{union_u}{U}}, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::type
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , unsigned int S, typename \mbox{\hyperlink{union_u}{U}} , typename \mbox{\hyperlink{struct_a}{A}} $>$ }\\auto \mbox{\hyperlink{namespacefc_a9607b0bf485e8d787f5ad99655e07dd1}{fc\+::operator$>$$>$}} (\mbox{\hyperlink{union_u}{U}} \&u, \mbox{\hyperlink{classfc_1_1fwd}{fwd}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{struct_s}{S}}, \mbox{\hyperlink{struct_a}{A}} $>$ \&\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}) -\/$>$ typename \mbox{\hyperlink{structfc_1_1detail_1_1extract__op}{detail\+::extract\+\_\+op}}$<$ \mbox{\hyperlink{union_u}{U}}, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::type
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} Required\+Size, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} Provided\+Size$>$ }\\void \mbox{\hyperlink{namespacefc_a38801b38281743a0d544ad21d0a4aaba}{fc\+::check\+\_\+size}} ()
+\end{DoxyCompactItemize}

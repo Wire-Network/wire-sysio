@@ -1,0 +1,39 @@
+<map id="main" name="main">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,324,55,349"/>
+<area shape="rect" id="Node000002" href="$class_generic_string_buffer.html#a42f15c959046d899cb74c3120a6995f9" title=" " alt="" coords="150,5,286,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="30,323,53,186,74,109,87,78,101,57,117,44,135,35,137,40,120,49,105,61,91,81,79,111,59,188,36,324"/>
+<area shape="rect" id="Node000003" href="$class_generic_schema_validator.html#a21c0ad159e91398d222bab4d91d4c5dd" title="Gets the error object." alt="" coords="136,71,300,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="29,323,33,284,43,229,64,172,81,145,101,121,120,107,123,112,104,125,85,148,69,174,48,231,38,284,34,323"/>
+<area shape="rect" id="Node000004" href="$class_generic_reader.html#ae9008523ccd06d839a57335835cb4091" title="Get the position of last parsing error in input, 0 otherwise." alt="" coords="117,136,318,161"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="30,322,37,291,49,250,70,208,84,188,101,172,107,167,110,171,104,176,88,192,74,211,54,252,42,293,36,323"/>
+<area shape="rect" id="Node000006" href="$class_generic_schema_validator.html#ac10a88c4dc138bbdbe2afd041658a3b0" title="Gets the JSON pointer pointed to the invalid value." alt="" coords="123,185,312,226"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="35,322,60,280,79,257,101,237,110,231,113,235,104,241,82,261,64,283,40,325"/>
+<area shape="rect" id="Node000007" href="$class_generic_schema_validator.html#ab5980d72c786b81ab907526fdf4172f3" title="Gets the keyword of invalid schema." alt="" coords="124,251,312,291"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="54,322,102,302,124,294,126,299,104,307,56,327"/>
+<area shape="rect" id="Node000008" href="$class_generic_schema_validator.html#a5b8f2d5c466b2a362e2e4c3bcfbfc5a8" title="Gets the JSON pointer pointed to the invalid schema." alt="" coords="129,316,306,357"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="55,334,113,334,113,339,55,339"/>
+<area shape="rect" id="Node000009" href="$group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga28835eb93d2c3c07bbea13515eb31415" title="Maps error code of parsing into error message." alt="" coords="154,381,282,406"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="56,346,104,366,140,376,138,381,102,371,54,351"/>
+<area shape="rect" id="Node000010" href="$class_generic_reader.html#a937bf90919f50e1c370b312cee5833e8" title="Get the ParseErrorCode of last parsing." alt="" coords="103,430,333,456"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="41,348,66,383,84,401,104,417,113,421,110,426,101,421,80,405,62,386,37,351"/>
+<area shape="rect" id="Node000012" href="$class_generic_string_buffer.html#a42079865bab1deb930c6cff7d491c719" title=" " alt="" coords="150,480,286,521"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="37,348,59,406,78,438,104,466,137,484,134,489,101,470,74,442,54,408,32,350"/>
+<area shape="rect" id="Node000015" href="$class_generic_schema_validator.html#a8ebda4da3d8b1fc41e57f15dd62e8f19" title="Checks whether the current state is valid." alt="" coords="136,545,300,586"/>
+<area shape="poly" id="edge16_Node000001_Node000015" title=" " alt="" coords="35,349,39,385,51,434,71,486,86,510,104,530,123,544,120,548,101,534,82,513,67,488,45,436,34,386,30,350"/>
+<area shape="rect" id="Node000016" href="$class_generic_reader.html#a0c450620d14ff1824e58bb7bd9b42099" title="Parse JSON text." alt="" coords="143,614,293,640"/>
+<area shape="poly" id="edge17_Node000001_Node000016" title=" " alt="" coords="33,349,34,396,42,462,51,498,63,534,81,567,104,596,129,612,126,617,101,600,77,570,59,536,45,500,37,463,29,396,28,349"/>
+<area shape="rect" id="Node000005" href="$struct_parse_result.html#afbe762766ac21b2aae266105f1dfa643" title="Get the error offset, if IsError(), 0 otherwise." alt="" coords="396,136,533,161"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="319,146,380,146,380,151,319,151"/>
+<area shape="rect" id="Node000011" href="$struct_parse_result.html#a2aae3c2f42b31cc2409ee1e03bc4852e" title="Get the error code." alt="" coords="398,410,530,436"/>
+<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="333,431,382,427,383,432,334,436"/>
+<area shape="rect" id="Node000013" href="$class_generic_string_buffer.html#a0038e53ba03c271bc4cbbac403ec4de4" title=" " alt="" coords="381,484,547,509"/>
+<area shape="poly" id="edge12_Node000012_Node000013" title=" " alt="" coords="286,497,366,495,366,501,286,502"/>
+<area shape="rect" id="Node000014" href="$class_generic_string_buffer.html#a80af78c43da93126a940a40d1889278a" title=" " alt="" coords="396,557,532,598"/>
+<area shape="poly" id="edge14_Node000012_Node000014" title=" " alt="" coords="287,517,334,531,389,549,388,554,332,536,285,522"/>
+<area shape="poly" id="edge13_Node000013_Node000013" title=" " alt="" coords="432,485,426,475,429,465,443,459,464,457,488,460,500,466,497,471,486,465,464,462,444,464,433,469,431,474,436,482"/>
+<area shape="poly" id="edge15_Node000014_Node000014" title=" " alt="" coords="428,557,426,547,432,538,445,533,464,531,485,533,498,539,495,544,484,538,464,536,446,538,435,543,431,548,433,556"/>
+<area shape="rect" id="Node000017" href="$struct_parse_result.html#a88b6d44f052a19e6436ae6aadc2c40b4" title="Reset error code." alt="" coords="398,622,530,648"/>
+<area shape="poly" id="edge18_Node000016_Node000017" title=" " alt="" coords="294,627,383,630,382,635,294,632"/>
+<area shape="rect" id="Node000018" href="$struct_parse_result.html#aa81b4a7b776b77216cb752385203a8c1" title="Update error code and offset." alt="" coords="595,622,717,648"/>
+<area shape="poly" id="edge19_Node000017_Node000018" title=" " alt="" coords="531,632,580,632,580,638,531,638"/>
+</map>

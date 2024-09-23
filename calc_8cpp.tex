@@ -1,0 +1,191 @@
+\doxysection{libraries/fc/libraries/ff/depends/xbyak/sample/calc.cpp File Reference}
+\hypertarget{calc_8cpp}{}\label{calc_8cpp}\index{libraries/fc/libraries/ff/depends/xbyak/sample/calc.cpp@{libraries/fc/libraries/ff/depends/xbyak/sample/calc.cpp}}
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$sstream$>$}\newline
+{\ttfamily \#include $<$map$>$}\newline
+{\ttfamily \#include "{}xbyak/xbyak.\+h"{}}\newline
+{\ttfamily \#include $<$boost/spirit/include/classic\+\_\+file\+\_\+iterator.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/spirit/include/classic\+\_\+core.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/bind.\+hpp$>$}\newline
+Include dependency graph for calc.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{calc_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{class_func_gen}{Func\+Gen}}
+\item 
+struct \mbox{\hyperlink{struct_grammar}{Grammar}}
+\item 
+struct \mbox{\hyperlink{struct_grammar_1_1definition}{Grammar\+::definition$<$ Scanner\+T $>$}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{calc_8cpp_a3ede98665532cce0e33f614fac5150f9}{XBYAK\+\_\+\+NO\+\_\+\+OP\+\_\+\+NAMES}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{calc_8cpp_a2c3e4bb40f36b262a5214e2da2bca9c5}{Error}} \{ \mbox{\hyperlink{calc_8cpp_a2c3e4bb40f36b262a5214e2da2bca9c5abdd8fbc6e5223908efcefdcb5da14f09}{UNDEFINED\+\_\+\+VARIABLE}} = 1
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{calc_8cpp_a41df23bb2f4940011b732bc4bb33be96}{put}} (const std\+::vector$<$ double $>$ \&x)
+\item 
+int \mbox{\hyperlink{calc_8cpp_a0ddf1224851353fc92bfbff6f499fa97}{main}} (int argc, char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}\mbox{[}$\,$\mbox{]})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{calc_8cpp_a3ede98665532cce0e33f614fac5150f9}\index{calc.cpp@{calc.cpp}!XBYAK\_NO\_OP\_NAMES@{XBYAK\_NO\_OP\_NAMES}}
+\index{XBYAK\_NO\_OP\_NAMES@{XBYAK\_NO\_OP\_NAMES}!calc.cpp@{calc.cpp}}
+\doxysubsubsection{\texorpdfstring{XBYAK\_NO\_OP\_NAMES}{XBYAK\_NO\_OP\_NAMES}}
+{\footnotesize\ttfamily \label{calc_8cpp_a3ede98665532cce0e33f614fac5150f9} 
+\#define XBYAK\+\_\+\+NO\+\_\+\+OP\+\_\+\+NAMES}
+
+
+
+Definition at line \mbox{\hyperlink{calc_8cpp_source_l00013}{13}} of file \mbox{\hyperlink{calc_8cpp_source}{calc.\+cpp}}.
+
+
+
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{calc_8cpp_a2c3e4bb40f36b262a5214e2da2bca9c5}\index{calc.cpp@{calc.cpp}!Error@{Error}}
+\index{Error@{Error}!calc.cpp@{calc.cpp}}
+\doxysubsubsection{\texorpdfstring{Error}{Error}}
+{\footnotesize\ttfamily \label{calc_8cpp_a2c3e4bb40f36b262a5214e2da2bca9c5} 
+enum \mbox{\hyperlink{calc_8cpp_a2c3e4bb40f36b262a5214e2da2bca9c5}{Error}}}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{UNDEFINED\_VARIABLE@{UNDEFINED\_VARIABLE}!calc.cpp@{calc.cpp}}\index{calc.cpp@{calc.cpp}!UNDEFINED\_VARIABLE@{UNDEFINED\_VARIABLE}}}\Hypertarget{calc_8cpp_a2c3e4bb40f36b262a5214e2da2bca9c5abdd8fbc6e5223908efcefdcb5da14f09}\label{calc_8cpp_a2c3e4bb40f36b262a5214e2da2bca9c5} 
+UNDEFINED\+\_\+\+VARIABLE&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{calc_8cpp_source_l00023}{23}} of file \mbox{\hyperlink{calc_8cpp_source}{calc.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00024\ \ \ \ \ \mbox{\hyperlink{calc_8cpp_a2c3e4bb40f36b262a5214e2da2bca9c5abdd8fbc6e5223908efcefdcb5da14f09}{UNDEFINED\_VARIABLE}}\ =\ 1}
+\DoxyCodeLine{00025\ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{calc_8cpp_a0ddf1224851353fc92bfbff6f499fa97}\index{calc.cpp@{calc.cpp}!main@{main}}
+\index{main@{main}!calc.cpp@{calc.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{calc_8cpp_a0ddf1224851353fc92bfbff6f499fa97} 
+int main (\begin{DoxyParamCaption}\item[{int}]{argc}{, }\item[{char \texorpdfstring{$\ast$}{*}}]{argv}{\mbox{[}$\,$\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{calc_8cpp_source_l00164}{164}} of file \mbox{\hyperlink{calc_8cpp_source}{calc.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00165\ \{}
+\DoxyCodeLine{00166\ \ \ \ \ \textcolor{keywordflow}{if}\ (argc\ <=\ 2)\ \{}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}calc\ \(\backslash\)"{}var1\ var2\ ...\(\backslash\)"{}\ \(\backslash\)"{}function\ of\ var\(\backslash\)"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}eg.\ calc\ x\ \(\backslash\)"{}x*x\(\backslash\)"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}eg.\ calc\ \(\backslash\)"{}x\ y\ z\(\backslash\)"{}\ \ \(\backslash\)"{}x*x\ +\ y\ -\/\ z\(\backslash\)"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{00171\ \ \ \ \ \}}
+\DoxyCodeLine{00172\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *poly\ =\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[2];}
+\DoxyCodeLine{00173\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ std::vector<std::string>\ varTbl;}
+\DoxyCodeLine{00175\ }
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ get\ varTbl\ from\ argv[1]}}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \ \ \ \ std::istringstream\ is(\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[1]);}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ i\ =\ 0;}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}varTbl\ =\ \{\ "{}});}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (is)\ \{}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ var;}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ is\ >>\ var;}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (var.empty())\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\%s:\%d,\ "{}},\ var.c\_str(),\ i);}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ varTbl.push\_back(var);}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i++;}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\}\(\backslash\)n"{}});}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_func_gen}{FuncGen}}\ funcGen(varTbl);}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_grammar}{Grammar}}\ \mbox{\hyperlink{namespacewebsocketpp_1_1sha1_ad75335df7a69d69b3fb8fef3f4594812}{calc}}(funcGen);}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \ \ boost::spirit::classic::parse\_info<>\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ =\ parse(poly,\ calc,\ boost::spirit::classic::space\_p);}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.full)\ \{}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}err\ poly=\%s\(\backslash\)n"{}},\ poly);}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ funcGen.complete();}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ std::vector<double>\ valTbl;}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ valTbl.resize(varTbl.size());}
+\DoxyCodeLine{00201\ \textcolor{preprocessor}{\#ifdef\ XBYAK32}}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \ \ puts(\textcolor{stringliteral}{"{}32bit\ mode"{}});}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ \ \ void\ (*func)(\textcolor{keywordtype}{double}\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}},\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{double}\ *valTbl)\ =\ funcGen.getCode<void\ (*)(\textcolor{keywordtype}{double}\ *,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{double}*)>();}
+\DoxyCodeLine{00204\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ puts(\textcolor{stringliteral}{"{}64bit\ mode"{}});}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ double\ (*func)(\textcolor{keyword}{const}\ \textcolor{keywordtype}{double}\ *valTbl)\ =\ funcGen.getCode<double\ (*)(\textcolor{keyword}{const}\ \textcolor{keywordtype}{double}*)>();}
+\DoxyCodeLine{00207\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ 10;\ i++)\ \{}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ =\ 0,\ n\ =\ valTbl.size();\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ <\ n;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}++)\ \{}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ valTbl[\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}]\ =\ rand()\ \%\ 7;}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ \mbox{\hyperlink{namespacefc_ab199a7c94624123911206db59ebe45da}{y}};}
+\DoxyCodeLine{00213\ \textcolor{preprocessor}{\#ifdef\ XBYAK32}}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2}{func}}(\&y,\ \&valTbl[0]);}
+\DoxyCodeLine{00215\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_ab199a7c94624123911206db59ebe45da}{y}}\ =\ \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2}{func}}(\&valTbl[0]);}
+\DoxyCodeLine{00217\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00218\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}f("{}});\ \mbox{\hyperlink{gen__code_8cpp_a760567729cc565fd13d414937a558a89}{put}}(valTbl);\ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{})=\%f\(\backslash\)n"{}},\ y);}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00220\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (std::exception\&\ e)\ \{}
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}ERR:\%s\(\backslash\)n"{}},\ e.what());}
+\DoxyCodeLine{00222\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\mbox{\hyperlink{calc_8cpp_a2c3e4bb40f36b262a5214e2da2bca9c5}{Error}}\ err)\ \{}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}ERR:\%d\(\backslash\)n"{}},\ err);}
+\DoxyCodeLine{00224\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{}
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}unknown\ error\(\backslash\)n"{}});}
+\DoxyCodeLine{00226\ \ \ \ \ \}}
+\DoxyCodeLine{00227\ }
+\DoxyCodeLine{00228\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00229\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{calc_8cpp_a0ddf1224851353fc92bfbff6f499fa97_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{calc_8cpp_a41df23bb2f4940011b732bc4bb33be96}\index{calc.cpp@{calc.cpp}!put@{put}}
+\index{put@{put}!calc.cpp@{calc.cpp}}
+\doxysubsubsection{\texorpdfstring{put()}{put()}}
+{\footnotesize\ttfamily \label{calc_8cpp_a41df23bb2f4940011b732bc4bb33be96} 
+void put (\begin{DoxyParamCaption}\item[{const std\+::vector$<$ double $>$ \&}]{x}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{calc_8cpp_source_l00156}{156}} of file \mbox{\hyperlink{calc_8cpp_source}{calc.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00157\ \{}
+\DoxyCodeLine{00158\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\%f"{}},\ x[0]);}
+\DoxyCodeLine{00159\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 1,\ n\ =\ x.size();\ i\ <\ n;\ i++)\ \{}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{},\ \%f"{}},\ x[i]);}
+\DoxyCodeLine{00161\ \ \ \ \ \}}
+\DoxyCodeLine{00162\ \}}
+
+\end{DoxyCode}

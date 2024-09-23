@@ -1,0 +1,9 @@
+<map id="CLI::App::set_help_flag" name="CLI::App::set_help_flag">
+<area shape="rect" id="Node000001" title="Set a help flag, replace the existing one if present." alt="" coords="5,55,164,80"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_app.html#a5fef22317a182fa5db1d7b1af4c89c68" title="Add a flag with no description or variable assignment." alt="" coords="245,5,375,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="146,51,232,32,234,38,147,57"/>
+<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_option_base.html#a618d6a4f8137bec3272a04d848106046" title="Allow in a configuration file." alt="" coords="212,55,408,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="164,65,196,65,196,70,164,70"/>
+<area shape="rect" id="Node000004" href="$class_c_l_i_1_1_app.html#a3058b128735eec0813589b56c5453115" title="Removes an option from the App. Takes an option pointer. Returns true if found and removed." alt="" coords="227,104,393,130"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="147,78,234,97,232,103,146,84"/>
+</map>

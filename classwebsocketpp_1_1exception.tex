@@ -1,0 +1,180 @@
+\doxysection{websocketpp\+::exception Class Reference}
+\hypertarget{classwebsocketpp_1_1exception}{}\label{classwebsocketpp_1_1exception}\index{websocketpp::exception@{websocketpp::exception}}
+
+
+{\ttfamily \#include $<$error.\+hpp$>$}
+
+
+
+Inheritance diagram for websocketpp\+::exception\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=202pt]{classwebsocketpp_1_1exception__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for websocketpp\+::exception\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=238pt]{classwebsocketpp_1_1exception__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classwebsocketpp_1_1exception_af95696b245ec29c38666bf6ac00e95b2}{exception}} (std\+::string const \&msg, lib\+::error\+\_\+code ec=make\+\_\+error\+\_\+code(\mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da0cd3808919f43e5fbeee42fbcb808d66}{error\+::general}}))
+\item 
+\mbox{\hyperlink{classwebsocketpp_1_1exception_aa90a59ff911af87c912fde8ff4d44c92}{exception}} (lib\+::error\+\_\+code ec)
+\item 
+\mbox{\hyperlink{classwebsocketpp_1_1exception_aa61e782a64249f6518f78de4bb634327}{\texorpdfstring{$\sim$}{\string~}exception}} ()  throw ()
+\item 
+virtual char const \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classwebsocketpp_1_1exception_a62dabd977bc59faaca6dc268744a6089}{what}} () const  throw ()
+\item 
+lib\+::error\+\_\+code \mbox{\hyperlink{classwebsocketpp_1_1exception_a2ca743bae5d6ba2be63d1a64bc2f878f}{code}} () const  throw ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+const std\+::string \mbox{\hyperlink{classwebsocketpp_1_1exception_a6a739f94138be314aaac2ef3b5e5b467}{m\+\_\+msg}}
+\item 
+lib\+::error\+\_\+code \mbox{\hyperlink{classwebsocketpp_1_1exception_ab34949df4a66b0ac7c3f2928364c85c7}{m\+\_\+code}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{error_8hpp_source_l00251}{251}} of file \mbox{\hyperlink{error_8hpp_source}{error.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classwebsocketpp_1_1exception_af95696b245ec29c38666bf6ac00e95b2}\index{websocketpp::exception@{websocketpp::exception}!exception@{exception}}
+\index{exception@{exception}!websocketpp::exception@{websocketpp::exception}}
+\doxysubsubsection{\texorpdfstring{exception()}{exception()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1exception_af95696b245ec29c38666bf6ac00e95b2} 
+websocketpp\+::exception\+::exception (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{msg}{, }\item[{lib\+::error\+\_\+code}]{ec}{ = {\ttfamily make\+\_\+error\+\_\+code(\mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da0cd3808919f43e5fbeee42fbcb808d66}{error\+::general}})}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{error_8hpp_source_l00253}{253}} of file \mbox{\hyperlink{error_8hpp_source}{error.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00254\ \ \ \ \ \ \ :\ \mbox{\hyperlink{classwebsocketpp_1_1exception_a6a739f94138be314aaac2ef3b5e5b467}{m\_msg}}(msg.empty()\ ?\ ec.message()\ :\ msg),\ \mbox{\hyperlink{classwebsocketpp_1_1exception_ab34949df4a66b0ac7c3f2928364c85c7}{m\_code}}(ec)}
+\DoxyCodeLine{00255\ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1exception_aa90a59ff911af87c912fde8ff4d44c92}\index{websocketpp::exception@{websocketpp::exception}!exception@{exception}}
+\index{exception@{exception}!websocketpp::exception@{websocketpp::exception}}
+\doxysubsubsection{\texorpdfstring{exception()}{exception()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1exception_aa90a59ff911af87c912fde8ff4d44c92} 
+websocketpp\+::exception\+::exception (\begin{DoxyParamCaption}\item[{lib\+::error\+\_\+code}]{ec}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{error_8hpp_source_l00257}{257}} of file \mbox{\hyperlink{error_8hpp_source}{error.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00258\ \ \ \ \ \ \ :\ \mbox{\hyperlink{classwebsocketpp_1_1exception_a6a739f94138be314aaac2ef3b5e5b467}{m\_msg}}(ec.message()),\ \mbox{\hyperlink{classwebsocketpp_1_1exception_ab34949df4a66b0ac7c3f2928364c85c7}{m\_code}}(ec)}
+\DoxyCodeLine{00259\ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1exception_aa61e782a64249f6518f78de4bb634327}\index{websocketpp::exception@{websocketpp::exception}!````~exception@{\texorpdfstring{$\sim$}{\string~}exception}}
+\index{````~exception@{\texorpdfstring{$\sim$}{\string~}exception}!websocketpp::exception@{websocketpp::exception}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}exception()}{\string~exception()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1exception_aa61e782a64249f6518f78de4bb634327} 
+websocketpp\+::exception\+::\texorpdfstring{$\sim$}{\string~}exception (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) throw ( ) \hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{error_8hpp_source_l00261}{261}} of file \mbox{\hyperlink{error_8hpp_source}{error.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00261\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classwebsocketpp_1_1exception_a2ca743bae5d6ba2be63d1a64bc2f878f}\index{websocketpp::exception@{websocketpp::exception}!code@{code}}
+\index{code@{code}!websocketpp::exception@{websocketpp::exception}}
+\doxysubsubsection{\texorpdfstring{code()}{code()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1exception_a2ca743bae5d6ba2be63d1a64bc2f878f} 
+lib\+::error\+\_\+code websocketpp\+::exception\+::code (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const throw ( ) \hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{error_8hpp_source_l00267}{267}} of file \mbox{\hyperlink{error_8hpp_source}{error.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00267\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00268\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classwebsocketpp_1_1exception_ab34949df4a66b0ac7c3f2928364c85c7}{m\_code}};}
+\DoxyCodeLine{00269\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1exception_a2ca743bae5d6ba2be63d1a64bc2f878f_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1exception_a62dabd977bc59faaca6dc268744a6089}\index{websocketpp::exception@{websocketpp::exception}!what@{what}}
+\index{what@{what}!websocketpp::exception@{websocketpp::exception}}
+\doxysubsubsection{\texorpdfstring{what()}{what()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1exception_a62dabd977bc59faaca6dc268744a6089} 
+virtual char const  \texorpdfstring{$\ast$}{*} websocketpp\+::exception\+::what (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const throw ( ) \hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{error_8hpp_source_l00263}{263}} of file \mbox{\hyperlink{error_8hpp_source}{error.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00263\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00264\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classwebsocketpp_1_1exception_a6a739f94138be314aaac2ef3b5e5b467}{m\_msg}}.c\_str();}
+\DoxyCodeLine{00265\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1exception_a62dabd977bc59faaca6dc268744a6089_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classwebsocketpp_1_1exception_ab34949df4a66b0ac7c3f2928364c85c7}\index{websocketpp::exception@{websocketpp::exception}!m\_code@{m\_code}}
+\index{m\_code@{m\_code}!websocketpp::exception@{websocketpp::exception}}
+\doxysubsubsection{\texorpdfstring{m\_code}{m\_code}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1exception_ab34949df4a66b0ac7c3f2928364c85c7} 
+lib\+::error\+\_\+code websocketpp\+::exception\+::m\+\_\+code}
+
+
+
+Definition at line \mbox{\hyperlink{error_8hpp_source_l00272}{272}} of file \mbox{\hyperlink{error_8hpp_source}{error.\+hpp}}.
+
+\Hypertarget{classwebsocketpp_1_1exception_a6a739f94138be314aaac2ef3b5e5b467}\index{websocketpp::exception@{websocketpp::exception}!m\_msg@{m\_msg}}
+\index{m\_msg@{m\_msg}!websocketpp::exception@{websocketpp::exception}}
+\doxysubsubsection{\texorpdfstring{m\_msg}{m\_msg}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1exception_a6a739f94138be314aaac2ef3b5e5b467} 
+const std\+::string websocketpp\+::exception\+::m\+\_\+msg}
+
+
+
+Definition at line \mbox{\hyperlink{error_8hpp_source_l00271}{271}} of file \mbox{\hyperlink{error_8hpp_source}{error.\+hpp}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/vendor/websocketpp/websocketpp/\mbox{\hyperlink{error_8hpp}{error.\+hpp}}\end{DoxyCompactItemize}

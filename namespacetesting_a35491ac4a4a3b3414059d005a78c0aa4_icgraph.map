@@ -1,0 +1,11 @@
+<map id="testing::NanSensitiveFloatNear" name="testing::NanSensitiveFloatNear">
+<area shape="rect" id="Node000001" title=" " alt="" coords="222,112,425,137"/>
+<area shape="rect" id="Node000002" href="$namespacetesting_1_1gmock__matchers__test.html#a7d029a5d7ca6bc503227f7c34a5e20e2" title=" " alt="" coords="5,5,174,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="278,107,173,61,143,49,145,44,175,57,280,102"/>
+<area shape="rect" id="Node000003" href="$namespacetesting_1_1gmock__matchers__test.html#a120a3f5e18772202f60c2b32ae0bc6b3" title=" " alt="" coords="5,71,174,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="213,111,174,106,174,100,214,106"/>
+<area shape="rect" id="Node000004" href="$namespacetesting_1_1gmock__matchers__test.html#a4e90d53ea578d6b767559d8615a4c0c2" title=" " alt="" coords="5,136,174,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="210,143,175,147,174,142,209,137"/>
+<area shape="rect" id="Node000005" href="$namespacetesting_1_1gmock__matchers__test.html#ae7521865828fba53b45cc2819bec1273" title=" " alt="" coords="5,201,174,242"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="278,146,175,191,145,203,142,198,173,186,276,141"/>
+</map>

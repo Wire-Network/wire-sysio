@@ -1,0 +1,7 @@
+<map id="fc::crypto::r1::ECDSA_SIG_recover_key_GFp" name="fc::crypto::r1::ECDSA_SIG_recover_key_GFp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="215,39,376,79"/>
+<area shape="rect" id="Node000002" href="$classfc_1_1crypto_1_1r1_1_1public__key.html#a0bf76a0d48a64d28e4d7665fcaffdb59" title=" " alt="" coords="17,5,155,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="199,46,155,39,155,34,200,41"/>
+<area shape="rect" id="Node000003" href="$classfc_1_1crypto_1_1webauthn_1_1public__key.html#aa592832abc76bc39b1fa664d548a1fc9" title=" " alt="" coords="5,71,167,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="199,76,167,81,167,76,199,71"/>
+</map>

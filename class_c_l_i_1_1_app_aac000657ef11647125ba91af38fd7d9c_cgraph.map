@@ -1,0 +1,11 @@
+<map id="CLI::App::exit" name="CLI::App::exit">
+<area shape="rect" id="Node000001" title="Print a nice error message and return the exit code." alt="" coords="5,31,108,56"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_error.html#a24faca884e953e6366bdb8d84d631588" title=" " alt="" coords="156,5,323,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="108,34,140,29,141,35,108,39"/>
+<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_app.html#a2d6847ad9eec079214a61d834f29e35f" title=" " alt="" coords="187,55,292,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="108,48,172,56,171,61,108,53"/>
+<area shape="rect" id="Node000004" href="$class_c_l_i_1_1_app.html#adeac41bd40859dfbff9817244c09c989" title="Get the name of the current app." alt="" coords="398,29,536,55"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="292,59,382,49,382,54,293,64"/>
+<area shape="rect" id="Node000005" href="$class_c_l_i_1_1_app.html#a6b4b0c02d0c3d08b534fb93737056751" title=" " alt="" coords="371,79,562,104"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="292,70,356,77,355,82,292,76"/>
+</map>

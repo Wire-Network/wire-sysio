@@ -1,0 +1,94 @@
+\doxysection{libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/test/gmock-\/spec-\/builders\+\_\+test.cc File Reference}
+\hypertarget{gmock-spec-builders__test_8cc}{}\label{gmock-spec-builders__test_8cc}\index{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googlemock/test/gmock-\/spec-\/builders\_test.cc@{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googlemock/test/gmock-\/spec-\/builders\_test.cc}}
+{\ttfamily \#include "{}gmock/gmock-\/spec-\/builders.\+h"{}}\newline
+{\ttfamily \#include $<$ostream$>$}\newline
+{\ttfamily \#include $<$sstream$>$}\newline
+{\ttfamily \#include $<$string$>$}\newline
+{\ttfamily \#include "{}gmock/gmock.\+h"{}}\newline
+{\ttfamily \#include "{}gmock/internal/gmock-\/port.\+h"{}}\newline
+{\ttfamily \#include "{}gtest/gtest.\+h"{}}\newline
+{\ttfamily \#include "{}gtest/gtest-\/spi.\+h"{}}\newline
+{\ttfamily \#include "{}gtest/internal/gtest-\/port.\+h"{}}\newline
+Include dependency graph for gmock-\/spec-\/builders\+\_\+test.cc\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{gmock-spec-builders__test_8cc__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=244pt]{gmock-spec-builders__test_8cc__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_tester}{testing\+::internal\+::\+Expectation\+Tester}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacetesting}{testing}}
+\item 
+namespace \mbox{\hyperlink{namespacetesting_1_1internal}{testing\+::internal}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{gmock-spec-builders__test_8cc_a95606368148f3e5aab5db46c32466afd}{Method}}~MethodW
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{gmock-spec-builders__test_8cc_a3c04138a5bfe5d72780bb7e82a18e627}{main}} (int argc, char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{gmock-spec-builders__test_8cc_a95606368148f3e5aab5db46c32466afd}\index{gmock-\/spec-\/builders\_test.cc@{gmock-\/spec-\/builders\_test.cc}!Method@{Method}}
+\index{Method@{Method}!gmock-\/spec-\/builders\_test.cc@{gmock-\/spec-\/builders\_test.cc}}
+\doxysubsubsection{\texorpdfstring{Method}{Method}}
+{\footnotesize\ttfamily \label{gmock-spec-builders__test_8cc_a95606368148f3e5aab5db46c32466afd} 
+\#define Method~MethodW}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders__test_8cc_source_l00187}{187}} of file \mbox{\hyperlink{gmock-spec-builders__test_8cc_source}{gmock-\/spec-\/builders\+\_\+test.\+cc}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{gmock-spec-builders__test_8cc_a3c04138a5bfe5d72780bb7e82a18e627}\index{gmock-\/spec-\/builders\_test.cc@{gmock-\/spec-\/builders\_test.cc}!main@{main}}
+\index{main@{main}!gmock-\/spec-\/builders\_test.cc@{gmock-\/spec-\/builders\_test.cc}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{gmock-spec-builders__test_8cc_a3c04138a5bfe5d72780bb7e82a18e627} 
+int main (\begin{DoxyParamCaption}\item[{int}]{argc}{, }\item[{char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{argv}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders__test_8cc_source_l02762}{2762}} of file \mbox{\hyperlink{gmock-spec-builders__test_8cc_source}{gmock-\/spec-\/builders\+\_\+test.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02762\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02763\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GMOCK\_RENAME\_MAIN}}
+\DoxyCodeLine{02764\ \ \ \mbox{\hyperlink{namespacetesting_a32b1c6db9ba5133ccabfa67616b3c041}{testing::InitGoogleMock}}(\&argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}});}
+\DoxyCodeLine{02765\ \ \ \textcolor{comment}{//\ Ensures\ that\ the\ tests\ pass\ no\ matter\ what\ value\ of}}
+\DoxyCodeLine{02766\ \ \ \textcolor{comment}{//\ -\/-\/gmock\_catch\_leaked\_mocks\ and\ -\/-\/gmock\_verbose\ the\ user\ specifies.}}
+\DoxyCodeLine{02767\ \ \ testing::GMOCK\_FLAG(catch\_leaked\_mocks)\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{02768\ \ \ testing::GMOCK\_FLAG(verbose)\ =\ \mbox{\hyperlink{namespacetesting_1_1internal_ad9386ccda6b6deac2f7b84784d3088c0}{testing::internal::kWarningVerbosity}};}
+\DoxyCodeLine{02769\ }
+\DoxyCodeLine{02770\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{gtest_8h_a853a3792807489591d3d4a2f2ff9359f}{RUN\_ALL\_TESTS}}();}
+\DoxyCodeLine{02771\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{gmock-spec-builders__test_8cc_a3c04138a5bfe5d72780bb7e82a18e627_cgraph}
+\end{center}
+\end{figure}

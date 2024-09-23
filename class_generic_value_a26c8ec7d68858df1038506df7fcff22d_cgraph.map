@@ -1,0 +1,5 @@
+<map id="GenericValue::SetObjectRaw" name="GenericValue::SetObjectRaw">
+<area shape="rect" id="Node000001" title="Initialize this value as object with initial data, without calling destructor." alt="" coords="5,13,197,38"/>
+<area shape="rect" id="Node000002" href="$class_generic_value.html#a634a87972649943604153708ca9aefb7" title=" " alt="" coords="245,5,425,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="197,23,229,23,229,28,197,28"/>
+</map>

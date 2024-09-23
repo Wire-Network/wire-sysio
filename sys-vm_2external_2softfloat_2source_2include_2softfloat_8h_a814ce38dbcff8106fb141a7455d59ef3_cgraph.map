@@ -1,0 +1,24 @@
+<map id="extF80M_add" name="extF80M_add">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,96,106,121"/>
+<area shape="rect" id="Node000002" href="$sys-vm_2external_2softfloat_2source_2s__add_ext_f80_m_8c.html#a1e79364122727d9e7c4d0863c58da8a3" title=" " alt="" coords="154,96,303,121"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="106,106,138,106,138,111,106,111"/>
+<area shape="rect" id="Node000003" href="$sys-vm_2external_2softfloat_2source_2s__invalid_ext_f80_m_8c.html#a51f71a27584700f84c2ede116f7054e0" title=" " alt="" coords="621,121,787,146"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="304,110,606,126,606,131,303,115"/>
+<area shape="rect" id="Node000005" href="$sys-vm_2external_2softfloat_2source_2s__norm_round_pack_m_to_ext_f80_m_8c.html#a9ce3e6e080f54b6f43c5da22e5a53144" title=" " alt="" coords="351,5,548,46"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="264,92,378,49,380,54,266,97"/>
+<area shape="rect" id="Node000006" href="$sys-vm_2external_2softfloat_2source_2s__round_pack_m_to_ext_f80_m_8c.html#a8802bf23c23a2c61013bff6f58327adf" title=" " alt="" coords="596,70,812,96"/>
+<area shape="poly" id="edge8_Node000002_Node000006" title=" " alt="" coords="303,102,351,99,581,87,581,92,351,104,304,107"/>
+<area shape="rect" id="Node000008" href="$sys-vm_2external_2softfloat_2source_2s__try_propagate_na_n_ext_f80_m_8c.html#a5da15212eaf2079cda13b971a0e5af37" title=" " alt="" coords="366,171,533,211"/>
+<area shape="poly" id="edge9_Node000002_Node000008" title=" " alt="" coords="266,119,380,162,378,167,264,124"/>
+<area shape="rect" id="Node000004" href="$softfloat_2source_28086-_s_s_e_2softfloat__raise_flags_8c.html#ac16bbf09eca0fe8ff91301d82c5a667f" title=" " alt="" coords="877,121,1012,146"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="787,131,862,131,862,136,787,136"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="544,44,629,64,628,69,542,49"/>
+<area shape="poly" id="edge6_Node000006_Node000004" title=" " alt="" coords="769,94,866,115,865,120,768,99"/>
+<area shape="rect" id="Node000007" href="$sys-vm_2external_2softfloat_2source_2s__shift_right_jam64_8c.html#ae2ed4d70d1f8a6da983a01ecc027280f" title=" " alt="" coords="860,70,1030,96"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="812,80,844,80,844,86,812,86"/>
+<area shape="rect" id="Node000009" href="$softfloat_2source_28086-_s_s_e_2s__propagate_na_n_ext_f80_m_8c.html#a6d1fff7785c3407c872c7c2147223b5a" title=" " alt="" coords="598,174,810,200"/>
+<area shape="poly" id="edge10_Node000008_Node000009" title=" " alt="" coords="533,187,582,186,582,192,533,192"/>
+<area shape="poly" id="edge12_Node000009_Node000004" title=" " alt="" coords="765,171,868,148,869,153,766,176"/>
+<area shape="rect" id="Node000010" href="$softfloat_2source_28086-_s_s_e_2ext_f80_m__is_signaling_na_n_8c.html#ace8e5230b332cd22bdf612d80da1a3de" title=" " alt="" coords="860,174,1030,200"/>
+<area shape="poly" id="edge11_Node000009_Node000010" title=" " alt="" coords="810,184,845,184,845,190,810,190"/>
+</map>

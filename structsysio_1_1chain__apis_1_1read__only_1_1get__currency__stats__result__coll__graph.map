@@ -1,0 +1,9 @@
+<map id="sysio::chain_apis::read_only::get_currency_stats_result" name="sysio::chain_apis::read_only::get_currency_stats_result">
+<area shape="rect" id="Node000001" title=" " alt="" coords="68,184,228,240"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1asset.html" title=" " alt="" coords="5,80,137,106"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="89,117,133,182,128,185,85,120"/>
+<area shape="rect" id="Node000003" href="$structfc_1_1reflect__init.html" title=" " alt="" coords="21,5,121,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="74,46,74,80,68,80,68,46"/>
+<area shape="rect" id="Node000004" href="$structsysio_1_1chain_1_1name.html" title="Immutable except for fc::from_variant." alt="" coords="161,80,293,106"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="218,122,196,161,177,185,173,182,191,159,213,119"/>
+</map>

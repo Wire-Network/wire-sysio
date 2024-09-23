@@ -1,0 +1,164 @@
+\doxysection{release\+\_\+docs.\+py}
+\hypertarget{release__docs_8py_source}{}\label{release__docs_8py_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/scripts/release\_docs.py@{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/scripts/release\_docs.py}}
+\mbox{\hyperlink{release__docs_8py}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00001}\mbox{\hyperlink{namespacerelease__docs}{00001}}\ \textcolor{comment}{\#!/usr/bin/env\ python}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00002}00002\ \textcolor{comment}{\#}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00003}00003\ \textcolor{comment}{\#\ Copyright\ 2013\ Google\ Inc.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00004}00004\ \textcolor{comment}{\#}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00005}00005\ \textcolor{comment}{\#\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00006}00006\ \textcolor{comment}{\#\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00007}00007\ \textcolor{comment}{\#\ met:}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00008}00008\ \textcolor{comment}{\#}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00009}00009\ \textcolor{comment}{\#\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00010}00010\ \textcolor{comment}{\#\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00011}00011\ \textcolor{comment}{\#\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00012}00012\ \textcolor{comment}{\#\ copyright\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00013}00013\ \textcolor{comment}{\#\ in\ the\ documentation\ and/or\ other\ materials\ provided\ with\ the}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00014}00014\ \textcolor{comment}{\#\ distribution.}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00015}00015\ \textcolor{comment}{\#\ \ \ \ \ *\ Neither\ the\ name\ of\ Google\ Inc.\ nor\ the\ names\ of\ its}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00016}00016\ \textcolor{comment}{\#\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products\ derived\ from}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00017}00017\ \textcolor{comment}{\#\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00018}00018\ \textcolor{comment}{\#}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00019}00019\ \textcolor{comment}{\#\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00020}00020\ \textcolor{comment}{\#\ "{}AS\ IS"{}\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00021}00021\ \textcolor{comment}{\#\ LIMITED\ TO,\ THE\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00022}00022\ \textcolor{comment}{\#\ A\ PARTICULAR\ PURPOSE\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ THE\ COPYRIGHT}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00023}00023\ \textcolor{comment}{\#\ OWNER\ OR\ CONTRIBUTORS\ BE\ LIABLE\ FOR\ ANY\ DIRECT,\ INDIRECT,\ INCIDENTAL,}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00024}00024\ \textcolor{comment}{\#\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES\ (INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00025}00025\ \textcolor{comment}{\#\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;\ LOSS\ OF\ USE,}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00026}00026\ \textcolor{comment}{\#\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND\ ON\ ANY}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00027}00027\ \textcolor{comment}{\#\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00028}00028\ \textcolor{comment}{\#\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00029}00029\ \textcolor{comment}{\#\ OF\ THIS\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00031}00031\ \textcolor{stringliteral}{"{}"{}"{}Script\ for\ branching\ Google\ Test/Mock\ wiki\ pages\ for\ a\ new\ version.}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00032}00032\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00033}00033\ \textcolor{stringliteral}{SYNOPSIS}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00034}00034\ \textcolor{stringliteral}{\ \ \ \ \ \ \ release\_docs.py\ NEW\_RELEASE\_VERSION}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00035}00035\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00036}00036\ \textcolor{stringliteral}{\ \ \ \ \ \ \ Google\ Test\ and\ Google\ Mock's\ external\ user\ documentation\ is\ in}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00037}00037\ \textcolor{stringliteral}{\ \ \ \ \ \ \ interlinked\ wiki\ files.\ \ When\ we\ release\ a\ new\ version\ of}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00038}00038\ \textcolor{stringliteral}{\ \ \ \ \ \ \ Google\ Test\ or\ Google\ Mock,\ we\ need\ to\ branch\ the\ wiki\ files}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00039}00039\ \textcolor{stringliteral}{\ \ \ \ \ \ \ such\ that\ users\ of\ a\ specific\ version\ of\ Google\ Test/Mock\ can}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00040}00040\ \textcolor{stringliteral}{\ \ \ \ \ \ \ look\ up\ documenation\ relevant\ for\ that\ version.\ \ This\ script}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00041}00041\ \textcolor{stringliteral}{\ \ \ \ \ \ \ automates\ that\ process\ by:}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00042}00042\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00043}00043\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ -\/\ branching\ the\ current\ wiki\ pages\ (which\ document\ the}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00044}00044\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ behavior\ of\ the\ SVN\ trunk\ head)\ to\ pages\ for\ the\ specified}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00045}00045\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ version\ (e.g.\ branching\ FAQ.wiki\ to\ V2\_6\_FAQ.wiki\ when}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00046}00046\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ NEW\_RELEASE\_VERSION\ is\ 2.6);}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00047}00047\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ -\/\ updating\ the\ links\ in\ the\ branched\ files\ to\ point\ to\ the\ branched}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00048}00048\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ version\ (e.g.\ a\ link\ in\ V2\_6\_FAQ.wiki\ that\ pointed\ to}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00049}00049\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ Primer.wiki\#Anchor\ will\ now\ point\ to\ V2\_6\_Primer.wiki\#Anchor).}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00050}00050\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00051}00051\ \textcolor{stringliteral}{\ \ \ \ \ \ \ NOTE:\ NEW\_RELEASE\_VERSION\ must\ be\ a\ NEW\ version\ number\ for}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00052}00052\ \textcolor{stringliteral}{\ \ \ \ \ \ \ which\ the\ wiki\ pages\ don't\ yet\ exist;\ otherwise\ you'll\ get\ SVN}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00053}00053\ \textcolor{stringliteral}{\ \ \ \ \ \ \ errors\ like\ "{}svn:\ Path\ 'V1\_7\_PumpManual.wiki'\ is\ not\ a}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00054}00054\ \textcolor{stringliteral}{\ \ \ \ \ \ \ directory"{}\ when\ running\ the\ script.}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00055}00055\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00056}00056\ \textcolor{stringliteral}{EXAMPLE}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00057}00057\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \$\ cd\ PATH/TO/GTEST\_SVN\_WORKSPACE/trunk}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00058}00058\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \$\ scripts/release\_docs.py\ 2.6\ \ \#\ create\ wiki\ pages\ for\ v2.6}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00059}00059\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \$\ svn\ status\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \#\ verify\ the\ file\ list}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00060}00060\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \$\ svn\ diff\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \#\ verify\ the\ file\ contents}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00061}00061\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \$\ svn\ commit\ -\/m\ "{}release\ wiki\ pages\ for\ v2.6"{}}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00062}00062\ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00064}00064\ \_\_author\_\_\ =\ \textcolor{stringliteral}{'wan@google.com\ (Zhanyong\ Wan)'}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00066}00066\ \textcolor{keyword}{import}\ os}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00067}00067\ \textcolor{keyword}{import}\ re}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00068}00068\ \textcolor{keyword}{import}\ sys}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00069}00069\ }
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00070}00070\ \textcolor{keyword}{import}\ common}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00073}00073\ \textcolor{comment}{\#\ Wiki\ pages\ that\ shouldn't\ be\ branched\ for\ every\ gtest/gmock\ release.}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00074}\mbox{\hyperlink{namespacerelease__docs_aaeabb8c74d9db7a4b2f3c66e8f1a04ee}{00074}}\ GTEST\_UNVERSIONED\_WIKIS\ =\ [\textcolor{stringliteral}{'DevGuide.wiki'}]}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00075}\mbox{\hyperlink{namespacerelease__docs_a675f92ba4643a6aef7773a6178e49b29}{00075}}\ GMOCK\_UNVERSIONED\_WIKIS\ =\ [}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00076}00076\ \ \ \ \ \textcolor{stringliteral}{'DesignDoc.wiki'},}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00077}00077\ \ \ \ \ \textcolor{stringliteral}{'DevGuide.wiki'},}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00078}00078\ \ \ \ \ \textcolor{stringliteral}{'KnownIssues.wiki'}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00079}00079\ \ \ \ \ ]}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00080}00080\ }
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00081}00081\ }
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00082}\mbox{\hyperlink{namespacerelease__docs_a244126c0293b9100e7fcfff1a2edd30a}{00082}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacerelease__docs_a244126c0293b9100e7fcfff1a2edd30a}{DropWikiSuffix}}(wiki\_filename):}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00083}00083\ \ \ \textcolor{stringliteral}{"{}"{}"{}Removes\ the\ .wiki\ suffix\ (if\ any)\ from\ the\ given\ filename."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00084}00084\ }
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00085}00085\ \ \ \textcolor{keywordflow}{return}\ (wiki\_filename[:-\/\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}(\textcolor{stringliteral}{'.wiki'})]\ \textcolor{keywordflow}{if}\ wiki\_filename.endswith(\textcolor{stringliteral}{'.wiki'})}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00086}00086\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ wiki\_filename)}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00087}00087\ }
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00088}00088\ }
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00089}\mbox{\hyperlink{classrelease__docs_1_1_wiki_brancher}{00089}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classrelease__docs_1_1_wiki_brancher}{WikiBrancher}}(object):}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00090}00090\ \ \ \textcolor{stringliteral}{"{}"{}"{}Branches\ ..."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00091}00091\ }
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00092}\mbox{\hyperlink{classrelease__docs_1_1_wiki_brancher_a42c5f62bdae9e3d9c3ba36dcc07bdd62}{00092}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classrelease__docs_1_1_wiki_brancher_a42c5f62bdae9e3d9c3ba36dcc07bdd62}{\_\_init\_\_}}(self,\ dot\_version):}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00093}\mbox{\hyperlink{classrelease__docs_1_1_wiki_brancher_a4ac9c796f95690cca04049b557055443}{00093}}\ \ \ \ \ self.\mbox{\hyperlink{classrelease__docs_1_1_wiki_brancher_a4ac9c796f95690cca04049b557055443}{project}},\ svn\_root\_path\ =\ \mbox{\hyperlink{namespacecommon_a916f1d8769cc92716b8c740b4023d5b7}{common.GetSvnInfo}}()}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00094}00094\ \ \ \ \ \textcolor{keywordflow}{if}\ self.\mbox{\hyperlink{classrelease__docs_1_1_wiki_brancher_a4ac9c796f95690cca04049b557055443}{project}}\ \textcolor{keywordflow}{not}\ \textcolor{keywordflow}{in}\ (\textcolor{stringliteral}{'googletest'},\ \textcolor{stringliteral}{'googlemock'}):}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00095}00095\ \ \ \ \ \ \ sys.exit(\textcolor{stringliteral}{'This\ script\ must\ be\ run\ in\ a\ gtest\ or\ gmock\ SVN\ workspace.'})}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00096}\mbox{\hyperlink{classrelease__docs_1_1_wiki_brancher_ad86478c9538ac0bf3916f67eb5da2910}{00096}}\ \ \ \ \ self.\mbox{\hyperlink{classrelease__docs_1_1_wiki_brancher_ad86478c9538ac0bf3916f67eb5da2910}{wiki\_dir}}\ =\ svn\_root\_path\ +\ \textcolor{stringliteral}{'/wiki'}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00097}00097\ \ \ \ \ \textcolor{comment}{\#\ Turn\ '2.6'\ to\ 'V2\_6\_'.}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00098}\mbox{\hyperlink{classrelease__docs_1_1_wiki_brancher_aa9d9a437f7f6ca3bd9b6c27268541ba4}{00098}}\ \ \ \ \ self.\mbox{\hyperlink{classrelease__docs_1_1_wiki_brancher_aa9d9a437f7f6ca3bd9b6c27268541ba4}{version\_prefix}}\ =\ \textcolor{stringliteral}{'V'}\ +\ dot\_version.replace(\textcolor{stringliteral}{'.'},\ \textcolor{stringliteral}{'\_'})\ +\ \textcolor{stringliteral}{'\_'}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00099}\mbox{\hyperlink{classrelease__docs_1_1_wiki_brancher_a938c78ba6e8adfb6af039dd500ac6466}{00099}}\ \ \ \ \ self.\mbox{\hyperlink{classrelease__docs_1_1_wiki_brancher_a938c78ba6e8adfb6af039dd500ac6466}{files\_to\_branch}}\mbox{\hyperlink{classrelease__docs_1_1_wiki_brancher_a8e38beb72d080d374963b925028baddc}{files\_to\_branch}}\ =\ self.\mbox{\hyperlink{classrelease__docs_1_1_wiki_brancher_a75323b0481ab3e9c81b2286a5d731041}{GetFilesToBranch}}()}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00100}00100\ \ \ \ \ page\_names\ =\ [\mbox{\hyperlink{namespacerelease__docs_a244126c0293b9100e7fcfff1a2edd30a}{DropWikiSuffix}}(f)\ \textcolor{keywordflow}{for}\ f\ \textcolor{keywordflow}{in}\ self.\mbox{\hyperlink{classrelease__docs_1_1_wiki_brancher_a938c78ba6e8adfb6af039dd500ac6466}{files\_to\_branch}}\mbox{\hyperlink{classrelease__docs_1_1_wiki_brancher_a8e38beb72d080d374963b925028baddc}{files\_to\_branch}}]}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00101}00101\ \ \ \ \ \textcolor{comment}{\#\ A\ link\ to\ Foo.wiki\ is\ in\ one\ of\ the\ following\ forms:}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00102}00102\ \ \ \ \ \textcolor{comment}{\#\ \ \ [Foo\ words]}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00103}00103\ \ \ \ \ \textcolor{comment}{\#\ \ \ [Foo\#Anchor\ words]}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00104}00104\ \ \ \ \ \textcolor{comment}{\#\ \ \ [http://code.google.com/.../wiki/Foo\ words]}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00105}00105\ \ \ \ \ \textcolor{comment}{\#\ \ \ [http://code.google.com/.../wiki/Foo\#Anchor\ words]}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00106}00106\ \ \ \ \ \textcolor{comment}{\#\ We\ want\ to\ replace\ 'Foo'\ with\ 'V2\_6\_Foo'\ in\ the\ above\ cases.}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00107}\mbox{\hyperlink{classrelease__docs_1_1_wiki_brancher_a029ce9007fefd6ac5f13bacdedb29af5}{00107}}\ \ \ \ \ self.\mbox{\hyperlink{classrelease__docs_1_1_wiki_brancher_a029ce9007fefd6ac5f13bacdedb29af5}{search\_for\_re}}\ =\ re.compile(}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00108}00108\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ This\ regex\ matches\ either}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00109}00109\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ \ \ [Foo}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00110}00110\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ or}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00111}00111\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ \ \ /wiki/Foo}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00112}00112\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ followed\ by\ a\ space\ or\ a\ \#,\ where\ Foo\ is\ the\ name\ of\ an}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00113}00113\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ unversioned\ wiki\ page.}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00114}00114\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'(\(\backslash\)[|/wiki/)(\%s)([\ \#])'}\ \%\ \textcolor{stringliteral}{'|'}.join(page\_names))}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00115}\mbox{\hyperlink{classrelease__docs_1_1_wiki_brancher_a0208002cbe9b43852be98ec4b0790b2e}{00115}}\ \ \ \ \ self.\mbox{\hyperlink{classrelease__docs_1_1_wiki_brancher_a0208002cbe9b43852be98ec4b0790b2e}{replace\_with}}\ =\ \textcolor{stringliteral}{r'\(\backslash\)1\%s\(\backslash\)2\(\backslash\)3'}\ \%\ (self.\mbox{\hyperlink{classrelease__docs_1_1_wiki_brancher_aa9d9a437f7f6ca3bd9b6c27268541ba4}{version\_prefix}},)}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00116}00116\ }
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00117}\mbox{\hyperlink{classrelease__docs_1_1_wiki_brancher_a75323b0481ab3e9c81b2286a5d731041}{00117}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classrelease__docs_1_1_wiki_brancher_a75323b0481ab3e9c81b2286a5d731041}{GetFilesToBranch}}(self):}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00118}00118\ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Returns\ a\ list\ of\ .wiki\ file\ names\ that\ need\ to\ be\ branched."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00119}00119\ }
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00120}00120\ \ \ \ \ unversioned\_wikis\ =\ (GTEST\_UNVERSIONED\_WIKIS\ \textcolor{keywordflow}{if}\ self.\mbox{\hyperlink{classrelease__docs_1_1_wiki_brancher_a4ac9c796f95690cca04049b557055443}{project}}\ ==\ \textcolor{stringliteral}{'googletest'}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00121}00121\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ GMOCK\_UNVERSIONED\_WIKIS)}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00122}00122\ \ \ \ \ \textcolor{keywordflow}{return}\ [f\ \textcolor{keywordflow}{for}\ f\ \textcolor{keywordflow}{in}\ os.listdir(self.\mbox{\hyperlink{classrelease__docs_1_1_wiki_brancher_ad86478c9538ac0bf3916f67eb5da2910}{wiki\_dir}})}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00123}00123\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (f.endswith(\textcolor{stringliteral}{'.wiki'})\ \textcolor{keywordflow}{and}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00124}00124\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{not}\ re.match(\textcolor{stringliteral}{r'\string^V\(\backslash\)d'},\ f)\ \textcolor{keywordflow}{and}\ \ \textcolor{comment}{\#\ Excluded\ versioned\ .wiki\ files.}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00125}00125\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ f\ \textcolor{keywordflow}{not}\ \textcolor{keywordflow}{in}\ unversioned\_wikis)]}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00126}00126\ }
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00127}\mbox{\hyperlink{classrelease__docs_1_1_wiki_brancher_adc9059c666f8380d4f5d646881bc4886}{00127}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classrelease__docs_1_1_wiki_brancher_adc9059c666f8380d4f5d646881bc4886}{BranchFiles}}(self):}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00128}00128\ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Branches\ the\ .wiki\ files\ needed\ to\ be\ branched."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00129}00129\ }
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00130}00130\ \ \ \ \ \textcolor{keywordflow}{print}\ \textcolor{stringliteral}{'Branching\ \%d\ .wiki\ files:'}\ \%\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}(self.\mbox{\hyperlink{classrelease__docs_1_1_wiki_brancher_a938c78ba6e8adfb6af039dd500ac6466}{files\_to\_branch}}\mbox{\hyperlink{classrelease__docs_1_1_wiki_brancher_a8e38beb72d080d374963b925028baddc}{files\_to\_branch}}),)}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00131}00131\ \ \ \ \ os.chdir(self.\mbox{\hyperlink{classrelease__docs_1_1_wiki_brancher_ad86478c9538ac0bf3916f67eb5da2910}{wiki\_dir}})}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00132}\mbox{\hyperlink{classrelease__docs_1_1_wiki_brancher_a8e38beb72d080d374963b925028baddc}{00132}}\ \ \ \ \ \textcolor{keywordflow}{for}\ f\ \textcolor{keywordflow}{in}\ self.\mbox{\hyperlink{classrelease__docs_1_1_wiki_brancher_a938c78ba6e8adfb6af039dd500ac6466}{files\_to\_branch}}\mbox{\hyperlink{classrelease__docs_1_1_wiki_brancher_a8e38beb72d080d374963b925028baddc}{files\_to\_branch}}:}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00133}00133\ \ \ \ \ \ \ command\ =\ \textcolor{stringliteral}{'svn\ cp\ \%s\ \%s\%s'}\ \%\ (f,\ self.\mbox{\hyperlink{classrelease__docs_1_1_wiki_brancher_aa9d9a437f7f6ca3bd9b6c27268541ba4}{version\_prefix}},\ f)}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00134}00134\ \ \ \ \ \ \ \textcolor{keywordflow}{print}\ command}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00135}00135\ \ \ \ \ \ \ os.system(command)}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00136}00136\ }
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00137}\mbox{\hyperlink{classrelease__docs_1_1_wiki_brancher_a8752eca1eab9ab4ee30b49f510527ff2}{00137}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classrelease__docs_1_1_wiki_brancher_a8752eca1eab9ab4ee30b49f510527ff2}{UpdateLinksInBranchedFiles}}(self):}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00138}00138\ }
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00139}00139\ \ \ \ \ \textcolor{keywordflow}{for}\ f\ \textcolor{keywordflow}{in}\ self.\mbox{\hyperlink{classrelease__docs_1_1_wiki_brancher_a938c78ba6e8adfb6af039dd500ac6466}{files\_to\_branch}}\mbox{\hyperlink{classrelease__docs_1_1_wiki_brancher_a8e38beb72d080d374963b925028baddc}{files\_to\_branch}}:}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00140}00140\ \ \ \ \ \ \ source\_file\ =\ os.path.join(self.\mbox{\hyperlink{classrelease__docs_1_1_wiki_brancher_ad86478c9538ac0bf3916f67eb5da2910}{wiki\_dir}},\ f)}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00141}00141\ \ \ \ \ \ \ versioned\_file\ =\ os.path.join(self.\mbox{\hyperlink{classrelease__docs_1_1_wiki_brancher_ad86478c9538ac0bf3916f67eb5da2910}{wiki\_dir}},\ self.\mbox{\hyperlink{classrelease__docs_1_1_wiki_brancher_aa9d9a437f7f6ca3bd9b6c27268541ba4}{version\_prefix}}\ +\ f)}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00142}00142\ \ \ \ \ \ \ \textcolor{keywordflow}{print}\ \textcolor{stringliteral}{'Updating\ links\ in\ \%s.'}\ \%\ (versioned\_file,)}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00143}00143\ \ \ \ \ \ \ text\ =\ file(source\_file,\ \textcolor{stringliteral}{'r'}).read()}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00144}00144\ \ \ \ \ \ \ new\_text\ =\ self.\mbox{\hyperlink{classrelease__docs_1_1_wiki_brancher_a029ce9007fefd6ac5f13bacdedb29af5}{search\_for\_re}}.\mbox{\hyperlink{xbyak__mnemonic_8h_ad8856ea517c970ed0584a251c3fdc94f}{sub}}(self.\mbox{\hyperlink{classrelease__docs_1_1_wiki_brancher_a0208002cbe9b43852be98ec4b0790b2e}{replace\_with}},\ text)}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00145}00145\ \ \ \ \ \ \ file(versioned\_file,\ \textcolor{stringliteral}{'w'}).write(new\_text)}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00146}00146\ }
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00147}00147\ }
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00148}\mbox{\hyperlink{namespacerelease__docs_a1daf128d38dad3e1f9da062bd07dc9c1}{00148}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacerelease__docs_a1daf128d38dad3e1f9da062bd07dc9c1}{main}}():}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00149}00149\ \ \ \textcolor{keywordflow}{if}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}(sys.argv)\ !=\ 2:}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00150}00150\ \ \ \ \ sys.exit(\_\_doc\_\_)}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00151}00151\ }
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00152}00152\ \ \ brancher\ =\ \mbox{\hyperlink{classrelease__docs_1_1_wiki_brancher}{WikiBrancher}}(sys.argv[1])}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00153}00153\ \ \ brancher.BranchFiles()}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00154}00154\ \ \ brancher.UpdateLinksInBranchedFiles()}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00155}00155\ }
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00156}00156\ }
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00157}00157\ \textcolor{keywordflow}{if}\ \_\_name\_\_\ ==\ \textcolor{stringliteral}{'\_\_main\_\_'}:}
+\DoxyCodeLine{\Hypertarget{release__docs_8py_source_l00158}00158\ \ \ \mbox{\hyperlink{namespacerelease__docs_a1daf128d38dad3e1f9da062bd07dc9c1}{main}}()}
+
+\end{DoxyCode}

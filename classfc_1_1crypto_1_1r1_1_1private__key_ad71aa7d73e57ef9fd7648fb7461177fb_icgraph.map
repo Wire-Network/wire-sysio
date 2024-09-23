@@ -1,0 +1,7 @@
+<map id="fc::crypto::r1::private_key::generate" name="fc::crypto::r1::private_key::generate">
+<area shape="rect" id="Node000001" title=" " alt="" coords="250,27,392,68"/>
+<area shape="rect" id="Node000002" href="$test__webauthn_8cpp.html#a297871fcd73110d766a978fe337ef1e5" title=" " alt="" coords="5,5,202,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="234,38,202,34,203,29,234,33"/>
+<area shape="rect" id="Node000003" href="$structfc_1_1crypto_1_1r1_1_1private__key__shim.html#adca021da556cfe6d75a6fe63f5286f73" title=" " alt="" coords="32,55,175,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="235,61,176,69,175,64,234,56"/>
+</map>

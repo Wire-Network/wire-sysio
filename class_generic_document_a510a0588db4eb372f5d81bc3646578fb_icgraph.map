@@ -1,0 +1,33 @@
+<map id="GenericDocument::HasParseError" name="GenericDocument::HasParseError">
+<area shape="rect" id="Node000001" title="Whether a parse error has occurred in the last parsing." alt="" coords="285,122,477,162"/>
+<area shape="rect" id="Node000002" href="$tutorial_8cpp.html#a81ce304348a420752ee080480d2b3095" title=" " alt="" coords="148,5,198,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="341,114,292,79,236,45,197,28,199,23,238,40,295,74,344,110"/>
+<area shape="rect" id="Node000003" href="$class_rapid_json.html#ae4e7e160193b9cac9c22f226e3d2b20e" title=" " alt="" coords="109,55,237,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="307,119,210,83,212,78,309,114"/>
+<area shape="rect" id="Node000004" href="$documenttest_8cpp.html#a724ac92c78ef829fcd9e0a7dd8ed0105" title=" " alt="" coords="145,104,200,130"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="269,131,201,123,201,117,270,126"/>
+<area shape="rect" id="Node000005" href="$jsoncheckertest_8cpp.html#a4d38202adffe61dff1743cfce7c6da8f" title=" " alt="" coords="145,153,200,179"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="270,158,201,166,201,160,269,152"/>
+<area shape="rect" id="Node000006" href="$namespacetest_8cpp.html#a6228e1447cd0572a116561d46c73ceb1" title=" " alt="" coords="145,203,200,228"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="308,171,202,209,200,203,306,166"/>
+<area shape="rect" id="Node000007" href="$cursorstreamwrappertest_8cpp.html#a275da0d1f29dba3630a7ba31e01101e2" title=" " alt="" coords="137,252,208,278"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="343,174,294,209,238,243,210,256,208,251,236,238,291,205,340,170"/>
+<area shape="rect" id="Node000008" href="$cursorstreamwrappertest_8cpp.html#ad7be74dba4df64b632deef663f49ee1d" title=" " alt="" coords="5,55,61,80"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="122,254,107,243,92,224,84,205,78,170,75,133,69,114,58,93,49,82,53,79,63,90,74,112,80,132,83,169,89,204,97,221,111,239,125,250"/>
+<area shape="rect" id="Node000009" href="$cursorstreamwrappertest_8cpp.html#aa928a9ee549a92b19b936232e5b80529" title=" " alt="" coords="5,104,61,130"/>
+<area shape="poly" id="edge8_Node000007_Node000009" title=" " alt="" coords="121,253,107,243,88,218,80,194,73,169,58,142,49,132,53,128,63,139,78,167,85,192,92,215,111,239,124,249"/>
+<area shape="rect" id="Node000010" href="$cursorstreamwrappertest_8cpp.html#ad4f41f82ee5faf1e197735d085678b10" title=" " alt="" coords="5,153,61,179"/>
+<area shape="poly" id="edge9_Node000007_Node000010" title=" " alt="" coords="122,251,107,243,81,219,59,192,47,181,51,177,63,188,85,215,110,239,124,246"/>
+<area shape="rect" id="Node000011" href="$cursorstreamwrappertest_8cpp.html#a540fcbc4d8110c5cf1e394bef973864e" title=" " alt="" coords="5,203,61,228"/>
+<area shape="poly" id="edge10_Node000007_Node000011" title=" " alt="" coords="122,250,60,228,62,223,124,245"/>
+<area shape="rect" id="Node000012" href="$cursorstreamwrappertest_8cpp.html#ac4fb8d3acd98f897e36fa6bc9d54583d" title=" " alt="" coords="5,252,61,278"/>
+<area shape="poly" id="edge11_Node000007_Node000012" title=" " alt="" coords="121,268,61,268,61,262,121,262"/>
+<area shape="rect" id="Node000013" href="$cursorstreamwrappertest_8cpp.html#ac4cf5478a8fa67307f2b5d2213aca3a8" title=" " alt="" coords="5,301,61,327"/>
+<area shape="poly" id="edge12_Node000007_Node000013" title=" " alt="" coords="124,285,62,307,60,302,122,280"/>
+<area shape="rect" id="Node000014" href="$cursorstreamwrappertest_8cpp.html#a6bd684af3886ac0848edf1a8bdfc5c66" title=" " alt="" coords="5,351,61,376"/>
+<area shape="poly" id="edge13_Node000007_Node000014" title=" " alt="" coords="142,289,55,352,51,348,139,285"/>
+<area shape="rect" id="Node000015" href="$cursorstreamwrappertest_8cpp.html#ae8b36851bf3b3305e4292794cdd52ddc" title=" " alt="" coords="5,400,61,426"/>
+<area shape="poly" id="edge14_Node000007_Node000015" title=" " alt="" coords="152,292,63,391,51,401,48,397,59,387,149,288"/>
+<area shape="rect" id="Node000016" href="$cursorstreamwrappertest_8cpp.html#a128a1978f9d76e5b8f33a73fb193cd69" title=" " alt="" coords="5,449,61,475"/>
+<area shape="poly" id="edge15_Node000007_Node000016" title=" " alt="" coords="160,293,119,362,63,440,52,451,48,447,59,436,115,359,155,290"/>
+</map>

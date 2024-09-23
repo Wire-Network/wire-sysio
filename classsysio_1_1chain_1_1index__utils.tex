@@ -1,0 +1,188 @@
+\doxysection{sysio\+::chain\+::index\+\_\+utils\texorpdfstring{$<$}{<} Index \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classsysio_1_1chain_1_1index__utils}{}\label{classsysio_1_1chain_1_1index__utils}\index{sysio::chain::index\_utils$<$ Index $>$@{sysio::chain::index\_utils$<$ Index $>$}}
+
+
+{\ttfamily \#include $<$database\+\_\+utils.\+hpp$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{classsysio_1_1chain_1_1index__utils_a21596a1372a887de97d58b72fdb11ebc}{index\+\_\+t}} = Index
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename F $>$ }\\static void \mbox{\hyperlink{classsysio_1_1chain_1_1index__utils_a20f6cbb7f55f78ff4d35a4bf7e928a86}{walk}} (const \mbox{\hyperlink{classchainbase_1_1database}{chainbase\+::database}} \&db, F function)
+\item 
+{\footnotesize template$<$typename Secondary , typename Key , typename F $>$ }\\static void \mbox{\hyperlink{classsysio_1_1chain_1_1index__utils_a98b75d18619bb78e3a12ff7315c44353}{walk\+\_\+range}} (const \mbox{\hyperlink{classchainbase_1_1database}{chainbase\+::database}} \&db, const Key \&begin\+\_\+key, const Key \&end\+\_\+key, F function)
+\item 
+{\footnotesize template$<$typename Secondary , typename Key $>$ }\\static size\+\_\+t \mbox{\hyperlink{classsysio_1_1chain_1_1index__utils_abc61d45b15a03ac0c4754a2ece6ca5bc}{size\+\_\+range}} (const \mbox{\hyperlink{classchainbase_1_1database}{chainbase\+::database}} \&db, const Key \&begin\+\_\+key, const Key \&end\+\_\+key)
+\item 
+{\footnotesize template$<$typename F $>$ }\\static void \mbox{\hyperlink{classsysio_1_1chain_1_1index__utils_a4ba170946682ddcea81d558b0ee8899a}{create}} (\mbox{\hyperlink{classchainbase_1_1database}{chainbase\+::database}} \&db, F cons)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Index$>$\newline
+class sysio\+::chain\+::index\+\_\+utils$<$ Index $>$}
+
+
+Definition at line \mbox{\hyperlink{database__utils_8hpp_source_l00013}{13}} of file \mbox{\hyperlink{database__utils_8hpp_source}{database\+\_\+utils.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classsysio_1_1chain_1_1index__utils_a21596a1372a887de97d58b72fdb11ebc}\index{sysio::chain::index\_utils$<$ Index $>$@{sysio::chain::index\_utils$<$ Index $>$}!index\_t@{index\_t}}
+\index{index\_t@{index\_t}!sysio::chain::index\_utils$<$ Index $>$@{sysio::chain::index\_utils$<$ Index $>$}}
+\doxysubsubsection{\texorpdfstring{index\_t}{index\_t}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1index__utils_a21596a1372a887de97d58b72fdb11ebc} 
+template$<$typename Index $>$ \\
+using \mbox{\hyperlink{classsysio_1_1chain_1_1index__utils}{sysio\+::chain\+::index\+\_\+utils}}$<$ Index $>$\+::index\+\_\+t = Index}
+
+
+
+Definition at line \mbox{\hyperlink{database__utils_8hpp_source_l00015}{15}} of file \mbox{\hyperlink{database__utils_8hpp_source}{database\+\_\+utils.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1chain_1_1index__utils_a4ba170946682ddcea81d558b0ee8899a}\index{sysio::chain::index\_utils$<$ Index $>$@{sysio::chain::index\_utils$<$ Index $>$}!create@{create}}
+\index{create@{create}!sysio::chain::index\_utils$<$ Index $>$@{sysio::chain::index\_utils$<$ Index $>$}}
+\doxysubsubsection{\texorpdfstring{create()}{create()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1index__utils_a4ba170946682ddcea81d558b0ee8899a} 
+template$<$typename Index $>$ \\
+template$<$typename F $>$ \\
+static void \mbox{\hyperlink{classsysio_1_1chain_1_1index__utils}{sysio\+::chain\+::index\+\_\+utils}}$<$ Index $>$\+::create (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classchainbase_1_1database}{chainbase\+::database}} \&}]{db}{, }\item[{F}]{cons}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{database__utils_8hpp_source_l00050}{50}} of file \mbox{\hyperlink{database__utils_8hpp_source}{database\+\_\+utils.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ db.\mbox{\hyperlink{classchainbase_1_1database_adc8f336b33d7013d1b0400399b16c5a7}{create}}<\textcolor{keyword}{typename}\ index\_t::value\_type>(cons);}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1index__utils_a4ba170946682ddcea81d558b0ee8899a_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1index__utils_a4ba170946682ddcea81d558b0ee8899a_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1index__utils_abc61d45b15a03ac0c4754a2ece6ca5bc}\index{sysio::chain::index\_utils$<$ Index $>$@{sysio::chain::index\_utils$<$ Index $>$}!size\_range@{size\_range}}
+\index{size\_range@{size\_range}!sysio::chain::index\_utils$<$ Index $>$@{sysio::chain::index\_utils$<$ Index $>$}}
+\doxysubsubsection{\texorpdfstring{size\_range()}{size\_range()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1index__utils_abc61d45b15a03ac0c4754a2ece6ca5bc} 
+template$<$typename Index $>$ \\
+template$<$typename Secondary , typename Key $>$ \\
+static size\+\_\+t \mbox{\hyperlink{classsysio_1_1chain_1_1index__utils}{sysio\+::chain\+::index\+\_\+utils}}$<$ Index $>$\+::size\+\_\+range (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classchainbase_1_1database}{chainbase\+::database}} \&}]{db}{, }\item[{const Key \&}]{begin\+\_\+key}{, }\item[{const Key \&}]{end\+\_\+key}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{database__utils_8hpp_source_l00038}{38}} of file \mbox{\hyperlink{database__utils_8hpp_source}{database\+\_\+utils.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ =\ db.\mbox{\hyperlink{classchainbase_1_1database_a4d5297635dcf70be481d9b600da9bc13}{get\_index}}<Index,\ Secondary>();}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ begin\_itr\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.lower\_bound(begin\_key);}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ end\_itr\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.lower\_bound(end\_key);}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ res\ =\ 0;}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (begin\_itr\ !=\ end\_itr)\ \{}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ res++;\ ++begin\_itr;}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ res;}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1index__utils_abc61d45b15a03ac0c4754a2ece6ca5bc_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1index__utils_a20f6cbb7f55f78ff4d35a4bf7e928a86}\index{sysio::chain::index\_utils$<$ Index $>$@{sysio::chain::index\_utils$<$ Index $>$}!walk@{walk}}
+\index{walk@{walk}!sysio::chain::index\_utils$<$ Index $>$@{sysio::chain::index\_utils$<$ Index $>$}}
+\doxysubsubsection{\texorpdfstring{walk()}{walk()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1index__utils_a20f6cbb7f55f78ff4d35a4bf7e928a86} 
+template$<$typename Index $>$ \\
+template$<$typename F $>$ \\
+static void \mbox{\hyperlink{classsysio_1_1chain_1_1index__utils}{sysio\+::chain\+::index\+\_\+utils}}$<$ Index $>$\+::walk (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classchainbase_1_1database}{chainbase\+::database}} \&}]{db}{, }\item[{F}]{function}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{database__utils_8hpp_source_l00018}{18}} of file \mbox{\hyperlink{database__utils_8hpp_source}{database\+\_\+utils.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \textcolor{keyword}{const}\&\ index\ =\ db.\mbox{\hyperlink{classchainbase_1_1database_a4d5297635dcf70be481d9b600da9bc13}{get\_index}}<Index>().indices();}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ first\ =\ index.begin();}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ last\ =\ index.end();}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\ itr\ =\ first;\ itr\ !=\ last;\ ++itr)\ \{}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ function(*itr);}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1index__utils_a20f6cbb7f55f78ff4d35a4bf7e928a86_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1index__utils_a20f6cbb7f55f78ff4d35a4bf7e928a86_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1index__utils_a98b75d18619bb78e3a12ff7315c44353}\index{sysio::chain::index\_utils$<$ Index $>$@{sysio::chain::index\_utils$<$ Index $>$}!walk\_range@{walk\_range}}
+\index{walk\_range@{walk\_range}!sysio::chain::index\_utils$<$ Index $>$@{sysio::chain::index\_utils$<$ Index $>$}}
+\doxysubsubsection{\texorpdfstring{walk\_range()}{walk\_range()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1index__utils_a98b75d18619bb78e3a12ff7315c44353} 
+template$<$typename Index $>$ \\
+template$<$typename Secondary , typename Key , typename F $>$ \\
+static void \mbox{\hyperlink{classsysio_1_1chain_1_1index__utils}{sysio\+::chain\+::index\+\_\+utils}}$<$ Index $>$\+::walk\+\_\+range (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classchainbase_1_1database}{chainbase\+::database}} \&}]{db}{, }\item[{const Key \&}]{begin\+\_\+key}{, }\item[{const Key \&}]{end\+\_\+key}{, }\item[{F}]{function}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{database__utils_8hpp_source_l00028}{28}} of file \mbox{\hyperlink{database__utils_8hpp_source}{database\+\_\+utils.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ =\ db.\mbox{\hyperlink{classchainbase_1_1database_a4d5297635dcf70be481d9b600da9bc13}{get\_index}}<Index,\ Secondary>();}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ begin\_itr\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.lower\_bound(begin\_key);}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ end\_itr\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.lower\_bound(end\_key);}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\ itr\ =\ begin\_itr;\ itr\ !=\ end\_itr;\ ++itr)\ \{}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ function(*itr);}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1index__utils_a98b75d18619bb78e3a12ff7315c44353_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{database__utils_8hpp}{database\+\_\+utils.\+hpp}}\end{DoxyCompactItemize}

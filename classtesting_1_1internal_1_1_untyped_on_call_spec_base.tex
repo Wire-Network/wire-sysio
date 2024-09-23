@@ -1,0 +1,246 @@
+\doxysection{testing\+::internal\+::Untyped\+On\+Call\+Spec\+Base Class Reference}
+\hypertarget{classtesting_1_1internal_1_1_untyped_on_call_spec_base}{}\label{classtesting_1_1internal_1_1_untyped_on_call_spec_base}\index{testing::internal::UntypedOnCallSpecBase@{testing::internal::UntypedOnCallSpecBase}}
+
+
+{\ttfamily \#include $<$gmock-\/spec-\/builders.\+h$>$}
+
+
+
+Inheritance diagram for testing\+::internal\+::Untyped\+On\+Call\+Spec\+Base\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=208pt]{classtesting_1_1internal_1_1_untyped_on_call_spec_base__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for testing\+::internal\+::Untyped\+On\+Call\+Spec\+Base\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=208pt]{classtesting_1_1internal_1_1_untyped_on_call_spec_base__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_on_call_spec_base_afc5da72d536ad61e2d66de87b2b9bc50}{Untyped\+On\+Call\+Spec\+Base}} (const char \texorpdfstring{$\ast$}{*}a\+\_\+file, int a\+\_\+line)
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_on_call_spec_base_a7f38a9661b49f992e744dfa446bf07e7}{file}} () const
+\item 
+int \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_on_call_spec_base_a18e9eb7155380b3e124bccc0d8115b5e}{line}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_on_call_spec_base_a78ebf16bfee40375e33a983f3100f354}{Clause}} \{ \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_on_call_spec_base_a78ebf16bfee40375e33a983f3100f354a57f312c5eacf22518ff0b12405cde4f1}{k\+None}}
+, \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_on_call_spec_base_a78ebf16bfee40375e33a983f3100f354a451699b0beaaabb325f8eaf1c65a071d}{k\+With}}
+, \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_on_call_spec_base_a78ebf16bfee40375e33a983f3100f354aeb25a21e1aa3dc4ca3a108b5533d7eed}{k\+Will\+By\+Default}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_on_call_spec_base_a5ec302e0788e40775218ce17288c04f3}{Assert\+Spec\+Property}} (bool property, const std\+::string \&failure\+\_\+message) const
+\item 
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_on_call_spec_base_a31ccd62aaa82c640c451ac92b4a33086}{Expect\+Spec\+Property}} (bool property, const std\+::string \&failure\+\_\+message) const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_on_call_spec_base_adf4e6c5022dfeb482f5328e9bb58ba88}{file\+\_\+}}
+\item 
+int \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_on_call_spec_base_a1dfa0dafaae6697f17adf5d837ca77c7}{line\+\_\+}}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_on_call_spec_base_a78ebf16bfee40375e33a983f3100f354}{Clause}} \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_on_call_spec_base_adb6d19adfeb5fde535d854aedbc5fb0f}{last\+\_\+clause\+\_\+}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00249}{249}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+
+\doxysubsection{Member Enumeration Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_untyped_on_call_spec_base_a78ebf16bfee40375e33a983f3100f354}\index{testing::internal::UntypedOnCallSpecBase@{testing::internal::UntypedOnCallSpecBase}!Clause@{Clause}}
+\index{Clause@{Clause}!testing::internal::UntypedOnCallSpecBase@{testing::internal::UntypedOnCallSpecBase}}
+\doxysubsubsection{\texorpdfstring{Clause}{Clause}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_untyped_on_call_spec_base_a78ebf16bfee40375e33a983f3100f354} 
+enum \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_on_call_spec_base_a78ebf16bfee40375e33a983f3100f354}{testing\+::internal\+::\+Untyped\+On\+Call\+Spec\+Base\+::\+Clause}}\hspace{0.3cm}{\ttfamily [protected]}}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kNone@{kNone}!testing::internal::UntypedOnCallSpecBase@{testing::internal::UntypedOnCallSpecBase}}\index{testing::internal::UntypedOnCallSpecBase@{testing::internal::UntypedOnCallSpecBase}!kNone@{kNone}}}\Hypertarget{classtesting_1_1internal_1_1_untyped_on_call_spec_base_a78ebf16bfee40375e33a983f3100f354a57f312c5eacf22518ff0b12405cde4f1}\label{classtesting_1_1internal_1_1_untyped_on_call_spec_base_a78ebf16bfee40375e33a983f3100f354} 
+k\+None&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kWith@{kWith}!testing::internal::UntypedOnCallSpecBase@{testing::internal::UntypedOnCallSpecBase}}\index{testing::internal::UntypedOnCallSpecBase@{testing::internal::UntypedOnCallSpecBase}!kWith@{kWith}}}\Hypertarget{classtesting_1_1internal_1_1_untyped_on_call_spec_base_a78ebf16bfee40375e33a983f3100f354a451699b0beaaabb325f8eaf1c65a071d}\label{classtesting_1_1internal_1_1_untyped_on_call_spec_base_a78ebf16bfee40375e33a983f3100f354} 
+k\+With&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kWillByDefault@{kWillByDefault}!testing::internal::UntypedOnCallSpecBase@{testing::internal::UntypedOnCallSpecBase}}\index{testing::internal::UntypedOnCallSpecBase@{testing::internal::UntypedOnCallSpecBase}!kWillByDefault@{kWillByDefault}}}\Hypertarget{classtesting_1_1internal_1_1_untyped_on_call_spec_base_a78ebf16bfee40375e33a983f3100f354aeb25a21e1aa3dc4ca3a108b5533d7eed}\label{classtesting_1_1internal_1_1_untyped_on_call_spec_base_a78ebf16bfee40375e33a983f3100f354} 
+k\+Will\+By\+Default&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00261}{261}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00261\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00262\ \ \ \ \ \textcolor{comment}{//\ Do\ not\ change\ the\ order\ of\ the\ enum\ members!\ \ The\ run-\/time}}
+\DoxyCodeLine{00263\ \ \ \ \ \textcolor{comment}{//\ syntax\ checking\ relies\ on\ it.}}
+\DoxyCodeLine{00264\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_on_call_spec_base_a78ebf16bfee40375e33a983f3100f354a57f312c5eacf22518ff0b12405cde4f1}{kNone}},}
+\DoxyCodeLine{00265\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_on_call_spec_base_a78ebf16bfee40375e33a983f3100f354a451699b0beaaabb325f8eaf1c65a071d}{kWith}},}
+\DoxyCodeLine{00266\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_on_call_spec_base_a78ebf16bfee40375e33a983f3100f354aeb25a21e1aa3dc4ca3a108b5533d7eed}{kWillByDefault}}}
+\DoxyCodeLine{00267\ \ \ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_untyped_on_call_spec_base_afc5da72d536ad61e2d66de87b2b9bc50}\index{testing::internal::UntypedOnCallSpecBase@{testing::internal::UntypedOnCallSpecBase}!UntypedOnCallSpecBase@{UntypedOnCallSpecBase}}
+\index{UntypedOnCallSpecBase@{UntypedOnCallSpecBase}!testing::internal::UntypedOnCallSpecBase@{testing::internal::UntypedOnCallSpecBase}}
+\doxysubsubsection{\texorpdfstring{UntypedOnCallSpecBase()}{UntypedOnCallSpecBase()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_untyped_on_call_spec_base_afc5da72d536ad61e2d66de87b2b9bc50} 
+testing\+::internal\+::\+Untyped\+On\+Call\+Spec\+Base\+::\+Untyped\+On\+Call\+Spec\+Base (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{a\+\_\+file}{, }\item[{int}]{a\+\_\+line}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00252}{252}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00253\ \ \ \ \ \ \ :\ \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_on_call_spec_base_adf4e6c5022dfeb482f5328e9bb58ba88}{file\_}}(a\_file),\ \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_on_call_spec_base_a1dfa0dafaae6697f17adf5d837ca77c7}{line\_}}(a\_line),\ \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_on_call_spec_base_adb6d19adfeb5fde535d854aedbc5fb0f}{last\_clause\_}}(\mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_on_call_spec_base_a78ebf16bfee40375e33a983f3100f354a57f312c5eacf22518ff0b12405cde4f1}{kNone}})\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_untyped_on_call_spec_base_a5ec302e0788e40775218ce17288c04f3}\index{testing::internal::UntypedOnCallSpecBase@{testing::internal::UntypedOnCallSpecBase}!AssertSpecProperty@{AssertSpecProperty}}
+\index{AssertSpecProperty@{AssertSpecProperty}!testing::internal::UntypedOnCallSpecBase@{testing::internal::UntypedOnCallSpecBase}}
+\doxysubsubsection{\texorpdfstring{AssertSpecProperty()}{AssertSpecProperty()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_untyped_on_call_spec_base_a5ec302e0788e40775218ce17288c04f3} 
+void testing\+::internal\+::\+Untyped\+On\+Call\+Spec\+Base\+::\+Assert\+Spec\+Property (\begin{DoxyParamCaption}\item[{bool}]{property}{, }\item[{const std\+::string \&}]{failure\+\_\+message}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00270}{270}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00271\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00272\ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a7a259643b7f2d23ce2b757728df42c99}{Assert}}(property,\ \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_on_call_spec_base_adf4e6c5022dfeb482f5328e9bb58ba88}{file\_}},\ \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_on_call_spec_base_a1dfa0dafaae6697f17adf5d837ca77c7}{line\_}},\ failure\_message);}
+\DoxyCodeLine{00273\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=333pt]{classtesting_1_1internal_1_1_untyped_on_call_spec_base_a5ec302e0788e40775218ce17288c04f3_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_untyped_on_call_spec_base_a31ccd62aaa82c640c451ac92b4a33086}\index{testing::internal::UntypedOnCallSpecBase@{testing::internal::UntypedOnCallSpecBase}!ExpectSpecProperty@{ExpectSpecProperty}}
+\index{ExpectSpecProperty@{ExpectSpecProperty}!testing::internal::UntypedOnCallSpecBase@{testing::internal::UntypedOnCallSpecBase}}
+\doxysubsubsection{\texorpdfstring{ExpectSpecProperty()}{ExpectSpecProperty()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_untyped_on_call_spec_base_a31ccd62aaa82c640c451ac92b4a33086} 
+void testing\+::internal\+::\+Untyped\+On\+Call\+Spec\+Base\+::\+Expect\+Spec\+Property (\begin{DoxyParamCaption}\item[{bool}]{property}{, }\item[{const std\+::string \&}]{failure\+\_\+message}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00276}{276}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00277\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00278\ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_ad93379317e10862a77b9fb90aa96e083}{Expect}}(property,\ \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_on_call_spec_base_adf4e6c5022dfeb482f5328e9bb58ba88}{file\_}},\ \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_on_call_spec_base_a1dfa0dafaae6697f17adf5d837ca77c7}{line\_}},\ failure\_message);}
+\DoxyCodeLine{00279\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=333pt]{classtesting_1_1internal_1_1_untyped_on_call_spec_base_a31ccd62aaa82c640c451ac92b4a33086_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_untyped_on_call_spec_base_a7f38a9661b49f992e744dfa446bf07e7}\index{testing::internal::UntypedOnCallSpecBase@{testing::internal::UntypedOnCallSpecBase}!file@{file}}
+\index{file@{file}!testing::internal::UntypedOnCallSpecBase@{testing::internal::UntypedOnCallSpecBase}}
+\doxysubsubsection{\texorpdfstring{file()}{file()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_untyped_on_call_spec_base_a7f38a9661b49f992e744dfa446bf07e7} 
+const char \texorpdfstring{$\ast$}{*} testing\+::internal\+::\+Untyped\+On\+Call\+Spec\+Base\+::file (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00256}{256}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00256\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_on_call_spec_base_adf4e6c5022dfeb482f5328e9bb58ba88}{file\_}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1internal_1_1_untyped_on_call_spec_base_a18e9eb7155380b3e124bccc0d8115b5e}\index{testing::internal::UntypedOnCallSpecBase@{testing::internal::UntypedOnCallSpecBase}!line@{line}}
+\index{line@{line}!testing::internal::UntypedOnCallSpecBase@{testing::internal::UntypedOnCallSpecBase}}
+\doxysubsubsection{\texorpdfstring{line()}{line()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_untyped_on_call_spec_base_a18e9eb7155380b3e124bccc0d8115b5e} 
+int testing\+::internal\+::\+Untyped\+On\+Call\+Spec\+Base\+::line (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00257}{257}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00257\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_on_call_spec_base_a1dfa0dafaae6697f17adf5d837ca77c7}{line\_}};\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_untyped_on_call_spec_base_a18e9eb7155380b3e124bccc0d8115b5e_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_untyped_on_call_spec_base_adf4e6c5022dfeb482f5328e9bb58ba88}\index{testing::internal::UntypedOnCallSpecBase@{testing::internal::UntypedOnCallSpecBase}!file\_@{file\_}}
+\index{file\_@{file\_}!testing::internal::UntypedOnCallSpecBase@{testing::internal::UntypedOnCallSpecBase}}
+\doxysubsubsection{\texorpdfstring{file\_}{file\_}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_untyped_on_call_spec_base_adf4e6c5022dfeb482f5328e9bb58ba88} 
+const char\texorpdfstring{$\ast$}{*} testing\+::internal\+::\+Untyped\+On\+Call\+Spec\+Base\+::file\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00281}{281}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+\Hypertarget{classtesting_1_1internal_1_1_untyped_on_call_spec_base_adb6d19adfeb5fde535d854aedbc5fb0f}\index{testing::internal::UntypedOnCallSpecBase@{testing::internal::UntypedOnCallSpecBase}!last\_clause\_@{last\_clause\_}}
+\index{last\_clause\_@{last\_clause\_}!testing::internal::UntypedOnCallSpecBase@{testing::internal::UntypedOnCallSpecBase}}
+\doxysubsubsection{\texorpdfstring{last\_clause\_}{last\_clause\_}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_untyped_on_call_spec_base_adb6d19adfeb5fde535d854aedbc5fb0f} 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_on_call_spec_base_a78ebf16bfee40375e33a983f3100f354}{Clause}} testing\+::internal\+::\+Untyped\+On\+Call\+Spec\+Base\+::last\+\_\+clause\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00286}{286}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+\Hypertarget{classtesting_1_1internal_1_1_untyped_on_call_spec_base_a1dfa0dafaae6697f17adf5d837ca77c7}\index{testing::internal::UntypedOnCallSpecBase@{testing::internal::UntypedOnCallSpecBase}!line\_@{line\_}}
+\index{line\_@{line\_}!testing::internal::UntypedOnCallSpecBase@{testing::internal::UntypedOnCallSpecBase}}
+\doxysubsubsection{\texorpdfstring{line\_}{line\_}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_untyped_on_call_spec_base_a1dfa0dafaae6697f17adf5d837ca77c7} 
+int testing\+::internal\+::\+Untyped\+On\+Call\+Spec\+Base\+::line\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00282}{282}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/include/gmock/\mbox{\hyperlink{gmock-spec-builders_8h}{gmock-\/spec-\/builders.\+h}}\end{DoxyCompactItemize}

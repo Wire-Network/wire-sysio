@@ -1,0 +1,107 @@
+\doxysection{update\+Wandbox Namespace Reference}
+\hypertarget{namespaceupdate_wandbox}{}\label{namespaceupdate_wandbox}\index{updateWandbox@{updateWandbox}}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespaceupdate_wandbox_ad97a15c46266f14244df412881f84b72}{upload}} (options)
+\item 
+\mbox{\hyperlink{namespaceupdate_wandbox_aafd943f4137e2dc29b9d22e4fe8f5f05}{upload\+Files}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+str \mbox{\hyperlink{namespaceupdate_wandbox_a8daaaa80d4f4a621979c69993d134a19}{main\+\_\+file}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespaceupdate_wandbox_ad97a15c46266f14244df412881f84b72}\index{updateWandbox@{updateWandbox}!upload@{upload}}
+\index{upload@{upload}!updateWandbox@{updateWandbox}}
+\doxysubsubsection{\texorpdfstring{upload()}{upload()}}
+{\footnotesize\ttfamily \label{namespaceupdate_wandbox_ad97a15c46266f14244df412881f84b72} 
+update\+Wandbox.\+upload (\begin{DoxyParamCaption}\item[{}]{options}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{update_wandbox_8py_source_l00009}{9}} of file \mbox{\hyperlink{update_wandbox_8py_source}{update\+Wandbox.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00009\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespaceupload}{upload}}(options):}
+\DoxyCodeLine{00010\ \ \ \ \ request\ =\ urllib2.Request(\textcolor{stringliteral}{'http://melpon.org/wandbox/api/compile.json'})}
+\DoxyCodeLine{00011\ \ \ \ \ request.add\_header(\textcolor{stringliteral}{'Content-\/Type'},\ \textcolor{stringliteral}{'application/json'})}
+\DoxyCodeLine{00012\ \ \ \ \ response\ =\ urllib2.urlopen(request,\ json.dumps(options))}
+\DoxyCodeLine{00013\ \ \ \ \ \textcolor{keywordflow}{return}\ json.loads(response.read())}
+\DoxyCodeLine{00014\ }
+
+\end{DoxyCode}
+\Hypertarget{namespaceupdate_wandbox_aafd943f4137e2dc29b9d22e4fe8f5f05}\index{updateWandbox@{updateWandbox}!uploadFiles@{uploadFiles}}
+\index{uploadFiles@{uploadFiles}!updateWandbox@{updateWandbox}}
+\doxysubsubsection{\texorpdfstring{uploadFiles()}{uploadFiles()}}
+{\footnotesize\ttfamily \label{namespaceupdate_wandbox_aafd943f4137e2dc29b9d22e4fe8f5f05} 
+update\+Wandbox.\+upload\+Files (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{update_wandbox_8py_source_l00031}{31}} of file \mbox{\hyperlink{update_wandbox_8py_source}{update\+Wandbox.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00031\ \textcolor{keyword}{def\ }uploadFiles():}
+\DoxyCodeLine{00032\ \ \ \ \ response\ =\ \mbox{\hyperlink{namespaceupload}{upload}}(\{}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'compiler'}:\ \textcolor{stringliteral}{'gcc-\/head'},}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'code'}:\ main\_file,}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'codes'}:\ [\{}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'file'}:\ \textcolor{stringliteral}{'catch.hpp'},}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'code'}:\ open(os.path.join(catchPath,\ \textcolor{stringliteral}{'single\_include'},\ \textcolor{stringliteral}{'catch2'},\ \textcolor{stringliteral}{'catch.hpp'})).read()}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \}],}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'options'}:\ \textcolor{stringliteral}{'c++11,cpp-\/no-\/pedantic,boost-\/nothing'},}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'compiler-\/option-\/raw'}:\ \textcolor{stringliteral}{'-\/DCATCH\_CONFIG\_FAST\_COMPILE'},}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'save'}:\ \textcolor{keyword}{True}}
+\DoxyCodeLine{00042\ \ \ \ \ \})}
+\DoxyCodeLine{00043\ }
+\DoxyCodeLine{00044\ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{stringliteral}{'status'}\ \textcolor{keywordflow}{in}\ response\ \textcolor{keywordflow}{and}\ \textcolor{stringliteral}{'compiler\_error'}\ \textcolor{keywordflow}{not}\ \textcolor{keywordflow}{in}\ response:}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{True},\ response[\textcolor{stringliteral}{'url'}]}
+\DoxyCodeLine{00046\ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{False},\ response}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespaceupdate_wandbox_aafd943f4137e2dc29b9d22e4fe8f5f05_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{namespaceupdate_wandbox_a8daaaa80d4f4a621979c69993d134a19}\index{updateWandbox@{updateWandbox}!main\_file@{main\_file}}
+\index{main\_file@{main\_file}!updateWandbox@{updateWandbox}}
+\doxysubsubsection{\texorpdfstring{main\_file}{main\_file}}
+{\footnotesize\ttfamily \label{namespaceupdate_wandbox_a8daaaa80d4f4a621979c69993d134a19} 
+str update\+Wandbox.\+main\+\_\+file}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ =\ \ \textcolor{stringliteral}{'''}}
+\DoxyCodeLine{00002\ \textcolor{stringliteral}{\#define\ CATCH\_CONFIG\_MAIN\ \ //\ This\ tells\ Catch\ to\ provide\ a\ main()\ -\/\ only\ do\ this\ in\ one\ cpp\ file}}
+\DoxyCodeLine{00003\ \textcolor{stringliteral}{\#include\ "{}catch.hpp"{}}}
+\DoxyCodeLine{00004\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00005\ \textcolor{stringliteral}{unsigned\ int\ Factorial(\ unsigned\ int\ number\ )\ \{}}
+\DoxyCodeLine{00006\ \textcolor{stringliteral}{\ \ \ \ return\ number\ <=\ 1\ ?\ number\ :\ Factorial(number-\/1)*number;}}
+\DoxyCodeLine{00007\ \textcolor{stringliteral}{\}}}
+\DoxyCodeLine{00008\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00009\ \textcolor{stringliteral}{TEST\_CASE(\ "{}Factorials\ are\ computed"{},\ "{}[factorial]"{}\ )\ \{}}
+\DoxyCodeLine{00010\ \textcolor{stringliteral}{\ \ \ \ REQUIRE(\ Factorial(1)\ ==\ 1\ );}}
+\DoxyCodeLine{00011\ \textcolor{stringliteral}{\ \ \ \ REQUIRE(\ Factorial(2)\ ==\ 2\ );}}
+\DoxyCodeLine{00012\ \textcolor{stringliteral}{\ \ \ \ REQUIRE(\ Factorial(3)\ ==\ 6\ );}}
+\DoxyCodeLine{00013\ \textcolor{stringliteral}{\ \ \ \ REQUIRE(\ Factorial(10)\ ==\ 3628800\ );}}
+\DoxyCodeLine{00014\ \textcolor{stringliteral}{\}}}
+\DoxyCodeLine{00015\ \textcolor{stringliteral}{'''}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{update_wandbox_8py_source_l00015}{15}} of file \mbox{\hyperlink{update_wandbox_8py_source}{update\+Wandbox.\+py}}.
+

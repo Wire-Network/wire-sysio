@@ -1,0 +1,7 @@
+<map id="sysio::chain_apis::account_query_db::get_accounts_by_authorizers_params::permission_level" name="sysio::chain_apis::account_query_db::get_accounts_by_authorizers_params::permission_level">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,199,182,270"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1permission__level.html" title=" " alt="" coords="12,109,175,150"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="96,165,96,199,91,199,91,165"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1chain_1_1name.html" title="Immutable except for fc::from_variant." alt="" coords="28,5,159,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="96,47,96,109,91,109,91,47"/>
+</map>

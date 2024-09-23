@@ -1,0 +1,80 @@
+\doxysection{appbase\+::drop\+\_\+exceptions Struct Reference}
+\hypertarget{structappbase_1_1drop__exceptions}{}\label{structappbase_1_1drop__exceptions}\index{appbase::drop\_exceptions@{appbase::drop\_exceptions}}
+
+
+{\ttfamily \#include $<$channel.\+hpp$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{structappbase_1_1drop__exceptions_a6554c981395a5ec01d56ade306a1f153}{result\+\_\+type}} = void
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structappbase_1_1drop__exceptions_ac34b2d6c56912836f817b8d8f1971e54}{drop\+\_\+exceptions}} ()=default
+\item 
+{\footnotesize template$<$typename Input\+Iterator $>$ }\\\mbox{\hyperlink{structappbase_1_1drop__exceptions_a6554c981395a5ec01d56ade306a1f153}{result\+\_\+type}} \mbox{\hyperlink{structappbase_1_1drop__exceptions_a22925e1ace190d37a35bebcdfd573288}{operator()}} (Input\+Iterator first, Input\+Iterator last)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\doxylink{struct_a}{A} basic Dispatch\+Policy that will catch and drop any exceptions thrown during the dispatch of messages on a channel 
+
+Definition at line \mbox{\hyperlink{channel_8hpp_source_l00019}{19}} of file \mbox{\hyperlink{channel_8hpp_source}{channel.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{structappbase_1_1drop__exceptions_a6554c981395a5ec01d56ade306a1f153}\index{appbase::drop\_exceptions@{appbase::drop\_exceptions}!result\_type@{result\_type}}
+\index{result\_type@{result\_type}!appbase::drop\_exceptions@{appbase::drop\_exceptions}}
+\doxysubsubsection{\texorpdfstring{result\_type}{result\_type}}
+{\footnotesize\ttfamily \label{structappbase_1_1drop__exceptions_a6554c981395a5ec01d56ade306a1f153} 
+using \mbox{\hyperlink{structappbase_1_1drop__exceptions_a6554c981395a5ec01d56ade306a1f153}{appbase\+::drop\+\_\+exceptions\+::result\+\_\+type}} = void}
+
+
+
+Definition at line \mbox{\hyperlink{channel_8hpp_source_l00021}{21}} of file \mbox{\hyperlink{channel_8hpp_source}{channel.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structappbase_1_1drop__exceptions_ac34b2d6c56912836f817b8d8f1971e54}\index{appbase::drop\_exceptions@{appbase::drop\_exceptions}!drop\_exceptions@{drop\_exceptions}}
+\index{drop\_exceptions@{drop\_exceptions}!appbase::drop\_exceptions@{appbase::drop\_exceptions}}
+\doxysubsubsection{\texorpdfstring{drop\_exceptions()}{drop\_exceptions()}}
+{\footnotesize\ttfamily \label{structappbase_1_1drop__exceptions_ac34b2d6c56912836f817b8d8f1971e54} 
+appbase\+::drop\+\_\+exceptions\+::drop\+\_\+exceptions (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [default]}}
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structappbase_1_1drop__exceptions_a22925e1ace190d37a35bebcdfd573288}\index{appbase::drop\_exceptions@{appbase::drop\_exceptions}!operator()@{operator()}}
+\index{operator()@{operator()}!appbase::drop\_exceptions@{appbase::drop\_exceptions}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}}
+{\footnotesize\ttfamily \label{structappbase_1_1drop__exceptions_a22925e1ace190d37a35bebcdfd573288} 
+template$<$typename Input\+Iterator $>$ \\
+\mbox{\hyperlink{structappbase_1_1drop__exceptions_a6554c981395a5ec01d56ade306a1f153}{result\+\_\+type}} appbase\+::drop\+\_\+exceptions\+::operator() (\begin{DoxyParamCaption}\item[{Input\+Iterator}]{first}{, }\item[{Input\+Iterator}]{last}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{channel_8hpp_source_l00024}{24}} of file \mbox{\hyperlink{channel_8hpp_source}{channel.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (first\ !=\ last)\ \{}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *first;}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ drop}}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \ \ \ ++first;}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/appbase/include/appbase/\mbox{\hyperlink{channel_8hpp}{channel.\+hpp}}\end{DoxyCompactItemize}

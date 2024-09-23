@@ -1,0 +1,13 @@
+<map id="sysio::state_history_plugin::plugin_initialize" name="sysio::state_history_plugin::plugin_initialize">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,96,164,137"/>
+<area shape="rect" id="Node000002" href="$namespaceappbase.html#a99374dc23934f008a09f2f79be9eae40" title=" " alt="" coords="232,13,332,38"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="122,93,211,49,226,42,228,47,213,53,124,98"/>
+<area shape="rect" id="Node000004" href="$classappbase_1_1application.html#a5dfd3cfb1124c57963fa17b3f4aabbe1" title="Get data directory." alt="" coords="212,63,352,103"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="163,100,196,95,197,100,164,106"/>
+<area shape="rect" id="Node000005" href="$classappbase_1_1application.html#a1d2c585f90007be342c9c64ee9cc0f7c" title=" " alt="" coords="212,128,352,169"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="164,127,197,132,196,137,163,132"/>
+<area shape="rect" id="Node000006" href="$programs_2sysio-launcher_2main_8cpp.html#a8d747b8417c90b78c386111de7934753" title=" " alt="" coords="259,193,305,218"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="125,135,213,178,245,191,243,196,211,183,123,140"/>
+<area shape="rect" id="Node000003" href="$classappbase_1_1application.html#ac874b2659b400fe254f1ae4260d06ecf" title=" " alt="" coords="400,5,540,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="332,23,384,23,384,28,332,28"/>
+</map>

@@ -1,0 +1,13 @@
+<map id="websocketpp::exception::what" name="websocketpp::exception::what">
+<area shape="rect" id="Node000001" title=" " alt="" coords="347,72,509,113"/>
+<area shape="rect" id="Node000002" href="$error_8cpp.html#a1e877f3c5b3112d62902a23e6c054c38" title=" " alt="" coords="103,5,299,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="364,69,298,45,261,34,263,29,300,40,366,64"/>
+<area shape="rect" id="Node000003" href="$broadcast__server_8cpp.html#ae66f6b31b5ad750f1fe042a706a4e3d4" title=" " alt="" coords="176,55,226,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="331,85,226,73,226,68,331,79"/>
+<area shape="rect" id="Node000004" href="$echo__client_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97" title=" " alt="" coords="176,104,226,130"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="331,106,226,117,226,112,331,100"/>
+<area shape="rect" id="Node000005" href="$classtelemetry__server.html#a8c09eba40e8993079859e9f1974254ab" title=" " alt="" coords="129,153,273,179"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="364,122,300,145,262,155,261,150,298,140,362,117"/>
+<area shape="rect" id="Node000006" href="$telemetry__server_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97" title=" " alt="" coords="5,153,55,179"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="113,169,55,169,55,164,113,164"/>
+</map>

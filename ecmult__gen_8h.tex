@@ -1,0 +1,63 @@
+\doxysection{libraries/fc/secp256k1/secp256k1/src/ecmult\+\_\+gen.h File Reference}
+\hypertarget{ecmult__gen_8h}{}\label{ecmult__gen_8h}\index{libraries/fc/secp256k1/secp256k1/src/ecmult\_gen.h@{libraries/fc/secp256k1/secp256k1/src/ecmult\_gen.h}}
+{\ttfamily \#include "{}scalar.\+h"{}}\newline
+{\ttfamily \#include "{}group.\+h"{}}\newline
+Include dependency graph for ecmult\+\_\+gen.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{ecmult__gen_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{ecmult__gen_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsecp256k1__ecmult__gen__context}{secp256k1\+\_\+ecmult\+\_\+gen\+\_\+context}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{ecmult__gen_8h_a1019fca261221b07435dd45c33bae38f}{ECMULT\+\_\+\+GEN\+\_\+\+PREC\+\_\+G}}(bits)
+\item 
+\#define \mbox{\hyperlink{ecmult__gen_8h_af7eb6942e607b19354d5466fcc52909f}{ECMULT\+\_\+\+GEN\+\_\+\+PREC\+\_\+N}}(bits)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{ecmult__gen_8h_a1019fca261221b07435dd45c33bae38f}\index{ecmult\_gen.h@{ecmult\_gen.h}!ECMULT\_GEN\_PREC\_G@{ECMULT\_GEN\_PREC\_G}}
+\index{ECMULT\_GEN\_PREC\_G@{ECMULT\_GEN\_PREC\_G}!ecmult\_gen.h@{ecmult\_gen.h}}
+\doxysubsubsection{\texorpdfstring{ECMULT\_GEN\_PREC\_G}{ECMULT\_GEN\_PREC\_G}}
+{\footnotesize\ttfamily \label{ecmult__gen_8h_a1019fca261221b07435dd45c33bae38f} 
+\#define ECMULT\+\_\+\+GEN\+\_\+\+PREC\+\_\+G(\begin{DoxyParamCaption}\item[{}]{bits}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(1\ <<\ bits)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{ecmult__gen_8h_source_l00016}{16}} of file \mbox{\hyperlink{ecmult__gen_8h_source}{ecmult\+\_\+gen.\+h}}.
+
+\Hypertarget{ecmult__gen_8h_af7eb6942e607b19354d5466fcc52909f}\index{ecmult\_gen.h@{ecmult\_gen.h}!ECMULT\_GEN\_PREC\_N@{ECMULT\_GEN\_PREC\_N}}
+\index{ECMULT\_GEN\_PREC\_N@{ECMULT\_GEN\_PREC\_N}!ecmult\_gen.h@{ecmult\_gen.h}}
+\doxysubsubsection{\texorpdfstring{ECMULT\_GEN\_PREC\_N}{ECMULT\_GEN\_PREC\_N}}
+{\footnotesize\ttfamily \label{ecmult__gen_8h_af7eb6942e607b19354d5466fcc52909f} 
+\#define ECMULT\+\_\+\+GEN\+\_\+\+PREC\+\_\+N(\begin{DoxyParamCaption}\item[{}]{bits}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(256\ /\ bits)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{ecmult__gen_8h_source_l00017}{17}} of file \mbox{\hyperlink{ecmult__gen_8h_source}{ecmult\+\_\+gen.\+h}}.
+

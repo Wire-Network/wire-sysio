@@ -1,0 +1,27 @@
+var snapshot_8hpp =
+[
+    [ "sysio::chain::detail::snapshot_section_traits< T >", "structsysio_1_1chain_1_1detail_1_1snapshot__section__traits.html", null ],
+    [ "sysio::chain::detail::snapshot_row_traits< T >", "structsysio_1_1chain_1_1detail_1_1snapshot__row__traits.html", "structsysio_1_1chain_1_1detail_1_1snapshot__row__traits" ],
+    [ "sysio::chain::detail::ostream_wrapper", "structsysio_1_1chain_1_1detail_1_1ostream__wrapper.html", "structsysio_1_1chain_1_1detail_1_1ostream__wrapper" ],
+    [ "sysio::chain::detail::abstract_snapshot_row_writer", "structsysio_1_1chain_1_1detail_1_1abstract__snapshot__row__writer.html", "structsysio_1_1chain_1_1detail_1_1abstract__snapshot__row__writer" ],
+    [ "sysio::chain::detail::snapshot_row_writer< T >", "structsysio_1_1chain_1_1detail_1_1snapshot__row__writer.html", "structsysio_1_1chain_1_1detail_1_1snapshot__row__writer" ],
+    [ "sysio::chain::snapshot_writer", "classsysio_1_1chain_1_1snapshot__writer.html", "classsysio_1_1chain_1_1snapshot__writer" ],
+    [ "sysio::chain::snapshot_writer::section_writer", "classsysio_1_1chain_1_1snapshot__writer_1_1section__writer.html", "classsysio_1_1chain_1_1snapshot__writer_1_1section__writer" ],
+    [ "sysio::chain::detail::abstract_snapshot_row_reader", "structsysio_1_1chain_1_1detail_1_1abstract__snapshot__row__reader.html", "structsysio_1_1chain_1_1detail_1_1abstract__snapshot__row__reader" ],
+    [ "sysio::chain::detail::is_chainbase_object< T >", "structsysio_1_1chain_1_1detail_1_1is__chainbase__object.html", null ],
+    [ "sysio::chain::detail::is_chainbase_object< chainbase::object< TypeNumber, Derived > >", "structsysio_1_1chain_1_1detail_1_1is__chainbase__object_3_01chainbase_1_1object_3_01_type_number_00_01_derived_01_4_01_4.html", null ],
+    [ "sysio::chain::detail::row_validation_helper", "structsysio_1_1chain_1_1detail_1_1row__validation__helper.html", null ],
+    [ "sysio::chain::detail::snapshot_row_reader< T >", "structsysio_1_1chain_1_1detail_1_1snapshot__row__reader.html", "structsysio_1_1chain_1_1detail_1_1snapshot__row__reader" ],
+    [ "sysio::chain::snapshot_reader", "classsysio_1_1chain_1_1snapshot__reader.html", "classsysio_1_1chain_1_1snapshot__reader" ],
+    [ "sysio::chain::snapshot_reader::section_reader", "classsysio_1_1chain_1_1snapshot__reader_1_1section__reader.html", "classsysio_1_1chain_1_1snapshot__reader_1_1section__reader" ],
+    [ "sysio::chain::variant_snapshot_writer", "classsysio_1_1chain_1_1variant__snapshot__writer.html", "classsysio_1_1chain_1_1variant__snapshot__writer" ],
+    [ "sysio::chain::variant_snapshot_reader", "classsysio_1_1chain_1_1variant__snapshot__reader.html", "classsysio_1_1chain_1_1variant__snapshot__reader" ],
+    [ "sysio::chain::ostream_snapshot_writer", "classsysio_1_1chain_1_1ostream__snapshot__writer.html", "classsysio_1_1chain_1_1ostream__snapshot__writer" ],
+    [ "sysio::chain::istream_snapshot_reader", "classsysio_1_1chain_1_1istream__snapshot__reader.html", "classsysio_1_1chain_1_1istream__snapshot__reader" ],
+    [ "sysio::chain::integrity_hash_snapshot_writer", "classsysio_1_1chain_1_1integrity__hash__snapshot__writer.html", "classsysio_1_1chain_1_1integrity__hash__snapshot__writer" ],
+    [ "snapshot_reader_ptr", "snapshot_8hpp.html#aaa27dacddc54cea475602788c8e7a02c", null ],
+    [ "snapshot_writer_ptr", "snapshot_8hpp.html#a80afaa06d96e661a0f93e0ba4b09c8dc", null ],
+    [ "make_row_reader", "snapshot_8hpp.html#a8b5dfe28805042524d57a8026700c394", null ],
+    [ "make_row_writer", "snapshot_8hpp.html#ad0835394419cdd13978fe88bf675870b", null ],
+    [ "is_chainbase_object_v", "snapshot_8hpp.html#aeacbb82e9d5a415b547019a1d61052b5", null ]
+];

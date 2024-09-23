@@ -1,0 +1,114 @@
+\doxysection{tracked\+\_\+storage.\+hpp}
+\hypertarget{tracked__storage_8hpp_source}{}\label{tracked__storage_8hpp_source}\index{libraries/fc/include/fc/container/tracked\_storage.hpp@{libraries/fc/include/fc/container/tracked\_storage.hpp}}
+\mbox{\hyperlink{tracked__storage_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{exception_8hpp}{fc/exception/exception.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{cfile_8hpp}{fc/io/cfile.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{datastream_8hpp}{fc/io/datastream.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{fstream_8hpp}{fc/io/fstream.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{raw_8hpp}{fc/io/raw.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <fstream>}}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00009}00009\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}\ \{}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00014}\mbox{\hyperlink{namespacefc_1_1tracked}{00014}}\ \ \ \ \textcolor{keyword}{namespace\ }tracked\ \{}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00015}00015\ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00016}\mbox{\hyperlink{namespacefc_1_1tracked_a7a874ea77f5afa2de8f3d5fb6d19a241}{00016}}\ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{namespacefc_1_1tracked_a7a874ea77f5afa2de8f3d5fb6d19a241}{memory\_size}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ obj\ )\ \{}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00017}00017\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ obj.memory\_size();}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00018}00018\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00019}00019\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00034}00034\ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ ContainerType>}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00035}\mbox{\hyperlink{classfc_1_1tracked__storage}{00035}}\ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classfc_1_1tracked__storage}{tracked\_storage}}\ \{}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00036}00036\ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00037}00037\ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \_memory\_size\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00038}00038\ \ \ \ \ \ \ ContainerType\ \_index;}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00039}00039\ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00040}\mbox{\hyperlink{classfc_1_1tracked__storage_a39342cd3dcb5251e92d8e8773f4be99e}{00040}}\ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{typename}\ ContainerType::template\ nth\_index<0>::type\ \mbox{\hyperlink{classfc_1_1tracked__storage_a39342cd3dcb5251e92d8e8773f4be99e}{primary\_index\_type}};}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00042}\mbox{\hyperlink{classfc_1_1tracked__storage_a1a66733ba4007eb1f6ed793fd5fb8bc0}{00042}}\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1tracked__storage_a1a66733ba4007eb1f6ed793fd5fb8bc0}{tracked\_storage}}()\ =\ \textcolor{keywordflow}{default};}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00044}00044\ \ \ \ \ \ \ \textcolor{comment}{//\ read\ in\ the\ contents\ of\ a\ persisted\ tracked\_storage\ and\ prevent\ reading\ in}}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00045}00045\ \ \ \ \ \ \ \textcolor{comment}{//\ more\ stored\ objects\ once\ max\_memory\ is\ reached.}}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00046}00046\ \ \ \ \ \ \ \textcolor{comment}{//\ returns\ true\ if\ entire\ persisted\ tracked\_storage\ was\ read}}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00047}\mbox{\hyperlink{classfc_1_1tracked__storage_ab9a0d44de1cddf62794cacf82c0d92e4}{00047}}\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classfc_1_1tracked__storage_ab9a0d44de1cddf62794cacf82c0d92e4}{read}}(\mbox{\hyperlink{classfc_1_1cfile__datastream}{fc::cfile\_datastream}}\&\ ds,\ \textcolor{keywordtype}{size\_t}\ max\_memory)\ \{}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ container\_size\ =\ \_index.size();}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a0b442d98ceb22dd5a6ae84745e43ffab}{fc::raw::unpack}}(ds,\ container\_size);}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00050}00050\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ container\_size;\ ++i)\ \{}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00051}00051\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classfc_1_1tracked__storage_a5bd678ec2e09568df574c8ecaa184962}{memory\_size}}()\ >=\ max\_memory)\ \{}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typename}\ ContainerType::value\_type\ v;}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a0b442d98ceb22dd5a6ae84745e43ffab}{fc::raw::unpack}}(ds,\ v);}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1tracked__storage_a6d24a6bf4512b48a846d88a1bf44b5b8}{insert}}(std::move(v));}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00059}00059\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00060}00060\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00062}\mbox{\hyperlink{classfc_1_1tracked__storage_ae0443e061d47c3862e61e13a5aead400}{00062}}\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1tracked__storage_ae0443e061d47c3862e61e13a5aead400}{write}}(\mbox{\hyperlink{classfc_1_1cfile}{fc::cfile}}\&\ dat\_content)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ container\_size\ =\ \_index.size();}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00064}00064\ \ \ \ \ \ \ \ \ \ dat\_content.\mbox{\hyperlink{classfc_1_1cfile_af6ad44b8179f355db75a9d01de931235}{write}}(\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(\&container\_size),\ \textcolor{keyword}{sizeof}(container\_size)\ );}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00065}00065\ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00066}00066\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ item\ :\ \_index)\ \{}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00067}00067\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ data\ =\ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(item);}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \ \ \ dat\_content.\mbox{\hyperlink{classfc_1_1cfile_af6ad44b8179f355db75a9d01de931235}{write}}(data.data(),\ data.size());}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00070}00070\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00072}\mbox{\hyperlink{classfc_1_1tracked__storage_a6d24a6bf4512b48a846d88a1bf44b5b8}{00072}}\ \ \ \ \ \ \ std::pair<typename\ primary\_index\_type::iterator,\ bool>\ \mbox{\hyperlink{classfc_1_1tracked__storage_a6d24a6bf4512b48a846d88a1bf44b5b8}{insert}}(\textcolor{keyword}{typename}\ ContainerType::value\_type\ obj)\ \{}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00073}00073\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ size\ =\ \mbox{\hyperlink{namespacefc_1_1tracked_a7a874ea77f5afa2de8f3d5fb6d19a241}{tracked::memory\_size}}(obj);}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00074}00074\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ result\ =\ \_index.insert(std::move(obj));}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00075}00075\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (result.second)\ \{}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \ \ \ \_memory\_size\ +=\ size;}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00078}00078\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00079}00079\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00080}00080\ }
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00081}00081\ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ Key>}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00082}\mbox{\hyperlink{classfc_1_1tracked__storage_adc1778619d5a0ef17222e82bfce775e8}{00082}}\ \ \ \ \ \ \ \textcolor{keyword}{typename}\ primary\_index\_type::iterator\ \mbox{\hyperlink{classfc_1_1tracked__storage_adc1778619d5a0ef17222e82bfce775e8}{find}}(\textcolor{keyword}{const}\ Key\&\ key)\ \{}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00083}00083\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1tracked__storage_a39342cd3dcb5251e92d8e8773f4be99e}{primary\_index\_type}}\&\ primary\_idx\ =\ \_index.template\ get<0>();}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00084}00084\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ primary\_idx.find(key);}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00085}00085\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00086}00086\ }
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00087}00087\ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ Key>}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00088}\mbox{\hyperlink{classfc_1_1tracked__storage_ae49462bfd832c24b2407c3f31fb10620}{00088}}\ \ \ \ \ \ \ \textcolor{keyword}{typename}\ primary\_index\_type::const\_iterator\ \mbox{\hyperlink{classfc_1_1tracked__storage_ae49462bfd832c24b2407c3f31fb10620}{find}}(\textcolor{keyword}{const}\ Key\&\ key)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00089}00089\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1tracked__storage_a39342cd3dcb5251e92d8e8773f4be99e}{primary\_index\_type}}\&\ primary\_idx\ =\ \_index.template\ get<0>();}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00090}00090\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ primary\_idx.find(key);}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00091}00091\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00092}00092\ }
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00093}00093\ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ Lam>}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00094}\mbox{\hyperlink{classfc_1_1tracked__storage_a857cf0f6d4ca31111b633b9d4c923ffe}{00094}}\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1tracked__storage_a857cf0f6d4ca31111b633b9d4c923ffe}{modify}}(\textcolor{keyword}{typename}\ primary\_index\_type::iterator\ itr,\ Lam\ lam)\ \{}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00095}00095\ \ \ \ \ \ \ \ \ \ \_memory\_size\ -\/=\ \mbox{\hyperlink{namespacefc_1_1tracked_a7a874ea77f5afa2de8f3d5fb6d19a241}{tracked::memory\_size}}(*itr);}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00096}00096\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\_index.modify(\ itr,\ std::move(lam)))\ \{}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00097}00097\ \ \ \ \ \ \ \ \ \ \ \ \ \_memory\_size\ +=\ \mbox{\hyperlink{namespacefc_1_1tracked_a7a874ea77f5afa2de8f3d5fb6d19a241}{tracked::memory\_size}}(*itr);}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00098}00098\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00099}00099\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00100}00100\ }
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00101}00101\ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ Key>}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00102}\mbox{\hyperlink{classfc_1_1tracked__storage_a51396073d7aa4bd1a431e318f5557924}{00102}}\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1tracked__storage_a51396073d7aa4bd1a431e318f5557924}{erase}}(\textcolor{keyword}{const}\ Key\&\ key)\ \{}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00103}00103\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ \_index.find(key);}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00104}00104\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (itr\ ==\ \_index.end())}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00105}00105\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00106}00106\ }
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00107}00107\ \ \ \ \ \ \ \ \ \ \_memory\_size\ -\/=\ \mbox{\hyperlink{namespacefc_1_1tracked_a7a874ea77f5afa2de8f3d5fb6d19a241}{tracked::memory\_size}}(*itr);}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00108}00108\ \ \ \ \ \ \ \ \ \ \_index.erase(itr);}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00109}00109\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00110}00110\ }
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00111}\mbox{\hyperlink{classfc_1_1tracked__storage_ac6ca9f9dedda856ea1b1b9ee40d522a3}{00111}}\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1tracked__storage_ac6ca9f9dedda856ea1b1b9ee40d522a3}{erase}}(\textcolor{keyword}{typename}\ primary\_index\_type::iterator\ itr)\ \{}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00112}00112\ \ \ \ \ \ \ \ \ \ \_memory\_size\ -\/=\ \mbox{\hyperlink{namespacefc_1_1tracked_a7a874ea77f5afa2de8f3d5fb6d19a241}{tracked::memory\_size}}(*itr);}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00113}00113\ \ \ \ \ \ \ \ \ \ \_index.erase(itr);}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00114}00114\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00115}00115\ }
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00116}\mbox{\hyperlink{classfc_1_1tracked__storage_a5bd678ec2e09568df574c8ecaa184962}{00116}}\ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classfc_1_1tracked__storage_a5bd678ec2e09568df574c8ecaa184962}{memory\_size}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00117}00117\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \_memory\_size;}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00118}00118\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00119}00119\ }
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00120}\mbox{\hyperlink{classfc_1_1tracked__storage_ab578f3765c80c8cee1d758d440c99e90}{00120}}\ \ \ \ \ \ \ \textcolor{keyword}{const}\ ContainerType\&\ \mbox{\hyperlink{classfc_1_1tracked__storage_ab578f3765c80c8cee1d758d440c99e90}{index}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00121}00121\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \_index;}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00122}00122\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00123}00123\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{tracked__storage_8hpp_source_l00124}00124\ \}}
+
+\end{DoxyCode}

@@ -1,0 +1,114 @@
+\doxysection{fc\+::variant\+\_\+stream Class Reference}
+\hypertarget{classfc_1_1variant__stream}{}\label{classfc_1_1variant__stream}\index{fc::variant\_stream@{fc::variant\_stream}}
+
+
+{\ttfamily \#include $<$variant\+\_\+stream.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1variant__stream_addb34b5a7761e521b06adcc909d1e07c}{variant\+\_\+stream}} (size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\item 
+\mbox{\hyperlink{classfc_1_1variant__stream_aaa8ed0e91af5e2858e5b99df882ac973}{\texorpdfstring{$\sim$}{\string~}variant\+\_\+stream}} ()
+\item 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{classfc_1_1variant__stream_a27edce830ba6ed70ed293096be85495b}{free}} ()
+\item 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{classfc_1_1variant__stream_a51044a413bcf7e74cdb287947a6871cb}{claim}} (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} num)
+\item 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{classfc_1_1variant__stream_a8e590de1bbe36cd4899e1be2a2919244}{publish}} (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} pos)
+\item 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{classfc_1_1variant__stream_a0b3239fe3a02325ed1a656242185d957}{wait\+\_\+free}} ()
+\item 
+\mbox{\hyperlink{classfc_1_1variant}{variant}} \& \mbox{\hyperlink{classfc_1_1variant__stream_a954d8b99fb4febe46cac7f60b95bd1b4}{get}} (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} pos)
+\item 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{classfc_1_1variant__stream_a8a0ba29c9ff02e5eacbbf7cdc838031a}{begin}} ()
+\item 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{classfc_1_1variant__stream_a8ef5eb832531813e0ef7860da128d458}{end}} ()
+\item 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{classfc_1_1variant__stream_ab540ce964d2a642c0d193b04d7862e16}{wait}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Thread-\/safe, circular buffer for passing variants between threads. 
+
+Definition at line \mbox{\hyperlink{variant__stream_8hpp_source_l00010}{10}} of file \mbox{\hyperlink{variant__stream_8hpp_source}{variant\+\_\+stream.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1variant__stream_addb34b5a7761e521b06adcc909d1e07c}\index{fc::variant\_stream@{fc::variant\_stream}!variant\_stream@{variant\_stream}}
+\index{variant\_stream@{variant\_stream}!fc::variant\_stream@{fc::variant\_stream}}
+\doxysubsubsection{\texorpdfstring{variant\_stream()}{variant\_stream()}}
+{\footnotesize\ttfamily \label{classfc_1_1variant__stream_addb34b5a7761e521b06adcc909d1e07c} 
+fc\+::variant\+\_\+stream\+::variant\+\_\+stream (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{s}{}\end{DoxyParamCaption})}
+
+\Hypertarget{classfc_1_1variant__stream_aaa8ed0e91af5e2858e5b99df882ac973}\index{fc::variant\_stream@{fc::variant\_stream}!````~variant\_stream@{\texorpdfstring{$\sim$}{\string~}variant\_stream}}
+\index{````~variant\_stream@{\texorpdfstring{$\sim$}{\string~}variant\_stream}!fc::variant\_stream@{fc::variant\_stream}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}variant\_stream()}{\string~variant\_stream()}}
+{\footnotesize\ttfamily \label{classfc_1_1variant__stream_aaa8ed0e91af5e2858e5b99df882ac973} 
+fc\+::variant\+\_\+stream\+::\texorpdfstring{$\sim$}{\string~}variant\+\_\+stream (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1variant__stream_a8a0ba29c9ff02e5eacbbf7cdc838031a}\index{fc::variant\_stream@{fc::variant\_stream}!begin@{begin}}
+\index{begin@{begin}!fc::variant\_stream@{fc::variant\_stream}}
+\doxysubsubsection{\texorpdfstring{begin()}{begin()}}
+{\footnotesize\ttfamily \label{classfc_1_1variant__stream_a8a0ba29c9ff02e5eacbbf7cdc838031a} 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} fc\+::variant\+\_\+stream\+::begin (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+consumer api \Hypertarget{classfc_1_1variant__stream_a51044a413bcf7e74cdb287947a6871cb}\index{fc::variant\_stream@{fc::variant\_stream}!claim@{claim}}
+\index{claim@{claim}!fc::variant\_stream@{fc::variant\_stream}}
+\doxysubsubsection{\texorpdfstring{claim()}{claim()}}
+{\footnotesize\ttfamily \label{classfc_1_1variant__stream_a51044a413bcf7e74cdb287947a6871cb} 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} fc\+::variant\+\_\+stream\+::claim (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}}]{num}{}\end{DoxyParamCaption})}
+
+\Hypertarget{classfc_1_1variant__stream_a8ef5eb832531813e0ef7860da128d458}\index{fc::variant\_stream@{fc::variant\_stream}!end@{end}}
+\index{end@{end}!fc::variant\_stream@{fc::variant\_stream}}
+\doxysubsubsection{\texorpdfstring{end()}{end()}}
+{\footnotesize\ttfamily \label{classfc_1_1variant__stream_a8ef5eb832531813e0ef7860da128d458} 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} fc\+::variant\+\_\+stream\+::end (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1variant__stream_a8ef5eb832531813e0ef7860da128d458_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant__stream_a27edce830ba6ed70ed293096be85495b}\index{fc::variant\_stream@{fc::variant\_stream}!free@{free}}
+\index{free@{free}!fc::variant\_stream@{fc::variant\_stream}}
+\doxysubsubsection{\texorpdfstring{free()}{free()}}
+{\footnotesize\ttfamily \label{classfc_1_1variant__stream_a27edce830ba6ed70ed293096be85495b} 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} fc\+::variant\+\_\+stream\+::free (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+producer api \Hypertarget{classfc_1_1variant__stream_a954d8b99fb4febe46cac7f60b95bd1b4}\index{fc::variant\_stream@{fc::variant\_stream}!get@{get}}
+\index{get@{get}!fc::variant\_stream@{fc::variant\_stream}}
+\doxysubsubsection{\texorpdfstring{get()}{get()}}
+{\footnotesize\ttfamily \label{classfc_1_1variant__stream_a954d8b99fb4febe46cac7f60b95bd1b4} 
+\mbox{\hyperlink{classfc_1_1variant}{variant}} \& fc\+::variant\+\_\+stream\+::get (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}}]{pos}{}\end{DoxyParamCaption})}
+
+\Hypertarget{classfc_1_1variant__stream_a8e590de1bbe36cd4899e1be2a2919244}\index{fc::variant\_stream@{fc::variant\_stream}!publish@{publish}}
+\index{publish@{publish}!fc::variant\_stream@{fc::variant\_stream}}
+\doxysubsubsection{\texorpdfstring{publish()}{publish()}}
+{\footnotesize\ttfamily \label{classfc_1_1variant__stream_a8e590de1bbe36cd4899e1be2a2919244} 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} fc\+::variant\+\_\+stream\+::publish (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}}]{pos}{}\end{DoxyParamCaption})}
+
+\Hypertarget{classfc_1_1variant__stream_ab540ce964d2a642c0d193b04d7862e16}\index{fc::variant\_stream@{fc::variant\_stream}!wait@{wait}}
+\index{wait@{wait}!fc::variant\_stream@{fc::variant\_stream}}
+\doxysubsubsection{\texorpdfstring{wait()}{wait()}}
+{\footnotesize\ttfamily \label{classfc_1_1variant__stream_ab540ce964d2a642c0d193b04d7862e16} 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} fc\+::variant\+\_\+stream\+::wait (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{classfc_1_1variant__stream_a0b3239fe3a02325ed1a656242185d957}\index{fc::variant\_stream@{fc::variant\_stream}!wait\_free@{wait\_free}}
+\index{wait\_free@{wait\_free}!fc::variant\_stream@{fc::variant\_stream}}
+\doxysubsubsection{\texorpdfstring{wait\_free()}{wait\_free()}}
+{\footnotesize\ttfamily \label{classfc_1_1variant__stream_a0b3239fe3a02325ed1a656242185d957} 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} fc\+::variant\+\_\+stream\+::wait\+\_\+free (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/rpc/\mbox{\hyperlink{variant__stream_8hpp}{variant\+\_\+stream.\+hpp}}\end{DoxyCompactItemize}

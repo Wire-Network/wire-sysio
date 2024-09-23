@@ -1,0 +1,214 @@
+\doxysection{libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/document.h File Reference}
+\hypertarget{document_8h}{}\label{document_8h}\index{libraries/fc/include/fc/crypto/webauthn\_json/include/rapidjson/document.h@{libraries/fc/include/fc/crypto/webauthn\_json/include/rapidjson/document.h}}
+{\ttfamily \#include "{}reader.\+h"{}}\newline
+{\ttfamily \#include "{}internal/meta.\+h"{}}\newline
+{\ttfamily \#include "{}internal/strfunc.\+h"{}}\newline
+{\ttfamily \#include "{}memorystream.\+h"{}}\newline
+{\ttfamily \#include "{}encodedstream.\+h"{}}\newline
+{\ttfamily \#include $<$new$>$}\newline
+{\ttfamily \#include $<$limits$>$}\newline
+{\ttfamily \#include $<$iterator$>$}\newline
+Include dependency graph for document.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{document_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{document_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_generic_member}{Generic\+Member$<$ Encoding, Allocator $>$}}
+\begin{DoxyCompactList}\small\item\em Name-\/value pair in a JSON object value. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_generic_member_iterator}{Generic\+Member\+Iterator$<$ Const, Encoding, Allocator $>$}}
+\begin{DoxyCompactList}\small\item\em (Constant) member iterator for a JSON object value \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_generic_string_ref}{Generic\+String\+Ref$<$ Char\+Type $>$}}
+\begin{DoxyCompactList}\small\item\em Reference to a constant string (not taking a copy) \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{structinternal_1_1_is_generic_value_impl}{internal\+::\+Is\+Generic\+Value\+Impl$<$ T, Encoding, Allocator $>$}}
+\item 
+struct \mbox{\hyperlink{structinternal_1_1_is_generic_value_impl_3_01_t_00_01typename_01_void_3_01typename_01_t_1_1_enco3a51e9d8b4986f001b39e1e8edecb66a}{internal\+::\+Is\+Generic\+Value\+Impl$<$ T, typename Void$<$ typename T\+::\+Encoding\+Type $>$\+::\+Type, typename Void$<$ typename T\+::\+Allocator\+Type $>$\+::\+Type $>$}}
+\item 
+struct \mbox{\hyperlink{structinternal_1_1_is_generic_value}{internal\+::\+Is\+Generic\+Value$<$ T $>$}}
+\item 
+struct \mbox{\hyperlink{structinternal_1_1_type_helper}{internal\+::\+Type\+Helper$<$ Value\+Type, T $>$}}
+\item 
+struct \mbox{\hyperlink{structinternal_1_1_type_helper_3_01_value_type_00_01bool_01_4}{internal\+::\+Type\+Helper$<$ Value\+Type, bool $>$}}
+\item 
+struct \mbox{\hyperlink{structinternal_1_1_type_helper_3_01_value_type_00_01int_01_4}{internal\+::\+Type\+Helper$<$ Value\+Type, int $>$}}
+\item 
+struct \mbox{\hyperlink{structinternal_1_1_type_helper_3_01_value_type_00_01unsigned_01_4}{internal\+::\+Type\+Helper$<$ Value\+Type, unsigned $>$}}
+\item 
+struct \mbox{\hyperlink{structinternal_1_1_type_helper_3_01_value_type_00_01int64__t_01_4}{internal\+::\+Type\+Helper$<$ Value\+Type, int64\+\_\+t $>$}}
+\item 
+struct \mbox{\hyperlink{structinternal_1_1_type_helper_3_01_value_type_00_01uint64__t_01_4}{internal\+::\+Type\+Helper$<$ Value\+Type, uint64\+\_\+t $>$}}
+\item 
+struct \mbox{\hyperlink{structinternal_1_1_type_helper_3_01_value_type_00_01double_01_4}{internal\+::\+Type\+Helper$<$ Value\+Type, double $>$}}
+\item 
+struct \mbox{\hyperlink{structinternal_1_1_type_helper_3_01_value_type_00_01float_01_4}{internal\+::\+Type\+Helper$<$ Value\+Type, float $>$}}
+\item 
+struct \mbox{\hyperlink{structinternal_1_1_type_helper_3_01_value_type_00_01const_01typename_01_value_type_1_1_ch_01_5_01_4}{internal\+::\+Type\+Helper$<$ Value\+Type, const typename Value\+Type\+::\+Ch \texorpdfstring{$\ast$}{*} $>$}}
+\item 
+struct \mbox{\hyperlink{structinternal_1_1_type_helper_3_01_value_type_00_01typename_01_value_type_1_1_array_01_4}{internal\+::\+Type\+Helper$<$ Value\+Type, typename Value\+Type\+::\+Array $>$}}
+\item 
+struct \mbox{\hyperlink{structinternal_1_1_type_helper_3_01_value_type_00_01typename_01_value_type_1_1_const_array_01_4}{internal\+::\+Type\+Helper$<$ Value\+Type, typename Value\+Type\+::\+Const\+Array $>$}}
+\item 
+struct \mbox{\hyperlink{structinternal_1_1_type_helper_3_01_value_type_00_01typename_01_value_type_1_1_object_01_4}{internal\+::\+Type\+Helper$<$ Value\+Type, typename Value\+Type\+::\+Object $>$}}
+\item 
+struct \mbox{\hyperlink{structinternal_1_1_type_helper_3_01_value_type_00_01typename_01_value_type_1_1_const_object_01_4}{internal\+::\+Type\+Helper$<$ Value\+Type, typename Value\+Type\+::\+Const\+Object $>$}}
+\item 
+class \mbox{\hyperlink{class_generic_value}{Generic\+Value$<$ Encoding, Allocator $>$}}
+\begin{DoxyCompactList}\small\item\em Represents a JSON value. Use Value for \doxylink{struct_u_t_f8}{UTF8} encoding and default allocator. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_generic_value_1_1_flag}{Generic\+Value$<$ Encoding, Allocator $>$\+::\+Flag}}
+\item 
+struct \mbox{\hyperlink{struct_generic_value_1_1_string}{Generic\+Value$<$ Encoding, Allocator $>$\+::\+String}}
+\item 
+struct \mbox{\hyperlink{struct_generic_value_1_1_short_string}{Generic\+Value$<$ Encoding, Allocator $>$\+::\+Short\+String}}
+\item 
+union \mbox{\hyperlink{union_generic_value_1_1_number}{Generic\+Value$<$ Encoding, Allocator $>$\+::\+Number}}
+\item 
+struct \mbox{\hyperlink{struct_generic_value_1_1_number_1_1_i}{Generic\+Value$<$ Encoding, Allocator $>$\+::\+Number\+::I}}
+\item 
+struct \mbox{\hyperlink{struct_generic_value_1_1_number_1_1_u}{Generic\+Value$<$ Encoding, Allocator $>$\+::\+Number\+::U}}
+\item 
+struct \mbox{\hyperlink{struct_generic_value_1_1_object_data}{Generic\+Value$<$ Encoding, Allocator $>$\+::\+Object\+Data}}
+\item 
+struct \mbox{\hyperlink{struct_generic_value_1_1_array_data}{Generic\+Value$<$ Encoding, Allocator $>$\+::\+Array\+Data}}
+\item 
+union \mbox{\hyperlink{union_generic_value_1_1_data}{Generic\+Value$<$ Encoding, Allocator $>$\+::\+Data}}
+\item 
+class \mbox{\hyperlink{class_generic_document}{Generic\+Document$<$ Encoding, Allocator, Stack\+Allocator $>$}}
+\begin{DoxyCompactList}\small\item\em \doxylink{struct_a}{A} document for parsing JSON text as DOM. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_generic_array}{Generic\+Array$<$ Const, Value\+T $>$}}
+\begin{DoxyCompactList}\small\item\em Helper class for accessing Value of array type. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_generic_object}{Generic\+Object$<$ Const, Value\+T $>$}}
+\begin{DoxyCompactList}\small\item\em Helper class for accessing Value of object type. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespaceinternal}{internal}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{struct_u_t_f8}{UTF8}}$<$$>$ $>$ \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}}
+\begin{DoxyCompactList}\small\item\em \doxylink{class_generic_value}{Generic\+Value} with \doxylink{struct_u_t_f8}{UTF8} encoding. \end{DoxyCompactList}\item 
+typedef \mbox{\hyperlink{class_generic_document}{Generic\+Document}}$<$ \mbox{\hyperlink{struct_u_t_f8}{UTF8}}$<$$>$ $>$ \mbox{\hyperlink{document_8h_ac6ea5b168e3fe8c7fa532450fc9391f7}{Document}}
+\begin{DoxyCompactList}\small\item\em \doxylink{class_generic_document}{Generic\+Document} with \doxylink{struct_u_t_f8}{UTF8} encoding. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename Char\+Type $>$ }\\\mbox{\hyperlink{struct_generic_string_ref}{Generic\+String\+Ref}}$<$ Char\+Type $>$ \mbox{\hyperlink{document_8h_aa6b9fd9f6aa49405a574c362ba9af6b5}{String\+Ref}} (const Char\+Type \texorpdfstring{$\ast$}{*}str)
+\begin{DoxyCompactList}\small\item\em Mark a character pointer as constant string. \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename Char\+Type $>$ }\\\mbox{\hyperlink{struct_generic_string_ref}{Generic\+String\+Ref}}$<$ Char\+Type $>$ \mbox{\hyperlink{document_8h_a578c51ab574a50a9c760b9da7c7562f2}{String\+Ref}} (const Char\+Type \texorpdfstring{$\ast$}{*}str, size\+\_\+t length)
+\begin{DoxyCompactList}\small\item\em Mark a character pointer as constant string. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{document_8h_ac6ea5b168e3fe8c7fa532450fc9391f7}\index{document.h@{document.h}!Document@{Document}}
+\index{Document@{Document}!document.h@{document.h}}
+\doxysubsubsection{\texorpdfstring{Document}{Document}}
+{\footnotesize\ttfamily \label{document_8h_ac6ea5b168e3fe8c7fa532450fc9391f7} 
+typedef \mbox{\hyperlink{class_generic_document}{Generic\+Document}}$<$\mbox{\hyperlink{struct_u_t_f8}{UTF8}}$<$$>$ $>$ \mbox{\hyperlink{document_8h_ac6ea5b168e3fe8c7fa532450fc9391f7}{Document}}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l02506}{2506}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+\Hypertarget{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}\index{document.h@{document.h}!Value@{Value}}
+\index{Value@{Value}!document.h@{document.h}}
+\doxysubsubsection{\texorpdfstring{Value}{Value}}
+{\footnotesize\ttfamily \label{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481} 
+typedef \mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$\mbox{\hyperlink{struct_u_t_f8}{UTF8}}$<$$>$ $>$ \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l02110}{2110}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{document_8h_aa6b9fd9f6aa49405a574c362ba9af6b5}\index{document.h@{document.h}!StringRef@{StringRef}}
+\index{StringRef@{StringRef}!document.h@{document.h}}
+\doxysubsubsection{\texorpdfstring{StringRef()}{StringRef()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{document_8h_aa6b9fd9f6aa49405a574c362ba9af6b5} 
+template$<$typename Char\+Type $>$ \\
+\mbox{\hyperlink{struct_generic_string_ref}{Generic\+String\+Ref}}$<$ Char\+Type $>$ String\+Ref (\begin{DoxyParamCaption}\item[{const Char\+Type \texorpdfstring{$\ast$}{*}}]{str}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Mark a plain character pointer as a "{}string literal"{}. This function can be used to avoid copying a character string to be referenced as a value in a JSON \doxylink{class_generic_value}{Generic\+Value} object, if the string\textquotesingle{}s lifetime is known to be valid long enough. 
+\begin{DoxyTemplParams}{Template Parameters}
+{\em Char\+Type} & Character type of the string \\
+\hline
+\end{DoxyTemplParams}
+
+\begin{DoxyParams}{Parameters}
+{\em str} & Constant string, lifetime assumed to be longer than the use of the string in e.\+g. a \doxylink{class_generic_value}{Generic\+Value} \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\doxylink{struct_generic_string_ref}{Generic\+String\+Ref} string reference object
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+Generic\+Value\+::\+Generic\+Value(\+String\+Ref\+Type), Generic\+Value\+::operator=(\+String\+Ref\+Type), Generic\+Value\+::\+Set\+String(\+String\+Ref\+Type), Generic\+Value\+::\+Push\+Back(\+String\+Ref\+Type, Allocator\&), Generic\+Value\+::\+Add\+Member 
+\end{DoxySeeAlso}
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l00364}{364}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00364\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00365\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_generic_string_ref}{GenericStringRef<CharType>}}(str);}
+\DoxyCodeLine{00366\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{document_8h_aa6b9fd9f6aa49405a574c362ba9af6b5_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{document_8h_a578c51ab574a50a9c760b9da7c7562f2}\index{document.h@{document.h}!StringRef@{StringRef}}
+\index{StringRef@{StringRef}!document.h@{document.h}}
+\doxysubsubsection{\texorpdfstring{StringRef()}{StringRef()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{document_8h_a578c51ab574a50a9c760b9da7c7562f2} 
+template$<$typename Char\+Type $>$ \\
+\mbox{\hyperlink{struct_generic_string_ref}{Generic\+String\+Ref}}$<$ Char\+Type $>$ String\+Ref (\begin{DoxyParamCaption}\item[{const Char\+Type \texorpdfstring{$\ast$}{*}}]{str}{, }\item[{size\+\_\+t}]{length}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Mark a plain character pointer as a "{}string literal"{}. This function can be used to avoid copying a character string to be referenced as a value in a JSON \doxylink{class_generic_value}{Generic\+Value} object, if the string\textquotesingle{}s lifetime is known to be valid long enough.
+
+This version has better performance with supplied length, and also supports string containing null characters.
+
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em Char\+Type} & character type of the string \\
+\hline
+\end{DoxyTemplParams}
+
+\begin{DoxyParams}{Parameters}
+{\em str} & Constant string, lifetime assumed to be longer than the use of the string in e.\+g. a \doxylink{class_generic_value}{Generic\+Value} \\
+\hline
+{\em length} & The length of source string. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\doxylink{struct_generic_string_ref}{Generic\+String\+Ref} string reference object 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l00384}{384}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00384\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00385\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_generic_string_ref}{GenericStringRef<CharType>}}(str,\ \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}(length));}
+\DoxyCodeLine{00386\ \}}
+
+\end{DoxyCode}

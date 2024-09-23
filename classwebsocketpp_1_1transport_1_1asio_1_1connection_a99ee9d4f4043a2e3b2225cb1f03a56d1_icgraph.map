@@ -1,0 +1,5 @@
+<map id="websocketpp::transport::asio::connection::set_proxy_basic_auth" name="websocketpp::transport::asio::connection::set_proxy_basic_auth">
+<area shape="rect" id="Node000001" title="Set the basic auth credentials to use (exception free)" alt="" coords="211,5,368,61"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1transport_1_1asio_1_1connection.html#a0a42cbcc12974d71c0ea91d12da6b72e" title="Set the basic auth credentials to use (exception)" alt="" coords="5,5,163,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="195,36,163,36,163,30,195,30"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="websocketpp::transport::asio::endpoint::handle_accept" name="websocketpp::transport::asio::endpoint::handle_accept">
+<area shape="rect" id="Node000001" title=" " alt="" coords="416,5,573,61"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1transport_1_1asio_1_1endpoint.html#ae24b2ea11e8ce90b6101c1ab56d7fe48" title="Accept the next connection attempt and assign it to con (exception free)" alt="" coords="211,5,368,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="401,36,369,36,369,30,401,30"/>
+<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1transport_1_1asio_1_1endpoint.html#a7e559e38bf344d60706f106db8b15d50" title="Accept the next connection attempt and assign it to con." alt="" coords="5,5,163,61"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="195,36,163,36,163,30,195,30"/>
+</map>

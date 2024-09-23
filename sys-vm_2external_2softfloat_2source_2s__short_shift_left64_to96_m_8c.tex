@@ -1,0 +1,49 @@
+\doxysection{libraries/sys-\/vm/external/softfloat/source/s\+\_\+short\+Shift\+Left64\+To96M.c File Reference}
+\hypertarget{sys-vm_2external_2softfloat_2source_2s__short_shift_left64_to96_m_8c}{}\label{sys-vm_2external_2softfloat_2source_2s__short_shift_left64_to96_m_8c}\index{libraries/sys-\/vm/external/softfloat/source/s\_shortShiftLeft64To96M.c@{libraries/sys-\/vm/external/softfloat/source/s\_shortShiftLeft64To96M.c}}
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include "{}platform.\+h"{}}\newline
+{\ttfamily \#include "{}primitive\+Types.\+h"{}}\newline
+Include dependency graph for s\+\_\+short\+Shift\+Left64\+To96\+M.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=343pt]{sys-vm_2external_2softfloat_2source_2s__short_shift_left64_to96_m_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2s__short_shift_left64_to96_m_8c_ab1211fd0fdca9812ad95810294163f46}{softfloat\+\_\+short\+Shift\+Left64\+To96M}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, \mbox{\hyperlink{stdint_8h_ad0fca8b15c218d2c687f8c373a71d228}{uint\+\_\+fast8\+\_\+t}} dist, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*}z\+Ptr)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{sys-vm_2external_2softfloat_2source_2s__short_shift_left64_to96_m_8c_ab1211fd0fdca9812ad95810294163f46}\index{s\_shortShiftLeft64To96M.c@{s\_shortShiftLeft64To96M.c}!softfloat\_shortShiftLeft64To96M@{softfloat\_shortShiftLeft64To96M}}
+\index{softfloat\_shortShiftLeft64To96M@{softfloat\_shortShiftLeft64To96M}!s\_shortShiftLeft64To96M.c@{s\_shortShiftLeft64To96M.c}}
+\doxysubsubsection{\texorpdfstring{softfloat\_shortShiftLeft64To96M()}{softfloat\_shortShiftLeft64To96M()}}
+{\footnotesize\ttfamily \label{sys-vm_2external_2softfloat_2source_2s__short_shift_left64_to96_m_8c_ab1211fd0fdca9812ad95810294163f46} 
+void softfloat\+\_\+short\+Shift\+Left64\+To96M (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{a}{, }\item[{\mbox{\hyperlink{stdint_8h_ad0fca8b15c218d2c687f8c373a71d228}{uint\+\_\+fast8\+\_\+t}}}]{dist}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{z\+Ptr}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2s__short_shift_left64_to96_m_8c_source_l00044}{44}} of file \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2s__short_shift_left64_to96_m_8c_source}{s\+\_\+short\+Shift\+Left64\+To96\+M.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00046\ \{}
+\DoxyCodeLine{00047\ }
+\DoxyCodeLine{00048\ \ \ \ \ zPtr[\mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a49446dd1193996f92b1e5bb62eaa4689}{indexWord}}(\ 3,\ 0\ )]\ =\ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}<<dist;}
+\DoxyCodeLine{00049\ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ >>=\ 32\ -\/\ dist;}
+\DoxyCodeLine{00050\ \ \ \ \ zPtr[\mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a49446dd1193996f92b1e5bb62eaa4689}{indexWord}}(\ 3,\ 2\ )]\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}>>32;}
+\DoxyCodeLine{00051\ \ \ \ \ zPtr[\mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a49446dd1193996f92b1e5bb62eaa4689}{indexWord}}(\ 3,\ 1\ )]\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}};}
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=318pt]{sys-vm_2external_2softfloat_2source_2s__short_shift_left64_to96_m_8c_ab1211fd0fdca9812ad95810294163f46_icgraph}
+\end{center}
+\end{figure}

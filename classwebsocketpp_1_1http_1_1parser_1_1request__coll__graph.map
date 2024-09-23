@@ -1,0 +1,9 @@
+<map id="websocketpp::http::parser::request" name="websocketpp::http::parser::request">
+<area shape="rect" id="Node000001" title="Stores, parses, and manipulates HTTP requests." alt="" coords="9,214,146,255"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1http_1_1parser_1_1parser.html" title="Base HTTP parser." alt="" coords="9,124,146,165"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="80,180,80,214,75,214,75,180"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,5,59,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="30,46,30,73,36,99,53,122,48,125,31,101,24,73,25,46"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="94,5,151,31"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="116,47,96,101,87,125,82,123,91,99,111,45"/>
+</map>

@@ -1,0 +1,12 @@
+<map id="sysio::vm::elem_segment" name="sysio::vm::elem_segment">
+<area shape="rect" id="Node000001" title=" " alt="" coords="90,213,262,238"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1vm_1_1init__expr.html" title=" " alt="" coords="28,116,164,142"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="118,152,168,210,164,214,114,156"/>
+<area shape="rect" id="Node000003" href="$unionsysio_1_1vm_1_1expr__value.html" title=" " alt="" coords="5,13,155,38"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="87,54,97,116,91,116,82,54"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1vm_1_1managed__vector.html" title=" " alt="" coords="202,109,342,150"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="243,162,190,214,186,211,240,159"/>
+<area shape="rect" id="Node000005" href="$classsysio_1_1vm_1_1detail_1_1vector.html" title=" " alt="" coords="179,5,365,46"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="266,62,267,109,262,109,261,62"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="283,62,282,109,277,109,278,62"/>
+</map>

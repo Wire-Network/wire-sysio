@@ -1,0 +1,313 @@
+\doxysection{libraries/fc/vendor/websocketpp/examples/echo\+\_\+server\+\_\+tls/echo\+\_\+server\+\_\+tls.cpp File Reference}
+\hypertarget{echo__server__tls_8cpp}{}\label{echo__server__tls_8cpp}\index{libraries/fc/vendor/websocketpp/examples/echo\_server\_tls/echo\_server\_tls.cpp@{libraries/fc/vendor/websocketpp/examples/echo\_server\_tls/echo\_server\_tls.cpp}}
+{\ttfamily \#include $<$websocketpp/config/asio.\+hpp$>$}\newline
+{\ttfamily \#include $<$websocketpp/server.\+hpp$>$}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+Include dependency graph for echo\+\_\+server\+\_\+tls.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{echo__server__tls_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1server}{websocketpp\+::server}}$<$ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio__tls}{websocketpp\+::config\+::asio\+\_\+tls}} $>$ \mbox{\hyperlink{echo__server__tls_8cpp_abb9c7464df5b229bc5077374249c419b}{server}}
+\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message_a665ccc8a3883dbea049aef85c46efe7f}{websocketpp\+::config\+::asio\+::message\+\_\+type\+::ptr}} \mbox{\hyperlink{echo__server__tls_8cpp_adccd3bce28dd8b0e40c2aac4890322f0}{message\+\_\+ptr}}
+\item 
+typedef websocketpp\+::lib\+::shared\+\_\+ptr$<$ websocketpp\+::lib\+::asio\+::ssl\+::context $>$ \mbox{\hyperlink{echo__server__tls_8cpp_a92fc5d22ec3d288e0ac56deb6c827d6f}{context\+\_\+ptr}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{echo__server__tls_8cpp_a450ff0965d64913e926abe64d0fb8297}{tls\+\_\+mode}} \{ \mbox{\hyperlink{echo__server__tls_8cpp_a450ff0965d64913e926abe64d0fb8297aecbea3d770f61ce616d3fc3a19e80c31}{MOZILLA\+\_\+\+INTERMEDIATE}} = 1
+, \mbox{\hyperlink{echo__server__tls_8cpp_a450ff0965d64913e926abe64d0fb8297a75009248ce85a836d045f46e261a41c1}{MOZILLA\+\_\+\+MODERN}} = 2
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{echo__server__tls_8cpp_a9a10d63d7c00e9917ce373bf47bda4b6}{on\+\_\+message}} (\mbox{\hyperlink{docs_2simple__broadcast__server_8cpp_afc38239e3eef2a4200e324bff14d91d1}{server}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, \mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{websocketpp\+::connection\+\_\+hdl}} hdl, \mbox{\hyperlink{debug__client_8cpp_a08398c4d31a4dc3e42d1b9a9ef64c6ad}{message\+\_\+ptr}} msg)
+\item 
+void \mbox{\hyperlink{echo__server__tls_8cpp_aff7dbd699b23a5b8bc3389dd4480c49a}{on\+\_\+http}} (\mbox{\hyperlink{docs_2simple__broadcast__server_8cpp_afc38239e3eef2a4200e324bff14d91d1}{server}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, \mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{websocketpp\+::connection\+\_\+hdl}} hdl)
+\item 
+std\+::string \mbox{\hyperlink{echo__server__tls_8cpp_af91460ab530c2375f8a4a11dd0e99c04}{get\+\_\+password}} ()
+\item 
+\mbox{\hyperlink{debug__client_8cpp_ab68ea3df896e32c1d2fb314a96c46a8f}{context\+\_\+ptr}} \mbox{\hyperlink{echo__server__tls_8cpp_afb6a48dfa998680f779255227e2e4a0e}{on\+\_\+tls\+\_\+init}} (\mbox{\hyperlink{echo__server__tls_8cpp_a450ff0965d64913e926abe64d0fb8297}{tls\+\_\+mode}} mode, \mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{websocketpp\+::connection\+\_\+hdl}} hdl)
+\item 
+int \mbox{\hyperlink{echo__server__tls_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{echo__server__tls_8cpp_a92fc5d22ec3d288e0ac56deb6c827d6f}\index{echo\_server\_tls.cpp@{echo\_server\_tls.cpp}!context\_ptr@{context\_ptr}}
+\index{context\_ptr@{context\_ptr}!echo\_server\_tls.cpp@{echo\_server\_tls.cpp}}
+\doxysubsubsection{\texorpdfstring{context\_ptr}{context\_ptr}}
+{\footnotesize\ttfamily \label{echo__server__tls_8cpp_a92fc5d22ec3d288e0ac56deb6c827d6f} 
+typedef websocketpp\+::lib\+::shared\+\_\+ptr$<$websocketpp\+::lib\+::asio\+::ssl\+::context$>$ \mbox{\hyperlink{debug__client_8cpp_ab68ea3df896e32c1d2fb314a96c46a8f}{context\+\_\+ptr}}}
+
+
+
+Definition at line \mbox{\hyperlink{echo__server__tls_8cpp_source_l00051}{51}} of file \mbox{\hyperlink{echo__server__tls_8cpp_source}{echo\+\_\+server\+\_\+tls.\+cpp}}.
+
+\Hypertarget{echo__server__tls_8cpp_adccd3bce28dd8b0e40c2aac4890322f0}\index{echo\_server\_tls.cpp@{echo\_server\_tls.cpp}!message\_ptr@{message\_ptr}}
+\index{message\_ptr@{message\_ptr}!echo\_server\_tls.cpp@{echo\_server\_tls.cpp}}
+\doxysubsubsection{\texorpdfstring{message\_ptr}{message\_ptr}}
+{\footnotesize\ttfamily \label{echo__server__tls_8cpp_adccd3bce28dd8b0e40c2aac4890322f0} 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message_a665ccc8a3883dbea049aef85c46efe7f}{websocketpp\+::config\+::asio\+::message\+\_\+type\+::ptr}} \mbox{\hyperlink{debug__client_8cpp_a08398c4d31a4dc3e42d1b9a9ef64c6ad}{message\+\_\+ptr}}}
+
+
+
+Definition at line \mbox{\hyperlink{echo__server__tls_8cpp_source_l00050}{50}} of file \mbox{\hyperlink{echo__server__tls_8cpp_source}{echo\+\_\+server\+\_\+tls.\+cpp}}.
+
+\Hypertarget{echo__server__tls_8cpp_abb9c7464df5b229bc5077374249c419b}\index{echo\_server\_tls.cpp@{echo\_server\_tls.cpp}!server@{server}}
+\index{server@{server}!echo\_server\_tls.cpp@{echo\_server\_tls.cpp}}
+\doxysubsubsection{\texorpdfstring{server}{server}}
+{\footnotesize\ttfamily \label{echo__server__tls_8cpp_abb9c7464df5b229bc5077374249c419b} 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1server}{websocketpp\+::server}}$<$\mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio__tls}{websocketpp\+::config\+::asio\+\_\+tls}}$>$ \mbox{\hyperlink{docs_2simple__broadcast__server_8cpp_afc38239e3eef2a4200e324bff14d91d1}{server}}}
+
+NOTES
+
+This example uses a number of standard classes through the \doxylink{namespacewebsocketpp_1_1lib}{websocketpp\+::lib} namespace. This is to allow easy switching between Boost, the C++11 STL, and the standalone Asio library. Your program need not use these namespaces if you do not need this sort of flexibility. 
+
+Definition at line \mbox{\hyperlink{echo__server__tls_8cpp_source_l00043}{43}} of file \mbox{\hyperlink{echo__server__tls_8cpp_source}{echo\+\_\+server\+\_\+tls.\+cpp}}.
+
+
+
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{echo__server__tls_8cpp_a450ff0965d64913e926abe64d0fb8297}\index{echo\_server\_tls.cpp@{echo\_server\_tls.cpp}!tls\_mode@{tls\_mode}}
+\index{tls\_mode@{tls\_mode}!echo\_server\_tls.cpp@{echo\_server\_tls.cpp}}
+\doxysubsubsection{\texorpdfstring{tls\_mode}{tls\_mode}}
+{\footnotesize\ttfamily \label{echo__server__tls_8cpp_a450ff0965d64913e926abe64d0fb8297} 
+enum \mbox{\hyperlink{echo__server__tls_8cpp_a450ff0965d64913e926abe64d0fb8297}{tls\+\_\+mode}}}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{MOZILLA\_INTERMEDIATE@{MOZILLA\_INTERMEDIATE}!echo\_server\_tls.cpp@{echo\_server\_tls.cpp}}\index{echo\_server\_tls.cpp@{echo\_server\_tls.cpp}!MOZILLA\_INTERMEDIATE@{MOZILLA\_INTERMEDIATE}}}\Hypertarget{echo__server__tls_8cpp_a450ff0965d64913e926abe64d0fb8297aecbea3d770f61ce616d3fc3a19e80c31}\label{echo__server__tls_8cpp_a450ff0965d64913e926abe64d0fb8297} 
+MOZILLA\+\_\+\+INTERMEDIATE&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{MOZILLA\_MODERN@{MOZILLA\_MODERN}!echo\_server\_tls.cpp@{echo\_server\_tls.cpp}}\index{echo\_server\_tls.cpp@{echo\_server\_tls.cpp}!MOZILLA\_MODERN@{MOZILLA\_MODERN}}}\Hypertarget{echo__server__tls_8cpp_a450ff0965d64913e926abe64d0fb8297a75009248ce85a836d045f46e261a41c1}\label{echo__server__tls_8cpp_a450ff0965d64913e926abe64d0fb8297} 
+MOZILLA\+\_\+\+MODERN&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{echo__server__tls_8cpp_source_l00079}{79}} of file \mbox{\hyperlink{echo__server__tls_8cpp_source}{echo\+\_\+server\+\_\+tls.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00080\ \ \ \ \ \mbox{\hyperlink{echo__server__tls_8cpp_a450ff0965d64913e926abe64d0fb8297aecbea3d770f61ce616d3fc3a19e80c31}{MOZILLA\_INTERMEDIATE}}\ =\ 1,}
+\DoxyCodeLine{00081\ \ \ \ \ \mbox{\hyperlink{echo__server__tls_8cpp_a450ff0965d64913e926abe64d0fb8297a75009248ce85a836d045f46e261a41c1}{MOZILLA\_MODERN}}\ =\ 2}
+\DoxyCodeLine{00082\ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{echo__server__tls_8cpp_af91460ab530c2375f8a4a11dd0e99c04}\index{echo\_server\_tls.cpp@{echo\_server\_tls.cpp}!get\_password@{get\_password}}
+\index{get\_password@{get\_password}!echo\_server\_tls.cpp@{echo\_server\_tls.cpp}}
+\doxysubsubsection{\texorpdfstring{get\_password()}{get\_password()}}
+{\footnotesize\ttfamily \label{echo__server__tls_8cpp_af91460ab530c2375f8a4a11dd0e99c04} 
+std\+::string get\+\_\+password (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{echo__server__tls_8cpp_source_l00073}{73}} of file \mbox{\hyperlink{echo__server__tls_8cpp_source}{echo\+\_\+server\+\_\+tls.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00074\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}test"{}};}
+\DoxyCodeLine{00075\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=326pt]{echo__server__tls_8cpp_af91460ab530c2375f8a4a11dd0e99c04_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{echo__server__tls_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}\index{echo\_server\_tls.cpp@{echo\_server\_tls.cpp}!main@{main}}
+\index{main@{main}!echo\_server\_tls.cpp@{echo\_server\_tls.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{echo__server__tls_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4} 
+int main (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{echo__server__tls_8cpp_source_l00133}{133}} of file \mbox{\hyperlink{echo__server__tls_8cpp_source}{echo\+\_\+server\+\_\+tls.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00134\ \ \ \ \ \textcolor{comment}{//\ Create\ a\ server\ endpoint}}
+\DoxyCodeLine{00135\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1server}{server}}\ echo\_server;}
+\DoxyCodeLine{00136\ }
+\DoxyCodeLine{00137\ \ \ \ \ \textcolor{comment}{//\ Initialize\ ASIO}}
+\DoxyCodeLine{00138\ \ \ \ \ echo\_server.init\_asio();}
+\DoxyCodeLine{00139\ }
+\DoxyCodeLine{00140\ \ \ \ \ \textcolor{comment}{//\ Register\ our\ message\ handler}}
+\DoxyCodeLine{00141\ \ \ \ \ echo\_server.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a34a3a8351bff65ba878975be471cab85}{set\_message\_handler}}(bind(\&\mbox{\hyperlink{echo__server__tls_8cpp_a9a10d63d7c00e9917ce373bf47bda4b6}{on\_message}},\&echo\_server,::\_1,::\_2));}
+\DoxyCodeLine{00142\ \ \ \ \ echo\_server.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a511874384b71238b042968cf736bc510}{set\_http\_handler}}(bind(\&\mbox{\hyperlink{echo__server__tls_8cpp_aff7dbd699b23a5b8bc3389dd4480c49a}{on\_http}},\&echo\_server,::\_1));}
+\DoxyCodeLine{00143\ \ \ \ \ echo\_server.set\_tls\_init\_handler(bind(\&\mbox{\hyperlink{echo__server__tls_8cpp_afb6a48dfa998680f779255227e2e4a0e}{on\_tls\_init}},\mbox{\hyperlink{echo__server__tls_8cpp_a450ff0965d64913e926abe64d0fb8297aecbea3d770f61ce616d3fc3a19e80c31}{MOZILLA\_INTERMEDIATE}},::\_1));}
+\DoxyCodeLine{00144\ }
+\DoxyCodeLine{00145\ \ \ \ \ \textcolor{comment}{//\ Listen\ on\ port\ 9002}}
+\DoxyCodeLine{00146\ \ \ \ \ echo\_server.listen(9002);}
+\DoxyCodeLine{00147\ }
+\DoxyCodeLine{00148\ \ \ \ \ \textcolor{comment}{//\ Start\ the\ server\ accept\ loop}}
+\DoxyCodeLine{00149\ \ \ \ \ echo\_server.\mbox{\hyperlink{classwebsocketpp_1_1server_a0204a7d444144f7ea5b8bbcf14689fc1}{start\_accept}}();}
+\DoxyCodeLine{00150\ }
+\DoxyCodeLine{00151\ \ \ \ \ \textcolor{comment}{//\ Start\ the\ ASIO\ io\_service\ run\ loop}}
+\DoxyCodeLine{00152\ \ \ \ \ echo\_server.run();}
+\DoxyCodeLine{00153\ }
+\DoxyCodeLine{00154\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{echo__server__tls_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{echo__server__tls_8cpp_aff7dbd699b23a5b8bc3389dd4480c49a}\index{echo\_server\_tls.cpp@{echo\_server\_tls.cpp}!on\_http@{on\_http}}
+\index{on\_http@{on\_http}!echo\_server\_tls.cpp@{echo\_server\_tls.cpp}}
+\doxysubsubsection{\texorpdfstring{on\_http()}{on\_http()}}
+{\footnotesize\ttfamily \label{echo__server__tls_8cpp_aff7dbd699b23a5b8bc3389dd4480c49a} 
+void on\+\_\+http (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{docs_2simple__broadcast__server_8cpp_afc38239e3eef2a4200e324bff14d91d1}{server}} \texorpdfstring{$\ast$}{*}}]{s}{, }\item[{\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{websocketpp\+::connection\+\_\+hdl}}}]{hdl}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{echo__server__tls_8cpp_source_l00066}{66}} of file \mbox{\hyperlink{echo__server__tls_8cpp_source}{echo\+\_\+server\+\_\+tls.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00067\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1server_abb895563dddafdc1426997d245cbd7cb}{server::connection\_ptr}}\ con\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}-\/>get\_con\_from\_hdl(hdl);}
+\DoxyCodeLine{00068\ \ \ \ \ }
+\DoxyCodeLine{00069\ \ \ \ \ con-\/>set\_body(\textcolor{stringliteral}{"{}Hello\ World!"{}});}
+\DoxyCodeLine{00070\ \ \ \ \ con-\/>set\_status(\mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1status__code_ae0d61c309e053ee5673517b54e2886c6a289caa931313b2f373b33032e3661733}{websocketpp::http::status\_code::ok}});}
+\DoxyCodeLine{00071\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=201pt]{echo__server__tls_8cpp_aff7dbd699b23a5b8bc3389dd4480c49a_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{echo__server__tls_8cpp_a9a10d63d7c00e9917ce373bf47bda4b6}\index{echo\_server\_tls.cpp@{echo\_server\_tls.cpp}!on\_message@{on\_message}}
+\index{on\_message@{on\_message}!echo\_server\_tls.cpp@{echo\_server\_tls.cpp}}
+\doxysubsubsection{\texorpdfstring{on\_message()}{on\_message()}}
+{\footnotesize\ttfamily \label{echo__server__tls_8cpp_a9a10d63d7c00e9917ce373bf47bda4b6} 
+void on\+\_\+message (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{docs_2simple__broadcast__server_8cpp_afc38239e3eef2a4200e324bff14d91d1}{server}} \texorpdfstring{$\ast$}{*}}]{s}{, }\item[{\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{websocketpp\+::connection\+\_\+hdl}}}]{hdl}{, }\item[{\mbox{\hyperlink{debug__client_8cpp_a08398c4d31a4dc3e42d1b9a9ef64c6ad}{message\+\_\+ptr}}}]{msg}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{echo__server__tls_8cpp_source_l00053}{53}} of file \mbox{\hyperlink{echo__server__tls_8cpp_source}{echo\+\_\+server\+\_\+tls.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00054\ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}on\_message\ called\ with\ hdl:\ "{}}\ <<\ hdl.lock().get()}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\ and\ message:\ "{}}\ <<\ msg-\/>get\_payload()}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ std::endl;}
+\DoxyCodeLine{00057\ }
+\DoxyCodeLine{00058\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}-\/>send(hdl,\ msg-\/>get\_payload(),\ msg-\/>get\_opcode());}
+\DoxyCodeLine{00060\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\textcolor{keyword}{const}\ websocketpp::lib::error\_code\&\ e)\ \{}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}Echo\ failed\ because:\ "{}}\ <<\ e}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}("{}}\ <<\ e.message()\ <<\ \textcolor{stringliteral}{"{})"{}}\ <<\ std::endl;}
+\DoxyCodeLine{00063\ \ \ \ \ \}}
+\DoxyCodeLine{00064\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=225pt]{echo__server__tls_8cpp_a9a10d63d7c00e9917ce373bf47bda4b6_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{echo__server__tls_8cpp_afb6a48dfa998680f779255227e2e4a0e}\index{echo\_server\_tls.cpp@{echo\_server\_tls.cpp}!on\_tls\_init@{on\_tls\_init}}
+\index{on\_tls\_init@{on\_tls\_init}!echo\_server\_tls.cpp@{echo\_server\_tls.cpp}}
+\doxysubsubsection{\texorpdfstring{on\_tls\_init()}{on\_tls\_init()}}
+{\footnotesize\ttfamily \label{echo__server__tls_8cpp_afb6a48dfa998680f779255227e2e4a0e} 
+\mbox{\hyperlink{debug__client_8cpp_ab68ea3df896e32c1d2fb314a96c46a8f}{context\+\_\+ptr}} on\+\_\+tls\+\_\+init (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{echo__server__tls_8cpp_a450ff0965d64913e926abe64d0fb8297}{tls\+\_\+mode}}}]{mode}{, }\item[{\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{websocketpp\+::connection\+\_\+hdl}}}]{hdl}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{echo__server__tls_8cpp_source_l00084}{84}} of file \mbox{\hyperlink{echo__server__tls_8cpp_source}{echo\+\_\+server\+\_\+tls.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00085\ \ \ \ \ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacewebsocketpp_1_1lib_1_1asio}{asio}}\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1lib_1_1asio}{websocketpp::lib::asio}};}
+\DoxyCodeLine{00086\ }
+\DoxyCodeLine{00087\ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}on\_tls\_init\ called\ with\ hdl:\ "{}}\ <<\ hdl.lock().get()\ <<\ std::endl;}
+\DoxyCodeLine{00088\ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}using\ TLS\ mode:\ "{}}\ <<\ (mode\ ==\ \mbox{\hyperlink{echo__server__tls_8cpp_a450ff0965d64913e926abe64d0fb8297a75009248ce85a836d045f46e261a41c1}{MOZILLA\_MODERN}}\ ?\ \textcolor{stringliteral}{"{}Mozilla\ Modern"{}}\ :\ \textcolor{stringliteral}{"{}Mozilla\ Intermediate"{}})\ <<\ std::endl;}
+\DoxyCodeLine{00089\ }
+\DoxyCodeLine{00090\ \ \ \ \ \mbox{\hyperlink{debug__client_8cpp_ab68ea3df896e32c1d2fb314a96c46a8f}{context\_ptr}}\ ctx\ =\ websocketpp::lib::make\_shared<asio::ssl::context>(asio::ssl::context::sslv23);}
+\DoxyCodeLine{00091\ }
+\DoxyCodeLine{00092\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (mode\ ==\ \mbox{\hyperlink{echo__server__tls_8cpp_a450ff0965d64913e926abe64d0fb8297a75009248ce85a836d045f46e261a41c1}{MOZILLA\_MODERN}})\ \{}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Modern\ disables\ TLSv1}}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \ \ \ ctx-\/>set\_options(asio::ssl::context::default\_workarounds\ |}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ asio::ssl::context::no\_sslv2\ |}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ asio::ssl::context::no\_sslv3\ |}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ asio::ssl::context::no\_tlsv1\ |}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ asio::ssl::context::single\_dh\_use);}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \ \ \ ctx-\/>set\_options(asio::ssl::context::default\_workarounds\ |}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ asio::ssl::context::no\_sslv2\ |}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ asio::ssl::context::no\_sslv3\ |}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ asio::ssl::context::single\_dh\_use);}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ ctx-\/>set\_password\_callback(bind(\&\mbox{\hyperlink{echo__server__tls_8cpp_af91460ab530c2375f8a4a11dd0e99c04}{get\_password}}));}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ ctx-\/>use\_certificate\_chain\_file(\textcolor{stringliteral}{"{}server.pem"{}});}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ ctx-\/>use\_private\_key\_file(\textcolor{stringliteral}{"{}server.pem"{}},\ asio::ssl::context::pem);}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Example\ method\ of\ generating\ this\ file:}}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ \`{}openssl\ dhparam\ -\/out\ dh.pem\ 2048`}}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Mozilla\ Intermediate\ suggests\ 1024\ as\ the\ minimum\ size\ to\ use}}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Mozilla\ Modern\ suggests\ 2048\ as\ the\ minimum\ size\ to\ use.}}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ ctx-\/>use\_tmp\_dh\_file(\textcolor{stringliteral}{"{}dh.pem"{}});}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ std::string\ ciphers;}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (mode\ ==\ \mbox{\hyperlink{echo__server__tls_8cpp_a450ff0965d64913e926abe64d0fb8297a75009248ce85a836d045f46e261a41c1}{MOZILLA\_MODERN}})\ \{}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ \ \ \ ciphers\ =\ \textcolor{stringliteral}{"{}ECDHE-\/RSA-\/AES128-\/GCM-\/SHA256:ECDHE-\/ECDSA-\/AES128-\/GCM-\/SHA256:ECDHE-\/RSA-\/AES256-\/GCM-\/SHA384:ECDHE-\/ECDSA-\/AES256-\/GCM-\/SHA384:DHE-\/RSA-\/AES128-\/GCM-\/SHA256:DHE-\/DSS-\/AES128-\/GCM-\/SHA256:kEDH+AESGCM:ECDHE-\/RSA-\/AES128-\/SHA256:ECDHE-\/ECDSA-\/AES128-\/SHA256:ECDHE-\/RSA-\/AES128-\/SHA:ECDHE-\/ECDSA-\/AES128-\/SHA:ECDHE-\/RSA-\/AES256-\/SHA384:ECDHE-\/ECDSA-\/AES256-\/SHA384:ECDHE-\/RSA-\/AES256-\/SHA:ECDHE-\/ECDSA-\/AES256-\/SHA:DHE-\/RSA-\/AES128-\/SHA256:DHE-\/RSA-\/AES128-\/SHA:DHE-\/DSS-\/AES128-\/SHA256:DHE-\/RSA-\/AES256-\/SHA256:DHE-\/DSS-\/AES256-\/SHA:DHE-\/RSA-\/AES256-\/SHA:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!3DES:!MD5:!PSK"{}};}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \ \ \ \ ciphers\ =\ \textcolor{stringliteral}{"{}ECDHE-\/RSA-\/AES128-\/GCM-\/SHA256:ECDHE-\/ECDSA-\/AES128-\/GCM-\/SHA256:ECDHE-\/RSA-\/AES256-\/GCM-\/SHA384:ECDHE-\/ECDSA-\/AES256-\/GCM-\/SHA384:DHE-\/RSA-\/AES128-\/GCM-\/SHA256:DHE-\/DSS-\/AES128-\/GCM-\/SHA256:kEDH+AESGCM:ECDHE-\/RSA-\/AES128-\/SHA256:ECDHE-\/ECDSA-\/AES128-\/SHA256:ECDHE-\/RSA-\/AES128-\/SHA:ECDHE-\/ECDSA-\/AES128-\/SHA:ECDHE-\/RSA-\/AES256-\/SHA384:ECDHE-\/ECDSA-\/AES256-\/SHA384:ECDHE-\/RSA-\/AES256-\/SHA:ECDHE-\/ECDSA-\/AES256-\/SHA:DHE-\/RSA-\/AES128-\/SHA256:DHE-\/RSA-\/AES128-\/SHA:DHE-\/DSS-\/AES128-\/SHA256:DHE-\/RSA-\/AES256-\/SHA256:DHE-\/DSS-\/AES256-\/SHA:DHE-\/RSA-\/AES256-\/SHA:AES128-\/GCM-\/SHA256:AES256-\/GCM-\/SHA384:AES128-\/SHA256:AES256-\/SHA256:AES128-\/SHA:AES256-\/SHA:AES:CAMELLIA:DES-\/CBC3-\/SHA:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!aECDH:!EDH-\/DSS-\/DES-\/CBC3-\/SHA:!EDH-\/RSA-\/DES-\/CBC3-\/SHA:!KRB5-\/DES-\/CBC3-\/SHA"{}};}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (SSL\_CTX\_set\_cipher\_list(ctx-\/>native\_handle()\ ,\ ciphers.c\_str())\ !=\ 1)\ \{}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}Error\ setting\ cipher\ list"{}}\ <<\ std::endl;}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00127\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (std::exception\&\ e)\ \{}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}Exception:\ "{}}\ <<\ e.what()\ <<\ std::endl;}
+\DoxyCodeLine{00129\ \ \ \ \ \}}
+\DoxyCodeLine{00130\ \ \ \ \ \textcolor{keywordflow}{return}\ ctx;}
+\DoxyCodeLine{00131\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=253pt]{echo__server__tls_8cpp_afb6a48dfa998680f779255227e2e4a0e_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=213pt]{echo__server__tls_8cpp_afb6a48dfa998680f779255227e2e4a0e_icgraph}
+\end{center}
+\end{figure}

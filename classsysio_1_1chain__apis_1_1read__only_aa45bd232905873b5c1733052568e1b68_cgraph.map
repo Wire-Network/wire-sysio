@@ -1,0 +1,46 @@
+<map id="sysio::chain_apis::read_only::get_account" name="sysio::chain_apis::read_only::get_account">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,185,162,226"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1abi__serializer.html#abe15ed5dd85d87a88cd86a6e45cef4d0" title=" " alt="" coords="210,5,385,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="96,183,141,122,172,87,208,57,217,51,219,56,211,61,176,91,145,125,100,186"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1chain_1_1abi__serializer.html#a2dc34bf706557f0c83d61b3791299c98" title=" " alt="" coords="210,71,385,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="115,183,208,127,232,116,234,120,211,132,118,187"/>
+<area shape="rect" id="Node000008" href="$classfc_1_1time__point.html#aa164ff1268a16d4b32afcff181f6100e" title=" " alt="" coords="454,140,587,165"/>
+<area shape="poly" id="edge15_Node000001_Node000008" title=" " alt="" coords="156,182,209,171,330,157,439,151,439,157,330,163,210,176,158,187"/>
+<area shape="rect" id="Node000013" href="$structsysio_1_1chain_1_1asset.html#a807aa81522392e1869c5180289b3a41d" title=" " alt="" coords="232,185,363,226"/>
+<area shape="poly" id="edge14_Node000001_Node000013" title=" " alt="" coords="162,203,216,203,216,208,162,208"/>
+<area shape="rect" id="Node000014" href="$structsysio_1_1chain_1_1abi__serializer.html#a551ed3dd188f2a751a4edf81c76502c2" title=" " alt="" coords="210,251,385,291"/>
+<area shape="poly" id="edge16_Node000001_Node000014" title=" " alt="" coords="153,224,214,243,213,248,151,229"/>
+<area shape="rect" id="Node000016" href="$namespacefc_1_1raw.html#a0b442d98ceb22dd5a6ae84745e43ffab" title=" " alt="" coords="465,298,576,324"/>
+<area shape="poly" id="edge20_Node000001_Node000016" title=" " alt="" coords="105,224,150,266,179,285,211,300,272,316,335,323,396,323,449,319,450,324,396,328,335,328,271,321,209,306,176,290,147,270,101,228"/>
+<area shape="rect" id="Node000017" href="$classsysio_1_1chain_1_1symbol.html#a31f998c4cfde2fa9148ac3232b11a25d" title=" " alt="" coords="227,377,368,418"/>
+<area shape="poly" id="edge21_Node000001_Node000017" title=" " alt="" coords="102,225,148,282,178,315,211,345,243,367,240,371,208,349,175,318,144,285,98,228"/>
+<area shape="rect" id="Node000004" href="$classfc_1_1microseconds.html#afc3eb0bfd792c7b1cda062e559e30c2e" title=" " alt="" coords="656,20,843,45"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="385,70,433,62,640,38,641,43,433,67,386,75"/>
+<area shape="rect" id="Node000006" href="$classfc_1_1time__point.html#aeccf1b70aa34b132c5269313b8a50573" title=" " alt="" coords="438,77,603,102"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="385,88,423,88,423,93,385,93"/>
+<area shape="poly" id="edge8_Node000003_Node000008" title=" " alt="" coords="375,109,457,132,456,137,373,115"/>
+<area shape="rect" id="Node000005" href="$classfc_1_1microseconds.html#a0c79856cd3ab96153901a64961bf216f" title=" " alt="" coords="891,20,1101,45"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="843,30,875,30,875,35,843,35"/>
+<area shape="poly" id="edge6_Node000006_Node000004" title=" " alt="" coords="574,74,680,47,681,52,576,79"/>
+<area shape="rect" id="Node000007" href="$classfc_1_1time__point.html#ab46781dcaab4880902bc136f36e39e5e" title=" " alt="" coords="683,69,816,110"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="604,87,667,87,667,92,604,92"/>
+<area shape="poly" id="edge12_Node000008_Node000007" title=" " alt="" coords="570,136,667,109,669,114,571,141"/>
+<area shape="rect" id="Node000009" href="$classfc_1_1mock__time__traits.html#a0bed781012a73b8c15882648397b56be" title=" " alt="" coords="679,135,820,175"/>
+<area shape="poly" id="edge9_Node000008_Node000009" title=" " alt="" coords="587,150,664,151,664,157,587,156"/>
+<area shape="rect" id="Node000011" href="$classfc_1_1mock__time__traits.html#adddeebdf472c33f927827c111ddbf0b1" title=" " alt="" coords="679,200,820,241"/>
+<area shape="poly" id="edge11_Node000008_Node000011" title=" " alt="" coords="567,163,665,193,664,198,566,168"/>
+<area shape="rect" id="Node000012" href="$classfc_1_1time__point.html#abfea5efbe9ef58024cda814395ee9945" title=" " alt="" coords="683,265,816,306"/>
+<area shape="poly" id="edge13_Node000008_Node000012" title=" " alt="" coords="555,163,583,177,610,196,625,210,634,224,643,237,658,250,670,258,668,262,655,254,639,241,630,227,621,214,607,200,580,182,553,168"/>
+<area shape="rect" id="Node000010" href="$classfc_1_1mock__time__traits.html#a0d7245b32fd62b3bc712f658250cc4db" title=" " alt="" coords="910,142,1082,168"/>
+<area shape="poly" id="edge10_Node000009_Node000010" title=" " alt="" coords="820,152,894,152,894,158,820,158"/>
+<area shape="rect" id="Node000015" href="$structsysio_1_1chain_1_1abi__serializer.html#a86cdea8e36ed545689cb36f932333ac7" title=" " alt="" coords="433,209,608,250"/>
+<area shape="poly" id="edge17_Node000014_Node000015" title=" " alt="" coords="385,252,417,246,418,251,386,257"/>
+<area shape="poly" id="edge18_Node000014_Node000016" title=" " alt="" coords="386,284,451,296,450,301,385,289"/>
+<area shape="poly" id="edge19_Node000016_Node000016" title=" " alt="" coords="484,299,476,290,481,280,496,274,521,272,548,274,562,281,560,286,547,279,521,277,497,279,484,284,482,289,488,296"/>
+<area shape="rect" id="Node000018" href="$classsysio_1_1chain_1_1symbol.html#a8e41beda74e6823bf4efe4d478440e88" title=" " alt="" coords="450,348,591,389"/>
+<area shape="poly" id="edge22_Node000017_Node000018" title=" " alt="" coords="368,386,434,377,435,382,369,391"/>
+<area shape="rect" id="Node000019" href="$classsysio_1_1chain_1_1symbol.html#a067cd53c6a32da32671b1302a0c1909a" title=" " alt="" coords="450,413,591,454"/>
+<area shape="poly" id="edge23_Node000017_Node000019" title=" " alt="" coords="369,406,435,417,434,422,368,412"/>
+<area shape="rect" id="Node000020" href="$classsysio_1_1chain_1_1symbol.html#a8f3fcd97b82083e359f91943b0674fc3" title=" " alt="" coords="450,479,591,519"/>
+<area shape="poly" id="edge24_Node000017_Node000020" title=" " alt="" coords="339,416,434,463,450,470,448,475,432,468,336,421"/>
+</map>

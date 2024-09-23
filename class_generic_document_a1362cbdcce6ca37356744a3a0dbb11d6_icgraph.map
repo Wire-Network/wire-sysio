@@ -1,0 +1,25 @@
+<map id="GenericDocument::GetAllocator" name="GenericDocument::GetAllocator">
+<area shape="rect" id="Node000001" title="Get the allocator of this document." alt="" coords="466,228,672,254"/>
+<area shape="rect" id="Node000002" href="$class_generic_document.html#a14097c833bed1a9c7be064ea619c887f" title=" " alt="" coords="220,5,408,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="553,216,532,177,502,130,463,83,417,44,395,34,398,29,419,40,467,80,506,127,537,174,558,213"/>
+<area shape="rect" id="Node000003" href="$class_generic_document.html#a42f2df68f9c9d8b88a15b609716867d9" title=" " alt="" coords="217,55,412,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="548,217,494,155,457,122,417,94,392,83,394,78,419,89,461,117,498,151,552,214"/>
+<area shape="rect" id="Node000004" href="$tutorial_8cpp.html#a81ce304348a420752ee080480d2b3095" title=" " alt="" coords="290,104,339,130"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="538,220,484,181,417,143,376,130,339,123,340,117,378,125,419,138,487,176,542,216"/>
+<area shape="rect" id="Node000005" href="$class_generic_document.html#af703994dec5af6ef049a24b5243aceab" title=" " alt="" coords="211,153,418,179"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="516,225,417,193,376,182,378,177,419,188,518,220"/>
+<area shape="rect" id="Node000006" href="$class_schema.html#a30f124d0ae285a4769582acc298ea65b" title=" " alt="" coords="257,203,372,228"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="450,232,372,224,372,219,451,226"/>
+<area shape="rect" id="Node000007" href="$class_generic_document.html#ad319fcc9e13606b6795424b9374a7398" title=" " alt="" coords="230,252,398,278"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="451,255,399,260,399,254,450,249"/>
+<area shape="rect" id="Node000009" href="$documenttest_8cpp.html#a5a5102163f2c3ffd2fd96b8b6f1b07ca" title=" " alt="" coords="287,301,342,327"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="517,262,419,293,343,311,342,306,417,288,515,257"/>
+<area shape="rect" id="Node000010" href="$documenttest_8cpp.html#a4a57d7460a1292e90944832a90aa7070" title=" " alt="" coords="287,351,342,376"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="542,266,487,305,419,342,380,355,343,362,342,357,378,350,417,337,484,300,538,261"/>
+<area shape="rect" id="Node000011" href="$documenttest_8cpp.html#a724ac92c78ef829fcd9e0a7dd8ed0105" title=" " alt="" coords="287,400,342,426"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="551,268,497,330,460,363,419,391,380,406,343,413,342,408,379,401,417,386,457,359,493,326,547,264"/>
+<area shape="rect" id="Node000012" href="$valuetest_8cpp.html#a3cf9cc967e6d126a803ea2fd4aea0bfb" title=" " alt="" coords="287,449,342,475"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="558,268,537,307,506,354,467,401,419,440,381,457,343,463,342,458,379,452,417,436,463,397,502,351,532,305,553,266"/>
+<area shape="rect" id="Node000008" href="$class_generic_document.html#a600d0950baabbcab11197cacb1459c7a" title=" " alt="" coords="5,252,163,278"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="215,268,163,268,163,262,215,262"/>
+</map>

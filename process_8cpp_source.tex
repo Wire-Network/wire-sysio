@@ -1,0 +1,184 @@
+\doxysection{process.\+cpp}
+\hypertarget{process_8cpp_source}{}\label{process_8cpp_source}\index{libraries/fc/src/interprocess/process.cpp@{libraries/fc/src/interprocess/process.cpp}}
+\mbox{\hyperlink{process_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{process_8hpp}{fc/interprocess/process.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <fc/io/iostream.hpp>}}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{buffered__iostream_8hpp}{fc/io/buffered\_iostream.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <fc/asio.hpp>}}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{filesystem_8hpp}{fc/filesystem.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{logger_8hpp}{fc/log/logger.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <boost/process/all.hpp>}}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <boost/iostreams/stream.hpp>}}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ <cstdlib>}}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00011}00011\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}\ \{}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00012}00012\ \ \ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_xbyak_1_1util_aa8a7e90a7fce7c382d20fa2a7895cda3}{bp}}\ =\ boost::process;}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00013}00013\ \ \ \textcolor{keyword}{namespace\ }io\ =\ boost::iostreams;}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00015}\mbox{\hyperlink{namespacefc_ad3297da9a0f1353ee019005de958dc0b}{00015}}\ \mbox{\hyperlink{classfc_1_1path}{fc::path}}\ \mbox{\hyperlink{namespacefc_ad3297da9a0f1353ee019005de958dc0b}{find\_executable\_in\_path}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc::string}}\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00016}00016\ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00017}00017\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc::string}}(bp::find\_executable\_in\_path(\ std::string(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}),\ \textcolor{stringliteral}{"{}"{}}\ ));}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00018}00018\ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00019}00019\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ std::getenv(\textcolor{stringliteral}{"{}PATH"{}});}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00020}00020\ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a3a1fa84768603c99866fe61af96c9f36}{FC\_THROW}}(\ \textcolor{stringliteral}{"{}Unable\ to\ find\ executable\ \$\{exe\}\ in\ path."{}},\ }
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00021}00021\ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}exe"{}},\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00022}00022\ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}inner"{}},\ \mbox{\hyperlink{namespacefc_a2bbff129626558fab1e343fcd5ad8bc5}{fc::except\_str}}()\ )}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00023}00023\ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}PATH"{}},\ \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc::string}}(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}!=\textcolor{keyword}{nullptr}?\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}:\textcolor{stringliteral}{"{}"{}})\ )\ );}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00024}00024\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00025}00025\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1path}{fc::path}}();}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00026}00026\ \}}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00029}\mbox{\hyperlink{classfc_1_1process_1_1impl}{00029}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classfc_1_1process_1_1impl}{process::impl}}\ }
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00030}00030\ \{}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00031}00031\ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00032}\mbox{\hyperlink{classfc_1_1process_1_1impl_a7cc655f7f7b118e849f01baa74fc7ebe}{00032}}\ \ \ \mbox{\hyperlink{classfc_1_1process_1_1impl_a7cc655f7f7b118e849f01baa74fc7ebe}{impl}}()}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00033}00033\ \ \ :\mbox{\hyperlink{classfc_1_1process_1_1impl_aaaedc39e5aa96be4ec8e676aeab7db7b}{stat}}(\ \mbox{\hyperlink{namespacefc}{fc}}::\mbox{\hyperlink{namespacewebsocketpp_1_1lib_1_1asio}{asio}}::default\_io\_service()\ )\{\}}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00035}\mbox{\hyperlink{classfc_1_1process_1_1impl_aea59482a7b5df894a163a0b6b7f6a7e7}{00035}}\ \ \ \mbox{\hyperlink{classfc_1_1process_1_1impl_aea59482a7b5df894a163a0b6b7f6a7e7}{\string~impl}}()\ }
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00036}00036\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00037}00037\ \ \ \ \ \textcolor{keywordflow}{try}\ }
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00038}00038\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00039}00039\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{classfc_1_1process_1_1impl_ad30de389f313b795cba873cea4954a4d}{\_in}}\ )}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00040}00040\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00041}00041\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1process_1_1impl_ad30de389f313b795cba873cea4954a4d}{\_in}}-\/>close();}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00042}00042\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00043}00043\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{classfc_1_1process_1_1impl_a5721dbb0ab23faadaab56847f50166a9}{\_exited}}.valid()\ \&\&\ !\mbox{\hyperlink{classfc_1_1process_1_1impl_a5721dbb0ab23faadaab56847f50166a9}{\_exited}}.ready())\ }
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00044}00044\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00045}00045\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//child-\/>terminate();}}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00046}00046\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1process_1_1impl_a5721dbb0ab23faadaab56847f50166a9}{\_exited}}.wait();}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00047}00047\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00048}00048\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00049}00049\ \ \ \ \ \textcolor{keywordflow}{catch}(...)\ }
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00050}00050\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00051}00051\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a1759e5c9691d8ad754bdf5eff8bb23ac}{wlog}}(\ \textcolor{stringliteral}{"{}caught\ exception\ cleaning\ up\ process:\ \$\{except\_str\}"{}},\ (\textcolor{stringliteral}{"{}except\_str"{}},\mbox{\hyperlink{namespacefc_a2bbff129626558fab1e343fcd5ad8bc5}{fc::except\_str}}())\ );}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00052}00052\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00053}00053\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00054}00054\ }
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00055}\mbox{\hyperlink{classfc_1_1process_1_1impl_afb0bf380d0ab71fc5c4c176dc8c04d9d}{00055}}\ \ \ std::shared\_ptr<bp::child>\ \mbox{\hyperlink{classfc_1_1process_1_1impl_afb0bf380d0ab71fc5c4c176dc8c04d9d}{child}};}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00057}\mbox{\hyperlink{classfc_1_1process_1_1impl_a6cd566d0eaa70107701d90f8f9696c42}{00057}}\ \ \ std::shared\_ptr<bp::pipe>\ \ \mbox{\hyperlink{classfc_1_1process_1_1impl_a6cd566d0eaa70107701d90f8f9696c42}{\_inp}};}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00058}\mbox{\hyperlink{classfc_1_1process_1_1impl_a3f9df0eef8bbd4fcc8faac1e35b772cb}{00058}}\ \ \ std::shared\_ptr<bp::pipe>\ \ \mbox{\hyperlink{classfc_1_1process_1_1impl_a3f9df0eef8bbd4fcc8faac1e35b772cb}{\_outp}};}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00059}\mbox{\hyperlink{classfc_1_1process_1_1impl_a9576ff72b2aa4832df23c8e3a9efc5f8}{00059}}\ \ \ std::shared\_ptr<bp::pipe>\ \ \mbox{\hyperlink{classfc_1_1process_1_1impl_a9576ff72b2aa4832df23c8e3a9efc5f8}{\_errp}};}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00061}\mbox{\hyperlink{classfc_1_1process_1_1impl_a13075131159d821d4ec121ac8a45a5c3}{00061}}\ \ \ \mbox{\hyperlink{namespacefc_a1de1d095ba3c29dc0ced564bc8f45123}{buffered\_istream\_ptr}}\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1process_1_1impl_a13075131159d821d4ec121ac8a45a5c3}{\_out}};}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00062}\mbox{\hyperlink{classfc_1_1process_1_1impl_ab36db23be72e25723681678f10ffac4e}{00062}}\ \ \ \mbox{\hyperlink{namespacefc_a1de1d095ba3c29dc0ced564bc8f45123}{buffered\_istream\_ptr}}\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1process_1_1impl_ab36db23be72e25723681678f10ffac4e}{\_err}};}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00063}\mbox{\hyperlink{classfc_1_1process_1_1impl_ad30de389f313b795cba873cea4954a4d}{00063}}\ \ \ \mbox{\hyperlink{namespacefc_a95f13893819c9b7254bd8dc1f906c497}{buffered\_ostream\_ptr}}\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1process_1_1impl_ad30de389f313b795cba873cea4954a4d}{\_in}};}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00065}\mbox{\hyperlink{classfc_1_1process_1_1impl_aaaedc39e5aa96be4ec8e676aeab7db7b}{00065}}\ \ \ bp::status\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1process_1_1impl_aaaedc39e5aa96be4ec8e676aeab7db7b}{stat}};}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00066}\mbox{\hyperlink{classfc_1_1process_1_1impl_a19790cdb8fcf5b620ab532702c9728d8}{00066}}\ \ \ bp::context\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1process_1_1impl_a19790cdb8fcf5b620ab532702c9728d8}{pctx}};}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00067}00067\ }
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00068}\mbox{\hyperlink{classfc_1_1process_1_1impl_a5721dbb0ab23faadaab56847f50166a9}{00068}}\ \ \ fc::future<int>\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1process_1_1impl_a5721dbb0ab23faadaab56847f50166a9}{\_exited}};}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00069}00069\ \};}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00071}\mbox{\hyperlink{classfc_1_1process_a1db88690c9d0e5317377b7acbc0970c3}{00071}}\ \mbox{\hyperlink{classfc_1_1process_a1db88690c9d0e5317377b7acbc0970c3}{process::process}}()}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00072}00072\ :my(\ new\ \mbox{\hyperlink{classfc_1_1process}{process}}::\mbox{\hyperlink{classfc_1_1process_1_1impl}{impl}}()\ )\{\}}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00073}\mbox{\hyperlink{classfc_1_1process_a5dffa9190200ad347a2edaa2d75d9e82}{00073}}\ \mbox{\hyperlink{classfc_1_1process_a5dffa9190200ad347a2edaa2d75d9e82}{process::\string~process}}()\{\}}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00074}00074\ }
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00075}\mbox{\hyperlink{classfc_1_1process_aa663b2fe8d58228224d0c1a954554a46}{00075}}\ \mbox{\hyperlink{classfc_1_1iprocess}{iprocess}}\&\ \mbox{\hyperlink{classfc_1_1process_aa663b2fe8d58228224d0c1a954554a46}{process::exec}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1path}{fc::path}}\&\ exe,\ }
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::vector<std::string>\ args,\ }
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1path}{fc::path}}\&\ work\_dir,\ \textcolor{keywordtype}{int}\ opt\ \ )\ }
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00078}00078\ \{}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00080}00080\ \ \ my-\/>pctx.work\_dir\ =\ work\_dir.\mbox{\hyperlink{classfc_1_1path_aaf0107e4a41f9977032b2a604161cf85}{string}}();}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00081}00081\ \ \ my-\/>pctx.suppress\_console\ =\ (opt\ \&\ \mbox{\hyperlink{classfc_1_1iprocess_a5c8a22e5daa2e344574cf9b98ebbc7c0ac57cedf7ffea9ae46e072a5ff3deae1a}{suppress\_console}})\ !=\ 0;}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00082}00082\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00083}00083\ \ \ \textcolor{keywordflow}{if}(\ opt\&\mbox{\hyperlink{classfc_1_1iprocess_a5c8a22e5daa2e344574cf9b98ebbc7c0a7b8800fa43953d78083d86327a0a604e}{open\_stdout}})}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00084}00084\ \ \ \ \ \ \ my-\/>pctx.streams[boost::process::stdout\_id]\ =\ bp::behavior::async\_pipe();}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00085}00085\ \ \ \textcolor{keywordflow}{else}\ }
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00086}00086\ \ \ \ \ \ \ my-\/>pctx.streams[boost::process::stdout\_id]\ =\ bp::behavior::null();}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00087}00087\ }
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00088}00088\ }
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00089}00089\ \ \ \textcolor{keywordflow}{if}(\ opt\&\ \mbox{\hyperlink{classfc_1_1iprocess_a5c8a22e5daa2e344574cf9b98ebbc7c0aad069fbbfabfc66f12f66a6270baa92d}{open\_stderr}}\ )}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00090}00090\ \ \ \ \ \ \ my-\/>pctx.streams[boost::process::stderr\_id]\ =\ bp::behavior::async\_pipe();}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00091}00091\ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00092}00092\ \ \ \ \ \ \ my-\/>pctx.streams[boost::process::stderr\_id]\ =\ bp::behavior::null();}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00093}00093\ }
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00094}00094\ \ \ \textcolor{keywordflow}{if}(\ opt\&\ \mbox{\hyperlink{classfc_1_1iprocess_a5c8a22e5daa2e344574cf9b98ebbc7c0a1ae4c54b9b2b285e1ab8b3562d14200c}{open\_stdin}}\ )}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00095}00095\ \ \ \ \ \ \ my-\/>pctx.streams[boost::process::stdin\_id]\ \ =\ bp::behavior::async\_pipe();}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00096}00096\ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00097}00097\ \ \ \ \ \ \ my-\/>pctx.streams[boost::process::stdin\_id]\ \ =\ bp::behavior::close();}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00098}00098\ }
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00099}00099\ \ \ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00100}00100\ \textcolor{comment}{\ \ std::vector<std::string>\ a;}}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00101}00101\ \textcolor{comment}{\ \ a.reserve(size\_t(args.size()));}}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00102}00102\ \textcolor{comment}{\ \ for(\ uint32\_t\ i\ =\ 0;\ i\ <\ args.size();\ ++i\ )\ \{}}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00103}00103\ \textcolor{comment}{\ \ \ \ a.push\_back(\ fc::move(args[i])\ );\ }}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00104}00104\ \textcolor{comment}{\ \ \}}}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00105}00105\ \textcolor{comment}{\ \ */}}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00106}00106\ \ \ my-\/>child.reset(\ \textcolor{keyword}{new}\ bp::child(\ bp::create\_child(\ exe.\mbox{\hyperlink{classfc_1_1path_aaf0107e4a41f9977032b2a604161cf85}{string}}(),\ fc::move(args),\ my-\/>pctx\ )\ )\ );}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00107}00107\ }
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00108}00108\ \ \ \textcolor{keywordflow}{if}(\ opt\ \&\ \mbox{\hyperlink{classfc_1_1iprocess_a5c8a22e5daa2e344574cf9b98ebbc7c0a7b8800fa43953d78083d86327a0a604e}{open\_stdout}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00109}00109\ \ \ \ \ \ bp::handle\ outh\ =\ my-\/>child-\/>get\_handle(\ bp::stdout\_id\ );}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00110}00110\ \ \ \ \ \ my-\/>\_outp.reset(\ \textcolor{keyword}{new}\ bp::pipe(\ fc::asio::default\_io\_service(),\ outh.release()\ )\ );}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00111}00111\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00112}00112\ \ \ \textcolor{keywordflow}{if}(\ opt\ \&\ \mbox{\hyperlink{classfc_1_1iprocess_a5c8a22e5daa2e344574cf9b98ebbc7c0aad069fbbfabfc66f12f66a6270baa92d}{open\_stderr}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00113}00113\ \ \ \ \ \ bp::handle\ errh\ =\ my-\/>child-\/>get\_handle(\ bp::stderr\_id\ );}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00114}00114\ \ \ \ \ \ my-\/>\_errp.reset(\ \textcolor{keyword}{new}\ bp::pipe(\ fc::asio::default\_io\_service(),\ errh.release()\ )\ );}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00115}00115\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00116}00116\ \ \ \textcolor{keywordflow}{if}(\ opt\ \&\ \mbox{\hyperlink{classfc_1_1iprocess_a5c8a22e5daa2e344574cf9b98ebbc7c0a1ae4c54b9b2b285e1ab8b3562d14200c}{open\_stdin}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00117}00117\ \ \ \ \ \ bp::handle\ inh\ \ =\ my-\/>child-\/>get\_handle(\ bp::stdin\_id\ );}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00118}00118\ \ \ \ \ \ my-\/>\_inp.reset(\ \ \textcolor{keyword}{new}\ bp::pipe(\ fc::asio::default\_io\_service(),\ inh.release()\ \ )\ );}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00119}00119\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00120}00120\ }
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00121}00121\ }
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00122}00122\ \ \ promise<int>::ptr\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}(\textcolor{keyword}{new}\ promise<int>(\textcolor{stringliteral}{"{}process"{}}));}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00123}00123\ \ \ my-\/>stat.async\_wait(\ \ my-\/>child-\/>get\_id(),\ [=](\ \textcolor{keyword}{const}\ boost::system::error\_code\&\ ec,\ \textcolor{keywordtype}{int}\ exit\_code\ )}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00124}00124\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00125}00125\ \ \ \ \ \ \ \textcolor{comment}{//slog(\ "{}process::result\ \%d"{},\ exit\_code\ );}}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00126}00126\ \ \ \ \ \ \ if(\ !ec\ )\ \{}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00127}00127\ \ \ \ \ \ \ \ \ \ \ \#ifdef\ BOOST\_POSIX\_API}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00128}00128\ \ \ \ \ \ \ \ \ \ \ if(\ WIFEXITED(exit\_code)\ )\ p-\/>set\_value(\ \ WEXITSTATUS(exit\_code)\ );}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00129}00129\ \ \ \ \ \ \ \ \ \ \ else}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00130}00130\ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00131}00131\ \ \ \ \ \ \ \ \ \ \ \ \ \ p-\/>set\_exception(\ }
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00132}00132\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fc::exception\_ptr(\ new\ fc::exception(\ }
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00133}00133\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ FC\_LOG\_MESSAGE(\ error,\ \textcolor{stringliteral}{"{}process\ exited\ with:\ \$\{message\}\ "{}},\ }
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00134}00134\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}message"{}},\ strsignal(WTERMSIG(exit\_code)))\ )\ )\ )\ );}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00135}00135\ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00136}00136\ \ \ \ \ \ \ \ \ \ \ \#else}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00137}00137\ \ \ \ \ \ \ \ \ \ \ p-\/>set\_value(exit\_code);}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00138}00138\ \ \ \ \ \ \ \ \ \ \ \#endif}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00139}00139\ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00140}00140\ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00141}00141\ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00142}00142\ \ \ \ \ \ \ \ \ \ \ p-\/>set\_exception(\ }
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00143}00143\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fc::exception\_ptr(\ new\ fc::exception(\ }
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00144}00144\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ FC\_LOG\_MESSAGE(\ error,\ \textcolor{stringliteral}{"{}process\ exited\ with:\ \$\{message\}\ "{}},\ }
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00145}00145\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}message"{}},\ boost::system::system\_error(ec).what()))\ )\ )\ );}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00146}00146\ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00147}00147\ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00148}00148\ \ \ \textcolor{keywordflow}{if}(\ opt\ \&\ open\_stdin\ )}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00149}00149\ \ \ \ \ my-\/>\_in\ \ \ \ \ =\ std::make\_shared<buffered\_ostream>(std::make\_shared<fc::asio::ostream<bp::pipe>>(my-\/>\_inp));}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00150}00150\ \ \ \textcolor{keywordflow}{if}(\ opt\ \&\ open\_stdout\ )}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00151}00151\ \ \ \ \ my-\/>\_out\ \ \ \ =\ std::make\_shared<buffered\_istream>(std::make\_shared<fc::asio::istream<bp::pipe>>(my-\/>\_outp));}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00152}00152\ \ \ \textcolor{keywordflow}{if}(\ opt\ \&\ open\_stderr\ )}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00153}00153\ \ \ \ \ my-\/>\_err\ \ \ \ =\ std::make\_shared<buffered\_istream>(std::make\_shared<fc::asio::istream<bp::pipe>>(my-\/>\_errp));}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00154}00154\ \ \ my-\/>\_exited\ =\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}};}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00155}00155\ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00156}00156\ \}}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00157}00157\ }
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00161}\mbox{\hyperlink{classfc_1_1process_a159c67b1fcff5dffb6678d15090ab335}{00161}}\ \textcolor{keywordtype}{void}\ process::kill()\ \{}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00162}00162\ \ \ my-\/>child-\/>terminate();}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00163}00163\ \}}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00164}00164\ }
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00168}\mbox{\hyperlink{classfc_1_1process_a87f8951f9911b85a30947ad641ae959a}{00168}}\ \mbox{\hyperlink{namespacefc_a95f13893819c9b7254bd8dc1f906c497}{fc::buffered\_ostream\_ptr}}\ process::in\_stream()\ \{}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00169}00169\ \ \ \textcolor{keywordflow}{return}\ my-\/>\_in;}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00170}00170\ \}}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00171}00171\ }
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00175}\mbox{\hyperlink{classfc_1_1process_a9cda12fc9cb8b8f8181af7603395c384}{00175}}\ \mbox{\hyperlink{namespacefc_a1de1d095ba3c29dc0ced564bc8f45123}{fc::buffered\_istream\_ptr}}\ process::out\_stream()\ \{}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00176}00176\ \ \ \textcolor{keywordflow}{return}\ my-\/>\_out;}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00177}00177\ \}}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00181}\mbox{\hyperlink{classfc_1_1process_ae2939ac9bd82790db5f386b13b365549}{00181}}\ \mbox{\hyperlink{namespacefc_a1de1d095ba3c29dc0ced564bc8f45123}{fc::buffered\_istream\_ptr}}\ process::err\_stream()\ \{}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00182}00182\ \ \ \textcolor{keywordflow}{return}\ my-\/>\_err;}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00183}00183\ \}}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00184}00184\ }
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00185}\mbox{\hyperlink{classfc_1_1process_a58711b1b058e41f8139a971d3cc9b0a4}{00185}}\ \textcolor{keywordtype}{int}\ process::result(\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1microseconds}{microseconds}}\&\ timeout\ \textcolor{comment}{/*\ =\ microseconds::maximum()\ */})\ }
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00186}00186\ \{}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00187}00187\ \ \ \ \ \textcolor{keywordflow}{return}\ my-\/>\_exited.wait(timeout);}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00188}00188\ \}}
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00189}00189\ }
+\DoxyCodeLine{\Hypertarget{process_8cpp_source_l00190}00190\ \}}
+
+\end{DoxyCode}

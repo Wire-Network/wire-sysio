@@ -1,0 +1,12 @@
+<map id="sysio::testing::base_tester::_produce_block" name="sysio::testing::base_tester::_produce_block">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,23,166,64"/>
+<area shape="rect" id="Node000002" href="$classfc_1_1microseconds.html#afc3eb0bfd792c7b1cda062e559e30c2e" title=" " alt="" coords="427,5,613,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="166,36,412,22,412,27,166,42"/>
+<area shape="rect" id="Node000004" href="$classfc_1_1time__point.html#aeccf1b70aa34b132c5269313b8a50573" title=" " alt="" coords="214,56,379,82"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="166,51,198,54,198,60,166,56"/>
+<area shape="rect" id="Node000003" href="$classfc_1_1microseconds.html#a0c79856cd3ab96153901a64961bf216f" title=" " alt="" coords="661,5,872,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="614,16,646,16,646,21,614,21"/>
+<area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="356,53,445,32,446,38,357,58"/>
+<area shape="rect" id="Node000005" href="$classfc_1_1time__point.html#ab46781dcaab4880902bc136f36e39e5e" title=" " alt="" coords="454,55,587,96"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="379,69,438,70,438,76,379,74"/>
+</map>

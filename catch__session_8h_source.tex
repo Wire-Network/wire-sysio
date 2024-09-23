@@ -1,0 +1,68 @@
+\doxysection{catch\+\_\+session.\+h}
+\hypertarget{catch__session_8h_source}{}\label{catch__session_8h_source}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_session.h@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_session.h}}
+\mbox{\hyperlink{catch__session_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00002}00002\ \textcolor{comment}{\ *\ \ Created\ by\ Phil\ on\ 31/10/2010.}}
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00003}00003\ \textcolor{comment}{\ *\ \ Copyright\ 2010\ Two\ Blue\ Cubes\ Ltd.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00004}00004\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00005}00005\ \textcolor{comment}{\ *\ \ Distributed\ under\ the\ Boost\ Software\ License,\ Version\ 1.0.\ (See\ accompanying}}
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00006}00006\ \textcolor{comment}{\ *\ \ file\ LICENSE\_1\_0.txt\ or\ copy\ at\ http://www.boost.org/LICENSE\_1\_0.txt)}}
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00007}00007\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00008}00008\ \textcolor{preprocessor}{\#ifndef\ TWOBLUECUBES\_CATCH\_RUNNER\_HPP\_INCLUDED}}
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00009}00009\ \textcolor{preprocessor}{\#define\ TWOBLUECUBES\_CATCH\_RUNNER\_HPP\_INCLUDED}}
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00011}00011\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__commandline_8h}{catch\_commandline.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00012}00012\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__config_8hpp}{catch\_config.hpp}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00013}00013\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__text_8h}{catch\_text.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00015}00015\ \textcolor{preprocessor}{\#include\ <memory>}}
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00017}00017\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00019}\mbox{\hyperlink{class_catch_1_1_session}{00019}}\ \ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_catch_1_1_session}{Session}}\ :\ \mbox{\hyperlink{class_catch_1_1_non_copyable}{NonCopyable}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00020}00020\ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00022}00022\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_session_a4564992e2b028770e38a1dcc6fff8b34}{Session}}();}
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00023}00023\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_session_a4870e67e56335ed29a53a1d98d768fbc}{\string~Session}}()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00025}00025\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_session_a4286263c17b16c3ea9d0632bd4f8eaee}{showHelp}}()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00026}00026\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_session_ac28e293014007bbd9f6383c2d5daa1e4}{libIdentify}}();}
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00028}00028\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{class_catch_1_1_session_af890db02c69e36356ac9f8be4084c464}{applyCommandLine}}(\ \textcolor{keywordtype}{int}\ argc,\ \textcolor{keywordtype}{char}\ \textcolor{keyword}{const}\ *\ \textcolor{keyword}{const}\ *\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}\ );}
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00029}00029\ \textcolor{preprocessor}{\ \ \ \ \#if\ defined(CATCH\_CONFIG\_WCHAR)\ \&\&\ defined(WIN32)\ \&\&\ defined(UNICODE)}}
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00030}00030\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{class_catch_1_1_session_af890db02c69e36356ac9f8be4084c464}{applyCommandLine}}(\ \textcolor{keywordtype}{int}\ argc,\ \textcolor{keywordtype}{wchar\_t}\ \textcolor{keyword}{const}\ *\ \textcolor{keyword}{const}\ *\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}\ );}
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00031}00031\ \textcolor{preprocessor}{\ \ \ \ \#endif}}
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00033}00033\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_session_a122417ed44bfa29a229941b1e12b91a3}{useConfigData}}(\ \mbox{\hyperlink{struct_catch_1_1_config_data}{ConfigData}}\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{class_catch_1_1_session_aadb20e3b2955209aaab3126c0c3da7a6}{configData}}\ );}
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00035}00035\ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ CharT>}
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00036}\mbox{\hyperlink{class_catch_1_1_session_a8c82b89613ebd99f1ba1a3f7b634e571}{00036}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{class_catch_1_1_session_a8c82b89613ebd99f1ba1a3f7b634e571}{run}}(\textcolor{keywordtype}{int}\ argc,\ CharT\ \textcolor{keyword}{const}\ *\ \textcolor{keyword}{const}\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[])\ \{}
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00037}00037\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (m\_startupExceptions)}
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00038}00038\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00039}00039\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ returnCode\ =\ \mbox{\hyperlink{class_catch_1_1_session_af890db02c69e36356ac9f8be4084c464}{applyCommandLine}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}});}
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00040}00040\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (returnCode\ ==\ 0)}
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00041}00041\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ returnCode\ =\ \mbox{\hyperlink{class_catch_1_1_session_a0232a6c37ad5b5064a2462eedf13a9be}{run}}();}
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00042}00042\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ returnCode;}
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00043}00043\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00044}00044\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00045}00045\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{class_catch_1_1_session_a0232a6c37ad5b5064a2462eedf13a9be}{run}}();}
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00047}00047\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1clara_1_1detail_1_1_parser}{clara::Parser}}\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{class_catch_1_1_session_a0a6457ac45988a75429a6fa22f95f6da}{cli}}()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00048}00048\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_session_a0a6457ac45988a75429a6fa22f95f6da}{cli}}(\ \mbox{\hyperlink{struct_catch_1_1clara_1_1detail_1_1_parser}{clara::Parser}}\ \textcolor{keyword}{const}\&\ newParser\ );}
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00049}00049\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_config_data}{ConfigData}}\&\ \mbox{\hyperlink{class_catch_1_1_session_aadb20e3b2955209aaab3126c0c3da7a6}{configData}}();}
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00050}00050\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_config}{Config}}\&\ \mbox{\hyperlink{class_catch_1_1_session_afac375cd0ef4715b09924575d88fdc13}{config}}();}
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00051}00051\ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00052}00052\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ runInternal();}
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00054}00054\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1clara_1_1detail_1_1_parser}{clara::Parser}}\ m\_cli;}
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00055}00055\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_config_data}{ConfigData}}\ m\_configData;}
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00056}00056\ \ \ \ \ \ \ \ \ std::shared\_ptr<Config>\ m\_config;}
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00057}00057\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ m\_startupExceptions\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00058}00058\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00060}00060\ \}\ \textcolor{comment}{//\ end\ namespace\ Catch}}
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{catch__session_8h_source_l00062}00062\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ TWOBLUECUBES\_CATCH\_RUNNER\_HPP\_INCLUDED}}
+
+\end{DoxyCode}

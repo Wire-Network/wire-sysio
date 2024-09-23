@@ -1,0 +1,65 @@
+\doxysection{mnt6\+\_\+init.\+hpp}
+\hypertarget{mnt6__init_8hpp_source}{}\label{mnt6__init_8hpp_source}\index{libraries/fc/libraries/ff/libff/algebra/curves/mnt/mnt6/mnt6\_init.hpp@{libraries/fc/libraries/ff/libff/algebra/curves/mnt/mnt6/mnt6\_init.hpp}}
+\mbox{\hyperlink{mnt6__init_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{mnt6__init_8hpp_source_l00001}00001\ }
+\DoxyCodeLine{\Hypertarget{mnt6__init_8hpp_source_l00012}00012\ \textcolor{preprocessor}{\#ifndef\ MNT6\_INIT\_HPP\_}}
+\DoxyCodeLine{\Hypertarget{mnt6__init_8hpp_source_l00013}00013\ \textcolor{preprocessor}{\#define\ MNT6\_INIT\_HPP\_}}
+\DoxyCodeLine{\Hypertarget{mnt6__init_8hpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{mnt6__init_8hpp_source_l00015}00015\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{mnt46__common_8hpp}{libff/algebra/curves/mnt/mnt46\_common.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{mnt6__init_8hpp_source_l00016}00016\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{public__params_8hpp}{libff/algebra/curves/public\_params.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{mnt6__init_8hpp_source_l00017}00017\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{fp_8hpp}{libff/algebra/fields/fp.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{mnt6__init_8hpp_source_l00018}00018\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{fp3_8hpp}{libff/algebra/fields/fp3.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{mnt6__init_8hpp_source_l00019}00019\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{fp6__2over3_8hpp}{libff/algebra/fields/fp6\_2over3.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{mnt6__init_8hpp_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{mnt6__init_8hpp_source_l00021}00021\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacelibff}{libff}}\ \{}
+\DoxyCodeLine{\Hypertarget{mnt6__init_8hpp_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{mnt6__init_8hpp_source_l00023}\mbox{\hyperlink{mnt6__init_8hpp_a896d66757fd5c706b0ef2f8c048ac176}{00023}}\ \textcolor{preprocessor}{\#define\ mnt6\_modulus\_r\ mnt46\_modulus\_B}}
+\DoxyCodeLine{\Hypertarget{mnt6__init_8hpp_source_l00024}\mbox{\hyperlink{mnt6__init_8hpp_ad5113fdaf825929a731565ce9842f0b7}{00024}}\ \textcolor{preprocessor}{\#define\ mnt6\_modulus\_q\ mnt46\_modulus\_A}}
+\DoxyCodeLine{\Hypertarget{mnt6__init_8hpp_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{mnt6__init_8hpp_source_l00026}\mbox{\hyperlink{namespacelibff_ab990a2ee72b1213f3b05904a7d358718}{00026}}\ \textcolor{keyword}{const}\ mp\_size\_t\ \mbox{\hyperlink{namespacelibff_ab990a2ee72b1213f3b05904a7d358718}{mnt6\_r\_bitcount}}\ =\ \mbox{\hyperlink{namespacelibff_a4dcac82e16e879f09821463c88ce9867}{mnt46\_B\_bitcount}};}
+\DoxyCodeLine{\Hypertarget{mnt6__init_8hpp_source_l00027}\mbox{\hyperlink{namespacelibff_a2ebe051dd2f6036dbd1fa2f06a22ff10}{00027}}\ \textcolor{keyword}{const}\ mp\_size\_t\ \mbox{\hyperlink{namespacelibff_a2ebe051dd2f6036dbd1fa2f06a22ff10}{mnt6\_q\_bitcount}}\ =\ \mbox{\hyperlink{namespacelibff_aa2953c5eab167d60a11456440ae802df}{mnt46\_A\_bitcount}};}
+\DoxyCodeLine{\Hypertarget{mnt6__init_8hpp_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{mnt6__init_8hpp_source_l00029}\mbox{\hyperlink{namespacelibff_a0144b8cef54f5a4488443b43abe0e5e3}{00029}}\ \textcolor{keyword}{const}\ mp\_size\_t\ \mbox{\hyperlink{namespacelibff_a0144b8cef54f5a4488443b43abe0e5e3}{mnt6\_r\_limbs}}\ =\ \mbox{\hyperlink{namespacelibff_ab1c78d21e299b6d4cfc20c1737f0c103}{mnt46\_B\_limbs}};}
+\DoxyCodeLine{\Hypertarget{mnt6__init_8hpp_source_l00030}\mbox{\hyperlink{namespacelibff_a899d14f72602eef1b7517d901fafb3f7}{00030}}\ \textcolor{keyword}{const}\ mp\_size\_t\ \mbox{\hyperlink{namespacelibff_a899d14f72602eef1b7517d901fafb3f7}{mnt6\_q\_limbs}}\ =\ \mbox{\hyperlink{namespacelibff_a5c9daf492971fd861a17bd0719efc7c7}{mnt46\_A\_limbs}};}
+\DoxyCodeLine{\Hypertarget{mnt6__init_8hpp_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{mnt6__init_8hpp_source_l00032}00032\ \textcolor{keyword}{extern}\ \mbox{\hyperlink{classlibff_1_1bigint}{bigint<mnt6\_r\_limbs>}}\ \mbox{\hyperlink{namespacelibff_a0e85563552222ac015948e63d4332566}{mnt6\_modulus\_r}};}
+\DoxyCodeLine{\Hypertarget{mnt6__init_8hpp_source_l00033}00033\ \textcolor{keyword}{extern}\ \mbox{\hyperlink{classlibff_1_1bigint}{bigint<mnt6\_q\_limbs>}}\ \mbox{\hyperlink{namespacelibff_a4c56ab789eb167e334a8613ee62fa54b}{mnt6\_modulus\_q}};}
+\DoxyCodeLine{\Hypertarget{mnt6__init_8hpp_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{mnt6__init_8hpp_source_l00035}\mbox{\hyperlink{namespacelibff_a8f3c635e051466da457c430c522285d9}{00035}}\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\_model<mnt6\_r\_limbs,\ mnt6\_modulus\_r>}}\ \mbox{\hyperlink{namespacelibff_a8f3c635e051466da457c430c522285d9}{mnt6\_Fr}};}
+\DoxyCodeLine{\Hypertarget{mnt6__init_8hpp_source_l00036}\mbox{\hyperlink{namespacelibff_a956442671f9bb7880b3dff2e80c69f8f}{00036}}\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\_model<mnt6\_q\_limbs,\ mnt6\_modulus\_q>}}\ \mbox{\hyperlink{namespacelibff_a956442671f9bb7880b3dff2e80c69f8f}{mnt6\_Fq}};}
+\DoxyCodeLine{\Hypertarget{mnt6__init_8hpp_source_l00037}\mbox{\hyperlink{namespacelibff_ad13fd48c480a123c223f4587ac92321b}{00037}}\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classlibff_1_1_fp3__model}{Fp3\_model<mnt6\_q\_limbs,\ mnt6\_modulus\_q>}}\ \mbox{\hyperlink{namespacelibff_ad13fd48c480a123c223f4587ac92321b}{mnt6\_Fq3}};}
+\DoxyCodeLine{\Hypertarget{mnt6__init_8hpp_source_l00038}\mbox{\hyperlink{namespacelibff_a05c88eafe15e4902420decd263b7552a}{00038}}\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classlibff_1_1_fp6__2over3__model}{Fp6\_2over3\_model<mnt6\_q\_limbs,\ mnt6\_modulus\_q>}}\ \mbox{\hyperlink{namespacelibff_a05c88eafe15e4902420decd263b7552a}{mnt6\_Fq6}};}
+\DoxyCodeLine{\Hypertarget{mnt6__init_8hpp_source_l00039}\mbox{\hyperlink{namespacelibff_a980f01e00963b1deb05e1b59e9ebe5ec}{00039}}\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classlibff_1_1_fp6__2over3__model}{mnt6\_Fq6}}\ \mbox{\hyperlink{namespacelibff_a980f01e00963b1deb05e1b59e9ebe5ec}{mnt6\_GT}};}
+\DoxyCodeLine{\Hypertarget{mnt6__init_8hpp_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{mnt6__init_8hpp_source_l00041}00041\ \textcolor{comment}{//\ parameters\ for\ twisted\ short\ Weierstrass\ curve\ E'/Fq3\ :\ y\string^2\ =\ x\string^3\ +\ (a\ *\ twist\string^2)\ *\ x\ +\ (b\ *\ twist\string^3)}}
+\DoxyCodeLine{\Hypertarget{mnt6__init_8hpp_source_l00042}00042\ \textcolor{keyword}{extern}\ \mbox{\hyperlink{classlibff_1_1_fp3__model}{mnt6\_Fq3}}\ \mbox{\hyperlink{namespacelibff_a9add7471ee509b4a4ba4c25d9c85d391}{mnt6\_twist}};}
+\DoxyCodeLine{\Hypertarget{mnt6__init_8hpp_source_l00043}00043\ \textcolor{keyword}{extern}\ \mbox{\hyperlink{classlibff_1_1_fp3__model}{mnt6\_Fq3}}\ \mbox{\hyperlink{namespacelibff_ac415111cac7732a9eb575f88b7df812b}{mnt6\_twist\_coeff\_a}};}
+\DoxyCodeLine{\Hypertarget{mnt6__init_8hpp_source_l00044}00044\ \textcolor{keyword}{extern}\ \mbox{\hyperlink{classlibff_1_1_fp3__model}{mnt6\_Fq3}}\ \mbox{\hyperlink{namespacelibff_adc84551522d88ceacca7fe6d50530799}{mnt6\_twist\_coeff\_b}};}
+\DoxyCodeLine{\Hypertarget{mnt6__init_8hpp_source_l00045}00045\ \textcolor{keyword}{extern}\ \mbox{\hyperlink{classlibff_1_1_fp__model}{mnt6\_Fq}}\ \mbox{\hyperlink{namespacelibff_a6f394fcdeebb6ba12f69cde489615d07}{mnt6\_twist\_mul\_by\_a\_c0}};}
+\DoxyCodeLine{\Hypertarget{mnt6__init_8hpp_source_l00046}00046\ \textcolor{keyword}{extern}\ \mbox{\hyperlink{classlibff_1_1_fp__model}{mnt6\_Fq}}\ \mbox{\hyperlink{namespacelibff_af77257a4b138a240b69e4bdeb0a7f58c}{mnt6\_twist\_mul\_by\_a\_c1}};}
+\DoxyCodeLine{\Hypertarget{mnt6__init_8hpp_source_l00047}00047\ \textcolor{keyword}{extern}\ \mbox{\hyperlink{classlibff_1_1_fp__model}{mnt6\_Fq}}\ \mbox{\hyperlink{namespacelibff_a81592bb13421ab87e8acfa86ffd5e3c9}{mnt6\_twist\_mul\_by\_a\_c2}};}
+\DoxyCodeLine{\Hypertarget{mnt6__init_8hpp_source_l00048}00048\ \textcolor{keyword}{extern}\ \mbox{\hyperlink{classlibff_1_1_fp__model}{mnt6\_Fq}}\ \mbox{\hyperlink{namespacelibff_acb1d3afbd8862be683fa36792348861a}{mnt6\_twist\_mul\_by\_b\_c0}};}
+\DoxyCodeLine{\Hypertarget{mnt6__init_8hpp_source_l00049}00049\ \textcolor{keyword}{extern}\ \mbox{\hyperlink{classlibff_1_1_fp__model}{mnt6\_Fq}}\ \mbox{\hyperlink{namespacelibff_ab03e7c321b519a76cfe0ac7fb722bda1}{mnt6\_twist\_mul\_by\_b\_c1}};}
+\DoxyCodeLine{\Hypertarget{mnt6__init_8hpp_source_l00050}00050\ \textcolor{keyword}{extern}\ \mbox{\hyperlink{classlibff_1_1_fp__model}{mnt6\_Fq}}\ \mbox{\hyperlink{namespacelibff_a92584659ba5f6ff528afa3aa8a97a432}{mnt6\_twist\_mul\_by\_b\_c2}};}
+\DoxyCodeLine{\Hypertarget{mnt6__init_8hpp_source_l00051}00051\ \textcolor{keyword}{extern}\ \mbox{\hyperlink{classlibff_1_1_fp__model}{mnt6\_Fq}}\ \mbox{\hyperlink{namespacelibff_acbda0c167b24b586761a1e490da6e0fb}{mnt6\_twist\_mul\_by\_q\_X}};}
+\DoxyCodeLine{\Hypertarget{mnt6__init_8hpp_source_l00052}00052\ \textcolor{keyword}{extern}\ \mbox{\hyperlink{classlibff_1_1_fp__model}{mnt6\_Fq}}\ \mbox{\hyperlink{namespacelibff_ac813529c23191f1fc2e302bc820fca1e}{mnt6\_twist\_mul\_by\_q\_Y}};}
+\DoxyCodeLine{\Hypertarget{mnt6__init_8hpp_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{mnt6__init_8hpp_source_l00054}00054\ \textcolor{comment}{//\ parameters\ for\ pairing}}
+\DoxyCodeLine{\Hypertarget{mnt6__init_8hpp_source_l00055}00055\ \textcolor{keyword}{extern}\ \mbox{\hyperlink{classlibff_1_1bigint}{bigint<mnt6\_q\_limbs>}}\ \mbox{\hyperlink{namespacelibff_aef135b9be5294089f99d8e488a5a5633}{mnt6\_ate\_loop\_count}};}
+\DoxyCodeLine{\Hypertarget{mnt6__init_8hpp_source_l00056}00056\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacelibff_ab6303decd17d2677858cd90deec1745b}{mnt6\_ate\_is\_loop\_count\_neg}};}
+\DoxyCodeLine{\Hypertarget{mnt6__init_8hpp_source_l00057}00057\ \textcolor{keyword}{extern}\ \mbox{\hyperlink{classlibff_1_1bigint}{bigint<6*mnt6\_q\_limbs>}}\ \mbox{\hyperlink{namespacelibff_a12f4e81f523320abc264981e52799e46}{mnt6\_final\_exponent}};}
+\DoxyCodeLine{\Hypertarget{mnt6__init_8hpp_source_l00058}00058\ \textcolor{keyword}{extern}\ \mbox{\hyperlink{classlibff_1_1bigint}{bigint<mnt6\_q\_limbs>}}\ \mbox{\hyperlink{namespacelibff_a1efaf035cd46d1bb1d5b88858181cc83}{mnt6\_final\_exponent\_last\_chunk\_abs\_of\_w0}};}
+\DoxyCodeLine{\Hypertarget{mnt6__init_8hpp_source_l00059}00059\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacelibff_a5cdb185fc65049e9f9a38a23db79045a}{mnt6\_final\_exponent\_last\_chunk\_is\_w0\_neg}};}
+\DoxyCodeLine{\Hypertarget{mnt6__init_8hpp_source_l00060}00060\ \textcolor{keyword}{extern}\ \mbox{\hyperlink{classlibff_1_1bigint}{bigint<mnt6\_q\_limbs>}}\ \mbox{\hyperlink{namespacelibff_a7d865f1d43cef33e6d8e3b60e2ebdf20}{mnt6\_final\_exponent\_last\_chunk\_w1}};}
+\DoxyCodeLine{\Hypertarget{mnt6__init_8hpp_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{mnt6__init_8hpp_source_l00062}00062\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacelibff_a43aa84da89b1fe08dc54a140165e6f8f}{init\_mnt6\_params}}();}
+\DoxyCodeLine{\Hypertarget{mnt6__init_8hpp_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{mnt6__init_8hpp_source_l00064}00064\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classlibff_1_1mnt6___g1}{mnt6\_G1}};}
+\DoxyCodeLine{\Hypertarget{mnt6__init_8hpp_source_l00065}00065\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classlibff_1_1mnt6___g2}{mnt6\_G2}};}
+\DoxyCodeLine{\Hypertarget{mnt6__init_8hpp_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{mnt6__init_8hpp_source_l00067}00067\ \}\ \textcolor{comment}{//\ libff}}
+\DoxyCodeLine{\Hypertarget{mnt6__init_8hpp_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{mnt6__init_8hpp_source_l00069}00069\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ MNT6\_INIT\_HPP\_}}
+
+\end{DoxyCode}

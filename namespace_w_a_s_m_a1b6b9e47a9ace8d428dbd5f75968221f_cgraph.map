@@ -1,0 +1,10 @@
+<map id="WASM::serialize" name="WASM::serialize">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,42,124,68"/>
+<area shape="rect" id="Node000002" href="$namespace_serialization.html#a4eb4f7ddb9c392ea5af0205ef8e4e987" title=" " alt="" coords="172,5,320,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="123,43,156,38,157,43,124,48"/>
+<area shape="rect" id="Node000003" href="$namespace_serialization.html#a1ea6ecb2f4de00340f936648398f4f66" title=" " alt="" coords="368,35,516,75"/>
+<area shape="poly" id="edge4_Node000001_Node000003" title=" " alt="" coords="124,54,172,55,320,55,352,55,352,60,320,60,172,60,124,59"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="321,34,353,39,352,44,320,39"/>
+<area shape="rect" id="Node000004" href="$namespace_serialization.html#a7542db4eecbd9af4bc8398241da2614d" title=" " alt="" coords="564,35,713,75"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="517,52,549,52,549,58,517,58"/>
+</map>

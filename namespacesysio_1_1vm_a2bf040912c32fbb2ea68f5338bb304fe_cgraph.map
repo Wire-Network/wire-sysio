@@ -1,0 +1,9 @@
+<map id="sysio::vm::setup_signal_handler" name="sysio::vm::setup_signal_handler">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,39,165,79"/>
+<area shape="rect" id="Node000002" href="$namespacesysio_1_1vm.html#a54ec5a188f3bccc28c33687d74736bdf" title=" " alt="" coords="213,5,383,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="165,44,197,39,198,44,166,49"/>
+<area shape="rect" id="Node000003" href="$namespacesysio_1_1vm.html#a3b729c87be5c09baca1dec359fad785b" title=" " alt="" coords="218,71,378,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="166,68,203,74,202,79,165,74"/>
+<area shape="rect" id="Node000004" href="$namespacesysio_1_1vm.html#aa2e30fac0f99c3450ef6d78aa934490f" title=" " alt="" coords="431,78,600,104"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="378,88,415,88,415,94,378,94"/>
+</map>

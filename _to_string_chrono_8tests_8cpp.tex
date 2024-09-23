@@ -1,0 +1,135 @@
+\doxysection{libraries/sys-\/vm/external/\+Catch2/projects/\+Self\+Test/\+Usage\+Tests/\+To\+String\+Chrono.tests.\+cpp File Reference}
+\hypertarget{_to_string_chrono_8tests_8cpp}{}\label{_to_string_chrono_8tests_8cpp}\index{libraries/sys-\/vm/external/Catch2/projects/SelfTest/UsageTests/ToStringChrono.tests.cpp@{libraries/sys-\/vm/external/Catch2/projects/SelfTest/UsageTests/ToStringChrono.tests.cpp}}
+{\ttfamily \#include "{}catch.\+hpp"{}}\newline
+{\ttfamily \#include $<$chrono$>$}\newline
+{\ttfamily \#include $<$cstdint$>$}\newline
+Include dependency graph for To\+String\+Chrono.\+tests.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=272pt]{_to_string_chrono_8tests_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{_to_string_chrono_8tests_8cpp_ae5ce616c3ba88e050008d20f8898a2e5}{CATCH\+\_\+\+CONFIG\+\_\+\+ENABLE\+\_\+\+CHRONO\+\_\+\+STRINGMAKER}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{_to_string_chrono_8tests_8cpp_a1e4baca8045da1e2ed9414b07e7a59bd}{TEST\+\_\+\+CASE}} ("{}Stringifying std\+::chrono\+::duration helpers"{}, "{}\mbox{[}to\+String\mbox{]}\mbox{[}chrono\mbox{]}"{})
+\item 
+\mbox{\hyperlink{_to_string_chrono_8tests_8cpp_a4f6a21d34bc04b0777ef1f9c71abd5f6}{TEST\+\_\+\+CASE}} ("{}Stringifying std\+::chrono\+::duration with weird ratios"{}, "{}\mbox{[}to\+String\mbox{]}\mbox{[}chrono\mbox{]}"{})
+\item 
+\mbox{\hyperlink{_to_string_chrono_8tests_8cpp_a1cb93431e3339e3a50b1498df4f57c51}{TEST\+\_\+\+CASE}} ("{}Stringifying std\+::chrono\+::time\+\_\+point$<$system\+\_\+clock$>$"{}, "{}\mbox{[}to\+String\mbox{]}\mbox{[}chrono\mbox{]}"{})
+\item 
+\mbox{\hyperlink{_to_string_chrono_8tests_8cpp_a4d71c33c906874b789712a6ca264359f}{TEST\+\_\+\+CASE}} ("{}Stringifying std\+::chrono\+::time\+\_\+point$<$Clock$>$"{}, "{}\mbox{[}to\+String\mbox{]}\mbox{[}chrono\mbox{]}\mbox{[}!nonportable\mbox{]}"{})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{_to_string_chrono_8tests_8cpp_ae5ce616c3ba88e050008d20f8898a2e5}\index{ToStringChrono.tests.cpp@{ToStringChrono.tests.cpp}!CATCH\_CONFIG\_ENABLE\_CHRONO\_STRINGMAKER@{CATCH\_CONFIG\_ENABLE\_CHRONO\_STRINGMAKER}}
+\index{CATCH\_CONFIG\_ENABLE\_CHRONO\_STRINGMAKER@{CATCH\_CONFIG\_ENABLE\_CHRONO\_STRINGMAKER}!ToStringChrono.tests.cpp@{ToStringChrono.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{CATCH\_CONFIG\_ENABLE\_CHRONO\_STRINGMAKER}{CATCH\_CONFIG\_ENABLE\_CHRONO\_STRINGMAKER}}
+{\footnotesize\ttfamily \label{_to_string_chrono_8tests_8cpp_ae5ce616c3ba88e050008d20f8898a2e5} 
+\#define CATCH\+\_\+\+CONFIG\+\_\+\+ENABLE\+\_\+\+CHRONO\+\_\+\+STRINGMAKER}
+
+
+
+Definition at line \mbox{\hyperlink{_to_string_chrono_8tests_8cpp_source_l00001}{1}} of file \mbox{\hyperlink{_to_string_chrono_8tests_8cpp_source}{To\+String\+Chrono.\+tests.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{_to_string_chrono_8tests_8cpp_a1e4baca8045da1e2ed9414b07e7a59bd}\index{ToStringChrono.tests.cpp@{ToStringChrono.tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!ToStringChrono.tests.cpp@{ToStringChrono.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{_to_string_chrono_8tests_8cpp_a1e4baca8045da1e2ed9414b07e7a59bd} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Stringifying std\+::chrono\+::duration helpers"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}to\+String\mbox{]}\mbox{[}chrono\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_to_string_chrono_8tests_8cpp_source_l00007}{7}} of file \mbox{\hyperlink{_to_string_chrono_8tests_8cpp_source}{To\+String\+Chrono.\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00007\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00008\ \ \ \ \ \textcolor{comment}{//\ No\ literals\ because\ we\ still\ support\ c++11}}
+\DoxyCodeLine{00009\ \ \ \ \ \textcolor{keyword}{auto}\ hour\ =\ std::chrono::hours(1);}
+\DoxyCodeLine{00010\ \ \ \ \ \textcolor{keyword}{auto}\ minute\ =\ std::chrono::minutes(1);}
+\DoxyCodeLine{00011\ \ \ \ \ \textcolor{keyword}{auto}\ seconds\ =\ std::chrono::seconds(60);}
+\DoxyCodeLine{00012\ \ \ \ \ \textcolor{keyword}{auto}\ micro\ =\ std::chrono::microseconds(1);}
+\DoxyCodeLine{00013\ \ \ \ \ \textcolor{keyword}{auto}\ milli\ =\ std::chrono::milliseconds(1);}
+\DoxyCodeLine{00014\ \ \ \ \ \textcolor{keyword}{auto}\ nano\ =\ std::chrono::nanoseconds(1);}
+\DoxyCodeLine{00015\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(minute\ ==\ seconds);}
+\DoxyCodeLine{00016\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(hour\ !=\ seconds);}
+\DoxyCodeLine{00017\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(micro\ !=\ milli);}
+\DoxyCodeLine{00018\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(nano\ !=\ micro);}
+\DoxyCodeLine{00019\ \}}
+
+\end{DoxyCode}
+\Hypertarget{_to_string_chrono_8tests_8cpp_a4f6a21d34bc04b0777ef1f9c71abd5f6}\index{ToStringChrono.tests.cpp@{ToStringChrono.tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!ToStringChrono.tests.cpp@{ToStringChrono.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{_to_string_chrono_8tests_8cpp_a4f6a21d34bc04b0777ef1f9c71abd5f6} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Stringifying std\+::chrono\+::duration with weird ratios"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}to\+String\mbox{]}\mbox{[}chrono\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_to_string_chrono_8tests_8cpp_source_l00021}{21}} of file \mbox{\hyperlink{_to_string_chrono_8tests_8cpp_source}{To\+String\+Chrono.\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00022\ \ \ \ \ std::chrono::duration<int64\_t,\ std::ratio<30>>\ half\_minute(1);}
+\DoxyCodeLine{00023\ \ \ \ \ std::chrono::duration<int64\_t,\ std::ratio<1,\ 1000000000000>>\ pico\_second(1);}
+\DoxyCodeLine{00024\ \ \ \ \ std::chrono::duration<int64\_t,\ std::ratio<1,\ 1000000000000000>>\ femto\_second(1);}
+\DoxyCodeLine{00025\ \ \ \ \ std::chrono::duration<int64\_t,\ std::ratio<1,\ 1000000000000000000>>\ atto\_second(1);}
+\DoxyCodeLine{00026\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(half\_minute\ !=\ femto\_second);}
+\DoxyCodeLine{00027\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(pico\_second\ !=\ atto\_second);}
+\DoxyCodeLine{00028\ \}}
+
+\end{DoxyCode}
+\Hypertarget{_to_string_chrono_8tests_8cpp_a4d71c33c906874b789712a6ca264359f}\index{ToStringChrono.tests.cpp@{ToStringChrono.tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!ToStringChrono.tests.cpp@{ToStringChrono.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{_to_string_chrono_8tests_8cpp_a4d71c33c906874b789712a6ca264359f} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Stringifying std\+::chrono\+::time\+\_\+point$<$Clock$>$"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}to\+String\mbox{]}\mbox{[}chrono\mbox{]}\mbox{[}!nonportable\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_to_string_chrono_8tests_8cpp_source_l00036}{36}} of file \mbox{\hyperlink{_to_string_chrono_8tests_8cpp_source}{To\+String\+Chrono.\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00037\ \ \ \ \ \textcolor{keyword}{auto}\ now\ =\ std::chrono::high\_resolution\_clock::now();}
+\DoxyCodeLine{00038\ \ \ \ \ \textcolor{keyword}{auto}\ later\ =\ now\ +\ std::chrono::minutes(2);}
+\DoxyCodeLine{00039\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(now\ !=\ later);}
+\DoxyCodeLine{00040\ }
+\DoxyCodeLine{00041\ \ \ \ \ \textcolor{keyword}{auto}\ now2\ =\ std::chrono::steady\_clock::now();}
+\DoxyCodeLine{00042\ \ \ \ \ \textcolor{keyword}{auto}\ later2\ =\ now2\ +\ std::chrono::minutes(2);}
+\DoxyCodeLine{00043\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(now2\ !=\ later2);}
+\DoxyCodeLine{00044\ \}}
+
+\end{DoxyCode}
+\Hypertarget{_to_string_chrono_8tests_8cpp_a1cb93431e3339e3a50b1498df4f57c51}\index{ToStringChrono.tests.cpp@{ToStringChrono.tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!ToStringChrono.tests.cpp@{ToStringChrono.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{_to_string_chrono_8tests_8cpp_a1cb93431e3339e3a50b1498df4f57c51} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Stringifying std\+::chrono\+::time\+\_\+point$<$system\+\_\+clock$>$"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}to\+String\mbox{]}\mbox{[}chrono\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_to_string_chrono_8tests_8cpp_source_l00030}{30}} of file \mbox{\hyperlink{_to_string_chrono_8tests_8cpp_source}{To\+String\+Chrono.\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00031\ \ \ \ \ \textcolor{keyword}{auto}\ now\ =\ std::chrono::system\_clock::now();}
+\DoxyCodeLine{00032\ \ \ \ \ \textcolor{keyword}{auto}\ later\ =\ now\ +\ std::chrono::minutes(2);}
+\DoxyCodeLine{00033\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(now\ !=\ later);}
+\DoxyCodeLine{00034\ \}}
+
+\end{DoxyCode}

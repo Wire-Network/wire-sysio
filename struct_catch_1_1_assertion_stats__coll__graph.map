@@ -1,0 +1,24 @@
+<map id="Catch::AssertionStats" name="Catch::AssertionStats">
+<area shape="rect" id="Node000001" title=" " alt="" coords="483,416,634,441"/>
+<area shape="rect" id="Node000002" href="$class_catch_1_1_assertion_result.html" title=" " alt="" coords="394,327,552,353"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="489,364,509,390,539,413,536,417,505,394,485,368"/>
+<area shape="rect" id="Node000003" href="$struct_catch_1_1_assertion_info.html" title=" " alt="" coords="150,228,292,253"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="267,257,443,324,441,329,266,262"/>
+<area shape="rect" id="Node000004" href="$class_catch_1_1_string_ref.html" title=" " alt="" coords="181,124,301,150"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="228,164,225,174,221,202,222,227,217,227,216,202,219,173,223,163"/>
+<area shape="rect" id="Node000005" href="$struct_catch_1_1_source_line_info.html" title=" " alt="" coords="5,124,157,150"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="109,157,169,201,204,225,201,230,165,206,106,161"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="345,5,401,31"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="331,39,112,126,110,121,329,34"/>
+<area shape="rect" id="Node000011" href="$struct_catch_1_1_counts.html" title=" " alt="" coords="640,124,746,150"/>
+<area shape="poly" id="edge11_Node000011_Node000006" title=" " alt="" coords="417,32,660,121,659,126,415,38"/>
+<area shape="rect" id="Node000007" href="$struct_catch_1_1_assertion_result_data.html" title=" " alt="" coords="380,228,566,253"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="476,269,476,327,470,327,470,269"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="344,124,397,150"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="364,165,363,185,369,202,382,215,398,225,396,229,378,219,364,205,357,185,359,165"/>
+<area shape="rect" id="Node000009" href="$class_catch_1_1_lazy_expression.html" title=" " alt="" coords="458,124,616,150"/>
+<area shape="poly" id="edge8_Node000007_Node000009" title=" " alt="" coords="534,166,528,186,518,205,494,229,490,225,514,202,523,184,529,164"/>
+<area shape="rect" id="Node000010" href="$struct_catch_1_1_totals.html" title=" " alt="" coords="594,277,693,303"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="639,319,626,356,604,393,579,417,575,413,600,390,621,353,634,317"/>
+<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="687,165,650,278,645,276,682,163"/>
+</map>

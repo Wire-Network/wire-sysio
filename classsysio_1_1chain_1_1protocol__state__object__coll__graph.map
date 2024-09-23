@@ -1,0 +1,5 @@
+<map id="sysio::chain::protocol_state_object" name="sysio::chain::protocol_state_object">
+<area shape="rect" id="Node000001" title="Maintains global state information about consensus protocol rules." alt="" coords="7,124,153,165"/>
+<area shape="rect" id="Node000002" href="$structchainbase_1_1object.html" title=" " alt="" coords="5,5,155,76"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="83,91,83,124,77,124,77,91"/>
+</map>

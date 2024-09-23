@@ -1,0 +1,148 @@
+\doxysection{libraries/sys-\/vm/external/\+Catch2/include/internal/catch\+\_\+generators.hpp File Reference}
+\hypertarget{catch__generators_8hpp}{}\label{catch__generators_8hpp}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_generators.hpp@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_generators.hpp}}
+{\ttfamily \#include "{}catch\+\_\+interfaces\+\_\+generatortracker.\+h"{}}\newline
+{\ttfamily \#include "{}catch\+\_\+common.\+h"{}}\newline
+{\ttfamily \#include "{}catch\+\_\+enforce.\+h"{}}\newline
+{\ttfamily \#include $<$memory$>$}\newline
+{\ttfamily \#include $<$vector$>$}\newline
+{\ttfamily \#include $<$cassert$>$}\newline
+{\ttfamily \#include $<$utility$>$}\newline
+{\ttfamily \#include $<$exception$>$}\newline
+Include dependency graph for catch\+\_\+generators.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{catch__generators_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{catch__generators_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{class_catch_1_1_generator_exception}{Catch\+::\+Generator\+Exception}}
+\item 
+struct \mbox{\hyperlink{struct_catch_1_1_generators_1_1_i_generator}{Catch\+::\+Generators\+::\+IGenerator$<$ T $>$}}
+\item 
+class \mbox{\hyperlink{class_catch_1_1_generators_1_1_single_value_generator}{Catch\+::\+Generators\+::\+Single\+Value\+Generator$<$ T $>$}}
+\item 
+class \mbox{\hyperlink{class_catch_1_1_generators_1_1_fixed_values_generator}{Catch\+::\+Generators\+::\+Fixed\+Values\+Generator$<$ T $>$}}
+\item 
+class \mbox{\hyperlink{class_catch_1_1_generators_1_1_generator_wrapper}{Catch\+::\+Generators\+::\+Generator\+Wrapper$<$ T $>$}}
+\item 
+class \mbox{\hyperlink{class_catch_1_1_generators_1_1_generators}{Catch\+::\+Generators\+::\+Generators$<$ T $>$}}
+\item 
+struct \mbox{\hyperlink{struct_catch_1_1_generators_1_1as}{Catch\+::\+Generators\+::as$<$ T $>$}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespace_catch}{Catch}}
+\item 
+namespace \mbox{\hyperlink{namespace_catch_1_1_generators}{Catch\+::\+Generators}}
+\item 
+namespace \mbox{\hyperlink{namespace_catch_1_1_generators_1_1pf}{Catch\+::\+Generators\+::pf}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{catch__generators_8hpp_a4941c6427cfa36ee7c52d734e460f9df}{GENERATE}}(...)
+\item 
+\#define \mbox{\hyperlink{catch__generators_8hpp_a44e2fff00253a218f0a392ad6abac624}{GENERATE\+\_\+\+COPY}}(...)
+\item 
+\#define \mbox{\hyperlink{catch__generators_8hpp_aebcb76dcf5cbbbd3dca153a21d6f78fe}{GENERATE\+\_\+\+REF}}(...)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename... Args$>$ }\\std\+::unique\+\_\+ptr$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \mbox{\hyperlink{namespace_catch_1_1_generators_1_1pf_a015e8fcef2972da878a07023e40d46d8}{Catch\+::\+Generators\+::pf\+::make\+\_\+unique}} (Args \&\&... args)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{class_catch_1_1_generators_1_1_generator_wrapper}{Generator\+Wrapper}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \mbox{\hyperlink{namespace_catch_1_1_generators_a3b2efc97978cf37951b75394aae1a3fb}{Catch\+::\+Generators\+::value}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\&value)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{class_catch_1_1_generators_1_1_generator_wrapper}{Generator\+Wrapper}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \mbox{\hyperlink{namespace_catch_1_1_generators_aff55717239311a0e8352a4de5d29967f}{Catch\+::\+Generators\+::values}} (std\+::initializer\+\_\+list$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ values)
+\item 
+{\footnotesize template$<$typename... Ts$>$ }\\\mbox{\hyperlink{class_catch_1_1_generators_1_1_generator_wrapper}{Generator\+Wrapper}}$<$ std\+::tuple$<$ Ts... $>$ $>$ \mbox{\hyperlink{namespace_catch_1_1_generators_ae980a8b181bc56242a73161a05b312ee}{Catch\+::\+Generators\+::table}} (std\+::initializer\+\_\+list$<$ std\+::tuple$<$ typename std\+::decay$<$ Ts $>$\+::type... $>$ $>$ tuples)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename... Gs$>$ }\\auto \mbox{\hyperlink{namespace_catch_1_1_generators_adabbca9c7049bd8b5dd0474240108485}{Catch\+::\+Generators\+::make\+Generators}} (\mbox{\hyperlink{class_catch_1_1_generators_1_1_generator_wrapper}{Generator\+Wrapper}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&\&generator, Gs... more\+Generators) -\/$>$ \mbox{\hyperlink{class_catch_1_1_generators_1_1_generators}{Generators}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\auto \mbox{\hyperlink{namespace_catch_1_1_generators_abefb1a0fab3c669b98a53037b3286d22}{Catch\+::\+Generators\+::make\+Generators}} (\mbox{\hyperlink{class_catch_1_1_generators_1_1_generator_wrapper}{Generator\+Wrapper}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&\&generator) -\/$>$ \mbox{\hyperlink{class_catch_1_1_generators_1_1_generators}{Generators}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename... Gs$>$ }\\auto \mbox{\hyperlink{namespace_catch_1_1_generators_a0497b4463b7afee28df49631d6d75e83}{Catch\+::\+Generators\+::make\+Generators}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\&val, Gs... more\+Generators) -\/$>$ \mbox{\hyperlink{class_catch_1_1_generators_1_1_generators}{Generators}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{union_u}{U}} , typename... Gs$>$ }\\auto \mbox{\hyperlink{namespace_catch_1_1_generators_a4032a75da538c6897f826399368e16ed}{Catch\+::\+Generators\+::make\+Generators}} (\mbox{\hyperlink{struct_catch_1_1_generators_1_1as}{as}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$, \mbox{\hyperlink{union_u}{U}} \&\&val, Gs... more\+Generators) -\/$>$ \mbox{\hyperlink{class_catch_1_1_generators_1_1_generators}{Generators}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$
+\item 
+auto \mbox{\hyperlink{namespace_catch_1_1_generators_a36413e3baec520d89d21bea23b7bea5b}{Catch\+::\+Generators\+::acquire\+Generator\+Tracker}} (\mbox{\hyperlink{struct_catch_1_1_source_line_info}{Source\+Line\+Info}} const \&line\+Info) -\/$>$ \mbox{\hyperlink{struct_catch_1_1_i_generator_tracker}{IGenerator\+Tracker}} \&
+\item 
+{\footnotesize template$<$typename L $>$ }\\auto \mbox{\hyperlink{namespace_catch_1_1_generators_adbda9e2d18cd3e4dbb124c7d8830c97b}{Catch\+::\+Generators\+::generate}} (\mbox{\hyperlink{struct_catch_1_1_source_line_info}{Source\+Line\+Info}} const \&line\+Info, L const \&generator\+Expression) -\/$>$ decltype(std\+::declval$<$ decltype(generator\+Expression())$>$().get())
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{catch__generators_8hpp_a4941c6427cfa36ee7c52d734e460f9df}\index{catch\_generators.hpp@{catch\_generators.hpp}!GENERATE@{GENERATE}}
+\index{GENERATE@{GENERATE}!catch\_generators.hpp@{catch\_generators.hpp}}
+\doxysubsubsection{\texorpdfstring{GENERATE}{GENERATE}}
+{\footnotesize\ttfamily \label{catch__generators_8hpp_a4941c6427cfa36ee7c52d734e460f9df} 
+\#define GENERATE(\begin{DoxyParamCaption}\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{namespace_catch_1_1_generators_adbda9e2d18cd3e4dbb124c7d8830c97b}{Catch::Generators::generate}}(\ \mbox{\hyperlink{catch__common_8h_abc0b2405454c51748a31e0393d9ad5d1}{CATCH\_INTERNAL\_LINEINFO}},\ [\ ]\{\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespace_catch_1_1_generators}{Catch::Generators}};\ \textcolor{keywordflow}{return}\ makeGenerators(\ \_\_VA\_ARGS\_\_\ );\ \}\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__generators_8hpp_source_l00203}{203}} of file \mbox{\hyperlink{catch__generators_8hpp_source}{catch\+\_\+generators.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00203\ \textcolor{preprocessor}{\#define\ GENERATE(\ ...\ )\ \(\backslash\)}}
+\DoxyCodeLine{00204\ \textcolor{preprocessor}{\ \ \ \ Catch::Generators::generate(\ CATCH\_INTERNAL\_LINEINFO,\ [\ ]\{\ using\ namespace\ Catch::Generators;\ return\ makeGenerators(\ \_\_VA\_ARGS\_\_\ );\ \}\ )}}
+
+\end{DoxyCode}
+\Hypertarget{catch__generators_8hpp_a44e2fff00253a218f0a392ad6abac624}\index{catch\_generators.hpp@{catch\_generators.hpp}!GENERATE\_COPY@{GENERATE\_COPY}}
+\index{GENERATE\_COPY@{GENERATE\_COPY}!catch\_generators.hpp@{catch\_generators.hpp}}
+\doxysubsubsection{\texorpdfstring{GENERATE\_COPY}{GENERATE\_COPY}}
+{\footnotesize\ttfamily \label{catch__generators_8hpp_a44e2fff00253a218f0a392ad6abac624} 
+\#define GENERATE\+\_\+\+COPY(\begin{DoxyParamCaption}\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{namespace_catch_1_1_generators_adbda9e2d18cd3e4dbb124c7d8830c97b}{Catch::Generators::generate}}(\ \mbox{\hyperlink{catch__common_8h_abc0b2405454c51748a31e0393d9ad5d1}{CATCH\_INTERNAL\_LINEINFO}},\ [=]\{\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespace_catch_1_1_generators}{Catch::Generators}};\ \textcolor{keywordflow}{return}\ makeGenerators(\ \_\_VA\_ARGS\_\_\ );\ \}\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__generators_8hpp_source_l00205}{205}} of file \mbox{\hyperlink{catch__generators_8hpp_source}{catch\+\_\+generators.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00205\ \textcolor{preprocessor}{\#define\ GENERATE\_COPY(\ ...\ )\ \(\backslash\)}}
+\DoxyCodeLine{00206\ \textcolor{preprocessor}{\ \ \ \ Catch::Generators::generate(\ CATCH\_INTERNAL\_LINEINFO,\ [=]\{\ using\ namespace\ Catch::Generators;\ return\ makeGenerators(\ \_\_VA\_ARGS\_\_\ );\ \}\ )}}
+
+\end{DoxyCode}
+\Hypertarget{catch__generators_8hpp_aebcb76dcf5cbbbd3dca153a21d6f78fe}\index{catch\_generators.hpp@{catch\_generators.hpp}!GENERATE\_REF@{GENERATE\_REF}}
+\index{GENERATE\_REF@{GENERATE\_REF}!catch\_generators.hpp@{catch\_generators.hpp}}
+\doxysubsubsection{\texorpdfstring{GENERATE\_REF}{GENERATE\_REF}}
+{\footnotesize\ttfamily \label{catch__generators_8hpp_aebcb76dcf5cbbbd3dca153a21d6f78fe} 
+\#define GENERATE\+\_\+\+REF(\begin{DoxyParamCaption}\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{namespace_catch_1_1_generators_adbda9e2d18cd3e4dbb124c7d8830c97b}{Catch::Generators::generate}}(\ \mbox{\hyperlink{catch__common_8h_abc0b2405454c51748a31e0393d9ad5d1}{CATCH\_INTERNAL\_LINEINFO}},\ [\&]\{\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespace_catch_1_1_generators}{Catch::Generators}};\ \textcolor{keywordflow}{return}\ makeGenerators(\ \_\_VA\_ARGS\_\_\ );\ \}\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__generators_8hpp_source_l00207}{207}} of file \mbox{\hyperlink{catch__generators_8hpp_source}{catch\+\_\+generators.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00207\ \textcolor{preprocessor}{\#define\ GENERATE\_REF(\ ...\ )\ \(\backslash\)}}
+\DoxyCodeLine{00208\ \textcolor{preprocessor}{\ \ \ \ Catch::Generators::generate(\ CATCH\_INTERNAL\_LINEINFO,\ [\&]\{\ using\ namespace\ Catch::Generators;\ return\ makeGenerators(\ \_\_VA\_ARGS\_\_\ );\ \}\ )}}
+
+\end{DoxyCode}

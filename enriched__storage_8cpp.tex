@@ -1,0 +1,77 @@
+\doxysection{libraries/fc/vendor/websocketpp/examples/enriched\+\_\+storage/enriched\+\_\+storage.cpp File Reference}
+\hypertarget{enriched__storage_8cpp}{}\label{enriched__storage_8cpp}\index{libraries/fc/vendor/websocketpp/examples/enriched\_storage/enriched\_storage.cpp@{libraries/fc/vendor/websocketpp/examples/enriched\_storage/enriched\_storage.cpp}}
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$websocketpp/config/asio\+\_\+no\+\_\+tls.\+hpp$>$}\newline
+{\ttfamily \#include $<$websocketpp/server.\+hpp$>$}\newline
+Include dependency graph for enriched\+\_\+storage.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{enriched__storage_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structconnection__data}{connection\+\_\+data}}
+\item 
+struct \mbox{\hyperlink{structcustom__config}{custom\+\_\+config}}
+\item 
+class \mbox{\hyperlink{classprint__server}{print\+\_\+server}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1server}{websocketpp\+::server}}$<$ \mbox{\hyperlink{structcustom__config}{custom\+\_\+config}} $>$ \mbox{\hyperlink{enriched__storage_8cpp_ad31ea1018bb1d0edc5ded29e96a90353}{server}}
+\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1server_abb895563dddafdc1426997d245cbd7cb}{server\+::connection\+\_\+ptr}} \mbox{\hyperlink{enriched__storage_8cpp_addcc7e406e500d41bf2df4e1c5d91716}{connection\+\_\+ptr}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{enriched__storage_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{enriched__storage_8cpp_addcc7e406e500d41bf2df4e1c5d91716}\index{enriched\_storage.cpp@{enriched\_storage.cpp}!connection\_ptr@{connection\_ptr}}
+\index{connection\_ptr@{connection\_ptr}!enriched\_storage.cpp@{enriched\_storage.cpp}}
+\doxysubsubsection{\texorpdfstring{connection\_ptr}{connection\_ptr}}
+{\footnotesize\ttfamily \label{enriched__storage_8cpp_addcc7e406e500d41bf2df4e1c5d91716} 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1server_abb895563dddafdc1426997d245cbd7cb}{server\+::connection\+\_\+ptr}} \mbox{\hyperlink{debug__client_8cpp_ae9c9779aea742ab80689add7e553df0d}{connection\+\_\+ptr}}}
+
+
+
+Definition at line \mbox{\hyperlink{enriched__storage_8cpp_source_l00031}{31}} of file \mbox{\hyperlink{enriched__storage_8cpp_source}{enriched\+\_\+storage.\+cpp}}.
+
+\Hypertarget{enriched__storage_8cpp_ad31ea1018bb1d0edc5ded29e96a90353}\index{enriched\_storage.cpp@{enriched\_storage.cpp}!server@{server}}
+\index{server@{server}!enriched\_storage.cpp@{enriched\_storage.cpp}}
+\doxysubsubsection{\texorpdfstring{server}{server}}
+{\footnotesize\ttfamily \label{enriched__storage_8cpp_ad31ea1018bb1d0edc5ded29e96a90353} 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1server}{websocketpp\+::server}}$<$\mbox{\hyperlink{structcustom__config}{custom\+\_\+config}}$>$ \mbox{\hyperlink{docs_2simple__broadcast__server_8cpp_afc38239e3eef2a4200e324bff14d91d1}{server}}}
+
+
+
+Definition at line \mbox{\hyperlink{enriched__storage_8cpp_source_l00030}{30}} of file \mbox{\hyperlink{enriched__storage_8cpp_source}{enriched\+\_\+storage.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{enriched__storage_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}\index{enriched\_storage.cpp@{enriched\_storage.cpp}!main@{main}}
+\index{main@{main}!enriched\_storage.cpp@{enriched\_storage.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{enriched__storage_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4} 
+int main (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{enriched__storage_8cpp_source_l00084}{84}} of file \mbox{\hyperlink{enriched__storage_8cpp_source}{enriched\+\_\+storage.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00085\ \ \ \ \ \mbox{\hyperlink{classprint__server}{print\_server}}\ \mbox{\hyperlink{enriched__storage_8cpp_ad31ea1018bb1d0edc5ded29e96a90353}{server}};}
+\DoxyCodeLine{00086\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1server}{server}}.run(9002);}
+\DoxyCodeLine{00087\ \}}
+
+\end{DoxyCode}

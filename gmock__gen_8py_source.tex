@@ -1,0 +1,37 @@
+\doxysection{gmock\+\_\+gen.\+py}
+\hypertarget{gmock__gen_8py_source}{}\label{gmock__gen_8py_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googlemock/scripts/generator/gmock\_gen.py@{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googlemock/scripts/generator/gmock\_gen.py}}
+\mbox{\hyperlink{gmock__gen_8py}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{gmock__gen_8py_source_l00001}\mbox{\hyperlink{namespacegmock__gen}{00001}}\ \textcolor{comment}{\#!/usr/bin/env\ python}}
+\DoxyCodeLine{\Hypertarget{gmock__gen_8py_source_l00002}00002\ \textcolor{comment}{\#}}
+\DoxyCodeLine{\Hypertarget{gmock__gen_8py_source_l00003}00003\ \textcolor{comment}{\#\ Copyright\ 2008\ Google\ Inc.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{\Hypertarget{gmock__gen_8py_source_l00004}00004\ \textcolor{comment}{\#}}
+\DoxyCodeLine{\Hypertarget{gmock__gen_8py_source_l00005}00005\ \textcolor{comment}{\#\ Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{\Hypertarget{gmock__gen_8py_source_l00006}00006\ \textcolor{comment}{\#\ you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{gmock__gen_8py_source_l00007}00007\ \textcolor{comment}{\#\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{\Hypertarget{gmock__gen_8py_source_l00008}00008\ \textcolor{comment}{\#}}
+\DoxyCodeLine{\Hypertarget{gmock__gen_8py_source_l00009}00009\ \textcolor{comment}{\#\ \ \ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{\Hypertarget{gmock__gen_8py_source_l00010}00010\ \textcolor{comment}{\#}}
+\DoxyCodeLine{\Hypertarget{gmock__gen_8py_source_l00011}00011\ \textcolor{comment}{\#\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{\Hypertarget{gmock__gen_8py_source_l00012}00012\ \textcolor{comment}{\#\ distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{\Hypertarget{gmock__gen_8py_source_l00013}00013\ \textcolor{comment}{\#\ WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{\Hypertarget{gmock__gen_8py_source_l00014}00014\ \textcolor{comment}{\#\ See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{\Hypertarget{gmock__gen_8py_source_l00015}00015\ \textcolor{comment}{\#\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{gmock__gen_8py_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{gmock__gen_8py_source_l00017}00017\ \textcolor{stringliteral}{"{}"{}"{}Driver\ for\ starting\ up\ Google\ Mock\ class\ generator."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__gen_8py_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{gmock__gen_8py_source_l00019}00019\ \_\_author\_\_\ =\ \textcolor{stringliteral}{'nnorwitz@google.com\ (Neal\ Norwitz)'}}
+\DoxyCodeLine{\Hypertarget{gmock__gen_8py_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{gmock__gen_8py_source_l00021}00021\ \textcolor{keyword}{import}\ os}
+\DoxyCodeLine{\Hypertarget{gmock__gen_8py_source_l00022}00022\ \textcolor{keyword}{import}\ sys}
+\DoxyCodeLine{\Hypertarget{gmock__gen_8py_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{gmock__gen_8py_source_l00024}00024\ \textcolor{keywordflow}{if}\ \_\_name\_\_\ ==\ \textcolor{stringliteral}{'\_\_main\_\_'}:}
+\DoxyCodeLine{\Hypertarget{gmock__gen_8py_source_l00025}00025\ \ \ \textcolor{comment}{\#\ Add\ the\ directory\ of\ this\ script\ to\ the\ path\ so\ we\ can\ import\ gmock\_class.}}
+\DoxyCodeLine{\Hypertarget{gmock__gen_8py_source_l00026}00026\ \ \ sys.path.append(os.path.dirname(\_\_file\_\_))}
+\DoxyCodeLine{\Hypertarget{gmock__gen_8py_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{gmock__gen_8py_source_l00028}00028\ \ \ \textcolor{keyword}{from}\ cpp\ \textcolor{keyword}{import}\ gmock\_class}
+\DoxyCodeLine{\Hypertarget{gmock__gen_8py_source_l00029}00029\ \ \ \textcolor{comment}{\#\ Fix\ the\ docstring\ in\ case\ they\ require\ the\ usage.}}
+\DoxyCodeLine{\Hypertarget{gmock__gen_8py_source_l00030}00030\ \ \ gmock\_class.\_\_doc\_\_\ =\ gmock\_class.\_\_doc\_\_.replace(\textcolor{stringliteral}{'gmock\_class.py'},\ \_\_file\_\_)}
+\DoxyCodeLine{\Hypertarget{gmock__gen_8py_source_l00031}00031\ \ \ gmock\_class.main()}
+
+\end{DoxyCode}

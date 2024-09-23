@@ -1,0 +1,63 @@
+\doxysection{websocketpp\+::transport\+::iostream Namespace Reference}
+\hypertarget{namespacewebsocketpp_1_1transport_1_1iostream}{}\label{namespacewebsocketpp_1_1transport_1_1iostream}\index{websocketpp::transport::iostream@{websocketpp::transport::iostream}}
+
+
+Transport policy that uses STL iostream for I/O and does not support timers.  
+
+
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1iostream_1_1error}{error}}
+\begin{DoxyCompactList}\small\item\em iostream transport errors \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1connection}{connection}}
+\item 
+class \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint}{endpoint}}
+\item 
+struct \mbox{\hyperlink{structwebsocketpp_1_1transport_1_1iostream_1_1timer}{timer}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef lib\+::function$<$ lib\+::error\+\_\+code(\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}}, char const \texorpdfstring{$\ast$}{*}, size\+\_\+t)$>$ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1iostream_abc22b834c2d0c698d6c87e51d5bfad2c}{write\+\_\+handler}}
+\begin{DoxyCompactList}\small\item\em The type and signature of the callback used by iostream transport to write. \end{DoxyCompactList}\item 
+typedef lib\+::function$<$ lib\+::error\+\_\+code(\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}}, std\+::vector$<$ \mbox{\hyperlink{structwebsocketpp_1_1transport_1_1buffer}{transport\+::buffer}} $>$ const \&bufs)$>$ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1iostream_a21982146513c0b5580786c3af5dd2878}{vector\+\_\+write\+\_\+handler}}
+\item 
+typedef lib\+::function$<$ lib\+::error\+\_\+code(\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}})$>$ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1iostream_a3563ce2cca06b1466f7d76ecb8eb4a0b}{shutdown\+\_\+handler}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{namespacewebsocketpp_1_1transport_1_1iostream_a3563ce2cca06b1466f7d76ecb8eb4a0b}\index{websocketpp::transport::iostream@{websocketpp::transport::iostream}!shutdown\_handler@{shutdown\_handler}}
+\index{shutdown\_handler@{shutdown\_handler}!websocketpp::transport::iostream@{websocketpp::transport::iostream}}
+\doxysubsubsection{\texorpdfstring{shutdown\_handler}{shutdown\_handler}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1transport_1_1iostream_a3563ce2cca06b1466f7d76ecb8eb4a0b} 
+typedef lib\+::function$<$lib\+::error\+\_\+code(\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}})$>$ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1iostream_a3563ce2cca06b1466f7d76ecb8eb4a0b}{websocketpp\+::transport\+::iostream\+::shutdown\+\_\+handler}}}
+
+The type and signature of the callback used by iostream transport to signal a transport shutdown. 
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2base_8hpp_source_l00061}{61}} of file \mbox{\hyperlink{transport_2iostream_2base_8hpp_source}{base.\+hpp}}.
+
+\Hypertarget{namespacewebsocketpp_1_1transport_1_1iostream_a21982146513c0b5580786c3af5dd2878}\index{websocketpp::transport::iostream@{websocketpp::transport::iostream}!vector\_write\_handler@{vector\_write\_handler}}
+\index{vector\_write\_handler@{vector\_write\_handler}!websocketpp::transport::iostream@{websocketpp::transport::iostream}}
+\doxysubsubsection{\texorpdfstring{vector\_write\_handler}{vector\_write\_handler}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1transport_1_1iostream_a21982146513c0b5580786c3af5dd2878} 
+typedef lib\+::function$<$lib\+::error\+\_\+code(\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}}, std\+::vector$<$\mbox{\hyperlink{structwebsocketpp_1_1transport_1_1buffer}{transport\+::buffer}}$>$ const \& bufs)$>$ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1iostream_a21982146513c0b5580786c3af5dd2878}{websocketpp\+::transport\+::iostream\+::vector\+\_\+write\+\_\+handler}}}
+
+The type and signature of the callback used by iostream transport to perform vectored writes. If a vectored write handler is not set the standard write handler will be called multiple times. 
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2base_8hpp_source_l00057}{57}} of file \mbox{\hyperlink{transport_2iostream_2base_8hpp_source}{base.\+hpp}}.
+
+\Hypertarget{namespacewebsocketpp_1_1transport_1_1iostream_abc22b834c2d0c698d6c87e51d5bfad2c}\index{websocketpp::transport::iostream@{websocketpp::transport::iostream}!write\_handler@{write\_handler}}
+\index{write\_handler@{write\_handler}!websocketpp::transport::iostream@{websocketpp::transport::iostream}}
+\doxysubsubsection{\texorpdfstring{write\_handler}{write\_handler}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1transport_1_1iostream_abc22b834c2d0c698d6c87e51d5bfad2c} 
+typedef lib\+::function$<$lib\+::error\+\_\+code(\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}}, char const \texorpdfstring{$\ast$}{*}, size\+\_\+t)$>$ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1iostream_abc22b834c2d0c698d6c87e51d5bfad2c}{websocketpp\+::transport\+::iostream\+::write\+\_\+handler}}}
+
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2base_8hpp_source_l00048}{48}} of file \mbox{\hyperlink{transport_2iostream_2base_8hpp_source}{base.\+hpp}}.
+

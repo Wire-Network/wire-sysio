@@ -1,0 +1,188 @@
+\doxysection{file\+\_\+space\+\_\+handler.\+hpp}
+\hypertarget{file__space__handler_8hpp_source}{}\label{file__space__handler_8hpp_source}\index{plugins/resource\_monitor\_plugin/include/sysio/resource\_monitor\_plugin/file\_space\_handler.hpp@{plugins/resource\_monitor\_plugin/include/sysio/resource\_monitor\_plugin/file\_space\_handler.hpp}}
+\mbox{\hyperlink{file__space__handler_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <boost/filesystem.hpp>}}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <boost/asio.hpp>}}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{application_8hpp}{appbase/application.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp}{sysio/chain/exceptions.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00009}00009\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceboost_1_1filesystem}{bfs}}\ =\ \mbox{\hyperlink{namespaceboost_1_1filesystem}{boost::filesystem}};}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00011}\mbox{\hyperlink{namespacesysio_1_1resource__monitor}{00011}}\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio_1_1resource__monitor}{sysio::resource\_monitor}}\ \{}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00012}00012\ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ SpaceProv\textcolor{keywordtype}{id}er>}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00013}\mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler}{00013}}\ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler}{file\_space\_handler}}\ \{}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00014}00014\ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00015}\mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler_a280cfe8aa62aac1214ad1cdc51204d26}{00015}}\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler_a280cfe8aa62aac1214ad1cdc51204d26}{file\_space\_handler}}(SpaceProvider\&\&\ space\_provider,\ boost::asio::io\_context\&\ ctx)}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00016}00016\ \ \ \ \ \ \ :space\_provider(\mbox{\hyperlink{namespacestd}{std}}::move(space\_provider)),}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00017}00017\ \ \ \ \ \ \ timer\{ctx\}}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00018}00018\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00019}00019\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00021}\mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler_af1ad683111aac7f94733e3866db0149e}{00021}}\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler_af1ad683111aac7f94733e3866db0149e}{set\_sleep\_time}}(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ sleep\_time)\ \{}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00022}00022\ \ \ \ \ \ \ \ \ \ sleep\_time\_in\_secs\ =\ sleep\_time;}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00023}00023\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00025}00025\ \ \ \ \ \ \ \textcolor{comment}{//\ warning\_threshold\ must\ be\ less\ than\ shutdown\_threshold.}}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00026}00026\ \ \ \ \ \ \ \textcolor{comment}{//\ set\ them\ together\ so\ it\ is\ simpler\ to\ check.}}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00027}\mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler_a51eaff9443b1a88e06cbbd1344a78071}{00027}}\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler_a51eaff9443b1a88e06cbbd1344a78071}{set\_threshold}}(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ new\_threshold,\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ new\_warning\_threshold)\ \{}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00028}00028\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(new\_warning\_threshold\ <\ new\_threshold,\ chain::plugin\_config\_exception,}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00029}00029\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}warning\_threshold\ \$\{new\_warning\_threshold\}\ must\ be\ less\ than\ threshold\ \$\{new\_threshold\}"{}},\ (\textcolor{stringliteral}{"{}new\_warning\_threshold"{}},\ new\_warning\_threshold)\ (\textcolor{stringliteral}{"{}new\_threshold"{}},\ new\_threshold));}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00031}00031\ \ \ \ \ \ \ \ \ \ shutdown\_threshold\ =\ new\_threshold;}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00032}00032\ \ \ \ \ \ \ \ \ \ warning\_threshold\ =\ new\_warning\_threshold;}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00033}00033\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00035}\mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler_ac0f510cb0298b9cefe68102772fc5db7}{00035}}\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler_ac0f510cb0298b9cefe68102772fc5db7}{set\_shutdown\_on\_exceeded}}(\textcolor{keywordtype}{bool}\ new\_shutdown\_on\_exceeded)\ \{}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00036}00036\ \ \ \ \ \ \ \ \ \ shutdown\_on\_exceeded\ =\ new\_shutdown\_on\_exceeded;}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00037}00037\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00039}\mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler_a5465fcb7ca6562cdb3622c5ef09b29a9}{00039}}\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler_a5465fcb7ca6562cdb3622c5ef09b29a9}{set\_warning\_interval}}(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ new\_warning\_interval)\ \{}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00040}00040\ \ \ \ \ \ \ \ \ \ warning\_interval\ =\ new\_warning\_interval;}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00041}00041\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00043}\mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler_a3571fc8484a45f62857dcbe29d73aa28}{00043}}\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler_a3571fc8484a45f62857dcbe29d73aa28}{is\_threshold\_exceeded}}()\ \{}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00044}00044\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Go\ over\ each\ monitored\ file\ system}}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00045}00045\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\&\ fs:\ filesystems)\ \{}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00046}00046\ \ \ \ \ \ \ \ \ \ \ \ \ boost::system::error\_code\ ec;}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00047}00047\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ info\ =\ space\_provider.get\_space(fs.path\_name,\ ec);}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ ec\ )\ \{}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ As\ the\ system\ is\ running\ and\ this\ plugin\ is\ not\ a\ critical}}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00050}00050\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ part\ of\ the\ system,\ we\ should\ not\ exit.}}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00051}00051\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Just\ report\ the\ failure\ and\ continue;}}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a1759e5c9691d8ad754bdf5eff8bb23ac}{wlog}}(\ \textcolor{stringliteral}{"{}Unable\ to\ get\ space\ info\ for\ \$\{path\_name\}:\ [code:\ \$\{ec\}]\ \$\{message\}.\ Ignore\ this\ failure."{}},}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}path\_name"{}},\ fs.path\_name.string())}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}ec"{}},\ ec.value())}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}message"{}},\ ec.message()));}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ info.available\ <\ fs.shutdown\_available\ )\ \{}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00061}00061\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (output\_threshold\_warning)\ \{}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00062}00062\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}}(\textcolor{stringliteral}{"{}Space\ usage\ warning:\ \$\{path\}'s\ file\ system\ exceeded\ threshold\ \$\{threshold\}\%,\ available:\ \$\{available\},\ Capacity:\ \$\{capacity\},\ shutdown\_available:\ \$\{shutdown\_available\}"{}},}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}path"{}},\ fs.path\_name.string())(\textcolor{stringliteral}{"{}threshold"{}},\ shutdown\_threshold)(\textcolor{stringliteral}{"{}available"{}},\ info.available)(\textcolor{stringliteral}{"{}capacity"{}},\ info.capacity)(\textcolor{stringliteral}{"{}shutdown\_available"{}},\ fs.shutdown\_available));}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00064}00064\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00065}00065\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00066}00066\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\ info.available\ <\ fs.warning\_available\ \&\&\ output\_threshold\_warning\ )\ \{}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00067}00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a1759e5c9691d8ad754bdf5eff8bb23ac}{wlog}}(\textcolor{stringliteral}{"{}Space\ usage\ warning:\ \$\{path\}'s\ file\ system\ approaching\ threshold.\ available:\ \$\{available\},\ warning\_available:\ \$\{warning\_available\}"{}},\ (\textcolor{stringliteral}{"{}path"{}},\ fs.path\_name.string())\ (\textcolor{stringliteral}{"{}available"{}},\ info.available)\ (\textcolor{stringliteral}{"{}warning\_available"{}},\ fs.warning\_available));}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ shutdown\_on\_exceeded)\ \{}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a1759e5c9691d8ad754bdf5eff8bb23ac}{wlog}}(\textcolor{stringliteral}{"{}nodeop\ will\ shutdown\ when\ space\ usage\ exceeds\ threshold\ \$\{threshold\}\%"{}},\ (\textcolor{stringliteral}{"{}threshold"{}},\ shutdown\_threshold));}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00071}00071\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00073}00073\ }
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00074}00074\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00075}00075\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00076}00076\ }
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00077}\mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler_a6a5e01f3f35cab4c846640e060b91b63}{00077}}\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler_a6a5e01f3f35cab4c846640e060b91b63}{add\_file\_system}}(\textcolor{keyword}{const}\ bfs::path\&\ path\_name)\ \{}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00078}00078\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Get\ detailed\ information\ of\ the\ path}}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{struct\ }stat\ statbuf;}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00080}00080\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ status\ =\ space\_provider.get\_stat(path\_name.string().c\_str(),\ \&statbuf);}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00081}00081\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(status\ ==\ 0,\ chain::plugin\_config\_exception,}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00082}00082\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Failed\ to\ run\ stat\ on\ \$\{path\}\ with\ status\ \$\{status\}"{}},\ (\textcolor{stringliteral}{"{}path"{}},\ path\_name.string())(\textcolor{stringliteral}{"{}status"{}},\ status));}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00083}00083\ }
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00084}00084\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a3da1571bad6ca6c94df9a3660b2115ee}{dlog}}(\textcolor{stringliteral}{"{}\$\{path\_name\}'s\ file\ system\ to\ be\ monitored"{}},\ (\textcolor{stringliteral}{"{}path\_name"{}},\ path\_name.string()));}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00085}00085\ }
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00086}00086\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ the\ file\ system\ containing\ the\ path\ is\ already}}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00087}00087\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ in\ the\ filesystem\ list,\ do\ not\ add\ it\ again}}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00088}00088\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\&\ fs:\ filesystems)\ \{}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00089}00089\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (statbuf.st\_dev\ ==\ fs.st\_dev)\ \{\ \textcolor{comment}{//\ Two\ files\ belong\ to\ the\ same\ file\ system\ if\ their\ device\ IDs\ are\ the\ same.}}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00090}00090\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a3da1571bad6ca6c94df9a3660b2115ee}{dlog}}(\textcolor{stringliteral}{"{}\$\{path\_name\}'s\ file\ system\ already\ monitored"{}},\ (\textcolor{stringliteral}{"{}path\_name"{}},\ path\_name.string()));}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00091}00091\ }
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00092}00092\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00093}00093\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00094}00094\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00095}00095\ }
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00096}00096\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ For\ efficiency,\ precalculate\ threshold\ values\ to\ avoid\ calculating\ it}}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00097}00097\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ everytime\ we\ check\ space\ usage.\ Since\ bfs::space\ returns}}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00098}00098\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ available\ amount,\ we\ use\ minimum\ available\ amount\ as\ threshold.\ }}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00099}00099\ \ \ \ \ \ \ \ \ \ boost::system::error\_code\ ec;}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00100}00100\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ info\ =\ space\_provider.get\_space(path\_name,\ ec);}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00101}00101\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(!ec,\ chain::plugin\_config\_exception,}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00102}00102\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Unable\ to\ get\ space\ info\ for\ \$\{path\_name\}:\ [code:\ \$\{ec\}]\ \$\{message\}"{}},}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00103}00103\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}path\_name"{}},\ path\_name.string())}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00104}00104\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}ec"{}},\ ec.value())}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00105}00105\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}message"{}},\ ec.message()));}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00106}00106\ }
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00107}00107\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ shutdown\_available\ =\ (100\ -\/\ shutdown\_threshold)\ *\ (info.capacity\ /\ 100);\ \textcolor{comment}{//\ (100\ -\/\ shutdown\_threshold)/100\ is\ the\ percentage\ of\ minimum\ number\ of\ available\ bytes\ the\ file\ system\ must\ maintain\ \ }}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00108}00108\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ warning\_available\ =\ (100\ -\/\ warning\_threshold)\ *\ (info.capacity\ /\ 100);}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00109}00109\ }
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00110}00110\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Add\ to\ the\ list}}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00111}00111\ \ \ \ \ \ \ \ \ \ filesystems.emplace\_back(statbuf.st\_dev,\ shutdown\_available,\ path\_name,\ warning\_available);}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00112}00112\ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00113}00113\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\textcolor{stringliteral}{"{}\$\{path\_name\}'s\ file\ system\ monitored.\ shutdown\_available:\ \$\{shutdown\_available\},\ capacity:\ \$\{capacity\},\ threshold:\ \$\{threshold\}"{}},\ (\textcolor{stringliteral}{"{}path\_name"{}},\ path\_name.string())\ (\textcolor{stringliteral}{"{}shutdown\_available"{}},\ shutdown\_available)\ (\textcolor{stringliteral}{"{}capacity"{}},\ info.capacity)\ (\textcolor{stringliteral}{"{}threshold"{}},\ shutdown\_threshold)\ );}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00114}00114\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00115}00115\ \ \ \ }
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00116}\mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler_a6faa30d2db31020b3db4886a554e147a}{00116}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler_a6faa30d2db31020b3db4886a554e147a}{space\_monitor\_loop}}()\ \{}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00117}00117\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ \mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler_a3571fc8484a45f62857dcbe29d73aa28}{is\_threshold\_exceeded}}()\ \&\&\ shutdown\_on\_exceeded\ )\ \{}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00118}00118\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}}(\textcolor{stringliteral}{"{}Shutting\ down,\ file\ system\ exceeded\ threshold"{}});}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00119}00119\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{appbase::app}}().\mbox{\hyperlink{classappbase_1_1application_a81aa58d3f94570b7976145039155fc46}{quit}}();\ \textcolor{comment}{//\ This\ will\ gracefully\ stop\ Nodeop}}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00120}00120\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00121}00121\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00122}00122\ \ \ \ \ \ \ update\_warning\_interval\_counter();}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00123}00123\ }
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00124}00124\ \ \ \ \ \ \ timer.expires\_from\_now(\ boost::posix\_time::seconds(\ sleep\_time\_in\_secs\ ));}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00125}00125\ }
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00126}00126\ \ \ \ \ \ \ timer.async\_wait([\textcolor{keyword}{this}](\textcolor{keyword}{auto}\&\ ec)\ \{}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00127}00127\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ ec\ )\ \{}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00128}00128\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a1759e5c9691d8ad754bdf5eff8bb23ac}{wlog}}(\textcolor{stringliteral}{"{}Exit\ due\ to\ error:\ \$\{ec\},\ message:\ \$\{message\}"{}},}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00129}00129\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}ec"{}},\ ec.value())}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00130}00130\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}message"{}},\ ec.message()));}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00131}00131\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00132}00132\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00133}00133\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Loop\ over}}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00134}00134\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler_a6faa30d2db31020b3db4886a554e147a}{space\_monitor\_loop}}();}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00135}00135\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00136}00136\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00137}00137\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00138}00138\ }
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00139}00139\ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00140}00140\ \ \ \ \ \ \ SpaceProvider\ space\_provider;}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00141}00141\ }
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00142}00142\ \ \ \ \ \ \ boost::asio::deadline\_timer\ timer;}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00143}00143\ \ \ \ }
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00144}00144\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ sleep\_time\_in\_secs\ \{2\};}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00145}00145\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ shutdown\_threshold\ \{90\};}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00146}00146\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ warning\_threshold\ \{85\};}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00147}00147\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \ \ \ \ shutdown\_on\_exceeded\ \{\textcolor{keyword}{true}\};}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00148}00148\ }
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00149}00149\ \ \ \ \ \ \ \textcolor{keyword}{struct\ \ \ }filesystem\_info\ \{}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00150}00150\ \ \ \ \ \ \ \ \ \ dev\_t\ \ \ \ \ \ st\_dev;\ \textcolor{comment}{//\ device\ id\ of\ file\ system\ containing\ "{}file\_path"{}}}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00151}00151\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a2ba5f6c0633401558d277b2c0e4f758d}{uintmax\_t}}\ \ shutdown\_available\ \{0\};\ \textcolor{comment}{//\ minimum\ number\ of\ available\ bytes\ the\ file\ system\ must\ maintain}}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00152}00152\ \ \ \ \ \ \ \ \ \ bfs::path\ \ path\_name;}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00153}00153\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a2ba5f6c0633401558d277b2c0e4f758d}{uintmax\_t}}\ \ warning\_available\ \{0\};\ \ \textcolor{comment}{//\ warning\ is\ issued\ when\ availabla\ number\ of\ bytese\ drops\ below\ warning\_available}}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00154}00154\ }
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00155}00155\ \ \ \ \ \ \ \ \ \ filesystem\_info(dev\_t\ dev,\ \mbox{\hyperlink{stdint_8h_a2ba5f6c0633401558d277b2c0e4f758d}{uintmax\_t}}\ available,\ \textcolor{keyword}{const}\ bfs::path\&\ path,\ \mbox{\hyperlink{stdint_8h_a2ba5f6c0633401558d277b2c0e4f758d}{uintmax\_t}}\ warning)}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00156}00156\ \ \ \ \ \ \ \ \ \ :\ st\_dev(dev),}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00157}00157\ \ \ \ \ \ \ \ \ \ shutdown\_available(available),}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00158}00158\ \ \ \ \ \ \ \ \ \ path\_name(path),}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00159}00159\ \ \ \ \ \ \ \ \ \ warning\_available(warning)}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00160}00160\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00161}00161\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00162}00162\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00163}00163\ }
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00164}00164\ \ \ \ \ \ \ \textcolor{comment}{//\ Stores\ file\ systems\ to\ be\ monitored.\ Duplicate}}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00165}00165\ \ \ \ \ \ \ \textcolor{comment}{//\ file\ systems\ are\ not\ stored.}}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00166}00166\ \ \ \ \ \ \ std::vector<filesystem\_info>\ filesystems;}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00167}00167\ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00168}00168\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ warning\_interval\ \{1\};}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00169}00169\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ warning\_interval\_counter\ \{1\};}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00170}00170\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \ \ \ \ output\_threshold\_warning\ \{\textcolor{keyword}{true}\};}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00171}00171\ }
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00172}00172\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ update\_warning\_interval\_counter()\ \{}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00173}00173\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ warning\_interval\_counter\ ==\ warning\_interval\ )\ \{}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00174}00174\ \ \ \ \ \ \ \ \ \ \ \ \ output\_threshold\_warning\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00175}00175\ \ \ \ \ \ \ \ \ \ \ \ \ warning\_interval\_counter\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00176}00176\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00177}00177\ \ \ \ \ \ \ \ \ \ \ \ \ output\_threshold\_warning\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00178}00178\ \ \ \ \ \ \ \ \ \ \ \ \ ++warning\_interval\_counter;}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00179}00179\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00180}00180\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00181}00181\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{file__space__handler_8hpp_source_l00182}00182\ \}}
+
+\end{DoxyCode}

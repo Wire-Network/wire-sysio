@@ -1,0 +1,105 @@
+\doxysection{blockinfo\+\_\+tester.\+hpp}
+\hypertarget{blockinfo__tester_8hpp_source}{}\label{blockinfo__tester_8hpp_source}\index{/Users/svetlasyrimis/Desktop/wire-\/network/WN-\/org/wire-\/system-\/contracts/contracts/test\_contracts/blockinfo\_tester/include/blockinfo\_tester/blockinfo\_tester.hpp@{/Users/svetlasyrimis/Desktop/wire-\/network/WN-\/org/wire-\/system-\/contracts/contracts/test\_contracts/blockinfo\_tester/include/blockinfo\_tester/blockinfo\_tester.hpp}}
+\mbox{\hyperlink{blockinfo__tester_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#ifdef\ TEST\_INCLUDE}}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{varint_8hpp}{fc/io/varint.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{include_2fc_2time_8hpp}{fc/time.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00008}00008\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <sysio/time.hpp>}}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00011}00011\ \textcolor{preprocessor}{\#include\ <sysio/varint.hpp>}}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00013}00013\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{block__info_8hpp}{sysio.system/block\_info.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00015}00015\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00017}00017\ \textcolor{preprocessor}{\#include\ <cstdint>}}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00018}00018\ \textcolor{preprocessor}{\#include\ <optional>}}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00019}00019\ \textcolor{preprocessor}{\#include\ <variant>}}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00021}\mbox{\hyperlink{namespacesystem__contracts}{00021}}\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester}{system\_contracts::testing::test\_contracts::blockinfo\_tester}}\ \{}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00023}00023\ \textcolor{preprocessor}{\#ifdef\ TEST\_INCLUDE}}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00025}00025\ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacesystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_a28ca3704afa6ea443dd4a095daaedb3a}{time\_point}}\ =\ \mbox{\hyperlink{classfc_1_1time__point}{fc::time\_point}};}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00026}00026\ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacesystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_a2aa5b65d4eca5bfc75fca6cfea60b36f}{varint}}\ \ \ \ \ =\ \mbox{\hyperlink{structfc_1_1unsigned__int}{fc::unsigned\_int}};}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00028}00028\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00030}\mbox{\hyperlink{namespacesystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_a28ca3704afa6ea443dd4a095daaedb3a}{00030}}\ \textcolor{keyword}{using\ }\mbox{\hyperlink{classfc_1_1time__point}{time\_point}}\ =\ \mbox{\hyperlink{classfc_1_1time__point}{sysio::time\_point}};}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00031}\mbox{\hyperlink{namespacesystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_a2aa5b65d4eca5bfc75fca6cfea60b36f}{00031}}\ \textcolor{keyword}{using\ }\mbox{\hyperlink{structfc_1_1unsigned__int}{varint}}\ \ \ \ \ =\ \mbox{\hyperlink{structfc_1_1unsigned__int}{sysio::unsigned\_int}};}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00033}00033\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00041}\mbox{\hyperlink{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1get__latest__block__batch__info}{00041}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1get__latest__block__batch__info}{get\_latest\_block\_batch\_info}}}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00042}00042\ \{}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00043}\mbox{\hyperlink{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1get__latest__block__batch__info_ac601553260c24e5fe6ed17828e4a41ef}{00043}}\ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1get__latest__block__batch__info_ac601553260c24e5fe6ed17828e4a41ef}{batch\_start\_height\_offset}};}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00044}\mbox{\hyperlink{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1get__latest__block__batch__info_a82ebd86affa47e2f8024b9083374ed8a}{00044}}\ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1get__latest__block__batch__info_a82ebd86affa47e2f8024b9083374ed8a}{batch\_size}};}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00045}00045\ \};}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00047}00047\ \textcolor{preprocessor}{\#ifdef\ TEST\_INCLUDE}}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00049}00049\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structsysiosystem_1_1block__info_1_1block__batch__info}{block\_batch\_info}}}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00050}00050\ \{}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00051}00051\ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \ \ \mbox{\hyperlink{structsysiosystem_1_1block__info_1_1block__batch__info_aeaa24fcac9d139fcfff41e4258f4259c}{batch\_start\_height}};}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00052}00052\ \ \ \ \mbox{\hyperlink{classfc_1_1time__point}{time\_point}}\ \mbox{\hyperlink{structsysiosystem_1_1block__info_1_1block__batch__info_aadb0c239e08878d060cf0b8728b4904c}{batch\_start\_timestamp}};}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00053}00053\ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \ \ \mbox{\hyperlink{structsysiosystem_1_1block__info_1_1block__batch__info_a7e43a661b545456ae45274dfde5e5356}{batch\_current\_end\_height}};}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00054}00054\ \ \ \ \mbox{\hyperlink{classfc_1_1time__point}{time\_point}}\ \mbox{\hyperlink{structsysiosystem_1_1block__info_1_1block__batch__info_a7ae417680161505d89fd7e9784e99a2c}{batch\_current\_end\_timestamp}};}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00055}00055\ \};}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00057}00057\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00059}00059\ \textcolor{keyword}{using\ }\mbox{\hyperlink{structsysiosystem_1_1block__info_1_1block__batch__info}{sysiosystem::block\_info::block\_batch\_info}};}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00061}00061\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00062}00062\ }
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00066}\mbox{\hyperlink{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result}{00066}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result}{latest\_block\_batch\_info\_result}}}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00067}00067\ \{}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00068}\mbox{\hyperlink{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_aeb9f839d5c51488952f8f1381f89a64a}{00068}}\ \ \ \ \textcolor{keyword}{enum}\ \mbox{\hyperlink{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_aeb9f839d5c51488952f8f1381f89a64a}{error\_code\_enum}}\ :\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00069}00069\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00070}\mbox{\hyperlink{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_aeb9f839d5c51488952f8f1381f89a64aa2a1d4c1c3cfc5a05f9cea814b5cb5987}{00070}}\ \ \ \ \ \ \ \mbox{\hyperlink{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_aeb9f839d5c51488952f8f1381f89a64aa2a1d4c1c3cfc5a05f9cea814b5cb5987}{no\_error}},}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00071}\mbox{\hyperlink{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_aeb9f839d5c51488952f8f1381f89a64aa47d347c195a1c26fdbce91210f28a157}{00071}}\ \ \ \ \ \ \ \mbox{\hyperlink{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_aeb9f839d5c51488952f8f1381f89a64aa47d347c195a1c26fdbce91210f28a157}{invalid\_input}},}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00072}\mbox{\hyperlink{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_aeb9f839d5c51488952f8f1381f89a64aabaabaf67659e847cf8aac8c9b9cafeca}{00072}}\ \ \ \ \ \ \ \mbox{\hyperlink{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_aeb9f839d5c51488952f8f1381f89a64aabaabaf67659e847cf8aac8c9b9cafeca}{unsupported\_version}},}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00073}00073\ \ \ \ \ \ \ \mbox{\hyperlink{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_aeb9f839d5c51488952f8f1381f89a64aaf18cb9d59b963ddb71352e9cf8f03bc8}{insufficient\_data}}}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00074}\mbox{\hyperlink{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_aeb9f839d5c51488952f8f1381f89a64aaf18cb9d59b963ddb71352e9cf8f03bc8}{00074}}\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00075}00075\ }
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00076}\mbox{\hyperlink{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_a6bef31839eb6c99ff3bb5f69bbb8b7a5}{00076}}\ \ \ \ std::optional<block\_batch\_info>\ \mbox{\hyperlink{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_a6bef31839eb6c99ff3bb5f69bbb8b7a5}{result}};}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00077}\mbox{\hyperlink{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_aa3bf20610c6a68ed0a5e3261cbdb5808}{00077}}\ \ \ \ \mbox{\hyperlink{structfc_1_1unsigned__int}{varint}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ error\_code\ =\ \mbox{\hyperlink{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_aeb9f839d5c51488952f8f1381f89a64aa2a1d4c1c3cfc5a05f9cea814b5cb5987}{no\_error}};}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00079}\mbox{\hyperlink{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_a8c36a77acb6436c335c075939e5ffc0d}{00079}}\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_a8c36a77acb6436c335c075939e5ffc0d}{has\_error}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ !(error\_code.value\ ==\ \mbox{\hyperlink{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_aeb9f839d5c51488952f8f1381f89a64aa2a1d4c1c3cfc5a05f9cea814b5cb5987}{no\_error}}\ \&\&\ \mbox{\hyperlink{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_a6bef31839eb6c99ff3bb5f69bbb8b7a5}{result}}.has\_value());\ \}}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00080}00080\ }
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00081}\mbox{\hyperlink{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_a98a9efbd6bbda91e666bd57e16095adb}{00081}}\ \ \ \ \mbox{\hyperlink{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_aeb9f839d5c51488952f8f1381f89a64a}{error\_code\_enum}}\ \mbox{\hyperlink{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_a98a9efbd6bbda91e666bd57e16095adb}{get\_error}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_aeb9f839d5c51488952f8f1381f89a64a}{error\_code\_enum}}\textcolor{keyword}{>}(error\_code.value);\ \}}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00083}00083\ \textcolor{preprocessor}{\#ifndef\ TEST\_INCLUDE}}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00084}00084\ }
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00085}00085\ \ \ \ SYSLIB\_SERIALIZE(\mbox{\hyperlink{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result}{latest\_block\_batch\_info\_result}},\ (\mbox{\hyperlink{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_a6bef31839eb6c99ff3bb5f69bbb8b7a5}{result}})(error\_code))}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00086}00086\ }
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00087}00087\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00088}00088\ \};}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00089}00089\ }
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00090}\mbox{\hyperlink{namespacesystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_a089ac244fc33f0091ba57ec3121b7c12}{00090}}\ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacesystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_a089ac244fc33f0091ba57ec3121b7c12}{input\_type}}\ =\ std::variant<get\_latest\_block\_batch\_info>;}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00091}00091\ }
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00092}\mbox{\hyperlink{namespacesystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_a0b95068352c90188d1859d7fb88844d4}{00092}}\ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacesystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_a0b95068352c90188d1859d7fb88844d4}{output\_type}}\ =\ std::variant<latest\_block\_batch\_info\_result>;}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00093}00093\ }
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00094}00094\ \}\ \textcolor{comment}{//\ namespace\ system\_contracts::testing::test\_contracts::blockinfo\_tester}}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00095}00095\ }
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00096}00096\ \textcolor{preprocessor}{\#ifdef\ TEST\_INCLUDE}}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00097}00097\ }
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00098}00098\ \mbox{\hyperlink{reflect_8hpp_a2ace850e636b1ca0b18fe3177e413d99}{FC\_REFLECT}}(\mbox{\hyperlink{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1get__latest__block__batch__info}{system\_contracts::testing::test\_contracts::blockinfo\_tester::get\_latest\_block\_batch\_info}},}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00099}00099\ \ \ \ \ \ \ \ \ \ \ \ (batch\_start\_height\_offset)(batch\_size))}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00100}00100\ \mbox{\hyperlink{reflect_8hpp_a2ace850e636b1ca0b18fe3177e413d99}{FC\_REFLECT}}(\mbox{\hyperlink{structsysiosystem_1_1block__info_1_1block__batch__info}{system\_contracts::testing::test\_contracts::blockinfo\_tester::block\_batch\_info}},}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00101}00101\ \ \ \ \ \ \ \ \ \ \ \ (batch\_start\_height)(batch\_start\_timestamp)(batch\_current\_end\_height)(batch\_current\_end\_timestamp))}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00102}00102\ \mbox{\hyperlink{reflect_8hpp_a3243e9d5f0a24341d7f7e64f9cd525ee}{FC\_REFLECT\_ENUM}}(}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00103}00103\ \ \ \ \mbox{\hyperlink{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_aeb9f839d5c51488952f8f1381f89a64a}{system\_contracts::testing::test\_contracts::blockinfo\_tester::latest\_block\_batch\_info\_result::error\_code\_enum}},}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00104}00104\ \ \ \ (no\_error)(invalid\_input)(unsupported\_version)(insufficient\_data))}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00105}00105\ \mbox{\hyperlink{reflect_8hpp_a2ace850e636b1ca0b18fe3177e413d99}{FC\_REFLECT}}(\mbox{\hyperlink{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result}{system\_contracts::testing::test\_contracts::blockinfo\_tester::latest\_block\_batch\_info\_result}},}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00106}00106\ \ \ \ \ \ \ \ \ \ \ \ (result)(error\_code))}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00107}00107\ }
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8hpp_source_l00108}00108\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

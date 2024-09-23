@@ -1,0 +1,9 @@
+<map id="WAST::AssertUnlinkableCommand" name="WAST::AssertUnlinkableCommand">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,258,230,283"/>
+<area shape="rect" id="Node000002" href="$struct_w_a_s_t_1_1_command.html" title=" " alt="" coords="55,183,180,208"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="120,224,120,257,115,257,115,224"/>
+<area shape="rect" id="Node000003" href="$struct_w_a_s_t_1_1_text_file_locus.html" title=" " alt="" coords="44,94,191,120"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="120,135,120,182,115,182,115,135"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="91,5,144,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="120,47,120,94,115,94,115,47"/>
+</map>

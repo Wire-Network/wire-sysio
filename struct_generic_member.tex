@@ -1,0 +1,93 @@
+\doxysection{Generic\+Member\texorpdfstring{$<$}{<} Encoding, Allocator \texorpdfstring{$>$}{>} Struct Template Reference}
+\hypertarget{struct_generic_member}{}\label{struct_generic_member}\index{GenericMember$<$ Encoding, Allocator $>$@{GenericMember$<$ Encoding, Allocator $>$}}
+
+
+Name-\/value pair in a JSON object value.  
+
+
+
+
+{\ttfamily \#include $<$document.\+h$>$}
+
+
+
+Collaboration diagram for Generic\+Member\texorpdfstring{$<$}{<} Encoding, Allocator \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_generic_member__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \mbox{\hyperlink{struct_generic_member_a7124f7ccd67421533d33139938604fac}{name}}
+\begin{DoxyCompactList}\small\item\em name of member (must be a string) \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \mbox{\hyperlink{struct_generic_member_aad3cfa4f9e8b9018068c8bc865723083}{value}}
+\begin{DoxyCompactList}\small\item\em value of member. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{struct_generic_member_af72094da5f8967de3fab3d2c34bc71cc}{swap}} (\mbox{\hyperlink{struct_generic_member}{Generic\+Member}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, \mbox{\hyperlink{struct_generic_member}{Generic\+Member}} \&b) RAPIDJSON\+\_\+\+NOEXCEPT
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}$>$\newline
+struct Generic\+Member$<$ Encoding, Allocator $>$}
+This class was internal to \doxylink{class_generic_value}{Generic\+Value}. It used to be a inner struct. But a compiler (IBM XL C/\+C++ for AIX) have reported to have problem with that so it moved as a namespace scope struct. \href{https://code.google.com/p/rapidjson/issues/detail?id=64}{\texttt{ https\+://code.\+google.\+com/p/rapidjson/issues/detail?id=64}} 
+
+Definition at line \mbox{\hyperlink{document_8h_source_l00066}{66}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{struct_generic_member_af72094da5f8967de3fab3d2c34bc71cc}\index{GenericMember$<$ Encoding, Allocator $>$@{GenericMember$<$ Encoding, Allocator $>$}!swap@{swap}}
+\index{swap@{swap}!GenericMember$<$ Encoding, Allocator $>$@{GenericMember$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{swap}{swap}}
+{\footnotesize\ttfamily \label{struct_generic_member_af72094da5f8967de3fab3d2c34bc71cc} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+void swap (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_generic_member}{Generic\+Member}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \&}]{a}{, }\item[{\mbox{\hyperlink{struct_generic_member}{Generic\+Member}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \&}]{b}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l00071}{71}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.name.Swap(b.\mbox{\hyperlink{struct_generic_member_a7124f7ccd67421533d33139938604fac}{name}});}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.value.Swap(b.\mbox{\hyperlink{struct_generic_member_aad3cfa4f9e8b9018068c8bc865723083}{value}});}
+\DoxyCodeLine{00074\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_generic_member_a7124f7ccd67421533d33139938604fac}\index{GenericMember$<$ Encoding, Allocator $>$@{GenericMember$<$ Encoding, Allocator $>$}!name@{name}}
+\index{name@{name}!GenericMember$<$ Encoding, Allocator $>$@{GenericMember$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{name}{name}}
+{\footnotesize\ttfamily \label{struct_generic_member_a7124f7ccd67421533d33139938604fac} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+\mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$\mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}$>$ \mbox{\hyperlink{struct_generic_member}{Generic\+Member}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::name}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l00067}{67}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+\Hypertarget{struct_generic_member_aad3cfa4f9e8b9018068c8bc865723083}\index{GenericMember$<$ Encoding, Allocator $>$@{GenericMember$<$ Encoding, Allocator $>$}!value@{value}}
+\index{value@{value}!GenericMember$<$ Encoding, Allocator $>$@{GenericMember$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{value}{value}}
+{\footnotesize\ttfamily \label{struct_generic_member_aad3cfa4f9e8b9018068c8bc865723083} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+\mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$\mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}$>$ \mbox{\hyperlink{struct_generic_member}{Generic\+Member}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::value}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l00068}{68}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/\mbox{\hyperlink{document_8h}{document.\+h}}\end{DoxyCompactItemize}

@@ -1,0 +1,628 @@
+\doxysection{Parse\+Function.\+cpp}
+\hypertarget{_parse_function_8cpp_source}{}\label{_parse_function_8cpp_source}\index{libraries/wasm-\/jit/Source/WAST/ParseFunction.cpp@{libraries/wasm-\/jit/Source/WAST/ParseFunction.cpp}}
+\mbox{\hyperlink{_parse_function_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_basic_types_8h}{Inline/BasicTypes.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_w_a_s_t_8h}{WAST.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_lexer_8h}{Lexer.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_parse_8h}{Parse.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_module_8h}{IR/Module.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_operators_8h}{IR/Operators.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_validate_8h}{IR/Validate.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_serialization_8h}{Inline/Serialization.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <memory>}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00012}00012\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespace_w_a_s_t}{WAST}};}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00013}00013\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespace_i_r}{IR}};}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00015}00015\ \textcolor{keyword}{namespace}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00016}00016\ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00017}00017\ \ \ \ \ \textcolor{comment}{//\ State\ associated\ with\ parsing\ a\ function.}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00018}00018\ \ \ \ \ \textcolor{keyword}{struct\ }FunctionParseState\ :\ \mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{ParseState}}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00019}00019\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00020}00020\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_w_a_s_t_1_1_module_parse_state}{ModuleParseState}}\&\ moduleState;}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00021}00021\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_i_r_1_1_function_def}{FunctionDef}}\&\ functionDef;}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00023}00023\ \ \ \ \ \ \ \ \ std::unique\_ptr<NameToIndexMap>\ localNameToIndexMap;}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00024}00024\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ numLocals;}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00026}00026\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_a2d9d3ba4e83db4fbb314c3068261afa5}{NameToIndexMap}}\ branchTargetNameToIndexMap;}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00027}00027\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}\ branchTargetDepth;}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00029}00029\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_serialization_1_1_array_output_stream}{Serialization::ArrayOutputStream}}\ codeByteStream;}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00030}00030\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_i_r_1_1_operator_encoder_stream}{OperatorEncoderStream}}\ operationEncoder;}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00031}00031\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_i_r_1_1_code_validation_proxy_stream}{CodeValidationProxyStream<OperatorEncoderStream>}}\ validatingCodeStream;}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00033}00033\ \ \ \ \ \ \ \ \ FunctionParseState(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_w_a_s_t_1_1_module_parse_state}{ModuleParseState}}\&\ inModuleState,\mbox{\hyperlink{namespace_w_a_s_t_a2d9d3ba4e83db4fbb314c3068261afa5}{NameToIndexMap}}*\ inLocalNameToIndexMap,\textcolor{keyword}{const}\ Token*\ firstBodyToken,\mbox{\hyperlink{struct_i_r_1_1_function_def}{FunctionDef}}\&\ inFunctionDef)}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00034}00034\ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{ParseState}}(inModuleState.string,inModuleState.lineInfo,inModuleState.errors,firstBodyToken)}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00035}00035\ \ \ \ \ \ \ \ \ ,\ moduleState(inModuleState)}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00036}00036\ \ \ \ \ \ \ \ \ ,\ functionDef(inFunctionDef)}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00037}00037\ \ \ \ \ \ \ \ \ ,\ localNameToIndexMap(inLocalNameToIndexMap)}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00038}00038\ \ \ \ \ \ \ \ \ ,\ numLocals(inFunctionDef.nonParameterLocalTypes.size()\ +\ inModuleState.\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.\mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55}{types}}[inFunctionDef.type.index]-\/>parameters.size())}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00039}00039\ \ \ \ \ \ \ \ \ ,\ branchTargetDepth(0)}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00040}00040\ \ \ \ \ \ \ \ \ ,\ operationEncoder(codeByteStream)}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00041}00041\ \ \ \ \ \ \ \ \ ,\ validatingCodeStream(inModuleState.\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}},functionDef,operationEncoder)}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00042}00042\ \ \ \ \ \ \ \ \ \{\}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00043}00043\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00045}00045\ \ \ \ \ \textcolor{comment}{//\ While\ in\ scope,\ pushes\ a\ branch\ target\ onto\ the\ branch\ target\ stack.}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00046}00046\ \ \ \ \ \textcolor{comment}{//\ Also\ maintains\ the\ branchTargetNameToIndexMap\ }}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00047}00047\ \ \ \ \ \textcolor{keyword}{struct\ }ScopedBranchTarget}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00048}00048\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00049}00049\ \ \ \ \ \ \ \ \ ScopedBranchTarget(FunctionParseState\&\ inState,\mbox{\hyperlink{struct_w_a_s_t_1_1_name}{Name}}\ inName)}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00050}00050\ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{structstate}{state}}(inState),\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(inName),\ previousBranchTargetIndex(\mbox{\hyperlink{stdint_8h_ab5eb23180f7cc12b7d6c04a8ec067fdd}{UINT32\_MAX}})}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00051}00051\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \ \ \ branchTargetIndex\ =\ ++\mbox{\hyperlink{structstate}{state}}.branchTargetDepth;}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(name)}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ previousIt\ =\ \mbox{\hyperlink{structstate}{state}}.branchTargetNameToIndexMap.find(name);}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(previousIt\ !=\ \mbox{\hyperlink{structstate}{state}}.branchTargetNameToIndexMap.end())}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ the\ name\ was\ already\ bound\ to\ a\ branch\ target,\ remember\ the}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00059}00059\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ previously\ bound\ branch\ target.}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ previousBranchTargetIndex\ =\ previousIt-\/>second;}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00061}00061\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ previousIt-\/>second\ =\ branchTargetIndex;}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00062}00062\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00064}00064\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00065}00065\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.branchTargetNameToIndexMap.emplace(name,branchTargetIndex);}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00066}00066\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00067}00067\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00068}00068\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00069}00069\ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00070}00070\ \ \ \ \ \ \ \ \ \string~ScopedBranchTarget()}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00071}00071\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_errors_8h_ad57cbc2f5c193d8f4002ee66d63eb952}{WAVM\_ASSERT\_TERMINATE}}(branchTargetIndex\ ==\ \mbox{\hyperlink{structstate}{state}}.branchTargetDepth);}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00073}00073\ \ \ \ \ \ \ \ \ \ \ \ \ -\/-\/\mbox{\hyperlink{structstate}{state}}.branchTargetDepth;}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00074}00074\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(name)}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00075}00075\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_errors_8h_ad57cbc2f5c193d8f4002ee66d63eb952}{WAVM\_ASSERT\_TERMINATE}}(\mbox{\hyperlink{structstate}{state}}.branchTargetNameToIndexMap.count(name)\ ==\ 1);}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_errors_8h_ad57cbc2f5c193d8f4002ee66d63eb952}{WAVM\_ASSERT\_TERMINATE}}(\mbox{\hyperlink{structstate}{state}}.branchTargetNameToIndexMap.at(name)\ ==\ branchTargetIndex);}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00078}00078\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(previousBranchTargetIndex\ ==\ \mbox{\hyperlink{stdint_8h_ab5eb23180f7cc12b7d6c04a8ec067fdd}{UINT32\_MAX}})}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00080}00080\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.branchTargetNameToIndexMap.erase(name);}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00081}00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00082}00082\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00083}00083\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00084}00084\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ hte\ name\ was\ previously\ bound\ to\ an\ outer\ branch\ target,\ restore\ it.}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00085}00085\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.branchTargetNameToIndexMap[\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}]\ =\ previousBranchTargetIndex;}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00086}00086\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00087}00087\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00088}00088\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00089}00089\ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00090}00090\ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00091}00091\ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00092}00092\ \ \ \ \ \ \ \ \ FunctionParseState\&\ \mbox{\hyperlink{structstate}{state}};}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00093}00093\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_w_a_s_t_1_1_name}{Name}}\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}};}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00094}00094\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}\ branchTargetIndex;}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00095}00095\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}\ previousBranchTargetIndex;}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00096}00096\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00097}00097\ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00098}00098\ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00099}00099\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{bool}\ tryParseAndResolveBranchTargetRef(FunctionParseState\&\ \mbox{\hyperlink{structstate}{state}},\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}\&\ outTargetDepth)}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00100}00100\ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00101}00101\ \ \ \ \ \mbox{\hyperlink{struct_w_a_s_t_1_1_reference}{Reference}}\ branchTargetRef;}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00102}00102\ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{namespace_w_a_s_t_a965b97566a3d051c08b06c7488c14ad8}{tryParseNameOrIndexRef}}(\mbox{\hyperlink{structstate}{state}},branchTargetRef))}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00103}00103\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00104}00104\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(branchTargetRef.\mbox{\hyperlink{struct_w_a_s_t_1_1_reference_acfd4670d22a4c21f5aa8918a0d14f599}{type}})}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00105}00105\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00106}00106\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ Reference::Type::index:\ outTargetDepth\ =\ branchTargetRef.\mbox{\hyperlink{struct_w_a_s_t_1_1_reference_a636568c708a85b40e965083a2eb0e371}{index}};\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00107}00107\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ Reference::Type::name:}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00108}00108\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00109}00109\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ nameToIndexMapIt\ =\ \mbox{\hyperlink{structstate}{state}}.branchTargetNameToIndexMap.find(branchTargetRef.\mbox{\hyperlink{struct_w_a_s_t_1_1_reference_a5cf0db51e258f551a0d12892056522a0}{name}});}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00110}00110\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(nameToIndexMapIt\ ==\ \mbox{\hyperlink{structstate}{state}}.branchTargetNameToIndexMap.end())}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00111}00111\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00112}00112\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_af36d14f42c697d5272a592bf7349d06d}{parseErrorf}}(\mbox{\hyperlink{structstate}{state}},branchTargetRef.\mbox{\hyperlink{struct_w_a_s_t_1_1_reference_a98e8e176b1812f626d9e8e1d83a63486}{token}},\textcolor{stringliteral}{"{}unknown\ name"{}});}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00113}00113\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ outTargetDepth\ =\ \mbox{\hyperlink{stdint_8h_ab5eb23180f7cc12b7d6c04a8ec067fdd}{UINT32\_MAX}};}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00114}00114\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00115}00115\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00116}00116\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00117}00117\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ outTargetDepth\ =\ \mbox{\hyperlink{structstate}{state}}.branchTargetDepth\ -\/\ nameToIndexMapIt-\/>second;}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00118}00118\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00119}00119\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00120}00120\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00121}00121\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:\ \mbox{\hyperlink{namespace_errors_a6959930ad6159fe3eb2e04ebf87c1b84}{Errors::unreachable}}();}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00122}00122\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00123}00123\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00124}00124\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00125}00125\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00126}00126\ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00127}00127\ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00128}00128\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ parseAndValidateRedundantBranchTargetName(\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{ParseState}}\&\ \mbox{\hyperlink{structstate}{state}},\mbox{\hyperlink{struct_w_a_s_t_1_1_name}{Name}}\ branchTargetName,\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{structcontext}{context}},\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ redundantContext)}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00129}00129\ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00130}00130\ \ \ \ \ \mbox{\hyperlink{struct_w_a_s_t_1_1_name}{Name}}\ redundantName;}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00131}00131\ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{namespace_w_a_s_t_a5a1887aa3f790b93a65b578a3b4628e3}{tryParseName}}(\mbox{\hyperlink{structstate}{state}},redundantName)\ \&\&\ branchTargetName\ !=\ redundantName)}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00132}00132\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00133}00133\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_af36d14f42c697d5272a592bf7349d06d}{parseErrorf}}(\mbox{\hyperlink{structstate}{state}},\mbox{\hyperlink{structstate}{state}}.nextToken-\/1,\textcolor{stringliteral}{"{}\%s\ label\ doesn't\ match\ \%s\ label"{}},redundantContext,\mbox{\hyperlink{structcontext}{context}});}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00134}00134\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00135}00135\ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00136}00136\ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00137}00137\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ parseImm(FunctionParseState\&\ \mbox{\hyperlink{structstate}{state}},\mbox{\hyperlink{struct_i_r_1_1_no_imm}{NoImm}}\&)\ \{\}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00138}00138\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ parseImm(FunctionParseState\&\ \mbox{\hyperlink{structstate}{state}},\mbox{\hyperlink{struct_i_r_1_1_memory_imm}{MemoryImm}}\&\ outImm)\ \{\}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00139}00139\ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00140}00140\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ parseImm(FunctionParseState\&\ \mbox{\hyperlink{structstate}{state}},\mbox{\hyperlink{struct_i_r_1_1_literal_imm}{LiteralImm<I32>}}\&\ outImm)\ \{\ outImm.\mbox{\hyperlink{struct_i_r_1_1_literal_imm_a9b796ec65d16af24f33ed01887df92ca}{value}}\ =\ (\mbox{\hyperlink{_basic_types_8h_a2f1a62071dd7dc3f6ef85c1b7612dc35}{I32}})\mbox{\hyperlink{namespace_w_a_s_t_aa08a40e9ae2c8cb30939574c65bb9eb7}{parseI32}}(\mbox{\hyperlink{structstate}{state}});\ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00141}00141\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ parseImm(FunctionParseState\&\ \mbox{\hyperlink{structstate}{state}},\mbox{\hyperlink{struct_i_r_1_1_literal_imm}{LiteralImm<I64>}}\&\ outImm)\ \{\ outImm.\mbox{\hyperlink{struct_i_r_1_1_literal_imm_a9b796ec65d16af24f33ed01887df92ca}{value}}\ =\ (\mbox{\hyperlink{keccak256_8cpp_a4a234a46224f2c5591a49ebdfa83c70e}{I64}})\mbox{\hyperlink{namespace_w_a_s_t_acc415079db29202983e4d49cabc59ab3}{parseI64}}(\mbox{\hyperlink{structstate}{state}});\ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00142}00142\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ parseImm(FunctionParseState\&\ \mbox{\hyperlink{structstate}{state}},\mbox{\hyperlink{struct_i_r_1_1_literal_imm}{LiteralImm<F32>}}\&\ outImm)\ \{\ outImm.\mbox{\hyperlink{struct_i_r_1_1_literal_imm_a9b796ec65d16af24f33ed01887df92ca}{value}}\ =\ \mbox{\hyperlink{namespace_w_a_s_t_a2951f7730d860b16cf24168f13ec7d01}{parseF32}}(\mbox{\hyperlink{structstate}{state}});\ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00143}00143\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ parseImm(FunctionParseState\&\ \mbox{\hyperlink{structstate}{state}},\mbox{\hyperlink{struct_i_r_1_1_literal_imm}{LiteralImm<F64>}}\&\ outImm)\ \{\ outImm.\mbox{\hyperlink{struct_i_r_1_1_literal_imm_a9b796ec65d16af24f33ed01887df92ca}{value}}\ =\ \mbox{\hyperlink{namespace_w_a_s_t_a40af95ba4f3fbebd5324a913f89d1aff}{parseF64}}(\mbox{\hyperlink{structstate}{state}});\ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00144}00144\ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00145}00145\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ parseImm(FunctionParseState\&\ \mbox{\hyperlink{structstate}{state}},\mbox{\hyperlink{struct_i_r_1_1_branch_imm}{BranchImm}}\&\ outImm)}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00146}00146\ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00147}00147\ \ \ \ \ \textcolor{keywordflow}{if}(!tryParseAndResolveBranchTargetRef(\mbox{\hyperlink{structstate}{state}},outImm.\mbox{\hyperlink{struct_i_r_1_1_branch_imm_a593815bfc84d3b4ba4f7bd74efe99e19}{targetDepth}}))}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00148}00148\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00149}00149\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_af36d14f42c697d5272a592bf7349d06d}{parseErrorf}}(\mbox{\hyperlink{structstate}{state}},\mbox{\hyperlink{structstate}{state}}.nextToken,\textcolor{stringliteral}{"{}expected\ branch\ target\ name\ or\ index"{}});}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00150}00150\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{struct_w_a_s_t_1_1_recover_parse_exception}{RecoverParseException}}();}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00151}00151\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00152}00152\ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00153}00153\ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00154}00154\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ parseImm(FunctionParseState\&\ \mbox{\hyperlink{structstate}{state}},\mbox{\hyperlink{struct_i_r_1_1_branch_table_imm}{BranchTableImm}}\&\ outImm)}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00155}00155\ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00156}00156\ \ \ \ \ std::vector<U32>\ targetDepths;}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00157}00157\ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}\ targetDepth\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00158}00158\ \ \ \ \ \textcolor{keywordflow}{while}(tryParseAndResolveBranchTargetRef(\mbox{\hyperlink{structstate}{state}},targetDepth))}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00159}00159\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00160}00160\ \ \ \ \ \ \ \ \ targetDepths.push\_back(targetDepth);}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00161}00161\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00162}00162\ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00163}00163\ \ \ \ \ \textcolor{keywordflow}{if}(!targetDepths.size())}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00164}00164\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00165}00165\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_af36d14f42c697d5272a592bf7349d06d}{parseErrorf}}(\mbox{\hyperlink{structstate}{state}},\mbox{\hyperlink{structstate}{state}}.nextToken,\textcolor{stringliteral}{"{}expected\ branch\ target\ name\ or\ index"{}});}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00166}00166\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{struct_w_a_s_t_1_1_recover_parse_exception}{RecoverParseException}}();}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00167}00167\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00168}00168\ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00169}00169\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00170}00170\ \ \ \ \ \ \ \ \ outImm.\mbox{\hyperlink{struct_i_r_1_1_branch_table_imm_a9d63b9dbb2610daabb09735384f7ab67}{defaultTargetDepth}}\ =\ targetDepths.back();}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00171}00171\ \ \ \ \ \ \ \ \ targetDepths.pop\_back();}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00172}00172\ \ \ \ \ \ \ \ \ outImm.\mbox{\hyperlink{struct_i_r_1_1_branch_table_imm_a997ecb7055eee01f77e205f495f0cb9c}{branchTableIndex}}\ =\ (\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}})\mbox{\hyperlink{structstate}{state}}.functionDef.branchTables.size();}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00173}00173\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.functionDef.branchTables.push\_back(std::move(targetDepths));}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00174}00174\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00175}00175\ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00176}00176\ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00177}00177\ \textcolor{keyword}{template}<\textcolor{keywordtype}{bool}\ isGlobal>}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00178}00178\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ parseImm(FunctionParseState\&\ \mbox{\hyperlink{structstate}{state}},\mbox{\hyperlink{struct_i_r_1_1_get_or_set_variable_imm}{GetOrSetVariableImm<isGlobal>}}\&\ outImm)}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00179}00179\ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00180}00180\ \ \ \ \ outImm.\mbox{\hyperlink{struct_i_r_1_1_get_or_set_variable_imm_a58f67a9226981e4cae7686ac9e65b11b}{variableIndex}}\ =\ \mbox{\hyperlink{namespace_w_a_s_t_a90c0a142bd4b2b03f4d957bca6a88365}{parseAndResolveNameOrIndexRef}}(}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00181}00181\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}},}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00182}00182\ \ \ \ \ \ \ \ \ isGlobal\ ?\ \mbox{\hyperlink{structstate}{state}}.moduleState.globalNameToIndexMap\ :\ *\mbox{\hyperlink{structstate}{state}}.localNameToIndexMap,}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00183}00183\ \ \ \ \ \ \ \ \ isGlobal\ ?\ \mbox{\hyperlink{structstate}{state}}.moduleState.module.globals.size()\ :\ \mbox{\hyperlink{structstate}{state}}.numLocals,}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00184}00184\ \ \ \ \ \ \ \ \ isGlobal\ ?\ \textcolor{stringliteral}{"{}global"{}}\ :\ \textcolor{stringliteral}{"{}local"{}});}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00185}00185\ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00186}00186\ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00187}00187\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ parseImm(FunctionParseState\&\ \mbox{\hyperlink{structstate}{state}},\mbox{\hyperlink{struct_i_r_1_1_call_imm}{CallImm}}\&\ outImm)}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00188}00188\ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00189}00189\ \ \ \ \ outImm.\mbox{\hyperlink{struct_i_r_1_1_call_imm_a79c3a5c31c922ca02ec83673d7f2c9cb}{functionIndex}}\ =\ \mbox{\hyperlink{namespace_w_a_s_t_a90c0a142bd4b2b03f4d957bca6a88365}{parseAndResolveNameOrIndexRef}}(}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00190}00190\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}},}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00191}00191\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.moduleState.functionNameToIndexMap,}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00192}00192\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.moduleState.module.functions.size(),}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00193}00193\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}function"{}}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00194}00194\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00195}00195\ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00196}00196\ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00197}00197\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ parseImm(FunctionParseState\&\ \mbox{\hyperlink{structstate}{state}},\mbox{\hyperlink{struct_i_r_1_1_call_indirect_imm}{CallIndirectImm}}\&\ outImm)}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00198}00198\ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00199}00199\ \ \ \ \ outImm.\mbox{\hyperlink{struct_i_r_1_1_call_indirect_imm_ad5e749796116ddbe5569617b53396415}{type}}.\mbox{\hyperlink{struct_i_r_1_1_indexed_function_type_ad76a69c366f186a0e17305099ea15aba}{index}}\ =\ \mbox{\hyperlink{namespace_w_a_s_t_a90c0a142bd4b2b03f4d957bca6a88365}{parseAndResolveNameOrIndexRef}}(}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00200}00200\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}},}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00201}00201\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.moduleState.typeNameToIndexMap,}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00202}00202\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.moduleState.module.types.size(),}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00203}00203\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}type"{}}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00204}00204\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00205}00205\ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00206}00206\ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00207}00207\ \textcolor{keyword}{template}<Uptr\ naturalAlignmentLog2>}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00208}00208\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ parseImm(FunctionParseState\&\ \mbox{\hyperlink{structstate}{state}},\mbox{\hyperlink{struct_i_r_1_1_load_or_store_imm}{LoadOrStoreImm<naturalAlignmentLog2>}}\&\ outImm)}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00209}00209\ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00210}00210\ \ \ \ \ outImm.\mbox{\hyperlink{struct_i_r_1_1_load_or_store_imm_a7d5caef7b1309efc59a40aff46ef4ca1}{offset}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00211}00211\ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{structstate}{state}}.nextToken-\/>type\ ==\ t\_offset)}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00212}00212\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00213}00213\ \ \ \ \ \ \ \ \ ++\mbox{\hyperlink{structstate}{state}}.nextToken;}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00214}00214\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_a8001b89de5d29cdf830471e70b13798a}{require}}(\mbox{\hyperlink{structstate}{state}},t\_equals);}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00215}00215\ \ \ \ \ \ \ \ \ outImm.\mbox{\hyperlink{struct_i_r_1_1_load_or_store_imm_a7d5caef7b1309efc59a40aff46ef4ca1}{offset}}\ =\ \mbox{\hyperlink{namespace_w_a_s_t_aa08a40e9ae2c8cb30939574c65bb9eb7}{parseI32}}(\mbox{\hyperlink{structstate}{state}});}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00216}00216\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00217}00217\ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00218}00218\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}\ naturalAlignment\ =\ 1\ <<\ naturalAlignmentLog2;}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00219}00219\ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}\ alignment\ =\ naturalAlignment;}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00220}00220\ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{structstate}{state}}.nextToken-\/>type\ ==\ t\_align)}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00221}00221\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00222}00222\ \ \ \ \ \ \ \ \ ++\mbox{\hyperlink{structstate}{state}}.nextToken;}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00223}00223\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_a8001b89de5d29cdf830471e70b13798a}{require}}(\mbox{\hyperlink{structstate}{state}},t\_equals);}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00224}00224\ \ \ \ \ \ \ \ \ alignment\ =\ \mbox{\hyperlink{namespace_w_a_s_t_aa08a40e9ae2c8cb30939574c65bb9eb7}{parseI32}}(\mbox{\hyperlink{structstate}{state}});}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00225}00225\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(alignment\ >\ naturalAlignment)}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00226}00226\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00227}00227\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_af36d14f42c697d5272a592bf7349d06d}{parseErrorf}}(\mbox{\hyperlink{structstate}{state}},\mbox{\hyperlink{structstate}{state}}.nextToken,\textcolor{stringliteral}{"{}alignment\ must\ be\ <=\ natural\ alignment"{}});}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00228}00228\ \ \ \ \ \ \ \ \ \ \ \ \ alignment\ =\ naturalAlignment;}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00229}00229\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00230}00230\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00231}00231\ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00232}00232\ \ \ \ \ outImm.\mbox{\hyperlink{struct_i_r_1_1_load_or_store_imm_a30107d37953b93bfe82f75d1974c42cb}{alignmentLog2}}\ =\ (\mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}})\mbox{\hyperlink{namespace_platform_aa618d555db82f8b59b0eeeac8d9a946a}{Platform::floorLogTwo}}(alignment);}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00233}00233\ \ \ \ \ \textcolor{keywordflow}{if}(!alignment\ ||\ alignment\ \&\ (alignment\ -\/\ 1))}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00234}00234\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00235}00235\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_af36d14f42c697d5272a592bf7349d06d}{parseErrorf}}(\mbox{\hyperlink{structstate}{state}},\mbox{\hyperlink{structstate}{state}}.nextToken,\textcolor{stringliteral}{"{}alignment\ must\ be\ power\ of\ 2"{}});}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00236}00236\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00237}00237\ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00238}00238\ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00239}00239\ \textcolor{preprocessor}{\#if\ ENABLE\_SIMD\_PROTOTYPE}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00240}00240\ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00241}00241\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ parseImm(FunctionParseState\&\ \mbox{\hyperlink{structstate}{state}},\mbox{\hyperlink{struct_i_r_1_1_literal_imm}{LiteralImm<V128>}}\&\ outImm)}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00242}00242\ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00243}00243\ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ laneIndex\ =\ 0;laneIndex\ <\ 16;++laneIndex)}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00244}00244\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00245}00245\ \ \ \ \ \ \ \ \ outImm.\mbox{\hyperlink{struct_i_r_1_1_literal_imm_a9b796ec65d16af24f33ed01887df92ca}{value}}.i8[laneIndex]\ =\ \mbox{\hyperlink{namespace_w_a_s_t_ad29b64fadb8a9ec5fe54a9a147fcf618}{parseI8}}(\mbox{\hyperlink{structstate}{state}});}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00246}00246\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00247}00247\ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00248}00248\ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00249}00249\ \textcolor{keyword}{template}<Uptr\ numLanes>}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00250}00250\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ parseImm(FunctionParseState\&\ \mbox{\hyperlink{structstate}{state}},LaneIndexImm<numLanes>\&\ outImm)}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00251}00251\ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00252}00252\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}}\ u64\ =\ \mbox{\hyperlink{namespace_w_a_s_t_acc415079db29202983e4d49cabc59ab3}{parseI64}}(\mbox{\hyperlink{structstate}{state}});}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00253}00253\ \ \ \ \ \textcolor{keywordflow}{if}(u64\ >\ numLanes)}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00254}00254\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00255}00255\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_af36d14f42c697d5272a592bf7349d06d}{parseErrorf}}(\mbox{\hyperlink{structstate}{state}},\mbox{\hyperlink{structstate}{state}}.nextToken-\/1,\textcolor{stringliteral}{"{}lane\ index\ must\ be\ in\ the\ range\ 0..\%u"{}},numLanes);}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00256}00256\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00257}00257\ \ \ \ \ outImm.laneIndex\ =\ \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}(u64);}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00258}00258\ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00259}00259\ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00260}00260\ \textcolor{keyword}{template}<Uptr\ numLanes>}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00261}00261\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ parseImm(FunctionParseState\&\ \mbox{\hyperlink{structstate}{state}},ShuffleImm<numLanes>\&\ outImm)}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00262}00262\ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00263}00263\ \ \ \ \ parseParenthesized(\mbox{\hyperlink{structstate}{state}},[\&]}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00264}00264\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00265}00265\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ laneIndex\ =\ 0;laneIndex\ <\ numLanes;++laneIndex)}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00266}00266\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00267}00267\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}}\ u64\ =\ \mbox{\hyperlink{namespace_w_a_s_t_acc415079db29202983e4d49cabc59ab3}{parseI64}}(\mbox{\hyperlink{structstate}{state}});}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00268}00268\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(u64\ >=\ numLanes\ *\ 2)}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00269}00269\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00270}00270\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_af36d14f42c697d5272a592bf7349d06d}{parseErrorf}}(\mbox{\hyperlink{structstate}{state}},\mbox{\hyperlink{structstate}{state}}.nextToken-\/1,\textcolor{stringliteral}{"{}lane\ index\ must\ be\ in\ the\ range\ 0..\%u"{}},numLanes\ *\ 2);}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00271}00271\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00272}00272\ \ \ \ \ \ \ \ \ \ \ \ \ outImm.laneIndices[laneIndex]\ =\ \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}(u64);}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00273}00273\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00274}00274\ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00275}00275\ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00276}00276\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00277}00277\ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00278}00278\ \textcolor{preprocessor}{\#if\ ENABLE\_THREADING\_PROTOTYPE}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00279}00279\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ parseImm(FunctionParseState\&\ \mbox{\hyperlink{structstate}{state}},LaunchThreadImm\&\ outImm)\ \{\}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00280}00280\ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00281}00281\ \textcolor{keyword}{template}<Uptr\ naturalAlignmentLog2>}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00282}00282\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ parseImm(FunctionParseState\&\ \mbox{\hyperlink{structstate}{state}},AtomicLoadOrStoreImm<naturalAlignmentLog2>\&\ outImm)}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00283}00283\ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00284}00284\ \ \ \ \ \mbox{\hyperlink{struct_i_r_1_1_load_or_store_imm}{LoadOrStoreImm<naturalAlignmentLog2>}}\ loadOrStoreImm;}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00285}00285\ \ \ \ \ parseImm(\mbox{\hyperlink{structstate}{state}},loadOrStoreImm);}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00286}00286\ \ \ \ \ outImm.alignmentLog2\ =\ loadOrStoreImm.\mbox{\hyperlink{struct_i_r_1_1_load_or_store_imm_a30107d37953b93bfe82f75d1974c42cb}{alignmentLog2}};}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00287}00287\ \ \ \ \ outImm.offset\ =\ loadOrStoreImm.\mbox{\hyperlink{struct_i_r_1_1_load_or_store_imm_a7d5caef7b1309efc59a40aff46ef4ca1}{offset}};}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00288}00288\ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00289}00289\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00290}00290\ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00291}00291\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ parseInstrSequence(FunctionParseState\&\ \mbox{\hyperlink{structstate}{state}});}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00292}00292\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ parseExpr(FunctionParseState\&\ \mbox{\hyperlink{structstate}{state}});}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00293}00293\ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00294}00294\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ parseControlImm(FunctionParseState\&\ \mbox{\hyperlink{structstate}{state}},\mbox{\hyperlink{struct_w_a_s_t_1_1_name}{Name}}\&\ outBranchTargetName,\mbox{\hyperlink{struct_i_r_1_1_control_structure_imm}{ControlStructureImm}}\&\ imm)}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00295}00295\ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00296}00296\ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_a5a1887aa3f790b93a65b578a3b4628e3}{tryParseName}}(\mbox{\hyperlink{structstate}{state}},outBranchTargetName);}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00297}00297\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00298}00298\ \ \ \ \ imm.\mbox{\hyperlink{struct_i_r_1_1_control_structure_imm_aeb701cf55047144f9cded296519cb742}{resultType}}\ =\ ResultType::none;}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00299}00299\ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{structstate}{state}}.nextToken[0].type\ ==\ t\_leftParenthesis\ \&\&\ \mbox{\hyperlink{structstate}{state}}.nextToken[1].type\ ==\ t\_result)}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00300}00300\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00301}00301\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.nextToken\ +=\ 2;}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00302}00302\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_a9e4c5dc0f2d2044bb55b0702d2f6dc51}{tryParseResultType}}(\mbox{\hyperlink{structstate}{state}},imm.\mbox{\hyperlink{struct_i_r_1_1_control_structure_imm_aeb701cf55047144f9cded296519cb742}{resultType}});}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00303}00303\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_a8001b89de5d29cdf830471e70b13798a}{require}}(\mbox{\hyperlink{structstate}{state}},t\_rightParenthesis);}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00304}00304\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00305}00305\ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00306}00306\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00307}00307\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ For\ backward\ compatibility,\ also\ handle\ just\ a\ result\ type.}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00308}00308\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_a9e4c5dc0f2d2044bb55b0702d2f6dc51}{tryParseResultType}}(\mbox{\hyperlink{structstate}{state}},imm.\mbox{\hyperlink{struct_i_r_1_1_control_structure_imm_aeb701cf55047144f9cded296519cb742}{resultType}});}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00309}00309\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00310}00310\ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00311}00311\ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00312}00312\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ parseBlock(FunctionParseState\&\ \mbox{\hyperlink{structstate}{state}},\textcolor{keywordtype}{bool}\ isExpr)}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00313}00313\ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00314}00314\ \ \ \ \ \mbox{\hyperlink{struct_w_a_s_t_1_1_name}{Name}}\ branchTargetName;}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00315}00315\ \ \ \ \ \mbox{\hyperlink{struct_i_r_1_1_control_structure_imm}{ControlStructureImm}}\ imm;}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00316}00316\ \ \ \ \ parseControlImm(\mbox{\hyperlink{structstate}{state}},branchTargetName,imm);}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00317}00317\ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00318}00318\ \ \ \ \ ScopedBranchTarget\ branchTarget(\mbox{\hyperlink{structstate}{state}},branchTargetName);}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00319}00319\ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.validatingCodeStream.block(imm);}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00320}00320\ \ \ \ \ parseInstrSequence(\mbox{\hyperlink{structstate}{state}});}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00321}00321\ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.validatingCodeStream.end();}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00322}00322\ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00323}00323\ \ \ \ \ \textcolor{keywordflow}{if}(!isExpr)}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00324}00324\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00325}00325\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_a8001b89de5d29cdf830471e70b13798a}{require}}(\mbox{\hyperlink{structstate}{state}},t\_end);}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00326}00326\ \ \ \ \ \ \ \ \ parseAndValidateRedundantBranchTargetName(\mbox{\hyperlink{structstate}{state}},branchTargetName,\textcolor{stringliteral}{"{}block"{}},\textcolor{stringliteral}{"{}end"{}});}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00327}00327\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00328}00328\ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00329}00329\ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00330}00330\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ parseLoop(FunctionParseState\&\ \mbox{\hyperlink{structstate}{state}},\textcolor{keywordtype}{bool}\ isExpr)}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00331}00331\ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00332}00332\ \ \ \ \ \mbox{\hyperlink{struct_w_a_s_t_1_1_name}{Name}}\ branchTargetName;}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00333}00333\ \ \ \ \ \mbox{\hyperlink{struct_i_r_1_1_control_structure_imm}{ControlStructureImm}}\ imm;}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00334}00334\ \ \ \ \ parseControlImm(\mbox{\hyperlink{structstate}{state}},branchTargetName,imm);}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00335}00335\ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00336}00336\ \ \ \ \ ScopedBranchTarget\ branchTarget(\mbox{\hyperlink{structstate}{state}},branchTargetName);}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00337}00337\ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.validatingCodeStream.loop(imm);}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00338}00338\ \ \ \ \ parseInstrSequence(\mbox{\hyperlink{structstate}{state}});}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00339}00339\ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.validatingCodeStream.end();}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00340}00340\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00341}00341\ \ \ \ \ \textcolor{keywordflow}{if}(!isExpr)}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00342}00342\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00343}00343\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_a8001b89de5d29cdf830471e70b13798a}{require}}(\mbox{\hyperlink{structstate}{state}},t\_end);}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00344}00344\ \ \ \ \ \ \ \ \ parseAndValidateRedundantBranchTargetName(\mbox{\hyperlink{structstate}{state}},branchTargetName,\textcolor{stringliteral}{"{}loop"{}},\textcolor{stringliteral}{"{}end"{}});}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00345}00345\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00346}00346\ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00347}00347\ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00348}00348\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ parseExprSequence(FunctionParseState\&\ \mbox{\hyperlink{structstate}{state}})}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00349}00349\ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00350}00350\ \ \ \ \ \textcolor{keywordflow}{while}(\mbox{\hyperlink{structstate}{state}}.nextToken-\/>type\ !=\ t\_rightParenthesis)}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00351}00351\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00352}00352\ \ \ \ \ \ \ \ \ parseExpr(\mbox{\hyperlink{structstate}{state}});}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00353}00353\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00354}00354\ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00355}00355\ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00356}\mbox{\hyperlink{_parse_function_8cpp_a5c975c850de8a1221bcc1a77cc2f7013}{00356}}\ \textcolor{preprocessor}{\#define\ VISIT\_OP(opcode,name,nameString,Imm,...)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00357}00357\ \textcolor{preprocessor}{\ \ \ \ static\ void\ parseOp\_\#\#name(FunctionParseState\&\ state,bool\ isExpression)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00358}00358\ \textcolor{preprocessor}{\ \ \ \ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00359}00359\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ ++state.nextToken;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00360}00360\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ Imm\ imm;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00361}00361\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ parseImm(state,imm);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00362}00362\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ if(isExpression)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00363}00363\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00364}00364\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ parseExprSequence(state);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00365}00365\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00366}00366\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ state.validatingCodeStream.name(imm);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00367}00367\ \textcolor{preprocessor}{\ \ \ \ \}}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00368}00368\ \mbox{\hyperlink{_operators_8h_a00ffff576f706ff1f69e93733a992e2d}{ENUM\_NONCONTROL\_OPERATORS}}(\mbox{\hyperlink{_parse_function_8cpp_a5c975c850de8a1221bcc1a77cc2f7013}{VISIT\_OP}})}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00369}00369\ \textcolor{preprocessor}{\#undef\ VISIT\_OP}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00370}00370\ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00371}00371\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ parseExpr(FunctionParseState\&\ \mbox{\hyperlink{structstate}{state}})}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00372}00372\ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00373}00373\ \ \ \ \ parseParenthesized(\mbox{\hyperlink{structstate}{state}},[\&]}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00374}00374\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00375}00375\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ Token*\ opcodeToken\ =\ \mbox{\hyperlink{structstate}{state}}.nextToken;}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00376}00376\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00377}00377\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00378}00378\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(\mbox{\hyperlink{structstate}{state}}.nextToken-\/>type)}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00379}00379\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00380}00380\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ t\_block:}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00381}00381\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00382}00382\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++\mbox{\hyperlink{structstate}{state}}.nextToken;}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00383}00383\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ parseBlock(\mbox{\hyperlink{structstate}{state}},\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00384}00384\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00385}00385\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00386}00386\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ t\_loop:}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00387}00387\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00388}00388\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++\mbox{\hyperlink{structstate}{state}}.nextToken;}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00389}00389\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ parseLoop(\mbox{\hyperlink{structstate}{state}},\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00390}00390\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00391}00391\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00392}00392\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ t\_if\_:}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00393}00393\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00394}00394\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++\mbox{\hyperlink{structstate}{state}}.nextToken;}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00395}00395\ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00396}00396\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_w_a_s_t_1_1_name}{Name}}\ branchTargetName;}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00397}00397\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_i_r_1_1_control_structure_imm}{ControlStructureImm}}\ imm;}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00398}00398\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ parseControlImm(\mbox{\hyperlink{structstate}{state}},branchTargetName,imm);}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00399}00399\ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00400}00400\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Parse\ an\ optional\ condition\ expression.}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00401}00401\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{structstate}{state}}.nextToken[0].type\ !=\ t\_leftParenthesis\ ||\ \mbox{\hyperlink{structstate}{state}}.nextToken[1].type\ !=\ t\_then)}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00402}00402\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00403}00403\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ parseExpr(\mbox{\hyperlink{structstate}{state}});}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00404}00404\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00405}00405\ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00406}00406\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ScopedBranchTarget\ branchTarget(\mbox{\hyperlink{structstate}{state}},branchTargetName);}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00407}00407\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.validatingCodeStream.if\_(imm);}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00408}00408\ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00409}00409\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Parse\ the\ if\ clauses.}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00410}00410\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{structstate}{state}}.nextToken[0].type\ ==\ t\_leftParenthesis\ \&\&\ \mbox{\hyperlink{structstate}{state}}.nextToken[1].type\ ==\ t\_then)}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00411}00411\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00412}00412\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ First\ syntax:\ (then\ <instr>)*\ (else\ <instr>*)?}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00413}00413\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ parseParenthesized(\mbox{\hyperlink{structstate}{state}},[\&]}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00414}00414\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00415}00415\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_a8001b89de5d29cdf830471e70b13798a}{require}}(\mbox{\hyperlink{structstate}{state}},t\_then);}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00416}00416\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ parseInstrSequence(\mbox{\hyperlink{structstate}{state}});}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00417}00417\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00418}00418\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{structstate}{state}}.nextToken-\/>type\ ==\ t\_leftParenthesis)}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00419}00419\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00420}00420\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ parseParenthesized(\mbox{\hyperlink{structstate}{state}},[\&]}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00421}00421\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00422}00422\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_a8001b89de5d29cdf830471e70b13798a}{require}}(\mbox{\hyperlink{structstate}{state}},t\_else\_);}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00423}00423\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.validatingCodeStream.else\_();}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00424}00424\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ parseInstrSequence(\mbox{\hyperlink{structstate}{state}});}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00425}00425\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00426}00426\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00427}00427\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00428}00428\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00429}00429\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00430}00430\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Second\ syntax\ option:\ <expr>\ <expr>?}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00431}00431\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ parseExpr(\mbox{\hyperlink{structstate}{state}});}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00432}00432\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{structstate}{state}}.nextToken-\/>type\ !=\ t\_rightParenthesis)}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00433}00433\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00434}00434\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.validatingCodeStream.else\_();}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00435}00435\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ parseExpr(\mbox{\hyperlink{structstate}{state}});}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00436}00436\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00437}00437\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00438}00438\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.validatingCodeStream.end();}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00439}00439\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00440}00440\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00441}00441\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \#define\ VISIT\_OP(opcode,name,nameString,Imm,...)\ case\ t\_\#\#name:\ parseOp\_\#\#name(state,true);\ break;}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00442}00442\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_operators_8h_a00ffff576f706ff1f69e93733a992e2d}{ENUM\_NONCONTROL\_OPERATORS}}(\mbox{\hyperlink{_parse_function_8cpp_a5c975c850de8a1221bcc1a77cc2f7013}{VISIT\_OP}})}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00443}00443\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{preprocessor}{\#undef\ VISIT\_OP}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00444}00444\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00445}00445\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_af36d14f42c697d5272a592bf7349d06d}{parseErrorf}}(\mbox{\hyperlink{structstate}{state}},\mbox{\hyperlink{structstate}{state}}.nextToken,\textcolor{stringliteral}{"{}expected\ opcode"{}});}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00446}00446\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{struct_w_a_s_t_1_1_recover_parse_exception}{RecoverParseException}}();}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00447}00447\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00448}00448\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00449}00449\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{catch}(\mbox{\hyperlink{struct_w_a_s_t_1_1_recover_parse_exception}{RecoverParseException}})}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00450}00450\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00451}00451\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.validatingCodeStream.unreachable();}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00452}00452\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{struct_w_a_s_t_1_1_recover_parse_exception}{RecoverParseException}}();}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00453}00453\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00454}00454\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{catch}(\mbox{\hyperlink{struct_i_r_1_1_validation_exception}{ValidationException}}\ exception)}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00455}00455\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00456}00456\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_af36d14f42c697d5272a592bf7349d06d}{parseErrorf}}(\mbox{\hyperlink{structstate}{state}},opcodeToken,\textcolor{stringliteral}{"{}\%s"{}},exception.\mbox{\hyperlink{struct_i_r_1_1_validation_exception_a9308689c3efeb272361bf9a07bf8f8ae}{message}}.c\_str());}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00457}00457\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.validatingCodeStream.unreachable();}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00458}00458\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{struct_w_a_s_t_1_1_recover_parse_exception}{RecoverParseException}}();}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00459}00459\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00460}00460\ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00461}00461\ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00462}00462\ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00463}00463\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ parseInstrSequence(FunctionParseState\&\ \mbox{\hyperlink{structstate}{state}})}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00464}00464\ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00465}00465\ \ \ \ \ \textcolor{keywordflow}{while}(\textcolor{keyword}{true})}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00466}00466\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00467}00467\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ Token*\ opcodeToken\ =\ \mbox{\hyperlink{structstate}{state}}.nextToken;}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00468}00468\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00469}00469\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00470}00470\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(\mbox{\hyperlink{structstate}{state}}.nextToken-\/>type)}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00471}00471\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00472}00472\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ t\_leftParenthesis:\ parseExpr(\mbox{\hyperlink{structstate}{state}});\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00473}00473\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ t\_rightParenthesis:\ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00474}00474\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ t\_else\_:\ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00475}00475\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ t\_end:\ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00476}00476\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ t\_block:}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00477}00477\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00478}00478\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++\mbox{\hyperlink{structstate}{state}}.nextToken;}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00479}00479\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ parseBlock(\mbox{\hyperlink{structstate}{state}},\textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00480}00480\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00481}00481\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00482}00482\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ t\_loop:}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00483}00483\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00484}00484\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++\mbox{\hyperlink{structstate}{state}}.nextToken;}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00485}00485\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ parseLoop(\mbox{\hyperlink{structstate}{state}},\textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00486}00486\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00487}00487\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00488}00488\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ t\_if\_:}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00489}00489\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00490}00490\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++\mbox{\hyperlink{structstate}{state}}.nextToken;}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00491}00491\ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00492}00492\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_w_a_s_t_1_1_name}{Name}}\ branchTargetName;}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00493}00493\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_i_r_1_1_control_structure_imm}{ControlStructureImm}}\ imm;}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00494}00494\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ parseControlImm(\mbox{\hyperlink{structstate}{state}},branchTargetName,imm);}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00495}00495\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00496}00496\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ScopedBranchTarget\ branchTarget(\mbox{\hyperlink{structstate}{state}},branchTargetName);}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00497}00497\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.validatingCodeStream.if\_(imm);}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00498}00498\ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00499}00499\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Parse\ the\ then\ clause.}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00500}00500\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ parseInstrSequence(\mbox{\hyperlink{structstate}{state}});}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00501}00501\ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00502}00502\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Parse\ the\ else\ clause.}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00503}00503\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{structstate}{state}}.nextToken-\/>type\ ==\ t\_else\_)}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00504}00504\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00505}00505\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++\mbox{\hyperlink{structstate}{state}}.nextToken;}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00506}00506\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ parseAndValidateRedundantBranchTargetName(\mbox{\hyperlink{structstate}{state}},branchTargetName,\textcolor{stringliteral}{"{}if"{}},\textcolor{stringliteral}{"{}else"{}});}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00507}00507\ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00508}00508\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.validatingCodeStream.else\_();}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00509}00509\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ parseInstrSequence(\mbox{\hyperlink{structstate}{state}});}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00510}00510\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00511}00511\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.validatingCodeStream.end();}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00512}00512\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00513}00513\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_a8001b89de5d29cdf830471e70b13798a}{require}}(\mbox{\hyperlink{structstate}{state}},t\_end);}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00514}00514\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ parseAndValidateRedundantBranchTargetName(\mbox{\hyperlink{structstate}{state}},branchTargetName,\textcolor{stringliteral}{"{}if"{}},\textcolor{stringliteral}{"{}end"{}});}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00515}00515\ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00516}00516\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00517}00517\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00518}00518\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \#define\ VISIT\_OP(opcode,name,nameString,Imm,...)\ case\ t\_\#\#name:\ parseOp\_\#\#name(state,false);\ break;}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00519}00519\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_operators_8h_a00ffff576f706ff1f69e93733a992e2d}{ENUM\_NONCONTROL\_OPERATORS}}(\mbox{\hyperlink{_parse_function_8cpp_a5c975c850de8a1221bcc1a77cc2f7013}{VISIT\_OP}})}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00520}00520\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{preprocessor}{\#undef\ VISIT\_OP}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00521}00521\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00522}00522\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_af36d14f42c697d5272a592bf7349d06d}{parseErrorf}}(\mbox{\hyperlink{structstate}{state}},\mbox{\hyperlink{structstate}{state}}.nextToken,\textcolor{stringliteral}{"{}expected\ opcode"{}});}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00523}00523\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{struct_w_a_s_t_1_1_recover_parse_exception}{RecoverParseException}}();}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00524}00524\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00525}00525\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00526}00526\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{catch}(\mbox{\hyperlink{struct_w_a_s_t_1_1_recover_parse_exception}{RecoverParseException}})}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00527}00527\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00528}00528\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.validatingCodeStream.unreachable();}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00529}00529\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{struct_w_a_s_t_1_1_recover_parse_exception}{RecoverParseException}}();}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00530}00530\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00531}00531\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{catch}(\mbox{\hyperlink{struct_i_r_1_1_validation_exception}{ValidationException}}\ exception)}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00532}00532\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00533}00533\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_af36d14f42c697d5272a592bf7349d06d}{parseErrorf}}(\mbox{\hyperlink{structstate}{state}},opcodeToken,\textcolor{stringliteral}{"{}\%s"{}},exception.\mbox{\hyperlink{struct_i_r_1_1_validation_exception_a9308689c3efeb272361bf9a07bf8f8ae}{message}}.c\_str());}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00534}00534\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.validatingCodeStream.unreachable();}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00535}00535\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{struct_w_a_s_t_1_1_recover_parse_exception}{RecoverParseException}}();}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00536}00536\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00537}00537\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00538}00538\ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00539}00539\ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00540}00540\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_w_a_s_t}{WAST}}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00541}00541\ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00542}\mbox{\hyperlink{namespace_w_a_s_t_ad67ed47b4a120f234a3a4a2da076418f}{00542}}\ \ \ \ \ \mbox{\hyperlink{struct_i_r_1_1_function_def}{FunctionDef}}\ \mbox{\hyperlink{namespace_w_a_s_t_ad67ed47b4a120f234a3a4a2da076418f}{parseFunctionDef}}(\mbox{\hyperlink{struct_w_a_s_t_1_1_module_parse_state}{ModuleParseState}}\&\ \mbox{\hyperlink{structstate}{state}},\textcolor{keyword}{const}\ Token*\ funcToken)}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00543}00543\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00544}00544\ \ \ \ \ \ \ \ \ std::vector<std::string>*\ localDisassemblyNames\ =\ \textcolor{keyword}{new}\ std::vector<std::string>;}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00545}00545\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_a2d9d3ba4e83db4fbb314c3068261afa5}{NameToIndexMap}}*\ localNameToIndexMap\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{namespace_w_a_s_t_a2d9d3ba4e83db4fbb314c3068261afa5}{NameToIndexMap}}();}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00546}00546\ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00547}00547\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Parse\ the\ function\ type,\ as\ a\ reference\ or\ explicit\ declaration.}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00548}00548\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_w_a_s_t_1_1_unresolved_function_type}{UnresolvedFunctionType}}\ unresolvedFunctionType\ =\ \mbox{\hyperlink{namespace_w_a_s_t_ab72b47fe2520b8a7840ff4ce5d07684d}{parseFunctionTypeRefAndOrDecl}}(\mbox{\hyperlink{structstate}{state}},*localNameToIndexMap,*localDisassemblyNames);}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00549}00549\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00550}00550\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Defer\ resolving\ the\ function\ type\ until\ all\ type\ declarations\ have\ been\ parsed.}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00551}00551\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ functionIndex\ =\ \mbox{\hyperlink{structstate}{state}}.module.functions.size();}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00552}00552\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ functionDefIndex\ =\ \mbox{\hyperlink{structstate}{state}}.module.functions.defs.size();}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00553}00553\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ Token*\ firstBodyToken\ =\ \mbox{\hyperlink{structstate}{state}}.nextToken;}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00554}00554\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.postTypeCallbacks.push\_back(}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00555}00555\ \ \ \ \ \ \ \ \ [functionIndex,functionDefIndex,firstBodyToken,localNameToIndexMap,localDisassemblyNames,unresolvedFunctionType]}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00556}00556\ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{struct_w_a_s_t_1_1_module_parse_state}{ModuleParseState}}\&\ \mbox{\hyperlink{structstate}{state}})}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00557}00557\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00558}00558\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Resolve\ the\ function\ type\ and\ set\ it\ on\ the\ FunctionDef.}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00559}00559\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_i_r_1_1_indexed_function_type}{IndexedFunctionType}}\ functionTypeIndex\ =\ \mbox{\hyperlink{namespace_w_a_s_t_ae274bd19819be1d3ef32161e6d8a2f7f}{resolveFunctionType}}(\mbox{\hyperlink{structstate}{state}},unresolvedFunctionType);}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00560}00560\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.module.functions.defs[functionDefIndex].type\ =\ functionTypeIndex;}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00561}00561\ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00562}00562\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Defer\ parsing\ the\ body\ of\ the\ function\ until\ all\ function\ types\ have\ been\ resolved.}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00563}00563\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.postDeclarationCallbacks.push\_back(}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00564}00564\ \ \ \ \ \ \ \ \ \ \ \ \ [functionIndex,functionDefIndex,firstBodyToken,localNameToIndexMap,localDisassemblyNames,functionTypeIndex]}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00565}00565\ \ \ \ \ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{struct_w_a_s_t_1_1_module_parse_state}{ModuleParseState}}\&\ \mbox{\hyperlink{structstate}{state}})}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00566}00566\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00567}00567\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_i_r_1_1_function_def}{FunctionDef}}\&\ functionDef\ =\ \mbox{\hyperlink{structstate}{state}}.module.functions.defs[functionDefIndex];}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00568}00568\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_i_r_1_1_function_type}{FunctionType}}*\ functionType\ =\ functionTypeIndex.\mbox{\hyperlink{struct_i_r_1_1_indexed_function_type_ad76a69c366f186a0e17305099ea15aba}{index}}\ ==\ \mbox{\hyperlink{stdint_8h_ab5eb23180f7cc12b7d6c04a8ec067fdd}{UINT32\_MAX}}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00569}00569\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ?\ \mbox{\hyperlink{struct_i_r_1_1_function_type_a97cbdf384d97c3a5203a1310c9af0822}{FunctionType::get}}()}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00570}00570\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{structstate}{state}}.module.types[functionTypeIndex.\mbox{\hyperlink{struct_i_r_1_1_indexed_function_type_ad76a69c366f186a0e17305099ea15aba}{index}}];}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00571}00571\ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00572}00572\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Parse\ the\ function's\ local\ variables.}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00573}00573\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{ParseState}}\ localParseState(\mbox{\hyperlink{structstate}{state}}.string,\mbox{\hyperlink{structstate}{state}}.lineInfo,\mbox{\hyperlink{structstate}{state}}.errors,firstBodyToken);}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00574}00574\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(tryParseParenthesizedTagged(localParseState,t\_local,[\&]}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00575}00575\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00576}00576\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_w_a_s_t_1_1_name}{Name}}\ localName;}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00577}00577\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{namespace_w_a_s_t_a5a1887aa3f790b93a65b578a3b4628e3}{tryParseName}}(localParseState,localName))}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00578}00578\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00579}00579\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_a9b736e747098508f90bd9495fa4a9a11}{bindName}}(localParseState,*localNameToIndexMap,localName,functionType-\/>\mbox{\hyperlink{struct_i_r_1_1_function_type_a92e17c58f6cd40ee5392dba1bdc2e822}{parameters}}.size()\ +\ functionDef.\mbox{\hyperlink{struct_i_r_1_1_function_def_a34738d2b2fa494ebf86433b872fee943}{nonParameterLocalTypes}}.size());}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00580}00580\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ localDisassemblyNames-\/>push\_back(localName.\mbox{\hyperlink{struct_w_a_s_t_1_1_name_acaddef876eb6fe1caf5c67998c3cc9b1}{getString}}());}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00581}00581\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ functionDef.\mbox{\hyperlink{struct_i_r_1_1_function_def_a34738d2b2fa494ebf86433b872fee943}{nonParameterLocalTypes}}.push\_back(\mbox{\hyperlink{namespace_w_a_s_t_afb469d566925151c57afa1dd31721c9c}{parseValueType}}(localParseState));}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00582}00582\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00583}00583\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00584}00584\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00585}00585\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(localParseState.\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state_aed44236c3beecfffdb5807d5a5af3e7a}{nextToken}}-\/>type\ !=\ t\_rightParenthesis)}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00586}00586\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00587}00587\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ localDisassemblyNames-\/>push\_back(std::string());}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00588}00588\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ functionDef.\mbox{\hyperlink{struct_i_r_1_1_function_def_a34738d2b2fa494ebf86433b872fee943}{nonParameterLocalTypes}}.push\_back(\mbox{\hyperlink{namespace_w_a_s_t_afb469d566925151c57afa1dd31721c9c}{parseValueType}}(localParseState));}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00589}00589\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00590}00590\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00591}00591\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}));}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00592}00592\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.disassemblyNames.functions[functionIndex].locals\ =\ std::move(*localDisassemblyNames);}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00593}00593\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{delete}\ localDisassemblyNames;}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00594}00594\ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00595}00595\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Parse\ the\ function's\ code.}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00596}00596\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ FunctionParseState\ functionState(\mbox{\hyperlink{structstate}{state}},localNameToIndexMap,localParseState.\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state_aed44236c3beecfffdb5807d5a5af3e7a}{nextToken}},functionDef);}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00597}00597\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00598}00598\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00599}00599\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ parseInstrSequence(functionState);}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00600}00600\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!functionState.errors.size())}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00601}00601\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00602}00602\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ functionState.validatingCodeStream.end();}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00603}00603\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ functionState.validatingCodeStream.finishValidation();}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00604}00604\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00605}00605\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00606}00606\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{catch}(\mbox{\hyperlink{struct_i_r_1_1_validation_exception}{ValidationException}}\ exception)}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00607}00607\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00608}00608\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_af36d14f42c697d5272a592bf7349d06d}{parseErrorf}}(\mbox{\hyperlink{structstate}{state}},firstBodyToken,\textcolor{stringliteral}{"{}\%s"{}},exception.\mbox{\hyperlink{struct_i_r_1_1_validation_exception_a9308689c3efeb272361bf9a07bf8f8ae}{message}}.c\_str());}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00609}00609\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00610}00610\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{catch}(\mbox{\hyperlink{struct_w_a_s_t_1_1_recover_parse_exception}{RecoverParseException}})\ \{\}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00611}00611\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{catch}(\mbox{\hyperlink{struct_w_a_s_t_1_1_fatal_parse_exception}{FatalParseException}})\ \{\}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00612}00612\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ functionDef.\mbox{\hyperlink{struct_i_r_1_1_function_def_a30854c34daa4c0da86950f8a63e59da5}{code}}\ =\ std::move(functionState.codeByteStream.\mbox{\hyperlink{struct_serialization_1_1_array_output_stream_aaf6d663f4644239d5960b4cbdd426488}{getBytes}}());}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00613}00613\ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00614}00614\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00615}00615\ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00616}00616\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Continue\ parsing\ after\ the\ closing\ parenthesis.}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00617}00617\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_a726a4231e5222857c2151800be474de7}{findClosingParenthesis}}(\mbox{\hyperlink{structstate}{state}},funcToken-\/1);}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00618}00618\ \ \ \ \ \ \ \ \ -\/-\/\mbox{\hyperlink{structstate}{state}}.nextToken;}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00619}00619\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00620}00620\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{\{\mbox{\hyperlink{stdint_8h_ab5eb23180f7cc12b7d6c04a8ec067fdd}{UINT32\_MAX}}\},\{\},\{\}\};}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00621}00621\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parse_function_8cpp_source_l00622}00622\ \}}
+
+\end{DoxyCode}

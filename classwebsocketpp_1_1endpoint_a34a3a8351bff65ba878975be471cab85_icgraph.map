@@ -1,0 +1,17 @@
+<map id="websocketpp::endpoint::set_message_handler" name="websocketpp::endpoint::set_message_handler">
+<area shape="rect" id="Node000001" title=" " alt="" coords="250,162,406,202"/>
+<area shape="rect" id="Node000002" href="$connection_2connection_8cpp.html#a336f63fb29bee4c9cf2eadfc4546d62b" title=" " alt="" coords="5,5,202,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="303,150,259,96,231,69,200,46,175,34,177,29,203,41,235,65,263,92,307,147"/>
+<area shape="rect" id="Node000003" href="$classbroadcast__server.html#af82bddbdb53e36a5aa8448bedd4a84d5" title=" " alt="" coords="10,55,197,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="283,156,201,110,173,99,175,94,203,105,285,151"/>
+<area shape="rect" id="Node000004" href="$debug__server_8cpp.html#ae66f6b31b5ad750f1fe042a706a4e3d4" title=" " alt="" coords="79,120,128,146"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="234,164,128,141,129,135,235,159"/>
+<area shape="rect" id="Node000005" href="$echo__client_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97" title=" " alt="" coords="79,169,128,195"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="234,185,128,185,128,180,234,180"/>
+<area shape="rect" id="Node000006" href="$classperftest.html#a4e118ad1d9d81fddf82b5db930b26924" title=" " alt="" coords="45,219,162,244"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="235,205,163,221,162,216,234,200"/>
+<area shape="rect" id="Node000007" href="$classprint__server.html#ab1b7c0e33a8466b329b8fc56af302ff0" title=" " alt="" coords="42,268,165,309"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="285,213,203,259,166,274,164,269,201,254,283,209"/>
+<area shape="rect" id="Node000008" href="$classutility__server.html#a4644a7feb970cc203374dd68eb8dec9c" title=" " alt="" coords="36,334,171,374"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="306,217,262,271,234,299,203,323,172,339,170,334,200,319,231,295,258,267,302,214"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="sysio::producer_plugin::is_producer_key" name="sysio::producer_plugin::is_producer_key">
+<area shape="rect" id="Node000001" title=" " alt="" coords="383,5,534,46"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1net__plugin__impl.html#a4b6d30c7436c1587f57cb19fd8b72d90" title="Determine if a peer is allowed to connect." alt="" coords="185,5,335,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="367,28,335,28,335,23,367,23"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1connection.html#a6969d80878d60791744f4ace46f1b806" title=" " alt="" coords="5,5,137,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="169,28,137,28,137,23,169,23"/>
+</map>

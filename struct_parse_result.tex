@@ -1,0 +1,357 @@
+\doxysection{Parse\+Result Struct Reference}
+\hypertarget{struct_parse_result}{}\label{struct_parse_result}\index{ParseResult@{ParseResult}}
+
+
+Result of parsing (wraps Parse\+Error\+Code)  
+
+
+
+
+{\ttfamily \#include $<$error.\+h$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef bool(Parse\+Result\+::\texorpdfstring{$\ast$}{*}) \mbox{\hyperlink{struct_parse_result_a849db11776cd57f07b4da1b82dc3681e}{Boolean\+Type}}() const
+\begin{DoxyCompactList}\small\item\em ! Unspecified boolean type \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_parse_result_acd4a266f815bec59fa27f64f1923fe9e}{Parse\+Result}} ()
+\begin{DoxyCompactList}\small\item\em Default constructor, no error. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{struct_parse_result_a38ca49a53e80633d0864ad5026adaf84}{Parse\+Result}} (\mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_ga8d4b32dfc45840bca189ade2bbcb6ba7}{Parse\+Error\+Code}} code, size\+\_\+t offset)
+\begin{DoxyCompactList}\small\item\em Constructor to set an error. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_ga8d4b32dfc45840bca189ade2bbcb6ba7}{Parse\+Error\+Code}} \mbox{\hyperlink{struct_parse_result_a2aae3c2f42b31cc2409ee1e03bc4852e}{Code}} () const
+\begin{DoxyCompactList}\small\item\em Get the error code. \end{DoxyCompactList}\item 
+size\+\_\+t \mbox{\hyperlink{struct_parse_result_afbe762766ac21b2aae266105f1dfa643}{Offset}} () const
+\begin{DoxyCompactList}\small\item\em Get the error offset, if \doxylink{struct_parse_result_adfe0ef5b994e82f8aa9ebf0b30c924b1}{Is\+Error()}, 0 otherwise. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{struct_parse_result_abcd534680e4067ab797b1c6e930ac91c}{operator Boolean\+Type}} () const
+\begin{DoxyCompactList}\small\item\em Explicit conversion to {\ttfamily bool}, returns {\ttfamily true}, iff !\doxylink{struct_parse_result_adfe0ef5b994e82f8aa9ebf0b30c924b1}{Is\+Error()}. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{struct_parse_result_adfe0ef5b994e82f8aa9ebf0b30c924b1}{Is\+Error}} () const
+\begin{DoxyCompactList}\small\item\em Whether the result is an error. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{struct_parse_result_a4d98465a5dc6055e367a7ea7089fc73d}{operator==}} (const \mbox{\hyperlink{struct_parse_result}{Parse\+Result}} \&that) const
+\item 
+bool \mbox{\hyperlink{struct_parse_result_a6de18a7e43013b2defc51d892c2cf90f}{operator==}} (\mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_ga8d4b32dfc45840bca189ade2bbcb6ba7}{Parse\+Error\+Code}} code) const
+\item 
+bool \mbox{\hyperlink{struct_parse_result_aa1fcc912cede0ef0526e0cbfcb14e4c2}{operator!=}} (const \mbox{\hyperlink{struct_parse_result}{Parse\+Result}} \&that) const
+\item 
+bool \mbox{\hyperlink{struct_parse_result_afbe78dd07fd1bc09adb1609dda028ee0}{operator!=}} (\mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_ga8d4b32dfc45840bca189ade2bbcb6ba7}{Parse\+Error\+Code}} code) const
+\item 
+void \mbox{\hyperlink{struct_parse_result_a88b6d44f052a19e6436ae6aadc2c40b4}{Clear}} ()
+\begin{DoxyCompactList}\small\item\em \doxylink{struct_reset}{Reset} error code. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{struct_parse_result_aa81b4a7b776b77216cb752385203a8c1}{Set}} (\mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_ga8d4b32dfc45840bca189ade2bbcb6ba7}{Parse\+Error\+Code}} code, size\+\_\+t offset=0)
+\begin{DoxyCompactList}\small\item\em Update error code and offset. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{struct_parse_result_a58c9982e833d1c74686506ac7449200c}{operator==}} (\mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_ga8d4b32dfc45840bca189ade2bbcb6ba7}{Parse\+Error\+Code}} code, const \mbox{\hyperlink{struct_parse_result}{Parse\+Result}} \&err)
+\item 
+bool \mbox{\hyperlink{struct_parse_result_a0498aebcfdd3d4a5dcb989ee29b93d4d}{operator!=}} (\mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_ga8d4b32dfc45840bca189ade2bbcb6ba7}{Parse\+Error\+Code}} code, const \mbox{\hyperlink{struct_parse_result}{Parse\+Result}} \&err)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_document}{Document}}\ doc;}
+\DoxyCodeLine{\mbox{\hyperlink{struct_parse_result}{ParseResult}}\ \mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3ac3fdc8e4e3df74b216721e3ae1fd4945}{ok}}\ =\ doc.\mbox{\hyperlink{class_generic_document_a901db1678f99a1b550003eed75bc380a}{Parse}}(\textcolor{stringliteral}{"{}[42]"{}});}
+\DoxyCodeLine{\textcolor{keywordflow}{if}\ (!ok)\ \{}
+\DoxyCodeLine{\ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}JSON\ parse\ error:\ \%s\ (\%u)"{}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_ga28835eb93d2c3c07bbea13515eb31415}{GetParseError\_En}}(\mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3ac3fdc8e4e3df74b216721e3ae1fd4945}{ok}}.Code()),\ \mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3ac3fdc8e4e3df74b216721e3ae1fd4945}{ok}}.Offset());}
+\DoxyCodeLine{\ \ \ \ exit(EXIT\_FAILURE);}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+ \begin{DoxySeeAlso}{See also}
+\doxylink{class_generic_reader_a0c450620d14ff1824e58bb7bd9b42099}{Generic\+Reader\+::\+Parse}, \doxylink{class_generic_document_a901db1678f99a1b550003eed75bc380a}{Generic\+Document\+::\+Parse} 
+\end{DoxySeeAlso}
+
+
+Definition at line \mbox{\hyperlink{error_8h_source_l00106}{106}} of file \mbox{\hyperlink{error_8h_source}{error.\+h}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{struct_parse_result_a849db11776cd57f07b4da1b82dc3681e}\index{ParseResult@{ParseResult}!BooleanType@{BooleanType}}
+\index{BooleanType@{BooleanType}!ParseResult@{ParseResult}}
+\doxysubsubsection{\texorpdfstring{BooleanType}{BooleanType}}
+{\footnotesize\ttfamily \label{struct_parse_result_a849db11776cd57f07b4da1b82dc3681e} 
+bool(Parse\+Result\+::\texorpdfstring{$\ast$}{*}) Parse\+Result\+::\+Boolean\+Type() const}
+
+
+
+Definition at line \mbox{\hyperlink{error_8h_source_l00108}{108}} of file \mbox{\hyperlink{error_8h_source}{error.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{struct_parse_result_acd4a266f815bec59fa27f64f1923fe9e}\index{ParseResult@{ParseResult}!ParseResult@{ParseResult}}
+\index{ParseResult@{ParseResult}!ParseResult@{ParseResult}}
+\doxysubsubsection{\texorpdfstring{ParseResult()}{ParseResult()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{struct_parse_result_acd4a266f815bec59fa27f64f1923fe9e} 
+Parse\+Result\+::\+Parse\+Result (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{error_8h_source_l00111}{111}} of file \mbox{\hyperlink{error_8h_source}{error.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00111\ :\ code\_(\mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_gga8d4b32dfc45840bca189ade2bbcb6ba7ac0856bac4945cbd1d09e9502fd8f852f}{kParseErrorNone}}),\ offset\_(0)\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{struct_parse_result_a38ca49a53e80633d0864ad5026adaf84}\index{ParseResult@{ParseResult}!ParseResult@{ParseResult}}
+\index{ParseResult@{ParseResult}!ParseResult@{ParseResult}}
+\doxysubsubsection{\texorpdfstring{ParseResult()}{ParseResult()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{struct_parse_result_a38ca49a53e80633d0864ad5026adaf84} 
+Parse\+Result\+::\+Parse\+Result (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_ga8d4b32dfc45840bca189ade2bbcb6ba7}{Parse\+Error\+Code}}}]{code}{, }\item[{size\+\_\+t}]{offset}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{error_8h_source_l00113}{113}} of file \mbox{\hyperlink{error_8h_source}{error.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00113\ :\ code\_(code),\ offset\_(offset)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_parse_result_a88b6d44f052a19e6436ae6aadc2c40b4}\index{ParseResult@{ParseResult}!Clear@{Clear}}
+\index{Clear@{Clear}!ParseResult@{ParseResult}}
+\doxysubsubsection{\texorpdfstring{Clear()}{Clear()}}
+{\footnotesize\ttfamily \label{struct_parse_result_a88b6d44f052a19e6436ae6aadc2c40b4} 
+void Parse\+Result\+::\+Clear (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{error_8h_source_l00134}{134}} of file \mbox{\hyperlink{error_8h_source}{error.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00134\ \{\ \mbox{\hyperlink{struct_parse_result_aa81b4a7b776b77216cb752385203a8c1}{Set}}(\mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_gga8d4b32dfc45840bca189ade2bbcb6ba7ac0856bac4945cbd1d09e9502fd8f852f}{kParseErrorNone}});\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=306pt]{struct_parse_result_a88b6d44f052a19e6436ae6aadc2c40b4_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{struct_parse_result_a88b6d44f052a19e6436ae6aadc2c40b4_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_parse_result_a2aae3c2f42b31cc2409ee1e03bc4852e}\index{ParseResult@{ParseResult}!Code@{Code}}
+\index{Code@{Code}!ParseResult@{ParseResult}}
+\doxysubsubsection{\texorpdfstring{Code()}{Code()}}
+{\footnotesize\ttfamily \label{struct_parse_result_a2aae3c2f42b31cc2409ee1e03bc4852e} 
+\mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_ga8d4b32dfc45840bca189ade2bbcb6ba7}{Parse\+Error\+Code}} Parse\+Result\+::\+Code (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{error_8h_source_l00116}{116}} of file \mbox{\hyperlink{error_8h_source}{error.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00116\ \{\ \textcolor{keywordflow}{return}\ code\_;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_parse_result_a2aae3c2f42b31cc2409ee1e03bc4852e_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_parse_result_adfe0ef5b994e82f8aa9ebf0b30c924b1}\index{ParseResult@{ParseResult}!IsError@{IsError}}
+\index{IsError@{IsError}!ParseResult@{ParseResult}}
+\doxysubsubsection{\texorpdfstring{IsError()}{IsError()}}
+{\footnotesize\ttfamily \label{struct_parse_result_adfe0ef5b994e82f8aa9ebf0b30c924b1} 
+bool Parse\+Result\+::\+Is\+Error (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{error_8h_source_l00123}{123}} of file \mbox{\hyperlink{error_8h_source}{error.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00123\ \{\ \textcolor{keywordflow}{return}\ code\_\ !=\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_gga8d4b32dfc45840bca189ade2bbcb6ba7ac0856bac4945cbd1d09e9502fd8f852f}{kParseErrorNone}};\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_parse_result_adfe0ef5b994e82f8aa9ebf0b30c924b1_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_parse_result_afbe762766ac21b2aae266105f1dfa643}\index{ParseResult@{ParseResult}!Offset@{Offset}}
+\index{Offset@{Offset}!ParseResult@{ParseResult}}
+\doxysubsubsection{\texorpdfstring{Offset()}{Offset()}}
+{\footnotesize\ttfamily \label{struct_parse_result_afbe762766ac21b2aae266105f1dfa643} 
+size\+\_\+t Parse\+Result\+::\+Offset (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{error_8h_source_l00118}{118}} of file \mbox{\hyperlink{error_8h_source}{error.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00118\ \{\ \textcolor{keywordflow}{return}\ offset\_;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_parse_result_afbe762766ac21b2aae266105f1dfa643_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_parse_result_abcd534680e4067ab797b1c6e930ac91c}\index{ParseResult@{ParseResult}!operator BooleanType@{operator BooleanType}}
+\index{operator BooleanType@{operator BooleanType}!ParseResult@{ParseResult}}
+\doxysubsubsection{\texorpdfstring{operator BooleanType()}{operator BooleanType()}}
+{\footnotesize\ttfamily \label{struct_parse_result_abcd534680e4067ab797b1c6e930ac91c} 
+Parse\+Result\+::operator \mbox{\hyperlink{struct_parse_result_a849db11776cd57f07b4da1b82dc3681e}{Boolean\+Type}} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{error_8h_source_l00121}{121}} of file \mbox{\hyperlink{error_8h_source}{error.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00121\ \{\ \textcolor{keywordflow}{return}\ !\mbox{\hyperlink{struct_parse_result_adfe0ef5b994e82f8aa9ebf0b30c924b1}{IsError}}()\ ?\ \&\mbox{\hyperlink{struct_parse_result_adfe0ef5b994e82f8aa9ebf0b30c924b1}{ParseResult::IsError}}\ :\ NULL;\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=333pt]{struct_parse_result_abcd534680e4067ab797b1c6e930ac91c_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_parse_result_aa1fcc912cede0ef0526e0cbfcb14e4c2}\index{ParseResult@{ParseResult}!operator"!=@{operator"!=}}
+\index{operator"!=@{operator"!=}!ParseResult@{ParseResult}}
+\doxysubsubsection{\texorpdfstring{operator"!=()}{operator!=()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{struct_parse_result_aa1fcc912cede0ef0526e0cbfcb14e4c2} 
+bool Parse\+Result\+::operator!= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct_parse_result}{Parse\+Result}} \&}]{that}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{error_8h_source_l00129}{129}} of file \mbox{\hyperlink{error_8h_source}{error.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00129\ \{\ \textcolor{keywordflow}{return}\ !(*\textcolor{keyword}{this}\ ==\ that);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_parse_result_afbe78dd07fd1bc09adb1609dda028ee0}\index{ParseResult@{ParseResult}!operator"!=@{operator"!=}}
+\index{operator"!=@{operator"!=}!ParseResult@{ParseResult}}
+\doxysubsubsection{\texorpdfstring{operator"!=()}{operator!=()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{struct_parse_result_afbe78dd07fd1bc09adb1609dda028ee0} 
+bool Parse\+Result\+::operator!= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_ga8d4b32dfc45840bca189ade2bbcb6ba7}{Parse\+Error\+Code}}}]{code}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{error_8h_source_l00130}{130}} of file \mbox{\hyperlink{error_8h_source}{error.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00130\ \{\ \textcolor{keywordflow}{return}\ !(*\textcolor{keyword}{this}\ ==\ code);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_parse_result_a4d98465a5dc6055e367a7ea7089fc73d}\index{ParseResult@{ParseResult}!operator==@{operator==}}
+\index{operator==@{operator==}!ParseResult@{ParseResult}}
+\doxysubsubsection{\texorpdfstring{operator==()}{operator==()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{struct_parse_result_a4d98465a5dc6055e367a7ea7089fc73d} 
+bool Parse\+Result\+::operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct_parse_result}{Parse\+Result}} \&}]{that}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{error_8h_source_l00125}{125}} of file \mbox{\hyperlink{error_8h_source}{error.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00125\ \{\ \textcolor{keywordflow}{return}\ code\_\ ==\ that.code\_;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_parse_result_a6de18a7e43013b2defc51d892c2cf90f}\index{ParseResult@{ParseResult}!operator==@{operator==}}
+\index{operator==@{operator==}!ParseResult@{ParseResult}}
+\doxysubsubsection{\texorpdfstring{operator==()}{operator==()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{struct_parse_result_a6de18a7e43013b2defc51d892c2cf90f} 
+bool Parse\+Result\+::operator== (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_ga8d4b32dfc45840bca189ade2bbcb6ba7}{Parse\+Error\+Code}}}]{code}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{error_8h_source_l00126}{126}} of file \mbox{\hyperlink{error_8h_source}{error.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00126\ \{\ \textcolor{keywordflow}{return}\ code\_\ ==\ code;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_parse_result_aa81b4a7b776b77216cb752385203a8c1}\index{ParseResult@{ParseResult}!Set@{Set}}
+\index{Set@{Set}!ParseResult@{ParseResult}}
+\doxysubsubsection{\texorpdfstring{Set()}{Set()}}
+{\footnotesize\ttfamily \label{struct_parse_result_aa81b4a7b776b77216cb752385203a8c1} 
+void Parse\+Result\+::\+Set (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_ga8d4b32dfc45840bca189ade2bbcb6ba7}{Parse\+Error\+Code}}}]{code}{, }\item[{size\+\_\+t}]{offset}{ = {\ttfamily 0}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{error_8h_source_l00136}{136}} of file \mbox{\hyperlink{error_8h_source}{error.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00136\ \{\ code\_\ =\ code;\ offset\_\ =\ offset;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{struct_parse_result_aa81b4a7b776b77216cb752385203a8c1_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{struct_parse_result_a0498aebcfdd3d4a5dcb989ee29b93d4d}\index{ParseResult@{ParseResult}!operator"!=@{operator"!=}}
+\index{operator"!=@{operator"!=}!ParseResult@{ParseResult}}
+\doxysubsubsection{\texorpdfstring{operator"!=}{operator!=}}
+{\footnotesize\ttfamily \label{struct_parse_result_a0498aebcfdd3d4a5dcb989ee29b93d4d} 
+bool operator!= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_ga8d4b32dfc45840bca189ade2bbcb6ba7}{Parse\+Error\+Code}}}]{code}{, }\item[{const \mbox{\hyperlink{struct_parse_result}{Parse\+Result}} \&}]{err}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{error_8h_source_l00131}{131}} of file \mbox{\hyperlink{error_8h_source}{error.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00131\ \{\ \textcolor{keywordflow}{return}\ err\ !=\ code;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_parse_result_a58c9982e833d1c74686506ac7449200c}\index{ParseResult@{ParseResult}!operator==@{operator==}}
+\index{operator==@{operator==}!ParseResult@{ParseResult}}
+\doxysubsubsection{\texorpdfstring{operator==}{operator==}}
+{\footnotesize\ttfamily \label{struct_parse_result_a58c9982e833d1c74686506ac7449200c} 
+bool operator== (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_ga8d4b32dfc45840bca189ade2bbcb6ba7}{Parse\+Error\+Code}}}]{code}{, }\item[{const \mbox{\hyperlink{struct_parse_result}{Parse\+Result}} \&}]{err}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{error_8h_source_l00127}{127}} of file \mbox{\hyperlink{error_8h_source}{error.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00127\ \{\ \textcolor{keywordflow}{return}\ code\ ==\ err.code\_;\ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/error/\mbox{\hyperlink{error_8h}{error.\+h}}\end{DoxyCompactItemize}

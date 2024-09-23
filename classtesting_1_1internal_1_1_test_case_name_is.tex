@@ -1,0 +1,66 @@
+\doxysection{testing\+::internal\+::Test\+Case\+Name\+Is Class Reference}
+\hypertarget{classtesting_1_1internal_1_1_test_case_name_is}{}\label{classtesting_1_1internal_1_1_test_case_name_is}\index{testing::internal::TestCaseNameIs@{testing::internal::TestCaseNameIs}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_test_case_name_is_a7c983707f4cfe7f36dbabc95da5113c4}{Test\+Case\+Name\+Is}} (const std\+::string \&\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})
+\item 
+bool \mbox{\hyperlink{classtesting_1_1internal_1_1_test_case_name_is_aa96c4e9facbaa7043c8f0b34465d1eae}{operator()}} (const \mbox{\hyperlink{classtesting_1_1_test_case}{Test\+Case}} \texorpdfstring{$\ast$}{*}test\+\_\+case) const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{gtest_8cc_source_l04879}{4879}} of file \mbox{\hyperlink{gtest_8cc_source}{gtest.\+cc}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_test_case_name_is_a7c983707f4cfe7f36dbabc95da5113c4}\index{testing::internal::TestCaseNameIs@{testing::internal::TestCaseNameIs}!TestCaseNameIs@{TestCaseNameIs}}
+\index{TestCaseNameIs@{TestCaseNameIs}!testing::internal::TestCaseNameIs@{testing::internal::TestCaseNameIs}}
+\doxysubsubsection{\texorpdfstring{TestCaseNameIs()}{TestCaseNameIs()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_test_case_name_is_a7c983707f4cfe7f36dbabc95da5113c4} 
+testing\+::internal\+::\+Test\+Case\+Name\+Is\+::\+Test\+Case\+Name\+Is (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{name}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8cc_source_l04882}{4882}} of file \mbox{\hyperlink{gtest_8cc_source}{gtest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{04883\ \ \ \ \ \ \ :\ name\_(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_test_case_name_is_aa96c4e9facbaa7043c8f0b34465d1eae}\index{testing::internal::TestCaseNameIs@{testing::internal::TestCaseNameIs}!operator()@{operator()}}
+\index{operator()@{operator()}!testing::internal::TestCaseNameIs@{testing::internal::TestCaseNameIs}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_test_case_name_is_aa96c4e9facbaa7043c8f0b34465d1eae} 
+bool testing\+::internal\+::\+Test\+Case\+Name\+Is\+::operator() (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classtesting_1_1_test_case}{Test\+Case}} \texorpdfstring{$\ast$}{*}}]{test\+\_\+case}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8cc_source_l04886}{4886}} of file \mbox{\hyperlink{gtest_8cc_source}{gtest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{04886\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{04887\ \ \ \ \ \textcolor{keywordflow}{return}\ test\_case\ !=\ NULL\ \&\&\ strcmp(test\_case-\/>name(),\ name\_.c\_str())\ ==\ 0;}
+\DoxyCodeLine{04888\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_test_case_name_is_aa96c4e9facbaa7043c8f0b34465d1eae_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/src/\mbox{\hyperlink{gtest_8cc}{gtest.\+cc}}\end{DoxyCompactItemize}

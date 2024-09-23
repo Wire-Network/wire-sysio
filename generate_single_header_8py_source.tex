@@ -1,0 +1,135 @@
+\doxysection{generate\+Single\+Header.\+py}
+\hypertarget{generate_single_header_8py_source}{}\label{generate_single_header_8py_source}\index{libraries/sys-\/vm/external/Catch2/scripts/generateSingleHeader.py@{libraries/sys-\/vm/external/Catch2/scripts/generateSingleHeader.py}}
+\mbox{\hyperlink{generate_single_header_8py}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00001}\mbox{\hyperlink{namespacegenerate_single_header}{00001}}\ \textcolor{comment}{\#!/usr/bin/env\ python}}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00003}00003\ \textcolor{keyword}{from}\ \_\_future\_\_\ \textcolor{keyword}{import}\ print\_function}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00005}00005\ \textcolor{keyword}{import}\ os}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00006}00006\ \textcolor{keyword}{import}\ io}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00007}00007\ \textcolor{keyword}{import}\ sys}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00008}00008\ \textcolor{keyword}{import}\ re}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00009}00009\ \textcolor{keyword}{import}\ datetime}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00010}00010\ \textcolor{keyword}{from}\ glob\ \textcolor{keyword}{import}\ glob}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00012}00012\ \textcolor{keyword}{from}\ scriptCommon\ \textcolor{keyword}{import}\ catchPath}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00014}\mbox{\hyperlink{namespacegenerate_single_header_a68b36c55964b0e4d53413e63f8597fb5}{00014}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacegenerate_single_header_a68b36c55964b0e4d53413e63f8597fb5}{generate}}(v):}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00015}00015\ \ \ \ \ includesParser\ =\ re.compile(\ \textcolor{stringliteral}{r'\(\backslash\)s*\#\(\backslash\)s*include\(\backslash\)s*"{}(.*)"{}'}\ )}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00016}00016\ \ \ \ \ guardParser\ =\ re.compile(\ \textcolor{stringliteral}{r'\(\backslash\)s*\#.*(TWOBLUECUBES\_)?CATCH\_.*\_INCLUDED'})}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00017}00017\ \ \ \ \ defineParser\ =\ re.compile(\ \textcolor{stringliteral}{r'\(\backslash\)s*\#define\(\backslash\)s+(TWOBLUECUBES\_)?CATCH\_.*\_INCLUDED'})}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00018}00018\ \ \ \ \ ifParser\ =\ re.compile(\ \textcolor{stringliteral}{r'\(\backslash\)s*\#ifndef\ (TWOBLUECUBES\_)?CATCH\_.*\_INCLUDED'})}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00019}00019\ \ \ \ \ endIfParser\ =\ re.compile(\ \textcolor{stringliteral}{r'\(\backslash\)s*\#endif\ //\ (TWOBLUECUBES\_)?CATCH\_.*\_INCLUDED'})}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00020}00020\ \ \ \ \ ifImplParser\ =\ re.compile(\ \textcolor{stringliteral}{r'\(\backslash\)s*\#ifdef\ CATCH\_CONFIG\_RUNNER'}\ )}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00021}00021\ \ \ \ \ commentParser1\ =\ re.compile(\ \textcolor{stringliteral}{r'\string^\(\backslash\)s*/\(\backslash\)*'})}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00022}00022\ \ \ \ \ commentParser2\ =\ re.compile(\ \textcolor{stringliteral}{r'\string^\ \(\backslash\)*'})}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00023}00023\ \ \ \ \ blankParser\ =\ re.compile(\ \textcolor{stringliteral}{r'\string^\(\backslash\)s*\$'})}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00025}00025\ \ \ \ \ seenHeaders\ =\ set([])}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00026}00026\ \ \ \ \ rootPath\ =\ os.path.join(\ catchPath,\ \textcolor{stringliteral}{'include/'}\ )}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00027}00027\ \ \ \ \ outputPath\ =\ os.path.join(\ catchPath,\ \textcolor{stringliteral}{'single\_include/catch2/catch.hpp'}\ )}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00029}00029\ \ \ \ \ globals\ =\ \{}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00030}00030\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'includeImpl'}\ :\ \textcolor{keyword}{True},}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00031}00031\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'ifdefs'}\ \ \ \ \ \ :\ \ 0,}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00032}00032\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'implIfDefs'}\ \ :\ -\/1}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00033}00033\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00035}00035\ \ \ \ \ \textcolor{keywordflow}{for}\ arg\ \textcolor{keywordflow}{in}\ sys.argv[1:]:}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00036}00036\ \ \ \ \ \ \ \ \ arg\ =\ arg.lower()}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00037}00037\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ arg\ ==\ \textcolor{stringliteral}{"{}noimpl"{}}:}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00038}00038\ \ \ \ \ \ \ \ \ \ \ \ \ globals[\textcolor{stringliteral}{'includeImpl'}]\ =\ \textcolor{keyword}{False}}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00039}00039\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\ \textcolor{stringliteral}{"{}Not\ including\ impl\ code"{}}\ )}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00040}00040\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00041}00041\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\ \textcolor{stringliteral}{"{}\(\backslash\)n**\ Unrecognised\ argument:\ "{}}\ +\ arg\ +\ \textcolor{stringliteral}{"{}\ **\(\backslash\)n"{}}\ )}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00042}00042\ \ \ \ \ \ \ \ \ \ \ \ \ exit(1)}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00045}00045\ \ \ \ \ \textcolor{comment}{\#\ ensure\ that\ the\ output\ directory\ exists\ (hopefully\ no\ races)}}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00046}00046\ \ \ \ \ outDir\ =\ os.path.dirname(outputPath)}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00047}00047\ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keywordflow}{not}\ os.path.exists(outDir):}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00048}00048\ \ \ \ \ \ \ \ \ os.makedirs(outDir)}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00049}00049\ \ \ \ \ out\ =\ io.open(\ outputPath,\ \textcolor{stringliteral}{'w'},\ newline=\textcolor{stringliteral}{'\(\backslash\)n'},\ encoding=\textcolor{stringliteral}{'utf-\/8'})}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00051}00051\ \ \ \ \ \textcolor{keyword}{def\ }write(\ line\ ):}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00052}00052\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ globals[\textcolor{stringliteral}{'includeImpl'}]\ \textcolor{keywordflow}{or}\ globals[\textcolor{stringliteral}{'implIfDefs'}]\ ==\ -\/1:}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \ \ \ out.write(\ line\ )}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00054}00054\ }
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00055}00055\ \ \ \ \ \textcolor{keyword}{def\ }insertCpps():}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00056}00056\ \ \ \ \ \ \ \ \ dirs\ =\ [os.path.join(\ rootPath,\ s)\ \textcolor{keywordflow}{for}\ s\ \textcolor{keywordflow}{in}\ [\textcolor{stringliteral}{''},\ \textcolor{stringliteral}{'internal'},\ \textcolor{stringliteral}{'reporters'}]]}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00057}00057\ \ \ \ \ \ \ \ \ cppFiles\ =\ []}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00058}00058\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ dir\ \textcolor{keywordflow}{in}\ dirs:}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00059}00059\ \ \ \ \ \ \ \ \ \ \ \ \ cppFiles\ +=\ glob(os.path.join(dir,\ \textcolor{stringliteral}{'*.cpp'}))}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00060}00060\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ To\ minimize\ random\ diffs,\ sort\ the\ files\ before\ processing\ them}}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00061}00061\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ fname\ \textcolor{keywordflow}{in}\ sorted(cppFiles):}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00062}00062\ \ \ \ \ \ \ \ \ \ \ \ \ dir,\ name\ =\ fname.rsplit(os.path.sep,\ 1)}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \ \ \ dir\ +=\ os.path.sep}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00064}00064\ \ \ \ \ \ \ \ \ \ \ \ \ parseFile(dir,\ name)}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00066}00066\ \ \ \ \ \textcolor{keyword}{def\ }parseFile(\ path,\ filename\ ):}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00067}00067\ \ \ \ \ \ \ \ \ f\ =\ io.open(\ os.path.join(path,\ filename),\ \textcolor{stringliteral}{'r'},\ encoding=\textcolor{stringliteral}{'utf-\/8'}\ )}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00068}00068\ \ \ \ \ \ \ \ \ blanks\ =\ 0}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00069}00069\ \ \ \ \ \ \ \ \ write(\ \textcolor{stringliteral}{u"{}//\ start\ \{0\}\(\backslash\)n"{}}.\mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}(\ filename\ )\ )}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00070}00070\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ line\ \textcolor{keywordflow}{in}\ f:}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00071}00071\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{stringliteral}{'//\ \string~*\string~*\ CATCH\_CPP\_STITCH\_PLACE\ *\string~*\string~'}\ \textcolor{keywordflow}{in}\ line:}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ insertCpps()}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00073}00073\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue}}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00074}00074\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{elif}\ ifParser.match(\ line\ ):}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00075}00075\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ globals[\textcolor{stringliteral}{'ifdefs'}]\ +=\ 1}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{elif}\ endIfParser.match(\ line\ ):}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ globals[\textcolor{stringliteral}{'ifdefs'}]\ -\/=\ 1}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00078}00078\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ globals[\textcolor{stringliteral}{'ifdefs'}]\ ==\ globals[\textcolor{stringliteral}{'implIfDefs'}]:}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ globals[\textcolor{stringliteral}{'implIfDefs'}]\ =\ -\/1}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00080}00080\ \ \ \ \ \ \ \ \ \ \ \ \ m\ =\ includesParser.match(\ line\ )}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00081}00081\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ m:}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00082}00082\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ header\ =\ m.group(1)}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00083}00083\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ headerPath,\ sep,\ headerFile\ =\ header.rpartition(\ \textcolor{stringliteral}{"{}/"{}}\ )}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00084}00084\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ headerFile\ \textcolor{keywordflow}{not}\ \textcolor{keywordflow}{in}\ seenHeaders:}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00085}00085\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ headerFile\ !=\ \textcolor{stringliteral}{"{}tbc\_text\_format.h"{}}\ \textcolor{keywordflow}{and}\ headerFile\ !=\ \textcolor{stringliteral}{"{}clara.h"{}}:}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00086}00086\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ seenHeaders.add(\ headerFile\ )}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00087}00087\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ headerPath\ ==\ \textcolor{stringliteral}{"{}internal"{}}\ \textcolor{keywordflow}{and}\ path.endswith(\textcolor{stringliteral}{"{}internal/"{}}):}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00088}00088\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ headerPath\ =\ \textcolor{stringliteral}{"{}"{}}}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00089}00089\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sep\ =\ \textcolor{stringliteral}{"{}"{}}}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00090}00090\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ os.path.exists(\ path\ +\ headerPath\ +\ sep\ +\ headerFile\ ):}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00091}00091\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ parseFile(\ path\ +\ headerPath\ +\ sep,\ headerFile\ )}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00092}00092\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00093}00093\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ parseFile(\ rootPath\ +\ headerPath\ +\ sep,\ headerFile\ )}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00094}00094\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00095}00095\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ifImplParser.match(line):}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00096}00096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ globals[\textcolor{stringliteral}{'implIfDefs'}]\ =\ globals[\textcolor{stringliteral}{'ifdefs'}]}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00097}00097\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keywordflow}{not}\ guardParser.match(\ line\ )\ \textcolor{keywordflow}{or}\ defineParser.match(\ line\ )\ )\ \textcolor{keywordflow}{and}\ \textcolor{keywordflow}{not}\ commentParser1.match(\ line\ )\textcolor{keywordflow}{and}\ \textcolor{keywordflow}{not}\ commentParser2.match(\ line\ ):}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00098}00098\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ blankParser.match(\ line\ ):}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00099}00099\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ blanks\ =\ blanks\ +\ 1}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00100}00100\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00101}00101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ blanks\ =\ 0}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00102}00102\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ blanks\ <\ 2\ \textcolor{keywordflow}{and}\ \textcolor{keywordflow}{not}\ defineParser.match(line):}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00103}00103\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ write(\ line.rstrip()\ +\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}\ )}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00104}00104\ \ \ \ \ \ \ \ \ write(\ \textcolor{stringliteral}{u'//\ end\ \{\}\(\backslash\)n'}.\mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}(filename)\ )}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00105}00105\ }
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00106}00106\ }
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00107}00107\ \ \ \ \ write(\ \textcolor{stringliteral}{u"{}/*\(\backslash\)n"{}}\ )}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00108}00108\ \ \ \ \ write(\ \textcolor{stringliteral}{u"{}\ *\ \ Catch\ v\{0\}\(\backslash\)n"{}}.\mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}(\ v.getVersionString()\ )\ )}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00109}00109\ \ \ \ \ write(\ \textcolor{stringliteral}{u"{}\ *\ \ Generated:\ \{0\}\(\backslash\)n"{}}.\mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}(\ datetime.datetime.now()\ )\ )}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00110}00110\ \ \ \ \ write(\ \textcolor{stringliteral}{u"{}\ *\ \ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\(\backslash\)n"{}}\ )}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00111}00111\ \ \ \ \ write(\ \textcolor{stringliteral}{u"{}\ *\ \ This\ file\ has\ been\ merged\ from\ multiple\ headers.\ Please\ don't\ edit\ it\ directly\(\backslash\)n"{}}\ )}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00112}00112\ \ \ \ \ write(\ \textcolor{stringliteral}{u"{}\ *\ \ Copyright\ (c)\ \{\}\ Two\ Blue\ Cubes\ Ltd.\ All\ rights\ reserved.\(\backslash\)n"{}}.\mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}(\ datetime.date.today().year\ )\ )}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00113}00113\ \ \ \ \ write(\ \textcolor{stringliteral}{u"{}\ *\(\backslash\)n"{}}\ )}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00114}00114\ \ \ \ \ write(\ \textcolor{stringliteral}{u"{}\ *\ \ Distributed\ under\ the\ Boost\ Software\ License,\ Version\ 1.0.\ (See\ accompanying\(\backslash\)n"{}}\ )}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00115}00115\ \ \ \ \ write(\ \textcolor{stringliteral}{u"{}\ *\ \ file\ LICENSE\_1\_0.txt\ or\ copy\ at\ http://www.boost.org/LICENSE\_1\_0.txt)\(\backslash\)n"{}}\ )}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00116}00116\ \ \ \ \ write(\ \textcolor{stringliteral}{u"{}\ */\(\backslash\)n"{}}\ )}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00117}00117\ \ \ \ \ write(\ \textcolor{stringliteral}{u"{}\#ifndef\ TWOBLUECUBES\_SINGLE\_INCLUDE\_CATCH\_HPP\_INCLUDED\(\backslash\)n"{}}\ )}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00118}00118\ \ \ \ \ write(\ \textcolor{stringliteral}{u"{}\#define\ TWOBLUECUBES\_SINGLE\_INCLUDE\_CATCH\_HPP\_INCLUDED\(\backslash\)n"{}}\ )}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00119}00119\ }
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00120}00120\ \ \ \ \ parseFile(\ rootPath,\ \textcolor{stringliteral}{'catch.hpp'}\ )}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00121}00121\ }
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00122}00122\ \ \ \ \ write(\ \textcolor{stringliteral}{u"{}\#endif\ //\ TWOBLUECUBES\_SINGLE\_INCLUDE\_CATCH\_HPP\_INCLUDED\(\backslash\)n\(\backslash\)n"{}}\ )}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00123}00123\ \ \ \ \ out.close()}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00124}00124\ \ \ \ \ \textcolor{keywordflow}{print}\ (\textcolor{stringliteral}{"{}Generated\ single\ include\ for\ Catch\ v\{0\}\(\backslash\)n"{}}.\mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}(\ v.getVersionString()\ )\ )}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00125}00125\ }
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00126}00126\ }
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00127}00127\ \textcolor{keywordflow}{if}\ \_\_name\_\_\ ==\ \textcolor{stringliteral}{'\_\_main\_\_'}:}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00128}00128\ \ \ \ \ \textcolor{keyword}{from}\ releaseCommon\ \textcolor{keyword}{import}\ Version}
+\DoxyCodeLine{\Hypertarget{generate_single_header_8py_source_l00129}00129\ \ \ \ \ \mbox{\hyperlink{namespacegenerate_single_header_a68b36c55964b0e4d53413e63f8597fb5}{generate}}(\mbox{\hyperlink{classrelease_common_1_1_version}{Version}}())}
+
+\end{DoxyCode}

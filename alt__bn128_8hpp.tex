@@ -1,0 +1,53 @@
+\doxysection{libraries/fc/include/fc/crypto/alt\+\_\+bn128.hpp File Reference}
+\hypertarget{alt__bn128_8hpp}{}\label{alt__bn128_8hpp}\index{libraries/fc/include/fc/crypto/alt\_bn128.hpp@{libraries/fc/include/fc/crypto/alt\_bn128.hpp}}
+{\ttfamily \#include $<$functional$>$}\newline
+{\ttfamily \#include $<$cstdint$>$}\newline
+{\ttfamily \#include $<$variant$>$}\newline
+{\ttfamily \#include $<$vector$>$}\newline
+{\ttfamily \#include $<$fc/utility.\+hpp$>$}\newline
+Include dependency graph for alt\+\_\+bn128.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{alt__bn128_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{alt__bn128_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacefc}{fc}}
+\begin{DoxyCompactList}\small\item\em namespace \doxylink{namespacesysio_1_1chain}{sysio\+::chain} \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{fc\+::bytes}} = std\+::vector$<$char$>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum class \mbox{\hyperlink{namespacefc_acf2fac70bed3c7c7668279d9de619f72}{fc\+::alt\+\_\+bn128\+\_\+error}} \+: int32\+\_\+t \{ \newline
+\mbox{\hyperlink{namespacefc_acf2fac70bed3c7c7668279d9de619f72a963c97bbe6e7d0586d653bf362ad7c8c}{fc\+::operand\+\_\+component\+\_\+invalid}}
+, \mbox{\hyperlink{namespacefc_acf2fac70bed3c7c7668279d9de619f72a13f94f90a7c58cfac2aad5ff6326df0f}{fc\+::operand\+\_\+not\+\_\+in\+\_\+curve}}
+, \mbox{\hyperlink{namespacefc_acf2fac70bed3c7c7668279d9de619f72a3c649dc69cf0422413733d5687c4ef76}{fc\+::pairing\+\_\+list\+\_\+size\+\_\+error}}
+, \mbox{\hyperlink{namespacefc_acf2fac70bed3c7c7668279d9de619f72aad6e4c3db4d7d0976f39b24344afd5e0}{fc\+::operand\+\_\+outside\+\_\+g2}}
+, \newline
+\mbox{\hyperlink{namespacefc_acf2fac70bed3c7c7668279d9de619f72a432c768a921a9550970c31c8d332d59a}{fc\+::input\+\_\+len\+\_\+error}}
+, \mbox{\hyperlink{namespacefc_acf2fac70bed3c7c7668279d9de619f72a846d76329a967dd8c99ad17c4af9d685}{fc\+::invalid\+\_\+scalar\+\_\+size}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+std\+::variant$<$ \mbox{\hyperlink{namespacefc_acf2fac70bed3c7c7668279d9de619f72}{alt\+\_\+bn128\+\_\+error}}, \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}} $>$ \mbox{\hyperlink{namespacefc_aaccc65ddd035c56d5e92bedde7de3bde}{fc\+::alt\+\_\+bn128\+\_\+add}} (const \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}} \&op1, const \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}} \&op2)
+\item 
+std\+::variant$<$ \mbox{\hyperlink{namespacefc_acf2fac70bed3c7c7668279d9de619f72}{alt\+\_\+bn128\+\_\+error}}, \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}} $>$ \mbox{\hyperlink{namespacefc_adabebd5c846d83006ef00e1e63c5ec09}{fc\+::alt\+\_\+bn128\+\_\+mul}} (const \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}} \&g1\+\_\+point, const \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}} \&scalar)
+\item 
+std\+::variant$<$ \mbox{\hyperlink{namespacefc_acf2fac70bed3c7c7668279d9de619f72}{alt\+\_\+bn128\+\_\+error}}, bool $>$ \mbox{\hyperlink{namespacefc_afff05d8da5063eecb517149a272d20ed}{fc\+::alt\+\_\+bn128\+\_\+pair}} (const \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}} \&g1\+\_\+g2\+\_\+pairs, const \mbox{\hyperlink{namespacefc_a978f9e97f64eb2ce6cbe892d3cc93397}{yield\+\_\+function\+\_\+t}} \&yield)
+\end{DoxyCompactItemize}

@@ -1,0 +1,107 @@
+\doxysection{IR\+::Size\+Constraints Struct Reference}
+\hypertarget{struct_i_r_1_1_size_constraints}{}\label{struct_i_r_1_1_size_constraints}\index{IR::SizeConstraints@{IR::SizeConstraints}}
+
+
+{\ttfamily \#include $<$Types.\+h$>$}
+
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}} \mbox{\hyperlink{struct_i_r_1_1_size_constraints_a1c14a08815ebd644f74f1cb4ba311616}{min}}
+\item 
+\mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}} \mbox{\hyperlink{struct_i_r_1_1_size_constraints_adc8bdcc2a510a4ae1f54ba3c0938e8a4}{max}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{struct_i_r_1_1_size_constraints_a5ee86a1a80364f329894cb01174f47e3}{operator==}} (const \mbox{\hyperlink{struct_i_r_1_1_size_constraints}{Size\+Constraints}} \&left, const \mbox{\hyperlink{struct_i_r_1_1_size_constraints}{Size\+Constraints}} \&right)
+\item 
+bool \mbox{\hyperlink{struct_i_r_1_1_size_constraints_a472e0c4784c3b8da1e1cea64f58366d0}{operator!=}} (const \mbox{\hyperlink{struct_i_r_1_1_size_constraints}{Size\+Constraints}} \&left, const \mbox{\hyperlink{struct_i_r_1_1_size_constraints}{Size\+Constraints}} \&right)
+\item 
+bool \mbox{\hyperlink{struct_i_r_1_1_size_constraints_a3b276d5593855179204e83dd63b3426f}{is\+Subset}} (const \mbox{\hyperlink{struct_i_r_1_1_size_constraints}{Size\+Constraints}} \&super, const \mbox{\hyperlink{struct_i_r_1_1_size_constraints}{Size\+Constraints}} \&\mbox{\hyperlink{xbyak__mnemonic_8h_ad8856ea517c970ed0584a251c3fdc94f}{sub}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{_types_8h_source_l00232}{232}} of file \mbox{\hyperlink{_types_8h_source}{Types.\+h}}.
+
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{struct_i_r_1_1_size_constraints_a3b276d5593855179204e83dd63b3426f}\index{IR::SizeConstraints@{IR::SizeConstraints}!isSubset@{isSubset}}
+\index{isSubset@{isSubset}!IR::SizeConstraints@{IR::SizeConstraints}}
+\doxysubsubsection{\texorpdfstring{isSubset}{isSubset}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_size_constraints_a3b276d5593855179204e83dd63b3426f} 
+bool is\+Subset (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct_i_r_1_1_size_constraints}{Size\+Constraints}} \&}]{super}{, }\item[{const \mbox{\hyperlink{struct_i_r_1_1_size_constraints}{Size\+Constraints}} \&}]{sub}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{_types_8h_source_l00239}{239}} of file \mbox{\hyperlink{_types_8h_source}{Types.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00241\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{xbyak__mnemonic_8h_ad8856ea517c970ed0584a251c3fdc94f}{sub}}.min\ >=\ super.min\ \&\&\ \mbox{\hyperlink{xbyak__mnemonic_8h_ad8856ea517c970ed0584a251c3fdc94f}{sub}}.max\ <=\ super.max;}
+\DoxyCodeLine{00242\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_i_r_1_1_size_constraints_a472e0c4784c3b8da1e1cea64f58366d0}\index{IR::SizeConstraints@{IR::SizeConstraints}!operator"!=@{operator"!=}}
+\index{operator"!=@{operator"!=}!IR::SizeConstraints@{IR::SizeConstraints}}
+\doxysubsubsection{\texorpdfstring{operator"!=}{operator!=}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_size_constraints_a472e0c4784c3b8da1e1cea64f58366d0} 
+bool operator!= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct_i_r_1_1_size_constraints}{Size\+Constraints}} \&}]{left}{, }\item[{const \mbox{\hyperlink{struct_i_r_1_1_size_constraints}{Size\+Constraints}} \&}]{right}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{_types_8h_source_l00238}{238}} of file \mbox{\hyperlink{_types_8h_source}{Types.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00238\ \{\ \textcolor{keywordflow}{return}\ left.min\ !=\ right.min\ ||\ left.max\ !=\ right.max;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_i_r_1_1_size_constraints_a5ee86a1a80364f329894cb01174f47e3}\index{IR::SizeConstraints@{IR::SizeConstraints}!operator==@{operator==}}
+\index{operator==@{operator==}!IR::SizeConstraints@{IR::SizeConstraints}}
+\doxysubsubsection{\texorpdfstring{operator==}{operator==}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_size_constraints_a5ee86a1a80364f329894cb01174f47e3} 
+bool operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct_i_r_1_1_size_constraints}{Size\+Constraints}} \&}]{left}{, }\item[{const \mbox{\hyperlink{struct_i_r_1_1_size_constraints}{Size\+Constraints}} \&}]{right}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{_types_8h_source_l00237}{237}} of file \mbox{\hyperlink{_types_8h_source}{Types.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00237\ \{\ \textcolor{keywordflow}{return}\ left.min\ ==\ right.min\ \&\&\ left.max\ ==\ right.max;\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_i_r_1_1_size_constraints_adc8bdcc2a510a4ae1f54ba3c0938e8a4}\index{IR::SizeConstraints@{IR::SizeConstraints}!max@{max}}
+\index{max@{max}!IR::SizeConstraints@{IR::SizeConstraints}}
+\doxysubsubsection{\texorpdfstring{max}{max}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_size_constraints_adc8bdcc2a510a4ae1f54ba3c0938e8a4} 
+\mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}} IR\+::\+Size\+Constraints\+::max}
+
+
+
+Definition at line \mbox{\hyperlink{_types_8h_source_l00235}{235}} of file \mbox{\hyperlink{_types_8h_source}{Types.\+h}}.
+
+\Hypertarget{struct_i_r_1_1_size_constraints_a1c14a08815ebd644f74f1cb4ba311616}\index{IR::SizeConstraints@{IR::SizeConstraints}!min@{min}}
+\index{min@{min}!IR::SizeConstraints@{IR::SizeConstraints}}
+\doxysubsubsection{\texorpdfstring{min}{min}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_size_constraints_a1c14a08815ebd644f74f1cb4ba311616} 
+\mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}} IR\+::\+Size\+Constraints\+::min}
+
+
+
+Definition at line \mbox{\hyperlink{_types_8h_source_l00234}{234}} of file \mbox{\hyperlink{_types_8h_source}{Types.\+h}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/wasm-\/jit/\+Include/\+IR/\mbox{\hyperlink{_types_8h}{Types.\+h}}\end{DoxyCompactItemize}

@@ -1,0 +1,68 @@
+\doxysection{error.\+c}
+\hypertarget{ykyh_2error_8c_source}{}\label{ykyh_2error_8c_source}\index{libraries/yubihsm/ykyh/error.c@{libraries/yubihsm/ykyh/error.c}}
+\mbox{\hyperlink{ykyh_2error_8c}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ 2015-\/2018\ Yubico\ AB}}
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00004}00004\ \textcolor{comment}{\ *\ Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00005}00005\ \textcolor{comment}{\ *\ you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00006}00006\ \textcolor{comment}{\ *\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00008}00008\ \textcolor{comment}{\ *\ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00009}00009\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00010}00010\ \textcolor{comment}{\ *\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00011}00011\ \textcolor{comment}{\ *\ distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00012}00012\ \textcolor{comment}{\ *\ WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00013}00013\ \textcolor{comment}{\ *\ See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00014}00014\ \textcolor{comment}{\ *\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00015}00015\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00017}00017\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ykyh_8h}{ykyh.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00019}00019\ \textcolor{preprocessor}{\#include\ <stddef.h>}}
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00021}\mbox{\hyperlink{ykyh_2error_8c_a9031fdea07a95f7cc4b194bce387e0a2}{00021}}\ \textcolor{preprocessor}{\#define\ ERR(name,\ desc)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00022}00022\ \textcolor{preprocessor}{\ \ \{\ name,\ \#name,\ desc\ \}}}
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00024}00024\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00025}\mbox{\hyperlink{structerr__t_a6626b0ae409950d185724d99060e6ba6}{00025}}\ \ \ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112}{ykyh\_rc}}\ \mbox{\hyperlink{structerr__t_a6626b0ae409950d185724d99060e6ba6}{rc}};}
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00026}\mbox{\hyperlink{structerr__t_a57a5cce969fd1a24d67633246758d479}{00026}}\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{structerr__t_a57a5cce969fd1a24d67633246758d479}{name}};}
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00027}00027\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *description;}
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00028}00028\ \}\ \mbox{\hyperlink{structerr__t}{err\_t}};}
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00030}00030\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structerr__t}{err\_t}}\ errors[]\ =\ \{}
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00031}00031\ \ \ \mbox{\hyperlink{lib_2error_8c_a9031fdea07a95f7cc4b194bce387e0a2}{ERR}}(\mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112a40500f2b4bd15d31f1348475e35f2459}{YKYHR\_SUCCESS}},\ \textcolor{stringliteral}{"{}Successful\ return"{}}),}
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00032}00032\ \ \ \mbox{\hyperlink{lib_2error_8c_a9031fdea07a95f7cc4b194bce387e0a2}{ERR}}(\mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112a734cac714da70c8a7853708acff0970f}{YKYHR\_MEMORY\_ERROR}},\ \textcolor{stringliteral}{"{}Error\ allocating\ memory"{}}),}
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00033}00033\ \ \ \mbox{\hyperlink{lib_2error_8c_a9031fdea07a95f7cc4b194bce387e0a2}{ERR}}(\mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112aa66bb77f3c39144ec56d01e741a6d0b5}{YKYHR\_PCSC\_ERROR}},\ \textcolor{stringliteral}{"{}Error\ in\ PCSC\ call"{}}),}
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00034}00034\ \ \ \mbox{\hyperlink{lib_2error_8c_a9031fdea07a95f7cc4b194bce387e0a2}{ERR}}(\mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112a3d10dec4a5d83d4227ea94c06efed2a3}{YKYHR\_GENERIC\_ERROR}},\ \textcolor{stringliteral}{"{}Something\ went\ wrong"{}}),}
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00035}00035\ \ \ \mbox{\hyperlink{lib_2error_8c_a9031fdea07a95f7cc4b194bce387e0a2}{ERR}}(\mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112ae58239391b2ac02c8bb353666cdf9ac8}{YKYHR\_WRONG\_PW}},\ \textcolor{stringliteral}{"{}Wrong\ Password"{}}),}
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00036}00036\ \ \ \mbox{\hyperlink{lib_2error_8c_a9031fdea07a95f7cc4b194bce387e0a2}{ERR}}(\mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112a3616b15980deeeb94e24538ede829d84}{YKYHR\_INVALID\_PARAMS}},\ \textcolor{stringliteral}{"{}Invalid\ argument\ to\ a\ function"{}}),}
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00037}00037\ \ \ \mbox{\hyperlink{lib_2error_8c_a9031fdea07a95f7cc4b194bce387e0a2}{ERR}}(\mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112acd0e2c78f0a0e431afb2a4ba555f821e}{YKYHR\_ENTRY\_NOT\_FOUND}},\ \textcolor{stringliteral}{"{}Entry\ not\ found"{}}),}
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00038}00038\ \};}
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00040}\mbox{\hyperlink{ykyh_2error_8c_a4544a3e0741c078e01233bb1ab541805}{00040}}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{ykyh_2error_8c_a4544a3e0741c078e01233bb1ab541805}{ykyh\_strerror}}(\mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112}{ykyh\_rc}}\ err)\ \{}
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00041}00041\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_ac160cc61da581bdcf075273493b9f156}{unknown}}\ =\ \textcolor{stringliteral}{"{}Unknown\ ykyh\ error"{}};}
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00042}00042\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}};}
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00044}00044\ \ \ \textcolor{keywordflow}{if}\ (-\/err\ <\ 0\ ||\ -\/err\ >=\ (\textcolor{keywordtype}{int})\ (\textcolor{keyword}{sizeof}(errors)\ /\ \textcolor{keyword}{sizeof}(errors[0])))\ \{}
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00045}00045\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_ac160cc61da581bdcf075273493b9f156}{unknown}};}
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00046}00046\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00048}00048\ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ errors[-\/err].\mbox{\hyperlink{structerr__t_a5443ed757b35a94fdb06a5dccaa2c427}{description}};}
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00049}00049\ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})\ \{}
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00050}00050\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_ac160cc61da581bdcf075273493b9f156}{unknown}};}
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00051}00051\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00052}00052\ }
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00053}00053\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}};}
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00054}00054\ \}}
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00056}\mbox{\hyperlink{ykyh_2error_8c_ad38c0d31859cc20ece3748e74e9bbd75}{00056}}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{ykyh_2error_8c_ad38c0d31859cc20ece3748e74e9bbd75}{ykyh\_strerror\_name}}(\mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112}{ykyh\_rc}}\ err)\ \{}
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00057}00057\ \ \ \textcolor{keywordflow}{if}\ (-\/err\ <\ 0\ ||\ -\/err\ >=\ (\textcolor{keywordtype}{int})\ (\textcolor{keyword}{sizeof}(errors)\ /\ \textcolor{keyword}{sizeof}(errors[0])))\ \{}
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00058}00058\ \ \ \ \ \textcolor{keywordflow}{return}\ NULL;}
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00059}00059\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00061}00061\ \ \ \textcolor{keywordflow}{return}\ errors[-\/err].\mbox{\hyperlink{structerr__t_a57a5cce969fd1a24d67633246758d479}{name}};}
+\DoxyCodeLine{\Hypertarget{ykyh_2error_8c_source_l00062}00062\ \}}
+
+\end{DoxyCode}

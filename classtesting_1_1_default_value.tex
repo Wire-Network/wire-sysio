@@ -1,0 +1,188 @@
+\doxysection{testing\+::Default\+Value\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classtesting_1_1_default_value}{}\label{classtesting_1_1_default_value}\index{testing::DefaultValue$<$ T $>$@{testing::DefaultValue$<$ T $>$}}
+
+
+{\ttfamily \#include $<$gmock-\/actions.\+h$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}(\texorpdfstring{$\ast$}{*}) \mbox{\hyperlink{classtesting_1_1_default_value_acb1af7d6efaa629f7c6627ea03f7eb33}{Factory\+Function}}()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static void \mbox{\hyperlink{classtesting_1_1_default_value_a5698814be364b9ac26e72ad37d6ff14e}{Set}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} x)
+\item 
+static void \mbox{\hyperlink{classtesting_1_1_default_value_af012445ff5b194940c1427529707cb91}{Set\+Factory}} (\mbox{\hyperlink{classtesting_1_1_default_value_acb1af7d6efaa629f7c6627ea03f7eb33}{Factory\+Function}} factory)
+\item 
+static void \mbox{\hyperlink{classtesting_1_1_default_value_a8163037b60311177cb211f070c512ee3}{Clear}} ()
+\item 
+static bool \mbox{\hyperlink{classtesting_1_1_default_value_ad49febe2c944cbbd06451ba7d0366ca1}{Is\+Set}} ()
+\item 
+static bool \mbox{\hyperlink{classtesting_1_1_default_value_aec1ff9b510af7dbb86c837fd2409fd70}{Exists}} ()
+\item 
+static \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{classtesting_1_1_default_value_a4dc6dfee4cbc9cdb36f5c9cde5cf2b83}{Get}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$\newline
+class testing\+::\+Default\+Value$<$ T $>$}
+
+
+Definition at line \mbox{\hyperlink{gmock-actions_8h_source_l00201}{201}} of file \mbox{\hyperlink{gmock-actions_8h_source}{gmock-\/actions.\+h}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classtesting_1_1_default_value_acb1af7d6efaa629f7c6627ea03f7eb33}\index{testing::DefaultValue$<$ T $>$@{testing::DefaultValue$<$ T $>$}!FactoryFunction@{FactoryFunction}}
+\index{FactoryFunction@{FactoryFunction}!testing::DefaultValue$<$ T $>$@{testing::DefaultValue$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{FactoryFunction}{FactoryFunction}}
+{\footnotesize\ttfamily \label{classtesting_1_1_default_value_acb1af7d6efaa629f7c6627ea03f7eb33} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}(\texorpdfstring{$\ast$}{*}) \mbox{\hyperlink{classtesting_1_1_default_value}{testing\+::\+Default\+Value}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::\+Factory\+Function()}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-actions_8h_source_l00213}{213}} of file \mbox{\hyperlink{gmock-actions_8h_source}{gmock-\/actions.\+h}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1_default_value_a8163037b60311177cb211f070c512ee3}\index{testing::DefaultValue$<$ T $>$@{testing::DefaultValue$<$ T $>$}!Clear@{Clear}}
+\index{Clear@{Clear}!testing::DefaultValue$<$ T $>$@{testing::DefaultValue$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{Clear()}{Clear()}}
+{\footnotesize\ttfamily \label{classtesting_1_1_default_value_a8163037b60311177cb211f070c512ee3} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+static void \mbox{\hyperlink{classtesting_1_1_default_value}{testing\+::\+Default\+Value}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::\+Clear (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-actions_8h_source_l00220}{220}} of file \mbox{\hyperlink{gmock-actions_8h_source}{gmock-\/actions.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00221\ \ \ \ \ \textcolor{keyword}{delete}\ producer\_;}
+\DoxyCodeLine{00222\ \ \ \ \ producer\_\ =\ NULL;}
+\DoxyCodeLine{00223\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1_default_value_aec1ff9b510af7dbb86c837fd2409fd70}\index{testing::DefaultValue$<$ T $>$@{testing::DefaultValue$<$ T $>$}!Exists@{Exists}}
+\index{Exists@{Exists}!testing::DefaultValue$<$ T $>$@{testing::DefaultValue$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{Exists()}{Exists()}}
+{\footnotesize\ttfamily \label{classtesting_1_1_default_value_aec1ff9b510af7dbb86c837fd2409fd70} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+static bool \mbox{\hyperlink{classtesting_1_1_default_value}{testing\+::\+Default\+Value}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::\+Exists (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-actions_8h_source_l00230}{230}} of file \mbox{\hyperlink{gmock-actions_8h_source}{gmock-\/actions.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00230\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00231\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtesting_1_1_default_value_ad49febe2c944cbbd06451ba7d0366ca1}{IsSet}}()\ ||\ \mbox{\hyperlink{classtesting_1_1internal_1_1_built_in_default_value_a35207bc20a493b0efb3980eb9a08dd2f}{internal::BuiltInDefaultValue<T>::Exists}}();}
+\DoxyCodeLine{00232\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=330pt]{classtesting_1_1_default_value_aec1ff9b510af7dbb86c837fd2409fd70_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1_default_value_a4dc6dfee4cbc9cdb36f5c9cde5cf2b83}\index{testing::DefaultValue$<$ T $>$@{testing::DefaultValue$<$ T $>$}!Get@{Get}}
+\index{Get@{Get}!testing::DefaultValue$<$ T $>$@{testing::DefaultValue$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{Get()}{Get()}}
+{\footnotesize\ttfamily \label{classtesting_1_1_default_value_a4dc6dfee4cbc9cdb36f5c9cde5cf2b83} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+static \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{classtesting_1_1_default_value}{testing\+::\+Default\+Value}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::\+Get (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-actions_8h_source_l00237}{237}} of file \mbox{\hyperlink{gmock-actions_8h_source}{gmock-\/actions.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00237\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00238\ \ \ \ \ \textcolor{keywordflow}{return}\ producer\_\ ==\ NULL\ ?}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_built_in_default_value_a7e26c1df14a887c8f393b29d6ea162e6}{internal::BuiltInDefaultValue<T>::Get}}()\ :\ producer\_-\/>Produce();}
+\DoxyCodeLine{00240\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1_default_value_a4dc6dfee4cbc9cdb36f5c9cde5cf2b83_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1_default_value_ad49febe2c944cbbd06451ba7d0366ca1}\index{testing::DefaultValue$<$ T $>$@{testing::DefaultValue$<$ T $>$}!IsSet@{IsSet}}
+\index{IsSet@{IsSet}!testing::DefaultValue$<$ T $>$@{testing::DefaultValue$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{IsSet()}{IsSet()}}
+{\footnotesize\ttfamily \label{classtesting_1_1_default_value_ad49febe2c944cbbd06451ba7d0366ca1} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+static bool \mbox{\hyperlink{classtesting_1_1_default_value}{testing\+::\+Default\+Value}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::\+Is\+Set (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-actions_8h_source_l00226}{226}} of file \mbox{\hyperlink{gmock-actions_8h_source}{gmock-\/actions.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00226\ \{\ \textcolor{keywordflow}{return}\ producer\_\ !=\ NULL;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=330pt]{classtesting_1_1_default_value_ad49febe2c944cbbd06451ba7d0366ca1_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1_default_value_a5698814be364b9ac26e72ad37d6ff14e}\index{testing::DefaultValue$<$ T $>$@{testing::DefaultValue$<$ T $>$}!Set@{Set}}
+\index{Set@{Set}!testing::DefaultValue$<$ T $>$@{testing::DefaultValue$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{Set()}{Set()}}
+{\footnotesize\ttfamily \label{classtesting_1_1_default_value_a5698814be364b9ac26e72ad37d6ff14e} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+static void \mbox{\hyperlink{classtesting_1_1_default_value}{testing\+::\+Default\+Value}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::\+Set (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}}]{x}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-actions_8h_source_l00205}{205}} of file \mbox{\hyperlink{gmock-actions_8h_source}{gmock-\/actions.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00206\ \ \ \ \ \textcolor{keyword}{delete}\ producer\_;}
+\DoxyCodeLine{00207\ \ \ \ \ producer\_\ =\ \textcolor{keyword}{new}\ FixedValueProducer(x);}
+\DoxyCodeLine{00208\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1_default_value_af012445ff5b194940c1427529707cb91}\index{testing::DefaultValue$<$ T $>$@{testing::DefaultValue$<$ T $>$}!SetFactory@{SetFactory}}
+\index{SetFactory@{SetFactory}!testing::DefaultValue$<$ T $>$@{testing::DefaultValue$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{SetFactory()}{SetFactory()}}
+{\footnotesize\ttfamily \label{classtesting_1_1_default_value_af012445ff5b194940c1427529707cb91} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+static void \mbox{\hyperlink{classtesting_1_1_default_value}{testing\+::\+Default\+Value}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::\+Set\+Factory (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classtesting_1_1_default_value_acb1af7d6efaa629f7c6627ea03f7eb33}{Factory\+Function}}}]{factory}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-actions_8h_source_l00214}{214}} of file \mbox{\hyperlink{gmock-actions_8h_source}{gmock-\/actions.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00215\ \ \ \ \ \textcolor{keyword}{delete}\ producer\_;}
+\DoxyCodeLine{00216\ \ \ \ \ producer\_\ =\ \textcolor{keyword}{new}\ FactoryValueProducer(factory);}
+\DoxyCodeLine{00217\ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/include/gmock/\mbox{\hyperlink{gmock-actions_8h}{gmock-\/actions.\+h}}\end{DoxyCompactItemize}

@@ -1,0 +1,68 @@
+\doxysection{connection\+\_\+tu2.\+cpp}
+\hypertarget{connection__tu2_8cpp_source}{}\label{connection__tu2_8cpp_source}\index{libraries/fc/vendor/websocketpp/test/connection/connection\_tu2.cpp@{libraries/fc/vendor/websocketpp/test/connection/connection\_tu2.cpp}}
+\mbox{\hyperlink{connection__tu2_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2014,\ Peter\ Thorson.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00004}00004\ \textcolor{comment}{\ *\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00005}00005\ \textcolor{comment}{\ *\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are\ met:}}
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00006}00006\ \textcolor{comment}{\ *\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00007}00007\ \textcolor{comment}{\ *\ \ \ \ \ \ \ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00008}00008\ \textcolor{comment}{\ *\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00009}00009\ \textcolor{comment}{\ *\ \ \ \ \ \ \ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer\ in\ the}}
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00010}00010\ \textcolor{comment}{\ *\ \ \ \ \ \ \ documentation\ and/or\ other\ materials\ provided\ with\ the\ distribution.}}
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00011}00011\ \textcolor{comment}{\ *\ \ \ \ \ *\ Neither\ the\ name\ of\ the\ WebSocket++\ Project\ nor\ the}}
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00012}00012\ \textcolor{comment}{\ *\ \ \ \ \ \ \ names\ of\ its\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products}}
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00013}00013\ \textcolor{comment}{\ *\ \ \ \ \ \ \ derived\ from\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00014}00014\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00015}00015\ \textcolor{comment}{\ *\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS\ "{}AS\ IS"{}}}
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00016}00016\ \textcolor{comment}{\ *\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ THE}}
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00017}00017\ \textcolor{comment}{\ *\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR\ A\ PARTICULAR\ PURPOSE}}
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00018}00018\ \textcolor{comment}{\ *\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ PETER\ THORSON\ BE\ LIABLE\ FOR\ ANY}}
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00019}00019\ \textcolor{comment}{\ *\ DIRECT,\ INDIRECT,\ INCIDENTAL,\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES}}
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00020}00020\ \textcolor{comment}{\ *\ (INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;}}
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00021}00021\ \textcolor{comment}{\ *\ LOSS\ OF\ USE,\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND}}
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00022}00022\ \textcolor{comment}{\ *\ ON\ ANY\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00023}00023\ \textcolor{comment}{\ *\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE\ OF\ THIS}}
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00024}00024\ \textcolor{comment}{\ *\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00025}00025\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00026}00026\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00028}00028\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{connection__tu2_8hpp}{connection\_tu2.hpp}}"{}}}
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00030}\mbox{\hyperlink{connection__tu2_8cpp_a8b14e82050a791e4af2a7c86aecc7caf}{00030}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{connection__tu2_8cpp_a8b14e82050a791e4af2a7c86aecc7caf}{echo\_func}}(\mbox{\hyperlink{classwebsocketpp_1_1server}{server}}*\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ \mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{websocketpp::connection\_hdl}}\ hdl,\ \mbox{\hyperlink{debug__client_8cpp_a08398c4d31a4dc3e42d1b9a9ef64c6ad}{message\_ptr}}\ msg)\ \{}
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00031}00031\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}-\/>send(hdl,\ msg-\/>get\_payload(),\ msg-\/>get\_opcode());}
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00032}00032\ \}}
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00034}\mbox{\hyperlink{connection__tu2_8cpp_a70900b0f15b8692b4586ed96d710a279}{00034}}\ std::string\ \mbox{\hyperlink{connection__tu2_8cpp_a70900b0f15b8692b4586ed96d710a279}{run\_server\_test}}(std::string\ input,\ \textcolor{keywordtype}{bool}\ log)\ \{}
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00035}00035\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1server}{server}}\ test\_server;}
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00036}00036\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{connection__tu2_8cpp_a70900b0f15b8692b4586ed96d710a279}{run\_server\_test}}(test\_server,input,log);}
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00037}00037\ \}}
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00039}\mbox{\hyperlink{connection__tu2_8cpp_acde16292c08c6946f9ccb28a307fe4cb}{00039}}\ std::string\ \mbox{\hyperlink{connection__tu2_8cpp_a70900b0f15b8692b4586ed96d710a279}{run\_server\_test}}(\mbox{\hyperlink{classwebsocketpp_1_1server}{server}}\ \&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ std::string\ input,\ \textcolor{keywordtype}{bool}\ log)\ \{}
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00040}00040\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1server_abb895563dddafdc1426997d245cbd7cb}{server::connection\_ptr}}\ con;}
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00041}00041\ \ \ \ \ std::stringstream\ output;}
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00043}00043\ \ \ \ \ \textcolor{keywordflow}{if}\ (log)\ \{}
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00044}00044\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.set\_access\_channels(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a853aa0b8976e53f3181af3bc398d493e}{websocketpp::log::alevel::all}});}
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00045}00045\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.set\_error\_channels(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1elevel_a9b31ff708c221d314f9f4eb3ff2b1ad7}{websocketpp::log::elevel::all}});}
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00046}00046\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00047}00047\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.clear\_access\_channels(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a853aa0b8976e53f3181af3bc398d493e}{websocketpp::log::alevel::all}});}
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.clear\_error\_channels(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1elevel_a9b31ff708c221d314f9f4eb3ff2b1ad7}{websocketpp::log::elevel::all}});}
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00049}00049\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00051}00051\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.register\_ostream(\&output);}
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00052}00052\ }
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00053}00053\ \ \ \ \ con\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.get\_connection();}
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00054}00054\ \ \ \ \ con-\/>start();}
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00056}00056\ \ \ \ \ std::stringstream\ channel;}
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00058}00058\ \ \ \ \ channel\ <<\ input;}
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00059}00059\ \ \ \ \ channel\ >>\ *con;}
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00061}00061\ \ \ \ \ \textcolor{keywordflow}{return}\ output.str();}
+\DoxyCodeLine{\Hypertarget{connection__tu2_8cpp_source_l00062}00062\ \}}
+
+\end{DoxyCode}

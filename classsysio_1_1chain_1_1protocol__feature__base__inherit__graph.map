@@ -1,0 +1,7 @@
+<map id="sysio::chain::protocol_feature_base" name="sysio::chain::protocol_feature_base">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,79,151,120"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1chain_1_1builtin__protocol__feature.html" title=" " alt="" coords="11,168,145,208"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="81,135,81,167,75,167,75,135"/>
+<area shape="rect" id="Node000002" href="$structfc_1_1reflect__init.html" title=" " alt="" coords="28,5,128,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="81,46,81,79,75,79,75,46"/>
+</map>

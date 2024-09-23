@@ -1,0 +1,17 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" href="$struct_w_a_s_t_1_1_command.html" title=" " alt="" coords="5,169,131,195"/>
+<area shape="rect" id="Node000001" href="$struct_w_a_s_t_1_1_action_command.html" title=" " alt="" coords="212,5,374,31"/>
+<area shape="poly" id="edge1012_Node000000_Node000001" title=" " alt="" coords="81,154,119,96,146,66,177,41,211,26,213,31,180,46,149,70,123,100,85,157"/>
+<area shape="rect" id="Node000002" href="$struct_w_a_s_t_1_1_assert_invalid_or_malformed_command.html" title=" " alt="" coords="185,55,402,96"/>
+<area shape="poly" id="edge1013_Node000000_Node000002" title=" " alt="" coords="96,157,133,130,178,105,206,94,208,99,180,110,136,135,99,161"/>
+<area shape="rect" id="Node000003" href="$struct_w_a_s_t_1_1_assert_return_command.html" title=" " alt="" coords="192,120,394,146"/>
+<area shape="poly" id="edge1014_Node000000_Node000003" title=" " alt="" coords="141,163,178,154,227,144,228,149,179,159,142,168"/>
+<area shape="rect" id="Node000004" href="$struct_w_a_s_t_1_1_assert_return_na_n_command.html" title=" " alt="" coords="179,169,408,195"/>
+<area shape="poly" id="edge1015_Node000000_Node000004" title=" " alt="" coords="146,180,178,180,178,185,146,185"/>
+<area shape="rect" id="Node000005" href="$struct_w_a_s_t_1_1_assert_trap_command.html" title=" " alt="" coords="199,219,388,244"/>
+<area shape="poly" id="edge1016_Node000000_Node000005" title=" " alt="" coords="142,196,179,205,228,215,227,221,178,210,141,202"/>
+<area shape="rect" id="Node000006" href="$struct_w_a_s_t_1_1_assert_unlinkable_command.html" title=" " alt="" coords="181,268,406,294"/>
+<area shape="poly" id="edge1017_Node000000_Node000006" title=" " alt="" coords="98,203,135,230,180,254,211,265,209,270,178,259,133,235,95,207"/>
+<area shape="rect" id="Node000007" href="$struct_w_a_s_t_1_1_register_command.html" title=" " alt="" coords="206,317,380,343"/>
+<area shape="poly" id="edge1018_Node000000_Node000007" title=" " alt="" coords="87,207,125,257,151,283,180,304,207,316,205,320,177,308,148,287,121,261,83,210"/>
+</map>

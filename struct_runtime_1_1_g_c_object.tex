@@ -1,0 +1,111 @@
+\doxysection{Runtime\+::GCObject Struct Reference}
+\hypertarget{struct_runtime_1_1_g_c_object}{}\label{struct_runtime_1_1_g_c_object}\index{Runtime::GCObject@{Runtime::GCObject}}
+
+
+{\ttfamily \#include $<$Runtime\+Private.\+h$>$}
+
+
+
+Inheritance diagram for Runtime\+::GCObject\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_runtime_1_1_g_c_object__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Runtime\+::GCObject\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=205pt]{struct_runtime_1_1_g_c_object__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_runtime_1_1_g_c_object_ad61fa15a80d09b18aa1e8f80b1338467}{GCObject}} (\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908}{Object\+Kind}} in\+Kind)
+\item 
+\mbox{\hyperlink{struct_runtime_1_1_g_c_object_a87fe6580879c9e158d151219dfe6999e}{\texorpdfstring{$\sim$}{\string~}\+GCObject}} () override
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{struct_runtime_1_1_object_instance}{Runtime\+::\+Object\+Instance}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_runtime_1_1_object_instance_af7231f91092e2c8d8f65491f648504b5}{Object\+Instance}} (\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908}{IR\+::\+Object\+Kind}} in\+Kind)
+\item 
+virtual \mbox{\hyperlink{struct_runtime_1_1_object_instance_a67bf2d4a743aff39354b04a65108f383}{\texorpdfstring{$\sim$}{\string~}\+Object\+Instance}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Public Attributes inherited from \mbox{\hyperlink{struct_runtime_1_1_object_instance}{Runtime\+::\+Object\+Instance}}}
+\begin{DoxyCompactItemize}
+\item 
+const \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908}{IR\+::\+Object\+Kind}} \mbox{\hyperlink{struct_runtime_1_1_object_instance_a0d77f442a8f7418381f356c31795d8db}{kind}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{_runtime_private_8h_source_l00037}{37}} of file \mbox{\hyperlink{_runtime_private_8h_source}{Runtime\+Private.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{struct_runtime_1_1_g_c_object_ad61fa15a80d09b18aa1e8f80b1338467}\index{Runtime::GCObject@{Runtime::GCObject}!GCObject@{GCObject}}
+\index{GCObject@{GCObject}!Runtime::GCObject@{Runtime::GCObject}}
+\doxysubsubsection{\texorpdfstring{GCObject()}{GCObject()}}
+{\footnotesize\ttfamily \label{struct_runtime_1_1_g_c_object_ad61fa15a80d09b18aa1e8f80b1338467} 
+Runtime\+::\+GCObject\+::\+GCObject (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908}{Object\+Kind}}}]{in\+Kind}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_object_g_c_8cpp_source_l00026}{26}} of file \mbox{\hyperlink{_object_g_c_8cpp_source}{Object\+GC.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{struct_runtime_1_1_object_instance_af7231f91092e2c8d8f65491f648504b5}{ObjectInstance}}(inKind)}
+\DoxyCodeLine{00027\ \ \ \ \ \{}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Add\ the\ object\ to\ the\ global\ array.}}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_runtime_1_1_g_c_globals_a1c033c698e1d21a0f4996b189ff891fe}{GCGlobals::get}}().\mbox{\hyperlink{struct_runtime_1_1_g_c_globals_a233f9a8b878fa2cbc9dfda96d5ce8f46}{allObjects}}.insert(\textcolor{keyword}{this});}
+\DoxyCodeLine{00030\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_runtime_1_1_g_c_object_ad61fa15a80d09b18aa1e8f80b1338467_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_runtime_1_1_g_c_object_a87fe6580879c9e158d151219dfe6999e}\index{Runtime::GCObject@{Runtime::GCObject}!````~GCObject@{\texorpdfstring{$\sim$}{\string~}GCObject}}
+\index{````~GCObject@{\texorpdfstring{$\sim$}{\string~}GCObject}!Runtime::GCObject@{Runtime::GCObject}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}GCObject()}{\string~GCObject()}}
+{\footnotesize\ttfamily \label{struct_runtime_1_1_g_c_object_a87fe6580879c9e158d151219dfe6999e} 
+Runtime\+::\+GCObject\+::\texorpdfstring{$\sim$}{\string~}\+GCObject (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line \mbox{\hyperlink{_object_g_c_8cpp_source_l00032}{32}} of file \mbox{\hyperlink{_object_g_c_8cpp_source}{Object\+GC.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00033\ \ \ \ \ \{}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Remove\ the\ object\ from\ the\ global\ array.}}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_runtime_1_1_g_c_globals_a1c033c698e1d21a0f4996b189ff891fe}{GCGlobals::get}}().\mbox{\hyperlink{struct_runtime_1_1_g_c_globals_a233f9a8b878fa2cbc9dfda96d5ce8f46}{allObjects}}.erase(\textcolor{keyword}{this});}
+\DoxyCodeLine{00036\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_runtime_1_1_g_c_object_a87fe6580879c9e158d151219dfe6999e_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/wasm-\/jit/\+Source/\+Runtime/\mbox{\hyperlink{_runtime_private_8h}{Runtime\+Private.\+h}}\item 
+libraries/wasm-\/jit/\+Source/\+Runtime/\mbox{\hyperlink{_object_g_c_8cpp}{Object\+GC.\+cpp}}\end{DoxyCompactItemize}

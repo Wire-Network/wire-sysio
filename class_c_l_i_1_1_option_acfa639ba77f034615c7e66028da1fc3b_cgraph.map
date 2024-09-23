@@ -1,0 +1,15 @@
+<map id="CLI::Option::check_sname" name="CLI::Option::check_sname">
+<area shape="rect" id="Node000001" title="Requires &quot;&#45;&quot; to be removed from string." alt="" coords="5,74,137,114"/>
+<area shape="rect" id="Node000002" href="$namespace_c_l_i_1_1detail.html#a356b9c9cc904af2b0a918fd55e86cd9c" title="Check if a string is a member of a list of strings and optionally ignore case or ignore underscores." alt="" coords="185,81,349,107"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="137,92,169,92,169,97,137,97"/>
+<area shape="rect" id="Node000003" href="$namespace_c_l_i.html#a0c52326d2681814c22aa1a93ce43375e" title="Helper function to allow ignore_case to be passed to IsMember or Transform." alt="" coords="415,5,535,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="304,78,423,34,425,39,305,83"/>
+<area shape="rect" id="Node000004" href="$namespace_c_l_i_1_1detail.html#ae83709ec148057ec53df4383645727e9" title="Return a lower case version of a string." alt="" coords="601,43,740,68"/>
+<area shape="poly" id="edge7_Node000002_Node000004" title=" " alt="" coords="349,84,585,61,586,66,350,89"/>
+<area shape="rect" id="Node000005" href="$namespace_c_l_i.html#a111b6f05d21b9b84e7ba933ade79884c" title="Helper function to allow ignore_underscore to be passed to IsMember or Transform." alt="" coords="397,107,553,132"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="350,102,382,105,381,111,349,107"/>
+<area shape="rect" id="Node000006" href="$namespace_c_l_i_1_1detail.html#a5359a7a0e33366a12e15523b100f591a" title="remove underscores from a string" alt="" coords="604,114,737,154"/>
+<area shape="poly" id="edge6_Node000002_Node000006" title=" " alt="" coords="295,105,342,126,398,142,446,148,496,150,589,144,589,149,496,155,446,154,396,147,340,131,293,110"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="536,27,587,37,586,42,535,32"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="554,123,589,125,589,131,554,128"/>
+</map>

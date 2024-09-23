@@ -1,0 +1,116 @@
+\doxysection{snapshot\+\_\+suites.\+hpp}
+\hypertarget{snapshot__suites_8hpp_source}{}\label{snapshot__suites_8hpp_source}\index{libraries/testing/include/sysio/testing/snapshot\_suites.hpp@{libraries/testing/include/sysio/testing/snapshot\_suites.hpp}}
+\mbox{\hyperlink{snapshot__suites_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{variant__object_8hpp}{fc/variant\_object.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <snapshots.hpp>}}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00006}00006\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacesysio_1_1chain}{sysio::chain}};}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00007}00007\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacesysio_1_1testing}{sysio::testing}};}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00009}\mbox{\hyperlink{structvariant__snapshot__suite}{00009}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structvariant__snapshot__suite}{variant\_snapshot\_suite}}\ \{}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00010}\mbox{\hyperlink{structvariant__snapshot__suite_a0e45d60f1d314842730ae9b307c92dbc}{00010}}\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1chain_1_1variant__snapshot__writer}{writer\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1variant__snapshot__writer}{variant\_snapshot\_writer}};}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00011}\mbox{\hyperlink{structvariant__snapshot__suite_a8278f173018017eb182e0e6e6356a0bb}{00011}}\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1chain_1_1variant__snapshot__reader}{reader\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1variant__snapshot__reader}{variant\_snapshot\_reader}};}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00012}\mbox{\hyperlink{structvariant__snapshot__suite_acf1c55eb9b225aff216fbbfa03957903}{00012}}\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classfc_1_1mutable__variant__object}{write\_storage\_t}}\ =\ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}};}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00013}\mbox{\hyperlink{structvariant__snapshot__suite_a778386700a73202cc14ffa518880ce75}{00013}}\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classfc_1_1variant}{snapshot\_t}}\ =\ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}};}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00015}\mbox{\hyperlink{structvariant__snapshot__suite_1_1writer}{00015}}\ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structvariant__snapshot__suite_1_1writer}{writer}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classsysio_1_1chain_1_1variant__snapshot__writer}{writer\_t}}\ \{}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00016}\mbox{\hyperlink{structvariant__snapshot__suite_1_1writer_a3e4d25663a754d0021ecb56bdad3427c}{00016}}\ \ \ \ \ \ \ \mbox{\hyperlink{structvariant__snapshot__suite_1_1writer_a3e4d25663a754d0021ecb56bdad3427c}{writer}}(\ \textcolor{keyword}{const}\ std::shared\_ptr<write\_storage\_t>\&\ \mbox{\hyperlink{structvariant__snapshot__suite_1_1writer_ae785b69f07321c786c32a9748ac10e34}{storage}}\ )}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00017}00017\ \ \ \ \ \ \ :\mbox{\hyperlink{classsysio_1_1chain_1_1variant__snapshot__writer}{writer\_t}}(*\mbox{\hyperlink{structvariant__snapshot__suite_1_1writer_ae785b69f07321c786c32a9748ac10e34}{storage}})}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00018}00018\ \ \ \ \ \ \ ,\mbox{\hyperlink{structvariant__snapshot__suite_1_1writer_ae785b69f07321c786c32a9748ac10e34}{storage}}(\mbox{\hyperlink{structvariant__snapshot__suite_1_1writer_ae785b69f07321c786c32a9748ac10e34}{storage}})}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00019}00019\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00021}00021\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00023}\mbox{\hyperlink{structvariant__snapshot__suite_1_1writer_ae785b69f07321c786c32a9748ac10e34}{00023}}\ \ \ \ \ \ \ std::shared\_ptr<write\_storage\_t>\ \mbox{\hyperlink{structvariant__snapshot__suite_1_1writer_ae785b69f07321c786c32a9748ac10e34}{storage}};}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00024}00024\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00026}\mbox{\hyperlink{structvariant__snapshot__suite_1_1reader}{00026}}\ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structvariant__snapshot__suite_1_1reader}{reader}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classsysio_1_1chain_1_1variant__snapshot__reader}{reader\_t}}\ \{}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00027}\mbox{\hyperlink{structvariant__snapshot__suite_1_1reader_a850c2345e478a7075f28b595a2dd62c5}{00027}}\ \ \ \ \ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{structvariant__snapshot__suite_1_1reader_a850c2345e478a7075f28b595a2dd62c5}{reader}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1variant}{snapshot\_t}}\&\ storage)}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00028}00028\ \ \ \ \ \ \ :\mbox{\hyperlink{classsysio_1_1chain_1_1variant__snapshot__reader}{reader\_t}}(storage)}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00029}00029\ \ \ \ \ \ \ \{\}}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00030}00030\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00033}\mbox{\hyperlink{structvariant__snapshot__suite_acbd5842584ce20bc4df8e2929efa513b}{00033}}\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structvariant__snapshot__suite_acbd5842584ce20bc4df8e2929efa513b}{get\_writer}}()\ \{}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00034}00034\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::make\_shared<writer>(std::make\_shared<write\_storage\_t>());}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00035}00035\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00037}\mbox{\hyperlink{structvariant__snapshot__suite_adcca0a8b4a811f07d2dad9b309801c93}{00037}}\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structvariant__snapshot__suite_adcca0a8b4a811f07d2dad9b309801c93}{finalize}}(\textcolor{keyword}{const}\ std::shared\_ptr<writer>\&\ w)\ \{}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00038}00038\ \ \ \ \ \ \ w-\/>finalize();}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00039}00039\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structvariant__snapshot__suite_a778386700a73202cc14ffa518880ce75}{snapshot\_t}}(*w-\/>storage);}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00040}00040\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00042}\mbox{\hyperlink{structvariant__snapshot__suite_acfb886a65f8214a643997977200ffc94}{00042}}\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structvariant__snapshot__suite_acfb886a65f8214a643997977200ffc94}{get\_reader}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1variant}{snapshot\_t}}\&\ buffer)\ \{}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00043}00043\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::make\_shared<reader>(buffer);}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00044}00044\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00046}\mbox{\hyperlink{structvariant__snapshot__suite_a5a0e33d4fa452671bcde330acd28fa72}{00046}}\ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classfc_1_1variant}{snapshot\_t}}\ \mbox{\hyperlink{structvariant__snapshot__suite_a5a0e33d4fa452671bcde330acd28fa72}{load\_from\_file}}(\textcolor{keyword}{const}\ std::string\&\ filename)\ \{}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00047}00047\ \ \ \ \ \ \ snapshot\_input\_file<snapshot::json>\ file(filename);}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00048}00048\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ file.read();}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00049}00049\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00051}\mbox{\hyperlink{structvariant__snapshot__suite_a2e95f260be9da09f6b324eb596170407}{00051}}\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structvariant__snapshot__suite_a2e95f260be9da09f6b324eb596170407}{write\_to\_file}}(\ \textcolor{keyword}{const}\ std::string\&\ basename,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1variant}{snapshot\_t}}\&\ snapshot\ )\ \{}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00052}00052\ \ \ \ \ \ snapshot\_output\_file<snapshot::json>\ file(basename);}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00053}00053\ \ \ \ \ \ file.write<\mbox{\hyperlink{classfc_1_1variant}{snapshot\_t}}>(snapshot);}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00054}00054\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00055}00055\ \};}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00057}\mbox{\hyperlink{structbuffered__snapshot__suite}{00057}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structbuffered__snapshot__suite}{buffered\_snapshot\_suite}}\ \{}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00058}\mbox{\hyperlink{structbuffered__snapshot__suite_ae765ad2156bfe6739d42e273daf1bd5a}{00058}}\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1chain_1_1ostream__snapshot__writer}{writer\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1ostream__snapshot__writer}{ostream\_snapshot\_writer}};}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00059}\mbox{\hyperlink{structbuffered__snapshot__suite_a4ad526f377995a81c6fa57cb0cbbf6c4}{00059}}\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1chain_1_1istream__snapshot__reader}{reader\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1istream__snapshot__reader}{istream\_snapshot\_reader}};}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00060}\mbox{\hyperlink{structbuffered__snapshot__suite_ac99fd20690e062aba1d09940a0f10c83}{00060}}\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{structbuffered__snapshot__suite_ac99fd20690e062aba1d09940a0f10c83}{write\_storage\_t}}\ =\ std::ostringstream;}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00061}\mbox{\hyperlink{structbuffered__snapshot__suite_a88ccb4faac6db55123e8c7ee10612e1c}{00061}}\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{structbuffered__snapshot__suite_a88ccb4faac6db55123e8c7ee10612e1c}{snapshot\_t}}\ =\ std::string;}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00062}\mbox{\hyperlink{structbuffered__snapshot__suite_a08329904fa207a6a36a5ef30fb683b17}{00062}}\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{structbuffered__snapshot__suite_a08329904fa207a6a36a5ef30fb683b17}{read\_storage\_t}}\ =\ std::istringstream;}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00064}\mbox{\hyperlink{structbuffered__snapshot__suite_1_1writer}{00064}}\ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structbuffered__snapshot__suite_1_1writer}{writer}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classsysio_1_1chain_1_1ostream__snapshot__writer}{writer\_t}}\ \{}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00065}\mbox{\hyperlink{structbuffered__snapshot__suite_1_1writer_aee9ac2a938d03de2f0f9b64c86dde971}{00065}}\ \ \ \ \ \ \ \mbox{\hyperlink{structbuffered__snapshot__suite_1_1writer_aee9ac2a938d03de2f0f9b64c86dde971}{writer}}(\ \textcolor{keyword}{const}\ std::shared\_ptr<write\_storage\_t>\&\ \mbox{\hyperlink{structbuffered__snapshot__suite_1_1writer_ad599a352caaaf959c39cf7c5c270c5e4}{storage}}\ )}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00066}00066\ \ \ \ \ \ \ :\mbox{\hyperlink{classsysio_1_1chain_1_1ostream__snapshot__writer}{writer\_t}}(*\mbox{\hyperlink{structbuffered__snapshot__suite_1_1writer_ad599a352caaaf959c39cf7c5c270c5e4}{storage}})}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00067}00067\ \ \ \ \ \ \ ,\mbox{\hyperlink{structbuffered__snapshot__suite_1_1writer_ad599a352caaaf959c39cf7c5c270c5e4}{storage}}(\mbox{\hyperlink{structbuffered__snapshot__suite_1_1writer_ad599a352caaaf959c39cf7c5c270c5e4}{storage}})}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00068}00068\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00069}00069\ }
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00070}00070\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00072}\mbox{\hyperlink{structbuffered__snapshot__suite_1_1writer_ad599a352caaaf959c39cf7c5c270c5e4}{00072}}\ \ \ \ \ \ \ std::shared\_ptr<write\_storage\_t>\ \mbox{\hyperlink{structbuffered__snapshot__suite_1_1writer_ad599a352caaaf959c39cf7c5c270c5e4}{storage}};}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00073}00073\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00074}00074\ }
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00075}\mbox{\hyperlink{structbuffered__snapshot__suite_1_1reader}{00075}}\ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structbuffered__snapshot__suite_1_1reader}{reader}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classsysio_1_1chain_1_1istream__snapshot__reader}{reader\_t}}\ \{}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00076}\mbox{\hyperlink{structbuffered__snapshot__suite_1_1reader_a842d930e870b50b6c8ccc36f7c6dd686}{00076}}\ \ \ \ \ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{structbuffered__snapshot__suite_1_1reader_a842d930e870b50b6c8ccc36f7c6dd686}{reader}}(\textcolor{keyword}{const}\ std::shared\_ptr<read\_storage\_t>\&\ \mbox{\hyperlink{structbuffered__snapshot__suite_1_1reader_a125efcc07faf3c159b9588ba5a792ff8}{storage}})}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00077}00077\ \ \ \ \ \ \ :\mbox{\hyperlink{classsysio_1_1chain_1_1istream__snapshot__reader}{reader\_t}}(*\mbox{\hyperlink{structbuffered__snapshot__suite_1_1reader_a125efcc07faf3c159b9588ba5a792ff8}{storage}})}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00078}00078\ \ \ \ \ \ \ ,\mbox{\hyperlink{structbuffered__snapshot__suite_1_1reader_a125efcc07faf3c159b9588ba5a792ff8}{storage}}(\mbox{\hyperlink{structbuffered__snapshot__suite_1_1reader_a125efcc07faf3c159b9588ba5a792ff8}{storage}})}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00079}00079\ \ \ \ \ \ \ \{\}}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00080}00080\ }
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00081}\mbox{\hyperlink{structbuffered__snapshot__suite_1_1reader_a125efcc07faf3c159b9588ba5a792ff8}{00081}}\ \ \ \ \ \ \ std::shared\_ptr<read\_storage\_t>\ \mbox{\hyperlink{structbuffered__snapshot__suite_1_1reader_a125efcc07faf3c159b9588ba5a792ff8}{storage}};}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00082}00082\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00083}00083\ }
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00084}00084\ }
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00085}\mbox{\hyperlink{structbuffered__snapshot__suite_ae6bb80c6d77ab451239b7749e8399cb0}{00085}}\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structbuffered__snapshot__suite_ae6bb80c6d77ab451239b7749e8399cb0}{get\_writer}}()\ \{}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00086}00086\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::make\_shared<writer>(std::make\_shared<write\_storage\_t>());}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00087}00087\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00088}00088\ }
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00089}\mbox{\hyperlink{structbuffered__snapshot__suite_ae2baf63cc2a63da2eede6eb8c7773e55}{00089}}\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structbuffered__snapshot__suite_ae2baf63cc2a63da2eede6eb8c7773e55}{finalize}}(\textcolor{keyword}{const}\ std::shared\_ptr<writer>\&\ w)\ \{}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00090}00090\ \ \ \ \ \ \ w-\/>finalize();}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00091}00091\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ w-\/>storage-\/>str();}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00092}00092\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00093}00093\ }
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00094}\mbox{\hyperlink{structbuffered__snapshot__suite_a7fa31dddf8afeb2805cfa6ae5fc4cf90}{00094}}\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structbuffered__snapshot__suite_a7fa31dddf8afeb2805cfa6ae5fc4cf90}{get\_reader}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structbuffered__snapshot__suite_a88ccb4faac6db55123e8c7ee10612e1c}{snapshot\_t}}\&\ buffer)\ \{}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00095}00095\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::make\_shared<reader>(std::make\_shared<read\_storage\_t>(buffer));}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00096}00096\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00097}00097\ }
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00098}\mbox{\hyperlink{structbuffered__snapshot__suite_add73f82ba802d6f548fd68182fc7078b}{00098}}\ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{structbuffered__snapshot__suite_a88ccb4faac6db55123e8c7ee10612e1c}{snapshot\_t}}\ \mbox{\hyperlink{structbuffered__snapshot__suite_add73f82ba802d6f548fd68182fc7078b}{load\_from\_file}}(\textcolor{keyword}{const}\ std::string\&\ filename)\ \{}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00099}00099\ \ \ \ \ \ \ snapshot\_input\_file<snapshot::binary>\ file(filename);}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00100}00100\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ file.read\_as\_string();}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00101}00101\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00102}00102\ }
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00103}\mbox{\hyperlink{structbuffered__snapshot__suite_a5cc8e96795ab01d39eaa31feb7a06129}{00103}}\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structbuffered__snapshot__suite_a5cc8e96795ab01d39eaa31feb7a06129}{write\_to\_file}}(\ \textcolor{keyword}{const}\ std::string\&\ basename,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structbuffered__snapshot__suite_a88ccb4faac6db55123e8c7ee10612e1c}{snapshot\_t}}\&\ snapshot\ )\ \{}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00104}00104\ \ \ \ \ \ \ snapshot\_output\_file<snapshot::binary>\ file(basename);}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00105}00105\ \ \ \ \ \ \ file.write<\mbox{\hyperlink{structbuffered__snapshot__suite_a88ccb4faac6db55123e8c7ee10612e1c}{snapshot\_t}}>(snapshot);}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00106}00106\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00107}00107\ \};}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00108}00108\ }
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00109}\mbox{\hyperlink{snapshot__suites_8hpp_a5afbc4bb8828b0ce7a96986d25e7fa01}{00109}}\ \textcolor{keyword}{using\ }\mbox{\hyperlink{snapshot__suites_8hpp_a5afbc4bb8828b0ce7a96986d25e7fa01}{snapshot\_suites}}\ =\ boost::mpl::list<variant\_snapshot\_suite,\ buffered\_snapshot\_suite>;}
+\DoxyCodeLine{\Hypertarget{snapshot__suites_8hpp_source_l00110}00110\ }
+
+\end{DoxyCode}

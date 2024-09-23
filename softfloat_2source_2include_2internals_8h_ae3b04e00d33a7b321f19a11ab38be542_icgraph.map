@@ -1,0 +1,7 @@
+<map id="softfloat_addMagsF16" name="softfloat_addMagsF16">
+<area shape="rect" id="Node000001" title=" " alt="" coords="121,31,271,56"/>
+<area shape="rect" id="Node000002" href="$softfloat_2source_2f16__add_8c.html#a6fa40eace51e75dd2854e4414616973c" title=" " alt="" coords="5,5,73,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="105,31,73,26,74,21,106,26"/>
+<area shape="rect" id="Node000003" href="$softfloat_2source_2f16__sub_8c.html#a28257da302a51ba2b9b6bb0f6f29be32" title=" " alt="" coords="5,55,73,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="106,60,74,65,73,60,105,55"/>
+</map>

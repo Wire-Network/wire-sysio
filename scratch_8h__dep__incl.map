@@ -1,0 +1,47 @@
+<map id="libraries/fc/secp256k1/secp256k1/src/scratch.h" name="libraries/fc/secp256k1/secp256k1/src/scratch.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="188,5,356,46"/>
+<area shape="rect" id="Node000002" href="$ecmult_8h.html" title=" " alt="" coords="366,102,530,142"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="324,51,412,99,410,103,321,56"/>
+<area shape="rect" id="Node000018" href="$scratch__impl_8h.html" title=" " alt="" coords="101,94,259,150"/>
+<area shape="poly" id="edge26_Node000001_Node000018" title=" " alt="" coords="244,59,209,95,205,91,241,55"/>
+<area shape="rect" id="Node000003" href="$ecdsa_8h.html" title=" " alt="" coords="36,205,196,246"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="370,150,181,207,180,202,368,145"/>
+<area shape="rect" id="Node000004" href="$ecdsa__impl_8h.html" title=" " alt="" coords="82,309,273,350"/>
+<area shape="poly" id="edge9_Node000002_Node000004" title=" " alt="" coords="353,150,305,171,260,200,235,226,215,255,187,310,183,307,210,253,231,222,257,196,302,166,351,145"/>
+<area shape="rect" id="Node000010" href="$eckey_8h.html" title=" " alt="" coords="270,205,429,246"/>
+<area shape="poly" id="edge10_Node000002_Node000010" title=" " alt="" coords="420,155,370,207,366,203,417,152"/>
+<area shape="rect" id="Node000012" href="$ecmult__compute__table__impl_8h.html" title=" " alt="" coords="844,198,999,253"/>
+<area shape="poly" id="edge13_Node000002_Node000012" title=" " alt="" coords="546,137,682,162,833,195,844,198,842,203,831,200,681,167,545,142"/>
+<area shape="rect" id="Node000013" href="$precompute__ecmult_8c.html" title=" " alt="" coords="953,301,1135,357"/>
+<area shape="poly" id="edge24_Node000002_Node000013" title=" " alt="" coords="546,121,670,125,807,136,872,146,931,159,979,175,1012,196,1031,219,1041,247,1047,276,1048,301,1043,301,1041,276,1036,249,1026,222,1009,200,976,180,929,164,871,151,806,142,669,130,546,126"/>
+<area shape="rect" id="Node000014" href="$ecmult__impl_8h.html" title=" " alt="" coords="666,198,819,253"/>
+<area shape="poly" id="edge16_Node000002_Node000014" title=" " alt="" coords="521,145,667,195,665,200,519,150"/>
+<area shape="rect" id="Node000017" href="$precomputed__ecmult_8c.html" title=" " alt="" coords="452,198,641,253"/>
+<area shape="poly" id="edge25_Node000002_Node000017" title=" " alt="" coords="480,152,522,195,518,199,476,155"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="138,258,168,307,163,310,133,260"/>
+<area shape="rect" id="Node000005" href="$secp256k1_8c.html" title=" " alt="" coords="349,412,537,453"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="244,353,392,409,390,414,242,358"/>
+<area shape="rect" id="Node000006" href="$bench__ecmult_8c.html" title=" " alt="" coords="340,509,546,549"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="445,469,445,508,440,508,440,469"/>
+<area shape="rect" id="Node000007" href="$bench__internal_8c.html" title=" " alt="" coords="570,509,779,549"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="506,457,627,506,625,511,504,462"/>
+<area shape="rect" id="Node000008" href="$tests_8c.html" title=" " alt="" coords="162,509,316,549"/>
+<area shape="poly" id="edge7_Node000005_Node000008" title=" " alt="" coords="387,462,283,511,280,506,385,458"/>
+<area shape="rect" id="Node000009" href="$tests__exhaustive_8c.html" title=" " alt="" coords="804,509,1028,549"/>
+<area shape="poly" id="edge8_Node000005_Node000009" title=" " alt="" coords="552,453,817,505,816,511,551,458"/>
+<area shape="rect" id="Node000011" href="$eckey__impl_8h.html" title=" " alt="" coords="298,309,489,350"/>
+<area shape="poly" id="edge11_Node000010_Node000011" title=" " alt="" coords="366,259,387,307,382,309,361,261"/>
+<area shape="poly" id="edge12_Node000011_Node000005" title=" " alt="" coords="412,363,436,411,431,413,407,365"/>
+<area shape="poly" id="edge15_Node000012_Node000009" title=" " alt="" coords="923,269,919,508,914,508,918,268"/>
+<area shape="poly" id="edge14_Node000012_Node000013" title=" " alt="" coords="968,261,1013,299,1009,303,964,266"/>
+<area shape="poly" id="edge23_Node000014_Node000005" title=" " alt="" coords="653,257,605,277,560,303,511,353,460,414,456,411,507,349,557,299,603,272,651,252"/>
+<area shape="poly" id="edge17_Node000014_Node000006" title=" " alt="" coords="683,264,638,303,621,325,610,344,596,382,581,421,569,441,551,463,520,490,486,510,483,506,516,485,547,459,565,438,576,418,591,381,605,342,617,322,634,299,680,260"/>
+<area shape="poly" id="edge18_Node000014_Node000007" title=" " alt="" coords="687,265,670,283,657,302,648,329,643,358,645,416,656,468,669,508,664,509,651,470,640,416,638,358,643,328,652,300,666,279,683,261"/>
+<area shape="rect" id="Node000015" href="$ecmult__const__impl_8h.html" title=" " alt="" coords="666,301,819,357"/>
+<area shape="poly" id="edge19_Node000014_Node000015" title=" " alt="" coords="745,269,745,301,740,301,740,269"/>
+<area shape="poly" id="edge22_Node000015_Node000005" title=" " alt="" coords="652,364,502,414,500,409,650,359"/>
+<area shape="poly" id="edge20_Node000015_Node000007" title=" " alt="" coords="722,372,707,406,690,461,680,509,675,508,685,460,702,404,717,370"/>
+<area shape="rect" id="Node000016" href="$ecdh_2main__impl_8h.html" title=" " alt="" coords="716,405,879,461"/>
+<area shape="poly" id="edge21_Node000015_Node000016" title=" " alt="" coords="767,370,785,403,780,406,762,372"/>
+<area shape="poly" id="edge27_Node000018_Node000005" title=" " alt="" coords="88,150,53,170,26,199,15,221,9,243,9,263,13,283,22,301,35,320,71,355,91,367,118,377,189,396,270,410,349,420,348,425,270,415,188,401,116,383,88,371,68,359,31,323,17,304,8,284,3,264,4,242,10,220,22,196,50,166,85,145"/>
+</map>

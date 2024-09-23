@@ -1,0 +1,7 @@
+<map id="CLI::App::remaining_for_passthrough" name="CLI::App::remaining_for_passthrough">
+<area shape="rect" id="Node000001" title="This returns the missing options in a form ready for processing by another command line program." alt="" coords="5,5,143,46"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_app.html#ad90f9b3c1925879dfe39cb03c5247742" title="This returns the missing options from the current subcommand." alt="" coords="191,13,328,38"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="143,23,175,23,175,28,143,28"/>
+<area shape="rect" id="Node000003" href="$xbyak__mnemonic_8h.html#ad8856ea517c970ed0584a251c3fdc94f" title=" " alt="" coords="376,13,418,38"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="329,23,360,23,360,28,329,28"/>
+</map>

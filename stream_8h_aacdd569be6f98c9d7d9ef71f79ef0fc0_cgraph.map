@@ -1,0 +1,7 @@
+<map id="PutN" name="PutN">
+<area shape="rect" id="Node000001" title="Put N copies of a character to a stream." alt="" coords="5,31,57,56"/>
+<area shape="rect" id="Node000002" href="$stream_8h.html#aa817b00a466bb84d96c5de1616436c95" title="Reserve n characters for writing to a stream." alt="" coords="105,5,195,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="56,36,89,28,90,34,58,41"/>
+<area shape="rect" id="Node000003" href="$stream_8h.html#ad57ba7f2912c5509924b69dec7db4396" title="Write character to a stream, presuming buffer is reserved." alt="" coords="108,55,192,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="58,46,94,53,93,59,56,51"/>
+</map>

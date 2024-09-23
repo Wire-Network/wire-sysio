@@ -1,0 +1,27 @@
+<map id="BOOST_AUTO_TEST_CASE" name="BOOST_AUTO_TEST_CASE">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,129,202,154"/>
+<area shape="rect" id="Node000002" href="$namespacewebsocketpp_1_1http_1_1parser.html#ae656f7130716b25fb2a34cee77a0444e" title=" " alt="" coords="250,39,386,79"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="138,126,248,83,250,88,140,131"/>
+<area shape="rect" id="Node000007" href="$archivertest_8cpp.html#a1440a7779ac56f47a3f355ce4a8c7da0" title=" " alt="" coords="293,104,343,129"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="202,127,277,118,278,124,202,133"/>
+<area shape="rect" id="Node000009" href="$archivertest_8cpp.html#a0283886819c7c140a023582b7269e2d0" title=" " alt="" coords="293,153,343,178"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="202,150,278,159,277,164,202,155"/>
+<area shape="rect" id="Node000010" href="$archivertest_8cpp.html#a6d0455dd5c30adda100e95f0423c786e" title=" " alt="" coords="293,202,343,228"/>
+<area shape="poly" id="edge10_Node000001_Node000010" title=" " alt="" coords="145,153,279,199,278,204,143,158"/>
+<area shape="rect" id="Node000003" href="$namespacewebsocketpp_1_1http_1_1parser.html#a263c7c466bbed56948d5877b9c33c354" title="Read and discard linear whitespace." alt="" coords="434,39,586,79"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="387,56,419,56,419,62,387,62"/>
+<area shape="rect" id="Node000004" href="$namespacewebsocketpp_1_1http_1_1parser.html#a1dacef9abccd8e5b6c572447d9f5a3ab" title="Read and discard one unit of linear whitespace." alt="" coords="634,39,771,79"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="586,56,619,56,619,62,586,62"/>
+<area shape="rect" id="Node000005" href="$namespacewebsocketpp_1_1http.html#a95df9e609616688298d34fee9ec34945" title="Is the character non&#45;whitespace." alt="" coords="819,5,980,46"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="771,45,803,39,803,45,772,50"/>
+<area shape="rect" id="Node000006" href="$namespacewebsocketpp_1_1http.html#a8ff7039dd19159bdbce3b98159c66ae2" title="Is the character whitespace." alt="" coords="831,71,968,111"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="772,67,816,75,816,80,771,73"/>
+<area shape="rect" id="Node000008" href="$class_json_writer.html#a69d5a42b3c5a94f5f05bb48d2489b281" title="Obtains the serialized JSON string." alt="" coords="437,153,583,178"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="344,120,443,146,442,151,343,125"/>
+<area shape="poly" id="edge9_Node000009_Node000008" title=" " alt="" coords="344,163,421,163,421,168,344,168"/>
+<area shape="poly" id="edge12_Node000010_Node000008" title=" " alt="" coords="343,206,442,180,443,186,344,211"/>
+<area shape="rect" id="Node000011" href="$class_canvas.html#a277e4e60f5ec3ea16efd7ce9e1fb654b" title=" " alt="" coords="443,202,577,228"/>
+<area shape="poly" id="edge11_Node000010_Node000011" title=" " alt="" coords="344,212,427,212,427,218,344,218"/>
+<area shape="rect" id="Node000012" href="$class_canvas.html#acf5c8e6bbc490927df36e3c30583800e" title=" " alt="" coords="460,252,561,277"/>
+<area shape="poly" id="edge13_Node000010_Node000012" title=" " alt="" coords="344,219,445,245,444,250,343,224"/>
+</map>

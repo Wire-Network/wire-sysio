@@ -1,0 +1,9 @@
+<map id="sysio::chain::transaction_context::validate_referenced_accounts" name="sysio::chain::transaction_context::validate_referenced_accounts">
+<area shape="rect" id="Node000001" title="record_transaction" alt="" coords="5,55,198,111"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1chain_1_1controller.html#aa378f4265708c1bc41e4ee058ed71e6a" title=" " alt="" coords="262,5,414,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="197,57,246,45,248,50,199,62"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1chain_1_1controller.html#a0c79d00dae8c0d90efc18f4d091b2391" title=" " alt="" coords="251,70,426,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="198,80,236,80,236,86,198,86"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1chain_1_1controller.html#a8f7456b81f2657ccf6c39b35afb16af4" title=" " alt="" coords="246,120,431,161"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="199,104,237,113,236,118,197,109"/>
+</map>

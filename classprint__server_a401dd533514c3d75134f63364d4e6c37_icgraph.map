@@ -1,0 +1,10 @@
+<map id="print_server::get_data_from_hdl" name="print_server::get_data_from_hdl">
+<area shape="rect" id="Node000001" title=" " alt="" coords="395,23,542,64"/>
+<area shape="rect" id="Node000002" href="$classprint__server.html#abb31736075d42768a36f1d953866b1c6" title=" " alt="" coords="187,5,336,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="379,35,336,30,337,25,380,30"/>
+<area shape="rect" id="Node000004" href="$classprint__server.html#a08d4b374fa69846cb78ecf54b40cfd70" title=" " alt="" coords="176,55,347,80"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="380,56,348,60,347,55,379,51"/>
+<area shape="rect" id="Node000003" href="$classprint__server.html#ab1b7c0e33a8466b329b8fc56af302ff0" title=" " alt="" coords="5,23,128,64"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="172,33,128,38,128,33,171,27"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="160,58,128,54,128,48,161,52"/>
+</map>

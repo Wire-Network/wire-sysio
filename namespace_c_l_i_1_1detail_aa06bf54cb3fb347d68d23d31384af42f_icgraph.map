@@ -1,0 +1,30 @@
+<map id="CLI::detail::ltrim" name="CLI::detail::ltrim">
+<area shape="rect" id="Node000001" title="Trim whitespace from left of string." alt="" coords="778,157,892,182"/>
+<area shape="rect" id="Node000002" href="$namespace_c_l_i_1_1detail.html#a86c8be4c04334eea7717547ed6816533" title=" " alt="" coords="432,5,546,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="787,153,539,49,541,44,789,148"/>
+<area shape="rect" id="Node000004" href="$namespace_c_l_i_1_1detail.html#a621323632158048f6168deacc432b838" title="Trim whitespace from string." alt="" coords="618,157,730,182"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="762,172,730,172,730,167,762,167"/>
+<area shape="rect" id="Node000013" href="$namespace_c_l_i_1_1detail.html#a0f03e175032897c99f1ae0e0f1cde27a" title="Trim anything from string." alt="" coords="618,206,730,232"/>
+<area shape="poly" id="edge15_Node000001_Node000013" title=" " alt="" coords="777,190,719,208,718,203,775,185"/>
+<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_app.html#a187f08c5326d89319802162e33faff4e" title=" " alt="" coords="226,42,340,68"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="417,39,340,50,340,44,416,33"/>
+<area shape="poly" id="edge7_Node000004_Node000002" title=" " alt="" coords="651,146,615,106,569,66,539,49,542,44,572,62,618,103,655,143"/>
+<area shape="poly" id="edge6_Node000004_Node000003" title=" " alt="" coords="641,150,607,129,569,111,510,92,448,78,340,62,340,57,449,73,511,87,571,106,610,124,644,145"/>
+<area shape="rect" id="Node000005" href="$class_c_l_i_1_1_as_number_with_unit.html#af5d2fc29cd92c1821e653a97f91b00cb" title=" " alt="" coords="407,120,570,161"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="602,161,570,156,571,151,603,156"/>
+<area shape="rect" id="Node000006" href="$class_c_l_i_1_1_config_base.html#a1395eecde5af65b73e3670529df0e17b" title="Convert a configuration into an app." alt="" coords="207,177,359,218"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="603,177,360,195,359,190,603,172"/>
+<area shape="rect" id="Node000007" href="$namespace_c_l_i_1_1detail.html#a5c7b00a328b3b2da564794081646c251" title="Make a copy of the string and then trim it." alt="" coords="416,236,562,261"/>
+<area shape="poly" id="edge8_Node000004_Node000007" title=" " alt="" coords="629,192,619,196,571,219,526,237,524,232,569,214,617,191,627,187"/>
+<area shape="rect" id="Node000011" href="$namespace_c_l_i_1_1detail.html#a09bd3735d1104a453e5376a43140d5a8" title="Make a copy of the string and then trim it, any filter string can be used (any char in string is filt..." alt="" coords="416,285,562,310"/>
+<area shape="poly" id="edge13_Node000004_Node000011" title=" " alt="" coords="623,193,620,196,605,215,597,235,590,256,572,276,554,286,551,282,569,272,585,253,592,233,600,213,616,192,620,189"/>
+<area shape="rect" id="Node000012" href="$namespace_c_l_i_1_1detail.html#aa249801c72ca4b9d138ef21ba1aa06b1" title=" " alt="" coords="429,334,548,360"/>
+<area shape="poly" id="edge14_Node000004_Node000012" title=" " alt="" coords="622,194,620,195,608,212,602,227,598,260,593,292,586,309,572,325,550,339,547,334,569,321,581,306,588,291,593,259,597,226,604,209,616,192,618,190"/>
+<area shape="poly" id="edge9_Node000007_Node000006" title=" " alt="" coords="418,234,359,219,360,214,419,229"/>
+<area shape="rect" id="Node000008" href="$namespace_c_l_i_1_1detail.html#a001565020c65971162bae8cc2ba7d3e1" title=" " alt="" coords="226,243,340,283"/>
+<area shape="poly" id="edge10_Node000007_Node000008" title=" " alt="" coords="401,257,340,262,339,256,400,252"/>
+<area shape="rect" id="Node000009" href="$namespace_c_l_i_1_1detail.html#aef5e2e24cdf5eb20ac37c5fdabec8f62" title="extract default flag values either {def} or starting with a !" alt="" coords="5,213,159,254"/>
+<area shape="poly" id="edge11_Node000008_Node000009" title=" " alt="" coords="210,255,159,248,159,242,211,250"/>
+<area shape="rect" id="Node000010" href="$class_c_l_i_1_1_option.html#a35e90f0fc810ccca676f7fa39bf4cc27" title="Making an option by hand is not defined, it must be made by the App class." alt="" coords="15,278,149,304"/>
+<area shape="poly" id="edge12_Node000008_Node000010" title=" " alt="" coords="211,276,150,284,149,279,211,270"/>
+</map>

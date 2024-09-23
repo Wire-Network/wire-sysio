@@ -1,0 +1,77 @@
+\doxysection{test\+\_\+k1\+\_\+recover.\+cpp}
+\hypertarget{test__k1__recover_8cpp_source}{}\label{test__k1__recover_8cpp_source}\index{libraries/fc/test/crypto/test\_k1\_recover.cpp@{libraries/fc/test/crypto/test\_k1\_recover.cpp}}
+\mbox{\hyperlink{test__k1__recover_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00001}\mbox{\hyperlink{test__k1__recover_8cpp_a6b2a3852db8bb19ab6909bac01859985}{00001}}\ \textcolor{preprocessor}{\#define\ BOOST\_TEST\_MODULE\ blake2}}
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <boost/test/included/unit\_test.hpp>}}
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{exception_8hpp}{fc/exception/exception.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{hex_8hpp}{fc/crypto/hex.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{k1__recover_8hpp}{fc/crypto/k1\_recover.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{utility_8hpp}{fc/utility.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00009}00009\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacefc}{fc}};}
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00011}00011\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{test__utils_8hpp}{test\_utils.hpp}}"{}}}
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00013}00013\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacestd}{std}}\ \{}
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00014}\mbox{\hyperlink{namespacestd_a70b9dc361b22eaf5f539699b9d2ff4a4}{00014}}\ std::ostream\&\ \mbox{\hyperlink{namespacestd_aa723876b3fe465de1898817742c90b93}{operator<<}}(std::ostream\&\ st,\ \textcolor{keyword}{const}\ std::variant<fc::k1\_recover\_error,\ bytes>\&\ err)}
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00015}00015\ \{}
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00016}00016\ \ \ \ \textcolor{keywordflow}{if}(std::holds\_alternative<fc::k1\_recover\_error>(err))}
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00017}00017\ \ \ \ \ \ \ st\ <<\ static\_cast<int32\_t>(std::get<fc::k1\_recover\_error>(err));}
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00018}00018\ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00019}00019\ \ \ \ \ \ \ st\ <<\ fc::to\_hex(std::get<bytes>(err));}
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00020}00020\ \ \ \ \ \textcolor{keywordflow}{return}\ st;}
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00021}00021\ \}}
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00022}00022\ \}}
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00024}00024\ BOOST\_AUTO\_TEST\_SUITE(\mbox{\hyperlink{namespacefc_ad33908e48c447780b71e5e4ba567d523}{k1\_recover}})}
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00025}\mbox{\hyperlink{test__k1__recover_8cpp_a24886974083c123b90ef271565b828e1}{00025}}\ \mbox{\hyperlink{test__k1__recover_8cpp_a24886974083c123b90ef271565b828e1}{BOOST\_AUTO\_TEST\_CASE}}(recover)\ \mbox{\hyperlink{hello__driver_8cpp_abe4cc9788f52e49485473dc699537388}{try}}\ \{}
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00027}00027\ \ \ \ \textcolor{keyword}{using\ }test\_k1\_recover\ =\ std::tuple<std::string,\ std::string,\ std::variant<fc::k1\_recover\_error,\ bytes>>;}
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00028}00028\ \ \ \ \textcolor{keyword}{const}\ std::vector<test\_k1\_recover>\ tests\ \{}
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00029}00029\ \ \ \ \ \ \ \textcolor{comment}{//test}}
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00030}00030\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00031}00031\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}1b323dd47a1dd5592c296ee2ee12e0af38974087a475e99098a440284f19c1f7642fa0baa10a8a3ab800dfdbe987dee68a09b6fa3db45a5cc4f3a5835a1671d4dd"{}},}
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00032}00032\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}92390316873c5a9d520b28aba61e7a8f00025ac069acd9c4d2a71d775a55fa5f"{}},}
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00033}00033\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{test__utils_8hpp_af42811e238a2a23276bd4200e2b40dde}{to\_bytes}}(\textcolor{stringliteral}{"{}044424982f5c4044aaf27444965d15b53f219c8ad332bf98a98a902ebfb05d46cb86ea6fe663aa83fd4ce0a383855dfae9bf7a07b779d34c84c347fec79d04c51e"{}})}
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00034}00034\ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00036}00036\ \ \ \ \ \ \ \textcolor{comment}{//test\ (invalid\ signature\ v)}}
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00037}00037\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00038}00038\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}01174de755b55bd29026d626f7313a5560353dc5175f29c78d79d961b81a0c04360d833ca789bc16d4ee714a6d1a19461d890966e0ec5c074f67be67e631d33aa7"{}},}
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00039}00039\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}45fd65f6dd062fe7020f11d19fe5c35dc4d425e1479c0968c8e932c208f25399"{}},}
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00040}00040\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a97e49922a2f755b551da706c89c774f2a12c527ffd45868061a192960b352b5d9}{fc::k1\_recover\_error::invalid\_signature}}}
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00041}00041\ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00043}00043\ \ \ \ \ \ \ \textcolor{comment}{//test\ (invalid\ signature\ len)}}
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00044}00044\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00045}00045\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}174de755b55bd29026d626f7313a5560353dc5175f29c78d79d961b81a0c04360d833ca789bc16d4ee714a6d1a19461d890966e0ec5c074f67be67e631d33aa7"{}},}
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00046}00046\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}45fd65f6dd062fe7020f11d19fe5c35dc4d425e1479c0968c8e932c208f25399"{}},}
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00047}00047\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a97e49922a2f755b551da706c89c774f2afcf739c019873c68ec4e3dd5ee56ddc2}{fc::k1\_recover\_error::input\_error}}}
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00048}00048\ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00050}00050\ \ \ \ \ \ \ \textcolor{comment}{//test\ (invalid\ digest\ len)}}
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00051}00051\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}00174de755b55bd29026d626f7313a5560353dc5175f29c78d79d961b81a0c04360d833ca789bc16d4ee714a6d1a19461d890966e0ec5c074f67be67e631d33aa7"{}},}
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}fd65f6dd062fe7020f11d19fe5c35dc4d425e1479c0968c8e932c208f25399"{}},}
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a97e49922a2f755b551da706c89c774f2afcf739c019873c68ec4e3dd5ee56ddc2}{fc::k1\_recover\_error::input\_error}}}
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00055}00055\ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00057}00057\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00059}00059\ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ test\ :\ tests)\ \{}
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00060}00060\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00061}00061\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{namespacefc_a50190ee8a24af6929033b058b16158c4}{signature}}\ \ \ \ \ \ \ =\ \mbox{\hyperlink{test__utils_8hpp_af42811e238a2a23276bd4200e2b40dde}{to\_bytes}}(std::get<0>(test));}
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00062}00062\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{namespacefc_a150ca4cd9c0318ca45dc0dc7df5d58b9}{digest}}\ \ \ \ \ \ \ \ \ \ =\ \mbox{\hyperlink{test__utils_8hpp_af42811e238a2a23276bd4200e2b40dde}{to\_bytes}}(std::get<1>(test));}
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00063}00063\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{ssh_8c_a2cd19dc464a5cf91cd7c2e717b9dffd7}{expected\_result}}\ =\ std::get<2>(test);}
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00065}00065\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ res\ =\ \mbox{\hyperlink{namespacefc_ad33908e48c447780b71e5e4ba567d523}{fc::k1\_recover}}(\mbox{\hyperlink{namespacefc_a50190ee8a24af6929033b058b16158c4}{signature}},\ \mbox{\hyperlink{namespacefc_a150ca4cd9c0318ca45dc0dc7df5d58b9}{digest}});}
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00066}00066\ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(res,\ \mbox{\hyperlink{ssh_8c_a2cd19dc464a5cf91cd7c2e717b9dffd7}{expected\_result}});}
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00067}00067\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00069}\mbox{\hyperlink{test__k1__recover_8cpp_ae70bfa24f5a3bc0917382b3c17fc033c}{00069}}\ \}\ \mbox{\hyperlink{test__k1__recover_8cpp_ae70bfa24f5a3bc0917382b3c17fc033c}{FC\_LOG\_AND\_RETHROW}}();}
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{test__k1__recover_8cpp_source_l00071}00071\ BOOST\_AUTO\_TEST\_SUITE\_END()}
+
+\end{DoxyCode}

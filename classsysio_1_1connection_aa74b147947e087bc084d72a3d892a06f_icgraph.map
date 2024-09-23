@@ -1,0 +1,16 @@
+<map id="sysio::connection::get_time" name="sysio::connection::get_time">
+<area shape="rect" id="Node000001" title="Read system time and convert to a 64 bit integer." alt="" coords="392,100,523,141"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1connection.html#a674cbe920ea083be64a0746c0ce76c86" title="Process time_message." alt="" coords="5,7,137,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="429,90,391,54,368,38,343,26,291,13,237,8,184,10,137,16,137,11,184,5,237,3,292,7,345,21,371,33,394,50,432,87"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1connection.html#a27f41e41ebd6b4570bc19a31b4bb1fef" title="Process the next message from the pending message buffer." alt="" coords="185,35,344,76"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="380,97,326,79,327,74,382,92"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1connection.html#a1c134c29679142daab81ca9fe4a10996" title="Populate and queue time_message." alt="" coords="199,100,330,141"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="377,123,330,123,330,118,377,118"/>
+<area shape="rect" id="Node000006" href="$classsysio_1_1connection.html#a0a699ed89ab1cf5d95aba5aa7de17e18" title="Populate and queue time_message immediately using incoming time_message." alt="" coords="199,166,330,206"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="382,149,327,168,326,163,380,144"/>
+<area shape="rect" id="Node000007" href="$classsysio_1_1net__plugin__impl.html#a181c584acad36b817fc3a5513a6b6c1b" title="Peer heartbeat ticker." alt="" coords="189,231,340,272"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="428,154,390,188,345,220,322,233,319,228,343,216,387,183,424,150"/>
+<area shape="poly" id="edge5_Node000004_Node000002" title=" " alt="" coords="197,96,183,90,108,51,111,46,186,85,199,91"/>
+<area shape="rect" id="Node000005" href="$classsysio_1_1connection.html#ad02fe050af3c833e156bea91308d6c1b" title="Check heartbeat time and send Time_message." alt="" coords="5,100,137,141"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="183,123,137,123,137,118,183,118"/>
+</map>

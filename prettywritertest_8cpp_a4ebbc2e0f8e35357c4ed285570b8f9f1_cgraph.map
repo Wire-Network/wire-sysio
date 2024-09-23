@@ -1,0 +1,47 @@
+<map id="TEST" name="TEST">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,210,61,236"/>
+<area shape="rect" id="Node000002" href="$class_pretty_writer.html#a1e9d97fc950d349f55abd864c787ff37" title=" " alt="" coords="111,84,264,109"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="48,208,157,117,160,121,52,212"/>
+<area shape="rect" id="Node000010" href="$class_generic_string_buffer.html#a42079865bab1deb930c6cff7d491c719" title=" " alt="" coords="120,357,255,398"/>
+<area shape="poly" id="edge10_Node000001_Node000010" title=" " alt="" coords="49,234,157,344,153,348,45,238"/>
+<area shape="rect" id="Node000013" href="$class_pretty_writer.html#aec7fdf4798a3af5e31c147633f4798ed" title=" " alt="" coords="109,234,266,260"/>
+<area shape="poly" id="edge15_Node000001_Node000013" title=" " alt="" coords="62,225,94,230,93,235,61,230"/>
+<area shape="rect" id="Node000016" href="$class_pretty_writer.html#ae544ccfe35dd7e80ed694873062409f6" title=" " alt="" coords="121,185,254,211"/>
+<area shape="poly" id="edge19_Node000001_Node000016" title=" " alt="" coords="61,216,106,208,107,214,62,221"/>
+<area shape="rect" id="Node000003" href="$class_writer.html#adc1cadbabc309d31f19cf7463251d879" title=" " alt="" coords="338,84,457,109"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="264,94,323,94,323,99,264,99"/>
+<area shape="rect" id="Node000005" href="$class_writer.html#a8ca4e364c546b2eb526caa68dde011d2" title="Flush the output stream." alt="" coords="576,9,672,35"/>
+<area shape="poly" id="edge5_Node000002_Node000005" title=" " alt="" coords="203,81,250,48,281,31,313,19,379,7,445,3,508,5,562,10,561,15,508,10,445,8,379,12,315,24,283,36,253,52,206,85"/>
+<area shape="rect" id="Node000006" href="$class_writer.html#aabda2df1be6e83cef416e9b1f042e8f4" title=" " alt="" coords="324,34,471,60"/>
+<area shape="poly" id="edge6_Node000002_Node000006" title=" " alt="" coords="245,80,324,61,325,67,246,85"/>
+<area shape="rect" id="Node000007" href="$class_pretty_writer.html#a6f244ecc94fd5b134d424033b1574b7e" title=" " alt="" coords="542,134,706,160"/>
+<area shape="poly" id="edge7_Node000002_Node000007" title=" " alt="" coords="248,107,314,119,424,132,527,139,526,145,424,137,314,124,247,112"/>
+<area shape="rect" id="Node000004" href="$classinternal_1_1_stack.html#a2b8bda380e33838a99e3c73ff9785f03" title=" " alt="" coords="548,84,700,109"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="457,94,533,94,533,99,457,99"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="446,80,481,70,572,38,574,43,482,75,448,85"/>
+<area shape="rect" id="Node000008" href="$classinternal_1_1_stack.html#ac484468a2791bd3e9ba609bd1600ab48" title=" " alt="" coords="767,110,927,136"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="706,136,751,131,751,136,707,141"/>
+<area shape="rect" id="Node000009" href="$filewritestream_8h.html#a5c9b0f0e6249be2acf7f3505c295c132" title="Implement specialized version of PutN() with memset() for better performance." alt="" coords="821,160,872,185"/>
+<area shape="poly" id="edge9_Node000007_Node000009" title=" " alt="" coords="707,154,806,165,805,170,706,159"/>
+<area shape="rect" id="Node000011" href="$class_generic_string_buffer.html#a0038e53ba03c271bc4cbbac403ec4de4" title=" " alt="" coords="314,446,481,472"/>
+<area shape="poly" id="edge11_Node000010_Node000011" title=" " alt="" coords="243,396,349,437,347,442,241,401"/>
+<area shape="rect" id="Node000012" href="$class_generic_string_buffer.html#a80af78c43da93126a940a40d1889278a" title=" " alt="" coords="330,357,465,398"/>
+<area shape="poly" id="edge13_Node000010_Node000012" title=" " alt="" coords="256,375,314,375,314,380,256,380"/>
+<area shape="poly" id="edge12_Node000011_Node000011" title=" " alt="" coords="363,447,356,438,360,428,374,422,398,420,423,422,437,429,434,434,422,427,398,425,375,427,364,432,361,437,367,444"/>
+<area shape="poly" id="edge14_Node000012_Node000012" title=" " alt="" coords="358,357,356,347,362,338,376,333,398,331,421,333,434,339,432,344,419,338,398,336,378,338,366,343,361,349,363,356"/>
+<area shape="rect" id="Node000014" href="$class_pretty_writer.html#a09709ffa3b545e007631ecfd35029843" title=" " alt="" coords="314,185,481,211"/>
+<area shape="poly" id="edge16_Node000013_Node000014" title=" " alt="" coords="245,231,324,212,325,217,246,236"/>
+<area shape="rect" id="Node000015" href="$class_writer.html#a3c3560a96cac58f98f4a74d6cb227204" title=" " alt="" coords="322,284,474,309"/>
+<area shape="poly" id="edge18_Node000013_Node000015" title=" " alt="" coords="246,258,325,277,324,282,245,263"/>
+<area shape="poly" id="edge17_Node000014_Node000007" title=" " alt="" coords="458,182,548,161,549,166,459,187"/>
+<area shape="poly" id="edge20_Node000016_Node000003" title=" " alt="" coords="215,182,355,114,357,119,217,187"/>
+<area shape="poly" id="edge21_Node000016_Node000014" title=" " alt="" coords="254,195,298,195,298,200,254,200"/>
+<area shape="rect" id="Node000017" href="$class_writer.html#acda4412ef5f4cac6e89f9544e4b10f70" title=" " alt="" coords="334,234,461,260"/>
+<area shape="poly" id="edge22_Node000016_Node000017" title=" " alt="" coords="246,209,325,227,324,233,245,214"/>
+<area shape="rect" id="Node000018" href="$stream_8h.html#aa817b00a466bb84d96c5de1616436c95" title="Reserve n characters for writing to a stream." alt="" coords="579,185,669,211"/>
+<area shape="poly" id="edge23_Node000017_Node000018" title=" " alt="" coords="460,231,563,208,564,213,461,236"/>
+<area shape="rect" id="Node000019" href="$stream_8h.html#ad57ba7f2912c5509924b69dec7db4396" title="Write character to a stream, presuming buffer is reserved." alt="" coords="582,234,666,260"/>
+<area shape="poly" id="edge24_Node000017_Node000019" title=" " alt="" coords="462,244,567,244,567,250,462,250"/>
+<area shape="rect" id="Node000020" href="$class_writer.html#a94140803bba7863a1b39c936bbe6d262" title=" " alt="" coords="529,284,719,325"/>
+<area shape="poly" id="edge25_Node000017_Node000020" title=" " alt="" coords="452,258,527,277,526,282,451,263"/>
+</map>

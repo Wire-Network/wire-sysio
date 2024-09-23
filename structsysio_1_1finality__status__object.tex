@@ -1,0 +1,176 @@
+\doxysection{sysio\+::finality\+\_\+status\+\_\+object Struct Reference}
+\hypertarget{structsysio_1_1finality__status__object}{}\label{structsysio_1_1finality__status__object}\index{sysio::finality\_status\_object@{sysio::finality\_status\_object}}
+
+
+tracks status related to a transaction in the blockchain  
+
+
+
+
+{\ttfamily \#include $<$finality\+\_\+status\+\_\+object.\+hpp$>$}
+
+
+
+Collaboration diagram for sysio\+::finality\+\_\+status\+\_\+object\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1finality__status__object__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+size\+\_\+t \mbox{\hyperlink{structsysio_1_1finality__status__object_a7ae6a77093644a97ede827d2be8d8c41}{memory\+\_\+size}} () const
+\item 
+bool \mbox{\hyperlink{structsysio_1_1finality__status__object_a6e9c5479c4fba403a1141d71e4a0954c}{is\+\_\+in\+\_\+block}} () const
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1finality__status__object_ab0aa7a62ce0809972ecbe23806b57b6f}{block\+\_\+num}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_aa85a3b49b3b219d1e3840567579e7e63}{chain\+::transaction\+\_\+id\+\_\+type}} \mbox{\hyperlink{structsysio_1_1finality__status__object_a007dbda184841433ac53eeefa19b7f4c}{trx\+\_\+id}}
+\item 
+\mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}} \mbox{\hyperlink{structsysio_1_1finality__status__object_a62a02b141ed732030c8a8b164b768e65}{trx\+\_\+expiry}}
+\item 
+\mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}} \mbox{\hyperlink{structsysio_1_1finality__status__object_a29332707e28e29790d2a6cd0c063a0b9}{received}}
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{chain\+::block\+\_\+id\+\_\+type}} \mbox{\hyperlink{structsysio_1_1finality__status__object_a45ea8643d0061aeedda3fd2cb610cd81}{block\+\_\+id}}
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_a11965fc424809ea1802175f8b36ae4e5}{chain\+::block\+\_\+timestamp\+\_\+type}} \mbox{\hyperlink{structsysio_1_1finality__status__object_a84419aca3d888816a90fff72fccc440b}{block\+\_\+timestamp}}
+\item 
+bool \mbox{\hyperlink{structsysio_1_1finality__status__object_ac845ab23a755acae525aea4fb3e98a2e}{forked\+\_\+out}} = false
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+To report the status of a transaction in the system we need to track what block it is seen in as well as determine when it has failed or needs to no no longer be tracked. 
+
+Definition at line \mbox{\hyperlink{finality__status__object_8hpp_source_l00018}{18}} of file \mbox{\hyperlink{finality__status__object_8hpp_source}{finality\+\_\+status\+\_\+object.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1finality__status__object_ab0aa7a62ce0809972ecbe23806b57b6f}\index{sysio::finality\_status\_object@{sysio::finality\_status\_object}!block\_num@{block\_num}}
+\index{block\_num@{block\_num}!sysio::finality\_status\_object@{sysio::finality\_status\_object}}
+\doxysubsubsection{\texorpdfstring{block\_num()}{block\_num()}}
+{\footnotesize\ttfamily \label{structsysio_1_1finality__status__object_ab0aa7a62ce0809972ecbe23806b57b6f} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::finality\+\_\+status\+\_\+object\+::block\+\_\+num (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{finality__status__object_8hpp_source_l00031}{31}} of file \mbox{\hyperlink{finality__status__object_8hpp_source}{finality\+\_\+status\+\_\+object.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00031\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1chain_1_1block__header_a39d57e33ef8d3f6ba59b4c458f0ae375}{chain::block\_header::num\_from\_id}}(\mbox{\hyperlink{structsysio_1_1finality__status__object_a45ea8643d0061aeedda3fd2cb610cd81}{block\_id}});\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1finality__status__object_ab0aa7a62ce0809972ecbe23806b57b6f_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1finality__status__object_a6e9c5479c4fba403a1141d71e4a0954c}\index{sysio::finality\_status\_object@{sysio::finality\_status\_object}!is\_in\_block@{is\_in\_block}}
+\index{is\_in\_block@{is\_in\_block}!sysio::finality\_status\_object@{sysio::finality\_status\_object}}
+\doxysubsubsection{\texorpdfstring{is\_in\_block()}{is\_in\_block()}}
+{\footnotesize\ttfamily \label{structsysio_1_1finality__status__object_a6e9c5479c4fba403a1141d71e4a0954c} 
+bool sysio\+::finality\+\_\+status\+\_\+object\+::is\+\_\+in\+\_\+block (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{finality__status__object_8hpp_source_l00028}{28}} of file \mbox{\hyperlink{finality__status__object_8hpp_source}{finality\+\_\+status\+\_\+object.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !\mbox{\hyperlink{structsysio_1_1finality__status__object_ac845ab23a755acae525aea4fb3e98a2e}{forked\_out}}\ \&\&\ \mbox{\hyperlink{structsysio_1_1finality__status__object_a45ea8643d0061aeedda3fd2cb610cd81}{block\_id}}\ !=\ \mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{chain::block\_id\_type}}\{\};}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1finality__status__object_a7ae6a77093644a97ede827d2be8d8c41}\index{sysio::finality\_status\_object@{sysio::finality\_status\_object}!memory\_size@{memory\_size}}
+\index{memory\_size@{memory\_size}!sysio::finality\_status\_object@{sysio::finality\_status\_object}}
+\doxysubsubsection{\texorpdfstring{memory\_size()}{memory\_size()}}
+{\footnotesize\ttfamily \label{structsysio_1_1finality__status__object_a7ae6a77093644a97ede827d2be8d8c41} 
+size\+\_\+t sysio\+::finality\+\_\+status\+\_\+object\+::memory\+\_\+size (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{finality__status__object_8hpp_source_l00027}{27}} of file \mbox{\hyperlink{finality__status__object_8hpp_source}{finality\+\_\+status\+\_\+object.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00027\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{sizeof}(*this);\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1finality__status__object_a45ea8643d0061aeedda3fd2cb610cd81}\index{sysio::finality\_status\_object@{sysio::finality\_status\_object}!block\_id@{block\_id}}
+\index{block\_id@{block\_id}!sysio::finality\_status\_object@{sysio::finality\_status\_object}}
+\doxysubsubsection{\texorpdfstring{block\_id}{block\_id}}
+{\footnotesize\ttfamily \label{structsysio_1_1finality__status__object_a45ea8643d0061aeedda3fd2cb610cd81} 
+\mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{chain\+::block\+\_\+id\+\_\+type}} sysio\+::finality\+\_\+status\+\_\+object\+::block\+\_\+id}
+
+
+
+Definition at line \mbox{\hyperlink{finality__status__object_8hpp_source_l00023}{23}} of file \mbox{\hyperlink{finality__status__object_8hpp_source}{finality\+\_\+status\+\_\+object.\+hpp}}.
+
+\Hypertarget{structsysio_1_1finality__status__object_a84419aca3d888816a90fff72fccc440b}\index{sysio::finality\_status\_object@{sysio::finality\_status\_object}!block\_timestamp@{block\_timestamp}}
+\index{block\_timestamp@{block\_timestamp}!sysio::finality\_status\_object@{sysio::finality\_status\_object}}
+\doxysubsubsection{\texorpdfstring{block\_timestamp}{block\_timestamp}}
+{\footnotesize\ttfamily \label{structsysio_1_1finality__status__object_a84419aca3d888816a90fff72fccc440b} 
+\mbox{\hyperlink{namespacesysio_1_1chain_a11965fc424809ea1802175f8b36ae4e5}{chain\+::block\+\_\+timestamp\+\_\+type}} sysio\+::finality\+\_\+status\+\_\+object\+::block\+\_\+timestamp}
+
+
+
+Definition at line \mbox{\hyperlink{finality__status__object_8hpp_source_l00024}{24}} of file \mbox{\hyperlink{finality__status__object_8hpp_source}{finality\+\_\+status\+\_\+object.\+hpp}}.
+
+\Hypertarget{structsysio_1_1finality__status__object_ac845ab23a755acae525aea4fb3e98a2e}\index{sysio::finality\_status\_object@{sysio::finality\_status\_object}!forked\_out@{forked\_out}}
+\index{forked\_out@{forked\_out}!sysio::finality\_status\_object@{sysio::finality\_status\_object}}
+\doxysubsubsection{\texorpdfstring{forked\_out}{forked\_out}}
+{\footnotesize\ttfamily \label{structsysio_1_1finality__status__object_ac845ab23a755acae525aea4fb3e98a2e} 
+bool sysio\+::finality\+\_\+status\+\_\+object\+::forked\+\_\+out = false}
+
+
+
+Definition at line \mbox{\hyperlink{finality__status__object_8hpp_source_l00025}{25}} of file \mbox{\hyperlink{finality__status__object_8hpp_source}{finality\+\_\+status\+\_\+object.\+hpp}}.
+
+\Hypertarget{structsysio_1_1finality__status__object_a29332707e28e29790d2a6cd0c063a0b9}\index{sysio::finality\_status\_object@{sysio::finality\_status\_object}!received@{received}}
+\index{received@{received}!sysio::finality\_status\_object@{sysio::finality\_status\_object}}
+\doxysubsubsection{\texorpdfstring{received}{received}}
+{\footnotesize\ttfamily \label{structsysio_1_1finality__status__object_a29332707e28e29790d2a6cd0c063a0b9} 
+\mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}} sysio\+::finality\+\_\+status\+\_\+object\+::received}
+
+
+
+Definition at line \mbox{\hyperlink{finality__status__object_8hpp_source_l00022}{22}} of file \mbox{\hyperlink{finality__status__object_8hpp_source}{finality\+\_\+status\+\_\+object.\+hpp}}.
+
+\Hypertarget{structsysio_1_1finality__status__object_a62a02b141ed732030c8a8b164b768e65}\index{sysio::finality\_status\_object@{sysio::finality\_status\_object}!trx\_expiry@{trx\_expiry}}
+\index{trx\_expiry@{trx\_expiry}!sysio::finality\_status\_object@{sysio::finality\_status\_object}}
+\doxysubsubsection{\texorpdfstring{trx\_expiry}{trx\_expiry}}
+{\footnotesize\ttfamily \label{structsysio_1_1finality__status__object_a62a02b141ed732030c8a8b164b768e65} 
+\mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}} sysio\+::finality\+\_\+status\+\_\+object\+::trx\+\_\+expiry}
+
+
+
+Definition at line \mbox{\hyperlink{finality__status__object_8hpp_source_l00021}{21}} of file \mbox{\hyperlink{finality__status__object_8hpp_source}{finality\+\_\+status\+\_\+object.\+hpp}}.
+
+\Hypertarget{structsysio_1_1finality__status__object_a007dbda184841433ac53eeefa19b7f4c}\index{sysio::finality\_status\_object@{sysio::finality\_status\_object}!trx\_id@{trx\_id}}
+\index{trx\_id@{trx\_id}!sysio::finality\_status\_object@{sysio::finality\_status\_object}}
+\doxysubsubsection{\texorpdfstring{trx\_id}{trx\_id}}
+{\footnotesize\ttfamily \label{structsysio_1_1finality__status__object_a007dbda184841433ac53eeefa19b7f4c} 
+\mbox{\hyperlink{namespacesysio_1_1chain_aa85a3b49b3b219d1e3840567579e7e63}{chain\+::transaction\+\_\+id\+\_\+type}} sysio\+::finality\+\_\+status\+\_\+object\+::trx\+\_\+id}
+
+
+
+Definition at line \mbox{\hyperlink{finality__status__object_8hpp_source_l00020}{20}} of file \mbox{\hyperlink{finality__status__object_8hpp_source}{finality\+\_\+status\+\_\+object.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+plugins/chain\+\_\+plugin/include/sysio/chain\+\_\+plugin/\mbox{\hyperlink{finality__status__object_8hpp}{finality\+\_\+status\+\_\+object.\+hpp}}\end{DoxyCompactItemize}

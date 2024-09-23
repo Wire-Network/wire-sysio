@@ -1,0 +1,562 @@
+\doxysection{Native Action Handlers}
+\hypertarget{group__native__action__handlers}{}\label{group__native__action__handlers}\index{Native Action Handlers@{Native Action Handlers}}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{group__native__action__handlers_gaf831ab656e697ba23f2f2a1b73647caf}{sysio\+::chain\+::apply\+\_\+sysio\+\_\+newaccount}} (\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context}{apply\+\_\+context}} \&)
+\item 
+void \mbox{\hyperlink{group__native__action__handlers_gacf5d6409205a5734a97033904741fc29}{sysio\+::chain\+::apply\+\_\+sysio\+\_\+updateauth}} (\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context}{apply\+\_\+context}} \&)
+\item 
+void \mbox{\hyperlink{group__native__action__handlers_ga7066cfd0bf35c67b300950c7282c4634}{sysio\+::chain\+::apply\+\_\+sysio\+\_\+deleteauth}} (\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context}{apply\+\_\+context}} \&)
+\item 
+void \mbox{\hyperlink{group__native__action__handlers_gaf5f965a8dcf8cf77b2cd04415d7bfa7f}{sysio\+::chain\+::apply\+\_\+sysio\+\_\+linkauth}} (\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context}{apply\+\_\+context}} \&)
+\item 
+void \mbox{\hyperlink{group__native__action__handlers_ga4563467ee8a6f7e9005314cd26560c34}{sysio\+::chain\+::apply\+\_\+sysio\+\_\+unlinkauth}} (\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context}{apply\+\_\+context}} \&)
+\item 
+void \mbox{\hyperlink{group__native__action__handlers_ga88394625fa30b19cd99bb0e89cda07dd}{sysio\+::chain\+::apply\+\_\+sysio\+\_\+setcode}} (\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context}{apply\+\_\+context}} \&)
+\item 
+void \mbox{\hyperlink{group__native__action__handlers_gad2aa3b784ec1f87e603f660e185b37ea}{sysio\+::chain\+::apply\+\_\+sysio\+\_\+setabi}} (\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context}{apply\+\_\+context}} \&)
+\item 
+void \mbox{\hyperlink{group__native__action__handlers_ga648d013d055bc0aa995f58f8fe0cb9f2}{sysio\+::chain\+::apply\+\_\+sysio\+\_\+canceldelay}} (\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context}{apply\+\_\+context}} \&)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{group__native__action__handlers_ga648d013d055bc0aa995f58f8fe0cb9f2}\index{Native Action Handlers@{Native Action Handlers}!apply\_sysio\_canceldelay@{apply\_sysio\_canceldelay}}
+\index{apply\_sysio\_canceldelay@{apply\_sysio\_canceldelay}!Native Action Handlers@{Native Action Handlers}}
+\doxysubsubsection{\texorpdfstring{apply\_sysio\_canceldelay()}{apply\_sysio\_canceldelay()}}
+{\footnotesize\ttfamily \label{group__native__action__handlers_ga648d013d055bc0aa995f58f8fe0cb9f2} 
+void sysio\+::chain\+::apply\+\_\+sysio\+\_\+canceldelay (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context}{apply\+\_\+context}} \&}]{context}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sysio__contract_8cpp_source_l00445}{445}} of file \mbox{\hyperlink{sysio__contract_8cpp_source}{sysio\+\_\+contract.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00445\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00446\ \ \ \ \textcolor{keyword}{auto}\ cancel\ =\ \mbox{\hyperlink{structcontext}{context}}.get\_action().data\_as<canceldelay>();}
+\DoxyCodeLine{00447\ \ \ \ \mbox{\hyperlink{structcontext}{context}}.require\_authorization(cancel.canceling\_auth.actor);\ \textcolor{comment}{//\ only\ here\ to\ mark\ the\ single\ authority\ on\ this\ action\ as\ used}}
+\DoxyCodeLine{00448\ }
+\DoxyCodeLine{00449\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ trx\_id\ =\ cancel.trx\_id;}
+\DoxyCodeLine{00450\ }
+\DoxyCodeLine{00451\ \ \ \ \mbox{\hyperlink{structcontext}{context}}.cancel\_deferred\_transaction(\mbox{\hyperlink{namespacesysio_1_1chain_aae2c9fe44a33a7568fb2b6a709112b9f}{transaction\_id\_to\_sender\_id}}(trx\_id),\ \mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\_name}}());}
+\DoxyCodeLine{00452\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=340pt]{group__native__action__handlers_ga648d013d055bc0aa995f58f8fe0cb9f2_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{group__native__action__handlers_ga7066cfd0bf35c67b300950c7282c4634}\index{Native Action Handlers@{Native Action Handlers}!apply\_sysio\_deleteauth@{apply\_sysio\_deleteauth}}
+\index{apply\_sysio\_deleteauth@{apply\_sysio\_deleteauth}!Native Action Handlers@{Native Action Handlers}}
+\doxysubsubsection{\texorpdfstring{apply\_sysio\_deleteauth()}{apply\_sysio\_deleteauth()}}
+{\footnotesize\ttfamily \label{group__native__action__handlers_ga7066cfd0bf35c67b300950c7282c4634} 
+void sysio\+::chain\+::apply\+\_\+sysio\+\_\+deleteauth (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context}{apply\+\_\+context}} \&}]{context}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sysio__contract_8cpp_source_l00326}{326}} of file \mbox{\hyperlink{sysio__contract_8cpp_source}{sysio\+\_\+contract.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00326\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00327\ \textcolor{comment}{//\ \ \ context.require\_write\_lock(\ config::sysio\_auth\_scope\ );}}
+\DoxyCodeLine{00328\ }
+\DoxyCodeLine{00329\ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacefc_a0db76f35dc060918029b16de918b1e84}{remove}}\ =\ \mbox{\hyperlink{structcontext}{context}}.get\_action().data\_as<deleteauth>();}
+\DoxyCodeLine{00330\ \ \ \ \mbox{\hyperlink{structcontext}{context}}.require\_authorization(\mbox{\hyperlink{namespacefc_a0db76f35dc060918029b16de918b1e84}{remove}}.account);\ \textcolor{comment}{//\ only\ here\ to\ mark\ the\ single\ authority\ on\ this\ action\ as\ used}}
+\DoxyCodeLine{00331\ }
+\DoxyCodeLine{00332\ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\mbox{\hyperlink{namespacefc_a0db76f35dc060918029b16de918b1e84}{remove}}.permission\ !=\ config::active\_name,\ action\_validate\_exception,\ \textcolor{stringliteral}{"{}Cannot\ delete\ active\ authority"{}});}
+\DoxyCodeLine{00333\ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\mbox{\hyperlink{namespacefc_a0db76f35dc060918029b16de918b1e84}{remove}}.permission\ !=\ config::owner\_name,\ action\_validate\_exception,\ \textcolor{stringliteral}{"{}Cannot\ delete\ owner\ authority"{}});}
+\DoxyCodeLine{00334\ }
+\DoxyCodeLine{00335\ \ \ \ \textcolor{keyword}{auto}\&\ authorization\ =\ \mbox{\hyperlink{structcontext}{context}}.control.get\_mutable\_authorization\_manager();}
+\DoxyCodeLine{00336\ \ \ \ \textcolor{keyword}{auto}\&\ db\ =\ \mbox{\hyperlink{structcontext}{context}}.db;}
+\DoxyCodeLine{00337\ }
+\DoxyCodeLine{00338\ }
+\DoxyCodeLine{00339\ }
+\DoxyCodeLine{00340\ \ \ \ \{\ \textcolor{comment}{//\ Check\ for\ links\ to\ this\ permission}}
+\DoxyCodeLine{00341\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ index\ =\ db.get\_index<\mbox{\hyperlink{namespacesysio_1_1chain_a255011fa21760c6c73a1187a23d0afd1}{permission\_link\_index}},\ by\_permission\_name>();}
+\DoxyCodeLine{00342\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ range\ =\ index.equal\_range(boost::make\_tuple(\mbox{\hyperlink{namespacefc_a0db76f35dc060918029b16de918b1e84}{remove}}.account,\ \mbox{\hyperlink{namespacefc_a0db76f35dc060918029b16de918b1e84}{remove}}.permission));}
+\DoxyCodeLine{00343\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(range.first\ ==\ range.second,\ action\_validate\_exception,}
+\DoxyCodeLine{00344\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Cannot\ delete\ a\ linked\ authority.\ Unlink\ the\ authority\ first.\ This\ authority\ is\ linked\ to\ \$\{code\}::\$\{type\}."{}},}
+\DoxyCodeLine{00345\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}code"{}},\ range.first-\/>code)(\textcolor{stringliteral}{"{}type"{}},\ range.first-\/>message\_type));}
+\DoxyCodeLine{00346\ \ \ \ \}}
+\DoxyCodeLine{00347\ }
+\DoxyCodeLine{00348\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ permission\ =\ authorization.get\_permission(\{\mbox{\hyperlink{namespacefc_a0db76f35dc060918029b16de918b1e84}{remove}}.account,\ \mbox{\hyperlink{namespacefc_a0db76f35dc060918029b16de918b1e84}{remove}}.permission\});}
+\DoxyCodeLine{00349\ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ old\_size\ =\ config::billable\_size\_v<permission\_object>\ +\ permission.auth.get\_billable\_size();}
+\DoxyCodeLine{00350\ }
+\DoxyCodeLine{00351\ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{auto}\ dm\_logger\ =\ \mbox{\hyperlink{structcontext}{context}}.control.get\_deep\_mind\_logger())\ \{}
+\DoxyCodeLine{00352\ \ \ \ \ \ \ dm\_logger-\/>on\_ram\_trace(\mbox{\hyperlink{deep__mind_8hpp_aaaa2f1dbd522de03ccbaa73f01db5f50}{RAM\_EVENT\_ID}}(\textcolor{stringliteral}{"{}\$\{id\}"{}},\ (\textcolor{stringliteral}{"{}id"{}},\ permission.id)),\ \textcolor{stringliteral}{"{}auth"{}},\ \textcolor{stringliteral}{"{}remove"{}},\ \textcolor{stringliteral}{"{}deleteauth"{}});}
+\DoxyCodeLine{00353\ \ \ \ \}}
+\DoxyCodeLine{00354\ }
+\DoxyCodeLine{00355\ \ \ \ authorization.remove\_permission(\ permission\ );}
+\DoxyCodeLine{00356\ }
+\DoxyCodeLine{00357\ \ \ \ \mbox{\hyperlink{structcontext}{context}}.add\_ram\_usage(\ \mbox{\hyperlink{namespacefc_a0db76f35dc060918029b16de918b1e84}{remove}}.account,\ -\/old\_size\ );}
+\DoxyCodeLine{00358\ }
+\DoxyCodeLine{00359\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{group__native__action__handlers_ga7066cfd0bf35c67b300950c7282c4634_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{group__native__action__handlers_gaf5f965a8dcf8cf77b2cd04415d7bfa7f}\index{Native Action Handlers@{Native Action Handlers}!apply\_sysio\_linkauth@{apply\_sysio\_linkauth}}
+\index{apply\_sysio\_linkauth@{apply\_sysio\_linkauth}!Native Action Handlers@{Native Action Handlers}}
+\doxysubsubsection{\texorpdfstring{apply\_sysio\_linkauth()}{apply\_sysio\_linkauth()}}
+{\footnotesize\ttfamily \label{group__native__action__handlers_gaf5f965a8dcf8cf77b2cd04415d7bfa7f} 
+void sysio\+::chain\+::apply\+\_\+sysio\+\_\+linkauth (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context}{apply\+\_\+context}} \&}]{context}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sysio__contract_8cpp_source_l00361}{361}} of file \mbox{\hyperlink{sysio__contract_8cpp_source}{sysio\+\_\+contract.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00361\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00362\ \textcolor{comment}{//\ \ \ context.require\_write\_lock(\ config::sysio\_auth\_scope\ );}}
+\DoxyCodeLine{00363\ }
+\DoxyCodeLine{00364\ \ \ \ \textcolor{keyword}{auto}\ requirement\ =\ \mbox{\hyperlink{structcontext}{context}}.get\_action().data\_as<linkauth>();}
+\DoxyCodeLine{00365\ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00366\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(!requirement.requirement.empty(),\ action\_validate\_exception,\ \textcolor{stringliteral}{"{}Required\ permission\ cannot\ be\ empty"{}});}
+\DoxyCodeLine{00367\ }
+\DoxyCodeLine{00368\ \ \ \ \ \ \ \mbox{\hyperlink{structcontext}{context}}.require\_authorization(requirement.account);\ \textcolor{comment}{//\ only\ here\ to\ mark\ the\ single\ authority\ on\ this\ action\ as\ used}}
+\DoxyCodeLine{00369\ }
+\DoxyCodeLine{00370\ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ db\ =\ \mbox{\hyperlink{structcontext}{context}}.db;}
+\DoxyCodeLine{00371\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ *account\ =\ db.find<account\_object,\ by\_name>(requirement.account);}
+\DoxyCodeLine{00372\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(account\ !=\ \textcolor{keyword}{nullptr},\ account\_query\_exception,}
+\DoxyCodeLine{00373\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Failed\ to\ retrieve\ account:\ \$\{account\}"{}},\ (\textcolor{stringliteral}{"{}account"{}},\ requirement.account));\ \textcolor{comment}{//\ Redundant?}}
+\DoxyCodeLine{00374\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ *code\ =\ db.find<account\_object,\ by\_name>(requirement.code);}
+\DoxyCodeLine{00375\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(code\ !=\ \textcolor{keyword}{nullptr},\ account\_query\_exception,}
+\DoxyCodeLine{00376\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Failed\ to\ retrieve\ code\ for\ account:\ \$\{account\}"{}},\ (\textcolor{stringliteral}{"{}account"{}},\ requirement.code));}
+\DoxyCodeLine{00377\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ requirement.requirement\ !=\ config::sysio\_any\_name\ )\ \{}
+\DoxyCodeLine{00378\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ permission\_object*\ permission\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00379\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{structcontext}{context}}.control.is\_builtin\_activated(\ builtin\_protocol\_feature\_t::only\_link\_to\_existing\_permission\ )\ )\ \{}
+\DoxyCodeLine{00380\ \ \ \ \ \ \ \ \ \ \ \ \ permission\ =\ db.find<permission\_object,\ by\_owner>(}
+\DoxyCodeLine{00381\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::make\_tuple(\ requirement.account,\ requirement.requirement\ )}
+\DoxyCodeLine{00382\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00383\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00384\ \ \ \ \ \ \ \ \ \ \ \ \ permission\ =\ db.find<permission\_object,\ by\_name>(requirement.requirement);}
+\DoxyCodeLine{00385\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00386\ }
+\DoxyCodeLine{00387\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(permission\ !=\ \textcolor{keyword}{nullptr},\ permission\_query\_exception,}
+\DoxyCodeLine{00388\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Failed\ to\ retrieve\ permission:\ \$\{permission\}"{}},\ (\textcolor{stringliteral}{"{}permission"{}},\ requirement.requirement));}
+\DoxyCodeLine{00389\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00390\ }
+\DoxyCodeLine{00391\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ link\_key\ =\ boost::make\_tuple(requirement.account,\ requirement.code,\ requirement.type);}
+\DoxyCodeLine{00392\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ link\ =\ db.find<permission\_link\_object,\ by\_action\_name>(link\_key);}
+\DoxyCodeLine{00393\ }
+\DoxyCodeLine{00394\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ link\ )\ \{}
+\DoxyCodeLine{00395\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(link-\/>required\_permission\ !=\ requirement.requirement,\ action\_validate\_exception,}
+\DoxyCodeLine{00396\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Attempting\ to\ update\ required\ authority,\ but\ new\ requirement\ is\ same\ as\ old"{}});}
+\DoxyCodeLine{00397\ \ \ \ \ \ \ \ \ \ db.modify(*link,\ [requirement\ =\ requirement.requirement](permission\_link\_object\&\ link)\ \{}
+\DoxyCodeLine{00398\ \ \ \ \ \ \ \ \ \ \ \ \ \ link.required\_permission\ =\ requirement;}
+\DoxyCodeLine{00399\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00400\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00401\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}\ =\ \ db.create<permission\_link\_object>([\&requirement](permission\_link\_object\&\ link)\ \{}
+\DoxyCodeLine{00402\ \ \ \ \ \ \ \ \ \ \ \ \ link.account\ =\ requirement.account;}
+\DoxyCodeLine{00403\ \ \ \ \ \ \ \ \ \ \ \ \ link.code\ =\ requirement.code;}
+\DoxyCodeLine{00404\ \ \ \ \ \ \ \ \ \ \ \ \ link.message\_type\ =\ requirement.type;}
+\DoxyCodeLine{00405\ \ \ \ \ \ \ \ \ \ \ \ \ link.required\_permission\ =\ requirement.requirement;}
+\DoxyCodeLine{00406\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00407\ }
+\DoxyCodeLine{00408\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{auto}\ dm\_logger\ =\ \mbox{\hyperlink{structcontext}{context}}.control.get\_deep\_mind\_logger())\ \{}
+\DoxyCodeLine{00409\ \ \ \ \ \ \ \ \ \ \ \ \ dm\_logger-\/>on\_ram\_trace(\mbox{\hyperlink{deep__mind_8hpp_aaaa2f1dbd522de03ccbaa73f01db5f50}{RAM\_EVENT\_ID}}(\textcolor{stringliteral}{"{}\$\{id\}"{}},\ (\textcolor{stringliteral}{"{}id"{}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}.id)),\ \textcolor{stringliteral}{"{}auth\_link"{}},\ \textcolor{stringliteral}{"{}add"{}},\ \textcolor{stringliteral}{"{}linkauth"{}});}
+\DoxyCodeLine{00410\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00411\ }
+\DoxyCodeLine{00412\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structcontext}{context}}.add\_ram\_usage(}
+\DoxyCodeLine{00413\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}.account,}
+\DoxyCodeLine{00414\ \ \ \ \ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}})(config::billable\_size\_v<permission\_link\_object>)}
+\DoxyCodeLine{00415\ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00416\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00417\ }
+\DoxyCodeLine{00418\ \ \ \}\ \mbox{\hyperlink{exception_8hpp_a094902280cad82ad6529ebbd12a697eb}{FC\_CAPTURE\_AND\_RETHROW}}((requirement))}
+\DoxyCodeLine{00419\ \}}
+
+\end{DoxyCode}
+\Hypertarget{group__native__action__handlers_gaf831ab656e697ba23f2f2a1b73647caf}\index{Native Action Handlers@{Native Action Handlers}!apply\_sysio\_newaccount@{apply\_sysio\_newaccount}}
+\index{apply\_sysio\_newaccount@{apply\_sysio\_newaccount}!Native Action Handlers@{Native Action Handlers}}
+\doxysubsubsection{\texorpdfstring{apply\_sysio\_newaccount()}{apply\_sysio\_newaccount()}}
+{\footnotesize\ttfamily \label{group__native__action__handlers_gaf831ab656e697ba23f2f2a1b73647caf} 
+void sysio\+::chain\+::apply\+\_\+sysio\+\_\+newaccount (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context}{apply\+\_\+context}} \&}]{context}{}\end{DoxyParamCaption})}
+
+This method is called assuming precondition\+\_\+system\+\_\+newaccount succeeds a 
+
+Definition at line \mbox{\hyperlink{sysio__contract_8cpp_source_l00067}{67}} of file \mbox{\hyperlink{sysio__contract_8cpp_source}{sysio\+\_\+contract.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00068\ \ \ \ \textcolor{keyword}{auto}\ create\ =\ \mbox{\hyperlink{structcontext}{context}}.get\_action().data\_as<newaccount>();}
+\DoxyCodeLine{00069\ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00070\ \ \ \ \mbox{\hyperlink{structcontext}{context}}.require\_authorization(create.creator);}
+\DoxyCodeLine{00071\ \textcolor{comment}{//\ \ \ context.require\_write\_lock(\ config::sysio\_auth\_scope\ );}}
+\DoxyCodeLine{00072\ \ \ \ \textcolor{keyword}{auto}\&\ authorization\ =\ \mbox{\hyperlink{structcontext}{context}}.control.get\_mutable\_authorization\_manager();}
+\DoxyCodeLine{00073\ }
+\DoxyCodeLine{00074\ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ \mbox{\hyperlink{debug__server_8cpp_a76b106c484654b62313da8bace255c9a}{validate}}(create.owner),\ action\_validate\_exception,\ \textcolor{stringliteral}{"{}Invalid\ owner\ authority"{}});}
+\DoxyCodeLine{00075\ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ \mbox{\hyperlink{debug__server_8cpp_a76b106c484654b62313da8bace255c9a}{validate}}(create.active),\ action\_validate\_exception,\ \textcolor{stringliteral}{"{}Invalid\ active\ authority"{}});}
+\DoxyCodeLine{00076\ }
+\DoxyCodeLine{00077\ \ \ \ \textcolor{keyword}{auto}\&\ db\ =\ \mbox{\hyperlink{structcontext}{context}}.db;}
+\DoxyCodeLine{00078\ }
+\DoxyCodeLine{00079\ \ \ \ \textcolor{keyword}{auto}\ name\_str\ =\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(create.name).to\_string();}
+\DoxyCodeLine{00080\ }
+\DoxyCodeLine{00081\ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ !create.name.empty(),\ action\_validate\_exception,\ \textcolor{stringliteral}{"{}account\ name\ cannot\ be\ empty"{}}\ );}
+\DoxyCodeLine{00082\ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ name\_str.size()\ <=\ 12,\ action\_validate\_exception,\ \textcolor{stringliteral}{"{}account\ names\ can\ only\ be\ 12\ chars\ long"{}}\ );}
+\DoxyCodeLine{00083\ }
+\DoxyCodeLine{00084\ \ \ \ \textcolor{comment}{//\ Check\ if\ the\ creator\ is\ privileged}}
+\DoxyCodeLine{00085\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ \&creator\ =\ db.get<account\_metadata\_object,\ by\_name>(create.creator);}
+\DoxyCodeLine{00086\ \ \ \ \textcolor{keywordflow}{if}(\ !creator.is\_privileged()\ )\ \{}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ name\_str.find(\ \textcolor{stringliteral}{"{}sysio."{}}\ )\ !=\ 0,\ action\_validate\_exception,}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}only\ privileged\ accounts\ can\ have\ names\ that\ start\ with\ 'sysio.'"{}}\ );}
+\DoxyCodeLine{00089\ \ \ \ \}}
+\DoxyCodeLine{00090\ }
+\DoxyCodeLine{00091\ \ \ \ \textcolor{keyword}{auto}\ existing\_account\ =\ db.find<account\_object,\ by\_name>(create.name);}
+\DoxyCodeLine{00092\ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(existing\_account\ ==\ \textcolor{keyword}{nullptr},\ account\_name\_exists\_exception,}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Cannot\ create\ account\ named\ \$\{name\},\ as\ that\ name\ is\ already\ taken"{}},}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}name"{}},\ create.name));}
+\DoxyCodeLine{00095\ }
+\DoxyCodeLine{00096\ \ \ \ db.create<account\_object>([\&](\textcolor{keyword}{auto}\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})\ \{}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.name\ =\ create.name;}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.creation\_date\ =\ \mbox{\hyperlink{structcontext}{context}}.control.pending\_block\_time();}
+\DoxyCodeLine{00099\ \ \ \ \});}
+\DoxyCodeLine{00100\ }
+\DoxyCodeLine{00101\ \ \ \ db.create<account\_metadata\_object>([\&](\textcolor{keyword}{auto}\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})\ \{}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.name\ =\ create.name;}
+\DoxyCodeLine{00103\ \ \ \ \});}
+\DoxyCodeLine{00104\ }
+\DoxyCodeLine{00105\ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ auth\ :\ \{\ create.owner,\ create.active\ \}\ )\{}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_a93ca7c3e741b9e1bc359493f5eb06641}{validate\_authority\_precondition}}(\ \mbox{\hyperlink{structcontext}{context}},\ auth\ );}
+\DoxyCodeLine{00107\ \ \ \ \}}
+\DoxyCodeLine{00108\ }
+\DoxyCodeLine{00109\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ owner\_permission\ \ =\ authorization.create\_permission(\ create.name,\ config::owner\_name,\ 0,}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::move(create.owner)\ );}
+\DoxyCodeLine{00111\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ active\_permission\ =\ authorization.create\_permission(\ create.name,\ config::active\_name,\ owner\_permission.id,}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::move(create.active)\ );}
+\DoxyCodeLine{00113\ }
+\DoxyCodeLine{00114\ \ \ \ \mbox{\hyperlink{structcontext}{context}}.control.get\_mutable\_resource\_limits\_manager().initialize\_account(create.name);}
+\DoxyCodeLine{00115\ }
+\DoxyCodeLine{00116\ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ ram\_delta\ =\ config::overhead\_per\_account\_ram\_bytes;}
+\DoxyCodeLine{00117\ \ \ \ ram\_delta\ +=\ 2*config::billable\_size\_v<permission\_object>;}
+\DoxyCodeLine{00118\ \ \ \ ram\_delta\ +=\ owner\_permission.auth.get\_billable\_size();}
+\DoxyCodeLine{00119\ \ \ \ ram\_delta\ +=\ active\_permission.auth.get\_billable\_size();}
+\DoxyCodeLine{00120\ }
+\DoxyCodeLine{00121\ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{auto}\ dm\_logger\ =\ \mbox{\hyperlink{structcontext}{context}}.control.get\_deep\_mind\_logger())\ \{}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ dm\_logger-\/>on\_ram\_trace(\mbox{\hyperlink{deep__mind_8hpp_aaaa2f1dbd522de03ccbaa73f01db5f50}{RAM\_EVENT\_ID}}(\textcolor{stringliteral}{"{}\$\{name\}"{}},\ (\textcolor{stringliteral}{"{}name"{}},\ create.name)),\ \textcolor{stringliteral}{"{}account"{}},\ \textcolor{stringliteral}{"{}add"{}},\ \textcolor{stringliteral}{"{}newaccount"{}});}
+\DoxyCodeLine{00123\ \ \ \ \}}
+\DoxyCodeLine{00124\ }
+\DoxyCodeLine{00125\ \ \ \ \mbox{\hyperlink{structcontext}{context}}.add\_ram\_usage(create.name,\ ram\_delta);}
+\DoxyCodeLine{00126\ }
+\DoxyCodeLine{00127\ \}\ \mbox{\hyperlink{exception_8hpp_a094902280cad82ad6529ebbd12a697eb}{FC\_CAPTURE\_AND\_RETHROW}}(\ (create)\ )\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=335pt]{group__native__action__handlers_gaf831ab656e697ba23f2f2a1b73647caf_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{group__native__action__handlers_gad2aa3b784ec1f87e603f660e185b37ea}\index{Native Action Handlers@{Native Action Handlers}!apply\_sysio\_setabi@{apply\_sysio\_setabi}}
+\index{apply\_sysio\_setabi@{apply\_sysio\_setabi}!Native Action Handlers@{Native Action Handlers}}
+\doxysubsubsection{\texorpdfstring{apply\_sysio\_setabi()}{apply\_sysio\_setabi()}}
+{\footnotesize\ttfamily \label{group__native__action__handlers_gad2aa3b784ec1f87e603f660e185b37ea} 
+void sysio\+::chain\+::apply\+\_\+sysio\+\_\+setabi (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context}{apply\+\_\+context}} \&}]{context}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sysio__contract_8cpp_source_l00212}{212}} of file \mbox{\hyperlink{sysio__contract_8cpp_source}{sysio\+\_\+contract.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00213\ \ \ \ \textcolor{keyword}{auto}\&\ db\ \ =\ \mbox{\hyperlink{structcontext}{context}}.db;}
+\DoxyCodeLine{00214\ \ \ \ \textcolor{keyword}{auto}\ \ act\ =\ \mbox{\hyperlink{structcontext}{context}}.get\_action().data\_as<setabi>();}
+\DoxyCodeLine{00215\ }
+\DoxyCodeLine{00216\ \ \ \ \mbox{\hyperlink{structcontext}{context}}.require\_authorization(act.account);}
+\DoxyCodeLine{00217\ }
+\DoxyCodeLine{00218\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ account\ =\ db.get<account\_object,by\_name>(act.account);}
+\DoxyCodeLine{00219\ }
+\DoxyCodeLine{00220\ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ abi\_size\ =\ act.abi.size();}
+\DoxyCodeLine{00221\ }
+\DoxyCodeLine{00222\ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ old\_size\ =\ (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}})account.abi.size();}
+\DoxyCodeLine{00223\ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ new\_size\ =\ abi\_size;}
+\DoxyCodeLine{00224\ }
+\DoxyCodeLine{00225\ \ \ \ db.modify(\ account,\ [\&](\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ )\ \{}
+\DoxyCodeLine{00226\ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.abi.assign(act.abi.data(),\ abi\_size);}
+\DoxyCodeLine{00227\ \ \ \ \});}
+\DoxyCodeLine{00228\ }
+\DoxyCodeLine{00229\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ account\_metadata\ =\ db.get<account\_metadata\_object,\ by\_name>(act.account);}
+\DoxyCodeLine{00230\ \ \ \ db.modify(\ account\_metadata,\ [\&](\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ )\ \{}
+\DoxyCodeLine{00231\ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.abi\_sequence\ +=\ 1;}
+\DoxyCodeLine{00232\ \ \ \ \});}
+\DoxyCodeLine{00233\ }
+\DoxyCodeLine{00234\ \ \ \ \textcolor{keywordflow}{if}\ (new\_size\ !=\ old\_size)\ \{}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{auto}\ dm\_logger\ =\ \mbox{\hyperlink{structcontext}{context}}.control.get\_deep\_mind\_logger())\ \{}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ operation\ =\ \textcolor{stringliteral}{"{}update"{}};}
+\DoxyCodeLine{00237\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (old\_size\ <=\ 0)\ \{}
+\DoxyCodeLine{00238\ \ \ \ \ \ \ \ \ \ \ \ \ operation\ =\ \textcolor{stringliteral}{"{}add"{}};}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (new\_size\ <=\ 0)\ \{}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \ \ \ \ \ \ operation\ =\ \textcolor{stringliteral}{"{}remove"{}};}
+\DoxyCodeLine{00241\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00242\ }
+\DoxyCodeLine{00243\ \ \ \ \ \ \ \ \ \ dm\_logger-\/>on\_ram\_trace(\mbox{\hyperlink{deep__mind_8hpp_aaaa2f1dbd522de03ccbaa73f01db5f50}{RAM\_EVENT\_ID}}(\textcolor{stringliteral}{"{}\$\{account\}"{}},\ (\textcolor{stringliteral}{"{}account"{}},\ act.account)),\ \textcolor{stringliteral}{"{}abi"{}},\ operation,\ \textcolor{stringliteral}{"{}setabi"{}});}
+\DoxyCodeLine{00244\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00245\ }
+\DoxyCodeLine{00246\ \ \ \ \ \ \ \mbox{\hyperlink{structcontext}{context}}.add\_ram\_usage(\ act.account,\ new\_size\ -\/\ old\_size\ );}
+\DoxyCodeLine{00247\ \ \ \ \}}
+\DoxyCodeLine{00248\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=333pt]{group__native__action__handlers_gad2aa3b784ec1f87e603f660e185b37ea_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{group__native__action__handlers_ga88394625fa30b19cd99bb0e89cda07dd}\index{Native Action Handlers@{Native Action Handlers}!apply\_sysio\_setcode@{apply\_sysio\_setcode}}
+\index{apply\_sysio\_setcode@{apply\_sysio\_setcode}!Native Action Handlers@{Native Action Handlers}}
+\doxysubsubsection{\texorpdfstring{apply\_sysio\_setcode()}{apply\_sysio\_setcode()}}
+{\footnotesize\ttfamily \label{group__native__action__handlers_ga88394625fa30b19cd99bb0e89cda07dd} 
+void sysio\+::chain\+::apply\+\_\+sysio\+\_\+setcode (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context}{apply\+\_\+context}} \&}]{context}{}\end{DoxyParamCaption})}
+
+default is the all zeros hash
+
+default is the all zeros hash
+
+Definition at line \mbox{\hyperlink{sysio__contract_8cpp_source_l00129}{129}} of file \mbox{\hyperlink{sysio__contract_8cpp_source}{sysio\+\_\+contract.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00130\ \ \ \ \textcolor{keyword}{auto}\&\ db\ =\ \mbox{\hyperlink{structcontext}{context}}.db;}
+\DoxyCodeLine{00131\ \ \ \ \textcolor{keyword}{auto}\ \ act\ =\ \mbox{\hyperlink{structcontext}{context}}.get\_action().data\_as<setcode>();}
+\DoxyCodeLine{00132\ \ \ \ \mbox{\hyperlink{structcontext}{context}}.require\_authorization(act.account);}
+\DoxyCodeLine{00133\ }
+\DoxyCodeLine{00134\ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ act.vmtype\ ==\ 0,\ invalid\_contract\_vm\_type,\ \textcolor{stringliteral}{"{}code\ should\ be\ 0"{}}\ );}
+\DoxyCodeLine{00135\ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ act.vmversion\ ==\ 0,\ invalid\_contract\_vm\_version,\ \textcolor{stringliteral}{"{}version\ should\ be\ 0"{}}\ );}
+\DoxyCodeLine{00136\ }
+\DoxyCodeLine{00137\ \ \ \ \mbox{\hyperlink{classfc_1_1sha256}{fc::sha256}}\ code\_hash;\ }
+\DoxyCodeLine{00138\ }
+\DoxyCodeLine{00139\ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ code\_size\ =\ (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}})act.code.size();}
+\DoxyCodeLine{00140\ }
+\DoxyCodeLine{00141\ \ \ \ \textcolor{keywordflow}{if}(\ code\_size\ >\ 0\ )\ \{}
+\DoxyCodeLine{00142\ \ \ \ \ \ code\_hash\ =\ \mbox{\hyperlink{classfc_1_1sha256_a474784de7d6213b855abd7e952df5e36}{fc::sha256::hash}}(\ act.code.data(),\ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})act.code.size()\ );}
+\DoxyCodeLine{00143\ \ \ \ \ \ wasm\_interface::validate(\mbox{\hyperlink{structcontext}{context}}.control,\ act.code);}
+\DoxyCodeLine{00144\ \ \ \ \}}
+\DoxyCodeLine{00145\ }
+\DoxyCodeLine{00146\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ account\ =\ db.get<account\_metadata\_object,by\_name>(act.account);}
+\DoxyCodeLine{00147\ \ \ \ \textcolor{keywordtype}{bool}\ existing\_code\ =\ (account.code\_hash\ !=\ \mbox{\hyperlink{namespacesysio_1_1chain_a357fd9478475457e5bb386a3143079b6}{digest\_type}}());}
+\DoxyCodeLine{00148\ }
+\DoxyCodeLine{00149\ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ code\_size\ >\ 0\ ||\ existing\_code,\ set\_exact\_code,\ \textcolor{stringliteral}{"{}contract\ is\ already\ cleared"{}}\ );}
+\DoxyCodeLine{00150\ }
+\DoxyCodeLine{00151\ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ old\_size\ \ =\ 0;}
+\DoxyCodeLine{00152\ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ new\_size\ \ =\ code\_size\ *\ config::setcode\_ram\_bytes\_multiplier;}
+\DoxyCodeLine{00153\ }
+\DoxyCodeLine{00154\ \ \ \ \textcolor{keywordflow}{if}(\ existing\_code\ )\ \{}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \textcolor{keyword}{const}\ code\_object\&\ old\_code\_entry\ =\ db.get<code\_object,\ by\_code\_hash>(boost::make\_tuple(account.code\_hash,\ account.vm\_type,\ account.vm\_version));}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ old\_code\_entry.code\_hash\ !=\ code\_hash,\ set\_exact\_code,}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}contract\ is\ already\ running\ this\ version\ of\ code"{}}\ );}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ old\_size\ \ =\ (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}})old\_code\_entry.code.size()\ *\ config::setcode\_ram\_bytes\_multiplier;}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ old\_code\_entry.code\_ref\_count\ ==\ 1\ )\ \{}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \ db.remove(old\_code\_entry);}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structcontext}{context}}.control.get\_wasm\_interface().code\_block\_num\_last\_used(account.code\_hash,\ account.vm\_type,\ account.vm\_version,\ \mbox{\hyperlink{structcontext}{context}}.control.head\_block\_num()\ +\ 1);}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \ db.modify(old\_code\_entry,\ [](code\_object\&\ o)\ \{}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ \ \ \ \ -\/-\/o.code\_ref\_count;}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00167\ \ \ \ \}}
+\DoxyCodeLine{00168\ }
+\DoxyCodeLine{00169\ \ \ \ \textcolor{keywordflow}{if}(\ code\_size\ >\ 0\ )\ \{}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \textcolor{keyword}{const}\ code\_object*\ new\_code\_entry\ =\ db.find<code\_object,\ by\_code\_hash>(}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::make\_tuple(code\_hash,\ act.vmtype,\ act.vmversion)\ );}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ new\_code\_entry\ )\ \{}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ \ db.modify(*new\_code\_entry,\ [\&](code\_object\&\ o)\ \{}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ \ \ \ \ ++o.code\_ref\_count;}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \ db.create<code\_object>([\&](code\_object\&\ o)\ \{}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \ \ \ \ o.code\_hash\ =\ code\_hash;}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \ \ \ \ o.code.assign(act.code.data(),\ code\_size);}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \ \ \ \ o.code\_ref\_count\ =\ 1;}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ \ \ \ \ o.first\_block\_used\ =\ \mbox{\hyperlink{structcontext}{context}}.control.head\_block\_num()\ +\ 1;}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \ \ \ \ o.vm\_type\ =\ act.vmtype;}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \ \ \ \ \ \ o.vm\_version\ =\ act.vmversion;}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00186\ \ \ \ \}}
+\DoxyCodeLine{00187\ }
+\DoxyCodeLine{00188\ \ \ \ db.modify(\ account,\ [\&](\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ )\ \{}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.code\_sequence\ +=\ 1;}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.code\_hash\ =\ code\_hash;}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.vm\_type\ =\ act.vmtype;}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.vm\_version\ =\ act.vmversion;}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.last\_code\_update\ =\ \mbox{\hyperlink{structcontext}{context}}.control.pending\_block\_time();}
+\DoxyCodeLine{00194\ \ \ \ \});}
+\DoxyCodeLine{00195\ }
+\DoxyCodeLine{00196\ \ \ \ \textcolor{keywordflow}{if}\ (new\_size\ !=\ old\_size)\ \{}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{auto}\ dm\_logger\ =\ \mbox{\hyperlink{structcontext}{context}}.control.get\_deep\_mind\_logger())\ \{}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ operation\ =\ \textcolor{stringliteral}{"{}update"{}};}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (old\_size\ <=\ 0)\ \{}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \ \ \ \ operation\ =\ \textcolor{stringliteral}{"{}add"{}};}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (new\_size\ <=\ 0)\ \{}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \ \ \ \ \ \ operation\ =\ \textcolor{stringliteral}{"{}remove"{}};}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00204\ }
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ \ dm\_logger-\/>on\_ram\_trace(\mbox{\hyperlink{deep__mind_8hpp_aaaa2f1dbd522de03ccbaa73f01db5f50}{RAM\_EVENT\_ID}}(\textcolor{stringliteral}{"{}\$\{account\}"{}},\ (\textcolor{stringliteral}{"{}account"{}},\ act.account)),\ \textcolor{stringliteral}{"{}code"{}},\ operation,\ \textcolor{stringliteral}{"{}setcode"{}});}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00207\ }
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \mbox{\hyperlink{structcontext}{context}}.add\_ram\_usage(\ act.account,\ new\_size\ -\/\ old\_size\ );}
+\DoxyCodeLine{00209\ \ \ \ \}}
+\DoxyCodeLine{00210\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{group__native__action__handlers_ga88394625fa30b19cd99bb0e89cda07dd_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{group__native__action__handlers_ga4563467ee8a6f7e9005314cd26560c34}\index{Native Action Handlers@{Native Action Handlers}!apply\_sysio\_unlinkauth@{apply\_sysio\_unlinkauth}}
+\index{apply\_sysio\_unlinkauth@{apply\_sysio\_unlinkauth}!Native Action Handlers@{Native Action Handlers}}
+\doxysubsubsection{\texorpdfstring{apply\_sysio\_unlinkauth()}{apply\_sysio\_unlinkauth()}}
+{\footnotesize\ttfamily \label{group__native__action__handlers_ga4563467ee8a6f7e9005314cd26560c34} 
+void sysio\+::chain\+::apply\+\_\+sysio\+\_\+unlinkauth (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context}{apply\+\_\+context}} \&}]{context}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sysio__contract_8cpp_source_l00421}{421}} of file \mbox{\hyperlink{sysio__contract_8cpp_source}{sysio\+\_\+contract.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00421\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00422\ \textcolor{comment}{//\ \ \ context.require\_write\_lock(\ config::sysio\_auth\_scope\ );}}
+\DoxyCodeLine{00423\ }
+\DoxyCodeLine{00424\ \ \ \ \textcolor{keyword}{auto}\&\ db\ =\ \mbox{\hyperlink{structcontext}{context}}.db;}
+\DoxyCodeLine{00425\ \ \ \ \textcolor{keyword}{auto}\ unlink\ =\ \mbox{\hyperlink{structcontext}{context}}.get\_action().data\_as<unlinkauth>();}
+\DoxyCodeLine{00426\ }
+\DoxyCodeLine{00427\ \ \ \ \mbox{\hyperlink{structcontext}{context}}.require\_authorization(unlink.account);\ \textcolor{comment}{//\ only\ here\ to\ mark\ the\ single\ authority\ on\ this\ action\ as\ used}}
+\DoxyCodeLine{00428\ }
+\DoxyCodeLine{00429\ \ \ \ \textcolor{keyword}{auto}\ link\_key\ =\ boost::make\_tuple(unlink.account,\ unlink.code,\ unlink.type);}
+\DoxyCodeLine{00430\ \ \ \ \textcolor{keyword}{auto}\ link\ =\ db.find<permission\_link\_object,\ by\_action\_name>(link\_key);}
+\DoxyCodeLine{00431\ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(link\ !=\ \textcolor{keyword}{nullptr},\ action\_validate\_exception,\ \textcolor{stringliteral}{"{}Attempting\ to\ unlink\ authority,\ but\ no\ link\ found"{}});}
+\DoxyCodeLine{00432\ }
+\DoxyCodeLine{00433\ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{auto}\ dm\_logger\ =\ \mbox{\hyperlink{structcontext}{context}}.control.get\_deep\_mind\_logger())\ \{}
+\DoxyCodeLine{00434\ \ \ \ \ \ \ dm\_logger-\/>on\_ram\_trace(\mbox{\hyperlink{deep__mind_8hpp_aaaa2f1dbd522de03ccbaa73f01db5f50}{RAM\_EVENT\_ID}}(\textcolor{stringliteral}{"{}\$\{id\}"{}},\ (\textcolor{stringliteral}{"{}id"{}},\ link-\/>id)),\ \textcolor{stringliteral}{"{}auth\_link"{}},\ \textcolor{stringliteral}{"{}remove"{}},\ \textcolor{stringliteral}{"{}unlinkauth"{}});}
+\DoxyCodeLine{00435\ \ \ \ \}}
+\DoxyCodeLine{00436\ }
+\DoxyCodeLine{00437\ \ \ \ \mbox{\hyperlink{structcontext}{context}}.add\_ram\_usage(}
+\DoxyCodeLine{00438\ \ \ \ \ \ \ link-\/>account,}
+\DoxyCodeLine{00439\ \ \ \ \ \ \ -\/(\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}})(config::billable\_size\_v<permission\_link\_object>)}
+\DoxyCodeLine{00440\ \ \ \ );}
+\DoxyCodeLine{00441\ }
+\DoxyCodeLine{00442\ \ \ \ db.remove(*link);}
+\DoxyCodeLine{00443\ \}}
+
+\end{DoxyCode}
+\Hypertarget{group__native__action__handlers_gacf5d6409205a5734a97033904741fc29}\index{Native Action Handlers@{Native Action Handlers}!apply\_sysio\_updateauth@{apply\_sysio\_updateauth}}
+\index{apply\_sysio\_updateauth@{apply\_sysio\_updateauth}!Native Action Handlers@{Native Action Handlers}}
+\doxysubsubsection{\texorpdfstring{apply\_sysio\_updateauth()}{apply\_sysio\_updateauth()}}
+{\footnotesize\ttfamily \label{group__native__action__handlers_gacf5d6409205a5734a97033904741fc29} 
+void sysio\+::chain\+::apply\+\_\+sysio\+\_\+updateauth (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context}{apply\+\_\+context}} \&}]{context}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sysio__contract_8cpp_source_l00250}{250}} of file \mbox{\hyperlink{sysio__contract_8cpp_source}{sysio\+\_\+contract.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00250\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00251\ }
+\DoxyCodeLine{00252\ \ \ \ \textcolor{keyword}{auto}\ update\ =\ \mbox{\hyperlink{structcontext}{context}}.get\_action().data\_as<updateauth>();}
+\DoxyCodeLine{00253\ }
+\DoxyCodeLine{00254\ \ \ \ \ \ \ \textcolor{comment}{//\ **\ NEW\ ADDED\ IF\ STATEMENT\ **}}
+\DoxyCodeLine{00255\ \ \ \ \textcolor{keywordflow}{if}(\ update.permission\ !=\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(\textcolor{stringliteral}{"{}auth.ext"{}})\ \&\&\ update.permission\ !=\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(\textcolor{stringliteral}{"{}auth.session"{}})\ )\ \{}
+\DoxyCodeLine{00256\ \ \ \ \ \ \ \mbox{\hyperlink{structcontext}{context}}.require\_authorization(update.account);\ \textcolor{comment}{//\ only\ here\ to\ mark\ the\ single\ authority\ on\ this\ action\ as\ used}}
+\DoxyCodeLine{00257\ \ \ \ \}}
+\DoxyCodeLine{00258\ }
+\DoxyCodeLine{00259\ \ \ \ \textcolor{keyword}{auto}\&\ authorization\ =\ \mbox{\hyperlink{structcontext}{context}}.control.get\_mutable\_authorization\_manager();}
+\DoxyCodeLine{00260\ \ \ \ \textcolor{keyword}{auto}\&\ db\ =\ \mbox{\hyperlink{structcontext}{context}}.db;}
+\DoxyCodeLine{00261\ }
+\DoxyCodeLine{00262\ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(!update.permission.empty(),\ action\_validate\_exception,\ \textcolor{stringliteral}{"{}Cannot\ create\ authority\ with\ empty\ name"{}});}
+\DoxyCodeLine{00263\ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ update.permission.to\_string().find(\ \textcolor{stringliteral}{"{}sysio."{}}\ )\ !=\ 0,\ action\_validate\_exception,}
+\DoxyCodeLine{00264\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Permission\ names\ that\ start\ with\ 'sysio.'\ are\ reserved"{}}\ );}
+\DoxyCodeLine{00265\ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(update.permission\ !=\ update.parent,\ action\_validate\_exception,\ \textcolor{stringliteral}{"{}Cannot\ set\ an\ authority\ as\ its\ own\ parent"{}});}
+\DoxyCodeLine{00266\ \ \ \ db.get<account\_object,\ by\_name>(update.account);}
+\DoxyCodeLine{00267\ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\mbox{\hyperlink{debug__server_8cpp_a76b106c484654b62313da8bace255c9a}{validate}}(update.auth),\ action\_validate\_exception,}
+\DoxyCodeLine{00268\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Invalid\ authority:\ \$\{auth\}"{}},\ (\textcolor{stringliteral}{"{}auth"{}},\ update.auth));}
+\DoxyCodeLine{00269\ \ \ \ \textcolor{keywordflow}{if}(\ update.permission\ ==\ config::active\_name\ )}
+\DoxyCodeLine{00270\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(update.parent\ ==\ config::owner\_name,\ action\_validate\_exception,\ \textcolor{stringliteral}{"{}Cannot\ change\ active\ authority's\ parent\ from\ owner"{}},\ (\textcolor{stringliteral}{"{}update.parent"{}},\ update.parent)\ );}
+\DoxyCodeLine{00271\ \ \ \ \textcolor{keywordflow}{if}\ (update.permission\ ==\ config::owner\_name)}
+\DoxyCodeLine{00272\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(update.parent.empty(),\ action\_validate\_exception,\ \textcolor{stringliteral}{"{}Cannot\ change\ owner\ authority's\ parent"{}});}
+\DoxyCodeLine{00273\ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00274\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(!update.parent.empty(),\ action\_validate\_exception,\ \textcolor{stringliteral}{"{}Only\ owner\ permission\ can\ have\ empty\ parent"{}}\ );}
+\DoxyCodeLine{00275\ }
+\DoxyCodeLine{00276\ \ \ \ \textcolor{keywordflow}{if}(\ update.auth.waits.size()\ >\ 0\ )\ \{}
+\DoxyCodeLine{00277\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ max\_delay\ =\ \mbox{\hyperlink{structcontext}{context}}.control.get\_global\_properties().configuration.max\_transaction\_delay;}
+\DoxyCodeLine{00278\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ update.auth.waits.back().wait\_sec\ <=\ max\_delay,\ action\_validate\_exception,}
+\DoxyCodeLine{00279\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Cannot\ set\ delay\ longer\ than\ max\_transacton\_delay,\ which\ is\ \$\{max\_delay\}\ seconds"{}},}
+\DoxyCodeLine{00280\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}max\_delay"{}},\ max\_delay)\ );}
+\DoxyCodeLine{00281\ \ \ \ \}}
+\DoxyCodeLine{00282\ }
+\DoxyCodeLine{00283\ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_a93ca7c3e741b9e1bc359493f5eb06641}{validate\_authority\_precondition}}(\mbox{\hyperlink{structcontext}{context}},\ update.auth);}
+\DoxyCodeLine{00284\ }
+\DoxyCodeLine{00285\ }
+\DoxyCodeLine{00286\ }
+\DoxyCodeLine{00287\ \ \ \ \textcolor{keyword}{auto}\ permission\ =\ authorization.find\_permission(\{update.account,\ update.permission\});}
+\DoxyCodeLine{00288\ }
+\DoxyCodeLine{00289\ \ \ \ \textcolor{comment}{//\ If\ a\ parent\_id\ of\ 0\ is\ going\ to\ be\ used\ to\ indicate\ the\ absence\ of\ a\ parent,\ then\ we\ need\ to\ make\ sure\ that\ the\ chain}}
+\DoxyCodeLine{00290\ \ \ \ \textcolor{comment}{//\ initializes\ permission\_index\ with\ a\ dummy\ object\ that\ reserves\ the\ id\ of\ 0.}}
+\DoxyCodeLine{00291\ \ \ \ authorization\_manager::permission\_id\_type\ parent\_id\ =\ 0;}
+\DoxyCodeLine{00292\ \ \ \ \textcolor{keywordflow}{if}(\ update.permission\ !=\ config::owner\_name\ )\ \{}
+\DoxyCodeLine{00293\ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ parent\ =\ authorization.get\_permission(\{update.account,\ update.parent\});}
+\DoxyCodeLine{00294\ \ \ \ \ \ \ parent\_id\ =\ parent.id;}
+\DoxyCodeLine{00295\ \ \ \ \}}
+\DoxyCodeLine{00296\ }
+\DoxyCodeLine{00297\ \ \ \ \textcolor{keywordflow}{if}(\ permission\ )\ \{}
+\DoxyCodeLine{00298\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(parent\_id\ ==\ permission-\/>parent,\ action\_validate\_exception,}
+\DoxyCodeLine{00299\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Changing\ parent\ authority\ is\ not\ currently\ supported"{}});}
+\DoxyCodeLine{00300\ }
+\DoxyCodeLine{00301\ }
+\DoxyCodeLine{00302\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ old\_size\ =\ (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}})(config::billable\_size\_v<permission\_object>\ +\ permission-\/>auth.get\_billable\_size());}
+\DoxyCodeLine{00303\ }
+\DoxyCodeLine{00304\ \ \ \ \ \ \ authorization.modify\_permission(\ *permission,\ update.auth\ );}
+\DoxyCodeLine{00305\ }
+\DoxyCodeLine{00306\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ new\_size\ =\ (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}})(config::billable\_size\_v<permission\_object>\ +\ permission-\/>auth.get\_billable\_size());}
+\DoxyCodeLine{00307\ }
+\DoxyCodeLine{00308\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{auto}\ dm\_logger\ =\ \mbox{\hyperlink{structcontext}{context}}.control.get\_deep\_mind\_logger())\ \{}
+\DoxyCodeLine{00309\ \ \ \ \ \ \ \ \ \ dm\_logger-\/>on\_ram\_trace(\mbox{\hyperlink{deep__mind_8hpp_aaaa2f1dbd522de03ccbaa73f01db5f50}{RAM\_EVENT\_ID}}(\textcolor{stringliteral}{"{}\$\{id\}"{}},\ (\textcolor{stringliteral}{"{}id"{}},\ permission-\/>id)),\ \textcolor{stringliteral}{"{}auth"{}},\ \textcolor{stringliteral}{"{}update"{}},\ \textcolor{stringliteral}{"{}updateauth\_update"{}});}
+\DoxyCodeLine{00310\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00311\ }
+\DoxyCodeLine{00312\ \ \ \ \ \ \ \mbox{\hyperlink{structcontext}{context}}.add\_ram\_usage(\ permission-\/>owner,\ new\_size\ -\/\ old\_size\ );}
+\DoxyCodeLine{00313\ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00314\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ authorization.create\_permission(\ update.account,\ update.permission,\ parent\_id,\ update.auth\ );}
+\DoxyCodeLine{00315\ }
+\DoxyCodeLine{00316\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ new\_size\ =\ (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}})(config::billable\_size\_v<permission\_object>\ +\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.auth.get\_billable\_size());}
+\DoxyCodeLine{00317\ }
+\DoxyCodeLine{00318\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{auto}\ dm\_logger\ =\ \mbox{\hyperlink{structcontext}{context}}.control.get\_deep\_mind\_logger())\ \{}
+\DoxyCodeLine{00319\ \ \ \ \ \ \ \ \ \ dm\_logger-\/>on\_ram\_trace(\mbox{\hyperlink{deep__mind_8hpp_aaaa2f1dbd522de03ccbaa73f01db5f50}{RAM\_EVENT\_ID}}(\textcolor{stringliteral}{"{}\$\{id\}"{}},\ (\textcolor{stringliteral}{"{}id"{}},\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.id)),\ \textcolor{stringliteral}{"{}auth"{}},\ \textcolor{stringliteral}{"{}add"{}},\ \textcolor{stringliteral}{"{}updateauth\_create"{}});}
+\DoxyCodeLine{00320\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00321\ }
+\DoxyCodeLine{00322\ \ \ \ \ \ \ \mbox{\hyperlink{structcontext}{context}}.add\_ram\_usage(\ update.account,\ new\_size\ );}
+\DoxyCodeLine{00323\ \ \ \ \}}
+\DoxyCodeLine{00324\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=330pt]{group__native__action__handlers_gacf5d6409205a5734a97033904741fc29_cgraph}
+\end{center}
+\end{figure}

@@ -1,0 +1,13 @@
+<map id="websocketpp::http::parser::strip_lws" name="websocketpp::http::parser::strip_lws">
+<area shape="rect" id="Node000001" title=" " alt="" coords="704,31,841,72"/>
+<area shape="rect" id="Node000002" href="$parser_8cpp.html#aaf32dbf85a444e1657a5ee29489fdc4b" title=" " alt="" coords="460,5,656,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="689,41,645,34,645,29,690,36"/>
+<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1http_1_1parser_1_1parser.html#a4dbb443fd916f8b4306e7afdb2e8ff45" title="Process a header line." alt="" coords="480,56,636,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="690,67,637,75,636,69,689,61"/>
+<area shape="rect" id="Node000004" href="$classwebsocketpp_1_1http_1_1parser_1_1request.html#abd9cae6f44634d62253d806d982ab1d6" title="Process bytes in the input buffer." alt="" coords="238,30,407,70"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="464,73,407,65,408,59,465,68"/>
+<area shape="rect" id="Node000005" href="$classwebsocketpp_1_1http_1_1parser_1_1response.html#ae99b8f1287898b74d1963b95347ab838" title="Process bytes in the input buffer." alt="" coords="233,95,412,136"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="465,99,413,106,412,101,465,93"/>
+<area shape="rect" id="Node000006" href="$classwebsocketpp_1_1http_1_1parser_1_1response.html#a5b274a9e5766e679f0939a7e1ecbad56" title="Process bytes in the input buffer (istream version)" alt="" coords="5,95,185,136"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="217,118,185,118,185,113,217,113"/>
+</map>

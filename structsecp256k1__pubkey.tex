@@ -1,0 +1,38 @@
+\doxysection{secp256k1\+\_\+pubkey Struct Reference}
+\hypertarget{structsecp256k1__pubkey}{}\label{structsecp256k1__pubkey}\index{secp256k1\_pubkey@{secp256k1\_pubkey}}
+
+
+{\ttfamily \#include $<$secp256k1.\+h$>$}
+
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+unsigned char \mbox{\hyperlink{structsecp256k1__pubkey_a337cef146cd8002610da4b04a91ee7ce}{data}} \mbox{[}64\mbox{]}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\doxylink{struct_opaque}{Opaque} data structure that holds a parsed and valid public key.
+
+The exact representation of data inside is implementation defined and not guaranteed to be portable between different platforms or versions. It is however guaranteed to be 64 bytes in size, and can be safely copied/moved. If you need to convert to a format suitable for storage or transmission, use secp256k1\+\_\+ec\+\_\+pubkey\+\_\+serialize and secp256k1\+\_\+ec\+\_\+pubkey\+\_\+parse. To compare keys, use secp256k1\+\_\+ec\+\_\+pubkey\+\_\+cmp. 
+
+Definition at line \mbox{\hyperlink{secp256k1_8h_source_l00070}{70}} of file \mbox{\hyperlink{secp256k1_8h_source}{secp256k1.\+h}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsecp256k1__pubkey_a337cef146cd8002610da4b04a91ee7ce}\index{secp256k1\_pubkey@{secp256k1\_pubkey}!data@{data}}
+\index{data@{data}!secp256k1\_pubkey@{secp256k1\_pubkey}}
+\doxysubsubsection{\texorpdfstring{data}{data}}
+{\footnotesize\ttfamily \label{structsecp256k1__pubkey_a337cef146cd8002610da4b04a91ee7ce} 
+unsigned char secp256k1\+\_\+pubkey\+::data\mbox{[}64\mbox{]}}
+
+
+
+Definition at line \mbox{\hyperlink{secp256k1_8h_source_l00071}{71}} of file \mbox{\hyperlink{secp256k1_8h_source}{secp256k1.\+h}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/secp256k1/secp256k1/include/\mbox{\hyperlink{secp256k1_8h}{secp256k1.\+h}}\end{DoxyCompactItemize}

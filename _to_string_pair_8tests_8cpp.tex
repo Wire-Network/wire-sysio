@@ -1,0 +1,149 @@
+\doxysection{libraries/sys-\/vm/external/\+Catch2/projects/\+Self\+Test/\+Usage\+Tests/\+To\+String\+Pair.tests.\+cpp File Reference}
+\hypertarget{_to_string_pair_8tests_8cpp}{}\label{_to_string_pair_8tests_8cpp}\index{libraries/sys-\/vm/external/Catch2/projects/SelfTest/UsageTests/ToStringPair.tests.cpp@{libraries/sys-\/vm/external/Catch2/projects/SelfTest/UsageTests/ToStringPair.tests.cpp}}
+{\ttfamily \#include "{}catch.\+hpp"{}}\newline
+Include dependency graph for To\+String\+Pair.\+tests.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=251pt]{_to_string_pair_8tests_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{_to_string_pair_8tests_8cpp_abcb2983dc4daef90b1d3f703d21071ac}{CATCH\+\_\+\+CONFIG\+\_\+\+ENABLE\+\_\+\+PAIR\+\_\+\+STRINGMAKER}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{_to_string_pair_8tests_8cpp_a651c2782d8fa6f84abfd437a7347404c}{TEST\+\_\+\+CASE}} ("{}std\+::pair$<$int,std\+::string$>$ -\/$>$ to\+String"{}, "{}\mbox{[}to\+String\mbox{]}\mbox{[}pair\mbox{]}"{})
+\item 
+\mbox{\hyperlink{_to_string_pair_8tests_8cpp_a936f6f8d8353881b5aa6739de5eecdd9}{TEST\+\_\+\+CASE}} ("{}std\+::pair$<$int,const std\+::string$>$ -\/$>$ to\+String"{}, "{}\mbox{[}to\+String\mbox{]}\mbox{[}pair\mbox{]}"{})
+\item 
+\mbox{\hyperlink{_to_string_pair_8tests_8cpp_a2db0fdf16ddfe50b954321978c980aad}{TEST\+\_\+\+CASE}} ("{}std\+::vector$<$std\+::pair$<$std\+::string,int$>$ $>$ -\/$>$ to\+String"{}, "{}\mbox{[}to\+String\mbox{]}\mbox{[}pair\mbox{]}"{})
+\item 
+\mbox{\hyperlink{_to_string_pair_8tests_8cpp_a24b1015bfb68b89cd0bff03fd27b6b63}{TEST\+\_\+\+CASE}} ("{}pair$<$pair$<$int,const char \texorpdfstring{$\ast$}{*},pair$<$std\+::string,int$>$ $>$ -\/$>$ to\+String"{}, "{}\mbox{[}to\+String\mbox{]}\mbox{[}pair\mbox{]}"{})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{_to_string_pair_8tests_8cpp_abcb2983dc4daef90b1d3f703d21071ac}\index{ToStringPair.tests.cpp@{ToStringPair.tests.cpp}!CATCH\_CONFIG\_ENABLE\_PAIR\_STRINGMAKER@{CATCH\_CONFIG\_ENABLE\_PAIR\_STRINGMAKER}}
+\index{CATCH\_CONFIG\_ENABLE\_PAIR\_STRINGMAKER@{CATCH\_CONFIG\_ENABLE\_PAIR\_STRINGMAKER}!ToStringPair.tests.cpp@{ToStringPair.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{CATCH\_CONFIG\_ENABLE\_PAIR\_STRINGMAKER}{CATCH\_CONFIG\_ENABLE\_PAIR\_STRINGMAKER}}
+{\footnotesize\ttfamily \label{_to_string_pair_8tests_8cpp_abcb2983dc4daef90b1d3f703d21071ac} 
+\#define CATCH\+\_\+\+CONFIG\+\_\+\+ENABLE\+\_\+\+PAIR\+\_\+\+STRINGMAKER}
+
+
+
+Definition at line \mbox{\hyperlink{_to_string_pair_8tests_8cpp_source_l00001}{1}} of file \mbox{\hyperlink{_to_string_pair_8tests_8cpp_source}{To\+String\+Pair.\+tests.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{_to_string_pair_8tests_8cpp_a24b1015bfb68b89cd0bff03fd27b6b63}\index{ToStringPair.tests.cpp@{ToStringPair.tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!ToStringPair.tests.cpp@{ToStringPair.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{_to_string_pair_8tests_8cpp_a24b1015bfb68b89cd0bff03fd27b6b63} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}pair$<$pair$<$int,const char \texorpdfstring{$\ast$}{*},pair$<$std\+::string,int$>$ $>$ -\/$>$ to\+String"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}to\+String\mbox{]}\mbox{[}pair\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_to_string_pair_8tests_8cpp_source_l00021}{21}} of file \mbox{\hyperlink{_to_string_pair_8tests_8cpp_source}{To\+String\+Pair.\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00022\ \ \ \ \ \textcolor{keyword}{typedef}\ std::pair<int,const\ char\ *>\ left\_t;}
+\DoxyCodeLine{00023\ \ \ \ \ \textcolor{keyword}{typedef}\ std::pair<std::string,int>\ right\_t;}
+\DoxyCodeLine{00024\ }
+\DoxyCodeLine{00025\ \ \ \ \ left\_t\ \ left(\ 42,\ \textcolor{stringliteral}{"{}Arthur"{}}\ );}
+\DoxyCodeLine{00026\ \ \ \ \ right\_t\ right(\ \textcolor{stringliteral}{"{}Ford"{}},\ 24\ );}
+\DoxyCodeLine{00027\ }
+\DoxyCodeLine{00028\ \ \ \ \ std::pair<left\_t,right\_t>\ pair(\ left,\ right\ );}
+\DoxyCodeLine{00029\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(\ pair\ )\ ==\ \textcolor{stringliteral}{"{}\{\ \{\ 42,\ \(\backslash\)"{}Arthur\(\backslash\)"{}\ \},\ \{\ \(\backslash\)"{}Ford\(\backslash\)"{},\ 24\ \}\ \}"{}}\ );}
+\DoxyCodeLine{00030\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=305pt]{_to_string_pair_8tests_8cpp_a24b1015bfb68b89cd0bff03fd27b6b63_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{_to_string_pair_8tests_8cpp_a936f6f8d8353881b5aa6739de5eecdd9}\index{ToStringPair.tests.cpp@{ToStringPair.tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!ToStringPair.tests.cpp@{ToStringPair.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{_to_string_pair_8tests_8cpp_a936f6f8d8353881b5aa6739de5eecdd9} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}std\+::pair$<$int,const std\+::string$>$ -\/$>$ to\+String"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}to\+String\mbox{]}\mbox{[}pair\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_to_string_pair_8tests_8cpp_source_l00009}{9}} of file \mbox{\hyperlink{_to_string_pair_8tests_8cpp_source}{To\+String\+Pair.\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00009\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00010\ \ \ \ \ std::pair<int,const\ std::string>\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}(\ 34,\ \textcolor{stringliteral}{"{}xyzzy"{}}\ );}
+\DoxyCodeLine{00011\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})\ ==\ \textcolor{stringliteral}{"{}\{\ 34,\ \(\backslash\)"{}xyzzy\(\backslash\)"{}\ \}"{}}\ );}
+\DoxyCodeLine{00012\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=305pt]{_to_string_pair_8tests_8cpp_a936f6f8d8353881b5aa6739de5eecdd9_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{_to_string_pair_8tests_8cpp_a651c2782d8fa6f84abfd437a7347404c}\index{ToStringPair.tests.cpp@{ToStringPair.tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!ToStringPair.tests.cpp@{ToStringPair.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{_to_string_pair_8tests_8cpp_a651c2782d8fa6f84abfd437a7347404c} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}std\+::pair$<$int,std\+::string$>$ -\/$>$ to\+String"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}to\+String\mbox{]}\mbox{[}pair\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_to_string_pair_8tests_8cpp_source_l00004}{4}} of file \mbox{\hyperlink{_to_string_pair_8tests_8cpp_source}{To\+String\+Pair.\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00004\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00005\ \ \ \ \ std::pair<int,std::string>\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}(\ 34,\ \textcolor{stringliteral}{"{}xyzzy"{}}\ );}
+\DoxyCodeLine{00006\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ )\ ==\ \textcolor{stringliteral}{"{}\{\ 34,\ \(\backslash\)"{}xyzzy\(\backslash\)"{}\ \}"{}}\ );}
+\DoxyCodeLine{00007\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=305pt]{_to_string_pair_8tests_8cpp_a651c2782d8fa6f84abfd437a7347404c_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{_to_string_pair_8tests_8cpp_a2db0fdf16ddfe50b954321978c980aad}\index{ToStringPair.tests.cpp@{ToStringPair.tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!ToStringPair.tests.cpp@{ToStringPair.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{_to_string_pair_8tests_8cpp_a2db0fdf16ddfe50b954321978c980aad} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}std\+::vector$<$std\+::pair$<$std\+::string,int$>$ $>$ -\/$>$ to\+String"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}to\+String\mbox{]}\mbox{[}pair\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_to_string_pair_8tests_8cpp_source_l00014}{14}} of file \mbox{\hyperlink{_to_string_pair_8tests_8cpp_source}{To\+String\+Pair.\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00014\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00015\ \ \ \ \ std::vector<std::pair<std::string,int>\ >\ pr;}
+\DoxyCodeLine{00016\ \ \ \ \ pr.push\_back(\ std::make\_pair(\textcolor{stringliteral}{"{}green"{}},\ 55\ )\ );}
+\DoxyCodeLine{00017\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(\ pr\ )\ ==\ \textcolor{stringliteral}{"{}\{\ \{\ \(\backslash\)"{}green\(\backslash\)"{},\ 55\ \}\ \}"{}}\ );}
+\DoxyCodeLine{00018\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=305pt]{_to_string_pair_8tests_8cpp_a2db0fdf16ddfe50b954321978c980aad_cgraph}
+\end{center}
+\end{figure}

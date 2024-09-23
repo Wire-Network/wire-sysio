@@ -1,0 +1,11 @@
+<map id="parse_rsa_generate_template" name="parse_rsa_generate_template">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,72,141,113"/>
+<area shape="rect" id="Node000002" href="$yubihsm__pkcs11_8c.html#ae785d5badbf1f08b491af31f32a135a1" title=" " alt="" coords="228,5,300,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="117,70,188,40,212,31,214,36,190,45,119,74"/>
+<area shape="rect" id="Node000003" href="$yubihsm__pkcs11_8c.html#adc4bd59a60361844aa0e852efa210105" title=" " alt="" coords="230,55,298,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="141,81,214,71,215,77,142,86"/>
+<area shape="rect" id="Node000004" href="$util__pkcs11_8c.html#a66eb3d4688d7e1358a14b6c86b2158f9" title=" " alt="" coords="210,104,318,130"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="142,99,195,106,194,111,141,104"/>
+<area shape="rect" id="Node000005" href="$util__pkcs11_8c.html#a03b553175220c8747145497de5032100" title=" " alt="" coords="189,153,339,179"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="121,111,190,140,206,145,204,150,188,145,119,116"/>
+</map>

@@ -1,0 +1,11 @@
+<map id="appbase::application::full_version_string" name="appbase::application::full_version_string">
+<area shape="rect" id="Node000001" title="Get full version string; same as version_string() unless set differently." alt="" coords="626,39,767,79"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1chain__apis_1_1read__only.html#a2cb11d9c62513f62a7db1df33f6248f6" title=" " alt="" coords="442,5,574,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="611,47,574,40,575,35,612,41"/>
+<area shape="rect" id="Node000003" href="$classappbase_1_1application.html#adebe1a60f6663b205a196385d4bc6231" title=" " alt="" coords="438,71,578,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="611,76,579,82,578,76,610,71"/>
+<area shape="rect" id="Node000004" href="$classappbase_1_1application.html#a29ed51314f78ebe6795930a4ca910fd6" title="Looks for the –plugin commandline / config option and calls initialize on those plugins." alt="" coords="250,71,390,111"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="423,94,390,94,390,88,423,88"/>
+<area shape="rect" id="Node000005" href="$test__trx__full_8cpp.html#afdace07785a80c02d7fbb1d13154c2c4" title=" " alt="" coords="5,78,202,104"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="234,94,202,94,202,88,234,88"/>
+</map>

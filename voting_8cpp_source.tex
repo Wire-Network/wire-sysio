@@ -1,0 +1,451 @@
+\doxysection{voting.\+cpp}
+\hypertarget{voting_8cpp_source}{}\label{voting_8cpp_source}\index{/Users/svetlasyrimis/Desktop/wire-\/network/WN-\/org/wire-\/system-\/contracts/contracts/sysio.system/src/voting.cpp@{/Users/svetlasyrimis/Desktop/wire-\/network/WN-\/org/wire-\/system-\/contracts/contracts/sysio.system/src/voting.cpp}}
+\mbox{\hyperlink{voting_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <sysio/crypto.hpp>}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <sysio/datastream.hpp>}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <sysio/sysio.hpp>}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <sysio/multi\_index.hpp>}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <sysio/permission.hpp>}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <sysio/privileged.hpp>}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <sysio/serialize.hpp>}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <sysio/singleton.hpp>}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{sysio_8system_8hpp}{sysio.system/sysio.system.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00011}00011\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{sysio_8token_8hpp}{sysio.token/sysio.token.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00013}00013\ \textcolor{preprocessor}{\#include\ <type\_traits>}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00014}00014\ \textcolor{preprocessor}{\#include\ <limits>}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00015}00015\ \textcolor{preprocessor}{\#include\ <set>}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00016}00016\ \textcolor{preprocessor}{\#include\ <algorithm>}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00017}00017\ \textcolor{preprocessor}{\#include\ <cmath>}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00019}00019\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysiosystem}{sysiosystem}}\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00021}00021\ \ \ \ \textcolor{keyword}{using\ }sysio::const\_mem\_fun;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00022}00022\ \ \ \ \textcolor{keyword}{using\ }sysio::current\_time\_point;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00023}00023\ \ \ \ \textcolor{keyword}{using\ }sysio::indexed\_by;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00024}00024\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classfc_1_1microseconds}{sysio::microseconds}};}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00025}00025\ \ \ \ \textcolor{keyword}{using\ }sysio::singleton;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00027}00027\ \ \ \ \textcolor{keywordtype}{void}\ system\_contract::register\_producer(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\&\ producer,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_a5d68aec4c925d17b62f0a9b543fabfc5}{sysio::block\_signing\_authority}}\&\ producer\_authority,\ \textcolor{keyword}{const}\ std::string\&\ \mbox{\hyperlink{programs_2clio_2main_8cpp_aa03c1ef4c41f36b048cf58d5aade7653}{url}},\ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ location\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00028}00028\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ prod\ =\ \_producers.find(\ producer.value\ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00029}00029\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ ct\ =\ current\_time\_point();}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00031}00031\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1crypto_1_1r1_1_1public__key}{sysio::public\_key}}\ producer\_key\{\};}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00033}00033\ \ \ \ \ \ \ std::visit(\ [\&](\textcolor{keyword}{auto}\&\&\ auth\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00034}00034\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ auth.keys.size()\ ==\ 1\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00035}00035\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ if\ the\ producer\_authority\ consists\ of\ a\ single\ key,\ use\ that\ key\ in\ the\ legacy\ producer\_key\ field}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00036}00036\ \ \ \ \ \ \ \ \ \ \ \ \ producer\_key\ =\ auth.keys[0].key;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00037}00037\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00038}00038\ \ \ \ \ \ \ \},\ producer\_authority\ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00040}00040\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ prod\ !=\ \_producers.end()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00041}00041\ \ \ \ \ \ \ \ \ \ \_producers.modify(\ prod,\ producer,\ [\&](\ producer\_info\&\ info\ )\{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00042}00042\ \ \ \ \ \ \ \ \ \ \ \ \ info.producer\_key\ \ \ \ \ \ \ =\ producer\_key;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00043}00043\ \ \ \ \ \ \ \ \ \ \ \ \ info.is\_active\ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00044}00044\ \ \ \ \ \ \ \ \ \ \ \ \ info.url\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \mbox{\hyperlink{programs_2clio_2main_8cpp_aa03c1ef4c41f36b048cf58d5aade7653}{url}};}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00045}00045\ \ \ \ \ \ \ \ \ \ \ \ \ info.location\ \ \ \ \ \ \ \ \ \ \ =\ location;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00046}00046\ \ \ \ \ \ \ \ \ \ \ \ \ info.producer\_authority.emplace(\ producer\_authority\ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00047}00047\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ info.last\_claim\_time\ ==\ \mbox{\hyperlink{namespacesystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_a28ca3704afa6ea443dd4a095daaedb3a}{time\_point}}()\ )}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ info.last\_claim\_time\ =\ ct;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00051}00051\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ prod2\ =\ \_producers2.find(\ producer.value\ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ prod2\ ==\ \_producers2.end()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \ \ \ \_producers2.emplace(\ producer,\ [\&](\ producer\_info2\&\ info\ )\{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ info.owner\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ producer;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ info.last\_votepay\_share\_update\ =\ ct;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \ \ \ update\_total\_votepay\_share(\ ct,\ 0.0,\ prod-\/>total\_votes\ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ When\ introducing\ the\ producer2\ table\ row\ for\ the\ first\ time,\ the\ producer's\ votes\ must\ also\ be\ accounted\ for\ in\ the\ global\ total\_producer\_votepay\_share\ at\ the\ same\ time.}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00059}00059\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00060}00060\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00061}00061\ \ \ \ \ \ \ \ \ \ \_producers.emplace(\ producer,\ [\&](\ producer\_info\&\ info\ )\{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00062}00062\ \ \ \ \ \ \ \ \ \ \ \ \ info.owner\ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ producer;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \ \ \ info.total\_votes\ \ \ \ \ \ \ \ =\ 0;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00064}00064\ \ \ \ \ \ \ \ \ \ \ \ \ info.producer\_key\ \ \ \ \ \ \ =\ producer\_key;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00065}00065\ \ \ \ \ \ \ \ \ \ \ \ \ info.is\_active\ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00066}00066\ \ \ \ \ \ \ \ \ \ \ \ \ info.url\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \mbox{\hyperlink{programs_2clio_2main_8cpp_aa03c1ef4c41f36b048cf58d5aade7653}{url}};}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00067}00067\ \ \ \ \ \ \ \ \ \ \ \ \ info.location\ \ \ \ \ \ \ \ \ \ \ =\ location;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \ \ \ info.last\_claim\_time\ \ \ \ =\ ct;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \ \ \ info.producer\_authority.emplace(\ producer\_authority\ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00071}00071\ \ \ \ \ \ \ \ \ \ \_producers2.emplace(\ producer,\ [\&](\ producer\_info2\&\ info\ )\{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \ \ \ info.owner\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ producer;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00073}00073\ \ \ \ \ \ \ \ \ \ \ \ \ info.last\_votepay\_share\_update\ =\ ct;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00074}00074\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00075}00075\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00076}00076\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00077}00077\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00079}\mbox{\hyperlink{classsysiosystem_1_1system__contract_ac5ae6d98b573572f96b35895e4a5c247}{00079}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_ac5ae6d98b573572f96b35895e4a5c247}{system\_contract::regproducer}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\&\ producer,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1crypto_1_1r1_1_1public__key}{sysio::public\_key}}\&\ producer\_key,\ \textcolor{keyword}{const}\ std::string\&\ \mbox{\hyperlink{programs_2clio_2main_8cpp_aa03c1ef4c41f36b048cf58d5aade7653}{url}},\ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ location\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00080}00080\ \ \ \ \ \ \ require\_auth(\ producer\ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00081}00081\ \ \ \ \ \ \ check(\ \mbox{\hyperlink{programs_2clio_2main_8cpp_aa03c1ef4c41f36b048cf58d5aade7653}{url}}.size()\ <\ 512,\ \textcolor{stringliteral}{"{}url\ too\ long"{}}\ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00083}00083\ \ \ \ \ \ \ register\_producer(\ producer,\ \mbox{\hyperlink{namespacesysiosystem_ac27d53bfd98cafb3f2da089102f5a490}{convert\_to\_block\_signing\_authority}}(\ producer\_key\ ),\ \mbox{\hyperlink{programs_2clio_2main_8cpp_aa03c1ef4c41f36b048cf58d5aade7653}{url}},\ location\ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00084}00084\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00085}00085\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00086}\mbox{\hyperlink{classsysiosystem_1_1system__contract_a40113ff6ec85dc675d64f45089d6e685}{00086}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_a40113ff6ec85dc675d64f45089d6e685}{system\_contract::regproducer2}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\&\ producer,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_a5d68aec4c925d17b62f0a9b543fabfc5}{sysio::block\_signing\_authority}}\&\ producer\_authority,\ \textcolor{keyword}{const}\ std::string\&\ \mbox{\hyperlink{programs_2clio_2main_8cpp_aa03c1ef4c41f36b048cf58d5aade7653}{url}},\ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ location\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00087}00087\ \ \ \ \ \ \ require\_auth(\ producer\ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00088}00088\ \ \ \ \ \ \ check(\ \mbox{\hyperlink{programs_2clio_2main_8cpp_aa03c1ef4c41f36b048cf58d5aade7653}{url}}.size()\ <\ 512,\ \textcolor{stringliteral}{"{}url\ too\ long"{}}\ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00089}00089\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00090}00090\ \ \ \ \ \ \ std::visit(\ [\&](\textcolor{keyword}{auto}\&\&\ auth\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00091}00091\ \ \ \ \ \ \ \ \ \ check(\ auth.is\_valid(),\ \textcolor{stringliteral}{"{}invalid\ producer\ authority"{}}\ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00092}00092\ \ \ \ \ \ \ \},\ producer\_authority\ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00093}00093\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00094}00094\ \ \ \ \ \ \ register\_producer(\ producer,\ producer\_authority,\ \mbox{\hyperlink{programs_2clio_2main_8cpp_aa03c1ef4c41f36b048cf58d5aade7653}{url}},\ location\ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00095}00095\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00096}00096\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00097}\mbox{\hyperlink{classsysiosystem_1_1system__contract_a46789423b806bd7c7ceb1f04617eaa0a}{00097}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_a46789423b806bd7c7ceb1f04617eaa0a}{system\_contract::unregprod}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\&\ producer\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00098}00098\ \ \ \ \ \ \ require\_auth(\ producer\ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00099}00099\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00100}00100\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ prod\ =\ \_producers.get(\ producer.value,\ \textcolor{stringliteral}{"{}producer\ not\ found"{}}\ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00101}00101\ \ \ \ \ \ \ \_producers.modify(\ prod,\ same\_payer,\ [\&](\ \mbox{\hyperlink{structsysiosystem_1_1producer__info}{producer\_info}}\&\ info\ )\{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00102}00102\ \ \ \ \ \ \ \ \ \ info.deactivate();}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00103}00103\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00104}00104\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00105}00105\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00106}00106\ \ \ \ \textcolor{keywordtype}{void}\ system\_contract::update\_elected\_producers(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{block\_timestamp}}\&\ block\_time\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00107}00107\ \ \ \ \ \ \ \_gstate.\mbox{\hyperlink{structsysiosystem_1_1sysio__global__state_aaa745851c2221bd24eae5fc4e383869b}{last\_producer\_schedule\_update}}\ =\ block\_time;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00108}00108\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00109}00109\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ idx\ =\ \_producers.get\_index<\textcolor{stringliteral}{"{}prototalvote"{}}\_n>();}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00110}00110\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00111}00111\ \ \ \ \ \ \ \textcolor{keyword}{using\ }value\_type\ =\ std::pair<sysio::producer\_authority,\ uint16\_t>;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00112}00112\ \ \ \ \ \ \ std::vector<\ value\_type\ >\ top\_producers;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00113}00113\ \ \ \ \ \ \ top\_producers.reserve(21);}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00114}00114\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00115}00115\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\ it\ =\ idx.cbegin();\ it\ !=\ idx.cend()\ \&\&\ top\_producers.size()\ <\ 21\ \&\&\ 0\ <\ it-\/>total\_votes\ \&\&\ it-\/>active();\ ++it\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00116}00116\ \ \ \ \ \ \ \ \ \ top\_producers.emplace\_back(}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00117}00117\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority}{sysio::producer\_authority}}\{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00118}00118\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .producer\_name\ =\ it-\/>owner,}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00119}00119\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .authority\ \ \ \ \ =\ it-\/>get\_producer\_authority()}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00120}00120\ \ \ \ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00121}00121\ \ \ \ \ \ \ \ \ \ \ \ \ it-\/>location}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00122}00122\ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00123}00123\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00124}00124\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00125}00125\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ top\_producers.size()\ ==\ 0\ ||\ top\_producers.size()\ <\ \_gstate.\mbox{\hyperlink{structsysiosystem_1_1sysio__global__state_a8a896a7ee01bf8ba6be126b053470ffb}{last\_producer\_schedule\_size}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00126}00126\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00127}00127\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00128}00128\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00129}00129\ \ \ \ \ \ \ std::sort(\ top\_producers.begin(),\ top\_producers.end(),\ [](\ \textcolor{keyword}{const}\ value\_type\&\ lhs,\ \textcolor{keyword}{const}\ value\_type\&\ rhs\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00130}00130\ \ \ \ \ \ \ \ \ \ return\ lhs.first.producer\_name\ <\ rhs.first.producer\_name;\ \textcolor{comment}{//\ sort\ by\ producer\ name}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00131}00131\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ return\ lhs.second\ <\ rhs.second;\ //\ sort\ by\ location}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00132}00132\ \ \ \ \ \ \ \}\ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00133}00133\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00134}00134\ \ \ \ \ \ \ std::vector<sysio::producer\_authority>\ \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a6d42fdcc89e90507ee6f095c8e92fa2b}{producers}};}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00135}00135\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00136}00136\ \ \ \ \ \ \ \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a6d42fdcc89e90507ee6f095c8e92fa2b}{producers}}.reserve(top\_producers.size());}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00137}00137\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\&\ item\ :\ top\_producers\ )}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00138}00138\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a6d42fdcc89e90507ee6f095c8e92fa2b}{producers}}.push\_back(\ std::move(item.first)\ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00139}00139\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00140}00140\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ set\_proposed\_producers(\ \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a6d42fdcc89e90507ee6f095c8e92fa2b}{producers}}\ )\ >=\ 0\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00141}00141\ \ \ \ \ \ \ \ \ \ \_gstate.\mbox{\hyperlink{structsysiosystem_1_1sysio__global__state_a8a896a7ee01bf8ba6be126b053470ffb}{last\_producer\_schedule\_size}}\ =\ \textcolor{keyword}{static\_cast<}decltype(\_gstate.last\_producer\_schedule\_size)\textcolor{keyword}{>}(\ top\_producers.size()\ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00142}00142\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00143}00143\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00144}00144\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00145}\mbox{\hyperlink{namespacesysiosystem_a41b99f8cd7ffeb86ed9c1be086f2ec22}{00145}}\ \ \ \ \textcolor{keywordtype}{double}\ \mbox{\hyperlink{namespacesysiosystem_a41b99f8cd7ffeb86ed9c1be086f2ec22}{stake2vote}}(\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ staked\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00147}00147\ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ weight\ =\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}(\ (current\_time\_point().sec\_since\_epoch()\ -\/\ (block\_timestamp::block\_timestamp\_epoch\ /\ 1000))\ /\ (seconds\_per\_day\ *\ 7)\ )\ \ /\ double(\ 52\ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00148}00148\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ double(staked)\ *\ std::pow(\ 2,\ weight\ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00149}00149\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00150}00150\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00151}00151\ \ \ \ \textcolor{keywordtype}{double}\ system\_contract::update\_total\_votepay\_share(\ \textcolor{keyword}{const}\ time\_point\&\ ct,}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00152}00152\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ additional\_shares\_delta,}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00153}00153\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ shares\_rate\_delta\ )}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00154}00154\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00155}00155\ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ delta\_total\_votepay\_share\ =\ 0.0;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00156}00156\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ ct\ >\ \_gstate3.\mbox{\hyperlink{structsysiosystem_1_1sysio__global__state3_a569c354a87528d9dbbef6f42ef1b2e77}{last\_vpay\_state\_update}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00157}00157\ \ \ \ \ \ \ \ \ \ delta\_total\_votepay\_share\ =\ \_gstate3.\mbox{\hyperlink{structsysiosystem_1_1sysio__global__state3_ae86ddaeba7fbb16297f671c161bed2c6}{total\_vpay\_share\_change\_rate}}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00158}00158\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *\ double(\ (ct\ -\/\ \_gstate3.\mbox{\hyperlink{structsysiosystem_1_1sysio__global__state3_a569c354a87528d9dbbef6f42ef1b2e77}{last\_vpay\_state\_update}}).count()\ /\ 1E6\ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00159}00159\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00160}00160\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00161}00161\ \ \ \ \ \ \ delta\_total\_votepay\_share\ +=\ additional\_shares\_delta;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00162}00162\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ delta\_total\_votepay\_share\ <\ 0\ \&\&\ \_gstate2.\mbox{\hyperlink{structsysiosystem_1_1sysio__global__state2_ad72e31622c28364d42c87cc29a6f1200}{total\_producer\_votepay\_share}}\ <\ -\/delta\_total\_votepay\_share\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00163}00163\ \ \ \ \ \ \ \ \ \ \_gstate2.\mbox{\hyperlink{structsysiosystem_1_1sysio__global__state2_ad72e31622c28364d42c87cc29a6f1200}{total\_producer\_votepay\_share}}\ =\ 0.0;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00164}00164\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00165}00165\ \ \ \ \ \ \ \ \ \ \_gstate2.\mbox{\hyperlink{structsysiosystem_1_1sysio__global__state2_ad72e31622c28364d42c87cc29a6f1200}{total\_producer\_votepay\_share}}\ +=\ delta\_total\_votepay\_share;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00166}00166\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00167}00167\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00168}00168\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ shares\_rate\_delta\ <\ 0\ \&\&\ \_gstate3.\mbox{\hyperlink{structsysiosystem_1_1sysio__global__state3_ae86ddaeba7fbb16297f671c161bed2c6}{total\_vpay\_share\_change\_rate}}\ <\ -\/shares\_rate\_delta\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00169}00169\ \ \ \ \ \ \ \ \ \ \_gstate3.\mbox{\hyperlink{structsysiosystem_1_1sysio__global__state3_ae86ddaeba7fbb16297f671c161bed2c6}{total\_vpay\_share\_change\_rate}}\ =\ 0.0;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00170}00170\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00171}00171\ \ \ \ \ \ \ \ \ \ \_gstate3.\mbox{\hyperlink{structsysiosystem_1_1sysio__global__state3_ae86ddaeba7fbb16297f671c161bed2c6}{total\_vpay\_share\_change\_rate}}\ +=\ shares\_rate\_delta;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00172}00172\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00173}00173\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00174}00174\ \ \ \ \ \ \ \_gstate3.\mbox{\hyperlink{structsysiosystem_1_1sysio__global__state3_a569c354a87528d9dbbef6f42ef1b2e77}{last\_vpay\_state\_update}}\ =\ ct;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00175}00175\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00176}00176\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \_gstate2.\mbox{\hyperlink{structsysiosystem_1_1sysio__global__state2_ad72e31622c28364d42c87cc29a6f1200}{total\_producer\_votepay\_share}};}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00177}00177\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00178}00178\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00179}00179\ \ \ \ \textcolor{keywordtype}{double}\ system\_contract::update\_producer\_votepay\_share(\ \textcolor{keyword}{const}\ producers\_table2::const\_iterator\&\ prod\_itr,}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00180}00180\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ time\_point\&\ ct,}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00181}00181\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ shares\_rate,}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00182}00182\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ reset\_to\_zero\ )}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00183}00183\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00184}00184\ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ delta\_votepay\_share\ =\ 0.0;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00185}00185\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ shares\_rate\ >\ 0.0\ \&\&\ ct\ >\ prod\_itr-\/>last\_votepay\_share\_update\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00186}00186\ \ \ \ \ \ \ \ \ \ delta\_votepay\_share\ =\ shares\_rate\ *\ double(\ (ct\ -\/\ prod\_itr-\/>last\_votepay\_share\_update).count()\ /\ 1E6\ );\ \textcolor{comment}{//\ cannot\ be\ negative}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00187}00187\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00188}00188\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00189}00189\ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ new\_votepay\_share\ =\ prod\_itr-\/>votepay\_share\ +\ delta\_votepay\_share;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00190}00190\ \ \ \ \ \ \ \_producers2.modify(\ prod\_itr,\ same\_payer,\ [\&](\textcolor{keyword}{auto}\&\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00191}00191\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ reset\_to\_zero\ )}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00192}00192\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.votepay\_share\ =\ 0.0;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00193}00193\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00194}00194\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.votepay\_share\ =\ new\_votepay\_share;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00195}00195\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00196}00196\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.last\_votepay\_share\_update\ =\ ct;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00197}00197\ \ \ \ \ \ \ \}\ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00198}00198\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00199}00199\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ new\_votepay\_share;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00200}00200\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00201}00201\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00202}\mbox{\hyperlink{classsysiosystem_1_1system__contract_a57f7203c9cb37634e89a66650f5b3b89}{00202}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_a57f7203c9cb37634e89a66650f5b3b89}{system\_contract::voteproducer}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\&\ voter\_name,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\&\ proxy,\ \textcolor{keyword}{const}\ std::vector<name>\&\ \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a6d42fdcc89e90507ee6f095c8e92fa2b}{producers}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00203}00203\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ voter\_name\ ==\ \textcolor{stringliteral}{"{}b1"{}}\_n\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00204}00204\ \ \ \ \ \ \ \ \ \ require\_auth(\textcolor{stringliteral}{"{}sysio"{}}\_n);}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00205}00205\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00206}00206\ \ \ \ \ \ \ \ \ \ require\_auth(\ voter\_name\ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00207}00207\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00208}00208\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00209}00209\ \ \ \ \ \ \ vote\_stake\_updater(\ voter\_name\ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00210}00210\ \ \ \ \ \ \ update\_votes(\ voter\_name,\ proxy,\ \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a6d42fdcc89e90507ee6f095c8e92fa2b}{producers}},\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00211}00211\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ rex\_itr\ =\ \_rexbalance.find(\ voter\_name.value\ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00212}00212\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ rex\_itr\ !=\ \_rexbalance.end()\ \&\&\ rex\_itr-\/>rex\_balance.amount\ >\ 0\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00213}00213\ \ \ \ \ \ \ \ \ \ check\_voting\_requirement(\ voter\_name,\ \textcolor{stringliteral}{"{}voter\ holding\ REX\ tokens\ must\ vote\ for\ at\ least\ 21\ producers\ or\ for\ a\ proxy"{}}\ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00214}00214\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00215}00215\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00216}00216\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00217}\mbox{\hyperlink{classsysiosystem_1_1system__contract_a752987bb05121075c2c123dd3926630c}{00217}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_a752987bb05121075c2c123dd3926630c}{system\_contract::voteupdate}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\&\ voter\_name\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00218}00218\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ voter\ =\ \_voters.find(\ voter\_name.value\ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00219}00219\ \ \ \ \ \ \ check(\ voter\ !=\ \_voters.end(),\ \textcolor{stringliteral}{"{}no\ voter\ found"{}}\ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00220}00220\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00221}00221\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ new\_staked\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00222}00222\ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00223}00223\ \ \ \ \ \ \ \mbox{\hyperlink{classsysiosystem_1_1system__contract_a7c64c4a168b7588494a46cc666637b83}{updaterex}}(voter\_name);}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00224}00224\ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00225}00225\ \ \ \ \ \ \ \textcolor{comment}{//\ get\ rex\ bal}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00226}00226\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ rex\_itr\ =\ \_rexbalance.find(\ voter\_name.value\ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00227}00227\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ rex\_itr\ !=\ \_rexbalance.end()\ \&\&\ rex\_itr-\/>rex\_balance.amount\ >\ 0\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00228}00228\ \ \ \ \ \ \ \ \ \ new\_staked\ +=\ rex\_itr-\/>vote\_stake.amount;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00229}00229\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00230}00230\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysiosystem_a205c7938369bd90edc20122ae99826be}{del\_bandwidth\_table}}\ \ \ \ \ del\_tbl(\ get\_self(),\ voter\_name.value\ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00231}00231\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00232}00232\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ del\_itr\ =\ del\_tbl.begin();}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00233}00233\ \ \ \ \ \ \ \textcolor{keywordflow}{while}(del\_itr\ !=\ del\_tbl.end())\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00234}00234\ \ \ \ \ \ \ \ \ \ new\_staked\ +=\ del\_itr-\/>net\_weight.amount\ +\ del\_itr-\/>cpu\_weight.amount;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00235}00235\ \ \ \ \ \ \ \ \ \ del\_itr++;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00236}00236\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00237}00237\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00238}00238\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ voter-\/>staked\ !=\ new\_staked)\{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00239}00239\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ check\ if\ staked\ and\ new\_staked\ are\ different\ and\ only}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00240}00240\ \ \ \ \ \ \ \ \ \ \_voters.modify(\ voter,\ same\_payer,\ [\&](\ \textcolor{keyword}{auto}\&\ av\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00241}00241\ \ \ \ \ \ \ \ \ \ \ \ \ av.staked\ =\ new\_staked;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00242}00242\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00243}00243\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00244}00244\ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00245}00245\ \ \ \ \ \ \ update\_votes(voter\_name,\ voter-\/>proxy,\ voter-\/>producers,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00246}00246\ \ \ \ \}\ \textcolor{comment}{//\ voteupdate}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00247}00247\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00248}00248\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00249}00249\ \ \ \ \textcolor{keywordtype}{void}\ system\_contract::update\_votes(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\&\ voter\_name,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\&\ proxy,\ \textcolor{keyword}{const}\ std::vector<name>\&\ \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a6d42fdcc89e90507ee6f095c8e92fa2b}{producers}},\ \textcolor{keywordtype}{bool}\ voting\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00250}00250\ \ \ \ \ \ \ \textcolor{comment}{//validate\ input}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00251}00251\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ proxy\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00252}00252\ \ \ \ \ \ \ \ \ \ check(\ \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a6d42fdcc89e90507ee6f095c8e92fa2b}{producers}}.size()\ ==\ 0,\ \textcolor{stringliteral}{"{}cannot\ vote\ for\ producers\ and\ proxy\ at\ same\ time"{}}\ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00253}00253\ \ \ \ \ \ \ \ \ \ check(\ voter\_name\ !=\ proxy,\ \textcolor{stringliteral}{"{}cannot\ proxy\ to\ self"{}}\ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00254}00254\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00255}00255\ \ \ \ \ \ \ \ \ \ check(\ \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a6d42fdcc89e90507ee6f095c8e92fa2b}{producers}}.size()\ <=\ 30,\ \textcolor{stringliteral}{"{}attempt\ to\ vote\ for\ too\ many\ producers"{}}\ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00256}00256\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keywordtype}{size\_t}\ i\ =\ 1;\ i\ <\ \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a6d42fdcc89e90507ee6f095c8e92fa2b}{producers}}.size();\ ++i\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00257}00257\ \ \ \ \ \ \ \ \ \ \ \ \ check(\ \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a6d42fdcc89e90507ee6f095c8e92fa2b}{producers}}[i-\/1]\ <\ \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a6d42fdcc89e90507ee6f095c8e92fa2b}{producers}}[i],\ \textcolor{stringliteral}{"{}producer\ votes\ must\ be\ unique\ and\ sorted"{}}\ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00258}00258\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00259}00259\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00260}00260\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00261}00261\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ voter\ =\ \_voters.find(\ voter\_name.value\ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00262}00262\ \ \ \ \ \ \ check(\ voter\ !=\ \_voters.end(),\ \textcolor{stringliteral}{"{}user\ must\ stake\ before\ they\ can\ vote"{}}\ );\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00263}00263\ \ \ \ \ \ \ check(\ !proxy\ ||\ !voter-\/>is\_proxy,\ \textcolor{stringliteral}{"{}account\ registered\ as\ a\ proxy\ is\ not\ allowed\ to\ use\ a\ proxy"{}}\ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00264}00264\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00270}00270\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \_gstate.\mbox{\hyperlink{structsysiosystem_1_1sysio__global__state_a9103ca2911e1be3a551b03f6f8d19895}{thresh\_activated\_stake\_time}}\ ==\ \mbox{\hyperlink{namespacesystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_a28ca3704afa6ea443dd4a095daaedb3a}{time\_point}}()\ \&\&\ voter-\/>last\_vote\_weight\ <=\ 0.0\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00271}00271\ \ \ \ \ \ \ \ \ \ \_gstate.\mbox{\hyperlink{structsysiosystem_1_1sysio__global__state_a5ca05fbdd02c746526e65a1376d507e0}{total\_activated\_stake}}\ +=\ voter-\/>staked;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00272}00272\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \_gstate.\mbox{\hyperlink{structsysiosystem_1_1sysio__global__state_a5ca05fbdd02c746526e65a1376d507e0}{total\_activated\_stake}}\ >=\ min\_activated\_stake\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00273}00273\ \ \ \ \ \ \ \ \ \ \ \ \ \_gstate.\mbox{\hyperlink{structsysiosystem_1_1sysio__global__state_a9103ca2911e1be3a551b03f6f8d19895}{thresh\_activated\_stake\_time}}\ =\ current\_time\_point();}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00274}00274\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00275}00275\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00276}00276\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00277}00277\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ new\_vote\_weight\ =\ \mbox{\hyperlink{namespacesysiosystem_a41b99f8cd7ffeb86ed9c1be086f2ec22}{stake2vote}}(\ voter-\/>staked\ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00278}00278\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ voter-\/>is\_proxy\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00279}00279\ \ \ \ \ \ \ \ \ \ new\_vote\_weight\ +=\ voter-\/>proxied\_vote\_weight;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00280}00280\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00281}00281\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00282}00282\ \ \ \ \ \ \ std::map<\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ std::pair<double,\ \textcolor{keywordtype}{bool}\ \textcolor{comment}{/*new*/}>\ >\ producer\_deltas;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00283}00283\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ voter-\/>last\_vote\_weight\ >\ 0\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00284}00284\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ voter-\/>proxy\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00285}00285\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ old\_proxy\ =\ \_voters.find(\ voter-\/>proxy.value\ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00286}00286\ \ \ \ \ \ \ \ \ \ \ \ \ check(\ old\_proxy\ !=\ \_voters.end(),\ \textcolor{stringliteral}{"{}old\ proxy\ not\ found"{}}\ );\ \textcolor{comment}{//data\ corruption}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00287}00287\ \ \ \ \ \ \ \ \ \ \ \ \ \_voters.modify(\ old\_proxy,\ same\_payer,\ [\&](\ \textcolor{keyword}{auto}\&\ vp\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00288}00288\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ vp.proxied\_vote\_weight\ -\/=\ voter-\/>last\_vote\_weight;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00289}00289\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00290}00290\ \ \ \ \ \ \ \ \ \ \ \ \ propagate\_weight\_change(\ *old\_proxy\ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00291}00291\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00292}00292\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ :\ voter-\/>producers\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00293}00293\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ =\ producer\_deltas[\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}];}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00294}00294\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.first\ -\/=\ voter-\/>last\_vote\_weight;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00295}00295\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.second\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00296}00296\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00297}00297\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00298}00298\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00299}00299\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00300}00300\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ proxy\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00301}00301\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ new\_proxy\ =\ \_voters.find(\ proxy.value\ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00302}00302\ \ \ \ \ \ \ \ \ \ check(\ new\_proxy\ !=\ \_voters.end(),\ \textcolor{stringliteral}{"{}invalid\ proxy\ specified"{}}\ );\ \textcolor{comment}{//if\ (\ !voting\ )\ \{\ data\ corruption\ \}\ else\ \{\ wrong\ vote\ \}}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00303}00303\ \ \ \ \ \ \ \ \ \ check(\ !voting\ ||\ new\_proxy-\/>is\_proxy,\ \textcolor{stringliteral}{"{}proxy\ not\ found"{}}\ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00304}00304\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ new\_vote\_weight\ >=\ 0\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00305}00305\ \ \ \ \ \ \ \ \ \ \ \ \ \_voters.modify(\ new\_proxy,\ same\_payer,\ [\&](\ \textcolor{keyword}{auto}\&\ vp\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00306}00306\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ vp.proxied\_vote\_weight\ +=\ new\_vote\_weight;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00307}00307\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00308}00308\ \ \ \ \ \ \ \ \ \ \ \ \ propagate\_weight\_change(\ *new\_proxy\ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00309}00309\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00310}00310\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00311}00311\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ new\_vote\_weight\ >=\ 0\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00312}00312\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ :\ \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a6d42fdcc89e90507ee6f095c8e92fa2b}{producers}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00313}00313\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ =\ producer\_deltas[\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}];}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00314}00314\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.first\ +=\ new\_vote\_weight;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00315}00315\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.second\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00316}00316\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00317}00317\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00318}00318\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00319}00319\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00320}00320\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ ct\ =\ current\_time\_point();}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00321}00321\ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ delta\_change\_rate\ \ \ \ \ \ \ \ \ =\ 0.0;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00322}00322\ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ total\_inactive\_vpay\_share\ =\ 0.0;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00323}00323\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ pd\ :\ producer\_deltas\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00324}00324\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ pitr\ =\ \_producers.find(\ pd.first.value\ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00325}00325\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ pitr\ !=\ \_producers.end()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00326}00326\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ voting\ \&\&\ !pitr-\/>active()\ \&\&\ pd.second.second\ \textcolor{comment}{/*\ from\ new\ set\ */}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00327}00327\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ check(\ \textcolor{keyword}{false},\ (\ \textcolor{stringliteral}{"{}producer\ "{}}\ +\ pitr-\/>owner.to\_string()\ +\ \textcolor{stringliteral}{"{}\ is\ not\ currently\ registered"{}}\ ).data()\ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00328}00328\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00329}00329\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ init\_total\_votes\ =\ pitr-\/>total\_votes;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00330}00330\ \ \ \ \ \ \ \ \ \ \ \ \ \_producers.modify(\ pitr,\ same\_payer,\ [\&](\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00331}00331\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.total\_votes\ +=\ pd.second.first;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00332}00332\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.total\_votes\ <\ 0\ )\ \{\ \textcolor{comment}{//\ floating\ point\ arithmetics\ can\ give\ small\ negative\ numbers}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00333}00333\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.total\_votes\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00334}00334\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00335}00335\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_gstate.\mbox{\hyperlink{structsysiosystem_1_1sysio__global__state_acb169bdf3bca4e6cabb0f5b8da2adc19}{total\_producer\_vote\_weight}}\ +=\ pd.second.first;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00336}00336\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//check(\ p.total\_votes\ >=\ 0,\ "{}something\ bad\ happened"{}\ );}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00337}00337\ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00338}00338\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ prod2\ =\ \_producers2.find(\ pd.first.value\ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00339}00339\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ prod2\ !=\ \_producers2.end()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00340}00340\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ last\_claim\_plus\_3days\ =\ pitr-\/>last\_claim\_time\ +\ microseconds(3\ *\ useconds\_per\_day);}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00341}00341\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ crossed\_threshold\ \ \ \ \ \ \ =\ (last\_claim\_plus\_3days\ <=\ ct);}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00342}00342\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ updated\_after\_threshold\ =\ (last\_claim\_plus\_3days\ <=\ prod2-\/>last\_votepay\_share\_update);}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00343}00343\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Note:\ updated\_after\_threshold\ implies\ cross\_threshold}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00344}00344\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00345}00345\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ new\_votepay\_share\ =\ update\_producer\_votepay\_share(\ prod2,}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00346}00346\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ct,}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00347}00347\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ updated\_after\_threshold\ ?\ 0.0\ :\ init\_total\_votes,}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00348}00348\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ crossed\_threshold\ \&\&\ !updated\_after\_threshold\ \textcolor{comment}{//\ only\ reset\ votepay\_share\ once\ after\ threshold}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00349}00349\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00350}00350\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00351}00351\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !crossed\_threshold\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00352}00352\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ delta\_change\_rate\ +=\ pd.second.first;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00353}00353\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(\ !updated\_after\_threshold\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00354}00354\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ total\_inactive\_vpay\_share\ +=\ new\_votepay\_share;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00355}00355\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ delta\_change\_rate\ -\/=\ init\_total\_votes;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00356}00356\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00357}00357\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00358}00358\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00359}00359\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ pd.second.second\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00360}00360\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ check(\ \textcolor{keyword}{false},\ (\ \textcolor{stringliteral}{"{}producer\ "{}}\ +\ pd.first.to\_string()\ +\ \textcolor{stringliteral}{"{}\ is\ not\ registered"{}}\ ).data()\ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00361}00361\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00362}00362\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00363}00363\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00364}00364\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00365}00365\ \ \ \ \ \ \ update\_total\_votepay\_share(\ ct,\ -\/total\_inactive\_vpay\_share,\ delta\_change\_rate\ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00366}00366\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00367}00367\ \ \ \ \ \ \ \_voters.modify(\ voter,\ same\_payer,\ [\&](\ \textcolor{keyword}{auto}\&\ av\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00368}00368\ \ \ \ \ \ \ \ \ \ av.last\_vote\_weight\ =\ new\_vote\_weight;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00369}00369\ \ \ \ \ \ \ \ \ \ av.producers\ =\ \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a6d42fdcc89e90507ee6f095c8e92fa2b}{producers}};}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00370}00370\ \ \ \ \ \ \ \ \ \ av.proxy\ \ \ \ \ =\ proxy;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00371}00371\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00372}00372\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00373}00373\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00374}\mbox{\hyperlink{classsysiosystem_1_1system__contract_a96a701eebb227d312d4a3782ddc0bf3d}{00374}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_a96a701eebb227d312d4a3782ddc0bf3d}{system\_contract::regproxy}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\&\ proxy,\ \textcolor{keywordtype}{bool}\ isproxy\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00375}00375\ \ \ \ \ \ \ require\_auth(\ proxy\ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00376}00376\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00377}00377\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ pitr\ =\ \_voters.find(\ proxy.value\ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00378}00378\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ pitr\ !=\ \_voters.end()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00379}00379\ \ \ \ \ \ \ \ \ \ check(\ isproxy\ !=\ pitr-\/>is\_proxy,\ \textcolor{stringliteral}{"{}action\ has\ no\ effect"{}}\ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00380}00380\ \ \ \ \ \ \ \ \ \ check(\ !isproxy\ ||\ !pitr-\/>proxy,\ \textcolor{stringliteral}{"{}account\ that\ uses\ a\ proxy\ is\ not\ allowed\ to\ become\ a\ proxy"{}}\ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00381}00381\ \ \ \ \ \ \ \ \ \ \_voters.modify(\ pitr,\ same\_payer,\ [\&](\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00382}00382\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.is\_proxy\ =\ isproxy;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00383}00383\ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00384}00384\ \ \ \ \ \ \ \ \ \ propagate\_weight\_change(\ *pitr\ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00385}00385\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00386}00386\ \ \ \ \ \ \ \ \ \ \_voters.emplace(\ proxy,\ [\&](\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00387}00387\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.owner\ \ =\ proxy;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00388}00388\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.is\_proxy\ =\ isproxy;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00389}00389\ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00390}00390\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00391}00391\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00392}00392\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00393}00393\ \ \ \ \textcolor{keywordtype}{void}\ system\_contract::propagate\_weight\_change(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysiosystem_1_1voter__info}{voter\_info}}\&\ voter\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00394}00394\ \ \ \ \ \ \ check(\ !voter.proxy\ ||\ !voter.is\_proxy,\ \textcolor{stringliteral}{"{}account\ registered\ as\ a\ proxy\ is\ not\ allowed\ to\ use\ a\ proxy"{}}\ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00395}00395\ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ new\_weight\ =\ \mbox{\hyperlink{namespacesysiosystem_a41b99f8cd7ffeb86ed9c1be086f2ec22}{stake2vote}}(\ voter.staked\ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00396}00396\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ voter.is\_proxy\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00397}00397\ \ \ \ \ \ \ \ \ \ new\_weight\ +=\ voter.proxied\_vote\_weight;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00398}00398\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00399}00399\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00401}00401\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ \mbox{\hyperlink{xbyak__mnemonic_8h_a3357ad22233ec022b85f32d969935f51}{fabs}}(\ new\_weight\ -\/\ voter.last\_vote\_weight\ )\ >\ 1\ )\ \ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00402}00402\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ voter.proxy\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00403}00403\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ proxy\ =\ \_voters.get(\ voter.proxy.value,\ \textcolor{stringliteral}{"{}proxy\ not\ found"{}}\ );\ \textcolor{comment}{//data\ corruption}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00404}00404\ \ \ \ \ \ \ \ \ \ \ \ \ \_voters.modify(\ proxy,\ same\_payer,\ [\&](\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00405}00405\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.proxied\_vote\_weight\ +=\ new\_weight\ -\/\ voter.last\_vote\_weight;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00406}00406\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00407}00407\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00408}00408\ \ \ \ \ \ \ \ \ \ \ \ \ propagate\_weight\_change(\ proxy\ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00409}00409\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00410}00410\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ delta\ =\ new\_weight\ -\/\ voter.last\_vote\_weight;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00411}00411\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ ct\ =\ current\_time\_point();}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00412}00412\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ delta\_change\_rate\ \ \ \ \ \ \ \ \ =\ 0;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00413}00413\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ total\_inactive\_vpay\_share\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00414}00414\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\ \textcolor{keyword}{auto}\ acnt\ :\ voter.producers\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00415}00415\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ prod\ =\ \_producers.get(\ acnt.value,\ \textcolor{stringliteral}{"{}producer\ not\ found"{}}\ );\ \textcolor{comment}{//data\ corruption}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00416}00416\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{double}\ init\_total\_votes\ =\ prod.total\_votes;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00417}00417\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_producers.modify(\ prod,\ same\_payer,\ [\&](\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00418}00418\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.total\_votes\ +=\ delta;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00419}00419\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_gstate.\mbox{\hyperlink{structsysiosystem_1_1sysio__global__state_acb169bdf3bca4e6cabb0f5b8da2adc19}{total\_producer\_vote\_weight}}\ +=\ delta;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00420}00420\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00421}00421\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ prod2\ =\ \_producers2.find(\ acnt.value\ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00422}00422\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ prod2\ !=\ \_producers2.end()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00423}00423\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ last\_claim\_plus\_3days\ =\ prod.last\_claim\_time\ +\ microseconds(3\ *\ useconds\_per\_day);}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00424}00424\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ crossed\_threshold\ \ \ \ \ \ \ =\ (last\_claim\_plus\_3days\ <=\ ct);}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00425}00425\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ updated\_after\_threshold\ =\ (last\_claim\_plus\_3days\ <=\ prod2-\/>last\_votepay\_share\_update);}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00426}00426\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Note:\ updated\_after\_threshold\ implies\ cross\_threshold}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00427}00427\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00428}00428\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ new\_votepay\_share\ =\ update\_producer\_votepay\_share(\ prod2,}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00429}00429\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ct,}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00430}00430\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ updated\_after\_threshold\ ?\ 0.0\ :\ init\_total\_votes,}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00431}00431\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ crossed\_threshold\ \&\&\ !updated\_after\_threshold\ \textcolor{comment}{//\ only\ reset\ votepay\_share\ once\ after\ threshold}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00432}00432\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00433}00433\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00434}00434\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !crossed\_threshold\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00435}00435\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ delta\_change\_rate\ +=\ delta;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00436}00436\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(\ !updated\_after\_threshold\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00437}00437\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ total\_inactive\_vpay\_share\ +=\ new\_votepay\_share;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00438}00438\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ delta\_change\_rate\ -\/=\ init\_total\_votes;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00439}00439\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00440}00440\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00441}00441\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00442}00442\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00443}00443\ \ \ \ \ \ \ \ \ \ \ \ \ update\_total\_votepay\_share(\ ct,\ -\/total\_inactive\_vpay\_share,\ delta\_change\_rate\ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00444}00444\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00445}00445\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00446}00446\ \ \ \ \ \ \ \_voters.modify(\ voter,\ same\_payer,\ [\&](\ \textcolor{keyword}{auto}\&\ v\ )\ \{}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00447}00447\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.last\_vote\_weight\ =\ new\_weight;}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00448}00448\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00449}00449\ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00450}00450\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00451}00451\ }
+\DoxyCodeLine{\Hypertarget{voting_8cpp_source_l00452}00452\ \}\ }
+
+\end{DoxyCode}

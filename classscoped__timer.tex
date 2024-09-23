@@ -1,0 +1,68 @@
+\doxysection{scoped\+\_\+timer Class Reference}
+\hypertarget{classscoped__timer}{}\label{classscoped__timer}\index{scoped\_timer@{scoped\_timer}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classscoped__timer_af0b177ccdf9f0d371548c47bbee73f9b}{scoped\+\_\+timer}} (std\+::string i)
+\item 
+\mbox{\hyperlink{classscoped__timer_a449f5d22df4b3f5db41f4ea9e2f0b93d}{\texorpdfstring{$\sim$}{\string~}scoped\+\_\+timer}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{parser__perf_8cpp_source_l00032}{32}} of file \mbox{\hyperlink{parser__perf_8cpp_source}{parser\+\_\+perf.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classscoped__timer_af0b177ccdf9f0d371548c47bbee73f9b}\index{scoped\_timer@{scoped\_timer}!scoped\_timer@{scoped\_timer}}
+\index{scoped\_timer@{scoped\_timer}!scoped\_timer@{scoped\_timer}}
+\doxysubsubsection{\texorpdfstring{scoped\_timer()}{scoped\_timer()}}
+{\footnotesize\ttfamily \label{classscoped__timer_af0b177ccdf9f0d371548c47bbee73f9b} 
+scoped\+\_\+timer\+::scoped\+\_\+timer (\begin{DoxyParamCaption}\item[{std\+::string}]{i}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{parser__perf_8cpp_source_l00034}{34}} of file \mbox{\hyperlink{parser__perf_8cpp_source}{parser\+\_\+perf.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ m\_id(i),m\_start(std::chrono::steady\_clock::now())\ \{}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}Clock\ "{}}\ <<\ i\ <<\ \textcolor{stringliteral}{"{}:\ "{}};}
+\DoxyCodeLine{00036\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classscoped__timer_a449f5d22df4b3f5db41f4ea9e2f0b93d}\index{scoped\_timer@{scoped\_timer}!````~scoped\_timer@{\texorpdfstring{$\sim$}{\string~}scoped\_timer}}
+\index{````~scoped\_timer@{\texorpdfstring{$\sim$}{\string~}scoped\_timer}!scoped\_timer@{scoped\_timer}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}scoped\_timer()}{\string~scoped\_timer()}}
+{\footnotesize\ttfamily \label{classscoped__timer_a449f5d22df4b3f5db41f4ea9e2f0b93d} 
+scoped\+\_\+timer\+::\texorpdfstring{$\sim$}{\string~}scoped\+\_\+timer (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{parser__perf_8cpp_source_l00037}{37}} of file \mbox{\hyperlink{parser__perf_8cpp_source}{parser\+\_\+perf.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ std::chrono::nanoseconds\ time\_taken\ =\ std::chrono::steady\_clock::now()-\/m\_start;}
+\DoxyCodeLine{00039\ }
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \textcolor{comment}{//nanoseconds\_per\_test}}
+\DoxyCodeLine{00041\ }
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \textcolor{comment}{//tests\_per\_second}}
+\DoxyCodeLine{00043\ }
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \textcolor{comment}{//1000000000.0/(double(time\_taken.count())/1000.0)}}
+\DoxyCodeLine{00045\ }
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ std::cout\ <<\ 1000000000.0/(double(time\_taken.count())/1000.0)\ <<\ std::endl;}
+\DoxyCodeLine{00047\ }
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \textcolor{comment}{//std::cout\ <<\ (1.0/double(time\_taken.count()))\ *\ double(1000000000*1000)\ <<\ std::endl;}}
+\DoxyCodeLine{00049\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/vendor/websocketpp/test/http/\mbox{\hyperlink{parser__perf_8cpp}{parser\+\_\+perf.\+cpp}}\end{DoxyCompactItemize}

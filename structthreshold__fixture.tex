@@ -1,0 +1,310 @@
+\doxysection{threshold\+\_\+fixture Struct Reference}
+\hypertarget{structthreshold__fixture}{}\label{structthreshold__fixture}\index{threshold\_fixture@{threshold\_fixture}}
+
+
+Collaboration diagram for threshold\+\_\+fixture\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=208pt]{structthreshold__fixture__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structthreshold__fixture_1_1mock__space__provider}{mock\+\_\+space\+\_\+provider}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{structthreshold__fixture_accee9c8aed9f34d788eaf61ddf3d00b0}{file\+\_\+space\+\_\+handler\+\_\+t}} = \mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler}{file\+\_\+space\+\_\+handler}}$<$\mbox{\hyperlink{structthreshold__fixture_1_1mock__space__provider}{mock\+\_\+space\+\_\+provider}}$>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structthreshold__fixture_a20b87806310ce3ce8a6713942e790a3a}{threshold\+\_\+fixture}} ()
+\item 
+void \mbox{\hyperlink{structthreshold__fixture_a62923953a5ed42843dbef6af9645bb27}{add\+\_\+file\+\_\+system}} (const bfs\+::path \&path\+\_\+name)
+\item 
+void \mbox{\hyperlink{structthreshold__fixture_a394c4e5f3651186aa2b82bb2a0fe67b9}{set\+\_\+threshold}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} threshold, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} warning\+\_\+threshold)
+\item 
+bool \mbox{\hyperlink{structthreshold__fixture_ad36b722388f251e4b012964b2d8eb071}{is\+\_\+threshold\+\_\+exceeded}} ()
+\item 
+void \mbox{\hyperlink{structthreshold__fixture_a0bca421cfd5a6c19b72a0c665aefe86d}{set\+\_\+shutdown\+\_\+on\+\_\+exceeded}} (bool shutdown\+\_\+on\+\_\+exceeded)
+\item 
+bool \mbox{\hyperlink{structthreshold__fixture_a12384110a96ecb01358f005d70b3d108}{test\+\_\+threshold\+\_\+common}} (std\+::map$<$ bfs\+::path, \mbox{\hyperlink{stdint_8h_a2ba5f6c0633401558d277b2c0e4f758d}{uintmax\+\_\+t}} $>$ \&available, std\+::map$<$ bfs\+::path, int $>$ \&dev, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} warning\+\_\+threshold=75)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+boost\+::asio\+::io\+\_\+context \mbox{\hyperlink{structthreshold__fixture_aea4beff391dd7055477afb31be17ba91}{ctx}}
+\item 
+std\+::function$<$ bfs\+::space\+\_\+info(const bfs\+::path \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}, boost\+::system\+::error\+\_\+code \&ec)$>$ \mbox{\hyperlink{structthreshold__fixture_ae6e78c0f3bb71975641308af02e71436}{mock\+\_\+get\+\_\+space}}
+\item 
+std\+::function$<$ int(const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{classfc_1_1path}{path}}, struct stat \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}})$>$ \mbox{\hyperlink{structthreshold__fixture_a90014508968d6d17b2f58cde93c17b72}{mock\+\_\+get\+\_\+stat}}
+\item 
+\mbox{\hyperlink{structthreshold__fixture_accee9c8aed9f34d788eaf61ddf3d00b0}{file\+\_\+space\+\_\+handler\+\_\+t}} \mbox{\hyperlink{structthreshold__fixture_aa3c10397609ed1f85965a0a65100de51}{space\+\_\+handler}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{test__threshold_8cpp_source_l00012}{12}} of file \mbox{\hyperlink{test__threshold_8cpp_source}{test\+\_\+threshold.\+cpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{structthreshold__fixture_accee9c8aed9f34d788eaf61ddf3d00b0}\index{threshold\_fixture@{threshold\_fixture}!file\_space\_handler\_t@{file\_space\_handler\_t}}
+\index{file\_space\_handler\_t@{file\_space\_handler\_t}!threshold\_fixture@{threshold\_fixture}}
+\doxysubsubsection{\texorpdfstring{file\_space\_handler\_t}{file\_space\_handler\_t}}
+{\footnotesize\ttfamily \label{structthreshold__fixture_accee9c8aed9f34d788eaf61ddf3d00b0} 
+using \mbox{\hyperlink{structthreshold__fixture_accee9c8aed9f34d788eaf61ddf3d00b0}{threshold\+\_\+fixture\+::file\+\_\+space\+\_\+handler\+\_\+t}} = \mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler}{file\+\_\+space\+\_\+handler}}$<$\mbox{\hyperlink{structthreshold__fixture_1_1mock__space__provider}{mock\+\_\+space\+\_\+provider}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{test__threshold_8cpp_source_l00031}{31}} of file \mbox{\hyperlink{test__threshold_8cpp_source}{test\+\_\+threshold.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structthreshold__fixture_a20b87806310ce3ce8a6713942e790a3a}\index{threshold\_fixture@{threshold\_fixture}!threshold\_fixture@{threshold\_fixture}}
+\index{threshold\_fixture@{threshold\_fixture}!threshold\_fixture@{threshold\_fixture}}
+\doxysubsubsection{\texorpdfstring{threshold\_fixture()}{threshold\_fixture()}}
+{\footnotesize\ttfamily \label{structthreshold__fixture_a20b87806310ce3ce8a6713942e790a3a} 
+threshold\+\_\+fixture\+::threshold\+\_\+fixture (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{test__threshold_8cpp_source_l00032}{32}} of file \mbox{\hyperlink{test__threshold_8cpp_source}{test\+\_\+threshold.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00033\ \ \ \ :\ \mbox{\hyperlink{structthreshold__fixture_aa3c10397609ed1f85965a0a65100de51}{space\_handler}}(mock\_space\_provider(*\textcolor{keyword}{this}),\ \mbox{\hyperlink{structthreshold__fixture_aea4beff391dd7055477afb31be17ba91}{ctx}})}
+\DoxyCodeLine{00034\ \ \ \ \{}
+\DoxyCodeLine{00035\ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structthreshold__fixture_a62923953a5ed42843dbef6af9645bb27}\index{threshold\_fixture@{threshold\_fixture}!add\_file\_system@{add\_file\_system}}
+\index{add\_file\_system@{add\_file\_system}!threshold\_fixture@{threshold\_fixture}}
+\doxysubsubsection{\texorpdfstring{add\_file\_system()}{add\_file\_system()}}
+{\footnotesize\ttfamily \label{structthreshold__fixture_a62923953a5ed42843dbef6af9645bb27} 
+void threshold\+\_\+fixture\+::add\+\_\+file\+\_\+system (\begin{DoxyParamCaption}\item[{const bfs\+::path \&}]{path\+\_\+name}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{test__threshold_8cpp_source_l00037}{37}} of file \mbox{\hyperlink{test__threshold_8cpp_source}{test\+\_\+threshold.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \mbox{\hyperlink{structthreshold__fixture_aa3c10397609ed1f85965a0a65100de51}{space\_handler}}.\mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler_a6a5e01f3f35cab4c846640e060b91b63}{add\_file\_system}}(path\_name);}
+\DoxyCodeLine{00039\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=330pt]{structthreshold__fixture_a62923953a5ed42843dbef6af9645bb27_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=330pt]{structthreshold__fixture_a62923953a5ed42843dbef6af9645bb27_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structthreshold__fixture_ad36b722388f251e4b012964b2d8eb071}\index{threshold\_fixture@{threshold\_fixture}!is\_threshold\_exceeded@{is\_threshold\_exceeded}}
+\index{is\_threshold\_exceeded@{is\_threshold\_exceeded}!threshold\_fixture@{threshold\_fixture}}
+\doxysubsubsection{\texorpdfstring{is\_threshold\_exceeded()}{is\_threshold\_exceeded()}}
+{\footnotesize\ttfamily \label{structthreshold__fixture_ad36b722388f251e4b012964b2d8eb071} 
+bool threshold\+\_\+fixture\+::is\+\_\+threshold\+\_\+exceeded (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{test__threshold_8cpp_source_l00045}{45}} of file \mbox{\hyperlink{test__threshold_8cpp_source}{test\+\_\+threshold.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structthreshold__fixture_aa3c10397609ed1f85965a0a65100de51}{space\_handler}}.\mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler_a3571fc8484a45f62857dcbe29d73aa28}{is\_threshold\_exceeded}}();}
+\DoxyCodeLine{00047\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structthreshold__fixture_ad36b722388f251e4b012964b2d8eb071_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structthreshold__fixture_ad36b722388f251e4b012964b2d8eb071_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structthreshold__fixture_a0bca421cfd5a6c19b72a0c665aefe86d}\index{threshold\_fixture@{threshold\_fixture}!set\_shutdown\_on\_exceeded@{set\_shutdown\_on\_exceeded}}
+\index{set\_shutdown\_on\_exceeded@{set\_shutdown\_on\_exceeded}!threshold\_fixture@{threshold\_fixture}}
+\doxysubsubsection{\texorpdfstring{set\_shutdown\_on\_exceeded()}{set\_shutdown\_on\_exceeded()}}
+{\footnotesize\ttfamily \label{structthreshold__fixture_a0bca421cfd5a6c19b72a0c665aefe86d} 
+void threshold\+\_\+fixture\+::set\+\_\+shutdown\+\_\+on\+\_\+exceeded (\begin{DoxyParamCaption}\item[{bool}]{shutdown\+\_\+on\+\_\+exceeded}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{test__threshold_8cpp_source_l00049}{49}} of file \mbox{\hyperlink{test__threshold_8cpp_source}{test\+\_\+threshold.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \mbox{\hyperlink{structthreshold__fixture_aa3c10397609ed1f85965a0a65100de51}{space\_handler}}.\mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler_ac0f510cb0298b9cefe68102772fc5db7}{set\_shutdown\_on\_exceeded}}(shutdown\_on\_exceeded);}
+\DoxyCodeLine{00051\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structthreshold__fixture_a0bca421cfd5a6c19b72a0c665aefe86d_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structthreshold__fixture_a0bca421cfd5a6c19b72a0c665aefe86d_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structthreshold__fixture_a394c4e5f3651186aa2b82bb2a0fe67b9}\index{threshold\_fixture@{threshold\_fixture}!set\_threshold@{set\_threshold}}
+\index{set\_threshold@{set\_threshold}!threshold\_fixture@{threshold\_fixture}}
+\doxysubsubsection{\texorpdfstring{set\_threshold()}{set\_threshold()}}
+{\footnotesize\ttfamily \label{structthreshold__fixture_a394c4e5f3651186aa2b82bb2a0fe67b9} 
+void threshold\+\_\+fixture\+::set\+\_\+threshold (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{threshold}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{warning\+\_\+threshold}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{test__threshold_8cpp_source_l00041}{41}} of file \mbox{\hyperlink{test__threshold_8cpp_source}{test\+\_\+threshold.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \mbox{\hyperlink{structthreshold__fixture_aa3c10397609ed1f85965a0a65100de51}{space\_handler}}.\mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler_a51eaff9443b1a88e06cbbd1344a78071}{set\_threshold}}(threshold,\ warning\_threshold);}
+\DoxyCodeLine{00043\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=330pt]{structthreshold__fixture_a394c4e5f3651186aa2b82bb2a0fe67b9_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=330pt]{structthreshold__fixture_a394c4e5f3651186aa2b82bb2a0fe67b9_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structthreshold__fixture_a12384110a96ecb01358f005d70b3d108}\index{threshold\_fixture@{threshold\_fixture}!test\_threshold\_common@{test\_threshold\_common}}
+\index{test\_threshold\_common@{test\_threshold\_common}!threshold\_fixture@{threshold\_fixture}}
+\doxysubsubsection{\texorpdfstring{test\_threshold\_common()}{test\_threshold\_common()}}
+{\footnotesize\ttfamily \label{structthreshold__fixture_a12384110a96ecb01358f005d70b3d108} 
+bool threshold\+\_\+fixture\+::test\+\_\+threshold\+\_\+common (\begin{DoxyParamCaption}\item[{std\+::map$<$ bfs\+::path, \mbox{\hyperlink{stdint_8h_a2ba5f6c0633401558d277b2c0e4f758d}{uintmax\+\_\+t}} $>$ \&}]{available}{, }\item[{std\+::map$<$ bfs\+::path, int $>$ \&}]{dev}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{warning\+\_\+threshold}{ = {\ttfamily 75}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{test__threshold_8cpp_source_l00053}{53}} of file \mbox{\hyperlink{test__threshold_8cpp_source}{test\+\_\+threshold.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00054\ \ \ \ \{}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \mbox{\hyperlink{structthreshold__fixture_ae6e78c0f3bb71975641308af02e71436}{mock\_get\_space}}\ =\ [available](\ \textcolor{keyword}{const}\ bfs::path\&\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\ boost::system::error\_code\&\ ec)\ \textcolor{keyword}{mutable}\ -\/>\ bfs::space\_info\ \{}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ ec\ =\ boost::system::errc::make\_error\_code(errc::success);}
+\DoxyCodeLine{00057\ }
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ bfs::space\_info\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}};}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}}.capacity\ \ =\ 1000000;}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}}.available\ =\ available[\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}];}
+\DoxyCodeLine{00061\ }
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}};}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00064\ }
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \mbox{\hyperlink{structthreshold__fixture_a90014508968d6d17b2f58cde93c17b72}{mock\_get\_stat}}\ =\ [dev](\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{classfc_1_1path}{path}},\ \textcolor{keyword}{struct\ }stat\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}\ )\ \textcolor{keyword}{mutable}\ -\/>\ \textcolor{keywordtype}{int}\ \{}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ bfs::path\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\ =\ \mbox{\hyperlink{classfc_1_1path}{path}};}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}-\/>st\_dev\ =\ dev[\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}];}
+\DoxyCodeLine{00068\ }
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00071\ }
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \mbox{\hyperlink{structthreshold__fixture_a394c4e5f3651186aa2b82bb2a0fe67b9}{set\_threshold}}(80,\ warning\_threshold);}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \mbox{\hyperlink{structthreshold__fixture_a0bca421cfd5a6c19b72a0c665aefe86d}{set\_shutdown\_on\_exceeded}}(\textcolor{keyword}{true});}
+\DoxyCodeLine{00074\ }
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\ i\ =\ 0;\ i\ <\ available.size();\ i++)\ \{}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structthreshold__fixture_a62923953a5ed42843dbef6af9645bb27}{add\_file\_system}}(\textcolor{stringliteral}{"{}/test"{}}\ +\ std::to\_string(i));}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00078\ }
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structthreshold__fixture_ad36b722388f251e4b012964b2d8eb071}{is\_threshold\_exceeded}}();}
+\DoxyCodeLine{00080\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structthreshold__fixture_a12384110a96ecb01358f005d70b3d108_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structthreshold__fixture_aea4beff391dd7055477afb31be17ba91}\index{threshold\_fixture@{threshold\_fixture}!ctx@{ctx}}
+\index{ctx@{ctx}!threshold\_fixture@{threshold\_fixture}}
+\doxysubsubsection{\texorpdfstring{ctx}{ctx}}
+{\footnotesize\ttfamily \label{structthreshold__fixture_aea4beff391dd7055477afb31be17ba91} 
+boost\+::asio\+::io\+\_\+context threshold\+\_\+fixture\+::ctx}
+
+
+
+Definition at line \mbox{\hyperlink{test__threshold_8cpp_source_l00029}{29}} of file \mbox{\hyperlink{test__threshold_8cpp_source}{test\+\_\+threshold.\+cpp}}.
+
+\Hypertarget{structthreshold__fixture_ae6e78c0f3bb71975641308af02e71436}\index{threshold\_fixture@{threshold\_fixture}!mock\_get\_space@{mock\_get\_space}}
+\index{mock\_get\_space@{mock\_get\_space}!threshold\_fixture@{threshold\_fixture}}
+\doxysubsubsection{\texorpdfstring{mock\_get\_space}{mock\_get\_space}}
+{\footnotesize\ttfamily \label{structthreshold__fixture_ae6e78c0f3bb71975641308af02e71436} 
+std\+::function$<$bfs\+::space\+\_\+info(const bfs\+::path\& \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}, boost\+::system\+::error\+\_\+code\& ec)$>$ threshold\+\_\+fixture\+::mock\+\_\+get\+\_\+space}
+
+
+
+Definition at line \mbox{\hyperlink{test__threshold_8cpp_source_l00083}{83}} of file \mbox{\hyperlink{test__threshold_8cpp_source}{test\+\_\+threshold.\+cpp}}.
+
+\Hypertarget{structthreshold__fixture_a90014508968d6d17b2f58cde93c17b72}\index{threshold\_fixture@{threshold\_fixture}!mock\_get\_stat@{mock\_get\_stat}}
+\index{mock\_get\_stat@{mock\_get\_stat}!threshold\_fixture@{threshold\_fixture}}
+\doxysubsubsection{\texorpdfstring{mock\_get\_stat}{mock\_get\_stat}}
+{\footnotesize\ttfamily \label{structthreshold__fixture_a90014508968d6d17b2f58cde93c17b72} 
+std\+::function$<$int(const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{classfc_1_1path}{path}}, struct stat \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}})$>$ threshold\+\_\+fixture\+::mock\+\_\+get\+\_\+stat}
+
+
+
+Definition at line \mbox{\hyperlink{test__threshold_8cpp_source_l00084}{84}} of file \mbox{\hyperlink{test__threshold_8cpp_source}{test\+\_\+threshold.\+cpp}}.
+
+\Hypertarget{structthreshold__fixture_aa3c10397609ed1f85965a0a65100de51}\index{threshold\_fixture@{threshold\_fixture}!space\_handler@{space\_handler}}
+\index{space\_handler@{space\_handler}!threshold\_fixture@{threshold\_fixture}}
+\doxysubsubsection{\texorpdfstring{space\_handler}{space\_handler}}
+{\footnotesize\ttfamily \label{structthreshold__fixture_aa3c10397609ed1f85965a0a65100de51} 
+\mbox{\hyperlink{structthreshold__fixture_accee9c8aed9f34d788eaf61ddf3d00b0}{file\+\_\+space\+\_\+handler\+\_\+t}} threshold\+\_\+fixture\+::space\+\_\+handler}
+
+
+
+Definition at line \mbox{\hyperlink{test__threshold_8cpp_source_l00086}{86}} of file \mbox{\hyperlink{test__threshold_8cpp_source}{test\+\_\+threshold.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+plugins/resource\+\_\+monitor\+\_\+plugin/test/\mbox{\hyperlink{test__threshold_8cpp}{test\+\_\+threshold.\+cpp}}\end{DoxyCompactItemize}

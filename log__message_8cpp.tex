@@ -1,0 +1,46 @@
+\doxysection{libraries/fc/src/log/log\+\_\+message.cpp File Reference}
+\hypertarget{log__message_8cpp}{}\label{log__message_8cpp}\index{libraries/fc/src/log/log\_message.cpp@{libraries/fc/src/log/log\_message.cpp}}
+{\ttfamily \#include $<$fc/log/log\+\_\+message.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/exception/exception.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/variant.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/time.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/filesystem.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/io/json.\+hpp$>$}\newline
+Include dependency graph for log\+\_\+message.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{log__message_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classfc_1_1detail_1_1log__context__impl}{fc\+::detail\+::log\+\_\+context\+\_\+impl}}
+\item 
+class \mbox{\hyperlink{classfc_1_1detail_1_1log__message__impl}{fc\+::detail\+::log\+\_\+message\+\_\+impl}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacefc}{fc}}
+\begin{DoxyCompactList}\small\item\em namespace \doxylink{namespacesysio_1_1chain}{sysio\+::chain} \end{DoxyCompactList}\item 
+namespace \mbox{\hyperlink{namespacefc_1_1detail}{fc\+::detail}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \& \mbox{\hyperlink{namespacefc_a6b490790e2e4297225ecaee475b64ccb}{fc\+::get\+\_\+thread\+\_\+name}} ()
+\item 
+void \mbox{\hyperlink{namespacefc_a1872b514f4232a25742f1de9ee3fbbd1}{fc\+::to\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1log__context}{log\+\_\+context}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}, \mbox{\hyperlink{classfc_1_1variant}{variant}} \&v)
+\item 
+void \mbox{\hyperlink{namespacefc_a78e632d9c5e00255b798eca04cd5cce8}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{variant}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}, \mbox{\hyperlink{classfc_1_1log__context}{log\+\_\+context}} \&c)
+\item 
+void \mbox{\hyperlink{namespacefc_a414797c3e1b2bde73ccae17379991abc}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{variant}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}, \mbox{\hyperlink{classfc_1_1log__message}{log\+\_\+message}} \&c)
+\item 
+void \mbox{\hyperlink{namespacefc_ab05ec647d778a15b40131c0aa3fb1d6a}{fc\+::to\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1log__message}{log\+\_\+message}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}, \mbox{\hyperlink{classfc_1_1variant}{variant}} \&v)
+\item 
+void \mbox{\hyperlink{namespacefc_aee0810f1b1db08ece638309bbb69c83f}{fc\+::to\+\_\+variant}} (\mbox{\hyperlink{classfc_1_1log__level}{log\+\_\+level}} e, \mbox{\hyperlink{classfc_1_1variant}{variant}} \&v)
+\item 
+void \mbox{\hyperlink{namespacefc_a097ff38ff4be4e50bd7f201fa95420ff}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{variant}} \&e, \mbox{\hyperlink{classfc_1_1log__level}{log\+\_\+level}} \&ll)
+\end{DoxyCompactItemize}

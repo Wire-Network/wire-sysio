@@ -1,0 +1,15 @@
+<map id="Catch::JunitReporter" name="Catch::JunitReporter">
+<area shape="rect" id="Node000001" title=" " alt="" coords="367,213,509,238"/>
+<area shape="rect" id="Node000002" href="$struct_catch_1_1_cumulative_reporter_base.html" title=" " alt="" coords="106,94,287,135"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="255,139,412,210,410,214,253,144"/>
+<area shape="rect" id="Node000003" href="$struct_catch_1_1_i_streaming_reporter.html" title=" " alt="" coords="5,5,183,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="120,39,177,91,173,95,116,43"/>
+<area shape="rect" id="Node000004" href="$struct_catch_1_1_reporter_preferences.html" title=" " alt="" coords="207,5,392,31"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="277,43,220,95,216,91,274,39"/>
+<area shape="rect" id="Node000005" href="$class_catch_1_1_xml_writer.html" title=" " alt="" coords="311,102,432,127"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="389,139,433,211,429,214,384,142"/>
+<area shape="rect" id="Node000006" href="$class_catch_1_1_timer.html" title=" " alt="" coords="456,102,553,127"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="492,142,447,214,443,211,487,139"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="578,102,631,127"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="593,142,574,168,549,191,524,205,498,215,496,210,522,200,546,187,570,164,588,139"/>
+</map>

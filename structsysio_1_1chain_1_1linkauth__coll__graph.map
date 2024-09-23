@@ -1,0 +1,5 @@
+<map id="sysio::chain::linkauth" name="sysio::chain::linkauth">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,124,150,150"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1name.html" title="Immutable except for fc::from_variant." alt="" coords="12,5,143,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="80,47,80,123,75,123,75,47"/>
+</map>

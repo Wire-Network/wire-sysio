@@ -1,0 +1,11 @@
+<map id="CLI::Option::get_type_size_max" name="CLI::Option::get_type_size_max">
+<area shape="rect" id="Node000001" title="The maximum number of arguments the option expects." alt="" coords="344,47,490,88"/>
+<area shape="rect" id="Node000002" href="$namespace_c_l_i.html#a36cfe4a6a80bf143735c0b80960bc252" title="Helper function to mark an option as retired." alt="" coords="175,55,296,80"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="328,70,296,70,296,65,328,65"/>
+<area shape="rect" id="Node000003" href="$namespace_c_l_i.html#a77cd1a3639a91dea33a7d144ea476df6" title="Helper function to mark an option as retired." alt="" coords="5,5,127,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="173,52,112,34,114,29,175,47"/>
+<area shape="rect" id="Node000004" href="$namespace_c_l_i.html#a52390f850f663cf38a27e134c1a39b61" title="Helper function to mark an option as retired." alt="" coords="5,55,127,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="159,70,127,70,127,65,159,65"/>
+<area shape="rect" id="Node000005" href="$namespace_c_l_i.html#ad9ac23b01e2ef840ec123f5a115302ab" title="Helper function to mark an option as retired." alt="" coords="5,104,127,130"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="175,88,114,106,112,101,173,83"/>
+</map>

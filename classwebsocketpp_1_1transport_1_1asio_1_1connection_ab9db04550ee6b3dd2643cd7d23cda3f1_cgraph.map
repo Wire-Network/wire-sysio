@@ -1,0 +1,9 @@
+<map id="websocketpp::transport::asio::connection::set_timer" name="websocketpp::transport::asio::connection::set_timer">
+<area shape="rect" id="Node000001" title="Call back a function after a period of time." alt="" coords="5,85,192,126"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1transport_1_1asio_1_1connection.html#ac190efbc8cfd2654bc07b5b9382c36cc" title="Get a shared pointer to this component." alt="" coords="264,5,422,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="169,82,249,58,250,63,170,87"/>
+<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1transport_1_1asio_1_1connection.html#a61ec4db64a17fcd38d2ca1c819dd2d9b" title="Timer callback." alt="" coords="240,85,446,126"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="192,102,224,102,224,108,192,108"/>
+<area shape="rect" id="Node000004" href="$namespacewebsocketpp_1_1lib_1_1asio.html#a38ce6cba13c37a134a65f3623d00090e" title=" " alt="" coords="267,150,418,191"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="178,123,253,144,251,149,176,129"/>
+</map>

@@ -1,0 +1,11 @@
+<map id="mie::Fp::Dbl" name="mie::Fp::Dbl">
+<area shape="rect" id="Node000001" title=" " alt="" coords="850,28,943,54"/>
+<area shape="rect" id="Node000002" href="$structmie_1_1local_1_1addsubmul.html" title=" " alt="" coords="632,5,802,76"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="817,38,849,38,849,43,817,43"/>
+<area shape="rect" id="Node000003" href="$structmie_1_1local_1_1comparable.html" title=" " alt="" coords="415,13,584,68"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="600,38,632,38,632,43,600,43"/>
+<area shape="rect" id="Node000004" href="$structmie_1_1local_1_1has_negative.html" title=" " alt="" coords="209,20,367,61"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="383,38,415,38,415,43,383,43"/>
+<area shape="rect" id="Node000005" href="$structmie_1_1local_1_1_empty.html" title=" " alt="" coords="5,28,161,54"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="176,38,208,38,208,43,176,43"/>
+</map>

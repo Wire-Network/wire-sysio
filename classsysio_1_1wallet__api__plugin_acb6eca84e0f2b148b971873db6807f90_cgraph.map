@@ -1,0 +1,12 @@
+<map id="sysio::wallet_api_plugin::plugin_initialize" name="sysio::wallet_api_plugin::plugin_initialize">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,51,165,91"/>
+<area shape="rect" id="Node000002" href="$namespaceappbase.html#a99374dc23934f008a09f2f79be9eae40" title=" " alt="" coords="233,21,332,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="165,53,217,43,218,48,166,59"/>
+<area shape="rect" id="Node000004" href="$classappbase_1_1application.html#a3c4b68a0667942b58f1369f454ce0ce3" title=" " alt="" coords="213,79,353,119"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="166,80,198,84,197,90,165,85"/>
+<area shape="rect" id="Node000003" href="$classappbase_1_1application.html#ac874b2659b400fe254f1ae4260d06ecf" title=" " alt="" coords="401,5,541,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="333,29,385,27,386,32,333,34"/>
+<area shape="rect" id="Node000005" href="$classappbase_1_1application.html#add09ef243c90b8f86636c9ee592db739" title=" " alt="" coords="401,95,541,135"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="354,102,386,105,385,110,353,108"/>
+<area shape="poly" id="edge5_Node000005_Node000005" title=" " alt="" coords="435,95,433,85,439,76,452,70,471,68,492,70,504,77,502,81,490,76,471,73,453,75,443,80,439,86,440,93"/>
+</map>

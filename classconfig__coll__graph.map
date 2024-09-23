@@ -1,0 +1,12 @@
+<map id="config" name="config">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,483,62,508"/>
+<area shape="rect" id="Node000002" href="$structwebsocketpp_1_1config_1_1asio__client.html" title="Client config with asio transport and TLS disabled." alt="" coords="88,393,230,433"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="117,444,54,484,51,480,114,440"/>
+<area shape="rect" id="Node000003" href="$structwebsocketpp_1_1config_1_1core__client.html" title="Client config with iostream transport." alt="" coords="122,139,263,180"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="194,195,190,275,176,369,169,393,164,391,171,368,184,274,189,194"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="16,5,62,31"/>
+<area shape="poly" id="edge5_Node000001_Node000004" title=" " alt="" coords="36,47,25,118,16,204,12,286,16,368,24,432,34,482,28,483,19,433,11,369,6,286,11,203,20,117,31,46"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="40,46,43,81,49,98,59,113,88,135,122,148,120,153,85,139,55,117,45,100,38,82,34,46"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="219,5,275,31"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="243,47,220,116,207,140,203,137,215,114,238,45"/>
+</map>

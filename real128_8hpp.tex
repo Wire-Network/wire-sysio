@@ -1,0 +1,58 @@
+\doxysection{libraries/fc/include/fc/real128.hpp File Reference}
+\hypertarget{real128_8hpp}{}\label{real128_8hpp}\index{libraries/fc/include/fc/real128.hpp@{libraries/fc/include/fc/real128.hpp}}
+{\ttfamily \#include $<$fc/uint128.\+hpp$>$}\newline
+Include dependency graph for real128.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{real128_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{real128_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classfc_1_1real128}{fc\+::real128}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacefc}{fc}}
+\begin{DoxyCompactList}\small\item\em namespace \doxylink{namespacesysio_1_1chain}{sysio\+::chain} \end{DoxyCompactList}\item 
+namespace \mbox{\hyperlink{namespacefc_1_1raw}{fc\+::raw}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{real128_8hpp_ac7d6999aca6d173e118c185e3c4513db}{FC\+\_\+\+REAL128\+\_\+\+PRECISION}}~(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}(1000000) \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}(1000000) \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}(1000000))
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{namespacefc_af8b901079ab6961265f159f45e8c8a50}{fc\+::to\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1real128}{real128}} \&var, \mbox{\hyperlink{classfc_1_1variant}{variant}} \&vo)
+\item 
+void \mbox{\hyperlink{namespacefc_a64c3f3dead69a5d90791f81445cb1e92}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{variant}} \&var, \mbox{\hyperlink{classfc_1_1real128}{real128}} \&vo)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_a2e1d77e36260124dbaee9b676929d885}{fc\+::raw\+::pack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, const \mbox{\hyperlink{classfc_1_1real128}{real128}} \&value\+\_\+to\+\_\+pack)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_a93159491c1c78328b6a639eed2071fff}{fc\+::raw\+::unpack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, \mbox{\hyperlink{classfc_1_1real128}{real128}} \&value\+\_\+to\+\_\+unpack)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{real128_8hpp_ac7d6999aca6d173e118c185e3c4513db}\index{real128.hpp@{real128.hpp}!FC\_REAL128\_PRECISION@{FC\_REAL128\_PRECISION}}
+\index{FC\_REAL128\_PRECISION@{FC\_REAL128\_PRECISION}!real128.hpp@{real128.hpp}}
+\doxysubsubsection{\texorpdfstring{FC\_REAL128\_PRECISION}{FC\_REAL128\_PRECISION}}
+{\footnotesize\ttfamily \label{real128_8hpp_ac7d6999aca6d173e118c185e3c4513db} 
+\#define FC\+\_\+\+REAL128\+\_\+\+PRECISION~(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}(1000000) \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}(1000000) \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}(1000000))}
+
+
+
+Definition at line \mbox{\hyperlink{real128_8hpp_source_l00004}{4}} of file \mbox{\hyperlink{real128_8hpp_source}{real128.\+hpp}}.
+

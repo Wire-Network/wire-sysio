@@ -1,0 +1,84 @@
+\doxysection{asset.\+cpp}
+\hypertarget{asset_8cpp_source}{}\label{asset_8cpp_source}\index{libraries/chain/asset.cpp@{libraries/chain/asset.cpp}}
+\mbox{\hyperlink{asset_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{asset_8hpp}{sysio/chain/asset.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <boost/rational.hpp>}}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{fc_2include_2fc_2reflect_2variant_8hpp}{fc/reflect/variant.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00005}00005\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{\ \textcolor{keyword}{namespace\ }chain\ \{}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00007}\mbox{\hyperlink{structsysio_1_1chain_1_1asset_a58fe81c1851c659b8421de02fbf1d188}{00007}}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset_a58fe81c1851c659b8421de02fbf1d188}{asset::decimals}}()\textcolor{keyword}{const\ }\{}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00008}00008\ \ \ \ \textcolor{keywordflow}{return}\ sym.\mbox{\hyperlink{classsysio_1_1chain_1_1symbol_a8e41beda74e6823bf4efe4d478440e88}{decimals}}();}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00009}00009\ \}}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00011}\mbox{\hyperlink{structsysio_1_1chain_1_1asset_a1808300b4460da11bebd5dbf7717e1e1}{00011}}\ \textcolor{keywordtype}{string}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset_a1808300b4460da11bebd5dbf7717e1e1}{asset::symbol\_name}}()\textcolor{keyword}{const\ }\{}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00012}00012\ \ \ \ \textcolor{keywordflow}{return}\ sym.\mbox{\hyperlink{classsysio_1_1chain_1_1symbol_a067cd53c6a32da32671b1302a0c1909a}{name}}();}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00013}00013\ \}}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00015}\mbox{\hyperlink{structsysio_1_1chain_1_1asset_a4cee270d5cd1e6a34ddf22beff6f902b}{00015}}\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset_a4cee270d5cd1e6a34ddf22beff6f902b}{asset::precision}}()\textcolor{keyword}{const\ }\{}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00016}00016\ \ \ \ \textcolor{keywordflow}{return}\ sym.\mbox{\hyperlink{classsysio_1_1chain_1_1symbol_af3be1ca4481ef5adfc236cf94431e2f2}{precision}}();}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00017}00017\ \}}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00019}\mbox{\hyperlink{structsysio_1_1chain_1_1asset_a48c40a7e8e433a43b7af638d10a8debb}{00019}}\ \textcolor{keywordtype}{string}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset_a48c40a7e8e433a43b7af638d10a8debb}{asset::to\_string}}()\textcolor{keyword}{const\ }\{}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00020}00020\ \ \ \ \textcolor{keywordtype}{string}\ sign\ =\ amount\ <\ 0\ ?\ \textcolor{stringliteral}{"{}-\/"{}}\ :\ \textcolor{stringliteral}{"{}"{}};}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00021}00021\ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ abs\_amount\ =\ std::abs(amount);}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00022}00022\ \ \ \ \textcolor{keywordtype}{string}\ result\ =\ \mbox{\hyperlink{namespacefc_a4e07b3870aa72f8c38bdd5f78044dad1}{fc::to\_string}}(\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\textcolor{keyword}{>}(abs\_amount)\ /\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset_a4cee270d5cd1e6a34ddf22beff6f902b}{precision}}());}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00023}00023\ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset_a58fe81c1851c659b8421de02fbf1d188}{decimals}}()\ )}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00024}00024\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00025}00025\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ fract\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\textcolor{keyword}{>}(abs\_amount)\ \%\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset_a4cee270d5cd1e6a34ddf22beff6f902b}{precision}}();}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00026}00026\ \ \ \ \ \ \ result\ +=\ \textcolor{stringliteral}{"{}."{}}\ +\ \mbox{\hyperlink{namespacefc_a4e07b3870aa72f8c38bdd5f78044dad1}{fc::to\_string}}(\mbox{\hyperlink{structsysio_1_1chain_1_1asset_a4cee270d5cd1e6a34ddf22beff6f902b}{precision}}()\ +\ fract).erase(0,1);}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00027}00027\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00028}00028\ \ \ \ \textcolor{keywordflow}{return}\ sign\ +\ result\ +\ \textcolor{stringliteral}{"{}\ "{}}\ +\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset_a1808300b4460da11bebd5dbf7717e1e1}{symbol\_name}}();}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00029}00029\ \}}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00031}\mbox{\hyperlink{structsysio_1_1chain_1_1asset_aad314ec30220438cbed1dda47af3356e}{00031}}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset_aad314ec30220438cbed1dda47af3356e}{asset::from\_string}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\&\ from)}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00032}00032\ \{}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00033}00033\ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00034}00034\ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ =\ \mbox{\hyperlink{namespacefc_af74120b9a0be3c409b63ff3ba526cffc}{fc::trim}}(from);}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00036}00036\ \ \ \ \ \ \ \textcolor{comment}{//\ Find\ space\ in\ order\ to\ split\ amount\ and\ symbol}}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00037}00037\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ space\_pos\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.find(\textcolor{charliteral}{'\ '});}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00038}00038\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}((space\_pos\ !=\ string::npos),\ asset\_type\_exception,\ \textcolor{stringliteral}{"{}Asset's\ amount\ and\ symbol\ should\ be\ separated\ with\ space"{}});}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00039}00039\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ symbol\_str\ =\ \mbox{\hyperlink{namespacefc_af74120b9a0be3c409b63ff3ba526cffc}{fc::trim}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.substr(space\_pos\ +\ 1));}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00040}00040\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ amount\_str\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.substr(0,\ space\_pos);}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00042}00042\ \ \ \ \ \ \ \textcolor{comment}{//\ Ensure\ that\ if\ decimal\ point\ is\ used\ (.),\ decimal\ fraction\ is\ specified}}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00043}00043\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ dot\_pos\ =\ amount\_str.find(\textcolor{charliteral}{'.'});}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00044}00044\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (dot\_pos\ !=\ string::npos)\ \{}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00045}00045\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}((dot\_pos\ !=\ amount\_str.size()\ -\/\ 1),\ asset\_type\_exception,\ \textcolor{stringliteral}{"{}Missing\ decimal\ fraction\ after\ decimal\ point"{}});}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00046}00046\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00048}00048\ \ \ \ \ \ \ \textcolor{comment}{//\ Parse\ symbol}}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00049}00049\ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ precision\_digit\_str;}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00050}00050\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (dot\_pos\ !=\ string::npos)\ \{}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00051}00051\ \ \ \ \ \ \ \ \ \ precision\_digit\_str\ =\ \mbox{\hyperlink{namespacefc_a4e07b3870aa72f8c38bdd5f78044dad1}{sysio::chain::to\_string}}(amount\_str.size()\ -\/\ dot\_pos\ -\/\ 1);}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00052}00052\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \ precision\_digit\_str\ =\ \textcolor{stringliteral}{"{}0"{}};}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00054}00054\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00056}00056\ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ symbol\_part\ =\ precision\_digit\_str\ +\ \textcolor{charliteral}{','}\ +\ symbol\_str;}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00057}00057\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1symbol}{symbol}}\ sym\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1symbol_af67333e1badee3ae6d4b0c528a8f89e0}{symbol::from\_string}}(symbol\_part);}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00059}00059\ \ \ \ \ \ \ \textcolor{comment}{//\ Parse\ amount}}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00060}00060\ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1safe}{safe<int64\_t>}}\ int\_part,\ fract\_part;}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00061}00061\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (dot\_pos\ !=\ string::npos)\ \{}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00062}00062\ \ \ \ \ \ \ \ \ \ int\_part\ =\ \mbox{\hyperlink{namespacefc_afe327b84123fcbda675ea00418471c9a}{fc::to\_int64}}(amount\_str.substr(0,\ dot\_pos));}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00063}00063\ \ \ \ \ \ \ \ \ \ fract\_part\ =\ \mbox{\hyperlink{namespacefc_afe327b84123fcbda675ea00418471c9a}{fc::to\_int64}}(amount\_str.substr(dot\_pos\ +\ 1));}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00064}00064\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (amount\_str[0]\ ==\ \textcolor{charliteral}{'-\/'})\ fract\_part\ *=\ -\/1;}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00065}00065\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00066}00066\ \ \ \ \ \ \ \ \ \ int\_part\ =\ \mbox{\hyperlink{namespacefc_afe327b84123fcbda675ea00418471c9a}{fc::to\_int64}}(amount\_str);}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00067}00067\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00069}00069\ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1safe}{safe<int64\_t>}}\ amount\ =\ int\_part;}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00070}00070\ \ \ \ \ \ \ amount\ *=\ \mbox{\hyperlink{structfc_1_1safe}{safe<int64\_t>}}(sym.\mbox{\hyperlink{classsysio_1_1chain_1_1symbol_af3be1ca4481ef5adfc236cf94431e2f2}{precision}}());}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00071}00071\ \ \ \ \ \ \ amount\ +=\ fract\_part;}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00073}00073\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset_ae1bdaa1519f4c6a01ae1e4ebea043818}{asset}}(amount.\mbox{\hyperlink{structfc_1_1safe_a6bb99e2058adab1fef1f6b9df91006c9}{value}},\ sym);}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00074}00074\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00075}00075\ \ \ \ \mbox{\hyperlink{exception_8hpp_ab46aa678a7742e0ed071b10eb88c615b}{FC\_CAPTURE\_LOG\_AND\_RETHROW}}(\ (from)\ )}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00076}00076\ \}}
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00077}00077\ }
+\DoxyCodeLine{\Hypertarget{asset_8cpp_source_l00078}00078\ \}\ \}\ \ \textcolor{comment}{//\ sysio::types}}
+
+\end{DoxyCode}

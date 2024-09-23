@@ -1,0 +1,58 @@
+\doxysection{libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/test/gtest\+\_\+premature\+\_\+exit\+\_\+test.cc File Reference}
+\hypertarget{gtest__premature__exit__test_8cc}{}\label{gtest__premature__exit__test_8cc}\index{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/test/gtest\_premature\_exit\_test.cc@{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/test/gtest\_premature\_exit\_test.cc}}
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include "{}gtest/gtest.\+h"{}}\newline
+Include dependency graph for gtest\+\_\+premature\+\_\+exit\+\_\+test.\+cc\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{gtest__premature__exit__test_8cc__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{gtest__premature__exit__test_8cc_a3c04138a5bfe5d72780bb7e82a18e627}{main}} (int argc, char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{gtest__premature__exit__test_8cc_a3c04138a5bfe5d72780bb7e82a18e627}\index{gtest\_premature\_exit\_test.cc@{gtest\_premature\_exit\_test.cc}!main@{main}}
+\index{main@{main}!gtest\_premature\_exit\_test.cc@{gtest\_premature\_exit\_test.cc}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{gtest__premature__exit__test_8cc_a3c04138a5bfe5d72780bb7e82a18e627} 
+int main (\begin{DoxyParamCaption}\item[{int}]{argc}{, }\item[{char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{argv}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest__premature__exit__test_8cc_source_l00110}{110}} of file \mbox{\hyperlink{gtest__premature__exit__test_8cc_source}{gtest\+\_\+premature\+\_\+exit\+\_\+test.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00111\ \ \ \mbox{\hyperlink{namespacetesting_afd726ae08c9bd16dc52f78c822d9946b}{InitGoogleTest}}(\&argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}});}
+\DoxyCodeLine{00112\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ exit\_code\ =\ \mbox{\hyperlink{gtest_8h_a853a3792807489591d3d4a2f2ff9359f}{RUN\_ALL\_TESTS}}();}
+\DoxyCodeLine{00113\ }
+\DoxyCodeLine{00114\ \ \ \textcolor{comment}{//\ Test\ that\ the\ premature-\/exit\ file\ is\ deleted\ upon\ return\ from}}
+\DoxyCodeLine{00115\ \ \ \textcolor{comment}{//\ RUN\_ALL\_TESTS().}}
+\DoxyCodeLine{00116\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \textcolor{keyword}{const}\ filepath\ =\ \mbox{\hyperlink{namespacetesting_1_1internal_1_1posix_aa78973d3f7aa4efd24742b0537c8cd50}{GetEnv}}(\textcolor{stringliteral}{"{}TEST\_PREMATURE\_EXIT\_FILE"{}});}
+\DoxyCodeLine{00117\ \ \ \textcolor{keywordflow}{if}\ (filepath\ !=\ NULL\ \&\&\ *filepath\ !=\ \textcolor{charliteral}{'\(\backslash\)0'})\ \{}
+\DoxyCodeLine{00118\ \ \ \ \ \textcolor{keywordflow}{if}\ (PrematureExitTest::FileExists(filepath))\ \{}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}File\ \%s\ shouldn't\ exist\ after\ the\ test\ program\ finishes,\ but\ does."{}},}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \ \ filepath);}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{00123\ \ \ \ \ \}}
+\DoxyCodeLine{00124\ \ \ \}}
+\DoxyCodeLine{00125\ }
+\DoxyCodeLine{00126\ \ \ \textcolor{keywordflow}{return}\ exit\_code;}
+\DoxyCodeLine{00127\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=252pt]{gtest__premature__exit__test_8cc_a3c04138a5bfe5d72780bb7e82a18e627_cgraph}
+\end{center}
+\end{figure}

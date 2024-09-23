@@ -1,0 +1,799 @@
+\doxysection{fc\+::detail\+::rate\+\_\+limiting\+\_\+group\+\_\+impl Class Reference}
+\hypertarget{classfc_1_1detail_1_1rate__limiting__group__impl}{}\label{classfc_1_1detail_1_1rate__limiting__group__impl}\index{fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}}
+
+
+Inheritance diagram for fc\+::detail\+::rate\+\_\+limiting\+\_\+group\+\_\+impl\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=192pt]{classfc_1_1detail_1_1rate__limiting__group__impl__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for fc\+::detail\+::rate\+\_\+limiting\+\_\+group\+\_\+impl\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1detail_1_1rate__limiting__group__impl__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef std\+::list$<$ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation}{rate\+\_\+limited\+\_\+operation}} \texorpdfstring{$\ast$}{*} $>$ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ab3c3730e5022917856d1976c90c8ed35}{rate\+\_\+limited\+\_\+operation\+\_\+list}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a863869f673130316f4f8af14f83bbbf5}{rate\+\_\+limiting\+\_\+group\+\_\+impl}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} upload\+\_\+bytes\+\_\+per\+\_\+second, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} download\+\_\+bytes\+\_\+per\+\_\+second, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} burstiness\+\_\+in\+\_\+seconds=1)
+\item 
+\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a68364005cee1ff5e92fd6582000e5439}{\texorpdfstring{$\sim$}{\string~}rate\+\_\+limiting\+\_\+group\+\_\+impl}} ()
+\item 
+virtual size\+\_\+t \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a8fe749da93ec7a60083d03c8a82a5091}{readsome}} (boost\+::asio\+::ip\+::tcp\+::socket \&socket, char \texorpdfstring{$\ast$}{*}buffer, size\+\_\+t length) override
+\item 
+virtual size\+\_\+t \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a77951eaab9932d076e231fabdbfde61e}{readsome}} (boost\+::asio\+::ip\+::tcp\+::socket \&socket, const std\+::shared\+\_\+ptr$<$ char $>$ \&buffer, size\+\_\+t length, size\+\_\+t offset) override
+\item 
+{\footnotesize template$<$typename Buffer\+Type $>$ }\\size\+\_\+t \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ac9c0f88e27254463a65975d5cc8484cd}{readsome\+\_\+impl}} (boost\+::asio\+::ip\+::tcp\+::socket \&socket, const Buffer\+Type \&buffer, size\+\_\+t length, size\+\_\+t offset)
+\item 
+virtual size\+\_\+t \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a50b7ec22b99f4ff67d71e44f2e2bdc88}{writesome}} (boost\+::asio\+::ip\+::tcp\+::socket \&socket, const char \texorpdfstring{$\ast$}{*}buffer, size\+\_\+t length) override
+\item 
+virtual size\+\_\+t \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ab6a53d6b835cb2d3ada56c834dc0bbe5}{writesome}} (boost\+::asio\+::ip\+::tcp\+::socket \&socket, const std\+::shared\+\_\+ptr$<$ const char $>$ \&buffer, size\+\_\+t length, size\+\_\+t offset) override
+\item 
+{\footnotesize template$<$typename Buffer\+Type $>$ }\\size\+\_\+t \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_aee2678c053a998c49ad7c671c77fe4dd}{writesome\+\_\+impl}} (boost\+::asio\+::ip\+::tcp\+::socket \&socket, const Buffer\+Type \&buffer, size\+\_\+t length, size\+\_\+t offset)
+\item 
+void \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a30e2a1f703fcd1983c5e2afb2dcd1ef7}{process\+\_\+pending\+\_\+reads}} ()
+\item 
+void \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_acea1501bba905857cdda6347631eb05b}{process\+\_\+pending\+\_\+writes}} ()
+\item 
+void \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ab87ad5f4ec8adcf3702745b30cd822ad}{process\+\_\+pending\+\_\+operations}} (\mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} \&last\+\_\+iteration\+\_\+start\+\_\+time, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \&limit\+\_\+bytes\+\_\+per\+\_\+second, \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ab3c3730e5022917856d1976c90c8ed35}{rate\+\_\+limited\+\_\+operation\+\_\+list}} \&operations\+\_\+in\+\_\+progress, \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ab3c3730e5022917856d1976c90c8ed35}{rate\+\_\+limited\+\_\+operation\+\_\+list}} \&operations\+\_\+for\+\_\+next\+\_\+iteration, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \&tokens, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \&unused\+\_\+tokens)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_aea464c799c11ea096400b885d642bba4}{\+\_\+upload\+\_\+bytes\+\_\+per\+\_\+second}}
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ab36bd64432521d513445cefc3e303eb6}{\+\_\+download\+\_\+bytes\+\_\+per\+\_\+second}}
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a88a841d35cba76a6704c868c4183a3b7}{\+\_\+burstiness\+\_\+in\+\_\+seconds}}
+\item 
+\mbox{\hyperlink{classfc_1_1microseconds}{microseconds}} \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a40589128811002a815b3ae26244c60a9}{\+\_\+granularity}}
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a0dcb6b1c8dfd386197232a21fb7f73a7}{\+\_\+read\+\_\+tokens}}
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a9376b5505587791a43adeb43b05f8056}{\+\_\+unused\+\_\+read\+\_\+tokens}}
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a7a35d9108ae23c5a99a73693dc7a1c54}{\+\_\+write\+\_\+tokens}}
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a966cf125ef17beef029f5c8352302758}{\+\_\+unused\+\_\+write\+\_\+tokens}}
+\item 
+\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ab3c3730e5022917856d1976c90c8ed35}{rate\+\_\+limited\+\_\+operation\+\_\+list}} \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_aa02fce050432e868fa63a1817d639b20}{\+\_\+read\+\_\+operations\+\_\+in\+\_\+progress}}
+\item 
+\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ab3c3730e5022917856d1976c90c8ed35}{rate\+\_\+limited\+\_\+operation\+\_\+list}} \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ac6c58ba1dce6c246b610978efaa953f5}{\+\_\+read\+\_\+operations\+\_\+for\+\_\+next\+\_\+iteration}}
+\item 
+\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ab3c3730e5022917856d1976c90c8ed35}{rate\+\_\+limited\+\_\+operation\+\_\+list}} \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a3fedce7e9ee44f57af077391af013cd4}{\+\_\+write\+\_\+operations\+\_\+in\+\_\+progress}}
+\item 
+\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ab3c3730e5022917856d1976c90c8ed35}{rate\+\_\+limited\+\_\+operation\+\_\+list}} \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a4eab5449ce828620059a63481584b914}{\+\_\+write\+\_\+operations\+\_\+for\+\_\+next\+\_\+iteration}}
+\item 
+\mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ab27d2289d9b796a3ad2eb6948d17f752}{\+\_\+last\+\_\+read\+\_\+iteration\+\_\+time}}
+\item 
+\mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a66e7e14cddeacf23b2cc907f2b75cd05}{\+\_\+last\+\_\+write\+\_\+iteration\+\_\+time}}
+\item 
+future$<$ void $>$ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ac9074d5e5c064707c52bcb8973639519}{\+\_\+process\+\_\+pending\+\_\+reads\+\_\+loop\+\_\+complete}}
+\item 
+promise$<$ void $>$\+::ptr \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ac27a30522117cbf377c837a1e21fefdb}{\+\_\+new\+\_\+read\+\_\+operation\+\_\+available\+\_\+promise}}
+\item 
+future$<$ void $>$ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a2dfe2dbb88f981587d9fab0be48cccc4}{\+\_\+process\+\_\+pending\+\_\+writes\+\_\+loop\+\_\+complete}}
+\item 
+promise$<$ void $>$\+::ptr \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a0eb2b117fe73fe9b58ba6a4d7dfc7ed4}{\+\_\+new\+\_\+write\+\_\+operation\+\_\+available\+\_\+promise}}
+\item 
+\mbox{\hyperlink{classfc_1_1detail_1_1average__rate__meter}{average\+\_\+rate\+\_\+meter}} \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_aac40eb765de719da6eadf2074fbe6e17}{\+\_\+actual\+\_\+upload\+\_\+rate}}
+\item 
+\mbox{\hyperlink{classfc_1_1detail_1_1average__rate__meter}{average\+\_\+rate\+\_\+meter}} \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a866c9c96a0ad6aa3c5b867b0289ac9bc}{\+\_\+actual\+\_\+download\+\_\+rate}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00191}{191}} of file \mbox{\hyperlink{rate__limiting_8cpp_source}{rate\+\_\+limiting.\+cpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classfc_1_1detail_1_1rate__limiting__group__impl_ab3c3730e5022917856d1976c90c8ed35}\index{fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}!rate\_limited\_operation\_list@{rate\_limited\_operation\_list}}
+\index{rate\_limited\_operation\_list@{rate\_limited\_operation\_list}!fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}}
+\doxysubsubsection{\texorpdfstring{rate\_limited\_operation\_list}{rate\_limited\_operation\_list}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1rate__limiting__group__impl_ab3c3730e5022917856d1976c90c8ed35} 
+std\+::list$<$\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation}{rate\+\_\+limited\+\_\+operation}}\texorpdfstring{$\ast$}{*}$>$ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ab3c3730e5022917856d1976c90c8ed35}{fc\+::detail\+::rate\+\_\+limiting\+\_\+group\+\_\+impl\+::rate\+\_\+limited\+\_\+operation\+\_\+list}}}
+
+
+
+Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00204}{204}} of file \mbox{\hyperlink{rate__limiting_8cpp_source}{rate\+\_\+limiting.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1detail_1_1rate__limiting__group__impl_a863869f673130316f4f8af14f83bbbf5}\index{fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}!rate\_limiting\_group\_impl@{rate\_limiting\_group\_impl}}
+\index{rate\_limiting\_group\_impl@{rate\_limiting\_group\_impl}!fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}}
+\doxysubsubsection{\texorpdfstring{rate\_limiting\_group\_impl()}{rate\_limiting\_group\_impl()}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1rate__limiting__group__impl_a863869f673130316f4f8af14f83bbbf5} 
+fc\+::detail\+::rate\+\_\+limiting\+\_\+group\+\_\+impl\+::rate\+\_\+limiting\+\_\+group\+\_\+impl (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{upload\+\_\+bytes\+\_\+per\+\_\+second}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{download\+\_\+bytes\+\_\+per\+\_\+second}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{burstiness\+\_\+in\+\_\+seconds}{ = {\ttfamily 1}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00244}{244}} of file \mbox{\hyperlink{rate__limiting_8cpp_source}{rate\+\_\+limiting.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00245\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :}
+\DoxyCodeLine{00246\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_aea464c799c11ea096400b885d642bba4}{\_upload\_bytes\_per\_second}}(upload\_bytes\_per\_second),}
+\DoxyCodeLine{00247\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ab36bd64432521d513445cefc3e303eb6}{\_download\_bytes\_per\_second}}(download\_bytes\_per\_second),}
+\DoxyCodeLine{00248\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a88a841d35cba76a6704c868c4183a3b7}{\_burstiness\_in\_seconds}}(burstiness\_in\_seconds),}
+\DoxyCodeLine{00249\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a40589128811002a815b3ae26244c60a9}{\_granularity}}(\mbox{\hyperlink{namespacefc_a76ae235ec7e9b8862e70740058d7eb1b}{milliseconds}}(50)),}
+\DoxyCodeLine{00250\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a0dcb6b1c8dfd386197232a21fb7f73a7}{\_read\_tokens}}(\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ab36bd64432521d513445cefc3e303eb6}{\_download\_bytes\_per\_second}}),}
+\DoxyCodeLine{00251\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a9376b5505587791a43adeb43b05f8056}{\_unused\_read\_tokens}}(0),}
+\DoxyCodeLine{00252\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a7a35d9108ae23c5a99a73693dc7a1c54}{\_write\_tokens}}(\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_aea464c799c11ea096400b885d642bba4}{\_upload\_bytes\_per\_second}}),}
+\DoxyCodeLine{00253\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a966cf125ef17beef029f5c8352302758}{\_unused\_write\_tokens}}(0)}
+\DoxyCodeLine{00254\ \ \ \ \ \{}
+\DoxyCodeLine{00255\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1detail_1_1rate__limiting__group__impl_a68364005cee1ff5e92fd6582000e5439}\index{fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}!````~rate\_limiting\_group\_impl@{\texorpdfstring{$\sim$}{\string~}rate\_limiting\_group\_impl}}
+\index{````~rate\_limiting\_group\_impl@{\texorpdfstring{$\sim$}{\string~}rate\_limiting\_group\_impl}!fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}rate\_limiting\_group\_impl()}{\string~rate\_limiting\_group\_impl()}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1rate__limiting__group__impl_a68364005cee1ff5e92fd6582000e5439} 
+fc\+::detail\+::rate\+\_\+limiting\+\_\+group\+\_\+impl\+::\texorpdfstring{$\sim$}{\string~}rate\+\_\+limiting\+\_\+group\+\_\+impl (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00257}{257}} of file \mbox{\hyperlink{rate__limiting_8cpp_source}{rate\+\_\+limiting.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00258\ \ \ \ \ \{}
+\DoxyCodeLine{00259\ \ \ \ \ \ \ \textcolor{keywordflow}{try}}
+\DoxyCodeLine{00260\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00261\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ac9074d5e5c064707c52bcb8973639519}{\_process\_pending\_reads\_loop\_complete}}.cancel\_and\_wait();}
+\DoxyCodeLine{00262\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00263\ \ \ \ \ \ \ \textcolor{keywordflow}{catch}\ (...)}
+\DoxyCodeLine{00264\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00265\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00266\ \ \ \ \ \ \ \textcolor{keywordflow}{try}}
+\DoxyCodeLine{00267\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00268\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a2dfe2dbb88f981587d9fab0be48cccc4}{\_process\_pending\_writes\_loop\_complete}}.cancel\_and\_wait();}
+\DoxyCodeLine{00269\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00270\ \ \ \ \ \ \ \textcolor{keywordflow}{catch}\ (...)}
+\DoxyCodeLine{00271\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00272\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00273\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1detail_1_1rate__limiting__group__impl_ab87ad5f4ec8adcf3702745b30cd822ad}\index{fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}!process\_pending\_operations@{process\_pending\_operations}}
+\index{process\_pending\_operations@{process\_pending\_operations}!fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}}
+\doxysubsubsection{\texorpdfstring{process\_pending\_operations()}{process\_pending\_operations()}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1rate__limiting__group__impl_ab87ad5f4ec8adcf3702745b30cd822ad} 
+void fc\+::detail\+::rate\+\_\+limiting\+\_\+group\+\_\+impl\+::process\+\_\+pending\+\_\+operations (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} \&}]{last\+\_\+iteration\+\_\+start\+\_\+time}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \&}]{limit\+\_\+bytes\+\_\+per\+\_\+second}{, }\item[{\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ab3c3730e5022917856d1976c90c8ed35}{rate\+\_\+limited\+\_\+operation\+\_\+list}} \&}]{operations\+\_\+in\+\_\+progress}{, }\item[{\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ab3c3730e5022917856d1976c90c8ed35}{rate\+\_\+limited\+\_\+operation\+\_\+list}} \&}]{operations\+\_\+for\+\_\+next\+\_\+iteration}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \&}]{tokens}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \&}]{unused\+\_\+tokens}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00409}{409}} of file \mbox{\hyperlink{rate__limiting_8cpp_source}{rate\+\_\+limiting.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00415\ \ \ \ \ \{}
+\DoxyCodeLine{00416\ \ \ \ \ \ \ \textcolor{comment}{//\ lock\ here\ for\ multithreaded}}
+\DoxyCodeLine{00417\ \ \ \ \ \ \ std::copy(operations\_for\_next\_iteration.begin(),}
+\DoxyCodeLine{00418\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ operations\_for\_next\_iteration.end(),}
+\DoxyCodeLine{00419\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::back\_inserter(operations\_in\_progress));}
+\DoxyCodeLine{00420\ \ \ \ \ \ \ operations\_for\_next\_iteration.clear();}
+\DoxyCodeLine{00421\ }
+\DoxyCodeLine{00422\ \ \ \ \ \ \ \textcolor{comment}{//\ find\ out\ how\ much\ time\ since\ our\ last\ read/write}}
+\DoxyCodeLine{00423\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_a28ca3704afa6ea443dd4a095daaedb3a}{time\_point}}\ this\_iteration\_start\_time\ =\ \mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{time\_point::now}}();}
+\DoxyCodeLine{00424\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (limit\_bytes\_per\_second)\ \textcolor{comment}{//\ the\ we\ are\ limiting\ up/download\ speed}}
+\DoxyCodeLine{00425\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00426\ \ \ \ \ \ \ \ \ microseconds\ time\_since\_last\_iteration\ =\ this\_iteration\_start\_time\ -\/\ last\_iteration\_start\_time;}
+\DoxyCodeLine{00427\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (time\_since\_last\_iteration\ >\ \mbox{\hyperlink{namespacefc_a9623b8cae3f48bbed6aa1fc2afe9b174}{seconds}}(1))}
+\DoxyCodeLine{00428\ \ \ \ \ \ \ \ \ \ \ time\_since\_last\_iteration\ =\ \mbox{\hyperlink{namespacefc_a9623b8cae3f48bbed6aa1fc2afe9b174}{seconds}}(1);}
+\DoxyCodeLine{00429\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (time\_since\_last\_iteration\ <\ microseconds(0))}
+\DoxyCodeLine{00430\ \ \ \ \ \ \ \ \ \ \ time\_since\_last\_iteration\ =\ microseconds(0);}
+\DoxyCodeLine{00431\ }
+\DoxyCodeLine{00432\ \ \ \ \ \ \ \ \ tokens\ +=\ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})((limit\_bytes\_per\_second\ *\ time\_since\_last\_iteration.count())\ /\ 1000000);}
+\DoxyCodeLine{00433\ \ \ \ \ \ \ \ \ tokens\ +=\ unused\_tokens;}
+\DoxyCodeLine{00434\ \ \ \ \ \ \ \ \ unused\_tokens\ =\ 0;}
+\DoxyCodeLine{00435\ \ \ \ \ \ \ \ \ tokens\ =\ std::min(tokens,\ limit\_bytes\_per\_second\ *\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a88a841d35cba76a6704c868c4183a3b7}{\_burstiness\_in\_seconds}});}
+\DoxyCodeLine{00436\ }
+\DoxyCodeLine{00437\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (tokens)}
+\DoxyCodeLine{00438\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00439\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ sort\ the\ pending\ reads/writes\ in\ order\ of\ the\ number\ of\ bytes\ they\ need\ to\ write,\ smallest\ first}}
+\DoxyCodeLine{00440\ \ \ \ \ \ \ \ \ \ \ std::vector<rate\_limited\_operation*>\ operations\_sorted\_by\_length;}
+\DoxyCodeLine{00441\ \ \ \ \ \ \ \ \ \ \ operations\_sorted\_by\_length.reserve(operations\_in\_progress.size());}
+\DoxyCodeLine{00442\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (rate\_limited\_operation*\ operation\_data\ :\ operations\_in\_progress)}
+\DoxyCodeLine{00443\ \ \ \ \ \ \ \ \ \ \ \ \ operations\_sorted\_by\_length.push\_back(operation\_data);}
+\DoxyCodeLine{00444\ \ \ \ \ \ \ \ \ \ \ std::sort(operations\_sorted\_by\_length.begin(),\ operations\_sorted\_by\_length.end(),\ is\_operation\_shorter());}
+\DoxyCodeLine{00445\ }
+\DoxyCodeLine{00446\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ figure\ out\ how\ many\ bytes\ each\ reader/writer\ is\ allowed\ to\ read/write}}
+\DoxyCodeLine{00447\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ bytes\_remaining\_to\_allocate\ =\ tokens;}
+\DoxyCodeLine{00448\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (!operations\_sorted\_by\_length.empty())}
+\DoxyCodeLine{00449\ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00450\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ bytes\_permitted\_for\_this\_operation\ =\ bytes\_remaining\_to\_allocate\ /\ operations\_sorted\_by\_length.size();}
+\DoxyCodeLine{00451\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ bytes\_allocated\_for\_this\_operation\ =\ std::min<size\_t>(operations\_sorted\_by\_length.back()-\/>length,\ bytes\_permitted\_for\_this\_operation);}
+\DoxyCodeLine{00452\ \ \ \ \ \ \ \ \ \ \ \ \ operations\_sorted\_by\_length.back()-\/>permitted\_length\ =\ bytes\_allocated\_for\_this\_operation;}
+\DoxyCodeLine{00453\ \ \ \ \ \ \ \ \ \ \ \ \ bytes\_remaining\_to\_allocate\ -\/=\ bytes\_allocated\_for\_this\_operation;}
+\DoxyCodeLine{00454\ \ \ \ \ \ \ \ \ \ \ \ \ operations\_sorted\_by\_length.pop\_back();}
+\DoxyCodeLine{00455\ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00456\ \ \ \ \ \ \ \ \ \ \ tokens\ =\ bytes\_remaining\_to\_allocate;}
+\DoxyCodeLine{00457\ }
+\DoxyCodeLine{00458\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ kick\ off\ the\ reads/writes\ in\ first-\/come\ order}}
+\DoxyCodeLine{00459\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\ iter\ =\ operations\_in\_progress.begin();\ iter\ !=\ operations\_in\_progress.end();)}
+\DoxyCodeLine{00460\ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00461\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((*iter)-\/>permitted\_length\ >\ 0)}
+\DoxyCodeLine{00462\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00463\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ rate\_limited\_operation*\ operation\_to\_perform\ =\ *iter;}
+\DoxyCodeLine{00464\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ iter\ =\ operations\_in\_progress.erase(iter);}
+\DoxyCodeLine{00465\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ operation\_to\_perform-\/>perform\_operation();}
+\DoxyCodeLine{00466\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00467\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00468\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++iter;}
+\DoxyCodeLine{00469\ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00470\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00471\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00472\ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{comment}{//\ down/upload\ speed\ is\ unlimited}}
+\DoxyCodeLine{00473\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00474\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ we\ shouldn't\ end\ up\ here\ often.\ \ If\ the\ rate\ is\ unlimited,\ we\ should\ just\ execute}}
+\DoxyCodeLine{00475\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ the\ operation\ immediately\ without\ being\ queued\ up.\ \ This\ should\ only\ be\ hit\ if}}
+\DoxyCodeLine{00476\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ we\ change\ from\ a\ limited\ rate\ to\ unlimited}}
+\DoxyCodeLine{00477\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\ iter\ =\ operations\_in\_progress.begin();}
+\DoxyCodeLine{00478\ \ \ \ \ \ \ \ \ \ \ \ \ \ iter\ !=\ operations\_in\_progress.end();)}
+\DoxyCodeLine{00479\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00480\ \ \ \ \ \ \ \ \ \ \ rate\_limited\_operation*\ operation\_to\_perform\ =\ *iter;}
+\DoxyCodeLine{00481\ \ \ \ \ \ \ \ \ \ \ iter\ =\ operations\_in\_progress.erase(iter);}
+\DoxyCodeLine{00482\ \ \ \ \ \ \ \ \ \ \ operation\_to\_perform-\/>permitted\_length\ =\ operation\_to\_perform-\/>length;}
+\DoxyCodeLine{00483\ \ \ \ \ \ \ \ \ \ \ operation\_to\_perform-\/>perform\_operation();}
+\DoxyCodeLine{00484\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00485\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00486\ \ \ \ \ \ \ last\_iteration\_start\_time\ =\ this\_iteration\_start\_time;}
+\DoxyCodeLine{00487\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1detail_1_1rate__limiting__group__impl_ab87ad5f4ec8adcf3702745b30cd822ad_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1detail_1_1rate__limiting__group__impl_ab87ad5f4ec8adcf3702745b30cd822ad_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1detail_1_1rate__limiting__group__impl_a30e2a1f703fcd1983c5e2afb2dcd1ef7}\index{fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}!process\_pending\_reads@{process\_pending\_reads}}
+\index{process\_pending\_reads@{process\_pending\_reads}!fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}}
+\doxysubsubsection{\texorpdfstring{process\_pending\_reads()}{process\_pending\_reads()}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1rate__limiting__group__impl_a30e2a1f703fcd1983c5e2afb2dcd1ef7} 
+void fc\+::detail\+::rate\+\_\+limiting\+\_\+group\+\_\+impl\+::process\+\_\+pending\+\_\+reads (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00367}{367}} of file \mbox{\hyperlink{rate__limiting_8cpp_source}{rate\+\_\+limiting.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00368\ \ \ \ \ \{}
+\DoxyCodeLine{00369\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (;;)}
+\DoxyCodeLine{00370\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00371\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ab87ad5f4ec8adcf3702745b30cd822ad}{process\_pending\_operations}}(\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ab27d2289d9b796a3ad2eb6948d17f752}{\_last\_read\_iteration\_time}},\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ab36bd64432521d513445cefc3e303eb6}{\_download\_bytes\_per\_second}},}
+\DoxyCodeLine{00372\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_aa02fce050432e868fa63a1817d639b20}{\_read\_operations\_in\_progress}},\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ac6c58ba1dce6c246b610978efaa953f5}{\_read\_operations\_for\_next\_iteration}},\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a0dcb6b1c8dfd386197232a21fb7f73a7}{\_read\_tokens}},\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a9376b5505587791a43adeb43b05f8056}{\_unused\_read\_tokens}});}
+\DoxyCodeLine{00373\ }
+\DoxyCodeLine{00374\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ac27a30522117cbf377c837a1e21fefdb}{\_new\_read\_operation\_available\_promise}}\ =\ \textcolor{keyword}{new}\ promise<void>(\textcolor{stringliteral}{"{}rate\_limiting\_group\_impl::process\_pending\_reads"{}});}
+\DoxyCodeLine{00375\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}}
+\DoxyCodeLine{00376\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00377\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_aa02fce050432e868fa63a1817d639b20}{\_read\_operations\_in\_progress}}.empty())}
+\DoxyCodeLine{00378\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ac27a30522117cbf377c837a1e21fefdb}{\_new\_read\_operation\_available\_promise}}-\/>wait();}
+\DoxyCodeLine{00379\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00380\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ac27a30522117cbf377c837a1e21fefdb}{\_new\_read\_operation\_available\_promise}}-\/>wait(\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a40589128811002a815b3ae26244c60a9}{\_granularity}});}
+\DoxyCodeLine{00381\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00382\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{catch}\ (\textcolor{keyword}{const}\ timeout\_exception\&)}
+\DoxyCodeLine{00383\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00384\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00385\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ac27a30522117cbf377c837a1e21fefdb}{\_new\_read\_operation\_available\_promise}}.reset();}
+\DoxyCodeLine{00386\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00387\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1detail_1_1rate__limiting__group__impl_a30e2a1f703fcd1983c5e2afb2dcd1ef7_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1detail_1_1rate__limiting__group__impl_a30e2a1f703fcd1983c5e2afb2dcd1ef7_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1detail_1_1rate__limiting__group__impl_acea1501bba905857cdda6347631eb05b}\index{fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}!process\_pending\_writes@{process\_pending\_writes}}
+\index{process\_pending\_writes@{process\_pending\_writes}!fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}}
+\doxysubsubsection{\texorpdfstring{process\_pending\_writes()}{process\_pending\_writes()}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1rate__limiting__group__impl_acea1501bba905857cdda6347631eb05b} 
+void fc\+::detail\+::rate\+\_\+limiting\+\_\+group\+\_\+impl\+::process\+\_\+pending\+\_\+writes (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00388}{388}} of file \mbox{\hyperlink{rate__limiting_8cpp_source}{rate\+\_\+limiting.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00389\ \ \ \ \ \{}
+\DoxyCodeLine{00390\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (;;)}
+\DoxyCodeLine{00391\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00392\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ab87ad5f4ec8adcf3702745b30cd822ad}{process\_pending\_operations}}(\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a66e7e14cddeacf23b2cc907f2b75cd05}{\_last\_write\_iteration\_time}},\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_aea464c799c11ea096400b885d642bba4}{\_upload\_bytes\_per\_second}},}
+\DoxyCodeLine{00393\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a3fedce7e9ee44f57af077391af013cd4}{\_write\_operations\_in\_progress}},\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a4eab5449ce828620059a63481584b914}{\_write\_operations\_for\_next\_iteration}},\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a7a35d9108ae23c5a99a73693dc7a1c54}{\_write\_tokens}},\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a966cf125ef17beef029f5c8352302758}{\_unused\_write\_tokens}});}
+\DoxyCodeLine{00394\ }
+\DoxyCodeLine{00395\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a0eb2b117fe73fe9b58ba6a4d7dfc7ed4}{\_new\_write\_operation\_available\_promise}}\ =\ \textcolor{keyword}{new}\ promise<void>(\textcolor{stringliteral}{"{}rate\_limiting\_group\_impl::process\_pending\_writes"{}});}
+\DoxyCodeLine{00396\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}}
+\DoxyCodeLine{00397\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00398\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a3fedce7e9ee44f57af077391af013cd4}{\_write\_operations\_in\_progress}}.empty())}
+\DoxyCodeLine{00399\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a0eb2b117fe73fe9b58ba6a4d7dfc7ed4}{\_new\_write\_operation\_available\_promise}}-\/>wait();}
+\DoxyCodeLine{00400\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00401\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a0eb2b117fe73fe9b58ba6a4d7dfc7ed4}{\_new\_write\_operation\_available\_promise}}-\/>wait(\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a40589128811002a815b3ae26244c60a9}{\_granularity}});}
+\DoxyCodeLine{00402\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00403\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{catch}\ (\textcolor{keyword}{const}\ timeout\_exception\&)}
+\DoxyCodeLine{00404\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00405\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00406\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a0eb2b117fe73fe9b58ba6a4d7dfc7ed4}{\_new\_write\_operation\_available\_promise}}.reset();}
+\DoxyCodeLine{00407\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00408\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1detail_1_1rate__limiting__group__impl_acea1501bba905857cdda6347631eb05b_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1detail_1_1rate__limiting__group__impl_acea1501bba905857cdda6347631eb05b_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1detail_1_1rate__limiting__group__impl_a8fe749da93ec7a60083d03c8a82a5091}\index{fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}!readsome@{readsome}}
+\index{readsome@{readsome}!fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}}
+\doxysubsubsection{\texorpdfstring{readsome()}{readsome()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1rate__limiting__group__impl_a8fe749da93ec7a60083d03c8a82a5091} 
+size\+\_\+t fc\+::detail\+::rate\+\_\+limiting\+\_\+group\+\_\+impl\+::readsome (\begin{DoxyParamCaption}\item[{boost\+::asio\+::ip\+::tcp\+::socket \&}]{socket}{, }\item[{char \texorpdfstring{$\ast$}{*}}]{buffer}{, }\item[{size\+\_\+t}]{length}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00280}{280}} of file \mbox{\hyperlink{rate__limiting_8cpp_source}{rate\+\_\+limiting.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00281\ \ \ \ \ \{}
+\DoxyCodeLine{00282\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ac9c0f88e27254463a65975d5cc8484cd}{readsome\_impl}}(socket,\ buffer,\ length,\ 0);}
+\DoxyCodeLine{00283\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1detail_1_1rate__limiting__group__impl_a8fe749da93ec7a60083d03c8a82a5091_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1detail_1_1rate__limiting__group__impl_a77951eaab9932d076e231fabdbfde61e}\index{fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}!readsome@{readsome}}
+\index{readsome@{readsome}!fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}}
+\doxysubsubsection{\texorpdfstring{readsome()}{readsome()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1rate__limiting__group__impl_a77951eaab9932d076e231fabdbfde61e} 
+size\+\_\+t fc\+::detail\+::rate\+\_\+limiting\+\_\+group\+\_\+impl\+::readsome (\begin{DoxyParamCaption}\item[{boost\+::asio\+::ip\+::tcp\+::socket \&}]{socket}{, }\item[{const std\+::shared\+\_\+ptr$<$ char $>$ \&}]{buffer}{, }\item[{size\+\_\+t}]{length}{, }\item[{size\+\_\+t}]{offset}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00275}{275}} of file \mbox{\hyperlink{rate__limiting_8cpp_source}{rate\+\_\+limiting.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00276\ \ \ \ \ \{}
+\DoxyCodeLine{00277\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ac9c0f88e27254463a65975d5cc8484cd}{readsome\_impl}}(socket,\ buffer,\ length,\ offset);}
+\DoxyCodeLine{00278\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1detail_1_1rate__limiting__group__impl_a77951eaab9932d076e231fabdbfde61e_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1detail_1_1rate__limiting__group__impl_ac9c0f88e27254463a65975d5cc8484cd}\index{fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}!readsome\_impl@{readsome\_impl}}
+\index{readsome\_impl@{readsome\_impl}!fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}}
+\doxysubsubsection{\texorpdfstring{readsome\_impl()}{readsome\_impl()}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1rate__limiting__group__impl_ac9c0f88e27254463a65975d5cc8484cd} 
+template$<$typename Buffer\+Type $>$ \\
+size\+\_\+t fc\+::detail\+::rate\+\_\+limiting\+\_\+group\+\_\+impl\+::readsome\+\_\+impl (\begin{DoxyParamCaption}\item[{boost\+::asio\+::ip\+::tcp\+::socket \&}]{socket}{, }\item[{const Buffer\+Type \&}]{buffer}{, }\item[{size\+\_\+t}]{length}{, }\item[{size\+\_\+t}]{offset}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00286}{286}} of file \mbox{\hyperlink{rate__limiting_8cpp_source}{rate\+\_\+limiting.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00287\ \ \ \ \ \{}
+\DoxyCodeLine{00288\ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ bytes\_read;}
+\DoxyCodeLine{00289\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ab36bd64432521d513445cefc3e303eb6}{\_download\_bytes\_per\_second}})}
+\DoxyCodeLine{00290\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00291\ \ \ \ \ \ \ \ \ promise<size\_t>::ptr\ completion\_promise(\textcolor{keyword}{new}\ promise<size\_t>(\textcolor{stringliteral}{"{}rate\_limiting\_group\_impl::readsome"{}}));}
+\DoxyCodeLine{00292\ \ \ \ \ \ \ \ \ rate\_limited\_tcp\_read\_operation\ read\_operation(socket,\ buffer,\ length,\ offset,\ completion\_promise);}
+\DoxyCodeLine{00293\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ac6c58ba1dce6c246b610978efaa953f5}{\_read\_operations\_for\_next\_iteration}}.push\_back(\&read\_operation);}
+\DoxyCodeLine{00294\ }
+\DoxyCodeLine{00295\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ launch\ the\ read\ processing\ loop\ it\ if\ isn't\ running,\ or\ signal\ it\ to\ resume\ if\ it's\ paused.}}
+\DoxyCodeLine{00296\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ac9074d5e5c064707c52bcb8973639519}{\_process\_pending\_reads\_loop\_complete}}.valid()\ ||\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ac9074d5e5c064707c52bcb8973639519}{\_process\_pending\_reads\_loop\_complete}}.ready())}
+\DoxyCodeLine{00297\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ac9074d5e5c064707c52bcb8973639519}{\_process\_pending\_reads\_loop\_complete}}\ =\ async([=]()\{\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a30e2a1f703fcd1983c5e2afb2dcd1ef7}{process\_pending\_reads}}();\ \},\ \textcolor{stringliteral}{"{}process\_pending\_reads"{}}\ );}
+\DoxyCodeLine{00298\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ac27a30522117cbf377c837a1e21fefdb}{\_new\_read\_operation\_available\_promise}})}
+\DoxyCodeLine{00299\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ac27a30522117cbf377c837a1e21fefdb}{\_new\_read\_operation\_available\_promise}}-\/>set\_value();}
+\DoxyCodeLine{00300\ }
+\DoxyCodeLine{00301\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}}
+\DoxyCodeLine{00302\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00303\ \ \ \ \ \ \ \ \ \ \ bytes\_read\ =\ completion\_promise-\/>wait();}
+\DoxyCodeLine{00304\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00305\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{catch}\ (...)}
+\DoxyCodeLine{00306\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00307\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ac6c58ba1dce6c246b610978efaa953f5}{\_read\_operations\_for\_next\_iteration}}.remove(\&read\_operation);}
+\DoxyCodeLine{00308\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_aa02fce050432e868fa63a1817d639b20}{\_read\_operations\_in\_progress}}.remove(\&read\_operation);}
+\DoxyCodeLine{00309\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw};}
+\DoxyCodeLine{00310\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00311\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a9376b5505587791a43adeb43b05f8056}{\_unused\_read\_tokens}}\ +=\ read\_operation.permitted\_length\ -\/\ bytes\_read;}
+\DoxyCodeLine{00312\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00313\ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00314\ \ \ \ \ \ \ \ \ bytes\_read\ =\ asio::read\_some(socket,\ buffer,\ length,\ offset);}
+\DoxyCodeLine{00315\ }
+\DoxyCodeLine{00316\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a866c9c96a0ad6aa3c5b867b0289ac9bc}{\_actual\_download\_rate}}.\mbox{\hyperlink{classfc_1_1detail_1_1average__rate__meter_ada9b561ff55964f5c3dd3f56a68858dc}{update}}(bytes\_read);}
+\DoxyCodeLine{00317\ }
+\DoxyCodeLine{00318\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ bytes\_read;}
+\DoxyCodeLine{00319\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1detail_1_1rate__limiting__group__impl_ac9c0f88e27254463a65975d5cc8484cd_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1detail_1_1rate__limiting__group__impl_ac9c0f88e27254463a65975d5cc8484cd_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1detail_1_1rate__limiting__group__impl_a50b7ec22b99f4ff67d71e44f2e2bdc88}\index{fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}!writesome@{writesome}}
+\index{writesome@{writesome}!fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}}
+\doxysubsubsection{\texorpdfstring{writesome()}{writesome()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1rate__limiting__group__impl_a50b7ec22b99f4ff67d71e44f2e2bdc88} 
+size\+\_\+t fc\+::detail\+::rate\+\_\+limiting\+\_\+group\+\_\+impl\+::writesome (\begin{DoxyParamCaption}\item[{boost\+::asio\+::ip\+::tcp\+::socket \&}]{socket}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{buffer}{, }\item[{size\+\_\+t}]{length}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00321}{321}} of file \mbox{\hyperlink{rate__limiting_8cpp_source}{rate\+\_\+limiting.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00322\ \ \ \ \ \{}
+\DoxyCodeLine{00323\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_aee2678c053a998c49ad7c671c77fe4dd}{writesome\_impl}}(socket,\ buffer,\ length,\ 0);}
+\DoxyCodeLine{00324\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1detail_1_1rate__limiting__group__impl_a50b7ec22b99f4ff67d71e44f2e2bdc88_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1detail_1_1rate__limiting__group__impl_ab6a53d6b835cb2d3ada56c834dc0bbe5}\index{fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}!writesome@{writesome}}
+\index{writesome@{writesome}!fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}}
+\doxysubsubsection{\texorpdfstring{writesome()}{writesome()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1rate__limiting__group__impl_ab6a53d6b835cb2d3ada56c834dc0bbe5} 
+size\+\_\+t fc\+::detail\+::rate\+\_\+limiting\+\_\+group\+\_\+impl\+::writesome (\begin{DoxyParamCaption}\item[{boost\+::asio\+::ip\+::tcp\+::socket \&}]{socket}{, }\item[{const std\+::shared\+\_\+ptr$<$ const char $>$ \&}]{buffer}{, }\item[{size\+\_\+t}]{length}{, }\item[{size\+\_\+t}]{offset}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00326}{326}} of file \mbox{\hyperlink{rate__limiting_8cpp_source}{rate\+\_\+limiting.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00327\ \ \ \ \ \{}
+\DoxyCodeLine{00328\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_aee2678c053a998c49ad7c671c77fe4dd}{writesome\_impl}}(socket,\ buffer,\ length,\ offset);}
+\DoxyCodeLine{00329\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1detail_1_1rate__limiting__group__impl_ab6a53d6b835cb2d3ada56c834dc0bbe5_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1detail_1_1rate__limiting__group__impl_aee2678c053a998c49ad7c671c77fe4dd}\index{fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}!writesome\_impl@{writesome\_impl}}
+\index{writesome\_impl@{writesome\_impl}!fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}}
+\doxysubsubsection{\texorpdfstring{writesome\_impl()}{writesome\_impl()}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1rate__limiting__group__impl_aee2678c053a998c49ad7c671c77fe4dd} 
+template$<$typename Buffer\+Type $>$ \\
+size\+\_\+t fc\+::detail\+::rate\+\_\+limiting\+\_\+group\+\_\+impl\+::writesome\+\_\+impl (\begin{DoxyParamCaption}\item[{boost\+::asio\+::ip\+::tcp\+::socket \&}]{socket}{, }\item[{const Buffer\+Type \&}]{buffer}{, }\item[{size\+\_\+t}]{length}{, }\item[{size\+\_\+t}]{offset}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00332}{332}} of file \mbox{\hyperlink{rate__limiting_8cpp_source}{rate\+\_\+limiting.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00333\ \ \ \ \ \{}
+\DoxyCodeLine{00334\ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ bytes\_written;}
+\DoxyCodeLine{00335\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_aea464c799c11ea096400b885d642bba4}{\_upload\_bytes\_per\_second}})}
+\DoxyCodeLine{00336\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00337\ \ \ \ \ \ \ \ \ promise<size\_t>::ptr\ completion\_promise(\textcolor{keyword}{new}\ promise<size\_t>(\textcolor{stringliteral}{"{}rate\_limiting\_group\_impl::writesome"{}}));}
+\DoxyCodeLine{00338\ \ \ \ \ \ \ \ \ rate\_limited\_tcp\_write\_operation\ write\_operation(socket,\ buffer,\ length,\ offset,\ completion\_promise);}
+\DoxyCodeLine{00339\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a4eab5449ce828620059a63481584b914}{\_write\_operations\_for\_next\_iteration}}.push\_back(\&write\_operation);}
+\DoxyCodeLine{00340\ }
+\DoxyCodeLine{00341\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ launch\ the\ write\ processing\ loop\ it\ if\ isn't\ running,\ or\ signal\ it\ to\ resume\ if\ it's\ paused.}}
+\DoxyCodeLine{00342\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a2dfe2dbb88f981587d9fab0be48cccc4}{\_process\_pending\_writes\_loop\_complete}}.valid()\ ||\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a2dfe2dbb88f981587d9fab0be48cccc4}{\_process\_pending\_writes\_loop\_complete}}.ready())}
+\DoxyCodeLine{00343\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a2dfe2dbb88f981587d9fab0be48cccc4}{\_process\_pending\_writes\_loop\_complete}}\ =\ async([=]()\{\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_acea1501bba905857cdda6347631eb05b}{process\_pending\_writes}}();\ \},\ \textcolor{stringliteral}{"{}process\_pending\_writes"{}});}
+\DoxyCodeLine{00344\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a0eb2b117fe73fe9b58ba6a4d7dfc7ed4}{\_new\_write\_operation\_available\_promise}})}
+\DoxyCodeLine{00345\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a0eb2b117fe73fe9b58ba6a4d7dfc7ed4}{\_new\_write\_operation\_available\_promise}}-\/>set\_value();}
+\DoxyCodeLine{00346\ }
+\DoxyCodeLine{00347\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}}
+\DoxyCodeLine{00348\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00349\ \ \ \ \ \ \ \ \ \ \ bytes\_written\ =\ completion\_promise-\/>wait();}
+\DoxyCodeLine{00350\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00351\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{catch}\ (...)}
+\DoxyCodeLine{00352\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00353\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a4eab5449ce828620059a63481584b914}{\_write\_operations\_for\_next\_iteration}}.remove(\&write\_operation);}
+\DoxyCodeLine{00354\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a3fedce7e9ee44f57af077391af013cd4}{\_write\_operations\_in\_progress}}.remove(\&write\_operation);}
+\DoxyCodeLine{00355\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw};}
+\DoxyCodeLine{00356\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00357\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_a966cf125ef17beef029f5c8352302758}{\_unused\_write\_tokens}}\ +=\ write\_operation.permitted\_length\ -\/\ bytes\_written;}
+\DoxyCodeLine{00358\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00359\ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00360\ \ \ \ \ \ \ \ \ bytes\_written\ =\ asio::write\_some(socket,\ buffer,\ length,\ offset);}
+\DoxyCodeLine{00361\ }
+\DoxyCodeLine{00362\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_aac40eb765de719da6eadf2074fbe6e17}{\_actual\_upload\_rate}}.\mbox{\hyperlink{classfc_1_1detail_1_1average__rate__meter_ada9b561ff55964f5c3dd3f56a68858dc}{update}}(bytes\_written);}
+\DoxyCodeLine{00363\ }
+\DoxyCodeLine{00364\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ bytes\_written;}
+\DoxyCodeLine{00365\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1detail_1_1rate__limiting__group__impl_aee2678c053a998c49ad7c671c77fe4dd_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1detail_1_1rate__limiting__group__impl_aee2678c053a998c49ad7c671c77fe4dd_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classfc_1_1detail_1_1rate__limiting__group__impl_a866c9c96a0ad6aa3c5b867b0289ac9bc}\index{fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}!\_actual\_download\_rate@{\_actual\_download\_rate}}
+\index{\_actual\_download\_rate@{\_actual\_download\_rate}!fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}}
+\doxysubsubsection{\texorpdfstring{\_actual\_download\_rate}{\_actual\_download\_rate}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1rate__limiting__group__impl_a866c9c96a0ad6aa3c5b867b0289ac9bc} 
+\mbox{\hyperlink{classfc_1_1detail_1_1average__rate__meter}{average\+\_\+rate\+\_\+meter}} fc\+::detail\+::rate\+\_\+limiting\+\_\+group\+\_\+impl\+::\+\_\+actual\+\_\+download\+\_\+rate}
+
+
+
+Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00219}{219}} of file \mbox{\hyperlink{rate__limiting_8cpp_source}{rate\+\_\+limiting.\+cpp}}.
+
+\Hypertarget{classfc_1_1detail_1_1rate__limiting__group__impl_aac40eb765de719da6eadf2074fbe6e17}\index{fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}!\_actual\_upload\_rate@{\_actual\_upload\_rate}}
+\index{\_actual\_upload\_rate@{\_actual\_upload\_rate}!fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}}
+\doxysubsubsection{\texorpdfstring{\_actual\_upload\_rate}{\_actual\_upload\_rate}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1rate__limiting__group__impl_aac40eb765de719da6eadf2074fbe6e17} 
+\mbox{\hyperlink{classfc_1_1detail_1_1average__rate__meter}{average\+\_\+rate\+\_\+meter}} fc\+::detail\+::rate\+\_\+limiting\+\_\+group\+\_\+impl\+::\+\_\+actual\+\_\+upload\+\_\+rate}
+
+
+
+Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00218}{218}} of file \mbox{\hyperlink{rate__limiting_8cpp_source}{rate\+\_\+limiting.\+cpp}}.
+
+\Hypertarget{classfc_1_1detail_1_1rate__limiting__group__impl_a88a841d35cba76a6704c868c4183a3b7}\index{fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}!\_burstiness\_in\_seconds@{\_burstiness\_in\_seconds}}
+\index{\_burstiness\_in\_seconds@{\_burstiness\_in\_seconds}!fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}}
+\doxysubsubsection{\texorpdfstring{\_burstiness\_in\_seconds}{\_burstiness\_in\_seconds}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1rate__limiting__group__impl_a88a841d35cba76a6704c868c4183a3b7} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} fc\+::detail\+::rate\+\_\+limiting\+\_\+group\+\_\+impl\+::\+\_\+burstiness\+\_\+in\+\_\+seconds}
+
+
+
+Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00196}{196}} of file \mbox{\hyperlink{rate__limiting_8cpp_source}{rate\+\_\+limiting.\+cpp}}.
+
+\Hypertarget{classfc_1_1detail_1_1rate__limiting__group__impl_ab36bd64432521d513445cefc3e303eb6}\index{fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}!\_download\_bytes\_per\_second@{\_download\_bytes\_per\_second}}
+\index{\_download\_bytes\_per\_second@{\_download\_bytes\_per\_second}!fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}}
+\doxysubsubsection{\texorpdfstring{\_download\_bytes\_per\_second}{\_download\_bytes\_per\_second}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1rate__limiting__group__impl_ab36bd64432521d513445cefc3e303eb6} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} fc\+::detail\+::rate\+\_\+limiting\+\_\+group\+\_\+impl\+::\+\_\+download\+\_\+bytes\+\_\+per\+\_\+second}
+
+
+
+Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00195}{195}} of file \mbox{\hyperlink{rate__limiting_8cpp_source}{rate\+\_\+limiting.\+cpp}}.
+
+\Hypertarget{classfc_1_1detail_1_1rate__limiting__group__impl_a40589128811002a815b3ae26244c60a9}\index{fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}!\_granularity@{\_granularity}}
+\index{\_granularity@{\_granularity}!fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}}
+\doxysubsubsection{\texorpdfstring{\_granularity}{\_granularity}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1rate__limiting__group__impl_a40589128811002a815b3ae26244c60a9} 
+\mbox{\hyperlink{classfc_1_1microseconds}{microseconds}} fc\+::detail\+::rate\+\_\+limiting\+\_\+group\+\_\+impl\+::\+\_\+granularity}
+
+
+
+Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00198}{198}} of file \mbox{\hyperlink{rate__limiting_8cpp_source}{rate\+\_\+limiting.\+cpp}}.
+
+\Hypertarget{classfc_1_1detail_1_1rate__limiting__group__impl_ab27d2289d9b796a3ad2eb6948d17f752}\index{fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}!\_last\_read\_iteration\_time@{\_last\_read\_iteration\_time}}
+\index{\_last\_read\_iteration\_time@{\_last\_read\_iteration\_time}!fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}}
+\doxysubsubsection{\texorpdfstring{\_last\_read\_iteration\_time}{\_last\_read\_iteration\_time}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1rate__limiting__group__impl_ab27d2289d9b796a3ad2eb6948d17f752} 
+\mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} fc\+::detail\+::rate\+\_\+limiting\+\_\+group\+\_\+impl\+::\+\_\+last\+\_\+read\+\_\+iteration\+\_\+time}
+
+
+
+Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00210}{210}} of file \mbox{\hyperlink{rate__limiting_8cpp_source}{rate\+\_\+limiting.\+cpp}}.
+
+\Hypertarget{classfc_1_1detail_1_1rate__limiting__group__impl_a66e7e14cddeacf23b2cc907f2b75cd05}\index{fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}!\_last\_write\_iteration\_time@{\_last\_write\_iteration\_time}}
+\index{\_last\_write\_iteration\_time@{\_last\_write\_iteration\_time}!fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}}
+\doxysubsubsection{\texorpdfstring{\_last\_write\_iteration\_time}{\_last\_write\_iteration\_time}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1rate__limiting__group__impl_a66e7e14cddeacf23b2cc907f2b75cd05} 
+\mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} fc\+::detail\+::rate\+\_\+limiting\+\_\+group\+\_\+impl\+::\+\_\+last\+\_\+write\+\_\+iteration\+\_\+time}
+
+
+
+Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00211}{211}} of file \mbox{\hyperlink{rate__limiting_8cpp_source}{rate\+\_\+limiting.\+cpp}}.
+
+\Hypertarget{classfc_1_1detail_1_1rate__limiting__group__impl_ac27a30522117cbf377c837a1e21fefdb}\index{fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}!\_new\_read\_operation\_available\_promise@{\_new\_read\_operation\_available\_promise}}
+\index{\_new\_read\_operation\_available\_promise@{\_new\_read\_operation\_available\_promise}!fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}}
+\doxysubsubsection{\texorpdfstring{\_new\_read\_operation\_available\_promise}{\_new\_read\_operation\_available\_promise}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1rate__limiting__group__impl_ac27a30522117cbf377c837a1e21fefdb} 
+promise$<$void$>$\+::ptr fc\+::detail\+::rate\+\_\+limiting\+\_\+group\+\_\+impl\+::\+\_\+new\+\_\+read\+\_\+operation\+\_\+available\+\_\+promise}
+
+
+
+Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00214}{214}} of file \mbox{\hyperlink{rate__limiting_8cpp_source}{rate\+\_\+limiting.\+cpp}}.
+
+\Hypertarget{classfc_1_1detail_1_1rate__limiting__group__impl_a0eb2b117fe73fe9b58ba6a4d7dfc7ed4}\index{fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}!\_new\_write\_operation\_available\_promise@{\_new\_write\_operation\_available\_promise}}
+\index{\_new\_write\_operation\_available\_promise@{\_new\_write\_operation\_available\_promise}!fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}}
+\doxysubsubsection{\texorpdfstring{\_new\_write\_operation\_available\_promise}{\_new\_write\_operation\_available\_promise}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1rate__limiting__group__impl_a0eb2b117fe73fe9b58ba6a4d7dfc7ed4} 
+promise$<$void$>$\+::ptr fc\+::detail\+::rate\+\_\+limiting\+\_\+group\+\_\+impl\+::\+\_\+new\+\_\+write\+\_\+operation\+\_\+available\+\_\+promise}
+
+
+
+Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00216}{216}} of file \mbox{\hyperlink{rate__limiting_8cpp_source}{rate\+\_\+limiting.\+cpp}}.
+
+\Hypertarget{classfc_1_1detail_1_1rate__limiting__group__impl_ac9074d5e5c064707c52bcb8973639519}\index{fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}!\_process\_pending\_reads\_loop\_complete@{\_process\_pending\_reads\_loop\_complete}}
+\index{\_process\_pending\_reads\_loop\_complete@{\_process\_pending\_reads\_loop\_complete}!fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}}
+\doxysubsubsection{\texorpdfstring{\_process\_pending\_reads\_loop\_complete}{\_process\_pending\_reads\_loop\_complete}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1rate__limiting__group__impl_ac9074d5e5c064707c52bcb8973639519} 
+future$<$void$>$ fc\+::detail\+::rate\+\_\+limiting\+\_\+group\+\_\+impl\+::\+\_\+process\+\_\+pending\+\_\+reads\+\_\+loop\+\_\+complete}
+
+
+
+Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00213}{213}} of file \mbox{\hyperlink{rate__limiting_8cpp_source}{rate\+\_\+limiting.\+cpp}}.
+
+\Hypertarget{classfc_1_1detail_1_1rate__limiting__group__impl_a2dfe2dbb88f981587d9fab0be48cccc4}\index{fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}!\_process\_pending\_writes\_loop\_complete@{\_process\_pending\_writes\_loop\_complete}}
+\index{\_process\_pending\_writes\_loop\_complete@{\_process\_pending\_writes\_loop\_complete}!fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}}
+\doxysubsubsection{\texorpdfstring{\_process\_pending\_writes\_loop\_complete}{\_process\_pending\_writes\_loop\_complete}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1rate__limiting__group__impl_a2dfe2dbb88f981587d9fab0be48cccc4} 
+future$<$void$>$ fc\+::detail\+::rate\+\_\+limiting\+\_\+group\+\_\+impl\+::\+\_\+process\+\_\+pending\+\_\+writes\+\_\+loop\+\_\+complete}
+
+
+
+Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00215}{215}} of file \mbox{\hyperlink{rate__limiting_8cpp_source}{rate\+\_\+limiting.\+cpp}}.
+
+\Hypertarget{classfc_1_1detail_1_1rate__limiting__group__impl_ac6c58ba1dce6c246b610978efaa953f5}\index{fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}!\_read\_operations\_for\_next\_iteration@{\_read\_operations\_for\_next\_iteration}}
+\index{\_read\_operations\_for\_next\_iteration@{\_read\_operations\_for\_next\_iteration}!fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}}
+\doxysubsubsection{\texorpdfstring{\_read\_operations\_for\_next\_iteration}{\_read\_operations\_for\_next\_iteration}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1rate__limiting__group__impl_ac6c58ba1dce6c246b610978efaa953f5} 
+\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ab3c3730e5022917856d1976c90c8ed35}{rate\+\_\+limited\+\_\+operation\+\_\+list}} fc\+::detail\+::rate\+\_\+limiting\+\_\+group\+\_\+impl\+::\+\_\+read\+\_\+operations\+\_\+for\+\_\+next\+\_\+iteration}
+
+
+
+Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00206}{206}} of file \mbox{\hyperlink{rate__limiting_8cpp_source}{rate\+\_\+limiting.\+cpp}}.
+
+\Hypertarget{classfc_1_1detail_1_1rate__limiting__group__impl_aa02fce050432e868fa63a1817d639b20}\index{fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}!\_read\_operations\_in\_progress@{\_read\_operations\_in\_progress}}
+\index{\_read\_operations\_in\_progress@{\_read\_operations\_in\_progress}!fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}}
+\doxysubsubsection{\texorpdfstring{\_read\_operations\_in\_progress}{\_read\_operations\_in\_progress}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1rate__limiting__group__impl_aa02fce050432e868fa63a1817d639b20} 
+\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ab3c3730e5022917856d1976c90c8ed35}{rate\+\_\+limited\+\_\+operation\+\_\+list}} fc\+::detail\+::rate\+\_\+limiting\+\_\+group\+\_\+impl\+::\+\_\+read\+\_\+operations\+\_\+in\+\_\+progress}
+
+
+
+Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00205}{205}} of file \mbox{\hyperlink{rate__limiting_8cpp_source}{rate\+\_\+limiting.\+cpp}}.
+
+\Hypertarget{classfc_1_1detail_1_1rate__limiting__group__impl_a0dcb6b1c8dfd386197232a21fb7f73a7}\index{fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}!\_read\_tokens@{\_read\_tokens}}
+\index{\_read\_tokens@{\_read\_tokens}!fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}}
+\doxysubsubsection{\texorpdfstring{\_read\_tokens}{\_read\_tokens}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1rate__limiting__group__impl_a0dcb6b1c8dfd386197232a21fb7f73a7} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} fc\+::detail\+::rate\+\_\+limiting\+\_\+group\+\_\+impl\+::\+\_\+read\+\_\+tokens}
+
+
+
+Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00199}{199}} of file \mbox{\hyperlink{rate__limiting_8cpp_source}{rate\+\_\+limiting.\+cpp}}.
+
+\Hypertarget{classfc_1_1detail_1_1rate__limiting__group__impl_a9376b5505587791a43adeb43b05f8056}\index{fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}!\_unused\_read\_tokens@{\_unused\_read\_tokens}}
+\index{\_unused\_read\_tokens@{\_unused\_read\_tokens}!fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}}
+\doxysubsubsection{\texorpdfstring{\_unused\_read\_tokens}{\_unused\_read\_tokens}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1rate__limiting__group__impl_a9376b5505587791a43adeb43b05f8056} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} fc\+::detail\+::rate\+\_\+limiting\+\_\+group\+\_\+impl\+::\+\_\+unused\+\_\+read\+\_\+tokens}
+
+
+
+Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00200}{200}} of file \mbox{\hyperlink{rate__limiting_8cpp_source}{rate\+\_\+limiting.\+cpp}}.
+
+\Hypertarget{classfc_1_1detail_1_1rate__limiting__group__impl_a966cf125ef17beef029f5c8352302758}\index{fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}!\_unused\_write\_tokens@{\_unused\_write\_tokens}}
+\index{\_unused\_write\_tokens@{\_unused\_write\_tokens}!fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}}
+\doxysubsubsection{\texorpdfstring{\_unused\_write\_tokens}{\_unused\_write\_tokens}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1rate__limiting__group__impl_a966cf125ef17beef029f5c8352302758} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} fc\+::detail\+::rate\+\_\+limiting\+\_\+group\+\_\+impl\+::\+\_\+unused\+\_\+write\+\_\+tokens}
+
+
+
+Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00202}{202}} of file \mbox{\hyperlink{rate__limiting_8cpp_source}{rate\+\_\+limiting.\+cpp}}.
+
+\Hypertarget{classfc_1_1detail_1_1rate__limiting__group__impl_aea464c799c11ea096400b885d642bba4}\index{fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}!\_upload\_bytes\_per\_second@{\_upload\_bytes\_per\_second}}
+\index{\_upload\_bytes\_per\_second@{\_upload\_bytes\_per\_second}!fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}}
+\doxysubsubsection{\texorpdfstring{\_upload\_bytes\_per\_second}{\_upload\_bytes\_per\_second}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1rate__limiting__group__impl_aea464c799c11ea096400b885d642bba4} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} fc\+::detail\+::rate\+\_\+limiting\+\_\+group\+\_\+impl\+::\+\_\+upload\+\_\+bytes\+\_\+per\+\_\+second}
+
+
+
+Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00194}{194}} of file \mbox{\hyperlink{rate__limiting_8cpp_source}{rate\+\_\+limiting.\+cpp}}.
+
+\Hypertarget{classfc_1_1detail_1_1rate__limiting__group__impl_a4eab5449ce828620059a63481584b914}\index{fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}!\_write\_operations\_for\_next\_iteration@{\_write\_operations\_for\_next\_iteration}}
+\index{\_write\_operations\_for\_next\_iteration@{\_write\_operations\_for\_next\_iteration}!fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}}
+\doxysubsubsection{\texorpdfstring{\_write\_operations\_for\_next\_iteration}{\_write\_operations\_for\_next\_iteration}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1rate__limiting__group__impl_a4eab5449ce828620059a63481584b914} 
+\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ab3c3730e5022917856d1976c90c8ed35}{rate\+\_\+limited\+\_\+operation\+\_\+list}} fc\+::detail\+::rate\+\_\+limiting\+\_\+group\+\_\+impl\+::\+\_\+write\+\_\+operations\+\_\+for\+\_\+next\+\_\+iteration}
+
+
+
+Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00208}{208}} of file \mbox{\hyperlink{rate__limiting_8cpp_source}{rate\+\_\+limiting.\+cpp}}.
+
+\Hypertarget{classfc_1_1detail_1_1rate__limiting__group__impl_a3fedce7e9ee44f57af077391af013cd4}\index{fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}!\_write\_operations\_in\_progress@{\_write\_operations\_in\_progress}}
+\index{\_write\_operations\_in\_progress@{\_write\_operations\_in\_progress}!fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}}
+\doxysubsubsection{\texorpdfstring{\_write\_operations\_in\_progress}{\_write\_operations\_in\_progress}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1rate__limiting__group__impl_a3fedce7e9ee44f57af077391af013cd4} 
+\mbox{\hyperlink{classfc_1_1detail_1_1rate__limiting__group__impl_ab3c3730e5022917856d1976c90c8ed35}{rate\+\_\+limited\+\_\+operation\+\_\+list}} fc\+::detail\+::rate\+\_\+limiting\+\_\+group\+\_\+impl\+::\+\_\+write\+\_\+operations\+\_\+in\+\_\+progress}
+
+
+
+Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00207}{207}} of file \mbox{\hyperlink{rate__limiting_8cpp_source}{rate\+\_\+limiting.\+cpp}}.
+
+\Hypertarget{classfc_1_1detail_1_1rate__limiting__group__impl_a7a35d9108ae23c5a99a73693dc7a1c54}\index{fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}!\_write\_tokens@{\_write\_tokens}}
+\index{\_write\_tokens@{\_write\_tokens}!fc::detail::rate\_limiting\_group\_impl@{fc::detail::rate\_limiting\_group\_impl}}
+\doxysubsubsection{\texorpdfstring{\_write\_tokens}{\_write\_tokens}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1rate__limiting__group__impl_a7a35d9108ae23c5a99a73693dc7a1c54} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} fc\+::detail\+::rate\+\_\+limiting\+\_\+group\+\_\+impl\+::\+\_\+write\+\_\+tokens}
+
+
+
+Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00201}{201}} of file \mbox{\hyperlink{rate__limiting_8cpp_source}{rate\+\_\+limiting.\+cpp}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/src/network/\mbox{\hyperlink{rate__limiting_8cpp}{rate\+\_\+limiting.\+cpp}}\end{DoxyCompactItemize}

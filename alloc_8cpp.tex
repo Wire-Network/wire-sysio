@@ -1,0 +1,112 @@
+\doxysection{libraries/fc/vendor/websocketpp/test/message\+\_\+buffer/alloc.cpp File Reference}
+\hypertarget{alloc_8cpp}{}\label{alloc_8cpp}\index{libraries/fc/vendor/websocketpp/test/message\_buffer/alloc.cpp@{libraries/fc/vendor/websocketpp/test/message\_buffer/alloc.cpp}}
+{\ttfamily \#include $<$boost/test/unit\+\_\+test.\+hpp$>$}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$string$>$}\newline
+{\ttfamily \#include $<$websocketpp/message\+\_\+buffer/alloc.\+hpp$>$}\newline
+Include dependency graph for alloc.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{alloc_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structstub}{stub$<$ con\+\_\+msg\+\_\+manager $>$}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{alloc_8cpp_a6b2a3852db8bb19ab6909bac01859985}{BOOST\+\_\+\+TEST\+\_\+\+MODULE}}~message\+\_\+buffer\+\_\+alloc
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{alloc_8cpp_a454370680c6621e3ac16171bb7dc9718}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (basic\+\_\+get\+\_\+message)
+\item 
+\mbox{\hyperlink{alloc_8cpp_a0f7b150c3c01d122359517686248c27d}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (basic\+\_\+get\+\_\+manager)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{alloc_8cpp_a6b2a3852db8bb19ab6909bac01859985}\index{alloc.cpp@{alloc.cpp}!BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}}
+\index{BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}!alloc.cpp@{alloc.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_TEST\_MODULE}{BOOST\_TEST\_MODULE}}
+{\footnotesize\ttfamily \label{alloc_8cpp_a6b2a3852db8bb19ab6909bac01859985} 
+\#define BOOST\+\_\+\+TEST\+\_\+\+MODULE~message\+\_\+buffer\+\_\+alloc}
+
+
+
+Definition at line \mbox{\hyperlink{alloc_8cpp_source_l00028}{28}} of file \mbox{\hyperlink{alloc_8cpp_source}{alloc.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{alloc_8cpp_a0f7b150c3c01d122359517686248c27d}\index{alloc.cpp@{alloc.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!alloc.cpp@{alloc.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{alloc_8cpp_a0f7b150c3c01d122359517686248c27d} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{basic\+\_\+get\+\_\+manager}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{alloc_8cpp_source_l00079}{79}} of file \mbox{\hyperlink{alloc_8cpp_source}{alloc.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00080\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{structstub}{stub<websocketpp::message\_buffer::alloc::con\_msg\_manager>}}}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ message\_type;}
+\DoxyCodeLine{00082\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1alloc_1_1con__msg__manager}{websocketpp::message\_buffer::alloc::con\_msg\_manager<message\_type>}}}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ con\_msg\_man\_type;}
+\DoxyCodeLine{00084\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1alloc_1_1endpoint__msg__manager}{websocketpp::message\_buffer::alloc::endpoint\_msg\_manager}}}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ <con\_msg\_man\_type>\ endpoint\_manager\_type;}
+\DoxyCodeLine{00086\ }
+\DoxyCodeLine{00087\ \ \ \ \ endpoint\_manager\_type\ em;}
+\DoxyCodeLine{00088\ \ \ \ \ con\_msg\_man\_type::ptr\ manager\ =\ em.\mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1alloc_1_1endpoint__msg__manager_a58c3cece7c5122cfabb4f0071cd9ced4}{get\_manager}}();}
+\DoxyCodeLine{00089\ \ \ \ \ message\_type::ptr\ msg\ =\ manager-\/>get\_message(\mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea35faaee264826923566fc05bdfd76b72}{websocketpp::frame::opcode::TEXT}},512);}
+\DoxyCodeLine{00090\ }
+\DoxyCodeLine{00091\ \ \ \ \ BOOST\_CHECK(msg);}
+\DoxyCodeLine{00092\ \ \ \ \ BOOST\_CHECK(msg-\/>m\_opcode\ ==\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea35faaee264826923566fc05bdfd76b72}{websocketpp::frame::opcode::TEXT}});}
+\DoxyCodeLine{00093\ \ \ \ \ BOOST\_CHECK(msg-\/>m\_manager.lock()\ ==\ manager);}
+\DoxyCodeLine{00094\ \ \ \ \ BOOST\_CHECK(msg-\/>m\_size\ ==\ 512);}
+\DoxyCodeLine{00095\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{alloc_8cpp_a0f7b150c3c01d122359517686248c27d_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{alloc_8cpp_a454370680c6621e3ac16171bb7dc9718}\index{alloc.cpp@{alloc.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!alloc.cpp@{alloc.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{alloc_8cpp_a454370680c6621e3ac16171bb7dc9718} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{basic\+\_\+get\+\_\+message}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{alloc_8cpp_source_l00064}{64}} of file \mbox{\hyperlink{alloc_8cpp_source}{alloc.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00065\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{structstub}{stub<websocketpp::message\_buffer::alloc::con\_msg\_manager>}}}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ message\_type;}
+\DoxyCodeLine{00067\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1alloc_1_1con__msg__manager}{websocketpp::message\_buffer::alloc::con\_msg\_manager<message\_type>}}}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ con\_msg\_man\_type;}
+\DoxyCodeLine{00069\ }
+\DoxyCodeLine{00070\ \ \ \ \ con\_msg\_man\_type::ptr\ manager(\textcolor{keyword}{new}\ con\_msg\_man\_type());}
+\DoxyCodeLine{00071\ \ \ \ \ message\_type::ptr\ msg\ =\ manager-\/>get\_message(\mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea35faaee264826923566fc05bdfd76b72}{websocketpp::frame::opcode::TEXT}},512);}
+\DoxyCodeLine{00072\ }
+\DoxyCodeLine{00073\ \ \ \ \ BOOST\_CHECK(msg);}
+\DoxyCodeLine{00074\ \ \ \ \ BOOST\_CHECK(msg-\/>m\_opcode\ ==\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea35faaee264826923566fc05bdfd76b72}{websocketpp::frame::opcode::TEXT}});}
+\DoxyCodeLine{00075\ \ \ \ \ BOOST\_CHECK(msg-\/>m\_manager.lock()\ ==\ manager);}
+\DoxyCodeLine{00076\ \ \ \ \ BOOST\_CHECK(msg-\/>m\_size\ ==\ 512);}
+\DoxyCodeLine{00077\ \}}
+
+\end{DoxyCode}

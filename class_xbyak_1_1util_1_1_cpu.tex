@@ -1,0 +1,1260 @@
+\doxysection{Xbyak\+::util\+::Cpu Class Reference}
+\hypertarget{class_xbyak_1_1util_1_1_cpu}{}\label{class_xbyak_1_1util_1_1_cpu}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+
+
+{\ttfamily \#include $<$xbyak\+\_\+util.\+h$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+unsigned int \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a33b95225d23baee8be46cd64ff9425c3}{get\+Data\+Cache\+Levels}} () const
+\item 
+unsigned int \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a48de211c96391a0ff01ad1ecb273c400}{get\+Cores\+Sharing\+Data\+Cache}} (unsigned int i) const
+\item 
+unsigned int \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_ae08b3c85154cca76ee23adb6e1dbd226}{get\+Data\+Cache\+Size}} (unsigned int i) const
+\item 
+\mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a9aa1f0e2f1bcd65e2e12d3dbf031de02}{Cpu}} ()
+\item 
+void \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a72aba63f99c5427292b39b9414a25f1b}{put\+Family}} () const
+\item 
+bool \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a445001cdff95d3819b6aecf4bfcf073c}{has}} (\mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} type) const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static void \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a41083751693a1d7fa8b32553e60b6f39}{get\+Cpuid}} (unsigned int eax\+In, unsigned int data\mbox{[}4\mbox{]})
+\item 
+static void \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a4d5d2d122400e2d904b9664de2513e97}{get\+Cpuid\+Ex}} (unsigned int eax\+In, unsigned int ecx\+In, unsigned int data\mbox{[}4\mbox{]})
+\item 
+static \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_aa19d832c685a8e87eb9c64006ceecb74}{get\+Xfeature}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a414080805629f2c283b4c4577778a193}{model}}
+\item 
+int \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a63b0b93bbc5a491b513f09e092f96cfc}{family}}
+\item 
+int \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_aa6162467d07750e96fe0fa9e00efd373}{stepping}}
+\item 
+int \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_ac0fd74a435e5dccf7f37f2656744f900}{ext\+Model}}
+\item 
+int \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a17a0173d8293d997ef5fc684d2a9c2d7}{ext\+Family}}
+\item 
+int \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a71ea42b7ac62418225984239f5a8220e}{display\+Family}}
+\item 
+int \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a7a97987cf663e1983000f1393dda525e}{display\+Model}}
+\item 
+unsigned int \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a2370a5b034d783ecfc8750a15fe4b855}{data\+\_\+cache\+\_\+size}} \mbox{[}\mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a1cc1e781244407fef6463efdd0c19107}{max\+Number\+Cache\+Levels}}\mbox{]}
+\item 
+unsigned int \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a264667db6a3a5f075506adf899feb547}{cores\+\_\+sharing\+\_\+data\+\_\+cache}} \mbox{[}\mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a1cc1e781244407fef6463efdd0c19107}{max\+Number\+Cache\+Levels}}\mbox{]}
+\item 
+unsigned int \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a84d398315bb87dfba71bf4c96b8f695c}{data\+\_\+cache\+\_\+levels}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static const unsigned int \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a1cc1e781244407fef6463efdd0c19107}{max\+Number\+Cache\+Levels}} = 10
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a2cbd2699f6e481e27edc8dc673b7ec2f}{NONE}} = 0
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_ad896c8938a0576e271eaada3620e5816}{t\+MMX}} = 1 $<$$<$ 0
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a768eb3c5459ee1dd6b778c5f46f2207b}{t\+MMX2}} = 1 $<$$<$ 1
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a9c937b7fe32f28f4fef6bafcc2653ae6}{t\+CMOV}} = 1 $<$$<$ 2
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_ae995e382de94425914655cc00e91764e}{t\+SSE}} = 1 $<$$<$ 3
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_ad2b444dea8355c62306d02db5e95bd64}{t\+SSE2}} = 1 $<$$<$ 4
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_ac8a49b4bda0c5fff5307ef7d49649f1d}{t\+SSE3}} = 1 $<$$<$ 5
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_aa7935f9bd4c2f5e873b8771a955f3c74}{t\+SSSE3}} = 1 $<$$<$ 6
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a2c0fcf14f3f5a117330aea07ea418e00}{t\+SSE41}} = 1 $<$$<$ 7
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_aa129ef9810aebc74d6a35050b2020487}{t\+SSE42}} = 1 $<$$<$ 8
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_ad0dd328b05e601f2e1501d53d76ff68e}{t\+POPCNT}} = 1 $<$$<$ 9
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a9ded2a8440317eedd470bdee146fcfb0}{t\+AESNI}} = 1 $<$$<$ 10
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a678186f23e006bd361b182a23340d912}{t\+SSE5}} = 1 $<$$<$ 11
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a5e29609add74ae63db1134da0a0a9528}{t\+OSXSAVE}} = 1 $<$$<$ 12
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a639d4c370fa358a76bca67ab7c6f2f5b}{t\+PCLMULQDQ}} = 1 $<$$<$ 13
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a5ff91a2d53d05f7e12977f13a3f5daec}{t\+AVX}} = 1 $<$$<$ 14
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a3972ab92b846d7cbbdf122be13021b16}{t\+FMA}} = 1 $<$$<$ 15
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a78912ef79fa6fa0db620c51036a623bc}{t3\+DN}} = 1 $<$$<$ 16
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_ad20b3d23e8ec7398370eb51e1750ccc4}{t\+E3\+DN}} = 1 $<$$<$ 17
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a3db0ed9104dd85a075f6e511f1d0630a}{t\+SSE4a}} = 1 $<$$<$ 18
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_addf10cc111727496e9e6307c0e37eece}{t\+RDTSCP}} = 1 $<$$<$ 19
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af1b9dd864103cf627c99ccdf84ed4e6a}{t\+AVX2}} = 1 $<$$<$ 20
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a1eb2e68ca009b010940c5baad68bd2ad}{t\+BMI1}} = 1 $<$$<$ 21
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a6523f6953f78de589f0e8475c7004504}{t\+BMI2}} = 1 $<$$<$ 22
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a3f9769d26d2941c68e0f0d8cea55199f}{t\+LZCNT}} = 1 $<$$<$ 23
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af657cc3bfdfeb9ec9646cee170a1d4f2}{t\+INTEL}} = 1 $<$$<$ 24
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_aae7c5f3b87e946c740fb42c9c683ff6e}{t\+AMD}} = 1 $<$$<$ 25
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_ae1ce5a10153cab5c49a8ff98d75ff746}{t\+ENHANCED\+\_\+\+REP}} = 1 $<$$<$ 26
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a1758681e885018a41b5c77b7a67052e5}{t\+RDRAND}} = 1 $<$$<$ 27
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a734e34880ea4adf722648aceff4843b6}{t\+ADX}} = 1 $<$$<$ 28
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_ab9b8513be6731ee9ca6317403cfc6cc4}{t\+RDSEED}} = 1 $<$$<$ 29
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a6c041cae3bfd7b9a66a5317d267258c0}{t\+SMAP}} = 1 $<$$<$ 30
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a947d08895a667c35e443d75fd72a4ee4}{t\+HLE}} = \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}}(1) $<$$<$ 31
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a51b7c3a2eee4d7989214806ab0d10415}{t\+RTM}} = \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}}(1) $<$$<$ 32
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_aeb9d840da1981a577588fb54386583da}{t\+F16C}} = \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}}(1) $<$$<$ 33
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a030958bb3548013891120e0764d7f868}{t\+MOVBE}} = \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}}(1) $<$$<$ 34
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af6e048e24931f629711d7205d6406a00}{t\+AVX512F}} = \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}}(1) $<$$<$ 35
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_ae433e4a3a2cab8f303e56e5023bbbc28}{t\+AVX512\+DQ}} = \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}}(1) $<$$<$ 36
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a932608a62a8adb005390ab495a855b18}{t\+AVX512\+\_\+\+IFMA}} = \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}}(1) $<$$<$ 37
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_aa22d02231a46d4fb3bad00590f0f860f}{t\+AVX512\+IFMA}} = \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a932608a62a8adb005390ab495a855b18}{t\+AVX512\+\_\+\+IFMA}}
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a1132f39b05206018b08148d73e73ecab}{t\+AVX512\+PF}} = \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}}(1) $<$$<$ 38
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a9de658583ab5f3a9be662b3bd42dc6c5}{t\+AVX512\+ER}} = \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}}(1) $<$$<$ 39
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a754a862f2b54947d1fb4f390cbf3c810}{t\+AVX512\+CD}} = \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}}(1) $<$$<$ 40
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a98eede95422d674bdb6c12646f2a0d26}{t\+AVX512\+BW}} = \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}}(1) $<$$<$ 41
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_aee6e6e2706e74908e8ee1a28060931c6}{t\+AVX512\+VL}} = \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}}(1) $<$$<$ 42
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a4b1bdbef2740470141bd971fb4390a15}{t\+AVX512\+\_\+\+VBMI}} = \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}}(1) $<$$<$ 43
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_adff8c9d7ee763b088436288898c6cd88}{t\+AVX512\+VBMI}} = \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a4b1bdbef2740470141bd971fb4390a15}{t\+AVX512\+\_\+\+VBMI}}
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a899ccd58aa8aa2179892768910e6ef6e}{t\+AVX512\+\_\+4\+VNNIW}} = \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}}(1) $<$$<$ 44
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af9ade1a6882d54eb738b1dea2243a810}{t\+AVX512\+\_\+4\+FMAPS}} = \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}}(1) $<$$<$ 45
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a6df4b7a67db539d9eae7952f1e4b9532}{t\+PREFETCHWT1}} = \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}}(1) $<$$<$ 46
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a22f0220ef54b005de5f80eb0ccf54531}{t\+PREFETCHW}} = \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}}(1) $<$$<$ 47
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a9f59600811f73f7d61c80c96eaf7b63e}{t\+SHA}} = \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}}(1) $<$$<$ 48
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a1cf1b35a5b3caf3e577fbf07558e6b29}{t\+MPX}} = \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}}(1) $<$$<$ 49
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_ae7eb117afc03a28ed5ab2d93cc66307e}{t\+AVX512\+\_\+\+VBMI2}} = \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}}(1) $<$$<$ 50
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_adc1dfcab19e962f53748fdcf8583aa73}{t\+GFNI}} = \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}}(1) $<$$<$ 51
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_ae1da87427e9c1f35db757d6e53ea1af7}{t\+VAES}} = \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}}(1) $<$$<$ 52
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a7ea42eaacc9ae97fea57867d1beceb48}{t\+VPCLMULQDQ}} = \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}}(1) $<$$<$ 53
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a9bcc2095494cc234364124d8b63bb167}{t\+AVX512\+\_\+\+VNNI}} = \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}}(1) $<$$<$ 54
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a582b3ab2d72ba34a92351a412cf6002d}{t\+AVX512\+\_\+\+BITALG}} = \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}}(1) $<$$<$ 55
+\item 
+static const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a53e332f35bf60e82d75ce340e63a3c9b}{t\+AVX512\+\_\+\+VPOPCNTDQ}} = \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}}(1) $<$$<$ 56
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+CPU detection class 
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00056}{56}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!Type@{Type}}
+\index{Type@{Type}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{Type}{Type}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a} 
+\mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}} \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Xbyak\+::util\+::\+Cpu\+::\+Type}}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00200}{200}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_a9aa1f0e2f1bcd65e2e12d3dbf031de02}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!Cpu@{Cpu}}
+\index{Cpu@{Cpu}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{Cpu()}{Cpu()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_a9aa1f0e2f1bcd65e2e12d3dbf031de02} 
+Xbyak\+::util\+::\+Cpu\+::\+Cpu (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00266}{266}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00267\ \ \ \ \ \ \ \ \ :\ type\_(\mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a2cbd2699f6e481e27edc8dc673b7ec2f}{NONE}})}
+\DoxyCodeLine{00268\ \ \ \ \ \ \ \ \ ,\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a84d398315bb87dfba71bf4c96b8f695c}{data\_cache\_levels}}(0)}
+\DoxyCodeLine{00269\ \ \ \ \ \{}
+\DoxyCodeLine{00270\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ data[4];}
+\DoxyCodeLine{00271\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\&\ \mbox{\hyperlink{make__512_8cpp_a36d2623c3e8461c0caa06e0e41a6f47b}{EAX}}\ =\ data[0];}
+\DoxyCodeLine{00272\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\&\ EBX\ =\ data[1];}
+\DoxyCodeLine{00273\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\&\ ECX\ =\ data[2];}
+\DoxyCodeLine{00274\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\&\ EDX\ =\ data[3];}
+\DoxyCodeLine{00275\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a41083751693a1d7fa8b32553e60b6f39}{getCpuid}}(0,\ data);}
+\DoxyCodeLine{00276\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ maxNum\ =\ \mbox{\hyperlink{make__512_8cpp_a36d2623c3e8461c0caa06e0e41a6f47b}{EAX}};}
+\DoxyCodeLine{00277\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ intel[]\ =\ \textcolor{stringliteral}{"{}ntel"{}};}
+\DoxyCodeLine{00278\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ amd[]\ =\ \textcolor{stringliteral}{"{}cAMD"{}};}
+\DoxyCodeLine{00279\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ECX\ ==\ get32bitAsBE(amd))\ \{}
+\DoxyCodeLine{00280\ \ \ \ \ \ \ \ \ \ \ \ \ type\_\ |=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_aae7c5f3b87e946c740fb42c9c683ff6e}{tAMD}};}
+\DoxyCodeLine{00281\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a41083751693a1d7fa8b32553e60b6f39}{getCpuid}}(0x80000001,\ data);}
+\DoxyCodeLine{00282\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (EDX\ \&\ (1U\ <<\ 31))\ type\_\ |=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a78912ef79fa6fa0db620c51036a623bc}{t3DN}};}
+\DoxyCodeLine{00283\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (EDX\ \&\ (1U\ <<\ 15))\ type\_\ |=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a9c937b7fe32f28f4fef6bafcc2653ae6}{tCMOV}};}
+\DoxyCodeLine{00284\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (EDX\ \&\ (1U\ <<\ 30))\ type\_\ |=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_ad20b3d23e8ec7398370eb51e1750ccc4}{tE3DN}};}
+\DoxyCodeLine{00285\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (EDX\ \&\ (1U\ <<\ 22))\ type\_\ |=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a768eb3c5459ee1dd6b778c5f46f2207b}{tMMX2}};}
+\DoxyCodeLine{00286\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (EDX\ \&\ (1U\ <<\ 27))\ type\_\ |=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_addf10cc111727496e9e6307c0e37eece}{tRDTSCP}};}
+\DoxyCodeLine{00287\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00288\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ECX\ ==\ get32bitAsBE(intel))\ \{}
+\DoxyCodeLine{00289\ \ \ \ \ \ \ \ \ \ \ \ \ type\_\ |=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af657cc3bfdfeb9ec9646cee170a1d4f2}{tINTEL}};}
+\DoxyCodeLine{00290\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a41083751693a1d7fa8b32553e60b6f39}{getCpuid}}(0x80000001,\ data);}
+\DoxyCodeLine{00291\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (EDX\ \&\ (1U\ <<\ 27))\ type\_\ |=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_addf10cc111727496e9e6307c0e37eece}{tRDTSCP}};}
+\DoxyCodeLine{00292\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ECX\ \&\ (1U\ <<\ 5))\ type\_\ |=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a3f9769d26d2941c68e0f0d8cea55199f}{tLZCNT}};}
+\DoxyCodeLine{00293\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ECX\ \&\ (1U\ <<\ 8))\ type\_\ |=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a22f0220ef54b005de5f80eb0ccf54531}{tPREFETCHW}};}
+\DoxyCodeLine{00294\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00295\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a41083751693a1d7fa8b32553e60b6f39}{getCpuid}}(1,\ data);}
+\DoxyCodeLine{00296\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ECX\ \&\ (1U\ <<\ 0))\ type\_\ |=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_ac8a49b4bda0c5fff5307ef7d49649f1d}{tSSE3}};}
+\DoxyCodeLine{00297\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ECX\ \&\ (1U\ <<\ 9))\ type\_\ |=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_aa7935f9bd4c2f5e873b8771a955f3c74}{tSSSE3}};}
+\DoxyCodeLine{00298\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ECX\ \&\ (1U\ <<\ 19))\ type\_\ |=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a2c0fcf14f3f5a117330aea07ea418e00}{tSSE41}};}
+\DoxyCodeLine{00299\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ECX\ \&\ (1U\ <<\ 20))\ type\_\ |=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_aa129ef9810aebc74d6a35050b2020487}{tSSE42}};}
+\DoxyCodeLine{00300\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ECX\ \&\ (1U\ <<\ 22))\ type\_\ |=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a030958bb3548013891120e0764d7f868}{tMOVBE}};}
+\DoxyCodeLine{00301\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ECX\ \&\ (1U\ <<\ 23))\ type\_\ |=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_ad0dd328b05e601f2e1501d53d76ff68e}{tPOPCNT}};}
+\DoxyCodeLine{00302\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ECX\ \&\ (1U\ <<\ 25))\ type\_\ |=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a9ded2a8440317eedd470bdee146fcfb0}{tAESNI}};}
+\DoxyCodeLine{00303\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ECX\ \&\ (1U\ <<\ 1))\ type\_\ |=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a639d4c370fa358a76bca67ab7c6f2f5b}{tPCLMULQDQ}};}
+\DoxyCodeLine{00304\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ECX\ \&\ (1U\ <<\ 27))\ type\_\ |=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a5e29609add74ae63db1134da0a0a9528}{tOSXSAVE}};}
+\DoxyCodeLine{00305\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ECX\ \&\ (1U\ <<\ 30))\ type\_\ |=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a1758681e885018a41b5c77b7a67052e5}{tRDRAND}};}
+\DoxyCodeLine{00306\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ECX\ \&\ (1U\ <<\ 29))\ type\_\ |=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_aeb9d840da1981a577588fb54386583da}{tF16C}};}
+\DoxyCodeLine{00307\ }
+\DoxyCodeLine{00308\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (EDX\ \&\ (1U\ <<\ 15))\ type\_\ |=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a9c937b7fe32f28f4fef6bafcc2653ae6}{tCMOV}};}
+\DoxyCodeLine{00309\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (EDX\ \&\ (1U\ <<\ 23))\ type\_\ |=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_ad896c8938a0576e271eaada3620e5816}{tMMX}};}
+\DoxyCodeLine{00310\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (EDX\ \&\ (1U\ <<\ 25))\ type\_\ |=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a768eb3c5459ee1dd6b778c5f46f2207b}{tMMX2}}\ |\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_ae995e382de94425914655cc00e91764e}{tSSE}};}
+\DoxyCodeLine{00311\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (EDX\ \&\ (1U\ <<\ 26))\ type\_\ |=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_ad2b444dea8355c62306d02db5e95bd64}{tSSE2}};}
+\DoxyCodeLine{00312\ }
+\DoxyCodeLine{00313\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (type\_\ \&\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a5e29609add74ae63db1134da0a0a9528}{tOSXSAVE}})\ \{}
+\DoxyCodeLine{00314\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ check\ XFEATURE\_ENABLED\_MASK[2:1]\ =\ '11b'}}
+\DoxyCodeLine{00315\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}}\ bv\ =\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_aa19d832c685a8e87eb9c64006ceecb74}{getXfeature}}();}
+\DoxyCodeLine{00316\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((bv\ \&\ 6)\ ==\ 6)\ \{}
+\DoxyCodeLine{00317\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ECX\ \&\ (1U\ <<\ 28))\ type\_\ |=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a5ff91a2d53d05f7e12977f13a3f5daec}{tAVX}};}
+\DoxyCodeLine{00318\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ECX\ \&\ (1U\ <<\ 12))\ type\_\ |=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a3972ab92b846d7cbbdf122be13021b16}{tFMA}};}
+\DoxyCodeLine{00319\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (((bv\ >>\ 5)\ \&\ 7)\ ==\ 7)\ \{}
+\DoxyCodeLine{00320\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a4d5d2d122400e2d904b9664de2513e97}{getCpuidEx}}(7,\ 0,\ data);}
+\DoxyCodeLine{00321\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (EBX\ \&\ (1U\ <<\ 16))\ type\_\ |=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af6e048e24931f629711d7205d6406a00}{tAVX512F}};}
+\DoxyCodeLine{00322\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (type\_\ \&\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af6e048e24931f629711d7205d6406a00}{tAVX512F}})\ \{}
+\DoxyCodeLine{00323\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (EBX\ \&\ (1U\ <<\ 17))\ type\_\ |=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_ae433e4a3a2cab8f303e56e5023bbbc28}{tAVX512DQ}};}
+\DoxyCodeLine{00324\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (EBX\ \&\ (1U\ <<\ 21))\ type\_\ |=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a932608a62a8adb005390ab495a855b18}{tAVX512\_IFMA}};}
+\DoxyCodeLine{00325\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (EBX\ \&\ (1U\ <<\ 26))\ type\_\ |=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a1132f39b05206018b08148d73e73ecab}{tAVX512PF}};}
+\DoxyCodeLine{00326\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (EBX\ \&\ (1U\ <<\ 27))\ type\_\ |=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a9de658583ab5f3a9be662b3bd42dc6c5}{tAVX512ER}};}
+\DoxyCodeLine{00327\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (EBX\ \&\ (1U\ <<\ 28))\ type\_\ |=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a754a862f2b54947d1fb4f390cbf3c810}{tAVX512CD}};}
+\DoxyCodeLine{00328\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (EBX\ \&\ (1U\ <<\ 30))\ type\_\ |=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a98eede95422d674bdb6c12646f2a0d26}{tAVX512BW}};}
+\DoxyCodeLine{00329\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (EBX\ \&\ (1U\ <<\ 31))\ type\_\ |=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_aee6e6e2706e74908e8ee1a28060931c6}{tAVX512VL}};}
+\DoxyCodeLine{00330\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ECX\ \&\ (1U\ <<\ 1))\ type\_\ |=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a4b1bdbef2740470141bd971fb4390a15}{tAVX512\_VBMI}};}
+\DoxyCodeLine{00331\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ECX\ \&\ (1U\ <<\ 6))\ type\_\ |=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_ae7eb117afc03a28ed5ab2d93cc66307e}{tAVX512\_VBMI2}};}
+\DoxyCodeLine{00332\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ECX\ \&\ (1U\ <<\ 8))\ type\_\ |=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_adc1dfcab19e962f53748fdcf8583aa73}{tGFNI}};}
+\DoxyCodeLine{00333\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ECX\ \&\ (1U\ <<\ 9))\ type\_\ |=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_ae1da87427e9c1f35db757d6e53ea1af7}{tVAES}};}
+\DoxyCodeLine{00334\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ECX\ \&\ (1U\ <<\ 10))\ type\_\ |=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a7ea42eaacc9ae97fea57867d1beceb48}{tVPCLMULQDQ}};}
+\DoxyCodeLine{00335\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ECX\ \&\ (1U\ <<\ 11))\ type\_\ |=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a9bcc2095494cc234364124d8b63bb167}{tAVX512\_VNNI}};}
+\DoxyCodeLine{00336\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ECX\ \&\ (1U\ <<\ 12))\ type\_\ |=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a582b3ab2d72ba34a92351a412cf6002d}{tAVX512\_BITALG}};}
+\DoxyCodeLine{00337\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ECX\ \&\ (1U\ <<\ 14))\ type\_\ |=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a53e332f35bf60e82d75ce340e63a3c9b}{tAVX512\_VPOPCNTDQ}};}
+\DoxyCodeLine{00338\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (EDX\ \&\ (1U\ <<\ 2))\ type\_\ |=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a899ccd58aa8aa2179892768910e6ef6e}{tAVX512\_4VNNIW}};}
+\DoxyCodeLine{00339\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (EDX\ \&\ (1U\ <<\ 3))\ type\_\ |=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af9ade1a6882d54eb738b1dea2243a810}{tAVX512\_4FMAPS}};}
+\DoxyCodeLine{00340\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00341\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00342\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00343\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00344\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (maxNum\ >=\ 7)\ \{}
+\DoxyCodeLine{00345\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a4d5d2d122400e2d904b9664de2513e97}{getCpuidEx}}(7,\ 0,\ data);}
+\DoxyCodeLine{00346\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (type\_\ \&\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a5ff91a2d53d05f7e12977f13a3f5daec}{tAVX}}\ \&\&\ (EBX\ \&\ (1U\ <<\ 5)))\ type\_\ |=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af1b9dd864103cf627c99ccdf84ed4e6a}{tAVX2}};}
+\DoxyCodeLine{00347\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (EBX\ \&\ (1U\ <<\ 3))\ type\_\ |=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a1eb2e68ca009b010940c5baad68bd2ad}{tBMI1}};}
+\DoxyCodeLine{00348\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (EBX\ \&\ (1U\ <<\ 8))\ type\_\ |=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a6523f6953f78de589f0e8475c7004504}{tBMI2}};}
+\DoxyCodeLine{00349\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (EBX\ \&\ (1U\ <<\ 9))\ type\_\ |=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_ae1ce5a10153cab5c49a8ff98d75ff746}{tENHANCED\_REP}};}
+\DoxyCodeLine{00350\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (EBX\ \&\ (1U\ <<\ 18))\ type\_\ |=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_ab9b8513be6731ee9ca6317403cfc6cc4}{tRDSEED}};}
+\DoxyCodeLine{00351\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (EBX\ \&\ (1U\ <<\ 19))\ type\_\ |=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a734e34880ea4adf722648aceff4843b6}{tADX}};}
+\DoxyCodeLine{00352\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (EBX\ \&\ (1U\ <<\ 20))\ type\_\ |=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a6c041cae3bfd7b9a66a5317d267258c0}{tSMAP}};}
+\DoxyCodeLine{00353\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (EBX\ \&\ (1U\ <<\ 4))\ type\_\ |=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a947d08895a667c35e443d75fd72a4ee4}{tHLE}};}
+\DoxyCodeLine{00354\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (EBX\ \&\ (1U\ <<\ 11))\ type\_\ |=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a51b7c3a2eee4d7989214806ab0d10415}{tRTM}};}
+\DoxyCodeLine{00355\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (EBX\ \&\ (1U\ <<\ 14))\ type\_\ |=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a1cf1b35a5b3caf3e577fbf07558e6b29}{tMPX}};}
+\DoxyCodeLine{00356\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (EBX\ \&\ (1U\ <<\ 29))\ type\_\ |=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a9f59600811f73f7d61c80c96eaf7b63e}{tSHA}};}
+\DoxyCodeLine{00357\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ECX\ \&\ (1U\ <<\ 0))\ type\_\ |=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a6df4b7a67db539d9eae7952f1e4b9532}{tPREFETCHWT1}};}
+\DoxyCodeLine{00358\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00359\ \ \ \ \ \ \ \ \ setFamily();}
+\DoxyCodeLine{00360\ \ \ \ \ \ \ \ \ setCacheHierarchy();}
+\DoxyCodeLine{00361\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_xbyak_1_1util_1_1_cpu_a9aa1f0e2f1bcd65e2e12d3dbf031de02_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_a48de211c96391a0ff01ad1ecb273c400}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!getCoresSharingDataCache@{getCoresSharingDataCache}}
+\index{getCoresSharingDataCache@{getCoresSharingDataCache}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{getCoresSharingDataCache()}{getCoresSharingDataCache()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_a48de211c96391a0ff01ad1ecb273c400} 
+unsigned int Xbyak\+::util\+::\+Cpu\+::get\+Cores\+Sharing\+Data\+Cache (\begin{DoxyParamCaption}\item[{unsigned int}]{i}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00158}{158}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00159\ \ \ \ \ \{}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (i\ >=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a84d398315bb87dfba71bf4c96b8f695c}{data\_cache\_levels}})\ \textcolor{keywordflow}{throw}\ \ \mbox{\hyperlink{calc_8cpp_a2c3e4bb40f36b262a5214e2da2bca9c5}{Error}}(\mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06ad95586d156d26087eb10d8c0d864beab}{ERR\_BAD\_PARAMETER}});}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a264667db6a3a5f075506adf899feb547}{cores\_sharing\_data\_cache}}[i];}
+\DoxyCodeLine{00162\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_xbyak_1_1util_1_1_cpu_a48de211c96391a0ff01ad1ecb273c400_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_a41083751693a1d7fa8b32553e60b6f39}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!getCpuid@{getCpuid}}
+\index{getCpuid@{getCpuid}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{getCpuid()}{getCpuid()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_a41083751693a1d7fa8b32553e60b6f39} 
+static void Xbyak\+::util\+::\+Cpu\+::get\+Cpuid (\begin{DoxyParamCaption}\item[{unsigned int}]{eax\+In}{, }\item[{unsigned int}]{data}{\mbox{[}4\mbox{]}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00172}{172}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00173\ \ \ \ \ \{}
+\DoxyCodeLine{00174\ \textcolor{preprocessor}{\#ifdef\ \_MSC\_VER}}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{xbyak__util_8h_a3fd0b711754fa0e66084b87a92c96162}{\_\_cpuid}}(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{int}*\textcolor{keyword}{>}(data),\ eaxIn);}
+\DoxyCodeLine{00176\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{xbyak__util_8h_a3fd0b711754fa0e66084b87a92c96162}{\_\_cpuid}}(eaxIn,\ data[0],\ data[1],\ data[2],\ data[3]);}
+\DoxyCodeLine{00178\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00179\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_xbyak_1_1util_1_1_cpu_a41083751693a1d7fa8b32553e60b6f39_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_a4d5d2d122400e2d904b9664de2513e97}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!getCpuidEx@{getCpuidEx}}
+\index{getCpuidEx@{getCpuidEx}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{getCpuidEx()}{getCpuidEx()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_a4d5d2d122400e2d904b9664de2513e97} 
+static void Xbyak\+::util\+::\+Cpu\+::get\+Cpuid\+Ex (\begin{DoxyParamCaption}\item[{unsigned int}]{eax\+In}{, }\item[{unsigned int}]{ecx\+In}{, }\item[{unsigned int}]{data}{\mbox{[}4\mbox{]}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00180}{180}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00181\ \ \ \ \ \{}
+\DoxyCodeLine{00182\ \textcolor{preprocessor}{\#ifdef\ \_MSC\_VER}}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \ \ \_\_cpuidex(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{int}*\textcolor{keyword}{>}(data),\ eaxIn,\ ecxIn);}
+\DoxyCodeLine{00184\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{xbyak__util_8h_a4cfa19ed076a6db2303c1921725245b3}{\_\_cpuid\_count}}(eaxIn,\ ecxIn,\ data[0],\ data[1],\ data[2],\ data[3]);}
+\DoxyCodeLine{00186\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00187\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_xbyak_1_1util_1_1_cpu_a4d5d2d122400e2d904b9664de2513e97_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_a33b95225d23baee8be46cd64ff9425c3}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!getDataCacheLevels@{getDataCacheLevels}}
+\index{getDataCacheLevels@{getDataCacheLevels}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{getDataCacheLevels()}{getDataCacheLevels()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_a33b95225d23baee8be46cd64ff9425c3} 
+unsigned int Xbyak\+::util\+::\+Cpu\+::get\+Data\+Cache\+Levels (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00157}{157}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00157\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a84d398315bb87dfba71bf4c96b8f695c}{data\_cache\_levels}};\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_xbyak_1_1util_1_1_cpu_a33b95225d23baee8be46cd64ff9425c3_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_ae08b3c85154cca76ee23adb6e1dbd226}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!getDataCacheSize@{getDataCacheSize}}
+\index{getDataCacheSize@{getDataCacheSize}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{getDataCacheSize()}{getDataCacheSize()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_ae08b3c85154cca76ee23adb6e1dbd226} 
+unsigned int Xbyak\+::util\+::\+Cpu\+::get\+Data\+Cache\+Size (\begin{DoxyParamCaption}\item[{unsigned int}]{i}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00163}{163}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00164\ \ \ \ \ \{}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (i\ >=\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a84d398315bb87dfba71bf4c96b8f695c}{data\_cache\_levels}})\ \textcolor{keywordflow}{throw}\ \ \mbox{\hyperlink{calc_8cpp_a2c3e4bb40f36b262a5214e2da2bca9c5}{Error}}(\mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06ad95586d156d26087eb10d8c0d864beab}{ERR\_BAD\_PARAMETER}});}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a2370a5b034d783ecfc8750a15fe4b855}{data\_cache\_size}}[i];}
+\DoxyCodeLine{00167\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_xbyak_1_1util_1_1_cpu_ae08b3c85154cca76ee23adb6e1dbd226_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_aa19d832c685a8e87eb9c64006ceecb74}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!getXfeature@{getXfeature}}
+\index{getXfeature@{getXfeature}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{getXfeature()}{getXfeature()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_aa19d832c685a8e87eb9c64006ceecb74} 
+static \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}} Xbyak\+::util\+::\+Cpu\+::get\+Xfeature (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00188}{188}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00189\ \ \ \ \ \{}
+\DoxyCodeLine{00190\ \textcolor{preprocessor}{\#ifdef\ \_MSC\_VER}}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \_xgetbv(0);}
+\DoxyCodeLine{00192\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ eax,\ \mbox{\hyperlink{namespace_xbyak_1_1util_a725c307c821a7e14594f383a190d3990}{edx}};}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ xgetvb\ is\ not\ support\ on\ gcc\ 4.2}}
+\DoxyCodeLine{00195\ \textcolor{comment}{//\ \ \ \ \ \ \_\_asm\_\_\ volatile("{}xgetbv"{}\ :\ "{}=a"{}(eax),\ "{}=d"{}(edx)\ :\ "{}c"{}(0));}}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \_\_asm\_\_\ \textcolor{keyword}{volatile}(\textcolor{stringliteral}{"{}.byte\ 0x0f,\ 0x01,\ 0xd0"{}}\ :\ \textcolor{stringliteral}{"{}=a"{}}(eax),\ \textcolor{stringliteral}{"{}=d"{}}(\mbox{\hyperlink{namespace_xbyak_1_1util_a725c307c821a7e14594f383a190d3990}{edx}})\ :\ \textcolor{stringliteral}{"{}c"{}}(0));}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ((\mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}})\mbox{\hyperlink{namespace_xbyak_1_1util_a725c307c821a7e14594f383a190d3990}{edx}}\ <<\ 32)\ |\ eax;}
+\DoxyCodeLine{00198\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00199\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=343pt]{class_xbyak_1_1util_1_1_cpu_aa19d832c685a8e87eb9c64006ceecb74_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_xbyak_1_1util_1_1_cpu_aa19d832c685a8e87eb9c64006ceecb74_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_a445001cdff95d3819b6aecf4bfcf073c}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!has@{has}}
+\index{has@{has}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{has()}{has()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_a445001cdff95d3819b6aecf4bfcf073c} 
+bool Xbyak\+::util\+::\+Cpu\+::has (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}}}]{type}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00368}{368}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00369\ \ \ \ \ \{}
+\DoxyCodeLine{00370\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (type\ \&\ type\_)\ !=\ 0;}
+\DoxyCodeLine{00371\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_xbyak_1_1util_1_1_cpu_a445001cdff95d3819b6aecf4bfcf073c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_a72aba63f99c5427292b39b9414a25f1b}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!putFamily@{putFamily}}
+\index{putFamily@{putFamily}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{putFamily()}{putFamily()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_a72aba63f99c5427292b39b9414a25f1b} 
+void Xbyak\+::util\+::\+Cpu\+::put\+Family (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00362}{362}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00363\ \ \ \ \ \{}
+\DoxyCodeLine{00364\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}family=\%d,\ model=\%X,\ stepping=\%d,\ extFamily=\%d,\ extModel=\%X\(\backslash\)n"{}},}
+\DoxyCodeLine{00365\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a63b0b93bbc5a491b513f09e092f96cfc}{family}},\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a414080805629f2c283b4c4577778a193}{model}},\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_aa6162467d07750e96fe0fa9e00efd373}{stepping}},\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a17a0173d8293d997ef5fc684d2a9c2d7}{extFamily}},\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_ac0fd74a435e5dccf7f37f2656744f900}{extModel}});}
+\DoxyCodeLine{00366\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}display:family=\%X,\ model=\%X\(\backslash\)n"{}},\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a71ea42b7ac62418225984239f5a8220e}{displayFamily}},\ \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a7a97987cf663e1983000f1393dda525e}{displayModel}});}
+\DoxyCodeLine{00367\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_xbyak_1_1util_1_1_cpu_a72aba63f99c5427292b39b9414a25f1b_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_a264667db6a3a5f075506adf899feb547}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!cores\_sharing\_data\_cache@{cores\_sharing\_data\_cache}}
+\index{cores\_sharing\_data\_cache@{cores\_sharing\_data\_cache}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{cores\_sharing\_data\_cache}{cores\_sharing\_data\_cache}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_a264667db6a3a5f075506adf899feb547} 
+unsigned int Xbyak\+::util\+::\+Cpu\+::cores\+\_\+sharing\+\_\+data\+\_\+cache\mbox{[}\mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a1cc1e781244407fef6463efdd0c19107}{max\+Number\+Cache\+Levels}}\mbox{]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00154}{154}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_a84d398315bb87dfba71bf4c96b8f695c}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!data\_cache\_levels@{data\_cache\_levels}}
+\index{data\_cache\_levels@{data\_cache\_levels}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{data\_cache\_levels}{data\_cache\_levels}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_a84d398315bb87dfba71bf4c96b8f695c} 
+unsigned int Xbyak\+::util\+::\+Cpu\+::data\+\_\+cache\+\_\+levels}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00155}{155}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_a2370a5b034d783ecfc8750a15fe4b855}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!data\_cache\_size@{data\_cache\_size}}
+\index{data\_cache\_size@{data\_cache\_size}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{data\_cache\_size}{data\_cache\_size}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_a2370a5b034d783ecfc8750a15fe4b855} 
+unsigned int Xbyak\+::util\+::\+Cpu\+::data\+\_\+cache\+\_\+size\mbox{[}\mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a1cc1e781244407fef6463efdd0c19107}{max\+Number\+Cache\+Levels}}\mbox{]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00153}{153}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_a71ea42b7ac62418225984239f5a8220e}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!displayFamily@{displayFamily}}
+\index{displayFamily@{displayFamily}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{displayFamily}{displayFamily}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_a71ea42b7ac62418225984239f5a8220e} 
+int Xbyak\+::util\+::\+Cpu\+::display\+Family}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00148}{148}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_a7a97987cf663e1983000f1393dda525e}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!displayModel@{displayModel}}
+\index{displayModel@{displayModel}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{displayModel}{displayModel}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_a7a97987cf663e1983000f1393dda525e} 
+int Xbyak\+::util\+::\+Cpu\+::display\+Model}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00149}{149}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_a17a0173d8293d997ef5fc684d2a9c2d7}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!extFamily@{extFamily}}
+\index{extFamily@{extFamily}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{extFamily}{extFamily}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_a17a0173d8293d997ef5fc684d2a9c2d7} 
+int Xbyak\+::util\+::\+Cpu\+::ext\+Family}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00147}{147}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_ac0fd74a435e5dccf7f37f2656744f900}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!extModel@{extModel}}
+\index{extModel@{extModel}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{extModel}{extModel}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_ac0fd74a435e5dccf7f37f2656744f900} 
+int Xbyak\+::util\+::\+Cpu\+::ext\+Model}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00146}{146}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_a63b0b93bbc5a491b513f09e092f96cfc}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!family@{family}}
+\index{family@{family}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{family}{family}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_a63b0b93bbc5a491b513f09e092f96cfc} 
+int Xbyak\+::util\+::\+Cpu\+::family}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00144}{144}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_a1cc1e781244407fef6463efdd0c19107}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!maxNumberCacheLevels@{maxNumberCacheLevels}}
+\index{maxNumberCacheLevels@{maxNumberCacheLevels}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{maxNumberCacheLevels}{maxNumberCacheLevels}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_a1cc1e781244407fef6463efdd0c19107} 
+const unsigned int Xbyak\+::util\+::\+Cpu\+::max\+Number\+Cache\+Levels = 10\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00152}{152}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_a414080805629f2c283b4c4577778a193}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!model@{model}}
+\index{model@{model}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{model}{model}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_a414080805629f2c283b4c4577778a193} 
+int Xbyak\+::util\+::\+Cpu\+::model}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00143}{143}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_a2cbd2699f6e481e27edc8dc673b7ec2f}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!NONE@{NONE}}
+\index{NONE@{NONE}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{NONE}{NONE}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_a2cbd2699f6e481e27edc8dc673b7ec2f} 
+const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} Xbyak\+::util\+::\+Cpu\+::\+NONE = 0\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00202}{202}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_aa6162467d07750e96fe0fa9e00efd373}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!stepping@{stepping}}
+\index{stepping@{stepping}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{stepping}{stepping}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_aa6162467d07750e96fe0fa9e00efd373} 
+int Xbyak\+::util\+::\+Cpu\+::stepping}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00145}{145}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_a78912ef79fa6fa0db620c51036a623bc}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!t3DN@{t3DN}}
+\index{t3DN@{t3DN}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{t3DN}{t3DN}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_a78912ef79fa6fa0db620c51036a623bc} 
+const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} Xbyak\+::util\+::\+Cpu\+::t3\+DN = 1 $<$$<$ 16\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00220}{220}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_a734e34880ea4adf722648aceff4843b6}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!tADX@{tADX}}
+\index{tADX@{tADX}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{tADX}{tADX}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_a734e34880ea4adf722648aceff4843b6} 
+const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} Xbyak\+::util\+::\+Cpu\+::t\+ADX = 1 $<$$<$ 28\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00234}{234}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_a9ded2a8440317eedd470bdee146fcfb0}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!tAESNI@{tAESNI}}
+\index{tAESNI@{tAESNI}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{tAESNI}{tAESNI}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_a9ded2a8440317eedd470bdee146fcfb0} 
+const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} Xbyak\+::util\+::\+Cpu\+::t\+AESNI = 1 $<$$<$ 10\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00213}{213}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_aae7c5f3b87e946c740fb42c9c683ff6e}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!tAMD@{tAMD}}
+\index{tAMD@{tAMD}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{tAMD}{tAMD}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_aae7c5f3b87e946c740fb42c9c683ff6e} 
+const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} Xbyak\+::util\+::\+Cpu\+::t\+AMD = 1 $<$$<$ 25\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00230}{230}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_a5ff91a2d53d05f7e12977f13a3f5daec}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!tAVX@{tAVX}}
+\index{tAVX@{tAVX}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{tAVX}{tAVX}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_a5ff91a2d53d05f7e12977f13a3f5daec} 
+const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} Xbyak\+::util\+::\+Cpu\+::t\+AVX = 1 $<$$<$ 14\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00217}{217}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_af1b9dd864103cf627c99ccdf84ed4e6a}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!tAVX2@{tAVX2}}
+\index{tAVX2@{tAVX2}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{tAVX2}{tAVX2}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_af1b9dd864103cf627c99ccdf84ed4e6a} 
+const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} Xbyak\+::util\+::\+Cpu\+::t\+AVX2 = 1 $<$$<$ 20\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00224}{224}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_af9ade1a6882d54eb738b1dea2243a810}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!tAVX512\_4FMAPS@{tAVX512\_4FMAPS}}
+\index{tAVX512\_4FMAPS@{tAVX512\_4FMAPS}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{tAVX512\_4FMAPS}{tAVX512\_4FMAPS}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_af9ade1a6882d54eb738b1dea2243a810} 
+const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} Xbyak\+::util\+::\+Cpu\+::t\+AVX512\+\_\+4\+FMAPS = \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}}(1) $<$$<$ 45\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00253}{253}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_a899ccd58aa8aa2179892768910e6ef6e}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!tAVX512\_4VNNIW@{tAVX512\_4VNNIW}}
+\index{tAVX512\_4VNNIW@{tAVX512\_4VNNIW}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{tAVX512\_4VNNIW}{tAVX512\_4VNNIW}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_a899ccd58aa8aa2179892768910e6ef6e} 
+const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} Xbyak\+::util\+::\+Cpu\+::t\+AVX512\+\_\+4\+VNNIW = \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}}(1) $<$$<$ 44\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00252}{252}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_a582b3ab2d72ba34a92351a412cf6002d}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!tAVX512\_BITALG@{tAVX512\_BITALG}}
+\index{tAVX512\_BITALG@{tAVX512\_BITALG}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{tAVX512\_BITALG}{tAVX512\_BITALG}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_a582b3ab2d72ba34a92351a412cf6002d} 
+const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} Xbyak\+::util\+::\+Cpu\+::t\+AVX512\+\_\+\+BITALG = \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}}(1) $<$$<$ 55\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00263}{263}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_a932608a62a8adb005390ab495a855b18}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!tAVX512\_IFMA@{tAVX512\_IFMA}}
+\index{tAVX512\_IFMA@{tAVX512\_IFMA}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{tAVX512\_IFMA}{tAVX512\_IFMA}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_a932608a62a8adb005390ab495a855b18} 
+const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} Xbyak\+::util\+::\+Cpu\+::t\+AVX512\+\_\+\+IFMA = \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}}(1) $<$$<$ 37\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00243}{243}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_a4b1bdbef2740470141bd971fb4390a15}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!tAVX512\_VBMI@{tAVX512\_VBMI}}
+\index{tAVX512\_VBMI@{tAVX512\_VBMI}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{tAVX512\_VBMI}{tAVX512\_VBMI}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_a4b1bdbef2740470141bd971fb4390a15} 
+const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} Xbyak\+::util\+::\+Cpu\+::t\+AVX512\+\_\+\+VBMI = \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}}(1) $<$$<$ 43\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00250}{250}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_ae7eb117afc03a28ed5ab2d93cc66307e}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!tAVX512\_VBMI2@{tAVX512\_VBMI2}}
+\index{tAVX512\_VBMI2@{tAVX512\_VBMI2}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{tAVX512\_VBMI2}{tAVX512\_VBMI2}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_ae7eb117afc03a28ed5ab2d93cc66307e} 
+const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} Xbyak\+::util\+::\+Cpu\+::t\+AVX512\+\_\+\+VBMI2 = \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}}(1) $<$$<$ 50\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00258}{258}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_a9bcc2095494cc234364124d8b63bb167}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!tAVX512\_VNNI@{tAVX512\_VNNI}}
+\index{tAVX512\_VNNI@{tAVX512\_VNNI}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{tAVX512\_VNNI}{tAVX512\_VNNI}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_a9bcc2095494cc234364124d8b63bb167} 
+const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} Xbyak\+::util\+::\+Cpu\+::t\+AVX512\+\_\+\+VNNI = \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}}(1) $<$$<$ 54\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00262}{262}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_a53e332f35bf60e82d75ce340e63a3c9b}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!tAVX512\_VPOPCNTDQ@{tAVX512\_VPOPCNTDQ}}
+\index{tAVX512\_VPOPCNTDQ@{tAVX512\_VPOPCNTDQ}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{tAVX512\_VPOPCNTDQ}{tAVX512\_VPOPCNTDQ}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_a53e332f35bf60e82d75ce340e63a3c9b} 
+const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} Xbyak\+::util\+::\+Cpu\+::t\+AVX512\+\_\+\+VPOPCNTDQ = \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}}(1) $<$$<$ 56\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00264}{264}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_a98eede95422d674bdb6c12646f2a0d26}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!tAVX512BW@{tAVX512BW}}
+\index{tAVX512BW@{tAVX512BW}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{tAVX512BW}{tAVX512BW}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_a98eede95422d674bdb6c12646f2a0d26} 
+const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} Xbyak\+::util\+::\+Cpu\+::t\+AVX512\+BW = \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}}(1) $<$$<$ 41\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00248}{248}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_a754a862f2b54947d1fb4f390cbf3c810}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!tAVX512CD@{tAVX512CD}}
+\index{tAVX512CD@{tAVX512CD}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{tAVX512CD}{tAVX512CD}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_a754a862f2b54947d1fb4f390cbf3c810} 
+const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} Xbyak\+::util\+::\+Cpu\+::t\+AVX512\+CD = \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}}(1) $<$$<$ 40\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00247}{247}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_ae433e4a3a2cab8f303e56e5023bbbc28}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!tAVX512DQ@{tAVX512DQ}}
+\index{tAVX512DQ@{tAVX512DQ}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{tAVX512DQ}{tAVX512DQ}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_ae433e4a3a2cab8f303e56e5023bbbc28} 
+const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} Xbyak\+::util\+::\+Cpu\+::t\+AVX512\+DQ = \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}}(1) $<$$<$ 36\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00242}{242}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_a9de658583ab5f3a9be662b3bd42dc6c5}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!tAVX512ER@{tAVX512ER}}
+\index{tAVX512ER@{tAVX512ER}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{tAVX512ER}{tAVX512ER}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_a9de658583ab5f3a9be662b3bd42dc6c5} 
+const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} Xbyak\+::util\+::\+Cpu\+::t\+AVX512\+ER = \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}}(1) $<$$<$ 39\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00246}{246}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_af6e048e24931f629711d7205d6406a00}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!tAVX512F@{tAVX512F}}
+\index{tAVX512F@{tAVX512F}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{tAVX512F}{tAVX512F}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_af6e048e24931f629711d7205d6406a00} 
+const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} Xbyak\+::util\+::\+Cpu\+::t\+AVX512F = \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}}(1) $<$$<$ 35\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00241}{241}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_aa22d02231a46d4fb3bad00590f0f860f}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!tAVX512IFMA@{tAVX512IFMA}}
+\index{tAVX512IFMA@{tAVX512IFMA}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{tAVX512IFMA}{tAVX512IFMA}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_aa22d02231a46d4fb3bad00590f0f860f} 
+const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} Xbyak\+::util\+::\+Cpu\+::t\+AVX512\+IFMA = \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a932608a62a8adb005390ab495a855b18}{t\+AVX512\+\_\+\+IFMA}}\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00244}{244}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_a1132f39b05206018b08148d73e73ecab}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!tAVX512PF@{tAVX512PF}}
+\index{tAVX512PF@{tAVX512PF}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{tAVX512PF}{tAVX512PF}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_a1132f39b05206018b08148d73e73ecab} 
+const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} Xbyak\+::util\+::\+Cpu\+::t\+AVX512\+PF = \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}}(1) $<$$<$ 38\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00245}{245}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_adff8c9d7ee763b088436288898c6cd88}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!tAVX512VBMI@{tAVX512VBMI}}
+\index{tAVX512VBMI@{tAVX512VBMI}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{tAVX512VBMI}{tAVX512VBMI}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_adff8c9d7ee763b088436288898c6cd88} 
+const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} Xbyak\+::util\+::\+Cpu\+::t\+AVX512\+VBMI = \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_a4b1bdbef2740470141bd971fb4390a15}{t\+AVX512\+\_\+\+VBMI}}\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00251}{251}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_aee6e6e2706e74908e8ee1a28060931c6}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!tAVX512VL@{tAVX512VL}}
+\index{tAVX512VL@{tAVX512VL}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{tAVX512VL}{tAVX512VL}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_aee6e6e2706e74908e8ee1a28060931c6} 
+const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} Xbyak\+::util\+::\+Cpu\+::t\+AVX512\+VL = \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}}(1) $<$$<$ 42\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00249}{249}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_a1eb2e68ca009b010940c5baad68bd2ad}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!tBMI1@{tBMI1}}
+\index{tBMI1@{tBMI1}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{tBMI1}{tBMI1}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_a1eb2e68ca009b010940c5baad68bd2ad} 
+const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} Xbyak\+::util\+::\+Cpu\+::t\+BMI1 = 1 $<$$<$ 21\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00225}{225}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_a6523f6953f78de589f0e8475c7004504}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!tBMI2@{tBMI2}}
+\index{tBMI2@{tBMI2}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{tBMI2}{tBMI2}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_a6523f6953f78de589f0e8475c7004504} 
+const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} Xbyak\+::util\+::\+Cpu\+::t\+BMI2 = 1 $<$$<$ 22\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00226}{226}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_a9c937b7fe32f28f4fef6bafcc2653ae6}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!tCMOV@{tCMOV}}
+\index{tCMOV@{tCMOV}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{tCMOV}{tCMOV}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_a9c937b7fe32f28f4fef6bafcc2653ae6} 
+const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} Xbyak\+::util\+::\+Cpu\+::t\+CMOV = 1 $<$$<$ 2\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00205}{205}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_ad20b3d23e8ec7398370eb51e1750ccc4}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!tE3DN@{tE3DN}}
+\index{tE3DN@{tE3DN}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{tE3DN}{tE3DN}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_ad20b3d23e8ec7398370eb51e1750ccc4} 
+const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} Xbyak\+::util\+::\+Cpu\+::t\+E3\+DN = 1 $<$$<$ 17\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00221}{221}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_ae1ce5a10153cab5c49a8ff98d75ff746}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!tENHANCED\_REP@{tENHANCED\_REP}}
+\index{tENHANCED\_REP@{tENHANCED\_REP}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{tENHANCED\_REP}{tENHANCED\_REP}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_ae1ce5a10153cab5c49a8ff98d75ff746} 
+const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} Xbyak\+::util\+::\+Cpu\+::t\+ENHANCED\+\_\+\+REP = 1 $<$$<$ 26\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00232}{232}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_aeb9d840da1981a577588fb54386583da}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!tF16C@{tF16C}}
+\index{tF16C@{tF16C}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{tF16C}{tF16C}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_aeb9d840da1981a577588fb54386583da} 
+const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} Xbyak\+::util\+::\+Cpu\+::t\+F16C = \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}}(1) $<$$<$ 33\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00239}{239}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_a3972ab92b846d7cbbdf122be13021b16}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!tFMA@{tFMA}}
+\index{tFMA@{tFMA}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{tFMA}{tFMA}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_a3972ab92b846d7cbbdf122be13021b16} 
+const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} Xbyak\+::util\+::\+Cpu\+::t\+FMA = 1 $<$$<$ 15\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00218}{218}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_adc1dfcab19e962f53748fdcf8583aa73}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!tGFNI@{tGFNI}}
+\index{tGFNI@{tGFNI}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{tGFNI}{tGFNI}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_adc1dfcab19e962f53748fdcf8583aa73} 
+const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} Xbyak\+::util\+::\+Cpu\+::t\+GFNI = \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}}(1) $<$$<$ 51\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00259}{259}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_a947d08895a667c35e443d75fd72a4ee4}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!tHLE@{tHLE}}
+\index{tHLE@{tHLE}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{tHLE}{tHLE}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_a947d08895a667c35e443d75fd72a4ee4} 
+const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} Xbyak\+::util\+::\+Cpu\+::t\+HLE = \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}}(1) $<$$<$ 31\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00237}{237}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_af657cc3bfdfeb9ec9646cee170a1d4f2}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!tINTEL@{tINTEL}}
+\index{tINTEL@{tINTEL}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{tINTEL}{tINTEL}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_af657cc3bfdfeb9ec9646cee170a1d4f2} 
+const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} Xbyak\+::util\+::\+Cpu\+::t\+INTEL = 1 $<$$<$ 24\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00229}{229}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_a3f9769d26d2941c68e0f0d8cea55199f}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!tLZCNT@{tLZCNT}}
+\index{tLZCNT@{tLZCNT}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{tLZCNT}{tLZCNT}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_a3f9769d26d2941c68e0f0d8cea55199f} 
+const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} Xbyak\+::util\+::\+Cpu\+::t\+LZCNT = 1 $<$$<$ 23\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00227}{227}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_ad896c8938a0576e271eaada3620e5816}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!tMMX@{tMMX}}
+\index{tMMX@{tMMX}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{tMMX}{tMMX}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_ad896c8938a0576e271eaada3620e5816} 
+const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} Xbyak\+::util\+::\+Cpu\+::t\+MMX = 1 $<$$<$ 0\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00203}{203}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_a768eb3c5459ee1dd6b778c5f46f2207b}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!tMMX2@{tMMX2}}
+\index{tMMX2@{tMMX2}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{tMMX2}{tMMX2}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_a768eb3c5459ee1dd6b778c5f46f2207b} 
+const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} Xbyak\+::util\+::\+Cpu\+::t\+MMX2 = 1 $<$$<$ 1\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00204}{204}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_a030958bb3548013891120e0764d7f868}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!tMOVBE@{tMOVBE}}
+\index{tMOVBE@{tMOVBE}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{tMOVBE}{tMOVBE}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_a030958bb3548013891120e0764d7f868} 
+const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} Xbyak\+::util\+::\+Cpu\+::t\+MOVBE = \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}}(1) $<$$<$ 34\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00240}{240}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_a1cf1b35a5b3caf3e577fbf07558e6b29}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!tMPX@{tMPX}}
+\index{tMPX@{tMPX}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{tMPX}{tMPX}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_a1cf1b35a5b3caf3e577fbf07558e6b29} 
+const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} Xbyak\+::util\+::\+Cpu\+::t\+MPX = \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}}(1) $<$$<$ 49\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00257}{257}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_a5e29609add74ae63db1134da0a0a9528}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!tOSXSAVE@{tOSXSAVE}}
+\index{tOSXSAVE@{tOSXSAVE}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{tOSXSAVE}{tOSXSAVE}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_a5e29609add74ae63db1134da0a0a9528} 
+const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} Xbyak\+::util\+::\+Cpu\+::t\+OSXSAVE = 1 $<$$<$ 12\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00215}{215}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_a639d4c370fa358a76bca67ab7c6f2f5b}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!tPCLMULQDQ@{tPCLMULQDQ}}
+\index{tPCLMULQDQ@{tPCLMULQDQ}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{tPCLMULQDQ}{tPCLMULQDQ}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_a639d4c370fa358a76bca67ab7c6f2f5b} 
+const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} Xbyak\+::util\+::\+Cpu\+::t\+PCLMULQDQ = 1 $<$$<$ 13\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00216}{216}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_ad0dd328b05e601f2e1501d53d76ff68e}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!tPOPCNT@{tPOPCNT}}
+\index{tPOPCNT@{tPOPCNT}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{tPOPCNT}{tPOPCNT}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_ad0dd328b05e601f2e1501d53d76ff68e} 
+const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} Xbyak\+::util\+::\+Cpu\+::t\+POPCNT = 1 $<$$<$ 9\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00212}{212}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_a22f0220ef54b005de5f80eb0ccf54531}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!tPREFETCHW@{tPREFETCHW}}
+\index{tPREFETCHW@{tPREFETCHW}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{tPREFETCHW}{tPREFETCHW}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_a22f0220ef54b005de5f80eb0ccf54531} 
+const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} Xbyak\+::util\+::\+Cpu\+::t\+PREFETCHW = \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}}(1) $<$$<$ 47\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00255}{255}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_a6df4b7a67db539d9eae7952f1e4b9532}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!tPREFETCHWT1@{tPREFETCHWT1}}
+\index{tPREFETCHWT1@{tPREFETCHWT1}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{tPREFETCHWT1}{tPREFETCHWT1}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_a6df4b7a67db539d9eae7952f1e4b9532} 
+const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} Xbyak\+::util\+::\+Cpu\+::t\+PREFETCHWT1 = \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}}(1) $<$$<$ 46\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00254}{254}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_a1758681e885018a41b5c77b7a67052e5}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!tRDRAND@{tRDRAND}}
+\index{tRDRAND@{tRDRAND}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{tRDRAND}{tRDRAND}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_a1758681e885018a41b5c77b7a67052e5} 
+const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} Xbyak\+::util\+::\+Cpu\+::t\+RDRAND = 1 $<$$<$ 27\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00233}{233}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_ab9b8513be6731ee9ca6317403cfc6cc4}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!tRDSEED@{tRDSEED}}
+\index{tRDSEED@{tRDSEED}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{tRDSEED}{tRDSEED}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_ab9b8513be6731ee9ca6317403cfc6cc4} 
+const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} Xbyak\+::util\+::\+Cpu\+::t\+RDSEED = 1 $<$$<$ 29\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00235}{235}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_addf10cc111727496e9e6307c0e37eece}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!tRDTSCP@{tRDTSCP}}
+\index{tRDTSCP@{tRDTSCP}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{tRDTSCP}{tRDTSCP}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_addf10cc111727496e9e6307c0e37eece} 
+const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} Xbyak\+::util\+::\+Cpu\+::t\+RDTSCP = 1 $<$$<$ 19\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00223}{223}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_a51b7c3a2eee4d7989214806ab0d10415}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!tRTM@{tRTM}}
+\index{tRTM@{tRTM}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{tRTM}{tRTM}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_a51b7c3a2eee4d7989214806ab0d10415} 
+const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} Xbyak\+::util\+::\+Cpu\+::t\+RTM = \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}}(1) $<$$<$ 32\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00238}{238}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_a9f59600811f73f7d61c80c96eaf7b63e}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!tSHA@{tSHA}}
+\index{tSHA@{tSHA}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{tSHA}{tSHA}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_a9f59600811f73f7d61c80c96eaf7b63e} 
+const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} Xbyak\+::util\+::\+Cpu\+::t\+SHA = \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}}(1) $<$$<$ 48\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00256}{256}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_a6c041cae3bfd7b9a66a5317d267258c0}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!tSMAP@{tSMAP}}
+\index{tSMAP@{tSMAP}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{tSMAP}{tSMAP}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_a6c041cae3bfd7b9a66a5317d267258c0} 
+const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} Xbyak\+::util\+::\+Cpu\+::t\+SMAP = 1 $<$$<$ 30\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00236}{236}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_ae995e382de94425914655cc00e91764e}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!tSSE@{tSSE}}
+\index{tSSE@{tSSE}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{tSSE}{tSSE}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_ae995e382de94425914655cc00e91764e} 
+const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} Xbyak\+::util\+::\+Cpu\+::t\+SSE = 1 $<$$<$ 3\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00206}{206}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_ad2b444dea8355c62306d02db5e95bd64}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!tSSE2@{tSSE2}}
+\index{tSSE2@{tSSE2}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{tSSE2}{tSSE2}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_ad2b444dea8355c62306d02db5e95bd64} 
+const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} Xbyak\+::util\+::\+Cpu\+::t\+SSE2 = 1 $<$$<$ 4\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00207}{207}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_ac8a49b4bda0c5fff5307ef7d49649f1d}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!tSSE3@{tSSE3}}
+\index{tSSE3@{tSSE3}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{tSSE3}{tSSE3}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_ac8a49b4bda0c5fff5307ef7d49649f1d} 
+const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} Xbyak\+::util\+::\+Cpu\+::t\+SSE3 = 1 $<$$<$ 5\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00208}{208}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_a2c0fcf14f3f5a117330aea07ea418e00}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!tSSE41@{tSSE41}}
+\index{tSSE41@{tSSE41}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{tSSE41}{tSSE41}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_a2c0fcf14f3f5a117330aea07ea418e00} 
+const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} Xbyak\+::util\+::\+Cpu\+::t\+SSE41 = 1 $<$$<$ 7\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00210}{210}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_aa129ef9810aebc74d6a35050b2020487}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!tSSE42@{tSSE42}}
+\index{tSSE42@{tSSE42}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{tSSE42}{tSSE42}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_aa129ef9810aebc74d6a35050b2020487} 
+const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} Xbyak\+::util\+::\+Cpu\+::t\+SSE42 = 1 $<$$<$ 8\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00211}{211}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_a3db0ed9104dd85a075f6e511f1d0630a}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!tSSE4a@{tSSE4a}}
+\index{tSSE4a@{tSSE4a}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{tSSE4a}{tSSE4a}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_a3db0ed9104dd85a075f6e511f1d0630a} 
+const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} Xbyak\+::util\+::\+Cpu\+::t\+SSE4a = 1 $<$$<$ 18\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00222}{222}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_a678186f23e006bd361b182a23340d912}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!tSSE5@{tSSE5}}
+\index{tSSE5@{tSSE5}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{tSSE5}{tSSE5}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_a678186f23e006bd361b182a23340d912} 
+const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} Xbyak\+::util\+::\+Cpu\+::t\+SSE5 = 1 $<$$<$ 11\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00214}{214}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_aa7935f9bd4c2f5e873b8771a955f3c74}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!tSSSE3@{tSSSE3}}
+\index{tSSSE3@{tSSSE3}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{tSSSE3}{tSSSE3}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_aa7935f9bd4c2f5e873b8771a955f3c74} 
+const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} Xbyak\+::util\+::\+Cpu\+::t\+SSSE3 = 1 $<$$<$ 6\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00209}{209}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_ae1da87427e9c1f35db757d6e53ea1af7}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!tVAES@{tVAES}}
+\index{tVAES@{tVAES}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{tVAES}{tVAES}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_ae1da87427e9c1f35db757d6e53ea1af7} 
+const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} Xbyak\+::util\+::\+Cpu\+::t\+VAES = \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}}(1) $<$$<$ 52\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00260}{260}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{class_xbyak_1_1util_1_1_cpu_a7ea42eaacc9ae97fea57867d1beceb48}\index{Xbyak::util::Cpu@{Xbyak::util::Cpu}!tVPCLMULQDQ@{tVPCLMULQDQ}}
+\index{tVPCLMULQDQ@{tVPCLMULQDQ}!Xbyak::util::Cpu@{Xbyak::util::Cpu}}
+\doxysubsubsection{\texorpdfstring{tVPCLMULQDQ}{tVPCLMULQDQ}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1util_1_1_cpu_a7ea42eaacc9ae97fea57867d1beceb48} 
+const \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu_af945450c0fac96f14a5a4b0f876e327a}{Type}} Xbyak\+::util\+::\+Cpu\+::t\+VPCLMULQDQ = \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{uint64}}(1) $<$$<$ 53\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00261}{261}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/libraries/ff/depends/xbyak/xbyak/\mbox{\hyperlink{xbyak__util_8h}{xbyak\+\_\+util.\+h}}\end{DoxyCompactItemize}

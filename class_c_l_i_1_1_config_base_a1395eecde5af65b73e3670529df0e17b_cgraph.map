@@ -1,0 +1,25 @@
+<map id="CLI::ConfigBase::from_config" name="CLI::ConfigBase::from_config">
+<area shape="rect" id="Node000001" title="Convert a configuration into an app." alt="" coords="5,127,158,167"/>
+<area shape="rect" id="Node000002" href="$namespace_c_l_i_1_1detail.html#a65e109bd9b97994ead2ca0173f56d617" title="assuming non default segments do a check on the close and open of the segments in a configItem struct..." alt="" coords="206,97,368,138"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="158,133,190,129,191,134,159,139"/>
+<area shape="rect" id="Node000003" href="$namespace_c_l_i_1_1detail.html#aa6876cdd19b6e5807239b574a9ce0e3c" title=" " alt="" coords="416,79,555,119"/>
+<area shape="poly" id="edge6_Node000001_Node000003" title=" " alt="" coords="113,124,155,101,205,83,255,75,306,73,401,80,401,86,306,78,256,80,206,88,158,106,115,129"/>
+<area shape="rect" id="Node000004" href="$namespace_c_l_i_1_1detail.html#a00aa494e4005562328fae48564194d8f" title="remove quotes at the front and back of a string either &#39;&quot;&#39; or &#39;\&#39;&#39;" alt="" coords="606,5,739,46"/>
+<area shape="poly" id="edge7_Node000001_Node000004" title=" " alt="" coords="103,124,148,89,175,72,205,59,255,44,306,32,411,19,508,15,591,17,590,22,508,20,411,24,307,38,256,49,207,64,178,77,151,94,106,128"/>
+<area shape="rect" id="Node000006" href="$namespace_c_l_i_1_1detail.html#ae83709ec148057ec53df4383645727e9" title="Return a lower case version of a string." alt="" coords="603,140,742,165"/>
+<area shape="poly" id="edge8_Node000001_Node000006" title=" " alt="" coords="158,146,206,147,588,150,588,155,206,152,158,151"/>
+<area shape="rect" id="Node000007" href="$namespace_c_l_i_1_1detail.html#a621323632158048f6168deacc432b838" title="Trim whitespace from string." alt="" coords="430,233,541,258"/>
+<area shape="poly" id="edge9_Node000001_Node000007" title=" " alt="" coords="133,165,206,191,316,216,415,234,414,239,315,222,205,196,131,170"/>
+<area shape="rect" id="Node000010" href="$namespace_c_l_i_1_1detail.html#a5c7b00a328b3b2da564794081646c251" title="Make a copy of the string and then trim it." alt="" coords="214,264,360,289"/>
+<area shape="poly" id="edge12_Node000001_Node000010" title=" " alt="" coords="107,166,151,204,207,242,233,255,230,260,204,247,148,208,103,170"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="368,107,400,104,401,110,369,113"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="538,76,604,50,606,55,540,81"/>
+<area shape="rect" id="Node000005" href="$namespace_c_l_i_1_1detail.html#ac18d5005c4b8cfaabf73e46294eac82a" title="Split a string by a delim." alt="" coords="616,86,729,112"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="556,96,601,96,601,102,556,102"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="556,116,611,132,610,137,555,121"/>
+<area shape="rect" id="Node000008" href="$namespace_c_l_i_1_1detail.html#aa06bf54cb3fb347d68d23d31384af42f" title="Trim whitespace from left of string." alt="" coords="615,204,730,229"/>
+<area shape="poly" id="edge10_Node000007_Node000008" title=" " alt="" coords="541,234,599,225,600,230,542,240"/>
+<area shape="rect" id="Node000009" href="$namespace_c_l_i_1_1detail.html#a32d84ce1a65de779e88fdf4aa3b54ea6" title="Trim whitespace from right of string." alt="" coords="615,253,730,278"/>
+<area shape="poly" id="edge11_Node000007_Node000009" title=" " alt="" coords="542,249,600,255,599,261,541,254"/>
+<area shape="poly" id="edge13_Node000010_Node000007" title=" " alt="" coords="360,262,414,254,415,259,361,268"/>
+</map>

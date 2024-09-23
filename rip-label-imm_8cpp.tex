@@ -1,0 +1,98 @@
+\doxysection{libraries/fc/libraries/ff/depends/xbyak/test/rip-\/label-\/imm.cpp File Reference}
+\hypertarget{rip-label-imm_8cpp}{}\label{rip-label-imm_8cpp}\index{libraries/fc/libraries/ff/depends/xbyak/test/rip-\/label-\/imm.cpp@{libraries/fc/libraries/ff/depends/xbyak/test/rip-\/label-\/imm.cpp}}
+{\ttfamily \#include $<$xbyak/xbyak.\+h$>$}\newline
+Include dependency graph for rip-\/label-\/imm.cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{rip-label-imm_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_code}{Code}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{rip-label-imm_8cpp_a3ede98665532cce0e33f614fac5150f9}{XBYAK\+\_\+\+NO\+\_\+\+OP\+\_\+\+NAMES}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{rip-label-imm_8cpp_a036d7aaffc355ca69613556cb1c507cc}{dump}} (const unsigned char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}, size\+\_\+t n)
+\item 
+int \mbox{\hyperlink{rip-label-imm_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{rip-label-imm_8cpp_a3ede98665532cce0e33f614fac5150f9}\index{rip-\/label-\/imm.cpp@{rip-\/label-\/imm.cpp}!XBYAK\_NO\_OP\_NAMES@{XBYAK\_NO\_OP\_NAMES}}
+\index{XBYAK\_NO\_OP\_NAMES@{XBYAK\_NO\_OP\_NAMES}!rip-\/label-\/imm.cpp@{rip-\/label-\/imm.cpp}}
+\doxysubsubsection{\texorpdfstring{XBYAK\_NO\_OP\_NAMES}{XBYAK\_NO\_OP\_NAMES}}
+{\footnotesize\ttfamily \label{rip-label-imm_8cpp_a3ede98665532cce0e33f614fac5150f9} 
+\#define XBYAK\+\_\+\+NO\+\_\+\+OP\+\_\+\+NAMES}
+
+
+
+Definition at line \mbox{\hyperlink{rip-label-imm_8cpp_source_l00001}{1}} of file \mbox{\hyperlink{rip-label-imm_8cpp_source}{rip-\/label-\/imm.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{rip-label-imm_8cpp_a036d7aaffc355ca69613556cb1c507cc}\index{rip-\/label-\/imm.cpp@{rip-\/label-\/imm.cpp}!dump@{dump}}
+\index{dump@{dump}!rip-\/label-\/imm.cpp@{rip-\/label-\/imm.cpp}}
+\doxysubsubsection{\texorpdfstring{dump()}{dump()}}
+{\footnotesize\ttfamily \label{rip-label-imm_8cpp_a036d7aaffc355ca69613556cb1c507cc} 
+void dump (\begin{DoxyParamCaption}\item[{const unsigned char \texorpdfstring{$\ast$}{*}}]{p}{, }\item[{size\+\_\+t}]{n}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{rip-label-imm_8cpp_source_l00073}{73}} of file \mbox{\hyperlink{rip-label-imm_8cpp_source}{rip-\/label-\/imm.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00074\ \{}
+\DoxyCodeLine{00075\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ n;\ i++)\ \{}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\%02x\ "{}},\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}[i]);}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((i\ \%\ 16)\ ==\ 15)\ putchar(\textcolor{charliteral}{'\(\backslash\)n'});}
+\DoxyCodeLine{00078\ \ \ \ \ \}}
+\DoxyCodeLine{00079\ \ \ \ \ putchar(\textcolor{charliteral}{'\(\backslash\)n'});}
+\DoxyCodeLine{00080\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=193pt]{rip-label-imm_8cpp_a036d7aaffc355ca69613556cb1c507cc_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{rip-label-imm_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}\index{rip-\/label-\/imm.cpp@{rip-\/label-\/imm.cpp}!main@{main}}
+\index{main@{main}!rip-\/label-\/imm.cpp@{rip-\/label-\/imm.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{rip-label-imm_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4} 
+int main (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{rip-label-imm_8cpp_source_l00082}{82}} of file \mbox{\hyperlink{rip-label-imm_8cpp_source}{rip-\/label-\/imm.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00083\ \{}
+\DoxyCodeLine{00084\ \ \ \ \ \mbox{\hyperlink{struct_code}{Code}}\ code;}
+\DoxyCodeLine{00085\ \ \ \ \ void\ (*\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})()\ =\ code.\mbox{\hyperlink{class_xbyak_1_1_code_array_a9ad8a38842d1e0de9045338e460f58ce}{getCode}}<void\ (*)()>();}
+\DoxyCodeLine{00086\ \ \ \ \ \mbox{\hyperlink{rip-label-imm_8cpp_a036d7aaffc355ca69613556cb1c507cc}{dump}}(code.getCode(),\ code.getSize());}
+\DoxyCodeLine{00087\ \ \ \ \ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}();}
+\DoxyCodeLine{00088\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=292pt]{rip-label-imm_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4_cgraph}
+\end{center}
+\end{figure}

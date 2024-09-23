@@ -1,0 +1,121 @@
+\doxysection{sysiosystem\+::user\+\_\+resources Struct Reference}
+\hypertarget{structsysiosystem_1_1user__resources}{}\label{structsysiosystem_1_1user__resources}\index{sysiosystem::user\_resources@{sysiosystem::user\_resources}}
+
+
+{\ttfamily \#include $<$sysio.\+system.\+hpp$>$}
+
+
+
+Collaboration diagram for sysiosystem\+::user\+\_\+resources\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=296pt]{structsysiosystem_1_1user__resources__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{structsysiosystem_1_1user__resources_ad0da672bb8bf8221aabc92fb781ce39b}{is\+\_\+empty}} () const
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1user__resources_a68128b292474165b4bc0ec5a79b439b0}{primary\+\_\+key}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \mbox{\hyperlink{structsysiosystem_1_1user__resources_a1d442735230b1c74f85662275242a32a}{owner}}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \mbox{\hyperlink{structsysiosystem_1_1user__resources_a814501a9f9b29525e6e448a2dfe7c35b}{net\+\_\+weight}}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \mbox{\hyperlink{structsysiosystem_1_1user__resources_a2a13b97b28310cfde5164f054b29ffc7}{cpu\+\_\+weight}}
+\item 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1user__resources_a679263f7994f59b8c00c46f6fdb06015}{ram\+\_\+bytes}} = 0
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00341}{341}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysiosystem_1_1user__resources_ad0da672bb8bf8221aabc92fb781ce39b}\index{sysiosystem::user\_resources@{sysiosystem::user\_resources}!is\_empty@{is\_empty}}
+\index{is\_empty@{is\_empty}!sysiosystem::user\_resources@{sysiosystem::user\_resources}}
+\doxysubsubsection{\texorpdfstring{is\_empty()}{is\_empty()}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1user__resources_ad0da672bb8bf8221aabc92fb781ce39b} 
+bool sysiosystem\+::user\+\_\+resources\+::is\+\_\+empty (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00347}{347}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00347\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysiosystem_1_1user__resources_a814501a9f9b29525e6e448a2dfe7c35b}{net\_weight}}.amount\ ==\ 0\ \&\&\ \mbox{\hyperlink{structsysiosystem_1_1user__resources_a2a13b97b28310cfde5164f054b29ffc7}{cpu\_weight}}.amount\ ==\ 0\ \&\&\ \mbox{\hyperlink{structsysiosystem_1_1user__resources_a679263f7994f59b8c00c46f6fdb06015}{ram\_bytes}}\ ==\ 0;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysiosystem_1_1user__resources_a68128b292474165b4bc0ec5a79b439b0}\index{sysiosystem::user\_resources@{sysiosystem::user\_resources}!primary\_key@{primary\_key}}
+\index{primary\_key@{primary\_key}!sysiosystem::user\_resources@{sysiosystem::user\_resources}}
+\doxysubsubsection{\texorpdfstring{primary\_key()}{primary\_key()}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1user__resources_a68128b292474165b4bc0ec5a79b439b0} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} sysiosystem\+::user\+\_\+resources\+::primary\+\_\+key (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00348}{348}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00348\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysiosystem_1_1user__resources_a1d442735230b1c74f85662275242a32a}{owner}}.value;\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysiosystem_1_1user__resources_a2a13b97b28310cfde5164f054b29ffc7}\index{sysiosystem::user\_resources@{sysiosystem::user\_resources}!cpu\_weight@{cpu\_weight}}
+\index{cpu\_weight@{cpu\_weight}!sysiosystem::user\_resources@{sysiosystem::user\_resources}}
+\doxysubsubsection{\texorpdfstring{cpu\_weight}{cpu\_weight}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1user__resources_a2a13b97b28310cfde5164f054b29ffc7} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} sysiosystem\+::user\+\_\+resources\+::cpu\+\_\+weight}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00344}{344}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1user__resources_a814501a9f9b29525e6e448a2dfe7c35b}\index{sysiosystem::user\_resources@{sysiosystem::user\_resources}!net\_weight@{net\_weight}}
+\index{net\_weight@{net\_weight}!sysiosystem::user\_resources@{sysiosystem::user\_resources}}
+\doxysubsubsection{\texorpdfstring{net\_weight}{net\_weight}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1user__resources_a814501a9f9b29525e6e448a2dfe7c35b} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} sysiosystem\+::user\+\_\+resources\+::net\+\_\+weight}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00343}{343}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1user__resources_a1d442735230b1c74f85662275242a32a}\index{sysiosystem::user\_resources@{sysiosystem::user\_resources}!owner@{owner}}
+\index{owner@{owner}!sysiosystem::user\_resources@{sysiosystem::user\_resources}}
+\doxysubsubsection{\texorpdfstring{owner}{owner}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1user__resources_a1d442735230b1c74f85662275242a32a} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} sysiosystem\+::user\+\_\+resources\+::owner}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00342}{342}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1user__resources_a679263f7994f59b8c00c46f6fdb06015}\index{sysiosystem::user\_resources@{sysiosystem::user\_resources}!ram\_bytes@{ram\_bytes}}
+\index{ram\_bytes@{ram\_bytes}!sysiosystem::user\_resources@{sysiosystem::user\_resources}}
+\doxysubsubsection{\texorpdfstring{ram\_bytes}{ram\_bytes}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1user__resources_a679263f7994f59b8c00c46f6fdb06015} 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} sysiosystem\+::user\+\_\+resources\+::ram\+\_\+bytes = 0}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00345}{345}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/svetlasyrimis/\+Desktop/wire-\/network/\+WN-\/org/wire-\/system-\/contracts/contracts/sysio.\+system/include/sysio.\+system/\mbox{\hyperlink{sysio_8system_8hpp}{sysio.\+system.\+hpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,245 @@
+\doxysection{fc\+::udt\+\_\+epoll\+\_\+service Class Reference}
+\hypertarget{classfc_1_1udt__epoll__service}{}\label{classfc_1_1udt__epoll__service}\index{fc::udt\_epoll\_service@{fc::udt\_epoll\_service}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1udt__epoll__service_ade1091fb32a3ec442dae2aeef03b8ca2}{udt\+\_\+epoll\+\_\+service}} ()
+\item 
+\mbox{\hyperlink{classfc_1_1udt__epoll__service_abb26f8e2397fcec887d49b3536a3f47c}{\texorpdfstring{$\sim$}{\string~}udt\+\_\+epoll\+\_\+service}} ()
+\item 
+void \mbox{\hyperlink{classfc_1_1udt__epoll__service_a134ece4113edfdae09280cddd1e74620}{poll\+\_\+loop}} ()
+\item 
+void \mbox{\hyperlink{classfc_1_1udt__epoll__service_ab596b07529bbe31b918003d0a6b86c19}{notify\+\_\+read}} (int udt\+\_\+socket\+\_\+id, const promise$<$ void $>$\+::ptr \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})
+\item 
+void \mbox{\hyperlink{classfc_1_1udt__epoll__service_af496434c4aded526255625c4b3ed5b25}{notify\+\_\+write}} (int udt\+\_\+socket\+\_\+id, const promise$<$ void $>$\+::ptr \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})
+\item 
+void \mbox{\hyperlink{classfc_1_1udt__epoll__service_ade4245e6e1ba5bd523ab82b100b8c3f0}{remove}} (int udt\+\_\+socket\+\_\+id)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{udt__socket_8cpp_source_l00025}{25}} of file \mbox{\hyperlink{udt__socket_8cpp_source}{udt\+\_\+socket.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1udt__epoll__service_ade1091fb32a3ec442dae2aeef03b8ca2}\index{fc::udt\_epoll\_service@{fc::udt\_epoll\_service}!udt\_epoll\_service@{udt\_epoll\_service}}
+\index{udt\_epoll\_service@{udt\_epoll\_service}!fc::udt\_epoll\_service@{fc::udt\_epoll\_service}}
+\doxysubsubsection{\texorpdfstring{udt\_epoll\_service()}{udt\_epoll\_service()}}
+{\footnotesize\ttfamily \label{classfc_1_1udt__epoll__service_ade1091fb32a3ec442dae2aeef03b8ca2} 
+fc\+::udt\+\_\+epoll\+\_\+service\+::udt\+\_\+epoll\+\_\+service (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{udt__socket_8cpp_source_l00028}{28}} of file \mbox{\hyperlink{udt__socket_8cpp_source}{udt\+\_\+socket.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ :\_epoll\_thread(\textcolor{stringliteral}{"{}udt\_epoll"{}})}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \ \ \ UDT::startup();}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_afdbe484e2037e7100368d2e2f799af18}{check\_udt\_errors}}();}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \ \ \ \_epoll\_id\ =\ UDT::epoll\_create();}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \ \ \ \_epoll\_loop\ =\ \_epoll\_thread.async(\ [=]()\{\ \mbox{\hyperlink{classfc_1_1udt__epoll__service_a134ece4113edfdae09280cddd1e74620}{poll\_loop}}();\ \},\ \textcolor{stringliteral}{"{}udt\_poll\_loop"{}}\ );}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=328pt]{classfc_1_1udt__epoll__service_ade1091fb32a3ec442dae2aeef03b8ca2_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1udt__epoll__service_abb26f8e2397fcec887d49b3536a3f47c}\index{fc::udt\_epoll\_service@{fc::udt\_epoll\_service}!````~udt\_epoll\_service@{\texorpdfstring{$\sim$}{\string~}udt\_epoll\_service}}
+\index{````~udt\_epoll\_service@{\texorpdfstring{$\sim$}{\string~}udt\_epoll\_service}!fc::udt\_epoll\_service@{fc::udt\_epoll\_service}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}udt\_epoll\_service()}{\string~udt\_epoll\_service()}}
+{\footnotesize\ttfamily \label{classfc_1_1udt__epoll__service_abb26f8e2397fcec887d49b3536a3f47c} 
+fc\+::udt\+\_\+epoll\+\_\+service\+::\texorpdfstring{$\sim$}{\string~}udt\+\_\+epoll\+\_\+service (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{udt__socket_8cpp_source_l00037}{37}} of file \mbox{\hyperlink{udt__socket_8cpp_source}{udt\+\_\+socket.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ \_epoll\_loop.cancel(\textcolor{stringliteral}{"{}udt\_epoll\_service\ is\ destructing"{}});}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ \_epoll\_loop.wait();}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \ \ \ UDT::cleanup();}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1udt__epoll__service_ab596b07529bbe31b918003d0a6b86c19}\index{fc::udt\_epoll\_service@{fc::udt\_epoll\_service}!notify\_read@{notify\_read}}
+\index{notify\_read@{notify\_read}!fc::udt\_epoll\_service@{fc::udt\_epoll\_service}}
+\doxysubsubsection{\texorpdfstring{notify\_read()}{notify\_read()}}
+{\footnotesize\ttfamily \label{classfc_1_1udt__epoll__service_ab596b07529bbe31b918003d0a6b86c19} 
+void fc\+::udt\+\_\+epoll\+\_\+service\+::notify\+\_\+read (\begin{DoxyParamCaption}\item[{int}]{udt\+\_\+socket\+\_\+id}{, }\item[{const promise$<$ void $>$\+::ptr \&}]{p}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{udt__socket_8cpp_source_l00081}{81}} of file \mbox{\hyperlink{udt__socket_8cpp_source}{udt\+\_\+socket.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ events\ =\ UDT\_EPOLL\_IN\ |\ UDT\_EPOLL\_ERR;}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ 0\ !=\ UDT::epoll\_add\_usock(\ \_epoll\_id,\ }
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ udt\_socket\_id,\ }
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&events\ )\ )}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_afdbe484e2037e7100368d2e2f799af18}{check\_udt\_errors}}();}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ \ \ \{\ \textcolor{keyword}{synchronized}(\_read\_promises\_mutex)}
+\DoxyCodeLine{00092\ }
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_read\_promises[udt\_socket\_id]\ =\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}};}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=327pt]{classfc_1_1udt__epoll__service_ab596b07529bbe31b918003d0a6b86c19_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1udt__epoll__service_af496434c4aded526255625c4b3ed5b25}\index{fc::udt\_epoll\_service@{fc::udt\_epoll\_service}!notify\_write@{notify\_write}}
+\index{notify\_write@{notify\_write}!fc::udt\_epoll\_service@{fc::udt\_epoll\_service}}
+\doxysubsubsection{\texorpdfstring{notify\_write()}{notify\_write()}}
+{\footnotesize\ttfamily \label{classfc_1_1udt__epoll__service_af496434c4aded526255625c4b3ed5b25} 
+void fc\+::udt\+\_\+epoll\+\_\+service\+::notify\+\_\+write (\begin{DoxyParamCaption}\item[{int}]{udt\+\_\+socket\+\_\+id}{, }\item[{const promise$<$ void $>$\+::ptr \&}]{p}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{udt__socket_8cpp_source_l00097}{97}} of file \mbox{\hyperlink{udt__socket_8cpp_source}{udt\+\_\+socket.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ events\ =\ UDT\_EPOLL\_OUT\ |\ UDT\_EPOLL\_ERR;}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ 0\ !=\ UDT::epoll\_add\_usock(\ \_epoll\_id,\ }
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ udt\_socket\_id,\ }
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&events\ )\ )}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_afdbe484e2037e7100368d2e2f799af18}{check\_udt\_errors}}();}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00107\ }
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \ \ \ \ \{\ \textcolor{keyword}{synchronized}(\_write\_promises\_mutex)}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_write\_promises[udt\_socket\_id]\ =\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}};}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=327pt]{classfc_1_1udt__epoll__service_af496434c4aded526255625c4b3ed5b25_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1udt__epoll__service_a134ece4113edfdae09280cddd1e74620}\index{fc::udt\_epoll\_service@{fc::udt\_epoll\_service}!poll\_loop@{poll\_loop}}
+\index{poll\_loop@{poll\_loop}!fc::udt\_epoll\_service@{fc::udt\_epoll\_service}}
+\doxysubsubsection{\texorpdfstring{poll\_loop()}{poll\_loop()}}
+{\footnotesize\ttfamily \label{classfc_1_1udt__epoll__service_a134ece4113edfdae09280cddd1e74620} 
+void fc\+::udt\+\_\+epoll\+\_\+service\+::poll\+\_\+loop (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{udt__socket_8cpp_source_l00044}{44}} of file \mbox{\hyperlink{udt__socket_8cpp_source}{udt\+\_\+socket.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \ \ \ std::set<UDTSOCKET>\ read\_ready;}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \ \ \ std::set<UDTSOCKET>\ write\_ready;}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\ !\_epoll\_loop.canceled()\ )}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UDT::epoll\_wait(\ \_epoll\_id,\ }
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&read\_ready,\ }
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&write\_ready,\ 100000000\ );}
+\DoxyCodeLine{00053\ }
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ \textcolor{keyword}{synchronized}(\_read\_promises\_mutex)}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\ sock\ :\ read\_ready\ )}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ \_read\_promises.find(\ sock\ );}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr\ !=\ \_read\_promises.end()\ )}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ itr-\/>second-\/>set\_value();}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_read\_promises.erase(itr);}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{comment}{//\ synchronized\ read\ promise\ mutex}}
+\DoxyCodeLine{00065\ }
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ \textcolor{keyword}{synchronized}(\_write\_promises\_mutex)}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\ sock\ :\ write\_ready\ )}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ \_write\_promises.find(\ sock\ );}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr\ !=\ \_write\_promises.end()\ )}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ itr-\/>second-\/>set\_value();}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_write\_promises.erase(itr);}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{comment}{//\ synchronized\ write\ promise\ mutex}}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{comment}{//\ while\ not\ canceled}}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{comment}{//\ poll\_loop}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=328pt]{classfc_1_1udt__epoll__service_a134ece4113edfdae09280cddd1e74620_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1udt__epoll__service_ade4245e6e1ba5bd523ab82b100b8c3f0}\index{fc::udt\_epoll\_service@{fc::udt\_epoll\_service}!remove@{remove}}
+\index{remove@{remove}!fc::udt\_epoll\_service@{fc::udt\_epoll\_service}}
+\doxysubsubsection{\texorpdfstring{remove()}{remove()}}
+{\footnotesize\ttfamily \label{classfc_1_1udt__epoll__service_ade4245e6e1ba5bd523ab82b100b8c3f0} 
+void fc\+::udt\+\_\+epoll\+\_\+service\+::remove (\begin{DoxyParamCaption}\item[{int}]{udt\+\_\+socket\+\_\+id}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{udt__socket_8cpp_source_l00112}{112}} of file \mbox{\hyperlink{udt__socket_8cpp_source}{udt\+\_\+socket.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ \textcolor{keyword}{synchronized}(\_read\_promises\_mutex)}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ read\_itr\ =\ \_read\_promises.find(\ udt\_socket\_id\ );}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ read\_itr\ !=\ \_read\_promises.end()\ )}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ read\_itr-\/>second-\/>set\_exception(\ \mbox{\hyperlink{namespacefc_a1647dced269f496f726a7fe5181b35d6}{fc::copy\_exception}}(\ \mbox{\hyperlink{classfc_1_1exception}{fc::exception}}()\ )\ );}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_read\_promises.erase(read\_itr);}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ \textcolor{keyword}{synchronized}(\_write\_promises\_mutex)}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ write\_itr\ =\ \_write\_promises.find(\ udt\_socket\_id\ );}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ write\_itr\ !=\ \_write\_promises.end()\ )}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ write\_itr-\/>second-\/>set\_exception(\ \mbox{\hyperlink{namespacefc_a1647dced269f496f726a7fe5181b35d6}{fc::copy\_exception}}(\ \mbox{\hyperlink{classfc_1_1exception}{fc::exception}}()\ )\ );}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_write\_promises.erase(write\_itr);}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \ \ \ \ UDT::epoll\_remove\_usock(\ \_epoll\_id,\ udt\_socket\_id\ );}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=321pt]{classfc_1_1udt__epoll__service_ade4245e6e1ba5bd523ab82b100b8c3f0_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/src/network/\mbox{\hyperlink{udt__socket_8cpp}{udt\+\_\+socket.\+cpp}}\end{DoxyCompactItemize}

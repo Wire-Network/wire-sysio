@@ -1,0 +1,9 @@
+<map id="sysio::connection::peer_address" name="sysio::connection::peer_address">
+<area shape="rect" id="Node000001" title=" " alt="" coords="198,71,329,111"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1connection.html#ad02fe050af3c833e156bea91308d6c1b" title="Check heartbeat time and send Time_message." alt="" coords="12,5,143,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="188,68,136,49,138,44,190,63"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1connection.html#a6969d80878d60791744f4ace46f1b806" title=" " alt="" coords="12,71,143,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="182,94,143,94,143,88,182,88"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1connection.html#a11ecb500e5bd8050f97f0c5a585df2ad" title=" " alt="" coords="5,136,150,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="190,119,138,138,136,133,188,114"/>
+</map>

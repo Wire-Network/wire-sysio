@@ -1,0 +1,26 @@
+<map id="CLI::detail::smart_deref" name="CLI::detail::smart_deref">
+<area shape="rect" id="Node000001" title=" " alt="" coords="471,157,593,198"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_checked_transformer.html#af11e8936b4c0707ff94338908622e111" title=" " alt="" coords="18,5,191,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="510,145,474,96,450,72,422,53,365,32,305,20,245,17,191,18,191,13,245,11,305,15,367,27,424,49,453,68,478,92,515,142"/>
+<area shape="rect" id="Node000003" href="$namespace_c_l_i_1_1detail.html#a320e031a5eb12297a140d2d6fc73362a" title="Generate a string representation of a map." alt="" coords="252,64,423,89"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="488,151,422,111,378,92,380,87,424,106,491,146"/>
+<area shape="rect" id="Node000005" href="$class_c_l_i_1_1_transformer.html#aef311ee89c54f64e3e78651bd2db826c" title=" " alt="" coords="5,136,204,161"/>
+<area shape="poly" id="edge15_Node000001_Node000005" title=" " alt="" coords="456,161,423,155,310,147,204,147,204,141,310,142,423,150,456,155"/>
+<area shape="rect" id="Node000006" href="$namespace_c_l_i_1_1detail.html#a75f66945cfe53b556e4c311f9a88a155" title="Generate a string representation of a set." alt="" coords="255,214,420,240"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="456,200,392,216,390,211,455,194"/>
+<area shape="rect" id="Node000007" href="$class_c_l_i_1_1_is_member.html#a778da19fa2481912c7fcfe6b3c8b453a" title=" " alt="" coords="17,214,192,240"/>
+<area shape="poly" id="edge8_Node000001_Node000007" title=" " alt="" coords="500,211,465,236,424,255,387,264,349,268,274,267,204,256,148,243,150,238,205,251,274,261,349,263,386,258,422,250,462,231,496,206"/>
+<area shape="rect" id="Node000008" href="$namespace_c_l_i_1_1detail.html#aa4b4a0a97c9b07110595765887647385" title="A search function." alt="" coords="273,165,402,190"/>
+<area shape="poly" id="edge9_Node000001_Node000008" title=" " alt="" coords="455,180,402,180,402,175,455,175"/>
+<area shape="rect" id="Node000009" href="$namespace_c_l_i_1_1detail.html#abcb81a667288aa66a4576a06b9322092" title="A search function with a filter function." alt="" coords="40,289,169,314"/>
+<area shape="poly" id="edge14_Node000001_Node000009" title=" " alt="" coords="506,212,469,245,424,273,358,294,290,306,225,310,169,309,169,304,225,304,289,300,357,289,422,269,466,241,502,208"/>
+<area shape="poly" id="edge4_Node000003_Node000002" title=" " alt="" coords="259,62,190,47,192,42,261,57"/>
+<area shape="rect" id="Node000004" href="$class_c_l_i_1_1_as_number_with_unit.html#af5d2fc29cd92c1821e653a97f91b00cb" title=" " alt="" coords="23,71,186,111"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="237,85,187,89,187,83,236,80"/>
+<area shape="poly" id="edge5_Node000003_Node000005" title=" " alt="" coords="288,97,204,126,162,138,160,132,203,120,286,92"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="240,230,192,230,192,224,240,224"/>
+<area shape="poly" id="edge10_Node000008_Node000002" title=" " alt="" coords="308,156,202,61,177,49,180,44,205,57,312,152"/>
+<area shape="poly" id="edge13_Node000008_Node000005" title=" " alt="" coords="258,170,204,164,204,158,259,165"/>
+<area shape="poly" id="edge11_Node000008_Node000007" title=" " alt="" coords="259,197,169,216,168,211,258,192"/>
+<area shape="poly" id="edge12_Node000008_Node000009" title=" " alt="" coords="261,199,253,204,238,216,229,228,220,241,205,254,173,275,140,291,138,286,170,270,202,250,216,237,225,225,235,212,250,199,259,195"/>
+</map>

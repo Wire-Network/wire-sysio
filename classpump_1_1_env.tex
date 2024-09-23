@@ -1,0 +1,262 @@
+\doxysection{pump.\+Env Class Reference}
+\hypertarget{classpump_1_1_env}{}\label{classpump_1_1_env}\index{pump.Env@{pump.Env}}
+
+
+Collaboration diagram for pump.\+Env\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=149pt]{classpump_1_1_env__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classpump_1_1_env_a2a1fc941b05e3bfb515013e85eaf3940}{\+\_\+\+\_\+init\+\_\+\+\_\+}} (self)
+\item 
+\mbox{\hyperlink{classpump_1_1_env_a04e121127581242e4019950e70d4a7fc}{Clone}} (self)
+\item 
+\mbox{\hyperlink{classpump_1_1_env_a844fce087a5ae4f7cefc03d00ffc9091}{Push\+Variable}} (self, var, \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+\mbox{\hyperlink{classpump_1_1_env_a76331ce1f4681fbb6124aba0c012375e}{Pop\+Variable}} (self)
+\item 
+\mbox{\hyperlink{classpump_1_1_env_a6588e98b89fb10e3e6801b01c9c33b50}{Push\+Range}} (self, var, lower, upper)
+\item 
+\mbox{\hyperlink{classpump_1_1_env_a0401127dc23c391e962931e25564afb2}{Pop\+Range}} (self)
+\item 
+\mbox{\hyperlink{classpump_1_1_env_ad3e3a11d5a2b161b31d01c4e7827c9db}{Get\+Value}} (self, identifier)
+\item 
+\mbox{\hyperlink{classpump_1_1_env_a8c745d8f88240c0669b87cb5297003ec}{Eval\+Exp}} (self, exp)
+\item 
+\mbox{\hyperlink{classpump_1_1_env_a714179430fa0b9ec3f1a7b92dca0548b}{Get\+Range}} (self, identifier)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+list \mbox{\hyperlink{classpump_1_1_env_aba6456f3d0d23ac92bc9508c1b966bcd}{variables}} = \mbox{[}$\,$\mbox{]}
+\item 
+list \mbox{\hyperlink{classpump_1_1_env_a8d5fec087c1a9108de9b105922b34309}{ranges}} = \mbox{[}$\,$\mbox{]}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{pump_8py_source_l00584}{584}} of file \mbox{\hyperlink{pump_8py_source}{pump.\+py}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classpump_1_1_env_a2a1fc941b05e3bfb515013e85eaf3940}\index{pump.Env@{pump.Env}!\_\_init\_\_@{\_\_init\_\_}}
+\index{\_\_init\_\_@{\_\_init\_\_}!pump.Env@{pump.Env}}
+\doxysubsubsection{\texorpdfstring{\_\_init\_\_()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily \label{classpump_1_1_env_a2a1fc941b05e3bfb515013e85eaf3940} 
+pump.\+Env.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pump_8py_source_l00585}{585}} of file \mbox{\hyperlink{pump_8py_source}{pump.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00585\ \ \ \textcolor{keyword}{def\ }\_\_init\_\_(self):}
+\DoxyCodeLine{00586\ \ \ \ \ self.variables\ =\ []}
+\DoxyCodeLine{00587\ \ \ \ \ self.ranges\ =\ []}
+\DoxyCodeLine{00588\ }
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classpump_1_1_env_a04e121127581242e4019950e70d4a7fc}\index{pump.Env@{pump.Env}!Clone@{Clone}}
+\index{Clone@{Clone}!pump.Env@{pump.Env}}
+\doxysubsubsection{\texorpdfstring{Clone()}{Clone()}}
+{\footnotesize\ttfamily \label{classpump_1_1_env_a04e121127581242e4019950e70d4a7fc} 
+pump.\+Env.\+Clone (\begin{DoxyParamCaption}\item[{}]{self}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pump_8py_source_l00589}{589}} of file \mbox{\hyperlink{pump_8py_source}{pump.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00589\ \ \ \textcolor{keyword}{def\ }Clone(self):}
+\DoxyCodeLine{00590\ \ \ \ \ clone\ =\ Env()}
+\DoxyCodeLine{00591\ \ \ \ \ clone.variables\ =\ self.variables[:]}
+\DoxyCodeLine{00592\ \ \ \ \ clone.ranges\ =\ self.ranges[:]}
+\DoxyCodeLine{00593\ \ \ \ \ \textcolor{keywordflow}{return}\ clone}
+\DoxyCodeLine{00594\ }
+
+\end{DoxyCode}
+\Hypertarget{classpump_1_1_env_a8c745d8f88240c0669b87cb5297003ec}\index{pump.Env@{pump.Env}!EvalExp@{EvalExp}}
+\index{EvalExp@{EvalExp}!pump.Env@{pump.Env}}
+\doxysubsubsection{\texorpdfstring{EvalExp()}{EvalExp()}}
+{\footnotesize\ttfamily \label{classpump_1_1_env_a8c745d8f88240c0669b87cb5297003ec} 
+pump.\+Env.\+Eval\+Exp (\begin{DoxyParamCaption}\item[{}]{self}{, }\item[{}]{exp}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pump_8py_source_l00622}{622}} of file \mbox{\hyperlink{pump_8py_source}{pump.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00622\ \ \ \textcolor{keyword}{def\ }EvalExp(self,\ exp):}
+\DoxyCodeLine{00623\ \ \ \ \ \textcolor{keywordflow}{try}:}
+\DoxyCodeLine{00624\ \ \ \ \ \ \ result\ =\ eval(exp.python\_exp)}
+\DoxyCodeLine{00625\ \ \ \ \ \textcolor{keywordflow}{except}\ Exception,\ e:}
+\DoxyCodeLine{00626\ \ \ \ \ \ \ \textcolor{keywordflow}{print}\ \textcolor{stringliteral}{'ERROR:\ caught\ exception\ \%s:\ \%s'}\ \%\ (e.\_\_class\_\_.\_\_name\_\_,\ e)}
+\DoxyCodeLine{00627\ \ \ \ \ \ \ \textcolor{keywordflow}{print}\ (\textcolor{stringliteral}{'ERROR:\ failed\ to\ evaluate\ meta\ expression\ \%s\ at\ \%s'}\ \%}
+\DoxyCodeLine{00628\ \ \ \ \ \ \ \ \ \ \ \ \ \ (exp.python\_exp,\ exp.token.start))}
+\DoxyCodeLine{00629\ \ \ \ \ \ \ sys.exit(1)}
+\DoxyCodeLine{00630\ \ \ \ \ \textcolor{keywordflow}{return}\ result}
+\DoxyCodeLine{00631\ }
+
+\end{DoxyCode}
+\Hypertarget{classpump_1_1_env_a714179430fa0b9ec3f1a7b92dca0548b}\index{pump.Env@{pump.Env}!GetRange@{GetRange}}
+\index{GetRange@{GetRange}!pump.Env@{pump.Env}}
+\doxysubsubsection{\texorpdfstring{GetRange()}{GetRange()}}
+{\footnotesize\ttfamily \label{classpump_1_1_env_a714179430fa0b9ec3f1a7b92dca0548b} 
+pump.\+Env.\+Get\+Range (\begin{DoxyParamCaption}\item[{}]{self}{, }\item[{}]{identifier}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pump_8py_source_l00632}{632}} of file \mbox{\hyperlink{pump_8py_source}{pump.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00632\ \ \ \textcolor{keyword}{def\ }GetRange(self,\ identifier):}
+\DoxyCodeLine{00633\ \ \ \ \ \textcolor{keywordflow}{for}\ (var,\ lower,\ upper)\ \textcolor{keywordflow}{in}\ self.ranges:}
+\DoxyCodeLine{00634\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ identifier\ ==\ var:}
+\DoxyCodeLine{00635\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (lower,\ upper)}
+\DoxyCodeLine{00636\ }
+\DoxyCodeLine{00637\ \ \ \ \ \textcolor{keywordflow}{print}\ \textcolor{stringliteral}{'ERROR:\ range\ \%s\ is\ undefined.'}\ \%\ (identifier,)}
+\DoxyCodeLine{00638\ \ \ \ \ sys.exit(1)}
+\DoxyCodeLine{00639\ }
+\DoxyCodeLine{00640\ }
+
+\end{DoxyCode}
+\Hypertarget{classpump_1_1_env_ad3e3a11d5a2b161b31d01c4e7827c9db}\index{pump.Env@{pump.Env}!GetValue@{GetValue}}
+\index{GetValue@{GetValue}!pump.Env@{pump.Env}}
+\doxysubsubsection{\texorpdfstring{GetValue()}{GetValue()}}
+{\footnotesize\ttfamily \label{classpump_1_1_env_ad3e3a11d5a2b161b31d01c4e7827c9db} 
+pump.\+Env.\+Get\+Value (\begin{DoxyParamCaption}\item[{}]{self}{, }\item[{}]{identifier}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pump_8py_source_l00614}{614}} of file \mbox{\hyperlink{pump_8py_source}{pump.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00614\ \ \ \textcolor{keyword}{def\ }GetValue(self,\ identifier):}
+\DoxyCodeLine{00615\ \ \ \ \ \textcolor{keywordflow}{for}\ (var,\ value)\ \textcolor{keywordflow}{in}\ self.variables:}
+\DoxyCodeLine{00616\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ identifier\ ==\ var:}
+\DoxyCodeLine{00617\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ value}
+\DoxyCodeLine{00618\ }
+\DoxyCodeLine{00619\ \ \ \ \ \textcolor{keywordflow}{print}\ \textcolor{stringliteral}{'ERROR:\ meta\ variable\ \%s\ is\ undefined.'}\ \%\ (identifier,)}
+\DoxyCodeLine{00620\ \ \ \ \ sys.exit(1)}
+\DoxyCodeLine{00621\ }
+
+\end{DoxyCode}
+\Hypertarget{classpump_1_1_env_a0401127dc23c391e962931e25564afb2}\index{pump.Env@{pump.Env}!PopRange@{PopRange}}
+\index{PopRange@{PopRange}!pump.Env@{pump.Env}}
+\doxysubsubsection{\texorpdfstring{PopRange()}{PopRange()}}
+{\footnotesize\ttfamily \label{classpump_1_1_env_a0401127dc23c391e962931e25564afb2} 
+pump.\+Env.\+Pop\+Range (\begin{DoxyParamCaption}\item[{}]{self}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pump_8py_source_l00611}{611}} of file \mbox{\hyperlink{pump_8py_source}{pump.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00611\ \ \ \textcolor{keyword}{def\ }PopRange(self):}
+\DoxyCodeLine{00612\ \ \ \ \ self.ranges[:1]\ =\ []}
+\DoxyCodeLine{00613\ }
+
+\end{DoxyCode}
+\Hypertarget{classpump_1_1_env_a76331ce1f4681fbb6124aba0c012375e}\index{pump.Env@{pump.Env}!PopVariable@{PopVariable}}
+\index{PopVariable@{PopVariable}!pump.Env@{pump.Env}}
+\doxysubsubsection{\texorpdfstring{PopVariable()}{PopVariable()}}
+{\footnotesize\ttfamily \label{classpump_1_1_env_a76331ce1f4681fbb6124aba0c012375e} 
+pump.\+Env.\+Pop\+Variable (\begin{DoxyParamCaption}\item[{}]{self}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pump_8py_source_l00605}{605}} of file \mbox{\hyperlink{pump_8py_source}{pump.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00605\ \ \ \textcolor{keyword}{def\ }PopVariable(self):}
+\DoxyCodeLine{00606\ \ \ \ \ self.variables[:1]\ =\ []}
+\DoxyCodeLine{00607\ }
+
+\end{DoxyCode}
+\Hypertarget{classpump_1_1_env_a6588e98b89fb10e3e6801b01c9c33b50}\index{pump.Env@{pump.Env}!PushRange@{PushRange}}
+\index{PushRange@{PushRange}!pump.Env@{pump.Env}}
+\doxysubsubsection{\texorpdfstring{PushRange()}{PushRange()}}
+{\footnotesize\ttfamily \label{classpump_1_1_env_a6588e98b89fb10e3e6801b01c9c33b50} 
+pump.\+Env.\+Push\+Range (\begin{DoxyParamCaption}\item[{}]{self}{, }\item[{}]{var}{, }\item[{}]{lower}{, }\item[{}]{upper}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pump_8py_source_l00608}{608}} of file \mbox{\hyperlink{pump_8py_source}{pump.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00608\ \ \ \textcolor{keyword}{def\ }PushRange(self,\ var,\ lower,\ upper):}
+\DoxyCodeLine{00609\ \ \ \ \ self.ranges[:0]\ =\ [(var,\ lower,\ upper)]}
+\DoxyCodeLine{00610\ }
+
+\end{DoxyCode}
+\Hypertarget{classpump_1_1_env_a844fce087a5ae4f7cefc03d00ffc9091}\index{pump.Env@{pump.Env}!PushVariable@{PushVariable}}
+\index{PushVariable@{PushVariable}!pump.Env@{pump.Env}}
+\doxysubsubsection{\texorpdfstring{PushVariable()}{PushVariable()}}
+{\footnotesize\ttfamily \label{classpump_1_1_env_a844fce087a5ae4f7cefc03d00ffc9091} 
+pump.\+Env.\+Push\+Variable (\begin{DoxyParamCaption}\item[{}]{self}{, }\item[{}]{var}{, }\item[{}]{value}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pump_8py_source_l00595}{595}} of file \mbox{\hyperlink{pump_8py_source}{pump.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00595\ \ \ \textcolor{keyword}{def\ }PushVariable(self,\ var,\ value):}
+\DoxyCodeLine{00596\ \ \ \ \ \textcolor{comment}{\#\ If\ value\ looks\ like\ an\ int,\ store\ it\ as\ an\ int.}}
+\DoxyCodeLine{00597\ \ \ \ \ \textcolor{keywordflow}{try}:}
+\DoxyCodeLine{00598\ \ \ \ \ \ \ int\_value\ =\ int(value)}
+\DoxyCodeLine{00599\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{stringliteral}{'\%s'}\ \%\ int\_value)\ ==\ value:}
+\DoxyCodeLine{00600\ \ \ \ \ \ \ \ \ value\ =\ int\_value}
+\DoxyCodeLine{00601\ \ \ \ \ \textcolor{keywordflow}{except}\ Exception:}
+\DoxyCodeLine{00602\ \ \ \ \ \ \ \textcolor{keywordflow}{pass}}
+\DoxyCodeLine{00603\ \ \ \ \ self.variables[:0]\ =\ [(var,\ value)]}
+\DoxyCodeLine{00604\ }
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classpump_1_1_env_a8d5fec087c1a9108de9b105922b34309}\index{pump.Env@{pump.Env}!ranges@{ranges}}
+\index{ranges@{ranges}!pump.Env@{pump.Env}}
+\doxysubsubsection{\texorpdfstring{ranges}{ranges}}
+{\footnotesize\ttfamily \label{classpump_1_1_env_a8d5fec087c1a9108de9b105922b34309} 
+pump.\+Env.\+ranges = \mbox{[}$\,$\mbox{]}}
+
+
+
+Definition at line \mbox{\hyperlink{pump_8py_source_l00587}{587}} of file \mbox{\hyperlink{pump_8py_source}{pump.\+py}}.
+
+\Hypertarget{classpump_1_1_env_aba6456f3d0d23ac92bc9508c1b966bcd}\index{pump.Env@{pump.Env}!variables@{variables}}
+\index{variables@{variables}!pump.Env@{pump.Env}}
+\doxysubsubsection{\texorpdfstring{variables}{variables}}
+{\footnotesize\ttfamily \label{classpump_1_1_env_aba6456f3d0d23ac92bc9508c1b966bcd} 
+pump.\+Env.\+variables = \mbox{[}$\,$\mbox{]}}
+
+
+
+Definition at line \mbox{\hyperlink{pump_8py_source_l00586}{586}} of file \mbox{\hyperlink{pump_8py_source}{pump.\+py}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/scripts/\mbox{\hyperlink{pump_8py}{pump.\+py}}\end{DoxyCompactItemize}

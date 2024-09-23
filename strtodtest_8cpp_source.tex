@@ -1,0 +1,138 @@
+\doxysection{strtodtest.\+cpp}
+\hypertarget{strtodtest_8cpp_source}{}\label{strtodtest_8cpp_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/test/unittest/strtodtest.cpp@{libraries/fc/include/fc/crypto/webauthn\_json/test/unittest/strtodtest.cpp}}
+\mbox{\hyperlink{strtodtest_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00001}00001\ \textcolor{comment}{//\ Tencent\ is\ pleased\ to\ support\ the\ open\ source\ community\ by\ making\ RapidJSON\ available.}}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00002}00002\ \textcolor{comment}{//\ }}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00003}00003\ \textcolor{comment}{//\ Copyright\ (C)\ 2015\ THL\ A29\ Limited,\ a\ Tencent\ company,\ and\ Milo\ Yip.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00004}00004\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00005}00005\ \textcolor{comment}{//\ Licensed\ under\ the\ MIT\ License\ (the\ "{}License"{});\ you\ may\ not\ use\ this\ file\ except}}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00006}00006\ \textcolor{comment}{//\ in\ compliance\ with\ the\ License.\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00007}00007\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00008}00008\ \textcolor{comment}{//\ http://opensource.org/licenses/MIT}}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00009}00009\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00010}00010\ \textcolor{comment}{//\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software\ distributed\ }}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00011}00011\ \textcolor{comment}{//\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,\ WITHOUT\ WARRANTIES\ OR\ }}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00012}00012\ \textcolor{comment}{//\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.\ See\ the\ License\ for\ the\ }}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00013}00013\ \textcolor{comment}{//\ specific\ language\ governing\ permissions\ and\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00015}00015\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{unittest_8h}{unittest.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00017}00017\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{strtod_8h}{rapidjson/internal/strtod.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00019}00019\ \textcolor{preprocessor}{\#ifdef\ \_\_clang\_\_}}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00020}00020\ RAPIDJSON\_DIAG\_PUSH}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00021}00021\ RAPIDJSON\_DIAG\_OFF(unreachable-\/code)}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00022}00022\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00024}\mbox{\hyperlink{strtodtest_8cpp_a92485163f9780d3f913ba6241bb668a1}{00024}}\ \textcolor{preprocessor}{\#define\ BIGINTEGER\_LITERAL(s)\ BigInteger(s,\ sizeof(s)\ -\/\ 1)}}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00026}00026\ \textcolor{keyword}{using\ namespace\ }rapidjson::internal;}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00028}\mbox{\hyperlink{strtodtest_8cpp_af9b928c452759c06619b92264055bf48}{00028}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(Strtod,\ CheckApproximationCase)\ \{}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00029}00029\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ kSignificandSize\ =\ 52;}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00030}00030\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ kExponentBias\ =\ 0x3FF;}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00031}00031\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ kExponentMask\ =\ \mbox{\hyperlink{rapidjson_8h_aaee1245f375a71be1ac9b8a07ba5fb8f}{RAPIDJSON\_UINT64\_C2}}(0x7FF00000,\ 0x00000000);}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00032}00032\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ kSignificandMask\ =\ \mbox{\hyperlink{rapidjson_8h_aaee1245f375a71be1ac9b8a07ba5fb8f}{RAPIDJSON\_UINT64\_C2}}(0x000FFFFF,\ 0xFFFFFFFF);}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00033}00033\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ kHiddenBit\ =\ \mbox{\hyperlink{rapidjson_8h_aaee1245f375a71be1ac9b8a07ba5fb8f}{RAPIDJSON\_UINT64\_C2}}(0x00100000,\ 0x00000000);}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00035}00035\ \ \ \ \ \textcolor{comment}{//\ http://www.exploringbinary.com/using-\/integers-\/to-\/check-\/a-\/floating-\/point-\/approximation/}}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00036}00036\ \ \ \ \ \textcolor{comment}{//\ Let\ b\ =\ 0x1.465a72e467d88p-\/149}}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00037}00037\ \ \ \ \ \textcolor{comment}{//\ \ \ \ \ \ \ =\ 5741268244528520\ x\ 2\string^-\/201}}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00038}00038\ \ \ \ \ \textcolor{keyword}{union\ }\{}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00039}00039\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}};}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00040}00040\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ u;}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00041}00041\ \ \ \ \ \}u;}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00042}00042\ \ \ \ \ u.u\ =\ 0x465a72e467d88\ |\ ((\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\textcolor{keyword}{>}(-\/149\ +\ kExponentBias))\ <<\ kSignificandSize);}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00043}00043\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{double}\ b\ =\ u.d;}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00044}00044\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ bInt\ =\ (u.u\ \&\ kSignificandMask)\ |\ kHiddenBit;}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00045}00045\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ bExp\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(((u.u\ \&\ kExponentMask)\ >>\ kSignificandSize)\ -\/\ kExponentBias\ -\/\ kSignificandSize);}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00046}00046\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ab4852f9430cf656690256ea7fe6323b8}{EXPECT\_DOUBLE\_EQ}}(1.7864e-\/45,\ b);}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00047}00047\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\mbox{\hyperlink{rapidjson_8h_aaee1245f375a71be1ac9b8a07ba5fb8f}{RAPIDJSON\_UINT64\_C2}}(0x001465a7,\ 0x2e467d88),\ bInt);}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00048}00048\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(-\/201,\ bExp);}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00050}00050\ \ \ \ \ \textcolor{comment}{//\ Let\ d\ =\ 17864\ x\ 10-\/49}}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00051}00051\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ dInt[]\ =\ \textcolor{stringliteral}{"{}17864"{}};}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00052}00052\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ dExp\ =\ -\/49;}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00054}00054\ \ \ \ \ \textcolor{comment}{//\ Let\ h\ =\ 2\string^(bExp-\/1)}}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00055}00055\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ hExp\ =\ bExp\ -\/\ 1;}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00056}00056\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(-\/202,\ hExp);}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00058}00058\ \ \ \ \ \textcolor{keywordtype}{int}\ dS\_Exp2\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00059}00059\ \ \ \ \ \textcolor{keywordtype}{int}\ dS\_Exp5\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00060}00060\ \ \ \ \ \textcolor{keywordtype}{int}\ bS\_Exp2\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00061}00061\ \ \ \ \ \textcolor{keywordtype}{int}\ bS\_Exp5\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00062}00062\ \ \ \ \ \textcolor{keywordtype}{int}\ hS\_Exp2\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00063}00063\ \ \ \ \ \textcolor{keywordtype}{int}\ hS\_Exp5\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00065}00065\ \ \ \ \ \textcolor{comment}{//\ Adjust\ for\ decimal\ exponent}}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00066}00066\ \ \ \ \ \textcolor{keywordflow}{if}\ (dExp\ >=\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00067}00067\ \ \ \ \ \ \ \ \ dS\_Exp2\ +=\ dExp;}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00068}00068\ \ \ \ \ \ \ \ \ dS\_Exp5\ +=\ dExp;}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00069}00069\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00070}00070\ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00071}00071\ \ \ \ \ \ \ \ \ bS\_Exp2\ -\/=\ dExp;}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00072}00072\ \ \ \ \ \ \ \ \ bS\_Exp5\ -\/=\ dExp;}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00073}00073\ \ \ \ \ \ \ \ \ hS\_Exp2\ -\/=\ dExp;}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00074}00074\ \ \ \ \ \ \ \ \ hS\_Exp5\ -\/=\ dExp;}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00075}00075\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00076}00076\ }
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00077}00077\ \ \ \ \ \textcolor{comment}{//\ Adjust\ for\ binary\ exponent}}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00078}00078\ \ \ \ \ \textcolor{keywordflow}{if}\ (bExp\ >=\ 0)}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00079}00079\ \ \ \ \ \ \ \ \ bS\_Exp2\ +=\ bExp;}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00080}00080\ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00081}00081\ \ \ \ \ \ \ \ \ dS\_Exp2\ -\/=\ bExp;}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00082}00082\ \ \ \ \ \ \ \ \ hS\_Exp2\ -\/=\ bExp;}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00083}00083\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00084}00084\ }
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00085}00085\ \ \ \ \ \textcolor{comment}{//\ Adjust\ for\ half\ ulp\ exponent}}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00086}00086\ \ \ \ \ \textcolor{keywordflow}{if}\ (hExp\ >=\ 0)}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00087}00087\ \ \ \ \ \ \ \ \ hS\_Exp2\ +=\ hExp;}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00088}00088\ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00089}00089\ \ \ \ \ \ \ \ \ dS\_Exp2\ -\/=\ hExp;}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00090}00090\ \ \ \ \ \ \ \ \ bS\_Exp2\ -\/=\ hExp;}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00091}00091\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00092}00092\ }
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00093}00093\ \ \ \ \ \textcolor{comment}{//\ Remove\ common\ power\ of\ two\ factor\ from\ all\ three\ scaled\ values}}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00094}00094\ \ \ \ \ \textcolor{keywordtype}{int}\ common\_Exp2\ =\ (std::min)(dS\_Exp2,\ (std::min)(bS\_Exp2,\ hS\_Exp2));}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00095}00095\ \ \ \ \ dS\_Exp2\ -\/=\ common\_Exp2;}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00096}00096\ \ \ \ \ bS\_Exp2\ -\/=\ common\_Exp2;}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00097}00097\ \ \ \ \ hS\_Exp2\ -\/=\ common\_Exp2;}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00098}00098\ }
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00099}00099\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(153,\ dS\_Exp2);}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00100}00100\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0,\ dS\_Exp5);}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00101}00101\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(1,\ bS\_Exp2);}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00102}00102\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(49,\ bS\_Exp5);}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00103}00103\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0,\ hS\_Exp2);}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00104}00104\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(49,\ hS\_Exp5);}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00105}00105\ }
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00106}00106\ \ \ \ \ BigInteger\ dS\ =\ \mbox{\hyperlink{strtodtest_8cpp_a92485163f9780d3f913ba6241bb668a1}{BIGINTEGER\_LITERAL}}(dInt);}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00107}00107\ \ \ \ \ dS.MultiplyPow5(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\textcolor{keyword}{>}(dS\_Exp5))\ <<=\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(dS\_Exp2);}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00108}00108\ }
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00109}00109\ \ \ \ \ BigInteger\ bS(bInt);}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00110}00110\ \ \ \ \ bS.MultiplyPow5(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\textcolor{keyword}{>}(bS\_Exp5))\ <<=\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(bS\_Exp2);}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00111}00111\ }
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00112}00112\ \ \ \ \ BigInteger\ hS(1);}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00113}00113\ \ \ \ \ hS.MultiplyPow5(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\textcolor{keyword}{>}(hS\_Exp5))\ <<=\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(hS\_Exp2);}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00114}00114\ }
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00115}00115\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{strtodtest_8cpp_a92485163f9780d3f913ba6241bb668a1}{BIGINTEGER\_LITERAL}}(\textcolor{stringliteral}{"{}203970822259994138521801764465966248930731085529088"{}})\ ==\ dS);}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00116}00116\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{strtodtest_8cpp_a92485163f9780d3f913ba6241bb668a1}{BIGINTEGER\_LITERAL}}(\textcolor{stringliteral}{"{}203970822259994122305215569213032722473144531250000"{}})\ ==\ bS);}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00117}00117\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{strtodtest_8cpp_a92485163f9780d3f913ba6241bb668a1}{BIGINTEGER\_LITERAL}}(\textcolor{stringliteral}{"{}17763568394002504646778106689453125"{}})\ ==\ hS);}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00118}00118\ }
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00119}00119\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(1,\ dS.Compare(bS));}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00120}00120\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00121}00121\ \ \ \ \ BigInteger\ delta(0);}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00122}00122\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(dS.Difference(bS,\ \&delta));}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00123}00123\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{strtodtest_8cpp_a92485163f9780d3f913ba6241bb668a1}{BIGINTEGER\_LITERAL}}(\textcolor{stringliteral}{"{}16216586195252933526457586554279088"{}})\ ==\ delta);}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00124}00124\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(bS.Difference(dS,\ \&delta));}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00125}00125\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{strtodtest_8cpp_a92485163f9780d3f913ba6241bb668a1}{BIGINTEGER\_LITERAL}}(\textcolor{stringliteral}{"{}16216586195252933526457586554279088"{}})\ ==\ delta);}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00126}00126\ }
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00127}00127\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(-\/1,\ delta.Compare(hS));}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00128}00128\ \}}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00129}00129\ }
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00130}00130\ \textcolor{preprocessor}{\#ifdef\ \_\_clang\_\_}}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00131}00131\ RAPIDJSON\_DIAG\_POP}
+\DoxyCodeLine{\Hypertarget{strtodtest_8cpp_source_l00132}00132\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

@@ -1,0 +1,254 @@
+\doxysection{CLI\+::As\+Number\+With\+Unit Class Reference}
+\hypertarget{class_c_l_i_1_1_as_number_with_unit}{}\label{class_c_l_i_1_1_as_number_with_unit}\index{CLI::AsNumberWithUnit@{CLI::AsNumberWithUnit}}
+
+
+{\ttfamily \#include $<$CLI11.\+hpp$>$}
+
+
+
+Inheritance diagram for CLI\+::As\+Number\+With\+Unit\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=203pt]{class_c_l_i_1_1_as_number_with_unit__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for CLI\+::As\+Number\+With\+Unit\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=203pt]{class_c_l_i_1_1_as_number_with_unit__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{class_c_l_i_1_1_as_number_with_unit_a4f1b96d1a43a6acb3f85b68dd6f5a321}{Options}} \{ \newline
+\mbox{\hyperlink{class_c_l_i_1_1_as_number_with_unit_a4f1b96d1a43a6acb3f85b68dd6f5a321a9a74bbe8ec5a2e406528acf1a03e4c8c}{CASE\+\_\+\+SENSITIVE}} = 0
+, \mbox{\hyperlink{class_c_l_i_1_1_as_number_with_unit_a4f1b96d1a43a6acb3f85b68dd6f5a321a7f446c7c1a6b0381bb3b648fab313bcb}{CASE\+\_\+\+INSENSITIVE}} = 1
+, \mbox{\hyperlink{class_c_l_i_1_1_as_number_with_unit_a4f1b96d1a43a6acb3f85b68dd6f5a321a485b9e5f4b359102413727e5b2491d8d}{UNIT\+\_\+\+OPTIONAL}} = 0
+, \mbox{\hyperlink{class_c_l_i_1_1_as_number_with_unit_a4f1b96d1a43a6acb3f85b68dd6f5a321a9996f24d3f700b703d5f5843f6ad1d99}{UNIT\+\_\+\+REQUIRED}} = 2
+, \newline
+\mbox{\hyperlink{class_c_l_i_1_1_as_number_with_unit_a4f1b96d1a43a6acb3f85b68dd6f5a321a870d760dcdc3ddfe3dea704c3985eb89}{DEFAULT}} = CASE\+\_\+\+INSENSITIVE \texorpdfstring{$\vert$}{|} UNIT\+\_\+\+OPTIONAL
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{namespace_c_l_i_a713b5a1bbb98173dbc74edd4f295a582}{Number}} $>$ }\\\mbox{\hyperlink{class_c_l_i_1_1_as_number_with_unit_af5d2fc29cd92c1821e653a97f91b00cb}{As\+Number\+With\+Unit}} (std\+::map$<$ std\+::string, \mbox{\hyperlink{namespace_c_l_i_a713b5a1bbb98173dbc74edd4f295a582}{Number}} $>$ mapping, \mbox{\hyperlink{class_c_l_i_1_1_as_number_with_unit_a4f1b96d1a43a6acb3f85b68dd6f5a321}{Options}} opts=\mbox{\hyperlink{class_c_l_i_1_1_as_number_with_unit_a4f1b96d1a43a6acb3f85b68dd6f5a321a870d760dcdc3ddfe3dea704c3985eb89}{DEFAULT}}, const std\+::string \&unit\+\_\+name="{}UNIT"{})
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{class_c_l_i_1_1_validator}{CLI\+::\+Validator}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_c_l_i_1_1_validator_a918d82662319f6dc9dad53d580741569}{Validator}} ()=default
+\item 
+\mbox{\hyperlink{class_c_l_i_1_1_validator_a71df7c1c94c4abceee930eef957f5b76}{Validator}} (std\+::string validator\+\_\+desc)
+\begin{DoxyCompactList}\small\item\em Construct a \doxylink{class_c_l_i_1_1_validator}{Validator} with just the description string. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_c_l_i_1_1_validator_aede1b1a51a7f924342a92cbbd3ee41be}{Validator}} (std\+::function$<$ std\+::string(std\+::string \&)$>$ \mbox{\hyperlink{unionop}{op}}, std\+::string validator\+\_\+desc, std\+::string validator\+\_\+name="{}"{})
+\begin{DoxyCompactList}\small\item\em Construct \doxylink{class_c_l_i_1_1_validator}{Validator} from basic information. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_c_l_i_1_1_validator}{Validator}} \& \mbox{\hyperlink{class_c_l_i_1_1_validator_afc57c1bbaadbff4ce9c5772519818831}{operation}} (std\+::function$<$ std\+::string(std\+::string \&)$>$ \mbox{\hyperlink{unionop}{op}})
+\begin{DoxyCompactList}\small\item\em Set the \doxylink{class_c_l_i_1_1_validator}{Validator} operation function. \end{DoxyCompactList}\item 
+std\+::string \mbox{\hyperlink{class_c_l_i_1_1_validator_a97241be1f8ac1c8d2fabdcf2ec761f49}{operator()}} (std\+::string \&str) const
+\item 
+std\+::string \mbox{\hyperlink{class_c_l_i_1_1_validator_a3e4e7670d82455a43c0d3f8c9cc1db4f}{operator()}} (const std\+::string \&str) const
+\item 
+\mbox{\hyperlink{class_c_l_i_1_1_validator}{Validator}} \& \mbox{\hyperlink{class_c_l_i_1_1_validator_a35930c9b193bb0f7c5b7597dfe002e1f}{description}} (std\+::string validator\+\_\+desc)
+\begin{DoxyCompactList}\small\item\em Specify the type string. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_c_l_i_1_1_validator}{Validator}} \mbox{\hyperlink{class_c_l_i_1_1_validator_acb7942915861f00426ba4106c3fa1445}{description}} (std\+::string validator\+\_\+desc) const
+\begin{DoxyCompactList}\small\item\em Specify the type string. \end{DoxyCompactList}\item 
+std\+::string \mbox{\hyperlink{class_c_l_i_1_1_validator_a77c9d0a1f496ccaa4a8ef293a41bca78}{get\+\_\+description}} () const
+\begin{DoxyCompactList}\small\item\em Generate type description information for the \doxylink{class_c_l_i_1_1_validator}{Validator}. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_c_l_i_1_1_validator}{Validator}} \& \mbox{\hyperlink{class_c_l_i_1_1_validator_a8fc0ddaaa61f5dc5a7fa527d697991da}{name}} (std\+::string validator\+\_\+name)
+\begin{DoxyCompactList}\small\item\em Specify the type string. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_c_l_i_1_1_validator}{Validator}} \mbox{\hyperlink{class_c_l_i_1_1_validator_a56272c0571e4b28e5f1387787bee671c}{name}} (std\+::string validator\+\_\+name) const
+\begin{DoxyCompactList}\small\item\em Specify the type string. \end{DoxyCompactList}\item 
+const std\+::string \& \mbox{\hyperlink{class_c_l_i_1_1_validator_a688775a9b9dffb8f7e40cfb42af11697}{get\+\_\+name}} () const
+\begin{DoxyCompactList}\small\item\em Get the name of the \doxylink{class_c_l_i_1_1_validator}{Validator}. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_c_l_i_1_1_validator}{Validator}} \& \mbox{\hyperlink{class_c_l_i_1_1_validator_ac8f0bd247c6cca15729c2f0f5b822fe4}{active}} (bool active\+\_\+val=true)
+\begin{DoxyCompactList}\small\item\em Specify whether the \doxylink{class_c_l_i_1_1_validator}{Validator} is active or not. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_c_l_i_1_1_validator}{Validator}} \mbox{\hyperlink{class_c_l_i_1_1_validator_a98fa76ba029599613e3ab8609e25af4d}{active}} (bool active\+\_\+val=true) const
+\begin{DoxyCompactList}\small\item\em Specify whether the \doxylink{class_c_l_i_1_1_validator}{Validator} is active or not. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_c_l_i_1_1_validator}{Validator}} \& \mbox{\hyperlink{class_c_l_i_1_1_validator_a356d979d984dffff3489caf4baca9160}{non\+\_\+modifying}} (bool no\+\_\+modify=true)
+\begin{DoxyCompactList}\small\item\em Specify whether the \doxylink{class_c_l_i_1_1_validator}{Validator} can be modifying or not. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_c_l_i_1_1_validator}{Validator}} \& \mbox{\hyperlink{class_c_l_i_1_1_validator_ae24fb3eedf62301b733b3a20d2b93757}{application\+\_\+index}} (int app\+\_\+index)
+\begin{DoxyCompactList}\small\item\em Specify the application index of a validator. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_c_l_i_1_1_validator}{Validator}} \mbox{\hyperlink{class_c_l_i_1_1_validator_a5f621b1380d9a1a3694bc509a087d1cd}{application\+\_\+index}} (int app\+\_\+index) const
+\begin{DoxyCompactList}\small\item\em Specify the application index of a validator. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{class_c_l_i_1_1_validator_aa27699959ccccc236af305582d2b3e90}{get\+\_\+application\+\_\+index}} () const
+\begin{DoxyCompactList}\small\item\em Get the current value of the application index. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_c_l_i_1_1_validator_a1c08bcd3bca8c446e49e44d2c4e1413f}{get\+\_\+active}} () const
+\begin{DoxyCompactList}\small\item\em Get a boolean if the validator is active. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_c_l_i_1_1_validator_addb6df41feafbbbe6347a46151d55762}{get\+\_\+modifying}} () const
+\begin{DoxyCompactList}\small\item\em Get a boolean if the validator is allowed to modify the input returns true if it can modify the input. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_c_l_i_1_1_validator}{Validator}} \mbox{\hyperlink{class_c_l_i_1_1_validator_a52e52713e3e170d132a01bf91ea2b879}{operator\&}} (const \mbox{\hyperlink{class_c_l_i_1_1_validator}{Validator}} \&other) const
+\item 
+\mbox{\hyperlink{class_c_l_i_1_1_validator}{Validator}} \mbox{\hyperlink{class_c_l_i_1_1_validator_ac19919604a6ac47c5a1cbd34920991a4}{operator\texorpdfstring{$\vert$}{|}}} (const \mbox{\hyperlink{class_c_l_i_1_1_validator}{Validator}} \&other) const
+\item 
+\mbox{\hyperlink{class_c_l_i_1_1_validator}{Validator}} \mbox{\hyperlink{class_c_l_i_1_1_validator_ab113af781dbc286b22cdfeedd5204e68}{operator!}} () const
+\begin{DoxyCompactList}\small\item\em Create a validator that fails when a given validator succeeds. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Protected Attributes inherited from \mbox{\hyperlink{class_c_l_i_1_1_validator}{CLI\+::\+Validator}}}
+\begin{DoxyCompactItemize}
+\item 
+std\+::function$<$ std\+::string()$>$ \mbox{\hyperlink{class_c_l_i_1_1_validator_a9f00a86d01b79facfc300be76b7463d7}{desc\+\_\+function\+\_\+}} \{\mbox{[}$\,$\mbox{]}() \{ \mbox{\hyperlink{hello__driver_8cpp_a9717e7bbecb906637e86cef6da3d83c2}{return}} std\+::string\{\}; \}\}
+\begin{DoxyCompactList}\small\item\em This is the description function, if empty the description\+\_\+ will be used. \end{DoxyCompactList}\item 
+std\+::function$<$ std\+::string(std\+::string \&)$>$ \mbox{\hyperlink{class_c_l_i_1_1_validator_aa6c1eedd7839b91d88246539f2305ef3}{func\+\_\+}} \{\mbox{[}$\,$\mbox{]}(std\+::string \&) \{ \mbox{\hyperlink{hello__driver_8cpp_a9717e7bbecb906637e86cef6da3d83c2}{return}} std\+::string\{\}; \}\}
+\item 
+std\+::string \mbox{\hyperlink{class_c_l_i_1_1_validator_ac97b23ee16e15ae0b31253feb39706bf}{name\+\_\+}} \{\}
+\begin{DoxyCompactList}\small\item\em The name for search purposes of the \doxylink{class_c_l_i_1_1_validator}{Validator}. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{class_c_l_i_1_1_validator_a301ecf2851e4a7cdcad7c9b774598320}{application\+\_\+index\+\_\+}} = -\/1
+\begin{DoxyCompactList}\small\item\em \doxylink{struct_a}{A} \doxylink{class_c_l_i_1_1_validator}{Validator} will only apply to an indexed value (-\/1 is all elements) \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_c_l_i_1_1_validator_a558776377513d88bf637b5d775c4e31b}{active\+\_\+}} \{true\}
+\begin{DoxyCompactList}\small\item\em Enable for \doxylink{class_c_l_i_1_1_validator}{Validator} to allow it to be disabled if need be. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_c_l_i_1_1_validator_a60df532d1d80afc040ec0e8ed2736200}{non\+\_\+modifying\+\_\+}} \{false\}
+\begin{DoxyCompactList}\small\item\em specify that a validator should not modify the input \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Multiply a number by a factor using given mapping. Can be used to write transforms for SIZE or DURATION inputs.
+
+Example\+: With mapping = {\ttfamily \{"{}b"{}-\/\texorpdfstring{$>$}{>}1, "{}kb"{}-\/\texorpdfstring{$>$}{>}1024, "{}mb"{}-\/\texorpdfstring{$>$}{>}1024\texorpdfstring{$\ast$}{*}1024\}} one can recognize inputs like "{}100"{}, "{}12kb"{}, "{}100 MB"{}, that will be automatically transformed to 100, 14448, 104857600.
+
+Output number type matches the type in the provided mapping. Therefore, if it is required to interpret real inputs like "{}0.\+42 s"{}, the mapping should be of a type \texorpdfstring{$<$}{<}string, float\texorpdfstring{$>$}{>} or \texorpdfstring{$<$}{<}string, double\texorpdfstring{$>$}{>}. 
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l02941}{2941}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+
+\doxysubsection{Member Enumeration Documentation}
+\Hypertarget{class_c_l_i_1_1_as_number_with_unit_a4f1b96d1a43a6acb3f85b68dd6f5a321}\index{CLI::AsNumberWithUnit@{CLI::AsNumberWithUnit}!Options@{Options}}
+\index{Options@{Options}!CLI::AsNumberWithUnit@{CLI::AsNumberWithUnit}}
+\doxysubsubsection{\texorpdfstring{Options}{Options}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_as_number_with_unit_a4f1b96d1a43a6acb3f85b68dd6f5a321} 
+enum \mbox{\hyperlink{class_c_l_i_1_1_as_number_with_unit_a4f1b96d1a43a6acb3f85b68dd6f5a321}{CLI\+::\+As\+Number\+With\+Unit\+::\+Options}}}
+
+Adjust \doxylink{class_c_l_i_1_1_as_number_with_unit}{As\+Number\+With\+Unit} behavior. CASE\+\_\+\+SENSITIVE/\+CASE\+\_\+\+INSENSITIVE controls how units are matched. UNIT\+\_\+\+OPTIONAL/\+UNIT\+\_\+\+REQUIRED throws \doxylink{class_c_l_i_1_1_validation_error}{Validation\+Error} if UNIT\+\_\+\+REQUIRED is set and unit literal is not found. \begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{CASE\_SENSITIVE@{CASE\_SENSITIVE}!CLI::AsNumberWithUnit@{CLI::AsNumberWithUnit}}\index{CLI::AsNumberWithUnit@{CLI::AsNumberWithUnit}!CASE\_SENSITIVE@{CASE\_SENSITIVE}}}\Hypertarget{class_c_l_i_1_1_as_number_with_unit_a4f1b96d1a43a6acb3f85b68dd6f5a321a9a74bbe8ec5a2e406528acf1a03e4c8c}\label{class_c_l_i_1_1_as_number_with_unit_a4f1b96d1a43a6acb3f85b68dd6f5a321} 
+CASE\+\_\+\+SENSITIVE&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{CASE\_INSENSITIVE@{CASE\_INSENSITIVE}!CLI::AsNumberWithUnit@{CLI::AsNumberWithUnit}}\index{CLI::AsNumberWithUnit@{CLI::AsNumberWithUnit}!CASE\_INSENSITIVE@{CASE\_INSENSITIVE}}}\Hypertarget{class_c_l_i_1_1_as_number_with_unit_a4f1b96d1a43a6acb3f85b68dd6f5a321a7f446c7c1a6b0381bb3b648fab313bcb}\label{class_c_l_i_1_1_as_number_with_unit_a4f1b96d1a43a6acb3f85b68dd6f5a321} 
+CASE\+\_\+\+INSENSITIVE&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{UNIT\_OPTIONAL@{UNIT\_OPTIONAL}!CLI::AsNumberWithUnit@{CLI::AsNumberWithUnit}}\index{CLI::AsNumberWithUnit@{CLI::AsNumberWithUnit}!UNIT\_OPTIONAL@{UNIT\_OPTIONAL}}}\Hypertarget{class_c_l_i_1_1_as_number_with_unit_a4f1b96d1a43a6acb3f85b68dd6f5a321a485b9e5f4b359102413727e5b2491d8d}\label{class_c_l_i_1_1_as_number_with_unit_a4f1b96d1a43a6acb3f85b68dd6f5a321} 
+UNIT\+\_\+\+OPTIONAL&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{UNIT\_REQUIRED@{UNIT\_REQUIRED}!CLI::AsNumberWithUnit@{CLI::AsNumberWithUnit}}\index{CLI::AsNumberWithUnit@{CLI::AsNumberWithUnit}!UNIT\_REQUIRED@{UNIT\_REQUIRED}}}\Hypertarget{class_c_l_i_1_1_as_number_with_unit_a4f1b96d1a43a6acb3f85b68dd6f5a321a9996f24d3f700b703d5f5843f6ad1d99}\label{class_c_l_i_1_1_as_number_with_unit_a4f1b96d1a43a6acb3f85b68dd6f5a321} 
+UNIT\+\_\+\+REQUIRED&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{DEFAULT@{DEFAULT}!CLI::AsNumberWithUnit@{CLI::AsNumberWithUnit}}\index{CLI::AsNumberWithUnit@{CLI::AsNumberWithUnit}!DEFAULT@{DEFAULT}}}\Hypertarget{class_c_l_i_1_1_as_number_with_unit_a4f1b96d1a43a6acb3f85b68dd6f5a321a870d760dcdc3ddfe3dea704c3985eb89}\label{class_c_l_i_1_1_as_number_with_unit_a4f1b96d1a43a6acb3f85b68dd6f5a321} 
+DEFAULT&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l02947}{2947}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02947\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02948\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_c_l_i_1_1_as_number_with_unit_a4f1b96d1a43a6acb3f85b68dd6f5a321a9a74bbe8ec5a2e406528acf1a03e4c8c}{CASE\_SENSITIVE}}\ =\ 0,}
+\DoxyCodeLine{02949\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_c_l_i_1_1_as_number_with_unit_a4f1b96d1a43a6acb3f85b68dd6f5a321a7f446c7c1a6b0381bb3b648fab313bcb}{CASE\_INSENSITIVE}}\ =\ 1,}
+\DoxyCodeLine{02950\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_c_l_i_1_1_as_number_with_unit_a4f1b96d1a43a6acb3f85b68dd6f5a321a485b9e5f4b359102413727e5b2491d8d}{UNIT\_OPTIONAL}}\ =\ 0,}
+\DoxyCodeLine{02951\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_c_l_i_1_1_as_number_with_unit_a4f1b96d1a43a6acb3f85b68dd6f5a321a9996f24d3f700b703d5f5843f6ad1d99}{UNIT\_REQUIRED}}\ =\ 2,}
+\DoxyCodeLine{02952\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_c_l_i_1_1_as_number_with_unit_a4f1b96d1a43a6acb3f85b68dd6f5a321a870d760dcdc3ddfe3dea704c3985eb89}{DEFAULT}}\ =\ \mbox{\hyperlink{class_c_l_i_1_1_as_number_with_unit_a4f1b96d1a43a6acb3f85b68dd6f5a321a7f446c7c1a6b0381bb3b648fab313bcb}{CASE\_INSENSITIVE}}\ |\ \mbox{\hyperlink{class_c_l_i_1_1_as_number_with_unit_a4f1b96d1a43a6acb3f85b68dd6f5a321a485b9e5f4b359102413727e5b2491d8d}{UNIT\_OPTIONAL}}}
+\DoxyCodeLine{02953\ \ \ \ \ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_c_l_i_1_1_as_number_with_unit_af5d2fc29cd92c1821e653a97f91b00cb}\index{CLI::AsNumberWithUnit@{CLI::AsNumberWithUnit}!AsNumberWithUnit@{AsNumberWithUnit}}
+\index{AsNumberWithUnit@{AsNumberWithUnit}!CLI::AsNumberWithUnit@{CLI::AsNumberWithUnit}}
+\doxysubsubsection{\texorpdfstring{AsNumberWithUnit()}{AsNumberWithUnit()}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_as_number_with_unit_af5d2fc29cd92c1821e653a97f91b00cb} 
+template$<$typename \mbox{\hyperlink{namespace_c_l_i_a713b5a1bbb98173dbc74edd4f295a582}{Number}} $>$ \\
+CLI\+::\+As\+Number\+With\+Unit\+::\+As\+Number\+With\+Unit (\begin{DoxyParamCaption}\item[{std\+::map$<$ std\+::string, \mbox{\hyperlink{namespace_c_l_i_a713b5a1bbb98173dbc74edd4f295a582}{Number}} $>$}]{mapping}{, }\item[{\mbox{\hyperlink{class_c_l_i_1_1_as_number_with_unit_a4f1b96d1a43a6acb3f85b68dd6f5a321}{Options}}}]{opts}{ = {\ttfamily \mbox{\hyperlink{class_c_l_i_1_1_as_number_with_unit_a4f1b96d1a43a6acb3f85b68dd6f5a321a870d760dcdc3ddfe3dea704c3985eb89}{DEFAULT}}}, }\item[{const std\+::string \&}]{unit\+\_\+name}{ = {\ttfamily "{}UNIT"{}}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l02956}{2956}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02958\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02959\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_c_l_i_1_1_validator_a35930c9b193bb0f7c5b7597dfe002e1f}{description}}(generate\_description<Number>(unit\_name,\ opts));}
+\DoxyCodeLine{02960\ \ \ \ \ \ \ \ \ validate\_mapping(mapping,\ opts);}
+\DoxyCodeLine{02961\ }
+\DoxyCodeLine{02962\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ transform\ function}}
+\DoxyCodeLine{02963\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_c_l_i_1_1_validator_aa6c1eedd7839b91d88246539f2305ef3}{func\_}}\ =\ [mapping,\ opts](std::string\ \&input)\ -\/>\ std::string\ \{}
+\DoxyCodeLine{02964\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_c_l_i_a713b5a1bbb98173dbc74edd4f295a582}{Number}}\ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6a0fc3cfbc27e91ea60a787de13dae3e3c}{num}};}
+\DoxyCodeLine{02965\ }
+\DoxyCodeLine{02966\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_c_l_i_1_1detail_a32d84ce1a65de779e88fdf4aa3b54ea6}{detail::rtrim}}(input);}
+\DoxyCodeLine{02967\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(input.empty())\ \{}
+\DoxyCodeLine{02968\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{namespace_c_l_i_a1d8108a219533f0b0361640a017f037ea8180c46099f957f51b2bc31f7f0f5c42}{ValidationError}}(\textcolor{stringliteral}{"{}Input\ is\ empty"{}});}
+\DoxyCodeLine{02969\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{02970\ }
+\DoxyCodeLine{02971\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Find\ split\ position\ between\ number\ and\ prefix}}
+\DoxyCodeLine{02972\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ unit\_begin\ =\ input.end();}
+\DoxyCodeLine{02973\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(unit\_begin\ >\ input.begin()\ \&\&\ std::isalpha(*(unit\_begin\ -\/\ 1),\ std::locale()))\ \{}
+\DoxyCodeLine{02974\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/-\/unit\_begin;}
+\DoxyCodeLine{02975\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{02976\ }
+\DoxyCodeLine{02977\ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ unit\{unit\_begin,\ input.end()\};}
+\DoxyCodeLine{02978\ \ \ \ \ \ \ \ \ \ \ \ \ input.resize(\textcolor{keyword}{static\_cast<}std::size\_t\textcolor{keyword}{>}(std::distance(input.begin(),\ unit\_begin)));}
+\DoxyCodeLine{02979\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_c_l_i_1_1detail_a621323632158048f6168deacc432b838}{detail::trim}}(input);}
+\DoxyCodeLine{02980\ }
+\DoxyCodeLine{02981\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(opts\ \&\ \mbox{\hyperlink{class_c_l_i_1_1_as_number_with_unit_a4f1b96d1a43a6acb3f85b68dd6f5a321a9996f24d3f700b703d5f5843f6ad1d99}{UNIT\_REQUIRED}}\ \&\&\ unit.empty())\ \{}
+\DoxyCodeLine{02982\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{namespace_c_l_i_a1d8108a219533f0b0361640a017f037ea8180c46099f957f51b2bc31f7f0f5c42}{ValidationError}}(\textcolor{stringliteral}{"{}Missing\ mandatory\ unit"{}});}
+\DoxyCodeLine{02983\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{02984\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(opts\ \&\ \mbox{\hyperlink{class_c_l_i_1_1_as_number_with_unit_a4f1b96d1a43a6acb3f85b68dd6f5a321a7f446c7c1a6b0381bb3b648fab313bcb}{CASE\_INSENSITIVE}})\ \{}
+\DoxyCodeLine{02985\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ unit\ =\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ae83709ec148057ec53df4383645727e9}{detail::to\_lower}}(unit);}
+\DoxyCodeLine{02986\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{02987\ }
+\DoxyCodeLine{02988\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ converted\ =\ detail::lexical\_cast(input,\ num);}
+\DoxyCodeLine{02989\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!converted)\ \{}
+\DoxyCodeLine{02990\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{namespace_c_l_i_a1d8108a219533f0b0361640a017f037ea8180c46099f957f51b2bc31f7f0f5c42}{ValidationError}}(std::string(\textcolor{stringliteral}{"{}Value\ "{}})\ +\ input\ +\ \textcolor{stringliteral}{"{}\ could\ not\ be\ converted\ to\ "{}}\ +}
+\DoxyCodeLine{02991\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_c_l_i_1_1detail_a0505c3528178408b76390be64bd452d4}{detail::type\_name<Number>}}());}
+\DoxyCodeLine{02992\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{02993\ }
+\DoxyCodeLine{02994\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(unit.empty())\ \{}
+\DoxyCodeLine{02995\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ No\ need\ to\ modify\ input\ if\ no\ unit\ passed}}
+\DoxyCodeLine{02996\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{\};}
+\DoxyCodeLine{02997\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{02998\ }
+\DoxyCodeLine{02999\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ find\ corresponding\ factor}}
+\DoxyCodeLine{03000\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ it\ =\ mapping.find(unit);}
+\DoxyCodeLine{03001\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(it\ ==\ mapping.end())\ \{}
+\DoxyCodeLine{03002\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{namespace_c_l_i_a1d8108a219533f0b0361640a017f037ea8180c46099f957f51b2bc31f7f0f5c42}{ValidationError}}(unit\ +}
+\DoxyCodeLine{03003\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ unit\ not\ recognized.\ "{}}}
+\DoxyCodeLine{03004\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Allowed\ values:\ "{}}\ +}
+\DoxyCodeLine{03005\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_c_l_i_1_1detail_a320e031a5eb12297a140d2d6fc73362a}{detail::generate\_map}}(mapping,\ \textcolor{keyword}{true}));}
+\DoxyCodeLine{03006\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{03007\ }
+\DoxyCodeLine{03008\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ perform\ safe\ multiplication}}
+\DoxyCodeLine{03009\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3ac3fdc8e4e3df74b216721e3ae1fd4945}{ok}}\ =\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_a58ce723daebf6cd298565eb365d1b157}{detail::checked\_multiply}}(num,\ it-\/>second);}
+\DoxyCodeLine{03010\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!ok)\ \{}
+\DoxyCodeLine{03011\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{namespace_c_l_i_a1d8108a219533f0b0361640a017f037ea8180c46099f957f51b2bc31f7f0f5c42}{ValidationError}}(\mbox{\hyperlink{namespace_c_l_i_1_1detail_a0e94052d485636fc9f18c21009026577}{detail::to\_string}}(num)\ +\ \textcolor{stringliteral}{"{}\ multiplied\ by\ "{}}\ +\ unit\ +}
+\DoxyCodeLine{03012\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ factor\ would\ cause\ number\ overflow.\ Use\ smaller\ value."{}});}
+\DoxyCodeLine{03013\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{03014\ \ \ \ \ \ \ \ \ \ \ \ \ input\ =\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_a0e94052d485636fc9f18c21009026577}{detail::to\_string}}(num);}
+\DoxyCodeLine{03015\ }
+\DoxyCodeLine{03016\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{\};}
+\DoxyCodeLine{03017\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{03018\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_c_l_i_1_1_as_number_with_unit_af5d2fc29cd92c1821e653a97f91b00cb_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+programs/clio/\mbox{\hyperlink{_c_l_i11_8hpp}{CLI11.\+hpp}}\end{DoxyCompactItemize}

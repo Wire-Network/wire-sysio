@@ -1,0 +1,11 @@
+<map id="sysio::vm::varint::from" name="sysio::vm::varint::from">
+<area shape="rect" id="Node000001" title=" " alt="" coords="180,112,332,137"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1vm_1_1varint.html#a06d4e73b03c0ecf61f29313189c7ec38" title=" " alt="" coords="5,5,132,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="215,106,108,49,110,44,217,101"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1vm_1_1varint.html#a9352372c85728df48cc45c0b6015d691" title=" " alt="" coords="5,71,132,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="164,111,132,105,133,100,165,106"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1vm_1_1varint.html#a39fd48cdfeef6adb870501823f6d5883" title=" " alt="" coords="5,136,132,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="165,143,132,148,131,143,164,137"/>
+<area shape="rect" id="Node000005" href="$classsysio_1_1vm_1_1varint.html#a787a826635bebed8111c6486dfd372a3" title=" " alt="" coords="5,201,132,242"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="217,147,111,203,108,198,215,142"/>
+</map>

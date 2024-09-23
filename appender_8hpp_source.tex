@@ -1,0 +1,48 @@
+\doxysection{appender.\+hpp}
+\hypertarget{appender_8hpp_source}{}\label{appender_8hpp_source}\index{libraries/fc/include/fc/log/appender.hpp@{libraries/fc/include/fc/log/appender.hpp}}
+\mbox{\hyperlink{appender_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{appender_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{appender_8hpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{any_8hpp}{fc/any.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{appender_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{string_8hpp}{fc/string.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{appender_8hpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <memory>}}
+\DoxyCodeLine{\Hypertarget{appender_8hpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{appender_8hpp_source_l00006}00006\ \textcolor{preprocessor}{\#if\ BOOST\_VERSION\ >=\ 106600}}
+\DoxyCodeLine{\Hypertarget{appender_8hpp_source_l00007}00007\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceboost}{boost}}\ \{\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacewebsocketpp_1_1lib_1_1asio}{asio}}\ \{\ \textcolor{keyword}{class\ }io\_context;\ \textcolor{keyword}{typedef}\ io\_context\ io\_service;\ \}\ \}}
+\DoxyCodeLine{\Hypertarget{appender_8hpp_source_l00008}00008\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{appender_8hpp_source_l00009}00009\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceboost}{boost}}\ \{\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacewebsocketpp_1_1lib_1_1asio}{asio}}\ \{\ \textcolor{keyword}{class\ }io\_service;\ \}\ \}}
+\DoxyCodeLine{\Hypertarget{appender_8hpp_source_l00010}00010\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{appender_8hpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{appender_8hpp_source_l00012}00012\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}\ \{}
+\DoxyCodeLine{\Hypertarget{appender_8hpp_source_l00013}00013\ \ \ \ \textcolor{keyword}{class\ }appender;}
+\DoxyCodeLine{\Hypertarget{appender_8hpp_source_l00014}00014\ \ \ \ \textcolor{keyword}{class\ }log\_message;}
+\DoxyCodeLine{\Hypertarget{appender_8hpp_source_l00015}00015\ \ \ \ \textcolor{keyword}{class\ }variant;}
+\DoxyCodeLine{\Hypertarget{appender_8hpp_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{appender_8hpp_source_l00017}\mbox{\hyperlink{classfc_1_1appender__factory}{00017}}\ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classfc_1_1appender__factory}{appender\_factory}}\ \{}
+\DoxyCodeLine{\Hypertarget{appender_8hpp_source_l00018}00018\ \ \ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{appender_8hpp_source_l00019}\mbox{\hyperlink{classfc_1_1appender__factory_a614d9219568f7a70abfb3a0bfa75c222}{00019}}\ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ std::shared\_ptr<appender\_factory>\ \mbox{\hyperlink{classfc_1_1appender__factory_a614d9219568f7a70abfb3a0bfa75c222}{ptr}};}
+\DoxyCodeLine{\Hypertarget{appender_8hpp_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{appender_8hpp_source_l00021}\mbox{\hyperlink{classfc_1_1appender__factory_add87c0099c23039a3a597b418c466e4e}{00021}}\ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classfc_1_1appender__factory_add87c0099c23039a3a597b418c466e4e}{\string~appender\_factory}}()\{\};}
+\DoxyCodeLine{\Hypertarget{appender_8hpp_source_l00022}\mbox{\hyperlink{classfc_1_1appender__factory_aac275525e1053167488de8a9313e0d74}{00022}}\ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ std::shared\_ptr<appender>\ \mbox{\hyperlink{classfc_1_1appender__factory_aac275525e1053167488de8a9313e0d74}{create}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1variant}{variant}}\&\ args\ )\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{appender_8hpp_source_l00023}00023\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{appender_8hpp_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{appender_8hpp_source_l00025}00025\ \ \ \ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacedetail}{detail}}\ \{}
+\DoxyCodeLine{\Hypertarget{appender_8hpp_source_l00026}00026\ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{appender_8hpp_source_l00027}\mbox{\hyperlink{classfc_1_1detail_1_1appender__factory__impl}{00027}}\ \ \ \ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classfc_1_1detail_1_1appender__factory__impl}{appender\_factory\_impl}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classfc_1_1appender__factory}{appender\_factory}}\ \{}
+\DoxyCodeLine{\Hypertarget{appender_8hpp_source_l00028}00028\ \ \ \ \ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{appender_8hpp_source_l00029}\mbox{\hyperlink{classfc_1_1detail_1_1appender__factory__impl_a198e0440024a99260ca45bb90ef4ab6e}{00029}}\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ std::shared\_ptr<appender>\ \mbox{\hyperlink{classfc_1_1detail_1_1appender__factory__impl_a198e0440024a99260ca45bb90ef4ab6e}{create}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1variant}{variant}}\&\ args\ )\ \{}
+\DoxyCodeLine{\Hypertarget{appender_8hpp_source_l00030}00030\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::shared\_ptr<appender>(\textcolor{keyword}{new}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}(args));}
+\DoxyCodeLine{\Hypertarget{appender_8hpp_source_l00031}00031\ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{appender_8hpp_source_l00032}00032\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{appender_8hpp_source_l00033}00033\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{appender_8hpp_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{appender_8hpp_source_l00035}\mbox{\hyperlink{classfc_1_1appender}{00035}}\ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classfc_1_1appender}{appender}}\ \{}
+\DoxyCodeLine{\Hypertarget{appender_8hpp_source_l00036}00036\ \ \ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{appender_8hpp_source_l00037}\mbox{\hyperlink{classfc_1_1appender_a860a005f416319eee3b733bb375308c9}{00037}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ std::shared\_ptr<appender>\ \mbox{\hyperlink{classfc_1_1appender_a860a005f416319eee3b733bb375308c9}{ptr}};}
+\DoxyCodeLine{\Hypertarget{appender_8hpp_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{appender_8hpp_source_l00039}\mbox{\hyperlink{classfc_1_1appender_ae86b4e5cfde6548556295692ba2badca}{00039}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1appender_ae86b4e5cfde6548556295692ba2badca}{initialize}}(\ boost::asio::io\_service\&\ io\_service\ )\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{appender_8hpp_source_l00040}\mbox{\hyperlink{classfc_1_1appender_a2c7c23788e18c882ced73b8a6f24e3c9}{00040}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1appender_a2c7c23788e18c882ced73b8a6f24e3c9}{log}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1log__message}{log\_message}}\&\ m\ )\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{appender_8hpp_source_l00041}00041\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{appender_8hpp_source_l00042}00042\ \}}
+
+\end{DoxyCode}

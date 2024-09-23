@@ -1,0 +1,44 @@
+\doxysection{Stream Class Reference}
+\hypertarget{classrapidjson_1_1_stream}{}\label{classrapidjson_1_1_stream}\index{Stream@{Stream}}
+
+
+Concept for reading and writing characters.  
+
+
+
+
+{\ttfamily \#include $<$stream.\+h$>$}
+
+
+
+\doxysubsection{Detailed Description}
+For read-\/only stream, no need to implement Put\+Begin(), \doxylink{bench_8cpp_a8496465558c5f8a68e4583295fb89c7d}{Put()}, Flush() and Put\+End().
+
+For write-\/only stream, only need to implement \doxylink{bench_8cpp_a8496465558c5f8a68e4583295fb89c7d}{Put()} and Flush().
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{concept\ }\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}}\ \{}
+\DoxyCodeLine{\ \ \ \ typename\ \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}};\ \ \ \ }
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}\ Peek()\ \mbox{\hyperlink{namespaceupload_a985aa9a71de3eb507344df65700c696d}{const}};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}\ Take();}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ size\_t\ Tell();}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}*\ PutBegin();}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ void\ \mbox{\hyperlink{bench_8cpp_a8496465558c5f8a68e4583295fb89c7d}{Put}}(\mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}\ c);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ void\ Flush();}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ size\_t\ PutEnd(\mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}*\ begin);}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+ 
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/\mbox{\hyperlink{stream_8h}{stream.\+h}}\end{DoxyCompactItemize}

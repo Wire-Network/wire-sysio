@@ -1,0 +1,144 @@
+\chapter{own-\/main}
+\hypertarget{md_libraries_2sys-vm_2external_2_catch2_2docs_2own-main}{}\label{md_libraries_2sys-vm_2external_2_catch2_2docs_2own-main}\index{own-\/main@{own-\/main}}
+\label{_top}%
+ \doxysection*{Supplying \doxylink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main()} yourself}
+
+{\bfseries{Contents}}~\newline
+ Let Catch take full control of args and config~\newline
+ Amending the config~\newline
+ Adding your own command line options~\newline
+ Version detection~\newline
+
+
+The easiest way to use \doxylink{namespace_catch}{Catch} is to let it supply {\ttfamily \doxylink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main()}} for you and handle configuring itself from the command line.
+
+This is achieved by writing {\ttfamily \#define CATCH\+\_\+\+CONFIG\+\_\+\+MAIN} before the {\ttfamily \#include "{}catch.\+hpp"{}} in {\itshape exactly one} source file.
+
+Sometimes, though, you need to write your own version of \doxylink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main()}. You can do this by writing {\ttfamily \#define CATCH\+\_\+\+CONFIG\+\_\+\+RUNNER} instead. Now you are free to write {\ttfamily \doxylink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main()}} as normal and call into \doxylink{namespace_catch}{Catch} yourself manually.
+
+You now have a lot of flexibility -\/ but here are three recipes to get your started\+:
+
+\doxysubsection*{Let \doxylink{namespace_catch}{Catch} take full control of args and config}
+
+If you just need to have code that executes before and/ or after \doxylink{namespace_catch}{Catch} this is the simplest option.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ ++}
+\DoxyCodeLine{\textcolor{preprocessor}{\#define\ CATCH\_CONFIG\_RUNNER}}
+\DoxyCodeLine{\textcolor{preprocessor}{\#include\ "{}catch.hpp"{}}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keywordtype}{int}\ \mbox{\hyperlink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}(\ \textcolor{keywordtype}{int}\ argc,\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[]\ )\ \{}
+\DoxyCodeLine{\ \ \textcolor{comment}{//\ global\ setup...}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{int}\ result\ =\ \mbox{\hyperlink{class_catch_1_1_session}{Catch::Session}}().\mbox{\hyperlink{class_catch_1_1_session_a8c82b89613ebd99f1ba1a3f7b634e571}{run}}(\ argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}\ );}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \textcolor{comment}{//\ global\ clean-\/up...}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection*{Amending the config}
+
+If you still want \doxylink{namespace_catch}{Catch} to process the command line, but you want to programmatically tweak the config, you can do so in one of two ways\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ ++}
+\DoxyCodeLine{\textcolor{preprocessor}{\#define\ CATCH\_CONFIG\_RUNNER}}
+\DoxyCodeLine{\textcolor{preprocessor}{\#include\ "{}catch.hpp"{}}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keywordtype}{int}\ \mbox{\hyperlink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}(\ \textcolor{keywordtype}{int}\ argc,\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[]\ )}
+\DoxyCodeLine{\{}
+\DoxyCodeLine{\ \ \mbox{\hyperlink{class_catch_1_1_session}{Catch::Session}}\ \mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}};\ \textcolor{comment}{//\ There\ must\ be\ exactly\ one\ instance}}
+\DoxyCodeLine{\ }
+\DoxyCodeLine{\ \ \textcolor{comment}{//\ writing\ to\ session.configData()\ here\ sets\ defaults}}
+\DoxyCodeLine{\ \ \textcolor{comment}{//\ this\ is\ the\ preferred\ way\ to\ set\ them}}
+\DoxyCodeLine{\ \ \ \ }
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{int}\ returnCode\ =\ \mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}}.\mbox{\hyperlink{class_catch_1_1_session_af890db02c69e36356ac9f8be4084c464}{applyCommandLine}}(\ argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}\ );}
+\DoxyCodeLine{\ \ \textcolor{keywordflow}{if}(\ returnCode\ !=\ 0\ )\ \textcolor{comment}{//\ Indicates\ a\ command\ line\ error}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ returnCode;}
+\DoxyCodeLine{\ }
+\DoxyCodeLine{\ \ \textcolor{comment}{//\ writing\ to\ session.configData()\ or\ session.Config()\ here\ }}
+\DoxyCodeLine{\ \ \textcolor{comment}{//\ overrides\ command\ line\ args}}
+\DoxyCodeLine{\ \ \textcolor{comment}{//\ only\ do\ this\ if\ you\ know\ you\ need\ to}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{int}\ numFailed\ =\ \mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}}.run();}
+\DoxyCodeLine{\ \ }
+\DoxyCodeLine{\ \ \textcolor{comment}{//\ numFailed\ is\ clamped\ to\ 255\ as\ some\ unices\ only\ use\ the\ lower\ 8\ bits.}}
+\DoxyCodeLine{\ \ \textcolor{comment}{//\ This\ clamping\ has\ already\ been\ applied,\ so\ just\ return\ it\ here}}
+\DoxyCodeLine{\ \ \textcolor{comment}{//\ You\ can\ also\ do\ any\ post\ run\ clean-\/up\ here}}
+\DoxyCodeLine{\ \ \textcolor{keywordflow}{return}\ numFailed;}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+Take a look at the definitions of Config and Config\+Data to see what you can do with them.
+
+To take full control of the config simply omit the call to {\ttfamily apply\+Command\+Line()}.
+
+\doxysubsection*{Adding your own command line options}
+
+\doxylink{namespace_catch}{Catch} embeds a powerful command line parser called \href{https://github.com/philsquared/Clara}{\texttt{ Clara}}. As of Catch2 (and Clara 1.\+0) Clara allows you to write {\itshape composable} option and argument parsers, so extending \doxylink{namespace_catch}{Catch}\textquotesingle{}s own command line options is now easy.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ ++}
+\DoxyCodeLine{\textcolor{preprocessor}{\#define\ CATCH\_CONFIG\_RUNNER}}
+\DoxyCodeLine{\textcolor{preprocessor}{\#include\ "{}catch.hpp"{}}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keywordtype}{int}\ \mbox{\hyperlink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}(\ \textcolor{keywordtype}{int}\ argc,\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[]\ )}
+\DoxyCodeLine{\{}
+\DoxyCodeLine{\ \ \mbox{\hyperlink{class_catch_1_1_session}{Catch::Session}}\ \mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}};\ \textcolor{comment}{//\ There\ must\ be\ exactly\ one\ instance}}
+\DoxyCodeLine{\ \ }
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{int}\ height\ =\ 0;\ \textcolor{comment}{//\ Some\ user\ variable\ you\ want\ to\ be\ able\ to\ set}}
+\DoxyCodeLine{\ \ }
+\DoxyCodeLine{\ \ \textcolor{comment}{//\ Build\ a\ new\ parser\ on\ top\ of\ Catch's}}
+\DoxyCodeLine{\ \ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespace_catch_1_1clara}{Catch::clara}};}
+\DoxyCodeLine{\ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{xbyak__mnemonic_8h_a4229a9b84f8b8673326f12bd41acd27c}{cli}}\ }
+\DoxyCodeLine{\ \ \ \ =\ \mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}}.cli()\ \textcolor{comment}{//\ Get\ Catch's\ composite\ command\ line\ parser}}
+\DoxyCodeLine{\ \ \ \ |\ \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_opt}{Opt}}(\ height,\ \textcolor{stringliteral}{"{}height"{}}\ )\ \textcolor{comment}{//\ bind\ variable\ to\ a\ new\ option,\ with\ a\ hint\ string}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ [\textcolor{stringliteral}{"{}-\/g"{}}][\textcolor{stringliteral}{"{}-\/-\/height"{}}]\ \ \ \ \textcolor{comment}{//\ the\ option\ names\ it\ will\ respond\ to}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}how\ high?"{}});\ \ \ \ \ \ \ \ \textcolor{comment}{//\ description\ string\ for\ the\ help\ output}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\ \ \textcolor{comment}{//\ Now\ pass\ the\ new\ composite\ back\ to\ Catch\ so\ it\ uses\ that}}
+\DoxyCodeLine{\ \ \mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}}.cli(\ \mbox{\hyperlink{xbyak__mnemonic_8h_a4229a9b84f8b8673326f12bd41acd27c}{cli}}\ );\ }
+\DoxyCodeLine{\ \ }
+\DoxyCodeLine{\ \ \textcolor{comment}{//\ Let\ Catch\ (using\ Clara)\ parse\ the\ command\ line}}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{int}\ returnCode\ =\ \mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}}.applyCommandLine(\ argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}\ );}
+\DoxyCodeLine{\ \ \textcolor{keywordflow}{if}(\ returnCode\ !=\ 0\ )\ \textcolor{comment}{//\ Indicates\ a\ command\ line\ error}}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keywordflow}{return}\ returnCode;}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \textcolor{comment}{//\ if\ set\ on\ the\ command\ line\ then\ 'height'\ is\ now\ set\ at\ this\ point}}
+\DoxyCodeLine{\ \ \textcolor{keywordflow}{if}(\ height\ >\ 0\ )}
+\DoxyCodeLine{\ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}height:\ "{}}\ <<\ height\ <<\ std::endl;}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}}.run();}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+See the \href{https://github.com/philsquared/Clara/blob/master/README.md}{\texttt{ Clara documentation}} for more details.
+
+\doxysubsection*{Version detection}
+
+\doxylink{namespace_catch}{Catch} provides a triplet of macros providing the header\textquotesingle{}s version,
+
+
+\begin{DoxyItemize}
+\item {\ttfamily CATCH\+\_\+\+VERSION\+\_\+\+MAJOR}
+\item {\ttfamily CATCH\+\_\+\+VERSION\+\_\+\+MINOR}
+\item {\ttfamily CATCH\+\_\+\+VERSION\+\_\+\+PATCH}
+\end{DoxyItemize}
+
+these macros expand into a single number, that corresponds to the appropriate part of the version. As an example, given single header version v2.\+3.\+4, the macros would expand into {\ttfamily 2}, {\ttfamily 3}, and {\ttfamily 4} respectively.
+
+\DoxyHorRuler{0}
+
+
+\href{Readme.md\#top}{\texttt{ Home}} 

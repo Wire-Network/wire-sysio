@@ -1,0 +1,280 @@
+\doxysection{Rapid\+JSON configuration}
+\hypertarget{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g}{}\label{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g}\index{RapidJSON configuration@{RapidJSON configuration}}
+
+
+Configuration macros for library features.  
+
+
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_ga860570d04d489be08b9835d2ec58bac5}{RAPIDJSON\+\_\+\+ALLOCATOR\+\_\+\+DEFAULT\+\_\+\+CHUNK\+\_\+\+CAPACITY}}~(64 \texorpdfstring{$\ast$}{*} 1024)
+\begin{DoxyCompactList}\small\item\em User-\/defined k\+Default\+Chunk\+Capacity definition. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gaf1ff1685be6cbebb5d4b2ab997776f45}{RAPIDJSON\+\_\+\+MAJOR\+\_\+\+VERSION}}~1
+\begin{DoxyCompactList}\small\item\em Major version of Rapid\+JSON in integer. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gaf9125105c593a636a79f1c2d96835376}{RAPIDJSON\+\_\+\+MINOR\+\_\+\+VERSION}}~1
+\begin{DoxyCompactList}\small\item\em Minor version of Rapid\+JSON in integer. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gaf967d31be43666ce7f53756d73bd1cdf}{RAPIDJSON\+\_\+\+PATCH\+\_\+\+VERSION}}~0
+\begin{DoxyCompactList}\small\item\em Patch version of Rapid\+JSON in integer. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gad283cfde97d9a32b7d8e8107b11f70a6}{RAPIDJSON\+\_\+\+VERSION\+\_\+\+STRING}}~    RAPIDJSON\+\_\+\+STRINGIFY(\mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gaf967d31be43666ce7f53756d73bd1cdf}{RAPIDJSON\+\_\+\+MAJOR\+\_\+\+VERSION.\+RAPIDJSON\+\_\+\+MINOR\+\_\+\+VERSION.\+RAPIDJSON\+\_\+\+PATCH\+\_\+\+VERSION}})
+\begin{DoxyCompactList}\small\item\em Version of Rapid\+JSON in "{}$<$major$>$.$<$minor$>$.$<$patch$>$"{} string format. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_ga743a79d3af927391fe3eb5c979136899}{RAPIDJSON\+\_\+\+NAMESPACE}}~rapidjson
+\begin{DoxyCompactList}\small\item\em provide custom rapidjson namespace \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gad3806c8251fdc7da9618b7e922674ffc}{RAPIDJSON\+\_\+\+NAMESPACE\+\_\+\+BEGIN}}~namespace \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_ga743a79d3af927391fe3eb5c979136899}{RAPIDJSON\+\_\+\+NAMESPACE}} \{
+\begin{DoxyCompactList}\small\item\em provide custom rapidjson namespace (opening expression) \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gaf18f052a98b9f5df5448d39484b743c1}{RAPIDJSON\+\_\+\+NAMESPACE\+\_\+\+END}}~\}
+\begin{DoxyCompactList}\small\item\em provide custom rapidjson namespace (closing expression) \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_ga2f2eef0ee4477f3fe5874703a66e997f}{RAPIDJSON\+\_\+\+HAS\+\_\+\+STDSTRING}}
+\begin{DoxyCompactList}\small\item\em Enable Rapid\+JSON support for {\ttfamily std\+::string}. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_ga583915242504c7fdb36e826f02f76242}{RAPIDJSON\+\_\+\+ALIGN}}(x)
+\begin{DoxyCompactList}\small\item\em \doxylink{struct_data}{Data} alignment of the machine. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_ga93fb983f78208d12c822376e1ea6d185}{RAPIDJSON\+\_\+48\+BITPOINTER\+\_\+\+OPTIMIZATION}}~0
+\begin{DoxyCompactList}\small\item\em Use only lower 48-\/bit address for some pointers. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\+\_\+\+ASSERT}}(x)
+\begin{DoxyCompactList}\small\item\em Assertion. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_ga5dc14176a9e71ace282404b0bcda57a1}{RAPIDJSON\+\_\+\+LIKELY}}(x)
+\begin{DoxyCompactList}\small\item\em Compiler branching hint for expression with high probability to be true. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_ga6a2b1695c13e77ae425e3cbac980ccb5}{RAPIDJSON\+\_\+\+UNLIKELY}}(x)
+\begin{DoxyCompactList}\small\item\em Compiler branching hint for expression with low probability to be true. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_ga2b2a0d9143aa4fb31205a85b34c43952}{RAPIDJSON\+\_\+\+NOEXCEPT\+\_\+\+ASSERT}}(x)
+\begin{DoxyCompactList}\small\item\em Assertion (in non-\/throwing contexts). \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Some Rapid\+JSON features are configurable to adapt the library to a wide variety of platforms, environments and usage scenarios. Most of the features can be configured in terms of overridden or predefined preprocessor macros at compile-\/time.
+
+Some additional customization is available in the \doxylink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s}{Rapid\+JSON error handling} APIs.
+
+\begin{DoxyNote}{Note}
+These macros should be given on the compiler command-\/line (where applicable) to avoid inconsistent values when compiling different translation units of a single application. 
+\end{DoxyNote}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_ga93fb983f78208d12c822376e1ea6d185}\index{RapidJSON configuration@{RapidJSON configuration}!RAPIDJSON\_48BITPOINTER\_OPTIMIZATION@{RAPIDJSON\_48BITPOINTER\_OPTIMIZATION}}
+\index{RAPIDJSON\_48BITPOINTER\_OPTIMIZATION@{RAPIDJSON\_48BITPOINTER\_OPTIMIZATION}!RapidJSON configuration@{RapidJSON configuration}}
+\doxysubsubsection{\texorpdfstring{RAPIDJSON\_48BITPOINTER\_OPTIMIZATION}{RAPIDJSON\_48BITPOINTER\_OPTIMIZATION}}
+{\footnotesize\ttfamily \label{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_ga93fb983f78208d12c822376e1ea6d185} 
+\#define RAPIDJSON\+\_\+48\+BITPOINTER\+\_\+\+OPTIMIZATION~0}
+
+This optimization uses the fact that current X86-\/64 architecture only implement lower 48-\/bit virtual address. The higher 16-\/bit can be used for storing other data. {\ttfamily \doxylink{class_generic_value}{Generic\+Value}} uses this optimization to reduce its size form 24 bytes to 16 bytes in 64-\/bit architecture. 
+
+Definition at line \mbox{\hyperlink{rapidjson_8h_source_l00307}{307}} of file \mbox{\hyperlink{rapidjson_8h_source}{rapidjson.\+h}}.
+
+\Hypertarget{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_ga583915242504c7fdb36e826f02f76242}\index{RapidJSON configuration@{RapidJSON configuration}!RAPIDJSON\_ALIGN@{RAPIDJSON\_ALIGN}}
+\index{RAPIDJSON\_ALIGN@{RAPIDJSON\_ALIGN}!RapidJSON configuration@{RapidJSON configuration}}
+\doxysubsubsection{\texorpdfstring{RAPIDJSON\_ALIGN}{RAPIDJSON\_ALIGN}}
+{\footnotesize\ttfamily \label{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_ga583915242504c7fdb36e826f02f76242} 
+\#define RAPIDJSON\+\_\+\+ALIGN(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(((x)\ +\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(7u))\ \&\ \string~static\_cast<size\_t>(7u))}
+
+\end{DoxyCode}
+
+\begin{DoxyParams}{Parameters}
+{\em x} & pointer to align\\
+\hline
+\end{DoxyParams}
+Some machines require strict data alignment. The default is 8 bytes. User can customize by defining the RAPIDJSON\+\_\+\+ALIGN function macro. 
+
+Definition at line \mbox{\hyperlink{rapidjson_8h_source_l00276}{276}} of file \mbox{\hyperlink{rapidjson_8h_source}{rapidjson.\+h}}.
+
+\Hypertarget{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_ga860570d04d489be08b9835d2ec58bac5}\index{RapidJSON configuration@{RapidJSON configuration}!RAPIDJSON\_ALLOCATOR\_DEFAULT\_CHUNK\_CAPACITY@{RAPIDJSON\_ALLOCATOR\_DEFAULT\_CHUNK\_CAPACITY}}
+\index{RAPIDJSON\_ALLOCATOR\_DEFAULT\_CHUNK\_CAPACITY@{RAPIDJSON\_ALLOCATOR\_DEFAULT\_CHUNK\_CAPACITY}!RapidJSON configuration@{RapidJSON configuration}}
+\doxysubsubsection{\texorpdfstring{RAPIDJSON\_ALLOCATOR\_DEFAULT\_CHUNK\_CAPACITY}{RAPIDJSON\_ALLOCATOR\_DEFAULT\_CHUNK\_CAPACITY}}
+{\footnotesize\ttfamily \label{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_ga860570d04d489be08b9835d2ec58bac5} 
+\#define RAPIDJSON\+\_\+\+ALLOCATOR\+\_\+\+DEFAULT\+\_\+\+CHUNK\+\_\+\+CAPACITY~(64 \texorpdfstring{$\ast$}{*} 1024)}
+
+User can define this as any {\ttfamily size} that is a power of 2. 
+
+Definition at line \mbox{\hyperlink{allocators_8h_source_l00064}{64}} of file \mbox{\hyperlink{allocators_8h_source}{allocators.\+h}}.
+
+\Hypertarget{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}\index{RapidJSON configuration@{RapidJSON configuration}!RAPIDJSON\_ASSERT@{RAPIDJSON\_ASSERT}}
+\index{RAPIDJSON\_ASSERT@{RAPIDJSON\_ASSERT}!RapidJSON configuration@{RapidJSON configuration}}
+\doxysubsubsection{\texorpdfstring{RAPIDJSON\_ASSERT}{RAPIDJSON\_ASSERT}}
+{\footnotesize\ttfamily \label{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c} 
+\#define RAPIDJSON\+\_\+\+ASSERT(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assert(x)}
+
+\end{DoxyCode}
+By default, rapidjson uses C {\ttfamily assert()} for internal assertions. User can override it by defining \doxylink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\+\_\+\+ASSERT(x)} macro.
+
+\begin{DoxyNote}{Note}
+Parsing errors are handled and can be customized by the \doxylink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s}{Rapid\+JSON error handling} APIs. 
+\end{DoxyNote}
+
+
+Definition at line \mbox{\hyperlink{rapidjson_8h_source_l00406}{406}} of file \mbox{\hyperlink{rapidjson_8h_source}{rapidjson.\+h}}.
+
+\Hypertarget{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_ga2f2eef0ee4477f3fe5874703a66e997f}\index{RapidJSON configuration@{RapidJSON configuration}!RAPIDJSON\_HAS\_STDSTRING@{RAPIDJSON\_HAS\_STDSTRING}}
+\index{RAPIDJSON\_HAS\_STDSTRING@{RAPIDJSON\_HAS\_STDSTRING}!RapidJSON configuration@{RapidJSON configuration}}
+\doxysubsubsection{\texorpdfstring{RAPIDJSON\_HAS\_STDSTRING}{RAPIDJSON\_HAS\_STDSTRING}}
+{\footnotesize\ttfamily \label{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_ga2f2eef0ee4477f3fe5874703a66e997f} 
+\#define RAPIDJSON\+\_\+\+HAS\+\_\+\+STDSTRING}
+
+By defining this preprocessor symbol to {\ttfamily 1}, several convenience functions for using rapidjson\+::\+Generic\+Value with {\ttfamily std\+::string} are enabled, especially for construction and comparison. 
+
+Definition at line \mbox{\hyperlink{rapidjson_8h_source_l00134}{134}} of file \mbox{\hyperlink{rapidjson_8h_source}{rapidjson.\+h}}.
+
+\Hypertarget{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_ga5dc14176a9e71ace282404b0bcda57a1}\index{RapidJSON configuration@{RapidJSON configuration}!RAPIDJSON\_LIKELY@{RAPIDJSON\_LIKELY}}
+\index{RAPIDJSON\_LIKELY@{RAPIDJSON\_LIKELY}!RapidJSON configuration@{RapidJSON configuration}}
+\doxysubsubsection{\texorpdfstring{RAPIDJSON\_LIKELY}{RAPIDJSON\_LIKELY}}
+{\footnotesize\ttfamily \label{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_ga5dc14176a9e71ace282404b0bcda57a1} 
+\#define RAPIDJSON\+\_\+\+LIKELY(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(x)}
+
+\end{DoxyCode}
+
+\begin{DoxyParams}{Parameters}
+{\em x} & Boolean expression likely to be true. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{rapidjson_8h_source_l00463}{463}} of file \mbox{\hyperlink{rapidjson_8h_source}{rapidjson.\+h}}.
+
+\Hypertarget{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gaf1ff1685be6cbebb5d4b2ab997776f45}\index{RapidJSON configuration@{RapidJSON configuration}!RAPIDJSON\_MAJOR\_VERSION@{RAPIDJSON\_MAJOR\_VERSION}}
+\index{RAPIDJSON\_MAJOR\_VERSION@{RAPIDJSON\_MAJOR\_VERSION}!RapidJSON configuration@{RapidJSON configuration}}
+\doxysubsubsection{\texorpdfstring{RAPIDJSON\_MAJOR\_VERSION}{RAPIDJSON\_MAJOR\_VERSION}}
+{\footnotesize\ttfamily \label{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gaf1ff1685be6cbebb5d4b2ab997776f45} 
+\#define RAPIDJSON\+\_\+\+MAJOR\+\_\+\+VERSION~1}
+
+
+
+Definition at line \mbox{\hyperlink{rapidjson_8h_source_l00075}{75}} of file \mbox{\hyperlink{rapidjson_8h_source}{rapidjson.\+h}}.
+
+\Hypertarget{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gaf9125105c593a636a79f1c2d96835376}\index{RapidJSON configuration@{RapidJSON configuration}!RAPIDJSON\_MINOR\_VERSION@{RAPIDJSON\_MINOR\_VERSION}}
+\index{RAPIDJSON\_MINOR\_VERSION@{RAPIDJSON\_MINOR\_VERSION}!RapidJSON configuration@{RapidJSON configuration}}
+\doxysubsubsection{\texorpdfstring{RAPIDJSON\_MINOR\_VERSION}{RAPIDJSON\_MINOR\_VERSION}}
+{\footnotesize\ttfamily \label{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gaf9125105c593a636a79f1c2d96835376} 
+\#define RAPIDJSON\+\_\+\+MINOR\+\_\+\+VERSION~1}
+
+
+
+Definition at line \mbox{\hyperlink{rapidjson_8h_source_l00076}{76}} of file \mbox{\hyperlink{rapidjson_8h_source}{rapidjson.\+h}}.
+
+\Hypertarget{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_ga743a79d3af927391fe3eb5c979136899}\index{RapidJSON configuration@{RapidJSON configuration}!RAPIDJSON\_NAMESPACE@{RAPIDJSON\_NAMESPACE}}
+\index{RAPIDJSON\_NAMESPACE@{RAPIDJSON\_NAMESPACE}!RapidJSON configuration@{RapidJSON configuration}}
+\doxysubsubsection{\texorpdfstring{RAPIDJSON\_NAMESPACE}{RAPIDJSON\_NAMESPACE}}
+{\footnotesize\ttfamily \label{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_ga743a79d3af927391fe3eb5c979136899} 
+\#define RAPIDJSON\+\_\+\+NAMESPACE~rapidjson}
+
+In order to avoid symbol clashes and/or "{}\+One Definition Rule"{} errors between multiple inclusions of (different versions of) Rapid\+JSON in a single binary, users can customize the name of the main Rapid\+JSON namespace.
+
+In case of a single nesting level, defining {\ttfamily RAPIDJSON\+\_\+\+NAMESPACE} to a custom name (e.\+g. {\ttfamily My\+Rapid\+JSON}) is sufficient. If multiple levels are needed, both \doxylink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gad3806c8251fdc7da9618b7e922674ffc}{RAPIDJSON\+\_\+\+NAMESPACE\+\_\+\+BEGIN} and \doxylink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gaf18f052a98b9f5df5448d39484b743c1}{RAPIDJSON\+\_\+\+NAMESPACE\+\_\+\+END} need to be defined as well\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{comment}{//\ in\ some\ .cpp\ file}}
+\DoxyCodeLine{\textcolor{preprocessor}{\#define\ RAPIDJSON\_NAMESPACE\ my::rapidjson}}
+\DoxyCodeLine{\textcolor{preprocessor}{\#define\ RAPIDJSON\_NAMESPACE\_BEGIN\ namespace\ my\ \{\ namespace\ rapidjson\ \{}}
+\DoxyCodeLine{\textcolor{preprocessor}{\#define\ RAPIDJSON\_NAMESPACE\_END\ \ \ \}\ \}}}
+\DoxyCodeLine{\textcolor{preprocessor}{\#include\ "{}rapidjson/..."{}}}
+
+\end{DoxyCode}
+
+
+\begin{DoxySeeAlso}{See also}
+\doxylink{namespacerapidjson}{rapidjson} 
+\end{DoxySeeAlso}
+
+
+Definition at line \mbox{\hyperlink{rapidjson_8h_source_l00118}{118}} of file \mbox{\hyperlink{rapidjson_8h_source}{rapidjson.\+h}}.
+
+\Hypertarget{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gad3806c8251fdc7da9618b7e922674ffc}\index{RapidJSON configuration@{RapidJSON configuration}!RAPIDJSON\_NAMESPACE\_BEGIN@{RAPIDJSON\_NAMESPACE\_BEGIN}}
+\index{RAPIDJSON\_NAMESPACE\_BEGIN@{RAPIDJSON\_NAMESPACE\_BEGIN}!RapidJSON configuration@{RapidJSON configuration}}
+\doxysubsubsection{\texorpdfstring{RAPIDJSON\_NAMESPACE\_BEGIN}{RAPIDJSON\_NAMESPACE\_BEGIN}}
+{\footnotesize\ttfamily \label{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gad3806c8251fdc7da9618b7e922674ffc} 
+\#define RAPIDJSON\+\_\+\+NAMESPACE\+\_\+\+BEGIN~namespace \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_ga743a79d3af927391fe3eb5c979136899}{RAPIDJSON\+\_\+\+NAMESPACE}} \{}
+
+\begin{DoxySeeAlso}{See also}
+\doxylink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_ga743a79d3af927391fe3eb5c979136899}{RAPIDJSON\+\_\+\+NAMESPACE} 
+\end{DoxySeeAlso}
+
+
+Definition at line \mbox{\hyperlink{rapidjson_8h_source_l00121}{121}} of file \mbox{\hyperlink{rapidjson_8h_source}{rapidjson.\+h}}.
+
+\Hypertarget{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gaf18f052a98b9f5df5448d39484b743c1}\index{RapidJSON configuration@{RapidJSON configuration}!RAPIDJSON\_NAMESPACE\_END@{RAPIDJSON\_NAMESPACE\_END}}
+\index{RAPIDJSON\_NAMESPACE\_END@{RAPIDJSON\_NAMESPACE\_END}!RapidJSON configuration@{RapidJSON configuration}}
+\doxysubsubsection{\texorpdfstring{RAPIDJSON\_NAMESPACE\_END}{RAPIDJSON\_NAMESPACE\_END}}
+{\footnotesize\ttfamily \label{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gaf18f052a98b9f5df5448d39484b743c1} 
+\#define RAPIDJSON\+\_\+\+NAMESPACE\+\_\+\+END~\}}
+
+\begin{DoxySeeAlso}{See also}
+\doxylink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_ga743a79d3af927391fe3eb5c979136899}{RAPIDJSON\+\_\+\+NAMESPACE} 
+\end{DoxySeeAlso}
+
+
+Definition at line \mbox{\hyperlink{rapidjson_8h_source_l00124}{124}} of file \mbox{\hyperlink{rapidjson_8h_source}{rapidjson.\+h}}.
+
+\Hypertarget{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_ga2b2a0d9143aa4fb31205a85b34c43952}\index{RapidJSON configuration@{RapidJSON configuration}!RAPIDJSON\_NOEXCEPT\_ASSERT@{RAPIDJSON\_NOEXCEPT\_ASSERT}}
+\index{RAPIDJSON\_NOEXCEPT\_ASSERT@{RAPIDJSON\_NOEXCEPT\_ASSERT}!RapidJSON configuration@{RapidJSON configuration}}
+\doxysubsubsection{\texorpdfstring{RAPIDJSON\_NOEXCEPT\_ASSERT}{RAPIDJSON\_NOEXCEPT\_ASSERT}}
+{\footnotesize\ttfamily \label{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_ga2b2a0d9143aa4fb31205a85b34c43952} 
+\#define RAPIDJSON\+\_\+\+NOEXCEPT\+\_\+\+ASSERT(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(x)}
+
+\end{DoxyCode}
+Some functions provide a {\ttfamily noexcept} guarantee, if the compiler supports it. In these cases, the \doxylink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\+\_\+\+ASSERT} macro cannot be overridden to throw an exception. This macro adds a separate customization point for such cases.
+
+Defaults to C {\ttfamily assert()} (as \doxylink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\+\_\+\+ASSERT}), if {\ttfamily noexcept} is supported, and to \doxylink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\+\_\+\+ASSERT} otherwise. 
+
+Definition at line \mbox{\hyperlink{rapidjson_8h_source_l00618}{618}} of file \mbox{\hyperlink{rapidjson_8h_source}{rapidjson.\+h}}.
+
+\Hypertarget{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gaf967d31be43666ce7f53756d73bd1cdf}\index{RapidJSON configuration@{RapidJSON configuration}!RAPIDJSON\_PATCH\_VERSION@{RAPIDJSON\_PATCH\_VERSION}}
+\index{RAPIDJSON\_PATCH\_VERSION@{RAPIDJSON\_PATCH\_VERSION}!RapidJSON configuration@{RapidJSON configuration}}
+\doxysubsubsection{\texorpdfstring{RAPIDJSON\_PATCH\_VERSION}{RAPIDJSON\_PATCH\_VERSION}}
+{\footnotesize\ttfamily \label{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gaf967d31be43666ce7f53756d73bd1cdf} 
+\#define RAPIDJSON\+\_\+\+PATCH\+\_\+\+VERSION~0}
+
+
+
+Definition at line \mbox{\hyperlink{rapidjson_8h_source_l00077}{77}} of file \mbox{\hyperlink{rapidjson_8h_source}{rapidjson.\+h}}.
+
+\Hypertarget{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_ga6a2b1695c13e77ae425e3cbac980ccb5}\index{RapidJSON configuration@{RapidJSON configuration}!RAPIDJSON\_UNLIKELY@{RAPIDJSON\_UNLIKELY}}
+\index{RAPIDJSON\_UNLIKELY@{RAPIDJSON\_UNLIKELY}!RapidJSON configuration@{RapidJSON configuration}}
+\doxysubsubsection{\texorpdfstring{RAPIDJSON\_UNLIKELY}{RAPIDJSON\_UNLIKELY}}
+{\footnotesize\ttfamily \label{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_ga6a2b1695c13e77ae425e3cbac980ccb5} 
+\#define RAPIDJSON\+\_\+\+UNLIKELY(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(x)}
+
+\end{DoxyCode}
+
+\begin{DoxyParams}{Parameters}
+{\em x} & Boolean expression unlikely to be true. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{rapidjson_8h_source_l00476}{476}} of file \mbox{\hyperlink{rapidjson_8h_source}{rapidjson.\+h}}.
+
+\Hypertarget{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gad283cfde97d9a32b7d8e8107b11f70a6}\index{RapidJSON configuration@{RapidJSON configuration}!RAPIDJSON\_VERSION\_STRING@{RAPIDJSON\_VERSION\_STRING}}
+\index{RAPIDJSON\_VERSION\_STRING@{RAPIDJSON\_VERSION\_STRING}!RapidJSON configuration@{RapidJSON configuration}}
+\doxysubsubsection{\texorpdfstring{RAPIDJSON\_VERSION\_STRING}{RAPIDJSON\_VERSION\_STRING}}
+{\footnotesize\ttfamily \label{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gad283cfde97d9a32b7d8e8107b11f70a6} 
+\#define RAPIDJSON\+\_\+\+VERSION\+\_\+\+STRING~    RAPIDJSON\+\_\+\+STRINGIFY(\mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gaf967d31be43666ce7f53756d73bd1cdf}{RAPIDJSON\+\_\+\+MAJOR\+\_\+\+VERSION.\+RAPIDJSON\+\_\+\+MINOR\+\_\+\+VERSION.\+RAPIDJSON\+\_\+\+PATCH\+\_\+\+VERSION}})}
+
+
+
+Definition at line \mbox{\hyperlink{rapidjson_8h_source_l00078}{78}} of file \mbox{\hyperlink{rapidjson_8h_source}{rapidjson.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00078\ \textcolor{preprocessor}{\#define\ RAPIDJSON\_VERSION\_STRING\ \(\backslash\)}}
+\DoxyCodeLine{00079\ \textcolor{preprocessor}{\ \ \ \ RAPIDJSON\_STRINGIFY(RAPIDJSON\_MAJOR\_VERSION.RAPIDJSON\_MINOR\_VERSION.RAPIDJSON\_PATCH\_VERSION)}}
+
+\end{DoxyCode}

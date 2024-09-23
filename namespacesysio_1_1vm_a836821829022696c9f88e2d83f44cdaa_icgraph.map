@@ -1,0 +1,7 @@
+<map id="sysio::vm::bytes_needed" name="sysio::vm::bytes_needed">
+<area shape="rect" id="Node000001" title=" " alt="" coords="206,35,373,60"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1vm_1_1varint.html#ac70ac563f03dee80a0a4e8f94c5062bf" title=" " alt="" coords="5,5,158,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="190,36,158,32,158,26,190,31"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1vm_1_1varuint.html#aed48f6f2267b3634e8911c76b9c69e1b" title=" " alt="" coords="19,55,144,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="191,63,145,70,144,64,190,58"/>
+</map>

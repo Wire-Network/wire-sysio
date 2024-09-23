@@ -1,0 +1,165 @@
+\doxysection{Catch\+::Version Struct Reference}
+\hypertarget{struct_catch_1_1_version}{}\label{struct_catch_1_1_version}\index{Catch::Version@{Catch::Version}}
+
+
+{\ttfamily \#include $<$catch\+\_\+version.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_catch_1_1_version_af5b9719c18f99ed86d9250ad83673dee}{Version}} (\mbox{\hyperlink{struct_catch_1_1_version}{Version}} const \&)=delete
+\item 
+\mbox{\hyperlink{struct_catch_1_1_version}{Version}} \& \mbox{\hyperlink{struct_catch_1_1_version_a4379119bb74879da3b92c71d980c6c87}{operator=}} (\mbox{\hyperlink{struct_catch_1_1_version}{Version}} const \&)=delete
+\item 
+\mbox{\hyperlink{struct_catch_1_1_version_a1c80c2102662b49dce9b930662f2a95c}{Version}} (unsigned int \+\_\+major\+Version, unsigned int \+\_\+minor\+Version, unsigned int \+\_\+patch\+Number, char const \texorpdfstring{$\ast$}{*}const \+\_\+branch\+Name, unsigned int \+\_\+build\+Number)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+unsigned int const \mbox{\hyperlink{struct_catch_1_1_version_a67d30e6cb9fdde34a3fc235043cd9c63}{major\+Version}}
+\item 
+unsigned int const \mbox{\hyperlink{struct_catch_1_1_version_a4993a9a98abd56991b9dad629b6783f1}{minor\+Version}}
+\item 
+unsigned int const \mbox{\hyperlink{struct_catch_1_1_version_a8bf08299323524985da5c1a0722464e0}{patch\+Number}}
+\item 
+char const  \texorpdfstring{$\ast$}{*}const \mbox{\hyperlink{struct_catch_1_1_version_a27f53638ae6af8cd9b5aba3cc2dca11f}{branch\+Name}}
+\item 
+unsigned int const \mbox{\hyperlink{struct_catch_1_1_version_a15facd4f9ac18f5ff2540bc798885c39}{build\+Number}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+std\+::ostream \& \mbox{\hyperlink{struct_catch_1_1_version_a6730b4be4f5fa640b39de13d8ffe1dce}{operator$<$$<$}} (std\+::ostream \&os, \mbox{\hyperlink{struct_catch_1_1_version}{Version}} const \&version)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{catch__version_8h_source_l00016}{16}} of file \mbox{\hyperlink{catch__version_8h_source}{catch\+\_\+version.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{struct_catch_1_1_version_af5b9719c18f99ed86d9250ad83673dee}\index{Catch::Version@{Catch::Version}!Version@{Version}}
+\index{Version@{Version}!Catch::Version@{Catch::Version}}
+\doxysubsubsection{\texorpdfstring{Version()}{Version()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_version_af5b9719c18f99ed86d9250ad83673dee} 
+Catch\+::\+Version\+::\+Version (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_version}{Version}} const \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [delete]}}
+
+\Hypertarget{struct_catch_1_1_version_a1c80c2102662b49dce9b930662f2a95c}\index{Catch::Version@{Catch::Version}!Version@{Version}}
+\index{Version@{Version}!Catch::Version@{Catch::Version}}
+\doxysubsubsection{\texorpdfstring{Version()}{Version()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_version_a1c80c2102662b49dce9b930662f2a95c} 
+Catch\+::\+Version\+::\+Version (\begin{DoxyParamCaption}\item[{unsigned int}]{\+\_\+major\+Version}{, }\item[{unsigned int}]{\+\_\+minor\+Version}{, }\item[{unsigned int}]{\+\_\+patch\+Number}{, }\item[{char const \texorpdfstring{$\ast$}{*}const}]{\+\_\+branch\+Name}{, }\item[{unsigned int}]{\+\_\+build\+Number}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__version_8cpp_source_l00014}{14}} of file \mbox{\hyperlink{catch__version_8cpp_source}{catch\+\_\+version.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00020\ \ \ \ \ :\ \ \ \mbox{\hyperlink{struct_catch_1_1_version_a67d30e6cb9fdde34a3fc235043cd9c63}{majorVersion}}(\ \_majorVersion\ ),}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_version_a4993a9a98abd56991b9dad629b6783f1}{minorVersion}}(\ \_minorVersion\ ),}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_version_a8bf08299323524985da5c1a0722464e0}{patchNumber}}(\ \_patchNumber\ ),}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_version_a27f53638ae6af8cd9b5aba3cc2dca11f}{branchName}}(\ \_branchName\ ),}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_version_a15facd4f9ac18f5ff2540bc798885c39}{buildNumber}}(\ \_buildNumber\ )}
+\DoxyCodeLine{00025\ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_catch_1_1_version_a4379119bb74879da3b92c71d980c6c87}\index{Catch::Version@{Catch::Version}!operator=@{operator=}}
+\index{operator=@{operator=}!Catch::Version@{Catch::Version}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_version_a4379119bb74879da3b92c71d980c6c87} 
+\mbox{\hyperlink{struct_catch_1_1_version}{Version}} \& Catch\+::\+Version\+::operator= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_version}{Version}} const \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [delete]}}
+
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{struct_catch_1_1_version_a6730b4be4f5fa640b39de13d8ffe1dce}\index{Catch::Version@{Catch::Version}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!Catch::Version@{Catch::Version}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$}{operator<<}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_version_a6730b4be4f5fa640b39de13d8ffe1dce} 
+std\+::ostream \& operator$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{os}{, }\item[{\mbox{\hyperlink{struct_catch_1_1_version}{Version}} const \&}]{version}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__version_8cpp_source_l00027}{27}} of file \mbox{\hyperlink{catch__version_8cpp_source}{catch\+\_\+version.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ os\ \ <<\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1state_a12f378e0c6dbf373781e7988ee4a0853a08c88a938bc459c7997b48f74248752f}{version}}.majorVersion\ <<\ \textcolor{charliteral}{'.'}}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1state_a12f378e0c6dbf373781e7988ee4a0853a08c88a938bc459c7997b48f74248752f}{version}}.minorVersion\ <<\ \textcolor{charliteral}{'.'}}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1state_a12f378e0c6dbf373781e7988ee4a0853a08c88a938bc459c7997b48f74248752f}{version}}.patchNumber;}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ branchName\ is\ never\ null\ -\/>\ 0th\ char\ is\ \(\backslash\)0\ if\ it\ is\ empty}}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1state_a12f378e0c6dbf373781e7988ee4a0853a08c88a938bc459c7997b48f74248752f}{version}}.branchName[0])\ \{}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{charliteral}{'-\/'}\ <<\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1state_a12f378e0c6dbf373781e7988ee4a0853a08c88a938bc459c7997b48f74248752f}{version}}.branchName}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{charliteral}{'.'}\ <<\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1state_a12f378e0c6dbf373781e7988ee4a0853a08c88a938bc459c7997b48f74248752f}{version}}.buildNumber;}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}};}
+\DoxyCodeLine{00037\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_catch_1_1_version_a27f53638ae6af8cd9b5aba3cc2dca11f}\index{Catch::Version@{Catch::Version}!branchName@{branchName}}
+\index{branchName@{branchName}!Catch::Version@{Catch::Version}}
+\doxysubsubsection{\texorpdfstring{branchName}{branchName}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_version_a27f53638ae6af8cd9b5aba3cc2dca11f} 
+char const\texorpdfstring{$\ast$}{*} const Catch\+::\+Version\+::branch\+Name}
+
+
+
+Definition at line \mbox{\hyperlink{catch__version_8h_source_l00030}{30}} of file \mbox{\hyperlink{catch__version_8h_source}{catch\+\_\+version.\+h}}.
+
+\Hypertarget{struct_catch_1_1_version_a15facd4f9ac18f5ff2540bc798885c39}\index{Catch::Version@{Catch::Version}!buildNumber@{buildNumber}}
+\index{buildNumber@{buildNumber}!Catch::Version@{Catch::Version}}
+\doxysubsubsection{\texorpdfstring{buildNumber}{buildNumber}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_version_a15facd4f9ac18f5ff2540bc798885c39} 
+unsigned int const Catch\+::\+Version\+::build\+Number}
+
+
+
+Definition at line \mbox{\hyperlink{catch__version_8h_source_l00031}{31}} of file \mbox{\hyperlink{catch__version_8h_source}{catch\+\_\+version.\+h}}.
+
+\Hypertarget{struct_catch_1_1_version_a67d30e6cb9fdde34a3fc235043cd9c63}\index{Catch::Version@{Catch::Version}!majorVersion@{majorVersion}}
+\index{majorVersion@{majorVersion}!Catch::Version@{Catch::Version}}
+\doxysubsubsection{\texorpdfstring{majorVersion}{majorVersion}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_version_a67d30e6cb9fdde34a3fc235043cd9c63} 
+unsigned int const Catch\+::\+Version\+::major\+Version}
+
+
+
+Definition at line \mbox{\hyperlink{catch__version_8h_source_l00025}{25}} of file \mbox{\hyperlink{catch__version_8h_source}{catch\+\_\+version.\+h}}.
+
+\Hypertarget{struct_catch_1_1_version_a4993a9a98abd56991b9dad629b6783f1}\index{Catch::Version@{Catch::Version}!minorVersion@{minorVersion}}
+\index{minorVersion@{minorVersion}!Catch::Version@{Catch::Version}}
+\doxysubsubsection{\texorpdfstring{minorVersion}{minorVersion}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_version_a4993a9a98abd56991b9dad629b6783f1} 
+unsigned int const Catch\+::\+Version\+::minor\+Version}
+
+
+
+Definition at line \mbox{\hyperlink{catch__version_8h_source_l00026}{26}} of file \mbox{\hyperlink{catch__version_8h_source}{catch\+\_\+version.\+h}}.
+
+\Hypertarget{struct_catch_1_1_version_a8bf08299323524985da5c1a0722464e0}\index{Catch::Version@{Catch::Version}!patchNumber@{patchNumber}}
+\index{patchNumber@{patchNumber}!Catch::Version@{Catch::Version}}
+\doxysubsubsection{\texorpdfstring{patchNumber}{patchNumber}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_version_a8bf08299323524985da5c1a0722464e0} 
+unsigned int const Catch\+::\+Version\+::patch\+Number}
+
+
+
+Definition at line \mbox{\hyperlink{catch__version_8h_source_l00027}{27}} of file \mbox{\hyperlink{catch__version_8h_source}{catch\+\_\+version.\+h}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__version_8h}{catch\+\_\+version.\+h}}\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__version_8cpp}{catch\+\_\+version.\+cpp}}\end{DoxyCompactItemize}

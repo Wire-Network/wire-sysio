@@ -1,0 +1,81 @@
+\doxysection{testing\+::internal\+::Ignore\+Result\+Action\texorpdfstring{$<$}{<} A \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classtesting_1_1internal_1_1_ignore_result_action}{}\label{classtesting_1_1internal_1_1_ignore_result_action}\index{testing::internal::IgnoreResultAction$<$ A $>$@{testing::internal::IgnoreResultAction$<$ A $>$}}
+
+
+{\ttfamily \#include $<$gmock-\/actions.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_ignore_result_action_a9199f7b1b7771b2e2a5fd28caf624623}{Ignore\+Result\+Action}} (const \mbox{\hyperlink{struct_a}{A}} \&\mbox{\hyperlink{structaction}{action}})
+\item 
+{\footnotesize template$<$typename F $>$ }\\\mbox{\hyperlink{classtesting_1_1internal_1_1_ignore_result_action_affb8b7439604c860e1416f45339c6e37}{operator Action$<$ F $>$}} () const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{struct_a}{A}}$>$\newline
+class testing\+::internal\+::\+Ignore\+Result\+Action$<$ A $>$}
+
+
+Definition at line \mbox{\hyperlink{gmock-actions_8h_source_l00941}{941}} of file \mbox{\hyperlink{gmock-actions_8h_source}{gmock-\/actions.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_ignore_result_action_a9199f7b1b7771b2e2a5fd28caf624623}\index{testing::internal::IgnoreResultAction$<$ A $>$@{testing::internal::IgnoreResultAction$<$ A $>$}!IgnoreResultAction@{IgnoreResultAction}}
+\index{IgnoreResultAction@{IgnoreResultAction}!testing::internal::IgnoreResultAction$<$ A $>$@{testing::internal::IgnoreResultAction$<$ A $>$}}
+\doxysubsubsection{\texorpdfstring{IgnoreResultAction()}{IgnoreResultAction()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_ignore_result_action_a9199f7b1b7771b2e2a5fd28caf624623} 
+template$<$typename \mbox{\hyperlink{struct_a}{A}} $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_ignore_result_action}{testing\+::internal\+::\+Ignore\+Result\+Action}}$<$ \mbox{\hyperlink{struct_a}{A}} $>$\+::\+Ignore\+Result\+Action (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct_a}{A}} \&}]{action}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-actions_8h_source_l00943}{943}} of file \mbox{\hyperlink{gmock-actions_8h_source}{gmock-\/actions.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00943\ :\ action\_(\mbox{\hyperlink{structaction}{action}})\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_ignore_result_action_affb8b7439604c860e1416f45339c6e37}\index{testing::internal::IgnoreResultAction$<$ A $>$@{testing::internal::IgnoreResultAction$<$ A $>$}!operator Action$<$ F $>$@{operator Action$<$ F $>$}}
+\index{operator Action$<$ F $>$@{operator Action$<$ F $>$}!testing::internal::IgnoreResultAction$<$ A $>$@{testing::internal::IgnoreResultAction$<$ A $>$}}
+\doxysubsubsection{\texorpdfstring{operator Action$<$ F $>$()}{operator Action< F >()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_ignore_result_action_affb8b7439604c860e1416f45339c6e37} 
+template$<$typename \mbox{\hyperlink{struct_a}{A}} $>$ \\
+template$<$typename F $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_ignore_result_action}{testing\+::internal\+::\+Ignore\+Result\+Action}}$<$ \mbox{\hyperlink{struct_a}{A}} $>$\+::operator \mbox{\hyperlink{classtesting_1_1_action}{Action}}$<$ F $>$ (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-actions_8h_source_l00946}{946}} of file \mbox{\hyperlink{gmock-actions_8h_source}{gmock-\/actions.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00946\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00947\ \ \ \ \ \textcolor{comment}{//\ Assert\ statement\ belongs\ here\ because\ this\ is\ the\ best\ place\ to\ verify}}
+\DoxyCodeLine{00948\ \ \ \ \ \textcolor{comment}{//\ conditions\ on\ F.\ It\ produces\ the\ clearest\ error\ messages}}
+\DoxyCodeLine{00949\ \ \ \ \ \textcolor{comment}{//\ in\ most\ compilers.}}
+\DoxyCodeLine{00950\ \ \ \ \ \textcolor{comment}{//\ Impl\ really\ belongs\ in\ this\ scope\ as\ a\ local\ class\ but\ can't}}
+\DoxyCodeLine{00951\ \ \ \ \ \textcolor{comment}{//\ because\ MSVC\ produces\ duplicate\ symbols\ in\ different\ translation\ units}}
+\DoxyCodeLine{00952\ \ \ \ \ \textcolor{comment}{//\ in\ this\ case.\ Until\ MS\ fixes\ that\ bug\ we\ put\ Impl\ into\ the\ class\ scope}}
+\DoxyCodeLine{00953\ \ \ \ \ \textcolor{comment}{//\ and\ put\ the\ typedef\ both\ here\ (for\ use\ in\ assert\ statement)\ and}}
+\DoxyCodeLine{00954\ \ \ \ \ \textcolor{comment}{//\ in\ the\ Impl\ class.\ But\ both\ definitions\ must\ be\ the\ same.}}
+\DoxyCodeLine{00955\ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{typename}\ internal::Function<F>::Result\ Result;}
+\DoxyCodeLine{00956\ }
+\DoxyCodeLine{00957\ \ \ \ \ \textcolor{comment}{//\ Asserts\ at\ compile\ time\ that\ F\ returns\ void.}}
+\DoxyCodeLine{00958\ \ \ \ \ CompileAssertTypesEqual<void,\ Result>();}
+\DoxyCodeLine{00959\ }
+\DoxyCodeLine{00960\ \ \ \ \ \textcolor{keywordflow}{return}\ Action<F>(\textcolor{keyword}{new}\ Impl<F>(action\_));}
+\DoxyCodeLine{00961\ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/include/gmock/\mbox{\hyperlink{gmock-actions_8h}{gmock-\/actions.\+h}}\end{DoxyCompactItemize}

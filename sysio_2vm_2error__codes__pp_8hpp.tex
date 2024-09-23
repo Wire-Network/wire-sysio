@@ -1,0 +1,226 @@
+\doxysection{libraries/sys-\/vm/include/sysio/sysio/vm/error\+\_\+codes\+\_\+pp.hpp File Reference}
+\hypertarget{sysio_2vm_2error__codes__pp_8hpp}{}\label{sysio_2vm_2error__codes__pp_8hpp}\index{libraries/sys-\/vm/include/sysio/sysio/vm/error\_codes\_pp.hpp@{libraries/sys-\/vm/include/sysio/sysio/vm/error\_codes\_pp.hpp}}
+{\ttfamily \#include $<$sysio/vm/config.\+hpp$>$}\newline
+{\ttfamily \#include $<$string$>$}\newline
+{\ttfamily \#include $<$system\+\_\+error$>$}\newline
+{\ttfamily \#include $<$type\+\_\+traits$>$}\newline
+Include dependency graph for error\+\_\+codes\+\_\+pp.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sysio_2vm_2error__codes__pp_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=254pt]{sysio_2vm_2error__codes__pp_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{sysio_2vm_2error__codes__pp_8hpp_a56e22cee4ff1d9163283ce5e5c136eea}{ERROR\+\_\+\+CODE\+\_\+\+NAMESPACE}}~std
+\item 
+\#define \mbox{\hyperlink{sysio_2vm_2error__codes__pp_8hpp_a9be9b68291ea7bfdc733be74fdf0f8b4}{TRUE\+\_\+\+TYPE}}~std\+::true\+\_\+type
+\item 
+\#define \mbox{\hyperlink{sysio_2vm_2error__codes__pp_8hpp_afcbda698ff3f4fdeef94259bb874391d}{GENERATE\+\_\+\+ERROR\+\_\+\+CATEGORY}}(CATEGORY,  \mbox{\hyperlink{pointertest_8cpp_a59c7737920212dcb3bb9df58d7062de4}{NAME}})
+\item 
+\#define \mbox{\hyperlink{sysio_2vm_2error__codes__pp_8hpp_a7072c93d91df3dcc3b62fbd4b108140e}{GENERATE\+\_\+\+ENUM\+\_\+\+ELEM}}(PARENT,  ITEM)
+\item 
+\#define \mbox{\hyperlink{sysio_2vm_2error__codes__pp_8hpp_a21d1a32d5976c920d87706eddda6cfbf}{GENERATE\+\_\+\+STR\+\_\+\+ELEM}}(PARENT,  ITEM)
+\item 
+\#define \mbox{\hyperlink{sysio_2vm_2error__codes__pp_8hpp_af8e3cbca66a3975aa80c57ec63cdce71}{CREATE\+\_\+\+ERROR\+\_\+\+CODES}}(CATEGORY,  ERRORS)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{sysio_2vm_2error__codes__pp_8hpp_ac452861493b06cf0431eab6526e0d689}{error\+\_\+category\+\_\+t}} = std\+::error\+\_\+category
+\item 
+using \mbox{\hyperlink{sysio_2vm_2error__codes__pp_8hpp_a259aaf33b8f659cae1cf15f593932e2c}{error\+\_\+code\+\_\+t}} = std\+::error\+\_\+code
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{sysio_2vm_2error__codes__pp_8hpp_af8e3cbca66a3975aa80c57ec63cdce71}\index{error\_codes\_pp.hpp@{error\_codes\_pp.hpp}!CREATE\_ERROR\_CODES@{CREATE\_ERROR\_CODES}}
+\index{CREATE\_ERROR\_CODES@{CREATE\_ERROR\_CODES}!error\_codes\_pp.hpp@{error\_codes\_pp.hpp}}
+\doxysubsubsection{\texorpdfstring{CREATE\_ERROR\_CODES}{CREATE\_ERROR\_CODES}}
+{\footnotesize\ttfamily \label{sysio_2vm_2error__codes__pp_8hpp_af8e3cbca66a3975aa80c57ec63cdce71} 
+\#define CREATE\+\_\+\+ERROR\+\_\+\+CODES(\begin{DoxyParamCaption}\item[{}]{CATEGORY}{, }\item[{}]{ERRORS}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{\ \textcolor{keyword}{namespace\ }vm\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \textcolor{keyword}{enum\ class}\ CATEGORY\ \{\ ERRORS(\mbox{\hyperlink{sysio_2vm_2error__codes__pp_8hpp_a7072c93d91df3dcc3b62fbd4b108140e}{GENERATE\_ENUM\_ELEM}})\ \};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{sysio_2vm_2error__codes__pp_8hpp_a56e22cee4ff1d9163283ce5e5c136eea}{ERROR\_CODE\_NAMESPACE}}\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keyword}{template}\ <>\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keyword}{struct\ }is\_error\_code\_enum<\mbox{\hyperlink{namespacesysio}{sysio}}::vm::CATEGORY>\ :\ \mbox{\hyperlink{sysio_2vm_2error__codes__pp_8hpp_a9be9b68291ea7bfdc733be74fdf0f8b4}{TRUE\_TYPE}}\ \{\};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{\ \textcolor{keyword}{namespace\ }vm\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \textcolor{keyword}{inline}\ std::string\ CATEGORY\#\#\_category::message(\textcolor{keywordtype}{int}\ ev)\textcolor{keyword}{\ const\ }\{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ switch\ (\textcolor{keyword}{static\_cast<}CATEGORY\textcolor{keyword}{>}(ev))\ \{\ ERRORS(\mbox{\hyperlink{sysio_2vm_2error__codes__pp_8hpp_a21d1a32d5976c920d87706eddda6cfbf}{GENERATE\_STR\_ELEM}})\ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}"{}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \textcolor{keyword}{inline}\ \mbox{\hyperlink{sysio_2vm_2error__codes__pp_8hpp_a259aaf33b8f659cae1cf15f593932e2c}{error\_code\_t}}\ make\_error\_code(CATEGORY\ e)\ \textcolor{keyword}{noexcept}\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(e),\ \_\_\#\#CATEGORY\#\#\_category\ \};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2error__codes__pp_8hpp_source_l00044}{44}} of file \mbox{\hyperlink{sysio_2vm_2error__codes__pp_8hpp_source}{error\+\_\+codes\+\_\+pp.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00044\ \textcolor{preprocessor}{\#define\ CREATE\_ERROR\_CODES(CATEGORY,\ ERRORS)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00045\ \textcolor{preprocessor}{\ \ \ namespace\ sysio\ \{\ namespace\ vm\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00046\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ enum\ class\ CATEGORY\ \{\ ERRORS(GENERATE\_ENUM\_ELEM)\ \};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00047\ \textcolor{preprocessor}{\ \ \ \ \ \ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00048\ \textcolor{preprocessor}{\ \ \ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00049\ \textcolor{preprocessor}{\ \ \ namespace\ ERROR\_CODE\_NAMESPACE\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00050\ \textcolor{preprocessor}{\ \ \ \ \ \ template\ <>\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00051\ \textcolor{preprocessor}{\ \ \ \ \ \ struct\ is\_error\_code\_enum<sysio::vm::CATEGORY>\ :\ TRUE\_TYPE\ \{\};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00052\ \textcolor{preprocessor}{\ \ \ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00053\ \textcolor{preprocessor}{\ \ \ namespace\ sysio\ \{\ namespace\ vm\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00054\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ inline\ std::string\ CATEGORY\#\#\_category::message(int\ ev)\ const\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00055\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ switch\ (static\_cast<CATEGORY>(ev))\ \{\ ERRORS(GENERATE\_STR\_ELEM)\ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00056\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ return\ "{}"{};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00057\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00058\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ inline\ error\_code\_t\ make\_error\_code(CATEGORY\ e)\ noexcept\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00059\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ return\ \{\ static\_cast<int>(e),\ \_\_\#\#CATEGORY\#\#\_category\ \};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00060\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00061\ \textcolor{preprocessor}{\ \ \ \ \ \ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00062\ \textcolor{preprocessor}{\ \ \ \}}}
+
+\end{DoxyCode}
+\Hypertarget{sysio_2vm_2error__codes__pp_8hpp_a56e22cee4ff1d9163283ce5e5c136eea}\index{error\_codes\_pp.hpp@{error\_codes\_pp.hpp}!ERROR\_CODE\_NAMESPACE@{ERROR\_CODE\_NAMESPACE}}
+\index{ERROR\_CODE\_NAMESPACE@{ERROR\_CODE\_NAMESPACE}!error\_codes\_pp.hpp@{error\_codes\_pp.hpp}}
+\doxysubsubsection{\texorpdfstring{ERROR\_CODE\_NAMESPACE}{ERROR\_CODE\_NAMESPACE}}
+{\footnotesize\ttfamily \label{sysio_2vm_2error__codes__pp_8hpp_a56e22cee4ff1d9163283ce5e5c136eea} 
+\#define ERROR\+\_\+\+CODE\+\_\+\+NAMESPACE~std}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2error__codes__pp_8hpp_source_l00019}{19}} of file \mbox{\hyperlink{sysio_2vm_2error__codes__pp_8hpp_source}{error\+\_\+codes\+\_\+pp.\+hpp}}.
+
+\Hypertarget{sysio_2vm_2error__codes__pp_8hpp_a7072c93d91df3dcc3b62fbd4b108140e}\index{error\_codes\_pp.hpp@{error\_codes\_pp.hpp}!GENERATE\_ENUM\_ELEM@{GENERATE\_ENUM\_ELEM}}
+\index{GENERATE\_ENUM\_ELEM@{GENERATE\_ENUM\_ELEM}!error\_codes\_pp.hpp@{error\_codes\_pp.hpp}}
+\doxysubsubsection{\texorpdfstring{GENERATE\_ENUM\_ELEM}{GENERATE\_ENUM\_ELEM}}
+{\footnotesize\ttfamily \label{sysio_2vm_2error__codes__pp_8hpp_a7072c93d91df3dcc3b62fbd4b108140e} 
+\#define GENERATE\+\_\+\+ENUM\+\_\+\+ELEM(\begin{DoxyParamCaption}\item[{}]{PARENT}{, }\item[{}]{ITEM}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{ITEM,}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2error__codes__pp_8hpp_source_l00038}{38}} of file \mbox{\hyperlink{sysio_2vm_2error__codes__pp_8hpp_source}{error\+\_\+codes\+\_\+pp.\+hpp}}.
+
+\Hypertarget{sysio_2vm_2error__codes__pp_8hpp_afcbda698ff3f4fdeef94259bb874391d}\index{error\_codes\_pp.hpp@{error\_codes\_pp.hpp}!GENERATE\_ERROR\_CATEGORY@{GENERATE\_ERROR\_CATEGORY}}
+\index{GENERATE\_ERROR\_CATEGORY@{GENERATE\_ERROR\_CATEGORY}!error\_codes\_pp.hpp@{error\_codes\_pp.hpp}}
+\doxysubsubsection{\texorpdfstring{GENERATE\_ERROR\_CATEGORY}{GENERATE\_ERROR\_CATEGORY}}
+{\footnotesize\ttfamily \label{sysio_2vm_2error__codes__pp_8hpp_afcbda698ff3f4fdeef94259bb874391d} 
+\#define GENERATE\+\_\+\+ERROR\+\_\+\+CATEGORY(\begin{DoxyParamCaption}\item[{}]{CATEGORY}{, }\item[{}]{\mbox{\hyperlink{pointertest_8cpp_a59c7737920212dcb3bb9df58d7062de4}{NAME}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{\ \textcolor{keyword}{namespace\ }vm\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \textcolor{keyword}{struct\ }CATEGORY\#\#\_category\ :\ \mbox{\hyperlink{sysio_2vm_2error__codes__pp_8hpp_ac452861493b06cf0431eab6526e0d689}{error\_category\_t}}\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}()\ const\ noexcept\textcolor{keyword}{\ override\ }\{\ \textcolor{keywordflow}{return}\ \#\mbox{\hyperlink{pointertest_8cpp_a59c7737920212dcb3bb9df58d7062de4}{NAME}};\ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ std::string\ message(\textcolor{keywordtype}{int}\ ev)\ \textcolor{keyword}{const\ override};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ CATEGORY\#\#\_category\ \_\_\#\#CATEGORY\#\#\_category\{\};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{inline}\ \textcolor{keyword}{constexpr}\ \textcolor{keyword}{auto}\ is\_a(\textcolor{keyword}{const}\ \mbox{\hyperlink{sysio_2vm_2error__codes__pp_8hpp_a259aaf33b8f659cae1cf15f593932e2c}{error\_code\_t}}\&\ ec)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>\ std::enable\_if\_t<std::is\_same\_v<T,\ CATEGORY\#\#\_category>,\ \textcolor{keywordtype}{bool}>\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ec.category()\ ==\ \_\_\#\#CATEGORY\#\#\_category;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2error__codes__pp_8hpp_source_l00023}{23}} of file \mbox{\hyperlink{sysio_2vm_2error__codes__pp_8hpp_source}{error\+\_\+codes\+\_\+pp.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#define\ GENERATE\_ERROR\_CATEGORY(CATEGORY,\ NAME)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\ \ \ namespace\ sysio\ \{\ namespace\ vm\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00025\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ struct\ CATEGORY\#\#\_category\ :\ error\_category\_t\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00026\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ const\ char*\ name()\ const\ noexcept\ override\ \{\ return\ \#NAME;\ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00027\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ std::string\ message(int\ ev)\ const\ override;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00028\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00029\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ const\ CATEGORY\#\#\_category\ \_\_\#\#CATEGORY\#\#\_category\{\};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00030\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ template\ <typename\ T>\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00031\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ static\ inline\ constexpr\ auto\ is\_a(const\ error\_code\_t\&\ ec)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00032\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>\ std::enable\_if\_t<std::is\_same\_v<T,\ CATEGORY\#\#\_category>,\ bool>\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00033\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ return\ ec.category()\ ==\ \_\_\#\#CATEGORY\#\#\_category;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00034\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00035\ \textcolor{preprocessor}{\ \ \ \ \ \ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00036\ \textcolor{preprocessor}{\ \ \ \}}}
+
+\end{DoxyCode}
+\Hypertarget{sysio_2vm_2error__codes__pp_8hpp_a21d1a32d5976c920d87706eddda6cfbf}\index{error\_codes\_pp.hpp@{error\_codes\_pp.hpp}!GENERATE\_STR\_ELEM@{GENERATE\_STR\_ELEM}}
+\index{GENERATE\_STR\_ELEM@{GENERATE\_STR\_ELEM}!error\_codes\_pp.hpp@{error\_codes\_pp.hpp}}
+\doxysubsubsection{\texorpdfstring{GENERATE\_STR\_ELEM}{GENERATE\_STR\_ELEM}}
+{\footnotesize\ttfamily \label{sysio_2vm_2error__codes__pp_8hpp_a21d1a32d5976c920d87706eddda6cfbf} 
+\#define GENERATE\+\_\+\+STR\+\_\+\+ELEM(\begin{DoxyParamCaption}\item[{}]{PARENT}{, }\item[{}]{ITEM}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \textcolor{keywordflow}{case}\ PARENT::ITEM:\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keywordflow}{return}\ \#ITEM;}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2error__codes__pp_8hpp_source_l00040}{40}} of file \mbox{\hyperlink{sysio_2vm_2error__codes__pp_8hpp_source}{error\+\_\+codes\+\_\+pp.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00040\ \textcolor{preprocessor}{\#define\ GENERATE\_STR\_ELEM(PARENT,\ ITEM)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00041\ \textcolor{preprocessor}{\ \ \ case\ PARENT::ITEM:\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00042\ \textcolor{preprocessor}{\ \ \ \ \ \ return\ \#ITEM;}}
+
+\end{DoxyCode}
+\Hypertarget{sysio_2vm_2error__codes__pp_8hpp_a9be9b68291ea7bfdc733be74fdf0f8b4}\index{error\_codes\_pp.hpp@{error\_codes\_pp.hpp}!TRUE\_TYPE@{TRUE\_TYPE}}
+\index{TRUE\_TYPE@{TRUE\_TYPE}!error\_codes\_pp.hpp@{error\_codes\_pp.hpp}}
+\doxysubsubsection{\texorpdfstring{TRUE\_TYPE}{TRUE\_TYPE}}
+{\footnotesize\ttfamily \label{sysio_2vm_2error__codes__pp_8hpp_a9be9b68291ea7bfdc733be74fdf0f8b4} 
+\#define TRUE\+\_\+\+TYPE~std\+::true\+\_\+type}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2error__codes__pp_8hpp_source_l00020}{20}} of file \mbox{\hyperlink{sysio_2vm_2error__codes__pp_8hpp_source}{error\+\_\+codes\+\_\+pp.\+hpp}}.
+
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{sysio_2vm_2error__codes__pp_8hpp_ac452861493b06cf0431eab6526e0d689}\index{error\_codes\_pp.hpp@{error\_codes\_pp.hpp}!error\_category\_t@{error\_category\_t}}
+\index{error\_category\_t@{error\_category\_t}!error\_codes\_pp.hpp@{error\_codes\_pp.hpp}}
+\doxysubsubsection{\texorpdfstring{error\_category\_t}{error\_category\_t}}
+{\footnotesize\ttfamily \label{sysio_2vm_2error__codes__pp_8hpp_ac452861493b06cf0431eab6526e0d689} 
+typedef std\+::error\+\_\+category \mbox{\hyperlink{sysio_2vm_2error__codes__pp_8hpp_ac452861493b06cf0431eab6526e0d689}{error\+\_\+category\+\_\+t}} = std\+::error\+\_\+category}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2error__codes__pp_8hpp_source_l00017}{17}} of file \mbox{\hyperlink{sysio_2vm_2error__codes__pp_8hpp_source}{error\+\_\+codes\+\_\+pp.\+hpp}}.
+
+\Hypertarget{sysio_2vm_2error__codes__pp_8hpp_a259aaf33b8f659cae1cf15f593932e2c}\index{error\_codes\_pp.hpp@{error\_codes\_pp.hpp}!error\_code\_t@{error\_code\_t}}
+\index{error\_code\_t@{error\_code\_t}!error\_codes\_pp.hpp@{error\_codes\_pp.hpp}}
+\doxysubsubsection{\texorpdfstring{error\_code\_t}{error\_code\_t}}
+{\footnotesize\ttfamily \label{sysio_2vm_2error__codes__pp_8hpp_a259aaf33b8f659cae1cf15f593932e2c} 
+typedef std\+::error\+\_\+code \mbox{\hyperlink{sysio_2vm_2error__codes__pp_8hpp_a259aaf33b8f659cae1cf15f593932e2c}{error\+\_\+code\+\_\+t}} = std\+::error\+\_\+code}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2error__codes__pp_8hpp_source_l00018}{18}} of file \mbox{\hyperlink{sysio_2vm_2error__codes__pp_8hpp_source}{error\+\_\+codes\+\_\+pp.\+hpp}}.
+
